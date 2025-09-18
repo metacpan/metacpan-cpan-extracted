@@ -1,0 +1,153 @@
+#!/usr/bin/env perl
+
+##############################################################################
+## GitKtti Tests - Modern version
+##############################################################################
+
+use strict;
+use warnings;
+use File::Basename;
+use Getopt::Long;
+use FindBin qw($RealBin);
+use lib "$RealBin/../lib";
+use App::GitKtti;
+
+App::GitKtti::showVersion();
+
+my $arg_help = "";
+my $arg_verbose = "";
+
+GetOptions ('help' => \$arg_help, 'verbose' => \$arg_verbose);
+
+if ( $arg_help ) {
+  App::GitKtti::printSection("HELP - GitKtti Tests");
+  print(App::GitKtti::BRIGHT_WHITE . "Usage:" . App::GitKtti::RESET . "\n");
+  print("   gitktti-tests [--help] [--verbose]\n\n");
+
+  App::GitKtti::printSubSection("Description");
+  print("This script runs diagnostic tests on your git repository and GitKtti setup.\n\n");
+
+  App::GitKtti::printSubSection("Examples");
+  App::GitKtti::printCommand("gitktti-tests");
+  App::GitKtti::printCommand("gitktti-tests --verbose");
+  exit(0);
+}
+
+my $ret = 99;
+my $tests_passed = 0;
+my $tests_failed = 0;
+
+sub run_test {
+  my ($test_name, $test_func) = @_;
+  
+  if ($arg_verbose) {
+    App::GitKtti::printSubSection("Testing: $test_name");
+  }
+  
+  if ($test_func->()) {
+    App::GitKtti::printSuccess("✓ $test_name");
+    $tests_passed++;
+  } else {
+    App::GitKtti::printError("✗ $test_name");
+    $tests_failed++;
+  }
+}
+
+App::GitKtti::printSection("GitKtti Diagnostic Tests");
+
+# Test 1: Check if we're in a git repository
+run_test("Git repository check", sub {
+  my $git_dir = App::GitKtti::git_getGitRootDirectory();
+  return $git_dir ne "";
+});
+
+# Test 2: Check for master/main branch
+run_test("Master/Main branch check", sub {
+  my @master_branches = App::GitKtti::git_getLocalBranchesFilter('^(master|main)$', \$ret);
+  return @master_branches > 0;
+});
+
+# Test 3: Check for develop branch
+run_test("Develop branch check", sub {
+  my @develop_branches = App::GitKtti::git_getLocalBranchesFilter('^(dev|develop)$', \$ret);
+  if (@develop_branches > 0) {
+    return 1;
+  } else {
+    App::GitKtti::printWarning("  No develop branch found (optional but recommended for git-flow)");
+    return 1; # Not a failure, just a warning
+  }
+});
+
+# Test 4: Check current branch
+run_test("Current branch check", sub {
+  my $current_branch = App::GitKtti::git_getCurrentBranch(\$ret);
+  if ($ret == 0 && $current_branch ne "") {
+    if ($arg_verbose) {
+      App::GitKtti::printInfo("  Current branch: $current_branch");
+    }
+    return 1;
+  }
+  return 0;
+});
+
+# Test 5: Check remote configuration
+run_test("Remote configuration check", sub {
+  my %tracked_branch = App::GitKtti::git_getTrackedRemoteBranch(\$ret);
+  if ($tracked_branch{"remote"} ne "" && $tracked_branch{"branch"} ne "") {
+    if ($arg_verbose) {
+      App::GitKtti::printInfo("  Remote: " . $tracked_branch{"remote"} . "/" . $tracked_branch{"branch"});
+    }
+    return 1;
+  } else {
+    App::GitKtti::printWarning("  No remote tracking branch (not required but recommended)");
+    return 1; # Not a failure, just a warning
+  }
+});
+
+# Test 6: Check repository cleanliness
+run_test("Repository clean check", sub {
+  my $is_clean = App::GitKtti::git_isRepoClean();
+  if (!$is_clean && $arg_verbose) {
+    App::GitKtti::printWarning("  Repository has uncommitted changes");
+  }
+  return 1; # Always pass, just informational
+});
+
+# Test 7: Check for existing tags
+run_test("Tags check", sub {
+  my $last_tag = App::GitKtti::git_getLastTagFromAllBranches(\$ret);
+  if ($last_tag ne "") {
+    if ($arg_verbose) {
+      App::GitKtti::printInfo("  Latest tag: $last_tag");
+    }
+  } else {
+    if ($arg_verbose) {
+      App::GitKtti::printInfo("  No tags found");
+    }
+  }
+  return 1; # Always pass, just informational
+});
+
+# Test 8: Check GitKtti module version
+run_test("GitKtti version check", sub {
+  if ($arg_verbose) {
+    App::GitKtti::printInfo("  GitKtti version: " . $App::GitKtti::VERSION);
+  }
+  return 1;
+});
+
+# Summary
+App::GitKtti::printSection("Test Results Summary");
+
+my $total_tests = $tests_passed + $tests_failed;
+App::GitKtti::printInfo("Total tests run: $total_tests");
+App::GitKtti::printSuccess("Tests passed: $tests_passed");
+
+if ($tests_failed > 0) {
+  App::GitKtti::printError("Tests failed: $tests_failed");
+  App::GitKtti::printWarning("Some issues were found. Please review the failed tests above.");
+  exit(1);
+} else {
+  App::GitKtti::printSuccess("All tests passed! GitKtti is ready to use.");
+  exit(0);
+}

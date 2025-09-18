@@ -1,0 +1,7 @@
+Revision history for Perl extension KeePass.
+
+0.2 2021-07-23
+  - remove Data::UUID dependency
+
+0.1 2021-06-17
+  - initial version

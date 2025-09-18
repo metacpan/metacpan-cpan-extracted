@@ -29,7 +29,7 @@ $output = `$perl ./bufrresolve.pl --code 020022 --tablepath t/bt -b $bt`;
 $expected = read_file( 't/codetable.txt' ) ;
 is($output, $expected, 'testing bufrresolve.pl -c on code table');
 
-$output = `$perl ./bufrresolve.pl --code 008042 --flag 145408 --tablepath t/bt -b $bt`;
+$output = `$perl ./bufrresolve.pl --code 020021 --flag 573440 --tablepath t/bt -b $bt`;
 $expected = read_file( 't/flag.txt' ) ;
 is($output, $expected, 'testing bufrresolve.pl -c -f on flag table');
 

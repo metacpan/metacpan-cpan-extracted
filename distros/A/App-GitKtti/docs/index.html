@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitKtti™ - Git Flow Made Simple</title>
+    <meta name="description" content="GitKtti™ is a powerful collection of Perl scripts designed to simplify Git Flow workflow for developers">
+    <link rel="icon" type="image/png" href="assets/gitktti_logo.png">
+    <link rel="apple-touch-icon" href="assets/gitktti_logo.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+
+        @keyframes glow {
+            0% { box-shadow: 0 0 20px rgba(102, 126, 234, 0.4); }
+            50% { box-shadow: 0 0 30px rgba(102, 126, 234, 0.8); }
+            100% { box-shadow: 0 0 20px rgba(102, 126, 234, 0.4); }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes starfield {
+            0% { transform: translateY(0) rotate(0deg); }
+            100% { transform: translateY(-100vh) rotate(360deg); }
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #e0e0e0;
+            background: #0a0a0a;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse at 25% 50%, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 75% 50%, rgba(118, 75, 162, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 25%, rgba(255, 107, 107, 0.05) 0%, transparent 50%);
+            z-index: -2;
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            animation: starfield 20s linear infinite;
+        }
+
+        .star:nth-child(odd) {
+            animation-duration: 25s;
+            opacity: 0.5;
+        }
+
+        .star:nth-child(3n) {
+            animation-duration: 15s;
+            opacity: 0.8;
+        }
+
+        .shooting-star {
+            position: absolute;
+            width: 12px;
+            height: 4px;
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 50%, rgba(255, 255, 255, 0) 100%);
+            border-radius: 50%;
+            opacity: 0;
+            animation: shootingStar 4s linear infinite;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+        }
+
+        .shooting-star::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: -30px;
+            width: 30px;
+            height: 1px;
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.6) 100%);
+            transform: translateY(-50%);
+        }
+
+        .shooting-star:nth-child(even) {
+            animation-delay: -2s;
+            animation-duration: 5s;
+        }
+
+        .shooting-star:nth-child(3n) {
+            animation-delay: -3s;
+            animation-duration: 3.5s;
+        }
+
+        @keyframes shootingStar {
+            0% {
+                opacity: 0;
+                transform: translateX(-100px) translateY(50px);
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+                transform: translateX(calc(100vw + 100px)) translateY(-200px);
+            }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(20px);
+            padding: 1.5rem 0;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            animation: slideInLeft 1s ease-out;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .git-logo {
+            width: 50px;
+            height: 50px;
+            background: url('assets/gitktti_logo.png') center/contain no-repeat;
+            filter: drop-shadow(0 0 15px rgba(240, 101, 67, 0.5));
+            transition: all 0.3s ease;
+        }
+
+        .git-logo:hover {
+            transform: scale(1.1) rotate(5deg);
+            filter: drop-shadow(0 0 25px rgba(240, 101, 67, 0.8));
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #667eea;
+            text-decoration: none;
+            text-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+            text-shadow: 0 0 30px rgba(102, 126, 234, 0.8);
+        }
+
+        .hero {
+            text-align: center;
+            padding: 8rem 0;
+            color: white;
+            position: relative;
+            animation: fadeInUp 1.5s ease-out;
+        }
+
+        .hero-logo {
+            width: 150px;
+            height: 150px;
+            background: url('assets/gitktti_logo.png') center/contain no-repeat;
+            margin: 0 auto 2rem;
+            filter: drop-shadow(0 0 30px rgba(240, 101, 67, 0.6));
+            animation: float 4s ease-in-out infinite;
+        }
+        .hero h1 {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 40px rgba(102, 126, 234, 0.6);
+            background: linear-gradient(45deg, #667eea, #764ba2, #ff6b6b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: float 6s ease-in-out infinite;
+            font-weight: 900;
+            letter-spacing: -2px;
+        }
+
+        .hero .subtitle {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            color: #667eea;
+            text-shadow: 0 0 20px rgba(102, 126, 234, 0.4);
+            animation: slideInLeft 1.5s ease-out 0.5s both;
+        }
+
+        .hero .tagline {
+            font-size: 1.4rem;
+            margin-bottom: 4rem;
+            opacity: 0.8;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            animation: slideInRight 1.5s ease-out 1s both;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.2rem;
+            transition: all 0.4s ease;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+            animation: glow 3s ease-in-out infinite;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .cta-button:hover::before {
+            left: 100%;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.6);
+            border-color: rgba(102, 126, 234, 0.5);
+        }
+
+        .main-content {
+            background: rgba(20, 20, 20, 0.8);
+            margin: 2rem 0;
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .features {
+            padding: 6rem 2rem;
+            position: relative;
+        }
+
+        .features h2 {
+            text-align: center;
+            font-size: 3.5rem;
+            margin-bottom: 4rem;
+            color: #e0e0e0;
+            text-shadow: 0 0 30px rgba(102, 126, 234, 0.5);
+            font-weight: 800;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 3rem;
+            margin-bottom: 4rem;
+        }
+
+        .feature-card {
+            background: rgba(30, 30, 30, 0.8);
+            padding: 3rem;
+            border-radius: 25px;
+            text-align: center;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: 0 30px 60px rgba(102, 126, 234, 0.3);
+            border-color: rgba(102, 126, 234, 0.6);
+        }
+
+        .feature-icon {
+            font-size: 4rem;
+            margin-bottom: 2rem;
+            display: block;
+            filter: drop-shadow(0 0 20px rgba(102, 126, 234, 0.5));
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .feature-card:nth-child(even) .feature-icon {
+            animation-delay: -2s;
+        }
+
+        .feature-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: #e0e0e0;
+            position: relative;
+            z-index: 1;
+            font-weight: 700;
+        }
+
+        .feature-card p {
+            color: #b0b0b0;
+            line-height: 1.8;
+            position: relative;
+            z-index: 1;
+            font-size: 1.1rem;
+        }
+
+        .aliases-section {
+            background: rgba(15, 15, 15, 0.9);
+            padding: 6rem 2rem;
+            border-top: 1px solid rgba(102, 126, 234, 0.3);
+            border-bottom: 1px solid rgba(102, 126, 234, 0.3);
+        }
+
+        .aliases-section h2 {
+            text-align: center;
+            font-size: 3.5rem;
+            margin-bottom: 4rem;
+            color: #e0e0e0;
+            text-shadow: 0 0 30px rgba(255, 107, 107, 0.5);
+            font-weight: 800;
+        }
+
+        .aliases-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .alias-item {
+            background: rgba(30, 30, 30, 0.8);
+            padding: 2rem;
+            border-radius: 20px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .alias-item:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.2);
+            border-color: rgba(102, 126, 234, 0.5);
+        }
+
+        .alias-item code {
+            font-family: 'Monaco', 'Menlo', monospace;
+            background: rgba(102, 126, 234, 0.2);
+            padding: 0.8rem 1.2rem;
+            border-radius: 10px;
+            font-weight: bold;
+            color: #667eea;
+            font-size: 1.2rem;
+            text-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
+        }
+
+        .alias-item p {
+            margin-top: 1rem;
+            color: #b0b0b0;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .installation {
+            padding: 6rem 2rem;
+            text-align: center;
+        }
+
+        .installation h2 {
+            font-size: 3.5rem;
+            margin-bottom: 3rem;
+            color: #e0e0e0;
+            text-shadow: 0 0 30px rgba(118, 75, 162, 0.5);
+            font-weight: 800;
+        }
+
+        .installation p {
+            font-size: 1.3rem;
+            color: #b0b0b0;
+            margin-bottom: 3rem;
+        }
+
+        .code-block {
+            background: rgba(10, 10, 10, 0.9);
+            color: #e2e8f0;
+            padding: 3rem;
+            border-radius: 20px;
+            margin: 3rem auto;
+            max-width: 800px;
+            text-align: left;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 1rem;
+            line-height: 1.6;
+            overflow-x: auto;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            position: relative;
+            white-space: pre-line;
+        }
+
+        .code-block::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2, #ff6b6b);
+            border-radius: 20px 20px 0 0;
+        }
+
+        /* Syntax highlighting colors */
+        .code-block .comment {
+            color: #6a9955;
+            font-style: italic;
+        }
+
+        .code-block .prompt {
+            color: #569cd6;
+            font-weight: bold;
+        }
+
+        .code-block .command {
+            color: #dcdcaa;
+            font-weight: bold;
+        }
+
+        .code-block .url {
+            color: #4fc1ff;
+            text-decoration: underline;
+        }
+
+        .code-block .variable {
+            color: #9cdcfe;
+        }
+
+        .code-block .path {
+            color: #ce9178;
+        }
+
+        .code-block .alias {
+            color: #c586c0;
+            font-weight: bold;
+        }
+
+        .code-block .string {
+            color: #ce9178;
+        }
+
+        .workflow-section {
+            background: rgba(15, 15, 15, 0.9);
+            padding: 6rem 2rem;
+            border-top: 1px solid rgba(102, 126, 234, 0.3);
+        }
+
+        .workflow-section h2 {
+            text-align: center;
+            font-size: 3.5rem;
+            margin-bottom: 4rem;
+            color: #e0e0e0;
+            text-shadow: 0 0 30px rgba(255, 107, 107, 0.5);
+            font-weight: 800;
+        }
+
+        .workflow-steps {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .workflow-step {
+            background: rgba(30, 30, 30, 0.8);
+            margin: 2rem 0;
+            padding: 3rem;
+            border-radius: 25px;
+            border-left: 5px solid #667eea;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .workflow-step:hover {
+            transform: translateX(10px);
+            box-shadow: 0 20px 50px rgba(102, 126, 234, 0.2);
+            border-color: rgba(102, 126, 234, 0.5);
+        }
+
+        .workflow-step h3 {
+            font-size: 1.6rem;
+            margin-bottom: 1.5rem;
+            color: #e0e0e0;
+            font-weight: 700;
+        }
+
+        .workflow-step p {
+            color: #b0b0b0;
+            line-height: 1.8;
+            font-size: 1.1rem;
+        }
+
+        .workflow-step code {
+            background: rgba(102, 126, 234, 0.2);
+            padding: 0.6rem 1rem;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            color: #667eea;
+            font-size: 1rem;
+            text-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
+        }
+
+        footer {
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            text-align: center;
+            padding: 3rem 0;
+            margin-top: 2rem;
+            border-top: 1px solid rgba(102, 126, 234, 0.3);
+            backdrop-filter: blur(20px);
+        }
+
+        footer p {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links {
+            margin-top: 2rem;
+        }
+
+        .footer-links a {
+            color: #667eea;
+            text-decoration: none;
+            margin: 0 1.5rem;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 1.1rem;
+        }
+
+        .footer-links a:hover {
+            color: #ff6b6b;
+            text-shadow: 0 0 15px rgba(255, 107, 107, 0.5);
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 3rem;
+            }
+
+            .hero .subtitle {
+                font-size: 1.5rem;
+            }
+
+            .hero .tagline {
+                font-size: 1.1rem;
+                padding: 0 1rem;
+            }
+
+            .features h2,
+            .aliases-section h2,
+            .installation h2,
+            .workflow-section h2 {
+                font-size: 2.5rem;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .feature-card {
+                padding: 2rem;
+            }
+
+            .aliases-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .workflow-step {
+                padding: 2rem;
+                margin: 1rem 0;
+            }
+
+            .code-block {
+                padding: 2rem;
+                font-size: 0.9rem;
+            }
+
+            .container {
+                padding: 0 15px;
+            }
+
+            .hero {
+                padding: 6rem 0;
+            }
+
+            .features,
+            .aliases-section,
+            .installation,
+            .workflow-section {
+                padding: 4rem 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero .subtitle {
+                font-size: 1.3rem;
+            }
+
+            .logo {
+                font-size: 2rem;
+            }
+
+            .features h2,
+            .aliases-section h2,
+            .installation h2,
+            .workflow-section h2 {
+                font-size: 2rem;
+            }
+
+            .cta-button {
+                padding: 15px 30px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars"></div>
+    
+    <script>
+        // Generate stars
+        function createStars() {
+            const starsContainer = document.querySelector('.stars');
+            const numberOfStars = 100;
+            const numberOfShootingStars = 3;
+
+            // Create regular stars
+            for (let i = 0; i < numberOfStars; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 20 + 's';
+                starsContainer.appendChild(star);
+            }
+
+            // Create shooting stars
+            for (let i = 0; i < numberOfShootingStars; i++) {
+                const shootingStar = document.createElement('div');
+                shootingStar.className = 'shooting-star';
+                
+                // Position de départ aléatoire
+                const startY = Math.random() * 50 + 40; // Entre 40% et 90% de la hauteur
+                shootingStar.style.top = startY + '%';
+                shootingStar.style.left = '-50px';
+                
+                // Trajectoire aléatoire pour chaque étoile
+                const randomStartY = Math.random() * 100 - 50; // Entre -50px et +50px de variation
+                const randomEndY = Math.random() * 300 - 150; // Entre -150px et +150px de variation finale
+                
+                // Créer une animation CSS personnalisée pour cette étoile
+                const animationName = `shootingStar${i}`;
+                const keyframes = `
+                    @keyframes ${animationName} {
+                        0% {
+                            opacity: 0;
+                            transform: translateX(-100px) translateY(${randomStartY}px);
+                        }
+                        10% {
+                            opacity: 1;
+                        }
+                        90% {
+                            opacity: 1;
+                        }
+                        100% {
+                            opacity: 0;
+                            transform: translateX(calc(100vw + 100px)) translateY(${-200 + randomEndY}px);
+                        }
+                    }
+                `;
+                
+                // Ajouter l'animation personnalisée au document
+                const style = document.createElement('style');
+                style.textContent = keyframes;
+                document.head.appendChild(style);
+                
+                // Appliquer l'animation personnalisée avec durée aléatoire
+                const duration = 3 + Math.random() * 3; // Entre 3 et 6 secondes
+                shootingStar.style.animation = `${animationName} ${duration}s linear infinite`;
+                shootingStar.style.animationDelay = Math.random() * 8 + 's';
+                
+                starsContainer.appendChild(shootingStar);
+            }
+        }
+
+        // Intersection Observer for animations
+        function setupScrollAnimations() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.animationPlayState = 'running';
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.feature-card, .alias-item, .workflow-step').forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(30px)';
+                el.style.transition = 'all 0.6s ease';
+                observer.observe(el);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            createStars();
+            setupScrollAnimations();
+        });
+    </script>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo-container">
+                    <div class="git-logo"></div>
+                    <a href="https://github.com/saumon/gitktti" class="logo">GitKtti™</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <div class="hero-logo"></div>
+            <h1>GitKtti™</h1>
+            <p class="subtitle">Git Flow Made Simple</p>
+            <p class="tagline">A modern CPAN-ready collection of tools designed to streamline your Git Flow workflow</p>
+            <a href="https://github.com/saumon/gitktti" class="cta-button">View on GitHub</a>
+        </div>
+    </section>
+
+    <div class="container">
+        <main class="main-content">
+            <section class="features">
+                <h2>Why GitKtti™?</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🌿</div>
+                        <h3>Git Flow Simplified</h3>
+                        <p>Automates complex Git Flow operations with simple, intuitive commands. Create feature branches, hotfixes, and releases effortlessly.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🛡️</div>
+                        <h3>Safe Operations</h3>
+                        <p>Built-in safeguards prevent accidental deletions of master/develop branches and ensure repository cleanliness before operations.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔧</div>
+                        <h3>Interactive Interface</h3>
+                        <p>Smart selectors and interactive prompts guide you through operations, making complex Git workflows accessible to everyone.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">⚡</div>
+                        <h3>CPAN Ready</h3>
+                        <p>Modern CPAN distribution with proper installation via <code>cpan App::GitKtti</code>. Optional aliases available for power users.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🎯</div>
+                        <h3>Branch Management</h3>
+                        <p>Comprehensive branch operations including creation, renaming, deletion, and smart checkout with remote tracking support.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🏷️</div>
+                        <h3>Professional Tools</h3>
+                        <p>Complete suite with <code>gitktti-tag</code>, <code>gitktti-tests</code>, and comprehensive help system for professional development workflows.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="aliases-section">
+                <h2>Quick Reference</h2>
+                <div class="aliases-grid">
+                    <div class="alias-item">
+                        <code>kfeat</code>
+                        <p>Create feature branch from develop</p>
+                    </div>
+                    <div class="alias-item">
+                        <code>kfix</code>
+                        <p>Create hotfix branch from master</p>
+                    </div>
+                    <div class="alias-item">
+                        <code>kreal</code>
+                        <p>Create release branch from develop</p>
+                    </div>
+                    <div class="alias-item">
+                        <code>kfixend</code>
+                        <p>Finalize and merge current branch</p>
+                    </div>
+                    <div class="alias-item">
+                        <code>kmove</code>
+                        <p>Rename branch locally and remotely</p>
+                    </div>
+                    <div class="alias-item">
+                        <code>kdel</code>
+                        <p>Delete branch safely with confirmation</p>
+                    </div>
+                    <div class="alias-item">
+                        <code>kco</code>
+                        <p>Smart branch checkout with Git flow awareness</p>
+                    </div>
+                    <div class="alias-item">
+                        <code>ktest</code>
+                        <p>Run diagnostic tests</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="modernization-section" style="background: rgba(15, 15, 15, 0.9); padding: 6rem 2rem; border-top: 1px solid rgba(102, 126, 234, 0.3); border-bottom: 1px solid rgba(102, 126, 234, 0.3);">
+                <h2 style="text-align: center; font-size: 3.5rem; margin-bottom: 4rem; color: #e0e0e0; text-shadow: 0 0 30px rgba(118, 75, 162, 0.5); font-weight: 800;">🚀 Version 2.0 - Modern Architecture</h2>
+                <div style="max-width: 1000px; margin: 0 auto;">
+                    <div style="background: rgba(30, 30, 30, 0.8); padding: 3rem; border-radius: 25px; border: 1px solid rgba(102, 126, 234, 0.3); backdrop-filter: blur(10px); margin-bottom: 3rem;">
+                        <h3 style="font-size: 1.8rem; margin-bottom: 2rem; color: #667eea; font-weight: 700;">What's New in 2.0?</h3>
+                        <ul style="color: #b0b0b0; line-height: 1.8; font-size: 1.1rem; list-style: none; padding: 0;">
+                            <li style="margin: 1rem 0; padding-left: 2rem; position: relative;">
+                                <span style="position: absolute; left: 0; color: #667eea;">✓</span>
+                                <strong>CPAN Distribution:</strong> Install with <code style="background: rgba(102, 126, 234, 0.2); padding: 0.4rem 0.8rem; border-radius: 6px; color: #667eea;">cpan App::GitKtti</code>
+                            </li>
+                            <li style="margin: 1rem 0; padding-left: 2rem; position: relative;">
+                                <span style="position: absolute; left: 0; color: #667eea;">✓</span>
+                                <strong>Modern Commands:</strong> <code style="background: rgba(102, 126, 234, 0.2); padding: 0.4rem 0.8rem; border-radius: 6px; color: #667eea;">gitktti-*</code> instead of <code style="background: rgba(102, 126, 234, 0.2); padding: 0.4rem 0.8rem; border-radius: 6px; color: #667eea;">perl gitktti_*.pl</code>
+                            </li>
+                            <li style="margin: 1rem 0; padding-left: 2rem; position: relative;">
+                                <span style="position: absolute; left: 0; color: #667eea;">✓</span>
+                                <strong>Better Documentation:</strong> Built-in help with <code style="background: rgba(102, 126, 234, 0.2); padding: 0.4rem 0.8rem; border-radius: 6px; color: #667eea;">--help</code> on every command
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="installation">
+                <h2>Getting Started</h2>
+                <p>Install GitKtti™ directly from CPAN or from source:</p>
+                <div class="code-block">
+<span class="comment"># Install from CPAN (Recommended)</span>
+<span class="prompt">$</span> <span class="command">cpan</span> <span class="variable">App::GitKtti</span>
+
+<span class="comment"># Or install from source</span>
+<span class="prompt">$</span> <span class="command">git clone</span> <span class="url">https://github.com/saumon/gitktti.git</span>
+<span class="prompt">$</span> <span class="command">cd</span> <span class="path">gitktti</span>
+<span class="prompt">$</span> <span class="command">./install.sh</span>
+
+<span class="comment"># Optional: Create convenient aliases</span>
+<span class="prompt">$</span> <span class="command">alias</span> <span class="alias">kfeat</span>=<span class="string">'gitktti-fix --mode feature'</span>
+<span class="prompt">$</span> <span class="command">alias</span> <span class="alias">kfix</span>=<span class="string">'gitktti-fix'</span>
+<span class="prompt">$</span> <span class="command">alias</span> <span class="alias">kreal</span>=<span class="string">'gitktti-fix --mode release'</span>
+<span class="prompt">$</span> <span class="command">alias</span> <span class="alias">kfixend</span>=<span class="string">'gitktti-fixend'</span>
+<span class="prompt">$</span> <span class="command">alias</span> <span class="alias">kmove</span>=<span class="string">'gitktti-move'</span>
+<span class="prompt">$</span> <span class="command">alias</span> <span class="alias">kdel</span>=<span class="string">'gitktti-delete'</span>
+<span class="prompt">$</span> <span class="command">alias</span> <span class="alias">kco</span>=<span class="string">'gitktti-checkout'</span>
+<span class="prompt">$</span> <span class="command">alias</span> <span class="alias">kprune</span>=<span class="string">'gitktti-fix --prune'</span>
+                </div>
+            </section>
+
+            <section class="workflow-section">
+                <h2>Typical Workflow</h2>
+                <div class="workflow-steps">
+                    <div class="workflow-step">
+                        <h3>1. Start a new feature</h3>
+                        <p>Create a new feature branch from develop: <code>kfeat --name user-authentication</code></p>
+                    </div>
+                    <div class="workflow-step">
+                        <h3>2. Work on your feature</h3>
+                        <p>Make your changes, commit as usual. GitKtti™ doesn't interfere with your development process.</p>
+                    </div>
+                    <div class="workflow-step">
+                        <h3>3. Finalize the feature</h3>
+                        <p>Merge back to develop and clean up: <code>kfixend</code></p>
+                    </div>
+                    <div class="workflow-step">
+                        <h3>4. Create a release</h3>
+                        <p>When ready for release: <code>kreal</code> to create a release branch</p>
+                    </div>
+                    <div class="workflow-step">
+                        <h3>5. Handle hotfixes</h3>
+                        <p>For urgent fixes: <code>kfix --name critical-security-patch</code></p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 GitKtti™ by saumon™. Made with ❤️ for developers who love clean Git workflows.</p>
+            <p style="margin-top: 1rem; color: #667eea; font-size: 1rem;">🚀 Now available on CPAN - Version 2.0.0</p>
+            <div class="footer-links">
+                <a href="https://github.com/saumon/gitktti">GitHub Repository</a>
+                <a href="https://github.com/saumon/gitktti/issues">Report Issues</a>
+                <a href="https://github.com/saumon/gitktti/blob/master/README.md">Documentation</a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

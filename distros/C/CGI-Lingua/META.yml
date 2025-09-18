@@ -3,17 +3,21 @@ abstract: 'Create a multilingual web page'
 author:
   - 'Nigel Horne <njh@nigelhorne.com>'
 build_requires:
+  CHI: '0'
   ExtUtils::MakeMaker: '0'
   File::Temp: '0'
   IPC::System::Simple: '0'
   LWP::Simple::WithCache: '0.04'
+  Log::Abstraction: '0'
   Test::Carp: '0'
   Test::Compile: '0'
   Test::DescribeMe: '0'
+  Test::Mockingbird: '0'
   Test::Most: '0'
   Test::Needs: '0'
   Test::NoWarnings: '0'
   Test::Requires: '0'
+  Test::RequiresInternet: '0'
   Test::Without::Module: '0'
   autodie: '0'
 configure_requires:
@@ -47,12 +51,12 @@ requires:
   Net::Whois::IANA: '0'
   Net::Whois::IP: '0'
   NetAddr::IP: '0'
-  Object::Configure: '0'
-  Params::Get: '0'
+  Object::Configure: '0.14'
+  Params::Get: '0.13'
   Sys::Syslog: '0'
   perl: '5.006002'
 resources:
-  bugtracker: https://github.com/nigelhorne/CGI-Lingua/issues
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=CGI-Lingua
   repository: git://github.com/nigelhorne/CGI-Lingua.git
-version: '0.75'
+version: '0.76'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

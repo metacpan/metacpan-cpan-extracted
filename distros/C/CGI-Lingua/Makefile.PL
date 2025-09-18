@@ -66,18 +66,22 @@ if(eval 'require IP::Country') {
 }
 
 my $test_requires = {
+	'autodie' => 0,
+	'CHI' => 0,
+	'IPC::System::Simple' => 0,
+	'Log::Abstraction' => 0,
 	'File::Temp' => 0,
 	'Test::Carp' => 0,
+	'Test::Compile' => 0,
 	'Test::DescribeMe' => 0,
+	'Test::Mockingbird' => 0,
 	'Test::Most' => 0,
 	'Test::Needs' => 0,
 	'Test::NoWarnings' => 0,
 	'Test::Requires' => 0,
-	# 'Test::Kwalitee' => 0,
-	'autodie' => 0,
-	'IPC::System::Simple' => 0,
-	'Test::Compile' => 0,
+	'Test::RequiresInternet' => 0,
 	'Test::Without::Module' => 0
+	# 'Test::Kwalitee' => 0,
 };
 
 if($online_tests) {
@@ -122,8 +126,8 @@ WriteMakefile(
 	'Net::Whois::IANA' => 0,
 	'Net::Whois::IP' => 0,
 	'NetAddr::IP' => 0,
-	'Object::Configure' => 0,
-	'Params::Get' => 0,
+	'Object::Configure' => 0.14,
+	'Params::Get' => 0.13,
 	'Class::Load' => 0,
 	'CGI::Info' => 0.60, # For AUTOLOAD
 	'Sys::Syslog' => 0,
@@ -141,14 +145,15 @@ WriteMakefile(
 			web => 'https://github.com/nigelhorne/CGI-Lingua',
 			repository => 'https://github.com/nigelhorne/CGI-Lingua',
 		}, bugtracker => {
-			# web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=CGI-Lingua',
-			web => 'https://github.com/nigelhorne/CGI-Lingua/issues',
-			url => 'https://github.com/nigelhorne/CGI-Lingua/issues',
+			url => 'https://rt.cpan.org/Public/Dist/Display.html?Name=CGI-Lingua',
+			web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=CGI-Lingua',
+			# web => 'https://github.com/nigelhorne/CGI-Lingua/issues',
+			# url => 'https://github.com/nigelhorne/CGI-Lingua/issues',
 			mailto => 'bug-CGI-Lingua@rt.cpan.org'
 		}
 	},
     },
-    MIN_PERL_VERSION	=> '5.6.2'	# Probably would work, but never tested on earlier versions than this
+	MIN_PERL_VERSION	=> '5.6.2'	# Probably would work, but never tested on earlier versions than this
 );
 
 sub are_online

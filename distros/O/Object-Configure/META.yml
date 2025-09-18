@@ -4,11 +4,18 @@ author:
   - 'Nigel Horne <njh@nigelhorne.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
   File::Temp: '0'
+  IO::Handle: '0'
+  IPC::System::Simple: '0'
+  Readonly: '0'
   Test::DescribeMe: '0'
   Test::Most: '0'
   Test::Needs: '0'
+  Test::NoWarnings: '0'
+  Time::HiRes: '0'
   YAML::XS: '0'
+  autodie: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
@@ -29,10 +36,11 @@ requires:
   Log::Abstraction: '0.25'
   Params::Get: '0.13'
   Return::Set: '0'
+  Scalar::Util: '0'
   perl: '5.008'
 resources:
   bugtracker: https://github.com/nigelhorne/Object-Configure/issues
   homepage: https://metacpan.org/pod/Object::Configure
   repository: git://github.com/nigelhorne/Object-Configure.git
-version: 0.14
+version: 0.15
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

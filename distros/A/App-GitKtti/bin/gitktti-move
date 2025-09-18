@@ -1,0 +1,203 @@
+#!/usr/bin/env perl
+
+##############################################################################
+## GitKtti Move - Modern version
+##############################################################################
+
+use strict;
+use warnings;
+use File::Basename;
+use Getopt::Long;
+use FindBin qw($RealBin);
+use lib "$RealBin/../lib";
+use App::GitKtti;
+
+use constant REGEX_DEVELOP => '^(dev|develop)$';
+use constant REGEX_MASTER  => '^(master|main)$';
+
+App::GitKtti::showVersion();
+
+my $arg_help     = "";
+my $arg_name     = "";
+my $ret          = 99;
+my $current_branch = "";
+my $new_branch   = "";
+my $old_branch   = "";
+
+## Args reading...
+GetOptions ('help' => \$arg_help, 'name=s' => \$arg_name);
+
+## arg : --help
+if ( $arg_help ) {
+  App::GitKtti::printSection("HELP - GitKtti Move");
+  print(App::GitKtti::BRIGHT_WHITE . "Usage:" . App::GitKtti::RESET . "\n");
+  print("   gitktti-move [--help] [--name new-branch-name]\n\n");
+
+  App::GitKtti::printSubSection("Description");
+  print("This script allows you to rename the current local branch and its remote counterpart.\n");
+  print("It will perform the following operations:\n");
+  print("  1. Rename the local branch\n");
+  print("  2. Push the new branch to remote\n");
+  print("  3. Delete the old remote branch\n");
+  print("  4. Set upstream tracking for the new branch\n\n");
+
+  App::GitKtti::printSubSection("Examples");
+  App::GitKtti::printCommand("gitktti-move --name feature/user-authentication");
+  App::GitKtti::printCommand("gitktti-move -n hotfix/critical-bug-fix");
+  exit(0);
+}
+
+## Get current branch...
+$current_branch = App::GitKtti::git_getCurrentBranch(\$ret);
+
+## Exit if we're on master or develop branch
+if ( $current_branch =~ REGEX_MASTER || $current_branch =~ REGEX_DEVELOP ) {
+  App::GitKtti::printError("Cannot rename master or develop branch!");
+  exit(1);
+}
+
+## Get tracked remote branch...
+my %tracked_branch = App::GitKtti::git_getTrackedRemoteBranch(\$ret);
+
+App::GitKtti::printSection("Branch Rename Configuration");
+
+print(App::GitKtti::BRIGHT_WHITE . "Current branch: " . App::GitKtti::RESET);
+App::GitKtti::printBranch($current_branch);
+print("\n");
+
+if ( $tracked_branch{"remote"} ne "" && $tracked_branch{"branch"} ne "" ) {
+  print(App::GitKtti::BRIGHT_WHITE . "Remote:         " . App::GitKtti::RESET . App::GitKtti::CYAN . $tracked_branch{"remote"} . App::GitKtti::RESET . "\n");
+  print(App::GitKtti::BRIGHT_WHITE . "Remote branch:  " . App::GitKtti::RESET . App::GitKtti::CYAN . $tracked_branch{"branch"} . App::GitKtti::RESET . "\n");
+}
+else {
+  print(App::GitKtti::BRIGHT_WHITE . "Remote:         " . App::GitKtti::RESET . App::GitKtti::DIM . "No remote tracking" . App::GitKtti::RESET . "\n");
+}
+
+## Get new branch name
+if ( $arg_name ) {
+  if ( $arg_name !~ /^[\w\/\-\.]+$/ ) {
+    App::GitKtti::printError("Invalid branch name! Use only letters, numbers, slashes, hyphens and dots.");
+    exit(1);
+  }
+  $new_branch = $arg_name;
+}
+else {
+  do {
+    $new_branch = App::GitKtti::getResponse("Enter new branch name:", $current_branch);
+
+    if ( $new_branch !~ /^[\w\/\-\.]+$/ ) {
+      App::GitKtti::printError("Invalid branch name! Use only letters, numbers, slashes, hyphens and dots.");
+      $new_branch = "";
+    }
+    elsif ( $new_branch eq $current_branch ) {
+      App::GitKtti::printWarning("New branch name is the same as current branch!");
+      $new_branch = "";
+    }
+  } while ( $new_branch eq "" );
+}
+
+## Check if new branch name already exists locally
+my @existing_branches = App::GitKtti::git_getLocalBranchesFilter("^" . quotemeta($new_branch) . "\$", \$ret);
+if ( @existing_branches > 0 ) {
+  App::GitKtti::printError("Branch '$new_branch' already exists locally!");
+  exit(1);
+}
+
+## Check if new branch name already exists on remote
+if ( $tracked_branch{"remote"} ne "" ) {
+  my @remote_branches = App::GitKtti::git_getRemoteBranchesFilter($tracked_branch{"remote"}, "^" . quotemeta($tracked_branch{"remote"} . "/" . $new_branch) . "\$", \$ret);
+  if ( @remote_branches > 0 ) {
+    App::GitKtti::printError("Branch '$new_branch' already exists on remote!");
+    exit(1);
+  }
+}
+
+print("\n");
+print(App::GitKtti::BRIGHT_WHITE . "New branch:     " . App::GitKtti::RESET);
+App::GitKtti::printBranch($new_branch);
+print("\n\n");
+
+## Check if repository is clean
+if ( !App::GitKtti::git_isRepoClean() ) {
+  App::GitKtti::printError("Your repository is not clean! Please commit or stash your changes first.");
+  exit(2);
+}
+
+## Show operations that will be performed
+App::GitKtti::printSubSection("Operations to be performed:");
+print("  1. " . App::GitKtti::CYAN . "git branch -m $current_branch $new_branch" . App::GitKtti::RESET . "\n");
+
+if ( $tracked_branch{"remote"} ne "" && $tracked_branch{"branch"} ne "" ) {
+  print("  2. " . App::GitKtti::CYAN . "git push " . $tracked_branch{"remote"} . " $new_branch" . App::GitKtti::RESET . "\n");
+  print("  3. " . App::GitKtti::CYAN . "git push " . $tracked_branch{"remote"} . " --delete " . $tracked_branch{"branch"} . App::GitKtti::RESET . "\n");
+  print("  4. " . App::GitKtti::CYAN . "git push --set-upstream " . $tracked_branch{"remote"} . " $new_branch" . App::GitKtti::RESET . "\n");
+}
+else {
+  App::GitKtti::printInfo("No remote tracking configured, only local branch will be renamed.");
+}
+
+print("\n");
+
+if ( App::GitKtti::isResponseYes("Proceed with branch rename?") ) {
+
+  ## Step 1: Rename local branch
+  App::GitKtti::printSubSection("Step 1: Renaming local branch");
+  App::GitKtti::launch("git branch -m $current_branch $new_branch", \$ret);
+
+  if ( $ret ne 0 ) {
+    App::GitKtti::printError("Failed to rename local branch!");
+    exit(2);
+  }
+
+  App::GitKtti::printSuccess("Local branch renamed successfully!");
+
+  ## Steps 2-4: Handle remote operations if remote tracking exists
+  if ( $tracked_branch{"remote"} ne "" && $tracked_branch{"branch"} ne "" ) {
+
+    ## Step 2: Push new branch to remote
+    App::GitKtti::printSubSection("Step 2: Pushing new branch to remote");
+    App::GitKtti::launch("git push " . $tracked_branch{"remote"} . " $new_branch", \$ret);
+
+    if ( $ret ne 0 ) {
+      App::GitKtti::printError("Failed to push new branch to remote!");
+      App::GitKtti::printWarning("Local branch has been renamed, but remote operations failed.");
+      exit(2);
+    }
+
+    App::GitKtti::printSuccess("New branch pushed to remote successfully!");
+
+    ## Step 3: Delete old remote branch
+    App::GitKtti::printSubSection("Step 3: Deleting old remote branch");
+    App::GitKtti::launch("git push " . $tracked_branch{"remote"} . " --delete " . $tracked_branch{"branch"}, \$ret);
+
+    if ( $ret ne 0 ) {
+      App::GitKtti::printWarning("Failed to delete old remote branch. You may need to delete it manually.");
+    }
+    else {
+      App::GitKtti::printSuccess("Old remote branch deleted successfully!");
+    }
+
+    ## Step 4: Set upstream tracking
+    App::GitKtti::printSubSection("Step 4: Setting upstream tracking");
+    App::GitKtti::launch("git push --set-upstream " . $tracked_branch{"remote"} . " $new_branch", \$ret);
+
+    if ( $ret ne 0 ) {
+      App::GitKtti::printWarning("Failed to set upstream tracking. You may need to set it manually.");
+    }
+    else {
+      App::GitKtti::printSuccess("Upstream tracking set successfully!");
+    }
+  }
+
+  App::GitKtti::printSection("Branch Rename Complete");
+  print(App::GitKtti::BRIGHT_GREEN . "✅ Branch successfully renamed from " . App::GitKtti::BOLD . $current_branch .
+        App::GitKtti::RESET . App::GitKtti::BRIGHT_GREEN . " to " . App::GitKtti::BOLD . $new_branch . App::GitKtti::RESET . "\n");
+
+  if ( $tracked_branch{"remote"} ne "" && $tracked_branch{"branch"} ne "" ) {
+    print(App::GitKtti::BRIGHT_GREEN . "✅ Remote branch operations completed" . App::GitKtti::RESET . "\n");
+  }
+
+}
+else {
+  App::GitKtti::printWarning("Operation cancelled!");
+}

@@ -1,5 +1,13 @@
 Revision history for Object::Configure - Runtime Configuration for an Object
 
+0.15	Wed Sep 17 07:28:24 EDT 2025
+	Allow the logger to be NULL, in which case nothing is set up
+	Scalar::Utils was used but not imported
+	instantiate: avoid double blessing
+	Added testing dashboard on GitHub Pages
+	Pass schema through to Config::Abstraction
+	Added configuration hot reloading without restarting the application (not supported on Windows)
+
 0.14	Wed Aug 27 13:16:36 EDT 2025
 	Allow the params to be undef
 

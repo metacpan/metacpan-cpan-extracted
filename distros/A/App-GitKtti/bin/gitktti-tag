@@ -1,0 +1,78 @@
+#!/usr/bin/env perl
+
+##############################################################################
+## GitKtti Tag - Modern version
+##############################################################################
+
+use strict;
+use warnings;
+use File::Basename;
+use POSIX;
+use FindBin qw($RealBin);
+use lib "$RealBin/../lib";
+use App::GitKtti;
+
+App::GitKtti::showVersion();
+
+my $ret               = 99;
+my $tagname           = "";
+my $lasttag           = "";
+my $lasttag_maj       = "";
+my $lasttag_min       = "";
+my $lasttag_patch     = "";
+my $lasttag_number    = 0;
+my $current_path      = getcwd();
+my $current_dir       = basename($current_path);
+my $current_branch    = App::GitKtti::git_getCurrentBranch(\$ret);
+my $current_repo_path = App::GitKtti::git_getGitRootDirectory();
+my $current_repo      = basename($current_repo_path);
+my $version           = "";
+my $version_maj       = "";
+my $version_min       = "";
+my $version_patch     = "";
+my $version_number    = 0;
+
+App::GitKtti::printSection("Repository Information");
+
+print(App::GitKtti::BRIGHT_WHITE . "Current path:      " . App::GitKtti::RESET . App::GitKtti::CYAN . $current_path . App::GitKtti::RESET . "\n");
+print(App::GitKtti::BRIGHT_WHITE . "Current directory: " . App::GitKtti::RESET . App::GitKtti::CYAN . $current_dir . App::GitKtti::RESET . "\n");
+print(App::GitKtti::BRIGHT_WHITE . "Repository path:   " . App::GitKtti::RESET . App::GitKtti::CYAN . $current_repo_path . App::GitKtti::RESET . "\n");
+print(App::GitKtti::BRIGHT_WHITE . "Repository name:   " . App::GitKtti::RESET . App::GitKtti::CYAN . $current_repo . App::GitKtti::RESET . "\n");
+
+if($current_branch =~ /^master$/) {
+  $lasttag = App::GitKtti::git_getLastTagFromCurrentBranch(\$ret);
+}
+else {
+  if ( !App::GitKtti::isResponseYes("! WARNING ! You are not on master branch. Tagging should be made on master branch. Are you sure?") ||
+       !App::GitKtti::isResponseYes("! WARNING ! Are you sure to be sure?") ) {
+    App::GitKtti::printError("You are not sure ! Aborted !");
+    exit(2);
+  }
+}
+
+if ( $tagname eq "" ) {
+  $tagname = App::GitKtti::getResponse("Last tag on this branch is " . App::GitKtti::BOLD . $lasttag . App::GitKtti::RESET . ". Please enter tag value ('" . $lasttag . "' --> 'x.x.x') :");
+}
+
+App::GitKtti::printSubSection("Tagging Summary");
+
+print(App::GitKtti::BRIGHT_WHITE . "Branch:  " . App::GitKtti::RESET);
+if ($current_branch =~ /^master$/) {
+  App::GitKtti::printBranch($current_branch, "master");
+} else {
+  App::GitKtti::printBranch($current_branch);
+}
+print("\n");
+
+if($lasttag ne "") {
+  print(App::GitKtti::BRIGHT_WHITE . "Last tag: " . App::GitKtti::RESET);
+  App::GitKtti::printTag($lasttag);
+  print("\n");
+}
+
+print(App::GitKtti::BRIGHT_WHITE . "New tag:  " . App::GitKtti::RESET);
+App::GitKtti::printTag($tagname);
+print("\n\n");
+
+## Go tagging !
+App::GitKtti::git_tagBranch($current_branch, $tagname, $lasttag);

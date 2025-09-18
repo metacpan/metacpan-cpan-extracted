@@ -1,9 +1,9 @@
 package Sim::OPT;
-# Copyright (C) 2008-2024 by Gian Luca Brunetti and Politecnico di Milano.
+# Copyright (C) 2008-2025 by Gian Luca Brunetti and Politecnico di Milano.
 # This is Sim::OPT, a program managing building performance simulation programs for performing optimization by overlapping block coordinate descent.
 # This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
-use v5.14;
+# use v5.14;
 # use v5.20;
 
 use Exporter;
@@ -62,7 +62,7 @@ $target %dowhat readsweeps $max_processes $computype $calcprocedure %specularrat
 toil genstar solvestar integratebox filterbox__ clean %dowhat @weighttransforms
 );
 
-$VERSION = '0.739';
+$VERSION = '0.741';
 $ABSTRACT = 'Sim::OPT is an optimization and parametric exploration program oriented toward problem decomposition. It can be used with simulation programs receiving text files as input and emitting text files as output. It allows a free mix of sequential and parallel block coordinate searches, as well of searches more complely structured in graphs.';
 
 #################################################################################
@@ -92,7 +92,7 @@ sub cleanbag
 		my %d = %{ $inst_r };
 		my $is = $d{is};
 
-		unless ( $is ~~ @bagnames )
+		unless ( grep { $_ eq $is } @bagnames )
 		{
 			push( @bagnames, $is );
 			push( @baginst, $inst_r );
@@ -123,7 +123,7 @@ sub washhash
 	my ( @bagnames, %newhash );
 	foreach my $key ( keys %hash )
 	{
-		unless ( $key ~~ @bagnames )
+		unless ( grep { $_ eq $key } @bagnames )
 		{
 			push( @bagnames, $key );
 			$newhash{$key} = $hash{$key};
@@ -142,7 +142,7 @@ sub filterinsts_winsts
 	foreach my $instance ( @fewerinsts )
 	{
 		my %d = %{ $instance };
-		unless ( $d{is} ~~ @fewerinstnames )
+		unless ( grep { $_ eq $d{is} } @fewerinstnames )
 		{
 			push( @fewerinstnames, $d{is} );
 		}
@@ -163,7 +163,7 @@ sub filterinsts_winsts
 
 	foreach my $value ( values %newinst )
 	{
-		if ( $value ~~ ( keys %newinst ) )
+		if ( exists newinst{$value} )
 		{
 			$newinst{$value} = $value{$value};
 		}
@@ -193,7 +193,7 @@ sub filterinsts_wnames
 
 	foreach my $value ( values %newinst )
 	{
-		if ( $value ~~ ( keys %newinst ) )
+		if ( exists newinst{$value} )
 		{
 			$newinst{$value} = $value{$value};
 		}
@@ -562,7 +562,7 @@ sub checkduplicates
 	foreach my $blockref (@sweepblocks)
 	{
 		@block = @$blockref;
-		if ( @slice ~~ @block )
+		if ( scalar(@slice) == scalar(@block) && !grep { $slice[$_] ne $block[$_] } 0..$#slice )
 		{
 			$signal++;
 		}
@@ -593,7 +593,7 @@ sub fromsweep_toopt
 			foreach (@varns)
 			{
 				my @parlist;
-				unless ($_ ~~ @intersection)
+				unless (grep { $_ eq $_ } @intersection)
 				{
 					push (@nonbelonging, $_);
 				}
@@ -815,7 +815,7 @@ sub extractcase #  UPDATES THE FILE NAME ON THE BASIS OF A %carrier
 
 		if ( ($1) and ($2) )
 		{
-			if ( $1 ~~ @blockelts )
+			if ( grep { $_ eq $1 } @blockelts )
 			{
 				$provhash{$1} = $2;
 			}
@@ -829,7 +829,7 @@ sub extractcase #  UPDATES THE FILE NAME ON THE BASIS OF A %carrier
 	{
 		if ( scalar( @blockelts > 0 ) )
 		{
-			if ( $key ~~ @blockelts )
+			if ( grep { $_ eq $key } @blockelts )
 			{
 				$tempc{$key} = $provhash{$key};
 			}
@@ -1034,13 +1034,13 @@ sub filterbox
 	foreach my $case ( @arr )
 	{
 		my $elt = $case->[0];
-		if ( not ( $elt ~~ @box ) )
+		if ( not ( grep { $_ eq $elt } @box ) )
 		{
 			my @bucket;
 			foreach my $caseagain ( @arr )
 			{
 				my $el = $caseagain->[0];
-				if ( $elt ~~ $el )
+				if ( $elt eq $el )
 				{
 					push ( @bucket, $case, $case->[4] );
 				}
@@ -2005,7 +2005,7 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 				my @divs = split( "_", $series );
 				foreach my $bit ( @divs )
 				{
-					if ( $bit ~~ @sack )
+					if ( grep { $_ eq $bit } @sack )
 					{
 						$count++;
 					}
@@ -2165,7 +2165,8 @@ sub setlaunch # IT SETS THE DATA FOR THE SEARCH ON THE ACTIVE BLOCK.
 			#unless ( $dirfiles{ga} eq "yes" )
 			#{
 				#
-        if ( not ( $to{cleanto} ~~ @{ $dirfiles{dones} } ) )
+		 
+        if ( not ( grep { $_ eq $to{cleanto} } @{ $dirfiles{dones} } ) )
 				{
 					unless ( $dirfiles{randompick} eq "yes" )
 					{
@@ -2549,7 +2550,7 @@ sub exe
 			Sim::OPT::Descend::descend(	{ instances => \@lastinstance, dowhat => \%dowhat, dirfiles => \%dirfiles, vehicles => \%vehicles, inst => \%inst, precedents => \@precedents, precious => "$precious" } );
 			say $tee "#Moving on " . ($countcase + 1) . ", block " . ($countblock + 1) . ".";
 
-			if ( not ( $is ~~ @sack ) )
+			if ( not ( grep { $_ eq $is } @sack ) )
 			{
 				push ( @sack, $is );
 				push ( @collect, @lastinstance );
@@ -2737,7 +2738,7 @@ sub genstar
 			my %hs = %{ $el };
 			foreach my $key ( sort( keys( %hs ) ) )
 			{
-				if ( not ( $key ~~ @blockelts ) )
+				if ( not ( grep { $_ eq $key } @blockelts ) )
 				{
 					$hs{$key} = $carrier{$key};
 				}

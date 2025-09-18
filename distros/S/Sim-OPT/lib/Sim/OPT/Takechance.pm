@@ -136,7 +136,8 @@ sub takechance
 		my @tempvarnumbers = @varnumbers; ###ZZZ
 		foreach my $elt ( keys %{ $varnumbers[$countcase] } ) # THIS STRIPS AWAY THE PARAMETERS THAT ARE NOT CONTAINED IN @pars_tocheck.
 		{
-			unless ( $elt ~~ @{ $pars_tocheck[$countcase] } )
+		               
+			unless ( grep { $_ eq $elt } @{ $pars_tocheck[$countcase] } )
 			{
 				delete ${ $tempvarnumbers[$countcase] }{$elt};
 			}
@@ -442,7 +443,8 @@ sub takechance
 								{
 									my $elmo = $elem;
 									$elmo =~ s/(.*)-(.*)/$1/;
-									if ($elmo ~~ @integralslice)
+									
+									if ( grep { $_ eq $elmo } @integralslice )
 									{
 										;
 									}

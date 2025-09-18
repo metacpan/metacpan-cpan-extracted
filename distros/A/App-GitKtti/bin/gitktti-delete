@@ -1,0 +1,228 @@
+#!/usr/bin/env perl
+
+##############################################################################
+## GitKtti Delete - Modern version
+##############################################################################
+
+use strict;
+use warnings;
+use File::Basename;
+use Getopt::Long;
+use FindBin qw($RealBin);
+use lib "$RealBin/../lib";
+use App::GitKtti;
+
+use constant REGEX_DEVELOP => '^(dev|develop)$';
+use constant REGEX_MASTER  => '^(master|main)$';
+
+App::GitKtti::showVersion();
+
+my $arg_help     = "";
+my $arg_name     = "";
+my $arg_force    = "";
+my $ret          = 99;
+my $current_branch = "";
+my $target_branch = "";
+
+## Args reading...
+GetOptions ('help' => \$arg_help, 'name=s' => \$arg_name, 'force' => \$arg_force);
+
+## arg : --help
+if ( $arg_help ) {
+  App::GitKtti::printSection("HELP - GitKtti Delete");
+  print(App::GitKtti::BRIGHT_WHITE . "Usage:" . App::GitKtti::RESET . "\n");
+  print("   gitktti-delete [--help] [--name branch-name] [--force]\n\n");
+
+  App::GitKtti::printSubSection("Description");
+  print("This script allows you to delete a local branch and its remote counterpart.\n");
+  print("It will perform the following operations:\n");
+  print("  1. Switch to develop/master if currently on the target branch\n");
+  print("  2. Delete the local branch\n");
+  print("  3. Delete the remote branch (if it exists)\n\n");
+
+  App::GitKtti::printSubSection("Options");
+  print("  --name      Specify the branch name to delete\n");
+  print("  --force     Force deletion (use -D instead of -d for local branch)\n");
+  print("  --help      Show this help message\n\n");
+
+  App::GitKtti::printSubSection("Examples");
+  App::GitKtti::printCommand("gitktti-delete --name feature/user-authentication");
+  App::GitKtti::printCommand("gitktti-delete -n hotfix/old-fix --force");
+  App::GitKtti::printCommand("gitktti-delete");
+  exit(0);
+}
+
+## Get current branch...
+$current_branch = App::GitKtti::git_getCurrentBranch(\$ret);
+
+## Get target branch name
+if ( $arg_name ) {
+  if ( $arg_name !~ /^[\w\/\-\.]+$/ ) {
+    App::GitKtti::printError("Invalid branch name! Use only letters, numbers, slashes, hyphens and dots.");
+    exit(1);
+  }
+  $target_branch = $arg_name;
+}
+else {
+  ## Show available local branches (excluding master/develop)
+  my @local_branches = App::GitKtti::git_getLocalBranches(\$ret);
+  my @filtered_branches = ();
+
+  foreach my $branch (@local_branches) {
+    if ( $branch !~ REGEX_MASTER && $branch !~ REGEX_DEVELOP ) {
+      push @filtered_branches, $branch;
+    }
+  }
+
+  if ( @filtered_branches == 0 ) {
+    App::GitKtti::printInfo("No feature branches found to delete.");
+    exit(0);
+  }
+
+  ## List local branches with selector
+  $target_branch = App::GitKtti::getSelectResponse("Which branch to delete?", @filtered_branches);
+}
+
+## Protect master and develop branches
+if ( $target_branch =~ REGEX_MASTER || $target_branch =~ REGEX_DEVELOP ) {
+  App::GitKtti::printError("Cannot delete master or develop branch!");
+  exit(1);
+}
+
+## Check if target branch exists locally
+my @existing_branches = App::GitKtti::git_getLocalBranchesFilter("^" . quotemeta($target_branch) . "\$", \$ret);
+if ( @existing_branches == 0 ) {
+  App::GitKtti::printError("Branch '$target_branch' does not exist locally!");
+  exit(1);
+}
+
+## Get tracked remote branch for the target branch
+my %tracked_branch = ();
+if ( $target_branch eq $current_branch ) {
+  %tracked_branch = App::GitKtti::git_getTrackedRemoteBranch(\$ret);
+}
+else {
+  ## Switch temporarily to get remote info
+  App::GitKtti::launch("git checkout $target_branch", \$ret);
+  if ( $ret == 0 ) {
+    %tracked_branch = App::GitKtti::git_getTrackedRemoteBranch(\$ret);
+    App::GitKtti::launch("git checkout $current_branch", \$ret);
+  }
+}
+
+App::GitKtti::printSection("Branch Deletion Configuration");
+
+print(App::GitKtti::BRIGHT_WHITE . "Target branch:  " . App::GitKtti::RESET);
+App::GitKtti::printBranch($target_branch);
+print("\n");
+
+print(App::GitKtti::BRIGHT_WHITE . "Current branch: " . App::GitKtti::RESET);
+App::GitKtti::printBranch($current_branch);
+print("\n");
+
+if ( $tracked_branch{"remote"} ne "" && $tracked_branch{"branch"} ne "" ) {
+  print(App::GitKtti::BRIGHT_WHITE . "Remote:         " . App::GitKtti::RESET . App::GitKtti::CYAN . $tracked_branch{"remote"} . App::GitKtti::RESET . "\n");
+  print(App::GitKtti::BRIGHT_WHITE . "Remote branch:  " . App::GitKtti::RESET . App::GitKtti::CYAN . $tracked_branch{"branch"} . App::GitKtti::RESET . "\n");
+}
+else {
+  print(App::GitKtti::BRIGHT_WHITE . "Remote:         " . App::GitKtti::RESET . App::GitKtti::DIM . "No remote tracking" . App::GitKtti::RESET . "\n");
+}
+
+print(App::GitKtti::BRIGHT_WHITE . "Force delete:   " . App::GitKtti::RESET . ($arg_force ? App::GitKtti::BRIGHT_RED . "YES" : App::GitKtti::DIM . "NO") . App::GitKtti::RESET . "\n");
+
+print("\n");
+
+## Check if repository is clean (only if we need to switch branches)
+if ( $target_branch eq $current_branch ) {
+  if ( !App::GitKtti::git_isRepoClean() ) {
+    App::GitKtti::printError("Your repository is not clean! Please commit or stash your changes first.");
+    exit(2);
+  }
+}
+
+## Show operations that will be performed
+App::GitKtti::printSubSection("Operations to be performed:");
+
+my $step = 1;
+if ( $target_branch eq $current_branch ) {
+  print("  $step. " . App::GitKtti::CYAN . "git checkout develop" . App::GitKtti::RESET . " (switch away from target branch)\n");
+  $step++;
+}
+
+my $delete_flag = $arg_force ? "-D" : "-d";
+print("  $step. " . App::GitKtti::CYAN . "git branch $delete_flag $target_branch" . App::GitKtti::RESET . "\n");
+$step++;
+
+if ( $tracked_branch{"remote"} ne "" && $tracked_branch{"branch"} ne "" ) {
+  print("  $step. " . App::GitKtti::CYAN . "git push " . $tracked_branch{"remote"} . " --delete " . $tracked_branch{"branch"} . App::GitKtti::RESET . "\n");
+}
+else {
+  App::GitKtti::printInfo("No remote tracking configured, only local branch will be deleted.");
+}
+
+print("\n");
+
+if ( App::GitKtti::isResponseYes("Proceed with branch deletion?") ) {
+
+  my $step_num = 1;
+
+  ## Step 1: Switch away from target branch if needed
+  if ( $target_branch eq $current_branch ) {
+    App::GitKtti::printSubSection("Step $step_num: Switching to develop branch");
+
+    ## Try to switch to develop first, then master if develop doesn't exist
+    App::GitKtti::launch("git checkout develop", \$ret);
+    if ( $ret ne 0 ) {
+      App::GitKtti::launch("git checkout master", \$ret);
+      if ( $ret ne 0 ) {
+        App::GitKtti::launch("git checkout main", \$ret);
+        if ( $ret ne 0 ) {
+          App::GitKtti::printError("Failed to switch to develop/master/main branch!");
+          exit(2);
+        }
+      }
+    }
+
+    App::GitKtti::printSuccess("Switched away from target branch!");
+    $step_num++;
+  }
+
+  ## Step 2: Delete local branch
+  App::GitKtti::printSubSection("Step $step_num: Deleting local branch");
+  App::GitKtti::launch("git branch $delete_flag $target_branch", \$ret);
+
+  if ( $ret ne 0 ) {
+    App::GitKtti::printError("Failed to delete local branch!");
+    if ( !$arg_force ) {
+      App::GitKtti::printInfo("Try using --force flag if the branch is not fully merged.");
+    }
+    exit(2);
+  }
+
+  App::GitKtti::printSuccess("Local branch deleted successfully!");
+  $step_num++;
+
+  ## Step 3: Delete remote branch if it exists
+  if ( $tracked_branch{"remote"} ne "" && $tracked_branch{"branch"} ne "" ) {
+    App::GitKtti::printSubSection("Step $step_num: Deleting remote branch");
+    App::GitKtti::launch("git push " . $tracked_branch{"remote"} . " --delete " . $tracked_branch{"branch"}, \$ret);
+
+    if ( $ret ne 0 ) {
+      App::GitKtti::printWarning("Failed to delete remote branch. It may have already been deleted or you may not have permission.");
+    }
+    else {
+      App::GitKtti::printSuccess("Remote branch deleted successfully!");
+    }
+  }
+
+  App::GitKtti::printSection("Branch Deletion Complete");
+  print(App::GitKtti::BRIGHT_GREEN . "✅ Branch " . App::GitKtti::BOLD . $target_branch . App::GitKtti::RESET . App::GitKtti::BRIGHT_GREEN . " deleted successfully" . App::GitKtti::RESET . "\n");
+
+  if ( $tracked_branch{"remote"} ne "" && $tracked_branch{"branch"} ne "" ) {
+    print(App::GitKtti::BRIGHT_GREEN . "✅ Remote branch operations completed" . App::GitKtti::RESET . "\n");
+  }
+
+}
+else {
+  App::GitKtti::printWarning("Operation cancelled!");
+}

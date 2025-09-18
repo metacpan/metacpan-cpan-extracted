@@ -1,0 +1,1844 @@
+Wed Sep 17 10:27:29 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.43]:
+	* t/02-cron.t: removed, needs to be refactored
+	* VERSION: bump
+	* bin/app-fargatestack
+	- make it work for app-fargatestack-checker
+	* lib/App/AWS.pm.in
+	(command): use class name if no service set
+
+Tue Sep  9 09:53:32 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.42]:
+	* README.md: generated
+	* VERSION: bump
+	* lib/App/FargateStack/Autoscaling.pm.in: new
+	* Makefile: add above to build
+	* lib/App/ApplicationAutoscaling.pm.in
+	- delete_scheduled_action, not describe-scheduled-actions
+	* lib/App/FargateStack.pm.in
+	- + add-scaling-policy, add-scheduled-action,
+	- + delete-scaling-policy, delete-scheduled-action
+	* lib/App/FargateStack/AutoscalingConfig.pm.in
+	(new)
+	- update config
+	(parse_cooldown): use class values or use config
+	(parse_capacity): likewise
+	(parse_metric): likewise
+	* lib/App/FargateStack/Builder.pm.in
+	(get_scheduled_action_names): new
+	* lib/App/FargateStack/Builder/Autoscaling.pm.in
+	(_build_autoscaling)
+	- update policy_arn
+	- add task name to policy name
+	- log message tweaks
+	- qualify required resource (autoscaling:scaling-policy)
+	(build_scheduled_actions): juxtaposed values in log file
+	* lib/App/FargateStack/Constants.pm.in
+	(%DEFAULT_NAMES): add task name to autoscaling policy name for uniqueness
+	* lib/App/FargateStack/Pod.pm.in
+
+Sun Sep  7 18:18:57 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.41]:
+	* README.md: generated
+	* VERSION: bump
+	* lib/App/FargateStack/AutoscalingConfig.pm.in: new
+	* Makefile: add above to build
+	* lib/App/ApplicationAutoscaling.pm.in
+	(put_scheduled_action)
+	- fleshed out API call
+	(describe_scheduled_actions): likewise
+	* lib/App/EC2.pm.in
+	(describe_security_groups): named args
+	* lib/App/Events.pm.in
+	(_validate_range): escape -
+	* lib/App/FargateStack/Builder.pm.in
+	(build)
+	- register-task-definitions
+	- check EFS ingress state
+	(is_efs_ingress_authorized): new
+	(get_efs_sgs): save state
+	* lib/App/FargateStack/Builder/Autoscaling.pm.in
+	(build_autoscaling)
+	- refactored to use App::FargateStack::AutoScalingConfig
+	(build_scheduled_actions): new
+	(_build_autoscaling): new
+	* lib/App/FargateStack/Builder/Cluster.pm.in
+	- log message tweaking
+	* lib/App/FargateStack/Builder/EFS.pm.in: likewise
+	* lib/App/FargateStack/Builder/HTTPService.pm.in
+	- likewise
+	- describe_security_group_rules named arguments
+	- true not JSON::true
+	* lib/App/FargateStack/Builder/IAM.pm.in
+	- log message tweaks
+	* lib/App/FargateStack/Builder/SecurityGroup.pm.in
+	(build_security_group)
+	- check_result
+	- report security_group_id properly
+	* lib/App/FargateStack/Builder/TaskDefinition.pm.in
+	- log message tweaks
+	* lib/App/FargateStack/Builder/Utils.pm.in
+	(log_die): die, so we invoke the handler
+	(fetch_cli_api): escape -
+	* lib/App/FargateStack/Builder/WafV2.pm.in: likewise
+	* lib/App/FargateStack/Constants.pm.in
+	- reorganize
+	* lib/App/FargateStack/CreateStack.pm.in
+	- refactored
+	- respect --no-update option
+	- true not JSON::true
+	(cmd_create_stack)
+	- validate config
+	- use constants
+	(parse_autoscaling_options)
+	- policy_name already set\
+	- true, not JSON::true
+	(parse_environment_option): new
+	* lib/App/FargateStack/Init.pm.in
+	(init)
+	- warn on caught eval errors
+	(_init_route53): log message tweaks
+	* lib/App/FargateStack/Logs.pm.in
+	(cmd_logs): fetch_logs
+	* lib/App/FargateStack/Pod.pm.in
+	- fixes
+	* t/02-cron.t: new
+
+Thu Sep  4 16:40:08 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.40]:
+	* lib/App/ApplicationAutoscaling.pm.in: new
+	* lib/App/FargateStack/Builder/Autoscaling.pm.in: new
+	* Makefile: add above to build
+	* README.md: generated
+	* VERSION: bump
+	* lib/App/AWS.pm.in
+	(command): get service name from _service_name
+	* lib/App/FargateStack.pm.in
+	- + App::FargateStack::Builder::Autoscaling
+	* lib/App/FargateStack/Builder.pm.in
+	(build)
+	- clearer message for apply
+	- autoscaling
+	* lib/App/FargateStack/Builder/LogGroup.pm.in
+	(build_log_group)
+	- refactoring
+	- detect and mitigate retention days drift
+	* lib/App/FargateStack/Builder/Utils.pm.in
+	(fetch_appliation_autoscaling): new
+	(fetch_cli_api)
+	- refactoring
+	- save _service_name
+	- set options properly
+	* lib/App/FargateStack/Builder/WafV2.pm.in
+	(build_waf)
+	- log message tweak
+	* lib/App/FargateStack/Constants.pm.in
+	- + $DEFAULT_CPU_SCALING_LEVEL, $DEFAULT_REQUESTS_SCALING_LEVEL
+	* lib/App/FargateStack/CreateStack.pm.in
+	(cmd_create_stack)
+	- add waf:, autoscaling: keywords
+	(parse_autoscaling_option): new
+	(parse_waf_option): new
+	* lib/App/FargateStack/Pod.pm.in
+	- document new features
+	* lib/App/Logs.pm.in
+	(delete_retention_policy): new
+
+Wed Sep  3 05:05:15 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.39]:
+	* VERSION: bump
+	* lib/App/FargateStack/Builder/WafV2.pm.in: new
+	* lib/App/WafV2.pm.in: new
+	* Makefile: add above to build
+	* README.md: generated
+	* bin/app-fargatestack: app-fargatestack -> app-FargateStack
+	* lib/App/FargateStack.pm.in: + App::FargateStack::Builder::WafV2
+	* lib/App/FargateStack/Builder.pm.in: build waf
+	* lib/App/FargateStack/Builder/Utils.pm.in
+	(fetch_wafv2): new
+	* lib/App/FargateStack/Constants.pm.in
+	- + $WAF_AVAILABILITY_TIMEOUT
+	- + $WAF_AVAILABILITY_SLEEP_TIME
+	- + %WAF_MANAGED_RULES
+	- + %WAF_MANAGED_RULE_BUNDLES
+	- + $WAF_RULE_STUB
+	(%DEFAULT_NAMES): + web-acl-name
+
+Sun Aug 31 08:23:10 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.38]:
+	* README.md: generated
+	* VERSION: bump
+	* bin/app-FargateStack-checker-docker
+	- map whole .aws directory
+	- no need to cd to $HOME
+	* bin/app-FargateStack-docker
+	- map pwd to /work, not $HOME
+	- map whol .aws directory
+	- cd to /work, not $HOME
+	* lib/App/FargateStack.pm.in
+	(cmd_delete_schedule):
+	- --force for delete-schedule
+	* lib/App/FargateStack/CreateStack.pm.in
+	(cmd_create_stack)
+	- recognize a task as a scheduled task if it has a schedule
+	- short env: for environment
+	* lib/App/FargateStack/Pod.pm.in
+	- tweaks, back to OVERVIEW
+	* lib/App/FargateStack/Logs.pm.in
+	(cmd_log):
+	- default task name if no arg
+
+Fri Aug 29 11:52:03 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.37]:
+	* bin/app-FargateStack-docker: new
+	* bin/app-FargateStack-checker-docker: new
+	* bin/app-fargatestack: new
+	* postamble: new
+	* .gitignore: -postamble
+	* bin/app-fargatestack: simplified for App::Fargate
+	* buildspec.yml: +postamble
+
+Tue Aug 26 16:39:29 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.36]:
+	* VERSION: bump
+	* docker/Dockerfile
+	- add JSON, Log::Log4perl, Log::Log4perl::Layout::JSON, Readonly
+	* docker/HelloWorld.pl
+	- write JSON logs
+	- only write env out once
+	* lib/App/ECS.pm.in
+	(list_task)
+	- allow hash ref of args to support desired-status
+	(update-service): + query
+	* lib/App/FargateStack.pm.in
+	(cmd_service_status)
+	- refactoring
+	- maybecolor
+	- display task status too
+	(cmd_display_task_status): new
+	(cmd_remove_service): verify_service just takes task-name
+	(update_task_count): likewise
+	(verify_service): just accept task-name
+	(get_task_image_digests): new
+	(get_latest_task_definition): new
+	(cmd_update_service): new
+	(cmd_start_stop_service): renamed from cmd_update_service
+	(cmd_list_tasks)
+	- refactoring
+	- color
+	- stopped reason
+	(fetch_option_defaults)
+	- set config name
+	(help): width 80
+	(main)
+	- create-stack - error level
+	- start/stop service => cmd_start_stop_service
+	- + update-service
+	- alias: create-service -> deploy-service
+	* lib/App/FargateStack/Builder.pm.in
+	(build)
+	- authorize efs ingress if enabled
+	(_delete_security_group): ENI, not ALB ENI
+	(authorize_efs_ingres): no --
+	* lib/App/FargateStack/Builder/TaskDefinition.pm.in
+	(register_task_definition): lazy load the real arn
+	(define_task_size): don't clobber if it set in config
+	* lib/App/FargateStack/Builder/Utils.pm.in
+	(maybe_color): new
+	(abbrev): new
+	(log_die): exit 1;
+	* lib/App/FargateStack/CreateStack.pm.in
+	(cmd_create_stack)
+	- use task name if no app name given
+	- set the config file name
+	- save the config file
+	* lib/App/FargateStack/Init.pm.in
+	(init)
+	- hijack command if --version
+	(_init_config): use config_name getter
+	(_init_accoutn): die if we can't get account from profile
+	* lib/App/FargateStack/Pod.pm.in
+	- OVERVIEW => GETTING STARTED
+	- updates based on new features
+	- tweaking & wordsmithing
+
+Fri Aug 22 10:26:54 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.35]:
+	* VERSION: bump
+	* README.md: generated
+	* lib/App/FargateStack.pm.in
+	(cmd_state): new
+	(fetch_option_defaults): call default_region
+	(main)
+	- make dns-profile an alias
+	- + cmd_state
+	* lib/App/FargateStack/Init.pm.in
+	(default_region): new
+	(_init_defaults): call default_region
+	* lib/App/FargateStack/Pod.pm.in
+	- pod updates (cmd_state)
+
+Tue Aug 19 09:04:55 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.34]:
+	* README.md: generated
+	* VERSION: bump
+	* lib/App/FargateStack.pm.in
+	(cmd_deploy_service):
+	- make sure task actually exists in config
+	(cmd_delete_daemon): color for error message
+	* lib/App/FargateStack/Builder.pm.in
+	(delete_task_resources)
+	- only remove alias record for http services
+	(_delete_alias_records); return if no domain configured
+	* lib/App/FargateStack/Builder/Events.pm.in
+	(build_events_iam_role)
+	- refactored to properly set role in config
+	* lib/App/FargateStack/Builder/IAM.pm.in
+	(build_iam_role)
+	- refactored to properly set role in config
+	- return role-name and role-arn
+	* lib/App/FargateStack/CreateStack.pm.in
+	(cmd_create_stack)
+	- add daemon to list of recognized types
+	- set image tag to latest if not provided in image uri
+
+Mon Aug 18 17:11:32 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.33]:
+	* README.md: generated
+	* VERSION: bump
+	* lib/App/FargateStack.pm.in
+	(main): dns-profile=s
+	* lib/App/FargateStack/Builder/LogGroup.pm.in
+	(add_log_group_policy): avoid uninitialized warning
+	* lib/App/FargateStack/CreateStack.pm.in
+	(cmd_create_stack)
+	- environment: tag creation
+	* lib/App/FargateStack/Pod.pm.in
+	- deploy-service, not create-service
+
+Fri Aug 15 14:56:43 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.32]
+	* VERSION: bump
+	* lib/App/FargateStack.pm.in
+	(cmd_run_task)
+	- fetch_ecs
+	- log_group from top level now
+	(get_task_status):
+	- $ecs->check_result
+	- fetch_ecs
+	(cmd_delete_task): allow --force to force delete
+	* lib/App/FargateStack/Builder.pm.in
+	(_delete_log_group): log_group from top level now
+	* lib/App/FargateStack/Builder/Cluster.pm.in
+	(add_ecr_policy)
+	- normalize image name
+	- add BatchCheckLayerAvailability permission
+
+Fri Aug 15 12:51:49 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.31]:
+	* VERSION: bump
+	* lib/App/EC2.pm.in
+	(new): croak, not log_die
+	(find_eligible_vpcs)
+	- return both nat and igw vpc ids
+	* lib/App/ECR.pm.in
+	(get_latest_image)
+	- support fully qualified image names
+	- warn don't croak if image not found in ECR
+	* lib/App/ElbV2.pm.in
+	(_find_alb_of_type):
+	- wordsmithing error messages
+	* lib/App/Events.pm.in
+	(rule_exists)
+	- fix issue when schedule passed
+	(target_exists): return undef for sure
+	* lib/App/FargateStack.pm.in
+	- cmd_create_service => cmd_deploy_service
+	(main)
+	- + dns-profile
+	- + cmd_create_stack
+	- skip_config, skip_init
+	* lib/App/FargateStack/Builder/Events.pm.in
+	(build_events)
+	- events have schedule key
+	- constructing, not construction
+	- skip tasks with no schedule, don't die
+	- refactoring
+	* lib/App/FargateStack/Builder/HTTPService.pm.in
+	(create_alb)
+	- trap errors returned from find_alb()
+	- don't try to find security group info if no alb
+	- log messages
+	- set security group name
+	(create_alb_security_group): set security group name
+	* lib/App/FargateStack/Builder/TaskDefinition.pm.in
+	(create_taskdef_file)
+	- use resolve_image_name() helper to resolve image name
+	* lib/App/FargateStack/Builder/Utils.pm.in
+	- <STDIN>, not <>
+	* lib/App/FargateStack/Init.pm.in
+	(init)
+	- use skip_config, skip_init flags
+	(init_defaults): no need to set default_log_group
+	(_init_route53): dns-profile alias
+	* lib/App/STS.pm.in
+	(get_caller_identity): add query
+	* lib/App/Fargate/Pod.pm.in: create-stack documentation, --dns-profile
+	* lib/App/FargateStack/Checker.pm.in: new
+	* lib/App/FargateStack/CreateStack.pm.in: new
+	* Makefile: above to build
+
+
+Wed Aug 13 11:59:54 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.30]:
+	* lib/App/FargateStack/CloudTrail.pm.in: new
+	* lib/App/CloudTrail.pm.in: new
+	* Makefile: add above to build
+	* README.md: generated
+	* VERSION: bump
+	* lib/App/ECS.pm.in
+	(describe_tasks): accept array ref
+	* lib/App/Events.pm.in
+	(rule_exists)
+	- refactoring
+	(put_rule)
+	- accept event_pattern
+	- make schedule, state conditional
+	(target_exists): refactoring
+	* lib/App/FargateStack.pm.in
+	(cmd_show): new
+	(cmd_create_service)
+	- allow count parameter
+	(cmd_delete_schedule): delete_task_resources
+	(main)
+	- + cloudtrail, output
+	- + show
+	* lib/App/FargateStack/Builder.pm.in
+	(build)
+	- create log group before task definitions
+	(delete_task_resources)
+	- selective deletion when multiple tasks defined
+	- make sure we have a cluster name
+	- more log messages
+	* lib/App/FargateStack/Builder/EFS.pm.in
+	(add_volumes): fetch_efs
+	* lib/App/FargateStack/Builder/Events.pm.in
+	(build_events)
+	- refactoring
+	- more log messages
+	(create_event_target)
+	- refactoring
+	- add tags to events
+	- detect policy diff and output diff listing
+	(build_events_iam_role)
+	- refactoring
+	- add tag policy
+	(build_run_tags): new
+	* lib/App/FargateStack/Builder/LogGroup.pm.in
+	(build_log_group)
+	- refactoring
+	(fetch_logs): removed
+	(update_log_groups): likewise
+	(add_log_group_policy): only 1 log group for this stack
+	* lib/App/FargateStack/Builder/Secrets.pm.in: whitespace
+	* lib/App/FargateStack/Builder/Service.pm.in
+	(build_service)
+	- place service in same AZ as ALB if http service
+	(get_service_subnets): likewise
+	* lib/App/FargateStack/Builder/TaskDefinition.pm.in
+	(define_port_mapping): only for http
+	(create_taskdef_files)
+	- default to type 'task'
+	- only 1 log group now
+	* lib/App/FargateStack/Builder/Utils.pm.in
+	- pod
+	(@EXPORT): +nomalize_name, normalize_time_range, normalize_timestamp, fetch_cloudrtrail
+	(normalize_timestamp): new
+	(display_diffs): tweak output
+	* lib/App/FargateStack/Constants.pm.in
+	- + $DEFAULT_MAX_EVENTS
+	* lib/App/FargateStack/Init.pm.in
+	(init)
+	- setup config earlier
+	(_init_config): move copyright message to init()
+	* lib/App/FargateStack/Logs.pm.in
+	(cmd_logs)
+	- only 1 log group now
+	(normalize_time_range): moved to Utils
+	* lib/App/FargateStack/Pod.pm.in
+	- add new options, commands
+
+Mon Aug 11 17:40:17 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.29]:
+	* ChangeLog
+	* VERSION: bump
+	* README.md: generated
+	* lib/App/FargateStack/Builder.pm.in
+	(delete_task_resources)
+	- delete id, last_updated
+	- log a message about skeleton config
+	(_delete_security_group)
+	- wait for ENI to release ALB security group
+	* lib/App/FargateStack/Builder/Cluster.pm.in
+	(build_fargate_cluster)
+	- make sure we set cluster info in config
+	- check_result after api call
+	* lib/App/FargateStack/Builder/HTTPService.pm.in
+	(create_alb): add tags
+	* lib/App/FargateStack/Init.pm.in
+	(init)
+	- add die handler for apply, destroy, delete- commands
+	* lib/App/FargateStack/Pod.pm.in
+	- typos, minor wordsmithing
+
+Mon Aug 11 15:59:40 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.28]:
+	* VERSION: bump
+	* lib/App/ElbV2.pm.in
+	(create_load_balancer)
+	- refactoring
+	- croak if no subnets or security groups defined
+	- format subnets, security group as lists
+	(create_listener)
+	- add default_actions
+	* lib/App/FargateStack.pm.in
+	(show_config): dryrun might be set later by command
+	(main): set info level for delete-service
+	* lib/App/FargateStack/Builder.pm.in
+	(build)
+	- typo
+	- arn, not task_definition_arn
+	(_delete_roles)
+	- refactoring
+	(_delete_log_group)
+	- refactoring
+	(_delete_http)
+	- remove alb arn if it does not exist
+	- log message about deleting listener rules
+	- revoke ALB ingress before deletion of sg
+	(alb_exists): new
+	(remove_alias_record)
+	- check for alias record
+	* lib/App/FargateStack/Builder/HTTPService.pm.in
+	(create_listeners)
+	- get_listeners_by_port
+	- return hash, not array
+	- check_result after creating
+	(create_alb)
+	- refactoring
+	- set alb object in config
+	- set security_group object in config
+	- set scheme based on alb type
+	(create_alb_security_group)
+	- refactoring
+	- check for existence of sg
+	- authorize ingress based on configured ports (don't hard code)
+	(create_alias)
+	- don't check if we don't have an ALB
+	(get_listeners_by_port): new
+	* lib/App/FargateStack/Builder/IAM.pm.in
+	(build_iam_role)
+	- always check, no caching
+	- check_result after api calls
+	- set policy_name in config
+	* lib/App/FargateStack/Builder/LogGroup.pm.in
+	(build_log_groups)
+	- update name in config
+	* lib/App/FargateStack/Builder/TaskDefinition.pm.in
+	(compare_task_definition)
+	- arn, not task_definition_arn
+	* lib/App/FargateStack/Init.pm.in
+	(init)
+	- set subnets in config
+	* lib/App/FargateStack/Logs.pm.in
+	- whitespace
+	* lib/App/Route53.pm.in
+	(list_resource_record_sets): new
+
+
+Mon Aug 11 07:40:44 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.27]:
+	* README.md: generated
+	* VERSION: bump
+	* lib/App/EC2.pm.in
+	(describe_subnet)
+	- refactoring
+	- allow list of subnets
+	(describe_subnets)
+	- refactoring
+	- allow hash of args
+	* lib/App/FargateStack/Init.pm.in
+	(_init_ec2)
+	- log messages
+	- check for 2 subnets
+	- always validate subnets
+	(_init_tasks)
+	- make sure we have private subnets if http service
+	- log messages
+	* lib/App/FargateStack/Builder.pm.in
+	(build)
+	- confirm apply
+	- log messages
+	* lib/App/FargateStack.pm.in
+	(init_logger): avoid uninitialized warning
+	(show_config): tidy up output
+	(cmd_remove_service)
+	- refactoring
+	- log messages
+	- cmd_delete_http => cmd_delete_http_service
+	(main): likewise
+	* lib/App/FargateStack/Builder/Service.pm.in
+	(build_service)
+	- always try to place task in private subnet
+	(get_service_subnets)
+	- get_alb_subnets => get_task_subnets
+	- do not allow placement of tasks in public subnets for http services
+	(get_task_subnets)
+	- align ALB, task AZs
+	* lib/App/FargateStack/Pod.pm.in
+	- tweak section on warning about public subnets
+	- blurb about task placement
+
+Mon Aug 11 05:25:47 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.26]:
+	* VERSION: bump
+	* lib/App/AWS.pm.in
+	(check_result): [$param]
+	* lib/App/ECS.pm.in
+	(register_task_definition): whitespace
+	(list_task_definitions): likewise
+	(deregister_task_definition): likewise
+	(create_service)
+	- assign public IP when in public subnet
+	* lib/App/FargateStack/Builder/Certificate.pm.in
+	(build_certificate)
+	- refactoring
+	- fix ChangeBatch
+	* lib/App/FargateStack/Builder/HTTPService.pm.in
+	(attach_certificate)
+	- check for certificate arn (may be dryrun mode)
+	(create_target_group)
+	- container_port
+	* lib/App/FargateStack/Builder/Service.pm.in
+	(build_service): enable public_ip if alb is public
+	* lib/App/FargateStack/Builder/Utils.pm.in
+	(fetch_acm): new
+	* lib/App/Route53.pm.in
+	(create_alias): fix ChangeBatch
+
+Sun Aug 10 20:34:38 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.25]:
+	* VERSION: bump
+	* lib/App/AWS.pm.in
+	(check_result)
+	- return if no error
+	* lib/App/FargateStack/Builder.pm.in
+	(remove_alias_record): elb, not self
+
+Sun Aug 10 19:22:39 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.24]:
+
+	* VERSION: bump
+	* lib/App/AWS.pm.in
+	(check_result)
+	- add multiple signatures
+	* lib/App/EC2.pm.in
+	- debug, not trace levels
+	* lib/App/ElbV2.pm.in
+	- + _alb_cache
+	(describe_load_balancers): cache alb info
+	* lib/App/FargateStack.pm.in
+	(init_logger): add module/method/line numbers in debug/trace modes
+	(check_service_name): die don't croak
+	(get_default_task_name): return task if just one
+	(cmd_run_task): die don't croak
+	(check_latest_image)
+	- return boolean
+	- whitespace
+	(get_task_status)
+	- refactoring
+	(get_default_service_name)
+	- refactoring
+	(cmd_create_service)
+	- refactoring
+	- allow count
+	(cmd_remove_service): die don't croak
+	(verify_service): likewise
+	(cmd_update_service): likewise
+	(cmd_register_task_definition)
+	- likewise
+	- check_result
+	(get_latest_image): fetch_ecr
+	(cmd_stop_task): croak don't die
+	(cmd_list_tasks): likewise
+	(cmd_delete_schedule): likewise
+	(cmd_delete_task): likewise
+	(cmd_delete_daemon): likewise
+	(cmd_delete_http): likewise
+	(cmd_redploy): likewise
+	(main)
+	- set log-level to info for create-service
+	- likewise for start-service
+	- register-task, not register
+	* lib/App/FargateStack/Builder.pm.in
+	(delete_task_resources)
+	- all --force to skip confirm
+	(delete_cluster)
+	- refactoring
+	- check_result
+	(delete_alias_record)
+	- refactoring
+	(_delete_service)
+	- more consistent log messages
+	(_delete_task_definitions): likewise
+	(_delete_roles): likewise
+	(_delete_log_group): likewise
+	(_delete_security_group): likewise
+	(_delete_target_group): likewise
+	(_delete_http): likewise, check_result
+	(is_our_alb): check_result
+	(remove_alias_record): likewise
+	(get_efs_sgs): likewise
+	(authorize_efs_ingress): fetch_ec2, check_result
+	* lib/App/FargateStack/Builder/HTTPService.pm.in
+	(build_http_service)
+	- refactoring
+	(create_target_group)
+	- fetch_elbv2
+	- check_result
+	(create_alb)
+	- refactoring
+	- make sure alb section is created
+	- check_result
+	(create_alb_security_group)
+	- refactoring
+	- fetch_ec2
+	(create_alias)
+	- fetch_route53
+	* lib/App/FargateStack/Builder/Service.pm.in
+	(build_service)
+	- allow count
+	- @desired_services  keys %{$tasks} if not specified (start all)
+	- use container_port from config if defined
+	(get_service_subnets)
+	- fetch_elbv2
+	- refactoring
+	* lib/App/FargateStack/Builder/TaskDefinition.pm.in
+	(register_task_definition)
+	- refactoring
+	(define_task_size)
+	- set size if not defined in config
+	* lib/App/FargateStack/Builder/Utils.pm.in
+	(@EXPORT)
+	- + fetch_ecr, fetch_elbv3, fetch_events, fetch_secrets
+	(log_die): exit
+	* lib/App/FargateStack/Init.pm.in
+	(_init_ec2)
+	- debug level instead of trace
+	(_init_route53): whitespace
+	* lib/App/Route53.pm.in
+	(create_alias): elb is required
+
+Sun Aug 10 08:24:22 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.23]:
+	* VERSION: bump
+	* lib/App/AWS.pm.in
+	(check_result): new
+	* lib/App/EC2.pm.in
+	(revoke_security_group_ingress): new
+	(delete_security_group): new
+	* lib/App/ECS.pm.in
+	(delete_cluster): new
+	* lib/App/EFS.pm.in
+	(describe_mount_targets): new
+	* lib/App/ElbV2.pm.in
+	(delete_target_group): new
+	(describe_rules): refactoring
+	(describe_load_balancers): take k/v/ pairs now
+	(_find_alb_of_type): describe_load_balancers signature change
+	(validate_alb): likewise
+	* lib/App/FargateStack.pm.in
+	(cmd_remove_service): fix usage message
+	(main): +elbv2, -elb, +ecr
+	* lib/App/FargateStack/Builder.pm.in
+	(remove_listener_rules)
+	- elbv2, don't need target arn, use domain
+	- make conditional more obvious (check domain)
+	(delete_task_resources)
+	- refactore, debugged
+	(is_our_alb): must pass alb_arn, tg_arn now
+	(remove_alb): removed
+	(remove_alias_record)
+	- refactoring
+	- describe_load_balancers signature change
+	- #JSON::false, not 'false'
+	(_delete_service): new
+	(_delete_task_definitions): new
+	(_delete_scheduled_task): new
+	(_delete_roles): new
+	(_delete_http): new
+	(_delete_log_group): new
+	(_delete_target_group): new
+	(_delete_cluster): new
+	(_delete_security_group): new
+	(_delete_alias_record): new
+	(wait_for_alb_delete): new
+	* lib/App/FargateStack/Builder/HTTPService.pm.in
+	(attach_certificate):
+	- fetch_elbv2, not get_elb
+	- refactoring
+	(create_listeners): likewise
+	(create_target_group): likewise
+	(create_alias): likewise
+	(create_alb)
+	- likewise
+	- describe_load_balancers signature change
+	* lib/App/FargateStack/Builder/IAM.pm.in
+	- removed fetch_iam()
+	* lib/App/FargateStack/Builder/Service.pm.in
+	- describe_load_balancers signature change
+	* lib/App/FargateStack/Builder/Utils.pm.in
+	(fetch_cli_api): new
+	(fetch_*): new
+	(is_service_running)
+	- need to check runningCount
+	* lib/App/FargateStack/Constants.pm.in
+	- + $DEFAULT_EFS_PORT, $DEFAULT_ALB_MAX_TRIES, $DEFAULT_ALB_POLL_SLEEPT_TIME
+	(%DEFAULT_NAMES): + cluster-name
+	* lib/App/FargateStack/Init.pm.in
+	(init): refactoring, fetch_*
+	(_init_ec2): likewise
+	(_init_tasks): likewise
+	(_init_account): likewise
+	(_init_route53)
+	* lib/App/FargateStack/Route53.pm.in
+	(display_hosted_zones): use fetch_route53
+	* lib/App/IAM.pm.in
+	(delete_role): new
+	* lib/App/Logs.pm.in
+	(delete_log_group): new
+	* lib/App/Route53.pm.in
+	- + elbv2, -elb
+	(create_alias): fetch_elbv2
+
+Fri Aug  8 06:33:14 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.22]:
+	* README.md: generated
+	* VERSION: bump
+	* bin/app-FargateStack: CARP_ALWAYS
+	* lib/App/ECS.pm.in
+	(delete_definitions): always deregister
+	(tag_resource): new
+	* lib/App/ElbV2.pm.in
+	(delete_load_balancer): new
+	(delete_rule): new
+	(describe_tags): new
+	* lib/App/FargateStack.pm.in
+	- remove Carp::Always and make it an option to app-Fargate script
+	(get_default_task_name):
+	- use filter arg to support task type
+	- refactoring
+	(cmd_run_task)
+	- make sure this is a task
+	(cmd_remove_service): new from cmd_delete_service
+	(cmd_register_task_definition): new from cmd_register
+	(cmd_destroy): new, but nt yet implemented
+	(build_section_paths): new
+	(cmd_delete_schedule): new
+	(cmd_delete_task): new
+	(cmd_delete_daemon): new
+	(cmd_delete_http): new
+	(help)
+	- use =head(n) sections as help topics
+	(main)
+	- ---confirm-all, --purge-config
+	* lib/App/FargateStack/Builder.pm.in
+	(build)
+	- move task-definition section break
+	(configure_alb): whitespace
+	(remove_listener_rules): new
+	(delete_task_resources): new
+	(is_our_alb): new
+	(remove_alb): new
+	(remove_alias_record): new
+	* lib/App/FargateStack/Builder/Events.pm.in
+	(create_event_target): use create_default, not "1"
+	(build_events_iam_role)
+	- create_events_role()
+	- use create_default() for policy_name
+	* lib/App/FargateStack/Builder/HTTPService.pm.in
+	(create_listeners)
+	- refactoring
+	(create_target_group)
+	- likewise
+	- use create_default() for target group name
+	(create_alb)
+	- {group_name} not {name}
+	- flag in config for creating new ALB
+	- message about creation of new ALB if requested in config
+	- use create_default() for ALB name
+	(create_alias): refactoring
+	* lib/App/FargateStack/Builder/Utils.pm.in
+	- export confirm()
+	(confirm): new
+	(is_service_running): new
+	* lib/App/FargateStack/Constants.pm.in
+	(DEFAULT_NAMES): added more default naming subs
+	* lib/App/FargateStack/Pod.pm.in
+	- updated to reflect new commands, options
+
+
+Tue Aug  5 16:04:58 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.21]:
+	* README.md: generated
+	* VERSION: bump
+	* lib/App/FargateStack.pm.in
+	(help): allow help {command}
+	* lib/App/FargateStack/Pod.pm.in: wordsmithing
+
+Tue Aug  5 14:08:01 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.20]:
+	* README.md: generated
+	* VERSION: bump
+	* lib/App/ECS.pm.in
+	(deregister_task_definition): new
+	(delete_task_definition): new
+	* lib/App/FargateStack/Builder/IAM.pm.in
+	(build_iam_role)
+	- refactoring
+	* lib/App/FargateStack/Builder/LogGroup.pm.in: likewise
+	* lib/App/FargateStack/Builder/SecurityGroup.pm.in: likewise
+	* lib/App/FargateStack/Builder/TaskDefinition.pm.in: likewise
+	* lib/App/FargateStack/Init.pm.in: likewise
+	* lib/App/FargateStack/Builder/Utils.pm.in
+	(create_default): new
+	(common_arg): do not cache var_pool!
+	* lib/App/FargateStack/Constants.pm.in
+	- don't import anything by default
+	- + %DEFAULT_NAMES
+	* lib/App/FargateStack/Pod.pm.in: current status
+
+Tue Aug  5 08:40:48 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.19]:
+	* Makefile
+	- fix clean (-f)
+	* README.md: generated
+	* VERSION: bump
+	* examples/README.md: wip
+	* lib/App/FargateStack.pm.in
+	(cmd_run_task)
+	- refactoring
+	- add dryun mode
+	- croak if no cluster created yet
+	(check_latest_image)
+	- only croak if an image is actually defined in the configuration
+	* lib/App/FargateStack/Builder/Cluster.pm.in
+	(build_fargate_cluster)
+	- refactoring
+	* lib/App/FargateStack/Builder/SecurityGroup.pm.in
+	(build_security_group)
+	- refactoring
+	* lib/App/FargateStack/Builder/TaskDefinition.pm.in
+	(register_task_definition)
+	- refactoring
+	- save image digest when we register definition
+	(define_port_mapping): new
+	(define_task_size): new
+	(create_taskdef_files)
+	- refactoring using above
+	- add profile sizes
+	(compare_task_definition): add trace message
+	* lib/App/FargateStack/Builder/Utils.pm.in
+	(common_args): +security_groups
+	* lib/App/FargateStack/Constants.pm.in
+	- + %ECS_TASK_PROFILES, %ECS_TASK_PROFILE_TYPES
+	- + task size help topic
+	* lib/App/FargateStack/Init.pm.in
+	(init): only carp if command eq apply
+	* lib/App/FargateStack/Pod.pm.in
+	- + TASK SIZE
+
+Tue Aug  5 04:01:14 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.18]:
+	* README.md: generated
+	* VERSION: bump
+	* docker/Makefile
+	(images): new target
+	(realclean): remove images, etc
+	* examples/README.md: wip
+	* lib/App/ECS.pm.in
+	(update_service)
+	- + --desired-count
+	* lib/App/FargateStack.pm.in
+	(cmd_run_task):
+	- assign public IP if subnet is public
+	(default_service_name): fix bug
+	(update_task_count): service_name, not service
+	* lib/App/FargateStack/Pod.pm.in
+	- troubleshoot tipso
+
+Mon Aug  4 18:20:45 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.17]:
+	* Makefile
+	- create markdown from lib/App/FargateStack/Pod.pm
+	* README.md: generatd
+	* VERSION: bump
+	* examples/README.md: wip
+	* examples/minimal-task.yml
+	* lib/App/ECS.pm.in
+	(cluster_exists): select ACTIVE clusters
+	* lib/App/FargateStack.pm.in
+	(show_config): private <> public
+	(cmd_run_task)
+	- warn about public subnets
+	- die if subnet-id invalid
+	* lib/App/FargateStack/Builder/Events.pm.in
+	(has_events): fix return value
+
+Mon Aug  4 16:46:53 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.16]:
+	* README.md: generated
+	* VERSION: bump
+	* lib/App/FargateStack.pm.in
+	- move code to modules below
+	* lib/App/FargateStack/Init.pm.in: new
+	* lib/App/FargateStack/Logs.pm.in: new
+	* lib/App/FargateStack/Pod.pm.in: new
+	* lib/App/FargateStack/Route53.pm.in: new
+	* Makefile: add above to build
+
+Mon Aug  4 14:53:22 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.15]:
+	* lib/App/FargateStack.pm.in:
+	- pod updates
+	(cmd_logs)
+	- refactored using 'filter-log-events'
+	(show_log_events): new
+	(find_task_log_stream): new
+	(help)
+	- help help
+	- use pager
+	(main)
+	- + --log-poll-time
+	* lib/App/FargateStack/Builder/Utils.pm.in
+	- export slurp_file
+	* lib/App/FargateStack/Constants.pm.in
+	- + help topics: ROADMAP, CONFIGURATION, TROUBLESHOOTING, CLI OPTION DEFAULTS
+	- buckets
+
+Mon Aug  4 09:45:49 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.14]:
+	* docker/00-default.conf -> docker/000-default.conf
+	* README.md: generated
+	* VERSION: bump
+	* docker/Dockerfile.apache
+	- 000-default.conf was apparently correct
+	* docker/HelloWorld.pl
+	- log a message if no efs mount point environment variable
+	* docker/Makefile
+	- always push to ECR (for now)
+	* lib/App/ECS.pm.in
+	(update_service)
+	- use named args
+	- support --task-defintion, --force-new-deployment args
+	* lib/App/ElbV2.pm.in
+	(describe_load_balancers)
+	- support --load-balancers-arn arg
+	* lib/App/FargateStack.pm.in
+	(init): bypass init flag for some commands
+	(cmd_service_status)
+	- refactoring
+	- colors
+	- fix pending
+	- add task-definition
+	(get_default_task_name): new
+	(cmd_run_task)
+	- refactoring
+	- support --subnet-id arg
+	- check that we running latest image
+	(check_latest_image): new
+	(get_default_service_name): new
+	(cmd_create_service)
+	- refactoring
+	- check if running latest image
+	(cmd_delete_service)
+	- refactoring
+	- verify service
+	(verify_service): new
+	(update_task_count): renamed from _update_task_count()
+	(cmd_register)
+	- refactoring
+	- $task_definition, not $task_definition_arn
+	(get_latest_image): new
+	(cmd_stop_task): refactoring
+	(cmd_redeploy): new
+	(main)
+	- + --force option to run task on old image, --subnet-id
+	* lib/App/FargateStack/Builder/Service.pm.in
+	(build_service)
+	- refactoring
+	- if http service, make sure we deploy in ALB subnets
+	(get_service_subnets): new
+	(get_alb_subnets): new
+	* lib/App/FargateStack/Builder/Utils.pm.in
+	(common_args): + cluster
+
+Sun Aug  3 07:52:35 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.13]:
+	* README.md: generated
+	* VERSION: bump
+	* lib/App/ECS.pm.in
+	(describe_services): typo
+	* lib/App/Events.pm.in
+	(rule_exists)
+	- just return the rule if we not checking schedule
+	(put_rule)
+	- add state to enable/disable rule
+	(describe_rule): new
+	(disable_rule): - --force
+	* lib/App/FargateStack.pm.in
+	(init)
+	- fetch history defaults
+	(_init_route53)
+	- list-zones, not list-hosted-zones
+	- delay return until after we set profile
+	(check_service_name): check and/or return default service
+	(cmd_service_status)
+	- accept service-name argument
+	- show max-events
+	(cmd_update_service)
+	- allow just count if we have just 1 service
+	(cmd_stop_stask): allow no arg if just 1 service
+	(cmd_enable_schedule_task): new
+	(cmd_disable_schedule_task): new
+	(cmd_reset_history): new
+	(fetch_option_defaults): new
+	(main)
+	- new option --max-events, --history, --abbreviations
+	* lib/App/FargateStack/Builder/Events.pm.in
+	(build_events)
+	- better log messages for event rule changes
+	(update_rule_state): new
+	* lib/App/FargateStack/Builder/Utils.pm.in
+	(write_json_file): new
+	* examples/minimial-scheduled-task.yml
+	- my-cron-job, not my-one-shot
+
+Sat Aug  2 15:01:28 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.12]:
+	* README.md: generated
+	* VERSION: bump
+	* docker/HelloWorld.pl
+	- use env var HAS_EFS_MOUNT
+	* lib/App/FargateStack.pm.in
+	(_init_route53): use route_53 from command line if present
+	(cmd_logs)
+	- croak if no log stream found
+	(cmd_register)
+	- croak if API eror
+	- get_skip_register, not skip_register
+	(main): add route53-profile
+	* lib/App/FargateStack/Builder.pm.in
+	(build)
+	- build security groups, task definitions and THEN events
+	* lib/App/FargateStack/Builder/Events.pm.in
+	(create_event_target)
+	- refactoring
+	- check if current task definition exists before comparing
+	- output target if error
+	* lib/App/FargateStack/Builder/IAM.pm.in
+	(build_iam_role)
+	- create policy when it doesn't exist or we don't have an ARN
+	- fix policy exists logic
+	(create_farget_role): ecs, not ecs-tasks
+	(create_role): refactoring
+	* lib/App/FargateStack/Builder/Secrets.pm.in: use log_die
+	* lib/App/FargateStack/Builder/SecurityGroup.pm.in
+	(build_security_group)
+	- fix log_die error message
+	* lib/App/FargateStack/Builder/TaskDefinition.pm.in
+	(comapare_task_definition)
+	- make sure $secrets is an array
+	- show diffs
+	* lib/App/FargateStack/Constants.pm.in
+	- use ecs instead of task for service domain keys
+	* examples/README.md: new
+
+
+Sat Aug  2 08:45:51 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.11]:
+	* VERSION: bump
+	* docker/.gitignore: new
+	* docker/000-default.conf -> docker/00-default.conf
+	* docker/Dockerfile.apache
+	- start-server => start-apache
+	* docker/Makefile: new
+	* docker/README.md: generated
+	* docker/README.md.in: new
+	* deploy-to-ecr -> docker/deploy-to-ecr
+
+Fri Aug  1 17:15:41 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.10]:
+	* README: generated
+	* VERSION: bump
+	* lib/App/FargateStack.pm.in
+	- pod updates (SECRETS)
+	(get_task_status): order of keys incorrect, swap container, stop_reason
+	* lib/App/FargateStack/Builder/TaskDefinition.pm.in
+	(create_taskdef_files): add_secrets returns array ref, not list
+
+Fri Aug  1 12:36:45 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.9]:
+	* .gitignore
+	- +.tdy, .LOG
+	* README.md: generated
+	* VERSION: bump
+	* requires: CLI::Simple 1.0.0
+	* lib/App/FargateStack.pm.in
+	(main): update log levels for some commands
+	(init)
+	- remove log_level munging (now done in run)
+	(init_tasks): whitespace
+	(cmd_service_status): refactoring
+	(cmd_run_task): likewise
+	(cmd_list_tasks): likewise
+	(cmd_logs): likewise
+	(get_task_status): new
+	* lib/App/FargateStack/Builder/Utils.pm.in
+	(jmespath_mapping): support array or hash list
+
+Fri Aug  1 08:28:10 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.8]:
+	* .gitignore
+	- *.yml, test-*.pl, packages, requires.in
+	* Makefile
+	- new target 'requires'
+	- add TOC to README.md
+	* README-FARGATE.md: minor tweaks
+	* VERSION: bump
+	* lib/App/Command.pm.in: trace message to dump command
+	* lib/App/ECS.pm.in
+	(list_tasks): new
+	(stop_task): new
+	* lib/App/FargateStack.pm.in
+	- updated pod
+	(init)
+	- add additional command that log @ error level
+	- use english $^S
+	(cmd_service_status): wrap events at 100 columns
+	(_init_config)
+	- use fargate-stack.yml as default
+	- allow enviroment variable for default configuration name
+	(cmd_update_service)
+	- add a sleep so we can get updated status
+	(cmd_register)
+	- refactoring
+	- update config with new arn
+	(help)
+	- show USAGE for help
+	(cmd_stop_task): new
+	(cmd_list_tasks): new
+	(cmd_update_policy): new
+	(main)
+	- - --force
+	- one-letter abbreviations missing for some options
+	- + list-tasks, stop-task, update-policy
+	* lib/App/FargateStack/Builder/EFS.pm.in
+	(add_volumes)
+	- use default mount point of /mnt
+	- minor refactoring
+	* lib/App/FargateStack/Builder/IAM.pm.in
+	(build_iam_role)
+	- major refactoring
+	- better logging
+	- display diffs in a friendlier way
+	(create_fargate_policy): new
+	* lib/App/FargateStack/Builder/S3Bucket.pm.in
+	(add_bucket_policy)
+	- + readonly option
+	- + paths option
+	* lib/App/FargateStack/Builder/SQSQueue.pm.in
+	(build_queue)
+	- refactoring
+	- support for dead letter queues
+	(ensure_queue_arn): new
+	(queue_exists): new
+	(apply_queue_defaults): new
+	(add_queue_policy): support for dlq
+	* lib/App/FargateStack/Builder/Utils.pm.in
+	(common_args): new
+	(display_diffs): new
+	(ToCamelCase): new
+	(toCamelCase): new
+	(_toCamelCase): new
+	(jmespath_mapping): new
+	(elapsed_time): new
+	* lib/App/FargateStack/Constants.pm.in
+	- + $DEFAULT_SQS+
+	- + $QUEUE_ATTRIBUTES
+	- + help topics CLOUDWATCH_LOGS, COMMAND LIST
+	* lib/App/SQS.pm.in
+	- + max_receive_count, delay_seconds, arn, url
+	(set_attributes): new
+	(get_queue_arn): new
+	(create_queue)
+	- use constants
+	- support dead letter queues
+	* my-stack-minimal.yml
+	* requires
+	- + Carp::Always, Text::Diff, Time::Piece, Date::Parse, IO::Pager
+	* examples/minimal-task.yml: renamed from my-stack-minimal.ym
+	* examples/minimal-scheduled-task.yml: new
+	* examples/minimal-https.yml: new
+	* examples/minimal-http.yml: new
+	* examples/minimal-daemon.yml: new
+	* docker/000-default.conf: new
+	* docker/Dockerfile.apache: new
+	* docker/HelloWorld.pl: moved from root
+	* docker/apache2.conf: new
+	* docker/bookworm-backports.list: new
+	* docker/start-apache: new
+
+Tue Jul 29 16:14:46 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.7]:
+	* README.md: generated
+	* VERSION: bump
+	* lib/App/ECS.pm.in
+	(describe_services): new
+	* lib/App/FargateStack.pm.in
+	(init)
+	- call _init_route53() unconditionally and let it figure it out
+	- set log-level to error for commands that shouldn't log
+	- command(), not get_command()
+	(show_config): log_level may not be initialized yet?
+	(_init_defaults):
+	- save last_updated and delete last_updated and id from config
+	- force cache off if config was invalidated
+	(_init_route53)
+	- return if not a command that needs route53
+	- get_cache, not cache()
+	(cmd_logs)
+	- refactoring
+	- order-by, descending (need most recent log stream)
+	- standardize log message output
+	(_init_ec2): debug message
+	(cmd_service_status): new
+	(_init_config): don't invalidate config here, too early
+	(cmd_run_task): standardize log message output
+	(check_task): new
+	(cmd_stop_service): removed
+	(cmd_start_service): removed
+	(cmd_update_service): replaces above
+	(_update_task_count): new
+	(init_logger): default 'info'
+	(main)
+	- log-time default now true
+	- added command status
+	* lib/App/FargateStack/Builder/HTTPService.pm.in
+	(create_alb)
+	- create alb in public or private subnet depending on service type (http/https)
+
+Tue Jul 29 09:32:14 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.6]:
+	* VERSION: bump
+	* README.md: generated
+	* lib/App/FargateStack.pm.in
+	- pod updates
+	(init)
+	- die handler for keeping config file in sync
+	- force --no-cache if config file out of sync
+	(_init_route53): refactoring
+	(_init_defaults): moved setting of cache here
+	(cmd_stop_service): first implementation
+	(cmd_list_hosted_zones): SCRIPT_NAME no SCRIPT_PATH
+	(cmd_run_task): likewise
+	(cmd_register): likewise
+	(_init_config)
+	- likewise
+	- invalidate config object
+	- add config_name to configuration object
+	(display_hosted_zones): set route53 if not set
+
+Mon Jul 28 15:52:08 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.5]:
+	* README.md
+	* VERSION
+	* lib/App/EC2.pm.in
+	(new): find eligible VPC if no vpc_id
+	(find_eligible_vpcs): new
+	(describe_internet_gateways): new
+	(describe_vpc_nat_gateways): new
+	(describe_nat_gateways): refactored
+	* lib/App/FargateStack.pm.in
+	(_init_ec2): no longer using default VPC
+	* lib/App/FargateStack/Builder/Events.pm.in
+	(build_events)
+	- log_die
+	* lib/App/FargateStack/Builder/LogGroup.pm.in
+	(build_log_groups): look for group again if arn is missing
+
+Mon Jul 28 13:24:03 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.4]:
+	* VERSION: bump
+	* README.md: generated
+	* lib/App/EC2.pm.in
+	(new)
+	- validate subnet ids against usable list
+	(describe_nat_gateways): new
+	(find_public_subnets): refactored
+	(find_private_subnets): likewise
+	(_find_subnets): likewise
+	(describe_route_tables): new
+	(list_route_table_associations): new
+	(categorize_subnets): rename from find_all_subnets()
+	* lib/App/FargateStack.pm.in
+	- pod updates
+	(show_config): zone_id // -
+	(cmd_logs): new
+	(normlize_time_range): new
+	(_to_epoch): new
+	(_init_ec2)
+	- don't set subnets until they are verified
+	(cmd_run_task)
+	- remove magic values, use constants
+	- iterate until no more message
+	- better formatting of messages
+	(main)
+	- + log-time, log-wait, task-timeout
+	- + logs command
+	* lib/App/FargateStack/Constants.pm.in
+	- +$DEFAULT_ECS*, $DEFAULT_LOG*, $SEC_*
+	* lib/App/Logs.pm.in
+	- +log_stream_name,
+	(get_log_events)
+	- renamed from get_log_event()
+	- use defaults
+	(get_next_log_events): new
+	* my-stack-minimal.yml
+
+Sun Jul 27 15:56:28 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.3]:
+	* Makefile
+	- build lib/App/FargateStack.pm separately
+	* README.md: generated
+	* VERSION: bump
+	* lib/App/AWS.pm.in
+	- get_logger, not log_error
+	* lib/App/Command.pm.in
+	- log4perl_conf may not be available so eval
+	* lib/App/EC2.pm.in
+	(is_sg_authorized): new
+	(find_security_group_name): new
+	* lib/App/ECS.pm.in
+	- require servic_name, security_groups
+	- set container port to default
+	* lib/App/ElbV2.pm.in
+	(create_target_group): add health checks
+	(_create_health_check_options): new
+	(list_certificates): new
+	- removed add_certficate since we have add_listener_certificates()
+	* lib/App/FargateStack.pm.in
+	- pod updates
+	(show_config): new
+	(init)
+	- trace level for Dumper messages
+	- don't allow --no-update and apply because we need to record some state
+	- use log_info
+	- add route53_profile, profile_source, update-config, dryrun settings to init messages
+	(init_tasks)
+	- dump images, tasks if some task does not have an image
+	- fix log_die message
+	(_init_defaults):
+	- set profile source
+	- update route53 config
+	(_init_route53)
+	- trace level for Dumper messages
+	- dump alb, http setting in debug mode
+	- display hosted zones if zone invalid
+	- find the zone if it is not provided
+	(cmd_list_zones): new
+	(display_hosted_zones): new
+	(_init_ec2): log_warn
+	(_init_config): log_info
+	(cmd_run_task): -sprintf
+	(cmd_create_service): likewise
+	(cmd_register): -likewise
+	(help)
+	- fix subject parsing
+	- can't use ?, use help list
+	- regex matching
+	(cmd_plan): new
+	(cmd_apply): new
+	(cmd_update_target): new
+	(main)
+	- + profile_source
+	- move default options to %default_options
+	- move commands to %commands
+	(create_rule): log debug message
+	(validate_alb)
+	- validate the alb by scheme
+	* lib/App/FargateStack/Builder.pm.in
+	(build)
+	- log_info, log_warn
+	- log if we update the config
+	(configure_alb)
+	- set ALB type based on task type (http or https)
+	* lib/App/FargateStack/Builder/Certificate.pm.in
+	- log_info, log_warn
+	* lib/App/FargateStack/Builder/HTTPService.pm.in
+	(build_http_service)
+	- log_warn
+	- attach_certificate() if is_https
+	- check to see if we need to authorize ingress
+	(attach_certificate): new
+	(create_listeners)
+	- trace level for Dumper messages
+	- don't redirect unless secure and redirect_80 set
+	- log_info, log_warn
+	- add_listener_certificates(), not add_certificate()
+	- $elb->fetch_rule_arns_by_arn
+	(create_target_group)
+	- add health checks
+	- task, not service
+	- log_info, log_warn
+	(create_alb)
+	- log_info, log_warn, log_die
+	- better die message if we can't describe alb
+	- update alb security group name
+	- moved message about finding sg with ingress
+	- trace level for Dumper messages
+	(create_alias)
+	- log_info, log_warn
+	- don't create alias record if one exists
+	* lib/App/FargateStack/Builder/LogGroups.pm.in
+	(build_log_groups):
+	- update log group name from arn if needed
+	- fix log group arn when first creating
+	* lib/App/FargateStack/Builder/IAM.pm.in
+	(build_iam_role)
+	- trace level for Dumper messages
+	- check policy if we don't see a name in the config
+	- if we have an ARN for the role we probably created the policy
+	- log_warn
+	- add debug logging
+	(create_role)
+	- trace level for Dumper messages
+	- use %AWS_SERVICE_DOMAINS instead of constructing service
+	- refactoring using choose(), sub {}
+	- log_warn
+	- add debug logging
+	* lib/App/FargateStack/Builder/SecurityGroup.pm.in
+	(build_security_group)
+	- trace level for Dumper messages
+	- log_die
+	- add debug logging
+	- make sure group_id gets set in config
+	* lib/App/FargateStack/Builder/Service.pm.in
+	(build_service)
+	- service_name, not task_name
+	- specify container port
+	* lib/App/FargateStack/Builder/TaskDefinition.pm.in
+	(create_taskdef_files)
+	- update port values in config
+	(register_task_definition)
+	- log_warn, log_die, log_info
+	- cpu, memory must be string
+	(compare_task_definition)
+	- set to false if no current task definition exists
+	* lib/App/FargateStack/Builder/Utils.pm.in
+	(choose): new
+	(dmp): new
+	* lib/App/FargateStack/Constants.pm.in
+	- + $DEFAULT_HEALTH_CHECK_*
+	- + %AWS_SERVICE_DOMAINS
+	- remove load balancers, one shot
+	- add scheduled jobs, environment variables, secrets, queues, buckets
+	- add log groups, efs support, filesystem support
+	* lib/App/Route53.pm.in
+	- + unlink
+	(find_hosted_zone): new
+	(create_alias)
+	- required ALB DNS name and ALB zone now instead of find using ALB ARN
+	- fix Changes payload
+	(change_resource_record_sets)
+	- die instead of croak
+	- use unlink
+	- payload already includes Changes
+	(list_hosted_zones): new
+	(validate_hosted_zones)
+	- die instead of croak
+	(find_alias_record): new
+	* my-stack-minimal.yml
+
+Thu Jul 24 14:50:31 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.2]:
+	* README.md: generated
+	* VERSION: bump
+	* lib/App/AWS.pm.in
+	(command)
+	- log result in trace mode
+	- use log_error
+	* lib/App/Command.pm.in
+	(execute)
+	- log flattended command
+	- use log_error
+	* lib/App/EC2.pm.in
+	(new)
+	- cache subnets
+	- use log_die
+	(find_public_subnets): use cached version
+	(find_private_subnets): likewise
+	* lib/App/FargateStack.pm.in
+	- +events, iam, logs, cache
+	- pod updates
+	(init)
+	- setup cache str
+	- log cache
+	- don't validate images if cached
+	(_init_account)
+	- use cached account
+	- use log_infi, log_die
+	(_init_ec2)
+	- pass subnets if caching
+	- do not validate subnets if caching
+	(help)
+	- display list of subjects in ASCII table
+	- use pager
+	* lib/App/FargateStack/Builder.pm.in
+	(update_config_id): new
+	* lib/App/FargateStack/Builder/Cluster.pm.in
+	- cache cluster
+	- removed create_fargate_role
+	* lib/App/FargateStack/Builder/EFS.pm.in
+	(add_volumes)
+	- +readonly
+	- cached EFS parameters
+	* lib/App/FargateStack/Builder/SecurityGroup.pm.in
+	(build_security_group)
+	- use cache
+	- refactoring
+	* lib/App/FargateStack/Builder/Events.pm.in
+	(build_events)
+	- some refactoring
+	(create_event_target)
+	- likewise
+	- use log_die
+	(build_events_iam_role)
+	- refactoring
+	- use cache
+	- use log_die
+	- update policy_name
+	(fetch_events): new
+	* lib/App/FargateStack/Builder/IAM.pm.in
+	(build_iam_role)
+	- refactoring
+	- use cache
+	- use log_die
+	(create_role)
+	- use cache
+	- use log_info
+	- use log_die
+	(fetch_iam): new
+	* lib/App/FargateStack/Builder/LogGroup.pm.in
+	- refactoring
+	- use cache
+	(fetch_logs): new
+	* lib/App/FargateStack/Builder/Secrets.pm.in
+	- refactoring
+	- store arn
+	- use cache
+	* lib/App/FargateStack/Builder/TaskDefinition.pm.in
+	(write_taskdef)
+	- refactoring
+	(compare_task_definition): new
+	* lib/App/FargateStack/Builder/Utils.pm.in: +log_trace
+	* lib/App/FargateStack/Constants.pm.in
+	- +$DEFAULT_LOG_RETENTION_DAYS, $SPACE, $DASH, $CLOUDWATCH_LOGS_RETENTION_DAYS
+	- %HELP_SUBJECT values now array
+	- add bold white for TRACE level
+	* lib/App/Logs.pm.in
+	- refactoring
+
+Wed Jul 23 08:00:19 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.1]:
+	* .gitignore: *.bak, \#
+	* README: generated
+	* VERSION: bump
+	* fargate-stack-orig.yml: deleted
+	* fargate-stack.yml: deleted
+	* lib/App/Bencmark.pm.in: deleted
+	* ChangeLog
+	* HelloWorld.pl
+	* README.md
+	* lib/App/Benchmark.pm.in
+	(dump_benchmarks): return sorted list
+	* lib/App/Command.pm.in
+	(get_logger): use custom config if available
+	* lib/App/ECS.pm.in
+	(describe_tasks): new
+	(run_task): new
+	(wait_tasks_stoped): new
+	* lib/App/ElbV2.pm.in: -File::Temp
+	* lib/App/Events.pm.in
+	- unlink
+	(remove_targets): new
+	(list_rules_by_target): new
+	(put_targets): use unlink value
+	* lib/App/Logs.pm.in
+	(get_log_events): new
+	* lib/App/Secrets.pm.in: remove unnecessary modules
+	* lib/App/FargateStack.pm.in
+	- override init_logger()
+	(_init_tasks)
+	- use log_die instead of croak
+	- add unlink to global_options (to pass to App::*)
+	(_init_config)
+	- tweak some error messages
+	(cmd_run_task): new
+	(cmd_register): new
+	(init_logger): new
+	(cmd_delete_service)
+	- service_name => task_name
+	- log_die instead of croak
+	(cmd_create_service): likewise
+	(main)
+	- +options: logger, color, force, log-level, skip-register, unlink, wait
+	- +commands: run-task, update-target, register
+	* lib/App/FargateStack/Builder.pm.in
+	(build): better messages at end of run
+	* lib/App/FargateStack/Builder/EFS.pm.in
+	(add_volumes)
+	- FileSystemArn not fileSystemArn
+	- volumes and mount points should be arrays
+	(add_efs_policy): fat arrow mistakenly replaced :
+	* lib/App/FargateStack/Builder/Events.pm.in
+	- add global options when creating events object
+	(build_events)
+	- delete rule if taskdef changes
+	- change info messages to warn
+	(create_event_target)
+	- add global options when creating events object
+	- check to if taskdef arn has changes and remove target
+	(put_targets): use unlink value
+	* lib/App/FargateStack/Builder/IAM.pm.in
+	- change info messages to warn
+	* lib/App/FargateStack/Builder/TaskDefinition.pm.in
+	- change info messages to warn
+	- tweak some error messages
+	- fixed log_stream_prefix value
+	- log message when writing the taskdef
+	* lib/App/FargateStack/Builder/Utils.pm.in
+	(log_fatal): new
+	(log_die): new
+	* lib/App/FargateStack/Constants.pm.in
+	- + $DEFAULT_RUL_ID, $LOG4PERL_CONF
+	* lib/App/IAM.pm.in
+	- remove unnecessary modules
+	- + unlink
+	(policy_exists): use command()
+	(create_policy): use unlink value
+	(is_policy_attached): uase command()
+	(put_role_policy): use unlink value
+	(create_role): likewise
+	* requires
+	- + Data::Compare, -Carp::Always
+
+Fri Jul 18 10:40:23 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[BigBang - 1.0.0]:
+	* .gitignore: new
+	* ChangeLog: new
+	* Dockerfile: new
+	* HelloWorld.pl: new
+	* Makefile: new
+	* README.md: new
+	* VERSION: new
+	* bin/app-FargateStack: new
+	* buildspec.yml: new
+	* deploy-to-ecr: new
+	* fargate-stack-orig.yml: new
+	* fargate-stack.yml: new
+	* fargate-template.yml: new
+	* lib/App/ACM.pm.in: new
+	* lib/App/AWS.pm.in: new
+	* lib/App/Benchmark.pm.in: new
+	* lib/App/Bencmark.pm.in: new
+	* lib/App/Command.pm.in: new
+	* lib/App/EC2.pm.in: new
+	* lib/App/ECR.pm.in: new
+	* lib/App/ECS.pm.in: new
+	* lib/App/EFS.pm.in: new
+	* lib/App/ElbV2.pm.in: new
+	* lib/App/Events.pm.in: new
+	* lib/App/FargateStack.pm.in: new
+	* lib/App/FargateStack/Builder.pm.in: new
+	* lib/App/FargateStack/Builder/Certificate.pm.in: new
+	* lib/App/FargateStack/Builder/Cluster.pm.in: new
+	* lib/App/FargateStack/Builder/EFS.pm.in: new
+	* lib/App/FargateStack/Builder/Events.pm.in: new
+	* lib/App/FargateStack/Builder/HTTPService.pm.in: new
+	* lib/App/FargateStack/Builder/IAM.pm.in: new
+	* lib/App/FargateStack/Builder/LogGroup.pm.in: new
+	* lib/App/FargateStack/Builder/S3Bucket.pm.in: new
+	* lib/App/FargateStack/Builder/SQSQueue.pm.in: new
+	* lib/App/FargateStack/Builder/Secrets.pm.in: new
+	* lib/App/FargateStack/Builder/SecurityGroup.pm.in: new
+	* lib/App/FargateStack/Builder/Service.pm.in: new
+	* lib/App/FargateStack/Builder/TaskDefinition.pm.in: new
+	* lib/App/FargateStack/Builder/Utils.pm.in: new
+	* lib/App/FargateStack/Constants.pm.in: new
+	* lib/App/IAM.pm.in: new
+	* lib/App/Logs.pm.in: new
+	* lib/App/Route53.pm.in: new
+	* lib/App/S3Api.pm.in: new
+	* lib/App/SQS.pm.in: new
+	* lib/App/STS.pm.in: new
+	* lib/App/SecretsManager.pm.in: new
+	* my-stack-minimal.yml: new
+	* requires: new
+	* t/00-app-fargatestack.t: new
+	* test-requires: new
+	* version.mk: new

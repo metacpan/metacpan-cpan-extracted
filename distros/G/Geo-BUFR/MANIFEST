@@ -124,6 +124,8 @@ t/substituted.txt_bitmap
 t/substituted.txt_noqc
 t/substituted_data
 t/substituted_metadata
+t/table_20021.txt_eccodes
+t/table_8042.txt_eccodes
 t/tempLow_200707271955.bufr
 t/tempLow_200707271955.txt
 t/bt/B0000000000000011000.TXT

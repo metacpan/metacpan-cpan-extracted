@@ -75,6 +75,8 @@ lib/URI/tn3270.pm
 lib/URI/urn.pm
 lib/URI/urn/isbn.pm
 lib/URI/urn/oid.pm
+lib/URI/ws.pm
+lib/URI/wss.pm
 perlimports.toml
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
@@ -145,6 +147,7 @@ t/urn-oid.t
 t/urn-scheme-exceptions.t
 t/userpass.t
 t/utf8.t
+t/ws.t
 uri-test
 xt/author/00-compile.t
 xt/author/distmeta.t

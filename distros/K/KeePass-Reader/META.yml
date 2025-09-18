@@ -1,0 +1,38 @@
+---
+abstract: 'Perl interface to read KeePass version 4'
+author:
+  - 'Quentin Garnier <qgarnier at ose-consulting.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker::Config: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: apache2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: KeePass-Reader
+no_index:
+  directory:
+    - t
+    - inc
+recommends:
+  ExtUtils::PkgConfig: '0'
+  XSLoader: '0'
+requires:
+  CryptX: '0',
+  Crypt::Argon2: '0',
+  Carp: '0'
+  DynaLoader: '0'
+  Exporter: '0'
+  overload: '0'
+  perl: '5.008001'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/garnier-quentin/perl-KeePass-Reader/issues
+  homepage: https://github.com/garnier-quentin/perl-KeePass-Reader
+  repository: git://github.com/garnier-quentin/perl-KeePass-Reader.git
+version: '0.2'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

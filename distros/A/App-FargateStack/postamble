@@ -1,0 +1,6 @@
+#-*- mode: makefile; -*-
+postamble ::
+
+install::
+	ln -sf $(INSTALLSITEBIN)/app-fargatestack $(INSTALLSITEBIN)/app-FargateStack-checker
+	ln -sf $(INSTALLSITEBIN)/app-fargatestack $(INSTALLSITEBIN)/app-FargateStack

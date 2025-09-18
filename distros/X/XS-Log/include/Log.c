@@ -1,7 +1,7 @@
 /***************************************************************************************
-* Build  MD5 : 4/l/K5ISfexT1tFj1NtpFQ
-* Build Time : 2025-09-16 15:49:51
-* Version    : 5.090109
+* Build  MD5 : n1+B4g6Faf1tWqy8Clo44A
+* Build Time : 2025-09-18 13:23:05
+* Version    : 5.090115
 * Author     : H.Q.Wang
 ****************************************************************************************/
 #include "Log.h"
@@ -103,7 +103,54 @@ bool openLog(const char *log_filepath,const LogOptions* config) {
 	
     return f;
 }
+void setLogLevel(int level)
+{
+	g_config.options.level = level;
+}
+void setLogMode(int flag)
+{
+	g_config.options.mode = flag;
+}
+void setLogColor(int flag)
+{
+	g_config.options.use_color = flag;
+}
+void setLogTargets(int flag)
+{
+	g_config.options.targets = flag;
+}
+// 设置配置项的函数
+bool setLogOptions(const char *key, void *val) {
+    if (!key) return false;
 
+    // 比较键名并设置对应的值
+    if (strcmp(key, "level") == 0) {
+        g_config.options.level = *(LogLevel*)val;
+    } else if (strcmp(key, "mode") == 0) {
+        g_config.options.mode = *(LogMode*)val;
+    } else if (strcmp(key, "targets") == 0) {
+        g_config.options.targets = *(LogTarget*)val;
+    } else if (strcmp(key, "use_color") == 0) {
+        g_config.options.use_color = *(bool*)val;
+    } else if (strcmp(key, "show_timestamp") == 0) {
+        g_config.options.show_timestamp = *(bool*)val;
+    } else if (strcmp(key, "show_log_level") == 0) {
+        g_config.options.show_log_level = *(bool*)val;
+    } else if (strcmp(key, "show_file_info") == 0) {
+        g_config.options.show_file_info = *(bool*)val;
+    } else if (strcmp(key, "max_file_size") == 0) {
+        g_config.options.max_file_size = *(long*)val;
+    } else if (strcmp(key, "max_files") == 0) {
+        g_config.options.max_files = *(int*)val;
+    } else if (strcmp(key, "flush_immediately") == 0) {
+        g_config.options.flush_immediately = *(bool*)val;
+    } else {
+        // 未知的配置项
+        return false;
+    }
+
+    return true;
+}
 void closeLog() {
     flushLog();
     log_close_file();
@@ -348,9 +395,7 @@ static void log_rotate_file() {
     rename(g_config.cur_path, new_name);
 }
 
-
 void log_write(LogLevel level, const char *file, int line, const char *format, ...) {
-	//printf("log level: %d\n",level);
 	if(level == LOG_LEVEL_OFF) return;
 	if(level != LOG_LEVEL_TEXT)
 	{

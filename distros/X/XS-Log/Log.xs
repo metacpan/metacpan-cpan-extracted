@@ -1,3 +1,9 @@
+/***************************************************************************************
+* Build  MD5 : Xrhks8OILOBduvDSsKMXFA
+* Build Time : 2025-09-18 13:22:45
+* Version    : 5.090111
+* Author     : H.Q.Wang
+****************************************************************************************/
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
@@ -151,24 +157,81 @@ flushLog()
   CODE: 
     flushLog();
 
+# 包装 bool setLogOptions(const char *key, void *val)
+bool
+setLogOptions(key, val)
+    const char *key
+    SV *val
+  CODE:
+    void *c_val;
+    
+    # 根据Perl值的类型转换为相应的C指针
+    if (SvIOK(val)) {
+        # 如果是整数，存储其地址
+        IV num = SvIV(val);
+        c_val = &num;
+    } else if (SvPOK(val)) {
+        # 如果是字符串，使用其指针
+        c_val = (void *)SvPV_nolen(val);
+    } else {
+        # 不支持的类型
+        croak("Unsupported value type for setLogOptions");
+        XSRETURN_UNDEF;
+    }
+    
+    RETVAL = setLogOptions(key, c_val);
+  OUTPUT:
+    RETVAL
+
+# 包装 void setUseColor(int flag)
+void
+setLogColor(flag)
+    int flag
+  CODE:
+    setLogColor(flag);
+
+void
+setLogLevel(level)
+    int level
+  CODE:
+    setLogLevel(level);
+
+void
+setLogMode(flag)
+    int flag
+  CODE:
+    setLogMode(flag);
+
+void
+setLogTargets(flag)
+    int flag
+  CODE:
+    setLogTargets(flag);
+
 void
 printNote(SV* fmt, ...)
   PPCODE:
     {
         dXSARGS;
-        if (items < 1) {
-            XSRETURN_EMPTY;
+        if (items < 1) XSRETURN_EMPTY;
+
+        ENTER; SAVETMPS;
+
+        PUSHMARK(SP);
+        for (int i = 0; i < items; i++) {
+            XPUSHs(ST(i));
+        }
+        PUTBACK;
+
+        int count = call_pv("CORE::sprintf", G_SCALAR);
+
+        SPAGAIN;
+        if (count == 1) {
+            SV* result = POPs;
+            printNote("%s", SvPV_nolen(result));
         }
 
-        // 创建一个空的 SV 用来拼接
-        SV* sv = newSVpv("", 0);
-
-        // 把参数 @_ 里的内容，按照 printf 格式化拼接
-        sv_catpvf(sv, SvPV_nolen(fmt), 
-                  (items > 1 ? SvPV_nolen(ST(1)) : ""));  
-
-        log_write(LOG_LEVEL_TRACE, __FILE__, __LINE__, "%s", SvPV_nolen(sv));
-        SvREFCNT_dec(sv);
+        PUTBACK; FREETMPS; LEAVE;
     }
 
 void
@@ -176,19 +239,25 @@ printBug(SV* fmt, ...)
   PPCODE:
     {
         dXSARGS;
-        if (items < 1) {
-            XSRETURN_EMPTY;
+        if (items < 1) XSRETURN_EMPTY;
+
+        ENTER; SAVETMPS;
+
+        PUSHMARK(SP);
+        for (int i = 0; i < items; i++) {
+            XPUSHs(ST(i));
+        }
+        PUTBACK;
+
+        int count = call_pv("CORE::sprintf", G_SCALAR);
+
+        SPAGAIN;
+        if (count == 1) {
+            SV* result = POPs;
+            printBug("%s", SvPV_nolen(result));
         }
 
-        // 创建一个空的 SV 用来拼接
-        SV* sv = newSVpv("", 0);
-
-        // 把参数 @_ 里的内容，按照 printf 格式化拼接
-        sv_catpvf(sv, SvPV_nolen(fmt), 
-                  (items > 1 ? SvPV_nolen(ST(1)) : ""));  
-
-        log_write(LOG_LEVEL_DEBUG, __FILE__, __LINE__, "%s", SvPV_nolen(sv));
-        SvREFCNT_dec(sv);
+        PUTBACK; FREETMPS; LEAVE;
     }
 
 void
@@ -196,19 +265,25 @@ printInf(SV* fmt, ...)
   PPCODE:
     {
         dXSARGS;
-        if (items < 1) {
-            XSRETURN_EMPTY;
+        if (items < 1) XSRETURN_EMPTY;
+
+        ENTER; SAVETMPS;
+
+        PUSHMARK(SP);
+        for (int i = 0; i < items; i++) {
+            XPUSHs(ST(i));
+        }
+        PUTBACK;
+
+        int count = call_pv("CORE::sprintf", G_SCALAR);
+
+        SPAGAIN;
+        if (count == 1) {
+            SV* result = POPs;
+            printInf("%s", SvPV_nolen(result));
         }
 
-        // 创建一个空的 SV 用来拼接
-        SV* sv = newSVpv("", 0);
-
-        // 把参数 @_ 里的内容，按照 printf 格式化拼接
-        sv_catpvf(sv, SvPV_nolen(fmt), 
-                  (items > 1 ? SvPV_nolen(ST(1)) : ""));  
-
-        log_write(LOG_LEVEL_INFO, __FILE__, __LINE__, "%s", SvPV_nolen(sv));
-        SvREFCNT_dec(sv);
+        PUTBACK; FREETMPS; LEAVE;
     }
 
 void
@@ -216,59 +291,51 @@ printWarn(SV* fmt, ...)
   PPCODE:
     {
         dXSARGS;
-        if (items < 1) {
-            XSRETURN_EMPTY;
+        if (items < 1) XSRETURN_EMPTY;
+
+        ENTER; SAVETMPS;
+
+        PUSHMARK(SP);
+        for (int i = 0; i < items; i++) {
+            XPUSHs(ST(i));
+        }
+        PUTBACK;
+
+        int count = call_pv("CORE::sprintf", G_SCALAR);
+
+        SPAGAIN;
+        if (count == 1) {
+            SV* result = POPs;
+            printWarn("%s", SvPV_nolen(result));
         }
 
-        // 创建一个空的 SV 用来拼接
-        SV* sv = newSVpv("", 0);
-
-        // 把参数 @_ 里的内容，按照 printf 格式化拼接
-        sv_catpvf(sv, SvPV_nolen(fmt), 
-                  (items > 1 ? SvPV_nolen(ST(1)) : ""));  
-
-        log_write(LOG_LEVEL_WARN, __FILE__, __LINE__, "%s", SvPV_nolen(sv));
-        SvREFCNT_dec(sv);
+        PUTBACK; FREETMPS; LEAVE;
     }
-	
+
 void
 printErr(SV* fmt, ...)
   PPCODE:
     {
         dXSARGS;
-        if (items < 1) {
-            XSRETURN_EMPTY;
+        if (items < 1) XSRETURN_EMPTY;
+
+        ENTER; SAVETMPS;
+
+        PUSHMARK(SP);
+        for (int i = 0; i < items; i++) {
+            XPUSHs(ST(i));
+        }
+        PUTBACK;
+
+        int count = call_pv("CORE::sprintf", G_SCALAR);
+
+        SPAGAIN;
+        if (count == 1) {
+            SV* result = POPs;
+            printErr("%s", SvPV_nolen(result));
         }
 
-        // 创建一个空的 SV 用来拼接
-        SV* sv = newSVpv("", 0);
-
-        // 把参数 @_ 里的内容，按照 printf 格式化拼接
-        sv_catpvf(sv, SvPV_nolen(fmt), 
-                  (items > 1 ? SvPV_nolen(ST(1)) : ""));  
-
-        log_write(LOG_LEVEL_ERROR, __FILE__, __LINE__, "%s", SvPV_nolen(sv));
-        SvREFCNT_dec(sv);
-    }
-
-void
-printFail(SV* fmt, ...)
-  PPCODE:
-    {
-        dXSARGS;
-        if (items < 1) {
-            XSRETURN_EMPTY;
-        }
-
-        // 创建一个空的 SV 用来拼接
-        SV* sv = newSVpv("", 0);
-
-        // 把参数 @_ 里的内容，按照 printf 格式化拼接
-        sv_catpvf(sv, SvPV_nolen(fmt), 
-                  (items > 1 ? SvPV_nolen(ST(1)) : ""));  
-
-        log_write(LOG_LEVEL_FATAL, __FILE__, __LINE__, "%s", SvPV_nolen(sv));
-        SvREFCNT_dec(sv);
+        PUTBACK; FREETMPS; LEAVE;
     }
 
 void
@@ -276,17 +343,51 @@ printText(SV* fmt, ...)
   PPCODE:
     {
         dXSARGS;
-        if (items < 1) {
-            XSRETURN_EMPTY;
+        if (items < 1) XSRETURN_EMPTY;
+
+        ENTER; SAVETMPS;
+
+        PUSHMARK(SP);
+        for (int i = 0; i < items; i++) {
+            XPUSHs(ST(i));
+        }
+        PUTBACK;
+
+        int count = call_pv("CORE::sprintf", G_SCALAR);
+
+        SPAGAIN;
+        if (count == 1) {
+            SV* result = POPs;
+            printText("%s", SvPV_nolen(result));
         }
 
-        // 创建一个空的 SV 用来拼接
-        SV* sv = newSVpv("", 0);
+        PUTBACK; FREETMPS; LEAVE;
+    }
 
-        // 把参数 @_ 里的内容，按照 printf 格式化拼接
-        sv_catpvf(sv, SvPV_nolen(fmt), 
-                  (items > 1 ? SvPV_nolen(ST(1)) : ""));  
 
-        log_write(LOG_LEVEL_TEXT, __FILE__, __LINE__, "%s", SvPV_nolen(sv));
-        SvREFCNT_dec(sv);
+
+void
+printFail(SV* fmt, ...)
+  PPCODE:
+    {
+        dXSARGS;
+        if (items < 1) XSRETURN_EMPTY;
+
+        ENTER; SAVETMPS;
+
+        PUSHMARK(SP);
+        for (int i = 0; i < items; i++) {
+            XPUSHs(ST(i));
+        }
+        PUTBACK;
+
+        int count = call_pv("CORE::sprintf", G_SCALAR);
+
+        SPAGAIN;
+        if (count == 1) {
+            SV* result = POPs;
+            printFail("%s", SvPV_nolen(result));
+        }
+
+        PUTBACK; FREETMPS; LEAVE;
     }

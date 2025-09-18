@@ -1,0 +1,194 @@
+---
+abstract: App::FargateStack
+author:
+  - 'Rob Lauer <rclauer@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '6.64'
+  File::ShareDir::Install: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+  File::ShareDir::Install: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-FargateStack
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  App::ACM:
+    file: lib/App/ACM.pm
+    version: '0'
+  App::AWS:
+    file: lib/App/AWS.pm
+    version: '0'
+  App::ApplicationAutoscaling:
+    file: lib/App/ApplicationAutoscaling.pm
+    version: '0'
+  App::Benchmark:
+    file: lib/App/Benchmark.pm
+    version: '0'
+  App::CloudTrail:
+    file: lib/App/CloudTrail.pm
+    version: '0'
+  App::Command:
+    file: lib/App/Command.pm
+    version: '0'
+  App::EC2:
+    file: lib/App/EC2.pm
+    version: '0'
+  App::ECR:
+    file: lib/App/ECR.pm
+    version: '0'
+  App::ECS:
+    file: lib/App/ECS.pm
+    version: '0'
+  App::EFS:
+    file: lib/App/EFS.pm
+    version: '0'
+  App::ElbV2:
+    file: lib/App/ElbV2.pm
+    version: '0'
+  App::Events:
+    file: lib/App/Events.pm
+    version: '0'
+  App::FargateStack:
+    file: lib/App/FargateStack.pm
+    version: v1.0.43
+  App::FargateStack::Autoscaling:
+    file: lib/App/FargateStack/Autoscaling.pm
+    version: '0'
+  App::FargateStack::AutoscalingConfig:
+    file: lib/App/FargateStack/AutoscalingConfig.pm
+    version: '0'
+  App::FargateStack::Builder:
+    file: lib/App/FargateStack/Builder.pm
+    version: '0'
+  App::FargateStack::Builder::Autoscaling:
+    file: lib/App/FargateStack/Builder/Autoscaling.pm
+    version: '0'
+  App::FargateStack::Builder::Certificate:
+    file: lib/App/FargateStack/Builder/Certificate.pm
+    version: '0'
+  App::FargateStack::Builder::Cluster:
+    file: lib/App/FargateStack/Builder/Cluster.pm
+    version: '0'
+  App::FargateStack::Builder::EFS:
+    file: lib/App/FargateStack/Builder/EFS.pm
+    version: '0'
+  App::FargateStack::Builder::Events:
+    file: lib/App/FargateStack/Builder/Events.pm
+    version: '0'
+  App::FargateStack::Builder::HTTPService:
+    file: lib/App/FargateStack/Builder/HTTPService.pm
+    version: '0'
+  App::FargateStack::Builder::IAM:
+    file: lib/App/FargateStack/Builder/IAM.pm
+    version: '0'
+  App::FargateStack::Builder::LogGroup:
+    file: lib/App/FargateStack/Builder/LogGroup.pm
+    version: '0'
+  App::FargateStack::Builder::S3Bucket:
+    file: lib/App/FargateStack/Builder/S3Bucket.pm
+    version: '0'
+  App::FargateStack::Builder::SQSQueue:
+    file: lib/App/FargateStack/Builder/SQSQueue.pm
+    version: '0'
+  App::FargateStack::Builder::Secrets:
+    file: lib/App/FargateStack/Builder/Secrets.pm
+    version: '0'
+  App::FargateStack::Builder::SecurityGroup:
+    file: lib/App/FargateStack/Builder/SecurityGroup.pm
+    version: '0'
+  App::FargateStack::Builder::Service:
+    file: lib/App/FargateStack/Builder/Service.pm
+    version: '0'
+  App::FargateStack::Builder::TaskDefinition:
+    file: lib/App/FargateStack/Builder/TaskDefinition.pm
+    version: '0'
+  App::FargateStack::Builder::Utils:
+    file: lib/App/FargateStack/Builder/Utils.pm
+    version: '0'
+  App::FargateStack::Builder::WafV2:
+    file: lib/App/FargateStack/Builder/WafV2.pm
+    version: '0'
+  App::FargateStack::Checker:
+    file: lib/App/FargateStack/Checker.pm
+    version: '0'
+  App::FargateStack::CloudTrail:
+    file: lib/App/FargateStack/CloudTrail.pm
+    version: '0'
+  App::FargateStack::Constants:
+    file: lib/App/FargateStack/Constants.pm
+    version: '0'
+  App::FargateStack::CreateStack:
+    file: lib/App/FargateStack/CreateStack.pm
+    version: '0'
+  App::FargateStack::Init:
+    file: lib/App/FargateStack/Init.pm
+    version: v1.0.43
+  App::FargateStack::Logs:
+    file: lib/App/FargateStack/Logs.pm
+    version: '0'
+  App::FargateStack::Pod:
+    file: lib/App/FargateStack/Pod.pm
+    version: '0'
+  App::FargateStack::Route53:
+    file: lib/App/FargateStack/Route53.pm
+    version: '0'
+  App::IAM:
+    file: lib/App/IAM.pm
+    version: '0'
+  App::Logs:
+    file: lib/App/Logs.pm
+    version: '0'
+  App::Route53:
+    file: lib/App/Route53.pm
+    version: '0'
+  App::S3Api:
+    file: lib/App/S3Api.pm
+    version: '0'
+  App::SQS:
+    file: lib/App/SQS.pm
+    version: '0'
+  App::STS:
+    file: lib/App/STS.pm
+    version: '0'
+  App::SecretsManager:
+    file: lib/App/SecretsManager.pm
+    version: '0'
+  App::WafV2:
+    file: lib/App/WafV2.pm
+    version: '0'
+requires:
+  CLI::Simple: v1.0.0
+  CLI::Simple::Constants: '0'
+  Carp::Always: '0'
+  Class::Accessor::Fast: '0'
+  Data::Compare: '0'
+  Date::Parse: '0'
+  IO::Pager: '0'
+  IPC::Run: '0'
+  JSON: '0'
+  List::Util: '0'
+  Log::Log4perl: '0'
+  Log::Log4perl::Level: '0'
+  Readonly: '0'
+  Role::Tiny: '0'
+  Role::Tiny::With: '0'
+  Text::ASCIITable::EasyTable: '0'
+  Text::Diff: '0'
+  Time::Piece: '0'
+  YAML: '0'
+  perl: '5.010'
+resources:
+  bugtracker: http://github.com/rlauer6/App-FargateStack
+  homepage: http://github.com/rlauer6/App-FargateStack
+  repository: git://github.com/rlauer6/App-FargateStack
+version: v1.0.43
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

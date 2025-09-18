@@ -1,7 +1,7 @@
 /***************************************************************************************
-* Build  MD5 : vXccxHawhVXjKfhBHaw+7g
-* Build Time : 2025-09-16 15:50:01
-* Version    : 5.090106
+* Build  MD5 : e4c/FCuACWSJA8bBi2Ww7A
+* Build Time : 2025-09-18 13:22:54
+* Version    : 5.090111
 * Author     : H.Q.Wang
 ----------------------------------------------------------------------------------------
 ## 功能说明
@@ -22,7 +22,7 @@
 
 // 日志级别定义
 typedef enum {
-	LOG_LEVEL_OFF = -1,	// 关闭日志
+	LOG_LEVEL_OFF,		// 关闭日志
 	LOG_LEVEL_FATAL,    // 严重错误
 	LOG_LEVEL_ERROR,    // 错误信息
 	LOG_LEVEL_WARN,     // 警告信息
@@ -66,6 +66,11 @@ bool openLog(const char *log_filepath,const LogOptions* config);
 void closeLog(void);
 void flushLog(void);
 bool makeDir(const char* dir);
+bool setLogOptions(const char *key, void *val);
+void setLogColor(int flag);
+void setLogMode(int flag);
+void setLogLevel(int level);
+void setTargets(int flag);
 
 void log_write(LogLevel level, const char *file, int line, const char *format, ...);
 // 快捷日志宏

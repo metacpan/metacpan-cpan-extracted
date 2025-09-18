@@ -1,0 +1,19 @@
+#!/bin/bash
+#-*- mode: sh; -*-
+
+if ! [ -e $HOME/.aws/credentials ]; then
+    echo "ERROR: no credentials file found!";
+    exit 1;
+fi
+
+command=${1:-help};
+shift;
+
+docker run --rm -it \
+   --user $(id -u):$(id -g) \
+   -v $(pwd):/work \
+   -v $HOME/.aws:$HOME/.aws \
+   -e HOME=$HOME \
+   -e AWS_PROFILE="$AWS_PROFILE" \
+   app-fargatestack \
+   /bin/bash -c  "cd /work && app-FargateStack $command $*"

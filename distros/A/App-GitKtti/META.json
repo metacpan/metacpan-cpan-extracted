@@ -1,0 +1,59 @@
+{
+   "abstract" : "Git flow helper scripts for safe branch management",
+   "author" : [
+      "saumon <shrekrobu@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown",
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-GitKtti",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Basename" : "0",
+            "Getopt::Long" : "0",
+            "POSIX" : "0",
+            "perl" : "5.014",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/saumon/gitktti/issues"
+      },
+      "homepage" : "http://saumon.github.io/gitktti/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/saumon/gitktti.git",
+         "web" : "https://github.com/saumon/gitktti"
+      }
+   },
+   "version" : "v2.0.0",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

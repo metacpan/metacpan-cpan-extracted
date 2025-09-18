@@ -1,7 +1,7 @@
 use warnings;
 use strict;
 
-use Test::More tests => 7;
+use Test::More tests => 9;
 use Config;
 
 my $perl = $Config{perlpath};
@@ -17,6 +17,14 @@ is($output, $expected, 'testing bufrread.pl -c --tableformat ECCODES');
 $output = `$perl ./bufrresolve.pl -c 8198 $table_fp --bufrtable 0/local/8/78/236`;
 $expected = read_file('t/local_table_8198.txt_eccodes');
 is($output, $expected, 'testing bufrresolve.pl on local ECCODES code table');
+
+$output = `$perl ./bufrresolve.pl --code 020021 $table_fp`;
+$expected = read_file('t/table_20021.txt_eccodes');
+is($output, $expected, 'testing bufrresolve.pl -c on ECCODES without explicit table');
+
+$output = `$perl ./bufrresolve.pl --code 20021 --flag 573440 $table_fp`;
+$expected = read_file('t/flag.txt');
+is($output, $expected, 'testing bufrresolve.pl -c -f on ECCODES without explicit table');
 
 $output = `$perl ./bufrresolve.pl 301193 $table_fp --bufrtable "0/wmo/13,0/local/8/78/236"`;
 $expected = read_file('t/local_desc_301193.txt_eccodes');

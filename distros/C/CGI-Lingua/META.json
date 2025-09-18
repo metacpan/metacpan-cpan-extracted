@@ -49,24 +49,28 @@
             "Net::Whois::IANA" : "0",
             "Net::Whois::IP" : "0",
             "NetAddr::IP" : "0",
-            "Object::Configure" : "0",
-            "Params::Get" : "0",
+            "Object::Configure" : "0.14",
+            "Params::Get" : "0.13",
             "Sys::Syslog" : "0",
             "perl" : "5.006002"
          }
       },
       "test" : {
          "requires" : {
+            "CHI" : "0",
             "File::Temp" : "0",
             "IPC::System::Simple" : "0",
             "LWP::Simple::WithCache" : "0.04",
+            "Log::Abstraction" : "0",
             "Test::Carp" : "0",
             "Test::Compile" : "0",
             "Test::DescribeMe" : "0",
+            "Test::Mockingbird" : "0",
             "Test::Most" : "0",
             "Test::Needs" : "0",
             "Test::NoWarnings" : "0",
             "Test::Requires" : "0",
+            "Test::RequiresInternet" : "0",
             "Test::Without::Module" : "0",
             "autodie" : "0"
          }
@@ -76,8 +80,8 @@
    "resources" : {
       "bugtracker" : {
          "mailto" : "bug-CGI-Lingua@rt.cpan.org",
-         "web" : "https://github.com/nigelhorne/CGI-Lingua/issues",
-         "x_url" : "https://github.com/nigelhorne/CGI-Lingua/issues"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=CGI-Lingua",
+         "x_url" : "https://rt.cpan.org/Public/Dist/Display.html?Name=CGI-Lingua"
       },
       "repository" : {
          "type" : "git",
@@ -86,6 +90,6 @@
          "x_repository" : "https://github.com/nigelhorne/CGI-Lingua"
       }
    },
-   "version" : "0.75",
+   "version" : "0.76",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

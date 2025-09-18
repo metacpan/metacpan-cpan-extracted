@@ -1,0 +1,32 @@
+---
+abstract: 'Git flow helper scripts for safe branch management'
+author:
+  - 'saumon <shrekrobu@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-GitKtti
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::Basename: '0'
+  Getopt::Long: '0'
+  POSIX: '0'
+  perl: '5.014'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/saumon/gitktti/issues
+  homepage: http://saumon.github.io/gitktti/
+  repository: https://github.com/saumon/gitktti.git
+version: v2.0.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

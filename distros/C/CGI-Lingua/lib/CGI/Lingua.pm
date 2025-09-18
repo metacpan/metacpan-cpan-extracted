@@ -3,12 +3,12 @@ package CGI::Lingua;
 use warnings;
 use strict;
 
-use Object::Configure;
-use Params::Get;
+use Object::Configure 0.14;
+use Params::Get 0.13;
 use Storable; # RT117983
 use Class::Autouse qw{Carp Locale::Language Locale::Object::Country Locale::Object::DB I18N::AcceptLanguage I18N::LangTags::Detect};
 
-our $VERSION = '0.75';
+our $VERSION = '0.76';
 
 =head1 NAME
 
@@ -16,7 +16,7 @@ CGI::Lingua - Create a multilingual web page
 
 =head1 VERSION
 
-Version 0.75
+Version 0.76
 
 =cut
 
@@ -77,16 +77,15 @@ For a list of country codes refer to ISO-3166 (e.g. 'gb' for United Kingdom).
     # Sample web page
     use CGI::Lingua;
     use CHI;
-    use Log::Log4perl;
+    use Log::Abstraction;
 
     my $cache = CHI->new(driver => 'File', root_dir => '/tmp/cache');
-    Log::Log4perl->easy_init({ level => $Log::Log4perl::DEBUG });
 
     # We support English, French, British and American English, in that order
     my $lingua = CGI::Lingua->new(
         supported => ['en', 'fr', 'en-gb', 'en-us'],
         cache     => $cache,
-        logger    => Log::Log4perl->get_logger(),
+        logger    => Log::Abstraction->new()
     );
 
     print "Content-Type: text/plain\n\n";
@@ -117,7 +116,7 @@ This allows the parameters to be set at run time.
 
 Used for warnings and traces.
 It can be an object that understands warn() and trace() messages,
-such as a L<Log::Log4perl> or L<Log::Any> object,
+such as a L<Log::Abstraction>, L<Log::Log4perl> or L<Log::Any> object,
 a reference to code,
 a reference to an array,
 or a filename.
@@ -168,17 +167,25 @@ sub new
 			if(my $logger = $params->{'logger'}) {
 				$logger->error(__PACKAGE__, ' use ->new() not ::new() to instantiate');
 			}
-			croak(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+			Carp::croak(__PACKAGE__, ' use ->new() not ::new() to instantiate');
 		}
 
 		# FIXME: this only works when no arguments are given
 		$class = __PACKAGE__;
 	} elsif(ref($class)) {
 		# clone the given object
+		$params->{_supported} ||= $params->{supported} if(defined($params->{'supported'}));
 		return bless { %{$class}, %{$params} }, ref($class);
 	}
 
 	$params = Object::Configure::configure($class, $params);
+
+	# Validate logger object has required methods
+	if(defined $params->{'logger'}) {
+		unless(Scalar::Util::blessed($params->{'logger'}) && $params->{'logger'}->can('warn') && $params->{'logger'}->can('info') && $params->{'logger'}->can('error')) {
+			Carp::croak("Logger must be an object with info() and error() methods");
+		}
+	}
 
 	# TODO: check that the number of supported languages is > 0
 	# unless($params->{supported} && ($#params->{supported} > 0)) {
@@ -1244,7 +1251,7 @@ sub locale {
 Returns the timezone of the web client.
 
 If L<Geo::IP> is installed,
-CGI::Lingua will make use of that, otherwise it will use ip-api.com
+CGI::Lingua will make use of that, otherwise it will use L<ip-api.com>
 
 =cut
 
@@ -1277,11 +1284,20 @@ sub time_zone {
 				if(my $data = LWP::Simple::WithCache::get("http://ip-api.com/json/$ip")) {
 					$self->{_timezone} = JSON::Parse::parse_json($data)->{'timezone'};
 				}
+			} elsif(eval { require LWP::Simple; require JSON::Parse } ) {
+				$self->_debug("Look up $ip on ip-api.com");
+
+				LWP::Simple->import();
+				JSON::Parse->import();
+
+				if(my $data = LWP::Simple::get("http://ip-api.com/json/$ip")) {
+					$self->{_timezone} = JSON::Parse::parse_json($data)->{'timezone'};
+				}
 			} else {
 				if(my $logger = $self->{'logger'}) {
 					$logger->error('You must have LWP::Simple::WithCache installed to connect to ip-api.com');
 				}
-				Carp::croak('You must have LWP::Simple::WithCache installed to connect to ip-api.com');
+				Carp::croak('You must have LWP::Simple::WithCache or LWP::Simple installed to connect to ip-api.com');
 			}
 		}
 	} else {

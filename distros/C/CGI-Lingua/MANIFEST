@@ -12,6 +12,7 @@ t/00-compile.t
 t/10-load.t
 t/20-new.t
 t/30-basics.t
+t/40-more.t
 t/boiler.t
 t/carp.t
 t/changes.t

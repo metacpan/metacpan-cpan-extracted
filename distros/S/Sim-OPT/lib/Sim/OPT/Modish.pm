@@ -2,11 +2,11 @@
 #NOTE: TO USE THE PROGRAM AS A SCRIPT, THE LINE ABOVE SHOULD BE ERASED OR TURNED INTO A COMMENT.
 #!/usr/bin/perl
 # Modish
-$VERSION = '0.4.2.3';
+$VERSION = '0.4.3';
 # Author: Gian Luca Brunetti, Politecnico di Milano - gianluca.brunetti@polimi.it.
 # An intermediate version of the subroutine createconstrdbfile has been modified by ESRU (2038),
 # University of Strathclyde, Glasgow.
-# All rights reserved, 2015-23.
+# All rights reserved, 2015-25.
 # This is free software.  You can redistribute it and/or modify it under the terms of the
 # GNU General Public License, version 3, as published by the Free Software Foundation.
 
@@ -20,9 +20,12 @@ $VERSION = '0.4.2.3';
 # reintroduced the possibility of non-embedded use; added the possibility of choosing which zones and surfaces to operate on.
 # In versions 0.4.1 (28.09.2022): bug fix.
 # In versions 0.4.2.1 (12.06.2023): updated the subprocedure "createfictgeofile "for creating fictitious obstruction files to the new obstruction file format.
-# In versions 0.4.2.3 (15.12.2024): improved the procedure to get parallel multicore computations.
+# In version 0.4.2.3 (25.01.2025): adapted to changes in prj and E2r.
+# In version 0.4.3 (10.06.2025): adapted to changes in Perl (disappearance of the smartmatch operator).
 
-use v5.14;
+print "I AM DOING\n";
+
+# use v5.14;
 use Exporter;
 use vars qw( $VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS );
 use Math::Trig;
@@ -35,6 +38,7 @@ use Regexp::Common;
 use Vector::Object3D::Polygon;
 use Math::Polygon::Tree;
 use Storable qw(store retrieve dclone);
+#use Parallel::ForkManager;
 use feature 'say';
 no strict;
 no warnings;
@@ -272,12 +276,12 @@ $ABSTRACT = 'Modish is a program for modifying the shading factors in the ISH (s
 ######### BEGINNING OF MODISH ##############################################################
 
 
-my $max_processes = $main::max_processes;
-if ( not ( defined( $max_processes ) ) ) { $max_processes = 1; }
+#my $max_processes = $main::max_processes;
+#if ( not ( defined( $max_processes ) ) ) { $max_processes = 1; }
 
 if ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
 {
-  say "\nSorry, this procedure works only on Linux and OSX." and die;
+  say "\nApologies, this procedure works only on Linux and OSX." and die;
 }
 
 my ( @zoneshds, @winsdata );
@@ -305,9 +309,9 @@ sub getmonthnum
 }
 
 sub getconffilenames
-{  # THIS GETS THE CONSTRUCTION AND MATERIALS FILES FROM THE CFG FILE. IT IS CALLED BY sub createfictitious
+{  # THIS GETS THE CONSTRUCTION AND MATERIALS FILES FROM THE CFG FILE. IT IS CALLED BY sub createfictitiousfiles
   my ( $conffile, $path, $askedzonenum, $cfgfile ) = @_;
-  open ( CONFFILE, "$conffile") or die;
+  open( CONFFILE, "$conffile") or die "Could not open file '\$conffile': $conffile, $!";
   my @lines = <CONFFILE>;
   close CONFFILE;
 
@@ -565,12 +569,12 @@ sub getconffilenames
   my $clmfilea = $clmfile . ".a";
   say MONITOR "CLMFILEA $clmfilea";
 
-  #if ( ( "getweather" ~~ @calcprocedures ) or ( "embedded" ~~ @calcprocedure ) )
+  #if ( ( grep { $_ eq "getweather" } @calcprocedures ) or ( grep { $_ eq "embedded" } @calcprocedure ) )
   {
     if ( not ( -e $clmfilea ) )
     {# THE CALL DOES NOT WORK WITH MODELS FLATTENED INTO ONE ROOT DIRECTORY. FIX THIS.
 
-    #if ( "embedded" ~~ @calcprocedures )
+    #if ( grep { $_ eq "embedded" } @calcprocedures )
     #{
     #  defendshd( $shdfile );
     #}
@@ -595,7 +599,7 @@ y
 -
 YYY
 ";
-      #if ( "embedded" ~~ @calcprocedures )
+      #if ( grep { $_ eq "embedded" } @calcprocedures )
       #{
       #  restoreshd( $shdfile );
       #}
@@ -679,6 +683,10 @@ sub createfictitiousfiles
   my $cfgpath = $path . "/cfg";
   say MONITOR "\$cfgpath $cfgpath";
 
+  my $shortroot = $conffile;
+  $shortroot =~ s/$cfgpath\/// ;
+  $shortroot =~ s/\.cfg// ;
+
   $conffile_f1 =~ s/\.cfg/\_f1\.cfg/;
   my $conffile_f2 = $conffile;
   $conffile_f2 =~ s/\.cfg/\_f2\.cfg/;
@@ -705,7 +713,7 @@ sub createfictitiousfiles
 
   unless ( -e $modishlock )
   {
-    open( CONFFILE, "$conffile" ) or die;
+    open( CONFFILE, "$conffile" ) or die "Could not open file '\$conffile': $conffile, $!";
     my @lines = <CONFFILE>;
     close CONFFILE;
 
@@ -848,43 +856,43 @@ YYY";
       print REPORT "cp -R -f $conffile $conffile_f5\n";
     }
 
-    if ( ( ( "radical" ~~ @calcprocedures ) and not( "alldiff" ~~ @calcprocedures ) )
-      or( ( "composite" ~~ @calcprocedures ) and not( "alldiff" ~~ @calcprocedures ) )
-      or( "noreflections" ~~ @calcprocedures ) )
+    if ( ( ( grep { $_ eq "radical" } @calcprocedures ) and not( grep { $_ eq "alldiff" } @calcprocedures ) )
+      or( ( grep { $_ eq "composite" } @calcprocedures ) and not( grep { $_ eq "alldiff" } @calcprocedures ) )
+      or( grep { $_ eq "noreflections" } @calcprocedures ) )
     {
       `cp -R -f $conffile $conffile_f6\n`;
       print REPORT "cp -R -f $conffile $conffile_f6\n";
     }
 
-    if ( ( ( "radical" ~~ @calcprocedures ) and not( "alldiff" ~~ @calcprocedures ) )
-      or( ( "composite" ~~ @calcprocedures ) and not( "groundreflections" ~~ @calcprocedures ) )
-      or( "noreflections" ~~ @calcprocedures ) )
+    if ( ( ( grep { $_ eq "radical" } @calcprocedures ) and not( grep { $_ eq "alldiff" } @calcprocedures ) )
+      or( ( grep { $_ eq "composite" } @calcprocedures ) and not( grep { $_ eq "groundreflections" } @calcprocedures ) )
+      or( grep { $_ eq "noreflections" } @calcprocedures ) )
     {
       `cp -R -f $conffile $conffile_f7\n`;
       print REPORT "cp -R -f $conffile $conffile_f7\n";
     }
 
-    if ( ( ( "composite" ~~ @calcprocedures ) and not( "groundreflections" ~~ @calcprocedures ) )
-      or( "noreflections" ~~ @calcprocedures ) )
+    if ( ( ( grep { $_ eq "composite" } @calcprocedures ) and not( grep { $_ eq "groundreflections" } @calcprocedures ) )
+      or( grep { $_ eq "noreflections" } @calcprocedures ) )
     {
       `cp -R -f $conffile $conffile_f8\n`;
       print REPORT "cp -R -f $conffile $conffile_f8\n";
     }
 
-    if ( "something_used" ~~ @calcprocedures ) # CURRENTLY UNUSED
+    if ( grep { $_ eq "something_used" } @calcprocedures ) # CURRENTLY UNUSED
     {
       `cp -R -f $conffile $conffile_f9\n`;
       print REPORT "cp -R -f $conffile $conffile_f9\n";
     }
 
-    if ( "something_used" ~~ @calcprocedures ) # CURRENTLY UNUSED
+    if ( grep { $_ eq "something_used" } @calcprocedures ) # CURRENTLY UNUSED
     {
       `cp -R -f $conffile $conffile_f10\n`;
       print REPORT "cp -R -f $conffile $conffile_f10\n";
     }
 
-    if ( ( ( "composite" ~~ @calcprocedures ) and not( "groundreflections" ~~ @calcprocedures ) )
-      or( "noreflections" ~~ @calcprocedures ) )
+    if ( ( ( grep { $_ eq "composite" } @calcprocedures ) and not( grep { $_ eq "groundreflections" } @calcprocedures ) )
+      or( grep { $_ eq "noreflections" } @calcprocedures ) )
     {
       `cp -R -f $conffile $conffile_f11\n`;
       print REPORT "cp -R -f $conffile $conffile_f11\n";
@@ -918,10 +926,10 @@ YYY";
   #unless ( -e $modishlock )
   #{
   #  say MONITOR "\$matdbfile $matdbfile";
-  #  open( MATDBFILE, "$matdbfile" ) or die;
+  #  open( MATDBFILE, "$matdbfile" ) or die  "Could not open file '$matdbfile': $!";
   #  my @matdblines = <MATDBFILE>;
   #  close MATDBFILE;
-  #  open( MATDBFILE, ">$matdbfile" ) or die;
+  #  open( MATDBFILE, ">$matdbfile" ) or die  or die  "Could not open file '$matdbfile': $!";
   #  foreach my $matdbline ( @matdblines )
   #  {
   #    unless ( ( $matdbline =~ /^#/ ) or ( $matdbline =~ /^\*/ ) or ( $matdbline =~ /^Category/ ) )
@@ -1085,7 +1093,8 @@ YYY";
 
   unless ( -e $modishlock )
   {
-    open ( CONFFILE_F1, ">$conffile_f1");
+    open( CONFFILE_F1, ">$conffile_f1");
+
     foreach my $line ( @conflines )
     {
       my $counter = 0;
@@ -1121,7 +1130,7 @@ YYY";
 
         if ( ( $counter == 0 ) and ( not ( $line =~ /^\*/ ) ) )
         {
-          open( CORRECTCONF, $conffile ) or die;
+          open( CORRECTCONF, $conffile ) or die "Could not open file '\$conffile': $conffile, $!";
           @correctlines = <CORRECTCONF>;
           close CORRECTCONF;
         }
@@ -1137,6 +1146,14 @@ YYY";
         $counter++;
       }
 
+      my @els;
+      if ( $line =~ /\*base_name/ )
+      {
+        @els = split( /\s+/, $line );
+        $els[1] = $shortroot . "_f1" ;
+        $line = join(' ', @els );
+      }
+
       if ( $line =~ /\*mat/ )
       {
         unless ( $line =~ /_f1/ )
@@ -1149,16 +1166,28 @@ YYY";
     }
     close CONFFILE_F1;
 
-    open ( CONFFILE_F1 , "$conffile_f1" ) or die;
+    open( CONFFILE_F1 , "$conffile_f1" ) or die "Could not open file '\$conffile_f1': $conffile_f1, $!";
     my  @conflines1 = <CONFFILE_F1> ;
     close CONFFILE_F1;
 
-    #unless ( "noreflections" ~~ @calcprocedures )
+    #unless ( grep { $_ eq "noreflections" } @calcprocedures )
     {
-      my @conflines = @{ dclone( \@conflines1 ) } ;
-      open ( CONFFILE_F2, ">$conffile_f2");
+      my @conflines = @{ dclone(
+       \@conflines1 ) } ;
+      open( CONFFILE_F2, ">$conffile_f2");
+
       foreach my $line ( @conflines )
       {
+
+        my @els;
+        if ( $line =~ /\*base_name/ )
+        {
+            @els = split( /\s+/, $line );
+            $els[1] = $shortroot . "_f2" ;
+            $line = join(' ', @els );
+        }
+
+
         if ( $line =~ /\*mat/ )
         {
           $line =~ s/_f1/_f2/ ;
@@ -1170,9 +1199,18 @@ YYY";
       if ( scalar( @selectives ) > 0 )
       {
         my @conflines = @{ dclone( \@conflines1 ) } ;
-        open ( CONFFILE_F3, ">$conffile_f3");
+        open( CONFFILE_F3, ">$conffile_f3");
         foreach my $line ( @conflines )
         {
+
+          my @els;
+          if ( $line =~ /\*base_name/ )
+          {
+              @els = split( /\s+/, $line );
+              $els[1] = $shortroot . "_f3" ;
+              $line = join(' ', @els );
+          }
+
           if ( $line =~ /\*mat/ )
           {
             $line =~ s/_f1/_f3/ ;
@@ -1183,9 +1221,18 @@ YYY";
 
         my @conflines = @{ dclone( \@conflines1 ) } ;
 
-        open ( CONFFILE_F4, ">$conffile_f4");
+        open( CONFFILE_F4, ">$conffile_f4");
         foreach my $line ( @conflines )
         {
+
+          my @els;
+          if ( $line =~ /\*base_name/ )
+          {
+              @els = split( /\s+/, $line );
+              $els[1] = $shortroot . "_f4" ;
+              $line = join(' ', @els );
+          }
+
           if ( $line =~ /\*mat/ )
           {
             $line =~ s/_f1/_f4/ ;
@@ -1196,12 +1243,22 @@ YYY";
       }
     }
 
-    #if ( "radical" ~~ @calcprocedures )
+    #if ( grep { $_ eq "radical" } @calcprocedures )
     {
       my @conflines = @{ dclone( \@conflines1 ) } ;
-      open ( CONFFILE_F5, ">$conffile_f5" );
+      open( CONFFILE_F5, ">$conffile_f5" );
       foreach my $line ( @conflines )
       {
+
+        my @els;
+        if ( $line =~ /\*base_name/ )
+        {
+            @els = split( /\s+/, $line );
+            $els[1] = $shortroot . "_f5" ;
+            $line = join(' ', @els );
+        }
+
+
         if ( $line =~ /\*mat/ )
         {
           if ($line =~ /_f1/ )
@@ -1237,12 +1294,21 @@ YYY";
     }
 
 
-    if ( ( "composite" ~~ @calcprocedures ) or ( "radical" ~~ @calcprocedures ) or ( "noreflections" ~~ @calcprocedures ) )
+    if ( ( grep { $_ eq "composite" } @calcprocedures ) or ( grep { $_ eq "radical" } @calcprocedures ) or ( grep { $_ eq "noreflections" } @calcprocedures ) )
     {
       my @conflines = @{ dclone( \@conflines1 ) } ;
-      open ( CONFFILE_F6, ">$conffile_f6");
+      open( CONFFILE_F6, ">$conffile_f6");
       foreach my $line ( @conflines )
       {
+
+        my @els;
+        if ( $line =~ /\*base_name/ )
+        {
+            @els = split( /\s+/, $line );
+            $els[1] = $shortroot . "_f6" ;
+            $line = join(' ', @els );
+        }
+
         if ( $line =~ /\*mat/ )
         {
           $line =~ s/_f1/_f6/ ;
@@ -1259,14 +1325,23 @@ YYY";
       }
       close CONFFILE_F6;
 
-      if ( ( ( "composite" ~~ @calcprocedures ) and not( "groundreflections" ~~ @calcprocedures ) )
-        or ( "radical" ~~ @calcprocedures )
-        or ( "noreflections" ~~ @calcprocedures ) )
+      if ( ( ( grep { $_ eq "composite" } @calcprocedures ) and not( grep { $_ eq "groundreflections" } @calcprocedures ) )
+        or ( grep { $_ eq "radical" } @calcprocedures )
+        or ( grep { $_ eq "noreflections" } @calcprocedures ) )
       {
         my @conflines = @{ dclone( \@conflines1 ) } ;
-        open ( CONFFILE_F7, ">$conffile_f7");
+        open( CONFFILE_F7, ">$conffile_f7");
         foreach my $line ( @conflines )
         {
+
+          my @els;
+          if ( $line =~ /\*base_name/ )
+          {
+              @els = split( /\s+/, $line );
+              $els[1] = $shortroot . "_f7" ;
+              $line = join(' ', @els );
+          }
+
           if ( $line =~ /\*mat/ )
           {
             $line =~ s/_f1/_f6/ ;
@@ -1293,13 +1368,22 @@ YYY";
       }
     }
 
-    if ( ( ( "composite" ~~ @calcprocedures ) and not( "groundreflections" ~~ @calcprocedures ) )
-      or ( "noreflections" ~~ @calcprocedures ) )
+    if ( ( ( grep { $_ eq "composite" } @calcprocedures ) and not( grep { $_ eq "groundreflections" } @calcprocedures ) )
+      or ( grep { $_ eq "noreflections" } @calcprocedures ) )
     {
       my @conflines = @{ dclone( \@conflines1 ) } ;
-      open ( CONFFILE_F8, ">$conffile_f8");
+      open( CONFFILE_F8, ">$conffile_f8");
       foreach my $line ( @conflines )
       {
+
+        my @els;
+        if ( $line =~ /\*base_name/ )
+        {
+            @els = split( /\s+/, $line );
+            $els[1] = $shortroot . "_f8" ;
+            $line = join(' ', @els );
+        }
+
         if ( $line =~ /\*mat/ )
         {
           $line =~ s/_f1/_f6/ ;
@@ -1309,12 +1393,21 @@ YYY";
       close CONFFILE_F8;
     }
 
-    if ( "something_used" ~~ @calcprocedures ) # CURRENTLY UNUSED
+    if ( grep { $_ eq "something_used" } @calcprocedures ) # CURRENTLY UNUSED
     {
       my @conflines = @{ dclone( \@conflines1 ) } ;
-      open ( CONFFILE_F9, ">$conffile_f9");
+      open( CONFFILE_F9, ">$conffile_f9");
       foreach my $line ( @conflines )
       {
+
+        my @els;
+        if ( $line =~ /\*base_name/ )
+        {
+            @els = split( /\s+/, $line );
+            $els[1] = $shortroot . "_f9" ;
+            $line = join(' ', @els );
+        }
+
         if ( $line =~ /ite exposure & ground reflectivity/ )
         {
           chomp $line;
@@ -1328,9 +1421,18 @@ YYY";
       close CONFFILE_F9;
 
       my @conflines = @{ dclone( \@conflines1 ) } ;
-      open ( CONFFILE_F10, ">$conffile_f10"); # CURRENTLY UNUSED
+      open( CONFFILE_F10, ">$conffile_f10"); # CURRENTLY UNUSED
       foreach my $line ( @conflines )
       {
+
+        my @els;
+        if ( $line =~ /\*base_name/ )
+        {
+            @els = split( /\s+/, $line );
+            $els[1] = $shortroot . "_f10" ;
+            $line = join(' ', @els );
+        }
+
         if ( $line =~ /\*geo/ )
         {
           $line =~ s/_f\./_f5\./ ;
@@ -1352,13 +1454,22 @@ YYY";
       close CONFFILE_F10;
     }
 
-    if ( ( ( "composite" ~~ @calcprocedures ) and not( "groundreflections" ~~ @calcprocedures ) )
-      or ( "noreflections" ~~ @calcprocedures ) )
+    if ( ( ( grep { $_ eq "composite" } @calcprocedures ) and not( grep { $_ eq "groundreflections" } @calcprocedures ) )
+      or ( grep { $_ eq "noreflections" } @calcprocedures ) )
     {
       my @conflines = @{ dclone( \@conflines1 ) } ;
-      open ( CONFFILE_F11, ">$conffile_f11");
+      open( CONFFILE_F11, ">$conffile_f11");
       foreach my $line ( @conflines )
       {
+
+        my @els;
+        if ( $line =~ /\*base_name/ )
+        {
+            @els = split( /\s+/, $line );
+            $els[1] = $shortroot . "_f11" ;
+            $line = join(' ', @els );
+        }
+
         if ( $line =~ /\*mat/ )
         {
           $line =~ s/_f1/_f6/ ;
@@ -1390,7 +1501,7 @@ sub readgeofile
   my ( $geofile, $transpsurfs_ref, $zonenum, $calcprocedures_ref, $modishlock ) = @_;
   my @transpsurfs = @{ $transpsurfs_ref };
   my @calcprocedures = @{ $calcprocedures_ref };
-  open ( GEOFILE, "$geofile") or die;
+  open( GEOFILE, "$geofile") or die "Could not open file '\$geofile': $geofile, $!";
   my @lines = <GEOFILE>;
   close GEOFILE;
   my ( @geofilestruct, @transpelts, @obs );
@@ -1627,11 +1738,11 @@ sub findextremes
         my (@extreme1positions, @extreme2positions);
         foreach my $elt ( @coordstype )
         {
-          if ( $elt ~~ $extreme1 )
+          if ( $elt eq $extreme1 )
           {
             push ( @extreme1positions, $countpos );
           }
-          if ( $elt ~~ $extreme2 )
+          if ( $elt eq $extreme2 )
           {
             push ( @extreme2positions, $countpos );
           }
@@ -1642,7 +1753,7 @@ sub findextremes
       }
       else
       {
-        if ( $surfdata[0][0][1] ~~ $surfdata[1][1][1] )
+        if ( $surfdata[0][0][1] eq $surfdata[1][1][1] )
         {
           my $swap = $surfdata[1][1];
           $surfdata[1][1] = $surfdata[1][0];
@@ -1871,17 +1982,17 @@ sub readshdfile
   say MONITOR "4,5 SHDFILE: $shdfile";
 
   my $mymonthname;
-  if ( "embedded" ~~ @calcprocedures )
+  if ( grep { $_ eq "embedded" } @calcprocedures )
   {
     $mymonthname = getmonthname($mymonth);
   }
 
   my $shdafile = $shdfile . "a";
 
-    if ( ( "keepdirshdf" ~~ @calcprocedures ) and ( $message eq "go" ) )
+    if ( ( grep { $_ eq "keepdirshdf" } @calcprocedures ) and ( $message eq "go" ) )
     {
 
-      #if ( "embedded" ~~ @calcprocedures )
+      #if ( grep { $_ eq "embedded" } @calcprocedures )
       #{
       #  defendshd( $shdfile );
       #}
@@ -1916,7 +2027,7 @@ $zoneletter
 YYY
 ";
 
-    #if ( "embedded" ~~ @calcprocedures )
+    #if ( grep { $_ eq "embedded" } @calcprocedures )
     #{
     #  restoreshd( $shdfile );
     #}
@@ -1924,13 +2035,13 @@ YYY
 
 
   say MONITOR "6 SHDAFILE_: $shdafile";
-  if ( ( not ( -e $shdafile ) ) and ( not ( "embedded" ~~ @calcprocedures ) ) )
+  if ( ( not ( -e $shdafile ) ) and ( not ( grep { $_ eq "embedded" } @calcprocedures ) ) )
   {
     say MONITOR "\nExiting. A file \".shda\" must be present in the model folders for the operation to be performed. Now it isn't. To obtain that, a shading and insolation calculation must have been performed.";
     say "\nExiting. A file \".shda\" must be present in the model folders for the operation to be performed. Now it isn't. To obtain that, a shading and insolation calculation must have been performed." and die;
   }
 
-  if ( "bbembedded" ~~ @calcprocedures )
+  if ( grep { $_ eq "bbembedded" } @calcprocedures )
   {
     #defendshd( $shdfile );
 
@@ -1954,13 +2065,13 @@ YYY
   my $tempfile = $shdafile;
   $tempfile =~ s/\.shda/\.temp\.shda/ ;
 
-  open ( SHDAFILE, "$shdafile");   # open ( SHDAFILE, "$shdafile") or die;
+  open( SHDAFILE, "$shdafile");   # open( SHDAFILE, "$shdafile") or die "Could not open file '$shdafile': $!";
   my @shdalines = <SHDAFILE>;
   close SHDAFILE;
 
   my (@filearray, @rawlines, @months);
 
-  if ( "embedded" ~~ @calcprocedures )
+  if ( grep { $_ eq "embedded" } @calcprocedures )
   {
     foreach my $line ( @shdalines )
     {
@@ -1986,12 +2097,12 @@ YYY
     my @elts = split(/\s+|,/, $line);
     if ( $line =~ /\* month:/ )
     {
-      if ( not ( "embedded" ~~ @calcprocedures ) )
+      if ( not ( grep { $_ eq "embedded" } @calcprocedures ) )
       {
         my $month = $elts[2];
         push ( @months, $month );
       }
-      elsif ( "embedded" ~~ @calcprocedures )
+      elsif ( grep { $_ eq "embedded" } @calcprocedures )
       {
         $elts[2] = $mymonthname;
         push ( @months, $mymonthname );
@@ -2000,7 +2111,7 @@ YYY
     push ( @filearray, [ @elts ] );
   }
 
-  open ( TEMP , ">$tempfile" ) or die;
+  open( TEMP , ">$tempfile" ) or die "Could not open file '\$tempfile': $tempfile, $!";
   foreach my $line ( @treatedlines )
   {
     print TEMP $line;
@@ -2215,9 +2326,11 @@ sub adjustlaunch
   print REPORT "mv -f $diffskyfile $skyfile\n";
 }
 
+
+
 sub setrad
 {
-  # THIS CREATES THE RADIANCE SCENES.
+  # THIS CREATES THE RADIANCE SCENES. BUGS STEM HERE WHENEVER THE E2r VERSION ADVANCES AND E2r CHANGES.
   my ( $conffile, $radoctfile, $rcffile, $path, $radpath, $monthnum, $day, $hour, $countfirst, $exportconstrref,
     $exportreflref, $skycondition_ref, $countrad, $specularratios_ref, $calcprocedures_ref, $debug, $paths_ref,
     $groundrefl, $count, $shdfile, $d_ref ) = @_;
@@ -2315,7 +2428,7 @@ sub setrad
       $action = 11;
     }
 
-    unless ( "embedded" ~~ @calcprocedures )
+    unless ( grep { $_ eq "embedded" } @calcprocedures )
     {
       say "\nConfiguration file: $conffile"; say REPORT "\$conffile: $conffile";
       say "$message";
@@ -2381,7 +2494,7 @@ sub setrad
     print REPORT "mkdir $paths{cfgpath}";
   }
 
-  #if ( "embedded" ~~ @calcprocedures )
+  #if ( grep { $_ eq "embedded" } @calcprocedures )
   #{
   #  defendshd( $shdfile );
   #}
@@ -2402,14 +2515,16 @@ sub setrad
 rm fort.*
 e2r -file $shortconffile -mode text <<YYY
 c
-a
+$shortrcffile
 a
 a
 $moment
 1
+
+
 n
 d
-
+$shortskyfile
 d
 $day $monthnum $hour
 g
@@ -2425,6 +2540,7 @@ h
 y
 >
 $shortriffile
+-
 u
 $parproc
 -
@@ -2432,18 +2548,21 @@ $parproc
 YYY
 `;
 
+
 say REPORT "cd $paths{cfgpath}
 rm fort.*
 e2r -file $shortconffile -mode text <<YYY
 c
-a
+$shortrcffile
 a
 a
 $moment
 1
+
+
 n
 d
-
+$shortskyfile
 d
 $day $monthnum $hour
 g
@@ -2459,22 +2578,24 @@ h
 y
 >
 $shortriffile
+-
 u
 $parproc
 -
 -
 YYY
-.Done this.
+Done this.
 ";
 
-  #if ( "embedded" ~~ @calcprocedures )
+
+  #if ( grep { $_ eq "embedded" } @calcprocedures )
   #{
   #  restoreshd( $shdfile );
   #}
 
 
   my $groundroughn;
-  if ( "grounddirdiff" ~~ @calcprocedures )
+  if ( grep { $_ eq "grounddirdiff" } @calcprocedures )
   {
     foreach my $el ( @calcprocedures )
     {
@@ -2518,7 +2639,7 @@ sub setroot
 
   $paths{rootconffile} = $rootname . ".cfg";
 
-  #if ( "embedded" ~~ @calcprocedures )
+  #if ( grep { $_ eq "embedded" } @calcprocedures )
   #{
   #  defendshd( $shdfile );
   #}
@@ -2563,7 +2684,7 @@ y
 YYY
 ";
 
-  #if ( "embedded" ~~ @calcprocedures )
+  #if ( grep { $_ eq "embedded" } @calcprocedures )
   #{
   #  restoreshd( $shdfile );
   #}
@@ -2726,37 +2847,37 @@ sub pursue
 
   my ( @radoctfiles, @rcffiles, @cnums );
 
-  if ( ( "composite" ~~ @calcprocedures ) and ( "groundreflections" ~~ @calcprocedures ) and not( "alldiff" ~~ @calcprocedures ))
+  if ( ( grep { $_ eq "composite" } @calcprocedures ) and ( grep { $_ eq "groundreflections" } @calcprocedures ) and not( grep { $_ eq "alldiff" } @calcprocedures ))
   {
     @radoctfiles = ( $radoctfile_f1, $radoctfile_f2 );
     @conffiles = ( $conffile_f1, $conffile_f2 );
     @cnums = ( 0, 1 );
   }
-  if ( ( "composite" ~~ @calcprocedures ) and ( "groundreflections" ~~ @calcprocedures ) )
+  if ( ( grep { $_ eq "composite" } @calcprocedures ) and ( grep { $_ eq "groundreflections" } @calcprocedures ) )
   {
     @radoctfiles = ( $radoctfile_f1, $radoctfile_f2, $radoctfile_f6 );
     @conffiles = ( $conffile_f1, $conffile_f2, $conffile_f6 );
     @cnums = ( 0, 1, 5 );
   }
-  elsif ( "composite" ~~ @calcprocedures )
+  elsif ( grep { $_ eq "composite" } @calcprocedures )
   {
     @radoctfiles = ( $radoctfile_f1, $radoctfile_f2, $radoctfile_f6,  $radoctfile_f7, $radoctfile_f8, $radoctfile_f11 );
     @conffiles = ( $conffile_f1, $conffile_f2, $conffile_f6, $conffile_f7, $conffile_f8, $conffile_f11 );
     @cnums = ( 0, 1, 5, 6, 7, 10 );
   }
-  elsif ( ( "radical" ~~ @calcprocedures ) and not( "alldiff" ~~ @calcprocedures ) )
+  elsif ( ( grep { $_ eq "radical" } @calcprocedures ) and not( grep { $_ eq "alldiff" } @calcprocedures ) )
   {
     @radoctfiles = ( $radoctfile_f2, $radoctfile_f5 );
     @conffiles = ( $conffile_f2, $conffile_f5 );
     @cnums = ( 1, 4 );
   }
-  elsif ( "radical" ~~ @calcprocedures )
+  elsif ( grep { $_ eq "radical" } @calcprocedures )
   {
     @radoctfiles = ( $radoctfile_f2, $radoctfile_f5, $radoctfile_f6, $radoctfile_f7 );
     @conffiles = ( $conffile_f2, $conffile_f5, $conffile_f6, $conffile_f7 );
     @cnums = ( 1, 4, 5, 6 );
   }
-  elsif ( "noreflections" ~~ @calcprocedures )
+  elsif ( grep { $_ eq "noreflections" } @calcprocedures )
   {
     @radoctfiles = ( $radoctfile_f6, $radoctfile_f7, $radoctfile_f8, $radoctfile_f11 );
     @conffiles = ( $conffile_f6, $conffile_f7, $conffile_f8, $conffile_f11 );
@@ -2768,7 +2889,7 @@ sub pursue
     @conffiles = ( $conffile_f1, $conffile_f3, $conffile_f4 );
     @cnums = ( 0, 2, 3 );
   }
-  elsif ( "plain" ~~ @calcprocedures )
+  elsif ( grep { $_ eq "plain" } @calcprocedures )
   {
     @radoctfiles = ( $radoctfile_f1, $radoctfile_f2 );
     @conffiles = ( $conffile_f1, $conffile_f2 );
@@ -2795,7 +2916,7 @@ sub pursue
 
 
   my ( $t_ref, $clmlines_ref, %t, @clmlines, %avgs );
-  if ( ( "getweather" ~~ @calcprocedures ) and ( not ( "embedded" ~~ @calcprocedures ) ) )
+  if ( ( grep { $_ eq "getweather" } @calcprocedures ) and ( not ( grep { $_ eq "embedded" } @calcprocedures ) ) )
   {
     if ( not( -e $clmavgs ) )
     {
@@ -2806,7 +2927,7 @@ sub pursue
 
     if ( ( scalar( @clmlines ) == 0 ) )
     {
-      open( CLMAVGS, "$clmavgs" ) or die;
+      open( CLMAVGS, "$clmavgs" ) or die "Could not open file '\$clmavgs': $clmavgs, $!";
       @clmlines = <CLMAVGS>;
       close CLMAVGS;
     }
@@ -2832,7 +2953,7 @@ sub pursue
       $extradfile, $inradfile, $glzradfile ) =
     tellradnames( $conffile, $path, $radpath );
 
-    if ( ( "blackground" ~~ @calcprocedures ) and ( $countrad == 0 ) )
+    if ( ( grep { $_ eq "blackground" } @calcprocedures ) and ( $countrad == 0 ) )
     {
       $groundrefl = 0.000;
     }
@@ -2866,11 +2987,11 @@ sub pursue
 
     `cp $riffile $riffileold`;
     say REPORT "cp $riffile $riffileold";
-    open( RIFFILE, "$riffile" ) or die;
+    open( RIFFILE, "$riffile" ) or die "Could not open file '\$riffile': $riffile, $!";
     my @riflines = <RIFFILE>;
     close RIFFILE;
 
-    open( RIFFILE, ">$riffile" ) or die;
+    open( RIFFILE, ">$riffile" ) or die "Could not open file '\$riffile': $riffile, $!";
     foreach my $rifline ( @riflines )
     {
       if ( $rifline =~ /^ZONE=/ )
@@ -2930,9 +3051,9 @@ sub pursue
             my $hour = ( $counthour + 1) ;
 
             my ( $dir, $diff );
-            if ( "getweather" ~~ @calcprocedures )
+            if ( grep { $_ eq "getweather" } @calcprocedures )
             {
-              if ( "embedded" ~~ @calcprocedures )
+              if ( grep { $_ eq "embedded" } @calcprocedures )
               {
                 $dir = $dirdiffs{$mymonth}{$myday}{$hour}{dir};
                 $diff = $dirdiffs{$mymonth}{$myday}{$hour}{diff};
@@ -2947,7 +3068,7 @@ sub pursue
             }
 
             my ( $alt, $azi );
-            if ( "embedded" ~~ @calcprocedures )
+            if ( grep { $_ eq "embedded" } @calcprocedures )
             {
               ( $alt, $azi ) = getaltaz( $myday, $mymonth, \%paths, $hour );
               #say MONITOR " FOR $\myday $myday \$mymonth $mymonth \%paths " . dump(%paths) . " \$hour $hour GOT ALT $alt AZI $azi";
@@ -2972,7 +3093,7 @@ sub pursue
                 say REPORT "cp -f $radmatfile $radmatcopy";
                 `cp -f $radmatfile $radmatcopy`;
 
-                open ( FIXLIST, ">$path/rad/fixl.pl" ) or die( $! );
+                open( FIXLIST, ">$path/rad/fixl.pl" ) or die( $! );
                 print FIXLIST "$radmatfile\n";
                 print FIXLIST "$radmatcopy\n";
                 close FIXLIST;
@@ -2981,7 +3102,7 @@ sub pursue
             }
 
             ## HERE THE CALLS FOR THE DIFFUSE IRRADIANCES FOLLOW.
-            unless ( ( "gendaylit" ~~ @calcprocedures ) or ( "gensky" ~~ @calcprocedures ) )
+            unless ( ( grep { $_ eq "gendaylit" } @calcprocedures ) or ( grep { $_ eq "gensky" } @calcprocedures ) )
             {
               setrad( $conffile, $radoctfile, $rcffile, $path, $radpath, $monthnum,
                 $day, $hour, $countfirst, $exportconstrref, $exportreflref, \%skycondition, $countrad,
@@ -2992,23 +3113,23 @@ sub pursue
             my $skycond = $skycondition{$monthnum};
 
             #say MONITOR "\@calcprocedures = " . dump( @calcprocedures );
-            if ( not( "alldiff" ~~ @calcprocedures )
-                  and ( ( "getweather" ~~ @calcprocedures )
-                    or ( ( "gensky" ~~ @calcprocedures ) and ( "altcalcdiff" ~~ @calcprocedures ) )
-                    or ( ( "gendaylit" ~~ @calcprocedures ) and ( "altcalcdiff" ~~ @calcprocedures ) ) ) ) # IF CONDITION, PRODUCE LIGHT WITH NO SUN TO CHECK DIFFUSE RADIATION
+            if ( not( grep { $_ eq "alldiff" } @calcprocedures )
+                  and ( ( grep { $_ eq "getweather" } @calcprocedures )
+                    or ( ( grep { $_ eq "gensky" } @calcprocedures ) and ( grep { $_ eq "altcalcdiff" } @calcprocedures ) )
+                    or ( ( grep { $_ eq "gendaylit" } @calcprocedures ) and ( grep { $_ eq "altcalcdiff" } @calcprocedures ) ) ) ) # IF CONDITION, PRODUCE LIGHT WITH NO SUN TO CHECK DIFFUSE RADIATION
             {
               my ( @returns, $altreturn );
-              if ( ( ( "radical" ~~ @calcprocedures ) and ( ( $countrad == 1 ) or ( $countrad == 4 ) ) )
-                  or ( ( ( ( "composite" ~~ @calcprocedures ) and ( "groundreflections" ~~ @calcprocedures ) )
+              if ( ( ( grep { $_ eq "radical" } @calcprocedures ) and ( ( $countrad == 1 ) or ( $countrad == 4 ) ) )
+                  or ( ( ( ( grep { $_ eq "composite" } @calcprocedures ) and ( grep { $_ eq "groundreflections" } @calcprocedures ) )
                     and ( ( $countrad == 0 ) or ( $countrad == 1 ) ) ) )
-                  or ( ( "composite" ~~ @calcprocedures )
+                  or ( ( grep { $_ eq "composite" } @calcprocedures )
                     and ( ( $countrad == 0 ) or ( $countrad == 1 ) ) ) )
               {
 
                 if ( $alt <= 0 ) { $alt = 0.0001; say REPORT "IMPOSED \$alt = 0.0001;"; } # say "IMPOSED \$alt = 0.0001;"; #IMPORTANT: THIS SETS THE ALTITUDE > 0 OF A TINY AMOUNT IF IT IS < 0 DUE TO THE FACT
                 # THAT THE MAJORITY OF THAT HOUR THE SUN WAS BELOW THE HORIZON, WHILE THE NET GAINED AMOUNT OF RADIATION WAS STILL > 0.
 
-                if ( ( "getweather" ~~ @calcprocedures ) and ( "getsimple" ~~ @calcprocedures ) )
+                if ( ( grep { $_ eq "getweather" } @calcprocedures ) and ( grep { $_ eq "getsimple" } @calcprocedures ) )
                 {
 
                   if ( $dir == 0 ){ $dir = 0.0001; say REPORT "IMPOSED \$dir = 0.0001;"; }
@@ -3017,28 +3138,28 @@ sub pursue
                 # IMPORTANT: THE TWO LINES ABOVE SET THE DIFFUSE AND DIRECT IRRADIANCE > 0 OF A TINY AMOUNT IF THERE ARE 0
                 # TO AVOID ERRORS IN THE rtrace CALLS WHEN THE ALTITUDE IS > 0.
 
-                if ( "gendaylit" ~~ @calcprocedures )
+                if ( grep { $_ eq "gendaylit" } @calcprocedures )
                 {
-                  if ( ( "getweather" ~~ @calcprocedures ) and ( "getsimple" ~~ @calcprocedures ) )
+                  if ( ( grep { $_ eq "getweather" } @calcprocedures ) and ( grep { $_ eq "getsimple" } @calcprocedures ) )
                   {
                     @returns = `gendaylit -ang $alt $azi +s -g $groundrefl -W 0 $diff -a $lat -o $long -m $standardmeridian`;
                     say REPORT "gendaylit -ang $alt $azi +s -g $groundrefl -W 0 $diff -a $lat -o $long -m $standardmeridian";
                   }
                   else
                   {
-                    if ( not( "getweather" ~~ @calcprocedures ) and not( "getsimple" ~~ @calcprocedures ) )
+                    if ( not( grep { $_ eq "getweather" } @calcprocedures ) and not( grep { $_ eq "getsimple" } @calcprocedures ) )
                     {
                       @returns = `gendaylit -ang $alt $azi -s -g $groundrefl -a $lat -o $long -m $standardmeridian`;
                       say REPORT "gendaylit -ang $alt $azi -s -g $groundrefl -a $lat -o $long -m $standardmeridian";
                     }
-                    elsif ( ( "getweather" ~~ @calcprocedures ) and not( "getsimple" ~~ @calcprocedures ) )
+                    elsif ( ( grep { $_ eq "getweather" } @calcprocedures ) and not( grep { $_ eq "getsimple" } @calcprocedures ) )
                     {
                       @returns = `gendaylit $monthnum $day $hour -s -g $groundrefl -W $dir $diff -a $lat -o $long -m $standardmeridian`;
                       say REPORT "gendaylit $monthnum $day $hour -s -g $groundrefl -W $dir $diff -a $lat -o $long -m $standardmeridian";
                     }
                   }
                 }
-                elsif ( "gensky" ~~ @calcprocedures )
+                elsif ( grep { $_ eq "gensky" } @calcprocedures )
                 {
                   if ( $skycond eq "clear" )
                   {
@@ -3061,7 +3182,7 @@ sub pursue
                 {
                   if ( $li =~ /Warning: sun altitude below zero/ )
                   {
-                    if ( "gensky" ~~ @calcprocedures )
+                    if ( grep { $_ eq "gensky" } @calcprocedures )
                     {
                       if ( $skycond eq "clear" )
                       {
@@ -3081,7 +3202,7 @@ sub pursue
                       last;
                     }
                   }
-                  elsif ( "gendaylit" ~~ @calcprocedures )
+                  elsif ( grep { $_ eq "gendaylit" } @calcprocedures )
                   {
                     @returns = `gendaylit -ang 0.0001 $azi -s -g 0 -a $lat -o $long -m $standardmeridian`;
                     say REPORT "gendaylit -ang 0.0001 $azi -s -g 0 -a $lat -o $long -m $standardmeridian";
@@ -3090,9 +3211,9 @@ sub pursue
                 }
 
 
-                if ( ( "gendaylit" ~~ @calcprocedures ) or ( "gensky" ~~ @calcprocedures ) )
+                if ( ( grep { $_ eq "gendaylit" } @calcprocedures ) or ( grep { $_ eq "gensky" } @calcprocedures ) )
                 {
-                  open( SKYFILE, ">$skyfile" ) or die;
+                  open( SKYFILE, ">$skyfile" ) or die "Could not open file '\$skyfile': $skyfile, $!";
 
                   foreach my $line ( @returns )
                   {
@@ -3100,7 +3221,7 @@ sub pursue
                     print REPORT $line;
                   }
 
-                  if ( not ( ( "getweather" ~~ @calcprocedures ) and ( "getsimple" ~~ @calcprocedures ) ) )
+                  if ( not ( ( grep { $_ eq "getweather" } @calcprocedures ) and ( grep { $_ eq "getsimple" } @calcprocedures ) ) )
                   {
 
 print SKYFILE "
@@ -3137,15 +3258,15 @@ solar source sun
                 say REPORT "IN CALCULATIONS FOR DIFFUSE RADIATION, cycle " . ( $countrad + 1 ) . ", \$hour: $hour, \$surfnum: $surfnum, \$month: $month";
 
                 my @shuffled;
-                if ( ( $countrad == 5 ) and ( "radical" ~~ @calcprocedures ) and ( "sparecycles" ~~ @calcprocedures ) )
+                if ( ( $countrad == 5 ) and ( grep { $_ eq "radical" } @calcprocedures ) and ( grep { $_ eq "sparecycles" } @calcprocedures ) )
                 {
                   @shuffleds = shuffle( @pointrefs );
                   @shuffleds = @shuffleds[0..1];
                 }
 
                 my $countpoint = 0;
-                unless ( ( $altreturn < 0 ) and ( ( "gensky" ~~ @calcprocedures ) or ( "gendaylit" ~~ @calcprocedures ) )
-                    and ( not ( ( "getweather" ~~ @calcprocedures ) and ( "getsimple" ~~ @calcprocedures ) ) ) )
+                unless ( ( $altreturn < 0 ) and ( ( grep { $_ eq "gensky" } @calcprocedures ) or ( grep { $_ eq "gendaylit" } @calcprocedures ) )
+                    and ( not ( ( grep { $_ eq "getweather" } @calcprocedures ) and ( grep { $_ eq "getsimple" } @calcprocedures ) ) ) )
                 {
                   foreach my $pointref ( @pointrefs )
                   {
@@ -3162,23 +3283,28 @@ solar source sun
 
                     my @dirvgroup = getdirvectors ( \@basevectors, \@dirvector );
 
+                    #my $pm = Parallel::ForkManager->new($parproc);
 
                     foreach my $dirvector ( @dirvgroup )
                     {
+                      #$pm->start and next; # Fork a new process
+
                       my ( $valstring, $valstring1, $valstring2, $irr, $irr1, $irr2 );
                       my ( $dirvx, $dirvy, $dirvz ) = @{ $dirvector };
 
                       $valstring = `cd $raddir \n echo $xcoord $ycoord $zcoord $dirvx $dirvy $dirvz | rtrace  -I -ab $bounceambnum -lr $bouncemaxnum $parpiece -h $radoctfile`;
                       say REPORT "cd $raddir \n echo $xcoord $ycoord $zcoord $dirvx $dirvy $dirvz | rtrace  -I -ab $bounceambnum -lr $bouncemaxnum $parpiece -h $radoctfile";
-                      say REPORT "OBTAINED: $valstring";#DDD
+                      say REPORT "OBTAINED, A: $valstring";
                       my ( $x, $y, $z ) = ( $valstring =~ m/(.+)\t(.+)\t(.+)\t/ );
                       $irr = ( 179 * ( ( .265 * $x ) + ( .670 * $y ) + ( .065 * $z ) ) );
-                      say REPORT "OBTAINED IRR: $irr";#DDD
+                      say REPORT "OBTAINED IRR, A: $irr";
                       push ( @{ $surftestsdiff{$countrad+1}{$monthnum}{$surfnum}{$hour} }, $irr );
+
+                      #$pm->finish; # End the child process
                     }
                     $countpoint++;
                   }
-                  unless ( "embedded" ~~ @calcprocedures )
+                  unless ( grep { $_ eq "embedded" } @calcprocedures )
                   {
                     say "\nSurface $surfnum, zone $zonenum, month $monthnum, day $day, hour $hour, octree $radoctfile";
                     say "Diffuse irradiances: " . mean( @{ $surftestsdiff{$countrad+1}{$monthnum}{$surfnum}{$hour} } );
@@ -3196,24 +3322,24 @@ solar source sun
 
             ## HERE FOLLOW THE OPERATIONS FOR THE TOTAL IRRADIANCES
 
-            if ( not ( "keepdirshdf" ~~ @calcprocedures ) )
+            if ( not ( grep { $_ eq "keepdirshdf" } @calcprocedures ) )
             {
               my ( @returns );
-              if ( ( ( ( "composite" ~~ @calcprocedures ) and not( "groundreflections" ~~ @calcprocedures ) )
+              if ( ( ( ( grep { $_ eq "composite" } @calcprocedures ) and not( grep { $_ eq "groundreflections" } @calcprocedures ) )
                     and ( ( $countrad == 0 ) or ( $countrad == 1 ) or ( $countrad == 5 ) or ( $countrad == 6 ) or ( $countrad == 7 ) or ( $countrad == 10 ) ) )
-                or ( ( ( "composite" ~~ @calcprocedures ) and ( "groundreflections" ~~ @calcprocedures ) )
+                or ( ( ( grep { $_ eq "composite" } @calcprocedures ) and ( grep { $_ eq "groundreflections" } @calcprocedures ) )
                     and ( ( $countrad == 0 ) or ( $countrad == 1 ) ) )
-                or ( ( "radical" ~~ @calcprocedures ) and ( ( $countrad == 1 ) or ( $countrad == 4 ) ) )
-                or ( ( "noreflections" ~~ @calcprocedures ) and ( ( $countrad == 5 )
+                or ( ( grep { $_ eq "radical" } @calcprocedures ) and ( ( $countrad == 1 ) or ( $countrad == 4 ) ) )
+                or ( ( grep { $_ eq "noreflections" } @calcprocedures ) and ( ( $countrad == 5 )
                   or ( $countrad == 6 ) or ( $countrad == 7 ) or ( $countrad == 10 ) ) )
-                or ( ( not( "noreflections" ~~ @calcprocedures ) and not( "composite" ~~ @calcprocedures ) and not( "radical" ~~ @calcprocedures )
-                  and ( ( $countrad == 0 ) or ( $countrad == 1 ) ) ) or ( "plain" ~~ @calcprocedures ) ) )
+                or ( ( not( grep { $_ eq "noreflections" } @calcprocedures ) and not( grep { $_ eq "composite" } @calcprocedures ) and not( grep { $_ eq "radical" } @calcprocedures )
+                  and ( ( $countrad == 0 ) or ( $countrad == 1 ) ) ) or ( grep { $_ eq "plain" } @calcprocedures ) ) )
               {
 
                 if ( $alt <= 0 ) { $alt = 0.0001; say REPORT "IMPOSED \$alt = 0.0001;"; } #say "IMPOSED \$alt = 0.0001;";  # IMPORTANT: THIS SETS THE ALTITUDE > 0 OF A TINY AMOUNT IF IT IS < 0 DUE TO THE FACT
                 # THAT THE MAJORITY OF THAT HOUR THE SUN WAS BELOW THE HORIZON, WHILE THE NET GAINED AMOUNT OF RADIATION WAS STILL > 0.
 
-                if ( ( "getweather" ~~ @calcprocedures ) and ( "getsimple" ~~ @calcprocedures ) )
+                if ( ( grep { $_ eq "getweather" } @calcprocedures ) and ( grep { $_ eq "getsimple" } @calcprocedures ) )
                 {
                   if ( $dir == 0 ){ $dir = 0.0001; say REPORT "IMPOSED \$dir = 0.0001;"; }  # say "IMPOSED \$dir = 0.0001;";
                   if ( $diff == 0 ){ $diff = 0.0001; say REPORT "IMPOSED \$diff = 0.0001;"; } # say "IMPOSED \$diff = 0.0001;";
@@ -3234,18 +3360,18 @@ solar source sun
 
                 my ( $altreturn, $lightsolar );
 
-                if ( ( "getweather" ~~ @calcprocedures ) and ( "getsimple" ~~ @calcprocedures ) ) # IF CONDITION, CHECK DIRECT RADIATION
+                if ( ( grep { $_ eq "getweather" } @calcprocedures ) and ( grep { $_ eq "getsimple" } @calcprocedures ) ) # IF CONDITION, CHECK DIRECT RADIATION
                 {
                   @returns = `gendaylit -ang $alt $azi +s -g $thisgref -W $dir 0 -a $lat -o $long -m $standardmeridian`;
                   say REPORT "gendaylit -ang $alt $azi +s -g $thisgref -W $dir 0 -a $lat -o $long -m $standardmeridian";
                 }
-                elsif ( ( "gendaylit" ~~ @calcprocedures ) and ( "getweather" ~~ @cacprocedures ) and ( not ( ( "getsimple" ~~ @calcprocedures ) ) ) )
+                elsif ( ( grep { $_ eq "gendaylit" } @calcprocedures ) and ( grep { $_ eq "getweather" } @cacprocedures ) and ( not ( ( grep { $_ eq "getsimple" } @calcprocedures ) ) ) )
                 {
                   @returns = `gendaylit -ang $alt $azi +s -g $thisgref -W $dir $diff -a $lat -o $long -m $standardmeridian`;
                   say REPORT "gendaylit -ang $alt $azi +s -g $thisgref -W $dir $diff -a $lat -o $long -m $standardmeridian";
                 }
-                elsif ( not( "getweather" ~~ @calcprocedures ) and not( "getsimple" ~~ @calcprocedures )
-                  and ( "gensky" ~~ @calcprocedures ) )
+                elsif ( not( grep { $_ eq "getweather" } @calcprocedures ) and not( grep { $_ eq "getsimple" } @calcprocedures )
+                  and ( grep { $_ eq "gensky" } @calcprocedures ) )
                 {
                   if ( $skycond eq "clear" )
                   {
@@ -3279,8 +3405,8 @@ solar source sun
                   }
 
                 }
-                elsif ( not( "getweather" ~~ @calcprocedures ) and not( "getsimple" ~~ @calcprocedures )
-                  and ( "gendaylit" ~~ @calcprocedures ) )
+                elsif ( not( grep { $_ eq "getweather" } @calcprocedures ) and not( grep { $_ eq "getsimple" } @calcprocedures )
+                  and ( grep { $_ eq "gendaylit" } @calcprocedures ) )
                 {
                   if ( $skycond eq "clear" )
                   {
@@ -3385,7 +3511,7 @@ solar source sun
                   "4 0.1 0.1 0.1 0.1\n" );
                 }
 
-                open( SKYFILE, ">$skyfile" ) or die;
+                open( SKYFILE, ">$skyfile" ) or die "Could not open file '\$skyfile': $skyfile, $!";
                 print REPORT "OBTAINED\n";
                 foreach my $line ( @returns )
                 {
@@ -3396,7 +3522,7 @@ solar source sun
 
                 my $countpoint = 0;
 
-                unless ( ( $altreturn < 0 ) and ( ( "gensky" ~~ @calcprocedures ) or ( "gendaylit" ~~ @calcprocedures ) ) )
+                unless ( ( $altreturn < 0 ) and ( ( grep { $_ eq "gensky" } @calcprocedures ) or ( grep { $_ eq "gendaylit" } @calcprocedures ) ) )
                 {
                   foreach my $pointref ( @pointrefs )
                   {
@@ -3406,21 +3532,27 @@ solar source sun
                     my $cfgpath = $paths{cfgpath};
                     my @dirvgroup = getdirvectors ( \@basevectors, \@dirvector );
 
+                    #my $pm = Parallel::ForkManager->new($parproc);
+
                     foreach my $dirvector ( @dirvgroup )
                     {
+                      #$pm->start and next; # Fork a new process
+
                       my ( $valstring, $valstring1, $valstring2, $irr, $irr1, $irr2 );
                       my ( $dirvx, $dirvy, $dirvz ) = @{ $dirvector };
                       $valstring = `cd $raddir \n echo $xcoord $ycoord $zcoord $dirvx $dirvy $dirvz | rtrace  -I -ab $bounceambnum -lr $bouncemaxnum $parpiece -h $radoctfile`;
                       say REPORT "cd $raddir \n echo $xcoord $ycoord $zcoord $dirvx $dirvy $dirvz | rtrace  -I -ab $bounceambnum -lr $bouncemaxnum $parpiece -h $radoctfile";
-                      say REPORT "OBTAINED: $valstring";#DDD
+                      say REPORT "OBTAINED, B: $valstring";#DDD
                       my ( $x, $y, $z ) = ( $valstring =~ m/(.+)\t(.+)\t(.+)\t/ );
                       $irr = ( 179 * ( ( .265 * $x ) + ( .670 * $y ) + ( .065 * $z ) ) );
-                      say REPORT "OBTAINED IRR: $irr";#DDD
+                      say REPORT "OBTAINED IRR, B: $irr";#DDD
                       push ( @{ $surftests{$countrad+1}{$monthnum}{$surfnum}{$hour} }, $irr );
+                      #$pm->finish; # End the child process
                     }
                     $countpoint++;
                   }
-                  unless ( "embedded" ~~ @calcprocedures )
+                  print REPORT "!!!! \@{ \$surftests{\$countrad+1}{\$monthnum}{\$surfnum}{\$hour} } :" . dump( @{ $surftests{$countrad+1}{$monthnum}{$surfnum}{$hour} } );
+                  unless ( grep { $_ eq "embedded" } @calcprocedures )
                   {
                     say "\nSurface $surfnum, zone $zonenum, month $monthnum, day $day, hour $hour, octree $radoctfile";
                     say "Total irradiances: " . mean( @{ $surftests{$countrad+1}{$monthnum}{$surfnum}{$hour} } );
@@ -3437,22 +3569,22 @@ solar source sun
 
 
             ## HERE FOLLOW THE OPERATIONS FOR THE DIRECT IRRADIANCES.
-            if ( ( "alldiff" ~~ @calcprocedures ) and not( "plain" ~~ @calcprocedures ) )
+            if ( ( grep { $_ eq "alldiff" } @calcprocedures ) and not( grep { $_ eq "plain" } @calcprocedures ) )
             {
               my @gridpoints = @gridpoints;
-              if ( "espdirres" ~~ @calcprocedures )
+              if ( grep { $_ eq "espdirres" } @calcprocedures )
               {
                 @gridpoints = @dirgridpoints;
               }
               my ( @returns, $altreturn, $positive );
-              if ( ( ( "composite" ~~ @calcprocedures ) and ( $countrad == 5 ) )
-                or ( ( "radical" ~~ @calcprocedures ) and ( ( $countrad == 5 ) or ( $countrad == 6 ) ) ) )
+              if ( ( ( grep { $_ eq "composite" } @calcprocedures ) and ( $countrad == 5 ) )
+                or ( ( grep { $_ eq "radical" } @calcprocedures ) and ( ( $countrad == 5 ) or ( $countrad == 6 ) ) ) )
               {
 
                 if ( $alt <= 0 ) { $alt = 0.0001; say REPORT "IMPOSED \$alt = 0.0001;"; } # say "IMPOSED \$alt = 0.0001;"; # IMPORTANT: THIS SETS THE ALTITUDE > 0 OF A TINY AMOUNT IF IT IS < 0 DUE TO THE FACT
                 # THAT THE MAJORITY OF THAT HOUR THE SUN WAS BELOW THE HORIZON, WHILE THE NET GAINED AMOUNT OF RADIATION WAS STILL > 0.
 
-                if ( ( "getweather" ~~ @calcprocedures ) and ( "getsimple" ~~ @calcprocedures ) )
+                if ( ( grep { $_ eq "getweather" } @calcprocedures ) and ( grep { $_ eq "getsimple" } @calcprocedures ) )
                 {
                   if ( $dir == 0 ){ $dir = 0.0001; say REPORT "IMPOSED \$dir = 0.0001;"; } # say "IMPOSED \$dir = 0.0001;";
                   if ( $diff == 0 ){ $diff = 0.0001;  say REPORT "IMPOSED \$diff = 0.0001;"; } # say "IMPOSED \$diff = 0.0001;";
@@ -3461,18 +3593,18 @@ solar source sun
                 # TO AVOID ERRORS IN THE rtrace CALLS WHEN THE ALTITUDE IS > 0.
 
                 my ( $altreturn, $lightsolar );
-                if ( ( "getweather" ~~ @calcprocedures ) and ( "getsimple" ~~ @calcprocedures ) ) # IF CONDITION, CHECK DIRECT RADIATION
+                if ( ( grep { $_ eq "getweather" } @calcprocedures ) and ( grep { $_ eq "getsimple" } @calcprocedures ) ) # IF CONDITION, CHECK DIRECT RADIATION
                 {
                   @returns = `gendaylit -ang $alt $azi +s -g 0 -W $dir 0 -a $lat -o $long -m $standardmeridian`;
                   say REPORT "gendaylit -ang $alt $azi +s -g 0 -W $dir 0 -a $lat -o $long -m $standardmeridian";
                 }
-                elsif ( ( "gendaylit" ~~ @calcprocedures ) and ( "getweather" ~~ @calcprocedures ) and not( "getsimple" ~~ @calcprocedures ) )
+                elsif ( ( grep { $_ eq "gendaylit" } @calcprocedures ) and ( grep { $_ eq "getweather" } @calcprocedures ) and not( grep { $_ eq "getsimple" } @calcprocedures ) )
                 {
                   @returns = `gendaylit -ang $alt $azi +s -g 0 -W $dir $diff -a $lat -o $long -m $standardmeridian`;
                   say REPORT "gendaylit -ang $alt $azi +s -g 0 -W $dir $diff -a $lat -o $long -m $standardmeridian";
                 }
-                elsif ( ( "gensky" ~~ @calcprocedures ) and not( "getweather" ~~ @calcprocedures )
-                  and not( "getsimple" ~~ @calcprocedures ) )
+                elsif ( ( grep { $_ eq "gensky" } @calcprocedures ) and not( grep { $_ eq "getweather" } @calcprocedures )
+                  and not( grep { $_ eq "getsimple" } @calcprocedures ) )
                 {
                   if ( $skycond eq "clear" )
                   {
@@ -3506,8 +3638,8 @@ solar source sun
                   }
 
                 }
-                elsif ( ( "gendaylit" ~~ @calcprocedures ) and not( "getweather" ~~ @calcprocedures )
-                  and not( "getsimple" ~~ @calcprocedures ) )
+                elsif ( ( grep { $_ eq "gendaylit" } @calcprocedures ) and not( grep { $_ eq "getweather" } @calcprocedures )
+                  and not( grep { $_ eq "getsimple" } @calcprocedures ) )
                 {
                   if ( $skycond eq "clear" )
                   {
@@ -3575,9 +3707,9 @@ solar source sun
                     $returns[$counter+3] = "7 0 0 0 0 0 0 0\n",
                   }
 
-                  if ( $liXXX =~ /Warning: sun altitude below zero/ )
+                  if ( $li =~ /Warning: sun altitude below zero/ )
                   {
-                    if ( "gensky" ~~ @calcprocedures )
+                    if ( grep { $_ eq "gensky" } @calcprocedures )
                     {
                       if ( $skycond eq "clear" )
                       {
@@ -3596,7 +3728,7 @@ solar source sun
                       }
                       last;
                     }
-                    elsif ( "gendaylit" ~~ @calcprocedures )
+                    elsif ( grep { $_ eq "gendaylit" } @calcprocedures )
                     {
                       @returns = `gendaylit -ang 0.0001 $azi +s -g 0 -a $lat -o $long -m $standardmeridian`;
                       say REPORT "gendaylit -ang 0.0001 $azi +s -g 0 -a $lat -o $long -m $standardmeridian";
@@ -3623,7 +3755,7 @@ solar source sun
 
                 say REPORT "IN CALCULATIONS FOR DIRECT RADIATION, cycle " . ( $countrad + 1 ) . ", \$hour: $hour, \$surfnum: $surfnum, \$month: $month";
 
-                open( SKYFILE, ">$skyfile" ) or die;
+                open( SKYFILE, ">$skyfile" ) or die "Could not open file '\$skyfile': $skyfile, $!";
 
                 print REPORT "OBTAINED";
                 foreach my $line ( @returns )
@@ -3635,7 +3767,7 @@ solar source sun
 
                 my $countpoint = 0;
 
-                unless ( ( $altreturn < 0 ) and ( ( "gensky" ~~ @calcprocedures ) or ( "gendaylit" ~~ @calcprocedures ) ) )
+                unless ( ( $altreturn < 0 ) and ( ( grep { $_ eq "gensky" } @calcprocedures ) or ( grep { $_ eq "gendaylit" } @calcprocedures ) ) )
                 {
                   foreach my $pointref ( @pointrefs )
                   {
@@ -3645,22 +3777,29 @@ solar source sun
                     my $cfgpath = $paths{cfgpath};
                     my @dirvgroup = getdirvectors ( \@basevectors, \@dirvector );
 
+                    #my $pm = Parallel::ForkManager->new($parproc);
+
                     foreach my $dirvector ( @dirvgroup )
                     {
+
+                      #$pm->start and next; # Fork a new process
+
                       my ( $valstring, $valstring1, $valstring2, $irr, $irr1, $irr2 );
                       my ( $dirvx, $dirvy, $dirvz ) = @{ $dirvector };
 
                       $valstring = `cd $raddir \n echo $xcoord $ycoord $zcoord $dirvx $dirvy $dirvz | rtrace  -I -ab 0 -lr 0 $parpiece -h $radoctfile`;
                       say REPORT "5TO SHELL: cd $raddir \n echo $xcoord $ycoord $zcoord $dirvx $dirvy $dirvz | rtrace  -I -ab 0 -lr 0 $parpiece -h $radoctfile";
-                      say REPORT "OBTAINED: $valstring";#DDD
+                      say REPORT "OBTAINED, C: $valstring";
                       my ( $x, $y, $z ) = ( $valstring =~ m/(.+)\t(.+)\t(.+)\t/ );
                       $irr = ( 179 * ( ( .265 * $x ) + ( .670 * $y ) + ( .065 * $z ) ) );
-                      say REPORT "OBTAINED IRR: $irr";#DDD
+                      say REPORT "OBTAINED IRR, C: $irr";
                       push ( @{ $surftestsdir{$countrad+1}{$monthnum}{$surfnum}{$hour} }, $irr );
+
+                      #$pm->finish; # End the child process
                     }
                     $countpoint++;
                   }
-                  unless ( "embedded" ~~ @calcprocedures )
+                  unless ( grep { $_ eq "embedded" } @calcprocedures )
                   {
                     say "\nSurface $surfnum, zone $zonenum, month $monthnum, day $day, hour $hour, octree $radoctfile";
                     say "Direct unreflected irradiances: " . mean ( @{ $surftestsdir{$countrad+1}{$monthnum}{$surfnum}{$hour} } );
@@ -3684,9 +3823,9 @@ solar source sun
 
             if ( $count == $radoctnum )
             {
-              if ( not( "alldiff" ~~ @calcprocedures ) )
+              if ( not( grep { $_ eq "alldiff" } @calcprocedures ) )
               {
-                if ( "radical" ~~ @calcprocedures )
+                if ( grep { $_ eq "radical" } @calcprocedures )
                 {
                   if ( @{ $surftests{5}{$monthnum}{$surfnum}{$hour} } )
                   {
@@ -3805,9 +3944,9 @@ solar source sun
                   $meanvaluesurf_dir3 = ( $meanvaluesurf3 - $meanvaluesurf_diff3 );
                 }
               }
-              elsif ( "alldiff" ~~ @calcprocedures )
+              elsif ( grep { $_ eq "alldiff" } @calcprocedures )
               {
-                if ( ( "noreflections" ~~ @calcprocedures ) or ( ( "composite" ~~ @calcprocedures ) and not( "groundreflections" ~~ @calcprocedures ) ) )
+                if ( ( grep { $_ eq "noreflections" } @calcprocedures ) or ( ( grep { $_ eq "composite" } @calcprocedures ) and not( grep { $_ eq "groundreflections" } @calcprocedures ) ) )
                 {
                   my ( $meanvaluesurf1, $meanvaluesurf2, $meanvaluesurf5, $meanvaluesurf6, $meanvaluesurf8, $meanvaluesurf9, $meanvaluesurf10, $meanvaluesurf11 );
                   if ( @{ $surftests{8}{$monthnum}{$surfnum}{$hour} } )
@@ -3872,7 +4011,7 @@ solar source sun
                   $surftests{modrelation}{$monthnum}{$surfnum}{$hour} = $modrelation;
                 }
 
-                if ( "composite" ~~ @calcprocedures )
+                if ( grep { $_ eq "composite" } @calcprocedures )
                 {
                   if ( @{ $surftests{2}{$monthnum}{$surfnum}{$hour} } )
                   {
@@ -3896,7 +4035,7 @@ solar source sun
 
                   $meanvaluesurf_diff1 = ( $meanvaluesurf1 - $meanvaluesurf_dir1 );
                 }
-                elsif ( "radical" ~~ @calcprocedures )
+                elsif ( grep { $_ eq "radical" } @calcprocedures )
                 {
                   if ( @{ $surftests{2}{$monthnum}{$surfnum}{$hour} } )
                   {
@@ -3922,7 +4061,7 @@ solar source sun
 
                   $meanvaluesurf_diff1 = ( $meanvaluesurf1 - $meanvaluesurf_dir1 );
                 }
-                elsif ( "plain" ~~ @calcprocedures )
+                elsif ( grep { $_ eq "plain" } @calcprocedures )
                 {
                   if ( @{ $surftests{1}{$monthnum}{$surfnum}{$hour} } )
                   {
@@ -4021,7 +4160,7 @@ solar source sun
                 $irrs{ $zonenum }{ 4 }{ $monthnum }{ $surfnum }{ $hour }{ meandirirr } = $meanvaluesurf_dir4;
               }
 
-              if ( ( ( ( "noreflections" ~~ @calcprocedures ) or ( ( "composite" ~~ @calcprocedures ) and not( "groundreflections" ~~ @calcprocedures ) ) and ( "alldiff" ~~ @calcprocedures ) ) ) and not ( "embedded" ~~ @calcprocedures ) )
+              if ( ( ( ( grep { $_ eq "noreflections" } @calcprocedures ) or ( ( grep { $_ eq "composite" } @calcprocedures ) and not( grep { $_ eq "groundreflections" } @calcprocedures ) ) and ( grep { $_ eq "alldiff" } @calcprocedures ) ) ) and not ( grep { $_ eq "embedded" } @calcprocedures ) )
               {
                 print "obs black: " . mean( @{ $surftests{8}{$monthnum}{$surfnum}{$hour} } ) .
                 "; obs & ground black: " . mean( @{ $surftests{6}{$monthnum}{$surfnum}{$hour} } ) .
@@ -4031,7 +4170,7 @@ solar source sun
                 "; rel difference: $surftests{groundradnoshad}{$monthnum}{$surfnum}{$hour} .\nabs difference: $surftests{groundraddifference}{$monthnum}{$surfnum}{$hour}; shdf for ground $surftests{modrelation}{$monthnum}{$surfnum}{$hour}\n" ;
               }
 
-              if ( ( ( ( "composite" ~~ @calcprocedures ) and ( "groundreflections" ~~ @calcprocedures ) and ( "alldiff" ~~ @calcprocedures ) ) and not( "plain" ~~ @calcprocedures ) ) and not ( "embedded" ~~ @calcprocedures ) )
+              if ( ( ( ( grep { $_ eq "composite" } @calcprocedures ) and ( grep { $_ eq "groundreflections" } @calcprocedures ) and ( grep { $_ eq "alldiff" } @calcprocedures ) ) and not( grep { $_ eq "plain" } @calcprocedures ) ) and not ( grep { $_ eq "embedded" } @calcprocedures ) )
               {
                 print "obs black: " . mean( @{ $surftests{8}{$monthnum}{$surfnum}{$hour} } ) .
                 "; obs & ground black: " . mean( @{ $surftests{6}{$monthnum}{$surfnum}{$hour} } ) .
@@ -4039,24 +4178,24 @@ solar source sun
               }
 
 
-              if ( ( ( "composite" ~~ @calcprocedures ) and not( "plain" ~~ @calcprocedures ) ) and not ( "embedded" ~~ @calcprocedures ) )
+              if ( ( ( grep { $_ eq "composite" } @calcprocedures ) and not( grep { $_ eq "plain" } @calcprocedures ) ) and not ( grep { $_ eq "embedded" } @calcprocedures ) )
               {
                 print "obs refl: $meanvaluesurf2; dir unrefl: $meanvaluesurf_dir2; diff: $meanvaluesurf_diff2 .
 obs black: $meanvaluesurf1; dir unrefl: $meanvaluesurf_dir1; diff: $meanvaluesurf_diff1\n" ;
               }
 
-              if ( ( "plain" ~~ @calcprocedures ) and not ( "embedded" ~~ @calcprocedures ) )
+              if ( ( grep { $_ eq "plain" } @calcprocedures ) and not ( grep { $_ eq "embedded" } @calcprocedures ) )
               {
                 print "obs refl: $meanvaluesurf2; obs black: $meanvaluesurf1\n" ;
               }
 
-              if ( ( "radical" ~~ @calcprocedures ) and not ( "embedded" ~~ @calcprocedures ) )
+              if ( ( grep { $_ eq "radical" } @calcprocedures ) and not ( grep { $_ eq "embedded" } @calcprocedures ) )
               {
                 print "model obs refl: $meanvaluesurf2; dir unrefl: $meanvaluesurf_dir2; diff: $meanvaluesurf_diff2 .
 no obs: $meanvaluesurf1; dir unrefl: $meanvaluesurf_dir1; diff: $meanvaluesurf_diff1\n" ;
               }
 
-              unless ( ( "noreflections" ~~ @calcprocedures ) or ( "plain" ~~ @calcprocedures ) or ( "embedded" ~~ @calcprocedures ) )
+              unless ( ( grep { $_ eq "noreflections" } @calcprocedures ) or ( grep { $_ eq "plain" } @calcprocedures ) or ( grep { $_ eq "embedded" } @calcprocedures ) )
               {
                 say "model 1 diff: $meanvaluesurf_diff1, model 1 tot: $meanvaluesurf1, model 1 dir: $meanvaluesurf_dir1. \nmodel 2 diff $meanvaluesurf_diff2, model 2 tot: $meanvaluesurf2, model 2 dir: $meanvaluesurf_dir2\n";
               }
@@ -4072,8 +4211,9 @@ no obs: $meanvaluesurf1; dir unrefl: $meanvaluesurf_dir1; diff: $meanvaluesurf_d
   }
   $" = ",";
   say MONITOR "OBTAINED IRRS: " . dump( \%irrs );
+  say REPORT "OBTAINED IRRS: " . dump( \%irrs );
   return ( \%irrs );
-}
+}#END sub pursue
 
 
 sub cleanblanks
@@ -4103,12 +4243,12 @@ sub createconstrdbfile
 
   my ( @bigcopy, @updatedlines, %exportconstr );
 
-  open ( DBFILE, "$constrdbfile" ) or die;
+  open( DBFILE, "$constrdbfile" ) or die "Could not open file '\$constrdbfile': $constrdbfile, $!";
   my @lines = <DBFILE>;
   close DBFILE;
 
   my $countcat = 0;
-  open ( MATFILE, "$matdbfile" ) or die;
+  open( MATFILE, "$matdbfile" ) or die "Could not open file '\$matdbfile': $matdbfile, $!";
   my @matlines = <MATFILE>;
   close MATFILE;
 
@@ -4165,7 +4305,7 @@ sub createconstrdbfile
     $countline++;
   }
 
-  if ( "newconstrdb" ~~ @calcprocedures )
+  if ( grep { $_ eq "newconstrdb" } @calcprocedures )
   {
     if ( $line =~ /^\*date,/ )
     {
@@ -4175,7 +4315,7 @@ sub createconstrdbfile
 
   #say MONITOR "\@updatedlines: " . dump ( @updatedlines );
 
-  if ( "oldconstrdb" ~~ @calcprocedures )
+  if ( grep { $_ eq "oldconstrdb" } @calcprocedures )
   {
     # --- OLD CONSTR DATABASE ---
     foreach my $el ( @obscon )
@@ -4217,7 +4357,7 @@ sub createconstrdbfile
     } # --- END OLD CONSTR DATABASE ---
     say MONITOR "BIGCOPY: " . dump ( @bigcopy );
   }
-  elsif ( not ( "oldconstrdb" ~~ @calcprocedures ) )
+  elsif ( not ( grep { $_ eq "oldconstrdb" } @calcprocedures ) )
   {
     # --- NEW CONSTR DATABASE ---
     # If there are obstruction constructions, loop through each @updatedlines.
@@ -4260,7 +4400,7 @@ sub createconstrdbfile
   #say MONITOR "BIGCOPY  " .dump ( @bigcopy );
 
   my ( @newbigcopy, @materials, @newmaterials, @materialnums );
-  if ( "oldconstrdb" ~~ @calcprocedures )
+  if ( grep { $_ eq "oldconstrdb" } @calcprocedures )
   {  # --- OLD CONSTR DATABASE ---
      my ( $newmatinssurf, $newmatextsurf );
      foreach my $copyref ( @bigcopy )
@@ -4309,24 +4449,24 @@ sub createconstrdbfile
 
         $newmatextlayer = "f_" . "$newmatextlayer";
 
-	if ( ( not( $matintlayer ~~ @materials ) ) and ( $matintlayer ne "" ) and ( not ( $matintlayer =~ /^f_/ ) ) )
+	if ( ( not( grep { $_ eq $matintlayer } @materials ) ) and ( $matintlayer ne "" ) and ( not ( $matintlayer =~ /^f_/ ) ) )
         {
 	   push ( @materials, $matintlayer );
 	   push ( @materialnums, $matintlayernum );
         }
 
-	if ( ( not( $matextlayer ~~ @materials ) ) and ( $matextlayer ne "" ) and ( not ( $matextlayer =~ /^f_/ ) ) )
+	if ( ( not( grep { $_ eq $matextlayer } @materials ) ) and ( $matextlayer ne "" ) and ( not ( $matextlayer =~ /^f_/ ) ) )
         {
 	   push ( @materials, $matextlayer );
 	   push ( @materialnums, $matextlayernum );
         }
 
-	 if ( ( not( $newmatintlayer ~~ @newmaterials ) ) and ( $newmatintlayer ne "" ) and ( $newmatintlayer =~ /^f_/ ) )
+	 if ( ( not( grep { $_ eq $newmatintlayer } @newmaterials ) ) and ( $newmatintlayer ne "" ) and ( $newmatintlayer =~ /^f_/ ) )
          {
 	    push ( @newmaterials, $newmatintlayer );
 	 }
 
-	 if ( ( not( $newmatextlayer ~~ @newmaterials ) ) and ( $newmatextlayer ne "" ) and ( $newmatextlayer =~ /^f_/ ) )
+	 if ( ( not( grep { $_ eq $newmatextlayer } @newmaterials ) ) and ( $newmatextlayer ne "" ) and ( $newmatextlayer =~ /^f_/ ) )
          {
 	    push ( @newmaterials, $newmatextlayer );
          }
@@ -4386,7 +4526,7 @@ sub createconstrdbfile
        }
      } # --- END OLD CONSTR DATABASE ---
   }
-  elsif ( "newconstrdb" ~~ @calcprocedures )
+  elsif ( grep { $_ eq "newconstrdb" } @calcprocedures )
   {
     # --- NEW CONSTR DATABASE ---
     # In each [ @copy ], modify the:
@@ -4446,24 +4586,24 @@ sub createconstrdbfile
 
       $newmatextlayer = "f_" . "$newmatextlayer";
 
-       if ( ( not( $matintlayer ~~ @materials ) ) and ( $matintlayer ne "" ) and ( not ( $matintlayer =~ /^f_/ ) ) )
+       if ( ( not( grep { $_ eq $matintlayer } @materials ) ) and ( $matintlayer ne "" ) and ( not ( $matintlayer =~ /^f_/ ) ) )
         {
 	   push ( @materials, $matintlayer );
 	   push ( @materialnums, $matintlayernum );
         }
 
-	if ( ( not( $matextlayer ~~ @materials ) ) and ( $matextlayer ne "" ) and ( not ( $matextlayer =~ /^f_/ ) ) )
+	if ( ( not( grep { $_ eq $matextlayer } @materials ) ) and ( $matextlayer ne "" ) and ( not ( $matextlayer =~ /^f_/ ) ) )
         {
 	   push ( @materials, $matextlayer );
 	   push ( @materialnums, $matextlayernum );
         }
 
-	 if ( ( not( $newmatintlayer ~~ @newmaterials ) ) and ( $newmatintlayer ne "" ) and ( $newmatintlayer =~ /^f_/ ) )
+	 if ( ( not( grep { $_ eq $newmatintlayer } @newmaterials ) ) and ( $newmatintlayer ne "" ) and ( $newmatintlayer =~ /^f_/ ) )
          {
 	    push ( @newmaterials, $newmatintlayer );
 	 }
 
-	 if ( ( not( $newmatextlayer ~~ @newmaterials ) ) and ( $newmatextlayer ne "" ) and ( $newmatextlayer =~ /^f_/ ) )
+	 if ( ( not( grep { $_ eq $newmatextlayer } @newmaterials ) ) and ( $newmatextlayer ne "" ) and ( $newmatextlayer =~ /^f_/ ) )
          {
 	    push ( @newmaterials, $newmatextlayer );
          }
@@ -4632,7 +4772,7 @@ sub createconstrdbfile
   @newmatnums = uniq( @newmatnums ); say MONITOR "CLEANED \@newmatnums " . dump( @newmatnums );
 
   my ( @lastcopy );
-  if ( "oldconstrdb" ~~ @calcprocedures )
+  if ( grep { $_ eq "oldconstrdb" } @calcprocedures )
   {
      foreach my $copyref ( @newbigcopy )
      {
@@ -4706,7 +4846,7 @@ sub createconstrdbfile
        push ( @lastcopy, @constrlines );
      }
   }
-  elsif ( "newconstrdb" ~~ @calcprocedures )
+  elsif ( grep { $_ eq "newconstrdb" } @calcprocedures )
   { # --- NEW CONSTR DATABASE ---
     foreach my $copyref ( @newbigcopy )
     {
@@ -4743,16 +4883,16 @@ sub createconstrdbfile
   say MONITOR "LASTCOPY " .dump ( @lastcopy );
   push ( @updatedlines, @lastcopy );
 
-  open ( CONSTRDBFILE_F, ">$constrdbfile_f" ) or die;
+  open( CONSTRDBFILE_F, ">$constrdbfile_f" ) or die "Could not open file '\$constrdbfile_f': $constrdbfile_f, $!";
 
-  if ( "oldconstrdb" ~~ @calcprocedures )
+  if ( grep { $_ eq "oldconstrdb" } @calcprocedures )
   {
     foreach ( @updatedlines )
     {
       say CONSTRDBFILE_F $_;
     }
   }
-  elsif ( "newconstrdb" ~~ @calcprocedures )
+  elsif ( grep { $_ eq "newconstrdb" } @calcprocedures )
   {
     foreach ( @updatedlines )
     {
@@ -4821,7 +4961,7 @@ sub compareirrs
 
           $irrvars{ $zonenum }{ $monthnum }{ $surfnum }{ $hour }{ modrelation } = $irrs{ $zonenum }{ 0 }{ $monthnum }{ $surfnum }{ $hour }{ modrelation };
 
-          unless ( ( "alldiff" ~~ @calcprocedures ) or ( "keepdirshdf" ~~ @calcprocedures ) )
+          unless ( ( grep { $_ eq "alldiff" } @calcprocedures ) or ( grep { $_ eq "keepdirshdf" } @calcprocedures ) )
           {
 
             $dirsurfirr = $irrs{ $zonenum }{ 1 }{ $monthnum }{ $surfnum }{ $hour }{ meandirirr }; say REPORT "\$dirsurfirr: $dirsurfirr";
@@ -4911,6 +5051,7 @@ sub fillhours
 
 sub modifyshda
 { # THIS MODIFIES THE ".shda" FILE ON THE BASIS OF THE IRRADIANCE RATIOS.
+  #say REPORT "ENTERED MODIFYSHDA!!!!";
   my ( $comparedirrsref, $surfslistref, $zonefilelistsref, $shdfileslistref, $daylighthoursref, $irrvarsref, $tempmod, $tempreport, $tempmoddir, $tempreportdir, $elm, $radtype, $calcprocedures_ref, $irrs_ref, $conffile_f2, $shdfile, $surfs_ref, $mymonth ) = @_; ##### CONDITION! "diffuse" AND "direct".
   my %surfslist = %$surfslistref;
   my %zonefilelists = %$zonefilelistsref;
@@ -4920,7 +5061,7 @@ sub modifyshda
   my @calcprocedures = @$calcprocedures_ref;
   my %irrs = %{ $irrs_ref };
 
-  if ( "embedded" ~~ @calcprocedures )
+  if ( grep { $_ eq "embedded" } @calcprocedures )
   {
     $monthnum = $mymonth;
   }
@@ -4934,7 +5075,7 @@ sub modifyshda
 
     my ( @surfsdo, @vehicle );
     my ( @insertlines, @inserts, $bringline ) ;
-    if ( ( "keepdirshdf" ~~ @calcprocedures ) and ( $radtype eq "direct" ) )
+    if ( ( grep { $_ eq "keepdirshdf" } @calcprocedures ) and ( $radtype eq "direct" ) )
     {
       foreach my $monthnum ( sort {$a <=> $b} ( keys %{ $irrvars{ $zonenum } } ) )
       {
@@ -5016,7 +5157,7 @@ sub modifyshda
             $modrelation = $irrs{ $zonenum }{ 0 }{ $monthnum }{ $surfnum }{ $hour }{ modrelation };
 
             my $pass;
-            unless ( ( ( "noreflections" ~~ @calcprocedures ) or ( ( "composite" ~~ @calcprocedures ) and not ( "groundreflections" ~~ @calcprocedures ) ) )
+            unless ( ( ( grep { $_ eq "noreflections" } @calcprocedures ) or ( ( grep { $_ eq "composite" } @calcprocedures ) and not ( grep { $_ eq "groundreflections" } @calcprocedures ) ) )
               and not( $modrelation =~ /$RE{num}{real}/ ) )
             {
               $pass ="yes";
@@ -5046,9 +5187,9 @@ sub modifyshda
                       {
                         if ( $radtype eq "diffuse" )
                         {
-                          unless ( "radical" ~~ @calcprocedures )
+                          unless ( grep { $_ eq "radical" } @calcprocedures )
                           {
-                            if ( "noreflections" ~~ @calcprocedures )
+                            if ( grep { $_ eq "noreflections" } @calcprocedures )
                             {
                               my ( $skycomp, $newskycomp );
                               if ( ( $modrelation ne "" ) and ( $pass eq "yes" ) )
@@ -5067,14 +5208,14 @@ sub modifyshda
                               }
                               $irrratio = $modrelation;
                             }
-                            elsif ( ( ( "composite" ~~ @calcprocedures ) and ( "groundreflections" ~~ @calcprocedures ) ) or ( "plain" ~~ @calcprocedures ) )
+                            elsif ( ( ( grep { $_ eq "composite" } @calcprocedures ) and ( grep { $_ eq "groundreflections" } @calcprocedures ) ) or ( grep { $_ eq "plain" } @calcprocedures ) )
                             {
                               $calcamount = ( 1 - $el ); # THIS IS THE RATIO OF NON-SHADED IRRADIATION AS CALCULATED BY THE ESP-r's ISH MODULE
                               $improvedguess = ( $calcamount * $irrratio ); # THIS IS THE RATIO ABOVE CORRECTED BY MULTIPLYING IT BY THE IRRADIANCE RATIO TO TAKE REFLECTIONS INTO ACCOUNT.
                               $newshadingvalue = ( 1 - $improvedguess ); # AS THE NAME SAYS, THIS IS THE NEW SHADING FACTOR.
                               if ( $newshadingvalue > $el ) { $newshadingvalue = $el }; # IF THE SHADING FACTOR IS INCREASING, KEEP THE OLD ONE.
                             }
-                            elsif ( "composite" ~~ @calcprocedures )
+                            elsif ( grep { $_ eq "composite" } @calcprocedures )
                             {
                               if ( ( $modrelation ne "" ) and ( $pass eq "yes" ) )
                               {
@@ -5102,9 +5243,9 @@ sub modifyshda
                         }
                         elsif ( $radtype eq "direct" )
                         {
-                          unless ( ( "alldiff" ~~ @calcprocedures ) or ( "radical" ~~ @calcprocedures ) )
+                          unless ( ( grep { $_ eq "alldiff" } @calcprocedures ) or ( grep { $_ eq "radical" } @calcprocedures ) )
                           {
-                            if ( "noreflections" ~~ @calcprocedures )
+                            if ( grep { $_ eq "noreflections" } @calcprocedures )
                             {
                               if ( ( $modrelation ne "" ) and ( $pass eq "yes" ) )
                               {
@@ -5122,14 +5263,14 @@ sub modifyshda
                               }
                               $irrratio = $modrelation;
                             }
-                            elsif ( ( ( "composite" ~~ @calcprocedures ) and ( "groundreflections" ~~ @calcprocedures ) ) or ( "plain" ~~ @calcprocedures ) )
+                            elsif ( ( ( grep { $_ eq "composite" } @calcprocedures ) and ( grep { $_ eq "groundreflections" } @calcprocedures ) ) or ( grep { $_ eq "plain" } @calcprocedures ) )
                             {
                               $calcamount = ( 1 - $el ); # THIS IS THE RATIO OF NON-SHADED IRRADIATION AS CALCULATED BY THE ESP-r's ISH MODULE
                               $improvedguess = ( $calcamount * $irrratio ); # THIS IS THE RATIO ABOVE CORRECTED BY MULTIPLYING IT BY THE IRRADIANCE RATIO TO TAKE REFLECTIONS INTO ACCOUNT.
                               $newshadingvalue = ( 1 - $improvedguess ); # AS THE NAME SAYS, THIS IS THE NEW SHADING FACTOR.
                               if ( $newshadingvalue > $el ) { $newshadingvalue = $el }; # IF THE SHADING FACTOR IS INCREASING, KEEP THE OLD ONE.
                             }
-                            elsif ( "composite" ~~ @calcprocedures )
+                            elsif ( grep { $_ eq "composite" } @calcprocedures )
                             {
                               if ( ( $modrelation ne "" ) and ( $pass eq "yes" ) )
                               {
@@ -5160,7 +5301,7 @@ sub modifyshda
                           }
                         }
 
-                        if ( "radical" ~~ @calcprocedures )
+                        if ( grep { $_ eq "radical" } @calcprocedures )
                         {
                           if ( $radtype eq "diffuse" )
                           {
@@ -5194,7 +5335,7 @@ sub modifyshda
                           }
                           elsif ( $radtype eq "direct" )
                           {
-                            if ( ( "keepdirshdf" ~~ @calcprocedures ) or ( "alldiff" ~~ @calcprocedures ) )
+                            if ( ( grep { $_ eq "keepdirshdf" } @calcprocedures ) or ( grep { $_ eq "alldiff" } @calcprocedures ) )
                             {
                               $newshadingvalue = $el;
                             }
@@ -5290,7 +5431,7 @@ sub modifyshda
 
                         my $irrratio = sprintf ( "%.4f", $irrratio );
 
-                        unless ( "embedded" ~~ @calcprocedures )
+                        unless ( grep { $_ eq "embedded" } @calcprocedures )
                         {
                           print REPORT "For $radtype radiation, obtained: zone number: $zonenum; month number $monthnum; surface number: $surfnum; hour: $hour; old shading factor: $el, new shading factor: $newshadingvalue; irradiance ratio: $irrratio\n";
                           say "Radiation type: $radtype; surface: $surfnum, month: $monthname, hour: $hour";
@@ -5307,6 +5448,9 @@ sub modifyshda
 
                     my @filledhourvals2 = fillhours( \@newhourvals2, $monthname, \%daylighthours );
 
+                    #print REPORT "SHOULD PRINT TRYTEMPMOD AND TRYTEMPMODDIR!!!!";
+                    #print TEMPMOD "TEMPMOD!!!!";
+                    #print TEMPMODDIR "TRYTEMPMODDIR!!!!";
                     #if ( ( scalar ( @filledhourvals ) > 1 ) and ( $monthname eq $monthnames[0] ) )
                     {
                       shift @monthnames;
@@ -5323,7 +5467,7 @@ sub modifyshda
                       elsif ( $radtype eq "direct" )#
                       {
                         my $newline;
-                        if ( "keepdirshdf" ~~ @calcprocedures )
+                        if ( grep { $_ eq "keepdirshdf" } @calcprocedures )
                         {
                           my $bringline = shift( @vehicle );
                           $newline = "$bringline" . "# direct - surface " . "$readsurfname $monthname\n";
@@ -5336,9 +5480,11 @@ sub modifyshda
                       }
                     }
 
-
+                    #print REPORT "SHOULD PRINT TRYTEMPREPORT AND TRYTEMPREPORTDIR!!!!";
+                    #print TEMPREPORT "TRYTEMPREPORT!!!!";
+                    #print TEMPREPORTDIR "TRYTEMPREPORTDIR!!!!";
                     #if ( ( scalar ( @filledhourvals2 ) > 1 ) and ( $monthname eq $monthnames2[0] ) )
-                    unless ( "embedded" ~~ @calcprocedures )
+                    unless ( grep { $_ eq "embedded" } @calcprocedures )
                     {
                       shift @monthnames2;
                       my @firstarr2 = @filledhourvals2[ 0..11 ];
@@ -5406,7 +5552,7 @@ sub createfictgeofile
   my @calcprocedures = @{ $calcprocedures_ref };
   my @groups = @{ $groups_ref };
 
-  open ( GEOFILE, "$geofile" ) or die;
+  open( GEOFILE, "$geofile" ) or die "Could not open file '\$geofile': $geofile, $!";
   my @geolines = <GEOFILE>;
   close GEOFILE;
 
@@ -5414,7 +5560,7 @@ sub createfictgeofile
 
   unless ( -e $modishlock )
   {
-    open( GEOFILE_F, ">$geofile_f" ) or die;
+    open( GEOFILE_F, ">$geofile_f" ) or die "Could not open file '\$geofile_f': $geofile_f, $!";
   }
 
   foreach my $geoline ( @geolines )
@@ -5522,13 +5668,13 @@ sub createfictgeofile
   unless ( -e $modishlock )
   {
     my ( $shortgeofile_f, $shortgeofile_f1, $geofile_f1 );
-    if ( ( "radical" ~~ @calcprocedures ) or ( "composite" ~~ @calcprocedures ) or ( "noreflections" ~~ @calcprocedures ) )
+    if ( ( grep { $_ eq "radical" } @calcprocedures ) or ( grep { $_ eq "composite" } @calcprocedures ) or ( grep { $_ eq "noreflections" } @calcprocedures ) )
     {
       $geofile_f5 = $geofile_f;
       $geofile_f5 =~ s/\.geo$// ;
       $geofile_f5 = $geofile_f5 . "5.geo";
 
-      open( GEOFILE_F, "$geofile_f" ) or die;
+      open( GEOFILE_F, "$geofile_f" ) or die "Could not open file '\$geofile_f': $geofile_f, $!";
       my @lines_f = <GEOFILE_F>;
       close GEOFILE_F;
 
@@ -5557,7 +5703,7 @@ sub createfictgeofile
       $shortgeofile_f =~ s/^$zonepath// ;
       $shortgeofile_f =~ s/^\/// ;
 
-      open ( CONFFILE_F5, "$conffile_f5" ) or die;
+      open( CONFFILE_F5, "$conffile_f5" ) or die "Could not open file '\$conffile_f5': $conffile_f5, $!";
       my @lines_old = <CONFFILE_F5>;
       close CONFFILE_F5;
 
@@ -5565,7 +5711,7 @@ sub createfictgeofile
       `mv -f $conffile_f5 $conffile_f5_old`;
       say REPORT "mv -f $conffile_f5 $conffile_f5_old";
 
-      open( CONFFILE_F5, ">$conffile_f5" ) or die;
+      open( CONFFILE_F5, ">$conffile_f5" ) or die "Could not open file '\$conffile_f5': $conffile_f5, $!";
       foreach my $line ( @lines_old )
       {
         if ( $line =~ /^\*geo/ )
@@ -5603,11 +5749,11 @@ sub creatematdbfiles
 
   my ( @box, %exportrefl, %obslayers, @bowl );
 
-  open ( MATDBFILE, "$matdbfile" ) or die;
+  open( MATDBFILE, "$matdbfile" ) or die "Could not open file '\$matdbfile': $matdbfile, $!";
   my @matlines = <MATDBFILE>;
   close MATDBFILE;
 
-  open( CONSTRDBFILE_F, "$constrdbfile_f" ) or die;
+  open( CONSTRDBFILE_F, "$constrdbfile_f" ) or die "Could not open file '\$constrdbfile_f': $constrdbfile_f, $!";
   my @constrlines = <CONSTRDBFILE_F>;
   close CONSTRDBFILE_F;
 
@@ -5761,7 +5907,7 @@ sub creatematdbfiles
     my @row = split( ",", $matline );
     if ( $row[0] eq "*item" )
     {
-      if ( $row[1] ~~ @newmaterials )
+      if ( grep { $_ eq $row[1] } @newmaterials )
       {
         $semaphore = "on";
       }
@@ -5776,9 +5922,9 @@ sub creatematdbfiles
     {
       if ( $semaphore eq "off" )
       {
-        if ( not( "diluted" ~~ @calcprocedures ) )
+        if ( not( grep { $_ eq "diluted" } @calcprocedures ) )
         {
-          if ( ( not( "radical" ~~ @calcprocedures ) ) or ( not( "noreflections" ~~ @calcprocedures ) ) )
+          if ( ( not( grep { $_ eq "radical" } @calcprocedures ) ) or ( not( grep { $_ eq "noreflections" } @calcprocedures ) ) )
           {
             my $lin = "$e[0],$e[1],$e[2],$e[3],$e[4],0.999,0.999,$e[7],$e[8],$e[9]";
             push( @firstloop, $lin );
@@ -5786,9 +5932,9 @@ sub creatematdbfiles
           my $linn = "$e[0],$e[1],$e[2],$e[3],$e[4],0.999,0.999,$e[7],$e[8],$e[9]";
           push( @secondloop, $linn );
         }
-        elsif ( "diluted" ~~ @calcprocedures )
+        elsif ( grep { $_ eq "diluted" } @calcprocedures )
         {
-          if ( ( not( "radical" ~~ @calcprocedures ) ) or ( not( "noreflections" ~~ @calcprocedures ) ) )
+          if ( ( not( grep { $_ eq "radical" } @calcprocedures ) ) or ( not( grep { $_ eq "noreflections" } @calcprocedures ) ) )
           {
             my $lin = "$e[0],$e[1],$e[2],$e[3],$e[4],$e[5],$e[6],$e[7],$e[8],$e[9]";
             push( @firstloop, $lin );
@@ -5801,9 +5947,9 @@ sub creatematdbfiles
       {
         $exportrefl{ $row[1] }{ absout } =  $e[5];
         $exportrefl{ $row[1] }{ absin } = $e[6];
-        if ( not( "diluted" ~~ @calcprocedures ) )
+        if ( not( grep { $_ eq "diluted" } @calcprocedures ) )
         {
-          if ( ( not( "radical" ~~ @calcprocedures ) ) or ( not( "noreflections" ~~ @calcprocedures ) ) )
+          if ( ( not( grep { $_ eq "radical" } @calcprocedures ) ) or ( not( grep { $_ eq "noreflections" } @calcprocedures ) ) )
           {
             my $lin = "$e[0],$e[1],$e[2],$e[3],$e[4],0.999,0.999,$e[7],$e[8],$e[9]";
             push( @firstloop, $lin );
@@ -5811,9 +5957,9 @@ sub creatematdbfiles
           my $linn = "$e[0],$e[1],$e[2],$e[3],$e[4],$e[5],$e[6],$e[7],$e[8],$e[9]";
           push( @secondloop, $linn );
         }
-        elsif ( "diluted" ~~ @calcprocedures )
+        elsif ( grep { $_ eq "diluted" } @calcprocedures )
         {
-          if ( ( not( "radical" ~~ @calcprocedures ) ) or ( not( "noreflections" ~~ @calcprocedures ) ) )
+          if ( ( not( grep { $_ eq "radical" } @calcprocedures ) ) or ( not( grep { $_ eq "noreflections" } @calcprocedures ) ) )
           {
             my $lin = "$e[0],$e[1],$e[2],$e[3],$e[4],0.999,0.999,$e[7],$e[8],$e[9]";
             push( @firstloop, $lin );
@@ -5830,10 +5976,10 @@ sub creatematdbfiles
     }
   }
 
-  #if ( ( not ( "radical" ~~ @calcprocedures ) ) and  ( not ( -e $matdbfile_f1 ) ) )
-  if ( not ( "radical" ~~ @calcprocedures ) )
+  #if ( ( not ( grep { $_ eq "radical" } @calcprocedures ) ) and  ( not ( -e $matdbfile_f1 ) ) )
+  if ( not ( grep { $_ eq "radical" } @calcprocedures ) )
   {
-    open( my $MATDBFILE_F1, ">$matdbfile_f1" ) or die;
+    open( my $MATDBFILE_F1, ">$matdbfile_f1" ) or die "Could not open file '\$matdbfile_f1': $matdbfile_f1, $!";
     foreach my $line ( @firstloop )
     {
       say $MATDBFILE_F1 $line ;
@@ -5843,7 +5989,7 @@ sub creatematdbfiles
 
   #if ( not ( -e $matdbfile_f2 ) )
   {
-    open( my $MATDBFILE_F2, ">$matdbfile_f2" ) or die;
+    open( my $MATDBFILE_F2, ">$matdbfile_f2" ) or die "Could not open file '\$matdbfile_f2': $matdbfile_f2, $!";
     foreach my $line ( @secondloop )
     {
       say $MATDBFILE_F2 $line ;
@@ -5863,7 +6009,7 @@ sub creatematdbfiles
       my @row = split( ",", $matline );
       if ( $row[0] eq "*item" )
       {
-        if ( $row[1] ~~ @obsconstr )
+        if ( grep { $_ eq $row[1] } @obsconstr )
         {
           $semaphore = "on";
         }
@@ -5878,14 +6024,14 @@ sub creatematdbfiles
       {
         if ( $semaphore eq "off" )
         {
-          if ( not( "diluted" ~~ @calcprocedures ) )
+          if ( not( grep { $_ eq "diluted" } @calcprocedures ) )
           {
             my $lin = "$e[0],$e[1],$e[2],$e[3],$e[4],0.999,0.999,$e[7],$e[8],$e[9]";
             push( @firstloop, $lin );
             my $linn = "$e[0],$e[1],$e[2],$e[3],$e[4],0.999,0.999,$e[7],$e[8],$e[9]";
             push( @secondloop, $linn );
           }
-          elsif ( "diluted" ~~ @calcprocedures )
+          elsif ( grep { $_ eq "diluted" } @calcprocedures )
           {
             my $lin = "$e[0],$e[1],$e[2],$e[3],$e[4],0.999,0.999,$e[7],$e[8],$e[9]";
             push( @firstloop, $lin );
@@ -5897,14 +6043,14 @@ sub creatematdbfiles
         {
           $exportrefl{ $row[1] }{ absout } =  $e[5];
           $exportrefl{ $row[1] }{ absin } = $e[6];
-          if ( not( "diluted" ~~ @calcprocedures ) )
+          if ( not( grep { $_ eq "diluted" } @calcprocedures ) )
           {
             my $lin = "$e[0],$e[1],$e[2],$e[3],$e[4],0.999,0.999,$e[7],$e[8],$e[9]";
             push( @firstloop, $lin );
             my $linn = "$e[0],$e[1],$e[2],$e[3],$e[4],0.999,0.999,$e[7],$e[8],$e[9]";
             push( @secondloop, $linn );
           }
-          elsif ( "diluted" ~~ @calcprocedures )
+          elsif ( grep { $_ eq "diluted" } @calcprocedures )
           {
             my $lin = "$e[0],$e[1],$e[2],$e[3],$e[4],0.999,0.999,$e[7],$e[8],$e[9]";
             push( @firstloop, $lin );
@@ -5920,7 +6066,7 @@ sub creatematdbfiles
       }
     }
 
-    open( my $MATDBFILE_F6, ">$matdbfile_f6" ) or die;
+    open( my $MATDBFILE_F6, ">$matdbfile_f6" ) or die "Could not open file '\$matdbfile_f6': $matdbfile_f6, $!";
     foreach my $line ( @firstloop )
     {
       say $MATDBFILE_F6 $line ;
@@ -5949,7 +6095,7 @@ sub adjust_radmatfile
   my @selectives = @{ $selectives_ref };
 
   my $specroughn;
-  if ( "dirdiff" ~~ @calcprocedures )
+  if ( grep { $_ eq "dirdiff" } @calcprocedures )
   {
     foreach my $proc ( @calcprocedures )
     {
@@ -6104,11 +6250,11 @@ sub adjust_radmatfile
     `cp -f $radmat_f2 $radmattemp`;
     say REPORT "cp -f $radmat_f2 $radmattemp";
 
-    open( RADMATTEMP, "$radmattemp" ) or die;
+    open( RADMATTEMP, "$radmattemp" ) or die "Could not open file '\$radmattemp': $radmattemp, $!";
     my @lines = <RADMATTEMP>;
     close RADMATTEMP;
 
-    open( RADMAT_F2, ">$radmat_f2" ) or die;
+    open( RADMAT_F2, ">$radmat_f2" ) or die "Could not open file '\$radmat_f2': $radmat_f2, $!";
     my $count = 0;
     my @constrs = keys %exportconstr;
     foreach ( @lines )
@@ -6161,10 +6307,10 @@ sub adjust_radmatfile
     `mv -f $radmat_f3 $radmattemp3`;
     say REPORT "mv -f $radmat_f3 $radmattemp3";
 
-    open( RADMATTEMP3, "$radmattemp3" ) or die;
+    open( RADMATTEMP3, "$radmattemp3" ) or die "Could not open file '\$radmattemp3': $radmattemp3, $!";
     my @lines = <RADMATTEMP3>;
     close RADMATTEMP3;
-    open( RADMAT_F3, ">$radmat_f3" ) or die;
+    open( RADMAT_F3, ">$radmat_f3" ) or die "Could not open file '\$radmat_f3': $radmat_f3, $!";
     my $count = 0;
     my @constrs = keys %exportconstr;
     foreach ( @lines )
@@ -6201,20 +6347,20 @@ sub adjust_radmatfile
   if ( $action == 6 )
   {
     my @lines;
-    if ( ( "composite" ~~ @calcprocedures ) or( "radical" ~~ @calcprocedures ) )
+    if ( ( grep { $_ eq "composite" } @calcprocedures ) or( grep { $_ eq "radical" } @calcprocedures ) )
     {
-      open( RADMATTEMP, "$radmat_f2" ) or die;
+      open( RADMATTEMP, "$radmat_f2" ) or die "Could not open file '\$radmat_f2': $radmat_f2, $!";
       @lines = <RADMATTEMP>;
       close RADMATTEMP;
     }
-    elsif ( "noreflections" ~~ @calcprocedures )
+    elsif ( grep { $_ eq "noreflections" } @calcprocedures )
     {
-      open( RADMATTEMP, "$radmat_f6" ) or die;
+      open( RADMATTEMP, "$radmat_f6" ) or die "Could not open file '\$radmat_f6': $radmat_f6, $!";
       @lines = <RADMATTEMP>;
       close RADMATTEMP;
     }
 
-    open( RADMAT_F6, ">$radmat_f6" ) or die;
+    open( RADMAT_F6, ">$radmat_f6" ) or die "Could not open file '\$radmat_f6': $radmat_f6, $!";
     my $count = 0;
     foreach ( @lines )
     {
@@ -6237,11 +6383,11 @@ sub adjust_radmatfile
     say REPORT "mv -f $extrad $oldextrad";
 
 
-    open ( OLDEXTRAD, "$oldextrad" ) or die;
+    open( OLDEXTRAD, "$oldextrad" ) or die "Could not open file '\$oldextrad': $oldextrad, $!";
     my @extlines = <OLDEXTRAD>;
     close OLDEXTRAD;
 
-    open( EXTRAD, ">$extrad" ) or die;
+    open( EXTRAD, ">$extrad" ) or die "Could not open file '\$extrad': $extrad, $!";
     my $count = 0;
     foreach my $extline ( @extlines )
     {
@@ -6430,7 +6576,7 @@ sub solveselective
   $shortmatdbfile_f3 =~ s/$path\/dbs\/// ;
   $shortmatdbfile_f4 =~ s/$path\/dbs\/// ;
 
-  open( my $MATDBFILE_F2, "$matdbfile_f2" ) or die;
+  open( my $MATDBFILE_F2, "$matdbfile_f2" ) or die "Could not open file '\$matdbfile_f2': $matdbfile_f2, $!";
   my @matlines = <$MATDBFILE_F2>;
   close $MATDBFILES_F2;
 
@@ -6445,7 +6591,7 @@ sub solveselective
     my @e = split( ",", $matline );
     if ( $e[0] eq "*item" )
     {
-      if ( $e[1] ~~ @mats )
+      if ( grep { $_ eq $e[1] } @mats )
       {
         $semaphore = "on";
       }
@@ -6484,14 +6630,14 @@ sub solveselective
       push( @fourthloop, $matline );
     }
 
-    open( my $MATDBFILE_F3, ">$matdbfile_f3" ) or die;
+    open( my $MATDBFILE_F3, ">$matdbfile_f3" ) or die "Could not open file '\$matdbfile_f3': $matdbfile_f3, $!";
     foreach my $line ( @thirdloop )
     {
       say $MATDBFILE_F3 $line ;
     }
     close $MATDBFILE_F3;
 
-    open( my $MATDBFILE_F4, ">$matdbfile_f4" ) or die;
+    open( my $MATDBFILE_F4, ">$matdbfile_f4" ) or die "Could not open file '\$matdbfile_f4': $matdbfile_f4, $!";
     foreach my $line ( @fourthloop )
     {
       say $MATDBFILE_F4 $line ;
@@ -6505,11 +6651,11 @@ sub solveselective
   `cp -R -f $conffile_f2 $conffile_f3\n`;
   say REPORT "cp -R -f $conffile_f2 $conffile_f3\n";
 
-  open( my $CONFFILE_F2, "$conffile_f2" ) or die;
+  open( my $CONFFILE_F2, "$conffile_f2" ) or die "Could not open file '\$conffile_f2': $conffile_f2, $!";
   my @lines2 =<$CONFFILE_F2>;
   close $CONFFILE_F2;
 
-  open( my $CONFFILE_F2, ">$conffile_f2" ) or die;
+  open( my $CONFFILE_F2, ">$conffile_f2" ) or die "Could not open file '\$conffile_f2': $conffile_f2, $!";
   foreach my $line2 ( @lines2 )
   {
     $line2 =~ s/$shortmatdbfile_f2/$shortmatdbfile_f3/ ;
@@ -6517,11 +6663,11 @@ sub solveselective
   }
   close $CONFFILE_F2;
 
-  open( my $CONFFILE_F3, "$conffile_f3" ) or die;
+  open( my $CONFFILE_F3, "$conffile_f3" ) or die "Could not open file '\$conffile_f3': $conffile_f3, $!";
   my @lines3 =<$CONFFILE_F3>;
   close $CONFFILE_F3;
 
-  open( my $CONFFILE_F3, ">$conffile_f3" ) or die;
+  open( my $CONFFILE_F3, ">$conffile_f3" ) or die "Could not open file '\$conffile_f3': $conffile_f3, $!";
   foreach my $line3 ( @lines3 )
   {
     $line3 =~ s/$shortmatdbfile_f2/$shortmatdbfile_f4/ ;
@@ -6548,7 +6694,7 @@ sub getsolar
   my $daynumber;
 
   say MONITOR "CLMA; $clma";
-  open ( WFILE, "$clma" ) or die; #open ( WFILE, "$clma" ) or die;
+  open( WFILE, "$clma" ) or die "Could not open file '\$clma': $clma, $!"; #open( WFILE, "$clma" ) or die "Could not open file '$clma': $!";
   my @wlines = <WFILE>;
   close WFILE;
 
@@ -6643,7 +6789,7 @@ sub getsolar
 
 
 
-  open( NEWCLM, ">$clmavgs" ) or die;
+  open( NEWCLM, ">$clmavgs" ) or die "Could not open file '\$clmavgs': $clmavgs, $!";
   foreach my $m ( sort { $a <=> $b} ( keys %{ $t{avg}{dir} } ) )
   {
     foreach my $h ( sort { $a <=> $b} ( keys %{ $t{avg}{dir}{$m} } ) )
@@ -6813,7 +6959,7 @@ sub getdirdiff
   my ( %year, $begun, %dirdiffs, $day, $monthnum );
   my $begun = "no";
 
-  open ( CLM, "$clma" ) or die;
+  open( CLM, "$clma" ) or die "Could not open file '\$clma': $clma, $!";
   my @lines = <CLM>;
   close CLM;
   #say MONITOR "\$clma $clma";
@@ -6834,7 +6980,7 @@ sub getdirdiff
     }
     else
     {
-      if ( "getweather" ~~ @calcprocedures )
+      if ( grep { $_ eq "getweather" } @calcprocedures )
       {
         if ( $begun eq "yes" )
         {
@@ -6869,11 +7015,11 @@ sub refilter
   `cp -f $infile $oldinfile`;
   say REPORT "cp -f $infile $oldinfile";
 
-  open( INFILE, "$infile" ) or die;
+  open( INFILE, "$infile" ) or die "Could not open file '\$infile': $infile, $!";
   my @lins = <INFILE>;
   close INFILE;
 
-  open( INFILE, ">$infile" ) or die;
+  open( INFILE, ">$infile" ) or die "Could not open file '\$infile': $infile, $!";
   my @nums = ( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 );
   my @names = qw( Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec );
   my ( @sems, @bag );
@@ -6908,11 +7054,12 @@ sub refilter
 
 sub modish
 { # MAIN PROGRAM
-  open( MONITOR, ">>./monitor.txt" ) or die;
+  open( MONITOR, ">>./monitor.txt" ) or die "Could not open file './monitor.txt': $!";
 
+  say MONITOR
   say MONITOR "ARGV: " . dump( @ARGV );
 
-  if ( "-setdefaults" ~~ @ARGV )
+  if ( grep { $_ eq "-setdefaults" } @ARGV )
   {
     shift @ARGV;
 
@@ -6940,28 +7087,25 @@ sub modish
     {
       if ( $_ eq "\1" ){ $_ = "1"; }; # % compute reflections from obs.
       if ( $_ eq "\2" ){ $_ = "2"; }; # % do not compute refl.from obs.
-      if ( $_ eq "\3" ){ $_ = "3"; }; # #
-      if ( $_ eq "\4" ){ $_ = "4"; }; # # shd.f. corr. + diffuse piping
-      if ( $_ eq "\5" ){ $_ = "5"; }; # # shd.f.c.+dif.pip.+ground refl
-      if ( $_ eq "\6" ){ $_ = "6"; }; # # complete recalculation
-      if ( $_ eq "\a" ){ $_ = "7"; }; # # compl.recalc.+ diffuse piping
-      if ( $_ eq "\b" ){ $_ = "8"; }; # pour direct reflections into the diffuse calculation channel
-      if ( $_ eq "\13" ){ $_ = "11"; }; # * with Perez sky from weather
-      if ( $_ eq "\f" ){ $_ = "12"; }; # * CIE sky not from weather
-      if ( $_ eq "\r" ){ $_ = "13"; }; # * with Perez sky no weather
-      if ( $_ eq "\16" ){ $_ = "14"; }; # $ 1 diffuse bounce
-      if ( $_ eq "\17" ){ $_ = "15"; }; # $ 2 diffuse bounces
-      if ( $_ eq "\20" ){ $_ = "16"; }; # $ 3 diffuse bounces
-      if ( $_ eq "\21" ){ $_ = "17"; }; # 1 direction vector
-      if ( $_ eq "\22" ){ $_ = "18"; }; # 5 direction vectors
-      if ( $_ eq "\23" ){ $_ = "19"; }; # 17 direction vectors
-      if ( $_ eq "\24" ){ $_ = "20"; }; # | resolution: 2x2 diffuse & dir
-      if ( $_ eq "\25" ){ $_ = "21"; }; # | resolution:2x2 diff 20x20 dir
-      if ( $_ eq "\26" ){ $_ = "22"; }; # | resolution:1x1 diff 10x10 dir
-      if ( $_ eq "\27" ){ $_ = "23"; }; # |
-      if ( $_ eq "\28" ){ $_ = "24"; }; # | compute all zones &all surfs
-      if ( $_ eq "\29" ){ $_ = "25"; }; # | include all zones &all surfs
-      if ( $_ eq "\30" ){ $_ = "26"; }; # | if non-embedded: compute now.
+      if ( $_ eq "\3" ){ $_ = "3"; }; # shd.f. corr. + diffuse piping
+      if ( $_ eq "\4" ){ $_ = "4"; }; # shd.f.c.+dif.pip.+ground refl
+      if ( $_ eq "\5" ){ $_ = "5"; }; # complete recalculation
+      if ( $_ eq "\6" ){ $_ = "6"; }; # compl.recalc.+ diffuse piping
+      if ( $_ eq "\a" ){ $_ = "7"; }; # pour direct reflections into the diffuse calculation channel
+      if ( $_ eq "\b" ){ $_ = "8"; }; # * with Perez sky from weather
+      if ( $_ eq "\13" ){ $_ = "9"; }; # * CIE sky not from weather
+      if ( $_ eq "\f" ){ $_ = "10"; }; # * with Perez sky no weather
+      if ( $_ eq "\r" ){ $_ = "11"; }; # $ 1 diffuse bounce
+      if ( $_ eq "\16" ){ $_ = "12"; }; # $ 2 diffuse bounces
+      if ( $_ eq "\17" ){ $_ = "13"; }; # $ 3 diffuse bounces
+      if ( $_ eq "\20" ){ $_ = "14"; }; # 5 direction vectors
+      if ( $_ eq "\21" ){ $_ = "15"; }; # 17 direction vectors
+      if ( $_ eq "\22" ){ $_ = "16"; }; # | resolution: diffuse & dir 2x2
+      if ( $_ eq "\23" ){ $_ = "17"; }; # | resolution:diff 2x2 dir 20x20
+      if ( $_ eq "\24" ){ $_ = "18"; }; # | resolution:1x1 diff 10x10 dir
+      if ( $_ eq "\25" ){ $_ = "19"; }; # - specify zons&surfs(optional)
+      if ( $_ eq "\26" ){ $_ = "20"; }; # - include all zones &all surfs
+      if ( $_ eq "\27" ){ $_ = "21"; }; # - if non-embedded: compute now
       push( @news, $_ );
     }
 
@@ -6990,11 +7134,11 @@ sub modish
     }
     #elsif ( $news[0] eq "3" )
     #{ # shading factor correction
-    #  open(FIL, "./modish_defaults.pl" ) or die;
+    #  open(FIL, "./modish_defaults.pl" ) or die "Could not open file './modish_defaults.pl': $!";
     #  my @lins = <FIL>;
     #  close FIL;
     #
-    #  open(FIL, ">./modish_defaults.pl" ) or die;
+    #  open(FIL, ">./modish_defaults.pl" ) or die "Could not open file './modish_defaults.pl': $!";
     #
     #  foreach my $lin ( @lins )
     #  {
@@ -7006,13 +7150,13 @@ sub modish
     #  }
     #  close FIL;
     #}
-    elsif ( $news[0] eq "4" )
+    elsif ( $news[0] eq "3" )
     {
-      open(FIL, "./modish_defaults.pl" ) or die;
+      open(FIL, "./modish_defaults.pl" ) or die "Could not open file './modish_defaults.pl': $!";
       my @lins = <FIL>;
       close FIL;
 
-      open(FIL, ">./modish_defaults.pl" ) or die;
+      open(FIL, ">./modish_defaults.pl" ) or die "Could not open file './modish_defaults.pl': $!";
 
       foreach my $lin ( @lins )
       {
@@ -7024,13 +7168,13 @@ sub modish
       }
       close FIL;
     }
-    elsif ( $news[0] eq "5" )
+    elsif ( $news[0] eq "4" )
     {
-      open(FIL, "./modish_defaults.pl" ) or die;
+      open(FIL, "./modish_defaults.pl" ) or die "Could not open file './modish_defaults.pl': $!";
       my @lins = <FIL>;
       close FIL;
 
-      open(FIL, ">./modish_defaults.pl" ) or die;
+      open(FIL, ">./modish_defaults.pl" ) or die "Could not open file './modish_defaults.pl': $!";
 
       foreach my $lin ( @lins )
       {
@@ -7042,13 +7186,13 @@ sub modish
       }
       close FIL;
     }
-    elsif ( $news[0] eq "6" )
+    elsif ( $news[0] eq "5" )
     {
-      open(FIL, "./modish_defaults.pl" ) or die;
+      open(FIL, "./modish_defaults.pl" ) or die "Could not open file './modish_defaults.pl': $!";
       my @lins = <FIL>;
       close FIL;
 
-      open(FIL, ">./modish_defaults.pl" ) or die;
+      open(FIL, ">./modish_defaults.pl" ) or die "Could not open file './modish_defaults.pl': $!";
 
       foreach my $lin ( @lins )
       {
@@ -7060,13 +7204,13 @@ sub modish
       }
       close FIL;
     }
-    elsif ( $news[0] eq "7" )
+    elsif ( $news[0] eq "6" )
     {
-      open(FIL, "./modish_defaults.pl" ) or die;
+      open(FIL, "./modish_defaults.pl" ) or die "Could not open file './modish_defaults.pl': $!";
       my @lins = <FIL>;
       close FIL;
 
-      open(FIL, ">./modish_defaults.pl" ) or die;
+      open(FIL, ">./modish_defaults.pl" ) or die "Could not open file './modish_defaults.pl': $!";
 
       foreach my $lin ( @lins )
       {
@@ -7078,13 +7222,13 @@ sub modish
       }
       close FIL;
     }
-    elsif ( $news[0] eq "8" )
+    elsif ( $news[0] eq "7" )
     {
-      open(FIL, "./modish_defaults.pl" ) or die;
+      open(FIL, "./modish_defaults.pl" ) or die "Could not open file './modish_defaults.pl': $!";
       my @lins = <FIL>;
       close FIL;
 
-      open(FIL, ">./modish_defaults.pl" ) or die;
+      open(FIL, ">./modish_defaults.pl" ) or die "Could not open file './modish_defaults.pl': $!";
 
       foreach my $lin ( @lins )
       {
@@ -7096,13 +7240,13 @@ sub modish
       }
       close FIL;
     }
-    elsif ( $news[0] eq "11" )
+    elsif ( $news[0] eq "8" )
     {
-      open(FIL, "./modish_defaults.pl" ) or die;
+      open(FIL, "./modish_defaults.pl" ) or die "Could not open file './modish_defaults.pl': $!";
       my @lins = <FIL>;
       close FIL;
 
-      open(FIL, ">./modish_defaults.pl" ) or die;
+      open(FIL, ">./modish_defaults.pl" ) or die "Could not open file './modish_defaults.pl': $!";
 
       foreach my $lin ( @lins )
       {
@@ -7118,13 +7262,13 @@ sub modish
       }
       close FIL;
     }
-    elsif ( $news[0] eq "12" )
+    elsif ( $news[0] eq "9" )
     {
-      open(FIL, "./modish_defaults.pl" ) or die;
+      open(FIL, "./modish_defaults.pl" ) or die "Could not open file './modish_defaults.pl': $!";
       my @lins = <FIL>;
       close FIL;
 
-      open(FIL, ">./modish_defaults.pl" ) or die;
+      open(FIL, ">./modish_defaults.pl" ) or die "Could not open file './modish_defaults.pl': $!";
 
       foreach my $lin ( @lins )
       {
@@ -7139,13 +7283,13 @@ sub modish
       }
       close FIL;
     }
-    elsif ( $news[0] eq "13" )
+    elsif ( $news[0] eq "10" )
     {
-      open(FIL, "./modish_defaults.pl" ) or die;
+      open(FIL, "./modish_defaults.pl" ) or die "Could not open file './modish_defaults.pl': $!";
       my @lins = <FIL>;
       close FIL;
 
-      open(FIL, ">./modish_defaults.pl" ) or die;
+      open(FIL, ">./modish_defaults.pl" ) or die "Could not open file './modish_defaults.pl': $!";
 
       foreach my $lin ( @lins )
       {
@@ -7158,13 +7302,13 @@ sub modish
       }
       close FIL;
     }
-    elsif ( $news[0] eq "14" )
+    elsif ( $news[0] eq "11" )
     {
-      open(FIL, "./modish_defaults.pl" ) or die;
+      open(FIL, "./modish_defaults.pl" ) or die "Could not open file './modish_defaults.pl': $!";
       my @lins = <FIL>;
       close FIL;
 
-      open(FIL, ">./modish_defaults.pl" ) or die;
+      open(FIL, ">./modish_defaults.pl" ) or die "Could not open file './modish_defaults.pl': $!";
 
       foreach my $lin ( @lins )
       {
@@ -7199,13 +7343,13 @@ sub modish
       }
       close FIL;
     }
-    elsif ( $news[0] eq "15" )
+    elsif ( $news[0] eq "12" )
     {
-      open(FIL, "./modish_defaults.pl" ) or die;
+      open(FIL, "./modish_defaults.pl" ) or die "Could not open file './modish_defaults.pl': $!";
       my @lins = <FIL>;
       close FIL;
 
-      open(FIL, ">./modish_defaults.pl" ) or die;
+      open(FIL, ">./modish_defaults.pl" ) or die "Could not open file './modish_defaults.pl': $!";
 
       foreach my $lin ( @lins )
       {
@@ -7239,13 +7383,13 @@ sub modish
       }
       close FIL;
     }
-    elsif ( $news[0] eq "16" )
+    elsif ( $news[0] eq "13" )
     {
-      open(FIL, "./modish_defaults.pl" ) or die;
+      open(FIL, "./modish_defaults.pl" ) or die "Could not open file './modish_defaults.pl': $!";
       my @lins = <FIL>;
       close FIL;
 
-      open(FIL, ">./modish_defaults.pl" ) or die;
+      open(FIL, ">./modish_defaults.pl" ) or die "Could not open file './modish_defaults.pl': $!";
 
       foreach my $lin ( @lins )
       {
@@ -7279,53 +7423,53 @@ sub modish
       }
       close FIL;
     }
-    elsif ( $news[0] eq "17" )
+#    elsif ( $news[0] eq "14" )
+#    {
+#      open(FIL, "./modish_defaults.pl" ) or die "Could not open file './modish_defaults.pl': $!";
+#      my @lins = <FIL>;
+#      close FIL;
+#
+#      open(FIL, ">./modish_defaults.pl" ) or die "Could not open file './modish_defaults.pl': $!";
+#
+#      foreach my $lin ( @lins )
+#      {
+#        if ( $lin =~ /^\@defaults/ )
+#        {
+#          chomp $lin;
+#          $lin =~ s/^\@defaults// ;
+#          $lin =~ s/=//g ;
+#          $lin =~ s/\(//g ;
+#          $lin =~ s/\)//g ;
+#          $lin =~ s/\[//g ;
+#          $lin =~ s/\]//g ;
+#          $lin =~ s/\;//g ;
+#          $lin =~ s/\s+//g ;
+#          $lin =~ s/\n//g ;
+#          my @elts = split( /,/, $lin );
+#          if ( scalar( @elts ) == 6 )
+#          {
+#            $elts[2] = 1;
+#            chomp $elts[5];
+#            $lin = "\@defaults = ( [ " . $elts[0] . ", " . $elts[1] . " ], " . $elts[2] . ", " . $elts[3] . ", " . $elts[4] . ", " . $elts[5] . " );\n";
+#          }
+#          elsif ( scalar( @elts ) == 8 )
+#          {
+#            $elts[4] = 1;
+#            chomp $elts[7];
+#            $lin = "\@defaults = ( [[ " . $elts[0] . ", " . $elts[1] . " ], [ " . $elts[2] . ", " . $elts[3] . " ]], " . $elts[4] . ", " . $elts[5] . ", " . $elts[6] . ", " . $elts[7] . " );\n";
+#          }
+#        }
+#        print FIL $lin;
+#      }
+#      close FIL;
+#    }
+    elsif ( $news[0] eq "14" )
     {
-      open(FIL, "./modish_defaults.pl" ) or die;
+      open(FIL, "./modish_defaults.pl" ) or die "Could not open file './modish_defaults.pl': $!";
       my @lins = <FIL>;
       close FIL;
 
-      open(FIL, ">./modish_defaults.pl" ) or die;
-
-      foreach my $lin ( @lins )
-      {
-        if ( $lin =~ /^\@defaults/ )
-        {
-          chomp $lin;
-          $lin =~ s/^\@defaults// ;
-          $lin =~ s/=//g ;
-          $lin =~ s/\(//g ;
-          $lin =~ s/\)//g ;
-          $lin =~ s/\[//g ;
-          $lin =~ s/\]//g ;
-          $lin =~ s/\;//g ;
-          $lin =~ s/\s+//g ;
-          $lin =~ s/\n//g ;
-          my @elts = split( /,/, $lin );
-          if ( scalar( @elts ) == 6 )
-          {
-            $elts[2] = 1;
-            chomp $elts[5];
-            $lin = "\@defaults = ( [ " . $elts[0] . ", " . $elts[1] . " ], " . $elts[2] . ", " . $elts[3] . ", " . $elts[4] . ", " . $elts[5] . " );\n";
-          }
-          elsif ( scalar( @elts ) == 8 )
-          {
-            $elts[4] = 1;
-            chomp $elts[7];
-            $lin = "\@defaults = ( [[ " . $elts[0] . ", " . $elts[1] . " ], [ " . $elts[2] . ", " . $elts[3] . " ]], " . $elts[4] . ", " . $elts[5] . ", " . $elts[6] . ", " . $elts[7] . " );\n";
-          }
-        }
-        print FIL $lin;
-      }
-      close FIL;
-    }
-    elsif ( $news[0] eq "18" )
-    {
-      open(FIL, "./modish_defaults.pl" ) or die;
-      my @lins = <FIL>;
-      close FIL;
-
-      open(FIL, ">./modish_defaults.pl" ) or die;
+      open(FIL, ">./modish_defaults.pl" ) or die "Could not open file './modish_defaults.pl': $!";
 
       foreach my $lin ( @lins )
       {
@@ -7359,13 +7503,13 @@ sub modish
       }
       close FIL;
     }
-    elsif ( $news[0] eq "19" )
+    elsif ( $news[0] eq "15" )
     {
-      open(FIL, "./modish_defaults.pl" ) or die;
+      open(FIL, "./modish_defaults.pl" ) or die "Could not open file './modish_defaults.pl': $!";
       my @lins = <FIL>;
       close FIL;
 
-      open(FIL, ">./modish_defaults.pl" ) or die;
+      open(FIL, ">./modish_defaults.pl" ) or die "Could not open file './modish_defaults.pl': $!";
 
       foreach my $lin ( @lins )
       {
@@ -7399,13 +7543,13 @@ sub modish
       }
       close FIL;
     }
-    elsif ( $news[0] eq "20" )
+    elsif ( $news[0] eq "16" )
     {
-      open(FIL, "./modish_defaults.pl" ) or die;
+      open(FIL, "./modish_defaults.pl" ) or die "Could not open file './modish_defaults.pl': $!";
       my @lins = <FIL>;
       close FIL;
 
-      open(FIL, ">./modish_defaults.pl" ) or die;
+      open(FIL, ">./modish_defaults.pl" ) or die "Could not open file './modish_defaults.pl': $!";
 
       foreach my $lin ( @lins )
       {
@@ -7441,13 +7585,13 @@ sub modish
       }
       close FIL;
     }
-    elsif ( $news[0] eq "21" )
+    elsif ( $news[0] eq "17" )
     {
-      open(FIL, "./modish_defaults.pl" ) or die;
+      open(FIL, "./modish_defaults.pl" ) or die "Could not open file './modish_defaults.pl': $!";
       my @lins = <FIL>;
       close FIL;
 
-      open(FIL, ">./modish_defaults.pl" ) or die;
+      open(FIL, ">./modish_defaults.pl" ) or die "Could not open file './modish_defaults.pl': $!";
 
       foreach my $lin ( @lins )
       {
@@ -7491,13 +7635,13 @@ sub modish
       }
       close FIL;
     }
-    elsif ( $news[0] eq "22" )
+    elsif ( $news[0] eq "18" )
     {
-      open(FIL, "./modish_defaults.pl" ) or die;
+      open(FIL, "./modish_defaults.pl" ) or die "Could not open file './modish_defaults.pl': $!";
       my @lins = <FIL>;
       close FIL;
 
-      open(FIL, ">./modish_defaults.pl" ) or die;
+      open(FIL, ">./modish_defaults.pl" ) or die "Could not open file './modish_defaults.pl': $!";
 
       foreach my $lin ( @lins )
       {
@@ -7541,7 +7685,7 @@ sub modish
       }
       close FIL;
     }
-    elsif ( $news[0] eq "24" )
+    elsif ( $news[0] eq "19" )
     { # specify zones & surfs - optional
       if (-e "./_modish_request.pl" )
       {
@@ -7551,33 +7695,36 @@ sub modish
       if ( ( not (-e "./modish_request.pl" ) ) and ( not (-e "./_modish_request.pl" ) ) )
       {
         open(FIL, ">./modish_request.pl" );
-        say FIL "\n\n# #Fill in the values in the first row of this \"modish_request.pl\"`file,
+        say FIL "
+# Fill in the values in the first row of this \"modish_request.pl\"`file,
 # then write here, in the second row, the name of the ESP-r config file,
 # then launch the shading reflection calculation from the ESP-r menu
 # about the shading calculations, in \"model context\".
 # The values to be filled into the first row above have to have this format:
 #
-# zone_number  opening_n_number  opening_y_number and ... and zone_number  opening_m_number  opening_z_number,
+# zone_number  opening_n_number  opening_y_number and ... and zone_number  opening_m_number  opening_z_number
 #
 # This series of numbers have to be written all in the first row,
-# and the row has always to be terminated by a comma.
+# and in the second line the name of the configuration file must be written.
 # For example:
-# 1 1 7 and 3 5,
-# would means: take into account the reflection from obstruction for zone 1, surfaces 1 and 7,
-# and zone 3, surface 5.
+# 1 1 7 and 3 5
+# caravan.cfg
+# would mean: take into account the reflection from obstruction for zone 1, surfaces 1 and 7,
+# and zone 3, surface 5, with regards to the model named _ caravan.cfg _.
 # If calculations of reflection from obstruction are not requested, leave the line blank.
 # If the file \"modish_request.pl\" is absent,
 # all the existing transparent surfaces in all the existing zones of model, however,
 # will be taken into account in the calculation of reflections from obstructions,
-# and this may be very slow."
+# and this may be very slow.
+"
       }
       `nedit ./modish_request.pl`;
     }
-    elsif ( $news[0] eq "25" )
+    elsif ( $news[0] eq "20" )
     { # do not specify zones & surfaces
       `mv -f ./modish_request.pl ./_modish_request.pl`;
     }
-    elsif ( $news[0] eq "26" )
+    elsif ( $news[0] eq "21" )
     { # launch monthly recalculation
       my ($add, $file);
       if ( scalar( @ARGV ) == 3 )
@@ -7619,25 +7766,14 @@ sub modish
     exit;
   }
 
-  if ( -e "./modish_defaults.pl" )
-  {
-    require "./modish_defaults.pl";
-  }
-  else
-  {
-    say "A \"modish_defaults.pl\" file must be present in the cfg model folder. Now it is not. Halting.";
-    exit;
-    #require "/opt/esp-r/bin/modish/modish_defaults.pl";
-  }
-
-  unless ( "report" ~~ @calcprocedures )
+  unless ( grep { $_ eq "report" } @calcprocedures )
   {
     close MONITOR;
   }
 
   my ( @things, @things2, $launchfile, $modishdefpath, %paths, $path, $myfile, $myday, $mymonth, $myzone, $zonenum, $launchtype, $cfgfile );
 
-  if ( ( @ARGV ) and ( ( not ( "-mode" ~~ @ARGV ) ) and ( not ( "-file" ~~ @ARGV ) ) and ( not ( "-zone" ~~ @ARGV ) ) ) )
+  if ( ( @ARGV ) and ( ( not ( grep { $_ eq "-mode" } @ARGV ) ) and ( not ( grep { $_ eq "-file" } @ARGV ) ) and ( not ( grep { $_ eq "-zone" } @ARGV ) ) ) )
   {
     $launchtype = "commandline";
     @things = @_;
@@ -7646,7 +7782,7 @@ sub modish
 
     $path = $launchfile;
 
-    if ( not ( "-finalizing" ~~ @ARGV ) )
+    if ( not ( grep { $_ eq "-finalizing" } @ARGV ) )
     {
       if ( -e "./modish_request.pl" )
       {
@@ -7662,7 +7798,9 @@ sub modish
         say MONITOR "HERE SPLITS: " . dump( @splits );
         foreach my $elt ( @splits )
         {
-          `perl /opt/esp-r/bin/modish/Modish.pm $launchfile $elt -finalizing`
+          `perl /opt/esp-r/bin/modish/Modish.pm $launchfile $elt -finalizing`;
+          say REPORT "CHECK!!!" . "perl /opt/esp-r/bin/modish/Modish.pm $launchfile $elt -finalizing";
+          say MONITOR "CHECK!!!" . "perl /opt/esp-r/bin/modish/Modish.pm $launchfile $elt -finalizing";
         }
         exit;
       }
@@ -7693,7 +7831,7 @@ sub modish
       }
       elsif ( scalar( @things ) == 0 )
       { say MONITOR "I AM 3";
-        open( THAT, $launchfile ) or die;
+        open( THAT, $launchfile ) or die "Could not open file '$launchfile': $!";
         my @lines = <THAT>;
         close THAT;
 
@@ -7724,13 +7862,13 @@ sub modish
       }
     }
 
-    if ( "-finalizing" ~~ @ARGV )
+    if ( grep { $_ eq "-finalizing" } @ARGV )
     {
       pop @ARGV;
       pop @things;
     }
 
-    if ( "embedded" ~~ @things )
+    if ( grep { $_ eq "embedded" } @things )
     {
       push( @calcprocedures, "embedded" );
       @things = grep(!/embedded/, @things);
@@ -7759,7 +7897,7 @@ sub modish
     }
     @things = @temps;
   }
-  elsif ( ( @ARGV ) and ( ( "-mode" ~~ @ARGV ) and ( "-file" ~~ @ARGV ) and ( "-zone" ~~ @ARGV) ) )
+  elsif ( ( @ARGV ) and ( ( grep { $_ eq "-mode" } @ARGV ) and ( grep { $_ eq "-file" } @ARGV ) and ( grep { $_ eq "-zone" } @ARGV) ) )
   {
     $launchtype = "ESP-r";
     @ARGV = grep( !/ish/, @ARGV );
@@ -7778,7 +7916,7 @@ sub modish
     push( @calcprocedures, "embedded" );
   }
 
-  if ( "getweather" ~~ @calcprocedures )
+  if ( grep { $_ eq "getweather" } @calcprocedures )
   {
     push( @calcprocedures, "getsimple" );
   }
@@ -7850,7 +7988,7 @@ sub modish
   }
   elsif ( $launchtype eq "ESP-r" )
   {
-    open( CONFIG, "$myfile" ) or die;
+    open( CONFIG, "$myfile" ) or die "Could not open file '\$myfile': $myfile, $!";
     my @lines = <CONFIG>;
 
     foreach my $line ( @lines )
@@ -7955,10 +8093,10 @@ sub modish
     $distgrid = $settings[4];
   }
 
-  if ( "report" ~~ @calcprocedures )
+  if ( grep { $_ eq "report" } @calcprocedures )
   {
     my $writefile = "$path/writefile.txt";
-    open ( REPORT, ">>$writefile" ) or die "Can't open $writefile !";
+    open( REPORT, ">>$writefile" ) or die "Can't open $writefile !";
   }
 
   if ( scalar( @resolutions ) == 0 ) { @resolutions = ( 2, 2 ); };
@@ -7979,7 +8117,7 @@ sub modish
 
   my $modishlock = "$path/tmp/Z" . $zonenum . ".lock.tmp";
 
-  if ( not ( "embedded" ~~ @calcprocedures ) )
+  if ( not ( grep { $_ eq "embedded" } @calcprocedures ) )
   {
     `rm -f $modishlock`;
     say REPORT "rm -f $modishlock";
@@ -8031,31 +8169,31 @@ sub modish
   my ( $alt, $az );
 
   my @groups;
-  if  ( ( "composite" ~~ @calcprocedures ) and not( "groundreflections" ~~ @calcprocedures ) and ( not( "alldiff" ~~ @calcprocedures ) ) )
+  if  ( ( grep { $_ eq "composite" } @calcprocedures ) and not( grep { $_ eq "groundreflections" } @calcprocedures ) and ( not( grep { $_ eq "alldiff" } @calcprocedures ) ) )
   {
     @groups = ( 1, 2, 6, 7, 8, 11 );
   }
-  elsif  ( ( "composite" ~~ @calcprocedures ) and ( not( "groundreflections" ~~ @calcprocedures ) ) )
+  elsif  ( ( grep { $_ eq "composite" } @calcprocedures ) and ( not( grep { $_ eq "groundreflections" } @calcprocedures ) ) )
   {
     @groups = ( 1, 2, 6, 7, 8, 11 );
   }
-  elsif ( ( "composite" ~~ @calcprocedures ) and ( "groundreflections" ~~ @calcprocedures ) and not( "alldiff" ~~ @calcprocedures ) )
+  elsif ( ( grep { $_ eq "composite" } @calcprocedures ) and ( grep { $_ eq "groundreflections" } @calcprocedures ) and not( grep { $_ eq "alldiff" } @calcprocedures ) )
   {
     @groups = ( 1, 2 );
   }
-  elsif ( ( "composite" ~~ @calcprocedures ) and ( "groundreflections" ~~ @calcprocedures ) )
+  elsif ( ( grep { $_ eq "composite" } @calcprocedures ) and ( grep { $_ eq "groundreflections" } @calcprocedures ) )
   {
     @groups = ( 1, 2, 6 );
   }
-  elsif ( ( "radical" ~~ @calcprocedures ) and not( "alldiff" ~~ @calcprocedures ) )
+  elsif ( ( grep { $_ eq "radical" } @calcprocedures ) and not( grep { $_ eq "alldiff" } @calcprocedures ) )
   {
     @groups = ( 2, 5 );
   }
-  elsif ( "radical" ~~ @calcprocedures )
+  elsif ( grep { $_ eq "radical" } @calcprocedures )
   {
     @groups = ( 2, 5, 6, 7 );
   }
-  elsif ( "noreflections" ~~ @calcprocedures )
+  elsif ( grep { $_ eq "noreflections" } @calcprocedures )
   {
     @groups = ( 6, 7, 8, 11 );
   }
@@ -8074,14 +8212,14 @@ sub modish
   unless ( -e $modishlock )
   {
     @basevectors = getbasevectors( $dirvectorsnum );
-    if ( "embedded" ~~ @calcprocedures )
+    if ( grep { $_ eq "embedded" } @calcprocedures )
     {
       store \@basevectors, "$path/tmp/basevectors.store.tmp";
     }
   }
   else
   {
-    if ( "embedded" ~~ @calcprocedures )
+    if ( grep { $_ eq "embedded" } @calcprocedures )
     {
       @basevectors = @{ retrieve( "$path/tmp/basevectors.store.tmp" ) };
     }
@@ -8167,7 +8305,7 @@ sub modish
   }
 
   say REPORT "\$tempmod $tempmod";
-  open ( TEMPMOD, ">>$tempmod" ) or die "$!";
+  open( TEMPMOD, ">>$tempmod" ) or die "$!";
 
   my $tempreport = "$launchfile.report.temp";
 
@@ -8182,13 +8320,13 @@ sub modish
 
   $tempreport = "$path/tmp/$tempreport";
 
-  open ( TEMPREPORT, ">>$tempreport" ) or die "$!";
+  open( TEMPREPORT, ">>$tempreport" ) or die "$!";
 
   $tempmoddir = $tempmod . ".dir";
-  open ( TEMPMODDIR, ">>$tempmoddir" ) or die "$!";
+  open( TEMPMODDIR, ">>$tempmoddir" ) or die "$!";
 
   $tempreportdir = $tempreport . ".dir";
-  open ( TEMPREPORTDIR, ">>$tempreportdir" ) or die "$!";
+  open( TEMPREPORTDIR, ">>$tempreportdir" ) or die "$!";
 
   my @treatedlines;
 
@@ -8234,7 +8372,7 @@ sub modish
       $obsmaterialsref, $surfs_ref, %storethis );
     my ( %surfs, @transpelts, @geodata, %surfslist, @obsdata, %datalist, @obsmaterials );
 
-    unless ( ( "embedded" ~~ @calcprocedures ) and ( -e $modishlock ) )
+    unless ( ( grep { $_ eq "embedded" } @calcprocedures ) and ( -e $modishlock ) )
     {
       ( $transpeltsref, $geofilestructref, $surfslistref, $obsref, $datalistref,
             $obsmaterialsref, $surfs_ref, $transpsurfs_ref ) = readgeofile( $geofile, \@transpsurfs, $zonenum, \@calcprocedures, $modishlock );
@@ -8245,7 +8383,7 @@ sub modish
       @transpsurfs = @{ $transpsurfs_ref };
     } #say MONITOR "NEWLY ARRIVED \@transpsurfs: @transpsurfs ";
 
-    if ( ( "embedded" ~~ @calcprocedures ) and ( not ( -e $modishlock ) ) )
+    if ( ( grep { $_ eq "embedded" } @calcprocedures ) and ( not ( -e $modishlock ) ) )
 	  {
       unless ( @{ $transpeltsref } == 0 )
       {
@@ -8284,7 +8422,7 @@ sub modish
 
       store \%storethis, "$path/tmp/storethis.store.tmp";
     }
-    elsif ( ( "embedded" ~~ @calcprocedures ) and ( -e $modishlock ) )
+    elsif ( ( grep { $_ eq "embedded" } @calcprocedures ) and ( -e $modishlock ) )
     {
       %storethis = %{ retrieve( "$path/tmp/storethis.store.tmp" ) };
       if ( $storethis{transpeltsref} )
@@ -8336,8 +8474,8 @@ sub modish
     %datalist = %$datalistref; say MONITOR "\%datalist " . dump( %datalist );
     @obsmaterials = @{ $obsmaterialsref };
 
-    #unless ( ( "embedded" ~~ @calcprocedures ) and ( ( -e $geofile_f ) or ( -e $geofile_f5 ) ) and ( -e $modishlock ) )
-	unless ( ( "embedded" ~~ @calcprocedures ) and ( -e $modishlock ) )
+    #unless ( ( grep { $_ eq "embedded" } @calcprocedures ) and ( ( -e $geofile_f ) or ( -e $geofile_f5 ) ) and ( -e $modishlock ) )
+	unless ( ( grep { $_ eq "embedded" } @calcprocedures ) and ( -e $modishlock ) )
     {
       %paths = createfictgeofile( $geofile, $geofile_f, $geofile_f5, \%paths, \@calcprocedures, \@groups, $conffile, $conffile_f5, $modishlock );
     }
@@ -8353,12 +8491,12 @@ sub modish
     @obscon = uniq( @obscon );
     @newobscon = uniq( @newobscon );
 
-    if ( not( "radical" ~~ @calcprocedures ) )
+    if ( not( grep { $_ eq "radical" } @calcprocedures ) )
     {
       setroot( $conffile_f1, $path, $debug, \%paths, \@calcprocedures, $shdfile );
     }
 
-    if ( not( "noreflections" ~~ @calcprocedures ) )
+    if ( not( grep { $_ eq "noreflections" } @calcprocedures ) )
     {
       setroot( $conffile_f2, $path, $debug, \%paths, \@calcprocedures, $shdfile );
     }
@@ -8369,50 +8507,50 @@ sub modish
       setroot( $conffile_f4, $path, $debug, \%paths, \@calcprocedures, $shdfile );
     }
 
-    if ( ( "radical" ~~ @calcprocedures ) and ( "alldiff" ~~ @calcprocedures ) )
+    if ( ( grep { $_ eq "radical" } @calcprocedures ) and ( grep { $_ eq "alldiff" } @calcprocedures ) )
     {
       setroot( $conffile_f5, $path, $debug, \%paths, \@calcprocedures, $shdfile );
     }
 
-    if ( ( "composite" ~~ @calcprocedures ) or ( "radical" ~~ @calcprocedures ) or ( "noreflections" ~~ @calcprocedures ) )
+    if ( ( grep { $_ eq "composite" } @calcprocedures ) or ( grep { $_ eq "radical" } @calcprocedures ) or ( grep { $_ eq "noreflections" } @calcprocedures ) )
     {
       setroot( $conffile_f6, $path, $debug, \%paths, \@calcprocedures, $shdfile );
     }
 
-    if ( ( ( "composite" ~~ @calcprocedures ) and not( "groundreflections" ~~ @calcprocedures ) )
-        or ( "radical" ~~ @calcprocedures )
-        or ( "noreflections" ~~ @calcprocedures ) )
+    if ( ( ( grep { $_ eq "composite" } @calcprocedures ) and not( grep { $_ eq "groundreflections" } @calcprocedures ) )
+        or ( grep { $_ eq "radical" } @calcprocedures )
+        or ( grep { $_ eq "noreflections" } @calcprocedures ) )
     {
       setroot( $conffile_f7, $path, $debug, \%paths, \@calcprocedures, $shdfile );
     }
 
-    if ( ( ( "composite" ~~ @calcprocedures ) and not( "groundreflections" ~~ @calcprocedures ) )
-        or ( "noreflections" ~~ @calcprocedures ) )
+    if ( ( ( grep { $_ eq "composite" } @calcprocedures ) and not( grep { $_ eq "groundreflections" } @calcprocedures ) )
+        or ( grep { $_ eq "noreflections" } @calcprocedures ) )
     {
       setroot( $conffile_f8, $path, $debug, \%paths, \@calcprocedures, $shdfile );
     }
 
-    if ( "something_used" ~~ @calcprocedures ) # CURRENTLY UNUSED
+    if ( grep { $_ eq "something_used" } @calcprocedures ) # CURRENTLY UNUSED
     {
       setroot( $conffile_f9, $path, $debug, \%paths, \@calcprocedures, $shdfile );
       setroot( $conffile_f10, $path, $debug, \%paths, \@calcprocedures, $shdfile );
     }
 
-    if ( ( ( "composite" ~~ @calcprocedures ) and not( "groundreflections" ~~ @calcprocedures ) )
-        or ( "noreflections" ~~ @calcprocedures ) )
+    if ( ( ( grep { $_ eq "composite" } @calcprocedures ) and not( grep { $_ eq "groundreflections" } @calcprocedures ) )
+        or ( grep { $_ eq "noreflections" } @calcprocedures ) )
     {
       setroot( $conffile_f11, $path, $debug, \%paths, \@calcprocedures, $shdfile );
     }
 
     my ( $materialsref, $newmaterialsref, $matnumsref, $newmatnumsref, $exportconstrref, %storethis2 );
 
-    #if ( not ( ( "embedded" ~~ @calcprocedures ) and ( -e $constrdbfile_f ) and ( -e $modishlock ) ) )
-	if ( not ( ( "embedded" ~~ @calcprocedures ) and ( -e $modishlock ) ) )
+    #if ( not ( ( grep { $_ eq "embedded" } @calcprocedures ) and ( -e $constrdbfile_f ) and ( -e $modishlock ) ) )
+	if ( not ( ( grep { $_ eq "embedded" } @calcprocedures ) and ( -e $modishlock ) ) )
     {
       ( $oldmaterialsref, $newmaterialsref, $exportconstrref, $conv_ref,
         $countm, $oldcountm, $newclass, $oldmatnums_ref, $newmatnums_ref ) =
         createconstrdbfile( $constrdbfile, $constrdbfile_f, \@obscon, $matdbfile, \@calcprocedures, \%paths, $modishlock );
-      if ( "embedded" ~~ @calcprocedures )
+      if ( grep { $_ eq "embedded" } @calcprocedures )
       {
 	    $storethis2{oldmaterialsref} = $oldmaterialsref;
         $storethis2{newmaterialsref} = $newmaterialsref;
@@ -8426,7 +8564,7 @@ sub modish
         store \%storethis2, "$path/tmp/storethis2.store.tmp";
       }
     }
-    elsif ( ( "embedded" ~~ @calcprocedures ) and ( -e $modishlock ) )
+    elsif ( ( grep { $_ eq "embedded" } @calcprocedures ) and ( -e $modishlock ) )
     {
        %storethis2 = %{ retrieve( "$path/tmp/storethis2.store.tmp" ) };
        $oldmaterialsref = $storethis2{oldmaterialsref};
@@ -8442,13 +8580,13 @@ sub modish
 
     my ( $exportreflref, $obslayers_ref, $selectives_ref, %storethis3 );
     my %obslayers;
-    if ( not ( ( "embedded" ~~ @calcprocedures ) and ( -e $modishlock ) ) )
+    if ( not ( ( grep { $_ eq "embedded" } @calcprocedures ) and ( -e $modishlock ) ) )
     {
       ( $exportreflref, $obslayers_ref ) = creatematdbfiles( $matdbfile,
          $matdbfile_f1, $matdbfile_f2, $matdbfile_f6, \@calcprocedures, $constrdbfile_f, \@obsdata, \@obscon,
          \@newobscon, $exportconstrref, $conv_ref, $countm, $oldcountm, $newclass, $oldmatnums_ref, $newmatnums_ref, $oldmaterialsref, $newmaterialsref );
 
-      if ( "embedded" ~~ @calcprocedures )
+      if ( grep { $_ eq "embedded" } @calcprocedures )
       {
         if ( $exportreflref )
         {
@@ -8467,7 +8605,7 @@ sub modish
         store \%storethis3, "$path/tmp/storethis3.store.tmp";
       }
     }
-    elsif ( ( "embedded" ~~ @calcprocedures ) and ( -e $modishlock ) )
+    elsif ( ( grep { $_ eq "embedded" } @calcprocedures ) and ( -e $modishlock ) )
     {
       %storethis3 = %{ retrieve( "$path/tmp/storethis3.store.tmp" ) };
       $exportreflref = $storethis3{exportreflref};
@@ -8480,7 +8618,7 @@ sub modish
 
     my @selectives;
 
-    if ( not ( ( "embedded" ~~ @calcprocedures) and ( -e $modishlock ) ) )
+    if ( not ( ( grep { $_ eq "embedded" } @calcprocedures) and ( -e $modishlock ) ) )
     {
       foreach my $item ( @calcprocedures )
       {
@@ -8493,7 +8631,7 @@ sub modish
         }
       }
       @selectives = uniq( @selectives );
-      if ( "embedded" ~~ @calcprocedures )
+      if ( grep { $_ eq "embedded" } @calcprocedures )
       {
         if ( scalar( @selectives ) > 0 )
         {
@@ -8501,9 +8639,9 @@ sub modish
         }
       }
     }
-    elsif ( ( "embedded" ~~ @calcprocedures) and ( -e $modishlock ) )
+    elsif ( ( grep { $_ eq "embedded" } @calcprocedures) and ( -e $modishlock ) )
     {
-      if ( "embedded" ~~ @calcprocedures )
+      if ( grep { $_ eq "embedded" } @calcprocedures )
       {
         if ( -e "selectives.store.tmp" )
         {
@@ -8512,12 +8650,12 @@ sub modish
       }
     }
 
-    if ( ( scalar( @selectives ) > 0 ) and ( not ( "embedded" ~~ @calcprocedures ) ) )
+    if ( ( scalar( @selectives ) > 0 ) and ( not ( grep { $_ eq "embedded" } @calcprocedures ) ) )
     {
       solveselective( $matdbfile_f2, \@selectives, $conffile, $conffile_f2, $path );
     }
     elsif
-    ( ( scalar( @selectives ) > 0 ) and ( ( "embedded" ~~ @calcprocedures ) and ( not ( -e $modishlock ) ) ) )
+    ( ( scalar( @selectives ) > 0 ) and ( ( grep { $_ eq "embedded" } @calcprocedures ) and ( not ( -e $modishlock ) ) ) )
     {
       solveselective( $matdbfile_f2, \@selectives, $conffile, $conffile_f2, $path );
     }
@@ -8550,7 +8688,7 @@ sub modish
 
     unless ( -e $modishlock )
     {
-      if ( "espdirres" ~~ @calcprocedures )
+      if ( grep { $_ eq "espdirres" } @calcprocedures )
       {
         @dirgridcoords = makecoordsgrid( \@extremes, \@dirresolutions, \@dirvectorsrefs );
         @dirgridpoints_transitional = makegrid( @dirgridcoords );
@@ -8575,7 +8713,7 @@ sub modish
 
 
     my ( $dirdiffs_ref, $paths_ref, %storethis4 );
-    if ( ( "embedded" ~~ @calcprocedures ) and ( not ( -e $modishlock ) ) )
+    if ( ( grep { $_ eq "embedded" } @calcprocedures ) and ( not ( -e $modishlock ) ) )
     {
       ( $dirdiffs_ref, $paths_ref ) = getdirdiff( \%paths, \@calcprocedures );#DDD
       $storethis4{dirdiffs_ref} = $dirdiffs_ref;
@@ -8584,7 +8722,7 @@ sub modish
 	  %paths = %{ $paths_ref };
 	  %dirdiffs = %{ $dirdiffs_ref };
     }
-    elsif ( ( "embedded" ~~ @calcprocedures ) and ( -e $modishlock ) )
+    elsif ( ( grep { $_ eq "embedded" } @calcprocedures ) and ( -e $modishlock ) )
     {
       %storethis4 = %{ retrieve( "$path/tmp/storethis4.store.tmp" ) };
       $dirdiffs_ref = $storethis4{dirdiffs_ref};
@@ -8594,7 +8732,7 @@ sub modish
     }
 
     my %storethis5;
-    if ( ( "embedded" ~~ @calcprocedures ) and ( not ( -e $modishlock ) ) )
+    if ( ( grep { $_ eq "embedded" } @calcprocedures ) and ( not ( -e $modishlock ) ) )
     {
       $storethis5{gridpoints_ref} = \@gridpoints;
       $storethis5{exportreflref} = $exportreflref;
@@ -8607,7 +8745,7 @@ sub modish
       `touch $modishlock`;
       say REPORT "touch $modishlock";
     }
-    elsif ( ( "embedded" ~~ @calcprocedures ) and ( -e $modishlock  ) )
+    elsif ( ( grep { $_ eq "embedded" } @calcprocedures ) and ( -e $modishlock  ) )
     {
       %storethis5 = %{ retrieve("$path/tmp/storethis5.store.tmp") };
       @gridpoints = @{ $storethis5{gridpoints_ref} };
@@ -8634,12 +8772,14 @@ sub modish
 
     foreach my $elm ( @transpsurfs )
     {
-      my @transpsurfs;
-      push ( @transpsurfs, $elm );
+      #my @transpsurfs; #ZZZ WHAT?
+      #push ( @transpsurfs, $elm ); #ZZZ WHAT?
+      #say REPORT "CHECK!!! ENTERED MODIFYSHDAS!!! = ";
+      #say MONITOR "CHECK!!! ENTERED MODIFYSHDAS!!! = ";
       modifyshda( \@comparedirrs, \%surfslist, \%zonefilelists, \%shdfileslist, \%daylighthours, $irrvarsref, $tempmod,
         $tempreport,  $tempmoddir, $tempreportdir, $elm, "diffuse", \@calcprocedures, $hashirrsref, $conffile_f2, $shdfile, \%surfs, $mymonth );
 
-      unless ( ( "noreflections" ~~ @calcprocedures ) or ( ( "composite" ~~ @calcprocedures ) and not ( "groundreflections" ~~ @calcprocedures ) ) )
+      unless ( ( grep { $_ eq "noreflections" } @calcprocedures ) or ( ( grep { $_ eq "composite" } @calcprocedures ) and not ( grep { $_ eq "groundreflections" } @calcprocedures ) ) )
       {
         modifyshda( \@comparedirrs, \%surfslist, \%zonefilelists, \%shdfileslist, \%daylighthours, $irrvarsref, $tempmod,
           $tempreport,  $tempmoddir, $tempreportdir, $elm, "direct", \@calcprocedures, $hashirrsref, $conffile_f2, $shdfile, \%surfs, $mymonth );
@@ -8651,7 +8791,7 @@ sub modish
 
   refilter( $tempmod );
 
-  open ( TEMPMOD, "$tempmod" ) or die;
+  open( TEMPMOD, "$tempmod" ) or die "Could not open file '\$tempmod': $tempmod, $!";
   my @tempmodlines = <TEMPMOD>;
 
   print MONITOR "TEMPMODLINES:\n" . dump( @tempmodlines ); #DDD
@@ -8662,9 +8802,9 @@ sub modish
   refilter( $tempreport );
 
   my @tempreportlines;
-  unless ( "embedded" ~~ @calcprocedures )
+  unless ( grep { $_ eq "embedded" } @calcprocedures )
   {
-    open ( TEMPREPORT, "$tempreport" ) or die;
+    open( TEMPREPORT, "$tempreport" ) or die "Could not open file '\$tempreport': $tempreport, $!";
     @tempreportlines = <TEMPREPORT>;
     close TEMPREPORT;
   }
@@ -8673,7 +8813,7 @@ sub modish
 
   refilter( $tempmoddir );
 
-  open ( TEMPMODDIR, "$tempmoddir" ) or die;
+  open( TEMPMODDIR, "$tempmoddir" ) or die "Could not open file '\$tempmoddir': $tempmoddir, $!";
   my @tempmoddirlines = <TEMPMODDIR>;
   close TEMPMODDIR;
   @tempmoddirlines = uniq( @tempmoddirlines );
@@ -8683,9 +8823,9 @@ sub modish
   refilter( $tempreportdir );
 
   my @tempreportdirlines;
-  unless ( "embedded" ~~ @calcprocedures )
+  unless ( grep { $_ eq "embedded" } @calcprocedures )
   {
-    open ( TEMPREPORTDIR, "$tempreportdir" ) or die;
+    open( TEMPREPORTDIR, "$tempreportdir" ) or die "Could not open file '\$tempreportdir': $tempreportdir, $!";
     @tempreportdirlines = <TEMPREPORTDIR>;
     close TEMPREPORTDIR;
     @tempreportdirlines = uniq( @tempreportdirlines );
@@ -8698,19 +8838,19 @@ sub modish
   my $shdafilemod = $shdafile;
   $shdafilemod =~ s/\.shda/\.mod.shda/;
 
-  open ( SHDAMOD, ">$shdafilemod" ) or die;
+  open( SHDAMOD, ">$shdafilemod" ) or die "Could not open file '\$shdafilemod': $shdafilemod, $!";
 
   my $shdafilereport = $shdafile;
   $shdafilereport =~ s/\.shda/\.report\.shda/;
 
-  #unless ( "embedded" ~~ @calcprocedures )
+  #unless ( grep { $_ eq "embedded" } @calcprocedures )
   {
     `cp -R -f $shdafile $shdafilereport`;
     `chmod 755 $shdafilereport`;
     say REPORT "cp -R -f $shdafile $shdafilereport";
     say REPORT "chmod 755 $shdafilereport";
 
-    open ( SHDAREPORT, ">>$shdafilereport" ) or die;
+    open ( SHDAREPORT, ">>$shdafilereport" ) or die "Could not open file '\$shdafilereport': $shdafilereport, $!";
     print SHDAREPORT "# FOLLOWING, THE VERIFIED VARIATIONS (AS RATIOS) OF IRRADIANCES DUE TO REFLECTIONS BY OBSTRUCTIONS.\n";
 
     my $counter = 0;;
@@ -8799,7 +8939,7 @@ sub modish
       $lin = "$joinedfirst\n" . "$joinedsecond\n";
     }
 
-    if ( "noins" ~~ @calcprocedures )
+    if ( grep { $_ eq "noins" } @calcprocedures )
     {
       if ( ( $lin =~ /24 hour external surface shading/ ) or
         ( $lin =~ /\* month:/ ) or ( $lin =~ /\* end/ ) or
@@ -8822,7 +8962,7 @@ sub modish
   }
   close SHDAMOD;
 
-  if ( "embedded" ~~ @calcprocedures )
+  if ( grep { $_ eq "embedded" } @calcprocedures )
   {
     my $shdafileold = $shdafile . ".old";
     `cp -f $shdafile $shdafileold`;
@@ -8858,7 +8998,7 @@ YYY
 
     say REPORT $wait;
   }
-  elsif ( not ( "embedded" ~~ @calcprocedures ) )
+  elsif ( not ( grep { $_ eq "embedded" } @calcprocedures ) )
   {
     my $shdafileold = $shdafile . ".old";
     `cp -f $shdafile $shdafileold`;
@@ -8871,7 +9011,7 @@ YYY
   exit;
 }
 
-open( MONITOR, ">>./monitor.txt" ) or die;
+#########open( MONITOR, ">>./monitor.txt" ) or die "Could not open file './monitor.txt': $!";
 
 #say MONITOR "LAUNCHING: " . dump( @ARGV );
 
@@ -8905,7 +9045,7 @@ modish( "/home/x/model/cfg/model.cfg", 1, 7, 9 );  (Which means: calculate for z
 =head1 DESCRIPTION
 
 modish is a program for altering the shading values calculated by the ESP-r building simulation platform to take into account reflections from obstructions.
-More precisely, modish brings into account the reflective effect of solar obstructions on solar gains on building models on the basis of irradiance ratios. Those ratios are obtained combining the direct radiation on a surface and the total radiation calculated by the means of a raytracer (Radiance) on the same surface. The radional for the procedure is presented in the following paper: L<Gian Luca Brunetti (2020). “Utilization of irradiance ratios for calculating the effect of reflections from obstructions in building energy simulation”. Building Simulation. DOI: 10.1007/s12273-020-0722-2|https://link.springer.com/article/10.1007/s12273-020-0722-2>.
+More precisely, modish brings into account the reflective effect of solar obstructions on solar gains on building models on the basis of irradiance ratios. Those ratios are obtained combining the direct radiation on a surface and the total radiation calculated by the means of a raytracer (Radiance) on the same surface.
 
 The effect of solar reflections is taken into account at each hour on the basis of the ratios between the irradiances measured at the models' surfaces in a model anologue of the original one, and a twin fictiotious model derived from that. The irradiances are calculated through Radiance and derive from a model in which the solar obstructions have their true reflectivity and a model in which the solar obstructions are black.
 
@@ -8989,6 +9129,6 @@ Gian Luca Brunetti, E<lt>gianluca.brunetti@polimi.itE<gt>. The subroutine "creat
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2024 by Gian Luca Brunetti and Politecnico di Milano. This is free software. You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
+Copyright (C) 2008-2022 by Gian Luca Brunetti and Politecnico di Milano. This is free software. You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
 =cut

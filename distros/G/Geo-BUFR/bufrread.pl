@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# (C) Copyright 2010-2023 MET Norway
+# (C) Copyright 2010-2025 MET Norway
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -32,9 +32,6 @@ use constant DEFAULT_TABLE_FORMAT => 'BUFRDC';
 # Will be used if neither --tablepath nor $ENV{BUFR_TABLES} is set
 use constant DEFAULT_TABLE_PATH_BUFRDC => '/usr/local/lib/bufrtables';
 use constant DEFAULT_TABLE_PATH_ECCODES => '/usr/local/share/eccodes/definitions/bufr/tables';
-# Ought to be your most up-to-date code table(s)
-use constant DEFAULT_CTABLE_BUFRDC => 'C0000000000000039000';
-use constant DEFAULT_CTABLE_ECCODES => '0/wmo/39';
 
 # Parse command line options
 my %option = ();
@@ -196,14 +193,14 @@ sub decode {
         if ($option{codetables} && !$option{nodata}) {
             # Load C table, trying first to use same table version as
             # the B and D tables loaded in next_observation, or if
-            # this C table file does not exist, loads DEFAULT_CTABLE
-            # instead.
+            # this C table file does not exist, loads C table for latest
+            # master table in table path found instead.
             my $table_version = $bufr->get_table_version();
             my $tableformat = Geo::BUFR->get_tableformat();
             if ($tableformat eq 'BUFRDC') {
-                $bufr->load_Ctable("C$table_version", DEFAULT_CTABLE_BUFRDC);
+                $bufr->load_Ctable("C$table_version");
             } elsif ($tableformat eq 'ECCODES')  {
-                $bufr->load_Ctable("$table_version", DEFAULT_CTABLE_ECCODES);
+                $bufr->load_Ctable("$table_version");
             }
         }
 
@@ -603,6 +600,6 @@ Pål Sannes E<lt>pal.sannes@met.noE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2010-2023 MET Norway
+Copyright (C) 2010-2025 MET Norway
 
 =cut

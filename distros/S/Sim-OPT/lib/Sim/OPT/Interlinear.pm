@@ -1,12 +1,12 @@
 package Sim::OPT::Interlinear;
 # NOTE: TO USE THE PROGRAM AS A SCRIPT, THE LINE ABOVE SHOULD BE DELETED.
 # Author: Gian Luca Brunetti, Politecnico di Milano. (gianluca.brunetti@polimi.it)
-# Copyright reserved.  2018-2024.
+# Copyright reserved.  2018-2025.
 # GPL License 3.0 or newer.
 # This is a program for filling a design space multivariate discrete dataseries
 # through a strategy entailing distance-weighting the nearest-neihbouring gradients.
 
-use v5.14;
+# use v5.14;
 use Math::Round;
 use List::Util qw( min max reduce shuffle any );
 use Statistics::Basic qw(:all);
@@ -31,7 +31,7 @@ use Sim::OPT::Parcoord3d;
 
 our @ISA = qw( Exporter );
 our @EXPORT = qw( interlinear, interstart prepfactlev tellstepsize );
-$VERSION = '0.191';
+$VERSION = '0.193';
 $ABSTRACT = 'Interlinear is a program for building metamodels from incomplete multivariate discrete dataseries on the basis of nearest-neighbouring gradients weighted by distance.';
 
 #######################################################################
@@ -109,7 +109,7 @@ sub diff_OLD
   my @int = get_intersection( \@aa, \@bb );
   foreach my $el ( @aa )
   {
-    if ( not ( $_ ~~ @int ) )
+    if ( not ( grep { $_ eq $_ } @int ) )
     #if ( not ( any { $_ eq $el } @int ) )
     {
       push ( @difference, $_ );
@@ -748,7 +748,7 @@ sub wei
     my %bank;
 
     my @newneighbours;
-    if ( "flat" ~~ @modality )
+    if ( grep { $_ eq "flat" } @modality )
     {
       foreach my $e ( @arra )
       {
@@ -760,7 +760,7 @@ sub wei
     {
       if ( ( $el->[2] ne "" ) and ( $el->[3] >= $minimumcertain ) )
       {
-        unless ( "bankflat" ~~ @modality )
+        unless ( grep { $_ eq "bankflat" } @modality )
         {
           if ( scalar( @{ $nears{$el->[0]}{neighbours} } ) == 0 )
           {
@@ -966,7 +966,7 @@ sub wei
     {
       my @els = split( "-", $trio );
       my $first = $els[0];
-      unless ( ( $message eq "principal" ) and ( $first ~~ @recedes ) )
+      unless ( ( $message eq "principal" ) and ( grep { $_ eq $first } @recedes ) )
       {
         my ( @grads, @ordists, @dists, @strengths );
         unless( ( $bank{$trio}{grad} eq "" ) or ( $bank{$trio}{ordists} eq "" )
@@ -1024,7 +1024,7 @@ sub wei
       {
         my @splits = split( "-", $trio );
         my $num = $splits[0];
-        if ( $num ~~ @parsws )
+        if ( grep { $_ eq $num } @parsws )
         {
           push ( @{ $bank{$trio}{orderedtrio} }, @{ $weldbank{$trio}{orderedtrio} } );
           push ( @{ $bank{$trio}{grad} }, @{ $weldbank{$trio}{grad} } );
@@ -1120,7 +1120,7 @@ sub wei
     my $coun = 0;
 
     my @newneighbours;
-    if ( "flat" ~~ @modality )
+    if ( grep { $_ eq "flat" } @modality )
     {
       foreach my $e ( @arrb )
       {
@@ -1136,7 +1136,7 @@ sub wei
       {
         my @neighbours;
 
-        unless ( "flat" ~~ @modality )
+        unless ( grep { $_ eq "flat" } @modality )
         {
           if ( scalar( @{ $nears{$el->[0]}{neighbours} } ) == 0 )
           {
@@ -1226,7 +1226,7 @@ sub wei
                             if ( $da1[$c] == $da2[$i] )
                             {
                               my $diffpar = abs( $e - $ei );
-                             ###################if ( ( ${ $bank{$newtrio}{orstring} }[$cn] ~~ @neighbours ) ) and ( $diffpar <= $minreq_forgrad->[1] ) and ( $diffpar > 0 ) ) ############################HERE
+                             ###################if ( ( ${ $bank{$newtrio}{orstring} }[grep { $_ eq $cn] } @neighbours ) ) and ( $diffpar <= $minreq_forgrad->[1] ) and ( $diffpar > 0 ) ) ############################HERE
                               if ( ( $diffpar <= $minreq_forgrad->[1] ) and ( $diffpar > 0 ) ) ###DDD!!! TAKE CARE, IT WAS: if ( ( $diffpar <= $minreq_forgrad->[1] ) and ( $diffpar > 0 ) )
                               {
                                 push ( @factbag, $fact );
@@ -1418,7 +1418,7 @@ sub wei
 
   my ( $wand_ref, $nears_ref );
 
-  if ( not ( "simple" ~~ @modality ) )
+  if ( not ( grep { $_ eq "simple" } @modality ) )
   {
     ( $wand_ref, $nears_ref ) = cyclearr( \@arr__, $minreq_forinclusion, $minreq_forgrad, \%bank, \%factlevels, $nfiltergrads,
       \@arrb, $first0, $last0, \%nears, $limitgrads, $limitpoints, \@modality );
@@ -1892,7 +1892,7 @@ sub prepfactlev_delete
       }
       else
       {
-        #if ( $head ~~ @blockelts )
+        #if ( grep { $_ eq $head } @blockelts )
         if ( any { $_ eq $head } @blockelts )
         {
           $hsh{pairs}{$head} = $tail;

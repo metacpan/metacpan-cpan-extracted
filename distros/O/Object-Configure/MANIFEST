@@ -3,16 +3,24 @@ lib/Object/Configure.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.SKIP
 README.md
+scripts/generate_index.pl
+t/00-load.t
+t/10-compile.t
+t/20-construct.t
 t/30-basics.t
 t/complex.t
 t/env.t
 t/eof.t
 t/eol.t
 t/instantiate.t
+t/manifest.t
 t/pod-cm.t
 t/pod-synopsis.t
 t/pod.t
+t/reload.t
 t/simple.t
+t/strict.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

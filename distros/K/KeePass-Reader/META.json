@@ -1,0 +1,53 @@
+{
+   "abstract" : "Perl interface to read KeePass version 4",
+   "author" : [
+      "Quentin Garnier <qgarnier@ose-consulting.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "apache2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "KeePass-Reader",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker::Config" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "ExtUtils::PkgConfig" : "0",
+            "XSLoader" : "0"
+         },
+         "requires" : {
+	    "CryptX": "0",
+	    "Crypt::Argon2": "0",
+            "Carp" : "0",
+            "DynaLoader" : "0",
+            "Exporter" : "0",
+            "overload" : "0",
+            "perl" : "5.008001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.2"
+}

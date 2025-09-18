@@ -3,7 +3,7 @@ package Sim::OPT::Report;
 # This is the module Sim::OPT::Retrieve of Sim::OPT, a program for detailed metadesign managing parametric explorations through the ESP-r building performance simulation platform and performing optimization by block coordinate descent.
 # This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
-use v5.14;
+# use v5.14;
 
 # use v5.20;
 use Exporter;
@@ -38,7 +38,7 @@ no warnings;
 
 our @EXPORT = qw( newretrieve newreport get_files );
 
-$VERSION = '0.119';
+$VERSION = '0.121';
 $ABSTRACT = 'Sim::OPT::Report is the module used by Sim::OPT to retrieve simulation results.';
 
 #########################################################################################
@@ -758,13 +758,13 @@ TTT
                   $retstruct[$countcase][$countblock][ $countinstance ][$counttheme][$countreport][$countitem][$counttool] = $retfile;
                   print RETBLOCK "$retfile\n";
 
-                  if ( not ($retfile ~~ @retcases ) )
+                  if ( not (grep { $_ eq $retfile } @retcases ) )
                   {
                     push ( @retcases, $retfile );
                     say RETLIST "$retfile";
                   }  @miditers = Sim::OPT::washn( @miditers );
 
-                  if ( not ( $retfile ~~ @{ $notecases[ $countcase ][ $countblock ][ $counttool ][ $countinstance ] } ) )
+                  if ( not ( grep { $_ eq $retfile } @{ $notecases[ $countcase ][ $countblock ][ $counttool ][ $countinstance ] } ) )
                   {
                     push ( @{ $notecases[ $countcase ][ $countblock ][ $counttool ][ $countinstance ] } ,
                       {
@@ -858,7 +858,7 @@ TTT
                 @repdata = @$reportdata_ref;
                 @retcases = uniq( @retcases );
                 my $retfile = $resfile;
-                if ( not ($retfile ~~ @retcases ) )
+                if ( not (grep { $_ eq $retfile } @retcases ) )
                 {
                   push ( @retcases, $retfile );
                   say RETLIST "$retfile";
@@ -1108,13 +1108,13 @@ sub newreport # This function retrieves the results of interest from the texts f
   @repcases = uniq( @repcases );
 
   say REPBLOCK "$repfile";
-  if ( not ( $repfile ~~ @repcases ) )
+  if ( not ( grep { $_ eq $repfile } @repcases ) )
   {
     push ( @repcases, $repfile );
     say REPLIST "$repfile";
   }
 
-  if ( not ( $repfile ~~ @{ $repstruct[$countcase][$countblock] } ) )
+  if ( not ( grep { $_ eq $repfile } @{ $repstruct[$countcase][$countblock] } ) )
   {
     push ( @{ $repstruct[$countcase][$countblock] }, $repfile );
   }

@@ -3,7 +3,7 @@ package Sim::OPT::Parcoord3d;
 # This is Sim::OPT::Parcoord3d, a program that can receive as input the data for a bi-dimensional parallel coordinate plot in cvs format to produce as output an Autolisp file that can be used from Autocad or Intellicad-based 3D CAD programs to obtain 3D parallel coordinate plots.
 # This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
-use v5.14;
+# use v5.14;
 # use v5.20;
 use Exporter;
 use parent 'Exporter'; # imports and subclasses Exporter
@@ -338,7 +338,7 @@ sub parcoord3d
 					{
 						my @elems = @{$elem};
 						my @cutelems = @elems[0..2]; # PUT ..2 IF ALSO THE THIRD AXIS HAS TO BE CHECKED FOR NON-REPETITIONS, PUT 1 OTHERWISE.
-						if (@cutelms ~~ @cutelems)
+						if (scalar(@cutelms) == scalar(@cutelems) && !grep { $cutelms[$_] ne $cutelems[$_] } 0..$#cutelms)
 						{
 
 							$counthit++;

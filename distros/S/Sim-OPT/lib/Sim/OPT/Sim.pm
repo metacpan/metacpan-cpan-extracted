@@ -3,7 +3,7 @@ package Sim::OPT::Sim;
 # This is the module Sim::OPT::Sim of Sim::OPT, a program for detailed metadesign managing parametric explorations through the ESP-r building performance simulation platform and performing optimization by block coordinate descent.
 # This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
-use v5.14;
+# use v5.14;
 
 # use v5.20;
 use Exporter;
@@ -39,7 +39,7 @@ use warnings::unused;
 
 our @EXPORT = qw( sim ); # our @EXPORT = qw( );
 
-$VERSION = '0.095'; # our $VERSION = '';
+$VERSION = '0.097'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Sim is the module used by Sim::OPT to launch simulations once the models have been built.';
 
 #########################################################################################
@@ -220,7 +220,7 @@ sub sim
     my ( $shortresfile, $shortflfile );
 
     #if ( ( $dowhat{simulate} eq "y")
-    #  and ( ( ( not ( $to{cleanto} ~~ ( @trieds ) ) ) or ( not ( $precious eq "" ) ) )
+    #  and ( ( ( not ( grep { $_ eq $to{cleanto} } @trieds ) ) or ( not ( $precious eq "" ) ) )
     #    or ( ( $gaproc eq "yes" ) and ( $fire eq "yes" ) ) ) )
 
     {
@@ -281,8 +281,8 @@ sub sim
               push ( @{ $simstruct[ $countcase ][ $countblock ][ $countinstance ][$counttool] }, $resfile );
               print SIMBLOCK "$resfile\n";
 
-              if ( ( not ( $resfile ~~ @simcases ) ) and ( not ( -e $resfile ) ) and ( $dowhat{simulate} eq "y")
-                and ( not ( $to{cleanto} ~~ ( @trieds ) ) ) )
+              if ( ( not ( grep { $_ eq $resfile } @simcases ) ) and ( not ( -e $resfile ) ) and ( $dowhat{simulate} eq "y")
+                and ( not ( grep { $_ eq $to{cleanto} } @trieds ) ) )
               {
                 push ( @simcases, $resfile );
                 print SIMLIST "$resfile\n";
@@ -501,7 +501,7 @@ XXX
                 print SIMBLOCK "$resfile\n";
               }
 
-              if ( ( not ( $resfile ~~ @retcases ) ) and ( not ( -e $resfile ) ) )
+              if ( ( not ( grep { $_ eq $resfile } @retcases ) ) and ( not ( -e $resfile ) ) )
               {
                 push ( @simcases, $resfile );
                 push ( @retcases, $resfile );

@@ -1,5 +1,9 @@
 Revision history for CGI-Lingua
 
+0.76	Wed Sep 17 10:25:10 EDT 2025
+	I can't reproduce https://github.com/nigelhorne/CGI-Lingua/issues/31, but this may fix it
+	Check the sanity of the logger argument
+
 0.75	Mon Sep 15 07:47:20 EDT 2025
 	Call logger->warn directly if defined
 	Downgraded the level of the message about IP address not in IP::Country from notice to debug

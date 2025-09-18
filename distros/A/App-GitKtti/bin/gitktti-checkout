@@ -1,0 +1,129 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use File::Basename;
+use Getopt::Long;
+use FindBin qw($RealBin);
+use lib "$RealBin/../lib";
+use App::GitKtti;
+
+use constant REGEX_DEVELOP => '^(dev|develop)$';
+use constant REGEX_MASTER  => '^(master|main)$';
+
+App::GitKtti::showVersion();
+
+my $arg_help        = "";
+my $arg_filter      = "";
+my $arg_delete      = "";
+my $ret             = 99;
+my $current_branch  = "";
+my $local_branch    = "";
+my $remote_branch   = "";
+my $deleted         = 0;
+my @local_branches  = ();
+my @remote_branches = ();
+my @develop_branches  = ();
+my @master_branches   = ();
+my @local_dev_or_master_branches = ();
+
+## Args reading...
+GetOptions ('help' => \$arg_help, 'filter=s' => \$arg_filter, 'delete' => \$arg_delete);
+
+## arg : --help
+if ( $arg_help ) {
+  App::GitKtti::printSection("HELP - GitKtti Checkout");
+  print(App::GitKtti::BRIGHT_WHITE . "Usage:" . App::GitKtti::RESET . "\n");
+  print("   gitktti-checkout [--help] [--filter filter] [--delete]\n\n");
+
+  App::GitKtti::printSubSection("Examples");
+  App::GitKtti::printCommand("gitktti-checkout --filter badbranch --delete");
+  App::GitKtti::printCommand("gitktti-checkout -f badbranch -d");
+  exit(0);
+}
+
+## Get develop branch real name (locally)
+@develop_branches = App::GitKtti::git_getLocalBranchesFilter(REGEX_DEVELOP, \$ret);
+
+## Get master branch real name (locally)
+@master_branches = App::GitKtti::git_getLocalBranchesFilter(REGEX_MASTER, \$ret);
+
+@local_dev_or_master_branches = (@develop_branches, @master_branches);
+
+## Get tracked remote branch...
+my %tracked_branch = App::GitKtti::git_getTrackedRemoteBranch(\$ret);
+
+## Get current branch...
+$current_branch = App::GitKtti::git_getCurrentBranch(\$ret);
+
+## Get local branches (filtered by name)
+@local_branches = App::GitKtti::git_getLocalBranchesFilter($arg_filter, \$ret);
+
+if ( @local_branches > 0 ) {
+  ## List local branches
+  $local_branch = App::GitKtti::getSelectResponse("Which local branch?", @local_branches);
+
+  ## Special case : you already are on the branch you want to switch to...
+  if ( $local_branch eq $current_branch ) {
+
+    ## The only reason to switch is when you want to delete your branch
+    if ( $arg_delete ) {
+      App::GitKtti::printWarning("you already are on this branch, need to switch to another in order to delete it...");
+
+      if ( @local_dev_or_master_branches > 0 ) {
+        ## Checkout develop or master branch
+        App::GitKtti::git_checkoutBranchNoConfirm(
+          App::GitKtti::getSelectResponse("Where to?", @local_dev_or_master_branches)
+        );
+      }
+      else {
+        App::GitKtti::printError("No develop or master branches found !");
+        exit(1);
+      }
+    }
+    else {
+      App::GitKtti::printInfo("You already are on this branch!");
+      exit(0);
+    }
+  }
+
+  if ( $arg_delete ) {
+    ## Delete branch ?
+    $deleted = App::GitKtti::git_deleteLocalBranch($local_branch);
+  }
+
+  ## Checkout selected local branch
+  if ( !$deleted ) {
+    App::GitKtti::git_checkoutBranchNoConfirm($local_branch);
+
+    ## Done
+    exit(0);
+  }
+}
+else {
+  App::GitKtti::printWarning("Local branch not found !");
+}
+
+## Fetch...
+if ( $tracked_branch{"remote"} ne "" && App::GitKtti::isResponseYes("Fetch from remote '" . $tracked_branch{"remote"} . "'?") ) {
+  App::GitKtti::git_fetch(\$ret);
+}
+
+## Get remote branches (filtered by name)
+@remote_branches = App::GitKtti::git_getRemoteBranchesFilter($tracked_branch{"remote"}, $arg_filter, \$ret);
+
+if ( @remote_branches > 0 ) {
+  ## List remote branches
+  $remote_branch = App::GitKtti::getSelectResponse("Which remote branch?", @remote_branches);
+
+  if ( $remote_branch =~ /^$tracked_branch{"remote"}\/(.+)$/ ) {
+    App::GitKtti::git_checkoutBranchNoConfirm($1);
+  }
+  else {
+    App::GitKtti::printError("unexpected error !");
+    exit(2);
+  }
+}
+else {
+  App::GitKtti::printInfo("No remote branch found.");
+}

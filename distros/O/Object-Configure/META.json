@@ -38,16 +38,24 @@
             "Log::Abstraction" : "0.25",
             "Params::Get" : "0.13",
             "Return::Set" : "0",
+            "Scalar::Util" : "0",
             "perl" : "5.008"
          }
       },
       "test" : {
          "requires" : {
+            "File::Spec" : "0",
             "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::System::Simple" : "0",
+            "Readonly" : "0",
             "Test::DescribeMe" : "0",
             "Test::Most" : "0",
             "Test::Needs" : "0",
-            "YAML::XS" : "0"
+            "Test::NoWarnings" : "0",
+            "Time::HiRes" : "0",
+            "YAML::XS" : "0",
+            "autodie" : "0"
          }
       }
    },
@@ -66,6 +74,6 @@
          "x_repository" : "https://github.com/nigelhorne/Object-Configure"
       }
    },
-   "version" : 0.14,
+   "version" : 0.15,
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

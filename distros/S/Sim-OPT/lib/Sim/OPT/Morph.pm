@@ -1,9 +1,9 @@
-package Sim::OPT::Morph;
-# Copyright (C) 2008-2024 by Gian Luca Brunetti and Politecnico di Milano.
+#package Sim::OPT::Morph;
+# Copyright (C) 2008-2025 by Gian Luca Brunetti and Politecnico di Milano.
 # This is the module Sim::OPT::Morph of Sim::OPT.
 # This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
-use v5.14;
+# use v5.14;
 use Exporter;
 use vars qw( $VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS );
 use Math::Trig;
@@ -47,7 +47,7 @@ decreasearray deg2rad_ rad2deg_ purifyarray replace_nth rotate2dabs rotate2d rot
 gatherseparators supercleanarray modish $max_processes @weighttransforms rebuildconstr
 ); # our @EXPORT = qw( );
 
-$VERSION = '0.163'; # our $VERSION = '';
+$VERSION = '0.165'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Morph is a morphing program for performing parametric variations on model for simulation programs.';
 
 ################################################# MORPH
@@ -943,7 +943,7 @@ sub morph
 					}
 					push ( @{ $morphstruct[$countcase][$countblock] }, $to{cleanto} );
 
-					#	if ( ( not ( $to ~~ @morphcases ) ) or ( $dowhat{actonmodels} eq "y" ) )
+					#	if ( ( not ( grep { $_ eq $to } @morphcases ) ) or ( $dowhat{actonmodels} eq "y" ) )
 					if ( ( $dowhat{actonmodels} eq "y" ) and ( not ( $dowhat{inactivatemorph} eq "y" ) ) )
 					{ say $tee "HERE 2 COUNTBLOCK: $countblock, \$countstep: $countstep, \$origin: $origin, \$is: $is \$from: $from, \$to{cleanto}: $to{cleanto}, \$to{thisto}: $to{thisto},  ";
 						push ( @morphcases, $is );
@@ -954,7 +954,7 @@ sub morph
 						{
 							if ( ( $dirfiles{randompick} eq "yes" ) or ( $dirfiles{latinhypercube} eq "yes" ) or ( $dirfiles{ga} eq "yes" ) )
 							{
-								if ( ( "begin" ~~ @whatto ) and ( not ( "end" ~~ @whatto ) ) and ( $dowhat{jumpinst} eq "yes" ) )
+								if ( ( grep { $_ eq "begin" } @whatto ) and ( not ( grep { $_ eq "end" } @whatto ) ) and ( $dowhat{jumpinst} eq "yes" ) )
 								{
 									$orig = "$mypath/$file";
 									$target = "$to{crypto}" . "-trans-$stamp" ;
@@ -968,7 +968,7 @@ sub morph
 										print $tee "LEVEL 1a: cp -R $orig $target\n\n";
 									}
 								}
-								elsif ( ( "begin" ~~ @whatto )  and ( not ( "end" ~~ @whatto ) ) and ( not ( $dowhat{jumpinst} eq "yes" ) ) )
+								elsif ( ( grep { $_ eq "begin" } @whatto )  and ( not ( grep { $_ eq "end" } @whatto ) ) and ( not ( $dowhat{jumpinst} eq "yes" ) ) )
 								{
 									$orig = "$mypath/$file";
 									$target = "$to{crypto}";
@@ -984,8 +984,8 @@ sub morph
 									}
 								}
 
-								if ( ( "transition" ~~ @whatto ) and ( not ( "begin" ~~ @whatto) ) and
-								            ( not ( "end" ~~ @whatto) ) and ( $dowhat{jumpinst} eq "yes" ) )
+								if ( ( grep { $_ eq "transition" } @whatto ) and ( not ( grep { $_ eq "begin" } @whatto) ) and
+								            ( not ( grep { $_ eq "end" } @whatto) ) and ( $dowhat{jumpinst} eq "yes" ) )
 								{
 									$orig = "$orig{crypto}" . "-trans-$stamp";
 									$target = "$to{crypto}" . "-trans-$stamp" ;
@@ -1000,8 +1000,8 @@ sub morph
 										print  "LEVEL 1c: cp -R $orig $target\n\n";
 									}
 								}
-								elsif ( ( "transition" ~~ @whatto ) and ( not ( "begin" ~~ @whatto) ) and
-								            ( not ( "end" ~~ @whatto) ) and ( not ( $dowhat{jumpinst} eq "yes" ) ) )
+								elsif ( ( grep { $_ eq "transition" } @whatto ) and ( not ( grep { $_ eq "begin" } @whatto) ) and
+								            ( not ( grep { $_ eq "end" } @whatto) ) and ( not ( $dowhat{jumpinst} eq "yes" ) ) )
 								{
 									$orig = "$orig{crypto}";
 									$target = "$to{crypto}";
@@ -1017,7 +1017,7 @@ sub morph
 									}
 								}
 
-								if ( ( "end" ~~ @whatto ) and ( $dowhat{jumpinst} eq "yes" ) )
+								if ( ( grep { $_ eq "end" } @whatto ) and ( $dowhat{jumpinst} eq "yes" ) )
 								{
 	                $orig = "$orig{crypto}" . "-trans-$stamp";
 									$target = "$to{crypto}";
@@ -1032,7 +1032,7 @@ sub morph
 										print  "LEVEL 1e1: cp -R $orig $target\n\n";
 									}
 								}
-                elsif ( ( "end" ~~ @whatto ) and ( not ( $dowhat{jumpinst} eq "yes" ) ) )
+                elsif ( ( grep { $_ eq "end" } @whatto ) and ( not ( $dowhat{jumpinst} eq "yes" ) ) )
 								{
 	                $orig = "$orig{crypto}";
 									$target = "$to{crypto}";
@@ -1420,7 +1420,7 @@ sub morph
 												my $expected_to = $expected_tos[ $countinst ];
 
 
-												if ( not ( $expected_to ~~ @{ $done_tos[ $countvar ] } ) )
+												if ( not ( grep { $_ eq $expected_to } @{ $done_tos[ $countvar ] } ) )
 												{
 													push ( @nondone_tos, $expected_to );
 													push ( @nondone_instances, $expected_instance );
@@ -3389,7 +3389,7 @@ sub obs_modify
 				say NEWOBSFILE $obsline;
 				#say $tee $obsline;
 			}
-			elsif (  $obsnum ~~ @obsbag )
+			elsif (  grep { $_ eq $obsnum } @obsbag )
 			{
 				say NEWOBSFILE "$obsts{$obsnum}{denomination},$obsts{$obsnum}{origin}->[0],$obsts{$obsnum}{origin}->[1],$obsts{$obsnum}{origin}->[2],$obsts{$obsnum}{dimensions}->[0],$obsts{$obsnum}{dimensions}->[1],$obsts{$obsnum}{dimensions}->[2],$obsts{$obsnum}{z_rotation},$obsts{$obsnum}{y_rotation},$obsts{$obsnum}{x_rotation},$obsts{$obsnum}{opacity},$obsts{$obsnum}{name}, $obsts{$obsnum}{construction},  # block  $obsts{$obsnum}{obsnum}" ;
 				say $tee "$obsts{$obsnum}{denomination},$obsts{$obsnum}{origin}->[0],$obsts{$obsnum}{origin}->[1],$obsts{$obsnum}{origin}->[2],$obsts{$obsnum}{dimensions}->[0],$obsts{$obsnum}{dimensions}->[1],$obsts{$obsnum}{dimensions}->[2],$obsts{$obsnum}{z_rotation},$obsts{$obsnum}{y_rotation},$obsts{$obsnum}{x_rotation},$obsts{$obsnum}{opacity},$obsts{$obsnum}{name}, $obsts{$obsnum}{construction},  # block  $obsts{$obsnum}{obsnum}" ;
@@ -5122,7 +5122,7 @@ sub reshape_windows # IT APPLIES CONSTRAINTS
 					if ($countvertex > 0)
 					{
 						my $vertexletter = $vertexletters[$countvertex];
-						if ($vertexletter  ~~ @work_letters)
+						if (grep { $_ eq $vertexletter } @work_letters)
 						{
 							my $printthis =
 "cd $to/cfg/
@@ -6778,7 +6778,7 @@ sub apply_loopcontrol_changes
 		$new_min_cooling_power = $loop[6];
 		$new_heating_setpoint = $loop[7];
 		$new_cooling_setpoint = $loop[8];
-		unless ( @{$new_loop_ctls[$countloop]} ~~ @{$temploopcontrol[$countloop]} )
+		unless ( @{$new_loop_ctls[grep { $_ eq $countloop]} } @{ $temploopcontrol[$countloop] } )
 		{
 			my $printthis =
 "prj -file $to/cfg/$fileconfig -mode script<<YYY
@@ -6847,7 +6847,7 @@ sub apply_flowcontrol_changes
 		$new_flow_setpoint = $flow[3];
 		$new_flow_onoff = $flow[4];
 		$new_flow_fraction = $flow[5];
-		unless ( @{$new_flowcontrols[$countflow]} ~~ @{$tempflowcontrol[$countflow]} )
+		unless ( @{$new_flowcontrols[grep { $_ eq $countflow]} } @{ $tempflowcontrol[$countflow] } )
 		{
 			my $printthis =
 "prj -file $to/cfg/$fileconfig -mode script<<YYY

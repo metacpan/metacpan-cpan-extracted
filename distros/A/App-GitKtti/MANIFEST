@@ -1,0 +1,17 @@
+Makefile.PL
+MANIFEST
+lib/App/GitKtti.pm
+bin/gitktti-checkout
+bin/gitktti-delete
+bin/gitktti-fix
+bin/gitktti-fixend
+bin/gitktti-move
+bin/gitktti-tag
+bin/gitktti-tests
+t/01-basic.t
+t/02-functions.t
+README.md
+docs/index.html
+docs/assets/gitktti_logo.png
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

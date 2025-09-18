@@ -1,0 +1,273 @@
+#!/usr/bin/env perl
+
+##############################################################################
+## GitKtti Fix - Modern version
+##############################################################################
+
+use strict;
+use warnings;
+use POSIX;
+use File::Basename;
+use Getopt::Long;
+use FindBin qw($RealBin);
+use lib "$RealBin/../lib";
+use App::GitKtti;
+
+use constant MODE_HOTFIX  => "hotfix";
+use constant MODE_FEATURE => "feature";
+use constant MODE_RELEASE => "release";
+
+use constant REGEX_HOTFIX  => '^(hotfix)/(.+)$';
+use constant REGEX_DEVELOP => '^(dev|develop)$';
+use constant REGEX_MASTER  => '^(master|main)$';
+use constant REGEX_RELEASE => '^(release)/(.+)$';
+use constant REGEX_FEATURE => '^(feature)/(.+)$';
+
+App::GitKtti::showVersion();
+
+my $ret            = 99;
+my $lasttag        = "";
+my $lasttag_maj    = "";
+my $lasttag_min    = "";
+my $lasttag_patch  = "";
+my $new_branch     = "";
+my $prefix_branch  = "";
+my $suffix_branch  = "";
+my $current_branch = "";
+my $arg_help       = "";
+my $arg_name       = "";
+my $arg_mode       = "";
+my $arg_prune      = "";
+my $arg_zeroprefix = "";
+my $mode           = MODE_HOTFIX;
+
+## Args reading...
+GetOptions ('help' => \$arg_help, 'name=s' => \$arg_name, 'mode=s' => \$arg_mode, 'prune' => \$arg_prune, 'zeroprefix' => \$arg_zeroprefix);
+
+## arg : --help
+if ( $arg_help ) {
+  App::GitKtti::printSection("HELP - GitKtti Fix");
+  print(App::GitKtti::BRIGHT_WHITE . "Usage:" . App::GitKtti::RESET . "\n");
+  print("   gitktti-fix [--help] [--name name] [--mode (hotfix|feature|release)] [--prune] [--zeroprefix]\n\n");
+
+  App::GitKtti::printSubSection("Examples");
+  App::GitKtti::printCommand("gitktti-fix --name bug-123 --zeroprefix");
+  App::GitKtti::printCommand("gitktti-fix -n coucou");
+  App::GitKtti::printCommand("gitktti-fix -m feature");
+  App::GitKtti::printCommand("gitktti-fix -m feature -n f-toto --z");
+  App::GitKtti::printCommand("gitktti-fix -m feature -n coucou");
+  App::GitKtti::printCommand("gitktti-fix -m release");
+  App::GitKtti::printCommand("gitktti-fix --prune");
+  exit(0);
+}
+
+## Get tracked remote branch...
+my %tracked_branch = App::GitKtti::git_getTrackedRemoteBranch(\$ret);
+
+## arg : --prune
+if ( $arg_prune ) {
+  if ( App::GitKtti::isResponseYes("Do you want to clean your local branches?") ) {
+    App::GitKtti::git_fetchPrune(\$ret);
+
+    if ( $tracked_branch{"remote"} ne "" ) {
+      App::GitKtti::git_remotePrune($tracked_branch{"remote"}, \$ret);
+
+      ## Delete local branches not found on remote...
+      foreach my $local_branch (App::GitKtti::git_getLocalBranchesFilter('', \$ret)) {
+        if ( scalar(App::GitKtti::git_getRemoteBranchesFilter($tracked_branch{"remote"}, "$local_branch\$", \$ret)) == 0 ) {
+          App::GitKtti::printWarning("local branch '" . $local_branch . "' not found on remote.");
+          App::GitKtti::git_deleteLocalBranch($local_branch, \$ret);
+        }
+        else {
+          App::GitKtti::printInfo("local branch '" . $local_branch . "' found on remote. I will not delete it ^^");
+        }
+      }
+    }
+  }
+
+  ## Local tags cleaning...
+  if ( App::GitKtti::isResponseYes("Do you want to clean your local tags?") &&
+       App::GitKtti::isResponseYes("! WARNING ! All local tags will be deleted. Are you sure to be sure?") ) {
+    App::GitKtti::git_cleanLocalTags(\$ret);
+    App::GitKtti::git_fetchTags(\$ret);
+  }
+
+  exit(0);
+}
+
+if ( $arg_name ) {
+
+  if($arg_name !~ /^[\w\-]+$/) {
+    App::GitKtti::printError("invalid name !");
+    exit(1);
+  }
+
+  $suffix_branch = $arg_name;
+}
+else {
+  $suffix_branch = strftime("%Y%m%d_%H%M%S", localtime);
+}
+
+## arg : --mode
+if ( $arg_mode ) {
+
+  if($arg_mode =~ /^(${\(MODE_HOTFIX)}|${\(MODE_FEATURE)}|${\(MODE_RELEASE)})$/) {
+    $mode = $1;
+  }
+  else {
+    App::GitKtti::printError("mode must be 'hotfix' or 'feature' or 'release'!");
+    exit(1);
+  }
+}
+
+## arg : --zeroprefix
+if ( $arg_zeroprefix ) {
+  $prefix_branch = "";
+}
+else {
+  $prefix_branch = $mode . "/";
+}
+
+## Get current branch...
+$current_branch = App::GitKtti::git_getCurrentBranch(\$ret);
+
+## mode : hotfix
+if ( $mode eq MODE_HOTFIX ) {
+  ## Check if we are on the right branch (master, hotfix/xxx, release/xxx)
+  if($current_branch =~ /${\(REGEX_MASTER)}/ || $current_branch =~ /${\(REGEX_HOTFIX)}/  || $current_branch =~ /${\(REGEX_RELEASE)}/ ) {
+
+    ## hotfix on hotfix ? strange but why not motherfucker
+    if ( $current_branch =~ /${\(REGEX_HOTFIX)}/ ) {
+      if ( !App::GitKtti::isResponseYes("It seems that you wish to start a new hotfix from hotfix '" . $current_branch . "' #weirdo. Are you dumb ? If not, are you sure??") ) {
+        App::GitKtti::printWarning("Aborted !");
+        exit(1);
+      }
+    }
+
+    ## Hotfix name...
+    $new_branch = $prefix_branch . $suffix_branch;
+  }
+  else {
+    App::GitKtti::printError("not on master/release branch !");
+    exit(1);
+  }
+}
+## mode : feature
+elsif ( $mode eq MODE_FEATURE ) {
+  ## Check if we are on develop/feature branch
+if ( $current_branch =~ /${\(REGEX_DEVELOP)}/ || $current_branch =~ /${\(REGEX_FEATURE)}/ ) {
+
+    ## feature on feature ? strange but why not motherfucker
+    if ( $current_branch =~ /${\(REGEX_FEATURE)}/ ) {
+      if ( !App::GitKtti::isResponseYes("It seems that you wish to start a new feature from feature '" . $current_branch . "' #weirdo. Are you dumb ? If not, are you sure??") ) {
+        App::GitKtti::printWarning("Aborted !");
+        exit(1);
+      }
+    }
+
+    if ( !$arg_name ) {
+      if ( !App::GitKtti::isResponseYes("By default, you can use [" . $prefix_branch . "AAAAMMJJ_HHMISS]. Do you want to use it?") ) {
+        $suffix_branch = "";
+      }
+    }
+
+    if ( $suffix_branch eq "" ) {
+      $suffix_branch = App::GitKtti::getResponse("Please enter " . $mode . " branch name XXX (" . $prefix_branch . "XXX) :");
+    }
+
+    $new_branch = $prefix_branch . $suffix_branch;
+  }
+  else {
+    App::GitKtti::printError("not on develop branch !");
+    exit(1);
+  }
+}
+## mode : release
+elsif ( $mode eq MODE_RELEASE ) {
+  ## Check if we are on develop branch
+  if($current_branch =~ /${\(REGEX_DEVELOP)}/) {
+
+    ## Get last tag from all branches
+    $lasttag = App::GitKtti::git_getLastTagFromAllBranches(\$ret);
+
+    ## Tries to get automatically next name...
+    if($lasttag =~ /^(\d+)\.(\d+)\.(\d+)$/) {
+      $lasttag_maj   = $1;
+      $lasttag_min   = $2;
+      $lasttag_patch = $3;
+
+      $new_branch = App::GitKtti::getSelectResponse("Please select a release name (last tag is [$lasttag]) :",
+          $mode . "/" . ($lasttag_maj+1) . "." . "0"              . "." . "0"                . "|next maj release",
+          $mode . "/" . $lasttag_maj     . "." . ($lasttag_min+1) . "." . "0"                . "|next min release",
+          $mode . "/" . $lasttag_maj     . "." . $lasttag_min     . "." . ($lasttag_patch+1) . "|next patch release",
+          "|none of them ! (another name)");
+    }
+    else {
+      print("Last tag is [$lasttag]. You should use next version for your release name ;)\n");
+    }
+
+    ## Use default datetime...
+    if ( $new_branch eq "" ) {
+      if ( App::GitKtti::isResponseYes("By default, you can use [" . $prefix_branch . "AAAAMMJJ_HHMISS]. Do you want to use it?") ) {
+        $new_branch = $prefix_branch . $suffix_branch;
+      }
+    }
+
+    ## Or use custom name...
+    if ( $new_branch eq "" ) {
+      $suffix_branch = App::GitKtti::getResponse("Please enter " . $mode . " branch name XXX (" . $prefix_branch . "XXX) :");
+      $new_branch = $prefix_branch . $suffix_branch;
+    }
+
+    ## Last check...
+    if ( $new_branch eq "" ) {
+      App::GitKtti::printError("branch name is empty !");
+      exit(1);
+    }
+  }
+  else {
+    App::GitKtti::printError("not on develop branch !");
+    exit(1);
+  }
+}
+
+App::GitKtti::printSection("Branch Configuration");
+
+print(App::GitKtti::BRIGHT_WHITE . "Mode:           " . App::GitKtti::RESET);
+App::GitKtti::printBranch($mode, $mode);
+print("\n");
+
+print(App::GitKtti::BRIGHT_WHITE . "Current branch: " . App::GitKtti::RESET);
+if ($current_branch =~ /${\(REGEX_MASTER)}/) {
+  App::GitKtti::printBranch($current_branch, "master");
+} elsif ($current_branch =~ /${\(REGEX_DEVELOP)}/) {
+  App::GitKtti::printBranch($current_branch, "develop");
+} elsif ($current_branch =~ /${\(REGEX_FEATURE)}/) {
+  App::GitKtti::printBranch($current_branch, "feature");
+} elsif ($current_branch =~ /${\(REGEX_HOTFIX)}/) {
+  App::GitKtti::printBranch($current_branch, "hotfix");
+} elsif ($current_branch =~ /${\(REGEX_RELEASE)}/) {
+  App::GitKtti::printBranch($current_branch, "release");
+} else {
+  App::GitKtti::printBranch($current_branch);
+}
+print("\n");
+
+print(App::GitKtti::BRIGHT_WHITE . "Remote:         " . App::GitKtti::RESET . App::GitKtti::CYAN . $tracked_branch{"remote"} . App::GitKtti::RESET . "\n");
+print(App::GitKtti::BRIGHT_WHITE . "Tracked branch: " . App::GitKtti::RESET . App::GitKtti::CYAN . $tracked_branch{"branch"} . App::GitKtti::RESET . "\n");
+
+print(App::GitKtti::BRIGHT_WHITE . "New branch:     " . App::GitKtti::RESET);
+App::GitKtti::printBranch($new_branch, $mode);
+print("\n\n");
+
+if ( App::GitKtti::isResponseYes("Create $mode " . App::GitKtti::BOLD . $new_branch . App::GitKtti::RESET . "?") ) {
+  App::GitKtti::launch("git checkout -b $new_branch", \$ret);
+}
+else {
+  App::GitKtti::printWarning("Aborted !");
+  exit(2);
+}
+
+if ( ($tracked_branch{"remote"} ne "") && (App::GitKtti::isResponseYes("Push $mode " . App::GitKtti::BOLD . $new_branch . App::GitKtti::RESET . " to remote " . App::GitKtti::BOLD . $tracked_branch{"remote"} . App::GitKtti::RESET . "?")) ) {
+  App::GitKtti::launch("git push --set-upstream " . $tracked_branch{"remote"} . " " . $new_branch, \$ret);
+}

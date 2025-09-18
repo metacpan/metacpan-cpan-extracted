@@ -16,7 +16,7 @@ CGI::Lingua - Create a multilingual web page
 
 # VERSION
 
-Version 0.75
+Version 0.76
 
 # SYNOPSIS
 
@@ -75,16 +75,15 @@ For a list of country codes refer to ISO-3166 (e.g. 'gb' for United Kingdom).
     # Sample web page
     use CGI::Lingua;
     use CHI;
-    use Log::Log4perl;
+    use Log::Abstraction;
 
     my $cache = CHI->new(driver => 'File', root_dir => '/tmp/cache');
-    Log::Log4perl->easy_init({ level => $Log::Log4perl::DEBUG });
 
     # We support English, French, British and American English, in that order
     my $lingua = CGI::Lingua->new(
         supported => ['en', 'fr', 'en-gb', 'en-us'],
         cache     => $cache,
-        logger    => Log::Log4perl->get_logger(),
+        logger    => Log::Abstraction->new()
     );
 
     print "Content-Type: text/plain\n\n";
@@ -113,7 +112,7 @@ It takes several optional parameters:
 
     Used for warnings and traces.
     It can be an object that understands warn() and trace() messages,
-    such as a [Log::Log4perl](https://metacpan.org/pod/Log%3A%3ALog4perl) or [Log::Any](https://metacpan.org/pod/Log%3A%3AAny) object,
+    such as a [Log::Abstraction](https://metacpan.org/pod/Log%3A%3AAbstraction), [Log::Log4perl](https://metacpan.org/pod/Log%3A%3ALog4perl) or [Log::Any](https://metacpan.org/pod/Log%3A%3AAny) object,
     a reference to code,
     a reference to an array,
     or a filename.
@@ -243,7 +242,7 @@ try to return the Locale::Object::Country for the US.
 Returns the timezone of the web client.
 
 If [Geo::IP](https://metacpan.org/pod/Geo%3A%3AIP) is installed,
-CGI::Lingua will make use of that, otherwise it will use ip-api.com
+CGI::Lingua will make use of that, otherwise it will use [ip-api.com](https://metacpan.org/pod/ip-api.com)
 
 # AUTHOR
 

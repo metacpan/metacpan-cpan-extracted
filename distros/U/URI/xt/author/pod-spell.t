@@ -119,6 +119,7 @@ URI
 URL
 Unix
 Ville
+WebSocket
 Whitener
 Willing
 Win32
@@ -237,4 +238,6 @@ unicode
 uppercasing
 urn
 ville
+ws
+wss
 xn

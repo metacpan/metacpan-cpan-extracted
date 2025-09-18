@@ -1,4 +1,7 @@
 Revision history for Perl extension Geo::BUFR.
+1.40 2025-09-18
+- New method get_max_table_version(), eliminating need for default
+  table in some methods, as well as in bufrread.pl and bufrresolve.pl
 1.39 2023-02-19
 - New option --gts in bufrextract.pl for extraction of full GTS envelope
   from GTS bulletins, dropping option --reuse_ahl

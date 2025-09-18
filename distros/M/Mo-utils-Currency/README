@@ -1,0 +1,89 @@
+NAME
+    Mo::utils::Currency - Mo currency utilities.
+
+SYNOPSIS
+     use Mo::utils::Currency qw(check_currency_code);
+
+     check_currency_code($self, $key);
+
+DESCRIPTION
+    Mo currency utilities for checking of data objects.
+
+SUBROUTINES
+  "check_currency_code"
+     check_currency_code($self, $key);
+
+    Check parameter defined by $key if it's currency code. Value could be
+    undefined.
+
+    Put error if check isn't ok.
+
+    Returns undef.
+
+ERRORS
+     check_currency_code():
+             Parameter '%s' must be a valid currency code.
+                   Value: %s
+
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     use Mo::utils::Currency qw(check_currency_code);
+
+     my $self = {
+             'key' => 'CZK',
+     };
+     check_currency_code($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output:
+     # ok
+
+EXAMPLE2
+     use strict;
+     use warnings;
+
+     use Error::Pure;
+     use Mo::utils::Currency qw(check_currency_code);
+
+     $Error::Pure::TYPE = 'Error';
+
+     my $self = {
+             'key' => 'xx',
+     };
+     check_currency_code($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output like:
+     # #Error [...Currency.pm:?] Parameter 'key' must be a valid currency code.
+
+DEPENDENCIES
+    Locale::Currency, Error::Pure, Exporter, Readonly.
+
+SEE ALSO
+    Mo  Micro Objects. Mo is less.
+
+    Mo::utils
+        Mo utilities.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Mo-utils-Currency>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2025 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# (C) Copyright 2010-2023 MET Norway
+# (C) Copyright 2010-2025 MET Norway
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -214,10 +214,8 @@ expression. E.g. C<--ahl 'ISS... ENMI'> will decode only BUFR SHIP
 
 Use option C<--gts> if you want the full GTS message envelope (if
 present) to be included in output. There are 2 main variations on this
-envelope: SOH/ETX and ZCZC/NNNN notation, see the Manual on the GTS:
-Attachment II-4 Format of Meteorological Messages. Only SOH/ETX is
-supported in bufrextract.pl, since ZCZC/NNNN is no longer used in
-modern data exchange.
+envelope (SOH/ETX and ZCZC notation), for details see the Manual on
+the GTS: Attachment II-4. Format of Meteorological Messages.
 
 No bufrtables are needed for running bufrextract.pl, since section 4
 in BUFR message will not be decoded (which also speeds up execution
@@ -251,6 +249,6 @@ Pål Sannes E<lt>pal.sannes@met.noE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2010-2023 MET Norway
+Copyright (C) 2010-2025 MET Norway
 
 =cut
