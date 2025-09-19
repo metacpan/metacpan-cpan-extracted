@@ -1,3 +1,10 @@
+0.134		2025-09-18	T. R. Wyant
+    Update canned magnitude table
+
+    Fix endless loop in almanac() for circumpolar star and perhaps other
+    conditions. Thanks to JohnDenker for reporting this and providing a
+    patch.
+
 0.133		2025-06-02	T. R. Wyant
     Add method next_elevation_extreme_tod(). This is analogous to
     next_elevation(), but returns the earliest (or latest) time the body

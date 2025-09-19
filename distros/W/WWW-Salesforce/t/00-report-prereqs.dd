@@ -1,12 +1,7 @@
 do { my $x = {
-       'build' => {
-                    'requires' => {
-                                    'ExtUtils::MakeMaker' => '0'
-                                  }
-                  },
        'configure' => {
                         'requires' => {
-                                        'ExtUtils::MakeMaker' => '0'
+                                        'Module::Build::Tiny' => '0.034'
                                       }
                       },
        'develop' => {
@@ -27,7 +22,7 @@ do { my $x = {
                                       'Test::Pod::Coverage' => '1.08',
                                       'Test::Pod::Spelling::CommonMistakes' => '1.000',
                                       'Test::Portability::Files' => '0',
-                                      'Test::Spelling' => '0.12',
+                                      'Test::Spelling' => '0.17',
                                       'Test::Version' => '1'
                                     }
                     },
@@ -36,11 +31,13 @@ do { my $x = {
                                       'DateTime' => '0',
                                       'Exporter' => '5.57',
                                       'IO::Socket::SSL' => '1.94',
+                                      'JSON::MaybeXS' => '1.0',
                                       'LWP::Protocol::https' => '6.00',
+                                      'LWP::UserAgent' => '0',
                                       'SOAP::Lite' => '1.0',
                                       'URI' => '0',
                                       'base' => '0',
-                                      'perl' => '5.008001',
+                                      'perl' => '5.016',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use Test::More;
-use Test::Without::Module qw(LWP::Simple::WithCache);
+use Test::Without::Module qw(LWP::Simple::WithCache LWP::Simple);
 use Test::Needs 'Geo::IP', 'JSON::Parse';
 
 use lib 't/lib';

@@ -1,7 +1,7 @@
 /***************************************************************************************
-* Build  MD5 : n1+B4g6Faf1tWqy8Clo44A
-* Build Time : 2025-09-18 13:23:05
-* Version    : 5.090115
+* Build  MD5 : NpL43ebUIKeIw3XcczrC0g
+* Build Time : 2025-09-19 17:23:16
+* Version    : 5.090119
 * Author     : H.Q.Wang
 ****************************************************************************************/
 #include "Log.h"
@@ -16,6 +16,30 @@
 #include <sys/stat.h>
 #include <sys/time.h> // 提供 gettimeofday 用于获取毫秒级时间
 #include <sys/file.h>
+/***************************************************************************************
+颜色				前景色		背景色
+黑色				\033[30m	\033[40m
+红色				\033[31m	\033[41m
+绿色				\033[32m	\033[42m
+黄色				\033[33m	\033[43m
+蓝色				\033[34m	\033[44m
+紫色				\033[35m	\033[45m
+青色				\033[36m	\033[46m
+浅灰				\033[37m	\033[47m
+回退到发行版默认值	\033[39m	\033[49m
+-------------------------------------------------------------------------------
+颜色				背景色
+深灰				\033[100m
+浅红				\033[101m
+浅绿				\033[102m
+黄色				\033[103m
+浅蓝				\033[104m
+浅紫				\033[105m
+蓝绿				\033[106m
+白色				\033[107m
+****************************************************************************************/
+
+//echo -e "\e[1;43;32m背景色，前景色\e[0m"
 
 
 // 日志模块全局状态
@@ -31,7 +55,6 @@ static struct {
 	char log_name[64];
 	char log_dir[128];
 	char log_ext[16];
-	long log_size;
 	
     // 控制台颜色定义
     const char *color_trace;
@@ -41,6 +64,7 @@ static struct {
     const char *color_error;
     const char *color_fatal;
     const char *color_reset;
+	const char *color_unkown;
 } g_config = {
     .options = {
         .level = LOG_LEVEL_INFO,
@@ -62,15 +86,15 @@ static struct {
 	.log_name    = {0},
 	.log_dir     = {0},
 	.log_ext     = {0},
-	.log_size    = 0,
     .log_file    = NULL,
-    .color_trace = "\033[37m",     // 灰色
-    .color_debug = "\033[34m",     // 蓝色
-    .color_info  = "\033[32m",     // 绿色
-    .color_warn  = "\033[33m",     // 黄色
-    .color_error = "\033[31m",     // 红色
-    .color_fatal = "\033[35m",     // 紫色
-    .color_reset = "\033[0m"       // 重置
+    .color_trace = "\033[36m",        // 青色
+    .color_info  = "\033[32m",        // 绿色
+    .color_warn  = "\033[33m",        // 黄色
+    .color_error = "\033[31m",        // 红色
+    .color_fatal = "\033[35m",        // 紫色
+	.color_unkown= "\033[37m",        // 灰色
+    .color_debug = "\033[44;36m",     // 蓝色,青色
+    .color_reset = "\033[0m"          // 重置
 };
 
 // 内部函数声明
@@ -236,12 +260,10 @@ static bool log_open_file() {
     }
     g_config.log_file = fopen(g_config.cur_path, "a+");
     if (g_config.log_file == NULL) {
-        printFail("Failed to open log file %s\n",g_config.cur_path);
+        printf("Failed to open log file %s\n",g_config.cur_path);
 		return false;
     }
 	
-	// 获取当前位置，即文件大小
-    g_config.log_size = ftell(g_config.log_file);
 	return true;
 }
 
@@ -355,13 +377,13 @@ static bool parse_filepath(const char* filepath) {
 
 static const char* log_level_to_string(LogLevel level) {
     switch (level) {
-        case LOG_LEVEL_TRACE: return "TRACE";
-        case LOG_LEVEL_DEBUG: return "DEBUG";
-        case LOG_LEVEL_INFO:  return "INFO ";
-        case LOG_LEVEL_WARN:  return "WARN ";
-        case LOG_LEVEL_ERROR: return "ERROR";
-        case LOG_LEVEL_FATAL: return "FATAL";
-        default:              return "UNKNOWN";
+        case LOG_LEVEL_TRACE: return "TRC";
+        case LOG_LEVEL_DEBUG: return "BUG";
+        case LOG_LEVEL_INFO:  return "INF";
+        case LOG_LEVEL_WARN:  return "WRN";
+        case LOG_LEVEL_ERROR: return "ERR";
+        case LOG_LEVEL_FATAL: return "FAL";
+        default:              return "UNK";
     }
 }
 
@@ -395,7 +417,7 @@ static void log_rotate_file() {
     rename(g_config.cur_path, new_name);
 }
 
-void log_write(LogLevel level, const char *file, int line, const char *format, ...) {
+void log_print(LogLevel level, const char *file, int line, const char *format, ...) {
 	if(level == LOG_LEVEL_OFF) return;
 	if(level != LOG_LEVEL_TEXT)
 	{
@@ -520,3 +542,131 @@ void log_write(LogLevel level, const char *file, int line, const char *format, .
         exit(EXIT_FAILURE);
     }
 }
+
+void log_write(LogLevel level, const char *file, int line, const char *message) {
+	size_t len = strlen(message);
+	if(message == NULL || len == 0) return;
+	if(level == LOG_LEVEL_OFF) return;
+	if(level != LOG_LEVEL_TEXT)
+	{
+		if (level > g_config.options.level) {
+			return;
+		}
+	}
+    char buf[1024];
+    
+    // 格式化日志头
+    int pos = 0;
+    
+	time_t now;
+	struct tm *tm_now;
+	
+	// 获取当前时间
+	time(&now);
+	tm_now = localtime(&now);
+		
+    if (g_config.options.show_timestamp && level != LOG_LEVEL_TEXT) {
+
+		struct timeval tv;
+		gettimeofday(&tv, NULL);
+        pos += strftime(buf + pos, sizeof(buf) - pos, "[%Y-%m-%d %H:%M:%S", tm_now);
+		
+		pos += snprintf(buf + pos,sizeof(buf) - pos,".%03ld]", tv.tv_usec / 1000);
+    }
+    
+    if (g_config.options.show_log_level && level != LOG_LEVEL_TEXT) {
+        const char *color = "";
+        const char *color_reset = "";
+        
+        if (g_config.options.use_color && g_config.options.targets & LOG_TARGET_CONSOLE) {
+            switch (level) {
+                case LOG_LEVEL_TRACE: color = g_config.color_trace; break;
+                case LOG_LEVEL_DEBUG: color = g_config.color_debug; break;
+                case LOG_LEVEL_INFO:  color = g_config.color_info;  break;
+                case LOG_LEVEL_WARN:  color = g_config.color_warn;  break;
+                case LOG_LEVEL_ERROR: color = g_config.color_error; break;
+                case LOG_LEVEL_FATAL: color = g_config.color_fatal; break;
+                default: color = ""; break;
+            }
+            color_reset = g_config.color_reset;
+        }
+        
+        pos += snprintf(buf + pos, sizeof(buf) - pos, "[%s%s%s] ", 
+                       color, log_level_to_string(level), color_reset);
+    }
+    
+    if (g_config.options.show_file_info && level != LOG_LEVEL_TEXT) {
+        pos += snprintf(buf + pos, sizeof(buf) - pos, "(%s:%d) ", file, line);
+    }
+	
+	if (pos + len < sizeof(buf)) {
+		memcpy(buf + pos, message, len);
+		pos += len;
+		buf[pos] = '\0'; // 记得补终止符
+	}
+    
+    // 确保以换行符结尾
+    if (pos >= sizeof(buf) - 2) {
+        pos = sizeof(buf) - 2;
+    }
+    if (buf[pos-1] != '\n') {
+        buf[pos++] = '\n';
+        buf[pos] = '\0';
+    }
+    
+    // 输出到控制台
+    if (g_config.options.targets & LOG_TARGET_CONSOLE) {
+        if (level >= LOG_LEVEL_ERROR) {
+            fputs(buf, stderr);
+        } else {
+            fputs(buf, stdout);
+        }
+    }
+    // 输出到文件
+    if ((g_config.options.targets & LOG_TARGET_FILE) && g_config.log_file != NULL) {
+		fputs(buf, g_config.log_file);
+        
+		switch (g_config.options.mode) {
+			case LOG_MODE_CYCLE:{
+				long size = ftell(g_config.log_file);
+				
+				if (size > g_config.options.max_file_size) {
+					log_close_file();
+					log_rotate_file();
+					log_open_file();
+				}
+				break;
+			}
+			case LOG_MODE_DAILY: {
+				char date_str[9];
+				strftime(date_str, sizeof(date_str), "%Y%m%d", tm_now);
+				if (date_str != g_config.cur_day) {
+					log_close_file();
+					log_open_file();
+				}
+				break;
+			}
+			case LOG_MODE_HOURLY: {
+				char hour_str[3];
+				strftime(hour_str, sizeof(hour_str), "%H", tm_now);
+				if (hour_str != g_config.cur_hour) {
+					log_close_file();
+					log_open_file();
+				}
+				break;
+			}
+		}     
+    }
+    
+    // 立即刷新缓冲
+    if (g_config.options.flush_immediately) {
+        flushLog();
+    }
+    
+    // 如果是FATAL级别，终止程序
+    if (level == LOG_LEVEL_FATAL) {
+        closeLog();
+        exit(EXIT_FAILURE);
+    }
+}
+

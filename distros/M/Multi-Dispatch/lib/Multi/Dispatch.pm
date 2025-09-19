@@ -7,7 +7,7 @@ use re 'eval';
 use mro;
 use Data::Dump;
 
-our $VERSION = '0.000005';
+our $VERSION = '0.000006';
 
 use Keyword::Simple;
 use PPR;
@@ -161,7 +161,7 @@ my $PARAMETER_PARSER = qr{
                 (?: (?<antitype> ! (?&ows) ) )?+
                 (?&PerlQualifiedIdentifier) (?: :: )?+
                 (?: \[ (?>(?&PPR_balanced_squares)) \] )?+
-                (?! (?&ows) => )    # Not a named parameter introducer
+                (?! (?&ows) => | : )    # Not a named parameter introducer
             )
             (?>(?&PerlOWS))
         )?+
@@ -235,7 +235,7 @@ my $PARAMETER_PARSER = qr{
         (?<keyedparam>
             (?>
                 (?<key> (?>(?&PerlIdentifier)) | (?>(?&PerlString)) )?+
-                (?&ows) => (?&ows)
+                (?&ows) (?: => | : ) (?&ows)
                 (?<subparam> (?&parameter) )
             )
         )
@@ -324,7 +324,7 @@ my $KEYEDPARAM_PARSER = qr{
     (?<keyedparam>
         (?>
             (?<key> (?>(?&PerlIdentifier)) | (?>(?&PerlString)) )?+
-            (?&ows) => (?&ows)
+            (?&ows) (?: => | : ) (?&ows)
             (?<subparam> $PARAMETER_PARSER )
         )
     )
@@ -1510,7 +1510,7 @@ Multi::Dispatch - Multiple dispatch for Perl subs and methods
 
 =head1  VERSION
 
-This document describes Multi::Dispatch version 0.000005
+This document describes Multi::Dispatch version 0.000006
 
 
 =head1  SYNOPSIS
@@ -2189,9 +2189,8 @@ must satisfy the constraint: C<< blessed($arg) && $arg->isa('Class::Name') >>.
 That is, the argument must be an object (as defined by C<Scalar::Util::blessed()>
 or C<builtin::blessed()>) of the specified class...or of one of its derived classes.
 
-For example, the following multimethod provides three variants that can
-accept either a Status::Message object, or an Event::Result object or a
-Transaction object:
+For example, the following multimethod provides three variants that can accept
+either a Status::Msg object, or an Event::Result object or a Transaction object:
 
     multimethod update_status(Status::Msg   $m) {...}
     multimethod update_status(Event::Result $r) {...}
@@ -3046,6 +3045,16 @@ Thus, the above examples could be rewritten as:
 Note that the "fat commas" (now prefix operators) are still required...
 to clearly indicate that the missing keys were I<intentionally> omitted
 and that the module is being explicitly requested to figure them out.
+
+A future release of Perl will support a (different) built-in syntax for
+named parameters. Instead of C<< => $param >>, it will use C<:$param>.
+Multi::Dispatch also supports this syntax:
+
+    multi handle( {cmd => 'insert',  :$ID,  :\%data} )
+    {...}       #                    ↑↑↑↑   ↑↑↑↑↑↑↑
+
+    multi handle( {cmd => 'report',  :$ID,  :$fh = *STDOUT} )
+    {...}       #                    ↑↑↑↑   ↑↑↑↑
 
 
 =head3  Slurpy hash destructuring
@@ -4323,12 +4332,9 @@ and handles correctly.
 Multimethod variants cannot at present be successfully composed in
 from an Object::Pad C<role>.
 
-The problem seems to stem from the fact that both Object::Pad and
-Multi::Dispatch are competing to parse the source code and extract their
-keywords in the same compiler pass. So, even though Multi::Dispatch does set up
-an Object::Pad method corresponding to each Multi::Dispatch multimethod that is
-declared within a given role, Object::Pad does not add that method into any
-subsequent classes that compose the role.
+The problem stems from the fact that Object::Pad does not allow methods
+to be injected into a role using typeglob assignmnent (which is how
+Multi::Dispatch adds dispatch methods/subs to a namespace).
 
 Note that, if the class that is composing the role also declares its own variant
 of the same-named multimethod (even if that variant takes different arguments),

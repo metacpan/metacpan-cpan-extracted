@@ -1,0 +1,13 @@
+Changes
+lib/Test/Against/Commit.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+shell/install_perl_only_custom_location
+shell/install_perl_only_from_tarball_custom_location
+t/001-new.t
+Todo
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -14,9 +14,9 @@ build_requires:
   strict: '0'
   warnings: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -33,35 +33,37 @@ no_index:
 provides:
   WWW::Salesforce:
     file: lib/WWW/Salesforce.pm
-    version: '0.304'
+    version: '0.400'
   WWW::Salesforce::Constants:
     file: lib/WWW/Salesforce/Constants.pm
-    version: '0.304'
+    version: '0.400'
   WWW::Salesforce::Deserializer:
     file: lib/WWW/Salesforce/Deserializer.pm
-    version: '0.304'
+    version: '0.400'
   WWW::Salesforce::Serializer:
     file: lib/WWW/Salesforce/Serializer.pm
-    version: '0.304'
+    version: '0.400'
   WWW::Salesforce::Simple:
     file: lib/WWW/Salesforce/Simple.pm
-    version: '0.304'
+    version: '0.400'
 requires:
   DateTime: '0'
   Exporter: '5.57'
   IO::Socket::SSL: '1.94'
+  JSON::MaybeXS: '1.0'
   LWP::Protocol::https: '6.00'
+  LWP::UserAgent: '0'
   SOAP::Lite: '1.0'
   URI: '0'
   base: '0'
-  perl: '5.008001'
+  perl: '5.016'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/p5-salesforce/WWW-Salesforce/issues
   homepage: https://github.com/p5-salesforce/WWW-Salesforce
   repository: https://github.com/p5-salesforce/WWW-Salesforce.git
-version: '0.304'
+version: '0.400'
 x_contributors:
   - 'Christopher Mckay <cmckay@iseek.com.au>'
   - 'Dave Clendenan <dclendenan@gmail.com>'
@@ -71,6 +73,6 @@ x_contributors:
   - 'Martin Gross <martin@pc-coholic.de>'
   - 'Nicholas Foos <nfoos@rm-f.me>'
   - 'redcharlie <creddi@acxiom.com>'
-x_generated_by_perl: v5.34.0
-x_serialization_backend: 'YAML::Tiny version 1.73'
+x_generated_by_perl: v5.36.0
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

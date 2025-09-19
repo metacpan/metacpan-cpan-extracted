@@ -58,5 +58,5 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=CGI-Lingua
   repository: git://github.com/nigelhorne/CGI-Lingua.git
-version: '0.76'
+version: '0.77'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

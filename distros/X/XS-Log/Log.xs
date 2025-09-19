@@ -1,13 +1,15 @@
 /***************************************************************************************
-* Build  MD5 : Xrhks8OILOBduvDSsKMXFA
-* Build Time : 2025-09-18 13:22:45
-* Version    : 5.090111
+* Build  MD5 : XHVtNlnGsjAeaS5+27EHJA
+* Build Time : 2025-09-19 17:23:39
+* Version    : 5.090114
 * Author     : H.Q.Wang
 ****************************************************************************************/
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
-
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdarg.h>
 #include "include/Log.h"
 #include "include/Log.c"
 
@@ -34,105 +36,6 @@ static LogOptions* hv_to_LogOptions(HV* hv) {
 MODULE = XS::Log      PACKAGE = XS::Log
 
 PROTOTYPES: ENABLE
-
-# 常量
-IV 
-LOG_LEVEL_OFF()
-  CODE: 
-    RETVAL = LOG_LEVEL_OFF;
-  OUTPUT: 
-    RETVAL
-
-IV
-LOG_LEVEL_FATAL()
-  CODE: 
-    RETVAL = LOG_LEVEL_FATAL; 
-  OUTPUT: 
-    RETVAL
-
-IV
-LOG_LEVEL_ERROR()
-  CODE: 
-    RETVAL = LOG_LEVEL_ERROR;
-  OUTPUT: 
-    RETVAL
-
-IV
-LOG_LEVEL_WARN()
-  CODE: 
-    RETVAL = LOG_LEVEL_WARN;  
-  OUTPUT: 
-    RETVAL
-
-IV 
-LOG_LEVEL_INFO()
-  CODE: 
-    RETVAL = LOG_LEVEL_INFO;  
-  OUTPUT: 
-    RETVAL
-
-IV 
-LOG_LEVEL_TRACE() 
-  CODE: 
-    RETVAL = LOG_LEVEL_TRACE; 
-  OUTPUT: 
-    RETVAL
-
-IV 
-LOG_LEVEL_DEBUG() 
-  CODE: 
-    RETVAL = LOG_LEVEL_DEBUG; 
-  OUTPUT: 
-    RETVAL
-
-IV 
-LOG_LEVEL_TEXT()  
-  CODE: 
-    RETVAL = LOG_LEVEL_TEXT;  
-  OUTPUT: 
-    RETVAL
-
-IV 
-LOG_MODE_CYCLE()  
-  CODE: 
-    RETVAL = LOG_MODE_CYCLE;  
-  OUTPUT: 
-    RETVAL
-
-IV 
-LOG_MODE_DAILY()  
-  CODE: 
-    RETVAL = LOG_MODE_DAILY;  
-  OUTPUT: 
-    RETVAL
-
-IV 
-LOG_MODE_HOURLY() 
-  CODE: 
-    RETVAL = LOG_MODE_HOURLY; 
-  OUTPUT: 
-    RETVAL
-
-IV 
-LOG_TARGET_CONSOLE() 
-  CODE: 
-    RETVAL = LOG_TARGET_CONSOLE; 
-  OUTPUT: 
-    RETVAL
-
-IV 
-LOG_TARGET_FILE()
-  CODE: 
-    RETVAL = LOG_TARGET_FILE;
-  OUTPUT: 
-    RETVAL
-
-IV 
-LOG_TARGET_SYSLOG()  
-  CODE: 
-    RETVAL = LOG_TARGET_SYSLOG;  
-  OUTPUT: 
-    RETVAL
 
 # 打开/关闭/刷新日志
 bool
@@ -209,185 +112,16 @@ setLogTargets(flag)
     setLogTargets(flag);
 
 void
-printNote(SV* fmt, ...)
-  PPCODE:
+log_write(level, file, line, message)
+    int level
+    SV* file
+    int line
+    SV* message
+  CODE:
     {
-        dXSARGS;
-        if (items < 1) XSRETURN_EMPTY;
+        STRLEN flen, mlen;
+        const char *cfile    = SvPV(file, flen);
+        const char *cmessage = SvPV(message, mlen);
 
-        ENTER; SAVETMPS;
-
-        PUSHMARK(SP);
-        for (int i = 0; i < items; i++) {
-            XPUSHs(ST(i));
-        }
-        PUTBACK;
-
-        int count = call_pv("CORE::sprintf", G_SCALAR);
-
-        SPAGAIN;
-        if (count == 1) {
-            SV* result = POPs;
-            printNote("%s", SvPV_nolen(result));
-        }
-
-        PUTBACK; FREETMPS; LEAVE;
-    }
-
-void
-printBug(SV* fmt, ...)
-  PPCODE:
-    {
-        dXSARGS;
-        if (items < 1) XSRETURN_EMPTY;
-
-        ENTER; SAVETMPS;
-
-        PUSHMARK(SP);
-        for (int i = 0; i < items; i++) {
-            XPUSHs(ST(i));
-        }
-        PUTBACK;
-
-        int count = call_pv("CORE::sprintf", G_SCALAR);
-
-        SPAGAIN;
-        if (count == 1) {
-            SV* result = POPs;
-            printBug("%s", SvPV_nolen(result));
-        }
-
-        PUTBACK; FREETMPS; LEAVE;
-    }
-
-void
-printInf(SV* fmt, ...)
-  PPCODE:
-    {
-        dXSARGS;
-        if (items < 1) XSRETURN_EMPTY;
-
-        ENTER; SAVETMPS;
-
-        PUSHMARK(SP);
-        for (int i = 0; i < items; i++) {
-            XPUSHs(ST(i));
-        }
-        PUTBACK;
-
-        int count = call_pv("CORE::sprintf", G_SCALAR);
-
-        SPAGAIN;
-        if (count == 1) {
-            SV* result = POPs;
-            printInf("%s", SvPV_nolen(result));
-        }
-
-        PUTBACK; FREETMPS; LEAVE;
-    }
-
-void
-printWarn(SV* fmt, ...)
-  PPCODE:
-    {
-        dXSARGS;
-        if (items < 1) XSRETURN_EMPTY;
-
-        ENTER; SAVETMPS;
-
-        PUSHMARK(SP);
-        for (int i = 0; i < items; i++) {
-            XPUSHs(ST(i));
-        }
-        PUTBACK;
-
-        int count = call_pv("CORE::sprintf", G_SCALAR);
-
-        SPAGAIN;
-        if (count == 1) {
-            SV* result = POPs;
-            printWarn("%s", SvPV_nolen(result));
-        }
-
-        PUTBACK; FREETMPS; LEAVE;
-    }
-
-void
-printErr(SV* fmt, ...)
-  PPCODE:
-    {
-        dXSARGS;
-        if (items < 1) XSRETURN_EMPTY;
-
-        ENTER; SAVETMPS;
-
-        PUSHMARK(SP);
-        for (int i = 0; i < items; i++) {
-            XPUSHs(ST(i));
-        }
-        PUTBACK;
-
-        int count = call_pv("CORE::sprintf", G_SCALAR);
-
-        SPAGAIN;
-        if (count == 1) {
-            SV* result = POPs;
-            printErr("%s", SvPV_nolen(result));
-        }
-
-        PUTBACK; FREETMPS; LEAVE;
-    }
-
-void
-printText(SV* fmt, ...)
-  PPCODE:
-    {
-        dXSARGS;
-        if (items < 1) XSRETURN_EMPTY;
-
-        ENTER; SAVETMPS;
-
-        PUSHMARK(SP);
-        for (int i = 0; i < items; i++) {
-            XPUSHs(ST(i));
-        }
-        PUTBACK;
-
-        int count = call_pv("CORE::sprintf", G_SCALAR);
-
-        SPAGAIN;
-        if (count == 1) {
-            SV* result = POPs;
-            printText("%s", SvPV_nolen(result));
-        }
-
-        PUTBACK; FREETMPS; LEAVE;
-    }
-
-
-
-void
-printFail(SV* fmt, ...)
-  PPCODE:
-    {
-        dXSARGS;
-        if (items < 1) XSRETURN_EMPTY;
-
-        ENTER; SAVETMPS;
-
-        PUSHMARK(SP);
-        for (int i = 0; i < items; i++) {
-            XPUSHs(ST(i));
-        }
-        PUTBACK;
-
-        int count = call_pv("CORE::sprintf", G_SCALAR);
-
-        SPAGAIN;
-        if (count == 1) {
-            SV* result = POPs;
-            printFail("%s", SvPV_nolen(result));
-        }
-
-        PUTBACK; FREETMPS; LEAVE;
+        log_write((LogLevel)level, cfile, line, cmessage);
     }

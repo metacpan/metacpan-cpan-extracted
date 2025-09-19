@@ -14,7 +14,7 @@ use Astro::Coord::ECI::Utils qw{ __default_station
 use Exporter ();
 use POSIX qw{ floor };
 
-our $VERSION = '0.133';
+our $VERSION = '0.134';
 
 our @EXPORT_OK = qw{
     almanac almanac_hash
@@ -47,8 +47,9 @@ sub almanac {
 	$obj->universal( $start );
 	while ( 1 ) {
 	    my ( $time, $which ) = $obj->$method ( @$args );
-	    $time >= $end
-		and last;
+	    defined $time	# Thanks to JohnDenker
+		and $time < $end
+		or last;
 	    defined ( my $text = ARRAY_REF eq ref $descr ?
 		$descr->[ $which ] : $self->$descr( $which ) )
 		or next;

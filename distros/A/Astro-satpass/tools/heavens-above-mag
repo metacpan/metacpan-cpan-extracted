@@ -13,7 +13,7 @@ use LWP::UserAgent;
 use Pod::Usage;
 use YAML 1.25 qw{ Dump Load };
 
-our $VERSION = '0.133';
+our $VERSION = '0.134';
 
 use constant CACHE_DIR	=> 'cache';
 

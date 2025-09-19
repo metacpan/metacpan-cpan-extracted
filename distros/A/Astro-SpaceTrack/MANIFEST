@@ -29,7 +29,6 @@ t/basic.t
 t/complete.t
 t/data/Mock-LWP-UserAgent/resp.json
 t/file.dat
-t/query_amsat.t
 t/query_celestrak.t
 t/query_mccants.t
 t/query_misc.t

@@ -58,5 +58,6 @@ t/tlib/Where_Undef.pm
 t/type_compounds.t
 t/type_prefixes.t
 t/type_where.t
+t/hashref_slurpy_and_named_colon.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

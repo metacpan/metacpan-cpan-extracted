@@ -64,7 +64,7 @@ complete( 'celestrak o', [ qw{ oneweb orbcomm other other-comm } ] );
 complete( 'celestrak_supplemental -', [ qw{ --file --format --match --no-match
 	--no-rms --query --rms } ] );
 
-complete( 'celestrak_supplemental o', [ qw{ oneweb } ] );
+complete( 'celestrak_supplemental o', [ qw{ oneweb orbcomm } ] );
 
 complete( 'favorite -', [ qw{ --format --json --no-json } ] );
 

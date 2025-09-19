@@ -1,0 +1,73 @@
+{
+   "abstract" : "Test CPAN modules against Perl dev releases",
+   "author" : [
+      "James E Keenan (jkeenan@cpan.org)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Test-Against-Commit",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Devel::CheckBin" : "0",
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Archive::Tar" : "0",
+            "CPAN::cpanminus::reporter::RetainReports" : "0.05",
+            "Carp" : "0",
+            "Data::Dump" : "0",
+            "File::Basename" : "0",
+            "File::Fetch" : "0",
+            "File::Path" : "2.15",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "JSON" : "0",
+            "Path::Tiny" : "0",
+            "Text::CSV_XS" : "0",
+            "perl" : "5.014000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Test::RequiresInternet" : "0",
+            "Test::Simple" : "0.44"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jkeenan/perl5-test-cpan-against-commit/issues"
+      },
+      "homepage" : "https://thenceforward.net/perl/modules/Test-Against-Commit/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jkeenan/perl5-test-cpan-against-commit.git",
+         "web" : "https://github.com/jkeenan/perl5-test-cpan-against-commit"
+      }
+   },
+   "version" : "0.15",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

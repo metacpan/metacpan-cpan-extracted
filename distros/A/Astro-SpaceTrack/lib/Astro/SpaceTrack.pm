@@ -61,9 +61,6 @@ providing orbital elements in a number of formats. The C<celestrak()>
 and C<celestrak_supplemental()> methods will track this, growing new
 arguments as needed.
 
-The API-based service appears not to provide OID lists. Accordingly, as
-of version 0.169 every use of the C<direct> attribute is fatal.
-
 =head2 DEPRECATION NOTICE: IRIDIUM STATUS
 
 As of version 0.137, Iridium status format C<'mccants'> is fully
@@ -133,7 +130,7 @@ use Exporter;
 
 our @ISA = qw{ Exporter };
 
-our $VERSION = '0.169';
+our $VERSION = '0.170';
 our @EXPORT_OK = qw{
     shell
 
@@ -418,10 +415,13 @@ my %catalogs = (	# Catalog names (and other info) for each source.
 	    match	=> 1,
 	},
 	# Removed 2024-12-25
-	#orbcomm		=> {
-	#    name	=> 'Orbcomm (no RMS or match data)',
-	#    # source	=> 'Orbcomm-TLE',
-	#},
+	# Added back 2025-07-28, with RMS and match data
+	orbcomm		=> {
+	    name	=> 'Orbcomm (no RMS or match data)',
+	    # source	=> 'Orbcomm-TLE',
+	    rms		=> 1,
+	    match	=> 1,
+	},
 	planet		=> {
 	    name	=> 'Planet (no, not Mercury etc)',
 	    # source	=> 'Planet-E',
@@ -684,7 +684,6 @@ my %mutator = (	# Mutators for the various attributes.
     banner => \&_mutate_attrib,
     cookie_expires => \&_mutate_spacetrack_interface,
     cookie_name => \&_mutate_spacetrack_interface,
-    direct => \&_mutate_attrib,
     domain_space_track => \&_mutate_spacetrack_interface,
     dump_headers => \&_mutate_dump_headers,	# Dump all HTTP headers. Undocumented and unsupported.
     fallback => \&_mutate_attrib,
@@ -782,7 +781,6 @@ sub new {
 
     my $self = {
 	banner => 1,	# shell () displays banner if true.
-	direct => 1,	# Direct-fetch from redistributors
 	dump_headers => DUMP_NONE,	# No dumping.
 	fallback => 0,	# Do not fall back if primary source offline
 	filter => 0,	# Filter mode.
@@ -854,15 +852,18 @@ sub new {
 
 =item $resp = $st->amsat ()
 
+B<Note> that this method is non-functional as of September 8 2025
+(probably earlier), because Amsat has gone to a "humans-only" policy for
+their web site. It will be put through the usual deprecation cycle and
+removed.
+
 This method downloads current orbital elements from the Radio Amateur
 Satellite Corporation's web page, L<https://www.amsat.org/>. This lists
 satellites of interest to radio amateurs, and appears to be updated
 weekly.
 
-No Space Track account is needed to access this data, even if the
-'direct' attribute is false. As of version 0.150 the setting of
-the 'with_name' attribute is honored even if the 'direct' attribute is
-true.
+No Space Track account is needed to access this data. As of version
+0.150 the setting of the 'with_name' attribute is honored.
 
 You can specify options as either command-type options (e.g.
 C<< amsat( '-file', 'foo.dat' ) >>) or as a leading hash reference (e.g.
@@ -915,6 +916,8 @@ sub _amsat_opts {	## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
 
 sub amsat {
     my ( $self, @args ) = @_;
+
+    $self->_deprecation_notice( 'amsat' );
 
     ( my $opt, @args ) = _parse_args( @args );
 
@@ -1159,10 +1162,6 @@ sub __catalog {
 =for html <a name="celestrak"></a>
 
 =item $resp = $st->celestrak ($name);
-
-B<Note:> As of version 0.150 of this module a false value of the
-C<'direct'> attribute is unsupported. See L<CELESTRAK API|/CELESTRAK API>
-above for details.
 
 As of version 0.158 this version is an interface to the CelesTrak API.
 The argument is the argument of a Celestrak query (see
@@ -1683,8 +1682,7 @@ content_source value of C<'mccants'>.
 If the C<content_type()> method returns C<'orbit'>, you can expect
 content-source values of C<'amsat'>, C<'celestrak'>, C<'mccants'>,
 or C<'spacetrack'>, corresponding to the actual source
-of the TLE data.  Note that the C<celestrak()> method may return a
-content_type of C<'spacetrack'> if the C<direct> attribute is false.
+of the TLE data.
 
 If the content_type method returns C<'quicksat'>, you can expect a
 content_source value of C<'mccants'>.
@@ -5161,7 +5159,7 @@ sub _check_cookie_generic {
 
 {
 
-    use constant _MASTER_IRIDIUM_DEPRECATION_LEVEL	=> 1;
+    use constant _MASTER_IRIDIUM_DEPRECATION_LEVEL	=> 2;
 
     my %deprecate = (
 	celestrak => {
@@ -5172,8 +5170,9 @@ sub _check_cookie_generic {
 #	    '--sort'		=> 3,
 #	    '--start_epoch'	=> 3,
 	},
+	amsat		=> 0,
 	attribute	=> {
-	    direct		=> 3,
+#	    direct		=> 3,
 	    url_iridium_status_kelso	=> 3,
 	    url_iridium_status_mccants	=> 3,
 	    url_iridium_status_sladen	=> _MASTER_IRIDIUM_DEPRECATION_LEVEL,
@@ -6768,16 +6767,6 @@ This attribute specifies the name of the session cookie. You should not
 need to change this in normal circumstances, but if Space Track changes
 the name of the session cookie you can use this to get you going again.
 
-=item direct (Boolean)
-
-This attribute specifies that orbital elements should be fetched
-directly from the redistributer This attribute is deprecated, and as of
-version 0.150 its value is ignored. As of version 0.167, use of this
-attribute will produce a warning, After a further 6 months, use of it
-will be fatal.
-
-The default is true (i.e. 1).
-
 =item domain_space_track (string)
 
 This attribute specifies the domain name of the Space Track web site.
@@ -7004,8 +6993,8 @@ The default is C<undef>, which leaves the functionality disabled.
 
 This attribute specifies whether the returned element sets should
 include the common name of the body (three-line format) or not
-(two-line format). It is ignored if the 'direct' attribute is true;
-in this case you get whatever the redistributer provides.
+(two-line format). This attribute may be ignored; see the individual
+method for details.
 
 The default is false (i.e. 0).
 

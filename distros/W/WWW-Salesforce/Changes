@@ -1,5 +1,18 @@
 Revision history for Perl extension WWW-Salesforce
 
+0.400     2025-09-18
+    - Fix some typos in the query documentation
+    - Add a new login type, OAuth2.0 Username-Password
+    - Add some documentation to show that the SOAP login() method is going away.
+    - Allow multiple spellings of some of the constructor arguments
+    - Add a test suite to test logging in with the new OAuth2.0 way
+    - Update our test Salesforce instance login information.
+    - Bump Perl requirement to v5.16
+    - Add LWP::UserAgent as a prereq 
+    - Add JSON::MaybeXS as a prereq
+    - Set the default version to be 64.0
+    - Move from ExtUtils::MakeMaker to Module::Build::Tiny
+
 0.304     2021-09-09
     - Update to a newer dzil config
     - Re-document a bit to fix some misconceptions

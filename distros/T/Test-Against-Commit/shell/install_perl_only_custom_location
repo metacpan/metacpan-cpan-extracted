@@ -1,0 +1,115 @@
+#!/bin/sh
+
+# NAME: install_perl_only_custom_location
+#
+# OBJECTIVE:
+#
+# Installs a perl executable at a user-specified location for testing purposes.
+# Executable is built from a git branch, commit or tag of the Perl 5 core distribution.
+# Does not install man pages, CPAN modules or other utilities such as 'cpanm'.
+
+# PREREQUISITES:
+
+# I.   Programs:  'perl', 'git', 'make'
+
+# II.  Environmental variables:
+
+#      $SECONDARY_CHECKOUT_DIR
+
+#        A directory holding a git checkout of perl.  This is labelled "secondary"
+#        in the belief that you will not want to risk harm to the git checkout you
+#        use for everyday Perl 5 core development.  Example: ~/gitwork/perl2/
+
+#      $TEST_JOBS
+
+#        An integer such as 4 or 8, appropriate to the number of cores in your machine,
+#        which will determine how many jobs 'make' will attempt to run in parallel.
+
+# III. USAGE: 2 required command-line arguments, 1 optional command-line argument
+#
+#   $ install_perl_only_custom_location \
+#         <name> \
+#         <installation_directory> \
+#         <custom_configure_arguments>
+
+# <name> must be one of a git branch, git tag, or git commit ID (SHA) which
+# can be subject to a git checkout from the repository in
+# $SECONDARY_CHECKOUT_DIR.
+
+# <installation_directory> must be the name of an already existing directory
+# on disk to which the user has write-access.
+
+# <custom_configure_arguments>:  Optional.  Any switches for ./Configure above and beyond
+# the basic "-des -Dusedevel".  For example, to build a threaded perl the user
+# would supply a third argument "-Dusethreads".
+
+# Adapted from Florian Ragwitz and Karl Williamson
+# Reference: https://en.wikibooks.org/wiki/Bourne_Shell_Scripting/Control_flow
+
+####################
+
+# Don't let me use uninit vars, and any error is a problem
+set -u
+set -e
+# Print expanded commands
+set -x
+
+if [ ! -d $SECONDARY_CHECKOUT_DIR ]; then
+  echo "$0: FAILED: could not locate SECONDARY_CHECKOUT_DIR"
+  exit 1
+fi
+
+if [ "$#" -eq 2 ]; then
+    BRANCH=$1;
+    INSTALLDIR=$2
+    CONFIG_ARGS=
+elif [ "$#" -eq 3 ]; then
+    BRANCH=$1;
+    INSTALLDIR=$2
+    CONFIG_ARGS=$3
+else
+  echo "$0: FAILED: wrong number of arguments"
+  exit 1
+fi
+
+if [ ! -d $INSTALLDIR ]; then
+  echo "$0: FAILED: could not locate INSTALLDIR"
+  exit 1
+fi
+
+echo "Handling branch: $BRANCH"
+
+# Move to $INSTALLDIR and clean out any existing subdirectory named $BRANCH.
+# Then create a (new) subdirectory named $BRANCH.
+
+cd $INSTALLDIR
+test -d $BRANCH && rm -rfv $BRANCH
+BRANCHDIR="$INSTALLDIR/$BRANCH"
+mkdir -p $BRANCHDIR
+cd $SECONDARY_CHECKOUT_DIR
+git clean -dfxq
+git fetch --prune origin
+git checkout $BRANCH
+if [ "$BRANCH" = 'blead' ]; then
+    git rebase origin/blead
+fi
+
+# configure so as to install under $BRANCHDIR; don't bother with man pages
+# configure and build quietly; redirect STDOUT to /dev/null
+
+CONFIGURE_COMMAND="./Configure -des -Dusedevel"
+if [ -n $CONFIG_ARGS ]; then
+    CONFIGURE_COMMAND="${CONFIGURE_COMMAND} $CONFIG_ARGS"
+fi
+CONFIGURE_COMMAND="${CONFIGURE_COMMAND} -Uversiononly -Dprefix=${BRANCHDIR} -Dman1dir=none -Dman3dir=none"
+
+echo "Quietly configuring a perl for installation under $BRANCHDIR"
+
+$CONFIGURE_COMMAND 1>/dev/null
+
+echo "Quietly building and installing a perl for installation under $BRANCHDIR"
+make -j${TEST_JOBS} install 1>/dev/null
+
+THISPERL="$BRANCHDIR/bin/perl -I$BRANCHDIR/lib"
+$THISPERL -v | head -n 2 | tail -n 1
+

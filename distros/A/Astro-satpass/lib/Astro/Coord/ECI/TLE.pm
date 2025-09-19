@@ -229,7 +229,7 @@ package Astro::Coord::ECI::TLE;
 use strict;
 use warnings;
 
-our $VERSION = '0.133';
+our $VERSION = '0.134';
 
 use base qw{ Astro::Coord::ECI Exporter };
 
@@ -8180,7 +8180,7 @@ sub _next_elevation_screen {
 #
 #   $ tools/heavens-above-mag --celestrak --update
 #
-# Last-Modified: Thu, 08 May 2025 21:26:45 GMT
+# Last-Modified: Sun, 07 Sep 2025 20:59:52 GMT
 
 %magnitude_table = (
   '00694' =>   2.7, # ATLAS CENTAUR 2 R/B
@@ -8211,9 +8211,7 @@ sub _next_elevation_screen {
   '13403' =>   4.2, # SL-3 R/B
   '13553' =>   4.7, # SL-14 R/B
   '13819' =>   4.7, # SL-3 R/B
-  '14032' =>   3.7, # COSMOS 1455
   '14208' =>   4.2, # SL-3 R/B
-  '14372' =>   4.7, # COSMOS 1500
   '14699' =>   4.2, # COSMOS 1536
   '14820' =>   4.7, # SL-14 R/B
   '15483' =>   4.7, # SL-8 R/B
@@ -8312,11 +8310,9 @@ sub _next_elevation_screen {
   '28931' =>   3.2, # ALOS
   '28932' =>   3.7, # H-2A R/B
   '29228' =>   3.7, # RESURS DK-1
-  '29252' =>   4.7, # GENESIS 1
   '29507' =>   2.7, # CZ-4B R/B
   '31114' =>   3.2, # CZ-2C R/B
   '31598' =>   3.7, # SKYMED 1
-  '31789' =>   5.7, # GENESIS 2
   '31792' =>   3.2, # COSMOS 2428
   '31793' =>   2.7, # SL-16 R/B
   '33504' =>   5.3, # KORONAS-FOTON

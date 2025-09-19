@@ -16,7 +16,7 @@ CGI::Lingua - Create a multilingual web page
 
 # VERSION
 
-Version 0.76
+Version 0.77
 
 # SYNOPSIS
 
@@ -251,7 +251,6 @@ Nigel Horne, `<njh at nigelhorne.com>`
 # BUGS
 
 Please report any bugs or feature requests to the author.
-This module is provided as-is without any warranty.
 
 If HTTP\_ACCEPT\_LANGUAGE is 3 characters, e.g., es-419,
 sublanguage() returns undef.
@@ -268,6 +267,7 @@ This means that if you support languages at a lower priority, it may be missed.
 # SEE ALSO
 
 - Testing Dashboard [https://nigelhorne.github.io/CGI-Lingua/coverage/](https://nigelhorne.github.io/CGI-Lingua/coverage/)
+- VWF - Versatile Web Framework [https://github.com/nigelhorne/vwf](https://github.com/nigelhorne/vwf)
 - [HTTP::BrowserDetect](https://metacpan.org/pod/HTTP%3A%3ABrowserDetect)
 - [I18N::AcceptLangauge](https://metacpan.org/pod/I18N%3A%3AAcceptLangauge)
 - [Locale::Country](https://metacpan.org/pod/Locale%3A%3ACountry)

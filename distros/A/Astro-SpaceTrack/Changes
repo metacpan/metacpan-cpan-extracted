@@ -1,3 +1,12 @@
+0.170		2025-09-18	T. R. Wyant
+    All iridium functionality now warns (at least) on all uses.
+
+    Deprecate amsat(), since they have gone to "humans-only".
+
+    Remove the 'direct' attribute.
+
+    Add back Orbcomm Celestrak supplemental data.
+
 0.169		2025-06-03	T. R. Wyant
     Add SECURITY policy.
 

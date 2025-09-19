@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use CGI::Info;
+use Log::Abstraction;
 use Test::Most;
 
 use lib 't/lib';
@@ -53,10 +54,10 @@ if(-e 't/online.enabled') {
 
 	$ENV{'HTTP_ACCEPT_LANGUAGE'} = 'en-gb,en;q=0.5';
 	delete $ENV{'REMOTE_ADDR'};
-	$l = CGI::Lingua->new(
+	$l = CGI::Lingua->new({
 		supported => ['en', 'fr', 'en-gb', 'en-us'],
 		dont_use_ip => 1,
-	);
+	});
 	ok(defined $l);
 	ok($l->isa('CGI::Lingua'));
 	ok($l->language() eq 'English');
@@ -70,7 +71,7 @@ if(-e 't/online.enabled') {
 	ok($l->language() eq 'Unknown');
 	ok(defined $l->requested_language());
 	if($l->requested_language() ne 'Unknown') {
-		diag('Expected Unknown got "' . $l->requested_language() . '"');
+		diag('Expected Unknown got "', $l->requested_language(), '"');
 	}
 	ok($l->requested_language() eq 'Unknown');
 
@@ -93,12 +94,12 @@ if(-e 't/online.enabled') {
 	ok($l->language_code_alpha2() eq 'en');
 	ok(!defined($l->sublanguage_code_alpha2()));
 	if($l->language() ne 'English') {
-		diag('Expected English got "' . $l->requested_language() . '"');
+		diag('Expected English got "', $l->requested_language(), '"');
 	}
 	ok($l->name() eq 'English');
 	ok(defined $l->requested_language());
 	if($l->requested_language() !~ /English/) {
-		diag('Expected English requested language, got "' . $l->requested_language() . '"');
+		diag('Expected English requested language, got "', $l->requested_language(), '"');
 	}
 	ok($l->requested_language() =~ /English/);
 	ok($l->country() eq 'gb');
@@ -156,17 +157,26 @@ if(-e 't/online.enabled') {
 	ok(!defined($l->sublanguage_code_alpha2()));
 	ok($l->country() eq 'no');
 	if($l->country() ne 'no') {
-		diag('Expected no got "' . $l->country() . '"');
+		diag('Expected no got "', $l->country(), '"');
 	}
 	ok($l->locale()->code_alpha2() eq 'no');
 
 	delete($ENV{'HTTP_ACCEPT_LANGUAGE'});
 	{
+		delete local $ENV{'GEOIP_COUNTRY_CODE'};
+		delete local $ENV{'HTTP_CF_IPCOUNTRY'};
 		local $ENV{'REMOTE_ADDR'} = 'a.b.c.d';
 		$l = new_ok('CGI::Lingua' => [
-			supported => ['en', 'fr']
+			supported => ['en', 'fr'],
 		]);
-		local $SIG{__WARN__} = sub { die $_[0] };
+		# Force the logger, in case a logger is defined in a config file that Config::Abstraction reads
+		$l->{'logger'} = Log::Abstraction->new({
+			'level' => 'warn',
+			'logger' => sub {
+				die $_[0]->{'message'}->[0];
+			}
+		});
+		local $SIG{__WARN__} = sub { die $_[0] };	# Probably not needed
 		throws_ok { $l->language() } qr/a\.b\.c\.d isn't a valid IP address/, 'Detects invalid IP address';
 		ok(defined($l->requested_language()));
 		ok($l->requested_language() eq 'Unknown');

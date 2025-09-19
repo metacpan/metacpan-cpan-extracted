@@ -1,27 +1,51 @@
 package XS::Log;
-#Build  MD5 : drVn1p6ygZRWEQSVolq0tg
-#Build Time : 2025-09-18 13:23:17
-our $VERSION = 1.04;
-our $BUILDDATE = "2025-09-18";  #Build Time: 13:23:17
+#Build  MD5 : 247/pl1Xcz3CA4JSyzAy3g
+#Build Time : 2025-09-19 17:22:30
+our $VERSION = 1.06;
+our $BUILDDATE = "2025-09-19";  #Build Time: 17:22:30
 use strict;
 use warnings;
+use constant { 
+    #颜色设置
+    LOG_LEVEL_OFF		=> 0,		# 关闭日志
+	LOG_LEVEL_FATAL		=> 1,    	# 严重错误
+	LOG_LEVEL_ERROR		=> 2,    	# 错误信息
+	LOG_LEVEL_WARN		=> 3,    	# 警告信息
+	LOG_LEVEL_INFO		=> 4,    	# 一般信息
+    LOG_LEVEL_TRACE		=> 5,    	# 最详细的日志信息
+    LOG_LEVEL_DEBUG		=> 6,    	# 调试信息
+	LOG_LEVEL_TEXT		=> 7,    	# 原文输出
+    LOG_MODE_CYCLE		=> 0,
+	LOG_MODE_DAILY		=> 1,
+	LOG_MODE_HOURLY		=> 2,
+    LOG_TARGET_CONSOLE	=> 0x01,
+	LOG_TARGET_FILE		=> 0x02,
+	LOG_TARGET_SYSLOG	=> 0x04
+};
 use XSLoader;
 require Exporter;
 our @ISA = qw(Exporter);
 
 our @EXPORT_OK = qw(
     openLog closeLog flushLog setLogOptions setLogColor setLogMode setLogTargets setLogLevel
-    printNote printBug printInf printWarn printErr printFail printText
-    LOG_LEVEL_OFF LOG_LEVEL_FATAL LOG_LEVEL_ERROR LOG_LEVEL_WARN LOG_LEVEL_INFO
-    LOG_LEVEL_TRACE LOG_LEVEL_DEBUG LOG_LEVEL_TEXT
-    LOG_MODE_CYCLE LOG_MODE_DAILY LOG_MODE_HOURLY
-    LOG_TARGET_CONSOLE LOG_TARGET_FILE LOG_TARGET_SYSLOG
+    log_write printNote printBug printInf printWarn printErr printFail printLog
+	LOG_LEVEL_OFF LOG_LEVEL_FATAL LOG_LEVEL_ERROR LOG_LEVEL_WARN LOG_LEVEL_INFO LOG_LEVEL_TRACE LOG_LEVEL_DEBUG LOG_LEVEL_TEXT
+	LOG_MODE_CYCLE LOG_MODE_DAILY LOG_MODE_HOURLY 
+	LOG_TARGET_CONSOLE LOG_TARGET_FILE LOG_TARGET_SYSLOG
 );
 # 定义导出标签 :all
 our %EXPORT_TAGS = (
     all => \@EXPORT_OK,
 );
 XSLoader::load('XS::Log', $VERSION);
+
+sub printNote {my ($fmt, @args) = @_;my $msg = sprintf($fmt, @args);my ($pkg, $file, $line) = caller;log_write(LOG_LEVEL_TRACE,$file, $line,$msg);}
+sub printBug  {my ($fmt, @args) = @_;my $msg = sprintf($fmt, @args);my ($pkg, $file, $line) = caller;log_write(LOG_LEVEL_DEBUG,$file, $line,$msg);}
+sub printInf  {my ($fmt, @args) = @_;my $msg = sprintf($fmt, @args);my ($pkg, $file, $line) = caller;log_write(LOG_LEVEL_INFO, $file, $line,$msg);}
+sub printWarn {my ($fmt, @args) = @_;my $msg = sprintf($fmt, @args);my ($pkg, $file, $line) = caller;log_write(LOG_LEVEL_WARN, $file, $line,$msg);}
+sub printErr  {my ($fmt, @args) = @_;my $msg = sprintf($fmt, @args);my ($pkg, $file, $line) = caller;log_write(LOG_LEVEL_ERROR,$file, $line,$msg);}
+sub printFail {my ($fmt, @args) = @_;my $msg = sprintf($fmt, @args);my ($pkg, $file, $line) = caller;log_write(LOG_LEVEL_FATAL,$file, $line,$msg);}
+sub printLog  {my ($fmt, @args) = @_;my $msg = sprintf($fmt, @args);my ($pkg, $file, $line) = caller;log_write(LOG_LEVEL_TEXT, $file, $line,$msg);}
 1;
 
 __END__
@@ -60,6 +84,7 @@ B<XS::Log>是高效快速的日志模块，纯c语言开发，快速高效的IO�
  
  openLog("test.log", \%opt);
  
+ printLog($msg);                    #原文输出
  printInf("This is info");
  printWarn("This is warning");
  printErr("This is error");
@@ -93,8 +118,25 @@ B<XS::Log>是高效快速的日志模块，纯c语言开发，快速高效的IO�
 =head2 日志模式
 
  LOG_MODE_CYCLE     0       #循环日志模式（默认）
+                            #设置日志：/temp/log/my.log
+                            #循环日志：/temp/log/my.1.log
+                            #        /temp/log/my.2.log
+                            #        /temp/log/my.3.log
+                            #        ......
+
  LOG_MODE_DAILY     1       #按天日志模式
+                            #设置日志：/temp/log/my.log
+                            #循环日志：/temp/log/20250101/my.log
+                            #        /temp/log/20250102/my.log
+                            #        /temp/log/20250103/my.log
+                            #        ......
+
  LOG_MODE_HOURLY    2       #按小时日志模式
+                            #设置日志：/temp/log/my.log
+                            #循环日志：/temp/log/20250101/my.00.log
+                            #        /temp/log/20250101/my.01.log
+                            #        /temp/log/20250101/my.02.log
+                            #        ......
 
 =head2 日志输出目标选项
 
@@ -117,8 +159,8 @@ B<XS::Log>是高效快速的日志模块，纯c语言开发，快速高效的IO�
   show_timestamp;        #是否显示时间戳，默认：1
   show_log_level;        #是否显示日志级别，默认：1
   show_file_info;        #是否显示文件信息，默认：0
-  max_file_size;         #最大文件大小(KB)，0表示不限制
-  max_files;             #最大文件数量，0表示不限制，默认100M
+  max_file_size;         #最大文件大小(KB)，0表示不限制，注意：mode=LOG_MODE_CYCLE有效
+  max_files;             #最大文件数量，0表示不限制，默认100M，注意：mode=LOG_MODE_CYCLE有效
   flush_immediately;     #每次记录后立即刷新，默认：0
 
 =head2 closeLog
@@ -129,7 +171,7 @@ B<XS::Log>是高效快速的日志模块，纯c语言开发，快速高效的IO�
 
   flushLog();           #flush日志缓存
 
-=head2 setLogConf 
+=head2 setLogOptions 
 
   setLogOptions($opt_key,$opt_val);	#设置options参数
 
@@ -154,13 +196,120 @@ B<XS::Log>是高效快速的日志模块，纯c语言开发，快速高效的IO�
   printInf($msg);
   printWarn($msg);
   printErr($msg);
-  printFail($msg);      #注意：谨慎使用，会直接exit退出程序
+  printFail($msg);              #注意：谨慎使用，会直接exit退出程序
   printNote($msg);
-  printText($msg);      #原文输出
+  printLog($msg);               #原文输出
 
-支持：%的方式格式化输出:
+  printInf("%s\n",$msg);        #支持：%的方式格式化输出
 
-  printInf("%s\n",$msg);
+=head1 使用例子
+
+=head2 例子1:/home/user/temp1.pl
+
+直接使用，不输出文件：
+
+  use strict;
+  use warnings;
+  use XS::Log qw(:all);
+  
+  printInf("This is info1\n");
+  printInf("This is info2\n");
+  printInf("This is info3\n");
+  printInf("This is info4\n");
+  printInf("This is info5\n");
+  printWarn("This is warning1\n");
+  printWarn("This is warning2\n");
+  printErr("This is error1\n");
+  printErr("This is error2\n");
+  
+  setLogOptions("use_color",0);                      #等效setLogColor(0);
+  setLogOptions("show_file_info",0);
+  setLogOptions("level",LOG_LEVEL_DEBUG);            #等效setLogLevel(LOG_LEVEL_DEBUG);
+  
+  my $user = "Alice";
+  my $val  = 42;
+  
+  printInf("Hello %s, value=%d\n", $user, $val);
+  printBug("Hello %s, value=%d\n", $user, $val);
+  printBug("Hello %s, value=%d\n", $user, $val);
+  printBug("Hello %s, value=%d\n", $user, $val);
+  printErr("File not found: %s\n", "/tmp/test.txt");
+
+屏幕输出结果：
+
+  [2025-09-18 18:44:38.983][INFO ] This is info1
+  [2025-09-18 18:44:38.983][INFO ] This is info2
+  [2025-09-18 18:44:38.983][INFO ] This is info4
+  [2025-09-18 18:44:38.983][INFO ] This is info5
+  [2025-09-18 18:44:38.983][WARN ] This is warning1
+  [2025-09-18 18:44:38.983][WARN ] This is warning2
+  [2025-09-18 18:44:38.983][ERROR] This is error1
+  [2025-09-18 18:44:38.983][ERROR] This is error2
+  [2025-09-18 18:44:38.983][INFO ] (/home/user/temp1.pl:38) Hello Alice, value=42
+  [2025-09-18 18:44:38.983][DEBUG] (/home/user/temp1.pl:39) Hello Alice, value=42
+  [2025-09-18 18:44:38.983][DEBUG] (/home/user/temp1.pl:40) Hello Alice, value=42
+  [2025-09-18 18:44:38.983][DEBUG] (/home/user/temp1.pl:41) Hello Alice, value=42
+  [2025-09-18 18:44:38.983][ERROR] (/home/user/temp1.pl:42) File not found: /tmp/test.txt
+
+=head2 例子2:/home/user/temp2.pl
+
+同时输出到文件和屏幕：
+
+  use strict;
+  use warnings;
+  use XS::Log qw(:all);
+
+  my %opt = (
+   level             => LOG_LEVEL_INFO,
+   mode              => LOG_MODE_CYCLE,
+   targets           => LOG_TARGET_CONSOLE|LOG_TARGET_FILE,        #同时输出到文件和屏幕
+   use_color         => 1,
+   show_timestamp    => 1,
+   show_log_level    => 1,
+   show_file_info    => 0,
+   max_file_size     => 1024*1024*10,                              #LOG_MODE_CYCLE 有效
+   max_files         => 5,                                         #LOG_MODE_CYCLE 有效
+   flush_immediately => 1,
+  );
+
+  openLog("/home/user/log/test.log", \%opt);
+  
+  printInf("This is info1\n");
+  printInf("This is info2\n");
+  printInf("This is info3\n");
+  printInf("This is info4\n");
+  printInf("This is info5\n");
+  printWarn("This is warning1\n");
+  printWarn("This is warning2\n");
+  printErr("This is error1\n");
+  printErr("This is error2\n");
+  
+  setLogOptions("use_color",0);                      #等效setLogColor(0);
+  setLogOptions("show_file_info",0);
+  setLogOptions("level",LOG_LEVEL_DEBUG);            #等效setLogLevel(LOG_LEVEL_DEBUG);
+  setLogOptions("targets",LOG_TARGET_FILE);          #等效setLogTargets(LOG_TARGET_FILE); 只输出到文件，不显示到屏幕
+  
+  my $user = "Alice";
+  my $val  = 42;
+  
+  printInf("Hello %s, value=%d\n", $user, $val);
+  printBug("Hello %s, value=%d\n", $user, $val);
+  printBug("Hello %s, value=%d\n", $user, $val);
+  printBug("Hello %s, value=%d\n", $user, $val);
+  printErr("File not found: %s\n", "/tmp/test.txt");
+  
+  closeLog();
+
+屏幕输出结果：
+
+  [2025-09-18 18:46:32.013][INFO ] This is info1
+  [2025-09-18 18:46:32.013][INFO ] This is info2
+  [2025-09-18 18:46:32.013][INFO ] This is info4
+  [2025-09-18 18:46:32.013][INFO ] This is info5
+  [2025-09-18 18:46:32.013][WARN ] This is warning1
+  [2025-09-18 18:46:32.013][WARN ] This is warning2
+  [2025-09-18 18:46:32.013][ERROR] This is error1
+  [2025-09-18 18:46:32.013][ERROR] This is error2
 
 =cut
 

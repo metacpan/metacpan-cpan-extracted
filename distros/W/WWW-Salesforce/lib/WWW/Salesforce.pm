@@ -3,22 +3,24 @@ package WWW::Salesforce;
 use strict;
 use warnings;
 
+use LWP::UserAgent ();
 use SOAP::Lite ();    # ( +trace => 'all', readable => 1, );#, outputxml => 1, );
 use DateTime ();
 use URI ();
-# use Data::Dumper;
+# use Data::Dumper qw(Dumper);
+use JSON::MaybeXS ();
 use WWW::Salesforce::Constants;
 use WWW::Salesforce::Deserializer;
 use WWW::Salesforce::Serializer;
 
-our $VERSION = '0.304';
+our $VERSION = '0.400';
 
-our $SF_PROXY       = 'https://login.salesforce.com/services/Soap/u/52.0';
+our $SF_PROXY       = 'https://login.salesforce.com/services/Soap/u/64.0';
 our $SF_URI         = 'urn:partner.soap.sforce.com';
 our $SF_PREFIX      = 'sforce';
 our $SF_SOBJECT_URI = 'urn:sobject.partner.soap.sforce.com';
 our $SF_URIM        = 'http://soap.sforce.com/2006/04/metadata';
-our $SF_APIVERSION  = '52.0';
+our $SF_APIVERSION  = '64.0';
 # set webproxy if firewall blocks port 443 to SF_PROXY
 our $WEB_PROXY  = ''; # e.g., http://my.proxy.com:8080
 
@@ -29,25 +31,54 @@ our $WEB_PROXY  = ''; # e.g., http://my.proxy.com:8080
 
 WWW::Salesforce - This class provides a simple SOAP client for Salesforce.com.
 
+=head1 WARNING
+
+B<NOTE:> As of version C<65.0> of the Salesforce APIs, the SOAP login method will no longer
+exist. Also, the login method for SOAP will be removed after the B<Summer ’27 release>. Read about
+this change here: L<https://help.salesforce.com/s/articleView?id=005132110&type=1>.
+
 =head1 SYNOPSIS
 
-    use Try::Tiny;
+    use v5.26;
+    use Syntax::Keyword::Try;
     use WWW::Salesforce ();
+
     try {
         my $sforce = WWW::Salesforce->login(
+            serverurl => 'https://test.my.salesforce.com',
+            version => '64.0', # must be a string
+            type => 'soap',
             username => 'foo',
-            password => 'password' . 'pass_token',
-            serverurl => 'https://test.salesforce.com',
-            version => '52.0' # must be a string
+            password => 'password' . 'pass_token'
         );
         my $res = $sforce->query(query => 'select Id, Name from Account');
         say "Found this many: ", $res->valueof('//queryResponse/result/size');
         my @records = $res->valueof('//queryResponse/result/records');
         say $records[0];
     }
-    catch {
+    catch ($e) {
         # log or whatever. we'll just die for example
-        die "Could not perform an action: $_";
+        die "Could not perform an action: $e";
+    }
+
+    try {
+        my $sforce = WWW::Salesforce->login(
+            serverurl => 'https://test.my.salesforce.com',
+            version => '64.0', # must be a string
+            type => 'oauth2-usernamepassword',
+            client_id => 'abc2134asdgkljag',
+            client_secret => 'axyalaskjag234qdf',
+            username => 'foo',
+            password => 'password' . 'pass_token'
+        );
+        my $res = $sforce->query(query => 'select Id, Name from Account');
+        say "Found this many: ", $res->valueof('//queryResponse/result/size');
+        my @records = $res->valueof('//queryResponse/result/records');
+        say $records[0];
+    }
+    catch ($e) {
+        # log or whatever. we'll just die for example
+        die "Could not perform an action: $e";
     }
 
 =head1 DESCRIPTION
@@ -64,31 +95,83 @@ Given that L<WWW::Salesforce> doesn't have attributes in the traditional
 sense, the following arguments, rather than attributes, can be passed
 into the constructor.
 
+=head2 client_id
+
+  my $sforce = WWW::Salesforce->new(client_id => 'abc123xyz12398', ...);
+  my $sforce = WWW::Salesforce->new(clientid => 'abc123xyz12398', ...);
+  my $sforce = WWW::Salesforce->new(clientId => 'abc123xyz12398', ...);
+
+The C<client_id> or C<clientid> or C<clientId> is the consumer key of
+the connected app. To access the consumer key, from the B<App Manager>, find the
+connected app and select B<View> from the dropdown. Then click B<Manage Consumer Details>.
+You're sometimes prompted to verify your identity before you can view the consumer key.
+
+=head2 client_secret
+
+  my $sforce = WWW::Salesforce->new(client_secret => 'abc123xyz12398', ...);
+  my $sforce = WWW::Salesforce->new(clientsecret => 'abc123xyz12398', ...);
+  my $sforce = WWW::Salesforce->new(clientSecret => 'abc123xyz12398', ...);
+
+The C<client_secret> or C<clientsecret> or C<clientSecret> is the consumer
+secret of the connected app. To access the consumer secret, from the B<App Manager>,
+find the connected app and select B<View> from the dropdown. Then click
+B<Manage Consumer Details>. You're sometimes prompted to verify your identity
+before you can view the consumer secret.
+
 =head2 password
 
-  my $sforce = WWW::Salesforce->new(password => 'foobar1232131');
+  my $sforce = WWW::Salesforce->new(password => 'foobar1232131', ...);
+  my $sforce = WWW::Salesforce->new(pass => 'foobar1232131', ...);
 
-The password is a combination of your Salesforce password and your user's
+The C<password> or C<pass> is a combination of your Salesforce password and your user's
 L<Security Token|https://developer.salesforce.com/docs/atlas.en-us.api.meta/api/sforce_api_concepts_security.htm>.
 
 =head2 serverurl
 
-  my $sforce = WWW::Salesforce->new(serverurl => 'https://login.salesforce.com');
-  # or maybe one of your developer instances
-  $sforce = WWW::Salesforce->new(serverurl => 'https://test.salesforce.com');
+  my $sforce = WWW::Salesforce->new(serverurl => 'https://login.salesforce.com', ...);
+  # or maybe one of your specific instance URLs
+  my $sforce = WWW::Salesforce->new(serverUrl => 'https://test.my.salesforce.com', ...);
+  my $sforce = WWW::Salesforce->new(instanceurl => 'https://test.my.salesforce.com', ...);
+  my $sforce = WWW::Salesforce->new(instanceUrl => 'https://test.my.salesforce.com', ...);
 
-When you login to Salesforce, it's sometimes useful to login to one of your sandbox or
-other instances. All you need is the base URL here.
+The C<serverurl> (or C<serverUrl>, C<instanceurl>, C<instanceUrl>) is used as your host
+to login to Salesforce. The default value here is C<https://login.salesforce.com>.
+All you need is the base URL here.
+
+=head2 type
+
+  my $sforce = WWW::Salesforce->new(type => 'soap', ...);
+  my $sforce = WWW::Salesforce->new(
+    type => 'oauth2-usernamepassword',
+    client_id => 'abc2134asdgkljag',
+    client_secret => 'axyalaskjag234qdf',
+    ...
+  );
+
+B<NOTE:> As of version C<65.0> of the Salesforce APIs, the SOAP login method will no longer
+exist. Also, the login method for SOAP will be removed after the B<Summer ’27 release>. Read about
+this change here: L<https://help.salesforce.com/s/articleView?id=005132110&type=1>.
+
+Given that our tried and true method of logging in with the
+L<SOAP login|https://developer.salesforce.com/docs/atlas.en-us.api.meta/api/sforce_api_calls_login.htm>
+method is going away, we are now providing you with an option of how to login.
+
+The default login C<type> will still be C<soap> for now. However, you can get ahead of things by setting your
+login C<type> to C<oauth2-suernamepassword>. The
+L<OAuth 2.0 Username-Password Flow|https://help.salesforce.com/s/articleView?id=xcloud.remoteaccess_oauth_username_password_flow.htm&type=5>
+will work largely the same way as the old SOAP login, but you'll need to provide a client from your Salesforce
+instance's C<App Manager>. Login to the Salesforce front-end and go to B<Setup> -> B<App Manager>.
 
 =head2 username
 
-  my $sforce = WWW::Salesforce->new(username => 'foo@bar.com');
+  my $sforce = WWW::Salesforce->new(username => 'foo@bar.com', ...);
+  my $sforce = WWW::Salesforce->new(user => 'foo@bar.com', ...);
 
-When you login to Salesforce, your username is necessary.
+When you login to Salesforce, your C<username> or C<user> is necessary.
 
 =head2 version
 
-  my $sforce = WWW::Salesforce->new(version => '52.0');
+  my $sforce = WWW::Salesforce->new(version => '64.0');
 
 Salesforce makes changes to their API and luckily for us, they version those changes.
 You can choose which API version you want to use by passing this argument. However, it
@@ -107,7 +190,7 @@ second constructor named login.
     username => 'foo@bar.com',
     password => 'password' . 'security_token',
     serverurl => 'https://login.salesforce.com',
-    version => '52.0'
+    version => '64.0'
   );
 
 When you create a new instance, the L<WWW::Salesforce/username> and L<WWW::Salesforce/password>
@@ -125,7 +208,7 @@ sub new { return shift->login(@_); }
     username => 'foo@bar.com',
     password => 'password' . 'security_token',
     serverurl => 'https://login.salesforce.com',
-    version => '52.0'
+    version => '64.0'
   );
 
 When you create a new instance, the L<WWW::Salesforce/username> and L<WWW::Salesforce/password>
@@ -138,48 +221,143 @@ sub login {
     my $class = shift;
     my (%params) = @_;
 
-    unless (defined $params{'username'} and length $params{'username'}) {
+    # allow multiple spellings of the server url
+    my $url = $params{serverurl}
+        // $params{serverUrl}
+        // $params{instanceurl}
+        // $params{instanceUrl}
+        // $params{url}
+        // $SF_PROXY;
+    my $version = $params{version}
+        // $SF_APIVERSION;
+    my $user = $params{username}
+        // $params{user};
+    my $pass = $params{password}
+        // $params{pass};
+    my $type = $params{type}
+        // 'soap';
+    my $client_id = $params{clientid}
+        // $params{clientId}
+        // $params{client_id};
+    my $client_secret = $params{clientsecret}
+        // $params{clientSecret}
+        // $params{client_secret};
+
+    # A login method is required. coerce to 'soap' for default
+    unless (defined($type) && length($type)) {
+        # if they provided an invalid version, just use 'soap'
+        $type = 'soap';
+    }
+    $type = lc($type);
+    if ($type ne 'soap' && $type ne 'oauth2-usernamepassword') {
+        $type = 'soap';
+    }
+    # All login methods require a version... coerce it to a usable value
+    unless (defined($version) && $version =~ /^\d\d+\.\d$/) {
+        # if they provided an invalid version, just use the current
+        $version = '64.0';
+    }
+    # All login methods at this point require a username and password
+    unless (defined($user) && length($user)) {
         die("WWW::Salesforce::login() requires a username");
     }
-    unless (defined $params{'password'} and length $params{'password'}) {
+    unless (defined($pass) && length($pass)) {
         die("WWW::Salesforce::login() requires a password");
     }
+    # All login methods require a URL
+    unless (defined($url) && length($url)) {
+        die("WWW::Salesforce::login() requires an instanceUrl");
+    }
 
-    # build the login URL
-    my $version = $params{version} || $SF_APIVERSION || '52.0';
-    my $url
-        = URI->new($params{serverurl}
-            || $SF_PROXY
-            || 'https://login.salesforce.com');
+    # get the login type
+    print('Current version : ', $version, "\n");
+
+    $url = URI->new($url);
+    # set the default SOAP path
     $url->path('/services/Soap/u/' . $version);
 
     my $self = {
-        sf_user      => $params{'username'},
-        sf_pass      => $params{'password'},
+        sf_user      => $user,
+        sf_pass      => $pass,
         sf_serverurl => $url->as_string(),
         sf_version   => $version,
+        sf_clientId  => $client_id,
+        sf_clientSec => $client_secret,
         sf_sid       => undef,
+        sf_uid       => undef,
+        sf_metadataServerUrl => undef,
     };
     bless $self, $class;
 
-    my $client = $self->_get_client();
-    my $r      = $client->login(
-        SOAP::Data->name('username' => $self->{'sf_user'}),
-        SOAP::Data->name('password' => $self->{'sf_pass'})
-    );
-    unless ($r) {
-        die sprintf("could not login, user %s, pass %s",
-            $self->{'sf_user'}, $self->{'sf_pass'});
-    }
-    if ($r->fault()) {
-        die($r->faultstring());
+    # now we have an object. let's login
+    if ($type eq 'oauth2-usernamepassword') {
+        unless (defined($self->{sf_clientId}) && length($self->{sf_clientId})) {
+            # client Id required
+            die("WWW::Salesforce::login() requires a client_id for this type.");
+        }
+        unless (defined($self->{sf_clientSec}) && length($self->{sf_clientSec})) {
+            # client Id required
+            die("WWW::Salesforce::login() requires a client_secret for this type.");
+        }
+        $url->path('/services/oauth2/token');
+        my $ua = LWP::UserAgent->new(timeout => 5);
+        if ($WEB_PROXY) {
+            $ua->proxy(https => $WEB_PROXY);
+        }
+        my $data = {
+            'grant_type' => 'password',
+            'client_id' => $self->{sf_clientId},
+            'client_secret' => $self->{sf_clientSec},
+            'username' => $self->{sf_user},
+            'password' => $self->{sf_pass},
+            'format' => 'json',
+        };
+        my $response = $ua->post($url->as_string(), $data);
+        unless (defined($response)) {
+            die("Unable to connect to Salesforce.");
+        }
+        my $result = JSON::MaybeXS::decode_json($response->decoded_content);
+        unless($response->is_success) {
+            # print Dumper($result);
+            die(join(': ', $response->status_line, $result->{error}, $result->{error_description}));
+        }
+        # we have a successful login. Let's grab some bits we need for later SOAP use
+        my $uri = URI->new($result->{id});
+        my ($org_id, $uid) = grep {defined($_) && length($_)} split('/', $uri->path() =~ s{^/id/}{}r);
+        unless(defined($org_id) && length($org_id) && defined($uid) && length($uid)) {
+            die('Unable to determine our org and user id from the login response.');
+        }
+        $self->{sf_uid} = $uid;
+        $self->{sf_sid} = $result->{access_token};
+        my $inst_url = URI->new($result->{instance_url});
+        $inst_url->path('/services/Soap/u/' . $self->{sf_version} . '/' . substr($org_id, 0, 15));
+        $self->{sf_serverurl} = $inst_url->as_string;
+        $inst_url->path('/services/Soap/m/' . $self->{sf_version} . '/' . substr($org_id, 0, 15));
+        $self->{'sf_metadataServerUrl'} = $inst_url->as_string;
+
+    } else {
+        my $client = $self->_get_client();
+        my $r      = $client->login(
+            SOAP::Data->name('username' => $self->{'sf_user'}),
+            SOAP::Data->name('password' => $self->{'sf_pass'})
+        );
+        unless ($r) {
+            die sprintf("could not login, user %s, pass %s",
+                $self->{'sf_user'}, $self->{'sf_pass'});
+        }
+        # print Dumper($r);
+        if ($r->fault()) {
+            die($r->faultstring());
+        }
+
+        $self->{'sf_sid'}       = $r->valueof('//loginResponse/result/sessionId');
+        $self->{'sf_uid'}       = $r->valueof('//loginResponse/result/userId');
+        $self->{'sf_serverurl'} = $r->valueof('//loginResponse/result/serverUrl');
+        $self->{'sf_metadataServerUrl'}
+            = $r->valueof('//loginResponse/result/metadataServerUrl');
     }
 
-    $self->{'sf_sid'}       = $r->valueof('//loginResponse/result/sessionId');
-    $self->{'sf_uid'}       = $r->valueof('//loginResponse/result/userId');
-    $self->{'sf_serverurl'} = $r->valueof('//loginResponse/result/serverUrl');
-    $self->{'sf_metadataServerUrl'}
-        = $r->valueof('//loginResponse/result/metadataServerUrl');
+    # we have our login stuff cached for use, let's return our object
     return $self;
 }
 
@@ -349,6 +527,7 @@ sub describeGlobal {
     unless ($r) {
         die "could not call method $method";
     }
+    # print Dumper($r);
     if ( $r->fault() ) {
         die( $r->faultstring() );
     }
@@ -741,9 +920,9 @@ sub logout {
   my $res = $sf->query(query => 'SELECT Id, Name FROM Account');
   $res = $sf->query(query => 'SELECT Id, Name FROM Account', limit => 20);
   # records as an array
-  my @records = $res->valueof('//QueryResult/result/records');
+  my @records = $res->valueof('//queryResponse/result/records');
   # number of records returned (int)
-  my $number = $res->valueof('//QueryResult/result/size');
+  my $number = $res->valueof('//queryResponse/result/size');
   # When our query has more results than our limit, we get paged results
   my $done = $res->valueof('//queryResponse/result/done');
   while (!$done) {

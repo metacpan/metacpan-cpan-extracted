@@ -65,3 +65,12 @@ Revision history for Multi::Dispatch
 
     * Furher documented limitations (and workaround) for multimethods in roles.
 
+
+
+0.000006  Fri Sep 19 15:34:20 2025
+
+    * Clarified actual issue with multimethods in roles
+
+    * Unknitted pod nits
+
+    * Allow future built-in :$named syntax

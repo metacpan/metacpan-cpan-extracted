@@ -1,0 +1,85 @@
+Revision history for Perl library Test::Against::Commit
+
+0.15 Thu Sep 18 08:58:52 PM EDT 2025
+
+    - Correct repository URLs only; no functional changes
+
+0.14 Thu Sep 18 06:02:40 PM EDT 2025
+
+    - CPAN distribution Test-Against-Dev transformed into Test-Against-Commit.
+      Development moved to https://github.com/jkeenan/perl5-test-cpan-against-commit.
+
+    - Remove all functionality for downloading and installing Perl from
+      release tarballs.  Provide shell scripts to do that outside the scope
+      of Test::Against::Commit methods.  This means less code to maintain in
+      this library while permitting the user to install perl via any modality.
+
+0.13 Sun Sep 23 19:13:32 EDT 2018
+    - Properly document Test::Against::Build::analyze_json_logs().
+      No change in functionality.
+
+0.12 Sat Jul 21 08:01:13 EDT 2018
+    - Introduce Test::Against::Dev::Salvage.  This package provides methods
+      that can be used when a test-against-dev run exits after completing
+      'cpanm' but before completing 'run_cpanm().
+
+0.11 Mon Jul 16 11:58:54 EDT 2018
+    - Correct error in Test::Against::Dev::ProcessPSV::read_one_psv().
+
+0.10 Sun Jul 15 21:23:52 EDT 2018
+    - Introduce Test::Against::Dev::ProcessPSV.  This package provides methods
+      to consolidate monthly PSV files into the master PSV file as it grows
+      from one monthly dev release to the next.  t/007-process-ppv.t exercises
+      these methods.
+
+    - Add helper program scripts/unpack-log-json-gz.  This program can be used
+      to properly unpack the tarball of .log.json files created by method
+      analyze_json_logs() in each of Test::Against::Dev and Test::Against::Build.
+
+    - The tarball file created by analyze_json_logs() now defaults to
+      extension '.tar.gz' rather than simply '.gz'.  This better describes the
+      fact that the file is a gzipped tar file of '.json.log' files.
+
+    - For consistency, all .pm and .t files now 'use 5.14.0'.
+
+    - t/005-tab-new.t has been renamed t/005-test-against-build.t.  This
+      better documents what it actually tests.
+
+0.09 Thu Jul 12 22:02:13 EDT 2018
+    - Introduce Test::Against::Build.  Whereas Test::Against::Dev assesses
+      the impact of monthly development releases -- and now also RC releases
+      -- on selected sets of modules (e.g., the top of the CPAN river),
+      Test::Against::Build assesses the impact of individual commits to the
+      repository.  It should be particularly useful in measuring changes in
+      impact between two specific commits.
+
+    - Introduce Test::Against::Dev::Sort.  Provides methods for validating and
+      sorting lists of perl version strings.
+
+0.08 Tue Apr  3 11:55:09 EDT 2018
+    - Correct some errors in test files.  No functional changes.
+
+0.07 Thu Mar 22 15:11:55 EDT 2018
+    - new_from_existing_perl_cpanm():  Assign cpanm_dir within object.
+    - Improved metadata.
+
+0.06 Tue Mar 20 09:24:51 EDT 2018
+    - *Breaking change*:  'analysis/01' directory no longer created.
+      See documentation in lib/Test/Against/Dev.pm for details.
+
+0.05 Tue Mar 13 15:32:42 EDT 2018
+    - Permit comma as delimiter in analyze_json_logs().
+
+0.04 Wed Dec 20 08:23:06 EST 2017
+    - Require perl-5.14.0
+
+0.03 Sun Dec 17 21:53:17 EST 2017
+    - First actual release to CPAN
+
+0.02 Fri Dec 15 15:30:08 EST 2017
+    - Intermediate work product; not released to CPAN
+
+0.01 Sat Dec  9 17:04:34 2017
+    - original version; created by ExtUtils::ModuleMaker 0.56
+
+

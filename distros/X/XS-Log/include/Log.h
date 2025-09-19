@@ -1,7 +1,7 @@
 /***************************************************************************************
-* Build  MD5 : e4c/FCuACWSJA8bBi2Ww7A
-* Build Time : 2025-09-18 13:22:54
-* Version    : 5.090111
+* Build  MD5 : MYBksociPW2BGBIsUXW9NA
+* Build Time : 2025-09-19 17:23:26
+* Version    : 5.090112
 * Author     : H.Q.Wang
 ----------------------------------------------------------------------------------------
 ## 功能说明
@@ -72,7 +72,9 @@ void setLogMode(int flag);
 void setLogLevel(int level);
 void setTargets(int flag);
 
-void log_write(LogLevel level, const char *file, int line, const char *format, ...);
+void log_print(LogLevel level, const char *file, int line, const char *format, ...);
+void log_write(LogLevel level, const char *file, int line, const char *message);
+/*******************************
 // 快捷日志宏
 #define printNote(...)	log_write(LOG_LEVEL_TRACE, __FILE__, __LINE__, __VA_ARGS__)
 #define printBug(...)	log_write(LOG_LEVEL_DEBUG, __FILE__, __LINE__, __VA_ARGS__)
@@ -81,5 +83,5 @@ void log_write(LogLevel level, const char *file, int line, const char *format, .
 #define printErr(...)	log_write(LOG_LEVEL_ERROR, __FILE__, __LINE__, __VA_ARGS__)
 #define printFail(...)	log_write(LOG_LEVEL_FATAL, __FILE__, __LINE__, __VA_ARGS__)
 #define printText(...)	log_write(LOG_LEVEL_TEXT,  __FILE__, __LINE__, __VA_ARGS__)
-
+*******************************/
 #endif // LOG_H
