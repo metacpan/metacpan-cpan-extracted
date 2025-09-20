@@ -34,7 +34,10 @@
          "requires" : {
             "DateTime::Format::Text" : "0",
             "Geo::Coder::Free" : "0",
-            "Geo::Coder::List" : "0"
+            "Geo::Coder::List" : "0",
+            "Params::Get" : "0.13",
+            "Params::Validate::Strict" : "0.1",
+            "Return::Set" : "0.02"
          }
       },
       "test" : {
@@ -46,6 +49,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

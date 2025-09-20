@@ -60,7 +60,7 @@ Parsed parameter pairs. Note that this method will normalize the parameters.
 
 =head1 Class Methods
 
-C<static method new : L<Mojo::Parameters|SPVM::Mojo::Parameters> ($params_value : object of string|object[] = undef);>
+C<static method new : L<Mojo::Parameters|SPVM::Mojo::Parameters> ($params_value : string|object[] = undef);>
 
 Construct a new L<Mojo::Parameters|SPVM::Mojo::Parameters> object and L</"parse"> parameters if necessary.
 
@@ -76,7 +76,7 @@ Examples:
 
 =head2 append
 
-C<method append : void ($pairs : object of object[]|L<Mojo::Parameters|SPVM::Mojo::Parameters>);>
+C<method append : void ($pairs : object[]|L<Mojo::Parameters|SPVM::Mojo::Parameters>);>
 
 Append parameters. Note that this method will normalize the parameters.
 
@@ -114,7 +114,7 @@ Examples:
 
 =head2 merge
 
-C<method merge : void ($parameters : object of object[]|L<Mojo::Parameters|SPVM::Mojo::Parameters>);>
+C<method merge : void ($parameters : object[]|L<Mojo::Parameters|SPVM::Mojo::Parameters>);>
 
 Merge parameters. Note that this method will normalize the parameters.
 
@@ -153,7 +153,7 @@ Examples:
 
 =head2 set_param
 
-C<method set_param : void ($name : string, $value : object of string|string[]);>
+C<method set_param : void ($name : string, $value : string|string[]);>
 
 Set parameter values. If there are multiple values sharing the same name, and you want to access more than just the
 last one, you can use L</"every_param">. Note that this method will normalize the parameters.
@@ -166,7 +166,7 @@ Examples:
 
 =head2 parse
 
-C<method parse : void ($params_value : object of string|object[]);>
+C<method parse : void ($params_value : string|object[]);>
 
 Parse parameters.
 

@@ -90,12 +90,6 @@ DESCRIPTION
     up. That said, the syntax provided is inspired by Moose's `has` keyword
     and hopefully not entirely horrible.
 
-    Sub::MultiMethod has much smarter dispatching than Kavorka, but the
-    tradeoff is that this is a little slower. Overall, for the JSON example in
-    the SYNOPSIS, Kavorka is about twice as fast. (But with Kavorka, it would
-    quote the numbers in the output because numbers are a type of string, and
-    that was declared first!)
-
   Functions
     Sub::MultiMethod exports nothing by default. You can import the functions
     you want by listing them in the `use` statement:
@@ -188,6 +182,25 @@ DESCRIPTION
         Multisubs where some candidates are methods and others are non-methods
         are not currently supported! (And probably never will be.)
 
+    `want` *(Str|ArrayRef)*
+        Optional.
+
+        Allows you to specify that a candidate only applies in certain
+        contexts. The context may be "VOID", "SCALAR", or "LIST". May
+        alternatively be an arrayref of contexts. "NONVOID" is a shortcut for
+        `["SCALAR","LIST"]`. "NONLIST" and "NONSCALAR" are also allowed.
+
+    `if` *(CodeRef)*
+        Optional.
+
+        Allows you to specify that a candidate only applies in certain
+        conditions.
+
+          if => sub { $ENV{OSTYPE} eq 'linux' },
+
+        The coderef is called with no parameters. It has no access to the
+        multimethod's @_.
+
     `score` *(Int)*
         Optional.
 
@@ -215,6 +228,11 @@ DESCRIPTION
 
    `monofunction $name => %spec`
     Like `monomethod` but defaults to `method => 0`.
+
+   `VOID`, `SCALAR`, `LIST`, `NONVOID`, `NONSCALAR`, `NONLIST`
+    Useful constants you can export to allow this to work:
+
+      want => NONVOID,
 
   Dispatch Technique
     When a multimethod is called, a list of packages to inspect for candidates
@@ -249,6 +267,8 @@ DESCRIPTION
     for the candidate. For candidates where the signature is a coderef, this
     is essentially a zero score for the signature unless a score was specified
     explicitly.
+
+    The score has 100,000 added if `want` or `if` was specified.
 
     If multiple candidates are equally constrained, child class candidates
     beat parent class candidates; class candidates beat role candidates; and
@@ -423,10 +443,11 @@ DESCRIPTION
         Returns a boolean indicating whether the coderef is known to be a
         multimethod dispatcher.
 
-    `Sub::MultiMethod->pick_candidate(\@candidates, \@args)`
+    `Sub::MultiMethod->pick_candidate(\@candidates, \@args, $wantarray)`
         Returns a list of two items: first the winning candidate from an array
         of specs, given the args and invocants, and second the modified args
-        after coercion has been applied.
+        after coercion has been applied. $wantarray should be a string 'VOID',
+        'SCALAR', or 'LIST'.
 
         This is basically how the dispatcher for a method works:
 
@@ -444,15 +465,36 @@ DESCRIPTION
               )
             ],
             \@_,
+            wantarray ? 'LIST' : defined(wantarray) ? 'SCALAR' : 'VOID',
           );
   
           $winner->{code}->( @$new_args );
+
+    `Sub::MultiMethod->clear_cache`
+        The `dispatch` method caches what `get_all_multimethod_candidates`
+        returns. It is expected that by the time a multisub/multimethod is
+        called, you have finished adding new candidates, so this should not be
+        harmful. If you do add new candidates, then the cache should
+        automatically clear itself anyway. However if new candidates emerge
+        by, for example, altering a class's @ISA at run time, you may need to
+        manually clear the cache. This is a very unlikely situation though.
+
+    `Sub::MultiMethod->get_cache`
+        Gets a reference to the dispatch cache hash. Mostly for people wanting
+        to subclass Sub::MultiMethod, especially if you want to override the
+        `dispatch` method.
 
 BUGS
     Please report any bugs to
     <http://rt.cpan.org/Dist/Display.html?Queue=Sub-MultiMethod>.
 
 SEE ALSO
+    Multi::Dispatch - probably almost as nice an implementation as
+    Sub::MultiMethod. It correctly handles inheritance, does a good job of
+    dispatching to the best candidate, etc. It's even significantly faster
+    than Sub::MultiMethod. On the downsides, it doesn't handle roles or
+    coercions.
+
     Class::Multimethods - uses Perl classes and ref types to dispatch. No
     syntax hacks but the fairly nice syntax shown in the pod relies on `use
     strict` being switched off! Need to quote a few more things otherwise.
@@ -473,8 +515,7 @@ SEE ALSO
 
     Kavorka - I wrote this, so I'm allowed to be critical. Type::Tiny-based
     type system. Very naive dispatching; just dispatches to the first declared
-    candidate that can handle it rather than trying to find the "best". It is
-    fast though.
+    candidate that can handle it rather than trying to find the "best".
 
     Sub::Multi::Tiny - uses Perl attributes to declare candidates to be
     dispatched to. Pluggable dispatching, but by default uses argument count.

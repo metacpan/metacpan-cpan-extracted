@@ -140,7 +140,7 @@ C<has query : rw L<Mojo::Parameters|SPVM::Mojo::Parameters>;>
 Query part of this URL, key/value pairs in an array reference will be appended with L<Mojo::Parameters#append|SPVM::Mojo::Parameters/"append"> method, and
 key/value pairs in a hash reference merged with L<Mojo::Parameters#merge|SPVM::Mojo::Parameters/"merge"> method, defaults to a L<Mojo::Parameters|SPVM::Mojo::Parameters> object.
 
-The setter also receives an object of object[] type. If the object is options, the merge operation is performed. Otherwise the append operation is performed.
+The setter also receives an object[] type. If the object is options, the merge operation is performed. Otherwise the append operation is performed.
 
 Examples:
 

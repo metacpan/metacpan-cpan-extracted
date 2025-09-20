@@ -48,7 +48,7 @@ class Mojo::Transaction::WebSocket extends Mojo::Transaction {
   }
   
   # Instance Methods
-  method build_message : Mojo::WebSocket::Frame ($msg : object of string|object[]) {
+  method build_message : Mojo::WebSocket::Frame ($msg : string|object[]) {
     
     my $options = (object[])undef;
     
@@ -165,7 +165,7 @@ class Mojo::Transaction::WebSocket extends Mojo::Transaction {
     $self->handshake->resume;
   }
   
-  method send : void ($msg : object of string|object[]|Mojo::WebSocket::Frame, $cb : Mojo::Callback = undef) {
+  method send : void ($msg : string|object[]|Mojo::WebSocket::Frame, $cb : Mojo::Callback = undef) {
     
     if ($cb) {
       $self->once(drain => $cb);

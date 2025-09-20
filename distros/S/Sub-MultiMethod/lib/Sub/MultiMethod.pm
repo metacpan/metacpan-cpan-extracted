@@ -5,18 +5,30 @@ use warnings;
 package Sub::MultiMethod;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '1.000';
+our $VERSION   = '1.001';
 
 use B ();
 use Eval::TypeTiny qw( set_subname );
 use Exporter::Shiny qw(
 	multimethod   monomethod
 	multifunction monofunction
+	VOID SCALAR LIST NONVOID NONSCALAR NONLIST
 );
 use Role::Hooks;
+use List::Util qw( max min any );
 use Scalar::Util qw( refaddr );
 use Type::Params ();
+use Types::TypeTiny qw( TypeTiny );
 use Types::Standard qw( -types -is );
+
+use constant {
+	VOID        => 'VOID',
+	LIST        => 'LIST',
+	SCALAR      => 'SCALAR',
+	NONVOID     => '~VOID',
+	NONLIST     => '~LIST',
+	NONSCALAR   => '~SCALAR',
+};
 
 # Options other than these will be passed through to
 # Type::Params.
@@ -28,12 +40,14 @@ my %KNOWN_OPTIONS = (
 	copied             => 1,
 	declaration_order  => 1,
 	height             => 1,
+	if                 => 1,
 	is_monomethod      => 1,
 	method             => 1,
 	named              => 'legacy',
 	no_dispatcher      => 1,
 	score              => 1,
 	signature          => 'legacy',
+	want               => 1,
 );
 
 # But not these!
@@ -46,6 +60,8 @@ my %BAD_OPTIONS = (
 	on_die             => 1,
 	message            => 1,
 );
+
+my %CACHE = ();
 
 {
 	my %CANDIDATES;
@@ -74,6 +90,7 @@ sub _get_multimethod_candidates_ref {
 
 sub _clear_multimethod_candidates_ref {
 	my ( $me, $target, $method_name ) = ( shift, @_ );
+	$me->clear_cache;
 	my ( $package_key, $method_key ) = ref( $method_name )
 		? ( '__CODE__', refaddr( $method_name ) )
 		: ( $target, $method_name );
@@ -94,6 +111,7 @@ sub has_multimethod_candidates {
 
 sub _add_multimethod_candidate {
 	my ($me, $target, $method_name, $spec) = @_;
+	$me->clear_cache;
 	my $mmc = $me->_get_multimethod_candidates_ref($target, $method_name);
 	no warnings 'uninitialized';
 	if ( @$mmc and $spec->{method} != $mmc->[0]{method} ) {
@@ -107,6 +125,14 @@ sub _add_multimethod_candidate {
 	}
 	push @$mmc, $spec;
 	$me;
+}
+
+sub clear_cache {
+	%CACHE = ();
+}
+
+sub get_cache {
+	return \%CACHE;
 }
 
 sub get_all_multimethod_candidates {
@@ -282,11 +308,16 @@ sub _extract_type_params_spec {
 		if ( $tp{method} > 1 ) {
 			my $excess = $tp{method} - 1;
 			$tp{method} = 1;
-			ref( $tp{head} ) ? push( @{ $tp{head} }, Any ) : ( $tp{head} += $excess );
+			ref( $tp{head} ) ? push( @{ $tp{head} }, ( Any ) x $excess ) : ( $tp{head} += $excess );
 		}
 		if ( $tp{method} == 1 ) {
 			$tp{method} = Any;
 		}
+	}
+
+	if ( not ( $tp{named} or $tp{pos} or $tp{positional} or $tp{multi} or $tp{multiple} ) ) {
+		$tp{pos} = [ Slurpy[Any] ];
+		$spec->{smiple} = 1;
 	}
 	
 	$spec->{signature_spec} = \%tp;
@@ -351,6 +382,20 @@ sub install_candidate {
 	$me->_extract_type_params_spec( $target, $sub_name, \%spec );
 
 	my $is_method = $spec{method};
+	
+	if ( $spec{want} ) {
+		my @canonical =
+			map {
+				( my $x = $_ ) =~ s/^NON/~/;
+				$_ eq '~VOID'   ? qw( SCALAR LIST ) :
+				$_ eq '~LIST'   ? qw( SCALAR VOID ) :
+				$_ eq '~SCALAR' ? qw( LIST   VOID ) : $_
+			}
+			map { split /,/, $_ }
+			map { uc $_ }
+			is_ArrayRef($spec{want}) ? @{$spec{want}} : $spec{want};
+		$spec{want} = \@canonical;
+	}
 	
 	$spec{declaration_order} = ++$DECLARATION_ORDER;
 	
@@ -495,13 +540,11 @@ sub install_dispatcher {
 		q{
 			package %s;
 			sub {
-				my $next = %s->can('dispatch');
-				@_ = (%s, %s, %s, %d, [@_]);
+				@_ = (%s, %s, %s, %d, [@_], wantarray);
 				goto $next;
 			}
 		},
 		$target,                     # package %s
-		B::perlstring($me),          # %s->can('dispatch')
 		B::perlstring($me),          # $_[0]
 		B::perlstring($target),      # $_[1]
 		ref($sub_name)               # $_[2]
@@ -512,6 +555,7 @@ sub install_dispatcher {
 	
 	my $coderef = do {
 		local $@;
+		my $next = $me->can('dispatch');
 		eval $code or die $@;
 	};
 	
@@ -522,20 +566,24 @@ sub install_dispatcher {
 
 sub dispatch {
 	my $me = shift;
-	my ($pkg, $method_name, $is_method, $argv) = @_;
+	my ($pkg, $method_name, $is_method, $argv, $wantarray) = @_;
+	$wantarray = wantarray if @_ < 5;
 	
+	my $search_from = $pkg;
 	if ( $is_method and is_Object $argv->[0] ) {
 		# object method; reset package search from invocant class
-		$pkg = ref $argv->[0];
+		$search_from = ref $argv->[0];
 	}
 	elsif ( $is_method and is_ClassName $argv->[0] ) {
 		# class method; reset package search from invocant class
-		$pkg = $argv->[0];
+		$search_from = $argv->[0];
 	}
 	
 	my ($winner, $new_argv) = $me->pick_candidate(
-		[ $me->get_all_multimethod_candidates($pkg, $method_name, $is_method) ],
+		$CACHE{"$pkg/$search_from/$method_name/$is_method"} ||=
+			[ $me->get_all_multimethod_candidates($search_from, $method_name, $is_method) ],
 		$argv,
+		$wantarray ? LIST : defined($wantarray) ? SCALAR : VOID,
 	) or do {
 		require Carp;
 		Carp::croak('Multimethod could not find candidate to dispatch to, stopped');
@@ -546,8 +594,28 @@ sub dispatch {
 	goto $next;
 }
 
+# Optimization for simple signatures: those consisting of only non-coercing positional parameters.
+my $smiple_keys = Enum[qw/ package subname method pos positional /];
+sub _maybe_make_smiple {
+	my ( $me, $candidate ) = @_;
+	return if $candidate->{smiple};
+	return unless $smiple_keys->all( keys %{ $candidate->{signature_spec} } );
+	my @types =
+		map { is_Bool( $_ ) ? ( $_ ? Any : Optional[Any] ) : $_ }
+		@{ $candidate->{signature_spec}{pos} or $candidate->{signature_spec}{positional} or [] };
+	return unless TypeTiny->all( @types );
+	if ( TypeTiny->check( $candidate->{signature_spec}{method} ) ) {
+		unshift @types, $candidate->{signature_spec}{method};
+	}
+	elsif ( $candidate->{signature_spec}{method} ) {
+		unshift @types, Any;
+	}
+	return if grep { $_->has_coercion } @types;
+	$candidate->{smiple} = Tuple->of( @types )->compiled_check;
+}
+
 sub pick_candidate {
-	my ( $me, $candidates, $argv ) = ( shift, @_ );
+	my ( $me, $candidates, $argv, $wantarray ) = ( shift, @_ );
 	
 	my @remaining = @{ $candidates };
 	
@@ -566,6 +634,7 @@ sub pick_candidate {
 				%{ $candidate->{signature_spec} },
 				want_details => 1,
 			);
+			$me->_maybe_make_smiple( $candidate );
 		}
 	}
 	
@@ -575,18 +644,14 @@ sub pick_candidate {
 	
 	my $argc = @$argv;
 	
-	@remaining = grep {
-		my $candidate = $_;
-		if (defined $candidate->{compiled}{min_args} and $candidate->{compiled}{min_args} > $argc) {
-			0;
+	@remaining =
+		grep { $_->{if} ? &{$_->{if}} : 1 }
+		grep { ($_->{want} and $wantarray) ? (!!any { $wantarray eq $_ } @{$_->{want}}) : 1 }
+		grep {
+			(defined $_->{compiled}{min_args} and $_->{compiled}{min_args} > $argc) ? 0 :
+			(defined $_->{compiled}{max_args} and $_->{compiled}{max_args} < $argc) ? 0 : 1;
 		}
-		elsif (defined $candidate->{compiled}{max_args} and $candidate->{compiled}{max_args} < $argc) {
-			0;
-		}
-		else {
-			1;
-		}
-	} @remaining;
+		@remaining;
 	
 	# Weed out signatures that cannot match because
 	# they fail type checks, etc
@@ -595,11 +660,15 @@ sub pick_candidate {
 	my %returns;
 	
 	@remaining = grep {
-		my $code = $_->{compiled}{closure};
-		eval {
-			$returns{"$code"} = [ $code->(@$argv) ];
-			1;
-		};
+		if ( my $smiple = $_->{smiple} ) {
+			!ref($smiple) || $smiple->($argv) ? ($returns{"$_"} = $argv) : ();
+		}
+		else {
+			eval {
+				$returns{"$_"} = [ $_->{compiled}{closure}->(@$argv) ];
+				1;
+			};
+		}
 	} @remaining;
 	
 	# Various techniques to cope with @remaining > 1...
@@ -608,38 +677,41 @@ sub pick_candidate {
 	if (@remaining > 1) {
 		no warnings qw(uninitialized numeric);
 		# Calculate signature constrainedness score. (Cached.)
+		my $max_score;
 		for my $candidate (@remaining) {
-			next if defined $candidate->{score};
-			my $sum = 0;
-			my @sig = map {
-				is_ArrayRef( $candidate->{signature_spec}{$_} ) ? @{ $candidate->{signature_spec}{$_} } : ();
-			} qw(positional pos named);
-			foreach my $type ( @sig ) {
-				next unless is_Object $type;
-				my @real_parents = grep !$_->_is_null_constraint, $type, $type->parents;
-				$sum += @real_parents;
-			}
-			$candidate->{score} = $sum;
+			my $score = $candidate->{score};
+			if ( not defined $score ) {
+				my $slurpyAny = Slurpy[Any];
+				$score = 0;
+				my @sig = map {
+					is_ArrayRef( $candidate->{signature_spec}{$_} ) ? @{ $candidate->{signature_spec}{$_} } : ();
+				} qw(positional pos named);
+				foreach my $type ( @sig ) {
+					next unless is_Object $type;
+					next if $type == $slurpyAny;
+					my @real_parents = grep !$_->_is_null_constraint, $type, $type->parents;
+					$score += @real_parents;
+				}
+				$score += 100_000 if $candidate->{want} || $candidate->{if};
+				$candidate->{score} = $score;
+			};
+			$max_score = max( grep defined, $score, $max_score );
 		}
 		# Only keep those with (equal) highest score
-		@remaining = sort { $b->{score} <=> $a->{score} } @remaining;
-		my $max_score = $remaining[0]->{score};
 		@remaining = grep { $_->{score} == $max_score } @remaining;
 	}
 	
 	if (@remaining > 1) {
 		# Only keep those from the most derived class
 		no warnings qw(uninitialized numeric);
-		@remaining = sort { $b->{height} <=> $a->{height} } @remaining;
-		my $max_score = $remaining[0]->{height};
+		my $max_score = max( map $_->{height}, @remaining );
 		@remaining = grep { $_->{height} == $max_score } @remaining;
 	}
 	
 	if (@remaining > 1) {
 		# Only keep those from the most non-role-like packages
 		no warnings qw(uninitialized numeric);
-		@remaining = sort { $a->{copied} <=> $b->{copied} } @remaining;
-		my $min_score = $remaining[0]->{copied};
+		my $min_score = min( map $_->{copied}, @remaining );
 		@remaining = grep { $_->{copied} == $min_score } @remaining;
 	}
 	
@@ -647,19 +719,14 @@ sub pick_candidate {
 		# Argh! Still got multiple candidates! Just choose whichever
 		# was declared first...
 		no warnings qw(uninitialized numeric);
-		@remaining = sort { $a->{declaration_order} <=> $b->{declaration_order} } @remaining;
-		@remaining = ($remaining[0]);
+		my $min_score = min( map $_->{declaration_order}, @remaining );
+		@remaining = grep { $_->{declaration_order} == $min_score } @remaining;
 	}
-	
-	# This is filled in each call. Clean it up, just in case.
-	delete $_->{height} for @$candidates;
 	
 	wantarray or die 'MUST BE CALLED IN LIST CONTEXT';
 	
 	return unless @remaining;
-	
-	my $sig_code  = $remaining[0]{compiled}{closure};
-	return ( $remaining[0], $returns{"$sig_code"} );
+	return ( $remaining[0], $returns{''.$remaining[0]} );
 }
 
 1;
@@ -765,12 +832,6 @@ well and is less concerned with providing a nice syntax for setting them
 up. That said, the syntax provided is inspired by Moose's C<has> keyword
 and hopefully not entirely horrible.
 
-Sub::MultiMethod has much smarter dispatching than L<Kavorka>, but the
-tradeoff is that this is a little slower. Overall, for the JSON example
-in the SYNOPSIS, Kavorka is about twice as fast. (But with Kavorka, it
-would quote the numbers in the output because numbers are a type of string,
-and that was declared first!)
-
 =head2 Functions
 
 Sub::MultiMethod exports nothing by default. You can import the functions
@@ -869,6 +930,26 @@ given if you want multifuncs with no invocant.
 Multisubs where some candidates are methods and others are non-methods are
 not currently supported! (And probably never will be.)
 
+=item C<< want >> I<< (Str|ArrayRef) >>
+
+Optional.
+
+Allows you to specify that a candidate only applies in certain contexts.
+The context may be "VOID", "SCALAR", or "LIST". May alternatively be an
+arrayref of contexts. "NONVOID" is a shortcut for C<< ["SCALAR","LIST"] >>.
+"NONLIST" and "NONSCALAR" are also allowed.
+
+=item C<< if >> I<< (CodeRef) >>
+
+Optional.
+
+Allows you to specify that a candidate only applies in certain conditions.
+
+  if => sub { $ENV{OSTYPE} eq 'linux' },
+
+The coderef is called with no parameters. It has no access to the multimethod's
+C<< @_ >>.
+
 =item C<< score >> I<< (Int) >>
 
 Optional.
@@ -903,6 +984,12 @@ Like C<multimethod> but defaults to C<< method => 0 >>.
 
 Like C<monomethod> but defaults to C<< method => 0 >>.
 
+=head3 C<< VOID >>, C<< SCALAR >>, C<< LIST >>, C<< NONVOID >>, C<< NONSCALAR >>, C<< NONLIST >>
+
+Useful constants you can export to allow this to work:
+
+  want => NONVOID,
+
 =head2 Dispatch Technique
 
 When a multimethod is called, a list of packages to inspect for candidates
@@ -936,6 +1023,8 @@ has the same score as its parent. All these scores are added together
 to get a single score for the candidate. For candidates where the
 signature is a coderef, this is essentially a zero score for the
 signature unless a score was specified explicitly.
+
+The score has 100,000 added if C<want> or C<if> was specified.
 
 If multiple candidates are equally constrained, child class candidates
 beat parent class candidates; class candidates beat role candidates;
@@ -1123,11 +1212,11 @@ shouldn't be inherited).
 Returns a boolean indicating whether the coderef is known to be a multimethod
 dispatcher.
 
-=item C<< Sub::MultiMethod->pick_candidate(\@candidates, \@args) >>
+=item C<< Sub::MultiMethod->pick_candidate(\@candidates, \@args, $wantarray) >>
 
 Returns a list of two items: first the winning candidate from an array of specs,
 given the args and invocants, and second the modified args after coercion has
-been applied.
+been applied. C<< $wantarray >> should be a string 'VOID', 'SCALAR', or 'LIST'.
 
 This is basically how the dispatcher for a method works:
 
@@ -1145,9 +1234,26 @@ This is basically how the dispatcher for a method works:
       )
     ],
     \@_,
+    wantarray ? 'LIST' : defined(wantarray) ? 'SCALAR' : 'VOID',
   );
   
   $winner->{code}->( @$new_args );
+
+=item C<< Sub::MultiMethod->clear_cache >>
+
+The C<dispatch> method caches what C<get_all_multimethod_candidates> returns.
+It is expected that by the time a multisub/multimethod is called, you have
+finished adding new candidates, so this should not be harmful. If you do add
+new candidates, then the cache should automatically clear itself anyway.
+However if new candidates emerge by, for example, altering a class's
+C<< @ISA >> at run time, you may need to manually clear the cache. This is
+a very unlikely situation though.
+
+=item C<< Sub::MultiMethod->get_cache >>
+
+Gets a reference to the dispatch cache hash. Mostly for people wanting to
+subclass Sub::MultiMethod, especially if you want to override the C<dispatch>
+method.
 
 =back
 
@@ -1157,6 +1263,11 @@ Please report any bugs to
 L<http://rt.cpan.org/Dist/Display.html?Queue=Sub-MultiMethod>.
 
 =head1 SEE ALSO
+
+L<Multi::Dispatch> - probably almost as nice an implementation as
+Sub::MultiMethod. It correctly handles inheritance, does a good job of
+dispatching to the best candidate, etc. It's even significantly faster than
+Sub::MultiMethod. On the downsides, it doesn't handle roles or coercions.
 
 L<Class::Multimethods> - uses Perl classes and ref types to dispatch.
 No syntax hacks but the fairly nice syntax shown in the pod relies on
@@ -1179,8 +1290,7 @@ syntax. Not entirely sure what the dispatching method is.
 
 L<Kavorka> - I wrote this, so I'm allowed to be critical. Type::Tiny-based
 type system. Very naive dispatching; just dispatches to the first declared
-candidate that can handle it rather than trying to find the "best". It is
-fast though.
+candidate that can handle it rather than trying to find the "best". 
 
 L<Sub::Multi::Tiny> - uses Perl attributes to declare candidates to
 be dispatched to. Pluggable dispatching, but by default uses argument

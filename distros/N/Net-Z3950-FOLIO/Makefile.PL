@@ -22,6 +22,7 @@ WriteMakefile(
 	Unicode::Diacritic::Strip => 0.13,
 	Test::Differences => 0.61,
 	Params::ValidationCompiler => 0.30,
+	XML::XSLT => 0.48,
     },
     META_ADD => {
 	no_index => {

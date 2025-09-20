@@ -134,42 +134,42 @@ class Mojo::Log extends Mojo::EventEmitter {
     return $content;
   }
   
-  method debug : void ($message : object of string|Mojo::Log::Callback::Message) {
+  method debug : void ($message : string|Mojo::Log::Callback::Message) {
     
     if (2 >= $LEVEL->get_int($self->level)) {
       $self->_log($message, "debug");
     }
   }
   
-  method error : void ($message : object of string|Mojo::Log::Callback::Message) {
+  method error : void ($message : string|Mojo::Log::Callback::Message) {
     
     if (5 >= $LEVEL->get_int($self->level)) {
       $self->_log($message, "error");
     }
   }
   
-  method fatal : void ($message : object of string|Mojo::Log::Callback::Message) {
+  method fatal : void ($message : string|Mojo::Log::Callback::Message) {
     
     if (6 >= $LEVEL->get_int($self->level)) {
       $self->_log($message, "fatal");
     }
   }
   
-  method info : void ($message : object of string|Mojo::Log::Callback::Message) {
+  method info : void ($message : string|Mojo::Log::Callback::Message) {
     
     if (3 >= $LEVEL->get_int($self->level)) {
       $self->_log($message, "info");
     }
   }
   
-  method trace : void ($message : object of string|Mojo::Log::Callback::Message) {
+  method trace : void ($message : string|Mojo::Log::Callback::Message) {
     
     if (1 >= $LEVEL->get_int($self->level)) {
       $self->_log($message, "trace");
     }
   }
   
-  method warn : void ($message : object of string|Mojo::Log::Callback::Message) {
+  method warn : void ($message : string|Mojo::Log::Callback::Message) {
     
     if (4 >= $LEVEL->get_int($self->level)) {
       $self->_log($message, "warn");
@@ -181,7 +181,7 @@ class Mojo::Log extends Mojo::EventEmitter {
   }
   
   # Private Instance Methods
-  private method _log : void ($message : object of string|Mojo::Log::Callback::Message, $level : string) {
+  private method _log : void ($message : string|Mojo::Log::Callback::Message, $level : string) {
     
     my $message_ : string;
     if ($message isa string) {

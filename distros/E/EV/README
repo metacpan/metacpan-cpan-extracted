@@ -11,8 +11,8 @@ SYNOPSIS
           warn "is called after 2s";
        };
    
-       my $w = EV::timer 2, 2, sub {
-          warn "is called roughly every 2s (repeat = 2)";
+       my $w = EV::timer 0, 3, sub {
+          warn "is called as soon as possible, then every 3s";
        };
    
        undef $w; # destroy event watcher again
@@ -36,7 +36,7 @@ SYNOPSIS
    
        # CHILD/PID STATUS CHANGES
   
-       my $w = EV::child 666, 0, sub {
+       my $w = EV::child $pid, 0, sub {
           my ($w, $revents) = @_;
           my $status = $w->rstatus;
        };
@@ -141,7 +141,7 @@ EVENT LOOPS
         The loop will automatically be destroyed when it is no longer
         referenced by any watcher and the loop object goes out of scope.
 
-        If you are not embedding the loop, then Using "EV::FLAG_FORKCHECK"
+        If you are not embedding the loop, then using "EV::FLAG_FORKCHECK"
         is recommended, as only the default event loop is protected by this
         module. If you *are* embedding this loop in the default loop, this
         is not necessary, as "EV::embed" automatically does the right thing

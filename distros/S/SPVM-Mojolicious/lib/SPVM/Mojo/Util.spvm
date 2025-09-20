@@ -10,6 +10,7 @@ class Mojo::Util {
   use StringList;
   use Digest::SHA;
   use Format;
+  use Getopt::Long;
   
   our $QUOTED_VALUE_RE : string;
   INIT {
@@ -396,6 +397,11 @@ class Mojo::Util {
     }
     
     return [$arg, $options];
+  }
+  
+  static method getopt : void ($comand_args_ref : string[][], $values_h : Hash, $spec_strings : string[]) {
+    
+    Getopt::Long->GetOptionsFromArray($comand_args_ref, $values_h, $spec_strings);
   }
 
 }

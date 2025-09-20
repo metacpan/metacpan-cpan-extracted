@@ -10,14 +10,14 @@ train stations via text and JSON output.
 ## DEPRECATION NOTICE
 
 As of May 2024, the backend service that this utility relies on is deprecated
-and may cease operation in the near future. There is no immediate successor.
-Hence, db-iris and Travel::Status::DE::IRIS are no longer actively maintained.
-There is no promise that issues and merge requests will be reviewed or merged.
+and may cease operation in the near future.  Hence, db-iris and
+Travel::Status::DE::IRIS are no longer actively maintained.  There is no
+promise that issues and merge requests will be reviewed or merged.
 
-The **hafas-m** application that is part of [Travel::Status::DE::HAFAS](https://finalrewind.org/projects/Travel-Status-DE-DeutscheBahn/)
-provides similar features. However, its default "DB" backend is also
-deprecated. There is no migration path to a Deutsche Bahn departure monitor
-that is not deprecated at the moment.
+The **dbris-m** application that is part of
+[Travel::Status::DE::DBRIS](https://finalrewind.org/projects/Travel-Status-DE-DBRIS/)
+has similar features.  Note that its backend does not provide detailed
+(timestamped) delay and quality of service messages.
 
 ## Installation
 

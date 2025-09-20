@@ -6,7 +6,7 @@ use 5.020;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 Travel::Status::DE::DBRIS::Location->mk_ro_accessors(
 	qw(eva id lat lon name products type is_cancelled is_additional is_separation display_priority
@@ -96,6 +96,9 @@ sub new {
 	for my $message ( @{ $json->{priorisierteMeldungen} // [] } ) {
 		if ( $message->{type} and $message->{type} eq 'HALT_AUSFALL' ) {
 			$ref->{is_cancelled} = 1;
+		}
+		elsif ( $message->{text} and $message->{text} eq 'Zusatzhalt' ) {
+			$ref->{is_additional} = 1;
 		}
 		push( @{ $ref->{messages} }, $message );
 	}

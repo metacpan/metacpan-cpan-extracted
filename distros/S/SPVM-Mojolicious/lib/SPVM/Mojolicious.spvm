@@ -2,22 +2,243 @@
 # MIT License
 
 class Mojolicious {
-  version "0.022";
+  version "0.023";
   
-  use Mojolicious::Routes;
+  use Mojo::Home;
+  use Mojo::Loader;
   use Mojo::Log;
+  use Mojo::Server;
+  use Mojo::Util;
+  use Mojolicious::Controller;
+  use Mojolicious::Plugins;
+  use Mojolicious::Renderer;
+  use Mojolicious::Routes;
   use Mojolicious::Sessions;
+  use Mojolicious::Static;
+  use Mojolicious::Types;
+  use Mojo::Transaction;
+  use Sys;
+  use Mojolicious::Helper::Reply;
+  use Mojolicious::Commands;
   
   # Fields
+  has home : rw Mojo::Home
+    get {
+      unless (exists $self->{home}) {
+        my $home = Mojo::Home->new;
+        $home->detect;
+        $self->{home} = $home;
+      }
+      return $self->{home};
+    }
+  ;
+  
+  has log  : rw Mojo::Log
+    get {
+      unless (exists $self->{log}) {
+        my $log = Mojo::Log->new;
+        
+        if (length (my $_ = Sys->env("SPVM_MOJO_LOG_LEVEL"))) {
+          $log->set_level($_);
+        }
+        else {
+          unless ($self->mode eq "development") {
+            $log->set_level("info");
+          }
+        }
+        
+        return $self->{log} = $log;
+      }
+    }
+  ;
+  
+  has mode : rw string
+    get {
+      unless (exists $self->{mode}) {
+        if (length (my $_ = Sys->env("SPVM_MOJO_MODE"))) {
+          $self->{mode} = $_;
+        }
+        else {
+          $self->{mode} = "development";
+        }
+      }
+      return $self->{mode};
+    }
+  ;
+  
+  has moniker : rw string;
+  
+  has max_request_size : rw int;
+  
+  has plugins : rw Mojolicious::Plugins
+    get {
+      unless (exists $self->{plugins}) {
+        $self->{plugins} = Mojolicious::Plugins->new;
+      }
+      return $self->{plugins};
+    }
+  ;
+  
+  has commands : rw Mojolicious::Commands
+    get {
+      unless (exists $self->{commands}) {
+        $self->{commands} = Mojolicious::Commands->new;
+      }
+      return $self->{commands};
+    }
+  ;
+  
+  has renderer : rw Mojolicious::Renderer
+    get {
+      unless (exists $self->{renderer}) {
+        $self->{renderer} = Mojolicious::Renderer->new;
+      }
+      return $self->{renderer};
+    }
+  ;
+  
   has routes : rw Mojolicious::Routes
     get {
       unless (exists $self->{routes}) {
         $self->{routes} = Mojolicious::Routes->new;
       }
+      return $self->{routes};
     }
   ;
   
-  has log : rw Mojo::Log;
+  has secrets : rw string[]
+    get {
+      unless (exists $self->{secrets}) {
+        # Warn developers about insecure default
+        $self->log->trace("Your secret passphrase needs to be changed (see FAQ for more)");
+        
+        # Default to moniker
+        return [$self->moniker];
+      }
+      return $self->{secrets};
+    }
+  ;
   
-  has moniker : rw string;
+  has sessions : rw Mojolicious::Sessions
+    get {
+      unless (exists $self->{sessions}) {
+        $self->{sessions} = Mojolicious::Sessions->new;
+      }
+      return $self->{sessions};
+    }
+  ;
+  
+  has static : rw Mojolicious::Static
+    get {
+      unless (exists $self->{static}) {
+        $self->{static} = Mojolicious::Static->new;
+      }
+      return $self->{static};
+    }
+  ;
+  
+  has types : rw Mojolicious::Types
+    get {
+      unless (exists $self->{types}) {
+        $self->{types} = Mojolicious::Types->new;
+      }
+      return $self->{types};
+    }
+  ;
+  
+  has config : rw Hash;
+  
+  has defaults : rw Hash;
+  
+  # Class Methods
+  static method new : Mojolicious () {
+    
+    my $self = new Mojolicious;
+    
+    my $home = $self->home;
+    $self->renderer->paths_list->push($home->child("templates")->to_string);
+    $self->static->paths_list->push($home->child("public")->to_string);
+    
+    return $self;
+  }
+  
+  # Instance Methods
+  method build_controller : Mojolicious::Controller ($tx : Mojo::Transaction) {
+    
+    unless ($tx) {
+      die "The transaction \$tx must be defined.";
+    }
+    
+    # Build default controller
+    my $defaults = $self->defaults;
+    
+    my $stash = $defaults->clone;
+    
+    my $c = Mojolicious::Controller->new;
+    $c->set_app($self);
+    $c->set_tx($tx);
+    $c->set_stash($stash);
+    
+    return $c;
+  }
+  
+  method dispatch : void ($c : Mojolicious::Controller) {
+    
+    my $stash = $c->stash;
+    if ($stash->get_int("mojo.rendered")) {
+      return;
+    }
+    
+    # Try to find a static file
+    my $tx = $c->tx;
+    unless ($tx->res->code >= 0) {
+      $self->static->dispatch($c);
+    }
+    
+    # Routes
+    unless ($tx->res->code) {
+      my $continue = $self->routes->dispatch($c);
+      
+      unless ($continue) {
+        unless ($tx->res->code) {
+          $c->reply->not_found;
+        }
+      }
+    }
+  }
+  
+  method helper : void ($name : string, $cb : Mojo::Callback) {
+    
+    $self->renderer->add_helper($name, $cb);
+  }
+  
+  method hook : void ($name : string, $cb : Mojo::Callback)  {
+    
+    $self->plugins->on($name, $cb);
+  }
+  
+  method plugin : void ($name : string, $options : object[] = undef) {
+    $self->plugins->register_plugin($name, $self, $options);
+  }
+  
+  method handler : void ($tx : Mojo::Transaction) {
+    
+    # Process with chain
+    my $c = $self->build_controller($tx);
+    $self->dispatch($c);
+  }
+  
+  method start : void ($argv : string[] = undef) {
+    
+    unless ($argv) {
+      $argv = CommandInfo->ARGV;
+    }
+    
+    $self->commands->run($argv);
+  }
+
 }
+
+
+__END__
+

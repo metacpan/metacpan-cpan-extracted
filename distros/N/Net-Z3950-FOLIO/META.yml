@@ -32,8 +32,9 @@ requires:
   Test::Differences: '0.61'
   Unicode::Diacritic::Strip: '0.13'
   XML::Simple: '2.25'
+  XML::XSLT: '0.48'
 resources:
   bugtracker: https://issues.folio.org/projects/ZF/issues
   repository: https://github.com/folio-org/Net-Z3950-FOLIO.git
-version: v4.2.0
+version: v4.3.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

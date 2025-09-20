@@ -1,0 +1,6 @@
+# Copyright (c) 2025 Yuki Kimoto
+# MIT License
+
+class Mojolicious::Command::Prefork {
+  version_from Mojolicious;
+}

@@ -14,7 +14,7 @@ use List::Util      qw(any);
 use List::MoreUtils qw(uniq lastval);
 use Scalar::Util    qw(weaken);
 
-our $VERSION = '1.98';
+our $VERSION = '2.00';
 
 Travel::Status::DE::IRIS::Result->mk_ro_accessors(
 	qw(arrival arrival_delay arrival_has_realtime arrival_is_additional arrival_is_cancelled arrival_hidden
@@ -59,6 +59,7 @@ my %translation = (
 	24 => 'Verspätung im Ausland',
 	25 => 'Bereitstellung weiterer Wagen',
 	26 => 'Abhängen von Wagen',
+	27 => 'Technische Störung am Bus',
 	28 => 'Gegenstände auf der Strecke',
 	29 => 'Ersatzverkehr mit Bus ist eingerichtet',
 	31 => 'Bauarbeiten',
@@ -939,7 +940,7 @@ arrival/departure received by Travel::Status::DE::IRIS
 
 =head1 VERSION
 
-version 1.98
+version 2.00
 
 =head1 DESCRIPTION
 

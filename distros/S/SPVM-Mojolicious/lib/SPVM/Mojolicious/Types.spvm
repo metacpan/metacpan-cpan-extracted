@@ -147,7 +147,7 @@ class Mojolicious::Types {
     return $type;
   }
   
-  method set_type : string ($ext : string, $type : object of string|string[] = undef) {
+  method set_type : string ($ext : string, $type : string|string[] = undef) {
     
     my $types = (string[])undef;
     if ($type isa string) {

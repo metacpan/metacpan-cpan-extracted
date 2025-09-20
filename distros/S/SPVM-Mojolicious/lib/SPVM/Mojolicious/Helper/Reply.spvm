@@ -1,0 +1,25 @@
+# Copyright (c) 2025 Yuki Kimoto
+# MIT License
+
+class Mojolicious::Helper::Reply {
+  version_from Mojolicious;
+  
+  use Mojolicious::Controller;
+  
+  # Fields
+  has controller : rw Mojolicious::Controller;
+  
+  # Class Methods
+  static method new : Mojolicious::Helper::Reply () {
+    
+    my $self = new Mojolicious::Helper::Reply;
+    
+    return $self;
+  }
+  
+  # Instance Methods
+  method not_found : void () {
+    die "TODO";
+  }
+  
+}

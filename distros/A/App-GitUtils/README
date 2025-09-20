@@ -2,17 +2,13 @@ NAME
     App::GitUtils - Day-to-day command-line utilities for git
 
 VERSION
-    This document describes version 0.087 of App::GitUtils (from Perl
-    distribution App-GitUtils), released on 2025-04-16.
+    This document describes version 0.088 of App::GitUtils (from Perl
+    distribution App-GitUtils), released on 2025-09-20.
 
 SYNOPSIS
     This distribution provides the following command-line utilities:
 
     *   gu
-
-    *   gu-calc-committing-total-size
-
-    *   gu-list-committing-large-files
 
     *   this-repo
 
@@ -36,6 +32,42 @@ FUNCTIONS
     Arguments ('*' denotes required arguments):
 
     *   include_untracked => *bool* (default: 1)
+
+        (No description)
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  calc_untracked_total_size
+    Usage:
+
+     calc_untracked_total_size(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Check the disk usage of untracked files.
+
+    This routine basically just grabs the list of untracked files returned
+    by status() ("gu status") then checks their disk usage and totals them.
+    CAVEAT: currently, if an untracked file is a directory, then this
+    routine will just count the disk usage of the content of the directory
+    recursively /without/ considering ignored files. Correcting this is in
+    the todo list.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   detail => *bool*
 
         (No description)
 
@@ -319,12 +351,50 @@ FUNCTIONS
 
     Return value: (any)
 
+  split_commit_add_untracked
+    Usage:
+
+     split_commit_add_untracked(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Commit untracked files, possibly over several commits, keeping commit
+    size under certain limit.
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   max_size => *datasize* (default: 2146435072)
+
+        (No description)
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
   status
     Usage:
 
      status() -> [$status_code, $reason, $payload, \%result_meta]
 
-    Run "git status" and return information as a data structure.
+    Run `git status` and return information as a data structure.
 
     Currently incomplete!
 

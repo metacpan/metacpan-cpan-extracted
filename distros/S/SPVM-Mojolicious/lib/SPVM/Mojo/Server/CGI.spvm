@@ -1,0 +1,23 @@
+# Copyright (c) 2025 Yuki Kimoto
+# MIT License
+
+class Mojo::Server::CGI extends Mojo::Server {
+  version_from Mojolicious;
+  
+  # Fields
+  has nph : rw byte;
+  
+  # Class Methods
+  static method new : Mojo::Server::CGI () {
+    
+    my $self = new Mojo::Server::CGI;
+    
+    return $self;
+  }
+  
+  # Instance Methods
+  method run : void () {
+    die "TODO";
+  }
+  
+}

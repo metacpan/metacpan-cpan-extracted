@@ -15,11 +15,12 @@ use Data::Dumper; $Data::Dumper::Indent = 1;
 
 use Net::Z3950::FOLIO::Session;
 use Net::Z3950::FOLIO::OPACXMLRecord qw(makeOPACXMLRecord);
+use Net::Z3950::FOLIO::TransformXML qw(transformXMLRecord);
 use Net::Z3950::FOLIO::RPN;
 use Net::Z3950::FOLIO::SurrogateDiagnostic;
 
 
-our $VERSION = 'v4.2.0';
+our $VERSION = 'v4.3.0';
 
 
 sub FORMAT_USMARC { '1.2.840.10003.5.10' }
@@ -227,7 +228,13 @@ sub _fetch_handler {
 	# OPAC-format XML
 	$res = makeOPACXMLRecord($rec);
     } elsif ($format eq FORMAT_XML) {
-	_throw(25, "XML records available in element-sets: raw, usmarc, opac");
+	$res = transformXMLRecord($session->{cfg}, $rec, $comp);
+	if (!$res) {
+	    my @eslist = qw(raw usmarc opac);
+	    my $es = $session->{cfg}->{xmlElementSets};
+	    push @eslist, keys(%$es) if $es;
+	    _throw(25, 'XML records available in element-sets: ' . join(', ', @eslist));
+	}
 
     } elsif ($format eq FORMAT_USMARC && (!$comp || $comp eq 'f' || $comp eq 'b')) {
 	# Static USMARC from SRS

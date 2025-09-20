@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.020;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use utf8;
 use DateTime;
@@ -126,7 +126,9 @@ else {
 	my $found;
 	for my $result ( $status->results ) {
 		if ( defined $result->eva ) {
-			if ( lc( $result->name ) ne lc( $opt{station} ) ) {
+			if ( lc( $result->name ) ne lc( $opt{station} )
+				and not( $json_output or $raw_json_output ) )
+			{
 				say $result->name;
 			}
 			$opt{station} = $result;
@@ -388,7 +390,9 @@ elsif ( $opt{journey} and not( $raw_json_output or $json_output ) ) {
 	}
 
 	printf( "%s %s am %s\n\n",
-		$trip->type, $trip->train_no, $trip->day->strftime('%d.%m.%Y') );
+		$trip->type,
+		$trip->train_no // $trip->number,
+		$trip->day->strftime('%d.%m.%Y') );
 
 	for my $stop ( $trip->route ) {
 		if ( $stop == $mark_stop ) {
@@ -603,7 +607,7 @@ B<dbris-m> B<?>I<query>|I<lat>B<:>I<lon>
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 DESCRIPTION
 

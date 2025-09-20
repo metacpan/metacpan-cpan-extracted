@@ -1,4 +1,6 @@
 use strict;
+#Build  MD5 : OgbxN1gZ/0Hmex8Gt93DSg
+#Build Time : 2025-09-19 18:09:53
 use warnings;
 use XS::Log qw(:all);
 
@@ -9,7 +11,7 @@ my %opt = (
  use_color         => 1,
  show_timestamp    => 1,
  show_log_level    => 1,
- show_file_info    => 1,
+ show_file_info    => 0,
  max_file_size     => 1024*1024*10,		#10M
  max_files         => 5,
  flush_immediately => 1,
@@ -33,16 +35,16 @@ printErr("This is error2\n");
 
 #setLogColor(0);
 setLogOptions("use_color",0);
-setLogOptions("show_file_info",0);
+setLogOptions("show_file_info",1);
 setLogOptions("level",10);
 
 my $user = "Alice";
 my $val  = 42;
 
-printInf("Hello %s, value=%d\n", $user, $val);
-printBug("Hello %s, value=%d\n", $user, $val);
-printBug("Hello %s, value=%d\n", $user, $val);
-printBug("Hello %s, value=%d\n", $user, $val);
+printInf("name = %s, value=%d\n", $user, $val);
+printBug("name = %s, value=%d\n", $user, $val);
+printBug("name = %s, value=%d\n", $user, $val);
+printBug("name = %s, value=%d\n", $user, $val);
 printErr("File not found: %s\n", "/tmp/test.txt");
 
 closeLog();

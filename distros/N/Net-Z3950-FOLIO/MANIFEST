@@ -48,11 +48,12 @@ etc/config.snapshot.json
 etc/config.unsuppressed-holdings.json
 etc/config.unsuppressed-items.json
 etc/config.withLoans.json
-etc/folio2marcxml.xsl
-etc/folio2opac.xsl
 etc/instances.graphql-query
 etc/mod-search-with-loans.graphql-query
 etc/mod-search.graphql-query
+etc/xslt/folio2marcxml.xsl
+etc/xslt/folio2mods.xsl
+etc/xslt/folio2opac.xsl
 etc/yazgfs.xml
 lib/DummyRecord.pm
 lib/Net/Z3950/FOLIO.pm
@@ -68,6 +69,7 @@ lib/Net/Z3950/FOLIO/Record.pm
 lib/Net/Z3950/FOLIO/ResultSet.pm
 lib/Net/Z3950/FOLIO/Session.pm
 lib/Net/Z3950/FOLIO/SurrogateDiagnostic.pm
+lib/Net/Z3950/FOLIO/TransformXML.pm
 lib/Net/Z3950/FOLIO/lodashGet.pm
 t/01-pqf-to-cql.t
 t/02-sortspec.t

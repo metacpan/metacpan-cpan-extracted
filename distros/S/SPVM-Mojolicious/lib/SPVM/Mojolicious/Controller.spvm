@@ -68,6 +68,14 @@ class Mojolicious::Controller {
   
   has session : rw Hash;
   
+  static method new : Mojolicious::Controller () {
+    
+    my $self = new Mojolicious::Controller;
+    
+    return $self;
+  }
+  
+  # Instance Methods
   method req : Mojo::Message::Request () {
     
     my $tx = $self->tx;
@@ -438,4 +446,12 @@ class Mojolicious::Controller {
 
 =cut
 
+  method reply : Mojolicious::Helper::Reply () {
+    
+    my $reply = Mojolicious::Helper::Reply->new;
+    $reply->set_controller($self);
+    
+    return $reply;
+  }
+  
 }

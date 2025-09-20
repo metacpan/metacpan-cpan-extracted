@@ -1,5 +1,9 @@
 # Revision history for Perl extension Net::Z3950::FOLIO.
 
+## 4.3.0 (Fri 19 Sep 2025 18:25:22 BST)
+
+* New `xmlElementSets` configuration entry, a mapping of XML element-set names to XSLT 1.0 stylesheets, which can be used to provide XML records in formats such as MODS. Fixes ZF-114.
+
 ## 4.2.0 (Wed 18 Jun 2025 12:33:06 CEST)
 
 * When a MARC record has multiple 999ff fields, the FOLIO ID will now be taken from the first of these that has a `$i` subfield, rather than always using the last. This means that composite records from ETL process, which may have multiple 999ff fields, can now be retrieved. Fixes ZF-112.

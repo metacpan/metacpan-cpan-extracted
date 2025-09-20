@@ -1,8 +1,8 @@
 package XS::Log;
-#Build  MD5 : 247/pl1Xcz3CA4JSyzAy3g
-#Build Time : 2025-09-19 17:22:30
-our $VERSION = 1.06;
-our $BUILDDATE = "2025-09-19";  #Build Time: 17:22:30
+#Build  MD5 : xsJ8PB1dSdfaKfw4DbOY3w
+#Build Time : 2025-09-20 09:36:19
+our $VERSION = 1.09;
+our $BUILDDATE = "2025-09-20";  #Build Time: 09:36:19
 use strict;
 use warnings;
 use constant { 
@@ -28,7 +28,7 @@ our @ISA = qw(Exporter);
 
 our @EXPORT_OK = qw(
     openLog closeLog flushLog setLogOptions setLogColor setLogMode setLogTargets setLogLevel
-    log_write printNote printBug printInf printWarn printErr printFail printLog
+    printNote printBug printInf printWarn printErr printFail printLog
 	LOG_LEVEL_OFF LOG_LEVEL_FATAL LOG_LEVEL_ERROR LOG_LEVEL_WARN LOG_LEVEL_INFO LOG_LEVEL_TRACE LOG_LEVEL_DEBUG LOG_LEVEL_TEXT
 	LOG_MODE_CYCLE LOG_MODE_DAILY LOG_MODE_HOURLY 
 	LOG_TARGET_CONSOLE LOG_TARGET_FILE LOG_TARGET_SYSLOG
@@ -39,13 +39,83 @@ our %EXPORT_TAGS = (
 );
 XSLoader::load('XS::Log', $VERSION);
 
-sub printNote {my ($fmt, @args) = @_;my $msg = sprintf($fmt, @args);my ($pkg, $file, $line) = caller;log_write(LOG_LEVEL_TRACE,$file, $line,$msg);}
-sub printBug  {my ($fmt, @args) = @_;my $msg = sprintf($fmt, @args);my ($pkg, $file, $line) = caller;log_write(LOG_LEVEL_DEBUG,$file, $line,$msg);}
-sub printInf  {my ($fmt, @args) = @_;my $msg = sprintf($fmt, @args);my ($pkg, $file, $line) = caller;log_write(LOG_LEVEL_INFO, $file, $line,$msg);}
-sub printWarn {my ($fmt, @args) = @_;my $msg = sprintf($fmt, @args);my ($pkg, $file, $line) = caller;log_write(LOG_LEVEL_WARN, $file, $line,$msg);}
-sub printErr  {my ($fmt, @args) = @_;my $msg = sprintf($fmt, @args);my ($pkg, $file, $line) = caller;log_write(LOG_LEVEL_ERROR,$file, $line,$msg);}
-sub printFail {my ($fmt, @args) = @_;my $msg = sprintf($fmt, @args);my ($pkg, $file, $line) = caller;log_write(LOG_LEVEL_FATAL,$file, $line,$msg);}
-sub printLog  {my ($fmt, @args) = @_;my $msg = sprintf($fmt, @args);my ($pkg, $file, $line) = caller;log_write(LOG_LEVEL_TEXT, $file, $line,$msg);}
+sub printNote {
+	my ($fmt, @args) = @_;
+	my $msg = sprintf($fmt, @args);
+	my ($pkg,$file,$line);
+	$file = ""; $line = 0;
+	#判断是否调用caller会提速？
+	if(get_show_file_info())
+	{
+		($pkg, $file, $line) = caller;
+	}
+	xs_log_write(LOG_LEVEL_TRACE,$file,$line,$msg);
+}
+sub printBug {
+	my ($fmt, @args) = @_;
+	my $msg = sprintf($fmt, @args);
+	my ($pkg,$file,$line);
+	$file = ""; $line = 0;
+	#判断是否调用caller会提速？
+	if(get_show_file_info())
+	{
+		($pkg, $file, $line) = caller;
+	}
+	xs_log_write(LOG_LEVEL_DEBUG,$file,$line,$msg);
+}
+sub printInf {
+	my ($fmt, @args) = @_;
+	my $msg = sprintf($fmt, @args);
+	my ($pkg,$file,$line);
+	$file = ""; $line = 0;
+	#判断是否调用caller会提速？
+	if(get_show_file_info())
+	{
+		($pkg, $file, $line) = caller;
+	}
+	xs_log_write(LOG_LEVEL_INFO,$file,$line,$msg);
+}
+sub printWarn {
+	my ($fmt, @args) = @_;
+	my $msg = sprintf($fmt, @args);
+	my ($pkg,$file,$line);
+	$file = ""; $line = 0;
+	#判断是否调用caller会提速？
+	if(get_show_file_info())
+	{
+		($pkg, $file, $line) = caller;
+	}
+	xs_log_write(LOG_LEVEL_WARN,$file,$line,$msg);
+}
+sub printErr {
+	my ($fmt, @args) = @_;
+	my $msg = sprintf($fmt, @args);
+	my ($pkg,$file,$line);
+	$file = ""; $line = 0;
+	#判断是否调用caller会提速？
+	if(get_show_file_info())
+	{
+		($pkg, $file, $line) = caller;
+	}
+	xs_log_write(LOG_LEVEL_ERROR,$file,$line,$msg);
+}
+sub printFail {
+	my ($fmt, @args) = @_;
+	my $msg = sprintf($fmt, @args);
+	my ($pkg,$file,$line);
+	$file = ""; $line = 0;
+	#判断是否调用caller会提速？
+	if(get_show_file_info())
+	{
+		($pkg, $file, $line) = caller;
+	}
+	xs_log_write(LOG_LEVEL_FATAL,$file,$line,$msg);
+}
+sub printLog {
+	my ($fmt, @args) = @_;
+	my $msg = sprintf($fmt, @args);
+	xs_log_write(LOG_LEVEL_TEXT,"",0,$msg);
+}
 1;
 
 __END__
@@ -237,19 +307,19 @@ B<XS::Log>是高效快速的日志模块，纯c语言开发，快速高效的IO�
 
 屏幕输出结果：
 
-  [2025-09-18 18:44:38.983][INFO ] This is info1
-  [2025-09-18 18:44:38.983][INFO ] This is info2
-  [2025-09-18 18:44:38.983][INFO ] This is info4
-  [2025-09-18 18:44:38.983][INFO ] This is info5
-  [2025-09-18 18:44:38.983][WARN ] This is warning1
-  [2025-09-18 18:44:38.983][WARN ] This is warning2
-  [2025-09-18 18:44:38.983][ERROR] This is error1
-  [2025-09-18 18:44:38.983][ERROR] This is error2
-  [2025-09-18 18:44:38.983][INFO ] (/home/user/temp1.pl:38) Hello Alice, value=42
-  [2025-09-18 18:44:38.983][DEBUG] (/home/user/temp1.pl:39) Hello Alice, value=42
-  [2025-09-18 18:44:38.983][DEBUG] (/home/user/temp1.pl:40) Hello Alice, value=42
-  [2025-09-18 18:44:38.983][DEBUG] (/home/user/temp1.pl:41) Hello Alice, value=42
-  [2025-09-18 18:44:38.983][ERROR] (/home/user/temp1.pl:42) File not found: /tmp/test.txt
+  [2025-09-18 18:44:38.983][INF] This is info1
+  [2025-09-18 18:44:38.983][INF] This is info2
+  [2025-09-18 18:44:38.983][INF] This is info4
+  [2025-09-18 18:44:38.983][INF] This is info5
+  [2025-09-18 18:44:38.983][WRN] This is warning1
+  [2025-09-18 18:44:38.983][WRN] This is warning2
+  [2025-09-18 18:44:38.983][ERR] This is error1
+  [2025-09-18 18:44:38.983][ERR] This is error2
+  [2025-09-18 18:44:38.983][INF] (/home/user/temp1.pl:38) Hello Alice, value=42
+  [2025-09-18 18:44:38.983][DEB] (/home/user/temp1.pl:39) Hello Alice, value=42
+  [2025-09-18 18:44:38.983][DEB] (/home/user/temp1.pl:40) Hello Alice, value=42
+  [2025-09-18 18:44:38.983][DEB] (/home/user/temp1.pl:41) Hello Alice, value=42
+  [2025-09-18 18:44:38.983][ERR] (/home/user/temp1.pl:42) File not found: /tmp/test.txt
 
 =head2 例子2:/home/user/temp2.pl
 
@@ -302,14 +372,14 @@ B<XS::Log>是高效快速的日志模块，纯c语言开发，快速高效的IO�
 
 屏幕输出结果：
 
-  [2025-09-18 18:46:32.013][INFO ] This is info1
-  [2025-09-18 18:46:32.013][INFO ] This is info2
-  [2025-09-18 18:46:32.013][INFO ] This is info4
-  [2025-09-18 18:46:32.013][INFO ] This is info5
-  [2025-09-18 18:46:32.013][WARN ] This is warning1
-  [2025-09-18 18:46:32.013][WARN ] This is warning2
-  [2025-09-18 18:46:32.013][ERROR] This is error1
-  [2025-09-18 18:46:32.013][ERROR] This is error2
+  [2025-09-18 18:46:32.013][INF] This is info1
+  [2025-09-18 18:46:32.013][INF] This is info2
+  [2025-09-18 18:46:32.013][INF] This is info4
+  [2025-09-18 18:46:32.013][INF] This is info5
+  [2025-09-18 18:46:32.013][WRN] This is warning1
+  [2025-09-18 18:46:32.013][WRN] This is warning2
+  [2025-09-18 18:46:32.013][ERR] This is error1
+  [2025-09-18 18:46:32.013][ERR] This is error2
 
 =cut
 

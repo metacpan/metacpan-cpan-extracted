@@ -1,4 +1,4 @@
-use v5.12;
+use v5.22;
 use strict;
 use warnings;
 use Benchmark qw( cmpthese );
@@ -164,6 +164,49 @@ package Implementation::Kavorka {
 	}
 }
 
+package Implementation::MD {
+	use Moo;
+	use Multi::Dispatch;
+	use Types::Standard -types;
+	
+	multimethod stringify (Undef $undef) {
+		'null';
+	}
+	
+	multimethod stringify (ScalarRef[Bool] $bool) {
+		$$bool ? 'true' : 'false';
+	}
+	
+	multimethod stringify (Str $str) {
+		sprintf(q<"%s">, quotemeta($str));
+	}
+	
+	multimethod stringify (Num $n) {
+		$n;
+	}
+	
+	multimethod stringify (ArrayRef $arr) {
+		sprintf(
+			q<[%s]>,
+			join(q<,>, map($self->stringify($_), @$arr))
+		);
+	}
+	
+	multimethod stringify (HashRef $hash) {
+		sprintf(
+			q<{%s}>,
+			join(
+				q<,>,
+				map sprintf(
+					q<%s:%s>,
+					$self->stringify($_),
+					$self->stringify($hash->{$_})
+				), sort keys %$hash,
+			)
+		);
+	}
+}
+
 our %INPUT = (
 	foo => 123,
 	bar => [1,2,3],
@@ -174,6 +217,7 @@ our %INPUT = (
 our $SMM = Implementation::SMM->new;
 our $KAV = Implementation::Kavorka->new;
 our $DIO = Implementation::Dios->new;
+our $MD  = Implementation::MD->new;
 
 say "SMM output:";
 say $SMM->stringify( \%INPUT );
@@ -184,14 +228,19 @@ say $KAV->stringify( \%INPUT );
 say "DIO output:";
 say $DIO->stringify( \%INPUT );
 
+say "MD output:";
+say $MD->stringify( \%INPUT );
+
 cmpthese -3, {
 	SMM  => q{ $::SMM->stringify(\%::INPUT) },
 	KAV  => q{ $::KAV->stringify(\%::INPUT) },
 	DIO  => q{ $::DIO->stringify(\%::INPUT) },
+	MD   => q{ $::MD ->stringify(\%::INPUT) },
 };
 
 __END__
-      Rate  DIO  SMM  KAV
-DIO  161/s   -- -79% -89%
-SMM  755/s 370%   -- -48%
-KAV 1444/s 799%  91%   --
+       Rate   DIO   KAV   SMM    MD
+DIO   372/s    --  -88%  -93%  -98%
+KAV  3197/s  759%    --  -38%  -84%
+SMM  5140/s 1280%   61%    --  -75%
+MD  20189/s 5322%  531%  293%    --

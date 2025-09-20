@@ -12,6 +12,7 @@ SIGNATURE
 dist.ini
 doap.ttl
 examples/benchmark.pl
+examples/dd2.pl
 examples/json.pl
 examples/rock-paper-scissors-zydeco.pl
 examples/rock-paper-scissors.pl
@@ -28,6 +29,7 @@ t/07multifunc.t
 t/08mro.t
 t/09coderef.t
 t/10headtail.t
+t/11want_and_if.t
 t/legacy/01basic.t
 t/legacy/02singleclass.t
 t/legacy/03inheritance.t

@@ -58,7 +58,7 @@ class Mojo::Date {
   }
   
   # Class Methods
-  static method new : Mojo::Date ($date_value : object of string|Long = undef) {
+  static method new : Mojo::Date ($date_value : string|Long = undef) {
     
     my $self = new Mojo::Date;
     

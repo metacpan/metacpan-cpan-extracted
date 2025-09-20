@@ -7,11 +7,12 @@ use Log::ger;
 
 use Cwd qw(getcwd abs_path);
 use File::chdir;
+use IPC::System::Options 'system', -log=>1, -die=>1;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-04-16'; # DATE
+our $DATE = '2025-09-20'; # DATE
 our $DIST = 'App-GitUtils'; # DIST
-our $VERSION = '0.087'; # VERSION
+our $VERSION = '0.088'; # VERSION
 
 our %SPEC;
 
@@ -290,7 +291,7 @@ sub clone_to_bare {
 
 $SPEC{status} = {
     v => 1.1,
-    summary => 'Run "git status" and return information as a data structure',
+    summary => 'Run `git status` and return information as a data structure',
     description => <<'MARKDOWN',
 
 Currently incomplete!
@@ -431,6 +432,7 @@ MARKDOWN
             schema => 'datasize*',
             req => 1,
             pos => 0,
+            cmdline_aliases => {s=>{}},
         },
     },
 };
@@ -469,6 +471,49 @@ sub _calc_totsize_recurse {
         $path,
     );
     $totsize;
+}
+
+$SPEC{calc_untracked_total_size} = {
+    v => 1.1,
+    summary => 'Check the disk usage of untracked files',
+    description => <<'MARKDOWN',
+
+This routine basically just grabs the list of untracked files returned by
+`status()` (`gu status`) then checks their disk usage and totals them. CAVEAT:
+currently, if an untracked file is a directory, then this routine will just
+count the disk usage of the content of the directory recursively /without/
+considering ignored files. Correcting this is in the todo list.
+
+MARKDOWN
+    args => {
+        detail => {
+            schema => 'bool*',
+            cmdline_aliases => {l=>{}},
+        },
+    },
+};
+sub calc_untracked_total_size {
+    my %args = @_;
+
+    my $res = status();
+    return $res unless $res->[0] == 200;
+
+    my $totsize = 0;
+    my @sizes;
+    for my $file (@{ $res->[2]{untracked} }) {
+        my $size;
+        if ($file =~ m!/\z!) {
+            $size += _calc_totsize_recurse($file);
+        } else {
+            $size += -s $file;
+        }
+        $totsize += $size;
+        if ($args{detail}) {
+            push @sizes, [$file, $size];
+        }
+    }
+
+    [200, "OK", $args{detail} ? \@sizes : $totsize];
 }
 
 $SPEC{calc_committing_total_size} = {
@@ -521,6 +566,85 @@ sub calc_committing_total_size {
     [200, "OK", $totsize];
 }
 
+$SPEC{split_commit_add_untracked} = {
+    v => 1.1,
+    summary => 'Commit untracked files, possibly over several commits, keeping commit size under certain limit',
+    description => <<'MARKDOWN',
+
+
+MARKDOWN
+    args => {
+        max_size => {
+            schema => 'datasize*',
+            default => 2*1024*1024*1024 - 1*1024*1024, # 1MB safe margin
+            pos => 0,
+            cmdline_aliases => {s=>{}},
+        },
+    },
+    features => {
+        dry_run => 1,
+    },
+};
+sub split_commit_add_untracked {
+    my %args = @_;
+    my $max_size = $args{max_size} // 2*1024*1024*1024 - 1*1024*1024;
+
+    my $res_status = status();
+    return [500, "Can't status(): $res_status->[0] - $res_status->[1]"]
+        unless $res_status->[0] == 200;
+
+    return [304, "Nothing to commit"]
+        unless @{ $res_status->[2]{untracked} };
+    return [409, "Please make we are not committing anything yet"]
+        if (
+            @{ $res_status->[2]{staged}{deleted} } ||
+            @{ $res_status->[2]{staged}{modified} } ||
+            @{ $res_status->[2]{staged}{new_files} } ||
+            @{ $res_status->[2]{unstaged}{deleted} } ||
+            @{ $res_status->[2]{unstaged}{modified} } ||
+            @{ $res_status->[2]{unstaged}{new_files} }
+        );
+
+    my @items;
+    for my $file (@{ $res_status->[2]{untracked} }) {
+        my $size;
+        if ($file =~ m!/\z!) {
+            $size = _calc_totsize_recurse($file);
+        } else {
+            $size = -s $file;
+        }
+        if ($size > $max_size) {
+            return [412, "One file is larger than max_size ($max_size): $file ($size)"];
+        }
+        push @items, [$file, $size];
+    }
+
+    require App::BinPackUtils;
+    my $res_pack = App::BinPackUtils::pack_bins(
+        bin_size => $max_size,
+        items => \@items,
+    );
+    return [500, "Can't pack_bins(): $res_pack->[0] - $res_pack->[1]"]
+        unless $res_pack->[0] == 200;
+
+    # TODO: split 'git add' if there are many files
+    my $i = 0;
+    my $num_bins = @{ $res_pack->[2] };
+    for my $bin (@{ $res_pack->[2] }) {
+        $i++;
+        my @files;
+        for my $item (@{ $bin->{items} }) {
+            push @files, $item->{label};
+        }
+        system("git", "add", @files);
+
+        # TODO: let user customize commit message
+        system("git", "commit", "-m", "Commited by gu split-commit-add-untracked #$i/$num_bins");
+    }
+    [200, "OK"];
+}
+
+
 1;
 # ABSTRACT: Day-to-day command-line utilities for git
 
@@ -536,7 +660,7 @@ App::GitUtils - Day-to-day command-line utilities for git
 
 =head1 VERSION
 
-This document describes version 0.087 of App::GitUtils (from Perl distribution App-GitUtils), released on 2025-04-16.
+This document describes version 0.088 of App::GitUtils (from Perl distribution App-GitUtils), released on 2025-09-20.
 
 =head1 SYNOPSIS
 
@@ -545,10 +669,6 @@ This distribution provides the following command-line utilities:
 =over
 
 =item * L<gu>
-
-=item * L<gu-calc-committing-total-size>
-
-=item * L<gu-list-committing-large-files>
 
 =item * L<this-repo>
 
@@ -579,6 +699,46 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<include_untracked> => I<bool> (default: 1)
+
+(No description)
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
+=head2 calc_untracked_total_size
+
+Usage:
+
+ calc_untracked_total_size(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Check the disk usage of untracked files.
+
+This routine basically just grabs the list of untracked files returned by
+C<status()> (C<gu status>) then checks their disk usage and totals them. CAVEAT:
+currently, if an untracked file is a directory, then this routine will just
+count the disk usage of the content of the directory recursively /without/
+considering ignored files. Correcting this is in the todo list.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<detail> => I<bool>
 
 (No description)
 
@@ -899,13 +1059,60 @@ Return value:  (any)
 
 
 
+=head2 split_commit_add_untracked
+
+Usage:
+
+ split_commit_add_untracked(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Commit untracked files, possibly over several commits, keeping commit size under certain limit.
+
+This function is not exported.
+
+This function supports dry-run operation.
+
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<max_size> => I<datasize> (default: 2146435072)
+
+(No description)
+
+
+=back
+
+Special arguments:
+
+=over 4
+
+=item * B<-dry_run> => I<bool>
+
+Pass -dry_run=E<gt>1 to enable simulation mode.
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
 =head2 status
 
 Usage:
 
  status() -> [$status_code, $reason, $payload, \%result_meta]
 
-Run "git status" and return information as a data structure.
+Run `git status` and return information as a data structure.
 
 Currently incomplete!
 

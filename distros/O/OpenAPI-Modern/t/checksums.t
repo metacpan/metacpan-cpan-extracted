@@ -30,5 +30,5 @@ __DATA__
 share/oas/LICENSE 7a3f5fcd4ca489b5555f5f92ec054a0a
 share/oas/dialect/base.schema.json 06cea984f8807c13e2916914251e22c3
 share/oas/meta/base.schema.json ecd6e7cbcc29cdabd9c445a2752fc394
-share/oas/schema-base.json b6b2bd772fdf763c2b805a7d8f48bddd
-share/oas/schema.json 189407a6e49667e45167e84810dbbb20
+share/oas/schema-base.json c7384a02a8fa98ba83488c09d76a1df1
+share/oas/schema.json 724962b927e62a5a578604093e5ecc78

@@ -68,7 +68,7 @@ Create a new L<Mojo::UserAgent|SPVM::Mojo::UserAgent> object, and return it.
 
 =head2 build_tx
 
-C<method build_tx : Mojo::Transaction::HTTP ($method : string, $url : object of string|L<Mojo::URL|SPVM::Mojo::URL>, $args1 : object = undef, $args2 : object = undef);>
+C<method build_tx : Mojo::Transaction::HTTP ($method : string, $url : string|L<Mojo::URL|SPVM::Mojo::URL>, $args1 : object = undef, $args2 : object = undef);>
 
 Generate L<Mojo::Transaction::HTTP|SPVM::Mojo::Transaction::HTTP> object with L<Mojo::UserAgent::Transactor#tx|SPVM::Mojo::UserAgent::Transactor/"tx">.
 
@@ -108,7 +108,7 @@ Not yet implemented.
 
 =head2 delete
 
-C<method delete : Mojo::Transaction::HTTP ($url : object of string|L<Mojo::URL|SPVM::Mojo::URL>, $args1 : object = undef, $args2 : object = undef);>
+C<method delete : Mojo::Transaction::HTTP ($url : string|L<Mojo::URL|SPVM::Mojo::URL>, $args1 : object = undef, $args2 : object = undef);>
 
 Perform blocking C<DELETE> request and return resulting L<Mojo::Transaction::HTTP|SPVM::Mojo::Transaction::HTTP> object, takes the same arguments as
 L<Mojo::UserAgent::Transactor/"tx"> (except for the C<DELETE> method, which is implied).
@@ -122,7 +122,7 @@ Examples:
 
 =head2 get
 
-C<method get : Mojo::Transaction::HTTP ($url : object of string|L<Mojo::URL|SPVM::Mojo::URL>, $args1 : object = undef, $args2 : object = undef);>
+C<method get : Mojo::Transaction::HTTP ($url : string|L<Mojo::URL|SPVM::Mojo::URL>, $args1 : object = undef, $args2 : object = undef);>
 
 Perform blocking C<GET> request and return resulting L<Mojo::Transaction::HTTP|SPVM::Mojo::Transaction::HTTP> object, takes the same arguments as
 L<Mojo::UserAgent::Transactor/"tx"> (except for the C<GET> method, which is implied).
@@ -136,7 +136,7 @@ Examples:
 
 =head2 head
 
-C<method head : Mojo::Transaction::HTTP ($url : object of string|L<Mojo::URL|SPVM::Mojo::URL>, $args1 : object = undef, $args2 : object = undef);>
+C<method head : Mojo::Transaction::HTTP ($url : string|L<Mojo::URL|SPVM::Mojo::URL>, $args1 : object = undef, $args2 : object = undef);>
 
 Perform blocking C<HEAD> request and return resulting L<Mojo::Transaction::HTTP|SPVM::Mojo::Transaction::HTTP> object, takes the same arguments as
 L<Mojo::UserAgent::Transactor/"tx"> (except for the C<HEAD> method, which is implied).
@@ -150,7 +150,7 @@ Examples:
 
 =head2 options
 
-C<method options : Mojo::Transaction::HTTP ($url : object of string|L<Mojo::URL|SPVM::Mojo::URL>, $args1 : object = undef, $args2 : object = undef);>
+C<method options : Mojo::Transaction::HTTP ($url : string|L<Mojo::URL|SPVM::Mojo::URL>, $args1 : object = undef, $args2 : object = undef);>
 
 Perform blocking C<OPTIONS> request and return resulting L<Mojo::Transaction::HTTP|SPVM::Mojo::Transaction::HTTP> object, takes the same arguments as
 L<Mojo::UserAgent::Transactor/"tx"> (except for the C<OPTIONS> method, which is implied).
@@ -164,7 +164,7 @@ Examples:
 
 =head2 patch
 
-C<method patch : Mojo::Transaction::HTTP ($url : object of string|L<Mojo::URL|SPVM::Mojo::URL>, $args1 : object = undef, $args2 : object = undef);>
+C<method patch : Mojo::Transaction::HTTP ($url : string|L<Mojo::URL|SPVM::Mojo::URL>, $args1 : object = undef, $args2 : object = undef);>
 
 Perform blocking C<PATCH> request and return resulting L<Mojo::Transaction::HTTP|SPVM::Mojo::Transaction::HTTP> object, takes the same arguments as
 L<Mojo::UserAgent::Transactor/"tx"> (except for the C<PATCH> method, which is implied).
@@ -178,7 +178,7 @@ Examples:
 
 =head2 post
 
-C<method post : Mojo::Transaction::HTTP ($url : object of string|L<Mojo::URL|SPVM::Mojo::URL>, $args1 : object = undef, $args2 : object = undef);>
+C<method post : Mojo::Transaction::HTTP ($url : string|L<Mojo::URL|SPVM::Mojo::URL>, $args1 : object = undef, $args2 : object = undef);>
 
 Perform blocking C<POST> request and return resulting L<Mojo::Transaction::HTTP|SPVM::Mojo::Transaction::HTTP> object, takes the same arguments as
 L<Mojo::UserAgent::Transactor/"tx"> (except for the C<POST> method, which is implied).
@@ -192,7 +192,7 @@ Examples:
 
 =head2 put
 
-C<method put : Mojo::Transaction::HTTP ($url : object of string|L<Mojo::URL|SPVM::Mojo::URL>, $args1 : object = undef, $args2 : object = undef);>
+C<method put : Mojo::Transaction::HTTP ($url : string|L<Mojo::URL|SPVM::Mojo::URL>, $args1 : object = undef, $args2 : object = undef);>
 
 Perform blocking C<PUT> request and return resulting L<Mojo::Transaction::HTTP|SPVM::Mojo::Transaction::HTTP> object, takes the same arguments as
 L<Mojo::UserAgent::Transactor/"tx"> (except for the C<PUT> method, which is implied).

@@ -42,6 +42,8 @@ class Mojolicious::Static {
     }
   ;
   
+  has paths_list : rw List of string;
+  
   has paths : rw string[]
     get {
       unless (exists $self->{paths}) {
@@ -92,5 +94,8 @@ class Mojolicious::Static {
     
     return "$prefix$file";
   }
-
+  
+  method dispatch : void ($c : Mojolicious::Controller) {
+    die "TODO";
+  }
 }

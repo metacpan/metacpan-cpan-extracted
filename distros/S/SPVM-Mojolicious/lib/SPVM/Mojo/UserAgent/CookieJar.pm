@@ -89,7 +89,7 @@ Create a new L<Mojo::UserAgent::CookieJar|SPVM::Mojo::UserAgent::CookieJar> obje
 
 =head2 add
 
-C<method add : void ($cookie : object of L<Mojo::Cookie::Response|SPVM::Mojo::Cookie::Response>|L<Mojo::Cookie::Response|SPVM::Mojo::Cookie::Response>[]);>
+C<method add : void ($cookie : L<Mojo::Cookie::Response|SPVM::Mojo::Cookie::Response>|L<Mojo::Cookie::Response|SPVM::Mojo::Cookie::Response>[]);>
 
 Add multiple L<Mojo::Cookie::Response|SPVM::Mojo::Cookie::Response> objects to the jar.
 

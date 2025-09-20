@@ -148,7 +148,7 @@ Examples:
 
 =head2 merge
 
-C<method merge : void ($path : object of string|L<Mojo::Path|SPVM::Mojo::Path>);>
+C<method merge : void ($path : string|L<Mojo::Path|SPVM::Mojo::Path>);>
 
 Merge paths. Note that this method will normalize both paths if necessary and that C<%2F> will be treated as C</> for
 security reasons.

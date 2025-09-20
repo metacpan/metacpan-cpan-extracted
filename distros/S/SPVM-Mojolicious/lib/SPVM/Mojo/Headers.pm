@@ -75,7 +75,7 @@ Creates a new L<Mojo::Headers|SPVM::Mojo::Headers> object, and returns it.
 
 =head2 add
 
-C<method add : void ($name : string, $value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method add : void ($name : string, $value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Add header with one or more lines.
 
@@ -161,7 +161,7 @@ Examples:
 
 =head2 set_header
   
-C<method set_header : void ($name : string, $value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_header : void ($name : string, $value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Replace the current header values.
 
@@ -271,7 +271,7 @@ Examples:
 
 =head2 set_accept
 
-C<method set_accept : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_accept : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Replace current header value, shortcut for the C<Accept> header.
 
@@ -291,7 +291,7 @@ Examples:
 
 =head2 set_accept_charset
 
-C<method set_accept_charset : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_accept_charset : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Replace current header value, shortcut for the C<Accept-Charset> header.
 
@@ -311,7 +311,7 @@ Examples:
 
 =head2 set_accept_encoding
 
-C<method set_accept_encoding : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_accept_encoding : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Replace current header value, shortcut for the C<Accept-Encoding> header.
 
@@ -331,7 +331,7 @@ Examples:
 
 =head2 set_accept_language
 
-C<method set_accept_language : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_accept_language : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Replace current header value, shortcut for the C<Accept-Language> header.
 
@@ -351,7 +351,7 @@ Examples:
 
 =head2 set_accept_ranges
 
-C<method set_accept_ranges : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_accept_ranges : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Replace current header value, shortcut for the C<Accept-Ranges> header.
 
@@ -372,7 +372,7 @@ Examples:
 
 =head2 set_access_control_allow_origin
 
-C<method set_access_control_allow_origin : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_access_control_allow_origin : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Replace current header value, shortcut for the C<Access-Control-Allow-Origin> header from L<Cross-Origin
 Resource Sharing|https://www.w3.org/TR/cors/>.
@@ -393,7 +393,7 @@ Examples:
 
 =head2 set_allow
 
-C<method set_allow : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_allow : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Replace current header value, shortcut for the C<Allow> header.
 
@@ -413,7 +413,7 @@ Examples:
 
 =head2 set_authorization
 
-C<method set_authorization : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_authorization : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Replace current header value, shortcut for the C<Authorization> header.
 
@@ -433,7 +433,7 @@ Examples:
 
 =head2 set_cache_control
 
-C<method set_cache_control : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_cache_control : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Replace current header value, shortcut for the C<Cache-Control> header.
 
@@ -453,7 +453,7 @@ Examples:
 
 =head2 set_connection
 
-C<method set_connection : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_connection : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Replace current header value, shortcut for the C<Connection> header.
 
@@ -473,7 +473,7 @@ Examples:
 
 =head2 set_content_disposition
 
-C<method set_content_disposition : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_content_disposition : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Replace current header value, shortcut for the C<Content-Disposition> header.
 
@@ -493,7 +493,7 @@ Examples:
 
 =head2 set_content_encoding
 
-C<method set_content_encoding : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_content_encoding : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Replace current header value, shortcut for the C<Content-Encoding> header.
 
@@ -513,7 +513,7 @@ Examples:
 
 =head2 set_content_language
 
-C<method set_content_language : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_content_language : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Replace current header value, shortcut for the C<Content-Language> header.
 
@@ -533,7 +533,7 @@ Examples:
 
 =head2 set_content_length
 
-C<method set_content_length : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_content_length : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Replace current header value, shortcut for the C<Content-Length> header.
 
@@ -553,7 +553,7 @@ Examples:
 
 =head2 set_content_location
 
-C<method set_content_location : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_content_location : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Replace current header value, shortcut for the C<Content-Location> header.
 
@@ -573,7 +573,7 @@ Examples:
 
 =head2 set_content_range
 
-C<method set_content_range : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_content_range : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Replace current header value, shortcut for the C<Content-Range> header.
 
@@ -594,7 +594,7 @@ Examples:
 
 =head2 set_content_security_policy
 
-C<method set_content_security_policy : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_content_security_policy : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Replace current header value, shortcut for the C<Content-Security-Policy> header from L<Content Security Policy
 1.0|https://www.w3.org/TR/CSP/>.
@@ -615,7 +615,7 @@ Examples:
 
 =head2 set_content_type
 
-C<method set_content_type : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_content_type : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Replace current header value, shortcut for the C<Content-Type> header.
 
@@ -636,7 +636,7 @@ Examples:
 
 =head2 set_cookie
 
-C<method set_cookie : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_cookie : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Replace current header value, shortcut for the C<Cookie> header from L<RFC
 6265|https://tools.ietf.org/html/rfc6265>.
@@ -657,7 +657,7 @@ Examples:
 
 =head2 set_date
 
-C<method set_date : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_date : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Replace current header value, shortcut for the C<Date> header.
 
@@ -678,7 +678,7 @@ Examples:
 
 =head2 set_dnt
 
-C<method set_dnt : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_dnt : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Replace current header value, shortcut for the C<DNT> (Do Not Track) header, which has no specification yet, but
 is very commonly used.
@@ -699,7 +699,7 @@ Examples:
 
 =head2 set_etag
 
-C<method set_etag : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_etag : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Replace current header value, shortcut for the C<ETag> header.
 
@@ -719,7 +719,7 @@ Examples:
 
 =head2 set_expect
 
-C<method set_expect : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_expect : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Replace current header value, shortcut for the C<Expect> header.
 
@@ -739,7 +739,7 @@ Examples:
 
 =head2 set_expires
 
-C<method set_expires : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_expires : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Replace current header value, shortcut for the C<Expires> header.
 
@@ -759,7 +759,7 @@ Examples:
 
 =head2 set_host
 
-C<method set_host : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_host : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Replace current header value, shortcut for the C<Host> header.
 
@@ -773,7 +773,7 @@ C<method if_modified_since : string ();>
 
 Get current header value, shortcut for the C<If-Modified-Since> header.
 
-C<method set_if_modified_since : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_if_modified_since : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Examples:
 
@@ -799,7 +799,7 @@ Examples:
 
 =head2 set_if_none_match
 
-C<method set_if_none_match : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_if_none_match : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Replace current header value, shortcut for the C<If-None-Match> header.
 
@@ -819,7 +819,7 @@ Examples:
 
 =head2 set_last_modified
 
-C<method set_last_modified : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_last_modified : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Replace current header value, shortcut for the C<Last-Modified> header.
 
@@ -839,7 +839,7 @@ Examples:
 
 =head2 set_link
 
-C<method set_link : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_link : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Replace current header value, shortcut for the Link header from L<RFC
 5988|https://tools.ietf.org/html/rfc5988>.
@@ -884,7 +884,7 @@ Examples:
 
 =head2 set_location
 
-C<method set_location : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_location : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Replace current header value, shortcut for the C<Location> header.
 
@@ -905,7 +905,7 @@ Examples:
 
 =head2 set_origin
 
-C<method set_origin : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_origin : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Replace current header value, shortcut for the C<Origin> header from L<RFC
 6454|https://tools.ietf.org/html/rfc6454>.
@@ -926,7 +926,7 @@ Examples:
 
 =head2 set_proxy_authenticate
 
-C<method set_proxy_authenticate : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_proxy_authenticate : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Replace current header value, shortcut for the C<Proxy-Authenticate> header.
 
@@ -946,7 +946,7 @@ Examples:
 
 =head2 set_proxy_authorization
 
-C<method set_proxy_authorization : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_proxy_authorization : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Replace current header value, shortcut for the C<Proxy-Authorization> header.
 
@@ -966,7 +966,7 @@ Examples:
 
 =head2 set_range
 
-C<method set_range : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_range : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Replace current header value, shortcut for the C<Range> header.
 
@@ -986,7 +986,7 @@ Examples:
 
 =head2 set_referer
   
-C<method set_referer : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_referer : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Alias for L</"set_referrer">.
 
@@ -1007,7 +1007,7 @@ Examples:
 
 =head2 set_referrer
   
-C<method set_referrer : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_referrer : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Replace current header value, shortcut for the C<Referer> header, there was a typo in L<RFC
 2068|https://tools.ietf.org/html/rfc2068> which resulted in C<Referer> becoming an official header.
@@ -1027,7 +1027,7 @@ Examples:
 
 =head2 set_sec_websocket_accept
 
-C<method set_sec_websocket_accept : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_sec_websocket_accept : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Replace current header value, shortcut for the C<Sec-WebSocket-Accept> header from L<RFC
 6455|https://tools.ietf.org/html/rfc6455>.
@@ -1049,7 +1049,7 @@ Examples:
 
 =head2 set_sec_websocket_extensions
 
-C<method set_sec_websocket_extensions : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_sec_websocket_extensions : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Replace current header value, shortcut for the C<Sec-WebSocket-Extensions> header from L<RFC
 6455|https://tools.ietf.org/html/rfc6455>.
@@ -1071,7 +1071,7 @@ Examples:
 
 =head2 set_sec_websocket_key
 
-C<method set_sec_websocket_key : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_sec_websocket_key : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Replace current header value, shortcut for the C<Sec-WebSocket-Key> header from L<RFC
 6455|https://tools.ietf.org/html/rfc6455>.
@@ -1093,7 +1093,7 @@ Examples:
 
 =head2 set_sec_websocket_protocol
 
-C<method set_sec_websocket_protocol : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_sec_websocket_protocol : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Replace current header value, shortcut for the C<Sec-WebSocket-Protocol> header from L<RFC
 6455|https://tools.ietf.org/html/rfc6455>.
@@ -1115,7 +1115,7 @@ Examples:
 
 =head2 set_sec_websocket_version
 
-C<method set_sec_websocket_version : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_sec_websocket_version : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Replace current header value, shortcut for the C<Sec-WebSocket-Version> header from L<RFC
 6455|https://tools.ietf.org/html/rfc6455>.
@@ -1136,7 +1136,7 @@ Examples:
 
 =head2 set_server
 
-C<method set_server : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_server : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Replace current header value, shortcut for the C<Server> header.
 
@@ -1157,7 +1157,7 @@ Examples:
 
 =head2 set_server_timing
 
-C<method set_server_timing : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_server_timing : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Replace current header value, shortcut for the C<Server-Timing> header from L<Server
 Timing|https://www.w3.org/TR/server-timing/>.
@@ -1179,7 +1179,7 @@ Examples:
 
 =head2 set_set_cookie
 
-C<method set_set_cookie : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_set_cookie : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Replace current header value, shortcut for the C<Set-Cookie> header from L<RFC
 6265|https://tools.ietf.org/html/rfc6265>.
@@ -1201,7 +1201,7 @@ Examples:
 
 =head2 set_status
 
-C<method set_status : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_status : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Replace current header value, shortcut for the C<Status> header from L<RFC
 3875|https://tools.ietf.org/html/rfc3875>.
@@ -1223,7 +1223,7 @@ Examples:
 
 =head2 set_strict_transport_security
 
-C<method set_strict_transport_security : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_strict_transport_security : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Replace current header value, shortcut for the C<Strict-Transport-Security> header from L<RFC
 6797|https://tools.ietf.org/html/rfc6797>.
@@ -1244,7 +1244,7 @@ Examples:
 
 =head2 set_te
 
-C<method set_te : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_te : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Replace current header value, shortcut for the C<TE> header.
 
@@ -1264,7 +1264,7 @@ Examples:
 
 =head2 set_trailer
 
-C<method set_trailer : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_trailer : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Replace current header value, shortcut for the C<Trailer> header.
 
@@ -1284,7 +1284,7 @@ Examples:
 
 =head2 set_transfer_encoding
 
-C<method set_transfer_encoding : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_transfer_encoding : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Replace current header value, shortcut for the C<Transfer-Encoding> header.
 
@@ -1304,7 +1304,7 @@ Examples:
 
 =head2 set_upgrade
 
-C<method set_upgrade : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_upgrade : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Replace current header value, shortcut for the C<Upgrade> header.
 
@@ -1324,7 +1324,7 @@ Examples:
 
 =head2 set_user_agent
 
-C<method set_user_agent : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_user_agent : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Replace current header value, shortcut for the C<User-Agent> header.
 
@@ -1336,7 +1336,7 @@ Examples:
 
 C<method vary : string ();>
 
-C<method set_vary : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_vary : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Get current header value, shortcut for the C<Vary> header.
 
@@ -1364,7 +1364,7 @@ Examples:
 
 =head2 set_www_authenticate
 
-C<method set_www_authenticate : void ($value : object of string|L<Stringable|SPVM::Stringable>|string[]);>
+C<method set_www_authenticate : void ($value : string|L<Stringable|SPVM::Stringable>|string[]);>
 
 Replace current header value, shortcut for the C<WWW-Authenticate> header.
 

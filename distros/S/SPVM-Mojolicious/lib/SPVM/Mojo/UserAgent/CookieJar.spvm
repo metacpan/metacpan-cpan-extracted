@@ -54,7 +54,7 @@ class Mojo::UserAgent::CookieJar {
   }
   
   # Instance Methods
-  method add : void ($cookie : object of Mojo::Cookie::Response|Mojo::Cookie::Response[]) {
+  method add : void ($cookie : Mojo::Cookie::Response|Mojo::Cookie::Response[]) {
     
     if ($cookie isa Mojo::Cookie::Response) {
       $self->_add([(Mojo::Cookie::Response)$cookie]);

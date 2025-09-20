@@ -44,6 +44,6 @@ is($cal->days_in_month(2028, 2), 29, 'days_in_month()');
 
 is($cal->ordinal(22), 'nd', 'ordinal()');
 
-is($cal->sse_from_ymd(2025, 9, 12), 1757646000, 'sse_from_ymd()');
+is($cal->sse_from_ymd(2025, 9, 12), 1757635200, 'sse_from_ymd()');
 
 done_testing();

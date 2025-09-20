@@ -11,7 +11,6 @@ lib/Travel/Status/DE/IRIS/Result.pm
 lib/Travel/Status/DE/IRIS/Stations.pm
 lib/Travel/Status/DE/IRIS/Stations.pm.PL
 MANIFEST			This list of files
-META.json
 README.md
 scripts/debug
 scripts/makedeb-docker
@@ -23,9 +22,11 @@ share/find-missing-wrapper
 share/json2csv
 share/json2json
 share/meta.json
+share/missing-from-travelynx
 share/old_stations.json
 share/renamed.json
 share/stations.json
+share/stations.xml
 share/xml2json
 share/xml2meta
 t/20-iris-class.t
@@ -65,4 +66,5 @@ xt/00-compile-pm.t
 xt/01-compile-pl.t
 xt/02-compile-pod.t
 META.yml
+META.json
 SIGNATURE    Added here by Module::Build

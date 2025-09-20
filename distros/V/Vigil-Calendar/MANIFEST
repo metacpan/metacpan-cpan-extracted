@@ -1,3 +1,4 @@
+Changes
 examples/agenda_html/cal_agenda_html.pl
 examples/agenda_html/calendar_css.pl
 examples/agenda_html/demo_calendar.css
@@ -14,11 +15,36 @@ examples/grid_pdf/cal_grid_pdf.pl
 examples/INSTRUCTIONS.md
 lib/Vigil/Calendar.pm
 LICENSE.txt
-README.md
-MANIFEST
+Makefile
 Makefile.PL
-Changes
+MANIFEST
+README.md
+SECURITY.md
 t/00_compile.t
 t/01_basic.t
+Vigil-Calendar-2.1.1/Changes
+Vigil-Calendar-2.1.1/examples/agenda_html/cal_agenda_html.pl
+Vigil-Calendar-2.1.1/examples/agenda_html/calendar_css.pl
+Vigil-Calendar-2.1.1/examples/agenda_html/demo_calendar.css
+Vigil-Calendar-2.1.1/examples/agenda_pdf/cal_agenda_pdf.pl
+Vigil-Calendar-2.1.1/examples/agenda_text/cal_agenda_text.pl
+Vigil-Calendar-2.1.1/examples/calendar.lib
+Vigil-Calendar-2.1.1/examples/css/calendar.css
+Vigil-Calendar-2.1.1/examples/css/calendar.css.backup
+Vigil-Calendar-2.1.1/examples/grid_html/cal_grid_html.pl
+Vigil-Calendar-2.1.1/examples/grid_html/calendar_css.pl
+Vigil-Calendar-2.1.1/examples/grid_html/demo_calendar.css
+Vigil-Calendar-2.1.1/examples/grid_html/demo_small_calendar.css
+Vigil-Calendar-2.1.1/examples/grid_pdf/cal_grid_pdf.pl
+Vigil-Calendar-2.1.1/examples/INSTRUCTIONS.md
+Vigil-Calendar-2.1.1/lib/Vigil/Calendar.pm
+Vigil-Calendar-2.1.1/LICENSE.txt
+Vigil-Calendar-2.1.1/Makefile.PL
+Vigil-Calendar-2.1.1/MANIFEST
+Vigil-Calendar-2.1.1/META.json
+Vigil-Calendar-2.1.1/META.yml
+Vigil-Calendar-2.1.1/README.md
+Vigil-Calendar-2.1.1/t/00_compile.t
+Vigil-Calendar-2.1.1/t/01_basic.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

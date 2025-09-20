@@ -1,7 +1,7 @@
 /***************************************************************************************
-* Build  MD5 : XHVtNlnGsjAeaS5+27EHJA
-* Build Time : 2025-09-19 17:23:39
-* Version    : 5.090114
+* Build  MD5 : kGCDEla76qeMr72JLP4oqw
+* Build Time : 2025-09-20 09:24:15
+* Version    : 5.090118
 * Author     : H.Q.Wang
 ****************************************************************************************/
 #include "EXTERN.h"
@@ -111,8 +111,15 @@ setLogTargets(flag)
   CODE:
     setLogTargets(flag);
 
+int
+get_show_file_info()
+  CODE:
+    RETVAL = g_config.options.show_file_info;
+  OUTPUT:
+    RETVAL
+
 void
-log_write(level, file, line, message)
+xs_log_write(level, file,line,message)
     int level
     SV* file
     int line
@@ -120,8 +127,7 @@ log_write(level, file, line, message)
   CODE:
     {
         STRLEN flen, mlen;
-        const char *cfile    = SvPV(file, flen);
         const char *cmessage = SvPV(message, mlen);
-
+		const char *cfile    = SvPV(file, flen);
         log_write((LogLevel)level, cfile, line, cmessage);
     }

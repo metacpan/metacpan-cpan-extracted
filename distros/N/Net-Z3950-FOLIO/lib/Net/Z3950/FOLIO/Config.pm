@@ -36,18 +36,30 @@ sub _compileConfig {
 	_mergeConfig($cfg, $overlay);
     }
 
-    my $gqlfile = $cfg->{graphqlQuery}
-        or die "$0: no GraphQL query file defined";
-
     my $path = $cfgbase;
     if ($path =~ /\//) {
 	$path =~ s/(.*)?\/.*/$1/;
-	$gqlfile = "$path/$gqlfile";
+    } else {
+	$path = '.';
     }
-    my $fh = new IO::File("<$gqlfile")
-	or die "$0: can't open GraphQL query file '$gqlfile': $!";
+
+    my $gqlfile = $cfg->{graphqlQuery}
+        or die "$0: no GraphQL query file defined";
+    my $fh = new IO::File("<$path/$gqlfile")
+	or die "$0: can't open GraphQL query file '$path/$gqlfile': $!";
     { local $/; $cfg->{graphql} = <$fh> };
     $fh->close();
+
+    my $esets = $cfg->{xmlElementSets};
+    if ($esets) {
+	foreach my $setname (keys %$esets) {
+	    my $filename = $esets->{$setname};
+	    my $fh = new IO::File("<$path/$filename")
+		or Net::Z3950::FOLIO::_throw(1, "can't open XSLT stylesheet file '$path/$filename': $!");
+	    { local $/; $esets->{$setname} = <$fh> };
+	    $fh->close();
+	}
+    }
 
     return $cfg;
 }
@@ -247,6 +259,10 @@ Net::Z3950::FOLIO::Config - configuration file for the FOLIO Z39.50 gateway
 	  }
 	}
       }
+    },
+    "xmlElementSets": {
+      "testmarc": "xslt/folio2marcxml.xsl",
+      "testopac": "xslt/folio2opac.xsl"
     }
   }
 
@@ -686,6 +702,13 @@ For example, the MARC post-processing directive
 Says first to remove all diacritics from the C<245$a> (title) field of
 the MARC record (so that for example C<é> becomes C<e>), then to
 replace all vowels with asterisks.
+
+
+=head2 C<xmlElementSets>
+
+If provided, a mapping of XML element-set names to the names of XSLT 1.0 stylesheets, relative to the location of the top-level configuration file. These stylesheets must be provided as part of the broader configuration. When an XML record is requested in non-standard format (i.e. record-syntax is C<xml> and element-set name is not C<raw>, C<usmarc> or C<opac>), the raw XML record is processed using the nominated XSLT stylesheet and the reslt is returned. This facility can be used to provide clients with, for example, MODS records.
+
+B<NOTE.> Only XSLT 1.0 is supported: not XSLT 2.0. (There seems to be no Perl module that implements XSLT 2.0.)
 
 
 =head1 CONFIGURATION STACKING

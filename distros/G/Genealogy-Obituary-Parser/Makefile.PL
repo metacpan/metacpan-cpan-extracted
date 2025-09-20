@@ -18,7 +18,10 @@ WriteMakefile(
 	PREREQ_PM    => {
 		'DateTime::Format::Text' => 0,
 		'Geo::Coder::Free' => 0,
-		'Geo::Coder::List' => 0
+		'Geo::Coder::List' => 0,
+		'Params::Get' => 0.13,
+		'Params::Validate::Strict' => 0.10,
+		'Return::Set' => 0.02
 	}, TEST_REQUIRES => {
 		'Test::DescribeMe' => 0,
 		'Test::Most' => 0,

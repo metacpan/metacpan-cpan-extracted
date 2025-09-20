@@ -587,6 +587,22 @@ a lot of kernel revisions, but probably(!) works in current versions.
 This backend maps C<EV_READ> and C<EV_WRITE> in the same way as
 C<EVBACKEND_POLL>.
 
+=item C<EVBACKEND_IOURING>    (value 128, linux)
+
+Use the linux-specific io_uring backend. It offers an enourmous amount
+of features other than just I/O events, but suffers from an extreme
+feature-first, correctness-later approach, and is slower than epoll, so
+it is not used by default.
+
+One important misdesign is that when sleeping in io_uring, the kernel
+wrongly counts that as disk I/O wait, keeping loadavg and a cpu core
+"virtually" busy, even if nothing actually waits for disk or uses CPU.
+
+If your application forks frequently, then this backend might be faster,
+as setting it up again after a fork is far more efficient with this
+backend, and it also doesn't suffer from the epoll design flaw of
+receiving events for closed file descriptors.
+
 =item C<EVBACKEND_LINUXAIO>   (value 64, Linux)
 
 Use the Linux-specific Linux AIO (I<not> C<< aio(7) >> but C<<
@@ -4772,9 +4788,9 @@ enabled on linux, otherwise disabled.
 =item EV_USE_IOURING
 
 If defined to be C<1>, libev will compile in support for the Linux
-io_uring backend (C<EV_USE_EPOLL> must also be enabled). Due to it's
-current limitations it has to be requested explicitly. If undefined, it
-will be enabled on linux, otherwise disabled.
+io_uring backend (C<EV_USE_EPOLL> must also be enabled). Note thet epoll
+take precedence because it is faster, so it has to be requested explicitly
+currently. If undefined, it will be enabled on linux, otherwise disabled.
 
 =item EV_USE_KQUEUE
 

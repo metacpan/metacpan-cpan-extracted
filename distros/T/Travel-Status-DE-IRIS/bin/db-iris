@@ -4,7 +4,7 @@ use warnings;
 use 5.014;
 use utf8;
 
-our $VERSION = '1.98';
+our $VERSION = '2.00';
 
 use DateTime;
 use DateTime::Format::Strptime;
@@ -78,7 +78,7 @@ if ($date) {
 	if ( $date eq 'tomorrow' ) {
 		$datetime->add( days => 1 );
 	}
-	elsif (not( defined $day and defined $month )
+	elsif ( not( defined $day and defined $month )
 		or ( $day < 1 )
 		or ( $day > 31 )
 		or ( $month < 1 )
@@ -138,7 +138,7 @@ if ($use_cache) {
 	my $schedule_cache_path = "${cache_path}/db-iris-schedule";
 	my $realtime_cache_path = "${cache_path}/db-iris-realtime";
 	eval {
-		use Cache::File;
+		require Cache::File;
 		$schedule_cache = Cache::File->new(
 			cache_root      => $schedule_cache_path,
 			default_expires => '6 hours',
@@ -284,10 +284,10 @@ sub format_delay {
 		$delay = ( $d->delay > 0 ? ' +' : q{ } ) . $d->delay;
 	}
 	if ( $d->is_cancelled ) {
-		$delay = ' CANCELED';
+		$delay = ' XXX';
 	}
 	elsif ( $d->departure_is_cancelled ) {
-		$delay .= ' ⊖';
+		$delay .= ' xxx';
 	}
 	elsif ( $d->start < $datetime and not $d->has_realtime ) {
 		$delay = '  ?';
@@ -587,19 +587,17 @@ B<db-iris> [B<-rx>] [B<-d> I<date>] [B<-o> I<output-flags>]
 
 =head1 VERSION
 
-version 1.98
+version 2.00
 
 =head1 DEPRECATION NOTICE
 
 As of May 2024, the backend service that this utility relies on is deprecated
-and may cease operation in the near future. There is no immediate successor.
-Hence, db-iris and Travel::Status::DE::IRIS are no longer actively maintained.
+and may cease operation in the near future. There is no successor with feature
+parity. db-iris and Travel::Status::DE::IRIS are no longer actively maintained.
 There is no promise that issues and merge requests will be reviewed or merged.
 
-The B<hafas-m> application that is part of Travel::Status::DE::HAFAS(3pm)
-provides similar features. However, its default "DB" backend is also
-deprecated. There is no migration path to a Deutsche Bahn departure monitor
-that is not deprecated at the moment.
+The B<dbris-m> application that is part of Travel::Status::DE::DBRIS(3pm)
+provides similar features.
 
 =head1 DESCRIPTION
 
@@ -870,7 +868,7 @@ There are no known bugs at the moment.
 
 =head1 AUTHOR
 
-Copyright (C) 2013-2024 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2013-2025 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
 
 The station data used by this script is provided by DB
 Station&Service AG, Europaplatz 1, 10557 Berlin, Germany and available

@@ -27,5 +27,10 @@
   },
   "graphqlQuery": "mod-search.graphql-query",
   "queryFilter": "cql.allRecords=1 NOT discoverySuppress=true",
-  "chunkSize": 5
+  "chunkSize": 5,
+  "xmlElementSets": {
+    "mods": "xslt/folio2mods.xsl",
+    "testmarc": "xslt/folio2marcxml.xsl",
+    "testopac": "xslt/folio2opac.xsl"
+  }
 }

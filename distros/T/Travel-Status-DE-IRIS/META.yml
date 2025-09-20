@@ -1,7 +1,7 @@
 ---
 abstract: 'Interface to IRIS based web departure monitors.'
 author:
-  - 'Copyright (C) 2013-2024 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>'
+  - 'Copyright (C) 2013-2025 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>'
 build_requires:
   File::Slurp: '9999.19'
   JSON: '0'
@@ -23,13 +23,13 @@ name: Travel-Status-DE-IRIS
 provides:
   Travel::Status::DE::IRIS:
     file: lib/Travel/Status/DE/IRIS.pm
-    version: '1.98'
+    version: '2.00'
   Travel::Status::DE::IRIS::Result:
     file: lib/Travel/Status/DE/IRIS/Result.pm
-    version: '1.98'
+    version: '2.00'
   Travel::Status::DE::IRIS::Stations:
     file: lib/Travel/Status/DE/IRIS/Stations.pm
-    version: '1.98'
+    version: '2.00'
 recommends:
   Cache::File: '0'
 requires:
@@ -52,5 +52,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/derf/Travel-Status-DE-IRIS
-version: '1.98'
+version: '2.00'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

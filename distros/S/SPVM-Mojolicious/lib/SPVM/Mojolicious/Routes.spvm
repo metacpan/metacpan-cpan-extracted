@@ -46,7 +46,7 @@ class Mojolicious::Routes extends Mojolicious::Routes::Route {
     }
   ;
   
-  has types : rw Hash of object of string|Regex|string[]|Regex[]|object[]
+  has types : rw Hash of string|Regex|string[]|Regex[]|object[]
     get {
       unless (exists $self->{types}) {
         $self->{types} = Hash->new;
@@ -119,7 +119,7 @@ class Mojolicious::Routes extends Mojolicious::Routes::Route {
     return $ret;
   }
   
-  method add_type : void ($name : string, $type : object of string|Regex|string[]|Regex[]|object[]) {
+  method add_type : void ($name : string, $type : string|Regex|string[]|Regex[]|object[]) {
     
     $self->types->set($name, $type);
   }
@@ -202,4 +202,53 @@ class Mojolicious::Routes extends Mojolicious::Routes::Route {
     return (Mojolicious::Routes)$self->SUPER::websocket($args);
   }
   
+  method dispatch : int ($c : Mojolicious::Controller) {
+    
+    $self->match($c);
+    
+    unless ($c->match->stack_list->length) {
+      return 0;
+    }
+    
+    $self->continue($c);
+    
+    return 1;
+  }
+  
+  method match : void ($c : Mojolicious::Controller) {
+    
+    die "TODO";
+
+=pod
+
+    # Path (partial path gets priority)
+    my $req  = $c->req;
+    my $path = $c->stash->{path};
+    if (defined $path) { $path = "/$path" if $path !~ m!^/! }
+    else               { $path = $req->url->path->to_route }
+
+    # Method (HEAD will be treated as GET)
+    my $method   = uc $req->method;
+    my $override = $req->url->query->clone->param('_method');
+    $method = uc $override if $override && $method eq 'POST';
+    $method = 'GET'        if $method eq 'HEAD';
+
+    # Check cache
+    my $ws    = $c->tx->is_websocket ? 1 : 0;
+    my $match = $c->match;
+    $match->root($self);
+    my $cache = $self->cache;
+    if (my $result = $cache->get("$method:$path:$ws")) {
+      return $match->endpoint($result->{endpoint})->stack($result->{stack});
+    }
+
+    # Check routes
+    $match->find($c => {method => $method, path => $path, websocket => $ws});
+    return undef unless my $route = $match->endpoint;
+    $cache->set("$method:$path:$ws" => {endpoint => $route, stack => $match->stack});
+
+=cut
+
+  }
+
 }

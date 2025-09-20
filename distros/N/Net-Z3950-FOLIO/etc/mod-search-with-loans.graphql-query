@@ -3,8 +3,85 @@ query($cql: String, $offset: Int, $limit: Int) {
     totalRecords
     instances {
       id
-      hrid title # Not used by the Z-server but useful for debugging
-      holdingsRecords2 {
+      tenantId
+      shared
+      hrid
+      title # Not used by the Z-server but useful for debugging
+      alternativeTitles {
+        alternativeTitleTypeId
+        alternativeTitle
+        authorityId
+      }
+      indexTitle
+      source
+      statisticalCodeIds
+      statusId
+      series {
+        value
+        authorityId
+      }
+      modeOfIssuanceId
+      identifiers {
+        identifierTypeId
+        value
+      }
+      contributors {
+        name
+        contributorTypeId
+        contributorTypeText
+        contributorNameTypeId
+        authorityId
+        primary
+      }
+      subjects {
+        value
+        authorityId
+        sourceId
+        typeId
+      }
+      dates {
+        dateTypeId
+        date1
+        date2
+      }
+      instanceTypeId
+      instanceFormatIds
+      languages
+      metadata {
+        createdDate
+        createdByUserId
+        updatedDate
+        updatedByUserId
+      }
+      administrativeNotes
+      natureOfContentTermIds
+      publication {
+        publisher
+        dateOfPublication
+        place
+      }
+      staffSuppress
+      discoverySuppress
+      isBoundWith
+      tags {
+        tagList
+      }
+      classifications {
+        classificationNumber
+        classificationTypeId
+      }
+      electronicAccess {
+        uri
+        linkText
+        materialsSpecification
+        publicNote
+        relationshipId
+      }
+      notes {
+        note
+        staffOnly
+      }
+      holdingsRecords2(limit: 100) {
         temporaryLocation {
           institution { name }
           library { name }
@@ -39,7 +116,7 @@ query($cql: String, $offset: Int, $limit: Int) {
           note
           staffNote
         }
-        bareHoldingsItems {
+        bareHoldingsItems(limit: 100) {
           discoverySuppress
           status { name }
           loans {

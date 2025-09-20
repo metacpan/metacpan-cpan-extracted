@@ -1,3 +1,23 @@
+0.088   2025-09-20  Released-By: PERLANCAR; Urgency: medium
+
+        - Add gu subcommand: split-commit-add-untracked.
+
+        - Add logging options to `gu`.
+
+
+0.088   2025-09-20  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
+
+        [INCOMPATIBLE CHANGES]
+
+        - Remove scripts `gu-calc-committing-total-size`,
+          `gu-list-committing-large-files`. Make them as subcommands of `gu`:
+          `gu du-committing`, `gu ls-committing-large`.
+
+        [ENHANCEMENTS]
+
+        - Add subcommands for `gu`: `gu du-untracked`.
+
+
 0.087   2025-04-16  Released-By: PERLANCAR; Urgency: medium
 
         - Add CLIs: gu-list-committing-large-files,

@@ -4,8 +4,8 @@ require 5.010;
 use Carp;
 use strict;
 use warnings;
-use Time::Local qw(timelocal);
-our $VERSION = '2.1.1';
+use Time::Local qw(timegm);
+our $VERSION = '2.1.4';
 
 use constant MONTHS => { 1 => 'January', 2 => 'February', 3 => 'March', 4 => 'April', 5 => 'May', 6 => 'June', 7 => 'July', 8 => 'August', 9 => 'September', 10 => 'October', 11 => 'November', 12 => 'December' };
 
@@ -275,7 +275,7 @@ sub ordinal {
 sub sse_from_ymd {
 	my ($self, $y, $m, $d) = @_;
 	return unless $y && $m && $d;
-	return timelocal(0, 0, 0, $d, $m - 1, $y - 1900);
+	return timegm(0, 0, 0, $d, $m - 1, $y - 1900);
 }
 
 sub _first_sunday {

@@ -8,24 +8,30 @@ use App::GitUtils;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-04-16'; # DATE
+our $DATE = '2025-09-20'; # DATE
 our $DIST = 'App-GitUtils'; # DIST
-our $VERSION = '0.087'; # VERSION
+our $VERSION = '0.088'; # VERSION
 
 my $p = '/App/GitUtils/'; # prefix
 Perinci::CmdLine::Any->new(
     url => $p,
     subcommands => {
         'info'           => {url => "${p}info"},
+        'status'         => {url => "${p}status"},
         'run-hook'       => {url => "${p}run_hook"},
         'rh'             => {url => "${p}run_hook",
                              summary => 'Alias for run-hook'},
         'post-commit'    => {url => "${p}post_commit"},
         'pre-commit'     => {url => "${p}pre_commit"},
         'clone-to-bare'  => {url => "${p}clone_to_bare"},
+        'du-untracked'   => {url => "${p}calc_untracked_total_size"},
+        'du-committing'  => {url => "${p}calc_committing_total_size"},
+        'ls-committing-large' => {url => "${p}list_committing_large_files"},
+        'split-commit-add-untracked' => {url => "${p}split_commit_add_untracked"},
     },
     default_subcommand => 'info',
     get_subcommand_from_arg => 2,
+    log => 1,
 )->run;
 
 # ABSTRACT: Day-to-day command-line utilities for git
@@ -43,7 +49,7 @@ gu - Day-to-day command-line utilities for git
 
 =head1 VERSION
 
-This document describes version 0.087 of gu (from Perl distribution App-GitUtils), released on 2025-04-16.
+This document describes version 0.088 of gu (from Perl distribution App-GitUtils), released on 2025-09-20.
 
 =head1 SYNOPSIS
 
@@ -53,23 +59,53 @@ B<gu> B<L<--subcommands|/"--subcommands">>
 
 B<gu> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<gu clone-to-bare> [B<L<--cmd|/"--cmd=s">>=I<subcommand_name>] [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--dir|/"--dir=s">>=I<L<dirname|Sah::Schema::dirname>>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--target-dir|/"--target-dir=s">>=I<L<dirname|Sah::Schema::dirname>>]
+B<gu clone-to-bare> [B<L<--cmd|/"--cmd=s">>=I<subcommand_name>] [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--dir|/"--dir=s">>=I<L<dirname|Sah::Schema::dirname>>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--target-dir|/"--target-dir=s">>=I<L<dirname|Sah::Schema::dirname>>]
 
-B<gu info> [B<L<--cmd|/"--cmd=s">>=I<subcommand_name>] [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--dir|/"--dir=s">>=I<L<dirname|Sah::Schema::dirname>>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]]
+B<gu du-committing> [B<L<--cmd|/"--cmd=s">>=I<subcommand_name>] [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--include-untracked|/"--exclude-untracked">>|B<L<--exclude-untracked|/"--exclude-untracked">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]]
 
-B<gu post-commit> [B<L<--cmd|/"--cmd=s">>=I<subcommand_name>] [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--dir|/"--dir=s">>=I<L<dirname|Sah::Schema::dirname>>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]]
+B<gu du-untracked> [B<L<--cmd|/"--cmd=s">>=I<subcommand_name>] [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--detail|/"--detail, -l">>|B<L<-l|/"--detail, -l">>|B<L<--no-detail|/"--detail, -l">>|B<L<--nodetail|/"--detail, -l">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]]
 
-B<gu pre-commit> [B<L<--cmd|/"--cmd=s">>=I<subcommand_name>] [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--dir|/"--dir=s">>=I<L<dirname|Sah::Schema::dirname>>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]]
+B<gu info> [B<L<--cmd|/"--cmd=s">>=I<subcommand_name>] [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--dir|/"--dir=s">>=I<L<dirname|Sah::Schema::dirname>>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]]
 
-B<gu rh> [B<L<--cmd|/"--cmd=s">>=I<subcommand_name>] [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--dir|/"--dir=s">>=I<L<dirname|Sah::Schema::dirname>>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- E<lt>I<L<name|/"--name=s*">>E<gt>
+B<gu ls-committing-large> [B<L<--cmd|/"--cmd=s">>=I<subcommand_name>] [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- E<lt>I<L<max_size|/"--max-size=s*, -s">>E<gt>
 
-B<gu run-hook> [B<L<--cmd|/"--cmd=s">>=I<subcommand_name>] [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--dir|/"--dir=s">>=I<L<dirname|Sah::Schema::dirname>>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- E<lt>I<L<name|/"--name=s*">>E<gt>
+B<gu post-commit> [B<L<--cmd|/"--cmd=s">>=I<subcommand_name>] [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--dir|/"--dir=s">>=I<L<dirname|Sah::Schema::dirname>>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]]
+
+B<gu pre-commit> [B<L<--cmd|/"--cmd=s">>=I<subcommand_name>] [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--dir|/"--dir=s">>=I<L<dirname|Sah::Schema::dirname>>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]]
+
+B<gu rh> [B<L<--cmd|/"--cmd=s">>=I<subcommand_name>] [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--dir|/"--dir=s">>=I<L<dirname|Sah::Schema::dirname>>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- E<lt>I<L<name|/"--name=s*">>E<gt>
+
+B<gu run-hook> [B<L<--cmd|/"--cmd=s">>=I<subcommand_name>] [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--dir|/"--dir=s">>=I<L<dirname|Sah::Schema::dirname>>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- E<lt>I<L<name|/"--name=s*">>E<gt>
+
+B<gu split-commit-add-untracked> [B<L<--cmd|/"--cmd=s">>=I<subcommand_name>] [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- [I<L<max_size|/"--max-size=s, -s">>]
+
+B<gu status> [B<L<--cmd|/"--cmd=s">>=I<subcommand_name>] [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]]
 
 =head1 SUBCOMMANDS
 
 =head2 B<clone-to-bare>
 
 Clone repository to a bare repository.
+
+=head2 B<du-committing>
+
+Calculate the total sizes of files to add/delete/modify.
+
+To be used in pre-commit script, for example.
+
+Some applications: Github limits commit total size to 2GB.
+
+
+=head2 B<du-untracked>
+
+Check the disk usage of untracked files.
+
+This routine basically just grabs the list of untracked files returned by
+C<status()> (C<gu status>) then checks their disk usage and totals them. CAVEAT:
+currently, if an untracked file is a directory, then this routine will just
+count the disk usage of the content of the directory recursively /without/
+considering ignored files. Correcting this is in the todo list.
+
 
 =head2 B<info>
 
@@ -83,6 +119,19 @@ Information include:
 Will return status 412 if working directory is not inside a git repository. Will
 return status 500 on errors, e.g. if C<git> command cannot recognize the
 repository.
+
+
+=head2 B<ls-committing-large>
+
+Check that added/modified files in staged/unstaged do not exceed a certain size.
+
+Will return an enveloped result with payload true containing added/modified
+files in staged/unstaged that are larger than a certain specified C<max_size>.
+
+To be used in a pre-commit script, for example.
+
+Some applications: Github for example warns when a file is above 50MB and
+rejects when a file is above 100MB in size.
 
 
 =head2 B<post-commit>
@@ -128,6 +177,20 @@ Basically the same as:
 
 except can be done anywhere inside git repo and provides tab completion.
 
+
+=head2 B<split-commit-add-untracked>
+
+Commit untracked files, possibly over several commits, keeping commit size under certain limit.
+
+
+
+
+=head2 B<status>
+
+Run `git status` and return information as a data structure.
+
+Currently incomplete!
+
 =head1 OPTIONS
 
 C<*> marks required options.
@@ -172,6 +235,10 @@ C<password> to C<beaver>. When you specify C<--config-profile=production>,
 C<username> will be set to C<bar> and C<password> to C<honey>.
 
 
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
 =item B<--format>=I<s>
 
 Choose output format, e.g. json, text.
@@ -193,6 +260,21 @@ Display help message and exit.
 =item B<--json>
 
 Set output format to json.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+By default, these log levels are available (in order of increasing level of
+importance, from least important to most): C<trace>, C<debug>, C<info>,
+C<warn>/C<warning>, C<error>, C<fatal>. By default, the level is usually set to
+C<warn>, which means that log statements with level C<info> and less important
+levels will not be shown. To increase verbosity, choose C<info>, C<debug>, or
+C<trace>.
+
+For more details on log level and logging, as well as how new logging levels can
+be defined or existing ones modified, see L<Log::ger>.
+
 
 =item B<--naked-res>
 
@@ -239,9 +321,21 @@ This option will pipe the output to a specified pager program. If pager program
 is not specified, a suitable default e.g. C<less> is chosen.
 
 
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
 =item B<--subcommands>
 
 List available subcommands.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
 
 =item B<--version>, B<-v>
 
@@ -279,6 +373,28 @@ If not specified, defaults to C<$repodir.bare/>.
 
 =back
 
+=head2 Options for subcommand du-committing
+
+=over
+
+=item B<--exclude-untracked>
+
+(No description)
+
+
+=back
+
+=head2 Options for subcommand du-untracked
+
+=over
+
+=item B<--detail>, B<-l>
+
+(No description)
+
+
+=back
+
 =head2 Options for subcommand info
 
 =over
@@ -290,6 +406,19 @@ A directory inside git repo.
 If not specified, will assume current directory is inside git repository and
 will search C<.git> upwards.
 
+
+=back
+
+=head2 Options for subcommand ls-committing-large
+
+=over
+
+=item B<--max-size>=I<s>*, B<-s>
+
+(No description)
+
+
+Can also be specified as the 1st command-line argument.
 
 =back
 
@@ -356,6 +485,20 @@ will search C<.git> upwards.
 =item B<--name>=I<s>*
 
 Hook name, e.g. post-commit.
+
+Can also be specified as the 1st command-line argument.
+
+=back
+
+=head2 Options for subcommand split-commit-add-untracked
+
+=over
+
+=item B<--max-size>=I<s>, B<-s>
+
+Default value:
+
+ 2146435072
 
 Can also be specified as the 1st command-line argument.
 
@@ -438,9 +581,21 @@ List of available configuration parameters:
  dir (see --dir)
  target_dir (see --target-dir)
 
+=head2 Configuration for subcommand du-committing
+
+ include_untracked (see --exclude-untracked)
+
+=head2 Configuration for subcommand du-untracked
+
+ detail (see --detail)
+
 =head2 Configuration for subcommand info
 
  dir (see --dir)
+
+=head2 Configuration for subcommand ls-committing-large
+
+ max_size (see --max-size)
 
 =head2 Configuration for subcommand post-commit
 
@@ -459,6 +614,12 @@ List of available configuration parameters:
 
  dir (see --dir)
  name (see --name)
+
+=head2 Configuration for subcommand split-commit-add-untracked
+
+ max_size (see --max-size)
+
+=head2 Configuration for subcommand status
 
 =head1 ENVIRONMENT
 

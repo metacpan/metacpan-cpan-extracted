@@ -1,6 +1,21 @@
 # Copyright (c) 2025 Yuki Kimoto
 # MIT License
 
-class Mojolicious::Commands {
+class Mojolicious::Commands extends Mojolicious::Command {
   version_from Mojolicious;
+  
+  use Mojolicious::Command::Cgi;
+  
+  # Class Methods
+  static method new : Mojolicious::Commands () {
+    
+    my $self = new Mojolicious::Commands;
+    
+    return $self;
+  }
+  
+  # Instance Methods
+  method run : void ($argv : string[]) {
+    
+  }
 }

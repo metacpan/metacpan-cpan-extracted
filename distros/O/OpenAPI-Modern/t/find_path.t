@@ -108,7 +108,7 @@ YAML
     {
       request => isa('Mojo::Message::Request'),
       path_template => '/blurp',
-      method => 'get',
+      method => 'GET',
       errors => [
         methods(TO_JSON => {
           instanceLocation => '/request/uri',
@@ -129,7 +129,7 @@ YAML
     {
       request => isa('Mojo::Message::Request'),
       path_template => '/foo/baz',
-      method => 'get',
+      method => 'GET',
       errors => [
         methods(TO_JSON => {
           instanceLocation => '/request/uri',
@@ -149,7 +149,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'get',
+      method => 'GET',
       operation_id => 'bloop',
       errors => [
         methods(TO_JSON => {
@@ -169,7 +169,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'put',
+      method => 'PUT',
       errors => [
         methods(TO_JSON => {
           instanceLocation => '/request',
@@ -182,13 +182,32 @@ YAML
     'operation does not exist under /paths/<path_template>/<method>',
   );
 
+  ok(!$openapi->find_path($options = { request => request('Post', 'http://example.com/foo/bloop') }),
+    to_str($request).': find_path returns false');
+  cmp_result(
+    $options,
+    {
+      request => isa('Mojo::Message::Request'),
+      method => 'Post',
+      errors => [
+        methods(TO_JSON => {
+          instanceLocation => '/request',
+          keywordLocation => '/paths',
+          absoluteKeywordLocation => $doc_uri.'#/paths',
+          error => 'no match found for request Post "http://example.com/foo/bloop"',
+        }),
+      ],
+    },
+    'Post does not map to post, only POST does, so operation does not exist under /paths/<path_template>/<method>',
+  );
+
   ok($openapi->find_path($options = { request => request('DELETE', 'http://example.com/foo/bar') }),
     to_str($request).': find_path returns successfully');
   cmp_result(
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'delete',
+      method => 'DELETE',
       path_template => '/foo/{foo_id}',
       path_captures => { foo_id => 'bar' },
       uri_captures => { foo_id => 'bar' },
@@ -206,7 +225,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'put',
+      method => 'PUT',
       errors => [
         methods(TO_JSON => {
           instanceLocation => '/request',
@@ -225,7 +244,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'put',
+      method => 'PUT',
       path_template => '/blech/bar',
       errors => [
         methods(TO_JSON => {
@@ -246,7 +265,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'post',
+      method => 'POST',
       path_template => '/foo/{foo_id}',
       operation_id => 'my_get_operation',
       errors => [
@@ -267,13 +286,13 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'post',
+      method => 'POST',
       errors => [
         methods(TO_JSON => {
           instanceLocation => '/request/method',
           keywordLocation => jsonp(qw(/paths /foo/bar get operationId)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/bar get operationId)))->to_string,
-          error => 'operation at operation_id does not match HTTP method "post"',
+          error => 'operation at operation_id does not match HTTP method "POST"',
         }),
       ],
     },
@@ -299,13 +318,13 @@ YAML
     'request HTTP method does not match method option',
   );
 
-  ok($openapi->find_path($options = { request => $request, method => 'PoST' }),
+  ok($openapi->find_path($options = { request => $request, method => 'POST' }),
     to_str($request).': find_path returns true');
   cmp_result(
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'PoST',
+      method => 'POST',
       path_template => '/foo/bar',
       path_captures => {},
       uri_captures => {},
@@ -324,7 +343,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'post',
+      method => 'POST',
       path_template => '/foo/{foo_id}',
       path_captures => { bloop => 'bar' },
       _path_item => { post => ignore, delete => ignore },
@@ -348,7 +367,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'post',
+      method => 'POST',
       path_template => '/foo/bar',
       path_captures => { bloop => 'bar' },
       _path_item => { get => ignore, post => ignore },
@@ -366,14 +385,33 @@ YAML
     'inferred path template does not match path captures',
   );
 
+  ok(!$openapi->find_path($options = { request => request('Get', 'http://example.com/foo/bloop'), operation_id => 'my_get_operation' }),
+    to_str($request).': find_path returns false');
+  cmp_result(
+    $options,
+    {
+      request => isa('Mojo::Message::Request'),
+      method => 'Get',
+      errors => [
+        methods(TO_JSON => {
+          instanceLocation => '/request/method',
+          keywordLocation => jsonp(qw(/paths /foo/bar get operationId)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/bar get operationId)))->to_string,
+          error => 'operation at operation_id does not match HTTP method "Get"',
+        }),
+      ],
+    },
+    'request HTTP method does not match operation',
+  );
+
   ok($openapi->find_path($options = { request => request('GET', 'http://example.com/foo/bar'),
-      path_template => '/foo/bar', method => 'get', operation_id => 'my_get_operation', path_captures => {} }),
+      path_template => '/foo/bar', method => 'GET', operation_id => 'my_get_operation', path_captures => {} }),
     to_str($request).': find_path returns successfully');
   cmp_result(
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'get',
+      method => 'GET',
       path_template => '/foo/bar',
       path_captures => {},
       uri_captures => {},
@@ -392,7 +430,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'get',
+      method => 'GET',
       path_template => '/foo/bar',
       errors => [
         methods(TO_JSON => {
@@ -413,7 +451,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'post',
+      method => 'POST',
       path_template => '/foo/{foo_id}',
       path_captures => { foo_id => 123 },
       errors => [
@@ -434,7 +472,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'post',
+      method => 'POST',
       path_template => '/foo/{foo_id}',
       errors => [
         methods(TO_JSON => {
@@ -454,7 +492,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'get',
+      method => 'GET',
       path_template => '/foo/bar',
       errors => [
         methods(TO_JSON => {
@@ -474,7 +512,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'post',
+      method => 'POST',
       path_template => '/foo/bar',
       operation_id => 'another_post_operation',
       errors => [
@@ -496,7 +534,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'get',
+      method => 'GET',
       errors => [
         methods(TO_JSON => {
           instanceLocation => '/request/uri',
@@ -516,7 +554,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'post',
+      method => 'POST',
       # we should not bother to extract path_captures
       # operation_id does not match, so is deleted
       errors => [
@@ -539,7 +577,7 @@ YAML
     {
       request => isa('Mojo::Message::Request'),
       path_template => '/foo/{foo_id}',
-      method => 'post',
+      method => 'POST',
       path_captures => { foo_id => 'goodbye' },
       uri_captures => { foo_id => 'hello' },
       operation_id => 'another_post_operation',
@@ -564,7 +602,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'post',
+      method => 'POST',
       path_captures => { foo_id => 123 },
       uri_captures => { foo_id => 123 },
       path_template => '/foo/{foo_id}',
@@ -584,7 +622,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'post',
+      method => 'POST',
       path_captures => { foo_id => 123 },
       uri_captures => { foo_id => 123 },
       path_template => '/foo/{foo_id}',
@@ -607,7 +645,7 @@ YAML
       path_template => '/foo/{foo_id}',
       path_captures => { foo_id => 'bar' },
       uri_captures => { foo_id => 'bar' },
-      method => 'post',
+      method => 'POST',
       _path_item => { post => { operationId => 'another_post_operation' }, delete => ignore },
       operation_id => 'another_post_operation',
       operation_uri => str($doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id} post)))),
@@ -625,7 +663,7 @@ YAML
       path_template => '/foo/{foo_id}',
       path_captures => { foo_id => 'bar' },
       uri_captures => { foo_id => 'bar' },
-      method => 'post',
+      method => 'POST',
       _path_item => { post => { operationId => 'another_post_operation' }, delete => ignore },
       operation_id => 'another_post_operation',
       operation_uri => str($doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id} post)))),
@@ -651,7 +689,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'post',
+      method => 'POST',
       path_template => '/foo/{foo_id}',
       path_captures => { foo_id => 'blah' },
       errors => [
@@ -675,7 +713,7 @@ YAML
       path_template => '/foo/{foo_id}',
       path_captures => { foo_id => '123' },
       uri_captures => { foo_id => '123' },
-      method => 'get',
+      method => 'GET',
       operation_id => 'my_get_operation',
       _path_item => { get => ignore },
       operation_uri => str($doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id} get)))),
@@ -719,7 +757,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'get',
+      method => 'GET',
       path_template => '/foo/{foo_id}',
       path_captures => { foo_id => 'a' },
       uri_captures => { foo_id => 123 },
@@ -745,7 +783,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'get',
+      method => 'GET',
       errors => [
         methods(TO_JSON => {
           instanceLocation => '/request',
@@ -768,7 +806,7 @@ YAML
     $options,
     $expected = {
       request => isa('Mojo::Message::Request'),
-      method => 'get',
+      method => 'GET',
       path_template => '/foo/{foo_id}',
       path_captures => { foo_id => 'hello // there ಠ_ಠ!' },
       uri_captures => { foo_id => 'hello // there ಠ_ಠ!' },
@@ -815,7 +853,7 @@ YAML
       path_captures => {},
       uri_captures => {},
       path_template => '/foo/bar',
-      method => 'get',
+      method => 'GET',
       operation_id => 'concrete_foo_bar',
       _path_item => { get => ignore },
       operation_uri => str($doc_uri->clone->fragment(jsonp(qw(/paths /foo/bar get)))),
@@ -829,7 +867,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'get',
+      method => 'GET',
       errors => [
         methods(TO_JSON => {
           instanceLocation => '/request/uri',
@@ -859,7 +897,7 @@ YAML
       uri_captures => { foo_id => 'x' },
       path_template => '/foo/{foo_id}.bar',
       operation_id => 'templated_foo_bar',
-      method => 'get',
+      method => 'GET',
       _path_item => { get => ignore },
       operation_uri => str($doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id}.bar get)))),
       errors => [],
@@ -872,7 +910,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'get',
+      method => 'GET',
       errors => [
         methods(TO_JSON => {
           instanceLocation => '/request/uri',
@@ -910,7 +948,7 @@ YAML
       path_template => '/foo/{foo_id}',
       path_captures => { foo_id => 'bar' },
       uri_captures => { foo_id => 'bar' },
-      method => 'get',
+      method => 'GET',
       _path_item => { get => ignore },
       operation_uri => str($doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id} get)))),
       errors => [],
@@ -927,7 +965,7 @@ YAML
       path_template => '/foo/{foo_id}',
       path_captures => { foo_id => 'bar' },
       uri_captures => { foo_id => 'bar' },
-      method => 'get',
+      method => 'GET',
       _path_item => { get => ignore },
       operation_uri => str($doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id} get)))),
       errors => [],
@@ -953,7 +991,7 @@ YAML
       path_template => '/',
       path_captures => {},
       uri_captures => {},
-      method => 'get',
+      method => 'GET',
       _path_item => { get => ignore },
       operation_uri => str($doc_uri->clone->fragment(jsonp(qw(/paths / get)))),
       errors => [],
@@ -1017,7 +1055,7 @@ YAML
       request => isa('Mojo::Message::Request'),
       path_template => '/foo/bar',
       _path_item => { post => ignore },
-      method => 'post',
+      method => 'POST',
       operation_id => 'my_components_pathItem_operation',
       errors => [
         methods(TO_JSON => {
@@ -1039,7 +1077,7 @@ YAML
       request => isa('Mojo::Message::Request'),
       path_template => '/foo/bar',
       _path_item => { post => ignore },
-      method => 'post',
+      method => 'POST',
       operation_id => 'my_components_pathItem_operation',
       errors => [
         methods(TO_JSON => {
@@ -1061,7 +1099,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'post',
+      method => 'POST',
       path_template => '/foo/bar',
       _path_item => { post => ignore },
       operation_id => 'my_webhook_operation',
@@ -1083,7 +1121,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'post',
+      method => 'POST',
       path_template => '/foo/bar',
       _path_item => { post => ignore },
       operation_id => '0',
@@ -1107,7 +1145,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'post',
+      method => 'POST',
       path_template => '/foo/bar',
       _path_item => { post => ignore },
       operation_id => 'my_paths_pathItem_callback_operation',
@@ -1129,7 +1167,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'post',
+      method => 'POST',
       path_template => '/foo/bar',
       _path_item => { post => ignore },
       operation_id => 'my_components_pathItem_callback_operation',
@@ -1156,7 +1194,7 @@ YAML
       path_captures => {},
       uri_captures => {},
       path_template => '/foo',
-      method => 'post',
+      method => 'POST',
       _path_item => { description => ignore, post => { operationId => 'my_reffed_component_operation' }},
       operation_uri => str($doc_uri.'#/components/pathItems/my_path_item2/post'),
       errors => [],
@@ -1173,7 +1211,7 @@ YAML
       path_captures => {},
       uri_captures => {},
       path_template => '/foo',
-      method => 'post',
+      method => 'POST',
       _path_item => { description => ignore, post => { operationId => 'my_reffed_component_operation' }},
       operation_uri => str($doc_uri.'#/components/pathItems/my_path_item2/post'),
       errors => [],
@@ -1190,7 +1228,7 @@ YAML
       path_captures => {},
       uri_captures => {},
       path_template => '/foo',
-      method => 'post',
+      method => 'POST',
       _path_item => { description => ignore, post => { operationId => 'my_reffed_component_operation' }},
       operation_uri => str($doc_uri.'#/components/pathItems/my_path_item2/post'),
       errors => [],
@@ -1208,7 +1246,7 @@ YAML
       path_template => '/foo',
       path_captures => {},
       uri_captures => {},
-      method => 'post',
+      method => 'POST',
       operation_id => 'my_reffed_component_operation',
       operation_uri => str($doc_uri.'#/components/pathItems/my_path_item2/post'),
       errors => [],
@@ -1239,7 +1277,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'post',
+      method => 'POST',
       errors => [
         methods(TO_JSON => {
           instanceLocation => '/request',
@@ -1258,7 +1296,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'post',
+      method => 'POST',
       path_template => '/bar',
       errors => [
         methods(TO_JSON => {
@@ -1278,7 +1316,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'post',
+      method => 'POST',
       errors => [
         methods(TO_JSON => {
           instanceLocation => '/request',
@@ -1374,7 +1412,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'get',
+      method => 'GET',
       errors => [
         methods(TO_JSON => {
           instanceLocation => '/request',
@@ -1394,7 +1432,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'get',
+      method => 'GET',
       path_template => '/foo/{foo_id}',
       path_captures => { foo_id => 1 },
       uri_captures => { foo_id => 1 },
@@ -1418,7 +1456,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'get',
+      method => 'GET',
       path_template => '/bar/{bar_id}',
       path_captures => { bar_id => 1 },
       uri_captures => { bar_id => 1 },
@@ -1435,7 +1473,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'get',
+      method => 'GET',
       path_template => '/qux/{qux_id}',
       path_captures => { qux_id => 1 },
       uri_captures => { qux_id => 1 },
@@ -1452,7 +1490,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'get',
+      method => 'GET',
       path_template => '/foo/{foo_id}',
       path_captures => { foo_id => 1 },
       uri_captures => { foo_id => 1 },
@@ -1469,7 +1507,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'get',
+      method => 'GET',
       path_template => '/bar/{bar_id}',
       path_captures => { bar_id => 1 },
       uri_captures => { bar_id => 1 },
@@ -1486,7 +1524,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'get',
+      method => 'GET',
       path_template => '/qux/{qux_id}',
       path_captures => { qux_id => 1 },
       uri_captures => { qux_id => 1 },
@@ -1503,7 +1541,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'get',
+      method => 'GET',
       path_template => '/subdir-operation',
       path_captures => {},
       uri_captures => {},
@@ -1520,7 +1558,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'get',
+      method => 'GET',
       path_template => '/subdir-path-item',
       path_captures => {},
       uri_captures => {},
@@ -1537,7 +1575,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'get',
+      method => 'GET',
       path_template => '/subdir-global',
       path_captures => {},
       uri_captures => {},
@@ -1554,7 +1592,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'get',
+      method => 'GET',
       path_template => '/bad/{host}',
       _path_item => { get => ignore, post => ignore, servers => ignore },
       errors => [
@@ -1575,7 +1613,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'post',
+      method => 'POST',
       path_template => '/bad/{host}',
       _path_item => { get => ignore, post => ignore, servers => ignore },
       errors => [
@@ -1596,13 +1634,13 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'get',
+      method => 'GET',
       path_template => '/worse/{host}',
       _path_item => { get => ignore },
       errors => [
         methods(TO_JSON => {
           instanceLocation => '/request/uri',
-          keywordLocation => jsonp(qw(/paths /worse/{host} $ref servers 3 url)),
+          keywordLocation => '/servers/3/url',
           absoluteKeywordLocation => $doc_uri.'#/servers/3/url',
           error => 'duplicate template name "host" in server url and path template',
         }),
@@ -1617,7 +1655,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'get',
+      method => 'GET',
       path_template => '/foo/{foo_id}',
       _path_item => { get => ignore },
       errors => [
@@ -1638,7 +1676,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'get',
+      method => 'GET',
       path_template => '/bar/{bar_id}',
       _path_item => { get => ignore, post => ignore, servers => ignore },
       errors => [
@@ -1659,13 +1697,13 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'get',
+      method => 'GET',
       path_template => '/qux/{qux_id}',
       _path_item => { get => ignore },
       errors => [
         methods(TO_JSON => {
           instanceLocation => '/request/uri',
-          keywordLocation => jsonp(qw(/paths /qux/{qux_id} $ref servers 3 variables host enum)),
+          keywordLocation => '/servers/3/variables/host/enum',
           absoluteKeywordLocation => $doc_uri.'#/servers/3/variables/host/enum',
           error => 'server url value does not match any of the allowed values',
         }),
@@ -1680,7 +1718,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'get',
+      method => 'GET',
       path_template => '/foo/{foo_id}',
       path_captures => { foo_id => 1 },
       uri_captures => { host => 'dev', foo_id => 1 },
@@ -1697,7 +1735,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'get',
+      method => 'GET',
       path_template => '/bar/{bar_id}',
       path_captures => { bar_id => 1 },
       uri_captures => { host => 'stg', bar_id => 1 },
@@ -1714,7 +1752,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'get',
+      method => 'GET',
       path_template => '/qux/{qux_id}',
       path_captures => { qux_id => 1 },
       uri_captures => { host => 'prod', qux_id => 1 },
@@ -1731,7 +1769,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'post',
+      method => 'POST',
       path_template => '/bar/{bar_id}',
       path_captures => { bar_id => 1 },
       uri_captures => { bar_id => 1 },
@@ -1749,7 +1787,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'get',
+      method => 'GET',
       path_template => '/foo/{foo_id}',
       _path_item => { get => ignore },
       uri_captures => { not_host => 'dev', foo_id => 1 },
@@ -1773,7 +1811,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'get',
+      method => 'GET',
       path_template => '/foo/{foo_id}',
       _path_item => { get => ignore },
       uri_captures => { host => 'not_dev', foo_id => 1 },
@@ -1797,7 +1835,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'get',
+      method => 'GET',
       path_template => '/foo/{foo_id}',
       _path_item => { get => ignore },
       uri_captures => { host => 'dev', foo_id => 1 },
@@ -1822,7 +1860,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'get',
+      method => 'GET',
       path_template => '/foo/{foo_id}',
       _path_item => { get => ignore },
       uri_captures => { host => 'dev', foo_id => 1 },
@@ -1866,7 +1904,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'get',
+      method => 'GET',
       path_template => '/foo',
       path_captures => {},
       uri_captures => {},
@@ -1883,7 +1921,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'get',
+      method => 'GET',
       path_template => '/bar',
       path_captures => {},
       uri_captures => {},
@@ -1900,7 +1938,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'get',
+      method => 'GET',
       path_template => '/baz',
       path_captures => {},
       uri_captures => {},
@@ -1926,7 +1964,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'get',
+      method => 'GET',
       path_template => '/foo',
       path_captures => {},
       uri_captures => {},
@@ -1943,7 +1981,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'get',
+      method => 'GET',
       path_template => '/foo',
       path_captures => {},
       uri_captures => {},
@@ -1977,7 +2015,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'get',
+      method => 'GET',
       operation_id => 'generic_get',
       path_template => '/user/{id}',
       path_captures => { id => 1 },
@@ -1996,7 +2034,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'get',
+      method => 'GET',
       operation_id => 'generic_get',
       path_template => '/company/{id}',
       path_captures => { id => 2 },
@@ -2081,11 +2119,77 @@ YAML
     'no request provided; operation method does not match passed-in method',
   );
 
-  ok(!$openapi->find_path($options = { method => 'get' }), 'find_path returns false');
+  ok(!$openapi->find_path($options = { operation_id => 'my_reffed_component_operation', method => 'GET' }),
+    'find_path returns false');
   cmp_result(
     $options,
     {
-      method => 'get',
+      method => 'GET',
+      errors => [
+        methods(TO_JSON => {
+          instanceLocation => '',
+          keywordLocation => '/components/pathItems/my_path_item/post/operationId',
+          absoluteKeywordLocation => $doc_uri.'#/components/pathItems/my_path_item/post/operationId',
+          error => 'operation at operation_id does not match HTTP method "GET"',
+        }),
+      ],
+    },
+    'passed-in method does not match operation at operationId under /components',
+  );
+
+  ok($openapi->find_path($options = { operation_id => 'my_reffed_component_operation', method => 'POST' }),
+    'find_path succeeded');
+  cmp_result(
+    $options,
+    {
+      operation_id => 'my_reffed_component_operation',
+      # no path_template
+      method => 'POST',
+      _path_item => { post => ignore },
+      operation_uri => str($doc_uri.'#/components/pathItems/my_path_item/post'),
+      errors => [],
+    },
+    'operation outside /paths can be found with operation_id and method'
+  );
+
+  ok(!$openapi->find_path($options = { operation_id => 'my_get_operation', method => 'Get' }),
+    'find_path returns false');
+  cmp_result(
+    $options,
+    {
+      method => 'Get',
+      errors => [
+        methods(TO_JSON => {
+          instanceLocation => '',
+          keywordLocation => jsonp(qw(/paths /foo/{foo_id} get operationId)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id} get operationId)))->to_string,
+          error => 'operation at operation_id does not match HTTP method "Get"',
+        }),
+      ],
+    },
+    'no request provided; Get does not map to get, only GET does, so operation does not exist',
+  );
+
+  ok($openapi->find_path($options = { operation_id => 'my_get_operation', method => 'GET' }),
+    'find_path succeeded');
+  cmp_result(
+    $options,
+    {
+      operation_id => 'my_get_operation',
+      path_template => '/foo/{foo_id}',
+      method => 'GET',
+      _path_item => { get => ignore },
+      operation_uri => str($doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id} get)))),
+      errors => [],
+    },
+    'operation can be found with operation_id and exact-cased method',
+  );
+
+  ok(!$openapi->find_path($options = { method => 'GET' }), 'find_path returns false');
+  cmp_result(
+    $options,
+    {
+      method => 'GET',
       errors => [
         methods(TO_JSON => {
           instanceLocation => '',
@@ -2114,12 +2218,12 @@ YAML
     'cannot do any lookup when provided no options',
   );
 
-  ok(!$openapi->find_path($options = { path_template => '/blurp', method => 'get' }), 'find_path failed');
+  ok(!$openapi->find_path($options = { path_template => '/blurp', method => 'GET' }), 'find_path failed');
   cmp_result(
     $options,
     {
       path_template => '/blurp',
-      method => 'get',
+      method => 'GET',
       errors => [
         methods(TO_JSON => {
           instanceLocation => '/request/uri',
@@ -2132,13 +2236,13 @@ YAML
     'no request provided; path template cannot be found under /paths',
   );
 
-  ok(!$openapi->find_path($options = { path_template => '/foo/{foo_id}', path_captures => {}, method => 'get' }), 'find_path failed');
+  ok(!$openapi->find_path($options = { path_template => '/foo/{foo_id}', path_captures => {}, method => 'GET' }), 'find_path failed');
   cmp_result(
     $options,
     {
       path_template => '/foo/{foo_id}',
       path_captures => {},
-      method => 'get',
+      method => 'GET',
       _path_item => { get => ignore },
       operation_id => 'my_get_operation',
       operation_uri => str($doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id} get)))),
@@ -2161,7 +2265,7 @@ YAML
       operation_id => 'my_get_operation',
       path_captures => { foo_id => 'a' },
       path_template => '/foo/{foo_id}',
-      method => 'get',
+      method => 'GET',
       _path_item => { get => ignore },
       operation_uri => str($doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id} get)))),
       errors => [],
@@ -2169,14 +2273,14 @@ YAML
     'no request provided; path_captures and method are derived from operation_id',
   );
 
-  ok($openapi->find_path($options = { method => 'get', path_template => '/foo/{foo_id}', path_captures => { foo_id => 'a' } }), 'find_path succeeded');
+  ok($openapi->find_path($options = { method => 'GET', path_template => '/foo/{foo_id}', path_captures => { foo_id => 'a' } }), 'find_path succeeded');
   cmp_result(
     $options,
     {
       operation_id => 'my_get_operation',
       path_captures => { foo_id => 'a' },
       path_template => '/foo/{foo_id}',
-      method => 'get',
+      method => 'GET',
       _path_item => { get => ignore },
       operation_uri => str($doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id} get)))),
       errors => [],
@@ -2184,14 +2288,14 @@ YAML
     'no request provided; operation_id is derived from method and path_template',
   );
 
-  ok($openapi->find_path($options = { method => 'get', path_template => '/foo/{foo_id}' }), 'find_path succeeded');
+  ok($openapi->find_path($options = { method => 'GET', path_template => '/foo/{foo_id}' }), 'find_path succeeded');
   cmp_result(
     $options,
     {
       operation_id => 'my_get_operation',
       path_template => '/foo/{foo_id}',
       # note: no path_captures
-      method => 'get',
+      method => 'GET',
       _path_item => { get => ignore },
       operation_uri => str($doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id} get)))),
       errors => [],
@@ -2199,12 +2303,52 @@ YAML
     'no request provided; path_captures is not required for verification',
   );
 
-  ok(!$openapi->find_path($options = { path_template => '/foo/{foo_id}', method => 'post' }), 'find_path failed');
+  ok(!$openapi->find_path($options = { method => 'get', path_template => '/foo/{foo_id}' }), 'find_path failed');
   cmp_result(
     $options,
     {
       path_template => '/foo/{foo_id}',
-      method => 'post',
+      method => 'get',
+      _path_item => { get => ignore },
+      errors => [ methods(
+        TO_JSON => {
+          instanceLocation => '/request/method',
+          keywordLocation => jsonp(qw(/paths /foo/{foo_id})),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id})))->to_string,
+          error => 'missing operation for HTTP method "get" under "/foo/{foo_id}" (should be GET)',
+        },
+        recommended_response => [ 405, 'Method Not Allowed' ],
+      )],
+    },
+    'no request provided; operation does not exist for path-item when provided method is wrongly cased',
+  );
+
+  ok(!$openapi->find_path($options = { method => 'Get', path_template => '/foo/{foo_id}' }), 'find_path failed');
+  cmp_result(
+    $options,
+    {
+      path_template => '/foo/{foo_id}',
+      method => 'Get',
+      _path_item => { get => ignore },
+      errors => [ methods(
+        TO_JSON => {
+          instanceLocation => '/request/method',
+          keywordLocation => jsonp(qw(/paths /foo/{foo_id})),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id})))->to_string,
+          error => 'missing operation for HTTP method "Get" under "/foo/{foo_id}" (should be GET)',
+        },
+        recommended_response => [ 405, 'Method Not Allowed' ],
+      )],
+    },
+    'no request provided; operation does not exist for path-item when provided method is wrongly cased',
+  );
+
+  ok(!$openapi->find_path($options = { path_template => '/foo/{foo_id}', method => 'POST' }), 'find_path failed');
+  cmp_result(
+    $options,
+    {
+      path_template => '/foo/{foo_id}',
+      method => 'POST',
       _path_item => { get => ignore },
       errors => [ methods(
         TO_JSON => {
@@ -2228,7 +2372,7 @@ YAML
       _path_item => { get => ignore },
       # note: no path_captures
       path_template => '/foo/{foo_id}',
-      method => 'get',
+      method => 'GET',
       errors => [],
     },
     'method and path_item are derived from operation_id; path_captures cannot be determined without request',
@@ -2276,7 +2420,7 @@ YAML
     {
       operation_id => 'my_reffed_component_operation',
       # note: no path_captures or path_template
-      method => 'post',
+      method => 'POST',
       _path_item => { post => { operationId => 'my_reffed_component_operation' }},
       operation_uri => str($doc_uri.'#/components/pathItems/my_path_item/post'),
       errors => [],
@@ -2284,14 +2428,14 @@ YAML
     'found path_item on the far side of a $ref using operation_id',
   );
 
-  ok($openapi->find_path($options = { path_template => '/foo', method => 'post' }), 'find_path succeeded');
+  ok($openapi->find_path($options = { path_template => '/foo', method => 'POST' }), 'find_path succeeded');
   cmp_result(
     $options,
     {
       operation_id => 'my_reffed_component_operation',
       # note: no path_captures
       path_template => '/foo',
-      method => 'post',
+      method => 'POST',
       _path_item => { post => { operationId => 'my_reffed_component_operation' }},
       operation_uri => str($doc_uri.'#/components/pathItems/my_path_item/post'),
       errors => [],
@@ -2308,12 +2452,12 @@ paths:
     get: {}
 YAML
 
-  ok($openapi->find_path($options = { method => 'get', path_template => '/foo/{foo_id}' }), 'find_path succeeded');
+  ok($openapi->find_path($options = { method => 'GET', path_template => '/foo/{foo_id}' }), 'find_path succeeded');
   cmp_result(
     $options,
     {
       path_template => '/foo/{foo_id}',
-      method => 'get',
+      method => 'GET',
       _path_item => { get => ignore },
       operation_uri => str($doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id} get)))),
       errors => [],
@@ -2322,11 +2466,11 @@ YAML
   );
 
   ok($openapi->find_path(
-      $options = { method => 'gET', path_template => '/foo/{foo_id}' }), 'find_path succeeded');
+      $options = { method => 'GET', path_template => '/foo/{foo_id}' }), 'find_path succeeded');
   cmp_result(
     $options,
     {
-      method => 'gET',
+      method => 'GET',
       path_template => '/foo/{foo_id}',
       _path_item => { get => ignore },
       operation_uri => str($doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id} get)))),
@@ -2346,7 +2490,7 @@ YAML
   cmp_result(
     $options,
     {
-      method => 'post',
+      method => 'POST',
       _path_item => $lots_of_options->{components}{pathItems}{my_path_item},
       operation_id => 'my_components_pathItem_operation',
       operation_uri => str($doc_uri.'#/components/pathItems/my_path_item/post'),
@@ -2362,7 +2506,7 @@ YAML
     {
       path_template => '/foo/bar',
       _path_item => { post => ignore },
-      method => 'post',
+      method => 'POST',
       operation_id => 'my_components_pathItem_operation',
       errors => [
         methods(TO_JSON => {
@@ -2381,7 +2525,7 @@ YAML
   cmp_result(
     $options,
     {
-      method => 'post',
+      method => 'POST',
       _path_item => $lots_of_options->{webhooks}{my_hook},
       operation_id => 'my_webhook_operation',
       operation_uri => str($doc_uri.'#/webhooks/my_hook/post'),
@@ -2395,7 +2539,7 @@ YAML
   cmp_result(
     $options,
     {
-      method => 'post',
+      method => 'POST',
       _path_item => $lots_of_options->{paths}{'/foo/bar'}{post}{callbacks}{my_callback}{'{$request.query.queryUrl}'},
       operation_id => 'my_paths_pathItem_callback_operation',
       operation_uri => str($doc_uri->clone->fragment(jsonp(qw(/paths /foo/bar post callbacks my_callback {$request.query.queryUrl} post)))),
@@ -2409,7 +2553,7 @@ YAML
   cmp_result(
     $options,
     {
-      method => 'post',
+      method => 'POST',
       _path_item => $lots_of_options->{components}{pathItems}{my_path_item}{post}{callbacks}{my_callback}{'{$request.query.queryUrl}'},
       operation_id => 'my_components_pathItem_callback_operation',
       operation_uri => str($doc_uri->clone->fragment('/components/pathItems/my_path_item/post/callbacks/my_callback/{$request.query.queryUrl}/post')),
@@ -2436,7 +2580,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'get',
+      method => 'GET',
       _path_item => { get => ignore },
       path_captures => { a => 1 },
       path_template => '/foo',
@@ -2462,7 +2606,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'get',
+      method => 'GET',
       _path_item => { get => ignore },
       path_captures => { a => 1 },
       path_template => '/foo',
@@ -2496,7 +2640,7 @@ YAML
     $options,
     {
       request => isa('Mojo::Message::Request'),
-      method => 'get',
+      method => 'GET',
       _path_item => { get => ignore },
       path_captures => { a => 1 },
       path_template => '/foo',

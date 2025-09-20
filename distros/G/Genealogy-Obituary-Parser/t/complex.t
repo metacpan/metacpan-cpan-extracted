@@ -16,7 +16,7 @@ Besides her husband she is predeceased by her sisters Dorothy Knowles, and Audre
 By personal request there will be no visitation at the funeral home
 STR
 
-my $foo = parse_obituary($str);
+my $foo = parse_obituary(\$str);
 
 cmp_deeply($foo,
 	{
@@ -162,7 +162,7 @@ STR
 						'date' => 'Aug 6, 1955'
 					}
 				 }
-		       ], 'funeral' => {
+			   ], 'funeral' => {
 				  'date' => 'Thursday, April 19th, 2007',
 				  'time' => '11am',
 				  'location' => 'St. Luke\'s United Church, Tantallon NS',
@@ -191,18 +191,18 @@ cmp_deeply($foo,
 	   'birth' => {
 			'date' => '1937/05/21',
 			'place' => 'Noblesville, IN'
-		      },
+			  },
 	   'parents' => {
 			  'father' => { 'name' => 'Virgil' },
 			  'mother' => {
 					'name' => 'Josephine Beaver',
 					'status' => 'living'
-				      }
+					  }
 			},
 	   'death' => {
 			'date' => 'April 21, 2013',
 			'age' => '75'
-		      },
+			  },
 	   'funeral' => {
 			  'location' => 'Forest Lawn Funeral Home, Greenwood, IN',
 			  'time' => '1:00 pm'
@@ -246,14 +246,42 @@ From The Indianapolis Star on Aug. 10, 2003
 
 http://www.legacy.com/obituaries/indystar/obituary.aspx?n=shirley-e-cloud-myers&pid=143444897
 
-Shirley E. Cloud Myers, 60, Indianapolis, died August 8, 2003. She was in customer service for Midwest Frozen Foods for 20 years, she also worked at Meijer's. Memorial Contributions may be made to the or Vistacare Hospice Foundation. Services will be held at 11:30 a.m. Tue., August 12 at Conkle Funeral Home, Speedway, with calling from 3 to 8 p.m. Mon., August 11. Burial: Floral Park Cemetery. She was preceded in death by her husband Charles Myers. Survivors include her sons, Michael and Douglas Cloud; and her granddaughter Lindsey Cloud
+Shirley E. Cloud Myers, 60, Indianapolis, died August 8, 2003. She was in customer service for Midwest Frozen Foods for 20 years, she also worked at Meijer's. Memorial Contributions may be made to the or Vistacare Hospice Foundation. Services will be held at 11:30 a.m. Tue., August 12 at Conkle Funeral Home, Speedway, with calling from 3 to 8 p.m. Mon., August 11. Burial: Floral Park Cemetery. She was preceded in death by her husband Charles Myers. Survivors include her sons,Michael and Douglas Cloud; and her granddaughter Lindsey Cloud
+STR
+
+$foo = parse_obituary($str);
+diag(Data::Dumper->new([$foo])->Dump()) if($ENV{'TEST_VERBOSE'});
+
+cmp_deeply($foo,
+	 {
+		'grandchildren' => [
+			{
+				'name' => 'Lindsey',
+				'sex' => 'F'
+			}
+		  ], 'children' => [
+			{
+				'name' => 'Michael',
+				'sex' => 'M'
+			}, {
+				'name' => 'Douglas',
+				'sex' => 'M'
+			}
+		], 'funeral' => {
+			'location' => 'Conkle Funeral Home, Speedway'
+		}
+	}
+);
+
+$str = <<'STR';
+Fort Wayne Journal Gazette, 20 February 1977:  Word has been received of the death of Charles F. Harris, 72, of 2717 Lynn Ave.  He died at the Fort Myers (Fla.) Community Hospital after a two week illness.  Mr. Harris was a native of Fort Wayne, and had lived here most of his life.  He retired from International Harvester Co.  in 1965 after 31 years' service.  He is survived by his wife, Ruth; two sons, Jack R., Grabill and Ralph E., Yoder; one daughter, Mrs. Arlene J. Gevara, Fort Wayne and one sister, Mrs. Alice Duncan, Englewood, Fla.  Services will be at 10 a.m.  Wednesday at D. O. McComb & sons Lakeside Park Funeral Home, with calling from 7 to 9 p.m.  Tuesday.  Burial will be in Prairie Grove Cemetery
 STR
 
 $foo = parse_obituary($str);
 diag(Data::Dumper->new([$foo])->Dump()) if($ENV{'TEST_VERBOSE'});
 
 $str = <<'STR';
-Fort Wayne Journal Gazette, 20 February 1977:  Word has been received of the death of Charles F. Harris, 72, of 2717 Lynn Ave.  He died at the Fort Myers (Fla.) Community Hospital after a two week illness.  Mr. Harris was a native of Fort Wayne, and had lived here most of his life.  He retired from International Harvester Co.  in 1965 after 31 years' service.  He is survived by his wife, Ruth; two sons, Jack R., Grabill and Ralph E., Yoder; one daughter, Mrs. Arlene J. Gevara, Fort Wayne and one sister, Mrs. Alice Duncan, Englewood, Fla.  Services will be at 10 a.m.  Wednesday at D. O. McComb & sons Lakeside Park Funeral Home, with calling from 7 to 9 p.m.  Tuesday.  Burial will be in Prairie Grove Cemetery
+Mrs. Rachael Bixler, aged 68 years, wife of William Bixler, died early yesterday morning at the residence, 1222 Spring street, after a six years illness from complications.  She was born August 26, 1845, in Wayne township, and her entire life had been spent in Allen county.  Besides the husband, the following children survive; William and John Bixler, Mrs. W. H. Kaiser and Mrs. William Burdage, of Fort Wayne, and Isaac Bixler, of Spencer, Ind.  Nineteen grandchildren, seven brothers and three sisters also survive, while five children preceded her in death.  The funeral will be held at 2 o'clock Monday at the residence, 2110 Parnell avenue, and burial will be in Prairie Grove cemetery
 STR
 
 $foo = parse_obituary($str);

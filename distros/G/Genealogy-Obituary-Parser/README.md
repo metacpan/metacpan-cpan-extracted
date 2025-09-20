@@ -25,16 +25,47 @@ Version 0.02
 
 This module parses freeform obituary text and extracts structured family relationship data
 for use in genealogical applications.
+It parses obituary text and extract structured family relationship data, including details about children, parents, spouse, siblings, grandchildren, and other relatives.
 
 # FUNCTIONS
 
 ## parse\_obituary($text)
 
-Returns a hashref of extracted relatives.
+The routine processes the obituary content to identify and organize relevant family information into a clear, structured hash.
+It returns a hash reference containing structured family information,
+with each family member's data organized into distinct categories such as children, spouse, parents, siblings, etc.
+
+Takes a string, or a ref to a string.
+
+### API SPECIFICATION
+
+#### INPUT
+
+    {
+      'text' => {
+        'type' => 'string',       # or stringref
+        'min' => 1,
+        'max' => 5000
+      }
+    }
+
+#### OUTPUT
+
+- No matches: undef
+
+    {
+      type => 'hashref',
+      'min' => 1,
+      'max' => 10
+    }
 
 # AUTHOR
 
 Nigel Horne, `<njh at nigelhorne.com>`
+
+# SEE ALSO
+
+Test coverage report: [https://nigelhorne.github.io/Genealogy-Obituary-Parser/coverage/](https://nigelhorne.github.io/Genealogy-Obituary-Parser/coverage/)
 
 # SUPPORT
 

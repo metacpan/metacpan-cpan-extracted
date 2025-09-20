@@ -141,7 +141,7 @@ class Mojo::UserAgent extends Mojo::EventEmitter {
       
       return $self->{socket_options};
     }
-    set ($_ : object of object[]|Hash) {
+    set ($_ : object[]|Hash) {
       if ($_ isa object[]) {
         $self->{socket_options} = Hash->new((object[])$_);
       }
@@ -165,7 +165,7 @@ class Mojo::UserAgent extends Mojo::EventEmitter {
       
       return $self->{tls_options};
     }
-    set ($_ : object of object[]|Hash) {
+    set ($_ : object[]|Hash) {
       if (is_options $_) {
         $self->{tls_options} = Hash->new((object[])$_);
       }
@@ -318,7 +318,7 @@ EOS
   }
   
   # Instance Methods
-  method get : Mojo::Transaction::HTTP ($url : object of string|Mojo::URL, $args1 : object = undef, $args2 : object = undef) {
+  method get : Mojo::Transaction::HTTP ($url : string|Mojo::URL, $args1 : object = undef, $args2 : object = undef) {
     
     my $method = "GET";
     
@@ -329,7 +329,7 @@ EOS
     return $tx;
   }
   
-  method head : Mojo::Transaction::HTTP ($url : object of string|Mojo::URL, $args1 : object = undef, $args2 : object = undef) {
+  method head : Mojo::Transaction::HTTP ($url : string|Mojo::URL, $args1 : object = undef, $args2 : object = undef) {
     
     my $method = "HEAD";
     
@@ -340,7 +340,7 @@ EOS
     return $tx;
   }
   
-  method delete : Mojo::Transaction::HTTP ($url : object of string|Mojo::URL, $args1 : object = undef, $args2 : object = undef) {
+  method delete : Mojo::Transaction::HTTP ($url : string|Mojo::URL, $args1 : object = undef, $args2 : object = undef) {
     
     my $method = "DELETE";
     
@@ -351,7 +351,7 @@ EOS
     return $tx;
   }
   
-  method options : Mojo::Transaction::HTTP ($url : object of string|Mojo::URL, $args1 : object = undef, $args2 : object = undef) {
+  method options : Mojo::Transaction::HTTP ($url : string|Mojo::URL, $args1 : object = undef, $args2 : object = undef) {
     
     my $method = "OPTIONS";
     
@@ -362,7 +362,7 @@ EOS
     return $tx;
   }
   
-  method patch : Mojo::Transaction::HTTP ($url : object of string|Mojo::URL, $args1 : object = undef, $args2 : object = undef) {
+  method patch : Mojo::Transaction::HTTP ($url : string|Mojo::URL, $args1 : object = undef, $args2 : object = undef) {
     
     my $method = "PATCH";
     
@@ -373,7 +373,7 @@ EOS
     return $tx;
   }
   
-  method post : Mojo::Transaction::HTTP ($url : object of string|Mojo::URL, $args1 : object = undef, $args2 : object = undef) {
+  method post : Mojo::Transaction::HTTP ($url : string|Mojo::URL, $args1 : object = undef, $args2 : object = undef) {
     
     my $method = "POST";
     
@@ -384,7 +384,7 @@ EOS
     return $tx;
   }
   
-  method put : Mojo::Transaction::HTTP ($url : object of string|Mojo::URL, $args1 : object = undef, $args2 : object = undef) {
+  method put : Mojo::Transaction::HTTP ($url : string|Mojo::URL, $args1 : object = undef, $args2 : object = undef) {
     
     my $method = "PUT";
     
@@ -395,7 +395,7 @@ EOS
     return $tx;
   }
   
-  method build_tx : Mojo::Transaction::HTTP ($method : string, $url : object of string|Mojo::URL, $args1 : object = undef, $args2 : object = undef) {
+  method build_tx : Mojo::Transaction::HTTP ($method : string, $url : string|Mojo::URL, $args1 : object = undef, $args2 : object = undef) {
     return $self->transactor->tx($method, $url, $args1, $args2);
   }
   

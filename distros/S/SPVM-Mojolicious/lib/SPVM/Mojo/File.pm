@@ -42,7 +42,7 @@ operating systems.
 
 =head2 file
 
-C<has file : rw object of string|L<File::Temp|SPVM::File::Temp>|L<File::Temp::Dir|SPVM::File::Temp::Dir>;>
+C<has file : rw string|L<File::Temp|SPVM::File::Temp>|L<File::Temp::Dir|SPVM::File::Temp::Dir>;>
 
 A file path or an object with a file path.
 
@@ -56,7 +56,7 @@ Examples:
 
 =head2 new
 
-C<static method new : L<Mojo::File|SPVM::Mojo::File> ($file : object of string|string[]|L<File::Temp|SPVM::File::Temp>|L<File::Temp::Dir|SPVM::File::Temp::Dir>);>
+C<static method new : L<Mojo::File|SPVM::Mojo::File> ($file : string|string[]|L<File::Temp|SPVM::File::Temp>|L<File::Temp::Dir|SPVM::File::Temp::Dir> = undef);>
 
 Construct a new L<Mojo::File|SPVM::Mojo::File> object, defaults to using the current working directory.
 
@@ -99,7 +99,7 @@ Construct a new scalar-based L<Mojo::File|SPVM::Mojo::File> object for a tempora
 
 =head2 path
 
-C<static method path : L<Mojo::File|SPVM::Mojo::File> ($file : object of string|string[]|L<File::Temp|SPVM::File::Temp>|L<File::Temp::Dir|SPVM::File::Temp::Dir>);>
+C<static method path : L<Mojo::File|SPVM::Mojo::File> ($file : string|string[]|L<File::Temp|SPVM::File::Temp>|L<File::Temp::Dir|SPVM::File::Temp::Dir> = undef);>
 
 Alias for L</"new"> method.
 
@@ -118,7 +118,7 @@ Exmaples:
 
 =head2 child
 
-C<method child : L<Mojo::File|SPVM::Mojo::File> ($base_name : object of string|string[]);>
+C<method child : L<Mojo::File|SPVM::Mojo::File> ($base_name : string|string[]);>
 
 Return a new L<Mojo::File|SPVM::Mojo::File> object relative to the path.
 
@@ -306,7 +306,7 @@ Move file with L<File::Copy|SPVM::File::Copy> and return the destination as a L<
 
 =head2 open
 
-C<method open : IO::File ($mode : object of string|Int)>
+C<method open : IO::File ($mode : string|Int)>
 
 Open file with L<IO::File|SPVM::IO::File>.
 
@@ -351,7 +351,7 @@ Examples:
 
 =head2 sibling
 
-C<method sibling : L<Mojo::File|SPVM::Mojo::File> ($base_name : object of string|stirng[]);>
+C<method sibling : L<Mojo::File|SPVM::Mojo::File> ($base_name : string|stirng[]);>
 
 Return a new L<Mojo::File|SPVM::Mojo::File> object relative to the directory part of the path.
 

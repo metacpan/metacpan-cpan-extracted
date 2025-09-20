@@ -1,0 +1,20 @@
+# Copyright (c) 2025 Yuki Kimoto
+# MIT License
+
+class Mojo::Server::Morbo extends Mojo::Server {
+  version_from Mojolicious;
+  
+  # Class Methods
+  static method new : Mojo::Server::Morbo () {
+    
+    my $self = new Mojo::Server::Morbo;
+    
+    return $self;
+  }
+  
+  # Instance Methods
+  method run : void () {
+    die "TODO";
+  }
+  
+}

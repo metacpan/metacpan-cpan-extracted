@@ -110,7 +110,7 @@ class Mojolicious::Routes::Pattern {
     return $self;
   }
   
-  private static method _compile_req : string ($req : object of string|string[]) {
+  private static method _compile_req : string ($req : string|string[]) {
     
     if ($req isa string) {
       return "(" . (string)$req . ")";
@@ -127,7 +127,7 @@ class Mojolicious::Routes::Pattern {
     return "(" . Fn->join("|", $reqs) . ")";
   }
   
-  private static method _compile_format : string ($format : object of string|string[], $has_default : int) {
+  private static method _compile_format : string ($format : string|string[], $has_default : int) {
     
     # No regex
     unless ($format) {

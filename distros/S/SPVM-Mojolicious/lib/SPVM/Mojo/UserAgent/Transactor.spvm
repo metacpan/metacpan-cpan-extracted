@@ -107,7 +107,7 @@ class Mojo::UserAgent::Transactor {
     $self->{generators}->set($name, $cb);
   }
   
-  method tx : Mojo::Transaction::HTTP ($method : string, $url : object of string|Mojo::URL, $args1 : object = undef, $args2 : object = undef) {
+  method tx : Mojo::Transaction::HTTP ($method : string, $url : string|Mojo::URL, $args1 : object = undef, $args2 : object = undef) {
     
     # Method and URL
     my $tx  = Mojo::Transaction::HTTP->new;

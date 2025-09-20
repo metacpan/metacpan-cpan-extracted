@@ -1,0 +1,145 @@
+# Copyright (c) 2025 Yuki Kimoto
+# MIT License
+
+class Mojolicious::Command {
+  version_from Mojolicious;
+  
+  use Mojo::File;
+  use Mojo::Loader;
+  use Mojo::Server;
+  use Mojo::Template;
+  
+  has app : rw Mojolicious
+    get {
+      unless (exists $self->{app}) {
+        $self->{app} = $self->{app_ref} = Mojo::Server->new->build_app("Mojo::HelloWorld");
+      }
+      return $self->{app};
+    }
+    set {
+      $self->{app} = $_;
+      weaken $self->{app};
+    }
+  ;
+  
+  has description : rw string
+    get {
+      unless (exists $self->{description}) {
+        $self->{description} = "No description";
+      }
+      return $self->{description};
+    }
+  ;
+  
+  has quiet : rw byte;
+  
+  has template : rw object[]
+    get {
+      unless (exists $self->{template}) {
+        $self->{template} = {vars => 1};
+      }
+      return $self->{template};
+    }
+  ;
+  
+  has usage : rw string
+    get {
+      unless (exists $self->{usage}) {
+        $self->{usage} = "Usage: APPLICATION\n";
+      }
+      return $self->{usage};
+    }
+  ;
+  
+  # Undocumented Fields
+  has app_ref : Mojolicious;
+  
+  # Class Methods
+  static method new : Mojolicious::Command () {
+    
+    my $self = new Mojolicious::Command;
+    
+    return $self;
+  }
+  
+  # Instance Methods
+  method chmod_file : void ($path : string, $mode : int) {
+    
+    Mojo::File->path($path)->chmod($mode);
+    
+    $self->_loud("  [chmod] $path " . Fn->sprintf("%lo", $mode));
+  }
+  
+  method chmod_rel_file : void ($path : string, $mode : int) {
+    $self->chmod_file($self->rel_file($path)->to_string, $mode);
+  }
+  
+  method create_dir : void ($path : string) {
+    if (Sys->d($path)) {
+      $self->_loud("  [exist] $path");
+      return;
+    }
+    
+    Mojo::File->path($path)->make_path;
+    
+    $self->_loud("  [mkdir] $path");
+  }
+  
+  method create_rel_dir : void ($path : string) {
+    $self->create_dir($self->rel_file($path)->to_string);
+  }
+  
+  method help : void () {
+    print $self->usage;
+  }
+  
+  method rel_file : Mojo::File ($path : string) {
+    return Mojo::File->path->child(Fn->split("/", $path));
+  }
+
+=pod TODO
+
+  method render_data : string ($name : string) {
+    
+    my $template = Mojo::Template->new($self->template)->name("template $name from DATA section");
+    
+    my $output = $template->render(data_section(ref $self, $name), @_);
+    
+    return ref $output ? die $output : $output;
+  }
+
+  sub render_to_file {
+    my ($self, $data, $path) = (shift, shift, shift);
+    return $self->write_file($path, $self->render_data($data, @_));
+  }
+  
+  sub render_to_rel_file {
+    my $self = shift;
+    $self->render_to_file(shift, $self->rel_file(shift), @_);
+  }
+
+=cut
+
+  private method _loud : void ($msg : string) {
+    
+    unless ($self->quiet) {
+      say $msg;
+    }
+  }
+  
+}
+
+__END__
+
+sub run { croak 'Method "run" not implemented by subclass' }
+
+sub write_file {
+  my ($self, $path, $data) = @_;
+  return $self->_loud("  [exist] $path") if -f $path;
+  $self->create_dir(path($path)->dirname);
+  path($path)->spew($data);
+  return $self->_loud("  [write] $path");
+}
+
+sub write_rel_file { $_[0]->write_file($_[0]->rel_file($_[1]), $_[2]) }
+

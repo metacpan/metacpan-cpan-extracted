@@ -172,7 +172,7 @@ Create a new L<Mojo::Transaction::WebSocket|SPVM::Mojo::Transaction::WebSocket> 
 
 =head2 build_message
 
-C<method build_message : Mojo::WebSocket::Frame ($msg : object of string|object[]);>
+C<method build_message : Mojo::WebSocket::Frame ($msg : string|object[]);>
 
 Build WebSocket message.
 
@@ -291,7 +291,7 @@ Resume L</"handshake"> transaction.
 
 =head2 send
 
-C<method send : void ($msg : object of string|object[]|L<Mojo::WebSocket::Frame|SPVM::Mojo::WebSocket::Frame>, $cb : L<Mojo::Callback|SPVM::Mojo::Callback> = undef);>
+C<method send : void ($msg : string|object[]|L<Mojo::WebSocket::Frame|SPVM::Mojo::WebSocket::Frame>, $cb : L<Mojo::Callback|SPVM::Mojo::Callback> = undef);>
 
 Send message or frame non-blocking via WebSocket, the optional drain callback will be executed once all data has been
 written.

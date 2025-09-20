@@ -18,10 +18,10 @@ class Mojo::File {
   interface Stringable;
   
   # Fields
-  has file : rw object of string|File::Temp|File::Temp::Dir;
+  has file : rw string|File::Temp|File::Temp::Dir;
   
   # Class Methods
-  static method new : Mojo::File ($file : object of string|string[]|File::Temp|File::Temp::Dir) {
+  static method new : Mojo::File ($file : string|string[]|File::Temp|File::Temp::Dir = undef) {
     
     my $self = new Mojo::File;
     
@@ -55,7 +55,7 @@ class Mojo::File {
     return &new(File::Temp->new($options));
   }
   
-  static method path : Mojo::File ($file : object of string|string[]|File::Temp|File::Temp::Dir) {
+  static method path : Mojo::File ($file : string|string[]|File::Temp|File::Temp::Dir = undef) {
     return &new($file);
   }
   
@@ -67,7 +67,7 @@ class Mojo::File {
     return $basename;
   }
   
-  method child : Mojo::File ($base_name : object of string|string[]) {
+  method child : Mojo::File ($base_name : string|string[]) {
     
     my $child = Mojo::File->new($base_name);
     
@@ -83,7 +83,7 @@ class Mojo::File {
     
     File::Copy->copy($self->to_string, $to);
     
-    my $new_args = (object of string|string[])undef;
+    my $new_args = (string|string[])undef;
     if (Sys->d($to)) {
       $new_args = [$to, $self->basename];
     }
@@ -241,7 +241,7 @@ class Mojo::File {
     
     File::Copy->move($path, $to);
     
-    my $new_args = (object of string|string[])undef;
+    my $new_args = (string|string[])undef;
     if (Sys->d($to)) {
       $new_args = [$to, File::Basename->basename($path)];
     }
@@ -254,7 +254,7 @@ class Mojo::File {
     return $mojo_file;
   }
   
-  method open : IO::File ($mode : object of string|Int) {
+  method open : IO::File ($mode : string|Int) {
     
     my $handle = IO::File->new;
     
@@ -279,7 +279,7 @@ class Mojo::File {
     File::Path->remove_tree($self->to_string, $options);
   }
   
-  method sibling : Mojo::File ($base_name : object of string|string[]) {
+  method sibling : Mojo::File ($base_name : string|string[]) {
     
     my $dirname = File::Basename->dirname($self->to_string);
     

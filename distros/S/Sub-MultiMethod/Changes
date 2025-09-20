@@ -6,6 +6,13 @@ Home page:    <https://metacpan.org/release/Sub-MultiMethod>
 Bug tracker:  <https://github.com/tobyink/p5-sub-multimethod/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+1.001	2025-09-19
+
+ - Added: Added `if` option.
+ - Added: Added `want` option and associated exportable constants.
+ - Optimization. Now around ten times faster for simple cases with
+   positional signatures and no coercion.
+
 1.000	2022-09-23
 
  [ BACK COMPAT ]

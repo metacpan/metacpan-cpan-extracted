@@ -4,15 +4,19 @@ use strict;
 use warnings;
 
 use DateTime::Format::Text;
+use Exporter 'import';
 use Geo::Coder::Free;
 use Geo::Coder::List;
-use Exporter 'import';
+use Params::Get 0.13;
+use Return::Set 0.03;
+use Params::Validate::Strict;
 
 our @EXPORT_OK = qw(parse_obituary);
 our $geocoder;
 
-# TODO:
-# use Lingua::EN::Tagger;
+# TODO:	use Lingua::EN::Tagger;
+# TODO:	add more general code, e.g. where it looks for father, also look for mother
+# TODO: parse https://funeral-notices.co.uk/notice/adams/5244000
 
 =head1 NAME
 
@@ -20,11 +24,11 @@ Genealogy::Obituary::Parser - Extract structured family relationships from obitu
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 SYNOPSIS
 
@@ -43,18 +47,63 @@ our $VERSION = '0.02';
 
 This module parses freeform obituary text and extracts structured family relationship data
 for use in genealogical applications.
+It parses obituary text and extract structured family relationship data, including details about children, parents, spouse, siblings, grandchildren, and other relatives.
 
 =head1 FUNCTIONS
 
 =head2 parse_obituary($text)
 
-Returns a hashref of extracted relatives.
+The routine processes the obituary content to identify and organize relevant family information into a clear, structured hash.
+It returns a hash reference containing structured family information,
+with each family member's data organized into distinct categories such as children, spouse, parents, siblings, etc.
+
+Takes a string, or a ref to a string.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+  {
+    'text' => {
+      'type' => 'string',	# or stringref
+      'min' => 1,
+      'max' => 10000
+    }
+  }
+
+=head4 OUTPUT
+
+=over 4
+
+=item * No matches: undef
+
+=back
+
+  {
+    type => 'hashref',
+    'min' => 1,
+    'max' => 10
+  }
 
 =cut
 
 sub parse_obituary
 {
-	my $text = shift;
+        my $params = Params::Validate::Strict::validate_strict({
+		args => Params::Get::get_params('text', \@_),
+		schema => {
+			'text' => {
+				'type' => 'string',
+				'min' => 1,
+				'max' => 10000
+			}
+		}
+	});
+	my $text = $params->{'text'};
+
+	if(ref($text) eq 'SCALAR') {
+		$text = ${$text};
+	}
 
 	# Quick scan to get started
 	sub parse_obituary_quick {
@@ -120,9 +169,8 @@ sub parse_obituary
 			# Match "Carol Girvan of Dartmouth, NS"
 			elsif ($entry =~ /^(.+?)\s+of\s+(.+)$/) {
 				$name = $1; $location = $2;
-			}
-			# Match names only (e.g. for siblings)
-			else {
+			} else {
+				# Match names only (e.g. for siblings)
 				$name = $entry;
 			}
 
@@ -190,7 +238,7 @@ sub parse_obituary
 		my $children_text = $1;
 		$children_text =~ s/, grandmother.+//;
 		$family{children} = extract_people_section($children_text);
-	} elsif($text =~ /sons,?\s+([a-z]+)\s+and\s+([a-z]+)/i) {
+	} elsif($text =~ /sons,?\s*([a-z]+)\s+and\s+([a-z]+)/i) {
 		my @children;
 		my @grandchildren;
 
@@ -211,12 +259,37 @@ sub parse_obituary
 
 		if($text =~ /\ssons,\s*(.*?);/s) {
 			my $sons_text = $1;
-			while($sons_text =~ /([\w. ]+?),\s*([\w. ]+?)(?:\s+and|\z)/g) {
-				push @children, {
-					name => $1,
-					location => $2,
-					sex => 'M',
-				};
+			if($sons_text =~ /, all of (.+)$/) {
+				my $location = $1;
+				while($sons_text =~ /([\w. ]+?),\s/g) {
+					my $son = $1;
+					if($son =~ /(\w+)\s+and\s+(\w+)/) {
+						push @children, {
+							name => $1,
+							location => $location,
+							sex => 'M',
+						}, {
+							name => $2,
+							location => $location,
+							sex => 'M',
+						};
+						last;
+					} else {
+						push @children, {
+							name => $son,
+							location => $location,
+							sex => 'M',
+						};
+					}
+				}
+			} else {
+				while($sons_text =~ /([\w. ]+?),\s*([\w. ]+?)(?:\s+and|\z)/g) {
+					push @children, {
+						name => $1,
+						location => $2,
+						sex => 'M',
+					};
+				}
 			}
 		}
 		if($text =~ /\sdaughters?,\s*Mrs\.\s+(.+?)\s+(\w+),\s+([^;]+)\sand/) {
@@ -226,6 +299,23 @@ sub parse_obituary
 				sex => 'F',
 				spouse => { 'name' => $2, sex => 'M' }
 			};
+		} elsif($text =~ /one daughter,\s*(.+?),\s*(.+?);/) {
+			my $name = $1;
+			my $location = $2;
+			if($name =~ /(\w+)\s+(\w+)/) {
+				push @children, {
+					name => $1,
+					location => $location,
+					sex => 'F',
+					spouse => { name => $2, sex => 'M' }
+				};
+			} else {
+				push @children, {
+					name => $1,
+					location => $location,
+					sex => 'F',
+				};
+			}
 		}
 		$family{children} = \@children if @children;
 
@@ -311,9 +401,7 @@ sub parse_obituary
 		$sisters_text =~ s/^,\s+//;
 		$family{sisters} = extract_people_section($sisters_text);
 	} else {
-		my @siblings;
-
-		while ($text =~ /\bsister[,\s]\s*([A-Z][a-z]+(?:\s+[A-Z][a-z.]+)*)(?:,\s*([A-Z][a-z]+))?/g) {
+		while($text =~ /\bsister[,\s]\s*([A-Z][a-z]+(?:\s+[A-Z][a-z.]+)*)(?:,\s*([A-Z][a-z]+))?/g) {
 			my $name = $1;
 			$family{'sisters'} ||= [];
 			if($name eq 'Mrs') {
@@ -328,6 +416,38 @@ sub parse_obituary
 					name => $name,
 					status => ($text =~ /\bpredeceased by.*?$name/i) ? 'deceased' : 'living',
 				};
+			}
+		}
+
+		if(!exists($family{'sisters'})) {
+			if($text =~ /\stwo\ssisters,\s*(.*?)\sand\s(.*?)[;:]/s) {
+				my($first, $second) = ($1, $2);
+				foreach my $sister($first, $second) {
+					if($sister =~ /Mrs\.\s(.+?),\s(.+)/) {
+						my $name = $1;
+						my $location = $2;
+						$location =~ s/,$//;
+						if($name =~ /(\w+)\s+(\w+)/) {
+							push @{$family{sisters}}, {
+								name => $1,
+								location => $location,
+								sex => 'F',
+								spouse => { 'name' => $2, 'sex' => 'M' }
+							};
+						} else {
+							push @{$family{sisters}}, {
+								name => $name,
+								location => $location,
+								sex => 'F',
+							};
+						}
+					} else {
+						push @{$family{sisters}}, {
+							name => $sister,
+							sex => 'F',
+						};
+					}
+				}
 			}
 		}
 	}
@@ -352,6 +472,44 @@ sub parse_obituary
 				push @{$family{'siblings'}},
 					{ 'name' => $1 },
 					{ 'name' => $2 }
+			}
+		}
+
+		if(!exists($family{'brothers'})) {
+			if($text =~ /\sbrothers,\s*(.*?)[;\.]/s) {
+				my $brothers_text = $1;
+				if($brothers_text =~ /, all of (.+)$/) {
+					my $location = $1;
+					while($brothers_text =~ /([\w. ]+?),\s/g) {
+						my $son = $1;
+						if($son =~ /(\w+)\s+and\s+(\w+)/) {
+							push @{$family{brothers}}, {
+								name => $1,
+								location => $location,
+								sex => 'M',
+							}, {
+								name => $2,
+								location => $location,
+								sex => 'M',
+							};
+							last;
+						} else {
+							push @{$family{brothers}}, {
+								name => $son,
+								location => $location,
+								sex => 'M',
+							};
+						}
+					}
+				} else {
+					while($brothers_text =~ /([\w. ]+?),\s*([\w. ]+?)(?:\s+and|\z)/g) {
+						push @{$family{brothers}}, {
+							name => $1,
+							location => $2,
+							sex => 'M',
+						};
+					}
+				}
 			}
 		}
 	}
@@ -453,6 +611,8 @@ sub parse_obituary
 		};
 	} elsif($text =~ /funeral services.+\sat\s(.+),\swith\s/i) {
 		$family{funeral} = { location => $1 }
+	} elsif($text =~ /services.+\sat\s(.+),\swith\s/i) {
+		$family{funeral} = { location => $1 }
 	}
 
 	# Extract father-in-law and mother-in-law information (if present)
@@ -504,12 +664,22 @@ sub parse_obituary
 		if($mother =~ /(.+)\s+\((.+)\)\s+(.+)/) {
 			$mother = "$1 $2";
 		}
+		if($father =~ /(.+?)\.\s\s/) {
+			$father = $1;
+		}
 		$family{parents} = {
 			father => { name => $father },
 			mother => { name => $mother }
 		};
 		if($text =~ /survived by (his|her) (father|mother)[\s,;]/i) {
 			$family{parents}->{$2}->{'status'} = 'living';
+		}
+	} elsif($text =~ /[^\b]S?he was born\s*(?:on\s+)?([A-Z][a-z]+ \d{1,2}, \d{4})[,\s]+(?:in\s+)([^,]+)?/i) {
+		if(my $dt = _extract_date($1)) {
+			$family{'birth'}->{date} = $dt->ymd('/');
+		}
+		if($2) {
+			$family{'birth'}->{'location'} = $2;
 		}
 	}
 
@@ -527,7 +697,7 @@ sub parse_obituary
 	}
 
 	# Place of death
-	if($text =~ /\bpassed away\b([a-z0-9\s,]+)\sat\s+(.+?)\./i) {
+	if($text =~ /\b(?:passed away|died)\b([a-z0-9\s,]+)\sat\s+(.+?)\./i) {
 		my $place = $2;
 		if($place =~ /(.+)\s+on\s+([A-Z]+ \d{1,2}, \d{4})/i) {
 			$place = $1;
@@ -538,6 +708,9 @@ sub parse_obituary
 				$family{death}->{date} = $dt->ymd('/');
 			}
 		}
+		$place =~ s/^\bthe residence,\s//;
+		$place =~ s/\bafter a.*$//;
+		$place =~ s/,\s+$//;
 		$family{death}->{place} = $place;
 	}
 
@@ -554,7 +727,9 @@ sub parse_obituary
 		}
 	}
 
-	return \%family;
+	return if(!scalar keys(%family));
+
+	return Return::Set::set_return(\%family, { type => 'hashref', 'min' => 1, 'max' => 10 });
 }
 
 sub _extract_date
@@ -589,12 +764,12 @@ sub _extract_location {
 		};
 	}
 	return {
-		raw  => $place_text,
-		# city   => $result->{components}{city} || $result->{components}{town},
+		raw => $place_text,
+		# city => $result->{components}{city} || $result->{components}{town},
 		# region => $result->{components}{state},
 		# country => $result->{components}{country},
-		latitude    => $result->{'latitude'},
-		longitude  => $result->{'longitude'}
+		latitude => $result->{'latitude'},
+		longitude => $result->{'longitude'}
 	};
 }
 
@@ -602,6 +777,10 @@ sub _extract_location {
 =head1 AUTHOR
 
 Nigel Horne, C<< <njh at nigelhorne.com> >>
+
+=head1 SEE ALSO
+
+Test coverage report: L<https://nigelhorne.github.io/Genealogy-Obituary-Parser/coverage/>
 
 =head1 SUPPORT
 

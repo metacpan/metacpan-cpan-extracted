@@ -60,7 +60,7 @@ Epoch nano seconds.
 
 =head2 new
 
-C<static method new : Mojo::Date ($date_value : object of string|L<Long|SPVM::Long> = undef);>
+C<static method new : Mojo::Date ($date_value : string|L<Long|SPVM::Long> = undef);>
 
 Construct a new L<Mojo::Date> object and L</"parse"> date if necessary.
 

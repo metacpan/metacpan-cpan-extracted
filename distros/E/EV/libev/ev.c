@@ -3167,13 +3167,14 @@ ev_recommended_backends (void) EV_NOEXCEPT
   flags &= ~EVBACKEND_POLL;   /* poll return value is unusable (http://forums.freebsd.org/archive/index.php/t-10270.html) */
 #endif
 
+  /* io uring was completely broken for select-style use until recently */
+  /* features have priority over bugs there, even if it affects basic usability */
+  if (ev_linux_version () < 0x060100) /* disable it on linux < 6.1.0 */
+    flags &= ~EVBACKEND_IOURING;
+
   /* TODO: linuxaio is very experimental */
 #if !EV_RECOMMEND_LINUXAIO
   flags &= ~EVBACKEND_LINUXAIO;
-#endif
-  /* TODO: iouring is super experimental */
-#if !EV_RECOMMEND_IOURING
-  flags &= ~EVBACKEND_IOURING;
 #endif
 
   return flags;
@@ -3333,14 +3334,15 @@ loop_init (EV_P_ unsigned int flags) EV_NOEXCEPT
 #if EV_USE_KQUEUE
       if (!backend && (flags & EVBACKEND_KQUEUE  )) backend = kqueue_init    (EV_A_ flags);
 #endif
-#if EV_USE_IOURING
-      if (!backend && (flags & EVBACKEND_IOURING )) backend = iouring_init   (EV_A_ flags);
-#endif
 #if EV_USE_LINUXAIO
       if (!backend && (flags & EVBACKEND_LINUXAIO)) backend = linuxaio_init  (EV_A_ flags);
 #endif
 #if EV_USE_EPOLL
       if (!backend && (flags & EVBACKEND_EPOLL   )) backend = epoll_init     (EV_A_ flags);
+#endif
+#if EV_USE_IOURING
+      /* probe after epoll, as io_uring is quite a bit slower than epoll */
+      if (!backend && (flags & EVBACKEND_IOURING )) backend = iouring_init   (EV_A_ flags);
 #endif
 #if EV_USE_POLL
       if (!backend && (flags & EVBACKEND_POLL    )) backend = poll_init      (EV_A_ flags);

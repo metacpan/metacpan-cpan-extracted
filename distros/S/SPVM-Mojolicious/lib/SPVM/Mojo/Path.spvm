@@ -196,7 +196,7 @@ class Mojo::Path {
     return $clone;
   }
   
-  method merge : void ($path : object of string|Mojo::Path) {
+  method merge : void ($path : string|Mojo::Path) {
     
     unless ($path) {
       die "The path \$path must be defined.";

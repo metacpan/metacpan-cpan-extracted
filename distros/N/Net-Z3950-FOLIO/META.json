@@ -45,7 +45,8 @@
             "Params::ValidationCompiler" : "0.3",
             "Test::Differences" : "0.61",
             "Unicode::Diacritic::Strip" : "0.13",
-            "XML::Simple" : "2.25"
+            "XML::Simple" : "2.25",
+            "XML::XSLT" : "0.48"
          }
       }
    },
@@ -60,6 +61,6 @@
          "web" : "https://github.com/folio-org/Net-Z3950-FOLIO"
       }
    },
-   "version" : "v4.2.0",
+   "version" : "v4.3.0",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

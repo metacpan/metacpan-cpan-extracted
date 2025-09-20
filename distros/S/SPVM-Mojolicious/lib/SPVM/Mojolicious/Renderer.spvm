@@ -3,4 +3,260 @@
 
 class Mojolicious::Renderer {
   version_from Mojolicious;
+  
+  # Fields
+  has helpers : rw Hash of Mojo::Callback;
+  
+  has paths_list : rw List of string;
+  
+  # Class Methods
+  static method new : Mojolicious::Renderer () {
+    
+    my $self = new Mojolicious::Renderer;
+    
+    $self->{helpers} = Hash->new;
+    
+    return $self;
+  }
+  
+  method add_helper : void ($name : string, $cb : Mojo::Callback) {
+    
+    $self->{helpers}->set($name, $cb);
+  }
+  
 }
+
+__END__
+
+package Mojolicious::Renderer;
+use Mojo::Base -base;
+
+use Carp qw(croak);
+use Mojo::Cache;
+use Mojo::DynamicMethods;
+use Mojo::File   qw(curfile path);
+use Mojo::JSON   qw(encode_json);
+use Mojo::Loader qw(data_section);
+use Mojo::Util   qw(decamelize deprecated encode gzip md5_sum monkey_patch);
+
+has cache          => sub { Mojo::Cache->new };
+has classes        => sub { ['main'] };
+has compress       => 1;
+has default_format => 'html';
+has 'default_handler';
+has encoding               => 'UTF-8';
+has [qw(handlers helpers)] => sub { {} };
+has min_compress_size      => 860;
+has paths                  => sub { [] };
+
+# Bundled templates
+my $TEMPLATES = curfile->sibling('resources', 'templates');
+
+sub DESTROY { Mojo::Util::_teardown($_) for @{shift->{namespaces}} }
+
+sub accepts {
+  my ($self, $c) = (shift, shift);
+
+  # DEPRECATED!
+  my $req   = $c->req;
+  my $param = $req->param('format');
+  deprecated 'The ?format=* parameter is deprecated in favor of ?_format=* for content negotiation' if defined $param;
+
+  # List representations
+  my $fmt  = $param // $req->param('_format') || $c->stash->{format};
+  my @exts = $fmt ? ($fmt) : ();
+  push @exts, @{$c->app->types->detect($req->headers->accept)};
+  return \@exts unless @_;
+
+  # Find best representation
+  for my $ext (@exts) { $ext eq $_ and return $ext for @_ }
+  return @exts ? undef : shift;
+}
+
+sub add_handler { $_[0]->handlers->{$_[1]} = $_[2] and return $_[0] }
+
+sub add_helper {
+  my ($self, $name, $cb) = @_;
+
+  $self->helpers->{$name} = $cb;
+  delete $self->{proxy};
+  $cb = $self->get_helper($name) if $name =~ s/\..*$//;
+  Mojo::DynamicMethods::register $_, $self, $name, $cb for qw(Mojolicious Mojolicious::Controller);
+
+  return $self;
+}
+
+sub get_data_template {
+  my ($self, $options) = @_;
+  return undef unless my $template = $self->template_name($options);
+  return data_section $self->{index}{$template}, $template;
+}
+
+sub get_helper {
+  my ($self, $name) = @_;
+
+  if (my $h = $self->{proxy}{$name} || $self->helpers->{$name}) { return $h }
+
+  my $found;
+  my $class = 'Mojolicious::Renderer::Helpers::' . md5_sum "$name:$self";
+  my $re    = length $name ? qr/^(\Q$name\E\.([^.]+))/ : qr/^(([^.]+))/;
+  for my $key (keys %{$self->helpers}) {
+    $key =~ $re ? ($found, my $method) = (1, $2) : next;
+    my $sub = $self->get_helper($1);
+    monkey_patch $class, $method => sub { ${shift()}->$sub(@_) };
+  }
+
+  $found ? push @{$self->{namespaces}}, $class : return undef;
+  return $self->{proxy}{$name} = sub { bless \(my $dummy = shift), $class };
+}
+
+sub render {
+  my ($self, $c) = @_;
+
+  my $stash   = $c->stash;
+  my $options = {
+    encoding => $self->encoding,
+    handler  => $stash->{handler},
+    template => delete $stash->{template},
+    variant  => $stash->{variant}
+  };
+  my $inline = $options->{inline} = delete $stash->{inline};
+  $options->{handler} //= $self->default_handler if defined $inline;
+  $options->{format} = $stash->{format} || $self->default_format;
+
+  # Data
+  return delete $stash->{data}, $options->{format} if defined $stash->{data};
+
+  # Text
+  return _maybe($options->{encoding}, delete $stash->{text}), $options->{format} if defined $stash->{text};
+
+  # JSON
+  return encode_json(delete $stash->{json}), 'json' if exists $stash->{json};
+
+  # Template or templateless handler
+  $options->{template} //= $self->template_for($c);
+  return () unless $self->_render_template($c, \my $output, $options);
+
+  # Inheritance
+  my $content = $stash->{'mojo.content'} //= {};
+  local $content->{content} = $output =~ /\S/ ? $output : undef if $stash->{extends} || $stash->{layout};
+  while ((my $next = _next($stash)) && !defined $inline) {
+    @$options{qw(handler template)} = ($stash->{handler}, $next);
+    $options->{format} = $stash->{format} || $self->default_format;
+    if ($self->_render_template($c, \my $tmp, $options)) { $output = $tmp }
+    $content->{content} //= $output if $output =~ /\S/;
+  }
+
+  return $output if $stash->{'mojo.string'};
+  return _maybe($options->{encoding}, $output), $options->{format};
+}
+
+sub respond {
+  my ($self, $c, $output, $format, $status) = @_;
+
+  croak 'A response has already been rendered' if $c->stash->{'mojo.respond'}++;
+
+  # Gzip compression
+  my $res = $c->res;
+  if ($self->compress && length($output) >= $self->min_compress_size) {
+    my $headers = $res->headers;
+    $headers->append(Vary => 'Accept-Encoding');
+    my $gzip = ($c->req->headers->accept_encoding // '') =~ /gzip/i;
+    if ($gzip && !$headers->content_encoding) {
+      $headers->content_encoding('gzip');
+      $output = gzip $output;
+    }
+  }
+
+  $res->body($output);
+  $c->app->types->content_type($c, {ext => $format});
+  return !!$c->rendered($status);
+}
+
+sub template_for {
+  my ($self, $c) = @_;
+
+  # Normal default template
+  my $stash = $c->stash;
+  my ($controller, $action) = @$stash{qw(controller action)};
+  return join '/', split(/-/, decamelize $controller), $action if $controller && $action;
+
+  # Try the route name if we don't have controller and action
+  return undef unless my $route = $c->match->endpoint;
+  return $route->name;
+}
+
+sub template_handler {
+  my ($self, $options) = @_;
+  return undef                  unless my $file     = $self->template_name($options);
+  return $self->default_handler unless my $handlers = $self->{templates}{$file};
+  return $handlers->[0];
+}
+
+sub template_name {
+  my ($self, $options) = @_;
+
+  return undef unless defined(my $template = $options->{template});
+  return undef unless my $format = $options->{format};
+  $template .= ".$format";
+
+  $self->warmup unless $self->{templates};
+
+  # Variants
+  my $handler = $options->{handler};
+  if (defined(my $variant = $options->{variant})) {
+    $variant = "$template+$variant";
+    my $handlers = $self->{templates}{$variant} // [];
+    $template = $variant if @$handlers && !defined $handler || grep { $_ eq $handler } @$handlers;
+  }
+
+  return defined $handler ? "$template.$handler" : $template;
+}
+
+sub template_path {
+  my ($self, $options) = @_;
+  return undef unless my $name = $self->template_name($options);
+  my @parts = split /\//, $name;
+  -r and return $_ for map { path($_, @parts)->to_string } @{$self->paths}, $TEMPLATES;
+  return undef;
+}
+
+sub warmup {
+  my $self = shift;
+
+  my ($index, $templates) = @$self{qw(index templates)} = ({}, {});
+
+  # Handlers for templates
+  for my $path (@{$self->paths}, $TEMPLATES) {
+    s/\.(\w+)$// and push @{$templates->{$_}}, $1
+      for path($path)->list_tree->map(sub { join '/', @{$_->to_rel($path)} })->each;
+  }
+
+  # Handlers and classes for DATA templates
+  for my $class (reverse @{$self->classes}) {
+    $index->{$_} = $class for my @keys = sort keys %{data_section $class};
+    s/\.(\w+)$// and unshift @{$templates->{$_}}, $1 for reverse @keys;
+  }
+}
+
+sub _maybe { $_[0] ? encode @_ : $_[1] }
+
+sub _next {
+  my $stash = shift;
+  return delete $stash->{extends} if $stash->{extends};
+  return undef unless my $layout = delete $stash->{layout};
+  return join '/', 'layouts', $layout;
+}
+
+sub _render_template {
+  my ($self, $c, $output, $options) = @_;
+
+  my $handler = $options->{handler} ||= $self->template_handler($options);
+  return undef unless $handler;
+  $c->helpers->log->error(qq{No handler for "$handler" found}) and return undef
+    unless my $renderer = $self->handlers->{$handler};
+
+  $renderer->($self, $c, $output, $options);
+  return 1 if defined $$output;
+}
+

@@ -12,8 +12,8 @@ EV - perl interface to libev, a high performance full-featured event loop
       warn "is called after 2s";
    };
    
-   my $w = EV::timer 2, 2, sub {
-      warn "is called roughly every 2s (repeat = 2)";
+   my $w = EV::timer 0, 3, sub {
+      warn "is called as soon as possible, then every 3s";
    };
    
    undef $w; # destroy event watcher again
@@ -37,7 +37,7 @@ EV - perl interface to libev, a high performance full-featured event loop
    
    # CHILD/PID STATUS CHANGES
   
-   my $w = EV::child 666, 0, sub {
+   my $w = EV::child $pid, 0, sub {
       my ($w, $revents) = @_;
       my $status = $w->rstatus;
    };
@@ -121,7 +121,7 @@ package EV;
 use common::sense;
 
 BEGIN {
-   our $VERSION = '4.34';
+   our $VERSION = '4.36';
    use XSLoader;
    local $^W = 0; # avoid spurious warning
    XSLoader::load "EV", $VERSION;
@@ -177,7 +177,7 @@ or locally-installed as F<EV::libev> manpage) for more info.
 The loop will automatically be destroyed when it is no longer referenced
 by any watcher and the loop object goes out of scope.
 
-If you are not embedding the loop, then Using C<EV::FLAG_FORKCHECK>
+If you are not embedding the loop, then using C<EV::FLAG_FORKCHECK>
 is recommended, as only the default event loop is protected by this
 module. If you I<are> embedding this loop in the default loop, this is not
 necessary, as C<EV::embed> automatically does the right thing on fork.

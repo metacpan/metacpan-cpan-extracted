@@ -2,7 +2,10 @@ include/Log.c
 include/Log.h
 include/test.c
 lib/XS/Log.pm
+Log.bs
+Log.c
 Log.h
+Log.o
 Log.xs
 Makefile.PL
 MANIFEST			This list of files

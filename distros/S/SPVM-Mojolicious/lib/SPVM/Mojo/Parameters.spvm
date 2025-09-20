@@ -45,7 +45,7 @@ class Mojo::Parameters {
   has string : string;
   
   # Class Methods
-  static method new : Mojo::Parameters ($params_value : object of string|object[] = undef) {
+  static method new : Mojo::Parameters ($params_value : string|object[] = undef) {
     
     my $self = new Mojo::Parameters;
     
@@ -57,7 +57,7 @@ class Mojo::Parameters {
   }
   
   # Instance Methods
-  method append : void ($pairs : object of object[]|Mojo::Parameters) {
+  method append : void ($pairs : object[]|Mojo::Parameters) {
     
     unless ($pairs) {
       die "The pairs \$pairs must be defined.";
@@ -138,7 +138,7 @@ class Mojo::Parameters {
     return $values;
   }
   
-  method merge : void ($parameters : object of object[]|Mojo::Parameters)  {
+  method merge : void ($parameters : object[]|Mojo::Parameters)  {
     
     unless ($parameters) {
       die "The parameters \$parameters must be defined.";
@@ -192,7 +192,7 @@ class Mojo::Parameters {
     return $param;
   }
   
-  method set_param : void ($name : string, $value : object of string|string[]) {
+  method set_param : void ($name : string, $value : string|string[]) {
     
     unless ($name) {
       die "The name \$name must be defined.";
@@ -216,7 +216,7 @@ class Mojo::Parameters {
     
   }
   
-  method parse : void ($params_value : object of string|object[]) {
+  method parse : void ($params_value : string|object[]) {
     
     if ($params_value isa string) {
       $self->{string} = (string)$params_value;

@@ -35,7 +35,7 @@ class Mojo::URL {
       return $self->{path};
     }
     
-    set ($path : object of string|Mojo::Path) {
+    set ($path : string|Mojo::Path) {
       
       unless ($path) {
         die "The path \$path must be defined.";
@@ -65,7 +65,7 @@ class Mojo::URL {
       return $self->{query};
     }
     
-    set ($query_value : object of object[]|Mojo::Parameters)  {
+    set ($query_value : object[]|Mojo::Parameters)  {
       
       unless ($query_value) {
         die "The query \$query_value must be defined.";
