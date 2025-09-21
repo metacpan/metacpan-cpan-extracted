@@ -1,8 +1,8 @@
 package XS::Log;
-#Build  MD5 : xsJ8PB1dSdfaKfw4DbOY3w
-#Build Time : 2025-09-20 09:36:19
-our $VERSION = 1.09;
-our $BUILDDATE = "2025-09-20";  #Build Time: 09:36:19
+#Build  MD5 : by6mFoRs35rXdowbtVLKew
+#Build Time : 2025-09-20 19:10:36
+our $VERSION = 1.10;
+our $BUILDDATE = "2025-09-20";  #Build Time: 19:10:36
 use strict;
 use warnings;
 use constant { 
@@ -158,7 +158,7 @@ B<XS::Log>是高效快速的日志模块，纯c语言开发，快速高效的IO�
  printInf("This is info");
  printWarn("This is warning");
  printErr("This is error");
- #printFail("This is fatal");
+ #printFail("This is fatal");		#注意：谨慎使用 ，程序会关闭文件并exit
  
  setLogColor(0);
  setLogOptions("show_file_info",1);
@@ -243,7 +243,7 @@ B<XS::Log>是高效快速的日志模块，纯c语言开发，快速高效的IO�
 
 =head2 setLogOptions 
 
-  setLogOptions($opt_key,$opt_val);	#设置options参数
+  setLogOptions($opt_key,$opt_val);	#设置options参数，注意：$opt_val的类型
 
 =head2 setLogUseColor 
 

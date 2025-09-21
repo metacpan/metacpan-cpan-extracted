@@ -5,11 +5,12 @@ package Iterator::Flex::Role::Freeze;
 use strict;
 use warnings;
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 use List::Util;
 
-use Iterator::Flex::Utils qw( :default REG_ITERATOR REG_ITER__DEPENDS REG_ITER_FREEZE );
+use Iterator::Flex::Utils
+  qw( :default REG_ITERATOR REG_ITER__DEPENDS REG_ITER_FREEZE throw_failure );
 use Iterator::Flex::Base;
 use Role::Tiny;
 use experimental 'signatures';
@@ -36,7 +37,7 @@ sub freeze ( $obj ) {
         # first check if dependencies can freeze.
         my $cant = List::Util::first { !$_->can( 'freeze' ) }
         @{ $ipar->[REG_ITER__DEPENDS] };
-        $obj->_throw( parameter => "dependency: @{[ $cant->_name ]} is not serializeable" )
+        throw_failure( parameter => "dependency: @{[ $cant->_name ]} is not serializeable" )
           if $cant;
 
         # now freeze them
@@ -74,7 +75,7 @@ Iterator::Flex::Role::Freeze - Role to add serialization capability to an Iterat
 
 =head1 VERSION
 
-version 0.30
+version 0.31
 
 =head1 METHODS
 

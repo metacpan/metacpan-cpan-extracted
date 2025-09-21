@@ -5,6 +5,11 @@ use Carp;
 use Exporter qw/import/;
 use overload '""' => 'as_string';
 
+use constant DEBUG => $ENV{DEBUG_MOP4IMPORT};
+BEGIN {
+  print STDERR "Using (file '" . __FILE__ . "')\n" if DEBUG and DEBUG >= 2
+}
+
 use MOP4Import::Util qw/globref/;
 
 use fields

@@ -5,7 +5,7 @@ package Iterator::Flex::Role::Reset::Closure;
 use strict;
 use warnings;
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 use Scalar::Util;
 use List::Util;
@@ -63,7 +63,7 @@ Iterator::Flex::Role::Reset::Closure - Implement C<reset> as a closure stored in
 
 =head1 VERSION
 
-version 0.30
+version 0.31
 
 =head1 METHODS
 

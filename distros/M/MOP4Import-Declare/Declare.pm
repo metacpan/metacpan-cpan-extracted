@@ -3,17 +3,18 @@ package MOP4Import::Declare;
 use 5.010;
 use strict;
 use warnings qw(FATAL all NONFATAL misc);
-our $VERSION = '0.062';
+our $VERSION = '0.070'; BEGIN {$VERSION = '0.062'};
 use Carp;
 use mro qw/c3/;
 
 use constant DEBUG => $ENV{DEBUG_MOP4IMPORT};
+BEGIN {
+  print STDERR "\nUsing ".__PACKAGE__. " = $VERSION (file '"
+    . __FILE__ . "')\n"
+    if DEBUG;
+}
 
 use Sub::Util ();
-
-print STDERR "\nUsing ".__PACKAGE__. " = $VERSION (file '"
-  . __FILE__ . "')\n"
-  if DEBUG;
 
 use MOP4Import::Opts
   qw/

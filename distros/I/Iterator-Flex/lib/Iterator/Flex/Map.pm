@@ -6,10 +6,10 @@ use strict;
 use warnings;
 use experimental 'signatures';
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 use Iterator::Flex::Utils qw( STATE THROW EXHAUSTION :IterAttrs :IterStates );
-use Iterator::Flex::Factory;
+use Iterator::Flex::Factory 'to_iterator';
 use Ref::Util;
 use parent 'Iterator::Flex::Base';
 
@@ -45,7 +45,7 @@ use namespace::clean;
 
 
 sub new ( $class, $code, $iterable, $pars = {} ) {
-    $class->_throw( parameter => q{'code' parameter is not a coderef} )
+    throw_failure( parameter => q{'code' parameter is not a coderef} )
       unless Ref::Util::is_coderef( $code );
 
     $class->SUPER::new( { code => $code, src => $iterable }, $pars );
@@ -53,13 +53,13 @@ sub new ( $class, $code, $iterable, $pars = {} ) {
 
 sub construct ( $class, $state ) {
 
-    $class->_throw( parameter => q{'state' parameter must be a HASH reference} )
+    throw_failure( parameter => q{'state' parameter must be a HASH reference} )
       unless Ref::Util::is_hashref( $state );
 
     my ( $code, $src ) = @{$state}{qw[ code src ]};
 
     $src
-      = Iterator::Flex::Factory->to_iterator( $src, { ( +EXHAUSTION ) => THROW } );
+      = to_iterator( $src, { ( +EXHAUSTION ) => THROW } );
 
     my @values;
     my $self;
@@ -75,19 +75,18 @@ sub construct ( $class, $state ) {
         ( +NEXT ) => sub {
             return $self->signal_exhaustion if $iterator_state == IterState_EXHAUSTED;
 
-            ## no critic( Until )
-            until ( @values ) {
-                @values = eval {
+            unless ( @values ) {
+                eval {
                     my $value = $src->();
                     local $_ = $value;
-                    $code->();
-                };
-                if ( $@ ne q{} ) {
+                    @values = $code->();
+                    1;
+                } or do {
                     die $@
                       unless Ref::Util::is_blessed_ref( $@ )
                       && $@->isa( 'Iterator::Flex::Failure::Exhausted' );
                     return $self->signal_exhaustion;
-                }
+                };
             }
             return shift @values;
         },
@@ -130,7 +129,7 @@ Iterator::Flex::Map - Map Iterator Class
 
 =head1 VERSION
 
-version 0.30
+version 0.31
 
 =head1 METHODS
 

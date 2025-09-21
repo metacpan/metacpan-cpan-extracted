@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = "0.002";
+our $VERSION = "0.010";
 
 use MOP4Import::Base::Configure -as_base
   , [fields => qw/sql bind/
@@ -12,26 +12,111 @@ use MOP4Import::Base::Configure -as_base
   ;
 use MOP4Import::Util qw/lexpand terse_dump/;
 
+use overload
+  '.' => 'operator_concat',
+  'bool' => 'operator_bool',
+  'eq' => 'operator_eq',
+  'ne' => 'operator_ne',
+  ;
+
+sub operator_bool {
+  (my MY $self) = @_;
+  defined $self->{sql} and $self->{sql} ne '';
+}
+
+sub operator_concat {
+  (my MY $self, my ($other, $swap)) = @_;
+  ref($self)->new(sep => $self->{sep})->concat(
+    _nonempty(
+      $swap ? ($other, $self) : ($self, $other)
+    )
+  );
+}
+
+sub operator_ne {
+  (my MY $self, my ($other, $swap)) = @_;
+  not $self->operator_eq($other, $swap);
+}
+
+sub operator_eq {
+  (my MY $self, my ($other, $swap)) = @_;
+
+  my $myBind = $self->{bind} // [];
+
+  if (not defined $other) {
+    return;
+  }
+  elsif (not ref $other) {
+    @$myBind == 0 && ($self->{sql} // '') eq $other
+  }
+  else {
+    my ($otherSQL, @other) = ref $other eq 'ARRAY'
+      ? @$other : $other->as_sql_bind;
+
+    ($self->{sql} // '') eq ($otherSQL // '')
+      &&
+      _array_equal($myBind, \@other)
+  }
+}
+
+sub _array_equal {
+  my ($la, $ra) = @_;
+  return unless @$la == @$ra;
+  for (my $i = 0; $i < @$ra; $i++) {
+    if (!defined $la->[$i] and !defined $ra->[$i]) {
+      # same
+    }
+    elsif (!defined $la->[$i] xor !defined $ra->[$i]) {
+      return;
+    }
+    elsif ($la->[$i] ne $ra->[$i]) {
+      return;
+    }
+  }
+  return 1;
+}
+
+sub TO_JSON {
+  (my MY $self) = @_;
+  [$self->as_sql_bind];
+}
+
 sub SQL {
   MY->new(sep => ' ')->concat(@_);
 }
 
-sub PAR {
+sub Q {
+  SQL(@_ ? [@_] : ())
+}
+
+*PAR = *PAREN; *PAR = *PAREN;
+sub PAREN {
   SQL(@_)->paren;
+}
+
+sub WHERE {
+  PFX(WHERE => @_);
+}
+
+sub AND {
+  CAT(AND => @_)->paren;
+}
+
+sub OR {
+  CAT(OR => @_)->paren;
 }
 
 # Useful for OPT("limit ?", $limit, OPT("offset ?", $offset))
 sub OPT {
   my ($expr, $value, @rest) = @_;
-  return unless defined $value;
+  return wantarray ? () : SQL() unless defined $value;
   SQL([$expr, $value], @rest);
 }
 
 sub PFX {
   my ($prefix, @items) = @_;
-  return unless @items;
-  my @non_empty = _nonempty(@items)
-    or return;
+  my @non_empty = @items ? _nonempty(@items) : ()
+    or return wantarray ? () : SQL();
   SQL($prefix => @non_empty);
 }
 
@@ -217,46 +302,34 @@ SQL::Concat - SQL concatenator, only cares about bind-vars, to write SQL generat
 
 =head1 SYNOPSIS
 
-    #
-    # Functional interface
-    #
-    use SQL::Concat qw/SQL/;
+    use SQL::Concat qw/SQL Q WHERE/;
 
-    $q = SQL("SELECT uid FROM authors"); # Just single fixed SQL
+    # core function: SQL(...SQL_FRAGMENTS...)
+    $q = SQL("select * from books", ["where name = ?", 'foo'], "limit 3");
 
-    $q = SQL("SELECT uid FROM authors"   # Fixed SQL fragment
-    
-            , ["WHERE name = ?", 'foo']  # Pair of placeholder(s) and value(s)
-    
-            , "ORDER BY uid"             # Fixed SQL fragment (again)
-    
-            , ($reverse ? "desc" : ())   # Conditional Fixed SQL fragment
-          );
+    [$q->as_sql_bind];
+    # ==> ['select * from books where name = ? limit 3', 'foo']
 
-    $q = SQL($q                          # SQL(SQL(SQL(...), SQL(..))) is ok
-             , "LIMIT 10"
-             , ["OFFSET ?", 30]
-          );
+    # Easy wrapper: Q($SQL, @bind)
+    # creates a SQL::Concat instance (with . operator overload)
+    $q = Q("select * from books where name = ? limit 3", 'foo');
+    $q = Q("select * from books")  . Q("where name = ?", 'foo'). "limit 3";
+    $q =   "select * from books"   . Q("where name = ?", 'foo'). "limit 3";
+    $q = Q(). "select * from books" . ["where name = ?", 'foo']. "limit 3";
 
-    # Extract concatenated SQL and bind vars.
-    #
-    ($sql, @binds) = $q->as_sql_bind;
-    # ==>
-    # SQL: SELECT uid FROM authors WHERE name = ? ORDER BY uid LIMIT 10 OFFSET ?
-    # BIND: ('foo', 30)
+    # Erasable 'WHERE': WHERE(...SQL_FRAGMENTS...)
+    $q = "select * from books" . WHERE() . "order by price";
+    # ==> ["select * from books order by price"]
 
-    #
-    # SQL() doesn't care about composed SQL syntax. It just concat given args.
-    #
-    $q = SQL("SELECT uid", "FROM authors");
-    $q = SQL("SELECT uid FROM", "authors");
-    $q = SQL(SELECT => uid => FROM => 'authors');
+    $q = "select * from books".WHERE(["name = ?", 'foo'])."order by price";
+    # ==> ["select * from books WHERE name = ? order by price", 'foo']
 
-    #
     # OO Interface
-    #
-    my $comp = SQL::Concat->new(sep => ' ')
-      ->concat(SELECT => foo => FROM => 'bar');
+    my $comp = SQL::Concat->new(sep => ' ')->concat(
+      "select * from books",
+      ["where name = ?", 'foo'],
+      "order by price",
+    );
 
 
 =head1 DESCRIPTION
@@ -456,6 +529,41 @@ To put paren around "OR" clause, you can use L<-E<gt>paren()|/paren> method.
 
 =head1 FUNCTIONS
 
+=head2 C<< Q($SQL, @BIND_VALUES) >>
+
+C<Q($SQL, @BIND)> creates SQL::Concat instance with given bind values.
+Since SQL::Concat overloads '.' operator, you can create complex SQL with placeholders just using string concatenation.
+
+
+    $q = Q("select * from foo where x = ? and y = ? limit 10", 3, 8);
+    $q = "select * from foo".Q("where x = ? and y = ?", 3, 8)."limit 10";
+    $q = Q()."select * from foo".["where x = ? and y = ?", 3, 8]."limit 10";
+
+Internally, C<Q($SQL, @BIND)> is defined using C<SQL()>:
+
+    SQL(@_ ? [@_] : ())
+
+
+=head2 C<< WHERE(@ITEMS...) >>
+
+C<WHERE(...)> creates SQL::Concat instance. If given C<@ITEMS> are not empty,
+it returns a keyword C<WHERE> and given items. Otherwise, it returns C<Q()>.
+
+    $q = WHERE($name ? ["name = ?", $name] : ());
+
+Internally, C<WHERE(...)> is defined using C<PFX()>:
+
+    PFX(WHERE => @_);
+
+
+=head2 C<< AND(@ITEMS...) >>
+
+    CAT(AND => @_)->paren;
+
+=head2 C<< OR(@ITEMS...) >>
+
+    CAT(OR => @_)->paren;
+
 =head2 C<< SQL( @ITEMS... ) >>
 X<SQL>
 
@@ -529,10 +637,12 @@ is shorthand version of:
      : ()
   )
 
-=head2 C<< PAR( @ITEMS... ) >>
-X<PAR>
+=head2 C<< PAREN( @ITEMS... ) >>
+X<PAREN>
 
 Equiv. of C<< SQL( ITEMS...)->paren >>
+
+C<PAR()> is an alias of C<PAREN()>
 
 =head2 C<< CSV( @ITEMS... ) >>
 X<CSV>

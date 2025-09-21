@@ -6,10 +6,10 @@ use strict;
 use warnings;
 use experimental qw( signatures declared_refs refaliasing );
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
-use Iterator::Flex::Utils qw( RETURN STATE EXHAUSTION :IterAttrs :IterStates );
-use Iterator::Flex::Factory;
+use Iterator::Flex::Utils qw( RETURN STATE EXHAUSTION :IterAttrs :IterStates can_meth );
+use Iterator::Flex::Factory 'to_iterator';
 use parent 'Iterator::Flex::Base';
 use List::Util 'all';
 
@@ -55,7 +55,7 @@ sub new ( $class, @args ) {
     my $pars = Ref::Util::is_hashref( $args[-1] ) ? pop @args : {};
 
     @args
-      or $class->_throw( parameter => 'not enough parameters' );
+      or throw_failure( parameter => 'not enough parameters' );
 
     $class->SUPER::new( {
             depends                => \@args,
@@ -66,17 +66,17 @@ sub new ( $class, @args ) {
 }
 
 sub construct ( $class, $state ) {
-    $class->_throw( parameter => q{state must be a HASH reference} )
+    throw_failure( parameter => q{state must be a HASH reference} )
       unless Ref::Util::is_hashref( $state );
 
     $state->{value} //= [];
 
-    my ( \@depends, $current_iterator_index, $prev, $current, $next, undef )
-      = @{$state}{ 'depends', 'current_iterator_index', 'prev', 'current', 'next', 'thaw' };
+    my ( \@depends, $current_iterator, $prev, $current, $next, undef )
+      = @{$state}{ 'depends', 'current_iterator', 'prev', 'current', 'next', 'thaw' };
 
     # transform into iterators if required.
     my @iterators
-      = map { Iterator::Flex::Factory->to_iterator( $_, { ( +EXHAUSTION ) => RETURN } ) } @depends;
+      = map { to_iterator( $_, { ( +EXHAUSTION ) => RETURN } ) } @depends;
 
     # -- not sure if this is just cargo-culted
     # my $value;
@@ -85,6 +85,22 @@ sub construct ( $class, $state ) {
 
     my $self;
     my $iterator_state;
+    my $iter;
+    my $is_exhausted;
+
+    my sub init {
+        $current_iterator //= 0;
+        if ( $current_iterator >= @iterators ) {
+            $iterator_state = IterState_EXHAUSTED;
+        }
+        else {
+            $iter         = $iterators[$current_iterator];
+            $is_exhausted = $iter->can( 'is_exhausted' );
+        }
+    }
+
+    init();
+
     my %params = (
 
         ( +_SELF ) => \$self,
@@ -94,23 +110,22 @@ sub construct ( $class, $state ) {
         ( +NEXT ) => sub {
             return $self->signal_exhaustion if $iterator_state == IterState_EXHAUSTED;
 
-            $current_iterator_index = 0
-              if !defined $current_iterator_index;
-
-            ## no critic (CStyleForLoops)
-            for ( ; $current_iterator_index < @iterators ; $current_iterator_index++ ) {
-                my $iter  = $iterators[$current_iterator_index];
+            while ( 1 ) {
                 my $value = $iter->();
-
-                unless ( $iter->is_exhausted ) {
+                if ( defined $value || !$iter->$is_exhausted ) {
                     $prev    = $current;
                     $current = $value;
                     return $current;
                 }
+
+                last if ++$current_iterator >= @iterators;
+                $iter         = $iterators[$current_iterator];
+                $is_exhausted = $iter->can( 'is_exhausted' );
             }
 
             # if we haven't returned, we've exhausted things
-            $prev = $current;
+            $current_iterator = undef;
+            $prev             = $current;
             return $current = $self->signal_exhaustion;
         },
 
@@ -129,30 +144,33 @@ sub construct ( $class, $state ) {
     );
 
     # can only freeze if the iterators support a current method
-    if ( all { defined $class->_can_meth( $_, 'current' ) } @iterators ) {
+    if ( all { defined can_meth( $_, 'current' ) } @iterators ) {
         $params{ +FREEZE } = sub {
             return [
                 $class,
                 {
-                    current_iterator_index => $current_iterator_index,
-                    prev                   => $prev,
-                    current                => $current,
-                    next                   => $next,
+                    current_iterator => $current_iterator,
+                    prev             => $prev,
+                    current          => $current,
+                    next             => $next,
                 } ];
         };
         push $params{ +_ROLES }->@*, 'Freeze';
     }
 
-    if ( all { defined $class->_can_meth( $_, 'reset' ) } @iterators ) {
+    if ( all { defined can_meth( $_, 'reset' ) } @iterators ) {
         $params{ +RESET } = sub {
-            $prev                   = $current = undef;
-            $current_iterator_index = undef;
+            $prev = $current = $current_iterator = undef;
+            init();
         };
         push $params{ +_ROLES }->@*, 'Reset::Closure';
     }
 
-    if ( all { defined $class->_can_meth( $_, 'rewind' ) } @iterators ) {
-        $params{ +REWIND } = sub { $current_iterator_index = undef; };
+    if ( all { defined can_meth( $_, 'rewind' ) } @iterators ) {
+        $params{ +REWIND } = sub {
+            $current_iterator = undef;
+            init();
+        };
         push $params{ +_ROLES }->@*, 'Rewind::Closure';
     }
 
@@ -192,7 +210,7 @@ Iterator::Flex::Cat - An iterator which concatenates a set of iterators
 
 =head1 VERSION
 
-version 0.30
+version 0.31
 
 =head1 METHODS
 

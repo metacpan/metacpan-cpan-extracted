@@ -108,7 +108,7 @@ my $sucat = {
 	_number_of_files_in   => '',
 	_input_suffix         => '',
 	_data_type            => '',
-	_output_file_name     => '',
+	_output_base_file_name => '',
 	_outbound             => '',
 	_velan_data           => '',
 	_Step                 => ''
@@ -134,7 +134,7 @@ sub clear {
 	$sucat->{_data_type}            = '';
 	$sucat->{_number_of_files_in}   = '';
 	$sucat->{_input_suffix}         = '';
-	$sucat->{_output_file_name}     = '';
+	$sucat->{_output_base_file_name} = '';
 	$sucat->{_outbound}             = '';
 	$sucat->{_Step}                 = '';
 }
@@ -562,7 +562,7 @@ sub get_outbound {
 
 	if (    length $sucat->{_outbound}
 		and length $sucat->{_data_type} 
-		and length $sucat->{_output_file_name})
+		and length $sucat->{_output_base_file_name})
 		
 	{
 		# CASE of list
@@ -573,7 +573,7 @@ sub get_outbound {
 			
 		}elsif( $sucat->{_data_type} eq $mute ) {
 			
-			my $result = $DATA_SEISMIC_TXT . '/'. $sucat->{_output_file_name}. $suffix_txt;
+			my $result = $DATA_SEISMIC_TXT . '/'. $sucat->{_output_base_file_name}. $suffix_txt;
 			return ($result);
 		}
 		else {
@@ -583,7 +583,7 @@ sub get_outbound {
 
 	}elsif (  length $sucat->{_outbound}
 		and not length $sucat->{_data_type} 
-		and length $sucat->{_output_file_name}){
+		and length $sucat->{_output_base_file_name}){
 			
 			# CASE of no list
 			my $result = $sucat->{_outbound};    # no change
@@ -593,7 +593,7 @@ sub get_outbound {
 		print("sucat,get_outbound: missing parameter\n");
 		print("outbound=$sucat->{_outbound}\n");
 		print("data_type=$sucat->{_data_type}\n");		
-		print("output_file_name=$sucat->{_output_file_name}\n");		
+		print("output_base_file_name=$sucat->{_output_base_file_name}\n");		
 	}
 
 }
@@ -807,22 +807,22 @@ sub outbound_directory {
 
 }
 
-=head2 sub output_file_name:
+=head2 sub output_base_file_name:
 
  for number of files to concatenate
 
 =cut
 
-sub output_file_name {
-	my ( $variable, $output_file_name ) = @_;
+sub output_base_file_name {
+	my ( $variable, $output_base_file_name ) = @_;
 
-	if ( $output_file_name ne $empty_string ) {
+	if ( $output_base_file_name ne $empty_string ) {
 		
-		$sucat->{_output_file_name} = $output_file_name;
+		$sucat->{_output_base_file_name} = $output_base_file_name;
 		
 	}
 	else {
-		# print("sucat,output_file_name: NADA\n");
+		# print("sucat,output_base_file_name: NADA\n");
 	}
 
 }

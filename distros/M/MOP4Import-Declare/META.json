@@ -34,11 +34,11 @@
             "Cpanel::JSON::XS" : "4.05",
             "Data::Dumper" : "2.160",
             "File::AddInc" : "0",
-            "Module::Runtime" : "0",
             "YAML::Syck" : "0"
          },
          "requires" : {
             "JSON::MaybeXS" : "0",
+            "Module::Runtime" : "0",
             "Sub::Util" : "1.40",
             "perl" : "5.010"
          }
@@ -47,6 +47,7 @@
          "requires" : {
             "Capture::Tiny" : "0",
             "Cpanel::JSON::XS" : "4.05",
+            "Test2::Tools::Command" : "0",
             "Test::Differences" : "0",
             "Test::Exit" : "0",
             "Test::Kantan" : "0",
@@ -74,7 +75,7 @@
       },
       "MOP4Import::Declare" : {
          "file" : "Declare.pm",
-         "version" : "0.062"
+         "version" : "0.070"
       },
       "MOP4Import::Declare::Type" : {
          "file" : "Declare/Type.pm"
@@ -137,6 +138,6 @@
          "url" : "https://github.com/hkoba/perl-mop4import-declare"
       }
    },
-   "version" : "0.062",
+   "version" : "0.070",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

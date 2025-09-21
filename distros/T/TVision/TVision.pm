@@ -1,8 +1,7 @@
 package TVision;
-our $VERSION="0.24";
+our $VERSION="0.25";
 
 use strict; # Sure. Good practice.
-# use warnings; # NO, the warnings.pm module is overbloated.
 
 =encoding utf-8
 =head1 NAME
@@ -36,6 +35,8 @@ TVision namespace contains subpakages of 2 types:
 All the TVision::xxxx widgets are array refs, where first item at index 0
 holds address of the underlying C++ object, 2nd ($obj->[1]) generated widget name,
 3rd - its path.
+4rd item - left to user, any scalar could be stored there, please see the methods
+store_user_value/retrieve_user_value for this.
 
 Some widgets (TButton) has 'num' key, which is usually small integer for the
 onCommand event. If 0 - then next availlable is taken.
@@ -44,7 +45,17 @@ TRect is array ref of 4 integers, which isn't always blessed to TVision::TRect.
 TPoint is array ref of 2 integers, which isn't always blessed to TVision::TPoint.
 TKey is array ref of 2 integers or just integer.
 
-=head1 Geometry managers
+=head1 Functions
+
+Most TVision functions are mapped into perl.
+
+    $str = TVision::messageBox($str, $options);
+    $str = TVision::messageBoxRect([$x0,$y0,$x1,$y1],$str, $options);
+    $str = TVision::inputBox($title, $label, $default="", $imit=1000);
+    $str = TVision::inputBoxRect([$x0,$y0,$x1,$y1],$title, $label, $default="", $imit=1000);
+    TVision::spin_loop();
+
+=head1 Geometry managers (not ready yet, pleae ignore this entire section)
 
 Geometry manager tkpack stolen/hijacked from tcl/tk. In order for it to function
 properly, each widget gets its name ("path")
@@ -86,6 +97,15 @@ sub TPoint {
     return [@_];
 }
 
+sub TVision::TObject::store_user_value {
+    my $self = shift;
+    $self->[4] = shift;
+}
+sub TVision::TObject::retrieve_user_value {
+    my $self = shift;
+    return $self->[4];
+}
+
 sub TVision::TGroup::insert($@) {
     my ($self, $obj) = @_;
     $self->xinsert($obj);
@@ -93,7 +113,6 @@ sub TVision::TGroup::insert($@) {
     print "{$obj->[2]}";
     $TVision::paths{$obj->[2]} = $self;
 }
-
 
 package TVision::WidgetWithOnCommand;
 # this isn't on classical turbovision, this package is the central place
@@ -380,7 +399,7 @@ package TVision::TDrawBuffer;
 package TVision::TDrawSurface;
 package TVision::TEditWindow;
 our @ISA = qw(TVision::TWindow);
-#class TEditWindow : public TWindow { 
+#class TEditWindow : public TWindow {
 #public:
 #    TEditWindow( const TRect&, TStringView, int ) noexcept;
 #    virtual void close();
@@ -505,7 +524,7 @@ our @ISA = qw(TVision::TView);
 #    static TStreamable *build();
 #};
 package TVision::TMemo;
-#class TMemo : public TEditor { 
+#class TMemo : public TEditor {
 #public:
 #    TMemo( const TRect&, TScrollBar *, TScrollBar *, TIndicator *, ushort ) noexcept;
 #    virtual void getData( void *rec );
@@ -518,8 +537,8 @@ package TVision::TMemo;
 #};
 package TVision::TFileEditor;
 our @ISA = qw(TVision::TEditor);
-#class TFileEditor : public TEditor { 
-#public: 
+#class TFileEditor : public TEditor {
+#public:
 #[ ]    char fileName[MAXPATH];
 #[ ]    TFileEditor( const TRect&, TScrollBar *, TScrollBar *, TIndicator *, TStringView) noexcept;
 #[ ]    virtual void doneBuffer();
@@ -804,7 +823,7 @@ our @ISA = qw(TVision::TListViewer);
 #};
 package TVision::THistoryWindow;
 package TVision::TIndicator;
-#class TIndicator : public TView { 
+#class TIndicator : public TView {
 #public:
 #    TIndicator( const TRect& ) noexcept;
 #    virtual void draw();
@@ -889,7 +908,7 @@ our @ISA = qw(TVision::TView);
 package TVision::TLookupValidator;
 
 package TVision::TMenu;
-#class TMenu { 
+#class TMenu {
 #public:
 #    TMenu() noexcept : items(0), deflt(0) {};
 #    TMenu( TMenuItem& itemList ) noexcept { items = &itemList; deflt = &itemList; }
@@ -912,7 +931,7 @@ our @ISA = qw(TVision::TMenuView);
 #};
 
 package TVision::TMenuBox;
-#class TMenuBox : public TMenuView { 
+#class TMenuBox : public TMenuView {
 #public:
 #    TMenuBox( const TRect& bounds, TMenu *aMenu, TMenuView *aParentMenu) noexcept;
 #    virtual void draw();
@@ -922,7 +941,7 @@ package TVision::TMenuBox;
 #};
 
 package TVision::TMenuItem;
-#class TMenuItem { 
+#class TMenuItem {
 #public:
 #[x]    TMenuItem( TStringView aName, ushort aCommand, TKey aKey, ushort aHelpCtx = hcNoContext, TStringView p = 0, TMenuItem *aNext = 0) noexcept;
 #[x]    TMenuItem( TStringView aName, TKey aKey, TMenu *aSubMenu, ushort aHelpCtx = hcNoContext, TMenuItem *aNext = 0) noexcept;
@@ -940,7 +959,7 @@ package TVision::TMenuItem;
 #[ ]    };
 #};
 package TVision::TMenuPopup;
-#class TMenuPopup : public TMenuBox { 
+#class TMenuPopup : public TMenuBox {
 #public:
 #    TMenuPopup(const TRect& bounds, TMenu *aMenu, TMenuView *aParent = 0) noexcept;
 #    virtual ushort execute();
@@ -968,7 +987,7 @@ our @ISA = qw(TVision::TView);
 #};
 package TVision::TSubMenu;
 our @ISA = qw(TVision::TMenuItem);
-#class TSubMenu : public TMenuItem { 
+#class TSubMenu : public TMenuItem {
 #public:
 #    TSubMenu( TStringView nm, TKey key, ushort helpCtx = hcNoContext ) noexcept;
 #};
@@ -1025,6 +1044,29 @@ package TVision::TSItem;
 
 package TVision::TScreen;
 package TVision::TScreenCell;
+# TODO
+#  //// TScreenCell
+#  //
+#  // Stores the text and color attributes in a screen cell.
+#  // Please use the functions in the TText namespace in order to fill screen cells
+#  // with text.
+#  //
+#  // Considerations:
+#  // * In order for a double-width character to be displayed entirely, its cell
+#  //   must be followed by another containing a wide char trail. If it is not,
+#  //   or if a wide char trail is not preceded by a double-width character,
+#  //   we'll understand that a double-width character is being overlapped partially.
+#
+#  struct TScreenCell  {
+#      TColorAttr attr;
+#      TCellChar _ch;
+#      TScreenCell() = default;
+#      inline TScreenCell(ushort bios);
+#      TV_TRIVIALLY_ASSIGNABLE(TScreenCell)
+#      constexpr inline bool isWide() const;
+#      inline bool operator==(const TScreenCell &other) const;
+#      inline bool operator!=(const TScreenCell &other) const;
+#  };
 package TVision::TScrollBar;
 #// TScrollBar part codes
 #    sbLeftArrow     = 0,
@@ -1043,7 +1085,7 @@ package TVision::TScrollBar;
 #// TScrollBar messages
 #    cmScrollBarChanged  = 53,
 #    cmScrollBarClicked  = 54,
-#class TScrollBar : public TView { 
+#class TScrollBar : public TView {
 #public:
 #[x]    TScrollBar( const TRect& bounds ) noexcept;
 #[ ]    virtual void draw();
@@ -1126,7 +1168,7 @@ our @ISA = qw(TVision::TView);
 
 package TVision::TStatusDef;
 package TVision::TStatusItem;
-#class TStatusItem { 
+#class TStatusItem {
 #public:
 #    TStatusItem( TStringView aText, TKey aKey, ushort cmd, TStatusItem *aNext = 0) noexcept;
 #    ~TStatusItem();
@@ -1148,7 +1190,7 @@ package TVision::TStringList;
 package TVision::TStringLookupValidator;
 
 #####IDK TODO
-#class TStringView { 
+#class TStringView {
 #    // This class exists only to compensate for the lack of std::string_view
 #    // in Borland C++. Unless you are programming for that compiler, you should
 #    // always use std::string_view.
@@ -1310,7 +1352,7 @@ our @ISA = qw(TVision::TObject);
 
 package TVision::TWindow;
 our @ISA = qw(TVision::TGroup);
-#class TWindow: public TGroup, public virtual TWindowInit { 
+#class TWindow: public TGroup, public virtual TWindowInit {
 #public:
 #[x]    TWindow( const TRect& bounds, TStringView aTitle, short aNumber) noexcept;
 #[ ]    ~TWindow();
@@ -1344,224 +1386,257 @@ package TVision::pstream;
 
 package TVision;
 
-my ($keys, $commands);
-BEGIN {
-$keys =  {
-# Control keys
-    kbCtrlA     => 0x0001,   kbCtrlB     => 0x0002,   kbCtrlC     => 0x0003,
-    kbCtrlD     => 0x0004,   kbCtrlE     => 0x0005,   kbCtrlF     => 0x0006,
-    kbCtrlG     => 0x0007,   kbCtrlH     => 0x0008,   kbCtrlI     => 0x0009,
-    kbCtrlJ     => 0x000a,   kbCtrlK     => 0x000b,   kbCtrlL     => 0x000c,
-    kbCtrlM     => 0x000d,   kbCtrlN     => 0x000e,   kbCtrlO     => 0x000f,
-    kbCtrlP     => 0x0010,   kbCtrlQ     => 0x0011,   kbCtrlR     => 0x0012,
-    kbCtrlS     => 0x0013,   kbCtrlT     => 0x0014,   kbCtrlU     => 0x0015,
-    kbCtrlV     => 0x0016,   kbCtrlW     => 0x0017,   kbCtrlX     => 0x0018,
-    kbCtrlY     => 0x0019,   kbCtrlZ     => 0x001a,
-# Extended key codes
-    kbEsc       => 0x011b,   kbAltSpace  => 0x0200,   kbCtrlIns   => 0x0400,
-    kbShiftIns  => 0x0500,   kbCtrlDel   => 0x0600,   kbShiftDel  => 0x0700,
-    kbBack      => 0x0e08,   kbCtrlBack  => 0x0e7f,   kbShiftTab  => 0x0f00,
-    kbTab       => 0x0f09,   kbAltQ      => 0x1000,   kbAltW      => 0x1100,
-    kbAltE      => 0x1200,   kbAltR      => 0x1300,   kbAltT      => 0x1400,
-    kbAltY      => 0x1500,   kbAltU      => 0x1600,   kbAltI      => 0x1700,
-    kbAltO      => 0x1800,   kbAltP      => 0x1900,   kbCtrlEnter => 0x1c0a,
-    kbEnter     => 0x1c0d,   kbAltA      => 0x1e00,   kbAltS      => 0x1f00,
-    kbAltD      => 0x2000,   kbAltF      => 0x2100,   kbAltG      => 0x2200,
-    kbAltH      => 0x2300,   kbAltJ      => 0x2400,   kbAltK      => 0x2500,
-    kbAltL      => 0x2600,   kbAltZ      => 0x2c00,   kbAltX      => 0x2d00,
-    kbAltC      => 0x2e00,   kbAltV      => 0x2f00,   kbAltB      => 0x3000,
-    kbAltN      => 0x3100,   kbAltM      => 0x3200,   kbF1        => 0x3b00,
-    kbF2        => 0x3c00,   kbF3        => 0x3d00,   kbF4        => 0x3e00,
-    kbF5        => 0x3f00,   kbF6        => 0x4000,   kbF7        => 0x4100,
-    kbF8        => 0x4200,   kbF9        => 0x4300,   kbF10       => 0x4400,
-    kbHome      => 0x4700,   kbUp        => 0x4800,   kbPgUp      => 0x4900,
-    kbGrayMinus => 0x4a2d,   kbLeft      => 0x4b00,   kbRight     => 0x4d00,
-    kbGrayPlus  => 0x4e2b,   kbEnd       => 0x4f00,   kbDown      => 0x5000,
-    kbPgDn      => 0x5100,   kbIns       => 0x5200,   kbDel       => 0x5300,
-    kbShiftF1   => 0x5400,   kbShiftF2   => 0x5500,   kbShiftF3   => 0x5600,
-    kbShiftF4   => 0x5700,   kbShiftF5   => 0x5800,   kbShiftF6   => 0x5900,
-    kbShiftF7   => 0x5a00,   kbShiftF8   => 0x5b00,   kbShiftF9   => 0x5c00,
-    kbShiftF10  => 0x5d00,   kbCtrlF1    => 0x5e00,   kbCtrlF2    => 0x5f00,
-    kbCtrlF3    => 0x6000,   kbCtrlF4    => 0x6100,   kbCtrlF5    => 0x6200,
-    kbCtrlF6    => 0x6300,   kbCtrlF7    => 0x6400,   kbCtrlF8    => 0x6500,
-    kbCtrlF9    => 0x6600,   kbCtrlF10   => 0x6700,   kbAltF1     => 0x6800,
-    kbAltF2     => 0x6900,   kbAltF3     => 0x6a00,   kbAltF4     => 0x6b00,
-    kbAltF5     => 0x6c00,   kbAltF6     => 0x6d00,   kbAltF7     => 0x6e00,
-    kbAltF8     => 0x6f00,   kbAltF9     => 0x7000,   kbAltF10    => 0x7100,
-    kbCtrlPrtSc => 0x7200,   kbCtrlLeft  => 0x7300,   kbCtrlRight => 0x7400,
-    kbCtrlEnd   => 0x7500,   kbCtrlPgDn  => 0x7600,   kbCtrlHome  => 0x7700,
-    kbAlt1      => 0x7800,   kbAlt2      => 0x7900,   kbAlt3      => 0x7a00,
-    kbAlt4      => 0x7b00,   kbAlt5      => 0x7c00,   kbAlt6      => 0x7d00,
-    kbAlt7      => 0x7e00,   kbAlt8      => 0x7f00,   kbAlt9      => 0x8000,
-    kbAlt0      => 0x8100,   kbAltMinus  => 0x8200,   kbAltEqual  => 0x8300,
-    kbCtrlPgUp  => 0x8400,   kbNoKey     => 0x0000,
-# Additional extended key codes
-    kbAltEsc    => 0x0100,   kbAltBack   => 0x0e00,   kbF11       => 0x8500,
-    kbF12       => 0x8600,   kbShiftF11  => 0x8700,   kbShiftF12  => 0x8800,
-    kbCtrlF11   => 0x8900,   kbCtrlF12   => 0x8a00,   kbAltF11    => 0x8b00,
-    kbAltF12    => 0x8c00,   kbCtrlUp    => 0x8d00,   kbCtrlDown  => 0x9100,
-    kbCtrlTab   => 0x9400,   kbAltHome   => 0x9700,   kbAltUp     => 0x9800,
-    kbAltPgUp   => 0x9900,   kbAltLeft   => 0x9b00,   kbAltRight  => 0x9d00,
-    kbAltEnd    => 0x9f00,   kbAltDown   => 0xa000,   kbAltPgDn   => 0xa100,
-    kbAltIns    => 0xa200,   kbAltDel    => 0xa300,   kbAltTab    => 0xa500,
-    kbAltEnter  => 0xa600
-};
+my ($keys, $commands, $msgbox);
 
-$commands = {
-# Standard command codes
-    cmValid         => 0,
-    cmQuit          => 1,
-    cmError         => 2,
-    cmMenu          => 3,
-    cmClose         => 4,
-    cmZoom          => 5,
-    cmResize        => 6,
-    cmNext          => 7,
-    cmPrev          => 8,
-    cmHelp          => 9,
-# TDialog standard commands
-    cmOK            => 10,
-    cmCancel        => 11,
-    cmYes           => 12,
-    cmNo            => 13,
-    cmDefault       => 14,
-# Standard application commands
-    cmNew           => 30,
-    cmOpen          => 31,
-    cmSave          => 32,
-    cmSaveAs        => 33,
-    cmSaveAll       => 34,
-    cmChDir         => 35,
-    cmDosShell      => 36,
-    cmCloseAll      => 37,
-# TView State masks
-    sfVisible       => 0x001,
-    sfCursorVis     => 0x002,
-    sfCursorIns     => 0x004,
-    sfShadow        => 0x008,
-    sfActive        => 0x010,
-    sfSelected      => 0x020,
-    sfFocused       => 0x040,
-    sfDragging      => 0x080,
-    sfDisabled      => 0x100,
-    sfModal         => 0x200,
-    sfDefault       => 0x400,
-    sfExposed       => 0x800,
-# TView Option masks
-    ofSelectable    => 0x001,
-    ofTopSelect     => 0x002,
-    ofFirstClick    => 0x004,
-    ofFramed        => 0x008,
-    ofPreProcess    => 0x010,
-    ofPostProcess   => 0x020,
-    ofBuffered      => 0x040,
-    ofTileable      => 0x080,
-    ofCenterX       => 0x100,
-    ofCenterY       => 0x200,
-    ofCentered      => 0x300,
-    ofValidate      => 0x400,
-# TView GrowMode masks
-    gfGrowLoX       => 0x01,
-    gfGrowLoY       => 0x02,
-    gfGrowHiX       => 0x04,
-    gfGrowHiY       => 0x08,
-    gfGrowAll       => 0x0f,
-    gfGrowRel       => 0x10,
-    gfFixed         => 0x20,
-# TView DragMode masks
-    dmDragMove      => 0x01,
-    dmDragGrow      => 0x02,
-    dmDragGrowLeft  => 0x04,
-    dmLimitLoX      => 0x10,
-    dmLimitLoY      => 0x20,
-    dmLimitHiX      => 0x40,
-    dmLimitHiY      => 0x80,
-    #TODO dmLimitAll      => dmLimitLoX | dmLimitLoY | dmLimitHiX | dmLimitHiY,
-# TView Help context codes
-    hcNoContext     => 0,
-    hcDragging      => 1,
-# TScrollBar part codes
-    sbLeftArrow     => 0,
-    sbRightArrow    => 1,
-    sbPageLeft      => 2,
-    sbPageRight     => 3,
-    sbUpArrow       => 4,
-    sbDownArrow     => 5,
-    sbPageUp        => 6,
-    sbPageDown      => 7,
-    sbIndicator     => 8,
-# TScrollBar options for TWindow.StandardScrollBar
-    sbHorizontal    => 0x000,
-    sbVertical      => 0x001,
-    sbHandleKeyboard => 0x002,
-# TWindow Flags masks
-    wfMove          => 0x01,
-    wfGrow          => 0x02,
-    wfClose         => 0x04,
-    wfZoom          => 0x08,
-# TView inhibit flags
-    noMenuBar       => 0x0001,
-    noDeskTop       => 0x0002,
-    noStatusLine    => 0x0004,
-    noBackground    => 0x0008,
-    noFrame         => 0x0010,
-    noViewer        => 0x0020,
-    noHistory       => 0x0040,
-# TWindow number constants
-    wnNoNumber      => 0,
-# TWindow palette entries
-    wpBlueWindow    => 0,
-    wpCyanWindow    => 1,
-    wpGrayWindow    => 2,
-#  Application command codes
-    cmCut           => 20,
-    cmCopy          => 21,
-    cmPaste         => 22,
-    cmUndo          => 23,
-    cmClear         => 24,
-    cmTile          => 25,
-    cmCascade       => 26,
-    cmRedo          => 27,
-# Standard messages
-    cmReceivedFocus     => 50,
-    cmReleasedFocus     => 51,
-    cmCommandSetChanged => 52,
-    cmTimerExpired      => 58,
-# TScrollBar messages
-    cmScrollBarChanged  => 53,
-    cmScrollBarClicked  => 54,
-# TWindow select messages
-    cmSelectWindowNum   => 55,
-# TListViewer messages
-    cmListItemSelected  => 56,
-# TProgram messages
-    cmScreenChanged     => 57,
-# Event masks
-    #TODO positionalEvents    => evMouse & ~evMouseWheel,
-    #TODO focusedEvents       => evKeyboard | evCommand;
-# BUTTON_TYPE
-    bfNormal    => 0x00,
-    bfDefault   => 0x01,
-    bfLeftJust  => 0x02,
-    bfBroadcast => 0x04,
-    bfGrabFocus => 0x08,
-    cmRecordHistory => 60,
-};
+BEGIN {
+    $keys =  {
+    # Control keys
+        kbCtrlA     => 0x0001,   kbCtrlB     => 0x0002,   kbCtrlC     => 0x0003,
+        kbCtrlD     => 0x0004,   kbCtrlE     => 0x0005,   kbCtrlF     => 0x0006,
+        kbCtrlG     => 0x0007,   kbCtrlH     => 0x0008,   kbCtrlI     => 0x0009,
+        kbCtrlJ     => 0x000a,   kbCtrlK     => 0x000b,   kbCtrlL     => 0x000c,
+        kbCtrlM     => 0x000d,   kbCtrlN     => 0x000e,   kbCtrlO     => 0x000f,
+        kbCtrlP     => 0x0010,   kbCtrlQ     => 0x0011,   kbCtrlR     => 0x0012,
+        kbCtrlS     => 0x0013,   kbCtrlT     => 0x0014,   kbCtrlU     => 0x0015,
+        kbCtrlV     => 0x0016,   kbCtrlW     => 0x0017,   kbCtrlX     => 0x0018,
+        kbCtrlY     => 0x0019,   kbCtrlZ     => 0x001a,
+    # Extended key codes
+        kbEsc       => 0x011b,   kbAltSpace  => 0x0200,   kbCtrlIns   => 0x0400,
+        kbShiftIns  => 0x0500,   kbCtrlDel   => 0x0600,   kbShiftDel  => 0x0700,
+        kbBack      => 0x0e08,   kbCtrlBack  => 0x0e7f,   kbShiftTab  => 0x0f00,
+        kbTab       => 0x0f09,   kbAltQ      => 0x1000,   kbAltW      => 0x1100,
+        kbAltE      => 0x1200,   kbAltR      => 0x1300,   kbAltT      => 0x1400,
+        kbAltY      => 0x1500,   kbAltU      => 0x1600,   kbAltI      => 0x1700,
+        kbAltO      => 0x1800,   kbAltP      => 0x1900,   kbCtrlEnter => 0x1c0a,
+        kbEnter     => 0x1c0d,   kbAltA      => 0x1e00,   kbAltS      => 0x1f00,
+        kbAltD      => 0x2000,   kbAltF      => 0x2100,   kbAltG      => 0x2200,
+        kbAltH      => 0x2300,   kbAltJ      => 0x2400,   kbAltK      => 0x2500,
+        kbAltL      => 0x2600,   kbAltZ      => 0x2c00,   kbAltX      => 0x2d00,
+        kbAltC      => 0x2e00,   kbAltV      => 0x2f00,   kbAltB      => 0x3000,
+        kbAltN      => 0x3100,   kbAltM      => 0x3200,   kbF1        => 0x3b00,
+        kbF2        => 0x3c00,   kbF3        => 0x3d00,   kbF4        => 0x3e00,
+        kbF5        => 0x3f00,   kbF6        => 0x4000,   kbF7        => 0x4100,
+        kbF8        => 0x4200,   kbF9        => 0x4300,   kbF10       => 0x4400,
+        kbHome      => 0x4700,   kbUp        => 0x4800,   kbPgUp      => 0x4900,
+        kbGrayMinus => 0x4a2d,   kbLeft      => 0x4b00,   kbRight     => 0x4d00,
+        kbGrayPlus  => 0x4e2b,   kbEnd       => 0x4f00,   kbDown      => 0x5000,
+        kbPgDn      => 0x5100,   kbIns       => 0x5200,   kbDel       => 0x5300,
+        kbShiftF1   => 0x5400,   kbShiftF2   => 0x5500,   kbShiftF3   => 0x5600,
+        kbShiftF4   => 0x5700,   kbShiftF5   => 0x5800,   kbShiftF6   => 0x5900,
+        kbShiftF7   => 0x5a00,   kbShiftF8   => 0x5b00,   kbShiftF9   => 0x5c00,
+        kbShiftF10  => 0x5d00,   kbCtrlF1    => 0x5e00,   kbCtrlF2    => 0x5f00,
+        kbCtrlF3    => 0x6000,   kbCtrlF4    => 0x6100,   kbCtrlF5    => 0x6200,
+        kbCtrlF6    => 0x6300,   kbCtrlF7    => 0x6400,   kbCtrlF8    => 0x6500,
+        kbCtrlF9    => 0x6600,   kbCtrlF10   => 0x6700,   kbAltF1     => 0x6800,
+        kbAltF2     => 0x6900,   kbAltF3     => 0x6a00,   kbAltF4     => 0x6b00,
+        kbAltF5     => 0x6c00,   kbAltF6     => 0x6d00,   kbAltF7     => 0x6e00,
+        kbAltF8     => 0x6f00,   kbAltF9     => 0x7000,   kbAltF10    => 0x7100,
+        kbCtrlPrtSc => 0x7200,   kbCtrlLeft  => 0x7300,   kbCtrlRight => 0x7400,
+        kbCtrlEnd   => 0x7500,   kbCtrlPgDn  => 0x7600,   kbCtrlHome  => 0x7700,
+        kbAlt1      => 0x7800,   kbAlt2      => 0x7900,   kbAlt3      => 0x7a00,
+        kbAlt4      => 0x7b00,   kbAlt5      => 0x7c00,   kbAlt6      => 0x7d00,
+        kbAlt7      => 0x7e00,   kbAlt8      => 0x7f00,   kbAlt9      => 0x8000,
+        kbAlt0      => 0x8100,   kbAltMinus  => 0x8200,   kbAltEqual  => 0x8300,
+        kbCtrlPgUp  => 0x8400,   kbNoKey     => 0x0000,
+    # Additional extended key codes
+        kbAltEsc    => 0x0100,   kbAltBack   => 0x0e00,   kbF11       => 0x8500,
+        kbF12       => 0x8600,   kbShiftF11  => 0x8700,   kbShiftF12  => 0x8800,
+        kbCtrlF11   => 0x8900,   kbCtrlF12   => 0x8a00,   kbAltF11    => 0x8b00,
+        kbAltF12    => 0x8c00,   kbCtrlUp    => 0x8d00,   kbCtrlDown  => 0x9100,
+        kbCtrlTab   => 0x9400,   kbAltHome   => 0x9700,   kbAltUp     => 0x9800,
+        kbAltPgUp   => 0x9900,   kbAltLeft   => 0x9b00,   kbAltRight  => 0x9d00,
+        kbAltEnd    => 0x9f00,   kbAltDown   => 0xa000,   kbAltPgDn   => 0xa100,
+        kbAltIns    => 0xa200,   kbAltDel    => 0xa300,   kbAltTab    => 0xa500,
+        kbAltEnter  => 0xa600
+    };
+
+    $commands = {
+    # Standard command codes
+        cmValid         => 0,
+        cmQuit          => 1,
+        cmError         => 2,
+        cmMenu          => 3,
+        cmClose         => 4,
+        cmZoom          => 5,
+        cmResize        => 6,
+        cmNext          => 7,
+        cmPrev          => 8,
+        cmHelp          => 9,
+    # TDialog standard commands
+        cmOK            => 10,
+        cmCancel        => 11,
+        cmYes           => 12,
+        cmNo            => 13,
+        cmDefault       => 14,
+    # Standard application commands
+        cmNew           => 30,
+        cmOpen          => 31,
+        cmSave          => 32,
+        cmSaveAs        => 33,
+        cmSaveAll       => 34,
+        cmChDir         => 35,
+        cmDosShell      => 36,
+        cmCloseAll      => 37,
+    # some more
+        cmAboutCmd             => 100,
+        cmOpenCmd              => 105,
+        cmChDirCmd             => 106,
+        cmMouseCmd             => 108,
+        cmSaveCmd              => 110,
+        cmRestoreCmd           => 111,
+        cmEventViewCmd         => 112,
+        #? cmResize => 120,
+        #? cmZoom => 120,
+        #? cmNext => 120,
+        #? cmClose => 120,
+        #? cmTile => 120,
+        #? cmCascade => 120,
+
+    # TView State masks
+        sfVisible       => 0x001,
+        sfCursorVis     => 0x002,
+        sfCursorIns     => 0x004,
+        sfShadow        => 0x008,
+        sfActive        => 0x010,
+        sfSelected      => 0x020,
+        sfFocused       => 0x040,
+        sfDragging      => 0x080,
+        sfDisabled      => 0x100,
+        sfModal         => 0x200,
+        sfDefault       => 0x400,
+        sfExposed       => 0x800,
+    # TView Option masks
+        ofSelectable    => 0x001,
+        ofTopSelect     => 0x002,
+        ofFirstClick    => 0x004,
+        ofFramed        => 0x008,
+        ofPreProcess    => 0x010,
+        ofPostProcess   => 0x020,
+        ofBuffered      => 0x040,
+        ofTileable      => 0x080,
+        ofCenterX       => 0x100,
+        ofCenterY       => 0x200,
+        ofCentered      => 0x300,
+        ofValidate      => 0x400,
+    # TView GrowMode masks
+        gfGrowLoX       => 0x01,
+        gfGrowLoY       => 0x02,
+        gfGrowHiX       => 0x04,
+        gfGrowHiY       => 0x08,
+        gfGrowAll       => 0x0f,
+        gfGrowRel       => 0x10,
+        gfFixed         => 0x20,
+    # TView DragMode masks
+        dmDragMove      => 0x01,
+        dmDragGrow      => 0x02,
+        dmDragGrowLeft  => 0x04,
+        dmLimitLoX      => 0x10,
+        dmLimitLoY      => 0x20,
+        dmLimitHiX      => 0x40,
+        dmLimitHiY      => 0x80,
+        #TODO dmLimitAll      => dmLimitLoX | dmLimitLoY | dmLimitHiX | dmLimitHiY,
+    # TView Help context codes
+        hcNoContext     => 0,
+        hcDragging      => 1,
+    # TScrollBar part codes
+        sbLeftArrow     => 0,
+        sbRightArrow    => 1,
+        sbPageLeft      => 2,
+        sbPageRight     => 3,
+        sbUpArrow       => 4,
+        sbDownArrow     => 5,
+        sbPageUp        => 6,
+        sbPageDown      => 7,
+        sbIndicator     => 8,
+    # TScrollBar options for TWindow.StandardScrollBar
+        sbHorizontal    => 0x000,
+        sbVertical      => 0x001,
+        sbHandleKeyboard => 0x002,
+    # TWindow Flags masks
+        wfMove          => 0x01,
+        wfGrow          => 0x02,
+        wfClose         => 0x04,
+        wfZoom          => 0x08,
+    # TView inhibit flags
+        noMenuBar       => 0x0001,
+        noDeskTop       => 0x0002,
+        noStatusLine    => 0x0004,
+        noBackground    => 0x0008,
+        noFrame         => 0x0010,
+        noViewer        => 0x0020,
+        noHistory       => 0x0040,
+    # TWindow number constants
+        wnNoNumber      => 0,
+    # TWindow palette entries
+        wpBlueWindow    => 0,
+        wpCyanWindow    => 1,
+        wpGrayWindow    => 2,
+    #  Application command codes
+        cmCut           => 20,
+        cmCopy          => 21,
+        cmPaste         => 22,
+        cmUndo          => 23,
+        cmClear         => 24,
+        cmTile          => 25,
+        cmCascade       => 26,
+        cmRedo          => 27,
+    # Standard messages
+        cmReceivedFocus     => 50,
+        cmReleasedFocus     => 51,
+        cmCommandSetChanged => 52,
+        cmTimerExpired      => 58,
+    # TScrollBar messages
+        cmScrollBarChanged  => 53,
+        cmScrollBarClicked  => 54,
+    # TWindow select messages
+        cmSelectWindowNum   => 55,
+    # TListViewer messages
+        cmListItemSelected  => 56,
+    # TProgram messages
+        cmScreenChanged     => 57,
+    # Event masks
+        #TODO positionalEvents    => evMouse & ~evMouseWheel,
+        #TODO focusedEvents       => evKeyboard | evCommand;
+    # BUTTON_TYPE
+        bfNormal    => 0x00,
+        bfDefault   => 0x01,
+        bfLeftJust  => 0x02,
+        bfBroadcast => 0x04,
+        bfGrabFocus => 0x08,
+        cmRecordHistory => 60,
+    };
+
+    $msgbox = {
+    #  Message box classes
+        mfWarning      => 0x0000,       # Display a Warning box
+        mfError        => 0x0001,       # Dispaly a Error box
+        mfInformation  => 0x0002,       # Display an Information Box
+        mfConfirmation => 0x0003,       # Display a Confirmation Box
+    # Message box button flags
+        mfYesButton    => 0x0100,       # Put a Yes button into the dialog
+        mfNoButton     => 0x0200,       # Put a No button into the dialog
+        mfOKButton     => 0x0400,       # Put an OK button into the dialog
+        mfCancelButton => 0x0800,       # Put a Cancel button into the dialog
+    };
+
+    # Standard Yes, No, Cancel dialog
+    $msgbox->{mfYesNoCancel}  = $msgbox->{mfYesButton} + $msgbox->{mfNoButton} + $msgbox->{mfCancelButton};
+    # Standard OK, Cancel dialog
+    $msgbox->{mfOKCancel}     = $msgbox->{mfOKButton} + $msgbox->{mfCancelButton};
 
 }
 
 our @EXPORT = ('tnew', 'TRect');
-# Items to export into callers namespace by default. Note: do not export
-# names by default without a very good reason. Use EXPORT_OK instead.
-# Do not simply export all your public functions/methods/constants.
 our %EXPORT_TAGS=(
     keys     => [ keys %$keys ],
     commands => [ keys %$commands ],
+    msgbox   => [ keys %$msgbox ],
 );
-our @EXPORT_OK = ((keys %$keys), (keys %$commands));
+our @EXPORT_OK = ((keys %$keys), (keys %$commands), (keys %$msgbox));
 
 use constant $keys;
 use constant $commands;
+use constant $msgbox;
 
 1;
 

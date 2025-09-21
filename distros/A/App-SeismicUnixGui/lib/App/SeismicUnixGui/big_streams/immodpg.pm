@@ -264,8 +264,8 @@ Only used in message files
 for communication with
 immopg.for
 'change*_opt' subs change values of repeatedly
-used variables whereas other subs change
-values of variables more frequently modified
+used variables, whereas other subs change
+values of variables frequently modified
 by user
 
 =cut
@@ -404,6 +404,15 @@ sub _checkVincrement {
 }
 
 =head2 sub _checkVtop
+
+Checks the current Vtop value compared to former Vtop values when modifying, 
+entering, or leaving the VtopEntry widget.
+
+Parameters:
+  $self - the object reference.
+
+Returns:
+  Nothing; updates internal state.
 
 When you modify, enter or leave VtopEntry widget
 check what the current Vtop value is
@@ -5876,7 +5885,7 @@ sub setVbot {
 
 =head2 sub setVbot_upper_layer
 
-When you enter or leave
+When you enter or leave a field,
 check what the current Vbot_upper_layer value is
 compared to former Vbot_upper_layer values
 Vtop value is updated in immodpg.for 

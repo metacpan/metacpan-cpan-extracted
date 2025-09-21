@@ -52,6 +52,7 @@ our (@EXPORT_OK, @ISA); #Global variables
 # export all; import at will
 @EXPORT_OK = qw($append $ascii $ascii_stdout $bin $cdp $CDP $SP
   $_cdp $_mute $_stkvel
+  $_clean
   $day $ep $go $gx $hour $in $max_amp $minute $rms_amp 
   $gather_num_suffix $rms $max $second $surms_ notes $sumax_notes $on $off $true $false $isurf
   $_isurf $isurf_par_ $itemp_surf_picks_ $itemp_surf_num_points_ $itemp_surf_picks_sorted_
@@ -229,6 +230,8 @@ our $in = ' < ';
 our $out = ' > ';
 
 our $_cdp = '_cdp';
+
+our $_clean = '_clean';
 
 our $_mute = '_mute';
 

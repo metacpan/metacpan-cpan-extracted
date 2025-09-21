@@ -6,9 +6,9 @@ use strict;
 use warnings;
 use experimental 'signatures';
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
-use Iterator::Flex::Factory;
+use Iterator::Flex::Factory 'to_iterator';
 use Iterator::Flex::Utils qw[ THROW STATE EXHAUSTION :IterAttrs :IterStates ];
 use Ref::Util;
 use parent 'Iterator::Flex::Base';
@@ -42,7 +42,7 @@ use namespace::clean;
 
 
 sub new ( $class, $code, $iterable, $pars = {} ) {
-    $class->_throw( parameter => q{'code' parameter is not a coderef} )
+    throw_failure( parameter => q{'code' parameter is not a coderef} )
       unless Ref::Util::is_coderef( $code );
 
     $class->SUPER::new( { code => $code, src => $iterable }, $pars );
@@ -51,13 +51,13 @@ sub new ( $class, $code, $iterable, $pars = {} ) {
 
 sub construct ( $class, $state ) {
 
-    $class->_throw( parameter => q{'state' parameter must be a HASH reference} )
+    throw_failure( parameter => q{'state' parameter must be a HASH reference} )
       unless Ref::Util::is_hashref( $state );
 
     my ( $code, $src ) = @{$state}{qw[ code src ]};
 
     $src
-      = Iterator::Flex::Factory->to_iterator( $src, { ( +EXHAUSTION ) => THROW } );
+      = to_iterator( $src, { ( +EXHAUSTION ) => THROW } );
 
     my $self;
     my $iterator_state;
@@ -79,13 +79,13 @@ sub construct ( $class, $state ) {
                     local $_ = $rv;
                     return $rv if $code->();
                 }
-            };
-            if ( $@ ne q{} ) {
+                1;
+            } or do {
                 die $@
                   unless Ref::Util::is_blessed_ref( $@ )
                   && $@->isa( 'Iterator::Flex::Failure::Exhausted' );
                 return $self->signal_exhaustion;
-            }
+            };
             return $ret;
         },
         ( +RESET )    => sub { },
@@ -125,7 +125,7 @@ Iterator::Flex::Grep - Grep Iterator Class
 
 =head1 VERSION
 
-version 0.30
+version 0.31
 
 =head1 METHODS
 

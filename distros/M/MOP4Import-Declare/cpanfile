@@ -6,7 +6,7 @@ requires 'JSON::MaybeXS';
 
 requires 'Sub::Util', '>= 1.40'; # For subname
 
-recommends 'Module::Runtime';
+requires 'Module::Runtime'; # For module_notional_filename
 recommends 'YAML::Syck';
 recommends 'Cpanel::JSON::XS', '>= 4.05';
 
@@ -32,6 +32,7 @@ on test => sub {
   requires 'Capture::Tiny';
   requires 'Test::Output';
   requires 'Test::Exit';
+  requires 'Test2::Tools::Command';
   requires 'YAML::Syck';
   requires 'Cpanel::JSON::XS', '>= 4.05';
 };

@@ -1,5 +1,5 @@
 use strict;
-use TVision (':keys', 'tnew');
+use TVision qw(:keys :commands tnew);
 
 use constant {
   hcCancelBtn            => 35,
@@ -35,20 +35,6 @@ use constant {
   hcWTile                => 21,
   hcWZoom                => 20,
   hcWindows              => 18,
-  cmAboutCmd             => 100,
-  cmOpenCmd              => 105,
-  cmChDirCmd             => 106,
-  cmMouseCmd             => 108,
-  cmSaveCmd              => 110,
-  cmRestoreCmd           => 111,
-  cmEventViewCmd         => 112,
-
-        cmResize => 120,
-        cmZoom => 120,
-        cmNext => 120,
-        cmClose => 120,
-        cmTile => 120,
-        cmCascade => 120,
 };
 
 my $submenu0 = tnew(TSubMenu=>"~s~ubmenu", 0, 0 );

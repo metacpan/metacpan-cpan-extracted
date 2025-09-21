@@ -5,7 +5,7 @@ package Iterator::Flex::Role;
 use strict;
 use warnings;
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 use Role::Tiny;
 use experimental 'signatures';
@@ -79,6 +79,18 @@ sub imap ( $iter, $code, @args ) { Iterator::Flex::Common::imap( \&{$code}, $ite
 
 
 
+
+
+sub iflatten ( $iter, @args ) { Iterator::Flex::Common::iflatten( $iter, @args ) }
+
+
+
+
+
+
+
+
+
 sub ifreeze ( $iter, $code, @args ) { Iterator::Flex::Common::ifreeze( \&{$code}, $iter, @args ) }
 
 1;
@@ -97,7 +109,7 @@ __END__
 
 =pod
 
-=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory ichunk igather
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory ichunk igather iflatten
 
 =head1 NAME
 
@@ -105,7 +117,7 @@ Iterator::Flex::Role - Iterator Methods to add Iterator::Flex Iterator modifiers
 
 =head1 VERSION
 
-version 0.30
+version 0.31
 
 =head1 METHODS
 
@@ -138,6 +150,12 @@ Return a new iterator modifying the original iterator via L<Iterator::Flex/igrep
   $new_iter = $iter->imap( sub { ... } );
 
 Return a new iterator modifying the original iterator via L<Iterator::Flex/ifreeze>.
+
+=head2 iflatten
+
+  $new_iter = $iter->iflatten;
+
+Return a new iterator modifying the original iterator via L<Iterator::Flex/iflatten>.
 
 =head2 ifreeze
 

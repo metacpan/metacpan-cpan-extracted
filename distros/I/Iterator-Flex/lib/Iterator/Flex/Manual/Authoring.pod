@@ -13,7 +13,7 @@ Iterator::Flex::Manual::Authoring - How to write an iterator
 
 =head1 VERSION
 
-version 0.30
+version 0.31
 
 =head1 DESCRIPTION
 
@@ -314,7 +314,7 @@ iterator object from our C<%AttrHash>:
 
   my @array = ( 1..100 );
   my $AttrHash = construct( \@array );
-  $iter = Iterator::Flex::Factorye->construct_from_attrs( $AttrHash, \%opts );
+  $iter = Iterator::Flex::Factorye::construct_from_attrs( $AttrHash, \%opts );
 
 In addition to C<%AttrHash>, C<construct_from_attrs> takes another options hash, which
 is where the exhaustion policy is set.
@@ -401,7 +401,7 @@ interpreted by the C<Iterator::Flex> framework.
 Here's the code for L<Iterator::Flex::Array/new>:
 
   sub new ( $class, $array, $pars={} ) {
-      $class->_throw( parameter => "argument must be an ARRAY reference" )
+      throw_failure( parameter => "argument must be an ARRAY reference" )
         unless Ref::Util::is_arrayref( $array );
       $class->SUPER::new( { array => $array }, $pars );
   }
@@ -509,7 +509,7 @@ These indicate that the named capability is present and implemented as a closure
       my $class = shift;
       my $gpar = Ref::Util::is_hashref( $_[-1] ) ? pop : {};
 
-      $class->_throw( parameter => "argument must be an ARRAY reference" )
+      throw_failure( parameter => "argument must be an ARRAY reference" )
         unless Ref::Util::is_arrayref( $_[0] );
 
       $class->SUPER::new( { array => $_[0] }, $gpar );

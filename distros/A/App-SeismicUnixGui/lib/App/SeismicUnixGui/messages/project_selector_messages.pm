@@ -8,7 +8,7 @@ sub get {
     my @message;
 
     $message[0] = (
-"Select ONLY one project; then click [OK], (backup_project_selector_message=2)\n"
+"Select ONLY one project; then click [OK], (project_selector_message=0)\n"
     );
     return ( \@message );
 }

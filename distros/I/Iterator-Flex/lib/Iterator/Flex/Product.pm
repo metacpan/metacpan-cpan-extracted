@@ -6,14 +6,13 @@ use strict;
 use warnings;
 use experimental qw( signatures declared_refs refaliasing );
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
-use Iterator::Flex::Utils qw( RETURN STATE EXHAUSTION :IterAttrs :IterStates );
-use Iterator::Flex::Factory;
+use Iterator::Flex::Utils qw( RETURN STATE EXHAUSTION :IterAttrs :IterStates can_meth );
+use Iterator::Flex::Factory 'to_iterator';
 use parent 'Iterator::Flex::Base';
 use Ref::Util;
 use List::Util;
-
 
 use namespace::clean;
 
@@ -62,7 +61,7 @@ use namespace::clean;
 sub new ( $class, @args ) {
     my $pars = Ref::Util::is_hashref( $args[-1] ) ? pop @args : {};
 
-    $class->_throw( parameter => 'not enough parameters' )
+    throw_failure( parameter => 'not enough parameters' )
       unless @args;
 
     my @iterators;
@@ -73,7 +72,7 @@ sub new ( $class, @args ) {
         @iterators = @args;
     }
     else {
-        $class->_throw( parameter => 'expected an even number of arguments' )
+        throw_failure( parameter => 'expected an even number of arguments' )
           if @args % 2;
 
         while ( @args ) {
@@ -86,7 +85,7 @@ sub new ( $class, @args ) {
 }
 
 sub construct ( $class, $state ) {    ## no critic (ExcessComplexity)
-    $class->_throw( parameter => q{state must be a HASH reference} )
+    throw_failure( parameter => q{state must be a HASH reference} )
       unless Ref::Util::is_hashref( $state );
 
     $state->{value} //= [];
@@ -96,13 +95,13 @@ sub construct ( $class, $state ) {    ## no critic (ExcessComplexity)
 
     # transform into iterators if required.
     my @iterators
-      = map { Iterator::Flex::Factory->to_iterator( $_, { ( +EXHAUSTION ) => RETURN } ) } @depends;
+      = map { to_iterator( $_, { ( +EXHAUSTION ) => RETURN } ) } @depends;
 
     # can only work if the iterators support a rewind method
-    $class->_throw( parameter => q{all iterables must provide a rewind method} )
-      unless List::Util::all { defined $class->_can_meth( $_, 'rewind' ) } @iterators;
+    throw_failure( parameter => q{all iterables must provide a rewind method} )
+      unless List::Util::all { defined can_meth( $_, 'rewind' ) } @iterators;
 
-    $class->_throw( parameter => q{number of keys not equal to number of iterators} )
+    throw_failure( parameter => q{number of keys not equal to number of iterators} )
       if @keys && @keys != @iterators;
 
     @value = map { $_->current } @iterators
@@ -110,6 +109,8 @@ sub construct ( $class, $state ) {    ## no critic (ExcessComplexity)
 
     ## no critic ( AmbiguousNames )
     my @set = ( 1 ) x @value;
+
+    my @src = map { [ $_, $_->can( 'is_exhausted' ) ] } @iterators;
 
     my $self;
     my $iterator_state;
@@ -125,36 +126,38 @@ sub construct ( $class, $state ) {    ## no critic (ExcessComplexity)
             # first time through
             if ( !@value ) {
 
-                for my $iter ( @iterators ) {
+                for my $src ( @src ) {
+                    my ( $iter, $is_exhausted ) = $src->@*;
                     push @value, $iter->();
 
-                    if ( $iter->is_exhausted ) {
-                        return $self->signal_exhaustion;
-                    }
+                    return $self->signal_exhaustion
+                      if $iter->$is_exhausted;
                 }
 
                 @set = ( 1 ) x @value;
             }
 
             else {
+                my ( $iter, $is_exhausted ) = $src[-1]->@*;
 
-                $value[-1] = $iterators[-1]->();
-                if ( $iterators[-1]->is_exhausted ) {
+                $value[-1] = $iter->();
+                if ( $iter->$is_exhausted ) {
                     $set[-1] = 0;
-                    my $idx = @iterators - 1;
+                    my $idx = @src - 1;
+
                     while ( --$idx >= 0 ) {
-                        $value[$idx] = $iterators[$idx]->();
-                        last unless $iterators[$idx]->is_exhausted;
+                        ( $iter, $is_exhausted ) = $src[$idx]->@*;
+                        $value[$idx] = $iter->();
+                        last unless $iter->$is_exhausted;
                         $set[$idx] = 0;
                     }
 
-                    if ( !$set[0] ) {
-                        return $self->signal_exhaustion;
-                    }
+                    return $self->signal_exhaustion
+                      if !$set[0];
 
-                    while ( ++$idx < @iterators ) {
-                        $iterators[$idx]->rewind;
-                        $value[$idx] = $iterators[$idx]->();
+                    while ( ++$idx < @src ) {
+                        $src[$idx][0]->rewind;
+                        $value[$idx] = $src[$idx][0]->();
                         $set[$idx]   = 1;
                     }
                 }
@@ -190,7 +193,7 @@ sub construct ( $class, $state ) {    ## no critic (ExcessComplexity)
 
     # can only freeze if the iterators support a current method
     if (
-        List::Util::all { defined $class->_can_meth( $_, 'current' ) }
+        List::Util::all { defined can_meth( $_, 'current' ) }
         @iterators
       )
     {
@@ -238,7 +241,7 @@ Iterator::Flex::Product - An iterator which produces a Cartesian product of iter
 
 =head1 VERSION
 
-version 0.30
+version 0.31
 
 =head1 METHODS
 

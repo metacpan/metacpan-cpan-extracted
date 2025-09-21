@@ -8,13 +8,13 @@ use warnings;
 
 use experimental qw( postderef signatures );
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 use Exporter 'import';
 
 our @EXPORT_OK = qw[
   iterator iter iarray ibatch ibuffer icycle icache
-  icat ichain ichunk igather igrep imap
+  icat ichain ichunk iflatten igather igrep imap
   ipermute
   iproduct iseq istack itake ifreeze izip
   thaw
@@ -25,7 +25,7 @@ our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 use Ref::Util             qw[ is_arrayref is_hashref is_ref is_globref ];
 use Module::Runtime       qw[ require_module ];
 use Iterator::Flex::Utils qw[ throw_failure ];
-use Iterator::Flex::Factory;
+use Iterator::Flex::Factory 'to_iterator', 'construct_from_iterable';
 
 
 
@@ -55,7 +55,7 @@ use Iterator::Flex::Factory;
 
 
 sub iterator : prototype(&@) ( $code, $pars = {} ) {
-    Iterator::Flex::Factory->construct_from_iterable( $code, $pars );
+    Iterator::Flex::Factory::construct_from_iterable( $code, $pars );
 }
 
 
@@ -75,7 +75,7 @@ sub iterator : prototype(&@) ( $code, $pars = {} ) {
 
 
 sub iter ( $iterable, $pars = {} ) {
-    Iterator::Flex::Factory->to_iterator( $iterable, $pars );
+    to_iterator( $iterable, $pars );
 }
 
 
@@ -275,6 +275,35 @@ sub icycle ( $array, $pars = {} ) {
 sub ibuffer ( $iterable, $n = 0, $pars = {} ) {
     require Iterator::Flex::Buffer;
     return Iterator::Flex::Buffer->new( $iterable, $n, $pars );
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sub iflatten ( $iterable, $pars = {} ) {
+    require Iterator::Flex::Flatten;
+    return Iterator::Flex::Flatten->new( $iterable, $pars );
 }
 
 
@@ -667,8 +696,8 @@ __END__
 
 =pod
 
-=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory ibatch ibuffer ipermute
-icat ichain ichunk igather istack izip
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory ibatch ibuffer iflatten
+ipermute icat ichain ichunk igather istack izip
 
 =head1 NAME
 
@@ -676,7 +705,7 @@ Iterator::Flex::Common - Iterator Generators and Adapters
 
 =head1 VERSION
 
-version 0.30
+version 0.31
 
 =head1 SYNOPSIS
 
@@ -927,6 +956,26 @@ repeats the process.
 If C<$capacity> is zero, the C<$iterator> is drained into a buffer.
 
 See L<Iterator::Flex::Buffer> for more details.
+
+=head2 iflatten
+
+  $iterator = iflatten( $iterable, ?\%pars );
+
+Returns an iterator which flattens the elements returned by C<$iterable>.
+
+=over
+
+=item *
+
+If an element is an array, its contents are returned, one-by-one.
+
+=item *
+
+If an element is an iterator, it is drained, one element at a time.
+
+=back
+
+See L<Iterator::Flex::Flatten> for more details.
 
 =head2 igather
 

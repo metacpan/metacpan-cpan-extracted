@@ -1,4 +1,4 @@
-.github/workflows/ci_in_docker.yml
+.github/workflows/perl_linux.yml
 .gitignore
 Base/CLI.pm
 Base/CLI.pod
@@ -9,10 +9,15 @@ Base/Configure.pm
 Base/JSON.pm
 Build.PL
 Changes
+CLAUDE.md
 cpanfile
 Declare.pm
 Declare.pod
 Declare/Type.pm
+docs/CLI_JSON_rationale.ja.md
+docs/CLI_JSON_rationale.md
+docs/OO_Modulino.ja.md
+docs/OO_Modulino.md
 FieldSpec.pm
 intro_runnable_module.pod
 MANIFEST			This list of files
@@ -42,6 +47,7 @@ t/10_configure.t
 t/200_cli.t
 t/20_inspector.t
 t/300_cli_json.t
+t/301_cli_xargs_json.t
 t/400_json_type.t
 t/410_json_type_nested.t
 t/420_json_type_scope.t

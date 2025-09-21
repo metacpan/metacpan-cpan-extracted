@@ -1,6 +1,6 @@
 use strict;
-#Build  MD5 : OgbxN1gZ/0Hmex8Gt93DSg
-#Build Time : 2025-09-19 18:09:53
+#Build  MD5 : 88HK2ldjhzqvHxCFCbIThA
+#Build Time : 2025-09-20 19:12:36
 use warnings;
 use XS::Log qw(:all);
 
@@ -33,10 +33,9 @@ printWarn("This is warning2\n");
 printErr("This is error1\n");
 printErr("This is error2\n");
 
-#setLogColor(0);
-setLogOptions("use_color",0);
+setLogOptions("use_color",0);			#等效setLogColor(0);
 setLogOptions("show_file_info",1);
-setLogOptions("level",10);
+#setLogOptions("level",10);
 
 my $user = "Alice";
 my $val  = 42;

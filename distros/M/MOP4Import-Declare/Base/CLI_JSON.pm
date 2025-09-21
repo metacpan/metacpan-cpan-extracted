@@ -2,7 +2,14 @@
 package MOP4Import::Base::CLI_JSON;
 use strict;
 use warnings;
+use Carp ();
+
 use constant DEBUG => $ENV{DEBUG_MOP4IMPORT};
+BEGIN {
+  print STDERR "Using (file '" . __FILE__ . "')\n"
+    , (DEBUG >= 3 ? Carp::longmess("callstack:") : ())
+    if DEBUG and DEBUG >= 2
+}
 
 use MOP4Import::Base::CLI -as_base
   , [constant => parse_opts__preserve_hyphen => 1]
@@ -36,10 +43,9 @@ use MOP4Import::Base::JSON -as_base;
 use MOP4Import::Opts;
 use MOP4Import::Util qw/lexpand globref take_locked_opts_of lock_keys_as/;
 
-use open ();
+use File::Spec ();
 
-print STDERR "Using (file '" . __FILE__ . "')\n"
-  if DEBUG and DEBUG >= 2;
+use open ();
 
 sub cli_precmd {
   (my MY $self) = @_;
@@ -246,7 +252,8 @@ BEGIN {
     }
   };
   (my $dir = __FILE__) =~ s,/?[^/]+\z,,;
-  my $fn = "$dir/../Util/$packSuffix.pm";
+
+  my $fn = File::Spec->rel2abs($dir) . "/../Util/$packSuffix.pm";
   if (-r __FILE__ and not -r $fn) {
     die "Can't load $fn";
   }

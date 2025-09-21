@@ -3,6 +3,11 @@ package MOP4Import::Util::Inspector;
 use strict;
 use warnings;
 use Carp;
+use constant DEBUG => $ENV{DEBUG_MOP4IMPORT};
+BEGIN {
+  print STDERR "Using (file '" . __FILE__ . "')\n" if DEBUG and DEBUG >= 2
+}
+
 use MOP4Import::Base::CLI_JSON -as_base
   , [fields =>
      [lib =>
@@ -67,9 +72,14 @@ sub list_options_of {
   my $symbol = fields_symbol($pack);
   if (my $array = *{$symbol}{ARRAY}) {
     List::Util::uniq(@$array, $self->list_options_onconfigure_of($pack))
-  } elsif (my $hash = *{$symbol}{HASH}) {
+  }
+  elsif (my $hash = *{$symbol}{HASH}) {
     sort keys %$hash;
-  } else {
+  }
+  elsif ($pack->can("meta")) {
+    $pack->meta->get_attribute_list
+  }
+  else {
     ();
   }
 }

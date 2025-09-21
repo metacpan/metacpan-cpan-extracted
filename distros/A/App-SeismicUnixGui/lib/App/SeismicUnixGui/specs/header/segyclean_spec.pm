@@ -1,17 +1,15 @@
 package App::SeismicUnixGui::specs::header::segyclean_spec;
 use Moose;
-our $VERSION = '0.0.1';
+our $VERSION = '0.0.2';
 
 use aliased 'App::SeismicUnixGui::configs::big_streams::Project_config';
 use App::SeismicUnixGui::misc::SeismicUnix qw($su $suffix_su);
 use aliased 'App::SeismicUnixGui::misc::L_SU_global_constants';
-use aliased 'App::SeismicUnixGui::sunix::header::segyclean';
 
 my $get       = L_SU_global_constants->new();
 my $Project   = Project_config->new();
-my $segyclean = segyclean->new();
 
-my $var = $get->var();
+my $var       = $get->var();
 
 my $empty_string     = $var->{_empty_string};
 my $true             = $var->{_true};
@@ -21,7 +19,7 @@ my $flow_type        = $get->flow_type_href();
 
 my $DATA_SEISMIC_SU = $Project->DATA_SEISMIC_SU();    # output data directory
 my $PL_SEISMIC		= $Project->PL_SEISMIC();
-my $max_index       = $segyclean->get_max_index();
+my $max_index       = 1;
 
 my $segyclean_spec =  {
     _CONFIG	 				=> $PL_SEISMIC,
@@ -35,7 +33,7 @@ my $segyclean_spec =  {
     _file_dialog_type_aref => '',
     _flow_type_aref        => '',
     _has_infile            => $true,
-    _has_outpar          => $false,
+    _has_outpar            => $false,
     _has_pipe_in           => $true,
     _has_pipe_out          => $true,
     _has_redirect_in       => $true,
@@ -51,7 +49,7 @@ my $segyclean_spec =  {
     _is_last_of_4or_more   => $false,
     _is_suprog             => $true,
     _is_superflow          => $false,
-    _max_index             => $max_index,
+    _max_index             => 0,
 };
 
 =head2  sub binding_index_aref
@@ -64,7 +62,10 @@ sub binding_index_aref {
 
     my @index;
 
-    $index[0] = 0;
+    # first binding index (index=0)
+	# connects to second item (index=1)
+	# in the parameter list
+	$index[0] = 0; # inbound/outbound item is bound
 
     $segyclean_spec->{_binding_index_aref} = \@index;
     return ();
@@ -84,7 +85,11 @@ sub file_dialog_type_aref {
 
     my @type;
 
-    $type[0] = '';
+	my $index_aref = get_binding_index_aref();
+	my @index      = @$index_aref;
+
+	# bound index will look for data
+	$type[$index[0]] = $file_dialog_type->{_Data};
 
     $segyclean_spec->{_file_dialog_type_aref} = \@type;
     return ();
@@ -314,6 +319,13 @@ sub prefix_aref {
         $prefix[$i] = $empty_string;
 
     }
+
+    my $index_aref = get_binding_index_aref();
+	my @index       = @$index_aref;
+
+	# label 1 in GUI is input/output xx_file and needs a home directory
+	$prefix[ $index[0] ] =  '$DATA_SEISMIC_TXT' . ".'/'.";
+
     $segyclean_spec->{_prefix_aref} = \@prefix;
     return ();
 
@@ -338,6 +350,14 @@ sub suffix_aref {
         $suffix[$i] = $empty_string;
 
     }
+
+
+	my $index_aref = get_binding_index_aref();
+	my @index       = @$index_aref;
+
+	# label 1 in GUI is input/ouput xx_file and needs a home directory
+	$suffix[ $index[0] ] =  ''.'' . '$suffix_txt';
+
     $segyclean_spec->{_suffix_aref} = \@suffix;
     return ();
 

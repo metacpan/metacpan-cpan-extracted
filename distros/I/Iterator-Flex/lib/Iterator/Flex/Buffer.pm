@@ -5,9 +5,10 @@ package Iterator::Flex::Buffer;
 use strict;
 use warnings;
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 use Iterator::Flex::Utils ':IterAttrs', ':IterStates', ':SignalParameters', ':ExhaustionActions';
+use Iterator::Flex::Factory 'to_iterator';
 use Ref::Util;
 use namespace::clean;
 use experimental 'signatures';
@@ -57,7 +58,7 @@ sub new ( $class, $iterable, $capacity = 0, $pars = {} ) {
     $capacity //= 0;
 
     Scalar::Util::looks_like_number( $capacity ) && int( $capacity ) == $capacity && $capacity >= 0
-      or $class->_throw(
+      or throw_failure(
         parameter => "parameter 'capacity' ($capacity) is not a positive or zero integer" );
 
     $class->SUPER::new( {
@@ -70,14 +71,14 @@ sub new ( $class, $iterable, $capacity = 0, $pars = {} ) {
 
 sub construct ( $class, $state ) {
 
-    $class->_throw( parameter => q{'state' parameter must be a HASH reference} )
+    throw_failure( parameter => q{'state' parameter must be a HASH reference} )
       unless Ref::Util::is_hashref( $state );
 
     my ( $src, $prev, $current, $next, $array, $capacity )
       = @{$state}{qw[ src prev current next array capacity ]};
 
     $src
-      = Iterator::Flex::Factory->to_iterator( $src, { ( +EXHAUSTION ) => THROW } );
+      = to_iterator( $src, { ( +EXHAUSTION ) => THROW } );
 
     my $nread = defined $array ? $array->@* - 1 : 0;
     $next //= 1;
@@ -224,7 +225,7 @@ Iterator::Flex::Buffer - Buffer Iterator Class
 
 =head1 VERSION
 
-version 0.30
+version 0.31
 
 =head1 METHODS
 

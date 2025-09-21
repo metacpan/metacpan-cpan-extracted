@@ -33,6 +33,7 @@ Error
 Exhaustion
 Factory
 Failure
+Flatten
 Flex
 Freeze
 Gather

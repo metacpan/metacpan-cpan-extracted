@@ -13,7 +13,7 @@ Iterator::Flex::Manual - Index of Iterator::Flex Manuals
 
 =head1 VERSION
 
-version 0.30
+version 0.31
 
 =head1 DESCRIPTION
 

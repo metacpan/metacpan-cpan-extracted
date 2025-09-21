@@ -156,13 +156,13 @@ sub set_pdf {
 		if ( $item eq 'InstallationGuide' ) {
 
 			$help_button_messages->{_item} =
-			  'SeismicUnixGuiInstallationGuide0.87.3.pdf';
+			  'SeismicUnixGuiInstallationGuide0.87.4.pdf';
 
 		}
 		elsif ( $item eq 'Tutorial' ) {
 
 			$help_button_messages->{_item} =
-			  'SeismicUnixGuiTutorial0.87.3.pdf';
+			  'SeismicUnixGuiTutorial0.87.4.pdf';
 			
 			
 		} else{

@@ -1,7 +1,7 @@
 /***************************************************************************************
-* Build  MD5 : kGCDEla76qeMr72JLP4oqw
-* Build Time : 2025-09-20 09:24:15
-* Version    : 5.090118
+* Build  MD5 : OFUsfWTKEr5kWhpuQY7WeA
+* Build Time : 2025-09-20 19:10:59
+* Version    : 5.090122
 * Author     : H.Q.Wang
 ****************************************************************************************/
 #include "EXTERN.h"
@@ -60,44 +60,27 @@ flushLog()
   CODE: 
     flushLog();
 
-# 包装 bool setLogOptions(const char *key, void *val)
-bool
+# 包装 bool setLogOptions(const char *key, long val);
+void
 setLogOptions(key, val)
     const char *key
-    SV *val
+    long        val
+  PREINIT:
+    bool ret;
   CODE:
-    void *c_val;
-    
-    # 根据Perl值的类型转换为相应的C指针
-    if (SvIOK(val)) {
-        # 如果是整数，存储其地址
-        IV num = SvIV(val);
-        c_val = &num;
-    } else if (SvPOK(val)) {
-        # 如果是字符串，使用其指针
-        c_val = (void *)SvPV_nolen(val);
-    } else {
-        # 不支持的类型
-        croak("Unsupported value type for setLogOptions");
-        XSRETURN_UNDEF;
+    ret = setLogOptions(key, val);
+    if (!ret) {
+      XSRETURN_UNDEF;   // 失败返回 undef
     }
-    
-    RETVAL = setLogOptions(key, c_val);
-  OUTPUT:
-    RETVAL
+    // 成功返回 SV* 类型的 true（Perl 中的真值）
+    ST(0) = sv_2mortal(newSViv(1));
 
-# 包装 void setUseColor(int flag)
+
 void
 setLogColor(flag)
     int flag
   CODE:
     setLogColor(flag);
-
-void
-setLogLevel(level)
-    int level
-  CODE:
-    setLogLevel(level);
 
 void
 setLogMode(flag)

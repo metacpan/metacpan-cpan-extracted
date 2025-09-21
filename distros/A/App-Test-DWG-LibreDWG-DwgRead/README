@@ -3,7 +3,7 @@ NAME
     command.
 
 SYNOPSIS
-     test-dwg-libredwg-dwgread [-d test_dir] [-f] [-h] [-i] [-m match_string] [-v level] [--version] directory
+     test-dwg-libredwg-dwgread [-d test_dir] [-f] [-h] [-i] [-m match_string] [-s] [-v level] [--version] directory
 
 DESCRIPTION
     This tool is used to test libredwg dwgread command on directory with DWG
@@ -38,6 +38,10 @@ ARGUMENTS
 
             Default value is not defined.
 
+    *       "-s"
+
+            Select files which are symlinks too.
+
     *       "-v level"
 
             Verbosity level.
@@ -68,10 +72,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2023-2024 Michal Josef Špaček
+    © 2023-2025 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.05
+    0.06
 

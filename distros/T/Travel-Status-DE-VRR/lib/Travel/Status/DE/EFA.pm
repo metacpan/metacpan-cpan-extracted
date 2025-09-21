@@ -5,12 +5,13 @@ use warnings;
 use 5.010;
 use utf8;
 
-our $VERSION = '3.15';
+our $VERSION = '3.16';
 
 use Carp qw(confess cluck);
 use DateTime;
 use DateTime::Format::Strptime;
 use Encode qw(encode);
+use IO::Socket::SSL;
 use JSON;
 use Travel::Status::DE::EFA::Departure;
 use Travel::Status::DE::EFA::Info;
@@ -66,6 +67,7 @@ sub new_p {
 sub new {
 	my ( $class, %opt ) = @_;
 
+	my $tls_insecure = 0;
 	$opt{timeout} //= 10;
 	if ( $opt{timeout} <= 0 ) {
 		delete $opt{timeout};
@@ -105,6 +107,9 @@ sub new {
 				$opt{efa_url} .= '/XML_DM_REQUEST';
 			}
 			$opt{time_zone} //= $service->{time_zone};
+			if ( not $service->{tls_verify} ) {
+				$tls_insecure = 1;
+			}
 		}
 	}
 
@@ -160,6 +165,7 @@ sub new {
 		developer_mode => $opt{developer_mode},
 		efa_url        => $opt{efa_url},
 		service        => $opt{service},
+		tls_insecure   => $tls_insecure,
 		strp_stopseq   => DateTime::Format::Strptime->new(
 			pattern   => '%Y%m%d %H:%M',
 			time_zone => $opt{time_zone},
@@ -248,6 +254,12 @@ sub new {
 	}
 	else {
 		my %lwp_options = %{ $opt{lwp_options} // { timeout => 10 } };
+		if ($tls_insecure) {
+			$lwp_options{ssl_opts}{SSL_verify_mode}
+			  = IO::Socket::SSL::SSL_VERIFY_NONE;
+			$lwp_options{ssl_opts}{verify_hostname} = 0;
+		}
+
 		$self->{ua} = LWP::UserAgent->new(%lwp_options);
 		$self->{ua}->env_proxy;
 	}
@@ -350,6 +362,10 @@ sub post_with_cache_p {
 
 	if ( $self->{developer_mode} ) {
 		say '  cache miss';
+	}
+
+	if ( $self->{tls_insecure} ) {
+		$self->{ua}->insecure(1);
 	}
 
 	$self->{ua}->post_p( $url, form => $self->{post} )->then(
@@ -708,7 +724,7 @@ Travel::Status::DE::EFA - unofficial EFA departure monitor
 
 =head1 VERSION
 
-version 3.15
+version 3.16
 
 =head1 DESCRIPTION
 

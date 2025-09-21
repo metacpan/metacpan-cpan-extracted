@@ -1,7 +1,7 @@
 /***************************************************************************************
-* Build  MD5 : zLVdfqGuKyqbgkBV/RKiQw
-* Build Time : 2025-09-19 18:10:23
-* Version    : 5.090113
+* Build  MD5 : t/lRzMRtc2aBjA2fg2wqQg
+* Build Time : 2025-09-20 19:05:28
+* Version    : 5.090114
 * Author     : H.Q.Wang
 ----------------------------------------------------------------------------------------
 ## 功能说明
@@ -66,7 +66,7 @@ bool openLog(const char *log_filepath,const LogOptions* config);
 void closeLog(void);
 void flushLog(void);
 bool makeDir(const char* dir);
-bool setLogOptions(const char *key, void *val);
+bool setLogOptions(const char *key, long val);
 void setLogColor(int flag);
 void setLogMode(int flag);
 void setLogLevel(int level);

@@ -5,9 +5,12 @@ package Iterator::Flex::Take;
 use strict;
 use warnings;
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 use Iterator::Flex::Utils ':IterAttrs', ':IterStates', ':SignalParameters', ':ExhaustionActions';
+
+use Iterator::Flex::Factory 'to_iterator';
+
 use Ref::Util;
 use namespace::clean;
 use experimental 'signatures';
@@ -65,7 +68,7 @@ sub new ( $class, $iterable, $n, $pars = {} ) {
     my %pars = $pars->%*;
 
     defined $n && Scalar::Util::looks_like_number( $n ) && int( $n ) == $n && $n >= 0
-      || $class->_throw( parameter => 'parameter "n" is not a positive integer' );
+      || throw_failure( parameter => 'parameter "n" is not a positive integer' );
 
     my $lazy = delete $pars{lazy} // !!1;
 
@@ -80,14 +83,14 @@ sub new ( $class, $iterable, $n, $pars = {} ) {
 
 sub construct ( $class, $state ) {
 
-    $class->_throw( parameter => q{'state' parameter must be a HASH reference} )
+    throw_failure( parameter => q{'state' parameter must be a HASH reference} )
       unless Ref::Util::is_hashref( $state );
 
     my ( $src, $prev, $current, $next, $array, $n, $lazy )
       = @{$state}{qw[ src prev current next array n lazy ]};
 
     $src
-      = Iterator::Flex::Factory->to_iterator( $src, { ( +EXHAUSTION ) => THROW } );
+      = to_iterator( $src, { ( +EXHAUSTION ) => RETURN } );
 
     my $len;
     $len = $array->@* if defined $array;
@@ -97,6 +100,7 @@ sub construct ( $class, $state ) {
     my $took = 0;
 
     my $self;
+    my $is_exhausted = $src->can( 'is_exhausted' );
     my $iterator_state;
 
     my %params = (
@@ -150,24 +154,20 @@ sub construct ( $class, $state ) {
         };
 
         $params{ +NEXT } = sub {
-            my $ret;
+
             return $self->signal_exhaustion
               if $iterator_state == IterState_EXHAUSTED
               || $took == $n;
 
-            eval {
-                $ret = $src->();
-                $took++;
-                1;
-            } or do {
-                die $@
-                  unless Ref::Util::is_blessed_ref( $@ )
-                  && $@->isa( 'Iterator::Flex::Failure::Exhausted' );
-                return $self->signal_exhaustion;
-            };
+            my $value = $src->();
+
+            return $self->signal_exhaustion
+              if !$value && $src->$is_exhausted;
+
+            $took++;
 
             $prev    = $current;
-            $current = $ret;
+            $current = $value;
             return $current;
         };
     }
@@ -281,7 +281,7 @@ Iterator::Flex::Take - Take Iterator Class
 
 =head1 VERSION
 
-version 0.30
+version 0.31
 
 =head1 METHODS
 

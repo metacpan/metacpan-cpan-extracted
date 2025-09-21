@@ -885,7 +885,7 @@ sub get_Path {
 	$iFile->{_path} = $Path;
 	$result = $iFile->{_path};
 
-	print("7. iFile,get_Path,path=$iFile->{_path}\n");
+#	print("7. iFile,get_Path,path=$iFile->{_path}\n");
 	return ($result);
 }
 

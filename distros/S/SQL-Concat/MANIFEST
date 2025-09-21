@@ -11,3 +11,5 @@ minil.toml
 t/00_compile.t
 t/10_oop.t
 t/20_fp.t
+t/21_overload.t
+t/22_to_json.t

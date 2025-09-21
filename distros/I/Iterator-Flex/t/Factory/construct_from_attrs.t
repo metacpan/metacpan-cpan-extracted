@@ -1,7 +1,7 @@
 #! perl
 
 use Test2::V0;
-use Iterator::Flex::Factory;
+use Iterator::Flex::Factory 'construct_from_attr';
 
 use v5.10;
 
@@ -44,14 +44,13 @@ sub construct {
 
 subtest 'return' => sub {
     subtest 'default' => sub {
-        my $iter = Iterator::Flex::Factory->construct_from_attr( construct() );
+        my $iter = construct_from_attr( construct() );
         DOES_ok( $iter, 'Iterator::Flex::Role::Exhaustion::Return' );
         drain( $iter, 10 );
     };
 
     subtest 'explicit' => sub {
-        my $iter = Iterator::Flex::Factory->construct_from_attr( construct(),
-            { exhaustion => [ return => undef ] } );
+        my $iter = construct_from_attr( construct(), { exhaustion => [ return => undef ] } );
         DOES_ok( $iter, 'Iterator::Flex::Role::Exhaustion::Return' );
         drain( $iter, 10 );
     };
@@ -59,7 +58,7 @@ subtest 'return' => sub {
 
 subtest 'throw' => sub {
 
-    my $iter = Iterator::Flex::Factory->construct_from_attr( construct(), { exhaustion => 'throw' } );
+    my $iter = construct_from_attr( construct(), { exhaustion => 'throw' } );
     DOES_ok( $iter, 'Iterator::Flex::Role::Exhaustion::Throw' );
     my $err = dies { drain( $iter, 10 ) };
     isa_ok( $err, 'Iterator::Flex::Failure::Exhausted' );

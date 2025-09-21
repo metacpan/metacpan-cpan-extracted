@@ -1,5 +1,12 @@
 Revision history for the TurboVision Perl extension.
 
+0.25	2025-09-20
+        - debugger tvdb.pm
+        - TEditor
+        - inputBox, inputBoxRect, messageBox, messageBoxRect, spin_loop
+
+0.24	2025-08-25 - minor addiotions on classes, methods
+
 0.23	2025-06(?)-xx
 	- pack geometry manager, stolen from tcl/tk (not ready yet)
 	- TColorSelector

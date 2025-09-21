@@ -6,16 +6,13 @@ use strict;
 use warnings;
 use experimental 'signatures';
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 use Ref::Util;
-use Iterator::Flex::Utils ':IterAttrs';
+use Iterator::Flex::Utils ':IterAttrs', 'resolve_meth';
 use namespace::clean;
 
 use parent 'Iterator::Flex::Base';
-use Role::Tiny::With ();
-Role::Tiny::With::with 'Iterator::Flex::Role::Utils';
-
 
 
 
@@ -85,30 +82,30 @@ sub new ( $class, $obj, $pars = {} ) {
 
 sub construct ( $class, $state ) {
 
-    $class->_throw( parameter => q{state must be a HASH reference} )
+    throw_failure( parameter => q{state must be a HASH reference} )
       unless Ref::Util::is_hashref( $state );
 
     my ( $obj, $prev, $current, $next, $length, $at )
       = @{$state}{qw[ object prev current next length at ]};
 
-    $class->_throw( parameter => q{state 'object' argument must be a blessed reference} )
+    throw_failure( parameter => q{state 'object' argument must be a blessed reference} )
       unless Ref::Util::is_blessed_ref( $obj );
 
-    $length = $class->_resolve_meth( $obj, $length, 'length', 'len' );
+    $length = resolve_meth( $obj, $length, 'length', 'len' );
 
-    $at = $class->_resolve_meth( $obj, $at, 'at', 'getitem' );
+    $at = resolve_meth( $obj, $at, 'at', 'getitem' );
 
     my $len = $obj->$length;
 
     $next = 0 unless defined $next;
 
-    $class->_throw( parameter => q{illegal value for state 'prev' argument} )
+    throw_failure( parameter => q{illegal value for state 'prev' argument} )
       if defined $prev && ( $prev < 0 || $prev >= $len );
 
-    $class->_throw( parameter => q{illegal value for state 'current' argument} )
+    throw_failure( parameter => q{illegal value for state 'current' argument} )
       if defined $current && ( $current < 0 || $current >= $len );
 
-    $class->_throw( parameter => q{illegal value for state 'next' argument} )
+    throw_failure( parameter => q{illegal value for state 'next' argument} )
       if $next < 0 || $next > $len;
 
     my $self;
@@ -183,7 +180,7 @@ Iterator::Flex::ArrayLike - ArrayLike Iterator Class
 
 =head1 VERSION
 
-version 0.30
+version 0.31
 
 =head1 METHODS
 

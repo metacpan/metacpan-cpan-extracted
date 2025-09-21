@@ -1,5 +1,9 @@
 Revision history for Perl extension SQL-Concat
 
+0.010 2025-09-21T04:27:02Z
+    - GH-4 - Add `Q($SQL, @BIND)`
+    - GH-3 - Add TO_JSON() (for better interoperability with MOP4Import::Base::CLI_JSON)
+
 0.002 2017-06-11T07:18:13Z
     - Better docs (I hope;-)
     - Added paren_nl_indent()

@@ -6,11 +6,11 @@ use strict;
 use warnings;
 use experimental qw( signatures postderef declared_refs );
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 use parent 'Iterator::Flex::Base';
 use Iterator::Flex::Utils qw( :IterAttrs :IterStates throw_failure );
-use Iterator::Flex::Factory;
+use Iterator::Flex::Factory 'to_iterator';
 use Scalar::Util;
 use Ref::Util 'is_hashref', 'is_arrayref';
 
@@ -77,7 +77,7 @@ my sub permutations;
 
 sub construct ( $class, $state ) {
 
-    $class->_throw( parameter => q{state must be a HASH reference} )
+    throw_failure( parameter => q{state must be a HASH reference} )
       unless Ref::Util::is_hashref( $state );
 
     my ( $array, $k, $idx, $value, $c, $i, $restart ) = @{$state}{
@@ -351,7 +351,7 @@ Iterator::Flex::Permute - Permute Iterator Class
 
 =head1 VERSION
 
-version 0.30
+version 0.31
 
 =head1 METHODS
 

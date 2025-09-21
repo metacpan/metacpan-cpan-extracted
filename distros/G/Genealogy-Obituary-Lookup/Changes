@@ -1,5 +1,12 @@
 Revision history for Genealogy::Obituary::Lookup
 
+0.20	Sat Sep 20 16:13:10 EDT 2025
+	Handle the location "St. Augustine's"
+	Use Params::Validate::Strict
+	Work around MakeMaker copying to blib *before* running the script to build the files to go there
+	bin/extract: use Path::Tiny to slurp in the file
+	bin/create_db: Validate the age must be only digits
+
 0.19	Tue Aug 19 19:59:45 EDT 2025
 	Look in the correct place for the default directory
 	Validate last name

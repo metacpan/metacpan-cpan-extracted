@@ -117,7 +117,7 @@ xmute=0.397959,4.11054,13.7934,28.7942,60.7526
     input_name_prefix                  =                  
     input_name_extension               =              
     list                               =  list [$DATA_SEISMIC_TXT]
-    output_file_name                   =  file_name
+    output_base_file_name              =  base_file_name
     alternative_inbound_directory      =               
     alternative_outbound_directory     =   
   
@@ -154,7 +154,7 @@ CASE 2
     input_name_prefix                   = cdp                 
     input_name_extension                = _clean              
     list                               	=                
-    output_file_name                    = 1000_01 
+    output_base_file_name               = 1000_01 
     alternative_inbound_directory       =                   
     alternative_outbound_directory      =  
     
@@ -188,7 +188,7 @@ CASE 3
  input_name_prefix                     = 
  input_name_extension                  = 
  list                                  = cat_list_good_sp [$DATA_SEISMIC_TXT]
- output_file_name                      = All_good_sp [$DATA_SEISMIC_SU]
+ output_base_file_name                 = All_good_sp [$DATA_SEISMIC_SU]
  alternative_inbound_directory         = 
  alternative_outbound_directory        =
 
@@ -201,7 +201,7 @@ CASE 3
   input_suffix                    = _clean.su [$DATA_SEISMIC_SU]
   input_name_prefix               = 
   input_name_extension            = 
-  output_file_name                = 1000_10 [$DATA_SEISMIC_SU]
+  output_base_file_name           = 1000_10 [$DATA_SEISMIC_SU]
   alternative_inbound_directory   = 
   alternative_outbound_directory  =
 
@@ -320,7 +320,7 @@ my $alternative_inbound_directory  = '';
 my $first_file_number_in = $CFG_h->{sucat}{1}{first_file_number_in};
 my $last_file_number_in  = $CFG_h->{sucat}{1}{last_file_number_in};
 my $number_of_files_in   = $CFG_h->{sucat}{1}{number_of_files_in};
-my $output_file_name     = $CFG_h->{sucat}{1}{output_file_name};
+my $output_base_file_name = $CFG_h->{sucat}{1}{output_base_file_name};
 my $input_suffix         = $CFG_h->{sucat}{1}{input_suffix};
 my $input_name_prefix    = $CFG_h->{sucat}{1}{input_name_prefix};
 my $input_name_extension = $CFG_h->{sucat}{1}{input_name_extension};
@@ -339,7 +339,7 @@ $alternative_outbound_directory =
 $list = $control->get_no_quotes($list);
 
 # print("Sucat.pl, list: $list\n\n");
-# print("Sucat.pl, output_file_name: $output_file_name\n\n");
+# print("Sucat.pl, output_base_file_name: $output_base_file_name\n\n");
 # print("Sucat.pl, outbound_directory: $outbound_directory\n\n");
 
 =head2 3. Consider compatible
@@ -409,9 +409,9 @@ else {
 
 =cut
 
-$file_out[1] = $output_file_name;    # always needed
+$file_out[1] = $output_base_file_name;    # always needed
 
-if ( length $output_file_name ) {
+if ( length $output_base_file_name ) {
 	
 	if ( $input_suffix ne $empty_string ) {
 
@@ -445,7 +445,7 @@ $sucat->number_of_files_in($number_of_files_in);
 $sucat->input_suffix($input_suffix);
 $sucat->input_name_prefix($input_name_prefix);
 $sucat->input_name_extension($input_name_extension);
-$sucat->output_file_name($output_file_name);
+$sucat->output_base_file_name($output_base_file_name);
 $sucat->list($list);
 $sucat->list_directory($list_directory);
 $sucat->inbound_directory($inbound_directory);

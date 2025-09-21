@@ -9,6 +9,11 @@ use Exporter qw/import/;
 
 use Sub::Util ();
 
+use constant DEBUG => $ENV{DEBUG_MOP4IMPORT};
+BEGIN {
+  print STDERR "Using (file '" . __FILE__ . "')\n" if DEBUG and DEBUG >= 2
+}
+
 sub globref {
   my $pack = shift;
   unless (defined $pack) {
@@ -206,7 +211,8 @@ sub take_hash_opts_maybe {
 
 sub take_locked_opts_of {
   my ($myPack, $typeName, $list, $alias, $sink) = @_;
-  $myPack->lock_keys_as($typeName, scalar $myPack->take_hash_opts_maybe(
+  $myPack->lock_keys_as($typeName, scalar take_hash_opts_maybe(
+    $myPack,
     $list,
     $sink,
     $alias,

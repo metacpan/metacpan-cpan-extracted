@@ -6,9 +6,9 @@ use strict;
 use warnings;
 use experimental 'signatures';
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
-use Iterator::Flex::Factory;
+use Iterator::Flex::Factory 'to_iterator';
 use Iterator::Flex::Utils qw[ THROW STATE EXHAUSTION :IterAttrs :IterStates ];
 use Ref::Util;
 use parent 'Iterator::Flex::Base';
@@ -65,13 +65,13 @@ sub new ( $class, $iterable, $pars = {} ) {
 
 sub construct ( $class, $state ) {
 
-    $class->_throw( parameter => q{'state' parameter must be a HASH reference} )
+    throw_failure( parameter => q{'state' parameter must be a HASH reference} )
       unless Ref::Util::is_hashref( $state );
 
     my ( $src, $capacity ) = @{$state}{qw[ src capacity ]};
 
     $src
-      = Iterator::Flex::Factory->to_iterator( $src, { ( +EXHAUSTION ) => THROW } );
+      = to_iterator( $src, { ( +EXHAUSTION ) => THROW } );
 
     my $self;
     my $iterator_state;
@@ -93,18 +93,17 @@ sub construct ( $class, $state ) {
               if $iterator_state == IterState_EXHAUSTED || $next_is_exhausted;
 
             my @chunked;
-            my $ret = eval {
+            eval {
                 push @chunked, $src->() while @chunked < $capacity;
                 1;
-            };
-            if ( !$ret && length $@ ) {
+            } or do {
                 die $@
                   unless Ref::Util::is_blessed_ref( $@ )
                   && $@->isa( 'Iterator::Flex::Failure::Exhausted' );
 
                 return $self->signal_exhaustion if !@chunked;
                 $next_is_exhausted = !!1;
-            }
+            };
             return \@chunked;
         },
         ( +RESET ) => sub {
@@ -144,7 +143,7 @@ Iterator::Flex::Chunk - Chunk Iterator Class
 
 =head1 VERSION
 
-version 0.30
+version 0.31
 
 =head1 METHODS
 

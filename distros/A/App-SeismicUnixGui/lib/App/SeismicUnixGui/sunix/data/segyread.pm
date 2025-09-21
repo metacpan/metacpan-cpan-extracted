@@ -303,9 +303,41 @@ Version:
 
 	dancing around with buffers and files.
 
+=head2 CHANGES and their DATES
 
+ JML V0.0.2, 9.1.25
 
+ Normally, segyread acts on only one file at a time
+ 
+ In V0.0.2 wraps an extension to process an arbitrary
+ list of trace numbers. The automatic iteration includes
+ two additional parameters: list and su_base_file_name
+ 
+ The parameter "list" is the name of a text file.
+ The file is automatically bound to the SEIMICS_DATA_TXT 
+ directory path.
+ 
+ "list" is the name of a file containing a numeric list
+ of trace numbers of type "key" that are to be deleted:
+ 
+ An example list
+ file contains values, one per line.
+    1 
+    3 
+    5
 
+  "list" = a file name (in directory path: DATA_SEISMICS_TXT)
+  
+  su_base_file_name =   e.g., 1001, which by defaults lies
+  in directory path: DATA_SEISMIC_SU.
+  A bare file name: '1001' will automatically be given an suffix
+  The file name on the disk will be '1001.su'
+  
+  Within code, the imported "list" includes path and name;
+  hence its name: _inbound_list. User enters a list name in 
+  GUI using the mouse <MB3>.
+
+=cut
 
 =head2 User's notes (Juan Lorenzo)
 untested
@@ -313,12 +345,8 @@ untested
 =cut
 
 
-=head2 CHANGES and their DATES
-
-=cut
-
 use Moose;
-our $VERSION = '0.0.1';
+our $VERSION = '0.0.2';
 
 
 =head2 Import packages
@@ -329,6 +357,7 @@ use aliased 'App::SeismicUnixGui::misc::L_SU_global_constants';
 
 use App::SeismicUnixGui::misc::SeismicUnix qw($go $in $off $on $out $ps $to $suffix_ascii $suffix_bin $suffix_ps $suffix_segy $suffix_su);
 use aliased 'App::SeismicUnixGui::configs::big_streams::Project_config';
+use aliased 'App::SeismicUnixGui::misc::manage_files_by2';
 
 
 =head2 instantiation of packages
@@ -337,11 +366,11 @@ use aliased 'App::SeismicUnixGui::configs::big_streams::Project_config';
 
 my $get					= L_SU_global_constants->new();
 my $Project				= Project_config->new();
+my $manage_files_by2    = manage_files_by2->new();
+my $DATA_SEISMIC_SEGY	= $Project->DATA_SEISMIC_SEGY();
 my $DATA_SEISMIC_SU		= $Project->DATA_SEISMIC_SU();
 my $DATA_SEISMIC_BIN	= $Project->DATA_SEISMIC_BIN();
 my $DATA_SEISMIC_TXT	= $Project->DATA_SEISMIC_TXT();
-
-my $PS_SEISMIC      	= $Project->PS_SEISMIC();
 
 my $var				= $get->var();
 my $on				= $var->{_on};
@@ -365,7 +394,8 @@ my $segyread			= {
 	_errmax					=> '',
 	_format					=> '',
 	_hfile					=> '',
-	_ns					=> '',
+	_inbound_list		    => '',
+	_ns					    => '',
 	_over					=> '',
 	_remap					=> '',
 	_tape					=> '',
@@ -386,12 +416,74 @@ collects switches and assembles bash instructions
 by adding the program name
 
 =cut
+sub  Step {
+ 	
+	my ($self) = @_;
+	
+	# simple check
+	if ( length $segyread->{_inbound_list} ) {
+		my $file_num;
+		my @Step;
+		my $step;
+		
+		my ($inbound_aref)  = _get_inbound4base_file_names();
+		my ($outbound_aref) = _get_outbound4base_file_names();
+		my @inbound         = @$inbound_aref;
+		my @outbound        = @$outbound_aref;		
+		my $num_of_files    = scalar @outbound;
 
- sub  Step {
+		# print("Step,inbound: @inbound\n");
+		# print("Step,inbound: @outbound\n");
 
+		my $last_idx        = $num_of_files - 1;
+
+		# All cases when num_files >=1
+		# for first file
+		$step     = " segyread $segyread->{_Step} tape=$inbound[0] > $outbound[0] ";
+
+		if ( $last_idx >= 2 ) {
+
+			# CASE: >= 3 operations
+			for ( my $i = 1 ; $i < $last_idx ; $i++ ) {
+				
+				$step =
+				  $step . "&  segyread $segyread->{_Step} tape=$inbound[$i] > $outbound[$i] ";
+
+			}
+
+			# for last file
+			$segyread->{_Step} =
+			  $step . "&  segyread $segyread->{_Step} tape=$inbound[$last_idx] > $outbound[$last_idx]";
+
+		}
+		elsif ( $last_idx == 1 ) {
+
+			# for last file
+			$segyread->{_Step} =
+			  $step . "&  segyread $segyread->{_Step} tape=$inbound[$last_idx] > $outbound[$last_idx] ";
+
+		}
+		elsif ( $last_idx == 0 ) {
+
+			$segyread->{_Step} = " $step";
+
+		}
+		else {
+			print("segyread,Step,unexpected case\n");
+			return();
+		}
+
+		return ($segyread->{_Step});
+		
+	}
+	elsif ( not length $segyread->{_inbound_list} ) {
+			
 	$segyread->{_Step}     = 'segyread'.$segyread->{_Step};
 	return ( $segyread->{_Step} );
-
+	}
+	else {
+		print("segyread, Step, incorrect parameters\n");
+	}
  }
 
 
@@ -421,11 +513,12 @@ by adding the program name
 		$segyread->{_buff}			= '';
 		$segyread->{_byte}			= '';
 		$segyread->{_conv}			= '';
-		$segyread->{_ebcdic}			= '';
-		$segyread->{_endian}			= '';
-		$segyread->{_errmax}			= '';
-		$segyread->{_format}			= '';
+		$segyread->{_ebcdic}		= '';
+		$segyread->{_endian}		= '';
+		$segyread->{_errmax}		= '';
+		$segyread->{_format}        = '';
 		$segyread->{_hfile}			= '';
+		$segyread->{_inbound_list}  = '';
 		$segyread->{_ns}			= '';
 		$segyread->{_over}			= '';
 		$segyread->{_remap}			= '';
@@ -440,6 +533,62 @@ by adding the program name
 		$segyread->{_note}			= '';
  }
 
+=head2 sub _get_inbound4base_file_names
+
+=cut
+
+sub _get_inbound4base_file_names {
+	my ($self) = @_;
+
+    my ( $array_ref, $num_files ) = $manage_files_by2->get_base_file_name_aref();
+
+	if ( defined $array_ref && @$array_ref ) {
+
+		my @base_file_name = @$array_ref;
+		my @inbound;
+
+		for ( my $i = 0 ; $i < $num_files ; $i++ ) {
+
+			$inbound[$i] = $DATA_SEISMIC_SEGY . '/' . $base_file_name[$i].$suffix_segy;
+		}
+		return ( \@inbound );
+
+	}
+	else {
+		print("segyread,_get_inbound4base_file_names, missing file names\n");
+		return ();
+	}
+
+}
+
+=head2 sub _get_outbound4base_file_names
+
+=cut
+
+sub _get_outbound4base_file_names {
+	my ($self) = @_;
+
+	my ( $array_ref, $num_files ) = $manage_files_by2->get_base_file_name_aref();
+
+	if ( length $array_ref ) {
+
+		my @base_file_name = @$array_ref;
+		my @outbound;
+
+		for ( my $i = 0 ; $i < $num_files ; $i++ ) {
+
+			$outbound[$i] = $DATA_SEISMIC_SU . '/' . $base_file_name[$i].$suffix_su;
+
+		}
+		return ( \@outbound );
+
+	}
+	else {
+		print("segyread,_get_outbound4basefile_names, missing file names\n");
+		return ();
+	}
+
+}
 
 =head2 sub bfile 
 
@@ -642,6 +791,31 @@ by adding the program name
 	 }
  }
 
+=head2 sub list
+
+ list array
+
+=cut
+
+sub list {
+	my ( $self, $list ) = @_;
+
+	if ( length $list ) {
+
+		# clear memory
+		$manage_files_by2->clear(); 
+		
+		$segyread->{_inbound_list} = $list;
+		
+		$manage_files_by2->set_inbound_list($list);
+		
+
+	}
+	else {
+		print("segyread, list, missing list,\n");
+	}
+	return ();
+}
 
 =head2 sub ns 
 
@@ -851,7 +1025,7 @@ max index = number of input variables -1
  
 sub get_max_index {
  	  my ($self) = @_;
-	my $max_index = 18;
+	my $max_index = 19;
 
     return($max_index);
 }

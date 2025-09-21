@@ -1,7 +1,7 @@
 /***************************************************************************************
-* Build  MD5 : YETAlzHmbxjZbwJf5m9JVg
-* Build Time : 2025-09-19 18:10:15
-* Version    : 5.090120
+* Build  MD5 : XKLsi2hUMK4JVcrq9zOpcQ
+* Build Time : 2025-09-20 19:13:51
+* Version    : 5.090122
 * Author     : H.Q.Wang
 ****************************************************************************************/
 #include "Log.h"
@@ -93,7 +93,7 @@ static struct {
     .color_error = "\033[31m",        // 红色
     .color_fatal = "\033[35m",        // 紫色
 	.color_unkown= "\033[37m",        // 灰色
-    .color_debug = "\033[44;36m",     // 蓝色,青色
+    .color_debug = "\033[44;37m",     // 蓝色,青色
     .color_reset = "\033[0m"          // 重置
 };
 
@@ -144,30 +144,30 @@ void setLogTargets(int flag)
 	g_config.options.targets = flag;
 }
 // 设置配置项的函数
-bool setLogOptions(const char *key, void *val) {
+bool setLogOptions(const char *key, long val) {
     if (!key) return false;
 
     // 比较键名并设置对应的值
     if (strcmp(key, "level") == 0) {
-        g_config.options.level = *(LogLevel*)val;
+        g_config.options.level = (LogLevel)val;
     } else if (strcmp(key, "mode") == 0) {
-        g_config.options.mode = *(LogMode*)val;
+        g_config.options.mode = (LogMode)val;
     } else if (strcmp(key, "targets") == 0) {
-        g_config.options.targets = *(LogTarget*)val;
+        g_config.options.targets = (LogTarget)val;
     } else if (strcmp(key, "use_color") == 0) {
-        g_config.options.use_color = *(bool*)val;
+        g_config.options.use_color = (bool)val;
     } else if (strcmp(key, "show_timestamp") == 0) {
-        g_config.options.show_timestamp = *(bool*)val;
+        g_config.options.show_timestamp = (bool)val;
     } else if (strcmp(key, "show_log_level") == 0) {
-        g_config.options.show_log_level = *(bool*)val;
+        g_config.options.show_log_level = (bool)val;
     } else if (strcmp(key, "show_file_info") == 0) {
-        g_config.options.show_file_info = *(bool*)val;
+        g_config.options.show_file_info = (bool)val;
     } else if (strcmp(key, "max_file_size") == 0) {
-        g_config.options.max_file_size = *(long*)val;
+        g_config.options.max_file_size = val;
     } else if (strcmp(key, "max_files") == 0) {
-        g_config.options.max_files = *(int*)val;
+        g_config.options.max_files = (int)val;
     } else if (strcmp(key, "flush_immediately") == 0) {
-        g_config.options.flush_immediately = *(bool*)val;
+        g_config.options.flush_immediately = (bool)val;
     } else {
         // 未知的配置项
         return false;

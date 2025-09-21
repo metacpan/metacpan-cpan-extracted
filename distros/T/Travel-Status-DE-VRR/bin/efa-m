@@ -4,7 +4,7 @@ use warnings;
 use 5.010;
 use utf8;
 
-our $VERSION = '3.15';
+our $VERSION = '3.16';
 
 binmode( STDOUT, ':encoding(utf-8)' );
 
@@ -636,7 +636,7 @@ B<efa-m> [B<-s> I<service>] I<tripid>
 
 =head1 VERSION
 
-version 3.15
+version 3.16
 
 =head1 DESCRIPTION
 

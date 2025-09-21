@@ -4,6 +4,7 @@ demo/menu.pl
 demo/pack.pl
 demo/tdialog.pl
 demo/tedit.pl
+demo/teditwindow.pl
 t/f.t
 Makefile.PL
 TVision-methods.xs

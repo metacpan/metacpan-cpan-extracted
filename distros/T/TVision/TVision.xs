@@ -219,6 +219,32 @@ TMenuBar *TVApp::initMenuBar(TRect r) {
     return (new TMenuBar( r, sub1 + sub2 + sub3 + sub4 ) );
 }
 
+ushort spin_loop() {
+    ushort endState;
+    do  {
+        endState = 0;
+        do  {
+            TEvent e;
+            tapp->getEvent( e );
+            tapp->handleEvent( e );
+            if( e.what != evNothing )
+                tapp->eventError( e );
+        } while( endState == 0 );
+    } while( !tapp->valid(endState) );
+    return endState;
+}
+
+MODULE=TVision PACKAGE=TVision
+
+void spin_loop()
+    CODE:
+        if(!tapp)
+            return;
+        TEvent e;
+        tapp->getEvent( e );
+        tapp->handleEvent( e );
+        if( e.what != evNothing )
+            tapp->eventError( e );
 
 MODULE=TVision::TApplication PACKAGE=TVision::TApplication
 
@@ -326,6 +352,36 @@ TRect getExtent(TView *self)
 	RETVAL
 
 MODULE=TVision PACKAGE=TVision
+
+int messageBox(char *msg, int options)
+    CODE:
+        RETVAL = messageBox(msg, options);
+    OUTPUT:
+	RETVAL
+
+int messageBoxRect(TRect r, char *msg, int options)
+    CODE:
+        RETVAL = messageBoxRect(r, msg, options);
+    OUTPUT:
+	RETVAL
+
+char *inputBox(char *title, char *label, char *dflt="", int limit=1000)
+    CODE:
+        char buf[4096];
+        strncpy(buf,dflt, 4096);
+        int ret = inputBox(title, label, buf, limit>4096 ? 4096 : limit);
+        RETVAL = buf;
+    OUTPUT:
+	RETVAL
+
+char *inputBoxRect(TRect r, char *title, char *label, char *dflt="", int limit=1000)
+    CODE:
+        char buf[4096];
+        strncpy(buf,dflt, 4096);
+        int ret = inputBoxRect(r, title, label, buf, limit>4096 ? 4096 : limit);
+        RETVAL = buf;
+    OUTPUT:
+	RETVAL
 
 BOOT:
     TObject *tvnull = NULL;

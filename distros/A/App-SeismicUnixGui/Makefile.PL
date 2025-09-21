@@ -56,11 +56,30 @@ WriteMakefile(
 
 	test => { TESTS => 't/*.t',
 
-	}
-	
+	},
+
+
 	);
 
+package MY;
+	sub MY::libscan   {
+           my ($self, $file) = @_;
+           # Exclude any file or directory that starts with a dot
+           # when it's part of a path component.
+           # This regex checks for a path component starting with a dot.
+           if ( $file =~ m{^/.[^/]+} ) {
+
+           return 0;
+
+           } else {
+   return $self->SUPER::libscan($file);
+            #return 1;
+	   }
+
+	}
+
 # post-installation required scripts
+#
 	
 sub MY::postamble {
 	return <<'END';

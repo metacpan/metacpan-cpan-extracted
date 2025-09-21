@@ -45,6 +45,7 @@
 
 extern TStatusLine *default_TStatusLine;
 extern TMenuBar *default_TMenuBar;
+extern TVApp *tapp;
 
 MODULE=TVision::TVApp PACKAGE=TVision::TVApp
 
@@ -53,7 +54,8 @@ TVApp* new(TMenuBar *tmbr=0, TStatusLine *tsl=0)
         if (tmbr)
 	    default_TMenuBar = tmbr;
 	default_TStatusLine = tsl;
-        RETVAL = new TVApp();
+        tapp = new TVApp();
+        RETVAL = tapp;
         // RETVAL = get_sv("TVision::TApplication::the_app", GV_ADD);
 	//do_sv_dump(0, PerlIO_stderr(), RETVAL, 0, 10, 0,0);
     OUTPUT:
@@ -683,7 +685,7 @@ int insertEOL(TEditor *self,int Boolean)
         RETVAL
 
 
-int insertText(TEditor *self,void *cv, int uint, int Boolean)
+int insertText(TEditor *self,char *cv, int uint, int Boolean)
     CODE:
         RETVAL = self->insertText(cv,  uint,  Boolean);
     OUTPUT:
@@ -1011,6 +1013,17 @@ TIndicator* get_indicator(TEditor *self)
 void set_indicator(TEditor *self, TIndicator* val)
     CODE:
         self->indicator = val;
+
+
+char* get_buffer(TEditor *self)
+    CODE:
+        RETVAL = self->buffer;
+    OUTPUT:
+        RETVAL
+
+void set_buffer(TEditor *self, char* val)
+    CODE:
+        self->buffer = val;
 
 
 int get_bufSize(TEditor *self)

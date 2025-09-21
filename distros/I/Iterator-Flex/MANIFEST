@@ -28,6 +28,7 @@ lib/Iterator/Flex/Common.pm
 lib/Iterator/Flex/Cycle.pm
 lib/Iterator/Flex/Factory.pm
 lib/Iterator/Flex/Failure.pm
+lib/Iterator/Flex/Flatten.pm
 lib/Iterator/Flex/Freeze.pm
 lib/Iterator/Flex/Gather.pm
 lib/Iterator/Flex/Gather/Constants.pm
@@ -68,7 +69,6 @@ lib/Iterator/Flex/Role/Rewind/Method.pm
 lib/Iterator/Flex/Role/State.pm
 lib/Iterator/Flex/Role/State/Closure.pm
 lib/Iterator/Flex/Role/State/Registry.pm
-lib/Iterator/Flex/Role/Utils.pm
 lib/Iterator/Flex/Role/Wrap/Return.pm
 lib/Iterator/Flex/Role/Wrap/Self.pm
 lib/Iterator/Flex/Role/Wrap/Throw.pm
@@ -77,6 +77,7 @@ lib/Iterator/Flex/Stack.pm
 lib/Iterator/Flex/Take.pm
 lib/Iterator/Flex/Utils.pm
 lib/Iterator/Flex/Zip.pm
+lib/Iterator/Flex/to_iterator
 perlcritic.rc
 perltidy.rc
 t.pl
@@ -97,6 +98,7 @@ t/Common/icat.t
 t/Common/ichain.t
 t/Common/ichunk.t
 t/Common/icycle.t
+t/Common/iflatten.t
 t/Common/ifreeze.t
 t/Common/igather.t
 t/Common/igrep.t

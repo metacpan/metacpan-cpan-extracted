@@ -55,6 +55,7 @@
             "Module::Info" : "0",
             "Object::Configure" : "0.12",
             "Params::Get" : "0.13",
+            "Params::Validate::Strict" : "0.09",
             "Return::Set" : "0",
             "Scalar::Util" : "0",
             "Text::CSV" : "0",
@@ -95,6 +96,6 @@
          "x_repository" : "https://github.com/nigelhorne/Genealogy-Obituary-Lookup"
       }
    },
-   "version" : "0.19",
+   "version" : "0.20",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

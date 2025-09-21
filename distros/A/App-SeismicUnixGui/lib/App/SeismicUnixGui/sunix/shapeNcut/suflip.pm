@@ -129,9 +129,7 @@ use aliased 'App::SeismicUnixGui::misc::L_SU_global_constants';
 
 use App::SeismicUnixGui::misc::SeismicUnix qw($flip $in $out $on $go $to $suffix_ascii $off $suffix_su $suffix_bin);
 use aliased 'App::SeismicUnixGui::configs::big_streams::Project_config';
-#use aliased 'App::SeismicUnixGui::misc::control';
 use aliased 'App::SeismicUnixGui::misc::manage_files_by2';
-#use aliased 'App::SeismicUnixGui::misc::readfiles';
 
 =head2 instantiation of packages
 
@@ -139,9 +137,7 @@ use aliased 'App::SeismicUnixGui::misc::manage_files_by2';
 
 my $get					= L_SU_global_constants->new();
 my $Project				= Project_config->new();
-#my $control          	= control->new();
 my $manage_files_by2    = manage_files_by2->new();
-#my $readfiles        	= readfiles->new();
 my $DATA_SEISMIC_SU		= $Project->DATA_SEISMIC_SU();
 my $DATA_SEISMIC_BIN	= $Project->DATA_SEISMIC_BIN();
 my $DATA_SEISMIC_TXT	= $Project->DATA_SEISMIC_TXT();
@@ -200,8 +196,8 @@ by adding the program name
 		my @outbound        = @$outbound_aref;		
 		my $num_of_files    = scalar @outbound;
 
-		print("Step,inbound: @inbound\n");
-		print("Step,inbound: @outbound\n");
+		# print("Step,inbound: @inbound\n");
+		# print("Step,inbound: @outbound\n");
 
 		my $last_idx        = $num_of_files - 1;
 
@@ -355,7 +351,7 @@ sub _get_inbound4base_file_names {
 #	my ( $array_ref, $num_files ) = _get_base_file_name_aref();
     my ( $array_ref, $num_files ) = $manage_files_by2->get_base_file_name_aref();
 
-	if ( length $array_ref ) {
+	if ( defined $array_ref && @$array_ref ) {
 
 		my @base_file_name = @$array_ref;
 		my @inbound;

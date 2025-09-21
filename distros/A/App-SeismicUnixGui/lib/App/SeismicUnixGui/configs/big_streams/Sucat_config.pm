@@ -66,17 +66,17 @@ package App::SeismicUnixGui::configs::big_streams::Sucat_config;
   $list                 = 'cat_list_good_sp';
 
   		Catted file name
-  $output_file_name     = 'All_good_sp';
+  $output_base_file_name     = 'All_good_sp';
 
   Another example:
   first_file_number_in   = 1000  a numerical value,
   last_file_number_in    = 1010  a numerical value,
   number_of_files_in     = 11    a numerical value,
-  #output_file_name    = 1001_10 
-  output_file_name    = 1000_10 
-  #output_file_name    = All_good_SH_B4diff 
-  #output_file_name    = SH_from_SW 
-  #output_file_name    = SH_from_NE 
+  #output_base_file_name    = 1001_10 
+  output_base_file_name    = 1000_10 
+  #output_base_file_name    = All_good_SH_B4diff 
+  #output_bas_file_name    = SH_from_SW 
+  #output_base_file_name    = SH_from_NE 
   input_suffix        =  '_clean.su' 
   #list               = list_good_shot_numbers
   #list               = list_good_shot_numbers
@@ -133,15 +133,15 @@ sub get_values {
 
     # print("Sucat_config,values=@{$Sucat_config->{_values_aref}}\n");
 
-    my $first_file_number_in = @{ $Sucat_config->{_values_aref} }[0];
-    my $last_file_number_in  = @{ $Sucat_config->{_values_aref} }[1];
-    my $number_of_files_in   = @{ $Sucat_config->{_values_aref} }[2];
+    my $first_file_number_in   = @{ $Sucat_config->{_values_aref} }[0];
+    my $last_file_number_in    = @{ $Sucat_config->{_values_aref} }[1];
+    my $number_of_files_in     = @{ $Sucat_config->{_values_aref} }[2];
 
-    my $input_suffix         = @{ $Sucat_config->{_values_aref} }[3];
-    my $input_name_prefix    = @{ $Sucat_config->{_values_aref} }[4];
-    my $input_name_extension = @{ $Sucat_config->{_values_aref} }[5];
-    my $list                 = @{ $Sucat_config->{_values_aref} }[6];    
-    my $output_file_name     = @{ $Sucat_config->{_values_aref} }[7];
+    my $input_suffix           = @{ $Sucat_config->{_values_aref} }[3];
+    my $input_name_prefix      = @{ $Sucat_config->{_values_aref} }[4];
+    my $input_name_extension   = @{ $Sucat_config->{_values_aref} }[5];
+    my $list                   = @{ $Sucat_config->{_values_aref} }[6];    
+    my $output_base_file_name  = @{ $Sucat_config->{_values_aref} }[7];
     my $alternative_inbound_directory  = @{ $Sucat_config->{_values_aref} }[8];
     my $alternative_outbound_directory  = @{ $Sucat_config->{_values_aref} }[9];
 
@@ -151,11 +151,11 @@ sub get_values {
                 first_file_number_in => $first_file_number_in,
                 last_file_number_in  => $last_file_number_in,
                 number_of_files_in   => $number_of_files_in,
-                output_file_name  => $output_file_name,
-                input_suffix      => $input_suffix,
-     			input_name_prefix       => $input_name_prefix,
-    			input_name_extension    => $input_name_extension,             
-                list              => $list,
+                output_base_file_name  => $output_base_file_name,
+                input_suffix         => $input_suffix,
+     			input_name_prefix    => $input_name_prefix,
+    			input_name_extension => $input_name_extension,             
+                list                 => $list,
                 alternative_inbound_directory => $alternative_inbound_directory,
                 alternative_outbound_directory => $alternative_outbound_directory,
             }

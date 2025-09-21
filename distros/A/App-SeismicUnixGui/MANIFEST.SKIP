@@ -3,6 +3,8 @@
 \B.FileHistory.txt
 \B.Makefile.PL.swp
 \bchain.sh
+\bjunk
+\bjunk.pl
 \bCHANGES
 \bMYMETA\.
 \btbd.pl
@@ -10,15 +12,19 @@
 \btbd
 # Skip temporary, backup files,
 # and directories
-\barchive/
+\bblib_bck/
 \B.bashrc
 \B.itemp_
 \B.temp
 \B.tbd
+\B.exists
 \B.num_samples
+\B.vscode/
+\barchive/
 \btbd/
 \bbck/
 \btemp/
+\bclean_unwanted_subdirectory.pl
 \bdocumentation_conversion/
 # Skip git-related files
 \B.git$

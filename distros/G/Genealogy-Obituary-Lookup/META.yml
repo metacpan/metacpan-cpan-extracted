@@ -51,6 +51,7 @@ requires:
   Module::Info: '0'
   Object::Configure: '0.12'
   Params::Get: '0.13'
+  Params::Validate::Strict: '0.09'
   Return::Set: '0'
   Scalar::Util: '0'
   Text::CSV: '0'
@@ -63,5 +64,5 @@ resources:
   bugtracker: https://github.com/nigelhorne/Genealogy-Obituary-Lookup/issues
   homepage: https://metacpan.org/pod/Genealogy::Obituary::Lookup
   repository: git://github.com/nigelhorne/Genealogy-Obituary-Lookup.git
-version: '0.19'
+version: '0.20'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

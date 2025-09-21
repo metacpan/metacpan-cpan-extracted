@@ -4,7 +4,7 @@
       "Matt Johnson <mjohnson@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -38,6 +38,7 @@
             "Game::Life::Faster" : "0.007",
             "List::Util" : "0",
             "Prima" : "1.74",
+            "Prima::Cairo" : "1.08",
             "perl" : "5.014"
          }
       },
@@ -59,6 +60,6 @@
          "web" : "https://github.com/mjohnson108/p5-App-GUI-GoLP"
       }
    },
-   "version" : "1.0",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "1.1",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

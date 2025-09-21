@@ -16,7 +16,7 @@ use Readonly;
 
 Readonly::Scalar our $DR => 'dwgread';
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 # Constructor.
 sub new {
@@ -40,17 +40,19 @@ sub run {
 		'h' => 0,
 		'i' => 0,
 		'm' => undef,
+		's' => 0,
 		'v' => 1,
 	};
-	if (! getopts('d:fhim:v:', $self->{'_opts'}) || @ARGV < 1
+	if (! getopts('d:fhim:sv:', $self->{'_opts'}) || @ARGV < 1
 		|| $self->{'_opts'}->{'h'}) {
 
-		print STDERR "Usage: $0 [-d test_dir] [-f] [-h] [-i] [-m match_string] [-v level] [--version] directory\n";
+		print STDERR "Usage: $0 [-d test_dir] [-f] [-h] [-i] [-m match_string] [-s] [-v level] [--version] directory\n";
 		print STDERR "\t-d test_dir\tTest directory (default is directory in system tmp).\n";
 		print STDERR "\t-f\t\tPrint file.\n";
 		print STDERR "\t-h\t\tPrint help.\n";
 		print STDERR "\t-i\t\tIgnore errors.\n";
 		print STDERR "\t-m match_string\tMatch string (default is not defined).\n";
+		print STDERR "\t-s\t\tSelect files which are symlinks too.\n";
 		print STDERR "\t-v level\tVerbosity level (default 1, min 0, max 9).\n";
 		print STDERR "\t--version\tPrint version.\n";
 		print STDERR "\tdirectory\tDirectory with DWG files to test.\n";
@@ -74,8 +76,14 @@ sub run {
 	# Verbose level.
 	my $v = '-v'.$self->{'_opts'}->{'v'};
 
+	my @selected_files;
+	if ($self->{'_opts'}->{'s'}) {
+		@selected_files = File::Find::Rule->in($self->{'_directory'});
+	} else {
+		@selected_files = File::Find::Rule->dwg->not_symlink->in($self->{'_directory'});
+	}
 	my $file_num = 1;
-	foreach my $dwg_file_in (File::Find::Rule->dwg->in($self->{'_directory'})) {
+	foreach my $dwg_file_in (@selected_files) {
 
 		# Copy DWG file to dir.
 		my $dwg_file_out = catfile($tmp_dir, $file_num.'.dwg');
@@ -256,12 +264,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2023-2024 Michal Josef Špaček
+© 2023-2025 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

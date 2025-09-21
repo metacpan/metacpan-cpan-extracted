@@ -6,13 +6,13 @@ use strict;
 use warnings;
 use experimental 'signatures', 'postderef';
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 use Scalar::Util;
 use List::Util;
 
 use parent 'Iterator::Flex::Base';
-use Iterator::Flex::Utils qw( STATE :IterAttrs );
+use Iterator::Flex::Utils qw( STATE :IterAttrs throw_failure );
 
 use namespace::clean;
 
@@ -53,7 +53,7 @@ sub new ( $class, @args ) {
 
     my $pars = Ref::Util::is_hashref( $args[-1] ) ? pop @args : {};
 
-    $class->_throw( parameter => q{incorrect number of arguments for sequence} )
+    throw_failure( parameter => q{incorrect number of arguments for sequence} )
       if @args < 1 || @args > 3;
 
     my %state;
@@ -67,7 +67,7 @@ sub new ( $class, @args ) {
 
 sub construct ( $class, $state ) {
 
-    $class->_throw( parameter => "$class: arguments must be numbers\n" )
+    throw_failure( parameter => "$class: arguments must be numbers\n" )
       unless List::Util::all { Scalar::Util::looks_like_number( $_ ) };
 
     my ( $begin, $end, $step, $iter, $next, $current, $prev )
@@ -111,7 +111,7 @@ sub construct ( $class, $state ) {
 
     else {
 
-        $class->_throw(
+        throw_failure(
             parameter => q{sequence will be inifinite as $step is zero or has the incorrect sign} )
           if ( $begin < $end && $step <= 0 ) || ( $begin > $end && $step >= 0 );
 
@@ -214,7 +214,7 @@ Iterator::Flex::Sequence - Numeric Sequence Iterator Class
 
 =head1 VERSION
 
-version 0.30
+version 0.31
 
 =head1 METHODS
 

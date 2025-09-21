@@ -2,11 +2,16 @@
 use strict;
 use Test::Kantan;
 use rlib;
-use SQL::Concat qw/SQL PAR OPT CAT CSV PFX/;
+use SQL::Concat qw/Q SQL PAR OPT CAT CSV PFX/;
 
 sub catch (&) {my ($code) = @_; local $@; eval {$code->()}; $@}
 
 describe "Functional interfaces of SQL::Concat", sub {
+
+  describe "Q", sub {
+    expect([Q("select * from books where name = ? limit 3", 'foo')->as_sql_bind])
+      ->to_be(["select * from books where name = ? limit 3", 'foo'])
+  };
 
   describe "SQL", sub {
 

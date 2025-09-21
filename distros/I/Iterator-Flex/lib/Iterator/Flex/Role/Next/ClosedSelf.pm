@@ -5,7 +5,7 @@ package Iterator::Flex::Role::Next::ClosedSelf;
 use strict;
 use warnings;
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 use Ref::Util;
 use Scalar::Util;
@@ -25,10 +25,10 @@ use namespace::clean;
 
 sub _construct_next ( $class, $ipar, $ ) {
 
-    my $sub = $ipar->{ +NEXT } // $class->_throw( parameter => q{Missing 'next' parameter} );
+    my $sub = $ipar->{ +NEXT } // throw_failure( parameter => q{Missing 'next' parameter} );
     Scalar::Util::weaken $ipar->{ +NEXT };
 
-    $class->_throw( parameter => q{Missing ability to set self} )
+    throw_failure( parameter => q{Missing ability to set self} )
       unless exists $ipar->{ +_SELF };
 
     my $ref = $ipar->{ +_SELF };
@@ -64,7 +64,7 @@ Iterator::Flex::Role::Next::ClosedSelf - Role for closure iterator which closes 
 
 =head1 VERSION
 
-version 0.30
+version 0.31
 
 =head1 METHODS
 

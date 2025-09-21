@@ -22,9 +22,6 @@ package App::SeismicUnixGui::misc::L_SU_path;
 Sets the environment variables on
 first pass using BEGIN
 
-getcwd points to the "local" directory from
-which SeismicUnixGui is commanded
-
 =head4 Examples
 
 
@@ -36,20 +33,19 @@ use Moose;
 our $VERSION = '0.0.1';
 use Carp;
 use Shell qw(echo);
-use Cwd;
+use Cwd qw(abs_path);
 
 my $path4SeismicUnixGui_slash;
 my $path4SeismicUnixGui_colon;
 my $SeismicUnixGui;
-#		my $local = getcwd();
-#		print("L_SU_path, local=$local\n");
 		
 BEGIN {
 
 	if ( length $ENV{'SeismicUnixGui'} ) {
 
 		$path4SeismicUnixGui_slash = $ENV{'SeismicUnixGui'};
-		
+	    # print "L52 We are in fully operational mode'.\n";
+
 		my @pieces = split( /\/App\//, $path4SeismicUnixGui_slash );
 		$path4SeismicUnixGui_colon = 'App/' . $pieces[1];
 		$path4SeismicUnixGui_colon =~ s/\//::/g;
@@ -57,20 +53,62 @@ BEGIN {
 		# print("\n1.L_SU_path: path4SeismicUnixGui_colon = $path4SeismicUnixGui_colon\n");
 	}
 	else {
-		my $dir       = 'App/SeismicUnixGui';
-		my $pathNfile = $dir . '/sunix/data/data_in.pm';
-		my $look  = `locate $pathNfile`;
-		my @field = split( $dir, $look );
-		$path4SeismicUnixGui_slash = $field[0] . $dir;
-		
-		my @pieces = split( /\/App\//, $path4SeismicUnixGui_slash );
-        $path4SeismicUnixGui_colon    = 'App/' . $pieces[1];
-        $path4SeismicUnixGui_colon    =~ s/\//::/g;
-		print("\nWarning: L_SU_path uses default: path4SeismicUnixGui_slash = $path4SeismicUnixGui_slash\n");
-		#print("\n2.L_SU_path: path4SeismicUnixGui_slash = $path4SeismicUnixGui_slash\n");
-		#print("\n2.L_SU_path: path4SeismicUnixGui_colon = $path4SeismicUnixGui_colon\n");		
-		
+		# When environment variables can not be found in Perl
+		# we could be undergoing an installation test
+		# or it could be the first time the program is run
+		# Look for a pattern in the Makefile
+		my $pathNfile_name = "./Makefile.PL";
+
+	    if (-f $pathNfile_name) {
+
+	        # print("L69 Found the file $pathNfile_name\n");
+		    $path4SeismicUnixGui_slash = abs_path().'/blib/lib/App/SeismicUnixGui';
+		    print("L71 We are in installation mode where \$SeismicUnixGui is \n".
+		         "set to: $path4SeismicUnixGui_slash \n");
+
+		    my @pieces = split( /\/App\//, $path4SeismicUnixGui_slash );
+            $path4SeismicUnixGui_colon    = 'App/' . $pieces[1];
+            $path4SeismicUnixGui_colon    =~ s/\//::/g;
+		    # print("\nL77 Warning: L_SU_path uses default: path4SeismicUnixGui_slash = $path4SeismicUnixGui_slash\n");
+		    # print("\n2.L_SU_path: path4SeismicUnixGui_slash = $path4SeismicUnixGui_slash\n");
+		    # print("\n2.L_SU_path: path4SeismicUnixGui_colon = $path4SeismicUnixGui_colon\n");	
+
+
+	    } else {
+	        # print("L 34 Did not find the file $pathNfile_name\n");
+        	print("We are not in installation mode and the \n". 
+			  "environment variable \$SeismicUnixGui is not set.\n".
+			  "You must set the environment variable\n");
+			  print("Exiting now ...\n");
+			  exit();
+		}
 	}
+
+	# if ( length $ENV{'SeismicUnixGui'} ) {
+
+	# 	$path4SeismicUnixGui_slash = $ENV{'SeismicUnixGui'};
+		
+	# 	my @pieces = split( /\/App\//, $path4SeismicUnixGui_slash );
+	# 	$path4SeismicUnixGui_colon = 'App/' . $pieces[1];
+	# 	$path4SeismicUnixGui_colon =~ s/\//::/g;
+	# 	# print("\n1.L_SU_path: path4SeismicUnixGui_slash = $path4SeismicUnixGui_slash\n");
+	# 	# print("\n1.L_SU_path: path4SeismicUnixGui_colon = $path4SeismicUnixGui_colon\n");
+	# }
+	# else {
+	# 	my $dir       = 'App/SeismicUnixGui';
+	# 	my $pathNfile = $dir . '/sunix/data/data_in.pm';
+	# 	my $look      = `locate $pathNfile`;
+	# 	my @field     = split( $dir, $look );
+	# 	$path4SeismicUnixGui_slash = $field[0] . $dir;
+		
+	# 	my @pieces = split( /\/App\//, $path4SeismicUnixGui_slash );
+    #     $path4SeismicUnixGui_colon    = 'App/' . $pieces[1];
+    #     $path4SeismicUnixGui_colon    =~ s/\//::/g;
+	# 	print("\nL69 Warning: L_SU_path uses default: path4SeismicUnixGui_slash = $path4SeismicUnixGui_slash\n");
+	# 	print("\n2.L_SU_path: path4SeismicUnixGui_slash = $path4SeismicUnixGui_slash\n");
+	# 	print("\n2.L_SU_path: path4SeismicUnixGui_colon = $path4SeismicUnixGui_colon\n");		
+		
+	# }
 }
 
 =head2 private hash

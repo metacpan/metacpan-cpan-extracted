@@ -6,10 +6,10 @@ use strict;
 use warnings;
 use experimental 'signatures', 'declared_refs';
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
-use Iterator::Flex::Factory;
-use Iterator::Flex::Utils qw[ THROW STATE EXHAUSTION :IterAttrs :IterStates ];
+use Iterator::Flex::Factory 'to_iterator';
+use Iterator::Flex::Utils qw[ THROW STATE EXHAUSTION :IterAttrs :IterStates throw_failure ];
 use Ref::Util 'is_ref', 'is_hashref', 'is_blessed_ref';
 use List::Util 'first';
 
@@ -93,7 +93,7 @@ use namespace::clean;
 sub new ( $class, @args ) {
     my $pars = is_hashref( $args[-1] ) ? pop @args : {};
 
-    $class->_throw( parameter => 'not enough parameters' )
+    throw_failure( parameter => 'not enough parameters' )
       unless @args;
 
     my @iterators;
@@ -104,7 +104,7 @@ sub new ( $class, @args ) {
         @iterators = @args;
     }
     else {
-        $class->_throw( parameter => 'expected an even number of arguments' )
+        throw_failure( parameter => 'expected an even number of arguments' )
           if @args % 2;
 
         while ( @args ) {
@@ -136,7 +136,7 @@ sub new ( $class, @args ) {
 
             my @iset = @idx{@ekeys};
 
-            $class->_throw( parameter => ON_EXHAUSTION . ' illegal iterator label or index' )
+            throw_failure( parameter => ON_EXHAUSTION . ' illegal iterator label or index' )
               if defined first { !defined } @iset;
 
             @set[@iset]    = ( !!1 ) x @iset;
@@ -147,7 +147,7 @@ sub new ( $class, @args ) {
             $attr{ +ON_EXHAUSTION } = INSERT;
         }
         elsif ( is_ref( $on_exhaustion ) or !first { $on_exhaustion eq $_ } TRUNCATE, THROW ) {
-            $class->_throw( parameter => ON_EXHAUSTION . ": unexpected value: $on_exhaustion" );
+            throw_failure( parameter => ON_EXHAUSTION . ": unexpected value: $on_exhaustion" );
         }
         else {
             $attr{ +ON_EXHAUSTION } = $on_exhaustion;
@@ -163,7 +163,7 @@ sub new ( $class, @args ) {
 
 ## no critic (ExcessComplexity)
 sub construct ( $class, $state ) {
-    $class->_throw( parameter => q{state must be a HASH reference} )
+    throw_failure( parameter => q{state must be a HASH reference} )
       unless is_hashref( $state );
 
     $state->{value} //= [];
@@ -175,9 +175,9 @@ sub construct ( $class, $state ) {
     # transform into iterators if required.
 
     my @iterators
-      = map { Iterator::Flex::Factory->to_iterator( $_, { ( +EXHAUSTION ) => THROW } ) } @depends;
+      = map { to_iterator( $_, { ( +EXHAUSTION ) => THROW } ) } @depends;
 
-    $class->_throw( parameter => q{number of keys not equal to number of iterators} )
+    throw_failure( parameter => q{number of keys not equal to number of iterators} )
       if @keys && @keys != @iterators;
 
     @value = map { $_->current } @iterators
@@ -278,7 +278,7 @@ sub construct ( $class, $state ) {
                 @exhausted = @keys[@exhausted]
                   if @keys;
 
-                $class->_throw( Truncated => \@exhausted );
+                throw_failure( Truncated => \@exhausted );
             };
 
             @value = @nvalue;
@@ -381,7 +381,7 @@ Iterator::Flex::Zip - Zip Iterator Class
 
 =head1 VERSION
 
-version 0.30
+version 0.31
 
 =head1 METHODS
 

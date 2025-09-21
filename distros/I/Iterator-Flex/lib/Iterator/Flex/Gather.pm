@@ -6,9 +6,9 @@ use strict;
 use warnings;
 use experimental 'signatures';
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
-use Iterator::Flex::Factory;
+use Iterator::Flex::Factory 'to_iterator';
 use Iterator::Flex::Utils qw[ THROW STATE EXHAUSTION :IterAttrs :IterStates ];
 use Ref::Util;
 use parent 'Iterator::Flex::Base';
@@ -169,7 +169,7 @@ use namespace::clean;
 
 sub new ( $class, $code, $iterable, $pars = {} ) {
 
-    $class->_throw( parameter => q{'code' parameter is not a coderef} )
+    throw_failure( parameter => q{'code' parameter is not a coderef} )
       unless Ref::Util::is_coderef( $code );
 
     my %pars = $pars->%*;
@@ -180,7 +180,7 @@ sub new ( $class, $code, $iterable, $pars = {} ) {
         src                 => $iterable,
     );
 
-    $class->_throw( parameter => q{'cycle_on_exhaustion': illegal value} )
+    throw_failure( parameter => q{'cycle_on_exhaustion': illegal value} )
       if defined $pars{cycle_on_exhaustion}
       and $pars{cycle_on_exhaustion} != GATHER_CYCLE_CHOOSE
       and !$pars{cycle_on_exhaustion} & ( GATHER_CYCLE_STOP | GATHER_CYCLE_ABORT );
@@ -191,13 +191,13 @@ sub new ( $class, $code, $iterable, $pars = {} ) {
 
 sub construct ( $class, $state ) {
 
-    $class->_throw( parameter => q{'state' parameter must be a HASH reference} )
+    throw_failure( parameter => q{'state' parameter must be a HASH reference} )
       unless Ref::Util::is_hashref( $state );
 
     my ( $code, $src, $cycle_on_exhaustion ) = @{$state}{qw[ code src cycle_on_exhaustion ]};
 
     $src
-      = Iterator::Flex::Factory->to_iterator( $src, { ( +EXHAUSTION ) => THROW } );
+      = to_iterator( $src, { ( +EXHAUSTION ) => THROW } );
 
     my $self;
 
@@ -236,14 +236,14 @@ sub construct ( $class, $state ) {
                     my $result = $code->( \@gathered, GATHER_GATHERING );
                     $cycle = $result & GATHER_CYCLE_MASK;
 
-                    $class->_throw( parameter => 'cycle action (continue, stop, abort, restart) was not specified' )
+                    throw_failure( parameter => 'cycle action (continue, stop, abort, restart) was not specified' )
                       unless $cycle;
 
                     if ( ( $result & GATHER_ELEMENT_MASK ) == GATHER_ELEMENT_INCLUDE ) {
                         push @gathered, $rv;
                     }
                     elsif ( ( $result & GATHER_ELEMENT_MASK ) == GATHER_ELEMENT_CACHE ) {
-                        $class->_throw( parameter =>
+                        throw_failure( parameter =>
                               'inconsistent return: element action GATHER_ELEMENT_CACHE requires cycle action GATHER_CYCLE_STOP'
                         ) unless $cycle & GATHER_CYCLE_RESTART;
                         $cache     = $rv;
@@ -315,7 +315,7 @@ Iterator::Flex::Gather - Gather Iterator Class
 
 =head1 VERSION
 
-version 0.30
+version 0.31
 
 =head1 METHODS
 

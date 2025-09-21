@@ -50,6 +50,7 @@
 
 extern TStatusLine *default_TStatusLine;
 extern TMenuBar *default_TMenuBar;
+extern TVApp *tapp;
 
 MODULE=TVision::TVApp PACKAGE=TVision::TVApp
 
@@ -58,7 +59,8 @@ TVApp* new(TMenuBar *tmbr=0, TStatusLine *tsl=0)
         if (tmbr)
 	    default_TMenuBar = tmbr;
 	default_TStatusLine = tsl;
-        RETVAL = new TVApp();
+        tapp = new TVApp();
+        RETVAL = tapp;
         // RETVAL = get_sv("TVision::TApplication::the_app", GV_ADD);
 	//do_sv_dump(0, PerlIO_stderr(), RETVAL, 0, 10, 0,0);
     OUTPUT:
@@ -291,7 +293,7 @@ EOS
 	int insertBuffer( char *c, int uint1, int uint2, int Boolean1, int Boolean2 )
 	int insertEOL( int Boolean )
 	#virtual Boolean insertFrom( TEditor * );
-	int insertText( void *cv, int uint, int Boolean )
+	int insertText( char *cv, int uint, int Boolean )
 	void scrollTo( int x, int y)
 	int search(char *c, int ushort )
 	#virtual Boolean setBufSize( uint );
@@ -396,7 +398,7 @@ EOS
 	TScrollBar *hScrollBar
 	TScrollBar *vScrollBar
 	TIndicator *indicator
-	#char *buffer;
+	char *buffer
 	int bufSize
 	int bufLen
 	int gapLen

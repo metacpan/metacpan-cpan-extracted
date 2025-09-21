@@ -9,7 +9,7 @@
 
 // Override dXSBOOTARGSXSAPIVERCHK, because in 5.40 we don't pass check in
 // Perl_xs_handshake(...) or similar.
-#define dXSBOOTARGSXSAPIVERCHK dXSARGS
+//#define dXSBOOTARGSXSAPIVERCHK dXSARGS
 // ... I don't know the reason of the failure, and also I don't know why this step
 // is not needed in TVision-methods.xs
 // TODO fix this

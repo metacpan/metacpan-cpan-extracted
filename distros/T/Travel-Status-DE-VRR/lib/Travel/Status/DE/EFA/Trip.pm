@@ -9,7 +9,7 @@ use Travel::Status::DE::EFA::Stop;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '3.15';
+our $VERSION = '3.16';
 
 Travel::Status::DE::EFA::Trip->mk_ro_accessors(
 	qw(operator product product_class name line number type id dest_name dest_id)
@@ -28,7 +28,7 @@ sub new {
 		product_class => $json->{product}{class},
 		polyline_raw  => $conf{json}{leg}{coords},
 		name          => $json->{name},
-		line          => $json->{disassembledName},
+		line          => $json->{disassembledName} // $json->{number},
 		number        => $json->{properties}{trainNumber},
 		type      => $json->{properties}{trainType} // $json->{product}{name},
 		id        => $json->{id},
@@ -238,7 +238,7 @@ trip
 
 =head1 VERSION
 
-version 3.15
+version 3.16
 
 =head1 DESCRIPTION
 

@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,10 +25,11 @@ requires:
   Game::Life::Faster: '0.007'
   List::Util: '0'
   Prima: '1.74'
+  Prima::Cairo: '1.08'
   perl: '5.014'
 resources:
   bugtracker: https://github.com/mjohnson108/p5-App-GUI-GoLP/issues
   homepage: https://github.com/mjohnson108/
   repository: https://github.com/mjohnson108/p5-App-GUI-GoLP.git
-version: '1.0'
+version: '1.1'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

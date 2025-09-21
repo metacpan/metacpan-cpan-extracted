@@ -17,12 +17,13 @@ sub load_instance {
 	my $data = $json->decode(
 		scalar read_file("ext/transport-apis/data/${path}-efa.json") );
 	my %ret = (
-		name      => $opt{name} // $data->{name} =~ s{ *[(][^)]+[)]}{}r,
-		homepage  => $data->{attribution}{homepage},
-		url       => $opt{url} // $data->{options}{endpoint} =~ s{ / $ }{}rx,
-		time_zone => $data->{timezone},
-		languages => $data->{supportedLanguages},
-		coverage  => {
+		name       => $opt{name} // $data->{name} =~ s{ *[(][^)]+[)]}{}r,
+		homepage   => $data->{attribution}{homepage},
+		url        => $opt{url} // $data->{options}{endpoint} =~ s{ / $ }{}rx,
+		time_zone  => $data->{timezone},
+		languages  => $data->{supportedLanguages},
+		tls_verify => $opt{tls_verify} // 1,
+		coverage   => {
 			area    => $data->{coverage}{realtimeCoverage}{area},
 			regions => $data->{coverage}{realtimeCoverage}{region} // []
 		},
@@ -35,6 +36,11 @@ sub load_instance {
 # VRT: Encoding issues
 # VVSt: NXDOMAIN
 my %efa_instance = (
+	AVV => {
+		url        => 'https://fahrtauskunft.avv-augsburg.de/efa',
+		name       => 'Augsburger Verkehrs- & Tarifverbund',
+		tls_verify => 0,
+	},
 	BEG => {
 		url  => 'https://bahnland-bayern.de/efa',
 		name => 'Bayerische Eisenbahngesellschaft',
@@ -108,7 +114,7 @@ use warnings;
 use 5.014;
 use utf8;
 
-our $VERSION = '3.15';
+our $VERSION = '3.16';
 
 # Most of these have been adapted from
 # <https://github.com/public-transport/transport-apis> and

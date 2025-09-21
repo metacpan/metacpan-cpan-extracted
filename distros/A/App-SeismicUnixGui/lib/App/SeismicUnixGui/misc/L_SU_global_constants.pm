@@ -3,28 +3,41 @@ package App::SeismicUnixGui::misc::L_SU_global_constants;
 use Moose;
 our $VERSION = '0.0.1';
 use Carp;
-use Cwd;
+use Cwd qw(abs_path);
 
 my $path4SeismicUnixGui;
 
 BEGIN {
 
+	# find out first if we are in installation and test mode
+	# or in fully operational mode
+
 	if ( length $ENV{'SeismicUnixGui'} ) {
 
 		$path4SeismicUnixGui = $ENV{'SeismicUnixGui'};
-
+	    # print "L18 We are in fully operational mode'.\n";
 	}
 	else {
 		# When environment variables can not be found in Perl
-		my $dir       = 'App/SeismicUnixGui';
-		my $pathNfile = $dir . '/sunix/data/data_in.pm';
-		my $look      = `locate $pathNfile`;
-		my @field     = split( $dir, $look );
-		$path4SeismicUnixGui = $field[0] . $dir;
+		# we could be undergoing an installation test
+		# or it could be the first time the program is run
+		# Look for a pattern in the Makefile
+		my $pathNfile_name = "./Makefile.PL";
+	    if (-f $pathNfile_name) {
 
-		print(
-"\nL22. Warning: Using default L_SU_global_constants, L_SU = $path4SeismicUnixGui\n"
-		);
+	        # print("L 26 Found the file $pathNfile_name\n");
+		    $path4SeismicUnixGui = abs_path().'/blib/lib/App/SeismicUnixGui';
+		    print("L38 We are in installation mode where \$SeismicUnixGui is \n".
+		         "set to: $path4SeismicUnixGui \n");
+
+	    } else {
+	        # print("L 34 Did not find the file $pathNfile_name\n");
+        	print("We are not in installation mode and the \n". 
+			  "environment variable \$SeismicUnixGui is not set.\n".
+			  "You must set the environment variable\n");
+			  print("Exiting now ...\n");
+			  exit();
+		}
 	}
 
 }
@@ -470,7 +483,7 @@ my $var = {
 	_one_character                 => '1',
 	_one_pixel                     => '1',
 	_one_pixel_borderwidth         => '1',
-	_program_title                 => 'SeismicUnixGui V0.87.3',
+	_program_title                 => 'SeismicUnixGui V0.87.4',
 	_project_selector_title        => 'Project Selector',
 	_l_suplot_title                => 'L_suplot',
 	_project_selector_title        => 'Project Selector',

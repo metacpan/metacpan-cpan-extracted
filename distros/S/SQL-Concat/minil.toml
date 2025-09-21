@@ -1,5 +1,4 @@
 name = "SQL-Concat"
-# badges = ["travis"]
 authority="cpan:HKOBA"
 
 module_maker="ModuleBuildTiny"
@@ -10,7 +9,6 @@ readme_from   = "lib/SQL/Concat.pm"
 markdown_maker = "Pod::Markdown::Github"
 
 license = "perl_5"
-badges = ['travis']
 
 [Metadata]
 x_static_install = 1

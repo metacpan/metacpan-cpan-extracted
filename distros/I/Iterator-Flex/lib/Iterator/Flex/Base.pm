@@ -9,7 +9,7 @@ use warnings;
 
 use experimental qw( signatures postderef declared_refs );
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 use Ref::Util;
 use Scalar::Util;
@@ -18,7 +18,7 @@ use Role::Tiny       ();
 use Role::Tiny::With ();
 use Module::Runtime  ();
 
-Role::Tiny::With::with 'Iterator::Flex::Role', 'Iterator::Flex::Role::Utils';
+Role::Tiny::With::with 'Iterator::Flex::Role';
 
 use Iterator::Flex::Utils qw (
   :default
@@ -29,6 +29,8 @@ use Iterator::Flex::Utils qw (
   :IterStates
   :InterfaceParameters
   :SignalParameters
+  load_role
+  throw_failure
 );
 
 use namespace::clean;
@@ -79,8 +81,7 @@ sub new_from_attrs ( $class, $in_ipar = {}, $in_gpar = {} ) {    ## no critic (E
         push @roles, 'Error::Throw';
     }
     else {
-        $class->_throw( q{unknown specification of iterator error signaling behavior:},
-            $gpar{ +ERROR }[0] );
+        throw_failure( q{unknown specification of iterator error signaling behavior:}, $gpar{ +ERROR }[0] );
     }
 
     my $exhaustion_action = $gpar{ +EXHAUSTION } // [ ( +RETURN ) => undef ];
@@ -103,21 +104,21 @@ sub new_from_attrs ( $class, $in_ipar = {}, $in_gpar = {} ) {    ## no critic (E
           : 'Exhaustion::Throw';
     }
     else {
-        $class->_throw( parameter => "unknown exhaustion action: $exhaustion_action[0]" );
+        throw_failure( parameter => "unknown exhaustion action: $exhaustion_action[0]" );
     }
 
     if ( defined( my $par = $ipar{ +METHODS } ) ) {
 
         require Iterator::Flex::Method;
 
-        $class->_throw( parameter => q{value for methods parameter must be a hash reference} )
+        throw_failure( parameter => q{value for methods parameter must be a hash reference} )
           unless Ref::Util::is_hashref( $par );
 
         for my $name ( keys $par->%* ) {
 
             my $code = $par->{$name};
 
-            $class->_throw( parameter => "value for 'methods' parameter key '$name' must be a code reference" )
+            throw_failure( parameter => "value for 'methods' parameter key '$name' must be a code reference" )
               unless Ref::Util::is_coderef( $code );
 
             # create role for the method
@@ -135,7 +136,7 @@ sub new_from_attrs ( $class, $in_ipar = {}, $in_gpar = {} ) {    ## no critic (E
         }
     }
 
-    @roles = map { $class->_load_role( $_ ) } @roles;
+    @roles = map { load_role( $_, $class->_role_namespaces ) } @roles;
     $class = Role::Tiny->create_class_with_roles( $class, @roles );
 
     unless ( $class->can( '_construct_next' ) ) {
@@ -151,7 +152,7 @@ sub new_from_attrs ( $class, $in_ipar = {}, $in_gpar = {} ) {    ## no critic (E
 
     my $self = bless $class->_construct_next( \%ipar, \%gpar ), $class;
 
-    $class->_throw(
+    throw_failure(
         parameter => q{attempt to register an iterator subroutine which has already been registered.} )
       if exists $REGISTRY{ refaddr $self };
 
@@ -187,15 +188,15 @@ sub _validate_interface_pars ( $class, $pars ) {
 
     my @bad = grep { !exists $InterfaceParameters{$_} } keys $pars->%*;
 
-    $class->_throw( parameter => "unknown interface parameters: @{[ join ', ', @bad ]}" )
+    throw_failure( parameter => "unknown interface parameters: @{[ join ', ', @bad ]}" )
       if @bad;
 
-    $class->_throw( parameter => "@{[ _ROLES ]}  must be an arrayref" )
+    throw_failure( parameter => "@{[ _ROLES ]}  must be an arrayref" )
       if defined $pars->{_ROLES} && !Ref::Util::is_arrayref( $pars->{ +_ROLES } );
 
     if ( defined( my $par = $pars->{ +_DEPENDS } ) ) {
         $pars->{ +_DEPENDS } = $par = [$par] unless Ref::Util::is_arrayref( $par );
-        $class->_throw( parameter => "dependency #$_ is not an iterator object" )
+        throw_failure( parameter => "dependency #$_ is not an iterator object" )
           unless List::Util::all { $class->_is_iterator( $_ ) } $par->@*;
     }
 
@@ -206,7 +207,7 @@ sub _validate_signal_pars ( $class, $pars ) {
     state %SignalParameters = {}->%{ +SIGNAL_PARAMETER_VALUES };
     my @bad = grep { !exists $SignalParameters{$_} } keys $pars->%*;
 
-    $class->_throw( parameter => "unknown signal parameters: @{[ join ', ', @bad ]}" )
+    throw_failure( parameter => "unknown signal parameters: @{[ join ', ', @bad ]}" )
       if @bad;
 }
 
@@ -325,7 +326,8 @@ sub _role_namespaces {
 
 
 sub _add_roles ( $class, @roles ) {
-    Role::Tiny->apply_roles_to_package( $class, map { $class->_load_role( $_ ) } @roles );
+    Role::Tiny->apply_roles_to_package( $class,
+        map { load_role( $_, $class->_role_namespaces ) } @roles );
 }
 
 sub _apply_method_to_depends ( $self, $meth ) {
@@ -333,7 +335,7 @@ sub _apply_method_to_depends ( $self, $meth ) {
     if ( defined( my $depends = $REGISTRY{ refaddr $self }[REG_ITERATOR][REG_ITER__DEPENDS] ) ) {
         # first check if dependencies have method
         my $cant = List::Util::first { !$_->can( $meth ) } $depends->@*;
-        $self->_throw( Unsupported => "dependency: @{[ $cant->_name ]} does not have a '$meth' method" )
+        throw_failure( Unsupported => "dependency: @{[ $cant->_name ]} does not have a '$meth' method" )
           if $cant;
 
         # now apply the method
@@ -483,7 +485,7 @@ Iterator::Flex::Base - Iterator object
 
 =head1 VERSION
 
-version 0.30
+version 0.31
 
 =head1 METHODS
 

@@ -4,7 +4,7 @@ use 5.014;
 use strict;
 use warnings;
 
-our $VERSION = "1.0";
+our $VERSION = "1.1";
 
 1;
 
@@ -16,7 +16,7 @@ App::GUI::GoLP - A GUI for viewing Life-like cellular automata, in Perl/Prima
 
 =head1 VERSION
 
-Version 1.0
+Version 1.1
 
 =head1 SYNOPSIS
 

@@ -106,5 +106,26 @@ use Test::More;
   }
 }
 
+{
+  {
+    package
+      t4;
+    use MOP4Import::Base::CLI_JSON -as_base
+      , [fields => qw(foo bar)];
+    sub TO_JSON {
+      (my MY $self) = @_;
+      [$self->{foo}, $self->{bar}];
+    }
+  }
+  my $test = sub {
+    my ($data, $expect, $theme) = @_;
+    is($data->cli_encode_json($data), $expect, "$theme: $expect");
+  };
+  {
+    $test->(t4->new(foo => 3, bar => "baz")
+            , '[3,"baz"]', 'TO_JSON can return ARRAY');
+  }
+}
+
 done_testing;
 

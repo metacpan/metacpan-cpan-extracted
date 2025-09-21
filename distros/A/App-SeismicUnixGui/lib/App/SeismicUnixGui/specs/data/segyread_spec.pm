@@ -1,6 +1,6 @@
 package App::SeismicUnixGui::specs::data::segyread_spec;
 use Moose;
-our $VERSION = '0.0.1';
+our $VERSION = '0.0.2';
 
 use aliased 'App::SeismicUnixGui::configs::big_streams::Project_config';
 use App::SeismicUnixGui::misc::SeismicUnix qw($bin $ps $segy $su $suffix_bin $suffix_ps $suffix_segy $suffix_su $suffix_txt $txt);
@@ -8,7 +8,6 @@ use aliased 'App::SeismicUnixGui::misc::L_SU_global_constants';
 
 my $get                 = L_SU_global_constants->new();
 my $Project             = Project_config->new();
-
 
 my $var                 = $get->var();
 
@@ -24,7 +23,7 @@ my $DATA_SEISMIC_SU  	= $Project->DATA_SEISMIC_SU();   # output data directory
 my $DATA_SEISMIC_TXT  	= $Project->DATA_SEISMIC_TXT();   # output data directory
 my $PL_SEISMIC		    = $Project->PL_SEISMIC();
 my $PS_SEISMIC  		= $Project->PS_SEISMIC();
-my $max_index           = 18;
+my $max_index           = 19;
 
 
 	my $segyread_spec = {
@@ -75,8 +74,9 @@ my $max_index           = 18;
 	# connects to second item (index=1)
 	# in the parameter list
 	$index[0] = 0; # inbound/outbound item is bound
-	$index[1] = 8; # inbound/outbound item is bound
-	$index[2] = 12; # inbound/outbound item is bound
+	$index[1] = 8; # inbound/outbound item is bou
+	$index[2] = 9; # inbound/outbound item is bound
+	$index[3] = 13; # inbound/outbound item is bound
 
 	$segyread_spec ->{_binding_index_aref} = \@index;
 	return();
@@ -103,7 +103,7 @@ one type of dialog for each index
 	$type[$index[0]] = $file_dialog_type->{_Data};
 	$type[$index[1]] = $file_dialog_type->{_Data};
 	$type[$index[2]] = $file_dialog_type->{_Data};
-#	$type[$index[2]]	=  $file_dialog_type->{_Data};
+	$type[$index[3]] =  $file_dialog_type->{_Data};
 
 	$segyread_spec ->{_file_dialog_type_aref} = \@type;
 	return();
@@ -338,9 +338,12 @@ are filtered by sunix_pl
  
 	# label 9 in GUI is input/output xx_file and needs a home directory
 	$prefix[ $index[1] ] =  '$DATA_SEISMIC_TXT' . ".'/'.";
+
+	# label 10 in GUI is input/output xx_file and needs a home directory
+	$prefix[ $index[2] ] =  '$DATA_SEISMIC_TXT' . ".'/'.";
  
-	# label 13 in GUI is input/output xx_file and needs a home directory
-	$prefix[ $index[2] ] =  '$DATA_SEISMIC_SEGY' . ".'/'.";
+	# label 14 in GUI is input/output xx_file and needs a home directory
+	$prefix[ $index[3] ] =  '$DATA_SEISMIC_SEGY' . ".'/'.";
  
 	$segyread_spec ->{_prefix_aref} = \@prefix;
 	return();
@@ -375,9 +378,12 @@ values
  
 	# label 9 in GUI is input/ouput xx_file and needs a home directory
 	$suffix[ $index[1] ] =  ''.'' . '$suffix_txt';
- 
-	# label 13 in GUI is input/ouput xx_file and needs a home directory
-	$suffix[ $index[2] ] =  ''.'' . '$suffix_segy';
+
+	# label 10 in GUI is input/ouput xx_file and needs a home directory
+	$suffix[ $index[2] ] =  ''.'' . '$suffix_txt'; 
+
+	# label 14 in GUI is input/ouput xx_file and needs a home directory
+	$suffix[ $index[3] ] =  ''.'' . '$suffix_segy';
  
 	$segyread_spec ->{_suffix_aref} = \@suffix;
 	return();

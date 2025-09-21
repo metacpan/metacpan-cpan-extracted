@@ -9,7 +9,7 @@ use warnings;
 
 use experimental 'signatures', 'postderef';
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 use Scalar::Util qw( refaddr );
 use Ref::Util    qw( is_hashref );
@@ -80,6 +80,9 @@ our %EXPORT_TAGS = (
     Functions           => [ qw(
           throw_failure
           parse_pars
+          can_meth
+          resolve_meth
+          load_role
         )
     ],
     default => [qw( %REGISTRY refaddr )],
@@ -93,11 +96,9 @@ our @EXPORT = @{ $EXPORT_TAGS{default} };    # ??? is this needed?
 our @EXPORT_OK = ( map { $_->@* } values %EXPORT_TAGS, );
 
 
-use Role::Tiny::With;
-with 'Iterator::Flex::Role::Utils';
-
 sub throw_failure ( $failure, $msg ) {
     require Iterator::Flex::Failure;
+    local @Iterator::Flex::Role::Utils::CARP_NOT = scalar caller;
     my $type = join( q{::}, 'Iterator::Flex::Failure', $failure );
     $type->throw( { msg => $msg, trace => Iterator::Flex::Failure->croak_trace } );
 }
@@ -137,6 +138,146 @@ sub parse_pars ( @args ) {
     return ( \%pars, \%ipars, \%spars );
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sub can_meth ( $obj, @methods ) {
+
+    my $par = Ref::Util::is_hashref( $methods[-1] ) ? pop @methods : {};
+
+    for my $method ( @methods ) {
+        throw_failure( parameter => q{'method' parameters must be a string} )
+          if Ref::Util::is_ref( $method );
+
+        my $sub;
+        foreach ( "__${method}__", $method ) {
+            if ( defined( $sub = $obj->can( $_ ) ) ) {
+                my @ret = ( ( !!$par->{name} ? $_ : () ), ( !!$par->{code} ? $sub : () ) );
+                push @ret, $sub unless @ret;
+                return @ret > 1 ? @ret : $ret[0];
+            }
+        }
+    }
+
+    return undef;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sub resolve_meth ( $target, $method, @fallbacks ) {
+
+    my $code = do {
+
+        if ( defined $method ) {
+            Ref::Util::is_coderef( $method )
+              ? $method
+              : $target->can( $method )
+              // throw_failure( parameter => qq{method '$method' is not provided by the object} );
+        }
+
+        else {
+            can_meth( $target, @fallbacks );
+        }
+    };
+
+    return $code;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sub load_module ( $path, @namespaces ) {
+
+    if ( substr( $path, 0, 1 ) eq q{+} ) {
+        my $module = substr( $path, 1 );
+        return $module if eval { Module::Runtime::require_module( $module ) };
+        throw_failure( class => "unable to load $module" );
+    }
+    else {
+        for my $namespace ( @namespaces ) {
+            my $module = $namespace . q{::} . $path;
+            return $module if eval { Module::Runtime::require_module( $module ) };
+        }
+    }
+
+    throw_failure(
+        class => join q{ },
+        "unable to find a module for '$path' in @{[ join( ', ', @namespaces ) ]}"
+    );
+}
+
+
+
+
+
+
+
+
+
+
+
+sub load_role ( $role, @namespaces ) {
+    load_module( $role, @namespaces );
+}
+
+
 1;
 
 #
@@ -153,7 +294,7 @@ __END__
 
 =pod
 
-=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory fallbacks
 
 =head1 NAME
 
@@ -161,7 +302,7 @@ Iterator::Flex::Utils - Internal utilities
 
 =head1 VERSION
 
-version 0.30
+version 0.31
 
 =head1 SUBROUTINES
 
@@ -174,6 +315,70 @@ L<model|Iterator::Flex::Manual::Overview/Model Parameters>
 L<interface|Iterator::Flex::Manual::Overview/Interface Parameters>
 L<signal|Iterator::Flex::Manual::Overview/Signal Parameters>
 parameters from C<%args>.
+
+=head2 can_meth
+
+  $code = can_meth( $obj, @method, ?\%pars );
+
+Scans an object to see if it provides one of the specified
+methods. For each C<$method> in C<@methods>, it probes for
+C<__$method__>, then C<$method>.
+
+By default, it returns a reference to the first method it finds,
+otherwise C<undef> if none was found.
+
+The return value can be altered using C<%pars>.
+
+=over
+
+=item name
+
+return the name of the method.
+
+=item code
+
+return the coderef of the method. (Default)
+
+=back
+
+If both C<code> and C<name> are specified, both are returned as a
+list, C<name> first:
+
+  ($name, $code ) = can_meth( $obj, @methods, {name => 1, code => 1 } );
+
+=head2 resolve_meth
+
+  $code = resolve_meth( $target, $method, @fallbacks );
+
+Return a coderef to the specified method or one of the fallbacks.
+
+If C<$method> is a coderef, it is returned.
+
+If C<$method> is defined and is not a coderef, it is checked for directly via C<$target->can>.
+If it does not exist, a C<Iterator::Flex::Failure::parameter> error is thrown.
+
+If C<$method> is not defined, then C<< can_meth( $target, @fallbacks ) >> is returned.
+
+=head2 load_module
+
+  $module = load_module( $module, ?\@namespaces );
+
+Loads the named module.  If C<$module> begins with a C<+> it is
+assumed to be a fully qualified module name, otherwise it is searched
+for in the namespaces provided by C<@namespaces> (which defaults to
+the namespaces returned by the C<<
+L<_namespaces|Iterator::Flex::Base/_namespaces> >> class method.
+
+Throws C<Iterator::Flex::Failure::class> if it couldn't require
+the module (for whatever reason).
+
+=head2 load_role
+
+  $module = load_role( $role, @namespaces );
+
+Loads the named role.  If C<$role> begins with a C<+>, it is assumed
+to be a fully qualified name, otherwise it is searched for in the
+C<@namespaces>
 
 =head1 INTERNALS
 

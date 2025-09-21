@@ -1,3 +1,7 @@
+Travel::Status::DE::VRR 3.16 - Sat Sep 20 2025
+
+    * Add AVV ("AVV Augsburg", not Aachen) service definition
+
 Travel::Status::DE::VRR 3.15 - Sat Aug 30 2025
 
     * Trip->polyline: improve handling of trips that pass the same stop

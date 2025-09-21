@@ -8,6 +8,7 @@ build_requires:
   JSON::PP: '2.273'
   Module::Build: '0.42'
   Module::Build::Pluggable::CPANfile: '0.05'
+  Test2::Tools::Command: '0'
   Test::Differences: '0'
   Test::Exit: '0'
   Test::Kantan: '0'
@@ -39,7 +40,7 @@ provides:
     file: Base/JSON.pm
   MOP4Import::Declare:
     file: Declare.pm
-    version: '0.062'
+    version: '0.070'
   MOP4Import::Declare::Type:
     file: Declare/Type.pm
   MOP4Import::FieldSpec:
@@ -78,14 +79,14 @@ recommends:
   Cpanel::JSON::XS: '4.05'
   Data::Dumper: '2.160'
   File::AddInc: '0'
-  Module::Runtime: '0'
   YAML::Syck: '0'
 requires:
   JSON::MaybeXS: '0'
+  Module::Runtime: '0'
   Sub::Util: '1.40'
   perl: '5.010'
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/hkoba/perl-mop4import-declare
-version: '0.062'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '0.070'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

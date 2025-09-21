@@ -11,6 +11,8 @@ use attributes ();
 
 use constant DEBUG => $ENV{DEBUG_MOP4IMPORT};
 
+use Module::Runtime ();
+
 use MOP4Import::Base::Configure -as_base, qw/FieldSpec/;
 
 #========================================
@@ -19,6 +21,11 @@ use MOP4Import::Base::Configure -as_base, qw/FieldSpec/;
 
 sub cli_run :method {
   my ($class, $arglist, $opt_alias) = @_;
+
+  {
+    my $modFn = Module::Runtime::module_notional_filename($class);
+    $INC{$modFn} //= 1;
+  }
 
   my MY $self = $class->new($class->cli_parse_opts($arglist, undef, $opt_alias));
 

@@ -862,10 +862,8 @@ lib/App/SeismicUnixGui/developer/Stripped/well/suwellrf.su.main.well_logs
 lib/App/SeismicUnixGui/doc/FAQ_immodpg
 lib/App/SeismicUnixGui/doc/FAQ_SeismicUnixGui
 lib/App/SeismicUnixGui/doc/README_to_INSTALL
-lib/App/SeismicUnixGui/doc/SeismicUnixGuiInstallationGuide0.87.2.pdf
-lib/App/SeismicUnixGui/doc/SeismicUnixGuiInstallationGuide0.87.3.pdf
-lib/App/SeismicUnixGui/doc/SeismicUnixGuiTutorial0.87.2.pdf
-lib/App/SeismicUnixGui/doc/SeismicUnixGuiTutorial0.87.3.pdf
+lib/App/SeismicUnixGui/doc/SeismicUnixGuiInstallationGuide0.87.4.pdf
+lib/App/SeismicUnixGui/doc/SeismicUnixGuiTutorial0.87.4.pdf
 lib/App/SeismicUnixGui/fortran/bin/immodpg1.1
 lib/App/SeismicUnixGui/fortran/bin/stdsleep
 lib/App/SeismicUnixGui/fortran/Makefile
@@ -1012,7 +1010,6 @@ lib/App/SeismicUnixGui/misc/grey_flow.pm
 lib/App/SeismicUnixGui/misc/gui_history.pm
 lib/App/SeismicUnixGui/misc/help.pm
 lib/App/SeismicUnixGui/misc/iFile.pm
-lib/App/SeismicUnixGui/misc/junk
 lib/App/SeismicUnixGui/misc/L_SU.pm
 lib/App/SeismicUnixGui/misc/L_SU_global_constants.pm
 lib/App/SeismicUnixGui/misc/L_SU_local_user_constants.pm
@@ -1739,7 +1736,6 @@ lib/App/SeismicUnixGui/sunix/well/sugassman.pm
 lib/App/SeismicUnixGui/sunix/well/sulprime.pm
 lib/App/SeismicUnixGui/sunix/well/suwellrf.pm
 Makefile
-Makefile.old
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.bak
@@ -1754,7 +1750,6 @@ t/developer.t
 t/geopsy.t
 t/messages.t
 t/misc.t
-t/misc_files.txt
 t/script.t
 t/specs.t
 t/sunix.t

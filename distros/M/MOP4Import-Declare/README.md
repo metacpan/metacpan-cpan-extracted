@@ -2,3 +2,6 @@
 
 See [MOP4Import::Declare](Declare.pod)
 and [Why fields?](whyfields.pod).
+
+For Modulino lovers, I strongly recommend [MOP4Import::Base::CLI_JSON](Base/CLI_JSON.pod). I wish my other CPAN distributions ([File::AddInc](https://metacpan.org/dist/File-AddInc/view/lib/File/AddInc.pod) and [App::oo_modulino_zsh_completion_helper](https://metacpan.org/pod/App::oo_modulino_zsh_completion_helper)) might help you too.
+

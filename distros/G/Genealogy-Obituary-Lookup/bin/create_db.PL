@@ -12,7 +12,7 @@
 use strict;
 use warnings;
 
-# use Data::Dumper;
+use Data::Dumper;
 use DBI;
 # use DBD::SQLite::Constants qw/:file_open/;	# For SQLITE_OPEN_READONLY
 use File::HomeDir;
@@ -47,6 +47,7 @@ BEGIN {
 my %normalised;
 my $force_flag;
 my $dir = 'lib/Genealogy/Obituary/Lookup/data';
+my $bdir = File::Spec->catdir('blib', $dir);
 
 if(defined($ARGV[0]) && ($ARGV[0] eq '-f')) {
 	$force_flag++;
@@ -88,7 +89,8 @@ HTTP::Cache::Transparent::init({
 
 print "This will take some time. It'd be best to go and make yourself a cup of tea.\n";
 
-my $ua = LWP::UserAgent::WithCache->new(timeout => 60, keep_alive => 1);
+my $ua = $force_flag ? LWP::UserAgent->new(timeout => 60, keep_alive => 1) : LWP::UserAgent::WithCache->new(timeout => 60, keep_alive => 1);
+# my $ua = LWP::UserAgent->new(timeout => 60, keep_alive => 1);
 $ua->env_proxy(1);
 $ua->agent('Mozilla/5.0');
 $ua->conn_cache()->total_capacity(undef);
@@ -128,6 +130,7 @@ foreach my $line (split/^/ms, $data) {
 	}
 }
 
+# funeral_notices('taylor', 5229508);
 while(my($last, $page) = each %notices) {
 	funeral_notices($last, $page);
 }
@@ -194,6 +197,12 @@ $dbh->prepare('CREATE INDEX name_index ON obituaries(first, last)')->execute();
 $dbh->prepare('CREATE INDEX name_age_index ON obituaries(first, last, age)')->execute();
 $dbh->do('pragma optimize');
 $dbh->disconnect();
+
+if(-d $bdir) {
+	my $bfilename = File::Spec->catdir($bdir, 'obituaries.sql');
+	unlink($bfilename) if(-e $bfilename);
+	link $filename, $bfilename;
+}
 
 # Import the data section
 sub data
@@ -273,7 +282,15 @@ sub mlarchives($$) {
 	while(my $line = shift(@lines)) {
 		# LAST NAME, First Name (MAIDEN); Age; Place of Death; Newspaper Name; Newspaper date; tagname
 
+		chomp $line;
+		next if(length($line) == 0);
 		next if((defined($last_line)) && ($line eq $last_line));
+		if(($line =~ /The Obituary Daily Times \(ODT\) is/) ||
+		   ($line =~ /To unsubscribe from this mailing list, please send a message/)) {
+			$stage = 0;
+			next;
+		}
+		last if($line =~ /^RootsWeb is funded and supported/);
 		$last_line = $line;
 
 		$line =~ s/^\n//;
@@ -339,8 +356,17 @@ sub mlarchives($$) {
 		$line = decode_entities($line);
 		$line =~ s/'/''/g;
 		my ($name, $age, $place, $newspaper, $date, $tag) = split(/;\s?/, $line);
+		if(defined($age) && ($age =~ /D/)) {
+			# Handle emails?listname=gen-obit&page=33
+			#	HAGEN, Anton Oliver; Crosby ND&gt;Great Falls MT; Great Falls MT; GFTrib; 2013-4-15; ndvivi
+			my $unknown;
+			($name, $place, $newspaper, $unknown, $date, $tag) = split(/;\s?/, $line);
+		}
 
-		next if((!defined($tag)) || ($tag eq ''));
+		if((!defined($tag)) || ($tag eq '')) {
+			warn "$url: no tag in '$line'";
+		}
+		# print "$page: $tag\n";
 
 		# print __LINE__, ": $page: '$line' ", Data::Dumper->new([split(/;\s?/, $line)])->Dump();
 		next unless(defined($name));
@@ -364,10 +390,11 @@ sub mlarchives($$) {
 			queue($first, normalise_name($last), $maiden, $age, $place, $date, $newspaper, 'M', $page);
 			# $entries++;
 		}
+		# $maiden ||= '';
 		# print "\"$last\",\"$first\",\"$maiden\",\"$age\",\"$place\",\"$date\",\"$newspaper\"\n" if($last =~ /^[A-Z]/);
 		$rc = 1;
 	}
-	die "Couldn't parse $url" if(!defined($rc));
+	die "\nCouldn't parse $url" if(!defined($rc));
 	# print "\n\t$entries\n";
 	return 1;
 }
@@ -486,7 +513,7 @@ sub funeral_notices
 
 	# Fetch the webpage
 	my $response = $ua->get($url);
-	die "Failed to fetch the webpage: ", $response->status_line unless $response->is_success;
+	die 'Failed to fetch the webpage: ', $response->status_line() unless $response->is_success();
 	my $content = $response->decoded_content();
 
 	my $maiden;
@@ -526,6 +553,7 @@ sub funeral_notices
 		} else {
 			die "Can't find location in $url";
 		}
+		$place =~ s/'/''/g;	# E.g. St Augustine's
 		$place .= ', United Kingdom';
 		if($content =~ /published in:<\/span> (.+)<\/h2>/is) {
 			if($1 =~ /funeral-notices.co.uk\./) {
@@ -577,9 +605,14 @@ sub queue($$$$$$$$$)
 		# $age =~ s/\s+//g;
 		# $columns{'age'} = $age;
 	# }
-	if(defined $age && $age =~ /^\d+$/) {
-		# $age =~ s/\s+//g;
-		$columns{age} = $age;
+	if(defined($age)) {
+		$age =~ s/\s+//g;
+		if($age =~ /\D/) {
+			print STDERR Data::Dumper->new([\@_])->Dump();
+			warn "Invalid age '$age'";
+			return;
+		}
+		$columns{age} = $age if(length($age));
 	}
 
 	# Add maiden name if provided
@@ -721,4 +754,5 @@ __DATA__
 "Malva",,"Ridge",88,,"2024-02-15","https://funeral-notices.co.uk/notice/ridge/5174115"
 "Paul",,"Batchelor",60,,"2024-02-21","https://funeral-notices.co.uk/notice/batchelor/5175192"
 "Pamela",,"Lambert",82,,"2024-02-24","https://funeral-notices.co.uk/notice/lambert/5175963"
-"Rodney",,"Bishop",84,"Brownwood, TX, USA","2024-02-26","https://www.brownwoodnews.com/2024/02/26/rodney-dwain-bishop/"
+"Rodney",,"Bishop",,84,"Brownwood, TX, USA","2024-02-26","https://www.brownwoodnews.com/2024/02/26/rodney-dwain-bishop/"
+"Wallace","Elizabeth","Wallace",,65,"Algonquin Grace Hospice, AL, USA","2025-09-29","https://doppleronline.ca/huntsville/sharon-elizabeth-wallace/"

@@ -53,6 +53,7 @@ my $prereqs = {
 	'Module::Info' => 0,
 	'Object::Configure' => 0.12,
 	'Params::Get' => 0.13,
+	'Params::Validate::Strict' => 0.09,
 	'Return::Set' => 0,
 	'Scalar::Util' => 0,
 	'Text::CSV' => 0,
@@ -111,7 +112,9 @@ WriteMakefile(
 	dist => $dist,
 	clean => { FILES => 'Genealogy-Obituary-Lookup-*' },
 	realclean => {
-		FILES => 'Genealogy-Obituary-Lookup-* lib/Genealogy/Obituary/Lookup/data'
+		# This would seem logical, but it will break "make && make test" even though you don't call "make realclean"
+		# FILES => 'Genealogy-Obituary-Lookup-* lib/Genealogy/Obituary/Lookup/data'
+		FILES => 'Genealogy-Obituary-Lookup-*'
 	},
 	# META_ADD => {
 		# provides => {}

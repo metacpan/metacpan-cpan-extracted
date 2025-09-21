@@ -6,10 +6,10 @@ use strict;
 use warnings;
 use experimental qw( signatures declared_refs refaliasing );
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 use Iterator::Flex::Utils qw( RETURN STATE EXHAUSTION :IterAttrs :IterStates );
-use Iterator::Flex::Factory;
+use Iterator::Flex::Factory 'to_iterator';
 use parent 'Iterator::Flex::Base';
 use List::Util 'all';
 
@@ -75,7 +75,7 @@ sub new ( $class, @args ) {
 }
 
 sub construct ( $class, $state ) {
-    $class->_throw( parameter => q{state must be a HASH reference} )
+    throw_failure( parameter => q{state must be a HASH reference} )
       unless Ref::Util::is_hashref( $state );
 
     $state->{value} //= [];
@@ -85,7 +85,7 @@ sub construct ( $class, $state ) {
 
     # transform into iterators if required.
     my @stack
-      = map { Iterator::Flex::Factory->to_iterator( $_, { ( +EXHAUSTION ) => RETURN } ) } @depends;
+      = map { to_iterator( $_, { ( +EXHAUSTION ) => RETURN } ) } @depends;
     my @snapshot = @stack;
 
     # --- cargo cult??
@@ -94,18 +94,36 @@ sub construct ( $class, $state ) {
     #   if $thaw;
 
     my $self;
+
+    my $iter;
+    my $is_exhausted;
     my $iterator_state;
+
+    my sub init {
+        $iterator_state = IterState_EXHAUSTED;
+        if ( @stack ) {
+            $iter           = $stack[0];
+            $is_exhausted   = $iter->can( 'is_exhausted' );
+            $iterator_state = IterState_CLEAR;
+        }
+    }
+    init();
+
     my %params = (
+
+        ( +_NAME ) => 'istack',
 
         ( +_SELF ) => \$self,
 
         ( +RESET ) => sub {
             $prev  = $current = undef;
             @stack = @snapshot;
+            init();
         },
 
         ( +REWIND ) => sub {
             @stack = @snapshot;
+            init();
         },
 
         ( +STATE ) => \$iterator_state,
@@ -113,17 +131,16 @@ sub construct ( $class, $state ) {
         ( +NEXT ) => sub {
             return $self->signal_exhaustion if $iterator_state == IterState_EXHAUSTED;
 
-            while ( @stack ) {
-                my $iter  = $stack[0];
+            while ( 1 ) {
                 my $value = $iter->();
 
-                unless ( $iter->is_exhausted ) {
-                    $prev    = $current;
-                    $current = $value;
-                    return $current;
+                if ( defined( $value ) || !$iter->$is_exhausted ) {
+                    $prev = $current;
+                    return $current = $value;
                 }
 
-                shift @stack;
+                last unless defined( $iter = shift @stack );
+                $is_exhausted = $iter->can( 'is_exhausted' );
             }
 
             $prev = $current;
@@ -145,19 +162,33 @@ sub construct ( $class, $state ) {
 
         ( +METHODS ) => {
             push => sub ( $, @iters ) {
-                push @stack,
-                  map { Iterator::Flex::Factory->to_iterator( $_, { ( +EXHAUSTION ) => RETURN } ) } @iters;
+                push @stack, map { to_iterator( $_, { ( +EXHAUSTION ) => RETURN } ) } @iters;
                 $self->_clear_state;
+                init() if @stack == 1;
             },
+
             pop => sub ($) {
+                if ( @stack == 1 ) {
+                    $iterator_state = IterState_EXHAUSTED;
+                    $iter           = $is_exhausted = undef;
+                }
                 return CORE::pop( @stack );
             },
+
             unshift => sub ( $, @iters ) {
-                unshift @stack,
-                  map { Iterator::Flex::Factory->to_iterator( $_, { ( +EXHAUSTION ) => RETURN } ) } @iters;
-                $self->_clear_state;
+                unshift @stack, map { to_iterator( $_, { ( +EXHAUSTION ) => RETURN } ) } @iters;
+                init();
             },
-            shift => sub ($) { return CORE::shift( @stack ); },
+
+            shift => sub ($) {
+                if ( @stack == 1 ) {
+                    $iterator_state = IterState_EXHAUSTED;
+                    $iter           = $is_exhausted = undef;
+                }
+                my $ret = CORE::shift( @stack );
+                init();
+                return $ret;
+            },
 
             snapshot => sub ($) {
                 @snapshot = @stack;
@@ -166,7 +197,6 @@ sub construct ( $class, $state ) {
 
     );
 
-    $params{ +_NAME } = 'istack';
     return \%params;
 }
 
@@ -204,7 +234,7 @@ Iterator::Flex::Stack - An iterator which concatenates a set of iterators
 
 =head1 VERSION
 
-version 0.30
+version 0.31
 
 =head1 METHODS
 

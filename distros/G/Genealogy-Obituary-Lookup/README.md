@@ -15,7 +15,7 @@ Genealogy::Obituary::Lookup - Lookup an obituary
 
 # VERSION
 
-Version 0.18
+Version 0.20
 
 # SYNOPSIS
 
@@ -68,6 +68,53 @@ Supports two return modes:
 
     Returns a single hash reference,
     or `undef` if there is no match.
+
+### FORMAL SPECIFICATION
+
+#### INPUT
+
+    {
+      'last' => {
+        type => 'string',
+        min => 1,
+        max => 100,
+        matches => qr/^[\w\-]+$/  # Allow hyphens in surnames
+      }, 'first' => {
+        type => 'string',
+        optional => 1,
+        min => 1,
+        max => 100
+      }, 'middle' => {
+        type => 'string',
+        optional => 1,
+        min => 1,
+        max => 100
+      }, 'age' => {
+        type => 'integer',
+        optional => 1,
+        min => 0,
+        max => 120
+      }
+    }
+
+#### OUTPUT
+
+Argument error: croak
+No matches found: undef
+
+Scalar context:
+
+    {
+      'type' => 'hashref',
+      'min' => 1
+    }
+
+List context:
+
+    {
+      'type' => 'array',
+      'min' => 1
+    }
 
 # AUTHOR
 

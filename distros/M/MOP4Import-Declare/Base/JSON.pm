@@ -46,23 +46,23 @@ sub cli_encode_json_as_bytes {
   my $json = do {
     if (not USING_CPANEL_JSON_XS) {
       $codec->encode($obj);
-    } else {
-      push @opts, do {
-        if (defined $json_type) {
-          $self->cli_json_type_of($json_type) // $json_type;
-        } elsif (ref $obj) {
-          $self->cli_json_type_of(ref $obj);
-        } else {
-          ();
-        }
-      };
-      if (not (my $sub = UNIVERSAL::can($obj, 'TO_JSON'))) {
-        $codec->encode($obj, @opts);
-      } elsif (ref (my $conv = $sub->($obj))) {
-        $codec->encode($conv, @opts);
+    }
+    elsif (defined $json_type) {
+      $codec->encode($obj, $self->cli_json_type_of($json_type) // $json_type);
+    }
+    elsif (my $sub = UNIVERSAL::can($obj, 'TO_JSON')) {
+      my $conv = $sub->($obj);
+      if (ref $conv eq 'HASH') {
+        $codec->encode($conv, $self->cli_json_type_of(ref $obj));
       } else {
-        $conv;
+        $codec->encode($conv);
       }
+    }
+    elsif (ref $obj and my @opts = $self->cli_json_type_of(ref $obj)) {
+      $codec->encode($obj, @opts);
+    }
+    else {
+      $codec->encode($obj);
     }
   };
   $json;

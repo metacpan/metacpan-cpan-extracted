@@ -4,34 +4,28 @@
 
 use strict;
 use warnings;
-use URI::Find;
+use autodie qw(:all);
+
 use MIME::QuotedPrint;
+use Path::Tiny;
+use URI::Find;
 
-# Check if a filename was provided as an argument
-if(@ARGV != 1) {
-	die "Usage: $0 <filename>";
+# Read from a file if given, otherwise from STDIN
+my $content;
+if(@ARGV == 1) {
+	# Decode quoted-printable content
+	$content = decode_qp(Path::Tiny::path($ARGV[0])->slurp());
+} else {
+	local $/;
+	$content = decode_qp(<STDIN>);
 }
-
-my $filename = $ARGV[0];
-
-# Open the file for reading
-open my $fh, '<', $filename or die "Could not open file '$filename': $!";
-
-# Read the entire file content
-my $encoded_content = do { local $/; <$fh> };
-
-# Close the file
-close $fh;
-
-# Decode quoted-printable content
-my $content = decode_qp($encoded_content);
 
 my @entries;
 
 # Create a URI::Find object to extract URLs
 my $finder = URI::Find->new(sub {
 	my $uri = shift;
-	if($uri =~ /funeral-notices\.co\.uk\/notice\/(.+)\/(.+)/) {
+	if($uri =~ m{funeral-notices\.co\.uk/notice/([^/]+)/([^/?#]+)}) {
 		# print "Found URL: $uri\n";
 		# print "'$1' => $2,\n";	# How it will appear in bin/create_DB.pl
 		push @entries, { name => $1, id => $2 };

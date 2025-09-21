@@ -5,7 +5,7 @@ package Iterator::Flex::Role::Reset::Method;
 use strict;
 use warnings;
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 use Role::Tiny;
 
@@ -61,7 +61,7 @@ Iterator::Flex::Role::Reset::Method - Implement C<reset> as a method
 
 =head1 VERSION
 
-version 0.30
+version 0.31
 
 =head1 METHODS
 

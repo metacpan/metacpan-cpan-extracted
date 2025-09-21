@@ -3,7 +3,9 @@ abstract: 'SQL concatenator, only cares about bind-vars, to write SQL generator'
 author:
   - 'Kobayasi, Hiroaki <hkoba @ cpan.org>'
 build_requires:
+  Cpanel::JSON::XS: '0'
   Test::Kantan: '0.4'
+  Test::Spec: '0'
   rlib: '0'
 configure_requires:
   Module::Build: '0'
@@ -12,7 +14,7 @@ configure_requires:
   Module::CPANfile: '0'
   rlib: '0'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.11, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.25, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,19 +33,19 @@ no_index:
 provides:
   SQL::Concat:
     file: lib/SQL/Concat.pm
-    version: '0.002'
+    version: '0.010'
 requires:
-  MOP4Import::Declare: '0.003'
+  MOP4Import::Declare: '0.07'
   perl: '5.010'
   rlib: '0'
 resources:
   bugtracker: https://github.com/hkoba/perl-SQL-Concat/issues
   homepage: https://github.com/hkoba/perl-SQL-Concat
-  repository: git://github.com/hkoba/perl-SQL-Concat.git
-version: '0.002'
+  repository: https://github.com/hkoba/perl-SQL-Concat.git
+version: '0.010'
 x_authority: cpan:HKOBA
 x_contributors:
   - 'KOBAYASI, Hiroaki <hkoba@ssri.com>'
   - 'Kobayasi, Hiroaki <buribullet@gmail.com>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
 x_static_install: 1

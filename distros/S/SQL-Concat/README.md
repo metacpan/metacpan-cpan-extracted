@@ -1,4 +1,3 @@
-[![Build Status](https://travis-ci.org/hkoba/perl-SQL-Concat.svg?branch=master)](https://travis-ci.org/hkoba/perl-SQL-Concat)
 # NAME
 
 SQL::Concat - SQL concatenator, only cares about bind-vars, to write SQL generator
@@ -6,46 +5,34 @@ SQL::Concat - SQL concatenator, only cares about bind-vars, to write SQL generat
 # SYNOPSIS
 
 ```perl
-#
-# Functional interface
-#
-use SQL::Concat qw/SQL/;
+use SQL::Concat qw/SQL Q WHERE/;
 
-$q = SQL("SELECT uid FROM authors"); # Just single fixed SQL
+# core function: SQL(...SQL_FRAGMENTS...)
+$q = SQL("select * from books", ["where name = ?", 'foo'], "limit 3");
 
-$q = SQL("SELECT uid FROM authors"   # Fixed SQL fragment
+[$q->as_sql_bind];
+# ==> ['select * from books where name = ? limit 3', 'foo']
 
-        , ["WHERE name = ?", 'foo']  # Pair of placeholder(s) and value(s)
+# Easy wrapper: Q($SQL, @bind)
+# creates a SQL::Concat instance (with . operator overload)
+$q = Q("select * from books where name = ? limit 3", 'foo');
+$q = Q("select * from books")  . Q("where name = ?", 'foo'). "limit 3";
+$q =   "select * from books"   . Q("where name = ?", 'foo'). "limit 3";
+$q = Q(). "select * from books" . ["where name = ?", 'foo']. "limit 3";
 
-        , "ORDER BY uid"             # Fixed SQL fragment (again)
+# Erasable 'WHERE': WHERE(...SQL_FRAGMENTS...)
+$q = "select * from books" . WHERE() . "order by price";
+# ==> ["select * from books order by price"]
 
-        , ($reverse ? "desc" : ())   # Conditional Fixed SQL fragment
-      );
+$q = "select * from books".WHERE(["name = ?", 'foo'])."order by price";
+# ==> ["select * from books WHERE name = ? order by price", 'foo']
 
-$q = SQL($q                          # SQL(SQL(SQL(...), SQL(..))) is ok
-         , "LIMIT 10"
-         , ["OFFSET ?", 30]
-      );
-
-# Extract concatenated SQL and bind vars.
-#
-($sql, @binds) = $q->as_sql_bind;
-# ==>
-# SQL: SELECT uid FROM authors WHERE name = ? ORDER BY uid LIMIT 10 OFFSET ?
-# BIND: ('foo', 30)
-
-#
-# SQL() doesn't care about composed SQL syntax. It just concat given args.
-#
-$q = SQL("SELECT uid", "FROM authors");
-$q = SQL("SELECT uid FROM", "authors");
-$q = SQL(SELECT => uid => FROM => 'authors');
-
-#
 # OO Interface
-#
-my $comp = SQL::Concat->new(sep => ' ')
-  ->concat(SELECT => foo => FROM => 'bar');
+my $comp = SQL::Concat->new(sep => ' ')->concat(
+  "select * from books",
+  ["where name = ?", 'foo'],
+  "order by price",
+);
 ```
 
 # DESCRIPTION
@@ -64,7 +51,7 @@ with keeping their corresponding bind variables.
 
 To run complex queries on RDBs, you must compose complex SQLs.
 There are many feature-rich SQL generators on CPAN to help these tasks
-(e.g. [SQL::Abstract](https://metacpan.org/pod/SQL::Abstract), [SQL::Maker](https://metacpan.org/pod/SQL::Maker), [SQL::QueryMaker](https://metacpan.org/pod/SQL::QueryMaker), ...).
+(e.g. [SQL::Abstract](https://metacpan.org/pod/SQL%3A%3AAbstract), [SQL::Maker](https://metacpan.org/pod/SQL%3A%3AMaker), [SQL::QueryMaker](https://metacpan.org/pod/SQL%3A%3AQueryMaker), ...).
 Unfortunately, they themselves come with their own syntax and semantics
 and have significant learning cost.
 And anyway, when you want to generate complex SQL at some level,
@@ -260,6 +247,50 @@ $c = CAT("AND"
 
 # FUNCTIONS
 
+## `Q($SQL, @BIND_VALUES)`
+
+`Q($SQL, @BIND)` creates SQL::Concat instance with given bind values.
+Since SQL::Concat overloads '.' operator, you can create complex SQL with placeholders just using string concatenation.
+
+```
+$q = Q("select * from foo where x = ? and y = ? limit 10", 3, 8);
+$q = "select * from foo".Q("where x = ? and y = ?", 3, 8)."limit 10";
+$q = Q()."select * from foo".["where x = ? and y = ?", 3, 8]."limit 10";
+```
+
+Internally, `Q($SQL, @BIND)` is defined using `SQL()`:
+
+```perl
+SQL(@_ ? [@_] : ())
+```
+
+## `WHERE(@ITEMS...)`
+
+`WHERE(...)` creates SQL::Concat instance. If given `@ITEMS` are not empty,
+it returns a keyword `WHERE` and given items. Otherwise, it returns `Q()`.
+
+```
+$q = WHERE($name ? ["name = ?", $name] : ());
+```
+
+Internally, `WHERE(...)` is defined using `PFX()`:
+
+```perl
+PFX(WHERE => @_);
+```
+
+## `AND(@ITEMS...)`
+
+```perl
+CAT(AND => @_)->paren;
+```
+
+## `OR(@ITEMS...)`
+
+```perl
+CAT(OR => @_)->paren;
+```
+
 ## `SQL( @ITEMS... )`
 
 
@@ -338,10 +369,12 @@ SQL(defined $limit
 )
 ```
 
-## `PAR( @ITEMS... )`
+## `PAREN( @ITEMS... )`
 
 
 Equiv. of `SQL( ITEMS...)->paren`
+
+`PAR()` is an alias of `PAREN()`
 
 ## `CSV( @ITEMS... )`
 
@@ -356,13 +389,13 @@ you can write `SQL(SELECT => "x, y, z")` instead of `SQL(SELECT => CSV(qw/x y z/
 ## `SQL::Concat->new(%args)`
 
 
-Constructor, inherited from [MOP4Import::Base::Configure](https://metacpan.org/pod/MOP4Import::Base::Configure).
+Constructor, inherited from [MOP4Import::Base::Configure](https://metacpan.org/pod/MOP4Import%3A%3ABase%3A%3AConfigure).
 
 ### Options
 
 Following options has their getter.
 To set these options after new,
-use ["configure" in MOP4Import::Base::Configure](https://metacpan.org/pod/MOP4Import::Base::Configure#configure) method.
+use ["configure" in MOP4Import::Base::Configure](https://metacpan.org/pod/MOP4Import%3A%3ABase%3A%3AConfigure#configure) method.
 
 - sep
 
@@ -526,7 +559,7 @@ ORDER BY fid desc, feno desc
 
 # SEE ALSO
 
-[SQL::Object](https://metacpan.org/pod/SQL::Object), [SQL::Maker](https://metacpan.org/pod/SQL::Maker), [SQL::QueryMaker](https://metacpan.org/pod/SQL::QueryMaker)
+[SQL::Object](https://metacpan.org/pod/SQL%3A%3AObject), [SQL::Maker](https://metacpan.org/pod/SQL%3A%3AMaker), [SQL::QueryMaker](https://metacpan.org/pod/SQL%3A%3AQueryMaker)
 
 # LICENSE
 

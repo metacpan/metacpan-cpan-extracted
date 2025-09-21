@@ -839,7 +839,7 @@ sub get_base_file_name_aref {
 		$control->remove_su_suffix4aref();
 		my $base_file_name_aref = $control->get_base_file_name_aref();
 
-		print("manage_files_by2, get_base_file_names, values=@$base_file_name_aref\n");
+		# print("manage_files_by2, get_base_file_names, values=@$base_file_name_aref\n");
 		
 		my $result_a = $base_file_name_aref;
 		my $result_b = $num_files;

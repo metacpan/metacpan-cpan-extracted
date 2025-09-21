@@ -6,11 +6,11 @@ use strict;
 use warnings;
 use experimental qw( signatures postderef );
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 use parent 'Iterator::Flex::Base';
 use Iterator::Flex::Utils qw( STATE :IterAttrs :IterStates throw_failure );
-use Iterator::Flex::Factory;
+use Iterator::Flex::Factory 'to_iterator';
 use Scalar::Util;
 use Ref::Util;
 
@@ -68,7 +68,7 @@ sub new ( $class, $iterable, $pars = {} ) {
 
     $class->SUPER::new( {
             capacity => $capacity,
-            depends  => [ Iterator::Flex::Factory->to_iterator( $iterable ) ],
+            depends  => [ to_iterator( $iterable ) ],
         },
         \%pars
     );
@@ -85,7 +85,7 @@ sub new ( $class, $iterable, $pars = {} ) {
 
 sub construct ( $class, $state ) {
 
-    $class->_throw( parameter => q{state must be a HASH reference} )
+    throw_failure( parameter => q{state must be a HASH reference} )
       unless Ref::Util::is_hashref( $state );
 
     my ( $src, $capacity, $idx, $cache ) = @{$state}{qw[ depends capacity idx cache ]};
@@ -94,6 +94,7 @@ sub construct ( $class, $state ) {
     $cache //= [];
 
     my $self;
+    my $is_exhausted = $src->can( 'is_exhausted' );
     my $iterator_state;
 
     return {
@@ -127,7 +128,7 @@ sub construct ( $class, $state ) {
             my $current = $cache->[$idx] = $src->();
 
             return $self->signal_exhaustion
-              if $src->is_exhausted;
+              if $src->$is_exhausted;
 
             return $current;
         },
@@ -183,7 +184,7 @@ Iterator::Flex::Cache - Cache Iterator Class
 
 =head1 VERSION
 
-version 0.30
+version 0.31
 
 =head1 METHODS
 

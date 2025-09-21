@@ -42,6 +42,6 @@
          "web" : "https://github.com/vadrerko/perl-tvision"
       }
    },
-   "version" : "0.24",
+   "version" : "0.25",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

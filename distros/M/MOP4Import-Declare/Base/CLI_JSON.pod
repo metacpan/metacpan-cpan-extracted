@@ -2,330 +2,362 @@
 
 =head1 NAME
 
-MOP4Import::Base::CLI_JSON - OO-Modulino with NDJSON args/outputs
+MOP4Import::Base::CLI_JSON - Base class for rapidly building testable CLI modules with JSON I/O
 
 =head1 SYNOPSIS
-
-In F<MyScript.pm>
 
 =for code perl
 
   #!/usr/bin/env perl
   package MyScript;
-  
+
   use MOP4Import::Base::CLI_JSON -as_base,
-      [fields => qw/verbose/, [structs => doc => "usage of this field"]];
-  
-  unless (caller) {
-    MY->cli_run(\@ARGV, {h => "help", v => 'verbose', d => 'debug'});
+      [fields =>
+        [verbose => doc => "Enable verbose output", json_type => 'bool'],
+        [config  => doc => "Config file path", json_type => 'string']
+      ];
+
+  MY->cli_run(\@ARGV) unless caller;
+
+  # Official CLI command - handles its own output
+  sub cmd_status : Doc("Show system status") {
+    my ($self) = @_;
+    print "System OK\n";
   }
-  
-  sub cmd_foo : Doc("This prints FOO") {
-    print "FOO\n"
+
+  # Regular method - output handled by CLI_JSON
+  sub query {
+    my ($self, $sql) = @_;
+    # Returns data structure that will be JSON-encoded
+    return {result => "data from $sql"};
   }
-  
-  sub bar {
-    (my MY $self) = @_;
-    ([arguments => @ARGV], [structs => $self->{structs}])
-  }
-  
+
   1;
 
 From shell:
 
 =for code sh
 
-  % chmod a+x MyScript.pm
-  % ./MyScript.pm -h
-  Usage: MyScript.pm [--opt=value].. <Command> ARGS...
-  
-  Commands
-    foo        This prints FOO
-    help        
-  
-  
-  Options from MyScript:
-    --verbose       
-    --structs       usage of this field
-  
-  Options from MOP4Import::Base::CLI_JSON:
-    --help          show this help message
-    --quiet         to be (somewhat) quiet
-    --scalar        evaluate methods in scalar context
-    --output        choose output serializer (ndjson/json/tsv/dump)
-    --undef-as      serialize undef as this value. used in tsv output
-    --no-exit-code  exit with 0(EXIT_SUCCESS) even when result was falsy/empty
-    --binary        keep STDIN/OUT/ERR binary friendly
-  %
-  % ./MyScript.pm foo
-  FOO
-  %
-  % ./MyScript.pm --structs='[1,2,{"x":"y"}]' bar '["baz",{"qux":"quux"}]' '{"other":"arg"}'
-  ["arguments",["baz",{"qux":"quux"}],{"other":"arg"}]
-  ["structs",[1,2,{"x":"y"}]]
+  # Show help
+  $ ./MyScript.pm --help
+
+  # Call official command
+  $ ./MyScript.pm status
+  System OK
+
+  # Call regular method (output as NDJSON by default)
+  $ ./MyScript.pm query "SELECT * FROM users"
+  {"result":"data from SELECT * FROM users"}
+
+  # Use different output format
+  $ ./MyScript.pm --output=yaml query "test"
+  ---
+  result: data from test
+
+  # Pass complex data structures as arguments
+  $ ./MyScript.pm process '{"key":"value"}' '[1,2,3]'
 
 =head1 DESCRIPTION
 
-MOP4Import::Base::CLI_JSON (or CLI_JSON for short in this document)
-is my latest boilerplate base class to write B<Object-Oriented Modulinos>
-(or OO Modulino),
-a variant of Modulino which I propose in this document.
-Note: you can write basic OO Modulino without any help of my modules, as I demonstrate soon below.
+MOP4Import::Base::CLI_JSON enables rapid development of Perl modules by making
+any method immediately testable from the command line. It provides automatic
+JSON serialization for inputs and outputs, making it ideal for exploratory
+development and debugging.
 
-=head2 What is OO Modulino?
-
-A Modulino is a Perl file that can act both as an executable or as a module
-(See L<these|https://perlmaven.com/modulino-both-script-and-module>
-good L<articles|https://www.masteringperl.org/category/chapters/modulinos/>).
-With Modulino, you can use some function(s) of the module
-from CLI without writing scripts or C<perl -e ...>.
-Though which functions you can use depend on how the Modulino is written.
-Generally, to use arbitrary public functions from given Modulino,
-you may still need to write some scripts.
-
-So, what is OO Modulino? An OO Modulino is a Perl file that can act both as
-a class module or as a CLI executable (create an instance and
-invoke a specified method). OO Modulino B<standardizes> the CLI behavior
-of Modulino about object construction, method invocation, and output handling
-from CLI so that you can test-drive almost all public features of the class
-by just giving a method name and parameters without worrying about its details.
-
-So, how do you standardize CLI behavior of OO Modulino?
-We can mimic CLI behaviors from well-known complex CLI apps.
-Just recall C<git> command usage. It has many subcommands like C<add>, C<commit>, C<push>... These can be used as method names.
-It also takes global options like C<< --git-dir=<path> >>, C< --no-pager> ...
-These can be used as constructor parameters.
-
-For example, suppose you have a module F<Greetings.pm> like followings:
-
-  package Greetings;
-  use strict;
-  use warnings;
-  
-  sub new  { my $class = shift; bless +{@_}, $class }
-  
-  sub hello { my $self = shift; join " ", "Hello", $self->{name} }
-  
-  sub goodnight { my $self = shift; join(" ", "Good night" => $self->{name}, @_)}
-  
-  1;
-
-To test above from CLI, you may write:
-
-  % perl -I. -MGreetings -le 'print Greetings->new(name => "world")->hello'
-
-
-Minimalistic form of OO Modulino of the above could be written
-by adding an C<unless (caller) {...}> block like followings:
-
-  #!/usr/bin/env perl
-  package Greetings_oo_modulino;
-  use strict;
-  use warnings;
-  
-  unless (caller) {
-    my $self = __PACKAGE__;
-  
-    my $cmd = shift
-      or die "Usage: $0 COMMAND ARGS...\n";
-  
-    print $self->new(name => "world")->$cmd(@ARGV), "\n";
-  }
-  
-  sub new  { my $class = shift; bless +{@_}, $class }
-  
-  sub hello { my $self = shift; join " ", "Hello", $self->{name} }
-  
-  sub goodnight { my $self = shift; join(" ", "Good night" => $self->{name}, @_)}
-  
-  1;
-
-You can test OO Modulino like following:
-
-  % ./Greetings_oo_modulino.pm hello
-
-Extending this to pass constructor options is easily achived
-by replacing C<unless (caller)> block and rest like followings:
-
-  use fields qw/name/;
-  sub MY () {__PACKAGE__}
-  
-  unless (caller) {
-    my $self = MY->new(name => 'world', MY->_parse_posix_opts(\@ARGV));
-  
-    my $cmd = shift
-      or die "Usage: $0 COMMAND ARGS...\n";
-  
-    print $self->$cmd(@ARGV), "\n";
-  }
-  
-  sub _parse_posix_opts {
-    my ($class, $list) = @_;
-    my @opts;
-    while (@$list and $list->[0] =~ /^--(?:(\w+)(?:=(.*))?)?\z/s) {
-      shift @$list;
-      last unless defined $1;
-      push @opts, $1, $2 // 1;
-    }
-    @opts;
-  }
-
-  sub new  { my MY $self = fields::new(shift); %$self = @_; $self }
-  
-  sub hello { my MY $self = shift; join " ", "Hello", $self->{name} }
-  
-  sub goodnight { my MY $self = shift; join " ", "Good night" => $self->{name}, @_}
-  
-  1;
-
-
-Now you can test OO Modulino with construction parameters like following:
-
-  % ./Greetings_oo_modulino_with_fields.pm --name=Universe hello
-  Hello Universe
-  %
-
-With L<fields>, you can reject unknown options at initialization.
-
-  % ./Greetings_oo_modulino_with_fields.pm --foo=bar xx
-  Attempt to access disallowed key 'foo' in a restricted hash at ./Greetings_oo_modulino_with_fields.pm line 29.
-
-=head2 About CLI_JSON
-
-Using CLI_JSON as a base class, you can run most methods
-directly from the shell. It treats subcommand names and options basically
-like following:
+Key features:
 
 =over 4
 
-=item * Subcomands are mapped to methods (basically).
+=item * Instant CLI access to any module method
 
-=item * (Posix style long) options before the subcommand are used to create instance(via C<< __PACKAGE__->new(%opts) >>).
+=item * Automatic JSON encoding/decoding of arguments and return values
+
+=item * Multiple output formats (ndjson, json, yaml, tsv, dump, raw)
+
+=item * Direct integration with debugger (C<perl -d>) and profiler
+
+=item * Type checking via C<json_type> field declarations
 
 =back
 
-You can pass complex structures like arrays and hashes as option
-values and arguments to methods in JSON array/object literal syntax.
-Results of method invocation are printed with JSON serializer by default.
-You can override this behavior by implementing official command
-methods C<cmd_$COMMAND>.
+For conceptual background, see L<OO Modulino Pattern|https://github.com/hkoba/perl-mop4import-declare/blob/master/docs/OO_Modulino.md>.
 
-Note: design goal of this module is B<*NOT*>
-to provide complete feature-rich human-friendly CLI base class.
-Instead, it aims to make most methods in developping modules
-testable/useable via CLI (and L<perl -d|perldebug>)
-from very beginning of its development
-so that we can develop perl modules more rapidly via CLI-tested pieces of codes.
+=head1 USAGE
 
+=head2 Creating a CLI_JSON Module
 
-=head1 CLASS METHODS
+To create a module that can be used both as a library and CLI tool:
 
-=head2 cli_run (\@ARGV, \%option_shortcuts)
+=for code perl
 
-  __PACKAGE__->cli_run(\@ARGV) unless caller;
+  package MyModule;
+  use MOP4Import::Base::CLI_JSON -as_base;
 
-This method parses arguments, invokes appropriate command
-and usually emits its result to STDOUT. Also there is an alias C<run()>
-which points to C<cli_run()> so that you do the same thing like below:
+  MY->cli_run(\@ARGV) unless caller;
 
-  __PACKAGE__->run(\@ARGV) unless caller;
+  # Your methods here
+  1;
 
-Accepted options are a subset of posix style options (C<--name> and C<--name=value> only). C<--name value> is not allowed,
-L<intentionally|MOP4Import::name_space_value_options_considered_harmful>.
-If I<value> part of options are recognized as JSON arrays/objects, they are automatically deserialized as perl's arrays/hashes.
+The C<unless caller> idiom ensures C<cli_run> only executes when the file is
+run directly, not when it's loaded as a module.
 
-If cli_run() gets optional second argument hash, it is used to
-accept short name for options like following:
+=head2 Command Resolution Rules
 
-  __PACKAGE__->cli_run(\@ARGV, {h => 'help', v => 'verbose'}) unless caller;
-
-In above, C<-h> is recognized samely as C<--help> and C<-v> as C<--verbose>.
-
-=head3 Command name interpretation rule
-X<command-rule>
-
-Then first word in C<@ARGV> is taken and treated as command name.
-Command name is resolved to a module method in following ways:
+When invoked from CLI, the first argument is treated as the command name:
 
 =over 4
 
 =item C<cmd_$COMMAND>
 
-If there is a method named C<cmd_$COMMAND>, it is assumed that
-this method is officially designed for CLI invocation.
-For official command, C<run()> just invokes it and do nothing else.
-Callee method is responsible to handle its output and possibly exit code.
+If a method C<cmd_$COMMAND> exists, it's treated as an official CLI command.
+The method is responsible for all output and exit handling.
 
 =item C<$COMMAND>
 
-If there is a method exactly matches to specified command,
-it is invoked via L<cli_invoke($method, @args)|cli_invoke>.
-It invokes the method in array context (unless C<--scalar> option is given).
-Results are printed by C<cli_output()> with JSON serializer.
+If a method matching the command name exists, it's invoked and its return
+value is automatically serialized according to the C<--output> option.
 
-If results are empty list, program exit with code 1
-(unless C<--no-exit-code> option is given).
+=item Unknown commands
 
-=item ??UNKNOWN??
-
-If the command name does not meet all above,
-C<cli_unknown_subcommand> hook is called instead.
+If no matching method exists, C<cli_unknown_subcommand> is called, which
+by default shows an error message and help.
 
 =back
 
-=head1 OPTIONS
+=head2 Field Declarations
 
-These options control L<run> method.
+Fields can be declared with type information and documentation:
+
+=for code perl
+
+  use MOP4Import::Base::CLI_JSON -as_base,
+    [fields =>
+      [dbfile =>
+        doc => "Database file path",
+        default => ":memory:",
+        json_type => 'string'
+      ],
+      [limit =>
+        doc => "Result limit",
+        json_type => 'integer',
+        validator => sub { $_[0] > 0 }
+      ]
+    ];
+
+=head3 Field Options
 
 =over 4
 
-=item quiet
+=item C<doc>
 
-suppress output of method invocation.
+Documentation string shown in help output
 
-=item scalar
+=item C<default>
 
-evaluate methods in scalar context
+Default value for the field
 
-=item output
+=item C<json_type>
 
-default 'ndjson'. ndjson stands for Newline Delimited JSON. See L<http://ndjson.org/>.
+JSON Schema type for validation. Supported types:
+C<string>, C<bool>, C<boolean>, C<int>, C<integer>, C<number>
 
-=item undef-as
+=item C<validator>
 
-default => 'null'
-
-=item no-exit-code
-
-suppress setting exit-code.
-
-=item binary
-
-keep STDIN/OUT/ERR binary friendly. (default 0)
+Code reference for custom validation. Receives the value and should
+return true if valid.
 
 =back
 
-=head1 METHODS
+=head1 CORE METHODS
 
-All public APIs are named starting with C<cli_...> prefix.
+=head2 cli_run(\@ARGV, \%shortcuts)
 
-=head2 cli_output
+  MY->cli_run(\@ARGV) unless caller;
 
-=head2 cli_invoke
+  # With option shortcuts
+  MY->cli_run(\@ARGV, {h => 'help', v => 'verbose'}) unless caller;
 
-=head2 cli_precmd
+Main entry point for CLI execution. Parses arguments, creates an instance,
+and invokes the appropriate method. Options before the command become
+constructor arguments, remaining arguments are passed to the method.
 
-=head2 cli_unknown_subcommand
+Option format: C<--name> or C<--name=value> (no space between name and value).
 
-=head1 COMMANDS
+JSON values in options and arguments are automatically decoded:
 
-=head3 help
+=for code sh
 
-This provides default implementation of usage output.
+  $ ./MyScript.pm --config='{"port":8080}' process '[1,2,3]'
+
+=head2 Command Methods
+
+=head3 Official Commands (cmd_*)
+
+Methods prefixed with C<cmd_> are official CLI commands:
+
+=for code perl
+
+  sub cmd_import : Doc("Import data from file") {
+    my ($self, $file) = @_;
+    # Handle own output
+    print "Importing $file...\n";
+    # Handle own exit code if needed
+    exit($success ? 0 : 1);
+  }
+
+=head3 Regular Methods
+
+Regular methods have their return values automatically serialized:
+
+=for code perl
+
+  sub calculate {
+    my ($self, $x, $y) = @_;
+    return {result => $x + $y};  # Will be JSON-encoded
+  }
+
+=head2 Output Control Methods
+
+=head3 cli_output(\@results)
+
+Called automatically to output method results. Can be overridden
+for custom output handling.
+
+=head3 cli_write_fh($filehandle, @data)
+
+Low-level output method that respects the C<--output> format option.
+
+=head1 OPTIONS
+
+These options control CLI behavior and are processed by C<cli_run>:
+
+=over 4
+
+=item C<--help>
+
+Show help message and exit
+
+=item C<--quiet>
+
+Suppress normal output
+
+=item C<--scalar>
+
+Evaluate methods in scalar context (default is list context)
+
+=item C<--output=FORMAT>
+
+Output format: C<ndjson> (default), C<json>, C<yaml>, C<tsv>, C<dump>, C<raw>
+
+=item C<--flatten>
+
+Flatten array results (useful with C<--output=tsv>)
+
+=item C<--undef-as=STRING>
+
+How to represent undef in TSV output (default: "null")
+
+=item C<--no-exit-code>
+
+Don't set exit code based on results
+
+=item C<--binary>
+
+Keep STDIN/STDOUT/STDERR in binary mode (no UTF-8 encoding)
+
+=back
+
+=head1 OUTPUT FORMATS
+
+=head2 ndjson (default)
+
+Newline Delimited JSON - one JSON object per line. Ideal for:
+
+=over 4
+
+=item * Large result sets (human readable without pretty-printing)
+
+=item * Pipeline processing with grep, awk, etc.
+
+=item * Streaming output
+
+=back
+
+=head2 json
+
+Standard JSON format with pretty-printing
+
+=head2 yaml
+
+YAML format (requires YAML::Syck)
+
+=head2 tsv
+
+Tab-separated values, useful for spreadsheet import
+
+=head2 dump
+
+Perl Data::Dumper output for debugging
+
+=head2 raw
+
+No serialization, raw string output
+
+=head1 UTILITY METHODS
+
+These methods are available for use in your modules:
+
+=head2 cli_decode_json($json_string)
+
+Decode a JSON string to Perl data structure
+
+=head2 cli_encode_json($data)
+
+Encode Perl data structure to JSON string
+
+=head2 cli_read_file($filename)
+
+Read and parse a file based on its extension (.json, .yml, .txt)
+
+=head1 DEVELOPMENT WORKFLOW
+
+CLI_JSON is designed to accelerate development through immediate feedback:
+
+=for code perl
+
+  # 1. Create minimal module
+  package MyModule;
+  use MOP4Import::Base::CLI_JSON -as_base;
+  MY->cli_run(\@ARGV) unless caller;
+  1;
+
+=for code sh
+
+  # 2. Check syntax
+  $ perl -wc MyModule.pm
+
+  # 3. Add a method and test immediately
+  $ ./MyModule.pm my_method "arg1" "arg2"
+
+  # 4. Debug interactively
+  $ perl -d ./MyModule.pm my_method "test"
+
+  # 5. Profile performance
+  $ perl -d:NYTProf ./MyModule.pm heavy_method
 
 =head1 SEE ALSO
 
-L<App::Cmd> - if your main goal is writing full-fleged CLI.
+=over 4
+
+=item * L<OO Modulino Pattern|https://github.com/hkoba/perl-mop4import-declare/blob/master/docs/OO_Modulino.md>
+
+=item * L<CLI_JSON Rationale|https://github.com/hkoba/perl-mop4import-declare/blob/master/docs/CLI_JSON_rationale.md>
+
+=item * L<MOP4Import::Base::CLI> - Base CLI class without JSON features
+
+=item * L<App::Cmd> - Full-featured CLI framework for production applications
+
+=back
 
 =head1 LICENSE
 

@@ -10,13 +10,14 @@ use Genealogy::Obituary::Lookup::obituaries;
 use Module::Info;
 use Object::Configure 0.12;
 use Params::Get 0.13;
+use Params::Validate::Strict 0.09;
 use Return::Set;
 use Scalar::Util;
 
 use constant URLS => {
 	# 'M' => "https://mlarchives.rootsweb.com/listindexes/emails?listname=gen-obit&page=",
-	'M' => "https://wayback.archive-it.org/20669/20231102044925/https://mlarchives.rootsweb.com/listindexes/emails?listname=gen-obit&page=",
-	'F' => "https://www.freelists.org/post/obitdailytimes/Obituary-Daily-Times-",
+	'M' => 'https://wayback.archive-it.org/20669/20231102044925/https://mlarchives.rootsweb.com/listindexes/emails?listname=gen-obit&page=',
+	'F' => 'https://www.freelists.org/post/obitdailytimes/Obituary-Daily-Times-',
 };
 
 =head1 NAME
@@ -25,11 +26,11 @@ Genealogy::Obituary::Lookup - Lookup an obituary
 
 =head1 VERSION
 
-Version 0.19
+Version 0.20
 
 =cut
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 # Class-level constants
 use constant {
@@ -106,6 +107,13 @@ sub new
 	# Load the configuration from a config file, if provided
 	%args = %{Object::Configure::configure($class, \%args)};
 
+	# Validate logger object has required methods
+	if(defined $args{'logger'}) {
+		unless(Scalar::Util::blessed($args{'logger'}) && $args{'logger'}->can('info') && $args{'logger'}->can('error')) {
+			Carp::croak("Logger must be an object with info() and error() methods");
+		}
+	}
+
 	if(!defined(my $directory = ($args{'directory'} || $Genealogy::Obituary::Lookup::obituaries->{'directory'}))) {
 		# If the directory argument isn't given, see if we can find the data
 		$directory = Module::Info->new_from_loaded($class)->file();
@@ -114,15 +122,11 @@ sub new
 	}
 
 	unless((-d $args{'directory'}) && (-r $args{'directory'})) {
+		if(my $logger = $args{'logger'}) {
+			$logger->warn("$class: $args{directory} is not a directory");
+		}
 		Carp::carp("$class: $args{directory} is not a directory");
 		return;
-	}
-
-	# Validate logger object has required methods
-	if(defined $args{'logger'}) {
-		unless(Scalar::Util::blessed($args{'logger'}) && $args{'logger'}->can('info') && $args{'logger'}->can('error')) {
-			Carp::croak("Logger must be an object with info() and error() methods");
-		}
 	}
 
 	# cache_duration can be overridden by the args
@@ -156,12 +160,88 @@ or C<undef> if there is no match.
 
 =back
 
+=head3	FORMAL SPECIFICATION
+
+=head4	INPUT
+
+  {
+    'last' => {
+      type => 'string',
+      min => 1,
+      max => 100,
+      matches => qr/^[\w\-]+$/	# Allow hyphens in surnames
+    }, 'first' => {
+      type => 'string',
+      optional => 1,
+      min => 1,
+      max => 100
+    }, 'middle' => {
+      type => 'string',
+      optional => 1,
+      min => 1,
+      max => 100
+    }, 'age' => {
+      type => 'integer',
+      optional => 1,
+      min => 0,
+      max => 120
+    }
+  }
+
+=head4	OUTPUT
+
+Argument error: croak
+No matches found: undef
+
+Scalar context:
+
+  {
+    'type' => 'hashref',
+    'min' => 1
+  }
+
+List context:
+
+  {
+    'type' => 'array',
+    'min' => 1
+  }
+
 =cut
 
 sub search
 {
 	my $self = shift;
-	my $params = Params::Get::get_params('last', @_);
+
+	# Ensure $self is valid
+	Carp::croak('search() must be called on an object') unless(Scalar::Util::blessed($self));
+
+        my $params = Params::Validate::Strict::validate_strict({
+		args => Params::Get::get_params('last', @_),
+		schema => {
+			'last' => {
+				type => 'string',
+				min => 1,
+				max => 100,
+				matches => qr/^[\w\-]+$/	# Allow hyphens in surnames
+			}, 'first' => {
+				type => 'string',
+				optional => 1,
+				min => 1,
+				max => 100
+			}, 'middle' => {
+				type => 'string',
+				optional => 1,
+				min => 1,
+				max => 100
+			}, 'age' => {
+				type => 'integer',
+				optional => 1,
+				min => 0,
+				max => 120
+			}
+		}
+	});
 
 	# Validate required parameters thoroughly
 	unless((defined($params->{'last'})) && (length($params->{'last'}) > 0)) {
