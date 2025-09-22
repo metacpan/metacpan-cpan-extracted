@@ -1,5 +1,11 @@
 Revision history for Perl-Types.
 
+0.300     2025-09-21 23:58:37-05:00 America/Chicago
+
+  - Upgrade to GitLab::Template
+  - Docker Hub release
+  - Add missing dependencies to 'cpanfile'
+
 0.210     2025-06-06 05:10:53-05:00 America/Chicago
 
   - Tests, fix failures in missing dependencies tests P2
@@ -16,7 +22,7 @@ Revision history for Perl-Types.
   - Codename Zaragoza
   - Beta version
   - Support left-to-right type names
-  - Support composable type names via '::' scope resolution operator
+  - Support composable type names via "::" scope resolution operator
   - Tests, run extensive data type & data structure tests
 
 0.001     2023-04-09 22:40:05-05:00 America/Chicago

@@ -68,7 +68,6 @@ our @EXPORT_OK = (@Data::Dumper::EXPORT_OK, @English::EXPORT_OK, @Carp::EXPORT_O
 # [[[ ADDITIONAL PACKAGES SPECIAL ]]]
 package    # hide from PAUSE indexing
     Perl;
-use File::Find qw(find);
 use File::Spec;
 use IPC::Cmd qw(can_run);       # to check for `reset`
 
@@ -111,8 +110,8 @@ use File::Basename qw(fileparse);
 # changed on a per-file basis by preprocessor directive, see Perl::CompileUnit::Module::Class::INIT
 # NEED UPGRADE: enable in Perl system code when bootstrapping compiler
 our $CHECK    = 'OFF';
-our $DEBUG    = 0;       # $Perl::DEBUG & env var PERL_DEBUG are equivalent, default to off, see debug*() & diag*() below
 our $VERBOSE  = 0;       # $Perl::VERBOSE & env var PERL_VERBOSE are equivalent, default to off, see verbose*() below
+our $DEBUG    = 0;       # $Perl::DEBUG & env var PERL_DEBUG are equivalent, default to off, see debug*() & diag*() below
 our $WARNINGS = 1;       # $Perl::WARNINGS & env var PERL_WARNINGS are equivalent, default to on, see warn*() below
 our $TYPES_CCFLAG = ' -D__CPP__TYPES'; # perltypes_mode.h & here default to CPPTYPES if PERLTYPES not explicitly set in this variable via perltypes::types_enable()
 our $BASE_PATH    = undef;                             # all target software lives below here
@@ -196,8 +195,6 @@ sub post_processor__absolute_path_delete {
 }
 
 
-
-
 # use a possibly-compiled Perl package during runtime
 sub eval_use {
     (my $package_name, my $display_errors) = @ARG;
@@ -261,6 +258,7 @@ EOL
     return $eval_retval;
 }
 
+
 # NEED UPGRADE: replace Data::Dumper with pure-Perl equivalent?
 #sub DUMPER {
 #    ( my $dumpee ) = @ARG;
@@ -271,31 +269,8 @@ EOL
 #    return Dumper($dumpee);
 #}
 
-# DEV NOTE: to make diag*() & debug*() & verbose*() & warning() truly variadic, do not accept args as first line in subroutine
 
-# DEV NOTE: diag() is simply a wrapper around debug(), they are 100% equivalent; likewise diag_pause() and debug_pause()
-sub diag { return debug(@ARG); }
-sub diag_pause { return debug_pause(@ARG); }
-
-# print debugging AKA diagnostic message to STDERR, if either PERL_DEBUG environmental variable or $Perl::DEBUG global variable are true
-sub debug {
-#    print {*STDERR} 'in debug(), have $ENV{PERL_DEBUG} = ' . $ENV{PERL_DEBUG} . "\n";
-
-    # DEV NOTE, CORRELATION #rp017: default to off; if either variable is set to true, then do emit messages
-    if ( $ENV{PERL_DEBUG} or $Perl::DEBUG ) { print {*STDERR} @ARG; }
-
-#    if ( $ENV{PERL_DEBUG} or $Perl::DEBUG ) { print {*STDERR} "\e[1;31m $message \e[0m"; }  # print in red
-    return 1;    # DEV NOTE: this must be here to avoid 'at -e line 0. INIT failed--call queue aborted.'... BUT WHY???
-}
-
-# same as debug(), except require <ENTER> to continue
-sub debug_pause {
-    if ( $ENV{PERL_DEBUG} or $Perl::DEBUG ) {
-        print {*STDERR} @ARG;
-        my $stdin_ignore = <STDIN>;
-    }
-    return 1;
-}
+# DEV NOTE: to make verbose*() & diag*() & debug*() & warning() truly variadic, do not accept args as first line in subroutine
 
 # print verbose user-friendly message to STDOUT, if either PERL_VERBOSE environmental variable or $Perl::VERBOSE global variable are true
 sub verbose {
@@ -306,6 +281,7 @@ sub verbose {
     return 1;
 }
 
+
 # same as verbose(), except require <ENTER> to continue
 sub verbose_pause {
     if ( $ENV{PERL_VERBOSE} or $Perl::VERBOSE ) {
@@ -314,6 +290,7 @@ sub verbose_pause {
     }
     return 1;
 }
+
 
 # clear STDOUT, if either PERL_VERBOSE environmental variable or $Perl::VERBOSE global variable are true
 sub verbose_clear_screen {
@@ -338,6 +315,34 @@ sub verbose_clear_screen {
     return 1;
 }
 
+
+# DEV NOTE: diag() is simply a wrapper around debug(), they are 100% equivalent; likewise diag_pause() and debug_pause()
+sub diag { return debug(@ARG); }
+sub diag_pause { return debug_pause(@ARG); }
+
+
+# print debugging AKA diagnostic message to STDERR, if either PERL_DEBUG environmental variable or $Perl::DEBUG global variable are true
+sub debug {
+#    print {*STDERR} 'in debug(), have $ENV{PERL_DEBUG} = ' . $ENV{PERL_DEBUG} . "\n";
+
+    # DEV NOTE, CORRELATION #rp017: default to off; if either variable is set to true, then do emit messages
+    if ( $ENV{PERL_DEBUG} or $Perl::DEBUG ) { print {*STDERR} @ARG; }
+
+#    if ( $ENV{PERL_DEBUG} or $Perl::DEBUG ) { print {*STDERR} "\e[1;31m $message \e[0m"; }  # print in red
+    return 1;    # DEV NOTE: this must be here to avoid 'at -e line 0. INIT failed--call queue aborted.'... BUT WHY???
+}
+
+
+# same as debug(), except require <ENTER> to continue
+sub debug_pause {
+    if ( $ENV{PERL_DEBUG} or $Perl::DEBUG ) {
+        print {*STDERR} @ARG;
+        my $stdin_ignore = <STDIN>;
+    }
+    return 1;
+}
+
+
 # print non-fatal warning message to STDERR, unless either PERL_WARNINGS environmental variable or $Perl::WARNINGS global variable are false
 sub warning {
     # default to on; if either variable is set to false, then do not emit messages
@@ -351,6 +356,7 @@ sub warning {
     }
     return 1;
 }
+
 
 sub analyze_class_symtab_entries {
     ( my $class ) = @ARG;
@@ -397,6 +403,7 @@ sub analyze_class_symtab_entries {
     $retval .= '<<<<< END SYMTAB ENTRIES >>>>>' . "\n";
     return $retval;
 }
+
 
 # [ AUTOMATICALLY SET SYSTEM-DEPENDENT PATH VARIABLES ]
 sub set_system_paths {

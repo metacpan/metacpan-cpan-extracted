@@ -53,7 +53,7 @@ use PPIx::Regexp::Constant qw{
     @CARP_NOT
 };
 
-our $VERSION = '0.089';
+our $VERSION = '0.090';
 
 use constant VERSION_WHEN_IN_REGEX_SET => '5.017009';
 

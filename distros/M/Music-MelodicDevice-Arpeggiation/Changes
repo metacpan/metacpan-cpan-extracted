@@ -1,0 +1,16 @@
+Revision history for Music-MelodicDevice-Arpeggiation
+
+0.0104 2025-09-21 17:07:31
+  - Improve the arp() method description.
+
+0.0103 2025-09-21 16:23:24
+  - Add the arp() method description.
+
+0.0102 2025-09-21 11:25:38
+    - Fix example again.
+
+0.0101 2025-09-21 10:49:11
+    - Fix example.
+
+0.0100 2025-09-21 10:10:13
+    - Mint with Dist::Zilla.

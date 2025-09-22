@@ -4,9 +4,9 @@
       "William N. Braswell, Jr. <wbraswell@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "gpl_3"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -24,37 +24,70 @@
       ]
    },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Alien::GMP" : "1.16",
-            "Alien::GSL" : "1.07",
-            "Inline" : "0.86",
-            "Inline::C" : "0.80",
-            "Inline::CPP" : "0.80",
-            "Inline::Filters" : "0.20"
-         }
-      },
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
          }
       },
+      "develop" : {
+         "requires" : {
+            "CPAN::Changes" : "0",
+            "Dist::Zilla::Plugin::CheckChangesHasContent" : "0",
+            "Dist::Zilla::Plugin::InsertCopyright" : "0",
+            "Dist::Zilla::Plugin::MakeMaker::Awesome" : "0",
+            "Dist::Zilla::Plugin::MetaResources" : "0",
+            "Dist::Zilla::Plugin::NextRelease" : "0",
+            "Dist::Zilla::Plugin::Prereqs::FromCPANfile" : "0",
+            "Dist::Zilla::PluginBundle::Starter::Git" : "0",
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "Getopt::Long" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "IPC::Run3" : "0",
+            "Software::License::GPL_3" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "version" : "0"
+         }
+      },
       "runtime" : {
          "requires" : {
-            "PadWalker" : "2.5",
+            "Alien::GMP" : "0",
+            "Alien::GSL" : "0",
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "Exporter" : "0",
+            "File::Spec" : "0",
+            "IPC::Cmd" : "0",
+            "IPC::Run3" : "0",
+            "Inline" : "0",
+            "Inline::C" : "0",
+            "Inline::CPP" : "0",
+            "Inline::Filters" : "0",
+            "Math::BigInt" : "0",
+            "Math::GSL::BLAS" : "0",
+            "Math::GSL::CBLAS" : "0",
+            "Math::GSL::Matrix" : "0",
+            "PadWalker" : "0",
+            "Scalar::Util" : "0",
+            "Term::ReadLine" : "0",
+            "parent" : "0",
             "perl" : "5.012"
          }
       },
       "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
          "requires" : {
-            "Cwd" : "3.75",
-            "File::Find" : "0",
-            "File::Spec" : "3.75",
-            "IPC::Run3" : "0.049",
-            "Test::CPAN::Changes" : "0.5",
-            "Test::Exception" : "0.43",
-            "Test::More" : "1.302208",
-            "Test::Number::Delta" : "1.06"
+            "Cwd" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "Test2::V0" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "Test::Number::Delta" : "0"
          }
       }
    },
@@ -141,15 +174,15 @@
       },
       "Perl::Structure::Graph::Tree::Binary::NodeReference" : {
          "file" : "lib/Perl/Structure/Graph/Tree/Binary/Node.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "Perl::Structure::Graph::Tree::BinaryReference" : {
          "file" : "lib/Perl/Structure/Graph/Tree/Binary.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "Perl::Structure::Graph::TreeReference" : {
          "file" : "lib/Perl/Structure/Graph/Tree.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "Perl::Structure::GraphReference" : {
          "file" : "lib/Perl/Structure/GraphReference.pm",
@@ -197,11 +230,11 @@
       },
       "Perl::Structure::LinkedList::NodeReference" : {
          "file" : "lib/Perl/Structure/LinkedList/Node.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "Perl::Structure::LinkedListReference" : {
          "file" : "lib/Perl/Structure/LinkedList.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "Perl::Structure::MongoDBBSON" : {
          "file" : "lib/Perl/Structure/MongoDBBSON.pm",
@@ -301,295 +334,295 @@
       },
       "array" : {
          "file" : "lib/Perl/Structure/Array/SubTypes.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "arrayref" : {
          "file" : "lib/Perl/Structure/Array/SubTypes.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "arrayref::arrayref" : {
          "file" : "lib/Perl/Structure/Array/SubTypes2D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "arrayref::arrayref::arrayref" : {
          "file" : "lib/Perl/Structure/Array/SubTypes3D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "arrayref::arrayref::arrayref::integer" : {
          "file" : "lib/Perl/Structure/Array/SubTypes3D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "arrayref::arrayref::arrayref::number" : {
          "file" : "lib/Perl/Structure/Array/SubTypes3D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "arrayref::arrayref::arrayref::scalartype" : {
          "file" : "lib/Perl/Structure/Array/SubTypes3D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "arrayref::arrayref::arrayref::string" : {
          "file" : "lib/Perl/Structure/Array/SubTypes3D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "arrayref::arrayref::integer" : {
          "file" : "lib/Perl/Structure/Array/SubTypes2D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "arrayref::arrayref::number" : {
          "file" : "lib/Perl/Structure/Array/SubTypes2D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "arrayref::arrayref::scalartype" : {
          "file" : "lib/Perl/Structure/Array/SubTypes2D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "arrayref::arrayref::string" : {
          "file" : "lib/Perl/Structure/Array/SubTypes2D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "arrayref::bson" : {
          "file" : "lib/Perl/Structure/MongoDBBSON.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "arrayref::character" : {
          "file" : "lib/Perl/Structure/Array/SubTypes1D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "arrayref::hashref" : {
          "file" : "lib/Perl/Structure/Array/SubTypes2D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "arrayref::integer" : {
          "file" : "lib/Perl/Structure/Array/SubTypes1D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "arrayref::number" : {
          "file" : "lib/Perl/Structure/Array/SubTypes1D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "arrayref::object" : {
          "file" : "lib/Perl/Structure/Array/SubTypes2D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "arrayref::scalartype" : {
          "file" : "lib/Perl/Structure/Array/SubTypes1D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "arrayref::string" : {
          "file" : "lib/Perl/Structure/Array/SubTypes1D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "boolean" : {
          "file" : "lib/Perl/Type/Boolean.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "bson_document" : {
          "file" : "lib/Perl/Structure/MongoDBBSON.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "bson_document__optional" : {
          "file" : "lib/Perl/Structure/MongoDBBSON.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "character" : {
          "file" : "lib/Perl/Type/Character.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "coderef" : {
          "file" : "lib/Perl/Structure/CodeReference.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "constant_integer" : {
          "file" : "lib/Perl/Type/Integer.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "constant_nonsigned_integer" : {
          "file" : "lib/Perl/Type/NonsignedInteger.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "constant_number" : {
          "file" : "lib/Perl/Type/Number.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "constant_sse_number_pair" : {
          "file" : "lib/Perl/Structure/SSENumberPair.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "filehandleref" : {
          "file" : "lib/Perl/Type/FileHandle.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "gmp_integer" : {
          "file" : "lib/Perl/Type/GMPInteger.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "gsl_matrix" : {
          "file" : "lib/Perl/Structure/GSLMatrix.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "hash" : {
          "file" : "lib/Perl/Structure/Hash/SubTypes.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "hashref" : {
          "file" : "lib/Perl/Structure/Hash/SubTypes.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "hashref::arrayref" : {
          "file" : "lib/Perl/Structure/Hash/SubTypes2D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "hashref::arrayref::arrayref" : {
          "file" : "lib/Perl/Structure/Hash/SubTypes3D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "hashref::arrayref::arrayref::integer" : {
          "file" : "lib/Perl/Structure/Hash/SubTypes3D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "hashref::arrayref::arrayref::number" : {
          "file" : "lib/Perl/Structure/Hash/SubTypes3D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "hashref::arrayref::arrayref::scalartype" : {
          "file" : "lib/Perl/Structure/Hash/SubTypes3D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "hashref::arrayref::arrayref::string" : {
          "file" : "lib/Perl/Structure/Hash/SubTypes3D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "hashref::arrayref::hashref" : {
          "file" : "lib/Perl/Structure/Hash/SubTypes3D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "hashref::arrayref::hashref::integer" : {
          "file" : "lib/Perl/Structure/Hash/SubTypes3D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "hashref::arrayref::hashref::number" : {
          "file" : "lib/Perl/Structure/Hash/SubTypes3D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "hashref::arrayref::hashref::scalartype" : {
          "file" : "lib/Perl/Structure/Hash/SubTypes3D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "hashref::arrayref::hashref::string" : {
          "file" : "lib/Perl/Structure/Hash/SubTypes3D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "hashref::arrayref::integer" : {
          "file" : "lib/Perl/Structure/Hash/SubTypes2D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "hashref::arrayref::number" : {
          "file" : "lib/Perl/Structure/Hash/SubTypes2D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "hashref::arrayref::string" : {
          "file" : "lib/Perl/Structure/Hash/SubTypes2D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "hashref::bson" : {
          "file" : "lib/Perl/Structure/MongoDBBSON.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "hashref::character" : {
          "file" : "lib/Perl/Structure/Hash/SubTypes1D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "hashref::hashref" : {
          "file" : "lib/Perl/Structure/Hash/SubTypes2D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "hashref::hashref::arrayref" : {
          "file" : "lib/Perl/Structure/Hash/SubTypes3D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "hashref::hashref::arrayref::integer" : {
          "file" : "lib/Perl/Structure/Hash/SubTypes3D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "hashref::hashref::arrayref::number" : {
          "file" : "lib/Perl/Structure/Hash/SubTypes3D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "hashref::hashref::arrayref::scalartype" : {
          "file" : "lib/Perl/Structure/Hash/SubTypes3D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "hashref::hashref::arrayref::string" : {
          "file" : "lib/Perl/Structure/Hash/SubTypes3D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "hashref::hashref::hashref" : {
          "file" : "lib/Perl/Structure/Hash/SubTypes3D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "hashref::hashref::hashref::integer" : {
          "file" : "lib/Perl/Structure/Hash/SubTypes3D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "hashref::hashref::hashref::number" : {
          "file" : "lib/Perl/Structure/Hash/SubTypes3D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "hashref::hashref::hashref::scalartype" : {
          "file" : "lib/Perl/Structure/Hash/SubTypes3D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "hashref::hashref::hashref::string" : {
          "file" : "lib/Perl/Structure/Hash/SubTypes3D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "hashref::hashref::integer" : {
          "file" : "lib/Perl/Structure/Hash/SubTypes2D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "hashref::hashref::number" : {
          "file" : "lib/Perl/Structure/Hash/SubTypes2D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "hashref::hashref::scalartype" : {
          "file" : "lib/Perl/Structure/Hash/SubTypes2D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "hashref::hashref::string" : {
          "file" : "lib/Perl/Structure/Hash/SubTypes2D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "hashref::integer" : {
          "file" : "lib/Perl/Structure/Hash/SubTypes1D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "hashref::number" : {
          "file" : "lib/Perl/Structure/Hash/SubTypes1D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "hashref::object" : {
          "file" : "lib/Perl/Structure/Hash/SubTypes2D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "hashref::scalartype" : {
          "file" : "lib/Perl/Structure/Hash/SubTypes1D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "hashref::string" : {
          "file" : "lib/Perl/Structure/Hash/SubTypes1D.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "integer" : {
          "file" : "lib/Perl/Type/Integer.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "nonsigned_integer" : {
          "file" : "lib/Perl/Type/NonsignedInteger.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "number" : {
          "file" : "lib/Perl/Type/Number.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "perltypes" : {
          "file" : "lib/perltypes.pm",
@@ -597,19 +630,19 @@
       },
       "reference" : {
          "file" : "lib/Perl/Type/Modifier/Reference.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "scalartype" : {
          "file" : "lib/Perl/Type/Scalar.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "sse_number_pair" : {
          "file" : "lib/Perl/Structure/SSENumberPair.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "string" : {
          "file" : "lib/Perl/Type/String.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "types" : {
          "file" : "lib/types.pm",
@@ -617,11 +650,11 @@
       },
       "unknown" : {
          "file" : "lib/Perl/Type/Unknown.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       },
       "void" : {
          "file" : "lib/Perl/Type/Void.pm",
-         "version" : "0.210"
+         "version" : "0.300"
       }
    },
    "release_status" : "stable",
@@ -636,9 +669,9 @@
       },
       "x_IRC" : "irc://irc.perl.org/#perl11"
    },
-   "version" : "0.210",
-   "x_generated_by_perl" : "v5.30.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
-   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+   "version" : "0.300",
+   "x_generated_by_perl" : "v5.38.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_spdx_expression" : "GPL-3.0-only"
 }
 

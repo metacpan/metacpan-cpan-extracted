@@ -47,7 +47,7 @@ sub check_class {
     { my void $RETURN_TYPE };
     ( my Perl::Types::Test::TypeCheckingOn::AllTypes $self ) = @ARG;
 
-#    Perl::Types::diag('in check_class(), received $self =', "\n", Dumper($self), "\n");
+#    Perl::diag('in check_class(), received $self =', "\n", Dumper($self), "\n");
     return;
 }
 
@@ -55,8 +55,8 @@ sub check_class_integer {
     { my void $RETURN_TYPE };
     ( my Perl::Types::Test::TypeCheckingOn::AllTypes $self, my integer $input_1 ) = @ARG;
 
-#    Perl::Types::diag('in check_class_integer(), received $self =', "\n", Dumper($self), "\n");
-#    Perl::Types::diag('in check_class_integer(), received $input_1 = ', $input_1, "\n");
+#    Perl::diag('in check_class_integer(), received $self =', "\n", Dumper($self), "\n");
+#    Perl::diag('in check_class_integer(), received $input_1 = ', $input_1, "\n");
     return;
 }
 
@@ -68,7 +68,7 @@ sub check_integer {
     { my void $RETURN_TYPE };
     ( my integer $input_1) = @ARG;
 
-#    Perl::Types::diag("in check_integer(), received \$input_1\n" . Dumper($input_1) . "\n");
+#    Perl::diag("in check_integer(), received \$input_1\n" . Dumper($input_1) . "\n");
     return;
 }
 
@@ -76,7 +76,7 @@ sub check_number {
     { my void $RETURN_TYPE };
     ( my number $input_1) = @ARG;
 
-#    Perl::Types::diag("in check_number(), received \$input_1\n" . Dumper($input_1) . "\n");
+#    Perl::diag("in check_number(), received \$input_1\n" . Dumper($input_1) . "\n");
     return;
 }
 
@@ -84,7 +84,7 @@ sub check_string {
     { my void $RETURN_TYPE };
     ( my string $input_1) = @ARG;
 
-#    Perl::Types::diag("in check_string(), received \$input_1\n" . Dumper($input_1) . "\n");
+#    Perl::diag("in check_string(), received \$input_1\n" . Dumper($input_1) . "\n");
     return;
 }
 
@@ -94,7 +94,7 @@ sub check_arrayref {
     { my void $RETURN_TYPE };
     ( my arrayref $input_1) = @ARG;
 
-#    Perl::Types::diag("in check_arrayref(), received \$input_1\n" . Dumper($input_1) . "\n");
+#    Perl::diag("in check_arrayref(), received \$input_1\n" . Dumper($input_1) . "\n");
     return;
 }
 
@@ -102,7 +102,7 @@ sub check_arrayref_integer {
     { my void $RETURN_TYPE };
     ( my arrayref::integer $input_1) = @ARG;
 
-#    Perl::Types::diag("in check_arrayref_integer(), received \$input_1\n" . Dumper($input_1) . "\n");
+#    Perl::diag("in check_arrayref_integer(), received \$input_1\n" . Dumper($input_1) . "\n");
     return;
 }
 
@@ -110,7 +110,7 @@ sub check_arrayref_number {
     { my void $RETURN_TYPE };
     ( my arrayref::number $input_1) = @ARG;
 
-#    Perl::Types::diag("in check_arrayref_number(), received \$input_1\n" . Dumper($input_1) . "\n");
+#    Perl::diag("in check_arrayref_number(), received \$input_1\n" . Dumper($input_1) . "\n");
     return;
 }
 
@@ -121,9 +121,9 @@ sub check_arrayref_number_multiple {
         my arrayref::number $input_3)
         = @ARG;
 
-#    Perl::Types::diag("in check_arrayref_number_multiple(), received \$input_1\n" . Dumper($input_1) . "\n");
-#    Perl::Types::diag("in check_arrayref_number_multiple(), received \$input_2\n" . Dumper($input_2) . "\n");
-#    Perl::Types::diag("in check_arrayref_number_multiple(), received \$input_3\n" . Dumper($input_3) . "\n");
+#    Perl::diag("in check_arrayref_number_multiple(), received \$input_1\n" . Dumper($input_1) . "\n");
+#    Perl::diag("in check_arrayref_number_multiple(), received \$input_2\n" . Dumper($input_2) . "\n");
+#    Perl::diag("in check_arrayref_number_multiple(), received \$input_3\n" . Dumper($input_3) . "\n");
 
 # DEPRECATED: type checking automated via <<< TYPE_CHECKING: CHECK(TRACE) >>> preprocessor directive
 #    ::arrayref_number_CHECK($input_1);
@@ -136,7 +136,7 @@ sub check_arrayref_string {
     { my void $RETURN_TYPE };
     ( my arrayref::string $input_1) = @ARG;
 
-#    Perl::Types::diag("in check_arrayref_string(), received \$input_1\n" . Dumper($input_1) . "\n");
+#    Perl::diag("in check_arrayref_string(), received \$input_1\n" . Dumper($input_1) . "\n");
     return;
 }
 
@@ -146,7 +146,7 @@ sub check_hashref {
     { my void $RETURN_TYPE };
     ( my hashref $input_1) = @ARG;
 
-#    Perl::Types::diag("in check_hashref(), received \$input_1\n" . Dumper($input_1) . "\n");
+#    Perl::diag("in check_hashref(), received \$input_1\n" . Dumper($input_1) . "\n");
     return;
 }
 
@@ -154,7 +154,7 @@ sub check_hashref_integer {
     { my void $RETURN_TYPE };
     ( my hashref::integer $input_1) = @ARG;
 
-#    Perl::Types::diag("in check_hashref_integer(), received \$input_1\n" . Dumper($input_1) . "\n");
+#    Perl::diag("in check_hashref_integer(), received \$input_1\n" . Dumper($input_1) . "\n");
     return;
 }
 
@@ -162,7 +162,7 @@ sub check_hashref_number {
     { my void $RETURN_TYPE };
     ( my hashref::number $input_1) = @ARG;
 
-#    Perl::Types::diag("in check_hashref_number(), received \$input_1\n" . Dumper($input_1) . "\n");
+#    Perl::diag("in check_hashref_number(), received \$input_1\n" . Dumper($input_1) . "\n");
     return;
 }
 
@@ -173,9 +173,9 @@ sub check_hashref_number_multiple {
         my hashref::number $input_3)
         = @ARG;
 
-#    Perl::Types::diag("in check_hashref_number_multiple(), received \$input_1\n" . Dumper($input_1) . "\n");
-#    Perl::Types::diag("in check_hashref_number_multiple(), received \$input_2\n" . Dumper($input_2) . "\n");
-#    Perl::Types::diag("in check_hashref_number_multiple(), received \$input_3\n" . Dumper($input_3) . "\n");
+#    Perl::diag("in check_hashref_number_multiple(), received \$input_1\n" . Dumper($input_1) . "\n");
+#    Perl::diag("in check_hashref_number_multiple(), received \$input_2\n" . Dumper($input_2) . "\n");
+#    Perl::diag("in check_hashref_number_multiple(), received \$input_3\n" . Dumper($input_3) . "\n");
     return;
 }
 
@@ -183,7 +183,7 @@ sub check_hashref_string {
     { my void $RETURN_TYPE };
     ( my hashref::string $input_1) = @ARG;
 
-#    Perl::Types::diag("in check_hashref_string(), received \$input_1\n" . Dumper($input_1) . "\n");
+#    Perl::diag("in check_hashref_string(), received \$input_1\n" . Dumper($input_1) . "\n");
     return;
 }
 
@@ -193,9 +193,9 @@ sub check__mixed_00 {
     { my void $RETURN_TYPE };
     ( my integer $input_1, my number $input_2, my string $input_3) = @ARG;
 
-#    Perl::Types::diag("in check__mixed_00(), received \$input_1\n" . Dumper($input_1) . "\n");
-#    Perl::Types::diag("in check__mixed_00(), received \$input_2\n" . Dumper($input_2) . "\n");
-#    Perl::Types::diag("in check__mixed_00(), received \$input_3\n" . Dumper($input_3) . "\n");
+#    Perl::diag("in check__mixed_00(), received \$input_1\n" . Dumper($input_1) . "\n");
+#    Perl::diag("in check__mixed_00(), received \$input_2\n" . Dumper($input_2) . "\n");
+#    Perl::diag("in check__mixed_00(), received \$input_3\n" . Dumper($input_3) . "\n");
     return;
 }
 
@@ -207,10 +207,10 @@ sub check__mixed_01 {
         my arrayref::string $input_4)
         = @ARG;
 
-#    Perl::Types::diag("in check__mixed_01(), received \$input_1\n" . Dumper($input_1) . "\n");
-#    Perl::Types::diag("in check__mixed_01(), received \$input_2\n" . Dumper($input_2) . "\n");
-#    Perl::Types::diag("in check__mixed_01(), received \$input_3\n" . Dumper($input_3) . "\n");
-#    Perl::Types::diag("in check__mixed_01(), received \$input_4\n" . Dumper($input_4) . "\n");
+#    Perl::diag("in check__mixed_01(), received \$input_1\n" . Dumper($input_1) . "\n");
+#    Perl::diag("in check__mixed_01(), received \$input_2\n" . Dumper($input_2) . "\n");
+#    Perl::diag("in check__mixed_01(), received \$input_3\n" . Dumper($input_3) . "\n");
+#    Perl::diag("in check__mixed_01(), received \$input_4\n" . Dumper($input_4) . "\n");
     return;
 }
 
@@ -222,10 +222,10 @@ sub check__mixed_02 {
         my hashref::string $input_4)
         = @ARG;
 
-#    Perl::Types::diag("in check__mixed_02(), received \$input_1\n" . Dumper($input_1) . "\n");
-#    Perl::Types::diag("in check__mixed_02(), received \$input_2\n" . Dumper($input_2) . "\n");
-#    Perl::Types::diag("in check__mixed_02(), received \$input_3\n" . Dumper($input_3) . "\n");
-#    Perl::Types::diag("in check__mixed_02(), received \$input_4\n" . Dumper($input_4) . "\n");
+#    Perl::diag("in check__mixed_02(), received \$input_1\n" . Dumper($input_1) . "\n");
+#    Perl::diag("in check__mixed_02(), received \$input_2\n" . Dumper($input_2) . "\n");
+#    Perl::diag("in check__mixed_02(), received \$input_3\n" . Dumper($input_3) . "\n");
+#    Perl::diag("in check__mixed_02(), received \$input_4\n" . Dumper($input_4) . "\n");
     return;
 }
 
@@ -244,17 +244,17 @@ sub check__mixed_03 {
         my hashref::string $input_11
     ) = @ARG;
 
-#    Perl::Types::diag("in check__mixed_03(), received \$input_1\n" . Dumper($input_1) . "\n");
-#    Perl::Types::diag("in check__mixed_03(), received \$input_2\n" . Dumper($input_2) . "\n");
-#    Perl::Types::diag("in check__mixed_03(), received \$input_3\n" . Dumper($input_3) . "\n");
-#    Perl::Types::diag("in check__mixed_03(), received \$input_4\n" . Dumper($input_4) . "\n");
-#    Perl::Types::diag("in check__mixed_03(), received \$input_5\n" . Dumper($input_5) . "\n");
-#    Perl::Types::diag("in check__mixed_03(), received \$input_6\n" . Dumper($input_6) . "\n");
-#    Perl::Types::diag("in check__mixed_03(), received \$input_7\n" . Dumper($input_7) . "\n");
-#    Perl::Types::diag("in check__mixed_03(), received \$input_8\n" . Dumper($input_8) . "\n");
-#    Perl::Types::diag("in check__mixed_03(), received \$input_9\n" . Dumper($input_9) . "\n");
-#    Perl::Types::diag("in check__mixed_03(), received \$input_10\n" . Dumper($input_10) . "\n");
-#    Perl::Types::diag("in check__mixed_03(), received \$input_11\n" . Dumper($input_11) . "\n");
+#    Perl::diag("in check__mixed_03(), received \$input_1\n" . Dumper($input_1) . "\n");
+#    Perl::diag("in check__mixed_03(), received \$input_2\n" . Dumper($input_2) . "\n");
+#    Perl::diag("in check__mixed_03(), received \$input_3\n" . Dumper($input_3) . "\n");
+#    Perl::diag("in check__mixed_03(), received \$input_4\n" . Dumper($input_4) . "\n");
+#    Perl::diag("in check__mixed_03(), received \$input_5\n" . Dumper($input_5) . "\n");
+#    Perl::diag("in check__mixed_03(), received \$input_6\n" . Dumper($input_6) . "\n");
+#    Perl::diag("in check__mixed_03(), received \$input_7\n" . Dumper($input_7) . "\n");
+#    Perl::diag("in check__mixed_03(), received \$input_8\n" . Dumper($input_8) . "\n");
+#    Perl::diag("in check__mixed_03(), received \$input_9\n" . Dumper($input_9) . "\n");
+#    Perl::diag("in check__mixed_03(), received \$input_10\n" . Dumper($input_10) . "\n");
+#    Perl::diag("in check__mixed_03(), received \$input_11\n" . Dumper($input_11) . "\n");
     return;
 }
 

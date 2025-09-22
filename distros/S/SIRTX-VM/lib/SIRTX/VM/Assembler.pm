@@ -22,7 +22,7 @@ use SIRTX::VM::Opcode;
 
 use parent 'Data::Identifier::Interface::Userdata';
 
-our $VERSION = v0.05;
+our $VERSION = v0.06;
 
 my %_escapes = (
     '\\' => '\\',
@@ -52,6 +52,8 @@ my %_header_ids = (
 my @_section_order = qw(header init text rodata trailer);
 my @_section_text  = qw(header init text);
 my @_section_load  = (@_section_text, qw(rodata));
+
+my %_info          = map {$_ => 1} qw(.author .license .copyright_years .copyright_holder .description .comment .displayname .displaycolour .icon .icontext);
 
 my %_synthetic = (
     mul             => [['"out"' => 'undef', reg => 1, '"arg"' => 'undef'] => ['user*' => 2] => [
@@ -90,16 +92,16 @@ my %_synthetic = (
                             ['open', \3, \2],
                             ['transfer', \1, \3],
                         ]],
-    control         => [[reg => 1, [qw(reg sni:)] => 2, string => 3] => ['user*' => 4] => [
+    control         => [[reg => 1, [qw(reg sni:)] => 2, [qw(string bool)] => 3] => ['user*' => 4] => [
                             ['open', \4, \3],
                             ['control', \1, \2, \4],
                         ],
-                        [reg => 1, [qw(reg sni:)] => 2, string => 3, reg => 4] => ['user*' => 5, 'arg' => 6] => [
+                        [reg => 1, [qw(reg sni:)] => 2, [qw(string bool)] => 3, reg => 4] => ['user*' => 5, 'arg' => 6] => [
                             ['open', \5, \3],
                             ['replace', \6, \4],
                             ['control', \1, \2, \5],
                         ],
-                        [reg => 1, [qw(reg sni:)] => 2, string => 3, any => 4] => ['user*' => 5, 'arg' => 6] => [
+                        [reg => 1, [qw(reg sni:)] => 2, [qw(string bool)] => 3, any => 4] => ['user*' => 5, 'arg' => 6] => [
                             ['open', \5, \3],
                             ['open', \6, \4],
                             ['control', \1, \2, \5],
@@ -118,16 +120,16 @@ my %_synthetic = (
                         ],
                         [any => 1, any => 2] => ['user*' => 3] => [
                             ['open', \3, \2],
-                            ['control', \1, 'sni:180', \3],
+                            ['push', \1, \3],
                         ],
-                        [any => 1, [qw(int id string)] => 2, '"arg"' => 3] => ['user*' => 4] => [
+                        [any => 1, [qw(int id string bool)] => 2, '"arg"' => 3] => ['user*' => 4] => [
                             ['open', \4, \2],
                             ['control', \1, 'sni:180', \4, \3],
                         ],
                         [any => 1, reg => 2, '"arg"' => 3] => [] => [
                             ['control', \1, 'sni:180', \2, \3],
                         ],
-                        [any => 1, [qw(int id string)] => 2, reg => 3] => ['user*' => 4, 'arg' => 5] => [
+                        [any => 1, [qw(int id string bool)] => 2, reg => 3] => ['user*' => 4, 'arg' => 5] => [
                             ['open', \4, \2],
                             ['replace', \5, \3],
                             ['control', \1, 'sni:180', \4, \3],
@@ -136,7 +138,7 @@ my %_synthetic = (
                             ['replace', \4, \3],
                             ['control', \1, 'sni:180', \2, \4],
                         ],
-                        [any => 1, [qw(int id string)] => 2, any => 3] => ['user*' => 4, 'arg' => 5] => [
+                        [any => 1, [qw(int id string bool)] => 2, any => 3] => ['user*' => 4, 'arg' => 5] => [
                             ['open', \4, \2],
                             ['open', \5, \3],
                             ['control', \1, 'sni:180', \4, \3],
@@ -165,6 +167,10 @@ my %_synthetic = (
                             ['replace', \4, \3],
                             ['open', \5, \2],
                             ['control', \1, 'sni:102', \5, \4],
+                        ],
+                        [reg => 1, reg => 2, any => 3] => ['arg' => 4] => [
+                            ['open', \4, \3],
+                            ['control', \1, 'sni:102', \2, \4],
                         ],
                         [reg => 1, any => 2, any => 3] => ['arg' => 4, 'user*' => 5] => [
                             ['open', \4, \3],
@@ -849,6 +855,8 @@ sub _proc_parts {
         $was_return = $opcode->is_return;
         ${$autodie} = undef if $opcode->is_autodie;
         $self->_pushback(pos => $pos, parts => $parts, opts => {%{$opts}, size => $opcode->required_size});
+    } elsif (defined($_info{$cmd}) && scalar(@args) > 1 && $args[0] =~ /^~0?$/) {
+        # no-op for now.
     } else {
         my $done;
 
@@ -1063,7 +1071,7 @@ SIRTX::VM::Assembler - module for assembling SIRTX VM code
 
 =head1 VERSION
 
-version v0.05
+version v0.06
 
 =head1 SYNOPSIS
 

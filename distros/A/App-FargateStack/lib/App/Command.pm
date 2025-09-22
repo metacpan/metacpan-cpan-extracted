@@ -77,7 +77,7 @@ use Readonly;
 use Role::Tiny::With;
 
 with 'App::Logger';
-with 'App::Benchmark';
+with 'App::BenchmarkRole';
 
 Readonly::Scalar our $EMPTY => q{};
 

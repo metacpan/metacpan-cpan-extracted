@@ -1,5 +1,3 @@
-#!/usr/bin/env perl
-
 # [[[ PRE-HEADER ]]]
 # suppress 'WEXRP00: Found multiple perl executables' due to blib/ & pre-existing installation(s)
 BEGIN { $ENV{PERL_WARNINGS} = 0; }

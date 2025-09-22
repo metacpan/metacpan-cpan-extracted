@@ -43,7 +43,7 @@
    "provides" : {
       "Minima" : {
          "file" : "lib/Minima.pm",
-         "version" : "v0.6.1"
+         "version" : "v0.6.2"
       },
       "Minima::App" : {
          "file" : "lib/Minima/App.pm"
@@ -76,6 +76,6 @@
          "url" : "https://github.com/tessarin/Minima"
       }
    },
-   "version" : "v0.6.1",
+   "version" : "v0.6.2",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

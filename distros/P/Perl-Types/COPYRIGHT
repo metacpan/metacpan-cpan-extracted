@@ -1,26 +1,19 @@
-Perl::Types is Copyright © 2023 Auto-Parallel Technologies, Inc.
+Perl::Types is Copyright © 2025 Perl Community 501(c)(3) nonprofit organization.
 All rights reserved.
 
-Perl::Types is part of the APTech Family of software and documentation.
+Perl::Types is part of the Perl Community Family of software, documentation, and creative data compilations.
 
 This program is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, which is either:
-
-    a) the GNU General Public License as published by the Free
-    Software Foundation; either version 1, or (at your option) any
-    later version, or
-
-    b) the "Artistic License" which comes with this Kit.
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3, or (at your option)
+any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See either
-the GNU General Public License or the Artistic License for more details.
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+GNU General Public License for more details.
 
-You should have received a copy of the Artistic License with this
-Kit, in the file named "ARTISTIC".  If not, I'll be glad to provide one.
-
-You should also have received a copy of the GNU General Public License
+You should have received a copy of the GNU General Public License
 along with this program in the file named "LICENSE". If not, write to the
 Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 Boston, MA 02110-1301, USA or visit their web page on the internet at

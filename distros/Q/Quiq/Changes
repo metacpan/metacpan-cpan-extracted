@@ -1,3 +1,52 @@
+1.132 2025-09-21
+================
+
+[Quiq::StreamServe::Block]
+* concat(): Methode hinzugefügt
+*getFirst(): Methode hinzugefügt
+
+[Quiq::StreamServe::Stream]
+* numberOfStreams(): Methode hinzugefügt
+
+[Quiq::Zugferd::Entity::Kaeufer]
+* Attribute auftragsreferenz, umsatzsteuerId hinzugefügt
+
+[Quiq::Zugferd::Entity::Rechnung]
+* Attribut bestellnummer entfernt
+
+[Quiq::Zugferd::Entity::Verkaeufer]
+* Attribute auftragsreferenz hinzugefügt
+
+[Quiq::DirHandle]
+* Doku bearbeitet
+
+[Quiq::Eog]
+* moveToEnd(): Methode hinzugefügt
+
+[Quiq::FileHandle]
+* captureStderr(): Code verbessert
+
+[Quiq::Hash]
+* validate(): in validateKeys() umbenannt
+
+[Quiq::LOgger]
+* Kosmetik
+
+[Quiq::Mustang]
+* diverse Verbesserungen
+
+[Quiq::Option]
+* Kosmetik
+
+[Quiq::Path]
+* reduceToEnvVar(): Methode hinzugefügt
+
+[Quiq::String]
+* concat(): Methode hnzugefügt
+
+[Quiq::Zugferd]
+* resolvePlaceholders(): Methode überarbeitet
+
 1.130 2025-08-30
 ================
 

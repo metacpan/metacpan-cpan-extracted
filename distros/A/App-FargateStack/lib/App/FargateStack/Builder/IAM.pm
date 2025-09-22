@@ -9,7 +9,7 @@ use Data::Compare;
 use English qw(-no_match_vars);
 
 use App::FargateStack::Constants;
-use App::FargateStack::Builder::Utils;
+use App::FargateStack::Builder::Utils qw(choose log_die);
 use Text::Diff;
 use JSON;
 
@@ -22,21 +22,57 @@ sub build_iam_role {
 
   my ( $config, $tasks, $dryrun ) = $self->common_args(qw(config tasks dryrun));
 
-  my $cache = $self->get_cache;
-
   my $iam = $self->fetch_iam;
-
-  my $role = $config->{role};
-
-  $self->log_trace( sub { return Dumper( [ role => $role ] ) } );
 
   ######################################################################
   # create role
   ######################################################################
+  my $role = $config->{role} // {};
+  $config->{role} = $role;
+
+  $self->log_trace( sub { return Dumper( [ role => $role ] ) } );
+
   my ( $role_name, $role_arn ) = $self->create_fargate_role();
 
   my $policy_name = $role->{policy_name} // $self->create_default( 'policy-name', 'ecs' );
   @{$role}{qw(name arn policy_name)} = ( $role_name, $role_arn, $policy_name );
+
+  ######################################################################
+  # create policy - see if policy needs to be created or updated
+  ######################################################################
+  $self->create_policy( $iam, 'ecs' );
+
+  ######################################################################
+  # create task role
+  ######################################################################
+  my $task_role = $config->{task_role} // {};
+  $config->{task_role} = $task_role;
+
+  $self->log_trace( sub { return Dumper( [ task_role => $task_role ] ) } );
+
+  my ( $task_role_name, $task_role_arn ) = $self->create_fargate_task_role();
+
+  my $task_policy_name = $task_role->{policy_name} // $self->create_default( 'policy-name', 'task' );
+  @{$task_role}{qw(name arn policy_name)} = ( $task_role_name, $task_role_arn, $task_policy_name );
+
+  ######################################################################
+  # create task policy
+  ######################################################################
+  $self->create_policy( $iam, 'task' );
+
+  return;
+}
+
+########################################################################
+sub create_policy {
+########################################################################
+  my ( $self, $iam, $type ) = @_;
+
+  my ( $config, $dryrun ) = $self->common_args(qw(config dryrun));
+
+  my $role = $type eq 'ecs' ? $config->{role} : $config->{task_role};
+
+  my ( $policy_name, $role_name ) = @{$role}{qw(policy_name name)};
 
   ######################################################################
   # create policy - see if policy needs to be created or updated
@@ -56,14 +92,18 @@ sub build_iam_role {
     sub {
       return Dumper(
         [ policy => $policy,
-          cache  => $cache,
           role   => $role
         ]
       );
     }
   );
 
-  my $role_policy = $self->create_fargate_policy;
+  my $role_policy = choose {
+    return $self->create_fargate_policy
+      if $type eq 'ecs';
+
+    return $self->create_fargate_task_policy;
+  };
 
   my $policy_exists = $FALSE;
 
@@ -84,7 +124,7 @@ sub build_iam_role {
   );
 
   if ( $policy_exists && $policy_exists != -1 ) {
-    $self->log_info( 'iam: policy: [%s] exists...%s', $policy_name, $cache || 'skipping' );
+    $self->log_info( 'iam: policy: [%s] exists...%s', $policy_name, 'skipping' );
     $self->inc_existing_resources( 'iam:role-policy' => [$policy_name] );
     return;
   }
@@ -103,20 +143,23 @@ sub build_iam_role {
   return
     if $dryrun;
 
-  # policy exists but differs
+  # -- policy exists but differs
   if ( $policy_exists == -1 ) {
     $self->log_warn( 'iam: deleting policy [%s] for role [%s]...', $policy_name, $role_name );
     $iam->delete_role_policy( $role_name, $policy_name );
   }
 
+  $self->log_trace( sub { return Dumper( [ 'iam:policy' => $role_policy ] ); } );
+
   $self->log_warn( 'iam: creating policy [%s] for role [%s]...', $policy_name, $role_name );
 
   $iam->put_role_policy( $role_name, $policy_name, $role_policy );
 
-  $self->log_trace( sub { return Dumper( [ 'iam:policy' => $role_policy ] ); } );
-
-  log_die( $self, "ERROR: could not create policy %s for %s\n%s", $role_name, $policy_name, $iam->get_error )
-    if $iam->get_error;
+  $iam->check_result(
+    { message => "ERROR: could not create policy %s for %s\n%s",
+      params  => [ $role_name, $policy_name, $iam->get_error ]
+    }
+  );
 
   return;
 }
@@ -141,6 +184,27 @@ sub create_fargate_policy {
 
   push @statement, $self->add_log_group_policy();
 
+  if ( my $secrets = $self->get_secrets ) {
+    push @statement, $self->add_secrets_policy($secrets);
+  }
+
+  return $role_policy;
+}
+
+########################################################################
+sub create_fargate_task_policy {
+########################################################################
+  my ($self) = @_;
+
+  my $config = $self->get_config;
+
+  my @statement;
+
+  my $role_task_policy = {
+    Version   => $IAM_POLICY_VERSION,
+    Statement => \@statement,
+  };
+
   if ( $config->{bucket} ) {
     push @statement, $self->add_bucket_policy;
   }
@@ -153,11 +217,13 @@ sub create_fargate_policy {
     push @statement, $self->add_secrets_policy($secrets);
   }
 
-  return $role_policy;
+  return $role_task_policy;
 }
 
 ########################################################################
 sub create_fargate_role { return shift->create_role( @_, 'ecs' ); }
+########################################################################
+sub create_fargate_task_role { return shift->create_role( @_, 'task' ); }
 ########################################################################
 
 ########################################################################
@@ -186,25 +252,27 @@ sub create_role {
     ]
   };
 
-  my $role_config = sub {
+  my $role_config = choose {
     if ( $type eq 'events' ) {
       $config->{events_role} //= {};
       return $config->{events_role};
     }
-    else {
+    elsif ( $type eq 'ecs' ) {
       $config->{role} //= {};
       return $config->{role};
     }
+    elsif ( $type eq 'task' ) {
+      $config->{task_role} //= {};
+      return $config->{task_role};
+
     }
-    ->();
+  };
 
-  my $role_name = $role_config->{name};
-
-  $role_name //= $self->create_default( 'role-name', $type );
+  my $role_name = $role_config->{name} // $self->create_default( 'role-name', $type );
 
   my $role = choose {
     return { Role => { Arn => $role_config->{arn} } }
-      if $self->get_cache && $role_config->{arn};
+      if $role_config->{arn};
 
     return $iam->role_exists($role_name);
   };

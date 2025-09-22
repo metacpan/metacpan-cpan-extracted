@@ -63,7 +63,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.230';
+our $VERSION = '1.231';
 
 use Scalar::Util ();
 use Quiq::Stacktrace;
@@ -907,12 +907,12 @@ sub hashSize {
 
 # -----------------------------------------------------------------------------
 
-=head3 validate() - Überprüfe Hash-Schlüssel
+=head3 validateKeys() - Überprüfe Hash-Schlüssel
 
 =head4 Synopsis
 
-  $class->validate(\%hash,\@keys);
-  $class->validate(\%hash,\%keys);
+  $class->validateKeys(\%hash,\@keys);
+  $class->validateKeys(\%hash,\%keys);
 
 =head4 Description
 
@@ -924,7 +924,7 @@ Prüfe die Schlüssel des Hash %hash gegen die Schlüssel in Array
 
 # -----------------------------------------------------------------------------
 
-sub validate {
+sub validateKeys {
     my ($class,$h,$arg) = @_;
 
     my $refH;
@@ -1766,7 +1766,7 @@ Das Benchmark-Programm (bench-hash):
 
 =head1 VERSION
 
-1.230
+1.231
 
 =head1 AUTHOR
 

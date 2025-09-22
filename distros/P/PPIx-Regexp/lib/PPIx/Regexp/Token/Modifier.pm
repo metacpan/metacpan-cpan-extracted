@@ -105,7 +105,7 @@ use PPIx::Regexp::Constant qw{
     @CARP_NOT
 };
 
-our $VERSION = '0.089';
+our $VERSION = '0.090';
 
 # Define modifiers that are to be aggregated internally for ease of
 # computation.
@@ -237,19 +237,35 @@ sub can_be_quantified { return };
     sub explain {
 	my ( $self ) = @_;
 	my @rslt;
-	my %mods = $self->modifiers();
-	if ( defined( my $val = delete $mods{match_semantics} ) ) {
+	my %modifier = $self->modifiers();
+	if ( defined( my $val = delete $modifier{match_semantics} ) ) {
 	    push @rslt, $explanation{$val};
 	}
-	foreach my $key ( sort keys %mods ) {
-	    if ( my $val = $mods{$key} ) {
-		push @rslt, $explanation{ $key x $val };
-	    } else {
-		push @rslt, $explanation{ "-$key" };
+	foreach my $mod ( sort keys %modifier ) {
+	    my $val = $modifier{$mod};
+	    my $key = $val ? $mod x $val : "-$mod";
+	    push @rslt, $explanation{$key};
+	    unless ( defined $rslt[-1] ) {
+		if ( my $code = $self->can( "_explain_$mod" ) ) {
+		    $rslt[-1] = "$key: " . $code->( $self, $mod, $val );
+		} else {
+		    $rslt[-1] = "$key: unknown modifier";
+		}
 	    }
 	}
 	return wantarray ? @rslt : join '; ', @rslt;
     }
+}
+
+# Called dynamically from explain(), above. This explanation is per
+# Commit 040a4d7 (perlop: properly document s///e modifier) by mauke,
+# which makes perlop explicitly state that more than 2 'e' modifiers are
+# permitted, and cause the result of the expression to be eval-ed n-1
+# times, where n is the number of 'e' modifiers.
+sub _explain_e {	## no critic (ProhibitUnusedPrivateSubroutines)
+    my ( undef, undef, $val ) = @_;
+    --$val;
+    return "substitution is expression whose result is eval()-ed $val times";
 }
 
 =head2 match_semantics

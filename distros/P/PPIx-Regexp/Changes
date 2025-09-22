@@ -1,3 +1,13 @@
+0.090		2025-09-21	T. R. Wyant
+    Explain s///eee... Perl commit 040a4d7 (perlop: properly document
+    s///e modifier) by mauke, makes perlop explicitly state that more
+    than 2 'e' modifiers are permitted, and cause the result of the
+    expression to be eval-ed n-1 times, where n is the number of 'e'
+    modifiers.
+
+    Fix typo in comment. Thanks to Michal Josef Špaček for picking this
+    up and providing the pull request.
+
 0.089		2025-05-18	T. R. Wyant
     The /x modifier should not affect the parse of the replacement
     string in a substitution operator. That is, the '#' in s/x/#/x does

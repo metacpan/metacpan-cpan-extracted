@@ -84,6 +84,7 @@ MANIFEST
 META.json
 META.yml
 README
+SECURITY
 t/basic.t
 t/fuzz.t
 t/inf.t

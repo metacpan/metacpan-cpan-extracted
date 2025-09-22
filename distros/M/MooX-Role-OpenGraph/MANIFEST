@@ -1,0 +1,8 @@
+lib/MooX/Role/OpenGraph.pm
+Changes.md
+MANIFEST
+t/lib/Object.pm
+t/object.t
+Makefile.PL
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

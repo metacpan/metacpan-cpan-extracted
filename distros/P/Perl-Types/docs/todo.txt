@@ -1,0 +1,42 @@
+CURRENT
+
+    declare `FOO::method` for data structures such as `arrayref::integer::method` and `hashref::string::method`, normal data types already declared
+
+OLD, NEED REVIEW & UPDATE
+
+    enable subroutine argument type-checking of user-defined Class types, see "NEED UPGRADE" in Class.pm create_symtab_entries_and_accessors_mutators()
+    disable use of 'constant_FOO' data types?  currently converted in RPerl::Generator::type_convert_perl_to_cpp(), possible 'const const' conflict in RPerl::CompileUnit::Constant
+    sort hash keys when generating string output in *hashref_to_string() CPPOPS Hash.cpp, as is done with 'sort keys' in PERLOPS Hash/Subtypes.pm
+    determine if 'long long' or 'long double' can be used at all???
+        DEV NOTE, CORRELATION #rp041: GMP does not support 'long long' or 'long double', will cause t/07_type_gmp.t to fail
+    scalar, scalar_arrayref, scalar_hashref, scalar_*
+    implement 3-D arrays & hashes
+    implement *OPS_*TYPES *_arrayref_arrayref_to_string()
+    implement *OPS_*TYPES boolean_arrayref_to_string(), nonsigned_integer_arrayref_to_string(), gmp_integer_arrayref_to_string(), character_arrayref_to_string()
+    implement CPPOPS_*TYPES *arrayref_to_string()
+    enable semi-dynamic auto-config of number format code for printf & friends in CPPOPS modes, replace %f by %"NUMBER"
+    add remaining generic overloaded type conversion subroutines to_boolean(), to_integer(), to_nonsigned_integer(), to_gmp_integer(), to_character() in perltypes.*
+    enable config of RPerl::NUMBER_EPSILON in RPerl/Config.pm to use either POSIX::FLT_EPSILON() or POSIX::DBL_EPSILON() http://perldoc.perl.org/POSIX.html#FLOAT
+    PERLOPS_CPPTYPES conversion routines
+    boolean_arrayref, nonsigned_integer_arrayref, character_arrayref
+    boolean_hashref, nonsigned_integer_hashref, character_hashref
+    gmp_integer_arrayref, gmp_integer_hashref
+    sse_number_pair_arrayref, sse_number_pair_hashref
+    enable looks_like_number() in *OPS_*TYPES (AKA all modes)
+        use in string_to_NUMERIC*() (AKA all string conversion subroutines) to reject non-numeric characters with RPerl error instead of Perl error
+        http://perldoc.perl.org/perlapi.html#looks_like_number
+    export ::*_*ref_to_*() conversion subroutines the same as ::*_to_*() subs in perltypesconv.pm, remove leading scopes in all calls
+    remove all object* types
+    add arrayref::grow_capacity() as safe version of std::vector::resize()
+    Dumper() in C++, use as default overload for <<
+    implement remaining *_arrayref_arrayref_CHECK*() in lib/DataStructure/Array/SubTypes.cpp
+    pre-declare RPerl::DataTypes and Perl::Structures, as discussed in RPerl/DataStructure/Array.pm $properties, so this works: 'use Perl::Structure::Array;'
+    constant hashrefs and arrayrefs, via "use constant" pragma OR ":const" Perl internals attribute OR "constant_integer_hashref" data types
+        :const supported in cperl only at this time
+            add a sub integer::MODIFY_SCALAR_ATTRIBUTE, which handles :const
+            `my integer $i :const = 1;`
+            http://perldoc.perl.org/attributes.html
+            integer class need only to accept or reject attributes. new() is not needed, neither @ISA
+            the stash must exists. I do %int::; that creates the stash, so its valid syntax
+            for :const I added the MODIFY_SCALAR_ATTRIBUTE function (into xsutils.c?)
+            also MODIFY_HASH_ATTRIBUTE and so on, for every reftype, _ARRAY_, _CODE_, …

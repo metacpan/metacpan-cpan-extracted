@@ -1,0 +1,60 @@
+{
+   "abstract" : "A role for generating OpenGraph meta tags",
+   "author" : [
+      "Dave Cross <dave@perlhacks.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "MooX-Role-OpenGraph",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0",
+            "namespace::autoclean" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moo" : "0",
+            "perl" : "5.020000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Moose" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/davorg-cpan/moox-role-opengraph/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/davorg-cpan/moox-role-opengraph.git",
+         "web" : "https://github.com/davorg-cpan/moox-role-opengraph"
+      }
+   },
+   "version" : "v0.0.3",
+   "x_contributors" : [],
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

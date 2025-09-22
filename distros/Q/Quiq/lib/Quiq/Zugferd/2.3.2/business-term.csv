@@ -4,16 +4,17 @@
 # 2: Pflicht bei Validierung durch den Mustang-Validator
 # ---
 BG-21-1;0;;Indikator für Zuschlag, Wert
-BT-1;1;rechnungsnummer;Rechnungsnummer
-BT-2;1;rechnungsdatum;Rechnungsdatum
+BT-1;1;;rechnungsnummer;Rechnungsnummer
+BT-2;1;;rechnungsdatum;Rechnungsdatum
 BT-2-0;1;;Code des Datumsformats
-BT-3;1;rechnungsart;Code für den Rechnungstyp (Werte siehe ZUGFeRD Doku)
-BT-5;1;waehrung;Code für die Rechnungswährung
+BT-3;1;;rechnungsart;Code für den Rechnungstyp (Werte siehe ZUGFeRD Doku)
+BT-5;1;;waehrung;Code für die Rechnungswährung
 BT-9;2;;Fälligkeitsdatum der Zahlung
 BT-9-0;2;;Datum, Format
 BT-10;0;;Leitweg-ID
 BT-12;0;;Vertragsreferenz
 BT-13;0;;Bestellreferenz
+BT-14;0;;Verkaufsauftragsreferenz
 BT-99;0;;Betrag des Zuschlags auf Dokumentenebene
 BT-20;0;;Zahlungsbedingungen
 BT-21;0;;Code zum Freitext der Rechnung
@@ -78,6 +79,8 @@ BT-118-0;1;;Art der Steuer (Code)
 BT-118;1;;Code der Umsatzsteuerkategorie
 BT-119;2;;Kategoriespezifischer Umsatzsteuersatz
 BT-120;0;;Umsatzsteuerbefreiungsgrund
+BT-122;0;;Kennung der rechnungsbegründenden Unterlage
+BT-122-0;0;;Typ des referenzierten Dokuments
 BT-126;1;;Kennung der Rechnungsposition
 BT-127;0;;Freitext zur Rechnungsposition
 BT-128-1;0;;Kennung des Schemas

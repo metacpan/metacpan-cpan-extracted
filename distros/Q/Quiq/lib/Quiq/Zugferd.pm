@@ -42,7 +42,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.230';
+our $VERSION = '1.231';
 
 use Quiq::PerlModule;
 use Quiq::Path;
@@ -54,8 +54,8 @@ use XML::Compile::Util ();
 use Quiq::Shell;
 use Quiq::Storable;
 use Quiq::AnsiColor;
-use Quiq::Xml;
 use Quiq::FileHandle;
+use Quiq::Xml;
 use Quiq::Hash;
 
 # -----------------------------------------------------------------------------
@@ -433,7 +433,7 @@ sub processSubTree {
 
 =head4 Synopsis
 
-  $xml = $zug->resolvePlaceholders(@keyVal,%options);
+  ($xml,$status,$debugText) = $zug->resolvePlaceholders(@keyVal,%options);
 
 =head4 Arguments
 
@@ -474,12 +474,12 @@ Aktiviere die Validierung durch XML::Compile
 
 =head4 Returns
 
-(String) XML nach Platzhalter-Ersetzung
+(Boolean,String,String) XML nach Platzhalter-Ersetzung und Debug-Text
 
 =head4 Description
 
 Ersetze die Platzhalter im Template des ZUGFeRD-Profils und liefere
-das resultierende XML zurück.
+das resultierende XML sowie etwaigen Debug-Text zurück.
 
 =cut
 
@@ -508,14 +508,16 @@ sub resolvePlaceholders {
     );
     # @$argA;
 
+    my $text = '';
     if ($showPlaceholders) {
-        printf "--%s--\n",$a->str('bold red',$label);
+        $text .= sprintf "--%s--\n",$a->str('bold red',$label);
         for (my $i = 0; $i < @$argA; $i += 2) {
             my $key = $argA->[$i];
             my $val = $argA->[$i+1];
             my $method = lc substr($key,0,2);
             my $bt = $self->$method($key);
-            printf "%s = %s - %s%s\n",$key,defined($val)? "'$val'": 'undef',
+            $text .= sprintf "%s = %s - %s%s\n",$key,
+                defined($val)? "'$val'": 'undef',
                 $bt->mandatory? $a->str('bold dark green','*').' ': '',
                 $a->str('dark green',$bt->text);
         }
@@ -526,7 +528,7 @@ sub resolvePlaceholders {
             '--',
             @$argA
         );
-        return;
+        return (0,'','');;
     }
 
     my ($sch,$rootType,$tree) = $self->get(qw/sch rootType tree/);
@@ -541,15 +543,15 @@ sub resolvePlaceholders {
     $tree->reduceTree;
 
     if ($showTree) {
-        say '-----';
-        say Quiq::Dumper->dump($tree);
-        say '-----';
+        $text .= "-----\n";
+        $text .= Quiq::Dumper->dump($tree);
+        $text .= "-----\n";
     }
 
     # (Leeren) XML-Baum instantiieren
     my $doc = XML::LibXML::Document->new('1.0','UTF-8');
 
-    # Instantiiere XML-Writer
+    # Erzeuge XML-Writer
 
     my $wrt = $sch->compile(WRITER=>$rootType,
         validation => $validate,
@@ -558,12 +560,27 @@ sub resolvePlaceholders {
             'urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100'],
     );
 
-    # Wandele den Baum in XML
-    my $xml = $wrt->($doc,$tree);
+    # Wandele den Baum nach XML. Auch wenn eine Validierung abgeschaltet
+    # ist (s.o.), kann es passieren, dass der Writer eine Exception wirft.
+    # Er schreibt dann auch eine Meldung nach STDERR, was störend ist.
+    # Wir fangen beides mit folgendem Code ab.
 
+    my $error = '';
+    my $xml = do {
+        local *STDERR;
+        Quiq::FileHandle->captureStderr(\$error);
+        eval {$wrt->($doc,$tree)};
+    };
+    $text .= $error;
+
+    if ($@) {
+        return (1,'',$text);
+    }
+    
     # Liefere das XML formatiert
+
     $xml =~ s/\x2//g; # CTRL-B herausfiltern => Quiq Fix
-    return Quiq::Xml->print($xml);
+    return (0,Quiq::Xml->print($xml),$text);
 }
 
 # -----------------------------------------------------------------------------
@@ -640,10 +657,12 @@ sub toXml {
 
     # Operation ausführen
 
+    my $debugText = '';
     if ($debug) {
         my $a = Quiq::AnsiColor->new(1);
-        printf "---%s---\n",$a->str('bold red','Objects');
-        say Quiq::Dumper->dump($rch),"---";
+        $debugText .= sprintf "---%s---\n",$a->str('bold red','Objects');
+        $debugText .= Quiq::Dumper->dump($rch);
+        $debugText .= "---";
     }
 
     # Freitexte
@@ -731,7 +750,7 @@ sub toXml {
        return $t;
     });
 
-    return $self->resolvePlaceholders(
+    my ($status,$xml,$text) = $self->resolvePlaceholders(
         -label => 'Rechnung',
         -validate => !$debug,
         -showPlaceholders => $debug,
@@ -758,6 +777,7 @@ sub toXml {
         'BT-35' => $rch->verkaeufer->strasse,
         'BT-37' => $rch->verkaeufer->ort,
         'BT-40' => $rch->verkaeufer->land,
+        'BT-14' => $rch->verkaeufer->auftragsreferenz,
         'BT-31' => $rch->verkaeufer->umsatzsteuerId,
         'BT-31-0' => 'VA',
         # Käufer (Zahler)
@@ -768,6 +788,9 @@ sub toXml {
         'BT-53' => $rch->kaeufer->plz,
         'BT-52' => $rch->kaeufer->ort,
         'BT-55' => $rch->kaeufer->land,
+        'BT-13' => $rch->kaeufer->auftragsreferenz,
+        'BT-48' => $rch->kaeufer->umsatzsteuerId,
+        'BT-48-0' => $rch->kaeufer->umsatzsteuerId? 'VA': undef,
         # Empfänger
         'BT-70' => $rch->empfaenger->name,
         'BT-76' => $rch->empfaenger->kontakt,
@@ -790,6 +813,18 @@ sub toXml {
         # Umsatzsteuern
         'BG-23' => $bg23,
     );
+    $debugText .= $text;
+    $debugText .= $self->checkAttributes($rch);
+
+    # Allgemeine Regeln, nach denen Rechnungen aussortiert werden
+
+    if ($rch->faelligerBetrag eq '0.00') {
+        # FIXME: temporär inaktiviert
+        # $status = 2;
+        # $debugText .= "AUSSORTIERT: faelligerBetrag = '0.00'\nXS";
+    }
+
+    return ($status,$xml,$debugText);
 }
 
 # -----------------------------------------------------------------------------
@@ -1234,7 +1269,7 @@ Texte auf Rechnungs- und Positionsebene
 
 =head1 VERSION
 
-1.230
+1.231
 
 =head1 AUTHOR
 

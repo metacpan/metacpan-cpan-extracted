@@ -16,7 +16,7 @@ use YAML qw(LoadFile);
 
 use Role::Tiny;
 
-our $VERSION = '1.0.43';
+our $VERSION = '1.0.47';
 
 ########################################################################
 sub init {
@@ -70,7 +70,12 @@ sub init {
 
   my $ec2 = $self->_init_ec2( $vpc_id, %{ $self->get_global_options } );
 
-  $self->get_config->{subnets} = $ec2->get_subnets;
+  if ( !$vpc_id ) {
+    $vpc_id = $ec2->get_vpc_id;
+    $config->{vpc_id} = $vpc_id;
+  }
+
+  $config->{subnets} = $ec2->get_subnets;
 
   $self->fetch_ecs->set_ec2($ec2);
 

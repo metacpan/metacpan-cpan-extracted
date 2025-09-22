@@ -5,7 +5,7 @@ bin/app-FargateStack-docker
 lib/App/ACM.pm
 lib/App/ApplicationAutoscaling.pm
 lib/App/AWS.pm
-lib/App/Benchmark.pm
+lib/App/BenchmarkRole.pm
 lib/App/CloudTrail.pm
 lib/App/Command.pm
 lib/App/EC2.pm

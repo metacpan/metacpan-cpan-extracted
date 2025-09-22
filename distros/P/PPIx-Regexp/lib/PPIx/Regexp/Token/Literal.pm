@@ -47,7 +47,7 @@ use PPIx::Regexp::Constant qw{
 
 use PPIx::Regexp::Util qw{ :width_one };
 
-our $VERSION = '0.089';
+our $VERSION = '0.090';
 
 sub __new {
     my ( $class, $content, %arg ) = @_;
@@ -260,7 +260,7 @@ sub __PPIX_TOKENIZER__regexp {
     # is whitespace, and '#' introduces a comment. Otherwise they are
     # both literals.
     # NOTE that the mode check is necessary for this section of code
-    # becaise we call this code in both 'regexp' and 'repl' mode.
+    # because we call this code in both 'regexp' and 'repl' mode.
     my $heed_x = $tokenizer->get_mode() eq 'regexp';
     if ( $heed_x && $tokenizer->modifier( 'x*' ) &&
 	! $tokenizer->cookie( COOKIE_CLASS ) ) {

@@ -1,3 +1,84 @@
+Mon Sep 22 05:21:47 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.46]:
+	* VERSION: bump
+	* lib/App/Benchmark.pm.in -> lib/App/BenchmarkRole.pm.in
+	* Makefile: above
+	* lib/App/Command.pm.in: above
+	* lib/App/FargateStack.pm.in: above
+	* lib/App/AWS.pm.in
+	(command): don't decode if output is text
+	* lib/App/FargateStack/Builder/IAM.pm.in
+	- import log_die
+	* lib/App/FargateStack/Builder/TaskDefinition.pm.in
+	(task_execution_role): remove
+	(create_role_arn): new
+	(create_taskdef_files)
+	- use above
+	- add taskRoleArn
+	* lib/App/FargateStack/Constants.pm.in: amazon, not amazn
+
+
+Sun Sep 21 11:19:05 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.45]:
+	* VERSION: bump
+	* lib/App/FargateStack.pm.in
+	(cmd_update_service): remove --force, use redeploy
+	(cmd_destroy): new
+	(cmd_tasks): new
+	(cmd_delete_schedule): delete_task_resource(task-name)
+	(cmd_delete_daemon): likewise
+	(cmd_delete_http_service): likewise
+	(cmd_delete_task): likewise
+	(main): +tasks
+	* lib/App/FargateStack/Builder.pm.in
+	(delete_task_resources)
+	- only need task-name
+	- use type from config
+	(_delete_roles)
+	- only need confirm-all
+	* lib/App/FargateStack/Pod.pm.in
+	- mention autoscaling in feature list
+
+Fri Sep 19 14:12:27 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.44]:
+	* README.md: generated
+	* VERSION: bump
+	* lib/App/EC2.pm.in
+	(new): refactored
+	* lib/App/FargateStack.pm.in
+	(cmd_update_service): force-update
+	* lib/App/FargateStack/Builder/TaskDefinition.pm.in
+	(register_task_definition)
+	- warn if image not pushed to ECR
+	(compare_task_definition)
+	- compare arrays separately
+	(array_compare): new
+	* lib/App/FargateStack/Builder/Utils.pm.in
+	(fetch_cli_api)
+	- don't clobber options set during new()
+	* lib/App/FargateStack/CreateStack.pm.in
+	(cmd_create_stack): croak if wrong order of spec
+	* lib/App/FargateStack/Init.pm.in
+	(init): set vpc_id if not set
+	* lib/App/FargateStack/Pod.pm.in
+	- mention order of specs for create-stack
+	* lib/App/FargateStack/Builder/IAM.pm.in
+	(build_iam_role)
+	- refactored to add task role & policy
+	(create_fargate_policy): remove S3, SQS permissions
+	(create_fargate_task_policy):new
+	(create_fargate_task_role): new
+	(create_role): new
+	* lib/App/FargateStack/Constants.pm.in
+	(%DEFALT_NAMES)
+	- handle 'task' roles for 'role-name'
+	* lib/App/IAM.pm.in
+	(is_policy_attached)
+	- whitepace, refactored
+
 Wed Sep 17 10:27:29 2025  Rob Lauer  <rlauer6@comcast.net>
 
 	[1.0.43]:

@@ -22,7 +22,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.230';
+our $VERSION = '1.231';
 
 use Encode::Guess ();
 use Encode ();
@@ -851,9 +851,61 @@ sub wrap {
 
 # -----------------------------------------------------------------------------
 
+=head2 Zusammenfügen
+
+=head3 concat() - Konkateniere Werte mit Trennzeichen
+
+=head4 Synopsis
+
+  $val = $class->concat($sep,@values);
+
+=head4 Arguments
+
+=over 4
+
+=item @values
+
+Die Liste der Werte
+
+=back
+
+=head4 Returns
+
+(String) Konkatenation der Werte
+
+=head4 Description
+
+Konkateniere die werte @values mit Trennzeichen $sep. Ist ein Wert nicht
+vorhanden (undef oder Leerstring), wird er ausgelassen.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub concat {
+    my $class = shift;
+    my $sep = shift;
+    # @_: @values
+
+    my $val = '';
+    for my $str (@_) {
+        if (!defined($str) || $str eq '') {
+            next;
+        }
+        if ($val ne '') {
+            $val .= $sep;
+        }
+        $val .= $str;
+    }
+
+    return $val;
+}
+
+# -----------------------------------------------------------------------------
+
 =head1 VERSION
 
-1.230
+1.231
 
 =head1 AUTHOR
 

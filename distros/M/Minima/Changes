@@ -1,3 +1,11 @@
+v0.6.2  2025-09-21
+
+        [Changes]
+        - Customize build action to remove obsolete templates.
+
+        [Fixes]
+        - Fix template using deprecated methods.
+
 v0.6.1  2025-09-13
 
         [Documentation-Only]

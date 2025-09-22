@@ -27,7 +27,7 @@ package main;
 my $namespaces_core = perltypesnamespaces::hash();
 #print 'in namespaces_regenerate.pl main::, ret from perltypesnamespaces::hash(), have $namespaces_core = ', Dumper($namespaces_core), "\n";
 
-# do not call Module::ScanDeps in RPerl.pm on files in the following namespaces
+# do not call Module::ScanDeps in Perl.pm on files in the following namespaces
 # DEV NOTE, CORRELATION #rp050: hard-coded list of Perl::Types files/packages/namespaces
 my $namespaces_noncompiled = {
     'Acme::' => 1,
@@ -278,7 +278,7 @@ $namespaces_perltypes = { %{$namespaces_perltypes}, %{$namespaces_perltypes_miss
 # separate Perl::Types namespaces and Perl core namespaces; discard Inline build eval_XX_YYYY namespaces
 foreach my $namespace ( keys %{$namespaces_perltypes} ) {
     if ( exists $namespaces_core->{$namespace} ) {
-        if ( $namespace =~ /rperl/ ) {
+        if ( $namespace =~ /perltypes/ ) {
             delete $namespaces_core->{$namespace};
         }
         else {

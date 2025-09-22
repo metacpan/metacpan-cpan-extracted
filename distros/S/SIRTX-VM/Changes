@@ -1,3 +1,12 @@
+v0.06  2025-09-21Z
+    - Added support for open false/true
+    - Added support for data_start_marker
+    - Added support for noop with a small string
+    - Allow the use of info directives (they are still no-ops):
+      .author, .license, .copyright_years, .copyright_holder,
+      .description, .comment, .displayname, .displaycolour,
+      .icon, .icontext
+
 v0.05  2025-09-10Z
     - Added support for push, pop, setvalue, getvalue
     - Added support for /NNN as identifier

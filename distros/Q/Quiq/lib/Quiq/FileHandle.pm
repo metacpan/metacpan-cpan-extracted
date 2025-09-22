@@ -62,7 +62,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.230';
+our $VERSION = '1.231';
 
 use Quiq::Path;
 use Quiq::Option;
@@ -209,7 +209,7 @@ sub new {
                 # Wir haben die Datei geöffnet und schließen sie gleich wieder
                 CORE::close $self;
             }
-            $class->throw('FH-00002: Kann Lock nicht setzen',Errstr=>$!);
+            $class->throw('FH-00002: Can\'t acquire lock',Errstr=>$!);
         };
     }
 
@@ -939,10 +939,12 @@ $str um.
 sub captureStderr {
     my ($class,$ref) = @_;
 
-    CORE::close STDERR;
+    if (Scalar::Util::openhandle(*STDERR)) {
+        CORE::close STDERR;
+    }
     CORE::open STDERR,'>',$ref or do {
         $class->throw(
-            'FH-00001: Abfangen von STDERR fehlgeschlagen',
+            'FH-00001: Capture of STDERR failed',
             Errstr=>$!,
         );
     };
@@ -979,7 +981,7 @@ sub slurpFromStdin {
 
 =head1 VERSION
 
-1.230
+1.231
 
 =head1 AUTHOR
 

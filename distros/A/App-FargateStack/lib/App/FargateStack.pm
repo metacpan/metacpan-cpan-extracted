@@ -40,7 +40,7 @@ with 'App::FargateStack::CloudTrail';
 with 'App::FargateStack::CreateStack';
 with 'App::FargateStack::Autoscaling';
 
-with 'App::Benchmark';
+with 'App::BenchmarkRole';
 
 # builder methods
 with 'App::FargateStack::Builder';
@@ -61,7 +61,7 @@ with 'App::FargateStack::Builder::TaskDefinition';
 with 'App::FargateStack::Builder::Utils';
 with 'App::FargateStack::Builder::WafV2';
 
-our $VERSION = '1.0.43';
+our $VERSION = '1.0.47';
 
 use parent qw(CLI::Simple);
 
@@ -781,7 +781,8 @@ sub cmd_update_service {
 
   $self->verify_service($service_name);
 
-  my $ecs                 = $self->fetch_ecs;
+  my $ecs = $self->fetch_ecs;
+
   my $task_definition_arn = $self->get_latest_task_definition($service_name);
 
   my @elems = qw(status running_count desired_count pending_count task_definition);
@@ -813,6 +814,13 @@ sub cmd_update_service {
     data    => \@data,
     columns => [ 'Status', 'Running Count', 'Pending Count', 'Desired Count' ]
   );
+
+  print {*STDOUT} <<'END_OF_NOTE';
+* Note that this command will not force redeployment of your services! To force redeployment of your servicce:
+
+ app-FargateStack redeploy [service-name]
+
+END_OF_NOTE
 
   return;
 }
@@ -1184,16 +1192,80 @@ sub cmd_destroy {
 ########################################################################
   my ( $self, @args ) = @_;
 
-  print {*STDERR} "TBD\n";
+  my $config = $self->get_config;
+
+  $self->set_dryrun( $self->get_dryrun ? '(dryrun)' : $EMPTY );
+
+  my %tasks = %{ $config->{tasks} };
+
+  if ( !$self->get_force ) {
+    my $warning = <<'END_OF_WARNING';
+** WARNING ** 
+
+This command will remove ALL resources provisioned for the cluster: [%s]!
+
+Resources that were not provisioned by App::FargateStack will NOT be removed.
+
+END_OF_WARNING
+    print {*STDOUT} sprintf $warning, $config->{cluster}->{name}, scalar %tasks;
+
+    log_die( $self, 'Aborting...' )
+      if !confirm( sprintf 'Are you sure you want to delete the entire stack?' );
+  }
+
+  foreach my $task_name ( keys %tasks ) {
+    $self->log_warn( 'destroy: deleting resources for: [%s]', $task_name );
+    $self->delete_task_resources($task_name);
+  }
 
   return $SUCCESS;
 }
+
 ########################################################################
 sub cmd_ {
 ########################################################################
   my ( $self, @args ) = @_;
 
   print {*STDERR} "TBD\n";
+
+  return $SUCCESS;
+}
+
+########################################################################
+sub cmd_tasks {
+########################################################################
+  my ( $self, @args ) = @_;
+
+  my $config = $self->get_config;
+
+  my $tasks = $config->{tasks};
+
+  my $roles = sprintf 'Execution Role: [%s] Task Role: [%s]', $config->{role}->{name}, $config->{task_role}->{name};
+
+  my $title = <<'END_OF_TITLE';
+Stack Summary
+
+Cluster: [%s] VPC: [%s] Region: [%s] Tasks: [%s]
+%s
+
+END_OF_TITLE
+  $title = sprintf $title, $config->{cluster}->{name}, $config->{vpc_id}, $config->{region}, scalar keys %{$tasks}, $roles;
+
+  my @data;
+
+  foreach my $task_name ( keys %{$tasks} ) {
+    my $task = $tasks->{$task_name};
+
+    my $environment = join "\n", map { sprintf '%s: %s', $_, $task->{environment}->{$_} } keys %{ $task->{environment} // {} };
+
+    push @data, { Task => $task_name, Type => $task->{type}, Size => $task->{size}, Environment => $environment };
+  }
+
+  print {*STDOUT} easy_table(
+    table_options => { headingText => $title },
+    data          => \@data,
+    columns       => [qw(Task Type Size Environment)],
+  );
 
   return $SUCCESS;
 }
@@ -1235,7 +1307,7 @@ END_OF_ERROR
       if !confirm( sprintf 'Are you sure you want to delete the %s scheduled task', $task_name );
   }
 
-  return $self->delete_task_resources( $task_name, 'scheduled' );
+  return $self->delete_task_resources($task_name);
 }
 
 ########################################################################
@@ -1269,7 +1341,7 @@ END_OF_ERROR
     exit 1;
   }
 
-  return $self->delete_task_resources( $task_name, 'task' );
+  return $self->delete_task_resources($task_name);
 }
 
 ########################################################################
@@ -1295,7 +1367,7 @@ END_OF_ERROR
     print {*STDERR} colored( $msg, 'bright_red' );
   }
 
-  return $self->delete_task_resources( $task_name, 'daemon' );
+  return $self->delete_task_resources($task_name);
 }
 
 ########################################################################
@@ -1324,7 +1396,7 @@ END_OF_WARNING
     print {*STDERR} colored( $msg, 'bright_red' );
   }
 
-  return $self->delete_task_resources( $task_name, $tasks->{$task_name}->{type} );
+  return $self->delete_task_resources($task_name);
 }
 
 ########################################################################
@@ -1630,14 +1702,15 @@ sub main {
     'update-target'           => \&cmd_update_target,
     apply                     => \&cmd_apply,
     default                   => [ \&cmd_explain, 'error' ],
-    destroy                   => \&cmd_destroy,
-    help                      => [ \&help,     'error', { skip_init => $TRUE, skip_config => $TRUE } ],
-    logs                      => [ \&cmd_logs, 'error' ],
+    destroy                   => [ \&cmd_destroy, 'error', { skip_init => $TRUE, skip_config => $FALSE } ],
+    help                      => [ \&help,        'error', { skip_init => $TRUE, skip_config => $TRUE } ],
+    logs                      => [ \&cmd_logs,    'error' ],
     plan                      => \&cmd_plan,
     redeploy                  => \&cmd_redeploy,
     show                      => [ \&cmd_show,           'error', { skip_init => $TRUE, skip_config => $TRUE } ],
     state                     => [ \&cmd_state,          'error', { skip_init => $TRUE, skip_config => $TRUE } ],
     status                    => [ \&cmd_service_status, 'error' ],
+    tasks                     => [ \&cmd_tasks,          'error', { skip_init => $TRUE, skip_config => $FALSE } ],
     version                   => [ \&cmd_version,        'error', { skip_init => $TRUE, skip_config => $TRUE } ],
   );
 

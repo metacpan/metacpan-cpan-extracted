@@ -262,15 +262,15 @@ sub test_hashSize : Test(1) {
 
 # -----------------------------------------------------------------------------
 
-sub test_validate : Test(2) {
+sub test_validateKeys : Test(2) {
     my $self = shift;
 
     my $h = {a=>1,b=>2,c=>3};
 
-    eval{Quiq::Hash->validate($h,[qw/a b c/])};
+    eval{Quiq::Hash->validateKeys($h,[qw/a b c/])};
     $self->ok(!$@);
 
-    eval{Quiq::Hash->validate($h,[qw/a b d/])};
+    eval{Quiq::Hash->validateKeys($h,[qw/a b d/])};
     $self->ok($@);
 }
 

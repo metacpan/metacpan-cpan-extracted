@@ -21,21 +21,140 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.230';
+our $VERSION = '1.231';
 
+use Quiq::Path;
+use Quiq::Eog;
 use Quiq::Trash;
 use Quiq::Shell;
-use Quiq::Path;
 use Quiq::Terminal;
 use Quiq::DirHandle;
 use Quiq::Array;
-use Quiq::Eog;
 
 # -----------------------------------------------------------------------------
 
 =head1 METHODS
 
 =head2 Klassenmethoden
+
+=head3 moveToEnd() - Verschiebe ausgewählte Bilder ans Ende des Verzeichnisses
+
+=head4 Synopsis
+
+  $class->moveToEnd($dir,@options);
+
+=head4 Arguments
+
+=over 4
+
+=item $dir
+
+Bildverzeichnis
+
+=back
+
+=head4 Options
+
+=over 4
+
+=item -step => $n (Default: 1)
+
+Schrittweite zwischen den Bildnummern
+
+=back
+
+=head4 Description
+
+Zeige die Bilddateien des Verzeichnisses $dir mit C<eog> an. Bilder, die
+in C<eog> mit C<DEL> gelöscht werden, landen im Trash. Nach Verlassen von
+C<eog> werden die Bilddateien aus dem Trash ans Ende des Verzeichnisses
+bewegt.
+
+Die Methode ist so konzipiert, dass auch Dateien mit dem gleichen
+Grundnamen wie die Bilddatei mitbewegt werden (z.B. .xfc-Dateien).
+
+Ist der Trash bei Aufruf der Methode nicht leer, wird gefragt, ob
+die Dateien im Trash vorab gelöscht werden sollen.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub moveToEnd {
+    my ($class,$dir) = splice @_,0,2;
+
+    my $p = Quiq::Path->new;
+
+    if (!-d $dir) {
+        $class->throw(
+            'EOG-00099: Directory does not exist',
+            Dir => $dir,
+        );
+    }
+
+    # Optionen
+
+    my $step = 1;
+
+    $class->parameters(0,0,\@_,
+        -step => \$step,
+    );
+
+    # Operation ausführen
+
+    # Höchste Dateinummer ermitteln
+    my $maxNumber = $p->maxFileNumber($dir); # Höchste Dateinummer
+
+    # Breite der Dateinmmern ermitteln
+
+    my $width;
+    my $dh = Quiq::DirHandle->new($dir);
+    while (my $entry = $dh->next) {
+        if ($entry =~ /^(\d+)/) {
+            $width = length $1;
+            last;
+        }
+    }
+    $dh->close;
+
+say "step=$step width=$width";
+
+    my %number;
+    my $fileA = Quiq::Eog->pickImages($dir);
+    for my $trashFile (@$fileA) {
+        my $filename = $p->filename($trashFile);
+        $filename =~ /^(\d+)/; # Dateinummer ermitteln
+        my $number = sprintf '%0*d',$width,$1;
+        if (!$number{$number}) {
+            # Dateinummer auf neue Nummer abbilden
+            $maxNumber += $step;
+            $number{$number} = sprintf '%0*d',$width,$maxNumber;
+        }
+
+        # Datei aus dem Trash kopieren
+
+        (my $destFile = "$dir/$filename") =~ s|/$number|/$number{$number}|;
+
+        say "$trashFile => $destFile";
+        $p->rename($trashFile,$destFile);
+        $p->touch($destFile);
+    }
+
+    for my $number (sort keys %number) {
+        my @srcFiles = $p->glob("$dir/$number*");
+        for my $srcFile (@srcFiles) {
+            (my $destFile = $srcFile) =~ s|/$number|/$number{$number}|;
+
+            say "$srcFile => $destFile";
+            $p->rename($srcFile,$destFile);
+            $p->touch($destFile);
+        }
+    }
+
+    return;
+}
+
+# -----------------------------------------------------------------------------
 
 =head3 pickImages() - Wähle Bilddateien mit eog aus
 
@@ -320,10 +439,12 @@ sub transferImages {
             if ($nameToNumber) {
                 my $ext = $p->extension($srcFile);
                 if ($ext) {
-                    $destFile = sprintf '%s/%0*d.%s',$destDir,$width,$number,$ext;
+                    $destFile = sprintf '%s/%0*d.%s',$destDir,$width,$number,
+                        $ext;
                 }
                 else {
-                    $destFile = sprintf '%s/%0*d',$destDir,$width,$number; # Verzeichnis
+                    $destFile = sprintf '%s/%0*d',$destDir,$width,
+                        $number; # Verzeichnis
                 }
             }
             else {
@@ -354,7 +475,7 @@ sub transferImages {
 
 =head1 VERSION
 
-1.230
+1.231
 
 =head1 AUTHOR
 

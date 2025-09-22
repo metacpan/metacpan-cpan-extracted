@@ -22,7 +22,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.230';
+our $VERSION = '1.231';
 
 use Quiq::Hash;
 use Scalar::Util ();
@@ -309,7 +309,7 @@ sub extract {
                 die "Ungültige Option: $dashPrefix$key\n";
             }
             $class->throw(
-                'OPT-00001: Ungültige Option',
+                'OPT-00001: Unknown option',
                 Option => "$dashPrefix$key",
             );
         };
@@ -481,7 +481,7 @@ sub extractMulti {
 
             if (!$sloppy) {
                 $this->throw(
-                    'OPT-00001: Ungültige Option',
+                    'OPT-00001: Unknown option',
                     Option => $arg);
             }
             $ref = undef;
@@ -513,7 +513,7 @@ sub extractMulti {
 
 =head1 VERSION
 
-1.230
+1.231
 
 =head1 AUTHOR
 

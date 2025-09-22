@@ -16,7 +16,7 @@ use Scalar::Util qw(looks_like_number);
 
 use parent 'Data::Identifier::Interface::Userdata';
 
-our $VERSION = v0.05;
+our $VERSION = v0.06;
 
 my %_die_raen = (code => 0, P => 7, codeX => 0, S => 2, T => 4+1, is_return => 1);
 
@@ -47,6 +47,7 @@ my %_simple_opcodes = (
     noop            => [\@_simple_0 => {first => 0, second => 0, T => 0}],
     magic           => [\@_simple_0 => {first => 0, codeX => 0, S => 0, T => 4+3, extra => "VM\r\n\xc0\n"}],
     autodie         => [\@_simple_0 => {code => 0, P => 7, codeX => 0, S => 2, T => 4+0, is_autodie => 1}],
+    data_start_marker   => [\@_simple_0 => {code => 0, P => 6, codeX => 0, S => 0, T => 0}],
 
     filesize        => [[int_half => 'extra[]'] => {code => 0, P => 1, codeX => 0, S => 0, T => 0+1}],
     section_pointer => [[int_half => 'extra[]'] => {code => 0, P => 1, codeX => 0, S => 1, T => 0+1}],
@@ -104,7 +105,11 @@ my %_simple_opcodes = (
 $_simple_opcodes{nop} = $_simple_opcodes{noop}; # alias
 
 my %_synthetic = (
-    open            => [[reg => 1, undef => 'undef'] => ['unref', \1]],
+    open            => [
+        [reg => 1, undef     => 'undef'] => ['unref', \1],
+        [reg => 1, '"false"' => 'undef'] => ['open', \1, 'sni:189'],
+        [reg => 1, '"true"'  => 'undef'] => ['open', \1, 'sni:190'],
+    ],
     add             => [['"out"' => 'undef', reg => 1, reg => 2] => ['control', \1, 'sni:81', \2]],
     sub             => [['"out"' => 'undef', reg => 1, reg => 2] => ['control', \1, 'sni:82', \2]],
     div             => [['"out"' => 'undef', reg => 1, reg => 2] => ['control', \1, 'sni:83', \2]],
@@ -383,6 +388,15 @@ sub from_template {
         }
 
         return $pkg->new(code => 3, P => $P, codeX => 0, S => $S, T => $T, extra => [$extra]);
+    } elsif ($cmd eq 'noop' && scalar(@args) == 1 && $asm->_get_value_type($args[0]) eq 'string') {
+        my $string = $asm->_parse_string($args[0]);
+        my $l = length($string);
+
+        if ($l > 6 || ($l & 1)) {
+            croak sprintf('Unsupported noop with data of invalid length: line %s: length %u', $line, $l);
+        }
+
+        return $pkg->new(first => 0, codeX => 0, S => 0, T => ($l/2), extra => $string);
     }
 
     croak 'Unsupported template';
@@ -495,7 +509,7 @@ SIRTX::VM::Opcode - module for single SIRTX VM opcodes
 
 =head1 VERSION
 
-version v0.05
+version v0.06
 
 =head1 SYNOPSIS
 

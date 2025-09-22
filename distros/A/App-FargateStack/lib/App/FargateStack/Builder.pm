@@ -394,7 +394,7 @@ For scheduled task we can delete
 
 If only 1 task in the configuration file, we can delete the entire stack.
 
-The task ARN will be deleted to indicate that the task resources were
+The task definition ARN will be deleted to indicate that the task resources were
 removed.
 
 =cut
@@ -404,7 +404,7 @@ removed.
 ########################################################################
 sub delete_task_resources {
 ########################################################################
-  my ( $self, $task_name, $type ) = @_;
+  my ( $self, $task_name ) = @_;
 
   my ( $config, $tasks, $dryrun, $security_groups, $cluster )
     = $self->common_args(qw(config tasks dryrun security_groups cluster));
@@ -414,17 +414,18 @@ sub delete_task_resources {
   my $num_tasks = scalar @active_tasks;
 
   $config->{cluster} //= {};
-  $cluster->{name}   //= $self->create_default('cluster-name');
+
+  $cluster->{name} //= $self->create_default('cluster-name');
+
+  # check to see if service is running before removing resources
+  my $type = $tasks->{$task_name}->{type};
 
   if ( !$self->get_force ) {
     return $SUCCESS
       if !confirm( sprintf 'Are you sure you want to delete the %s (%s) task?', $task_name, $type );
   }
 
-  # check to see if service is running before removing resources
-  my $task_type = $tasks->{$task_name}->{type};
-
-  if ( $task_type =~ /^(?:https?|daemon)$/xsm ) {
+  if ( $type =~ /^(?:https?|daemon)$/xsm ) {
     $self->log_trace( sub { return Dumper( [ cluster => $cluster ] ); } );
 
     log_die( $self, 'ERROR: service [%s] is still running...stop service first.', $task_name )
@@ -448,13 +449,13 @@ sub delete_task_resources {
   # -- delete roles & policies
   ######################################################################
   if ( $num_tasks == 1 ) {
-    $self->_delete_roles( $confirm_all, $task_name, $type );
+    $self->_delete_roles($confirm_all);
   }
 
   ######################################################################
   # -- delete scheduled task
   ######################################################################
-  if ( $type eq 'scheduled' ) {
+  if ( defined $tasks->{$task_name}->{schedule} ) {
     $self->_delete_scheduled_task( $confirm_all, $task_name );
   }
 
@@ -721,11 +722,12 @@ sub _delete_scheduled_task {
 ########################################################################
 sub _delete_roles {
 ########################################################################
-  my ( $self, $confirm_all, $task_name, $type ) = @_;
+  my ( $self, $confirm_all ) = @_;
 
   my ( $config, $dryrun ) = $self->common_args(qw(config dryrun));
+  my $cluster_name = $config->{cluster}->{name};
 
-  my $confirmed = $confirm_all ? confirm( 'iam: delete roles & policies for task: [%s]?', $task_name ) : $TRUE;
+  my $confirmed = $confirm_all ? confirm( 'iam: delete roles & policies for cluster: [%s]?', $cluster_name ) : $TRUE;
 
   ######################################################################
   # -- delete roles & policies
@@ -734,7 +736,7 @@ sub _delete_roles {
 
     my $iam = $self->fetch_iam();
 
-    my @roles = ( 'role', $type eq 'scheduled' ? 'events_role' : () );
+    my @roles = ( 'role', 'task_role', defined $config->{events_role} ? 'events_role' : () );
 
     foreach my $r (@roles) {
       my $role = $config->{$r};

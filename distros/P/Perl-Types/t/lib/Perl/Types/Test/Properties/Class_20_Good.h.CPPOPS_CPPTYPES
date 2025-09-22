@@ -5,7 +5,7 @@ using std::cout;  using std::cerr;  using std::endl;
 #define __CPP__INCLUDED__Perl__Types__Test__Properties__Class_20_Good_h 0.001_000
 
 // [[[ INCLUDES & OO INHERITANCE INCLUDES ]]]
-#include <Perl::Types.cpp>  // -> Perl::Types.h -> (rperltypes_mode.h; rperloperations.h; rperltypes.h; HelperFunctions.cpp)
+#include <Perl::Types.cpp>  // -> Perl::Types.h -> (perltypes_mode.h; rperloperations.h; perltypes.h; HelperFunctions.cpp)
 #include "Perl::Types/Test.cpp"
 
 # ifdef __PERL__TYPES

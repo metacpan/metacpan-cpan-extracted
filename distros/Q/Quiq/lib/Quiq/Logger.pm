@@ -21,9 +21,9 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.230';
+our $VERSION = '1.231';
 
-use Quiq::String;
+use Quiq::Unindent;
 use Quiq::Path;
 use POSIX ();
 use Encode ();
@@ -326,7 +326,7 @@ sub write {
         return;
     }
 
-    $msg = Quiq::String->unindent($msg);
+    $msg = Quiq::Unindent->trim($msg);
     if ($msg =~ /\n/) { # mehrzeilige Meldung
         # $msg =~ s/^/| /mg;
         $msg = "\n$msg\n";
@@ -335,7 +335,7 @@ sub write {
         $msg = " $msg\n";
     }
 
-    $msg = sprintf '%s %s %s%s',
+    $msg = sprintf '%s %6d %-5s%s',
         POSIX::strftime('%Y-%m-%d %H:%M:%S',localtime),$$,$level,$msg;
 
     if ($self->{'toTerm'}) {
@@ -351,7 +351,7 @@ sub write {
 
 =head1 VERSION
 
-1.230
+1.231
 
 =head1 AUTHOR
 

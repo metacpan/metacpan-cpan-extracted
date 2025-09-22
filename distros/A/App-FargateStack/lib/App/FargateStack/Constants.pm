@@ -3,7 +3,7 @@ package App::FargateStack::Constants;
 use strict;
 use warnings;
 
-use App::FargateStack::Builder::Utils qw();
+use App::FargateStack::Builder::Utils qw(choose);
 
 use Data::Dumper;
 use English qw(no_match_vars);
@@ -38,6 +38,7 @@ Readonly::Scalar our $IAM_POLICY_VERSION  => '2012-10-17';
 Readonly::Hash our %AWS_SERVICE_DOMAINS => (
   events => 'events.amazonaws.com',
   ecs    => 'ecs-tasks.amazonaws.com',
+  task   => 'ecs-tasks.amazonaws.com'
 );
 
 Readonly::Hash our %ECS_TASK_PROFILES => (
@@ -256,20 +257,40 @@ Readonly::Hash our %DEFAULT_NAMES => (
   'role-name' => sub {
     my ( $self, $type ) = @_;
 
-    my $app_name = $self->get_config->{app}->{name};
+    my $app_name = $self->normalize_name( $self->get_config->{app}->{name} );
 
-    $type = ( $type eq 'events' ? 'Events' : 'Fargate' );
+    my @args = choose {
+      return ( 'Events', $app_name, $EMPTY )
+        if $type eq 'events';
 
-    return sprintf '%s%sRole', $type, $self->normalize_name($app_name);
+      return ( 'Fargate', $app_name, $EMPTY )
+        if $type eq 'ecs';
+
+      return ( 'Fargate', $app_name, 'Task' )
+        if $type eq 'task';
+    };
+
+    # Ex: FargateSqsExampleTaskRole'
+    return sprintf '%s%s%sRole', @args;
   },
   'policy-name' => sub {
     my ( $self, $type ) = @_;
 
-    my $app_name = $self->get_config->{app}->{name};
+    my $app_name = $self->normalize_name( $self->get_config->{app}->{name} );
 
-    $type = ( $type eq 'events' ? 'Events' : 'Fargate' );
+    my @args = choose {
+      return ( 'Events', $app_name, $EMPTY )
+        if $type eq 'events';
 
-    return sprintf '%s%sPolicy', $type, $self->normalize_name($app_name);
+      return ( 'Fargate', $app_name, $EMPTY )
+        if $type eq 'ecs';
+
+      return ( 'Fargate', $app_name, 'Task' )
+        if $type eq 'task';
+    };
+
+    # Ex: FargateSqsExampleTaskPolicy'
+    return sprintf '%s%s%sPolicy', @args;
   },
   'rule-id' => sub {
     my ( $self, $task_name ) = @_;

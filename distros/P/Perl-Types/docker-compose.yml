@@ -1,0 +1,53 @@
+# Docker Compose configuration for a two-image development setup, Docker base image & Docker application image
+
+services:
+  # build the Docker base image, equivalent to `docker build -t base:dev -f Dockerfile .`
+  base:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: base:dev
+
+  # build and run the Docker application image, equivalent to
+  # `docker build -t app:dev -f docker/Dockerfile.app --build-arg BASE_IMAGE=base:dev .`
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.app
+      args:
+        BASE_IMAGE: base:dev     # uses the image built by the "base" service above
+    image: app:dev               # tag produced by this build
+    working_dir: /app            # match 'Dockerfile' working directory
+
+    # LIVE DEVELOPER MODE:
+    # mount the repository from the host OS's current directory into the '/app' Docker working directory,
+    # thereby overlaying the copy of the repository that was baked into the Docker application image
+    # with the latest copy of the respository from the host operating system;
+    # this allows live edits on the host OS to be immediately reflected within the Docker application
+    volumes:
+      - ./:/app
+
+    # the following 3 environmental variables are used by Perl::Config & Perl::Types & Perl::Compiler,
+    # feel free to use them in your own code as well;
+    # these should not be permanently hard-coded into the 'Dockerfile' like "PERL5LIB" & "PATH",
+    # so we can disable them when decreased verbosity is desired
+    environment:
+      PERL_VERBOSE: "1"
+      PERL_DEBUG: "1"
+      PERL_WARNINGS: "1"
+
+    # default to an interactive shell for development;
+    # allocate a pseudo-TTY (like an interactive terminal);
+    # without this the container doesn’t behave like it has a real terminal attached,
+    # which can mess with shells, interactive programs (e.g. bash, top),
+    # or tools that check whether they’re running in a terminal;
+    # equivalent to passing `-t` when you run `docker run -it ...`
+    tty: true
+    # keep STDIN open even if nothing is attached;
+    # this allows you to type commands interactively, or pipe input into the container after it’s running;
+    # equivalent to passing `-i` when you run `docker run -it ...`
+    stdin_open: true
+
+    # example port mapping if your application listens on a port
+    # ports:
+    #   - "8080:8080"

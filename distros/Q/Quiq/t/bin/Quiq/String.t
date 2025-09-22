@@ -395,6 +395,15 @@ sub test_wrap : Test(4) {
 
 # -----------------------------------------------------------------------------
 
+sub test_concat : Test(1) {
+    my $self = shift;
+
+    my $val = Quiq::String->concat(' ','','A','','B',undef,'C',0);
+    $self->is($val,'A B C 0');
+}
+
+# -----------------------------------------------------------------------------
+
 package main;
 Quiq::String::Test->runTests;
 

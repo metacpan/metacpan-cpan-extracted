@@ -40,6 +40,7 @@
     * [delete-scheduled-task](#delete-scheduled-task)
     * [delete-task](#delete-task)
     * [delete-http-service](#delete-http-service)
+    * [destroy](#destroy)
     * [disable-scheduled-task](#disable-scheduled-task)
     * [enable-scheduled-task](#enable-scheduled-task)
     * [list-tasks](#list-tasks)
@@ -55,6 +56,7 @@
     * [stop-task](#stop-task)
     * [stop-service](#stop-service)
     * [start-service](#start-service)
+    * [tasks](#tasks)
     * [update-policy](#update-policy)
     * [update-service](#update-service)
     * [update-target](#update-target)
@@ -66,6 +68,7 @@
 * [CLOUDWATCH LOG GROUPS](#cloudwatch-log-groups)
   * [Log Group Notes](#log-group-notes)
 * [IAM PERMISSIONS](#iam-permissions)
+  * [Task Execution Role vs. Task Role](#task-execution-role-vs-task-role)
 * [SECURITY GROUPS](#security-groups)
 * [FILESYSTEM SUPPORT](#filesystem-support)
   * [Field Descriptions](#field-descriptions)
@@ -205,7 +208,7 @@ _This is a work in progress._ Versions prior to 1.1.0 are considered usable
 but may still contain issues related to edge cases or uncommon configuration
 combinations.
 
-This documentation corresponds to version 1.0.43.
+This documentation corresponds to version 1.0.47.
 
 The release of version _1.1.0_ will mark the first production-ready release.
 Until then, you're encouraged to try it out and provide feedback. Issues or
@@ -236,11 +239,12 @@ VPCs, subnets, ALBs)
 - Public or private service deployment (via ALB in public subnet or
 internal-only)
 - Built-in service health check integration
-- Automatic IAM role and policy generation based on task needs
+- Automatic IAM role and policy generation based on configured resources
 - Optional HTTPS support with ACM certificate discovery and creation
 - Optional support for adding AWS WAF support for your HTTPS site
 - Lightweight dependency stack: Perl, AWS CLI, a few CPAN modules
 - Convenient CLI: start, stop, update, and tail logs for any service
+- Scheduled and metric based autoscaling
 
 [Back to Table of Contents](#table-of-contents)
 
@@ -271,6 +275,7 @@ object-oriented use. As such, this section is intentionally omitted.
     delete-daemon             task-name                    deletes all resources associated with a daemon  (See Note 11)
     delete-http-service       task-name                    deletes all resources associated with a http service  (See Note 11)
     deploy-service            task-name                    create a new service (see Note 4)
+    destroy                                                removes all resources in your stack that were provisioned by App::FargateStack
     disable-scheduled-task    task-name                    disable a scheduled task
     enable-scheduled-task t   ask-name                     enable a scheduled task
     help                      [subject]                    displays general help or help on a particular subject (see Note 2)
@@ -287,9 +292,10 @@ object-oriented use. As such, this section is intentionally omitted.
     start-service             task-name [count]            starts a service
     status                    task-name                    provides the current status for a task
     stop-service              task-name                    stops a running service
-    update-policy                                         updates the ECS policy in the event of resource changes
+    tasks                                                  displays a summary of all tasks in your stack
+    update-policy                                          updates the ECS policy in the event of resource changes
     update-target             task-name                    force update of target definition
-    version                                               display the current version number
+    version                                                display the current version number
 
 ## Options
 
@@ -520,6 +526,7 @@ syntax (See ["INJECTING SECRETS FROM SECRETS MANAGER"](#injecting-secrets-from-s
 - automatic creation of log groups with customizable retention period
 - discovery of existing environment to intelligently populate configuration defaults
 - automatically create a minimal Fargate app/service config from shorthand
+- support for scheduled and metric based [autoscaling](#autoscaling)
 
 ## Minimal Configuration
 
@@ -925,7 +932,7 @@ updates configuration file with resource details.
 
 Parses a compact, positional CLI grammar and emits a ready-to-edit YAML
 configuration for your Fargate framework. The command **does not** create any
-AWS resources; it only synthesizes config based on the clauses you pass.
+AWS resources; it only synthesizes a configuration based on the clauses you pass.
 
 Examples:
 
@@ -951,6 +958,9 @@ Examples:
 
 Each service is introduced by `<type>:<name>` followed by its required
 key:value pairs. You may specify multiple services in one command.
+
+_Note: You must start each task definition set with a task type (one of
+daemon, task, scheduled, http or https)._
 
 Valid `type` values and minimum keys:
 
@@ -1040,7 +1050,7 @@ Valid `type` values and minimum keys:
         If you omit the target value, a sensible default will be used (e.g.,
         `500` for requests, `60` for CPU).
 
-    When the `create-stack` command sees the C>autoscaling:> keyword, it
+    When the `create-stack` command sees the `autoscaling:` keyword, it
     will generate a complete `autoscaling` block in your configuration
     file. This block will be populated with safe defaults (`min_capacity: 1`,
     `max_capacity: 2`), the specified metric, and all other necessary fields,
@@ -1201,6 +1211,17 @@ This command will also not delete any ACM certificate that was
 provisioned by `App::FargateStack`.
 
 See ["Notes on Deletion of Resources"](#notes-on-deletion-of-resources) for additional details.
+
+### destroy
+
+Removes all resources provisioned by App::FargateStack. This command
+will confirm deletion before removing any resources. Use `--force` to
+prevent confirmation.  Use `--confirm-all` to confirm deletion of
+every resource.
+
+After this command is executed a skeleton of the tasks will
+remain. You can run `--plan` again and then `--apply` to reprovision
+the stack.
 
 ### disable-scheduled-task
 
@@ -1429,6 +1450,10 @@ target service by selecting the task of type `daemon`, `http`, or
 `https`, but only if exactly one such service is defined in your
 configuration file.
 
+### tasks
+
+Displays a table that summarizes your stack resources.
+
 ### update-policy
 
     update-policy
@@ -1458,7 +1483,7 @@ variables, or resource allocations.
 When an ECS service is launched, it is "pinned" to a specific revision
 of a task definition (e.g., my-task:9). If you later push a new
 container image or change the task's configuration in your
-fargate-stack.yml, the running service will not automatically pick up
+configuration file, the running service **will not** automatically pick up
 those changes.
 
 This command is the essential final step in the deployment process.
@@ -1470,22 +1495,24 @@ new task definition.
 configuration. The next time you run start-service, it will launch
 tasks using the new task definition.
 
-When to Use update-service vs. redeploy While both commands can result
-in a new deployment, they serve different purposes:
+**When to use `update-service` vs. `redeploy`**
 
-Use update-service when you have made any changes to your
+While both commands can result in a new deployment, they serve
+different purposes:
+
+Use `update-service` when you have made any change to your
 configuration file that affect the task definition. This is the
 correct command for deploying a new image, adding environment
 variables, injecting secrets, changing CPU/memory, or adding EFS mount
 points. The workflow is:
 
-Update your fargate-stack.yml file.
+Update your configuration file.
 
-Run app-FargateStack register-task-definition task-name.
+Run `app-FargateStack register-task-definition task-name`
 
-Run app-FargateStack update-service task-name.
+Run `app-FargateStack update-service task-name`
 
-Use redeploy as a shortcut only when you have pushed a new image using
+Use `redeploy` as a shortcut only when you have pushed a new image using
 the same tag (e.g., :latest) and have made no other configuration
 changes. redeploy forces a new deployment using the existing task
 definition, which is simpler but will not apply any other updates.
@@ -1640,9 +1667,23 @@ role will be permitted to access only that specific bucket - not all
 buckets in your account. The policy is updated when new resources are
 added to the configuration file.
 
-The role name an role policy name are found under the `role:` key in
-the configuration. A role name and role policy name are automatically
+The task execution role name and role policy name are found under the
+`role:` key in the configuration. The task role is found under the
+`task_role:` key. Role names and role policy names are automatically
 fabricated for you from the name you specified under the `app:` key.
+
+## Task Execution Role vs. Task Role
+
+It's important to understand that App::FargateStack provisions two
+distinct IAM roles for your service. The Task Role, which is detailed
+above, grants your application the specific permissions it needs to
+interact with other AWS services like S3 or SQS. In addition, the
+framework also creates a Task Execution Role. This second role is used
+by the Amazon ECS container agent itself and grants it permission to
+perform essential actions, such as pulling container images from ECR
+and sending logs to CloudWatch. You typically won't need to modify the
+Task Execution Role, as the framework manages its permissions
+automatically.
 
 [Back to Table of Contents](#table-of-contents)
 
@@ -3169,18 +3210,18 @@ This script is released under the same terms as Perl itself.
 
 Hey! **The above document had some coding errors, which are explained below:**
 
-- Around line 367:
+- Around line 373:
 
     Expected '=item \*'
 
-- Around line 370:
+- Around line 376:
 
     Expected '=item \*'
 
-- Around line 384:
+- Around line 390:
 
     Expected '=item \*'
 
-- Around line 386:
+- Around line 392:
 
     Expected '=item \*'

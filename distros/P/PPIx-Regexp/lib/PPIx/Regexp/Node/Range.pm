@@ -40,7 +40,7 @@ use PPIx::Regexp::Constant qw{
     @CARP_NOT
 };
 
-our $VERSION = '0.089';
+our $VERSION = '0.090';
 
 sub explain {
     my ( $self ) = @_;

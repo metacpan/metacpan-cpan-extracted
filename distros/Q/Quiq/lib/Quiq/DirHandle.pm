@@ -15,8 +15,11 @@ L<Quiq::Object>
   use Quiq::DirHandle;
   
   my $dh = Quiq::DirHandle->new($dir);
-  while (my $entry = $dh->next) {
-      say $entry;
+  while (my $e = $dh->next) {
+      if ($e eq '.' || $e eq '..') {
+          next;
+      }
+      say $e;
   }
   $dh->close;
 
@@ -25,6 +28,8 @@ L<Quiq::Object>
 Die Klasse stellt eine objektorientierte Schnittstelle zu
 Perls Directory Handles her. Mit den Methoden der Klasse kann
 ein Verzeichnis geöffnet und über seine Einträge iteriert werden.
+Die Standard-Einträge . und .. werden nicht ausgelassen. Diese
+müssen ggf. selbst übergangen werden.
 
 =cut
 
@@ -37,7 +42,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.230';
+our $VERSION = '1.231';
 
 # -----------------------------------------------------------------------------
 
@@ -133,7 +138,7 @@ sub next {
 
 =head1 VERSION
 
-1.230
+1.231
 
 =head1 AUTHOR
 

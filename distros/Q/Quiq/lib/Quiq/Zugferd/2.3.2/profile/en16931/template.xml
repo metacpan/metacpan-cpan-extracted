@@ -301,7 +301,7 @@
         </ram:SpecifiedTaxRegistration>
       </ram:SellerTaxRepresentativeTradeParty>
       <ram:SellerOrderReferencedDocument>
-        <ram:IssuerAssignedID schemeID=""></ram:IssuerAssignedID>
+        <ram:IssuerAssignedID schemeID="">BT-14</ram:IssuerAssignedID>
         <ram:URIID schemeID=""></ram:URIID>
         <ram:LineID schemeID=""></ram:LineID>
         <ram:TypeCode></ram:TypeCode>
@@ -507,7 +507,7 @@
       </ram:BillingSpecifiedPeriod>
       <ram:SpecifiedTradeAllowanceCharge>
         <ram:ChargeIndicator>
-          <udt:Indicator>BG-21-1</udt:Indicator>
+          <udt:Indicator>BT-21-1</udt:Indicator> 
         </ram:ChargeIndicator>
         <ram:CalculationPercent></ram:CalculationPercent>
         <ram:BasisAmount currencyID=""></ram:BasisAmount>

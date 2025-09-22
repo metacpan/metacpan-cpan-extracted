@@ -41,7 +41,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.230';
+our $VERSION = '1.231';
 
 use Net::SFTP::Foreign ();
 use File::Temp ();
@@ -499,7 +499,7 @@ sub putData {
 
 =head1 VERSION
 
-1.230
+1.231
 
 =head1 AUTHOR
 

@@ -1,4 +1,4 @@
-#our $VERSION = 0.041_000;  # DEV NOTE: comment to avoid potential conflict w/ Dist::Zilla & friends
+#our $VERSION = 0.042_000;  # DEV NOTE: comment to avoid potential conflict w/ Dist::Zilla & friends
 
 package MY;
 BEGIN { use English; }

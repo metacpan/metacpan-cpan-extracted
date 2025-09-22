@@ -107,6 +107,8 @@ sub fetch_cli_api {
   }
 
   foreach ( keys %options ) {
+    next if !defined $options{$_};
+
     $class->set( $_, $options{$_} );
   }
 

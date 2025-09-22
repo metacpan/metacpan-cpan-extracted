@@ -25,41 +25,41 @@ sub cpp_load {
     if (    ( exists $main::{'Perl__Types__Test__Properties__Class_20_Good__MODE_ID'} )
         and ( defined &{ $main::{'Perl__Types__Test__Properties__Class_20_Good__MODE_ID'} } ) )
     {
-#Perl::Types::diag('in Perl::Types::Test::Properties::Class_20_Good::cpp_load, Perl__Types__Test__Properties__Class_20_Good__MODE_ID() exists & defined' . "\n");
-#Perl::Types::diag(q{in Perl::Types::Test::Properties::Class_20_Good::cpp_load, have Perl__Types__Test__Properties__Class_20_Good__MODE_ID() retval = '} . main::Perl__Types__Test__Properties__Class_20_Good__MODE_ID() . q{'} . "\n");
+#Perl::diag('in Perl::Types::Test::Properties::Class_20_Good::cpp_load, Perl__Types__Test__Properties__Class_20_Good__MODE_ID() exists & defined' . "\n");
+#Perl::diag(q{in Perl::Types::Test::Properties::Class_20_Good::cpp_load, have Perl__Types__Test__Properties__Class_20_Good__MODE_ID() retval = '} . main::Perl__Types__Test__Properties__Class_20_Good__MODE_ID() . q{'} . "\n");
         if ( $Perl::Types::MODES->{ main::Perl__Types__Test__Properties__Class_20_Good__MODE_ID() }->{ops} ne 'CPP' ) {
             $need_load_cpp = 1;
         }
     }
     else {
-      #Perl::Types::diag('in Perl::Types::Test::Properties::Class_20_Good::cpp_load, Perl__Types__Test__Properties__Class_20_Good__MODE_ID() does not exist or undefined' . "\n");
+      #Perl::diag('in Perl::Types::Test::Properties::Class_20_Good::cpp_load, Perl__Types__Test__Properties__Class_20_Good__MODE_ID() does not exist or undefined' . "\n");
         $need_load_cpp = 1;
     }
 
     if ($need_load_cpp) {
 
-        #Perl::Types::diag('in Perl::Types::Test::Properties::Class_20_Good::cpp_load, need load CPP code' . "\n");
+        #Perl::diag('in Perl::Types::Test::Properties::Class_20_Good::cpp_load, need load CPP code' . "\n");
 
         my $eval_string = <<"EOF";
 package main;
 use Perl::Types::Inline;
-BEGIN { Perl::Types::diag("[[[ BEGIN 'use Inline' STAGE for 'Perl::Types/Test/Properties/Class_20_Good.cpp' ]]]\n" x 1); }
+BEGIN { Perl::diag("[[[ BEGIN 'use Inline' STAGE for 'Perl::Types/Test/Properties/Class_20_Good.cpp' ]]]\n" x 1); }
 use Inline (CPP => '$main::INCLUDE_PATH' . '/' . 'Perl::Types/Test/Properties/Class_20_Good.cpp', \%Perl::Types::Inline::ARGS);
-Perl::Types::diag("[[[ END   'use Inline' STAGE for 'Perl::Types/Test/Properties/Class_20_Good.cpp' ]]]\n" x 1);
+Perl::diag("[[[ END   'use Inline' STAGE for 'Perl::Types/Test/Properties/Class_20_Good.cpp' ]]]\n" x 1);
 1;
 EOF
 
         $Perl::Types::Inline::ARGS{ccflagsex}
-            = $Perl::Types::Inline::CCFLAGSEX . $Perl::Types::TYPES_CCFLAG . rperltypessizes::type_integer_native_ccflag() . rperltypessizes::type_number_native_ccflag();
-        $Perl::Types::Inline::ARGS{cppflags} = $Perl::Types::TYPES_CCFLAG . rperltypessizes::type_integer_native_ccflag() . rperltypessizes::type_number_native_ccflag();
+            = $Perl::Types::Inline::CCFLAGSEX . $Perl::Types::TYPES_CCFLAG . perltypessizes::type_integer_native_ccflag() . perltypessizes::type_number_native_ccflag();
+        $Perl::Types::Inline::ARGS{cppflags} = $Perl::Types::TYPES_CCFLAG . perltypessizes::type_integer_native_ccflag() . perltypessizes::type_number_native_ccflag();
 
-#Perl::Types::diag('in Perl::Types::Test::Properties::Class_20_Good::cpp_load(), CPP not yet loaded, about to call eval() on $eval_string =' . "\n" . '<<< BEGIN EVAL STRING>>>' . "\n" . $eval_string . '<<< END EVAL STRING >>>' . "\n");
+#Perl::diag('in Perl::Types::Test::Properties::Class_20_Good::cpp_load(), CPP not yet loaded, about to call eval() on $eval_string =' . "\n" . '<<< BEGIN EVAL STRING>>>' . "\n" . $eval_string . '<<< END EVAL STRING >>>' . "\n");
 
         eval $eval_string or croak( $OS_ERROR . "\n" . $EVAL_ERROR );
         if ($EVAL_ERROR) { croak($EVAL_ERROR); }
     }
 
-    #else { Perl::Types::diag('in Perl::Types::Test::Properties::Class_20_Good::cpp_load(), CPP already loaded, DOING NOTHING' . "\n"); }
+    #else { Perl::diag('in Perl::Types::Test::Properties::Class_20_Good::cpp_load(), CPP already loaded, DOING NOTHING' . "\n"); }
 }
 
 # DEV NOTE, CORRELATION #rp015: suppress 'Too late to run INIT block' at run-time loading via require or eval

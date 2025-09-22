@@ -91,7 +91,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.230';
+our $VERSION = '1.231';
 
 use Quiq::Hash;
 
@@ -160,7 +160,7 @@ sub html {
     my ($class,$id,$tabA) = $self->get(qw/class id tabs/);
 
     for my $h (@$tabA) {
-        Quiq::Hash->validate($h,[qw/content label link/]);
+        Quiq::Hash->validateKeys($h,[qw/content label link/]);
     }
 
     return $h->tag('div',
@@ -194,7 +194,7 @@ sub html {
 
 =head1 VERSION
 
-1.230
+1.231
 
 =head1 AUTHOR
 

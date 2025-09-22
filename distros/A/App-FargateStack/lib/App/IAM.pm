@@ -97,8 +97,10 @@ sub is_policy_attached {
 
   my $output = $self->command(
     'list-attached-role-policies' => [
-      '--role-name', $role_name, '--query', "AttachedPolicies[?PolicyArn=='$policy_arn'].PolicyArn",
-      '--output',    'text',
+      '--role-name' => $role_name,
+      '--query'     => sprintf 'AttachedPolicies[?PolicyArn==`%s`].PolicyArn',
+      $policy_arn,
+      '--output' => 'text',
     ]
   );
 

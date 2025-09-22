@@ -31,7 +31,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.230';
+our $VERSION = '1.231';
 
 use Quiq::Option;
 use Quiq::FileHandle;
@@ -338,6 +338,12 @@ sub convertEncoding {
 
 Erzeuge Zielverzeichnis, falls es nicht existiert.
 
+=item -log => $stream (Default: undef)
+
+Schreibe Meldung auf Dateihandle. Beispiel:
+
+  -log => \*STDOUT
+
 =item -move => $bool (Default: 0)
 
 Lösche Quelldatei $srcPath nach dem Kopieren.
@@ -372,6 +378,7 @@ sub copy {
     # Optionen
 
     my $createDir = 0;
+    my $log => undef;
     my $move = 0;
     my $overwrite = 1;
     my $preserve = 0;
@@ -379,6 +386,7 @@ sub copy {
     if (@_) {
         Quiq::Option->extract(\@_,
             -createDir => \$createDir,
+            -log => \$log,
             -move => \$move,
             -overwrite => \$overwrite,
             -preserve => \$preserve,
@@ -423,6 +431,10 @@ sub copy {
         $this->mtime($destPath,$this->mtime($srcPath));
     }
 
+    if ($log) {
+        print $log "$srcPath => $destPath\n";
+    }
+
     if ($move) {
         $this->delete($srcPath);
     }
@@ -445,6 +457,12 @@ sub copy {
 =item -createDir => $bool (Default: 0)
 
 Erzeuge Zielverzeichnis, falls es nicht existiert.
+
+=item -log => $stream (Default: undef)
+
+Schreibe Meldung auf Dateihandle. Beispiel:
+
+  -log => \*STDOUT
 
 =item -move => $bool (Default: 0)
 
@@ -1669,7 +1687,7 @@ sub count {
 
 # -----------------------------------------------------------------------------
 
-=head3 deleteContent() - Lösche Inhalt des Verzeichnis
+=head3 deleteContent() - Lösche Inhalt des Verzeichnisses
 
 =head4 Synopsis
 
@@ -3467,6 +3485,56 @@ sub readlink {
 
 # -----------------------------------------------------------------------------
 
+=head3 reduceToEnvVar() - Ersetze Pfandanfang durch Name von Environment-Variable
+
+=head4 Synopsis
+
+  $pathNew = $class->reduceToEnvVar($envVar,$path);
+
+=head4 Arguments
+
+=over 4
+
+=item $path
+
+Ein Pfad
+
+=back
+
+=head4 Returns
+
+Pfad (String)
+
+=head4 Description
+
+Ersetze den Pfadanfang von $path durch den Namen der Environmen-Variable
+$envVar, wenn dieser dem Wert der Variable entspricht, und liefere
+resultierenden Pfad zurück. Beginnt der Pfad nicht mit dem Wert der
+Variable, bleibt er unverändert.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub reduceToEnvVar {
+    my ($class,$envVar,$path) = @_;
+
+    if (!exists $ENV{$envVar}) {
+        $class->throw(
+            'PATH-00016: Environment variable does not exist',
+            EnvVar => $envVar
+        );
+    }
+
+    my $envPath = $class->expandTilde($ENV{$envVar});
+    $path = $class->expandTilde($path);
+    $path =~ s#^$envPath#\$$envVar#;
+    
+    return $path;
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 reduceToTilde() - Ersetze Pfandanfang durch Tilde
 
 =head4 Synopsis
@@ -4497,7 +4565,7 @@ sub uid {
 
 =head1 VERSION
 
-1.230
+1.231
 
 =head1 AUTHOR
 

@@ -5,8 +5,8 @@ use warnings;
 
 use App::FargateStack::Builder::Utils qw(log_die dmp);
 use App::FargateStack::Constants;
-use CLI::Simple::Constants qw(:booleans :chars);
 use Carp;
+use CLI::Simple::Constants qw(:booleans :chars);
 use Data::Dumper;
 use English qw(-no_match_vars);
 use File::Basename qw(basename);
@@ -61,6 +61,9 @@ sub cmd_create_stack {
         }
         push @{ $tasks{$tag} }, $next_tag;
       }
+    }
+    elsif ( !keys %tasks ) {
+      croak "ERROR: start your task definition with daemon|task|scheduled|http|https\n";
     }
   }
 

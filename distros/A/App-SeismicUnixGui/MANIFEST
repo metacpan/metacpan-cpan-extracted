@@ -862,8 +862,8 @@ lib/App/SeismicUnixGui/developer/Stripped/well/suwellrf.su.main.well_logs
 lib/App/SeismicUnixGui/doc/FAQ_immodpg
 lib/App/SeismicUnixGui/doc/FAQ_SeismicUnixGui
 lib/App/SeismicUnixGui/doc/README_to_INSTALL
-lib/App/SeismicUnixGui/doc/SeismicUnixGuiInstallationGuide0.87.4.pdf
-lib/App/SeismicUnixGui/doc/SeismicUnixGuiTutorial0.87.4.pdf
+lib/App/SeismicUnixGui/doc/SeismicUnixGuiInstallationGuide0.87.5.pdf
+lib/App/SeismicUnixGui/doc/SeismicUnixGuiTutorial0.87.5.pdf
 lib/App/SeismicUnixGui/fortran/bin/immodpg1.1
 lib/App/SeismicUnixGui/fortran/bin/stdsleep
 lib/App/SeismicUnixGui/fortran/Makefile
@@ -1111,6 +1111,7 @@ lib/App/SeismicUnixGui/script/iSpectralAnalysis
 lib/App/SeismicUnixGui/script/iTopMute
 lib/App/SeismicUnixGui/script/iVA
 lib/App/SeismicUnixGui/script/L_SU.pl
+lib/App/SeismicUnixGui/script/L_SU_project_selector.pl
 lib/App/SeismicUnixGui/script/LICENSE
 lib/App/SeismicUnixGui/script/post_install_c_compile.pl
 lib/App/SeismicUnixGui/script/post_install_env.pl

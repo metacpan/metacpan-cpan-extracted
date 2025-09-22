@@ -30,8 +30,8 @@ provides:
   App::ApplicationAutoscaling:
     file: lib/App/ApplicationAutoscaling.pm
     version: '0'
-  App::Benchmark:
-    file: lib/App/Benchmark.pm
+  App::BenchmarkRole:
+    file: lib/App/BenchmarkRole.pm
     version: '0'
   App::CloudTrail:
     file: lib/App/CloudTrail.pm
@@ -59,7 +59,7 @@ provides:
     version: '0'
   App::FargateStack:
     file: lib/App/FargateStack.pm
-    version: v1.0.43
+    version: v1.0.47
   App::FargateStack::Autoscaling:
     file: lib/App/FargateStack/Autoscaling.pm
     version: '0'
@@ -131,7 +131,7 @@ provides:
     version: '0'
   App::FargateStack::Init:
     file: lib/App/FargateStack/Init.pm
-    version: v1.0.43
+    version: v1.0.47
   App::FargateStack::Logs:
     file: lib/App/FargateStack/Logs.pm
     version: '0'
@@ -190,5 +190,5 @@ resources:
   bugtracker: http://github.com/rlauer6/App-FargateStack
   homepage: http://github.com/rlauer6/App-FargateStack
   repository: git://github.com/rlauer6/App-FargateStack
-version: v1.0.43
+version: v1.0.47
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

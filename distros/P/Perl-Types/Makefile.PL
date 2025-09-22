@@ -5,13 +5,12 @@
 use strict;
 use warnings;
 
-use 5.012;
 use ExtUtils::MakeMaker;
 
-#our $VERSION = 0.041_000;  # DEV NOTE: comment to avoid potential conflict w/ Dist::Zilla & friends
-use 5.012;  # NEED ANSWER, CORRELATION #rp000: is RPerl truly incompatible with Perl v5.10 and earlier?
+#our $VERSION = 0.042_000;  # DEV NOTE: comment to avoid potential conflict w/ Dist::Zilla & friends
 
-#use ExtUtils::MakeMaker;  # NEED DELETE, RPERL REFACTOR
+# DEV NOTE, CORRELATION #pt000: minimum Perl version to support "my array @foo;" & "my hash %bar;" Perl::Types syntax
+use 5.012;
 
 BEGIN { 
     use Config;
@@ -86,26 +85,25 @@ if ($version < $min_cxx_versions->{$cxx_real}) {
 }
 
 # fix read-only blib/lib in MS Windows
-if ( $OSNAME eq 'MSWin32' ) {
-    push( @ExtUtils::MakeMaker::Overridable, qw(pm_to_blib) );
+BEGIN {
+    require ExtUtils::MakeMaker;  # ensure EUMM is actually loaded before modifying "@ExtUtils::MakeMaker::Overridable"
+    if ( $OSNAME eq 'MSWin32' ) {
+        push( @ExtUtils::MakeMaker::Overridable, qw(pm_to_blib) );
+    }
 }
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "the Perl data type system",
   "AUTHOR" => "William N. Braswell, Jr. <wbraswell\@cpan.org>",
-  "BUILD_REQUIRES" => {
-    "Alien::GMP" => "1.16",
-    "Alien::GSL" => "1.07",
-    "Inline" => "0.86",
-    "Inline::C" => "0.80",
-    "Inline::CPP" => "0.80",
-    "Inline::Filters" => "0.20"
-  },
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Perl-Types",
   "EXE_FILES" => [
+    "bin/dev/GMP/gmp_manual.pl",
+    "bin/dev/GMP/gmp_manual_orig.pl",
+    "bin/dev/GMP/gmp_symtab_dump.pl",
+    "bin/dev/GSL/gsl_cpp_manual.pl",
     "bin/dev/find_replace_recurse_scalars.sh",
     "bin/dev/namespaces_regenerate.pl",
     "bin/dev/perl_types_refactor_cpp_namespaces.pl",
@@ -118,47 +116,87 @@ my %WriteMakefileArgs = (
     "bin/dev/perl_types_refactor_names_map.pm",
     "bin/dev/perl_types_refactor_names_parser.out",
     "bin/dev/perl_types_refactor_names_parser.pl",
+    "bin/dev/perlapinames_regenerate.pl",
     "bin/dev/refactor_names_map_create_groups.pl",
-    "bin/dev/t09_interpret_execute__mv_failures.sh"
+    "bin/dev/t09_interpret_execute__mv_failures.sh",
+    "bin/dev/unused/data_structure_array_test.pl",
+    "bin/dev/unused/data_structure_hash_test.pl",
+    "bin/dev/unused/data_structure_tree_test.pl",
+    "bin/dev/unused/data_type_integer_part.cpp",
+    "bin/dev/unused/data_type_integer_precision.cpp",
+    "bin/dev/unused/data_type_integer_precision.pl",
+    "bin/dev/unused/data_type_number_floating_point_error.pl",
+    "bin/dev/unused/data_type_number_precision.cpp",
+    "bin/dev/unused/data_type_scalar_test.pl",
+    "bin/dev/unused/data_type_string_backslashes.cpp",
+    "bin/dev/unused/data_type_string_backslashes.pl"
   ],
-  "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.012",
+  "LICENSE" => "gpl",
   "NAME" => "Perl::Types",
   "PREREQ_PM" => {
-    "PadWalker" => "2.5"
+    "Alien::GMP" => 0,
+    "Alien::GSL" => 0,
+    "Carp" => 0,
+    "Data::Dumper" => 0,
+    "Exporter" => 0,
+    "File::Spec" => 0,
+    "IPC::Cmd" => 0,
+    "IPC::Run3" => 0,
+    "Inline" => 0,
+    "Inline::C" => 0,
+    "Inline::CPP" => 0,
+    "Inline::Filters" => 0,
+    "Math::BigInt" => 0,
+    "Math::GSL::BLAS" => 0,
+    "Math::GSL::CBLAS" => 0,
+    "Math::GSL::Matrix" => 0,
+    "PadWalker" => 0,
+    "Scalar::Util" => 0,
+    "Term::ReadLine" => 0,
+    "parent" => 0
   },
   "TEST_REQUIRES" => {
-    "Cwd" => "3.75",
-    "File::Find" => 0,
-    "File::Spec" => "3.75",
-    "IPC::Run3" => "0.049",
-    "Test::CPAN::Changes" => "0.5",
-    "Test::Exception" => "0.43",
-    "Test::More" => "1.302208",
-    "Test::Number::Delta" => "1.06"
+    "Cwd" => 0,
+    "ExtUtils::MakeMaker" => 0,
+    "File::Spec" => 0,
+    "Test2::V0" => 0,
+    "Test::Exception" => 0,
+    "Test::More" => 0,
+    "Test::Number::Delta" => 0
   },
-  "VERSION" => "0.210",
+  "VERSION" => "0.300",
   "test" => {
-    "TESTS" => "t/*.t"
+    "TESTS" => "t/*.t t/author/*.t"
   }
 );
 
 my %FallbackPrereqs = (
-  "Alien::GMP" => "1.16",
-  "Alien::GSL" => "1.07",
-  "Cwd" => "3.75",
-  "File::Find" => 0,
-  "File::Spec" => "3.75",
-  "IPC::Run3" => "0.049",
-  "Inline" => "0.86",
-  "Inline::C" => "0.80",
-  "Inline::CPP" => "0.80",
-  "Inline::Filters" => "0.20",
-  "PadWalker" => "2.5",
-  "Test::CPAN::Changes" => "0.5",
-  "Test::Exception" => "0.43",
-  "Test::More" => "1.302208",
-  "Test::Number::Delta" => "1.06"
+  "Alien::GMP" => 0,
+  "Alien::GSL" => 0,
+  "Carp" => 0,
+  "Cwd" => 0,
+  "Data::Dumper" => 0,
+  "Exporter" => 0,
+  "ExtUtils::MakeMaker" => 0,
+  "File::Spec" => 0,
+  "IPC::Cmd" => 0,
+  "IPC::Run3" => 0,
+  "Inline" => 0,
+  "Inline::C" => 0,
+  "Inline::CPP" => 0,
+  "Inline::Filters" => 0,
+  "Math::BigInt" => 0,
+  "Math::GSL::BLAS" => 0,
+  "Math::GSL::CBLAS" => 0,
+  "Math::GSL::Matrix" => 0,
+  "PadWalker" => 0,
+  "Scalar::Util" => 0,
+  "Term::ReadLine" => 0,
+  "Test2::V0" => 0,
+  "Test::Exception" => 0,
+  "Test::More" => 0,
+  "Test::Number::Delta" => 0,
+  "parent" => 0
 );
 
 unless ( eval { ExtUtils::MakeMaker->VERSION('6.63_03') } ) {
@@ -172,7 +210,7 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
 
 WriteMakefile(%WriteMakefileArgs);
 
-#our $VERSION = 0.041_000;  # DEV NOTE: comment to avoid potential conflict w/ Dist::Zilla & friends
+#our $VERSION = 0.042_000;  # DEV NOTE: comment to avoid potential conflict w/ Dist::Zilla & friends
 
 package MY;
 BEGIN { use English; }

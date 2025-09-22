@@ -1,3 +1,4 @@
+App-SeismicUnixGui-0.87.4.tar.gz
 dist/manifest.pl
 dist/my_uninstall.sh
 dist/uninstall_module.pl
@@ -863,7 +864,9 @@ lib/App/SeismicUnixGui/doc/FAQ_immodpg
 lib/App/SeismicUnixGui/doc/FAQ_SeismicUnixGui
 lib/App/SeismicUnixGui/doc/README_to_INSTALL
 lib/App/SeismicUnixGui/doc/SeismicUnixGuiInstallationGuide0.87.4.pdf
+lib/App/SeismicUnixGui/doc/SeismicUnixGuiInstallationGuide0.87.5.pdf
 lib/App/SeismicUnixGui/doc/SeismicUnixGuiTutorial0.87.4.pdf
+lib/App/SeismicUnixGui/doc/SeismicUnixGuiTutorial0.87.5.pdf
 lib/App/SeismicUnixGui/fortran/bin/immodpg1.1
 lib/App/SeismicUnixGui/fortran/bin/stdsleep
 lib/App/SeismicUnixGui/fortran/Makefile

@@ -27,7 +27,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.230';
+our $VERSION = '1.231';
 
 use Quiq::Hash;
 
@@ -106,6 +106,41 @@ sub add {
     $self->hash->add($key,$val);
 
     return;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 concat() - Konkateniere Attributwerte
+
+=head4 Synopsis
+
+  $val = $ssb->concat($sep,@keys);
+
+=head4 Description
+
+Konkateniere die Werte der Attribute @keys mit Trennzeichen $sep zu
+einem Wert und liefere diesen zurück. Leere Werte werden übergangen.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub concat {
+    my $self = shift;
+    my $sep = shift;
+    # @_: @keys
+
+    my $val;
+    for my $key (@_) {
+        if (my $str = $self->get($key)) {
+            if ($val) {
+                $val .= $sep;
+            }
+            $val .= $str;
+        }
+    }
+
+    return $val;
 }
 
 # -----------------------------------------------------------------------------
@@ -209,6 +244,36 @@ sub get {
 
 # -----------------------------------------------------------------------------
 
+=head3 getFirst() - Liefere ersten Attributwert
+
+=head4 Synopsis
+
+  $val = $ssb->getFirst(@keys);
+
+=head4 Description
+
+Liefere den ersten nichtleeren Wert der Attribute @keys.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub getFirst {
+    my $self = shift;
+    # @_: @keys
+
+    for my $key (@_) {
+        my $val = $self->get($key);
+        if ($val ne '') {
+            return $val;
+        }
+    }
+
+    return undef;
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 prefix() - Liefere Präfix
 
 =head4 Synopsis
@@ -225,7 +290,7 @@ sub get {
 
 =head1 VERSION
 
-1.230
+1.231
 
 =head1 AUTHOR
 

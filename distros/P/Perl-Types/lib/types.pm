@@ -1,10 +1,11 @@
 #
 # This file is part of Perl-Types
 #
-# This software is copyright (c) 2025 by Auto-Parallel Technologies, Inc.
+# This software is Copyright (c) 2025 by Perl Community 501(c)(3) nonprofit organization.
 #
-# This is free software; you can redistribute it and/or modify it under
-# the same terms as the Perl 5 programming language system itself.
+# This is free software, licensed under:
+#
+#   The GNU General Public License, Version 3, June 2007
 #
 # [[[ HEADER ]]]
 # ABSTRACT: the Perl data type system

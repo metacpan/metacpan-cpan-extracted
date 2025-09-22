@@ -1,0 +1,12 @@
+// disable the following errors...
+// MD013/line-length Line length [Expected: 80; Actual: XYZ]
+// MD007/ul-indent Unordered list indentation [Expected: 2; Actual: 4]
+{
+    "config": {
+        "MD013": false,
+        "MD007": {
+            "indent": 4
+        }
+    }
+}
+

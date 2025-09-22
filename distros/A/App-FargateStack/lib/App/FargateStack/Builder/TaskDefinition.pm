@@ -12,6 +12,7 @@ use File::Basename qw(fileparse);
 use Data::Compare;
 use List::Util qw(uniq);
 use JSON;
+use Test::More;
 
 use Role::Tiny;
 
@@ -83,7 +84,12 @@ sub register_task_definition {
     my $latest_image  = $self->get_latest_image($task_name);
     my $latest_digest = $latest_image->{imageDigest};
 
-    $self->log_warn( 'register-task-definition: updating image digest in config: [%s]', $latest_digest );
+    if ( !$latest_digest ) {
+      $self->log_error('register-task-definition: unable to retrieve image digest...did you push it to ECR?');
+    }
+    else {
+      $self->log_warn( 'register-task-definition: updating image digest in config: [%s]', $latest_digest );
+    }
 
     $tasks->{$task_name}->{image_digest} = $latest_digest;
   }
@@ -110,22 +116,9 @@ sub taskdef_status {
 }
 
 ########################################################################
-sub task_execution_role {
+sub create_role_arn {
 ########################################################################
   my ( $self, $role_name ) = @_;
-
-  my $config = $self->get_config;
-
-  $role_name //= $config->{role}->{name};
-
-  if ( !$role_name ) {
-    my $app_name = $self->get_config->{app}->{name};
-    $app_name =~ s/[^[:alpha:]_-]//xsm;
-
-    $role_name = sprintf 'Fargate%sRole', $role_name;
-
-    $config->{role}->{name} = $role_name;
-  }
 
   return sprintf 'arn:aws:iam::%s:role/%s', $self->get_account, $role_name;
 }
@@ -246,10 +239,17 @@ sub create_taskdef_files {
     # -- efs mounts --
     my ( $volumes, $mount_points ) = $self->add_volumes($task);
 
-    my $role_name = $config->{role}->{name} // $self->create_default( 'role-name', 'ecs' );
+    my $role_name      = $config->{role}->{name}      // $self->create_default( 'role-name', 'ecs' );
+    my $task_role_name = $config->{task_role}->{name} // $self->create_default( 'role-name', 'task' );
+
+    # Note that we create the role ARNs rather than taking them from
+    # the config. This is because we create the task definition before
+    # we actually create the roles. The role ARN is determistic...so
+    # why not?
 
     my $taskdef = {
-      executionRoleArn     => $self->task_execution_role($role_name),
+      executionRoleArn     => $self->create_role_arn($role_name),
+      taskRoleArn          => $self->create_role_arn($task_role_name),
       memory               => "$task->{memory}",
       containerDefinitions => [
         { logConfiguration => {
@@ -339,7 +339,12 @@ sub compare_task_definition {
   foreach my $k ( keys %{$taskdef} ) {
     next if $k eq 'containerDefinitions';
 
-    next if Compare( $taskdef->{$k}, $current_taskdef->{$k} );
+    if ( ref( $current_taskdef->{$k} ) eq 'ARRAY' ) {
+      next if array_compare( $taskdef->{$k}, $current_taskdef->{$k} );
+    }
+    else {
+      next if Compare( $taskdef->{$k}, $current_taskdef->{$k} );
+    }
 
     $self->log_warn( 'task: [%s] %s changed...forces new task definition', $task_name, $k );
 
@@ -374,9 +379,15 @@ sub compare_task_definition {
 
   foreach my $k ( uniq @keys_to_check ) {
     my $current_elem = $current_taskdef->{containerDefinitions}->[0]->{$k};
-    next if Compare( $containerDefinitions->{$k}, $current_elem );
+    if ( ref($current_elem) eq 'ARRAY' ) {
+      next if array_compare( $current_elem, $containerDefinitions->{$k} );
+    }
+    else {
+      next if Compare( $containerDefinitions->{$k}, $current_elem );
+    }
 
     $self->log_warn( 'task: [%s] %s changed...forces new task definition', $task_name, $k );
+
     $self->display_diffs( $current_elem, $containerDefinitions->{$k}, { title => sprintf '%s changes', $k } );
 
     $status = $FALSE;
@@ -387,6 +398,29 @@ sub compare_task_definition {
   $self->set_taskdef_status($taskdef_status);
 
   return;
+}
+
+########################################################################
+sub array_compare {
+########################################################################
+  my ( $array1, $array2 ) = @_;
+
+  return $FALSE
+    if $array1 && !$array2;
+
+  return $FALSE
+    if !$array1 && $array2;
+
+  return $FALSE
+    if @{$array1} != @{$array2};
+
+  my $json = JSON->new->canonical;
+
+  my $array1_sorted = join q{}, sort map { ref $_ ? $json->encode($_) : $_ } @{$array1};
+
+  my $array2_sorted = join q{}, sort map { ref $_ ? $json->encode($_) : $_ } @{$array2};
+
+  return $array1_sorted eq $array2_sorted;
 }
 
 1;

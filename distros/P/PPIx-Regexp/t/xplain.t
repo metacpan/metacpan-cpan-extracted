@@ -452,6 +452,12 @@ choose(  child => 2 );
 klass(   'PPIx::Regexp::Token::Modifier' );
 xplain(  'a: restrict non-Unicode classes to ASCII; m: ^ and $ match within string; n: parentheses do not capture; s: . can match newline; x: ignore whitespace and comments' );
 
+parse(   's/foo/bar()/eee' );
+value(   failures => [], 0 );
+choose(  child => 3 );
+klass(   'PPIx::Regexp::Token::Modifier' );
+xplain(  'eee: substitution is expression whose result is eval()-ed 2 times' );
+
 note	 'PPIx::Regexp::Token::Unknown since 5.28; previously ::NoOp';
 
 parse   ( '/\\N{}/' );

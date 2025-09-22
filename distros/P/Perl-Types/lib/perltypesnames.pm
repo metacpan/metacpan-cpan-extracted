@@ -1,20 +1,20 @@
 ## no critic qw(Capitalization ProhibitMultiplePackages ProhibitReusedNames)  # SYSTEM DEFAULT 3: allow multiple & lower case package names
 package  # hide from PAUSE indexing
-    rperlnames;
+    perlnames;
 use strict;
 use warnings;
-use RPerl::Config;
+use Perl::Config;
 our $VERSION = 0.001_010;
 
 1;
 
 # DEV NOTE, CORRELATION #rp008: export name() and scope_type_name_value() to main:: namespace;
-# can't achieve via Exporter due to circular dependency issue caused by Exporter in Config.pm and solved by 'require rperltypes;' in RPerl.pm
+# can't achieve via Exporter due to circular dependency issue caused by Exporter in Config.pm and solved by 'require perltypes;' in Perl.pm
 package main;
-use rperltypes;
-use rperlnamespaces;
+use perltypes;
+use perltypesnamespaces;
 
-#BEGIN { print 'in rperlnames.pm, have @INC = ' . "\n" . Dumper(\@INC) . "\n"; }
+#BEGIN { print 'in perlnames.pm, have @INC = ' . "\n" . Dumper(\@INC) . "\n"; }
 
 use PadWalker qw(peek_my peek_our);
 
@@ -40,7 +40,7 @@ sub name {
     ];
     foreach my string $namespace (
         ( caller() . '::' ),
-        sort keys %{ rperlnamespaces::hash_noncore_nonrperl() }
+        sort keys %{ perltypesnamespaces::hash_noncore_nonperltypes() }
         )
     {
         $pad = do { no strict 'refs'; \%{$namespace} };    # pad stash
@@ -95,10 +95,10 @@ sub scope_type_name_value {
 
     foreach my string $namespace (
         ( caller() . '::' ),
-        sort keys %{ rperlnamespaces::hash_noncore_nonrperl() }
+        sort keys %{ perltypesnamespaces::hash_noncore_nonperltypes() }
         )
     {
-#        RPerl::diag( 'in scope_type_name_value(), have $namespace = ' . $namespace . "\n" );
+#        Perl::diag( 'in scope_type_name_value(), have $namespace = ' . $namespace . "\n" );
         $pad = do { no strict 'refs'; \%{$namespace} };    # pad stash
         for my string $name ( keys %{$pad} ) {
             if ( ( ref \$pad->{$name} ) ne 'GLOB' ) { next; }

@@ -1,7 +1,7 @@
-#our $VERSION = 0.041_000;  # DEV NOTE: comment to avoid potential conflict w/ Dist::Zilla & friends
-use 5.012;  # NEED ANSWER, CORRELATION #rp000: is RPerl truly incompatible with Perl v5.10 and earlier?
+#our $VERSION = 0.042_000;  # DEV NOTE: comment to avoid potential conflict w/ Dist::Zilla & friends
 
-#use ExtUtils::MakeMaker;  # NEED DELETE, RPERL REFACTOR
+# DEV NOTE, CORRELATION #pt000: minimum Perl version to support "my array @foo;" & "my hash %bar;" Perl::Types syntax
+use 5.012;
 
 BEGIN { 
     use Config;
@@ -76,6 +76,9 @@ if ($version < $min_cxx_versions->{$cxx_real}) {
 }
 
 # fix read-only blib/lib in MS Windows
-if ( $OSNAME eq 'MSWin32' ) {
-    push( @ExtUtils::MakeMaker::Overridable, qw(pm_to_blib) );
+BEGIN {
+    require ExtUtils::MakeMaker;  # ensure EUMM is actually loaded before modifying "@ExtUtils::MakeMaker::Overridable"
+    if ( $OSNAME eq 'MSWin32' ) {
+        push( @ExtUtils::MakeMaker::Overridable, qw(pm_to_blib) );
+    }
 }

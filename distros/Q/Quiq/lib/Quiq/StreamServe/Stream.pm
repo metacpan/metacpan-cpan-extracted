@@ -38,7 +38,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.230';
+our $VERSION = '1.231';
 
 use Quiq::StreamServe::Block;
 use Quiq::FileHandle;
@@ -91,6 +91,8 @@ Objekt
 =head4 Description
 
 Instantiiere ein Objekt der Klasse und liefere dieses zurück.
+Enthält die Streamdatei mehr als einen Stream, wird eine Exception
+geworfen.
 
 =cut
 
@@ -113,6 +115,7 @@ sub new {
 
     # Datenstrukturen mit erstem (zunächst leeren) Block
 
+    my $n = 0;
     my $type;
     my $prefix = '*';
     my $blk = Quiq::StreamServe::Block->new($prefix);
@@ -135,6 +138,12 @@ sub new {
             # Wir übergehen Zeilen ohne Wert. Es sollte nur eine geben:
             #     BEGIN<NAME>
             ($type) = $key =~ /BEGIN(.*)/;
+            if (++$n > 1) {
+                $class->throw(
+                    'STREAM-00099: Streamfile contains more than one stream',
+                    StreamFile => $file,
+                );
+            }
             next;
         }
         $val =~ s/^\s+|\s+$//; # Wert von umgebendem Whitespace befreien
@@ -163,6 +172,54 @@ sub new {
         blockA => \@blocks,
         sectionH => Quiq::Hash->new(\%section),
     );
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 numberOfStreams() - Anzahl der (Einzel-)Streams
+
+=head4 Synopsis
+
+  $n = $class->numberOfStreams($file);
+
+=head4 Arguments
+
+=over 4
+
+=item $file
+
+Stream-Datei
+
+=back
+
+=head4 Returns
+
+(Integer) Anzahl der Einzelstreams
+
+=head4 Description
+
+Ermittele die Anzahl der Einzelstreams und liefere diese zurück.
+Ax-Streams zählen wir nicht mit.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub numberOfStreams {
+    my ($class,$file) = @_;
+
+    my $n = 0;
+    my $fh = Quiq::FileHandle->new('<',$file);
+    while (<$fh>) {
+        if (/^BEGIN/) {
+            if (!/A\d$/) {
+                $n++;
+            }
+        }
+    }
+    $fh->close;
+
+    return $n;
 }
 
 # -----------------------------------------------------------------------------
@@ -197,8 +254,8 @@ Stream-Daten
 Zerlege einen (Multi-)Stream (aus Datei oder In-Memory-Daten)
 in Einzelstreams und liefere die Liste der Einzelstreams zurück.
 
-Die gelieferte Liste ist leer, wenn der Stream lediglich einen A0- oder
-A1-Block enthält.
+Ax-Streams ignorieren wir. D.h. die gelieferte Liste ist leer, wenn der
+Stream lediglich einen A0- oder A1-Stream enthält.
 
 =cut
 
@@ -565,7 +622,7 @@ sub type {
 
 =head1 VERSION
 
-1.230
+1.231
 
 =head1 AUTHOR
 

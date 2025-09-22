@@ -50,13 +50,14 @@ sub new {
   }
 
   my $subnets = $self->get_subnets;
+  my $vpc_id  = $self->get_vpc_id;
 
   # if the caller did not send any subnets, find all usable public and
   # private subnets
   if ( !$subnets ) {
-    my $result = $self->describe_subnets( $self->get_vpc_id, 'Subnets' );
+    my $result = $self->describe_subnets( $vpc_id, 'Subnets' );
 
-    croak sprintf "ERROR: there are no subnets in %s\n", $self->get_vpc_id
+    croak sprintf "ERROR: there are no subnets in %s\n", $vpc_id
       if !@{$result};
 
     $subnets = $self->categorize_subnets;  # find private, public subnets

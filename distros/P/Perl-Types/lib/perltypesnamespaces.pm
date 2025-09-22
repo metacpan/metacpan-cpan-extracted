@@ -49,7 +49,7 @@ sub hash_noncore {
 }
 
 sub hash_noncore_nonperltypes {
-#    print 'in hash_noncore(), have $perltypesnamespaces_generated::CORE = ' . Dumper($perltypesnamespaces_generated::CORE) . "\n";
+#    print 'in hash_noncore_nonperltypes(), have $perltypesnamespaces_generated::CORE = ' . Dumper($perltypesnamespaces_generated::CORE) . "\n";
     my $namespaces = {};
     for my $name ( sort keys %main:: ) {
         my $glob = $main::{$name};

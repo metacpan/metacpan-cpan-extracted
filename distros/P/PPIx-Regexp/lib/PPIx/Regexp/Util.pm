@@ -33,7 +33,7 @@ our %EXPORT_TAGS = (
     width_one	=> [ qw{ raw_width width } ],
 );
 
-our $VERSION = '0.089';
+our $VERSION = '0.090';
 
 sub is_ppi_regexp_element {
     my ( $elem ) = @_;

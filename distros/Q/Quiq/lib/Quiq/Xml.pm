@@ -21,7 +21,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.230';
+our $VERSION = '1.231';
 
 use XML::Twig ();
 use Quiq::Path;
@@ -171,7 +171,7 @@ sub xmlToTree {
 
 =head1 VERSION
 
-1.230
+1.231
 
 =head1 AUTHOR
 

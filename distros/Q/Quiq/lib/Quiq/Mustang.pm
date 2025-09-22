@@ -45,12 +45,11 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.230';
+our $VERSION = '1.231';
 
 use Quiq::Path;
 use Quiq::PerlModule;
 use Quiq::Shell;
-use Quiq::Assert;
 use Quiq::Html::Producer;
 use Quiq::Html::List;
 use Quiq::Html::Page;
@@ -141,10 +140,6 @@ ZUGFeRD-Datei, wie B<Mustang> sie erwartet (als XML oder PDF).
 
 =over 4
 
-=item -force => $bool (Default: 0)
-
-Forciere die Validierung, auch wenn sie schon einmal erfolgt ist.
-
 =item -notice => $bool (Default: 0)
 
 Protokolliere nicht nur Validierungsfehler, sondern gib darüber
@@ -158,13 +153,13 @@ Gib Laufzeitinformation über die Verarbeitung auf STDOUT aus.
 
 =head4 Returns
 
-(Integer) Status der Validierung: 0 = ok, 1 = fehlgeschlagen,
--1 = Datei wurde übergangen, da bereits validiert.
+(Integer) Status der Validierung: 0 = ok, 1 = fehlgeschlagen.
 
 =head4 Description
 
 Validiere die ZUGFeRD-Datei $file und liefere den Status der
-Validierung zurück.
+Validierung zurück. Ferner wird eine XML-Datei geschrieben(_result.xml),
+die das Validierungsergebnis enhält.
 
 =cut
 
@@ -180,7 +175,6 @@ sub validate {
     my $verbose = 0;
 
     my $argA = $self->parameters(1,1,\@_,
-        -force => \$force,
         -notice => \$notice,
         -verbose => \$verbose,
     );
@@ -198,23 +192,22 @@ sub validate {
     my $logFile = sprintf '%s_result.log',$basename;
 
     my $status;
-    if ($p->exists($resultFile) && !$force) {
-        $status = -1;
-    }    
-    else {
-        my $cmd = "java -Xmx1G -Dfile.encoding=UTF-8".
-            " -jar $self->{'jarFile'} --action validate".
-            " --source $file --log-as-pdf$noticeOpt >$resultFile 2>$logFile";
-        my $exitCode = $sh->exec($cmd,-log=>$verbose);
-        if ($exitCode == 130) {
-            for my $file ($p->glob("*_result.*")) {
-                say "DELETING $file";
-                $p->delete($file);
-            }
-            exit 130;
+    my $cmd = "java -Xmx1G -Dfile.encoding=UTF-8".
+        " -jar $self->{'jarFile'} --action validate".
+        " --source $file --log-as-pdf$noticeOpt >$resultFile 2>$logFile";
+    my $exitCode = $sh->exec($cmd,-log=>$verbose);
+    if ($exitCode == 130) {
+        # Ausführung wurde mit ^C abgebrochen. Wir entfernen die
+        # durch die Ausgabeumlenkung angelegten Resultat-Dateien
+
+        for my $file ($p->glob("*_result.*")) {
+            say "DELETING $file";
+            $p->delete($file);
         }
-        $status = $exitCode? 1: 0;
+        exit 130;
     }
+    $status = $exitCode? 1: 0;
+
     $sh->back;
 
     return $status;
@@ -226,11 +219,7 @@ sub validate {
 
 =head4 Synopsis
 
-  ($status,$val) = $mus->getResult($pattern,$as);
-  
-  ($status,$text) = $mus->getResult($pattern,'text');
-  ($status,$ruleH) = $mus->getResult($pattern,'hash');
-  ($status,$html) = $mus->getResult($pattern,'html');
+  ($status,$text,$html,$ruleH) = $mus->getResult($pattern);
 
 =head4 Arguments
 
@@ -239,20 +228,6 @@ sub validate {
 =item $pattern
 
 Glob()-Pattern der Resultat-Datei des Mustang Validators.
-
-=item $as
-
-Typ des Returnwerts:
-
-=over 4
-
-=item 'text'
-
-=item 'hash'
-
-=item 'html'
-
-=back
 
 =back
 
@@ -280,25 +255,17 @@ Es liegt kein Validierungsergebis vor.
 
 =back
 
-=item $val
-
-Detailinformation. Mögliche Werte:
-
-=over 4
-
 =item $text
 
-Textuelle Beschreibung.
-
-=item $ruleH
-
-Hash der verletzten Regeln.
+Textuelle Beschreibung
 
 =item $html
 
-Beschreibung in HTML.
+Beschreibung in HTML
 
-=back
+=item $ruleH
+
+Hash der verletzten Regeln
 
 =back
 
@@ -312,17 +279,16 @@ Liefere das Ergebnis der ZUGFeRD-Validierung.
 
 sub getResult {
     my $self = shift;
+    # @_: $pattern
 
     # Optionen und Argumente
 
     my $language = 'de';
 
-    my $argA = $self->parameters(2,2,\@_,
+    my $argA = $self->parameters(1,1,\@_,
         -language => \$language,
     );
-    my ($pattern,$as) = @$argA;
-
-    Quiq::Assert->isEnumValue($as,['text','hash','html']);
+    my $pattern = shift @$argA;
 
     # Operation ausführen
 
@@ -333,115 +299,90 @@ sub getResult {
     my %rule;
 
     my ($resultFile) = $p->glob($pattern);
-    if (!$resultFile || !$p->exists($resultFile) || !$p->size($resultFile)) {
-        # Es liegt kein Mustang Validierungsergebnis vor
 
-        $status = 2;
-        $text = $language eq 'de'? "Es liegt kein Validierungsergebnis vor\n":
-            "No validation result\n";
-        $rule{'NO_VALIDATION_RESULT'}++;
+    my $xml = Quiq::Path->read($resultFile,-decode=>'UTF-8');
+
+    my ($failed) = $xml =~ m|<failed>(.+?)</failed>|;
+    # Wenn <failed> auf 0 gefaked ist
+    if (!$failed && $xml =~ m|<summary status="invalid"/>|) {
+        $failed = 1;
     }
-    else {
-        # Es liegt ein Mustang Validierungsergebnis vor
 
-        my $xml = Quiq::Path->read($resultFile,-decode=>'UTF-8');
+    $status = $failed? 1: 0;
 
-        my ($failed) = $xml =~ m|<failed>(.+?)</failed>|;
-        # Wenn <failed> auf 0 gefaked ist
-        if (!$failed && $xml =~ m|<summary status="invalid"/>|) {
-            $failed = 1;
-        }
+    # Text und Hash
 
-        $status = $failed? 1: 0;
-        while ($xml =~ m|(<error.*?</error>)|g) {
-            my $error = $1;
-            my $path = '';
-            while ($error =~ m|/\*:(.*?)\[|g) {
-                if ($path) {
-                    $path .= '/';
-                }
-                $path .= $1;
+    while ($xml =~ m|(<error.*?</error>)|g) {
+        my $error = $1;
+        my $path = '';
+        while ($error =~ m|/\*:(.*?)\[|g) {
+            if ($path) {
+                $path .= '/';
             }
-            my $br = 'NOT_FOUND';
-            my ($msg) = $error =~ m|>(.*)</|;
-            if ($msg =~ /^\[(.*?)\]/) {
-                $br = $1;
-                if ($rule{$br}++) {
-                    # Wir melden jede BR-Verletzung nur ein Mal
-                    next;
-                }
-            }
-            if ($language eq 'de') {
-                my $text = $self->br($br);
-                if ($text) {
-                    $msg = "[$br] $text";
-                }
-            }
-            $text .= "ERROR: $path\n$msg\n-----\n";
-
-            # else {
-            #     $rule{'XML_INV'}++;
-            # }
+            $path .= $1;
         }
+        my $br = 'NOT_FOUND';
+        my ($msg) = $error =~ m|>(.*)</|;
+        if ($msg =~ /^\[(.*?)\]/) {
+            $br = $1;
+            if ($rule{$br}++) {
+                # Wir melden jede BR-Verletzung nur ein Mal
+                next;
+            }
+        }
+        if ($language eq 'de') {
+            my $text = $self->br($br);
+            if ($text) {
+                $msg = "[$br] $text";
+            }
+        }
+        $text .= "ERROR: $path\n$msg\n-----\n";
     }
 
-    if ($as eq 'text') {
-        return ($status,$text);
+    # HTML
+
+    my @arr = split /^-+\n/m,$text;
+    for (@arr) {
+        s|(ERROR:)|<span class="red">$1</span>|g;
+        s|(.*)\[|<span class="bold">$1</span>[|s;
+        s|(B[TGR]-[-\w]+)|<span class="red">$1</span>|g;
     }
-    elsif ($as eq 'hash') {
-        return ($status,\%rule);
-    }
-    elsif ($as eq 'html') {
-        my @arr = split /^-+\n/m,$text;
-        for (@arr) {
-            s|(ERROR:)|<span class="red">$1</span>|g;
-            s|(.*)\[|<span class="bold">$1</span>[|s;
-            s|(B[TGR]-[-\w]+)|<span class="red">$1</span>|g;
-        }
-        my $h = Quiq::Html::Producer->new;
-        my $body;
-        if ($status) {
-            $body = Quiq::Html::List->html($h,
-                items => \@arr,
-            );
-        }
-        else {
-            $body = $h->tag('span',
-                class => 'bold green',
-                'E-Rechnung: Das XML ist valide'
-            );
-        }
-        my $html = Quiq::Html::Page->html($h,
-            styleSheet => q~
-                body {
-                    font-family: sans-serif;
-                    font-size: 10pt;
-                }
-                li {
-                    padding-bottom: 0.5em;
-                }
-                .bold {
-                    font-weight: bold;
-                }
-                .red {
-                    color: red;
-                }
-                .green {
-                    color: green;
-                }
-            ~,
-            body => $body,
-        );
-        return ($status,$html);
-    }
-    else {
-        $self->throw(
-            'MUSTANG-00099: Unknown result type',
-            ResultType => $as,
+    my $h = Quiq::Html::Producer->new;
+    my $body;
+    if ($status) {
+        $body = Quiq::Html::List->html($h,
+            items => \@arr,
         );
     }
+    else {
+        $body = $h->tag('span',
+            class => 'bold green',
+            'E-Rechnung: Das XML ist valide'
+        );
+    }
+    my $html = Quiq::Html::Page->html($h,
+        styleSheet => q~
+            body {
+                font-family: sans-serif;
+                font-size: 10pt;
+            }
+            li {
+                padding-bottom: 0.5em;
+            }
+            .bold {
+                font-weight: bold;
+            }
+            .red {
+                color: red;
+            }
+            .green {
+                color: green;
+            }
+        ~,
+        body => $body,
+    );
 
-    # not reached
+    return ($status,$text,$html,\%rule);
 }
 
 # -----------------------------------------------------------------------------
@@ -502,28 +443,43 @@ sub visualize {
     # Optionen und Argumente
 
     my $addBusinessTerms = 0;
+    my $verbose = 0;
 
     my $argA = $self->parameters(2,2,\@_,
         -addBusinessTerms => \$addBusinessTerms,
+        -verbose => \$verbose,
     );
     my ($xmlFile,$outFile) = @$argA;
 
     # Operation ausführen
 
-    my $sh = Quiq::Shell->new(log=>1);
+    (my $logFile = $outFile) =~ s/\..*/.log/;
+
+    my $sh = Quiq::Shell->new(log=>$verbose);
 
     my $cmd;
     if ($outFile =~ /\.pdf$/) {
         $cmd = "java -Xmx1G -Dfile.encoding=UTF-8 -jar $self->{'jarFile'}".
             " --action pdf --source $xmlFile --out $outFile".
-            " >/dev/null 2>&1";
+            " >$logFile 2>&1";
     }
     else {
         $cmd = "java -Xmx1G -Dfile.encoding=UTF-8 -jar $self->{'jarFile'}".
-            " --action visualize --language de --source $xmlFile --out $outFile".
-            " >/dev/null 2>&1";
+            " --action visualize --language de --source $xmlFile".
+            " --out $outFile >$logFile 2>&1";
     }
     $sh->exec($cmd);
+
+    # Wenn in der Logdatei eine Exception gemeldet wird, löschen
+    # wir die Outdatei, da diese dann ggf. fehlerhaft ist (die PDF-Datei
+    # is dann korrupt) und kehren zurück.
+
+    my $p = Quiq::Path->new;
+    my $logData = $p->read($logFile);
+    if ($logData =~ /Exception/i) {
+        $p->delete($outFile);
+        return;
+    }
 
     if ($outFile =~ /\.html$/) {
         my $p = Quiq::Path->new;
@@ -555,11 +511,6 @@ sub visualize {
             my $html = $p->read($outFile,-decode=>'UTF-8');
             $html =~ s{<div class="haftungausschluss">.*?</div>\n}{}g;
 
-            # $html =~ s{(title="(BT-.*?)".*?)</div>}
-            #     {$1 (<span style="color: green">$2</span>)</div>}sg;
-            # $html =~ s{(title="(BG-.*?)".*?)</div>}
-            #     {$1 (<span style="color: #bbbbbb">$2</span>)</div>}sg;
-
             $html =~ s{(title="(B[GT]-.*?)".*?)</div>}
                 {"$1 (".$sub->(\%key,$2).')</div>'}sge;
 
@@ -567,7 +518,7 @@ sub visualize {
         }
 
         # Eine CSS- und JS-Datei werden erzeugt, die wir jedoch nicht
-        # brauchen, da der Code ist in der erzeugten HTML-Datei enthalten ist
+        # brauchen, da der Code in der erzeugten HTML-Datei enthalten ist
         $sh->exec('rm -f xrechnung-viewer.*');
     }
 
@@ -686,7 +637,7 @@ sub mustangDir {
 
 =head1 VERSION
 
-1.230
+1.231
 
 =head1 AUTHOR
 

@@ -1,7 +1,34 @@
 use v5.40;
 use Module::Build;
 
-my $build = Module::Build->new(
+my $build = Module::Build->subclass(
+    class => 'Minima::Builder',
+    code => <<~\EOF,
+        use v5.40;
+        use Path::Tiny;
+        use File::ShareDir;
+
+        sub ACTION_install ($self, @args) {
+            # run normal install
+            $self->SUPER::ACTION_install(@args);
+
+            # try to clean up obsolete shared file
+            try {
+                require File::ShareDir;
+                my $dir = File::ShareDir::dist_dir('Minima');
+                my $file = path($dir, 'templates', 'etc-config.pl.stpl');
+                if ($file->exists) {
+                    $file->remove
+                        or warn "Could not remove obsolete file $file: $!\n";
+                } else {
+                    say 'Updated templates.';
+                }
+            } catch ($e) {
+                warn "Error whilre cleaning obsolete file: $e\n";
+            }
+        }
+        EOF
+)->new(
     module_name => 'Minima',
     share_dir => 'share',
     requires => {

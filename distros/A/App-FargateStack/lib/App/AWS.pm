@@ -63,10 +63,14 @@ sub command {
 
   chomp $result;
 
-  my $obj = eval { return decode_json($result); };
+  my $obj = eval {
+    return $result
+      if join( q{}, @args ) =~ /outputtext/xsm;
 
-  if ( !$obj && none { '--output' eq $_ } @args ) {
-    # note that errors may occur when $result is just text, that's ok
+    return JSON->new->utf8->decode($result);
+  };
+
+  if ( !$obj || $EVAL_ERROR ) {
     $self->get_logger->error($EVAL_ERROR);
     $self->get_logger->error( join q{ }, @cmd, @args );
   }

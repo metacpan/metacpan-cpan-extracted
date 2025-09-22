@@ -37,7 +37,7 @@ use base qw{ PPIx::Regexp::Token::Structure };
 
 use PPIx::Regexp::Constant qw{ MINIMUM_PERL @CARP_NOT };
 
-our $VERSION = '0.089';
+our $VERSION = '0.090';
 
 # Return true if the token can be quantified, and false otherwise
 # sub can_be_quantified { return };

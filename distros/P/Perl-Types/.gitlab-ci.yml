@@ -1,0 +1,389 @@
+---
+# enable standard stages
+stages:
+  - .pre
+  - build
+  - test
+  - deploy
+
+# define project-wide variables
+variables:
+  # the path to this GitLab repository's container registry & our custom Docker image name
+  CONTAINER_REGISTRY: $CI_REGISTRY/$CI_PROJECT_PATH
+  CUSTOM_IMAGE_NAME: gitlab-ci-image
+
+
+# build & push our repository's custom Linux Docker base image to the GitLab Docker repository;
+# DEV NOTE: all `apt-get install` dependencies are in our custom-build Docker image (see 'Dockerfile' for details),
+# rather than try to somehow find all the various system-wide locations `apt-get install` writes and artifact them all;
+# also, all of our other Perl & non-Perl dependencies are in the Docker base image, to speed up GitLab CI runtime
+# and provide reproducibility outside of GitLab CI
+linux-perl-docker-base-build:
+  stage: .pre
+  # DEV NOTE: this is the image used as the host Linux OS (not base image) when building our own
+  # custom Linux Docker image, please see the 'Dockerfile' for the base image
+  image: docker:latest
+  services: [docker:dind]
+  variables:
+    DOCKER_BUILDKIT: "1"
+  rules:
+    # only rebuild Docker base image when one of these files changes...
+    - changes:
+        - .gitlab-ci.yml # base image's 'Dockerfile' is called by `docker build`, so yes need to rebuild on changes here
+        - Dockerfile # base image's 'Dockerfile' configures Docker build, so yes need to rebuild on changes there
+        - cpanfile   # base image's 'Dockerfile' does call `cpanm`, so yes need to rebuild on 'cpanfile' changes
+#        - dist.ini  # base image's 'Dockerfile' does NOT call `dzil`, so no need to rebuild on 'dist.ini' changes
+    # OR on release tags, so Docker base image is freshly rebuilt for each release
+    - if: '$CI_COMMIT_TAG =~ /^v?\d+\.\d+(\.\d+)?$/'
+
+  script:
+    # actually build custom Linux Docker base image;
+    # use YAML folded block starting with ">" to split one long command across multiple lines
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - BASE_IMAGE="$CI_REGISTRY_IMAGE/base"
+    - >
+      docker build
+      -t "$BASE_IMAGE:$CI_COMMIT_SHA"
+      -t "$BASE_IMAGE:base-$CI_DEFAULT_BRANCH"
+      -f Dockerfile
+      --build-arg OCI_TITLE="${CI_PROJECT_TITLE:-$CI_PROJECT_NAME}"
+      --build-arg OCI_VERSION="${CI_COMMIT_TAG:-$CI_COMMIT_SHORT_SHA}"
+      --build-arg OCI_REVISION="$CI_COMMIT_SHA"
+      --build-arg OCI_SOURCE="$CI_PROJECT_URL"
+      --build-arg OCI_CREATED="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+      --build-arg OCI_LICENSES="GPL-3.0-or-later"
+      --build-arg OCI_DESCRIPTION="Base image containing build tools and dependencies for $CI_PROJECT_PATH"
+      .
+
+    # display all "OCI_*" label metadata in the newly-built Docker image, passed in via `--build-arg` lines above
+    - docker inspect "$BASE_IMAGE:$CI_COMMIT_SHA" --format '{{range $k,$v := .Config.Labels}}{{printf "%-30s %s\n" $k $v}}{{end}}'
+
+    # upload the Docker application image to the GitLab registry
+    - docker push "$BASE_IMAGE:$CI_COMMIT_SHA"
+    - docker push "$BASE_IMAGE:base-$CI_DEFAULT_BRANCH"
+
+
+linux-perl-docker-app-build:
+  stage: build
+  image: docker:latest
+  services: [docker:dind]
+  variables:
+    DOCKER_BUILDKIT: "1"
+    # configure GitLab CI to clone our repository with full history & tags (not shallow),
+    # so `dzil build` in 'docker/Dockerfile.app' avoids the following error...
+    # fatal: not a git repository (or any of the parent directories): .git
+    GIT_STRATEGY: fetch
+    GIT_DEPTH: "0"
+  tags: [gitlab-org-docker]
+  script:
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+
+    # prefer the specific Docker base image built in *this* GitLab CI Pipeline if present,
+    # otherwise use the Docker base image with the latest tracking tag
+    - BASE_IMAGE="$CI_REGISTRY_IMAGE/base"
+    - if docker pull "$BASE_IMAGE:$CI_COMMIT_SHA" ; then USE_BASE="$BASE_IMAGE:$CI_COMMIT_SHA"; else docker pull "$BASE_IMAGE:base-$CI_DEFAULT_BRANCH"; USE_BASE="$BASE_IMAGE:base-$CI_DEFAULT_BRANCH"; fi
+
+    # prepare tiny context that includes only `.git` in temporary directory, delete when done
+    - GIT_CONTEXT="$(mktemp -d)"
+    - trap 'rm -Rf "$GIT_CONTEXT"' EXIT
+    - cp -a .git/. "$GIT_CONTEXT/.git/"
+    - touch "$GIT_CONTEXT/.dockerignore"  # empty, so '.git' is not ignored here
+
+    # build the Docker application image on top of the Docker base image,
+    # calling `dzil build` & `cpanm .` inside the 'docker/Dockerfile.app';
+    # use YAML folded block starting with ">" to split one long command across multiple lines
+    - APP_IMAGE="$CI_REGISTRY_IMAGE/app"
+    - >
+      docker build
+      --build-arg BASE_IMAGE="$USE_BASE"
+      --build-context gitctx="$GIT_CONTEXT"
+      -t "$APP_IMAGE:$CI_COMMIT_SHA"
+      -t "$APP_IMAGE:$CI_COMMIT_REF_SLUG"
+      -f docker/Dockerfile.app
+      --build-arg OCI_TITLE="${CI_PROJECT_TITLE:-$CI_PROJECT_NAME} (app)"
+      --build-arg OCI_VERSION="${CI_COMMIT_TAG:-$CI_COMMIT_SHORT_SHA}"
+      --build-arg OCI_REVISION="$CI_COMMIT_SHA"
+      --build-arg OCI_SOURCE="$CI_PROJECT_URL"
+      --build-arg OCI_CREATED="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+      --build-arg OCI_LICENSES="GPL-3.0-or-later"
+      --build-arg OCI_DESCRIPTION="Application image containing libraries and executables for $CI_PROJECT_PATH"
+      .
+
+    # display all "OCI_*" label metadata in the newly-built Docker image, passed in via `--build-arg` lines above
+    - docker inspect "$APP_IMAGE:$CI_COMMIT_SHA" --format '{{range $k,$v := .Config.Labels}}{{printf "%-30s %s\n" $k $v}}{{end}}'
+
+    # upload the Docker application image to the GitLab registry
+    - docker push "$APP_IMAGE:$CI_COMMIT_SHA"
+    - docker push "$APP_IMAGE:$CI_COMMIT_REF_SLUG"
+
+    # extract the built Perl distribution in '_build-dir' from the Docker application image,
+    # so downstream jobs can consume it
+    - cid=$(docker create "$APP_IMAGE:$CI_COMMIT_SHA" true)
+    - docker cp "$cid":/tmp/_build-dir ./_build-dir
+    - docker rm "$cid"
+
+    # make artifacts writable by all users & groups, so "linux-perl-coverage" job can write 'cover_db' as non-root user
+    - chmod -R a+rwX _build-dir
+
+  artifacts:
+    # use GitLab persistent storage to save the temporary files for use by subsequent job(s),
+    # and keep for 1 week in case we need to download for debugging purposes
+    paths:
+      - _build-dir/  # Perl Dist::Zilla build directory
+    expire_in: 1 week
+
+
+linux-perl-test:
+  stage: test
+  dependencies:
+    - linux-perl-docker-app-build  # download artifacts from previous job
+  tags:
+    - gitlab-org-docker
+  # use our GitLab repository's custom Linux Docker application image
+  image: $CI_REGISTRY_IMAGE/app:$CI_COMMIT_REF_SLUG
+
+  variables:
+    # enable 't/author/*.t'
+    AUTHOR_TESTING: "1"
+
+  before_script:
+    # install TAP::Harness::JUnit to enable formatting Perl test output into GitLab-compatible XML 'junit.xml' file;
+    # DEV NOTE: this is a CI-specific dependency, so it is installed here rather than in the 'cpanfile'
+    - cpanm --verbose --notest TAP::Harness::JUnit
+
+  script:
+    # display all environmental variables, to make sure they are set correctly
+    - env | sort
+
+    # testing via `dzil` may NOT work, because it automatically creates new tests such as 'xt/author/00-compile.t',
+    # which includes the test 'no warnings found' that can be falsely triggered to fail by
+    # any output printed to STDERR, such as PERL_DEBUG and PERL_WARNINGS output from
+    # Inline::CPP or Perl::Config or any other place that outputs to STDERR
+#    - dzil test
+
+    # testing via `prove` works;
+    # use TAP::Harness::JUnit to format Perl test output into GitLab-compatible XML 'junit.xml' file;
+    # DEV NOTE: explicitly pass '_build-dir/lib' rather than adding to PERL5LIB, to avoid possible version conflicts etc
+    - export JUNIT_OUTPUT_FILE=$CI_PROJECT_DIR/junit.xml
+    - prove --harness TAP::Harness::JUnit -I _build-dir/lib -v -r t/
+
+    # testing via `perl` works, but prefer `prove` as it is the standard practice
+#    - perl -I _build-dir/lib t/00_foo.t
+#    - perl -I _build-dir/lib t/01_bar.t
+#    - perl -I _build-dir/lib t/02_baz.t
+
+  artifacts:
+    # 'junit.xml' file is always uploaded even if the tests fail, for viewing failed test results in the GitLab UI
+    when: always
+    # 'junit.xml' file is available for download if needed
+    paths:
+      - junit.xml
+    # 'junit.xml' file is where GitLab will look for the JUnit XML file, for viewing test results in the GitLab UI
+    reports:
+      junit: junit.xml
+
+
+linux-perl-cover:
+  stage: test
+  dependencies:
+    - linux-perl-docker-app-build  # download artifacts from previous job
+  tags:
+    - gitlab-org-docker
+  # use our GitLab repository's custom Linux Docker application image
+  image: $CI_REGISTRY_IMAGE/app:$CI_COMMIT_REF_SLUG
+
+  before_script:
+    # install Devel::Cover to enable code coverage Perl testing, and
+    # install Devel::Cover::Report::Cobertura to enable output into GitLab-compatible XML 'cobertura.xml' file;
+    # install Devel::Cover::Report::Html to enable output into GitLab-compatible HTML 'coverage.html' file;
+    # DEV NOTE: this is a CI-specific dependency, so it is installed here rather than in the 'cpanfile'
+    - cpanm --verbose --notest Devel::Cover Devel::Cover::Report::Cobertura Devel::Cover::Report::Html
+
+  script:
+    # display all environmental variables, to make sure they are set correctly
+    - env | sort
+
+    # set test harness switches to use Devel::Cover and call `prove` command with `|| true`
+    # in case `prove` has failed tests and thus returns a failing return code, which would prevent the
+    # following call to `cover` not to run at all; IOW, always generate the coverage report, regardless of test results
+    # DEV NOTE: since we cd into '_build-dir/' before executing the `prove` command, we can specify the 'cover_db'
+    # path directly without the '_build-dir/' prefix; the path will be relative to the new current directory
+    - cd _build-dir/
+    - HARNESS_PERL_SWITCHES="-MDevel::Cover=-db,cover_db,-ignore_re,^t/,-silent,0" prove -Ilib -r . || true
+    # call `cover` command to generate XML (machine-readable) & HTML (human-readable) reports
+    - cover -report cobertura
+    - cover -report html
+
+  # even if tests fail in the coverage job, this isn't a critical pipeline failure;
+  # DEV NOTE: `|| true` above is a local script-level trick to ensure all commands run, whereas "allow_failure: true"
+  # is a higher-level pipeline setting for managing the job's overall impact on the pipeline's status
+  allow_failure: true
+
+  # parse the output generated by Devel::Cover to extract the numeric percentage of code coverage, for displaying in
+  # the GitLab UI; to see coverage in GitLab UI, go to "Build" then "Jobs" then look in the Coverage column;
+  # DEV NOTE: sample output to be parsed as "22.0%" by regex below:
+  # $ cover -report cobertura
+  # Reading database from /builds/<NAMESPACE>/<PROJECT>/_build-dir/cover_db
+  # ...
+  # Total                             27.1   10.2    3.8   81.8  100.0   22.0
+  coverage: '/^Total\s+.*?(\d+\.\d+)%?$/'
+
+  artifacts:
+    paths:
+      # 'cover_db/' directory is available for download if needed; includes both Cobertura XML & plain HTML reports
+      - _build-dir/cover_db
+    # 'cobertura.xml' file is where GitLab will look for the Cobertura XML file, for visualizing in the GitLab UI;
+    # to see Cobertura output in GitLab UI, go to "Analyze" then "Repository analytics" then "Code Coverage Statistics",
+    # or make a merge request and go to the MR's "Overview" tab for "Test Coverage" and "Changes" tab for colored lines
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: _build-dir/cover_db/cobertura.xml
+
+  # DEV NOTE: code coverage analysis can be a resource-intensive & time-consuming process
+  # that doesn't need to run on every commit;
+  # only run the code coverage job for...
+  rules:
+    # commits to your project's default branch, so experimental or temporary branches
+    # don't trigger code coverage;
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    # OR
+    # merge requests, so a coverage report is available for every potential merge,
+    # allowing developers to see the impact of their changes on test coverage
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+
+
+# publish Devel::Cover code coverage HTML report via GitLab Pages, for viewing via GitLab UI;
+# DEV NOTE: must be named exactly "pages" due to GitLab keyword, rather than more descriptive "linux-perl-cover-pages"
+pages:
+  stage: deploy
+  dependencies:
+    - linux-perl-cover
+  tags:
+    - gitlab-org-docker
+  # use our GitLab repository's custom Linux Docker application image
+  image: $CI_REGISTRY_IMAGE/app:$CI_COMMIT_REF_SLUG
+  script:
+
+    # check what files are in the current directory, to make sure we received the HTML report artifacts correctly;
+    # use `-prune` to exclude '.git/' directory, pass to `ls` command for proper formatting
+    - find . -path './.git' -prune -o -print | xargs ls -ld
+
+    # delete any previously-existing 'public' directory, to avoid possibility of stale files accumulating across builds
+    - rm -Rf public
+
+    # create special 'public' directory for use by GitLab Pages
+    - mkdir public
+
+    # copy the HTML (& XML) report from the artifact to the public directory; rename for correct web page loading
+    - cp -av _build-dir/cover_db/* public/
+    - mv public/coverage.html public/index.html
+
+    # check what files are in the current directory, to make sure we extracted the HTML report artifacts correctly
+    - find . -path './.git' -prune -o -print | xargs ls -ld
+  artifacts:
+    paths:
+      - public
+
+
+# release Docker application image onto Docker Hub
+linux-perl-docker-app-release:
+  stage: deploy
+  image: docker:latest
+  services: [docker:dind]
+  variables:
+    DOCKER_BUILDKIT: "1"
+  rules:
+    # consider a "release" to be any GitLab commit tag pattern like v0.001 or 0.001
+    - if: '$CI_COMMIT_TAG =~ /^v?\d+\.\d+(\.\d+)?$/'
+  script:
+    # login to Docker Hub & GitLab registries
+    - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USERNAME" --password-stdin
+    # DEV NOTE: the following two shell commands are GitLab YAML edge cases & therefore must be wrapped in double quotes
+    - "echo 'Docker Hub login as:'"
+    - "docker info --format '{{.Username}}'"
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+    # DEV NOTE: the following two shell commands are GitLab YAML edge cases & therefore must be wrapped in double quotes
+    - "echo 'GitLab Registry login as:'"
+    - "docker info --format '{{.Username}}'"
+    - APP_IMAGE="$CI_REGISTRY_IMAGE/app"
+    - HUB_IMAGE="$DOCKER_HUB_REPO"
+
+    # download & retag latest Docker application image from GitLab registry
+    - docker pull "$APP_IMAGE:$CI_COMMIT_SHA"
+    - docker tag  "$APP_IMAGE:$CI_COMMIT_SHA" "$HUB_IMAGE:$CI_COMMIT_TAG"
+    - docker tag  "$APP_IMAGE:$CI_COMMIT_SHA" "$HUB_IMAGE:latest"
+
+    # upload retagged Docker application image to Docker Hub
+    - docker push "$HUB_IMAGE:$CI_COMMIT_TAG"
+    - docker push "$HUB_IMAGE:latest"
+
+
+.shared_windows_runners:
+  tags:
+    # M$ Windows Server 2022 environment
+    - saas-windows-medium-amd64
+
+.windows:
+  extends:
+    - .shared_windows_runners
+  stage: test
+  before_script:
+    - choco install -y --allowemptychecksum strawberryperl
+    - $env:PATH="C:\strawberry\perl\bin;C:\strawberry\perl\site\bin;C:\strawberry\c\bin;$env:PATH"
+    # install Dist::Zilla and its dependencies
+    - cpanm --verbose --notest Dist::Zilla
+    # install Perl dependencies
+    - dzil authordeps --missing | cpanm --notest --verbose
+    - dzil listdeps --missing | cpanm --notest --verbose
+    # install TAP::Harness::JUnit for test reporting
+    - cpanm --verbose --notest TAP::Harness::JUnit
+    # perform a platform-specific build
+    - dzil build --in _build-dir
+  script:
+    - $env:JUNIT_OUTPUT_FILE="$env:CI_PROJECT_DIR/junit.xml";
+      $env:HARNESS_VERBOSE=1;
+      $env:HARNESS_TIMER=1;
+    - cpanm --verbose --test-only --harness TAP::Harness::JUnit ./_build-dir/
+    - Remove-Item Env:\JUNIT_OUTPUT_FILE;
+      Remove-Item Env:\HARNESS_VERBOSE;
+      Remove-Item Env:\HARNESS_TIMER;
+  artifacts:
+    when: always
+    reports:
+      junit: junit.xml
+
+
+# DEV NOTE: macOS job disabled in GitLab Free tier, must have GitLab Premium or Ultimate paid tiers
+# <https://gitlab.com/gitlab-com/runner-saas-macos-access-requests>.
+.macos_saas_runners:
+  tags:
+    # an Apple M-series or Intel-based Mac (amd64) running macOS 14 (Sonoma)
+    - saas-macos-14-metal-amd64
+  # macOS 14 with Xcode 15
+  image: macos-14-xcode-15
+
+.macos:
+  extends:
+    - .macos_saas_runners
+  stage: test
+  before_script:
+    - brew install perl
+    # install Dist::Zilla and its dependencies
+    - cpanm --verbose --notest Dist::Zilla
+    # install Perl dependencies
+    - dzil authordeps --missing | cpanm --notest --verbose
+    - dzil listdeps --missing | cpanm --notest --verbose
+    # install TAP::Harness::JUnit for test reporting
+    - cpanm --verbose --notest TAP::Harness::JUnit
+    # perform a platform-specific build
+    - dzil build --in _build-dir
+  script:
+    - export JUNIT_OUTPUT_FILE=$CI_PROJECT_DIR/junit.xml
+    - export HARNESS_VERBOSE=1
+    - export HARNESS_TIMER=1
+    - cpanm --verbose --test-only --harness TAP::Harness::JUnit ./_build-dir/
+  artifacts:
+    when: always
+    reports:
+      junit: junit.xml

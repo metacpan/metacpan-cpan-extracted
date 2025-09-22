@@ -1,21 +1,246 @@
 # perl-types
+
 Perl::Types
 
 The Perl data type system
 
-## Developers Only
+```perl
+    # the following three styles are functionally equivalent,
+    # only choose one:
+    use Perl::Types;  # OO style
+    # OR
+    use perltypes;    # pragma style
+    # OR
+    use types;        # pragma style, shortened
+
+    # declare a typed scalar
+    my integer $i = 42;
+
+    # declare a typed compound reference
+    my arrayref::integer $arr = [1, 2, 3];
 ```
-# install static dependencies
-$ dzil authordeps | cpanm
-$ dzil listdeps | cpanm
 
+[comment]: # DEV NOTE, CORRELATION #gt00: copy all project description changes between 'README.md' & 'lib/Perl/Types.pm' POD
+
+```console
+$ docker run -it perlcommunity/perl-types
+# OR
+$ apt-get install perl-perl-types
+# OR
+$ cpanm Perl::Types
+```
+
+[Docker Hub Releases](https://hub.docker.com/r/perlcommunity/perl-types "View Docker Hub releases")
+
+[OS Package Releases](https://packages.perlcommunity.org/perl-types "View OS-specific package releases")
+
+[CPAN Releases](https://metacpan.org/pod/Perl::Types "View CPAN distribution releases")
+
+[Code Build/Test Current via GitLab CI Pipelines](https://gitlab.com/perl-types/perl-types/-/pipelines/latest "View latest auto-generated code build/test info")
+
+[Code Build/Test History via GitLab CI Pipelines](https://gitlab.com/perl-types/perl-types/-/pipelines "View past auto-generated code build/test info")
+
+[Code Test Cases Current via TAP::Harness::JUnit (CLICK "Tests" TAB)](https://gitlab.com/perl-types/perl-types/-/pipelines/latest "View latest auto-generated code test case info")
+
+[Code Coverage Current via Devel::Cover::Report::Html](https://perl-types.gitlab.io/perl-types/ "View latest auto-generated code coverage info")
+
+[Code Coverage History via Devel::Cover::Report::Cobertura](https://gitlab.com/perl-types/perl-types/-/graphs/main/charts "View past auto-generated code coverage info")
+
+## USERS: Docker Commands
+
+```console
+# install Docker & Docker Compose if you haven't already, confirm it runs;
+# look up installation instructions for "docker-ce" instead of "docker.io" if you need the very latest version of Docker
+$ sudo apt-get install docker.io docker-buildx docker-compose-v2
+$ docker compose version
+
+# use `docker` to download & run Docker image from Docker Hub
+$ docker run -it perlcommunity/perl-types
+
+# use `docker` to build local Docker base image & Docker application image
+$ docker build -t base:dev -f Dockerfile .
+$ docker build -t app:dev -f docker/Dockerfile.app .
+
+# use `docker` to run local Docker application image
+$ docker run -it --rm app:dev
+
+# use `docker` to run local Docker application image with one-off command, in this case `prove` to run Perl tests
+$ docker run -it --rm app:dev prove -Ilib -r t
+
+# use `docker` to run local Docker application image in Live Developer Mode;
+# mount the repository from the host OS's current directory into the '/app' Docker working directory,
+# thereby overlaying the copy of the repository that was baked into the Docker application image
+# with the latest copy of the respository from the host operating system;
+# this allows live edits on the host OS to be immediately reflected within the Docker application
+$ docker run -it --rm -v "$PWD:/app" -e PERL_VERBOSE=1 -e PERL_DEBUG=1 -e PERL_WARNINGS=1 app:dev
+
+# use `docker compose` to build local Docker images
+$ docker compose build base app
+
+# use `docker compose` to run local Docker application image in Live Developer Mode via settings in 'docker-compose.yml'
+$ docker compose run --rm app
+
+# use `docker compose` to run local Docker application image in Live Developer Mode via settings in 'docker-compose.yml'
+# with one-off command, in this case `prove` to run Perl tests
+$ docker compose run --rm app prove -Ilib -r t
+```
+
+## USERS: Install Perl Dependencies
+
+```console
+# install static CPAN dependencies
+$ dzil authordeps --missing | cpanm --notest --verbose
+$ dzil listdeps   --missing | cpanm --notest --verbose
+```
+
+## USERS: Run & Test Perl Code
+
+```console
+# run all tests via `dzil`, creates new tests so may not always work properly
+$ dzil test
+
+# run all tests via `prove`
+$ prove -v t/*.t
+
+# run individual tests via `perl`
+$ perl t/00_foo.t
+```
+
+## DEVELOPERS: Perl::Types & Perl::Config
+
+The Docker application image comes with the Perl data type system built in and ready to use.  If you are not using Docker, then you will need to manually install the GCC compiler and libraries; please see the `Dockerfile` for more details about the non-Perl dependencies.
+
+Perl::Types usage details are in the POD:
+[Perl::Types on MetaCPAN](https://metacpan.org/pod/Perl::Types "View latest Perl::Types documentation")
+
+Along with Perl::Types comes Perl::Config, which (among other things) provides you with 3 very useful environmental variables:
+
+```console
+# default 0
+$ export PERL_VERBOSE=1
+
+# default 0
+$ export PERL_DEBUG=1
+
+# default 1
+$ export PERL_WARNINGS=1
+```
+
+These 3 environmental variables control the visibility of the output generated by the following Perl subroutines, respectively:
+
+```perl
+# always include Perl::Types
+use types;
+
+# only displays if PERL_VERBOSE=1
+Perl::verbose('This is a verbose message.');
+
+# only displays if PERL_DEBUG=1
+Perl::diag('This is a diagnostic message.');
+Perl::debug('This is a debugging message.');
+
+# only displays if PERL_WARNINGS=1
+Perl::warn('This is a warning message.');
+```
+
+Warning Note: the pragma `use warnings;` enables warnings from the Perl interpreter, whereas `Perl::warn()` generates warnings from the developer.
+
+Diagnostics Note: when writing Perl tests, please use the `diag()` provided by Test2::V0 (or equivalent) instead of `Perl::diag()`, which is meant for use in normal non-test source code.
+
+## DEVELOPERS: Formatting in Markdown vs Comments vs POD
+
+TL;DR: In source code comments, use backticks `` ` `` around shell commands (`` `ls -la` ``), double quotes `"` around source code (`"my string $foo = bar();"`), and single quotes around file names (`'/usr/bin/perl'`); individual `subroutine()` and `$variable` names may be written without double quotes, as long as they include suffixed parentheses `()` and prefixed sigils `$`/`@`/`%` respectively.  In normal (inline) Markdown, use backticks `` ` `` around all of the above.  That should cover about 90% of everyday usage; see below for the remaining 10%.
+
+All Perl documentation is formatted according to either the Markdown inline, Markdown fenced, comment, or Plain Old Documentation (POD) formats.  The comment format includes both Perl source code comments as well as shell script and shell commmand comments, all of which start with the octothorpe AKA pound sign AKA hash tag `#` character.  Unfortunately, these formats are different enough that they must be considered separately.
+
+Within each of these formats, there are multiple content categories, listed below.  Depending on the format, each content category may utilize a different type of string delimiter, such as backtick `` ` ``, single-quotation-mark `'`, or double-quotation-mark `"`.
+
+Inline Markdown occurs anywhere within normal Markdown text contents, whereas fenced Markdown starts and ends with new lines containing only triple-backticks ```` ``` ```` thereby allowing multi-line `fixed-width` data.  In Markdown, displaying data using a `fixed-width` font is the primary visual cue to distinguish technical data (such as shell commands, source code, and file names) from non-technical data (normal plain English prose).  Therefore, all Markdown data inside single-backtick strings or triple-backtick fenced code blocks is displayed as `fixed-width`.
+
+Content categories and their respective rules for each format:
+
+- Shell Commands
+    - Markdown Inline: backtick           `` `perl howdy.pl` ``  (always use backticks for fixed-width inline Markdown)
+    - Markdown Fenced: dollar space        `$ perl howdy.pl`     (looks like a shell prompt)
+    - Code Comments:   backtick           `` `perl howdy.pl` ``  (Perl uses backticks to run shell commands)
+    - POD:             code dollar space `C<$ perl howdy.pl>`, or indented verbatim paragraph (looks like a shell prompt)
+- Source Code
+    - Markdown Inline: backtick    `` `my string $foo = bar();` `` (always use backticks for fixed-width inline Markdown)
+    - Markdown Fenced: plain text     `my string $foo = bar();`    (code goes in fenced code blocks)
+    - Code Comments:   double quotes `"my string $foo = bar();"`   (Perl uses double quotes to interpolate code)
+                    OR plain text               `$foo` `bar()`     (only for individual subroutine & variable names)
+    - POD:             code         `C<my string $foo = bar();>`, or indented verbatim paragraph (code goes in code tags)
+- File & Directory Names
+    - Markdown Inline: backtick    `` `lib/Perl/Howdy.pm` ``  (always use backticks for fixed-width inline Markdown)
+    - Markdown Fenced: plain text     `lib/Perl/Howdy.pm`     (file names go in fenced code blocks)
+    - Code Comments:   single quotes `'lib/Perl/Howdy.pm'`    (Perl uses single quotes for hard-coded literal values)
+    - POD:             code         `C<lib/Perl/Howdy.pm>`, or indented verbatim paragraph (file names go in code tags)
+- Document Section Names
+    - Markdown Inline: link  `[Title](#Section-Name)`  (document section names are linked titles)
+    - Markdown Fenced: plain text title, comment       (document section names are titles, double quotes if complex)
+    - Code Comments:   plain text title, comment       (document section names are titles, double quotes if complex)
+    - POD:             link `L<Title|/"Section Name">` (document section names are linked titles)
+- Project Names
+    - Markdown Inline: plain text proper noun, first time bold `**GreatProject**`   (project names are proper nouns)
+    - Markdown Fenced: plain text proper noun, comment         `# GreatProject`     (project names are proper nouns)
+    - Code Comments:   plain text proper noun                    `GreatProject`     (project names are proper nouns)
+    - POD:             plain text proper noun, first time bold `B<GreatProject>`    (project names are proper nouns)
+- Direct Quotations
+    - Markdown Inline: double quotes            `"Perl rules!"`, or `> block quotes` (quotations go in quotes)
+    - Markdown Fenced: double quotes, comment `# "Perl rules!"`                      (quotations go in quotes)
+    - Code Comments:   double quotes            `"Perl rules!"`                      (quotations go in quotes)
+    - POD:             double quotes            `"Perl rules!"`, or indented verbatim paragraph (quotations go in quotes)
+
+In cases where a project name is also the name of a software package or file name, determine which usage is employed on a case-by-case basis and use the appropriate formatting for each.  For, if a project name is mentioned twice in the first sentence of some Markdown inline content, followed by a sentence referring to the Perl package of the same name, then the first is bold text, the second in plain text, and the third is backtick fixed width as follows:
+
+```markdown
+This is the first sentence mentioning **GreatProject**, and we hope you will like GreatProject.
+Simply load the `GreatProject` package in your Perl code, and everything will be great!
+```
+
+Which should render to look like this:
+
+This is the first sentence mentioning **GreatProject**, and we hope you will like GreatProject.
+Simply load the `GreatProject` package in your Perl code, and everything will be great!
+
+In cases where one content format rule is nested or otherwise embedded within another content format rule, then each rule should likewise be applied at its respective nesting level.  For example, if a source code snippet is written in a code comment, which is itself inside of a Markdown fenced code block, then the source-code-in-code-comment rule will apply and the source code snippet will be wrapped in double quotes as follows:
+
+````markdown
+```
+# a shell command, in a code comment, in a Markdown fenced code block: `perl howdy.pl`
+# a code snippet, in a code comment, in a Markdown fenced code block: "my string $foo = bar();"
+# a file name, in a code comment, in a Markdown fenced code block: 'lib/Perl/Howdy.pm'
+```
+````
+
+## DEVELOPERS: Code Comment Tags
+
+When writing normal source code comments, the content of the comments should only describe normal source code behavior.  However, there are a number of special cases where a specific comment tag should be used.  Please always use one of the following comment tags, if it applies to your current lines of source code.
+
+For each of the following, the comment tag portion is the uppercase part (plus optional "#xyz00" serialization) before the colon ":" character, and the comment content portion is the lowercase part after the colon.  In these examples, the comment content is an explanation of its preceding comment tag, and should be replaced by your actual comment content which can span multiple comment lines as needed.  When using "#xyz00" serialization for correlations, please replace the "xyz" with a short abbreviation of your overall software project name, such as "fb" for Foo::Bar.  Then simply increase the serialized integer from "00" to "01" as you add different correlations (not additional instances of the same correlation), so the first Foo::Bar correlation serialization would be "#fb00" and so forth.
+
+```perl
+# DEV NOTE: this is a note for developers, and relates to some abnormal or confusing or especially complex behavior
+# DEV NOTE, CORRELATION #xyz00: this is a developers note which appears in more than one location or file
+# START HERE: this is where you left off in today's programming session, and where to pick up tomorrow
+# NEED FIX: this is a reminder to fix a known bug
+# NEED ANSWER: this is a reminder to answer a known question
+# NEED UPDATE: this is a reminder to update your software to use a newer version of someone elses's software
+# NEED UPGRADE: this is a reminder to upgrade your software to include significant new features or functionality
+# NEED DELETE, TMP DEBUG: this is a reminder to remove temporary debugging code when no longer needed
+# WBRASWELL 20250101: this is a comment in someone else's code base, with searchable first-initial-last-name & longdate
+```
+
+## DEVELOPERS: Release Perl Code on CPAN
+
+```console
 # document changes & insert copyrights before CPAN release
-$ vi Changes       # include latest release info, used by [NextRelease] and [CheckChangesHasContent] plugins
+$ vi Changes       # include latest release notes, used by "[NextRelease]" and "[CheckChangesHasContent]" plugins
 $ vi dist.ini      # update version number
-$ vi FOO.pm foo.t  # add "# COPYRIGHT" as first  line of file, used by [InsertCopyright] plugin
-$ vi foo.pl        # add "# COPYRIGHT" as second line of file, used by [InsertCopyright] plugin
+$ vi FOO.pm foo.t  # add "# COPYRIGHT" as first  line of file, used by "[InsertCopyright]" plugin
+$ vi foo.pl        # add "# COPYRIGHT" as second line of file, used by "[InsertCopyright]" plugin
 
-# build & install dynamic dependencies & test before CPAN release
+# build & install dynamic CPAN dependencies & test before CPAN release
 $ dzil build
 $ ls -ld Perl-Types*
 $ cpanm --installdeps ./Perl-Types-FOO.tar.gz  # install dynamic dependencies if any exist
@@ -23,7 +248,7 @@ $ dzil test  # may need dependencies installed by above `cpanm` commands
 
 # inspect build files before CPAN release
 $ cd Perl-Types-FOO
-$ ls -l
+$ ls -la
 $ less Changes
 $ less LICENSE
 $ less COPYRIGHT
@@ -34,24 +259,19 @@ $ less README
 $ less META.json
 $ less META.yml
 
-# make CPAN release
-$ git add -A; git commit -av  # CPAN Release, vX.YYY; Codename FOO, BAR Edition
+# make CPAN release, make one manual commit before `dzil release` makes automatic commit below
+$ git add -A; git commit --all --message="CPAN Release, v1.000; Codename FOO, BAR Edition"
 $ git push origin main
-$ dzil release  # will build, test, prompt for CPAN upload, and create/tag/upload new git commit w/ only version number as commit message
-```
 
-## Original Creation
-Perl::Types was originally created via the following commands:
+# log into Docker Hub, create new personal access token named "gitlab-ci-token" with "read / write" permissions;
+# log into GitLab, click Settings -> CI/CD -> Variables, create new "DOCKER_HUB_USERNAME" and "DOCKER_HUB_PASSWORD"
+# with personal access token as password; Docker Hub release WILL NOT WORK if you don't have proper credentials!
 
-```
-# normal installation procedure for minting profile
-$ cpanm Dist::Zilla::MintingProfile
-
-# normal minting procedure
-$ dzil new Perl::Types
+# build, test, prompt for CPAN upload, and create/tag/upload new git commit w/ only version number as commit message;
+# DEV NOTE: let `dzil release` handle git tagging
+$ dzil release
 ```
 
 ## License & Copyright
+
 Perl::Types is Free & Open Source Software (FOSS), please see the LICENSE and COPYRIGHT and CONTRIBUTING files for legal information.
-
-

@@ -1,0 +1,83 @@
+# [[[ EXCLUDE ALL AUTOMATICALLY-GENERATED FILES FROM GIT ]]]
+# DEV NOTE, CORRELATION #gt06: copy all automatically-generated files between '.gitignore' & '.dockerignore'
+# v0.300_000
+
+# NEED DELETE, TMP DEBUG: ignore generated diff and snapshot files from perl_types_refactor_names
+/bin/dev/perl_types_refactor_names/
+
+# [ CPAN Release ]
+# tarballs & directories from `make dist` or `dzil build`
+Perl-Types-*
+
+# [ Git Repository ]
+.git
+.gitlab
+.github
+#.gitignore  # .gitignore is used by Dist::Zilla, so keep it just in case
+.gitattributes
+
+# [ Perl Build ]
+blib
+pm_to_blib
+Makefile
+Makefile.old
+MANIFEST*
+MYMETA.*
+MakeMaker-*  # any MakeMaker archives
+nytprof.out
+nytprof*.html
+*.bs
+*.o
+*.bundle
+*.dylib
+*.so
+
+# [ Dist::Zilla Build ]
+_build-dir
+.build
+.build-dir
+
+# [ Inline Build ]
+_Inline
+
+# [ local::lib Install ]
+perl5
+local
+
+# [ Code Coverage ]
+.coverage
+cover_db
+_cover
+
+# [ POD ]
+pod2htmd.tmp
+
+# [ GitLab Pages ]
+public
+
+# [ Temporary & Log Files ]
+tmp
+*.tmp
+*.swp
+*.bak
+*.log
+
+# [ Python Install ]
+.venv
+
+# [ Node.js Install ]
+node_modules
+.pnpm-store
+.npm
+.yarn
+dist
+
+# [ Rust & Java Build ]
+target
+
+# [ OS & Editors ]
+.DS_Store
+Thumbs.db
+.Spotlight-V100
+.idea
+.vscode
