@@ -17,7 +17,7 @@ $editor->insertMultilineText($s,length($s));
 
 $desktop->insert($teditw);
 
-$tapp->onCommand(my $sub = sub {
+$tapp->onCommand(sub {
     my ($cmd, $arg) = @_;
     print "command[@_]\n";
     if ($cmd == 123) {

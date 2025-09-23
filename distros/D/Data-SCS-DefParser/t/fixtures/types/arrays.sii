@@ -1,0 +1,19 @@
+SiiNunit
+{
+test : types {
+
+array[]: "one"
+array[]: "two"
+array[]: "three"
+
+fixed: 2
+fixed[]: "value"
+fixed[]: "value2"
+
+empty: 0
+
+index[1]: "one"
+index[2]: "two"
+
+}
+}

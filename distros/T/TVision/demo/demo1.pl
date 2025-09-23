@@ -29,7 +29,7 @@ $desktop->insert($b);
 $w2->insert($tedit);
 $tapp->on_idle(sub {$::e++});
 #$tapp->handleEvent(sub {print "handleEvent\n"});
-$tapp->onCommand(my $sub = sub {
+$tapp->onCommand(sub {
     my ($cmd, $arg) = @_;
     print "command[@_]\n";
     if ($cmd == 123) {

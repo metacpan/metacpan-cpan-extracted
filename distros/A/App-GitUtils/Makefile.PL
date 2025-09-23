@@ -7,7 +7,7 @@ use 5.010001;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Day-to-day command-line utilities for git",
+  "ABSTRACT" => "Some additional command-line utilities for git",
   "AUTHOR" => "perlancar <perlancar\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -49,7 +49,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.088",
+  "VERSION" => "0.089",
   "test" => {
     "TESTS" => "t/*.t"
   }

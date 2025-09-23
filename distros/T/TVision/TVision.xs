@@ -250,16 +250,27 @@ MODULE=TVision::TApplication PACKAGE=TVision::TApplication
 
 void on_idle(SV *self, CV *c = 0)
     CODE:
+        if (cv_on_idle)
+            SvREFCNT_dec(cv_on_idle);
         cv_on_idle = c;
+        if (c)
+            SvREFCNT_inc(c);
 
 void handleEvent(SV *self, CV *c = 0)
     CODE:
+        if (cv_handleEvent)
+            SvREFCNT_dec(cv_handleEvent);
         cv_handleEvent = c;
+        if (c)
+            SvREFCNT_inc(c);
 
 void onCommand(SV *self, CV *c = 0)
     CODE:
+        if (cv_onCommand)
+            SvREFCNT_dec(cv_onCommand);
         cv_onCommand = c;
-	printf("cv_onCommand=%016X\n", cv_onCommand);
+        if (c)
+            SvREFCNT_inc(c);
 
 MODULE=TVision::TButton PACKAGE=TVision::TButton
 SV* _new_h(int _ax, int ay, int bx, int by, char *title, int cmd, int flags)

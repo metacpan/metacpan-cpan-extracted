@@ -21,7 +21,7 @@ use constant {
     CRLF => "\015\012",
 };
 
-our $VERSION = v0.02;
+our $VERSION = v0.03;
 
 my %_check_defaults = (
     blank_lines => 'die',
@@ -252,7 +252,7 @@ File::URIList - module for reading and writing RFC 2483 URI lists
 
 =head1 VERSION
 
-version v0.02
+version v0.03
 
 =head1 SYNOPSIS
 
@@ -318,7 +318,7 @@ Applies to reading lists only.
 
 =item C<slash_as_local>
 
-Defines URIs that begin with as slash are handled.
+Defines how URIs that begin with a slash are handled.
 
 If true the URIs are considerd local filenames (and parsed as such), if false (default) they are parsed as URIs.
 

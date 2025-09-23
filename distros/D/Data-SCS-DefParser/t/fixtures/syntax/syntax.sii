@@ -1,0 +1,21 @@
+SiiNunit
+{
+
+# hash comment
+// double-slash comment
+
+cmt : foo//cmt
+
+{// block starts after new line
+ # indented
+ bar:/* C-style comment */ 123# next line indented
+ }
+
+# comment syntax inside strings
+cmt: string {
+in1: "a/*b*/c"
+in2: "a/*b\"c*/"
+in3: "a//b"
+}
+
+}

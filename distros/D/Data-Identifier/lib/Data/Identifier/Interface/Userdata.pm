@@ -13,7 +13,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = v0.17;
+our $VERSION = v0.18;
 
 my %_package_storage;
 
@@ -56,7 +56,7 @@ Data::Identifier::Interface::Userdata - format independent identifier object
 
 =head1 VERSION
 
-version v0.17
+version v0.18
 
 =head1 SYNOPSIS
 

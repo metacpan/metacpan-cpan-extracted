@@ -20,7 +20,7 @@ use Data::Identifier::Generate;
 
 use parent 'Data::Identifier::Interface::Known';
 
-our $VERSION = v0.17;
+our $VERSION = v0.18;
 
 use constant {
     WK_UUID => '8be115d2-dc2f-4a98-91e1-a6e3075cbc31', # uuid
@@ -229,7 +229,7 @@ Data::Identifier::Wellknown - format independent identifier object
 
 =head1 VERSION
 
-version v0.17
+version v0.18
 
 =head1 SYNOPSIS
 
@@ -419,7 +419,7 @@ $extra_classes identifier
 .   ce7aae1e-a210-4214-926a-0ebca56d77e3    wikidata-identifier         sid=9,sni=123
 .   2bffc55d-7380-454e-bd53-c5acd525d692    roaraudio-error-number      sid=26,sni=116
 .   66beb503-9159-41cb-9e7f-2c3eb6b4b5ff    roaraudio-error-symbol      sni=117
-.   f87a38cb-fd13-4e15-866c-e49901adbec5    small-identifier            sid=27
+.   f87a38cb-fd13-4e15-866c-e49901adbec5    small-identifier            sid=27,sni=115
 .   2c7e15ed-aa2f-4e2f-9a1d-64df0c85875a    chat-0-word-identifier      sid=112,sni=118
 .   82d529be-0f00-4b4f-a43f-4a22de5f5312    gtin                        sid=160
 .   931f155e-5a24-499b-9fbb-ed4efefe27fe    doi                         sid=162
@@ -428,7 +428,7 @@ $extra_classes identifier
 .   f4b073ff-0b53-4034-b4e4-4affe5caf72c    ascii-code-point            sni=122
 .   5f167223-cc9c-4b2f-9928-9fe1b253b560    unicode-code-point
 .   5e80c7b7-215e-4154-b310-a5387045c336    sirtx-logical               sni=129
-.   039e0bb7-5dd3-40ee-a98c-596ff6cce405    sirtx-numerical-identifier  sni=10
+.   039e0bb7-5dd3-40ee-a98c-596ff6cce405    sirtx-numerical-identifier  sid=113,sni=10
 .   d73b6550-5309-46ad-acc9-865c9261065b    sirtx-function-number       sni=127
 .   d690772e-de18-4714-aa4e-73fd35e8efc9    sirtx-function-name         sni=128
 .   b1418262-6bc9-459c-b4b0-a054d77db0ea    iban
@@ -846,9 +846,17 @@ $type uuid
 .   6f1c921b-e0bb-4449-911f-a00719e91a1e    metadata
 
 
+$class boolean
+$type uuid
+
+.   6d34d4a1-8fbc-4e22-b3e0-d50f43d97cb1    false   sid=45,sni=189
+.   eb50b3dc-28be-4cfc-a9ea-bd7cee73aed5    true    sid=46,sni=190
+
+
 $class integer
 $generator style=integer-based,namespace=5dd8ddbb-13a8-4d6c-9264-36e6dd6f9c99
 
+.   -1  .       sid=47
 .   0   zero    sid=48
 .   1   one     sid=49
 .   2   two     sid=50
@@ -865,7 +873,7 @@ $namespace 34f1f1d2-51be-4754-9585-83e33c5cb7e8
 .   ripemd-1-160
 .   tiger-1-192
 .   tiger-2-192
-.   sha-1-160
+.   sha-1-160       .   sni=185
 .   sha-2-224
 .   sha-2-256
 .   sha-2-384
@@ -873,7 +881,7 @@ $namespace 34f1f1d2-51be-4754-9585-83e33c5cb7e8
 .   sha-3-224
 .   sha-3-256
 .   sha-3-384
-.   sha-3-512
+.   sha-3-512       .   sni=186
 
 
 $class rdf
@@ -1223,15 +1231,19 @@ $generator style=name-based,namespace=50d7c533-2d9b-4208-b560-bcbbf75ce3f9
 .   application/vnd.oasis.opendocument.text-master-template
 .   application/vnd.oasis.opendocument.text-template
 .   application/vnd.oasis.opendocument.text-web
+.   application/vnd.sirtx.vmv0
 .   application/xhtml+xml
 .   application/xml
 .   audio/flac
 .   audio/matroska
 .   audio/ogg
+.   image/bmp
 .   image/gif
 .   image/jpeg
 .   image/png
 .   image/svg+xml
+.   image/vnd.microsoft.icon
+.   image/vnd.wap.wbmp
 .   image/webp
 .   message/http
 .   text/html
@@ -1375,8 +1387,7 @@ $type uuid
 % Handled above: 41
 % Unassigned: 42
 % Handled above: 43-44
-% Reserved: 45 - 47
-% Handled above: 48 - 50
+% Handled above: 45 - 50
 % Unassigned: 51
 % Handled above: 52 - 59
 .   3c2c155f-a4a0-49f3-bdaf-7f61d25c6b8c    Earth                       sid=60
@@ -1395,8 +1406,8 @@ $type uuid
 % Reserved: 102
 % Handled above: 103 - 107
 % Reserved: 108
-% Handled above: 109 - 112
-% Unassigned: 113 - 118
+% Handled above: 109 - 113
+% Unassigned: 114 - 118
 % Handled above: 119 - 126
 % Reserved: 127 - 131
 % Handled above: 132 - 133

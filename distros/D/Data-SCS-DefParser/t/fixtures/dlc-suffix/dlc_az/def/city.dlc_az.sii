@@ -1,0 +1,8 @@
+SiiNunit
+{
+city_data : city.ehrenberg
+{
+	city_name: "Ehrenberg"
+	country: arizona
+}
+}

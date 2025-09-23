@@ -16,7 +16,6 @@ my %WriteMakefileArgs = (
   "LICENSE" => "mit",
   "NAME" => "Task::MemManager::View",
   "PREREQ_PM" => {
-    "Carp" => 0,
     "Module::Find" => 0,
     "Module::Runtime" => 0,
     "constant" => 0,
@@ -28,7 +27,7 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -36,7 +35,6 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Carp" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "Module::Find" => 0,

@@ -1,5 +1,20 @@
 Revision history for Music-MelodicDevice-Arpeggiation
 
+0.0203 2025-09-22 16:29:42
+  - Improve tests.
+  - Drop the public `build_pattern()` method.
+
+0.0202 2025-09-22 13:38:26
+  - Fix arppegiation logic again...
+  - Improve documentation.
+  - Improve tests.
+
+0.0201 2025-09-22 12:48:34
+  - Wow. Leftover paste cruft?? Wow.
+
+0.0200 2025-09-22 12:39:15
+  - Refactor how patterns are constructed and handled with named types.
+
 0.0104 2025-09-21 17:07:31
   - Improve the arp() method description.
 
@@ -7,10 +22,10 @@ Revision history for Music-MelodicDevice-Arpeggiation
   - Add the arp() method description.
 
 0.0102 2025-09-21 11:25:38
-    - Fix example again.
+  - Fix example again.
 
 0.0101 2025-09-21 10:49:11
-    - Fix example.
+  - Fix example.
 
 0.0100 2025-09-21 10:10:13
-    - Mint with Dist::Zilla.
+  - Mint with Dist::Zilla.

@@ -1,0 +1,13 @@
+﻿SiiNunit
+{
+# UTF-8 BOM before magic mark
+
+utf8 : utf8.raw_bytes {
+ string: "Genève"
+}
+
+utf8 : utf8.x_escaped {
+ string: "Gen\xc3\xa8ve"
+}
+
+}

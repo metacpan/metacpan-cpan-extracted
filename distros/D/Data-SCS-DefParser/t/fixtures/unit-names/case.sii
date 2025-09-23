@@ -1,0 +1,8 @@
+SiiNunit
+{
+
+illegal : UPPER.Case {
+ error: 1
+}
+
+}

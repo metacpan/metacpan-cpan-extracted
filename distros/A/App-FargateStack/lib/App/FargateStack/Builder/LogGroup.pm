@@ -29,6 +29,7 @@ sub build_log_group {
     my ( $arn, $name, $retention_days ) = @{$log_group}{qw(logGroupArn logGroupName retentionInDays)};
 
     $config->{log_group}->{name} = $name;  # just in case
+    $config->{log_group}->{arn}  = $arn;
 
     $self->log_info( 'logs: [%s] exists...%s', $name, 'skipping' );
 

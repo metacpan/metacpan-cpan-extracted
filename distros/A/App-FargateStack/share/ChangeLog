@@ -1,3 +1,45 @@
+Mon Sep 22 07:00:50 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.50]:
+	* VERSION: bump
+	* README.md: generated
+	* lib/App/FargateStack/Builder/LogGroup.pm.in
+	(build_log_group)
+	- update ARN 
+	* lib/App/Logs.pm.in
+	(describe_log_groups)
+	- lookup exact name if given
+	* requires
+	- + Sub::Util
+
+Mon Sep 22 06:28:03 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.49]:
+	* VERSION: bump
+	* README.md: generated
+	* lib/App/FargateStack/Constants.pm.in
+	(%DEFAULT_NAMES)
+	- create a more unique log-group name
+	* lib/App/Logs.pm.in
+	(describe_log_groups)
+	- add "/" for exact match
+
+Mon Sep 22 06:09:10 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.48]:
+	* VERSION: bump
+	* README.md: generated
+	* lib/App/FargateStack/Builder/IAM.pm.in
+	(create_policy)
+	- skip policy if not required
+
+Mon Sep 22 05:34:42 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.47]:
+	* VERSION: bump
+	* Makefile: BenchmarkRole.pm
+	* README.md: generated
+
 Mon Sep 22 05:21:47 2025  Rob Lauer  <rlauer6@comcast.net>
 
 	[1.0.46]:

@@ -3,11 +3,11 @@ NAME
     buffers
 
 VERSION
-    version 0.01
+    version 0.02
 
 SYNOPSIS
         use Task::MemManager;
-        use Task::MemManager::View; # automatically loaded if Task::MemManager is used
+        use Task::MemManager::View 'PDL'; # automatically loaded if Task::MemManager is used
 
         my $buffer = Task::MemManager->new( size => 1000, 1 );
 
@@ -35,17 +35,19 @@ DESCRIPTION
     to the "Task::MemManager" class to create, delete, and retrieve views.
     Views are implemented as separate modules under the
     "Task::MemManager::View" namespace. Each view module must implement a
-    set of mandatory methods (see below). The view modules are automatically
-    discovered and loaded when the "Task::MemManager::View" module is
-    loaded. If you do not need a view, do not install the corresponding
-    module, because "Task::MemManager::View" is a graceful module that will
-    load every module under it's namespace.
+    set of mandatory methods (see below). You can specify the modules to be
+    loaded by passing their names as parameters when importing the
+    "Task::MemManager::View" module. It is also possible to do so when
+    importing the "Task::MemManager" module, by providing the parameter
+    View=>['PDL', ...]. If no parameters are provided, the default is to
+    load the "PDL" view module, which provides a view of the buffer as a
+    Perl scalar. Note that this module must be installed separately.
 
 METHODS
   create_view
       Usage       : $view =  $buffer->create_view($view_type, \%options);
       Purpose     : Create a view of the specified type for the buffer
-      Returns     : The created view
+      Returns     : The created view (a {Perl scalar or an object)
       Parameters  : $view_type - type of the view (e.g. 'PDL')
                     \%options - hash reference with options for the view. The
                                 option view_name is reserved for naming the view.
@@ -92,17 +94,14 @@ EXAMPLES
 
 DIAGNOSTICS
     If you set up the environment variable DEBUG to a non-zero value, then a
-    number of sanity checks will be performed, and the module will carp with
+    number of sanity checks will be performed, and the module will warn with
     an (informative message ?) if something is wrong.
 
 DEPENDENCIES
     The module extends the "Task::MemManager" module so this is definitely a
     dependency. It also uses the "Module::Find" and "Module::Runtime"
     modules to find and load the view modules (so you can count them as
-    dependencies too). By default all installed view modules will be loaded.
-    If you do not need a specific view, do not install the corresponding
-    module. This may change in the future, if I decide to add a mechanism to
-    load only specific view modules.
+    dependencies too).
 
 TODO
     Open to suggestions. A few foolish ideas of my own include: adding

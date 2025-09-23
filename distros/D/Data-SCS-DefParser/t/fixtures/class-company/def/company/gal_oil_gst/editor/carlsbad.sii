@@ -1,0 +1,7 @@
+SiiNunit
+{
+company_def : .carlsbad {
+ city: carlsbad
+ prefab: us_gas_06
+}
+}

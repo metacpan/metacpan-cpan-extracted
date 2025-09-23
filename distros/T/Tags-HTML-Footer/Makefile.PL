@@ -20,6 +20,7 @@ readme_from 'Footer.pm';
 recursive_author_tests('xt');
 requires 'Class::Utils' => 0;
 requires 'Error::Pure' => 0;
+requires 'Mo::utils::Hash' => 0.02;
 requires 'Mo::utils::Language' => 0.05;
 requires 'Readonly' => 0;
 requires 'Scalar::Util' => 0;
@@ -37,7 +38,7 @@ test_requires 'Test::MockObject' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.03';
+version '0.04';
 
 # Run.
 WriteAll();

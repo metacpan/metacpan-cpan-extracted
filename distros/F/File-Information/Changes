@@ -1,3 +1,8 @@
+v0.13  2025-09-22Z
+    - Added support to read GIMP palette files
+    - Added support to read X11 rgb.txt files
+    - Added basic libpng support in File::Information::Deep
+
 v0.12  2025-09-09Z
     - Added PNG IHDR parser
     - Added GIF89a header parser stub

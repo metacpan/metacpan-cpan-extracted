@@ -20,7 +20,7 @@ use Fcntl qw(S_ISREG S_ISDIR S_ISLNK S_ISBLK S_ISCHR S_ISFIFO S_ISSOCK S_IWUSR S
 use Data::Identifier v0.08;
 use Data::Identifier::Generate;
 
-our $VERSION = v0.12;
+our $VERSION = v0.13;
 
 my $HAVE_XATTR              = eval {require File::ExtAttr; 1;};
 my $HAVE_FILE_VALUEFILE     = eval {require File::ValueFile::Simple::Reader; 1;};
@@ -991,7 +991,7 @@ File::Information::Inode - generic module for extracting information from filesy
 
 =head1 VERSION
 
-version v0.12
+version v0.13
 
 =head1 SYNOPSIS
 

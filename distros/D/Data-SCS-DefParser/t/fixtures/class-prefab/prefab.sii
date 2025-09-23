@@ -1,0 +1,43 @@
+SiiNunit
+{
+# from def/world/prefab.sii
+
+prefab_model : prefab.us_gas_06
+{
+	model_desc: "/prefab/gas/nm_gas_station1_depot.pmd"
+	prefab_desc: "/prefab/gas/nm_gas_station1_depot.ppd"
+	use_perlin: false
+	detail_veg_max_distance: 25
+	slow_time: true
+	dynamic_lod_desc[]: "/prefab/gas/nm_gas_station1_depot_lod1.pmd"
+	dynamic_lod_dist[]: 146
+	gps_avoid: true
+	use_semaphores: true
+}
+
+prefab_model : prefab.d_road_wrk2
+{
+	name: "tx_roadwork_01"
+	model_desc: "/prefab/roadwork/tx_roadwork_01.pmd"
+	prefab_desc: "/prefab/roadwork/tx_roadwork_01.ppd"
+	use_perlin: true
+	detail_veg_max_distance: 25
+
+	allowed_trailer_length: 25
+
+	running_timer: (10000, 30000)	# cca 1week ON + 3weeks OFF
+	disabled_depot: d_road_wrk2c
+
+	dynamic_lod_desc[]: "/prefab/roadwork/tx_roadwork_01_lod1.pmd"
+	dynamic_lod_dist[]: 100
+}
+
+prefab_model : prefab.d_road_wrk2c
+{
+	name: "tx_roadwork_01_clear"
+	model_desc: "/prefab/roadwork/tx_roadwork_clear_01.pmd"
+	prefab_desc: "/prefab/roadwork/tx_roadwork_clear_01.ppd"
+	use_perlin: true
+}
+
+}

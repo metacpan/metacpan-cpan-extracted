@@ -16,7 +16,7 @@ use YAML qw(LoadFile);
 
 use Role::Tiny;
 
-our $VERSION = '1.0.47';
+our $VERSION = '1.0.50';
 
 ########################################################################
 sub init {

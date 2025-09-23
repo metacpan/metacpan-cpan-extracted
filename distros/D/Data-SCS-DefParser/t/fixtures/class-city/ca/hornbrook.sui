@@ -1,0 +1,24 @@
+city_data : city.hornbrook
+{
+	city_name: "Hornbrook"
+	city_name_localized: "@@hornbrook@@"
+	country: california
+
+	map_x_offsets[]: 0
+	map_x_offsets[]: 0
+	map_x_offsets[]: 0
+	map_x_offsets[]: -3
+	map_x_offsets[]: -45
+	map_x_offsets[]: -44
+	map_x_offsets[]: -44
+	map_x_offsets[]: -46
+
+	map_y_offsets[]: 0
+	map_y_offsets[]: 0
+	map_y_offsets[]: 35
+	map_y_offsets[]: -8
+	map_y_offsets[]: -120
+	map_y_offsets[]: -53
+	map_y_offsets[]: -33
+	map_y_offsets[]: -28
+}

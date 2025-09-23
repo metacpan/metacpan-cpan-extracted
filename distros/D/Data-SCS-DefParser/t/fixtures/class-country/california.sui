@@ -1,0 +1,26 @@
+
+country_data : country.data.california
+{
+	country_id: 1
+
+	name: "California"
+	name_localized: "@@california@@"
+	country_code: "CA"
+	iso_country_code: usca
+
+	pos: (-100000, 0, 4000)
+
+	fuel_price: 1.3100292	# $4.959/gallonUS = $1.3100292/litre
+
+	lights_mandatory: false
+	imperial_units: true
+	driving_tired_offence: true
+
+	time_zone: -420		# -7 hours in minutes
+	time_zone_name: "@@tz_pdt@@"
+
+	mass_limit_per_axle_count[]: 18143.7	# 40000 lb	# 2-axle vehicle
+	mass_limit_per_axle_count[]: 27215.6	# 60000 lb
+	mass_limit_per_axle_count[]: 36287.4	# 80000 lb
+}
+

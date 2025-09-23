@@ -105,6 +105,11 @@ sub create_policy {
     return $self->create_fargate_task_policy;
   };
 
+  if ( !$role_policy ) {
+    $self->log_info( 'iam: policy: [%s] ... not required...skipping', $policy_name );
+    return;
+  }
+
   my $policy_exists = $FALSE;
 
   if ($policy) {
@@ -217,7 +222,7 @@ sub create_fargate_task_policy {
     push @statement, $self->add_secrets_policy($secrets);
   }
 
-  return $role_task_policy;
+  return @statement ? $role_task_policy : $EMPTY;
 }
 
 ########################################################################

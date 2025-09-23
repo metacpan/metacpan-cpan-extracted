@@ -1,3 +1,8 @@
+v0.18  2025-09-22Z
+    - Added additional media subtypes to well known list
+    - Updated sirtx-numerical-identifier list
+    - Updated small-identifier list
+
 v0.17  2025-08-26Z
     - Added basic support for sirtx-numerical-identifier
 

@@ -1,3 +1,8 @@
+0.010   2025-09-23  Released-By: PERLANCAR; Urgency: medium
+
+        - Add utilities: cdprev-backend, cdnext-backend.
+
+
 0.009   2025-06-01  Released-By: PERLANCAR; Urgency: medium
 
         - [ux] Add completion for cdpart.

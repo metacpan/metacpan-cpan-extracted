@@ -1,6 +1,8 @@
 include/Log.c
 include/Log.h
+include/test.c
 lib/XS/Log.pm
+Log.h
 Log.xs
 Makefile.PL
 MANIFEST			This list of files

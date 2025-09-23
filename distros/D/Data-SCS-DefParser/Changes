@@ -1,0 +1,23 @@
+Revision history for perl distribution Data-SCS-DefParser
+
+0.10 - 2025-09-22
+
+  - Parsing of scientific float, boolean, hex values
+
+  - Add limited support for C-style comments
+
+  - Treat not resolvable include as fatal error
+
+  - Remove legacy code for positions import, prefab cache, wiki_name
+
+  - Add tests
+
+0.09 - not released
+
+  - Imported from ATS_DB on 2025-02-16
+
+  - Convert into reusable class Data::SCS::DefParser
+
+  - Float and tuple parsing, better UTF-8 compatibility
+
+  - Performance improvements

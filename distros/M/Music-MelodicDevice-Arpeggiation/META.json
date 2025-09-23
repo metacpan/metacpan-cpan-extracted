@@ -34,6 +34,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Array::Circular" : "0",
             "Data::Dumper::Compact" : "0",
             "Moo" : "2",
             "constant" : "0",
@@ -64,7 +65,7 @@
          "web" : "https://github.com/ology/Music-MelodicDevice-Arpeggiation"
       }
    },
-   "version" : "0.0104",
+   "version" : "0.0203",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040000"

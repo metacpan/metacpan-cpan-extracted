@@ -19,7 +19,7 @@ use Carp;
 use Math::BigInt lib => 'GMP';
 use URI;
 
-our $VERSION = v0.17;
+our $VERSION = v0.18;
 
 use constant {
     RE_UUID => qr/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/,
@@ -130,6 +130,7 @@ $_->register foreach values %well_known;
         '06aff30f-70e8-48b4-8b20-9194d22fc460'  =>  36, # SEEK_END
         '59a5691a-6a19-4051-bc26-8db82c019df3'  =>  37, # inode
         '2c7e15ed-aa2f-4e2f-9a1d-64df0c85875a'  => 112, # chat-0-word-identifier
+        WK_SNI()                                => 113, # sirtx-numerical-identifier
         WK_GTIN()                               => 160,
     );
 
@@ -888,7 +889,7 @@ Data::Identifier - format independent identifier object
 
 =head1 VERSION
 
-version v0.17
+version v0.18
 
 =head1 SYNOPSIS
 

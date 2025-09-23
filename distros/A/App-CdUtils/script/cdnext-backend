@@ -1,0 +1,224 @@
+#!perl
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Cwd qw(cwd);
+use File::chdir;
+use Getopt::Long::Complete qw(GetOptionsWithCompletion);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2025-09-23'; # DATE
+our $DIST = 'App-CdUtils'; # DIST
+our $VERSION = '0.010'; # VERSION
+
+# FRAGMENT id=shcompgen-hint completer=1 for=cdprev
+
+my $cwd = $ENV{PWD} || cwd();
+my @cwd_elems = split m!/+!, $cwd;
+my $sort_files_opts = $ENV{CDPREVNEXT_SORT_FILES_OPTS} // '--by-field=name';
+my %opts = (
+    num => 1,
+);
+
+GetOptionsWithCompletion(
+    sub {
+        [];
+    },
+    'help|h' => sub {
+        print <<USAGE;
+Usage:
+  % cdprev [options]
+Options:
+  --help, -h
+  --version, -v
+  --num=i, -n
+USAGE
+        exit 0;
+    },
+    'version|v' => sub {
+        no warnings 'once';
+        print "cdprev version ", ($main::VERSION || "dev"), "\n";
+        exit 0;
+    },
+    'num|n=i' => \$opts{num},
+);
+
+
+# we are at the root, no siblings
+unless (@cwd_elems) {
+    print ".\n";
+    exit 0;
+}
+
+my @dirs;
+{
+    local $CWD = "..";
+    open my $cmd, "sort-files $sort_files_opts |"; ## no critic: InputOutput::ProhibitTwoArgOpen
+    while (defined(my $e = <$cmd>)) {
+        chomp $e;
+        next unless -d $e;
+        push @dirs, $e;
+    }
+}
+
+my $curpos;
+for my $i (0 .. $#dirs) {
+    if ($dirs[$i] eq $cwd_elems[-1]) {
+        $curpos = $i;
+        last;
+    }
+}
+
+$curpos //= 0;
+my $newpos = $curpos + $opts{num} * ($0 =~ /prev-backend$/ ? -1 : 1);
+$newpos = 0 if $newpos < 0;
+$newpos = @dirs-1 if $newpos >= @dirs;
+print "../$dirs[$newpos]\n";
+
+# ABSTRACT: Change to the "previous" or "next" (sibling) directory
+# PODNAME: cdnext-backend
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+cdnext-backend - Change to the "previous" or "next" (sibling) directory
+
+=head1 VERSION
+
+This document describes version 0.010 of cdnext-backend (from Perl distribution App-CdUtils), released on 2025-09-23.
+
+=head1 SYNOPSIS
+
+To use in shell:
+
+ % cdprev() { cd `cdprev-backend "$1"`; }
+ % cdnext() { cd `cdnext-backend "$1"`; }
+
+ % pwd
+ /some/path
+
+ % ls
+ four/   one/   three/   two/
+
+ % cd four
+
+ % cdnext
+ % pwd
+ /some/path/one
+
+ % cdnext -n2
+ % pwd
+ /some/path/two
+
+ % cdprev -n3
+ % pwd
+ /some/path/four
+
+=head1 DESCRIPTION
+
+B<cdprev> and C<cdnext> are commands to change to "previous" and "next" sibling
+directories, respectively. By default, asciibetical ordering is used. You can
+change the ordering by setting the L</CDPREVNEXT_SORT_FILES_OPTS> options, as
+L<sort-files> utility is used to sort the directories.
+
+=head1 OPTIONS
+
+=head2 --num=i, -n
+
+Integer. Default 1.
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C cdnext-backend cdnext-backend
+
+in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete cdnext-backend 'p/*/`cdnext-backend`/'
+
+in your tcsh startup (e.g. C<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install C<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install C<shcompgen> as described above.
+
+=head1 ENVIRONMENT
+
+=head2 CDPREVNEXT_SORT_FILES_OPTS
+
+String. Options to pass to B<sort-files>. Default: C<--by-field name>.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-CdUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-CdUtils>.
+
+=head1 SEE ALSO
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-CdUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

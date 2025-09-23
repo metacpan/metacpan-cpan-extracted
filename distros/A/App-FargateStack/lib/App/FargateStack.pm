@@ -61,7 +61,7 @@ with 'App::FargateStack::Builder::TaskDefinition';
 with 'App::FargateStack::Builder::Utils';
 with 'App::FargateStack::Builder::WafV2';
 
-our $VERSION = '1.0.47';
+our $VERSION = '1.0.50';
 
 use parent qw(CLI::Simple);
 
@@ -139,18 +139,26 @@ sub check_service_name {
 
   my $tasks = $self->common_args('tasks');
 
+  return $service_name
+    if $service_name && $tasks->{$service_name};
+
   # if only 1 service in config, then let's stat that
-  if ( !$service_name ) {
-    my ( $default_service, $error ) = grep { $tasks->{$_}->{type} =~ /daemon|http/xsm } keys %{$tasks};
+  my ( $default_service, $error ) = grep { $tasks->{$_}->{type} =~ /daemon|http/xsm } keys %{$tasks};
 
-    return
-      if !$default_service && $return_on_missing;
+  return
+    if $default_service || ( !$default_service && $return_on_missing );
 
-    die sprintf "usage: %s status task-name\n", $ENV{SCRIPT_NAME}
-      if $error || !$default_service;
-
-    $service_name = $default_service;
+  if ($error) {
+    $self->log_error('ERROR: multiple service defined in configuration.');
   }
+  elsif ($service_name) {
+    $self->log_error( 'ERROR: no such service: [%s] in configuration', $service_name );
+  }
+  else {
+    $self->log_error('ERROR: no services defined in configuration');
+  }
+
+  die sprintf "usage: %s status service-name\n", $ENV{SCRIPT_NAME};
 
   return $service_name;
 }
@@ -619,7 +627,7 @@ sub cmd_deploy_service {
 
   my ( $task_name, $desired_count ) = $self->get_args;
 
-  if ( looks_like_number $task_name ) {
+  if ( $task_name && looks_like_number $task_name ) {
     $desired_count = $task_name;
     $task_name     = $EMPTY;
   }
@@ -627,8 +635,14 @@ sub cmd_deploy_service {
   if ( !$task_name || !exists $tasks->{$task_name} ) {
     ( $task_name, my $err ) = $self->get_default_service_name($TRUE);  # skip arg
 
-    if ( !$task_name || $err ) {
-      $self->log_error( 'ERROR: no task-name or not a valid task-name: [%s]', $task_name // q{} );
+    if ( $err || !$task_name ) {
+      if ($err) {
+        $self->log_error('ERROR: multiple services in configuration.');
+      }
+      elsif ( !$task_name ) {
+        $self->log_error( 'ERROR: %s',
+          $task_name ? "service: [$task_name] not found in configuration" : 'no service types in configuration' );
+      }
 
       die sprintf "usage: %s deploy-service service-name\n", $ENV{SCRIPT_NAME};
     }

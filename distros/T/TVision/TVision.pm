@@ -1,5 +1,5 @@
 package TVision;
-our $VERSION="0.25";
+our $VERSION="0.26";
 
 use strict; # Sure. Good practice.
 
@@ -28,7 +28,7 @@ The TVision package is a perl glue to the TurboVision library
 github.com/magiblot/tvision.
 
 TVision namespace contains subpakages of 2 types:
-* turbovision widgets (or 'controls') such as TButton, etc
+* turbovision widgets (or 'controls') such as TButton, etc.
 * and also some helper packages, these are:
 ..........
 
@@ -45,6 +45,152 @@ TRect is array ref of 4 integers, which isn't always blessed to TVision::TRect.
 TPoint is array ref of 2 integers, which isn't always blessed to TVision::TPoint.
 TKey is array ref of 2 integers or just integer.
 
+=head1 Following classes and members are mapped 1-1:
+
+    class TApplication : public virtual TSubsystemsInit, public TProgram
+    class TProgInit
+    class TProgram : public TGroup, public virtual TProgInit
+    class TBackground : public TView ...
+    class TButton : public TView
+    [x]    TButton( const TRect& bounds, TStringView aTitle, ushort aCommand, ushort aFlags) noexcept;
+    class TCheckBoxes : public TCluster
+    class TCollection : public virtual TNSCollection, public TStreamable
+    class TNSCollection : public TObject
+    class TColorGroup
+    class TColorGroupList : public TListViewer
+    class TColorItem
+    class TColorIndex
+    class TColorItemList : public TListViewer
+    class TColorSelector : public TView
+    class TDeskTop : public TGroup, public virtual TDeskInit
+    class TEditWindow : public TWindow
+    class TEditor : public TView
+    class TMemo : public TEditor
+    class TFileEditor : public TEditor
+    class TInputLine : public TView
+    class TFrame : public TView
+    class TGroup : public TView
+    [x]    void redraw() noexcept;
+    class THistory : public TView
+    class THistoryViewer : public TListViewer
+    class TIndicator : public TView
+    class TKey
+    class TLabel : public TStaticText
+    [x]   TLabel( const TRect& bounds, TStringView aText, TView *aLink ) noexcept;
+    class TListBox : public TListViewer
+    class TListViewer : public TView
+    class TMenu
+    class TMenuBar : public TMenuView
+    class TMenuBox : public TMenuView
+    class TMenuItem
+    [x]    TMenuItem( TStringView aName, ushort aCommand, TKey aKey, ushort aHelpCtx = hcNoContext, TStringView p = 0, TMenuItem *aNext = 0) noexcept;
+    [x]    TMenuItem( TStringView aName, TKey aKey, TMenu *aSubMenu, ushort aHelpCtx = hcNoContext, TMenuItem *aNext = 0) noexcept;
+    [x]    void append( TMenuItem *aNext ) noexcept;
+    [x]    TMenuItem *next;
+    [x]    ushort command;
+    [x]    Boolean disabled;
+    [x]    TKey keyCode;
+    [x]    ushort helpCtx;
+    class TMenuPopup : public TMenuBox
+    class TMenuView : public Tiew
+    class TSubMenu : public TMenuItem
+    class TRadioButtons : public TCluster
+    class TRect  TPoint a, b; ;
+    class TPoint  int x,y; ;
+    class TKey
+    class TSItem
+    class TScrollBar : public TView
+    [x]    TScrollBar( const TRect& bounds ) noexcept;
+    [x]    void setParams( int aValue, int aMin, int aMax, int aPgStep, int aArStep ) noexcept;
+    [x]    void setRange( int aMin, int aMax ) noexcept;
+    [x]    void setStep( int aPgStep, int aArStep ) noexcept;
+    [x]    void setValue( int aValue ) noexcept;
+    [x]    void drawPos( int pos ) noexcept;
+    [x]    int getPos() noexcept;
+    [x]    int getSize() noexcept;
+    [x]    int value;
+    [x]    int minVal;
+    [x]    int maxVal;
+    [x]    int pgStep;
+    [x]    int arStep;
+    class TScroller : public TView
+    [x]    TScroller( const TRect& bounds, TScrollBar *aHScrollBar, TScrollBar *aVScrollBar) noexcept;
+    [x]    void scrollTo( int x, int y ) noexcept;
+    [x]    void setLimit( int x, int y ) noexcept;
+    [x]    void checkDraw() noexcept;
+    [x]    TPoint delta;
+    class TStaticText : public TView
+    [x]    TStaticText( const TRect& bounds, TStringView aText ) noexcept;
+    class TStatusItem
+    class TStringView
+    class TView : public TObject, public TStreamable
+    [x]    TView( const TRect& bounds ) noexcept;
+    [x]    TRect getBounds() const noexcept;
+    [x]    TRect getExtent() const noexcept;
+    [x]    TRect getClipRect() const noexcept;
+    [x]    Boolean mouseInView( TPoint mouse ) noexcept;
+    [x]    void locate( TRect& bounds );
+    [x]    void growTo( short x, short y );
+    [x]    void moveTo( short x, short y );
+    [x]    void hide();
+    [x]    void show();
+    [x]    void drawView() noexcept;
+    [x]    Boolean exposed() noexcept;
+    [x]    Boolean focus();
+    [x]    void hideCursor();
+    [x]    void drawHide( TView *lastView );
+    [x]    void drawShow( TView *lastView );
+    [x]    void drawUnderRect( TRect& r, TView *lastView );
+    [x]    void drawUnderView( Boolean doShadow, TView *lastView );
+    [x]    void blockCursor();
+    [x]    void normalCursor();
+    [x]    virtual void resetCursor();
+    [x]    void setCursor( int x, int y ) noexcept;
+    [x]    void showCursor();
+    [x]    void drawCursor() noexcept;
+    [x]    static Boolean commandEnabled( ushort command ) noexcept;
+    [x]    static void disableCommand( ushort command ) noexcept;
+    [x]    static void enableCommand( ushort command ) noexcept;
+    [x]    virtual void endModal( ushort command );
+    [x]    virtual ushort execute();
+    [x]    Boolean getState( ushort aState ) const noexcept;
+    [x]    void select();
+    [x]    TPoint makeGlobal( TPoint source ) noexcept;
+    [x]    TPoint makeLocal( TPoint source ) noexcept;
+    [x]    TView *nextView() noexcept;
+    [x]    TView *prevView() noexcept;
+    [x]    TView *prev() noexcept;
+    [x]    TView *next;
+    [x]    void makeFirst();
+    [x]    void putInFrontOf( TView *Target );
+    [x]    TView *TopView() noexcept;
+    [x]    TPoint size;
+    [x]    ushort options;
+    [x]    ushort eventMask;
+    [x]    ushort state;
+    [x]    TPoint origin;
+    [x]    TPoint cursor;
+    [x]    uchar growMode;
+    [x]    uchar dragMode;
+    [x]    ushort helpCtx;
+    [x]    static Boolean _NEAR commandSetChanged;
+    [x]    TGroup *owner;
+    [x]    static Boolean _NEAR showMarkers;
+    [x]    static uchar _NEAR errorAttr;
+    class TWindow: public TGroup, public virtual TWindowInit
+    [x]    TWindow( const TRect& bounds, TStringView aTitle, short aNumber) noexcept;
+    [x]    static TFrame *initFrame( TRect );
+    [x]    TScrollBar *standardScrollBar( ushort aOptions ) noexcept;
+    [x]    virtual void zoom();
+    [x]    virtual void shutDown();
+    [x]    uchar flags;
+    [x]    TRect zoomRect;
+    [x]    short number;
+    [x]    short palette;
+    [x]    TFrame *frame;
+
+Getters and setters are named get_xxxx and set_xxxx respectively.
+
 =head1 Functions
 
 Most TVision functions are mapped into perl.
@@ -54,6 +200,10 @@ Most TVision functions are mapped into perl.
     $str = TVision::inputBox($title, $label, $default="", $imit=1000);
     $str = TVision::inputBoxRect([$x0,$y0,$x1,$y1],$title, $label, $default="", $imit=1000);
     TVision::spin_loop();
+
+=head1 TVision::TApplication::onCommand function
+
+WIP
 
 =head1 Geometry managers (not ready yet, pleae ignore this entire section)
 
@@ -215,7 +365,7 @@ our @ISA = qw(TVision::TGroup TVision::TProgInit);
 
 package TVision::MsgBox;
 package TVision::TBackground;
-# class TBackground : public TView {...}
+#class TBackground : public TView {...}
 our @ISA = qw(TVision::TView);
 package TVision::TButton;
 #class TButton : public TView {
@@ -334,12 +484,12 @@ package TVision::TColorItem;
 #    friend TColorGroup& operator + ( TColorGroup&, TColorItem& ) noexcept;
 #    friend TColorItem& operator + ( TColorItem& i1, TColorItem& i2 ) noexcept;
 #};
-# class TColorIndex {
-# public:
-#     uchar groupIndex;
-#     uchar colorSize;
-#     uchar colorIndex[256];
-# };
+#class TColorIndex {
+#public:
+#    uchar groupIndex;
+#    uchar colorSize;
+#    uchar colorIndex[256];
+#};
 
 package TVision::TColorItemList;
 #class TColorItemList : public TListViewer {
@@ -354,7 +504,7 @@ package TVision::TColorItemList;
 
 package TVision::TColorSelector;
 our @ISA = qw(TVision::TView);
-#[ ]class TColorSelector : public TView {
+#class TColorSelector : public TView {
 #[ ]public:
 #[ ]    enum ColorSel { csBackground, csForeground };
 #[ ]    TColorSelector( const TRect& Bounds, ColorSel ASelType ) noexcept;
@@ -374,7 +524,7 @@ our @ISA = qw(TVision::TView);
 #[ ]public:
 #[ ]    static const char * const _NEAR name;
 #[ ]    static TStreamable *build();
-#[ ]};
+#};
 
 package TVision::TCommandSet;
 package TVision::TDeskTop;
@@ -1020,7 +1170,7 @@ package TVision::TRangeValidator;
 package TVision::TRect;
 #class TRect { TPoint a, b; };
 package TVision::TPoint;
-# class TPoint { int x,y; };
+#class TPoint { int x,y; };
 package TVision::TKey;
 #class TKey {
 #    constexpr TKey() noexcept;
@@ -1111,7 +1261,7 @@ package TVision::TScrollBar;
 #};
 package TVision::TScroller;
 our @ISA = qw(TVision::TView);
-#[ ]class TScroller : public TView {
+#class TScroller : public TView {
 #[ ]public:
 #[x]    TScroller( const TRect& bounds, TScrollBar *aHScrollBar, TScrollBar *aVScrollBar) noexcept;
 #[ ]    virtual void changeBounds( const TRect& bounds );
@@ -1139,7 +1289,7 @@ our @ISA = qw(TVision::TView);
 #[ ]public:
 #[ ]    static const char * const _NEAR name;
 #[ ]    static TStreamable *build();
-#[ ]};
+#};
 package TVision::TSearchRec;
 package TVision::TSortedCollection;
 package TVision::TSortedListBox;

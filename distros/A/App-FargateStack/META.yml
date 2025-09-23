@@ -59,7 +59,7 @@ provides:
     version: '0'
   App::FargateStack:
     file: lib/App/FargateStack.pm
-    version: v1.0.47
+    version: v1.0.50
   App::FargateStack::Autoscaling:
     file: lib/App/FargateStack/Autoscaling.pm
     version: '0'
@@ -131,7 +131,7 @@ provides:
     version: '0'
   App::FargateStack::Init:
     file: lib/App/FargateStack/Init.pm
-    version: v1.0.47
+    version: v1.0.50
   App::FargateStack::Logs:
     file: lib/App/FargateStack/Logs.pm
     version: '0'
@@ -166,7 +166,7 @@ provides:
     file: lib/App/WafV2.pm
     version: '0'
 requires:
-  CLI::Simple: v1.0.0
+  CLI::Simple: '0'
   CLI::Simple::Constants: '0'
   Carp::Always: '0'
   Class::Accessor::Fast: '0'
@@ -181,6 +181,7 @@ requires:
   Readonly: '0'
   Role::Tiny: '0'
   Role::Tiny::With: '0'
+  Sub::Util: '0'
   Text::ASCIITable::EasyTable: '0'
   Text::Diff: '0'
   Time::Piece: '0'
@@ -190,5 +191,5 @@ resources:
   bugtracker: http://github.com/rlauer6/App-FargateStack
   homepage: http://github.com/rlauer6/App-FargateStack
   repository: git://github.com/rlauer6/App-FargateStack
-version: v1.0.47
+version: v1.0.50
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

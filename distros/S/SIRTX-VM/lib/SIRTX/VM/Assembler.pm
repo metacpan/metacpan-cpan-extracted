@@ -22,7 +22,7 @@ use SIRTX::VM::Opcode;
 
 use parent 'Data::Identifier::Interface::Userdata';
 
-our $VERSION = v0.06;
+our $VERSION = v0.07;
 
 my %_escapes = (
     '\\' => '\\',
@@ -53,7 +53,12 @@ my @_section_order = qw(header init text rodata trailer);
 my @_section_text  = qw(header init text);
 my @_section_load  = (@_section_text, qw(rodata));
 
-my %_info          = map {$_ => 1} qw(.author .license .copyright_years .copyright_holder .description .comment .displayname .displaycolour .icon .icontext);
+my %_info          = map {$_ => 1} (
+    qw(.author .license .copyright_years .copyright_holder),
+    qw(.description .comment .displayname .displaycolour .icon .icontext),
+    qw(.subject_webpage .vendor_webpage .author_webpage .webpage),
+    qw(.repo_uri),
+);
 
 my %_synthetic = (
     mul             => [['"out"' => 'undef', reg => 1, '"arg"' => 'undef'] => ['user*' => 2] => [
@@ -216,6 +221,11 @@ my %_synthetic = (
                             ['.autosectionstart', \1],
                             ['.endsection']
                         ]],
+    '.filechunk'    => [[string => 1, 'any...' => 2] => [] => [
+                            ['.chunk', \2],
+                            ['.cat', \1],
+                            ['.endchunk'],
+                        ]],
 );
 
 my %_section_order_bad;
@@ -354,6 +364,7 @@ sub run {
         foreach my $entry (@{$pushback}) {
             local $self->{rf} = $entry->{rf};
             $self->{out}->seek($entry->{pos}, SEEK_SET);
+            $entry->{update}->($self, $entry) if defined $entry->{update};
             $self->_proc_parts($entry->{parts}, $entry->{opts}, undef, 1);
         }
     }
@@ -619,6 +630,7 @@ sub _proc_parts {
                 $part = $self->{aliases}{$alts[0]}[-1] if defined $self->{aliases}{$alts[0]};
             }
         }
+        ($cmd, @args) = @{$parts};
     }
 
     if ($cmd eq '.quit' && scalar(@args) == 0) {
@@ -662,6 +674,22 @@ sub _proc_parts {
         foreach my $str (@args) {
             my $c = $self->_parse_int($str, $last);
             print $out pack('C', $c);
+            $last = $c;
+        }
+        $self->_set_alignment(1);
+    } elsif ($cmd eq '.uint16') { # INTERNAL COMMAND! NOT FOR DOCS!
+        my $last;
+        foreach my $str (@args) {
+            my $c = $self->_parse_int($str, $last);
+            print $out pack('n', $c);
+            $last = $c;
+        }
+        $self->_set_alignment(1);
+    } elsif ($cmd eq '.uint16_half_up') { # INTERNAL COMMAND! NOT FOR DOCS!
+        my $last;
+        foreach my $str (@args) {
+            my $c = $self->_parse_int($str, $last);
+            print $out pack('n', ($c / 2) + ($c & 1));
             $last = $c;
         }
         $self->_set_alignment(1);
@@ -792,6 +820,89 @@ sub _proc_parts {
         $self->_write_opcode($section->{close_opcode}) if defined $section->{close_opcode};
         $self->_save_endposition($section_suffix);
         $self->{current}{section} = undef;
+    } elsif ($cmd eq '.chunk' && scalar(@args) >= 2) {
+        my @in = @args;
+        my $flags = 0;
+        my $type;
+        my $identifier = 0;
+        my %info;
+        $self->_align(2, 1);
+
+        while (scalar(@in)) {
+            my $c = shift(@in);
+
+            if (($c eq 'of' || $c eq 'as' || $c eq 'name') && scalar(@in)) {
+                $info{$c} = shift(@in);
+            } elsif ($c eq 'standalone') {
+                $info{$c} = 1;
+            } else {
+                croak sprintf('Invalid chunk option: line %s: %s', $opts->{line}, $c);
+            }
+        }
+
+        if (defined(my $as = $info{as})) {
+            if ($as !~ /^~([0-9])/) {
+                croak sprintf('Invalid chunk option: line %s: as %s', $opts->{line}, $as);
+            }
+
+            $identifier = int($1);
+        }
+
+        if (defined($info{name}) && length($info{name})) {
+            unless ($info{name} =~ /^[0-9a-z]+$/) {
+                croak sprintf('Invalid chunk name: line %s: %s', $opts->{line}, $info{name});
+            }
+        } elsif ($identifier) {
+            $info{name} = sprintf('idchunk$%u', $identifier);
+        } else {
+            state $autochunk = 0;
+            $info{name} = sprintf('autochunk$%u', $autochunk++);
+        }
+
+        if (defined(my $of = $info{of})) {
+            if ($of =~ /^~([0-9]+)$/) {
+                $type = int($1);
+                $flags |= 1<<15;
+            } else {
+                my $t;
+                ($t, $type) = $self->_parse_id($of);
+
+                if ($t eq 'sid') {
+                    $flags |= 1<<14;
+                } elsif ($t eq 'sni') {
+                    # no-op
+                } else {
+                    croak sprintf('Invalid chunk type: line %s: of type %s not supported', $opts->{line}, $t);
+                }
+            }
+        } else {
+            croak sprintf('Invalid chunk: line %s: no of (type) given', $opts->{line});
+        }
+
+        $flags |= 1<<7 if $info{standalone};
+        $flags |= 1<<1 if $identifier > 0;
+
+        print $out chr(0x06), chr(0x38+1);
+        $self->_pushback(pos => $out->tell, parts => ['.uint16_half_up', 'size$chunk$'.$info{name}], opts => {%{$opts}, size => 2});
+        print $out chr(0) x 2;
+
+        $self->{current}{chunk} = $info{name};
+        $self->_save_position('chunk$'.$info{name});
+
+        $self->_pushback(pos => $out->tell, parts => ['.uint16', $flags], opts => {%{$opts}, size => 2}, update => sub {
+                my (undef, $entry) = @_;
+                $entry->{parts}[1] |= $self->{aliases}{'size$chunk$'.$info{name}}[-1] & 1; # update padding flag
+            });
+        print $out chr(0) x 2;
+
+        print $out pack('n', $type);
+        print $out pack('n', $identifier) if $identifier > 0;
+        $self->_save_position('inner$chunk$'.$info{name});
+    } elsif ($cmd eq '.endchunk' && scalar(@args) == 0 && defined($self->{current}{chunk})) {
+        $self->_save_endposition('inner$chunk$'.$self->{current}{chunk});
+        $self->_save_endposition('chunk$'.$self->{current}{chunk});
+        $self->{current}{chunk} = undef;
+        $self->_align(2);
     } elsif ($cmd =~ /^\.(regmap_auto|synthetic_auto_unref)$/ && scalar(@args) == 1) {
         $self->{settings}{$1} = $self->_parse_bool($args[0]);
     } elsif ($cmd eq '.map' && scalar(@args) == 2) {
@@ -869,8 +980,13 @@ sub _proc_parts {
                 my @allocations;
                 my $reset_autodie;
 
-                next unless (scalar(@args)*2) == scalar(@argmap);
+                if (scalar(@argmap) >= 2 && $argmap[-2] eq 'any...') {
+                    next unless (scalar(@args)*2) >= scalar(@argmap);
+                } else {
+                    next unless (scalar(@args)*2) == scalar(@argmap);
+                }
 
+                # Process argument map:
                 for (my $j = 0; ($j*2) < scalar(@argmap); $j++) {
                     my $type = $argmap[$j*2 + 0];
                     my $dst  = $argmap[$j*2 + 1];
@@ -880,6 +996,8 @@ sub _proc_parts {
                         next outer if $val ne $self->_parse_string($type);
                     } elsif ($type eq 'any') {
                         # no-op.
+                    } elsif ($type eq 'any...') {
+                        $val = [@args[$j..$#args]];
                     } else {
                         my $t = $self->_get_value_type($val);
                         if (ref $type) {
@@ -903,6 +1021,7 @@ sub _proc_parts {
                     }
                 }
 
+                # Find suitable temp registers:
                 for (my $j = 0; ($j*2) < scalar(@requests); $j++) {
                     my $req   = $requests[$j*2 + 0];
                     my $dst   = $requests[$j*2 + 1];
@@ -912,8 +1031,9 @@ sub _proc_parts {
                     push(@allocations, $found);
                 }
 
+                # Actually run the parts:
                 foreach my $parts (@{$entry->[$i+2]}) {
-                    my @parts = map {ref ? $updates{${$_}} : $_} @{$parts};
+                    my @parts = map {ref ? ref($updates{${$_}}) ? @{$updates{${$_}}} : $updates{${$_}} : $_} @{$parts};
                     my $ad;
 
                     if ($parts[0] =~ s/\*$//) {
@@ -1071,7 +1191,7 @@ SIRTX::VM::Assembler - module for assembling SIRTX VM code
 
 =head1 VERSION
 
-version v0.06
+version v0.07
 
 =head1 SYNOPSIS
 
@@ -1131,6 +1251,7 @@ Runs the assembler.
 (experimental)
 
 Dumps data collected by L</run>.
+C<$filename> may be a file name or a already open file handle.
 
 =head1 AUTHOR
 

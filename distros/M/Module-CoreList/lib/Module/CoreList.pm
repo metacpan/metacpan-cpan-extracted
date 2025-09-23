@@ -4,7 +4,7 @@ use strict;
 our ( %released, %version, %families, %upstream, %bug_tracker, %deprecated, %delta );
 
 use version;
-our $VERSION = '5.20250820';
+our $VERSION = '5.20250923';
 
 sub PKG_PATTERN () { q#\A[a-zA-Z_][0-9a-zA-Z_]*(?:(::|')[0-9a-zA-Z_]+)*\z# }
 sub _looks_like_invocant ($) { local $@; !!eval { $_[0]->isa(__PACKAGE__) } }
@@ -447,6 +447,7 @@ sub changes_between {
     5.038005 => '2025-08-03',
     5.040003 => '2025-08-03',
     5.043002 => '2025-08-20',
+    5.043003 => '2025-09-23',
   );
 
 for my $version ( sort { $a <=> $b } keys %released ) {
@@ -23832,6 +23833,52 @@ for my $version ( sort { $a <=> $b } keys %released ) {
         removed => {
         }
     },
+    5.043003 => {
+        delta_from => 5.043002,
+        changed => {
+            'B'                     => '1.90',
+            'B::Concise'            => '1.009',
+            'B::Deparse'            => '1.87',
+            'B::Op_private'         => '5.043003',
+            'Config'                => '5.043003',
+            'ExtUtils::ParseXS'     => '3.60',
+            'ExtUtils::ParseXS::Constants'=> '3.60',
+            'ExtUtils::ParseXS::CountLines'=> '3.60',
+            'ExtUtils::ParseXS::Eval'=> '3.60',
+            'ExtUtils::ParseXS::Node'=> '3.60',
+            'ExtUtils::ParseXS::Utilities'=> '3.60',
+            'ExtUtils::Typemaps'    => '3.60',
+            'ExtUtils::Typemaps::Cmd'=> '3.60',
+            'ExtUtils::Typemaps::InputMap'=> '3.60',
+            'ExtUtils::Typemaps::OutputMap'=> '3.60',
+            'ExtUtils::Typemaps::Type'=> '3.60',
+            'File::Copy'            => '2.43',
+            'File::Temp'            => '0.2312',
+            'Filter::Util::Call'    => '1.65',
+            'Module::CoreList'      => '5.20250923',
+            'Module::CoreList::Utils'=> '5.20250923',
+            'Net::Ping'             => '2.77',
+            'Opcode'                => '1.70',
+            'PerlIO::via'           => '0.21',
+            'Storable'              => '3.39',
+            'Term::Table'           => '0.025',
+            'Term::Table::Cell'     => '0.025',
+            'Term::Table::CellStack'=> '0.025',
+            'Term::Table::HashBase' => '0.025',
+            'Term::Table::LineBreak'=> '0.025',
+            'Term::Table::Spacer'   => '0.025',
+            'Term::Table::Util'     => '0.025',
+            'Time::HiRes'           => '1.9779',
+            'Time::Piece'           => '1.3701',
+            'Time::Seconds'         => '1.3701',
+            'Unicode'               => '17.0.0',
+            'XS::APItest'           => '1.46',
+            'overloading'           => '0.03',
+            'utf8'                  => '1.29',
+        },
+        removed => {
+        }
+    },
 );
 
 sub is_core
@@ -25508,6 +25555,13 @@ sub is_core
     },
     5.043002 => {
         delta_from => 5.043001,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.043003 => {
+        delta_from => 5.043002,
         changed => {
         },
         removed => {

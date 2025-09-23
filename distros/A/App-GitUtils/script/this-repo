@@ -10,9 +10,9 @@ use Cwd;
 use Getopt::Long;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-09-20'; # DATE
+our $DATE = '2025-09-23'; # DATE
 our $DIST = 'App-GitUtils'; # DIST
-our $VERSION = '0.088'; # VERSION
+our $VERSION = '0.089'; # VERSION
 
 Getopt::Long::Configure("bundling", "no_ignore_case");
 my $quiet;
@@ -48,7 +48,7 @@ this-repo - Return name of git repository associated with current directory
 
 =head1 VERSION
 
-This document describes version 0.088 of this-repo (from Perl distribution App-GitUtils), released on 2025-09-20.
+This document describes version 0.089 of this-repo (from Perl distribution App-GitUtils), released on 2025-09-23.
 
 =head1 SYNOPSIS
 

@@ -1,7 +1,7 @@
 /***************************************************************************************
-* Build  MD5 : OFUsfWTKEr5kWhpuQY7WeA
-* Build Time : 2025-09-20 19:10:59
-* Version    : 5.090122
+* Build  MD5 : bTO8KdNuOXUI/qjnYirIyg
+* Build Time : 2025-09-23 11:51:03
+* Version    : 5.090124
 * Author     : H.Q.Wang
 ****************************************************************************************/
 #include "EXTERN.h"
@@ -23,6 +23,7 @@ static LogOptions* hv_to_LogOptions(HV* hv) {
     if ((val = hv_fetch(hv, "mode", 4, 0)))             opt->mode = (LogMode)SvIV(*val);
     if ((val = hv_fetch(hv, "targets", 7, 0)))          opt->targets = SvIV(*val);
     if ((val = hv_fetch(hv, "use_color", 9, 0)))        opt->use_color = SvTRUE(*val);
+	if ((val = hv_fetch(hv, "with_rep", 8, 0)))         opt->with_rep = SvTRUE(*val);
     if ((val = hv_fetch(hv, "show_timestamp", 14, 0)))  opt->show_timestamp = SvTRUE(*val);
     if ((val = hv_fetch(hv, "show_log_level", 14, 0)))  opt->show_log_level = SvTRUE(*val);
     if ((val = hv_fetch(hv, "show_file_info", 14, 0)))  opt->show_file_info = SvTRUE(*val);
@@ -113,4 +114,14 @@ xs_log_write(level, file,line,message)
         const char *cmessage = SvPV(message, mlen);
 		const char *cfile    = SvPV(file, flen);
         log_write((LogLevel)level, cfile, line, cmessage);
+    }
+
+void
+xs_rep_write(message)
+    SV* message
+  CODE:
+    {
+        STRLEN flen, mlen;
+        const char *cmessage = SvPV(message, mlen);
+        rep_write(cmessage);
     }

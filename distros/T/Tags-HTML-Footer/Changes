@@ -1,3 +1,10 @@
+0.04 2025-09-22T17:38:36+02:00
+ - Fix output of EXAMPLE1 in doc.
+ - Regen README file.
+ - Regen image of EXAMPLE2 in doc.
+ - Simplify constructor checks.
+ - Update copyright years.
+
 0.03 2024-08-05T09:02:50+02:00
  - Change all fonts to sans-serif.
 

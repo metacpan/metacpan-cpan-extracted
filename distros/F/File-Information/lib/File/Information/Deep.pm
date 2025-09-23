@@ -16,7 +16,7 @@ use parent 'File::Information::Base';
 use Carp;
 use Scalar::Util qw(weaken);
 
-our $VERSION = v0.12;
+our $VERSION = v0.13;
 
 my %_PNG_colour_types = ( # namespace: 4c11d438-f6f3-417f-85e3-e56e46851dae
     0   => {ise => 'a3934b85-5bec-5cd7-a571-727e4cecfcb1', displayname => 'Greyscale'},
@@ -58,6 +58,14 @@ my %_properties = (
     png_ihdr_interlace_method   => {loader => \&_load_png},
     gif_screen_width            => {loader => \&_load_gif},
     gif_screen_height           => {loader => \&_load_gif},
+    gpl_palette_name            => {loader => \&_load_gpl},
+    gpl_palette_columns         => {loader => \&_load_gpl},
+    gpl_palette_colours         => {loader => \&_load_gpl},
+    rgbtxt_palette_colours      => {loader => \&_load_rgbtxt},
+    libpng_ihdr_width           => {loader => \&_load_libpng},
+    libpng_ihdr_height          => {loader => \&_load_libpng},
+    libpng_ihdr_color_type      => {loader => \&_load_libpng},
+    libpng_plte_colours         => {loader => \&_load_libpng},
 );
 
 my %_vmv0_code_P1_info = (
@@ -145,7 +153,7 @@ sub _new {
 
     # copy a few critical values:
     $pv->{contentise} = {raw => $parent->get('contentise', lifecycle => 'current', as => 'uuid')};
-    $pv->{mediatype}  = {raw => $parent->get('mediatype',  lifecycle => 'current', as => 'mediatype')};
+    eval { $pv->{mediatype}  = {raw => $parent->get('mediatype',  lifecycle => 'current', as => 'mediatype')} };
 
     return $self;
 }
@@ -164,7 +172,11 @@ sub _dynamic_property {
 
 sub _check_mediatype {
     my ($self, @mediasubtypes) = @_;
-    my $v = $self->{properties_values}{current}{mediatype}{raw};
+    my $v;
+
+    return undef unless defined $self->{properties_values}{current}{mediatype}{raw};
+
+    $v = $self->{properties_values}{current}{mediatype}{raw};
 
     foreach my $mediasubtype (@mediasubtypes) {
         return 1 if $v eq $mediasubtype;
@@ -412,6 +424,87 @@ sub _load_gif {
     }
 }
 
+sub _load_gpl {
+    my ($self, $key, %opts) = @_;
+    my $pv = ($self->{properties_values} //= {})->{current} //= {};
+
+    return if defined $self->{_loaded_gpl};
+    $self->{_loaded_gpl} = 1;
+
+    {
+        my $inode = $self->parent->inode;
+        my $data = $inode->peek(wanted => 64);
+
+        if ($data =~ /^GIMP Palette\r?\n/) {
+            my $fh = $inode->_get_fh;
+            my @colours;
+
+            return unless eval { require Data::URIID::Colour; 1; };
+
+            while (defined(my $line = <$fh>)) {
+                $line =~ s/\r?\n$//;
+                $line =~ s/^\s*#.*$//;
+                next unless length($line);
+                if ($line eq 'GIMP Palette') {
+                    # magic, good, no-op
+                } elsif ($line =~ /^Name:\s+(\S.+)$/) {
+                    $pv->{gpl_palette_name} = {raw => $1};
+                } elsif ($line =~ /^Columns:\s+([1-9][0-9]*)$/) {
+                    $pv->{gpl_palette_columns} = {raw => int($1)};
+                } elsif ($line =~ /^(0|[1-9][0-9]*)\s+(0|[1-9][0-9]*)\s+(0|[1-9][0-9]*)\s+(\S(?:.*\S)?)$/) {
+                    push(@colours, {raw => Data::URIID::Colour->new(
+                            rgb => sprintf('#%02x%02x%02x', $1, $2, $3),
+                            displayname => $4,
+                        )});
+                } elsif ($line =~ /^(0|[1-9][0-9]*)\s+(0|[1-9][0-9]*)\s+(0|[1-9][0-9]*)$/) {
+                    push(@colours, {raw => Data::URIID::Colour->new(
+                            rgb => sprintf('#%02x%02x%02x', $1, $2, $3),
+                        )});
+                } else {
+                    # BAD line!?
+                }
+            }
+
+            $pv->{gpl_palette_colours} = \@colours if scalar @colours;
+        }
+    }
+}
+
+sub _load_rgbtxt {
+    my ($self, $key, %opts) = @_;
+    my $pv = ($self->{properties_values} //= {})->{current} //= {};
+
+    return if defined $self->{_loaded_rgbtxt};
+    $self->{_loaded_rgbtxt} = 1;
+
+    {
+        my $inode = $self->parent->inode;
+        my $data = $inode->peek(wanted => 64);
+
+        if ($data =~ /^\! \$Xorg: rgb\.txt,v .+ Exp \$\r?\n/) {
+            my $fh = $inode->_get_fh;
+            my @colours;
+
+            return unless eval { require Data::URIID::Colour; 1; };
+
+            while (defined(my $line = <$fh>)) {
+                $line =~ s/\r?\n$//;
+                next unless length($line);
+                if ($line =~ /^(0|[1-9][0-9]*)\s+(0|[1-9][0-9]*)\s+(0|[1-9][0-9]*)\s+(\S(?:.*\S)?)$/) {
+                    push(@colours, {raw => Data::URIID::Colour->new(
+                            rgb => sprintf('#%02x%02x%02x', $1, $2, $3),
+                            displayname => $4,
+                        )});
+                } else {
+                    # BAD line!?
+                }
+            }
+
+            $pv->{rgbtxt_palette_colours} = \@colours if scalar @colours;
+        }
+    }
+}
+
 sub _load_image_info {
     my ($self, $key, %opts) = @_;
     my $pv = ($self->{properties_values} //= {})->{current} //= {};
@@ -532,6 +625,38 @@ sub _load_barcodes {
     }
 }
 
+sub _load_libpng {
+    my ($self, $key, %opts) = @_;
+    my $pv = ($self->{properties_values} //= {})->{current} //= {};
+
+    return if defined $self->{_loaded_libpng};
+    $self->{_loaded_libpng} = 1;
+
+    return unless $self->_check_mediatype(qw(image/png));
+    return unless defined $self->{path};
+    return unless eval { require Image::PNG::Libpng; 1; };
+
+    if (defined(my $png = eval {Image::PNG::Libpng::read_png_file($self->{path})})) {
+        my $IHDR = $png->get_IHDR;
+
+        $pv->{libpng_ihdr_width} = {raw => $IHDR->{width}};
+        $pv->{libpng_ihdr_height} = {raw => $IHDR->{height}};
+
+        if (defined(my $ct = $_PNG_colour_types{$IHDR->{color_type}})) {
+            $pv->{libpng_ihdr_color_type} = {raw => $IHDR->{color_type}, ise => $ct->{ise}};
+        }
+
+        if (defined(my $PLTE = eval {$png->get_PLTE})) {
+            if (eval { require Data::URIID::Colour; 1; }) {
+                my @colours = map {{
+                    raw => Data::URIID::Colour->new(rgb => sprintf('#%02x%02x%02x', $_->{red}, $_->{green}, $_->{blue})),
+                }} @{$PLTE};
+                $pv->{libpng_plte_colours} = \@colours if scalar @colours;
+            }
+        }
+    }
+}
+
 1;
 
 __END__
@@ -546,7 +671,7 @@ File::Information::Deep - generic module for extracting information from filesys
 
 =head1 VERSION
 
-version v0.12
+version v0.13
 
 =head1 SYNOPSIS
 

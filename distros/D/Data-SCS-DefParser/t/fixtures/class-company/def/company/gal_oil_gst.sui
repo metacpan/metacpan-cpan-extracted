@@ -1,0 +1,6 @@
+company_permanent: company.permanent.gal_oil_gst
+{
+	name: "Gallon Oil"
+	sort_name: "gallon oil"
+	trailer_look: gallon
+}

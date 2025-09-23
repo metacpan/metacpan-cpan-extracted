@@ -10,15 +10,15 @@ use File::chdir;
 use IPC::System::Options 'system', -log=>1, -die=>1;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-09-20'; # DATE
+our $DATE = '2025-09-23'; # DATE
 our $DIST = 'App-GitUtils'; # DIST
-our $VERSION = '0.088'; # VERSION
+our $VERSION = '0.089'; # VERSION
 
 our %SPEC;
 
 $SPEC{':package'} = {
     v => 1.1,
-    summary => 'Day-to-day command-line utilities for git',
+    summary => 'Some additional command-line utilities for git',
 };
 
 our %argspecopt_dir = (
@@ -80,12 +80,42 @@ sub _search_git_dir {
     return $res;
 }
 
+$SPEC{get_git_dir} = {
+    v => 1.1,
+    summary => 'Get the path to the .git directory',
+    description => <<'MARKDOWN',
+
+Basically just the C<git_dir> information from `gu info`. Useful in shell
+scripts.
+
+MARKDOWN
+    args => {
+        %argspecopt_dir,
+    },
+    deps => {
+        prog => {name=>'git', min_version=>'2.22.0'}, # for --show-current option
+    },
+    tags => [
+        'find-dotgit-dir', # we accept 'dir' arg for these
+    ],
+};
+sub get_git_dir {
+    my %args = @_;
+
+    my $git_dir = _search_git_dir(\%args);
+    return [412, "Can't find .git dir, make sure ".($args{dir} // "the current directory")." is a git repo"]
+        unless defined $git_dir;
+
+    [200, "OK", $git_dir];
+}
+
 $SPEC{info} = {
     v => 1.1,
     summary => 'Return information about git repository',
     description => <<'MARKDOWN',
 
 Information include:
+
 - Path of the git directory
 - Repository name
 - Current/active branch
@@ -430,7 +460,7 @@ MARKDOWN
     args => {
         max_size => {
             schema => 'datasize*',
-            req => 1,
+            default => 100*1024*1024 - 1*1024, # safe margin
             pos => 0,
             cmdline_aliases => {s=>{}},
         },
@@ -646,7 +676,7 @@ sub split_commit_add_untracked {
 
 
 1;
-# ABSTRACT: Day-to-day command-line utilities for git
+# ABSTRACT: Some additional command-line utilities for git
 
 __END__
 
@@ -656,11 +686,11 @@ __END__
 
 =head1 NAME
 
-App::GitUtils - Day-to-day command-line utilities for git
+App::GitUtils - Some additional command-line utilities for git
 
 =head1 VERSION
 
-This document describes version 0.088 of App::GitUtils (from Perl distribution App-GitUtils), released on 2025-09-20.
+This document describes version 0.089 of App::GitUtils (from Perl distribution App-GitUtils), released on 2025-09-23.
 
 =head1 SYNOPSIS
 
@@ -801,6 +831,46 @@ Return value:  (any)
 
 
 
+=head2 get_git_dir
+
+Usage:
+
+ get_git_dir(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Get the path to the .git directory.
+
+Basically just the C<git_dir> information from C<gu info>. Useful in shell
+scripts.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<dir> => I<dirname>
+
+A directory inside git repo.
+
+If not specified, will assume current directory is inside git repository and
+will search C<.git> upwards.
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
 =head2 info
 
 Usage:
@@ -810,9 +880,16 @@ Usage:
 Return information about git repository.
 
 Information include:
-- Path of the git directory
-- Repository name
-- Current/active branch
+
+=over
+
+=item * Path of the git directory
+
+=item * Repository name
+
+=item * Current/active branch
+
+=back
 
 Will return status 412 if working directory is not inside a git repository. Will
 return status 500 on errors, e.g. if C<git> command cannot recognize the
@@ -869,7 +946,7 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<max_size>* => I<datasize>
+=item * B<max_size> => I<datasize> (default: 104856576)
 
 (No description)
 

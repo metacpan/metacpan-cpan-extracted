@@ -16,7 +16,6 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'Carp' => '0',
                                       'Module::Find' => '0',
                                       'Module::Runtime' => '0',
                                       'constant' => '0',

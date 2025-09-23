@@ -1,7 +1,7 @@
 /***************************************************************************************
-* Build  MD5 : t/lRzMRtc2aBjA2fg2wqQg
-* Build Time : 2025-09-20 19:05:28
-* Version    : 5.090114
+* Build  MD5 : gsGuz4lXXbVuVnlQlPZe6g
+* Build Time : 2025-09-23 10:58:42
+* Version    : 5.090115
 * Author     : H.Q.Wang
 ----------------------------------------------------------------------------------------
 ## 功能说明
@@ -51,6 +51,7 @@ typedef struct {
     LogLevel level;             // 日志级别
 	LogMode mode;				// 日志模式
     int targets;                // 输出目标组合(位掩码)
+    bool with_rep;              // 同时生成rep的日志
     bool use_color;             // 是否使用彩色输出(控制台)
     bool show_timestamp;        // 是否显示时间戳
     bool show_log_level;        // 是否显示日志级别
@@ -74,6 +75,7 @@ void setTargets(int flag);
 
 void log_print(LogLevel level, const char *file, int line, const char *format, ...);
 void log_write(LogLevel level, const char *file, int line, const char *message);
+void rep_write(const char *message);
 /*******************************
 // 快捷日志宏
 #define printNote(...)	log_write(LOG_LEVEL_TRACE, __FILE__, __LINE__, __VA_ARGS__)

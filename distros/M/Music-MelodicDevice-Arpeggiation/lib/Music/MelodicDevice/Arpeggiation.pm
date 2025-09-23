@@ -3,20 +3,28 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Apply arpeggiation patterns to groups of notes
 
-our $VERSION = '0.0104';
+our $VERSION = '0.0203';
 
 use Moo;
 use strictures 2;
+use Array::Circular ();
 use Data::Dumper::Compact qw(ddc);
 use namespace::clean;
 
 use constant TICKS => 96;
 
+my $DISPATCH = {
+    up     => sub { my ($notes) = @_; return [ 0 .. $#$notes ] },
+    down   => sub { my ($notes) = @_; return [ reverse(0 .. $#$notes) ] },
+    updown => sub { my ($notes) = @_; return [ 0 .. $#$notes, reverse(1 .. $#$notes - 1) ] },
+    random => sub { my ($notes) = @_; return [ map { rand @$notes } @$notes ] },
+};
 
-has pattern => (
+
+has type => (
     is      => 'rw',
-    isa     => sub { die "$_[0] is not an array reference" unless ref($_[0]) eq 'ARRAY' },
-    default => sub { [0,1,2] },
+    isa     => sub { die "$_[0] is not a known named type" unless exists $DISPATCH->{$_[0]} },
+    default => sub { 'up' },
 );
 
 
@@ -43,29 +51,51 @@ has verbose => (
 
 
 sub arp {
-    my ($self, $notes, $duration, $pattern, $repeats) = @_;
+    my ($self, $notes, $duration, $type, $repeats) = @_;
 
     $duration ||= $self->duration;
-    $pattern  ||= $self->pattern;
+    $type     ||= $self->type;
     $repeats  ||= $self->repeats;
 
-    my $number = @$notes; # Number of notes in the arpeggiation
+    my $pattern = ref $type eq 'ARRAY' ? $type : $self->_build_pattern($type, $notes);
 
-    # Compute the ornament durations
+    my $pat = Array::Circular->new(@$pattern);
+
+    # compute the arp durations
     my $x = $duration * TICKS;
-    my $z = sprintf '%0.f', $x / $number;
+    my $z = sprintf '%0.f', $x / @$notes;
     print "Durations: $x, $z\n" if $self->verbose;
     $z = 'd' . $z;
 
     my @arp;
     for my $i (1 .. $repeats) {
-        for my $p (@$pattern) {
-            push @arp, [ $z, $notes->[$p] ];
+        for my $j (1 .. @$notes) {
+            push @arp, [ $z, $notes->[ $pat->current ] ];
+            $pat->next;
         }
     }
     print 'Arp: ', ddc(\@arp) if $self->verbose;
 
     return \@arp;
+}
+
+sub _build_pattern {
+    my ($self, $type, $notes) = @_;
+    return $self->arp_type($type)->($notes);
+}
+
+
+sub arp_type {
+    my ($self, $type, $coderef) = @_;
+    if ($type && $coderef) {
+        $DISPATCH->{$type} = $coderef;
+    }
+    elsif ($type) {
+        return $DISPATCH->{$type};
+    }
+    else {
+        return $DISPATCH;
+    }
 }
 
 1;
@@ -82,7 +112,7 @@ Music::MelodicDevice::Arpeggiation - Apply arpeggiation patterns to groups of no
 
 =head1 VERSION
 
-version 0.0104
+version 0.0203
 
 =head1 SYNOPSIS
 
@@ -90,7 +120,11 @@ version 0.0104
 
   my $arp = Music::MelodicDevice::Arpeggiation->new;
 
-  my $arped = $arp->arp([60,64,67], 1, [0,1,2,1], 3);
+  $arp->arp_type('my_type', sub { my ($notes); return [0,2,1] }); # set a new type
+
+  my $arped = $arp->arp([60,64,67], 1, 'updown', 3);
+
+  my $pattern = $arp->build_pattern('my-type', [60,65,67,69]); # [0,2,1]
 
 =head1 DESCRIPTION
 
@@ -99,14 +133,21 @@ groups of notes.
 
 =head1 ATTRIBUTES
 
-=head2 pattern
+=head2 type
 
-  $arp->pattern(\@pattern);
-  $pattern = $arp->pattern;
+  $arp->type($type);
+  $type = $arp->type;
 
-Default: C<[0,1,2]>
+Default: C<up>
 
-Arpeggiation note index selection pattern.
+Arpeggiation named type.
+
+Known types:
+
+  up
+  down
+  updown
+  random
 
 =head2 duration
 
@@ -140,9 +181,10 @@ Show progress.
 =head2 new
 
   $x = Music::MelodicDevice::Arpeggiation->new(
-    scale_note => $scale_note,
-    scale_name => $scale_name,
-    verbose    => $verbose,
+    type     => $type,
+    duration => $duration,
+    repeats  => $repeats,
+    verbose  => $verbose,
   );
 
 Create a new C<Music::MelodicDevice::Arpeggiation> object.
@@ -153,16 +195,34 @@ Create a new C<Music::MelodicDevice::Arpeggiation> object.
 
   $notes = $arp->arp(\@pitches); # use object defaults
   $notes = $arp->arp(\@pitches, $duration);
-  $notes = $arp->arp(\@pitches, $duration, \@pattern);
-  $notes = $arp->arp(\@pitches, $duration, \@pattern, $repeats);
+  $notes = $arp->arp(\@pitches, $duration, $type);
+  $notes = $arp->arp(\@pitches, $duration, $type, $repeats);
 
-Return a list of lists of C<d#> MIDI-Perl strings with the pitches indexed by the arpeggiated pattern. These MIDI-Perl duration strings are distributed evenly across the given C<duration>.
+Return a list of lists of C<d#> MIDI-Perl strings with the pitches indexed by the arpeggiated pattern built from the given C<type>. These MIDI-Perl duration strings are distributed evenly across the given C<duration>.
 
-So given a duration of 1 (a quarter-note), a list of 4 notes to arpeggiate, an arpeggiation pattern of C<[0,1,2,3]>, and 1 repeat, this method will return a list of lists with length of the duration divided by the number of pitches. An item of the list is itself a list of 2 elements: the divided duration and the selected pitch given the pattern index.
+=head2 arp_type
+
+  $all_types = $self->arp_type # get everything
+  $coderef = $self->arp_type($type); # get the value
+  $self->arp_type($type, $coderef); # set a new type
+
+For no arguments, return the full hash reference of all arpeggiation
+types. For a single argument, return the code-reference value of that
+type, of known. If two arguments are given, add the named C<type> to
+the known arpeggiation types with its code-reference value.
+
+Known types and their code-ref values are:
+
+  up     => sub { my ($notes) = @_; return [ 0 .. $#$notes ] },
+  down   => sub { my ($notes) = @_; return [ reverse(0 .. $#$notes) ] },
+  updown => sub { my ($notes) = @_; return [ 0 .. $#$notes, reverse(1 .. $#$notes - 1) ] },
+  random => sub { my ($notes) = @_; return [ map { rand @$notes } @$notes ] },
 
 =head1 SEE ALSO
 
-The F<t/01-methods.t> and F<eg/*> programs in this distribution
+The F<t/01-methods.t> program in this distribution
+
+L<Array::Circular>
 
 L<Data::Dumper::Compact>
 

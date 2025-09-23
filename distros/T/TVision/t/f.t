@@ -103,7 +103,7 @@ my $desktop = $tapp->deskTop;
 my @f = map {makeForm($_,$_, $data->[$_ % 4])} 1 .. 45;
 $desktop->insert($_) for @f;
 
-$tapp->on_idle(my $sub = sub {
+$tapp->on_idle(sub {
     $::e++;
     if ($::e % 10 == 0) {
 	$f[int(rand($#f))]->focus();

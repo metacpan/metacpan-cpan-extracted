@@ -15,7 +15,7 @@ use Carp;
 
 use parent 'Data::Identifier::Interface::Userdata';
 
-our $VERSION = v0.06;
+our $VERSION = v0.07;
 
 use constant {
     TYPE_USER               => 'user',
@@ -73,6 +73,9 @@ sub _new {
     }, $pkg;
 }
 
+# ---- Docs for constants ----
+
+
 1;
 
 __END__
@@ -87,7 +90,7 @@ SIRTX::VM::Register - module for interacting with SIRTX VM code
 
 =head1 VERSION
 
-version v0.06
+version v0.07
 
 =head1 SYNOPSIS
 
@@ -134,6 +137,75 @@ Gets or sets the register temperature.
     my SIRTX::VM::Register $clone = $register->clone;
 
 Clones the register.
+
+=head1 CONSTANTS
+
+=head2 Type
+
+Each register has a type, which is a read only property. The following values are supported:
+
+=over
+
+=item C<SIRTX::VM::Register::TYPE_USER()>
+
+The register is a user register.
+It's meaning is defined by the user/application.
+
+=item C<SIRTX::VM::Register::TYPE_SYSTEM()>
+
+The register is a system register.
+It's meaning is defined by the formal specification and must not be used in any other way.
+
+=back
+
+=head2 Owner
+
+Each register has a owner. The owner is a read-write property that defines who currently owns the register.
+
+=over
+
+=item C<SIRTX::VM::Register::OWNER_MINE()>
+
+The register is owned by the user/application.
+The application may use the register anyway it pleases.
+
+This is the default.
+
+=item C<SIRTX::VM::Register::OWNER_YOURS()>
+
+The register is currently owned by the assembler. The assembler is free to use the register as sees fit.
+The user/application is not allowed to alter the content of the register (unless specifically documented).
+
+=item C<SIRTX::VM::Register::OWNER_THEIRS()>
+
+The register is owned by external code (such as a library).
+Both user/application and assembler are not allowed to alter the register.
+
+=back
+
+=head2 Temperature
+
+The register temperature tells how much a register is currently used.
+This is a read-write property.
+This is used by the assembler to optimise code.
+
+=over
+
+=item C<SIRTX::VM::Register::TEMPERATURE_COLD()>
+
+The register is currently not or only rarely used.
+
+=item C<SIRTX::VM::Register::TEMPERATURE_LUKEWARM()>
+
+The register is used sometimes.
+
+This is the default.
+
+=item C<SIRTX::VM::Register::TEMPERATURE_HOT()>
+
+The register is currently in active use.
+
+=back
 
 =head1 AUTHOR
 

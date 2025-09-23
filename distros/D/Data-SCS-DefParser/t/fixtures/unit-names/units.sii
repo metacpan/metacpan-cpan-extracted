@@ -1,0 +1,28 @@
+SiiNunit
+{
+
+class_name : single_cmpnt {
+ single: "ok"
+}
+
+long_class_name : two.components {
+ long: "ok"
+}
+
+no_space_before_colon: one.two.three {
+ many: "ok"
+}
+
+digits : 1.2.3.456 {
+ digits: "ok"
+}
+
+mixed : a_1.2a._3.4_.5_6a {
+ mixed: "ok"
+}
+
+class: .foo.bar {
+ nameless: "ok"
+}
+
+}

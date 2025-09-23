@@ -1,0 +1,10 @@
+SiiNunit
+{
+
+city_data : city.carlsbad
+{
+	city_name: "Carlsbad"
+	country: california
+}
+
+}

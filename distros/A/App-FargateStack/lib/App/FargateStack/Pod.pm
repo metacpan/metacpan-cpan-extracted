@@ -53,7 +53,7 @@ I<This is a work in progress.> Versions prior to 1.1.0 are considered usable
 but may still contain issues related to edge cases or uncommon configuration
 combinations.
 
-This documentation corresponds to version 1.0.47.
+This documentation corresponds to version 1.0.50.
 
 The release of version I<1.1.0> will mark the first production-ready release.
 Until then, you're encouraged to try it out and provide feedback. Issues or

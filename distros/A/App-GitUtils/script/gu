@@ -8,14 +8,15 @@ use App::GitUtils;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-09-20'; # DATE
+our $DATE = '2025-09-23'; # DATE
 our $DIST = 'App-GitUtils'; # DIST
-our $VERSION = '0.088'; # VERSION
+our $VERSION = '0.089'; # VERSION
 
 my $p = '/App/GitUtils/'; # prefix
 Perinci::CmdLine::Any->new(
     url => $p,
     subcommands => {
+        'dir'            => {url => "${p}get_git_dir"},
         'info'           => {url => "${p}info"},
         'status'         => {url => "${p}status"},
         'run-hook'       => {url => "${p}run_hook"},
@@ -34,7 +35,7 @@ Perinci::CmdLine::Any->new(
     log => 1,
 )->run;
 
-# ABSTRACT: Day-to-day command-line utilities for git
+# ABSTRACT: Some additional command-line utilities for git
 # PODNAME: gu
 
 __END__
@@ -45,11 +46,11 @@ __END__
 
 =head1 NAME
 
-gu - Day-to-day command-line utilities for git
+gu - Some additional command-line utilities for git
 
 =head1 VERSION
 
-This document describes version 0.088 of gu (from Perl distribution App-GitUtils), released on 2025-09-20.
+This document describes version 0.089 of gu (from Perl distribution App-GitUtils), released on 2025-09-23.
 
 =head1 SYNOPSIS
 
@@ -61,13 +62,15 @@ B<gu> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
 B<gu clone-to-bare> [B<L<--cmd|/"--cmd=s">>=I<subcommand_name>] [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--dir|/"--dir=s">>=I<L<dirname|Sah::Schema::dirname>>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--target-dir|/"--target-dir=s">>=I<L<dirname|Sah::Schema::dirname>>]
 
+B<gu dir> [B<L<--cmd|/"--cmd=s">>=I<subcommand_name>] [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--dir|/"--dir=s">>=I<L<dirname|Sah::Schema::dirname>>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]]
+
 B<gu du-committing> [B<L<--cmd|/"--cmd=s">>=I<subcommand_name>] [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--include-untracked|/"--exclude-untracked">>|B<L<--exclude-untracked|/"--exclude-untracked">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]]
 
 B<gu du-untracked> [B<L<--cmd|/"--cmd=s">>=I<subcommand_name>] [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--detail|/"--detail, -l">>|B<L<-l|/"--detail, -l">>|B<L<--no-detail|/"--detail, -l">>|B<L<--nodetail|/"--detail, -l">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]]
 
 B<gu info> [B<L<--cmd|/"--cmd=s">>=I<subcommand_name>] [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--dir|/"--dir=s">>=I<L<dirname|Sah::Schema::dirname>>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]]
 
-B<gu ls-committing-large> [B<L<--cmd|/"--cmd=s">>=I<subcommand_name>] [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- E<lt>I<L<max_size|/"--max-size=s*, -s">>E<gt>
+B<gu ls-committing-large> [B<L<--cmd|/"--cmd=s">>=I<subcommand_name>] [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- [I<L<max_size|/"--max-size=s, -s">>]
 
 B<gu post-commit> [B<L<--cmd|/"--cmd=s">>=I<subcommand_name>] [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--dir|/"--dir=s">>=I<L<dirname|Sah::Schema::dirname>>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]]
 
@@ -86,6 +89,14 @@ B<gu status> [B<L<--cmd|/"--cmd=s">>=I<subcommand_name>] [B<L<--config-path|/"--
 =head2 B<clone-to-bare>
 
 Clone repository to a bare repository.
+
+=head2 B<dir>
+
+Get the path to the .git directory.
+
+Basically just the C<git_dir> information from C<gu info>. Useful in shell
+scripts.
+
 
 =head2 B<du-committing>
 
@@ -112,9 +123,16 @@ considering ignored files. Correcting this is in the todo list.
 Return information about git repository.
 
 Information include:
-- Path of the git directory
-- Repository name
-- Current/active branch
+
+=over
+
+=item * Path of the git directory
+
+=item * Repository name
+
+=item * Current/active branch
+
+=back
 
 Will return status 412 if working directory is not inside a git repository. Will
 return status 500 on errors, e.g. if C<git> command cannot recognize the
@@ -373,6 +391,20 @@ If not specified, defaults to C<$repodir.bare/>.
 
 =back
 
+=head2 Options for subcommand dir
+
+=over
+
+=item B<--dir>=I<s>
+
+A directory inside git repo.
+
+If not specified, will assume current directory is inside git repository and
+will search C<.git> upwards.
+
+
+=back
+
 =head2 Options for subcommand du-committing
 
 =over
@@ -413,10 +445,11 @@ will search C<.git> upwards.
 
 =over
 
-=item B<--max-size>=I<s>*, B<-s>
+=item B<--max-size>=I<s>, B<-s>
 
-(No description)
+Default value:
 
+ 104856576
 
 Can also be specified as the 1st command-line argument.
 
@@ -581,6 +614,10 @@ List of available configuration parameters:
  dir (see --dir)
  target_dir (see --target-dir)
 
+=head2 Configuration for subcommand dir
+
+ dir (see --dir)
+
 =head2 Configuration for subcommand du-committing
 
  include_untracked (see --exclude-untracked)
@@ -634,6 +671,114 @@ String. Specify additional command-line options.
 =head2 /home/u1/gu.conf
 
 =head2 /etc/gu.conf
+
+=head1 EXAMPLES
+
+=head2 Getting information
+
+Get some information about the git repository:
+
+ % gu info
+ % gu ; # the default is the 'info' subcommand
+ +----------------+---------------------------------------+
+ | key            | value                                 |
+ +----------------+---------------------------------------+
+ | current_branch | master                                |
+ | git_dir        | /home/u1/repos/perl-App-GitUtils/.git |
+ | repo_name      | perl-App-GitUtils                     |
+ +----------------+---------------------------------------+
+
+Get the path to the C<.git> directory (basically, only the C<git_dir>
+information of C<gu info>):
+
+ % cd lib; # just to show that we can run 'gu' anywhere inside the repo
+ % gu dir
+
+C<git status> parsed into data structure form:
+
+ % git status
+ On branch master
+ Your branch is up to date with 'origin/master'.
+
+ Changes not staged for commit:
+   (use "git add <file>..." to update what will be committed)
+   (use "git restore <file>..." to discard changes in working directory)
+ 	modified:   lib/App/GitUtils.pm
+ 	modified:   script/gu
+
+ no changes added to commit (use "git add" and/or "git commit -a")
+
+ % gu status
+ [
+    200,
+    "OK",
+    {
+       "branch" : "master",
+       "staged" : {
+          "deleted" : [],
+          "modified" : [],
+          "new_files" : []
+       },
+       "unstaged" : {
+          "deleted" : [],
+          "modified" : [
+             "lib/App/GitUtils.pm",
+             "script/gu"
+          ],
+          "new_files" : []
+       },
+       "untracked" : []
+    },
+    {
+       "stream" : 0,
+       "title" : "gu status"
+    }
+ ]
+
+=head2 Running hooks
+
+ % gu run-hook post-commit
+ % gu rh pre-commit
+
+Some shortcuts:
+
+ % gu post-commit; # shortcut for 'gu rh post-commit'
+ % gu pre-commit;  # shortcut for 'gu rh pre-commit'
+
+=head2 Cloning
+
+ % gu clone-to-bare
+
+Deprecated. Basically just C<git clone --bare>.
+
+=head2 Subcommand: ls-committing-large
+
+This subcommand lists large files that are being committed. You can do something
+like this in a `pre-commit` Bash script hook, for example:
+
+ # GitHub rejects files over 100MB
+ if [[ `gu ls-committing-large 100MB` != "" ]]; then
+   echo "Cancelling commit, there are files that will be rejected by GitHub"
+   exit 1
+ fi
+
+=head2 Subcommand: du-committing
+
+Calculate the size of the commit. You can do something like this in a
+`pre-commit` Bash script hook, for example:
+
+ # GitHub rejects commit size over 2GB
+ if [[ `gu du-committing` > $[2*1024*1024*1024] ]]; then
+   echo "Cancelling commit, too large, will be rejected by GitHub"
+   exit 1
+ fi
+
+=head2 Subcommand: split-commit-add-untracked
+
+If you have untracked files with a total size of larger than 2GB, you can split
+the commit using this subcommand:
+
+ % gu split-commit-add-untracked
 
 =head1 HOMEPAGE
 

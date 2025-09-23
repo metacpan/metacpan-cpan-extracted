@@ -252,7 +252,7 @@ Readonly::Hash our %DEFAULT_NAMES => (
   'log-group' => sub {
     my ( $self, @args ) = @_;
 
-    return sprintf '/ecs/%s', $self->get_config->{app}->{name};
+    return sprintf '/ecs/app-fargatestack/%s', $self->get_config->{app}->{name};
   },
   'role-name' => sub {
     my ( $self, $type ) = @_;

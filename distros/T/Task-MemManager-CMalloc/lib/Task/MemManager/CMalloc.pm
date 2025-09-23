@@ -1,5 +1,5 @@
 package Task::MemManager::CMalloc;
-$Task::MemManager::CMalloc::VERSION = '0.03';
+$Task::MemManager::CMalloc::VERSION = '0.04';
 use strict;
 use warnings;
 
@@ -10,15 +10,18 @@ Inline->init()
   ; ## prevents warning "One or more DATA sections were not processed by Inline"
 
 my $MAX_ADDR;
+
 BEGIN {
 
-    if ($Config{ptrsize} == 8) {
+    if ( $Config{ptrsize} == 8 ) {
         $MAX_ADDR = 2**48 - 1;
-    } elsif ($Config{ptrsize} == 4) {
+    }
+    elsif ( $Config{ptrsize} == 4 ) {
         $MAX_ADDR = 2**32 - 1;
-    } else {
+    }
+    else {
         die "Unsupported pointer size: $Config{ptrsize} "
-        . "when initializing the package Task::MemManager::CMalloc";
+          . "when initializing the package Task::MemManager::CMalloc";
     }
 }
 ##############################################################################
@@ -62,7 +65,7 @@ sub get_buffer_address {
 #               $init_value        - Value to initialize the buffer with
 # Throws      : dies if the buffer allocation fails
 # Comments    : While not used here, Task::MemManager will pass the opts of
-#               the constructor to malloc as the third parameter. 
+#               the constructor to malloc as the third parameter.
 # See Also    : n/a
 #
 # See Also    : n/a
@@ -71,19 +74,19 @@ sub malloc {
     my ( $num_of_items, $size_of_each_item, $init_value ) = @_;
     my $buffer_size = $num_of_items * $size_of_each_item;
     my $buffer;
-    
+
     die "Invalid $buffer_size, should be between [0,$MAX_ADDR]\n"
       if ( !defined($buffer_size)
         || $buffer_size <= 0
         || $buffer_size > $MAX_ADDR );
 
-    unless (  $init_value ) {
+    unless ($init_value) {
         $buffer = _alloc_with_malloc($buffer_size);
     }
     elsif ( $init_value == 0 ) {
         $buffer = _alloc_with_calloc($buffer_size);
     }
-    elsif (  $init_value ) {
+    elsif ($init_value) {
         $buffer = _alloc_with_malloc_and_set( $buffer_size, $init_value );
     }
 
@@ -100,17 +103,21 @@ sub malloc {
 # Purpose     : Consumes an external buffer, whose address is stored in a scalar
 #               (provided as a reference to simulate pass-by-reference)
 # Returns     : A reference to the buffer that is now owned by
-#               Task::MemManager. 
+#               Task::MemManager.
 # Parameters  : $external_buffer - A reference to the external buffer
-#               $length          - The length of the buffer to consume. 
+#               $length          - The length of the buffer to consume.
 #                                This info should be provided by the caller and
 #                                should be accurate to ensure no buffer
 #                                overflows occur.
-# Throws      : dies if the external buffer is not defined, or if it is not a
+# Throws      : Dies if the external buffer is not defined, or if it is not a
 #               scalar reference or if the length of the external buffer is
 #               non-positive, or not a 64 bit address
-# Comments    : The external buffer value will be zeroed out by
+# Comments    : The external buffer reference will be zeroed out by
 #               Task::MemManager to avoid double frees.
+#               The function uses realloc to change the size of the buffer and
+#               thus a *copy* of the original buffer may be made.
+#               If realloc returns NULL, then a warning is issued that the user
+#               should not assume that the requested buffer length is correct.
 # See Also    : n/a
 
 sub consume {
@@ -118,10 +125,15 @@ sub consume {
     die "External buffer is not defined" unless defined $external_buffer_ref;
     die "External buffer is not a scalar reference"
       unless ref($external_buffer_ref) eq 'SCALAR';
-        
-        die "Length of external buffer is not a valid memory address"
-            unless ($length > 0 && $length < $MAX_ADDR);
-    my $return_value = $$external_buffer_ref;
+
+    die "Length of external buffer is not a valid memory address"
+      unless ( $length > 0 && $length < $MAX_ADDR );
+    my $return_value = _realloc_buffer( $$external_buffer_ref, $length );
+    unless ( defined $return_value ) {
+        $return_value = $$external_buffer_ref;
+        warn "C's realloc returned an error; the requested buffer length "
+          . " may not be correct. Use the consumed region at your own risk\n";
+    }
     $$external_buffer_ref = 0;
 
     return \$return_value;
@@ -134,7 +146,7 @@ Task::MemManager::CMalloc - Allocates buffers using C's malloc
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -177,6 +189,19 @@ Frees the buffer allocated by C<malloc>.
 
 Returns the memory address of the buffer as a Perl scalar.
 
+=item * C<consume($external_buffer_ref, $length)>
+
+Consumes an external buffer, whose address is stored in a scalar variable, with 
+the latter passed as a reference to simulate pass-by-reference in C). The length 
+of the buffer should be provide. The value of the reference to the address of 
+the external buffer is then zeroed out to prevent double free from a subsequent 
+call to C's free. Internally C's realloc is used to grow/shrink the buffer to
+the desired length, and thus an implicit copy may be made. If realloc returns
+NULL, then a warning is issued that the user should not assume that the requested
+buffer length is correct.
+Note that the C<$external_buffer> should be a valid Perl integer, otherwise the
+consumption will fail.
+
 =back
 
 =head1 DIAGNOSTICS
@@ -191,6 +216,10 @@ with an (informative message ?) if something is wrong.
 
 The module depends on the C<Inline::C> module to compile the C code for 
 the memory allocation and deallocation functions.
+
+=head1 TODO
+
+None I can think of, but open to suggestions. 
 
 =head1 SEE ALSO
 
@@ -231,6 +260,7 @@ __C__
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 // allocates a buffer using malloc - contents are not initialized
 SV* _alloc_with_malloc(size_t length) {
@@ -286,5 +316,20 @@ SV* _get_buffer_address(SV* sv) {
         return &PL_sv_undef;
     }
     char* buffer = SvPVbyte_nolen(sv);
+    return newSVuv(PTR2UV(buffer));
+}
+
+// Simple realloc interface - should be called with an integer value
+SV* _realloc_buffer(SV* sv, size_t length) {
+    if (! SvIOK(sv)) {
+        return &PL_sv_undef;
+    }
+    void *mem_addr = (void *)(uintptr_t)SvUV(sv);
+    
+    // Allocate memory for the array - return undef if something happened
+    void* buffer = realloc(mem_addr, length);
+    if (buffer == NULL) {
+        return &PL_sv_undef;
+    }
     return newSVuv(PTR2UV(buffer));
 }

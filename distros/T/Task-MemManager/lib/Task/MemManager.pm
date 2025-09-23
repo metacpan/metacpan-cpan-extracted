@@ -1,5 +1,6 @@
 package Task::MemManager;
-$Task::MemManager::VERSION = '0.07';
+$Task::MemManager::VERSION = '0.08';
+# ABSTRACT: A memory allocator for low level code in Perl.
 use strict;
 use warnings;
 
@@ -11,7 +12,7 @@ use Inline ( C => 'DATA', );
 use Carp;
 use Module::Find;
 use Module::Runtime 'use_module';
-use Scalar::Util;
+use Scalar::Util qw(refaddr);
 
 Inline->init()
   ; ## prevents warning "One or more DATA sections were not processed by Inline"
@@ -19,7 +20,22 @@ Inline->init()
 *ident = \&Scalar::Util::refaddr
   ;  # alias of refaddr in Ch. 15 & 16 of "Perl Best Practices" (O'Reilly, 2005)
 
-# ABSTRACT: A memory allocator for low level code in Perl.
+# functionalities and their imported modules
+my @functionalities      = qw(Allocator Device View);
+my %namespace_of_modules = (
+    Allocator => 'Task::MemManager',
+    Device    => 'Task::MemManager::Device',
+    View      => 'Task::MemManager::View'
+);
+my %default_modules  = ( Allocator => 'PerlAlloc', );
+my %imported_modules = ();
+
+my @utility_modules;
+
+# Load allocators and store their functions
+my %allocator_function;
+my @allocator_functions = qw(malloc free get_buffer_address);
+my @optional_functions  = qw(consume);
 
 # Properties of the Memory Manager class (inside out object attributes)
 my %buffer;               # Memory buffer
@@ -36,48 +52,96 @@ my %creation_opts;        # Options used to create the object
 # Private functions
 my $consume_or_allocate_private_func;    # Avoids DRY when allocating/consuming
 
-# Find implemented memory allocators under this namespace
-my @alloc_modules = findsubmod 'Task::MemManager';
+# Track if import was explicitly called
+my $import_was_called = 0;
 
-my @utility_modules;
+sub import {
+    shift;
+    my %options = (@_);
 
-# Load allocators and store their functions
-my %allocator_function;
-my @allocator_functions = qw(malloc free get_buffer_address);
-my @optional_functions  = qw(consume);
-TEST_MODULE: foreach my $module_name (@alloc_modules) {
+    # Mark that import was explicitly called
+    $import_was_called = 1;
 
-    # Skip the View and GPU modules unless requested explicitly
-    next TEST_MODULE if $module_name =~ /::View$/;
-    next TEST_MODULE if $module_name =~ /::GPU$/;
+   # Convert all keys to Titlecase - remember delete will return alias to values
+    my @new_keys = map { ucfirst lc $_ } keys %options;
+    @options{@new_keys} = delete @options{ keys %options };
 
-    ( my $key = $module_name ) =~ s/Task::MemManager:://;
-    my $alloc_module = use_module($module_name);    # Load the module
-    my $number_of_functions =
-      grep { $alloc_module->can($_) } @allocator_functions;
-    if (    $number_of_functions > 0
-        and $number_of_functions < @allocator_functions )
-    {
-        push @utility_modules, $module_name;
-        warn "Module $alloc_module does not implement all required methods: "
-          . "(@allocator_functions).\nThis module will not be used for "
-          . "memory allocation";
-        next TEST_MODULE;
-    }    ## zero implemented functions is OK, it may be a utility module
+    # Process options only for Allocator, Device, and View
+    %options = %options{ grep { exists $options{$_} } @functionalities };
+    %imported_modules = ( %default_modules, %options );
 
-    # Store the mandatory and optional functions of the allocator
-    foreach my $function (@allocator_functions) {
-        $allocator_function{$key}{$function} = $alloc_module->can($function);
+    # if PerlAlloc=> undef or '' or used package without options
+    $imported_modules{Allocator} //= ['PerlAlloc'];
+
+    # Ensure that module names are either single strings or array references
+    while ( my ( $key, $modules ) = each %imported_modules ) {
+        next unless $modules;    # skip empty module names
+        warn "Must provide a single module name or an array reference for $key"
+          unless ref($modules) eq ''
+          or ref($modules) eq 'ARRAY';
+        $imported_modules{$key} = [$modules] if ref($modules) eq '';
     }
-    foreach my $function (@optional_functions) {
-        $allocator_function{$key}{$function} = (
-              $alloc_module->can($function)
-            ? $alloc_module->can($function)
-            : sub {
-                warn "$module_name does not implement $function";
+
+   # ensure that PerlAlloc is always available & that unique allocators are used
+    push $imported_modules{Allocator}->@*, 'PerlAlloc';
+    my %unique_allocators = map { $_ => 1 } $imported_modules{Allocator}->@*;
+    $imported_modules{Allocator} = [ keys %unique_allocators ];
+
+    # Find implemented memory allocators under this namespace
+    my @alloc_modules = findsubmod $namespace_of_modules{Allocator};
+  TEST_MODULE: foreach my $module_name (@alloc_modules) {
+        ( my $key = $module_name ) =~ s/$namespace_of_modules{Allocator}:://;
+        my $alloc_module;
+        for my $module ( @{ $imported_modules{Allocator} } ) {
+            next unless $module eq $key;
+            $alloc_module = use_module($module_name);    # Load the module
+                # Store the optional functions of the allocator
+            foreach my $function (@optional_functions) {
+                $allocator_function{$key}{$function} = (
+                      $alloc_module->can($function)
+                    ? $alloc_module->can($function)
+                    : sub {
+                        warn "$module_name does not implement $function";
+                    }
+                );
             }
-        );
+            if (DEBUG) {
+                print "Loaded allocator module: $module_name.\n";
+            }
+
+            # Find if the module implements all required functions & store them
+            my $number_of_functions =
+              grep { $alloc_module->can($_) } @allocator_functions;
+            if ( $number_of_functions < @allocator_functions ) {
+                push @utility_modules, $module_name;
+                warn "Module $alloc_module does not implement all "
+                  . "required methods: ( @allocator_functions ).\n"
+                  . "This module will not be used for memory allocation. "
+                  . "However, it may be used for ( @optional_functions ), if implemented.\n";
+                next TEST_MODULE;
+            }    ## Need a complete set of functions to be an allocator
+            foreach my $function (@allocator_functions) {
+                $allocator_function{$key}{$function} =
+                  $alloc_module->can($function);
+            }
+        }
     }
+
+    delete $imported_modules{Allocator};
+
+    # Load Device and View modules if any are available
+    while ( my ( $key, $modules ) = each %imported_modules ) {
+        next unless $modules;    # skip empty module names
+        my @options_of_namespaces = $imported_modules{$key}->@*;
+        eval "require $namespace_of_modules{$key}";
+        $@ and warn "Could not load $namespace_of_modules{$key}" if DEBUG;
+        $namespace_of_modules{$key}->import(@options_of_namespaces);
+    }
+}
+
+# Ensure import runs even if module is used without options
+unless ($import_was_called) {
+    __PACKAGE__->import();    # Call with no arguments (uses defaults)
 }
 
 ###############################################################################
@@ -96,14 +160,17 @@ TEST_MODULE: foreach my $module_name (@alloc_modules) {
 #                death_stub     - Function to call upon object destruction
 #                  it will receive the object's properties and identifier
 #                  as a hash reference if it is defined
-# Throws      : croaks if the buffer allocation fails, or if the allocator
+# Throws      : Dies if the buffer allocation fails, or if the allocator
 #                does not exist or if one attempts to allocate a region that
 #                overlaps with an existing buffer.
 # Comments    : Default allocator is PerlAlloc, which uses Perl's string
-#                functions,
+#                functions (and is always loaded!)
 #               Default init_value is undef ('zero' zeroes out memory, any
 #                 byte value will initialize memory with that value)
 #               Default delayed_gc is 0 (garbage collection is immediate)
+#               Survivable errors (e.g. calling as a class method, or forgetting
+#               to define the number of items or the size of each item) will
+#               return undef.
 # See Also    : n/a
 sub new {
     my ( $self, $num_of_items, $size_of_each_item, $opts_ref ) = @_;
@@ -111,16 +178,17 @@ sub new {
     my $init_value = $opts_ref->{init_value};
     $opts_ref->{delayed_gc} //= 0;
 
-
     if ( ref($self) ) {
         if (DEBUG) {
-            carp "Cannot call new on a (blessed) reference.\n";
+            die "Cannot call new on a (blessed) reference.\n";
         }
         return undef;
     }
 
-    die "Number of items and size of each item must be defined"
-      unless defined $num_of_items and defined $size_of_each_item;
+    unless ( defined $num_of_items and defined $size_of_each_item ) {
+        warn "Number of items and size of each item must be defined";
+        return undef;
+    }
 
     $init_value =
       ( !defined $init_value || ( lc $init_value eq 'zero' ) )
@@ -165,19 +233,15 @@ sub new {
 #               Default init_value is undef ('zero' zeroes out memory, any
 #                 byte value will initialize memory with that value)
 #               Default delayed_gc is 1 (garbage collection is delayed)
+#               Survivable errors (e.g. calling as a class method, or forgetting
+#               to define the number of items or the size of each item) will
+#               return undef.
 # See Also    : n/a
 sub consume {
     my ( $self, $external_buffer_ref, $num_of_items, $size_of_each_item,
         $opts_ref )
       = @_;
     $opts_ref->{delayed_gc} //= 1;
-
-    unless ( ref($self) ) {
-        if (DEBUG) {
-            carp "Cannot call consume as class method.\n";
-        }
-        return undef;
-    }
 
     return $self->$consume_or_allocate_private_func( $num_of_items,
         $size_of_each_item, $opts_ref, 'consume',
@@ -191,9 +255,11 @@ $consume_or_allocate_private_func = sub {
         $func_args_ref )
       = @_;
 
-    # exit if the number of items or the number of bytes per item is not defined
-    die "Number of items and size of each item must be defined"
-      unless defined $num_of_items and defined $size_of_each_item;
+   # undef if the number of items or the number of bytes per item is not defined
+    unless ( defined $num_of_items and defined $size_of_each_item ) {
+        warn "Number of items and size of each item must be defined";
+        return undef;
+    }
 
     # Various defaults here
 
@@ -380,7 +446,7 @@ Task::MemManager - A memory allocated and manager for low level code in Perl.
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -411,6 +477,21 @@ B<Optional functions> that may be implemented include:
 Packages that do not implement these functions will not be used for memory allocation purposes.
 e.g. they may implement other functionalities for working with memory buffers.
 The default allocator is PerlAlloc, which uses Perl's string functions to allocate memory.
+The package may be loaded with options to specify different allocators,
+device mappings and views. For example:
+
+  use Task::MemManager Allocator => ['PerlAlloc'];  # only PerlAlloc
+  use Task::MemManager;                             # only PerlAlloc
+  use Task::MemManager ();                          # only PerlAlloc
+  use Task::MemManager Allocator => ['MyAlloc'];    # MyAlloc and PerlAlloc
+
+  use Task::MemManager Allocator => ['MyAlloc','PerlAlloc']; # MyAlloc and PerlAlloc
+
+  use Task::MemManager Device => ['NVIDIA_GPU'];    # NVIDIA_GPU device mapping
+
+  use Task::MemManager View => ['PDL'];             # PDL view of buffers
+
+One can combine options for Allocator, Device, and View as needed.
 
 =head1 METHODS
 
@@ -437,6 +518,9 @@ The default allocator is PerlAlloc, which uses Perl's string functions to alloca
                 Default init_value is undef ('zero' zeroes out memory, 
                 any other byte value will initialize memory with that value).
                 Default delayed_gc is 0 (garbage collection is immediate).
+                Survivable errors (e.g. calling as a class method, or forgetting
+                to define the number of items or the size of each item) will
+                return undef.
 
 =head2 consume
 
@@ -465,8 +549,11 @@ The default allocator is PerlAlloc, which uses Perl's string functions to alloca
   Comments    : Default allocator is PerlAlloc, which uses Perl's string
                 functions,
                 Default init_value is undef ('zero' zeroes out memory, any
-                  byte value will initialize memory with that value)
+                byte value will initialize memory with that value)
                 Default delayed_gc is 1 (garbage collection is delayed)
+                See the comments of each allocator for type constraints of
+                the external buffer (e.g. if CMalloc is used, then the buffer
+                must be a reference to a scalar containing an integer).
 
 =head2 extract_buffer_region
 
@@ -536,7 +623,7 @@ The examples are best run sequentially in a single Perl script.
 
 =head2 Example 1: Allocating buffers and killing them 
 
-  use Task::MemManager;
+  use Task::MemManager Allocator => ['CMalloc'];
   ## uses the default allocator PerlAlloc
   my $memdeath = Task::MemManager->new(
       40, 1,
@@ -688,7 +775,7 @@ In this example we will create two buffers, one without and one with delayed
 garbage collection and will track when they die relative to the end of the
 script. This example is entirely self-contained.
 
-  use Task::MemManager;
+  use Task::MemManager Allocator => ['CMalloc','PerlAlloc'];
   use strict;
   use warnings;
 
@@ -829,6 +916,7 @@ Open to suggestions. A few foolish ideas of my own include: adding further
 allocators and providing facilities that will *trigger* the delayed garbage 
 collection for a specific object, at specific time points in a script 
 (emulating for example Go's garbage collector).
+
 
 =head1 SEE ALSO
 

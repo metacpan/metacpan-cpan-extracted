@@ -16,7 +16,7 @@ use Scalar::Util qw(looks_like_number);
 
 use parent 'Data::Identifier::Interface::Userdata';
 
-our $VERSION = v0.06;
+our $VERSION = v0.07;
 
 my %_die_raen = (code => 0, P => 7, codeX => 0, S => 2, T => 4+1, is_return => 1);
 
@@ -384,7 +384,7 @@ sub from_template {
         }
 
         if (scalar @cond) {
-            croak sprintf('Unsupported jump syntax: line %s: condition %s', $opts{line}, join(' ', @cond));
+            croak sprintf('Unsupported jump syntax: line %s: condition %s', $line, join(' ', @cond));
         }
 
         return $pkg->new(code => 3, P => $P, codeX => 0, S => $S, T => $T, extra => [$extra]);
@@ -509,7 +509,7 @@ SIRTX::VM::Opcode - module for single SIRTX VM opcodes
 
 =head1 VERSION
 
-version v0.06
+version v0.07
 
 =head1 SYNOPSIS
 

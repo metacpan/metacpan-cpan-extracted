@@ -1,5 +1,14 @@
 Revision history for Task-MemManager
 
+0.08      2025-09-22 21:27:05-06:00 America/Denver
+- Expanded documentation to include details on error handling e.g. when the
+allocator will return undef
+- Allows options when loading the package to specify which allocators to use
+- Allows the loading of optional View modules that generates (CPU) memory views
+  of the allocated buffers
+- Allows the loading of optional Device  modules that generates Device (e.g. GPU)
+  mapping and update of buffers
+- Added a DEBUG constant to control debug output and checks from the environment
 0.07      2025-09-14 15:17:53-06:00 America/Denver
 - Fixed subtle bug in the new method that was expecting a reference to the class
 0.06      2025-09-14 14:29:14-06:00 America/Denver

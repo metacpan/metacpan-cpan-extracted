@@ -1,0 +1,8 @@
+SiiNunit
+{
+
+illegal : hyphen-token {
+ error: 1
+}
+
+}

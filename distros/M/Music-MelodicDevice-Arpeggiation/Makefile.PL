@@ -17,6 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.006",
   "NAME" => "Music::MelodicDevice::Arpeggiation",
   "PREREQ_PM" => {
+    "Array::Circular" => 0,
     "Data::Dumper::Compact" => 0,
     "Moo" => 2,
     "constant" => 0,
@@ -32,7 +33,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.0104",
+  "VERSION" => "0.0203",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,6 +41,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Array::Circular" => 0,
   "Data::Dumper::Compact" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,

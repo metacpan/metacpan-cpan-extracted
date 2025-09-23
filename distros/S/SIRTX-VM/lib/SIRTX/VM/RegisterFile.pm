@@ -17,7 +17,7 @@ use SIRTX::VM::Register;
 
 use parent 'Data::Identifier::Interface::Userdata';
 
-our $VERSION = v0.06;
+our $VERSION = v0.07;
 
 my @_register_templates = (
     # user:
@@ -251,7 +251,7 @@ SIRTX::VM::RegisterFile - module for interacting with SIRTX VM code
 
 =head1 VERSION
 
-version v0.06
+version v0.07
 
 =head1 SYNOPSIS
 

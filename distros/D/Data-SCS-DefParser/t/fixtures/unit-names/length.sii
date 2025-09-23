@@ -1,0 +1,8 @@
+SiiNunit
+{
+
+illegal : too_long_token {
+ error: 1
+}
+
+}

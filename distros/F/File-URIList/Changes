@@ -1,3 +1,6 @@
+v0.03  2025-09-22Z
+    - Fixed typo in POD
+
 v0.02  2025-06-02Z
     - Support for writing a Data::Identifier::Cloudlet
     - Support to copy from one list to another

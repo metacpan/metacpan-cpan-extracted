@@ -26,18 +26,20 @@ no_index:
 provides:
   Task::MemManager:
     file: lib/Task/MemManager/View.pm
-    version: '0.01'
+    version: '0.02'
   Task::MemManager::View:
     file: lib/Task/MemManager/View.pm
-    version: '0.01'
+    version: '0.02'
 requires:
-  Carp: '0'
   Module::Find: '0'
   Module::Runtime: '0'
   constant: '0'
   strict: '0'
   warnings: '0'
-version: '0.01'
+resources:
+  homepage: https://github.com/chrisarg/Task-MemManager-View
+  repository: https://github.com/chrisarg/Task-MemManager-View.git
+version: '0.02'
 x_generated_by_perl: v5.38.0
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: MIT

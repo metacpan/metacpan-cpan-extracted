@@ -1,0 +1,33 @@
+SiiNunit
+{
+# from def/sign/mileage_targets.sii
+
+mileage_target : mileage.ok_oklacity {
+ editor_name: "OK Oklahoma City"
+ default_name: "Oklahoma City"
+ variants: 1
+ variants[0]: okla_city
+ names: 1
+ names[0]: "Okla. City"
+ image_atlas_paths: 0
+ image_atlas_indices: 0
+ distance_offset: 2
+ node_uid: nil
+ position: (&c5e2cc07, &41ac8cd9, &46985370)
+ search_radius: 50
+}
+
+mileage_target : mileage.ok_seiling {
+ editor_name: "OK Seiling"
+ default_name: Seiling
+ variants: 0
+ names: 0
+ image_atlas_paths: 0
+ image_atlas_indices: 0
+ distance_offset: &40200000
+ node_uid: 5427112652697371218
+ position: (&7f7fffff, &7f7fffff, &7f7fffff)
+ search_radius: -1
+}
+
+}

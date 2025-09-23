@@ -1,5 +1,8 @@
 Revision history for the TurboVision Perl extension.
 
+0.26	2025-09-23
+        better refouunt callback, more other improvements
+
 0.25	2025-09-20
         - debugger tvdb.pm
         - TEditor

@@ -1,23 +1,55 @@
 package Task::MemManager::View;
-$Task::MemManager::View::VERSION = '0.01';
+$Task::MemManager::View::VERSION = '0.02';
 use strict;
 use warnings;
 use Module::Find;
 use Module::Runtime 'use_module';
 
 BEGIN {
-    require Task::MemManager unless defined &Task::MemManager::VERSION;
     use constant DEBUG => $ENV{DEBUG} // 0;
+    unless ( defined $Task::MemManager::VERSION ) {
+        require Task::MemManager;
+        if (DEBUG) {
+            print
+              "Loading Task::MemManager version $Task::MemManager::VERSION\n";
+        }
+        Task::MemManager->import;
+    }
 
     # Save the original DESTROY
     our $destroyer = *Task::MemManager::DESTROY{CODE};
 }
 
+# Track if import was explicitly called
+my $import_was_called = 0;
+
+sub import {
+    shift;
+
+    # Mark that import was explicitly called
+    $import_was_called = 1;
+
+    # Sanity check: don't install modules > 1 time & PDL is included
+    my @requested_view_modules = @_;
+    unless (@_) {
+        @requested_view_modules = ('PDL');    # Default view module
+    }
+    else {
+        push @requested_view_modules, 'PDL';
+    }
+    my %seen;
+    @requested_view_modules = grep { !$seen{$_}++ } @requested_view_modules;
+    Task::MemManager->install_view_modules(@requested_view_modules);
+}
+
+unless ($import_was_called) {
+    __PACKAGE__->import();    # Call with no arguments (uses defaults)
+}
+
 ## Switch to Task::MemManager namespace, since we are extending it
 package Task::MemManager;
-$Task::MemManager::VERSION = '0.01';
-use Carp;
-no warnings 'redefine';    # We are redefining DESTROY
+$Task::MemManager::VERSION = '0.02';
+no warnings 'redefine';       # We are redefining DESTROY
 
 # Find implemented memory views under this namespace
 
@@ -29,28 +61,38 @@ my %view_buffer_of  = ();
 my %view_type_of    = ();
 my %options_of_view = ();
 
-TEST_MODULE: foreach my $module_name (@view_modules) {
-    ( my $key = $module_name ) =~ s/Task::MemManager::View:://;
-    my $view_module = use_module($module_name);    # Load the module
-    my $number_of_functions =
-      grep { $view_module->can($_) } @view_functions;
-    if ( $number_of_functions < @view_functions ) {
-        warn "Module $view_module does not implement all required methods: "
-          . "(@view_functions).\nThis module will not be used for "
-          . "creating views.\n";
-        next TEST_MODULE;
-    }    ## zero implemented functions is OK, it may be a utility module
+sub install_view_modules {
+    my (@requested_view_modules) = @_;
+  TEST_MODULE: foreach my $module_name (@view_modules) {
+        ( my $key = $module_name ) =~ s/Task::MemManager::View:://;
+        my $view_module;
+        for my $module (@requested_view_modules) {
+            next unless $module eq $key;
+            $view_module = use_module($module_name);    # Load the module
+            my $number_of_functions =
+              grep { $view_module->can($_) } @view_functions;
+            if ( $number_of_functions < @view_functions ) {
+                warn "Module $view_module does not implement all required "
+                  . "methods: ( @view_functions ).\nThis module will not be used for "
+                  . "creating views.\n";
+                next TEST_MODULE;
+            }    ## zero implemented functions is OK, it may be a utility module
+            if (DEBUG) {
+                print "Loaded view module $view_module for type '$key'.\n";
+            }
 
-    # Store the mandatory and optional functions of the allocator
-    foreach my $function (@view_functions) {
-        $view_function_with{$key}{$function} = $view_module->can($function);
+            # Store the mandatory and optional functions of the allocator
+            foreach my $function (@view_functions) {
+                $view_function_with{$key}{$function} =
+                  $view_module->can($function);
+            }
+        }
     }
 }
-
 ###############################################################################
 # Usage       : $view =  $buffer->create_view($view_type, \%options);
 # Purpose     : Create a view of the specified type for the buffer
-# Returns     : The created view
+# Returns     : The created view (a reference to an object, or a scalar, etc)
 # Parameters  : $view_type - type of the view (e.g. 'PDL')
 #               \%options - hash reference with options for the view. The
 #                           option view_name is reserved for naming the view.
@@ -59,7 +101,8 @@ TEST_MODULE: foreach my $module_name (@view_modules) {
 #               See the documentation of each view module for the supported
 #               options.
 # Throws      : n/a
-# Comments    : Returns undef if the view creation fails for any reason.
+# Comments    : Returns undef if the view creation fails for any reason e.g.
+#               when specifying a view that does not exist.
 #               Warnings will be generated if DEBUG is set to a non-zero value.
 
 sub create_view {
@@ -69,19 +112,19 @@ sub create_view {
     # Sanity checks
     unless ( ref($self) ) {
         if (DEBUG) {
-            carp "Cannot call create_view as class method.\n";
+            warn "Cannot call create_view as class method.\n";
         }
         return undef;
     }
     unless ( defined $view_type ) {
         if (DEBUG) {
-            carp "View type must be specified.\n";
+            warn "View type must be specified.\n";
         }
         return undef;
     }
     unless ( exists $view_function_with{$view_type} ) {
         if (DEBUG) {
-            carp "View type '$view_type' is not supported.\n";
+            warn "View type '$view_type' is not supported.\n";
         }
         return undef;
     }
@@ -92,7 +135,7 @@ sub create_view {
       ->( $self->get_buffer, $self->get_buffer_size, $opts_ref );
     unless ( defined $view ) {
         if (DEBUG) {
-            carp "View creation failed for type '$view_type'.\n";
+            warn "View creation failed for type '$view_type'.\n";
         }
         return undef;
     }
@@ -120,13 +163,13 @@ sub delete_view {
     my ( $self, $view_name ) = @_;
     unless ( ref($self) ) {
         if (DEBUG) {
-            carp "Cannot call get_view as class method.\n";
+            warn "Cannot call get_view as class method.\n";
         }
         return undef;
     }
     unless ( defined $view_name ) {
         if (DEBUG) {
-            carp "View name must be specified.\n";
+            warn "View name must be specified.\n";
         }
         return undef;
     }
@@ -137,7 +180,7 @@ sub delete_view {
 
 ###############################################################################
 # Usage       : $view =  $buffer->get_view($view_name);
-# Purpose     : Retrieve the specified view of the buffer
+# Purpose     : Retrieve the specified view of the buffer as a reference
 # Returns     : The view, or undef if any error occurs
 # Parameters  : $view_name - name of the view to retrieve
 # Throws      : n/a
@@ -149,13 +192,13 @@ sub get_view {
 
     unless ( ref($self) ) {
         if (DEBUG) {
-            carp "Cannot call get_view as class method.\n";
+            warn "Cannot call get_view as class method.\n";
         }
         return undef;
     }
     unless ( defined $view_name ) {
         if (DEBUG) {
-            carp "View name must be specified.\n";
+            warn "View name must be specified.\n";
         }
         return undef;
     }
@@ -176,8 +219,8 @@ sub get_view {
 sub clone_view {
     my ( $self, $view_name ) = @_;
     if (DEBUG) {
-        carp "Cannot call clone_view as class method.\n" unless ref($self);
-        carp "View name must be specified.\n"
+        warn "Cannot call clone_view as class method.\n" unless ref($self);
+        warn "View name must be specified.\n"
           unless defined $view_name;
     }
 
@@ -186,7 +229,7 @@ sub clone_view {
 
     unless ( defined $view ) {
         if (DEBUG) {
-            carp "View '$view_name' not found for cloning.\n"
+            warn "View '$view_name' not found for cloning.\n"
               unless defined $view;
         }
         return undef;
@@ -204,11 +247,11 @@ sub DESTROY {
     # recursively destroy all views associated with this buffer
     if ( exists $view_buffer_of{$identifier} ) {
         foreach my $view_name ( keys %{ $view_buffer_of{$identifier} } ) {
-            delete $view_buffer_of{$identifier}{$view_name};
             if (DEBUG) {
                 print "\nDESTROYED view $view_name of "
-                  . "Task::MemManager::View $identifier, $self\n";
+                  . "Task::MemManager::View $identifier, $self, obj: $view_buffer_of{$identifier}{$view_name}\n";
             }
+            delete $view_buffer_of{$identifier}{$view_name};
         }
         delete $view_buffer_of{$identifier};
     }
@@ -223,12 +266,12 @@ Task::MemManager::View - Provides convenient views for Task::MemManager buffers
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
     use Task::MemManager;
-    use Task::MemManager::View; # automatically loaded if Task::MemManager is used
+    use Task::MemManager::View 'PDL'; # automatically loaded if Task::MemManager is used
 
     my $buffer = Task::MemManager->new( size => 1000, 1 );
 
@@ -258,10 +301,14 @@ C<Task::MemManager> module. It does so, by adding additional methods to the
 C<Task::MemManager> class to create, delete, and retrieve views.
 Views are implemented as separate modules under the C<Task::MemManager::View>
 namespace. Each view module must implement a set of mandatory methods
-(see below). The view modules are automatically discovered and loaded when
-the C<Task::MemManager::View> module is loaded. If you do not need a view, 
-do not install the corresponding module, because C<Task::MemManager::View>  is
-a graceful module that will load B<every> module under it's namespace.
+(see below). 
+You can specify the modules to be loaded by passing their names as parameters
+when importing the C<Task::MemManager::View> module. It is also possible to
+do so when importing the C<Task::MemManager> module, by providing the parameter
+View=>['PDL', ...]. If no parameters are provided, the default is to load the
+C<PDL> view module, which provides a view of the buffer as a Perl scalar.
+Note that this module must be installed separately.
+
 
 =head1 METHODS
 
@@ -269,7 +316,7 @@ a graceful module that will load B<every> module under it's namespace.
 
   Usage       : $view =  $buffer->create_view($view_type, \%options);
   Purpose     : Create a view of the specified type for the buffer
-  Returns     : The created view
+  Returns     : The created view (a {Perl scalar or an object)
   Parameters  : $view_type - type of the view (e.g. 'PDL')
                 \%options - hash reference with options for the view. The
                             option view_name is reserved for naming the view.
@@ -321,7 +368,7 @@ Please see the examples in the module L<Task::MemManager::View::PDL>
 =head1 DIAGNOSTICS
 
 If you set up the environment variable DEBUG to a non-zero value, then
-a number of sanity checks will be performed, and the module will carp
+a number of sanity checks will be performed, and the module will warn
 with an (informative message ?) if something is wrong.
 
 =head1 DEPENDENCIES
@@ -329,9 +376,7 @@ with an (informative message ?) if something is wrong.
 The module extends the C<Task::MemManager> module so this is definitely a
 dependency. It also uses the C<Module::Find> and C<Module::Runtime> modules
 to find and load the view modules (so you can count them as dependencies too).
-By default all installed view modules will be loaded. If you do not need a
-specific view, do not install the corresponding module. This may change in
-the future, if I decide to add a mechanism to load only specific view modules.
+
 
 =head1 TODO
 

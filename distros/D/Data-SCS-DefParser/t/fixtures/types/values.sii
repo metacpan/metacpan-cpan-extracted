@@ -1,0 +1,35 @@
+SiiNunit
+{
+test : types {
+
+string: "String value"
+
+float_f: 1.23
+float_e: -.62e+4
+float_b: &3f800000
+
+float2: (1.0, 2.4)
+float3: (1.0, 5.4E-1, &40780000)
+float4: (1.0, 5.4, 3.0, 9.0) # quaternion
+
+# placement: (0, 0, 0) (1; 0, 0, 0)
+
+fixed: 10
+fixed2: (20, 69) # int2
+fixed3: (10, 22, 33)
+fixed4: (10, 22, 33, 44)
+
+signed: -15
+
+true: true
+false: false
+
+token: value
+owner_ptr: .some.nameless.unit
+link_ptr: some.named.unit
+resource_tie: "path/to/some/resource.pma"
+
+hex: 0x685FAF
+
+}
+}

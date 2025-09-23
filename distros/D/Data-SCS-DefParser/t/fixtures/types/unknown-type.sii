@@ -1,0 +1,8 @@
+SiiNunit
+{
+test : types {
+
+foo(bar): "value"
+
+}
+}

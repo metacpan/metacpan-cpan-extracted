@@ -1,0 +1,9 @@
+SiiNunit
+{
+test : inline
+{
+
+error: @include "unit.sui"
+
+}
+}

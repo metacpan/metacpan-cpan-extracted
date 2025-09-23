@@ -1,5 +1,9 @@
 Revision history for Task-MemManager-CMalloc
 
+0.04      2025-09-22 21:25:42-06:00 America/Denver
+- Rewrote consume to use realloc to resize the buffer to the desired length.
+This was done to be compatible with PerlAlloc's behavior.
+- Expanded documentation for consume to explain the new behavior.
 0.03      2025-09-14 17:14:24-06:00 America/Denver
 - Initial value handled as an integer between 0-255 for allocation purposes
 - Replaced croak with die as the package approaches maturity

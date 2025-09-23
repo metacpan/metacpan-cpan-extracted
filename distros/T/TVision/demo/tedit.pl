@@ -15,7 +15,7 @@ print "e=[@$r]\n";
 $desktop->insert($tedit);
 $desktop->insert($tedit2);
 
-$tapp->onCommand(my $sub = sub {
+$tapp->onCommand(sub {
     my ($cmd, $arg) = @_;
     print "command[@_]\n";
     if ($cmd == 123) {

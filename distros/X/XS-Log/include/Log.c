@@ -1,7 +1,7 @@
 /***************************************************************************************
-* Build  MD5 : XKLsi2hUMK4JVcrq9zOpcQ
-* Build Time : 2025-09-20 19:13:51
-* Version    : 5.090122
+* Build  MD5 : 5fwVxA2qtRz4Alk3/+EnLw
+* Build Time : 2025-09-23 13:31:15
+* Version    : 5.090129
 * Author     : H.Q.Wang
 ****************************************************************************************/
 #include "Log.h"
@@ -46,14 +46,22 @@
 static struct {
     LogOptions options;
     FILE *log_file;
+	int rep_file;
     
-	char cur_path[256];
-	char cur_dir[256];
-	char cur_day[9];
-	char cur_hour[3];
+	char cur_rep_path[256];
+	char cur_rep_dir[256];
+	char cur_rep_day[9];
+	char cur_rep_hour[3];
+	char rep_dir[150];
+	char rep_name[64];
+	
+	char cur_log_path[256];
+	char cur_log_dir[256];
+	char cur_log_day[9];
+	char cur_log_hour[3];
     char log_path[256];
 	char log_name[64];
-	char log_dir[128];
+	char log_dir[150];
 	char log_ext[16];
 	
     // 控制台颜色定义
@@ -71,6 +79,7 @@ static struct {
 		.mode = LOG_MODE_CYCLE,
         .targets = LOG_TARGET_CONSOLE,
         .use_color = true,
+		.with_rep = false,
         .show_timestamp = true,
         .show_log_level = true,
         .show_file_info = false,
@@ -78,15 +87,22 @@ static struct {
         .max_files = 10,
         .flush_immediately = false
     },
-	.cur_path    = {0},
-	.cur_dir     = {0},
-	.cur_day     = {0},
-	.cur_dir     = {0},
-	.cur_hour    = {0},
+	
+	.cur_rep_path= {0},
+	.cur_rep_day = {0},
+	.cur_rep_dir = {0},
+	.cur_rep_hour= {0},
+	
+	.cur_log_path= {0},
+	.cur_log_day = {0},
+	.cur_log_dir = {0},
+	.cur_log_hour= {0},
+	
 	.log_name    = {0},
 	.log_dir     = {0},
 	.log_ext     = {0},
     .log_file    = NULL,
+	.rep_file    = -1,
     .color_trace = "\033[36m",        // 青色
     .color_info  = "\033[32m",        // 绿色
     .color_warn  = "\033[33m",        // 黄色
@@ -98,11 +114,14 @@ static struct {
 };
 
 // 内部函数声明
+static void rep_rotate_file(void);
+static bool rep_open_file(void);
+static void rep_close_file(void);
 
 static void log_rotate_file(void);
-
 static bool log_open_file(void);
 static void log_close_file(void);
+
 static void get_current_log_path();
 static bool parse_filepath(const char* filepath);
 static const char* log_level_to_string(LogLevel level);
@@ -123,9 +142,13 @@ bool openLog(const char *log_filepath,const LogOptions* config) {
         return false;
     }
     
-    bool f = log_open_file();
-	
-    return f;
+    bool l = log_open_file();
+	bool r = true;
+	if(g_config.options.with_rep)
+	{
+		r = rep_open_file();
+	}
+    return l && r;
 }
 void setLogLevel(int level)
 {
@@ -178,6 +201,7 @@ bool setLogOptions(const char *key, long val) {
 void closeLog() {
     flushLog();
     log_close_file();
+	rep_close_file();
 }
 void flushLog() {
     if (g_config.log_file != NULL) {
@@ -244,6 +268,37 @@ bool makeDir(const char* dir) {
     return true;
 }
 
+static bool rep_open_file() {
+
+	if(!(g_config.options.targets & LOG_TARGET_FILE)) return true;
+	
+    // 获取当前日志文件路径并打开
+	
+    get_current_log_path();
+
+    if (strlen(g_config.cur_rep_path) == 0) {
+		return false;
+	}
+    if (!makeDir(g_config.cur_rep_dir)) {
+        return false;
+    }
+	rep_close_file();
+	g_config.rep_file = open(g_config.cur_rep_path, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    if (g_config.rep_file < 0) {
+        printf("Failed to open rep file %s\n",g_config.cur_rep_path);
+		return false;
+    }
+	
+	return true;
+}
+
+static void rep_close_file() {
+    if (g_config.rep_file >= 0) {
+        close(g_config.rep_file);
+        g_config.rep_file = -1;
+    }
+}
+
 static bool log_open_file() {
 
 	if(!(g_config.options.targets & LOG_TARGET_FILE)) return true;
@@ -252,15 +307,16 @@ static bool log_open_file() {
 	
     get_current_log_path();
 
-    if (strlen(g_config.cur_path) == 0) {
+    if (strlen(g_config.cur_log_path) == 0) {
 		return false;
 	}
-    if (!makeDir(g_config.cur_dir)) {
+    if (!makeDir(g_config.cur_log_dir)) {
         return false;
     }
-    g_config.log_file = fopen(g_config.cur_path, "a+");
+	log_close_file();
+    g_config.log_file = fopen(g_config.cur_log_path, "a+");
     if (g_config.log_file == NULL) {
-        printf("Failed to open log file %s\n",g_config.cur_path);
+        printf("Failed to open log file %s\n",g_config.cur_log_path);
 		return false;
     }
 	
@@ -282,31 +338,61 @@ static void log_close_file() {
 static void get_current_log_path() {
     time_t now = time(NULL);
     struct tm* tm_info = localtime(&now);
-    g_config.cur_path[0] = '\0';
+    g_config.cur_log_path[0] = '\0';
+
+	if(g_config.options.with_rep)
+	{
+		g_config.cur_rep_path[0] = '\0';
+	}
 
     switch (g_config.options.mode) {
         case LOG_MODE_CYCLE:{
-            snprintf(g_config.cur_path, sizeof(g_config.cur_path), "%s/%s.%s", 
+            snprintf(g_config.cur_log_path, sizeof(g_config.cur_log_path), "%s/%s.%s", 
                     g_config.log_dir, g_config.log_name, g_config.log_ext);
-					
-			//snprintf(g_config.cur_dir, sizeof(g_config.cur_dir), "%s",g_config.log_dir);
+			
+			//snprintf(g_config.cur_log_dir, sizeof(g_config.cur_log_dir), "%s",g_config.log_dir);
 			// 等价以上，推荐用：
-			strncpy(g_config.cur_dir, g_config.log_dir, sizeof(g_config.cur_dir) - 1);
-			g_config.cur_dir[sizeof(g_config.cur_dir) - 1] = '\0'; // 确保字符串以 null 结尾
+			strncpy(g_config.cur_log_dir, g_config.log_dir, sizeof(g_config.cur_log_dir) - 1);
+			g_config.cur_log_dir[sizeof(g_config.cur_log_dir) - 1] = '\0'; // 确保字符串以 null 结尾
+			
+			
+			if(g_config.options.with_rep)
+			{
+				snprintf(g_config.cur_rep_path, sizeof(g_config.cur_rep_path), "%s/%s.rep", 
+                    g_config.rep_dir, g_config.rep_name);
+				snprintf(g_config.cur_rep_dir, sizeof(g_config.cur_rep_dir), "%s",g_config.rep_dir);
+			}
+					
 			
             break;
 		}
         case LOG_MODE_DAILY: {
             char date_str[9];
             strftime(date_str, sizeof(date_str), "%Y%m%d", tm_info);
-            snprintf(g_config.cur_path, sizeof(g_config.cur_path), "%s/%s/%s.%s", 
+            snprintf(g_config.cur_log_path, sizeof(g_config.cur_log_path), "%s/%s/%s.%s", 
                     g_config.log_dir, date_str, g_config.log_name, g_config.log_ext);
-			snprintf(g_config.cur_dir, sizeof(g_config.cur_dir), "%s/%s", 
+			
+			snprintf(g_config.cur_log_dir, sizeof(g_config.cur_log_dir), "%s/%s", 
                     g_config.log_dir, date_str);
-			//snprintf(g_config.cur_day, sizeof(g_config.cur_day), date_str);
+			//snprintf(g_config.cur_log_day, sizeof(g_config.cur_log_day), date_str);
 			// 等价以上，推荐用：
-			strncpy(g_config.cur_day, date_str, sizeof(g_config.cur_day) - 1);
-			g_config.cur_day[sizeof(g_config.cur_day) - 1] = '\0'; // 确保字符串以 null 结尾
+			strncpy(g_config.cur_log_day, date_str, sizeof(g_config.cur_log_day) - 1);
+			g_config.cur_log_day[sizeof(g_config.cur_log_day) - 1] = '\0'; // 确保字符串以 null 结尾
+			
+			if(g_config.options.with_rep)
+			{
+				snprintf(g_config.cur_rep_path, sizeof(g_config.cur_rep_path), "%s/%s/%s.rep", 
+                    g_config.rep_dir, date_str, g_config.rep_name);
+				snprintf(g_config.cur_rep_dir, sizeof(g_config.cur_rep_dir), "%s/%s", 
+                    g_config.rep_dir, date_str);
+				
+				//有warning用下面方式赋值
+				//snprintf(g_config.cur_rep_day, sizeof(g_config.cur_rep_day), date_str);
+				strncpy(g_config.cur_rep_day, date_str, sizeof(g_config.cur_rep_day) - 1);
+				g_config.cur_rep_day[sizeof(g_config.cur_rep_day) - 1] = '\0'; // 确保字符串以 null 结尾
+			
+			}
+			
             break;
         }
             
@@ -315,19 +401,39 @@ static void get_current_log_path() {
             char hour_str[3];
             strftime(date_str, sizeof(date_str), "%Y%m%d", tm_info);
             strftime(hour_str, sizeof(hour_str), "%H", tm_info);
-            snprintf(g_config.cur_path, sizeof(g_config.cur_path), "%s/%s/%s.%s.%s", 
+            snprintf(g_config.cur_log_path, sizeof(g_config.cur_log_path), "%s/%s/%s.%s.%s", 
                     g_config.log_dir, date_str, g_config.log_name, hour_str, g_config.log_ext);
-			snprintf(g_config.cur_dir, sizeof(g_config.cur_dir), "%s/%s", 
+			
+			snprintf(g_config.cur_log_dir, sizeof(g_config.cur_log_dir), "%s/%s", 
                     g_config.log_dir, date_str);
-			//snprintf(g_config.cur_day, sizeof(g_config.cur_day), date_str);
-			//snprintf(g_config.cur_hour, sizeof(g_config.cur_hour), hour_str);
+			//snprintf(g_config.cur_log_day, sizeof(g_config.cur_log_day), date_str);
+			//snprintf(g_config.cur_log_hour, sizeof(g_config.cur_log_hour), hour_str);
 			
 			// 等价以上，推荐用：
-			strncpy(g_config.cur_day, date_str, sizeof(g_config.cur_day) - 1);
-			g_config.cur_day[sizeof(g_config.cur_day) - 1] = '\0'; // 确保字符串以 null 结尾
+			strncpy(g_config.cur_log_day, date_str, sizeof(g_config.cur_log_day) - 1);
+			g_config.cur_log_day[sizeof(g_config.cur_log_day) - 1] = '\0'; // 确保字符串以 null 结尾
 			
-			strncpy(g_config.cur_hour, hour_str, sizeof(g_config.cur_hour) - 1);
-			g_config.cur_hour[sizeof(g_config.cur_hour) - 1] = '\0'; // 确保字符串以 null 结尾
+			strncpy(g_config.cur_log_hour, hour_str, sizeof(g_config.cur_log_hour) - 1);
+			g_config.cur_log_hour[sizeof(g_config.cur_log_hour) - 1] = '\0'; // 确保字符串以 null 结尾
+			
+			
+			if(g_config.options.with_rep)
+			{
+				snprintf(g_config.cur_rep_path, sizeof(g_config.cur_rep_path), "%s/%s/%s.%s.rep", 
+                    g_config.rep_dir, date_str, g_config.rep_name, hour_str);
+				snprintf(g_config.cur_rep_dir, sizeof(g_config.cur_rep_dir), "%s/%s", 
+                    g_config.rep_dir, date_str);
+					
+				//snprintf(g_config.cur_rep_day, sizeof(g_config.cur_rep_day), date_str);
+				//snprintf(g_config.cur_rep_hour, sizeof(g_config.cur_rep_hour), hour_str);
+				
+				strncpy(g_config.cur_rep_day, date_str, sizeof(g_config.cur_rep_day) - 1);
+				g_config.cur_rep_day[sizeof(g_config.cur_rep_day) - 1] = '\0'; // 确保字符串以 null 结尾
+				
+				strncpy(g_config.cur_rep_hour, hour_str, sizeof(g_config.cur_rep_hour) - 1);
+				g_config.cur_rep_hour[sizeof(g_config.cur_rep_hour) - 1] = '\0'; // 确保字符串以 null 结尾
+				
+			}
 			
 			
             break;
@@ -341,7 +447,7 @@ static bool parse_filepath(const char* filepath) {
         return false;
     }
     // 复制文件路径用于处理
-    char temp_path[256];
+    char temp_path[128];
     strncpy(temp_path, filepath, sizeof(temp_path) - 1);
     temp_path[sizeof(temp_path) - 1] = '\0';
 	
@@ -352,25 +458,62 @@ static bool parse_filepath(const char* filepath) {
     char* filename = strrchr(temp_path, '/');
     if (filename == NULL) {
         filename = temp_path;
-        strcpy(g_config.log_dir, ".");
+		if(g_config.options.with_rep)
+		{
+			strcpy(g_config.rep_dir, ".");
+			strcpy(g_config.log_dir, "./LOG");
+		}
+		else
+		{
+			strcpy(g_config.log_dir, ".");	
+		}
     } else {
         *filename = '\0';
         filename++;
-        strncpy(g_config.log_dir, temp_path, sizeof(g_config.log_dir) - 1);
-        g_config.log_dir[sizeof(g_config.log_dir) - 1] = '\0';
+		if(g_config.options.with_rep)
+		{
+			strncpy(g_config.rep_dir, temp_path, sizeof(g_config.rep_dir) - 1);
+			g_config.rep_dir[sizeof(g_config.rep_dir) - 1] = '\0';
+			snprintf(g_config.log_dir, sizeof(g_config.log_dir), "%s/LOG", 
+                    temp_path);
+		}
+		else
+		{
+			strncpy(g_config.log_dir, temp_path, sizeof(g_config.log_dir) - 1);
+			g_config.log_dir[sizeof(g_config.log_dir) - 1] = '\0';
+		}
+
     }
-    // 分离程序名和扩展名
+    // 分离程序名和扩展名: 
     char* dot = strrchr(filename, '.');
+	//带扩展名的情况
     if (dot != NULL) {
         *dot = '\0';
         strncpy(g_config.log_name, filename, sizeof(g_config.log_name) - 1);
         g_config.log_name[sizeof(g_config.log_name) - 1] = '\0';
         strncpy(g_config.log_ext, dot + 1, sizeof(g_config.log_ext) - 1);
         g_config.log_ext[sizeof(g_config.log_ext) - 1] = '\0';
-    } else {
+		//rep日志名称
+		if(g_config.options.with_rep)
+		{
+			//可能TongSMT.P02.log，需要再次分离文件名称
+			dot = strrchr(filename, '.');
+			strncpy(g_config.rep_name, filename, sizeof(g_config.rep_name) - 1);
+			g_config.rep_name[sizeof(g_config.rep_name) - 1] = '\0';
+		}
+    } 
+	//不带扩展名的情况
+	else 
+	{
         strncpy(g_config.log_name, filename, sizeof(g_config.log_name) - 1);
         g_config.log_name[sizeof(g_config.log_name) - 1] = '\0';
         strcpy(g_config.log_ext, "log"); // 默认扩展名
+		//rep日志名称
+		if(g_config.options.with_rep)
+		{
+			strncpy(g_config.rep_name, filename, sizeof(g_config.rep_name) - 1);
+			g_config.rep_name[sizeof(g_config.rep_name) - 1] = '\0';
+		}
     }
     return true;
 }
@@ -386,11 +529,40 @@ static const char* log_level_to_string(LogLevel level) {
         default:              return "UNK";
     }
 }
+// 判断是否需要备份日志日志文件
+static void rep_rotate_file() {
+    if (g_config.options.max_files <= 0) {
+        remove(g_config.cur_rep_path);
+        return;
+    }
+
+    // 删除最旧的日志文件
+    char old_name[512];
+    char new_name[512];
+    
+    snprintf(old_name, sizeof(old_name), "%s/%s.%d.rep", 
+                    g_config.cur_rep_dir, g_config.rep_name, g_config.options.max_files);
+    remove(old_name);
+
+    // 重命名其他日志文件
+    for (int i = g_config.options.max_files - 1; i >= 1; i--) {
+        snprintf(new_name, sizeof(old_name), "%s/%s.%d.rep", 
+                 g_config.cur_rep_dir, g_config.rep_name,i);
+        snprintf(old_name, sizeof(new_name), "%s/%s.%d.rep", 
+                 g_config.cur_rep_dir, g_config.rep_name,i - 1);
+        rename(old_name, new_name);
+    }
+
+    // 重命名当前日志文件
+    snprintf(new_name, sizeof(new_name), "%s/%s.%d.rep", 
+                 g_config.cur_rep_dir, g_config.rep_name,1);
+    rename(g_config.cur_rep_path, new_name);
+}
 
 // 判断是否需要备份日志日志文件
 static void log_rotate_file() {
     if (g_config.options.max_files <= 0) {
-        remove(g_config.cur_path);
+        remove(g_config.cur_log_path);
         return;
     }
 
@@ -399,22 +571,22 @@ static void log_rotate_file() {
     char new_name[512];
     
     snprintf(old_name, sizeof(old_name), "%s/%s.%d.%s", 
-                    g_config.cur_dir, g_config.log_name, g_config.options.max_files,g_config.log_ext);
+                    g_config.cur_log_dir, g_config.log_name, g_config.options.max_files,g_config.log_ext);
     remove(old_name);
 
     // 重命名其他日志文件
     for (int i = g_config.options.max_files - 1; i >= 1; i--) {
         snprintf(new_name, sizeof(old_name), "%s/%s.%d.%s", 
-                 g_config.cur_dir, g_config.log_name,i,g_config.log_ext);
+                 g_config.cur_log_dir, g_config.log_name,i,g_config.log_ext);
         snprintf(old_name, sizeof(new_name), "%s/%s.%d.%s", 
-                 g_config.cur_dir, g_config.log_name,i - 1,g_config.log_ext);
+                 g_config.cur_log_dir, g_config.log_name,i - 1,g_config.log_ext);
         rename(old_name, new_name);
     }
 
     // 重命名当前日志文件
     snprintf(new_name, sizeof(new_name), "%s/%s.%d.%s", 
-                 g_config.cur_dir, g_config.log_name,1,g_config.log_ext);
-    rename(g_config.cur_path, new_name);
+                 g_config.cur_log_dir, g_config.log_name,1,g_config.log_ext);
+    rename(g_config.cur_log_path, new_name);
 }
 
 void log_print(LogLevel level, const char *file, int line, const char *format, ...) {
@@ -513,7 +685,7 @@ void log_print(LogLevel level, const char *file, int line, const char *format, .
 			case LOG_MODE_DAILY: {
 				char date_str[9];
 				strftime(date_str, sizeof(date_str), "%Y%m%d", tm_now);
-				if (date_str != g_config.cur_day) {
+				if (date_str != g_config.cur_log_day) {
 					log_close_file();
 					log_open_file();
 				}
@@ -522,7 +694,7 @@ void log_print(LogLevel level, const char *file, int line, const char *format, .
 			case LOG_MODE_HOURLY: {
 				char hour_str[3];
 				strftime(hour_str, sizeof(hour_str), "%H", tm_now);
-				if (hour_str != g_config.cur_hour) {
+				if (hour_str != g_config.cur_log_hour) {
 					log_close_file();
 					log_open_file();
 				}
@@ -640,7 +812,7 @@ void log_write(LogLevel level, const char *file, int line, const char *message) 
 			case LOG_MODE_DAILY: {
 				char date_str[9];
 				strftime(date_str, sizeof(date_str), "%Y%m%d", tm_now);
-				if (date_str != g_config.cur_day) {
+				if (date_str != g_config.cur_log_day) {
 					log_close_file();
 					log_open_file();
 				}
@@ -649,7 +821,7 @@ void log_write(LogLevel level, const char *file, int line, const char *message) 
 			case LOG_MODE_HOURLY: {
 				char hour_str[3];
 				strftime(hour_str, sizeof(hour_str), "%H", tm_now);
-				if (hour_str != g_config.cur_hour) {
+				if (hour_str != g_config.cur_log_hour) {
 					log_close_file();
 					log_open_file();
 				}
@@ -670,3 +842,74 @@ void log_write(LogLevel level, const char *file, int line, const char *message) 
     }
 }
 
+void rep_write(const char *message) {
+	if (!g_config.options.with_rep) return;
+    size_t len = strlen(message);
+    if (len == 0) return;
+
+    // 输出到控制台
+    if (g_config.options.targets & LOG_TARGET_CONSOLE) 
+	{
+        fputs(message, stdout);
+		if (message[len - 1] != '\n') 
+		{
+			fputs("\n", stdout);
+		}
+    }
+	
+    // 输出到文件
+    if ((g_config.options.targets & LOG_TARGET_FILE) && g_config.rep_file >= 0) {
+		flock(g_config.rep_file, LOCK_EX); 
+		//write() 会直接进入内核缓冲区，不会被用户态的 stdio 缓冲影响。不需要 fflush()，因为根本没用到 FILE* 的缓冲。
+		ssize_t wlen = write(g_config.rep_file, message, len);
+		
+		if (message[len - 1] != '\n') 
+		{
+			wlen = write(g_config.rep_file,"\n", 1);
+		}
+		
+		flock(g_config.rep_file, LOCK_UN);   		// 解锁
+		switch (g_config.options.mode) {
+			case LOG_MODE_CYCLE:{
+				//long size = ftell(g_config.rep_file);
+				long size = (long)lseek(g_config.rep_file, 0, SEEK_END);
+				if (size > g_config.options.max_file_size) {
+					rep_close_file();
+					rep_rotate_file();
+					rep_open_file();
+				}
+				break;
+			}
+			case LOG_MODE_DAILY: {
+				char date_str[9];
+				
+				time_t now;
+				struct tm *tm_now;
+				time(&now);
+				tm_now = localtime(&now);
+	
+				strftime(date_str, sizeof(date_str), "%Y%m%d", tm_now);
+				if (date_str != g_config.cur_rep_day) {
+					rep_close_file();
+					rep_open_file();
+				}
+				break;
+			}
+			case LOG_MODE_HOURLY: {
+				char hour_str[3];
+				
+				time_t now;
+				struct tm *tm_now;
+				time(&now);
+				tm_now = localtime(&now);
+				
+				strftime(hour_str, sizeof(hour_str), "%H", tm_now);
+				if (hour_str != g_config.cur_rep_hour) {
+					rep_close_file();
+					rep_open_file();
+				}
+				break;
+			}
+		}     
+    }
+}

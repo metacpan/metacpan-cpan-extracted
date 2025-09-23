@@ -48,7 +48,7 @@ sub log_group_exists {
   $log_group_name //= $self->get_log_group_name;
 
   # Check if log group exists already
-  my $result = $self->describe_log_groups( $log_group_name, 'logGroups' );
+  my $result = $self->describe_log_groups( $log_group_name, sprintf 'logGroups[?logGroupName == `%s`]', $log_group_name );
 
   return
     if !$result || !@{$result};

@@ -176,6 +176,8 @@ sub dump_base {
                         }
                     } elsif ($value->isa('Data::URIID::Barcode')) {
                         $value = sprintf('Barcode <%s>', $value->data);
+                    } elsif ($value->isa('Data::URIID::Colour')) {
+                        $value = sprintf('Colour <%s>', $value->rgb);
                     } elsif ($value->isa('File::FStore::File')) {
                         $value = sprintf('Store File <%s>', $value->dbname);
                     }

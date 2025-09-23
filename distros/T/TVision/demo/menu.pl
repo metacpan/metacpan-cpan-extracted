@@ -126,7 +126,7 @@ my $menubar = tnew TMenuBar=>([0,0,179,1],$sub1);
 my $tapp = tnew TVApp => $menubar;
 
 my $desktop = $tapp->deskTop;
-$tapp->onCommand(my $sub = sub {
+$tapp->onCommand(sub {
     my ($cmd, $arg) = @_;
     print "command[@_]\n";
     if ($cmd == 123) {

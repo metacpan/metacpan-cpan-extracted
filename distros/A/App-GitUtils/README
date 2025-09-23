@@ -1,9 +1,9 @@
 NAME
-    App::GitUtils - Day-to-day command-line utilities for git
+    App::GitUtils - Some additional command-line utilities for git
 
 VERSION
-    This document describes version 0.088 of App::GitUtils (from Perl
-    distribution App-GitUtils), released on 2025-09-20.
+    This document describes version 0.089 of App::GitUtils (from Perl
+    distribution App-GitUtils), released on 2025-09-23.
 
 SYNOPSIS
     This distribution provides the following command-line utilities:
@@ -123,6 +123,41 @@ FUNCTIONS
 
     Return value: (any)
 
+  get_git_dir
+    Usage:
+
+     get_git_dir(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Get the path to the .git directory.
+
+    Basically just the "git_dir" information from "gu info". Useful in shell
+    scripts.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   dir => *dirname*
+
+        A directory inside git repo.
+
+        If not specified, will assume current directory is inside git
+        repository and will search ".git" upwards.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
   info
     Usage:
 
@@ -130,8 +165,13 @@ FUNCTIONS
 
     Return information about git repository.
 
-    Information include: - Path of the git directory - Repository name -
-    Current/active branch
+    Information include:
+
+    *   Path of the git directory
+
+    *   Repository name
+
+    *   Current/active branch
 
     Will return status 412 if working directory is not inside a git
     repository. Will return status 500 on errors, e.g. if "git" command
@@ -183,7 +223,7 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   max_size* => *datasize*
+    *   max_size => *datasize* (default: 104856576)
 
         (No description)
 

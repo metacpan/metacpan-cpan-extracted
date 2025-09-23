@@ -31,6 +31,7 @@ no_index:
 requires:
   Class::Utils: 0
   Error::Pure: 0
+  Mo::utils::Hash: 0.02
   Mo::utils::Language: 0.05
   Readonly: 0
   Scalar::Util: 0
@@ -42,4 +43,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Tags-HTML-Footer
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Tags-HTML-Footer
-version: '0.03'
+version: '0.04'

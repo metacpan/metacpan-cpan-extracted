@@ -1,0 +1,9 @@
+SiiNunit
+{
+
+tiny : foobar
+{
+	foo: "bar"
+}
+
+}

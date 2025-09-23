@@ -79,8 +79,8 @@ eval {
 		'text' => undef,
 	);
 };
-is($EVAL_ERROR, "Parameter 'text' is required.\n",
-	"Parameter 'text' is required.");
+is($EVAL_ERROR, "Parameter 'text' isn't hash reference.\n",
+	"Parameter 'text' isn't hash reference (undef).");
 clean();
 
 # Test.
@@ -89,8 +89,8 @@ eval {
 		'text' => [],
 	);
 };
-is($EVAL_ERROR, "Parameter 'text' must be a hash with language texts.\n",
-	"Parameter 'text' must be a hash with language texts.");
+is($EVAL_ERROR, "Parameter 'text' isn't hash reference.\n",
+	"Parameter 'text' isn't hash reference (reference to array).");
 clean();
 
 # Test.
@@ -99,8 +99,8 @@ eval {
 		'text' => {},
 	);
 };
-is($EVAL_ERROR, "Texts for language 'eng' doesn't exist.\n",
-	"Texts for language 'eng' doesn't exist.");
+is($EVAL_ERROR, "Parameter 'text' doesn't contain expected keys.\n",
+	"Parameter 'text' doesn't contain expected keys (blank text).");
 clean();
 
 # Test.
@@ -112,8 +112,8 @@ eval {
 		},
 	);
 };
-is($EVAL_ERROR, "Number of texts isn't same as expected.\n",
-	"Number of texts isn't same as expected (no translations for cze).");
+is($EVAL_ERROR, "Parameter 'text' doesn't contain expected keys.\n",
+	"Parameter 'text' doesn't contain expected keys (blank text->{'cze'}).");
 clean();
 
 # Test.
@@ -127,6 +127,6 @@ eval {
 		},
 	);
 };
-is($EVAL_ERROR, "Text for lang 'cze' and key 'version' doesn't exist.\n",
-	"Text for lang 'cze' and key 'version' doesn't exist (no right translations).");
+is($EVAL_ERROR, "Parameter 'text' doesn't contain expected keys.\n",
+	"Parameter 'text' doesn't contain expected keys (foo key, but no version key).");
 clean();

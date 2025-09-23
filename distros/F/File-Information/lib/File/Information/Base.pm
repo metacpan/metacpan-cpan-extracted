@@ -53,7 +53,7 @@ use constant { # Taken from Data::Identifier
     WK_TAGPOOL_POOL                 => '1f30649d-eb55-48cb-93d7-6d6fcba23909',
 };
 
-our $VERSION = v0.12;
+our $VERSION = v0.13;
 
 our %_digest_name_converter = ( # stolen from Data::URIID::Result
     fc('md5')   => 'md-5-128',
@@ -1014,7 +1014,7 @@ File::Information::Base - generic module for extracting information from filesys
 
 =head1 VERSION
 
-version v0.12
+version v0.13
 
 =head1 SYNOPSIS
 

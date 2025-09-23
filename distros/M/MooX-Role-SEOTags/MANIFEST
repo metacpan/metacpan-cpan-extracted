@@ -1,0 +1,13 @@
+lib/MooX/Role/SEOTags.pm
+Changes.md
+LICENSE
+README.md
+MANIFEST
+t/lib/Object.pm
+t/object.t
+t/edge-cases.t
+t/pod.t
+t/pod-coverage.t
+Makefile.PL
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

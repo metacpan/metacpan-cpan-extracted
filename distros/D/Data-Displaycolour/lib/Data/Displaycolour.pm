@@ -19,7 +19,7 @@ use Data::URIID::Colour;
 
 use parent qw(Data::Identifier::Interface::Userdata Data::Identifier::Interface::Subobjects Data::Identifier::Interface::Known);
 
-our $VERSION = v0.02;
+our $VERSION = v0.03;
 
 my %_abstract_names_to_ise = (
     black    => 'fade296d-c34f-4ded-abd5-d9adaf37c284',
@@ -37,7 +37,6 @@ my %_abstract_names_to_ise = (
 my %_abstract_ise_to_name = map {$_abstract_names_to_ise{$_} => $_} keys %_abstract_names_to_ise;
 my %_abstract_rgb_to_name = (
     # this is filled later using palette data, so we only do corner cases here:
-    '#00ff00' => 'green', # not yet part of any our palettes.
 );
 
 my $_default_text_ops = [qw(trim fc)];
@@ -172,6 +171,19 @@ my %_palette = (
         grey        => '#c0c0c0',
         _other      => ['#808080'],
     },
+    vic2 => {
+        black       => '#000000',
+        white       => '#FFFFFF',
+        red         => '#813338',
+        cyan        => '#75CEC8',
+        magenta     => '#8E3C97',
+        green       => '#56AC4D',
+        blue        => '#2E2C9B',
+        yellow      => '#EDF171',
+        orange      => '#8E5029',
+        gray        => '#B2B2B2',
+        _other      => ['#C46C71', '#4A4A4A', '#7B7B7B', '#A9FF9F', '#706DEB', '#553800'],
+    },
 );
 
 {
@@ -217,9 +229,15 @@ sub new {
         my $palette = delete($opts{palette}) // 'v0';
 
         if (ref($palette) eq 'ARRAY' && scalar(@{$palette}) >= 1) {
-            $self->{palette} = {
+            $palette = [map {ref ? Data::URIID::Colour->new(from => $_)->rgb : $_} @{$palette}];
+            my $p = $self->{palette} = {
                 _all => $palette,
             };
+            foreach my $colour (@{$palette}) {
+                if (defined(my $name = $_abstract_rgb_to_name{fc($colour)})) {
+                    $p->{$name} //= $colour;
+                }
+            }
         } else {
             $self->{palette} = $_palette{$palette} // croak 'Invalid palette: '.$palette;
         }
@@ -511,7 +529,7 @@ Data::Displaycolour - Work with display colours
 
 =head1 VERSION
 
-version v0.02
+version v0.03
 
 =head1 SYNOPSIS
 
@@ -578,7 +596,9 @@ Please also keep the notes in the documentation for that method in mind.
 =item C<palette>
 
 The palette to use. If this is a scalar it is the name of the palette.
-If an array reference it must be a list of C<#rrggbb> values. In this case default values are used for abstract colours.
+If an array reference it must be a list of C<#rrggbb> values.
+In this case the colours are matched to the abstract colours if possible,
+with the default values used what what cannot be matched.
 Other types of values might be supported.
 Newer versions of this module might support more palette types.
 

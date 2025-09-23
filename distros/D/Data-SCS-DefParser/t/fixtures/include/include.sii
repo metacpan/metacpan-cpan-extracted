@@ -1,0 +1,7 @@
+SiiNunit
+{
+test : foo {
+@include "attr.txt"
+}
+@include "unit.sui"
+}

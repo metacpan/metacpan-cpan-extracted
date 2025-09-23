@@ -1,3 +1,9 @@
+v0.03  2025-09-22Z
+    - Added palette: vic2
+    - Code cleanup
+    - Improved colour matching for custom palettes
+    - Improved support for (blessed) colour values in custom palettes
+
 v0.02  2025-08-18Z
     - Fixed encoding in example CGI
     - Added palette: wfw_default

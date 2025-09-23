@@ -1,5 +1,5 @@
 {
-   "abstract" : "Day-to-day command-line utilities for git",
+   "abstract" : "Some additional command-line utilities for git",
    "author" : [
       "perlancar <perlancar@cpan.org>"
    ],
@@ -69,7 +69,7 @@
    "provides" : {
       "App::GitUtils" : {
          "file" : "lib/App/GitUtils.pm",
-         "version" : "0.088"
+         "version" : "0.089"
       }
    },
    "release_status" : "stable",
@@ -84,7 +84,7 @@
          "web" : "https://github.com/perlancar/perl-App-GitUtils"
       }
    },
-   "version" : "0.088",
+   "version" : "0.089",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040002"
