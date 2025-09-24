@@ -64,11 +64,19 @@
    "provides" : {
       "Task::MemManager::View::PDL" : {
          "file" : "lib/Task/MemManager/View/PDL.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
+   "resources" : {
+      "homepage" : "https://github.com/chrisarg/Task-MemManager-View-PDL",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/chrisarg/Task-MemManager-View-PDL.git",
+         "web" : "https://github.com/chrisarg/Task-MemManager-View-PDL"
+      }
+   },
+   "version" : "0.02",
    "x_generated_by_perl" : "v5.38.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
    "x_spdx_expression" : "MIT"

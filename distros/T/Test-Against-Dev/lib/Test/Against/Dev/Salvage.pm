@@ -1,7 +1,7 @@
 package Test::Against::Dev::Salvage;
 use strict;
 use 5.14.0;
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 our @ISA = ('Test::Against::Dev');
 use Carp;
 use Cwd;
@@ -14,7 +14,7 @@ use Test::Against::Dev;
 
 =head1 NAME
 
-Test::Against::Dev::Salvage - Parse a F<cpanm> F<build.log> when C<run_cpanm()> existed prematurely.
+Test::Against::Dev::Salvage - Parse a F<cpanm> F<build.log> when C<run_cpanm()> exited prematurely.
 
 =cut
 

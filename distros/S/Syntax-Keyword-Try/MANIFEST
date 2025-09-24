@@ -1,6 +1,7 @@
 .editorconfig
 Build.PL
 Changes
+hax/cop_warnings.c.inc
 hax/newOP_CUSTOM.c.inc
 hax/op_sibling_splice.c.inc
 hax/optree-additions.c.inc

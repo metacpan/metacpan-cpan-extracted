@@ -30,14 +30,16 @@ this terra is incognita. Please let me know on your findongs with issue report.
 
 # TODO
 
+* tests are failing because stdout/stderr is captured by c++ library (although executing test is useful to see whether binding actually works)
 * TButton/TMenu -oncommand => sub {...}
-* TEvent
-* TEditor window - how to initialise it properly - with indicator and scrollbars
 * tie variable to control's setData/getData, so to allow -textvariable => \my $var
+* geometry managers from tcl/tk
+* TEvent
 * TStatusDef TStatusItem TStatusLine
 * better typemaps for the unit and other similar types
+* use XS::typemap?
 * move to magic concept described at https://blogs.perl.org/users/nerdvana/2025/01/premium-xs-integration-pt-1.html and https://blogs.perl.org/users/nerdvana/2025/02/premium-xs-integration-pt-2.html
 * improve setData/getData
 * full editor based on other git repo https://github.com/magiblot/turbo.git - a separate module
-* debugger, based on it - also as a separate module
-
+* move debugger tvdb.pm into its own distribution
+* problems on cygwin

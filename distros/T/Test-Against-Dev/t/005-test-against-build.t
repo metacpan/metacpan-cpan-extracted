@@ -238,7 +238,7 @@ SKIP: {
         {
             local $@;
             my $list = [
-                map { File::Spec->catfile($cwd, 't', 'data', $_) }
+                map { File::Spec->catfile($cwd, 't', 'data', 'M', 'ME', 'METATEST', $_) }
                 ( qw| Phony-PASS-0.01.tar.gz Phony-FAIL-0.01.tar.gz  | )
             ];
             eval {
@@ -254,7 +254,7 @@ SKIP: {
         {
             local $@;
             my $list = [
-                map { File::Spec->catfile($cwd, 't', 'data', $_) }
+                map { File::Spec->catfile($cwd, 't', 'data', 'M', 'ME', 'METATEST', $_) }
                 ( qw| Phony-PASS-0.01.tar.gz Phony-FAIL-0.01.tar.gz  | )
             ];
             eval {
@@ -272,7 +272,7 @@ SKIP: {
         note("run_cpanm(): Testing via 'module_list'");
         local $@;
         my $list = [
-            map { File::Spec->catfile($cwd, 't', 'data', $_) }
+            map { File::Spec->catfile($cwd, 't', 'data', 'M', 'ME', 'METATEST', $_) }
             ( qw| Phony-PASS-0.01.tar.gz Phony-FAIL-0.01.tar.gz  | )
         ];
 
@@ -308,7 +308,7 @@ SKIP: {
         note("run_cpanm(): Testing via 'module_file'");
         local $@;
         my $list = [
-            map { File::Spec->catfile($cwd, 't', 'data', $_) }
+            map { File::Spec->catfile($cwd, 't', 'data', 'M', 'ME', 'METATEST', $_) }
             ( qw| Phony-PASS-0.01.tar.gz Phony-FAIL-0.01.tar.gz  | )
         ];
         my ($IN, $file) = tempfile('005_files_for_cpanm_XXXXX', UNLINK => 1);

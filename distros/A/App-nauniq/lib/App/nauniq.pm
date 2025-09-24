@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-12-27'; # DATE
+our $DATE = '2025-09-24'; # DATE
 our $DIST = 'App-nauniq'; # DIST
-our $VERSION = '0.111'; # VERSION
+our $VERSION = '0.112'; # VERSION
 
 sub run {
     my %opts = @_;
@@ -108,7 +108,7 @@ App::nauniq - Non-adjacent uniq
 
 =head1 VERSION
 
-This document describes version 0.111 of App::nauniq (from Perl distribution App-nauniq), released on 2023-12-27.
+This document describes version 0.112 of App::nauniq (from Perl distribution App-nauniq), released on 2025-09-24.
 
 =head1 SYNOPSIS
 
@@ -154,7 +154,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2022, 2017, 2015, 2014 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

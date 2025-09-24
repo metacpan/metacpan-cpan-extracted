@@ -19,7 +19,7 @@ name: App-GitUtils
 provides:
   App::GitUtils:
     file: lib/App/GitUtils.pm
-    version: '0.089'
+    version: '0.091'
 requires:
   App::BinPackUtils: '0'
   Cwd: '0'
@@ -47,7 +47,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-GitUtils
   homepage: https://metacpan.org/release/App-GitUtils
   repository: git://github.com/perlancar/perl-App-GitUtils.git
-version: '0.089'
+version: '0.091'
 x_Dist_Zilla:
   perl:
     version: '5.040002'

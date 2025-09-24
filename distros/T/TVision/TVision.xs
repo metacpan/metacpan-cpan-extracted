@@ -57,14 +57,10 @@ TVApp::TVApp() :
 
 void TVApp::idle() {
     TProgram::idle();
-        //eval_pv("$::r++\n", TRUE);
-        //eval_pv("TVision::fefe()", TRUE);
-	//call_pv("TVision::fefe",0);
     if (cv_on_idle) {
 	dSP;
 	PUSHMARK(SP);
 	PUTBACK;
-	//call_pv("TVision::fefe", G_DISCARD|G_NOARGS);
 	call_sv((SV*)cv_on_idle, G_DISCARD);
     }
 }

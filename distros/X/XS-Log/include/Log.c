@@ -1,7 +1,7 @@
 /***************************************************************************************
-* Build  MD5 : 5fwVxA2qtRz4Alk3/+EnLw
-* Build Time : 2025-09-23 13:31:15
-* Version    : 5.090129
+* Build  MD5 : ZQaDDvbzQqSO2kEnjXFD1g
+* Build Time : 2025-09-24 09:44:42
+* Version    : 5.090130
 * Author     : H.Q.Wang
 ****************************************************************************************/
 #include "Log.h"
@@ -283,7 +283,8 @@ static bool rep_open_file() {
         return false;
     }
 	rep_close_file();
-	g_config.rep_file = open(g_config.cur_rep_path, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	//O_APPEND 存在追加 O_TRUNC 存在覆盖
+	g_config.rep_file = open(g_config.cur_rep_path, O_WRONLY | O_CREAT | O_APPEND, 0644);
     if (g_config.rep_file < 0) {
         printf("Failed to open rep file %s\n",g_config.cur_rep_path);
 		return false;

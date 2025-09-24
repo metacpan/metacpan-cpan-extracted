@@ -14,7 +14,7 @@ CVS/.*
 \.shar$
 \.tar$
 \.tgz$
-\.tar\.gz$
+#\.tar\.gz$
 \.zip$
 \.DS_Store$
 _uu$

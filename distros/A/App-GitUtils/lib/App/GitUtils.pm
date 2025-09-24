@@ -10,9 +10,9 @@ use File::chdir;
 use IPC::System::Options 'system', -log=>1, -die=>1;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-09-23'; # DATE
+our $DATE = '2025-09-24'; # DATE
 our $DIST = 'App-GitUtils'; # DIST
-our $VERSION = '0.089'; # VERSION
+our $VERSION = '0.091'; # VERSION
 
 our %SPEC;
 
@@ -43,6 +43,17 @@ our %argspec_target_dir = (
 If not specified, defaults to `$repodir.bare/`.
 
 MARKDOWN
+    },
+);
+
+our %argspecopt_include_untracked = (
+    include_untracked => {
+        schema => 'bool*',
+        default => 1,
+        cmdline_aliases => {
+            u => {code=>sub { $_[0]{include_untracked} = 1 }, is_flag=>1, summary=>'Include untracked files (the default)'},
+            U => {code=>sub { $_[0]{include_untracked} = 0 }, is_flag=>1, summary=>'Do not include untracked files'},
+        },
     },
 );
 
@@ -328,17 +339,29 @@ Currently incomplete!
 
 MARKDOWN
     args => {
+        untracked => {
+            summary => "Untracked files option, will be passed as `-u` option to `git status`",
+            schema => ['str*' => {in => ['no', 'normal', 'all']}],
+            default => 'normal',
+            cmdline_aliases => {u=>{}},
+            description => <<'MARKDOWN',
+
+This will be passed to `git status` in the `-u` option.
+
+MARKDOWN
+        },
     },
 };
 sub status {
     require IPC::System::Options;
 
     my %args = @_;
+    my $untracked = $args{untracked} // 'normal';
 
     my $stdout;
     IPC::System::Options::system(
         {log=>1, die=>1, capture_stdout => \$stdout},
-        "git", "status",
+        "git", "status", "-u$untracked",
     );
 
     my $res = [200, "OK", {}];
@@ -464,24 +487,36 @@ MARKDOWN
             pos => 0,
             cmdline_aliases => {s=>{}},
         },
+        %argspecopt_include_untracked,
+        detail => {
+            schema => 'bool*',
+            cmdline_aliases => {l=>{}},
+        },
     },
 };
 sub list_committing_large_files {
     my %args = @_;
     my $max_size = $args{max_size} or return [400, "Please specify max_size"];
+    my $include_untracked = $args{include_untracked} // 1;
+    my $detail = $args{detail};
 
-    my $res = status();
+    my $res = status(untracked => 'all');
     return $res unless $res->[0] == 200;
 
     my @files;
-    for my $file (
-        @{ $res->[2]{staged}{new_files} },
-        @{ $res->[2]{staged}{modified} },
-        @{ $res->[2]{unstaged}{new_files} },
-        @{ $res->[2]{unstaged}{modified} },
-    ) {
-        my $size = -s $file;
-        push @files, $file if $size > $max_size;
+    my %section_files = (
+        staged_new_files   => $res->[2]{staged}{new_files},
+        staged_modified    => $res->[2]{staged}{modified},
+        unstaged_new_files => $res->[2]{unstaged}{new_files},
+        unstaged_modified  => $res->[2]{unstaged}{modified},
+        ( $include_untracked ? (untracked => $res->[2]{untracked}) : () ),
+    );
+    for my $section (sort keys %section_files) {
+        for my $file (@{ $section_files{$section} }) {
+            my $size = -s $file;
+            next unless $size > $max_size;
+            push @files, $detail ? {section=>$section, file=>$file, size=>$size} : $file;
+        }
     }
     [200, "OK", \@files];
 }
@@ -509,10 +544,7 @@ $SPEC{calc_untracked_total_size} = {
     description => <<'MARKDOWN',
 
 This routine basically just grabs the list of untracked files returned by
-`status()` (`gu status`) then checks their disk usage and totals them. CAVEAT:
-currently, if an untracked file is a directory, then this routine will just
-count the disk usage of the content of the directory recursively /without/
-considering ignored files. Correcting this is in the todo list.
+`status()` (`gu status`) then checks their disk usage and totals them.
 
 MARKDOWN
     args => {
@@ -525,7 +557,7 @@ MARKDOWN
 sub calc_untracked_total_size {
     my %args = @_;
 
-    my $res = status();
+    my $res = status(untracked => 'all');
     return $res unless $res->[0] == 200;
 
     my $totsize = 0;
@@ -533,6 +565,7 @@ sub calc_untracked_total_size {
     for my $file (@{ $res->[2]{untracked} }) {
         my $size;
         if ($file =~ m!/\z!) {
+            # with "git status -uall" should not happen
             $size += _calc_totsize_recurse($file);
         } else {
             $size += -s $file;
@@ -557,17 +590,14 @@ Some applications: Github limits commit total size to 2GB.
 
 MARKDOWN
     args => {
-        include_untracked => {
-            schema => 'bool*',
-            default => 1,
-        },
+        %argspecopt_include_untracked
     },
 };
 sub calc_committing_total_size {
     my %args = @_;
     my $include_untracked = $args{include_untracked} // 1;
 
-    my $res = status();
+    my $res = status(untracked => 'all');
     return $res unless $res->[0] == 200;
 
     # TODO: calculate deleted
@@ -578,19 +608,11 @@ sub calc_committing_total_size {
         @{ $res->[2]{staged}{modified} },
         @{ $res->[2]{unstaged}{new_files} },
         @{ $res->[2]{unstaged}{modified} },
+        @{ $res->[2]{unstaged}{modified} },
+        ( $include_untracked ? @{ $res->[2]{untracked} } : ()),
     ) {
         my $size = -s $file;
         $totsize += $size;
-    }
-
-    if ($include_untracked) {
-        for my $file (@{ $res->[2]{untracked} }) {
-            if ($file =~ m!/\z!) {
-                $totsize += _calc_totsize_recurse($file);
-            } else {
-                $totsize += -s $file;
-            }
-        }
     }
 
     [200, "OK", $totsize];
@@ -690,7 +712,7 @@ App::GitUtils - Some additional command-line utilities for git
 
 =head1 VERSION
 
-This document describes version 0.089 of App::GitUtils (from Perl distribution App-GitUtils), released on 2025-09-23.
+This document describes version 0.091 of App::GitUtils (from Perl distribution App-GitUtils), released on 2025-09-24.
 
 =head1 SYNOPSIS
 
@@ -757,10 +779,7 @@ Usage:
 Check the disk usage of untracked files.
 
 This routine basically just grabs the list of untracked files returned by
-C<status()> (C<gu status>) then checks their disk usage and totals them. CAVEAT:
-currently, if an untracked file is a directory, then this routine will just
-count the disk usage of the content of the directory recursively /without/
-considering ignored files. Correcting this is in the todo list.
+C<status()> (C<gu status>) then checks their disk usage and totals them.
 
 This function is not exported.
 
@@ -945,6 +964,14 @@ This function is not exported.
 Arguments ('*' denotes required arguments):
 
 =over 4
+
+=item * B<detail> => I<bool>
+
+(No description)
+
+=item * B<include_untracked> => I<bool> (default: 1)
+
+(No description)
 
 =item * B<max_size> => I<datasize> (default: 104856576)
 
@@ -1187,7 +1214,7 @@ Return value:  (any)
 
 Usage:
 
- status() -> [$status_code, $reason, $payload, \%result_meta]
+ status(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Run `git status` and return information as a data structure.
 
@@ -1195,7 +1222,18 @@ Currently incomplete!
 
 This function is not exported.
 
-No arguments.
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<untracked> => I<str> (default: "normal")
+
+Untracked files option, will be passed as `-u` option to `git status`.
+
+This will be passed to C<git status> in the C<-u> option.
+
+
+=back
 
 Returns an enveloped result (an array).
 

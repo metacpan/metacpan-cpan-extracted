@@ -22,3 +22,7 @@ on 'configure' => sub {
   requires "ExtUtils::MakeMaker::CPANfile" => "0.08";
   requires "Path::Tiny" => "0.062";
 };
+
+on 'develop' => sub {
+  suggests "Data::Hexdumper" => "3.00";
+};

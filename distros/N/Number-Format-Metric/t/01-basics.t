@@ -2,10 +2,11 @@
 
 use 5.010;
 use strict;
+use utf8;
 use warnings;
+use Test::More 0.98;
 
 use Number::Format::Metric qw(format_metric);
-use Test::More 0.98;
 
 BEGIN {
     use POSIX qw();
@@ -21,6 +22,16 @@ subtest format_metric => sub {
     is(format_metric(1.23e3  , {base=>10, i_mark=>0}), "1.2k"  , "i_mark=0");
     is(format_metric(1.23e-1 , {base=>10}           ), "123.0m", "number smaller than 1 1");
     is(format_metric(-1.23e-2, {base=>10}           ), "-12.3m", "number smaller than 1 1");
+
+    # uppercase_k option
+    is(format_metric(1.23e3  , {base=>10, uppercase_k=>1}), "1.2Ki");
+
+    # latin_only option
+    is(format_metric(1.23e-6 , {base=>10}               ), "1.2μ");
+    is(format_metric(1.23e-6 , {base=>10, latin_only=>1}), "1.2mc");
+
+    # additional_prefix option
+    is(format_metric(1.23e-6 , {base=>10, latin_only=>1, additional_prefix=>"g"}), "1.2mcg");
 };
 
 DONE_TESTING:

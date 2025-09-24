@@ -1,5 +1,11 @@
 Revision history for perl distribution Archive-SCS
 
+1.08 - 2025-09-24
+
+  - Silence "unknown kind" warnings for game version 1.55
+
+  - Fix documentation for handles_path() -> handles_file() rename
+
 1.07 - 2025-04-22
 
   - Add ZIP file format handler
@@ -42,7 +48,7 @@ Revision history for perl distribution Archive-SCS
   - Fix CLI tool: Output files in the same order they were requested in
 
   - Release fix: Some tests were still broken in 1.02
-  
+
   - Allow non-GNU C++ compilers
 
 1.02 - 2024-05-31

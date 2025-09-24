@@ -69,7 +69,7 @@
    "provides" : {
       "App::GitUtils" : {
          "file" : "lib/App/GitUtils.pm",
-         "version" : "0.089"
+         "version" : "0.091"
       }
    },
    "release_status" : "stable",
@@ -84,7 +84,7 @@
          "web" : "https://github.com/perlancar/perl-App-GitUtils"
       }
    },
-   "version" : "0.089",
+   "version" : "0.091",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040002"

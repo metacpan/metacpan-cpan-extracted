@@ -29,6 +29,7 @@ typedef I32 array_ix_t;
 #include "optree-additions.c.inc"
 #include "op_sibling_splice.c.inc"
 #include "newOP_CUSTOM.c.inc"
+#include "cop_warnings.c.inc"
 
 static OP *pp_entertrycatch(pTHX);
 static OP *pp_catch(pTHX);
@@ -179,38 +180,8 @@ static OP *MY_newLOCALISEOP(pTHX_ GV *gv)
 static OP *MY_newSTATEOP_nowarnings(pTHX)
 {
   OP *op = newSTATEOP(0, NULL, NULL);
-#if HAVE_PERL_VERSION(5,37,6)
-  /* cop_warnings no longer has the weird STRLEN prefix on it
-   *   https://github.com/Perl/perl5/pull/20469
-   */
-  char *warnings = ((COP *)op)->cop_warnings;
-#  define WARNING_BITS  warnings
-#else
-  STRLEN *warnings = ((COP *)op)->cop_warnings;
-#  define WARNING_BITS  (char *)(warnings + 1)
-#endif
-  char *warning_bits;
-
-  if(warnings == pWARN_NONE)
-    return op;
-
-  if(warnings == pWARN_STD)
-    /* TODO: understand what STD vs ALL means */
-    warning_bits = WARN_ALLstring;
-  else if(warnings == pWARN_ALL)
-    warning_bits = WARN_ALLstring;
-  else
-    warning_bits = WARNING_BITS;
-
-  warnings = Perl_new_warnings_bitfield(aTHX_ warnings, warning_bits, WARNsize);
-  ((COP *)op)->cop_warnings = warnings;
-
-  warning_bits = WARNING_BITS;
-  warning_bits[(2*WARN_EXITING) / 8] &= ~(1 << (2*WARN_EXITING % 8));
-
+  cop_disable_warning((COP *)op, WARN_EXITING);
   return op;
-
-#undef WARNING_BITS
 }
 
 static void rethread_op(OP *op, OP *old, OP *new)

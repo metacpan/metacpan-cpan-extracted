@@ -1,7 +1,7 @@
 package TVision;
-our $VERSION="0.26";
+our $VERSION="0.28";
 
-use strict; # Sure. Good practice.
+use strict;
 
 =encoding utf-8
 =head1 NAME
@@ -29,8 +29,7 @@ github.com/magiblot/tvision.
 
 TVision namespace contains subpakages of 2 types:
 * turbovision widgets (or 'controls') such as TButton, etc.
-* and also some helper packages, these are:
-..........
+* and also some helper packages.
 
 All the TVision::xxxx widgets are array refs, where first item at index 0
 holds address of the underlying C++ object, 2nd ($obj->[1]) generated widget name,
@@ -45,149 +44,251 @@ TRect is array ref of 4 integers, which isn't always blessed to TVision::TRect.
 TPoint is array ref of 2 integers, which isn't always blessed to TVision::TPoint.
 TKey is array ref of 2 integers or just integer.
 
-=head1 Following classes and members are mapped 1-1:
+=head1 Following classes and members are mapped to the underlying c++ TurboVision library:
 
-    class TApplication : public virtual TSubsystemsInit, public TProgram
-    class TProgInit
-    class TProgram : public TGroup, public virtual TProgInit
-    class TBackground : public TView ...
-    class TButton : public TView
-    [x]    TButton( const TRect& bounds, TStringView aTitle, ushort aCommand, ushort aFlags) noexcept;
-    class TCheckBoxes : public TCluster
-    class TCollection : public virtual TNSCollection, public TStreamable
-    class TNSCollection : public TObject
-    class TColorGroup
-    class TColorGroupList : public TListViewer
-    class TColorItem
-    class TColorIndex
-    class TColorItemList : public TListViewer
-    class TColorSelector : public TView
-    class TDeskTop : public TGroup, public virtual TDeskInit
-    class TEditWindow : public TWindow
-    class TEditor : public TView
-    class TMemo : public TEditor
-    class TFileEditor : public TEditor
-    class TInputLine : public TView
-    class TFrame : public TView
-    class TGroup : public TView
-    [x]    void redraw() noexcept;
-    class THistory : public TView
-    class THistoryViewer : public TListViewer
-    class TIndicator : public TView
-    class TKey
-    class TLabel : public TStaticText
-    [x]   TLabel( const TRect& bounds, TStringView aText, TView *aLink ) noexcept;
-    class TListBox : public TListViewer
-    class TListViewer : public TView
-    class TMenu
-    class TMenuBar : public TMenuView
-    class TMenuBox : public TMenuView
-    class TMenuItem
-    [x]    TMenuItem( TStringView aName, ushort aCommand, TKey aKey, ushort aHelpCtx = hcNoContext, TStringView p = 0, TMenuItem *aNext = 0) noexcept;
-    [x]    TMenuItem( TStringView aName, TKey aKey, TMenu *aSubMenu, ushort aHelpCtx = hcNoContext, TMenuItem *aNext = 0) noexcept;
-    [x]    void append( TMenuItem *aNext ) noexcept;
-    [x]    TMenuItem *next;
-    [x]    ushort command;
-    [x]    Boolean disabled;
-    [x]    TKey keyCode;
-    [x]    ushort helpCtx;
-    class TMenuPopup : public TMenuBox
-    class TMenuView : public Tiew
-    class TSubMenu : public TMenuItem
-    class TRadioButtons : public TCluster
-    class TRect  TPoint a, b; ;
-    class TPoint  int x,y; ;
-    class TKey
-    class TSItem
-    class TScrollBar : public TView
-    [x]    TScrollBar( const TRect& bounds ) noexcept;
-    [x]    void setParams( int aValue, int aMin, int aMax, int aPgStep, int aArStep ) noexcept;
-    [x]    void setRange( int aMin, int aMax ) noexcept;
-    [x]    void setStep( int aPgStep, int aArStep ) noexcept;
-    [x]    void setValue( int aValue ) noexcept;
-    [x]    void drawPos( int pos ) noexcept;
-    [x]    int getPos() noexcept;
-    [x]    int getSize() noexcept;
-    [x]    int value;
-    [x]    int minVal;
-    [x]    int maxVal;
-    [x]    int pgStep;
-    [x]    int arStep;
-    class TScroller : public TView
-    [x]    TScroller( const TRect& bounds, TScrollBar *aHScrollBar, TScrollBar *aVScrollBar) noexcept;
-    [x]    void scrollTo( int x, int y ) noexcept;
-    [x]    void setLimit( int x, int y ) noexcept;
-    [x]    void checkDraw() noexcept;
-    [x]    TPoint delta;
-    class TStaticText : public TView
-    [x]    TStaticText( const TRect& bounds, TStringView aText ) noexcept;
-    class TStatusItem
-    class TStringView
-    class TView : public TObject, public TStreamable
-    [x]    TView( const TRect& bounds ) noexcept;
-    [x]    TRect getBounds() const noexcept;
-    [x]    TRect getExtent() const noexcept;
-    [x]    TRect getClipRect() const noexcept;
-    [x]    Boolean mouseInView( TPoint mouse ) noexcept;
-    [x]    void locate( TRect& bounds );
-    [x]    void growTo( short x, short y );
-    [x]    void moveTo( short x, short y );
-    [x]    void hide();
-    [x]    void show();
-    [x]    void drawView() noexcept;
-    [x]    Boolean exposed() noexcept;
-    [x]    Boolean focus();
-    [x]    void hideCursor();
-    [x]    void drawHide( TView *lastView );
-    [x]    void drawShow( TView *lastView );
-    [x]    void drawUnderRect( TRect& r, TView *lastView );
-    [x]    void drawUnderView( Boolean doShadow, TView *lastView );
-    [x]    void blockCursor();
-    [x]    void normalCursor();
-    [x]    virtual void resetCursor();
-    [x]    void setCursor( int x, int y ) noexcept;
-    [x]    void showCursor();
-    [x]    void drawCursor() noexcept;
-    [x]    static Boolean commandEnabled( ushort command ) noexcept;
-    [x]    static void disableCommand( ushort command ) noexcept;
-    [x]    static void enableCommand( ushort command ) noexcept;
-    [x]    virtual void endModal( ushort command );
-    [x]    virtual ushort execute();
-    [x]    Boolean getState( ushort aState ) const noexcept;
-    [x]    void select();
-    [x]    TPoint makeGlobal( TPoint source ) noexcept;
-    [x]    TPoint makeLocal( TPoint source ) noexcept;
-    [x]    TView *nextView() noexcept;
-    [x]    TView *prevView() noexcept;
-    [x]    TView *prev() noexcept;
-    [x]    TView *next;
-    [x]    void makeFirst();
-    [x]    void putInFrontOf( TView *Target );
-    [x]    TView *TopView() noexcept;
-    [x]    TPoint size;
-    [x]    ushort options;
-    [x]    ushort eventMask;
-    [x]    ushort state;
-    [x]    TPoint origin;
-    [x]    TPoint cursor;
-    [x]    uchar growMode;
-    [x]    uchar dragMode;
-    [x]    ushort helpCtx;
-    [x]    static Boolean _NEAR commandSetChanged;
-    [x]    TGroup *owner;
-    [x]    static Boolean _NEAR showMarkers;
-    [x]    static uchar _NEAR errorAttr;
-    class TWindow: public TGroup, public virtual TWindowInit
-    [x]    TWindow( const TRect& bounds, TStringView aTitle, short aNumber) noexcept;
-    [x]    static TFrame *initFrame( TRect );
-    [x]    TScrollBar *standardScrollBar( ushort aOptions ) noexcept;
-    [x]    virtual void zoom();
-    [x]    virtual void shutDown();
-    [x]    uchar flags;
-    [x]    TRect zoomRect;
-    [x]    short number;
-    [x]    short palette;
-    [x]    TFrame *frame;
+=head2 Mapping of following constructors are implemented:
+
+    TBackground(TRect r, char aPattern)
+    TDeskTop(TRect r)
+    TScroller(TRect r, TScrollBar *aHScrollBar, TScrollBar *aVScrollBar)
+    TLabel(TRect r, TStringView aText, TView *aLink )
+    TButton(TRect r, char *title, int cmd, int flags)
+    TScrollBar(TRect r)
+    TIndicator(TRect r)
+    TInputLine(TRect r, int limit)
+    TMenuBar(TRect r, TSubMenu* &aMenu)
+    TMenuBar1(TRect r, TMenu *aMenu)
+    TMenu()
+    TMenu1( TMenuItem*& itemList )
+    TMenu2( TMenuItem*& itemList, TMenuItem*& TheDefault)
+    TMenuItem(TStringView aName, int aCommand, TKey aKey, int aHelpCtx=hcNoContext, TStringView p=0, TMenuItem *aNext=0)
+    TMenuItem1(TStringView aName, TKey aKey, TMenu *aSubMenu, int aHelpCtx=hcNoContext, TMenuItem *aNext=0)
+    TSubMenu( TStringView nm, TKey key, int helpCtx = hcNoContext )
+    TEditor(TRect r, TScrollBar *sb1=0, TScrollBar *sb2=0, TIndicator *ind=0, int n=1000)
+    TEditWindow(TRect r, char *title, int num)
+    TWindow(TRect r, char *title, int num)
+    TView(TRect r)
+    TDialog(TRect r, char *title)
+    TStaticText(TRect r, char *title)
+    THistory( TRect bounds, TInputLine *aLink, int aHistoryId )
+    TSItem( TStringView aValue, TSItem *aNext )
+
+=head2 Mapping of following methods are implemented:
+
+    TApplication:
+	void cascade()
+	void dosShell()
+	void tile()
+	void shutDown()
+    TProgram:
+	void run()
+	void idle()
+	void setScreenMode(int mode)
+	TView *validView(TView *p)
+    TView:
+	void locate(TRect r)
+	TRect getBounds()
+	TRect getExtent()
+	TRect getClipRect()
+	int mouseInView( TPoint mouse )
+	void growTo( short x, short y )
+	void moveTo( short x, short y )
+	void setBounds(TRect r)
+	void hide()
+	void show()
+	void drawView()
+	int exposed()
+	int focus()
+	void hideCursor()
+	void drawHide( TView *lastView )
+	void drawShow( TView *lastView )
+	void drawUnderRect(TRect r, TView *lastView ) self->drawUnderRect( r, lastView);
+	void drawUnderView( int doShadow, TView *lastView )
+	void blockCursor()
+	void normalCursor()
+	void setCursor( int x, int y )
+	void showCursor()
+	void drawCursor()
+	int eventAvail()
+	int commandEnabled( int command )
+	void disableCommand( int command )
+	void enableCommand( int command )
+	int getState( int aState )
+	void select()
+	TPoint makeGlobal( TPoint source )
+	TPoint makeLocal( TPoint source )
+	TView *nextView()
+	TView *prevView()
+	TView *prev()
+	void makeFirst()
+	void putInFrontOf( TView *Target )
+	TView *TopView()
+	int getHelpCtx()
+	int valid( int command )
+	void draw()
+	int dataSize()
+	void getData( void *rec )
+	void setData( void *rec )
+	void awaken()
+	void resetCursor()
+	void endModal( int command )
+	int execute()
+	void setState( int aState, int enable )
+    TScrollBar:
+	void setParams( int aValue, int aMin, int aMax, int aPgStep, int aArStep )
+	void setRange( int aMin, int aMax )
+	void setStep( int aPgStep, int aArStep )
+	void setValue( int aValue )
+	void drawPos( int pos )
+	int getPos()
+	int getSize()
+    TScroller:
+        void scrollTo( int x, int y )
+        void setLimit( int x, int y )
+        void checkDraw()
+    TWindow:
+        TFrame *initFrame( TRect r)
+	TScrollBar *standardScrollBar( int aOptions )
+	void zoom()
+	void shutDown()
+    TEditor:
+	char bufChar( int a)
+	int bufPtr( int a)
+	int cursorVisible()
+	void deleteSelect()
+	int insertMultilineText( char *a, int b)
+	int insertBuffer( char *c, int uint1, int uint2, int Boolean1, int Boolean2 )
+	int insertEOL( int Boolean )
+	int insertText( char *cv, int uint, int Boolean )
+	void scrollTo( int x, int y)
+	int search(char *c, int ushort )
+	void setCmdState( int ushort, int Boolean )
+	void setSelect( int a, int b, int Boolean)
+	void trackCursor( int Boolean )
+	void undo()
+	int charPos( int uint1, int uint2 )
+	int charPtr( int uint1, int a)
+	int clipCopy()
+	void clipCut()
+	void clipPaste()
+	void deleteRange( int uint1, int uint2, int Boolean )
+	void doUpdate()
+	void doSearchReplace()
+	void drawLines( int a, int b, int uint )
+	void find()
+	unsigned_int getMousePtr( TPoint p)
+	int hasSelection()
+	void hideSelect()
+	int isClipboard()
+	int lineEnd( int uint )
+	int lineMove( int uint, int i)
+	int lineStart( int uint )
+	int indentedLineStart( int uint )
+	void lock()
+	void newLine()
+	int nextChar( int uint )
+	int nextLine( int uint )
+	int nextWord( int uint )
+	int prevChar( int uint )
+	int prevLine( int uint )
+	int prevWord( int uint )
+	void replace()
+	void setBufLen( int uint )
+	void setCurPtr( int uint, int uchar )
+	void startSelect()
+	void toggleEncoding()
+	void toggleInsMode()
+	void unlock()
+	void update( int uchar )
+	void detectEol()
+    TMenuItem:
+        void append(TMenuItem *aNext)
+    TGroup:
+        void xinsert(TWindow *what) self->insert(what);
+	void insertView(TView *p, TView *Target)
+        void remove( TView *p )
+        void removeView( TView *p )
+        void resetCurrent()
+        void selectNext( int forwards )
+        void redraw()
+    TInputLine:
+        void setData(char *data)
+    TButton:
+        void setTitle(char *title) delete self->title; self->title = new char[strlen(title)+1]; strcpy((char*)self->title,title); self->draw();
+
+=head2 Mapping of following public class members are implemented:
+
+    TEditor:
+	TScrollBar *hScrollBar
+	TScrollBar *vScrollBar
+	TIndicator *indicator
+	char *buffer
+	int bufSize
+	int bufLen
+	int gapLen
+	int selStart
+	int selEnd
+	int curPtr
+	TPoint curPos
+	TPoint delta
+	TPoint limit
+	int drawLine
+	int drawPtr
+	int delCount
+	int insCount
+	int isValid
+	int canUndo
+	int modified
+	int selecting
+	int overwrite
+	int autoIndent
+	int lockCount
+	int updateFlags
+	int keyState
+    TEditWindow:
+	TFileEditor *editor
+    TWindow:
+	int flags
+	TRect zoomRect
+	int number
+	int palette
+	TFrame *frame
+    TView:
+	TView *next
+        TPoint size
+        int options
+        int eventMask
+        int state
+        TPoint origin
+        TPoint cursor
+        int growMode
+        int dragMode
+        int helpCtx
+        int commandSetChanged
+        TGroup *owner
+        int showMarkers
+        int errorAttr
+    TScrollBar:
+        int value
+        int minVal
+        int maxVal
+        int pgStep
+        int arStep
+    TScroller:
+        TPoint delta
+    TProgram:
+	TProgram *application
+	TStatusLine *statusLine
+	TMenuBar *menuBar
+	TDeskTop *deskTop
+	int appPalette
+	int eventTimeoutMs
+    TMenuItem:
+	TMenuItem *next
+	int command
+	int disabled
+	TKey keyCode
+	int helpCtx
 
 Getters and setters are named get_xxxx and set_xxxx respectively.
 
@@ -201,9 +302,28 @@ Most TVision functions are mapped into perl.
     $str = TVision::inputBoxRect([$x0,$y0,$x1,$y1],$title, $label, $default="", $imit=1000);
     TVision::spin_loop();
 
-=head1 TVision::TApplication::onCommand function
+=head1 TVision::TApplication::onCommand($coderef) function
 
-WIP
+Registers callback for a function to be invoked in TApplication event loop. This function
+takes 2 integers as its arguments - command ID and any user data.  Example:
+
+    $tvapp->onCommand(sub {
+        my ($cmd, $arg) = @_;
+        if ($cmd == 123) { # e.g. - button pressed
+            # do something on button press
+        }
+        elsif ($cmd == 125) {
+            ...
+        }
+    });
+
+Pass undef or 0 to reset such callback.
+
+=head1 TVision::TApplication::on_idle($coderef) function
+
+Registers callback for a function to be invoked after TProgram::idle().
+
+Pass undef or 0 to reset such callback.
 
 =head1 Geometry managers (not ready yet, pleae ignore this entire section)
 
@@ -551,127 +671,127 @@ package TVision::TEditWindow;
 our @ISA = qw(TVision::TWindow);
 #class TEditWindow : public TWindow {
 #public:
-#    TEditWindow( const TRect&, TStringView, int ) noexcept;
-#    virtual void close();
-#    virtual const char *getTitle( short );
-#    virtual void handleEvent( TEvent& );
-#    virtual void sizeLimits( TPoint& min, TPoint& max );
-#    TFileEditor *editor;
-#    static const char * const _NEAR name;
-#    static TStreamable *build();
+#[ ]    TEditWindow( const TRect&, TStringView, int ) noexcept;
+#[ ]    virtual void close();
+#[ ]    virtual const char *getTitle( short );
+#[ ]    virtual void handleEvent( TEvent& );
+#[ ]    virtual void sizeLimits( TPoint& min, TPoint& max );
+#[x]    TFileEditor *editor;
+#[ ]    static const char * const _NEAR name;
+#[ ]    static TStreamable *build();
 #};
 
 package TVision::TEditor;
 our @ISA = qw(TVision::TView);
 #class TEditor : public TView {
 #public:
-#    friend void genRefs();
-#    TEditor( const TRect&, TScrollBar *, TScrollBar *, TIndicator *, uint ) noexcept;
-#    virtual ~TEditor();
-#    virtual void shutDown();
-#    char bufChar( uint );
-#    uint bufPtr( uint );
-#    virtual void changeBounds( const TRect& );
-#    virtual void convertEvent( TEvent& );
-#    Boolean cursorVisible();
-#    void deleteSelect();
-#    virtual void doneBuffer();
-#    virtual void draw();
-#    virtual TPalette& getPalette() const;
-#    virtual void handleEvent( TEvent& );
-#    virtual void initBuffer();
-#    virtual TMenuItem& initContextMenu( TPoint );
-#    uint insertMultilineText( const char *, uint );
-#    Boolean insertBuffer( const char *, uint, uint, Boolean, Boolean );
-#    Boolean insertEOL( Boolean );
-#    virtual Boolean insertFrom( TEditor * );
-#    Boolean insertText( const void *, uint, Boolean );
-#    void scrollTo( int, int );
-#    Boolean search( const char *, ushort );
-#    virtual Boolean setBufSize( uint );
-#    void setCmdState( ushort, Boolean );
-#    void setSelect( uint, uint, Boolean);
-#    virtual void setState( ushort, Boolean );
-#    void trackCursor( Boolean );
-#    void undo();
-#    virtual void updateCommands();
-#    virtual Boolean valid( ushort );
-#    int charPos( uint, uint );
-#    uint charPtr( uint, int );
-#    Boolean clipCopy();
-#    void clipCut();
-#    void clipPaste();
-#    void deleteRange( uint, uint, Boolean );
-#    void doUpdate();
-#    void doSearchReplace();
-#    void drawLines( int, int, uint );
-#    void formatLine(TScreenCell *, uint, int, TAttrPair );
-#    void find();
-#    uint getMousePtr( TPoint );
-#    Boolean hasSelection();
-#    void hideSelect();
-#    Boolean isClipboard();
-#    uint lineEnd( uint );
-#    uint lineMove( uint, int );
-#    uint lineStart( uint );
-#    uint indentedLineStart( uint );
-#    void lock();
-#    void newLine();
-#    uint nextChar( uint );
-#    uint nextLine( uint );
-#    uint nextWord( uint );
-#    uint prevChar( uint );
-#    uint prevLine( uint );
-#    uint prevWord( uint );
-#    void replace();
-#    void setBufLen( uint );
-#    void setCurPtr( uint, uchar );
-#    void startSelect();
-#    void toggleEncoding();
-#    void toggleInsMode();
-#    void unlock();
-#    void update( uchar );
-#    void checkScrollBar( const TEvent&, TScrollBar *, int& );
-#    void detectEol();
-#    TScrollBar *hScrollBar;
-#    TScrollBar *vScrollBar;
-#    TIndicator *indicator;
-#    char *buffer;
-#    uint bufSize;
-#    uint bufLen;
-#    uint gapLen;
-#    uint selStart;
-#    uint selEnd;
-#    uint curPtr;
-#    TPoint curPos;
-#    TPoint delta;
-#    TPoint limit;
-#    int drawLine;
-#    uint drawPtr;
-#    uint delCount;
-#    uint insCount;
-#    Boolean isValid;
-#    Boolean canUndo;
-#    Boolean modified;
-#    Boolean selecting;
-#    Boolean overwrite;
-#    Boolean autoIndent;
-#    enum EolType { eolCrLf, eolLf, eolCr } eolType;
-#    enum Encoding { encDefault, encSingleByte } encoding;
-#    void nextChar( TStringView, uint &P, uint &width );
-#    Boolean formatCell( TSpan<TScreenCell>, uint&, TStringView, uint& , TColorAttr );
-#    TStringView bufChars( uint );
-#    TStringView prevBufChars( uint );
-#    static TEditorDialog _NEAR editorDialog;
-#    static ushort _NEAR editorFlags;
-#    static char _NEAR findStr[maxFindStrLen];
-#    static char _NEAR replaceStr[maxReplaceStrLen];
-#    static TEditor * _NEAR clipboard;
-#    uchar lockCount;
-#    uchar updateFlags;
-#    int keyState;
-#    static const char * const _NEAR name;
-#    static TStreamable *build();
+#[ ]    friend void genRefs();
+#[ ]    TEditor( const TRect&, TScrollBar *, TScrollBar *, TIndicator *, uint ) noexcept;
+#[ ]    virtual ~TEditor();
+#[ ]    virtual void shutDown();
+#[x]    char bufChar( uint );
+#[x]    uint bufPtr( uint );
+#[ ]    virtual void changeBounds( const TRect& );
+#[ ]    virtual void convertEvent( TEvent& );
+#[x]    Boolean cursorVisible();
+#[x]    void deleteSelect();
+#[ ]    virtual void doneBuffer();
+#[ ]    virtual void draw();
+#[ ]    virtual TPalette& getPalette() const;
+#[ ]    virtual void handleEvent( TEvent& );
+#[ ]    virtual void initBuffer();
+#[ ]    virtual TMenuItem& initContextMenu( TPoint );
+#[x]    uint insertMultilineText( const char *, uint );
+#[x]    Boolean insertBuffer( const char *, uint, uint, Boolean, Boolean );
+#[ ]    Boolean insertEOL( Boolean );
+#[ ]    virtual Boolean insertFrom( TEditor * );
+#[ ]    Boolean insertText( const void *, uint, Boolean );
+#[ ]    void scrollTo( int, int );
+#[ ]    Boolean search( const char *, ushort );
+#[ ]    virtual Boolean setBufSize( uint );
+#[ ]    void setCmdState( ushort, Boolean );
+#[ ]    void setSelect( uint, uint, Boolean);
+#[ ]    virtual void setState( ushort, Boolean );
+#[ ]    void trackCursor( Boolean );
+#[ ]    void undo();
+#[ ]    virtual void updateCommands();
+#[ ]    virtual Boolean valid( ushort );
+#[ ]    int charPos( uint, uint );
+#[ ]    uint charPtr( uint, int );
+#[ ]    Boolean clipCopy();
+#[ ]    void clipCut();
+#[ ]    void clipPaste();
+#[ ]    void deleteRange( uint, uint, Boolean );
+#[ ]    void doUpdate();
+#[ ]    void doSearchReplace();
+#[ ]    void drawLines( int, int, uint );
+#[ ]    void formatLine(TScreenCell *, uint, int, TAttrPair );
+#[ ]    void find();
+#[ ]    uint getMousePtr( TPoint );
+#[ ]    Boolean hasSelection();
+#[ ]    void hideSelect();
+#[ ]    Boolean isClipboard();
+#[ ]    uint lineEnd( uint );
+#[ ]    uint lineMove( uint, int );
+#[ ]    uint lineStart( uint );
+#[ ]    uint indentedLineStart( uint );
+#[ ]    void lock();
+#[ ]    void newLine();
+#[ ]    uint nextChar( uint );
+#[ ]    uint nextLine( uint );
+#[ ]    uint nextWord( uint );
+#[ ]    uint prevChar( uint );
+#[ ]    uint prevLine( uint );
+#[ ]    uint prevWord( uint );
+#[ ]    void replace();
+#[ ]    void setBufLen( uint );
+#[ ]    void setCurPtr( uint, uchar );
+#[ ]    void startSelect();
+#[ ]    void toggleEncoding();
+#[ ]    void toggleInsMode();
+#[ ]    void unlock();
+#[ ]    void update( uchar );
+#[ ]    void checkScrollBar( const TEvent&, TScrollBar *, int& );
+#[ ]    void detectEol();
+#[ ]    TScrollBar *hScrollBar;
+#[ ]    TScrollBar *vScrollBar;
+#[ ]    TIndicator *indicator;
+#[ ]    char *buffer;
+#[ ]    uint bufSize;
+#[ ]    uint bufLen;
+#[ ]    uint gapLen;
+#[ ]    uint selStart;
+#[ ]    uint selEnd;
+#[ ]    uint curPtr;
+#[ ]    TPoint curPos;
+#[ ]    TPoint delta;
+#[ ]    TPoint limit;
+#[ ]    int drawLine;
+#[ ]    uint drawPtr;
+#[ ]    uint delCount;
+#[ ]    uint insCount;
+#[ ]    Boolean isValid;
+#[ ]    Boolean canUndo;
+#[ ]    Boolean modified;
+#[ ]    Boolean selecting;
+#[ ]    Boolean overwrite;
+#[ ]    Boolean autoIndent;
+#[ ]    enum EolType { eolCrLf, eolLf, eolCr } eolType;
+#[ ]    enum Encoding { encDefault, encSingleByte } encoding;
+#[ ]    void nextChar( TStringView, uint &P, uint &width );
+#[ ]    Boolean formatCell( TSpan<TScreenCell>, uint&, TStringView, uint& , TColorAttr );
+#[ ]    TStringView bufChars( uint );
+#[ ]    TStringView prevBufChars( uint );
+#[ ]    static TEditorDialog _NEAR editorDialog;
+#[ ]    static ushort _NEAR editorFlags;
+#[ ]    static char _NEAR findStr[maxFindStrLen];
+#[ ]    static char _NEAR replaceStr[maxReplaceStrLen];
+#[ ]    static TEditor * _NEAR clipboard;
+#[ ]    uchar lockCount;
+#[ ]    uchar updateFlags;
+#[ ]    int keyState;
+#[ ]    static const char * const _NEAR name;
+#[ ]    static TStreamable *build();
 #};
 package TVision::TMemo;
 #class TMemo : public TEditor {

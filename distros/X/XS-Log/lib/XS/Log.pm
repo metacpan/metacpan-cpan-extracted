@@ -1,8 +1,8 @@
 package XS::Log;
-#Build  MD5 : 9OIX4TrV94RQ4xS0t862yg
-#Build Time : 2025-09-23 11:57:16
-our $VERSION = 1.11;
-our $BUILDDATE = "2025-09-23";  #Build Time: 11:57:16
+#Build  MD5 : IUB9AMzYdq6WFBId+Gku6A
+#Build Time : 2025-09-24 09:47:55
+our $VERSION = 1.12;
+our $BUILDDATE = "2025-09-24";  #Build Time: 09:47:55
 use strict;
 use warnings;
 use constant { 
@@ -148,27 +148,27 @@ B<XS::Log>是高效快速的日志模块，纯c语言开发，快速高效的IO�
      level             => LOG_LEVEL_DEBUG,
      mode              => LOG_MODE_DAILY,
      targets           => LOG_TARGET_CONSOLE | LOG_TARGET_FILE,
-	 with_rep          => 0,        #参考：关于with_rep参数
+     with_rep          => 0,               #参考：关于with_rep参数
      use_color         => 1,
      show_timestamp    => 1,
      show_log_level    => 1,
      show_file_info    => 1,
-     max_file_size     => 1024*1024*10,		#10M
+     max_file_size     => 1024*1024*10,    #10M
      max_files         => 5,
      flush_immediately => 1,
  );
  
  openLog("test.log", \%opt);
  
- printLog($msg);                    #原文输出
+ printLog($msg);                           #原文输出
  printInf("This is info");
  printWarn("This is warning");
  printErr("This is error");
- #printFail("This is fatal");		#注意：谨慎使用 ，程序会关闭文件并exit
+ #printFail("This is fatal");              #注意：谨慎使用 ，程序会关闭文件并exit
  
  setLogColor(0);
  setLogOptions("show_file_info",1);
- setLogMode(LOG_LEVEL_DEBUG);		#最高级别，显示所有日志
+ setLogMode(LOG_LEVEL_DEBUG);              #最高级别，显示所有日志
  
  my $user = "Alice";
  my $val  = 42;
@@ -317,13 +317,13 @@ LOG日志目录和文件：
 =head2 setLogUseColor 
 
   setLogUseColor($bool);                       #设置日志颜色，0-无颜色 1-有颜色
-							                  
+
 =head2 setLogTargets
-							                  
+
   setLogTargets($target);                      #设置日志输出日志模式，LOG_TARGET_CONSOLE/LOG_TARGET_FILE
-							                  
+
 =head2 setLogMode                             
-							                  
+
   setLogMode($mode);                           #设置日志文件循环模式
 
 =head2 setLogLevel

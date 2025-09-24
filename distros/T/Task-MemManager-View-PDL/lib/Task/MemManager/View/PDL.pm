@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Task::MemManager::View::PDL;
-$Task::MemManager::View::PDL::VERSION = '0.01';
+$Task::MemManager::View::PDL::VERSION = '0.02';
 use Config;
 my $MAX_ADDR;
 
@@ -57,7 +57,8 @@ my %PDL_types = (
 ## now update those sizes using the sizeof operator
 
 ###############################################################################
-# Usage       : $view =  $buffer->create_view($buffer_address, $buffer_size \%options);
+# Usage       : $view =  $buffer->create_view($buffer_address, $buffer_size, 
+#                        \%options);
 # Purpose     : Create a PDL view of the specified type for the buffer
 # Returns     : The created view (a PDL ndarray) or undef on failure
 #               The view is created using the buffer's memory. 
@@ -123,7 +124,7 @@ Task::MemManager::View::PDL - Create PDL views of Task::MemManager buffers
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -297,13 +298,16 @@ This continues from Example 2.
 
   $pdl_view(0:4).=20;
   $pdl_view +=1;  # implied in place
-  say $pdl_view->inplace->sqrt;
-  print_hex_values($mem->extract_buffer_region(0,9),10);
+  say $pdl_view->inplace->sqrt;  # PDL view
+  print_hex_values($mem->extract_buffer_region(0,9),10); # stored Task::MemManager object
+  say $mem->get_view('PDL_default'); # view through Task::MemManager 
 
-Output should be:
+All three outputs should be identical:
 
-  28 28 28 28 28 28 28 28 28 28 
   [4 4 4 4 4 6 6 6 6 6]
+  04 04 04 04 04 06 06 06 06 06 
+  [4 4 4 4 4 6 6 6 6 6]
+
 
 =head2 Example 4: Cloning a view
 
@@ -325,6 +329,7 @@ Output should be:
   Initial View : [4 4 4 4 4 6 6 6 6 6]
   Cloned View : [4 4 4 4 4 6 6 6 6 6]
     Int32 View : [1028 1028 1540 1542 1542]
+
 
 
 =head1 DIAGNOSTICS

@@ -1,5 +1,8 @@
 Revision history for cpan2rpm
 
+2.041 09/23/2025 23:00:00
+ - Adjust VERSION format for compatibility.
+
 2.040 09/16/2025 02:00:00
  - Fix --upgrade to use general URL from CPAN.
 

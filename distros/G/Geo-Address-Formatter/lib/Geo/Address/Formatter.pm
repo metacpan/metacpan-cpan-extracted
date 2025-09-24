@@ -1,5 +1,5 @@
 package Geo::Address::Formatter;
-$Geo::Address::Formatter::VERSION = '1.9987';
+$Geo::Address::Formatter::VERSION = '1.9988';
 # ABSTRACT: take structured address data and format it according to the various global/country rules
 
 use strict;
@@ -380,19 +380,20 @@ sub format_address {
         say STDERR Dumper $compiled_template;
     }
 
+
     # 11. render the template
     my $text = $self->_render_template($compiled_template, $rh_components);
     if ($debug){
         say STDERR "text after _render_template $text";
     }
 
-    # 11. postformatting
+    # 12. postformatting
     $text = $self->_postformat($text, $rh_config->{postformat_replace});
 
-    # 12. clean again
+    # 13. clean again
     $text = $self->_clean($text);
 
-    # 13. set final components (so we can get them later)
+    # 14. set final components (so we can get them later)
     $self->{final_components} = $rh_components;
 
     # all done
@@ -406,7 +407,8 @@ sub _postformat {
     my $raa_rules = shift;
 
     if ($debug){
-        say STDERR "entering _postformat: $text"
+        say STDERR "entering _postformat: $text";
+        say STDERR Dumper $raa_rules;
     }
 
     # remove duplicates
@@ -718,7 +720,7 @@ sub _apply_replacements {
             }
             if (defined($regexp)){
                 try {
-                    my $re = qr/$regexp/;
+                    my $re = qr/$regexp/i;
                     $rh_components->{$component} =~ s/$re/$ra_fromto->[1]/;
                 } catch {
                     warn "invalid replacement: " . join(', ', @$ra_fromto);
@@ -967,7 +969,7 @@ Geo::Address::Formatter - take structured address data and format it according t
 
 =head1 VERSION
 
-version 1.9987
+version 1.9988
 
 =head1 SYNOPSIS
 

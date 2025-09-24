@@ -3,7 +3,7 @@ NAME
     buffers
 
 VERSION
-    version 0.01
+    version 0.02
 
 SYNOPSIS
       use Task::MemManager::View::PDL; ## this will also import Task::MemManager
@@ -169,12 +169,14 @@ EXAMPLES
 
       $pdl_view(0:4).=20;
       $pdl_view +=1;  # implied in place
-      say $pdl_view->inplace->sqrt;
-      print_hex_values($mem->extract_buffer_region(0,9),10);
+      say $pdl_view->inplace->sqrt;  # PDL view
+      print_hex_values($mem->extract_buffer_region(0,9),10); # stored Task::MemManager object
+      say $mem->get_view('PDL_default'); # view through Task::MemManager
 
-    Output should be:
+    All three outputs should be identical:
 
-      28 28 28 28 28 28 28 28 28 28 
+      [4 4 4 4 4 6 6 6 6 6]
+      04 04 04 04 04 06 06 06 06 06 
       [4 4 4 4 4 6 6 6 6 6]
 
   Example 4: Cloning a view

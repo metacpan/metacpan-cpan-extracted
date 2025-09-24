@@ -1,3 +1,24 @@
+0.091   2025-09-24  Released-By: PERLANCAR; Urgency: medium
+
+        - [subcommand ls-committing-large] Add option --detail (-l).
+
+        - [subcommand du-committing][doc][ux] Add example showing usage of
+          datasize-to-metric.
+
+
+0.090   2025-09-24  Released-By: PERLANCAR; Urgency: medium
+
+        - [subcommand status] Add '--untracked' option (with shortcuts -u & -U).
+          Pass this to -u in 'git status'.
+
+        - [subcommand du-untracked] [doc] Remove caveat about not respecting
+          .gitignore in listing untracked files since we now use -uall.
+
+        - [ux] [subcommand ls-committing-large] Add '--untracked' option (with
+          shortcuts -u & -U), by default include untracked files in
+          ls-committing-large.
+
+
 0.089   2025-09-23  Released-By: PERLANCAR; Urgency: medium
 
         - Add subcommand: dir.

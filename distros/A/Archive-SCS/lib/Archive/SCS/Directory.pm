@@ -2,7 +2,7 @@ use v5.34;
 use warnings;
 use Object::Pad 0.73 ':experimental(adjust_params)';
 
-class Archive::SCS::Directory 1.07
+class Archive::SCS::Directory 1.08
   :isa( Archive::SCS::Mountable );
 
 use builtin 'reftype';
@@ -187,7 +187,7 @@ I<Since version 1.06.>
 
 =head2 handles_path
 
-  $bool = Archive::SCS::Directory->handles_path($path, $header);
+  $bool = Archive::SCS::Directory->handles_path($path_tiny, $header);
 
 =head2 list_dirs
 

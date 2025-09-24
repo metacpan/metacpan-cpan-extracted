@@ -2,7 +2,7 @@ use v5.34;
 use warnings;
 use Object::Pad 0.73;
 
-class Archive::SCS::Zip 1.07
+class Archive::SCS::Zip 1.08
   :isa( Archive::SCS::Mountable );
 
 use builtin qw( blessed true );
@@ -253,7 +253,7 @@ Hash values used with this module must be in the internal format
 
 =head2 handles_path
 
-  $bool = Archive::SCS::Zip->handles_file($fh, $header);
+  $bool = Archive::SCS::Zip->handles_path($path_tiny, $header);
 
 =head2 list_dirs
 

@@ -2,7 +2,7 @@ use v5.34;
 use warnings;
 use Object::Pad 0.73;
 
-class Archive::SCS::HashFS2 1.07
+class Archive::SCS::HashFS2 1.08
   :isa( Archive::SCS::Mountable );
 
 use stable 0.031 'isa';
@@ -112,6 +112,8 @@ method mount () {
       my $size = (my $is_data_part = $kind & 0x80) ? 16
         : $kind == 1 ? 8
         : $kind == 2 ? 4
+        : $kind == 5 ? 32  # seen with .pma files on 1.55+
+        : $kind == 6 ? 8   # seen with .pmg files on 1.55+
         : 0 or warnings::warnif io =>
           sprintf "Encountered index 2 part with unknown kind %02x", $kind;
 
@@ -443,9 +445,14 @@ Hash values used with this module must be in the internal format
 
   $bool = $archive->is_mounted;
 
-=head2 handles_file
+=head2 handles_path
 
-  $bool = Archive::SCS::HashFS2->handles_file($fh, $header);
+  $bool = Archive::SCS::HashFS2->handles_path($path_tiny, $header);
+
+I<Since version 1.06.>
+
+In version 1.05 and earlier, there was an equivalent C<handles_file($fh, $header)>
+method, which is now deprecated.
 
 =head2 list_dirs
 

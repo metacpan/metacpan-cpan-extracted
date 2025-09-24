@@ -3,7 +3,7 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-package Archive::SCS::CityHash 1.07;
+package Archive::SCS::CityHash 1.08;
 
 use Exporter 'import';
 use XSLoader 0.14;

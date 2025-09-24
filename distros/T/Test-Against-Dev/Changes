@@ -1,5 +1,10 @@
 Revision history for Perl module Test::Against::Dev
 
+0.14 Tue Sep 23 09:34:24 AM EDT 2025
+    - Rework tests so that dummy tarballs are pre-positioned in CPAN index
+      order.
+      No change in functionality.
+
 0.13 Sun Sep 23 19:13:32 EDT 2018
     - Properly document Test::Against::Build::analyze_json_logs().
       No change in functionality.
@@ -67,5 +72,4 @@ Revision history for Perl module Test::Against::Dev
 
 0.01 Sat Dec  9 17:04:34 2017
     - original version; created by ExtUtils::ModuleMaker 0.56
-
 

@@ -1,3 +1,10 @@
+0.112   2025-09-24  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Add option: --version (-v).
+
+
 0.111   2023-12-27  Released-By: PERLANCAR; Urgency: medium
 
         - [bug] Forgot to configure Getopt::Long with gnu_getopt,

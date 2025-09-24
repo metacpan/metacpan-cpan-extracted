@@ -262,7 +262,7 @@ SKIP: {
     my $this_cpanm = $self->get_this_cpanm();
     is($this_cpanm, catfile($bin_dir, 'cpanm'), "Got expected 'cpanm': $this_cpanm");
 
-    pp({ %{$self} });
+    #pp({ %{$self} });
 
     my $expected_log = catfile($self->get_release_dir(), '.cpanm', 'build.log');
     my $gzipped_build_log;
@@ -282,7 +282,7 @@ SKIP: {
         note("Testing via 'module_list'");
         local $@;
         my $list = [
-            map { catfile($cwd, 't', 'data', $_) }
+            map { catfile($cwd, 't', 'data', 'M', 'ME', 'METATEST', $_) }
             ( qw| Phony-PASS-0.01.tar.gz Phony-FAIL-0.01.tar.gz  | )
         ];
         #pp($list);
@@ -308,7 +308,7 @@ SKIP: {
         note("Testing via 'module_file'");
         local $@;
         my $list = [
-            map { catfile($cwd, 't', 'data', $_) }
+            map { catfile($cwd, 't', 'data', 'M', 'ME', 'METATEST', $_) }
             ( qw| Phony-PASS-0.01.tar.gz Phony-FAIL-0.01.tar.gz  | )
         ];
         my ($IN, $file) = tempfile('004_files_for_cpanm_XXXXX', UNLINK => 1);

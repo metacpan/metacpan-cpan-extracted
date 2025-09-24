@@ -2,7 +2,7 @@ use v5.34;
 use warnings;
 use Object::Pad 0.73;
 
-class Archive::SCS::HashFS 1.07
+class Archive::SCS::HashFS 1.08
   :isa( Archive::SCS::Mountable );
 
 use stable 0.031 'isa';
@@ -322,9 +322,14 @@ Hash values used with this module must be in the internal format
 
   $bool = $archive->is_mounted;
 
-=head2 handles_file
+=head2 handles_path
 
-  $bool = Archive::SCS::HashFS->handles_file($fh, $header);
+  $bool = Archive::SCS::HashFS->handles_path($path_tiny, $header);
+
+I<Since version 1.06.>
+
+In version 1.05 and earlier, there was an equivalent C<handles_file($fh, $header)>
+method, which is now deprecated.
 
 =head2 list_dirs
 

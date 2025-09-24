@@ -18,8 +18,7 @@ use Test::More 0.96;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 use Test::Deep; # import symbols: ignore, re etc
 use Test2::API 'context_do';
-use JSON::PP ();
-use constant { true => JSON::PP::true, false => JSON::PP::false };
+use JSON::Schema::Modern::Utilities qw(true false);
 
 my $encoder = JSON::Schema::Modern::_JSON_BACKEND()->new
   ->allow_nonref(1)

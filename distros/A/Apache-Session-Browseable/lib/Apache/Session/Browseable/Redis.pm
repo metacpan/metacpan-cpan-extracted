@@ -9,10 +9,8 @@ use Apache::Session::Lock::Null;
 use Apache::Session::Serialize::JSON;
 use Apache::Session::Browseable::_common;
 
-our $VERSION = '1.3.16';
+our $VERSION = '1.3.18';
 our @ISA     = qw(Apache::Session);
-
-our $redis = $Apache::Session::Browseable::Store::Redis::redis;
 
 sub populate {
     my $self = shift;
@@ -236,29 +234,8 @@ sub get_key_from_all_sessions {
 }
 
 sub _getRedis {
-    my $class = shift;
-    my $args  = shift;
-
-    # Manage undef encoding
-    $args->{encoding} = undef
-      if (  $args->{encoding}
-        and $args->{encoding} eq "undef" );
-
-    # If sentinels is not given as an array ref, try to parse
-    # a comma delimited list instead
-    if ( $args->{sentinels}
-        and ref $args->{sentinels} ne 'ARRAY' )
-    {
-        $args->{sentinels} =
-          [ split /[,\s]+/, $args->{sentinels} ];
-    }
-
-    my $redisObj = $redis->new( %{$args} );
-
-    # Manage database
-    $redisObj->select( $args->{database} )
-      if defined $args->{database};
-    return $redisObj;
+    my ( $class, $args ) = @_;
+    return Apache::Session::Browseable::Store::Redis->_getRedis($args);
 }
 
 1;
@@ -278,6 +255,12 @@ Apache::Session::Redis
 
        # Select database (optional)
        #database => 0,
+
+       # Use a persistent connection to the Redis server
+       # (value is the connection cache key)
+       # You'll probably also want to set
+       # read_timeout, write_timeout, reconnect and every
+       reuse => "myserver",
 
        # Choose your browseable fields
        Index          => 'uid mail',

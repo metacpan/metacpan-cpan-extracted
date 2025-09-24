@@ -1,0 +1,83 @@
+{
+   "abstract" : "Install and find Turso CLI",
+   "author" : [
+      "ytnobody E<lt>ytnobody@gmail.comE<gt>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alien-Turso-CLI",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::Build::MB" : "0.01",
+            "Alien::Build::Plugin::Download::Negotiate" : "1.30",
+            "Archive::Tar" : "0",
+            "HTTP::Tiny" : "0.044",
+            "IO::Socket::SSL" : "1.56",
+            "IO::Zlib" : "0",
+            "Module::Build" : "0.36",
+            "Mojo::DOM" : "0",
+            "Mojolicious" : "7.00",
+            "Mozilla::CA" : "0",
+            "Net::SSLeay" : "1.49",
+            "URI" : "0",
+            "URI::Escape" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Build" : "0",
+            "Alien::Build::MB" : "0.01",
+            "Alien::Build::Plugin::Download::GitHub" : "0.09",
+            "Module::Build" : "0.36"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::Turso::CLI" : {
+         "file" : "lib/Alien/Turso/CLI.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.01",
+   "x_alienfile" : {
+      "generated_by" : "Alien::Build::MB version 0.09",
+      "requires" : {
+         "share" : {
+            "Alien::Build::Plugin::Download::Negotiate" : "1.30",
+            "Archive::Tar" : "0",
+            "HTTP::Tiny" : "0.044",
+            "IO::Socket::SSL" : "1.56",
+            "IO::Zlib" : "0",
+            "Mojo::DOM" : "0",
+            "Mojolicious" : "7.00",
+            "Mozilla::CA" : "0",
+            "Net::SSLeay" : "1.49",
+            "URI" : "0",
+            "URI::Escape" : "0"
+         },
+         "system" : {
+            "turso" : "0"
+         }
+      }
+   },
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

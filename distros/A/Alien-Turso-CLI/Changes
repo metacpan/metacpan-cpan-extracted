@@ -1,0 +1,12 @@
+Revision history for Perl extension Alien-Turso-CLI
+
+{{$NEXT}}
+
+0.01 2025-09-23T18:30:00Z
+
+    - Initial release
+    - Provides Turso CLI v1.0.13 for Perl applications
+    - Automatically downloads and installs Turso CLI from GitHub releases
+    - Supports Linux x86_64 platform
+    - Complete Alien::Base integration
+

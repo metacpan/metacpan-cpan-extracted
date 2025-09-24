@@ -1,10 +1,10 @@
 use strictures 2;
-package Mojolicious::Plugin::OpenAPI::Modern; # git description: v0.016-4-g0ffa9cf
+package Mojolicious::Plugin::OpenAPI::Modern; # git description: v0.017-4-ga539d8d
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Mojolicious plugin providing access to an OpenAPI document and parser
 # KEYWORDS: validation evaluation JSON Schema OpenAPI Swagger HTTP request response
 
-our $VERSION = '0.017';
+our $VERSION = '0.018';
 
 use 5.020;
 use utf8;
@@ -20,7 +20,7 @@ use YAML::PP;
 use Path::Tiny;
 use Mojo::JSON 'decode_json';
 use Safe::Isa;
-use OpenAPI::Modern 0.037;
+use OpenAPI::Modern 0.096;
 use namespace::clean;
 
 # we store data in two places: on the app (persistent storage, for the OpenAPI::Modern object
@@ -107,7 +107,7 @@ Mojolicious::Plugin::OpenAPI::Modern - Mojolicious plugin providing access to an
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 SYNOPSIS
 
@@ -163,7 +163,11 @@ Only used if L</openapi_obj> is not provided.
 A uri (string or Mojo::URL object) which identifies the OpenAPI document, and is used for resolving
 any relative URIs within the document (as well as locations in any error objects from validation).
 Note: as of OpenAPI 3.2, you can also set this value within the document itself, using the C<$self>
-keyword.
+keyword. This is passed as C<openapi_uri> to the L<OpenAPI::Modern> constructor.
+
+Note that in tests, you should use a relative URI, otherwise request URIs will not match. This is
+because L<Test::Mojo> uses a randomly-generated port for test requests, which cannot be predicted in
+advance to be included in C<openapi_uri>.
 
 Only used if L</openapi_obj> is not provided.
 

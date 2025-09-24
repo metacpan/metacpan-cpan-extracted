@@ -1,0 +1,9 @@
+Build.PL
+check_before_version.sh
+lib/Attribute/Validate.pm
+LICENSE
+MANIFEST			This list of files
+t-modern-perl/0000001-modern-usecase.t
+t/0000001-requires.t
+META.yml
+META.json

@@ -2,8 +2,8 @@ NAME
     App::GitUtils - Some additional command-line utilities for git
 
 VERSION
-    This document describes version 0.089 of App::GitUtils (from Perl
-    distribution App-GitUtils), released on 2025-09-23.
+    This document describes version 0.091 of App::GitUtils (from Perl
+    distribution App-GitUtils), released on 2025-09-24.
 
 SYNOPSIS
     This distribution provides the following command-line utilities:
@@ -58,10 +58,6 @@ FUNCTIONS
 
     This routine basically just grabs the list of untracked files returned
     by status() ("gu status") then checks their disk usage and totals them.
-    CAVEAT: currently, if an untracked file is a directory, then this
-    routine will just count the disk usage of the content of the directory
-    recursively /without/ considering ignored files. Correcting this is in
-    the todo list.
 
     This function is not exported.
 
@@ -222,6 +218,14 @@ FUNCTIONS
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
+
+    *   detail => *bool*
+
+        (No description)
+
+    *   include_untracked => *bool* (default: 1)
+
+        (No description)
 
     *   max_size => *datasize* (default: 104856576)
 
@@ -432,7 +436,7 @@ FUNCTIONS
   status
     Usage:
 
-     status() -> [$status_code, $reason, $payload, \%result_meta]
+     status(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Run `git status` and return information as a data structure.
 
@@ -440,7 +444,14 @@ FUNCTIONS
 
     This function is not exported.
 
-    No arguments.
+    Arguments ('*' denotes required arguments):
+
+    *   untracked => *str* (default: "normal")
+
+        Untracked files option, will be passed as `-u` option to `git
+        status`.
+
+        This will be passed to "git status" in the "-u" option.
 
     Returns an enveloped result (an array).
 

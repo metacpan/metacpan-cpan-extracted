@@ -1,0 +1,7 @@
+name = "Alien-Turso-CLI"
+badges = ["github-actions/test.yml"]
+module_maker = "AlienBuild"
+static_install = "auto"
+abstract = "Install and find Turso CLI"
+readme_from = "lib/Alien/Turso/CLI.pm"
+

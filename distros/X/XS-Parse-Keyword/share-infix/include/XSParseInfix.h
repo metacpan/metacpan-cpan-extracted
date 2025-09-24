@@ -114,7 +114,7 @@ static void S_register_xs_parse_infix(pTHX_ const char *opname, const struct XSP
   if(!register_xs_parse_infix_func)
     croak("Must call boot_xs_parse_infix() first");
 
-  return (*register_xs_parse_infix_func)(aTHX_ opname, hooks, hookdata);
+  (*register_xs_parse_infix_func)(aTHX_ opname, hooks, hookdata);
 }
 
 #define boot_xs_parse_infix(ver) S_boot_xs_parse_infix(aTHX_ ver)

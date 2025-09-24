@@ -1,7 +1,7 @@
 package Test::Against::Dev;
 use strict;
 use 5.14.0;
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 use Carp;
 use Cwd;
 use File::Basename;
@@ -1402,7 +1402,7 @@ it and/or modify it under the same terms as Perl itself.
 The full text of the license can be found in the
 LICENSE file included with this module.
 
-Copyright James E Keenan 2017-2018.  All rights reserved.
+Copyright James E Keenan 2017-2025.  All rights reserved.
 
 =head1 ACKNOWLEDGEMENTS
 
@@ -1425,6 +1425,14 @@ generous contributions from the following companies:
 =item * L<Assurant|https://www.assurantmortgagesolutions.com/>
 
 =item * L<Grant Street Group|https://grantstreet.com/>
+
+=back
+
+=head2 Additional Contributors
+
+=over 4
+
+=item * Mohammad S Anwar
 
 =back
 

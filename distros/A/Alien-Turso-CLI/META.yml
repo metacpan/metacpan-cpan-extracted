@@ -1,0 +1,57 @@
+---
+abstract: 'Install and find Turso CLI'
+author:
+  - 'ytnobody E<lt>ytnobody@gmail.comE<gt>'
+build_requires:
+  Alien::Build::MB: '0.01'
+  Alien::Build::Plugin::Download::Negotiate: '1.30'
+  Archive::Tar: '0'
+  HTTP::Tiny: '0.044'
+  IO::Socket::SSL: '1.56'
+  IO::Zlib: '0'
+  Module::Build: '0.36'
+  Mojo::DOM: '0'
+  Mojolicious: '7.00'
+  Mozilla::CA: '0'
+  Net::SSLeay: '1.49'
+  URI: '0'
+  URI::Escape: '0'
+configure_requires:
+  Alien::Build: '0'
+  Alien::Build::MB: '0.01'
+  Alien::Build::Plugin::Download::GitHub: '0.09'
+  Module::Build: '0.36'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-Turso-CLI
+provides:
+  Alien::Turso::CLI:
+    file: lib/Alien/Turso/CLI.pm
+    version: '0.01'
+requires:
+  Alien::Base: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.01'
+x_alienfile:
+  generated_by: 'Alien::Build::MB version 0.09'
+  requires:
+    share:
+      Alien::Build::Plugin::Download::Negotiate: '1.30'
+      Archive::Tar: '0'
+      HTTP::Tiny: '0.044'
+      IO::Socket::SSL: '1.56'
+      IO::Zlib: '0'
+      Mojo::DOM: '0'
+      Mojolicious: '7.00'
+      Mozilla::CA: '0'
+      Net::SSLeay: '1.49'
+      URI: '0'
+      URI::Escape: '0'
+    system:
+      turso: '0'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

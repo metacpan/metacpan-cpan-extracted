@@ -8,9 +8,9 @@ use App::nauniq;
 use Getopt::Long;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-12-27'; # DATE
+our $DATE = '2025-09-24'; # DATE
 our $DIST = 'App-nauniq'; # DIST
-our $VERSION = '0.111'; # VERSION
+our $VERSION = '0.112'; # VERSION
 
 my %Opts = (
     append         => 0,
@@ -71,6 +71,10 @@ For more details, see the manpage/documentation.
 USAGE
             exit 0;
         },
+        'version|v' => sub {
+            print "nauniq version ", ($main::VERSION // 'dev'), "\n";
+            exit 0;
+        },
     );
     exit 99 if !$res;
 }
@@ -96,7 +100,7 @@ nauniq - Non-adjacent uniq
 
 =head1 VERSION
 
-This document describes version 0.111 of nauniq (from Perl distribution App-nauniq), released on 2023-12-27.
+This document describes version 0.112 of nauniq (from Perl distribution App-nauniq), released on 2025-09-24.
 
 =head1 SYNOPSIS
 
@@ -193,6 +197,14 @@ Whether to read output file first. This option works only with C<--append> and
 is usually used via C<-a> to append lines to file if they do not exist yet in
 the file.
 
+=item * --help, -h
+
+Show help message then exit.
+
+=item * --version, -v
+
+Show version then exit.
+
 =back
 
 =head1 FAQ
@@ -244,7 +256,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2022, 2017, 2015, 2014 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

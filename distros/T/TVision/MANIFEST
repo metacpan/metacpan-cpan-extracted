@@ -17,7 +17,7 @@ tkInt.h
 tkPack.c
 tkPack-cpp.xs
 TVision.pm
-Devel/tvdb.pm
+lib/Devel/tvdb.pm
 README.md
 MANIFEST
 Changes

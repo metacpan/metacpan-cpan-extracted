@@ -116,7 +116,7 @@ $id5             = $session5{_session_id};
 untie %session5;
 
 # Pollutes Redis
-my $redis = $package->_getRedis($args);
+my $redis = 'Apache::Session::Browseable::Store::Redis'->_getRedis($args);
 $redis->set( 'aaaa',     'bbbb' );
 $redis->set( '@aaaa:aa', 'bbbb/bb' );
 

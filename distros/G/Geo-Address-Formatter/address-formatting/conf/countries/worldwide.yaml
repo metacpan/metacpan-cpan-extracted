@@ -817,10 +817,15 @@ FK:
     change_country: Falkland Islands, United Kingdom
 
 # Federated States of Micronesia
+# uses US postal system, but not part of the US
 FM:
-    use_country: US
-    change_country: United States of America
-    add_component: state=Micronesia
+    address_template: *generic4
+    fallback_template: *fallback2
+    postformat_replace:
+        - ["PNI 96941","FM 96941"]
+        - ["TRK 96942","FM 96942"]
+        - ["YAP 96943","FM 96943"]
+        - ["KSA 96944","FM 96944"]
 
 # Faroe Islands
 FO:
@@ -840,7 +845,6 @@ FR:
         - ["\\(eaux territoriales\\)",""]
         - ["state= \\(France\\)$",""]
         - ["Paris (\\d+)(\\w+) Arrondissement$","Paris"]
-
 
 # Gabon
 GA:
@@ -1142,9 +1146,9 @@ IS:
 IT:
     address_template: *generic8
     replace:
-        - ["Città metropolitana di ",""]
-        - ["Metropolitan City of ",""]
-        - ["^Provincia di ",""]
+        - ["county=Provincia di ",""]
+        - ["county=Città Metropolitana di ",""]
+        - ["county=Metropolitan City of ",""]
     postformat_replace:
         - ["Vatican City\nVatican City$","\nVatican City"]
         - ["Città del Vaticano\nCittà del Vaticano$","Città del Vaticano\n"]
@@ -1386,9 +1390,13 @@ MF:
     change_country: France
 
 # Marshall Islands
+# uses US postal system, but not part of the US
 MH:
-    use_country: US
-    add_component: state=Marshall Islands
+    address_template: *generic4
+    fallback_template: *fallback2
+    postformat_replace:
+        - [", 96060",", MH 96060"]
+        - [", 96070",", MH 96070"]
 
 # Madagascar
 MG:
@@ -1662,7 +1670,7 @@ PH:
         {{{attention}}}
         {{{house}}}
         {{{house_number}}} {{{road}}}, {{#first}}{{{suburb}}} || {{{city_district}}} || {{{neighbourhood}}}{{/first}}, {{#first}} {{{city}}} || {{{town}}} || {{{village}}} || {{{hamlet}}} || {{{suburb}}} || {{{state_district}}} {{/first}}
-        {{{postcode}}} {{#first}} {{{municipality}}} || {{{region}}} || {{{state}}} || {{/first}}
+        {{{postcode}}} {{#first}} {{{municipality}}} || {{{region}}} || {{{state}}} {{/first}}
         {{{country}}}
 
 # Pakistan
@@ -1797,7 +1805,6 @@ SG:
         {{{house}}}, {{{quarter}}}
         {{{house_number}}} {{{road}}}, {{{residential}}}
         {{#first}} {{{country}}} || {{{town}}} || {{{city}}} || {{{municipality}}} || {{{hamlet}}} || {{{village}}} || {{{county}}} {{/first}} {{{postcode}}}
-        {{{country}}}
 
 # Saint Helena, Ascension and Tristan da Cunha - same as UK
 SH:

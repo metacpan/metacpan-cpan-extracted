@@ -1,8 +1,19 @@
 Revision history for Perl extension LaTeX::Replicase.
 
 0.03  Fri Aug 15 16:11:41 2025
-	- original version; created by h2xs 1.23 with options
-		-XAn LaTeX::Replicase
+	- original version; created by h2xs 1.23 with options.
+		-XAn LaTeX::Replicase.
 
 0.031 Fri Aug 19 09:09:09 2025
-	- Fixed tests for MSWIN32
+	- Fixed tests for MSWIN32.
+
+0.057 Tue Sep 23 11:11:11 2025
+	- Added a new subroutine tex_escape().
+	- Added (expanded) new structures to fill the template: SCALAR, ARRAY, HASH, ARRAY.ARRAY, ARRAY.HASH, ARRAY.ARRAY.ARRAY, and ARRAY.HASH.ARRAY data.
+	- Added special '@' variable name for '%%%V:' tag of ...ARRAY data.
+	- Added '%' semaphore at end of the variable name to eliminate line breaks.
+	- Removed/Replaced '%%%CASEn:' and '%%%SKIP:' tags with '%%%ADDn:' and '%%%ADDX:' accordingly.
+	- The behavior of the nested '%%%VAR:' tag has been extended to be similar to '%%%END:'.
+	- Expanded control of input values for filling out TeX-template.
+	- Significantly improved error messages when debugging.
+	- Fixed tests.

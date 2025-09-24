@@ -1,3 +1,16 @@
+0.604   2025-09-24  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Give explanation for each mentioned module, mention
+          Data::Sah::Coerce routines and App::DataSizeSpeedUtils.
+
+
+0.603   2025-09-24  Released-By: PERLANCAR; Urgency: medium
+
+        - Add options: uppercase_k, latin_only, additional_prefix.
+
+
 0.602   2023-02-14  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

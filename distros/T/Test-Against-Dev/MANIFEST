@@ -21,6 +21,8 @@ t/008-salvage.t
 t/data/cpan-river-1000-perl-5.27.0.psv
 t/data/cpan-river-1000-perl-5.27.1.psv
 t/data/four-modules.txt
+t/data/M/ME/METATEST/Phony-FAIL-0.01.tar.gz
+t/data/M/ME/METATEST/Phony-PASS-0.01.tar.gz
 t/data/sample.build.log
 t/data/two-modules.txt
 t/lib/Helpers.pm

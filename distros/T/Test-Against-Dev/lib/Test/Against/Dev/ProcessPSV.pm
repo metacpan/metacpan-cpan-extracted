@@ -1,7 +1,7 @@
 package Test::Against::Dev::ProcessPSV;
 use strict;
 use 5.14.0;
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 use Carp;
 use Data::Dump ( qw| dd pp | );
 use Text::CSV_XS;
@@ -201,7 +201,7 @@ Hash reference, currently with 2 possible elements:
 
 Array reference holding list of column names to be written to master PSV file.
 
-=item 3 C<master_psvfile>
+=item * C<master_psvfile>
 
 String holding absolute path to the new master PSV file to be populated with
 data in object.

@@ -1,27 +1,50 @@
 NAME
-    Number::Format::Metric - Format number with metric prefix
+    Number::Format::Metric - Format number with metric prefix, with some
+    options
 
 VERSION
-    This document describes version 0.602 of Number::Format::Metric (from
-    Perl distribution Number-Format-Metric), released on 2023-02-14.
+    This document describes version 0.604 of Number::Format::Metric (from
+    Perl distribution Number-Format-Metric), released on 2025-09-24.
 
 SYNOPSIS
      use Number::Format::Metric qw(format_metric);
 
+     # precision option
      format_metric(14     , {base=>10});               # => "14.0"
      format_metric(14     , {base=>10, precision=>0}); # => "14"
-     format_metric(12001  , {base=> 2, precision=>1}); # => "11.7k"
-     format_metric(12001  , {base=>10, precision=>3}); # => "12.001ki"
-     format_metric(-0.0017, {base=>10});               # => "-1.7m"
-     format_metric(1.26e6 , {base=>10});               # => "1.3Mi"
+
+     # base 2 vs base 10
+     format_metric(12001  , {base=> 2, precision=>1});                 # => "11.7k"
+     format_metric(12001  , {base=>10, precision=>3});                 # => "12.001ki"
+     format_metric(-0.0017, {base=>10});                               # => "-1.7m"
+     format_metric(1.26e6 , {base=>10});                               # => "1.3Mi"
+
+     # don't use "i" mark for base 10
+     format_metric(12001  , {base=>10, precision=>3, i_mark=>0});      # => "12.001k"
+
+     # uppercase_k option
+     format_metric(12001  , {base=>10, precision=>3, uppercase_k=>1}); # => "12.001Ki"
+
+     # additional_prefix option
+     format_metric(12001  , {base=> 2, precision=>1, additional_prefix=>"b"});    # => "11.7kb"
+     format_metric(12001  , {base=>10, precision=>1, additional_prefix=>"bps"});  # => "12.0kbps"
+
+     # latin_only option
+     format_metric(2.3e-6 , {base=>10, precision=>1, additional_prefix=>"g"});                # => "2.3Î¼g"
+     format_metric(2.3e-6 , {base=>10, precision=>1, additional_prefix=>"g", latin_only=>1}); # => "2.3mcg"
 
 FUNCTIONS
     None exported by default but all of them exportable.
 
   format_metric($num, \%opts) => STR
     Format $num using metric prefix. Locale settings are respected (this
-    module uses locale). Might produce non-Latin Unicode characters (e.g. μ
-    for 1e-6 prefix). Known options:
+    module uses locale).
+
+    Might produce non-Latin Unicode characters (e.g. "Î¼" for 1e-6 prefix),
+    unless if you set the "latin_only" option, in which case "Î¼" will be
+    shown as "mc".
+
+    Known options:
 
     *   base => INT (either 2 or 10, default: 2)
 
@@ -32,6 +55,19 @@ FUNCTIONS
         Give "i" suffix to prefixes when in base 10 for k, M, G, T, and so
         on.
 
+    *   uppercase_k => BOOL (default: 0)
+
+        When set to true, will use "K" instead of "k" for kilo.
+
+    *   latin_only => BOOL (default: 0)
+
+        When set to true, will use "mc" instead of "Î¼" for micro.
+
+    *   additional_prefix => STR
+
+        String to add after the prefix, e.g. "b" (for byte), "g" (for gram),
+        etc.
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/Number-Format-Metric>.
@@ -41,8 +77,26 @@ SOURCE
     <https://github.com/perlancar/perl-Number-Format-Metric>.
 
 SEE ALSO
-    Other number formatting modules: Number::Format, Format::Human::Bytes,
-    Number::Bytes::Human.
+  Unformatting numbers
+    Data::Sah::Coerce coerce module:
+    Data::Sah::Coerce::perl::To_float::From_str::suffix_datasize and
+    Data::Sah::Coerce::perl::To_float::From_str::suffix_datasize. Example of
+    using this can be seen in datasize-from-metric and dataspeed-from-metric
+    (included in the App::DataSizeSpeedUtils distribution).
+
+  Other number formatting modules
+    Number::Format can format several kinds of numbers e.g. bytes ("2.3KB")
+    or prices ("USD 5,000") as well as format using template ("picture")
+    like `sprintf`. But for metric prefixes it only supports kilo, kibi,
+    mega, mebi, giga, gibi. It can also unformat numbers back to floating
+    point form.
+
+    Format::Human::Bytes supports formatting bytes with prefixes kilo, mega,
+    giga, and tera.
+
+    Number::Bytes::Human supports formatting with prefixes kilo (2^10) to
+    yotta (2^70), but does not support smaller prefixes, e.g. milli, micro,
+    etc. Obviously.
 
     <https://en.wikipedia.org/wiki/Metric_prefix>
 
@@ -69,8 +123,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023, 2014, 2013 by perlancar
-    <perlancar@cpan.org>.
+    This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

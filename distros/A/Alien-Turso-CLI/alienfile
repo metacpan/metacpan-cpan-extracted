@@ -1,0 +1,29 @@
+use alienfile;
+
+# Note: The Download::Negotiate warnings shown during build are a known issue
+# with Alien::Build::Plugin::Download::GitHub. These warnings do not affect
+# functionality and the plugin correctly uses the GitHub API.
+# See: https://github.com/PerlAlien/Alien-Build-Plugin-Download-GitHub/issues
+
+share {
+    plugin 'Download::GitHub' => (
+        github_user => 'tursodatabase', 
+        github_repo => 'turso-cli',
+        asset => 1,
+        asset_name => qr/^turso-cli_Linux_x86_64\.tar\.gz$/,
+    );
+
+    plugin 'Extract' => 'tar.gz';
+
+    build [
+        # Extract the binary and copy to bin directory
+        'mkdir -p %{.install.prefix}/bin',
+        'cp turso %{.install.prefix}/bin/',
+        'chmod +x %{.install.prefix}/bin/turso',
+    ];
+};
+
+sys {
+    # Check if turso is already installed in system
+    requires 'turso';
+};

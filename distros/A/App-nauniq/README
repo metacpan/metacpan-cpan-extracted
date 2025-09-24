@@ -2,8 +2,8 @@ NAME
     App::nauniq - Non-adjacent uniq
 
 VERSION
-    This document describes version 0.111 of App::nauniq (from Perl
-    distribution App-nauniq), released on 2023-12-27.
+    This document describes version 0.112 of App::nauniq (from Perl
+    distribution App-nauniq), released on 2025-09-24.
 
 SYNOPSIS
     See the command-line script nauniq.
@@ -38,8 +38,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023, 2022, 2017, 2015, 2014 by perlancar
-    <perlancar@cpan.org>.
+    This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
