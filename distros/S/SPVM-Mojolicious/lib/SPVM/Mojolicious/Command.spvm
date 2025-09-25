@@ -10,12 +10,6 @@ class Mojolicious::Command {
   use Mojo::Template;
   
   has app : rw Mojolicious
-    get {
-      unless (exists $self->{app}) {
-        $self->{app} = $self->{app_ref} = Mojo::Server->new->build_app("Mojo::HelloWorld");
-      }
-      return $self->{app};
-    }
     set {
       $self->{app} = $_;
       weaken $self->{app};

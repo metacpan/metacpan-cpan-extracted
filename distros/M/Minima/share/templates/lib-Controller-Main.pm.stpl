@@ -13,8 +13,6 @@ ADJUST {
     );
     $view->add_before_template('header');
     $view->add_after_template('footer');
-
-    $self->response->content_type('text/html; charset=utf-8');
 }
 
 method home

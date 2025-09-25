@@ -1,3 +1,5 @@
+#!/usr/bin/env perl
+
 require 5.006;
 use strict;
 use warnings;
@@ -24,6 +26,7 @@ if($ENV{'AUTHOR_TESTING'}) {
 
 my $test_requires = {
 	'Log::Dispatch::Null' => 0,
+	'Test::DescribeMe' => 0,
 	'Test::Most' => 0,
 	'Test::Needs' => 0,
 	'Test::TempDir::Tiny' => 0,
@@ -42,6 +45,15 @@ if($online_tests) {
 	unlink('t/online.enabled');
 }
 
+my $dist = {
+	COMPRESS => 'gzip -9f',
+	SUFFIX => 'gz'
+};
+
+if($^O eq 'darwin') {
+	$dist->{'TAR'} = 'gtar';
+}
+
 WriteMakefile (
 	NAME		=> "Log::WarnDie",
 	# AUTHOR		=> 'Elizabeth Mattijsen (liz@dijkmat.nl)',
@@ -56,7 +68,7 @@ WriteMakefile (
 		'Scalar::Util' => 1.08,
 	},
 	TEST_REQUIRES => $test_requires,
-	dist		=> { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+	dist => $dist,
 	clean		=> { FILES => 'Log::WarnDie-*' },
 	META_MERGE	=> {
 		'meta-spec' => { version => 2 },
@@ -79,14 +91,13 @@ WriteMakefile (
 
 sub are_online
 {
-	return 0 if($ENV{'NO_NETWORK_TESTING'} || $ENV{'TRAVIS_PERL_VERSION'}) || $ENV{'AUTOMATED_TESTING'} || (!-t STDIN);
+	return 0 if($ENV{'NO_NETWORK_TESTING'} || $ENV{'CIRCLECI'} || $ENV{'TRAVIS_PERL_VERSION'}) || $ENV{'AUTOMATED_TESTING'} || (!-t STDIN);
 
-	my $s = IO::Socket::INET->new(
+	if(my $s = IO::Socket::INET->new(
 		# PeerAddr => 'www.ripe.net:43',
 		PeerAddr => 'test.rebex.net:22',
 		Timeout => 5
-	);
-	if($s) {
+	)) {
 		print <<EOF;
 
 You appear to be directly connected to the Internet.  I have a regression test
@@ -108,8 +119,7 @@ EOF
 			return 1;	# The default is 'y'
 		}
 		return $rc;
-	} else {
-		print "On-line tests disabled because I couldn't detect an Internet connexion\n";
-		return 0;
 	}
+	print "On-line tests disabled because I couldn't detect an Internet connexion\n";
+	return 0;
 }

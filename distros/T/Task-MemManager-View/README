@@ -3,7 +3,7 @@ NAME
     buffers
 
 VERSION
-    version 0.02
+    version 0.04
 
 SYNOPSIS
         use Task::MemManager;

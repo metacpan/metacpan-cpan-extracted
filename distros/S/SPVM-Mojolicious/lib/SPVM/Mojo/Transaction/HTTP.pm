@@ -153,7 +153,7 @@ Read data server-side, used to implement web servers such as L<Mojo::Server::Dae
 
 =head2 server_write
 
-C<method server_write : string ($server : int);>
+C<method server_write : string ();>
 
 Write data server-side, used to implement web servers such as L<Mojo::Server::Daemon|SPVM::Mojo::Server::Daemon>.
 

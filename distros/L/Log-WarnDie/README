@@ -1,4 +1,4 @@
-Log-WarnDie 0.11
+Log-WarnDie 0.12
 
 INSTALLATION
 
@@ -29,7 +29,6 @@ You can also look for information at:
 
     Search CPAN
         http://search.cpan.org/dist/Log-WarnDie/
-
 
 LICENSE AND COPYRIGHT
 

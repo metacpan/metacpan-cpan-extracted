@@ -1,6 +1,93 @@
 # Copyright (c) 2025 Yuki Kimoto
 # MIT License
 
-class Mojolicious::Command::Hypnotoad {
+class Mojolicious::Command::Hypnotoad extends Mojolicious::Command {
   version_from Mojolicious;
+  
+  use Mojo::Server::Hypnotoad;
+  use Mojo::Util;
+  use Fn;
+  
+  has description : rw string
+    get {
+      unless (exists $self->{description}) {
+        $self->{description} = "Hypnotoad HTTP and WebSocket server";
+      }
+      return $self->{description};
+    }
+  ;
+  
+  has usage : rw string
+    get {
+      unless (exists $self->{usage}) {
+        $self->{usage} = <<'EOS';
+Usage: hypnotoad [OPTIONS] [APPLICATION]
+
+  ./myapp.spvm hypnotoad
+  ./myapp.spvm hypnotoad -f
+
+Options:
+  -f, --foreground   Keep manager process in foreground
+  -h, --help         Show this message
+  -s, --stop         Stop server gracefully
+  -t, --test         Test application and exit
+
+EOS
+      }
+      
+      return $self->{usage};
+    }
+  ;
+  
+  method build_server : Mojo::Server::Hypnotoad ($args : string[] = undef) {
+    
+    my $values_h = Hash->new;
+    
+    my $specs = [
+      "f|foreground",
+      "h|help",
+      "s|stop",
+      "t|test",
+    ];
+    
+    eval { Mojo::Util->getopt(my $_ = [$args], $values_h, $specs); }
+    
+    if ($@) {
+      die $self->usage;
+    }
+    
+    if ($values_h->get_int("help")) {
+      print $self->usage;
+      Sys->exit(0);
+    }
+    
+    if ($values_h->exists("foreground")) {
+      my $foreground = $values_h->get_int("foreground");
+      Sys->set_env("SPVM_HYPNOTOAD_FOREGROUND", $foreground);
+    }
+    
+    if ($values_h->exists("stop")) {
+      my $stop = $values_h->get_int("stop");
+      Sys->set_env("SPVM_HYPNOTOAD_STOP", $stop);
+    }
+    
+    if ($values_h->exists("test")) {
+      my $test = $values_h->get_int("test");
+      Sys->set_env("SPVM_HYPNOTOAD_TEST", $test);
+    }
+    
+    my $server = Mojo::Server::Hypnotoad->new;
+    
+    my $app = $self->app;
+    
+    $server->set_app($app);
+    
+    return $server;
+  }
+  
+  method run : void ($args : string[]) {
+    
+    $self->build_server($args)->run;
+  }
+  
 }

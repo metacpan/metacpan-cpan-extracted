@@ -1,5 +1,5 @@
 package Task::MemManager::View;
-$Task::MemManager::View::VERSION = '0.02';
+$Task::MemManager::View::VERSION = '0.04';
 use strict;
 use warnings;
 use Module::Find;
@@ -42,13 +42,11 @@ sub import {
     Task::MemManager->install_view_modules(@requested_view_modules);
 }
 
-unless ($import_was_called) {
-    __PACKAGE__->import();    # Call with no arguments (uses defaults)
-}
+
 
 ## Switch to Task::MemManager namespace, since we are extending it
 package Task::MemManager;
-$Task::MemManager::VERSION = '0.02';
+$Task::MemManager::VERSION = '0.04';
 no warnings 'redefine';       # We are redefining DESTROY
 
 # Find implemented memory views under this namespace
@@ -62,6 +60,7 @@ my %view_type_of    = ();
 my %options_of_view = ();
 
 sub install_view_modules {
+    shift;
     my (@requested_view_modules) = @_;
   TEST_MODULE: foreach my $module_name (@view_modules) {
         ( my $key = $module_name ) =~ s/Task::MemManager::View:://;
@@ -266,7 +265,7 @@ Task::MemManager::View - Provides convenient views for Task::MemManager buffers
 
 =head1 VERSION
 
-version 0.02
+version 0.04
 
 =head1 SYNOPSIS
 

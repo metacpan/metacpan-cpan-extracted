@@ -65,7 +65,7 @@
          "web" : "https://github.com/ology/Music-MelodicDevice-Arpeggiation"
       }
    },
-   "version" : "0.0203",
+   "version" : "0.0302",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040000"

@@ -2,7 +2,7 @@
 # MIT License
 
 class Mojolicious {
-  version "0.023";
+  version "0.024";
   
   use Mojo::Home;
   use Mojo::Loader;
@@ -235,6 +235,25 @@ class Mojolicious {
     }
     
     $self->commands->run($argv);
+  }
+  
+  method server : void ($server : Mojo::Server) {
+    
+  }
+  
+  method build_tx : Mojo::Transaction::HTTP () {
+    
+    my $tx  = Mojo::Transaction::HTTP->new;
+    
+    if (exists $self->{max_request_size}) {
+      my $max = $self->max_request_size;
+      $tx->req->set_max_message_size($max);
+    }
+    
+    # TODO
+    # $self->plugins->emit_hook(after_build_tx => $tx, $self);
+    
+    return $tx;
   }
 
 }

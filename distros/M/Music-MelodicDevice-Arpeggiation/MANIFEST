@@ -8,6 +8,7 @@ Makefile.PL
 README
 README.md
 dist.ini
+eg/arp.pl
 lib/Music/MelodicDevice/Arpeggiation.pm
 t/00-compile.t
 t/01-methods.t

@@ -4,17 +4,407 @@
 class Mojo::Server::Daemon extends Mojo::Server {
   version_from Mojolicious;
   
+  use Mojo::Transaction::WebSocket;
+  use Mojo::URL;
+  use Mojo::Util;
+  use Mojo::WebSocket;
+  use IO::Socket;
+  use IO::Socket::IP;
+  use Mojo::Connection::Server;
+  use Mojo::Connection::Stream;
+  
+  # Fields
+  has acceptors : virtual rw Mojo::Connection::Server[]
+    get {
+      return $self->{acceptors_list}->to_array->(Mojo::Connection::Server[]);
+    }
+    set {
+      $self->{acceptors_list} = List->new((Mojo::Connection::Server[])$_);
+    }
+  ;
+  
+  has acceptors_list : rw List of Mojo::Connection::Server;
+  
+  has backlog : rw int;
+  
+  has max_clients : rw int;
+  
+  has inactivity_timeout : rw int
+    get {
+      unless (exists $self->{inactivity_timeout}) {
+        $self->{inactivity_timeout} = length(my $_ = Sys->env("SPVM_MOJO_INACTIVITY_TIMEOUT")) ? (int)$_ : 30;
+      }
+      return $self->{inactivity_timeout};
+    }
+  ;
+  
+  has keep_alive_timeout : rw int
+    get {
+      unless (exists $self->{keep_alive_timeout}) {
+        $self->{keep_alive_timeout} = length(my $_ = Sys->env("SPVM_MOJO_KEEP_ALIVE_TIMEOUT")) ? (int)$_ : 5;
+      }
+      return $self->{keep_alive_timeout};
+    }
+  ;
+  
+  has max_requests : rw int
+    get {
+      unless (exists $self->{max_requests}) {
+        $self->{max_requests} = 100;
+      }
+      return $self->{max_requests};
+    }
+  ;
+  
+  has listen : rw string[]
+    get {
+      unless (exists $self->{listen}) {
+        $self->{listen} = length(my $_ = Sys->env("SPVM_MOJO_KEEP_ALIVE_TIMEOUT")) ? Fn->split(",", $_) : ["http://*:3000"];
+      }
+      return $self->{listen};
+    }
+  ;
+  
+  has reverse_proxy : rw byte;
+  
+  has trusted_proxies : rw string[];
+  
+  has silent : rw byte;
+  
+  # Undocumented Fields
+  has servers : Mojo::Connection::Server[];
+  
   # Class Methods
-  static method new : Mojo::Server::CGIDaemon () {
+  static method new : Mojo::Server::Daemon () {
     
     my $self = new Mojo::Server::Daemon;
+    
+    $self->{acceptors_list} = List->new(new Mojo::Connection::Server[0]);
     
     return $self;
   }
   
-  # Instance Methods
-  method run : void () {
-    die "TODO";
+  static method DEBUG : int () {
+    return length(my $_ = Sys->env("SPVM_MOJO_SERVER_DEBUG")) ? (int)$_ : 0;
   }
   
+  # Instance Methods
+  method ports : int[] () {
+    
+    my $acceptors = $self->acceptors;
+    
+    my $ports_list = IntList->new;
+    for (my $i = 0; $i < @$acceptors; $i++) {
+      my $handle = $acceptors->[$i];
+      $ports_list->push($handle->port);
+    }
+    
+    return $ports_list->to_array;
+  }
+  
+  method run : void () {
+    
+    # TODO
+    # local $SIG{INT} = local $SIG{TERM} = sub { $self->stop };
+    
+    $self->start;
+  }
+  
+  method start : void () {
+    
+    my $max = $self->max_clients;
+    
+    # Resume accepting connections
+    if (my $servers = $self->{servers}) {
+      $self->set_acceptors($self->{servers});
+    }
+    
+    # Start listening
+    elsif (!@{$self->acceptors}) {
+      $self->app->server($self);
+      for my $_ (@{$self->listen}) {
+        $self->_listen($_);
+      }
+    }
+  }
+  
+  method stop : void () {
+    
+    for my $server (@{$self->acceptors}) {
+      $server->stop;
+    }
+    
+  }
+  
+  method _build_tx : Mojo::Transaction::HTTP ($conn_accepted : Mojo::Connection::Stream) {
+    
+    my $tx = $self->build_tx;
+    
+    $tx->set_connection($conn_accepted);
+    
+    $tx->res->headers->set_server("Mojolicious (SPVM)");
+    
+    my $handle = $conn_accepted->handle;
+    
+    # TODO: set this to goroutine
+    $conn_accepted->set_timeout($self->inactivity_timeout);
+    
+    unless ($handle isa IO::Socket::UNIX) {
+      $tx->set_local_address($handle->(IO::Socket::IP)->sockhost);
+      $tx->set_local_port($handle->(IO::Socket::IP)->sockport);
+      $tx->set_remote_address($handle->(IO::Socket::IP)->peerhost);
+      $tx->set_remote_port($handle->(IO::Socket::IP)->peerport);
+    }
+    
+    if ($conn_accepted->tls) {
+      $tx->req->url->base->set_scheme("https");
+    }
+    
+    my $request_cb = [$this : Mojo::Server::Daemon = $self, $conn_accepted : Mojo::Connection::Stream] method : void ($tx : Mojo::Transaction::HTTP) {
+      
+      my $req = $tx->req;
+      
+      # WebSocket
+      if ($req->is_handshake) {
+        
+        my $ws = Mojo::Transaction::WebSocket->new;
+        $ws->set_handshake($tx);
+        
+        $conn_accepted->set_next($ws);
+        
+        $this->emit(request => Mojo::WebSocket->server_handshake($ws));
+      }
+      
+      # HTTP
+      else { $this->emit(request => $tx); }
+      
+      # Last keep-alive request or corrupted connection
+      if (($conn_accepted->requests || 1) >= $this->max_requests) {
+        $tx->res->headers->set_connection("close");
+      }
+      
+      my $resume_cb = [$this : Mojo::Server::Daemon, $conn_accepted : Mojo::Connection::Stream] method : void () {
+        $this->_write($conn_accepted);
+      };
+      
+      $tx->on(resume => $resume_cb);
+      $this->_write($conn_accepted);
+    };
+    weaken $request_cb->{this};
+    
+    $tx->on(request => $request_cb);
+    
+    # Kept alive if we have more than one request on the connection
+    my $requests = $conn_accepted->requests;
+    ++$requests;
+    
+    if ($requests > 1) {
+      $tx->set_kept_alive(1);
+    }
+    
+    $conn_accepted->set_requests($requests);
+    
+    return $tx;
+  }
+  
+  method _write : void ($c : Mojo::Connection::Stream) {
+    
+    # Protect from resume event recursion
+    my $tx = $c->tx;
+    if (!$tx || $c->writing) {
+      return;
+    }
+    
+    my $writing_save = $c->writing;
+    Fn->defer([$c : Mojo::Connection::Stream, $writing_save : int] method : void () {
+      $c->set_writing($writing_save);
+    });
+    
+    $c->set_writing(1);
+    
+    my $chunk = $tx->server_write;
+    if (&DEBUG) {
+      # warn term_escape "-- Server >>> Client (@{[_url($tx)]})\n$chunk\n" ;
+    }
+    my $next = $tx->is_finished ? "_finish" : length $chunk ? "_write" : undef;
+    
+    unless ($next) {
+      $c->write($chunk);
+      return;
+    }
+    
+    my $write_cb = [$this : Mojo::Server::Daemon = $self, $next : string, $c : Mojo::Connection::Stream] method : void () {
+      if ($next eq "_finish") {
+        $this->_finish($c);
+      }
+      elsif ($next eq "_write") {
+        $this->_write($c);
+      }
+      else {
+        die "[Unexpected Error]\$next is invalid.";
+      }
+    };
+    weaken $write_cb->{this};
+    
+    $c->write($chunk => $write_cb);
+    
+  }
+  
+  method _finish : void ($c : Mojo::Connection::Stream) {
+    
+    # Always remove connection for WebSockets
+    my $tx = $c->tx;
+    unless ($tx) {
+      return;
+    }
+    
+    $tx->closed;
+    
+    my $ws = (Mojo::Transaction::WebSocket)$c->next;
+    $c->set_next(undef);
+    
+    # Upgrade connection to WebSocket
+    if ($ws) {
+      # Successful upgrade
+      if ($ws->handshake->res->code == 101) {
+        $ws->set_established(1);
+        $c->set_tx($ws);
+        $ws->on(resume => [$this : Mojo::Server::Daemon = $self, $c : Mojo::Connection::Stream] method : void () {
+          $this->_write($c);
+        });
+        $self->_write($c);
+      }
+      
+      # Failed upgrade
+      else { $ws->closed; }
+    }
+    
+    # Close connection if necessary
+    if ($tx isa Mojo::Transaction::HTTP && !$tx->(Mojo::Transaction::HTTP)->keep_alive) {
+      $tx->closed;
+    }
+    
+    # Build new transaction for leftovers
+    if (length(my $leftovers = $tx->req->content->leftovers)) {
+    
+      $tx = $self->_build_tx($c);
+      
+      $c->set_tx($tx);
+      
+      $tx->server_read($leftovers);
+    }
+    
+    # Keep-alive connection
+    unless ($c->tx) {
+      $c->set_timeout($self->keep_alive_timeout);
+    }
+  }
+  
+  private static method _peer : string ($handle : IO::Socket) {
+    
+    my $peer = (string)undef;
+    
+    if ($handle isa IO::Socket::UNIX) {
+      $peer = $handle->(IO::Socket::UNIX)->peerpath;
+    }
+    else {
+      $peer = $handle->(IO::Socket::IP)->peerhost;
+    }
+    
+    return $peer;
+  }
+  
+  private method _read : void ($c : Mojo::Connection::Stream, $chunk : string) {
+    
+    # Make sure we have a transaction
+    my $tx = $self->_build_tx($c);
+    $c->set_tx($tx);
+    $tx->server_read($chunk);
+  }
+  
+  private static method _url : string ($tx : Mojo::Transaction) {
+    
+    return $tx->req->url->to_abs->to_string;
+  }
+  
+  method _listen : void ($listen : string) {
+    
+    my $url = Mojo::URL->new($listen);
+    
+    my $proto = $url->protocol;
+    unless ($proto eq "http" || $proto eq "https" || $proto eq "http+unix") {
+      die "Invalid listen location '$listen'";
+    }
+    
+    my $query   = $url->query;
+    my $options = Hash->new({backlog => $self->backlog});
+    
+    $options->set("fd" => $query->param("fd"));
+    $options->set("single_accept" => $query->param("single_accept"));
+    $options->set("reuse" => $query->param("reuse"));
+    
+    if ($proto eq "http+unix") { $options->set(path => $url->host); }
+    else {
+      if ((my $host = $url->host) ne "*") { $options->set(address => $host); }
+      if (my $port = $url->port) { $options->set(port => $port); }
+    }
+    
+    $options->set(tls_ca => $query->param("ca"));
+    
+    for my $_ (@{$query->names}) {
+      if (my $m = Re->m($_, "^(.*)_(cert|key)$")) {
+        my $type = $m->cap1;
+        my $name = "tls_" . $m->cap2;
+        
+        $options->set($name, Hash->new);
+        $options->get($name)->(Hash)->set($type, $query->param($_));
+      }
+    }
+    
+    if (my $cert = $query->param("cert")) { $options->get("tls_cert")->(Hash)->set("", $cert); }
+    if (my $key  = $query->param("key"))  { $options->get("tls_key")->(Hash)->set("", $key); }
+    my $ciphers = $query->param("ciphers");
+    my $verify = $query->param("verify");
+    my $version = $query->param("version");
+    
+    $options->set(tls_options => Hash->new);
+    
+    if ($ciphers) {
+      $options->get("tls_options")->(Hash)->set(SSL_cipher_list => $ciphers);
+    }
+    if ($verify) {
+      $options->get("tls_options")->(Hash)->set(SSL_verify_mode => Fn->hex($verify));
+    }
+    if ($version) {
+      $options->get("tls_options")->(Hash)->set(SSL_version => $version);
+    }
+    
+    my $tls =  $proto eq "https";
+    $options->set(tls => $tls);
+    
+    my $c = Mojo::Connection::Server->new;
+    
+    $c->set_timeout($self->inactivity_timeout);
+    
+    $c->listen($options);
+    
+    $self->acceptors_list->push($c);
+    
+    if ($self->silent) {
+      return;
+    }
+    
+    $self->app->log->info("Listening at '" . $url->to_string . "'");
+    $query->set_pairs(new string[0]);
+    
+    if ($url->host eq "*") {
+      $url->set_host("127.0.0.1");
+    }
+    if (!$options->get("path") && !$url->port) {
+      $url->set_port($self->ports->[@$self->ports - 1]) ;
+    }
+    
+    say "Web application available at " . ($options->get_string("path") // $url->to_string);
+  }
+
 }

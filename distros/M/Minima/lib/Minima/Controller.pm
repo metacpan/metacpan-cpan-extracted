@@ -6,6 +6,7 @@ class Minima::Controller;
 use Data::Dumper;
 use Encode qw(decode);
 use Hash::MultiValue;
+use JSON;
 use Minima::View::PlainText;
 use Plack::Request;
 use Plack::Response;
@@ -59,6 +60,25 @@ method trimmed_params ($options = {})
         push @params, $k, $v;
     }
     return Hash::MultiValue->new(@params);
+}
+
+method json_body
+{
+    my $c_type = $request->content_type // '';
+    return undef unless $c_type =~ m|\Aapplication/json\b|i;
+
+    my $body = $request->content // '';
+    return undef unless length $body;
+
+    my $data;
+
+    try {
+        $data = decode_json($body);
+    } catch ($e) {
+        return undef;
+    }
+
+    return $data;
 }
 
 method hello
@@ -247,6 +267,18 @@ directly to the response object. This is typically used for logging,
 instrumentation, or post-processing.
 
 See also: L<Minima::App/run>.
+
+=head2 json_body
+
+    method json_body
+
+Attempts to decode the request body as JSON. This method is useful for
+controllers handling C<application/json> POST requests.
+
+If the C<Content-Type> is not C<application/json>, the body is empty,
+the declared C<Content-Length> is invalid, or the JSON cannot be parsed,
+the method returns C<undef>. Otherwise, it returns the decoded Perl
+structure (typically a hash or array reference).
 
 =head2 redirect
 

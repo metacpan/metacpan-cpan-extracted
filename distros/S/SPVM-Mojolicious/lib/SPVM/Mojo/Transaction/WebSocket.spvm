@@ -6,6 +6,7 @@ class Mojo::Transaction::WebSocket extends Mojo::Transaction {
   
   use Mojo::WebSocket::Frame;
   use Packer;
+  use IO::Socket;
   
   # Fields
   has handshake : rw Mojo::Transaction::HTTP;
@@ -105,7 +106,7 @@ class Mojo::Transaction::WebSocket extends Mojo::Transaction {
     $self->emit(finish => $code, $reason);
   }
   
-  method connection : string () { return $self->handshake->connection; }
+  method connection : Mojo::Connection () { return $self->handshake->connection; }
   
   method finish : void ($code : int = 0, $reason : string = undef) {
     

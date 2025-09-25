@@ -36,6 +36,7 @@ use v5.40;
 # janeskil1525 E<lt>janeskil1525@gmail.com
 #
 
+use Data::Dumper;
 
 sub load_projects ($self) {
 
@@ -45,8 +46,9 @@ sub load_projects ($self) {
     #     $self->req->headers->header('X-Token-Check')
     # );
 
+    $self->app->log->debug($self->req->headers->header('X-Token-Check'));
     # my $setting = $self->param('setting');
-    $self->tools_projects->load_full_list_p()->then(sub($result) {
+    $self->v_tools_projects->load_full_list_p()->then(sub($result) {
         $self->render(json => $result->{data});
     })->catch(sub($err) {
         $self->render(json => { 'result' => 'failed', data => $err });
@@ -54,10 +56,12 @@ sub load_projects ($self) {
 }
 
 sub save_projects ($self) {
+
+    $self->app->log->debug('Daje::Controller::Toolsprojects::save_projects');
     $self->render_later;
 
     my $json_hash = decode_json ($self->req->body);
-    $self->tools_projects->save_projects($json_hash)->then(sub ($result) {
+    $self->tools_projects->insert_tools_projects_p($json_hash)->then(sub ($result) {
         $self->render(json => {'result' => $result});
     })->catch( sub ($err) {
         $self->render(json => {'result' => $err});

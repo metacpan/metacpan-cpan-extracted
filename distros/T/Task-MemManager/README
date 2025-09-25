@@ -3,7 +3,7 @@ NAME
     Perl.
 
 VERSION
-    version 0.08
+    version 0.09
 
 SYNOPSIS
       use Task::MemManager;
@@ -37,7 +37,7 @@ DESCRIPTION
 
       use Task::MemManager Allocator => ['PerlAlloc'];  # only PerlAlloc
       use Task::MemManager;                             # only PerlAlloc
-      use Task::MemManager ();                          # only PerlAlloc
+      use Task::MemManager ();                          # unusable
       use Task::MemManager Allocator => ['MyAlloc'];    # MyAlloc and PerlAlloc
 
       use Task::MemManager Allocator => ['MyAlloc','PerlAlloc']; # MyAlloc and PerlAlloc

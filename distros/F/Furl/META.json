@@ -4,7 +4,7 @@
       "Tokuhiro Matsuno <tokuhirom@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.12",
+   "generated_by" : "Minilla/v3.1.28",
    "license" : [
       "perl_5"
    ],
@@ -91,6 +91,7 @@
             "Test::TCP" : "2.11"
          },
          "suggests" : {
+            "HTTP::Body" : "0",
             "HTTP::CookieJar" : "0",
             "HTTP::Proxy" : "0",
             "HTTP::Server::PSGI" : "0",
@@ -109,14 +110,14 @@
    "provides" : {
       "Furl" : {
          "file" : "lib/Furl.pm",
-         "version" : "3.14"
+         "version" : "3.15"
       },
       "Furl::ConnectionCache" : {
          "file" : "lib/Furl/ConnectionCache.pm"
       },
       "Furl::HTTP" : {
          "file" : "lib/Furl/HTTP.pm",
-         "version" : "3.14"
+         "version" : "3.15"
       },
       "Furl::Headers" : {
          "file" : "lib/Furl/Headers.pm"
@@ -138,11 +139,12 @@
       },
       "homepage" : "https://github.com/tokuhirom/Furl",
       "repository" : {
-         "url" : "git://github.com/tokuhirom/Furl.git",
+         "type" : "git",
+         "url" : "https://github.com/tokuhirom/Furl.git",
          "web" : "https://github.com/tokuhirom/Furl"
       }
    },
-   "version" : "3.14",
+   "version" : "3.15",
    "x_contributors" : [
       "Audrey Tang <audreyt@audreyt.org>",
       "Breno G. de Oliveira <garu@cpan.org>",
@@ -160,6 +162,7 @@
       "Neil Bowers <neil@bowers.com>",
       "Shohei YOSHIDA <syohex@gmail.com>",
       "Shoichi Kaji <skaji@cpan.org>",
+      "Slaven Rezic <slaven@rezic.de>",
       "Toshio Ito <debug.ito@gmail.com>",
       "Yasuhiro Matsumoto <mattn.jp@gmail.com>",
       "bayashi <bayashi@cpan.org>",
@@ -170,8 +173,10 @@
       "lestrrat <lestrrat+github@gmail.com>",
       "s-aska <s.aska.org@gmail.com>",
       "tarao <tarao.gnn@gmail.com>",
-      "xaicron <xaicron@gmail.com>"
+      "xaicron <xaicron@gmail.com>",
+      "yoshikazusawa <883514+yoshikazusawa@users.noreply.github.com>",
+      "yuji-hatakeyama <htkymyj0512@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.06",
+   "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

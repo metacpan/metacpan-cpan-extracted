@@ -4,6 +4,36 @@
 class Mojo::Server::CGI extends Mojo::Server {
   version_from Mojolicious;
   
+  use IO::File;
+  use Sys;
+  
+  # Class Variables
+  our $CGI_ENV_NAMES : string[];
+  INIT {
+    $CGI_ENV_NAMES = [
+      "REQUEST_METHOD",
+      "QUERY_STRING",
+      "CONTENT_TYPE",
+      "CONTENT_LENGTH",
+      "SERVER_SOFTWARE",
+      "SERVER_NAME",
+      "SERVER_PROTOCOL",
+      "SERVER_PORT",
+      "GATEWAY_INTERFACE",
+      "REMOTE_ADDR",
+      "REMOTE_HOST",
+      "REMOTE_USER",
+      "AUTH_TYPE",
+      "SCRIPT_NAME",
+      "PATH_INFO",
+      "PATH_TRANSLATED",
+      "HTTP_USER_AGENT",
+      "HTTP_ACCEPT",
+      "HTTP_REFERER",
+      "HTTP_COOKIE", 
+    ];
+  }
+  
   # Fields
   has nph : rw byte;
   
@@ -17,7 +47,124 @@ class Mojo::Server::CGI extends Mojo::Server {
   
   # Instance Methods
   method run : void () {
-    die "TODO";
+    
+    $self->app->server($self);
+    
+    my $tx = $self->build_tx;
+    
+    my $env = $self->_env;
+    
+    my $req = $tx->req;
+    $req->parse(undef, $env);
+    
+    $tx->set_local_port((int)Sys->env("SERVER_PORT"));
+    $tx->set_remote_address(Sys->env("REMOTE_ADDR"));
+    
+    my $STDIN = IO::File->new_from_fd(Sys->fileno(Sys->STDIN), "<");
+    
+    # Request body (may block if we try to read too much)
+    my $len = (int)$req->headers->content_length;
+    while (1) {
+      
+      if ($req->is_finished) {
+        last;
+      }
+      
+      my $chunk = ($len && $len < 131072) ? $len : 131072;
+      my $buffer = (mutable string)new_string_len $chunk;
+      my $read = $STDIN->read($buffer);
+      unless ($read) {
+        last;
+      }
+      $req->parse($buffer);
+      
+      if (($len -= $read) <= 0) {
+        last;
+      }
+    }
+    
+    $self->emit(request => $tx);
+    
+    # Response start-line
+    my $res = $tx->res;
+    $res->fix_headers;
+    if ($self->nph && !&_write($res, "get_start_line_chunk")) {
+      return;
+    }
+    
+    # Response headers
+    my $code = $res->code || 404;
+    my $msg  = $res->message // $res->default_message;
+    unless ($self->nph) {
+      $res->headers->set_status("$code $msg");
+    }
+    unless (&_write($res, "get_header_chunk")) {
+      return;
+    }
+    
+    # Response body
+    unless ($tx->is_empty || &_write($res, "get_body_chunk")) {
+      return;
+    }
+    
+    # Finish transaction
+    $tx->closed;
+    
+    # return $res->code;
   }
   
+  private static method _write : int ($res : Mojo::Message::Response, $method : string)  {
+    
+    my $offset = 0;
+    while (1) {
+      
+      my $chunk = (string)undef;
+      if ($method eq "get_start_line_chunk") {
+        $chunk = $res->get_start_line_chunk($offset);
+      }
+      elsif ($method eq "get_header_chunk") {
+        $chunk = $res->get_header_chunk($offset);
+      }
+      elsif ($method eq "get_body_chunk") {
+        $chunk = $res->get_body_chunk($offset);
+      }
+      else {
+        die "[Unexpected Error]Invalid method '$method';";
+      }
+      
+      # No chunk yet, try again
+      unless ($chunk) {
+        Sys->sleep(1);
+        next;
+      }
+      
+      # End of part
+      my $len = length $chunk;
+      unless ($len) {
+        last;
+      }
+      
+      # Make sure we can still write
+      $offset += $len;
+      
+      # TODO: I don't understand this meaning
+      # return undef unless STDOUT->opened;
+      
+      print $chunk;
+    }
+    
+    return 1;
+  }
+  
+  private method _env : Hash () {
+    
+    my $env = Hash->new;
+    for my $name (@$CGI_ENV_NAMES) {
+      if (length (my $_ = Sys->env($name))) {
+        $env->set($name, $_);
+      }
+    }
+    
+    return $env;
+  }
 }

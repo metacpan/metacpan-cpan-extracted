@@ -39,8 +39,20 @@ like(
     'dies for file passed as directory'
 );
 
-my $cpanfile = path('cpanfile')->slurp;
-my ($version) = $cpanfile =~ /'([^']+)';/;
+# cpanfile
+ok(
+    !-e 'cpanfile',
+    'no cpanfile by default'
+);
+
+my $wcpan = $dir->child('with-cpanfile');
+Minima::Project::create($wcpan, { cpanfile => 1 });
+my $cpanfile = $wcpan->child('cpanfile');
+
+ok( -e $cpanfile, 'creates cpanfile if requested' );
+
+my $contents = $cpanfile->slurp;
+my ($version) = $contents =~ /'([^']+)';/;
 
 ok(
     defined $version,

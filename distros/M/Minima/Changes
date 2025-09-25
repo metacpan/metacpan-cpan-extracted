@@ -1,3 +1,16 @@
+v0.7.0  2025-09-24
+
+        [Changes]
+        - Add helper method `json_body` to Minima::Controller to decode
+          JSON request bodies.
+        - Make cpanfile optional in `minima new`. New projects no longer
+          include a cpanfile by default; pass `--cpanfile` to generate
+          one.
+
+        [Fixes]
+        - Remove obsolete content-type setting from controller template;
+          views now handle response preparation.
+
 v0.6.2  2025-09-21
 
         [Changes]

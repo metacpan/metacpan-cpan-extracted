@@ -30,6 +30,7 @@ if ($command eq 'new') {
     my %config;
     GetOptions(
         \%config,
+        'cpanfile!',
         'static|s!',
         'verbose!',
     );
@@ -114,6 +115,13 @@ current directory. The specified directory must be empty.
 All options can be inverted by using the C<no-> prefix.
 
 =over 4
+
+=item B<--cpanfile> I<(default: false)>
+
+Generate a F<cpanfile> in the new project root. This file declares the
+basic dependencies required by the generated application, allowing you
+to install them with L<Carton> or similar tools. By default, no
+F<cpanfile> is created unless this option is specified.
 
 =item B<--static, -s> I<(default: true)>
 

@@ -743,7 +743,10 @@ EOS
     
     my $handle = (IO::Socket)$self->{connections_h}->get(Fn->to_address($tx));
     
-    $tx->set_connection(Fn->to_address($tx));
+    my $connection = Mojo::Connection->new;
+    $connection->set_handle($handle);
+    
+    $tx->set_connection($connection);
     
     unless ($handle isa IO::Socket::UNIX) {
       my $handle_ip = (IO::Socket::IP)$handle;

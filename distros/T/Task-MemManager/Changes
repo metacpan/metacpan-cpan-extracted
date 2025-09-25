@@ -1,5 +1,7 @@
 Revision history for Task-MemManager
 
+0.09      2025-09-24 05:51:46-06:00 America/Denver
+- Fixed flawed logic that led to double import
 0.08      2025-09-22 21:27:05-06:00 America/Denver
 - Expanded documentation to include details on error handling e.g. when the
 allocator will return undef

@@ -22,13 +22,17 @@ our $LAST;
 our $WARN;
 our $DIE;
 
+# Handle the situation when the logger you hand to Log::WarnDie is (directly or indirectly) writing to STDERR, which this module has tied.
+# That causes the tied PRINT/PRINTF/__WARN__ handler to call the dispatcher again which writes to STDERR and you end up with deep recursion
+our $IN_LOG;	# false normally, true while we're inside a logging call
+
 =head1 NAME
 
 Log::WarnDie - Log standard Perl warnings and errors on a log handler
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =head1 SYNOPSIS
 
@@ -49,9 +53,7 @@ Version 0.11
     warn "This is a warning";       # now also dispatched
     die "Sorry it didn't work out"; # now also dispatched
 
-    no Log::WarnDie; # deactivate later
-
-    Log::WarnDie->dispatcher( undef ); # same
+    Log::WarnDie->dispatcher(undef); # deactivate
 
     Log::WarnDie->filter(\&filter);
     warn "This is a warning"; # no longer dispatched
@@ -59,12 +61,12 @@ Version 0.11
 
     # Filter out File::stat noise
     sub filter {
-	    return ($_[0] !~ /^S_IFFIFO is not a valid Fcntl macro/);
+	    return 0 if($_[0] != /^S_IFFIFO is not a valid Fcntl macro/);
     }
 
 =head1 DESCRIPTION
 
-The "Log::WarnDie" module offers a logging alternative for standard
+The C<Log::WarnDie> module offers a logging alternative for standard
 Perl core functions.  This allows you to use the features of e.g.
 L<Log::Dispatch>, L<Log::Any> or L<Log::Log4perl> B<without> having to make extensive
 changes to your source code.
@@ -98,7 +100,7 @@ level message.
 
 =cut
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 =head1 SUBROUTINES/METHODS
 
@@ -127,26 +129,28 @@ sub TIEHANDLE { bless \"$_[0]",$_[0] } #TIEHANDLE
 #  IN: 1 blessed object returned by TIEHANDLE
 #      2..N whatever was needed to be printed
 
-sub PRINT {
+sub PRINT
+{
+	# Lose the object
+	# If there is a dispatcher
+	#  Put it in the log handler if not the same as last time
+	#  Reset the flag
+	# Make sure it appears on the original STDERR as well
 
-# Lose the object
-# If there is a dispatcher
-#  Put it in the log handler if not the same as last time
-#  Reset the flag
-# Make sure it appears on the original STDERR as well
-
-    shift;
-    if($FILTER) {
-	return if($FILTER->(@_) == 0);
-    }
-    if ($DISPATCHER) {
-        $DISPATCHER->error( @_ )
-         unless $LAST and @$LAST == @_ and join( '',@$LAST ) eq join( '',@_ );
-        undef $LAST;
-    }
-    if($STDERR) {
-	print $STDERR @_;
-    }
+	return if $IN_LOG;	# prevents re-entry
+	shift;
+	if($FILTER) {
+		return if($FILTER->(@_) == 0);
+	}
+	if ($DISPATCHER) {
+		# Prevent deep recursion
+		local $IN_LOG = 1;
+		$DISPATCHER->error( @_ ) unless $LAST and @$LAST == @_ and join( '',@$LAST ) eq join( '',@_ );
+		undef $LAST;
+	}
+	if($STDERR) {
+		print $STDERR @_;
+	}
 } #PRINT
 
 #---------------------------------------------------------------------------
@@ -165,21 +169,23 @@ sub PRINTF {
 #  Reset the flag
 # Make sure it appears on the original STDERR as well
 
-    shift;
-    my $format = shift;
-    my @args = @_;
-    return if(scalar(@args) == 0);
-    if($FILTER) {
-	return if($FILTER->(sprintf($format, @args)) == 0);
-    }
-    if ($DISPATCHER) {
-        $DISPATCHER->error(sprintf($format, @args))
-         unless $LAST and @$LAST == @args and join( '',@$LAST ) eq join( '',@args );
-        undef $LAST;
-    }
-    if($STDERR) {
-	printf $STDERR $format, @args;
-    }
+	return if $IN_LOG;	# prevents re-entry
+	shift;
+	my $format = shift;
+	my @args = @_;
+	return if(scalar(@args) == 0);
+	if($FILTER) {
+		return if($FILTER->(sprintf($format, @args)) == 0);
+	}
+	if ($DISPATCHER) {
+		local $IN_LOG = 1;
+		$DISPATCHER->error(sprintf($format, @args))
+		unless $LAST and @$LAST == @args and join( '',@$LAST ) eq join( '',@args );
+		undef $LAST;
+	}
+	if($STDERR) {
+		printf $STDERR $format, @args;
+	}
 } #PRINTF
 
 #---------------------------------------------------------------------------
@@ -233,8 +239,7 @@ sub OPEN {
 
 BEGIN {
     $STDERR = IO::Handle->new();
-    $STDERR->fdopen( fileno( STDERR ),"w" )
-     or die "Could not open STDERR 2nd time: $!\n";
+    $STDERR->fdopen(fileno(STDERR), 'w') or die "Could not open STDERR 2nd time: $!\n";
     tie *STDERR,__PACKAGE__;
 
 #  Save current __WARN__ setting
@@ -309,9 +314,9 @@ BEGIN {
 	}
     };
 
-#  Make sure we won't be listed ourselves by Carp::
+	#  Make sure we won't be listed ourselves by Carp::
 
-    $Carp::Internal{__PACKAGE__} = 1;
+	$Carp::Internal{__PACKAGE__} = 1;
 } #BEGIN
 
 # Satisfy require
@@ -332,34 +337,34 @@ Class method to set and/or return the current dispatcher
 
 =cut
 
-sub dispatcher {
+sub dispatcher
+{
+	# Return the current dispatcher if no changes needed
+	# Set the new dispatcher
 
-# Return the current dispatcher if no changes needed
-# Set the new dispatcher
+	return $DISPATCHER if(scalar(@_) <= 1);
+	$DISPATCHER = $_[1];
 
-    return $DISPATCHER if(scalar(@_) <= 1);
-    $DISPATCHER = $_[1];
+	# If there is a dispatcher now
+	#  If the dispatcher is a Log::Dispatch er
+	#   Make sure all of standard Log::Dispatch stuff becomes invisible for Carp::
+	#   If there are outputs already
+	#    Make sure all of the output objects become invisible for Carp::
 
-# If there is a dispatcher now
-#  If the dispatcher is a Log::Dispatch er
-#   Make sure all of standard Log::Dispatch stuff becomes invisible for Carp::
-#   If there are outputs already
-#    Make sure all of the output objects become invisible for Carp::
+	if ($DISPATCHER) {
+		if($DISPATCHER->isa( 'Log::Dispatch')) {
+			$Carp::Internal{$_} = 1
+			foreach 'Log::Dispatch','Log::Dispatch::Output';
+			if(my $outputs = $DISPATCHER->{'outputs'}) {
+				$Carp::Internal{$_} = 1
+				foreach map {blessed $_} values %{$outputs};
+			}
+		}
+	}
 
-    if ($DISPATCHER) {
-        if ($DISPATCHER->isa( 'Log::Dispatch' )) {
-            $Carp::Internal{$_} = 1
-             foreach 'Log::Dispatch','Log::Dispatch::Output';
-            if (my $outputs = $DISPATCHER->{'outputs'}) {
-                $Carp::Internal{$_} = 1
-                 foreach map {blessed $_} values %{$outputs};
-            }
-        }
-    }
+	# Return the current dispatcher
 
-# Return the current dispatcher
-
-    $DISPATCHER;
+	return $DISPATCHER;
 } #dispatcher
 
 =head2 filter
@@ -406,9 +411,11 @@ sub unimport { import( undef ) } #unimport
 
 Elizabeth Mattijsen, <liz@dijkmat.nl>
 
-Maintained by Nigel Horne, C<< <njh at bandsman.co.uk> >>
+Maintained by Nigel Horne, C<< <njh at nigelhorne.com> >>
 
 =head1 BUGS
+
+This module is provided as-is without any warranty.
 
 Please report any bugs or feature requests to C<bug-log-warndie at rt.cpan.org>,
 or through the web interface at
@@ -424,31 +431,37 @@ The following caveats may apply to your situation.
 
 Although a module such as L<Log::Dispatch> is B<not> listed as a prerequisite,
 the real use of this module only comes into view when such a module B<is>
-installed.  Please note that for testing this module, you will need the
+installed.
+Please note that for testing this module, you will need the
 L<Log::Dispatch::Buffer> module to also be available.
 
 This module has been tested with
 L<Log::Dispatch>, L<Log::Any> and L<Log::Log4perl>.
-In principle any object which recognises C<warning>, C<error> and C<critical> should work.
+In principle,
+any object which recognises C<warning>, C<error> and C<critical> should work.
 
 =head2 eval
 
 In the current implementation of Perl, a __DIE__ handler is B<also> called
-inside an eval.  Whereas a normal C<die> would just exit the eval, the __DIE__
-handler _will_ get called inside the eval.  Which may or may not be what you
-want.  To prevent the __DIE__ handler to be called inside eval's, add the
+inside an eval.
+Whereas a normal C<die> would just exit the eval, the __DIE__
+handler _will_ get called inside the eval.
+Which may or may not be what you want.
+To prevent the __DIE__ handler from being called inside eval's, add the
 following line to the eval block or string being evaluated:
 
     local $SIG{__DIE__} = undef;
 
 This disables the __DIE__ handler within the evalled block or string, and
 will automatically enable it again upon exit of the evalled block or string.
-Unfortunately there is no automatic way to do that for you.
+Unfortunately,
+there is no automatic way to do that for you.
 
 =head1 COPYRIGHT
 
 Copyright (c) 2004, 2007 Elizabeth Mattijsen <liz@dijkmat.nl>. All rights
-reserved.  This program is free software; you can redistribute it and/or
+reserved.
+This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
 Portions of versions 0.06 onwards, Copyright 2017-2024 Nigel Horne

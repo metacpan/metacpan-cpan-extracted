@@ -6,19 +6,20 @@ use warnings;
 use Carp;
 use Text::CSV_XS;
 use Data::Dumper;
-use ReadonlyX;
 use Scalar::Util qw(reftype);
 
-Readonly our $SUCCESS => 1;
-Readonly our $FAILURE => 0;
-Readonly our $TRUE    => 1;
-Readonly our $FALSE   => 0;
+use Readonly;
 
-Readonly our $EMPTY => q{};
-Readonly our $NL    => "\n";
-Readonly our $TAB   => "\t";
-Readonly our $PIPE  => q{|};
-Readonly our $COMMA => q{,};
+Readonly::Scalar our $SUCCESS => 1;
+Readonly::Scalar our $FAILURE => 0;
+Readonly::Scalar our $TRUE    => 1;
+Readonly::Scalar our $FALSE   => 0;
+
+Readonly::Scalar our $EMPTY => q{};
+Readonly::Scalar our $NL    => "\n";
+Readonly::Scalar our $TAB   => "\t";
+Readonly::Scalar our $PIPE  => q{|};
+Readonly::Scalar our $COMMA => q{,};
 
 use parent qw(Exporter);
 

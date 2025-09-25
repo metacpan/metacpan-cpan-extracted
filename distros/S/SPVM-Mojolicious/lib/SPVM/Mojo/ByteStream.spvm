@@ -3,4 +3,30 @@
 
 class Mojo::ByteStream {
   version_from Mojolicious;
+  
+  # Interfaces
+  interface Stringable;
+  
+  # Undocumented Fields
+  has string : string;
+  
+  # Class Mehtods
+  static method new : Mojo::ByteStream ($string : string) {
+    
+    my $self = new Mojo::ByteStream;
+    
+    unless ($string) {
+      die "The string \$string must be defined.";
+    }
+    
+    $self->{string} = $string;
+    
+    return $self;
+  }
+  
+  # Instance Methods
+  method to_string : string () {
+    return $self->{string};
+  }
+  
 }

@@ -15,6 +15,7 @@ sub create ($dir, $user_config = {})
 {
     my $project = path($dir // '.')->absolute;
     my %config = (
+        'cpanfile' => 0,
         'static' => 1,
         'verbose' => 0,
         %$user_config
@@ -73,7 +74,7 @@ sub get_templates ($config)
             $content = $processed;
         }
         s/\.\w+$//;
-        $files{$_} = $content;
+        $files{$_} = $content if $content;
     }
 
     map { $_, $files{$_} } sort keys %files;

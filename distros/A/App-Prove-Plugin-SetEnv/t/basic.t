@@ -1,31 +1,16 @@
 use strict;
 use warnings;
 
-use Test::More;
-use Test::Fatal;
+use Test::More import => [ qw( is ) ], tests => 2;
 
-use Capture::Tiny 0.12 qw(capture);
-use App::Prove;
+use App::Prove ();
 
-use ok "App::Prove::Plugin::SetEnv";
+my $default_PATH = '/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin';
+local @ENV{ qw( FOO PATH ) } = ( '', $default_PATH );
+my $app = App::Prove->new;
+$app->process_args( '-PSetEnv=FOO=bar,PATH=baz:$PATH' );
+$app->_load_extensions( $app->plugins, App::Prove::PLUGINS() );
 
-
-delete $ENV{"APP_PROVE_PLUGIN_SETENV_TEST_$_"}
-    foreach qw(FOO BAR);
-
-is exception {
-    my ($stdout, $stderr, $result) = capture {
-        my $app = App::Prove->new;
-        $app->process_args(
-            qw(--norc -Q -P),
-            'SetEnv=' . join(',', map { "APP_PROVE_PLUGIN_SETENV_TEST_$_=$_" } qw(FOO BAR)),
-            't/data/env.pl'
-        );
-        $app->run;
-    };
-    ok $result, "success";
-    like $stdout, qr/PASS/, "PASS in output";
-    is $stderr, "", "no error output";
-}, undef, "no exception";
-
-done_testing();
+is $ENV{ FOO }, 'bar', 'set new FOO environment variable';
+is $ENV{ PATH }, "baz:$default_PATH",
+  'expand string in PATH environment variable'

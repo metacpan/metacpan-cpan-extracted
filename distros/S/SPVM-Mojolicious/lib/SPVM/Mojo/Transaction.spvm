@@ -8,6 +8,8 @@ class Mojo::Transaction extends Mojo::EventEmitter {
   use Mojo::Message::Response;
   use Mojo::Util;
   use Hash;
+  use IO::Socket;
+  use Mojo::Connection;
   
   # Fields
   has kept_alive : rw byte;
@@ -85,7 +87,7 @@ class Mojo::Transaction extends Mojo::EventEmitter {
     }
   ;
   
-  has connection : rw string
+  has connection : rw Mojo::Connection
     set {
       
       $self->{connection} = $_;
@@ -145,7 +147,7 @@ class Mojo::Transaction extends Mojo::EventEmitter {
   
   method server_read : void ($chunk : string) { die "Not implemented."; }
   
-  method server_write : string ($server : int) { die "Not implemented."; }
+  method server_write : string () { die "Not implemented."; }
 
 }
 

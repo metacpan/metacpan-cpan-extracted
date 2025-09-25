@@ -21,6 +21,14 @@ lib/SPVM/Mojo/Callback.pm
 lib/SPVM/Mojo/Callback.spvm
 lib/SPVM/Mojo/Collection.pm
 lib/SPVM/Mojo/Collection.spvm
+lib/SPVM/Mojo/Connection.pm
+lib/SPVM/Mojo/Connection.spvm
+lib/SPVM/Mojo/Connection/Client.pm
+lib/SPVM/Mojo/Connection/Client.spvm
+lib/SPVM/Mojo/Connection/Server.pm
+lib/SPVM/Mojo/Connection/Server.spvm
+lib/SPVM/Mojo/Connection/Stream.pm
+lib/SPVM/Mojo/Connection/Stream.spvm
 lib/SPVM/Mojo/Content.pm
 lib/SPVM/Mojo/Content.spvm
 lib/SPVM/Mojo/Content/MultiPart.pm
@@ -79,6 +87,10 @@ lib/SPVM/Mojo/Server/Hypnotoad.pm
 lib/SPVM/Mojo/Server/Hypnotoad.spvm
 lib/SPVM/Mojo/Server/Morbo.pm
 lib/SPVM/Mojo/Server/Morbo.spvm
+lib/SPVM/Mojo/Server/Morbo/Backend.pm
+lib/SPVM/Mojo/Server/Morbo/Backend.spvm
+lib/SPVM/Mojo/Server/Morbo/Backend/Poll.pm
+lib/SPVM/Mojo/Server/Morbo/Backend/Poll.spvm
 lib/SPVM/Mojo/Server/Prefork.pm
 lib/SPVM/Mojo/Server/Prefork.spvm
 lib/SPVM/Mojo/SSE.pm

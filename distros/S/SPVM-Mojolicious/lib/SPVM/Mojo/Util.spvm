@@ -403,5 +403,9 @@ class Mojo::Util {
     
     Getopt::Long->GetOptionsFromArray($comand_args_ref, $values_h, $spec_strings);
   }
-
+  
+  static method get_data_template : string ($data_section : string, $name : string) {
+    
+  }
+  
 }

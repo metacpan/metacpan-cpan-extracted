@@ -5,6 +5,10 @@ class Mojolicious::Commands extends Mojolicious::Command {
   version_from Mojolicious;
   
   use Mojolicious::Command::Cgi;
+  use Mojolicious::Command::Daemon;
+  use Mojolicious::Command::Prefork;
+  use Mojolicious::Command::Morbo;
+  use Mojolicious::Command::Hypnotoad;
   
   # Class Methods
   static method new : Mojolicious::Commands () {
@@ -18,4 +22,5 @@ class Mojolicious::Commands extends Mojolicious::Command {
   method run : void ($argv : string[]) {
     
   }
+  
 }

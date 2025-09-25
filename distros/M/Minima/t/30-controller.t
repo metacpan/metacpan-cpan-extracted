@@ -2,8 +2,11 @@ use v5.40;
 use Test2::V0;
 
 use Hash::MultiValue;
+use JSON;
 use Minima::App;
 use Minima::Controller;
+
+use utf8;
 
 # Basic response
 {
@@ -96,6 +99,67 @@ use Minima::Controller;
     is( [ $params->get_all('multi') ], [0,1], 'trims values of multi-keys' );
     is( $params->{array}[1], 1, 'trims elements of array values' );
     is( $params->{hash}{key}, ' value ', 'leaves hash refs untouched' );
+}
+
+# UTF-8 JSON decoding
+{
+    my $body = encode_json({ word => 'órgão' });
+    open my $fh, '<', \$body;
+    my $env = {
+        'psgi.input'     => $fh,
+        'CONTENT_LENGTH' => length($body),
+        'CONTENT_TYPE'   => 'application/json',
+    };
+    my $app = Minima::App->new(environment => $env);
+    my $c   = Minima::Controller->new(app => $app);
+
+    my $data = $c->json_body;
+    is( $data->{word}, 'órgão', 'decodes UTF-8 JSON correctly' );
+}
+
+# Wrong content-type
+{
+    my $body = '{}'; open my $fh, '<', \$body;
+    my $env = {
+        'psgi.input'     => $fh,
+        'CONTENT_LENGTH' => length($body),
+        'CONTENT_TYPE'   => 'text/plain',
+    };
+    my $app = Minima::App->new(environment => $env);
+    my $c   = Minima::Controller->new(app => $app);
+
+    is( $c->json_body, undef, 'wrong content-type returns undef' );
+}
+
+# Broken content-length
+{
+    my $body = '{}'; open my $fh, '<', \$body;
+    my $env = {
+        'psgi.input'     => $fh,
+        'CONTENT_LENGTH' => 662,
+        'CONTENT_TYPE'   => 'application/json',
+    };
+    my $app = Minima::App->new(environment => $env);
+
+    like(
+        dies { my $c   = Minima::Controller->new(app => $app) },
+        qr/content-length/i,
+        'dies on broken content-length'
+    );
+}
+
+# Invalid JSON
+{
+    my $body = '{broken:json}'; open my $fh, '<', \$body;
+    my $env = {
+        'psgi.input'     => $fh,
+        'CONTENT_LENGTH' => length($body),
+        'CONTENT_TYPE'   => 'application/json',
+    };
+    my $app = Minima::App->new(environment => $env);
+    my $c   = Minima::Controller->new(app => $app);
+
+    is( $c->json_body, undef, 'invalid JSON returns undef' );
 }
 
 done_testing;

@@ -76,11 +76,11 @@ class Mojo::WebSocket {
 
   }
   
-  static method client_handshake : Mojo::Transaction::HTTP ($tx : Mojo::Transaction::HTTP) {
+  static method client_handshake : Mojo::Transaction::HTTP ($tx : Mojo::Transaction) {
     die "Not yet implemented.";
   }
 
-  static method server_handshake : Mojo::Transaction::HTTP ($tx : Mojo::Transaction::HTTP) {
+  static method server_handshake : Mojo::Transaction::HTTP ($tx : Mojo::Transaction) {
     die "Not yet implemented.";
   }
 

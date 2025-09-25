@@ -66,6 +66,6 @@
          "web" : "https://github.com/yuki-kimoto/SPVM-Mojolicious"
       }
    },
-   "version" : "0.023",
+   "version" : "0.024",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

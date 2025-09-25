@@ -138,7 +138,7 @@ class Mojo::Transaction::HTTP extends Mojo::Transaction {
     
   }
   
-  method server_write : string ($server : int) { $self->_write(1); }
+  method server_write : string () { $self->_write(1); }
   
   private method _start_line : string ($msg : Mojo::Message) {
     

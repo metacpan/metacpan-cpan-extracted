@@ -7,6 +7,8 @@ build_requires:
   File::Spec: '3.4'
   IPC::System::Simple: '0'
   Log::Dispatch::Null: '0'
+  Net::SFTP::Foreign: '0'
+  Test::DescribeMe: '0'
   Test::File::Contents: '0'
   Test::Most: '0'
   Test::Needs: '0'
@@ -15,7 +17,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,5 +33,5 @@ requires:
 resources:
   bugtracker: https://github.com/nigelhorne/Log-WarnDie
   repository: git://github.com/nigelhorne/Log::WarnDie.git
-version: '0.11'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '0.12'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

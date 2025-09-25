@@ -1,8 +1,23 @@
 # Copyright (c) 2025 Yuki Kimoto
 # MIT License
 
-class Mojo::Server::Prefork extends Mojo::Server {
+class Mojo::Server::Prefork extends Mojo::Server::Daemon {
   version_from Mojolicious;
+  
+  # Fields
+  has accepts : rw int;
+  
+  has graceful_timeout : rw int;
+  
+  has heartbeat_interval : rw int;
+  
+  has heartbeat_timeout : rw int;
+  
+  has pid_file : rw string;
+  
+  has spare : rw int;
+  
+  has workers : rw int;
   
   # Class Methods
   static method new : Mojo::Server::Prefork () {

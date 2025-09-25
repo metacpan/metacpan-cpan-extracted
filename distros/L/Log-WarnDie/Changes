@@ -1,3 +1,10 @@
+Revision history for Log-WarnDie
+
+0.12	Wed Sep 24 11:50:20 EDT 2025
+	Use Test::DescribeMe to simplify tests
+	Added t/30-basics.t
+	Fix "Deep recursion on anonymous subroutine"
+
 0.11	Thu Jul 18 08:12:22 EDT 2024
 	Added Test::Needs
 

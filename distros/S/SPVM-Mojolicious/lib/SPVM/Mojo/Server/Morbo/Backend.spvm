@@ -1,0 +1,15 @@
+# Copyright (c) 2025 Yuki Kimoto
+# MIT License
+
+class Mojo::Server::Morbo::Backend {
+  version_from Mojolicious;
+  
+  # Fields
+  has watch : rw string[];
+  
+  has watch_timeout : rw int;
+  
+  # Instance Methods
+  method modified_files : void () { die "Not implemented."; }
+  
+}

@@ -1,14 +1,13 @@
 use strict;
 use warnings;
 
+use Test::DescribeMe qw(author);
 use Test::Most;
 
-unless($ENV{RELEASE_TESTING}) {
-    plan( skip_all => "Author tests not required for installation" );
+eval "use Test::Kwalitee tests => [ qw( -has_meta_yml ) ]";
+
+if($@) {
+	plan(skip_all => 'Test::Kwalitee not installed; skipping') if $@;
+} else {
+	unlink('Debian_CPANTS.txt') if -e 'Debian_CPANTS.txt';
 }
-
-eval { require Test::Kwalitee; Test::Kwalitee->import(); };
-
-plan( skip_all => 'Test::Kwalitee not installed; skipping' ) if $@;
-
-unlink 'Debian_CPANTS.txt' if -e 'Debian_CPANTS.txt';

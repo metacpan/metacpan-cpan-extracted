@@ -8,5 +8,5 @@ class Mojo::Loader {
   static method load_class : void ($class_name : string) {
     die "Not implemented";
   }
-
+  
 }

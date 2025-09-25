@@ -23,7 +23,7 @@ class Mojolicious::Command::Cgi extends Mojolicious::Command {
         $self->{usage} = <<'EOS';
 Usage: APPLICATION cgi [OPTIONS]
 
-  ./myapp.pl cgi
+  ./myapp.spvm cgi
 
 Options:
   -h, --help          Show this summary of available options

@@ -1,8 +1,8 @@
-0.022 2025-09-20
-  [Requirement Changes]
-    * Require SPVM::Getopt::Long 0.003.
+0.024 2025-09-25
+  [Changes]
+    * Improve server related classes.
     
-0.021 2025-09-18
+0.023 2025-09-18
   [Requirement Changes]
     * Require SPVM 0.990090.
     

@@ -1,5 +1,5 @@
 package Task::MemManager;
-$Task::MemManager::VERSION = '0.08';
+$Task::MemManager::VERSION = '0.09';
 # ABSTRACT: A memory allocator for low level code in Perl.
 use strict;
 use warnings;
@@ -139,10 +139,6 @@ sub import {
     }
 }
 
-# Ensure import runs even if module is used without options
-unless ($import_was_called) {
-    __PACKAGE__->import();    # Call with no arguments (uses defaults)
-}
 
 ###############################################################################
 # Usage       : my $buffer = Task::MemManager->new(10, 1, {allocator =>
@@ -446,7 +442,7 @@ Task::MemManager - A memory allocated and manager for low level code in Perl.
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -482,7 +478,7 @@ device mappings and views. For example:
 
   use Task::MemManager Allocator => ['PerlAlloc'];  # only PerlAlloc
   use Task::MemManager;                             # only PerlAlloc
-  use Task::MemManager ();                          # only PerlAlloc
+  use Task::MemManager ();                          # unusable
   use Task::MemManager Allocator => ['MyAlloc'];    # MyAlloc and PerlAlloc
 
   use Task::MemManager Allocator => ['MyAlloc','PerlAlloc']; # MyAlloc and PerlAlloc

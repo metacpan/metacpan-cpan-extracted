@@ -57,6 +57,7 @@ t/100_low/36_inactivity_timeout.t
 t/100_low/37_bad_content_length.t
 t/100_low/38_continue.t
 t/100_low/39_httpoxy.t
+t/100_low/40_timeout_body_no_content_length.t
 t/300_high/01_simple.t
 t/300_high/02_agent.t
 t/300_high/04_http_request.t

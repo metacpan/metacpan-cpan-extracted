@@ -1,7 +1,9 @@
 Revision history for Task-MemManager-View
 - Provided parameters to import() to specify view modules to be loaded
-- Provide a default view module (Scalar) if none is specified. This 
-view module provides a view of the buffer as a Perl scalar.
+0.04      2025-09-24 05:53:59-06:00 America/Denver
+- Fixed mistake in sub install_view_modules, which led to the view
+'Task::MemManager' be created, because I forgot to shift when 
+entering the sub
 0.02      2025-09-22 21:25:13-06:00 America/Denver
 - Provide the ability to install view modules passed as parameters to import()
 0.01      2025-09-14 13:55:44-06:00 America/Denver

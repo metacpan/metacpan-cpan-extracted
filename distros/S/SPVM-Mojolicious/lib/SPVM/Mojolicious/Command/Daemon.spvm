@@ -1,6 +1,142 @@
 # Copyright (c) 2025 Yuki Kimoto
 # MIT License
 
-class Mojolicious::Command::Daemon {
+class Mojolicious::Command::Daemon extends Mojolicious::Command {
   version_from Mojolicious;
+  
+  use Mojo::Server::Daemon;
+  use Mojo::Util;
+  use Fn;
+  
+  has description : rw string
+    get {
+      unless (exists $self->{description}) {
+        $self->{description} = "Start application with HTTP and WebSocket server";
+      }
+      return $self->{description};
+    }
+  ;
+  
+  has usage : rw string
+    get {
+      unless (exists $self->{usage}) {
+        $self->{usage} = <<'EOS';
+Usage: APPLICATION daemon [OPTIONS]
+
+  ./myapp.spvm daemon
+  ./myapp.spvm daemon -m production -p -l http://*:8080
+  ./myapp.spvm daemon -l http://127.0.0.1:8080 -l https://[::]:8081
+  ./myapp.spvm daemon -l 'https://*:443?cert=./server.crt&key=./server.key'
+  ./myapp.spvm daemon -l http+unix://%2Ftmp%2Fmyapp.sock
+  ./myapp.spvm daemon -l http://127.0.0.1:8080 -p 127.0.0.0/8 -p fc00::/7
+
+Options:
+  -b, --backlog <size>                 Listen backlog size, defaults to
+                                       SOMAXCONN
+  -c, --clients <number>               Maximum number of concurrent
+                                       connections, defaults to 1000
+  -h, --help                           Show this summary of available options
+      --home <path>                    Path to home directory of your
+                                       application, defaults to the value of
+                                       MOJO_HOME or auto-detection
+  -i, --inactivity-timeout <seconds>   Inactivity timeout, defaults to the
+                                       value of MOJO_INACTIVITY_TIMEOUT or 30
+  -k, --keep-alive-timeout <seconds>   Keep-alive timeout, defaults to the
+                                       value of MOJO_KEEP_ALIVE_TIMEOUT or 5
+  -l, --listen <location>              One or more locations you want to
+                                       listen on, defaults to the value of
+                                       MOJO_LISTEN or "http://*:3000"
+  -m, --mode <name>                    Operating mode for your application,
+                                       defaults to the value of
+                                       MOJO_MODE/PLACK_ENV or "development"
+  -p, --proxy [<network>]              Activate reverse proxy support,
+                                       defaults to the value of
+                                       MOJO_REVERSE_PROXY, optionally takes
+                                       one or more trusted proxy addresses or
+                                       networks
+  -r, --requests <number>              Maximum number of requests per
+                                       keep-alive connection, defaults to 100
+
+EOS
+      }
+      
+      return $self->{usage};
+    }
+  ;
+  
+  method build_server : Mojo::Server::Daemon ($args : string[] = undef) {
+    
+    my $values_h = Hash->new({
+      listen => new string[0],
+      proxy => new string[0],
+    });
+    
+    my $specs = [
+      "b|backlog=i",
+      "c|clients=i",
+      "i|inactivity-timeout=i",
+      "k|keep-alive-timeout=i",
+      "l|listen=s",
+      "p|proxy=s",
+      "r|requests=i",
+    ];
+    
+    eval { Mojo::Util->getopt(my $_ = [$args], $values_h, $specs); }
+    
+    if ($@) {
+      die $self->usage;
+    }
+    
+    my $server = Mojo::Server::Daemon->new;
+    
+    $server->set_app($self->app);
+    
+    if ($values_h->exists("backlog")) {
+      my $backlog = $values_h->get_int("backlog");
+      $server->set_backlog($backlog);
+    }
+    
+    if ($values_h->exists("clients")) {
+      my $max_clients = $values_h->get_int("clients");
+      $server->set_max_clients($max_clients);
+    }
+    
+    if ($values_h->exists("inactivity-timeout")) {
+      my $inactivity_timeout = $values_h->get_int("inactivity-timeout");
+      $server->set_inactivity_timeout($inactivity_timeout);
+    }
+    
+    if ($values_h->exists("keep-alive-timeout")) {
+      my $keep_alive_timeout = $values_h->get_int("keep-alive-timeout");
+      $server->set_keep_alive_timeout($keep_alive_timeout);
+    }
+    
+    if ($values_h->exists("requests")) {
+      my $max_requests = $values_h->get_int("requests");
+      $server->set_max_requests($max_requests);
+    }
+    
+    my $listen = (string[])$values_h->get("listen");
+    if (@$listen) {
+      $server->set_listen($listen);
+    }
+    
+    my $proxy = (string[])$values_h->get("proxy");
+    if (@$proxy) {
+      $server->set_reverse_proxy(1);
+    }
+    
+    my $trusted = (string[])Fn->grep(method : int ($_ : string) { return length $_; }, $proxy);
+    if (@$trusted) {
+      $server->set_trusted_proxies($trusted);
+    }
+    
+    return $server;
+  }
+  
+  method run : void ($args : string[]) {
+    
+    $self->build_server($args)->run;
+  }
+  
 }

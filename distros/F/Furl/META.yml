@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.12, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.28, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,12 +29,12 @@ no_index:
 provides:
   Furl:
     file: lib/Furl.pm
-    version: '3.14'
+    version: '3.15'
   Furl::ConnectionCache:
     file: lib/Furl/ConnectionCache.pm
   Furl::HTTP:
     file: lib/Furl/HTTP.pm
-    version: '3.14'
+    version: '3.15'
   Furl::Headers:
     file: lib/Furl/Headers.pm
   Furl::Request:
@@ -61,8 +61,8 @@ requires:
 resources:
   bugtracker: https://github.com/tokuhirom/Furl/issues
   homepage: https://github.com/tokuhirom/Furl
-  repository: git://github.com/tokuhirom/Furl.git
-version: '3.14'
+  repository: https://github.com/tokuhirom/Furl.git
+version: '3.15'
 x_contributors:
   - 'Audrey Tang <audreyt@audreyt.org>'
   - 'Breno G. de Oliveira <garu@cpan.org>'
@@ -80,6 +80,7 @@ x_contributors:
   - 'Neil Bowers <neil@bowers.com>'
   - 'Shohei YOSHIDA <syohex@gmail.com>'
   - 'Shoichi Kaji <skaji@cpan.org>'
+  - 'Slaven Rezic <slaven@rezic.de>'
   - 'Toshio Ito <debug.ito@gmail.com>'
   - 'Yasuhiro Matsumoto <mattn.jp@gmail.com>'
   - 'bayashi <bayashi@cpan.org>'
@@ -91,5 +92,7 @@ x_contributors:
   - 's-aska <s.aska.org@gmail.com>'
   - 'tarao <tarao.gnn@gmail.com>'
   - 'xaicron <xaicron@gmail.com>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+  - 'yoshikazusawa <883514+yoshikazusawa@users.noreply.github.com>'
+  - 'yuji-hatakeyama <htkymyj0512@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
 x_static_install: 1

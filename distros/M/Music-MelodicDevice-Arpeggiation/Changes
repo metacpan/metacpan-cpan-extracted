@@ -1,5 +1,14 @@
 Revision history for Music-MelodicDevice-Arpeggiation
 
+0.0302 2025-09-24 14:51:36
+  - Improve example documentation.
+
+0.0301 2025-09-24 11:55:48
+  - Add the eg/arp.pl example program.
+
+0.0300 2025-09-24 10:27:49
+  - Refactored how arpeggiation works, again. :|
+
 0.0203 2025-09-22 16:29:42
   - Improve tests.
   - Drop the public `build_pattern()` method.

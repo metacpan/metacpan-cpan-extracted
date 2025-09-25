@@ -4,6 +4,16 @@
 class Mojo::Server::Morbo extends Mojo::Server {
   version_from Mojolicious;
   
+  use Mojo::Server::Morbo::Backend;
+  use Mojo::Server::Daemon;
+  
+  # Fields
+  has backend : rw Mojo::Server::Morbo::Backend;
+  
+  has daemon : rw Mojo::Server::Daemon;
+
+  has silent : rw byte;
+  
   # Class Methods
   static method new : Mojo::Server::Morbo () {
     

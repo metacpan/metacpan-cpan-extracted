@@ -1,13 +1,11 @@
 Changes
-LICENSE
-MANIFEST
-MANIFEST.SKIP
-META.json
-META.yml
-Makefile.PL
-README
-dist.ini
+cpanfile
 lib/App/Prove/Plugin/SetEnv.pm
+lib/App/Prove/Plugin/SetEnv.pod
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
 t/basic.t
-t/data/env.pl
-t/release-pod-syntax.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

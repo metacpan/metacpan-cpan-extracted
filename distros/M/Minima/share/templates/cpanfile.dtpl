@@ -1,1 +1,3 @@
+@@ IF cpanfile
 requires 'Minima', '[* version *]';
+@@ END

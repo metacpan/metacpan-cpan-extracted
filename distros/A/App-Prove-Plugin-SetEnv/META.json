@@ -1,10 +1,10 @@
 {
-   "abstract" : "a prove plugin to set environment variables",
+   "abstract" : "A prove plugin to set environment variables",
    "author" : [
-      "Dagfinn Ilmari Manns\u00c3\u00a5ker <ilmari@photobox.com>;"
+      "Sven Willenbuecher <sven.willenbuecher@gmx.de>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.300006, CPAN::Meta::Converter version 2.113640",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "perl_5"
    ],
@@ -13,37 +13,58 @@
       "version" : "2"
    },
    "name" : "App-Prove-Plugin-SetEnv",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.30"
+            "ExtUtils::MakeMaker" : "6.76",
+            "ExtUtils::MakeMaker::CPANfile" : "0.09",
+            "File::Spec" : "0",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "strict" : 0,
-            "warnings" : 0
+            "String::Expand" : "0",
+            "perl" : "5.010001",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "test" : {
          "requires" : {
-            "App::Prove" : 0,
-            "Capture::Tiny" : "0.12",
-            "Test::Fatal" : 0,
-            "Test::More" : 0,
-            "ok" : 0
+            "App::Prove" : "0",
+            "Test::More" : "1.001005"
          }
+      }
+   },
+   "provides" : {
+      "App::Prove::Plugin::SetEnv" : {
+         "file" : "lib/App/Prove/Plugin/SetEnv.pm",
+         "version" : "v1.0.0"
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "https://github.com/ilmari/App-Prove-Plugin-SetEnv",
+      "bugtracker" : {
+         "web" : "https://github.com/XSven/App-Prove-Plugin-SetEnv/issues"
+      },
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/ilmari/App-Prove-Plugin-SetEnv.git",
-         "web" : "https://github.com/ilmari/App-Prove-Plugin-SetEnv"
+         "url" : "https://github.com/XSven/App-Prove-Plugin-SetEnv.git",
+         "web" : "https://github.com/XSven/App-Prove-Plugin-SetEnv"
       }
    },
-   "version" : "0.001"
+   "version" : "v1.0.0"
 }
-

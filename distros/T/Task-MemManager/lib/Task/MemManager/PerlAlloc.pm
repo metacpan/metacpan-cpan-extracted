@@ -1,5 +1,5 @@
 package Task::MemManager::PerlAlloc;
-$Task::MemManager::PerlAlloc::VERSION = '0.08';
+$Task::MemManager::PerlAlloc::VERSION = '0.09';
 use strict;
 use warnings;
 
@@ -135,7 +135,7 @@ Task::MemManager::PerlAlloc - Allocates buffers using Perl's string functions
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SYNOPSIS
 

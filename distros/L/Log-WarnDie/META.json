@@ -4,7 +4,7 @@
       "Nigel Horne <njh@bandsman.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -41,6 +41,8 @@
             "File::Spec" : "3.4",
             "IPC::System::Simple" : "0",
             "Log::Dispatch::Null" : "0",
+            "Net::SFTP::Foreign" : "0",
+            "Test::DescribeMe" : "0",
             "Test::File::Contents" : "0",
             "Test::Most" : "0",
             "Test::Needs" : "0",
@@ -62,6 +64,6 @@
          "x_repository" : "https://github.com/nigelhorne/Log-WarnDie"
       }
    },
-   "version" : "0.11",
+   "version" : "0.12",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

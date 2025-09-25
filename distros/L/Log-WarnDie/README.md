@@ -10,7 +10,7 @@ Log::WarnDie - Log standard Perl warnings and errors on a log handler
 
 # VERSION
 
-Version 0.11
+Version 0.12
 
 # SYNOPSIS
 
@@ -31,9 +31,7 @@ Version 0.11
     warn "This is a warning";       # now also dispatched
     die "Sorry it didn't work out"; # now also dispatched
 
-    no Log::WarnDie; # deactivate later
-
-    Log::WarnDie->dispatcher( undef ); # same
+    Log::WarnDie->dispatcher(undef); # deactivate
 
     Log::WarnDie->filter(\&filter);
     warn "This is a warning"; # no longer dispatched
@@ -41,12 +39,12 @@ Version 0.11
 
     # Filter out File::stat noise
     sub filter {
-            return ($_[0] !~ /^S_IFFIFO is not a valid Fcntl macro/);
+            return 0 if($_[0] != /^S_IFFIFO is not a valid Fcntl macro/);
     }
 
 # DESCRIPTION
 
-The "Log::WarnDie" module offers a logging alternative for standard
+The `Log::WarnDie` module offers a logging alternative for standard
 Perl core functions.  This allows you to use the features of e.g.
 [Log::Dispatch](https://metacpan.org/pod/Log%3A%3ADispatch), [Log::Any](https://metacpan.org/pod/Log%3A%3AAny) or [Log::Log4perl](https://metacpan.org/pod/Log%3A%3ALog4perl) **without** having to make extensive
 changes to your source code.
@@ -100,9 +98,11 @@ Useful for noisy messages such as File::stat giving S\_IFFIFO is not a valid Fcn
 
 Elizabeth Mattijsen, <liz@dijkmat.nl>
 
-Maintained by Nigel Horne, `<njh at bandsman.co.uk>`
+Maintained by Nigel Horne, `<njh at nigelhorne.com>`
 
 # BUGS
+
+This module is provided as-is without any warranty.
 
 Please report any bugs or feature requests to `bug-log-warndie at rt.cpan.org`,
 or through the web interface at
@@ -118,31 +118,37 @@ The following caveats may apply to your situation.
 
 Although a module such as [Log::Dispatch](https://metacpan.org/pod/Log%3A%3ADispatch) is **not** listed as a prerequisite,
 the real use of this module only comes into view when such a module **is**
-installed.  Please note that for testing this module, you will need the
+installed.
+Please note that for testing this module, you will need the
 [Log::Dispatch::Buffer](https://metacpan.org/pod/Log%3A%3ADispatch%3A%3ABuffer) module to also be available.
 
 This module has been tested with
 [Log::Dispatch](https://metacpan.org/pod/Log%3A%3ADispatch), [Log::Any](https://metacpan.org/pod/Log%3A%3AAny) and [Log::Log4perl](https://metacpan.org/pod/Log%3A%3ALog4perl).
-In principle any object which recognises `warning`, `error` and `critical` should work.
+In principle,
+any object which recognises `warning`, `error` and `critical` should work.
 
 ## eval
 
 In the current implementation of Perl, a \_\_DIE\_\_ handler is **also** called
-inside an eval.  Whereas a normal `die` would just exit the eval, the \_\_DIE\_\_
-handler \_will\_ get called inside the eval.  Which may or may not be what you
-want.  To prevent the \_\_DIE\_\_ handler to be called inside eval's, add the
+inside an eval.
+Whereas a normal `die` would just exit the eval, the \_\_DIE\_\_
+handler \_will\_ get called inside the eval.
+Which may or may not be what you want.
+To prevent the \_\_DIE\_\_ handler from being called inside eval's, add the
 following line to the eval block or string being evaluated:
 
     local $SIG{__DIE__} = undef;
 
 This disables the \_\_DIE\_\_ handler within the evalled block or string, and
 will automatically enable it again upon exit of the evalled block or string.
-Unfortunately there is no automatic way to do that for you.
+Unfortunately,
+there is no automatic way to do that for you.
 
 # COPYRIGHT
 
 Copyright (c) 2004, 2007 Elizabeth Mattijsen <liz@dijkmat.nl>. All rights
-reserved.  This program is free software; you can redistribute it and/or
+reserved.
+This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
 Portions of versions 0.06 onwards, Copyright 2017-2024 Nigel Horne

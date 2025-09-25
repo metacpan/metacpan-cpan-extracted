@@ -1,17 +1,10 @@
-#!perl -wT
+#!perl -w
 
 use strict;
 use warnings;
+use Test::DescribeMe qw(author);
 use Test::Most;
+use Test::Needs { 'warnings::unused' => '0.04' };
 
-unless($ENV{RELEASE_TESTING}) {
-	plan(skip_all => "Author tests not required for installation");
-}
-
-eval 'use warnings::unused -global';
-if($@ || ($warnings::unused::VERSION < 0.04)) {
-	plan(skip_all => 'warnings::unused >= 0.04 needed for testing');
-} else {
-	use_ok('Log::WarnDie');
-	plan tests => 1;
-}
+use_ok('Log::WarnDie');
+plan(tests => 1);

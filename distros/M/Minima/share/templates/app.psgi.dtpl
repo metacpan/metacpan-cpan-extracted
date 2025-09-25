@@ -1,5 +1,8 @@
-use FindBin '$Dir';
-use lib "$Dir/lib";
+@@ IF cpanfile
+use lib qw| lib local/lib/perl5 |;
+@@ ELSE
+use lib 'lib';
+@@ END
 @@ IF static
 use Plack::Builder;
 @@ END

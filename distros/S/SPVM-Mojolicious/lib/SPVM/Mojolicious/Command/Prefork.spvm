@@ -1,6 +1,193 @@
 # Copyright (c) 2025 Yuki Kimoto
 # MIT License
 
-class Mojolicious::Command::Prefork {
+class Mojolicious::Command::Prefork extends Mojolicious::Command {
   version_from Mojolicious;
+  use Mojo::Server::Prefork;
+  use Mojo::Util;
+  use Fn;
+  
+  has description : rw string
+    get {
+      unless (exists $self->{description}) {
+        $self->{description} = "Start application with pre-forking HTTP and WebSocket server";
+      }
+      return $self->{description};
+    }
+  ;
+  
+  has usage : rw string
+    get {
+      unless (exists $self->{usage}) {
+        $self->{usage} = <<'EOS';
+Usage: APPLICATION prefork [OPTIONS]
+
+  ./myapp.spvm prefork
+  ./myapp.spvm prefork -m production -p -l http://*:8080
+  ./myapp.spvm prefork -l http://127.0.0.1:8080 -l https://[::]:8081
+  ./myapp.spvm prefork -l 'https://*:443?cert=./server.crt&key=./server.key'
+  ./myapp.spvm prefork -l http+unix://%2Ftmp%2Fmyapp.sock -w 12
+  ./myapp.spvm prefork -l http://127.0.0.1:8080 -p 127.0.0.0/8 -p fc00::/7
+
+Options:
+  -a, --accepts <number>               Number of connections for workers to
+                                       accept, defaults to 10000
+  -b, --backlog <size>                 Listen backlog size, defaults to
+                                       SOMAXCONN
+  -c, --clients <number>               Maximum number of concurrent
+                                       connections, defaults to 1000
+  -G, --graceful-timeout <seconds>     Graceful timeout, defaults to 120.
+  -I, --heartbeat-interval <seconds>   Heartbeat interval, defaults to 5
+  -H, --heartbeat-timeout <seconds>    Heartbeat timeout, defaults to 50
+  -h, --help                           Show this summary of available options
+      --home <path>                    Path to home directory of your
+                                       application, defaults to the value of
+                                       MOJO_HOME or auto-detection
+  -i, --inactivity-timeout <seconds>   Inactivity timeout, defaults to the
+                                       value of MOJO_INACTIVITY_TIMEOUT or 30
+  -k, --keep-alive-timeout <seconds>   Keep-alive timeout, defaults to the
+                                       value of MOJO_KEEP_ALIVE_TIMEOUT or 5
+  -l, --listen <location>              One or more locations you want to
+                                       listen on, defaults to the value of
+                                       MOJO_LISTEN or "http://*:3000"
+  -m, --mode <name>                    Operating mode for your application,
+                                       defaults to the value of
+                                       MOJO_MODE/PLACK_ENV or "development"
+  -P, --pid-file <path>                Path to process id file, defaults to
+                                       "prefork.pid" in a temporary directory
+  -p, --proxy [<network>]              Activate reverse proxy support,
+                                       defaults to the value of
+                                       MOJO_REVERSE_PROXY, optionally takes
+                                       one or more trusted proxy addresses or
+                                       networks
+  -r, --requests <number>              Maximum number of requests per
+                                       keep-alive connection, defaults to 100
+  -s, --spare <number>                 Temporarily spawn up to this number of
+                                       additional workers, defaults to 2
+  -w, --workers <number>               Number of workers, defaults to 4
+
+EOS
+      }
+      
+      return $self->{usage};
+    }
+  ;
+  
+  method build_server : Mojo::Server::Prefork ($args : string[] = undef) {
+    
+    my $values_h = Hash->new({
+      listen => new string[0],
+      proxy => new string[0],
+    });
+    
+    my $specs = [
+      "b|backlog=i",
+      "c|clients=i",
+      "i|inactivity-timeout=i",
+      "k|keep-alive-timeout=i",
+      "l|listen=s",
+      "p|proxy=s",
+      "r|requests=i",
+      "a|accepts=i",
+      "G|graceful-timeout=i",
+      "I|heartbeat-interval=i",
+      "H|heartbeat-timeout=i",
+      "P|pid-file=s",
+      "s|spare=i",
+      "w|workers=i",
+    ];
+    
+    eval { Mojo::Util->getopt(my $_ = [$args], $values_h, $specs); }
+    
+    if ($@) {
+      die $self->usage;
+    }
+    
+    my $server = Mojo::Server::Prefork->new;
+    
+    $server->set_app($self->app);
+    
+    if ($values_h->exists("backlog")) {
+      my $backlog = $values_h->get_int("backlog");
+      $server->set_backlog($backlog);
+    }
+    
+    if ($values_h->exists("clients")) {
+      my $max_clients = $values_h->get_int("clients");
+      $server->set_max_clients($max_clients);
+    }
+    
+    if ($values_h->exists("inactivity-timeout")) {
+      my $inactivity_timeout = $values_h->get_int("inactivity-timeout");
+      $server->set_inactivity_timeout($inactivity_timeout);
+    }
+    
+    if ($values_h->exists("keep-alive-timeout")) {
+      my $keep_alive_timeout = $values_h->get_int("keep-alive-timeout");
+      $server->set_keep_alive_timeout($keep_alive_timeout);
+    }
+    
+    if ($values_h->exists("requests")) {
+      my $max_requests = $values_h->get_int("requests");
+      $server->set_max_requests($max_requests);
+    }
+    
+    my $listen = (string[])$values_h->get("listen");
+    if (@$listen) {
+      $server->set_listen($listen);
+    }
+    
+    my $proxy = (string[])$values_h->get("proxy");
+    if (@$proxy) {
+      $server->set_reverse_proxy(1);
+    }
+    
+    my $trusted = (string[])Fn->grep(method : int ($_ : string) { return length $_; }, $proxy);
+    if (@$trusted) {
+      $server->set_trusted_proxies($trusted);
+    }
+    
+    if ($values_h->exists("accepts")) {
+      my $accepts = $values_h->get_int("accepts");
+      $server->set_accepts($accepts);
+    }
+    
+    if ($values_h->exists("graceful-timeout")) {
+      my $graceful_timeout = $values_h->get_int("graceful-timeout");
+      $server->set_graceful_timeout($graceful_timeout);
+    }
+    
+    if ($values_h->exists("heartbeat-interval")) {
+      my $heartbeat_interval = $values_h->get_int("heartbeat-interval");
+      $server->set_heartbeat_interval($heartbeat_interval);
+    }
+    
+    if ($values_h->exists("heartbeat-timeout")) {
+      my $heartbeat_timeout = $values_h->get_int("heartbeat-timeout");
+      $server->set_heartbeat_timeout($heartbeat_timeout);
+    }
+    
+    if ($values_h->exists("pid-file")) {
+      my $pid_file = $values_h->get_string("pid-file");
+      $server->set_pid_file($pid_file);
+    }
+    
+    if ($values_h->exists("spare")) {
+      my $spare = $values_h->get_int("spare");
+      $server->set_spare($spare);
+    }
+    
+    if ($values_h->exists("workers")) {
+      my $workers = $values_h->get_int("workers");
+      $server->set_workers($workers);
+    }
+    
+    return $server;
+  }
+  
+  method run : void ($args : string[]) {
+    
+    $self->build_server($args)->run;
+  }
+  
 }

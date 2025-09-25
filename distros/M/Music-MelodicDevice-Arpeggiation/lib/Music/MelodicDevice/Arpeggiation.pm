@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Apply arpeggiation patterns to groups of notes
 
-our $VERSION = '0.0203';
+our $VERSION = '0.0302';
 
 use Moo;
 use strictures 2;
@@ -63,14 +63,15 @@ sub arp {
 
     # compute the arp durations
     my $x = $duration * TICKS;
-    my $z = sprintf '%0.f', $x / @$notes;
+    my $z = sprintf '%0.f', $x / @$pattern;
     print "Durations: $x, $z\n" if $self->verbose;
     $z = 'd' . $z;
 
     my @arp;
     for my $i (1 .. $repeats) {
-        for my $j (1 .. @$notes) {
-            push @arp, [ $z, $notes->[ $pat->current ] ];
+        for my $j (1 .. @$pattern) {
+            push @arp, [ $z, $notes->[ $pat->current ] ]
+                if $pat->current < @$notes;
             $pat->next;
         }
     }
@@ -112,24 +113,26 @@ Music::MelodicDevice::Arpeggiation - Apply arpeggiation patterns to groups of no
 
 =head1 VERSION
 
-version 0.0203
+version 0.0302
 
 =head1 SYNOPSIS
 
-  use Music::MelodicDevice::Arpeggiation;
+  use Music::MelodicDevice::Arpeggiation ();
 
   my $arp = Music::MelodicDevice::Arpeggiation->new;
 
-  $arp->arp_type('my_type', sub { my ($notes); return [0,2,1] }); # set a new type
+  # set a new pattern type
+  $arp->arp_type('my_type', sub { my ($notes); return [0,2,1] });
 
-  my $arped = $arp->arp([60,64,67], 1, 'updown', 3);
-
-  my $pattern = $arp->build_pattern('my-type', [60,65,67,69]); # [0,2,1]
+  # arpeggiate the 'updown' pattern
+  my $arped = $arp->arp(['C4','E4','G4'], 1, 'updown');
+  # [['d24', 'C4'],['d24', 'E4'],['d24', 'G4'],['d24', 'E4']]
+  $arped = $arp->arp([60,64,67], 1, 'updown', 3); # midinums repeated 3 times
 
 =head1 DESCRIPTION
 
 C<Music::MelodicDevice::Arpeggiation> applies arpeggiation patterns to
-groups of notes.
+groups of notes that can be used with MIDI-Perl.
 
 =head1 ATTRIBUTES
 
@@ -198,7 +201,10 @@ Create a new C<Music::MelodicDevice::Arpeggiation> object.
   $notes = $arp->arp(\@pitches, $duration, $type);
   $notes = $arp->arp(\@pitches, $duration, $type, $repeats);
 
-Return a list of lists of C<d#> MIDI-Perl strings with the pitches indexed by the arpeggiated pattern built from the given C<type>. These MIDI-Perl duration strings are distributed evenly across the given C<duration>.
+Return a list of lists of C<d#> MIDI-Perl strings with the pitches
+indexed by the arpeggiated pattern built from the given C<type>. These
+MIDI-Perl duration strings are distributed evenly across the given
+C<duration>.
 
 =head2 arp_type
 

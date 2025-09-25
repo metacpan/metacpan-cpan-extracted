@@ -1,6 +1,122 @@
 # Copyright (c) 2025 Yuki Kimoto
 # MIT License
 
-class Mojolicious::Command::Morbo {
+class Mojolicious::Command::Morbo extends Mojolicious::Command {
   version_from Mojolicious;
+  
+  use Mojo::Server::Morbo;
+  use Mojo::Util;
+  use Fn;
+  use Sys;
+  
+  has description : rw string
+    get {
+      unless (exists $self->{description}) {
+        $self->{description} = "Morbo HTTP and WebSocket development server";
+      }
+      return $self->{description};
+    }
+  ;
+  
+  has usage : rw string
+    get {
+      unless (exists $self->{usage}) {
+        $self->{usage} = <<'EOS';
+Usage: morbo [OPTIONS] [APPLICATION]
+
+  ./myapp.spvm morbo
+  ./myapp.spvm morbo -m production -l https://*:443 -l http://[::]:3000
+  ./myapp.spvm morbo -l 'https://*:443?cert=./server.crt&key=./server.key'
+  ./myapp.spvm morbo -w /usr/local/lib -w public -w myapp.conf
+
+Options:
+  -b, --backend <name>           Morbo backend to use for reloading, defaults
+                                 to "Poll"
+  -h, --help                     Show this message
+  -l, --listen <location>        One or more locations you want to listen on,
+                                 defaults to the value of MOJO_LISTEN or
+                                 "http://*:3000"
+  -m, --mode <name>              Operating mode for your application,
+                                 defaults to the value of
+                                 MOJO_MODE/PLACK_ENV or "development"
+  -v, --verbose                  Print details about what files changed to
+                                 STDOUT
+  -w, --watch <directory/file>   One or more directories and files to watch
+                                 for changes, defaults to the application
+                                 script as well as the "lib" and "templates"
+                                 directories in the current working
+                                 directory
+
+EOS
+      }
+      
+      return $self->{usage};
+    }
+  ;
+  
+  method build_server : Mojo::Server::Morbo ($args : string[] = undef) {
+    
+    my $values_h = Hash->new({
+      help => 0,
+      listen => new string[0],
+      proxy => new string[0],
+      verbose => 0,
+    });
+    
+    my $specs = [
+      "b|backend=s",
+      "h|help",
+      "l|listen=s",
+      "m|mode=s",
+      "v|verbose",
+      "w|watch=s",
+    ];
+    
+    eval { Mojo::Util->getopt(my $_ = [$args], $values_h, $specs); }
+    
+    if ($@) {
+      die $self->usage;
+    }
+    
+    if ($values_h->get_int("help")) {
+      print $self->usage;
+      Sys->exit(0);
+    }
+    
+    if ($values_h->exists("backend")) {
+      my $backend = $values_h->get_string("backend");
+      Sys->set_env("SPVM_MOJO_MORBO_BACKEND", $backend);
+    }
+    
+    if ($values_h->exists("mode")) {
+      my $mode = $values_h->get_string("mode");
+      Sys->set_env("SPVM_MOJO_MODE", $mode);
+    }
+    
+    my $server = Mojo::Server::Morbo->new;
+    
+    $server->daemon->set_app($self->app);
+    
+    my $verbose = $values_h->get_int("verbose");
+    
+    $server->set_silent(!$verbose);
+    
+    my $listen = (string[])$values_h->get("listen");
+    if (@$listen) {
+      $server->daemon->set_listen($listen);
+    }
+    
+    my $watch = (string[])$values_h->get("watch");
+    if (@$watch) {
+      $server->backend->set_watch($watch);
+    }
+    
+    return $server;
+  }
+  
+  method run : void ($args : string[]) {
+    
+    $self->build_server($args)->run;
+  }
+  
 }

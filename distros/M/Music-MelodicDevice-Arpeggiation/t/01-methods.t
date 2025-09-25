@@ -39,11 +39,18 @@ subtest arp_type => sub {
     $got = $mda->arp_type('foo');
     is ref($got), 'CODE', 'arp_type';
     $got = $mda->arp([60], 1, 'foo');
-    is_deeply $got, [['d96', 60]], 'arp';
+    is_deeply $got, [['d48', 60]], 'arp';
     $got = $mda->arp([60,64], 1, 'foo');
     is_deeply $got, [['d48', 60],['d48', 64]], 'arp';
     $got = $mda->arp([60,64,67], 1, 'foo');
-    is_deeply $got, [['d32', 60],['d32', 64],['d32', 60]], 'arp';
+    is_deeply $got, [['d48', 60],['d48', 64]], 'arp';
+    $got = $mda->arp([60,64,67], 1, 'foo', 2);
+    is_deeply $got, [['d48', 60],['d48', 64],['d48', 60],['d48', 64]], 'arp';
+    $got = $mda->_build_pattern('updown', [60,61,62,63]);
+    is_deeply $got, [0,1,2,3,2,1], 'build_pattern';
+    $got = $mda->arp(['C4','E4','G4'], 1, 'updown');
+    is_deeply $got, [['d24', 'C4'],['d24', 'E4'],['d24', 'G4'],['d24', 'E4']], 'updown';
+
 };
 
 done_testing();
