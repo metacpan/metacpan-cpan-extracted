@@ -37,9 +37,10 @@ method after_action     ($r) { }
 method trimmed_params ($options = {})
 {
     my $exclude = $options->{exclude} // [];
+    my @f_params = $params->flatten;
     my @params;
 
-    for my ($k, $v) ($params->flatten) {
+    for my ($k, $v) (@f_params) {
         if (defined $v) {
             my $skip = 0;
             for my $pat (@$exclude) {

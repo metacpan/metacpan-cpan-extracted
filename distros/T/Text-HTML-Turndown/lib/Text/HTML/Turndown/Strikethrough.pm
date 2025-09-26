@@ -1,4 +1,4 @@
-package Text::HTML::Turndown::Strikethrough 0.07;
+package Text::HTML::Turndown::Strikethrough 0.08;
 use 5.020;
 use experimental 'signatures';
 use stable 'postderef';

@@ -190,7 +190,7 @@ for my $file_name ( "CharWidthAmbiguousWide.pm", "CharWidthDefault.pm" ) {
     my $module = $file_name =~ s/\.pm\z//r;
 
     print $fh <<"PP_HEADER";
-package Term::Choose::LineFold::$module;
+package Term::Choose::LineFold::PP::$module;
 
 use warnings;
 use strict;
@@ -273,7 +273,7 @@ XS_FOOTER
 for my $file_name ( "CharWidthAmbiguousWide.pm6", "CharWidthDefault.pm6" ) {
     my $ranges;
     my $amb;
-    if ( $file_name eq "CharWidthDefault.pm" ) {
+    if ( $file_name eq "CharWidthDefault.pm6" ) {
         $amb = 'narrow';
         $ranges = build_ranges( $width_normal );
     }
@@ -282,7 +282,7 @@ for my $file_name ( "CharWidthAmbiguousWide.pm6", "CharWidthDefault.pm6" ) {
         $ranges = build_ranges( $width_ambiguous );
     }
     open my $fh, '>', $file_name or die $!;
-    my $module = $file_name =~ s/\.pm\z//r;
+    my $module = $file_name =~ s/\.pm6\z//r;
 
     print $fh <<"RAKU_HEADER";
 use v6;

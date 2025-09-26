@@ -1,5 +1,10 @@
 Revision history for Encode::Wide
 
+0.06	Thu Sep 25 08:28:23 EDT 2025
+	Added the µ character
+	In HTML, Encode ! as &excl;
+	Added the test dashboard
+
 0.05	Fri Aug  8 16:57:40 EDT 2025
 	Use tables to reduce the scanning of the input
 	Allow the input to be a ref to a string

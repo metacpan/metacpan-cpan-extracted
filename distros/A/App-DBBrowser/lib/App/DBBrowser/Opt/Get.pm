@@ -32,7 +32,6 @@ sub defaults {
             qualified_table_name  => 0,
             quote_tables          => 1,
             quote_columns         => 1,
-            quote_aliases         => 0,
 
             limit_fetch_col_names => 1, ##
             edit_sql_menu_sq      => 0,
@@ -42,7 +41,7 @@ sub defaults {
         },
         alias => {
             complex_cols_select => 0,
-            tables_in_join      => 0,
+            tables_in_join      => 1,
             join_columns        => 0,
             derived_table       => 1,
             ordinary_table      => 0,

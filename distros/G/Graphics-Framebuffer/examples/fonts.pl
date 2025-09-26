@@ -15,7 +15,12 @@ GetOptions(
 );
 my $device = (exists($ENV{'DISPLAY'})) ? 1 : 0;
 
-my $fb = Graphics::Framebuffer->new('SPLASH' => 0, 'SHOW_ERRORS' => 1, 'FB_DEVICE' => "/dev/fb$device", 'RESET' => 0);    # ,'SIMULATED_X'=>1280,'SIMULATED_Y'=>720);
+my $fb = Graphics::Framebuffer->new(
+	'SPLASH'      => 0,
+	'SHOW_ERRORS' => 1,
+	'FB_DEVICE'   => "/dev/fb$device",
+	'RESET'       => 0,
+);
 
 $SIG{'QUIT'} = $SIG{'INT'} = $SIG{'HUP'} = $SIG{'KILL'} = $SIG{'TERM'} = sub { exec('reset'); };
 
@@ -105,8 +110,6 @@ All Rights Reserved
 
 =head1 LICENSE
 
-GNU Public License Version 3.0
-
-* The "LICENSE" file in the distribution has this license.
+Perl Artistic License
 
 =cut

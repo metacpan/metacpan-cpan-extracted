@@ -371,7 +371,6 @@ sub set_options {
                     [ 'qualified_table_name', "- Qualified table names", [ $no, $yes ] ],
                     [ 'quote_tables',         "- Quote table names",     [ $no, $yes ] ],
                     [ 'quote_columns',        "- Quote column names",    [ $no, $yes ] ],
-                    [ 'quote_aliases',        "- Quote aliases",         [ $no, $yes ] ],
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }

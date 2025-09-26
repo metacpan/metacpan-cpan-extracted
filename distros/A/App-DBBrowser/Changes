@@ -1,6 +1,13 @@
 Revision history for App-DBBrowser
 
 
+2.432  2025-09-26
+        - Firebird: bugfix in add-database.
+        - Pg: update auto-convert-to-text.
+        - Bugfix: don't allow different quoting for column names and aliases, as aliases could be used as column names later on.
+        - Bugfix: set the default for "add alias for tables in join" to auto.
+        - Unicode 17.
+
 2.431  2025-06-06
         - Update history for date_add and data_substract.
         - Update available columns for extended expressions.

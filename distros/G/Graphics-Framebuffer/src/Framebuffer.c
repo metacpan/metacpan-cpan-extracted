@@ -10,6 +10,9 @@
 
    8 bit and 1 bit modes are not yet supported and their case values are just
    placeholders.
+
+   I am NOT a C programmer and this code likely proves that, but this code works
+   and that's good enough for me.
 */
 
 #include <stdlib.h>
@@ -1941,13 +1944,14 @@ void c_convert_16_32( char* buf16, unsigned int size16, char* buf32, unsigned ch
 
 // Convert a RGB888 bitmap to a RGB565 bitmap
 void c_convert_24_16(char* buf24, unsigned int size24, char* buf16, unsigned char color_order) {
-    unsigned int loc16 = 0;
-    unsigned int loc24 = 0;
+    unsigned int loc16    = 0;
+    unsigned int loc24    = 0;
     unsigned short rgb565 = 0;
     while(loc24 < size24) {
         unsigned char r8 = *(buf24 + loc24++);
         unsigned char g8 = *(buf24 + loc24++);
         unsigned char b8 = *(buf24 + loc24++);
+	    loc24 += 3;
         unsigned char r5 = ( r8 * 249 + 1014 ) >> 11;
         unsigned char g6 = ( g8 * 253 + 505  ) >> 10;
         unsigned char b5 = ( b8 * 249 + 1014 ) >> 11;
@@ -1956,8 +1960,8 @@ void c_convert_24_16(char* buf24, unsigned int size24, char* buf16, unsigned cha
         } else {
             rgb565 = (r5 << 11) | (g6 << 5) | b5;
         }
-        *((unsigned short*)(buf16 + loc16)) = rgb565;
-        loc16 += 2;
+        *((unsigned short*)(buf16 + loc16++)) = rgb565;
+        loc16++;
     }
 }
 
@@ -1971,6 +1975,7 @@ void c_convert_32_16(char* buf32, unsigned int size32, char* buf16, unsigned cha
         unsigned char r8 = crgb & 255;
         unsigned char g8 = (crgb >> 8) & 255;
         unsigned char b8 = (crgb >> 16) & 255;
+	    loc32 += 4;
         unsigned char r5 = ( r8 * 249 + 1014 ) >> 11;
         unsigned char g6 = ( g8 * 253 + 505  ) >> 10;
         unsigned char b5 = ( b8 * 249 + 1014 ) >> 11;
@@ -1979,8 +1984,8 @@ void c_convert_32_16(char* buf32, unsigned int size32, char* buf16, unsigned cha
         } else {
             rgb565 = (r5 << 11) | (g6 << 5) | b5;
         }
-        *((unsigned short*)(buf16 + loc16)) = rgb565;
-        loc16 += 2;
+        *((unsigned short*)(buf16 + loc16++)) = rgb565;
+        loc16++;
     }
 }
 
@@ -2004,7 +2009,7 @@ void c_convert_24_32(char* buf24, unsigned int size24, char* buf32, unsigned cha
         unsigned char r = *(buf24 + loc24++);
         unsigned char g = *(buf24 + loc24++);
         unsigned char b = *(buf24 + loc24++);
-        *((unsigned int*)(buf32 + loc32++)) = r | (g << 8) | (b << 16);
+        *((unsigned int*)(buf32 + loc32)) = r | (g << 8) | (b << 16);
         loc32 += 3;
         if (r == 0 && g == 0 && b == 0) {
             *(buf32 + loc32++) = 0; // The background is transparent
@@ -2016,16 +2021,99 @@ void c_convert_24_32(char* buf24, unsigned int size24, char* buf32, unsigned cha
 
 // These are not yet implemented, but they will likely incorporate conversion to/from monochrome
 void c_convert_32_8(char* buf32, unsigned int size32, char* buf8, unsigned char color_order) {
+    unsigned int loc32 = 0;
+    unsigned int loc8  = 0;
+    unsigned char m    = 0;
+    while(loc32 < size32) {
+        unsigned int crgb = *((unsigned int*)(buf32 + loc32));
+	    loc32 += 4;
+        unsigned char r = crgb & 255;
+        unsigned char g = (crgb >> 8) & 255;
+        unsigned char b = (crgb >> 16) & 255;
+	    m = (unsigned char) round(0.2126 * r + 0.7152 * g + 0.0722 * b);
+        *((unsigned char*)(buf8 + loc8++)) = m;
+    }
 }
 void c_convert_24_8(char* buf24, unsigned int size24, char* buf8, unsigned char color_order) {
+    unsigned int loc8  = 0;
+    unsigned int loc24 = 0;
+    unsigned char m    = 0;
+    while(loc24 < size24) {
+        unsigned int crgb = *((unsigned int*)(buf24 + loc24));
+	    loc24 += 3;
+        unsigned char r = crgb & 255;
+        unsigned char g = (crgb >> 8) & 255;
+        unsigned char b = (crgb >> 16) & 255;
+	    m = (unsigned char) round(0.2126 * r + 0.7152 * g + 0.0722 * b);
+        *((unsigned char*)(buf8 + loc8++)) = m;
+    }
 }
 void c_convert_16_8(char* buf16, unsigned int size16, char* buf8, unsigned char color_order) {
+    unsigned int loc8  = 0;
+    unsigned int loc16 = 0;
+    unsigned char r5;
+    unsigned char g6;
+    unsigned char b5;
+
+    while(loc16 < size16) {
+        unsigned short rgb565 = *((unsigned short*)(buf16 + loc16));
+        loc16 += 2;
+        if (color_order == 0) {
+            b5 = (rgb565 & 0xf800) >> 11;
+            r5 = (rgb565 & 0x001f);
+        } else {
+            r5 = (rgb565 & 0xf800) >> 11;
+            b5 = (rgb565 & 0x001f);
+        }
+        g6 = (rgb565 & 0x07e0) >> 5;
+        unsigned char r8 = (r5 * 527 + 23) >> 6;
+        unsigned char g8 = (g6 * 259 + 33) >> 6;
+        unsigned char b8 = (b5 * 527 + 23) >> 6;
+        *((unsigned int*)(buf8 + loc8++)) = (unsigned char) round(0.2126 * r8 + 0.7152 * g8 + 0.0722 * b8);
+    }
 }
 void c_convert_8_32(char* buf8, unsigned int size8, char* buf32, unsigned char color_order) {
+    unsigned int loc8  = 0;
+    unsigned int loc32 = 0;
+
+    while(loc8 < size8) {
+        unsigned char m = *((unsigned char*)(buf8 + loc8++));
+        *((unsigned int*)(buf32 + loc32)) = m | (m << 8) | (m << 16);
+        loc32 += 3;
+        if (m == 0) { // Black is always treated as a clear mask
+            *((unsigned char*)(buf32 + loc32++)) = 0;
+        } else { // Anything but black is opague
+            *((unsigned char*)(buf32 + loc32++)) = 255;
+        }
+    }
 }
 void c_convert_8_24(char* buf8, unsigned int size8, char* buf24, unsigned char color_order) {
+    unsigned int loc8  = 0;
+    unsigned int loc24 = 0;
+
+    while(loc8 < size8) {
+        unsigned char m = *((unsigned char*)(buf8 + loc8++));
+        *((unsigned int*)(buf24 + loc24)) = m | (m << 8) | (m << 16);
+        loc24 += 3;
+    }
 }
 void c_convert_8_16(char* buf8, unsigned int size8, char* buf16, unsigned char color_order) {
+    unsigned int loc8     = 0;
+    unsigned int loc16    = 0;
+    unsigned short rgb565 = 0;
+    while(loc8 < size8) {
+        unsigned char m = *(buf8 + loc8++);
+        unsigned char r5 = ( m * 249 + 1014 ) >> 11;
+        unsigned char g6 = ( m * 253 + 505  ) >> 10;
+        unsigned char b5 = ( m * 249 + 1014 ) >> 11;
+        if (color_order == RGB) {
+            rgb565 = (b5 << 11) | (g6 << 5) | r5;
+        } else {
+            rgb565 = (r5 << 11) | (g6 << 5) | b5;
+        }
+        *((unsigned short*)(buf16 + loc16)) = rgb565;
+        loc16 += 2;
+    }
 }
 
 // Convert any type RGB bitmap to a monochrome bitmap of the same type

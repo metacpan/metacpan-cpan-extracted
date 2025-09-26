@@ -191,8 +191,6 @@ sub show {
             $display = TRUE;
         } ## end if (defined($image))
         $idx++;
-
-        #        $idx = 0 if ($idx >= $p);
     } ## end while ($idx < $p)
 } ## end sub show
 
@@ -280,8 +278,6 @@ All Rights Reserved
 
 =head1 LICENSE
 
-GNU Public License Version 3.0
-
-* See the "LICENSE" file in the distribution for this license.
+Perl Artistic License
 
 =cut

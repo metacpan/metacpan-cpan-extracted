@@ -1,7 +1,6 @@
 package Encode::Wide;
 
-# TODO: don't transform anything within <script>...</script>
-# TODO: a lot of this should be table driven
+# TODO: don't transform anything within <script>...</script> in wide_to_html
 
 use strict;
 use warnings;
@@ -31,11 +30,11 @@ Encode::Wide - Convert wide characters (Unicode, UTF-8, etc.) into HTML or XML-s
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 =head1 SYNOPSIS
 
@@ -181,7 +180,8 @@ sub wide_to_html
 		["\xe2\x80\x94", '&mdash;'],
 		["\xe2\x80\x98", '&apos;'],	# ‘
 		["\xe2\x80\x99", '&apos;'],	# ’
-		["\xe2\x80\xA6", '...']	# …
+		["\xe2\x80\xA6", '...'],	# …
+		['!', '&excl;'],	# Do this early before the ascii check, since it's an ascii character
 	);
 
 	$string = _sub_map(\$string, \@byte_map);
@@ -266,6 +266,7 @@ sub wide_to_html
 		["\N{U+00AA}", '&ordf;'],	# ª
 		["\N{U+00AB}", '&quot;'],	# «
 		["\N{U+00AE}", '&reg;'],
+		["\N{U+00B5}", '&micro;'],	# µ
 		["\N{U+00BB}", '&quot;'],	# »
 		["\N{U+00CE}", '&Icirc;'],	# Î
 		["\N{U+00DE}", '&THORN;'],	# Þ
@@ -389,6 +390,7 @@ sub wide_to_html
 		[ 'û', '&ucirc;' ],
 		[ 'ü', '&uuml;' ],
 		[ 'ú', '&uacute;' ],
+		[ 'µ', '&micro;'],
 		[ '£', '&pound;' ],
 		[ 'ß', '&szlig;' ],
 		[ '–', '&ndash;' ],
@@ -657,6 +659,7 @@ sub wide_to_xml
 		["\N{U+010D}", '&#x10D;'],
 		["\N{U+00AB}", '&quot;'],	# «
 		["\N{U+00AE}", '&#x0AE;'],	# ®
+		["\N{U+00B5}", '&#x0B5;'],	# µ
 		["\N{U+00C1}", '&#x0C1;'],	# Á
 		["\N{U+00CE}", '&#x0CE;'],	# Î
 		["\N{U+00DE}", '&#x0DE;'],	# Þ
@@ -743,7 +746,7 @@ sub wide_to_xml
 		['č', '&#x10D;'],
 		['ž', '&#x17E;'],
 		['£', '&#x0A3;'],
-
+		['µ', '&#x0B5;'],
 		['á', '&#x0E1;'],	# á
 		['â', '&#x0E2;'],
 		['ä', '&#x0E4;'],	# ä
@@ -836,9 +839,21 @@ sub _sub_map
 
 =head1 SEE ALSO
 
-L<HTML::Entities>, L<Encode>, L<XML::Entities>, L<Unicode::Escape>.
+=over 4
 
-L<https://www.compart.com/en/unicode/>.
+=item * Test coverage report: L<https://nigelhorne.github.io/Encode-Wide/coverage/>
+
+=item * L<HTML::Entities>
+
+=item * L<Encode>
+
+=item * L<XML::Entities>
+
+=item * L<Unicode::Escape>
+
+=item * L<https://www.compart.com/en/unicode/>
+
+=back
 
 =head1 SUPPORT
 

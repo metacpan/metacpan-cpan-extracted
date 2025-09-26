@@ -71,7 +71,14 @@ our $STAMP = sprintf('%.1', time);
 
 print "Images loaded\nRunning $threads threads\n";
 
-my $F = Graphics::Framebuffer->new('FB_DEVICE' => "/dev/fb$dev", 'SHOW_ERRORS' => 0, 'ACCELERATED' => !$noaccel, 'SPLASH' => 0, 'RESET' => FALSE, 'IGNORE_X_WINDOWS' => $ignore_x);
+my $F = Graphics::Framebuffer->new(
+	'FB_DEVICE'        => "/dev/fb$dev",
+	'SHOW_ERRORS'      => 0,
+	'ACCELERATED'      => !$noaccel,
+	'SPLASH'           => 0,
+	'RESET'            => FALSE,
+	'IGNORE_X_WINDOWS' => $ignore_x,
+);
 
 $SIG{'HUP'} = $SIG{'QUIT'} = $SIG{'INT'} = $SIG{'KILL'} = $SIG{'TERM'} = \&finish;
 
@@ -269,7 +276,7 @@ my @order : shared = (
     'Texture Filled Pies',
     'Texture Filled Polygons',
 
-    #    'Flood Fill',
+    'Flood Fill',
     'TrueType Fonts',
     'TrueType Printing',
 
@@ -278,7 +285,7 @@ my @order : shared = (
     #    'Color Replace Clipped',
     'Blitting',
 
-    #    'Blit Move',
+    'Blit Move',
     'Rotate',
     'Flipping',
     'Monochrome',
@@ -1832,8 +1839,6 @@ All Rights Reserved
 
 =head1 LICENSE
 
-GNU Public License Version 3.0
-
-* See the "LICENSE" file in the distribution for this license.
+Perl Artistic License
 
 This program must always be included as part of the Graphics::Framebuffer package.

@@ -1,3 +1,21 @@
+v0.7.1  2025-09-25
+
+        [Fixes]
+        - Work around Perl 5.42 segfault in two-variable for loops
+          (https://github.com/Perl/perl5/issues/23405). In
+          Minima::Controller::trimmed_params, `$params->flatten` is now
+          stored in a temporary array before iteration, avoiding the
+          core bug while preserving behavior.
+        - Simplify setup test: t/52-setup-from-psgi.t no longer
+          overrides CORE::GLOBAL::caller, which caused errors on Perl
+          5.42. Instead, it now creates a temporary directory with a
+          dummy app.psgi and base.pl to simulate real setup usage.
+        - Remove temporary custom ACTION_install from Build.PL. This was
+          only used to clean up an obsolete template file left by older
+          releases. With the file no longer shipped, the extra build
+          step is unnecessary and created an unintended configure-time
+          dependency on Path::Tiny and File::ShareDir.
+
 v0.7.0  2025-09-24
 
         [Changes]

@@ -183,7 +183,7 @@ sub __add_operator_and_value {
         if ( $operator =~ /(?:REGEXP(?:_i)?|SIMILAR\sTO)\z/ ) {
             my $not_match = $operator =~ /^NOT/ ? 1 : 0;
             my $case_sensitive = $operator =~ /REGEXP_i\z/ ? 0 : 1;
-            my $regex_op = $sf->__pattern_match( $col, $not_match, $case_sensitive );
+            my $regex_op = $sf->__pattern_match( $sql, $col, $not_match, $case_sensitive );
             if ( ! $regex_op ) {
                 next OPERATOR if @operators > 1;
                 return;
@@ -394,7 +394,7 @@ sub __choose_a_column {
 
 
 sub __pattern_match {
-    my ( $sf, $col, $not_match, $case_sensitive ) = @_;
+    my ( $sf, $sql, $col, $not_match, $case_sensitive ) = @_;
     my $driver = $sf->{i}{driver};
     if ( $driver eq 'SQLite' ) {
         if ( $not_match ) {
@@ -415,13 +415,15 @@ sub __pattern_match {
         }
     }
     elsif ( $driver eq 'Pg' ) {
+        my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+        my $col = $ax->pg_column_to_text( $sql, $col );
         if ( $not_match ) {
-            return " ${col}::text !~*" if ! $case_sensitive; ##
-            return " ${col}::text !~"  if   $case_sensitive;
+            return " $col !~*" if ! $case_sensitive;
+            return " $col !~"  if   $case_sensitive;
         }
         else {
-            return " ${col}::text ~*" if ! $case_sensitive;
-            return " ${col}::text ~"  if   $case_sensitive;
+            return " $col ~*" if ! $case_sensitive;
+            return " $col ~"  if   $case_sensitive;
         }
     }
     elsif ( $driver eq 'Firebird' ) {
@@ -443,6 +445,7 @@ sub __pattern_match {
         }
     }
 }
+
 
 
 # The pattern must match the entire string:

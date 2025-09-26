@@ -695,8 +695,6 @@ All Rights Reserved
 
 =head1 LICENSE
 
-GNU Public License Version 3.0
-
-* See the "LICENSE" file in the distribution for this license.
+Perl Artistic License
 
 =cut

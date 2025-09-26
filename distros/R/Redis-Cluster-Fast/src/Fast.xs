@@ -11,7 +11,7 @@ extern "C" {
 #include <unistd.h>
 #include <string.h>
 #include <time.h>
-#include "hiredis_cluster/adapters/libevent.h"
+#include "adapters/libevent.h"
 #include "hiredis_cluster/hircluster.h"
 
 #ifdef __cplusplus
@@ -26,6 +26,13 @@ extern "C" {
 #define NANO_SECOND_TO_MICRO 1000
 
 #define MIN_ATTEMPT_TO_GET_RESULT 2
+
+/* libevent adapter priority configuration
+   Uses 2 priority levels to ensure I/O events are processed before timeouts:
+   - Priority 0: I/O events (Redis responses) - highest priority
+   - Priority 1: Timer events (timeouts) - lower priority
+   EVENT_BASE_PRIORITY_NUMBER sets the total priorities for event_base_priority_init() */
+#define EVENT_BASE_PRIORITY_NUMBER 2
 
 #define DEBUG_MSG(fmt, ...) \
     if (self->debug) {                                                  \
@@ -272,6 +279,11 @@ SV *Redis__Cluster__Fast_connect(pTHX_ Redis__Cluster__Fast self) {
     }
 
     self->cluster_event_base = event_base_new();
+
+    if (event_base_priority_init(self->cluster_event_base, EVENT_BASE_PRIORITY_NUMBER) != 0) {
+      return newSVpvf("%s", "failed to initialize event base priorities");
+    }
+
     if (redisClusterLibeventAttach(self->acc, self->cluster_event_base) != REDIS_OK) {
         return newSVpvf("%s", "failed to attach event base");
     }
@@ -471,7 +483,7 @@ int Redis__Cluster__Fast_run_event_loop(pTHX_ Redis__Cluster__Fast self) {
         return 0;
     }
     DEBUG_EVENT_BASE();
-    event_loop_error = event_base_loop(self->cluster_event_base, EVLOOP_ONCE);
+    event_loop_error = event_base_loop(self->cluster_event_base, EVLOOP_NONBLOCK);
     if (event_loop_error != 0) {
         return -1;
     }

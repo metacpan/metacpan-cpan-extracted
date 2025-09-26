@@ -152,10 +152,12 @@ sub get_databases {
         }
         elsif ( $choice eq $add ) {
             my $tu = Term::Choose::Util->new( $sf->{i}{tcu_default} );
-            my $new = $tu->choose_a_file( { ##
-                file_type => 'Database',
-                prompt_file_dir => 'Choose the database location:' }
-            );
+            my $new = $tu->choose_a_file( {
+                info => $info,
+                prompt => 'Choose the database location:',
+                cs_label => 'Database: ',
+                prompt2 => 'Your choice:'
+            } );
             if ( length $new ) {
                 $databases = [ uniq sort( @$databases, $new ) ];
                 $changed++;

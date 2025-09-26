@@ -1,5 +1,9 @@
 Revision history for Perl extension Redis-Cluster-Fast
 
+0.096 2025-09-25T17:02:58Z
+
+    - Fix premature timeout errors by prioritizing I/O events over timer events.
+
 0.095 2025-02-04T05:18:38Z
 
     - Fix minor memory leaks.

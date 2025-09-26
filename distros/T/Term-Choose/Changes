@@ -1,6 +1,9 @@
 Revision history for Term::Choose
 
 
+1.776   2025-09-26
+    - Unicode 17.
+
 1.775   2025-06-11
     - Makefile.PL: added back the 'dist' section.
     - Code refactoring LineFold.pm.

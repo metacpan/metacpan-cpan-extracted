@@ -67,7 +67,7 @@ sub worker_body {
 
       # this does have a race condition, but the jobs we're protecting
       # against are likely to be long running
-      my $t = Proc::ProcessTable->new;
+      my $t = Proc::ProcessTable->new( 'enable_ttys' => 0 );
 
       $num_slots = parse_max_workers( setting('workers')->{tasks} )
                       - $self->{queue}->pending();
@@ -83,11 +83,13 @@ sub worker_body {
           }
 
           # 1392 check for any of the same job running already
-          foreach my $p ( @{$t->table} ) {
-              if ($p->cmndline
-                    and $p->cmndline =~ m/nd2: #\d+ poll: #\d+: ${display_name}/) {
-                  debug "mgr ($wid): duplicate running job detected: $display_name";
-                  next JOB;
+          if ($job->device) {
+              foreach my $p ( @{$t->table} ) {
+                  if ($p->cmndline
+                        and $p->cmndline =~ m/nd2: #\d+ poll: #\d+: ${display_name}/) {
+                      debug "mgr ($wid): duplicate running job detected: $display_name";
+                      next JOB;
+                  }
               }
           }
 

@@ -1,5 +1,8 @@
 Revision history for Perl distribution Music-Harmonica-Tabs
 
+1.06 - 2025-09-25
+ - Add support for natural sign (♮).
+
 1.05 - 2025-09-06
  - Set a tag "other" on tunings that are not harmonicas.
 

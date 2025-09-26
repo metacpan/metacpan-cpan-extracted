@@ -2,7 +2,7 @@
 use warnings;
 use strict;
 use 5.016;
-our $VERSION = '2.431';
+our $VERSION = '2.432';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -46,7 +46,7 @@ C<db-browser> - Browse SQL databases and their tables interactively.
 
 =head1 VERSION
 
-Version 2.431
+Version 2.432
 
 =head1 SYNOPSIS
 
@@ -807,8 +807,10 @@ Not all of these extensions are available everywhere.
 
 Enter a constant value.
 
-If the data type is numeric or unknown and the literal looks like a number, the literal is not enclosed in quotation
+If the data type is numeric or undefined and the literal looks like a number, the literal is not enclosed in quotation
 marks. In all other cases, the entered literal is enclosed in quotation marks.
+
+To enter a value quoted manually, use the C<SQL> menu entry from the C<%%> menu.
 
 =item SQL
 
@@ -1030,11 +1032,7 @@ Quote Table Names
 
 =item
 
-Quote Column Names
-
-=item
-
-Quote Aliases
+Quote Column Names and Aliases
 
 =back
 

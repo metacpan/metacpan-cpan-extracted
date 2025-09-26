@@ -1,0 +1,17 @@
+Revision history for perl module NetBox::API.
+
+0.1.3 Fri Sep 26 09:35:47 EEST 2025
+	- CPAN compatibility fixes. Again.
+
+0.1.1 Fri Sep 26 09:00:20 EEST 2025
+	- CPAN compatibility fixes.
+
+0.1.0 Thu Sep 25 17:39:00 EEST 2025
+	- initial public release.
+
+0.0.4 Thu Apr 17 13:28:28 EEST 2025
+	- added fields filtering in response.
+
+0.0.1 Mon Mar  4 11:48:26 EET 2024
+	- initial version.
+

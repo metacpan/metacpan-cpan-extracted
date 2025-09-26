@@ -4,7 +4,7 @@
       "Matthaeus Kiem <cuer2s@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.74, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -39,7 +39,7 @@
          "requires" : {
             "Carp" : "0",
             "Exporter" : "0",
-            "Term::Choose::LineFold::XS" : "0.001",
+            "Term::Choose::LineFold::XS" : "0.003",
             "constant" : "0",
             "perl" : "5.010001",
             "strict" : "0",
@@ -58,6 +58,6 @@
          "web" : "https://github.com/kuerbis/Term-Choose"
       }
    },
-   "version" : "1.775",
+   "version" : "1.776",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

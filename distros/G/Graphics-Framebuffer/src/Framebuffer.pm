@@ -4,7 +4,7 @@ package Graphics::Framebuffer;
 #  Copyright 2017 - 2025 Richard Kelsch
 ## TEMPCOPYRIGHT ##
 
-# Only POD is utf-8.
+# Only POD is utf-8.  The module code CANNOT be UTF-8
 =encoding utf8
 
 =head1 NAME
@@ -13,7 +13,7 @@ Graphics::Framebuffer - A Simple Framebuffer Graphics Library
 
 =head1 SYNOPSIS
 
-Direct drawing for 32/24/16 bit framebuffers (others would be supported if asked for)
+Direct drawing for 32/24/16 bit framebuffers (others would be supported if asked for, and I have the means to test it)
 
  use Graphics::Framebuffer;
 
@@ -321,14 +321,14 @@ use constant {
     CENTER_X    => 1,
     CENTER_Y    => 2,
     CENTER_XY   => 3,
-    CENTRE_NONE => 0,      #   Constants for centering (for British and Canadian folks)
+    CENTRE_NONE => 0,      #   Constants for centering (for English speaking nations using post King George III English)
     CENTRE_X    => 1,
     CENTRE_Y    => 2,
     CENTRE_XY   => 3,
 
     PERL     => 0,
     SOFTWARE => 1,
-    HARDWARE => 2,
+    HARDWARE => 2,  # I seriously doubt hardware will ever be implemented since most framebuffers have no hardware acceleration capability
 
     ## Set up the Framebuffer driver "constants" defaults
     # Commands
@@ -450,6 +450,7 @@ BEGIN {
       BRG
       GBR
       GRB
+	  pi
       CENTER_NONE
       CENTER_X
       CENTER_Y
@@ -641,8 +642,8 @@ A zero value turns it off
 
 * B<IGNORE_X_WINDOWS>
 
-Bypasses the X-Windows check and loads anyway (dangerous).
-Set to 1 to disable X-Windows check. Default is 0.
+Bypasses the X-Windows/Wayland check and loads anyway (dangerous).
+Set to 1 to disable X-Windows/Wayland check. Default is 0.
 
 * B<FONT_PATH>
 
@@ -733,13 +734,16 @@ Why do many video cards use the BGR color order?  Simple, their GPUs operate wit
     # kind of became this mess.  I could change it, but it likely would break any
     # code that directly uses values.
     my $this;
+
     $ENV{'PATH'} = '/usr/bin:/bin:/usr/local/bin'; # Testing doesn't work in taint mode unless this is here.
-    my $FFMPEG;
+
+    my $FFMPEG;  # The module can "play" short video files.  However, what it does is convert them to animated GIF for the module to play
     if (-e '/usr/bin/ffmpeg') {
         $FFMPEG = '/usr/bin/ffmpeg';
     } elsif (-e '/usr/local/bin/ffmpeg') {
         $FFMPEG = '/usr/local/bin/ffmpeg';
     }
+
 	my $os = `/usr/bin/uname`;
 	chomp($os);
     my $self = {
@@ -748,18 +752,18 @@ Why do many video cards use the BGR color order?  Simple, their GPUs operate wit
         'RESET'         => TRUE,          # Default to use 'reset' on destroy
         'VERSION'       => $VERSION,      # Helps with debugging for people sending me dumps
         'HATCHES'       => [@HATCHES],    # Pull in hatches from Imager
-        'FFMPEG'        => $FFMPEG,
-		'OS'            => $os,
+        'FFMPEG'        => $FFMPEG,       # Location of FFMPEG binary or undef.
+		'OS'            => $os,           # Name of the operating system (helps with dump debugging)
 
         # Set up the user defined graphics primitives and attributes default values
-        'Imager-Has-TrueType'  => $Imager::formats{'tt'}  || 0,
+        'Imager-Has-TrueType'  => $Imager::formats{'tt'}  || 0, # If you installed Imager properly, all of these should have valid values.  However, only one is needed for font operation.
         'Imager-Has-Type1'     => $Imager::formats{'t1'}  || 0,
         'Imager-Has-Freetype2' => $Imager::formats{'ft2'} || 0,
         'Imager-Image-Types'   => [ map( {uc($_) } Imager->read_types()) ],
 
-        'X'           => 0,                 # Last position plotted X
+        'X'           => 0,                 # Last position plotted X.  We need to keep track of where the "cursor" is.
         'Y'           => 0,                 # Last position plotted Y
-        'X_CLIP'      => 0,                 # Top left clip start X
+        'X_CLIP'      => 0,                 # Top left clip start X.
         'Y_CLIP'      => 0,                 # Top left clip start Y
         'YY_CLIP'     => undef,             # Bottom right clip end X
         'XX_CLIP'     => undef,             # Bottom right clip end Y
@@ -833,7 +837,7 @@ Why do many video cards use the BGR color order?  Simple, their GPUs operate wit
         'KD_TEXT'             => 0,
 
         # I=32.64,L=32,S=16,C=8,A=string
-        # Structure Definitions
+        # Structure Definitions (This is a legacy fallback for Pure Perl.  C handles this much better)
         'vt_stat'             => 'SSS',    # v_active, v_signal, v_state
         'FBioget_vscreeninfo' => 'L' .     # 32 bits for xres
           'L' .                            # 32 bits for yres
@@ -910,7 +914,7 @@ Why do many video cards use the BGR color order?  Simple, their GPUs operate wit
         'FBIOGET_FSCREENINFO' => 0x4602,
         @_                         # Pull in the overrides
     };
-    if ($self->{'GARBAGE'}) {
+    if ($self->{'GARBAGE'}) {  # This is for weird framebuffer formats (like an Atari ST).  The module doesn't support these
         my $garbage = {
 
             'PIXEL_TYPES'  => [
@@ -1073,8 +1077,8 @@ Why do many video cards use the BGR color order?  Simple, their GPUs operate wit
         };
         $self = { %{$self},%{$garbage} };
     }
-	if ($os =~ /FreeBSD/i) {
-		unless (defined($self->{'FB_DEVICE'})) {     # We scan for all 32 possible devices at both possible locations
+	if ($os =~ /FreeBSD/i) { # MAYBE this will eventually work on FreeBSD if I can figure this monster out.
+		unless (defined($self->{'FB_DEVICE'})) {     # We scan for all 16 possible devices at both possible locations
 			my $prefix = 'dev/ttyv';
 			foreach my $dev (0 .. 15) {
 				my $device = hex($dev);
@@ -1109,8 +1113,8 @@ Why do many video cards use the BGR color order?  Simple, their GPUs operate wit
     if ( (! $has_X) && defined($self->{'FB_DEVICE'}) && (-e $self->{'FB_DEVICE'}) && open($self->{'FB'}, '+<', $self->{'FB_DEVICE'})) {    # Can we open the framebuffer device??
         binmode($self->{'FB'});                                                                                                                            # We have to be in binary mode first
         $|++;
-        if ($self->{'ACCELERATED'}) {
-            (
+        if ($self->{'ACCELERATED'}) { # Pull in the C structure for the Framebuffer
+            ( # These need to be accurate to give accurate output
                 $self->{'fscreeninfo'}->{'id'},
                 $self->{'fscreeninfo'}->{'smem_start'},
                 $self->{'fscreeninfo'}->{'smem_len'},
@@ -1163,7 +1167,7 @@ Why do many video cards use the BGR color order?  Simple, their GPUs operate wit
             ) = (c_get_screen_info($self->{'FB_DEVICE'}));
         } else { # Fallback if not accelerated.  Do it the old way
             # Make the IOCTL call to get info on the virtual (viewable) screen (Sometimes different than physical)
-            (
+            ( # This method has the potential for errors
                 $self->{'vscreeninfo'}->{'xres'},                                # (32)
                 $self->{'vscreeninfo'}->{'yres'},                                # (32)
                 $self->{'vscreeninfo'}->{'xres_virtual'},                        # (32)
@@ -1319,6 +1323,7 @@ Why do many video cards use the BGR color order?  Simple, their GPUs operate wit
                 $self->{'fscreeninfo'}->{'smem_len'},
             );
         };
+###
         if ($@) {
             print STDERR qq{
 OUCH!  Graphics::Framebuffer cannot memory map the framebuffer!
@@ -1364,6 +1369,7 @@ To get back into X-Windows/Wayland, you just hit ALT-F1 (or ALT-F7 or ALT-F8
 on some systems).  Linux can have many consoles, which are usually mapped F1
 to F9.  One of them is set aside for X-Windows/Wayland.
 };
+###
         sleep ($self->{'RESET'}) ? 10 : 1;
         exit(1);
     } else { # Go into emulation mode if no actual framebuffer available
@@ -1430,7 +1436,7 @@ to F9.  One of them is set aside for X-Windows/Wayland.
 
         bless($self, $class);
     }
-    $self->{'MIN_BYTES'} = max(3,$self->{'BYTES'});
+    $self->{'MIN_BYTES'} = max(3,$self->{'BYTES'}); # Helpful with Imager calls and avoids time wasting calculations
     $self->{'X_FACTOR'} = 3840 / $self->{'XRES'};
     $self->{'Y_FACTOR'} = 2160 / $self->{'YRES'};
     if ($self->{'RESET'}) {
@@ -1446,7 +1452,7 @@ to F9.  One of them is set aside for X-Windows/Wayland.
         }
     }
     $self->_flush_screen();
-    unless($self->{'RESET'}) {
+    unless($self->{'RESET'}) { # This is to restore the screen as it was when script started
 		$self->{'START_SCREEN'} = ''. $self->{'SCREEN'}; # Force Perl to copy the string, not the reference
 	}
     chomp($self->{'this_tty'} = `tty`);
@@ -1524,7 +1530,7 @@ Sets the TTY into text mode, where text can interfere with the display
 =cut
 
     my $self = shift;
-    c_text_mode($self->{'this_tty'});
+    c_text_mode($self->{'this_tty'}) if ($self->acceleration());
 }
 
 sub graphics_mode {
@@ -1535,7 +1541,7 @@ Sets the TTY in exclusive graphics mode, where text and cursor cannot interfere 
 =cut
 
     my $self = shift;
-    c_graphics_mode($self->{'this_tty'});
+    c_graphics_mode($self->{'this_tty'}) if ($self->acceleration());
 }
 
 sub screen_dimensions {
@@ -1683,54 +1689,48 @@ Sets or returns the drawing mode, depending on how it is called.
 
                                    # When you draw it...
 
- $fb->draw_mode(NORMAL_MODE);      # Replaces the screen pixel
-                                   # with the new pixel. Imager
-                                   # assisted drawing (acceleration)
-                                   # only works in this mode.
+ $fb->draw_mode(NORMAL_MODE);      # Replaces the screen pixel with the new
+                                   # pixel. Imager assisted drawing
+                                   # (acceleration) only works in this mode.
 
- $fb->draw_mode(XOR_MODE);         # Does a bitwise XOR with
-                                   # the new pixel and screen
-                                   # pixel.
+ $fb->draw_mode(XOR_MODE);         # Does a bitwise XOR with the new pixel and
+                                   # screen pixel.
 
- $fb->draw_mode(OR_MODE);          # Does a bitwise OR with
-                                   # the new pixel and screen
-                                   # pixel.
+ $fb->draw_mode(OR_MODE);          # Does a bitwise OR with the new pixel and
+                                   # screen pixel.  This has the benefit of
+                                   # not writing pure black to the screen
+                                   # (usually the background)
 
- $fb->draw_mode(AND_MODE);         # Does a bitwise AND with
-                                   # the new pixel and screen
-                                   # pixel.
+ $fb->draw_mode(AND_MODE);         # Does a bitwise AND with the new pixel and
+                                   # screen pixel.
 
- $fb->draw_mode(MASK_MODE);        # If pixels in the source
-                                   # are equal to the global
-                                   # background color, then they
-                                   # are not drawn (transparent).
+ $fb->draw_mode(MASK_MODE);        # If pixels in the source are equal to the
+                                   # global background color, then they are
+                                   # not drawn (transparent).
 
- $fb->draw_mode(UNMASK_MODE);      # Draws the new pixel on
-                                   # screen areas only equal to
-                                   # the background color.
+ $fb->draw_mode(UNMASK_MODE);      # Draws the new pixel on screen areas only
+                                   # equal to the background color.
 
- $fb->draw_mode(ALPHA_MODE);       # Draws the new pixel on the screen
-                                   # using the alpha channel value as
-                                   # a transparency value.  This means
-                                   # the new pixel will not be
-                                   # opague.
+ $fb->draw_mode(ALPHA_MODE);       # Draws the new pixel on the screen using
+                                   # the alpha channel value as a transparency
+                                   # value.  This means the new pixel will not
+                                   # be opague.
 
- $fb->draw_mode(ADD_MODE);         # Draws the new pixel on the screen
-                                   # by mathematically adding its pixel
-                                   # value to the existing pixel value
+ $fb->draw_mode(ADD_MODE);         # Draws the new pixel on the screen by
+                                   # mathematically adding its pixel value to
+                                   # the existing pixel value
 
- $fb->draw_mode(SUBTRACT_MODE);    # Draws the new pixel on the screen
-                                   # by mathematically subtracting the
-                                   # the new pixel value from the existing
-                                   # value
+ $fb->draw_mode(SUBTRACT_MODE);    # Draws the new pixel on the screen by
+                                   # mathematically subtracting the new pixel
+                                   # value from the existing value
 
- $fb->draw_mode(MULTIPLY_MODE);    # Draws the new pixel on the screen
-                                   # by mathematically multiplying it with
-                                   # the existing pixel value (usually not
-                                   # too useful, but here for completeness)
+ $fb->draw_mode(MULTIPLY_MODE);    # Draws the new pixel on the screen by
+                                   # mathematically multiplying it with the
+                                   # existing pixel value (usually not too
+                                   # useful, but here for completeness)
 
- $fb->draw_mode(DIVIDE_MODE);      # Draws the new pixel on the screen
-                                   # by mathematically dividing it with the
+ $fb->draw_mode(DIVIDE_MODE);      # Draws the new pixel on the screen by
+                                   # mathematically dividing it with the
                                    # existing pixel value (usually not too
                                    # useful, but here for completeness)
 
@@ -1846,7 +1846,7 @@ This is an alias to draw_mode(MASK_MODE)
 =cut
 
     my $self = shift;
-    $self->draw_mode(MASK_MODE);
+    $self->draw_mode(MASK_MODE); # 16 bit mode may have issues with this
 }
 
 sub unmask_mode {
@@ -1900,7 +1900,7 @@ This is an alias to draw_mode(SUBTRACT_MODE)
     $self->draw_mode(SUBTRACT_MODE);
 }
 
-sub multiply_mode {
+sub multiply_mode { # I see no use for this, but it's here for use
 =head2 multiply_mode
 
 This is an alias to draw_mode(MULTIPLY_MODE)
@@ -1917,7 +1917,7 @@ This is an alias to draw_mode(MULTIPLY_MODE)
     $self->draw_mode(MULTIPLY_MODE);
 }
 
-sub divide_mode {
+sub divide_mode { # I see no use for this, but it's here for use
 =head2 divide_mode
 
 This is an alias to draw_mode(DIVIDE_MODE)
@@ -2310,7 +2310,7 @@ Draws a line, in the foreground color, from point x,y to point xx,yy.  Clipping 
     'xx'          => 100,
     'yy'          => 332
     'pixel_size'  => 1,
-    'antialiased' => TRUE
+    'antialiased' => TRUE # Antialiasing is slower
  });
 
 =back
@@ -2567,10 +2567,10 @@ sub _flush_screen {
     my $self = shift;
     unless ($self->{'DEVICE'} eq 'EMULATED') {
         select(STDERR);
-        $|++;
+        $| = 1;
     }
     select($self->{'FB'});
-    $|++;
+    $| = 1;
 }
 
 sub _adj_plot {
@@ -3168,7 +3168,7 @@ Draw an ellipse at center position x,y with XRadius, YRadius.  Either a filled e
     ## Only one of the following may be used
 
     'gradient'   => {  # optional, but 'filled' must be set
-        'direction' => 'horizontal', # or vertical
+        'direction' => 'horizontal', # or vertical 90 degree directions only
         'colors'    => { # 2 to any number of transitions allowed
             'red'   => [255,255,0], # Red to yellow to cyan
             'green' => [0,255,255],
@@ -3188,6 +3188,8 @@ Draw an ellipse at center position x,y with XRadius, YRadius.  Either a filled e
 =back
 
 * This is not affected by the Acceleration setting
+
+** Also note, ellipses are only drawn with 90 degree angles.  You can rotate it to get other angles.
 
 =cut
 
@@ -3734,7 +3736,7 @@ It is up to you to make sure the coordinates are "sane".  Weird things can resul
 
     my $size       = int($params->{'pixel_size'} || 1);
     my $aa         = $params->{'antialiased'} || 0;
-    $size = $params->{'pixel_size'} = 1 if ($aa);
+    $size          = $params->{'pixel_size'} = 1 if ($aa);
     my $history_on = (exists($self->{'history'})) ? TRUE : FALSE;
 
     if ($params->{'filled'}) {
@@ -4766,7 +4768,8 @@ It also returns the data moved like "blit_read"
     my $image    = (exists($params->{'image'})) ?
         $params
         :
-        $self->blit_read({ 'x' => int($params->{'x'}), 'y' => int($params->{'y'}), 'width' => int($params->{'width'}), 'height' => int($params->{'height'}) });
+        $self->blit_read({ 'x' => int($params->{'x'}), 'y' => int($params->{'y'}), 'width' => int($params->{'width'}), 'height' => int($params->{'height'}) }
+	);
     $self->xor_mode();
     $self->blit_write($image);
     $self->{'DRAW_MODE'} = $old_mode;
@@ -5019,9 +5022,9 @@ It takes a hash reference.  It draws in the current drawing mode.
     my $w = int($params->{'width'}  || 1);
     my $h = int($params->{'height'} || 1);
 
-    my $draw_mode = $self->{'DRAW_MODE'};
-    my $bytes     = $self->{'BYTES'};
-	my $bits      = $self->{'BITS'};
+    my $draw_mode            = $self->{'DRAW_MODE'};
+    my $bytes                = $self->{'BYTES'};
+	my $bits                 = $self->{'BITS'};
 	my $raw_background_color = $self->{'RAW_BACKGROUND_COLOR'};
 
     return unless (defined($params->{'image'}) && $params->{'image'} ne '' && $h && $w);
@@ -5047,7 +5050,6 @@ It takes a hash reference.  It draws in the current drawing mode.
         my $scan = $w * $bytes;
         my $yend = $y + $h;
 
-        #    my $WW = $scan * $h;
         my $WW  = int((length($scrn) / $h));
         my $X_X = ($x + $self->{'XOFFSET'}) * $bytes;
         my ($index, $data, $px, $line, $idx, $px4, $buf, $ipx);
@@ -6241,74 +6243,69 @@ If 'width' and/or 'height' is given, the image is resized.  Note, resizing is CP
  $fb->blit_write(
      $fb->load_image(
          {
-             'x'          => 0,    # Optional (only applies if
-                                   # CENTER_X or CENTER_XY is not
-                                   # used)
+             'x'          => 0,     # Optional (only applies if CENTER_X or
+                                    # CENTER_XY is not used)
 
-             'y'          => 0,    # Optional (only applies if
-                                   # CENTER_Y or CENTER_XY is not
-                                   # used)
+             'y'          => 0,     # Optional (only applies if CENTER_Y or
+                                    # CENTER_XY is not used)
 
-             'width'      => 1920, # Optional. Resizes to this maximum
-                                   # width.  It fits the image to this
-                                   # size.
+             'width'      => 1920,  # Optional. Resizes to this maximum width.
+                                    # It fits the image to this size.
 
-             'height'     => 1080, # Optional. Resizes to this maximum
-                                   # height.  It fits the image to this
-                                   # size
+             'height'     => 1080,  # Optional. Resizes to this maximum height.
+                                    # It fits the image to this size
 
-             'scale_type' => 'min',# Optional. Sets the type of scaling
-                                   #
-                                   #  'min'     = The smaller of the two
-                                   #              sizes are used (default)
-                                   #  'max'     = The larger of the two
-                                   #              sizes are used
-                                   #  'nonprop' = Non-proportional sizing
-                                   #              The image is scaled to
-                                   #              width x height exactly.
+             'scale_type' => 'min', # Optional. Sets the type of scaling
+                                    #
+                                    #  'min'     = The smaller of the two sizes
+                                    #              are used (default)
+                                    #  'max'     = The larger of the two sizes
+                                    #              are used
+                                    #  'nonprop' = Non-proportional sizing
+                                    #              The image is scaled to
+                                    #              width x height exactly.
 
-             'autolevels' => FALSE,# Optional.  It does a color
-                                   # correction. Sometimes this
-                                   # works well, and sometimes it
-                                   # looks quite ugly.  It depends
-                                   # on the image
+             'autolevels' => FALSE, # Optional.  It does a color correction.
+                                    # Sometimes this works well, and sometimes
+                                    # it looks quite ugly.  It depends on the
+                                    # image
 
              'center'     => CENTER_XY, # Optional
-                                   # Three centering options are available
-                                   #  CENTER_X  = center horizontally
-                                   #  CENTER_Y  = center vertically
-                                   #  CENTER_XY = center horizontally and
-                                   #              vertically.  Placing it
-                                   #              right in the middle of
-                                   #              the screen.
+                                    # Three centering options are available
+                                    #  CENTER_X  = center horizontally
+                                    #  CENTER_Y  = center vertically
+                                    #  CENTER_XY = center horizontally and
+                                    #              vertically.  Placing it
+                                    #              right in the middle of
+                                    #              the screen.
 
              'file'       => 'RWBY_Faces.png', # Usually needs full path
 
              'convertalpha' => TRUE, # Converts the color matching the global
-                                   # background color to have the same alpha
-                                   # channel value as the global background,
-                                   # which is beneficial for using 'merge'
-                                   # in 'blit_transform'.
+                                     # background color to have the same alpha
+                                     # channel value as the global background,
+                                     # which is beneficial for using 'merge'
+                                     # in 'blit_transform'.
 
              'preserve_transparency' => FALSE,
-                                   # Preserve the transparency of GIFs for
-                                   # use with "mask_mode" playback.
-                                   # This can allow for slightly faster
-                                   # playback of animated GIFs on systems
-                                   # using the acceration features of this
-                                   # module.  However, not all animated
-                                   # GIFs look right when this is done.
-                                   # the safest setting is to not use this,
-                                   # and playback using normal_mode.
+                                     # Preserve the transparency of GIFs for
+                                     # use with "mask_mode" playback.
+                                     # This can allow for slightly faster
+                                     # playback of animated GIFs on systems
+                                     # using the acceration features of this
+                                     # module.  However, not all animated
+                                     # GIFs look right when this is done.
+                                     # the safest setting is to not use this,
+                                     # and playback using normal_mode.
 
               'fpsmax' => 10,
-                                   # If the file is a video file, it will be
-                                   # converted to a GIF file.  This value
-                                   # determines the maximum number of frames
-                                   # per second allowed in the conversion.
-                                   # Note, the higher the number, the slower
-                                   # the conversion process.  This only works
-                                   # if "ffmpeg" is installed.
+                                     # If the file is a video file, it will be
+                                     # converted to a GIF file.  This value
+                                     # determines the maximum number of frames
+                                     # per second allowed in the conversion.
+                                     # Note, the higher the number, the slower
+                                     # the conversion process.  This only works
+                                     # if "ffmpeg" is installed.
          }
      )
  );
@@ -6320,12 +6317,12 @@ If a single image is loaded, it returns a reference to an anonymous hash, of the
 =over 4
 
  {
-      'x'           => horizontal position calculated (or passed through),
-      'y'           => vertical position calculated (or passed through),
-      'width'       => Width of the image,
-      'height'      => Height of the image,
-      'tags'        => The tags of the image (hashref)
-      'image'       => [raw image data]
+      'x'      => horizontal position calculated (or passed through),
+      'y'      => vertical position calculated (or passed through),
+      'width'  => Width of the image,
+      'height' => Height of the image,
+      'tags'   => The tags of the image (hashref)
+      'image'  => [raw image data]
  }
 
 =back
@@ -6334,28 +6331,29 @@ If the image has multiple frames, then a reference to an array of hashes is retu
 
 =over 4
 
- # NOTE:  X and Y positions can change frame to frame, so use them for each frame!
- #        Also, X and Y are based upon what was originally passed through, else they
- #        reference 0,0 (but only if you didn't give an X,Y value initially).
+ # NOTE:  X and Y positions can change frame to frame, so use them for each
+ #        frame!  Also, X and Y are based upon what was originally passed
+ #        through, else they reference 0,0 (but only if you didn't give an X,Y
+ #        value initially).
 
  # ALSO:  The tags may also specify offsets, and they will be taken into account.
 
  [
      { # Frame 1
-         'x'           => horizontal position calculated (or passed through),
-         'y'           => vertical position calculated (or passed through),
-         'width'       => Width of the image,
-         'height'      => Height of the image,
-         'tags'        => The tags of the image (hashref)
-         'image'       => [raw image data]
+         'x'      => horizontal position calculated (or passed through),
+         'y'      => vertical position calculated (or passed through),
+         'width'  => Width of the image,
+         'height' => Height of the image,
+         'tags'   => The tags of the image (hashref)
+         'image'  => [raw image data]
      },
      { # Frame 2 (and so on)
-         'x'           => horizontal position calculated (or passed through),
-         'y'           => vertical position calculated (or passed through),
-         'width'       => Width of the image,
-         'height'      => Height of the image,
-         'tags'        => The tags of the image (hashref)
-         'image'       => [raw image data]
+         'x'      => horizontal position calculated (or passed through),
+         'y'      => vertical position calculated (or passed through),
+         'width'  => Width of the image,
+         'height' => Height of the image,
+         'tags'   => The tags of the image (hashref)
+         'image'  => [raw image data]
      }
  ]
 
@@ -7574,9 +7572,9 @@ Ok, you've installed the module, but can't seem to get it to work properly.  Her
 
 =item B< You Have To Run From The Console >
 
-A console window doesn't count as "the console".  You cannot use this module from within X-Windows.  It won't work, and likely will only go into emulation mode if you do, or maybe crash, or even corrupt your X-Windows screen.
+A console window doesn't count as "the console".  You cannot use this module from within X-Windows/Wayland.  It won't work, and likely will only go into emulation mode if you do, or maybe crash, or even corrupt your X-Windows/Wayland screen.
 
-If you want to run your program within X-Windows, then you have the wrong module.  Use SDL, QT, or GTK or something similar.
+If you want to run your program within X-Windows/Wayland, then you have the wrong module.  Use SDL, QT, or GTK or something similar.
 
 You MUST have a framebuffer based video driver for this to work.  The device ("/dev/fb0" for example) must exist.
 
@@ -7697,7 +7695,6 @@ This license does not grant you the right to use any trademark, service mark, tr
 This license includes the non-exclusive, worldwide, free-of-charge patent license to make, have made, use, offer to sell, sell, import and otherwise transfer the Package with respect to any patent claims licensable by the Copyright Holder that are necessarily infringed by the Package. If you institute patent litigation (including a cross-claim or counterclaim) against any party alleging that the Package constitutes direct or contributory patent infringement, then this Artistic License to you shall terminate on the date that such litigation is filed.
 
 Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES. THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
 
 =head1 VERSION
 

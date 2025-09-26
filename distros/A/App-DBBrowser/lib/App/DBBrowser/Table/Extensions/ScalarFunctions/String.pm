@@ -265,7 +265,7 @@ sub function_trim {
     }
     else {
         $args_data = [
-            { prompt => 'Where: ', history => [ qw(BOTH LEADING TRAILING) ], history_only => 1, unquote => 1, skip_ok => 1 },
+            { prompt => 'Where: ', unquote => 1, history => [ qw(BOTH LEADING TRAILING) ], history_only => 1, skip_ok => 1 },
             { prompt => 'What: ' }
         ];
     }

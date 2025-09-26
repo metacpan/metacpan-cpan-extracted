@@ -10,12 +10,11 @@ my @tests = (
         input    => '',
         html     => '',
         xml      => '',
-    },
-    {
+    }, {
         desc     => 'ASCII only',
-        input    => 'Hello, World!',
-        html     => 'Hello, World!',
-        xml      => 'Hello, World!',
+        input    => 'Hello, World.',
+        html     => 'Hello, World.',
+        xml      => 'Hello, World.',
     },
     {
         desc     => 'Control characters',

@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.16.0;
 
-our $VERSION = '0.173';
+our $VERSION = '0.174';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -904,7 +904,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.173
+Version 0.174
 
 =cut
 

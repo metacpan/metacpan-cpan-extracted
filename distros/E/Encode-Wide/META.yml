@@ -4,6 +4,12 @@ author:
   - 'Nigel Horne <njh@nigelhorne.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  File::Glob: '0'
+  File::Slurp: '0'
+  File::stat: '0'
+  IPC::System::Simple: '0'
+  POSIX: '0'
+  Readonly: '0'
   Test::DescribeMe: '0'
   Test::Most: '0'
   Test::Needs: '0'
@@ -31,5 +37,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Encode-Wide
   homepage: https://metacpan.org/pod/Encode::Wide
   repository: git://github.com/nigelhorne/Encode-Wide.git
-version: 0.05
+version: 0.06
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

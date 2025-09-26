@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-05-06'; # DATE
+our $DATE = '2025-09-26'; # DATE
 our $DIST = 'App-MineralUtils'; # DIST
-our $VERSION = '0.022'; # VERSION
+our $VERSION = '0.023'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/MineralUtils/convert_sodium_unit",
@@ -39,7 +39,7 @@ convert-sodium-unit - Convert a sodium quantity from one unit to another
 
 =head1 VERSION
 
-This document describes version 0.022 of convert-sodium-unit (from Perl distribution App-MineralUtils), released on 2025-05-06.
+This document describes version 0.023 of convert-sodium-unit (from Perl distribution App-MineralUtils), released on 2025-09-26.
 
 =head1 SYNOPSIS
 

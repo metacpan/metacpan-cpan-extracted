@@ -49,9 +49,13 @@ Readonly my %NOTE_TO_TONE => (
 
 Readonly my %ACCIDENTAL_TO_ALTERATION => (
   '#' => 1,
+  '♯' => 1,
   '+' => 1,
   'b' => -1,
   '-' => -1,
+  '♭' => -1,
+  '♮' => 0,
+  '=' => 0,
   '' => 0,
 );
 
@@ -96,6 +100,8 @@ Readonly my %KEY_TO_ALTERATION => (
 Readonly my @NOTE_NAMES => qw(do Do ut Ut ré Ré re Re mi Mi fa Fa sol Sol la La si Si);
 Readonly my $JOINED_NOTE_NAMES => join('|', @NOTE_NAMES);
 Readonly my $NOTE_NAME_RE => qr/ ${JOINED_NOTE_NAMES} | [A-H] /x;
+Readonly my $ACCIDENTAL_RE => join '|',
+    map { (quotemeta $_).'+' } grep { $_ ne '' } keys %ACCIDENTAL_TO_ALTERATION;
 
 Readonly my $BASE_OCTAVE => 4;
 Readonly my $TONES_PER_SCALE => 12;
@@ -153,7 +159,7 @@ sub convert ($self, $symbols) {
     }
 
     # There is a bug here that A-3 won’t be parsed as the - will be taken for a flat.
-    if ($symbols =~ m/\G ( ${NOTE_NAME_RE} ) ( \#+ | \++ | b+ | \-* ) ( \d+ )? (,+|’+|'+)?/xgc) {
+    if ($symbols =~ m/\G ( ${NOTE_NAME_RE} ) ( ${ACCIDENTAL_RE} )? ( \d+ )? (,+|’+|'+)?/xgc) {
       my ($note, $accidental, $octave, $rel_octave) =
           (ucfirst($1), $2, $3 // $self->{default_octave}, $4);
       if ($rel_octave) {

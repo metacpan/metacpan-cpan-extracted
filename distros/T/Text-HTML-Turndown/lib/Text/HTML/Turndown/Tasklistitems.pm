@@ -1,4 +1,4 @@
-package Text::HTML::Turndown::Tasklistitems 0.07;
+package Text::HTML::Turndown::Tasklistitems 0.08;
 use 5.020;
 use experimental 'signatures';
 use stable 'postderef';
@@ -11,7 +11,7 @@ our %RULES = (
                    && uc $node->parentNode->nodeName eq 'LI'
         },
         replacement => sub( $content, $node, $options, $context ) {
-            return ($node->getAttribute('checked') ? '[x]' : '[ ]') . ' '
+            return (defined $node->getAttribute('checked') ? '[x]' : '[ ]') . ' '
         }
     },
 );

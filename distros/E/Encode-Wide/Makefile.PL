@@ -21,12 +21,18 @@ WriteMakefile(
 		: ()),
 	CONFIGURE_REQUIRES => {
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
-	}, PREREQ_PM    => {
-		'Exporter'       => 0,
+	}, PREREQ_PM => {
+		'Exporter' => 0,
 		'HTML::Entities' => 0,
 		'Params::Get' => 0.13,
 		'Term::ANSIColor' => 0,
 	},  TEST_REQUIRES => {
+		'File::Glob' => 0,
+		'File::Slurp' => 0,
+		'File::stat' => 0,
+		'IPC::System::Simple' => 0,
+		'POSIX' => 0,
+		'Readonly' => 0,
 		'Test::DescribeMe' => 0,
 		'Test::Most' => 0,
 		'Test::Needs' => 0,
@@ -45,7 +51,7 @@ WriteMakefile(
 				type => 'git',
 				url => 'git://github.com/nigelhorne/Encode-Wide.git',
 				web => 'https://github.com/nigelhorne/Encode-Wide',
-				# license    => 'http://dev.perl.org/licenses/',
+				# license => 'http://dev.perl.org/licenses/',
 			}, bugtracker => {
 				mailto => 'bug-Encode-Wide@rt.cpan.org',
 				url => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Encode-Wide',

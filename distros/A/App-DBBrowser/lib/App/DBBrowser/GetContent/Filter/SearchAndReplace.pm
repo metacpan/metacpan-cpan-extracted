@@ -268,7 +268,7 @@ sub __execute_substitutions {
             if ( $count_e || $replacement_str =~ tr/$// ) {
                 for my $row ( 0 .. $#$aoa ) {
                     for my $col ( @$col_idxs ) {
-                        $c = 0;
+                        $c = 0; ##
                         if ( ! defined $aoa->[$row][$col] ) {
                             next;
                         }

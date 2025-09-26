@@ -1,3 +1,6 @@
+0.08 2025-09-25
+    * Fix handling of "checked" for checkboxes
+
 0.07 2025-08-17
     * Add helper shorthand function C<html2markdown>
 

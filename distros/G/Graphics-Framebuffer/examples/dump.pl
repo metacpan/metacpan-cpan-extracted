@@ -13,6 +13,11 @@ use open qw(:std :utf8);
 
 use Term::ANSIColor;
 use Data::Dumper;
+eval { # Data::Dumper::Simple is preferred.  Try to load it without dying.
+	require Data::Dumper::Simple;
+	Data::Dumper::Simple->import();
+	1;
+};
 
 # Set up dumper variables for friendly output
 

@@ -64,10 +64,10 @@ sub __add_date_subtract_date {
     }
     my $args_data = [];
     if ( $driver =~ /^(?:SQLite|Informix|Oracle)\z/ ) {
-        push @$args_data, { prompt => 'Unit: ', history => [ qw(YEAR MONTH DAY HOUR MINUTE SECOND) ], unquote => 1 };
+        push @$args_data, { prompt => 'Unit: ', unquote => 1, history => [ qw(YEAR MONTH DAY HOUR MINUTE SECOND) ] };
     }
     else {
-        push @$args_data, { prompt => 'Unit: ', history => [ qw(YEAR MONTH WEEK DAY HOUR MINUTE SECOND) ], unquote => 1 };
+        push @$args_data, { prompt => 'Unit: ', unquote => 1, history => [ qw(YEAR MONTH WEEK DAY HOUR MINUTE SECOND) ] };
     }
     push @$args_data, { prompt => 'Amount: ', is_numeric => 1 };
     my ( $unit, $amount ) = $ga->get_arguments( $sql, $clause, $func, $args_data, $r_data );
@@ -120,7 +120,7 @@ sub function_date_trunc {
     }
     my $history = [ qw(YEAR QUARTER MONTH WEEK DAY HOUR MINUTE SECOND MILLISECONDS MICROSECONDS DECADE CENTURY MILLENNIUM) ];
     my $args_data = [
-        { prompt => 'Field: ', history => $history, unquote => 0 },
+        { prompt => 'Field: ', unquote => 0, history => $history },
     ];
     if ( $driver eq 'Pg' ) {
         push @$args_data, { prompt => 'Time_zone:' };
@@ -148,7 +148,7 @@ sub function_date_part {
                         DOW DOY TIMEZONE TIMEZONE_HOUR TIMEZONE_MINUTE ISODOW ISOYEAR DECADE CENTURY MILLENNIUM) ];
     }
     my $args_data = [
-        { prompt => 'Field: ', history => $history, unquote => 0 },
+        { prompt => 'Field: ', unquote => 0, history => $history },
     ];
     my ( $field ) = $ga->get_arguments( $sql, $clause, $func, $args_data, $r_data );
     if ( ! defined $field ) {
@@ -195,7 +195,7 @@ sub function_extract {
                         TIMEZONE_HOUR TIMEZONE_MINUTE TIMEZONE_REGION TIMEZONE_ABBR) ];
     }
     my $args_data = [
-        { prompt => 'Field: ', history => $history, unquote => 1 },
+        { prompt => 'Field: ', unquote => 1, history => $history },
     ];
     my ( $field ) = $ga->get_arguments( $sql, $clause, $func, $args_data, $r_data );
     if ( ! defined $field ) {
@@ -291,7 +291,7 @@ sub function_week {
     if ( $driver =~ /^(?:mysql|MariaDB)\z/ ) {
         my $history = [ 0 .. 7 ];
         my $args_data = [
-            { prompt => 'Mode: ', history => $history, is_numeric => 1 },
+            { prompt => 'Mode: ', is_numeric => 1, history => $history },
         ];
         ( $mode ) = $ga->get_arguments( $sql, $clause, $func, $args_data, $r_data );
     }
@@ -311,12 +311,12 @@ sub function_datediff {
     my $args_data = [];
     if ( $driver eq 'Firebird' ) {
         $args_data = [
-            { prompt => 'Unit: ', history => [ qw(YEAR MONTH WEEK DAY HOUR MINUTE SECOND MILLISECOND) ], unquote => 1 }
+            { prompt => 'Unit: ', unquote => 1, history => [ qw(YEAR MONTH WEEK DAY HOUR MINUTE SECOND MILLISECOND) ] }
         ];
     }
     else {
         $args_data = [
-            { prompt => 'Unit: ', history => [ qw(YEAR MONTH DAY HOUR MINUTE SECOND) ], history_only => 1, unquote => 1 }
+            { prompt => 'Unit: ', unquote => 1, history => [ qw(YEAR MONTH DAY HOUR MINUTE SECOND) ], history_only => 1 }
         ];
     }
     my ( $unit ) = $ga->get_arguments( $sql, $clause, $func, $args_data, $r_data );
@@ -396,7 +396,7 @@ sub function_timestampdiff {
     }
     my $ga = App::DBBrowser::Table::Extensions::ScalarFunctions::GetArguments->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $args_data = [
-        { prompt => 'Unit: ', history => [ qw(YEAR MONTH WEEK DAY HOUR MINUTE SECOND MILLISECOND) ], unquote => 1 }
+        { prompt => 'Unit: ', unquote => 1, history => [ qw(YEAR MONTH WEEK DAY HOUR MINUTE SECOND MILLISECOND) ] }
     ];
     my ( $unit ) = $ga->get_arguments( $sql, $clause, $func, $args_data, $r_data );
     return if ! defined $unit;

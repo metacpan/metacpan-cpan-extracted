@@ -167,31 +167,19 @@ do not execute fork() without issuing `disconnect` if all callbacks are not exec
 
 ## run\_event\_loop()
 
-This method allows you to issue commands without waiting for their responses.
-You can then perform a blocking wait for those responses later, if needed.
+This method is nonblocking and allows you to issue commands without waiting for their responses.
 
-Executes one iteration of the event loop to process any pending commands that have not yet been sent
-and any incoming responses from Redis.
-
-If there are events that can be triggered immediately, they will all be processed.
-In other words, if there are unsent commands, they will be pipelined and sent,
+If there are unsent commands, they will be pipelined and sent,
 and if there are already-received responses, their corresponding callbacks will be executed.
-
-If there are no events that can be triggered immediately: there are neither unsent commands nor any Redis responses available to read,
-but unprocessed callbacks remain, then this method will block for up to `command_timeout` while waiting for a response from Redis.
 When a timeout occurs, an error will be propagated to the corresponding callback(s).
 
-The return value can be either 1 for success (e.g., commands sent or responses read),
+The return value can be either 1 for success
+(e.g., commands sent, responses read, or exit without waiting for any responses),
 0 for no callbacks remained, or undef for other errors.
 
 ### Notes
 
-- Be aware that the timeout check will only be triggered when there are neither unsent commands nor Redis responses available to read.
-If a timeout occurs, all remaining commands on that node will time out as well.
-- Internally, this method calls `event_base_loop(..., EVLOOP_ONCE)`, which
-performs a single iteration of the event loop. A command will not be fully processed in a single call.
-- If you need to process multiple commands or wait for all responses, call
-this method repeatedly or use `wait_all_responses`.
+- If a timeout occurs, all remaining commands on that node will time out as well.
 - For a simpler, synchronous-like usage where you need at least one response,
 refer to `wait_one_response`. If you only need to block until all
 pending commands are processed, see `wait_all_responses`.
@@ -205,17 +193,17 @@ pending commands are processed, see `wait_all_responses`.
     # Send commands to Redis without waiting for responses
     $redis->run_event_loop();
 
-    # Possibly wait for responses
+    # If any responses are available, read them immediately without waiting for the rest
     $redis->run_event_loop();
 
 ## wait\_one\_response()
 
-If there are any unexcuted callbacks, it will block until at least one is executed.
+If there are any unexecuted callbacks, it will block until at least one is executed.
 The return value can be either 1 for success, 0 for no callbacks remained, or undef for other errors.
 
 ## wait\_all\_responses()
 
-If there are any unexcuted callbacks, it will block until all of them are executed.
+If there are any unexecuted callbacks, it will block until all of them are executed.
 The return value can be either 1 for success, 0 for no callbacks remained, or undef for other errors.
 
 ## disconnect()

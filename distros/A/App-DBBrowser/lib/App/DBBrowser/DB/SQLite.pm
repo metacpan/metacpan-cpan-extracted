@@ -54,6 +54,13 @@ sub set_attributes {
         DBD_SQLITE_STRING_MODE_UNICODE_FALLBACK . ' DBD_SQLITE_STRING_MODE_UNICODE_FALLBACK', # 5
         DBD_SQLITE_STRING_MODE_UNICODE_STRICT   . ' DBD_SQLITE_STRING_MODE_UNICODE_STRICT',   # 6
     ];
+    #my $values = [
+    #    DBD_SQLITE_STRING_MODE_PV,               # 0
+    #    DBD_SQLITE_STRING_MODE_BYTES,            # 1
+    #    DBD_SQLITE_STRING_MODE_UNICODE_NAIVE,    # 4
+    #    DBD_SQLITE_STRING_MODE_UNICODE_FALLBACK, # 5
+    #    DBD_SQLITE_STRING_MODE_UNICODE_STRICT,   # 6
+    #];
     return [
         { name => 'sqlite_string_mode',         default => 3, values => $values }, # $values->[3] == DBD_SQLITE_STRING_MODE_UNICODE_FALLBACK (5)
         { name => 'sqlite_see_if_its_a_number', default => 1, values => [ 0, 1 ] },

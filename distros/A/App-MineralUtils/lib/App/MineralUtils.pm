@@ -6,9 +6,9 @@ use utf8;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-05-06'; # DATE
+our $DATE = '2025-09-26'; # DATE
 our $DIST = 'App-MineralUtils'; # DIST
-our $VERSION = '0.022'; # VERSION
+our $VERSION = '0.023'; # VERSION
 
 our %SPEC;
 
@@ -928,38 +928,114 @@ our @zinc_forms = (
         zinc_ratio => 1,
         summary => 'Elemental zinc, in milligrams',
     },
-    # also has anhydrous, dihydrate, trihydrate
+
+    # LACTATE
     {
-        name => 'mg-zn-lactate-monohydrate',
-        zinc_ratio => 65.38 / 243.5, # 26.9%
-        summary => 'Zinc lactate monohydrate (Zn(C3H5O3)2.H2O), in milligrams',
+        name => 'mg-zn-lactate-anhydrous',
+        zinc_ratio => 65.38 / 245.5, # 26.63%
+        summary => 'Zinc lactate anhydrous (Zn(C3H5O3)2), in milligrams',
     },
     {
-        name => 'mg-zn-picolinate',
+        name => 'mg-zn-lactate-monohydrate',
+        zinc_ratio => 65.38 / 263.6, # 24.80%
+        summary => 'Zinc lactate monohydrate (Zn(C₃H₅O₃)₂·H₂O), in milligrams',
+    },
+    {
+        name => 'mg-zn-lactate-dihydrate',
+        zinc_ratio => 65.38 / 281.6, # 23.22%
+        summary => 'Zinc lactate dihydrate (Zn(C₃H₅O₃)₂·2H₂O) [most common hydrate form, along -trihydrate], in milligrams',
+    },
+    {
+        name => 'mg-zn-lactate-trihydrate',
+        zinc_ratio => 65.38 / 299.6, # 21.82%
+        summary => 'Zinc lactate trihydrate (Zn(C₃H₅O₃)₂·3H₂O) [most common hydrate form, along -diihydrate], in milligrams',
+    },
+
+    # PICOLINATE
+    {
+        name => 'mg-zn-picolinate-anhydrous',
         zinc_ratio => 65.38 / 298.6, # 21.9%
         summary => 'Zinc picolinate (Zn(C6H4NO2)2), in milligrams',
     },
-    # also has monohydrate, dihydrate
+    {
+        name => 'mg-zn-picolinate-dihydrate',
+        zinc_ratio => 65.38 / (298.6+2*18), # 19.5%
+        summary => 'Zinc picolinate dihydrate (Zn(C6H4NO2)2.2H2O) [most common hydrate form, along with -tetrahydrate], in milligrams',
+    },
+    {
+        name => 'mg-zn-picolinate-tetrahydrate',
+        zinc_ratio => 65.38 / (298.6+4*18), # 17.6%
+        summary => 'Zinc picolinate tetrahydrate (Zn(C6H4NO2)2.2H2O) [most common hydrate form, along with -dihydrate], in milligrams',
+    },
+
+    # GLUCONATE
     {
         name => 'mg-zn-gluconate-anhydrous',
         zinc_ratio => 65.38 / 455.7, # 14.4%
-        summary => 'Zinc gluconate anhydrous (Zn(C6H11O7)2), in milligrams',
+        summary => 'Zinc gluconate anhydrous (Zn(C6H11O7)2) [uncommon], in milligrams',
     },
     {
-        name => 'mg-zn-citrate',
-        zinc_ratio => 3*65.38 / 574.3, # 31.1%
-        summary => 'Zinc citrate (Zn3(C6H5O7)2, trizinc dicitrate), in milligrams',
+        name => 'mg-zn-gluconate-dihydrate',
+        zinc_ratio => 65.38 / (455.7 + 2*18), # 13.3%
+        summary => 'Zinc gluconate dihydrate (Zn(C6H11O7)2.2H2O) [most common hydrate form with trihydrate], in milligrams',
     },
+    {
+        name => 'mg-zn-gluconate-trihydrate',
+        zinc_ratio => 65.38 / (455.7 + 3*18), # 12.8%
+        summary => 'Zinc gluconate trihydrate (Zn(C6H11O7)2.3H2O) [most common hydrate form with dihydrate], in milligrams',
+    },
+
+    # CITRATE
+    {
+        name => 'mg-zn-citrate-andhydrous',
+        zinc_ratio => 3*65.38 / 574.3, # 34.2%
+        summary => 'Zinc citrate (trizinc dicitrate) anhydrous (Zn3(C6H5O7)2), in milligrams',
+    },
+    {
+        name => 'mg-zn-citrate-dihydrate',
+        zinc_ratio => 3*65.38 / (574.3+3*18), # 32.1%
+        summary => 'Zinc citrate (trizinc dicitrate) dihydrate (Zn3(C6H5O7)2.2H2O) [most common hydrate form], in milligrams',
+    },
+    {
+        name => 'mg-zn-citrate-trihydrate',
+        zinc_ratio => 3*65.38 / (574.3+3*18), # 31.2%
+        summary => 'Zinc citrate (trizinc dicitrate) trihydrate (Zn3(C6H5O7)2.3H2O) [uncommon], in milligrams',
+    },
+
+    # OXIDE, no hydrate forms
     {
         name => 'mg-zn-oxide',
         zinc_ratio => 65.38 / 81.38, # 80.3%
         summary => 'Zinc oxide (ZnO), in milligrams',
     },
-    # there are also monohydrate, heptahydrate
+
+    # SULFATE
     {
         name => 'mg-zn-sulfate-anhydrous',
         zinc_ratio =>  65.38 / 161.5, # 36.6%
-        summary => 'Zinc sulfate (ZnSO4), in milligrams',
+        summary => 'Zinc sulfate anhydrous (ZnSO4), in milligrams',
+    },
+    {
+        name => 'mg-zn-sulfate-heptahydrate',
+        zinc_ratio =>  65.38 / (161.5+7*18), # 22.7%
+        summary => 'Zinc sulfate heptahydrate (ZnSO4.7H2O) [most common hydrate form], in milligrams',
+    },
+    {
+        name => 'mg-zn-sulfate-dihydrate',
+        zinc_ratio =>  65.38 / (161.5+2*18), # 33.1%
+        summary => 'Zinc sulfate dihydrate (ZnSO4.7H2O) [less common hydrate form], in milligrams',
+    },
+
+    # GLYCINATE
+    {
+        name => 'mg-zn-glycinate-anhydrous',
+        zinc_ratio => 65.38 / 213.5, # 30.6%
+        summary => 'Zinc (bis)glycinate anhydrous (C4H8N2O4Zn) [most common hydrate form], in milligrams',
+    },
+    {
+        name => 'mg-zn-glycinate-monohydrate',
+        zinc_ratio => 65.38 / 233.5, # 28.0%
+        summary => 'Zinc (bis)glycinate monohydrate (C4H8N2O4Zn.H2O), in milligrams',
     },
 );
 
@@ -1064,7 +1140,7 @@ App::MineralUtils - Utilities related to mineral supplements
 
 =head1 VERSION
 
-This document describes version 0.022 of App::MineralUtils (from Perl distribution App-MineralUtils), released on 2025-05-06.
+This document describes version 0.023 of App::MineralUtils (from Perl distribution App-MineralUtils), released on 2025-09-26.
 
 =head1 DESCRIPTION
 
@@ -1285,7 +1361,7 @@ Result:
    ],
    {
      "table.field_formats" => [
-                                ["number", { thousands_sep => "", precision => 3 }],
+                                ["number", { precision => 3, thousands_sep => "" }],
                                 ["number", { thousands_sep => "", precision => 3 }],
                                 undef,
                                 undef,
@@ -1605,15 +1681,15 @@ Result:
      },
    ],
    {
-     "table.fields"        => ["amount", "pct_mg", "purity", "unit", "summary"],
      "table.field_formats" => [
                                 ["number", { thousands_sep => "", precision => 3 }],
-                                ["number", { precision => 3, thousands_sep => "" }],
-                                ["number", { precision => 3, thousands_sep => "" }],
+                                ["number", { thousands_sep => "", precision => 3 }],
+                                ["number", { thousands_sep => "", precision => 3 }],
                                 undef,
                                 undef,
                               ],
      "table.field_aligns"  => ["number", "number", "left", "left"],
+     "table.fields"        => ["amount", "pct_mg", "purity", "unit", "summary"],
    },
  ]
 
@@ -1749,7 +1825,6 @@ Result:
      },
    ],
    {
-     "table.fields"        => ["amount", "pct_k", "unit", "summary"],
      "table.field_formats" => [
                                 ["number", { thousands_sep => "", precision => 3 }],
                                 ["number", { precision => 3, thousands_sep => "" }],
@@ -1757,6 +1832,7 @@ Result:
                                 undef,
                               ],
      "table.field_aligns"  => ["number", "number", "left", "left"],
+     "table.fields"        => ["amount", "pct_k", "unit", "summary"],
    },
  ]
 
@@ -1874,14 +1950,14 @@ Result:
      },
    ],
    {
-     "table.fields"        => ["amount", "pct_na", "unit", "summary"],
      "table.field_aligns"  => ["number", "number", "left", "left"],
      "table.field_formats" => [
                                 ["number", { precision => 3, thousands_sep => "" }],
-                                ["number", { thousands_sep => "", precision => 3 }],
+                                ["number", { precision => 3, thousands_sep => "" }],
                                 undef,
                                 undef,
                               ],
+     "table.fields"        => ["amount", "pct_na", "unit", "summary"],
    },
  ]
 
@@ -1956,28 +2032,82 @@ Result:
        summary => "Elemental zinc, in milligrams",
      },
      {
-       amount  => 3.71747211895911,
-       pct_zn  => 26.8501026694045,
+       amount  => 3.7593984962406,
+       pct_zn  => 26.6313645621181,
+       unit    => "mg-zn-lactate-anhydrous",
+       summary => "Zinc lactate anhydrous (Zn(C3H5O3)2), in milligrams",
+     },
+     {
+       amount  => 4.03225806451613,
+       pct_zn  => 24.8027314112291,
        unit    => "mg-zn-lactate-monohydrate",
-       summary => "Zinc lactate monohydrate (Zn(C3H5O3)2.H2O), in milligrams",
+       summary => "Zinc lactate monohydrate (Zn(C\x{2083}H\x{2085}O\x{2083})\x{2082}\xB7H\x{2082}O), in milligrams",
+     },
+     {
+       amount  => 4.31034482758621,
+       pct_zn  => 23.2173295454545,
+       unit    => "mg-zn-lactate-dihydrate",
+       summary => "Zinc lactate dihydrate (Zn(C\x{2083}H\x{2085}O\x{2083})\x{2082}\xB72H\x{2082}O) [most common hydrate form, along -trihydrate], in milligrams",
+     },
+     {
+       amount  => 4.58715596330275,
+       pct_zn  => 21.8224299065421,
+       unit    => "mg-zn-lactate-trihydrate",
+       summary => "Zinc lactate trihydrate (Zn(C\x{2083}H\x{2085}O\x{2083})\x{2082}\xB73H\x{2082}O) [most common hydrate form, along -diihydrate], in milligrams",
      },
      {
        amount  => 4.5662100456621,
        pct_zn  => 21.8955123911587,
-       unit    => "mg-zn-picolinate",
+       unit    => "mg-zn-picolinate-anhydrous",
        summary => "Zinc picolinate (Zn(C6H4NO2)2), in milligrams",
+     },
+     {
+       amount  => 5.12820512820513,
+       pct_zn  => 19.5397489539749,
+       unit    => "mg-zn-picolinate-dihydrate",
+       summary => "Zinc picolinate dihydrate (Zn(C6H4NO2)2.2H2O) [most common hydrate form, along with -tetrahydrate], in milligrams",
+     },
+     {
+       amount  => 5.68181818181818,
+       pct_zn  => 17.6416621694549,
+       unit    => "mg-zn-picolinate-tetrahydrate",
+       summary => "Zinc picolinate tetrahydrate (Zn(C6H4NO2)2.2H2O) [most common hydrate form, along with -dihydrate], in milligrams",
      },
      {
        amount  => 6.99300699300699,
        pct_zn  => 14.347158218126,
        unit    => "mg-zn-gluconate-anhydrous",
-       summary => "Zinc gluconate anhydrous (Zn(C6H11O7)2), in milligrams",
+       summary => "Zinc gluconate anhydrous (Zn(C6H11O7)2) [uncommon], in milligrams",
+     },
+     {
+       amount  => 7.5187969924812,
+       pct_zn  => 13.2967256457189,
+       unit    => "mg-zn-gluconate-dihydrate",
+       summary => "Zinc gluconate dihydrate (Zn(C6H11O7)2.2H2O) [most common hydrate form with trihydrate], in milligrams",
+     },
+     {
+       amount  => 7.8125,
+       pct_zn  => 12.8271532273887,
+       unit    => "mg-zn-gluconate-trihydrate",
+       summary => "Zinc gluconate trihydrate (Zn(C6H11O7)2.3H2O) [most common hydrate form with dihydrate], in milligrams",
      },
      {
        amount  => 2.92397660818713,
        pct_zn  => 34.1528817691102,
-       unit    => "mg-zn-citrate",
-       summary => "Zinc citrate (Zn3(C6H5O7)2, trizinc dicitrate), in milligrams",
+       unit    => "mg-zn-citrate-andhydrous",
+       summary => "Zinc citrate (trizinc dicitrate) anhydrous (Zn3(C6H5O7)2), in milligrams",
+     },
+     {
+       amount  => 3.20512820512821,
+       pct_zn  => 31.2175712239376,
+       unit    => "mg-zn-citrate-dihydrate",
+       summary => "Zinc citrate (trizinc dicitrate) dihydrate (Zn3(C6H5O7)2.2H2O) [most common hydrate form], in milligrams",
+     },
+     {
+       amount  => 3.20512820512821,
+       pct_zn  => 31.2175712239376,
+       unit    => "mg-zn-citrate-trihydrate",
+       summary => "Zinc citrate (trizinc dicitrate) trihydrate (Zn3(C6H5O7)2.3H2O) [uncommon], in milligrams",
      },
      {
        amount  => 1.2453300124533,
@@ -1989,18 +2119,42 @@ Result:
        amount  => 2.46913580246914,
        pct_zn  => 40.4829721362229,
        unit    => "mg-zn-sulfate-anhydrous",
-       summary => "Zinc sulfate (ZnSO4), in milligrams",
+       summary => "Zinc sulfate anhydrous (ZnSO4), in milligrams",
+     },
+     {
+       amount  => 4.40528634361233,
+       pct_zn  => 22.7408695652174,
+       unit    => "mg-zn-sulfate-heptahydrate",
+       summary => "Zinc sulfate heptahydrate (ZnSO4.7H2O) [most common hydrate form], in milligrams",
+     },
+     {
+       amount  => 3.02114803625378,
+       pct_zn  => 33.1037974683544,
+       unit    => "mg-zn-sulfate-dihydrate",
+       summary => "Zinc sulfate dihydrate (ZnSO4.7H2O) [less common hydrate form], in milligrams",
+     },
+     {
+       amount  => 3.26797385620915,
+       pct_zn  => 30.6229508196721,
+       unit    => "mg-zn-glycinate-anhydrous",
+       summary => "Zinc (bis)glycinate anhydrous (C4H8N2O4Zn) [most common hydrate form], in milligrams",
+     },
+     {
+       amount  => 3.57142857142857,
+       pct_zn  => 28,
+       unit    => "mg-zn-glycinate-monohydrate",
+       summary => "Zinc (bis)glycinate monohydrate (C4H8N2O4Zn.H2O), in milligrams",
      },
    ],
    {
      "table.fields"        => ["amount", "pct_zn", "unit", "summary"],
+     "table.field_aligns"  => ["number", "number", "left", "left"],
      "table.field_formats" => [
-                                ["number", { thousands_sep => "", precision => 3 }],
                                 ["number", { precision => 3, thousands_sep => "" }],
+                                ["number", { thousands_sep => "", precision => 3 }],
                                 undef,
                                 undef,
                               ],
-     "table.field_aligns"  => ["number", "number", "left", "left"],
    },
  ]
 

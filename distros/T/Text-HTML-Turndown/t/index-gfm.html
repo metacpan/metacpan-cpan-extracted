@@ -34,6 +34,16 @@
   <pre class="expected">*   [x] Checked!</pre>
 </div>
 
+<div class="case" data-name="checked inputs with quotes">
+  <div class="input"><ul><li><input type=checkbox checked="">Checked!</li></ul></div>
+  <pre class="expected">*   [x] Checked!</pre>
+</div>
+
+<div class="case" data-name="checked inputs with quotes and value">
+  <div class="input"><ul><li><input type=checkbox checked="checked">Checked!</li></ul></div>
+  <pre class="expected">*   [x] Checked!</pre>
+</div>
+
 <div class="case" data-name="basic table">
   <div class="input">
     <table>

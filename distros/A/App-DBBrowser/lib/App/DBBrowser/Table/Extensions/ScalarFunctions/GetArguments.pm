@@ -131,7 +131,7 @@ sub choose_columns {
                 next COLUMNS;
             }
             push @bu, [ @$subset ];
-            push @$subset, $ax->quote_constant( $value );
+            push @$subset, $ax->quote_if_not_numeric( $value );
         }
         else {
             push @bu, [ @$subset ];

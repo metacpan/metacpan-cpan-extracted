@@ -249,9 +249,14 @@ sub __choose_extension {
             }
             # return if ! length $value; ##
             if ( $opt->{is_numeric} ) {
-                #  1 numeric
-                # -1 unkown
-                return $ax->quote_constant( $value );
+                if ( $opt->{is_numeric} == -1 ) {
+                    # -1: unknown data type
+                    return $ax->quote_if_not_numeric( $value );
+                }
+                else {
+                    #return $value; # then change the documentation
+                    return $ax->quote_if_not_numeric( $value );
+                }
             }
             else {
                 return $sf->{d}{dbh}->quote( $value );

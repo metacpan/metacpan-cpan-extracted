@@ -26,7 +26,7 @@ sub function_cast {
         return;
     }
     my $args_data = [
-        { prompt => 'Data type: ', history => [ qw(VARCHAR CHAR TEXT INT DECIMAL DATE DATETIME TIME TIMESTAMP) ], unquote => 1 }, ##
+        { prompt => 'Data type: ', unquote => 1, history => [ qw(VARCHAR CHAR TEXT INT DECIMAL DATE DATETIME TIME TIMESTAMP) ] },
     ];
     my ( $data_type ) = $ga->get_arguments( $sql, $clause, $func, $args_data, $r_data );
     return if ! defined $data_type;

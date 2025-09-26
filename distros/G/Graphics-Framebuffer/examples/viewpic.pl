@@ -101,7 +101,7 @@ Single image (or animation) viewer
 
 The image is automatically proportionally scaled to full screen.  This turns that off and shows the image in its original resolution (unless it is too big for the screen).
 
-=item B<--alpha>=1-254
+=item B<--alpha>=1-255
 
 Alpha value to overlay an image on what is already there.  Usually used to just dim the image.  Comes in handy for using with fbterm to make a background image.
 
@@ -118,8 +118,6 @@ All Rights Reserved
 
 =head1 LICENSE
 
-GNU Public License Version 3.0
-
-* See the "LICENSE" file in this distribution for this license.
+Perl Artistic License.
 
 =cut

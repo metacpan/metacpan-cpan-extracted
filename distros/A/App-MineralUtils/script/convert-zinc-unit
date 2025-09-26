@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-05-06'; # DATE
+our $DATE = '2025-09-26'; # DATE
 our $DIST = 'App-MineralUtils'; # DIST
-our $VERSION = '0.022'; # VERSION
+our $VERSION = '0.023'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/MineralUtils/convert_zinc_unit",
@@ -39,7 +39,7 @@ convert-zinc-unit - Convert a zinc quantity from one unit to another
 
 =head1 VERSION
 
-This document describes version 0.022 of convert-zinc-unit (from Perl distribution App-MineralUtils), released on 2025-05-06.
+This document describes version 0.023 of convert-zinc-unit (from Perl distribution App-MineralUtils), released on 2025-09-26.
 
 =head1 SYNOPSIS
 
@@ -77,7 +77,7 @@ Can also be specified as the 1st command-line argument.
 
 Valid values:
 
- ["mg","mg-zn-elem","mg-zn-lactate-monohydrate","mg-zn-picolinate","mg-zn-gluconate-anhydrous","mg-zn-citrate","mg-zn-oxide","mg-zn-sulfate-anhydrous"]
+ ["mg","mg-zn-elem","mg-zn-lactate-anhydrous","mg-zn-lactate-monohydrate","mg-zn-lactate-dihydrate","mg-zn-lactate-trihydrate","mg-zn-picolinate-anhydrous","mg-zn-picolinate-dihydrate","mg-zn-picolinate-tetrahydrate","mg-zn-gluconate-anhydrous","mg-zn-gluconate-dihydrate","mg-zn-gluconate-trihydrate","mg-zn-citrate-andhydrous","mg-zn-citrate-dihydrate","mg-zn-citrate-trihydrate","mg-zn-oxide","mg-zn-sulfate-anhydrous","mg-zn-sulfate-heptahydrate","mg-zn-sulfate-dihydrate","mg-zn-glycinate-anhydrous","mg-zn-glycinate-monohydrate"]
 
 Can also be specified as the 2nd command-line argument.
 
@@ -198,17 +198,30 @@ For fish and zsh, install L<shcompgen> as described above.
 =head2 Show all possible conversions
 
  % convert-zinc-unit
- +--------+---------+---------------------------+---------------------------------------------------------------+
- | amount |  pct_zn | unit                      | summary                                                       |
- +--------+---------+---------------------------+---------------------------------------------------------------+
- |  1.000 | 100.000 | mg-zn-elem                | Elemental zinc, in milligrams                                 |
- |  3.717 |  26.850 | mg-zn-lactate-monohydrate | Zinc lactate monohydrate (Zn(C3H5O3)2.H2O), in milligrams     |
- |  4.566 |  21.896 | mg-zn-picolinate          | Zinc picolinate (Zn(C6H4NO2)2), in milligrams                 |
- |  6.993 |  14.347 | mg-zn-gluconate-anhydrous | Zinc gluconate anhydrous (Zn(C6H11O7)2), in milligrams        |
- |  2.924 |  34.153 | mg-zn-citrate             | Zinc citrate (Zn3(C6H5O7)2, trizinc dicitrate), in milligrams |
- |  1.245 |  80.339 | mg-zn-oxide               | Zinc oxide (ZnO), in milligrams                               |
- |  2.469 |  40.483 | mg-zn-sulfate-anhydrous   | Zinc sulfate (ZnSO4), in milligrams                           |
- +--------+---------+---------------------------+---------------------------------------------------------------+
+ +--------+---------+-------------------------------+-------------------------------------------------------------------------------------------------------------------+
+ | amount |  pct_zn | unit                          | summary                                                                                                           |
+ +--------+---------+-------------------------------+-------------------------------------------------------------------------------------------------------------------+
+ |  1.000 | 100.000 | mg-zn-elem                    | Elemental zinc, in milligrams                                                                                     |
+ |  3.759 |  26.631 | mg-zn-lactate-anhydrous       | Zinc lactate anhydrous (Zn(C3H5O3)2), in milligrams                                                               |
+ |  4.032 |  24.803 | mg-zn-lactate-monohydrate     | Zinc lactate monohydrate (Zn(C₃H₅O₃)₂·H₂O), in milligrams                                                         |
+ |  4.310 |  23.217 | mg-zn-lactate-dihydrate       | Zinc lactate dihydrate (Zn(C₃H₅O₃)₂·2H₂O) [most common hydrate form, along -trihydrate], in milligrams            |
+ |  4.587 |  21.822 | mg-zn-lactate-trihydrate      | Zinc lactate trihydrate (Zn(C₃H₅O₃)₂·3H₂O) [most common hydrate form, along -diihydrate], in milligrams           |
+ |  4.566 |  21.896 | mg-zn-picolinate-anhydrous    | Zinc picolinate (Zn(C6H4NO2)2), in milligrams                                                                     |
+ |  5.128 |  19.540 | mg-zn-picolinate-dihydrate    | Zinc picolinate dihydrate (Zn(C6H4NO2)2.2H2O) [most common hydrate form, along with -tetrahydrate], in milligrams |
+ |  5.682 |  17.642 | mg-zn-picolinate-tetrahydrate | Zinc picolinate tetrahydrate (Zn(C6H4NO2)2.2H2O) [most common hydrate form, along with -dihydrate], in milligrams |
+ |  6.993 |  14.347 | mg-zn-gluconate-anhydrous     | Zinc gluconate anhydrous (Zn(C6H11O7)2) [uncommon], in milligrams                                                 |
+ |  7.519 |  13.297 | mg-zn-gluconate-dihydrate     | Zinc gluconate dihydrate (Zn(C6H11O7)2.2H2O) [most common hydrate form with trihydrate], in milligrams            |
+ |  7.812 |  12.827 | mg-zn-gluconate-trihydrate    | Zinc gluconate trihydrate (Zn(C6H11O7)2.3H2O) [most common hydrate form with dihydrate], in milligrams            |
+ |  2.924 |  34.153 | mg-zn-citrate-andhydrous      | Zinc citrate (trizinc dicitrate) anhydrous (Zn3(C6H5O7)2), in milligrams                                          |
+ |  3.205 |  31.218 | mg-zn-citrate-dihydrate       | Zinc citrate (trizinc dicitrate) dihydrate (Zn3(C6H5O7)2.2H2O) [most common hydrate form], in milligrams          |
+ |  3.205 |  31.218 | mg-zn-citrate-trihydrate      | Zinc citrate (trizinc dicitrate) trihydrate (Zn3(C6H5O7)2.3H2O) [uncommon], in milligrams                         |
+ |  1.245 |  80.339 | mg-zn-oxide                   | Zinc oxide (ZnO), in milligrams                                                                                   |
+ |  2.469 |  40.483 | mg-zn-sulfate-anhydrous       | Zinc sulfate anhydrous (ZnSO4), in milligrams                                                                     |
+ |  4.405 |  22.741 | mg-zn-sulfate-heptahydrate    | Zinc sulfate heptahydrate (ZnSO4.7H2O) [most common hydrate form], in milligrams                                  |
+ |  3.021 |  33.104 | mg-zn-sulfate-dihydrate       | Zinc sulfate dihydrate (ZnSO4.7H2O) [less common hydrate form], in milligrams                                     |
+ |  3.268 |  30.623 | mg-zn-glycinate-anhydrous     | Zinc (bis)glycinate anhydrous (C4H8N2O4Zn) [most common hydrate form], in milligrams                              |
+ |  3.571 |  28.000 | mg-zn-glycinate-monohydrate   | Zinc (bis)glycinate monohydrate (C4H8N2O4Zn.H2O), in milligrams                                                   |
+ +--------+---------+-------------------------------+-------------------------------------------------------------------------------------------------------------------+
 
 =head1 HOMEPAGE
 

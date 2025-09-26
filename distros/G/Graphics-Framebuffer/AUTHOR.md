@@ -1,7 +1,5 @@
 # Richard Kelsch
 
-The author of this utility, has been a Perl coder for nearly four decades.  His specialization was code optimization and multi-threading and did it quite well.
-
-He has switched jobs and is now a Linux System Administrator, but still codes in Perl as a hobby.
+I am a Perl Programmer and Linux System Administrator by profession.  I specialize in code optimization and multi-threading.  I have been coding professionally for nearly 4 decades.  I am a published author as well.
 
 * **GitHub** - https://github.com/richcsst

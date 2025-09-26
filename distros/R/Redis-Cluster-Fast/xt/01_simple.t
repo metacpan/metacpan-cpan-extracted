@@ -149,7 +149,7 @@ for my $case (
         is $result, 12345;
     });
     ok $redis->run_event_loop;
-    ok $redis->run_event_loop;
+    ok $redis->wait_one_response;
     is $redis->run_event_loop, 0;
 }
 

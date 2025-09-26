@@ -9,7 +9,7 @@ configure_requires:
   Module::Build: '0.4005'
   Module::Build::XSUtil: '0.02'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.25, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.26, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,14 +29,14 @@ no_index:
 provides:
   Redis::Cluster::Fast:
     file: lib/Redis/Cluster/Fast.pm
-    version: '0.095'
+    version: '0.096'
 requires:
   perl: '5.008001'
 resources:
   bugtracker: https://github.com/plainbanana/Redis-Cluster-Fast/issues
   homepage: https://github.com/plainbanana/Redis-Cluster-Fast
   repository: https://github.com/plainbanana/Redis-Cluster-Fast.git
-version: '0.095'
+version: '0.096'
 x_contributors:
   - 'Masahiro Honma <hiratara@cpan.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

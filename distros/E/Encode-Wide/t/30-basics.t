@@ -1,3 +1,5 @@
+#!/usr/bin/env perl
+
 use strict;
 use warnings;
 
@@ -8,9 +10,9 @@ use Test::Returns;
 my @tests = (
 	{
 		name	=> 'Plain ASCII unchanged',
-		input   => 'Hello world!',
-		html	=> 'Hello world!',
-		xml	 => 'Hello world!',
+		input   => 'Hello world?',
+		html	=> 'Hello world?',
+		xml	 => 'Hello world?',
 	}, {
 		name	=> 'Non-breaking space',
 		input   => "Hello\x{00A0}world",
@@ -47,6 +49,11 @@ my @tests = (
 		input   => "It's a test ‘quoted’",
 		html	=> "It's a test &apos;quoted&apos;",
 		args	=> { keep_apos => 1 },
+	}, {
+		name	=> 'Exclamation mark',
+		input   => 'You are not right!',
+		html	=> 'You are not right&excl;',
+		xml	=> 'You are not right!',
 	},
 );
 
@@ -54,6 +61,7 @@ foreach my $test (@tests) {
 	my $args = $test->{args} || {};
 	my $html = wide_to_html(string => $test->{input}, %{$args});
 
+	diag($test->{'input'}, "->$html") if($ENV{'TEST_VERBOSE'});
 	like $html, qr/^\P{Unassigned}*$/, "$test->{name} - HTML output is ASCII-safe";
 	is $html, $test->{html}, "$test->{name} - HTML correct output" if defined $test->{html};
 

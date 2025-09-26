@@ -383,9 +383,10 @@ sub column_names_and_types {
         #$stmt .= "SELECT * FROM " . $table . $sf->sql_limit( 0 );
         my $sth = $sf->{d}{dbh}->prepare( $stmt );
         if ( $sf->{i}{driver} eq 'SQLite' ) {
-            my $rx_numeric = 'INT|DOUBLE|REAL|NUM|FLOAT|DEC|BOOL|BIT|MONEY';
             $column_names = [ @{$sth->{NAME}} ];
+            my $rx_numeric = 'INT|DOUBLE|REAL|NUM|FLOAT|DEC|BOOL|BIT|MONEY';
             $column_types = [ map { ! $_ || $_ =~ /$rx_numeric/i ? 2 : 1 } @{$sth->{TYPE}} ];
+            #$column_types = [];
         }
         else {
             $sth->execute();
@@ -397,56 +398,25 @@ sub column_names_and_types {
         $sf->print_error_message( $@ );
         return;
     }
-    $column_names = $sf->quote_cols( $column_names ); ##
+    $column_names = $sf->quote_cols( $column_names );
     return $column_names, $column_types;
 }
 
 
 sub is_numeric {
     my ( $sf, $sql, $col ) = @_;
-    my $is_numeric = 0;
-    if ( ! length $sql->{data_types}{$col} || ( $sql->{data_types}{$col} >= 2 && $sql->{data_types}{$col} <= 8 ) ) {
-        $is_numeric = 1;
-    }
-    return $is_numeric;
-}
-
-
-sub is_char_datatype {
-    my ( $sf, $sql, $col ) = @_;
-    my $is_char;
-    if ( ! defined $sql->{data_types}{$col} ) {
-        if ( looks_like_number $col ) { ##
-            $is_char = 0;
-        }
-        elsif ( $col =~ /^(?:AVG|COUNT|MAX|MIN|SUM)\(/ ) {
-            $is_char = 0;
-        }
-    }
-    else {
-        # 1 CHAR, 12 VARCHAR
-        if ( $sql->{data_types}{$col} == 1 || $sql->{data_types}{$col} == 12 ) {
-            $is_char = 1;
-        }
-        else {
-            $is_char = 0;
-        }
-    }
-    return $is_char;
+    return -1 if ! length $sql->{data_types}{$col};
+    return  1 if $sql->{data_types}{$col} >= 2 && $sql->{data_types}{$col} <= 8;
+    return  0;
 }
 
 
 sub pg_column_to_text {
     my ( $sf, $sql, $col ) = @_;
-    if ( ! $sf->{o}{G}{pg_autocast} ) {
-        return $col;
-    }
-    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $is_char_datatype = $ax->is_char_datatype( $sql, $col );
-    if ( defined $is_char_datatype && ! $is_char_datatype ) {
-        $col .= "::text";
-    }
-    return $col;
+    return $col if ! $sf->{o}{G}{pg_autocast};
+    return $col if defined $sql->{data_types}{$col} && ( $sql->{data_types}{$col} == 1 || $sql->{data_types}{$col} == 12 );
+    return $col if $col =~ /^(?:CONCAT|LEFT|LOWER|LPAD|LTRIM|REPLACE|REVERSE|RIGHT|RPAD|RTRIM|SUBSTRING|SUBSTR|TRIM|UPPER|TO_CHAR)\(/;
+    return $col . "::text";
 }
 
 
@@ -591,9 +561,10 @@ sub quote_cols {
 }
 
 
-sub quote_alias {
+sub quote_alias { ##
     my ( $sf, $alias ) = @_;
-    if ( $sf->{o}{G}{quote_aliases} ) {
+    #if ( $sf->{o}{G}{quote_aliases} ) {
+    if ( $sf->{o}{G}{quote_columns} ) {
         ( $alias ) = $sf->__quote_identifiers( $alias );
     }
     return $alias;
@@ -608,7 +579,7 @@ sub unquote_identifier {
 }
 
 
-sub quote_constant {
+sub quote_if_not_numeric {
     my ( $sf, $value ) = @_;
     if ( looks_like_number $value ) {
         return $value;

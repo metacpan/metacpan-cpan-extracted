@@ -43,7 +43,7 @@
    "provides" : {
       "Minima" : {
          "file" : "lib/Minima.pm",
-         "version" : "v0.7.0"
+         "version" : "v0.7.1"
       },
       "Minima::App" : {
          "file" : "lib/Minima/App.pm"
@@ -70,12 +70,12 @@
          "web" : "https://github.com/tessarin/Minima/issues"
       },
       "license" : [
-         "http://www.opensource.org/licenses/mit-license.php"
+         "http://opensource.org/licenses/mit-license.php"
       ],
       "repository" : {
          "url" : "https://github.com/tessarin/Minima"
       }
    },
-   "version" : "v0.7.0",
+   "version" : "v0.7.1",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }
