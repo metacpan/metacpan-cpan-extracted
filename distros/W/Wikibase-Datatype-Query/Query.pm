@@ -7,7 +7,7 @@ use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 use Scalar::Util qw(blessed);
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 # Constructor.
 sub new {
@@ -76,9 +76,14 @@ sub query_item {
 	} elsif ($query_string =~ m/^label:?([\w\-]+)?$/ms) {
 		return $self->_query_text($item, $1, 'labels');
 
+	# Sitelink.
+	} elsif ($query_string =~ m/^sitelink:?([\w\-]+)?$/ms) {
+		return $self->_query_sitelink($item, $1);
+
 	# Statement(s)
 	} elsif ($query_string =~ m/^statement:(P\d+)$/ms) {
 		return $self->_query_property_statement($item, $1);
+
 	} else {
 		err "Unsupported query string '$query_string'.";
 	}
@@ -187,6 +192,21 @@ sub _query_sense {
 	return wantarray ? @values : $values[0];
 }
 
+sub _query_sitelink {
+	my ($self, $item, $lang) = @_;
+
+	my $sitelink_exp = $lang.'wiki';
+	my $ret;
+	foreach my $sitelink (@{$item->sitelinks}) {
+		if ($sitelink->site eq $sitelink_exp) {
+			$ret = $sitelink;
+			last;
+		}
+	}
+
+	return $ret ? $ret->title : undef;
+}
+
 sub _query_text {
 	my ($self, $item, $lang, $method) = @_;
 
@@ -289,6 +309,10 @@ For description value.
 =item label:.*
 
 For label value.
+
+=item sitelink:.*
+
+For sitelink.
 
 =item statement:P\d+
 
@@ -427,6 +451,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

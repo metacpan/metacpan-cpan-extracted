@@ -62,7 +62,7 @@ GetOptions(
 );
 ###
 my $text = <<'VERSION';
-[% CLEAR %][% ORANGE %]╔═════════════════════════════════════════════════════════════════════════════╗[% RESET %]
+[% CLS %][% ORANGE %]╔═════════════════════════════════════════════════════════════════════════════╗[% RESET %]
 [% ORANGE %]║[% B_BLACK %][% RED %]               [% BRIGHT YELLOW %] _   _ [% GREEN %] _____ [% BRIGHT BLUE %]_____  [% BRIGHT WHITE %] ______                     _            [% RESET %][% ORANGE %]║[% RESET %]
 [% ORANGE %]║[% B_BLACK %][% RED %]          ╱╲   [% BRIGHT YELLOW %]│ ╲ │ │[% GREEN %]╱ ____│[% BRIGHT BLUE %]_   _│ [% BRIGHT WHITE %]│  ____│                   │ │           [% RESET %][% ORANGE %]║[% RESET %]
 [% ORANGE %]║[% B_BLACK %][% RED %]         ╱  ╲  [% BRIGHT YELLOW %]│  ╲│ │[% GREEN %] (___  [% BRIGHT BLUE %] │ │   [% BRIGHT WHITE %]│ │__   _ __   ___ ___   __│ │ ___       [% RESET %][% ORANGE %]║[% RESET %]
@@ -71,12 +71,12 @@ my $text = <<'VERSION';
 [% ORANGE %]║[% B_BLACK %][% RED %]      ╱_╱    ╲_╲[% BRIGHT YELLOW %]_│ ╲_│[% GREEN %]_____╱[% BRIGHT BLUE %]│_____│ [% BRIGHT WHITE %]│______│_│ │_│╲___╲___╱ ╲__,_│╲___│      [% RESET %][% ORANGE %]║[% RESET %]
 [% ORANGE %]║[% B_BLACK %]                                                                             [% ORANGE %]║[% B_BLACK %]
 [% ORANGE %]╠═════════════════════════════════════════════════════════════════════════════╣[% RESET %]
-[% ORANGE %]║[% RESET %][% B_ANSI17 %]                         Written By [% BRIGHT YELLOW %]Richard Kelsch[% RESET %][% B_ANSI17 %]                           [% RESET %][% ORANGE %]║[% RESET %]
-[% ORANGE %]║[% RESET %][% B_ANSI17 %]                       Copyright ©[% GREEN %]2025 [% BRIGHT YELLOW %]Richard Kelsch[% RESET %][% B_ANSI17 %]                        [% RESET %][% ORANGE %]║[% RESET %]
-[% ORANGE %]║[% RESET %][% B_ANSI17 %]                            All Rights Reserved                              [% RESET %][% ORANGE %]║[% RESET %]
-[% ORANGE %]║[% RESET %][% B_ANSI17 %]                           Perl Artistic License                             [% RESET %][% ORANGE %]║[% RESET %]
-[% ORANGE %]║[% RESET %][% B_ANSI17 %]                               Version [% GREEN %]XXXX[% RESET %][% B_ANSI17 %]                                  [% RESET %][% ORANGE %]║[% RESET %]
-[% ORANGE %]║[% RESET %][% B_ANSI17 %]              GitHub:  https://github.com/richcsst/ansi-encode               [% RESET %][% ORANGE %]║[% RESET %]
+[% ORANGE %]║[% RESET %][% B_COLOR 17 %]                         Written By [% BRIGHT YELLOW %]Richard Kelsch[% RESET %][% B_COLOR 17 %]                           [% RESET %][% ORANGE %]║[% RESET %]
+[% ORANGE %]║[% RESET %][% B_COLOR 17 %]                       Copyright ©[% GREEN %]2025 [% BRIGHT YELLOW %]Richard Kelsch[% RESET %][% B_COLOR 17 %]                        [% RESET %][% ORANGE %]║[% RESET %]
+[% ORANGE %]║[% RESET %][% B_COLOR 17 %]                            All Rights Reserved                              [% RESET %][% ORANGE %]║[% RESET %]
+[% ORANGE %]║[% RESET %][% B_COLOR 17 %]                           Perl Artistic License                             [% RESET %][% ORANGE %]║[% RESET %]
+[% ORANGE %]║[% RESET %][% B_COLOR 17 %]                               Version [% GREEN %]XXXX[% RESET %][% B_COLOR 17 %]                                  [% RESET %][% ORANGE %]║[% RESET %]
+[% ORANGE %]║[% RESET %][% B_COLOR 17 %]              GitHub:  https://github.com/richcsst/ansi-encode               [% RESET %][% ORANGE %]║[% RESET %]
 [% ORANGE %]╚═════════════════════════════════════════════════════════════════════════════╝[% RESET %]
 
 VERSION
@@ -87,18 +87,18 @@ my $ansi = ($full) ? Term::ANSIEncode->new('mode' => 'full') : Term::ANSIEncode-
 
 ###
 my $small = <<'SMALL';
-[% CLEAR %]╔═════════════════════════════════════════════════════════════════════════╗
+[% CLS %]╔═════════════════════════════════════════════════════════════════════════╗
 ║[% B_BLACK %]                     [% RED %]┏━┓[% BRIGHT YELLOW %]┏┓╻[% GREEN %]┏━┓[% BRIGHT BLUE %]╻   [% BRIGHT WHITE %]┏━╸┏┓╻┏━╸┏━┓╺┳┓┏━╸                     [% RESET %]║
 ║[% B_BLACK %]                     [% RED %]┣━┫[% BRIGHT YELLOW %]┃┗┫[% GREEN %]┗━┓[% BRIGHT BLUE %]┃   [% BRIGHT WHITE %]┣╸ ┃┗┫┃  ┃ ┃ ┃┃┣╸                      [% RESET %]║
 ║[% B_BLACK %]                     [% RED %]╹ ╹[% BRIGHT YELLOW %]╹ ╹[% GREEN %]┗━┛[% BRIGHT BLUE %]╹   [% BRIGHT WHITE %]┗━╸╹ ╹┗━╸┗━┛╺┻┛┗━╸                     [% RESET %]║
 ╠═════════════════════════════════════════════════════════════════════════╣
-║[% B_ANSI52 %][% BRIGHT YELLOW %] DESCRIPTION                                                             [% RESET %]║
+║[% B_COLOR 52 %][% BRIGHT YELLOW %] DESCRIPTION                                                             [% RESET %]║
 ║     Markup text to ANSI encoder.                                        ║
 ║                                                                         ║
-║[% B_ANSI52 %][% BRIGHT YELLOW %] USAGE                                                                   [% RESET %]║
+║[% B_COLOR 52 %][% BRIGHT YELLOW %] USAGE                                                                   [% RESET %]║
 ║     [% CYAN %]ansi-encode[% RESET %] [options] [text file]                                   ║
 ║                                                                         ║
-║[% B_ANSI52 %][% BRIGHT YELLOW %] OPTIONS                                                                 [% RESET %]║
+║[% B_COLOR 52 %][% BRIGHT YELLOW %] OPTIONS                                                                 [% RESET %]║
 ║     -[% PINK %]v[% RESET %] or --[% PINK %]version[% RESET %]                                                     ║
 ║         Shows version and licensing info                                ║
 ║                                                                         ║
@@ -130,12 +130,12 @@ SMALL
 ###
 my $greydient = '';    # Yes, the spelling is intentional
 foreach my $c (0 .. 23) {
-    $greydient .= "[% B_GREY$c %] ";
+    $greydient .= "[% B_GREY $c %] ";
 }
 $greydient .= '[% RESET %]';
 ###
 my $to = <<'TOKENS';
-[% CLEAR %]Tokens have to be encapsulated inside [ % TOKEN % ] (the TOKEN must be
+[% CLS %]Tokens have to be encapsulated inside [ % TOKEN % ] (the TOKEN must be
 surrounded by at least one space on each side).  Colors beyond the standard 8
 will require a terminal that supports 256 colors.  It is also recommended that
 your terminal supports UTF-8 for advanced character/symbol support.  Some
@@ -180,13 +180,13 @@ NOTE:  Use "less -r" to view ANSI in "less"
 [% BRIGHT WHITE %]│[% RESET %] DEFAULT FONT                   [% BRIGHT WHITE %]│[% RESET %] Default font                              [% BRIGHT WHITE %]│[% RESET %]
 [% BRIGHT WHITE %]╞══[% B_BLACK %] [% BOLD %][% BRIGHT RED %]FRAMES [% RESET %][% BRIGHT WHITE %]══════════════════════╪═══════════════════════════════════════════╡[% RESET %]
 [% BRIGHT WHITE %]│[% RESET %] BOX color,x,y,w,h,type         [% BRIGHT WHITE %]│[% RESET %] Define a box color, dimensions and type   [% BRIGHT WHITE %]│[% RESET %]
-[% BRIGHT WHITE %]│[% RESET %] [% GREY7 %]------------------------------[% RESET %] [% BRIGHT WHITE %]│[% RESET %] Types:  DEFAULT, THICK, THIN, ROUNDED     [% BRIGHT WHITE %]│[% RESET %]
+[% BRIGHT WHITE %]│[% RESET %] [% GREY 7 %]------------------------------[% RESET %] [% BRIGHT WHITE %]│[% RESET %] Types:  DEFAULT, THICK, THIN, ROUNDED     [% BRIGHT WHITE %]│[% RESET %]
 [% BRIGHT WHITE %]│[% RESET %] ENDBOX                         [% BRIGHT WHITE %]│[% RESET %] Terminator for encapsulated text in a box [% BRIGHT WHITE %]│[% RESET %]
 [% BRIGHT WHITE %]╞══[% B_BLACK %] [% BOLD %][% GREEN %]COLORS [% RESET %][% BRIGHT WHITE %]══════════════════════╪═══════════════════════════════════════════╡[% RESET %]
 [% BRIGHT WHITE %]│[% RESET %] NORMAL                         [% BRIGHT WHITE %]│[% RESET %] Sets colors to default                    [% BRIGHT WHITE %]│[% RESET %]
 [% BRIGHT WHITE %]╞══[% B_BLACK %] [% BOLD %][% PINK %]FOREGROUND [% RESET %][% BRIGHT WHITE %]══════════════════╪═══════════════════════════════════════════╡[% RESET %]
 [% BRIGHT WHITE %]│[% RESET %] DEFAULT                        [% BRIGHT WHITE %]│[% RESET %] Default foreground color[% RESET %]                  [% BRIGHT WHITE %]│[% RESET %]
-[% BRIGHT WHITE %]│[% RESET %] BLACK                          [% BRIGHT WHITE %]│[% RESET %] [% B_GREY8        %][% BLACK %] Black [% RESET %]                                   [% BRIGHT WHITE %]│[% RESET %]
+[% BRIGHT WHITE %]│[% RESET %] BLACK                          [% BRIGHT WHITE %]│[% RESET %] [% B_GREY 8       %][% BLACK %] Black [% RESET %]                                   [% BRIGHT WHITE %]│[% RESET %]
 [% BRIGHT WHITE %]│[% RESET %] RED                            [% BRIGHT WHITE %]│[% RESET %] [% RED            %]Red[% RESET %]                                       [% BRIGHT WHITE %]│[% RESET %]
 [% BRIGHT WHITE %]│[% RESET %] PINK                           [% BRIGHT WHITE %]│[% RESET %] [% PINK           %]Hot pink[% RESET %]                                  [% BRIGHT WHITE %]│[% RESET %]
 [% BRIGHT WHITE %]│[% RESET %] ORANGE                         [% BRIGHT WHITE %]│[% RESET %] [% ORANGE         %]Orange[% RESET %]                                    [% BRIGHT WHITE %]│[% RESET %]
@@ -205,8 +205,9 @@ NOTE:  Use "less -r" to view ANSI in "less"
 [% BRIGHT WHITE %]│[% RESET %] BRIGHT MAGENTA                 [% BRIGHT WHITE %]│[% RESET %] [% BRIGHT MAGENTA %]Bright magenta[% RESET %]                            [% BRIGHT WHITE %]│[% RESET %]
 [% BRIGHT WHITE %]│[% RESET %] BRIGHT CYAN                    [% BRIGHT WHITE %]│[% RESET %] [% BRIGHT CYAN    %]Bright cyan[% RESET %]                               [% BRIGHT WHITE %]│[% RESET %]
 [% BRIGHT WHITE %]│[% RESET %] BRIGHT WHITE                   [% BRIGHT WHITE %]│[% RESET %] [% BRIGHT WHITE   %]Bright white[% RESET %]                              [% BRIGHT WHITE %]│[% RESET %]
-[% BRIGHT WHITE %]│[% RESET %] ANSI0 - ANSI231                [% BRIGHT WHITE %]│[% RESET %] X-Term256 colors    (use -c to see these) [% BRIGHT WHITE %]│[% RESET %]
-[% BRIGHT WHITE %]│[% RESET %] GREY0 - GREY23                 [% BRIGHT WHITE %]│[% RESET %] Levels of grey  [% GREYDIENT %]  [% BRIGHT WHITE %]│[% RESET %]
+[% BRIGHT WHITE %]│[% RESET %] COLOR 0 - 231                  [% BRIGHT WHITE %]│[% RESET %] X-Term256 colors    (use -c to see these) [% BRIGHT WHITE %]│[% RESET %]
+[% BRIGHT WHITE %]│[% RESET %] GREY 0 - 23                    [% BRIGHT WHITE %]│[% RESET %] Levels of grey  [% GREYDIENT %]  [% BRIGHT WHITE %]│[% RESET %]
+[% BRIGHT WHITE %]│[% RESET %] RGB 0-255,0-255,0-255          [% BRIGHT WHITE %]│[% RESET %] X-Term256 24 bit color (R,G,B)            [% BRIGHT WHITE %]│[% RESET %]
 ╞══[% B_BLACK %] [% BOLD %][% ORANGE %]BACKGROUND [% RESET %][% BRIGHT WHITE %]══════════════════╪═══════════════════════════════════════════╡[% RESET %]
 [% BRIGHT WHITE %]│[% RESET %] B_DEFAULT                      [% BRIGHT WHITE %]│[% RESET %] Default background color                  [% BRIGHT WHITE %]│[% RESET %]
 [% BRIGHT WHITE %]│[% RESET %] B_BLACK                        [% BRIGHT WHITE %]│[% RESET %] [% B_BLACK          %] Black          [% RESET %]                          [% BRIGHT WHITE %]│[% RESET %]
@@ -228,8 +229,9 @@ NOTE:  Use "less -r" to view ANSI in "less"
 [% BRIGHT WHITE %]│[% RESET %] BRIGHT B_MAGENTA               [% BRIGHT WHITE %]│[% RESET %] [% BRIGHT B_MAGENTA %][% BLACK %] Bright magenta [% RESET %]                          [% BRIGHT WHITE %]│[% RESET %]
 [% BRIGHT WHITE %]│[% RESET %] BRIGHT B_CYAN                  [% BRIGHT WHITE %]│[% RESET %] [% BRIGHT B_CYAN    %][% BLACK %] Bright cyan    [% RESET %]                          [% BRIGHT WHITE %]│[% RESET %]
 [% BRIGHT WHITE %]│[% RESET %] BRIGHT B_WHITE                 [% BRIGHT WHITE %]│[% RESET %] [% BRIGHT B_WHITE   %][% BLACK %] [% BLACK %]Bright white   [% RESET %]                          [% BRIGHT WHITE %]│[% RESET %]
-[% BRIGHT WHITE %]│[% RESET %] B_ANSI0 - B_ANSI231            [% BRIGHT WHITE %]│[% RESET %] X-Term256 background colors               [% BRIGHT WHITE %]│[% RESET %]
-[% BRIGHT WHITE %]│[% RESET %] B_GREY0 - B_GREY23             [% BRIGHT WHITE %]│[% RESET %] Levels of grey  [% GREYDIENT %]  [% BRIGHT WHITE %]│[% RESET %]
+[% BRIGHT WHITE %]│[% RESET %] B_COLOR 0 - 231                [% BRIGHT WHITE %]│[% RESET %] X-Term256 background colors               [% BRIGHT WHITE %]│[% RESET %]
+[% BRIGHT WHITE %]│[% RESET %] B_GREY 0 - 23                  [% BRIGHT WHITE %]│[% RESET %] Levels of grey  [% GREYDIENT %]  [% BRIGHT WHITE %]│[% RESET %]
+[% BRIGHT WHITE %]│[% RESET %] B_RGB 0-255,0-255,0-255        [% BRIGHT WHITE %]│[% RESET %] X-Term256 24 bit color (R,G,B)            [% BRIGHT WHITE %]│[% RESET %]
 ╞══[% B_BLACK %] [% BOLD %][% BRIGHT BLUE %]HORIZONTAL RULES [% RESET %][% BRIGHT WHITE %]════════════╪═══════════════════════════════════════════╡[% RESET %]
 [% BRIGHT WHITE %]│[% RESET %] HORIZONTAL RULE RED            [% BRIGHT WHITE %]│[% BLACK %][% B_RED            %] A solid line of red background            [% RESET %][% BRIGHT WHITE %]│[% RESET %]
 [% BRIGHT WHITE %]│[% RESET %] HORIZONTAL RULE GREEN          [% BRIGHT WHITE %]│[% BLACK %][% B_GREEN          %] A solid line of green background          [% RESET %][% BRIGHT WHITE %]│[% RESET %]
@@ -265,12 +267,12 @@ if ($version) {
     print "\n╔", '═' x 131, "╗\n";
     $ansi->ansi_output('║[% B_BLACK %][% BRIGHT YELLOW %]' . ' ' x 46 . 'THE FOLLOWING ARE THE AVAILABLE TOKENS' . ' ' x 47 . "[% RESET %]║\n");
     print '╠', '═' x 32, '╦', '═' x 32, '╦', '═' x 32, '╦', '═' x 32, '╣', "\n";
-    printf('║ %-31s║ %-31s║ %-31s║ %-31s║', 'ANSI0 - ANSI231', 'B_ANSI0 - B_ANSI231', 'GREY0 - GREY28', 'B_GREY0 - B_GREY28');
+    printf('║ %-31s║ %-31s║ %-31s║ %-31s║', 'COLOR 0 - COLOR 231', 'B_COLOR 0 - B_COLOR 231', 'GREY 0 - GREY 28', 'B_GREY 0 - B_GREY 28');
     print "\n║";
     my $width = 4;
     my $count = 1;
     foreach my $token (sort(keys %{ $ansi->{'ansi_sequences'} })) {
-        next if ($token =~ /ANSI|GREY/);
+        next if ($token =~ /COLOR |GREY /);
         printf(' %-31s', $token);
         $count++;
         if ($count > $width) {
@@ -308,9 +310,9 @@ if ($version) {
     foreach my $name (@names) {
         $size = max($size, length($name));
     }
-    my $temp = "\nNOTE:  Not all terminals will support all characters\n" . '[% ANSI52 %]╭───────╮[% RESET %]' . "\n";
-    $temp .= '[% ANSI52 %]│[% BRIGHT CYAN %]Unicode[% ANSI52 %]│[% RESET %][% BRIGHT WHITE %] 0 1 2 3 4 5 6 7 8 9 A B C D E F[% RESET %]' . "\n";
-    $temp .= '[% ANSI52 %]├───────┼───────────────────────────────────[% RESET %]' . "\n";
+    my $temp = "\nNOTE:  Not all terminals will support all characters\n" . '[% COLOR 52 %]╭───────╮[% RESET %]' . "\n";
+    $temp .= '[% COLOR 52 %]│[% BRIGHT CYAN %]Unicode[% COLOR 52 %]│[% RESET %][% BRIGHT WHITE %] 0 1 2 3 4 5 6 7 8 9 A B C D E F[% RESET %]' . "\n";
+    $temp .= '[% COLOR 52 %]├───────┼───────────────────────────────────[% RESET %]' . "\n";
     my $count = 0;
     while (scalar(@names)) {
         my $name = shift(@names);
@@ -321,13 +323,13 @@ if ($version) {
             }
             if ($name =~ /^U0(20D.|20E.|20F0)/) {
                 unless ($count) {
-                    $temp .= '[% ANSI52 %]│[% BRIGHT WHITE %]' . $name . ' [% ANSI52 %]│[% RESET %]  ' . $ansi->{'characters'}->{'UNICODE'}->{$name};
+                    $temp .= '[% COLOR 52 %]│[% BRIGHT WHITE %]' . $name . ' [% COLOR 52 %]│[% RESET %]  ' . $ansi->{'characters'}->{'UNICODE'}->{$name};
                 } else {
                     $temp .= '  ' . $ansi->{'characters'}->{'UNICODE'}->{$name};
                 }
             } else {
                 unless ($count) {
-                    $temp .= '[% ANSI52 %]│[% BRIGHT WHITE %]' . $name . ' [% ANSI52 %]│[% RESET %] ' . $ansi->{'characters'}->{'UNICODE'}->{$name};
+                    $temp .= '[% COLOR 52 %]│[% BRIGHT WHITE %]' . $name . ' [% COLOR 52 %]│[% RESET %] ' . $ansi->{'characters'}->{'UNICODE'}->{$name};
                 } else {
                     $temp .= ' ' . $ansi->{'characters'}->{'UNICODE'}->{$name};
                 }
@@ -340,7 +342,7 @@ if ($version) {
         } ## end if ($name ne '')
     } ## end while (scalar(@names))
     $temp .= "\n" unless ($full);
-    $temp .= '[% ANSI52 %]╰───────┴───────────────────────────────────[% RESET %]' . "\n\n";
+    $temp .= '[% COLOR 52 %]╰───────┴───────────────────────────────────[% RESET %]' . "\n\n";
     $ansi->ansi_output($temp);
 } elsif ($symbols) {
     my @names;
@@ -354,33 +356,33 @@ if ($version) {
     foreach my $name (@names) {
         $size = max($size, length($name));
     }
-    my $temp = "\nNOTE:  Not all terminals will support all characters\n" . '[% ANSI52 %]╭───────┬─' . '─' x $size . '─╮[% RESET %]' . "\n";
-    $temp .= '[% ANSI52 %]│[% B_BLACK %][% CYAN %]Unicode[% RESET %][% ANSI52 %]│[% B_BLACK %]' . ' ' x ($size - 20) . '[% BRIGHT YELLOW %]Character Token Names [% RESET %]' . "[% ANSI52 %]│[% RESET %]\n";
-    $temp .= '[% ANSI52 %]├───────┼─' . '─' x $size . "─┤[% RESET %]\n";
+    my $temp = "\nNOTE:  Not all terminals will support all characters\n" . '[% COLOR 52 %]╭───────┬─' . '─' x $size . '─╮[% RESET %]' . "\n";
+    $temp .= '[% COLOR 52 %]│[% B_BLACK %][% CYAN %]Unicode[% RESET %][% COLOR 52 %]│[% B_BLACK %]' . ' ' x ($size - 20) . '[% BRIGHT YELLOW %]Character Token Names [% RESET %]' . "[% COLOR 52 %]│[% RESET %]\n";
+    $temp .= '[% COLOR 52 %]├───────┼─' . '─' x $size . "─┤[% RESET %]\n";
     while (scalar(@names)) {
         my $name = shift(@names);
         if ($name ne '') {
             if ($name =~ /^COMBINING/) {
-                $temp .= sprintf('%s│%sU%05X %s│%s %' . $size . 's %s│%s   %s', '[% ANSI52 %]', '[% RESET %]', charnames::vianame($name), '[% ANSI52 %]', '[% RESET %]', $name, '[% ANSI52 %]', '[% RESET %]', $ansi->{'characters'}->{'NAME'}->{$name}) . "\n";
+                $temp .= sprintf('%s│%sU%05X %s│%s %' . $size . 's %s│%s   %s', '[% COLOR 52 %]', '[% RESET %]', charnames::vianame($name), '[% COLOR 52 %]', '[% RESET %]', $name, '[% COLOR 52 %]', '[% RESET %]', $ansi->{'characters'}->{'NAME'}->{$name}) . "\n";
             } else {
-                $temp .= sprintf('%s│%sU%05X %s│%s %' . $size . 's %s│%s %s', '[% ANSI52 %]', '[% RESET %]', charnames::vianame($name), '[% ANSI52 %]', '[% RESET %]', $name, '[% ANSI52 %]', '[% RESET %]', $ansi->{'characters'}->{'NAME'}->{$name}) . "\n";
+                $temp .= sprintf('%s│%sU%05X %s│%s %' . $size . 's %s│%s %s', '[% COLOR 52 %]', '[% RESET %]', charnames::vianame($name), '[% COLOR 52 %]', '[% RESET %]', $name, '[% COLOR 52 %]', '[% RESET %]', $ansi->{'characters'}->{'NAME'}->{$name}) . "\n";
             }
         } ## end if ($name ne '')
     } ## end while (scalar(@names))
-    $temp .= '[% ANSI52 %]╰───────┴─' . '─' x $size . '─╯[% RESET %]' . "\n\n";
+    $temp .= '[% COLOR 52 %]╰───────┴─' . '─' x $size . '─╯[% RESET %]' . "\n\n";
     $ansi->ansi_output($temp);
 } elsif ($colors) {
-    my $grey   = '[% GREY8 %]';
+    my $grey   = '[% GREY 8 %]';
     my $off    = '[% RESET %]';
     my $string = '';
     $string .= "\n" . '[% BRIGHT WHITE %] ANSI Colors and GREY colors (requires a terminal with 256 color support for all colors)' . $off . "\n";
-    $string .= $grey . '╭────┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──╮' . $off . "\n";
-    $string .= $grey . '│' . $off . 'ANSI';
+    $string .= $grey . '╭─────┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──╮' . $off . "\n";
+    $string .= $grey . '│' . $off . 'COLOR';
     foreach my $i (0 .. 35) {
         $string .= $grey . '│' . $off . sprintf('%02d', $i);
     }
-    $string .= $grey . "│\n├────┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┤$off\n";
-    $string .= sprintf('%s│%s %3d%s│%s', $grey, $off, 0, $grey, $off);
+    $string .= $grey . "│\n├─────┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┤$off\n";
+    $string .= sprintf('%s│%s %4d%s│%s', $grey, $off, 0, $grey, $off);
     foreach my $i (0 .. 35) {
         if ($i <= 15) {
             $string .= chr(27) . '[48;5;' . $i . 'm  ' . $off . $grey . '│' . $off;
@@ -390,18 +392,23 @@ if ($version) {
     } ## end foreach my $i (0 .. 35)
     foreach my $i (0 .. 6) {
         my $_i = ($i * 36) + 16;
-        $string .= "\n" . $grey . '├────┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┤' . $off . "\n";
+        $string .= "\n" . $grey . '├─────┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┤' . $off . "\n";
         if ($i == 6) {
-            $string .= $grey . '│' . $off . 'GREY' . $grey . '│' . $off;
+            $string .= $grey . '│' . $off . 'GREY ' . $grey . '│' . $off;
         } else {
-            $string .= sprintf("%s│%s %3d%s│%s", $grey, $off, $_i, $grey, $off);
+            $string .= sprintf("%s│%s %4d%s│%s", $grey, $off, $_i, $grey, $off);
         }
         foreach my $j (0 .. 35) {
             $string .= chr(27) . '[48;5;' . ($_i + $j) . 'm  ' . chr(27) . '[m' . $grey . '│' . $off;
         }
     } ## end foreach my $i (0 .. 6)
-    $string .= "\n" . $grey . '╰────┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──╯' . $off . "\n";
+    $string .= "\n" . $grey . '╰─────┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──┴──╯' . $off . "\n\n";
+	$string .= 'RGB and B_RGB take three values (0 - 255) for [% RED %]RED[% RESET %],[% GREEN %]GREEN[% RESET %],[% BLUE %]BLUE[% RESET %] for full 24 bit color' . "\n";
     $ansi->ansi_output($string);
+	print 'For example:  [% RGB 255,255,255 %] WHITE [% RESET %] will show as ';
+	$ansi->ansi_output('[% RGB 255,255,255 %] WHITE [% RESET %]' . "\n");
+	print '              [% RGB 255,128,192 %] COLOR [% RESET %] will show as ';
+	$ansi->ansi_output('[% RGB 255,128,192 %] COLOR [% RESET %]' . "\n");
 } else {    # Output file to STDOUT
     my $file = $ARGV[0];
     if (defined($file) && -e $file) {
@@ -494,8 +501,8 @@ B<RESET> changes output text to normal.
  RETURN     = ASCII RETURN (13)
  LINEFEED   = ASCII LINEFEED (10)
  NEWLINE    = RETURN + LINEFEED (13 + 10)
- CLEAR      = Places cursor at top left, screen cleared
- CLS        = Same as CLEAR
+ CLS        = Places cursor at top left, screen cleared
+ CLEAR      = Clear screen only, cursor remains where it was
  CLEAR LINE = Clear to the end of line
  CLEAR DOWN = Clear down from current cursor position
  CLEAR UP   = Clear up from current cursor position

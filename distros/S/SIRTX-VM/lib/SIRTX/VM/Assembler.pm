@@ -22,7 +22,7 @@ use SIRTX::VM::Opcode;
 
 use parent 'Data::Identifier::Interface::Userdata';
 
-our $VERSION = v0.07;
+our $VERSION = v0.08;
 
 my %_escapes = (
     '\\' => '\\',
@@ -32,26 +32,21 @@ my %_escapes = (
     't' => chr(0x09),
     'e' => chr(0x1B),
 );
-my %_type_to_sni = (
-    sni     =>  10,
-    sid     => 115,
-    raen    => 116,
-    chat0w  => 118,
-    asciicp => 122,
-);
+my %_type_to_sni = %SIRTX::VM::Opcode::_logicals_to_sni; # copy
 my %_sni_to_type = map {$_type_to_sni{$_} => $_} keys %_type_to_sni;
 
 my %_header_ids = (
-    init    => 1,
-    header  => 2,
-    rodata  => 3,
-    text    => 4,
-    trailer => 5,
+    init        => 1,
+    header      => 2,
+    rodata      => 3,
+    text        => 4,
+    trailer     => 5,
+    resources   => 6,
 );
 
-my @_section_order = qw(header init text rodata trailer);
+my @_section_order = qw(header init text rodata resources trailer);
 my @_section_text  = qw(header init text);
-my @_section_load  = (@_section_text, qw(rodata));
+my @_section_load  = (@_section_text, qw(rodata resources));
 
 my %_info          = map {$_ => 1} (
     qw(.author .license .copyright_years .copyright_holder),
@@ -258,6 +253,7 @@ sub new {
             },
             rodata              => String::Super->new,
             alias_rodata_idx    => {},
+            auto_host_defined   => undef,
         }, $pkg);
 
     {
@@ -548,6 +544,22 @@ sub _autostring_allocate {
     return $key;
 }
 
+sub _auto_host_defined {
+    my ($self) = @_;
+    my $auto_host_defined = $self->{auto_host_defined};
+    my $res;
+
+    croak 'No auto host defined IDs available' unless defined($auto_host_defined) && defined($auto_host_defined->[2]);
+
+    $res = $auto_host_defined->[2]++;
+
+    if ($auto_host_defined->[2] > $auto_host_defined->[1]) {
+        $auto_host_defined->[2] = undef;
+    }
+
+    return '~'.$res;
+}
+
 sub _pushback {
     my ($self, %opts) = @_;
     $opts{rf} = $self->{rf}->clone;
@@ -631,6 +643,12 @@ sub _proc_parts {
             }
         }
         ($cmd, @args) = @{$parts};
+    }
+
+    foreach my $arg (@args) {
+        if ($arg eq '~auto') {
+            $arg = $self->_auto_host_defined;
+        }
     }
 
     if ($cmd eq '.quit' && scalar(@args) == 0) {
@@ -758,17 +776,29 @@ sub _proc_parts {
     } elsif ($cmd eq '.align' && scalar(@args) == 1) {
         my $p = $self->_parse_int($args[0]);
         $self->_align($p);
-    } elsif ($cmd eq '.label' && scalar(@args) == 1 && $args[0] =~ /^[a-z0-9A-Z_]+$/) {
+    } elsif ($cmd eq '.host_defined_auto_range' && scalar(@args) == 2 && $self->_get_value_type($args[0]) eq 'int' && $self->_get_value_type($args[1]) eq 'int') {
+        my $start = $self->_parse_int($args[0]);
+        my $end   = $self->_parse_int($args[1], $start);
+        croak 'Invalid range for host defined identifiers: '.$start.' to '.$end if $end < $start || $start < 1;
+        croak 'Host defined range already set, trying to set it again in line '.$opts->{line} if defined $self->{auto_host_defined};
+        $self->{auto_host_defined} = [$start, $end, $start];
+    } elsif ($cmd eq '.label' && (scalar(@args) == 1 || scalar(@args) == 3) && $args[0] =~ /^[a-z0-9A-Z_]+$/ && (scalar(@args) == 1 || ($args[1] eq 'as' && $args[2] =~ /^~[0-9]+$/))) {
         $self->{current}{label} = 'label$'.$args[0];
         $self->_save_position($self->{current}{label});
+        if (scalar(@args) == 3 && $args[1] eq 'as' && $args[2] =~ /^~[0-9]+$/) {
+            push(@{$self->{aliases}{'hostdefined$label$'.$self->{current}{label}} //= []}, $args[2]);
+        }
     } elsif ($cmd eq '.endlabel' && scalar(@args) == 0 && defined($self->{current}{label})) {
         $self->_save_endposition($self->{current}{label});
         $self->{current}{label} = undef;
-    } elsif ($cmd eq '.function' && scalar(@args) == 1 && $args[0] =~ /^[a-z0-9A-Z_]+$/) {
+    } elsif ($cmd eq '.function' && (scalar(@args) == 1 || scalar(@args) == 3) && $args[0] =~ /^[a-z0-9A-Z_]+$/ && (scalar(@args) == 1 || ($args[1] eq 'as' && $args[2] =~ /^~[0-9]+$/))) {
         $self->_align(2, 1);
         $self->{current}{function} = $args[0];
         $self->_save_position('function$'.$self->{current}{function});
         $self->{rf}->map_reset;
+        if (scalar(@args) == 3 && $args[1] eq 'as' && $args[2] =~ /^~[0-9]+$/) {
+            push(@{$self->{aliases}{'hostdefined$function$'.$self->{current}{function}} //= []}, $args[2]);
+        }
     } elsif ($cmd eq '.endfunction' && scalar(@args) == 0 && defined($self->{current}{function})) {
         unless ($self->{was_return}) {
             $self->_save_position('return$function$'.$self->{current}{function});
@@ -841,7 +871,7 @@ sub _proc_parts {
         }
 
         if (defined(my $as = $info{as})) {
-            if ($as !~ /^~([0-9])/) {
+            if ($as !~ /^~([0-9]+)$/) {
                 croak sprintf('Invalid chunk option: line %s: as %s', $opts->{line}, $as);
             }
 
@@ -858,6 +888,9 @@ sub _proc_parts {
             state $autochunk = 0;
             $info{name} = sprintf('autochunk$%u', $autochunk++);
         }
+
+        # Allow for chunks' ID to be accessed via it's name
+        push(@{$self->{aliases}{'hostdefined$chunk$'.$info{name}} //= []}, $info{as}) if defined $info{as};
 
         if (defined(my $of = $info{of})) {
             if ($of =~ /^~([0-9]+)$/) {
@@ -1093,6 +1126,7 @@ sub _get_value_type {
         }
         return $type.':';
     }
+    return 'logical:' if $value =~ /^logical:/;
     return 'alias' if $value =~ /^[a-z0-9]*\$/;
     die 'Bad value: '.$value;
 }
@@ -1191,7 +1225,7 @@ SIRTX::VM::Assembler - module for assembling SIRTX VM code
 
 =head1 VERSION
 
-version v0.07
+version v0.08
 
 =head1 SYNOPSIS
 

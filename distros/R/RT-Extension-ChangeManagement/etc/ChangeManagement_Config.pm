@@ -20,6 +20,10 @@ Set(%Lifecycles,
         inactive        => [ qw( deployed failed cancelled rejected deleted ) ], # loc_qw
         defaults => {
             on_create   => 'requested',
+            approved    => 'approved',
+            denied      => 'rejected',
+            reminder_on_open    => 'requested',
+            reminder_on_resolve => 'deployed',
         },
         transitions => {
             # The following transition is required for ticket creation

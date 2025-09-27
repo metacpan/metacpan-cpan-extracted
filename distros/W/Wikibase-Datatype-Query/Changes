@@ -1,3 +1,6 @@
+0.06 2025-09-27T11:07:56+02:00
+ - Add support for query on sitelink.
+
 0.05 2025-08-03T12:34:19+02:00
  - Add query process for full statement defined by property in item.
  - Regen MANIFEST file.

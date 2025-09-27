@@ -40,6 +40,12 @@ METHODS
 
             Default value is 'eng'.
 
+    *       "logo_image_url"
+
+            URL to logo image.
+
+            Default value is undef.
+
     *       "tags"
 
             'Tags::Output' object.
@@ -266,10 +272,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2021-2024 Michal Josef Špaček
+    © 2021-2025 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.08
+    0.09
 

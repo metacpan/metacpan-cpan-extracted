@@ -16,7 +16,7 @@ use Scalar::Util qw(looks_like_number);
 
 use parent 'Data::Identifier::Interface::Userdata';
 
-our $VERSION = v0.07;
+our $VERSION = v0.08;
 
 my %_die_raen = (code => 0, P => 7, codeX => 0, S => 2, T => 4+1, is_return => 1);
 
@@ -36,6 +36,55 @@ my %_raes_to_raen = (
     ILLSEQ  => 56,
     BADEXEC => 79,
     BADFH   => 83,
+);
+
+our %_logicals_to_sni = (
+    sni     =>  10,
+    sid     => 115,
+    raen    => 116,
+    chat0w  => 118,
+    uuid    => 119,
+    uri     => 121,
+    asciicp => 122,
+    oid     => 120,
+    wd      => 123,
+    logical => 129,
+    false   => 189,
+    true    => 190,
+);
+
+my %_logicals_to_sid = (
+    asi         => 1,
+    tagname     => 3,
+    SEEK_SET    => 34,
+    SEEK_CUR    => 35,
+    SEEK_END    => 36,
+    backwards   => 43,
+    forwards    => 44,
+    black       => 61,
+    white       => 62,
+    grey        => 63,
+    red         => 119,
+    green       => 120,
+    blue        => 121,
+    cyan        => 122,
+    magenta     => 123,
+    yellow      => 124,
+    orange      => 125,
+    gtin        => 160,
+    left        => 192,
+    right       => 193,
+    up          => 194,
+    down        => 195,
+    north       => 208,
+    east        => 209,
+    south       => 210,
+    west        => 211,
+);
+
+my %_logicals = (
+    (map {$_ => 'sni:'.$_logicals_to_sni{$_}} keys %_logicals_to_sni),
+    (map {$_ => 'sid:'.$_logicals_to_sid{$_}} keys %_logicals_to_sid),
 );
 
 my @_simple_0 = ();
@@ -178,6 +227,10 @@ sub from_template {
                     if (defined(my $raen = $_raes_to_raen{uc($1)})) {
                         $val = 'raen:'.$raen;
                     }
+                } elsif ($val =~ /^logical:(.+)$/) {
+                    if (defined(my $logical = $_logicals{$1})) {
+                        $val = $logical;
+                    }
                 }
 
                 if ($type =~ /^".+"$/) {
@@ -196,6 +249,15 @@ sub from_template {
             }
 
             ($cmd, @args) = map {ref ? $updates{${$_}} : $_} @{$entry->[$i+1]};
+        }
+    }
+
+    # replace logics:
+    foreach my $arg (@args) {
+        if ($arg =~ /^logical:(.+)$/) {
+            if (defined(my $logical = $_logicals{$1})) {
+                $arg = $logical;
+            }
         }
     }
 
@@ -509,7 +571,7 @@ SIRTX::VM::Opcode - module for single SIRTX VM opcodes
 
 =head1 VERSION
 
-version v0.07
+version v0.08
 
 =head1 SYNOPSIS
 

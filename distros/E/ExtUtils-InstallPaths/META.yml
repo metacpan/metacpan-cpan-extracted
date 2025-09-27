@@ -2,7 +2,7 @@
 abstract: 'Build.PL install path logic made easy'
 author:
   - 'Ken Williams <kwilliams@cpan.org>'
-  - 'Leon Timmermans <leont@cpan.org>'
+  - 'Leon Timmermans <fawaka@gmail.com>'
 build_requires:
   File::Spec::Functions: '0.83'
   File::Temp: '0'
@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,7 +19,7 @@ name: ExtUtils-InstallPaths
 provides:
   ExtUtils::InstallPaths:
     file: lib/ExtUtils/InstallPaths.pm
-    version: '0.014'
+    version: '0.015'
 requires:
   Carp: '0'
   ExtUtils::Config: '0.009'
@@ -28,9 +28,9 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=ExtUtils-InstallPaths
-  repository: git://github.com/Leont/extutils-installpaths.git
-version: '0.014'
-x_generated_by_perl: v5.38.0
-x_serialization_backend: 'YAML::Tiny version 1.74'
+  bugtracker: https://github.com/Perl-Toolchain-Gang/extutils-installpaths/issues
+  repository: git://github.com/Perl-Toolchain-Gang/extutils-installpaths.git
+version: '0.015'
+x_generated_by_perl: v5.42.0
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

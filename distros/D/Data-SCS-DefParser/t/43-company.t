@@ -17,6 +17,10 @@ is $gal_oil_gst->{company_def}, [
     city   => 'carlsbad',
     prefab => 'us_gas_06',
   },
+  {
+    city   => 'Hornbrook',
+    prefab => 'd_oil_gst',
+  },
 ], 'gal_oil_gst company_def';
 
 done_testing;

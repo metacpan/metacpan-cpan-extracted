@@ -14,7 +14,7 @@ CVS/.*
 \.shar$
 \.tar$
 \.tgz$
-\.tar\.gz$
+^.tar\.gz$
 \.zip$
 \.DS_Store$
 _uu$
@@ -42,4 +42,4 @@ dump
 \.appveyor.yml*
 ^README.md
 tmp/
-Test-Against-Dev-*.tar.gz
+Test-Against-Commit-*.tar.gz

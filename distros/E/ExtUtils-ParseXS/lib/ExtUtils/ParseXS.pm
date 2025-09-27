@@ -64,7 +64,7 @@ use Symbol;
 
 our $VERSION;
 BEGIN {
-  $VERSION = '3.59';
+  $VERSION = '3.60';
   require ExtUtils::ParseXS::Constants; ExtUtils::ParseXS::Constants->VERSION($VERSION);
   require ExtUtils::ParseXS::CountLines; ExtUtils::ParseXS::CountLines->VERSION($VERSION);
   require ExtUtils::ParseXS::Node; ExtUtils::ParseXS::Node->VERSION($VERSION);
@@ -74,7 +74,6 @@ BEGIN {
 $VERSION = eval $VERSION if $VERSION =~ /_/;
 
 use ExtUtils::ParseXS::Utilities qw(
-  standard_typemap_locations
   trim_whitespace
   C_string
   valid_proto_string

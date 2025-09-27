@@ -1,0 +1,44 @@
+{
+   "abstract" : "A Perl module packager",
+   "author" : [
+      "Erick Calder <ecalder@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "cpan2rpm",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "5.4302",
+            "HTTP::Request" : "0",
+            "LWP::UserAgent" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "2.044",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

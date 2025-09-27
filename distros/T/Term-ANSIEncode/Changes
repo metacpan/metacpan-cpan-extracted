@@ -102,3 +102,7 @@
 1.28    Aug 10, 2025
 
         Updated the documentation to be better informative on CPAN.
+
+1.29    Sept 26, 2025
+
+        More tokens and RGB color handling.

@@ -967,7 +967,7 @@ EOF
         |
         |int
         |foo(  a   ,  char   * b  , OUT  int  c  ,  OUTLIST int  d   ,    \
-        |      IN_OUT char * * e    =   1  + 2 ,   long length(b)   ,    \
+        |      IN_OUT char * * e    =   1  + 2 ,   long length(e)   ,    \
         |      char* f="abc"  ,     g  =   0  ,   ...     )
 EOF
 
@@ -1607,13 +1607,6 @@ EOF
             [ 1, 0, qr{\QError: length() on non-parameter 's'\E.*line 6},
                    "got expected error" ],
         ],
-
-		[
-			'length of int is invalid',
-			['int', 'foo(int a, size_t length(a))'],
-			[ 1, 0 , qr/length\(NAME\) not supported with typemaps other than T_PV/, 'Got expected error about length' ],
-		],
-
     );
 
     test_many($preamble, 'XS_Foo_', \@test_fns);
@@ -4811,6 +4804,10 @@ EOF
         |
         |PROTOTYPES:  DISABLE
         |
+        |TYPEMAP: <<EOTM
+        |X::Y T_IV
+        |EOTM
+        |
 EOF
 
     my @test_fns = (
@@ -4825,7 +4822,36 @@ EOF
                    "got XSFUNCTION declaration" ],
             [ 0, 0, qr{\QXSFUNCTION = XSINTERFACE_FUNC(void,cv,XSANY.any_dptr);},
                    "got XSFUNCTION assign" ],
-            [ 0, 0, qr{\bXSFUNCTION\(\)},
+            [ 0, 0, qr{\Q((void (*)())(XSFUNCTION))();},
+                   "got XSFUNCTION call" ],
+        ],
+        [
+            'INTERFACE with perl package name',
+            [ Q(<<'EOF') ],
+                |X::Y
+                |foo(X::Y a, char *b)
+                |    INTERFACE: f1
+EOF
+            [ 0, 0, qr{\b\QdXSFUNCTION(X__Y)},
+                   "got XSFUNCTION declaration" ],
+            [ 0, 0, qr{\QXSFUNCTION = XSINTERFACE_FUNC(X__Y,cv,XSANY.any_dptr);},
+                   "got XSFUNCTION assign" ],
+            [ 0, 0, qr{\QRETVAL = ((X__Y (*)(X__Y, char *))(XSFUNCTION))(a, b);},
+                   "got XSFUNCTION call" ],
+        ],
+        [
+            'INTERFACE with C_ARGS',
+            [ Q(<<'EOF') ],
+                |char *
+                |foo(X::Y a, int b, char *c)
+                |    INTERFACE: f1
+                |    C_ARGS:  a,  c
+EOF
+            [ 0, 0, qr{\b\QdXSFUNCTION(char *)},
+                   "got XSFUNCTION declaration" ],
+            [ 0, 0, qr{\QXSFUNCTION = XSINTERFACE_FUNC(char *,cv,XSANY.any_dptr);},
+                   "got XSFUNCTION assign" ],
+            [ 0, 0, qr{\QRETVAL = ((char * (*)(X__Y, char *))(XSFUNCTION))(a,  c);},
                    "got XSFUNCTION call" ],
         ],
     );

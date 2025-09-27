@@ -30,5 +30,5 @@ requires:
   Time::HiRes: '0'
   charnames: '0'
   perl: '5.020'
-version: '1.28'
+version: '1.29'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

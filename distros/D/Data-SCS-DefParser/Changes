@@ -1,5 +1,12 @@
 Revision history for perl distribution Data-SCS-DefParser
 
+0.11 - 2025-09-27
+
+  - Add all_locations() method
+
+  - Fix inconsistent results when the list of installed states doesn't exactly
+    match the installed ATS version
+
 0.10 - 2025-09-22
 
   - Parsing of scientific float, boolean, hex values

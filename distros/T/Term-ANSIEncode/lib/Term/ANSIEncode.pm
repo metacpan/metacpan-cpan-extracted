@@ -48,15 +48,55 @@ binmode(STDOUT, ":encoding(UTF-8)");
 binmode(STDIN,  ":encoding(UTF-8)");
 
 BEGIN {
-    our $VERSION = '1.28';
+    our $VERSION = '1.29';
 }
 
 sub ansi_output {
-    my $self  = shift;
-    my $text  = shift;
+    my $self = shift;
+    my $text = shift;
 
-	if (length($text) > 1) {
-		while ($text =~ /\[\% (.*?) \%\]/) {
+    if (length($text) > 1) {
+        while ($text =~ /\[\% (.*?) \%\]/) {
+			while ($text =~ /\[\% SCROLL UP (\d+)\s+\%\]/) {
+				my $s = $1;
+				my $replace = $self->{'ansi_sequences'}->{'CSI'} . $s . 'S';
+				$text =~ s/\[\% SCROLL UP $s\s+\%\]/$replace/g;
+			}
+			while ($text =~ /\[\% SCROLL DOWN (\d+)\s+\%\]/) {
+				my $s = $1;
+				my $replace = $self->{'ansi_sequences'}->{'CSI'} . $s . 'T';
+				$text =~ s/\[\% SCROLL DOWN $s\s+\%\]/$replace/g;
+			}
+			while ($text =~ /\[\% RGB (\d+),(\d+),(\d+)\s+\%\]/) {
+				my ($r,$g,$b) = ($1,$2,$3);
+				my $replace = $self->{'ansi_sequences'}->{'CSI'} . "38:2:$r:$g:$b" . 'm';
+				$text =~ s/\[\% RGB $r,$g,$b\s+\%\]/$replace/g;
+			}
+			while ($text =~ /\[\% B_RGB (\d+),(\d+),(\d+)\s+\%\]/) {
+				my ($r,$g,$b) = ($1,$2,$3);
+				my $replace = $self->{'ansi_sequences'}->{'CSI'} . "48:2:$r:$g:$b" . 'm';
+				$text =~ s/\[\% B_RGB $r,$g,$b\s+\%\]/$replace/g;
+			}
+			while ($text =~ /\[\% COLOR (\d+)\s+\%\]/) {
+				my $c = $1;
+				my $replace = $self->{'ansi_sequences'}->{'CSI'} . "38:5:$c" . 'm';
+				$text =~ s/\[\% COLOR $c\s+\%\]/$replace/g;
+			}
+			while ($text =~ /\[\% B_COLOR (\d+)\s+\%\]/) {
+				my $c = $1;
+				my $replace = $self->{'ansi_sequences'}->{'CSI'} . "48:5:$c" . 'm';
+				$text =~ s/\[\% B_COLOR $c\s+\%\]/$replace/g;
+			}
+			while ($text =~ /\[\% GREY (\d+)\s+\%\]/) {
+				my $g = $1;
+				my $replace = $self->{'ansi_sequences'}->{'CSI'} . '38:5:' . (232 + $g) . 'm';
+				$text =~ s/\[\% GREY $g\s+\%\]/$replace/g;
+			}
+			while ($text =~ /\[\% B_GREY (\d+)\s+\%\]/) {
+				my $g = $1;
+				my $replace = $self->{'ansi_sequences'}->{'CSI'} . '48:5:' . (232 + $g) . 'm';
+				$text =~ s/\[\% B_GREY $g\s+\%\]/$replace/g;
+			}
             while ($text =~ /\[\%\s+BOX (.*?),(\d+),(\d+),(\d+),(\d+),(.*?)\s+\%\](.*?)\[\%\s+ENDBOX\s+\%\]/i) {
                 my $replace = $self->box($1, $2, $3, $4, $5, $6, $7);
                 $text =~ s/\[\%\s+BOX.*?\%\].*?\[\%\s+ENDBOX.*?\%\]/$replace/i;
@@ -70,10 +110,10 @@ sub ansi_output {
             foreach my $string (keys %{ $self->{'characters'}->{'UNICODE'} }) {
                 $text =~ s/\[\%\s+$string\s+\%\]/$self->{'characters'}->{'UNICODE'}->{$string}/gi;
             }
-        }
-		$text =~ s/\[ \% TOKEN \% \]/\[\% TOKEN \%\]/;
-		print $text;
-    }
+        } ## end while ($text =~ /\[\% (.*?) \%\]/)
+        $text =~ s/\[ \% TOKEN \% \]/\[\% TOKEN \%\]/;
+        print $text;
+    } ## end if (length($text) > 1)
     return (TRUE);
 } ## end sub ansi_output
 
@@ -137,102 +177,122 @@ sub box {
 sub new {
     my $class = shift;
 
-    my $esc = chr(27) . '[';
+    my $esc = chr(27);
+    my $csi = $esc . '[';
 
     my $self = {
-        'ansi_prefix'    => $esc,
+        'ansi_prefix'    => $csi,
         'mode'           => 'long',
         'ansi_sequences' => {
+            'SS2'      => $esc . 'N',
+            'SS3'      => $esc . 'O',
+            'CSI'      => $esc . '[',
+            'OSC'      => $esc . ']',
+            'SOS'      => $esc . 'X',
+            'ST'       => $esc . "\\",
+            'DCS'      => $esc . 'P',
             'RETURN'   => chr(13),
             'LINEFEED' => chr(10),
             'NEWLINE'  => chr(13) . chr(10),
 
-            'CLEAR'      => $esc . '2J' . $esc . 'H',
-            'CLS'        => $esc . '2J' . $esc . 'H',
-            'CLEAR LINE' => $esc . '0K',
-            'CLEAR DOWN' => $esc . '0J',
-            'CLEAR UP'   => $esc . '1J',
-            'HOME'       => $esc . 'H',
+            'CLS'        => $csi . '2J' . $csi . 'H',
+            'CLEAR'      => $csi . '2J',
+            'CLEAR LINE' => $csi . '0K',
+            'CLEAR DOWN' => $csi . '0J',
+            'CLEAR UP'   => $csi . '1J',
+            'HOME'       => $csi . 'H',
 
             # Cursor
-            'UP'      => $esc . 'A',
-            'DOWN'    => $esc . 'B',
-            'RIGHT'   => $esc . 'C',
-            'LEFT'    => $esc . 'D',
-            'SAVE'    => $esc . 's',
-            'RESTORE' => $esc . 'u',
-            'RESET'   => $esc . '0m',
+            'UP'            => $csi . 'A',
+            'DOWN'          => $csi . 'B',
+            'RIGHT'         => $csi . 'C',
+            'LEFT'          => $csi . 'D',
+            'NEXT LINE'     => $csi . 'E',
+            'PREVIOUS LINE' => $csi . 'F',
+            'SAVE'          => $csi . 's',
+            'RESTORE'       => $csi . 'u',
+            'RESET'         => $csi . '0m',
+            'CURSOR ON'     => $csi . '?25h',
+            'CURSOR OFF'    => $csi . '?25l',
+            'SCREEN 1'      => $csi . '?1049l',
+            'SCREEN 2'      => $csi . '?1049h',
 
             # Attributes
-            'BOLD'         => $esc . '1m',
-            'FAINT'        => $esc . '2m',
-            'ITALIC'       => $esc . '3m',
-            'UNDERLINE'    => $esc . '4m',
-            'OVERLINE'     => $esc . '53m',
-            'SLOW BLINK'   => $esc . '5m',
-            'RAPID BLINK'  => $esc . '6m',
-            'INVERT'       => $esc . '7m',
-            'REVERSE'      => $esc . '7m',
-            'CROSSED OUT'  => $esc . '9m',
-            'DEFAULT FONT' => $esc . '10m',
-            'FONT1'        => $esc . '11m',
-            'FONT2'        => $esc . '12m',
-            'FONT3'        => $esc . '13m',
-            'FONT4'        => $esc . '14m',
-            'FONT5'        => $esc . '15m',
-            'FONT6'        => $esc . '16m',
-            'FONT7'        => $esc . '17m',
-            'FONT8'        => $esc . '18m',
-            'FONT9'        => $esc . '19m',
+            'BOLD'                    => $csi . '1m',
+            'NORMAL'                  => $csi . '22m',
+            'FAINT'                   => $csi . '2m',
+            'ITALIC'                  => $csi . '3m',
+            'UNDERLINE'               => $csi . '4m',
+            'FRAMED'                  => $csi . '51m',
+            'FRAMED OFF'              => $csi . '54m',
+            'ENCIRCLED'               => $csi . '52m',
+            'ENCIRCLED OFF'           => $csi . '54m',
+            'OVERLINED'               => $csi . '53m',
+            'OVERLINED OFF'           => $csi . '55m',
+            'DEFAULT UNDERLINE COLOR' => $csi . '59m',
+            'SUPERSCRIPT'             => $csi . '73m',
+            'SUBSCRIPT'               => $csi . '74m',
+            'SUPERSCRIPT OFF'         => $csi . '75m',
+            'SUBSCRIPT OFF'           => $csi . '75m',
+            'SLOW BLINK'              => $csi . '5m',
+            'RAPID BLINK'             => $csi . '6m',
+            'INVERT'                  => $csi . '7m',
+            'REVERSE'                 => $csi . '7m',
+            'HIDE'                    => $csi . '8m',
+            'REVEAL'                  => $csi . '28m',
+            'CROSSED OUT'             => $csi . '9m',
+            'DEFAULT FONT'            => $csi . '10m',
+            'PROPORTIONAL ON'         => $csi . '26m',
+            'PROPORTIONAL OFF'        => $csi . '50m',
 
             # Color
-            'NORMAL' => $esc . '22m',
 
             # Foreground color
-            'BLACK'          => $esc . '30m',
-            'RED'            => $esc . '31m',
-            'PINK'           => $esc . '38;5;198m',
-            'ORANGE'         => $esc . '38;5;202m',
-            'NAVY'           => $esc . '38;5;17m',
-            'GREEN'          => $esc . '32m',
-            'YELLOW'         => $esc . '33m',
-            'BLUE'           => $esc . '34m',
-            'MAGENTA'        => $esc . '35m',
-            'CYAN'           => $esc . '36m',
-            'WHITE'          => $esc . '37m',
-            'DEFAULT'        => $esc . '39m',
-            'BRIGHT BLACK'   => $esc . '90m',
-            'BRIGHT RED'     => $esc . '91m',
-            'BRIGHT GREEN'   => $esc . '92m',
-            'BRIGHT YELLOW'  => $esc . '93m',
-            'BRIGHT BLUE'    => $esc . '94m',
-            'BRIGHT MAGENTA' => $esc . '95m',
-            'BRIGHT CYAN'    => $esc . '96m',
-            'BRIGHT WHITE'   => $esc . '97m',
+            'DEFAULT'        => $csi . '39m',
+            'BLACK'          => $csi . '30m',
+            'RED'            => $csi . '31m',
+            'PINK'           => $csi . '38;5;198m',
+            'ORANGE'         => $csi . '38;5;202m',
+            'NAVY'           => $csi . '38;5;17m',
+            'GREEN'          => $csi . '32m',
+            'YELLOW'         => $csi . '33m',
+            'BLUE'           => $csi . '34m',
+            'MAGENTA'        => $csi . '35m',
+            'CYAN'           => $csi . '36m',
+            'WHITE'          => $csi . '37m',
+            'BRIGHT BLACK'   => $csi . '90m',
+            'BRIGHT RED'     => $csi . '91m',
+            'BRIGHT GREEN'   => $csi . '92m',
+            'BRIGHT YELLOW'  => $csi . '93m',
+            'BRIGHT BLUE'    => $csi . '94m',
+            'BRIGHT MAGENTA' => $csi . '95m',
+            'BRIGHT CYAN'    => $csi . '96m',
+            'BRIGHT WHITE'   => $csi . '97m',
 
             # Background color
-            'B_BLACK'          => $esc . '40m',
-            'B_RED'            => $esc . '41m',
-            'B_GREEN'          => $esc . '42m',
-            'B_YELLOW'         => $esc . '43m',
-            'B_BLUE'           => $esc . '44m',
-            'B_MAGENTA'        => $esc . '45m',
-            'B_CYAN'           => $esc . '46m',
-            'B_WHITE'          => $esc . '47m',
-            'B_DEFAULT'        => $esc . '49m',
-            'B_PINK'           => $esc . '48;5;198m',
-            'B_ORANGE'         => $esc . '48;5;202m',
-            'B_NAVY'           => $esc . '48;5;17m',
-            'BRIGHT B_BLACK'   => $esc . '100m',
-            'BRIGHT B_RED'     => $esc . '101m',
-            'BRIGHT B_GREEN'   => $esc . '102m',
-            'BRIGHT B_YELLOW'  => $esc . '103m',
-            'BRIGHT B_BLUE'    => $esc . '104m',
-            'BRIGHT B_MAGENTA' => $esc . '105m',
-            'BRIGHT B_CYAN'    => $esc . '106m',
-            'BRIGHT B_WHITE'   => $esc . '107m',
+            'B_DEFAULT'        => $csi . '49m',
+            'B_BLACK'          => $csi . '40m',
+            'B_RED'            => $csi . '41m',
+            'B_GREEN'          => $csi . '42m',
+            'B_YELLOW'         => $csi . '43m',
+            'B_BLUE'           => $csi . '44m',
+            'B_MAGENTA'        => $csi . '45m',
+            'B_CYAN'           => $csi . '46m',
+            'B_WHITE'          => $csi . '47m',
+            'B_DEFAULT'        => $csi . '49m',
+            'B_PINK'           => $csi . '48;5;198m',
+            'B_ORANGE'         => $csi . '48;5;202m',
+            'B_NAVY'           => $csi . '48;5;17m',
+            'BRIGHT B_BLACK'   => $csi . '100m',
+            'BRIGHT B_RED'     => $csi . '101m',
+            'BRIGHT B_GREEN'   => $csi . '102m',
+            'BRIGHT B_YELLOW'  => $csi . '103m',
+            'BRIGHT B_BLUE'    => $csi . '104m',
+            'BRIGHT B_MAGENTA' => $csi . '105m',
+            'BRIGHT B_CYAN'    => $csi . '106m',
+            'BRIGHT B_WHITE'   => $csi . '107m',
 
-			# MACROS
+            # MACROS
             'HORIZONTAL RULE ORANGE'         => '[% RETURN %][% B_ORANGE %][% CLEAR LINE %][% RESET %]',
             'HORIZONTAL RULE PINK'           => '[% RETURN %][% B_PINK %][% CLEAR LINE %][% RESET %]',
             'HORIZONTAL RULE RED'            => '[% RETURN %][% B_RED %][% CLEAR LINE %][% RESET %]',
@@ -253,16 +313,10 @@ sub new {
         @_,
     };
 
-    # Generate generic colors
-    foreach my $count (0 .. 255) {
-        $self->{'ansi_sequences'}->{"ANSI$count"}   = $esc . '38;5;' . $count . 'm';
-        $self->{'ansi_sequences'}->{"B_ANSI$count"} = $esc . '48;5;' . $count . 'm';
-        if ($count >= 232 && $count <= 255) {
-            my $num = $count - 232;
-            $self->{'ansi_sequences'}->{"GREY$num"}   = $esc . '38;5;' . $count . 'm';
-            $self->{'ansi_sequences'}->{"B_GREY$num"} = $esc . '48;5;' . $count . 'm';
-        }
-    } ## end foreach my $count (0 .. 255)
+    # Alternate Fonts
+    foreach my $count (1 .. 9) {
+        $self->{ 'FONT ' . $count } = $csi . ($count + 10);
+    }
 
     # 20D0 - 20EF
     # 2100 - 218B

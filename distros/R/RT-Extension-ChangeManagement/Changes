@@ -1,5 +1,8 @@
 Revision history for RT-Extension-ChangeManagement
 
+1.01 2025-09-26
+ - Add status configuration for reminders in the Change Management lifecycle
+
 1.00 2025-08-06
  - Update for RT 6.0
 

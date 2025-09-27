@@ -10,6 +10,8 @@ Markup text to ANSI encoder
 
 **ansi-encode** [options] [text file name]
 
+It is HIGHLY encouraged for your terminal be set as UTF-8 for the advanced features in this module/utility.
+
 ## Options
 
 ### -**v** or --**version**

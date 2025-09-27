@@ -18,6 +18,7 @@ t/45-prefab.t
 t/46-mileage-targets.t
 t/54-dlc-suffix.t
 t/55-tidy.t
+t/61-all-locs.t
 t/fixtures/class-city/ca/hornbrook.sui
 t/fixtures/class-city/ca/los_angeles.sui
 t/fixtures/class-city/city.sii
@@ -25,6 +26,7 @@ t/fixtures/class-company/def/city.sii
 t/fixtures/class-company/def/company.sii
 t/fixtures/class-company/def/company/gal_oil_gst.sui
 t/fixtures/class-company/def/company/gal_oil_gst/editor/carlsbad.sii
+t/fixtures/class-company/def/company/gal_oil_gst/editor/hornbrook.sii
 t/fixtures/class-country/california.sui
 t/fixtures/class-country/country.sii
 t/fixtures/class-mileage-targets/mileage_targets.sii

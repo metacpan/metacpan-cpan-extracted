@@ -1,3 +1,7 @@
+0.09 2025-09-27T11:37:51+02:00
+ - Add support for logo.
+ - Update copyright years.
+
 0.08 2024-02-08T13:54:59+01:00
  - Fix data element in label of username field.
 

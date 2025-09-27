@@ -1,5 +1,8 @@
 Revision history for ExtUtils-InstallPaths
 
+0.015     2025-09-26 21:13:44+02:00 Europe/Brussels
+          - Restore installing non-standard types
+
 0.014     2024-09-10 18:20:50+02:00 Europe/Brussels
           - Drop 5.006 support
           - Compensate for perls without installsitescript

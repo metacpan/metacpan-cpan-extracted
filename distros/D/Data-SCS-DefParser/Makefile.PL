@@ -6,7 +6,7 @@ use ExtUtils::MakeMaker::CPANfile;
 my %provides = (
   'Data::SCS::DefParser' => {
     file => 'lib/Data/SCS/DefParser.pm',
-    version => '0.10',
+    version => '0.11',
   },
 );
 

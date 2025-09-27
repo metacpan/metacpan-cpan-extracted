@@ -1,7 +1,7 @@
 use v5.36;
 use Object::Pad 0.805;
 
-class Data::SCS::DefParser 0.10
+class Data::SCS::DefParser 0.11
   :strict(params);
 
 use Archive::SCS 1.06;
@@ -246,15 +246,24 @@ method init_def ($source) {
 
     if ( $gamedir->game =~ m/^A/i ) {
       # The DLC file names for ATS are well-known; limiting the mounts
-      # to just the needed ones saves a bunch of time.
-      @mounts = sort +(
+      # to essentially the ones suggested by country.sii saves a bunch of time.
+      # Using only the DLC file list for this would be unreliable unless you
+      # always run the latest game version and always get all DLC immediately.
+      my %countries = Data::SCS::DefParser->new(
+        mount => $gamedir->mounted('def.scs'),
+        parse => 'def/country.sii',
+      )->raw_data->{country}{data}->%*;
+      my %mount;
+      $mount{$_}++ for (
+        'def.scs',
         'dlc_kenworth_t680.scs',
         'dlc_peterbilt_579.scs',
         'dlc_westernstar_49x.scs',
         'dlc_arizona.scs',
         'dlc_nevada.scs',
-        grep { /^def|^dlc_[a-z]{2}\.scs$/ } @mounts,
+        map { lc sprintf 'dlc_%s.scs', $_->{country_code} } values %countries,
       );
+      @mounts = grep { $mount{$_} } $gamedir->archives;
     }
 
     @mounts = map { $gamedir->path->child($_)->stringify } @mounts;
@@ -354,6 +363,29 @@ sub ats_db_company_filter {
   for my $prefab (sort keys $ats_data->{prefab}->%*) {
     delete $ats_data->{prefab}{$prefab} unless $prefabs{$prefab};
   }
+}
+
+
+method all_locations ($companies = {}, $data = $self->data) {
+  # get a list of every company location as an array of hashrefs
+  # (allows for very simple filtering code)
+  my %branch_company;
+  for my $company (keys $companies->%*) {
+    for my $branch ($companies->{$company}{branches}->@*) {
+      $branch_company{$branch} = $company;
+    }
+  }
+  my @locs;
+  for my $branch (sort keys $data->{company}{permanent}->%*) {
+    push @locs, map {
+      branch  => $branch,
+      company => $branch_company{$branch},
+      country => lc $data->{city}{ lc $_->{city} }{country},
+      city    => lc $_->{city},
+      prefab  => lc $_->{prefab},
+    }, $data->{company}{permanent}{$branch}{company_def}->@*;
+  }
+  return sort { $a->{city} cmp $b->{city} } @locs;
 }
 
 

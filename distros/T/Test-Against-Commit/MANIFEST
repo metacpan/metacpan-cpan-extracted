@@ -5,9 +5,13 @@ Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 README
-shell/install_perl_only_custom_location
-shell/install_perl_only_from_tarball_custom_location
 t/001-new.t
+t/002-new-constructor-creates-dirs.t
+t/003-prepare-testing-directories.t
+t/004-non-verbose.t
+t/005-dryrun.t
+t/data/M/ME/METATEST/Phony-FAIL-0.01.tar.gz
+t/data/M/ME/METATEST/Phony-PASS-0.01.tar.gz
 Todo
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

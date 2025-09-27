@@ -1,0 +1,5 @@
+Revision history for Nix::Proc::Meminfo
+0.11 Fri Sept 26 11:00:00 2025
+     - created dist.ini
+     - updated README.md
+     - prepare for CPAN release

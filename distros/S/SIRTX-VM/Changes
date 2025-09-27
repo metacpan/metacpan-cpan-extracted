@@ -1,3 +1,9 @@
+v0.08  2025-09-26Z
+    - Added experimental support for logical:XXX
+    - Added support for resources sections
+    - Added support for ~auto, and .host_defined_auto_range to allow for automatic host defined identifiers
+    - Added support for as-clause in .label, and .function
+
 v0.07  2025-09-22Z
     - Added support for .chunk, .endchunk, and .filechunk
     - Updated documentation

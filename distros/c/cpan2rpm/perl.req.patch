@@ -1,0 +1,12 @@
+--- /usr/lib/rpm/perl.req.ORIG  Mon Jun  2 15:00:43 2003
++++ /usr/lib/rpm/perl.req       Mon Jun  2 15:03:59 2003
+@@ -75,6 +75,9 @@
+   
+   my ($file) = @_;
+   chomp $file;
++  if ($ENV{CPAN2RPM} && ! $ENV{CPAN2RPM_REQ_ALL}) {
++    return unless $file =~ /\.pm$/;
++    }
+   
+   open(FILE, "<$file") || return;
+

@@ -1,0 +1,15 @@
+README
+README.redhat6
+MANIFEST
+LICENSE
+Makefile.PL
+Changes
+lib/cpan2rpm.pm
+lib/CPAN/RPM.pm
+cpan2rpm
+t/100_compile.t
+cpan2rpm.spec.PL
+cpan2rpm.spec
+perl.req.patch
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,4 +1,4 @@
-README for Perl extension Test::Against::Dev
+README for Perl extension Test::Against::Commit
 
 This library should be used by anyone who wishes to assess the impact of
 month-to-month changes in the Perl 5 core distribution on the installability

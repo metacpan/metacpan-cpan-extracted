@@ -21,7 +21,7 @@ no_index:
 provides:
   Data::SCS::DefParser:
     file: lib/Data/SCS/DefParser.pm
-    version: '0.10'
+    version: '0.11'
 requires:
   Archive::SCS: '0'
   Archive::SCS::Directory: '0'
@@ -31,5 +31,5 @@ requires:
   perl: v5.36.0
 resources:
   repository: https://github.com/nautofon/Data-SCS-DefParser.git
-version: '0.10'
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

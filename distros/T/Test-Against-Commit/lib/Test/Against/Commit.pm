@@ -1,12 +1,11 @@
 package Test::Against::Commit;
 use strict;
 use 5.14.0;
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 # core modules
 use Archive::Tar;
 use Carp;
 use Cwd;
-use File::Fetch;
 use File::Path ( qw| make_path | );
 use File::Spec;
 use File::Temp ( qw| tempfile | );
@@ -25,12 +24,15 @@ Test::Against::Commit - Test CPAN modules against Perl dev releases
 
     my $self = Test::Against::Commit->new( {
         application_dir => '/path/to/application',
-        commit          => <commit_ID_tag_or_branch>,
+        project         => 'business_project',
+        install          => <commit_ID_tag_or_branch>,
     } );
+
+    $self->prepare_testing_directories();
 
     my $this_cpanm = $self->fetch_cpanm( { verbose => 1 } );
 
-    my $gzipped_build_log = $self->run_cpanm( {
+    my $modules_ref = $self->process_modules( {
         module_file => '/path/to/cpan-river-file.txt',
         title       => 'cpan-river-1000',
         verbose     => 1,
@@ -48,8 +50,9 @@ L<Test-Against-Dev|https://metacpan.org/dist/Test-Against-Dev>.
 
 =head2 The Problem Addressed by This Library
 
-In the development of Perl as a language we face a problem typically referred to as B<Blead Breaks CPAN> (or B<BBC> for
-short).  Perl 5 undergoes an annual development cycle characterized by:
+In the development of Perl as a language we face a problem typically referred
+to as B<Blead Breaks CPAN> (or B<BBC> for short).  Perl 5 undergoes an annual
+development cycle characterized by:
 
 =over 4
 
@@ -82,7 +85,6 @@ referred to as "core developers" or as the "Perl 5 Porters."
 
 This library is intended as a contribution to those efforts by enabling the
 Perl 5 Porters to assess the impact of changes in the Perl 5 core distribution
-on important provide a monthly snapshot of the impact of core development on
 CPAN libraries well in advance of production and maintenance releases.
 
 =head2 The Approach Test-Against-Commit Takes
@@ -114,48 +116,142 @@ on CPAN, it could in principle be extended to test an organization's private
 libraries as well.  This functionality, however, has not yet been implemented
 or tested.
 
-=head2 What Is the Result Produced by This Library?
+=head2 Terminology
 
-We will use the term I<run> to describe an instance of (i) testing one or more
-CPAN libraries against a given installed F<perl> and (ii) the recording of
-data from that instance of testing.  Our objective is to be able to compare
-the results of different runs against different F<perl> executables.
-
-For example, suppose a person working on the Perl core distribution wants to
-assess the impact of certain changes being proposed in a pull request on set
-of fifty specific CPAN libraries.  The user will first create a benchmark
-F<perl> probably built from a monthly development release, the GH tag
-associated with that release, or the GH commit from which the pull request was
-generated.  She will use this library to conduct a run against that
-executable.  In the run, each CPAN library will be graded C<PASS>, C<FAIL> (or
-C<NA> for "not applicable").
-
-At a certain point in the course of the pull request's development, the user
-will build a new F<perl> executable and conduct a run against that F<perl>.
-If a particular CPAN library receives a grade of C<PASS> during the first run
-and a grade of C<FAIL> during the next, the Perl 5 Porters will be asked to
-determine the cause of that breakage.
+Here are some terms which we use in a specific way in this library:
 
 =over 4
 
-=item *
+=item * B<application directory>
 
-Sometimes the change in Perl 5 is wrong and needs to be reverted.
+A directory to which the user has write-privileges and which holds the input
+and output for one or more I<projects>.  I<Example:> C</path-to-application>.
 
-=item *
+=item * B<project>
 
-Sometimes the change in Perl 5 is correct (or, at least, plausible) but
-exposes sub-optimal code in the CPAN module.
+A short-hand description of the focus of a particular investigation using
+Test-Against-Commit.  I<Example:> C<goto-fatal> could describe an investigation of
+the impact of fatalization of certain uses of the Perl C<goto> function on
+CPAN libraries.
 
-=item *
+=item * B<project directory>
 
-Sometimes the failure is due to external conditions, such as a change in a C
-library on the testing platform.
+A subdirectory of the I<application directory> which holds the input and
+output data for one I<project>.  I<Example:> C</path-to-application/goto-fatal>.
+
+=item * B<installation>
+
+An installation of one F<perl> executable, the libraries that get installed
+with the core distribution, CPAN libraries whose installability we tested
+against that F<perl> and data gathered to analyze that installability and
+answer questions for the business purpose of the I<project>.
+
+An installation will be built either from a particular checkout, tag or branch
+from a F<git> repository of the Perl 5 source code (C<23ae7f95ea>, C<v5.43.3>,
+C<blead>) or from a Perl 5 development, production or maintenance release in
+tarball form (C<perl-5.44.0>).
+
+A I<project> will consist of at least one installation but will probably hold
+two or three installations: the first will be used to determine a baseline
+state, the second will be used to assess the impact of a proposed change in
+the Perl 5 core distribution on installability of CPAN libraries.
+
+=item * B<installation directory>
+
+A subdirectory of the I<project directory> holding one installation.  I<Example:>
+
+    /path-to-application/                         # <-- application directory
+    /path-to-application/goto-fatal/              # <-- project directory
+    /path-to-application/goto-fatal/23ae7f95ea/   # <-- installation directory
+    /path-to-application/goto-fatal/v5.43.3/      # <-- another installation directory
+
+Each installation directory will have exactly two subdirectories: C<testing>
+and C<results>. (See next two items.)
+
+=item * B<testing directory>
+
+A subdirectory of an I<installation directory> which in turn initially holds
+two subdirectories, C<bin/> and C<lib/>.
+
+The C<bin/> directory holds the F<perl>, F<perldoc>, F<cpan> and other
+executable when a particular F<perl> is built for the project.  The C<lib/>
+directory holds all modules installed either initially with the executable or
+subsequently, including those whose functionality we are assessing as part of
+the project's business purpose.  Test-Against-Commit methods will create other
+subdirectories next to C<bin/> and C<lib/>, some of which are hidden, as part
+of the testing progress.
+
+    /path-to-application/goto-fatal/23ae7f95ea/               # <-- installation directory
+    /path-to-application/goto-fatal/23ae7f95ea/testing/       # <-- testing directory
+    /path-to-application/goto-fatal/23ae7f95ea/testing/bin/   # <-- bin directory
+    /path-to-application/goto-fatal/23ae7f95ea/testing/lib/   # <-- lib directory
+
+The data in the I<testing directory> can be thought of as the project's
+I<input> data.
+
+=item * B<results directory>
+
+A subdirectory of an I<installation directory> which holds the data created by
+running a program using Test::Against::Commit methods.  This directory will in turn
+hold two subdirectories: C<analysis/> and C<storage/>.
+
+    /path-to-application/goto-fatal/23ae7f95ea/           # <-- installation directory
+    /path-to-application/goto-fatal/23ae7f95ea/testing/   # <-- testing directory
+    ...
+    /path-to-application/goto-fatal/23ae7f95ea/results/   # <-- results directory
+    /path-to-application/goto-fatal/23ae7f95ea/results/analysis/
+    /path-to-application/goto-fatal/23ae7f95ea/results/storage/
+
+The data in the I<results directory> can be thought of as the project's
+I<output> data.
+
+=item * B<run>
+
+A I<run> is an instance of (i) testing a set of one or more CPAN libraries
+against a given I<installation> and (ii) the recording of data from that
+instance of testing.
+
+=item * B<Perl 5 configuration>
+
+The way one calls F<Configure> when building Perl 5 from source, <e.g.>:
+
+    sh ./Configure -des -Dusedevel
+
+or:
+
+    sh ./Configure -des -Dusedevel \
+        -Duseithreads \
+        -Doptimize="-O2 -pipe -fstack-protector -fno-strict-aliasing"
+
+Once you begin to use Test-Against-Commit for a particular I<project>, you
+should use the same configuration for each I<installation> over the life of
+that project.  For instance, you should not configure without threads in one
+run but with threads in the next.  Nor should you switch from regular to
+debugging builds between I<runs>.  Otherwise, the results may reflect changes
+in that configuration rather than changes in Perl 5 core distribution code or
+changes in the targeted CPAN libraries.
 
 =back
 
-There's no way to write code to figure out which situation -- or mix of
-situations -- we are in.  The human user must intervene at this point.
+=head2 What Is the Result Produced by This Library?
+
+Our objective is to be able to compare output data recorded in one I<run> for
+a given I<project> with data recorded in a different I<run> for a different
+(presumably subsequent) installation within the same I<project>.  To return to
+the example of the I<goto-fatal> project, let's assume we have two different
+installations, the first of which sets our baseline (which CPAN libraries
+currently C<PASS> and which currently C<FAIL>) and a second which determines
+the impact of applying a pull request.
+
+    /path-to-application/goto-fatal/              # <-- project directory
+    /path-to-application/goto-fatal/23ae7f95ea/   # <-- first installation directory
+    /path-to-application/goto-fatal/v5.43.3/      # <-- second installation directory
+
+We will end up comparing data stored in these installations' respective
+C<results/analysis/> subdirectories.
+
+    /path-to-application/goto-fatal/23ae7f95ea/results/analysis/
+    /path-to-application/goto-fatal/v5.43.3/results/analysis/
 
 =head2 What Preparations Are Needed to Use This Library?
 
@@ -172,25 +268,9 @@ system.
 
 =item * Perl 5 Configuration
 
-The user must decide on a Perl 5 configuration before using
-F<Test-Against-Commit> on a regular basis and then must refrain from changing
-that configuration over the course of the testing period.  Otherwise, the
-results may reflect changes in that configuration rather than changes in Perl
-5 core distribution code or changes in the targeted CPAN libraries.
-
-By "Perl 5 configuration" we mean the way one calls F<Configure> when building
-Perl 5 from source, <e.g.>:
-
-    sh ./Configure -des -Dusedevel
-
-or:
-
-    sh ./Configure -des -Dusedevel \
-        -Duseithreads \
-        -Doptimize="-O2 -pipe -fstack-protector -fno-strict-aliasing"
-
-For instance, you should not configure without threads in one run but with threads
-in the next.  Nor should you switch from regular to debugging builds between threads.
+The user must decide on a Perl 5 configuration for a given I<project> and then
+must refrain from changing configurations over the course of the project's
+existence.  See item under L<Terminology> above.
 
 =item * F<perl> Executable Installation Location
 
@@ -198,63 +278,44 @@ As noted above, this library leaves to the user the choice of a I<way to get
 the Perl source code> and the decision of I<how to configure> an individual
 F<perl> executable.  It also leaves to the user, with one caveat, the decision
 of I<where> to install that executable on disk.  That caveat is that the
-F<perl> installation should reside in a directory named F<testing> which in
-turn sits underneath a directory which we'll refer to as the I<application
+I<installation> should reside in a directory named F<testing> which in turn
+sits underneath a directory which we'll refer to as the I<application
 directory>.  The user will have to manually create the I<application
-directory> as well as the F<testing> directory underneath.
+directory>, the I<project directory>, the I<installation directory> and the
+I<testing directory> and then use the I<testing directory> as the value for
+the I<-Dprefix> option in the invocation of F<Configure>.
 
-Example:  Suppose you want all your Test-Against-Commit data to sit in the directory tree F</path/to/application>:
+In terms of the directory structure discussed above, that the user would
+create a directory structure something like this:
 
-    /path/to/application
+    $ cd ~/tmp
+    $ export TESTINGDIR=`pwd`/all-tad-projects/goto-fatal/23ae7f95ea/testing
+    $ echo $TESTINGDIR
+    .../tmp/all-tad-projects/goto-fatal/23ae7f95ea/testing
+    $ mkdir -p $TESTINGDIR
+    $ ls -l $TESTINGDIR
+    total 0
 
-You will need a subdirectory called F<testing> underneath that:
+    $ cd <git checkout of perl branch or decompressed release tarball>
 
-    /path/to/application
-    /path/to/application/testing
+The user would then invoke F<Configure> in a way something like this:
 
-You can create these directories with this command:
-
-    $ mkdir -p /path/to/application/testing
-
-Now suppose that for one project you want to use as your baseline a F<perl>
-built from a F<git> checkout at commit C<03f24b8a08>, and for a I<different>
-project you want to use as your baseline a F<perl> built from a maintenance
-release tarball of C<perl-5.40.2>.  That means you will I<ultimately> want a
-directory structure like this:
-
-    /path/to/application/
-    /path/to/application/testing/
-    /path/to/application/testing/03f24b8a08/
-    /path/to/application/testing/perl-5.40.2/
-
-Using the second of the C<Configure> examples above, for the first project you would configure with:
-
-    $ sh ./Configure -des -Dusedevel \
-        -Duseithreads \
-        -Doptimize="-O2 -pipe -fstack-protector -fno-strict-aliasing"
-        -Dprefix=/path/to/application/testing/03f24b8a08
-
-For the second project you would configure with:
-
-    $ sh ./Configure -des -Dusedevel \
-        -Duseithreads \
-        -Doptimize="-O2 -pipe -fstack-protector -fno-strict-aliasing"
-        -Dprefix=/path/to/application/testing/perl-5.40.2
-
-After running C<sh ./Configure>, you would then call in each project:
-
+    $ sh ./Configure -des -Dusedevel -Dprefix=$TESTINGDIR \
+        -Uversiononly -Dman1dir=none -Dman3dir=none
     $ make install
 
-You would end up with a directory structure the top of which would look like this:
+The user could then confirm installation with this:
 
-    /path/to/application/
-    /path/to/application/testing/
-    /path/to/application/testing/03f24b8a08/
-    /path/to/application/testing/03f24b8a08/bin
-    /path/to/application/testing/03f24b8a08/lib
-    /path/to/application/testing/perl-5.40.2/
-    /path/to/application/testing/perl-5.40.2/bin
-    /path/to/application/testing/perl-5.40.2/lib
+    $ $TESTINGDIR/bin/perl -v | head -2 | tail -1
+    This is perl 5, version 43, subversion 3 (v5.43.3 (v5.43.2-343-g5fdb3e501b)) built for x86_64-linux
+
+Note that at this point we have not yet created the I<results directory> ...
+
+    $ cd ~/tmp
+    $ ls -l ./all-tad-projects/goto-fatal/23ae7f95ea/results
+    ... No such file or directory
+
+... but no worries; Test-Against-Commit methods will handle that.
 
 =item * Selection of CPAN Libraries for Testing
 
@@ -269,7 +330,7 @@ a starting point where those modules are working proprerly and assess their
 installability at later points.>
 
 Hence, once you decide to track a certain CPAN library, you should continue to
-include it in your list of modules to be tracked for the balance of that year's 
+include it in your list of modules to be tracked for the balance of that year's
 development cycle.  You can, it is true, B<add> additional modules to your
 list part way through the development cycle.  You simply won't have the same
 baseline data that you have for the modules you selected at the very
@@ -325,7 +386,8 @@ directories thereunder:  F<testing/> and F<results/>.
 
     my $self = Test::Against::Commit->new( {
         application_dir => '/path/to/application',
-        commit => 'blead',
+        project => 'goto-fatal'
+        install => '23ae7f95ea',
     } );
 
 Takes a hash reference with the following elements:
@@ -334,12 +396,17 @@ Takes a hash reference with the following elements:
 
 =item * C<application_dir>
 
-String holding path to the directory which will serve as the top level for your application.
+String holding path to the directory which will serve as the top level for all
+projects using Test-Against-Commit technology.
 
-=item * C<commit>
+=item * C<project>
 
-String holding a name for the specific F<perl> executable against which you
-will be attempting to install CPAN modules.  If you are building F<perl> from
+String holding a short name for your current business project.
+
+=item * C<install>
+
+String holding a name for the specific I<installation> of F<perl> against which you
+will be attempting to install CPAN modules.  If you have built F<perl> from
 a F<git> checkout, this should be the F<git> commit ID (SHA), F<git> tag or
 F<git> branch name from which you are starting.  If you are building F<perl>
 from a release tarball, consider using a string such as C<perl-5.42.0> from
@@ -370,15 +437,24 @@ sub new {
         unless ref($args) eq 'HASH';
     croak "Hash ref must contain 'application_dir' element"
         unless $args->{application_dir};
-    croak "Hash ref must contain 'commit' element"
-        unless $args->{commit};
+    croak "Hash ref must contain 'install' element"
+        unless $args->{install};
     croak "Could not locate application directory $args->{application_dir}"
         unless (-d $args->{application_dir});
+    croak "Must supply name for project"
+        unless length($args->{project});
 
     my %verified = ();
+    my $project_dir = File::Spec->catdir($args->{application_dir}, $args->{project});
+    unless (-d $project_dir) { make_path($project_dir, { mode => 0755 }); }
+    $verified{project_dir} = $project_dir;
+    my $install_dir = File::Spec->catdir($project_dir, $args->{install});
+    unless (-d $install_dir) { make_path($install_dir, { mode => 0755 }); }
+    $verified{install_dir} = $install_dir;
+
     for my $dir (qw| testing results |) {
-        my $fdir = File::Spec->catdir($args->{application_dir}, $dir);
-        croak "Could not locate $dir directory $fdir" unless (-d $fdir);
+        my $fdir = File::Spec->catdir($install_dir, $dir);
+        unless (-d $fdir) { make_path($fdir, { mode => 0755 }); }
         my $k = $dir . '_dir';
         $verified{$k} = $fdir;
     }
@@ -394,13 +470,13 @@ sub new {
     return bless $data, $class;
 }
 
-=head2 C<get_application_dir() get_testing_dir() get_results_dir()>
+=head2 C<get_application_dir() get_project_dir() get_install_dir() get_testing_dir() get_results_dir()>
 
 =over 4
 
 =item * Purpose
 
-Three methods which simply return the path to relevant directories (along with
+Methods which simply return the path to relevant directories (along with
 I<short-hand versions> of their name):
 
 =over 4
@@ -408,8 +484,16 @@ I<short-hand versions> of their name):
 =item * application directory (I<application_dir>)
 
 The top-level directory for all code and data implemented by
-Test-Against-Commit.  It will typically hold 2 subdirectories: C<testing> and
-C<results>, described below.
+Test-Against-Commit.  It will typically hold 1 subdirectory for each business
+project using Test-Against-Commit technology.
+
+=item * project directory (I<project_dir>)
+
+TK
+
+=item * install directory (I<install_dir>)
+
+TK
 
 =item * testing directory (I<testing_dir>)
 
@@ -429,6 +513,10 @@ pipe-separated-value (PSV) formats.
 =item * Arguments
 
     $application_dir = $self->get_application_dir();
+
+    $project_dir = $self->get_project_dir();
+
+    $install_dir = $self->get_install_dir();
 
     $testing_dir = $self->get_testing_dir();
 
@@ -452,6 +540,16 @@ sub get_application_dir {
     return $self->{application_dir};
 }
 
+sub get_project_dir {
+    my $self = shift;
+    return $self->{project_dir};
+}
+
+sub get_install_dir {
+    my $self = shift;
+    return $self->{install_dir};
+}
+
 sub get_testing_dir {
     my $self = shift;
     return $self->{testing_dir};
@@ -462,7 +560,7 @@ sub get_results_dir {
     return $self->{results_dir};
 }
 
-=head2 C<get_commit()>
+=head2 C<get_install()>
 
 =over 4
 
@@ -474,7 +572,7 @@ build this F<perl> from a F<git> checkout, this should be one of the commit ID
 
 =item * Arguments
 
-    my $commit = $self->get_commit();
+    my $install = $self->get_install();
 
 =item * Return Value
 
@@ -482,7 +580,7 @@ String holding a F<git> commit ID, tag or branch name.
 
 =item * Comment
 
-Since C<commit> is one of the key-value pairs we are handing to C<new()>, this
+Since C<install> is one of the key-value pairs we are handing to C<new()>, this
 method essentially just gives us back what we already told it.  However, we
 will use it internally later to derive the path to the installed F<perl>
 against which we are trying to install modules.
@@ -493,9 +591,9 @@ TK:  What about when we're building from a tarball?
 
 =cut
 
-sub get_commit {
+sub get_install {
     my $self = shift;
-    return $self->{commit};
+    return $self->{install};
 }
 
 =head2 C<prepare_testing_directory>
@@ -527,15 +625,8 @@ TK
 sub prepare_testing_directory {
     my $self = shift;
 
-    my $commit_dir = File::Spec->catdir($self->{testing_dir}, $self->{commit});
-    if (-d $commit_dir) {
-        $self->{commit_dir} = $commit_dir;
-    }
-    else {
-        croak "Could not locate $commit_dir; have you built and installed a perl executable?";
-    }
     for my $dir (qw| bin lib|) {
-        my $subdir = File::Spec->catdir($self->{commit_dir}, $dir);
+        my $subdir = File::Spec->catdir($self->{testing_dir}, $dir);
         if (-d $subdir) {
             my $this = $dir . '_dir';
             $self->{$this} = $subdir;
@@ -544,46 +635,46 @@ sub prepare_testing_directory {
             croak "Could not locate $subdir; have you built and installed a perl executable?";
         }
     }
-    my $thisperl = File::Spec->catfile($self->get_bin_dir, 'perl');
-    my $libdir = $self->get_lib_dir();
-    my $invoke = "$thisperl -I$libdir";
+    my $lib_dir = $self->get_lib_dir();
+    my $this_perl = File::Spec->catfile($self->get_bin_dir, 'perl');
+    my $invoke = "$this_perl -I$lib_dir";
     my $rv = system(qq{$invoke -v | head -n 2 | tail -n 1})
-        and croak "Could not run perl executable at $thisperl";
+        and croak "Could not run perl executable at $this_perl";
+    $self->{this_perl} = $this_perl;
+
+    my $this_cpan = File::Spec->catfile($self->get_bin_dir, 'cpan');
+    $invoke = "$this_cpan -v";
+    $rv = system(qq{$invoke})
+        and croak "Could not run cpan executable at $this_cpan";
+    $self->{this_cpan} = $this_cpan;
 
     return $self;
 }
 
-=head2 C<get_commit_dir() <get_bin_dir() get_lib_dir()>
+=head2 C<get_bin_dir() get_lib_dir()>
 
 =over 4
 
 =item * Purpose
 
-Once C<prepare_testing_directory()> has been run, three additional methods
+Once C<prepare_testing_directory()> has been run, two additional methods
 become available to help the code determine where it is.
 
 =over 4
 
-=item * commit directory (I<commit_dir>)
-
-A directory underneath C<testing_dir> holding F<perl> installation.  This
-directory will start off life with two subdirectories, C<bin> and C<lib>.
-
 =item * bin directory (I<bin_dir>)
 
-The directory underneath an individual C<commit_dir> directory holding installed
+The directory underneath an individual C<install_dir> directory holding installed
 executables such as F<perl>, F<cpan> and F<cpanm>.
 
 =item * lib directory (I<lib_dir>)
 
-The directory underneath an individual C<commit_dir> directory holding the
+The directory underneath an individual C<install_dir> directory holding the
 libraries supporting the installed executables found in the C<bin_dir>.
 
 =back
 
 =item * Arguments
-
-    $commit_dir = $self->get_commit_dir();
 
     $bin_dir = $self->get_bin_dir();
 
@@ -601,16 +692,6 @@ throw exceptions.
 =back
 
 =cut
-
-sub get_commit_dir {
-    my $self = shift;
-    if (! defined $self->{commit_dir}) {
-        croak "commit directory has not yet been defined; have you installed perl?";
-    }
-    else {
-        return $self->{commit_dir};
-    }
-}
 
 sub get_bin_dir {
     my $self = shift;
@@ -631,7 +712,6 @@ sub get_lib_dir {
         return $self->{lib_dir};
     }
 }
-
 
 =head2 C<get_this_perl()>
 
@@ -681,35 +761,68 @@ sub get_this_perl {
     }
 }
 
+=head2 C<get_this_cpan()>
+
+=over 4
+
+=item * Purpose
+
+Identify the location of the F<cpan> executable file.
+
+=item * Arguments
+
+    $this_cpan = $self->get_this_cpan()
+
+=item * Return Value
+
+String holding the path to the F<cpan> executable being tested.
+
+=item * Comment
+
+Will throw an exception if such a F<cpan> executable has not yet been installed.  We will use F<cpan> to subsequently install F<App::cpanminus>.
+
+=back
+
+=cut
+
+sub get_this_cpan {
+    my $self = shift;
+    if ($self->{this_cpan}) {
+        return $self->{this_cpan};
+    }
+    else {
+        local $@;
+        my $this_cpan;
+        eval {
+            $this_cpan = File::Spec->catfile($self->get_bin_dir, 'cpan');
+        };
+        if ($@) {
+            croak $@;
+        }
+        elsif (-e $this_cpan) {
+            $self->{this_cpan} = $this_cpan;
+            return $self->{this_cpan};
+        }
+        else {
+            croak "No executable cpan found at: $this_cpan";
+        }
+    }
+}
+
 =head2 C<fetch_cpanm() get_this_cpanm() get_cpanm_dir()>
 
 =over 4
 
 =item * Purpose
 
-Determine whether F<cpanm> has been installed.  If it has not, fetch the
-fatpacked F<cpanm> executable and install it against the newly installed
-F<perl>.
+Determine whether F<cpanm> has been installed.  If it has not, install
+F<App::cpanminus> and the F<cpanm> executable against the installed F<perl>.
 
 =item * Arguments
 
-    my $rv = $self->fetch_cpanm( { verbose => 1 } );
+    my $rv = $self->fetch_cpanm();
 
-Hash reference with these elements:
-
-=over 4
-
-=item * C<uri>
-
-String holding URI from which F<cpanm> will be downloaded.  Optional; defaults
-to L<https://fastapi.metacpan.org/source/MIYAGAWA/App-cpanminus-1.7048/bin/cpanm>.
-
-=item * C<verbose>
-
-Extra information provided on STDOUT.  Optional; defaults to being off;
-provide a Perl-true value to turn it on.  Scope is limited to this method.
-
-=back
+None.  All information is already inside the object.  No C<verbose> output.
 
 =item * Return Value
 
@@ -719,7 +832,7 @@ Returns the Test::Against::Commit object, which now holds additional data.
 
 The F<cpanm> executable's location can subsequently be accessed by calling
 C<$self->get_this_cpanm()>.  The method also guarantees the existence of a
-F<.cpanm> directory underneath the commit directory, I<i.e.,> side-by-side
+F<.cpanm> directory underneath the install directory, I<i.e.,> side-by-side
 with C<bin> and C<lib>.  This directory can subsequently be accessed by
 calling C<$self->get_cpanm_dir()>.
 
@@ -728,33 +841,21 @@ calling C<$self->get_cpanm_dir()>.
 =cut
 
 sub fetch_cpanm {
-    my ($self, $args) = @_;
-    croak "fetch_cpanm: Must supply hash ref as argument"
-        unless ( ( defined $args ) and ( ref($args) eq 'HASH' ) );
-    my $verbose = delete $args->{verbose} || '';
-    my $uri = (exists $args->{uri} and length $args->{uri})
-        ? $args->{uri}
-        : 'https://fastapi.metacpan.org/source/MIYAGAWA/App-cpanminus-1.7048/bin/cpanm';
+    my $self = shift;
 
-    my $cpanm_dir = File::Spec->catdir($self->get_commit_dir(), '.cpanm');
+    my $cpanm_dir = File::Spec->catdir($self->get_testing_dir(), '.cpanm');
     unless (-d $cpanm_dir) { make_path($cpanm_dir, { mode => 0755 }); }
     croak "Could not locate $cpanm_dir" unless (-d $cpanm_dir);
     $self->{cpanm_dir} = $cpanm_dir;
 
     my $bin_dir = $self->get_bin_dir();
+    my $this_cpan = File::Spec->catfile($bin_dir, 'cpan');
+    $self->{this_cpan} = $this_cpan;
+    system(qq| $this_cpan -v 1>/dev/null |) and croak "Unable to call 'cpan -v'";
+    system(qq| $this_cpan App::cpanminus 1>/dev/null |)
+        and croak "Unable to use cpan to install App::cpanminus";
     my $this_cpanm = File::Spec->catfile($bin_dir, 'cpanm');
-    # If cpanm is already installed in bin_dir, we don't need to try to
-    # reinstall it.
-    if (-f $this_cpanm) {
-        say "'$this_cpanm' already installed" if $verbose;
-    }
-    else {
-       say "Fetching 'cpanm' from $uri" if $verbose;
-       my $ff = File::Fetch->new(uri => $uri)->fetch(to => $bin_dir)
-           or croak "Unable to fetch 'cpanm' from $uri";
-    }
-    my $cnt = chmod 0755, $this_cpanm;
-    croak "Unable to make '$this_cpanm' executable" unless $cnt;
+    system(qq| $this_cpanm -V 1>/dev/null |) and croak "Unable to call 'cpanm -V'";
     $self->{this_cpanm} = $this_cpanm;
 
     return $self;
@@ -780,7 +881,7 @@ sub get_cpanm_dir {
     }
 }
 
-=head2 C<run_cpanm()>
+=head2 C<process_modules()>
 
 =over 4
 
@@ -797,7 +898,7 @@ Two mutually exclusive interfaces:
 
 =item * Modules provided in a list
 
-    $gzipped_build_log = $self->run_cpanm( {
+    my $modules_ref = $self->process_modules( {
         module_list => [ 'DateTime', 'AnyEvent' ],
         title       => 'two-important-libraries',
         verbose     => 1,
@@ -805,7 +906,7 @@ Two mutually exclusive interfaces:
 
 =item * Modules listed in a file
 
-    $gzipped_build_log = $self->run_cpanm( {
+    my $modules_ref = $self->process_modules( {
         module_file => '/path/to/cpan-river-file.txt',
         title       => 'cpan-river-1000',
         verbose     => 1,
@@ -823,9 +924,16 @@ Mutually exclusive; you may use one or the other but not both.
 
 The value of C<module_list> must be an array reference holding a list of
 modules for which you wish to assess the impact of changes in the Perl 5 core
-distribution.  In either case the module names are spelled in
-C<Some::Module> format -- I<i.e.>, double-colons -- rather than in
-C<Some-Distribution> format (hyphens).
+distribution.
+
+The value of C<module_file> must be an absolute path to a file which holds a
+list of modules, one module per line.  Lines in such a file that start with a
+'C<#>' (hash-mark or sharp) be treated as a comment and no module listed on
+that line will be processed.
+
+In either case the module names are spelled in C<Some::Module> format --
+I<i.e.>, double-colons -- rather than in C<Some-Distribution> format
+(hyphens).
 
 =item * C<title>
 
@@ -837,53 +945,52 @@ files.  Required.
 Extra information provided on STDOUT.  Optional; defaults to being off;
 provide a Perl-true value to turn it on.  Scope is limited to this method.
 
+=item * C<dryrun>
+
+Optional; defaults to being off.  Program runs only as far as determining
+modules which the user will attempt to load, prints number of modules being
+attempted, then C<process_modules()> returns an undefined value (which would
+prevent subsequent methods from running correctly).
+
 =back
 
 =item * Return Value
 
-String holding the absolute path of a gzipped copy of the F<build.log>
-generated by the F<cpanm> run which this method conducts.  The basename
-of this file, using the arguments supplied, would be:
+Default: Single array reference holding a list of all modules that
+C<process_modules()> at least attempted to process.
 
-   cpan-river-1000.perl-5.43.6.01.build.log.gz
+With true-value for C<dryrun>: Undefined value.
 
 =item * Comment
 
-The method confirms the existence of several directories underneath the
+The method creates or confirms the existence of several directories underneath the
 I<results_dir> directory discussed above.  These are illustrated as follows:
 
-    /path/to/application/results/
-                        /results/perl-5.43.6/
-                        /results/perl-5.43.6/analysis/
-                        /results/perl-5.43.6/buildlogs/
-                        /results/perl-5.43.6/storage/
+    /path-to-application/                                 # <-- application directory
+    /path-to-application/goto-fatal/                      # <-- project directory
+    /path-to-application/goto-fatal/23ae7f95ea/           # <-- installation directory
+    /path-to-application/goto-fatal/23ae7f95ea/testing/   # <-- testing directory
+    /path-to-application/goto-fatal/23ae7f95ea/results/   # <-- results directory
+    /path-to-application/goto-fatal/23ae7f95ea/results/analysis/   # <-- analysis directory
+    /path-to-application/goto-fatal/23ae7f95ea/results/storage/   # <-- storage directory
 
 =back
 
 =cut
 
-sub run_cpanm {
+sub process_modules {
     my ($self, $args) = @_;
-    croak "run_cpanm: Must supply hash ref as argument"
+    croak "process_modules: Must supply hash ref as argument"
         unless ( ( defined $args ) and ( ref($args) eq 'HASH' ) );
+
     my $verbose = delete $args->{verbose} || '';
+    my $dryrun = delete $args->{dryrun} || '';
     my %eligible_args = map { $_ => 1 } ( qw|
         module_file module_list title
     | );
     for my $k (keys %$args) {
-        croak "run_cpanm: '$k' is not a valid element"
+        croak "process_modules: '$k' is not a valid element"
             unless $eligible_args{$k};
-    }
-    if (exists $args->{module_file} and exists $args->{module_list}) {
-        croak "run_cpanm: Supply either a file for 'module_file' or an array ref for 'module_list' but not both";
-    }
-    if ($args->{module_file}) {
-        croak "run_cpanm: Could not locate '$args->{module_file}'"
-            unless (-f $args->{module_file});
-    }
-    if ($args->{module_list}) {
-        croak "run_cpanm: Must supply array ref for 'module_list'"
-            unless ref($args->{module_list}) eq 'ARRAY';
     }
 
     unless (defined $args->{title} and length $args->{title}) {
@@ -891,25 +998,22 @@ sub run_cpanm {
     }
     $self->{title} = $args->{title};
 
-    # Need to rethink results directory setup, because we are now no longer
-    # limited to testing perl releases (which have unambiguous perl_versions
-    # associated with them).
-    unless (-d $self->{vresults_dir}) {
-        $self->setup_results_directories();
+    if (exists $args->{module_file} and exists $args->{module_list}) {
+        croak "process_modules: Supply either a file for 'module_file' or an array ref for 'module_list' but not both";
+    }
+    if (! (exists $args->{module_file} or exists $args->{module_list}) ) {
+        croak "process_modules: Must supply one of 'module_file' or 'module_list'";
+    }
+    if ($args->{module_file}) {
+        croak "process_modules: Could not locate '$args->{module_file}'"
+            unless (-f $args->{module_file});
+    }
+    if ($args->{module_list}) {
+        croak "process_modules: Must supply array ref for 'module_list'"
+            unless ref($args->{module_list}) eq 'ARRAY';
     }
 
-    my $cpanreporter_dir = File::Spec->catdir($self->get_commit_dir(), '.cpanreporter');
-    unless (-d $cpanreporter_dir) { make_path($cpanreporter_dir, { mode => 0755 }); }
-    croak "Could not locate $cpanreporter_dir" unless (-d $cpanreporter_dir);
-    $self->{cpanreporter_dir} = $cpanreporter_dir;
-
-    unless ($self->{cpanm_dir}) {
-        say "Defining previously undefined cpanm_dir" if $verbose;
-        my $cpanm_dir = File::Spec->catdir($self->get_commit_dir(), '.cpanm');
-        unless (-d $cpanm_dir) { make_path($cpanm_dir, { mode => 0755 }); }
-        croak "Could not locate $cpanm_dir" unless (-d $cpanm_dir);
-        $self->{cpanm_dir} = $cpanm_dir;
-    }
+    $self->setup_results_directories();
 
     say "cpanm_dir: ", $self->get_cpanm_dir() if $verbose;
     local $ENV{PERL_CPANM_HOME} = $self->get_cpanm_dir();
@@ -918,143 +1022,148 @@ sub run_cpanm {
     if ($args->{module_list}) {
         @modules = @{$args->{module_list}};
     }
-    elsif ($args->{module_file}) {
+    else {
         open my $IN, '<', $args->{module_file}
             or croak "Could not open $args->{module_file} for reading";
         while (my $m = <$IN>) {
             chomp $m;
+            next if $m =~ m/^#/; # Skip lines that are commented out
             push @modules, $m;
         }
         close $IN or croak "Could not close $args->{module_file} after reading";
     }
-    my $libdir = $self->get_lib_dir();
-    my @cmd = (
-        $self->get_this_perl,
-        "-I$libdir",
-        $self->get_this_cpanm,
-        @modules,
-    );
-    {
-        local $@;
-        my $rv;
-        eval { $rv = system(@cmd); };
-        say "<$@>" if $@;
+    if ($dryrun) {
+        say "Planning to process ", scalar(@modules), " modules";
         if ($verbose) {
-            say $self->get_this_cpanm(), " exited with ", $rv >> 8;
+            dd(\@modules);
         }
+        return;
     }
-    my $gzipped_build_log = $self->gzip_cpanm_build_log();
-    say "See gzipped build.log in $gzipped_build_log" if $verbose;
 
-    return $gzipped_build_log;
+    my $libdir = $self->get_lib_dir();
+
+    for my $m (@modules) {
+
+        # Formulate the system call
+        my @cmd = (
+            $self->get_this_perl(),
+            "-I$libdir",
+            $self->get_this_cpanm(),
+            $m,
+        );
+        # Execute the system call
+        {
+            local $@;
+            my $rv;
+            eval { $rv = system(@cmd); };
+            say "<$@>" if $@;
+            say $self->get_this_cpanm(), " exited with ", $rv >> 8
+                if ($verbose);
+        }
+        my $this_buildlog_link =
+            File::Spec->catfile($self->get_cpanm_dir(), 'build.log');
+        croak "$this_buildlog_link is not a symlink" unless (-l $this_buildlog_link);
+        my $this_buildlog = readlink($this_buildlog_link);
+        croak "$this_buildlog not found" unless (-f $this_buildlog);
+
+        $self->process_one_report($this_buildlog);
+    }
+
+    # End of loop.
+    # This should lead to 100s of .json files in the analysis_dir.
+
+    return [ @modules ];
 }
 
 sub setup_results_directories {
     my $self = shift;
-    my $vresults_dir = File::Spec->catdir($self->get_results_dir, $self->get_commit());
-    my $buildlogs_dir = File::Spec->catdir($vresults_dir, 'buildlogs');
-    my $analysis_dir = File::Spec->catdir($vresults_dir, 'analysis');
-    my $storage_dir = File::Spec->catdir($vresults_dir, 'storage');
-    my @created = make_path( $vresults_dir, $buildlogs_dir, $analysis_dir, $storage_dir,
+    my $results_dir = $self->get_results_dir();
+    my $analysis_dir = File::Spec->catdir($results_dir, 'analysis');
+    my $storage_dir = File::Spec->catdir($results_dir, 'storage');
+    my @created = make_path( $analysis_dir, $storage_dir,
         { mode => 0755 });
     for my $dir (@created) { croak "$dir not found" unless -d $dir; }
-    $self->{vresults_dir} = $vresults_dir;
-    $self->{buildlogs_dir} = $buildlogs_dir;
     $self->{analysis_dir} = $analysis_dir;
     $self->{storage_dir} = $storage_dir;
     return scalar(@created);
 }
 
-sub gzip_cpanm_build_log {
-    my ($self) = @_;
-    my $build_log_link = File::Spec->catfile($self->get_cpanm_dir, 'build.log');
-    croak "Did not find symlink for build.log at $build_log_link"
-        unless (-l $build_log_link);
-    my $real_log = readlink($build_log_link);
-
-    my $pattern = qr/^$self->{title}\.$self->{commit}\.build\.log\.gz$/;
-    $self->{gzlog_pattern} = $pattern;
-    opendir my $DIRH, $self->{buildlogs_dir} or croak "Unable to open buildlogs_dir for reading";
-    my @files_found = grep { -f $_ and $_ =~ m/$pattern/ } readdir $DIRH;
-    closedir $DIRH or croak "Unable to close buildlogs_dir after reading";
-
-    # In this new approach, we'll assume that we never do anything except
-    # exactly 1 run per monthly release.  Hence, there shouldn't be any files
-    # in this directory whatsoever.  We'll croak if there are such file.
-    # TODO: Now that we're in Test-Against-Commit, is that assumption still
-    # valid?
-    croak "There are already log files in '$self->{buildlogs_dir}'"if scalar(@files_found);
-
-    my $gzipped_build_log = join('.' => (
-        $self->{title},
-        $self->{commit},
-        'build',
-        'log',
-        'gz'
-    ) );
-    my $gzlog = File::Spec->catfile($self->{buildlogs_dir}, $gzipped_build_log);
-    system(qq| gzip -c $real_log > $gzlog |)
-        and croak "Unable to gzip $real_log to $gzlog";
-    $self->{gzlog} = $gzlog;
+sub process_one_report {
+    my ($self, $this_buildlog) = @_;
+    my $reporter = CPAN::cpanminus::reporter::RetainReports->new(
+      force => 1, # ignore mtime check on build.log
+      build_logfile => $this_buildlog,
+      build_dir => $self->get_cpanm_dir(),
+      'ignore-versions' => 1,
+    );
+    croak "Unable to create new reporter for $this_buildlog"
+        unless defined $reporter;
+    no warnings 'redefine';
+    local *CPAN::cpanminus::reporter::RetainReports::_check_cpantesters_config_data = sub { 1 };
+    $reporter->set_report_dir($self->get_analysis_dir());
+    $reporter->run;
+    return 1;
 }
 
-=head2 C<analyze_cpanm_build_logs()>
+=head2 C<get_analysis_dir() get_storage_dir()>
 
 =over 4
 
 =item * Purpose
 
-Parse the F<build.log> created by running C<run_cpanm()>, creating JSON files
-which log the results of attempting to install each module in the list or
-file.
+Once C<process_modules()> has been run, two additional methods become available to
+help code determine where output data are located.
+
+=over 4
+
+=item * analysis directory (I<analysis_dir>)
+
+The directory underneath the I<results directory> holding files representing
+the parsed content of the build log of the most recent run.  These files are
+in C<.json> format.
+
+=item * storage directory (I<storage_dir>)
+
+The directory underneath the I<results directory> holding final output results.
+
+=back
 
 =item * Arguments
 
-    $ranalysis_dir = $self->analyze_cpanm_build_logs( { verbose => 1 } );
-
-Hash reference which, at the present time, can only take one element:
-C<verbose>.  Optional.
+    $storage_dir = $self->get_storage_dir();
 
 =item * Return Value
 
-String holding absolute path to the directory holding F<.log.json> files for a
-particular run of C<run_cpanm()>.
+String holding a path to the named directory.
 
 =item * Comment
+
+These directories are only confirmed to exist once internal method
+C<setup_results_directories()> has been executed.  (That method is called
+within C<process_modules()>.) Otherwise, these methods will throw exceptions.
 
 =back
 
 =cut
 
-sub analyze_cpanm_build_logs {
-    my ($self, $args) = @_;
-    croak "analyze_cpanm_build_logs: Must supply hash ref as argument"
-        unless ( ( defined $args ) and ( ref($args) eq 'HASH' ) );
-    my $verbose = delete $args->{verbose} || '';
+sub get_analysis_dir {
+    my $self = shift;
+    if (! defined $self->{analysis_dir}) {
+        croak "analysis directory has not yet been defined";
+    }
+    else {
+        return $self->{analysis_dir};
+    }
+}
 
-    my $gzlog = $self->{gzlog};
-    unless (-d $self->{analysis_dir}) { make_path($self->{analysis_dir}, { mode => 0755 }); }
-    croak "Could not locate $self->{analysis_dir}" unless (-d $self->{analysis_dir});
-
-    my ($fh, $working_log) = tempfile();
-    system(qq|gunzip -c $gzlog > $working_log|)
-        and croak "Unable to gunzip $gzlog to $working_log";
-
-    my $reporter = CPAN::cpanminus::reporter::RetainReports->new(
-      force => 1, # ignore mtime check on build.log
-      build_logfile => $working_log,
-      build_dir => $self->get_cpanm_dir,
-      'ignore-versions' => 1,
-    );
-    croak "Unable to create new reporter for $working_log"
-        unless defined $reporter;
-    no warnings 'redefine';
-    local *CPAN::cpanminus::reporter::RetainReports::_check_cpantesters_config_data = sub { 1 };
-    $reporter->set_report_dir($self->{analysis_dir});
-    $reporter->run;
-    say "See results in $self->{analysis_dir}" if $verbose;
-
-    return $self->{analysis_dir};
+sub get_storage_dir {
+    my $self = shift;
+    if (! defined $self->{storage_dir}) {
+        croak "storage directory has not yet been defined";
+    }
+    else {
+        return $self->{storage_dir};
+    }
 }
 
 =head2 C<analyze_json_logs()>
@@ -1103,6 +1212,12 @@ files for a given run.
 
 sub analyze_json_logs {
     my ($self, $args) = @_;
+    # TODO: If we don't have an $args supplied at all, that's okay provided we
+    # can ensure that we will have a default sep_char set
+    # Test this method with hash ref but lacking 'verbose'
+    # Test this method with hash ref but lacking 'sep_char'
+    # Test this method with hash ref but both KVPs
+    # Test this method with no arg
     croak "analyze_json_logs: Must supply hash ref as argument"
         unless ( ( defined $args ) and ( ref($args) eq 'HASH' ) );
     my $verbose     = delete $args->{verbose}   || '';
@@ -1112,11 +1227,13 @@ sub analyze_json_logs {
 
     # Locate our log.json files
     my $json_log_files = $self->_list_log_files();
+    # Test without verbose
     dd($json_log_files) if $verbose;
 
     # As a precaution, we archive those log.json files.
     $self->_archive_log_files( {
         json_log_files  => $json_log_files,
+        # $verbose: ensure that it is initialized, if only to ''
         verbose         => $verbose,
     } );
 
@@ -1124,7 +1241,7 @@ sub analyze_json_logs {
     # write a pipe- (or comma-) separated-values file summarizing the run.
     my %data = ();
     for my $log (@{$json_log_files}) {
-        my $flog = File::Spec->catfile($self->{vresults_dir}, $log);
+        my $flog = File::Spec->catfile($self->{results_dir}, $log);
         my %this = ();
         my $f = Path::Tiny::path($flog);
         my $decoded;
@@ -1142,8 +1259,10 @@ sub analyze_json_logs {
 
     # Now we create a CSV file (really ... a PSV)
     my $fcdvfile = $self->_create_csv_file( {
+        # $verbose: ensure that it is initialized, if only to ''
         sep_char        => $sep_char,
         data            => \%data,
+        # $verbose: ensure that it is initialized, if only to ''
         verbose         => $verbose,
     } );
 
@@ -1152,11 +1271,11 @@ sub analyze_json_logs {
 
 sub _list_log_files {
     my $self = shift;
-    my $vranalysis_dir = $self->{analysis_dir};
-    opendir my $DIRH, $vranalysis_dir or croak "Unable to open $vranalysis_dir for reading";
+    my $analysis_dir = $self->{analysis_dir};
+    opendir my $DIRH, $analysis_dir or croak "Unable to open $analysis_dir for reading";
     my @json_log_files = sort map { File::Spec->catfile('analysis', $_) }
         grep { m/\.log\.json$/ } readdir $DIRH;
-    closedir $DIRH or croak "Unable to close $vranalysis_dir after reading";
+    closedir $DIRH or croak "Unable to close $analysis_dir after reading";
     return \@json_log_files;
 }
 
@@ -1165,22 +1284,25 @@ sub _archive_log_files {
     # TODO: Is this file name self-documenting enough?  Need datestamp?
     my $output = join('.' => (
         $self->{title},
-        $self->{commit},
+        $self->{install},
         'log',
         'json',
         'tar',
         'gz'
     ) );
     my $foutput = File::Spec->catfile($self->{storage_dir}, $output);
+    # Test this without $args->{verbose}
     say "Output will be: $foutput" if $args->{verbose};
-    my $versioned_results_dir = $self->{vresults_dir};
+    my $versioned_results_dir = $self->{results_dir};
     my $previous_cwd = cwd();
-    chdir $self->{vresults_dir} or croak "Unable to chdir to $self->{vresults_dir}";
-    say "Now in $self->{vresults_dir}" if $args->{verbose};
+    chdir $self->{results_dir} or croak "Unable to chdir to $self->{results_dir}";
+    # Test this without $args->{verbose}
+    say "Now in $self->{results_dir}" if $args->{verbose};
     my $tar = Archive::Tar->new;
     $tar->add_files(@{$args->{json_log_files}});
     $tar->write($foutput, COMPRESS_GZIP);
     croak "$foutput not created" unless (-f $foutput);
+    # Test this without $args->{verbose}
     say "Created archive $foutput" if $args->{verbose};
     chdir $previous_cwd or croak "Unable to change back to $previous_cwd";
     return 1;
@@ -1191,14 +1313,15 @@ sub _create_csv_file {
 
     my $cdvfile = join('.' => (
         $self->{title},
-        $self->{commit},
+        $self->{install},
         (($args->{sep_char} eq ',') ? 'csv' : 'psv'),
     ) );
     my $fcdvfile = File::Spec->catfile($self->{storage_dir}, $cdvfile);
+    # Test this without $args->{verbose}
     say "Output will be: $fcdvfile" if $args->{verbose};
 
     my @fields = ( qw| author distname grade | );
-    my $commit = $self->{commit};
+    my $install = $self->{install};
     my $columns = [
         'dist',
         @fields,
@@ -1220,6 +1343,7 @@ sub _create_csv_file {
     }
     close $OUT or croak "Unable to close $fcdvfile after writing";
     croak "$fcdvfile not created" unless (-f $fcdvfile);
+    # Test this without $args->{verbose}
     say "Examine ",
         (($args->{sep_char} eq ',') ? 'comma' : 'pipe'),
         "-separated values in $fcdvfile"
