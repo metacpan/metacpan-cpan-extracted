@@ -76,6 +76,12 @@ METHODS
 
             Default value is 'Plack::App::Register; Version: __VERSION__'.
 
+    *       "logo_image_url"
+
+            Logo image URL.
+
+            Default value is undef.
+
     *       "message_cb"
 
             Callback to process message from application. Arguments for
@@ -319,10 +325,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2023-2024 Michal Josef Špaček
+    © 2023-2025 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.04
+    0.05
 

@@ -1,5 +1,5 @@
 package TVision;
-our $VERSION="0.28";
+our $VERSION="0.29";
 
 use strict;
 
@@ -72,6 +72,9 @@ TKey is array ref of 2 integers or just integer.
     TStaticText(TRect r, char *title)
     THistory( TRect bounds, TInputLine *aLink, int aHistoryId )
     TSItem( TStringView aValue, TSItem *aNext )
+    TNode(TStringView aText)
+    TNode1(TStringView aText, TNode* aChildren, TNode* aNext, int initialState=1)
+    TOutline(TRect r, TScrollBar* aHScrollBar, TScrollBar* aVScrollBar, TNode* aRoot)
 
 =head2 Mapping of following methods are implemented:
 
@@ -214,7 +217,42 @@ TKey is array ref of 2 integers or just integer.
     TInputLine:
         void setData(char *data)
     TButton:
-        void setTitle(char *title) delete self->title; self->title = new char[strlen(title)+1]; strcpy((char*)self->title,title); self->draw();
+        void setTitle(char *title)
+    TOutlineViewer:
+        void update()
+        void expandAll(TNode* node)
+        char* createGraph(int level, int lines, int flags, int levWidth, int endWidth, char* chars)
+    TOutline:
+        void adjust(TNode* node, int expand)
+        TNode* getRoot()
+        int getNumChildren(TNode* node)
+        TNode* getNext(TNode *node)
+        TNode* getChild(TNode* node, int i)
+        int isExpanded(TNode* node)
+        int hasChildren(TNode* node)
+EOS
+}}}
+{{{
+    # getters/setters:
+    use strict;
+    my $pkg='';
+    my $first=1;
+    join '', (map {
+        if (/^\s*#/) {()} # ignore comment
+        elsif (/^\s*$/) {()} # ignore empty line
+        elsif (/^\s*(\S+):/) {$pkg=$1; $first=1;() }
+	else {
+	    my ($type, $var) = /^\s*(.+)\s+(\S+)/;
+	    if ($var=~s/^\*//) {$type.='*'}
+	    my $line0 = $first ? "MODULE=TVision::$pkg PACKAGE=TVision::$pkg" : "";
+	    $first=0;
+	<<"EOS"
+$line0
+$type get_$var($pkg *self)
+    CODE:
+        RETVAL = self->$var;
+    OUTPUT:
+        RETVAL
 
 =head2 Mapping of following public class members are implemented:
 
@@ -289,6 +327,15 @@ TKey is array ref of 2 integers or just integer.
 	int disabled
 	TKey keyCode
 	int helpCtx
+    TNode:
+        TNode* next
+        const char* text
+        TNode* childList
+        int expanded
+    TOutlineViewer:
+        int foc
+    TOutline:
+        TNode* root
 
 Getters and setters are named get_xxxx and set_xxxx respectively.
 
@@ -352,6 +399,14 @@ my %widget_names_cnt;
 sub tnew($@) {
     my $class = shift;
     my $sub = \&{"TVision::$class\::new"};
+    my $w = $sub->(@_);
+    $w->[1] = lc($class) . ++$widget_names_cnt{$class};
+    $TVision::names{$w->[1]} = $w;
+    return $w;
+}
+sub tnew1($@) {
+    my $class = shift;
+    my $sub = \&{"TVision::$class\::new1"};
     my $w = $sub->(@_);
     $w->[1] = lc($class) . ++$widget_names_cnt{$class};
     $TVision::names{$w->[1]} = $w;
@@ -1262,12 +1317,61 @@ our @ISA = qw(TVision::TMenuItem);
 #    TSubMenu( TStringView nm, TKey key, ushort helpCtx = hcNoContext ) noexcept;
 #};
 
-
 package TVision::TMonoSelector;
 package TVision::TMultiCheckBoxes;
 package TVision::TObject;
 package TVision::TOutline;
+our @ISA = qw(TVision::TOutlineViewer);
+#[ ]class TOutline : public TOutlineViewer {
+#[ ]public:
+#[ ]    TOutline(const TRect& bounds, TScrollBar* aHScrollBar, TScrollBar* aVScrollBar, TNode* aRoot) noexcept;
+#[ ]    ~TOutline();
+#[ ]    virtual void adjust(TNode* node, Boolean expand);
+#[ ]    virtual TNode* getRoot();
+#[ ]    virtual int getNumChildren(TNode* node);
+#[ ]    virtual TNode* getNext(TNode *node);
+#[ ]    virtual TNode* getChild(TNode* node, int i);
+#[ ]    virtual const char* getText(TNode* node);
+#[ ]    virtual Boolean isExpanded(TNode* node);
+#[ ]    virtual Boolean hasChildren(TNode* node);
+#[ ]    TNode* root;
+#[ ]    static TStreamable* build();
+#[ ]    static const char* const _NEAR name;
+#[ ]};
 package TVision::TOutlineViewer;
+our @ISA = qw(TVision::TScroller);
+#[ ]class TOutlineViewer : public TScroller {
+#[ ]public:
+#[ ]    TOutlineViewer(const TRect& bounds, TScrollBar* aHScrollBar, TScrollBar* aVScrollBar) noexcept;
+#[ ]    TOutlineViewer(StreamableInit s) noexcept;
+#[ ]    virtual void adjust(TNode* node, Boolean expand)=0;
+#[ ]    virtual void draw();
+#[ ]    virtual void focused(int i);
+#[ ]    virtual TNode* getNext(TNode* node)=0;
+#[ ]    virtual TNode* getChild(TNode* node, int i)=0;
+#[ ]    virtual char* getGraph(int level, long lines, ushort flags);
+#[ ]    virtual int getNumChildren(TNode* node)=0;
+#[ ]    virtual TNode* getNode(int i);
+#[ ]    virtual TPalette& getPalette() const;
+#[ ]    virtual TNode* getRoot()=0;
+#[ ]    virtual const char* getText(TNode* node)=0;
+#[ ]    virtual void handleEvent(TEvent& event);
+#[ ]    virtual Boolean hasChildren(TNode* node)=0;
+#[ ]    virtual Boolean isExpanded(TNode* node)=0;
+#[ ]    virtual Boolean isSelected(int i);
+#[ ]    virtual void selected(int i);
+#[ ]    virtual void setState(ushort aState, Boolean enable);
+#[ ]    void update() noexcept;
+#[ ]    void expandAll(TNode* node);
+#[ ]    TNode* firstThat(TOutlineVisitor test, void* arg) noexcept;
+#[ ]    TNode* firstThat(TOutlineVisitorNoArg test) noexcept;
+#[ ]    TNode* forEach(TOutlineVisitor action, void* arg) noexcept;
+#[ ]    TNode* forEach(TOutlineVisitorNoArg action) noexcept;
+#[ ]    char* createGraph(int level, long lines, ushort flags, int levWidth, int endWidth, const char* chars) noexcept;
+#[ ]    int foc;
+#[ ]    static TStreamable *build();
+#[ ]    static const char * const _NEAR name;
+#[ ]};
 package TVision::TPReadObjects;
 package TVision::TPWrittenObjects;
 package TVision::TPXPictureValidator;
@@ -1896,7 +2000,7 @@ BEGIN {
 
 }
 
-our @EXPORT = ('tnew', 'TRect');
+our @EXPORT = ('tnew', 'tnew1',  'TRect');
 our %EXPORT_TAGS=(
     keys     => [ keys %$keys ],
     commands => [ keys %$commands ],

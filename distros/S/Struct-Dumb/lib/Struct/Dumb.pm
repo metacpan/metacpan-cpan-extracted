@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2012-2024 -- leonerd@leonerd.org.uk
 
-package Struct::Dumb 0.15;
+package Struct::Dumb 0.16;
 
 use v5.14;
 use warnings;
@@ -20,8 +20,14 @@ use constant HAVE_FEATURE_CLASS => defined eval { require feature; $feature::fea
 
 BEGIN {
    if( HAVE_FEATURE_CLASS ) {
-      my $ok = eval <<'EOF';
-         { use experimental 'class'; class Struct::Dumb::Struct { }; }
+      # Before Perl 5.43.4, a class with no fields in it would cause thread
+      # cloning to segfault.
+      #   https://github.com/Perl/perl5/issues/23771
+      my $dummy_field = "";
+      $dummy_field = 'field $dummy;' if $^V lt v5.43.4;
+
+      my $ok = eval <<"EOF";
+         { use experimental 'class'; class Struct::Dumb::Struct {$dummy_field}; }
          1
 EOF
 

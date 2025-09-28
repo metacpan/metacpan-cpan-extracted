@@ -1,5 +1,12 @@
 Revision history for perl distribution Archive-SCS
 
+1.09 - 2025-09-28
+
+  - Avoid conflicts between builtin compat modules (RT158702, GH#1)
+    (Karen Etheridge)
+
+  - Increase required Object::Pad version to 0.818 (RT159823)
+
 1.08 - 2025-09-24
 
   - Silence "unknown kind" warnings for game version 1.55

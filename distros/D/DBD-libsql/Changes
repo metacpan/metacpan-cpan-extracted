@@ -1,0 +1,11 @@
+Revision history for Perl extension DBD-libsql
+
+0.02 2025-09-28T09:41:32Z
+
+    - fix typo: s/schema/scheme/g
+    - Turso tokens can now be passed as the 3rd argument to the connect method.
+
+0.01 2025-09-28T08:48:54Z
+
+    - original version
+

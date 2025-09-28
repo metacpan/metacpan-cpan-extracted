@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Carp;
-use List::Util qw(any);	# Required for memberof validation
+use List::Util 1.33 qw(any);	# Required for memberof validation
 use Exporter qw(import);	# Required for @EXPORT_OK
 use Params::Get 0.13;
 use Scalar::Util;
@@ -18,11 +18,11 @@ Params::Validate::Strict - Validates a set of parameters against a schema
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =cut
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 =head1 SYNOPSIS
 
@@ -90,7 +90,7 @@ The schema can define the following rules for each parameter:
 =item * C<type>
 
 The data type of the parameter.
-Valid types are C<string>, C<integer>, C<number>, C<hashref>, C<arrayref>, C<object> and C<coderef>.
+Valid types are C<string>, C<integer>, C<number>, C<boolean>, C<hashref>, C<arrayref>, C<object> and C<coderef>.
 
 =item * C<can>
 
@@ -153,7 +153,7 @@ Extends the validation to individual elements of arrays.
   tags => {
     type => 'arrayref',
     element_type => 'number',
-    min => 1,	# this the length of array ref, not the min value for each of the numbers, for that, add a C<schema> rule
+    min => 1,	# this is the length of the array, not the min value for each of the numbers. For that, add a C<schema> rule
     max => 5
   }
 
@@ -290,7 +290,7 @@ sub validate_strict
 		}
 
 		# If rules are a simple type string
-		if((ref($rules) eq '') || !defined(ref($rules))) {
+		if(ref($rules) eq '') {
 			$rules = { type => $rules };
 		}
 
@@ -338,7 +338,7 @@ sub validate_strict
 						}
 					} elsif($type eq 'integer') {
 						if(!defined($value)) {
-							next;	# Skip if string is undefined
+							next;	# Skip if number is undefined
 						}
 						if($value !~ /^\s*[+\-]?\d+\s*$/) {
 							if($rules->{'error_message'}) {
@@ -369,7 +369,7 @@ sub validate_strict
 							if($rules->{'error_message'}) {
 								_error($logger, $rules->{'error_message'});
 							} else {
-								_error($logger, "validate_strict: Parameter '$key' must be an arrayref");
+								_error($logger, "validate_strict: Parameter '$key' must be an arrayref, not " . ref($value));
 							}
 						}
 					} elsif($type eq 'hashref') {
@@ -383,6 +383,23 @@ sub validate_strict
 								_error($logger, "validate_strict: Parameter '$key' must be an hashref");
 							}
 						}
+					} elsif($type eq 'boolean') {
+						if(!defined($value)) {
+							next;	# Skip if bool is undefined
+						}
+						if(($value eq 'true') || ($value eq 'on')) {
+							$value = 1;
+						} elsif(($value eq 'false') || ($value eq 'off')) {
+							$value = 0;
+						}
+						if(($value != 1) && ($value != 0)) {
+							if($rules->{'error_message'}) {
+								_error($logger, $rules->{'error_message'});
+							} else {
+								_error($logger, "validate_strict: Parameter '$key' ($value) must be a boolean");
+							}
+						}
+						$value = int($value);	# Coerce to integer
 					} elsif($type eq 'coderef') {
 						if(ref($value) ne 'CODE') {
 							if($rules->{'error_message'}) {
@@ -403,6 +420,9 @@ sub validate_strict
 						_error($logger, "validate_strict: Unknown type '$type'");
 					}
 				} elsif($rule_name eq 'min') {
+					if(!defined($rules->{'type'})) {
+						_error($logger, "validate_strict: Don't know type of '$key' to determine its minimum value $rule_value");
+					}
 					if($rules->{'type'} eq 'string') {
 						if(!defined($value)) {
 							next;	# Skip if string is undefined
@@ -422,7 +442,7 @@ sub validate_strict
 							if($rules->{'error_message'}) {
 								_error($logger, $rules->{'error_message'});
 							} else {
-								_error($logger, "validate_strict: Parameter '$key' must be an arrayref");
+								_error($logger, "validate_strict: Parameter '$key' must be an arrayref, not " . ref($value));
 							}
 						}
 						if(scalar(@{$value}) < $rule_value) {
@@ -458,6 +478,9 @@ sub validate_strict
 						_error($logger, "validate_strict: Parameter '$key' has meaningless min value $rule_value");
 					}
 				} elsif($rule_name eq 'max') {
+					if(!defined($rules->{'type'})) {
+						_error($logger, "validate_strict: Don't know type of '$key' to determine its maximum value $rule_value");
+					}
 					if($rules->{'type'} eq 'string') {
 						if(!defined($value)) {
 							next;	# Skip if string is undefined
@@ -466,7 +489,7 @@ sub validate_strict
 							if($rules->{'error_message'}) {
 								_error($logger, $rules->{'error_message'});
 							} else {
-								_error($logger, "validate_strict: String parameter '$key' too long, must be no longer than $rule_value");
+								_error($logger, "validate_strict: String parameter '$key' too long, (" . length($value) . " characters), must be no longer than $rule_value");
 							}
 						}
 					} elsif($rules->{'type'} eq 'arrayref') {
@@ -477,7 +500,7 @@ sub validate_strict
 							if($rules->{'error_message'}) {
 								_error($logger, $rules->{'error_message'});
 							} else {
-								_error($logger, "validate_strict: Parameter '$key' must be an arrayref");
+								_error($logger, "validate_strict: Parameter '$key' must be an arrayref, not " . ref($value));
 							}
 						}
 						if(scalar(@{$value}) > $rule_value) {
@@ -506,7 +529,7 @@ sub validate_strict
 							if($rules->{'error_message'}) {
 								_error($logger, $rules->{'error_message'});
 							} else {
-								_error($logger, "validate_strict: Parameter '$key' must be no more than $rule_value");
+								_error($logger, "validate_strict: Parameter '$key' ($value) must be no more than $rule_value");
 							}
 						}
 					} else {
@@ -630,12 +653,20 @@ sub validate_strict
 										_error($logger, "$key can only contain strings");
 									}
 								}
-							} elsif($rule_value eq 'number') {
+							} elsif($rule_value eq 'integer') {
 								if(ref($member) || ($member =~ /\D/)) {
 									if($rules->{'error_message'}) {
 										_error($logger, $rules->{'error_message'});
 									} else {
-										_error($logger, "$key can only contain numbers");
+										_error($logger, "$key can only contain numbers (found $member)");
+									}
+								}
+							} elsif($rule_value eq 'number') {
+								if(ref($member) || ($member !~ /^[-+]?(\d*\.\d+|\d+\.?\d*)$/)) {
+									if($rules->{'error_message'}) {
+										_error($logger, $rules->{'error_message'});
+									} else {
+										_error($logger, "$key can only contain numbers (found $member)");
 									}
 								}
 							}
@@ -656,8 +687,8 @@ sub validate_strict
 							foreach my $member(@{$value}) {
 								validate_strict({ input => { $key => $member }, schema => { $key => $rule_value } });
 							}
-						} else {
-							_error($logger, "validate_strict: Parameter '$value' must be an arrayref");
+						} elsif(defined($value)) {	# Allow undef for optional values
+							_error($logger, "validate_strict: nested schema: Parameter '$value' must be an arrayref");
 						}
 					} elsif($rules->{'type'} eq 'hashref') {
 						if(ref($value) eq 'HASH') {
@@ -665,7 +696,7 @@ sub validate_strict
 								validate_strict({ input => $value, schema => $rule_value });
 							}
 						} else {
-							_error($logger, "validate_strict: Parameter '$value' must be an hashref");
+							_error($logger, "validate_strict: nested schema: Parameter '$value' must be an hashref");
 						}
 					} else {
 						_error($logger, "validate_strict: Parameter '$key': 'schema' only supports arrayref and hashref, not $rules->{type}");
@@ -675,7 +706,7 @@ sub validate_strict
 				}
 			}
 		} elsif(ref($rules)) {
-			_error($logger, 'rules must be hash reference or string');
+			_error($logger, 'rules must be a hash reference or string');
 		}
 
 		$validated_args{$key} = $value;
@@ -690,10 +721,11 @@ sub _error
 	my $logger = shift;
 	my $message = join('', @_);
 
+	my @call_details = caller(0);
 	if($logger) {
-		$logger->error(__PACKAGE__, ": $message");
+		$logger->error(__PACKAGE__, ' line ', $call_details[2], ": $message");
 	} else {
-		croak(__PACKAGE__ . ": $message");
+		croak(__PACKAGE__, ' line ', $call_details[2], ": $message");
 	}
 }
 

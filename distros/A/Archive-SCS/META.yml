@@ -27,50 +27,50 @@ no_index:
 provides:
   Archive::SCS:
     file: lib/Archive/SCS.pm
-    version: '1.08'
+    version: '1.09'
   Archive::SCS::CityHash:
     file: lib/Archive/SCS/CityHash.pm
-    version: '1.08'
+    version: '1.09'
   Archive::SCS::DirIndex:
     file: lib/Archive/SCS/DirIndex.pm
-    version: '1.08'
+    version: '1.09'
   Archive::SCS::Directory:
     file: lib/Archive/SCS/Directory.pm
-    version: '1.08'
+    version: '1.09'
   Archive::SCS::GameDir:
     file: lib/Archive/SCS/GameDir.pm
-    version: '1.08'
+    version: '1.09'
   Archive::SCS::HashFS:
     file: lib/Archive/SCS/HashFS.pm
-    version: '1.08'
+    version: '1.09'
   Archive::SCS::HashFS2:
     file: lib/Archive/SCS/HashFS2.pm
-    version: '1.08'
+    version: '1.09'
   Archive::SCS::InMemory:
     file: lib/Archive/SCS/InMemory.pm
-    version: '1.08'
+    version: '1.09'
   Archive::SCS::Mountable:
     file: lib/Archive/SCS/Mountable.pm
-    version: '1.08'
+    version: '1.09'
   Archive::SCS::TObj:
     file: lib/Archive/SCS/TObj.pm
-    version: '1.08'
+    version: '1.09'
   Archive::SCS::Zip:
     file: lib/Archive/SCS/Zip.pm
-    version: '1.08'
+    version: '1.09'
 requires:
   Compress::Raw::Zlib: '2.070'
   IO::Compress::Zip: '0'
   IO::Uncompress::Unzip: '0'
   List::Util: '1.45'
-  Object::Pad: '0.73'
+  Object::Pad: '0.818'
   Path::Tiny: '0.125'
-  builtin::Backport: '0'
+  builtin::compat: '0.003003'
   perl: v5.34.0
   stable: '0.031'
 resources:
   bugtracker: https://forum.scssoft.com/viewtopic.php?t=330746
   homepage: https://forum.scssoft.com/viewtopic.php?t=330746
   repository: git://github.com/nautofon/Archive-SCS.git
-version: '1.08'
+version: '1.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

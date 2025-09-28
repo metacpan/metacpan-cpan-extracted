@@ -1,5 +1,10 @@
 Revision history for Struct-Dumb
 
+0.16    2025-09-27
+        [BUGFIXES]
+         * Don't segfault at thread cloning time (RT170460)
+           (workaround for https://github.com/Perl/perl5/issues/23771)
+
 0.15    2025-08-19
         [CHANGES]
          * Added `dumper_info` helper function

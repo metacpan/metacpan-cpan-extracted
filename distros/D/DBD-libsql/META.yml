@@ -1,0 +1,54 @@
+---
+abstract: 'DBI driver for libsql databases'
+author:
+  - 'ytnobody <ytnobody@gmail.com>'
+build_requires:
+  DBD::SQLite: '1.66'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.25, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBD-libsql
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  DBD::libsql:
+    file: lib/DBD/libsql.pm
+    version: '0.02'
+  DBD::libsql::Hrana:
+    file: lib/DBD/libsql/Hrana.pm
+    version: '0.02'
+  DBD::libsql::db:
+    file: lib/DBD/libsql.pm
+  DBD::libsql::dr:
+    file: lib/DBD/libsql.pm
+  DBD::libsql::st:
+    file: lib/DBD/libsql.pm
+requires:
+  DBI: '1.631'
+  HTTP::Request: '6.00'
+  IO::Socket::SSL: '2.00'
+  JSON: '4.00'
+  LWP::UserAgent: '6.00'
+  Protocol::WebSocket: '0.20'
+  perl: '5.018'
+resources:
+  bugtracker: https://github.com/ytnobody/p5-DBD-libsql/issues
+  homepage: https://github.com/ytnobody/p5-DBD-libsql
+  repository: https://github.com/ytnobody/p5-DBD-libsql.git
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

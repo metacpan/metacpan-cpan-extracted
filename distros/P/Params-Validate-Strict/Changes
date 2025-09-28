@@ -1,5 +1,13 @@
 Revision history for Params-Validate-Strict
 
+0.13	Sat Sep 27 10:27:25 EDT 2025
+	Say how long the text is, when complaining it's too long
+	Say what the current value is when testing max
+	Better assertion that the type of a value has not been given
+	Give line number of the assertion failure
+	Fix https://www.cpantesters.org/cpan/report/905b8bfc-9a5e-11f0-a3bc-a055f9c4ba34
+	Support the boolean data type
+
 0.12	Tue Sep 16 16:25:18 EDT 2025
 	Support the logger argument
 	Remove unneeded regex

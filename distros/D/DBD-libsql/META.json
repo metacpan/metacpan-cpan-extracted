@@ -1,0 +1,96 @@
+{
+   "abstract" : "DBI driver for libsql databases",
+   "author" : [
+      "ytnobody <ytnobody@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.25",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBD-libsql",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Alien::Turso::CLI" : "0.01",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBI" : "1.631",
+            "HTTP::Request" : "6.00",
+            "IO::Socket::SSL" : "2.00",
+            "JSON" : "4.00",
+            "LWP::UserAgent" : "6.00",
+            "Protocol::WebSocket" : "0.20",
+            "perl" : "5.018"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DBD::SQLite" : "1.66",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "DBD::libsql" : {
+         "file" : "lib/DBD/libsql.pm",
+         "version" : "0.02"
+      },
+      "DBD::libsql::Hrana" : {
+         "file" : "lib/DBD/libsql/Hrana.pm",
+         "version" : "0.02"
+      },
+      "DBD::libsql::db" : {
+         "file" : "lib/DBD/libsql.pm"
+      },
+      "DBD::libsql::dr" : {
+         "file" : "lib/DBD/libsql.pm"
+      },
+      "DBD::libsql::st" : {
+         "file" : "lib/DBD/libsql.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ytnobody/p5-DBD-libsql/issues"
+      },
+      "homepage" : "https://github.com/ytnobody/p5-DBD-libsql",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ytnobody/p5-DBD-libsql.git",
+         "web" : "https://github.com/ytnobody/p5-DBD-libsql"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.06",
+   "x_static_install" : 1
+}

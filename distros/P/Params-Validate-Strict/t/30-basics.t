@@ -20,7 +20,8 @@ subtest 'Valid Inputs' => sub {
 		email => { type => 'string', matches => qr/^[^@]+@[^@]+\.[^@]+$/, min => 1 },
 		bio => { type => 'string', optional => 1, 'min' => 10, 'max' => 10 },
 		price => { type => 'number', min => 0 },
-		quantity => { type => 'number', min => 1 },
+		quantity => { type => 'number', min => 1, optional => 0 },
+		discount => { type => 'boolean', optional => 1 },
 		password => {
 			type => 'string',
 			min => 8,
@@ -42,6 +43,7 @@ subtest 'Valid Inputs' => sub {
 		quantity => 10,
 		password => 'P@$$wOrd123',
 		name => 'John Doe',
+		discount => 1,
 		obj => new_ok('MyClass')
 	};
 
@@ -54,6 +56,7 @@ subtest 'Valid Inputs' => sub {
 	is $validated_params->{bio}, "A test bio", "Bio should be correct";
 	is $validated_params->{price}, 19.99, "Price should be correct and coerced to number";
 	is $validated_params->{quantity}, 10, "Quantity should be correct and coerced to number";
+	is $validated_params->{discount}, 1, 'Discount is offered';
 	is $validated_params->{password}, 'P@$$wOrd123', "Password should be correct";
 	is $validated_params->{name}, "John Doe", "Name should be correct";
 	isa_ok($validated_params->{obj}, 'MyClass', 'Object can be passed');
@@ -91,7 +94,7 @@ subtest 'Valid Inputs' => sub {
 	ok defined validate_strict(schema => $schema, args => $args4, unknown_parameter_handler => 'die');
 };
 
-subtest "Invalid Inputs" => sub {
+subtest 'Invalid Inputs' => sub {
 	my $schema = {
 		username => { type => 'string', min => 3, max => 50, optional => 1 },
 		age => { type => 'integer', min => 0, max => 150, optional => 1 },
@@ -183,6 +186,14 @@ subtest "Invalid Inputs" => sub {
 	throws_ok {
 		validate_strict(input => $args14, schema => $schema, unknown_parameter_handler => 'die')
 	} qr/must be an object that understands the bar method/, 'validate min and max in the schema';
+
+	$schema = {
+		'obj' => { 'type' => 'object', optional => 1, can => 'bar' },
+		'discount' => { 'type' => 'boolean' },
+	};
+	my $args15 = { discount => 2 }; # Invalid discount
+	my $validated_params15 = eval { validate_strict(schema => $schema, args => $args15) };
+	like($@, qr/must be a boolean/, 'Booleans must be 0/1 true/false off/on');
 };
 
 done_testing();

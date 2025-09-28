@@ -39,6 +39,16 @@ print $tags->flush."\n";
 # 	padding: 0;
 # 	margin-bottom: 20px;
 # }
+# .form-register .logo {
+#	height: 5em;
+#	width: 100%;
+# }
+# .form-register img {
+#	margin: auto;
+#	display: block;
+#	max-width: 100%;
+#	max-height: 5em;
+# }
 # .form-register legend {
 # 	font-weight: bold;
 # 	margin-bottom: 10px;

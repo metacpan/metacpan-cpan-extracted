@@ -36,6 +36,10 @@ subtest 'Type coercion edge cases' => sub {
 	};
 
 	lives_ok { validate_strict(schema => $schema, args => undef) };
+	lives_ok { validate_strict(schema => $schema, args => { int_field => undef }) };
+	lives_ok { validate_strict(schema => $schema, args => { int_field => 1 }) };
+	lives_ok { validate_strict(schema => $schema, args => { num_field => undef }) };
+	lives_ok { validate_strict(schema => $schema, args => { num_field => 1 }) };
 
 	# Integer edge cases
 	for my $test_case (
@@ -607,7 +611,7 @@ subtest 'Input validation and error handling' => sub {
 			schema => {bad => []},  # Array instead of hash or string
 			args => {bad => 'value'}
 		);
-	} qr/must be hash reference or string/, 'Invalid rule type rejected';
+	} qr/must be a hash reference or string/, 'Invalid rule type rejected';
 
 	# Invalid type in schema
 	throws_ok {

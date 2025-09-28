@@ -5,7 +5,7 @@ use warnings;
 
 use Module::Pluggable require => 1;
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 1;
 
@@ -56,6 +56,7 @@ Returns list of plugin module name strings.
  # Output like:
  # List of plugins:
  # - MARC::Validator::Plugin::Field008
+ # - MARC::Validator::Plugin::Field020
  # - MARC::Validator::Plugin::Field260
  # - MARC::Validator::Plugin::Field264
 
@@ -81,6 +82,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

@@ -32,6 +32,18 @@ is_deeply(
 		['d', 'margin-bottom', '20px'],
 		['e'],
 
+		['s', '.form-register .logo'],
+		['d', 'height', '5em'],
+		['d', 'width', '100%'],
+		['e'],
+
+		['s', '.form-register img'],
+		['d', 'margin', 'auto'],
+		['d', 'display', 'block'],
+		['d', 'max-width', '100%'],
+		['d', 'max-height', '5em'],
+		['e'],
+
 		['s', '.form-register legend'],
 		['d', 'font-weight', 'bold'],
 		['d', 'margin-bottom', '10px'],
@@ -102,6 +114,18 @@ is_deeply(
 		['d', 'border', 'none'],
 		['d', 'padding', 0],
 		['d', 'margin-bottom', '20px'],
+		['e'],
+
+		['s', '.form-register .logo'],
+		['d', 'height', '5em'],
+		['d', 'width', '100%'],
+		['e'],
+
+		['s', '.form-register img'],
+		['d', 'margin', 'auto'],
+		['d', 'display', 'block'],
+		['d', 'max-width', '100%'],
+		['d', 'max-height', '5em'],
 		['e'],
 
 		['s', '.form-register legend'],

@@ -24,7 +24,7 @@ requires 'Plack::Request' => 0;
 requires 'Plack::Response' => 0;
 requires 'Plack::Session' => 0;
 requires 'Tags::HTML::Container' => 0;
-requires 'Tags::HTML::Login::Register' => 0.08;
+requires 'Tags::HTML::Login::Register' => 0.09;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Plack-App-Register/issues';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/Plack-App-Register';
 resources 'repository' => 'git://github.com/michal-josef-spacek/Plack-App-Register';
@@ -35,7 +35,7 @@ test_requires 'Tags::Output::Indent' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.04';
+version '0.05';
 
 # Run.
 WriteAll();

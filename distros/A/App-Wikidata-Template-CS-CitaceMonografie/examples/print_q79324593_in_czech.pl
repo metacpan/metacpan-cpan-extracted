@@ -16,7 +16,7 @@ use App::Wikidata::Template::CS::CitaceMonografie;
 exit App::Wikidata::Template::CS::CitaceMonografie->new->run;
 
 # Output like:
-# {{citace monografie
+# {{Citace monografie
 #  | autor = Mistr Eckhart
 #  | isbn = 978-80-901884-8-8
 #  | místo = Brno

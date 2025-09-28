@@ -5,7 +5,7 @@ use warnings;
 
 use App::Wikidata::Template::CS::CitaceMonografie;
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Run.
 exit App::Wikidata::Template::CS::CitaceMonografie->new->run;
@@ -82,6 +82,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

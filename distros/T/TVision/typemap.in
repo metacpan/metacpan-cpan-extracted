@@ -39,6 +39,9 @@
     TSubMenu
     TValidator
     THistory
+    TNode
+    TOutline
+    TOutlineViewer
 );
 
 =comment

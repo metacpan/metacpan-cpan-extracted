@@ -1,0 +1,17 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/DBD/libsql.pm
+lib/DBD/libsql/Hrana.pm
+minil.toml
+t/00_compile.t
+t/01_basic.t
+t/02_dsn.t
+xt/01_integration.t
+xt/02_smoke.t
+xt/03_turso_live.t
+META.yml
+MANIFEST

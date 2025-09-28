@@ -28,6 +28,7 @@
 #define Uses_TMenuItem
 #define Uses_TMenuBar
 #define Uses_TSubMenu
+#define Uses_TOutline
 
 #include <tvision/tv.h>
 
@@ -354,9 +355,16 @@ MODULE=TVision::TView PACKAGE=TVision::TView
 TRect getExtent(TView *self)
     CODE:
         RETVAL = self->getExtent();
-	printf("%d,%d,%d,%d\n",RETVAL.a.x,RETVAL.a.y,RETVAL.b.x,RETVAL.b.y);
     OUTPUT:
 	RETVAL
+
+void my_draw(TView *self, TRect r, char *text, int color)
+    CODE:
+        TDrawBuffer buf;
+        char textAttr = self->getColor(color); // Obtain attribute for given index.
+        buf.moveStr(0, text, textAttr);      // Write to buffer.
+        self->writeLine(r.a.x, r.a.y, r.b.x, r.b.y, buf); // Write buffer to view.
+
 
 MODULE=TVision PACKAGE=TVision
 
@@ -389,6 +397,7 @@ char *inputBoxRect(TRect r, char *title, char *label, char *dflt="", int limit=1
         RETVAL = buf;
     OUTPUT:
 	RETVAL
+
 
 BOOT:
     TObject *tvnull = NULL;

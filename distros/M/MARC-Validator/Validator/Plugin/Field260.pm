@@ -6,7 +6,7 @@ use warnings;
 
 use MARC::Validator::Utils qw(check_260c_year);
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 sub name {
 	my $self = shift;

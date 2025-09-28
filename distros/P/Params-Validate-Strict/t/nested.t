@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::Most tests => 17;
+use Test::Most tests => 18;
 use Params::Validate::Strict qw(validate_strict);
 
 # Test nested structure validation
@@ -88,6 +88,19 @@ sub test_nested_validation {
 		}
 	};
 
+	my $wrong_type_elements = {
+		user => {
+			name => 'John Doe',
+			age => 30,
+			address => {
+				street => '123 Main St',
+				city => 'Anytown',
+				zip => '12345'
+			},
+			hobbies => [ { 'foo' => 'bar' } ],	# Should be an arrayref of strings
+		}
+	};
+
 	# Test valid input
 	my $result;
 	lives_ok {
@@ -116,7 +129,12 @@ sub test_nested_validation {
 	# Test wrong type for hobbies
 	throws_ok {
 		validate_strict(schema => $schema, input => $wrong_type_input);
-	} qr/must be an arrayref/, "Wrong type for hobbies should throw error";
+	} qr/must be an arrayref/, 'Wrong type for hobbies should throw error';
+
+	# Each hobby should be a string
+	throws_ok {
+		validate_strict(schema => $schema, input => $wrong_type_elements);
+	} qr/must be a string/, 'Wrong type for hobbies should throw error';
 
 	# Test with empty nested structure
 	my $empty_nested_input = {

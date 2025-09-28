@@ -37,6 +37,7 @@
 #define Uses_TMenuBar
 #define Uses_TSubMenu
 #define Uses_THistory
+#define Uses_TOutline
 
 #include <tvision/tv.h>
 
@@ -112,7 +113,7 @@ EOS
 	TMenu()
 	TMenu1( TMenuItem*& itemList )
 	TMenu2( TMenuItem*& itemList, TMenuItem*& TheDefault)
-	TMenuItem(TStringView aName, int aCommand, TKey aKey, int aHelpCtx=hcNoContext, TStringView p=0, TMenuItem *aNext=0)
+	TMenuItem(TStringView aName, int aCommand, TKey aKey=0, int aHelpCtx=hcNoContext, TStringView p=0, TMenuItem *aNext=0)
 	TMenuItem1(TStringView aName, TKey aKey, TMenu *aSubMenu, int aHelpCtx=hcNoContext, TMenuItem *aNext=0)
 	TSubMenu( TStringView nm, TKey key, int helpCtx = hcNoContext )
 	TEditor(TRect r, TScrollBar *sb1=0, TScrollBar *sb2=0, TIndicator *ind=0, int n=1000)
@@ -123,6 +124,9 @@ EOS
 	TStaticText(TRect r, char *title)
 	THistory( TRect bounds, TInputLine *aLink, int aHistoryId )
 	TSItem( TStringView aValue, TSItem *aNext )
+	TNode(TStringView aText)
+        TNode1(TStringView aText, TNode* aChildren, TNode* aNext, int initialState=1)
+        TOutline(TRect r, TScrollBar* aHScrollBar, TScrollBar* aVScrollBar, TNode* aRoot)
 EOS
 }}}
 {{{
@@ -363,6 +367,23 @@ EOS
         void setData(char *data)
       TButton:
         void setTitle(char *title) delete self->title; self->title = new char[strlen(title)+1]; strcpy((char*)self->title,title); self->draw();
+      TOutlineViewer:
+        void update()
+        void expandAll(TNode* node)
+        #TNode* firstThat(TOutlineVisitor test, void* arg)
+        #TNode* firstThat(TOutlineVisitorNoArg test)
+        #TNode* forEach(TOutlineVisitor action, void* arg)
+        #TNode* forEach(TOutlineVisitorNoArg action)
+        char* createGraph(int level, int lines, int flags, int levWidth, int endWidth, char* chars)
+      TOutline:
+        void adjust(TNode* node, int expand)
+        TNode* getRoot()
+        int getNumChildren(TNode* node)
+        TNode* getNext(TNode *node)
+        TNode* getChild(TNode* node, int i)
+        #const char* getText(TNode* node)
+        int isExpanded(TNode* node)
+        int hasChildren(TNode* node)
 EOS
 }}}
 {{{
@@ -473,6 +494,15 @@ EOS
 	int disabled
 	TKey keyCode
 	int helpCtx
+      TNode:
+        TNode* next
+        const char* text
+        TNode* childList
+        int expanded
+      TOutlineViewer:
+        int foc
+      TOutline:
+        TNode* root
 EOS
 }}}
 

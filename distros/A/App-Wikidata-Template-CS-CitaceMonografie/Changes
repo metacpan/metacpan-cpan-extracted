@@ -1,3 +1,8 @@
+0.05 2025-09-27T12:31:07+02:00
+ - Add check of 'cb_wikidata' callback.
+ - Add link to author.
+ - Rename {{citace ..}} to {{Citace ..}}.
+
 0.04 2025-05-09T09:52:12+02:00
  - Add tests for check of edition.
  - Fix DEPENDENCIES section in doc.

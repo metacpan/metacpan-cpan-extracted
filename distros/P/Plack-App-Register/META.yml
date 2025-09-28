@@ -33,11 +33,11 @@ requires:
   Plack::Session: 0
   Plack::Util::Accessor: 0
   Tags::HTML::Container: 0
-  Tags::HTML::Login::Register: 0.08
+  Tags::HTML::Login::Register: 0.09
   perl: 5.8.0
 resources:
   bugtracker: https://github.com/michal-josef-spacek/Plack-App-Register/issues
   homepage: https://github.com/michal-josef-spacek/Plack-App-Register
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Plack-App-Register
-version: '0.04'
+version: '0.05'

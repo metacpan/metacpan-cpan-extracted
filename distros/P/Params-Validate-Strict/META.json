@@ -35,7 +35,7 @@
             "Carp" : "0",
             "Exporter" : "0",
             "ExtUtils::MakeMaker" : "6.64",
-            "List::Util" : "0",
+            "List::Util" : "1.33",
             "Params::Get" : "0.13",
             "Scalar::Util" : "0",
             "strict" : "0",
@@ -74,6 +74,6 @@
          "x_repository" : "https://github.com/nigelhorne/Params-Validate-Strict"
       }
    },
-   "version" : "0.12",
+   "version" : "0.13",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

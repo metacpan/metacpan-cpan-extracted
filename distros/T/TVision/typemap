@@ -38,6 +38,9 @@ TMenuBar*  O_TMenuBar
 TSubMenu*  O_TSubMenu
 TValidator*  O_TValidator
 THistory*  O_THistory
+TNode*  O_TNode
+TOutline*  O_TOutline
+TOutlineViewer*  O_TOutlineViewer
 
 
 INPUT
@@ -139,6 +142,12 @@ O_TValidator
   $var = (TValidator*)sv2tv_a($arg);
 O_THistory
   $var = (THistory*)sv2tv_a($arg);
+O_TNode
+  $var = (TNode*)sv2tv_a($arg);
+O_TOutline
+  $var = (TOutline*)sv2tv_a($arg);
+O_TOutlineViewer
+  $var = (TOutlineViewer*)sv2tv_a($arg);
 
 
 OUTPUT
@@ -342,6 +351,21 @@ O_TValidator
     $arg = newRV_inc((SV*) self);
     sv_bless($arg, gv_stashpv("TVision::${\ ($type=~y/ *//dr)}", GV_ADD));
 O_THistory
+    AV *self = newAV();
+    av_store(self, 0, newSVpvn((const char *)&$var, sizeof($var)));
+    $arg = newRV_inc((SV*) self);
+    sv_bless($arg, gv_stashpv("TVision::${\ ($type=~y/ *//dr)}", GV_ADD));
+O_TNode
+    AV *self = newAV();
+    av_store(self, 0, newSVpvn((const char *)&$var, sizeof($var)));
+    $arg = newRV_inc((SV*) self);
+    sv_bless($arg, gv_stashpv("TVision::${\ ($type=~y/ *//dr)}", GV_ADD));
+O_TOutline
+    AV *self = newAV();
+    av_store(self, 0, newSVpvn((const char *)&$var, sizeof($var)));
+    $arg = newRV_inc((SV*) self);
+    sv_bless($arg, gv_stashpv("TVision::${\ ($type=~y/ *//dr)}", GV_ADD));
+O_TOutlineViewer
     AV *self = newAV();
     av_store(self, 0, newSVpvn((const char *)&$var, sizeof($var)));
     $arg = newRV_inc((SV*) self);

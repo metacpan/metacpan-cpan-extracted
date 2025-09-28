@@ -1,41 +1,57 @@
 Revision history for Env-Assert
 
+0.011     2025-09-28 09:32:02+02:00 Europe/Stockholm
+            * Bump version to 0.011 and remove underscore hack.
+            * Change Security Policy to use CPANSec's template.
+            * Add SEE ALSO chapters to Env::Assert and script/envassert.
+            * Add .github dir.
+            * Add files CONTRIBUTING.md, CODE_OF_CONDUCT.md and SECURITY.md.
+            * Clean dist.ini.
+            * Remove fatpacker instruction from README.
+            * Add new LICENSE files and change README.md.
+            * Use @Filter to use PluginBundle::MIKKOI.
+            * Readjust Changes file.
+            * Bump version.
+            * Add BumpVersionAfterRelease and Git::Commit to dist.ini.
+            * Add $VERSION to library and executable files.
+
 0.010     2024-01-02 20:32:48+01:00 Europe/Stockholm
-          * Fix errors in SYNOPSIS. (Ron Savage <ron@savage.net.au>)
+            * Fix errors in SYNOPSIS. (Ron Savage <ron@savage.net.au>)
 
 0.009     2023-11-15 19:35:06+01:00 Europe/Stockholm
-          * Add App::FatPacker to deps.
-          * Add contributor gregor herrmann <gregoa@debian.org>
-          * Add Repology link to README.md.
-          * Available as a Debian package. (gregor herrmann <gregoa@debian.org>)
+            * Add App::FatPacker to deps.
+            * Add contributor gregor herrmann <gregoa@debian.org>
+            * Add Repology link to README.md.
+            * Available as a Debian package. (gregor herrmann <gregoa@debian.org>)
 
 0.008     2023-08-13 13:25:41+02:00 Europe/Berlin
-          * Fix dist.ini Run::AfterRelease action.
-          * Create CLI option --exact
+            * Fix dist.ini Run::AfterRelease action.
+            * Create CLI option --exact
 
 0.007     2023-04-23 22:45:02+02:00 Europe/Stockholm
-          * Replace say with print
-          * Add envassert.self-contained to MANIFEST.SKIP.
+            * Replace say with print
+            * Add envassert.self-contained to MANIFEST.SKIP.
 
 0.006     2023-02-27 22:15:15+01:00 Europe/Stockholm
-          * Clean up documentation.
-          * Clean up dist.ini a little.
-          * Use option auto_help in executable.
-          * Use option auto_version in executable.
-          * Move fatpacked executable to root.
-          * Update dist.ini with ExecDir to `script`.
-          * Update envassert.self-contained url.
+            * Clean up documentation.
+            * Clean up dist.ini a little.
+            * Use option auto_help in executable.
+            * Use option auto_version in executable.
+            * Move fatpacked executable to root.
+            * Update dist.ini with ExecDir to `script`.
+            * Update envassert.self-contained url.
 
 0.005     2023-02-25 19:28:40+01:00 Europe/Stockholm
-          * Fix typos (Ivan Bessarabov <ivan@bessarabov.ru>)
-          * Update README.md
+            * Fix typos (Ivan Bessarabov <ivan@bessarabov.ru>)
+            * Update README.md
 
 0.004     2023-02-19 15:47:10+01:00 Europe/Stockholm
-          * Move fatpacked executable to root.
-          * Update dist.ini with ExecDir to `script`.
+            * Move fatpacked executable to root.
+            * Update dist.ini with ExecDir to `script`.
 
 0.003     2023-02-16 09:55:57+01:00 Europe/Stockholm
 
 0.002     2023-02-15 17:34:31+01:00 Europe/Stockholm
 
-0.001     2023-02-15 14:51:19+01:00 Europe/Stockholm   * Initial version
+0.001     2023-02-15 14:51:19+01:00 Europe/Stockholm
+            * Initial version

@@ -43,7 +43,7 @@ WriteMakefile(
 		'Carp' => 0,
 		'Exporter' => 0,
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
-		'List::Util' => 0,
+		'List::Util' => 1.33,	# Minimum version for any()
 		'Params::Get' => 0.13,
 		'Scalar::Util' => 0,
 		'strict' => 0,

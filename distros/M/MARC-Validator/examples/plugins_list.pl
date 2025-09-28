@@ -19,5 +19,6 @@ if (@plugins) {
 # Output like:
 # List of plugins:
 # - MARC::Validator::Plugin::Field008
+# - MARC::Validator::Plugin::Field020
 # - MARC::Validator::Plugin::Field260
 # - MARC::Validator::Plugin::Field264

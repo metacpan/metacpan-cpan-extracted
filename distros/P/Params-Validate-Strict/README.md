@@ -4,7 +4,7 @@ Params::Validate::Strict - Validates a set of parameters against a schema
 
 # VERSION
 
-Version 0.12
+Version 0.13
 
 # SYNOPSIS
 
@@ -62,7 +62,7 @@ The schema can define the following rules for each parameter:
 - `type`
 
     The data type of the parameter.
-    Valid types are `string`, `integer`, `number`, `hashref`, `arrayref`, `object` and `coderef`.
+    Valid types are `string`, `integer`, `number`, `boolean`, `hashref`, `arrayref`, `object` and `coderef`.
 
 - `can`
 
@@ -125,7 +125,7 @@ The schema can define the following rules for each parameter:
         tags => {
           type => 'arrayref',
           element_type => 'number',
-          min => 1,   # this the length of array ref, not the min value for each of the numbers, for that, add a C<schema> rule
+          min => 1,   # this is the length of the array, not the min value for each of the numbers. For that, add a C<schema> rule
           max => 5
         }
 

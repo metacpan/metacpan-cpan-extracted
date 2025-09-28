@@ -34,6 +34,7 @@ EXAMPLE
      # Output like:
      # List of plugins:
      # - MARC::Validator::Plugin::Field008
+     # - MARC::Validator::Plugin::Field020
      # - MARC::Validator::Plugin::Field260
      # - MARC::Validator::Plugin::Field264
 
@@ -54,5 +55,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.01
+    0.02
 

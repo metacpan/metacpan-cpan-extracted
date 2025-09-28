@@ -37,14 +37,15 @@ requires:
   Error::Pure: 0
   Getopt::Std: 0
   List::Util: 1.33
+  Mo::utils: 0.12
   Readonly: 0
   Unicode::UTF8: 0
   Wikibase::API: 0.04
-  Wikibase::Datatype::Query: 0
+  Wikibase::Datatype::Query: 0.06
   perl: 5.6.0
 resources:
   bugtracker: https://github.com/michal-josef-spacek/App-Wikidata-Template-CS-CitaceMonografie/issues
   homepage: https://github.com/michal-josef-spacek/App-Wikidata-Template-CS-CitaceMonografie
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/App-Wikidata-Template-CS-CitaceMonografie
-version: '0.04'
+version: '0.05'

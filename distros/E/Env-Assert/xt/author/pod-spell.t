@@ -18,7 +18,6 @@ Koivunalho
 Mikko
 Ron
 Savage
-envassert
 gregoa
 gregor
 herrmann
@@ -26,4 +25,3 @@ ivan
 lib
 mikkoi
 ron
-script

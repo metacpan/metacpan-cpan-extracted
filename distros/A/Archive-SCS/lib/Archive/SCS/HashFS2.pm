@@ -2,7 +2,7 @@ use v5.34;
 use warnings;
 use Object::Pad 0.73;
 
-class Archive::SCS::HashFS2 1.08
+class Archive::SCS::HashFS2 1.09
   :isa( Archive::SCS::Mountable );
 
 use stable 0.031 'isa';

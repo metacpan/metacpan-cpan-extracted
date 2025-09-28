@@ -16,10 +16,10 @@ name: Struct-Dumb
 provides:
   Struct::Dumb:
     file: lib/Struct/Dumb.pm
-    version: '0.15'
+    version: '0.16'
 requires:
   perl: '5.014'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.15'
+version: '0.16'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

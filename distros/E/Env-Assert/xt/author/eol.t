@@ -8,7 +8,6 @@ use Test::EOL;
 
 my @files = (
     'lib/Env/Assert.pm',
-    'script/envassert',
     't/env-assert-private.t',
     't/env-assert-public-assert.t',
     't/env-assert-public-report_errors.t'

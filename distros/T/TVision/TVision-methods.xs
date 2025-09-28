@@ -32,6 +32,7 @@
 #define Uses_TMenuBar
 #define Uses_TSubMenu
 #define Uses_THistory
+#define Uses_TOutline
 
 #include <tvision/tv.h>
 
@@ -162,7 +163,7 @@ TMenu* new2(TMenuItem* itemList, TMenuItem* TheDefault)
 	RETVAL
 
 MODULE=TVision::TMenuItem PACKAGE=TVision::TMenuItem
-TMenuItem* new(char * aName, int aCommand, TKey aKey, int aHelpCtx=hcNoContext, char * p=0, TMenuItem *aNext=0)
+TMenuItem* new(char * aName, int aCommand, TKey aKey=0, int aHelpCtx=hcNoContext, char * p=0, TMenuItem *aNext=0)
     CODE:
         RETVAL = new TMenuItem( aName,  aCommand,  aKey,  aHelpCtx,  p, aNext);
     OUTPUT:
@@ -235,6 +236,27 @@ MODULE=TVision::TSItem PACKAGE=TVision::TSItem
 TSItem* new(char * aValue, TSItem *aNext)
     CODE:
         RETVAL = new TSItem( aValue, aNext);
+    OUTPUT:
+	RETVAL
+
+MODULE=TVision::TNode PACKAGE=TVision::TNode
+TNode* new(char * aText)
+    CODE:
+        RETVAL = new TNode( aText);
+    OUTPUT:
+	RETVAL
+
+MODULE=TVision::TNode PACKAGE=TVision::TNode
+TNode* new1(char * aText, TNode* aChildren, TNode* aNext, int initialState=1)
+    CODE:
+        RETVAL = new TNode( aText,  aChildren,  aNext,  initialState);
+    OUTPUT:
+	RETVAL
+
+MODULE=TVision::TOutline PACKAGE=TVision::TOutline
+TOutline* new(TRect r, TScrollBar* aHScrollBar, TScrollBar* aVScrollBar, TNode* aRoot)
+    CODE:
+        RETVAL = new TOutline( r,  aHScrollBar,  aVScrollBar,  aRoot);
     OUTPUT:
 	RETVAL
 
@@ -980,6 +1002,70 @@ void setTitle(TButton *self,char *title)
     CODE:
         delete self->title; self->title = new char[strlen(title)+1]; strcpy((char*)self->title,title); self->draw();
 
+MODULE=TVision::TOutlineViewer PACKAGE=TVision::TOutlineViewer
+void update(TOutlineViewer *self)
+    CODE:
+        self->update();
+
+
+void expandAll(TOutlineViewer *self,TNode* node)
+    CODE:
+        self->expandAll( node);
+
+
+char* createGraph(TOutlineViewer *self,int level, int lines, int flags, int levWidth, int endWidth, char* chars)
+    CODE:
+        RETVAL = self->createGraph( level,  lines,  flags,  levWidth,  endWidth,  chars);
+    OUTPUT:
+        RETVAL
+
+MODULE=TVision::TOutline PACKAGE=TVision::TOutline
+void adjust(TOutline *self,TNode* node, int expand)
+    CODE:
+        self->adjust( node,  expand);
+
+
+TNode* getRoot(TOutline *self)
+    CODE:
+        RETVAL = self->getRoot();
+    OUTPUT:
+        RETVAL
+
+
+int getNumChildren(TOutline *self,TNode* node)
+    CODE:
+        RETVAL = self->getNumChildren( node);
+    OUTPUT:
+        RETVAL
+
+
+TNode* getNext(TOutline *self,TNode *node)
+    CODE:
+        RETVAL = self->getNext(node);
+    OUTPUT:
+        RETVAL
+
+
+TNode* getChild(TOutline *self,TNode* node, int i)
+    CODE:
+        RETVAL = self->getChild( node,  i);
+    OUTPUT:
+        RETVAL
+
+
+int isExpanded(TOutline *self,TNode* node)
+    CODE:
+        RETVAL = self->isExpanded( node);
+    OUTPUT:
+        RETVAL
+
+
+int hasChildren(TOutline *self,TNode* node)
+    CODE:
+        RETVAL = self->hasChildren( node);
+    OUTPUT:
+        RETVAL
+
 
 MODULE=TVision::TEditor PACKAGE=TVision::TEditor
 TScrollBar* get_hScrollBar(TEditor *self)
@@ -1673,6 +1759,72 @@ int get_helpCtx(TMenuItem *self)
 void set_helpCtx(TMenuItem *self, int val)
     CODE:
         self->helpCtx = val;
+
+MODULE=TVision::TNode PACKAGE=TVision::TNode
+TNode* get_next(TNode *self)
+    CODE:
+        RETVAL = self->next;
+    OUTPUT:
+        RETVAL
+
+void set_next(TNode *self, TNode* val)
+    CODE:
+        self->next = val;
+
+
+const char* get_text(TNode *self)
+    CODE:
+        RETVAL = self->text;
+    OUTPUT:
+        RETVAL
+
+void set_text(TNode *self, const char* val)
+    CODE:
+        self->text = val;
+
+
+TNode* get_childList(TNode *self)
+    CODE:
+        RETVAL = self->childList;
+    OUTPUT:
+        RETVAL
+
+void set_childList(TNode *self, TNode* val)
+    CODE:
+        self->childList = val;
+
+
+int get_expanded(TNode *self)
+    CODE:
+        RETVAL = self->expanded;
+    OUTPUT:
+        RETVAL
+
+void set_expanded(TNode *self, int val)
+    CODE:
+        self->expanded = val;
+
+MODULE=TVision::TOutlineViewer PACKAGE=TVision::TOutlineViewer
+int get_foc(TOutlineViewer *self)
+    CODE:
+        RETVAL = self->foc;
+    OUTPUT:
+        RETVAL
+
+void set_foc(TOutlineViewer *self, int val)
+    CODE:
+        self->foc = val;
+
+MODULE=TVision::TOutline PACKAGE=TVision::TOutline
+TNode* get_root(TOutline *self)
+    CODE:
+        RETVAL = self->root;
+    OUTPUT:
+        RETVAL
+
+void set_root(TOutline *self, TNode* val)
+    CODE:
+        self->root = val;
 
 
 

@@ -12,7 +12,7 @@ use Tags::HTML::Messages;
 
 Readonly::Array our @FORM_METHODS => qw(post get);
 
-our $VERSION = 0.09;
+our $VERSION = 0.10;
 
 # Constructor.
 sub new {
@@ -189,6 +189,18 @@ sub _process_css {
 		['d', 'border', 'none'],
 		['d', 'padding', 0],
 		['d', 'margin-bottom', '20px'],
+		['e'],
+
+		['s', '.'.$self->{'css_register'}.' .logo'],
+		['d', 'height', '5em'],
+		['d', 'width', '100%'],
+		['e'],
+
+		['s', '.'.$self->{'css_register'}.' img'],
+		['d', 'margin', 'auto'],
+		['d', 'display', 'block'],
+		['d', 'max-width', '100%'],
+		['d', 'max-height', '5em'],
 		['e'],
 
 		['s', '.'.$self->{'css_register'}.' legend'],
@@ -424,6 +436,16 @@ Returns undef.
  # 	padding: 0;
  # 	margin-bottom: 20px;
  # }
+ # .form-register .logo {
+ #	height: 5em;
+ #	width: 100%;
+ # }
+ # .form-register img {
+ #	margin: auto;
+ #	display: block;
+ #	max-width: 100%;
+ #	max-height: 5em;
+ # }
  # .form-register legend {
  # 	font-weight: bold;
  # 	margin-bottom: 10px;
@@ -578,6 +600,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.09
+0.10
 
 =cut

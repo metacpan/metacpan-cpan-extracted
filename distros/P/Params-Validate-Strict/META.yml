@@ -33,7 +33,7 @@ requires:
   Carp: '0'
   Exporter: '0'
   ExtUtils::MakeMaker: '6.64'
-  List::Util: '0'
+  List::Util: '1.33'
   Params::Get: '0.13'
   Scalar::Util: '0'
   strict: '0'
@@ -42,5 +42,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Params-Validate-Strict
   homepage: https://metacpan.org/pod/Params::Validate::Strict
   repository: git://github.com/nigelhorne/Params-Validate-Strict.git
-version: '0.12'
+version: '0.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

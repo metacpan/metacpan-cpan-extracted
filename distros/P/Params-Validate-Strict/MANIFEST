@@ -1,13 +1,16 @@
 Changes
 lib/Params/Validate/Strict.pm
+LICENSE
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 README.md
 scripts/generate_index.pl
+t/00-load.t
 t/10-compile.t
 t/30-basics.t
 t/40-more.t
+t/50-even-more.t
 t/array.t
 t/default.t
 t/eof.t
@@ -15,11 +18,13 @@ t/eol.t
 t/get.t
 t/nested.t
 t/pod-cm.t
+t/pod-coverage.t
 t/pod-spelling.t
 t/pod-synopsis.t
 t/pod.t
 t/prereq.t
 t/strict.t
+t/tabs.t
 t/validate.t
 t/vars.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

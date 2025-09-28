@@ -4,14 +4,15 @@ use base qw(Plack::Component::Tags::HTML);
 use strict;
 use warnings;
 
-use Plack::Util::Accessor qw(generator message_cb redirect_register redirect_error register_cb title);
+use Plack::Util::Accessor qw(generator logo_image_url message_cb
+	redirect_register redirect_error register_cb title);
 use Plack::Request;
 use Plack::Response;
 use Plack::Session;
 use Tags::HTML::Container;
-use Tags::HTML::Login::Register;
+use Tags::HTML::Login::Register 0.09;
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 sub _css {
 	my ($self, $env) = @_;
@@ -55,7 +56,9 @@ sub _prepare_app {
 		'css' => $self->css,
 		'tags' => $self->tags,
 	);
-	$self->{'_login_register'} = Tags::HTML::Login::Register->new(%p);
+	$self->{'_login_register'} = Tags::HTML::Login::Register->new(%p,
+		'logo_image_url' => $self->logo_image_url,
+	);
 	$self->{'_container'} = Tags::HTML::Container->new(%p);
 
 	return;
@@ -225,6 +228,12 @@ Default value is 1.
 HTML generator string.
 
 Default value is 'Plack::App::Register; Version: __VERSION__'.
+
+=item * C<logo_image_url>
+
+Logo image URL.
+
+Default value is undef.
 
 =item * C<message_cb>
 
@@ -500,12 +509,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2023-2024 Michal Josef Špaček
+© 2023-2025 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

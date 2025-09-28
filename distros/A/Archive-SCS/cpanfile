@@ -1,12 +1,12 @@
 requires "perl" => "v5.34";
 
-requires "builtin::Backport" => "0";
+requires "builtin::compat" => "0.003003";
 requires "stable" => "0.031";
 requires "Compress::Raw::Zlib" => "2.070";
 requires "IO::Compress::Zip" => "0";
 requires "IO::Uncompress::Unzip" => "0";
 requires "List::Util" => "1.45";
-requires "Object::Pad" => "0.73";
+requires "Object::Pad" => "0.818"; # RT158048
 requires "Path::Tiny" => "0.125";
 
 on 'test' => sub {

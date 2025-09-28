@@ -7,12 +7,13 @@ use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 use Getopt::Std;
 use List::Util 1.33 qw(none);
+use Mo::utils 0.12 qw(check_code);
 use Readonly;
 use Unicode::UTF8 qw(decode_utf8 encode_utf8);
 use Wikibase::API;
-use Wikibase::Datatype::Query;
+use Wikibase::Datatype::Query 0.06;
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 Readonly::Array our @LANGUAGES => ('mul', 'cs', 'en');
 
@@ -35,6 +36,9 @@ sub new {
 
 	# Process parameters.
 	set_params($self, @params);
+
+	# Check 'cb_wikidata'.
+	check_code($self, 'cb_wikidata');
 
 	$self->{'_q'} = Wikibase::Datatype::Query->new;
 
@@ -99,7 +103,7 @@ sub _citace_monografie {
 	my ($self, $params_hr, $pretty_print) = @_;
 
 	$pretty_print //= 0;
-	my $ret = '{{citace monografie';
+	my $ret = '{{Citace monografie';
 	foreach my $param (sort keys %{$params_hr}) {
 		if ($pretty_print) {
 			$ret .= "\n";
@@ -153,7 +157,11 @@ sub _get_citace_params {
 		}
 
 		# Link to author.
-		# TODO
+		# XXX Hardcoded lang = 'cs'.
+		my $sitelink_title = $self->{'_q'}->query($author_item, 'sitelink:cs');
+		if (defined $sitelink_title) {
+			$ret_hr->{'odkaz na autora'} = $sitelink_title;
+		}
 
 		$author_count++;
 	}
@@ -357,7 +365,7 @@ Returns 1 for error, 0 for success.
  exit App::Wikidata::Template::CS::CitaceMonografie->new->run;
 
  # Output like:
- # {{citace monografie
+ # {{Citace monografie
  #  | autor = Mistr Eckhart
  #  | isbn = 978-80-901884-8-8
  #  | místo = Brno
@@ -397,6 +405,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

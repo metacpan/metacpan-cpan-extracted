@@ -2,12 +2,11 @@ use v5.34;
 use warnings;
 use Object::Pad 0.73 ':experimental(adjust_params)';
 
-class Archive::SCS::Directory 1.08
+class Archive::SCS::Directory 1.09
   :isa( Archive::SCS::Mountable );
 
-use builtin 'reftype';
+use builtin::compat 'reftype';
 use stable 0.031 'isa';
-no warnings 'experimental::builtin';
 
 use Archive::SCS::CityHash 'cityhash64';
 use Archive::SCS::DirIndex;

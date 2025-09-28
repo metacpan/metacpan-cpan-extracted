@@ -16,8 +16,6 @@ my $int;
 sub idle {
     TVision::spin_loop();
     $int->update if $int;
-    #__PACKAGE__->step;
-    #__PACKAGE__->ready;
 }
 sub loadfile {
     print "loadfile[@_]\n";
@@ -80,6 +78,11 @@ sub stop {
     my ($self, $filename, $line) = @_;
     ::_log "STOP - $filename $line \$#dbline=$#DB::dbline";
 }
+sub cleanup {
+    # why not called?
+    ...;
+    TVision::messageBox("program ended.",mfOKButton);
+}
 my $wnd_cnt=-1;
 sub showfile {
     my ($self, $filename, $line) = @_;
@@ -123,6 +126,7 @@ sub showfile {
     $cur_editor->setSelect($pos{$filename}->[$line]+7, $pos{$filename}->[$line]+8, 0);
     $cur_editor->insertText("*", 1,0);
     $cur_editor->setSelect($pos{$filename}->[$line], $pos{$filename}->[$line]+4, 0);
+    $cur_editor->trackCursor(0);
 
     $prevline = $line;
 
@@ -131,7 +135,6 @@ sub showfile {
 my $received_message = '';
 sub output {
     TVision::messageBoxRect([5,5,60,12],$_[1],mfOKButton);
-    # TVision::messageBox($_[1],mfOKButton);
     $received_message = $_[1];
 }
 
@@ -157,6 +160,9 @@ sub init1 {
         ->plus(
             tnew(TSubMenu=>"~T~cl/tk", 0, 0 )
                 ->plus(tnew('TMenuItem','tcl/tk', 306, kbAltL, 0, 'Alt-L'))
+                ->plus(TVision::TMenuItem::newLine)
+                ->plus(tnew('TMenuItem','try1', 307))
+                ->plus(tnew('TMenuItem','try2', 308))
         )
         -> plus (
             TVision::TSubMenu::new( "~W~indows", 0, 0 )
@@ -209,6 +215,7 @@ sub init1 {
                     my $_filename = $cur_editor->retrieve_user_value();
                     $cur_editor->setSelect($pos{$_filename}->[$p->[1]]+5, $pos{$_filename}->[$p->[1]]+6, 0);
                     $cur_editor->insertText('@', 1,0);
+                    #$cur_editor->my_draw([1,1,100,1], "proba1 proba2 проба3 ~проба4~ ds", 0x4E);
                 } else {
                     # was not able to set breakpoint, so nothig to be done here
                 }
@@ -217,7 +224,12 @@ sub init1 {
             ::_log  join "\n", __PACKAGE__->files(), '';
 	} elsif ($cmd == 208) {
             ::_log join "\n", __PACKAGE__->subs(), '';
-	} elsif ($cmd == 306) {
+	} elsif ($cmd == 307) { # try1
+            ::_log "drawLine=" . $cur_editor->get_drawLine;
+	} elsif ($cmd == 308) { # try2
+            ::_log "set_drawLine(5)";
+            $cur_editor->set_drawLine(5);
+	} elsif ($cmd == 306) { # tcl/tk
             unless ($int) {
                 require Tcl::Tk;
                 $int = new Tcl::Tk;
