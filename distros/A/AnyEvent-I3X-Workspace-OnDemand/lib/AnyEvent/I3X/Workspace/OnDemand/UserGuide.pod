@@ -1,0 +1,220 @@
+
+#PODNAME: AnyEvent::I3X::Workspace::OnDemand::UserGuide
+#
+#ABSTRACT: User document for AnyEvent::I3X::Workspace::OnDemand
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+AnyEvent::I3X::Workspace::OnDemand::UserGuide - User document for AnyEvent::I3X::Workspace::OnDemand
+
+=head1 VERSION
+
+version 0.005
+
+=head2 Getting Started
+
+To install L<AnyEvent::I3X::Workspace::OnDemand> you need to do the following:
+
+  sudo cpanm AnyEvent::I3X::Workspace::OnDemand
+
+For users who want to use L<local::lib>:
+
+  export PERL_LOCAL_LIB_ROOT=$HOME/.local
+  export PERL_MB_OPT="--install_base '$PERL_LOCAL_LIB_ROOT'"
+  export PERL_MM_OPT="INSTALL_BASE=$PERL_LOCAL_LIB_ROOT"
+  export PERL5LIB="./lib:$PERL_LOCAL_LIB_ROOT/lib/perl5"
+
+Then run:
+
+  cpanm AnyEvent::I3X::Workspace::OnDemand
+
+You'll now be able run C<i3-ipc> and C<i3-wod>.
+
+=head2 Quick Start Example
+
+Now you can start creating workspace groups. You'll need to create a config
+file, you can use C<$HOME/.config/i3/wod.conf> or
+C<$XDG_CONFIG_HOME/.config/i3/wod.conf> for this.
+
+Here's a complete minimal setup with two groups and two workspaces:
+
+  # wod.conf
+  ---
+  groups:
+    - personal
+    - work
+  workspace:
+    dev:
+      group:
+        work:
+        personal:
+    dbg:
+      group:
+        work:
+        personal:
+
+  # i3 config
+  set $dev "dev"
+  set $debug "dbg"
+  bindsym $mod+1 workspace $dev
+  bindsym $mod+2 workspace $debug
+  bindsym $mod+Shift+1 move container to workspace $dev
+  bindsym $mod+Shift+2 move container to workspace $debug
+
+  # Dynamic workspaces
+  bindsym $mod+w mode "Dynamic workspaces"
+  mode "Dynamic workspaces" {
+    bindsym 0 exec i3-msg -t send_tick group:personal; mode default
+    bindsym 9 exec i3-msg -t send_tick group:work; mode default
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+  }
+
+=head2 Layout Management
+
+Now you need to create layouts for your workspaces, for this please refer to
+the L<i3 website|https://i3wm.org/docs/layout-saving.html>. They have excellent
+documenation and allows you to play a bit with your layout(s) before
+configuring them: C<i3-msg "workspace foo; append_layout /path/to/layout.json">
+
+You can store your layouts in C<$HOME/.config/i3>, or put them elsewhere and
+configure a path for it:
+
+  # wod.conf
+  layout_path: /path/to/layouts
+
+Once you are happy with your layout you can configure them in C<wod.conf>:
+
+  workspace:
+    dev:
+      layout: dev.json
+      group:
+        work:
+          layout: dev-work.json 
+        personal:
+
+And as you see, you can override a layout for a specific group.
+You can also disable a workspace for a group, C<dev> now isn't part of
+C<personal>:
+
+  workspace:
+    dev:
+      layout: dev.json
+      group:
+        work:
+
+And to make a workspace available in all groups:
+
+  workspace:
+    dev:
+      layout: dev.json
+      group:
+        all:
+
+To have a workspace available in only one group, don't define a global layout,
+just on the group itself
+
+ media:
+  group:
+    personal:
+      layout: media.json
+
+There is one take-home message here:
+A workspace is considered active when it is assigned to a group.
+A layout is optional — if one is present (either globally or under the group),
+it will be applied.
+
+If no layout is found, the workspace will still be available, but nothing will
+be appended or launched.
+
+=head2 Application Launching
+
+Applications are automatically launched based on the swallow construct on the
+layout:
+
+  - cmd: --no-startup-id kitty
+    match:
+      class: ^kitty$
+
+Here you see that kitty is started on the class kitty.
+But you can start a specific thunderbird profile on the group C<work> when your
+layout has a class C<thunderbird-default>, but starts another instance when you
+are on either a different workspace or group:
+
+  - cmd: tb-work
+    on:
+      group: work
+    match:
+      class: ^thunderbird-default$
+
+  - cmd: tb-private
+    on:
+      workspace: area51
+    match:
+      class: ^thunderbird-default$
+
+The same can be done for browsers:
+
+  - cmd: firefox-nightly
+    on:
+      group: personal
+    match:
+      window_role: ^browser$
+
+  - cmd: --no-startup-id start-chrome work
+    on:
+      group: work
+    match:
+      window_role: ^browser$
+
+This allows you to tweak all the startup applications you have defined in the
+layout without having to start them when you open i3. Closing an empty
+workspace and reopening it will result in an C<init> action by i3 and gives you
+a fresh layout start.
+
+=head2 i3 Integration
+
+Use to ensure i3-wod is always running correctly, even after reloading i3:
+
+  exec_always --no-startup-id "i3-wod &"
+
+As shown earlier you can use regular C<bindsym>s to trigger group or context
+changes. Modes are the preferred way:
+
+  # Dynamic workspaces
+  bindsym $mod+w mode "Dynamic workspaces"
+  mode "Dynamic workspaces" {
+    bindsym 0 exec i3-msg -t send_tick group:personal; mode default
+    bindsym 9 exec i3-msg -t send_tick group:work; mode default
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+  }
+
+But you can also use L<rofi|https://davatorium.github.io/rofi/> for a more
+visual style. Script for this are not included in the distribution as it
+would add a dependency and maybe unneeded for users who use different tools.
+
+Once a group (or context) is switched current workspaces get renamed to
+$former_group:$workspace_name and leaves new workspaces for the ones you have
+defined. If you switch back to the previous group the workspaces get renamed,
+and the old ones get reinserted/applied.
+
+=head1 AUTHOR
+
+Wesley Schwengle <waterkip@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2024 by Wesley Schwengle.
+
+This is free software, licensed under:
+
+  The (three-clause) BSD License
+
+=cut

@@ -17,7 +17,7 @@ use Log::Log4perl qw(:easy);
 
 use Pod::Usage;
 
-our $VERSION              = '1.0.3';
+our $VERSION              = '1.0.7';
 our $GETOPT_EXIT_ON_ERROR = $TRUE;
 our $GETOPT_STATUS;
 our $GETOPT_ERROR_MESSAGE;
@@ -181,11 +181,15 @@ sub new {
   if ($alias) {
     if ( $alias->{options} ) {
       foreach my $p ( pairs %{ $alias->{options} } ) {
-        if ( defined $cli_options{ $p->[1] } ) {
-          $cli_options{ $p->[0] } = $cli_options{ $p->[1] };
+        my ( $aka, $name ) = @{$p};
+        $aka  =~ s/[-]/_/gxsm;
+        $name =~ s/[-]/_/gxsm;
+
+        if ( defined $cli_options{$name} ) {
+          $cli_options{$aka} = $cli_options{$name};
         }
-        elsif ( defined $cli_options{ $p->[0] } ) {
-          $cli_options{ $p->[1] } = $cli_options{ $p->[0] };
+        elsif ( defined $cli_options{$aka} ) {
+          $cli_options{$name} = $cli_options{$aka};
         }
       }
     }
@@ -383,7 +387,11 @@ sub example {
 ########################################################################
 sub command {
 ########################################################################
-  my ($self) = @_;
+  my ( $self, $command ) = @_;
+
+  if ($command) {
+    $self->set__command($command);
+  }
 
   return $self->get__command;
 }
@@ -391,9 +399,19 @@ sub command {
 ########################################################################
 sub commands {
 ########################################################################
-  my ($self) = @_;
+  my ( $self, $command, $handler ) = @_;
 
-  return $self->get__commands;
+  my $commands = $self->get__commands;
+
+  if ( $command && $handler ) {
+
+    croak "ERROR: usage: commands([command, subref])\n"
+      if reftype($handler) ne 'CODE';
+
+    $commands->{$command} = $handler;
+  }
+
+  return $commands;
 }
 
 ########################################################################
@@ -517,7 +535,7 @@ L<CLI::Simple::Constants>, which pairs naturally with this module.
 
 =head1 VERSION
 
-This documentation refers to version 1.0.3.
+This documentation refers to version 1.0.7.
 
 =head2 Features
 
@@ -796,11 +814,24 @@ recognizes.
 
 =head2 command
 
-Returns the command presented on the command line.
+ command
+ command(command)
+
+Get or sets the command to execute. Usually this is the first argument
+on the command line after all options have been parsed. There are
+times when you might want to override the argument. You can pass a new
+command that will be executed when you call the C<run()> method.
 
 =head2 commands
 
-Returns the hash you passed in the constructor as C<commands>.
+ commands
+ commands(command, handler)
+
+Returns the hash you passed in the constructor as C<commands> or can
+be used to insert a new command into the C<commands> hash. C<handler>
+should be a code reference.
+
+ commands(foo => sub { return 'foo' });
 
 =head2 run
 

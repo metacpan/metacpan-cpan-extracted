@@ -1,3 +1,8 @@
+0.03 2025-09-28T20:34:58+02:00
+ - Add test for bad ISBN (field 020a).
+ - Add test for record without ISB (field 020a).
+ - Fix dependencies.
+
 0.02 2025-09-28T09:09:10+02:00
  - Add add_error() helper function.
  - Add validation for field 020a ISBN.

@@ -2,12 +2,10 @@ Changes
 lib/Data/JPack.pm
 lib/Data/JPack.pod
 lib/Data/JPack/App.pm
-lib/Data/JPack/Container.pm
-lib/Data/JPack/Packer.pm
-lib/Data/JPack/TimeSeries.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.SKIP
 README
 README.md
 script/jpack-app
@@ -15,12 +13,13 @@ share/js/00-sprintf.min.js
 share/js/01-workerpool.js
 share/js/02-chunkloader.js
 share/js/pako.min.js
+share/js/sha.js
+share/js/uuid.min.js
 t/01-container.t.dis
 t/01-encode.t.dis
 t/01-file-db.t
 t/01-js.t
 t/02-process.t.dis
 t/02-unpack.t.dis
-t/test.js
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

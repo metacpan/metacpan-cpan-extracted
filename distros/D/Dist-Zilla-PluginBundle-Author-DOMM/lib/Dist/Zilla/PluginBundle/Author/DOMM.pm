@@ -2,7 +2,7 @@ package Dist::Zilla::PluginBundle::Author::DOMM;
 
 # ABSTRACT: Dist::Zilla config suiting my needs
 
-our $VERSION = '0.909'; # VERSION
+our $VERSION = '0.912'; # VERSION
 
 use Moose;
 use namespace::autoclean;
@@ -36,6 +36,7 @@ use Dist::Zilla::Plugin::TestRelease;
 use Dist::Zilla::Plugin::ReadmeAnyFromPod;
 use Dist::Zilla::Plugin::CopyFilesFromBuild;
 use Dist::Zilla::Plugin::GithubMeta;
+use Dist::Zilla::Plugin::SourceHutMeta;
 use Dist::Zilla::Plugin::Git::Check;
 use Dist::Zilla::Plugin::ConfirmRelease;
 use Dist::Zilla::Plugin::UploadToCPAN;
@@ -52,12 +53,19 @@ has homepage => (
   default => sub { $_[0]->payload->{homepage} } ,
 );
 
+has bugtracker => (
+  is      => 'ro' ,
+  isa     => 'Maybe[Str]' ,
+  lazy    => 1,
+  default => sub { $_[0]->payload->{bugtracker} } ,
+);
+
 sub configure {
     my $self = shift;
 
     $self->add_plugins(
         [ 'Git::GatherDir' =>
-            { exclude_filename => [qw/README.pod META.json cpanfile/] }],
+            { exclude_filename => [qw/README.pod META.json cpanfile LICENSE/] }],
         'PruneCruft',
         'ManifestSkip',
         'License',
@@ -81,7 +89,8 @@ sub configure {
         'PodWeaver',
         'InstallGuide',
         ['Test::Compile' => {
-            fake_home => 1
+            fake_home => 1,
+            fail_on_warning=>'none',
         }],
         'TestRelease',
         [ 'ReadmeAnyFromPod' => { # TODO escaping of '::' in metacpan urls in readme
@@ -89,10 +98,14 @@ sub configure {
             filename=>'README.md',
             location=>'build',
         }],
-        [ 'CopyFilesFromBuild' => { copy => ['README.md', 'cpanfile'] } ],
+        [ 'CopyFilesFromBuild' => { copy => ['README.md', 'cpanfile', 'LICENSE'] } ],
         # TODO default homepage should be metacpan!
         ['GithubMeta' => {
             issues=>1,
+            ($self->homepage ? (homepage => $self->homepage) : ()),
+        }],
+        ['SourceHutMeta' => {
+            bugtracker => $self->bugtracker,
             ($self->homepage ? (homepage => $self->homepage) : ()),
         }],
         [ 'Git::Check' => {
@@ -131,7 +144,7 @@ Dist::Zilla::PluginBundle::Author::DOMM - Dist::Zilla config suiting my needs
 
 =head1 VERSION
 
-version 0.909
+version 0.912
 
 =head1 DESCRIPTION
 

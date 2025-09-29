@@ -39,6 +39,7 @@ subtest 'basic construction' => sub {
 paths: {}
 YAML
 
+  cmp_result([ $doc->errors ], [], 'no errors when loading empty document');
   cmp_result(
     { $doc->resource_index },
     {
@@ -82,6 +83,7 @@ YAML
     'unsupported construction arguments (but supported in the base class) generate warnings',
   );
 
+  cmp_result([ $doc->errors ], [], 'no errors when using an ignored constructor argument');
   cmp_result(
     $doc->{resource_index},
     {
@@ -319,7 +321,7 @@ ERRORS
 };
 
 subtest 'openapi version checks' => sub {
-  foreach my $version (qw(3.1.2)) {    # TODO: 3.2.5 4.0.0 4.1.0
+  foreach my $version (qw(3.1.3 3.1.9 3.1.10)) {    # TODO: 3.2.5 4.0.0 4.1.0
     cmp_result(
       [ warnings {
         JSON::Schema::Modern::Document::OpenAPI->new(
@@ -527,6 +529,7 @@ components:
     Foo:
       maxLength: false,  # this is a bad schema, but our custom dialect does not detect that
 YAML
+  cmp_result([ $doc->errors ], [], 'no errors with a relative jsonSchemaDialect');
   $js->add_document($doc);
 
   cmp_result(
@@ -612,6 +615,7 @@ $self: user/api.json  # the 'user' family of APIs
 paths: {}
 YAML
 
+  cmp_result([ $doc->errors ], [], 'no errors with a relative $self and absolute original_uri');
   is($doc->original_uri, 'http://localhost:1234/foo/api.json', 'retrieval uri');
   is($doc->canonical_uri, 'http://localhost:1234/foo/user/api.json', 'canonical uri is $self resolved against retrieval uri');
   cmp_result(
@@ -637,6 +641,7 @@ $self: http://localhost:5555/user/api.json  # the 'user' family of APIs
 paths: {}
 YAML
 
+  cmp_result([ $doc->errors ], [], 'no errors with an absolute $self');
   is($doc->original_uri, 'http://localhost:1234/foo/api.json', 'retrieval uri');
   is($doc->canonical_uri, 'http://localhost:5555/user/api.json', 'canonical uri is $self, already absolute');
   cmp_result(
@@ -661,6 +666,7 @@ $self: user/api.json  # the 'user' family of APIs
 paths: {}
 YAML
 
+  cmp_result([ $doc->errors ], [], 'no errors with a relative $self and relative original_uri');
   is($doc->original_uri, 'foo/api.json', 'retrieval uri');
   is($doc->canonical_uri, 'foo/user/api.json', 'canonical uri is $self resolved against retrieval uri');
   cmp_result(
@@ -685,6 +691,7 @@ $self: http://localhost:5555/user/api.json  # the 'user' family of APIs
 paths: {}
 YAML
 
+  cmp_result([ $doc->errors ], [], 'no errors with an absolute $self and relative original_uri');
   is($doc->original_uri, 'foo/api.json', 'retrieval uri');
   is($doc->canonical_uri, 'http://localhost:5555/user/api.json', 'canonical uri is $self, already absolute');
   cmp_result(

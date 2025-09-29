@@ -2,7 +2,7 @@
 use warnings;
 use strict;
 use 5.016;
-our $VERSION = '2.432';
+our $VERSION = '2.433';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -46,7 +46,7 @@ C<db-browser> - Browse SQL databases and their tables interactively.
 
 =head1 VERSION
 
-Version 2.432
+Version 2.433
 
 =head1 SYNOPSIS
 
@@ -807,8 +807,11 @@ Not all of these extensions are available everywhere.
 
 Enter a constant value.
 
-If the data type is numeric or undefined and the literal looks like a number, the literal is not enclosed in quotation
-marks. In all other cases, the entered literal is enclosed in quotation marks.
+If the data type is numeric or undefined and the literal looks like a number, it is not enclosed in quotation marks.
+In all other cases, the literal is enclosed in quotation marks.
+
+C<SQLite>: If the option C<sqlite_see_if_its_a_number> is enabled, values that look like numbers are not enclosed in
+quotation marks; otherwise, they are.
 
 To enter a value quoted manually, use the C<SQL> menu entry from the C<%%> menu.
 
@@ -830,7 +833,7 @@ of the scalar function menu.
 C<DATEADD>, C<EXTRACT> and some other functions: use the keys C<Up-Arrow> and C<Down-Arrow> to choose one of the
 predefined fields (in C<Value> if the extended arguments are enabled).
 
-C<TO_EPOCH> and C<Oracle>: the argument I<Column type> can be any of the following: I<DATE>, I<TIMESTAMP> or
+C<TO_EPOCH> and C<Oracle>: The argument I<Column type> can be any of the following: I<DATE>, I<TIMESTAMP> or
 I<TIMESTAMP_TZ>. If the column type is I<DATE> or I<TIMESTAMP> the session timezone is used as timezone.
 
 Scalar functions may not work with the C<ODBC> plugin.
@@ -871,7 +874,7 @@ C<WHERE>: Skip the column and use the EXISTS or the NOT EXISTS operator.
 
 =item Parentheses
 
-C<WHERE>, C<WHEN> and C<HAVING>: in the C<%%> menu are also available parentheses.
+C<WHERE>, C<WHEN> and C<HAVING>: In the C<%%> menu are also available parentheses.
 
 =item Column Aliases
 
@@ -956,7 +959,7 @@ Non-unique columns in JOIN
 
 Derived table
 
-C<PostgreSQL>, C<MySQL> and C<MariaDB>: ensure that aliases for derived tables are enabled.
+C<PostgreSQL>, C<MySQL> and C<MariaDB>: Ensure that aliases for derived tables are enabled.
 
 =item
 
@@ -1036,11 +1039,11 @@ Quote Column Names and Aliases
 
 =back
 
-C<SQLite>: if the current database has attached databases, the use of qualified table names is enabled automatically.
+C<SQLite>: If the current database has attached databases, the use of qualified table names is enabled automatically.
 
-C<SQLite>: database names in SQL statements (C<ATTACH DATABASE>) are always quoted.
+C<SQLite>: Database names in SQL statements (C<ATTACH DATABASE>) are always quoted.
 
-C<Informix>: set the C<DELIMIDENT> environment variable to allow quoted identifiers.
+C<Informix>: Set the C<DELIMIDENT> environment variable to allow quoted identifiers.
 
 =head3 View Prefix
 

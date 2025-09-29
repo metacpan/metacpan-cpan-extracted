@@ -4,7 +4,7 @@
       "Thomas Klausner <domm@plix.at>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -62,6 +62,7 @@
             "Dist::Zilla::Plugin::PruneCruft" : "0",
             "Dist::Zilla::Plugin::ReadmeAnyFromPod" : "0",
             "Dist::Zilla::Plugin::ShareDir" : "0",
+            "Dist::Zilla::Plugin::SourceHutMeta" : "0",
             "Dist::Zilla::Plugin::Test::Compile" : "0",
             "Dist::Zilla::Plugin::TestRelease" : "0",
             "Dist::Zilla::Plugin::UploadToCPAN" : "0",
@@ -86,24 +87,25 @@
    "provides" : {
       "Dist::Zilla::PluginBundle::Author::DOMM" : {
          "file" : "lib/Dist/Zilla/PluginBundle/Author/DOMM.pm",
-         "version" : "0.909"
+         "version" : "0.912"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/domm/Dist-Zilla-PluginBundle-Author-DOMM/issues"
+         "mailto" : "Thomas Klausner <domm@plix.at>"
       },
-      "homepage" : "https://github.com/domm/Dist-Zilla-PluginBundle-Author-DOMM",
+      "homepage" : "https://git.sr.ht/~domm/Dist-Zilla-PluginBundle-Author-DOMM",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/domm/Dist-Zilla-PluginBundle-Author-DOMM.git",
-         "web" : "https://github.com/domm/Dist-Zilla-PluginBundle-Author-DOMM"
-      }
+         "url" : "https://git.sr.ht/~domm/Dist-Zilla-PluginBundle-Author-DOMM",
+         "web" : "https://git.sr.ht/~domm/Dist-Zilla-PluginBundle-Author-DOMM"
+      },
+      "x_foo" : 1
    },
-   "version" : "0.909",
-   "x_generated_by_perl" : "v5.32.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "version" : "0.912",
+   "x_generated_by_perl" : "v5.40.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

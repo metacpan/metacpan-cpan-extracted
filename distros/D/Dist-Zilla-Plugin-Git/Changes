@@ -1,5 +1,8 @@
 Revision history for Dist::Zilla::Plugin::Git
 
+2.052     2025-09-28 16:59:28Z
+  - clear $XDG_CONFIG_HOME in tests (Graham Knop)
+
 2.051     2024-06-16 16:53:20Z
   - skip some tests if git version is not new enough
 

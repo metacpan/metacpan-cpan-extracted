@@ -191,6 +191,19 @@ sub _in_transaction_check {
     }
 }
 
+sub DESTROY {
+    my ($self) = @_;
+    
+    # Automatically call disconnect when the object is destroyed or program terminates
+    # Skip calling disconnect in forked processes (only call in the process that owns the connection)
+    if ($self->{dbh} && 
+        $self->{dbh}->FETCH('Active') && 
+        defined $self->owner_pid && 
+        $self->owner_pid == $$) {
+        $self->disconnect();
+    }
+}
+
 
 1;
 __END__
@@ -410,6 +423,8 @@ returns last_insert_id. (mysql_insertid in MySQL or last_insert_rowid in SQLite)
 =head2 disconnect
 
 disconnect database.
+
+Note: Since version with auto-disconnect feature, disconnect() is automatically called when the object is destroyed (at program termination or when the object goes out of scope), but only in the process that originally created the connection (fork-safe).
 
 =head2 reconnect
 

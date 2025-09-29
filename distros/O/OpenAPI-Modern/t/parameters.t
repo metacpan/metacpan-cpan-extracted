@@ -43,7 +43,7 @@ no warnings 'redefine';
   $parameter_content = $dataref->$*;
 };
 
-my $schema_path = '/paths/~1foo/get/parameters/0';
+my $keyword_path = '/paths/~1foo/get/parameters/0';
 
 subtest 'path parameters' => sub {
   my @tests = (
@@ -59,8 +59,8 @@ subtest 'path parameters' => sub {
       errors => [
         {
           instanceLocation => '/request/path',
-          keywordLocation => $schema_path.'/required',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$schema_path.'/required',
+          keywordLocation => $keyword_path.'/required',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
           error => 'missing path parameter: missing',
         },
       ],
@@ -73,8 +73,8 @@ subtest 'path parameters' => sub {
       errors => [
         {
           instanceLocation => '/request/path',
-          keywordLocation => $schema_path.'/required',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$schema_path.'/required',
+          keywordLocation => $keyword_path.'/required',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
           error => 'missing path parameter: missing_json_content',
         },
       ],
@@ -224,8 +224,8 @@ subtest 'path parameters' => sub {
     undef $parameter_content;
     my $state = {
       initial_schema_uri => $openapi->openapi_uri,
-      traversed_schema_path => '',
-      schema_path => $schema_path,
+      traversed_keyword_path => '',
+      keyword_path => $keyword_path,
       errors => [],
       depth => 0,
     };
@@ -281,8 +281,8 @@ subtest 'query parameters' => sub {
       errors => [
         {
           instanceLocation => '/request/query',
-          keywordLocation => $schema_path.'/required',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$schema_path.'/required',
+          keywordLocation => $keyword_path.'/required',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
           error => 'missing query parameter: missing_encoded_required',
         },
       ],
@@ -299,8 +299,8 @@ subtest 'query parameters' => sub {
       errors => [
         {
           instanceLocation => '/request/query/reserved',
-          keywordLocation => $schema_path.'/allowReserved',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$schema_path.'/required',
+          keywordLocation => $keyword_path.'/allowReserved',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
           error => 'allowReserved: true is not yet supported',
         },
       ],
@@ -370,8 +370,8 @@ subtest 'query parameters' => sub {
     undef $parameter_content;
     my $state = {
       initial_schema_uri => $openapi->openapi_uri,
-      traversed_schema_path => '',
-      schema_path => $schema_path,
+      traversed_keyword_path => '',
+      keyword_path => $keyword_path,
       errors => [],
       depth => 0,
     };
@@ -430,8 +430,8 @@ subtest 'header parameters' => sub {
       errors => [
         {
           instanceLocation => '/request/header',
-          keywordLocation => $schema_path.'/required',,
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$schema_path.'/required',
+          keywordLocation => $keyword_path.'/required',,
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
           error => 'missing header: Missing',
         },
       ],
@@ -542,8 +542,8 @@ subtest 'header parameters' => sub {
     undef $parameter_content;
     my $state = {
       initial_schema_uri => $openapi->openapi_uri,
-      traversed_schema_path => '',
-      schema_path => $schema_path,
+      traversed_keyword_path => '',
+      keyword_path => $keyword_path,
       errors => [],
       depth => 0,
     };

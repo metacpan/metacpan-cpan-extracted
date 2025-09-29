@@ -22,6 +22,7 @@ BEGIN{ package MyClass; sub dd() { return '(MyClass)' } }
 	multi dd (\%data)  { '{' . join(', ', map {dd($_, $data{$_})} keys %data) . '}' }
 
 	# Format strings, numbers, regexen...
+	multi dd (undef)                             { 'undef' }
 	multi dd ($data)                             { '"' . quotemeta($data) . '"' }
 	multi dd ($data :where(\&looks_like_number)) { $data }
 	multi dd ($data :where(Regexp))              { 'qr{' . $data . '}' }
@@ -70,6 +71,11 @@ BEGIN{ package MyClass; sub dd() { return '(MyClass)' } }
 	# Format strings, numbers, regexen...
 
 	multi dd => (
+		pos    => [ Undef ],
+		return => 'undef',
+	);
+
+	multi dd => (
 		pos  => [ Str ],
 		code => sub { '"' . quotemeta(shift) . '"' },
 		alias => 'dd_str',
@@ -114,7 +120,7 @@ my @cases = (
 	[ \*STDERR ],
 	[ bless {}, 'MyClass' ],
 	[ Object ],
-	['label' => { a=>1, b=>2, z=>[3, 'three', 3] } ],
+	['label' => { a=>1, b=>2, y=>undef, z=>[3, 'three', 3] } ],
 );
 
 for my $case ( @cases ) {
@@ -123,7 +129,7 @@ for my $case ( @cases ) {
 	$got1 eq $got2 or warn "$got1 vs $got2";
 }
 
-our $test_data = [ 'label' => { a=>1, b=>2, z=>[3, 'three', 3] }, 'label2' => qr{foo} ];
+our $test_data = [ 'label' => { a=>1, b=>2, y=>undef, z=>[3, 'three', 3] }, 'label2' => qr{foo} ];
 
 use Benchmark 'cmpthese';
 

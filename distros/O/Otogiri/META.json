@@ -76,7 +76,7 @@
       },
       "Otogiri" : {
          "file" : "lib/Otogiri.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       }
    },
    "release_status" : "stable",
@@ -91,13 +91,13 @@
          "web" : "https://github.com/ytnobody/Otogiri"
       }
    },
-   "version" : "0.23",
+   "version" : "0.24",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "Takuya Tsuchida <tsucchi@cpan.org>",
       "papix <mail@papix.net>",
       "ytnobody <ytnobody@ytnobody.net>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.02",
+   "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

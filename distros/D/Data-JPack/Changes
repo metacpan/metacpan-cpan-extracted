@@ -1,6 +1,25 @@
 Revision history for Perl extension Data::JPack.
 
-0.01  Fri Oct 22 12:05:23 2021
+v0.2.1 2025-09-10
+  [fixes]
+    - die if directory cannot be made
+    - remove debug statements
+
+v0.2.0 2025-05-26
+  -  Added uuid generation (https://github.com/verzth/uuid-js) to overcome non
+     secure context limitation in browser cryto api
+
+  -  Added hashing functions (https://github.com/Caligatio/jsSHA) to overcome
+     non secure context limititions in broswer cryto api secure context
+
+  - Removed artifcat files from distribution
+
+v0.1.1  2024-12-13
+  [improvements]
+    - added OO API ->encode_file. Reads input file, encodes, and writes to
+      output file if supplied.
+  
+v0.1.0  2024-10-22
 	- original version; created by h2xs 1.23 with options
 		-PX -n Data::JPack
 

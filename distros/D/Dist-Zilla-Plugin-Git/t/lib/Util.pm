@@ -108,6 +108,7 @@ sub _clean_environment
 
   $ENV{HOME} = $ENV{GNUPGHOME} = $homedir;
   $ENV{GIT_CONFIG_NOSYSTEM} = 1; # Don't read /etc/gitconfig
+  delete $ENV{XDG_CONFIG_HOME};
 } # end _clean_environment
 
 #---------------------------------------------------------------------

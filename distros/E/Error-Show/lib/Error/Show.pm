@@ -7,7 +7,7 @@ use feature "say";
 
 
 
-our $VERSION = 'v0.4.0';
+our $VERSION = 'v0.5.0';
 
 use constant::more DEBUG=>undef;
 use constant::more {
@@ -33,6 +33,7 @@ use constant::more {
 my @IINC;
 sub context;
 
+my %programs;
  
 sub import {
   my $package=shift;
@@ -46,8 +47,15 @@ sub import {
   #
   if($caller[LINE]){
     no strict "refs";
-    my $name=$caller[0]."::context";
+    my $name;
+    $name=$caller[0]."::context";
     *{$name}=\&{"context"};
+
+    $name=$caller[0]."::streval";
+    *{$name}=\&{"streval"};
+
+    $name=$caller[0]."::throw";
+    *{$name}=\&{"throw"};
     return; 
   }
 
@@ -142,7 +150,7 @@ sub import {
 
   my $runnable=$?==0;
 
-  my $status=context(splain=>$splain, clean=>$clean, error=>$result )."\n";
+  my $status=context( $result, splain=>$splain, clean=>$clean)."\n";
 
   if($^C){
     if($runnable){
@@ -175,7 +183,7 @@ sub import {
           my @frames;
           my $i=0;
           push @frames , [caller $i++] while caller $i;
-          say STDERR Error::Show::context message=>$_[0], frames=>\@frames;
+          say STDERR Error::Show::context bless {error=>$_[0], frames=>\@frames}, "Error::Show::Exception";
           exit;
         };
       }
@@ -192,49 +200,54 @@ sub import {
 
 
 sub process_string_error{
-  my $error=pop;
+
+  my $error_in=shift;
   my %opts=@_;
 
-	my @error_lines;
+  require Scalar::Util;
+  my @error_lines;
   my @errors; 
   #my @entry;
   my %entry;
-	if(defined $error){
-    #local $_=$error;
-		#Substitue with a line number relative to the start marker
-		#Reported line numbers are 1 based, stored lines are 0 based
-    #my $translation=$opts{translation};
-    #my $start=$opts{start};
-  
-    my $i=0;
-		for(split "\n", $error){
-      DEBUG and say STDERR "ERROR LINE: ".$_;
-      if(/at (.*?) line (\d+)/
-        or /Missing right curly or square bracket at (.*?) (\d+) at end of line/){
-        #
-        # Group by file names
-        #
-        DEBUG and say STDERR "PROCESSING: ".$_;
-        DEBUG and say STDERR "file: $1 and line $2";
-        my $entry=$entry{$1}//=[];
-        #push @$entry, {file=>$1, line=>$2,message=>$_, sequence=>$i++};
-        my $a=[];
-        $a->[FILENAME]=$1;
-        $a->[LINE]=$2-1;
-        $a->[MESSAGE]=$_;
-        $a->[MESSAGE]=$opts{message} if $opts{message};
-        $a->[SEQUENCE]=$i++;
-        $a->[EVALTEXT]=$opts{program} if $opts{program};
-        push @$entry, $a;
-      }
-    }
 
-    
-	}
-	else {
-		#Assume a target line
-    #push @error_lines, $opts{line}-1;
-	}
+  
+
+  #  Convert the object (or string) error to string.. and process the line numbers etc.
+  #  This is the easiest way to support multiple Execption types. 
+  #
+  my $error;
+  $error||="$error_in";
+
+  #local $_=$error;
+  #Substitue with a line number relative to the start marker
+  #Reported line numbers are 1 based, stored lines are 0 based
+  #my $translation=$opts{translation};
+  #my $start=$opts{start};
+
+  my $i=0;
+  for(split "\n", $error){
+    DEBUG and say STDERR "ERROR LINE: ".$_;
+    if(/at (.*?) line (\d+)/
+        or /Missing right curly or square bracket at (.*?) (\d+) at end of line/){
+      #
+      # Group by file names
+      #
+      DEBUG and say STDERR "PROCESSING: ".$_;
+      DEBUG and say STDERR "file: $1 and line $2";
+      my $entry=$entry{$1}//=[];
+      #push @$entry, {file=>$1, line=>$2,message=>$_, sequence=>$i++};
+      my $a=[];
+      $a->[FILENAME]=$1;
+      $a->[LINE]=$2-1;
+      $a->[MESSAGE]=$_;
+      $a->[MESSAGE]=$opts{message} if $opts{message};
+      $a->[SEQUENCE]=$i++;
+      $a->[EVALTEXT]=$opts{program} if $opts{program};
+      push @$entry, $a;
+    }
+  }
+
+
 
   #Key is file name
   # value is a hash of filename,line number, perl error string and the sequence number
@@ -243,13 +256,14 @@ sub process_string_error{
 
 }
 
-# Takes a hash ref error sources
+# Takes a hash ref 'normalized error' sources, cross reference with source
+# files and internal caching of string eval, and generates context lines around
+# target line number
 
 sub text_output {
-  my $info_ref=pop;
+  my $info_ref=shift;
   my %opts=@_;
   my $total="";
-
   DEBUG and say STDERR "Reverse flag in text output set to: $opts{reverse}";
 
   # Sort by sequence number 
@@ -273,8 +287,13 @@ sub text_output {
     unless(exists $info->[CODE_LINES]){
       my @code;
       
-      if($info->[EVALTEXT]){
-        @code=split "\n", $info->[EVALTEXT];
+      if(my @f=$info->[FILENAME] =~ /\(eval \d+\)/g){
+        # Not actually a file, this was an eval
+        my $prog=$programs{$f[0]};
+        @code=split "\n", $prog//"";
+
+        # Remove the cached code once its been accessed, unless we really want to keep it
+        delete $programs{$f[0]} unless $opts{keep};
       }
       else {
         @code=split "\n", do {
@@ -349,9 +368,9 @@ sub text_output {
     #
     my $f_len=length("$max");
 
-    my $out="$opts{indent}$info->[FILENAME]\n";
+    my $indent=$opts{current_indent}//"";
+    my $out="$indent$info->[FILENAME]\n";
     
-    my $indent=$opts{indent}//"";
     my $format="$indent%${f_len}d% 2s %s\n";
     my $mark="";
 
@@ -389,79 +408,58 @@ sub text_output {
 }
 
 
-#Take an error string and attempt to contextualize it
-#	context options_pairs, error string	
-sub _context{
-	#use feature ":all";
-	DEBUG and say STDERR "IN context call";
-  #my ($package, $file, $caller_line)=caller;
-	# 
-  # Error is set by single argument, key/value pair, or if no
-  # argument $@ is used
-  #
-	my %opts=@_;
-
-  my $error= $opts{error};
-
-
-
-  #$opts{start_mark};#//=qr|.*|;	#regex which matches the start of the code 
-	$opts{pre_lines}//=5;		  #Number of lines to show before target line
-	$opts{post_lines}//=5;		#Number of lines to show after target line
-	$opts{start_offset}//=0;	#Offset past start mark to consider as min line
-	$opts{end_offset}//=0;		#Offset before end to consider as max line
-	$opts{translation}//=0;		#A static value added to the line numbering
-	$opts{indent}//="";
-	$opts{file}//="";
-
-  # Get the all the info we need to process
-  my $info_ref;
-  if(defined($error) and ref($error) eq ""){
-    #A string error. A normal string die/warn or compile time errors/warnings
-    $info_ref=process_string_error %opts, $error;
-  }
-  else{
-    #Some kind of object, converted into line and file hash
-    $info_ref= {$error->[FILENAME]=>[$error]};#  {$error->{file}=>[$error]};
-    $error->[MESSAGE]=$opts{message}//""; #Store the message
-    $error->[EVALTEXT]=$opts{program} if $opts{program};
-  }
-  
-  # Override text/file to search
-  my $output;
-  $output=text_output %opts, $info_ref;
-  
-  #TODO:
-  #
-	$output;
-  
-}
-
-
 #
 # Front end to the main processing sub. Configures and checks the inputs
 #
 my $msg= "Trace must be a ref to array of  {file=>.., line=>..} pairs";
 sub context{
   shift if(defined $_[0] and $_[0] eq __PACKAGE__);
-  my %opts;
+
+
+  my $error=shift;
+  return unless $error;
+
+  my %opts=@_;
+
   my $out;
-  if(@_==0){
-    $opts{error}=$@;
-  }
-  elsif(@_==1){
-    $opts{error}=shift;
-  }
-  else {
-    %opts=@_;
-  }
-  if($opts{frames}){
-    $opts{error}=delete $opts{frames};
+  my $do_internal_frames=1;
+
+  #return unless $opts{error} or $opts{frames} or $do_internal_frames;
+  #$opts{start_mark};#//=qr|.*|;	#regex which matches the start of the code 
+	$opts{pre_lines}//=5;		  #Number of lines to show before target line
+	$opts{post_lines}//=5;		#Number of lines to show after target line
+	$opts{start_offset}//=0;	#Offset past start mark to consider as min line
+	$opts{end_offset}//=0;		#Offset before end to consider as max line
+	$opts{translation}//=0;		#A static value added to the line numbering
+	$opts{indent}//="    ";
+	$opts{file}//="";
+  $opts{current_indent}="";
+
+
+
+  unless($opts{reverse}){
+    # Show the actual error 
+    $opts{clean}=undef;
+    my $info_ref=process_string_error $error, %opts ;
+    $out.=text_output $info_ref, %opts;
+    $opts{current_indent}.=$opts{indent};
   }
 
-  # For the special case of error undefined, we assume we want to dump the current location/context
+
+
+
+  
+  # Convert from supported exceptions classes to internal format
+  my $frames;
+  $frames||=eval {$error->{frames}};          # Error::Show::Exception
+  $frames||=eval {[$error->trace->frames]};   # Exception::Class::Base    ok
+  $frames||=eval {$error->caller_stack};      # Exception::Base           ok
+  $frames||=eval {[$error->getStackTrace]};  # Class::Throwable           ok
+  $frames||=eval {\($error->frames)};  # Mojo::Exception                  ok
+  $frames||=[];
+
   #
-  unless(defined $opts{error}){
+  if($do_internal_frames and @$frames==0){
     my $i=0;
 
     #build call frames
@@ -469,97 +467,76 @@ sub context{
     my @stack;
 
     while(@frame=caller($i++)){
-       push @stack, [@frame];
+       push @$frames, [@frame];
     }
-    $opts{error}=\@stack;
   }
   
-  # Convert from supported exceptions classes to internal format
-  my $ref=ref $opts{error};
   my $dstf="Devel::StackTrace::Frame";
 
   require Scalar::Util;
-  if((Scalar::Util::blessed($opts{error})//"") eq $dstf){
-    # Single DSTF stack frame. Convert to an array
-    $opts{error}=[$opts{error}];
-  }
-  elsif($ref eq "ARRAY" and ref($opts{error}[0]) eq ""){
-    # Array of scalars  - a normal stack frame - wrap it
-    $opts{error}=[[$opts{error}->@*]];
-  }
-  elsif($ref eq ""){
-    # Not a reference - A string error 
-  }
-  elsif($ref eq "ARRAY" and ref($opts{error}[0]) eq "ARRAY"){
-    # Array of  arrays of scalars
-    $opts{error}=[map { [$_->@*] } $opts{error}->@* ];
-    
-  }
-  elsif($ref eq "ARRAY" and Scalar::Util::blessed($opts{error}[0]) eq $dstf){
-    #Array of DSTF object
-  }
-  else {
-    # Force stringification of error as a last ditch attempt
-    $opts{error}="$opts{error}";
-  }
-  
-  DEBUG and say STDERR "Reverse flag set to: $opts{reverse}";
+
+
+  #DEBUG and ;
 
   # Reverse the ordering of errors here if requested
   #
-  $opts{error}->@*=reverse $opts{error}->@* if $opts{reverse};
+  my @frames_copy=$frames->@*;
+  @frames_copy=reverse @frames_copy if $opts{reverse};
   # Check for trace kv pair. If this is present. We ignore the error
   #
-  if(ref($opts{error}) eq "ARRAY" and ref $opts{error}[0]){
     # Iterate through the list
-    my $_indent=$opts{indent}//="    ";
-    my $current_indent="";
 
-    my %_opts=%opts;
+    #my %_opts=%opts;
+    $opts{clean}=1;
     my $i=0;  #Sequence number
-    for my $e ($opts{error}->@*) {
+    for my $e (@frames_copy) {
 
+      my $a=[];
       if((Scalar::Util::blessed($e)//"") eq "Devel::StackTrace::Frame"){
         #Convert to an array
-        my @a;
-        $a[PACKAGE]=$e->package;
-        $a[FILENAME]=$e->filename;
-        $a[LINE]=$e->line;
-        $a[SUBROUTINE]=$e->subroutine;
-        $a[HASARGS]=$e->hasargs;
-        $a[WANTARRAY]=$e->wantarray;
-        $a[EVALTEXT]=$e->evaltext;
-        $a[IS_REQUIRE]=$e->is_require;
-        $a[HINTS]=$e->hints;
-        $a[BITMASK]=$e->bitmask;
-        $a[HINT_HASH]=$e->hints;
-        $e=\@a;
+        $a->[PACKAGE]=$e->package;
+        $a->[FILENAME]=$e->filename;
+        $a->[LINE]=$e->line;
+        $a->[SUBROUTINE]=$e->subroutine;
+        $a->[HASARGS]=$e->hasargs;
+        $a->[WANTARRAY]=$e->wantarray;
+        $a->[EVALTEXT]=$e->evaltext;
+        $a->[IS_REQUIRE]=$e->is_require;
+        $a->[HINTS]=$e->hints;
+        $a->[BITMASK]=$e->bitmask;
+        $a->[HINT_HASH]=$e->hints;
+        #$e=\@a;
+      }
+      else {
+        #Copy incase multiple calls to context on same error
+        @$a=$e->@*;
       }
 
+      # Skip over any frames from this package
+      next if $a->[PACKAGE] eq __PACKAGE__;
 
-      if($e->[FILENAME] and defined $e->[LINE]){
-        $e->[MESSAGE]//="";
 
-        #Force a message if one is provided
-        $e->[LINE]--; #Make the error 0 based
-        $e->[MESSAGE]=$opts{message} if $opts{message};
-        $e->[SEQUENCE]=$i++;
-        
-        # Generate the context here
-        #
-        $_opts{indent}=$current_indent;
-        $_opts{error}=$e;
-        $out.=_context %_opts;
-        $current_indent.=$_indent;
-      }
-      else{
-        die $msg;
-      }
+      $a->[MESSAGE]//="";
+
+      #Force a message if one is provided
+      $a->[LINE]--; #Make the error 0 based
+      $a->[MESSAGE]=$opts{message} if $opts{message};
+      $a->[SEQUENCE]=$i++;
+
+      # Generate the context here
+      #
+      my %entry;
+      my $entry=$entry{$a->[FILENAME]}=[];
+      push @$entry, $a;
+      $out.= text_output \%entry, %opts;
+      $opts{current_indent}.=$opts{indent};
     }
-
-  }
-  else {
-    $out=_context %opts;
+  if($opts{reverse}){
+    # Show the actual error 
+    $opts{clean}=undef;
+    my $info_ref=process_string_error $error, %opts ;
+    $out.=text_output $info_ref, %opts;
+    $opts{current_indent}.=$opts{indent};
   }
   $out;
 }
@@ -602,5 +579,123 @@ sub splain {
   }
   $out;
 }
+
+sub streval ($;$){
+
+  # The program we want to execute
+  my $code= $_[0];
+  if(ref($code) eq "CODE"){
+    return eval {$code->()};
+  }
+    my $package=$_[1]//caller;
+
+
+    # Wrap the eval in a sub. Here we can seperate syntax/complile errors and run
+    # time errors
+    #
+
+    my $file;
+
+    # Do eval to get current eval number and then calculate the NEXT eval number
+    my $number=eval '__FILE__=~ qr/(\d+)/; $1';
+    $number++;
+    $file="(eval $number)"; 
+    $programs{$file}=$code;
+    my @in_sub_frame;
+    # Attempt to compile 
+    #
+    my $sub;
+    {
+      local $@;
+      #$sub=eval "sub {package $package; \@in_sub_frame=caller(0); local \$@; my \@res=eval {$code}; if(\$@){} \@res}";
+      $sub=eval "sub {package $package; \@in_sub_frame=caller(0); $code}";
+
+      # Check for SYNTAX error
+      #
+      my $error=$@;
+      if(!defined($sub) or $error){
+        if(!ref $error){
+          # extract the filename (including the () )stored in the error
+          my $filename= $error=~/\(eval \d+\)/g;
+
+          my @frame;
+          my @stack;
+
+          my $i=1;
+          push @stack, [@frame];   #frame from actual eval
+          while(@frame=caller($i++)){
+            push @stack, [@frame];
+          }
+
+          my $o=bless {error=>$error, frames=>\@stack}, "Error::Show::Exception";
+          die $o;#{error=>$error, frames=>\@stack};
+        }
+        else{
+          die $error;
+        }
+      }
+    }
+
+
+    my $result;
+    { 
+      # Check for RUNTIME error
+      local $@;
+      my @frame;
+      $result=eval { $sub->(); };
+      my $error=$@;
+      if($error){
+        if(!ref $error){
+          # extract the filename stored in the error  string
+          my $filename= $error=~/\(eval (\d+)\)/g;
+          my @stack;
+          my $i=1;
+          push @stack, [@in_sub_frame];   #frame from actual eval
+          while(@frame=caller($i++)){
+            push @stack, [@frame];
+          }
+
+          my $o=bless {error=>$error, frames=>\@stack}, "Error::Show::Exception";
+          die $o;
+        }
+        else {
+          # Rethrow as is
+          die $error;
+        }
+      }
+    }
+
+    # otherwise return the result
+    $result;
+}
+
+sub throw {
+  my $error=shift;
+  $error//=$@;
+  my @c=caller(0);
+   
+  my @frames;
+  my $i=1;
+  while(my @frame=caller($i++)){
+    push @frames, \@frame;
+  }
+
+  unless(ref $error){
+    # Error is just a string. so we re create the file and line number 
+    # from the the caller this sub
+    # 
+    die bless {error=>"$error at $c[1] line $c[2]", frames=>\@frames}, "Error::Show::Exception";
+  }
+  else {
+    # rethrow
+    die bless {error=>$error, frames=>\@frames}, "Error::Show::Exception";
+  }
+}
+
+package Error::Show::Exception;
+use overload 
+  '""'=>sub { "$_[0]{error}" },
+  'eq'=>sub { "$_[0]{error}" eq $_[1] };
+
 1;
 __END__

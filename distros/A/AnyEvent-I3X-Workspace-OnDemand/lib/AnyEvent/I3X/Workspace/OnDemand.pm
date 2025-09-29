@@ -1,5 +1,5 @@
 package AnyEvent::I3X::Workspace::OnDemand;
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 use v5.26;
 use Object::Pad;
 
@@ -463,7 +463,7 @@ AnyEvent::I3X::Workspace::OnDemand - An I3 workspace loader
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -543,6 +543,9 @@ groups:
     bindsym Return mode "default"
     bindsym Escape mode "default"
   }
+
+For the user guide please refer to
+L<AnyEvent::I3X::Workspace::OnDemand::UserGuide>.
 
 =head1 METHODS
 

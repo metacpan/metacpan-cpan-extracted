@@ -1,5 +1,8 @@
 Revision history for Perl extension Otogiri
 
+0.24 2025-09-29T08:34:31Z
+    - Added an auto disconnect feature: $otogiri->disconnect() be called when $otogiri to be undef.
+
 0.23 2024-06-08T13:41:40Z
     - Now a hashref can be specified in 2nd argument of update()
 

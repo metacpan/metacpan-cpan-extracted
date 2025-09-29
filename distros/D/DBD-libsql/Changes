@@ -1,5 +1,8 @@
 Revision history for Perl extension DBD-libsql
 
+0.03 2025-09-29T08:40:30Z
+    - fix: call $sth->finish() when DESTROY and $sth is active
+
 0.02 2025-09-28T09:41:32Z
 
     - fix typo: s/schema/scheme/g

@@ -11,7 +11,7 @@ use HTTP::Request;
 use JSON;
 use Data::Dumper;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 our $drh;
 
 # Global hash to store HTTP clients keyed by database handle reference
@@ -249,12 +249,16 @@ sub FETCH {
 sub disconnect {
     my $dbh = shift;
     
+    # Skip if already disconnected
+    return 1 unless $dbh && $dbh->FETCH('Active');
+    
     # Clean up HTTP client if exists
     my $dbh_id = $dbh->FETCH('libsql_dbh_id');
-    if ($dbh_id) {
+    if ($dbh_id && exists $HTTP_CLIENTS{$dbh_id}) {
         delete $HTTP_CLIENTS{$dbh_id};
     }
     
+    # Mark as inactive
     $dbh->STORE('Active', 0);
     return 1;
 }
@@ -465,7 +469,18 @@ sub selectrow_array {
 
 sub DESTROY {
     my $dbh = shift;
-    # Cleanup
+    
+    # Safely attempt cleanup
+    if ($dbh) {
+        # Clean up HTTP client resources
+        my $dbh_id = $dbh->{libsql_dbh_id};
+        if ($dbh_id && exists $HTTP_CLIENTS{$dbh_id}) {
+            delete $HTTP_CLIENTS{$dbh_id};
+        }
+        
+        # Call parent DESTROY to properly handle DBI cleanup
+        $dbh->SUPER::DESTROY() if $dbh->can('SUPER::DESTROY');
+    }
 }
 
 package DBD::libsql::st;
@@ -580,9 +595,15 @@ sub fetchrow_array {
 
 sub finish {
     my $sth = shift;
+    
+    # Clean up statement resources
     delete $sth->{libsql_mock_data};
     delete $sth->{libsql_http_rows};
     delete $sth->{libsql_fetch_index};
+    
+    # Mark as inactive
+    $sth->STORE('Active', 0) if $sth;
+    
     return 1;
 }
 
@@ -593,7 +614,11 @@ sub rows {
 
 sub DESTROY {
     my $sth = shift;
-    # Cleanup
+    
+    # Ensure finish is called if still active
+    if ($sth && $sth->FETCH('Active')) {
+        $sth->finish();
+    }
 }
 
 1;

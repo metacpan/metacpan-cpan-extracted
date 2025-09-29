@@ -14,7 +14,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION ='0.93';
+our $VERSION ='0.94';
 
 my ( $btype1, $btype2, $btype3, $btype4) = ( 1, 2, 3, 4 );
 
@@ -432,6 +432,7 @@ my %_revinfostash = (
         
         
         'd04190' => 'Q4 2024', #    500 1.0 8GB Sony UK
+        'e04190' => 'Q3 2025', #    500+ 1.0 16GB Sony UK
         
         'e04171' => 'Q1 2025', #    5B  1.1 16GB Sony UK
     },

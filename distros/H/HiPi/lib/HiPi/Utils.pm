@@ -21,7 +21,7 @@ use XSLoader;
 use HiPi qw( :rpi );
 use HiPi::RaspberryPi;
 
-our $VERSION ='0.93';
+our $VERSION ='0.94';
 
 our $defaultuser = 'pi';
 

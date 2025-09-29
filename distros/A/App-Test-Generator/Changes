@@ -1,0 +1,8 @@
+Revision history for App-Test-Generator
+
+0.02	Sun Sep 28 09:03:49 EDT 2025
+	Use gtar on OS/X to generate the distro
+	Added edge case test generator for booleans and memberof
+
+0.01	Sun Sep 28 08:43:35 EDT 2025
+        First draft

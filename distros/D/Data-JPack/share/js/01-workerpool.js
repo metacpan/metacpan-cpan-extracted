@@ -119,21 +119,37 @@ class WorkerTemplate{
 	callFunction(name, arg, transfer){
 		//Add to the queue
 		let resolver;
+    let rejecter;
 		let promise=new Promise((resolve, reject)=>{
 			resolver=resolve;
+      rejecter=reject;
 		});
-		this.requestQueue.push({name,arg,transfer,resolver});
+		this.requestQueue.push({name,arg,transfer,resolver,rejecter});
 		this._executeNext();
 		return promise;
 
 	}
 	_executeNext(){
+    //console.log("is busy", this.isBusy);
 		if((!this.isBusy) && (this.requestQueue.length>0)){
 			//console.log(`POSTING TO WORKER ${this.id}`);
 			this.isBusy=true;
 			let r=this.requestQueue.shift();
 			this.responseQueue.push(r);
-			this.worker.postMessage({cmd:"callFunction",name:r.name, arg:r.arg },r.transfer);
+      //console.log("_in execute next", r);
+      try {
+			  this.worker.postMessage({cmd:"callFunction",name:r.name, arg:r.arg },r.transfer);
+      }
+      catch(e){
+        let er={data:{name:"error", result:undefined}};
+        // Could not send message, probably a bad argument. Make as not busy
+				let r=this.responseQueue.shift();
+				//console.log(`Response from worker ${this.id}`);
+				r.rejecter(er);
+				this.isBusy=false;
+				this._executeNext();	//Trigger the queue again
+      }
+
 		}
 	}
 }

@@ -13,6 +13,7 @@ my @files = (
     'lib/OpenAPI/Modern.pm',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
+    't/bundled-schemas.t',
     't/checksums.t',
     't/discriminator.t',
     't/document-parsing.t',

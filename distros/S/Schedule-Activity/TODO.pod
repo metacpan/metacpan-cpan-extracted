@@ -1,0 +1,73 @@
+=pod
+
+=head1 Features
+
+=head2 Slack/buffer defaults
+
+Generally a user shouldn't need to provide any activity/action time other than the C<tmavg>.  Some default behavior should be used, either C<tmmax=1.1*tmavg>, perhaps a default buffering value used during configuration building, or passed as part of schedule building.  As a side benefit, having a value used during schedule building would permit relaxation during retries, and could be reported with the result.  User-configured cases where C<tmmax==tmavg> would never be adjusted.
+
+=head2 Attributes
+
+Attributes of the form C<attribute=E<gt>{attribute=E<gt>value,...}> should be available in all activity/action nodes (and messages when added, see below).  Attributes will be returned from C<buildSchedule> in the C<attribute> key of the result as a hash of C<attribute name=E<gt>{total=E<gt>value,xy=E<gt>[[seconds,total],...]}>.  Attribute totals may then be used by the caller to trigger rebuilds.  Eventually, node filters should support conditional logic predicated on the current attribute values during the build, such as C<next> node look-ahead filtering (with fallback).  Based on the nature of filtering, a nodal change at a given time may induce a rebuild of all following times (or the entire containing activity).
+
+=head2 Multimessage support
+
+A message string only contains the announcement message, but a message array signals customized structures.  If an entry in the array is a scalar, it would be a regular text message.  If the entry is a hash, it would be of the form C<{message=E<gt>'the message',attribute=E<gt>{attribute=E<gt>value}>.  Messages would be chosen randomly, except with filters or searching, which may narrow the selection based on attributes.
+
+=head2 Flat configurations
+
+If possible, support loading of configuration from a Markdown-styled nested listed, with activities as the outermost level and actions at level two.  This only works when all actions are 'equal' and can occur repeatedly in any order.  The concluding action for each activity would be automatic in this case.
+
+=head2 Convenience, min/max/valid reporting functions
+
+More complex schedules may be difficult to interpret at a glance.  One particular annoyance is finding that the target time for an activity cannot be reached, or that there are too many actions to fit a smaller goal window.  Recommend some convenience functions to find the minimum possible activity time (shortest path through the nodes, ultimately), if the activity can be completed at all (sorta easy to forget, and should be checked before attempting scheduling), and the maximum possible activity time (if defined).
+
+=head2 Tension
+
+Scheduling tension is currently only available for buffer time, but it should also be configurable for slack time.
+
+=head2 Node filtering
+
+Node activation conditional upon current attribute values and, possibly, upon total node counts (to avoid the overhead of needing one attribute per node to track this).  Each C<filter=[...]> could therefore have entries of C<nodecount=E<gt>name,op=E<gt>value> or C<attribute=E<gt>name,op=E<gt>value>, where the C<op> keys are the literal key names as C<eq>, C<gt>, ... (converted to numeric operators during evaluation).  This would permit easier "gating operations", which currently require branch duplication in the configuraiton.
+
+=head2 Insertion events
+
+Not yet fully defined, but insertion events would be secondary/tertiary schedules that are predicated on the primary list of activity/actions.  After the actions have been scheduled, additional messages are inserted into the schedule either "before" or "after" existing events.  For example, in an exercise schedule, a message to change the background music is an insertion event and not part of the primary schedule.
+
+Undecided at this time is the desired configuration, since insertion events may have categories of their own.  This may be implemented entirely recursively with calls to buildSchedule where the activities and goal times are taken from the primary schedule, or it may be built using node filtering.
+
+=head2 State
+
+Actions can change states based on the path chosen.  Those states may affect choices during later schedule builds.  This would be useful for "consumables".  This may be indistinguishable from attribute filters like "where sum(attribute)<1".
+
+=head2 Command line tool
+
+Something of the form C<schedule-activity.pl --schedule=file.dumper --activity='600,name' --activity='300,name' ...> might be useful.
+
+=head1 Functional improvements
+
+=head2 Object interface
+
+Move C<Schedule::Activity> from class functions to an object interface.
+
+=head2 Pre-scheduling validation
+
+Scheduling shouldn't be attempted if it's impossible to achieve the goals.  As per the suggested convenience functions above, verify that the minimum path time and max path times bound the activity goal time.
+
+=head2 Slackless/Bufferless configurations
+
+Goals can never be met if 
+
+=head2 Support full object configurations
+
+The current validation logic assumes plain hash references in several spots, but a user should be able to build an object-oriented collection of Nodes etcetera and still call buildSchedule, without manually overriding the pre-validation flag.
+
+=head2 Backtracking behavior
+
+The current mechanism is primarily for safety.  Better backtracking support should be possible.
+
+=head2 Validation of tmmin/avg/max
+
+Validation should check that values are non-decreasing.
+
+=cut

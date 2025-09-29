@@ -8,67 +8,45 @@ package Implementation::SMM {
 	use Sub::MultiMethod qw(multimethod);
 	use Types::Standard -types;
 	
-	multimethod stringify => (
-		positional => [ Undef ],
-		code       => sub {
-			my ($self, $undef) = (shift, @_);
-			'null';
-		},
-	);
+	multimethod stringify => [ Undef ] => ( return => 'null' );
 	
-	multimethod stringify => (
-		positional => [ ScalarRef[Bool] ],
-		code       => sub {
-			my ($self, $bool) = (shift, @_);
-			$$bool ? 'true' : 'false';
-		},
-	);
+	multimethod stringify => [ ScalarRef[Bool] ] => sub {
+		my ($self, $bool) = (shift, @_);
+		$$bool ? 'true' : 'false';
+	};
 	
-	multimethod stringify => (
-		alias      => "stringify_str",
-		positional => [ Str ],
-		code       => sub {
-			my ($self, $str) = (shift, @_);
-			sprintf(q<"%s">, quotemeta($str));
-		},
-	);
+	multimethod stringify => [ Str ] => ( alias => "stringify_str" ) => sub {
+		my ($self, $str) = (shift, @_);
+		sprintf(q<"%s">, quotemeta($str));
+	};
 	
-	multimethod stringify => (
-		positional => [ Num ],
-		code       => sub {
-			my ($self, $n) = (shift, @_);
-			$n;
-		},
-	);
+	multimethod stringify => [ Num ] => sub {
+		my ($self, $n) = (shift, @_);
+		$n;
+	};
 	
-	multimethod stringify => (
-		positional => [ ArrayRef ],
-		code       => sub {
-			my ($self, $arr) = (shift, @_);
-			sprintf(
-				q<[%s]>,
-				join(q<,>, map($self->stringify($_), @$arr))
-			);
-		},
-	);
+	multimethod stringify => [ ArrayRef ] => sub {
+		my ($self, $arr) = (shift, @_);
+		sprintf(
+			q<[%s]>,
+			join(q<,>, map($self->stringify($_), @$arr))
+		);
+	};
 	
-	multimethod stringify => (
-		positional => [ HashRef ],
-		code       => sub {
-			my ($self, $hash) = (shift, @_);
-			sprintf(
-				q<{%s}>,
-				join(
-					q<,>,
-					map sprintf(
-						q<%s:%s>,
-						$self->stringify_str($_),
-						$self->stringify($hash->{$_})
-					), sort keys %$hash,
-				)
-			);
-		},
-	);
+	multimethod stringify => [ HashRef ] => sub {
+		my ($self, $hash) = (shift, @_);
+		sprintf(
+			q<{%s}>,
+			join(
+				q<,>,
+				map sprintf(
+					q<%s:%s>,
+					$self->stringify_str($_),
+					$self->stringify($hash->{$_})
+				), sort keys %$hash,
+			)
+		);
+	};
 }
 
 
@@ -208,15 +186,16 @@ package Implementation::MD {
 }
 
 our %INPUT = (
-	foo => 123,
-	bar => [1,2,3],
-	baz => \1,
-	quux => { xyzzy => 666 },
+	foo   => 123,
+	bar   => [1,2,3,undef],
+	baz   => \1,
+	quux  => { xyzzy => 666 },
+	quuux => undef,
 );
 
 our $SMM = Implementation::SMM->new;
 our $KAV = Implementation::Kavorka->new;
-our $DIO = Implementation::Dios->new;
+#our $DIO = Implementation::Dios->new;
 our $MD  = Implementation::MD->new;
 
 say "SMM output:";
@@ -225,16 +204,16 @@ say $SMM->stringify( \%INPUT );
 say "KAV output:";
 say $KAV->stringify( \%INPUT );
 
-say "DIO output:";
-say $DIO->stringify( \%INPUT );
+#say "DIO output:";
+#say $DIO->stringify( \%INPUT );
 
 say "MD output:";
 say $MD->stringify( \%INPUT );
 
-cmpthese -3, {
+cmpthese -1, {
 	SMM  => q{ $::SMM->stringify(\%::INPUT) },
 	KAV  => q{ $::KAV->stringify(\%::INPUT) },
-	DIO  => q{ $::DIO->stringify(\%::INPUT) },
+#	DIO  => q{ $::DIO->stringify(\%::INPUT) },
 	MD   => q{ $::MD ->stringify(\%::INPUT) },
 };
 

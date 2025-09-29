@@ -19,6 +19,7 @@ perl_version 5.006002;
 readme_from 'Validator.pm';
 recursive_author_tests('xt');
 requires 'Class::Utils' => 0.03;
+requires 'Business::ISBN' => 0;
 requires 'DateTime' => 0;
 requires 'English' => 0;
 requires 'Error::Pure' => 0;
@@ -37,7 +38,7 @@ test_requires 'MARC::File::XML' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.02';
+version '0.03';
 
 # Run.
 WriteAll();

@@ -1,4 +1,26 @@
 Revision history for Perl extension Error::Show.
+v0.5.0
+  [new features]
+
+    - Added streval subroutine. Does a string eval but makes it possible for
+      Error::Show::context to generate  context and saves the required
+      information to generate a stack trace if required.
+
+
+    - added throw subroutine. Creates a basic exception object with stack trace
+      and dies
+      
+    - exports context, streval, throw
+
+  [improvements]
+    - refactored code
+    - simplified logic
+
+  [fixes]
+    - context copies frame data to prevent action at a distance
+    - context can not be called on the same error and give same output
+
+
 v0.4.0 2024-04-23
   [fixes]
   - Clean up of warnings test output

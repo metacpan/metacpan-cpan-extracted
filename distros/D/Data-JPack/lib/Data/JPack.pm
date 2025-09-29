@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use feature ":all";
 
-our $VERSION="v0.1.0";
+our $VERSION="v0.2.1";
 
 use feature qw<say>;
 no warnings "experimental";
@@ -30,9 +30,15 @@ use Export::These qw<jpack_encode jpack_encode_file jpack_decode_file>;
 #
 use constant::more('options_=0', qw<compress_ buffer_ src_ html_root_ html_container_ prefix_  current_set_ current_file_>);
 
+# Database of files seen by a html_container.
+#
+my %seen;
+
+
+
+
 sub new {
 	my $pack=shift//__PACKAGE__;
-  say STDERR "IN NEW JPACK";
 	#options include
 	#	compression
 	#	tagName
@@ -68,7 +74,6 @@ sub new {
 
   make_path $self->[html_root_];
 
-  say STDERR "HTML ROOT IS $self->[html_root_]";
   #$self->[prefix_]
   #$self->[html_root_];
 	bless $self , $pack;
@@ -161,6 +166,31 @@ sub encode {
 	.$self->encode_data($data)
 	.$self->encode_footer
 }
+ 
+sub encode_file {
+  my $self=shift;
+
+	my $path = shift;
+  my $out_path=shift;
+
+	local $/;
+  #return unless 
+  open my $file, "<", $path or die "$path: $!";
+
+	my $data=$self->encode(<$file>);
+
+  if($out_path){
+    my $dir=dirname $out_path;
+    make_path $dir;
+    open my $fh, ">", $out_path or die $!;
+    print $fh $data;
+  }
+  else
+  {
+    $data;
+  }
+
+}
 
 #single shot.. non OO
 sub jpack_encode {
@@ -171,11 +201,27 @@ sub jpack_encode {
 }
 
 
+# Opens, reads and encodes data from file at $path
+# if $out_path is given the dir and file is create and data written
+# otherwise the encoded data is returned
 sub jpack_encode_file {
 	local $/;
 	my $path = shift;
+  my $out_path=shift;
 	return unless open my $file, "<", $path;
-	jpack_encode <$file>, @_;
+
+	my $data=jpack_encode <$file>, @_;
+  if($out_path){
+    my $dir=dirname $out_path;
+    make_path $dir;
+    open my $fh, ">", $out_path;
+    print $fh $data;
+  }
+  else
+  {
+    $data;
+  }
+
 }
 
 sub decode {
@@ -258,7 +304,6 @@ sub next_set_name {
   #make_path $name;
 
   $self->[current_set_]=$name;
-  say STDERR  "NEXT SET NAME is $name";
   return $name;
 }
 
@@ -266,6 +311,23 @@ sub next_set_name {
 # Returns the path of a file, in a next set ( or set provided)
 sub next_file_name{
 	my $self =shift;
+  my $path =shift;
+
+  #Check if the passed file dis defined. If so then we check if its seen or not
+  if(defined $path){
+    my $p=$self->[html_root_]."/".$self->[prefix_]."/".$path;
+    if($seen{$p}){
+      #use feature ":all";
+      #sleep 1;
+      return undef;
+    }
+    else {
+      $seen{$p}=1;
+    }
+  }
+  else {
+    # Ass previous versions
+  }
   my $set_dir=$self->[current_set_]//$self->next_set_name;
 
   my @list= map {hex} sort grep {length == 32 } map {s/\.jpack// ; basename $_ } <$set_dir/*.jpack>;
@@ -277,7 +339,6 @@ sub next_file_name{
   my $max=pop @list;
 
 	my $name=sprintf "$set_dir/%032x.jpack", $max+1;
-  say STDERR "NEXT file name $name";
   return $name;
 }
 

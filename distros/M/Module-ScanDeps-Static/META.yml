@@ -23,13 +23,13 @@ no_index:
 provides:
   Module::ScanDeps::FindRequires:
     file: lib/Module/ScanDeps/FindRequires.pm
-    version: v1.7.6
+    version: v1.7.8
   Module::ScanDeps::Static:
     file: lib/Module/ScanDeps/Static.pm
-    version: v1.7.6
+    version: v1.7.8
   Module::ScanDeps::Static::VERSION:
     file: lib/Module/ScanDeps/Static/VERSION.pm
-    version: v1.7.6
+    version: v1.7.8
 requires:
   CLI::Simple: '0'
   Class::Accessor::Fast: '0'
@@ -42,5 +42,5 @@ requires:
   Readonly: '0'
   perl: '5.010'
 resources: {}
-version: v1.7.6
+version: v1.7.8
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

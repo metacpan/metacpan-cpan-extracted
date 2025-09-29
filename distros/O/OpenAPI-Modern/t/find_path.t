@@ -1091,8 +1091,8 @@ YAML
     'this operation cannot be reached by using this path template',
   );
 
-  # TODO: no way at present to match a webhook request to its path-item (and OpenAPI 3.1 does not
-  # provide for specifying a path_template for webhooks)
+  # TODO: no way at present to match a webhook request to its path and path_template (and OpenAPI
+  # 3.x does not provide for specifying a path_template for webhooks)
   ok(!$openapi->find_path($options = { request => $request, operation_id => 'my_webhook_operation' }),
     to_str($request).': find_path returns false');
   cmp_result(

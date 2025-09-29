@@ -27,6 +27,7 @@ no_index:
     - t
     - xt
 requires:
+  Business::ISBN: 0
   Class::Utils: 0.03
   DateTime: 0
   English: 0
@@ -42,4 +43,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/MARC-Validator
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/MARC-Validator
-version: '0.02'
+version: '0.03'

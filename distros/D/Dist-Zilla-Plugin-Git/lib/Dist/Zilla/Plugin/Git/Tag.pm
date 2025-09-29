@@ -13,10 +13,9 @@ use warnings;
 package Dist::Zilla::Plugin::Git::Tag;
 # ABSTRACT: Tag the new version
 
-our $VERSION = '2.051';
+our $VERSION = '2.052';
 
 use Moose;
-use MooseX::Has::Sugar;
 use Types::Standard qw{ Str Bool};
 use namespace::autoclean;
 
@@ -26,11 +25,11 @@ sub _git_config_mapping { +{
 
 # -- attributes
 
-has tag_format  => ( ro, isa=>Str, default => 'v%V' );
-has tag_message => ( ro, isa=>Str, default => 'v%V' );
-has changelog   => ( ro, isa=>Str, default => 'Changes' );
-has branch => ( ro, isa=>Str, predicate=>'has_branch' );
-has signed => ( ro, isa=>Bool, default=>0 );
+has tag_format  => ( is => 'ro', isa=>Str, default => 'v%V' );
+has tag_message => ( is => 'ro', isa=>Str, default => 'v%V' );
+has changelog   => ( is => 'ro', isa=>Str, default => 'Changes' );
+has branch => ( is => 'ro', isa=>Str, predicate=>'has_branch' );
+has signed => ( is => 'ro', isa=>Bool, default=>0 );
 
 with 'Dist::Zilla::Role::BeforeRelease',
     'Dist::Zilla::Role::AfterRelease',
@@ -47,7 +46,7 @@ with 'Dist::Zilla::Role::GitConfig';
 #pod
 #pod =cut
 
-has tag => ( ro, isa => Str, lazy_build => 1, );
+has tag => ( is => 'ro', isa => Str, lazy_build => 1, );
 
 sub _build_tag
 {
@@ -115,7 +114,7 @@ Dist::Zilla::Plugin::Git::Tag - Tag the new version
 
 =head1 VERSION
 
-version 2.051
+version 2.052
 
 =head1 SYNOPSIS
 

@@ -6,6 +6,14 @@ Home page:    <https://metacpan.org/release/Sub-MultiMethod>
 Bug tracker:  <https://github.com/tobyink/p5-sub-multimethod/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+1.002	2025-09-28
+
+ - Added: Added `die` option as a shortcut for `code => sub { croak ... }`.
+ - Added: Added `return` option as a shortcut for `code => sub { return ...
+   }`.
+ - Added: Support simpler syntax: `multimethod foo => [...] => sub { ...
+   };`
+
 1.001	2025-09-19
 
  - Added: Added `if` option.

@@ -72,7 +72,6 @@ my @include = qw(
   File::Temp
   JSON::PP
   Module::Runtime
-  Pod::Coverage
   Sub::Name
   YAML
   autodie

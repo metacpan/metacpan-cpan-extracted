@@ -1,3 +1,6 @@
+Version 0.94  - 28 September 2025
+                Updated for Raspberry Pi 500+
+
 Version 0.93  - 29 April 2024
                 Updated for 16GB Raspberry Pi 5
                 HiPi::Device::GPIO ( sysfs gpio interface )

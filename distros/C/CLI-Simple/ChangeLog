@@ -1,3 +1,28 @@
+Sun Sep 28 15:43:18 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.7]:
+	* VERSION: bump
+	* cpan/test-requires: add missing depdencies
+	* src/main/perl/lib/CLI/Simple/README.md: generated
+
+Sun Sep 28 07:37:59 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.5]:
+	* VERSION: bump
+	* src/main/perl/lib/CLI/Simple/README.md: generated
+	* src/main/perl/lib/CLI/Simple.pm.in
+	(command): allow setting new command
+	(commands): allow insert of new command
+
+Fri Aug 22 07:59:10 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.4]:
+	* VERSION: bump
+	* src/main/perl/lib/CLI/Simple/README.md: generated
+	* src/main/perl/lib/CLI/Simple.pm.in
+	(new)
+	- normalize alias definitions too
+
 Thu Aug 21 15:23:34 2025  Rob Lauer  <rlauer6@comcast.net>
 
 	[1.0.3]:

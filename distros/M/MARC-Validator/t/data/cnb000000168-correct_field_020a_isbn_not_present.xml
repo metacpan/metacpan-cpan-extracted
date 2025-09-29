@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<collection
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"
+  xmlns="http://www.loc.gov/MARC21/slim">
+
+<record>
+  <leader>01981nam a2200517 i 4500</leader>
+  <controlfield tag="001">ck8300150</controlfield>
+  <controlfield tag="003">CZ PrNK</controlfield>
+  <controlfield tag="005">20230404083006.0</controlfield>
+  <controlfield tag="007">ta</controlfield>
+  <controlfield tag="008">951020s1983    xr a   d p    000 0 cze  </controlfield>
+  <datafield tag="015" ind1=" " ind2=" ">
+    <subfield code="a">cnb000000168</subfield>
+  </datafield>
+  <datafield tag="020" ind1=" " ind2=" ">
+    <subfield code="q">(Vázáno) :</subfield>
+    <subfield code="c">Kčs 16,00</subfield>
+  </datafield>
+  <datafield tag="035" ind1=" " ind2=" ">
+    <subfield code="a">(OCoLC)1378694800</subfield>
+  </datafield>
+  <datafield tag="035" ind1=" " ind2=" ">
+    <subfield code="a">(OCoLC)39562076</subfield>
+  </datafield>
+  <datafield tag="040" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+    <subfield code="b">cze</subfield>
+    <subfield code="d">ABA001</subfield>
+    <subfield code="e">rda</subfield>
+  </datafield>
+  <datafield tag="041" ind1="1" ind2=" ">
+    <subfield code="a">cze</subfield>
+    <subfield code="h">slo</subfield>
+  </datafield>
+  <datafield tag="072" ind1=" " ind2="7">
+    <subfield code="a">51</subfield>
+    <subfield code="x">Matematika</subfield>
+    <subfield code="2">Konspekt</subfield>
+    <subfield code="9">13</subfield>
+  </datafield>
+  <datafield tag="072" ind1=" " ind2="7">
+    <subfield code="a">37.016</subfield>
+    <subfield code="x">Učební osnovy. Vyučovací předměty. Učebnice</subfield>
+    <subfield code="2">Konspekt</subfield>
+    <subfield code="9">22</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">51</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">373.5.016</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">(035)</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="100" ind1="1" ind2=" ">
+    <subfield code="a">Novoveský, Štefan,</subfield>
+    <subfield code="d">1917-1984</subfield>
+    <subfield code="7">ola2003175152</subfield>
+    <subfield code="4">aut</subfield>
+  </datafield>
+  <datafield tag="245" ind1="1" ind2="0">
+    <subfield code="a">Zábavná matematika /</subfield>
+    <subfield code="c">Štefan Novoveský, Karol Križalkovič, Imrich Lečko ; ze slovenského originálu přeložil Zdeněk Trefný</subfield>
+  </datafield>
+  <datafield tag="250" ind1=" " ind2=" ">
+    <subfield code="a">Čtvrté nezměněné vydání</subfield>
+  </datafield>
+  <datafield tag="264" ind1=" " ind2="1">
+    <subfield code="a">Praha :</subfield>
+    <subfield code="b">Státní pedagogické nakladatelství,</subfield>
+    <subfield code="c">1983</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">325 stran :</subfield>
+    <subfield code="b">ilustrace ;</subfield>
+    <subfield code="c">17 cm</subfield>
+  </datafield>
+  <datafield tag="336" ind1=" " ind2=" ">
+    <subfield code="a">text</subfield>
+    <subfield code="b">txt</subfield>
+    <subfield code="2">rdacontent</subfield>
+  </datafield>
+  <datafield tag="337" ind1=" " ind2=" ">
+    <subfield code="a">bez média</subfield>
+    <subfield code="b">n</subfield>
+    <subfield code="2">rdamedia</subfield>
+  </datafield>
+  <datafield tag="338" ind1=" " ind2=" ">
+    <subfield code="a">svazek</subfield>
+    <subfield code="b">nc</subfield>
+    <subfield code="2">rdacarrier</subfield>
+  </datafield>
+  <datafield tag="490" ind1="1" ind2=" ">
+    <subfield code="a">Knižnice všeobecného vzdělání. Řada Maják</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">15000 výtisků</subfield>
+  </datafield>
+  <datafield tag="504" ind1=" " ind2=" ">
+    <subfield code="a">Obsahuje bibliografické odkazy</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="7">
+    <subfield code="a">matematika</subfield>
+    <subfield code="7">ph117231</subfield>
+    <subfield code="x">úlohy</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="7">
+    <subfield code="a">učivo středních škol</subfield>
+    <subfield code="7">ph136702</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="9">
+    <subfield code="a">mathematics</subfield>
+    <subfield code="x">problems, exercises, etc.</subfield>
+    <subfield code="2">eczenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="9">
+    <subfield code="a">secondary school curriculum</subfield>
+    <subfield code="2">eczenas</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="7">
+    <subfield code="a">příručky</subfield>
+    <subfield code="7">fd133209</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="9">
+    <subfield code="a">handbooks and manuals</subfield>
+    <subfield code="2">eczenas</subfield>
+  </datafield>
+  <datafield tag="700" ind1="1" ind2=" ">
+    <subfield code="a">Križalkovič, Karol</subfield>
+    <subfield code="7">kup19980000052831</subfield>
+    <subfield code="4">aut</subfield>
+  </datafield>
+  <datafield tag="700" ind1="1" ind2=" ">
+    <subfield code="a">Lečko, Imrich,</subfield>
+    <subfield code="d">1915-1974</subfield>
+    <subfield code="7">mzk2002142548</subfield>
+    <subfield code="4">aut</subfield>
+  </datafield>
+  <datafield tag="700" ind1="1" ind2=" ">
+    <subfield code="a">Trefný, Zdeněk</subfield>
+    <subfield code="7">jk01140075</subfield>
+    <subfield code="4">trl</subfield>
+  </datafield>
+  <datafield tag="830" ind1=" " ind2="0">
+    <subfield code="a">Knižnice všeobecného vzdělání.</subfield>
+    <subfield code="p">Maják</subfield>
+  </datafield>
+  <datafield tag="856" ind1="4" ind2="1">
+    <subfield code="u">http://krameriusndk.nkp.cz/search/handle/uuid:d2ad5b00-54f3-11e4-8b11-005056827e51</subfield>
+    <subfield code="y">Digitalizovaný dokument</subfield>
+  </datafield>
+  <datafield tag="910" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+  </datafield>
+  <datafield tag="928" ind1="9" ind2=" ">
+    <subfield code="a">SPN</subfield>
+  </datafield>
+  <datafield tag="998" ind1=" " ind2=" ">
+    <subfield code="a">000000168</subfield>
+  </datafield>
+</record>
+
+</collection>

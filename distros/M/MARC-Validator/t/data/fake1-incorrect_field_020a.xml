@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<collection
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"
+  xmlns="http://www.loc.gov/MARC21/slim">
+
+<record>
+  <leader>01753cam a2200469 i 4500</leader>
+  <controlfield tag="001">nkc20203260113</controlfield>
+  <controlfield tag="003">CZ PrNK</controlfield>
+  <controlfield tag="005">20250610063853.0</controlfield>
+  <controlfield tag="007">ta</controlfield>
+  <controlfield tag="008">230911s2019    xr g   e pf   000 0 cze d</controlfield>
+  <datafield tag="015" ind1=" " ind2=" ">
+    <subfield code="a">fake1</subfield>
+  </datafield>
+  <datafield tag="020" ind1=" " ind2=" ">
+    <subfield code="a">bad</subfield>
+    <subfield code="q">(brožováno)</subfield>
+  </datafield>
+</record>
+
+</collection>

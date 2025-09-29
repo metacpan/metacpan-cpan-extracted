@@ -203,7 +203,6 @@ class ChunkLoader extends ScriptLoader {
     //Stack, step, offset, fail_count
 		function next(oldStack, step, offset, fail_count){
 
-      console.log("OLD STACK", oldStack);
       //Copy stack
       let stack=oldStack.map((e)=>{return e});
 
@@ -254,13 +253,13 @@ class ChunkLoader extends ScriptLoader {
 					})
 
 					.catch((e)=>{
-				  	console.log("CATCH", e,  fail_count);
+				  	//console.log("CATCH", e,  fail_count);
             fail_count++;
             //console.log("fail count", fail_count);
             switch(fail_count){
               case 1:
                 scope.unloadScript(scope.buildRoot+segPath);
-                console.log("Reached end of current dir push first child dir with first file ");
+                //console.log("Reached end of current dir push first child dir with first file ");
 
                 //Depth first  Pop the current value, push to first child, and push to first file
                 stack.pop();
@@ -273,7 +272,7 @@ class ChunkLoader extends ScriptLoader {
 
               case 2:
                 scope.unloadScript(scope.buildRoot+segPath);
-                console.log("Could not read child dir with expected first file");
+                //console.log("Could not read child dir with expected first file");
 
                 // Pop the the file, pop the child,
                 stack.pop();
@@ -288,12 +287,12 @@ class ChunkLoader extends ScriptLoader {
 
               case 3:
                 // Could not read sibling dir
-                console.log("Could not read siblind dir");
+                //console.log("Could not read siblind dir");
 						    rejecter();
                 break
               default:
                 //  Should not get here
-                console.log("DEFAULT jpack error");
+                //console.log("DEFAULT jpack error");
 						    rejecter();
                 break;
             }
@@ -344,7 +343,7 @@ class ChunkLoader extends ScriptLoader {
       // Expected the content is javascript. Create a script element, with the content and append to head?
       let decoder=new TextDecoder("utf-8");
       let string=decoder.decode(data);
-      console.log("----Content of script", string);
+      //console.log("----Content of script", string);
       let s=document.createElement("script");
       s.innerHTML=string;
       document.head.appendChild(s);

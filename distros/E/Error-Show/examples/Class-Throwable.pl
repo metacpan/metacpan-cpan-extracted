@@ -1,5 +1,5 @@
 use v5.36;
-my @a=qw<a,b,c>;
+my @a=qw<a b c>;
 use Class::Throwable;# VERBOSE=>1;
 Class::Throwable->setVerbosity(2);
 #use Exception::Class;
@@ -11,12 +11,9 @@ sub my_func {
 
   }
   catch($e){
-    
     #Show the top of the stack, the latest exception
-    say Error::Show::context message=>$e, frames=>$e->getStackTrace->[0];
+    say Error::Show::context $e;
 
-    #Show the whole stack
-    say Error::Show::context message=>"$e", frames=>[$e->getStackTrace];
   }
 }
 

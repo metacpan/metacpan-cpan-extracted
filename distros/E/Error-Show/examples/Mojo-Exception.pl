@@ -7,22 +7,17 @@ sub my_func {
     raise 'MyApp::X::Name', 'The name Minion is already taken';
   }
   catch($e){
-
-    say Error::Show::context($e);
-
-    say Error::Show::context message=>$e, error=> $e->frames->[0];
-
-
-    say Error::Show::context message=>$e, error=>$e->frames;
+    say Error::Show::context $e;
   }
-
 
   my $string='"Hello
     and something eler
    to look at"';
-  eval  $string;
+
+  local $@;
+  eval $string;
   if($@){
-    say Error::Show::context program=>$string, error=>$@;
+    say Error::Show::context $@;
   }
 }
 

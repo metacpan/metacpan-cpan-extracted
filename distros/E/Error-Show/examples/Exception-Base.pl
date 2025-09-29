@@ -18,14 +18,8 @@ sub my_func {
     #
     $e->verbosity=2;
 
-    # Message normally contatins the file and line numbers. So stringified
-    # process will work
-    #
     say Error::Show::context $e;
 
-    # Access the frames in the caller stack
-    #
-    say Error::Show::context message=>$e->message, frames=>$e->caller_stack;
   }
 }
 

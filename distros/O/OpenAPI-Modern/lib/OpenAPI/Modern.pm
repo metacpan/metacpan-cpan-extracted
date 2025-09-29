@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.095-6-g5701a5c
+package OpenAPI::Modern; # git description: v0.096-13-g7a35922
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.1 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.1 Swagger HTTP request response
 
-our $VERSION = '0.096';
+our $VERSION = '0.097';
 
 use 5.020;
 use utf8;
@@ -127,7 +127,7 @@ sub validate_request ($self, $request, $options = {}) {
     foreach my $section ($method, 'path-item') {
       ENTRY:
       foreach my $idx (0 .. (($section eq $method ? $operation : $path_item)->{parameters}//[])->$#*) {
-        my $state = { %$state, schema_path => jsonp($state->{schema_path},
+        my $state = { %$state, keyword_path => jsonp($state->{keyword_path},
           ($section eq $method ? $method : ()), 'parameters', $idx) };
         my $param_obj = ($section eq $method ? $operation : $path_item)->{parameters}[$idx];
         while (defined(my $ref = $param_obj->{'$ref'})) {
@@ -167,7 +167,7 @@ sub validate_request ($self, $request, $options = {}) {
         if not exists(($request_parameters_processed->{path}//{})->{$path_name});
     }
 
-    $state->{schema_path} = jsonp($state->{schema_path}, $method);
+    $state->{keyword_path} = jsonp($state->{keyword_path}, $method);
 
     # RFC9112 §6.2-2: "A sender MUST NOT send a Content-Length header field in any message that
     # contains a Transfer-Encoding header field."
@@ -183,7 +183,7 @@ sub validate_request ($self, $request, $options = {}) {
         and not $request->content->is_chunked;
 
     if (my $body_obj = $operation->{requestBody}) {
-      $state->{schema_path} = $state->{schema_path}.'/requestBody';
+      $state->{keyword_path} = $state->{keyword_path}.'/requestBody';
 
       while (defined(my $ref = $body_obj->{'$ref'})) {
         $body_obj = $self->_resolve_ref('request-body', $ref, $state);
@@ -245,7 +245,7 @@ sub validate_response ($self, $response, $options = {}) {
 
     return $self->_result($state, 0, 1) if not exists $operation->{responses};
 
-    $state->{schema_path} = jsonp($state->{schema_path}, lc $options->{method});
+    $state->{keyword_path} = jsonp($state->{keyword_path}, lc $options->{method});
     $response = _convert_response($response);   # now guaranteed to be a Mojo::Message::Response
 
     if ($response->headers->header('Transfer-Encoding')) {
@@ -286,14 +286,14 @@ sub validate_response ($self, $response, $options = {}) {
     }
 
     my $response_obj = $operation->{responses}{$response_name};
-    $state->{schema_path} = jsonp($state->{schema_path}, 'responses', $response_name);
+    $state->{keyword_path} = jsonp($state->{keyword_path}, 'responses', $response_name);
     while (defined(my $ref = $response_obj->{'$ref'})) {
       $response_obj = $self->_resolve_ref('response', $ref, $state);
     }
 
     foreach my $header_name (sort keys(($response_obj->{headers}//{})->%*)) {
       next if fc $header_name eq fc 'Content-Type';
-      my $state = { %$state, schema_path => jsonp($state->{schema_path}, 'headers', $header_name) };
+      my $state = { %$state, keyword_path => jsonp($state->{keyword_path}, 'headers', $header_name) };
       my $header_obj = $response_obj->{headers}{$header_name};
       while (defined(my $ref = $header_obj->{'$ref'})) {
         $header_obj = $self->_resolve_ref('header', $ref, $state);
@@ -329,8 +329,8 @@ sub find_path ($self, $options, $state = {}) {
   # OpenAPI validation, such as document, document_path, vocabularies, specification_version
   $state->{data_path} //= '';
   $state->{initial_schema_uri} = $self->openapi_uri;   # the canonical URI as of the start or last $id, or the last traversed $ref
-  $state->{traversed_schema_path} = '';    # the accumulated traversal path as of the start, or last $id, or up to the last traversed $ref
-  $state->{schema_path} = '';              # the rest of the path, since the last $id or the last traversed $ref
+  $state->{traversed_keyword_path} = '';   # the accumulated traversal path as of the start, or last $id, or up to the last traversed $ref
+  $state->{keyword_path} = '';             # the rest of the path, since the last $id or the last traversed $ref
   $state->{errors} = $options->{errors} //= [];
   $state->{annotations} //= [];
   $state->{depth} = 0;
@@ -386,14 +386,14 @@ sub find_path ($self, $options, $state = {}) {
     else {
       # the path_template need not be provided, but if it is, the operation must be located at the
       # path-item directly underneath that /paths/<path_template>.
-      return E({ %$state, schema_path => $operation_path.'/operationId', recommended_response => [ 500 ] },
+      return E({ %$state, keyword_path => $operation_path.'/operationId', recommended_response => [ 500 ] },
           'operation at operation_id does not match provided path_template')
         if exists $options->{path_template} and $options->{path_template} ne $path_template;
     }
 
     if ($options->{method} and $options->{method} ne $method) {
       delete $options->{operation_id};
-      return E({ %$state, ($options->{request} ? ( data_path => '/request/method' ) : ()), schema_path => $operation_path.'/operationId' },
+      return E({ %$state, ($options->{request} ? ( data_path => '/request/method' ) : ()), keyword_path => $operation_path.'/operationId' },
         'operation at operation_id does not match HTTP method "%s"', $options->{method});
     }
 
@@ -422,7 +422,7 @@ sub find_path ($self, $options, $state = {}) {
     # some operations don't exist directly under a /paths/$path_template - e.g. webhooks or
     # callbacks, but they are still usable
     my $path_item_path = $operation_path =~ s{/\L$method$}{}r;
-    $state->{schema_path} = $path_item_path;
+    $state->{keyword_path} = $path_item_path;
     $options->{_path_item} = $self->document_get($path_item_path);
 
     # FIXME: this is not accurate if the operation lives in another document
@@ -441,13 +441,13 @@ sub find_path ($self, $options, $state = {}) {
     # 0x7c (pipe), 0x7d (close-brace) or 0x7e (tilde)
     foreach my $pt (sort keys(($schema->{paths}//{})->%*)) {
       $state->{path_item} = $schema->{paths}{$pt};
-      $state->{schema_path} = jsonp('/paths', $pt);
+      $state->{keyword_path} = jsonp('/paths', $pt);
       $captures = $self->_match_uri($options->{request}->method, $options->{request}->url, $pt, $state);
 
       # note: this might not be the intended match, as multiple templates can match the same URI
       $path_template = $pt, last if $captures;
 
-      # the initial match succeeded, but something else went wrong
+      # the initial match succeeded, but something else went wrong and we will still stop iterating
       if ($state->{errors}->@*) {
         $options->{path_template} = $pt;
         $options->{_path_item} = $state->{path_item};
@@ -455,7 +455,7 @@ sub find_path ($self, $options, $state = {}) {
       }
     }
 
-    return E({ %$state, data_path => '/request', schema_path => '', keyword => 'paths' },
+    return E({ %$state, data_path => '/request', keyword_path => '', keyword => 'paths' },
         'no match found for request %s "%s"',
         $options->{request}->method, $options->{request}->url->clone->query('')->fragment(undef))
       if not $captures;
@@ -465,10 +465,11 @@ sub find_path ($self, $options, $state = {}) {
     # we were passed path_template in options or we calculated it from operation_id, and now we
     # verify it against path_captures and the request URI.
     $state->{path_item} = $schema->{paths}{$path_template};
-    $state->{schema_path} = jsonp('/paths', $path_template);
+    $state->{keyword_path} = jsonp('/paths', $path_template);
     $captures = $self->_match_uri($options->{request}->method, $options->{request}->url, $path_template, $state);
 
     if (not $captures) {
+      #  no path-item and operation found that matches the request's method and uri
       delete $options->{operation_id};
 
       # the initial match succeeded, but something else went wrong
@@ -480,13 +481,13 @@ sub find_path ($self, $options, $state = {}) {
 
       if (exists $options->{path_template}) {
         return E({ %$state, data_path => '/request/uri',
-            schema_path => jsonp('/paths', $path_template), recommended_response => [ 500 ] },
+            keyword_path => jsonp('/paths', $path_template), recommended_response => [ 500 ] },
           'provided path_template does not match request URI "%s"',
           $options->{request}->url->clone->query('')->fragment(undef));
       }
       else {
         return E({ %$state, data_path => '/request/uri',
-            schema_path => $operation_path.'/operationId', recommended_response => [ 500 ] },
+            keyword_path => $operation_path.'/operationId', recommended_response => [ 500 ] },
           'provided operation_id does not match request %s %s',
           $options->{request}->method, $options->{request}->url->clone->query('')->fragment(undef));
       }
@@ -494,8 +495,9 @@ sub find_path ($self, $options, $state = {}) {
   }
 
   else {
+    # we were provided $options->{path_template}, and we have already confirmed that it exists.
     $state->{path_item} = $schema->{paths}{$path_template};
-    $state->{schema_path} = jsonp('/paths', $path_template);
+    $state->{keyword_path} = jsonp('/paths', $path_template);
     while (defined(my $ref = $state->{path_item}{'$ref'})) {
       $state->{path_item} = $self->_resolve_ref('path-item', $ref, $state);
     }
@@ -522,7 +524,7 @@ sub find_path ($self, $options, $state = {}) {
   # if initial_schema_uri still points to the head of the entry document, then we have not followed
   # a $ref and the path-item is located at /paths/<path_template>
   $options->{operation_uri} = $state->{initial_schema_uri}->clone
-    ->fragment(($state->{initial_schema_uri}->fragment // $state->{schema_path}).'/'.lc $method);
+    ->fragment(($state->{initial_schema_uri}->fragment // $state->{keyword_path}).'/'.lc $method);
 
   $options->{operation_id} = $options->{_path_item}{lc $method}{operationId}
     if exists $options->{_path_item}{lc $method}{operationId};
@@ -596,7 +598,8 @@ sub recursive_get ($self, $uri_reference, $entity_type = undef) {
 
 ######## NO PUBLIC INTERFACES FOLLOW THIS POINT ########
 
-# given a request uri and a path_template, check that these match, and extract capture values.
+# given a request's method and uri, and a path_template, check that these match (taking into
+# consideration additional information in the current path-item), and extract capture values.
 # returns false on error, possibly adding errors to $state.
 sub _match_uri ($self, $method, $uri, $path_template, $state) {
   my $uri_path = $uri->path->to_string;
@@ -617,6 +620,8 @@ sub _match_uri ($self, $method, $uri, $path_template, $state) {
     if exists $state->{debug};
   return if $uri_path !~ m/$path_pattern$/;
 
+  # we set aside $state for potential restoration because we might still encounter issues later on
+  # that require us to keep iterating for another URI match
   my $local_state = +{ %$state };
 
   while (defined(my $ref = $local_state->{path_item}{'$ref'})) {
@@ -634,7 +639,7 @@ sub _match_uri ($self, $method, $uri, $path_template, $state) {
 
   # we need to keep track of the traversed path to the servers object, as well as its absolute
   # location, for usage in error objects
-  my ($servers, $more_schema_path, $base_schema_uri) =
+  my ($servers, $more_keyword_path, $base_schema_uri) =
       exists $local_state->{path_item}{lc $method}{servers}
         ? ($local_state->{path_item}{lc $method}{servers}, [lc $method])
     : exists $local_state->{path_item}{servers}
@@ -682,10 +687,12 @@ sub _match_uri ($self, $method, $uri, $path_template, $state) {
 
     my ($valid, %seen) = (1);
     foreach my $name (@uri_capture_names) {
+      # TODO: ideally this should be caught at document load time, but the use of $refs between
+      # /paths entries and path-items makes this difficult
       $valid = E({ %$state, keyword => 'url', data_path => '/request/uri',
             defined $base_schema_uri
-              ? (initial_schema_uri => $base_schema_uri, traversed_schema_path => '', schema_path => '/servers/'.$index)
-              : (schema_path => jsonp($state->{schema_path}, @$more_schema_path, 'servers', $index)) },
+              ? (initial_schema_uri => $base_schema_uri, traversed_keyword_path => '', keyword_path => '/servers/'.$index)
+              : (keyword_path => jsonp($state->{keyword_path}, @$more_keyword_path, 'servers', $index)) },
           'duplicate template name "%s" in server url and path template', $name)
         if $seen{$name}++;
     }
@@ -699,9 +706,9 @@ sub _match_uri ($self, $method, $uri, $path_template, $state) {
 
       $valid = E({ %$state, data_path => '/request/uri', keyword => 'enum',
             defined $base_schema_uri
-              ? (initial_schema_uri => $base_schema_uri, traversed_schema_path => '',
-                  schema_path => jsonp('/servers', $index, 'variables', $name))
-              : (schema_path => jsonp($state->{schema_path}, @$more_schema_path, 'servers', $index, 'variables', $name)) },
+              ? (initial_schema_uri => $base_schema_uri, traversed_keyword_path => '',
+                  keyword_path => jsonp('/servers', $index, 'variables', $name))
+              : (keyword_path => jsonp($state->{keyword_path}, @$more_keyword_path, 'servers', $index, 'variables', $name)) },
           'server url value does not match any of the allowed values')
         if not any { $captures{$name} eq $_ } $server->{variables}{$name}{enum}->@*;
     }
@@ -729,7 +736,7 @@ sub _validate_path_parameter ($self, $state, $param_obj, $path_captures) {
   return E({ %$state, keyword => 'style' }, 'only style: simple is supported in path parameters')
     if ($param_obj->{style}//'simple') ne 'simple';
 
-  my @types = $self->_type_in_schema($param_obj->{schema}, { %$state, schema_path => $state->{schema_path}.'/schema' });
+  my @types = $self->_type_in_schema($param_obj->{schema}, { %$state, keyword_path => $state->{keyword_path}.'/schema' });
   if (grep $_ eq 'array', @types or grep $_ eq 'object', @types) {
     return E($state, 'deserializing to non-primitive types is not yet supported in path parameters');
   }
@@ -739,7 +746,7 @@ sub _validate_path_parameter ($self, $state, $param_obj, $path_captures) {
   }
   $data = undef if $data eq '' and grep $_ eq 'null', @types;
 
-  $self->_evaluate_subschema(\$data, $param_obj->{schema}, { %$state, schema_path => $state->{schema_path}.'/schema', stringy_numbers => 1, depth => $state->{depth}+1 });
+  $self->_evaluate_subschema(\$data, $param_obj->{schema}, { %$state, keyword_path => $state->{keyword_path}.'/schema', stringy_numbers => 1, depth => $state->{depth}+1 });
 }
 
 sub _validate_query_parameter ($self, $state, $param_obj, $uri) {
@@ -775,7 +782,7 @@ sub _validate_query_parameter ($self, $state, $param_obj, $uri) {
   return E({ %$state, keyword => 'style' }, 'only style: form is supported in query parameters')
     if ($param_obj->{style}//'form') ne 'form';
 
-  my @types = $self->_type_in_schema($param_obj->{schema}, { %$state, schema_path => $state->{schema_path}.'/schema' });
+  my @types = $self->_type_in_schema($param_obj->{schema}, { %$state, keyword_path => $state->{keyword_path}.'/schema' });
   if (grep $_ eq 'array', @types or grep $_ eq 'object', @types) {
     return E($state, 'deserializing to non-primitive types is not yet supported in query parameters');
   }
@@ -786,7 +793,7 @@ sub _validate_query_parameter ($self, $state, $param_obj, $uri) {
   }
   $data = undef if $data eq '' and grep $_ eq 'null', @types;
 
-  $state = { %$state, schema_path => $state->{schema_path}.'/schema', stringy_numbers => 1, depth => $state->{depth}+1 };
+  $state = { %$state, keyword_path => $state->{keyword_path}.'/schema', stringy_numbers => 1, depth => $state->{depth}+1 };
   $self->_evaluate_subschema(\$data, $param_obj->{schema}, $state);
 }
 
@@ -811,7 +818,7 @@ sub _validate_header_parameter ($self, $state, $header_name, $header_obj, $heade
   # line value from a field line."
   my @values = map s/^\s*//r =~ s/\s*$//r, map split(/,/, $_), $headers->every_header($header_name)->@*;
 
-  my @types = $self->_type_in_schema($header_obj->{schema}, { %$state, schema_path => $state->{schema_path}.'/schema' });
+  my @types = $self->_type_in_schema($header_obj->{schema}, { %$state, keyword_path => $state->{keyword_path}.'/schema' });
 
   # RFC9110 §5.3-1: "A recipient MAY combine multiple field lines within a field section that have
   # the same field name into one field line, without changing the semantics of the message, by
@@ -845,7 +852,7 @@ sub _validate_header_parameter ($self, $state, $header_name, $header_obj, $heade
     $data = undef if $data eq '' and grep $_ eq 'null', @types;
   }
 
-  $state = { %$state, schema_path => $state->{schema_path}.'/schema', stringy_numbers => 1, depth => $state->{depth}+1 };
+  $state = { %$state, keyword_path => $state->{keyword_path}.'/schema', stringy_numbers => 1, depth => $state->{depth}+1 };
   $self->_evaluate_subschema(\$data, $header_obj->{schema}, $state);
 }
 
@@ -882,10 +889,10 @@ sub _validate_body_content ($self, $state, $content_obj, $message) {
   # type is multipart or application/x-www-form-urlencoded."
   if ($content_type =~ m{^\Fmultipart/} or fc($content_type) eq 'application/x-www-form-urlencoded') {
     if (exists $content_obj->{$media_type}{encoding}) {
-      my $state = { %$state, schema_path => jsonp($state->{schema_path}, 'content', $media_type) };
+      my $state = { %$state, keyword_path => jsonp($state->{keyword_path}, 'content', $media_type) };
       # §4.8.14.1: "The key, being the property name, MUST exist in the schema as a property."
       foreach my $property (sort keys $content_obj->{$media_type}{encoding}->%*) {
-        ()= E({ $state, schema_path => jsonp($state->{schema_path}, 'schema', 'properties', $property) },
+        ()= E({ $state, keyword_path => jsonp($state->{keyword_path}, 'schema', 'properties', $property) },
             'encoding property "%s" requires a matching property definition in the schema')
           if not exists(($content_obj->{$media_type}{schema}{properties}//{})->{$property});
       }
@@ -905,7 +912,7 @@ sub _validate_body_content ($self, $state, $content_obj, $message) {
       $content_ref = \ Encode::decode($charset, $content_ref->$*, Encode::DIE_ON_ERR);
     }
     catch ($e) {
-      return E({ %$state, keyword => 'content', _schema_path_suffix => $media_type },
+      return E({ %$state, keyword => 'content', _keyword_path_suffix => $media_type },
         'could not decode content as %s: %s', $charset, $e =~ s/^(.*)\n/$1/r);
     }
   }
@@ -924,7 +931,7 @@ sub _validate_media_type ($self, $state, $content_obj, $media_type, $media_type_
     my $schema = $content_obj->{$media_type}{schema};
     return if not defined $schema or is_plain_hashref($schema) ? !keys %$schema : $schema;
 
-    abort({ %$state, keyword => 'content', _schema_path_suffix => $media_type},
+    abort({ %$state, keyword => 'content', _keyword_path_suffix => $media_type},
       'EXCEPTION: unsupported media type "%s": add support with $openapi->add_media_type(...)', $media_type);
   }
 
@@ -932,13 +939,13 @@ sub _validate_media_type ($self, $state, $content_obj, $media_type, $media_type_
     $content_ref = $media_type_decoder->($content_ref);
   }
   catch ($e) {
-    return E({ %$state, keyword => 'content', _schema_path_suffix => $media_type },
+    return E({ %$state, keyword => 'content', _keyword_path_suffix => $media_type },
       'could not decode content as %s: %s', $media_type, $e =~ s/^(.*)\n/$1/r);
   }
 
   return if not exists $content_obj->{$media_type}{schema};
 
-  $state = { %$state, schema_path => jsonp($state->{schema_path}, 'content', $media_type, 'schema'), depth => $state->{depth}+1 };
+  $state = { %$state, keyword_path => jsonp($state->{keyword_path}, 'content', $media_type, 'schema'), depth => $state->{depth}+1 };
   $self->_evaluate_subschema($content_ref, $content_obj->{$media_type}{schema}, $state);
 }
 
@@ -970,8 +977,8 @@ sub _resolve_ref ($self, $entity_type, $ref, $state) {
     if $schema_info->{document}->get_entity_at_location($schema_info->{document_path}) ne $entity_type;
 
   $state->{initial_schema_uri} = $schema_info->{canonical_uri};
-  $state->{traversed_schema_path} = $state->{traversed_schema_path}.$state->{schema_path}.'/$ref';
-  $state->{schema_path} = '';
+  $state->{traversed_keyword_path} = $state->{traversed_keyword_path}.$state->{keyword_path}.'/$ref';
+  $state->{keyword_path} = '';
 
   return $schema_info->{schema};
 }
@@ -989,7 +996,7 @@ sub _type_in_schema ($self, $schema, $state) {
     if exists $schema->{type};
 
   push @types, map $self->_type_in_schema($schema->{allOf}[$_],
-      { %$state, schema_path => $state->{schema_path}.'/allOf/'.$_ }), 0..$schema->{allOf}->$#*
+      { %$state, keyword_path => $state->{keyword_path}.'/allOf/'.$_ }), 0..$schema->{allOf}->$#*
     if exists $schema->{allOf};
 
   if (defined(my $ref = $schema->{'$ref'})) {
@@ -1020,7 +1027,7 @@ sub _evaluate_subschema ($self, $dataref, $schema, $state) {
 
   # this is not necessarily the canonical uri of the location, but it is still a valid location
   my $uri = $state->{initial_schema_uri}->clone;
-  $uri->fragment(($uri->fragment//'').$state->{schema_path});
+  $uri->fragment(($uri->fragment//'').$state->{keyword_path});
 
   my $result = $self->evaluator->evaluate(
     $dataref->$*,
@@ -1028,7 +1035,7 @@ sub _evaluate_subschema ($self, $dataref, $schema, $state) {
     $uri,
     {
       data_path => $state->{data_path},
-      traversed_schema_path => $state->{traversed_schema_path}.$state->{schema_path},
+      traversed_keyword_path => $state->{traversed_keyword_path}.$state->{keyword_path},
       $state->{stringy_numbers} ? ( stringy_numbers => 1 ) : (),
     },
   );
@@ -1134,7 +1141,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.1 d
 
 =head1 VERSION
 
-version 0.096
+version 0.097
 
 =head1 SYNOPSIS
 

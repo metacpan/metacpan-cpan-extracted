@@ -10,10 +10,10 @@ use 5.008;
 use strict;
 use warnings;
 
-package Dist::Zilla::Plugin::Git; # git description: v2.050-2-gdfedc3b
+package Dist::Zilla::Plugin::Git; # git description: v2.051-6-gab4f382
 # ABSTRACT: Update your git repository after release
 
-our $VERSION = '2.051';
+our $VERSION = '2.052';
 
 1;
 
@@ -29,7 +29,7 @@ Dist::Zilla::Plugin::Git - Update your git repository after release
 
 =head1 VERSION
 
-version 2.051
+version 2.052
 
 =head1 DESCRIPTION
 
@@ -116,7 +116,7 @@ Jerome Quelin
 
 =head1 CONTRIBUTORS
 
-=for stopwords Christopher J. Madsen Jérôme Quelin Karen Etheridge Kent Fredric Yanick Champoux Ricardo Signes David Golden Graham Knop Mike Friedman Chris Weyl Stephen R. Scaffidi Apocalypse Curtis Jewell Barr Doherty Mikko Koivunalho Randy Stauner Alessandro Ghedini Alexandr Ciornii Brendan Byrd Brian Phillips Steinbrunner Geoffrey Broadwell Harley Pig Jesse Luehrs Matt Follett Michael McClimon Schout Nigel Metheringham Olivier Mengué Sean Whitton Tatsuhiko Miyagawa Tuomas Jormola
+=for stopwords Christopher J. Madsen Jérôme Quelin Karen Etheridge Kent Fredric Yanick Champoux Ricardo Signes Graham Knop David Golden Mike Friedman Chris Weyl Stephen R. Scaffidi Apocalypse Curtis Jewell Barr Doherty Mikko Koivunalho Randy Stauner Alessandro Ghedini Alexandr Ciornii Brendan Byrd Brian Phillips Steinbrunner Geoffrey Broadwell Harley Pig Jesse Luehrs Matt Follett Michael McClimon Schout Nigel Metheringham Olivier Mengué Sean Whitton Tatsuhiko Miyagawa Tuomas Jormola
 
 =over 4
 
@@ -146,11 +146,11 @@ Ricardo Signes <rjbs@cpan.org>
 
 =item *
 
-David Golden <dagolden@cpan.org>
+Graham Knop <haarg@haarg.org>
 
 =item *
 
-Graham Knop <haarg@haarg.org>
+David Golden <dagolden@cpan.org>
 
 =item *
 

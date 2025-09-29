@@ -115,7 +115,7 @@ DESCRIPTION
     are not supported.)
 
     `code` *(CodeRef)*
-        Required.
+        Conceptually required, but see the `return` and `die` shortcuts.
 
         The sub to dispatch to. It will receive parameters in @_ as you would
         expect, but these parameters have been passed through the signature
@@ -153,6 +153,21 @@ DESCRIPTION
             print { $arg->output } $arg->prefix;
             ...;
           },
+
+    `return` *(Value)*
+        Shortcut.
+
+        You can use `return => "foo"` as a shortcut for `code => sub { return
+        "foo" }`. This cannot be used to return refereneces.
+
+    `die` *(CodeRef|Str)*
+        Shortcut.
+
+        You can use `die => "foo"` as a shortcut for `code => sub { require
+        Carp; Carp::croak("foo") }`.
+
+        You can use `die => \&foo` as a shortcut for `code => sub { require
+        Carp; Carp::croak(foo()) }`.
 
     `signature` *(CodeRef)*
         Optional.
@@ -217,6 +232,45 @@ DESCRIPTION
         If set to true, Sub::MultiMethods will register the candidate method
         but won't install a dispatcher. You should mostly not worry about this
         and accept the default.
+
+    The @_ passed to Sub::MultiMethod is pre-processed slightly after $name
+    has been shifted off but before being interpreted as the %spec hash.
+    Obviously hashes are expected to have string keys, so if the first
+    argument of @_ is an arrayref or hashref, those are interpreted as a
+    positional or named signature respectively.
+
+    So the following are equivalent:
+
+      multimethod foo => [...] => %spec;
+      multimethod foo => ( positional => [...], %spec );
+
+    And so are the following (note that the hashref becomes an arrayref):
+
+      multimethod foo => {...} => ( %spec );
+      multimethod foo => ( named => [...], %spec );
+
+    After this, if @_ is an odd-sized list with a coderef in the last
+    position, the coderef is treated as the `code` option.
+
+    So the following are equivalent:
+
+      multimethod foo => ( %spec ) => sub { ... };
+      multimethod foo => ( %spec, code => sub { ... } );
+
+    For the common case of:
+
+      multimethod foo => (
+        positional => [...],
+        code       => sub {
+          ...;
+        },
+      );
+
+    These combination of shortcuts allow it to be written as:
+
+      multimethod foo => [...] => sub {
+        ...;
+      };
 
    `monomethod $name => %spec`
     `monomethod($name, %spec)` is basically just a shortcut for
@@ -370,6 +424,19 @@ DESCRIPTION
     The $coderef and $otherref variables will actually end up as blessed
     coderefs so that some tidy ups can take place in `DESTROY`.
 
+  Exporter
+    Sub::MultiMethod uses Exporter::Tiny as an exporter, which means exported
+    functions can be renamed, etc.
+
+      use Sub::MultiMethod multimethod => { -as => 'mm' };
+
+    You may also set various defaults in the import:
+
+      use Sub::MultiMethod multimethod => {
+        -as       => 'mm',
+        defaults  => { bless => 0 },   # see Type::Params
+      };
+
   API
     Sub::MultiMethod avoids cute syntax hacks because those can be added by
     third party modules. It provides an API for these modules.
@@ -483,6 +550,69 @@ DESCRIPTION
         Gets a reference to the dispatch cache hash. Mostly for people wanting
         to subclass Sub::MultiMethod, especially if you want to override the
         `dispatch` method.
+
+EXAMPLES
+  Naive (Slightly Broken) JSON Writer
+    Here is similar code to the "SYNOPSIS", but written as a function instead
+    of a method, employing a few shortcuts, and with a variant that throws an
+    error if called in void context.
+
+      use v5.20;
+      use strict;
+      use warnings;
+      use experimental 'signatures';
+  
+      package My::JSON {
+        use Sub::MultiMethod multifunction => { -as => 'multi' };
+        use Types::Standard -types;
+    
+        multi stringify => ( want => 'VOID', die => 'Unexpected void context' );
+    
+        multi stringify => [ Undef ] => ( return => 'null' );
+    
+        multi stringify => [ ScalarRef[Bool] ] => sub ( $bool ) {
+          return $$bool ? 'true' : 'false';
+        };
+    
+        multi stringify => [ Str ] => (
+          alias      => "stringify_str",
+          code       => sub ( $str ) {
+            return sprintf( q<"%s">, quotemeta($str) );
+          },
+        );
+    
+        multi stringify => [ Num ] => sub ( $n ) {
+          return $n;
+        };
+    
+        multi stringify => [ ArrayRef ] => sub ( $arr ) {
+          return sprintf(
+            q<[%s]>,
+            join( q<,>, map( stringify($_), @$arr ) )
+          );
+        };
+    
+        multi stringify => [ HashRef ] => sub ( $hash ) {
+          return sprintf(
+            q<{%s}>,
+            join(
+              q<,>,
+              map sprintf(
+                q<%s:%s>,
+                stringify_str($_),
+                stringify( $hash->{$_} )
+              ), sort keys %$hash,
+            )
+          );
+        };
+      }
+  
+      say My::JSON::stringify( {
+        foo  => 123,
+        bar  => [ 1, 2, 3 ],
+        baz  => \1,
+        quux => { xyzzy => 666 },
+      } );
 
 BUGS
     Please report any bugs to

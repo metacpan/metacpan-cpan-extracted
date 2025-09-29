@@ -6,14 +6,15 @@ use warnings;
 
 use Test::More;
 
-plan tests => 2 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'AnyEvent/I3X/Workspace/OnDemand.pm'
 );
 
 my @scripts = (
-    'bin/i3-ipc'
+    'bin/i3-ipc',
+    'bin/i3-wod'
 );
 
 # no fake home requested

@@ -1,0 +1,49 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Getopt::Long qw(GetOptions);
+use Pod::Usage;
+use App::Test::Generator;
+
+my $help;
+GetOptions(
+	'help|h' => \$help,
+) or pod2usage(2);
+
+pod2usage(1) if $help;
+
+my $conf_file = shift @ARGV or pod2usage('No config file given');
+
+App::Test::Generator::generate($conf_file);
+
+exit 0;
+
+__END__
+
+=head1 NAME
+
+fuzz-harness-generator - Generate fuzzing + corpus-based test harnesses
+
+=head1 SYNOPSIS
+
+  fuzz-harness-generator t/conf/add.conf
+
+=head1 DESCRIPTION
+
+This tool generates a C<t/fuzz.t> test file that fuzzes and validates a target module's function or method,
+using both randomized fuzz cases and static corpus
+cases (Perl or YAML).
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--help>
+
+Show this help.
+
+=back
+
+=cut

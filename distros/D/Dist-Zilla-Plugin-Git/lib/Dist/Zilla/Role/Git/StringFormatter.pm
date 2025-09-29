@@ -9,7 +9,7 @@
 package Dist::Zilla::Role::Git::StringFormatter;
 # ABSTRACT: Provide a String::Formatter for commit messages
 
-our $VERSION = '2.051';
+our $VERSION = '2.052';
 
 use 5.008;
 use strict;
@@ -19,7 +19,6 @@ use namespace::autoclean;
 use List::Util qw{ first };
 
 use Moose::Role;
-use MooseX::Has::Sugar;
 use Types::Standard qw{ Str };
 
 requires qw(changelog log zilla);
@@ -51,7 +50,7 @@ use String::Formatter method_stringf => {
 #pod
 #pod =cut
 
-has time_zone => ( ro, isa=>Str, default => 'local' );
+has time_zone => ( is => 'ro', isa=>Str, default => 'local' );
 
 around dump_config => sub
 {
@@ -122,7 +121,7 @@ Dist::Zilla::Role::Git::StringFormatter - Provide a String::Formatter for commit
 
 =head1 VERSION
 
-version 2.051
+version 2.052
 
 =head1 DESCRIPTION
 

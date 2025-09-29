@@ -25,33 +25,35 @@ $tmp=1+1;
 ##_END
 # line after 1
 # line after 2
-# line arger 3
+# line arfer 3
 ';
 
-my $sub=eval $program;
-ok $@, "Expected syntax error";
+my $sub;
+$sub=eval {Error::Show::streval $program};
+my $error=$@;
+ok $error, "Expected syntax error";
 
 # Test that with no adjustments we get the expected line numbers
 # Syntax error should be on line 8
 
-if($@){
-  my $context=Error::Show::context error=>$@, program=>$program;
+if($error){
+  my $context=Error::Show::context $error, keep=>1;
+
   my $match='10=> my \$test=1\+a;';
+  say STDERR "CONTEXT $context";
   ok $context=~/$match/s, "Found error on expected unmodified line";
-  say $context;
+  #say $context;
 }
 
 # Test that with adjustments we get the expected line numbers
 # Syntax error should be on line 4
-if($@){
-  my $context=Error::Show::context error=>$@, program=>$program,
-  start_mark=>'##_START',
-  end_mark=>'##_END';
+if($error){
+  my $context=Error::Show::context $error, start_mark=>'##_START', end_mark=>'##_END';
   
   #my $match='5=> my $test=1+a;';
   my $match='6=> my \$test=1\+a;';
   ok $context=~/$match/s, "Found error on expected modified line";
-  say $context;
+  #say $context;
 }
 
 
@@ -79,7 +81,7 @@ $tmp=1+1;
 # line arger 3
 ';
 
-$sub=eval $program;
+$sub=Error::Show::streval $program;
 
 ok !$@, "Compiled ok";
 
@@ -88,7 +90,7 @@ eval {
 };
 
 if($@){
-  my $context=Error::Show::context error=>$@, program=>$program;
+  my $context=Error::Show::context $@, keep=>1;
   my $match='10=> my \$test=1/0;';
   ok $context=~/$match/ms;
   say $context;
@@ -98,9 +100,7 @@ eval {
 };
 
 if($@){
-  my $context=Error::Show::context error=>$@, program=>$program,
-  start_mark=>'##_START',
-  end_mark=>'##_END';
+  my $context=Error::Show::context $@,  start_mark=>'##_START', end_mark=>'##_END';
   my $match='6=> my \$test=1/0;';
   ok $context=~/$match/ms;
   say $context;

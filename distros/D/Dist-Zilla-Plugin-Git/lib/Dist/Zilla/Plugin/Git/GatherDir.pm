@@ -9,7 +9,7 @@
 package Dist::Zilla::Plugin::Git::GatherDir;
 # ABSTRACT: Gather all tracked files in a Git working directory
 
-our $VERSION = '2.051';
+our $VERSION = '2.052';
 
 use Moose;
 extends 'Dist::Zilla::Plugin::GatherDir' => { -version => 4.200016 }; # exclude_match
@@ -230,7 +230,7 @@ Dist::Zilla::Plugin::Git::GatherDir - Gather all tracked files in a Git working 
 
 =head1 VERSION
 
-version 2.051
+version 2.052
 
 =head1 SYNOPSIS
 

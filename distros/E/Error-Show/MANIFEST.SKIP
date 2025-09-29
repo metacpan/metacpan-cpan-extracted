@@ -1,3 +1,4 @@
+__test.pl
 .*tar\.gz$
 .*tar$
 test.html

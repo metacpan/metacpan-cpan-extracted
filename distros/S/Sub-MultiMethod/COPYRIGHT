@@ -3,20 +3,6 @@ Upstream-Name: Sub-MultiMethod
 Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
 Source: https://metacpan.org/release/Sub-MultiMethod
 
-Files: t/02singleclass.t
- t/03inheritance.t
- t/04roles.t
- t/05rolesdonotinstalldispatchers.t
- t/06monomethod-weird.t
- t/06monomethod.t
- t/07multifunc.t
- t/09coderef.t
- t/legacy/02singleclass.t
- t/legacy/07multifunc.t
- t/legacy/09coderef.t
-Copyright: Copyright 2022 Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: INSTALL
  LICENSE
  Makefile.PL
@@ -29,12 +15,26 @@ Files: INSTALL
 Copyright: Unknown
 License: Unknown
 
+Files: t/03inheritance.t
+ t/04roles.t
+ t/05rolesdonotinstalldispatchers.t
+ t/06monomethod-weird.t
+ t/06monomethod.t
+ t/07multifunc.t
+ t/09coderef.t
+ t/legacy/07multifunc.t
+ t/legacy/09coderef.t
+Copyright: Copyright 2022 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 Files: Changes
  META.json
  META.yml
  doap.ttl
+ t/02singleclass.t
  t/08mro.t
  t/11want_and_if.t
+ t/legacy/02singleclass.t
  t/legacy/08mro.t
 Copyright: Copyright 2025 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0

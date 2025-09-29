@@ -1,0 +1,126 @@
+#!perl
+
+# PODNAME: i3-wod
+# ABSTRACT: i3 workspace on demand
+
+use v5.26;
+use warnings;
+use strict;
+
+use AnyEvent::I3X::Workspace::OnDemand;
+use AnyEvent;
+use EV;
+use Data::Dumper;
+use Getopt::Long;
+use File::Spec::Functions qw(catfile);
+use YAML::XS qw(LoadFile);
+use Pod::Usage qw(pod2usage);
+use Proc::Find qw(find_proc);
+
+
+my %options = (
+  config => catfile($ENV{HOME}, qw(.config i3 wod.conf)),
+  workdir => catfile($ENV{HOME}, qw(.config i3)),
+);
+
+GetOptions(\%options, qw(debug help man config=s workdir=s));
+
+if ($options{help}) {
+    pod2usage(-verbose => 1);
+}
+if ($options{man}) {
+    pod2usage(-verbose => 2);
+}
+
+if (!-f $options{config} || ! -r $options{config}) {
+    die "Unable to open configuration file $options{config}";
+}
+
+my $config = LoadFile($options{config});
+my $workdir = $options{workdir} // delete $config->{workdir};
+my $debug = $options{debug} // delete $config->{debug};
+
+my $pidfile = catfile($workdir, 'pid');
+
+if (-f $pidfile) {
+    open my $fh, '<', $pidfile;
+    my $pid = find_proc(pid => <$fh>, detail => 1);
+    close($fh);
+    if (@$pid && $pid->[0]{fname} eq 'i3-wod') {
+        die "Already started, not running twice", $/;
+    }
+    unlink($pidfile);
+}
+
+open my $fh, '>', $pidfile;
+print $fh $$;
+close($fh);
+
+
+my $i3 = AnyEvent::I3X::Workspace::OnDemand->new(
+  %{$config},
+  defined $debug ? (debug => $debug) : (),
+);
+
+# We kill ourselves after a shutdown
+$i3->on_shutdown(exit => sub { exit 0 });
+$i3->on_shutdown(restart => sub { exit 0 });
+
+EV::loop;
+AE::cv->recv;
+
+exit 0;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+i3-wod - i3 workspace on demand
+
+=head1 VERSION
+
+version 0.005
+
+=head1 SYNOPSIS
+
+i3-wod OPTIONS
+
+=head1 DESCRIPTION
+
+An i3 workspace loader
+
+=head1 OPTIONS
+
+=head2 --config
+
+Your configuration for this workspace loader
+
+=head2 --workdir
+
+The workdir for this loader
+
+=head2 --debug
+
+Enable debugging
+
+=head2 --help
+
+This help
+
+=head1 AUTHOR
+
+Wesley Schwengle <waterkip@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2024 by Wesley Schwengle.
+
+This is free software, licensed under:
+
+  The (three-clause) BSD License
+
+=cut

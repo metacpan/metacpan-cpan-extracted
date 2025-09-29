@@ -1,5 +1,17 @@
 Revision history for Dist::Zilla::PluginBundle::Author::DOMM
 
+0.912     2025-09-28 22:25:40+02:00
+    - adapt to changes in Dist::Zilla::Plugin::SourceHutMeta (Thomas Klausner)
+
+
+0.911     2025-09-28 17:52:36+02:00
+    - add CONTRIBUTING.md (manually, because doing this via dist::zilla seems very complex..)
+
+0.910     2025-09-28 17:16:38+02:00
+    - add SourceHutMeta to plugins (Thomas Klausner)
+    - copy LICENSE from build into git repo (sourcehut complains if there is no license file) (Thomas Klausner)
+
+
 0.909     2021-04-04 16:18:34+02:00
     - move data from global dist.ini into dist (Thomas Klausner)
     - add UploadToCPAN and Clean (Thomas Klausner)

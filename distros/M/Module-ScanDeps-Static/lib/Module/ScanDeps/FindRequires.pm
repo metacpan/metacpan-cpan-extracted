@@ -29,7 +29,7 @@ Readonly::Scalar our $FAILURE => 1;
 Readonly::Scalar our $MIN_PERL_VERSION => $PERL_VERSION;
 
 require Module::ScanDeps::Static::VERSION;
-our $VERSION = '1.7.6';
+our $VERSION = '1.7.8';
 
 use parent qw(CLI::Simple);
 
@@ -691,6 +691,7 @@ sub main {
     filter|F=s
     file-list|L=s
     format|t=s
+    help|h
     max-items|m=i
     min-perl-version=s
     module-version=s
@@ -755,15 +756,17 @@ __END__
 
 =head1 NAME
 
-find-requires.pl
+Module::ScanDeps::FindRequires
 
 =head1 SYNOPSIS
 
- find-requires.pl --path src/main/perl list-requires
+ find-requires --path src/main/perl list-requires
 
- find-requires.pl --path src/main/perl dump-map
+ find-requires --path src/main/perl dump-map
 
  Script to maintain a manifest of Perl module dependencies for a project.
+
+I<NOTE: find-requires.ps1 should be used when running under Windows.>
 
 =head1 DESCRIPTION
 
@@ -880,26 +883,26 @@ you are executing the script from the root of your application.>
 
 =item * create the C<requires> file the first time
 
-   find-requires.pl --path src/main/perl create-requires > requires
+   find-requires --path src/main/perl create-requires > requires
 
 =item * check to see if a module has a new requirement
 
-   find-requires.pl -f src/main/perl/lib/TreasurersBriefcase/Foo.pm check-requires
+   find-requires -f src/main/perl/lib/TreasurersBriefcase/Foo.pm check-requires
 
 =item * add new dependencies to the C<requires> file
 
-   find-requires.pl --module Foo --module-version 0.1 add-requires
+   find-requires --module Foo --module-version 0.1 add-requires
 
-   find-requires.pl --file myscript.pl check-requires | \
-      find-requires.pl -u add-requires
+   find-requires --file myscript.pl check-requires | \
+      find-requires -u add-requires
 
 =item * delete a module from the C<requires> file
 
-  find-requires.pl -M Foo::Bar::Baz -u delete-requires
+  find-requires -M Foo::Bar::Baz -u delete-requires
 
 =item * create a cpanfile from the C<requires> file
 
-   find-requires.pl create-cpanfile
+   find-requires create-cpanfile
 
 =item * create listing of each file and its dependencies
 

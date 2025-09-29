@@ -6,6 +6,7 @@ use strict;
 use 5.016;
 
 use Scalar::Util qw( looks_like_number );
+#use Storable     qw();  # required
 
 use JSON::MaybeXS   qw( decode_json );
 use List::MoreUtils qw( none uniq );
@@ -384,9 +385,13 @@ sub column_names_and_types {
         my $sth = $sf->{d}{dbh}->prepare( $stmt );
         if ( $sf->{i}{driver} eq 'SQLite' ) {
             $column_names = [ @{$sth->{NAME}} ];
-            my $rx_numeric = 'INT|DOUBLE|REAL|NUM|FLOAT|DEC|BOOL|BIT|MONEY';
-            $column_types = [ map { ! $_ || $_ =~ /$rx_numeric/i ? 2 : 1 } @{$sth->{TYPE}} ];
-            #$column_types = [];
+            if ( $sf->{d}{dbh}{sqlite_see_if_its_a_number} ) {
+                $column_types = [];
+            }
+            else {
+                my $rx_numeric = 'INTEGER|INT$|DOUBLE|REAL|NUM|FLOAT|DEC|BOOL|BIT|MONEY';
+                $column_types = [ map { ! $_ || $_ =~ /$rx_numeric/i ? 2 : 1 } @{$sth->{TYPE}} ];
+            }
         }
         else {
             $sth->execute();

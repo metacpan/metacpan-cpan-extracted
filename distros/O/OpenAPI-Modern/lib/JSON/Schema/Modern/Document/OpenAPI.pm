@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document::OpenAPI;
 # ABSTRACT: One OpenAPI v3.1 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.096';
+our $VERSION = '0.097';
 
 use 5.020;
 use utf8;
@@ -21,12 +21,10 @@ no if "$]" >= 5.041009, feature => 'smartmatch';
 no feature 'switch';
 use JSON::Schema::Modern::Utilities qw(E canonical_uri jsonp is_equal);
 use Carp qw(croak carp);
-use Safe::Isa;
 use Digest::MD5 'md5_hex';
 use Storable 'dclone';
 use File::ShareDir 'dist_dir';
 use Path::Tiny;
-use List::Util 'pairs';
 use Ref::Util 'is_plain_hashref';
 use builtin::compat 'blessed';
 use MooX::TypeTiny 0.002002;
@@ -35,7 +33,7 @@ use namespace::clean;
 
 extends 'JSON::Schema::Modern::Document';
 
-our @CARP_NOT = qw(Sereal Sereal::Decoder);
+our @CARP_NOT = qw(Sereal Sereal::Decoder JSON::Schema::Modern::Document);
 
 # schema files to add by default
 # these are also available as URIs with 'latest' instead of the timestamp.
@@ -57,7 +55,7 @@ use constant OAS_VOCABULARY => 'https://spec.openapis.org/oas/3.1/meta/2024-11-1
 # it is likely the case that we can support a version beyond what's stated here -- but we may not,
 # so we'll warn to that effect. Every effort will be made to upgrade this implementation to fully
 # support the latest version as soon as possible.
-use constant OAS_VERSION => '3.1.1';
+use constant OAS_VERSION => '3.1.2';
 
 has '+schema' => (
   isa => HashRef,
@@ -108,13 +106,13 @@ sub traverse ($self, $evaluator, $config_override = {}) {
   my $schema = $self->schema;
   my $state = {
     # initial_schema_uri calculated from '$self' below
-    traversed_schema_path => '',
-    schema_path => '',
+    traversed_keyword_path => '',
+    keyword_path => '',
     data_path => '',
     errors => [],
     evaluator => $evaluator,
     identifiers => {},
-    # note that this is the JSON Schema specification version, not OpenAPI
+    # note that this is the JSON Schema specification version, not OpenAPI version
     specification_version => $evaluator->SPECIFICATION_VERSION_DEFAULT,
     vocabularies => [],
     subschemas => [],
@@ -130,7 +128,7 @@ sub traverse ($self, $evaluator, $config_override = {}) {
     type => 'object',
     required => ['openapi'],
     properties => {
-      '$self' => {
+      '$self' => {    # not in 3.1, but we patch our schema to allow it so we can test
         type => 'string',
         format => 'uri-reference',
         pattern => '',  # just here for the callback so we can customize the error
@@ -198,12 +196,12 @@ sub traverse ($self, $evaluator, $config_override = {}) {
       ? Mojo::URL->new($schema->{jsonSchemaDialect})->to_abs($self->canonical_uri)
       : DEFAULT_DIALECT;
 
-    # traverse an empty schema with this metaschema uri to confirm it is valid, and add an entry in
+    # traverse an empty schema with this dialect uri to confirm it is valid, and add an entry in
     # the evaluator's _metaschema_vocabulary_classes
     my $check_metaschema_state = $evaluator->traverse({}, {
       metaschema_uri => $json_schema_dialect,
       initial_schema_uri => $self->canonical_uri->clone->fragment('/jsonSchemaDialect'),
-      traversed_schema_path => '/jsonSchemaDialect',
+      traversed_keyword_path => '/jsonSchemaDialect',
     });
 
     # we cannot continue if the metaschema is invalid
@@ -290,7 +288,7 @@ sub traverse ($self, $evaluator, $config_override = {}) {
     # { for the editor
     foreach my $name ($path =~ m!\{([^}]+)\}!g) {
       if (++$seen_names{$name} == 2) {
-        ()= E({ %$state, schema_path => jsonp('/paths', $path) },
+        ()= E({ %$state, keyword_path => jsonp('/paths', $path) },
           'duplicate path template variable "%s"', $name);
       }
     }
@@ -298,7 +296,7 @@ sub traverse ($self, $evaluator, $config_override = {}) {
     # { for the editor
     my $normalized = $path =~ s/\{[^}]+\}/\x00/r;
     if (my $first_path = $seen_path{$normalized}) {
-      ()= E({ %$state, schema_path => jsonp('/paths', $path) },
+      ()= E({ %$state, keyword_path => jsonp('/paths', $path) },
         'duplicate of templated path "%s"', $first_path);
       next;
     }
@@ -306,7 +304,7 @@ sub traverse ($self, $evaluator, $config_override = {}) {
   }
 
   foreach my $path_item (sort keys %bad_path_item_refs) {
-    ()= E({ %$state, schema_path => $path_item },
+    ()= E({ %$state, keyword_path => $path_item },
       'invalid keywords used adjacent to $ref in a path-item: %s', $bad_path_item_refs{$path_item});
   }
 
@@ -319,7 +317,7 @@ sub traverse ($self, $evaluator, $config_override = {}) {
 
     foreach my $server_idx (0 .. $servers->$#*) {
       if ($servers->[$server_idx]{url} =~ m{(?:/$|\?|#)}) {
-        ()= E({ %$state, schema_path => jsonp($servers_location, $server_idx, 'url') },
+        ()= E({ %$state, keyword_path => jsonp($servers_location, $server_idx, 'url') },
           'server url cannot end in / or contain query or fragment components');
         next;
       }
@@ -330,7 +328,7 @@ sub traverse ($self, $evaluator, $config_override = {}) {
       my @url_variables = $servers->[$server_idx]{url} =~ /\{([^}]+)\}/g;
 
       if (my $first_url = $seen_url{$normalized}) {
-        ()= E({ %$state, schema_path => jsonp($servers_location, $server_idx, 'url') },
+        ()= E({ %$state, keyword_path => jsonp($servers_location, $server_idx, 'url') },
           'duplicate of templated server url "%s"', $first_url);
       }
       $seen_url{$normalized} = $servers->[$server_idx]{url};
@@ -338,24 +336,24 @@ sub traverse ($self, $evaluator, $config_override = {}) {
       my $variables_obj = $servers->[$server_idx]{variables};
       if (not $variables_obj) {
         # missing 'variables': needs variables/$varname/default
-        ()= E({ %$state, schema_path => jsonp($servers_location, $server_idx) },
+        ()= E({ %$state, keyword_path => jsonp($servers_location, $server_idx) },
           '"variables" property is required for templated server urls') if @url_variables;
         next;
       }
 
       my %seen_names;
       foreach my $name (@url_variables) {
-        ()= E({ %$state, schema_path => jsonp($servers_location, $server_idx) },
+        ()= E({ %$state, keyword_path => jsonp($servers_location, $server_idx) },
             'duplicate servers template variable "%s"', $name)
           if ++$seen_names{$name} == 2;
 
-        ()= E({ %$state, schema_path => jsonp($servers_location, $server_idx, 'variables') },
+        ()= E({ %$state, keyword_path => jsonp($servers_location, $server_idx, 'variables') },
             'missing "variables" definition for servers template variable "%s"', $name)
           if $seen_names{$name} == 1 and not exists $variables_obj->{$name};
       }
 
       foreach my $varname (keys $variables_obj->%*) {
-        ()= E({ %$state, schema_path => jsonp($servers_location, $server_idx, 'variables', $varname, 'default') },
+        ()= E({ %$state, keyword_path => jsonp($servers_location, $server_idx, 'variables', $varname, 'default') },
             'servers default is not a member of enum')
           if exists $variables_obj->{$varname}{enum}
             and not grep $variables_obj->{$varname}{default} eq $_, $variables_obj->{$varname}{enum}->@*;
@@ -379,13 +377,13 @@ sub traverse ($self, $evaluator, $config_override = {}) {
     push @real_json_schema_paths, $json_schema_paths[$idx];
   }
 
-  $self->_traverse_schema({ %$state, schema_path => $_ }) foreach reverse @real_json_schema_paths;
+  $self->_traverse_schema({ %$state, keyword_path => $_ }) foreach reverse @real_json_schema_paths;
   $self->_add_entity_location($_, 'schema') foreach $state->{subschemas}->@*;
 
   foreach my $pair (@operation_paths) {
     my ($operation_id, $path) = @$pair;
     if (my $existing = $self->get_operationId_path($operation_id)) {
-      ()= E({ %$state, schema_path => $path .'/operationId' },
+      ()= E({ %$state, keyword_path => $path .'/operationId' },
         'duplicate of operationId at %s', $existing);
     }
     else {
@@ -445,7 +443,7 @@ sub _add_vocab_and_default_schemas ($self, $evaluator) {
     else {
       my $file = path(dist_dir('OpenAPI-Modern'), $filename);
       my $schema = $evaluator->_json_decoder->decode($file->slurp_raw);
-      $document = $evaluator->add_schema($schema);
+      $metaschema_cache->{$filename} = $document = $evaluator->add_schema($schema);
     }
 
     $evaluator->add_document($`.'/latest', $document)
@@ -465,12 +463,12 @@ sub _add_vocab_and_default_schemas ($self, $evaluator) {
 # traverse this JSON Schema and identify all errors, subschema locations, and referenceable
 # identifiers
 sub _traverse_schema ($self, $state) {
-  my $schema = $self->get($state->{schema_path});
+  my $schema = $self->get($state->{keyword_path});
   return if not is_plain_hashref($schema) or not keys %$schema;
 
   my $subschema_state = $state->{evaluator}->traverse($schema, {
     initial_schema_uri => canonical_uri($state),
-    traversed_schema_path => $state->{traversed_schema_path}.$state->{schema_path},
+    traversed_keyword_path => $state->{traversed_keyword_path}.$state->{keyword_path},
     metaschema_uri => $state->{json_schema_dialect},  # can be overridden with the '$schema' keyword
   });
 
@@ -489,7 +487,7 @@ sub _traverse_schema ($self, $state) {
     if (not is_equal(
         { canonical_uri => $new->{canonical_uri}.'', map +($_ => $new->{$_}), qw(path specification_version vocabularies) },
         { canonical_uri => $existing->{canonical_uri}.'', map +($_ => $existing->{$_}), qw(path specification_version vocabularies) })) {
-      ()= E({ %$state, schema_path => $new->{path} },
+      ()= E({ %$state, keyword_path => $new->{path} },
         'duplicate canonical uri "%s" found (original at path "%s")',
         $new_uri, $existing->{path});
       next;
@@ -497,7 +495,7 @@ sub _traverse_schema ($self, $state) {
 
     foreach my $anchor (sort keys $new->{anchors}->%*) {
       if (my $existing_anchor = ($existing->{anchors}//{})->{$anchor}) {
-        ()= E({ %$state, schema_path => $new->{anchors}{$anchor}{path} },
+        ()= E({ %$state, keyword_path => $new->{anchors}{$anchor}{path} },
           'duplicate anchor uri "%s" found (original at path "%s")',
           $new->{canonical_uri}->clone->fragment($anchor),
           $existing->{anchors}{$anchor}{path});
@@ -570,7 +568,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.1 document
 
 =head1 VERSION
 
-version 0.096
+version 0.097
 
 =head1 SYNOPSIS
 

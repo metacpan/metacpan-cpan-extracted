@@ -8,18 +8,22 @@ sub my_func {
   }
   catch($e){
 
-    my @frames=$e->trace->frames;
-    say Error::Show::context message=>$e, frames=>[@frames[0]];#{line=>$e->line, file=>$e->file, message=>"$e"};
+    say Error::Show::context $e;
 
   }
 
 
-  my $string='"Hello
-    and something eler
-   to look at"';
+  my $string='
+  sub inner {
+    Exception::Class::Base->throw("An error occured");
+    }
+    inner();
+   ';
+   local $@;
   eval  $string;
-  if($@){
-    say Error::Show::context program=>$string, error=>$@;
+  my $error=$@;
+  if($error){
+    say Error::Show::context $error;
   }
 }
 

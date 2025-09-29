@@ -13,12 +13,11 @@ use warnings;
 package Dist::Zilla::Plugin::Git::Commit;
 # ABSTRACT: Commit dirty files
 
-our $VERSION = '2.051';
+our $VERSION = '2.052';
 
 use namespace::autoclean;
 use File::Temp           qw{ tempfile };
 use Moose;
-use MooseX::Has::Sugar;
 use Types::Standard qw(Str ArrayRef Bool);
 use Types::Path::Tiny 'Path';
 use Path::Tiny 0.048 qw(); # subsumes
@@ -36,9 +35,9 @@ sub _git_config_mapping { +{
 
 # -- attributes
 
-has commit_msg => ( ro, isa=>Str, default => 'v%V%n%n%c' );
-has add_files_in  => ( ro, isa=> ArrayRef[Path], coerce => 1, default => sub { [] });
-has signoff => ( ro, isa => Bool, default => 0 );
+has commit_msg => ( is => 'ro', isa=>Str, default => 'v%V%n%n%c' );
+has add_files_in  => ( is => 'ro', isa=> ArrayRef[Path], coerce => 1, default => sub { [] });
+has signoff => ( is => 'ro', isa => Bool, default => 0 );
 
 
 # -- public methods
@@ -132,7 +131,7 @@ Dist::Zilla::Plugin::Git::Commit - Commit dirty files
 
 =head1 VERSION
 
-version 2.051
+version 2.052
 
 =head1 SYNOPSIS
 

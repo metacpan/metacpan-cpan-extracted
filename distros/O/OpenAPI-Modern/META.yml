@@ -57,13 +57,13 @@ no_index:
 provides:
   JSON::Schema::Modern::Document::OpenAPI:
     file: lib/JSON/Schema/Modern/Document/OpenAPI.pm
-    version: '0.096'
+    version: '0.097'
   JSON::Schema::Modern::Vocabulary::OpenAPI:
     file: lib/JSON/Schema/Modern/Vocabulary/OpenAPI.pm
-    version: '0.096'
+    version: '0.097'
   OpenAPI::Modern:
     file: lib/OpenAPI/Modern.pm
-    version: '0.096'
+    version: '0.097'
 requires:
   Carp: '0'
   Digest::MD5: '0'
@@ -71,7 +71,7 @@ requires:
   Feature::Compat::Try: '0'
   File::ShareDir: '0'
   JSON::Schema::Modern: '0.603'
-  JSON::Schema::Modern::Document: '0.617'
+  JSON::Schema::Modern::Document: '0.619'
   JSON::Schema::Modern::Utilities: '0'
   JSON::Schema::Modern::Vocabulary: '0'
   List::Util: '0'
@@ -102,10 +102,10 @@ resources:
   bugtracker: https://github.com/karenetheridge/OpenAPI-Modern/issues
   homepage: https://github.com/karenetheridge/OpenAPI-Modern
   repository: https://github.com/karenetheridge/OpenAPI-Modern.git
-version: '0.096'
+version: '0.097'
 x_Dist_Zilla:
   perl:
-    version: '5.043002'
+    version: '5.043003'
   plugins:
     -
       class: Dist::Zilla::Plugin::Run::BeforeRelease
@@ -162,7 +162,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: '@Author::ETHER/Git::GatherDir'
-      version: '2.051'
+      version: '2.052'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Author::ETHER/MetaYAML'
@@ -617,7 +617,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20250820'
+          Module::CoreList: '5.20250923'
       name: '@Author::ETHER/EnsureLatestPerl'
       version: '0.010'
     -
@@ -645,7 +645,7 @@ x_Dist_Zilla:
           git_version: 2.50.1
           repo_root: .
       name: '@Author::ETHER/initial check'
-      version: '2.051'
+      version: '2.052'
     -
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
@@ -687,7 +687,7 @@ x_Dist_Zilla:
           git_version: 2.50.1
           repo_root: .
       name: '@Author::ETHER/after tests'
-      version: '2.051'
+      version: '2.052'
     -
       class: Dist::Zilla::Plugin::CheckIssues
       name: '@Author::ETHER/CheckIssues'
@@ -773,7 +773,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::ETHER/@Git::VersionManager/release snapshot'
-      version: '2.051'
+      version: '2.052'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -781,7 +781,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.096
+          tag: v0.097
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
@@ -790,7 +790,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::ETHER/@Git::VersionManager/Git::Tag'
-      version: '2.051'
+      version: '2.052'
     -
       class: Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional
       config:
@@ -827,7 +827,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::ETHER/@Git::VersionManager/post-release commit'
-      version: '2.051'
+      version: '2.052'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -847,7 +847,7 @@ x_Dist_Zilla:
           git_version: 2.50.1
           repo_root: .
       name: '@Author::ETHER/Git::Push'
-      version: '2.051'
+      version: '2.052'
     -
       class: Dist::Zilla::Plugin::GitHub::Update
       config:
@@ -984,7 +984,7 @@ x_Dist_Zilla:
 x_authority: cpan:ETHER
 x_breaks:
   Test::Mojo::Role::OpenAPI::Modern: '< 0.007'
-x_generated_by_perl: v5.43.2
+x_generated_by_perl: v5.43.3
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 1

@@ -21,7 +21,7 @@ no_index:
 provides:
   HiPi:
     file: lib/HiPi.pm
-    version: '0.93'
+    version: '0.94'
   HiPi::Class:
     file: lib/HiPi/Class.pm
     version: '0.81'
@@ -39,13 +39,13 @@ provides:
     version: '0.93'
   HiPi::Device::I2C:
     file: lib/HiPi/Device/I2C.pm
-    version: '0.93'
+    version: '0.94'
   HiPi::Device::OneWire:
     file: lib/HiPi/Device/OneWire.pm
     version: '0.91'
   HiPi::Device::SPI:
     file: lib/HiPi/Device/SPI.pm
-    version: '0.93'
+    version: '0.94'
   HiPi::Device::SerialPort:
     file: lib/HiPi/Device/SerialPort.pm
     version: '0.81'
@@ -63,7 +63,7 @@ provides:
     version: '0.89'
   HiPi::GPIO:
     file: lib/HiPi/GPIO.pm
-    version: '0.93'
+    version: '0.94'
   HiPi::GPIO::Pin:
     file: lib/HiPi/GPIO/Pin.pm
     version: '0.81'
@@ -489,10 +489,10 @@ provides:
     file: lib/HiPi/RF/OpenThings/Message.pm
   HiPi::RaspberryPi:
     file: lib/HiPi/RaspberryPi.pm
-    version: '0.93'
+    version: '0.94'
   HiPi::Utils:
     file: lib/HiPi/Utils.pm
-    version: '0.93'
+    version: '0.94'
   HiPi::Utils::BitBuffer:
     file: lib/HiPi/Utils/BitBuffer.pm
     version: '0.82'
@@ -501,7 +501,7 @@ provides:
     version: '0.81'
   HiPi::Utils::Exec:
     file: lib/HiPi/Utils/Exec.pm
-    version: '0.93'
+    version: '0.94'
   HiPi::Utils::OLEDFont:
     file: lib/HiPi/Utils/OLEDFont.pm
     version: '0.81'
@@ -521,5 +521,5 @@ requires:
 resources:
   homepage: http://raspberry.znix.com/
   license: http://dev.perl.org/licenses/
-version: '0.93'
+version: '0.94'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

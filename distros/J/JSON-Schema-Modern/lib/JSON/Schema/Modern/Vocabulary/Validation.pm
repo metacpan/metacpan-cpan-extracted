@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Validation;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Validation vocabulary
 
-our $VERSION = '0.618';
+our $VERSION = '0.619';
 
 use 5.020;
 use Moo;
@@ -303,15 +303,15 @@ sub _traverse_keyword_dependentRequired ($class, $schema, $state) {
 
   my $valid = 1;
   foreach my $property (sort keys $schema->{dependentRequired}->%*) {
-    $valid = E({ %$state, _schema_path_suffix => $property }, 'value is not an array'), next
+    $valid = E({ %$state, _keyword_path_suffix => $property }, 'value is not an array'), next
       if not is_type('array', $schema->{dependentRequired}{$property});
 
     foreach my $index (0..$schema->{dependentRequired}{$property}->$#*) {
-      $valid = E({ %$state, _schema_path_suffix => [ $property, $index ] }, 'element #%d is not a string', $index)
+      $valid = E({ %$state, _keyword_path_suffix => [ $property, $index ] }, 'element #%d is not a string', $index)
         if not is_type('string', $schema->{dependentRequired}{$property}[$index]);
     }
 
-    $valid = E({ %$state, _schema_path_suffix => $property }, 'elements are not unique')
+    $valid = E({ %$state, _keyword_path_suffix => $property }, 'elements are not unique')
       if not is_elements_unique($schema->{dependentRequired}{$property});
   }
   return $valid;
@@ -325,7 +325,7 @@ sub _eval_keyword_dependentRequired ($class, $data, $schema, $state) {
     next if not exists $data->{$property};
 
     if (my @missing = grep !exists($data->{$_}), $schema->{dependentRequired}{$property}->@*) {
-      $valid = E({ %$state, _schema_path_suffix => $property },
+      $valid = E({ %$state, _keyword_path_suffix => $property },
         'object is missing propert%s: %s', @missing > 1 ? 'ies' : 'y', join(', ', @missing));
     }
   }
@@ -359,7 +359,7 @@ JSON::Schema::Modern::Vocabulary::Validation - Implementation of the JSON Schema
 
 =head1 VERSION
 
-version 0.618
+version 0.619
 
 =head1 DESCRIPTION
 

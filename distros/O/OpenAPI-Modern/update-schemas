@@ -14,11 +14,11 @@ use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 use Path::Tiny;
 use Mojo::UserAgent;
 use Digest::MD5 'md5_hex';
-use Test::File::ShareDir -share => { -dist => { 'OpenAPI-Modern' => 'share' } };
 use JSON::Schema::Modern;
 use lib 'lib';  # make sure we load the newly-patched version of our modules
 
 # see https://spec.openapis.org/#openapi-specification-schemas for the latest links
+# these are updated automatically at build time via 'update-schemas'
 
 # note that these entries are duplicated in JSON::Schema::Modern::Document::OpenAPI
 my %files = (
@@ -39,20 +39,24 @@ my %files = (
   'oas/LICENSE' => 'https://raw.githubusercontent.com/OAI/OpenAPI-Specification/main/LICENSE',
 );
 
-my $web_url = 'https://spec.openapis.org/';
+my $web_url = 'https://spec.openapis.org/oas';
 
 my $ua = Mojo::UserAgent->new(max_redirects => 3);
-say "# fetching $web_url" if $ENV{DEBUG};
+say "# fetching   $web_url" if $ENV{DEBUG};
 my $res = $ua->get($web_url)->result;
 die "Failed to fetch $web_url", $res->code, " ", $res->message if $res->is_error;
 
-my %new_schemas = ();  # keys are existing OAS schema URIs, defined above in %files
+# keys are existing OAS schema URLs, as found above
+# values is the list of all schemas found on the website of the same type
+my %new_schemas;
 
 # check the website and find all files that are newer than what we've got
+my $links;
 foreach my $e ($res->dom->find('a[href]')->each) {
   my $link = $e->{href};
   next if $link !~ m{^/oas/3.1/[a-z-]+/\d{4}-\d{2}-\d{2}$};
 
+  ++$links;
   $link = Mojo::URL->new($web_url)->path($link)->to_string; # normalize slashes
 
   if (my ($existing) = grep !/github/ && $link =~ m{^\Q${\substr($_, 0, -10)}\E}, values %files) {
@@ -61,13 +65,21 @@ foreach my $e ($res->dom->find('a[href]')->each) {
   }
 }
 
+die "no links found on $web_url?!" if not $links;
+
 # identify outdated schema files, and replace all references to them in the repository
-if (my @outdated_schemas = grep $new_schemas{$_}->@*, sort keys %new_schemas) {
+if (my @outdated_schemas = grep $new_schemas{$_}->@*, reverse sort keys %new_schemas) {
   warn join("\n", 'these outdated entries will be replaced everywhere they are found (including in this script itself):',
-    map +("$_ -> ".join(', ', sort $new_schemas{$_}->@*)), @outdated_schemas), "\n\n";
+    map "$_ -> $new_schemas{$_}->[0]", @outdated_schemas), "\n\n";
 
   # now we just keep track of the newest version of each..
-  %new_schemas = map +($new_schemas{$_}->@* ? ($_ => $new_schemas{$_}->[-1]) : ()), @outdated_schemas;
+  %new_schemas = map +($_ => $new_schemas{$_}->[0]), @outdated_schemas;
+
+  if ($ENV{DEBUG}) {
+    foreach my $outdated (@outdated_schemas) {
+      say 'replacing "'.$outdated.'" with "'.$new_schemas{$outdated}.'"';
+    }
+  }
 
   foreach my $file (split("\n", `git ls-files`) ) {
     next if $file =~ m{^share/oas/};  # skip references in the files we are replacing
@@ -79,21 +91,19 @@ if (my @outdated_schemas = grep $new_schemas{$_}->@*, sort keys %new_schemas) {
   }
 
   # update the values of %files for all schemas that are outdated
+  # we want to download even unchanged files to make sure the checksum matches
   my %inverted_files = reverse %files;
   foreach my $outdated (@outdated_schemas) {
     $inverted_files{$new_schemas{$outdated}} = delete $inverted_files{$outdated};
   }
   %files = reverse %inverted_files;
 }
-else {
-  %new_schemas = ();
-}
 
 my $json_decoder = JSON::Schema::Modern::_JSON_BACKEND()->new->utf8(1);
-my $js = JSON::Schema::Modern->new(strict => 1, validate_formats => 1);
+my $js = JSON::Schema::Modern->new;
 my %checksums;
 
-# download fresh copies of our files, validate against their schemas and against our code
+# download fresh copies of all files, validate against their schemas
 foreach my $target (sort keys %files) {
   my $uri = $files{$target};
 
@@ -112,37 +122,8 @@ foreach my $target (sort keys %files) {
   # JSON::Schema::Modern instance
   my $schema = $json_decoder->decode($content);
   say '# validating ', $schema->{'$id'}, ' -> ', $target if $ENV{DEBUG};
-  my $result = $js->validate_schema($schema, { strict => 1 });
+  my $result = $js->validate_schema($schema, { strict => 1, validate_formats => 1 });
   die $result->dump if not $result->valid;
-}
-
-# all files must be updated before any of them can be loaded as documents, since they depend on each
-# other via the '$schema' and '$vocabulary' keywords... and we delay loading the document class,
-# so we get the new versions of our constants
-require JSON::Schema::Modern::Document::OpenAPI;
-
-foreach my $target (sort keys %files) {
-  $target = path('share', $target);
-  next if $target->basename eq 'LICENSE';
-
-  my $schema = $json_decoder->decode($target->slurp_raw);
-  say '# loading    ', $schema->{'$id'}, ' -> ', $target if $ENV{DEBUG};
-
-  # Note that if these are new files, then this type of validate won't work...
-  # because the files won't be in the resource index. But we can fix this by carefully rearranging
-  # the order in which we load the files, and can sequentially add them to the evaluator's resource
-  # index.
-
-  my $result = JSON::Schema::Modern::Document->validate(schema => $schema);
-  die $result->dump if not $result->valid;
-
-  die 'for uri ', $schema->{'$id'}, ', mismatch between jsonSchemaDialect "',
-      $schema->{properties}{jsonSchemaDialect}{default},
-      '" and assumed default "',
-      JSON::Schema::Modern::Document::OpenAPI->DEFAULT_DIALECT, '"'
-    if exists((($schema->{properties}//{})->{jsonSchemaDialect}//{})->{default})
-      and $schema->{properties}{jsonSchemaDialect}{default}
-        ne JSON::Schema::Modern::Document::OpenAPI->DEFAULT_DIALECT;
 }
 
 # compute checksums and record them in the test
@@ -151,7 +132,8 @@ path('t/checksums.t')->edit_raw(sub {
   $_ = substr($_, 0, pos()+1).join("\n", map $_.' '.$checksums{$_}, sort keys %checksums)."\n";
 });
 
-if (keys %new_schemas) {
+# only edit Changes file if there are updated files to be committed
+if (system('git diff --quiet --stat share/') >> 8) {
   my ($seen_next, $seen_blank);
   say '# edited Changes file' if $ENV{DEBUG};
   path('Changes')->edit_lines_utf8(sub {
@@ -162,4 +144,7 @@ if (keys %new_schemas) {
   });
 
   exec 'git commit -m"update bundled schemas to latest versions" Changes lib share t update-schemas';
+}
+else {
+  say '# no changes to bundled schemas';
 }

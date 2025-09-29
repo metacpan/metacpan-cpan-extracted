@@ -1,6 +1,9 @@
 Revision history for App-DBBrowser
 
 
+2.433  2025-09-29
+        - SQLite: Respect the "sqlite_see_if_its_a_number" option when quoting constants.
+
 2.432  2025-09-26
         - Firebird: bugfix in add-database.
         - Pg: update auto-convert-to-text.

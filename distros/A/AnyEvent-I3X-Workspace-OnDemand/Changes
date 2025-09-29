@@ -1,21 +1,26 @@
 Revision history for AnyEvent-I3X-Workspace-OnDemand
 
+0.005     2025-09-28 23:27:00Z
+
+  * Include i3-wod to distribution
+  * Add User documentation
+
 0.004     2024-10-25 17:14:27Z
 
-    * Start commands on a workspace or group
-    * Add (basic) support for all event types
+  * Start commands on a workspace or group
+  * Add (basic) support for all event types
 
 0.003     2024-04-25 17:57:03Z
 
-    * Support shutdown events
-    * Add more supported actions with on_workspace
-    * Only switch workspaces when they exist
-      This prevents starting up multiple layouts on non-existing workspaces
+  * Support shutdown events
+  * Add more supported actions with on_workspace
+  * Only switch workspaces when they exist
+    This prevents starting up multiple layouts on non-existing workspaces
 
 0.002     2024-04-19 22:15:56Z
 
-    * Update documentation
+  * Update documentation
 
 0.001     2024-04-12 18:32:27Z
 
-     Initial release
+   Initial release

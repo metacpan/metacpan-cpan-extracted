@@ -1,8 +1,102 @@
 # NAME
 
-Error::Show - Show context around syntax errors and exceptions
+Error::Show - Locate and Diagnose Errors/Exceptions in Perl programs
 
 # SYNOPSIS
+
+## String EVAL
+
+Consider the string/program to be evaluated that has a illegal divide by zero ( or could be a syntax error );
+
+```perl
+use Error::Show;
+
+my $prog='
+
+sub call_me {
+  $a+1/0;
+}
+
+say "hello there";
+call_me;
+
+';
+```
+
+With normal string eval and exception checking, we get:
+
+```perl
+my $result =eval $prog; 
+if($@){
+  say $@;
+}
+#======== OUTPUT
+
+hello there
+Illegal division by zero at (eval 1) line 4.
+```
+
+Using normal string eval with `context` we get:
+
+```perl
+my $result =eval $prog; 
+if($@){
+  say "ERROR is $@".Error::Show::context $@;
+}
+
+#====== OUTPUT
+
+(eval 2)
+Illegal division by zero at (eval 2) 0
+    examples/eval.pl
+    30
+    31   {
+    32     say "================== Normal string with context =====================";
+    33     my $result =eval $prog;
+    34     if($@){
+    35=>     say Error::Show::context $@;
+    36     }
+    37
+    38   }
+    39
+    40
+```
+
+Using `streval` with `context` we get:
+
+```perl
+my $result =eval {streval $prog};
+if($@){
+  say Error::Show::context $@;
+}
+
+#======= OUTPUT
+
+hello there
+(eval 4)
+1
+2
+3     sub call_me {
+4=>     $a+1/0;
+5     }
+6
+7     say "hello there";
+8     call_me;
+9
+Illegal division by zero at (eval 4) 4
+    examples/eval.pl
+    41
+    42   say "";
+    43
+    44   {
+    45     say "================== eval streval =====================";
+    46=>   my $result =eval {streval $prog};
+    47     if($@){
+    48       say Error::Show::context $@;
+    49     }
+    50
+    51
+```
 
 ## Command Line Syntax Checking
 
@@ -29,7 +123,7 @@ use Socket;
 print "this will never work";
 ```
 
-Attempting to run this program with perl normally gives this error output:
+Attempting to run this program with Perl normally gives this error output:
 
 ```perl
 ->perl examples/synopsis.pl       
@@ -78,7 +172,7 @@ BEGIN not safe after errors--compilation aborted at examples/synopsis.pl line 15
 
 ## Command Line Exception Call Stack Dump (from v0.4.0)
 
-Consder the following short program (examples/synopsis2.pl
+Consider the following short program (examples/synopsis2.pl
 
 ```perl
 use v5.36;
@@ -92,7 +186,7 @@ sub test {
 test;
 ```
 
-Running this program with perl normally gives this error output:
+Running this program with Perl normally gives this error output:
 
 ```
 perl examples/synopsis2.pl  
@@ -158,36 +252,66 @@ try {
 
 }
 catch($e){
-  say STDERR context message=>$e, frames=>$e->frames
+  say STDERR context $e;
 }
 
 ```
 
 # DESCRIPTION
 
+This module provides three tools/modes to help locate and diagnose errors in
+your Perl programs.
+
+## Command Line
+
 From the command line this module transparently executes your syntactically
-correct program. However in the case of syntax errors (or warnings if desired),
-it extracts context (lines of code) surrounding them. The lines are prefixed
-with numbers  and the nicely formatted context is dumped on STDERR for you to
-see the error or your ways.
+correct program. No code changes are required. However in the case of syntax
+errors (or warnings if desired), it extracts context (lines of code)
+surrounding them. The lines are prefixed with numbers  and the nicely formatted
+context is dumped on STDERR for you to see the error or your ways.
 
 The resulting output is optionally filtered seamlessly through the **splain**
 program (see [diagnostics](https://metacpan.org/pod/diagnostics)), giving more information on why the reported
 syntax errors and warnings might have occurred. 
 
-From within a program at runtime, this module can be used to give the same
-formatted code context around the source of an exception and iterate through
-any associated stack frames if provided.
+## In Program Exception Context
 
-It supports perl string exceptions and warnings directly and also provides the
+From within a program, this module can be used to give formatted code context
+around the source of an exception and the context of each of the stack frames
+captured when the exception was raised.
+
+It supports Perl string exceptions and warnings directly and also provides the
 ability to integrate third party CPAN exception objects and traces with minimal
 effort. Please see examples in this document or in the examples directory of
 the distribution showing use with [Mojo::Exception](https://metacpan.org/pod/Mojo%3A%3AException), [Exception::Base](https://metacpan.org/pod/Exception%3A%3ABase),
 [Exception::Class::Base](https://metacpan.org/pod/Exception%3A%3AClass%3A%3ABase) and [Class::Throwable](https://metacpan.org/pod/Class%3A%3AThrowable).
 
+From `v0.5.0`  a `throw` routine is exported which, generates a very basic
+exception object, with stack frame capture, in case using an larger exception
+object/class is unneeded
+
+## String evals with Execption/Syntax Error Context
+
+From `v0.5.0` the `streval` subroutine has been added to allow context
+information to be generated for errors originating from code dynamically
+created from string evaluations.
+
+# Changes and Options
+
 A handful of options are available for basic configuration of how many lines of
 code to print before and after the error line, indenting of stack trace
 context, etc.
+
+**v0.5.0** Has alot of changes which might break compatibility. THe up side is
+the codes is simpler, has less errors, and easier to use. This is especial the
+case for third party exceptions objects. It also gives the intended purpose of
+handling errors and exceptions from  string evals like any other.
+
+That being said, an earlier version might need to be used if you want the use
+the `$@` variable implicitly in a call to `context`. This subroutine now
+requires an explicated error argument
+
+Sub routines `context`, `throw` and `streval` are exported by default.
 
 **From v0.3.0:** `context` subroutine is now exported by default. To prevent
 this, import with an empty list, ie `use Error::Show ()`.
@@ -203,22 +327,22 @@ context reporting of dynamically generated code.
     perl -MError::Show  [options] file.pl 
 ```
 
-When included in a command line switch to perl, `-MError::Show` syntax checks
+When included in a command line switch to Perl, `-MError::Show` syntax checks
 the input program. If the syntax is OK, normal execution continues in a
 transparent fashion.  Otherwise, detailed code context surrounding the source
 of the error is generated and printed on STDERR.
 
 **From v0.4.0** a global \_\_DIE\_\_ handler is also installed, which will catch any
-stray execptions during execution and present a line numbered summary stack
+stray exceptions during execution and present a line numbered summary stack
 trace. Programs a free to overload this handler. However the features of this
-moudle will be lost.
+module will be lost.
 
 **NOTE:** It is important that it's the first `-M` switch for this module to
-operate correctly and to prevent any incompatibilites withe global signal
+operate correctly and to prevent any incompatibilities withe global signal
 handlers.
 
 If the **-c** flag is specified, only a syntax check will be performed,
-mimicking normal perl behaviour.
+mimicking normal Perl behaviour.
 
 Additional `@INC` directories using the **-I** switch are supported as are
 additional modules via the **-M** switch.
@@ -229,7 +353,7 @@ The following options can be used in isolation or together:
 
 #### clean
 
-If you prefer just the code context without the perl error, add the clean
+If you prefer just the code context without the Perl error, add the clean
 option:
 
 ```
@@ -263,8 +387,8 @@ Prevents the global DIE handler from being installed.
 
 ### Return code
 
-When in check only mode (-c), the main process is exited, just has perl
-normally would have done. The return code is a replica of what perl would have
+When in check only mode (-c), the main process is exited, just has Perl
+normally would have done. The return code is a replica of what Perl would have
 reported for success/failure of a syntax check.
 
 ## In Program (Exception) Usage
@@ -280,23 +404,35 @@ It provides a single subroutine for processing errors and exceptions.
 ### Error::Show::context
 
 ```perl
-my $context=Error::Show::context;                     (1)
-my $context=Error::Show::context $error;              (2)
-my $context=Error::Show::context option_pairs, message=>$error_as_string, frames=>$stack frames (3)
-
-my $context=Error::Show::context undef;               (4)
-my $context=context undef;                            (5)
-
-my $context=Error::Show->context(...);                (6)
-
-      
+my $context=Error::Show::context $error , options_pairs, ...;
 ```
 
-Takes an error string, or exception object and extracts the code surrounding
-the source of the error. The code lines are prefixed with line numbers and the
-error line marked with a fat arrow.
+Takes an error string, or exception object `$error` and extracts the code
+surrounding the source of the error. The code lines are prefixed with line
+numbers and the error line marked with a fat arrow.
 
-The return value is the formatted context, followed by the original perl error
+The expected types of error are 
+
+- Error string, as per `die` and `warn`
+
+    This is expected to contain file and line number. These are extracted from the
+    string error to locate context.
+
+- Supported Execption Object
+
+    Several common exceptions classes on CPAN are supported:
+
+    - Error::Show::Exception
+    - Exception::Class::Base
+    - Exception::Base
+    - Class::Throwable
+    - Mojo::Exception
+
+    Other classes will likely work as long as the stringify to resemble a perl
+    error string  (with the filename and line number formatted correctly). The
+    stack frame capture would work however)
+
+The return value is the formatted context, followed by the original Perl error
 strings, or stringified exception objects/messages:
 
 ```perl
@@ -310,51 +446,12 @@ filename.pl
 ... error... at filename.pl line 12 ...
 ```
 
-In the first form (1), the `$@` variable is implicitly used as the error. No
-processing options can be supplied in this form. This is stringified for
-processing.
-
-In the second form (2), a single argument is supplied, which becomes the error
-to process. No processing options can be supplied in this form. This is
-stringified for processing.
-
-In the third for (3), all options are provided as key value pairs. 
-
-**From v0.3.0:** In the forth form (4), an explicit single argument of `undef`,
-will generate call stack/frames internally and generate context information
-from it.
-
 The `context` subroutine (5) is exported by default, so does not need a fully
 qualified name
 
 `context` Can also be called with package arrow notation (6) ie
-`Error::Show->context(...)` if prefered, with the same arguemtn handling
+`Error::Show->context(...)` if prefered, with the same argument handling
 as the other forms.
-
-The expected types of data are as follows:
-
-- 1. String Errors (perl errors)
-
-    Error string, as per `die` and `warn`, containing file and line number. These
-    are extracted from the string error to locate context.
-
-    The output message after the context is this string, 
-
-- 2. An reference to an array containing results from `caller`
-
-    The filename, and line elements are used to process. No error message is output
-    unless the **message** option is also specified. 
-
-- 3. An Devel::StackTrace::Frame object
-
-    This is converted internally to a array of `caller()` output. As above.
-
-- 4. or, an array of 2. or  3.
-
-    An reference to an array of call frames in `caller()` or
-    `Devel::StackTrace::Frame` format can also be supplied as the error or frames.
-    Again the `message` option needs to be provided if error string is required in
-    the output.
 
 **Options include:**
 
@@ -407,7 +504,7 @@ Specific the maximum lines of code to display after the error line. Default is
 clean=>bool
 ```
 
-When true, the normal perl error string is not included in the context
+When true, the normal Perl error string is not included in the context
 information, for a cleaner look.
 
 #### indent
@@ -448,208 +545,48 @@ if($@){
 For advanced string eval processing options please see the **ADVANCED STRING
 EVAL** section in this document.
 
-# EXAMPLES
-
-## Integrating with Exception classes
-
-The following are a cheat sheet / example code to interoperate this module with
-exception objects.
-
-The most reliable way is usually to explicitly set the **message** and **frames**
-options explicitly. This works with a single frame (for the latest exception)
-or ref to array, for a complete trace
-
-### Mojo::Exception
-
-**FYI:** [Mojo::Exception](https://metacpan.org/pod/Mojo%3A%3AException) does provide it's own facility to show the code
-context around an exception.
+### streval
 
 ```perl
-use v5.36;
-use feature "try";
-use Error::Show;
-use Mojo::Exception qw<check raise>;
+local $@;
 
-try{
-  raise 'MyApp::X::Name', 'The name Minion is already taken';
-}
-catch($e){
-
-  # Message is the stringified $e object. Print the first frame
-  #
-  say Error::Show::context message=>$e, error=> $e->frames->[0];
-
-
-  # Message is the stringified $e object. Print all frames
-  #
-  say Error::Show::context message=>$e, error=>$e->frames;
-
-}
-```
-
-### Class::Throwable
-
-```perl
-use v5.36;
-my @a=qw<a,b,c>;
-use Class::Throwable;# VERBOSE=>1;
-Class::Throwable->setVerbosity(2);
-#use Exception::Class;
-use Error::Show;
-use feature "try";
-sub my_func {
-  try{
-    Class::Throwable->throw("Something has gone wrong");
-
-  }
-  catch($e){
-    
-    #Show the top of the stack, the latest exception
-    say Error::Show::context message=>$e, frames=>$e->getStackTrace->[0];
-
-    #Show the whole stack
-    say Error::Show::context message=>"$e", frames=>[$e->getStackTrace];
-  }
-}
-
-sub my_func2{
-  my_func;
-}
-warn "some warning";
-my_func2;
-```
-
-### Exception::Base
-
-```perl
-use v5.36;
-use feature qw<try say>;
-
-use Exception::Base verbosity=>4;
-use Error::Show;
-
-sub my_func {
-  try{
-    my $e= Exception::Base->new();
-    #$e->verbosity(10);
-    $e->throw(message=>"Bad things");
-
-  }
-  catch($e){
-    
-    # Set verbosity to stop duplicate outputs, but provide a file and line number
-    # in the stringified version of the error
-    #
-    $e->verbosity=2;
-
-    # Message normally contatins the file and line numbers. So stringified
-    # process will work
-    #
-    say Error::Show::context $e;
-
-    # Access the frames in the caller stack
-    #
-    say Error::Show::context message=>$e->message, frames=>$e->caller_stack;
-  }
-}
-
-sub my_func2{
-  my_func;
-}
-
-my_func2;
-```
-
-### Exception::Class::Base
-
-```perl
-use v5.36;
-use Exception::Class;
-use Error::Show;
-use feature "try";
-try{
-  Exception::Class::Base->throw("An error occured");
-}
-catch($e){
-
-  my @frames=$e->trace->frames;
-  
-  # Message is the stringified $e object. Print the first frame
-  #
-  say Error::Show::context message=>$e, frames=>$frames[0];
-
-  # Message is the stringified $e object. Print all frames
-  #
-  say Error::Show::context message=>$e, frames=>\@frames;
-
-}
-```
-
-### Syntax Checking String `eval`, Without Execution
-
-A block eval will have it's syntax checked during normal compilation time. A
-string eval is checked at run time and it uses the same variable `$@` to
-report syntax errors and run time errors. 
-
-Together these limitation make it impossible to distinguish between syntax
-errors and runtime errors (without some kind of heavy error lookup). The code
-is also executed immediately.
-
-To work around these limitations, and have `Error::Show` still provide context
-information, start by wrapping your eval string with "sub { ... }.  The eval
-result will be code ref if syntactically correct. Otherwise the error in `$@`
-is the syntax error string, which can be feed directly into `Error::Show`.
-The code ref is executed in a block eval, which if dies from an exception will
-place the runtime error in `$@`, which again can be used in `Error::Show`.
-As an example:
-
-```perl
-Example: Separate compiling/syntax checking from eval execution
-=======
-
-use strict;
-use warnings;
-use feature "say";
-
-use Error::Show;
-
-
-# Orginal string to eval
-my $prog='say "hello there";
-$a+1/0;
-';
-
-# Wrap string in a sub
-
-$prog="sub { $prog }";
-
-
-# Do an eval to retun an actual code ref
-
-my $code =eval $prog; 
-
-
-# Check for syntax errors here. No run time error as the code ref has not been executed.
-# Use the program option in Error::Show to specifiy the text of the program
+my $result=eval { streval "program";
 
 if($@){
-  say "ERROR is".Error::Show::context error=>$@, program=>$prog;
+  print STDERR context $@;
 }
 
-# Execute the code reference. Any errors here are run time
 
-eval {$code->()};
+##### or ####
 
-# Again use the program option in Error::Show to specifiy the text of the program
 
-if($@){
-  say "ERROR is".Error::Show::context error=>$@, program=>$prog;
+try {
+  my $result=strval "program";
+}
+catch($e){
+  print STDERR context $e;
 }
 ```
 
-Please see the examples directory in this distribution
+`streval` makes it possible to debug code generated from string eval.
+Internally it caches program code, to allow a context to be generated in the
+case of an exception.
 
-# ADVANCED STRING EVAL
+**NOTE:** It also throws an exception on syntax error, which also then can have
+a context generated for it.
+
+### throw
+
+```
+throw "My error message";
+```
+
+Raises an exception with a basic exception object with the provided message.
+Captures the call stack frames at the point of call.
+
+Use this if you don't want to use other exception classes/modules
+
+# ADVANCED STRING EVAL 
 
 **From v0.2.0** features to support advanced string evaluation are available.
 This was added to support the error reporting needs of the [Template::Plex](https://metacpan.org/pod/Template%3A%3APlex)
@@ -686,7 +623,7 @@ Additional configuration options can be provided  to search for the relevant
 code lines and offset the error line numbers.
 
 **NOTE** if these options are used, the **message** field is modified with
-updated line numbers if its in the form of a normal perl errors ie 'error line
+updated line numbers if its in the form of a normal Perl errors ie 'error line
 123 at file'.
 
 ### start\_mark
@@ -741,9 +678,9 @@ showing up in the user program context.
 
 # FUTURE WORK/TODO
 
-- Possible just use the DIE and WARN signal handler instead of forking processes
+- Possible just use the DIE and WARN signal handler instead of forking processes?
 - Make usable from a Language Server?
-- Colour terminal output
+- Colour terminal output?
 - JSON output?
 
 # KNOWN ISSUES/GOTCHAS
@@ -761,10 +698,10 @@ doesn't show any errors by design (only interested in process return code)
 
 [Syntax::Check](https://metacpan.org/pod/Syntax%3A%3ACheck) provides programmatic syntax checking of files.
 
-[Perl::Critic](https://metacpan.org/pod/Perl%3A%3ACritic) gives actual perl linting, but not great for syntax errors.
+[Perl::Critic](https://metacpan.org/pod/Perl%3A%3ACritic) gives actual Perl linting, but not great for syntax errors.
 
 [diagnostics](https://metacpan.org/pod/diagnostics)  and the `splain` program give some very useful explanations
-about the otherwise terse error strings normally output. It is part of the perl
+about the otherwise terse error strings normally output. It is part of the Perl
 distribution
 
 # AUTHOR
@@ -774,11 +711,11 @@ Ruben Westerberg, <drclaw@mac.com>
 # REPOSITORTY and BUGS
 
 Please report any bugs via git hub:
-[http://github.com/drclaw1394/perl-error-show](http://github.com/drclaw1394/perl-error-show)
+[https://github.com/drclaw1394/perl-error-show](https://github.com/drclaw1394/perl-error-show)
 
 # COPYRIGHT AND LICENSE
 
-Copyright (C) 2023 by Ruben Westerberg
+Copyright (C) 2025 by Ruben Westerberg
 
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl or the MIT license.

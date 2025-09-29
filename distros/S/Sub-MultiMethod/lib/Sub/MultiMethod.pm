@@ -5,7 +5,7 @@ use warnings;
 package Sub::MultiMethod;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '1.001';
+our $VERSION   = '1.002';
 
 use B ();
 use Eval::TypeTiny qw( set_subname );
@@ -39,12 +39,14 @@ my %KNOWN_OPTIONS = (
 	compiled           => 1,
 	copied             => 1,
 	declaration_order  => 1,
+	die                => 1,
 	height             => 1,
 	if                 => 1,
 	is_monomethod      => 1,
 	method             => 1,
 	named              => 'legacy',
 	no_dispatcher      => 1,
+	return             => 1,
 	score              => 1,
 	signature          => 'legacy',
 	want               => 1,
@@ -226,10 +228,78 @@ sub _generate_exported_function {
 	my $api_call = $args->{api_call} || 'install_candidate';
 	
 	return sub {
-		my ( $sub_name, %spec ) = @_;
+		my $sub_name = shift;
+		
+		my @tmp_sigs;
+		while ( is_ArrayRef $_[0] or is_HashRef $_[0] ) {
+			push @tmp_sigs, shift;
+		}
+		
+		my @tmp_code;
+		if ( @_ % 2 == 1 ) {
+			if ( is_CodeRef $_[-1] ) {
+				push @tmp_code, pop;
+			}
+			else {
+				require Carp;
+				Carp::croak( "Odd-length list passed to $name; should be key-value pairs" );
+			}
+		}
+		
+		my %spec = @_;
+		$spec{positional} ||= delete $spec{pos}   if exists $spec{pos};
+		$spec{multiple}   ||= delete $spec{multi} if exists $spec{multi};
+		
+		while ( my $sig = shift @tmp_sigs ) {
+			if ( is_ArrayRef $sig ) {
+				if ( $spec{positional} ) {
+					require Carp;
+					Carp::croak( "Leading arrayref passed as argument to $name; unexpected positional signature found in list of key-value pairs" );
+				}
+				else {
+					$spec{positional} = $sig;
+				}
+			}
+			elsif ( is_HashRef $sig ) {
+				if ( $spec{named} ) {
+					require Carp;
+					Carp::croak( "Leading hashref passed as argument to $name; unexpected named signature found in list of key-value pairs" );
+				}
+				else {
+					$spec{named} = [ %$sig ];
+				}
+			}
+		}
+		
+		if ( $spec{named} and $spec{positional} ) {
+			push @{ $spec{multiple} ||= [] }, (
+				{ named      => delete $spec{named}, named_to_list => !!1 },
+				{ positional => delete $spec{positional} },
+			);
+		}
+		
+		if ( @tmp_code ) {
+			if ( $spec{code} ) {
+				require Carp;
+				Carp::croak( "Trailing coderef passed as argument to $name; unexpected code key found in list of key-value pairs" );
+			}
+			$spec{code} = shift @tmp_code;
+		}
+		
+		unless ( exists $spec{code} or exists $spec{return} or exists $spec{die} ) {
+			require Carp;
+			Carp::croak( "Missing 'code', 'return', or 'die'" );
+		}
+		
+		if ( ref $spec{return} ) {
+			require Carp;
+			Carp::croak( "Setting 'return' to a reference is not supported" );
+		}
+		
 		if ( $defaults{no_dispatcher} eq 'auto' ) {
 			$defaults{no_dispatcher} = 0+!! 'Role::Hooks'->is_role( $target );
 		}
+		
 		$me->$api_call(
 			$target,
 			$sub_name,
@@ -243,31 +313,31 @@ sub _generate_exported_function {
 
 sub _generate_multimethod {
 	my ( $me, $name, $args, $globals ) = ( shift, @_ );
-	$args->{defaults}{no_dispatcher} = 'auto';
-	$args->{defaults}{method} = 1;
+	$args->{defaults}{no_dispatcher} = 'auto'  unless exists $args->{defaults}{no_dispatcher};
+	$args->{defaults}{method}        = !!1     unless exists $args->{defaults}{method};
 	return $me->_generate_exported_function( $name, $args, $globals );
 }
 
 sub _generate_monomethod {
 	my ( $me, $name, $args, $globals ) = ( shift, @_ );
-	$args->{defaults}{no_dispatcher} = 1;
-	$args->{defaults}{method} = 1;
-	$args->{api_call} = 'install_monomethod';
+	$args->{defaults}{no_dispatcher} = !!1     unless exists $args->{defaults}{no_dispatcher};
+	$args->{defaults}{method}        = !!1     unless exists $args->{defaults}{method};
+	$args->{api_call}                = 'install_monomethod';
 	return $me->_generate_exported_function( $name, $args, $globals );
 }
 
 sub _generate_multifunction {
 	my ( $me, $name, $args, $globals ) = ( shift, @_ );
-	$args->{defaults}{no_dispatcher} = 'auto';
-	$args->{defaults}{method} = 0;
+	$args->{defaults}{no_dispatcher} = 'auto'  unless exists $args->{defaults}{no_dispatcher};
+	$args->{defaults}{method}        = !!0     unless exists $args->{defaults}{method};
 	return $me->_generate_exported_function( $name, $args, $globals );
 }
 
 sub _generate_monofunction {
 	my ( $me, $name, $args, $globals ) = ( shift, @_ );
-	$args->{defaults}{no_dispatcher} = 1;
-	$args->{defaults}{method} = 0;
-	$args->{api_call} = 'install_monomethod';
+	$args->{defaults}{no_dispatcher} = !!1     unless exists $args->{defaults}{no_dispatcher};
+	$args->{defaults}{method}        = !!0     unless exists $args->{defaults}{method};
+	$args->{api_call}                = 'install_monomethod';
 	return $me->_generate_exported_function( $name, $args, $globals );
 }
 
@@ -414,7 +484,11 @@ sub install_candidate {
 		
 		my %sig_spec = (
 			%{ $spec{signature_spec} },
-			goto_next => $spec{code} || die('NO CODE???'),
+			goto_next =>
+				defined($spec{code})   ? $spec{code} :
+				is_CodeRef($spec{die}) ? sub { require Carp; Carp::croak($spec{die}->()) } :
+				defined($spec{die})    ? sub { require Carp; Carp::croak($spec{die}) } :
+				sub { $spec{return} },
 		);
 		my $code = sprintf(
 			q{
@@ -589,9 +663,17 @@ sub dispatch {
 		Carp::croak('Multimethod could not find candidate to dispatch to, stopped');
 	};
 	
-	my $next = $winner->{code};
-	@_ = @$new_argv;
-	goto $next;
+	if ( my $next = $winner->{code} ) {
+		@_ = @$new_argv;
+		goto $next;
+	}
+	elsif ( defined $winner->{die} ) {
+		require Carp;
+		Carp::croak( is_CodeRef( $winner->{die} ) ? $winner->{die}->() : $winner->{die} );
+	}
+	else {
+		return $winner->{return};
+	}
 }
 
 # Optimization for simple signatures: those consisting of only non-coercing positional parameters.
@@ -862,7 +944,7 @@ C<want_*> are not supported.)
 
 =item C<< code >> I<< (CodeRef) >>
 
-Required.
+Conceptually required, but see the C<return> and C<die> shortcuts.
 
 The sub to dispatch to. It will receive parameters in C<< @_ >> as you
 would expect, but these parameters have been passed through the signature
@@ -899,6 +981,24 @@ And:
     print { $arg->output } $arg->prefix;
     ...;
   },
+
+=item C<< return >> I<< (Value) >>
+
+Shortcut.
+
+You can use C<< return => "foo" >> as a shortcut for
+C<< code => sub { return "foo" } >>. This cannot be used
+to return refereneces.
+
+=item C<< die >> I<< (CodeRef|Str) >>
+
+Shortcut.
+
+You can use C<< die => "foo" >> as a shortcut for
+C<< code => sub { require Carp; Carp::croak("foo") } >>.
+
+You can use C<< die => \&foo >> as a shortcut for
+C<< code => sub { require Carp; Carp::croak(foo()) } >>.
 
 =item C<< signature >> I<< (CodeRef) >>
 
@@ -969,6 +1069,45 @@ but won't install a dispatcher. You should mostly not worry about this
 and accept the default.
 
 =back
+
+The C<< @_ >> passed to Sub::MultiMethod is pre-processed slightly
+after C<< $name >> has been shifted off but before being interpreted as
+the C<< %spec >> hash. Obviously hashes are expected to have string keys,
+so if the first argument of C<< @_ >> is an arrayref or hashref, those
+are interpreted as a positional or named signature respectively.
+
+So the following are equivalent:
+
+  multimethod foo => [...] => %spec;
+  multimethod foo => ( positional => [...], %spec );
+
+And so are the following (note that the hashref becomes an arrayref):
+
+  multimethod foo => {...} => ( %spec );
+  multimethod foo => ( named => [...], %spec );
+
+After this, if C<< @_ >> is an odd-sized list with a coderef in the last
+position, the coderef is treated as the C<code> option.
+
+So the following are equivalent:
+
+  multimethod foo => ( %spec ) => sub { ... };
+  multimethod foo => ( %spec, code => sub { ... } );
+
+For the common case of:
+
+  multimethod foo => (
+    positional => [...],
+    code       => sub {
+      ...;
+    },
+  );
+
+These combination of shortcuts allow it to be written as:
+
+  multimethod foo => [...] => sub {
+    ...;
+  };
 
 =head3 C<< monomethod $name => %spec >>
 
@@ -1127,6 +1266,20 @@ scalar referred to. Example:
 The C<< $coderef >> and C<< $otherref >> variables will actually end up
 as blessed coderefs so that some tidy ups can take place in C<DESTROY>.
 
+=head2 Exporter
+
+Sub::MultiMethod uses L<Exporter::Tiny> as an exporter, which means
+exported functions can be renamed, etc.
+
+  use Sub::MultiMethod multimethod => { -as => 'mm' };
+
+You may also set various defaults in the import:
+
+  use Sub::MultiMethod multimethod => {
+    -as       => 'mm',
+    defaults  => { bless => 0 },   # see Type::Params
+  };
+
 =head2 API
 
 Sub::MultiMethod avoids cute syntax hacks because those can be added by
@@ -1256,6 +1409,71 @@ subclass Sub::MultiMethod, especially if you want to override the C<dispatch>
 method.
 
 =back
+
+=head1 EXAMPLES
+
+=head2 Naive (Slightly Broken) JSON Writer
+
+Here is similar code to the L</SYNOPSIS>, but written as a function
+instead of a method, employing a few shortcuts, and with a variant
+that throws an error if called in void context.
+
+  use v5.20;
+  use strict;
+  use warnings;
+  use experimental 'signatures';
+  
+  package My::JSON {
+    use Sub::MultiMethod multifunction => { -as => 'multi' };
+    use Types::Standard -types;
+    
+    multi stringify => ( want => 'VOID', die => 'Unexpected void context' );
+    
+    multi stringify => [ Undef ] => ( return => 'null' );
+    
+    multi stringify => [ ScalarRef[Bool] ] => sub ( $bool ) {
+      return $$bool ? 'true' : 'false';
+    };
+    
+    multi stringify => [ Str ] => (
+      alias      => "stringify_str",
+      code       => sub ( $str ) {
+        return sprintf( q<"%s">, quotemeta($str) );
+      },
+    );
+    
+    multi stringify => [ Num ] => sub ( $n ) {
+      return $n;
+    };
+    
+    multi stringify => [ ArrayRef ] => sub ( $arr ) {
+      return sprintf(
+        q<[%s]>,
+        join( q<,>, map( stringify($_), @$arr ) )
+      );
+    };
+    
+    multi stringify => [ HashRef ] => sub ( $hash ) {
+      return sprintf(
+        q<{%s}>,
+        join(
+          q<,>,
+          map sprintf(
+            q<%s:%s>,
+            stringify_str($_),
+            stringify( $hash->{$_} )
+          ), sort keys %$hash,
+        )
+      );
+    };
+  }
+  
+  say My::JSON::stringify( {
+    foo  => 123,
+    bar  => [ 1, 2, 3 ],
+    baz  => \1,
+    quux => { xyzzy => 666 },
+  } );
 
 =head1 BUGS
 

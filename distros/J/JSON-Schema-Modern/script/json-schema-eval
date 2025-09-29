@@ -155,7 +155,7 @@ json-schema-eval - A command-line interface to JSON::Schema::Modern::evaluate()
 
 =head1 VERSION
 
-version 0.618
+version 0.619
 
 =head1 SYNOPSIS
 

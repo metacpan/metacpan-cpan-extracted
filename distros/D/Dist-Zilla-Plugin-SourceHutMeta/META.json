@@ -1,0 +1,83 @@
+{
+   "abstract" : "Automatically include SourceHut meta information in META.yml",
+   "author" : [
+      "Thomas Klausner <domm@plix.at>",
+      "Chris Williams <chris@bingosnet.co.uk>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dist-Zilla-Plugin-SourceHutMeta",
+   "no_index" : {
+      "directory" : [
+         "examples",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cwd" : "0",
+            "Dist::Zilla::Role::MetaProvider" : "0",
+            "File::pushd" : "0",
+            "IPC::Cmd" : "0",
+            "Moose" : "0",
+            "MooseX::Types::URI" : "0",
+            "Try::Tiny" : "0",
+            "namespace::autoclean" : "0",
+            "version" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Zilla::Plugin::SourceHutMeta" : {
+         "file" : "lib/Dist/Zilla/Plugin/SourceHutMeta.pm",
+         "version" : "1.004"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "Thomas Klausner <domm@plix.at>"
+      },
+      "homepage" : "https://git.sr.ht/~domm/Dist-Zilla-Plugin-SourceHutMeta",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://git.sr.ht/~domm/Dist-Zilla-Plugin-SourceHutMeta",
+         "web" : "https://git.sr.ht/~domm/Dist-Zilla-Plugin-SourceHutMeta"
+      },
+      "x_foo" : 1
+   },
+   "version" : "1.004",
+   "x_generated_by_perl" : "v5.40.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

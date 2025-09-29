@@ -27,10 +27,10 @@ no_index:
 provides:
   DBD::libsql:
     file: lib/DBD/libsql.pm
-    version: '0.02'
+    version: '0.03'
   DBD::libsql::Hrana:
     file: lib/DBD/libsql/Hrana.pm
-    version: '0.02'
+    version: '0.03'
   DBD::libsql::db:
     file: lib/DBD/libsql.pm
   DBD::libsql::dr:
@@ -49,6 +49,6 @@ resources:
   bugtracker: https://github.com/ytnobody/p5-DBD-libsql/issues
   homepage: https://github.com/ytnobody/p5-DBD-libsql
   repository: https://github.com/ytnobody/p5-DBD-libsql.git
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

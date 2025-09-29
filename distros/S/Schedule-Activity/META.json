@@ -1,0 +1,35 @@
+{
+	"version" : "0.1.0",
+	"name"    : "Schedule-Activity",
+	"author"  : ["Brian Blackmore <BBLACKM@cpan.org>"],
+	"abstract": "Generate activity schedules",
+	"license" : ["gpl_3"],
+	"prereqs" : {
+		"configure": {
+			"requires": {
+				"Module::Build::Tiny": "0.040"
+			}
+		},
+		"runtime": {
+			"requires": {
+				"perl": "5.16.3",
+				"List::Util": "1.33",
+				"Ref::Util": "0.010",
+				"Scalar::Util": "1.39"
+			}
+		},
+		"test": {
+			"requires": {
+				"Test::More": "0.61"
+			}
+		}
+	},
+	"resources": {
+		"bugtracker": {"web":"https://github.com/blb8/perl-schedule-activity/issues"},
+		"repository": {"url":"git://github.com/blb8/perl-schedule-activity.git"}
+	},
+	"meta-spec": {"url":"http://search.cpan.org/perldoc?CPAN::Meta::Spec","version":"2"},
+	"dynamic_config": 1,
+	"generated_by": "Brian Blackmore",
+	"release_status": "stable"
+}

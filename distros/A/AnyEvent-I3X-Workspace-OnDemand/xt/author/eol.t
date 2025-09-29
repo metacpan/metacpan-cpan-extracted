@@ -8,7 +8,9 @@ use Test::EOL;
 
 my @files = (
     'bin/i3-ipc',
+    'bin/i3-wod',
     'lib/AnyEvent/I3X/Workspace/OnDemand.pm',
+    'lib/AnyEvent/I3X/Workspace/OnDemand/UserGuide.pod',
     't/00-compile.t',
     't/01-basic.t'
 );

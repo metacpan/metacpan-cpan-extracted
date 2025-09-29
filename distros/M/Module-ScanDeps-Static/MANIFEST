@@ -1,10 +1,11 @@
+bin/find-requires
+bin/find-requires.ps1
 bin/scandeps-static.pl
 lib/Module/ScanDeps/FindRequires.pm
 lib/Module/ScanDeps/Static.pm
 lib/Module/ScanDeps/Static/VERSION.pm
 Makefile.PL
 MANIFEST			This list of files
-postamble
 t/00-scandeps.t
 t/01-scandeps.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

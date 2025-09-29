@@ -18,6 +18,9 @@ groups:
       bindsym Escape mode "default"
     }
 
+For the user guide please refer to
+[AnyEvent::I3X::Workspace::OnDemand::UserGuide](https://metacpan.org/pod/AnyEvent%3A%3AI3X%3A%3AWorkspace%3A%3AOnDemand%3A%3AUserGuide).
+
 # SYNOPSIS
 
     use AnyEvent::I3X::Workspace::OnDemand;

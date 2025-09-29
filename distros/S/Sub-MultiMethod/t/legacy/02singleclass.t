@@ -11,10 +11,7 @@ package My::JSON; {
 	
 	multimethod stringify => (
 		signature => [ Undef ],
-		code      => sub {
-			my ($self, $undef) = (shift, @_);
-			'null';
-		},
+		return    => 'null',
 	);
 	
 	multimethod stringify => (

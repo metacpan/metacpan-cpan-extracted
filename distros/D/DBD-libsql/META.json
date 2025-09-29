@@ -62,11 +62,11 @@
    "provides" : {
       "DBD::libsql" : {
          "file" : "lib/DBD/libsql.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "DBD::libsql::Hrana" : {
          "file" : "lib/DBD/libsql/Hrana.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "DBD::libsql::db" : {
          "file" : "lib/DBD/libsql.pm"
@@ -90,7 +90,7 @@
          "web" : "https://github.com/ytnobody/p5-DBD-libsql"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.06",
    "x_static_install" : 1
 }
