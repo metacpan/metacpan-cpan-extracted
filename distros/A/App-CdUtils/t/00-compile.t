@@ -13,9 +13,9 @@ my @module_files = (
 );
 
 my @scripts = (
-    'script/cdnext-backend',
+    'script/cdnextsibling-backend',
     'script/cdpart-backend',
-    'script/cdprev-backend',
+    'script/cdprevsibling-backend',
     'script/cdsibling-backend',
     'script/cdtarget-backend',
     'script/cdtree-backend'

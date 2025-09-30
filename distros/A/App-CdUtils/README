@@ -2,17 +2,17 @@ NAME
     App::CdUtils - CLI utilities related to changing directories
 
 VERSION
-    This document describes version 0.010 of App::CdUtils (from Perl
-    distribution App-CdUtils), released on 2025-09-23.
+    This document describes version 0.011 of App::CdUtils (from Perl
+    distribution App-CdUtils), released on 2025-09-30.
 
 DESCRIPTION
     This distribution contains the following utilities:
 
-    *   cdnext-backend
+    *   cdnextsibling-backend
 
     *   cdpart-backend
 
-    *   cdprev-backend
+    *   cdprevsibling-backend
 
     *   cdsibling-backend
 

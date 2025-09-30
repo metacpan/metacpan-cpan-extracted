@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/CdUtils.pm','script/cdnext-backend','script/cdpart-backend','script/cdprev-backend','script/cdsibling-backend','script/cdtarget-backend','script/cdtree-backend'];
+my $filenames = ['lib/App/CdUtils.pm','script/cdnextsibling-backend','script/cdpart-backend','script/cdprevsibling-backend','script/cdsibling-backend','script/cdtarget-backend','script/cdtree-backend'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

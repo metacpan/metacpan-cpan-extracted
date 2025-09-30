@@ -2,12 +2,11 @@
 
 use strict;
 use warnings;
-BEGIN{ delete @ENV{qw(NDEBUG PERL_NDEBUG)} };
-use Assert::Refute {};
+use Assert::Refute ":core";
 
 use Test::More;
 
-my $fail = try_refute {
+my $fail = refute_and_report {
     package T;
     use Assert::Refute qw(:all);
     plan tests => 2;
@@ -20,7 +19,7 @@ is $fail->get_sign, 't1E', "Contract failed with 1 passing test"
 is $fail->get_error, "Looks like you planned 2 tests but ran 1",
     "Error as expected";
 
-my $pass = try_refute {
+my $pass = refute_and_report {
     package T;
     use Assert::Refute qw(:all);
     plan tests => 2;

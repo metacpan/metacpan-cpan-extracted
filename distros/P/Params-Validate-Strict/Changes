@@ -1,5 +1,9 @@
 Revision history for Params-Validate-Strict
 
+0.14	Mon Sep 29 15:17:39 EDT 2025
+	Support optionals for memberof
+	Min/max make no sense with memberof
+
 0.13	Sat Sep 27 10:27:25 EDT 2025
 	Say how long the text is, when complaining it's too long
 	Say what the current value is when testing max

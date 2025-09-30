@@ -2,12 +2,11 @@
 
 use strict;
 use warnings;
-BEGIN{ delete @ENV{qw(NDEBUG PERL_NDEBUG)} };
 use Test::More;
 
-use Assert::Refute qw(:core), {};
+use Assert::Refute qw(:core);
 
-my $report = try_refute {
+my $report = refute_and_report {
     package T;
     my $self = shift;
 

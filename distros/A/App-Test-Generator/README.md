@@ -100,10 +100,12 @@ Supported constraint types:
 
         our %input = (
             status => { type => 'string', memberof => [ 'ok', 'error', 'pending' ] },
-            level  => { type => 'integer', memberof => [ 1, 2, 3 ] },
+            level => { type => 'integer', memberof => [ 1, 2, 3 ] },
         );
 
-    The generator will automatically create test cases for each allowed value (inside the member list), and at least one value outside the list (which should die, \`\_STATUS => 'DIES'\`). This works for strings, integers, and numbers.
+    The generator will automatically create test cases for each allowed value (inside the member list),
+    and at least one value outside the list (which should die, `_STATUS = 'DIES'`).
+    This works for strings, integers, and numbers.
 
 - `boolean` - automatic boundary tests for boolean fields
 
@@ -111,7 +113,7 @@ Supported constraint types:
             flag => { type => 'boolean' },
         );
 
-    The generator will automatically create test cases for \`0\` and \`1\`, and optionally invalid values that should trigger \`\_STATUS => 'DIES'\`.
+    The generator will automatically create test cases for 0 and 1, and optionally invalid values that should trigger `_STATUS = 'DIES'`.
 
 These edge cases are inserted automatically, in addition to the random
 fuzzing inputs, so each run will reliably probe boundary conditions
@@ -181,8 +183,9 @@ Recognized items:
 - `%type_edge_cases` - optional hash mapping types to arrayrefs of extra values to try for any field of that type:
 
             our %type_edge_cases = (
-                    string => [ '', ' ', "\n", "\\0", "long" x 50 ],
-                    integer => [ -1, 0, 1, 2**31 - 1 ],
+                    string  => [ '', ' ', "\t", "\n", "\0", 'long' x 1024, chr(0x1F600) ],
+                    number  => [ 0, 1.0, -1.0, 1e308, -1e308, 1e-308, -1e-308, 'NaN', 'Infinity' ],
+                    integer => [ 0, 1, -1, 2**31-1, -(2**31), 2**63-1, -(2**63) ],
             );
 
 # EXAMPLES
@@ -264,7 +267,8 @@ The generated test:
 
 # SEE ALSO
 
-[Test::Most](https://metacpan.org/pod/Test%3A%3AMost), [Params::Get](https://metacpan.org/pod/Params%3A%3AGet), [Params::Validate::Strict](https://metacpan.org/pod/Params%3A%3AValidate%3A%3AStrict), [Return::Set](https://metacpan.org/pod/Return%3A%3ASet), [YAML::XS](https://metacpan.org/pod/YAML%3A%3AXS)
+- Test coverage report: [https://nigelhorne.github.io/App-Test-Generator/coverage/](https://nigelhorne.github.io/App-Test-Generator/coverage/)
+- [Test::Most](https://metacpan.org/pod/Test%3A%3AMost), [Params::Get](https://metacpan.org/pod/Params%3A%3AGet), [Params::Validate::Strict](https://metacpan.org/pod/Params%3A%3AValidate%3A%3AStrict), [Return::Set](https://metacpan.org/pod/Return%3A%3ASet), [YAML::XS](https://metacpan.org/pod/YAML%3A%3AXS)
 
 # AUTHOR
 

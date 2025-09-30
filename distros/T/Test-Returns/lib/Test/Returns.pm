@@ -9,7 +9,7 @@ use Test::Builder;
 use Return::Set qw(set_return);
 
 our @EXPORT = qw(returns_ok returns_not_ok returns_is returns_isnt);
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 my $Test = Test::Builder->new();
 
@@ -46,15 +46,20 @@ sub returns_is {
 	my $ok;
 	my $error;
 
-	$test_name ||= 'Value matches schema';
-
 	eval {
-		$ok = set_return($value, $schema) eq $value;
+		if($value) {
+			$ok = set_return($value, $schema) eq $value;
+		} else {
+			set_return(undef, $schema);
+			$ok = 1;
+		}
 		1;
 	} or do {
 		$error = $@;
 		$ok = 0;
 	};
+
+	$test_name ||= 'Value matches schema';
 
 	if($ok) {
 		$Test->ok(1, $test_name);
@@ -78,13 +83,13 @@ sub returns_isnt
 
 	my $ok;
 
-	$test_name ||= 'Value does not match schema';
-
 	eval {
 		$ok = defined(set_return($value, $schema));
 	} or do {
 		$ok = 0;
 	};
+
+	$test_name ||= 'Value does not match schema';
 
 	if($ok) {
 		$Test->ok(0, $test_name);	# Value matched schema — test fails

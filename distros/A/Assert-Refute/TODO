@@ -1,12 +1,10 @@
         -- next big thing --
-+   ++  MOD split out T::Numeric, T::Array, and T::Hash
 
         -- backlog --
 +   ++  API one-line report format for dying/warning
 ++  +   MOD multiline like
 +   ++  MOD port Test::Differences to refute
 +   ++  TST Even more examples
-++  +   MOD T::Array: point out misbehaving elements in all tests
 ++  ++  API todo() or $TODO - don't slow down passing tests!
 ++  ++  MOD Round-trip assertion
 ++  ++  MOD Util::Tempfile - preserve file if tests fail
@@ -14,7 +12,6 @@
 +++ +   API Optional short-circuit on first failure
 +++ +   API Some extra goodies to contract {...} like title
 +++ +   API verbosity switch to include more/less info in report
-+++ +   MOD T::Array: block subs curry if no second arg
 +++ +   API bail_out() - can die for now, only needed for Unit
 ++  +++ DRV add Test-based driver
 ++  +++ MOD Provide what Test::Most can

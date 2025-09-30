@@ -7,9 +7,9 @@ use File::Util::Test;
 use Path::Tiny;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-09-23'; # DATE
+our $DATE = '2025-09-30'; # DATE
 our $DIST = 'App-CdUtils'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 our $DEBUG = $ENV{DEBUG};
 
@@ -55,7 +55,7 @@ cdtarget-backend - Change directory to symlink target's directory
 
 =head1 VERSION
 
-This document describes version 0.010 of cdtarget-backend (from Perl distribution App-CdUtils), released on 2025-09-23.
+This document describes version 0.011 of cdtarget-backend (from Perl distribution App-CdUtils), released on 2025-09-30.
 
 =head1 SYNOPSIS
 

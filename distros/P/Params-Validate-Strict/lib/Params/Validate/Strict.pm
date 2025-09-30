@@ -18,11 +18,11 @@ Params::Validate::Strict - Validates a set of parameters against a schema
 
 =head1 VERSION
 
-Version 0.13
+Version 0.14
 
 =cut
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 =head1 SYNOPSIS
 
@@ -315,6 +315,16 @@ sub validate_strict
 					_error($logger, "validate_strict($key): min must be <= max ($min > $max)");
 				}
 			}
+
+			if($rules->{'memberof'}) {
+				if(my $min = $rules->{'min'}) {
+					_error($logger, "validate_strict($key): min ($min) makes no sense with memberof");
+				}
+				if(my $max = $rules->{'max'}) {
+					_error($logger, "validate_strict($key): max ($max) makes no sense with memberof");
+				}
+			}
+
 			foreach my $rule_name (keys %$rules) {
 				my $rule_value = $rules->{$rule_name};
 
@@ -578,6 +588,9 @@ sub validate_strict
 						}
 					}
 				} elsif($rule_name eq 'memberof') {
+					if(!defined($value)) {
+						next;	# Skip if string is undefined
+					}
 					if(ref($rule_value) eq 'ARRAY') {
 						if(($rules->{'type'} eq 'integer') || ($rules->{'type'} eq 'number')) {
 							unless(List::Util::any { $_ == $value } @{$rule_value}) {

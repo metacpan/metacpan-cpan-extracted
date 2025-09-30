@@ -14,9 +14,9 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "App-CdUtils",
   "EXE_FILES" => [
-    "script/cdnext-backend",
+    "script/cdnextsibling-backend",
     "script/cdpart-backend",
-    "script/cdprev-backend",
+    "script/cdprevsibling-backend",
     "script/cdsibling-backend",
     "script/cdtarget-backend",
     "script/cdtree-backend"
@@ -40,7 +40,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.010",
+  "VERSION" => "0.011",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -2,16 +2,15 @@
 
 use strict;
 use warnings;
-BEGIN{ delete @ENV{qw(NDEBUG PERL_NDEBUG)} };
 
 # Load BEFORE T::M to avoid detecting it
-use Assert::Refute qw(:core), {};
+use Assert::Refute qw(:core);
 
 use Test::More;
 use Scalar::Util qw(refaddr);
 
 my @trace;
-my $report = try_refute {
+my $report = refute_and_report {
     push @trace, current_contract;
     push @trace, "alive";
 };

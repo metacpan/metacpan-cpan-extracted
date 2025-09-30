@@ -22,8 +22,8 @@ use Test::More tests => 7;
     sub b : Requires(Int, Maybe[Str], Str) {
         ok 'Called b';
     }
-    lives_ok {
         b( 3, undef, "hola" );
+    lives_ok {
     }
     'Proper calls work';
     dies_ok {

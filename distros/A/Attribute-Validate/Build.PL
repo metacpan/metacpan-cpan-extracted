@@ -15,7 +15,7 @@ my $build = Module::Build->new(
         'Attribute::Handlers' => 0,
         'Carp' => 0,
         'Carp::Always' => 0,
-        'Type::Params' => 0,
+        'Type::Params' => '2.008003',
     },
     configure_requires => {
         'Module::Build' => 0,

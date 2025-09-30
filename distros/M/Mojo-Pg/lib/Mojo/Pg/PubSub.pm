@@ -1,7 +1,7 @@
 package Mojo::Pg::PubSub;
 use Mojo::Base 'Mojo::EventEmitter';
 
-use Mojo::JSON qw(from_json to_json);
+use Mojo::JSON   qw(from_json to_json);
 use Scalar::Util qw(weaken);
 
 has pg => undef, weak => 1;

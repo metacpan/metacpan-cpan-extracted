@@ -1,5 +1,21 @@
 Revision history for Assert-Refute
 
+0.1701	Mon Sep 29 2025
+	- BUG Fix tests on perls >= 5.39.1
+
+0.17    Sat Apr 20 2019
+        - API Introduce experimental refute_invariant for named assertion
+        - API Introduce configure_global for setting a big project's callback
+        - API Add report->get_title, set_title
+
+0.16    Fri Nov 23 2018
+        - API Introduce experimental assert_refute and refute_and_report as successors to jack-of-all-trades try_refute
+        - MOD BREAK T::Array, T::Hash, T::Numeric, and T::Scalar moved to separate distributions
+        - API BREAK subcontract rethrows exceptions
+        - API Add get_parent() and set_parent() to Report for subcontracts
+        - API Add get_failed_ids() to Report class
+        - API BREAK Remove deprecated refute_these{} and set_result() function
+
 0.1501  Fri Nov 9 2018
         - BUG Fix typo (thx MANWAR)
 

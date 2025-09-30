@@ -135,7 +135,8 @@ subtest 'Promises' => sub {
 
   $result = undef;
   $db->update_p('crud_test', {name => 'promise_two'}, {name => 'promise'}, {returning => '*'})
-    ->then(sub { $result = shift->hash })->wait;
+    ->then(sub { $result = shift->hash })
+    ->wait;
   is $result->{name}, 'promise_two', 'right result';
   $db->delete_p('crud_test', {name => 'promise_two'}, {returning => '*'})->then(sub { $result = shift->hash })->wait;
   is $result->{name}, 'promise_two', 'right result';

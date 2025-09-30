@@ -9,15 +9,16 @@ use File::chdir;
 use Getopt::Long::Complete qw(GetOptionsWithCompletion);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-09-23'; # DATE
+our $DATE = '2025-09-30'; # DATE
 our $DIST = 'App-CdUtils'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
-# FRAGMENT id=shcompgen-hint completer=1 for=cdprev
+# FRAGMENT id=shcompgen-hint completer=1 for=cdprevsibling
 
 my $cwd = $ENV{PWD} || cwd();
 my @cwd_elems = split m!/+!, $cwd;
-my $sort_files_opts = $ENV{CDPREVNEXT_SORT_FILES_OPTS} // '--by-field=name';
+my $cmd = $0 =~ /cdprev/ ? 'cdprevsibling' : 'cdnextsibling';
+my $sort_files_opts = $ENV{CDPREVNEXTSIBLING_SORT_FILES_OPTS} // '--by-field=name';
 my %opts = (
     num => 1,
 );
@@ -29,7 +30,7 @@ GetOptionsWithCompletion(
     'help|h' => sub {
         print <<USAGE;
 Usage:
-  % cdprev [options]
+  % $cmd [options]
 Options:
   --help, -h
   --version, -v
@@ -39,7 +40,7 @@ USAGE
     },
     'version|v' => sub {
         no warnings 'once';
-        print "cdprev version ", ($main::VERSION || "dev"), "\n";
+        print "$cmd version ", ($main::VERSION || "dev"), "\n";
         exit 0;
     },
     'num|n=i' => \$opts{num},
@@ -55,8 +56,8 @@ unless (@cwd_elems) {
 my @dirs;
 {
     local $CWD = "..";
-    open my $cmd, "sort-files $sort_files_opts |"; ## no critic: InputOutput::ProhibitTwoArgOpen
-    while (defined(my $e = <$cmd>)) {
+    open my $fh, "sort-files $sort_files_opts |"; ## no critic: InputOutput::ProhibitTwoArgOpen
+    while (defined(my $e = <$fh>)) {
         chomp $e;
         next unless -d $e;
         push @dirs, $e;
@@ -72,13 +73,13 @@ for my $i (0 .. $#dirs) {
 }
 
 $curpos //= 0;
-my $newpos = $curpos + $opts{num} * ($0 =~ /prev-backend$/ ? -1 : 1);
+my $newpos = $curpos + $opts{num} * ($cmd eq 'cdprevsibling' ? -1 : 1);
 $newpos = 0 if $newpos < 0;
 $newpos = @dirs-1 if $newpos >= @dirs;
 print "../$dirs[$newpos]\n";
 
-# ABSTRACT: Change to the "previous" or "next" (sibling) directory
-# PODNAME: cdnext-backend
+# ABSTRACT: Change to the "previous" or "next" sibling directory
+# PODNAME: cdprevsibling-backend
 
 __END__
 
@@ -88,18 +89,18 @@ __END__
 
 =head1 NAME
 
-cdnext-backend - Change to the "previous" or "next" (sibling) directory
+cdprevsibling-backend - Change to the "previous" or "next" sibling directory
 
 =head1 VERSION
 
-This document describes version 0.010 of cdnext-backend (from Perl distribution App-CdUtils), released on 2025-09-23.
+This document describes version 0.011 of cdprevsibling-backend (from Perl distribution App-CdUtils), released on 2025-09-30.
 
 =head1 SYNOPSIS
 
 To use in shell:
 
- % cdprev() { cd `cdprev-backend "$1"`; }
- % cdnext() { cd `cdnext-backend "$1"`; }
+ % cdprevsibling() { cd `cdprevsibling-backend "$1"`; }
+ % cdnextsibling() { cd `cdnextsibling-backend "$1"`; }
 
  % pwd
  /some/path
@@ -109,24 +110,25 @@ To use in shell:
 
  % cd four
 
- % cdnext
+ % cdnextsibling
  % pwd
  /some/path/one
 
- % cdnext -n2
+ % cdnextsibling -n2
  % pwd
  /some/path/two
 
- % cdprev -n3
+ % cdprevsibling -n3
  % pwd
  /some/path/four
 
 =head1 DESCRIPTION
 
-B<cdprev> and C<cdnext> are commands to change to "previous" and "next" sibling
-directories, respectively. By default, asciibetical ordering is used. You can
-change the ordering by setting the L</CDPREVNEXT_SORT_FILES_OPTS> options, as
-L<sort-files> utility is used to sort the directories.
+B<cdprevsibling> and B<cdnextsibling> are commands to change to "previous" and
+"next" sibling directories, respectively. By default, asciibetical ordering is
+used. You can change the ordering by setting the
+L</CDPREVNEXTSIBLING_SORT_FILES_OPTS> options, as L<sort-files> utility is used
+to sort the directories.
 
 =head1 OPTIONS
 
@@ -143,7 +145,7 @@ shells.
 
 To activate bash completion for this script, put:
 
- complete -C cdnext-backend cdnext-backend
+ complete -C cdprevsibling-backend cdprevsibling-backend
 
 in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then
 recognize tab completion for the command. Or, you can also directly execute the
@@ -156,7 +158,7 @@ which can activate shell completion for scripts immediately.
 
 To activate tcsh completion for this script, put:
 
- complete cdnext-backend 'p/*/`cdnext-backend`/'
+ complete cdprevsibling-backend 'p/*/`cdprevsibling-backend`/'
 
 in your tcsh startup (e.g. C<~/.tcshrc>). Your next shell session will then
 recognize tab completion for the command. Or, you can also directly execute the
@@ -170,7 +172,7 @@ For fish and zsh, install C<shcompgen> as described above.
 
 =head1 ENVIRONMENT
 
-=head2 CDPREVNEXT_SORT_FILES_OPTS
+=head2 CDPREVNEXTSIBLING_SORT_FILES_OPTS
 
 String. Options to pass to B<sort-files>. Default: C<--by-field name>.
 

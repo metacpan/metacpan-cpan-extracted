@@ -2,6 +2,14 @@ Revision history for Perl extension Alien-Turso-CLI
 
 {{$NEXT}}
 
+0.02 2025-09-30T19:00:00Z
+
+    - Fix SYNOPSIS examples based on user feedback
+    - Remove unnecessary 'use Alien;' from main example
+    - Add alternative usage note for environments that may need it
+    - Add more practical usage examples in SYNOPSIS
+    - Improve documentation clarity
+
 0.01 2025-09-23T18:30:00Z
 
     - Initial release

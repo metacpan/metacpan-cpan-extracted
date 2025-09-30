@@ -24,7 +24,7 @@
             "Attribute::Handlers" : "0",
             "Carp" : "0",
             "Carp::Always" : "0",
-            "Type::Params" : "0"
+            "Type::Params" : "2.008003"
          }
       },
       "test" : {
@@ -37,7 +37,7 @@
    "provides" : {
       "Attribute::Validate" : {
          "file" : "lib/Attribute/Validate.pm",
-         "version" : "v0.0.1"
+         "version" : "v0.0.3"
       }
    },
    "release_status" : "stable",
@@ -52,6 +52,6 @@
          "url" : "https://github.com/sergiotarxz/Perl-Attribute-Validate"
       }
    },
-   "version" : "v0.0.1",
+   "version" : "v0.0.3",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

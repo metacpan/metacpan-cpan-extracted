@@ -1,3 +1,10 @@
+0.011   2025-09-30  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename commands to avoid ambiguity: cdprev & cdnext ->
+          cdprevsibling & cdnextsibling; cdprev & cdnext might mean
+          prev/next in terms of history.
+
+
 0.010   2025-09-23  Released-By: PERLANCAR; Urgency: medium
 
         - Add utilities: cdprev-backend, cdnext-backend.

@@ -5,12 +5,11 @@
 
 use strict;
 use warnings;
-BEGIN{ delete @ENV{qw(NDEBUG PERL_NDEBUG)} };
-use Assert::Refute {};
+use Assert::Refute ":core";
 
 use Test::More tests => 4;
 
-my $report = try_refute {
+my $report = refute_and_report {
     my $rep = shift;
     $rep->diag( "premature text" );
     refute 0, "Passing test";

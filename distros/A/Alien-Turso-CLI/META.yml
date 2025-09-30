@@ -31,12 +31,12 @@ name: Alien-Turso-CLI
 provides:
   Alien::Turso::CLI:
     file: lib/Alien/Turso/CLI.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   Alien::Base: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.01'
+version: '0.02'
 x_alienfile:
   generated_by: 'Alien::Build::MB version 0.09'
   requires:

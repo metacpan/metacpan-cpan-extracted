@@ -2,10 +2,9 @@
 
 use strict;
 use warnings;
-BEGIN{ delete @ENV{qw(NDEBUG PERL_NDEBUG)} };
 use Test::More tests => 2;
 
-use Assert::Refute qw(:core), {};
+use Assert::Refute qw(:core);
 
 # emulate use Foo;
 BEGIN {
@@ -23,7 +22,7 @@ BEGIN {
     Foo->import;
 };
 
-my $report = try_refute {
+my $report = refute_and_report {
     my_is 137, 137, "TEST FAILED IS YOU SEE THIS (equal)";
     my_is  42, 137, "TEST FAILED IS YOU SEE THIS (not equal)";
 };

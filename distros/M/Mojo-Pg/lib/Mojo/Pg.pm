@@ -22,7 +22,7 @@ has options         => sub {
 has [qw(password username)] => '';
 has pubsub                  => sub { Mojo::Pg::PubSub->new(pg => shift) };
 
-our $VERSION = '4.27';
+our $VERSION = '4.28';
 
 sub db { $_[0]->database_class->new(dbh => $_[0]->_prepare, pg => $_[0]) }
 
@@ -506,6 +506,8 @@ In alphabetical order:
 
 =over 2
 
+Brett Watson
+
 Christopher Eveland
 
 Dan Book
@@ -526,7 +528,7 @@ William Lindley
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2014-2022, Sebastian Riedel and others.
+Copyright (C) 2014-2025, Sebastian Riedel and others.
 
 This program is free software, you can redistribute it and/or modify it under the terms of the Artistic License version
 2.0.

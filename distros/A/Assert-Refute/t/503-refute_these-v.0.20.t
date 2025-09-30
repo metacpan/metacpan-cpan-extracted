@@ -7,16 +7,12 @@ use Test::More;
 use Assert::Refute::T::Errors;
 
 my $report;
-warns_like {
+dies_like {
     package T;
     use Assert::Refute {};
     $report = refute_these {
         refute 1, "If you see this message the tests have failed!";
     };
-} [qr/refute_these.*DEPRECATED.*try_refute/], "Deprecated, alternative suggested";
-
-isa_ok $report, "Assert::Refute::Report";
-is $report->get_count, 1, "1 test in refute block";
-ok !$report->is_passing, "... and it has failed";
+} qr/refute_these.*no more.*try_refute/, "Deprecated, alternative suggested";
 
 done_testing;

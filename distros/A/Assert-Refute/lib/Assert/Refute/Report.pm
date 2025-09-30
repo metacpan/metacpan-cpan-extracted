@@ -3,7 +3,7 @@ package Assert::Refute::Report;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.1501';
+our $VERSION = '0.1701';
 
 =head1 NAME
 
@@ -41,12 +41,12 @@ See L<Assert::Refute::Contract> for contract I<definition>.
 # The rest can wait.
 
 use Carp;
-use Scalar::Util qw(blessed);
+use Scalar::Util qw( blessed weaken );
 
 use Assert::Refute::Build qw(to_scalar);
 
 # Always add basic testing primitives to the arsenal
-use Assert::Refute::T::Basic qw();
+require Assert::Refute::T::Basic;
 
 my $ERROR_DONE = "done_testing was called, no more changes may be added";
 
@@ -60,6 +60,7 @@ No arguments are currently supported.
 
 =cut
 
+# NOTE keep it simple for performance reasons
 sub new {
     bless {
         fail   => {},
@@ -90,8 +91,20 @@ and the report will become unconditionally failing.
 
 =cut
 
+my %allow_plan;
+$allow_plan{$_}++ for qw( tests skip_all title );
+
 sub plan {
-    my ($self, $todo, @args) = @_;
+    my $self = shift;
+    $self->_croak("Odd number of arguments in plan()")
+        if @_ % 2;
+    my %args = @_;
+
+    my @extra = grep { !$allow_plan{$_} } keys %args;
+    $self->_croak( "Unknown options to plan(): ".join ",", sort @extra )
+        if @extra;
+    $self->_croak( "Useless use of plan() without arguments" )
+        unless %args;
 
     $self->_croak( $ERROR_DONE )
         if $self->{done};
@@ -101,18 +114,19 @@ sub plan {
     $self->_croak( "plan(): testing already started" )
         if $self->{count} > 0;
 
-    if ($todo eq 'tests') {
-        $self->_croak( "plan(): usage: plan tests => n")
-            unless @args == 1 and defined $args[0] and $args[0] =~ /^\d+$/;
-        $self->{plan_tests} = $args[0];
-    } elsif ($todo eq 'skip_all') {
-        $self->_croak( "plan(): usage: plan skip_all => reason")
-            unless @args == 1 and defined $args[0] and length $args[0];
-        $self->{plan_skip} = $args[0];
+    if ($args{skip_all}) {
+        $self->{plan_skip} = $args{skip_all};
         $self->{plan_tests} = 0;
         # TODO should we lock report?
-    } else {
-        $self->_croak( "Unknown 'plan $todo ...' command" );
+    } elsif (defined $args{tests}) {
+        $self->_croak( "plan(): usage: plan tests => n")
+            unless $args{tests} =~ /^[0-9]+$/;
+        # TODO should we forbid tests => 0 w/o a reason?
+        $self->{plan_tests} = int $args{tests};
+    };
+
+    if ($args{title}) {
+        $self->set_title( $args{title} );
     };
 
     return $self;
@@ -273,6 +287,28 @@ sub set_context {
     return $self;
 };
 
+=head3 set_title
+
+Set the a contract title
+that briefly explains what we are trying to prove, and why.
+
+See also L</get_title>.
+
+B<[EXPERIMENTAL]>. Name and meaning may change in the future.
+
+=cut
+
+# TODO setter
+sub set_title {
+    my ($self, $str) = @_;
+
+    $self->_croak( $ERROR_DONE )
+        if $self->{done};
+
+    $self->{title} = $str;
+    return $self;
+};
+
 =head2 TESTING PRIMITIVES
 
 L<Assert::Refute> comes with a set of basic checks
@@ -302,11 +338,21 @@ $specification may be one of:
 =over
 
 =item * code reference - will be executed in C<eval> block, with a I<new>
-L<Assert::Refute::Report> passed as argument;
+L<Assert::Refute::Report> passed as argument.
+
+Exceptions are rethrown, leaving a failed contract behind.
+
+    $report->subcontract( "My code" => sub {
+        my $new_report = shift;
+        # run some checks here
+    } );
 
 =item * L<Assert::Refute::Contract> instance - apply() will be called;
 
-=item * L<Assert::Refute::Report> instance implying a previously executed test.
+As of v.0.15, contract swallows exceptions, leaving behind a failed
+contract report only. This MAY change in the future.
+
+=item * L<Assert::Refute::Report> instance from a previously executed test.
 
 =back
 
@@ -321,8 +367,9 @@ sub subcontract {
     $self->_croak( $ERROR_DONE )
         if $self->{done};
     $self->_croak( "Name is required for subcontract" )
-        unless $msg;
+        if !$msg or ref $msg;
 
+    my $rethrow;
     my $rep;
     if ( blessed $sub and $sub->isa( "Assert::Refute::Contract" ) ) {
         $rep = $sub->apply(@args);
@@ -333,21 +380,25 @@ sub subcontract {
             unless $sub->is_done;
         $rep = $sub;
     } elsif (UNIVERSAL::isa( $sub, 'CODE' )) {
-        $rep = Assert::Refute::Report->new;
-        local $Assert::Refute::DRIVER = $rep;
+        $rep = Assert::Refute::Report->new->set_parent($self);
         eval {
+            # This is ripoff of do_run - maybe just call do_run here
+            local $Assert::Refute::DRIVER = $rep;
             $sub->($rep, @args);
             $rep->done_testing(0);
             1;
         } or do {
-            $rep->done_testing( $@ || "Execution interrupted" );
+            $rethrow = $@ || Carp::shortmess("Subcontract execution interrupted");
+            $rep->done_testing( $rethrow );
         };
     } else {
-        $self->_croak("subcontract must be a contract definition or execution log");
+        $self->_croak("subcontract must be a coderef, a Contract object, or a finished Report object");
     };
 
     $self->{subcontract}{ $self->get_count + 1 } = $rep;
-    $self->refute( !$rep->is_passing, "$msg (subtest)" );
+    my $ret = $self->refute( !$rep->is_passing, "$msg (subtest)" );
+    die $rethrow if $rethrow;
+    return $ret;
 };
 
 =head2 QUERYING PRIMITIVES
@@ -407,6 +458,18 @@ Returns a list of test ids, preserving order.
 sub get_tests {
     my $self = shift;
     return 1 .. $self->{count};
+};
+
+=head3 get_failed_ids
+
+List the numbers of tests that failed.
+
+=cut
+
+sub get_failed_ids {
+    my $self = shift;
+
+    return my @list = sort { $a <=> $b } keys %{ $self->{fail} || {} };
 };
 
 =head3 get_result( $id )
@@ -631,6 +694,22 @@ sub get_sign {
     return join '', @t, $d;
 };
 
+=head3 get_title
+
+Returns the contract title
+that briefly explains what we are trying to prove, and why.
+
+See also L</set_title>.
+
+B<[EXPERIMENTAL]>. Name and meaning may change in the future.
+
+=cut
+
+# TODO Dumb getter
+sub get_title {
+    return $_[0]->{title};
+};
+
 =head2 DEVELOPMENT PRIMITIVES
 
 Generally one should not touch these methods unless
@@ -648,6 +727,10 @@ Run given CODEREF, passing self as both first argument I<and>
 current_contract().
 Report object is locked afterwards via L</done_testing> call.
 
+Exceptions are rethrown.
+As of current, an exception in CODEREF leaves report in an unfinished state.
+This may or may not change in the future.
+
 Returns self.
 
 Example usage is
@@ -661,15 +744,11 @@ Example usage is
 
 sub do_run {
     my ($self, $code, @args) = @_;
+
     local $Assert::Refute::DRIVER = $self;
-    eval {
-        $code->($self, @args);
-        $self->done_testing(0);
-        1;
-    } || do {
-        $self->done_testing(
-            $@ || Carp::shortmess( 'Contract execution interrupted' ) );
-    };
+    $code->($self, @args);
+    $self->done_testing(0);
+
     return $self;
 };
 
@@ -764,6 +843,78 @@ sub _plan_to_tap {
     return [ 0, 0, $line ];
 };
 
+=head2 set_parent
+
+    $report->set_parent($bigger_report);
+    $report->set_parent(undef);
+
+Indicate that a contract is part of a larger one.
+The parent object should be an L<Assert::Refute::Report> instance.
+The parent object reference will be weakened to avoid memory leak.
+
+Provide C<undef> as argument to erase parent information.
+
+Returns self, so that calls to set_parent can be chained.
+
+This is used internally by L</subcontract>.
+
+B<NOTE> As of 0.16, no C<isa>/C<DOES> check on the argument is enforced.
+It must be blessed, however.
+This MAY change in the future.
+
+=cut
+
+sub set_parent {
+    my ($self, $parent) = @_;
+
+    if (blessed $parent) {
+        $self->{parent} = $parent;
+        # avoid a circular loop because $self is likely to be stored
+        # in parent as subcontract
+        weaken $self->{parent};
+    } elsif (!defined $parent) {
+        delete $self->{parent};
+    } else {
+        $self->_croak('parent must be a Report object, not a '.(ref $parent || 'scalar'))
+    };
+    return $self;
+};
+
+=head2 get_parent
+
+Return parent contract, i.e. the contract we are subcontract of, if any.
+
+Always check get_parent to be defined
+as it will vanish if parent object goes out of scope.
+This is done so to avoid memory leak in subcontract call.
+
+=cut
+
+# Dumb getter
+sub get_parent {
+    return $_[0]->{parent};
+};
+
+=head2 get_depth
+
+Returns 0 is there is no parent, or parent's depth + 1.
+This of this as "this contract's indentation level".
+
+B<EXPERIMENTAL>. Name and meaning MAY change in the future.
+
+=cut
+
+sub get_depth {
+    my $self = shift;
+
+    if (!exists $self->{depth}) {
+        my $parent = $self->get_parent;
+        $self->{depth} = $parent ? $parent->get_depth + 1 : 0;
+    };
+
+    return $self->{depth};
+};
+
 sub _croak {
     my ($self, $mess) = @_;
 
@@ -774,24 +925,6 @@ sub _croak {
     $fun =~ s/(.*)::/${1}->/;
 
     croak "$fun(): $mess";
-};
-
-=head2 DEPRECATED METHODS
-
-=over
-
-=item set_result
-
-Was used inside refute() prior to 0.10. This is no more the case.
-This function just dies and will be removed completely in 0.15.
-
-=back
-
-=cut
-
-sub set_result {
-    my $self = shift;
-    $self->_croak( "set_result() is removed, use refute() instead" );
 };
 
 =head1 LICENSE AND COPYRIGHT

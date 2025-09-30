@@ -2,11 +2,10 @@
 
 use strict;
 use warnings;
-BEGIN{ delete @ENV{qw(NDEBUG PERL_NDEBUG)} };
-use Assert::Refute qw(:core), {};
+use Assert::Refute qw(:core);
 use Test::More;
 
-my $report = try_refute {
+my $report = refute_and_report {
     package T;
     use Assert::Refute qw(:all);
     cmp_ok 1, "<", 2;
@@ -19,11 +18,15 @@ my $report = try_refute {
 is $report->get_sign, "t1N1NNNd", "Compare results";
 note $report->get_tap;
 
-my $deadman = try_refute {
-    package T;
-    cmp_ok 1, "<<", 2;
+my $deadman;
+eval {
+    $deadman = refute_and_report {
+        package T;
+        cmp_ok 1, "<<", 2;
+    }
 };
-is $deadman->get_sign, 'tE', "Bad operator died";
-like $deadman->get_error, qr/cmp_ok.*Comparison.*<</, "Error as expected";
+my $err = $@;
+is $deadman, undef, "Bad operator died";
+like $err, qr/cmp_ok.*Comparison.*<</, "Error as expected";
 
 done_testing;

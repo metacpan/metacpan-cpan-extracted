@@ -5,7 +5,7 @@ use warnings;
 
 use base qw( Alien::Base );
 
-our $VERSION = "0.01";
+our $VERSION = "0.02";
 
 1;
 __END__
@@ -19,10 +19,20 @@ Alien::Turso::CLI - Install and find Turso CLI
 =head1 SYNOPSIS
 
     use Alien::Turso::CLI;
-    use Alien qw( Alien::Turso::CLI );
     
+    # Get the turso binary path
     my $turso = Alien::Turso::CLI->bin_dir . '/turso';
+    
+    # Check version
     system $turso, "--version";
+    
+    # Run turso commands
+    system $turso, "auth", "login";  # Login to Turso
+    system $turso, "db", "list";     # List databases
+    
+    # Alternative usage (if you encounter issues):
+    # use Alien;
+    # use Alien::Turso::CLI;
 
 =head1 DESCRIPTION
 
@@ -62,7 +72,7 @@ Or manually:
 
 After installation, you can use the Turso CLI:
 
-    perl -MAlien::Turso::CLI -E 'system Alien::Turso::CLI->bin_dir . "/turso", "--version"'
+    perl -MAlien -MAlien::Turso::CLI -E 'system Alien::Turso::CLI->bin_dir . "/turso", "--version"'
 
 =head1 KNOWN ISSUES
 

@@ -1,5 +1,14 @@
 Revision history for App-Test-Generator
 
+0.03	Mon Sep 29 18:18:36 EDT 2025
+	If minimum is not set, verify 0 or empty fields are allowable
+	Added the testing dashboard
+	Fixed handling of memberof in input/output array creation
+	If TEST_VERBOSE is set, print the generated dataset when running it
+	Always ensure mandatory strings are passed when testing other arguments
+	rand_int and rand_numb now also sometimes return very large and very small numbers
+	Put utf-8 and NUL bytes into strings
+
 0.02	Sun Sep 28 09:03:49 EDT 2025
 	Use gtar on OS/X to generate the distro
 	Added edge case test generator for booleans and memberof

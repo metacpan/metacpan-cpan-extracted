@@ -3,7 +3,7 @@ package Assert::Refute;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.1501';
+our $VERSION = '0.1701';
 
 =head1 NAME
 
@@ -159,15 +159,16 @@ my @core  = qw(
     contract refute_these try_refute
     refute subcontract contract_is current_contract
 );
+my @extra = qw( assert_refute refute_and_report refute_invariant );
 
 our @ISA = qw(Exporter);
 our @EXPORT = @core;
-our @EXPORT_OK = @basic;
+our @EXPORT_OK = (@basic, @extra);
 
 our %EXPORT_TAGS = (
-    basic => \@basic,
-    core  => \@core,
-    all   => [@core, @basic],
+    basic => [@basic],
+    core  => [@core, @extra],
+    all   => [@EXPORT, @EXPORT_OK],
 );
 
 our $DRIVER; # Used by other modules, declaration JFYI
@@ -179,7 +180,11 @@ $NDEBUG = $ENV{NDEBUG} unless defined $NDEBUG;
 
 sub import {
     my $class = shift;
-    my (%conf, @exp, $need_conf);
+
+    # NOTE ugly hack - allow for 'use Assert::Refute {}'
+    # this should not be needed with new assert_refute / refute_and_report API
+    my %conf = ( on_fail => 'skip' );
+    my (@exp, $need_conf);
     foreach (@_) {
         if (ref $_ eq 'HASH') {
             %conf = (%conf, %$_);
@@ -202,17 +207,26 @@ my %known_callback = (
     skip => '',
     carp => sub {
         my $report = shift;
-        carp $report->get_tap
-            .($report->is_passing ? "Contract passed" : "Contract failed");
+        warn $report->get_tap . _report_mess( $report );
     },
     croak => sub {
         my $report = shift;
-        croak $report->get_tap
-            .($report->is_passing ? "Contract passed" : "Contract failed");
+        die $report->get_tap . _report_mess( $report );
     },
 );
+
+# TODO maybe public method in Report?
+sub _report_mess {
+    my $report = shift;
+
+    my $state = $report->is_passing ? "passed" : "failed";
+    my $title = $report->get_title;
+    my $str   = $title ? "Contract '$title' $state" : "Contract $state";
+    return Carp::shortmess($str);
+};
+
 my %default_conf = (
-    on_fail => 'skip',
+    on_fail => 'carp',
     on_pass => 'skip',
 );
 
@@ -242,12 +256,6 @@ which returns an unconditionally passing report.
 
 This is basically what one expects from a module in C<Assert::*> namespace.
 
-=head2 refute_these
-
-B<[DEPRECATED]> Same as above.
-
-It will stay available (with a warning) until as least 0.15.
-
 =cut
 
 sub try_refute(&;@) { ## no critic # need prototype
@@ -256,13 +264,18 @@ sub try_refute(&;@) { ## no critic # need prototype
     # Should a missing config even happen? Ok, play defensively...
     my $conf = $CALLER_CONF{+caller};
     if( !$conf ) {
-        carp "try_refute(): Usage without explicit configure() is DEPRECATED, assuming { on_fail => 'carp' }";
-        $conf = __PACKAGE__->configure( { on_fail => 'carp' }, scalar caller );
+        $conf = __PACKAGE__->configure( {}, scalar caller );
     };
     return $conf->{skip_all} if exists $conf->{skip_all};
 
-    # This is generally a ripoff of A::R::Contract->apply
-    my $report = $conf->{driver}->new->do_run($block);
+    my $report = $conf->{driver}->new;
+    eval {
+        $report->do_run($block);
+        1;
+    } || do {
+        $report->done_testing(
+            $@ || Carp::shortmess( 'Contract execution interrupted' ) );
+    };
 
     # perform whatever action is needed
     my $callback = $conf->{ $report->is_passing ? "on_pass" : "on_fail" };
@@ -271,10 +284,125 @@ sub try_refute(&;@) { ## no critic # need prototype
     return $report;
 };
 
-sub refute_these (&;@) { ## no critic # need prototype
-    carp "refute_these { ... } is DEPRECATED, use try_refute{ ... } instead";
-    goto \&try_refute; ## no critic
-}
+=head2 assert_refute { ... }
+
+Check whether given contract BLOCK containing zero or more assertions passes.
+
+Contract will fail if any of the assertions fail
+or a C<plan> is declared and not fulfilled.
+Otherwise it is assumed to pass.
+
+Unlike with try_refute, exceptions are just let through.
+
+The BLOCK must accept one argument, the contract execution report,
+likely a L<Assert::Refute::Report> instance.
+
+More arguments MAY be added in the future.
+Return value is ignored.
+
+A read-only report instance is returned by C<try_refute> instead.
+
+If C<on_pass>/C<on_fail> callbacks were specified during C<use> or
+using C<configure>, they will also be executed if appropriate.
+
+If C<NDEBUG> or C<PERL_NDEBUG> environment variable is set at compile time,
+this block is replaced with a stub
+which returns an unconditionally passing report.
+
+This is basically what one expects from a module in C<Assert::*> namespace.
+
+B<[EXPERIMENTAL]>. Name and behavior MAY change in the future.
+Should this function prove useful, it will become the successor
+or C<try_refute>.
+
+=cut
+
+sub assert_refute(&;@) { ## no critic # need prototype
+    unshift @_, '';
+
+    goto &_real_assert;
+};
+
+=head2 refute_invariant "name" => sub { ... }
+
+A named runtime assertion.
+
+Exactly as above, except that a title is added to the report object
+which will be appended to the emitted warning/error (if any).
+
+Title can be queried via C<get_title> method in report object.
+
+B<[EXPERIMENTAL]>. Name and meaning may change in the future.
+
+=cut
+
+sub refute_invariant(@) { ## no critic # need prototype
+    my ( $name, $block, @arg ) = @_;
+
+    croak q{Usage: refute_invariant "name" => sub { ... }"}
+        unless $name and ref $block eq 'CODE';
+
+    goto &_real_assert;
+};
+
+sub _real_assert {
+    my ( $name, $block ) = @_;
+
+    # Should a missing config even happen? Ok, play defensively...
+    my $conf = $CALLER_CONF{+caller};
+    if( !$conf ) {
+        # TODO add configure_global & use default configuration
+        $conf = __PACKAGE__->configure( { on_fail => 'carp' }, scalar caller );
+    };
+    return $conf->{skip_all} if exists $conf->{skip_all};
+
+    my $report = $conf->{driver}->new->set_title($name)->do_run($block);
+
+    # perform whatever action is needed
+    my $callback = $conf->{ $report->is_passing ? "on_pass" : "on_fail" };
+    $callback->($report) if $callback;
+
+    return $report;
+};
+
+=head2 refute_and_report { ... }
+
+Run a block of code with a fresh L<Assert::Refute::Report> object as argument.
+Lock the report afterwards and return it.
+
+For instance,
+
+    my $report = refute_and_report {
+        my $c = shift;
+        $c->is( $price * $amount, $total, "Numbers add up" );
+        $c->like( $header, qr/<h1>/, "Header as expected" );
+        $c->can_ok( $duck, "quack" );
+    };
+
+Or alternatively one may resort to L<Test::More>-like DSL:
+
+    use Assert::Refute qw(:all);
+    my $report = refute_and_report {
+        is      $price * $amount, $total, "Numbers add up";
+        like    $header, qr/<h1>/, "Header as expected";
+        can_ok  $duck, "quack";
+    };
+
+This method does not adhere C<NDEBUG>, apply callbacks, or handle expections.
+It just executes the checks.
+Not exported by default.
+
+B<[EXPERIMENTAL]>. Name and behavior MAY change in the future.
+Should this function prove useful, it will become the successor
+or C<try_refute>.
+
+=cut
+
+sub refute_and_report (&;@) { ## no critic # need prototype
+    my ( $block, @arg ) = @_;
+
+    return Assert::Refute::Report->new->do_run($block);
+};
 
 =head2 contract { ... }
 
@@ -548,6 +676,31 @@ sub configure {
     $CALLER_CONF{$caller} = $conf;
 };
 
+=head2 configure_global( \%global_defaults )
+
+Set a global configuration to be used as default.
+
+This can be used e.g. to set an assertion failure callback throughout
+a big project.
+
+=cut
+
+sub configure_global {
+    my ($class, $conf) = @_;
+
+    croak "Usage: $class->configure_global( \\%hash )"
+        unless ref $conf eq 'HASH';
+
+    my @extra = grep { !$conf_known{$_} } keys %$conf;
+    croak "$class->configure_global: unknown parameters (@extra)"
+        if @extra;
+
+    $default_conf{$_} = $conf->{$_}
+        for keys %$conf;
+
+    return $class; # oh really?
+};
+
 =head2 get_config
 
 Returns configuration from above, initializing with defaults if needed.
@@ -570,6 +723,20 @@ sub _coerce_cb {
         unless ref $sub and UNIVERSAL::isa( $sub, 'CODE' );
     return $sub;
 };
+
+=head2 refute_these
+
+B<[DEPRECATED]> This used to be the old name of C<try_refute>.
+It just dies now and will be removed completely in the future.
+
+=cut
+
+# TODO v.0.20 remove completely
+# Keep it prototyped just in case some poor guy/gal forgot to change it
+#     or else they'll get a very confusing error message
+sub refute_these (&;@) { ## no critic # need prototype
+    croak "refute_these { ... } is no more supported, use try_refute{ ... } instead";
+}
 
 =head1 EXTENDING THE SUITE
 
@@ -657,6 +824,23 @@ It will succeed silently, yet spell out details if it doesn't pass.
 
 These primitives can serve as building blocks for arbitrarily complex
 assertions, tests, and validations.
+
+=head1 DEPRECATION WARNING
+
+The following modules used to be part of this package, but are separate
+CPAN distributions now:
+
+=over
+
+=item * L<Assert::Refute::T::Array>
+
+=item * L<Assert::Refute::T::Hash>
+
+=item * L<Assert::Refute::T::Numeric>
+
+=item * L<Assert::Refute::T::Scalar>
+
+=back
 
 =head1 SEE ALSO
 

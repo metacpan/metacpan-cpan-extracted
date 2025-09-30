@@ -47,8 +47,12 @@ subtest 'JSON' => sub {
   );
   Mojo::IOLoop->next_tick(sub {
     $pg->db->notify(pstest => 'fail');
-    $pg->pubsub->notify('pstest')->notify(pstest => {msg => '♥works♥'})->notify(pstest => [1, 2, 3])
-      ->notify(pstest => true)->notify(pstest2 => '♥works♥')->notify(pstest => {msg => 'stop'});
+    $pg->pubsub->notify('pstest')
+      ->notify(pstest  => {msg => '♥works♥'})
+      ->notify(pstest  => [1, 2, 3])
+      ->notify(pstest  => true)
+      ->notify(pstest2 => '♥works♥')
+      ->notify(pstest  => {msg => 'stop'});
   });
   Mojo::IOLoop->start;
   is_deeply \@json, [undef, undef, {msg => '♥works♥'}, [1, 2, 3], true, {msg => 'stop'}], 'right data structures';

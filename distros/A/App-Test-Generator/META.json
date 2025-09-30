@@ -40,31 +40,41 @@
             "Return::Set" : "0",
             "Test::Most" : "0",
             "YAML::XS" : "0",
+            "autodie" : "0",
             "perl" : "5.014"
          }
       },
       "test" : {
          "requires" : {
+            "File::Glob" : "0",
             "File::Temp" : "0",
+            "File::stat" : "0",
             "IPC::System::Simple" : "0",
+            "JSON::MaybeXS" : "0",
+            "POSIX" : "0",
+            "Readonly" : "0",
             "Test::DescribeMe" : "0",
             "Test::More" : "0",
             "Test::Needs" : "0",
-            "Test::Returns" : "0"
+            "Test::Returns" : "0.02"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/nigelhorne/App-Test-Generator/issues"
+         "mailto" : "bug-App-Test-Generator@rt.cpan.org",
+         "web" : "https://github.com/nigelhorne/App-Test-Generator/issues",
+         "x_url" : "https://github.com/nigelhorne/App-Test-Generator/issues"
       },
+      "homepage" : "https://metacpan.org/pod/App::Test::Generator",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/nigelhorne/App-Test-Generator.git",
-         "web" : "https://github.com/nigelhorne/App-Test-Generator"
+         "url" : "git://github.com/nigelhorne/App-Test-Generator.git",
+         "web" : "https://github.com/nigelhorne/App-Test-Generator",
+         "x_repository" : "https://github.com/nigelhorne/App-Test-Generator"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

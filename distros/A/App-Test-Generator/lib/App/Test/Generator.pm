@@ -1,7 +1,11 @@
 package App::Test::Generator;
 
+# TODO: Formally define the transformation from the input set to the output set
+
 use strict;
 use warnings;
+use autodie qw(:all);
+
 use Exporter 'import';
 use File::Basename qw(basename);
 use YAML::XS qw(LoadFile);
@@ -9,7 +13,7 @@ use Carp qw(croak);
 
 our @EXPORT_OK = qw(generate);
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 NAME
 
@@ -132,10 +136,12 @@ of keys).
 
     our %input = (
         status => { type => 'string', memberof => [ 'ok', 'error', 'pending' ] },
-        level  => { type => 'integer', memberof => [ 1, 2, 3 ] },
+        level => { type => 'integer', memberof => [ 1, 2, 3 ] },
     );
 
-The generator will automatically create test cases for each allowed value (inside the member list), and at least one value outside the list (which should die, `_STATUS => 'DIES'`). This works for strings, integers, and numbers.
+The generator will automatically create test cases for each allowed value (inside the member list),
+and at least one value outside the list (which should die, C<_STATUS = 'DIES'>).
+This works for strings, integers, and numbers.
 
 =item * C<boolean> - automatic boundary tests for boolean fields
 
@@ -143,7 +149,7 @@ The generator will automatically create test cases for each allowed value (insid
         flag => { type => 'boolean' },
     );
 
-The generator will automatically create test cases for `0` and `1`, and optionally invalid values that should trigger `_STATUS => 'DIES'`.
+The generator will automatically create test cases for 0 and 1, and optionally invalid values that should trigger C<_STATUS = 'DIES'>.
 
 =back
 
@@ -221,8 +227,9 @@ To ensure new is called with no arguments, you still need to defined new, thus:
 =item * C<%type_edge_cases> - optional hash mapping types to arrayrefs of extra values to try for any field of that type:
 
 	our %type_edge_cases = (
-		string => [ '', ' ', "\n", "\\0", "long" x 50 ],
-		integer => [ -1, 0, 1, 2**31 - 1 ],
+		string  => [ '', ' ', "\t", "\n", "\0", 'long' x 1024, chr(0x1F600) ],
+		number  => [ 0, 1.0, -1.0, 1e308, -1e308, 1e-308, -1e-308, 'NaN', 'Infinity' ],
+		integer => [ 0, 1, -1, 2**31-1, -(2**31), 2**63-1, -(2**63) ],
 	);
 
 =back
@@ -322,6 +329,7 @@ sub generate {
 
 	# --- Load configuration safely (require so config can use 'our' variables) ---
 	{
+		# FIXME:  would be better to use Config::Abstraction, since requiring the user's config could execute arbitrary code
 		my $abs = $conf_file;
 		$abs = "./$abs" unless $abs =~ m{^/};
 		require $abs;
@@ -335,7 +343,7 @@ sub generate {
 	# sensible defaults
 	$function ||= 'run';
 	$iterations ||= 50;		 # default fuzz runs if not specified
-	$seed		= undef if defined $seed && $seed eq '';	# treat empty as undef
+	$seed = undef if defined $seed && $seed eq '';	# treat empty as undef
 
 	# Guess module name from config file if not set
 	if (!$module) {
@@ -360,6 +368,10 @@ sub generate {
 	sub perl_quote {
 		my ($v) = @_;
 		return 'undef' unless defined $v;
+		if(ref($v) eq 'ARRAY') {
+			my @quoted_v = map { perl_quote($_) } @{$v};
+			return '[ ' . join(', ', @quoted_v) . ' ]';
+		}
 		return $v =~ /^-?\d+(\.\d+)?$/ ? $v : "'" . ( $v =~ s/'/\\'/gr ) . "'";
 	}
 
@@ -438,7 +450,7 @@ sub generate {
 					$corpus_code .= "dies_ok { \$obj->$function($input_str) } "
 								. "'$function(" . join(", ", map { $_ // '' } @$inputs ) . ") dies';\n";
 				} elsif($expected_str eq "'_STATUS:WARNS'") {
-					$corpus_code .= "warnings_exist { \$obj->$function($input_str) } qr[''], "
+					$corpus_code .= "warnings_exist { \$obj->$function($input_str) } qr/./, "
 								. "'$function(" . join(", ", map { $_ // '' } @$inputs ) . ") warns';\n";
 				} else {
 					$corpus_code .= "is(\$obj->$function($input_str), $expected_str, "
@@ -449,7 +461,7 @@ sub generate {
 					$corpus_code .= "dies_ok { $module\::$function($input_str) } "
 								. "'$function(" . join(", ", map { $_ // '' } @$inputs ) . ") dies';\n";
 				} elsif($expected_str eq "'_STATUS:WARNS'") {
-					$corpus_code .= "warnings_exist { $module\::$function($input_str) } qr[''], "
+					$corpus_code .= "warnings_exist { $module\::$function($input_str) } qr/./, "
 								. "'$function(" . join(", ", map { $_ // '' } @$inputs ) . ") warns';\n";
 				} else {
 					$corpus_code .= "is($module\::$function($input_str), $expected_str, "
@@ -475,12 +487,14 @@ sub generate {
 use strict;
 use warnings;
 
+use utf8;
+use Data::Dumper;
 use Test::Most;
-use Test::Returns;
+use Test::Returns 0.02;
 
 $setup_code
 
-diag("$module test case created by https://github.com/nigelhorne/Test-Corpus");
+diag("${module}::$function test case created by https://github.com/nigelhorne/App-Test-Generator");
 
 # Edge-case maps injected from config (optional)
 my %edge_cases = (
@@ -508,13 +522,86 @@ sub _pick_from {
 	return \$arrayref->[ int(rand(scalar \@\$arrayref)) ];
 }
 
+# sub rand_str {
+	# my \$len = shift || int(rand(10)) + 1;
+	# join '', map { chr(97 + int(rand(26))) } 1..\$len;
+# }
+
+my \@unicode_codepoints = (
+    0x00A9,        # ©
+    0x00AE,        # ®
+    0x03A9,        # Ω
+    0x20AC,        # €
+    0x2013,        # – (en-dash)
+    0x0301,        # combining acute accent
+    0x0308,        # combining diaeresis
+    0x1F600,       # 😀 (emoji)
+    0x1F62E,       # 😮
+    0x1F4A9,       # 💩 (yes)
+);
+
+sub rand_unicode_char {
+    my \$cp = \$unicode_codepoints[ int(rand(\@unicode_codepoints)) ];
+    return chr(\$cp);
+}
+
+# Generate a string: mostly ASCII, sometimes unicode, sometimes nul bytes or combining marks
 sub rand_str {
 	my \$len = shift || int(rand(10)) + 1;
-	join '', map { chr(97 + int(rand(26))) } 1..\$len;
+	my \@chars;
+	for (1..\$len) {
+		my \$r = rand();
+		if (\$r < 0.72) {
+			push \@chars, chr(97 + int(rand(26)));          # a-z
+		} elsif (\$r < 0.88) {
+			push \@chars, chr(65 + int(rand(26)));          # A-Z
+		} elsif (\$r < 0.95) {
+			push \@chars, chr(48 + int(rand(10)));          # 0-9
+		} elsif (\$r < 0.975) {
+			push \@chars, rand_unicode_char();              # occasional emoji/marks
+		} else {
+			push \@chars, chr(0);                           # nul byte injection
+		}
+	}
+	# Occasionally prepend/append a combining mark to produce combining sequences
+	if (rand() < 0.08) {
+		unshift \@chars, chr(0x0301);
+	}
+	if (rand() < 0.08) {
+		push \@chars, chr(0x0308);
+	}
+	return join('', \@chars);
 }
-sub rand_int { int(rand(200)) - 100 }
+
+# Integer generator: mix typical small ints with large limits
+sub rand_int {
+	my \$r = rand();
+	if (\$r < 0.75) {
+		return int(rand(200)) - 100;	# -100 .. 100 (usual)
+	} elsif (\$r < 0.9) {
+		return int(rand(2**31)) - 2**30;	# 32-bit-ish
+	} elsif (\$r < 0.98) {
+		return (int(rand(2**63)) - 2**62);	# 64-bit-ish
+	} else {
+		# very large/suspicious values
+		return 2**63 - 1;
+	}
+}
 sub rand_bool { rand() > 0.5 ? 1 : 0 }
-sub rand_num { rand() * 200 - 100 }
+
+# Number generator (floating), includes tiny/huge floats
+sub rand_num {
+	my \$r = rand();
+	if (\$r < 0.7) {
+		return (rand() * 200 - 100);	# -100 .. 100
+	} elsif (\$r < 0.9) {
+		return (rand() * 1e12) - 5e11;             # large-ish
+	} elsif (\$r < 0.98) {
+		return (rand() * 1e308) - 5e307;           # very large floats
+	} else {
+		return 1e-308 * (rand() * 1000);           # tiny float, subnormal-like
+	}
+}
 
 sub rand_arrayref {
 	my \$len = shift || int(rand(3)) + 1; # small arrays
@@ -536,6 +623,7 @@ sub fuzz_inputs {
 		my %case;
 		foreach my \$field (keys %input) {
 			my \$spec = \$input{\$field} || {};
+			next if \$spec->{'memberof'};	# Memberof data is created below
 			my \$type = \$spec->{type} || 'string';
 
 			# 1) Sometimes pick a field-specific edge-case
@@ -581,86 +669,46 @@ sub fuzz_inputs {
 		push \@cases, \\%case;
 	}
 
-	# edge-case runs appended
-	push \@cases, {};
-	push \@cases, { map { \$_ => undef } keys \%input };
+	# edge-cases
 
-	# generate numeric, string, hashref and arrayref min/max edge cases
-	# TODO:  For hashref and arrayref, if there's a \$spec->{schema} field, use that for the sata that's being generated
+	# Are any options manadatory?
+	my \$all_optional = 1;
+	my \%mandatory_strings;	# List of mandatory strings to be added to all tests, always put at start so it can be overwritten
 	foreach my \$field (keys \%input) {
 		my \$spec = \$input{\$field} || {};
-		my \$type = \$spec->{type} || '';
-
-		if (\$type eq 'number' || \$type eq 'integer') {
-			if (defined \$spec->{min}) {
-				push \@cases, { \$field => \$spec->{min} + 1 };	# just inside
-				push \@cases, { \$field => \$spec->{min} };	# border
-				push \@cases, { \$field => \$spec->{min} - 1, _STATUS => 'DIES' }; # outside
-			}
-			if (defined \$spec->{max}) {
-				push \@cases, { \$field => \$spec->{max} - 1 };	# just inside
-				push \@cases, { \$field => \$spec->{max} };	# border
-				push \@cases, { \$field => \$spec->{max} + 1, _STATUS => 'DIES' }; # outside
-			}
-		} elsif (\$type eq 'string') {
-			if (defined \$spec->{min}) {
-				my \$len = \$spec->{min};
-				push \@cases, { \$field => 'a' x (\$len + 1) };	# just inside
-				push \@cases, { \$field => 'a' x \$len};	# border
-				push \@cases, { \$field => 'a' x (\$len - 1), _STATUS => 'DIES' } if \$len > 0; # outside
-			}
-			if (defined \$spec->{max}) {
-				my \$len = \$spec->{max};
-				push \@cases, { \$field => 'a' x (\$len - 1) };	# just inside
-				push \@cases, { \$field => 'a' x \$len};	# border
-				push \@cases, { \$field => 'a' x (\$len + 1), _STATUS => 'DIES' }; # outside
-			}
-		} elsif (\$type eq 'arrayref') {
-			if (defined \$spec->{min}) {
-				my \$len = \$spec->{min};
-				push \@cases, { \$field => [ (1) x (\$len + 1) ] };	# just inside
-				push \@cases, { \$field => [ (1) x \$len ] };	# border
-				push \@cases, { \$field => [ (1) x (\$len - 1) ], _STATUS => 'DIES' } if \$len > 0; # outside
-			}
-			if (defined \$spec->{max}) {
-				my \$len = \$spec->{max};
-				push \@cases, { \$field => [ (1) x (\$len - 1) ] };	# just inside
-				push \@cases, { \$field => [ (1) x \$len ] };	# border
-				push \@cases, { \$field => [ (1) x (\$len + 1) ], _STATUS => 'DIES' }; # outside
-			}
-		} elsif (\$type eq 'hashref') {
-			if (defined \$spec->{min}) {
-				my \$len = \$spec->{min};
-				push \@cases, { \$field => { map { "k\$_" => 1 }, 1 .. (\$len + 1) } };
-				push \@cases, { \$field => { map { "k\$_" => 1 }, 1 .. \$len } };
-				push \@cases, { \$field => { map { "k\$_" => 1 }, 1 .. (\$len - 1) }, _STATUS => 'DIES' } if \$len > 0;
-			}
-			if (defined \$spec->{max}) {
-				my \$len = \$spec->{max};
-				push \@cases, { \$field => { map { "k\$_" => 1 }, 1 .. (\$len - 1) } };
-				push \@cases, { \$field => { map { "k\$_" => 1 }, 1 .. \$len } };
-				push \@cases, { \$field => { map { "k\$_" => 1 }, 1 .. (\$len + 1) }, _STATUS => 'DIES' };
-			}
-		} elsif (\$type eq 'boolean') {
-			if (exists \$spec->{memberof} && ref \$spec->{memberof} eq 'ARRAY') {
-				# memberof already defines allowed booleans
-				foreach my \$val (\@{\$spec->{memberof}}) {
-					push \@cases, { \$field => \$val };
-				}
+		if(!\$spec->{optional}) {
+			\$all_optional = 0;
+			if(\$spec->{'type'} eq 'string') {
+				\$mandatory_strings{\$field} = rand_str();
 			} else {
-				# basic boolean edge cases
-				push \@cases, { \$field => 0 };
-				push \@cases, { \$field => 1 };
-				push \@cases, { \$field => undef, _STATUS => 'DIES' };
-				push \@cases, { \$field => 2, _STATUS => 'DIES' };	# invalid boolean
+				die 'TODO: type = ', \$spec->{'type'};
 			}
 		}
+	}
 
-		# Generate edge cases for memberof
+	if(\$all_optional) {
+		push \@cases, {};
+	} else {
+		# Note that this is set on the input rather than output
+		push \@cases, { '_STATUS' => 'DIES' };	# At least one argument is needed
+	}
+
+	push \@cases, { '_STATUS' => 'DIES', map { \$_ => undef } keys \%input };
+
+	# If it's not in mandatory_strings it sets to 'undef' which is the idea, to test { value => undef } in the args
+	push \@cases, { map { \$_ => \$mandatory_strings{\$_} } keys \%input };
+
+	# generate numeric, string, hashref and arrayref min/max edge cases
+	# TODO: For hashref and arrayref, if there's a \$spec->{schema} field, use that for the data that's being generated
+	foreach my \$field (keys \%input) {
+		my \$spec = \$input{\$field} || {};
+		my \$type = \$spec->{type} || 'string';
+
 		if (exists \$spec->{memberof} && ref \$spec->{memberof} eq 'ARRAY' && \@{\$spec->{memberof}}) {
+			# Generate edge cases for memberof
 			# inside values
 			foreach my \$val (\@{\$spec->{memberof}}) {
-				push \@cases, { \$field => \$val };
+				push \@cases, { \%mandatory_strings, \$field => \$val };
 			}
 			# outside value
 			my \$outside;
@@ -669,9 +717,96 @@ sub fuzz_inputs {
 			} else {
 				\$outside = 'INVALID_MEMBEROF';
 			}
-			push \@cases, { \$field => \$outside, _STATUS => 'DIES' };
+			push \@cases, { \%mandatory_strings, \$field => \$outside, _STATUS => 'DIES' };
+		} else {
+			# Generate edge cases for min/max
+			if (\$type eq 'number' || \$type eq 'integer') {
+				if (defined \$spec->{min}) {
+					push \@cases, { \$field => \$spec->{min} + 1 };	# just inside
+					push \@cases, { \$field => \$spec->{min} };	# border
+					push \@cases, { \$field => \$spec->{min} - 1, _STATUS => 'DIES' }; # outside
+				} else {
+					push \@cases, { \$field => 0 };	# No min, so 0 should be allowable
+					push \@cases, { \$field => -1 };	# No min, so -1 should be allowable
+				}
+				if (defined \$spec->{max}) {
+					push \@cases, { \$field => \$spec->{max} - 1 };	# just inside
+					push \@cases, { \$field => \$spec->{max} };	# border
+					push \@cases, { \$field => \$spec->{max} + 1, _STATUS => 'DIES' }; # outside
+				}
+			} elsif (\$type eq 'string') {
+				if (defined \$spec->{min}) {
+					my \$len = \$spec->{min};
+					push \@cases, { %mandatory_strings, \$field => 'a' x (\$len + 1) };	# just inside
+					push \@cases, { %mandatory_strings, \$field => 'a' x \$len };	# border
+					push \@cases, { %mandatory_strings, \$field => 'a' x (\$len - 1), _STATUS => 'DIES' } if \$len > 0; # outside
+				} else {
+					push \@cases, { %mandatory_strings, \$field => '' };	# No min, empty string should be allowable
+				}
+				if (defined \$spec->{max}) {
+					my \$len = \$spec->{max};
+					push \@cases, { %mandatory_strings, \$field => 'a' x (\$len - 1), %mandatory_strings };	# just inside
+					push \@cases, { %mandatory_strings, \$field => 'a' x \$len, %mandatory_strings};	# border
+					push \@cases, { %mandatory_strings, \$field => 'a' x (\$len + 1), _STATUS => 'DIES', %mandatory_strings }; # outside
+				}
+			} elsif (\$type eq 'arrayref') {
+				if (defined \$spec->{min}) {
+					my \$len = \$spec->{min};
+					push \@cases, { \$field => [ (1) x (\$len + 1) ] };	# just inside
+					push \@cases, { \$field => [ (1) x \$len ] };	# border
+					push \@cases, { \$field => [ (1) x (\$len - 1) ], _STATUS => 'DIES' } if \$len > 0; # outside
+				} else {
+					push \@cases, { \$field => [] };	# No min, empty array should be allowable
+				}
+				if (defined \$spec->{max}) {
+					my \$len = \$spec->{max};
+					push \@cases, { \$field => [ (1) x (\$len - 1) ] };	# just inside
+					push \@cases, { \$field => [ (1) x \$len ] };	# border
+					push \@cases, { \$field => [ (1) x (\$len + 1) ], _STATUS => 'DIES' }; # outside
+				}
+			} elsif (\$type eq 'hashref') {
+				if (defined \$spec->{min}) {
+					my \$len = \$spec->{min};
+					push \@cases, { \$field => { map { "k\$_" => 1 }, 1 .. (\$len + 1) } };
+					push \@cases, { \$field => { map { "k\$_" => 1 }, 1 .. \$len } };
+					push \@cases, { \$field => { map { "k\$_" => 1 }, 1 .. (\$len - 1) }, _STATUS => 'DIES' } if \$len > 0;
+				} else {
+					push \@cases, { \$field => {} };	# No min, empty hash should be allowable
+				}
+				if (defined \$spec->{max}) {
+					my \$len = \$spec->{max};
+					push \@cases, { \$field => { map { "k\$_" => 1 }, 1 .. (\$len - 1) } };
+					push \@cases, { \$field => { map { "k\$_" => 1 }, 1 .. \$len } };
+					push \@cases, { \$field => { map { "k\$_" => 1 }, 1 .. (\$len + 1) }, _STATUS => 'DIES' };
+				}
+			} elsif (\$type eq 'boolean') {
+				if (exists \$spec->{memberof} && ref \$spec->{memberof} eq 'ARRAY') {
+					# memberof already defines allowed booleans
+					foreach my \$val (\@{\$spec->{memberof}}) {
+						push \@cases, { \$field => \$val };
+					}
+				} else {
+					# basic boolean edge cases
+					push \@cases, { \$field => 0 };
+					push \@cases, { \$field => 1 };
+					push \@cases, { \$field => undef, _STATUS => 'DIES' };
+					push \@cases, { \$field => 2, _STATUS => 'DIES' };	# invalid boolean
+				}
+			}
 		}
 	}
+
+	# TODO: dedup, fuzzing can easily generate repeats
+	# our \$dedup = 1;	# default on
+
+	# later
+	# if (\$dedup) {
+		# my \%seen;
+		# \@cases = grep {
+			# my \$dump = encode_json(\$_);
+			# !\$seen{\$dump}++
+		# } \@cases;
+	# }
 
 	return \\\@cases;
 }
@@ -681,12 +816,14 @@ foreach my \$case (\@{fuzz_inputs()}) {
 	# lives_ok { %params = get_params(\\%input, \%\$case) } 'Params::Get input check';
 	# lives_ok { validate_strict(\\%input, %params) } 'Params::Validate::Strict input check';
 
+	::diag(Dumper[\$case]) if(\$ENV{'TEST_VERBOSE'});
+
 	my \$result;
-	if(my \$status = delete \$output{'_STATUS'}) {
+	if(my \$status = delete \$case->{'_STATUS'} || delete \$output{'_STATUS'}) {
 		if(\$status eq 'DIES') {
 			dies_ok { \$result = $call_code } 'function call dies';
 		} elsif(\$status eq 'WARNS') {
-			warnings_exist { \$result = $call_code } qr[''], 'function call warns';
+			warnings_exist { \$result = $call_code } qr/./, 'function call warns';
 		} else {
 			lives_ok { \$result = $call_code } 'function call survives';
 		}
@@ -718,7 +855,13 @@ __END__
 
 =head1 SEE ALSO
 
-L<Test::Most>, L<Params::Get>, L<Params::Validate::Strict>, L<Return::Set>, L<YAML::XS>
+=over 4
+
+=item * Test coverage report: L<https://nigelhorne.github.io/App-Test-Generator/coverage/>
+
+=item * L<Test::Most>, L<Params::Get>, L<Params::Validate::Strict>, L<Return::Set>, L<YAML::XS>
+
+=back
 
 =head1 AUTHOR
 

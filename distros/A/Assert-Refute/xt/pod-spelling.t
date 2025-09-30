@@ -13,11 +13,11 @@ BEGIN {
         spelling => {
             allow_words => [qw[
                 Konstantin Uvarin Forsyth
-                falsifiability stringified
+                falsifiability stringified rethrown
                 github metacpan annocpan CPAN
                 regex min max
                 diag isnt ok qr
-                TBD
+                TBD DSL
             ]],
         }
     );

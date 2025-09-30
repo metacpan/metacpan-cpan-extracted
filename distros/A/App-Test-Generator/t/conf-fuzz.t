@@ -22,9 +22,12 @@ like($contents, qr/diag\(/, 'fuzz test has diag line');
 eval {
 	system("$^X -c $outfile");
 };
-diag($@) if($@);
-ok(!$@, "$outfile compiles");
 
-unlink $outfile;
+if($@) {
+	diag($@);
+} else {
+	unlink $outfile;
+}
+ok(!$@, "$outfile compiles");
 
 done_testing();

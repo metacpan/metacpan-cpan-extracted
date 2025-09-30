@@ -4,12 +4,17 @@ author:
   - 'Nigel Horne <njh@nigelhorne.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  File::Glob: '0'
   File::Temp: '0'
+  File::stat: '0'
   IPC::System::Simple: '0'
+  JSON::MaybeXS: '0'
+  POSIX: '0'
+  Readonly: '0'
   Test::DescribeMe: '0'
   Test::More: '0'
   Test::Needs: '0'
-  Test::Returns: '0'
+  Test::Returns: '0.02'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -32,9 +37,11 @@ requires:
   Return::Set: '0'
   Test::Most: '0'
   YAML::XS: '0'
+  autodie: '0'
   perl: '5.014'
 resources:
   bugtracker: https://github.com/nigelhorne/App-Test-Generator/issues
-  repository: https://github.com/nigelhorne/App-Test-Generator.git
-version: '0.02'
+  homepage: https://metacpan.org/pod/App::Test::Generator
+  repository: git://github.com/nigelhorne/App-Test-Generator.git
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

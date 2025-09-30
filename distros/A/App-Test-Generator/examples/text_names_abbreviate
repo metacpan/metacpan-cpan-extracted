@@ -1,0 +1,27 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+our %input = (
+	'name' => { 'type' => 'string', 'min' => 1 },
+	'format' => {
+		'type' => 'string',
+		'memberof' => [ 'default', 'initials', 'compact', 'shortlast' ],
+		'optional' => 1
+	}, 'style' => {
+		'type' => 'string',
+		'memberof' => [ 'first_last', 'last_first' ],
+		'optional' => 1
+	}, 'separator' => {
+		'type' => 'string',
+		'optional' => 1
+	}
+);
+
+our %output = (
+	 type => 'string'
+);
+
+our $module = 'Text::Names::Abbreviate';
+our $function = 'abbreviate';
