@@ -566,7 +566,20 @@ S20:
  * JJV case df > 1.0
  * gennch = genchi(df-1.0)+pow(gennor(sqrt(xnonc),1.0),2.0); <- OLD
  */
-    gennch = 2.0*sgamma((df-1.0)/2.0)+pow(snorm()+sqrt(xnonc),2.0);
+/*   the following expression is split to ensure consistent evaluation
+     across platforms.  since sgamma() and snorm() both change the state
+     of the random number generator, it is important that they be evaluated
+     in the same order, regardless of how the compiler chooses to order
+     things
+
+     gennch = 2.0*sgamma((df-1.0)/2.0)+pow(snorm()+sqrt(xnonc),2.0;
+*/
+    {
+      double t1, t2;
+      t1 = 2.0*sgamma((df-1.0)/2.0);
+      t2 = pow(snorm()+sqrt(xnonc),2.0);
+      gennch = t1 + t2;
+    }
 S30:
     return gennch;
 }
@@ -620,7 +633,20 @@ S10:
     goto S30;
 S20:
 /* JJV case df > 1.0 */
+/*   the following expression is split to ensure consistent evaluation
+     across platforms.  since sgamma() and snorm() both change the state
+     of the random number generator, it is important that they be evaluated
+     in the same order, regardless of how the compiler chooses to order
+     things
+
     xnum = (2.0*sgamma((dfn-1.0)/2.0)+pow(snorm()+sqrt(xnonc),2.0))/dfn;
+*/
+    {
+      double t1, t2;
+      t1 = 2.0*sgamma((dfn-1.0)/2.0);
+      t2 = pow(snorm()+sqrt(xnonc),2.0);
+      xnum = (t1 + t2) / dfn;
+    }
 S30:
     xden = 2.0*sgamma(dfd/2.0)/dfd;
 /*

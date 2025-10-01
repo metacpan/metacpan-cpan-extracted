@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File.pm
-## Version v0.14.0
+## Version v0.15.0
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2025/09/06
+## Modified 2025/09/30
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -143,7 +143,7 @@ BEGIN
     # Catching non-ascii characters: [^\x00-\x7F]
     # Credits to: File::Util
     $ILLEGAL_CHARACTERS = qr/[\x5C\/\|\015\012\t\013\*\"\?\<\:\>]/;
-    our $VERSION = 'v0.14.0';
+    our $VERSION = 'v0.15.0';
 };
 
 use v5.12.0;
@@ -599,8 +599,39 @@ sub checksum_md5
     my $self = shift( @_ );
     return( $self->error( "File ", $self->filename, " does not exist." ) ) if( !$self->exists );
     return( $self->error( "File ", $self->filename, " is not a file." ) ) if( !$self->is_file );
-    $self->_load_class( 'Crypt::Digest::MD5' ) || return( $self->pass_error );
-    return( Crypt::Digest::MD5::md5_file_hex( $self->filename ) );
+    if( $self->_load_class( 'Crypt::Digest::MD5' ) )
+    {
+        return( Crypt::Digest::MD5::md5_file_hex( $self->filename ) );
+    }
+    else
+    {
+        $self->_load_class( 'Digest::MD5' ) || return( $self->pass_error );
+        my $md5 = Digest::MD5->new;
+        my $is_opened = $self->is_opened;
+        my $fh;
+        if( $is_opened )
+        {
+            my $fname = $self->filename;
+            my $clone = $self->new( "$fname" ) || return( $self->pass_error );
+            $fh = $clone->open( '<', { binmode => 'raw' } ) || return( $self->pass_error( $clone->error ) );
+        }
+        else
+        {
+            $fh = $self->open( '<', { binmode => 'raw' } ) || return( $self->pass_error );
+        }
+        # try-catch
+        local $@;
+        eval
+        {
+            $md5->addfile( $fh );
+        };
+        $fh->close;
+        if( $@ )
+        {
+            return( $self->error( "Error adding file handle $fh to \$md5->addfile: $@" ) );
+        }
+        return( $md5->hexdigest );
+    }
 }
 
 sub checksum_sha256
@@ -608,8 +639,39 @@ sub checksum_sha256
     my $self = shift( @_ );
     return( $self->error( "File ", $self->filename, " does not exist." ) ) if( !$self->exists );
     return( $self->error( "File ", $self->filename, " is not a file." ) ) if( !$self->is_file );
-    $self->_load_class( 'Crypt::Digest::SHA256' ) || return( $self->pass_error );
-    return( Crypt::Digest::SHA256::sha256_file_hex( $self->filename ) );
+    if( $self->_load_class( 'Crypt::Digest::SHA256' ) )
+    {
+        return( Crypt::Digest::SHA256::sha256_file_hex( $self->filename ) );
+    }
+    else
+    {
+        $self->_load_class( 'Digest::SHA' ) || return( $self->pass_error );
+        my $sha = Digest::SHA->new(256);
+        my $is_opened = $self->is_opened;
+        my $fh;
+        if( $is_opened )
+        {
+            my $fname = $self->filename;
+            my $clone = $self->new( "$fname" ) || return( $self->pass_error );
+            $fh = $clone->open( '<', { binmode => 'raw' } ) || return( $self->pass_error( $clone->error ) );
+        }
+        else
+        {
+            $fh = $self->open( '<', { binmode => 'raw' } ) || return( $self->pass_error );
+        }
+        # try-catch
+        local $@;
+        eval
+        {
+            $sha->addfile( $fh );
+        };
+        $fh->close;
+        if( $@ )
+        {
+            return( $self->error( "Error adding file handle $fh to \$md5->addfile: $@" ) );
+        }
+        return( $sha->hexdigest );
+    }
 }
 
 sub checksum_sha512
@@ -617,8 +679,39 @@ sub checksum_sha512
     my $self = shift( @_ );
     return( $self->error( "File ", $self->filename, " does not exist." ) ) if( !$self->exists );
     return( $self->error( "File ", $self->filename, " is not a file." ) ) if( !$self->is_file );
-    $self->_load_class( 'Crypt::Digest::SHA512' ) || return( $self->pass_error );
-    return( Crypt::Digest::SHA512::sha512_file_hex( $self->filename ) );
+    if( $self->_load_class( 'Crypt::Digest::SHA512' ) )
+    {
+        return( Crypt::Digest::SHA512::sha512_file_hex( $self->filename ) );
+    }
+    else
+    {
+        $self->_load_class( 'Digest::SHA' ) || return( $self->pass_error );
+        my $sha = Digest::SHA->new(512);
+        my $is_opened = $self->is_opened;
+        my $fh;
+        if( $is_opened )
+        {
+            my $fname = $self->filename;
+            my $clone = $self->new( "$fname" ) || return( $self->pass_error );
+            $fh = $clone->open( '<', { binmode => 'raw' } ) || return( $self->pass_error( $clone->error ) );
+        }
+        else
+        {
+            $fh = $self->open( '<', { binmode => 'raw' } ) || return( $self->pass_error );
+        }
+        # try-catch
+        local $@;
+        eval
+        {
+            $sha->addfile( $fh );
+        };
+        $fh->close;
+        if( $@ )
+        {
+            return( $self->error( "Error adding file handle $fh to \$md5->addfile: $@" ) );
+        }
+        return( $sha->hexdigest );
+    }
 }
 
 sub chdir
@@ -5684,7 +5777,7 @@ Module::Generic::File - File Object Abstraction Class
 
 =head1 VERSION
 
-    v0.14.0
+    v0.15.0
 
 =head1 DESCRIPTION
 
@@ -5991,25 +6084,28 @@ Shorthand for L</copy>
 
 =head2 checksum_md5
 
-This uses L<Crypt::Digest::MD5> to perform a md5 checksum as an hex value and returns it.
+This performs a md5 checksum as an hex value and returns it.
 
-It requires this module L<Crypt::Digest::MD5> to be installed, and also the file to be a plain text file and not a directory, otherwise this sets an L<error|Module::Generic/error> and return C<undef>
+It tries to load L<Crypt::Digest::MD5> if it is installed, otherwise it will default to L<Digest::MD5>.
+It requires the file to be a plain text file and not a directory, otherwise this sets an L<error|Module::Generic/error> and return C<undef>
 
 On success, this returns a md5 hex digest of the underlying file.
 
 =head2 checksum_sha256
 
-This uses L<Crypt::Digest::SHA256> to perform a sha256 checksum as an hex value and returns it.
+This performs a sha256 checksum as an hex value and returns it.
 
-It requires this module L<Crypt::Digest::SHA256> to be installed, and also the file to be a plain text file and not a directory, otherwise this sets an L<error|Module::Generic/error> and return C<undef>
+It tries to load L<Crypt::Digest::SHA256> if it is installed, otherwise it will default to L<Digest::SHA>.
+It requires the file to be a plain text file and not a directory, otherwise this sets an L<error|Module::Generic/error> and return C<undef>
 
 On success, this returns a md5 hex digest of the underlying file.
 
 =head2 checksum_sha512
 
-This uses L<Crypt::Digest::SHA512> to perform a sha512 checksum as an hex value and returns it.
+This performs a sha512 checksum as an hex value and returns it.
 
-It requires this module L<Crypt::Digest::SHA512> to be installed, and also the file to be a plain text file and not a directory, otherwise this sets an L<error|Module::Generic/error> and return C<undef>
+It tries to load L<Crypt::Digest::SHA512> if it is installed, otherwise it will default to L<Digest::SHA>.
+It requires the file to be a plain text file and not a directory, otherwise this sets an L<error|Module::Generic/error> and return C<undef>
 
 On success, this returns a md5 hex digest of the underlying file.
 

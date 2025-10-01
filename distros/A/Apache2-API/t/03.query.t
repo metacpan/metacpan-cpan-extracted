@@ -7,7 +7,6 @@ BEGIN
     use open ':std' => ':utf8';
     # use Test2::V0;
     use Test::More;
-    use Devel::Confess;
     use vars qw( $DEBUG );
     use ok( 'Apache2::API::Query' ) || bail_out( "Cannot load Apache2::API::Query" );
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;

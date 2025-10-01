@@ -1,0 +1,15 @@
+Tue Sep 30 10:39:03 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[BigBang]:
+
+	* ChangeLog: new
+	* Makefile: new
+	* README.md: new
+	* VERSION: new
+	* buildspec.yml: new
+	* lib/Log/Log4perl/Appender/AmazonSES.pm.in: new
+	* requires: new
+	* t/00-amazonses.t: new
+	* test-requires: new
+	* version.mk: new
+	* .gitignore: new

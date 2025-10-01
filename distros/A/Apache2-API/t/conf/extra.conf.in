@@ -13,7 +13,7 @@ PerlSwitches -I@ServerRoot@/lib
 PerlSwitches -I@ServerRoot@/../lib
 PerlSwitches -I@ServerRoot@/..
 # preload the module
-PerlModule Cookie::Jar
+# PerlModule Cookie::Jar
 PerlOptions +GlobalRequest
 PerlSetupEnv On
 PerlSetVar API_DEBUG 4

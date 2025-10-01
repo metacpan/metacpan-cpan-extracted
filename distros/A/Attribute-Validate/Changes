@@ -1,0 +1,18 @@
+0.0.1 Tue 23 Sep 22:43:48 CEST 2025
+    - Initial version
+
+0.0.2 Mon Sep 29 18:12:28 2025 +0200
+    - Setting minimum Type::Params version
+    - Fixing typo not mentioning you cannot use anonymous subs.
+
+0.0.3 Mon Sep 29 18:48:15 2025 +0200
+    - Adding anon_requires to enforce types into anonsubs.
+    - More tests.
+
+0.0.4 Tue Sep 30 19:12:27 2025 +0200
+    - Improving Kwalitee score
+    - Separating Subs from Attributes in POD
+
+0.0.5 Tue Sep 30 21:24:59 2025 +0200
+    - Adding VoidContext validation to enforce how a sub must be used.
+    - Adding NoVoidContext validation to enforce how a sub must be used.

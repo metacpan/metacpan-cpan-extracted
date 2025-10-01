@@ -1,5 +1,9 @@
 Change history for SBOM::CycloneDX
 
+1.05 2025-09-30
+    - Updating SPDX license list to 3.27.0
+    - FIX "Initialization of state variables in list context currently forbidden" in Perl < 5.28
+
 1.04 2025-09-07
     - Fix name in Makefile.PL (giterlizzi/perl-SBOM-CycloneDX#2)
     - Fix mapping of "perl_5" license with SPDX expression

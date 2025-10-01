@@ -24,7 +24,7 @@ Module::Generic::Dynamic - Dynamic Object Class
     # Accessing methods
     print $object->name; # Test Product
     print $object->metadata->sku; # ABC123
-    print $object->tags->join(','); # product,test
+    print $object->tags->join(','); # product,entrepreneurship,capital
     print $object->created->year; # 2023
 
     # Dynamic method creation via AUTOLOAD

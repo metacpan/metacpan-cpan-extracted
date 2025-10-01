@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<collection
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"
+  xmlns="http://www.loc.gov/MARC21/slim">
+
+<record>
+  <leader>01609cem a2200445 i 4500</leader>
+  <controlfield tag="001">ck9102885</controlfield>
+  <controlfield tag="003">CZ PrNK</controlfield>
+  <controlfield tag="005">20240603144749.0</controlfield>
+  <controlfield tag="007">ad canzn</controlfield>
+  <controlfield tag="008">910607s1990    xr z      e     1   cze  </controlfield>
+  <datafield tag="015" ind1=" " ind2=" ">
+    <subfield code="a">cnb000060952</subfield>
+    <subfield code="z">cnb000162859</subfield>
+  </datafield>
+  <datafield tag="020" ind1=" " ind2=" ">
+    <subfield code="a">80-7011-077-5 :</subfield>
+    <subfield code="c">69 Kčs</subfield>
+  </datafield>
+  <datafield tag="034" ind1="1" ind2=" ">
+    <subfield code="a">a</subfield>
+    <subfield code="b">200000</subfield>
+  </datafield>
+  <datafield tag="035" ind1=" " ind2=" ">
+    <subfield code="a">(OCoLC)25586943</subfield>
+  </datafield>
+  <datafield tag="040" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+    <subfield code="b">cze</subfield>
+    <subfield code="d">ABA001</subfield>
+    <subfield code="e">rda</subfield>
+  </datafield>
+  <datafield tag="043" ind1=" " ind2=" ">
+    <subfield code="a">e-cs---</subfield>
+  </datafield>
+  <datafield tag="072" ind1=" " ind2="7">
+    <subfield code="a">913(437)</subfield>
+    <subfield code="x">Geografie Česka a Slovenska, reálie, cestování</subfield>
+    <subfield code="2">Konspekt</subfield>
+    <subfield code="9">7</subfield>
+  </datafield>
+  <datafield tag="072" ind1=" " ind2="7">
+    <subfield code="a">912</subfield>
+    <subfield code="x">Mapy. Atlasy. Glóby</subfield>
+    <subfield code="2">Konspekt</subfield>
+    <subfield code="9">7</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">656.1</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">913(437)</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">(084.4)</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="110" ind1="2" ind2=" ">
+    <subfield code="a">Kartografie Praha (firma)</subfield>
+    <subfield code="7">kn20010724363</subfield>
+    <subfield code="4">ctg</subfield>
+  </datafield>
+  <datafield tag="245" ind1="1" ind2="0">
+    <subfield code="a">Velký autoatlas Československa :</subfield>
+    <subfield code="b">1:200 000 /</subfield>
+    <subfield code="c">vydala a zpracovala Kartografie Praha, s.p.</subfield>
+  </datafield>
+  <datafield tag="250" ind1=" " ind2=" ">
+    <subfield code="a">1. vydání</subfield>
+  </datafield>
+  <datafield tag="255" ind1=" " ind2=" ">
+    <subfield code="a">Měřítko 1:200 000</subfield>
+  </datafield>
+  <datafield tag="264" ind1=" " ind2="1">
+    <subfield code="a">Praha :</subfield>
+    <subfield code="b">Kartografie Praha,</subfield>
+    <subfield code="c">1990</subfield>
+  </datafield>
+  <datafield tag="264" ind1=" " ind2="3">
+    <subfield code="a">Harmanec :</subfield>
+    <subfield code="b">Vojenký kartografický ústav</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">1 atlas (93 stran) :</subfield>
+    <subfield code="b">přibližně 63 barevných map ;</subfield>
+    <subfield code="c">32 cm</subfield>
+  </datafield>
+  <datafield tag="336" ind1=" " ind2=" ">
+    <subfield code="a">kartografický obraz</subfield>
+    <subfield code="b">cri</subfield>
+    <subfield code="2">rdacontent</subfield>
+  </datafield>
+  <datafield tag="336" ind1=" " ind2=" ">
+    <subfield code="a">text</subfield>
+    <subfield code="b">txt</subfield>
+    <subfield code="2">rdacontent</subfield>
+  </datafield>
+  <datafield tag="337" ind1=" " ind2=" ">
+    <subfield code="a">bez média</subfield>
+    <subfield code="b">n</subfield>
+    <subfield code="2">rdamedia</subfield>
+  </datafield>
+  <datafield tag="338" ind1=" " ind2=" ">
+    <subfield code="a">svazek</subfield>
+    <subfield code="b">nc</subfield>
+    <subfield code="2">rdacarrier</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Obsahuje rejstřík</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Průjezdní plánky měst, Grand prix (Brno)</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="7">
+    <subfield code="a">silniční doprava</subfield>
+    <subfield code="7">ph116143</subfield>
+    <subfield code="z">Československo</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="7">
+    <subfield code="a">autoatlasy</subfield>
+    <subfield code="7">fd131844</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="901" ind1=" " ind2=" ">
+    <subfield code="o">19970407</subfield>
+    <subfield code="f">1. vyd.</subfield>
+    <subfield code="g">Stejné ISBN přiděleno duplicitně též 2., nezm. vyd.</subfield>
+  </datafield>
+  <datafield tag="910" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+  </datafield>
+  <datafield tag="964" ind1=" " ind2=" ">
+    <subfield code="a">automapy - Československo - atlasy</subfield>
+  </datafield>
+  <datafield tag="998" ind1=" " ind2=" ">
+    <subfield code="a">000060952</subfield>
+  </datafield>
+</record>
+
+</collection>

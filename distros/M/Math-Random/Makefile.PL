@@ -1,31 +1,40 @@
+#! perl
+
 use ExtUtils::MakeMaker;
 
 #--- Original or revised phrtsd?
-$OPT = $ARGV[0];
-if ($OPT =~ /phrtsd_orig/i) {
-   warn "*"x40, "\nUsing original phrtsd\n", "*"x40, "\n";
-   $def = '-DPHRTSD_ORIG';
-   copy('test1.pl', 'test.pl');
-} else {
-   $def = '';
-   copy('test2.pl', 'test.pl');
-}
+my $OPT = $ARGV[0];
+my $def = q{};
+$def = '-DPHRTSD_ORIG'
+  if $OPT =~ /phrtsd_orig/i;
 
 WriteMakefile(
-    'NAME'		=> 'Math::Random',
-    'VERSION_FROM'	=> 'Random.pm',
-    'OBJECT'		=> '$(O_FILES)',
-    'LIBS'		=> ['-lm'],
-    'DEFINE'		=> $def,
-    'INC'		=> '',     # e.g., '-I/opt/pkg/perl5.002/dist' 
-    'dist'		=> { COMPRESS=>"gzip -9", SUFFIX=>"gz" },
+    NAME         => 'Math::Random',
+    VERSION      => '0.75',
+    XS_VERSION   => '0.75',
+    # VERSION_FROM => 'Random.pm',
+    OBJECT       => '$(O_FILES)',
+    LIBS         => ['-lm'],
+    DEFINE       => $def,
+    MIN_PERL_VERSION => '5.10.0',
+    TEST_REQUIRES => {
+        'Test2::V0' => '1.302200',  # a somewhat recent version will do
+    },
+
+    META_ADD => {
+        "meta-spec" => { version => 2 },
+        resources => {
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/djerius/Math-Random.git',
+                web  => 'https://github.com/djerius/Math-Random',
+            },
+            bugtracker => {
+                mailto => 'bug-math-random@rt.cpan.org',
+                web    => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Math-Random',
+            },
+        },
+    },
+
 );
 
-sub copy {
- my ($in, $out) = @_;
- open(I, $in) or die "Could not open $in: $!";
- open(O, ">$out") or die "Could not open $out: $!";
- while (<I>) { print O; }
- close I;
- close O;
-}

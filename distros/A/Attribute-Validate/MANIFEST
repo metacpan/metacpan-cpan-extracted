@@ -7,3 +7,5 @@ t-modern-perl/0000001-modern-usecase.t
 t/0000001-requires.t
 META.yml
 META.json
+README.md
+Changes

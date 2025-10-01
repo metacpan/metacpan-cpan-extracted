@@ -10,7 +10,7 @@ require SBOM::CycloneDX::Util;
 
 use Cpanel::JSON::XS qw(decode_json);
 
-state @LICENSES = ();
+state @LICENSES;
 
 unless (@LICENSES) {
     my $spdx_json_schema_file = SBOM::CycloneDX::Schema::schema_file('spdx.schema.json');

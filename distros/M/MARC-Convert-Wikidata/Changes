@@ -1,3 +1,7 @@
+0.31 2025-09-30T13:58:20+02:00
+ - Add clean_isbn() function.
+ - Fix ISBN processing (cleanup of extra separator).
+
 0.30 2025-08-03T13:09:26+02:00
  - Update to new version of Wikibase::Datatype@0.39.
 

@@ -34,6 +34,7 @@ use v5.40;
 
 use Data::Dumper;
 use Mojo::JSON qw{decode_json};
+use Daje::Workflow::Database::Model;
 
 sub execute($self) {
 
@@ -45,9 +46,13 @@ sub execute($self) {
     );
 
     my $data->{context} = decode_json ($self->req->body);
+    $data->{context}->{workflow}->{workflow_pkey} =
+        Daje::Workflow::Database::Model->new(
+            pg => $self->pg
+        )->load_workflow_from_connector_fkey($data->{context}->{workflow});
+
     $data->{context}->{users_fkey} = $users_pkey;
     $data->{context}->{companies_fkey} = $companies_pkey;
-    $data->{context}->{workflow}->{workflow_pkey} = 0 unless $data->{context}->{workflow}->{workflow_pkey};
     #
     # push @{$data->{actions}}, "$self->stash('wf_action')";
     # $data->{workflow}->{workflow} = $self->stash('workflow');
@@ -62,15 +67,15 @@ sub execute($self) {
         $self->workflow->context($data);
         $self->workflow->process($data->{context}->{workflow}->{activity});
         if($self->workflow->error->has_error() == 0) {
-            $self->render(json => {'result' => 'success'});
+            $self->render(json => {result => 1, data => 'OK'});
         } else {
             $self->render(json =>
-                {'result' => 'failed', data => $self->workflow->error->error()}
+                {result => 0, data => $self->workflow->error->error()}
             );
         }
     } catch ($e) {
-        $self->render(json => {'result' => 'failed', data => $e});
         $self->app->log->error('Daje::Controller::Workflow::execute ' . $e);
+        $self->render(json => {result => 0, data => $e});
     };
     $self->app->log->debug('Daje::Controller::Workflow::execute ends');
 }

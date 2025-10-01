@@ -51,7 +51,7 @@ test_requires 'Test::NoWarnings' => 0;
 test_requires 'Test::Warn' => 0;
 test_requires 'Unicode::UTF8' => 0;
 tests_recursive;
-version '0.30';
+version '0.31';
 
 # Run.
 WriteAll();

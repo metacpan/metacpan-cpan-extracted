@@ -9,13 +9,13 @@ my $build = Module::Build->new(
     license           => 'mit',
     dist_version_from => 'lib/Attribute/Validate.pm',
     dist_author       => 'Sergio Iglesias <sergioxz@cpan.org>',
-    dist_abstract     =>
-      'Validate subroutine parameters.',
-    requires => {
+    dist_abstract     => 'Validate subroutine parameters.',
+    requires          => {
+        'perl'                => '5.16.3',
         'Attribute::Handlers' => 0,
-        'Carp' => 0,
-        'Carp::Always' => 0,
-        'Type::Params' => '2.008003',
+        'Carp'                => 0,
+        'Carp::Always'        => 0,
+        'Type::Params'        => '2.008003',
     },
     configure_requires => {
         'Module::Build' => 0,
@@ -28,7 +28,8 @@ my $build = Module::Build->new(
         resources => {
             bugtracker =>
               'https://github.com/sergiotarxz/Perl-Attribute-Validate/issues',
-            repository => 'https://github.com/sergiotarxz/Perl-Attribute-Validate',
+            repository =>
+              'https://github.com/sergiotarxz/Perl-Attribute-Validate',
         }
     },
 );

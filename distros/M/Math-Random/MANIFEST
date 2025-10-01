@@ -1,18 +1,19 @@
 Changes
-INSTALL
-Index
-MANIFEST
-Makefile.PL
-README
-Random.pm
-Random.xs
 com.c
 example.pl
 helper.c
 helper.h
+INSTALL
 linpack.c
+Makefile.PL
+MANIFEST			This list of files
+META.yml
 randlib.c
 randlib.h
-test1.pl
-test2.pl
-META.yml                                 Module meta-data (added by MakeMaker)
+Random.pm
+Random.xs
+README
+t/basegen.t
+t/test.t
+t/test_phrtsd_orig.t
+META.json                                Module JSON meta-data (added by MakeMaker)

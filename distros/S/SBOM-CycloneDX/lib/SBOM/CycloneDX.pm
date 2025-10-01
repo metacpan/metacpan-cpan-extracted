@@ -29,7 +29,7 @@ use constant JSON_SCHEMA_1_4 => 'http://cyclonedx.org/schema/bom-1.4.schema.json
 use constant JSON_SCHEMA_1_5 => 'http://cyclonedx.org/schema/bom-1.5.schema.json';
 use constant JSON_SCHEMA_1_6 => 'http://cyclonedx.org/schema/bom-1.6.schema.json';
 
-our $VERSION = 1.04;
+our $VERSION = 1.05;
 
 our %JSON_SCHEMA = (
     '1.2' => JSON_SCHEMA_1_2,

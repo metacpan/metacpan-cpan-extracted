@@ -17,15 +17,16 @@ name: Attribute-Validate
 provides:
   Attribute::Validate:
     file: lib/Attribute/Validate.pm
-    version: v0.0.3
+    version: v0.0.5
 requires:
   Attribute::Handlers: '0'
   Carp: '0'
   Carp::Always: '0'
   Type::Params: '2.008003'
+  perl: v5.16.3
 resources:
   bugtracker: https://github.com/sergiotarxz/Perl-Attribute-Validate/issues
-  license: http://opensource.org/licenses/mit-license.php
+  license: http://www.opensource.org/licenses/mit-license.php
   repository: https://github.com/sergiotarxz/Perl-Attribute-Validate
-version: v0.0.3
+version: v0.0.5
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

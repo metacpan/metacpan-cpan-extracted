@@ -25,7 +25,7 @@ BEGIN
 sub cleanup
 {
     my $s = Apache2::ServerUtil->server;
-    $s->log->info( "startup.pl: cleanup Apache2::SSI::Notes..." );
+    $s->log->info( "startup.pl: cleanup..." );
     # print( STDERR "startup.pl: cleanup Apache2::SSI::Notes...\n" );
 }
 

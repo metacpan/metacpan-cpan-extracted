@@ -1,407 +1,388 @@
 package Math::Random;
 
+use v5.10;
 use strict;
+use warnings;
+
 use Carp;
-use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $AUTOLOAD);
 
-require Exporter;
-require DynaLoader;
-require AutoLoader;
+use parent qw( Exporter DynaLoader);
 
-@ISA = qw(Exporter DynaLoader);
-$VERSION = '0.72';
+our $VERSION = '0.75';
 
-@EXPORT = qw(random_normal 
-	     random_permutation 
-	     random_permuted_index
-	     random_uniform 
-	     random_uniform_integer 
-             random_seed_from_phrase
-             random_get_seed
-             random_set_seed_from_phrase
-             random_set_seed
-	     );
+## no critic ( Wantarray DollarAB ComplexMappings )
 
-@EXPORT_OK = qw(random_beta 
-		random_chi_square 
-		random_exponential 
-		random_f 
-		random_gamma 
-		random_multivariate_normal 
-		random_multinomial 
-		random_noncentral_chi_square 
-		random_noncentral_f 
-		random_normal 
-		random_permutation 
-		random_permuted_index
-		random_uniform 
-		random_poisson 
-		random_uniform_integer 
-		random_negative_binomial 
-		random_binomial 
-                random_seed_from_phrase
-                random_get_seed
-                random_set_seed_from_phrase
-                random_set_seed
-		);
+our @EXPORT = qw(random_normal
+  random_permutation
+  random_permuted_index
+  random_uniform
+  random_uniform_integer
+  random_seed_from_phrase
+  random_get_seed
+  random_set_seed_from_phrase
+  random_set_seed
+);
 
-%EXPORT_TAGS = ( all => [ @EXPORT_OK ] );
+our @EXPORT_OK = qw(random_beta
+  random_chi_square
+  random_exponential
+  random_f
+  random_gamma
+  random_multivariate_normal
+  random_multinomial
+  random_noncentral_chi_square
+  random_noncentral_f
+  random_normal
+  random_permutation
+  random_permuted_index
+  random_uniform
+  random_poisson
+  random_uniform_integer
+  random_negative_binomial
+  random_binomial
+  random_seed_from_phrase
+  random_get_seed
+  random_set_seed_from_phrase
+  random_set_seed
+  random_integer
+  random_init_generator
+  random_set_antithetic
+  random_advance_state
+  random_get_generator_num
+  random_set_generator_num
+);
 
-sub AUTOLOAD {
-    # This AUTOLOAD is used to 'autoload' constants from the constant()
-    # XS function.  If a constant is not found then control is passed
-    # to the AUTOLOAD in AutoLoader.
-
-    my $constname;
-    ($constname = $AUTOLOAD) =~ s/.*:://;
-    croak "& not defined" if $constname eq 'constant';
-    my $val = constant($constname, @_ ? $_[0] : 0);
-    if ($! != 0) {
-	if ($! =~ /Invalid/) {
-	    $AutoLoader::AUTOLOAD = $AUTOLOAD;
-	    goto &AutoLoader::AUTOLOAD;
-	}
-	else {
-		croak "Your vendor has not defined Math::Random macro $constname";
-	}
-    }
-    *$AUTOLOAD = sub () { $val };
-    goto &$AUTOLOAD;
-}
+our %EXPORT_TAGS = ( all => [@EXPORT_OK] );
 
 bootstrap Math::Random $VERSION;
 
 
 ### set seeds by default
-salfph(get_seed() || scalar(localtime));
+salfph( get_seed() || scalar( localtime ) );
 
 #####################################################################
 #		      RANDOM DEVIATE GENERATORS                     #
 #####################################################################
 
-sub random_beta { # Arguments: ($n,$aa,$bb)
-    croak "Usage: random_beta(\$n,\$aa,\$bb)" if scalar(@_) < 3;
-    my($n, $aa, $bb) = @_;
-    croak("($aa = \$aa < 1.0E-37) or ($bb = \$bb < 1.0E-37)\nin ".
-	  "random_beta(\$n,\$aa,\$bb)")
-	if (($aa < 1.0E-37) or ($bb < 1.0E-37));
-    return genbet($aa,$bb) unless wantarray();
-    my $val;
-    my @ans = (0) x $n;
-    foreach $val (@ans) { $val = genbet($aa,$bb); }
-    return @ans;
+sub random_beta {    # Arguments: ($n,$aa,$bb)
+
+    croak 'Usage: random_beta($n,$aa,$bb)' if @_ < 3;
+
+    my ( $n, $aa, $bb ) = @_;
+    croak( "random_beta: ($aa = \$aa < 1.0E-37) or ($bb = \$bb < 1.0E-37)" )
+      if ( $aa < 1.0E-37 ) || ( $bb < 1.0E-37 );
+
+    return wantarray
+      ? map { genbet( $aa, $bb ) } 1 .. $n
+      : genbet( $aa, $bb );
 }
 
-sub random_chi_square { # Arguments: ($n,$df)
-    croak "Usage: random_chi_square(\$n,\$df)" if scalar(@_) < 2;
-    my($n, $df) = @_;
-    croak "$df = \$df <= 0\nin random_chi_square(\$n,\$df)" if ($df <= 0);
-    return genchi($df) unless wantarray();
-    my $val;
-    my @ans = (0) x $n;
-    foreach $val (@ans) { $val = genchi($df); }
-    return @ans;
+sub random_chi_square {    # Arguments: ($n,$df)
+    croak 'Usage: random_chi_square(\$n,\$df)'
+      if @_ < 2;
+
+    my ( $n, $df ) = @_;
+    croak "random_chi_square: $df = \$df <= 0"
+      if $df <= 0;
+
+    return wantarray
+      ? map { genchi( $df ) } 1 .. $n
+      : genchi( $df );
 }
 
-sub random_exponential { # Arguments: ($n,$av), defaults (1,1)
-    return wantarray() ? (genexp(1)) : genexp(1)
-	if scalar(@_) == 0; # default behavior if no arguments
-    my($n, $av) = @_;
-    $av = 1 unless defined($av); # default $av is 1
-    croak "$av = \$av < 0\nin random_exponential(\$n,\$av)" if ($av < 0);
-    return genexp($av) unless wantarray();
-    my $val;
-    my @ans = (0) x $n;
-    foreach $val (@ans) { $val = genexp($av); }
-    return @ans;
+sub random_exponential {    # Arguments: ($n,$av), defaults (1,1)
+    return wantarray() ? ( genexp( 1 ) ) : genexp( 1 )
+      if @_ == 0;           # default behavior if no arguments
+
+    my ( $n, $av ) = @_;
+    $av //= 1;              # default $av is 1
+    croak "random_exponential: $av = \$av < 0"
+      if $av < 0;
+
+    return wantarray
+      ? map { genexp( $av ) } 1 .. $n
+      : genexp( $av );
 }
 
-sub random_f { # Arguments: ($n,$dfn,$dfd)
-    croak "Usage: random_f(\$n,\$dfn,\$dfd)" if scalar(@_) < 3;
-    my($n, $dfn, $dfd) = @_;
-    croak("($dfn = \$dfn <= 0) or ($dfd = \$dfd <= 0)\nin ".
-	  "random_f(\$n,\$dfn,\$dfd)") if (($dfn <= 0) or ($dfd <= 0));
-    return genf($dfn,$dfd) unless wantarray();
-    my $val;
-    my @ans = (0) x $n;
-    foreach $val (@ans) { $val = genf($dfn,$dfd); }
-    return @ans;
+sub random_f {    # Arguments: ($n,$dfn,$dfd)
+    croak 'Usage: random_f($n,$dfn,$dfd)' if @_ < 3;
+    my ( $n, $dfn, $dfd ) = @_;
+    croak( "random_f: ($dfn = \$dfn <= 0) or ($dfd = \$dfd <= 0" )
+      if ( $dfn <= 0 ) || ( $dfd <= 0 );
+
+    return wantarray
+      ? map { genf( $dfn, $dfd ) } 1 .. $n
+      : genf( $dfn, $dfd );
 }
 
-sub random_gamma { # Arguments: ($n,$a,$r)
-    croak "Usage: random_gamma(\$n,\$a,\$r)" if scalar(@_) < 3;
-    my($n, $a, $r) = @_;
-    croak "($a = \$a <= 0) or ($r = \$r <= 0)\nin random_gamma(\$n,\$a,\$r)"
-	if (($a <= 0) or ($r <= 0));
-    return gengam($a,$r) unless wantarray();
-    my $val;
-    my @ans = (0) x $n;
-    foreach $val (@ans) { $val = gengam($a,$r); }
-    return @ans;
+sub random_gamma {    # Arguments: ($n,$a,$r)
+    croak 'Usage: random_gamma($n,$a,$r)' if @_ < 3;
+    my ( $n, $a, $r ) = @_;
+    croak "random_gamma: ($a = \$a <= 0) or ($r = \$r <= 0)"
+      if ( $a <= 0 ) || ( $r <= 0 );
+
+    return wantarray
+      ? map { gengam( $a, $r ) } 1 .. $n
+      : gengam( $a, $r );
 }
 
-sub random_multivariate_normal { # Arguments: ($n, @mean, @covar(2-dim'l))
+sub random_multivariate_normal {    # Arguments: ($n, @mean, @covar(2-dimensional))
 
-    croak "Usage: random_multivariate_normal(\$n,\@mean,\@covar(2-dim'l))"
-	if (scalar(@_)) < 3;
-    my $n = shift(@_); # first element is number of obs. desired
-    my $p = scalar(@_)/2; # best guess at dimension of deviate
-    
+    croak 'Usage: random_multivariate_normal($n,@mean,@covar(2-dimensional))'
+      if @_ < 3;
+    my $n = shift( @_ );            # first element is number of obs. desired
+    my $p = @_ / 2;                 # best guess at dimension of deviate
+
     # check outline of arguments
-    croak("Sizes of \@mean and \@covar don't match\nin ".
-	  "random_multivariate_normal(\$n, \@mean, \@covar(2-dim'l))")
-	unless (($p == int($p)) and ("$_[$p - 1]" !~ /^ARRAY/) and
-		("$_[$p]" =~ /^ARRAY/));
-    
+    croak( q{random_multivariate_normal: Sizes of @mean and @covar don't match} )
+      if $p != int( $p )
+      || ref $_[ $p - 1 ] eq 'ARRAY'
+      || ref $_[$p] ne 'ARRAY';
+
     # linearize input - it seems faster to push
-    my @linear = ();
-    
-    push @linear, splice(@_, 0, $p); # fill first $p slots w/ mean
-    
+    my @linear = splice( @_, 0, $p );    # fill first $p slots w/ mean
+
     # expand array references
-    my $ref;
-    foreach $ref (@_) { # for the rest of the input
-	
-	# check length of row of @covariance
-	croak("\@covar is not a $p by $p array ($p is size of \@mean)\nin ".
-	      "random_multivariate_normal(\$n, \@mean, \@covar(2-dim'l))")
-	    unless (scalar(@{$ref}) == $p);
-	
-	push @linear, @{$ref};
+    foreach my $ref ( @_ ) {             # for the rest of the input
+
+        # check length of row of @covariance
+        croak( 'random_multivariate_normal: @covar is not a $p x $p array ($p is size of @mean)' )
+          unless @{$ref} == $p;
+
+        push @linear, @{$ref};
     }
-    
+
     # load float working array with linearized input
-    putflt(@linear) or
-	croak "Unable to allocate memory\nin random_multivariate_normal";
-    
+    putflt( @linear )
+      or croak 'random_multivariate_normal: unable to allocate memory';
+
     # initialize parameter array for multivariate normal generator
-    psetmn($p) or 
-	croak "Unable to allocate memory\nin random_multivariate_normal";
-    
-    unless (wantarray()) {
-	### if called in a scalar context, returns single refernce to obs
-	pgenmn();
-	return [ getflt($p) ];
+    psetmn( $p )
+      or croak 'random_multivariate_normal: unable to allocate memory';
+
+    unless ( wantarray() ) {
+        ### if called in a scalar context, returns single reference to obs
+        pgenmn();
+        return [ getflt( $p ) ];
     }
-    
+
     # otherwise return an $n by $p array of obs.
-    my @ans = (0) x $n;
-    foreach $ref (@ans) {
-	pgenmn();
-	$ref = [ getflt($p) ];
-    }
-    return @ans;
+    return map {
+        pgenmn();
+        [ getflt( $p ) ]
+    } 1 .. $n;
 }
 
-sub random_multinomial { # Arguments: ($n,@p)
-    my($n, @p) = @_;
-    my $ncat = scalar(@p); # number of categories
-    $n = int($n);
-    croak "$n = \$n < 0\nin random_multinomial(\$n,\@p)" if ($n < 0);
-    croak "$ncat = (length of \@p) < 2\nin random_multinomial(\$n,\@p)"
-	if ($ncat < 2);
-    rspriw($ncat) or croak "Unable to allocate memory\nin random_multinomial";
-    my($i,$sum,$val) = (0,0,0);
+sub random_multinomial {    # Arguments: ($n,@p)
+    my ( $n, @p ) = @_;
+    my $ncat = @p;          # number of categories
+    $n = int( $n );
+
+    croak "random_multinomial: $n = \$n < 0"
+      if $n < 0;
+
+    croak "random_multinomial: $ncat = (length of \@p) < 2"
+      if $ncat < 2;
+
+    rspriw( $ncat )
+      or croak 'random_multinomial: Unable to allocate memory';
+
     pop @p;
-    rsprfw(scalar(@p)) or 
-	croak "Unable to allocate memory\nin random_multinomial";
-    foreach $val (@p) {
-	croak "$val = (some \$p[i]) < 0 or > 1\nin random_multinomial(\$n,\@p)"
-	    if (($val < 0) or ($val > 1));
-	svprfw($i,$val);
-	$i++;
-	$sum += $val;
+    rsprfw( scalar( @p ) )
+      or croak 'random_multinomial: Unable to allocate memory';
+
+    my ( $i, $sum ) = ( 0, 0 );
+    foreach my $val ( @p ) {
+        croak "random_multinomial: $val = (some \$p[i]) < 0 or > 1"
+          if $val < 0 || $val > 1;
+        svprfw( $i++, $val );
+        $sum += $val;
     }
-    croak "Sum of \@p > 1\nin random_multinomial(\$n,\@p)" if ($sum > 0.99999);
-    pgnmul($n, $ncat);
+    croak 'random_multinomial: sum of \@p > 1'
+      if $sum > 0.99999;
+
+    pgnmul( $n, $ncat );
     ### get the results
     $i = 0;
-    foreach $val (@p) {
-	$val = gvpriw($i);
-	$i++;
-    }
-    push @p, gvpriw($i);
+    $_ = gvpriw( $i++ ) for @p;
+    push @p, gvpriw( $i );
     return @p;
 }
 
-sub random_noncentral_chi_square { # Arguments: ($n,$df,$nonc)
-    croak "Usage: random_noncentral_chi_square(\$n,\$df,\$nonc)"
-	if scalar(@_) < 3;
-    my($n, $df, $nonc) = @_;
-    croak("($df = \$df < 1) or ($nonc = \$nonc) < 0\n".
-	  "in random_noncentral_chi_square(\$n,\$df,\$nonc)")
-	if (($df < 1) or ($nonc < 0));
-    return gennch($df,$nonc) unless wantarray();
-    my $val;
-    my @ans = (0) x $n;
-    foreach $val (@ans) { $val = gennch($df,$nonc); }
-    return @ans;
+sub random_noncentral_chi_square {    # Arguments: ($n,$df,$nonc)
+    croak 'Usage: random_noncentral_chi_square($n,$df,$nonc)'
+      if @_ < 3;
+    my ( $n, $df, $nonc ) = @_;
+    croak( "random_noncentral_chi_square: ($df = \$df < 1) or ($nonc = \$nonc) < 0" )
+      if $df < 1 || $nonc < 0;
+
+    return wantarray
+      ? map { gennch( $df, $nonc ) } 1 .. $n
+      : gennch( $df, $nonc );
 }
 
-sub random_noncentral_f { # Arguments: ($n,$dfn,$dfd,$nonc)
-    croak "Usage: random_noncentral_f(\$n,\$dfn,\$dfd,\$nonc)"
-	if scalar(@_) < 4;
-    my($n, $dfn, $dfd, $nonc) = @_;
-    croak("($dfn = \$dfn < 1) or ($dfd = \$dfd <= 0) or ($nonc ".
-	  "= \$nonc < 0)\nin random_noncentral_f(\$n,\$dfn,\$dfd,\$nonc)")
-	if (($dfn < 1) or ($dfd <= 0) or ($nonc < 0));
-    return gennf($dfn,$dfd,$nonc) unless wantarray();
-    my $val;
-    my @ans = (0) x $n;
-    foreach $val (@ans) { $val = gennf($dfn,$dfd,$nonc); }
-    return @ans;
+sub random_noncentral_f {    # Arguments: ($n,$dfn,$dfd,$nonc)
+    croak 'Usage: random_noncentral_f($n,$dfn,$dfd,$nonc)'
+      if @_ < 4;
+    my ( $n, $dfn, $dfd, $nonc ) = @_;
+
+    croak( "random_noncentral_f: ($dfn = \$dfn < 1) or ($dfd = \$dfd <= 0) or ($nonc = \$nonc < 0)" )
+      if $dfn < 1 || $dfd <= 0 || $nonc < 0;
+
+    return wantarray
+      ? map { gennf( $dfn, $dfd, $nonc ) } 1 .. $n
+      : gennf( $dfn, $dfd, $nonc );
 }
 
-sub random_normal { # Arguments: ($n,$av,$sd), defaults (1,0,1)
-    return wantarray() ? (gennor(0,1)) : gennor(0,1)
-	if scalar(@_) == 0; # default behavior if no arguments
-    my($n, $av, $sd) = @_;
-    $av = 0 unless defined($av); # $av defaults to 0
-    $sd = 1 unless defined($sd); # $sd defaults to 1, even if $av specified
-    croak "$sd = \$sd < 0\nin random_normal([\$n[,\$av[,\$sd]]])" if ($sd < 0);
-    return gennor($av,$sd) unless wantarray();
-    my $val;
-    my @ans = (0) x $n;
-    foreach $val (@ans) { $val = gennor($av,$sd); }
-    return @ans;
+sub random_normal {    # Arguments: ($n,$av,$sd), defaults (1,0,1)
+    return wantarray() ? ( gennor( 0, 1 ) ) : gennor( 0, 1 )
+      if @_ == 0;      # default behavior if no arguments
+    my ( $n, $av, $sd ) = @_;
+
+    $av //= 0;         # $av defaults to 0
+    $sd //= 1;         # $sd defaults to 1, even if $av specified
+    croak "random_normal: $sd = \$sd < 0)"
+      if $sd < 0;
+
+    return wantarray
+      ? map { gennor( $av, $sd ) } 1 .. $n
+      : gennor( $av, $sd );
 }
 
-sub random_permutation { # Argument: (@array) - array to be permuted.
-    my $n = scalar(@_); # number of elements to be permuted
+sub random_permutation {    # Argument: (@array) - array to be permuted.
+    my $n = @_;             # number of elements to be permuted
     return () if $n == 0;
-    rspriw($n) or
-	croak "Unable to allocate memory\nin random_permutation";
-    pgnprm($n);
-    my($val, $i) = (0,0);
-    my @ans = (0) x $n;
-    foreach $val (@ans) {
-	$val = gvpriw($i);
-	$i++;
-    }
+    rspriw( $n )
+      or croak 'random_permutation: unable to allocate memory';
+
+    pgnprm( $n );
+    my @ans = map { gvpriw( $_ ) } 0 .. $n - 1;
     return @_[@ans];
 }
 
-sub random_permuted_index { # Argument: $n = scalar(@array) (for permutation)
-    croak "Usage: random_permuted_index(\$n)" if scalar(@_) < 1;
-    my $n = int(shift(@_)); # number of elements to be permuted
-    croak "$n = \$n < 0 in random_permuted_index(\$n)" if $n < 0;
+sub random_permuted_index {    # Argument: $n = scalar(@array) (for permutation)
+
+    croak 'Usage: random_permuted_index($n)'
+      if @_ < 1;
+
+    my $n = int( shift( @_ ) );    # number of elements to be permuted
+    croak "random_permuted_index: $n = \$n < 0"
+      if $n < 0;
     return () if $n == 0;
-    rspriw($n) or
-	croak "Unable to allocate memory\nin random_permuted_index";
-    pgnprm($n);
-    my($val, $i) = (0,0);
-    my @ans = (0) x $n;
-    foreach $val (@ans) {
-	$val = gvpriw($i);
-	$i++;
-    }
-    return @ans;
+    rspriw( $n )
+      or croak 'random_permuted_index: unable to allocate memory';
+
+    pgnprm( $n );
+    return map { gvpriw( $_ ) } 0 .. $n - 1;
 }
 
-sub random_uniform { # Arguments: ($n,$low,$high), defaults (1,0,1)
-    return wantarray() ? (genunf(0,1)) : genunf(0,1)
-	if scalar(@_) == 0;
-    croak "Usage: random_uniform([\$n,[\$low,\$high]])"
-	if scalar(@_) == 2; # only default is (0,1) for ($low,$high) both undef
-    my($n, $low, $high) = @_;
-    $low  = 0 unless defined($low); # default for $low is 0
-    $high = 1 unless defined($high); # default for $high is 1
-    croak("$low = \$low > \$high = $high\nin ".
-	  "random_uniform([\$n,[\$low,\$high]])") if ($low > $high);
-    return genunf($low,$high) unless wantarray();
-    my $val;
-    my @ans = (0) x $n;
-    foreach $val (@ans) { $val = genunf($low,$high); }
-    return @ans;
+sub random_uniform {    # Arguments: ($n,$low,$high), defaults (1,0,1)
+    return wantarray() ? ( genunf( 0, 1 ) ) : genunf( 0, 1 )
+      if @_ == 0;
+
+    croak 'Usage: random_uniform([$n,[$low,$high]])'
+      if @_ == 2;       # only default is (0,1) for ($low,$high) both undef
+
+    my ( $n, $low, $high ) = @_;
+    $low  //= 0;        # default for $low is 0
+    $high //= 1;        # default for $high is 1
+
+    croak( "random_uniform: $low = \$low > \$high = $high" )
+      if $low > $high;
+
+    return wantarray
+      ? map { genunf( $low, $high ) } 1 .. $n
+      : genunf( $low, $high );
 }
 
-sub random_poisson { # Arguments: ($n, $mu)
-    croak "Usage: random_poisson(\$n,\$mu)" if scalar(@_) < 2;
-    my($n, $mu) = @_;
-    croak "$mu = \$mu < 0\nin random_poisson(\$n,\$mu)" if ($mu < 0);
-    return ignpoi($mu) unless wantarray();
-    my $val;
-    my @ans = (0) x $n;
-    foreach $val (@ans) { $val = ignpoi($mu); }
-    return @ans;
+sub random_poisson {    # Arguments: ($n, $mu)
+    croak 'Usage: random_poisson($n,$mu)' if @_ < 2;
+
+    my ( $n, $mu ) = @_;
+    croak "random_poisson: $mu = \$mu < 0"
+      if $mu < 0;
+
+    return wantarray
+      ? map { ignpoi( $mu ) } 1 .. $n
+      : ignpoi( $mu );
 }
 
-sub random_uniform_integer { # Arguments: ($n,$low,$high)
-    croak "Usage: random_uniform_integer(\$n,\$low,\$high)" if scalar(@_) < 3;
-    my($n, $low, $high) = @_;
-    $low = int($low);
-    $high = int($high);
-    croak("$low = \$low > \$high = $high\nin ".
-	  "random_uniform_integer(\$n,\$low,\$high)") if ($low > $high);
+sub random_uniform_integer {    # Arguments: ($n,$low,$high)
+
+    croak 'Usage: random_uniform_integer($n,$low,$high)' if @_ < 3;
+
+    my ( $n, $low, $high ) = @_;
+    $low  = int( $low );
+    $high = int( $high );
+    croak( "random_uniform_integer: $low = \$low > \$high = $high" )
+      if $low > $high;
     my $range = $high - $low;
-    croak("$range = (\$high - \$low) > 2147483561\nin ".
-	  "random_uniform_integer(\$n,\$low,\$high)") if ($range > 2147483561);
-    return ($low + ignuin(0,$range)) unless wantarray();
-    my $val;
-    my @ans = (0) x $n;
-    foreach $val (@ans) { $val = $low + ignuin(0,$range); }
-    return @ans;
+
+    croak( "random_uniform_integer: $range = (\$high - \$low) > 2147483561" )
+      if $range > 2_147_483_561;
+
+    return wantarray
+      ? map { $low + ignuin( 0, $range ) } 1 .. $n
+      : $low + ignuin( 0, $range );
 }
 
-sub random_negative_binomial { # Arguments: ($n,$ne,$p)
-    croak "Usage: random_negative_binomial(\$n,\$ne,\$p)" if scalar(@_) < 3;
-    my($n, $ne, $p) = @_;
-    $ne = int($ne);
-    croak("($ne = \$ne <= 0) or ($p = \$p <= 0 or >= 1)\nin ".
-	  "random_negative_binomial(\$n,\$ne,\$p)")
-	if (($ne <= 0) or (($p <= 0) or ($p >= 1)));
-    return ignnbn($ne,$p) unless wantarray();
-    my $val;
-    my @ans = (0) x $n;
-    foreach $val (@ans) { $val = ignnbn($ne,$p); }
-    return @ans;
+sub random_negative_binomial {    # Arguments: ($n,$ne,$p)
+
+    croak 'Usage: random_negative_binomial($n,$ne,$p)'
+      if @_ < 3;
+
+    my ( $n, $ne, $p ) = @_;
+    $ne = int( $ne );
+    croak( "random_negative_binomial: ($ne = \$ne <= 0) or ($p = \$p <= 0 or >= 1)" )
+      if $ne <= 0 || $p <= 0 || $p >= 1;
+
+    return wantarray
+      ? map { ignnbn( $ne, $p ) } 1 .. $n
+      : ignnbn( $ne, $p );
 }
 
-sub random_binomial { # Arguments: ($n,$nt,$p)
-    croak "Usage: random_binomial(\$n,\$nt,\$p)" if scalar(@_) < 3;
-    my($n, $nt, $p) = @_;
-    $nt = int($nt);
-    croak("($nt = \$nt < 0) or ($p = \$p < 0 or > 1)\nin ".
-	  "random_binomial(\$n,\$nt,\$p)")
-	if (($nt < 0) or (($p < 0) or ($p > 1)));
-    return ignbin($nt,$p) unless wantarray();
-    my $val;
-    my @ans = (0) x $n;
-    foreach $val (@ans) { $val = ignbin($nt,$p); }
-    return @ans;
+sub random_binomial {    # Arguments: ($n,$nt,$p)
+    croak 'Usage: random_binomial($n,$nt,$p)'
+      if @_ < 3;
+
+    my ( $n, $nt, $p ) = @_;
+    $nt = int( $nt );
+    croak( "random_binomial: ($nt = \$nt < 0) or ($p = \$p < 0 or > 1)" )
+      if $nt < 0 || $p < 0 || $p > 1;
+
+    return wantarray
+      ? map { ignbin( $nt, $p ) } 1 .. $n
+      : ignbin( $nt, $p );
 }
+
 
 #####################################################################
 #			SEED HANDLER FUNCTIONS                      #
 #####################################################################
 
-sub random_seed_from_phrase { # Argument $phrase
-    my $phrase = shift(@_);
-    $phrase ||= "";
-    return phrtsd($phrase);
+sub random_seed_from_phrase {    # Argument $phrase
+    my $phrase = shift( @_ );
+    $phrase ||= q{};
+    return phrtsd( $phrase );
 }
 
-sub random_get_seed { # no argument
-    return getsd();
-}
-
-sub random_set_seed_from_phrase { # Argument $phrase
-    my $phrase = shift(@_);
-    $phrase ||= "";
-    salfph($phrase);
+sub random_set_seed_from_phrase {    # Argument $phrase
+    my $phrase = shift( @_ );
+    $phrase ||= q{};
+    salfph( $phrase );
     return 1;
 }
 
-sub random_set_seed { # Argument @seed
-    my($seed1,$seed2) = @_;
-    croak("Usage: random_set_seed(\@seed)\n\@seed[0,1] must be two integers ".
-	  "in the range (1,1) to (2147483562,2147483398)\nand usually comes ".
-	  "from a call to random_get_seed() ".
-	  "or\nrandom_seed_from_phrase(\$phrase).")
-	unless (((($seed1 == int($seed1)) and ($seed2 == int($seed2))) and
-		 (($seed1 > 0) and ($seed2 > 0))) and
-		(($seed1 < 2147483563) and ($seed2 < 2147483399)));
-    setall($seed1,$seed2);
+sub random_set_seed {    # Argument @seed
+    my ( $seed1, $seed2 ) = @_;
+    croak(  'Usage: random_set_seed(\@seed)\n\@seed[0,1] must be two integers '
+          . "in the range (1,1) to (2147483562,2147483398)\nand usually comes "
+          . 'from a call to random_get_seed() '
+          . "or\nrandom_seed_from_phrase(\$phrase)." )
+      unless ( $seed1 == int( $seed1 ) && $seed1 > 0 && $seed1 < 2_147_483_563 )
+      && ( $seed2 == int( $seed2 ) && $seed2 > 0 && $seed2 < 2_147_483_399 );
+
+    setall( $seed1, $seed2 );
     return 1;
 }
 
@@ -412,30 +393,18 @@ sub random_set_seed { # Argument @seed
 #####################################################################
 
 sub getflt {
-    my $n = $_[0];
-    my $val;
-    my $i = 0;
-    my @junk = (0) x $n;
-    foreach $val (@junk) {
-	$val = gvprfw($i);
-	$i++;
-    }
-    return @junk;
+    my $n = shift;
+    return map { gvprfw( $_ ) } 0 .. $n - 1;
 }
 
 sub putflt {
-    my $n = scalar(@_);
-    rsprfw($n) or return 0;
-    my $val;
+    my $n = @_;
+    rsprfw( $n )
+      or return 0;
     my $i = 0;
-    foreach $val (@_) { # load up floats
-	svprfw($i,$val);
-	$i++;
-    }
+    svprfw( $i++, $_ ) for @_;
     return 1;
 }
-
-# Autoload methods go after =cut, and are processed by the autosplit program.
 
 1;
 
@@ -577,6 +546,10 @@ Usually, the  argument  I<@seed> should be  the result  of  a  call to
 C<random_get_seed>  or C<random_seed_from_phrase>.  I<@seed>[0,1] must
 be two integers in the range S<(1, 1)> to S<(2147483562, 2147483398)>,
 inclusive.
+
+=item C<random_integer()>
+
+Returns a raw random long integer.
 
 =item C<random_uniform($n, $low, $high)>
 
@@ -851,6 +824,53 @@ There are no defaults; both arguments must be provided.
 
 =back
 
+=head2 Base Generator Routines
+
+These routines control the underlying base random number generator.
+
+=over
+
+=item C<random_init_generator($type)>
+
+Sets the seeds of the current random number generator based on C<$type>:
+
+=over
+
+=item  Z<>-1
+
+initial value
+
+=item  Z<> 0
+
+first value of the current block
+
+=item  Z<> 1
+
+first value of the next block
+
+=back
+
+
+=item C<random_set_antithetic($bool)>
+
+Sets whether to return antithetic random numbers.
+A non-zero value enables antithetic mode.
+
+=item C<random_advance_state($k)>
+
+Advances the state of the current generator by C<2**$k> values and
+resets the initial seed to that value.
+
+=item C<random_get_generator_num()>
+
+Returns the number of the current random number generator.
+
+=item C<random_set_generator_num($g)>
+
+Sets the current random number generator to C<$g>.
+
+=back
+
 =head1 ERROR HANDLING
 
 The B<Perl> code should C<croak> if bad arguments are passed or if the
@@ -866,20 +886,20 @@ soon be available in B<Fortran90> source as well.  B<randlib.c> can be
 obtained from     B<statlib>.  Send mail   whose  message   is I<'send
 randlib.c.shar from general'> to:
 
-		       statlib@lib.stat.cmu.edu
+                       statlib@lib.stat.cmu.edu
 
 B<randlib.c>   can  also  be    obtained    by  anonymous  B<ftp>   to:
 
-		  odin.mdacc.tmc.edu (143.111.62.32)
+                  odin.mdacc.tmc.edu (143.111.62.32)
 
 where it is available as
 
-		   /pub/source/randlib.c-1.3.tar.gz
+                   /pub/source/randlib.c-1.3.tar.gz
 
 For obvious reasons, the original B<randlib>  (in B<Fortran>) has been
 renamed to
 
-		   /pub/source/randlib.f-1.3.tar.gz
+                   /pub/source/randlib.f-1.3.tar.gz
 
 on the same machine.
 
@@ -916,10 +936,10 @@ performing some hand crafting of the result.
 
 Information on B<PROMULA.FORTRAN> can be obtained from:
 
-		   PROMULA Development Corporation
-		    3620 N. High Street, Suite 301
-			 Columbus, Ohio 43214
-			    (614) 263-5454
+                   PROMULA Development Corporation
+                    3620 N. High Street, Suite 301
+                         Columbus, Ohio 43214
+                            (614) 263-5454
 
 F<wrapper.c>  (now  obsolete)   was  created   by  using B<SWIG>,  and
 performing some modification of the result.  B<SWIG> also produced the
@@ -927,7 +947,7 @@ skeleton of F<Random.pm>.
 
 Information on B<SWIG> can be obtained from:
 
-		   http://www.swig.org
+                   http://www.swig.org
 
 =head1 SOURCES
 
@@ -955,13 +975,13 @@ Exponential and Normal  Distributions."  Comm. ACM, 15,10 (Oct. 1972),
 
 =item Gamma
 
-(Case R >= 1.0)                                          
+(Case R >= 1.0)
 
 Ahrens, J. H., and Dieter, U. "Generating Gamma Variates by a Modified
 Rejection Technique."  Comm. ACM, 25,1 (Jan. 1982), 47-54.
-Algorithm GD                                                       
+Algorithm GD
 
-(Case 0.0 <= R <= 1.0)                                   
+(Case 0.0 <= R <= 1.0)
 
 Ahrens, J. H.,  and  Dieter, U.  "Computer Methods  for Sampling  from
 Gamma, Beta, Poisson and Binomial Distributions."  Computing, 12 (1974),
@@ -1020,7 +1040,7 @@ Variate Generation.  New York: Springer-Verlag, 1986.
 
 =head1 VERSION
 
-This POD documents B<Math::Random> version 0.71.
+This POD documents B<Math::Random> version 0.75.
 
 =head1 AUTHORS
 
@@ -1040,19 +1060,24 @@ Kathy Russell, and John Venier.
 
 =item *
 
-Correspondence   regarding   B<Math::Random> or   B<randlib> should be
-addressed to John Venier by email to
+Correspondence regarding B<randlib> should be addressed to John Venier
+by email to
 
-		      jvenier@mdanderson.org
+                      jvenier@mdanderson.org
+
+Issues with B<Math::Random> should be filed at the CPAN bugtracker at
+
+  https://rt.cpan.org/Public/Dist/Display.html?Name=Math-Random
+
 
 =item *
 
 Our address is:
 
-		Department of Biomathematics, Box 237
-	 The University of Texas, M.D. Anderson Cancer Center
-		       1515 Holcombe Boulevard
-			  Houston, TX 77030
+                Department of Biomathematics, Box 237
+         The University of Texas, M.D. Anderson Cancer Center
+                       1515 Holcombe Boulevard
+                          Houston, TX 77030
 
 =item *
 
@@ -1064,7 +1089,7 @@ Geoffrey Rommel may be reached at grommel [at] cpan [dot] org.
 
 =over 4
 
-=item * 
+=item *
 
 The programs in the  B<Perl> code distributed with B<Math::Random> and
 in    the B<C> code F<helper.c>, as    well as  the documentation, are
@@ -1096,7 +1121,7 @@ Krogh, F.  "Algorithms Policy."  ACM  Tran.  Math.  Softw.  13 (1987),
 Note, however, that only the particular expression of an algorithm can
 be copyrighted, not the algorithm per se; see 17 USC 102E<40>bE<41>.
 
-We place the Randlib code that we have written in the public domain.  
+We place the Randlib code that we have written in the public domain.
 
 =item *
 

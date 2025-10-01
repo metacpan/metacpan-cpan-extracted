@@ -95,7 +95,7 @@ sub header_datetime { return( shift->_test({ method => 'header_datetime', expect
 
 sub is_perl_option_enabled { return( shift->_test({ method => 'is_perl_option_enabled', expect => 1, type => 'boolean', args => ['GlobalRequest'] }) ); }
 
-sub json { return( shift->_test({ method => 'header_datetime', expect => sub
+sub json { return( shift->_test({ method => 'json', expect => sub
 {
     my $json = shift( @_ );
     return( Scalar::Util::blessed( $json ) && 

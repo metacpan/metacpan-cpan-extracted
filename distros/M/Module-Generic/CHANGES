@@ -1,5 +1,8 @@
 Revision history for Perl module Module::Generic
 
+v1.1.0 2025-09-30T15:30:30+0900
+    - Improved the methods checksum_md5, checksum_sha256, and checksum_sha512 in Module::Generic::File
+
 v1.0.6 2025-09-10T11:23:50+0900
     - Added methods parents, splitdir, and splitpath in Module::Generic::File
     - Corrected a faulty unit test in 27.dynamic.t

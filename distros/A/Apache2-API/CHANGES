@@ -1,5 +1,12 @@
 Revision history for Perl module Apache2::API
 
+v0.4.0 2025-09-30T20:30:14+0900
+    - Adding the log method to access the Apache2::Log::Request object
+    - Added the methods is_initial_req and psignature to Apache2::API::Request
+    - Added the method 'apr1_md5' to generate htpasswd
+    - Added the method 'htpasswd' to instantiate new Apache2::API::Password objects
+    - Added class Apache2::API::Password to handle md5, blowfish (bcrypt), and SHA-256, SHA-512 Apache passwords
+
 v0.3.1 2024-09-04T20:28:56+0900
     - Removed dependency on Devel::Confess. Best added by the user himself
 

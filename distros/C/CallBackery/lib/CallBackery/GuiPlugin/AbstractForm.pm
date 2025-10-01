@@ -75,6 +75,7 @@ Return the form data independently from the form phase.
 
 sub formData ($self) {
     my $args = $self->args || {};
+    return {} if ref $args->{location} eq 'HASH';
     return $args->{currentFormData} || $args->{formData} || $args;
 };
 

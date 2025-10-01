@@ -10,10 +10,10 @@ use Type::Params qw/signature/;
 use Carp::Always;
 use Carp qw/confess/;
 
-use parent 'Exporter';  # inherit all of Exporter's methods
+use parent 'Exporter';    # inherit all of Exporter's methods
 our @EXPORT_OK = qw(anon_requires);
 
-our $VERSION = "0.0.3";
+our $VERSION = "0.0.5";
 
 {
     my %compilations_of_types;
@@ -34,7 +34,50 @@ our $VERSION = "0.0.3";
         if ( !defined $compiled ) {
             $compilations_of_types{$referent} = _requires_compile_types(@$data);
         }
-        *{$symbol} = _requires_new_sub($compilations_of_types{$referent}, $orig_sub);
+        *{$symbol} =
+          _requires_new_sub( $compilations_of_types{$referent}, $orig_sub );
+    }
+}
+
+sub UNIVERSAL::NoVoidContext : ATTR(CODE) {
+    no warnings 'redefine';
+    no strict 'refs';
+    my (
+        $package, $symbol, $referent, $attr,
+        $data,    $phase,  $filename, $linenum
+    ) = @_;
+    if ( $symbol eq 'ANON' ) {
+        local $Carp::Internal{'Attribute::Validate'} = 1;
+        confess "Unable to add signature to anon subroutine";
+    }
+    my $orig_sub = *{$symbol}{CODE};
+    *{$symbol} = sub {
+        local $Carp::Internal{'Attribute::Validate'} = 1;
+        if ( !defined wantarray ) {
+            confess 'The return of this sub must be used or stored';
+        }
+        goto &$orig_sub;
+    }
+}
+
+sub UNIVERSAL::VoidContext : ATTR(CODE) {
+    no warnings 'redefine';
+    no strict 'refs';
+    my (
+        $package, $symbol, $referent, $attr,
+        $data,    $phase,  $filename, $linenum
+    ) = @_;
+    if ( $symbol eq 'ANON' ) {
+        local $Carp::Internal{'Attribute::Validate'} = 1;
+        confess "Unable to add signature to anon subroutine";
+    }
+    my $orig_sub = *{$symbol}{CODE};
+    *{$symbol} = sub {
+        local $Carp::Internal{'Attribute::Validate'} = 1;
+        if ( defined wantarray ) {
+            confess 'It is forbidden to store or use the return of this sub';
+        }
+        goto &$orig_sub;
     }
 }
 
@@ -49,17 +92,17 @@ sub _requires_compile_types {
 }
 
 sub anon_requires {
-    my $orig_sub      = shift;
-    if (!defined $orig_sub || 'CODE' ne ref $orig_sub) {
+    my $orig_sub = shift;
+    if ( !defined $orig_sub || 'CODE' ne ref $orig_sub ) {
         die 'Anon requires didn\'t receive a sub';
     }
     my $compiled = _requires_compile_types(@_);
-    return _requires_new_sub($compiled, $orig_sub);
+    return _requires_new_sub( $compiled, $orig_sub );
 }
 
 sub _requires_new_sub {
-    my ($compiled, $orig_sub) = @_;
-    if (!defined $orig_sub) {
+    my ( $compiled, $orig_sub ) = @_;
+    if ( !defined $orig_sub ) {
         die 'Didn\'t receive a sub';
     }
     return sub {
@@ -124,6 +167,26 @@ Receives a list of L<Type::Tiny> types and enforces those types into the argumen
 spec of L<Type::Params> to change the behavior of this module, for example {strictness => 0} as the first argument will allow the user
 to have more arguments than the ones declared.
 
+=head2 VoidContext
+
+    sub doesnt_return: VoidContext {
+    }
+    my $lawless = doesnt_return(); # Dies
+    doesnt_return(); # Works
+
+Enforces the caller to use this sub in Void Context and do nothing with the return to avoid programmer errors and incorrect assumptions.
+
+=head2 NoVoidContext
+
+    sub returns: NoVoidContext {
+    }
+    my $lawful = returns(); # Works
+    returns(); # Dies
+
+Enforces the caller to do something with the return of a sub to avoid programmer errors and assumptions.
+
+=head1 EXPORTABLE SUBROUTINES
+
 =head2 anon_requires
 
     my $say_thing = anon_requires(sub($thing) {
@@ -150,13 +213,11 @@ Enchanting anonymous subroutines with attributes won't allow them to be used by 
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2025 Sergio Iglesias
+This software is Copyright (c) 2025 by Sergio Iglesias.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the " Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+This is free software, licensed under:
 
-The above copyright notice and this permission notice (including the next paragraph) shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  The MIT (X11) License
 
 =head1 CREDITS
 

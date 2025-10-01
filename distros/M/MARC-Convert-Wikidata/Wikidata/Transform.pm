@@ -15,7 +15,7 @@ use MARC::Convert::Wikidata::Object::People;
 use MARC::Convert::Wikidata::Object::Publisher;
 use MARC::Convert::Wikidata::Object::Series 0.09;
 use MARC::Convert::Wikidata::Utils qw(clean_cover clean_date clean_edition_number
-	clean_issn clean_number_of_pages clean_oclc clean_publication_date
+	clean_isbn clean_issn clean_number_of_pages clean_oclc clean_publication_date
 	clean_publisher_name clean_publisher_place clean_series_name clean_series_ordinal
 	clean_subtitle clean_title);
 use MARC::Field008 0.03;
@@ -39,7 +39,7 @@ Readonly::Hash our %PEOPLE_TYPE => {
 	'trl' => 'translators',
 };
 
-our $VERSION = 0.30;
+our $VERSION = 0.31;
 
 # Constructor.
 sub new {
@@ -247,6 +247,7 @@ sub _isbns {
 			}
 			$valid = 0;
 		}
+		$isbn = clean_isbn($isbn);
 		my @publishers = $isbn_field->subfield('q');
 		my ($publisher, $cover, $collective) = (undef, undef, 0);
 		foreach my $pub (@publishers) {

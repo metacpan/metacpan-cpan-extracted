@@ -9,13 +9,13 @@ use Readonly;
 use Roman;
 use Unicode::UTF8 qw(decode_utf8 encode_utf8);
 
-Readonly::Array our @EXPORT_OK => qw(clean_cover clean_date clean_issn clean_edition_number
-	clean_number_of_pages clean_oclc clean_publication_date clean_publisher_name
-	clean_publisher_place clean_series_name clean_series_ordinal clean_subtitle
-	clean_title look_for_external_id);
+Readonly::Array our @EXPORT_OK => qw(clean_cover clean_date clean_isbn clean_issn
+	clean_edition_number clean_number_of_pages clean_oclc clean_publication_date
+	clean_publisher_name clean_publisher_place clean_series_name clean_series_ordinal
+	clean_subtitle clean_title look_for_external_id);
 Readonly::Array our @COVERS => qw(hardback paperback);
 
-our $VERSION = 0.30;
+our $VERSION = 0.31;
 our $DEBUG = 0;
 
 sub clean_cover {
@@ -259,6 +259,26 @@ sub clean_edition_number {
 	}
 
 	return $ret_edition_number;
+}
+
+sub clean_isbn {
+	my $isbn = shift;
+
+	if (! defined $isbn) {
+		return;
+	}
+
+	my $ret_isbn = $isbn;
+	$ret_isbn =~ s/\s+:?$//ms;
+
+	if ($ret_isbn !~ m/^[\d\-]+$/ms) {
+		if ($DEBUG) {
+			warn "ISBN '$ret_isbn' couldn't clean.";
+		}
+		$ret_isbn = undef;
+	}
+
+	return $ret_isbn;
 }
 
 sub clean_issn {
@@ -613,6 +633,7 @@ MARC::Convert::Wikidata::Utils - Utilities for MARC::Convert::Wikidata.
  my $cleaned_date = clean_date($date);
  my ($cleaned_date, $options_hr) = clean_date($date);
  my $cleaned_edition_number = clean_edition_number($edition_number);
+ my $cleaned_isbn = clean_isbn($isbn);
  my $cleaned_issn = clean_issn($issn);
  my $cleaned_number_of_pages = clean_number_of_pages($number_of_pages);
  my $cleaned_oclc = clean_oclc($oclc);
@@ -651,6 +672,14 @@ Returns string or undef of date and hash reference with options in array context
  my $cleaned_edition_number = clean_edition_number($edition_number);
 
 Clean edition number in Czech language.
+
+Returns string or undef.
+
+=head2 C<clean_isbn>
+
+ my $cleaned_isbn = clean_isbn($isbn);
+
+Clean ISBN.
 
 Returns string or undef.
 
@@ -873,6 +902,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.30
+0.31
 
 =cut

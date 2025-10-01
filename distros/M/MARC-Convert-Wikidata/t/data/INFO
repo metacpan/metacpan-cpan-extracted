@@ -2,6 +2,7 @@ INFO
 ====
 cnb000024035.xml - Author of introduction without NKCR AUT ID (700 field).
 cnb000040543.xml - Multiple people roles (700 field).
+cnb000060952.xml - Field 020a with ISBN + extra separator.
 cnb000065206.xml - Field 008 with q (Questionable date) = 1969-1991
 cnb000080974.xml - Book series with ISSN (490 field).
 cnb000087983.xml - Translator (700 field).

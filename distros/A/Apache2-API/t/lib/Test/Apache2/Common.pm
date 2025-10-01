@@ -30,11 +30,12 @@ sub handler : method
     $r->log_error( "${class}: Received request for uri \"", $r->uri, "\" matching file \"", $r->filename, "\": ", $r->as_string );
     my $uri = APR::URI->parse( $r->pool, $r->uri );
     my $path = [split( '/', $uri->path )]->[-1];
-    my $api = Apache2::API->new( $r, debug => $debug, compression_threshold => 102400 ) || do
+    my $api = Apache2::API->new( $r, debug => $debug, compression_threshold => 102400 );
+    if( !$api )
     {
-        $r->log_error( "$class: Error instantiating Apache2::API object: ", Apache2::API->error );
+        $r->log_error( "${class}: Error instantiating Apache2::API object: ", Apache2::API->error );
         return( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
-    };
+    }
     my $self = bless( { request => $r, api => $api, debug => int( $r->dir_config( 'API_DEBUG' ) ) } => $class );
     my $code = $self->can( $path );
     if( !defined( $code ) )
@@ -44,7 +45,7 @@ sub handler : method
     }
     $r->err_headers_out->set( 'Test-No' => $path );
     my $rc = $code->( $self );
-    $r->log_error( "$class: Returning HTTP code '$rc' for method '$path'" );
+    $r->log_error( "${class}: Returning HTTP code '$rc' for method '$path'" );
     if( $rc == Apache2::Const::HTTP_OK )
     {
         # https://perl.apache.org/docs/2.0/user/handlers/intro.html#item_RUN_FIRST
@@ -142,30 +143,33 @@ sub _test
     my $api = $self->api;
     my $r = $self->request;
     my $debug = $self->debug;
-    my $meth = $opts->{method} || do
+    my $meth = $opts->{method};
+    if( !$meth )
     {
-        $r->log_error( "$[class}: no method provided to test." );
+        $r->log_error( "${class}: no method provided to test." );
         return( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
-    };
+    }
     # expect may be undef
-    exists( $opts->{expect} ) || do
+    if( !exists( $opts->{expect} ) )
     {
-        $r->log_error( "$[class}: no expected value provided to test method '$meth'." );
+        $r->log_error( "${class}: no expected value provided to test method '$meth'." );
         return( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
-    };
+    }
     my $expect = $opts->{expect};
     my $args = exists( $opts->{args} ) ? $opts->{args} : undef;
     $opts->{type} //= '';
-    my $obj = $self->_target || do
+    my $obj = $self->_target;
+    if( !$obj )
     {
-        $r->log_error( "$[class}: Cannot get a target object." );
+        $r->log_error( "${class}: Cannot get a target object." );
         return( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
-    };
-    my $code = $obj->can( $meth ) || do
+    }
+    my $code = $obj->can( $meth );
+    if( !$code )
     {
-        $r->log_error( "$[class}: Method '$meth' is not supported in ", ref( $obj ), "." );
+        $r->log_error( "${class}: Method '$meth' is not supported in ", ref( $obj ), "." );
         return( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
-    };
+    }
     my $base_path;
     unless( $base_path = $class2log->{ ref( $obj ) } )
     {
@@ -231,7 +235,7 @@ sub _test
     }
     $io->close;
     $log_file->remove if( $log_file->is_empty );
-    $r->log_error( "$[class}: ${meth}() -> ", ( $rv ? 'ok' : 'not ok' ) ) if( $debug );
+    $r->log_error( "${class}: ${meth}() -> ", ( $rv ? 'ok' : 'not ok' ) ) if( $debug );
     return( $self->ok( $rv ) );
 }
 

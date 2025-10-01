@@ -2,6 +2,7 @@ CHANGES
 CONTRIBUTING.md
 lib/Apache2/API.pm
 lib/Apache2/API/DateTime.pm
+lib/Apache2/API/Password.pod
 lib/Apache2/API/Query.pm
 lib/Apache2/API/Request.pm
 lib/Apache2/API/Request/Params.pm
@@ -19,6 +20,7 @@ t/02.datetime.t
 t/03.query.t
 t/04.status.t
 t/05.other.t
+t/06.apr1.t
 t/90.coverage.t
 t/91.pod.t
 t/92.signature.t

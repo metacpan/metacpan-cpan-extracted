@@ -17,7 +17,7 @@ elsif ( !-e 'SIGNATURE' )
 elsif ( -s 'SIGNATURE' == 0 ) {
     skip_all( "SIGNATURE file empty" );
 }
-elsif (!eval { require Socket; Socket::inet_aton('pool.sks-keyservers.net') }) {
+elsif (!eval { require Socket; Socket::inet_aton('keyserver.ubuntu.com') }) {
     skip_all( "Cannot connect to the keyserver to check module signature" );
 }
 else {

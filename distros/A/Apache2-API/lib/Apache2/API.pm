@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Apache2 API Framework - ~/lib/Apache2/API.pm
-## Version v0.3.1
+## Version v0.4.0
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/05/30
-## Modified 2024/09/04
+## Modified 2024/12/14
 ## All rights reserved
 ## 
 ## 
@@ -17,7 +17,7 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Module::Generic );
-    use vars qw( $VERSION $DEBUG );
+    use vars qw( $VERSION $DEBUG @EXPORT );
     use version;
     use Encode ();
     # use Apache2::Const qw( :common :http );
@@ -35,10 +35,12 @@ BEGIN
     use APR::Base64 ();
     use APR::Request ();
     use APR::UUID ();
+    use Exporter ();
     use JSON ();
     use Scalar::Util ();
+    our @EXPORT = qw( apr1_md5 );
     $DEBUG   = 0;
-    $VERSION = 'v0.3.1';
+    $VERSION = 'v0.4.0';
 };
 
 use strict;
@@ -60,6 +62,7 @@ sub import
     # Apache2::Const->compile( $class => qw( AUTH_REQUIRED ) );
 
     Apache2::Const->compile( $class => @arguments );
+    Exporter::export_to_level( $this, 1, @EXPORT );
 }
 
 sub init
@@ -97,6 +100,14 @@ sub init
 }
 
 sub apache_request { return( shift->_set_get_object_without_init( 'apache_request', 'Apache2::RequestRec', @_ ) ); }
+
+sub apr1_md5
+{
+    my( $passwd, $salt ) = @_;
+    my $ht = Apache2::API::Password->new( $passwd, create => 1, algo => 'md5', ( defined( $salt ) ? ( salt => $salt ) : () ) ) ||
+        die( Apache2::API::Password->error );
+    return( $ht->hash );
+}
 
 sub bailout
 {
@@ -378,6 +389,17 @@ sub header_datetime
     return( $dt );
 }
 
+sub htpasswd
+{
+    my $self = shift( @_ );
+    my $rv = Apache2::API::Password->new( @_ );
+    if( !defined( $rv ) && Apache2::API::Password->error )
+    {
+        return( $self->pass_error( Apache2::API::Password->error ) );
+    }
+    return( $rv );
+}
+
 sub is_perl_option_enabled { return( shift->_try( 'request', 'is_perl_option_enabled', @_ ) ); }
 
 # We return a new object each time, because if we cached it, some routine might set the utf8 bit flagged on while some other would not want it
@@ -392,7 +414,7 @@ sub json
         sorted => 'canonical',
         sort => 'canonical',
     };
-    
+
     foreach my $opt ( keys( %$opts ) )
     {
         my $ref;
@@ -423,6 +445,9 @@ sub lang_web
     $lang =~ tr/_/-/;
     return( $lang );
 }
+
+# Would return a Apache2::Log::Request
+sub log { return( shift->_try( 'apache_request', 'log', @_ ) ); }
 
 sub log_error { return( shift->_try( 'apache_request', 'log_error', @_ ) ); }
 
@@ -563,7 +588,7 @@ sub reply
         $self->error( "Data provided to send is not an hash ref." );
         return( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
     }
-    
+
     my $msg;
     if( CORE::exists( $ref->{success} ) )
     {
@@ -626,7 +651,7 @@ sub reply
     {
         $self->response->headers->set( 'Cache-Control' => 'private, no-cache, no-store, must-revalidate' );
     }
-    $self->response->content_type( 'application/json' );
+    $self->response->content_type( 'application/json; charset=utf-8' );
     # $r->status( $code );
     $self->response->code( $code );
     if( defined( $msg ) && $self->apache_request->content_type ne 'application/json' )
@@ -640,7 +665,7 @@ sub reply
         $self->response->custom_response( $code, '' );
         #$r->status( $code );
     }
-    
+
     # We make sure the code is set
     if( CORE::exists( $ref->{error} ) && !$self->response->is_success( $code ) )
     {
@@ -650,7 +675,7 @@ sub reply
         {
             $lang = $ref->{locale};
         }
-        
+
         unless( length( "$lang" ) )
         {
             $lang = $self->request->preferred_language( Apache2::API::Status->supported_languages );
@@ -701,7 +726,7 @@ sub reply
             $ref->{locale} = $locale if( length( "$locale" ) );
         }
     }
-    
+
     if( CORE::exists( $ref->{cleanup} ) &&
         defined( $ref->{cleanup} ) &&
         ref( $ref->{cleanup} ) eq 'CODE' )
@@ -711,14 +736,31 @@ sub reply
         $self->request->request->pool->cleanup_register( $cleanup, $self );
         # $r->push_handlers( PerlCleanupHandler => $cleanup );
     }
-    
+
     # Our print() will possibly change the HTTP headers, so we do not flush now just yet.
     my $json = $self->json->utf8->relaxed(0)->allow_blessed->convert_blessed->encode( $ref );
     # Before we use this, we have to make sure all Apache module that deal with content encoding are de-activated because they would interfere
-    $self->print( $json ) || do
+    if( !$self->print( $json ) )
     {
         return( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
-    };
+    }
+    return( $code );
+}
+
+# Special reply for Server-Sent Event that need to close the connection if there was an error
+sub reply_sse
+{
+    my $self = shift( @_ );
+    my $code = $self->reply( @_ );
+    $code //= 500;
+    if( Apache2::API::Status->is_error( $code ) )
+    {
+        my $req = $self->request;
+        $req->request->pool->cleanup_register(sub
+        {
+            $req->close;
+        });
+    }
     return( $code );
 }
 
@@ -806,6 +848,674 @@ sub STORABLE_thaw { CORE::return( CORE::shift->THAW( @_ ) ); }
 
 # NOTE: sub THAW is inherited
 
+# NOTE: Apache2::API::Password
+package Apache2::API::Password;
+use parent qw( Module::Generic );
+use strict;
+use warnings;
+use vars qw( $VERSION $APR1_RE $BCRYPT_RE $SHA_RE );
+# Compile the regular expression once
+our $APR1_RE   = qr/\$apr1\$(?<salt>[.\/0-9A-Za-z]{1,8})\$[.\/0-9A-Za-z]{22}/;
+our $BCRYPT_RE = qr/\$2[aby]\$(?<bcrypt_cost>\d{2})\$(?<salt>[A-Za-z0-9.\/]{22})[A-Za-z0-9.\/]{31}/;
+our $SHA_RE    = qr/\$(?<sha_size>[56])\$(?:rounds=(?<rounds>\d+)\$)?(?<salt>[A-Za-z0-9.\/]{1,16})\$[A-Za-z0-9.\/]+/;
+our $VERSION   = 'v0.1.0';
+
+sub init
+{
+    my $self = shift( @_ );
+    my $pwd  = shift( @_ );
+    return( $self->error( "No password was provided." ) ) if( !defined( $pwd ) );
+    $self->{create}        = 0     if( !exists( $self->{create} ) );
+    # md5 | bcrypt | sha256 | sha512
+    $self->{algo}          = 'md5' if( !exists( $self->{algo} ) );
+    # 04..31
+    $self->{bcrypt_cost}   = 12    if( !exists( $self->{bcrypt_cost} ) );
+    # undef => default (5000)
+    $self->{sha_rounds}    = undef if( !exists( $self->{sha_rounds} ) );
+    # By default, like Apache does, we use Apache md5 algorithm
+    # Other possibilities are bcrypt (Blowfish)
+    $self->SUPER::init( @_ ) ||
+        return( $self->pass_error );
+    if( $self->{create} )
+    {
+        my $hash = $self->make( $pwd ) ||
+            return( $self->pass_error );
+        $self->hash( $hash );
+    }
+    # Existing hash path: validate by known prefixes, also extract salt into ->salt
+    elsif( $pwd =~ /\A$APR1_RE\z/ ||
+           $pwd =~ /\A$BCRYPT_RE\z/ ||
+           $pwd =~ /\A$SHA_RE\z/ )
+    {
+        $self->hash( $pwd );
+    }
+    else
+    {
+        return( $self->error(
+            "Value provided is not a recognized hash (APR1/bcrypt/SHA-crypt). " .
+            "If you want to create one from clear text, use the 'create' option."
+        ) );
+    }
+    return( $self );
+}
+
+sub algo { return( shift->_set_get_enum({
+    field => 'algo',
+    allowed => [qw( md5 bcrypt sha256 sha512 )],
+}, @_ ) ); }
+
+sub bcrypt_cost { return( shift->_set_get_scalar({
+    field => 'bcrypt_cost',
+    check => sub
+    {
+        my( $self, $v ) = @_;
+        return(1) unless( defined( $v ) );
+        unless( $v =~ /^\d+$/ && 
+                $v >= 4 &&
+                $v <= 31 )
+        {
+            return( $self->error( "bcrypt_cost must be between 4 and 31" ) );
+        }
+        return(1);
+    },
+}, @_ ) ); }
+
+sub create { return( shift->_set_get_boolean( 'create', @_ ) ); }
+
+sub hash { return( shift->_set_get_scalar({
+    field => 'hash',
+    callbacks =>
+    {
+        set => sub
+        {
+            my( $self, $v ) = @_;
+            if( $v =~ /\A$APR1_RE\z/ )
+            {
+                $self->{salt} = $+{salt}
+            }
+            elsif( $v =~ /\A$BCRYPT_RE\z/ )
+            {
+                $self->{salt} = $+{salt};
+                $self->{bcrypt_cost} = $+{bcrypt_cost};
+            }
+            elsif( $v =~ /\A$SHA_RE\z/ )
+            {
+                $self->{salt} = $+{salt};
+                $self->{sha_rounds} = $+{rounds} if( defined( $+{rounds} ) );
+            }
+            else
+            {
+                return( $self->error( "Not a valid Apache hash (APR1/bcrypt/SHA-crypt)" ) );
+            }
+            return( $v );
+        },
+    },
+}, @_ ) ); }
+
+sub make
+{
+    my $self = shift( @_ );
+    my( $passwd, $salt ) = @_;
+
+    my $algo = lc( $self->{algo} || 'md5' );
+    # md5, bcrypt, sha256, sha512
+    my $code = $self->can( "make_${algo}" ) ||
+        return( $self->error( "No method defined to handle algorithm '$algo'." ) );
+    return( $code->( $self, $passwd, $salt ) );
+}
+
+sub make_bcrypt
+{
+    my $self = shift( @_ );
+    my $passwd = shift( @_ );
+    my $salt = shift( @_ ) || $self->{salt};
+
+    my $cost = $self->bcrypt_cost;
+    $cost = 12 if( !defined( $cost ) || $cost < 4 || $cost > 31 );
+
+    # Generate a 22-char bcrypt-base64 salt. Easiest: draw from allowed alphabet.
+    # (Most libc crypt() accept any 22 chars in the bcrypt alphabet.)
+
+    # 22 chars from [./A-Za-z0-9]
+    # $salt //= $self->_make_salt(22);
+    $salt //= $self->_make_salt_bcrypt;
+    if( $salt =~ m,[^./0-9A-Za-z], )
+    {
+        return( $self->error( "Salt value provided contains illegal characters." ) );
+    }
+    $salt = substr( $salt, 0, 22 );
+    # pad if caller gave shorter
+    $salt .= '.' x ( 22 - length( $salt ) ) if( length( $salt ) < 22 );
+
+    # modular crypt format
+    my $setting = sprintf( '$2y$%02d$%s', $cost, $salt );
+    local $@;
+    # try-catch
+    my $hash = eval
+    {
+        crypt( $passwd, $setting );
+    };
+    if( !$@ && defined( $hash ) && $hash =~ /^\$2[aby]\$/ )
+    {
+        return( $hash );
+    }
+
+    # Save it, if any.
+    my $crypt_error = $@;
+
+    # Fallback 1: Authen::Passphrase::BlowfishCrypt
+    if( $self->_load_class( 'Authen::Passphrase::BlowfishCrypt' ) )
+    {
+        my $ppr = eval
+        {
+            Authen::Passphrase::BlowfishCrypt->new(
+                cost => $cost,
+                salt_base64 => $salt,
+                passphrase => $passwd,
+            );
+        };
+        if( $@ )
+        {
+            return( $self->error( "Error instantiating a new Authen::Passphrase::BlowfishCrypt object for the bcrypt hash: $@" ) );
+        }
+        # $2a/$2y$...
+        return( $ppr->as_crypt );
+    }
+    # Fallback 2: Crypt::Bcrypt
+    elsif( $self->_load_class( 'Crypt::Bcrypt' ) )
+    {
+        my $bc = eval
+        {
+            Crypt::Bcrypt->new( cost => $cost, salt => $salt );
+        };
+        if( $@ )
+        {
+            return( $self->error( "Error instantiating a new Crypt::Bcrypt object for the bcrypt hash: $@" ) );
+        }
+        # returns $2b/$2y$...
+        return( $bc->hash( $passwd ) );
+    }
+    # Fallback 3: Crypt::Eksblowfish::Bcrypt (settings must have bcrypt-base64 salt)
+    elsif( $self->_load_class( 'Crypt::Eksblowfish::Bcrypt' ) )
+    {
+        $hash = eval
+        {
+            Crypt::Eksblowfish::Bcrypt::bcrypt( $passwd, $setting );
+        };
+        if( $@ )
+        {
+            return( $self->error( "Error generating bcrypt hash with Crypt::Eksblowfish::Bcrypt: $@" ) );
+        }
+        return( $hash );
+    }
+    elsif( $crypt_error )
+    {
+        return( $self->error( "Error generating bcrypt hash, and alternative modules (Authen::Passphrase::BlowfishCrypt, Crypt::Bcrypt, Crypt::Eksblowfish::Bcrypt) are not installed: $@" ) );
+    }
+    else
+    {
+        return( $self->error( "System crypt() does not support bcrypt, and alternative modules (Authen::Passphrase::BlowfishCrypt, Crypt::Bcrypt, Crypt::Eksblowfish::Bcrypt) are not installed." ) );
+    }
+}
+
+sub make_md5
+{
+    my $self = shift( @_ );
+    my $passwd = shift( @_ );
+    my $salt = shift( @_ ) || $self->{salt};
+
+    # salt: max 8 chars, allowed ./0-9A-Za-z
+    $salt //= $self->_make_salt(8);
+    if( $salt =~ m,[^./0-9A-Za-z], )
+    {
+        return( $self->error( "Salt value provided contains illegal characters." ) );
+    }
+    $salt = substr( $salt, 0, 8 );
+    $self->_load_class( 'Digest::MD5' ) ||
+        return( $self->pass_error );
+
+    my $magic = '$apr1$';
+    # 1) initial ctx: password + magic + salt
+    my $ctx = Digest::MD5->new;
+    local $@;
+    # try-catch
+    eval
+    {
+        $ctx->add( $passwd, $magic, $salt );
+    };
+    if( $@ )
+    {
+        return( $self->error( "Error adding string to create MD5 hash: $@" ) );
+    }
+
+    # 2) alternate sum: md5(password + salt + password)
+    my $alt = Digest::MD5->new;
+    eval
+    {
+        $alt->add( $passwd, $salt, $passwd );
+    };
+    if( $@ )
+    {
+        return( $self->error( "Error adding string to create MD5 hash: $@" ) );
+    }
+    # 16 bytes
+    my $alt_result = $alt->digest;
+
+    # 3) append to ctx as many full 16-byte blocks of alt_result
+    my $plen = length( $passwd );
+    for( my $i = $plen; $i > 0; $i -= 16 )
+    {
+        eval
+        {
+            $ctx->add( substr( $alt_result, 0, $i < 16 ? $i : 16 ) );
+        };
+        if( $@ )
+        {
+            return( $self->error( "Error adding string to create MD5 hash: $@" ) );
+        }
+    }
+
+    # 4) mix in bytes based on bits of password length
+    for( my $i = $plen; $i > 0; $i >>= 1 )
+    {
+        eval
+        {
+            if( $i & 1 )
+            {
+                $ctx->add( pack( 'C', 0 ) );
+            }
+            else
+            {
+                $ctx->add( substr( $passwd, 0, 1 ) );
+            }
+        };
+        if( $@ )
+        {
+            return( $self->error( "Error adding string to create MD5 hash: $@" ) );
+        }
+    }
+
+    # 16 bytes
+    my $final = $ctx->digest;
+
+    # 5) 1000 iterations "rounds"
+    for( my $i = 0; $i < 1000; $i++ )
+    {
+        my $t = Digest::MD5->new;
+
+        eval
+        {
+            if( $i & 1 )
+            {
+                $t->add( $passwd );
+            }
+            else
+            {
+                $t->add( $final );
+            }
+
+            if( $i % 3 )
+            {
+                $t->add( $salt );
+            }
+
+            if( $i % 7 )
+            {
+                $t->add( $passwd );
+            }
+
+            if( $i & 1 )
+            {
+                $t->add( $final );
+            }
+            else
+            {
+                $t->add( $passwd );
+            }
+        };
+        if( $@ )
+        {
+            return( $self->error( "Error adding string to create MD5 hash: $@" ) );
+        }
+
+        $final = $t->digest;
+    }
+
+    # 6) rearrange final bytes and base64-like encode (crypt's 64-char set)
+    my @b = unpack( 'C16', $final );
+    my $itoa64 = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+
+    my $encoded = '';
+    $encoded .= $self->_to64( ( $b[0] << 16 ) | ( $b[6] << 8 ) | $b[12], 4, $itoa64 );
+    $encoded .= $self->_to64( ( $b[1] << 16 ) | ( $b[7] << 8 ) | $b[13], 4, $itoa64 );
+    $encoded .= $self->_to64( ( $b[2] << 16 ) | ( $b[8] << 8 ) | $b[14], 4, $itoa64 );
+    $encoded .= $self->_to64( ( $b[3] << 16 ) | ( $b[9] << 8 ) | $b[15], 4, $itoa64 );
+    $encoded .= $self->_to64( ( $b[4] << 16 ) | ( $b[10] << 8 ) | $b[5], 4, $itoa64 );
+    $encoded .= $self->_to64( $b[11], 2, $itoa64 );
+
+    return( $magic . $salt . '$' . $encoded );
+}
+
+sub make_sha256 { return( shift->_make_sha_crypt( 5, @_ ) ); }
+
+sub make_sha512 { return( shift->_make_sha_crypt( 6, @_ ) ); }
+
+sub matches
+{
+    my $self = shift( @_ );
+    my $pwd  = shift( @_ );
+    my $hash = $self->{hash};
+    return(0) unless( defined( $pwd ) && defined( $hash ) );
+    local $@;
+
+    if( $hash =~ /^\$apr1\$/ )
+    {
+        my $salt;
+        # If the 'salt' is already set, we use it.
+        unless( $salt = $self->{salt} )
+        {
+            if( $hash =~ /\A$APR1_RE\z/ )
+            {
+                $salt = $+{salt};
+            }
+            else
+            {
+                return(0);
+            }
+        }
+        my $calc = $self->make_md5( $pwd, $salt ) ||
+            return( $self->pass_error );
+        return( $hash eq $calc );
+    }
+    # bcrypt
+    elsif( $hash =~ /\A$BCRYPT_RE\z/ )
+    {
+        # crypt() verification: use the stored hash as the salt spec
+        # try-catch
+        my $out = eval
+        {
+            crypt( $pwd, $hash );
+        };
+        if( $@ || !defined( $out ) || $out !~ /^\$2[aby]\$/ )
+        {
+            # Save it, if any.
+            my $crypt_error = $@;
+            # Fallback 1: Authen::Passphrase::BlowfishCrypt
+            if( $self->_load_class( 'Authen::Passphrase::BlowfishCrypt' ) )
+            {
+                # try-catch
+                my $ppr = eval
+                {
+                    Authen::Passphrase::BlowfishCrypt->from_crypt( $hash );
+                };
+                if( $@ )
+                {
+                    return( $self->error( "Error instantiating a new Authen::Passphrase::BlowfishCrypt object for the bcrypt hash: $@" ) );
+                }
+                return( $ppr->match( $pwd ) );
+            }
+            # Fallback 2: Crypt::Bcrypt
+            elsif( $self->_load_class( 'Crypt::Bcrypt' ) )
+            {
+                # try-catch
+                my $bool = eval
+                {
+                    Crypt::Bcrypt::bcrypt_check( $pwd => $hash );
+                };
+                if( $@ )
+                {
+                    return( $self->error( "Error checking if password matches using Crypt::Bcrypt: $@" ) );
+                }
+                return( $bool );
+            }
+            # Fallback 3: Crypt::Eksblowfish::Bcrypt (settings must have bcrypt-base64 salt)
+            elsif( $self->_load_class( 'Crypt::Eksblowfish::Bcrypt' ) )
+            {
+                # try-catch
+                $out = eval
+                {
+                    Crypt::Eksblowfish::Bcrypt::bcrypt( $pwd, $hash );
+                };
+                if( $@ )
+                {
+                    return( $self->error( "Error generating bcrypt hash with Crypt::Eksblowfish::Bcrypt: $@" ) );
+                }
+                return( defined( $out ) && $out eq $hash );
+            }
+            elsif( $crypt_error )
+            {
+                return( $self->error( "Error checking bcrypt password: $crypt_error" ) );
+            }
+        }
+        return( defined( $out ) && $out eq $hash );
+    }
+    elsif( $hash =~ /\A$SHA_RE\z/ )
+    {
+        # try-catch
+        my $out = eval
+        {
+            crypt( $pwd, $hash );
+        };
+        if( defined( $out ) && $out eq $hash )
+        {
+            return(1);
+        }
+        # Save it, if any.
+        my $crypt_error = $@;
+    
+        if( $self->_load_class( 'Crypt::Passwd::XS' ) )
+        {
+            # try-catch
+            $out = eval
+            {
+                Crypt::Passwd::XS::crypt( $pwd, $hash );
+            };
+            if( $@ )
+            {
+                return( $self->error( "Error checking the password using Crypt::Passwd::XS: $@" ) );
+            }
+            return( defined( $out ) && $out eq $hash );
+        }
+        elsif( $crypt_error )
+        {
+            return( $self->error( "Error checking SHA password: $crypt_error" ) );
+        }
+        return(0);
+    }
+    else
+    {
+        return(0);
+    }
+}
+
+sub salt { return( shift->_set_get_scalar( 'salt', @_ ) ); }
+
+sub sha_rounds { return( shift->_set_get_number({
+    field => 'sha_rounds',
+    check => sub
+    {
+        my( $self, $n ) = @_;
+        unless( $n =~ /^\d+$/ && 
+                $n >= 1000 &&
+                $n <= 999999999 )
+        {
+            return( $self->error( "sha_rounds must be between 1000 and 999999999" ) )
+        }
+        return(1);
+    },
+},  @_ ) ); }
+
+sub _make_salt
+{
+    my $self = shift( @_ );
+    # Default to 8 for MD5, 16 for bcrypt/SHA-2
+    my $len  = shift( @_ ) || 8;
+    if( $len !~ /^\d+$/ )
+    {
+        return( $self->error( "Length provided is not an integer." ) );
+    }
+    my @chars = ( '.', '/', 0..9, 'A'..'Z', 'a'..'z' );
+
+    if( $self->_load_class( 'Crypt::URandom' ) )
+    {
+        my $raw = Crypt::URandom::urandom( $len );
+        my $salt = '';
+        for my $byte ( unpack( 'C*', $raw ) )
+        {
+            $salt .= $chars[ $byte % @chars ];
+        }
+        return( substr( $salt, 0, $len ) );
+    }
+    elsif( $self->_load_class( 'Bytes::Random::Secure' ) )
+    {
+        return( Bytes::Random::Secure::random_string_from( join( '', @chars ), $len ) );
+    }
+
+    my $salt = '';
+    $salt .= $chars[ int( rand( @chars ) ) ] for 1..$len;
+    return( $salt );
+}
+
+# 16 raw bytes -> 22-char bcrypt base64, using either the module helper
+# or a tiny built-in encoder if the module isn't present.
+sub _make_salt_bcrypt
+{
+    my $self = shift( @_ );
+    # 1) get 16 cryptographically-strong random bytes
+    my $raw;
+    if( $self->_load_class( 'Crypt::URandom' ) )
+    {
+        $raw = Crypt::URandom::urandom(16);
+    }
+    elsif( $self->_load_class( 'Bytes::Random::Secure' ) )
+    {
+        # build 16 bytes from secure RNG
+        my $rng = Bytes::Random::Secure->new;
+        $raw = $rng->bytes(16);
+    }
+    else
+    {
+        # fallback: pseudo-random bytes (last resort)
+        $raw = pack( 'C*', map{ int( rand(256) ) } 1..16 );
+    }
+
+    # 2) preferred: use Eksblowfish helper
+    if( $self->_load_class( 'Crypt::Eksblowfish::Bcrypt' ) )
+    {
+        # 22 chars
+        return( Crypt::Eksblowfish::Bcrypt::en_base64( $raw ) );
+    }
+
+    # 3) tiny bcrypt-base64 encoder (./A–Z a–z 0–9), 16 bytes -> 22 chars
+    my $alpha = './ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    my @b = unpack( 'C*', $raw );
+    my $out = '';
+    for( my $i = 0; $i < @b; $i += 3 )
+    {
+        my $c1 = $b[$i];
+        my $c2 = ( $i + 1 < @b ) ? $b[ $i + 1 ] : 0;
+        my $c3 = ( $i + 2 < @b ) ? $b[ $i + 2 ] : 0;
+        my $w  = ( $c1 << 16 ) | ( $c2 << 8 ) | $c3;
+        # emit 4 chars, least-significant 6 bits first
+        for( 1..4 )
+        {
+            $out .= substr( $alpha, $w & 0x3f, 1 );
+            $w >>= 6;
+        }
+    }
+    # bcrypt wants exactly 22 chars for 16-byte input
+    return( substr( $out, 0, 22 ) );
+}
+
+sub _make_sha_crypt
+{
+    my $self = shift( @_ );
+    # $which = 5 or 6
+    my( $which, $passwd, $salt ) = @_;
+    if( !defined( $which ) || !length( $which // '' ) )
+    {
+        return( $self->error( "No SHA version was provided. This should be 5 for 256, and 6 for 512." ) );
+    }
+    elsif( $which !~ /^\d$/ )
+    {
+        return( $self->error( "SHA version provided is not an integer." ) );
+    }
+    elsif( $which != 5 && $which != 6 )
+    {
+        return( $self->error( "Invalid SHA version provided. It should be either 5 or 6." ) );
+    }
+    # undef => default 5000
+    my $rounds = $self->sha_rounds;
+
+    $salt //= $self->_make_salt(16);
+    if( $salt =~ m,[^./0-9A-Za-z], )
+    {
+        return( $self->error( "Salt value provided contains illegal characters." ) );
+    }
+    $salt = substr( $salt, 0, 16 );
+
+    my $setting = defined( $rounds )
+        ? sprintf( '$%d$rounds=%d$%s$', $which, $rounds, $salt )
+        : sprintf( '$%d$%s$',           $which,          $salt );
+
+    local $@;
+    # try-catch
+    my $hash = eval
+    {
+        crypt( $passwd, $setting );
+    };
+    if( !$@ && defined( $hash ) && $hash =~ /^\$[56]\$/ )
+    {
+        return( $hash );
+    }
+
+    my $crypt_error = $@;
+    my $sha_version = ( $which == 5 ? 256 : 512 );
+
+    # Fallback: Crypt::Passwd::XS
+    if( $self->_load_class( 'Crypt::Passwd::XS' ) )
+    {
+        $hash = eval
+        {
+            # XS exposes a `crypt`-like function:
+            Crypt::Passwd::XS::crypt( $passwd, $setting );
+        };
+        if( $@ )
+        {
+            return( $self->error( "Error generating a SHA-${sha_version} hash using Crypt::Passwd::XS: $@" ) );
+        }
+        elsif( defined( $hash ) && $hash =~ /^\$[56]\$/ )
+        {
+            return( $hash );
+        }
+        else
+        {
+            return( $self->error( "Unable to generate a SHA-${sha_version} hash using Crypt::Passwd::XS." ) );
+        }
+    }
+    elsif( $crypt_error )
+    {
+        return( $self->error( "Error generating SHA-${sha_version} hash, and alternative modules (Crypt::Passwd::XS) are not installed: $@" ) );
+    }
+    else
+    {
+        return( $self->error( "System crypt() does not support SHA-${sha_version}, and alternative modules (Crypt::Passwd::XS) are not installed" ) );
+    }
+}
+
+sub _to64
+{
+    my $self = shift( @_ );
+    my( $v, $n, $itoa64 ) = @_;
+    my $s = '';
+    while( $n-- > 0 )
+    {
+        $s .= substr( $itoa64, $v & 0x3f, 1 );
+        $v >>= 6;
+    }
+    return( $s );
+}
+
 1;
 # NOTE: POD
 __END__
@@ -821,7 +1531,7 @@ Apache2::API - Apache2 API Framework
     use Apache2::API
     # To import in your namespace
     # use Apache2::API qw( :common :http );
-    
+
     # $r is an Apache2::RequestRec object that you can get from within an handler or 
     # with Apache2::RequestUtil->request
     my $api = Apache2::API->new( $r, compression_threshold => 204800 ) ||
@@ -835,7 +1545,7 @@ Apache2::API - Apache2 API Framework
     use strict;
     use warnings;
     use Apache2::API;
-    
+
     my $r = shift( @_ );
     my $api = Apache2::API->new( $r );
     # for example:
@@ -849,7 +1559,7 @@ Apache2::API - Apache2 API Framework
     }) );
     # or
     return( $api->bailout( @some_reasons ) );
-    
+
     # 100kb
     $api->compression_threshold(102400);
     my $decoded = $api->decode_base64( $b64_string );
@@ -894,9 +1604,16 @@ Apache2::API - Apache2 API Framework
     $api->set_handlers( $name => $code_reference );
     $api->warn( @some_warnings );
 
+    my $hash = apr1_md5( $clear_password );
+    my $hash = apr1_md5( $clear_password, $salt );
+    my $ht = $api->htpasswd( $clear_password );
+    my $ht = $api->htpasswd( $clear_password, salt => $salt );
+    my $hash = $ht->hash;
+    say "Does our password match ? ", $ht->matches( $user_clear_password ) ? "yes" : "not";
+
 =head1 VERSION
 
-    v0.3.1
+    v0.4.0
 
 =head1 DESCRIPTION
 
@@ -1028,6 +1745,17 @@ This is supposed to be superseded by the package inheriting from L<Apache2::API>
 
 Given a L<DateTime> object, this sets it to GMT time zone and set the proper formatter (L<Apache2::API::DateTime>) so that the stringification is compliant with HTTP headers standard.
 
+=head2 htpasswd
+
+    my $ht = $api->htpasswd( $clear_password, create => 1 );
+    my $ht = $api->htpasswd( $clear_password, create => 1, salt => $salt );
+    my $ht = $api->htpasswd( $md5_password );
+    my $bool = $ht->matches( $user_input_password );
+
+This instantiates a new L<Apache2::API::Password> object by providing its constructor whatever arguments was received.
+
+It returns a new L<Apache2::API::Password> object, or, upon error, C<undef> in scalar context, or an empty list in list context.
+
 =head2 is_perl_option_enabled
 
 Checks if perl option is enabled in the Virtual Host and returns a boolean value
@@ -1055,6 +1783,19 @@ Given a language, this returns a language code formatted the unix way, ie en-GB 
 =head2 lang_web( $string )
 
 Given a language, this returns a language code formatted the web way, ie en_GB would become en-GB
+
+=head2 log
+
+    $api->log->emerg( "Urgent message." );
+    $api->log->alert( "Alert!" );
+    $api->log->crit( "Critical message." );
+    $api->log->error( "Error message." );
+    $api->log->warn( "Warning..." );
+    $api->log->notice( "You should know." );
+    $api->log->info( "This is for your information." );
+    $api->log->debug( "This is debugging message." );
+
+Returns a L<Apache2::Log::Request> object.
 
 =head2 log_error( $string )
 
@@ -1094,6 +1835,12 @@ If a C<cleanup> hash property is provided with a callback code reference as a va
 
 The L<Apache2::API> object will be passed as the first and only argument to the callback routine.
 
+=head2 reply_sse
+
+Special reply for Server-Sent Event that need to close the connection if there was an error.
+
+It takes the same arguments as L</reply>, call L</reply>, and if the return code is an HTTP error, it will close the HTTP connection.
+
 =head2 request()
 
 Returns the L<Apache2::API::Request> object. This object is set upon instantiation.
@@ -1124,6 +1871,23 @@ Given an object type, a method name and optional parameters, this attempts to ca
 
 Apache2 methods are designed to die upon error, whereas our model is based on returning C<undef> and setting an exception with L<Module::Generic::Exception>, because we believe that only the main program should be in control of the flow and decide whether to interrupt abruptly the execution, not some sub routines.
 
+=head1 CLASS FUNCTIONS
+
+=head2 apr1_md5
+
+    my $md5_password = apr1_md5( $clear_password );
+    my $md5_password = apr1_md5( $clear_password, $salt );
+
+This class function is exported by default.
+
+It takes a clear password, and optionally a salt, and returns an Apache md5 encoded password.
+
+This function merely instantiates a new L<Apache2::API::Password> object, and calls the method L<hash|Apache2::API::Password/hash> to return the encoded password.
+
+The password returned is suitable to be used and saved in an Apache password file used in web basic authentication.
+
+Upon error, this will die.
+
 =head1 CONSTANTS
 
 C<mod_perl> provides constants through L<Apache2::Constant> and L<APR::Constant>. L<Apache2::API> makes all those constants available using their respective package name, such as:
@@ -1137,6 +1901,30 @@ You can import constants into your namespace by specifying them when loading L<A
     say HTTP_BAD_REQUEST; # 400
 
 Be careful, however, that there are over 400 Apache2 constants and some common constant names in L<Apache2::Constant> and L<APR::Constant>, so it is recommended to use the fully qualified constant names rather than importing them into your namespace.
+
+Some constants are special like C<OK>, C<DECLINED> or C<DECLINE_CMD>
+
+Apache L<underlines|https://perl.apache.org/docs/2.0/user/handlers/http.html#toc_HTTP_Request_Cycle_Phases> that "all handlers in the chain will be run as long as they return Apache2::Const::OK or Apache2::Const::DECLINED. Because stacked handlers is a special case. So don't be surprised if you've returned Apache2::Const::OK and the next handler was still executed. This is a feature, not a bug."
+
+=over 4
+
+=item * C<Apache2::Const::OK>
+
+The only value that can be returned by all handlers is C<Apache2::Const::OK>, which tells Apache that the handler has successfully finished its execution.
+
+=item * C<Apache2::Const::DECLINED>
+
+This indicates success, but it's only relevant for phases of type RUN_FIRST (C<PerlProcessConnectionHandler>, C<PerlTransHandler>, C<PerlMapToStorageHandler>, C<PerlAuthenHandler>, C<PerlAuthzHandler>, C<PerlTypeHandler>, C<PerlResponseHandler>
+
+Apache2 L<documentation explains|https://perl.apache.org/docs/2.0/api/Apache2/RequestRec.html#toc_C_allowed_> that "generally modules should C<Apache2::Const::DECLINED> any request methods they do not handle."
+
+=item * C<Apache2::Const::DONE>
+
+This "tells Apache to stop the normal HTTP request cycle and fast forward to the PerlLogHandler,"
+
+=back
+
+Check L<Apache documentation on handler return value|https://perl.apache.org/docs/2.0/user/handlers/intro.html#toc_Handler_Return_Values> for more information.
 
 =head1 INSTALLATION
 

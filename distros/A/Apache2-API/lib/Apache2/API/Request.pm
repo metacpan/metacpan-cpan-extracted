@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Apache2 API Framework - ~/lib/Apache2/API/Request.pm
-## Version v0.2.1
+## Version v0.3.0
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/05/30
-## Modified 2024/09/04
+## Modified 2024/12/14
 ## All rights reserved
 ## 
 ## 
@@ -55,7 +55,7 @@ BEGIN
     use URI;
     use URI::Escape;
     use Want;
-    our $VERSION = 'v0.2.1';
+    our $VERSION = 'v0.3.0';
     our( $SERVER_VERSION, $ERROR );
 };
 
@@ -250,6 +250,12 @@ sub auto_header
 # my( $rc, $passwd ) = $req->basic_auth_passwd;
 sub basic_auth_passwd { return( shift->_try( 'request', 'get_basic_auth_pw' ) ); }
 
+{
+    no warnings 'once';
+    *basic_auth_pwd = \&basic_auth_passwd;
+    *basic_auth_pw = \&basic_auth_passwd;
+}
+
 # See APR::Request
 # sub body { return( shift->_try( 'request', 'body', @_ ) ); }
 sub body { return( shift->_try( 'apr', 'body', @_ ) ); }
@@ -297,7 +303,7 @@ sub close
     }
     else
     {
-        return( 0 );
+        return(0);
     }
 }
 
@@ -625,6 +631,8 @@ sub is_header_only { return( shift->request->header_only ); }
 # To find out if a PerlOptions is activated like +GlobalRequest or -GlobalRequest
 sub is_perl_option_enabled { return( shift->_try( 'request', 'is_perl_option_enabled', @_ ) ); }
 
+sub is_initial_req { return( shift->_try( 'request', 'is_initial_req', @_ ) ); }
+
 sub is_secure { return( shift->env( 'HTTPS' ) eq 'on' ? 1 : 0 ); }
 
 sub json
@@ -675,6 +683,9 @@ sub local_ip { return( shift->_try( 'connection', 'local_ip' ) ); }
 
 sub location { return( shift->_try( 'request', 'location' ) ); }
 
+# Would return a Apache2::Log::Request
+sub log { return( shift->_try( 'request', 'log', @_ ) ); }
+
 sub log_error { return( shift->_try( 'request', 'log_error', @_ ) ); }
 
 sub max_size { return( shift->_set_get_number( 'max_size', @_ ) ); }
@@ -698,7 +709,7 @@ sub no_cache { return( shift->_try( 'request', 'no_cache', @_ ) ); }
 
 # Takes an APR::Table object
 # There is also one available via the connection object
-# I returns an APR::Table object which can be used like a hash ie foreach my $k ( sort( keys( %{$table} ) ) )
+# It returns an APR::Table object which can be used like a hash ie foreach my $k ( sort( keys( %{$table} ) ) )
 sub notes
 {
     my $self = shift( @_ );
@@ -866,6 +877,8 @@ sub prev { return( shift->_try( 'request', 'prev' ) ); }
 sub protocol { return( shift->_try( 'request', 'protocol' ) ); }
 
 sub proxyreq { return( shift->_try( 'request', 'proxyreq', @_ ) ); }
+
+sub psignature { return( shift->_try( 'request', 'psignature', @_ ) ); }
 
 # push_handlers( PerlCleanupHandler => \&handler );
 # $ok = $r->push_handlers($hook_name => \&handler);
@@ -1645,7 +1658,7 @@ Apache2::API::Request - Apache2 Incoming Request Access and Manipulation
 
 =head1 VERSION
 
-    v0.2.1
+    v0.3.0
 
 =head1 DESCRIPTION
 
@@ -1986,7 +1999,7 @@ See L<Apache2::RequestRec> for more information on this.
 
 =head2 basic_auth_passwd
 
-    my( $rc, $passwd ) = $req->basic_auth_pw;
+    my( $rc, $passwd ) = $req->basic_auth_passwd;
 
 Get the details from the basic authentication, by calling L<Apache2::Access/get_basic_auth_pw>
 
@@ -2606,6 +2619,17 @@ See also: PerlOptions and the equivalent function for server level PerlOptions f
 
 See the L<Apache2::RequestUtil> module documentation for more information.
 
+=head2 is_initial_req
+
+    # Are we in the main request?
+    $is_initial = $req->is_initial_req;
+
+Determines whether the current request is the main request or a sub-request.
+
+This returns a boolean value.
+
+See also L<main|/main>, which returns the main request object.
+
 =head2 is_secure
 
 Returns true (1) if the connection is made under ssl, i.e. of the environment variable C<HTTPS> is set to C<on>, other it returns false (0).
@@ -2707,6 +2731,19 @@ Get the path of the <Location> section from which the current C<Perl*Handler> is
 This calls L<Apache2::RequestUtil/location>
 
 Returns a string.
+
+=head2 log
+
+    $req->log->emerg( "Urgent message." );
+    $req->log->alert( "Alert!" );
+    $req->log->crit( "Critical message." );
+    $req->log->error( "Error message." );
+    $req->log->warn( "Warning..." );
+    $req->log->notice( "You should know." );
+    $req->log->info( "This is for your information." );
+    $req->log->debug( "This is debugging message." );
+
+Returns a L<Apache2::Log::Request> object.
 
 =head2 log_error
 
@@ -2967,6 +3004,15 @@ And you may also want to add
      $req->set_handlers( PerlResponseHandler => [] );
 
 so that any response handlers which match apache directives will not run in addition to the mod_proxy content handler.
+
+=head2 psignature
+
+    my $sig = $req->psignature;
+    my $sig = $req->psignature( $prefix );
+
+Get HTML describing the address and (optionally) admin of the server. It takes an optional C<$prefix> that will be prepended to the return value.
+
+Note that depending on the value of the C<ServerSignature> directive, the function may return the address, including the admin information or nothing at all.
 
 =head2 push_handlers
 
