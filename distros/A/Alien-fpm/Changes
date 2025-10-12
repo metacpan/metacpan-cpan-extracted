@@ -1,3 +1,8 @@
+0.03 2025-10-02
+
+   - Add a dependency for Alien::Ruby.
+   - Changed license to GPL3.
+
 0.02 2024-10-21
 
    - Minor documentation format updates.

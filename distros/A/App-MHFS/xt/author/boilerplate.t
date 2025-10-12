@@ -1,8 +1,8 @@
 #!perl
-use 5.006;
+use 5.014;
 use strict;
 use warnings;
-use Test::More;
+use Test2::V0;
 
 plan tests => 3;
 
@@ -38,8 +38,7 @@ sub module_boilerplate_ok {
     );
 }
 
-TODO: {
-  local $TODO = "Need to replace the boilerplate text";
+todo "Need to replace the boilerplate text" => sub {
 
   not_in_file_ok(README =>
     "The README is used..."       => qr/The README is used/,
@@ -53,5 +52,4 @@ TODO: {
   module_boilerplate_ok('lib/App/MHFS.pm');
 
 
-}
-
+};

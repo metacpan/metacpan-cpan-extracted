@@ -10,17 +10,19 @@ App::Greple::xlate - translation support module for greple
 
     greple -Mxlate::gpt4 --xlate pattern target-file
 
-    greple -Mxlate --xlate-engine gpt4 --xlate pattern target-file
+    greple -Mxlate::gpt5 --xlate pattern target-file
+
+    greple -Mxlate --xlate-engine gpt5 --xlate pattern target-file
 
 =head1 VERSION
 
-Version 0.9912
+Version 0.9914
 
 =head1 DESCRIPTION
 
 B<Greple> B<xlate> module find desired text blocks and replace them by
-the translated text.  Currently DeepL (F<deepl.pm>) and ChatGPT 4.1
-(F<gpt4.pm>) module are implemented as a back-end engine.
+the translated text.  Currently DeepL (F<deepl.pm>), ChatGPT 4.1
+(F<gpt4.pm>), and GPT-5 (F<gpt5.pm>) module are implemented as a back-end engine.
 
 If you want to translate normal text blocks in a document written in
 the Perl's pod style, use B<greple> command with C<xlate::deepl> and
@@ -186,6 +188,8 @@ At this time, the following engines are available
 B<gpt-4o>'s interface is unstable and cannot be guaranteed to work
 correctly at the moment.
 
+=item * B<gpt5>: gpt-5
+
 =back
 
 =item B<--xlate-labor>
@@ -297,6 +301,27 @@ Specify the maximum lines of text to be sent to the API at once.
 
 Set this value to 1 if you want to translate one line at a time.  This
 option takes precedence over the C<--xlate-maxlen> option.
+
+=item B<--xlate-prompt>=I<text>
+
+Specify a custom prompt to be sent to the translation engine.  This option
+is only available when using ChatGPT engines (gpt3, gpt4, gpt4o).  You can
+customize the translation behavior by providing specific instructions to the
+AI model.  If the prompt contains C<%s>, it will be replaced with the target
+language name.
+
+=item B<--xlate-context>=I<text>
+
+Specify additional context information to be sent to the translation
+engine.  This option can be used multiple times to provide multiple
+context strings.  The context information helps the translation engine
+understand the background and produce more accurate translations.
+
+=item B<--xlate-glossary>=I<glossary>
+
+Specify a glossary ID to be used for translation.  This option is only
+available when using the DeepL engine.  The glossary ID should be obtained
+from your DeepL account and ensures consistent translation of specific terms.
 
 =item B<-->[B<no->]B<xlate-progress> (Default: True)
 
@@ -455,6 +480,8 @@ L<App::Greple::xlate>
 L<App::Greple::xlate::deepl>
 
 L<App::Greple::xlate::gpt4>
+
+L<App::Greple::xlate::gpt5>
 
 =over 2
 

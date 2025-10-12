@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-package App::Cmd::ArgProcessor 0.337;
+package App::Cmd::ArgProcessor 0.338;
 
 # ABSTRACT: App::Cmd-specific wrapper for Getopt::Long::Descriptive
 
@@ -35,7 +35,7 @@ App::Cmd::ArgProcessor - App::Cmd-specific wrapper for Getopt::Long::Descriptive
 
 =head1 VERSION
 
-version 0.337
+version 0.338
 
 =head1 PERL VERSION
 
@@ -53,7 +53,7 @@ Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Ricardo Signes.
+This software is copyright (c) 2025 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

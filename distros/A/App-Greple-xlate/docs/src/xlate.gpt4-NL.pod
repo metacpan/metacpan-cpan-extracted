@@ -10,15 +10,17 @@ App::Greple::xlate - vertaalondersteuningsmodule voor greple
 
     greple -Mxlate::gpt4 --xlate pattern target-file
 
-    greple -Mxlate --xlate-engine gpt4 --xlate pattern target-file
+    greple -Mxlate::gpt5 --xlate pattern target-file
+
+    greple -Mxlate --xlate-engine gpt5 --xlate pattern target-file
 
 =head1 VERSION
 
-Version 0.9912
+Version 0.9914
 
 =head1 DESCRIPTION
 
-B<Greple> B<xlate> module vindt gewenste tekstblokken en vervangt deze door de vertaalde tekst. Momenteel zijn DeepL (F<deepl.pm>) en ChatGPT 4.1 (F<gpt4.pm>) module geïmplementeerd als back-end engine.
+B<Greple> B<xlate> module vindt de gewenste tekstblokken en vervangt deze door de vertaalde tekst. Momenteel zijn DeepL (F<deepl.pm>), ChatGPT 4.1 (F<gpt4.pm>) en GPT-5 (F<gpt5.pm>) modules geïmplementeerd als back-end engine.
 
 Als je normale tekstblokken in een document geschreven in de Perl's pod-stijl wilt vertalen, gebruik dan het B<greple> commando met C<xlate::deepl> en C<perl> module zoals dit:
 
@@ -134,6 +136,8 @@ Op dit moment zijn de volgende engines beschikbaar
 
 B<gpt-4o>'s interface is instabiel en kan momenteel niet gegarandeerd correct werken.
 
+=item * B<gpt5>: gpt-5
+
 =back
 
 =item B<--xlate-labor>
@@ -226,6 +230,18 @@ Als het formaat C<xtxt> (vertaalde tekst) of onbekend is, wordt alleen de vertaa
 Specificeer de maximale lengte van de tekst die in één keer naar de API mag worden gestuurd. De standaardwaarde is ingesteld zoals voor de gratis DeepL-accountservice: 128K voor de API (B<--xlate>) en 5000 voor de klembordinterface (B<--xlate-labor>). Mogelijk kunt u deze waarde wijzigen als u de Pro-service gebruikt.
 
 Specificeer het maximaal aantal regels tekst dat in één keer naar de API mag worden gestuurd.
+
+=item B<--xlate-prompt>=I<text>
+
+Geef een aangepaste prompt op die naar de vertaalmachine wordt gestuurd. Deze optie is alleen beschikbaar bij gebruik van ChatGPT-engines (gpt3, gpt4, gpt4o). Je kunt het vertaalgedrag aanpassen door specifieke instructies aan het AI-model te geven. Als de prompt C<%s> bevat, wordt deze vervangen door de naam van de doeltaal.
+
+=item B<--xlate-context>=I<text>
+
+Geef extra contextinformatie op die naar de vertaalmachine wordt gestuurd. Deze optie kan meerdere keren worden gebruikt om meerdere contextstrings te leveren. De contextinformatie helpt de vertaalmachine de achtergrond te begrijpen en nauwkeurigere vertalingen te produceren.
+
+=item B<--xlate-glossary>=I<glossary>
+
+Geef een woordenlijst-ID op die voor de vertaling wordt gebruikt. Deze optie is alleen beschikbaar bij gebruik van de DeepL-engine. De woordenlijst-ID moet uit je DeepL-account worden verkregen en zorgt voor consistente vertaling van specifieke termen.
 
 =item B<-->[B<no->]B<xlate-progress> (Default: True)
 
@@ -356,6 +372,8 @@ L<App::Greple::xlate>
 L<App::Greple::xlate::deepl>
 
 L<App::Greple::xlate::gpt4>
+
+L<App::Greple::xlate::gpt5>
 
 =over 2
 

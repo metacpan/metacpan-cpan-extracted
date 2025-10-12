@@ -8,15 +8,17 @@ App::Greple::xlate - grepleのための翻訳サポートモジュール
 
     greple -Mxlate::gpt4 --xlate pattern target-file
 
-    greple -Mxlate --xlate-engine gpt4 --xlate pattern target-file
+    greple -Mxlate::gpt5 --xlate pattern target-file
+
+    greple -Mxlate --xlate-engine gpt5 --xlate pattern target-file
 
 # VERSION
 
-Version 0.9912
+Version 0.9914
 
 # DESCRIPTION
 
-**Greple** **xlate** モジュールは、目的のテキストブロックを見つけて翻訳されたテキストに置き換えます。現在、DeepL（`deepl.pm`）およびChatGPT 4.1（`gpt4.pm`）モジュールがバックエンドエンジンとして実装されています。
+**Greple** **xlate** モジュールは、指定したテキストブロックを検索し、翻訳されたテキストに置き換えます。現在、DeepL（`deepl.pm`）、ChatGPT 4.1（`gpt4.pm`）、およびGPT-5（`gpt5.pm`）モジュールがバックエンドエンジンとして実装されています。
 
 Perlのpodスタイルで書かれたドキュメント内の通常のテキストブロックを翻訳したい場合は、**greple**コマンドを`xlate::deepl`および`perl`モジュールとともに次のように使用します。
 
@@ -113,6 +115,8 @@ Perlのpodスタイルで書かれたドキュメント内の通常のテキス�
 
         **gpt-4o** のインターフェースは不安定で、現時点では正しく動作する保証はありません。
 
+    - **gpt5**: gpt-5
+
 - **--xlate-labor**
 - **--xlabor**
 
@@ -197,6 +201,18 @@ Perlのpodスタイルで書かれたドキュメント内の通常のテキス�
     一度にAPIに送信するテキストの最大行数を指定します。
 
     1行ずつ翻訳したい場合は、この値を1に設定してください。このオプションは`--xlate-maxlen`オプションより優先されます。
+
+- **--xlate-prompt**=_text_
+
+    翻訳エンジンに送信するカスタムプロンプトを指定します。このオプションはChatGPTエンジン（gpt3、gpt4、gpt4o）を使用している場合のみ利用可能です。AIモデルに特定の指示を与えることで、翻訳の挙動をカスタマイズできます。プロンプトに`%s`が含まれている場合は、対象言語名に置き換えられます。
+
+- **--xlate-context**=_text_
+
+    翻訳エンジンに送信する追加のコンテキスト情報を指定します。このオプションは複数回使用でき、複数のコンテキスト文字列を提供できます。コンテキスト情報は翻訳エンジンが背景を理解し、より正確な翻訳を生成するのに役立ちます。
+
+- **--xlate-glossary**=_glossary_
+
+    翻訳に使用する用語集IDを指定します。このオプションはDeepLエンジンを使用している場合のみ利用可能です。用語集IDはDeepLアカウントから取得する必要があり、特定の用語の一貫した翻訳を保証します。
 
 - **--**\[**no-**\]**xlate-progress** (Default: True)
 
@@ -312,6 +328,8 @@ DeepLとChatGPTのコマンドラインツールをインストールする必�
 [App::Greple::xlate](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate)
 
 [App::Greple::xlate::gpt4](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt4)
+
+[App::Greple::xlate::gpt5](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt5)
 
 - [https://hub.docker.com/r/tecolicom/xlate](https://hub.docker.com/r/tecolicom/xlate)
 

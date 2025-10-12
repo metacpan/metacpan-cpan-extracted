@@ -1,7 +1,19 @@
 // ExposeType: Expose constants, structs, and unions to js
 #pragma once
 #include <stddef.h>
+#include <stdint.h>
 #include <assert.h>
+
+#if defined(__SIZEOF_SIZE_T__) && defined(__SIZEOF_POINTER__)
+#if __SIZEOF_SIZE_T__ >= __SIZEOF_POINTER__
+  typedef size_t et_value;
+#else
+  typedef uintptr_t et_value;
+#endif
+#else
+  typedef size_t et_value;
+  static_assert(sizeof(et_value) < sizeof(uintptr_t), "et_value not big enough for pointer");
+#endif
 
 typedef enum {
     ET_TT_CONST_IV = 1,
@@ -21,7 +33,7 @@ case 0: \
 return XTYPE; \
 break; \
 case 1: \
-return (uint64_t)#X; \
+return (et_value)#X; \
 break; \
 case 2: \
 return X; \
@@ -39,7 +51,7 @@ case 0: \
 return XTYPE; \
 break; \
 case 1: \
-return (uint64_t)#XMEMBER; \
+return (et_value)#XMEMBER; \
 break; \
 case 2: \
 return offsetof(XSTRUCT, XMEMBER); \
@@ -72,7 +84,7 @@ case 0: \
 return ET_TT_ST; \
 break; \
 case 1: \
-return (uint64_t)#X; \
+return (et_value)#X; \
 break; \
 case 2: \
 return sizeof(X); \

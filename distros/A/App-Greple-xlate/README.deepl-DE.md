@@ -8,15 +8,17 @@ App::Greple::xlate - Übersetzungsunterstützungsmodul für Greple
 
     greple -Mxlate::gpt4 --xlate pattern target-file
 
-    greple -Mxlate --xlate-engine gpt4 --xlate pattern target-file
+    greple -Mxlate::gpt5 --xlate pattern target-file
+
+    greple -Mxlate --xlate-engine gpt5 --xlate pattern target-file
 
 # VERSION
 
-Version 0.9912
+Version 0.9914
 
 # DESCRIPTION
 
-**Greple** **xlate** Modul findet die gewünschten Textblöcke und ersetzt sie durch den übersetzten Text. Derzeit sind die Module DeepL (`deepl.pm`) und ChatGPT 4.1 (`gpt4.pm`) als Backend-Engine implementiert.
+**Greple** **xlate** Das Modul findet die gewünschten Textblöcke und ersetzt sie durch den übersetzten Text. Derzeit sind die Module DeepL (`deepl.pm`), ChatGPT 4.1 (`gpt4.pm`) und GPT-5 (`gpt5.pm`) als Backend-Engine implementiert.
 
 Wenn Sie normale Textblöcke in einem Dokument übersetzen wollen, das im Pod-Stil von Perl geschrieben ist, verwenden Sie den Befehl **greple** mit dem Modul `xlate::deepl` und `perl` wie folgt:
 
@@ -113,6 +115,8 @@ Diese Schnittstelle ist experimentell und kann sich in Zukunft noch ändern.
 
         Die Schnittstelle von **gpt-4o** ist instabil und es kann nicht garantiert werden, dass sie im Moment korrekt funktioniert.
 
+    - **gpt5**: gpt-5
+
 - **--xlate-labor**
 - **--xlabor**
 
@@ -197,6 +201,18 @@ Diese Schnittstelle ist experimentell und kann sich in Zukunft noch ändern.
     Geben Sie die maximale Anzahl von Textzeilen an, die auf einmal an die API gesendet werden sollen.
 
     Setzen Sie diesen Wert auf 1, wenn Sie jeweils nur eine Zeile übersetzen wollen. Diese Option hat Vorrang vor der Option `--xlate-maxlen`.
+
+- **--xlate-prompt**=_text_
+
+    Geben Sie eine benutzerdefinierte Eingabeaufforderung an, die an die Übersetzungsmaschine gesendet werden soll. Diese Option ist nur bei Verwendung von ChatGPT-Engines (gpt3, gpt4, gpt4o) verfügbar. Sie können das Übersetzungsverhalten anpassen, indem Sie dem KI-Modell spezifische Anweisungen geben. Wenn die Eingabeaufforderung `%s` enthält, wird sie durch den Namen der Zielsprache ersetzt.
+
+- **--xlate-context**=_text_
+
+    Geben Sie zusätzliche Kontextinformationen an, die an die Übersetzungsmaschine gesendet werden sollen. Diese Option kann mehrfach verwendet werden, um mehrere Kontextstrings anzugeben. Die Kontextinformationen helfen der Übersetzungsmaschine, den Hintergrund zu verstehen und genauere Übersetzungen zu erstellen.
+
+- **--xlate-glossary**=_glossary_
+
+    Geben Sie eine Glossarkennung an, die für die Übersetzung verwendet werden soll. Diese Option ist nur bei Verwendung der DeepL Engine verfügbar. Die Glossar-ID sollte von Ihrem DeepL Konto bezogen werden und gewährleistet eine konsistente Übersetzung bestimmter Begriffe.
 
 - **--**\[**no-**\]**xlate-progress** (Default: True)
 
@@ -312,6 +328,8 @@ Sie müssen die Befehlszeilentools für DeepL und ChatGPT installieren.
 [App::Greple::xlate::deepl](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Adeepl)
 
 [App::Greple::xlate::gpt4](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt4)
+
+[App::Greple::xlate::gpt5](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt5)
 
 - [https://hub.docker.com/r/tecolicom/xlate](https://hub.docker.com/r/tecolicom/xlate)
 

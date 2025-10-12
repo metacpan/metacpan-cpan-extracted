@@ -9,19 +9,19 @@
 #endif
 #include <stdint.h>
 #include <stddef.h>
+#include "exposetype.h"
 
 // util
 LIBEXPORT unsigned long mhfs_cl_djb2(const uint8_t *pData, const size_t dataLen);
 
 // For JS convenience export types
-LIBEXPORT uint64_t mhfs_cl_et_load_type(const uint32_t itemIndex, const uint32_t subItemIndex);
+LIBEXPORT et_value mhfs_cl_et_load_type(const uint32_t itemIndex, const uint32_t subItemIndex);
 #endif /* mhfs_cl_misc_h */
 
 #if defined(MHFSCLMISC_IMPLEMENTATION)
 #ifndef mhfs_cl_misc_c
 #define mhfs_cl_misc_c
 
-#include "exposetype.h"
 #include "mhfs_cl.h"
 #include "mhfs_cl_track.h"
 
@@ -35,7 +35,7 @@ unsigned long mhfs_cl_djb2(const uint8_t *pData, const size_t dataLen)
     return hash;
 }
 
-uint64_t mhfs_cl_et_load_type(const uint32_t itemIndex, const uint32_t subItemIndex)
+et_value mhfs_cl_et_load_type(const uint32_t itemIndex, const uint32_t subItemIndex)
 {
     switch(itemIndex)
     {

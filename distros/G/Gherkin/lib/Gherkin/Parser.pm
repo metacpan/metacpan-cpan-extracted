@@ -1,5 +1,5 @@
 package Gherkin::Parser;
-$Gherkin::Parser::VERSION = '35.1.0';
+$Gherkin::Parser::VERSION = '36.0.0';
 use strict;
 use warnings;
 

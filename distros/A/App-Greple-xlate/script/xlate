@@ -59,13 +59,13 @@ define pod <<"=cut"
         -I # docker image or version (default: tecolicom/xlate:version)
 
     Control Files:
-        *.LANG    translation languates
-        *.FORMAT  translation foramt (xtxt, cm, ifdef, colon, space)
+        *.LANG    translation languages
+        *.FORMAT  translation format (xtxt, cm, ifdef, colon, space)
         *.ENGINE  translation engine (deepl, gpt3, gpt4, gpt4o)
 
 =head1 VERSION
 
-    Version 0.9912
+    Version 0.9914
 
 =cut
 
@@ -76,13 +76,13 @@ git_topdir() {
     [[ $(git rev-parse --is-inside-work-tree 2>/dev/null) == true ]] || return
     local         dir="$(git rev-parse --show-superproject-working-tree)"
     [[ $dir ]] || dir="$(git rev-parse --show-toplevel)"
-    echo $dir
+    echo "$dir"
 }
 
 get_ip() {
     : get_ip
     local ip=$(ifconfig 2>/dev/null | awk '/inet /{print $2}' | tail -1)
-    echo $ip
+    echo "$ip"
 }
 
 dist_dir() {
@@ -91,7 +91,7 @@ dist_dir() {
 
 warn() {
     [[ $quiet ]] && return
-    echo ${1+"$@"} >&2
+    echo "$@" >&2
 }
 
 topdir=$(git_topdir)
@@ -141,7 +141,7 @@ container_name() {
 	fi
 	[[ $volume ]] && name+=.${volume##*/}
     fi
-    echo $name
+    echo "$name"
 }
 
 docker_find() {
@@ -150,12 +150,12 @@ docker_find() {
     while getopts "s:" OPT
     do
 	case $OPT in
-	    s) status+=($OPTARG) ;;
+	    s) status+=("$OPTARG") ;;
 	esac
     done
     shift $((OPTIND - 1))
     id=$(docker ps -a -q ${status[@]/#/-f status=} -f name="^/$1\$")
-    [[ $id ]] && echo $id || return 1
+    [[ $id ]] && echo "$id" || return 1
 }
 
 docker_status() {
@@ -175,7 +175,7 @@ do
     [[ -r $rc ]] || continue
     mapfile -t OPTS < <(grep -v ^# "$rc")
     warn "$myname: ${OPTS[@]}"
-    set -- ${OPTS[@]} ${1+"$@"}
+    set -- ${OPTS[@]} "$@"
 done
 
 ##
@@ -201,7 +201,7 @@ do
 	    ;;
 	E) ENV+=("$OPTARG") ;;
 	P) ports+=("$OPTARG") ;;
-	O) others+=($OPTARG) ;;
+	O) others+=("$OPTARG") ;;
 	B) interactive= ;;
 
 	# mount related options
@@ -287,7 +287,7 @@ do
 		D) command=(xlate) ;;
 		*) shift $((OPTIND - 1)) ;;
 	    esac
-	    command+=(${1+"$@"})
+	    command+=("$@")
 	    : ${image:=${repository}${version:+:$version}}
 	    : ${hostname:=$(<<< ${image} sed -e s:.*/:: -e s/:.*//)}
 	    declare -a dockopt=(
@@ -353,7 +353,7 @@ do
 	    then
 		cat $file
 	    else
-		echo $share
+		echo "$share"
 		ls -1 $share | sed 's/^/\t/'
 	    fi
 	    exit
@@ -378,9 +378,9 @@ shift $((OPTIND - 1))
 find_gmake() {
     local make
     (( $# == 0 )) && set make gmake gnumake
-    for make in $@
+    for make in "$@"
     do
-	[[ $($make --version) =~ GNU ]] && { echo $make; return 0; }
+	[[ $("$make" --version) =~ GNU ]] && { echo "$make"; return 0; }
     done
     return 1
 }
@@ -485,7 +485,7 @@ else
     option+=("${area[@]}")
 fi
 
-exec=(greple "${module[@]}" "${option[@]}" ${1+"$@"})
+exec=(greple "${module[@]}" "${option[@]}" "$@")
 [[ $dryrun ]] && exec=(echo "${exec[@]}")
 
 exec "${exec[@]}"
@@ -594,7 +594,7 @@ configuration settings without modifying the container itself.
 
 xlate utilizes GNU Make for automating and managing translation tasks.
 This feature is particularly useful for handling translations of
-multiple files or to different languages.
+multiple files or translations to different languages.
 
 To use the make feature:
 
@@ -713,7 +713,7 @@ See L<App::Greple::xlate/NORMALIZATION>.
 
 =item B<-f> I<file>
 
-Specify a file containing pattern to determine the translation area.
+Specify a file containing patterns to determine the translation area.
 See L<App::Greple::xlate/NORMALIZATION>.
 
 =item B<-o> I<format>
@@ -749,7 +749,7 @@ Run make.
 
 =item B<-n>
 
-Dry run.
+Dry-run.
 
 =back
 
@@ -757,14 +757,14 @@ Dry run.
 
 Docker feature is invoked by the C<-D>, C<-C> or C<-L> option.
 Once any of these options appear, subsequent options are not
-interpreted, so it should always be the last of Docker related
+interpreted, so they should always be the last of the Docker-related
 options.
 
 =over 7
 
 =item B<-D> I<options>
 
-Run B<xlate> scirpt on the Docker container with the rest of the
+Run B<xlate> script on the Docker container with the rest of the
 parameters.
 
 =item B<-C> [ I<command> ]
@@ -786,11 +786,11 @@ Therefore, the next time it attaches, it connects to the container
 that executes that command.
 
 Target container is distinguished by name.  The default container name
-is C<xlate>.  The last portion of the Docker image to run is given as
-the name of the container.  If a directory to mount is specified, the
-name of that directory is added after dot (C<.>).  For example, if you
-run C<ubuntu:latest> image with mounting home directory (C<-H>), the
-container name will be C<ubuntu.yourname>.
+is C<xlate>.  The image name (the part after the last slash in the
+Docker image name) is used as the container name.  If a directory to
+mount is specified, the name of that directory is added after a dot
+(C<.>).  For example, if you run C<ubuntu:latest> image with mounting
+home directory (C<-H>), the container name will be C<ubuntu.yourname>.
 
 =begin comment
 
@@ -803,10 +803,10 @@ the container.
 
 =back
 
-When running in a docker environment, the L<git(1)> top directory is
+When running in a Docker environment, the L<git(1)> top directory is
 mounted if you are in a directory under git, otherwise current
-directory is mounted.  Working directory will still be moved to the
-current location within that tree.
+directory is mounted.  The working directory inside the container will
+be set to the corresponding location within that tree.
 
 =over 7
 
@@ -838,7 +838,7 @@ Mount directory as read-only.
 
 =item B<-V> I<from>:I<to>
 
-Specify the additional directory to be mounted.
+Specify an additional directory to be mounted.
 Repeatable.
 
 =item B<-E> I<name>[=I<value>]
@@ -871,7 +871,7 @@ without the C<--interactive> and C<--tty> options.
 
 Specifies the name of the live container explicitly.  Once you have
 created a container named C<xlate>, you can connect to it with just
-the C<-A> option.
+the C<-L> option.
 
 =item B<-K>
 

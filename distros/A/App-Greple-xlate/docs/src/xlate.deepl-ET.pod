@@ -10,15 +10,17 @@ App::Greple::xlate - Greple tõlkimise tugimoodul
 
     greple -Mxlate::gpt4 --xlate pattern target-file
 
-    greple -Mxlate --xlate-engine gpt4 --xlate pattern target-file
+    greple -Mxlate::gpt5 --xlate pattern target-file
+
+    greple -Mxlate --xlate-engine gpt5 --xlate pattern target-file
 
 =head1 VERSION
 
-Version 0.9912
+Version 0.9914
 
 =head1 DESCRIPTION
 
-B<Greple> B<xlate> moodul leiab soovitud tekstiplokid ja asendab need tõlgitud tekstiga. Hetkel on rakendatud DeepL (F<deepl.pm>) ja ChatGPT 4.1 (F<gpt4.pm>) moodulit kui back-end mootorit.
+B<Greple> B<xlate> moodul leiab soovitud tekstiplokid ja asendab need tõlgitud tekstiga. Praegu on moodul DeepL (F<deepl.pm>), ChatGPT 4.1 (F<gpt4.pm>) ja GPT-5 (F<gpt5.pm>) rakendatud back-end mootorina.
 
 Kui soovite tõlkida tavalisi tekstiplokke Perli pod-stiilis kirjutatud dokumendis, kasutage käsku B<greple> koos C<xlate::deepl> ja C<perl> mooduliga niimoodi:
 
@@ -134,6 +136,8 @@ Praegu on saadaval järgmised mootorid
 
 B<gpt-4o> liides on ebastabiilne ja hetkel ei saa garanteerida selle korrektset toimimist.
 
+=item * B<gpt5>: gpt-5
+
 =back
 
 =item B<--xlate-labor>
@@ -226,6 +230,18 @@ Määrake API-le korraga saadetava teksti maksimaalne pikkus. Vaikeväärtus on 
 Määrake API-le korraga saadetava teksti maksimaalne ridade arv.
 
 Määrake selle väärtuseks 1, kui soovite tõlkida ühe rea korraga. See valik on ülimuslik valikust C<--xlate-maxlen>.
+
+=item B<--xlate-prompt>=I<text>
+
+Määrake tõlkemootorile saadetav kohandatud üleskutse. See valik on saadaval ainult siis, kui kasutate ChatGPT mootoreid (gpt3, gpt4, gpt4o). Te saate kohandada tõlkekäitumist, andes AI-mudelile konkreetsed juhised. Kui üleskutse sisaldab C<%s>, asendatakse see sihtkeele nimega.
+
+=item B<--xlate-context>=I<text>
+
+Määrake lisakonteksti teave, mis saadetakse tõlkemootorile. Seda valikut saab kasutada mitu korda, et anda mitu kontekstijada. Kontekstiandmed aitavad tõlkemootoril mõista tausta ja toota täpsemaid tõlkeid.
+
+=item B<--xlate-glossary>=I<glossary>
+
+Määrake sõnastiku ID, mida kasutatakse tõlkimisel. See valik on saadaval ainult siis, kui kasutatakse DeepL mootorit. Sõnastiku ID tuleks saada teie DeepL kontolt ja see tagab konkreetsete terminite järjepideva tõlkimise.
 
 =item B<-->[B<no->]B<xlate-progress> (Default: True)
 
@@ -356,6 +372,8 @@ L<App::Greple::xlate>
 L<App::Greple::xlate::deepl>
 
 L<App::Greple::xlate::gpt4>
+
+L<App::Greple::xlate::gpt5>
 
 =over 2
 

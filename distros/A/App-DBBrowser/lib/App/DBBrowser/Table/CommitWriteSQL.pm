@@ -37,14 +37,17 @@ sub commit_sql {
         $ax->print_sql_info( $ax->get_sql_info( $sql ), $waiting );
         $count_affected = @{$sql->{insert_args}};
     }
-    else {
+    elsif ( $stmt_type eq 'Update' or $stmt_type eq 'Delete' ) {
         $ax->print_sql_info( $ax->get_sql_info( $sql ), $waiting );
         my $all_arrayref = [];
         if ( ! eval {
-            my $stmt = "SELECT * FROM $sql->{table}";
+            my $ctes = $ax->cte_stmts( 'prepare', 1 );
+            my $stmt = length $ctes ? $ctes . ' ' : '';
+            $stmt .= "SELECT * FROM $sql->{table}";
             if ( length $sql->{where_stmt} ) {
                 $stmt .= ' ' . $sql->{where_stmt};
             }
+            #my $stmt = $ax->get_stmt( $sql, 'Select', 'prepare' );
             my $sth = $dbh->prepare( $stmt );
             $sth->execute();
             my $col_names = $sth->{NAME};
@@ -69,6 +72,11 @@ sub commit_sql {
         }
         $ax->print_sql_info( $info, $waiting );
     }
+
+    else {
+        die $stmt_type // 'undefined_stmt_type';
+    }
+
     my $transaction;
     eval {
         $dbh->{AutoCommit} = 1;

@@ -4,7 +4,9 @@ use strict;
 use warnings;
 use base qw( Alien::Base );
 
-our $VERSION = '0.02';
+use Alien::Ruby;
+
+our $VERSION = '0.03';
 
 sub fpm_gem_home {
     my ($class) = @_;

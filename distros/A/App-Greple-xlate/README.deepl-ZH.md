@@ -8,15 +8,17 @@ App::Greple::xlate - greple的翻译支持模块
 
     greple -Mxlate::gpt4 --xlate pattern target-file
 
-    greple -Mxlate --xlate-engine gpt4 --xlate pattern target-file
+    greple -Mxlate::gpt5 --xlate pattern target-file
+
+    greple -Mxlate --xlate-engine gpt5 --xlate pattern target-file
 
 # VERSION
 
-Version 0.9912
+Version 0.9914
 
 # DESCRIPTION
 
-**Greple** **xlate** 模块可找到所需的文本块，并将其替换为翻译文本。目前，DeepL (`deepl.pm`)和 ChatGPT 4.1 (`gpt4.pm`)模块是作为后端引擎实现的。
+**Greple** **xlate** 模块查找所需的文本块，并用翻译文本替换它们。目前，DeepL (`deepl.pm`)、ChatGPT 4.1 (`gpt4.pm`)和 GPT-5 (`gpt5.pm`)模块是作为后端引擎实现的。
 
 如果要翻译以 Perl 的 pod 风格编写的文档中的普通文本块，请使用 **greple** 命令，并像这样使用 `xlate::deepl` 和 `perl` 模块：
 
@@ -113,6 +115,8 @@ Version 0.9912
 
         **gpt-4o** 的接口不稳定，目前无法保证正常工作。
 
+    - **gpt5**: gpt-5
+
 - **--xlate-labor**
 - **--xlabor**
 
@@ -197,6 +201,18 @@ Version 0.9912
     指定一次发送到 API 的最大文本行数。
 
     如果想一次翻译一行，则将该值设为 1。该选项优先于 `--xlate-maxlen` 选项。
+
+- **--xlate-prompt**=_text_
+
+    指定发送给翻译引擎的自定义提示。此选项仅在使用 ChatGPT 引擎（gpt3、gpt4、gpt4o）时可用。您可以通过向人工智能模型提供特定指令来定制翻译行为。如果提示包含 `%s`，它将被替换为目标语言名称。
+
+- **--xlate-context**=_text_
+
+    指定要发送给翻译引擎的其他上下文信息。此选项可多次使用，以提供多个上下文字符串。上下文信息有助于翻译引擎理解背景并生成更准确的翻译。
+
+- **--xlate-glossary**=_glossary_
+
+    指定用于翻译的词汇表 ID。该选项仅在使用 DeepL 引擎时可用。词汇表 ID 应从您的 DeepL 账户获取，可确保特定术语翻译的一致性。
 
 - **--**\[**no-**\]**xlate-progress** (Default: True)
 
@@ -312,6 +328,8 @@ Version 0.9912
 [App::Greple::xlate::deepl](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Adeepl)
 
 [App::Greple::xlate::gpt4](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt4)
+
+[App::Greple::xlate::gpt5](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt5)
 
 - [https://hub.docker.com/r/tecolicom/xlate](https://hub.docker.com/r/tecolicom/xlate)
 

@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Apache2 API Framework - ~/lib/Apache2/API/Response.pm
-## Version v0.1.2
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v0.1.3
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/05/30
-## Modified 2024/09/04
+## Modified 2025/10/03
 ## All rights reserved
 ## 
 ## 
@@ -32,7 +32,7 @@ BEGIN
     use Cookie::Jar;
     use Scalar::Util;
     use URI::Escape ();
-    our $VERSION = 'v0.1.2';
+    our $VERSION = 'v0.1.3';
 };
 
 use strict;
@@ -691,16 +691,28 @@ sub _try
     # $r->log_error( "Apache2::API::Response::_try to call method \"$meth\" in package \"$pack\"." );
     # try-catch
     local $@;
-    my $rv = eval
+    my( @rv, $rv );
+    if( wantarray() )
     {
-        return( $self->$pack->$meth ) if( !scalar( @_ ) );
-        return( $self->$pack->$meth( @_ ) );
-    };
+        @rv = eval
+        {
+            return( $self->$pack->$meth() ) if( !scalar( @_ ) );
+            return( $self->$pack->$meth( @_ ) );
+        };
+    }
+    else
+    {
+        $rv = eval
+        {
+            return( $self->$pack->$meth() ) if( !scalar( @_ ) );
+            return( $self->$pack->$meth( @_ ) );
+        };
+    }
     if( $@ )
     {
         return( $self->error( "An error occurred while trying to call Apache ", ucfirst( $pack ), " method \"$meth\": $@" ) );
     }
-    return( $rv );
+    return( wantarray() ? @rv : $rv );
 }
 
 # NOTE: sub FREEZE is inherited
@@ -904,7 +916,7 @@ Apache2::API::Response - Apache2 Outgoing Response Access and Manipulation
 
 =head1 VERSION
 
-    v0.1.2
+    v0.1.3
 
 =head1 DESCRIPTION
 

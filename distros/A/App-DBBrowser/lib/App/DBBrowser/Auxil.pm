@@ -97,12 +97,12 @@ sub __group_by_stmt {
 }
 
 
-sub __cte_stmts {
+sub cte_stmts {
     my ( $sf, $used_for, $indent1 ) = @_;
     if ( ! @{$sf->{d}{cte_history}//[]} ) {
         return;
     }
-    if ( length( $sf->{d}{main_info} ) && $used_for eq 'print' ) {
+    if ( length( $sf->{d}{main_info} ) && $used_for eq 'print' ) { ##
         # else the cte definitions would be printed twice if a cte is used inside a cte.
         return;
     }
@@ -131,7 +131,7 @@ sub get_stmt {
     my $indent2 = 2;
     my $table = $sql->{table};
     my @tmp;
-    my $ctes = $sf->__cte_stmts( $used_for, $indent1 );
+    my $ctes = $sf->cte_stmts( $used_for, $indent1 );
     if ( defined $ctes ) {
         push @tmp, $ctes;
     }
@@ -169,11 +169,11 @@ sub get_stmt {
         }
     }
     elsif ( $stmt_type eq 'Delete' ) {
-        @tmp = ( $sf->__stmt_fold( $term_w, $used_for, "DELETE FROM " . $table, $indent0 ) );
+        push @tmp, $sf->__stmt_fold( $term_w, $used_for, "DELETE FROM " . $table, $indent0 );
         push @tmp, $sf->__stmt_fold( $term_w, $used_for, $sql->{where_stmt}, $indent1 ) if $sql->{where_stmt};
     }
     elsif ( $stmt_type eq 'Update' ) {
-        @tmp = ( $sf->__stmt_fold( $term_w, $used_for, "UPDATE " . $table, $indent0 ) );
+        push @tmp, $sf->__stmt_fold( $term_w, $used_for, "UPDATE " . $table, $indent0 );
         push @tmp, $sf->__stmt_fold( $term_w, $used_for, $sql->{set_stmt},   $indent1 ) if $sql->{set_stmt};
         push @tmp, $sf->__stmt_fold( $term_w, $used_for, $sql->{where_stmt}, $indent1 ) if $sql->{where_stmt};
     }
@@ -371,7 +371,7 @@ sub column_names_and_types {
     my $column_types = [];
     if ( ! eval {
         my $stmt = '';
-        my $ctes = $sf->__cte_stmts( 'prepare', 0 );
+        my $ctes = $sf->cte_stmts( 'prepare', 0 );
         if ( defined $ctes ) {
             $stmt = $ctes;
         }

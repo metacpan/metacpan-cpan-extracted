@@ -1,12 +1,8 @@
 #!perl
-use 5.006;
+use 5.014;
 use strict;
 use warnings;
-use Test::More;
-
-unless ( $ENV{RELEASE_TESTING} ) {
-    plan( skip_all => "Author tests not required for installation" );
-}
+use Test2::V0;
 
 # Ensure a recent version of Test::Pod
 my $min_tp = 1.22;

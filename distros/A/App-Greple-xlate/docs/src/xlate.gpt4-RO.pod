@@ -10,15 +10,17 @@ App::Greple::xlate - modul de suport pentru traducere pentru greple
 
     greple -Mxlate::gpt4 --xlate pattern target-file
 
-    greple -Mxlate --xlate-engine gpt4 --xlate pattern target-file
+    greple -Mxlate::gpt5 --xlate pattern target-file
+
+    greple -Mxlate --xlate-engine gpt5 --xlate pattern target-file
 
 =head1 VERSION
 
-Version 0.9912
+Version 0.9914
 
 =head1 DESCRIPTION
 
-B<Greple> B<xlate> modulul găsește blocurile de text dorite și le înlocuiește cu textul tradus. În prezent, modulele DeepL (F<deepl.pm>) și ChatGPT 4.1 (F<gpt4.pm>) sunt implementate ca motor de back-end.
+B<Greple> B<xlate> modulul găsește blocurile de text dorite și le înlocuiește cu textul tradus. În prezent, modulele DeepL (F<deepl.pm>), ChatGPT 4.1 (F<gpt4.pm>) și GPT-5 (F<gpt5.pm>) sunt implementate ca motoare back-end.
 
 Dacă doriți să traduceți blocuri normale de text într-un document scris în stilul pod al Perl, folosiți comanda B<greple> cu C<xlate::deepl> și modulul C<perl> astfel:
 
@@ -134,6 +136,8 @@ Specifică motorul de traducere care va fi folosit. Dacă specificați direct mo
 
 Interfața B<gpt-4o> este instabilă și nu se poate garanta că funcționează corect în acest moment.
 
+=item * B<gpt5>: gpt-5
+
 =back
 
 =item B<--xlate-labor>
@@ -226,6 +230,18 @@ Dacă formatul este C<xtxt> (text tradus) sau necunoscut, se afișează doar tex
 Specificați lungimea maximă a textului care poate fi trimis la API odată. Valoarea implicită este setată ca pentru serviciul gratuit DeepL: 128K pentru API (B<--xlate>) și 5000 pentru interfața clipboard (B<--xlate-labor>). Este posibil să puteți schimba aceste valori dacă folosiți serviciul Pro.
 
 Specificați numărul maxim de linii de text care pot fi trimise la API odată.
+
+=item B<--xlate-prompt>=I<text>
+
+Specificați un prompt personalizat care va fi trimis motorului de traducere. Această opțiune este disponibilă doar atunci când utilizați motoarele ChatGPT (gpt3, gpt4, gpt4o). Puteți personaliza comportamentul traducerii oferind instrucțiuni specifice modelului AI. Dacă promptul conține C<%s>, acesta va fi înlocuit cu numele limbii țintă.
+
+=item B<--xlate-context>=I<text>
+
+Specificați informații suplimentare de context care vor fi trimise motorului de traducere. Această opțiune poate fi folosită de mai multe ori pentru a furniza mai multe șiruri de context. Informațiile de context ajută motorul de traducere să înțeleagă fundalul și să producă traduceri mai precise.
+
+=item B<--xlate-glossary>=I<glossary>
+
+Specificați un ID de glosar care va fi folosit pentru traducere. Această opțiune este disponibilă doar atunci când utilizați motorul DeepL. ID-ul de glosar trebuie obținut din contul dumneavoastră DeepL și asigură traducerea consecventă a anumitor termeni.
 
 =item B<-->[B<no->]B<xlate-progress> (Default: True)
 
@@ -356,6 +372,8 @@ L<https://github.com/tecolicom/App-gpty>
 L<App::Greple::xlate>
 
 L<App::Greple::xlate::gpt4>
+
+L<App::Greple::xlate::gpt5>
 
 =over 2
 

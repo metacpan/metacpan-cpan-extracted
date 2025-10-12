@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Apache2 API Framework - ~/lib/Apache2/API/Request.pm
-## Version v0.3.0
+## Version v0.3.1
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/05/30
-## Modified 2024/12/14
+## Modified 2025/10/03
 ## All rights reserved
 ## 
 ## 
@@ -55,7 +55,7 @@ BEGIN
     use URI;
     use URI::Escape;
     use Want;
-    our $VERSION = 'v0.3.0';
+    our $VERSION = 'v0.3.1';
     our( $SERVER_VERSION, $ERROR );
 };
 
@@ -1348,16 +1348,28 @@ sub _try
     my $r = $self->request;
     # try-catch
     local $@;
-    my $rv = eval
+    my( @rv, $rv );
+    if( wantarray() )
     {
-        return( $self->$pack->$meth() ) if( !scalar( @_ ) );
-        return( $self->$pack->$meth( @_ ) );
-    };
+        @rv = eval
+        {
+            return( $self->$pack->$meth() ) if( !scalar( @_ ) );
+            return( $self->$pack->$meth( @_ ) );
+        };
+    }
+    else
+    {
+        $rv = eval
+        {
+            return( $self->$pack->$meth() ) if( !scalar( @_ ) );
+            return( $self->$pack->$meth( @_ ) );
+        };
+    }
     if( $@ )
     {
         return( $self->error( "An error occurred while trying to call Apache ", ucfirst( $pack ), " method \"$meth\": $@" ) );
     }
-    return( $rv );
+    return( wantarray() ? @rv : $rv );
 }
 
 # NOTE: sub FREEZE is inherited
@@ -1658,7 +1670,7 @@ Apache2::API::Request - Apache2 Incoming Request Access and Manipulation
 
 =head1 VERSION
 
-    v0.3.0
+    v0.3.1
 
 =head1 DESCRIPTION
 
@@ -2958,6 +2970,16 @@ Returns the pool associated with the request as a L<APR::Pool> object of the L<A
 Given an array reference of supported languages, this method will get the client accepted languages by calling L</accept_language> and derive the best match, ie the client preferred language, using L<HTTP::AcceptLanguage>,.
 
 It returns a string representing a language code.
+
+Note that it does not matter if the array reference of supported language use underscore or dash, so both of the followings are equivalent:
+
+    my $best_lang = $req->preferred_language( [qw( en_GB fr_FR ja_JP ko_KR )] );
+
+and
+
+    my $best_lang = $req->preferred_language( [qw( en-GB fr-FR ja-JP ko-KR )] );
+
+If somehow, no suitable language could be found, it will return an empty string, and it will return C<undef> in scalar context, or an empty list in list context upon error, so check if the return value is defined or not.
 
 See also: L</languages> and L</accept_language>
 

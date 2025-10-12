@@ -43,7 +43,7 @@ Issues are currently reported using CPAN [bug tracker](https://gitlab.com/jackde
 
 ## More information
 
-Please refer to the [README](https://metacpan.org/source/JDEGUEST/Apache2-API-v0.3.1/README.md)
+Please refer to the [README](https://metacpan.org/source/JDEGUEST/Apache2-API-v0.4.0/README.md)
 
 ## Author
 

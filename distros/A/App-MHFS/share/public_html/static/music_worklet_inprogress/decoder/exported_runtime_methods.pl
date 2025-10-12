@@ -1,20 +1,27 @@
 #!/usr/bin/perl
-# EXTRA_EXPORTED_RUNTIME_METHODS was deprecated in emsdk 2.0.18
 use strict; use warnings;
 my @exported_runtime_methods = ("cwrap", "ccall");
-my @extra_exported_runtime_methods = ("UTF8ToString", "addFunction", "removeFunction", "allocateUTF8");
+my @extra_exported_runtime_methods = ("UTF8ToString", "addFunction", "removeFunction");
 
 # determine configuration
 open(my $emcc, "-|", 'emcc', '--version') or die("Failed to open emcc");
-my $combine_extra;
 my $line = <$emcc>;
-if($line =~ /\s+(\d+)\.(\d+)\.(\d+)/) {
-    my ($maj, $min, $patch) = ($1, $2, $3);
-    $combine_extra = ($maj > 2) || (($maj == 2) && (($min > 0) || ($patch >= 18)));
+my @version = $line =~ /\s+(\d+)\.(\d+)\.(\d+)/;
+if (!@version) {
+    @version = (4, 0, 12);
+    warn "version parsing failed, assuming " . join('.', @version);
 }
-if(!defined($combine_extra)) {
-    warn "warn: Failed to find version, assuming combine_extra";
-    $combine_extra = 1;
+# EXTRA_EXPORTED_RUNTIME_METHODS was deprecated
+my $combine_extra = version_greater_than_or_equal(\@version, [2, 0, 18]);
+# allocateUTF8 was deprecated in favor of stringToNewUTF8
+if (version_greater_than_or_equal(\@version, [3, 1, 35])) {
+    push @exported_runtime_methods, 'stringToNewUTF8';
+} else {
+    push @extra_exported_runtime_methods, 'allocateUTF8';
+}
+# HEAP* is no longer exported by default in emsdk 4.0.7
+if (version_greater_than_or_equal(\@version, [4, 0, 7])) {
+    push @exported_runtime_methods, qw(HEAPU8 HEAPU16 HEAPU32);
 }
 
 # build the arrays
@@ -40,3 +47,15 @@ if(!$combine_extra) {
 }
 
 print $opts;
+
+sub version_greater_than_or_equal {
+    my ($version, $expected) = @_;
+    @$version >= @$expected or die "expected has more version components";
+    my $i = 0;
+    foreach my $component (@$expected) {
+        return 0 if($version->[$i] < $component);
+        return 1 if($version->[$i] > $component);
+        $i++;
+    }
+    return 1;
+}

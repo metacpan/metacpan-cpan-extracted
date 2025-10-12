@@ -10,15 +10,17 @@ App::Greple::xlate - greple을 위한 번역 지원 모듈입니다.
 
     greple -Mxlate::gpt4 --xlate pattern target-file
 
-    greple -Mxlate --xlate-engine gpt4 --xlate pattern target-file
+    greple -Mxlate::gpt5 --xlate pattern target-file
+
+    greple -Mxlate --xlate-engine gpt5 --xlate pattern target-file
 
 =head1 VERSION
 
-Version 0.9912
+Version 0.9914
 
 =head1 DESCRIPTION
 
-B<Greple> B<xlate> 모듈은 원하는 텍스트 블록을 찾아 번역된 텍스트로 교체합니다. 현재 DeepL(F<deepl.pm>)과 ChatGPT 4.1(F<gpt4.pm>) 모듈이 백엔드 엔진으로 구현되어 있습니다.
+B<Greple> B<xlate> 모듈은 원하는 텍스트 블록을 찾아 번역된 텍스트로 교체합니다. 현재 DeepL(F<deepl.pm>), ChatGPT 4.1(F<gpt4.pm>), 그리고 GPT-5(F<gpt5.pm>) 모듈이 백엔드 엔진으로 구현되어 있습니다.
 
 Perl의 pod 스타일로 작성된 문서에서 일반 텍스트 블록을 번역하려면, B<greple> 명령어를 C<xlate::deepl> 및 C<perl> 모듈과 함께 다음과 같이 사용하세요:
 
@@ -134,6 +136,8 @@ C<^([\w\pP].*\n)+>
 
 B<--all>
 
+=item * B<gpt5>: gpt-5
+
 =back
 
 =item B<--xlate-labor>
@@ -226,6 +230,18 @@ C<--no-cdif>
 한 번에 API로 전송할 텍스트의 최대 줄 수를 지정합니다.
 
 한 번에 한 줄씩 번역하려면 이 값을 1로 설정하세요. 이 옵션은 C<--xlate-maxlen> 옵션보다 우선 적용됩니다.
+
+=item B<--xlate-prompt>=I<text>
+
+번역 엔진에 전송할 사용자 지정 프롬프트를 지정합니다. 이 옵션은 ChatGPT 엔진(gpt3, gpt4, gpt4o)을 사용할 때만 사용할 수 있습니다. AI 모델에 특정 지침을 제공하여 번역 동작을 사용자 정의할 수 있습니다. 프롬프트에 C<%s>이 포함되어 있으면 대상 언어 이름으로 대체됩니다.
+
+=item B<--xlate-context>=I<text>
+
+번역 엔진에 전송할 추가 컨텍스트 정보를 지정합니다. 이 옵션은 여러 번 사용할 수 있어 여러 개의 컨텍스트 문자열을 제공할 수 있습니다. 컨텍스트 정보는 번역 엔진이 배경을 이해하고 더 정확한 번역을 생성하는 데 도움이 됩니다.
+
+=item B<--xlate-glossary>=I<glossary>
+
+번역에 사용할 용어집 ID를 지정합니다. 이 옵션은 DeepL 엔진을 사용할 때만 사용할 수 있습니다. 용어집 ID는 DeepL 계정에서 얻어야 하며, 특정 용어의 일관된 번역을 보장합니다.
 
 =item B<-->[B<no->]B<xlate-progress> (Default: True)
 
@@ -356,6 +372,8 @@ L<https://github.com/tecolicom/App-gpty>
 L<App::Greple::xlate>
 
 L<App::Greple::xlate::gpt4>
+
+L<App::Greple::xlate::gpt5>
 
 =over 2
 

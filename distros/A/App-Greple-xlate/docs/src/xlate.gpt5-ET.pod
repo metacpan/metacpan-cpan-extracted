@@ -1,0 +1,443 @@
+=encoding utf-8
+
+=head1 NAME
+
+App::Greple::xlate - tõlke tugimoodul greple jaoks
+
+=head1 SYNOPSIS
+
+    greple -Mxlate::deepl --xlate pattern target-file
+
+    greple -Mxlate::gpt4 --xlate pattern target-file
+
+    greple -Mxlate::gpt5 --xlate pattern target-file
+
+    greple -Mxlate --xlate-engine gpt5 --xlate pattern target-file
+
+=head1 VERSION
+
+Version 0.9914
+
+=head1 DESCRIPTION
+
+B<Greple> B<xlate> moodul leiab soovitud tekstiplokid ja asendab need tõlgitud tekstiga. Praegu on taustmootorina rakendatud DeepL (F<deepl.pm>), ChatGPT 4.1 (F<gpt4.pm>) ja GPT-5 (F<gpt5.pm>) moodul.
+
+Kui soovite tõlkida tavalisi tekstiplokke dokumendis, mis on kirjutatud Perli pod-stiilis, kasutage käsku B<greple> koos C<xlate::deepl> ja C<perl> mooduliga järgmiselt:
+
+    greple -Mxlate::deepl -Mperl --pod --re '^([\w\pP].*\n)+' --all foo.pm
+
+Selles käsus tähendab mustrijada C<^([\w\pP].*\n)+> järjestikuseid ridu, mis algavad tähtnumbrilise ja kirjavahemärgi märgiga. See käsk näitab tõlkimiseks valitud ala esiletõstetuna. Valikut B<--all> kasutatakse kogu teksti kuvamiseks.
+
+=for html <p>
+<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/select-area.png">
+</p>
+
+Seejärel lisage valik C<--xlate>, et tõlkida valitud ala. Seejärel leiab see soovitud jaotised ja asendab need käsu B<deepl> väljundiga.
+
+Vaikimisi prinditakse originaal ja tõlgitud tekst „konfliktimärgi” vormingus, mis on ühilduv L<git(1)>-ga. Kasutades vormingut C<ifdef>, saate soovitud osa hõlpsasti kätte käsuga L<unifdef(1)>. Väljundvormingut saab määrata valikuga B<--xlate-format>.
+
+=for html <p>
+<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/format-conflict.png">
+</p>
+
+Kui soovite tõlkida kogu teksti, kasutage valikut B<--match-all>. See on otsetee mustri C<(?s).+> määramiseks, mis vastab kogu tekstile.
+
+Konfliktimärgi vormingu andmeid saab vaadata kõrvuti stiilis käsuga L<sdif|App::sdif> koos valikuga C<-V>. Kuna üksikute stringide kaupa võrdlemisel pole mõtet, on soovitatav valik C<--no-cdif>. Kui te ei pea teksti värvima, määrake C<--no-textcolor> (või C<--no-tc>).
+
+    sdif -V --no-filename --no-tc --no-cdif data_shishin.deepl-EN-US.cm
+
+=for html <p>
+<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/sdif-cm-view.png">
+</p>
+
+=head1 NORMALIZATION
+
+Töötlemine toimub määratud ühikutes, kuid mitme järjestikuse tühjade ridadeta tekstiridade korral ühendatakse need koos üheks reaks. See toiming tehakse järgmiselt:
+
+=over 2
+
+=item *
+
+Eemaldage iga rea algusest ja lõpust tühikud.
+
+=item *
+
+Kui rida lõpeb täislaiuses kirjavahemärgiga, liidetakse järgmise reaga.
+
+=item *
+
+Kui rida lõpeb täislaiuses märgiga ja järgmine rida algab täislaiuses märgiga, liidetakse read.
+
+=item *
+
+Kui kas rea lõpp või algus ei ole täislaiuses märk, ühendage need, lisades tühiku.
+
+=back
+
+Puhvriandmeid hallatakse normaliseeritud teksti alusel, seega isegi kui tehakse muudatusi, mis ei mõjuta normaliseerimise tulemust, jäävad puhverdatud tõlkeandmed kehtima.
+
+See normaliseerimisprotsess tehakse ainult esimesele (0.) ja paarisnumbrilistele mustritele. Seega, kui on määratud kaks mustrit järgmiselt, töödeldakse esimesele mustrile vastav tekst pärast normaliseerimist ning teisele mustrile vastava teksti puhul normaliseerimist ei tehta.
+
+    greple -Mxlate -E normalized -E not-normalized
+
+Seetõttu kasutage esimest mustrit teksti jaoks, mida tuleb töödelda mitme rea ühendamisega üheks reaks, ja teist mustrit eelformindatud teksti jaoks. Kui esimesele mustrile ei vasta ühtegi teksti, kasutage mustrit, mis millelegi ei vasta, näiteks C<(?!)>.
+
+=head1 MASKING
+
+Mõnikord on tekstis osasid, mida te ei soovi tõlkida. Näiteks sildid markdown-failides. DeepL soovitab sellistel juhtudel tõlkimisest välja jäetav osa teisendada XML-siltideks, lasta see läbi tõlke ja taastada pärast tõlkimise lõppu. Selle toetamiseks on võimalik määrata osad, mis tuleb tõlkimise eest maskeerida.
+
+    --xlate-setopt maskfile=MASKPATTERN
+
+See tõlgendab faili `MASKPATTERN` iga rida regulaaravaldiseina, tõlgib sellega sobivad stringid ja taastab need pärast töötlemist. Ridu, mis algavad C<#>, eiratakse.
+
+Keerukat mustrit saab kirjutada mitmele reale, kasutades taandejärgset reavahetust tagurpidi kaldkriipsuga.
+
+Kuidas tekst maskeerimise käigus muundatakse, on nähtav valikuga B<--xlate-mask>.
+
+See liides on eksperimentaalne ja võib tulevikus muutuda.
+
+=head1 OPTIONS
+
+=over 7
+
+=item B<--xlate>
+
+=item B<--xlate-color>
+
+=item B<--xlate-fold>
+
+=item B<--xlate-fold-width>=I<n> (Default: 70)
+
+Käivitab tõlkeprotsessi iga vaste piirkonna jaoks.
+
+Ilma selle valikuta käitub B<greple> nagu tavaline otsingukäsk. Nii saate enne tegeliku töö käivitamist kontrollida, milline faili osa läheb tõlkimisele.
+
+Käsu tulemus läheb standardsesse väljundisse, seega suunake vajadusel faili või kaaluge mooduli L<App::Greple::update> kasutamist.
+
+Valik B<--xlate> kutsub välja valiku B<--xlate-color> koos valikuga B<--color=never>.
+
+Valikuga B<--xlate-fold> murtakse teisendatud tekst etteantud laiusele. Vaikelaius on 70 ja seda saab määrata valikuga B<--xlate-fold-width>. Neli veergu on reserveeritud jooksva sisestuse jaoks, seega mahub igale reale maksimaalselt 74 märki.
+
+=item B<--xlate-engine>=I<engine>
+
+Määrab kasutatava tõlkemootori. Kui täpsustate mootori mooduli otse, näiteks C<-Mxlate::deepl>, ei pea te seda valikut kasutama.
+
+Praegu on saadaval järgmised mootorid
+
+=over 2
+
+=item * B<deepl>: DeepL API
+
+=item * B<gpt3>: gpt-3.5-turbo
+
+=item * B<gpt4>: gpt-4.1
+
+=item * B<gpt4o>: gpt-4o-mini
+
+B<gpt-4o> liides on ebastabiilne ja praegu ei saa selle korrektset toimimist garanteerida.
+
+=item * B<gpt5>: gpt-5
+
+=back
+
+=item B<--xlate-labor>
+
+=item B<--xlabor>
+
+Tõlkemootori kutsumise asemel eeldatakse, et teete töö ise. Pärast tõlgitava teksti ettevalmistamist kopeeritakse need lõikepuhvrisse. Eeldatakse, et kleebite need vormi, kopeerite tulemuse lõikepuhvrisse ja vajutate Enter.
+
+=item B<--xlate-to> (Default: C<EN-US>)
+
+Määrake sihtkeel. Saadavalolevaid keeli saate C<deepl languages> käsuga, kui kasutate mootorit B<DeepL>.
+
+=item B<--xlate-format>=I<format> (Default: C<conflict>)
+
+Määrake originaal- ja tõlketeksti väljundvorming.
+
+Järgnevad vormingud peale C<xtxt> eeldavad, et tõlgitav osa on ridade kogum. Tegelikult on võimalik tõlkida ainult osa reast, kuid muu kui C<xtxt> vormingu määramine ei anna mõtestatud tulemust.
+
+=over 4
+
+=item B<conflict>, B<cm>
+
+Algne ja teisendatud tekst prinditakse L<git(1)> konfliktimarkerite vormingus.
+
+    <<<<<<< ORIGINAL
+    original text
+    =======
+    translated Japanese text
+    >>>>>>> JA
+
+Algse faili saate taastada järgmise käsuga L<sed(1)>.
+
+    sed -e '/^<<<<<<< /d' -e '/^=======$/,/^>>>>>>> /d'
+
+=item B<colon>, I<:::::::>
+
+Algne ja tõlgitud tekst väljastatakse markdown’i kohandatud konteineri stiilis.
+
+    ::::::: ORIGINAL
+    original text
+    :::::::
+    ::::::: JA
+    translated Japanese text
+    :::::::
+
+Ülaltoodud tekst teisendatakse HTML-is järgnevaks.
+
+    <div class="ORIGINAL">
+    original text
+    </div>
+    <div class="JA">
+    translated Japanese text
+    </div>
+
+Koolonite arv on vaikimisi 7. Kui määrate koolonite jada nagu C<:::::>, kasutatakse seda 7 kooloni asemel.
+
+=item B<ifdef>
+
+Algne ja teisendatud tekst prinditakse vormingus L<cpp(1)> C<#ifdef>.
+
+    #ifdef ORIGINAL
+    original text
+    #endif
+    #ifdef JA
+    translated Japanese text
+    #endif
+
+Ainult jaapanikeelse teksti saate kätte käsuga B<unifdef>:
+
+    unifdef -UORIGINAL -DJA foo.ja.pm
+
+=item B<space>
+
+=item B<space+>
+
+Algne ja teisendatud tekst prinditakse, eraldatuna ühe tühja reaga. C<space+> korral väljastatakse teisendatud teksti järel ka reavahetus.
+
+=item B<xtxt>
+
+Kui vorming on C<xtxt> (tõlgitud tekst) või tundmatu, prinditakse ainult tõlgitud tekst.
+
+=back
+
+=item B<--xlate-maxlen>=I<chars> (Default: 0)
+
+Määra maksimaalne teksti pikkus, mis korraga API-le saadetakse. Vaikeväärtus on määratud DeepL tasuta konto teenuse järgi: 128K API jaoks (B<--xlate>) ja 5000 lõikepuhvri liidese jaoks (B<--xlate-labor>). Kui kasutad Pro-teenust, võid neid väärtusi muuta.
+
+=item B<--xlate-maxline>=I<n> (Default: 0)
+
+Määra maksimaalne ridade arv, mis korraga API-le saadetakse.
+
+Sea see väärtus 1, kui soovid tõlkida ühe rea kaupa. See valik on ülimuslik valiku C<--xlate-maxlen> suhtes.
+
+=item B<--xlate-prompt>=I<text>
+
+Määra kohandatud viip, mis saadetakse tõlkemootorile. See valik on saadaval ainult ChatGPT mootorite (gpt3, gpt4, gpt4o) kasutamisel. Saad kohandada tõlke käitumist, andes mudelile konkreetsed juhised. Kui viip sisaldab C<%s>, asendatakse see sihtkeele nimega.
+
+=item B<--xlate-context>=I<text>
+
+Määra täiendav kontekstiinfo, mis saadetakse tõlkemootorile. Seda valikut saab kasutada mitu korda, et edastada mitu kontekstistringi. Kontekst aitab tõlkemootoril tausta mõista ja anda täpsemaid tõlkeid.
+
+=item B<--xlate-glossary>=I<glossary>
+
+Määra sõnastiku ID, mida tõlkimisel kasutada. See valik on saadaval ainult DeepL mootori kasutamisel. Sõnastiku ID tuleb hankida oma DeepL kontolt ning see tagab kindlate terminite ühtlase tõlke.
+
+=item B<-->[B<no->]B<xlate-progress> (Default: True)
+
+Vaata tõlketulemust reaalajas STDERR-väljundis.
+
+=item B<--xlate-stripe>
+
+Kasuta moodulit L<App::Greple::stripe>, et näidata sobitatud osa sebramustriga. See on kasulik, kui sobitatud osad paiknevad vahetult üksteise järel.
+
+Värvipalett lülitub vastavalt terminali taustavärvile. Kui soovid seda selgesõnaliselt määrata, võid kasutada B<--xlate-stripe-light> või B<--xlate-stripe-dark>.
+
+=item B<--xlate-mask>
+
+Tee maskimine ja kuva teisendatud tekst taastamata kujul.
+
+=item B<--match-all>
+
+Sea kogu faili tekst sihtalaks.
+
+=item B<--lineify-cm>
+
+=item B<--lineify-colon>
+
+Vormingute C<cm> ja C<colon> puhul jagatakse väljund ridade kaupa ja vormindatakse vastavalt. Seetõttu ei saa oodatud tulemust, kui tõlgitakse ainult osa reast. Need filtrid parandavad väljundi, mis on rikutud rea osalise tõlkimise tõttu, viies selle normaalse reahaaval väljundi kujule.
+
+Praeguses teostuses, kui ühest reast tõlgitakse mitu osa, väljastatakse need sõltumatute ridadena.
+
+=back
+
+=head1 CACHE OPTIONS
+
+Moodul B<xlate> saab talletada iga faili tõlke puhverdatud teksti ja lugeda selle enne täitmist, et vältida päringute esitamise ülekulu serverile. Vaikimisi puhverdamisstrateegia C<auto> korral hoitakse puhvriandmeid ainult siis, kui sihtfaili jaoks on olemas puhverfail.
+
+Kasuta B<--xlate-cache=clear>, et algatada puhvri haldus või puhastada kogu olemasolev puhvriandmestik. Kui see valik on korra käivitatud, luuakse uus puhverfail, kui seda ei ole, ja seda hallatakse edaspidi automaatselt.
+
+=over 7
+
+=item --xlate-cache=I<strategy>
+
+=over 4
+
+=item C<auto> (Default)
+
+Säilita puhverfail, kui see eksisteerib.
+
+=item C<create>
+
+Loo tühi puhverfail ja välju.
+
+=item C<always>, C<yes>, C<1>
+
+Säilita vahemälu igal juhul, kui siht on tavaline fail.
+
+=item C<clear>
+
+Tühjenda esmalt vahemälu andmed.
+
+=item C<never>, C<no>, C<0>
+
+Ära kasuta vahemälufaili isegi siis, kui see olemas on.
+
+=item C<accumulate>
+
+Vaikimisi eemaldatakse kasutamata andmed vahemälufailist. Kui sa ei soovi neid eemaldada ja tahad faili alles jätta, kasuta C<accumulate>.
+
+=back
+
+=item B<--xlate-update>
+
+See valik sunnib vahemälufaili uuendama isegi siis, kui see pole vajalik.
+
+=back
+
+=head1 COMMAND LINE INTERFACE
+
+Seda moodulit saab hõlpsasti kasutada käsurealt, kasutades levitusega kaasas olevat käsku C<xlate>. Vaata kasutusjuhiseid man-lehelt C<xlate>.
+
+Käsk C<xlate> töötab kooskõlas Dockeri keskkonnaga, seega isegi kui sul pole midagi lokaalselt paigaldatud, saad seda kasutada seni, kuni Docker on saadaval. Kasuta valikut C<-D> või C<-C>.
+
+Samuti, kuna on pakutud mitmesuguste dokumendistiilide makefile’e, on tõlkimine teistesse keeltesse võimalik ilma erisäteteta. Kasuta valikut C<-M>.
+
+Võid kombineerida ka Docker ja C<make> valikud, et käitada C<make> Dockeri keskkonnas.
+
+Käivitamine kujul C<xlate -C> avab shelli, kus jooksev töökoopia git-repositoorium on ühendatud.
+
+Loe üksikasju jaapani artiklist jaotisest L</SEE ALSO>.
+
+=head1 EMACS
+
+Laadi repositooriumis olev F<xlate.el> fail, et kasutada Emacsis käsku C<xlate>. Funktsioon C<xlate-region> tõlgib etteantud piirkonna. Vaikimisi keel on C<EN-US> ning keelt saab määrata seda prefiksargumendiga kutsudes.
+
+=for html <p>
+<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/emacs.png">
+</p>
+
+=head1 ENVIRONMENT
+
+=over 7
+
+=item DEEPL_AUTH_KEY
+
+Sea oma DeepL teenuse autentimisvõti.
+
+=item OPENAI_API_KEY
+
+OpenAI autentimisvõti.
+
+=back
+
+=head1 INSTALL
+
+=head2 CPANMINUS
+
+    $ cpanm App::Greple::xlate
+
+=head2 TOOLS
+
+Pead paigaldama käsurea tööriistad DeepL-i ja ChatGPT jaoks.
+
+L<https://github.com/DeepLcom/deepl-python>
+
+L<https://github.com/tecolicom/App-gpty>
+
+=head1 SEE ALSO
+
+L<App::Greple::xlate>
+
+L<App::Greple::xlate::deepl>
+
+L<App::Greple::xlate::gpt4>
+
+L<App::Greple::xlate::gpt5>
+
+=over 2
+
+=item * L<https://hub.docker.com/r/tecolicom/xlate>
+
+Dockeri konteineripilt.
+
+=item * L<https://github.com/DeepLcom/deepl-python>
+
+DeepL Python’i teek ja CLI käsk.
+
+=item * L<https://github.com/openai/openai-python>
+
+OpenAI Python’i teek
+
+=item * L<https://github.com/tecolicom/App-gpty>
+
+OpenAI käsurea liides
+
+=item * L<App::Greple>
+
+Vaata sihtteksti mustri üksikasju käsiraamatust B<greple>. Kasuta valikuid B<--inside>, B<--outside>, B<--include>, B<--exclude> vastendusala piiramiseks.
+
+=item * L<App::Greple::update>
+
+Saad kasutada moodulit C<-Mupdate>, et muuta faile käsu B<greple> tulemuste põhjal.
+
+=item * L<App::sdif>
+
+Kasuta B<sdif>, et näidata konfliktimärgendite formaati kõrvuti valikuga B<-V>.
+
+=item * L<App::Greple::stripe>
+
+Greple B<stripe> moodulit kasutatakse valikuga B<--xlate-stripe>.
+
+=back
+
+=head2 ARTICLES
+
+=over 2
+
+=item * L<https://qiita.com/kaz-utashiro/items/1c1a51a4591922e18250>
+
+Greple moodul vajalike osade tõlkimiseks ja asendamiseks ainult DeepL API-ga (jaapani keeles)
+
+=item * L<https://qiita.com/kaz-utashiro/items/a5e19736416ca183ecf6>
+
+Dokumentide genereerimine 15 keeles DeepL API mooduliga (jaapani keeles)
+
+=item * L<https://qiita.com/kaz-utashiro/items/1b9e155d6ae0620ab4dd>
+
+Automaatse tõlke Docker-keskkond DeepL API-ga (jaapani keeles)
+
+=back
+
+=head1 AUTHOR
+
+Kazumasa Utashiro
+
+=head1 LICENSE
+
+Copyright © 2023-2025 Kazumasa Utashiro.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

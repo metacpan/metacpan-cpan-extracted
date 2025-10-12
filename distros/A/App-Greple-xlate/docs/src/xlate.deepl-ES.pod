@@ -10,15 +10,17 @@ App::Greple::xlate - módulo de traducción para greple
 
     greple -Mxlate::gpt4 --xlate pattern target-file
 
-    greple -Mxlate --xlate-engine gpt4 --xlate pattern target-file
+    greple -Mxlate::gpt5 --xlate pattern target-file
+
+    greple -Mxlate --xlate-engine gpt5 --xlate pattern target-file
 
 =head1 VERSION
 
-Version 0.9912
+Version 0.9914
 
 =head1 DESCRIPTION
 
-El módulo B<Greple> B<xlate> encuentra los bloques de texto deseados y los sustituye por el texto traducido. Actualmente DeepL (F<deepl.pm>) y ChatGPT 4.1 (F<gpt4.pm>) módulo se implementan como un motor de back-end.
+El módulo B<Greple> B<xlate> encuentra los bloques de texto deseados y los sustituye por el texto traducido. Actualmente DeepL (F<deepl.pm>), ChatGPT 4.1 (F<gpt4.pm>), y GPT-5 (F<gpt5.pm>) módulo se implementan como un motor de back-end.
 
 Si desea traducir bloques de texto normal en un documento escrito en el estilo vaina de Perl, utilice el comando B<greple> con el módulo C<xlate::deepl> y C<perl> de la siguiente manera:
 
@@ -134,6 +136,8 @@ En este momento, están disponibles los siguientes motores
 
 La interfaz de B<gpt-4o> es inestable y no se puede garantizar que funcione correctamente por el momento.
 
+=item * B<gpt5>: gpt-5
+
 =back
 
 =item B<--xlate-labor>
@@ -226,6 +230,18 @@ Especifique la longitud máxima del texto que se enviará a la API de una sola v
 Especifique el número máximo de líneas de texto que se enviarán a la API de una sola vez.
 
 Establezca este valor en 1 si desea traducir una línea cada vez. Esta opción tiene prioridad sobre la opción C<--xlate-maxlen>.
+
+=item B<--xlate-prompt>=I<text>
+
+Especifique un mensaje personalizado que se enviará al motor de traducción. Esta opción sólo está disponible cuando se utilizan motores ChatGPT (gpt3, gpt4, gpt4o). Puede personalizar el comportamiento de la traducción proporcionando instrucciones específicas al modelo de IA. Si la instrucción contiene C<%s>, se sustituirá por el nombre del idioma de destino.
+
+=item B<--xlate-context>=I<text>
+
+Especifique la información de contexto adicional que se enviará al motor de traducción. Esta opción puede utilizarse varias veces para proporcionar varias cadenas de contexto. La información de contexto ayuda al motor de traducción a comprender el contexto y producir traducciones más precisas.
+
+=item B<--xlate-glossary>=I<glossary>
+
+Especifique un ID de glosario que se utilizará para la traducción. Esta opción sólo está disponible cuando se utiliza el motor DeepL. El ID del glosario debe obtenerse de su cuenta de DeepL y garantiza la traducción coherente de términos específicos.
 
 =item B<-->[B<no->]B<xlate-progress> (Default: True)
 
@@ -356,6 +372,8 @@ L<App::Greple::xlate>
 L<App::Greple::xlate::deepl>
 
 L<App::Greple::xlate::gpt4>
+
+L<App::Greple::xlate::gpt5>
 
 =over 2
 

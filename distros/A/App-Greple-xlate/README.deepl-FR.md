@@ -8,15 +8,17 @@ App::Greple::xlate - module d'aide à la traduction pour greple
 
     greple -Mxlate::gpt4 --xlate pattern target-file
 
-    greple -Mxlate --xlate-engine gpt4 --xlate pattern target-file
+    greple -Mxlate::gpt5 --xlate pattern target-file
+
+    greple -Mxlate --xlate-engine gpt5 --xlate pattern target-file
 
 # VERSION
 
-Version 0.9912
+Version 0.9914
 
 # DESCRIPTION
 
-Le module **Greple** **xlate** recherche les blocs de texte souhaités et les remplace par le texte traduit. Actuellement, les modules DeepL (`deepl.pm`) et ChatGPT 4.1 (`gpt4.pm`) sont mis en œuvre en tant que moteur dorsal.
+Le module **Greple** **xlate** recherche les blocs de texte souhaités et les remplace par le texte traduit. Actuellement, les modules DeepL (`deepl.pm`), ChatGPT 4.1 (`gpt4.pm`) et GPT-5 (`gpt5.pm`) sont mis en œuvre en tant que moteur dorsal.
 
 Si vous souhaitez traduire des blocs de texte normaux dans un document écrit dans le style Perl's pod, utilisez la commande **greple** avec les modules `xlate::deepl` et `perl` comme suit :
 
@@ -113,6 +115,8 @@ Cette interface est expérimentale et peut être modifiée à l'avenir.
 
         L'interface de **gpt-4o** est instable et son bon fonctionnement ne peut être garanti pour le moment.
 
+    - **gpt5**: gpt-5
+
 - **--xlate-labor**
 - **--xlabor**
 
@@ -197,6 +201,18 @@ Cette interface est expérimentale et peut être modifiée à l'avenir.
     Indiquez le nombre maximal de lignes de texte à envoyer à l'API en une seule fois.
 
     Définissez cette valeur sur 1 si vous souhaitez traduire une ligne à la fois. Cette option est prioritaire sur l'option `--xlate-maxlen`.
+
+- **--xlate-prompt**=_text_
+
+    Spécifiez une invite personnalisée à envoyer au moteur de traduction. Cette option n'est disponible que pour les moteurs ChatGPT (gpt3, gpt4, gpt4o). Vous pouvez personnaliser le comportement de la traduction en fournissant des instructions spécifiques au modèle d'IA. Si l'invite contient `%s`, elle sera remplacée par le nom de la langue cible.
+
+- **--xlate-context**=_text_
+
+    Spécifiez des informations contextuelles supplémentaires à envoyer au moteur de traduction. Cette option peut être utilisée plusieurs fois pour fournir plusieurs chaînes de contexte. Les informations contextuelles aident le moteur de traduction à comprendre le contexte et à produire des traductions plus précises.
+
+- **--xlate-glossary**=_glossary_
+
+    Spécifier un identifiant de glossaire à utiliser pour la traduction. Cette option n'est disponible que lors de l'utilisation du moteur DeepL. L'ID du glossaire doit être obtenu à partir de votre compte DeepL et garantit une traduction cohérente de termes spécifiques.
 
 - **--**\[**no-**\]**xlate-progress** (Default: True)
 
@@ -312,6 +328,8 @@ Vous devez installer les outils de ligne de commande pour DeepL et ChatGPT.
 [App::Greple::xlate::deepl](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Adeepl)
 
 [App::Greple::xlate::gpt4](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt4)
+
+[App::Greple::xlate::gpt5](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt5)
 
 - [https://hub.docker.com/r/tecolicom/xlate](https://hub.docker.com/r/tecolicom/xlate)
 

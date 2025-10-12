@@ -1,5 +1,8 @@
 Revision history for Perl module Apache2::API
 
+v0.4.1 2025-10-07T08:09:10+0900
+    - Corrected the key support method _try so that it honours the list call context
+
 v0.4.0 2025-09-30T20:30:14+0900
     - Adding the log method to access the Apache2::Log::Request object
     - Added the methods is_initial_req and psignature to Apache2::API::Request

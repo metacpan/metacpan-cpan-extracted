@@ -10,15 +10,17 @@ App::Greple::xlate - greple 的翻译支持模块
 
     greple -Mxlate::gpt4 --xlate pattern target-file
 
-    greple -Mxlate --xlate-engine gpt4 --xlate pattern target-file
+    greple -Mxlate::gpt5 --xlate pattern target-file
+
+    greple -Mxlate --xlate-engine gpt5 --xlate pattern target-file
 
 =head1 VERSION
 
-Version 0.9912
+Version 0.9914
 
 =head1 DESCRIPTION
 
-B<Greple> B<xlate> 模块查找所需的文本块并将其替换为翻译后的文本。目前，DeepL（F<deepl.pm>）和ChatGPT 4.1（F<gpt4.pm>）模块已作为后端引擎实现。
+B<Greple> B<xlate> 模块查找所需的文本块并用翻译后的文本替换它们。目前已实现 DeepL（F<deepl.pm>）、ChatGPT 4.1（F<gpt4.pm>）和 GPT-5（F<gpt5.pm>）模块作为后端引擎。
 
 如果你想翻译以 Perl 的 pod 风格编写的文档中的普通文本块，请使用 B<greple> 命令，并结合 C<xlate::deepl> 和 C<perl> 模块，如下所示：
 
@@ -134,6 +136,8 @@ B<Greple> B<xlate> 模块查找所需的文本块并将其替换为翻译后的�
 
 B<gpt-4o> 的接口不稳定，目前无法保证正常工作。
 
+=item * B<gpt5>: gpt-5
+
 =back
 
 =item B<--xlate-labor>
@@ -226,6 +230,18 @@ B<gpt-4o> 的接口不稳定，目前无法保证正常工作。
 指定一次发送到 API 的最大文本长度。默认值设置为免费 DeepL 账户服务：API 为 128K（B<--xlate>），剪贴板接口为 5000（B<--xlate-labor>）。如果您使用的是 Pro 服务，可能可以更改这些值。
 
 指定一次发送到 API 的最大文本行数。
+
+=item B<--xlate-prompt>=I<text>
+
+指定要发送到翻译引擎的自定义提示。此选项仅在使用 ChatGPT 引擎（gpt3、gpt4、gpt4o）时可用。您可以通过向 AI 模型提供特定指令来自定义翻译行为。如果提示中包含 C<%s>，它将被替换为目标语言名称。
+
+=item B<--xlate-context>=I<text>
+
+指定要发送到翻译引擎的附加上下文信息。此选项可以多次使用，以提供多个上下文字符串。上下文信息有助于翻译引擎理解背景并生成更准确的翻译。
+
+=item B<--xlate-glossary>=I<glossary>
+
+指定用于翻译的术语表 ID。此选项仅在使用 DeepL 引擎时可用。术语表 ID 应从您的 DeepL 账户获取，并确保特定术语的一致翻译。
 
 =item B<-->[B<no->]B<xlate-progress> (Default: True)
 
@@ -356,6 +372,8 @@ L<App::Greple::xlate>
 L<App::Greple::xlate::deepl>
 
 L<App::Greple::xlate::gpt4>
+
+L<App::Greple::xlate::gpt5>
 
 =over 2
 

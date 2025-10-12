@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Apache2 API Framework - ~/lib/Apache2/API.pm
-## Version v0.4.0
+## Version v0.4.1
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/05/30
-## Modified 2024/12/14
+## Modified 2025/10/03
 ## All rights reserved
 ## 
 ## 
@@ -40,7 +40,7 @@ BEGIN
     use Scalar::Util ();
     our @EXPORT = qw( apr1_md5 );
     $DEBUG   = 0;
-    $VERSION = 'v0.4.0';
+    $VERSION = 'v0.4.1';
 };
 
 use strict;
@@ -1613,7 +1613,7 @@ Apache2::API - Apache2 API Framework
 
 =head1 VERSION
 
-    v0.4.0
+    v0.4.1
 
 =head1 DESCRIPTION
 

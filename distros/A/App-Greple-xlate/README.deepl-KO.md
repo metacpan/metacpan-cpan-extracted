@@ -8,15 +8,17 @@ App::Greple::xlate - Greple용 번역 지원 모듈
 
     greple -Mxlate::gpt4 --xlate pattern target-file
 
-    greple -Mxlate --xlate-engine gpt4 --xlate pattern target-file
+    greple -Mxlate::gpt5 --xlate pattern target-file
+
+    greple -Mxlate --xlate-engine gpt5 --xlate pattern target-file
 
 # VERSION
 
-Version 0.9912
+Version 0.9914
 
 # DESCRIPTION
 
-**Greple** **xlate** 모듈은 원하는 텍스트 블록을 찾아 번역된 텍스트로 대체합니다. 현재 DeepL (`deepl.pm`) 및 ChatGPT 4.1 (`gpt4.pm`) 모듈이 백엔드 엔진으로 구현되어 있습니다.
+**Greple** **xlate** 모듈은 원하는 텍스트 블록을 찾아 번역된 텍스트로 대체합니다. 현재 DeepL (`deepl.pm`), ChatGPT 4.1 (`gpt4.pm`) 및 GPT-5 (`gpt5.pm`) 모듈이 백엔드 엔진으로 구현되어 있습니다.
 
 Perl의 포드 스타일로 작성된 문서에서 일반 텍스트 블록을 번역하려면 다음과 같이 **greple** 명령과 `xlate::deepl` 및 `perl` 모듈을 사용합니다:
 
@@ -113,6 +115,8 @@ Perl의 포드 스타일로 작성된 문서에서 일반 텍스트 블록을 �
 
         **gpt-4o**의 인터페이스는 불안정하며 현재로서는 제대로 작동한다고 보장할 수 없습니다.
 
+    - **gpt5**: gpt-5
+
 - **--xlate-labor**
 - **--xlabor**
 
@@ -197,6 +201,18 @@ Perl의 포드 스타일로 작성된 문서에서 일반 텍스트 블록을 �
     한 번에 API로 전송할 텍스트의 최대 줄 수를 지정합니다.
 
     한 번에 한 줄씩 번역하려면 이 값을 1로 설정합니다. 이 옵션은 `--xlate-maxlen` 옵션보다 우선합니다.
+
+- **--xlate-prompt**=_text_
+
+    번역 엔진에 전송할 사용자 지정 프롬프트를 지정합니다. 이 옵션은 ChatGPT 엔진(gpt3, gpt4, gpt4o)을 사용할 때만 사용할 수 있습니다. AI 모델에 특정 지침을 제공하여 번역 동작을 사용자 지정할 수 있습니다. 프롬프트에 `%s`이 포함되어 있으면 대상 언어 이름으로 대체됩니다.
+
+- **--xlate-context**=_text_
+
+    번역 엔진에 전송할 추가 컨텍스트 정보를 지정합니다. 이 옵션을 여러 번 사용하여 여러 개의 컨텍스트 문자열을 제공할 수 있습니다. 컨텍스트 정보는 번역 엔진이 배경을 이해하고 보다 정확한 번역을 생성하는 데 도움이 됩니다.
+
+- **--xlate-glossary**=_glossary_
+
+    번역에 사용할 용어집 ID를 지정합니다. 이 옵션은 DeepL 엔진을 사용할 때만 사용할 수 있습니다. 용어집 ID는 DeepL 계정에서 가져와야 하며 특정 용어의 일관된 번역을 보장합니다.
 
 - **--**\[**no-**\]**xlate-progress** (Default: True)
 
@@ -312,6 +328,8 @@ DeepL 및 ChatGPT용 명령줄 도구를 설치해야 합니다.
 [App::Greple::xlate::deepl](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Adeepl)
 
 [App::Greple::xlate::gpt4](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt4)
+
+[App::Greple::xlate::gpt5](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt5)
 
 - [https://hub.docker.com/r/tecolicom/xlate](https://hub.docker.com/r/tecolicom/xlate)
 

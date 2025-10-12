@@ -34,7 +34,7 @@ my $e_par_open = '(';
 my $e_par_close = ')';
 my $e_col_aliases = 'alias';
 my $e_skip_col = ''; # no length
-my $e_multi_col = 'mc';
+my $e_multi_col = 'mc'; ##
 
 
 sub new {

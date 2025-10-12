@@ -1,6 +1,6 @@
 package App::Greple::xlate::deepl;
 
-our $VERSION = "0.9912";
+our $VERSION = "0.9914";
 
 use v5.14;
 use warnings;
@@ -10,7 +10,7 @@ use Data::Dumper;
 use List::Util qw(sum);
 use App::cdif::Command;
 
-use App::Greple::xlate qw(opt);
+use App::Greple::xlate qw(%opt &opt);
 use App::Greple::xlate::Lang qw(%LANGNAME);
 
 our $lang_from //= 'ORIGINAL';
@@ -32,6 +32,9 @@ sub deepl {
 	push @c,  ('--from', $lang_from) if $lang_from ne 'ORIGINAL';
 	push @c,  ('--auth-key', $auth_key) if $auth_key;
 	push @c,  ('--glossary-id', $glossary) if $glossary;
+	if (my @contexts = @{$opt{contexts}}) {
+	    push @c, '--context' => join "\n", @contexts;
+	}
 	\@c;
     };
     $deepl->command([@$command, +shift])->update->data;

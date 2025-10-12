@@ -1,4 +1,24 @@
-Revision history for App-MHFS, note the CHANGELOG.md of the repository is much more comprehensive
+Revision history for App-MHFS, see the CHANGELOG.md of the repository for
+changes across all MHFS distributions.
+v0.7.0  2025-10-07
+        Split App/MHFS.pm into multiple modules.
+        `use 5.014;` consistently across packages
+        MHFS::BitTorrent::Bencoding, MHFS::Util - export with @EXPORT_OK
+        Add running tests to release process
+        Switch much of the error handling to try catch with Feature::Compat::Try
+          Mostly in MHFS::Plugin::Kodi and MHFS::Util
+          MHFS::Promise: use actual exceptions instead of fake exception system
+        Fix circular dependencies with MHFS::Kodi::* and MHFS::Plugin::Kodi
+        Fix output_dir_versatile not properly terminating some directories,
+        Fix SendLocalFile having some unnecessary lock checks
+        Disable global Carp::confess
+        Add debug flag to turn on Carp::confess on $SIG{ __DIE__ }
+        MHFS::Util - croak instead of die, warnif instead of say for warnings
+        `/kodi/tv` better organizing and metadata loading
+        music player - build with WASM_BIGINT, emscripten 4.0.7 compat
+        get_printable_utf8 - fix invalid UTF-8 causing valid characters to be
+          omitted from the output, improve implementation, add tests
+
 v0.6.0  2024-10-21
         Kodi JSON API `/kodi/movies` and `/kodi/tv`
             - TMDB metadata and art fetching

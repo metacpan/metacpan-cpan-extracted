@@ -8,15 +8,17 @@ App::Greple::xlate - greple을 위한 번역 지원 모듈입니다.
 
     greple -Mxlate::gpt4 --xlate pattern target-file
 
-    greple -Mxlate --xlate-engine gpt4 --xlate pattern target-file
+    greple -Mxlate::gpt5 --xlate pattern target-file
+
+    greple -Mxlate --xlate-engine gpt5 --xlate pattern target-file
 
 # VERSION
 
-Version 0.9912
+Version 0.9914
 
 # DESCRIPTION
 
-**Greple** **xlate** 모듈은 원하는 텍스트 블록을 찾아 번역된 텍스트로 교체합니다. 현재 DeepL(`deepl.pm`)과 ChatGPT 4.1(`gpt4.pm`) 모듈이 백엔드 엔진으로 구현되어 있습니다.
+**Greple** **xlate** 모듈은 원하는 텍스트 블록을 찾아 번역된 텍스트로 교체합니다. 현재 DeepL(`deepl.pm`), ChatGPT 4.1(`gpt4.pm`), 그리고 GPT-5(`gpt5.pm`) 모듈이 백엔드 엔진으로 구현되어 있습니다.
 
 Perl의 pod 스타일로 작성된 문서에서 일반 텍스트 블록을 번역하려면, **greple** 명령어를 `xlate::deepl` 및 `perl` 모듈과 함께 다음과 같이 사용하세요:
 
@@ -113,6 +115,8 @@ DeepL은 이러한 경우, 번역에서 제외할 부분을 XML 태그로 변환
 
         **--all**
 
+    - **gpt5**: gpt-5
+
 - **--xlate-labor**
 - **--xlabor**
 
@@ -197,6 +201,18 @@ DeepL은 이러한 경우, 번역에서 제외할 부분을 XML 태그로 변환
     한 번에 API로 전송할 텍스트의 최대 줄 수를 지정합니다.
 
     한 번에 한 줄씩 번역하려면 이 값을 1로 설정하세요. 이 옵션은 `--xlate-maxlen` 옵션보다 우선 적용됩니다.
+
+- **--xlate-prompt**=_text_
+
+    번역 엔진에 전송할 사용자 지정 프롬프트를 지정합니다. 이 옵션은 ChatGPT 엔진(gpt3, gpt4, gpt4o)을 사용할 때만 사용할 수 있습니다. AI 모델에 특정 지침을 제공하여 번역 동작을 사용자 정의할 수 있습니다. 프롬프트에 `%s`이 포함되어 있으면 대상 언어 이름으로 대체됩니다.
+
+- **--xlate-context**=_text_
+
+    번역 엔진에 전송할 추가 컨텍스트 정보를 지정합니다. 이 옵션은 여러 번 사용할 수 있어 여러 개의 컨텍스트 문자열을 제공할 수 있습니다. 컨텍스트 정보는 번역 엔진이 배경을 이해하고 더 정확한 번역을 생성하는 데 도움이 됩니다.
+
+- **--xlate-glossary**=_glossary_
+
+    번역에 사용할 용어집 ID를 지정합니다. 이 옵션은 DeepL 엔진을 사용할 때만 사용할 수 있습니다. 용어집 ID는 DeepL 계정에서 얻어야 하며, 특정 용어의 일관된 번역을 보장합니다.
 
 - **--**\[**no-**\]**xlate-progress** (Default: True)
 
@@ -312,6 +328,8 @@ DeepL과 ChatGPT용 커맨드라인 도구를 설치해야 합니다.
 [App::Greple::xlate](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate)
 
 [App::Greple::xlate::gpt4](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt4)
+
+[App::Greple::xlate::gpt5](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt5)
 
 - [https://hub.docker.com/r/tecolicom/xlate](https://hub.docker.com/r/tecolicom/xlate)
 

@@ -1,0 +1,443 @@
+=encoding utf-8
+
+=head1 NAME
+
+App::Greple::xlate - modul dukungan terjemahan untuk greple
+
+=head1 SYNOPSIS
+
+    greple -Mxlate::deepl --xlate pattern target-file
+
+    greple -Mxlate::gpt4 --xlate pattern target-file
+
+    greple -Mxlate::gpt5 --xlate pattern target-file
+
+    greple -Mxlate --xlate-engine gpt5 --xlate pattern target-file
+
+=head1 VERSION
+
+Version 0.9914
+
+=head1 DESCRIPTION
+
+B<Greple> B<xlate> modul menemukan blok teks yang diinginkan dan menggantinya dengan teks terjemahan. Saat ini modul DeepL (F<deepl.pm>), ChatGPT 4.1 (F<gpt4.pm>), dan GPT-5 (F<gpt5.pm>) diimplementasikan sebagai mesin back-end.
+
+Jika Anda ingin menerjemahkan blok teks normal dalam sebuah dokumen yang ditulis dalam gaya pod Perl, gunakan perintah B<greple> dengan modul C<xlate::deepl> dan C<perl> seperti ini:
+
+    greple -Mxlate::deepl -Mperl --pod --re '^([\w\pP].*\n)+' --all foo.pm
+
+Dalam perintah ini, string pola C<^([\w\pP].*\n)+> berarti baris-baris berurutan yang dimulai dengan huruf angka dan tanda baca. Perintah ini menampilkan area yang akan diterjemahkan dengan sorotan. Opsi B<--all> digunakan untuk menghasilkan seluruh teks.
+
+=for html <p>
+<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/select-area.png">
+</p>
+
+Lalu tambahkan opsi C<--xlate> untuk menerjemahkan area yang dipilih. Kemudian, ini akan menemukan bagian yang diinginkan dan menggantinya dengan keluaran perintah B<deepl>.
+
+Secara bawaan, teks asli dan terjemahan dicetak dalam format "penanda konflik" yang kompatibel dengan L<git(1)>. Dengan menggunakan format C<ifdef>, Anda dapat mengambil bagian yang diinginkan dengan perintah L<unifdef(1)> dengan mudah. Format keluaran dapat ditentukan dengan opsi B<--xlate-format>.
+
+=for html <p>
+<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/format-conflict.png">
+</p>
+
+Jika Anda ingin menerjemahkan seluruh teks, gunakan opsi B<--match-all>. Ini adalah jalan pintas untuk menentukan pola C<(?s).+> yang mencocokkan seluruh teks.
+
+Data format penanda konflik dapat dilihat dalam gaya berdampingan dengan perintah L<sdif|App::sdif> bersama opsi C<-V>. Karena tidak masuk akal untuk membandingkan per string, opsi C<--no-cdif> direkomendasikan. Jika Anda tidak perlu mewarnai teks, tentukan C<--no-textcolor> (atau C<--no-tc>).
+
+    sdif -V --no-filename --no-tc --no-cdif data_shishin.deepl-EN-US.cm
+
+=for html <p>
+<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/sdif-cm-view.png">
+</p>
+
+=head1 NORMALIZATION
+
+Pemrosesan dilakukan dalam unit yang ditentukan, tetapi dalam kasus rangkaian beberapa baris teks yang tidak kosong, teks tersebut digabungkan menjadi satu baris. Operasi ini dilakukan sebagai berikut:
+
+=over 2
+
+=item *
+
+Hapus spasi putih di awal dan akhir setiap baris.
+
+=item *
+
+Jika sebuah baris diakhiri dengan karakter tanda baca lebar penuh, gabungkan dengan baris berikutnya.
+
+=item *
+
+Jika sebuah baris diakhiri dengan karakter lebar penuh dan baris berikutnya dimulai dengan karakter lebar penuh, gabungkan baris-baris tersebut.
+
+=item *
+
+Jika salah satu dari akhir atau awal baris bukan karakter lebar penuh, gabungkan dengan menyisipkan satu karakter spasi.
+
+=back
+
+Data cache dikelola berdasarkan teks yang dinormalisasi, sehingga meskipun dilakukan modifikasi yang tidak mempengaruhi hasil normalisasi, data terjemahan yang di-cache tetap efektif.
+
+Proses normalisasi ini dilakukan hanya untuk pola pertama (ke-0) dan bernomor genap. Dengan demikian, jika dua pola ditentukan seperti berikut, teks yang cocok dengan pola pertama akan diproses setelah normalisasi, dan tidak ada proses normalisasi yang dilakukan pada teks yang cocok dengan pola kedua.
+
+    greple -Mxlate -E normalized -E not-normalized
+
+Oleh karena itu, gunakan pola pertama untuk teks yang akan diproses dengan menggabungkan beberapa baris menjadi satu baris, dan gunakan pola kedua untuk teks pra-format. Jika tidak ada teks yang cocok pada pola pertama, gunakan pola yang tidak mencocokkan apa pun, seperti C<(?!)>.
+
+=head1 MASKING
+
+Terkadang, ada bagian teks yang tidak ingin Anda terjemahkan. Misalnya, tag dalam berkas markdown. DeepL menyarankan bahwa dalam kasus seperti itu, bagian teks yang dikecualikan diubah menjadi tag XML, diterjemahkan, lalu dipulihkan setelah terjemahan selesai. Untuk mendukung ini, dimungkinkan untuk menentukan bagian yang akan dimask dari terjemahan.
+
+    --xlate-setopt maskfile=MASKPATTERN
+
+Ini akan menafsirkan setiap baris dari berkas `MASKPATTERN` sebagai ekspresi reguler, menerjemahkan string yang cocok dengannya, dan mengembalikan setelah pemrosesan. Baris yang dimulai dengan C<#> diabaikan.
+
+Pola kompleks dapat ditulis dalam beberapa baris dengan baris baru yang di-escape dengan backslash.
+
+Bagaimana teks diubah oleh masking dapat dilihat dengan opsi B<--xlate-mask>.
+
+Antarmuka ini bersifat eksperimental dan dapat berubah di masa mendatang.
+
+=head1 OPTIONS
+
+=over 7
+
+=item B<--xlate>
+
+=item B<--xlate-color>
+
+=item B<--xlate-fold>
+
+=item B<--xlate-fold-width>=I<n> (Default: 70)
+
+Panggil proses terjemahan untuk setiap area yang cocok.
+
+Tanpa opsi ini, B<greple> berperilaku sebagai perintah pencarian normal. Jadi Anda dapat memeriksa bagian mana dari berkas yang akan menjadi subjek terjemahan sebelum menjalankan pekerjaan yang sebenarnya.
+
+Hasil perintah masuk ke standar keluaran, jadi arahkan ke berkas jika perlu, atau pertimbangkan untuk menggunakan modul L<App::Greple::update>.
+
+Opsi B<--xlate> memanggil opsi B<--xlate-color> dengan opsi B<--color=never>.
+
+Dengan opsi B<--xlate-fold>, teks yang dikonversi dilipat berdasarkan lebar yang ditentukan. Lebar default adalah 70 dan dapat diatur oleh opsi B<--xlate-fold-width>. Empat kolom dicadangkan untuk operasi run-in, jadi setiap baris dapat memuat paling banyak 74 karakter.
+
+=item B<--xlate-engine>=I<engine>
+
+Menentukan mesin terjemahan yang akan digunakan. Jika Anda menentukan modul mesin secara langsung, seperti C<-Mxlate::deepl>, Anda tidak perlu menggunakan opsi ini.
+
+Saat ini, mesin berikut tersedia
+
+=over 2
+
+=item * B<deepl>: DeepL API
+
+=item * B<gpt3>: gpt-3.5-turbo
+
+=item * B<gpt4>: gpt-4.1
+
+=item * B<gpt4o>: gpt-4o-mini
+
+Antarmuka B<gpt-4o> tidak stabil dan tidak dapat dijamin berfungsi dengan benar saat ini.
+
+=item * B<gpt5>: gpt-5
+
+=back
+
+=item B<--xlate-labor>
+
+=item B<--xlabor>
+
+Alih-alih memanggil mesin terjemahan, Anda diharapkan bekerja secara manual. Setelah menyiapkan teks yang akan diterjemahkan, teks tersebut disalin ke papan klip. Anda diharapkan menempelkannya ke formulir, menyalin hasilnya ke papan klip, dan menekan return.
+
+=item B<--xlate-to> (Default: C<EN-US>)
+
+Tentukan bahasa target. Anda bisa mendapatkan bahasa yang tersedia dengan perintah C<deepl languages> saat menggunakan mesin B<DeepL>.
+
+=item B<--xlate-format>=I<format> (Default: C<conflict>)
+
+Tentukan format keluaran untuk teks asli dan terjemahan.
+
+Format berikut selain C<xtxt> mengasumsikan bahwa bagian yang akan diterjemahkan adalah kumpulan baris. Sebenarnya, memungkinkan untuk menerjemahkan hanya sebagian dari sebuah baris, tetapi menentukan format selain C<xtxt> tidak akan menghasilkan hasil yang bermakna.
+
+=over 4
+
+=item B<conflict>, B<cm>
+
+Teks asli dan yang telah dikonversi dicetak dalam format penanda konflik L<git(1)>.
+
+    <<<<<<< ORIGINAL
+    original text
+    =======
+    translated Japanese text
+    >>>>>>> JA
+
+Anda dapat memulihkan berkas asli dengan perintah L<sed(1)> berikutnya.
+
+    sed -e '/^<<<<<<< /d' -e '/^=======$/,/^>>>>>>> /d'
+
+=item B<colon>, I<:::::::>
+
+Teks asli dan terjemahan dikeluarkan dalam gaya container kustom markdown.
+
+    ::::::: ORIGINAL
+    original text
+    :::::::
+    ::::::: JA
+    translated Japanese text
+    :::::::
+
+Teks di atas akan diterjemahkan menjadi berikut ini dalam HTML.
+
+    <div class="ORIGINAL">
+    original text
+    </div>
+    <div class="JA">
+    translated Japanese text
+    </div>
+
+Jumlah tanda titik dua adalah 7 secara default. Jika Anda menentukan urutan tanda titik dua seperti C<:::::>, itu digunakan sebagai pengganti 7 tanda titik dua.
+
+=item B<ifdef>
+
+Teks asli dan yang telah dikonversi dicetak dalam format L<cpp(1)> C<#ifdef>.
+
+    #ifdef ORIGINAL
+    original text
+    #endif
+    #ifdef JA
+    translated Japanese text
+    #endif
+
+Anda dapat mengambil hanya teks bahasa Jepang dengan perintah B<unifdef>:
+
+    unifdef -UORIGINAL -DJA foo.ja.pm
+
+=item B<space>
+
+=item B<space+>
+
+Teks asli dan teks yang dikonversi dicetak dipisahkan oleh satu baris kosong. Untuk C<space+>, juga mengeluarkan baris baru setelah teks yang dikonversi.
+
+=item B<xtxt>
+
+Jika formatnya C<xtxt> (teks terjemahan) atau tidak dikenal, hanya teks terjemahan yang dicetak.
+
+=back
+
+=item B<--xlate-maxlen>=I<chars> (Default: 0)
+
+Tentukan panjang maksimum teks yang akan dikirim ke API sekaligus. Nilai default ditetapkan seperti untuk layanan akun DeepL gratis: 128K untuk API (B<--xlate>) dan 5000 untuk antarmuka papan klip (B<--xlate-labor>). Anda mungkin dapat mengubah nilai-nilai ini jika menggunakan layanan Pro.
+
+=item B<--xlate-maxline>=I<n> (Default: 0)
+
+Tentukan jumlah maksimum baris teks yang akan dikirim ke API sekaligus.
+
+Setel nilai ini ke 1 jika Anda ingin menerjemahkan satu baris setiap kali. Opsi ini memiliki prioritas lebih tinggi daripada opsi C<--xlate-maxlen>.
+
+=item B<--xlate-prompt>=I<text>
+
+Tentukan prompt kustom yang akan dikirim ke mesin terjemahan. Opsi ini hanya tersedia saat menggunakan mesin ChatGPT (gpt3, gpt4, gpt4o). Anda dapat menyesuaikan perilaku terjemahan dengan memberikan instruksi khusus kepada model AI. Jika prompt berisi C<%s>, itu akan diganti dengan nama bahasa target.
+
+=item B<--xlate-context>=I<text>
+
+Tentukan informasi konteks tambahan yang akan dikirim ke mesin terjemahan. Opsi ini dapat digunakan beberapa kali untuk menyediakan beberapa string konteks. Informasi konteks membantu mesin terjemahan memahami latar belakang dan menghasilkan terjemahan yang lebih akurat.
+
+=item B<--xlate-glossary>=I<glossary>
+
+Tentukan ID glosarium yang akan digunakan untuk terjemahan. Opsi ini hanya tersedia saat menggunakan mesin DeepL. ID glosarium harus diperoleh dari akun DeepL Anda dan memastikan terjemahan yang konsisten untuk istilah-istilah tertentu.
+
+=item B<-->[B<no->]B<xlate-progress> (Default: True)
+
+Lihat hasil terjemahan secara waktu nyata di keluaran STDERR.
+
+=item B<--xlate-stripe>
+
+Gunakan modul L<App::Greple::stripe> untuk menampilkan bagian yang cocok dengan pola strip zebra. Ini berguna ketika bagian yang cocok tersambung berurutan.
+
+Palet warna dialihkan sesuai dengan warna latar belakang terminal. Jika Anda ingin menentukan secara eksplisit, Anda dapat menggunakan B<--xlate-stripe-light> atau B<--xlate-stripe-dark>.
+
+=item B<--xlate-mask>
+
+Lakukan fungsi masking dan tampilkan teks yang dikonversi apa adanya tanpa pemulihan.
+
+=item B<--match-all>
+
+Tetapkan seluruh teks file sebagai area target.
+
+=item B<--lineify-cm>
+
+=item B<--lineify-colon>
+
+Dalam kasus format C<cm> dan C<colon>, keluaran dipecah dan diformat baris demi baris. Oleh karena itu, jika hanya sebagian dari suatu baris yang akan diterjemahkan, hasil yang diharapkan tidak dapat diperoleh. Filter ini memperbaiki keluaran yang rusak karena menerjemahkan sebagian baris menjadi keluaran normal baris demi baris.
+
+Dalam implementasi saat ini, jika beberapa bagian dari suatu baris diterjemahkan, bagian-bagian tersebut dikeluarkan sebagai baris independen.
+
+=back
+
+=head1 CACHE OPTIONS
+
+Modul B<xlate> dapat menyimpan teks terjemahan yang di-cache untuk setiap file dan membacanya sebelum eksekusi untuk menghilangkan overhead permintaan ke server. Dengan strategi cache default C<auto>, ia mempertahankan data cache hanya ketika file cache ada untuk file target.
+
+Gunakan B<--xlate-cache=clear> untuk memulai manajemen cache atau membersihkan semua data cache yang ada. Setelah dijalankan dengan opsi ini, file cache baru akan dibuat jika belum ada dan kemudian secara otomatis dipelihara setelahnya.
+
+=over 7
+
+=item --xlate-cache=I<strategy>
+
+=over 4
+
+=item C<auto> (Default)
+
+Pertahankan file cache jika ada.
+
+=item C<create>
+
+Buat file cache kosong dan keluar.
+
+=item C<always>, C<yes>, C<1>
+
+Pertahankan cache bagaimanapun juga selama target adalah file normal.
+
+=item C<clear>
+
+Bersihkan data cache terlebih dahulu.
+
+=item C<never>, C<no>, C<0>
+
+Jangan pernah gunakan file cache meskipun ada.
+
+=item C<accumulate>
+
+Secara default, data yang tidak digunakan dihapus dari file cache. Jika Anda tidak ingin menghapusnya dan tetap menyimpannya di file, gunakan C<accumulate>.
+
+=back
+
+=item B<--xlate-update>
+
+Opsi ini memaksa pembaruan file cache meskipun tidak diperlukan.
+
+=back
+
+=head1 COMMAND LINE INTERFACE
+
+Anda dapat dengan mudah menggunakan modul ini dari baris perintah dengan menggunakan perintah C<xlate> yang disertakan dalam distribusi. Lihat halaman manual C<xlate> untuk penggunaan.
+
+Perintah C<xlate> bekerja selaras dengan lingkungan Docker, jadi meskipun Anda tidak memasang apa pun secara lokal, Anda dapat menggunakannya selama Docker tersedia. Gunakan opsi C<-D> atau C<-C>.
+
+Selain itu, karena makefile untuk berbagai gaya dokumen disediakan, penerjemahan ke bahasa lain dimungkinkan tanpa spesifikasi khusus. Gunakan opsi C<-M>.
+
+Anda juga dapat menggabungkan opsi Docker dan C<make> sehingga Anda dapat menjalankan C<make> di lingkungan Docker.
+
+Menjalankan seperti C<xlate -C> akan meluncurkan shell dengan repositori git working directory saat ini di-mount.
+
+Baca artikel berbahasa Jepang di bagian L</SEE ALSO> untuk detailnya.
+
+=head1 EMACS
+
+Muat file F<xlate.el> yang disertakan dalam repositori untuk menggunakan perintah C<xlate> dari editor Emacs. Fungsi C<xlate-region> menerjemahkan region yang diberikan. Bahasa default adalah C<EN-US> dan Anda dapat menentukan bahasa dengan memanggilnya menggunakan argumen prefix.
+
+=for html <p>
+<img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/emacs.png">
+</p>
+
+=head1 ENVIRONMENT
+
+=over 7
+
+=item DEEPL_AUTH_KEY
+
+Atur kunci autentikasi Anda untuk layanan DeepL.
+
+=item OPENAI_API_KEY
+
+Kunci autentikasi OpenAI.
+
+=back
+
+=head1 INSTALL
+
+=head2 CPANMINUS
+
+    $ cpanm App::Greple::xlate
+
+=head2 TOOLS
+
+Anda harus memasang alat baris perintah untuk DeepL dan ChatGPT.
+
+L<https://github.com/DeepLcom/deepl-python>
+
+L<https://github.com/tecolicom/App-gpty>
+
+=head1 SEE ALSO
+
+L<App::Greple::xlate>
+
+L<App::Greple::xlate::deepl>
+
+L<App::Greple::xlate::gpt4>
+
+L<App::Greple::xlate::gpt5>
+
+=over 2
+
+=item * L<https://hub.docker.com/r/tecolicom/xlate>
+
+Citra kontainer Docker.
+
+=item * L<https://github.com/DeepLcom/deepl-python>
+
+Pustaka Python dan perintah CLI DeepL.
+
+=item * L<https://github.com/openai/openai-python>
+
+Pustaka Python OpenAI
+
+=item * L<https://github.com/tecolicom/App-gpty>
+
+Antarmuka baris perintah OpenAI
+
+=item * L<App::Greple>
+
+Lihat manual B<greple> untuk detail tentang pola teks target. Gunakan opsi B<--inside>, B<--outside>, B<--include>, B<--exclude> untuk membatasi area pencocokan.
+
+=item * L<App::Greple::update>
+
+Anda dapat menggunakan modul C<-Mupdate> untuk memodifikasi file berdasarkan hasil perintah B<greple>.
+
+=item * L<App::sdif>
+
+Gunakan B<sdif> untuk menampilkan format penanda konflik berdampingan dengan opsi B<-V>.
+
+=item * L<App::Greple::stripe>
+
+Modul Greple B<stripe> digunakan oleh opsi B<--xlate-stripe>.
+
+=back
+
+=head2 ARTICLES
+
+=over 2
+
+=item * L<https://qiita.com/kaz-utashiro/items/1c1a51a4591922e18250>
+
+Modul Greple untuk menerjemahkan dan mengganti hanya bagian yang diperlukan dengan DeepL API (dalam bahasa Jepang)
+
+=item * L<https://qiita.com/kaz-utashiro/items/a5e19736416ca183ecf6>
+
+Menghasilkan dokumen dalam 15 bahasa dengan modul DeepL API (dalam bahasa Jepang)
+
+=item * L<https://qiita.com/kaz-utashiro/items/1b9e155d6ae0620ab4dd>
+
+Lingkungan Docker terjemahan otomatis dengan DeepL API (dalam bahasa Jepang)
+
+=back
+
+=head1 AUTHOR
+
+Kazumasa Utashiro
+
+=head1 LICENSE
+
+Copyright © 2023-2025 Kazumasa Utashiro.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

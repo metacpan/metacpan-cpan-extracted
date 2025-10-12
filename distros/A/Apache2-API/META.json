@@ -101,6 +101,6 @@
          "web" : "https://gitlab.com/jackdeguest/Apache2-API"
       }
    },
-   "version" : "v0.4.0",
+   "version" : "v0.4.1",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

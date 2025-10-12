@@ -5,7 +5,7 @@ use 5.020;
 use warnings;
 use experimental qw(postderef postderef_qq);
 
-package App::Cmd 0.337;
+package App::Cmd 0.338;
 
 use parent 'App::Cmd::ArgProcessor';
 # ABSTRACT: write command line apps with less suffering
@@ -751,7 +751,7 @@ App::Cmd - write command line apps with less suffering
 
 =head1 VERSION
 
-version 0.337
+version 0.338
 
 =head1 SYNOPSIS
 
@@ -1191,7 +1191,7 @@ Yuval Kogman <nuffin@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Ricardo Signes.
+This software is copyright (c) 2025 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

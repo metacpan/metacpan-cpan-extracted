@@ -10,15 +10,17 @@ App::Greple::xlate - Übersetzungsunterstützungsmodul für greple
 
     greple -Mxlate::gpt4 --xlate pattern target-file
 
-    greple -Mxlate --xlate-engine gpt4 --xlate pattern target-file
+    greple -Mxlate::gpt5 --xlate pattern target-file
+
+    greple -Mxlate --xlate-engine gpt5 --xlate pattern target-file
 
 =head1 VERSION
 
-Version 0.9912
+Version 0.9914
 
 =head1 DESCRIPTION
 
-B<Greple> B<xlate> Modul findet gewünschte Textblöcke und ersetzt sie durch den übersetzten Text. Derzeit sind DeepL (F<deepl.pm>) und ChatGPT 4.1 (F<gpt4.pm>) Modul als Back-End-Engine implementiert.
+B<Greple> B<xlate> Modul findet gewünschte Textblöcke und ersetzt sie durch den übersetzten Text. Derzeit sind DeepL (F<deepl.pm>), ChatGPT 4.1 (F<gpt4.pm>) und GPT-5 (F<gpt5.pm>) als Back-End-Engines implementiert.
 
 Wenn Sie normale Textblöcke in einem im Perl-Pod-Stil geschriebenen Dokument übersetzen möchten, verwenden Sie den B<greple>-Befehl mit C<xlate::deepl> und C<perl>-Modul wie folgt:
 
@@ -134,6 +136,8 @@ Derzeit sind folgende Engines verfügbar
 
 Die Schnittstelle von B<gpt-4o> ist instabil und kann derzeit nicht korrekt funktionieren.
 
+=item * B<gpt5>: gpt-5
+
 =back
 
 =item B<--xlate-labor>
@@ -226,6 +230,18 @@ Wenn das Format C<xtxt> (übersetzter Text) oder unbekannt ist, wird nur der üb
 Geben Sie die maximale Textlänge an, die auf einmal an die API gesendet werden soll. Der Standardwert ist wie für den kostenlosen DeepL-Kontodienst festgelegt: 128K für die API (B<--xlate>) und 5000 für die Zwischenablage-Schnittstelle (B<--xlate-labor>). Sie können diese Werte möglicherweise ändern, wenn Sie den Pro-Service nutzen.
 
 Geben Sie die maximale Zeilenanzahl an, die auf einmal an die API gesendet werden soll.
+
+=item B<--xlate-prompt>=I<text>
+
+Geben Sie eine benutzerdefinierte Eingabeaufforderung an, die an die Übersetzungs-Engine gesendet wird. Diese Option ist nur verfügbar, wenn ChatGPT-Engines (gpt3, gpt4, gpt4o) verwendet werden. Sie können das Übersetzungsverhalten anpassen, indem Sie dem KI-Modell spezifische Anweisungen geben. Wenn die Eingabeaufforderung C<%s> enthält, wird sie durch den Namen der Zielsprache ersetzt.
+
+=item B<--xlate-context>=I<text>
+
+Geben Sie zusätzliche Kontextinformationen an, die an die Übersetzungs-Engine gesendet werden. Diese Option kann mehrfach verwendet werden, um mehrere Kontextzeichenfolgen bereitzustellen. Die Kontextinformationen helfen der Übersetzungs-Engine, den Hintergrund zu verstehen und genauere Übersetzungen zu erzeugen.
+
+=item B<--xlate-glossary>=I<glossary>
+
+Geben Sie eine Glossar-ID an, die für die Übersetzung verwendet werden soll. Diese Option ist nur verfügbar, wenn die DeepL-Engine verwendet wird. Die Glossar-ID sollte aus Ihrem DeepL-Konto stammen und sorgt für eine konsistente Übersetzung bestimmter Begriffe.
 
 =item B<-->[B<no->]B<xlate-progress> (Default: True)
 
@@ -356,6 +372,8 @@ L<App::Greple::xlate>
 L<App::Greple::xlate::deepl>
 
 L<App::Greple::xlate::gpt4>
+
+L<App::Greple::xlate::gpt5>
 
 =over 2
 

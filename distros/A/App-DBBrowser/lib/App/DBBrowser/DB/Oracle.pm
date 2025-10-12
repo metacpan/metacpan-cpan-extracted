@@ -7,6 +7,8 @@ use 5.016;
 
 use DBI qw();
 
+use Term::Choose qw( choose );
+
 use App::DBBrowser::Credentials;
 use App::DBBrowser::Opt::DBGet;
 
@@ -58,6 +60,7 @@ sub set_attributes {
     return [
         { name => 'LongTruncOk', default => 0, values => [ 0, 1 ] },
         { name => 'ChopBlanks',  default => 0, values => [ 0, 1 ] },
+        { name => 'AskIfSID',    default => 0, values => [ 0, 1 ] },
     ];
 }
 
@@ -70,30 +73,53 @@ sub get_db_handle {
     my $env_var_yes    = $db_opt_get->enabled_env_vars( $db, $db_opt );
     my $read_attributes = $db_opt_get->get_read_attributes( $db, $db_opt );
     my $set_attributes  = $db_opt_get->get_set_attributes( $db, $db_opt );
-
     my $cred = App::DBBrowser::Credentials->new( $sf->{i}, $sf->{o} );
     my $settings = { login_data => $login_data, env_var_yes => $env_var_yes };
-    my $dsn;
-    my $show_sofar = 'DB '. $db;
+    my $show_sofar = 'DB: '. $db;
     my $host = $cred->get_login( 'host', $show_sofar, $settings );
-    if ( defined $host ) {
+    my $port;
+    if ( length $host ) {
         $show_sofar .= "\n" . 'Host: ' . $host;
+        $port = $cred->get_login( 'port', $show_sofar, $settings );
+        if ( length $port ) {
+            $show_sofar .= "\n" . 'Port: ' . $port;
+        }
     }
-    my $port = $cred->get_login( 'port', $show_sofar, $settings );
-    if ( defined $port ) {
-        $show_sofar .= "\n" . 'Port: ' . $port;
-    }
-    my @address;
-    push @address, "host=$host" if length $host;
-    push @address, "sid=$db";
-    push @address, "port=$port" if length $port;
-    if ( @address == 1 ) {
-        $dsn = "dbi:$sf->{i}{driver}:$db";
+    my $ask_if_sid = delete $set_attributes->{AskIfSID};
+    my $dsn = "dbi:$sf->{i}{driver}:";
+    if ( $host ) {
+        my $db_type;
+        my $sid = 'SID';
+        if ( $ask_if_sid ) {
+            $db_type = choose(
+                [ undef, 'Service_Name', $sid ],
+                { info => $show_sofar . "\n", prompt => "DB Identifier Type:",  undef => '<' }
+            );
+            if ( defined $db_type ) {
+                $show_sofar .= "\n" . 'Type: ' . $db_type;
+            }
+        }
+        if ( defined $db_type && $db_type eq $sid ) {
+            if ( $port ) {
+                $dsn .= "host=$host;port=$port;sid=$db";
+            }
+            else {
+                $dsn .= "host=$host;sid=$db";
+            }
+        }
+        else {
+            if ( $port ) {
+                $dsn .= "//$host:$port/$db";
+            }
+            else {
+                $dsn .= "//$host/$db";
+            }
+        }
     }
     else {
-        $dsn = "dbi:$sf->{i}{driver}:" . join( ';', @address );
+        $dsn .= $db;
     }
-    my $user   = $cred->get_login( 'user', $show_sofar, $settings );
+    my $user = $cred->get_login( 'user', $show_sofar, $settings );
     $show_sofar .= "\n" . 'User: ' . $user if defined $user;
     my $passwd = $cred->get_login( 'pass', $show_sofar, $settings );
     my $dbh = DBI->connect( $dsn, $user, $passwd, {

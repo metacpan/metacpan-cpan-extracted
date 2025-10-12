@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-package App::Cmd::Command::commands 0.337;
+package App::Cmd::Command::commands 0.338;
 
 use App::Cmd::Command;
 BEGIN { our @ISA = 'App::Cmd::Command' };
@@ -24,11 +24,18 @@ BEGIN { our @ISA = 'App::Cmd::Command' };
 #pod
 #pod =cut
 
+sub opt_spec {
+  return (
+    [ 'stderr' => 'hidden' ],
+    [ 'for-completion', 'one per line, for use in tab completion scripts' ],
+  );
+}
+
 sub execute {
   my ($self, $opt, $args) = @_;
 
   my $target = $opt->stderr ? *STDERR : *STDOUT;
- 
+
   my @cmd_groups = $self->app->command_groups;
   my @primary_commands = map { @$_ if ref $_ } @cmd_groups;
 
@@ -39,6 +46,11 @@ sub execute {
       $self->app->command_plugins;
 
     @cmd_groups = $self->sort_commands(@primary_commands);
+  }
+
+  if ($opt->for_completion) {
+    print "$_\n" for map {; @$_ } @cmd_groups;
+    return;
   }
 
   my $fmt_width = 0;
@@ -84,12 +96,6 @@ sub sort_commands {
   return (\@head, \@tail);
 }
 
-sub opt_spec {
-  return (
-    [ 'stderr' => 'hidden' ],
-  );
-}
-
 1;
 
 __END__
@@ -104,7 +110,7 @@ App::Cmd::Command::commands - list the application's commands
 
 =head1 VERSION
 
-version 0.337
+version 0.338
 
 =head1 DESCRIPTION
 
@@ -151,7 +157,7 @@ Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Ricardo Signes.
+This software is copyright (c) 2025 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

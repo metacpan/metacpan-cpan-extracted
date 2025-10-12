@@ -136,7 +136,7 @@ sub create_table {
                 if ( $orig_row_count - 1 == @{$sql->{insert_args}} ) {
                     unshift @{$sql->{insert_args}}, $bu_first_row;
                 }
-                $sql->{ct_column_definitions} = [];
+                $sql->{ct_column_definitions} = []; ##
                 $sql->{insert_col_names}  = [];
                 my $header_row = $sf->__get_column_names( $sql );
                 if ( ! defined $header_row ) {

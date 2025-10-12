@@ -26,6 +26,7 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'Alien::Base' => '0',
+                                      'Alien::Ruby' => '0',
                                       'base' => '0',
                                       'strict' => '0',
                                       'warnings' => '0'

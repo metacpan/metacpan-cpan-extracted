@@ -1,4 +1,6 @@
+AGENTS.md
 Build.PL
+CLAUDE.md
 Changes
 LICENSE
 MANIFEST.SKIP
@@ -15,6 +17,12 @@ README.gpt4-JA.md
 README.gpt4-KO.md
 README.gpt4-RU.md
 README.gpt4-ZH.md
+README.gpt5-DE.md
+README.gpt5-FR.md
+README.gpt5-JA.md
+README.gpt5-KO.md
+README.gpt5-RU.md
+README.gpt5-ZH.md
 README.md
 cpanfile
 docs/PATTERN_MASK
@@ -44,6 +52,19 @@ docs/src/xlate.gpt4-RO.pod
 docs/src/xlate.gpt4-RU.pod
 docs/src/xlate.gpt4-TR.pod
 docs/src/xlate.gpt4-ZH.pod
+docs/src/xlate.gpt5-DE.pod
+docs/src/xlate.gpt5-EL.pod
+docs/src/xlate.gpt5-ES.pod
+docs/src/xlate.gpt5-ET.pod
+docs/src/xlate.gpt5-FR.pod
+docs/src/xlate.gpt5-ID.pod
+docs/src/xlate.gpt5-JA.pod
+docs/src/xlate.gpt5-KO.pod
+docs/src/xlate.gpt5-NL.pod
+docs/src/xlate.gpt5-RO.pod
+docs/src/xlate.gpt5-RU.pod
+docs/src/xlate.gpt5-TR.pod
+docs/src/xlate.gpt5-ZH.pod
 docs/src/xlate.pod
 lib/App/Greple/xlate.pm
 lib/App/Greple/xlate/Cache.pm
@@ -55,6 +76,7 @@ lib/App/Greple/xlate/deepl.pm
 lib/App/Greple/xlate/gpt3.pm
 lib/App/Greple/xlate/gpt4.pm
 lib/App/Greple/xlate/gpt4o.pm
+lib/App/Greple/xlate/gpt5.pm
 lib/App/Greple/xlate/null.pm
 minil.toml
 script/xlate

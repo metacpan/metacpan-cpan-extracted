@@ -4,11 +4,12 @@ use Carp;
 use Cwd qw(abs_path);
 use File::Basename qw(basename dirname);
 use File::Spec;
-use File::Temp;
 use File::stat;
+use File::Temp;
 use HTML::Tiny;
 use List::Util qw(any);
 use POSIX qw(strftime ceil);
+use URI::Escape;
 use constant {
     INDEX_FILE  => 'index.html',
     SIGNATURE   => '@~@ I was made by App::htidx @~@',
@@ -22,7 +23,7 @@ use vars qw($VERSION $H $CSS);
 use warnings;
 
 
-$VERSION = '0.01';
+$VERSION = '0.02';
 
 $H = HTML::Tiny->new(mode => 'html');
 
@@ -32,7 +33,7 @@ $CSS = <DATA>;
 sub main {
     help() if (any { '-h' eq $_ || '--help' eq $_ } @_);
 
-    my $dir = abs_path(shift(@_));
+    my $dir = abs_path(shift(@_) || '.');
 
     croak("Error: $dir does not exist") unless (-e $dir);
     croak("Error: $dir is not a directory") unless (-d $dir);
@@ -130,7 +131,7 @@ sub mkhtml {
         { class => 'htidx-directory' },
         [
             $H->td($H->a(
-                { href => '..'},
+                { href => '../'},
                 'Parent Directory'
             )),
             $H->td(strftime(TIMEFMT, localtime(stat(File::Spec->catfile(dirname($dir)))->mtime))),
@@ -143,7 +144,7 @@ sub mkhtml {
             { class => 'htidx-directory' },
             [ map { $H->td($_) } (
                 $H->a(
-                    { href => $entry},
+                    { href => uri_escape($entry).'/'},
                     he($entry.'/')
                 ),
                 strftime(TIMEFMT, localtime(stat(File::Spec->catfile($dir, $entry))->mtime)),
@@ -159,7 +160,7 @@ sub mkhtml {
             { class => 'htidx-file' },
             [ map { $H->td($_) } (
                 $H->a(
-                    { href => $entry },
+                    { href => uri_escape($entry) },
                     he($entry)
                 ),
                 strftime(TIMEFMT, localtime($stat->mtime)),
@@ -206,7 +207,7 @@ App::htidx - generate static HTML directory listings.
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

@@ -10,15 +10,17 @@ App::Greple::xlate - grepleのための翻訳サポートモジュール
 
     greple -Mxlate::gpt4 --xlate pattern target-file
 
-    greple -Mxlate --xlate-engine gpt4 --xlate pattern target-file
+    greple -Mxlate::gpt5 --xlate pattern target-file
+
+    greple -Mxlate --xlate-engine gpt5 --xlate pattern target-file
 
 =head1 VERSION
 
-Version 0.9912
+Version 0.9914
 
 =head1 DESCRIPTION
 
-B<Greple> B<xlate> モジュールは、目的のテキストブロックを見つけて翻訳されたテキストに置き換えます。現在、DeepL（F<deepl.pm>）およびChatGPT 4.1（F<gpt4.pm>）モジュールがバックエンドエンジンとして実装されています。
+B<Greple> B<xlate> モジュールは、指定したテキストブロックを検索し、翻訳されたテキストに置き換えます。現在、DeepL（F<deepl.pm>）、ChatGPT 4.1（F<gpt4.pm>）、およびGPT-5（F<gpt5.pm>）モジュールがバックエンドエンジンとして実装されています。
 
 Perlのpodスタイルで書かれたドキュメント内の通常のテキストブロックを翻訳したい場合は、B<greple>コマンドをC<xlate::deepl>およびC<perl>モジュールとともに次のように使用します。
 
@@ -134,6 +136,8 @@ B<--xlate-fold> オプションを指定すると、変換されたテキスト�
 
 B<gpt-4o> のインターフェースは不安定で、現時点では正しく動作する保証はありません。
 
+=item * B<gpt5>: gpt-5
+
 =back
 
 =item B<--xlate-labor>
@@ -226,6 +230,18 @@ C<xtxt>（翻訳されたテキスト）や不明な場合は、翻訳された�
 一度にAPIに送信するテキストの最大行数を指定します。
 
 1行ずつ翻訳したい場合は、この値を1に設定してください。このオプションはC<--xlate-maxlen>オプションより優先されます。
+
+=item B<--xlate-prompt>=I<text>
+
+翻訳エンジンに送信するカスタムプロンプトを指定します。このオプションはChatGPTエンジン（gpt3、gpt4、gpt4o）を使用している場合のみ利用可能です。AIモデルに特定の指示を与えることで、翻訳の挙動をカスタマイズできます。プロンプトにC<%s>が含まれている場合は、対象言語名に置き換えられます。
+
+=item B<--xlate-context>=I<text>
+
+翻訳エンジンに送信する追加のコンテキスト情報を指定します。このオプションは複数回使用でき、複数のコンテキスト文字列を提供できます。コンテキスト情報は翻訳エンジンが背景を理解し、より正確な翻訳を生成するのに役立ちます。
+
+=item B<--xlate-glossary>=I<glossary>
+
+翻訳に使用する用語集IDを指定します。このオプションはDeepLエンジンを使用している場合のみ利用可能です。用語集IDはDeepLアカウントから取得する必要があり、特定の用語の一貫した翻訳を保証します。
 
 =item B<-->[B<no->]B<xlate-progress> (Default: True)
 
@@ -356,6 +372,8 @@ L<https://github.com/tecolicom/App-gpty>
 L<App::Greple::xlate>
 
 L<App::Greple::xlate::gpt4>
+
+L<App::Greple::xlate::gpt5>
 
 =over 2
 

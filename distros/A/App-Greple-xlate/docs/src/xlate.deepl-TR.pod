@@ -10,15 +10,17 @@ App::Greple::xlate - greple için çeviri destek modülü
 
     greple -Mxlate::gpt4 --xlate pattern target-file
 
-    greple -Mxlate --xlate-engine gpt4 --xlate pattern target-file
+    greple -Mxlate::gpt5 --xlate pattern target-file
+
+    greple -Mxlate --xlate-engine gpt5 --xlate pattern target-file
 
 =head1 VERSION
 
-Version 0.9912
+Version 0.9914
 
 =head1 DESCRIPTION
 
-B<Greple> B<xlate> modülü istenen metin bloklarını bulur ve bunları çevrilmiş metinle değiştirir. Şu anda DeepL (F<deepl.pm>) ve ChatGPT 4.1 (F<gpt4.pm>) modülü bir arka uç motoru olarak uygulanmaktadır.
+B<Greple> B<xlate> modülü istenen metin bloklarını bulur ve bunları çevrilen metinle değiştirir. Şu anda DeepL (F<deepl.pm>), ChatGPT 4.1 (F<gpt4.pm>) ve GPT-5 (F<gpt5.pm>) modülü bir arka uç motoru olarak uygulanmaktadır.
 
 Perl'ün pod stilinde yazılmış bir belgedeki normal metin bloklarını çevirmek istiyorsanız, B<greple> komutunu C<xlate::deepl> ve C<perl> modülü ile aşağıdaki gibi kullanın:
 
@@ -134,6 +136,8 @@ Kullanılacak çeviri motorunu belirtir. Motor modülünü C<-Mxlate::deepl> gib
 
 B<gpt-4o>'nun arayüzü kararsızdır ve şu anda doğru çalışacağı garanti edilemez.
 
+=item * B<gpt5>: gpt-5
+
 =back
 
 =item B<--xlate-labor>
@@ -226,6 +230,18 @@ API'ye bir kerede gönderilecek maksimum metin uzunluğunu belirtin. Varsayılan
 API'ye bir kerede gönderilecek maksimum metin satırını belirtin.
 
 Her seferinde bir satır çevirmek istiyorsanız bu değeri 1 olarak ayarlayın. Bu seçenek C<--xlate-maxlen> seçeneğine göre önceliklidir.
+
+=item B<--xlate-prompt>=I<text>
+
+Çeviri motoruna gönderilecek özel bir istem belirtin. Bu seçenek yalnızca ChatGPT motorları (gpt3, gpt4, gpt4o) kullanıldığında kullanılabilir. Yapay zeka modeline özel talimatlar sağlayarak çeviri davranışını özelleştirebilirsiniz. Komut istemi C<%s> içeriyorsa, hedef dil adı ile değiştirilecektir.
+
+=item B<--xlate-context>=I<text>
+
+Çeviri motoruna gönderilecek ek bağlam bilgilerini belirtin. Bu seçenek, birden fazla bağlam dizesi sağlamak için birden fazla kez kullanılabilir. Bağlam bilgisi, çeviri motorunun arka planı anlamasına ve daha doğru çeviriler üretmesine yardımcı olur.
+
+=item B<--xlate-glossary>=I<glossary>
+
+Çeviri için kullanılacak bir sözlük kimliği belirtin. Bu seçenek yalnızca DeepL motoru kullanılırken kullanılabilir. Sözlük kimliği DeepL hesabınızdan alınmalıdır ve belirli terimlerin tutarlı bir şekilde çevrilmesini sağlar.
 
 =item B<-->[B<no->]B<xlate-progress> (Default: True)
 
@@ -356,6 +372,8 @@ L<App::Greple::xlate>
 L<App::Greple::xlate::deepl>
 
 L<App::Greple::xlate::gpt4>
+
+L<App::Greple::xlate::gpt5>
 
 =over 2
 

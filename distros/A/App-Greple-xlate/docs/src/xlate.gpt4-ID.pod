@@ -10,15 +10,17 @@ App::Greple::xlate - modul dukungan terjemahan untuk greple
 
     greple -Mxlate::gpt4 --xlate pattern target-file
 
-    greple -Mxlate --xlate-engine gpt4 --xlate pattern target-file
+    greple -Mxlate::gpt5 --xlate pattern target-file
+
+    greple -Mxlate --xlate-engine gpt5 --xlate pattern target-file
 
 =head1 VERSION
 
-Version 0.9912
+Version 0.9914
 
 =head1 DESCRIPTION
 
-B<Greple> B<xlate> modul menemukan blok teks yang diinginkan dan menggantinya dengan teks terjemahan. Saat ini DeepL (F<deepl.pm>) dan ChatGPT 4.1 (F<gpt4.pm>) telah diimplementasikan sebagai mesin back-end.
+B<Greple> B<xlate> modul menemukan blok teks yang diinginkan dan menggantinya dengan teks terjemahan. Saat ini modul DeepL (F<deepl.pm>), ChatGPT 4.1 (F<gpt4.pm>), dan GPT-5 (F<gpt5.pm>) telah diimplementasikan sebagai mesin back-end.
 
 Jika Anda ingin menerjemahkan blok teks biasa dalam dokumen yang ditulis dengan gaya pod Perl, gunakan perintah B<greple> dengan modul C<xlate::deepl> dan C<perl> seperti ini:
 
@@ -134,6 +136,8 @@ Saat ini, mesin-mesin berikut tersedia
 
 Antarmuka B<gpt-4o> tidak stabil dan tidak dapat dijamin berfungsi dengan benar saat ini.
 
+=item * B<gpt5>: gpt-5
+
 =back
 
 =item B<--xlate-labor>
@@ -226,6 +230,18 @@ Jika formatnya adalah C<xtxt> (teks yang diterjemahkan) atau tidak dikenal, hany
 Tentukan panjang maksimum teks yang akan dikirim ke API sekaligus. Nilai default diatur seperti untuk layanan akun gratis DeepL: 128K untuk API (B<--xlate>) dan 5000 untuk antarmuka clipboard (B<--xlate-labor>). Anda mungkin dapat mengubah nilai ini jika menggunakan layanan Pro.
 
 Tentukan jumlah baris maksimum teks yang akan dikirim ke API sekaligus.
+
+=item B<--xlate-prompt>=I<text>
+
+Tentukan prompt khusus yang akan dikirimkan ke mesin terjemahan. Opsi ini hanya tersedia saat menggunakan mesin ChatGPT (gpt3, gpt4, gpt4o). Anda dapat menyesuaikan perilaku terjemahan dengan memberikan instruksi spesifik kepada model AI. Jika prompt berisi C<%s>, maka akan digantikan dengan nama bahasa target.
+
+=item B<--xlate-context>=I<text>
+
+Tentukan informasi konteks tambahan yang akan dikirimkan ke mesin terjemahan. Opsi ini dapat digunakan beberapa kali untuk memberikan beberapa string konteks. Informasi konteks membantu mesin terjemahan memahami latar belakang dan menghasilkan terjemahan yang lebih akurat.
+
+=item B<--xlate-glossary>=I<glossary>
+
+Tentukan ID glosarium yang akan digunakan untuk terjemahan. Opsi ini hanya tersedia saat menggunakan mesin DeepL. ID glosarium harus diperoleh dari akun DeepL Anda dan memastikan konsistensi terjemahan istilah tertentu.
 
 =item B<-->[B<no->]B<xlate-progress> (Default: True)
 
@@ -356,6 +372,8 @@ L<https://github.com/DeepLcom/deepl-python>
 L<https://github.com/tecolicom/App-gpty>
 
 L<App::Greple::xlate::gpt4>
+
+L<App::Greple::xlate::gpt5>
 
 =over 2
 

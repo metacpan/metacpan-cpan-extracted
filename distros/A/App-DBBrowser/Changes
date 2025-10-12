@@ -1,6 +1,11 @@
 Revision history for App-DBBrowser
 
 
+2.434  2025-10-05
+        - Allow existing CTEs to be used in the WHERE clause of UPDATE and DELETE statements.
+        - DBD::Oracle: fixed DSN setup.
+        - DBD::Oracle: new option "AskIfSid".
+
 2.433  2025-09-29
         - SQLite: Respect the "sqlite_see_if_its_a_number" option when quoting constants.
 

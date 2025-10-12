@@ -1,6 +1,6 @@
 package App::Greple::xlate::gpt4;
 
-our $VERSION = "0.9912";
+our $VERSION = "0.9914";
 
 use v5.14;
 use warnings;
@@ -16,7 +16,7 @@ use Data::Dumper;
 use List::Util qw(sum);
 use App::cdif::Command;
 
-use App::Greple::xlate qw(opt);
+use App::Greple::xlate qw(%opt &opt);
 use App::Greple::xlate::Lang qw(%LANGNAME);
 
 our $lang_from //= 'ORIGINAL';
@@ -67,8 +67,11 @@ sub gpty {
 	-e => $param->{engine},
 	-t => $param->{temp},
 	-s => $system,
-	'-',
     );
+    if (my @contexts = @{$opt{contexts}}) {
+	push @command, map { (-s => "Translation context: $_") } @contexts;
+    }
+    push @command, '-';
     warn Dumper \@command if opt('debug');
     $gpty->command(\@command)->setstdin($text)->update->data;
 }
