@@ -6,9 +6,9 @@ Test::HTTPStatus - check an HTTP status
 
         use Test::HTTPStatus tests => 2;
 
-        http_ok( 'https://www.perl.org', HTTP_OK );
+        http_ok('https://www.perl.org', HTTP_OK);
 
-        http_ok( $url, $status );
+        http_ok($url, $status);
 
 # DESCRIPTION
 
@@ -99,7 +99,7 @@ Returns the user agent being used
 
 brian d foy, `<bdfoy@cpan.org>`
 
-Maintained by Nigel Horne, `<njh at bandsman.co.uk>`
+Maintained by Nigel Horne, `<njh at nigelhorne.com>`
 
 # SUPPORT
 

@@ -1,5 +1,28 @@
 Revision history for App-Test-Generator
 
+0.06	Fri Oct 10 08:55:36 EDT 2025
+	Allow real config files to be read
+	Validate the configuration file
+
+0.05	Thu Oct  9 18:23:03 EDT 2025
+	Removed duplicate regex candidate table
+	Validate that the corpus inputs are arrayrefs
+	Only load Class::Simple when needed
+	Use rel2abs
+	Load the configuration file in a (slightly) safer way
+	The test code is now in a template toolkit
+	Improved random test generator, more knowledgable about min/max, memberof and matches
+
+0.04	Wed Oct  8 08:39:49 EDT 2025
+	Add fuzzy regex generator
+	Do basic hard-coded tests where possible, to get it started
+	Allow pathnames in the module name
+	Added qwrap - GitHub#1 - thanks to neo1ite
+	Don't try to fuzz input if no %input is given
+	Added %config - GitHub#2
+	Generate tests for routines that take one unnamed parameter - GitHub#2
+	Added fallback for perl_quote for hashes and objects
+
 0.03	Mon Sep 29 18:18:36 EDT 2025
 	If minimum is not set, verify 0 or empty fields are allowable
 	Added the testing dashboard

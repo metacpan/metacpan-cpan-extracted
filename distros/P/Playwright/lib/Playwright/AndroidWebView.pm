@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::AndroidWebView;
-$Playwright::AndroidWebView::VERSION = '1.532';
+$Playwright::AndroidWebView::VERSION = '1.551';
 use parent 'Playwright::Base';
 
 sub new {
@@ -20,6 +20,16 @@ sub new {
 
 sub spec {
     return $Playwright::spec->{'AndroidWebView'}{members};
+}
+
+sub page {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'page',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
 }
 
 sub close {
@@ -47,16 +57,6 @@ sub pkg {
     return $self->_api_request(
         args    => [@_],
         command => 'pkg',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub page {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'page',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -106,7 +106,7 @@ Playwright::AndroidWebView - Automatically generated class for Playwright::Andro
 
 =head1 VERSION
 
-version 1.532
+version 1.551
 
 =head1 CONSTRUCTOR
 
@@ -116,6 +116,12 @@ You shouldn't have to call this directly.
 Instead it should be returned to you as the result of calls on Playwright objects, or objects it returns.
 
 =head1 METHODS
+
+=head2 page(@args)
+
+Execute the AndroidWebView::page playwright routine.
+
+See L<https://playwright.dev/docs/api/class-AndroidWebView#AndroidWebView-page> for more information.
 
 =head2 close(@args)
 
@@ -134,12 +140,6 @@ See L<https://playwright.dev/docs/api/class-AndroidWebView#AndroidWebView-pid> f
 Execute the AndroidWebView::pkg playwright routine.
 
 See L<https://playwright.dev/docs/api/class-AndroidWebView#AndroidWebView-pkg> for more information.
-
-=head2 page(@args)
-
-Execute the AndroidWebView::page playwright routine.
-
-See L<https://playwright.dev/docs/api/class-AndroidWebView#AndroidWebView-page> for more information.
 
 =head2 on(@args)
 
@@ -194,7 +194,7 @@ George S. Baugh <teodesian@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2020 Troglodyne LLC
+Copyright (c) 2025 Troglodyne LLC
 
 
 Permission is hereby granted, free of charge, to any person obtaining a copy

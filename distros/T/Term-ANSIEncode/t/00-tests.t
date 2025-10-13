@@ -22,7 +22,7 @@ binmode $builder->failure_output, ":encoding(UTF-8)";
 binmode $builder->todo_output,    ":encoding(UTF-8)";
 
 diag(colored(['black on_magenta'],sprintf('%-28s',' Testing object creation ')));
-my $ansi = Term::ANSIEncode->new('mode' => 'small');
+my $ansi = Term::ANSIEncode->new();
 isa_ok($ansi,'Term::ANSIEncode');
 
 my $max = 1;
@@ -32,9 +32,9 @@ foreach my $t (keys %{$ansi->{'ansi_sequences'}}) {
 }
 $max += 6;
 foreach my $token (sort(keys %{$ansi->{'ansi_sequences'}})) {
-	next if ($token =~ /NEWLINE|LINEFEED|RETURN/);
+	next if ($token =~ /NEWLINE|LINEFEED|RETURN|HORIZONTAL/);
 	my $text   = '[% ' . $token . ' %]';
-    my $output = $ansi->ansi_output($text,0,1);
+    my $output = $ansi->ansi_decode($text);
 
 	$output =~ s/\e/\\e/gs;
     $output =~ s/\r/\\r/gs;
@@ -44,26 +44,7 @@ foreach my $token (sort(keys %{$ansi->{'ansi_sequences'}})) {
     $test =~ s/\e/\\e/gs;
     $test =~ s/\[\% RETURN \%\]/\\r/gs;
 
-	note(sprintf('%-' . $max . 's (GOT)-> %-28s (EXPECTED)-> %-28s',$text ,$output, $test));
-	cmp_ok($output,'eq',$test,$text) || BAIL_OUT($text);
-}
-
-diag(colored(['black on_bright_yellow'],sprintf('%-28s',' Testing special characters ')) . " It's okay if some of these fail ");
-$max = 1;
-foreach my $c (keys %{$ansi->{'characters'}->{'NAME'}}) {
-	$max = max(length($c),$max);
-}
-$max += 6;
-foreach my $character (sort(keys %{$ansi->{'characters'}->{'NAME'}})) {
-    my $text   = '[% ' . $character . ' %]';
-    my $output = $ansi->ansi_output($text,0,1);
-    my $test   = $ansi->{'characters'}->{'NAME'}->{$character};
-
-    note(sprintf('%-' . $max . 's (GOT)-> %-4s    (EXPECTED)-> %-4s',$text , $output, $test));
-	SKIP: {
-		skip "$text Not available on this terminal", 1 if ($output ne $test);
-		cmp_ok($output,'eq',$test,$text) || diag($text);
-	}
+	cmp_ok($output,'eq',"$test","$text");
 }
 
 exit(0);

@@ -2,7 +2,7 @@ package Data::Password::zxcvbn::Match::BruteForce;
 use Moo;
 with 'Data::Password::zxcvbn::Match';
 use List::AllUtils qw(max);
-our $VERSION = '1.1.2'; # VERSION
+our $VERSION = '1.1.3'; # VERSION
 # ABSTRACT: special match class for brute-force guesses
 
 
@@ -63,7 +63,7 @@ Data::Password::zxcvbn::Match::BruteForce - special match class for brute-force 
 
 =head1 VERSION
 
-version 1.1.2
+version 1.1.3
 
 =head1 DESCRIPTION
 

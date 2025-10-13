@@ -4,23 +4,33 @@
 
 =head2 Slack/buffer defaults
 
-Generally a user shouldn't need to provide any activity/action time other than the C<tmavg>.  Some default behavior should be used, either C<tmmax=1.1*tmavg>, perhaps a default buffering value used during configuration building, or passed as part of schedule building.  As a side benefit, having a value used during schedule building would permit relaxation during retries, and could be reported with the result.  User-configured cases where C<tmmax==tmavg> would never be adjusted.
+As of version 0.1.1, missing time values are set with ratios 3,4,5; see L<Schedule::Activity>.  As an improvement, support passing these ratios during configuration building.  Eventually it will be helpful to pass slack/buffer defaults as part of schedule building:  Having a value used during schedule building would permit relaxation during retries, and could be reported with the result.  This requires changing assumptions in the validators.
 
 =head2 Attributes
 
-Attributes of the form C<attribute=E<gt>{attribute=E<gt>value,...}> should be available in all activity/action nodes (and messages when added, see below).  Attributes will be returned from C<buildSchedule> in the C<attribute> key of the result as a hash of C<attribute name=E<gt>{total=E<gt>value,xy=E<gt>[[seconds,total],...]}>.  Attribute totals may then be used by the caller to trigger rebuilds.  Eventually, node filters should support conditional logic predicated on the current attribute values during the build, such as C<next> node look-ahead filtering (with fallback).  Based on the nature of filtering, a nodal change at a given time may induce a rebuild of all following times (or the entire containing activity).
+As of version 0.1.1, attributes are available in activity/action configurations and reported with C<buildSchedule>.  Future versions may support node filters, ie conditional logic predicated on the current attribute values during the build, such as C<next> node look-ahead filtering (with fallback).  Based on the nature of filtering, a nodal change at a given time may induce a rebuild of all following times (or the entire containing activity).
 
 =head2 Multimessage support
 
-A message string only contains the announcement message, but a message array signals customized structures.  If an entry in the array is a scalar, it would be a regular text message.  If the entry is a hash, it would be of the form C<{message=E<gt>'the message',attribute=E<gt>{attribute=E<gt>value}>.  Messages would be chosen randomly, except with filters or searching, which may narrow the selection based on attributes.
+As of version 0.1.1, messages can be strings, arrays, or a hash of alternates.  Messages are chosen randomly.  Message attributes are reported with the overall attribute results from C<buildSchedule>.  Attributes may be used in the future for filtering and searching.
 
 =head2 Flat configurations
 
-If possible, support loading of configuration from a Markdown-styled nested listed, with activities as the outermost level and actions at level two.  This only works when all actions are 'equal' and can occur repeatedly in any order.  The concluding action for each activity would be automatic in this case.
+As of version 0.1.1, basic Markdown can be imported via C<Activity::loadMarkdown> and supports randomization, and time specifications for activities and actions.
+
+=head2 Annotations
+
+As of version 0.1.1, annotations are secondary/tertiary schedules that are predicated on the primary list of activity/actions.  After the actions have been scheduled, additional messages are inserted into the schedule either "before" or "after" existing events.  For example, in an exercise schedule, a message to change the background music is an annotation and not part of the primary schedule.
+
+Configuration is defined in L<Schedule::Activity::Annotation>.  The C<insert> functionality is still only "proposed" and may be unnecessary.  Additional functionality might be added to prevent clashes across multiple annotation groups.
+
+=head2 Annotation Attributes
+
+As of version 0.1.1, annotations may contain attributes but they are not reported with the C<attributes> from C<buildSchedule> and must be managed by the caller.
 
 =head2 Convenience, min/max/valid reporting functions
 
-More complex schedules may be difficult to interpret at a glance.  One particular annoyance is finding that the target time for an activity cannot be reached, or that there are too many actions to fit a smaller goal window.  Recommend some convenience functions to find the minimum possible activity time (shortest path through the nodes, ultimately), if the activity can be completed at all (sorta easy to forget, and should be checked before attempting scheduling), and the maximum possible activity time (if defined).
+More complex schedules may be difficult to interpret at a glance.  One particular annoyance is finding that the target time for an activity cannot be reached, or that there are too many actions to fit a smaller goal window.  Recommend some convenience functions to find the minimum possible activity time (shortest path through the nodes, ultimately), if the activity can be completed at all (sorta easy to forget, and should be checked before attempting scheduling), and the maximum possible activity time (if defined).  Moreover, these checks are needed to avoid hanging nodes (that don't reach finish), or action nodes with zero times (that never make progress).
 
 =head2 Tension
 
@@ -30,12 +40,6 @@ Scheduling tension is currently only available for buffer time, but it should al
 
 Node activation conditional upon current attribute values and, possibly, upon total node counts (to avoid the overhead of needing one attribute per node to track this).  Each C<filter=[...]> could therefore have entries of C<nodecount=E<gt>name,op=E<gt>value> or C<attribute=E<gt>name,op=E<gt>value>, where the C<op> keys are the literal key names as C<eq>, C<gt>, ... (converted to numeric operators during evaluation).  This would permit easier "gating operations", which currently require branch duplication in the configuraiton.
 
-=head2 Insertion events
-
-Not yet fully defined, but insertion events would be secondary/tertiary schedules that are predicated on the primary list of activity/actions.  After the actions have been scheduled, additional messages are inserted into the schedule either "before" or "after" existing events.  For example, in an exercise schedule, a message to change the background music is an insertion event and not part of the primary schedule.
-
-Undecided at this time is the desired configuration, since insertion events may have categories of their own.  This may be implemented entirely recursively with calls to buildSchedule where the activities and goal times are taken from the primary schedule, or it may be built using node filtering.
-
 =head2 State
 
 Actions can change states based on the path chosen.  Those states may affect choices during later schedule builds.  This would be useful for "consumables".  This may be indistinguishable from attribute filters like "where sum(attribute)<1".
@@ -44,15 +48,37 @@ Actions can change states based on the path chosen.  Those states may affect cho
 
 Something of the form C<schedule-activity.pl --schedule=file.dumper --activity='600,name' --activity='300,name' ...> might be useful.
 
+=head2 Sample text to speech tool
+
+An HTML+Javascript solution utilizing Web text to speech already exists to handle reminders for schedules of the form C<hh:mm:ss message # comment> and could be provided in C<samples/>.
+
+=head2 Action limits
+
+As a special case of Attributes, a shortcut of the form C<limit=N> can be supported.  While the case C<limit=1> is not the primary/initial use case of the scheduler, it makes sense that some events would specifically never be repeated.  Implementation requires Attributes and Node filtering, above, so this is not the highest priority on the list.
+
+=head2 Imports for common patterns
+
+There are three use cases that cannot currently be provided as examples.
+
+First, something like a music playlist is similar to the base case here.  This is a "large number of random choices" but "each is very fixed in time length".  There are multiple potential actions to be randomized.  Music has attributes (mood).  Scheduling can be arranged in chunks (activities), so there are natural groupings for an arrangement.  Scheduling requires Action limits, above, so currently this is slightly difficult and/or requires a helper import mechanism to build the schedules.  Moreover, the slack/buffer mechanisms operate 'backwards', in the sense that music+pause periods are fixed and may be impossible to schedule within a fixed/given window of time (hence the common patterns of advertisements between songs and fade-in/out techniques).  It's not clear that an arithmetic equivalent of fading will ever be supported in this library.  Nevertheless, a "playlist import" type mechanism to build the configurations would be helpful.
+
+Second, something like holiday activities.  This is a "small number of choices" but "each is very fluid in length" and has C<limit=1>.  An import tool for this type of request should be rather easy, but Action limits are a prerequisite.
+
+Third, scheduling of paired events is not straightforward.  An example would be match-off lineups of N teams (eg fantasy leagues).  That is less a concern of temporal scheduling and more about uniformity in the lineup.  This is possible by running two simultaneous builders on the same configuration, with very fixed times, but may result in self-alignment of activities.  It's not clear that this type of scheduling will ever be supported in this library.
+
 =head1 Functional improvements
 
 =head2 Object interface
 
-Move C<Schedule::Activity> from class functions to an object interface.
+Move C<Schedule::Activity> from static functions to an object interface.
 
 =head2 Pre-scheduling validation
 
 Scheduling shouldn't be attempted if it's impossible to achieve the goals.  As per the suggested convenience functions above, verify that the minimum path time and max path times bound the activity goal time.
+
+=head2 Annotation validation
+
+Annotations need better pre-scheduling validation and better separation from the main scheduling code.  Currently unclear of the best place to provide those helpers, as well as annotation-group-merging functions and the associated configurations.
 
 =head2 Slackless/Bufferless configurations
 

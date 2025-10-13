@@ -13,7 +13,7 @@ Iterator::Flex::Manual::Basics - Iterator Basics
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 DESCRIPTION
 
@@ -199,8 +199,6 @@ There are a number of existing iterator packages on CPAN (see
 L<Iterator::Flex::Manual::PriorArt>).  L<Iterator::Flex> can wrap
 those iterators so that they can be used within the L<Iterator::Flex>
 framework.  See L<Iterator::Flex::Manual::Alien>.
-
-=head1 INTERNALS
 
 =head1 SUPPORT
 

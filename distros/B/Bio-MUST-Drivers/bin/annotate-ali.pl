@@ -49,38 +49,38 @@ for my $infile (@ARGV_infiles) {
 
     HIT:
     while ( my $hit = $parser->next_hit ) {
-        my ($qid, $hid, $evalue, $identity)
-            = map { $hit->$_ } qw(query_id hit_id evalue percent_identity);
+        my ($qid, $hid, $identity)
+            = map { $hit->$_ } qw(query_id hit_id percent_identity);
 
         next HIT if $identity < $ARGV_identity;     # skip weak-identity hits
 
-        unless ($ARGV_hit_list) {
+        unless ($ARGV_hit_list) {                   # optionally
             next HIT if $qid eq $curr_id;           # skip non-first hits
             $curr_id = $qid;
         }
 
-        # capture annotation bit in ref seq id using regex
+        # capture annotation bit in ref seq_id using regex
         my ($annotation) = $blastdb->long_id_for($hid) =~ $ARGV_ref_regex;
         my $full_qid = $queries->long_id_for($qid);
-        $ann_for{$full_qid} = $annotation;
+        $ann_for{$full_qid} //= $annotation;        # use only first hit
 
-        # collect all hits for at specified E-value and identity thresholds
-        push @{ $hit_id_for{$full_qid} }, $annotation;
+        # extract additional (optionally) wanted fields
+        my @wanted_fields = map { $hit->$_ } @ARGV_fields;
+
+        # collect all hits for at specified (E-value and) identity thresholds
+        push @{ $hit_id_for{$full_qid} }, {
+            annotation => $annotation,
+            fields     => \@wanted_fields,
+        };
     }
     ##### Annotations: %ann_for
 
-    # output hit list...
-    say '# ' . join "\t", qw(tag id);
-    if ($ARGV_hit_list) {
-        while (my ($id, $hits) = each %hit_id_for) {
-            say join "\t", $_, $id for @{$hits};
-        }
-    }
-
-    # ... or standard annotation report
-    else {
-        while (my ($id, $ann) = each %ann_for) {
-            say join "\t", $ann, $id;
+    # output annotation report
+    my @header = ('tag', 'id', @ARGV_fields);
+    say '# ' . join "\t", @header;
+    while (my ($id, $hits) = each %hit_id_for) {
+        for my $hit ( @{$hits} ) {
+            say join "\t", $hit->{annotation}, $id, @{ $hit->{fields} };
         }
     }
 
@@ -94,6 +94,7 @@ for my $infile (@ARGV_infiles) {
     }
 }
 
+# TODO: replace by or add some --store-id-mapper option?
 # TODO: move into BMC::Ali
 sub prefix_ids {
     my $ali     = shift;
@@ -107,6 +108,9 @@ sub prefix_ids {
     return $ali;
 }
 
+# TODO: check coherence of option layout with cdhit-tax-filter.pl
+# e.g., replace --ann-file by --store-id-mapper
+
 __END__
 
 =pod
@@ -117,7 +121,7 @@ annotate-ali.pl - Annotate sequences by homology search using BLAST
 
 =head1 VERSION
 
-version 0.251060
+version 0.252830
 
 =head1 USAGE
 
@@ -190,6 +194,18 @@ Write an annotated version (with prefixed ids) of the infile [default: no].
 
 Print a list of id/hit pairs (at the specified E-value and identity thresholds)
 instead of the standard annotation report [default: no].
+
+=item --fields [=] <str>...
+
+List of whitespace-separated BLAST fields to be displayed in final report
+[default: no].
+
+Valid fields are: percent_identity, hsp_length, mismatches, gaps, query_from,
+query_to, hit_from, hit_to, evalue, bit_score, query_start, query_end,
+hit_start, hit_end.
+
+=for Euclid: str.type: string, str eq "percent_identity" || str eq "hsp_length" || str eq "mismatches" || str eq "gaps" || str eq "query_from" || str eq "query_to" || str eq "hit_from" || str eq "hit_to" || str eq "evalue" || str eq "bit_score" || str eq "query_start" || str eq "query_end" || str eq "hit_start" || str eq "hit_end"
+    str.default: []
 
 =item --out[-suffix] [=] <suffix>
 

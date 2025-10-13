@@ -34,7 +34,7 @@ use Path::Tiny;
 # for some reason during tests our new 'lib' dir does not have the
 # highest priority when Data::Record::Serialize searches for encoders,
 # and pre-installed versions of this module will get used.
-use lib Path::Tiny->cwd->child('lib');
+use lib Path::Tiny->cwd->child('lib')->stringify;
 
 eval { require DBI; 1 }
   or plan skip_all => "Need DBI to run the DBI backend tests\n";
@@ -43,7 +43,7 @@ my @DBDs;
 
 my $DBD_SQLite_VERSION = 1.31;
 
-use constant TABLE     => 'drst_sttbl';
+use constant TABLE     => 'DRST_sttbl';  # make sure it needs quoting
 use constant SQLITE_DB => 'foo/bar/test.db';
 
 my @dsn_fields = qw(
@@ -75,11 +75,19 @@ if ( defined( my $driver = $ENV{TEST_DRSE_DRIVER} ) ) {
     } @dsn_fields;
     $dbd{dbd} = $driver;
     $dbd{table} //= TABLE;
+
+    if ( defined $dbd{dbname} ) {
+
     push @DBDs, \%dbd;
 
     $dbd{user} //= getpwuid( $< )->name;
 
     shift @DBDs if $ENV{TEST_DRSE_ALTERNATE_ONLY};
+}
+    else {
+        bail_out "No dbname set; specify it via the TEST_DRSE_DBNAME env variable" ;
+    }
+
 }
 
 @DBDs
@@ -356,7 +364,9 @@ sub table_exists {
 
     # DBD::Sybase doesn't filter, so need to search
     my $matches = $dbh->table_info( q{%}, $schema, $table, 'TABLE' )->fetchall_arrayref;
-    return any { $_->[2] eq $table } @{$matches};
+    return any { $_->[2] eq $table
+                   or $_->[2] eq $dbh->quote_identifier( $table )
+             } @{$matches};
 }
 
 

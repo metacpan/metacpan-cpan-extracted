@@ -130,7 +130,7 @@ use Exporter;
 
 our @ISA = qw{ Exporter };
 
-our $VERSION = '0.170';
+our $VERSION = '0.171';
 our @EXPORT_OK = qw{
     shell
 
@@ -2926,9 +2926,15 @@ catalog names are:
 
  classified: Classified TLE file (classfd.zip)
  integrated: Integrated TLE file (inttles.zip)
- mcnames: Molczan-format magnitude file (mcnames.zip)
+ mcnames: Molczan-format magnitude file (mcnames.zip) REMOVED
  quicksat: Quicksat-format magnitude file (qsmag.zip)
- vsnames: Molczan-format magnitudes of visual bodies (vsnames.zip)
+ vsnames: Molczan-format mags of visual bodies (vsnames.zip) REMOVED
+
+The files marked B<REMOVED> have been removed from Mike McCants' web
+site. The associated arguments are deprecated, will warn on every use,
+and return a C<404> error. Six months after the release of
+C<Astro-SpaceTrack> version 0.171, these arguments will produce a fatal
+error.
 
 You can specify options as either command-type options (e.g. C<<
 mccants( '-file', 'foo.dat', ... ) >>) or as a leading hash reference
@@ -5182,6 +5188,10 @@ sub _check_cookie_generic {
 	    kelso	=> 3,
 	    mccants	=> 3,
 	    sladen	=> _MASTER_IRIDIUM_DEPRECATION_LEVEL,
+	},
+	mccants	=> {
+	    mcnames	=> 2,
+	    vsnames	=> 2,
 	},
 	BODY_STATUS_IS_OPERATIONAL	=> _MASTER_IRIDIUM_DEPRECATION_LEVEL,
 	BODY_STATUS_IS_SPARE	=> _MASTER_IRIDIUM_DEPRECATION_LEVEL,

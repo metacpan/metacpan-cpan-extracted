@@ -4,7 +4,7 @@ no warnings "experimental::class";
 
 class Snig::Collection {
 
-    our $VERSION = '1.000'; # VERSION
+    our $VERSION = '1.001'; # VERSION
     # ABSTRACT: Snig Collection Class
     # PODNAME: Snig::Collection
 
@@ -26,7 +26,7 @@ class Snig::Collection {
 
     ADJUST {
         $input = path($input) if !ref($input);
-        $tt = Template->new(ABSOLUTE=>1);
+        $tt = Template->new(ABSOLUTE=>1, WRAPPER=>dist_file('Snig','wrapper.tt'));
 
         for my $file ( $self->input->children ) {
             next unless $file->basename =~ /\.jpe?g$/i; # TODO allow other image types?
@@ -64,26 +64,28 @@ class Snig::Collection {
     }
 
     method write_index( $output, $force_zip = 0 ) {
-        $log->infof("Generating zip archive and index");
+        my $zip_file = $self->zip_file($output);
+        $log->infof("Generating zip archive %s and index", $zip_file);
         copy(dist_file('Snig','snig.css'), $output);
 
-        if (!$output->child($self->zip_file)->is_file || $force_zip ) {
-            system('zip', '-r', $output->child($self->zip_file)->stringify, $input->stringify);
+        if (!$zip_file->is_file || $force_zip ) {
+            system('zip', '-r', $zip_file->stringify, $input->stringify);
         }
 
         $tt->process(dist_file('Snig','index.tt'), {
             collection=> {
                 name => $name,
                 images => \@sorted,
-                zip_file => $self->zip_file,
-                zip_size => $output->child($self->zip_file)->size_human( {format => "si"} ),
-            }
+                zip_file => $zip_file->basename,
+                zip_size => $zip_file->size_human( {format => "si"} ),
+            },
+            version => Snig->VERSION,
         }, $output->child('index.html')->stringify) || die $tt->error;
     }
 
-    method zip_file {
-        my $dir = lc($input->basename);
-        return $dir.'.zip';
+    method zip_file($output) {
+        my $dir = lc($output->basename);
+        return $output->child($dir.'.zip');
     }
 
 }
@@ -100,7 +102,7 @@ Snig::Collection - Snig Collection Class
 
 =head1 VERSION
 
-version 1.000
+version 1.001
 
 =head1 SYNOPSIS
 

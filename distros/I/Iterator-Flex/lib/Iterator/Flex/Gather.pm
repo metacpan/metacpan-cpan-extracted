@@ -2,11 +2,12 @@ package Iterator::Flex::Gather;
 
 # ABSTRACT: Gather Iterator Class
 
+use v5.28;
 use strict;
 use warnings;
 use experimental 'signatures';
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Iterator::Flex::Factory 'to_iterator';
 use Iterator::Flex::Utils qw[ THROW STATE EXHAUSTION :IterAttrs :IterStates ];
@@ -244,7 +245,7 @@ sub construct ( $class, $state ) {
                     }
                     elsif ( ( $result & GATHER_ELEMENT_MASK ) == GATHER_ELEMENT_CACHE ) {
                         throw_failure( parameter =>
-                              'inconsistent return: element action GATHER_ELEMENT_CACHE requires cycle action GATHER_CYCLE_STOP'
+                              'inconsistent return: element action GATHER_ELEMENT_CACHE requires cycle action GATHER_CYCLE_STOP',
                         ) unless $cycle & GATHER_CYCLE_RESTART;
                         $cache     = $rv;
                         $has_cache = !!1;
@@ -315,7 +316,7 @@ Iterator::Flex::Gather - Gather Iterator Class
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 METHODS
 
@@ -462,8 +463,6 @@ The iterator supports the following capabilities:
 =item rewind
 
 =back
-
-=head1 INTERNALS
 
 =head1 EXAMPLES
 

@@ -15,7 +15,7 @@ use namespace::autoclean;
 use constant registry_release => '1.1';
 use constant default_lock_timeout => 60;
 
-our $VERSION = 'v1.5.2'; # VERSION
+our $VERSION = 'v1.6.0'; # VERSION
 
 has sqitch => (
     is       => 'ro',

@@ -32,27 +32,9 @@ class Mojolicious::Routes::Pattern {
     }
   ;
   
-  has placeholders : virtual rw string[]
-    get {
-      return $self->placeholders_list->to_array;
-    }
-    set {
-      $self->set_placeholders_list(StringList->new($_));
-    }
-  ;
+  has placeholders : rw string[];
   
-  has placeholders_list : rw StringList;
-  
-  has tree : rw object[]
-    get {
-      return (string[][])$self->tree_list->to_array;
-    }
-    set {
-      $self->set_tree_list(List->new($_));
-    }
-  ;
-  
-  has tree_list : rw List;
+  has tree : rw object[];
   
   has quote_end : rw string
     get {
@@ -184,10 +166,10 @@ class Mojolicious::Routes::Pattern {
     $pathref->[0] = Fn->substr($pathref->[0], $match_start, $match_length);
     
     my $captures_h = Hash->new($self->defaults->to_array);
-    my $placeholders_list = StringList->new($self->placeholders);
-    $placeholders_list->push("format");
+    my $placeholders = StringList->new($self->placeholders);
+    $placeholders->push("format");
     
-    for my $placeholder (@{$placeholders_list->to_array}) {
+    for my $placeholder (@{$placeholders->get_array}) {
       
       unless ($captures_list->length) {
         last;
@@ -237,8 +219,10 @@ class Mojolicious::Routes::Pattern {
     
     my $optional = 1;
     
-    for (my $i = $self->tree_list->length - 1; $i >= 0; $i--) {
-      my $token = (object[])$self->tree_list->get($i);
+    my $tree_list = (List of object[])List->new_ref($self->{tree});
+    
+    for (my $i = $tree_list->length - 1; $i >= 0; $i--) {
+      my $token = (object[])$tree_list->get($i);
       
       my $op = (string)$token->[0];
       my $value = $token->[1];
@@ -301,7 +285,7 @@ class Mojolicious::Routes::Pattern {
 
   method _tokenize : void ($pattern : string) {
     
-    my $placeholders_list = $self->placeholders_list;
+    my $placeholders = StringList->new_ref($self->placeholders);
     my $type_start   = $self->type_start;
     my $quote_end    = $self->quote_end;
     my $quote_start  = $self->quote_start;
@@ -388,21 +372,21 @@ class Mojolicious::Routes::Pattern {
         $token->[1] = [(object)$token->[1], undef, undef];
       }
       
-      $placeholders_list->unshift($token->[1]->(object[])->[0]->(string));
+      $placeholders->unshift($token->[1]->(object[])->[0]->(string));
     }
     
     $self->set_unparsed($pattern);
     
-    $self->set_tree_list($tree_list);
+    $self->set_tree($tree_list->get_array);
   }
   
   method render : string ($values : Hash, $endpoint : int) {
     
     # Placeholders can only be optional without a format
-    my $optional = !(my $format = $values->get_string("format"));
+    my $optional = !(my $format = $values->{"format"}->(string));
     
     my $str = "";
-    my $tree_list = $self->tree_list;
+    my $tree_list = (List of object[])List->new_ref($self->tree);
     for (my $i = $tree_list->length - 1; $i >= 0; $i--) {
       my $token = (object[])$tree_list->get($i);
       
@@ -427,9 +411,9 @@ class Mojolicious::Routes::Pattern {
       # Placeholder
       else {
         my $name    = $value->(object[])->[0]->(string);
-        my $default = $self->defaults->get_string($name);
+        my $default = $self->defaults->{$name}->(string);
         
-        $part = $values->get_string($name) // $default // "";
+        $part = $values->{$name}->(string) // $default // "";
         
         if    (!$default || ($default ne $part)) { $optional = 0; }
         elsif ($optional)                                { $part     = ""; }

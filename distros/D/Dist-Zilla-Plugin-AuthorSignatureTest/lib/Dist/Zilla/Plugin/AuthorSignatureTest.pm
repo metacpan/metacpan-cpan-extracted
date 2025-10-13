@@ -7,7 +7,7 @@
 # the same terms as the Perl 5 programming language system itself.
 #
 package Dist::Zilla::Plugin::AuthorSignatureTest;
-$Dist::Zilla::Plugin::AuthorSignatureTest::VERSION = '0.02';
+$Dist::Zilla::Plugin::AuthorSignatureTest::VERSION = '0.03';
 # ABSTRACT: An Author Distribution C<SIGNATURE> Test for L<Dist::Zilla>
 
 use strict;
@@ -16,20 +16,46 @@ use warnings;
 use Moose;
 
 extends 'Dist::Zilla::Plugin::InlineFiles';
-with 'Dist::Zilla::Role::PrereqSource';
+with (
+    'Dist::Zilla::Role::PrereqSource',
+    'Dist::Zilla::Role::FileMunger',
+    'Dist::Zilla::Role::TextTemplate',
+);
+
+has force => (
+    is       => 'ro',
+    isa      => 'Bool',
+    default  => sub { 0 },
+);
 
 
 sub register_prereqs {
     my $self = shift;
-
     $self->zilla->register_prereqs(
         { type => 'requires', phase => 'develop' },
         'Test::Signature' => 0);
 }
 
+sub munge_file {
+    my $self = shift;
+    my ($file) = @_;
+
+    return unless $file->name eq 'xt/author/signature.t';
+    $file->content(
+        $self->fill_in_string(
+            $file->content,
+            {
+                force => $self->force ? q{force_} : q{},
+            }
+        )
+    );
+}
+
 __PACKAGE__->meta->make_immutable;
 
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -37,11 +63,16 @@ Dist::Zilla::Plugin::AuthorSignatureTest - An Author Distribution C<SIGNATURE> T
 
 =head1 VERSION
 
-version 0.02
+version 0.03
+
+=head1 SYNOPSIS
+
+   [AuthorSignatureTest]
+   force = false
 
 =head1 DESCRIPTION
 
-This is an extensionof L<Dist::Zilla::Plugin::InlineFile>, providing the
+This is an extension of L<Dist::Zilla::Plugin::InlineFile>, providing the
 following files:
 
    xt/author/signature.t - a standard Test::Signature test
@@ -49,17 +80,33 @@ following files:
 This test uses L<Test::Signature> to test the SIGNATURE file in your dist.  If
 L<Test::Signature> is not installed, the test is skipped.
 
-=for Pod::Coverage register_prereqs
+=head1 ATTRIBUTES
+
+=head2 force
+
+E.g. C<force = true>
+
+By default L<Test::Signature>::signature_ok does not make test fail if it cannot perform it,
+for example, because of missing B<SIGNATURE> file, missing package L<Module::Signature>
+or not able to make connection to the key server.
+
+Turn on this feature to make test fail also in the above cases.
+
+=for Pod::Coverage register_prereqs munge_file
 
 =head1 SOURCE
 
 The development version is on github at L<https://github.com/mschout/perl-dist-zilla-plugin-authorsignaturetest>
-and may be cloned from L<git://github.com/mschout/perl-dist-zilla-plugin-authorsignaturetest.git>
+and may be cloned from L<https://github.com/mschout/perl-dist-zilla-plugin-authorsignaturetest.git>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to bug-dist-zilla-plugin-authorsignaturetest@rt.cpan.org or through the web interface at:
- http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-AuthorSignatureTest
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/mschout/perl-dist-zilla-plugin-authorsignaturetest/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =head1 AUTHOR
 
@@ -88,5 +135,5 @@ unless (eval { require Test::Signature; 1 }) {
     plan skip_all => 'Test::Signature is required for this test';
 }
 
-Test::Signature::signature_ok();
+Test::Signature::signature_{{ $force }}ok();
 done_testing;

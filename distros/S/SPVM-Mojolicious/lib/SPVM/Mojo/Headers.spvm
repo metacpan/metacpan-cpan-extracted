@@ -321,7 +321,7 @@ class Mojo::Headers {
         my $params = (Hash)$params_and_header->[0];
         $header = (string)$params_and_header->[1];
         
-        if (my $rel = $params->get_string("rel")) {
+        if (my $rel = $params->{"rel"}->(string)) {
           unless ($data->get($rel)) {
             my $params_h = (Hash of string)$params->clone;
             $params_h->set("link" => $target);
@@ -347,7 +347,7 @@ class Mojo::Headers {
     my $string_links_list = StringList->new;
     
     for my $_ (@$keys) {
-      my $string_link = "<" . $links_h->get_string($_) . ">; rel=\"$_\"}";
+      my $string_link = "<" . $links_h->{$_}->(string) . ">; rel=\"$_\"}";
     }
     
     $self->set_link(Fn->join(", ", $string_links_list->to_array));
@@ -380,7 +380,8 @@ class Mojo::Headers {
         last;
       }
       
-      my $line_buffer = StringBuffer->new($_->match->cap1);
+      my $line_buffer = StringBuffer->new;
+      $line_buffer->push($_->match->cap1);
       
       # Check line size limit
       if ($offset > $size || $headers->length >= $lines) {

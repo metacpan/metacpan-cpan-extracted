@@ -1,6 +1,6 @@
 package Bio::MUST::Drivers::Blast::Database::Temporary;
 # ABSTRACT: Internal class for BLAST driver
-$Bio::MUST::Drivers::Blast::Database::Temporary::VERSION = '0.251060';
+$Bio::MUST::Drivers::Blast::Database::Temporary::VERSION = '0.252830';
 use Moose;
 use namespace::autoclean;
 
@@ -107,7 +107,7 @@ Bio::MUST::Drivers::Blast::Database::Temporary - Internal class for BLAST driver
 
 =head1 VERSION
 
-version 0.251060
+version 0.252830
 
 =head1 SYNOPSIS
 

@@ -3,7 +3,7 @@ use feature 'class';
 no warnings "experimental::class";
 
 class Snig {
-    our $VERSION = '1.000'; # VERSION
+    our $VERSION = '1.001'; # VERSION
     # ABSTRACT: (Simple|Static|Small|S..) Image Gallery
     # PODNAME: Snig
 
@@ -49,7 +49,7 @@ Snig - (Simple|Static|Small|S..) Image Gallery
 
 =head1 VERSION
 
-version 1.000
+version 1.001
 
 =head1 SYNOPSIS
 

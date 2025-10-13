@@ -1,0 +1,68 @@
+#!/usr/bin/perl
+
+# Copyright (c) 2024-2025 Löwenfelsen UG (haftungsbeschränkt)
+
+# licensed under Artistic License 2.0 (see LICENSE file)
+
+# ABSTRACT: Script used to render text using a font
+
+use strict;
+use warnings;
+use v5.16;
+
+use Carp;
+use Fcntl qw(SEEK_SET);
+use Getopt::Long;
+use SIRTX::Font;
+
+my %config = (
+    output      => undef,
+    font        => undef,
+    text        => undef,
+);
+
+{
+    my %opts;
+
+    $opts{'output|o=s'}     = \$config{output};
+    $opts{'font=s'}         = \$config{font};
+    $opts{'text=s'}         = \$config{text};
+
+    $opts{'help|h'} = sub {
+        printf("Usage: %s [OPTIONS] -o output.png --font=input.sf [--text='Hello World'] INPUT...\n", $0);
+        say '';
+        printf("OPTIONS:\n");
+        printf(" %s\n", $_) foreach sort keys %opts;
+        exit(0);
+    };
+
+    Getopt::Long::Configure('bundling');
+    GetOptions(%opts);
+}
+
+my $font = SIRTX::Font->new;
+
+if (defined($config{font})) {
+    open(my $in, '<:raw', $config{font}) or croak 'Cannot open: '.$config{font};
+    $font->read($in);
+}
+
+if (defined $config{text}) {
+    require Encode;
+    $config{text} = Encode::decode('UTF-8', $config{text});
+} else {
+    $config{text} = '';
+}
+
+foreach my $input (@ARGV) {
+    open(my $in, '<:utf8', $input) or croak 'Cannot open: '.$input;
+    local $/ = \4096;
+    $config{text} .= $_ while <$in>;
+}
+
+if (defined $config{output}) {
+    my $image = $font->render($config{text});
+    $image->Write($config{output});
+}
+
+#ll

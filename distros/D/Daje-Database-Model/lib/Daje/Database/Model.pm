@@ -1,6 +1,5 @@
+package Daje::Database::Model;
 use v5.40;
-use experimental 'class';
-
 
 # NAME
 # ====
@@ -31,9 +30,10 @@ use experimental 'class';
 # janeskil1525 E<lt>janeskil1525@gmail.comE<gt>
 #
 #
-class Daje::Database::Model {
 
-    our $VERSION = "0.03";
+our $VERSION = "0.05";
+
+sub test  {
 
 }
 

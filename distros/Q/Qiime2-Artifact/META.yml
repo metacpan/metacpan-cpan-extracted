@@ -7,7 +7,7 @@ configure_requires:
   Devel::CheckBin: '0'
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,7 +16,7 @@ name: Qiime2-Artifact
 provides:
   Qiime2::Artifact:
     file: lib/Qiime2/Artifact.pm
-    version: v0.13.0
+    version: v0.14.0
 recommends:
   File::Which: '0'
 requires:
@@ -32,7 +32,7 @@ requires:
   perl: '5.014'
 resources:
   repository: https://github.com/telatin/qiime2tools
-version: 0.13.0
+version: 0.14.0
 x_generated_by_perl: v5.38.2
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: MIT

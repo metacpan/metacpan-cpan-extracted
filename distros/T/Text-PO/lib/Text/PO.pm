@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## PO Files Manipulation - ~/lib/Text/PO.pm
-## Version v0.7.2
+## Version v0.8.0
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2018/06/21
-## Modified 2024/12/07
+## Modified 2025/10/08
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -28,7 +28,7 @@ BEGIN
     use Scalar::Util;
     use Text::PO::Element;
     use constant HAS_LOCAL_TZ => ( eval( qq{DateTime::TimeZone->new( name => 'local' );} ) ? 1 : 0 );
-    our $VERSION = 'v0.7.2';
+    our $VERSION = 'v0.8.0';
 };
 
 use strict;
@@ -235,9 +235,9 @@ sub charset
     return( $def->params->{charset} );
 }
 
-sub content_encoding { return( shift->_set_get_meta_value( 'Content-Transfer-Encoding' ) ); }
+sub content_encoding { return( shift->_set_get_meta_value( 'Content-Transfer-Encoding', @_ ) ); }
 
-sub content_type { return( shift->_set_get_meta_value( 'Content-Type' ) ); }
+sub content_type { return( shift->_set_get_meta_value( 'Content-Type', @_ ) ); }
 
 # <https://superuser.com/questions/392439/lang-and-language-environment-variable-in-debian-based-systems>
 sub current_lang
@@ -383,11 +383,11 @@ sub hash
 
 sub header { return( shift->_set_get_array_as_object( 'header', @_ ) ); }
 
-sub language { return( shift->_set_get_meta_value( 'Language' ) ); }
+sub language { return( shift->_set_get_meta_value( 'Language', @_ ) ); }
 
-sub language_team { return( shift->_set_get_meta_value( 'Language-Team' ) ); }
+sub language_team { return( shift->_set_get_meta_value( 'Language-Team', @_ ) ); }
 
-sub last_translator { return( shift->_set_get_meta_value( 'Last-Translator' ) ); }
+sub last_translator { return( shift->_set_get_meta_value( 'Last-Translator', @_ ) ); }
 
 sub merge
 {
@@ -465,7 +465,7 @@ sub meta_keys
     return( $self->new_array( $new ) );
 }
 
-sub mime_version { return( shift->_set_get_meta_value( 'MIME-Version' ) ); }
+sub mime_version { return( shift->_set_get_meta_value( 'MIME-Version', @_ ) ); }
 
 sub new_element
 {
@@ -1367,7 +1367,7 @@ Or, maybe using the object overloading directly:
 
 =head1 VERSION
 
-    v0.7.2
+    v0.8.0
 
 =head1 DESCRIPTION
 
@@ -1380,6 +1380,8 @@ Thus, with those modules, you do not need to install C<msgfmt>, C<msginit> of GN
 Also, this distribution provides a way to export the C<po> files in json format to be used from within JavaScript and a JavaScript class to load and use those files is also provided along with some command line scripts. See the C<share> folder along with its own test units.
 
 Also, there is a script in C<scripts> that can be used to transcode C<.po> or C<mo> files into json format and vice versa.
+
+For more information on the format of a PO element, check L<Text::PO::Element>
 
 =head1 CONSTRUCTOR
 

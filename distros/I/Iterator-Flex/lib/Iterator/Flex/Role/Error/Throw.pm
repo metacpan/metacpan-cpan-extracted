@@ -2,10 +2,11 @@ package Iterator::Flex::Role::Error::Throw;
 
 # ABSTRACT: signal error by throwing
 
+use v5.28;
 use strict;
 use warnings;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Iterator::Flex::Utils qw( :default REG_GENERAL REG_GP_ERROR  );
 use Ref::Util;
@@ -68,7 +69,7 @@ Iterator::Flex::Role::Error::Throw - signal error by throwing
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 METHODS
 
@@ -85,8 +86,6 @@ The caller may define a custom error handler when the iterator is
 created.  It must throw an exception.
 
 If C<$message> is defined, it is passed to the error handler.
-
-=head1 INTERNALS
 
 =head1 SUPPORT
 

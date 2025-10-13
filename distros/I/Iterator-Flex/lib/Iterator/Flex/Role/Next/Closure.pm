@@ -2,10 +2,11 @@ package Iterator::Flex::Role::Next::Closure;
 
 # ABSTRACT: Construct a next() method for iterators without closed over $self
 
+use v5.28;
 use strict;
 use warnings;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Iterator::Flex::Utils 'NEXT';
 use Scalar::Util;
@@ -62,7 +63,7 @@ Iterator::Flex::Role::Next::Closure - Construct a next() method for iterators wi
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 METHODS
 
@@ -76,8 +77,6 @@ Wrapper for iterator next callback optimized for the case where
 iterator exhaustion is handled by the iterator.  Typically this means
 the iterator closure calls C<< $self->signal_exhaustion >>, which is added
 by a specific C<Iterator::Flex::Role::Exhaustion> role.
-
-=head1 INTERNALS
 
 =head1 SUPPORT
 

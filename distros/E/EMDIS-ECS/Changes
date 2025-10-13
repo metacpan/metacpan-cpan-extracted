@@ -554,3 +554,9 @@ Version 0.46 2025-09-12
 - docker/dist/Dockerfile:  add gnupg1 package (provides gpg1)
 - docker/rockylinux/Dockerfile:  add gnupg1 package (provides gpg1)
 - docker/ubuntu/Dockerfile:  add gnupg1 package (provides gpg1)
+
+Version 0.47 2025-10-01
+=======================
+- ECS.pm:  fix typo in embedded documentation
+- ecstool:  add jsondump operation to --nodedata command
+- Makefile.PL:  add JSON::PP dependency

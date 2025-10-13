@@ -1,0 +1,24 @@
+---
+
+module: HTML::Genealogy::Map
+function: onload_render
+
+input:
+  gedcom:
+    type: object
+    can: individuals
+  geocoder:
+    type: object
+    can: geocode
+  debug:
+    type: boolean
+    optional: true
+  google_key:
+    type: string
+    optional: true
+    min: 39
+    max: 39
+    matches: "^AIza[0-9A-Za-z_-]{35}$"
+
+config:
+  test_undef: 0

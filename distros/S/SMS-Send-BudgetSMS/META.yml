@@ -1,0 +1,30 @@
+---
+abstract: 'SMS::Send driver for BudgetSMS'
+author:
+  - 'Lari Taskula <lari.taskula@hypernova.fi>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SMS-Send-BudgetSMS
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  LWP::UserAgent: '5.837'
+  Number::Phone::Normalize: '0.220'
+  SMS::Send: '1.06'
+resources:
+  bugtracker: https://github.com/Hypernova-Oy/SMS-Send-BudgetSMS/issues
+  homepage: https://github.com/Hypernova-Oy/SMS-Send-BudgetSMS
+  repository: https://github.com/Hypernova-Oy/SMS-Send-BudgetSMS.git
+version: '0.05'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

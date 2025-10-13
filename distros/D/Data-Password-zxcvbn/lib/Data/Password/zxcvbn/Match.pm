@@ -7,7 +7,7 @@ use overload
     'cmp' => \&compare,
     bool => sub { 1 },
     ;
-our $VERSION = '1.1.2'; # VERSION
+our $VERSION = '1.1.3'; # VERSION
 # ABSTRACT: role for match objects
 
 
@@ -92,7 +92,7 @@ Data::Password::zxcvbn::Match - role for match objects
 
 =head1 VERSION
 
-version 1.1.2
+version 1.1.3
 
 =head1 SYNOPSIS
 

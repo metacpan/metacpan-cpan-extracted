@@ -1,5 +1,5 @@
 package Selenium::PhantomJS;
-$Selenium::PhantomJS::VERSION = '1.49';
+$Selenium::PhantomJS::VERSION = '1.50';
 use strict;
 use warnings;
 
@@ -54,7 +54,7 @@ Selenium::PhantomJS - Use GhostDriver without a Selenium server
 
 =head1 VERSION
 
-version 1.49
+version 1.50
 
 =head1 SYNOPSIS
 

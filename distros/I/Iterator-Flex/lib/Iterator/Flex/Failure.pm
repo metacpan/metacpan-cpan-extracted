@@ -2,10 +2,11 @@ package Iterator::Flex::Failure;
 
 # ABSTRACT: Failure classes for Iterator::Flex
 
+use v5.28;
 use strict;
 use warnings;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use custom::failures qw/Exhausted Truncated Error RoleExists Unsupported/;
 
@@ -35,9 +36,7 @@ Iterator::Flex::Failure - Failure classes for Iterator::Flex
 
 =head1 VERSION
 
-version 0.31
-
-=head1 INTERNALS
+version 0.32
 
 =head1 SUPPORT
 

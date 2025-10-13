@@ -317,7 +317,7 @@ subtest 'Pattern matching' => sub {
 			schema => {bad => {type => 'string', matches => '[unclosed'}},
 			args => {bad => 'test'}
 		);
-	} qr/invalid regex/, 'Invalid regex in schema detected';
+	} qr/regex .+ error/, 'Invalid regex in schema detected';
 
 	# Test undefined value with patterns (should skip validation)
 	lives_ok {
@@ -528,9 +528,7 @@ subtest 'Callback validation' => sub {
 	# Test callback with complex validation
 	my $complex_validator = sub {
 		my $val = shift;
-		return ref($val) eq 'HASH' &&
-			   exists $val->{required_key} &&
-			   $val->{required_key} =~ /^valid/;
+		return ref($val) eq 'HASH' && exists $val->{required_key} && $val->{required_key} =~ /^valid/;
 	};
 
 	lives_ok {
@@ -635,14 +633,12 @@ subtest 'Input validation and error handling' => sub {
 					type => 'hashref',
 					callback => sub {
 						my $user = shift;
-						return exists $user->{name} &&
-							   exists $user->{email} &&
-							   $user->{email} =~ /\@/;
+						return exists $user->{name} && exists $user->{email} && $user->{email} =~ /\@/;
 					}
 				}
 			},
 			args => {
-				user => {name => 'John'}  # Missing email
+				user => {name => 'John'}	# Missing email
 			}
 		);
 	} qr/failed custom validation/, 'Complex validation failures handled';

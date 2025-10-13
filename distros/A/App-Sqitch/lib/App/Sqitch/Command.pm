@@ -12,7 +12,7 @@ use File::Path qw(make_path);
 use Moo;
 use App::Sqitch::Types qw(Sqitch Target);
 
-our $VERSION = 'v1.5.2'; # VERSION
+our $VERSION = 'v1.6.0'; # VERSION
 
 use constant ENGINES => qw(
     pg
@@ -24,6 +24,7 @@ use constant ENGINES => qw(
     exasol
     snowflake
     cockroach
+    clickhouse
 );
 
 has sqitch => (
@@ -371,6 +372,8 @@ Returns the list of supported engines, currently:
 =item * C<snowflake>
 
 =item * C<cockroach>
+
+=item * C<clickhouse>
 
 =back
 

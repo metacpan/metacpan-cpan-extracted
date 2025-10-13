@@ -21,7 +21,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 # Need working palPlante
 use Astro::PAL 0.95 ();

@@ -5,7 +5,7 @@ package Config::XrmDatabase;
 use v5.26;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use Feature::Compat::Try;
 
@@ -13,7 +13,7 @@ use Config::XrmDatabase::Failure ':all';
 use Config::XrmDatabase::Util ':all';
 use Config::XrmDatabase::Types -all;
 use Types::Standard qw( Object Str Optional HashRef );
-use Type::Params qw( compile_named );
+use Type::Params    qw( compile_named );
 use Ref::Util;
 
 use Moo;
@@ -23,6 +23,7 @@ use namespace::clean;
 use MooX::StrictConstructor;
 
 use experimental qw( signatures postderef declared_refs refaliasing );
+use if $] >= 5.034, 'experimental', 'try';
 
 has _db => (
     is       => 'rwp',
@@ -112,7 +113,7 @@ sub insert ( $self, $name, $value ) {
 
     $name = parse_resource_name( $name );
     my $db = $self->_db;
-    $db = $db->{$_} //= {} for $name->@*;
+    $db                   = $db->{$_} //= {} for $name->@*;
     $db->{ +VALUE }       = $value;
     $db->{ +MATCH_COUNT } = 0;
 }
@@ -220,28 +221,27 @@ sub query ( $self, $class, $name, %iopt ) {
 
     state $check = compile_named(
         { head => [ Str, Str ] },
-        return_value => Optional[QueryReturnValue],
-        on_failure => Optional[OnQueryFailure],
+        return_value => Optional [QueryReturnValue],
+        on_failure   => Optional [OnQueryFailure],
     );
 
     ( $class, $name, my \%opt ) = $check->( $class, $name, %iopt );
 
-    $opt{on_failure} //= $self->_query_on_failure;
+    $opt{on_failure}   //= $self->_query_on_failure;
     $opt{return_value} //= $self->_query_return_value;
 
     ( $class, $name ) = map { parse_fq_resource_name( $_ ) } $class, $name;
 
-    components_failure->throw(
-        "class and name must have the same number of components" )
+    components_failure->throw( 'class and name must have the same number of components' )
       if @$class != @$name;
 
     my $return_all = $opt{return_value} eq QUERY_RETURN_ALL;
 
-    my $match = [];
-    my @qargs = ( $class, $name, $return_all, $match );
+    my $match  = [];
+    my @qargs  = ( $class, $name, $return_all, $match );
     my $retval = $self->_query( $self->_db, 0, \@qargs );
 
-    if ( ! defined $retval ) {
+    if ( !defined $retval ) {
         return $opt{on_failure}->( $name, $class )
           if Ref::Util::is_coderef( $opt{on_failure} );
 
@@ -308,9 +308,10 @@ sub _query ( $self, $db, $idx, $args ) {
     if ( my $subdb = $db->{ +LOOSE } ) {
         my $max = @$name;
         push $match->@*, LOOSE;
-        for ( my $idx = $idx ; $idx < $max ; ++$idx ) {
+        while ( $idx < $max ) {
             my $res = $self->$_query( $subdb, $idx, $args );
             return $res if defined $res;
+            ++$idx;
         }
         pop $match->@*;
     }
@@ -345,15 +346,14 @@ sub read_file ( $class, $file, %opts ) {
         @lines = File::Slurper::read_lines( $file );
     }
     catch ( $e ) {
-        file_failure->throw( "error opening $file: $!" );
+        file_failure->throw( "$e: error opening $file: $!" );
     }
 
     my $idx = 0;
     for my $line ( @lines ) {
         ++$idx;
         my ( $var, $value ) = $line =~ /^\s*([^:]+?)\s*:\s*(.*?)\s*$/;
-        file_failure->throw(
-            sprintf( "%s:%d: unable to parse line", $file, $idx ) )
+        file_failure->throw( sprintf( '%s:%d: unable to parse line', $file, $idx ) )
           unless defined $var and defined $value;
         $self->insert( $var, $value );
     }
@@ -405,7 +405,7 @@ sub to_string ( $self ) {
         push @records, "$key : $value";
     }
 
-   return @records ? join( "\n", @records, '' ) : '';
+    return @records ? join( "\n", @records, q{} ) : q{};
 }
 
 
@@ -441,7 +441,7 @@ sub clone ( $self ) {
     require Scalar::Util;
 
     my \%args = $self->TO_HASH;
-    my $db = delete $args{db}; # this isn't a constructor argument.
+    my $db    = delete $args{db};                                # this isn't a constructor argument.
     my $clone = Scalar::Util::blessed( $self )->new( \%args );
     $clone->_set__db( $db );
     return $clone;
@@ -508,8 +508,7 @@ sub clone ( $self ) {
 
 my %KV_CONSTANTS;
 BEGIN {
-    %KV_CONSTANTS = ( map { uc( "KV_$_" ) => $_ }
-          qw( all string array value match_count ) );
+    %KV_CONSTANTS = ( map { uc( "KV_$_" ) => $_ } qw( all string array value match_count ) );
 
 }
 use constant \%KV_CONSTANTS;
@@ -519,19 +518,19 @@ sub _to_kv_xx ( $self, %iopt ) {
     %iopt = ( key => KV_STRING, value => KV_VALUE, %iopt );
 
     state $match = {
-        value =>
-          qr/^(?<match> @{[ join '|', KV_VALUE, KV_MATCH_COUNT, KV_ALL ]} )$/xi,
-        key => qr/^(?<match> @{[ join '|', KV_STRING, KV_ARRAY ]} )$/xi,
+        ## no critic (ComplexRegexes)
+        value => qr/^(?<match> @{[ join '|', KV_VALUE, KV_MATCH_COUNT, KV_ALL ]} )$/xi,
+        key   => qr/^(?<match> @{[ join '|', KV_STRING, KV_ARRAY ]} )$/xi,
     };
 
+    ## no critic (ComplexMappings)
     my %opt = map {
         parameter_failure->throw( "illegal value for '$_' option: $iopt{$_}" )
           unless $iopt{$_} =~ $match->{$_};
         $_ => $+{match};
     } qw( key value );
 
-    parameter_failure->throw( "illegal option: $_" )
-      for grep !defined $opt{$_}, keys %iopt;
+    parameter_failure->throw( "illegal option: $_" ) for grep !defined $opt{$_}, keys %iopt;
 
     # don't clean out excess TIGHT characters if we'll need to later
     # split it into components.  otherwise we'd have to run
@@ -571,7 +570,7 @@ sub _to_kv_xx ( $self, %iopt ) {
     return $folded
       if $opt{key} eq KV_STRING;
 
-    return [ map { [ [ split( /[.]/, $_ ) ], $folded->{$_} ] } keys $folded->%* ]
+    return [ map { [ [ split( /[.]/ ) ], $folded->{$_} ] } keys $folded->%* ]
       if $opt{key} eq KV_ARRAY;
 
     internal_failure->throw( "internal error: unexpected value for 'key': $iopt{key}" );
@@ -689,7 +688,7 @@ sub TO_HASH ( $self ) {
         query_return_value => $self->_query_return_value,
         query_on_failure   => $self->_query_on_failure,
         db                 => Storable::dclone( $self->_db ),
-    }
+    };
 }
 
 
@@ -704,7 +703,7 @@ sub _folded ( $self, $normalize_names = 1 ) {
 
     # Hash::Fold is overkill
     require Hash::Fold;
-    my $folded = Hash::Fold->new( delimiter => '.' )->fold( $self->TO_HASH->{db} );
+    my $folded = Hash::Fold->new( delimiter => q{.} )->fold( $self->TO_HASH->{db} );
 
     return $folded unless $normalize_names;
 
@@ -745,7 +744,7 @@ Config::XrmDatabase - Pure Perl X Resource Manager Database
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -1122,6 +1121,36 @@ Convert the DB object into a hash.  Useful? Who knows?
 
 See L</to_kv> for a perhaps more useful output.
 
+=head1 EXCEPTIONS
+
+Exception objects which are thrown are in the C<Config::XrmDatabase::Failure> namespace.
+
+They stringify to a detailed message, which is also available via the C<msg> method.
+
+=over
+
+=item components
+
+There is a mismatch in components between a key and its class.
+
+=item file
+
+There was an error in reading or writing a file.
+
+=item internal
+
+Something went wrong that shouldn't have
+
+=item key
+
+An illegal key was specified.
+
+=item parameter
+
+Something was wrong with a passed in parameter
+
+=back
+
 =for Pod::Coverage BUILD
 
 =begin internals
@@ -1190,36 +1219,6 @@ this includes C<value> and C<match_count>
 
 =end internals
 
-=head1 EXCEPTIONS
-
-Exception objects which are thrown are in the C<Config::XrmDatabase::Failure> namespace.
-
-They stringify to a detailed message, which is also available via the C<msg> method.
-
-=over
-
-=item components
-
-There is a mismatch in components between a key and its class.
-
-=item file
-
-There was an error in reading or writing a file.
-
-=item internal
-
-Something went wrong that shouldn't have
-
-=item key
-
-An illegal key was specified.
-
-=item parameter
-
-Something was wrong with a passed in parameter
-
-=back
-
 =head1 INCOMPATIBILITIES
 
 =over
@@ -1250,7 +1249,7 @@ This module can't read or write config files with multi-line values
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-config-xrmdatabase@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=Config-XrmDatabase
+Please report any bugs or feature requests to bug-config-xrmdatabase@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=Config-XrmDatabase>
 
 =head2 Source
 
@@ -1270,7 +1269,7 @@ Please see those modules/websites for more information related to this module.
 
 =item *
 
-L<https://x.org/releases/current/doc/libX11/libX11/libX11.html#Resource_Manager_Functions|https://x.org/releases/current/doc/libX11/libX11/libX11.html#Resource_Manager_Functions>
+L<https://x.org/releases/current/doc/libX11/libX11/libX11.html#Resource_Manager_Functions>
 
 =back
 

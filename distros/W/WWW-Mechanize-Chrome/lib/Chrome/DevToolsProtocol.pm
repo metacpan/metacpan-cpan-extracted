@@ -18,7 +18,7 @@ use URI;
 
 with 'MooX::Role::EventEmitter';
 
-our $VERSION = '0.73';
+our $VERSION = '0.74';
 our @CARP_NOT;
 
 =head1 NAME
@@ -165,7 +165,7 @@ The event-loop specific transport backend
 
 has 'transport' => (
     is => 'ro',
-    handles => ['future'],
+    handles => ['future','sleep'],
 );
 
 has 'is_connected' => (
@@ -242,7 +242,7 @@ sub add_listener( $self, $event, $callback ) {
     $self->listener->{ $event } ||= [];
     push @{ $self->listener->{ $event }}, $listener;
     weaken $self->listener->{ $event }->[-1];
-    $listener
+    return $listener
 }
 
 =head2 C<< ->remove_listener >>
@@ -407,10 +407,6 @@ sub close( $self ) {
 Sleep for the amount of seconds in an event-loop compatible way
 
 =cut
-
-sub sleep( $self, $seconds ) {
-    $self->transport->sleep($seconds);
-};
 
 sub DESTROY( $self ) {
     delete $self->{ua};
@@ -904,6 +900,23 @@ sub getWindowForTarget( $self, $targetId ) {
     );
 }
 
+=head2 C<< $target->setWindowBoundsForTarget >>
+
+    my $info = $chrome->getWindowForTarget( $targetId )->get;
+    $info->{bounds}->{width} = 100;
+    $chrome->setWindowBounds( $info->{windowId}, $info->{bounds} )->get;
+
+Sets the window dimensions of the current target
+
+=cut
+
+sub setWindowBounds( $self, $windowId, $bounds ) {
+    $self->send_message('Browser.setWindowBounds',
+        windowId => 0+$windowId,
+        bounds => $bounds,
+    );
+}
+
 =head2 C<< $chrome->getBrowserContexts >>
 
     my @browserContextIds = $chrome->getBrowserContexts->get;
@@ -929,7 +942,7 @@ use Carp 'croak';
 no warnings 'experimental::signatures';
 use feature 'signatures';
 
-our $VERSION = '0.73';
+our $VERSION = '0.74';
 
 has 'protocol' => (
     is => 'ro',

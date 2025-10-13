@@ -58,7 +58,7 @@
          "web" : "https://github.com/davorg-cpan/moox-role-json_ld"
       }
    },
-   "version" : "v2.0.0",
+   "version" : "v2.1.0",
    "x_contributors" : [
       "Robert Rothenberg <rrwo@cpan.org>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",

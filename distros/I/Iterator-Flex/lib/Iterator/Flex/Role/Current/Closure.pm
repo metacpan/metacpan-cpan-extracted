@@ -1,11 +1,12 @@
 package Iterator::Flex::Role::Current::Closure;
 
-# ABSTRACT: Implement C<current> as a closure stored in the registry
+# ABSTRACT: Implement current as a closure stored in the registry
 
+use v5.28;
 use strict;
 use warnings;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Iterator::Flex::Utils qw( :default REG_ITERATOR REG_ITER_CURRENT );
 use Role::Tiny;
@@ -48,11 +49,11 @@ __END__
 
 =head1 NAME
 
-Iterator::Flex::Role::Current::Closure - Implement C<current> as a closure stored in the registry
+Iterator::Flex::Role::Current::Closure - Implement current as a closure stored in the registry
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 METHODS
 
@@ -63,8 +64,6 @@ version 0.31
    $iterator->current;
 
 Returns the current value.
-
-=head1 INTERNALS
 
 =head1 SUPPORT
 

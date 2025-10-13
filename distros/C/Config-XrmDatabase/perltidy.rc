@@ -10,3 +10,7 @@
 -blbs=2
 -nolq
 -nsbl
+-l=100
+-vmll
+-tso
+-xs

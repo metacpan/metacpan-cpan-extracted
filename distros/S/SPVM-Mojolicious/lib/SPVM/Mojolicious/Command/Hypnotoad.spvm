@@ -56,23 +56,23 @@ EOS
       die $self->usage;
     }
     
-    if ($values_h->get_int("help")) {
+    if ($values_h->{"help"}->(int)) {
       print $self->usage;
       Sys->exit(0);
     }
     
     if ($values_h->exists("foreground")) {
-      my $foreground = $values_h->get_int("foreground");
+      my $foreground = $values_h->{"foreground"}->(int);
       Sys->set_env("SPVM_HYPNOTOAD_FOREGROUND", $foreground);
     }
     
     if ($values_h->exists("stop")) {
-      my $stop = $values_h->get_int("stop");
+      my $stop = $values_h->{"stop"}->(int);
       Sys->set_env("SPVM_HYPNOTOAD_STOP", $stop);
     }
     
     if ($values_h->exists("test")) {
-      my $test = $values_h->get_int("test");
+      my $test = $values_h->{"test"}->(int);
       Sys->set_env("SPVM_HYPNOTOAD_TEST", $test);
     }
     

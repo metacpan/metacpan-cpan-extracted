@@ -30,6 +30,7 @@ WriteMakefile(
         IO::File         => 1.08,
         IO::Handle       => 1.21,
         IPC::Open2       => 1.01,
+        JSON::PP         => 4.00,
         MIME::QuotedPrint => 3.07,
         Net::POP3        => 2.16,
         Net::SMTP        => 2.13,

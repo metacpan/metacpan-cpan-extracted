@@ -13,7 +13,7 @@ Iterator::Flex::Manual::Overview - An Abstract overview of Iterators
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 DESCRIPTION
 
@@ -711,8 +711,6 @@ Invoke C<$coderef>.  If it does not throw, an exception of  L<Iterator::Flex::Fa
 =back
 
 =back
-
-=head1 INTERNALS
 
 =head1 SUPPORT
 

@@ -4,7 +4,7 @@ use experimental qw( signatures );
 use stable qw( postderef );
 use true;
 
-package FFI::Platypus::Lang::V 0.02 {
+package FFI::Platypus::Lang::V 0.03 {
 
     # ABSTRACT: Documentation and tools for using Platypus with the V programming language
 
@@ -39,7 +39,7 @@ FFI::Platypus::Lang::V - Documentation and tools for using Platypus with the V p
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -47,7 +47,7 @@ V:
 
  module foo
  
- pub fn add(a, b i32) i32 {
+ pub fn add(a i32, b i32) i32 {
      return a + b
  }
 
@@ -97,7 +97,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Graham Ollis.
+This software is copyright (c) 2025 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

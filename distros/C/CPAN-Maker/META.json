@@ -40,7 +40,7 @@
             "Log::Log4perl" : "0",
             "Module::ScanDeps::Static" : "0",
             "Pod::Find" : "0",
-            "ReadonlyX" : "1.04",
+            "Readonly" : "0",
             "Text::CSV_XS" : "0",
             "YAML::Tiny" : "0",
             "perl" : "5.010"
@@ -56,15 +56,15 @@
    "provides" : {
       "CPAN::Maker" : {
          "file" : "lib/CPAN/Maker.pm",
-         "version" : "v1.5.47"
+         "version" : "v1.6.0"
       },
       "CPAN::Maker::Constants" : {
          "file" : "lib/CPAN/Maker/Constants.pm",
-         "version" : "v1.5.47"
+         "version" : "v1.6.0"
       },
       "CPAN::Maker::Utils" : {
          "file" : "lib/CPAN/Maker/Utils.pm",
-         "version" : "v1.5.47"
+         "version" : "v1.6.0"
       },
       "File::Process" : {
          "file" : "lib/File/Process.pm",
@@ -87,6 +87,6 @@
          "web" : "http://github.com/rlauer6/make-cpan-dist"
       }
    },
-   "version" : "v1.5.47",
+   "version" : "v1.6.0",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

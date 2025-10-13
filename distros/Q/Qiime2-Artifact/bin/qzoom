@@ -3,6 +3,7 @@
 # ABSTRACT: A script to print metadata from Qiime2 artifacts
 use 5.014;
 use warnings;
+use autodie;
 use Getopt::Long;
 use Pod::Usage;
 use Qiime2::Artifact;
@@ -10,8 +11,8 @@ use File::Basename;
 use File::Path qw(make_path);
 use Term::ANSIColor qw(:constants);
 use File::Spec;
-use Data::Dumper;
-my $VERSION = '0.12.0';
+use Carp;
+my $VERSION = '0.14.0';
 
 # Command line options
 my $opt = {
@@ -37,7 +38,7 @@ GetOptions(
     'b|bibtex=s' => \$opt->{bibtex},
     'r|rename'   => \$opt->{rename},
     't|tabular'  => \$opt->{tabular},
-    'verbose'    => \$opt->{verbose},
+    'V|verbose'  => \$opt->{verbose},
     'help'       => \$opt->{help},
     'version'    => \$opt->{version},
 ) or pod2usage(-verbose => 1, -exitval => 1);
@@ -78,7 +79,13 @@ sub process_artifact {
         });
     };
     if ($@) {
-        warn "Error processing $file: $@\n";
+        warn RED, "Error processing $file: $@", RESET, "\n";
+        return;
+    }
+    
+    # Ensure artifact was properly loaded
+    unless (defined $artifact) {
+        warn RED, "Failed to load artifact: $file", RESET, "\n";
         return;
     }
 
@@ -119,7 +126,12 @@ sub process_artifact {
     # Extract data
     if ($opt->{extract}) {
         my $target_dir = $opt->{outdir};
-        make_path($target_dir) unless -d $target_dir;
+        
+        # Create target directory if it doesn't exist
+        if (!-d $target_dir) {
+            make_path($target_dir) or confess "Failed to create directory $target_dir: $!";
+            say "Created directory: $target_dir" if $opt->{verbose};
+        }
         
         for my $data_file (@data_files) {
             my $output_file = $data_file;
@@ -134,27 +146,52 @@ sub process_artifact {
             
             my $target_path = File::Spec->catfile($target_dir, $output_file);
             
-            if ($opt->{verbose}) {
-                say "Extracting: $data_file -> $target_path";
+            # Create subdirectories if needed
+            if ($output_file =~ m{/}) {
+                my $dir_path = File::Spec->catfile($target_dir, dirname($output_file));
+                make_path($dir_path) unless -d $dir_path;
             }
             
-            # Here you would add the actual extraction code
-            # This would require additional methods in the Qiime2::Artifact module
-            # to extract files from the zip archive
+            if ($opt->{verbose}) {
+                say BOLD, "Extracting:", RESET, " $data_file -> $target_path";
+            }
+            
+            # Perform extraction
+            eval {
+                $artifact->extract_file($data_file, $target_path);
+            };
+            if ($@) {
+                warn RED, "Failed to extract $data_file: $@", RESET, "\n";
+            }
         }
     }
     
-    # Handle citations (placeholder - would need citation data from artifact)
+    # Handle citations
     if ($opt->{cite}) {
+        my $citation = $artifact->get_bib();
+        
+        if (!defined $citation || $citation eq '') {
+            say YELLOW, "No citation information found in artifact: $basename", RESET;
+            return;
+        }
+        
         if ($opt->{bibtex}) {
             # Append citations to bibtex file
-            # Would need to implement citation extraction from artifact
-            my $citation = $artifact->get_bib();
-            open my $fh, '>>', $opt->{bibtex} or die "Cannot open $opt->{bibtex}: $!";
-            print $fh $citation;
-            close $fh;
+            eval {
+                open my $fh, '>>', $opt->{bibtex};
+                print $fh $citation;
+                close $fh;
+                say GREEN, "Citation saved to: $opt->{bibtex}", RESET if $opt->{verbose};
+            };
+            if ($@) {
+                warn RED, "Failed to write citation to $opt->{bibtex}: $@", RESET, "\n";
+            }
         } else {
-            say $artifact->get_bib();
+            # Print to standard output
+            if ($opt->{verbose}) {
+                say BOLD, "Citation for $basename:", RESET;
+            }
+            say $citation;
         }
     }
 }
@@ -171,7 +208,7 @@ qzoom - A script to print metadata from Qiime2 artifacts
 
 =head1 VERSION
 
-version 0.13.0
+version 0.14.0
 
 =head1 SYNOPSIS
 
@@ -221,7 +258,7 @@ Rename extracted files to {artifactbasename}.{ext}.
 
 Print output in tabular format.
 
-=item B<--verbose>
+=item B<-V, --verbose>
 
 Print verbose output.
 

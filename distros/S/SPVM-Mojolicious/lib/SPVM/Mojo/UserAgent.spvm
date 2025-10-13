@@ -192,7 +192,7 @@ class Mojo::UserAgent extends Mojo::EventEmitter {
   ;
   
   # Uncodumented Fields
-  has keep_alive_sockets_list : List of object[]; # endpoint and socket pairs 
+  has keep_alive_sockets : object[]; # endpoint and socket pairs 
   
   has connections_h : Hash of IO::Socket;
   
@@ -201,7 +201,7 @@ class Mojo::UserAgent extends Mojo::EventEmitter {
     
     my $self = new Mojo::UserAgent;
     
-    $self->{keep_alive_sockets_list} = List->new(new object[0]);
+    $self->{keep_alive_sockets} = new object[0];
     
     $self->{connections_h} = (Hash of IO::Socket)Hash->new;
     
@@ -213,10 +213,10 @@ class Mojo::UserAgent extends Mojo::EventEmitter {
     my $port = 0;
     
     if ($options_h->exists("port")) {
-      $port = $options_h->get_int("port");
+      $port = $options_h->{"port"}->(int);
     }
     else {
-      my $tsl = $options_h->get_or_default_int("tls", 0);
+      my $tsl = $options_h->get_or_default("tls", 0)->(int);
       $port = $tsl ? 443 : 80;
     }
     
@@ -434,9 +434,9 @@ EOS
     
     my $options_h = Hash->new($options);
     
-    my $headers = (Mojo::Headers)$options_h->delete_or_default("headers", undef);
+    my $headers = (Mojo::Headers)$options_h->get_or_default("headers", undef);
     
-    my $request_timeout = $options_h->delete_or_default_double("request_timeout", $self->{request_timeout});
+    my $request_timeout = $options_h->get_or_default("request_timeout", $self->{request_timeout})->(double);
     
     for my $name (@{$options_h->keys}) {
       die "The \$name option is not available.";
@@ -516,7 +516,7 @@ EOS
     # TLS
     my $tls = $proto eq "https";
     
-    my $path = $options_h->get_string("path");
+    my $path = $options_h->{"path"}->(string);
     
     # UNIX domain socket
     if ($path) {
@@ -527,7 +527,7 @@ EOS
     
     # IP socket
     else {
-      $options_h->set(PeerAddr => $options_h->get_string("address"));
+      $options_h->set(PeerAddr => $options_h->{"address"}->(string));
       $options_h->delete("address");
       $options_h->set(PeerPort => &_port($options_h));
       $options_h->delete("port");
@@ -689,10 +689,10 @@ EOS
     my $max = $self->max_connections;
     
     # Keep connection alive
-    my $keep_alive_sockets_list = $self->{keep_alive_sockets_list};
+    my $keep_alive_sockets = List->new_ref($self->{keep_alive_sockets});
     
-    while ($keep_alive_sockets_list->length && $keep_alive_sockets_list->length >= $max) {
-      $keep_alive_sockets_list->shift;
+    while ($keep_alive_sockets->length && $keep_alive_sockets->length >= $max) {
+      $keep_alive_sockets->shift;
     }
     
     my $_ = $self->transactor->endpoint($tx);
@@ -704,7 +704,7 @@ EOS
     $self->_dequeue($endpoint);
     
     my $handle = (IO::Socket)$self->{connections_h}->get(Fn->to_address($tx));
-    $keep_alive_sockets_list->push([(object)$endpoint, $handle]);
+    $keep_alive_sockets->push([(object)$endpoint, $handle]);
   }
   
   private method _connect_proxy : Mojo::Transaction::HTTP ($old : Mojo::Transaction::HTTP) {
@@ -759,15 +759,15 @@ EOS
   
   private method _dequeue : IO::Socket ($endpoint : string)  {
     
-    my $keep_alive_sockets_list = $self->{keep_alive_sockets_list};
+    my $keep_alive_sockets = List->new_ref($self->{keep_alive_sockets});
     
-    for (my $i = 0; $i < $keep_alive_sockets_list->length; $i++) {
-      my $keep_alive_socket = (object[])$keep_alive_sockets_list->get($i);
+    for (my $i = 0; $i < $keep_alive_sockets->length; $i++) {
+      my $keep_alive_socket = (object[])$keep_alive_sockets->get($i);
       my $my_endpoint = (string)$keep_alive_socket->[0];
       my $handle = (IO::Socket)$keep_alive_socket->[1];
       
       if ($endpoint eq $my_endpoint) {
-        $keep_alive_sockets_list->remove($i);
+        $keep_alive_sockets->remove($i);
         return $handle;
       }
     }

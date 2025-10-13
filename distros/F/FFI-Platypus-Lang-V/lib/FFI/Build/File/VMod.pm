@@ -4,7 +4,7 @@ use experimental qw( signatures );
 use stable qw( postderef );
 use true;
 
-package FFI::Build::File::VMod 0.02 {
+package FFI::Build::File::VMod 0.03 {
 
     # ABSTRACT: Class to track V source in FFI::Build
 
@@ -132,7 +132,7 @@ FFI::Build::File::VMod - Class to track V source in FFI::Build
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -167,7 +167,7 @@ ffi/foo.v:
 
  module foo
  
- pub fn add(a, b i32) i32 {
+ pub fn add(a i32, b i32) i32 {
      return a + b
  }
 
@@ -200,7 +200,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Graham Ollis.
+This software is copyright (c) 2025 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

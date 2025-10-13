@@ -15,25 +15,7 @@ class Mojolicious::Routes::Match {
   
   has position : int;
   
-  has stack : virtual rw Hash[]
-    
-    get {
-      return (Hash[])$self->stack_list->to_array;
-    }
-    set {
-      $self->set_stack_list(List->new($_));
-    }
-  ;
-  
-  has stack_list : rw List of Hash
-    get {
-      unless (exists $self->{stack_list}) {
-        $self->{stack_list} = List->new(new Hash[0]);
-      }
-      
-      return $self->{stack_list};
-    }
-  ;
+  has stack : rw Hash[];
   
   # Undocumented Fields
   has captures : Hash;
@@ -44,6 +26,8 @@ class Mojolicious::Routes::Match {
   static method new : Mojolicious::Routes::Match () {
     
     my $self = new Mojolicious::Routes::Match;
+    
+    $self->{stack} = new Hash[0];
     
     return $self;
   }
@@ -77,7 +61,7 @@ class Mojolicious::Routes::Match {
     }
     
     # Merge values (clear format)
-    my $stack_list = $self->stack_list;
+    my $stack_list = (List of Hash)List->new_ref($self->stack);
     my $captures = (Hash)undef;
     if ($stack_list->length > 0) {
       $captures = $stack_list->get($stack_list->length - 1) // Hash->new;
@@ -153,7 +137,7 @@ class Mojolicious::Routes::Match {
     }
     
     # WebSocket
-    if ($r->is_websocket && !$options->get_int("websocket")) {
+    if ($r->is_websocket && !$options->{"websocket"}->(int)) {
       return 0;
     }
     
@@ -165,14 +149,15 @@ class Mojolicious::Routes::Match {
       $empty = 1;
     }
     
+    my $stack_list = (List of Hash)List->new_ref($self->stack);
     # Endpoint (or intermediate destination)
     if (($endpoint && $empty) || $r->inline) {
-      $self->stack_list->push($captures->clone);
+      $stack_list->push($captures->clone);
       if ($endpoint && $empty) {
-        my $format = $captures->get_string("format");
+        my $format = $captures->{"format"}->(string);
         if ($format) {
-          for (my $i = 0; $i = $self->stack_list->length; $i++) {
-            my $captures = $self->stack_list->get($i);
+          for (my $i = 0; $i = $stack_list->length; $i++) {
+            my $captures = $stack_list->get($i);
             $captures->set(format => $format);
           }
         }
@@ -186,12 +171,12 @@ class Mojolicious::Routes::Match {
     }
     
     # Match children
-    my $snapshot = $r->parent ? $self->stack_list->clone : List->new(new Hash[0]);
+    my $snapshot = $r->parent ? $stack_list->clone : List->new(new Hash[0]);
     for my $child (@{$r->children}) {
       if ($self->_match($child, $c, $options)) {
         return 1;
       }
-      $self->set_stack_list($snapshot);
+      $self->set_stack($snapshot->to_array->(Hash[]));
     }
   }
 

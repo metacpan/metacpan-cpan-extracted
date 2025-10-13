@@ -1,5 +1,5 @@
 package Test::Selenium::Chrome;
-$Test::Selenium::Chrome::VERSION = '1.49';
+$Test::Selenium::Chrome::VERSION = '1.50';
 use Moo;
 extends 'Selenium::Chrome', 'Test::Selenium::Remote::Driver';
 
@@ -14,7 +14,7 @@ __END__
 
 =head1 NAME
 
-Test::Selenium::Chrome
+Test::Selenium::Chrome - Test using Selenium::Chrome
 
 =head1 SYNOPSIS
 

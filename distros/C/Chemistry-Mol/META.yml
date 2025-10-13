@@ -23,10 +23,11 @@ requires:
   IO::String: '0'
   Math::VectorReal: '1.0'
   Scalar::Util: '1.01'
+  Set::Object: '0'
   Text::Balanced: '0'
 resources:
   homepage: https://search.cpan.org/dist/Chemistry-Mol
   repository: git://github.com/perlmol/chemistry-mol.git
-version: '0.39'
+version: '0.40'
 x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

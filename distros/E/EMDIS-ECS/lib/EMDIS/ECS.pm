@@ -35,7 +35,7 @@ BEGIN
 }
 
 # module/package version
-$VERSION = '0.46';
+$VERSION = '0.47';
 
 # file creation mode (octal, a la chmod)
 $FILEMODE = 0660;
@@ -1438,7 +1438,7 @@ __DATA__
 
 =head1 NAME
 
-EMDIS::ECS - Perl implementation of EMDIS Communicatin System (ECS)
+EMDIS::ECS - Perl implementation of EMDIS Communication System (ECS)
 
 =head1 SYNOPSIS
 

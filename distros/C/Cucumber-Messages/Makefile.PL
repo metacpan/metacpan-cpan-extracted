@@ -25,7 +25,7 @@ my %WriteMakefileArgs = (
     "Test2::Tools::ClassicCompare" => 0,
     "Test2::V0" => 0
   },
-  "VERSION" => "29.0.1",
+  "VERSION" => "30.1.0",
   "test" => {
     "TESTS" => "t/*.t"
   }

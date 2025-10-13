@@ -4,7 +4,7 @@
 # compare with rv application
 
 use strict;
-use Test::More tests => 30;
+use Test::More tests => 31;
 use Test::Number::Delta within => 0.01;
 use DateTime;
 
@@ -127,4 +127,5 @@ is($c->vdefn, 'RADIO', 'check velocity definition');
 is($c->vframe, 'LSRK', 'check velocity frame');
 is($c->rv, 20, 'check velocity');
 delta_ok($c->obsvel, (20 + $c->vlsrk), "velocity between observer and target");
+delta_within($c->redshift, 0.000067, 1e-6, 'check redshift from radio velocity');
 print "# Doppler correction : ". $c->doppler. "\n";

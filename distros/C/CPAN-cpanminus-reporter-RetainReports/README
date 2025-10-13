@@ -2,8 +2,8 @@ README for Perl extension CPAN-cpanminus-reporter-RetainReports
 
 CPAN::cpanminus::reporter::RetainReports - Retain reports on disk rather than transmitting them
 
-This document refers to version 0.10 of CPAN-cpanminus-reporter-RetainReports.
-This version was released December 29 2017.
+This document refers to version 0.12 of CPAN-cpanminus-reporter-RetainReports.
+This version was released October 1 2025.
 
 SYNOPSIS
 
@@ -21,7 +21,7 @@ SYNOPSIS
         'ignore-versions' => 1,
     );
 
-    my $analysisdir = '/home/username/bbc/testing/results/perl-5.27.0';
+    my $analysisdir = '/home/username/bbc/testing/results/perl-5.43.0';
     $reporter->set_report_dir($analysisdir);
     $reporter->run;
 
@@ -30,9 +30,9 @@ INSTALLATION
 To install this module on your system, place the tarball archive file in a
 temporary directory and call the following:
 
-    gunzip CPAN-cpanminus-reporter-RetainReports-0.10.tar.gz
-    tar xf CPAN-cpanminus-reporter-RetainReports-0.10.tar
-    cd CPAN-cpanminus-reporter-RetainReports-0.10
+    gunzip CPAN-cpanminus-reporter-RetainReports-0.12.tar.gz
+    tar xf CPAN-cpanminus-reporter-RetainReports-0.12.tar
+    cd CPAN-cpanminus-reporter-RetainReports-0.12
     perl Makefile.PL
     make
     make test

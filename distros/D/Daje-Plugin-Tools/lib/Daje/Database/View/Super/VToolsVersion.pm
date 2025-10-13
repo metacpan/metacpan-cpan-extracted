@@ -34,7 +34,7 @@ use v5.40;
 has 'fields' => "tools_version_pkey, editnum, insby, insdatetime, modby, moddatetime, tools_projects_fkey, version, locked, name, workflow_fkey";
 has 'primary_keys' => "tools_version_pkey";
 has 'foreign_keys' => "tools_projects_fkey, workflow_fkey";
-has 'view_name' => "v_tools_objects_workflow_fkey";
+has 'view_name' => "v_tools_version_workflow_fkey";
 
 
 async sub load_full_list_p($self) {
@@ -45,5 +45,29 @@ async sub load_full_list_p($self) {
     return $result;
 }
 
+async sub load_full_list($self) {
+    my $result = $self->load_a_full_list(
+        $self->view_name,
+        $self->fields
+    );
+    return $result;
+}
 
+sub load_pkey($self, $tools_version_pkey) {
+
+    my $result = $self->load_pk(
+        $self->view_name,
+        $self->fields,
+        $self->primary_keys,
+        $tools_version_pkey
+    );
+    return $result;
+}
+
+sub load_tools_version_fkey($self, $tools_projects_pkey) {
+
+    return $self->load_fkey(
+        $self->view_name, $self->fields(), "tools_projects_fkey", $tools_projects_pkey
+    );
+}
 1;

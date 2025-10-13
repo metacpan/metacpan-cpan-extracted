@@ -26,16 +26,7 @@ class Mojolicious::Renderer {
   
   has min_compress_size : rw int;
   
-  has paths : virtual rw string[]
-    get {
-      return $self->paths_list->to_array->(string[]);
-    }
-    set {
-      $self->{paths_list} = StringList->new($_);
-    }
-  ;
-  
-  has paths_list : rw StringList;
+  has paths : rw string[];
   
   has data_section : rw string;
   
@@ -59,7 +50,7 @@ class Mojolicious::Renderer {
     
     $self->{min_compress_size} = 860;
     
-    $self->{paths_list} = StringList->new;
+    $self->{paths} = new string[0];
     
     $self->{templates} = Hash->new;
     
@@ -119,14 +110,14 @@ class Mojolicious::Renderer {
   
   method template_name : string ($options : Hash|object[]) {
     
-    my $options_h = &to_hash($options);
+    my $options_h = Fn->to_hash($options);
     
-    my $template = $options_h->get_string("template");
+    my $template = $options_h->{"template"}->(string);
     unless ($template) {
       return undef;
     }
     
-    my $format = $options_h->get_string("format");
+    my $format = $options_h->{"format"}->(string);
     unless ($format) {
       return undef;
     }
@@ -134,7 +125,7 @@ class Mojolicious::Renderer {
     $template .= ".$format";
     
     # Variants
-    my $handler = $options_h->get_string("handler");
+    my $handler = $options_h->{"handler"}->(string);
     
     return $handler ? "$template.$handler" : $template;
   }
@@ -148,7 +139,7 @@ class Mojolicious::Renderer {
     
     my $stash   = $c->stash;
     my $options_h = Hash->new({
-      handler  => $stash->get_string("handler"),
+      handler  => $stash->{"handler"}->(string),
       template => (string)$stash->delete("template"),
     });
     
@@ -161,16 +152,16 @@ class Mojolicious::Renderer {
       }
     }
     
-    $options_h->set(format => $stash->get_string("format") // $self->default_format);
+    $options_h->set(format => $stash->{"format"}->(string) // $self->default_format);
     
     # Data
     if ($stash->get("data")) {
-      return [(string)$stash->delete("data"), $options_h->get_string("format")];
+      return [(string)$stash->delete("data"), $options_h->{"format"}->(string)];
     }
     
     # Text
     if ($stash->get("text")) {
-      return [(string)$stash->delete("text"), $options_h->get_string("format")];
+      return [(string)$stash->delete("text"), $options_h->{"format"}->(string)];
     }
     
     # JSON
@@ -199,11 +190,11 @@ class Mojolicious::Renderer {
 
 =cut
     
-    if ($stash->get_int("mojo.string")) {
+    if ($stash->{"mojo.string"}->(int)) {
       return [$output, undef];
     }
     
-    return [$output, $options_h->get_string("format")];
+    return [$output, $options_h->{"format"}->(string)];
     
   }
 
@@ -238,28 +229,9 @@ class Mojolicious::Renderer {
     }
   }
   
-  private static method to_hash : Hash ($options : Hash|object[]) {
-    
-    my $options_h = (Hash)undef;
-    if (!$options) {
-      $options_h = Hash->new;
-    }
-    elsif ($options isa Hash) {
-      $options_h = (Hash)$options;
-    }
-    elsif ($options isa object[]) {
-      $options_h = Hash->new((object[])$options);
-    }
-    else {
-      die "The type of the options \$options must be Hash or object[].";
-    }
-    
-    return $options_h;
-  }
-  
   method template_handler : string ($options : Hash|object[] = undef) {
     
-    my $options_h = &to_hash($options);
+    my $options_h = Fn->to_hash($options);
     
     my $file = $self->template_name($options_h);
     unless ($file) {

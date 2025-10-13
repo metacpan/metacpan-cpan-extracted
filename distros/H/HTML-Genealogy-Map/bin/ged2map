@@ -1,0 +1,113 @@
+#!/usr/bin/env perl
+
+# Create a web page of events from a family tree
+
+# The program uses a multi-tier geocoding strategy:
+# 1. Local geocoding cache (Geo::Coder::Free::Local)
+# 2. Free geocoding database (Geo::Coder::Free)
+# 3. OpenStreetMap Nominatim service (Geo::Coder::OSM)
+
+# All geocoding results are cached to improve performance and reduce API calls.
+
+use strict;
+use warnings;
+
+use utf8;
+
+use open qw(:std :encoding(UTF-8));
+
+use autodie;
+
+use CHI;
+use File::Basename;
+use File::HomeDir;
+use File::Spec;
+use Gedcom;
+use Geo::Coder::Free;
+use Geo::Coder::List;
+use Geo::Coder::OSM;
+use HTML::Genealogy::Map;
+
+# Configuration
+my $gedcom_file = $ARGV[0] or die "Usage: $0 <gedcom_file>";
+my $output_file = $ARGV[1] || 'events_map.html';
+
+# Initialize GEDCOM parser
+my $gedcom = Gedcom->new(gedcom_file => $gedcom_file, read_only => 1);
+
+# Initialize geocoder
+my $cache_dir;
+if(my $e = $ENV{'CACHEDIR'} || $ENV{'CACHE_DIR'}) {
+	$cache_dir = File::Spec->catfile($e, basename($0));
+} else {
+	$cache_dir = File::Spec->catfile(File::HomeDir->my_home(), '.cache', basename($0));
+}
+my $geocoder = Geo::Coder::List->new(
+	cache => CHI->new(
+		driver => 'File',
+		root_dir => $cache_dir,
+		l1_cache => { driver => 'RawMemory', datastore => {}, max_size => 1024*1024 }
+	),
+)->push(Geo::Coder::Free::Local->new())->push(Geo::Coder::Free->new())->push(Geo::Coder::OSM->new());
+
+my $opts = {
+	height => '400px',
+	width => '600px',
+	gedcom => $gedcom,
+	debug => 1,
+	geocoder => $geocoder
+};
+
+if($ENV{'GMAP_WEBSITE_KEY'}) {
+	$opts->{'google_key'} = $ENV{'GMAP_WEBSITE_KEY'};
+}
+my ($head, $body) = HTML::Genealogy::Map->onload_render($opts);
+
+if(open(my $fout, '>', $output_file)) {
+	print "Saving map to $output_file\n";
+
+	print $fout ${render($head, $body)};
+
+	close $fout;
+}
+
+# Generate HTML
+sub render {
+	my ($head, $body) = @_;
+
+	my $html = <<"HTML";
+<!DOCTYPE html>
+<html>
+<head>
+	<title>GEDCOM Events Map</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<style>
+		body { margin: 0; padding: 0; font-family: Arial, sans-serif; }
+		#map {
+			margin: 0 auto; /* This centers it horizontally */
+			/* height: 90vh;
+			width: 80% !important; */
+			height: 400px;
+			width: 600px;
+		}
+		#map > * {
+			margin: 0 auto; /* This centers child elements */
+			/* width: 100% !important; /* Use 100% to fill the parent, not 80% */
+			/* height: 100% !important; */
+			height: 400px;
+			width: 600px;
+		}
+	</style>
+	$head
+</head>
+<body>
+	<div id="map">
+	$body
+	</div>
+</body>
+</html>
+HTML
+
+	return \$html;
+}

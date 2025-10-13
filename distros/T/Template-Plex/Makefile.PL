@@ -5,7 +5,7 @@ WriteMakefile(
 	PREREQ_PM		=> {
 					"Log::ger"=>0,
 					"Log::OK"=>0,
-          "Error::Show"=>"v0.2.0",
+          "Error::Show"=>"v0.5.0",
           "Export::These"=>0,
           "constant::more"=>"v0.2.1"
 

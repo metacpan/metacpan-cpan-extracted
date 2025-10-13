@@ -58,7 +58,7 @@ use v5.40;
 #
 
 
-our $VERSION = '0.07';
+our $VERSION = '0.09';
 
 use Daje::Database::Model::ToolsProjects;
 use Daje::Database::Helper::TreeList;
@@ -90,7 +90,8 @@ sub register ($self, $app, $config) {
     ;
     my $r = $app->routes;
     $r->get('/tools/api/v1/projects')->to('ToolsProjects#load_projects');
-    $r->put('/tools/api/v1/projects')->to('ToolsProjects#save_projects');
+    $r->get('/tools/api/v1/versions/')->to('ToolsVersions#load_versions_list');
+    $r->get('/tools/api/v1/versions/:tools_version_pkey')->to('ToolsVersions#load_versions');
     $r->get('/tools/api/v1/treelist/:tools_projects_pkey')->to('ToolsTreelist#load_treelist');
 
     $app->log->debug("route loading done");

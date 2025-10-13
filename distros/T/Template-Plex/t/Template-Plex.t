@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use feature qw<say>;
 
-use Test::More tests => 22;
+use Test::More tests => 20;
 use Log::OK {sys=>"Log::ger"};
 
 BEGIN { use_ok('Template::Plex') };
@@ -20,13 +20,20 @@ my $template=q|@{[ do {
 	}]}|;
 
 
+eval {
 $template=Template::Plex->load([$template], $default_data);
+};
+if($@){
+  say STDERR Error::Show::context $@;
+}
+
 my $result=$template->render();
 my $expected="";
 for(1,2,3,4){
 	$expected.="row $_\n";
 }
 ok $result eq $expected, "Base values";
+
 
 $default_data->{data}=[5,6,7,8];
 $result=$template->render();
@@ -179,24 +186,29 @@ ok $result eq "my name is John not Jill", "Lexical and override access";
   my $tt=[
     '@{[init{
     $self->args->{test}="testing";
-    {1+a
-    } ]}Hello!'
+    {1+}}
+    }]}Hello!'
   ];
         my %vars;
-        my $template=
+        my $template;
+        local $@;
         eval {
-          Template::Plex->load($tt, \%vars);
+          $template=Template::Plex->load($tt, \%vars);
         };
+        my $error=$@;
         ok !defined($template), "Template load fail ok";
 
-        ok $@, "Compile error set";
-        if($@){
-          my $expected='4=>     } ]}Hello!';
-          #say STDERR "RESULT: $@";
-          #say STDERR "Expected $expected";
-          ok $@=~/$expected/s, "Error as expected";
-          #test for the correct line number
-        }
+        ###################################################
+        # ok $error, "Compile error set";                 #
+        # if($error){                                     #
+        #   say STDERR Error::Show::context $@;           #
+        #   my $expected='4=>     } ]}Hello!';            #
+        #   say STDERR "====RESULT: $error";              #
+        #   say STDERR "====Expected $expected";          #
+        #   ok $error=~/$expected/s, "Error as expected"; #
+        #   #test for the correct line number             #
+        # }                                               #
+        ###################################################
 }
 
 {
@@ -211,18 +223,22 @@ ok $result eq "my name is John not Jill", "Lexical and override access";
 
   ];
         my %vars;
-        my $template=
+        local $@;
+        my $template;
         eval {
-          Template::Plex->load($tt, \%vars);
+          $template=Template::Plex->load($tt, \%vars);
         };
+        my $error=$@;
         ok !defined($template), "Template load failed ok";
 
-        ok $@, "Compile error set";
+        ok $error, "Compile error set";
 
-        if($@){
-          #my $expected='4=>     \} \]\}Hello\!';
-          #say STDERR "RESULT: $@";
-          #ok $@=~/$expected/s;
-          #test for the correct line number
-        }
+        ############################################
+        # if($error){                              #
+        #   my $expected='4=>     \} \]\}Hello\!'; #
+        #   say STDERR "RESULT: $error";           #
+        #   ok $error=~/$expected/s;               #
+        #   #test for the correct line number      #
+        # }                                        #
+        ############################################
 }

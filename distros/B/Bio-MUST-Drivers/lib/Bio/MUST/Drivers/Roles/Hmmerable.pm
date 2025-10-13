@@ -1,7 +1,7 @@
 package Bio::MUST::Drivers::Roles::Hmmerable;
 # ABSTRACT: HMMER model-related methods
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
-$Bio::MUST::Drivers::Roles::Hmmerable::VERSION = '0.251060';
+$Bio::MUST::Drivers::Roles::Hmmerable::VERSION = '0.252830';
 use Moose::Role;
 
 use autodie;
@@ -123,7 +123,7 @@ Bio::MUST::Drivers::Roles::Hmmerable - HMMER model-related methods
 
 =head1 VERSION
 
-version 0.251060
+version 0.252830
 
 =head1 SYNOPSIS
 

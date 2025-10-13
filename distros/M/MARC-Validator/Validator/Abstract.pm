@@ -9,7 +9,7 @@ use Error::Pure qw(err);
 use Mo::utils 0.06 qw(check_bool);
 use Mo::utils::Hash qw(check_hash);
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Constructor.
 sub new {
@@ -444,6 +444,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

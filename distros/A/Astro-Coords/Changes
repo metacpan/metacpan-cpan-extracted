@@ -1,5 +1,11 @@
 Revision history for Astro::Coords
 
+0.23 2025-09-30
+
+  - Corrected sense of radio rv check for redshift calculation.
+  - Corrected wrapping of angles in meridian time calculation which could
+    lead to the wrong rise/set time being found (Eric Jensen).
+
 0.22 2024-11-01
 
   - Added distance method to Astro::Coords::Offset.

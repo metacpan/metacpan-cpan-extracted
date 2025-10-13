@@ -32,13 +32,18 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
+            "Config::Abstraction" : "0",
+            "Data::Dumper" : "0",
+            "Data::Section::Simple" : "0",
             "File::Slurp" : "0",
+            "File::Spec" : "0",
             "Getopt::Long" : "0",
             "Params::Get" : "0",
             "Params::Validate::Strict" : "0",
             "Pod::Usage" : "0",
             "Return::Set" : "0",
-            "Test::Most" : "0",
+            "Template" : "0",
             "YAML::XS" : "0",
             "autodie" : "0",
             "perl" : "5.014"
@@ -46,15 +51,18 @@
       },
       "test" : {
          "requires" : {
+            "Cwd" : "0",
+            "Encode" : "0",
             "File::Glob" : "0",
             "File::Temp" : "0",
             "File::stat" : "0",
+            "IPC::Run3" : "0",
             "IPC::System::Simple" : "0",
             "JSON::MaybeXS" : "0",
             "POSIX" : "0",
             "Readonly" : "0",
             "Test::DescribeMe" : "0",
-            "Test::More" : "0",
+            "Test::Most" : "0",
             "Test::Needs" : "0",
             "Test::Returns" : "0.02"
          }
@@ -75,6 +83,6 @@
          "x_repository" : "https://github.com/nigelhorne/App-Test-Generator"
       }
    },
-   "version" : "0.03",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

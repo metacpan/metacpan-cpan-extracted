@@ -61,43 +61,43 @@ class Mojo::Cookie::Response extends Mojo::Cookie {
       my $options_h = Hash->new($options);
       
       if ($options_h->exists("name")) {
-        $self->{name} = $options_h->get_string("name");
+        $self->{name} = $options_h->{"name"}->(string);
       }
       
       if ($options_h->exists("value")) {
-        $self->{value} = $options_h->get_string("value");
+        $self->{value} = $options_h->{"value"}->(string);
       }
       
       if ($options_h->exists("domain")) {
-        $self->{domain} = $options_h->get_string("domain");
+        $self->{domain} = $options_h->{"domain"}->(string);
       }
       
       if ($options_h->exists("expires")) {
-        $self->{expires} = $options_h->get_long("expires");
+        $self->{expires} = $options_h->{"expires"}->(long);
       }
       
       if ($options_h->exists("host_only")) {
-        $self->{host_only} = (byte)$options_h->get_int("host_only");
+        $self->{host_only} = (byte)$options_h->{"host_only"}->(int);
       }
       
       if ($options_h->exists("httponly")) {
-        $self->{httponly} = (byte)$options_h->get_int("httponly");
+        $self->{httponly} = (byte)$options_h->{"httponly"}->(int);
       }
       
       if ($options_h->exists("max_age")) {
-        $self->{max_age} = $options_h->get_int("max_age");
+        $self->{max_age} = $options_h->{"max_age"}->(int);
       }
       
       if ($options_h->exists("path")) {
-        $self->{path} = $options_h->get_string("path");
+        $self->{path} = $options_h->{"path"}->(string);
       }
       
       if ($options_h->exists("samesite")) {
-        $self->{samesite} = $options_h->get_string("samesite");
+        $self->{samesite} = $options_h->{"samesite"}->(string);
       }
       
       if ($options_h->exists("secure")) {
-        $self->{secure} = (byte)$options_h->get_int("secure");
+        $self->{secure} = (byte)$options_h->{"secure"}->(int);
       }
       
     }

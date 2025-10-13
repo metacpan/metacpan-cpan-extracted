@@ -24,7 +24,6 @@ is_deeply($obj->json_ld_data, {
   baz => 'Bar Foo',
   zip => {
       '@type' => 'Example',
-      '@context' => 'https://schema.org/',
       bax => 'Bar',
       baz => 'Bar Foo',
       boop => 'Bop!',
@@ -37,7 +36,6 @@ is($obj->json_ld, '{
    "bax" : "Bar",
    "baz" : "Bar Foo",
    "zip" : {
-      "@context" : "https://schema.org/",
       "@type" : "Example",
       "bax" : "Bar",
       "baz" : "Bar Foo",

@@ -1,10 +1,6 @@
 #! perl
 
 use v5.28;
-
-use strict;
-use warnings;
-
 use Test2::V0;
 
 use Iterator::Flex::Common 'iseq';

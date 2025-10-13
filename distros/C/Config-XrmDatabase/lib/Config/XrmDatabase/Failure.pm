@@ -5,7 +5,7 @@ package Config::XrmDatabase::Failure;
 use v5.26;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use custom::failures::x::alias
   -suffix => '_failure',
@@ -20,6 +20,16 @@ use custom::failures::x::alias
 
 1;
 
+#
+# This file is part of Config-XrmDatabase
+#
+# This software is Copyright (c) 2021 by Smithsonian Astrophysical Observatory.
+#
+# This is free software, licensed under:
+#
+#   The GNU General Public License, Version 3, June 2007
+#
+
 __END__
 
 =pod
@@ -32,13 +42,20 @@ Config::XrmDatabase::Failure - Exception class
 
 =head1 VERSION
 
-version 0.07
+version 0.08
+
+=for Pod::Coverage components_failure
+file_failure
+internal_failure
+key_failure
+parameter_failure
+query_failure
 
 =head1 SUPPORT
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-config-xrmdatabase@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=Config-XrmDatabase
+Please report any bugs or feature requests to bug-config-xrmdatabase@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=Config-XrmDatabase>
 
 =head2 Source
 

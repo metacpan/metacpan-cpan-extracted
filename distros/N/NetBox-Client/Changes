@@ -1,0 +1,26 @@
+Revision history for perl module NetBox::API.
+
+0.1.5 Wed Oct  8 11:03:48 EEST 2025
+	- renamed module to NetBox::Client to match CPAN naming conventions.
+
+0.1.4 Fri Sep 26 16:45:50 EEST 2025
+	- Added LICENSE;
+	- Fixed automation issues;
+	- README.md is now generated from module POD;
+	- Fixed RPM spec-file.
+
+0.1.3 Fri Sep 26 09:35:47 EEST 2025
+	- CPAN compatibility fixes. Again.
+
+0.1.1 Fri Sep 26 09:00:20 EEST 2025
+	- CPAN compatibility fixes.
+
+0.1.0 Thu Sep 25 17:39:00 EEST 2025
+	- initial public release.
+
+0.0.4 Thu Apr 17 13:28:28 EEST 2025
+	- added fields filtering in response.
+
+0.0.1 Mon Mar  4 11:48:26 EET 2024
+	- initial version.
+

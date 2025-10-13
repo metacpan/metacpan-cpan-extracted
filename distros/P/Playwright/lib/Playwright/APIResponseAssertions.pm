@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::APIResponseAssertions;
-$Playwright::APIResponseAssertions::VERSION = '1.532';
+$Playwright::APIResponseAssertions::VERSION = '1.551';
 use parent 'Playwright::Base';
 
 sub new {
@@ -32,21 +32,21 @@ sub not {
     );
 }
 
-sub NotToBeOK {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'NotToBeOK',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
 sub toBeOK {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
         command => 'toBeOK',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub NotToBeOK {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'NotToBeOK',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -96,7 +96,7 @@ Playwright::APIResponseAssertions - Automatically generated class for Playwright
 
 =head1 VERSION
 
-version 1.532
+version 1.551
 
 =head1 CONSTRUCTOR
 
@@ -113,17 +113,17 @@ Execute the APIResponseAssertions::not playwright routine.
 
 See L<https://playwright.dev/docs/api/class-APIResponseAssertions#APIResponseAssertions-not> for more information.
 
-=head2 NotToBeOK(@args)
-
-Execute the APIResponseAssertions::NotToBeOK playwright routine.
-
-See L<https://playwright.dev/docs/api/class-APIResponseAssertions#APIResponseAssertions-NotToBeOK> for more information.
-
 =head2 toBeOK(@args)
 
 Execute the APIResponseAssertions::toBeOK playwright routine.
 
 See L<https://playwright.dev/docs/api/class-APIResponseAssertions#APIResponseAssertions-toBeOK> for more information.
+
+=head2 NotToBeOK(@args)
+
+Execute the APIResponseAssertions::NotToBeOK playwright routine.
+
+See L<https://playwright.dev/docs/api/class-APIResponseAssertions#APIResponseAssertions-NotToBeOK> for more information.
 
 =head2 on(@args)
 
@@ -178,7 +178,7 @@ George S. Baugh <teodesian@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2020 Troglodyne LLC
+Copyright (c) 2025 Troglodyne LLC
 
 
 Permission is hereby granted, free of charge, to any person obtaining a copy

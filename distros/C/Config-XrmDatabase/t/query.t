@@ -1,5 +1,6 @@
 #! perl
 
+use v5.26;
 use Test2::V0;
 
 use Config::XrmDatabase;
@@ -24,7 +25,7 @@ sub query ( $which = 'query', %args ) {
     my ( %new_args, %query_args );
 
     if ( $which eq 'new' ) {
-        %new_args = map {; "query_${_}" => $args{$_} } keys %args;
+        %new_args = map { ; "query_${_}" => $args{$_} } keys %args;
     }
     elsif ( $which eq 'query' ) {
         %query_args = %args;
@@ -38,8 +39,7 @@ sub query ( $which = 'query', %args ) {
 
     my $name = $fail ? 'What.Me.Worry.About.Anything' : 'Xmh.Paned.Box.Command.Foreground';
 
-    $db->query( $name,
-        'xmh.toc.messagefunctions.incorporate.activeForeground', %query_args );
+    $db->query( $name, 'xmh.toc.messagefunctions.incorporate.activeForeground', %query_args );
 }
 
 sub return_value ( $which ) {
@@ -60,13 +60,12 @@ sub return_value ( $which ) {
         is(
             query( $which, return_value => 'all' ),
             hash {
-                field value => 'black';
-                field key =>
-                  [ 'xmh', 'toc', '*', 'Command', 'activeForeground' ];
+                field value       => 'black';
+                field key         => [ 'xmh', 'toc', q{*}, 'Command', 'activeForeground' ];
                 field match_count => 1;
                 end;
             },
-            'value'
+            'value',
         );
     };
 }
@@ -87,22 +86,20 @@ sub failure ( $which ) {
         };
 
         isa_ok( $res, ['Config::XrmDatabase::Failure::query'], 'exception' );
-        like( "$res",
-              qr/ \Qxmh.toc.messagefunctions.incorporate.activeForeground\E
+        ## no critic  (ComplexRegexes)
+        like(
+            "$res",
+            qr{ \Qxmh.toc.messagefunctions.incorporate.activeForeground\E
                   .*
                  \QWhat.Me.Worry.About.Anything\E
-                /x
-            );
+                }x,
+        );
     };
 
     subtest 'code' => sub {
         my $failed;
-        is(
-            query( $which, fail => 1, on_failure => sub { $failed = 7; 42; } ),
-            42,
-            "return value"
-        );
-        is( $failed, 7, "code ran" );
+        is( query( $which, fail => 1, on_failure => sub { $failed = 7; 42; } ), 42, 'return value' );
+        is( $failed,                                                            7,  'code ran' );
     };
 
 }
@@ -110,14 +107,14 @@ sub failure ( $which ) {
 subtest 'return value' => sub {
 
     subtest 'constructor args', \&return_value, 'new';
-    subtest 'query args', \&return_value, 'query';
+    subtest 'query args',       \&return_value, 'query';
 
 };
 
 subtest failure => sub {
 
     subtest 'constructor args', \&failure, 'new';
-    subtest 'query args', \&failure, 'query';
+    subtest 'query args',       \&failure, 'query';
 
 };
 

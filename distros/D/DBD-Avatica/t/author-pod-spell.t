@@ -22,6 +22,7 @@ __DATA__
 ActiveKids
 Adapter
 Alexey
+Andrey
 Attrubute
 AutoCommit
 AutoInactiveDestroy
@@ -40,6 +41,7 @@ HandleSetErr
 Ibaev
 InactiveDestroy
 Ivan
+Khozov
 MaxRetries
 NULLABLE
 ParamValues
@@ -60,6 +62,7 @@ TransactionIsolation
 UNCOMMITED
 UserAgent
 avatica
+avkhozov
 dbh
 dionys
 errstr

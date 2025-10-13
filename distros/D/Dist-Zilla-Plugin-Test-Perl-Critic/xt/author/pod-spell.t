@@ -25,8 +25,10 @@ Jérôme
 Karen
 Kent
 Knop
+Koivunalho
 Mengué
 Mike
+Mikko
 Olivier
 Perl
 Plugin
@@ -46,4 +48,5 @@ irc
 jquelin
 kentfredric
 lib
+mikkoi
 stephen

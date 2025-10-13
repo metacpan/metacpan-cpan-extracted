@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Coverage;
-$Playwright::Coverage::VERSION = '1.532';
+$Playwright::Coverage::VERSION = '1.551';
 use parent 'Playwright::Base';
 
 sub new {
@@ -20,16 +20,6 @@ sub new {
 
 sub spec {
     return $Playwright::spec->{'Coverage'}{members};
-}
-
-sub stopCSSCoverage {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'stopCSSCoverage',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
 }
 
 sub startJSCoverage {
@@ -57,6 +47,16 @@ sub stopJSCoverage {
     return $self->_api_request(
         args    => [@_],
         command => 'stopJSCoverage',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub stopCSSCoverage {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'stopCSSCoverage',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -106,7 +106,7 @@ Playwright::Coverage - Automatically generated class for Playwright::Coverage
 
 =head1 VERSION
 
-version 1.532
+version 1.551
 
 =head1 CONSTRUCTOR
 
@@ -116,12 +116,6 @@ You shouldn't have to call this directly.
 Instead it should be returned to you as the result of calls on Playwright objects, or objects it returns.
 
 =head1 METHODS
-
-=head2 stopCSSCoverage(@args)
-
-Execute the Coverage::stopCSSCoverage playwright routine.
-
-See L<https://playwright.dev/docs/api/class-Coverage#Coverage-stopCSSCoverage> for more information.
 
 =head2 startJSCoverage(@args)
 
@@ -140,6 +134,12 @@ See L<https://playwright.dev/docs/api/class-Coverage#Coverage-startCSSCoverage> 
 Execute the Coverage::stopJSCoverage playwright routine.
 
 See L<https://playwright.dev/docs/api/class-Coverage#Coverage-stopJSCoverage> for more information.
+
+=head2 stopCSSCoverage(@args)
+
+Execute the Coverage::stopCSSCoverage playwright routine.
+
+See L<https://playwright.dev/docs/api/class-Coverage#Coverage-stopCSSCoverage> for more information.
 
 =head2 on(@args)
 
@@ -194,7 +194,7 @@ George S. Baugh <teodesian@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2020 Troglodyne LLC
+Copyright (c) 2025 Troglodyne LLC
 
 
 Permission is hereby granted, free of charge, to any person obtaining a copy

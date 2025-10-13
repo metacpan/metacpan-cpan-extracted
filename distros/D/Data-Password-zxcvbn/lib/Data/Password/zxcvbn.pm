@@ -6,7 +6,7 @@ use Data::Password::zxcvbn::MatchList;
 use Data::Password::zxcvbn::TimeEstimate qw(estimate_attack_times);
 use Exporter 'import';
 our @EXPORT_OK=qw(password_strength);
-our $VERSION = '1.1.2'; # VERSION
+our $VERSION = '1.1.3'; # VERSION
 # ABSTRACT: Dropbox's password estimation logic
 
 
@@ -62,7 +62,7 @@ Data::Password::zxcvbn - Dropbox's password estimation logic
 
 =head1 VERSION
 
-version 1.1.2
+version 1.1.3
 
 =head1 SYNOPSIS
 

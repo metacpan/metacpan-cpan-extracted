@@ -92,27 +92,27 @@ EOS
     $server->set_app($self->app);
     
     if ($values_h->exists("backlog")) {
-      my $backlog = $values_h->get_int("backlog");
+      my $backlog = $values_h->{"backlog"}->(int);
       $server->set_backlog($backlog);
     }
     
     if ($values_h->exists("clients")) {
-      my $max_clients = $values_h->get_int("clients");
+      my $max_clients = $values_h->{"clients"}->(int);
       $server->set_max_clients($max_clients);
     }
     
     if ($values_h->exists("inactivity-timeout")) {
-      my $inactivity_timeout = $values_h->get_int("inactivity-timeout");
+      my $inactivity_timeout = $values_h->{"inactivity-timeout"}->(int);
       $server->set_inactivity_timeout($inactivity_timeout);
     }
     
     if ($values_h->exists("keep-alive-timeout")) {
-      my $keep_alive_timeout = $values_h->get_int("keep-alive-timeout");
+      my $keep_alive_timeout = $values_h->{"keep-alive-timeout"}->(int);
       $server->set_keep_alive_timeout($keep_alive_timeout);
     }
     
     if ($values_h->exists("requests")) {
-      my $max_requests = $values_h->get_int("requests");
+      my $max_requests = $values_h->{"requests"}->(int);
       $server->set_max_requests($max_requests);
     }
     

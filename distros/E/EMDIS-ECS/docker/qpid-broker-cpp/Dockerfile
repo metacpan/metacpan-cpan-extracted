@@ -16,18 +16,18 @@
 #    directory.
 #
 #    cp ../dist/certfiles.tar.gz .
-#    docker build --network=host -t perlecs/qpid-broker-cpp:0.46-1 .
+#    docker build --network=host -t perlecs/qpid-broker-cpp:0.47-1 .
 #
 #    (the --network=host option may be needed to overcome a build-time error)
 #
 #    Alternatively, use --build-arg to override the GENERATE_NEW_CERTFILES
 #    environment variable at build time.
 #
-#    docker build --build-arg GENERATE_NEW_CERTFILES=YES -t perlecs/qpid-broker-cpp:0.46-1 .
+#    docker build --build-arg GENERATE_NEW_CERTFILES=YES -t perlecs/qpid-broker-cpp:0.47-1 .
 #
 # 3) Run a Docker container based on the image, e.g.
 #
-#    docker run --rm --name=perlecs_qpid_broker_cpp perlecs/qpid-broker-cpp:0.46-1
+#    docker run --rm --name=perlecs_qpid_broker_cpp perlecs/qpid-broker-cpp:0.47-1
 #
 # 4) If needed, start a separate bash shell within the running container and
 #    use it to execute commands such as qpid-stat and qpid-config, e.g.
@@ -42,7 +42,7 @@
 FROM centos:7
 LABEL Maintainer="Joel Schneider <joel@joelschneider.net>" \
       Description="Apache Qpid Broker-CPP" \
-      Version="0.46"
+      Version="0.47"
 
 # hack yum config for post-EOL CentOS 7
 # see also https://superuser.com/questions/1373881/centos-7-cannot-find-a-valid-baseurl-for-repo-base-7-x86-64-when-i-run-yum-upda

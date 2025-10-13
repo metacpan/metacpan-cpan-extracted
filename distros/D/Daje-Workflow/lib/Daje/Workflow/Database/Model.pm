@@ -4,6 +4,7 @@ use Mojo::Base -base, -signatures;
 use Daje::Workflow::Database::Model::Workflow;
 use Daje::Workflow::Database::Model::Context;
 use Daje::Workflow::Database::Model::History;
+use Daje::Workflow::Database::Model::WorkflowConnection;
 
 # NAME
 # ====
@@ -149,8 +150,30 @@ sub insert_history($self, $history_text, $class = " ", $internal =  1) {
     );
 }
 
+sub load_workflow_from_connector_fkey($self, $data) {
+    my $connector = Daje::Workflow::Database::Model::WorkflowConnection->new(db => $self->db);
+
+    $data->{connector_data}->{connector_pkey} = 0 unless $data->{connector_data}->{connector_pkey};
+    my $workflow_fkey = 0;
+
+    if ($data->{connector_data}->{connector_pkey} > 0) {
+        $workflow_fkey = $connector->load($data->{connector_data})->{workflow_fkey};
+    }
+
+    return $workflow_fkey;
+}
+
+sub insert_connector($self, $data) {
+    my $workflow_connections_pkey = Daje::Workflow::Database::Model::WorkflowConnection->new(
+        db => $self->db
+    )->insert($data);
+
+    return $workflow_connections_pkey;
+}
 1;
 __END__
+
+
 
 
 

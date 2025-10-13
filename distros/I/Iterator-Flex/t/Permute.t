@@ -7,7 +7,7 @@ use Iterator::Flex::Permute;
 use Math::BigInt;
 use List::Util 'uniqstr';
 
-use experimental 'declared_refs', 'signatures', 'for_list';
+use experimental 'declared_refs', 'signatures';
 
 # https://en.wikipedia.org/wiki/Permute#k-permutations_of_n
 sub nexpect ( $n, $k ) { Math::BigInt->bfac( $n ) / Math::BigInt->bfac( $n - $k ) }

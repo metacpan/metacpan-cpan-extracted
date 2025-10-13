@@ -2,10 +2,11 @@ package Iterator::Flex::Role::Exhaustion::ImportedThrow;
 
 # ABSTRACT: Imported iterator throws
 
+use v5.28;
 use strict;
 use warnings;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Role::Tiny;
 
@@ -33,9 +34,7 @@ Iterator::Flex::Role::Exhaustion::ImportedThrow - Imported iterator throws
 
 =head1 VERSION
 
-version 0.31
-
-=head1 INTERNALS
+version 0.32
 
 =head1 SUPPORT
 

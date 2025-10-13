@@ -16,14 +16,14 @@ From Perl:
     App::Test::Generator::generate("t/conf/add.conf");
 
     # Generate directly to a file
-    App::Test::Generator::generate("t/conf/add.conf", "t/add_fuzz.t");
+    App::Test::Generator::generate('t/conf/add.conf', 't/add_fuzz.t');
 
 # OVERVIEW
 
 This module takes a formal input/output specification for a routine or
 method and automatically generates test cases. In effect, it allows you
 to easily add comprehensive black-box tests in addition to the more
-common white-box tests typically written for CPAN modules and other
+common white-box tests that are typically written for CPAN modules and other
 subroutines.
 
 The generated tests combine:
@@ -44,9 +44,7 @@ produces a ready-to-run `.t` test script using [Test::Most](https://metacpan.org
 
 It reads configuration files (Perl `.conf` with `our` variables,
 and optional YAML corpus files), and generates a [Test::Most](https://metacpan.org/pod/Test%3A%3AMost)-based
-fuzzing harness in `t/fuzz.t`.
-
-Generates `t/fuzz.t` combining:
+fuzzing harness combining:
 
 - Randomized fuzzing of inputs (with edge cases)
 - Optional static corpus tests from Perl `%cases` or YAML file (`yaml_cases` key)
@@ -56,8 +54,7 @@ Generates `t/fuzz.t` combining:
 ## EDGE CASE GENERATION
 
 In addition to purely random fuzz cases, the harness generates
-deterministic edge cases for parameters that declare `min`, `max`,
-`len`, or `len` in their schema definitions.
+deterministic edge cases for parameters that declare `min`, `max` or `len` in their schema definitions.
 
 For each constraint, three edge cases are added:
 
@@ -82,13 +79,11 @@ Supported constraint types:
 
 - `string`
 
-    Uses strings of lengths one below, equal to, and one above the boundary
-    (minimum length = `len`, maximum length = `len`).
+    Uses strings of lengths one below, equal to, and one above the boundary.
 
 - `arrayref`
 
-    Uses references to arrays of lengths one below, equal to, and one above the boundary
-    (minimum length = `len`, maximum length = `len`).
+    Uses references to arrays of with the number of elements one below, equal to, and one above the boundary.
 
 - `hashref`
 
@@ -96,7 +91,7 @@ Supported constraint types:
     boundary (`min` = minimum number of keys, `max` = maximum number
     of keys).
 
-- `memberof` - optional arrayref of allowed values for a parameter:
+- `memberof` - arrayref of allowed values for a parameter:
 
         our %input = (
             status => { type => 'string', memberof => [ 'ok', 'error', 'pending' ] },
@@ -113,7 +108,7 @@ Supported constraint types:
             flag => { type => 'boolean' },
         );
 
-    The generator will automatically create test cases for 0 and 1, and optionally invalid values that should trigger `_STATUS = 'DIES'`.
+    The generator will automatically create test cases for 0 and 1; true and false; off and on, and values that should trigger `_STATUS = 'DIES'`.
 
 These edge cases are inserted automatically, in addition to the random
 fuzzing inputs, so each run will reliably probe boundary conditions
@@ -121,20 +116,32 @@ without relying solely on randomness.
 
 # CONFIGURATION
 
-The configuration file is a Perl file that should set variables with `our`.
+The configuration file is either a file that can be read by [Config::Abstraction](https://metacpan.org/pod/Config%3A%3AAbstraction) or a **trusted input** Perl file that should set variables with `our`.
+
+The documentation here covers the old trusted input style input, but that will go away so you are recommended to use
+Config::Abstraction files.
 Example: the generator expects your config to use `our %input`, `our $function`, etc.
 
 Recognized items:
 
 - `%input` - input params with keys => type/optional specs:
 
-            our %input = (
-                    name => { type => 'string', optional => 0 },
-                    age => { type => 'integer', optional => 1 },
-            );
+    When using named parameters
+    	our %input = (
+    		name => { type => 'string', optional => 0 },
+    		age => { type => 'integer', optional => 1 },
+    	);
 
     Supported basic types used by the fuzzer: `string`, `integer`, `number`, `boolean`, `arrayref`, `hashref`.
     (You can add more types; they will default to `undef` unless extended.)
+
+    For routines with one unnamed parameter
+
+        our %input = (
+           type => 'string'
+        );
+
+    Currently, routines with more than one unnamed parameter are not supported.
 
 - `%output` - output param types for Return::Set checking:
 
@@ -157,28 +164,41 @@ Recognized items:
 
             our $new = { api_key => 'ABC123', verbose => 1 };
 
-    To ensure new is called with no arguments, you still need to defined new, thus:
+    To ensure new is called with no arguments, you still need to define new, thus:
 
         our $new = '';
 
-- `%cases` - optional Perl static corpus (expected => \[ args... \]):
+- `%cases` - optional Perl static corpus, when the output is a simple string (expected => \[ args... \]):
+
+    Maps the expected output string to the input and \_STATUS
 
         our %cases = (
-          'ok'   => [ 'ping' ],
-          'error'=> [ '' ],
+          'ok'   => {
+              input => 'ping',
+              status => 'OK',
+          'error' =>
+              input => '',
+              status => 'DIES'
         );
 
 - `$yaml_cases` - optional path to a YAML file with the same shape as `%cases`.
 - `$seed` - optional integer. When provided, the generated `t/fuzz.t` will call `srand($seed)` so fuzz runs are reproducible.
 - `$iterations` - optional integer controlling how many fuzz iterations to perform (default 50).
-- `%edge_cases` - optional hash mapping parameter names to arrayrefs of extra values to inject:
+- `%edge_cases` - optional hash mapping of extra values to inject:
 
+            # Two named parameters
             our %edge_cases = (
                     name => [ '', 'a' x 1024, \"\x{263A}" ],
                     age  => [ -1, 0, 99999999 ],
             );
 
+            # Takes a string input
+            our %edge_cases (
+                    'foo', 'bar'
+            );
+
     (Values can be strings or numbers; strings will be properly quoted.)
+    Note that this only works with routines that take named parameters.
 
 - `%type_edge_cases` - optional hash mapping types to arrayrefs of extra values to try for any field of that type:
 
@@ -187,6 +207,14 @@ Recognized items:
                     number  => [ 0, 1.0, -1.0, 1e308, -1e308, 1e-308, -1e-308, 'NaN', 'Infinity' ],
                     integer => [ 0, 1, -1, 2**31-1, -(2**31), 2**63-1, -(2**63) ],
             );
+
+- `%config` - optional hash of configuration.
+
+    The current supported variables are
+
+    - `test_nuls`, inject NUL bytes into strings (default: 1)
+    - `test_undef`, test with undefined value (default: 1)
+    - `dedup`, fuzzing can create duplicate tests, go some way to remove duplicates (default: 1)
 
 # EXAMPLES
 
@@ -245,8 +273,38 @@ A YAML mapping of expected -> args array:
         status => { type => 'string', memberof => [ 'ok', 'error', 'pending' ] },
     );
     our %output = ( type => 'string' );
+    our %config = ( test_nuls => 0, test_undef => 1 );
 
 This will generate fuzz cases for 'ok', 'error', 'pending', and one invalid string that should die.
+
+## New format input
+
+Testing [HTML::Genealogy::Map](https://metacpan.org/pod/HTML%3A%3AGenealogy%3A%3AMap):
+
+    ---
+
+    module: HTML::Genealogy::Map
+    function: onload_render
+
+    input:
+      gedcom:
+        type: object
+        can: individuals
+      geocoder:
+        type: object
+        can: geocode
+      debug:
+        type: boolean
+        optional: true
+      google_key:
+        type: string
+        optional: true
+        min: 39
+        max: 39
+        matches: "^AIza[0-9A-Za-z_-]{35}$"
+
+    config:
+      test_undef: 0
 
 # OUTPUT
 
@@ -262,8 +320,7 @@ The generated test:
 
 # NOTES
 
-\- The conf file must use `our` declarations so variables are visible to the generator via `require`.
-\- Use `srand($seed)` replay to reproduce failing cases. When you get a failure, re-run generator with the same `$seed` to reproduce.
+- The conf file must use `our` declarations so variables are visible to the generator via `require`.
 
 # SEE ALSO
 

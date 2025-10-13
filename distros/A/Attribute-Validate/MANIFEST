@@ -4,8 +4,13 @@ lib/Attribute/Validate.pm
 LICENSE
 MANIFEST			This list of files
 t-modern-perl/0000001-modern-usecase.t
-t/0000001-requires.t
 META.yml
 META.json
 README.md
 Changes
+t/0000001-requires.t
+t/0000002-anon-requires.t
+t/0000003-void-context.t
+t/0000004-list-context.t
+t/0000005-scalar-context.t
+

@@ -16,3 +16,19 @@
 0.0.5 Tue Sep 30 21:24:59 2025 +0200
     - Adding VoidContext validation to enforce how a sub must be used.
     - Adding NoVoidContext validation to enforce how a sub must be used.
+
+0.0.6 Wed Oct 1 19:19:22 2025 +0200
+    - Adding ListContext validation
+    - Adding NoListContext validation
+    - Improving error messages for context errors in anon subs.
+
+0.0.7 Wed Oct 1 19:41:48 2025 +0200
+    - Adding ScalarContext validation
+    - Adding NoScalarContext validation
+    - Fixing references to "function" in the documentation while in Perl they are called subroutines.
+
+0.0.8 Thu Oct 2 23:12:03 2025 +0200
+    - Missing test in the final dist.
+
+0.0.9 Sat Oct 4 13:47:05 2025 +0200
+    - Avoiding $compiled confusing lines.

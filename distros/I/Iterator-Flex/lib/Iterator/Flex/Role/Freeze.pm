@@ -2,10 +2,11 @@ package Iterator::Flex::Role::Freeze;
 
 # ABSTRACT: Role to add serialization capability to an Iterator::Flex::Base
 
+use v5.28;
 use strict;
 use warnings;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use List::Util;
 
@@ -75,7 +76,7 @@ Iterator::Flex::Role::Freeze - Role to add serialization capability to an Iterat
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 METHODS
 
@@ -85,8 +86,6 @@ version 0.31
 
 Returns a recipe to freeze an iterator and its dependencies.  See
 L<Iterator::Flex/"Serialization of Iterators"> for more information.
-
-=head1 INTERNALS
 
 =head1 SUPPORT
 

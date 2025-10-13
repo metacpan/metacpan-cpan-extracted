@@ -3,7 +3,7 @@ package Specio::Subs;
 use strict;
 use warnings;
 
-our $VERSION = '0.52';
+our $VERSION = '0.53';
 
 use Carp            qw( croak );
 use Eval::Closure   qw( eval_closure );
@@ -186,7 +186,7 @@ Specio::Subs - Make validation and coercion subs from Specio types
 
 =head1 VERSION
 
-version 0.52
+version 0.53
 
 =head1 SYNOPSIS
 

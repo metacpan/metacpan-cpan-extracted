@@ -184,6 +184,11 @@ name starts with C<:>, a prefix (defaulting to C<Controller:>) is
 automatically prepended. This prefix can be customized using
 L<C<set_prefix>|/set_prefix>.
 
+B<Note:> When using L<Minima::Router> through the default Minima::App,
+the controller prefix may also be set via the
+L<C<controller_prefix>|Minima::App/controller_prefix> configuration key,
+without needing to call C<set_prefix> directly.
+
 This may be left blank only if the next column is also blank, which will
 be translated as C<undef> in the match hash.
 
@@ -271,6 +276,12 @@ more than one file.
 
 Sets the prefix for completing controller names when using the C<:>
 notation. Defaults to C<Controller>. See L</Controller> for details.
+
+If you are using Minima::Router through the default L<Minima::App>
+integration, you do not need to call this method directly. Instead, set
+the L<C<controller_prefix>|Minima::App/controller_prefix> key in the
+configuration hash passed to Minima::App, and it will configure the
+router automatically.
 
 =head1 SEE ALSO
 

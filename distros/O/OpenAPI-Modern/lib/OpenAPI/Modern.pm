@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.096-13-g7a35922
+package OpenAPI::Modern; # git description: v0.097-15-g5b274315
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.1 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.1 Swagger HTTP request response
 
-our $VERSION = '0.097';
+our $VERSION = '0.098';
 
 use 5.020;
 use utf8;
@@ -144,14 +144,11 @@ sub validate_request ($self, $request, $options = {}) {
           $request_parameters_processed->{$param_obj->{in}}{$fc_name} = $section;
         }
 
-        $state->{data_path} = jsonp('/request',
-          ((grep $param_obj->{in} eq $_, qw(path query)) ? 'uri' : ()), $param_obj->{in},
-          $param_obj->{name});
         my $valid =
             $param_obj->{in} eq 'path' ? $self->_validate_path_parameter({ %$state, depth => $state->{depth}+1 }, $param_obj, $options->{path_captures})
           : $param_obj->{in} eq 'query' ? $self->_validate_query_parameter({ %$state, depth => $state->{depth}+1 }, $param_obj, $request->url)
           : $param_obj->{in} eq 'header' ? $self->_validate_header_parameter({ %$state, depth => $state->{depth}+1 }, $param_obj->{name}, $param_obj, $request->headers)
-          : $param_obj->{in} eq 'cookie' ? $self->_validate_cookie_parameter({ %$state, depth => $state->{depth}+1 }, $param_obj, $request)
+          : $param_obj->{in} eq 'cookie' ? $self->_validate_cookie_parameter({ %$state, depth => $state->{depth}+1 }, $param_obj)
           : abort($state, 'unrecognized "in" value "%s"', $param_obj->{in});
       }
     }
@@ -183,7 +180,7 @@ sub validate_request ($self, $request, $options = {}) {
         and not $request->content->is_chunked;
 
     if (my $body_obj = $operation->{requestBody}) {
-      $state->{keyword_path} = $state->{keyword_path}.'/requestBody';
+      $state->{keyword_path} .= '/requestBody';
 
       while (defined(my $ref = $body_obj->{'$ref'})) {
         $body_obj = $self->_resolve_ref('request-body', $ref, $state);
@@ -299,8 +296,7 @@ sub validate_response ($self, $response, $options = {}) {
         $header_obj = $self->_resolve_ref('header', $ref, $state);
       }
 
-      ()= $self->_validate_header_parameter({ %$state,
-          data_path => jsonp('/response/header', $header_name), depth => $state->{depth}+1 },
+      ()= $self->_validate_header_parameter({ %$state, depth => $state->{depth}+1 },
         $header_name, $header_obj, $response->headers);
     }
 
@@ -360,9 +356,9 @@ sub find_path ($self, $options, $state = {}) {
     $method = $options->{method};
   }
 
-  my ($path_template, $operation_path);
+  my $operation_path;
 
-  # path_template and method from operation_id from options
+  # method from operation_id from options
   if (exists $options->{operation_id}) {
     # FIXME: what if the operation is defined in another document? Need to look it up across
     # all documents, and localize $state->{initial_schema_uri}
@@ -370,32 +366,24 @@ sub find_path ($self, $options, $state = {}) {
     return E({ %$state, recommended_response => [ 500 ] }, 'unknown operation_id "%s"', $options->{operation_id})
       if not $operation_path;
 
+    # The path_template cannot be unambiguously found by looking at the path of the operation:
+    # the operation path may be under /components/pathItems or /webhooks, or the intended /paths
+    # entry might contain a $ref to this location.
+    # We can do a URI -> path_template lookup later on, which will succeed if the operation is
+    # reachable from a /paths entry, but as this can possibly match more than once, in order to
+    # provide an unambiguous result, provide the operation_id as well.
+
     # the operation path always ends with the method
-    ($path_template, $method) = (unjsonp($operation_path))[-2,-1];
-    $method = uc $method;
+    my @parts = unjsonp($operation_path);
+    ((my $path_item_path), $method) = (jsonp(@parts[0..$#parts-1]), uc($parts[-1]));
 
-    # The path_template cannot be found if the operation path is not directly under /paths (such as
-    # for path-items reached by a $ref): we will do a URI -> path_template lookup later on,
-    # which will work as long as the operation does not correspond to a webhook or callback.
-    # TODO: need a mechanism for specifying these for validate_request
-    # FIXME: if the request's real 'path' has a $ref to this path-item, we will find the wrong
-    # path_template, and the subsequent _match_uri check will fail.
-    if ($operation_path ne jsonp('/paths', $path_template, lc $method)) {
-      undef $path_template;
-    }
-    else {
-      # the path_template need not be provided, but if it is, the operation must be located at the
-      # path-item directly underneath that /paths/<path_template>.
-      return E({ %$state, keyword_path => $operation_path.'/operationId', recommended_response => [ 500 ] },
-          'operation at operation_id does not match provided path_template')
-        if exists $options->{path_template} and $options->{path_template} ne $path_template;
-    }
-
-    if ($options->{method} and $options->{method} ne $method) {
-      delete $options->{operation_id};
-      return E({ %$state, ($options->{request} ? ( data_path => '/request/method' ) : ()), keyword_path => $operation_path.'/operationId' },
-        'operation at operation_id does not match HTTP method "%s"', $options->{method});
-    }
+    return E({ %$state, ($options->{request} ? (data_path => '/request/method') : ()), keyword_path => $operation_path.'/operationId' },
+        'operation at operation_id does not match %s method "%s"%s',
+          exists $options->{request} ? 'request' : 'provided HTTP', $options->{method},
+          (!exists $options->{request} && $options->{method} eq lc $options->{method}
+              && exists $self->openapi_document->get($path_item_path)->{$options->{method}}
+            ? (' (should be '.uc $options->{method}.')') : ''))
+      if $options->{method} and $options->{method} ne $method;
 
     $options->{method} = $method;
   }
@@ -411,14 +399,11 @@ sub find_path ($self, $options, $state = {}) {
   my $schema = $self->openapi_document->schema;
 
   # path_template from options
-  if (exists $options->{path_template}) {
-    $path_template = $options->{path_template};
+  return E({ %$state, (exists $options->{request} ? (data_path => '/request/uri') : ()),
+        keyword => 'paths' }, 'missing path "%s"', $options->{path_template})
+    if exists $options->{path_template} and not exists $schema->{paths}{$options->{path_template}};
 
-    return E({ %$state, data_path => '/request/uri', keyword => 'paths' }, 'missing path-item "%s"', $path_template)
-      if not exists $schema->{paths}{$path_template};
-  }
-
-  if (not $path_template and not $options->{request}) {
+  if (not $options->{path_template} and not $options->{request}) {
     # some operations don't exist directly under a /paths/$path_template - e.g. webhooks or
     # callbacks, but they are still usable
     my $path_item_path = $operation_path =~ s{/\L$method$}{}r;
@@ -433,40 +418,50 @@ sub find_path ($self, $options, $state = {}) {
 
   my $captures;  # hashref of template variable names -> concrete values from the uri
 
-  if (not $path_template and $options->{request}) {
+  if (not $options->{path_template} and $options->{request}) {
     # derive path_template and capture values from the request URI
 
     # sorting (ascii-wise) gives us the desired results that concrete path components sort ahead of
     # templated components, except when the concrete component is a non-ascii character or matches
     # 0x7c (pipe), 0x7d (close-brace) or 0x7e (tilde)
     foreach my $pt (sort keys(($schema->{paths}//{})->%*)) {
-      $state->{path_item} = $schema->{paths}{$pt};
-      $state->{keyword_path} = jsonp('/paths', $pt);
-      $captures = $self->_match_uri($options->{request}->method, $options->{request}->url, $pt, $state);
+      my $local_state = +{ %$state };
+      $local_state->{path_item} = $schema->{paths}{$pt};
+      $local_state->{keyword_path} = jsonp('/paths', $pt);
+      $captures = $self->_match_uri($options->{request}->method, $options->{request}->url, $pt, $local_state);
 
-      # note: this might not be the intended match, as multiple templates can match the same URI
-      $path_template = $pt, last if $captures;
+      if ($captures) {
+        # a URI can match multiple /paths entries, and an operationId can be reachable from multiple
+        # /paths entries, so keep searching until both are a match
+        next if exists $options->{operation_id}
+          and (not exists $local_state->{path_item}{lc $method}{operationId}
+            or $local_state->{path_item}{lc $method}{operationId} ne $options->{operation_id});
 
-      # the initial match succeeded, but something else went wrong and we will still stop iterating
-      if ($state->{errors}->@*) {
+        %$state = %$local_state;
+        $options->{path_template} = $pt;
+        last;
+      }
+
+      # something went wrong, but the match succeeded so we will stop iterating
+      if ($local_state->{errors}->@*) {
+        %$state = %$local_state;
         $options->{path_template} = $pt;
         $options->{_path_item} = $state->{path_item};
         return;
       }
     }
 
-    return E({ %$state, data_path => '/request', keyword_path => '', keyword => 'paths' },
-        'no match found for request %s "%s"',
+    return E({ %$state, data_path => '/request', keyword => 'paths' },
+        'no match found for request %s %s',
         $options->{request}->method, $options->{request}->url->clone->query('')->fragment(undef))
-      if not $captures;
+      if not exists $options->{path_template};
   }
 
   elsif ($options->{request}) {
-    # we were passed path_template in options or we calculated it from operation_id, and now we
-    # verify it against path_captures and the request URI.
-    $state->{path_item} = $schema->{paths}{$path_template};
-    $state->{keyword_path} = jsonp('/paths', $path_template);
-    $captures = $self->_match_uri($options->{request}->method, $options->{request}->url, $path_template, $state);
+    # we were passed path_template in options, and now we verify it against the request URI
+    $state->{path_item} = $schema->{paths}{$options->{path_template}};
+    $state->{keyword_path} = jsonp('/paths', $options->{path_template});
+    $captures = $self->_match_uri($options->{request}->method, $options->{request}->url, $options->{path_template}, $state);
 
     if (not $captures) {
       #  no path-item and operation found that matches the request's method and uri
@@ -474,52 +469,52 @@ sub find_path ($self, $options, $state = {}) {
 
       # the initial match succeeded, but something else went wrong
       if ($state->{errors}->@*) {
-        $options->{path_template} = $path_template;
         $options->{_path_item} = $state->{path_item};
         return;
       }
 
-      if (exists $options->{path_template}) {
-        return E({ %$state, data_path => '/request/uri',
-            keyword_path => jsonp('/paths', $path_template), recommended_response => [ 500 ] },
-          'provided path_template does not match request URI "%s"',
-          $options->{request}->url->clone->query('')->fragment(undef));
-      }
-      else {
-        return E({ %$state, data_path => '/request/uri',
-            keyword_path => $operation_path.'/operationId', recommended_response => [ 500 ] },
-          'provided operation_id does not match request %s %s',
-          $options->{request}->method, $options->{request}->url->clone->query('')->fragment(undef));
-      }
+      return E({ %$state, data_path => '/request/uri', recommended_response => [ 500 ] },
+        'provided path_template does not match request URI "%s"',
+        $options->{request}->url->clone->query('')->fragment(undef));
+    }
+
+    if (exists $options->{operation_id}
+        and (not exists $state->{path_item}{lc $method}{operationId}
+          or $state->{path_item}{lc $method}{operationId} ne $options->{operation_id})) {
+      delete $options->@{qw(_path_item path_captures uri_captures operation_uri)};
+      return E({ %$state, keyword_path => jsonp($state->{keyword_path}, lc $method,
+          (exists $state->{path_item}{lc $method}{operationId} ? 'operationId' : ())),
+          recommended_response => [ 500 ] },
+        'provided path_template and operation_id do not match request %s %s',
+        $options->{request}->method, $options->{request}->url->clone->query('')->fragment(undef));
     }
   }
 
   else {
     # we were provided $options->{path_template}, and we have already confirmed that it exists.
-    $state->{path_item} = $schema->{paths}{$path_template};
-    $state->{keyword_path} = jsonp('/paths', $path_template);
+    $state->{path_item} = $schema->{paths}{$options->{path_template}};
+    $state->{keyword_path} = jsonp('/paths', $options->{path_template});
     while (defined(my $ref = $state->{path_item}{'$ref'})) {
       $state->{path_item} = $self->_resolve_ref('path-item', $ref, $state);
     }
+
+    return E({ %$state, recommended_response => [ 405 ] },
+        'missing operation for HTTP method "%s" under "%s"%s', $method, $options->{path_template},
+        exists $options->{method} && $options->{method} eq lc $options->{method}
+          && exists $state->{path_item}{$options->{method}} ? (' (should be '.uc $method.')') : '')
+      if $options->{method} ne uc $method # all currently-supported methods are uppercased
+        or not exists $state->{path_item}{lc $method};
+
+    return E({ %$state, keyword_path => jsonp($state->{keyword_path}, lc $method,
+          (exists $state->{path_item}{lc $method}{operationId} ? 'operationId' : ())),
+        recommended_response => [ 500 ] },
+        'templated operation does not match provided operation_id')
+      if exists $options->{operation_id}
+        and (not exists $state->{path_item}{lc $method}{operationId}
+          or $state->{path_item}{lc $method}{operationId} ne $options->{operation_id});
   }
 
-  # if we weren't passed a request, we can't verify that the path_template matches, but we may have
-  # derived it from looking upward from the operation_id
-  $options->{path_template} = $path_template;
   $options->{_path_item} = $state->{path_item};
-
-  # this can only happen if we were not able to derive the path_template from the provided
-  # operation_id earlier, but we still matched the request against some other path-item
-  return E({ %$state, recommended_response => [ 500 ] }, 'templated operation does not match provided operation_id')
-    if exists $options->{operation_id}
-      and (($options->{_path_item}{lc $method}//{})->{operationId}//'') ne $options->{operation_id};
-
-  # this can only happen if we do not have a request object, as otherwise a missing operation is
-  # simply reported as a match failure
-  return E({ %$state, data_path => '/request/method', recommended_response => [ 405 ] },
-      'missing operation for HTTP method "%s" under "%s"%s', $method, $path_template,
-      exists $options->{_path_item}{lc $method} ? (' (should be '.uc $method.')') : '')
-    if $method ne uc $method or not exists $options->{_path_item}{lc $method};
 
   # if initial_schema_uri still points to the head of the entry document, then we have not followed
   # a $ref and the path-item is located at /paths/<path_template>
@@ -531,8 +526,8 @@ sub find_path ($self, $options, $state = {}) {
 
   # note: we aren't doing anything special with escaped slashes. this bit of the spec is hazy.
   # { for the editor
-  my @path_capture_names = ($path_template =~ m!\{([^}]+)\}!g);
-  return E({ %$state, $options->{request} ? ( data_path => '/request/uri' ) : (), recommended_response => [ 500 ] }, 'provided path_captures names do not match path template "%s"', $path_template)
+  my @path_capture_names = ($options->{path_template} =~ m!\{([^}]+)\}!g);
+  return E({ %$state, $options->{request} ? (data_path => '/request/uri') : (), recommended_response => [ 500 ] }, 'provided path_captures names do not match path template "%s"', $options->{path_template})
     if exists $options->{path_captures}
       and not is_equal([ sort keys $options->{path_captures}->%* ], [ sort @path_capture_names ]);
 
@@ -541,7 +536,7 @@ sub find_path ($self, $options, $state = {}) {
   my @uri_capture_names = keys %$captures;
 
   if (exists $options->{uri_captures}) {
-    return E({ %$state, $options->{request} ? ( data_path => '/request/uri' ) : (), recommended_response => [ 500 ] },
+    return E({ %$state, $options->{request} ? (data_path => '/request/uri') : (), recommended_response => [ 500 ] },
         'provided uri_captures names do not match extracted values')
       if not is_equal([ sort keys $options->{uri_captures}->%* ], [ sort @uri_capture_names ]);
 
@@ -722,10 +717,13 @@ sub _match_uri ($self, $method, $uri, $path_template, $state) {
 }
 
 sub _validate_path_parameter ($self, $state, $param_obj, $path_captures) {
+  $state->{data_path} .= '/uri/path';
+
   # 'required' is always true for path parameters
-  return E({ %$state, data_path => $state->{data_path} =~ s{/$param_obj->{name}$}{}r, keyword => 'required' },
-      'missing path parameter: %s', $param_obj->{name})
+  return E({ %$state, keyword => 'required' }, 'missing path parameter: %s', $param_obj->{name})
     if not exists $path_captures->{$param_obj->{name}};
+
+  $state->{data_path} = jsonp($state->{data_path}, $param_obj->{name});
 
   my $data = $path_captures->{$param_obj->{name}};
   $data .= '';
@@ -750,16 +748,18 @@ sub _validate_path_parameter ($self, $state, $param_obj, $path_captures) {
 }
 
 sub _validate_query_parameter ($self, $state, $param_obj, $uri) {
+  $state->{data_path} .= '/uri/query';
+
   # parse the query parameters out of uri
   my $query_params = +{ $uri->query->pairs->@* };
 
   if (not exists $query_params->{$param_obj->{name}}) {
-    return E({ %$state, data_path => $state->{data_path} =~ s{/$param_obj->{name}$}{}r, keyword => 'required' },
-        'missing query parameter: %s', $param_obj->{name})
+    return E({ %$state, keyword => 'required' }, 'missing query parameter: %s', $param_obj->{name})
       if $param_obj->{required};
     return 1;
   }
 
+  $state->{data_path} = jsonp($state->{data_path}, $param_obj->{name});
   my $data = $query_params->{$param_obj->{name}};
 
   return $self->_validate_parameter_content({ %$state, depth => $state->{depth}+1 }, $param_obj, \$data)
@@ -801,12 +801,15 @@ sub _validate_query_parameter ($self, $state, $param_obj, $uri) {
 sub _validate_header_parameter ($self, $state, $header_name, $header_obj, $headers) {
   return 1 if grep fc $header_name eq fc $_, qw(Accept Content-Type Authorization);
 
+  $state->{data_path} .= '/header';
+
   if (not $headers->every_header($header_name)->@*) {
-    return E({ %$state, data_path => $state->{data_path} =~ s{/$header_name$}{}r,
-        keyword => 'required' }, 'missing header: %s', $header_name)
+    return E({ %$state, keyword => 'required' }, 'missing header: %s', $header_name)
       if $header_obj->{required};
     return 1;
   }
+
+  $state->{data_path} = jsonp($state->{data_path}, $header_name);
 
   # validate as a single comma-concatenated string, presumably to be decoded
   return $self->_validate_parameter_content({ %$state, depth => $state->{depth}+1 }, $header_obj, \ $headers->header($header_name))
@@ -856,7 +859,9 @@ sub _validate_header_parameter ($self, $state, $header_name, $header_obj, $heade
   $self->_evaluate_subschema(\$data, $header_obj->{schema}, $state);
 }
 
-sub _validate_cookie_parameter ($self, $state, $param_obj, $request) {
+sub _validate_cookie_parameter ($self, $state, $param_obj, @args) {
+  $state->{data_path} = jsonp($state->{data_path}, qw(headers Cookie), $param_obj->{name});
+
   return E($state, 'cookie parameters not yet supported');
 }
 
@@ -874,7 +879,7 @@ sub _validate_body_content ($self, $state, $content_obj, $message) {
   # strip media-type parameters (e.g. charset) from Content-Type
   my $content_type = (split(/;/, $message->headers->content_type//'', 2))[0] // '';
 
-  return E({ %$state, data_path => $state->{data_path} =~ s{body}{header}r, keyword => 'content' },
+  return E({ %$state, data_path => $state->{data_path} =~ s{body$}{header}r, keyword => 'content' },
       'missing header: Content-Type')
     if not length $content_type;
 
@@ -956,11 +961,11 @@ sub _result ($self, $state, $is_exception = 0, $is_response = 0) {
     output_format => $self->evaluator->output_format,
     formatted_annotations => 0,
     valid => !$state->{errors}->@*,
-    $is_exception ? ( exception => 1 ) : (), # -> recommended_response: [ 500, 'Internal Server Error' ]
+    $is_exception ? (exception => 1) : (), # -> recommended_response: [ 500, 'Internal Server Error' ]
     !$state->{errors}->@*
       ? (annotations => $state->{annotations}//[])
       : (errors => $state->{errors}),
-    $is_response ? ( recommended_response => undef ) : (),  # responses don't have responses
+    $is_response ? (recommended_response => undef) : (),  # responses don't have responses
   );
 }
 
@@ -1036,7 +1041,7 @@ sub _evaluate_subschema ($self, $dataref, $schema, $state) {
     {
       data_path => $state->{data_path},
       traversed_keyword_path => $state->{traversed_keyword_path}.$state->{keyword_path},
-      $state->{stringy_numbers} ? ( stringy_numbers => 1 ) : (),
+      $state->{stringy_numbers} ? (stringy_numbers => 1) : (),
     },
   );
 
@@ -1141,7 +1146,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.1 d
 
 =head1 VERSION
 
-version 0.097
+version 0.098
 
 =head1 SYNOPSIS
 
@@ -1452,7 +1457,13 @@ C<uri_captures>: a hashref mapping placeholders in the entire uri template (serv
 
 =item *
 
-C<operation_uri>: a URI indicating the document location of the operation object for the request, after following any references (usually something under C</paths/>, but may be in another document). Use C<< $openapi->evaluator->get($uri) >> to fetch this content (see L<JSON::Schema::Modern/get>). Note that this is the same as C<< $openapi->recursive_get(Mojo::URL->new->fragment(JSON::Schema::Modern::Utilities::jsonp('/paths', $options->{path_template}{$options->{method}}))) >>. (See the documentation for an operation at L<https://learn.openapis.org/specification/paths.html#the-endpoints-list> or in the specification at L<§4.8.10 of the specification|https://spec.openapis.org/oas/v3.1#operation-object>.)
+C<operation_uri>: a URI indicating the document location of the operation object for the request, after following any references (usually something under C</paths/>, but may be in another document). Use C<< $openapi->evaluator->get($uri) >> to fetch this content (see L<JSON::Schema::Modern/get>). Note that this is the same as:
+
+    $openapi->document_get(Mojo::URL->new($openapi->openapi_uri)->fragment(< path to operation >);
+
+(See the documentation for an operation at L<https://learn.openapis.org/specification/paths.html#the-endpoints-list>
+or in the specification at
+L<§4.8.10 of the specification|https://spec.openapis.org/oas/v3.1#operation-object>.)
 
 =item *
 

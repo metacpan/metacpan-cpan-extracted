@@ -1,0 +1,4 @@
+# corpus-camelize.yml
+"FooBar::Baz":        ["foo_bar-baz"]
+"Hello::World":       ["hello-world"]
+"DbIx::Class":        ["db_ix-class"]

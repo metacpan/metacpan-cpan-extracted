@@ -1,0 +1,12 @@
+Revision history for Win32::Pipe::PP
+
+0.1.1  2025-10-04
+    - Hide my Win32::Pipe package from CPAN
+
+0.1.0  2025-10-04
+    - Pure Perl implementation of Win32::Pipe
+    - Full API compatibility with XS version
+    - IPC support via get_Win32_IPC_HANDLE
+
+0.0.1  2025-10-01
+    - Initial release

@@ -18,6 +18,7 @@ use File::Copy qw(copy move);
 use File::Spec::Functions qw(catdir catfile);
 use File::Temp qw(tempfile);
 use Getopt::Long;
+use JSON::PP qw(encode_json);
 use Time::HiRes qw(gettimeofday);
 use Env qw(ECS_CONFIG_FILE);
 
@@ -39,7 +40,7 @@ my $usage =
     "    --maildrop [filename]\n" .
     "    --meta <node> <msg_type> [seq_num[:part_num] [seq2]]\n" .
     "    --modify <node> <addr> <addr_r> <encr_typ> [encr_sig]\n" .
-    "    --nodedata <import|export> <filename> [node]\n" .
+    "    --nodedata <import|export|jsondump> <filename> [node]\n" .
     "    --overview\n" .
     "    --prune <node> <seq1> <seq2>\n" .
     "    --send [node] [filename]\n" .
@@ -775,7 +776,7 @@ if($opt_nodedata) {
         print "Done.\n";
         $ECS_NODE_TBL->unlock();  # unlock node_tbl
     }
-    elsif($operation eq 'export') {
+    elsif($operation eq 'export' or $operation eq 'jsondump') {
         $ECS_NODE_TBL->lock()     # lock node_tbl
             or die "Error: unable to lock node_tbl: " .
                 $ECS_NODE_TBL->ERROR . "\n";
@@ -790,13 +791,18 @@ if($opt_nodedata) {
         my $fh = new IO::File;
         die "Unable to open file: $filename"
             unless $fh->open("> $filename");
-        my $dumper = Data::Dumper->new([$nodedata],['nodedata']);
-        $dumper->Sortkeys(1);
-        print $fh $dumper->Dump();
+        if($operation eq 'export') {
+            my $dumper = Data::Dumper->new([$nodedata],['nodedata']);
+            $dumper->Sortkeys(1);
+            print $fh $dumper->Dump();
+        }
+        else {
+            print $fh encode_json $nodedata;
+        }
         close $fh;
     }
     else {
-        die "Unrecognized operation:  $operation.  Expected import or export.\n";
+        die "Unrecognized operation:  $operation.  Expected import, export, or jsondump.\n";
     }
 }
 

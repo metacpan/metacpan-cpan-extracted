@@ -1,5 +1,9 @@
 Revision history for Params-Validate-Strict
 
+0.15	Thu Oct  9 16:48:57 EDT 2025
+	Added float as a synomym of number
+	Do string compares on bools for edge case testing
+
 0.14	Mon Sep 29 15:17:39 EDT 2025
 	Support optionals for memberof
 	Min/max make no sense with memberof

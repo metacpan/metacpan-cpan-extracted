@@ -2,9 +2,15 @@ bin/fuzz-harness-generator
 Changes
 examples/example1.conf
 examples/example2.conf
+examples/html_genealogy_map.conf
 examples/math_simple_add.conf
 examples/math_simple_add.yml
-examples/text_names_abbreviate
+examples/text_names_abbreviate.conf
+github_2/camelize.conf
+github_2/corpus-camelize.yml
+github_2/corpus-decamelize.yml
+github_2/decamelize.conf
+github_2/Util.pm
 lib/App/Test/Generator.pm
 LICENSE
 Makefile.PL
@@ -13,17 +19,23 @@ MANIFEST.SKIP
 README.md
 scripts/generate_index.pl
 t/10-compile.t
-t/basics.t
+t/30-basics.t
 t/conf-corpus.t
 t/conf-fuzz.t
 t/conf/add.conf
+t/conf/html_genealogy_map.conf
+t/conf/html_genealogy_map.yml
 t/conf/math_simple_add.conf
 t/conf/math_simple_add.yml
 t/eof.t
 t/eol.t
+t/generate.t
+t/html_genealogy_map.t
 t/pod-cm.t
 t/pod-coverage.t
+t/pod-spelling.t
 t/pod-synopsis.t
 t/pod.t
+t/vars.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

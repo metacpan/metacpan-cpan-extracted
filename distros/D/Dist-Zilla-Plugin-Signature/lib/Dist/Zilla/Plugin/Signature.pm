@@ -1,7 +1,5 @@
 package Dist::Zilla::Plugin::Signature;
-BEGIN {
-  $Dist::Zilla::Plugin::Signature::VERSION = '1.100930';
-}
+$Dist::Zilla::Plugin::Signature::VERSION = '1.252770';
 use Moose;
 with 'Dist::Zilla::Role::FileGatherer';
 with 'Dist::Zilla::Role::BeforeArchive';
@@ -76,7 +74,7 @@ Dist::Zilla::Plugin::Signature - sign releases with Module::Signature
 
 =head1 VERSION
 
-version 1.100930
+version 1.252770
 
 =head1 DESCRIPTION
 
@@ -102,9 +100,12 @@ This attribute can be overridden by an environment variable C<DZSIGN>
 
   Graham Barr <gbarr@pobox.com>
 
+  Mikko Koivunalho <mikkoi@cpan.org>
+
 =head1 COPYRIGHT AND LICENSE
 
 This software is copyright (c) 2010 by Graham Barr.
+This software is copyright (c) 2025 by Mikko Koivunalho.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

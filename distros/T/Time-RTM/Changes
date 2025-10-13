@@ -1,5 +1,8 @@
 Revision history for Perl module Time::RTM
 
+1.15 2024-12-11 CADE
+  - scope object adds set_keys() to change/set scope keys before finishing
+
 1.14 2024-12-03 CADE
   - rt bug typo in Time::RTM::Scope
 

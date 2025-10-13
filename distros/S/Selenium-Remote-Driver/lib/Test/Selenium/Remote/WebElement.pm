@@ -1,5 +1,5 @@
 package Test::Selenium::Remote::WebElement;
-$Test::Selenium::Remote::WebElement::VERSION = '1.49';
+$Test::Selenium::Remote::WebElement::VERSION = '1.50';
 # ABSTRACT: A sub-class of L<Selenium::Remote::WebElement>, with several test-specific method additions.
 
 use Moo;
@@ -63,6 +63,10 @@ sub BUILD {
 1;
 
 __END__
+
+=head1 NAME
+
+Test::Selenium::Remote::WebElement - Test using Selenium::Remote::WebElement
 
 =head1 DESCRIPTION
 

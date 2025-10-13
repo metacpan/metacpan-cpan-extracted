@@ -1,0 +1,20 @@
+#use Test::More;
+use v5.36;
+use Template::Plex;
+use Data::Dumper;
+
+my $template="THis is a teplate"x1024;
+
+my $i=0;
+for(0..100000){
+
+  my $t=Template::Plex->load([$template]);
+  $t->render;
+  $t->cleanup;
+  #$t->render;
+#say STDERR $i++;
+#say STDERR Dumper $t;
+}
+
+
+#done_testing;

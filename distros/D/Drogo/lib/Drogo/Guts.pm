@@ -406,7 +406,7 @@ sub request_part
 Return a parameter passed via CGI--works like CGI::param.
 
 =cut
-
+warn 'drogo';
 sub param 
 {
     my ($self, $lookup_key) = @_;
@@ -415,6 +415,9 @@ sub param
     my %seen_hash;
     my $request = $request_data{args};
 
+    use Data::Dumper;
+    warn Dumper \%request_data;
+    
     if ($request_data{request_parts})
     {
         for my $part (@{$request_data{request_parts}})
@@ -424,7 +427,7 @@ sub param
 
             if ($lookup_key)
             {
-                push @values, __PACKAGE__->unescape($part->{data})
+                push @values, $part->{data}
                     if $lookup_key eq $part->{name};
             }
             else
@@ -820,7 +823,13 @@ sub process_auto_header
 
     $request_data{headers}{'Content-Type'} = $content_type;
 
-    __PACKAGE__->server->print($request_data{output});
+    open(my $ofh, '<', \$request_data{output});
+    my $buffer;
+    while (read($ofh, $buffer, 1024))
+    {
+        __PACKAGE__->server->print($buffer);
+    }
+    close($ofh);
 
     __PACKAGE__->flush;
 }

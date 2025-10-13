@@ -1,3 +1,24 @@
+0.027 2025-10-10
+  [Requirement Changes]
+    * Require SPVM 0.990102.
+  [Changes]
+    * Improve Mojo::Parameters.
+    * Improve Mojo::Path.
+    * Improve Mojo::UserAgent.
+    * Remove all xxx_list fields.
+  
+  [Internal Changes]
+    * Use hash access syntax.
+  
+0.026 2025-10-09
+  [Internal Changes]
+    * Clean up the code.
+    
+0.025 2025-09-29
+  [Requirement Changes]
+    * Require SPVM 0.990092.
+  [Changes]
+    * Improve server related classes.
 0.024 2025-09-25
   [Changes]
     * Improve server related classes.

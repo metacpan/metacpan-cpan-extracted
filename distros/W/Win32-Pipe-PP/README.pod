@@ -1,0 +1,94 @@
+=head1 NAME
+
+Win32::Pipe::PP - Pure Perl replacement for Win32::Pipe using Win32::API
+
+=head1 OVERVIEW
+
+This module provides a pure Perl implementation of L<Win32::Pipe>, 
+using L<Win32::API> to bind directly to native Windows system calls. It is 
+designed as a drop-in replacement for the original XS-based module, with API 
+compatibility and improved maintainability.
+
+=head1 GOALS
+
+=over
+
+=item * Eliminate XS dependency for easier installation and portability
+
+=item * Provide full API compatibility with Win32::Pipe
+
+=item * Support IPC integration via C<get_Win32_IPC_HANDLE>
+
+=item * Enable modular testing and extensibility
+
+=back
+
+=head1 DIFFERENCES
+
+=over
+
+=item * No XS or compiled components - implemented entirely in Perl
+
+=item * Message mode and advanced flags are simplified or stubbed
+
+=item * Overlapped I/O is not yet supported
+
+=back
+
+=head1 IMPROVEMENTS
+
+=over
+
+=item * C<Read()> handles ERROR_MORE_DATA correctly and returns complete data
+
+=item * Consistent error reporting via C<Error()>
+
+=item * IPC compatibility without inheritance - via C<get_Win32_IPC_HANDLE>
+
+=item * Clean separation of pipe handle and metadata for event loops
+
+=back
+
+=head1 PROJECT STRUCTURE
+
+This distribution follows CPAN best practices for layout and packaging:
+
+  Win32-Pipe-PP/
+  !
+  +-- LICENSE                  # MIT license text
+  +-- Makefile.PL              # Build script using ExtUtils::MakeMaker
+  +-- Changes                  # Version history and release notes
+  +-- MANIFEST.SKIP            # Patterns to exclude from MANIFEST
+  +-- MANIFEST                 # List of files included in the CPAN distribution
+  +-- .gitignore               # Git exclusion rules for build artifacts, etc.
+  +-- README.pod               # Project overview, goals, differences
+  +-- lib/
+  !   '-- Win32/
+  !       '-- Pipe/
+  !           '-- PP.pm        # Main module with full POD
+  +-- t/                       # Public test suite (runs via "make test")
+  !   +-- 01_load.t            # Constructor usage
+  !   +-- 02_api_compat.t      # API compatibility with XS version
+  !   +-- 03_behavior.t        # Expected behavior under normal conditions
+  !   +-- 04_error_codes.t     # Error handling and return values
+  !   +-- 05_read_write.t      # Client server test
+  !   +-- 06_ipc_support.t     # Compatibility with Win32::IPC::wait_any
+  +-- .github/
+  !   '-- workflows/
+  !       '-- ci.yml           # GitHub Actions workflow for automated testing
+
+=head1 AUTHOR
+
+J. Schneider <brickpool@cpan.org>
+
+=head1 LICENSE
+
+MIT License - see LICENSE file for full text. However, this library distributes 
+and references code from other open source projects that have their own 
+licenses.
+
+=head1 CREDITS
+
+Special thanks go to David Roth for creating L<Win32::Pipe>
+
+=cut

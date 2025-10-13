@@ -1,6 +1,6 @@
 package Bio::MUST::Drivers::Exonerate::Sugar;
 # ABSTRACT: Internal class for exonerate driver
-$Bio::MUST::Drivers::Exonerate::Sugar::VERSION = '0.251060';
+$Bio::MUST::Drivers::Exonerate::Sugar::VERSION = '0.252830';
 use Moose;
 use namespace::autoclean;
 
@@ -36,7 +36,7 @@ Bio::MUST::Drivers::Exonerate::Sugar - Internal class for exonerate driver
 
 =head1 VERSION
 
-version 0.251060
+version 0.252830
 
 =head1 SYNOPSIS
 

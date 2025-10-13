@@ -2,10 +2,11 @@ package Iterator::Flex::Take;
 
 # ABSTRACT: Take Iterator Class
 
+use v5.28;
 use strict;
 use warnings;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Iterator::Flex::Utils ':IterAttrs', ':IterStates', ':SignalParameters', ':ExhaustionActions';
 
@@ -77,7 +78,7 @@ sub new ( $class, $iterable, $n, $pars = {} ) {
             lazy => $lazy,
             src  => $iterable,
         },
-        \%pars
+        \%pars,
     );
 }
 
@@ -281,7 +282,7 @@ Iterator::Flex::Take - Take Iterator Class
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 METHODS
 
@@ -328,8 +329,6 @@ The returned iterator supports the following capabilities:
 =item freeze
 
 =back
-
-=head1 INTERNALS
 
 =head1 SUPPORT
 

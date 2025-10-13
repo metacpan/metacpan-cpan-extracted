@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Clock;
-$Playwright::Clock::VERSION = '1.532';
+$Playwright::Clock::VERSION = '1.551';
 use parent 'Playwright::Base';
 
 sub new {
@@ -22,11 +22,41 @@ sub spec {
     return $Playwright::spec->{'Clock'}{members};
 }
 
+sub install {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'install',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub setFixedTime {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'setFixedTime',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
 sub runFor {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
         command => 'runFor',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub fastForward {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'fastForward',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -57,36 +87,6 @@ sub resume {
     return $self->_api_request(
         args    => [@_],
         command => 'resume',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub fastForward {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'fastForward',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub install {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'install',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub setFixedTime {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'setFixedTime',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -136,7 +136,7 @@ Playwright::Clock - Automatically generated class for Playwright::Clock
 
 =head1 VERSION
 
-version 1.532
+version 1.551
 
 =head1 CONSTRUCTOR
 
@@ -147,11 +147,29 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
+=head2 install(@args)
+
+Execute the Clock::install playwright routine.
+
+See L<https://playwright.dev/docs/api/class-Clock#Clock-install> for more information.
+
+=head2 setFixedTime(@args)
+
+Execute the Clock::setFixedTime playwright routine.
+
+See L<https://playwright.dev/docs/api/class-Clock#Clock-setFixedTime> for more information.
+
 =head2 runFor(@args)
 
 Execute the Clock::runFor playwright routine.
 
 See L<https://playwright.dev/docs/api/class-Clock#Clock-runFor> for more information.
+
+=head2 fastForward(@args)
+
+Execute the Clock::fastForward playwright routine.
+
+See L<https://playwright.dev/docs/api/class-Clock#Clock-fastForward> for more information.
 
 =head2 setSystemTime(@args)
 
@@ -170,24 +188,6 @@ See L<https://playwright.dev/docs/api/class-Clock#Clock-pauseAt> for more inform
 Execute the Clock::resume playwright routine.
 
 See L<https://playwright.dev/docs/api/class-Clock#Clock-resume> for more information.
-
-=head2 fastForward(@args)
-
-Execute the Clock::fastForward playwright routine.
-
-See L<https://playwright.dev/docs/api/class-Clock#Clock-fastForward> for more information.
-
-=head2 install(@args)
-
-Execute the Clock::install playwright routine.
-
-See L<https://playwright.dev/docs/api/class-Clock#Clock-install> for more information.
-
-=head2 setFixedTime(@args)
-
-Execute the Clock::setFixedTime playwright routine.
-
-See L<https://playwright.dev/docs/api/class-Clock#Clock-setFixedTime> for more information.
 
 =head2 on(@args)
 
@@ -242,7 +242,7 @@ George S. Baugh <teodesian@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2020 Troglodyne LLC
+Copyright (c) 2025 Troglodyne LLC
 
 
 Permission is hereby granted, free of charge, to any person obtaining a copy

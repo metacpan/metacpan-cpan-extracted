@@ -17,6 +17,7 @@ lib/Daje/Workflow/Database/Model.pm
 lib/Daje/Workflow/Database/Model/Context.pm
 lib/Daje/Workflow/Database/Model/History.pm
 lib/Daje/Workflow/Database/Model/Workflow.pm
+lib/Daje/Workflow/Database/Model/WorkflowConnection.pm
 lib/Daje/Workflow/Errors/Error.pm
 lib/Daje/Workflow/Observers.pm
 minil.toml

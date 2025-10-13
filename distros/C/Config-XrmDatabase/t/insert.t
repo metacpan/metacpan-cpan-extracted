@@ -13,10 +13,10 @@ use Config::XrmDatabase::Util ':constants';
     is(
         $db->TO_HASH->{db},
         hash {
-            field '*' => hash {
+            field q{*} => hash {
                 field 'b' => hash {
                     field 'd' => hash {
-                        field VALUE()     => 'v1';
+                        field VALUE()       => 'v1';
                         field MATCH_COUNT() => 0;
                         end;
                     };
@@ -32,12 +32,12 @@ use Config::XrmDatabase::Util ':constants';
     is(
         $db->TO_HASH->{db},
         hash {
-            field '*' => hash {
+            field q{*} => hash {
                 field 'b' => hash {
-                    field VALUE()     => 'v1';
+                    field VALUE()       => 'v1';
                     field MATCH_COUNT() => 0;
-                    field 'd'         => hash {
-                        field VALUE()     => 'v1';
+                    field 'd'           => hash {
+                        field VALUE()       => 'v1';
                         field MATCH_COUNT() => 0;
                         end;
                     };

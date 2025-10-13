@@ -5,7 +5,15 @@ use warnings;
 use List::Util qw/any/;
 use Scalar::Util qw/looks_like_number/;
 
-my %property=map {$_=>undef} qw/tmmin tmavg tmmax next finish message attribute note/;
+our $VERSION='0.1.1';
+
+my %property=map {$_=>undef} qw/tmmin tmavg tmmax next finish message attribute note attributes/;
+
+my %defaults=(
+	'tmmax/tmavg'=>5/4,
+	'tmavg/tmmin'=>4/3,
+	'tmmax/tmmin'=>5/3,
+);
 
 sub new {
 	my ($ref,%opt)=@_;
@@ -13,20 +21,48 @@ sub new {
 	return bless(\%opt,$class);
 }
 
+sub defaulting {
+	my ($node)=@_;
+	my $mult=sub { my ($x,$y)=@_; if(defined($y)) { return $x*$y } return };
+	my @lln=map {looks_like_number($$node{$_})} qw/tmmin tmavg tmmax/;
+	if(any {!$_} @lln) {
+		if($lln[1]) {
+			$$node{tmmax}//=$$node{tmavg}*$defaults{'tmmax/tmavg'};
+			$$node{tmmin}//=$$node{tmavg}/$defaults{'tmavg/tmmin'};
+		}
+		elsif($lln[0]&&$lln[2]) {
+			$$node{tmavg}=0.5*($$node{tmmin}+$$node{tmmax})
+		}
+		elsif($lln[0]) {
+			$$node{tmmax}//=$$node{tmmin}*$defaults{'tmmax/tmmin'};
+			$$node{tmavg}//=$$node{tmmin}*$defaults{'tmavg/tmmin'};
+		}
+		elsif($lln[2]) {
+			$$node{tmavg}//=$$node{tmmax}/$defaults{'tmmax/tmavg'};
+			$$node{tmmin}//=$$node{tmmax}/$defaults{'tmmax/tmmin'};
+		}
+	}
+}
+
 sub validate {
 	my (%node)=@_;
 	if($node{_valid}) { return }
-	my (@errors,@invalids);
+	my (@errors,@invalids,@tmseq);
 	foreach my $k (grep {!exists($property{$_})} keys(%node)) { push @errors,"Invalid key:  $k" }
 	foreach my $k (map {"tm$_"} qw/min avg max/) {
 		if(defined($node{$k})) {
 			if   (!looks_like_number($node{$k})) { push @errors,"Invalid value:  $k" }
 			elsif($node{$k}<0)                   { push @errors,"Negative value:  $k" }
+			else                                 { push @tmseq,$node{$k} }
 		}
 		else { push @invalids,$k }
 	}
 	@invalids=sort(@invalids);
 	if(@invalids&&($#invalids!=2)) { push @errors,"Incomplete time specification missing:  ".join(' ',@invalids) }
+	if($#tmseq==2) {
+		if($tmseq[0]>$tmseq[1]) { push @errors,"Invalid:  tmmin>tmavg" }
+		if($tmseq[1]>$tmseq[2]) { push @errors,"Invalid:  tmavg>tmmax" }
+	}
 	if(exists($node{next})) {
 		if(ref($node{next}) ne 'ARRAY') { push @errors,'Expected array:  next' }
 		else {

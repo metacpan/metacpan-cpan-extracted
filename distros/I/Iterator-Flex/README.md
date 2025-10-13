@@ -4,7 +4,7 @@ Iterator::Flex - Iterators with flexible behaviors
 
 # VERSION
 
-version 0.31
+version 0.32
 
 # SYNOPSIS
 
@@ -50,8 +50,6 @@ together.
 ## What doesn't work?  What should frighten me away?
 
 [Iterator::Flex::Manual::Caveats](https://metacpan.org/pod/Iterator%3A%3AFlex%3A%3AManual%3A%3ACaveats)
-
-# INTERNALS
 
 # SUPPORT
 

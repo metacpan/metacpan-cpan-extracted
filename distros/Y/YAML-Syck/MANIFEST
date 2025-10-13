@@ -51,6 +51,7 @@ t/json-refs.t
 t/json-singlequote.t
 t/leak.t
 t/load-blessed.t
+t/str-type-regression.t
 t/TestYAML.pm
 t/yaml-alias.t
 t/yaml-blessed-ref.t

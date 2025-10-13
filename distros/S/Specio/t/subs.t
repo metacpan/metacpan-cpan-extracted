@@ -18,7 +18,7 @@ use lib "$lib_path/lib";
 
 use Test::Fatal;
 use Test::More 0.96;
-use Test::Specio qw( builtins_tests describe :vars );
+use Test::Specio qw( create_BAR_handle_code builtins_tests describe :vars );
 
 use Specio::Declare;
 use Specio::Subs qw(
@@ -40,8 +40,10 @@ my $GLOB_OVERLOAD = _T::GlobOverload->new( \*FOO );
 
 local *BAR;
 {
-    ## no critic (InputOutput::ProhibitBarewordFileHandles, InputOutput::RequireBriefOpen)
-    open BAR, '<', $^X or die "Could not open $^X for the test";
+    local $@;
+    ## no critic (BuiltinFunctions::ProhibitStringyEval, ErrorHandling::RequireCheckingReturnValueOfEval)
+    eval create_BAR_handle_code();
+    die $@ if $@;
 }
 my $GLOB_OVERLOAD_FH = _T::GlobOverload->new( \*BAR );
 

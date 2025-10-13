@@ -1,5 +1,8 @@
 Revision history for Dist::Zilla::Plugin::Test::Perl::Critic
 
+3.005     2025-10-01 18:30:45Z
+  - added option embed_critic_config (Mikko Koivunalho)
+
 3.004     2024-10-20 22:37:37Z
   - added files and filter options to specify files to criticise
 

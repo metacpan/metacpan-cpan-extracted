@@ -2,10 +2,10 @@ package Iterator::Flex;
 
 # ABSTRACT: Iterators with flexible behaviors
 
+use v5.28;
 use strict;
 use warnings;
-use v5.28.0;
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 1;
 
@@ -31,7 +31,7 @@ Iterator::Flex - Iterators with flexible behaviors
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 SYNOPSIS
 
@@ -98,8 +98,6 @@ L<Iterator::Flex::Manual>
 =head2 What doesn't work?  What should frighten me away?
 
 L<Iterator::Flex::Manual::Caveats>
-
-=head1 INTERNALS
 
 =head1 SUPPORT
 

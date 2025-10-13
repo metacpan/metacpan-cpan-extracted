@@ -2,13 +2,13 @@ package Iterator::Flex::Factory;
 
 # ABSTRACT: Create on-the-fly Iterator::Flex classes/objects
 
-use 5.25.0;
+use v5.28;
 use strict;
 use warnings;
 
 use experimental qw( signatures declared_refs refaliasing);
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Ref::Util        ();
 use Role::Tiny       ();
@@ -46,8 +46,8 @@ sub to_iterator ( $iterable = undef, $pars = {} ) {
     return defined $iterable
       ? construct_from_iterable( $iterable, $pars )
       : construct( {
-            ( +NEXT ) => sub { }
-        } );
+          ( +NEXT ) => sub { },
+      } );
 }
 
 
@@ -233,9 +233,9 @@ sub construct_from_iterable ( $obj, $pars = {} ) {
 
     elsif ( Ref::Util::is_globref( $obj ) ) {
         return construct( {
-                $ipars->%*, next => sub { scalar <$obj> }
+                $ipars->%*, next => sub { scalar <$obj> },
             },
-            $spars
+            $spars,
         );
     }
 
@@ -396,7 +396,7 @@ Iterator::Flex::Factory - Create on-the-fly Iterator::Flex classes/objects
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 SUBROUTINES
 
@@ -466,8 +466,6 @@ by the constructed iterator:
 =item C<__current__> or C<current>
 
 =back
-
-=head1 INTERNALS
 
 =head1 SUPPORT
 

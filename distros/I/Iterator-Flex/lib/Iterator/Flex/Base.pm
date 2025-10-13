@@ -2,14 +2,13 @@ package Iterator::Flex::Base;
 
 # ABSTRACT: Iterator object
 
-use 5.10.0;
-
+use v5.28;
 use strict;
 use warnings;
 
 use experimental qw( signatures postderef declared_refs );
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Ref::Util;
 use Scalar::Util;
@@ -324,7 +323,6 @@ sub _role_namespaces {
 
 
 
-
 sub _add_roles ( $class, @roles ) {
     Role::Tiny->apply_roles_to_package( $class,
         map { load_role( $_, $class->_role_namespaces ) } @roles );
@@ -485,7 +483,7 @@ Iterator::Flex::Base - Iterator object
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 METHODS
 
@@ -499,7 +497,7 @@ Returns true if an object is an iterator, where iterator is defined as
 
 =item *
 
-An object which inherits from L<Iterator::Flex::Base>.
+An object which inherits from C<Iterator::Flex::Base>.
 
 =back
 
@@ -543,8 +541,7 @@ returns
 
 Add roles to the class. If the name begins with a C<+>, it is assumed
 to be a fully qualified name, otherwise it is searched for in the
-namespaces returned by the C<<
-L<_role_namespaces|Iterator::Flex::Base/_role_namespaces> >> class
+namespaces returned by the L</_role_namespaces> class
 method.
 
 =head2 is_exhausted
@@ -585,8 +582,6 @@ exhaustion by throwing.
 
 If C<$nelem> is provided, it will return no more than C<$nelem> at a
 time.
-
-=head1 INTERNALS
 
 =begin internal
 

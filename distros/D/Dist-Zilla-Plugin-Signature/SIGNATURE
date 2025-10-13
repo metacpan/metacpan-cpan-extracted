@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.55.
+signed via the Module::Signature module, version 0.93.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,22 +12,26 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 48cafd827affb60eb4d2b3f2bff9043f57826652 Changes
-SHA1 24680eb2a8fe871c0f35e23caa5b528f4101a21b LICENSE
-SHA1 4ea784d87978d93f2564bc55ff740b8953d89ff0 MANIFEST
-SHA1 400dacbfa1365777ffa4a8f4d832bc522477550c META.json
-SHA1 27586ef0777f901c4814b0823986580b78411f86 META.yml
-SHA1 5537ca03f133733d26827bcea934e8addda904dc Makefile.PL
-SHA1 bec3b0a58576577671bf6726729241f4e47165d0 README
-SHA1 eafd9dbb309cd189bfb8bbf2ff96f29de4b08f52 README.md
-SHA1 4d7f90210087b79220e68c4b14c0ddede471f3b0 lib/Dist/Zilla/Plugin/Signature.pm
-SHA1 5618160b911e727f4ce23898778f0fc052534e1a t/00-load.t
+SHA256 a44fcb37ae5947bd21a48c658b35069623d598cedfde14e6c9622b0dc2a93ae3 Changes
+SHA256 1be99ba6c965f876f7755fa8b9550529673d420b72b8fba27d414fa0933282d6 LICENSE
+SHA256 3cd8d136fa94a7614f4929416c3c7f1153d072ce4a9114962b64e9be2ce8921b MANIFEST
+SHA256 96c30b02a706cd5fc9dcf44c8d979ec489983e82bc286432ebf0575bf44ef10a META.json
+SHA256 0c5167b0718691880b8f479ac176211fa7c335da5dfa5f97604ce77b7bdd4577 META.yml
+SHA256 ee8666502e0494140f28bbbb5468acbe34183eca00ae57ae77fbb52d31833ab2 Makefile.PL
+SHA256 83d43c49f8d6280debebb564901a7f69c67f2de719702ceddf2244583440998e README
+SHA256 efae2808f1a99fca9f3f3b46f0b0668d924b1a964e4e247bc07a47b99405982f README.md
+SHA256 656ee6ec5b5f7a6edab64e024163ef7796f48236d89d83227d0d6849d39e0a4a lib/Dist/Zilla/Plugin/Signature.pm
+SHA256 c504d1b01386b648ab24b0b0b78f81d0fb2936affb1ef29270fb4eec052d74d0 t/00-load.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.10 (Darwin)
 
-iEYEARECAAYFAku2iwQACgkQR0BL4gbYw3SaKQCePot+1zYIDOW+W9CwVLKnNHT8
-TdQAn2iiiW+W1Y9Bkhx8+pu+w2LyNF4G
-=W3uW
+iQEzBAEBAwAdFiEEWEkagorOrVZ9fT1PwlMNB3QaREsFAmjhrCMACgkQwlMNB3Qa
+REs54Af/dsasVWkaajNDJ16zx8BpoxhhxKI/qa/52q2ZLlVvDhuAIMFjmcvDMdqi
+Ft9yxBrvV04+qx4WTh6mDAnIjrO0V4m/6ar2suR8VikN6RUZgMIpLzUV4GBeVVSG
+lFPoBZYd2bJOryGOIECh4jop0jkly+tR6mzCqGNNswqOVBJMXznEajKIDb9ZtB7d
+0qqfCdidY6+bUOjZYffs3sIrutOyjznIXijMfi0ZRZLu3FRgnbit/+Cbjw2LTkhq
+Nl9xnWKgqBqPMUkKYFpWdOG4GHhmwyKt/CbCuE2QPgiJDQ6Tx/2wf6yNv7E/ULgf
+zdf7uoX9GH++U9MvN5GnrkGUzO5XCA==
+=t99D
 -----END PGP SIGNATURE-----

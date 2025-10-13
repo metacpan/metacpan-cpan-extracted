@@ -3,7 +3,7 @@ package Specio::Library::Structured::Dict;
 use strict;
 use warnings;
 
-our $VERSION = '0.52';
+our $VERSION = '0.53';
 
 use Carp            qw( confess );
 use List::Util 1.33 ();
@@ -132,7 +132,7 @@ Specio::Library::Structured::Dict - Guts of Dict structured type
 
 =head1 VERSION
 
-version 0.52
+version 0.53
 
 =head1 DESCRIPTION
 

@@ -2,10 +2,11 @@ package Iterator::Flex::Gather::Constants;
 
 # ABSTRACT: Constants for Gather
 
+use v5.28;
 use strict;
 use warnings;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Exporter 'import';
 
@@ -40,7 +41,7 @@ our %EXPORT_TAGS = (
           GATHER_CYCLE_ABORT
           GATHER_GATHERING
           GATHER_SRC_EXHAUSTED
-        )
+        ),
     ],
 );
 
@@ -60,9 +61,7 @@ Iterator::Flex::Gather::Constants - Constants for Gather
 
 =head1 VERSION
 
-version 0.31
-
-=head1 INTERNALS
+version 0.32
 
 =head1 SUPPORT
 

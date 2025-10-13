@@ -20,13 +20,13 @@ Mojo::Path class in L<SPVM> is a container for paths used by L<Mojo::URL|SPVM::M
   
   # Parse
   my $path = Mojo::Path->new("/foo%2Fbar%3B/baz.html");
-  my $parts_list = $path->parts_list;
-  say $parts_list->get(0);
+  my $parts = $path->parts;
+  say $parts->[0];
   
   # Build
   my $path = Mojo::Path->new("/i/♥");
-  my $parts_list = $path->parts_list;
-  $parts_list->push("mojolicious");
+  my $parts = $path->parts;
+  StringList->new_ref($parts)->push("mojolicious");
   say $path->to_string;
 
 =head1 Interfaces
@@ -41,23 +41,9 @@ Mojo::Path class in L<SPVM> is a container for paths used by L<Mojo::URL|SPVM::M
 
 =head2 parts
 
-C<has parts : virtual rw string[]>
+C<has parts : rw string[]>
 
 The path parts.
-
-This is a virtual field. The value is got from and stored to L</"parts_list">.
-
-=head2 parts_list
-
-C<has parts_list : rw L<StringList|SPVM::StringList>;>
-
-The path parts. Note that this method will normalize the path and that C<%2F> will be treated as C</> for security
-reasons.
-
-Examples:
-
-  # Part with slash
-  $path->parts_list->push("foo/bar");
 
 =head2 leading_slash
 

@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Accessibility;
-$Playwright::Accessibility::VERSION = '1.532';
+$Playwright::Accessibility::VERSION = '1.551';
 use parent 'Playwright::Base';
 
 sub new {
@@ -76,7 +76,7 @@ Playwright::Accessibility - Automatically generated class for Playwright::Access
 
 =head1 VERSION
 
-version 1.532
+version 1.551
 
 =head1 CONSTRUCTOR
 
@@ -146,7 +146,7 @@ George S. Baugh <teodesian@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2020 Troglodyne LLC
+Copyright (c) 2025 Troglodyne LLC
 
 
 Permission is hereby granted, free of charge, to any person obtaining a copy

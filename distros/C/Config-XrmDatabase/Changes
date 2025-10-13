@@ -1,5 +1,17 @@
 Revision history for Config-XrmDatabase
 
+0.08      2025-10-06 01:56:27-04:00 America/New_York
+
+  [MISC]
+
+    * Perl as of 5.034 has native, but experimental try/catch; tweak
+      to avoid warnings
+
+  [BUILD]
+
+    * update build infrastructure, perlcritic policies, make
+      perlcritic happier
+
 0.07      2021-10-07 16:51:22-04:00 America/New_York
 
   [BUG FIX]

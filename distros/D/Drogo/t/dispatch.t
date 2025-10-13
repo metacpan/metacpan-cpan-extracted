@@ -13,6 +13,7 @@ use Test::More tests => 15;
 my $server = Drogo::Server::Test->new;
 
 # check if we present an index
+
 cmp_ok( Foo->handler( uri => '/' )->{output}, 'eq', 'howdy friend', 'output correct');
 cmp_ok( Foo->handler( uri => '/' )->{status}, '==', 200, 'default status correct');
 cmp_ok( Foo->handler( uri => '/' )->{http_header}, 'eq', 'text/html', 'default header is correct');

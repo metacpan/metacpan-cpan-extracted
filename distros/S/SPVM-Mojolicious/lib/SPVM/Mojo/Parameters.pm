@@ -26,7 +26,8 @@ Mojo::Parameters class in L<SPVM> is a container for form parameters used by L<M
   
   # Build
   my $params = Mojo::Parameters->new({foo => "bar", baz => 23});
-  $params->pairs_list->push_([i => "♥ mojolicious"]);
+  my $pairs = $params->pairs;
+  StringList->new_ref($pairs)->push_([i => "♥ mojolicious"]);
   say $params->to_string;
 
 =head1 Interfaces
@@ -41,22 +42,14 @@ Mojo::Parameters class in L<SPVM> is a container for form parameters used by L<M
 
 =head2 pairs
 
-C<has pairs : virtual rw string[];>
+C<has pairs : rw string[];>
 
 Parsed parameter pairs.
-
-This is a virtual field. The value is got from and stored to L</"pairs_list">.
 
 Examples:
 
   # Remove all parameters
   $params->set_pairs(new string[0]);
-
-=head2 pairs_list
-
-C<has pairs_list : rw L<StringList|SPVM::StringList>;>
-
-Parsed parameter pairs. Note that this method will normalize the parameters.
 
 =head1 Class Methods
 

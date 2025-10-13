@@ -6,7 +6,7 @@ use namespace::autoclean;
 use Moo;
 extends 'App::Sqitch::Plan::Line';
 
-our $VERSION = 'v1.5.2'; # VERSION
+our $VERSION = 'v1.6.0'; # VERSION
 
 has '+name' => ( default => '', required => 0 );
 

@@ -1,0 +1,24 @@
+site_name: Qiime2::Artifact Documentation
+site_description: A Perl module for parsing and extracting information from QIIME 2 artifact files
+site_author: Andrea Telatin
+repo_url: https://github.com/telatin/qiime2tools
+repo_name: telatin/qiime2tools
+
+theme:
+  name: readthedocs
+
+nav:
+  - Home: index.md
+  - Installation: installation.md
+  - Usage: usage.md
+  - API Reference: api.md
+  - qzoom CLI: qzoom.md
+  - Examples: examples.md
+  - Contributing: contributing.md
+
+markdown_extensions:
+  - toc:
+      permalink: true
+  - admonition
+  - codehilite
+  - extra

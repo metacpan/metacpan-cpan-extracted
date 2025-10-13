@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>[%- collection.name -%]</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="snig.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body>
+  [% content %]
+    <footer>
+      Created with <a href="https://snig.plix.at">s<sup>n</sup>ig</a> [% version %].
+      <div class="license">
+        © 2025 Thomas Klausner, licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>
+      </div>
+    </footer>
+  </body>
+</html>

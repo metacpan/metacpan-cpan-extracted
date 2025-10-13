@@ -1,0 +1,116 @@
+#!/usr/bin/perl
+
+# Copyright (c) 2024-2025 Löwenfelsen UG (haftungsbeschränkt)
+
+# licensed under Artistic License 2.0 (see LICENSE file)
+
+# ABSTRACT: Script used to merge or compile font files
+
+use strict;
+use warnings;
+use v5.16;
+
+use Carp;
+use Fcntl qw(SEEK_SET);
+use Getopt::Long;
+use SIRTX::Font;
+
+my %config = (
+    output          => undef,
+    width           => undef,
+    height          => undef,
+    bits            => undef,
+    update          => undef,
+    incremental     => undef,
+    gc              => undef,
+    default_aliases => undef,
+    remove_codepoint=> [],
+);
+
+{
+    my %opts;
+
+    $opts{'output|o=s'}         = \$config{output};
+    $opts{'width=i'}            = \$config{width};
+    $opts{'height=i'}           = \$config{height};
+    $opts{'bits=i'}             = \$config{bits};
+    $opts{'update!'}            = \$config{update};
+    $opts{'incremental!'}       = \$config{incremental};
+    $opts{'gc!'}                = \$config{gc};
+    $opts{'default-aliases=s'}  = \$config{default_aliases};
+    $opts{'remove-codepoint=s@'}= \$config{remove_codepoint};
+
+    $opts{'help|h'} = sub {
+        printf("Usage: %s [OPTIONS] -o output.sf INPUT...\n", $0);
+        say '';
+        printf("OPTIONS:\n");
+        printf(" %s\n", $_) foreach sort keys %opts;
+        exit(0);
+    };
+
+    Getopt::Long::Configure('bundling');
+    GetOptions(%opts);
+}
+
+my $font = SIRTX::Font->new;
+
+foreach my $key (qw(width height bits)) {
+    my $v = $config{$key} // next;
+    $font->can($key)->($font => $v);
+}
+
+if ($config{update} && defined($config{output})) {
+    open(my $in, '<:raw', $config{output}) or croak 'Cannot open: '.$config{output};
+    $font->read($in);
+}
+
+foreach my $input (@ARGV) {
+    if (-d $input) {
+        $font->import_directory($input, incremental => $config{incremental});
+    } else {
+        my $magic;
+
+        open(my $in, '<:raw', $input) or croak 'Cannot open: '.$input;
+
+        $in->read($magic, 10);
+        $in->seek(0, SEEK_SET) or croak 'Cannot seek on input: '.$input;
+        if ($magic eq "\0\x07SF\x0d\x0a\xc0\x0a\x06\0") {
+            $font->read($in);
+        } elsif ($input =~ m#[/\\][Uu]\+([0-9a-fA-F]{4,6})\.[^\.]+$#) {
+            my $codepoint = hex $1;
+            my $glyph = $font->import_glyph($input);
+            $font->glyph_for($codepoint => $glyph);
+        } else {
+            warn 'Strange input, trying to read as font file: '.$input;
+            $font->read($in);
+        }
+    }
+}
+
+
+foreach my $list (@{$config{remove_codepoint}}) {
+    foreach my $codepoint_pair (split /(?:\s*,\s*|\s+)/, $list) {
+        my ($start, $end);
+
+        if ($codepoint_pair =~ /^[Uu]\+([0-9a-fA-F]{4,6})(?:-[Uu]\+([0-9a-fA-F]{4,6}))?$/) {
+            $start = hex $1;
+            $end   = hex $2 if defined $2;
+        } else {
+            croak 'Bad code point: '.$codepoint_pair;
+        }
+        $end //= $start;
+        for (my $codepoint = $start; $codepoint <= $end; $codepoint++) {
+            $font->remove_codepoint($codepoint);
+        }
+    }
+}
+
+$font->add_default_aliases($config{default_aliases}) if defined $config{default_aliases};
+$font->gc if $config{gc};
+
+if (defined $config{output}) {
+    open(my $out, '>:raw', $config{output}) or croak 'Cannot open output: '.$config{output};
+    $font->write($out);
+}
+
+#ll

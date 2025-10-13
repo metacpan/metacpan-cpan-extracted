@@ -14,7 +14,11 @@ use Bio::MUST::Core;
 use Bio::MUST::Drivers;
 
 
-say 'Note: tests designed for: HMMER 3.3 (Nov 2019); http://hmmer.org/';
+say <<'EOT';
+Note: tests designed for:
+- HMMER 3.3 (Nov 2019); http://hmmer.org/
+- HMMER 3.4 (Aug 2023); http://hmmer.org/
+EOT
 
 my     $class = 'Bio::MUST::Drivers::Hmmer::Model';
 my $tmp_class = 'Bio::MUST::Drivers::Hmmer::Model::Temporary';

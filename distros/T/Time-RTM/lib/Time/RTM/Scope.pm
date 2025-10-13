@@ -13,7 +13,7 @@ use strict;
 use Time::HiRes;
 use Carp;
 
-our $VERSION = '1.14';
+our $VERSION = '1.15';
 
 ##############################################################################
 
@@ -69,8 +69,9 @@ sub stop
 
   carp( "scope timer is not started, use start() first" ) if $self->{ 'START' } == 0;
 
+  my $et = Time::HiRes::time();
   my $st = $self->{ 'START' };
-  my $dt = Time::HiRes::time() - $st;
+  my $dt = $et - $st;
   
   my $rtm = $self->__rtm();
   
@@ -79,11 +80,20 @@ sub stop
   for my $key ( @$keys )
     {
     $key = $self->auto_key() if $key =~ /^\*?$/;
-    $rtm->__add_dt( $key, $st, $dt );
+    $rtm->__add_dt( $key, $st, $dt, $et );
     }
 
   delete $self->{ 'START' };
 }
+
+# rename/set new keys before finish
+sub set_keys
+{
+  my $self = shift;
+
+  $self->{ 'KEYS' } = [ @_ ];
+}
+
 
 sub DESTROY
 {

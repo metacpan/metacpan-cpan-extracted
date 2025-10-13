@@ -1,0 +1,16 @@
+This software is copyright (c) 2024 Kawamura Shingo.
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5 itself.  That means either:
+
+    * the "Artistic License" (as shipped with the Perl 5 source code), or
+    * the "GNU General Public License" version 1 (or, at your option, any
+      later version).
+
+Copies of these licenses should have been supplied with your Perl 5
+distribution.  If not, they are available online at:
+
+    https://perldoc.perl.org/Artistic.html
+    https://www.gnu.org/licenses/old-licenses/gpl-1.0.html
+
+You may distribute this software under either of those licenses.

@@ -1,0 +1,17 @@
+v0.03  2025-10-10Z
+    - Updated lists of default aliases
+    - Added render()
+    - Added tools: sf-merge, sf-render, sf-to-html
+    - Added lists: dec-tech
+
+v0.02  2025-10-01Z
+    - Added codepoints(), and glyphs(), add_default_aliases()
+    - Added basic character list support:
+        - Methods: has_all_codepoints_from(), missing_codepoints_from(), and remove_codepoint_not_in()
+        - Lists: ascii, dec-mcs, dec-sg, sirtx-characters, important,
+                 cp-850, cp-858, and cp-437
+    - Added support to import directories via import_directory()
+
+v0.01  2025-10-01Z
+    - Initial release
+    - Basic API

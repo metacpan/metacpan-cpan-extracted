@@ -1,3 +1,7 @@
+1.252770 -- Sun Oct 05 01:22:11 CEST 2025
+  * Distribution ownership transferred to Mikko Koivunalho <mikkoi@cpan.org> 2025-10-03.
+    Please see https://github.com/gbarr/Dist-Zilla-Plugin-Signature/pull/1
+
 1.100930 -- Fri Apr 02 19:25:38 CDT 2010
   * use Dist::Zilla::Role::BeforeArchive now it is in core
 

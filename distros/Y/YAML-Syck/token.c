@@ -1552,6 +1552,7 @@ Plain:
         int qidx = 0;
         int qcapa = 100;
         char *qstr = S_ALLOC_N( char, qcapa );
+        qstr[0] = '\0';
         SyckLevel *plvl;
         int parentIndent;
 
@@ -1804,6 +1805,7 @@ SingleQuote:
         int qidx = 0;
         int qcapa = 100;
         char *qstr = S_ALLOC_N( char, qcapa );
+        qstr[0] = '\0';
 
 SingleQuote2:
         YYTOKEN = YYCURSOR;
@@ -1962,6 +1964,7 @@ DoubleQuote:
         int qidx = 0;
         int qcapa = 100;
         char *qstr = S_ALLOC_N( char, qcapa );
+        qstr[0] = '\0';
 
 DoubleQuote2:
         YYTOKEN = YYCURSOR;
@@ -2232,6 +2235,7 @@ TransferMethod:
         int qidx = 0;
         int qcapa = 100;
         char *qstr = S_ALLOC_N( char, qcapa );
+        qstr[0] = '\0';
 
 TransferMethod2:
         YYTOKTMP = YYCURSOR;
@@ -2450,6 +2454,7 @@ ScalarBlock:
         SyckLevel *lvl = CURRENT_LEVEL();
         int parentIndent = -1;
 
+        qstr[0] = '\0';
         switch ( *yyt )
         {
             case '|': blockType = BLOCK_LIT; break;
@@ -2472,7 +2477,6 @@ ScalarBlock:
             }
         }
 
-        qstr[0] = '\0';
         YYTOKEN = YYCURSOR;
 
 ScalarBlock2:

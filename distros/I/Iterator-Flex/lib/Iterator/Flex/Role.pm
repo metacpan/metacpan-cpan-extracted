@@ -2,10 +2,11 @@ package Iterator::Flex::Role;
 
 # ABSTRACT: Iterator Methods to add Iterator::Flex Iterator modifiers
 
+use v5.28;
 use strict;
 use warnings;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Role::Tiny;
 use experimental 'signatures';
@@ -117,7 +118,7 @@ Iterator::Flex::Role - Iterator Methods to add Iterator::Flex Iterator modifiers
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 METHODS
 
@@ -162,8 +163,6 @@ Return a new iterator modifying the original iterator via L<Iterator::Flex/iflat
   $new_iter = $iter->ifreeze( sub { ... } );
 
 Return a new iterator modifying the original iterator via L<Iterator::Flex/ifreeze>.
-
-=head1 INTERNALS
 
 =head1 SUPPORT
 

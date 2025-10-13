@@ -2,11 +2,12 @@ package Iterator::Flex::Chunk;
 
 # ABSTRACT: Chunk Iterator Class
 
+use v5.28;
 use strict;
 use warnings;
 use experimental 'signatures';
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Iterator::Flex::Factory 'to_iterator';
 use Iterator::Flex::Utils qw[ THROW STATE EXHAUSTION :IterAttrs :IterStates ];
@@ -14,7 +15,6 @@ use Ref::Util;
 use parent 'Iterator::Flex::Base';
 
 use namespace::clean;
-
 
 
 
@@ -59,7 +59,7 @@ sub new ( $class, $iterable, $pars = {} ) {
             capacity => $capacity,
             src      => $iterable,
         },
-        \%pars
+        \%pars,
     );
 }
 
@@ -143,18 +143,17 @@ Iterator::Flex::Chunk - Chunk Iterator Class
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 METHODS
 
 =head2 new
 
-  use Iterator::Flex::Chunk::Constants ':all';
-
   $iterator = Ierator::Flex::Chunk->new( $iterable, ?\%pars );
 
-Returns an iterator which chunks elements returned by
-C<$iterable> Chunked items are returned as an arrayref.
+Returns an iterator which, for each iteration, reads up to a specified
+number of elements from C<$iterable>, and returns an arrayref containing
+those elements.
 
 C<$iterable> is converted into an iterator via
 L<Iterator::Flex::Factory/to_iterator> if required.
@@ -180,8 +179,6 @@ The iterator supports the following capabilities:
 =item reset
 
 =back
-
-=head1 INTERNALS
 
 =head1 SUPPORT
 

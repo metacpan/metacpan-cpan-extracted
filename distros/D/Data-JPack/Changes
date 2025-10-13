@@ -1,5 +1,9 @@
 Revision history for Perl extension Data::JPack.
 
+v0.2.2 2025-10-01
+  [fixes]
+    - Fix filename globbing for paths with spaces
+
 v0.2.1 2025-09-10
   [fixes]
     - die if directory cannot be made

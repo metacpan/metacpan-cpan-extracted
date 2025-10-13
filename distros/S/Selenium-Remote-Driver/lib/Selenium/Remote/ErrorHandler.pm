@@ -1,5 +1,5 @@
 package Selenium::Remote::ErrorHandler;
-$Selenium::Remote::ErrorHandler::VERSION = '1.49';
+$Selenium::Remote::ErrorHandler::VERSION = '1.50';
 use strict;
 use warnings;
 
@@ -154,7 +154,7 @@ Selenium::Remote::ErrorHandler - Error handler for Selenium::Remote::Driver
 
 =head1 VERSION
 
-version 1.49
+version 1.50
 
 =head1 SUBROUTINES
 

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Exporter 'import';
 our @EXPORT_OK=qw(nCk factorial enumerate_substitution_maps);
-our $VERSION = '1.1.2'; # VERSION
+our $VERSION = '1.1.3'; # VERSION
 # ABSTRACT: some combinatorial functions
 
 
@@ -93,7 +93,7 @@ Data::Password::zxcvbn::Combinatorics - some combinatorial functions
 
 =head1 VERSION
 
-version 1.1.2
+version 1.1.3
 
 =head1 DESCRIPTION
 

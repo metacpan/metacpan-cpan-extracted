@@ -1,5 +1,8 @@
 Revision history for DBD-Phoenix
 
+0.2.3  2025-10-08
+    - Fixed work with column aliases.
+
 0.2.2  2022-01-11
     - Synchronized docker files with perl-avatica-client.
     - Improved test.

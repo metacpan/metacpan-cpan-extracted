@@ -44,7 +44,6 @@ use warnings;
 use base qw{ PPIx::Regexp::Token::Code };
 
 use Carp qw{ confess };
-use PPI::Document;
 use PPIx::Regexp::Constant qw{
     COOKIE_CLASS
     COOKIE_REGEX_SET
@@ -53,7 +52,7 @@ use PPIx::Regexp::Constant qw{
     @CARP_NOT
 };
 
-our $VERSION = '0.090';
+our $VERSION = '0.091';
 
 use constant VERSION_WHEN_IN_REGEX_SET => '5.017009';
 

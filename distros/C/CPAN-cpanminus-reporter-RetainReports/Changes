@@ -1,5 +1,8 @@
 Revision history for Perl module CPAN::cpanminus::reporter::RetainReports
 
+0.12 Wed Oct  1 03:10:55 PM EDT 2025
+    - Minor touch-ups; no change in functionality
+
 0.11 Fri May 12 09:02:22 PM EDT 2023
     - Accommodate changes in App::cpanminus::reporter version 0.19.
       (Changes are internal; no change in interface.)

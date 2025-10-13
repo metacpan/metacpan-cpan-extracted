@@ -3,7 +3,7 @@ package JSON::Schema::Modern::Vocabulary::OpenAPI;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema OpenAPI vocabulary
 
-our $VERSION = '0.097';
+our $VERSION = '0.098';
 
 use 5.020;
 use utf8;
@@ -122,7 +122,7 @@ JSON::Schema::Modern::Vocabulary::OpenAPI - Implementation of the JSON Schema Op
 
 =head1 VERSION
 
-version 0.097
+version 0.098
 
 =head1 DESCRIPTION
 

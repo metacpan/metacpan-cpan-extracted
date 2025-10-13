@@ -1,3 +1,13 @@
+0.252830  2025-10-10 10:50:33+02:00 Europe/Brussels
+    - Additions:
+        binaries: new script cdhit-tax-filter.pl
+        binaries: annotate-ali.pl now allows to customize the annotation report
+    - Changes:
+      - Exonerate::Aligned: removed dependence on deprecated `switch` constructs
+    - Fixes:
+      - binaries: fixed a bug in annotate-ali.pl where --hit-list captured tags from later hits
+      - Blast: updated tests to BLAST 2.17.0
+
 0.251060  2025-04-16 22:44:33+02:00 Europe/Brussels
     - Fixes
       - Blast: fixed a seq id bug in temporary databases with >10000 seqs

@@ -3,11 +3,10 @@
 use strict;
 use warnings;
 use Schedule::Activity;
-use Test::More tests=>4;
+use Test::More tests=>10;
 
 subtest 'validation'=>sub {
 	plan tests=>2;
-
 	is_deeply(
 		{Schedule::Activity::buildSchedule(
 			configuration=>{
@@ -20,7 +19,6 @@ subtest 'validation'=>sub {
 				},
 			},
 		)},{error=>['Node 1, Undefined name in array:  next']},'node:  invalid next entry');
-
 	is_deeply(
 		{Schedule::Activity::buildSchedule(
 			configuration=>{
@@ -33,7 +31,6 @@ subtest 'validation'=>sub {
 				},
 			},
 		)},{error=>['Node 1, Undefined name:  finish']},'node:  invalid finish entry');
-
 };
 
 subtest 'Simple scheduling'=>sub {
@@ -48,7 +45,7 @@ subtest 'Simple scheduling'=>sub {
 				finish=>'Activity, conclude',
 			},
 			'action 1'=>{
-				message=>'Begin action 1',
+				message=>['Begin action 1'],
 				tmmin=>5,tmavg=>10,tmmax=>15,
 				next=>['action 2'],
 			},
@@ -159,4 +156,223 @@ subtest 'cycles'=>sub {
 	ok($#{$schedule{activities}}>10,'Self-cycle');
 };
 
-# test, if times are zero, it can get stuck in an infinite loop
+subtest 'edge cases'=>sub {
+	plan skip_all=>'Pending min/max reachability reporting';
+	#
+	# If this falls into the spin branch, it will hang.
+	# Compiling/reachability should determine that the spin node can never exit, for example.
+	#
+	my %schedule;
+	%schedule=Schedule::Activity::buildSchedule(activities=>[[3000,'root']],configuration=>{node=>{
+		'root'=>{finish=>'terminate',next=>['cycle','spin'],tmmin=>0,tmavg=>0,tmmax=>0},
+		'spin' =>{tmmin=>0,tmavg=>0,tmmax=>0,next=>['spin']},
+		'cycle'=>{tmmin=>100,tmavg=>200,tmmax=>400,next=>['cycle','terminate']},
+		'terminate'=>{tmmin=>0,tmavg=>0,tmmax=>0},
+	}});
+	ok($#{$schedule{activities}}>10,'Spin node');
+};
+
+subtest 'Attributes'=>sub {
+	plan tests=>5;
+	my $rnd=sub { my ($x)=@_; return int($x*1e6)/1e6 };
+	my %schedule=Schedule::Activity::buildSchedule(activities=>[[15,'root']],configuration=>{node=>{
+		root=>{
+			next=>['step1'],
+			tmavg=>5,
+			finish=>'finish',
+			attributes=>{
+				counter=>{incr=>1},
+				score  =>{set=>5},
+				enabled=>{set=>1},
+			},
+		},
+		'step1'=>{
+			tmavg=>5,
+			next=>['finish'],
+			attributes=>{
+				counter=>{incr=>1},
+				score  =>{incr=>4},
+				enabled=>{set=>0},
+			},
+		},
+		'finish'=>{
+			tmavg=>5,
+			attributes=>{
+				counter=>{incr=>1},
+			},
+		}},
+		attributes=>{
+			counter=>{type=>'int',value=>0},
+			enabled=>{type=>'bool'},
+		},
+	});
+	is($#{$schedule{attributes}{score}{xy}},                2,'Score:  N');
+	is(&$rnd($schedule{attributes}{score}{avg}),  &$rnd(25/3),'Score:  avg');
+	is($#{$schedule{attributes}{enabled}{xy}},              2,'Enabled:  N');
+	is(&$rnd($schedule{attributes}{enabled}{avg}),&$rnd( 1/3),'Enabled:  avg');
+	is($schedule{attributes}{counter}{y},                   3,'Counter:  count');
+};
+
+subtest 'Message randomization'=>sub {
+	plan tests=>2;
+	my %schedule;
+	my %configuration=(
+		node=>{
+			Activity=>{
+				message=>[map {'act0.'.$_} (0..3)],
+				next=>['action 1'],
+				tmmin=>5,tmavg=>5,tmmax=>5,
+				finish=>'Activity, conclude',
+			},
+			'action 1'=>{
+				message=>[map {'act1.'.$_} (0..3)],
+				tmmin=>5,tmavg=>10,tmmax=>15,
+				next=>['action 2'],
+			},
+			'action 2'=>{
+				message=>[map {'act2.'.$_} (0..3)],
+				tmmin=>5,tmavg=>10,tmmax=>15,
+				next=>['Activity, conclude'],
+			},
+			'Activity, conclude'=>{
+				message=>[map {'act3.'.$_} (0..3)],
+				tmmin=>5,tmavg=>5,tmmax=>5,
+			},
+		},
+	);
+	my %seen;
+	foreach (1..4*4*100) {
+		%schedule=Schedule::Activity::buildSchedule(configuration=>\%configuration,activities=>[[30,'Activity']]);
+		foreach my $msg (map {$$_[1]{message}} @{$schedule{activities}}) { $seen{$msg}=1 }
+	}
+	my %expect;
+	foreach my $i (0..3) {
+	foreach my $j (0..3) {
+		$expect{"act$i.$j"}=1;
+	} }
+	is_deeply(\%seen,\%expect,'All combinations observed');
+	is_deeply($configuration{node}{Activity}{message},[map {'act0.'.$_} (0..3)],'verify non-mutation of configuration');
+};
+
+subtest 'Message attributes'=>sub {
+	plan tests=>3;
+	my %schedule;
+	my %configuration=(
+		node=>{
+			Activity=>{
+				message=>{alternates=>[{message=>'Activity',attributes=>{messages=>{incr=>1}}}]},
+				next=>['action 1'],
+				tmmin=>5,tmavg=>5,tmmax=>5,
+				finish=>'Activity, conclude',
+				attributes=>{activity=>{incr=>1}},
+			},
+			'action 1'=>{
+				message=>{alternates=>[{message=>'Activity',attributes=>{messages=>{incr=>1}}}]},
+				tmmin=>5,tmavg=>10,tmmax=>15,
+				next=>['action 2'],
+				attributes=>{action=>{incr=>1}},
+			},
+			'action 2'=>{
+				message=>{alternates=>[{message=>'Activity',attributes=>{messages=>{incr=>1}}}]},
+				tmmin=>5,tmavg=>10,tmmax=>15,
+				next=>['Activity, conclude'],
+				attributes=>{action=>{incr=>1}},
+			},
+			'Activity, conclude'=>{
+				message=>{alternates=>[{message=>'Activity',attributes=>{messages=>{incr=>1}}}]},
+				tmmin=>5,tmavg=>5,tmmax=>5,
+				attributes=>{activity=>{incr=>1}},
+			},
+		},
+		attributes=>{
+			messages=>{type=>'int',value=>0},
+			activity=>{type=>'int',value=>0},
+			action  =>{type=>'int',value=>0},
+		},
+	);
+	%schedule=Schedule::Activity::buildSchedule(configuration=>\%configuration,activities=>[[30,'Activity']]);
+	is_deeply($schedule{attributes}{activity}{xy},[[0,1],[25,2],[30,2]],'Activities');
+	is_deeply($schedule{attributes}{action}{xy},  [[0,0],[5,1],[15,2],[30,2]],'Actions');
+	is_deeply($schedule{attributes}{messages}{xy},[[0,1],[5,2],[15,3],[25,4],[30,4]],'Messages');
+};
+
+subtest 'Annotations'=>sub {
+	plan tests=>1;
+	my %schedule;
+	my %configuration=(
+		node=>{
+			Activity=>{
+				message=>'Begin Activity',
+				next=>['action 1'],
+				tmmin=>5,tmavg=>5,tmmax=>5,
+				finish=>'Activity, conclude',
+			},
+			'action 1'=>{
+				message=>['Begin action 1'],
+				tmmin=>5,tmavg=>10,tmmax=>15,
+				next=>['action 2'],
+			},
+			'action 2'=>{
+				message=>'Begin action 2',
+				tmmin=>5,tmavg=>10,tmmax=>15,
+				next=>['Activity, conclude'],
+			},
+			'Activity, conclude'=>{
+				message=>'Conclude Activity',
+				tmmin=>5,tmavg=>5,tmmax=>5,
+			},
+		},
+		annotations=>{
+			'apple'=>[
+				{
+					message=>'annotation 1',
+					nodes=>qr/action 1/,
+					before=>{min=>-5,max=>-5},
+				},
+				{
+					message=>'annotation 2',
+					nodes=>qr/action 2/,
+					before=>{min=>5,max=>5},
+				},
+			],
+		},
+	);
+	%schedule=Schedule::Activity::buildSchedule(configuration=>\%configuration,activities=>[[30,'Activity']]);
+	is_deeply($schedule{annotations},{apple=>{events=>[[10,{message=>'annotation 1'}]]}},'Annotations created, overlap removed');
+};
+
+subtest 'Markdown loading'=>sub {
+	plan tests=>7;
+	my %settings=Schedule::Activity::loadMarkdown(q|
+1. Group one, 5min
+	1. action one, 1min
+  - action two, 2min
+ * action three, 3min
+-  Group two, 5min
+	* action one, 3min
+	* action two, 2min
+	* action three, 1min
+*  Group three, 5min
+	* action one, 2min
+	* action two, 3min
+	* action three, 1min
+	|);
+	my %schedule=Schedule::Activity::buildSchedule(%settings);
+	my @materialized=map {[$$_[0],$$_[1]{message}]} @{$schedule{activities}};
+	my @expect=(
+		[  0,qr/Group one/],
+		[  0,qr/action (one|two|three)/],
+		[300,qr/Group two/],
+		[300,qr/action (one|two|three)/],
+		[600,qr/Group three/],
+		[600,qr/action (one|two|three)/],
+		[900,qr/^$/], # group three conclude
+	);
+	my $i=0;
+	foreach my $match (@expect) {
+		while(($i<$#materialized)&&($materialized[$i][0]<$$match[0])) { $i++ }
+		if(($materialized[$i][1]!~$$match[1])&&($i<$#materialized)&&($materialized[$i][0]==$materialized[1+$i][0])) { $i++ }
+		like($materialized[$i][1],$$match[1],"At $$match[0], $$match[1]");
+	}
+};
+

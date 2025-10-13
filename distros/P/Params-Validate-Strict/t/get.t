@@ -13,11 +13,11 @@ sub where_am_i
 		args => Params::Get::get_params(undef, @_),
 		schema => {
 			'latitude' => {
-				type => 'number',
+				type => 'float',
 				min => -180,
 				max => 180
 			}, 'longitude' => {
-				type => 'number',
+				type => 'float',
 				min => -180,
 				max => 180
 			}

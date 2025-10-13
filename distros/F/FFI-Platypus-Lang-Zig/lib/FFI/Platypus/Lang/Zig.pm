@@ -2,18 +2,15 @@ package FFI::Platypus::Lang::Zig;
 
 use strict;
 use warnings;
+use feature qw( state );
 use File::ShareDir::Dist qw( dist_share );
-use 5.008004;
+use 5.020;
 
 # ABSTRACT: Documentation and tools for using Platypus with the Zig programming language
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.02'; # VERSION
 
-my $map;
-
-sub native_type_map
-{
-  unless($map)
-  {
+sub native_type_map {
+  state $map = do {
     my %map = (
       u8        => 'uint8',
       u16       => 'uint16',
@@ -41,8 +38,8 @@ sub native_type_map
 
     %map = (%map, %$map2);
 
-    $map = \%map;
-  }
+    \%map;
+  };
 
   $map;
 }
@@ -61,13 +58,13 @@ FFI::Platypus::Lang::Zig - Documentation and tools for using Platypus with the Z
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
 Zig:
 
- export fn add(a: i32, b: i32) callconv(.C) i32 {
+ pub export fn add(a: i32, b: i32) i32 {
      return a + b;
  }
 
@@ -110,7 +107,7 @@ can be found in the C<examples> directory.
 
 =head3 Zig Source
 
- export fn add(a: i32, b: i32) callconv(.C) i32 {
+ pub export fn add(a: i32, b: i32) i32 {
      return a + b;
  }
 
@@ -188,7 +185,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Graham Ollis.
+This software is copyright (c) 2022-2025 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

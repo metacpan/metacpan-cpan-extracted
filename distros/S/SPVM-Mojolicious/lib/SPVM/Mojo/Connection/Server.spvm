@@ -163,8 +163,8 @@ EOS
   method listen : void ($args : Hash) {
     
     # Look for reusable file descriptor
-    my $path    = $args->get_string("path");
-    my $address = $args->get_string("address") // "0.0.0.0";
+    my $path    = $args->{"path"}->(string);
+    my $address = $args->{"address"}->(string) // "0.0.0.0";
     my $port    = (int)$args->get("port");
     
     my $options = Hash->new({Listen => $args->exists("backlog") ? (int)$args->get("backlog") : SOCKET->SOMAXCONN, Type => SOCKET->SOCK_STREAM});

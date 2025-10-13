@@ -169,7 +169,7 @@ use MRO::Compat;
 use Types::Standard qw[ArrayRef HashRef InstanceOf Str is_CodeRef is_HashRef
   is_ArrayRef is_Ref is_Object];
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.1.0';
 
 requires qw[json_ld_type json_ld_fields];
 
@@ -237,10 +237,26 @@ sub process_hash {
 sub json_ld_data {
   my $self = shift;
 
+  # We need to know if there's another call to json_ld_data somewhere
+  # in the call stack. If there is, we're not the top-level object and
+  # we should omit the @context;
+
+  my $already_in_stack = 0;
+  my $this_sub = (caller(0))[3];
+  my $i = 1;
+
+  while (my @call = caller $i++) {
+    if ($call[3] eq $this_sub) {
+      $already_in_stack = 1;
+      last;
+    }
+  }
+
   my $data = {
-    '@context' => $self->context,
     '@type'    => $self->json_ld_type,
   };
+
+  $data->{'@context'} = $self->context unless $already_in_stack;
 
   foreach my $field (@{$self->json_ld_fields}) {
 

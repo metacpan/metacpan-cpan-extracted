@@ -6,8 +6,7 @@ subtest types => sub {
 
   my $types = FFI::Platypus::Lang::Zig->native_type_map;
 
-  foreach my $key (sort keys %$types)
-  {
+  foreach my $key (sort keys %$types) {
     my $val = $types->{$key};
     note sprintf "%-12s = %s\n", $key, $val;
   }

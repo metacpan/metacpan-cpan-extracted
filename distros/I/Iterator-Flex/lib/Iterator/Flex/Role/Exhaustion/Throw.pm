@@ -2,10 +2,11 @@ package Iterator::Flex::Role::Exhaustion::Throw;
 
 # ABSTRACT: signal exhaustion by setting exhausted flag;
 
+use v5.28;
 use strict;
 use warnings;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Ref::Util;
 use Iterator::Flex::Utils qw( :default REG_GENERAL REG_GP_EXHAUSTION );
@@ -61,7 +62,7 @@ Iterator::Flex::Role::Exhaustion::Throw - signal exhaustion by setting exhausted
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 METHODS
 
@@ -71,8 +72,6 @@ version 0.31
 
 Signal that the iterator is exhausted.  This version sets the
 iterator's exhausted flag and throws an exception.
-
-=head1 INTERNALS
 
 =head1 SUPPORT
 

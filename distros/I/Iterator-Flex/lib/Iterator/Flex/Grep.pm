@@ -2,11 +2,12 @@ package Iterator::Flex::Grep;
 
 # ABSTRACT: Grep Iterator Class
 
+use v5.28;
 use strict;
 use warnings;
 use experimental 'signatures';
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Iterator::Flex::Factory 'to_iterator';
 use Iterator::Flex::Utils qw[ THROW STATE EXHAUSTION :IterAttrs :IterStates ];
@@ -125,7 +126,7 @@ Iterator::Flex::Grep - Grep Iterator Class
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 METHODS
 
@@ -152,8 +153,6 @@ The iterator supports the following capabilities:
 =item reset
 
 =back
-
-=head1 INTERNALS
 
 =head1 SUPPORT
 

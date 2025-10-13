@@ -4,6 +4,7 @@ use v5.40;
 
 use Mojo::JSON qw { to_json from_json };
 use DBD::Pg ':pg_types';
+use Data::Dumper;
 
 # NAME
 # ====
@@ -132,17 +133,24 @@ sub save($self, $context) {
     $context->{context_pkey} = 0 unless exists $context->{context_pkey};
     $context->{context} = to_json($context->{context});
     my $context_pkey;
+    say "Daje::Workflow::Database::Model::Context::save " . Dumper($context);
 
     if ($context->{context_pkey} > 0) {
-        $self->db->update(
-            "context",
-            {
-                context => $context->{context}
-            },
-            {
-                context_pkey => $context->{context_pkey}
-            }
-        );
+        try {
+            $self->db->update(
+                "context",
+                {
+                    context => $context->{context}
+                },
+                {
+                    context_pkey => $context->{context_pkey}
+                }
+            );
+        } catch ($e) {
+            my $test = $e;
+            say $e->to_string;
+            $e = $e;
+        }
     } else {
         try {
             delete %$context{context_pkey};
@@ -173,6 +181,8 @@ sub save($self, $context) {
 }
 
 1;
+
+
 
 
 

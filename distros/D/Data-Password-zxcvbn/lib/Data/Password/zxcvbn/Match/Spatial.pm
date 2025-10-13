@@ -3,7 +3,7 @@ use Moo;
 with 'Data::Password::zxcvbn::Match';
 use Data::Password::zxcvbn::Combinatorics qw(nCk);
 use List::AllUtils qw(min);
-our $VERSION = '1.1.2'; # VERSION
+our $VERSION = '1.1.3'; # VERSION
 # ABSTRACT: match class for sequences of nearby keys
 
 
@@ -186,7 +186,7 @@ Data::Password::zxcvbn::Match::Spatial - match class for sequences of nearby key
 
 =head1 VERSION
 
-version 1.1.2
+version 1.1.3
 
 =head1 DESCRIPTION
 

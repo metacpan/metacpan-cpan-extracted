@@ -2,11 +2,12 @@ package Iterator::Flex::Map;
 
 # ABSTRACT: Map Iterator Class
 
+use v5.28;
 use strict;
 use warnings;
 use experimental 'signatures';
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Iterator::Flex::Utils qw( STATE THROW EXHAUSTION :IterAttrs :IterStates );
 use Iterator::Flex::Factory 'to_iterator';
@@ -129,7 +130,7 @@ Iterator::Flex::Map - Map Iterator Class
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 METHODS
 
@@ -159,8 +160,6 @@ The iterator supports the following capabilities:
 =item rewind
 
 =back
-
-=head1 INTERNALS
 
 =head1 SUPPORT
 

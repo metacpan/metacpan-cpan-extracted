@@ -1,8 +1,7 @@
 package Test::HTTPStatus;
-use strict;
 
+use strict;
 use warnings;
-# no warnings;
 
 =encoding utf-8
 
@@ -25,7 +24,7 @@ Check the HTTP status for a resource.
 =cut
 
 use v5.10.1;	# Mojolicious is v5.10.1 and later
-our $VERSION = '2.11';
+our $VERSION = '2.12';
 
 use parent 'Test::Builder::Module';
 
@@ -135,19 +134,21 @@ sub http_ok {
 	my $url = shift;
 	my $expected = shift || HTTP_OK;
 
-	# Always succeed when NO_NETWOK_TESTING is set
+	# Always succeed when NO_NETWORK_TESTING is set
 	my $hash = $ENV{'NO_NETWORK_TESTING'} ? { status => $expected, url => $url } : _get_status( $url );
 
 	my $status = $hash->{status};
 
-	if(defined($expected) && ($expected eq $status)) {
-		$Test->ok( 1, "Expected [$expected], got [$status] for [$url]" );
-	} elsif( $status == NO_URL ) {
+	if(!defined($status)) {
+		$Test->ok(0, "[$url] status is not set");
+	} elsif(defined($expected) && ($expected == $status)) {
+		$Test->ok(1, "Expected [$expected], got [$status] for [$url]");
+	} elsif($status == NO_URL) {
 		$Test->ok( 0, "[$url] does not appear to be anything" );
 	} elsif( $status == INVALID_URL ) {
 		$Test->ok( 0, "[$url] does not appear to be a valid URL" );
 	} else {
-		$Test->ok( 0, "Mysterious failure for [$url] with status [$status]" );
+		$Test->ok(0, "Unknown failure for [$url] with status [$status]");
 	}
 }
 
@@ -157,7 +158,7 @@ sub _get_status {
 	return { status => NO_URL } unless defined $string;
 
 	my $url = Mojo::URL->new( $string );
-	return { status => undef } unless $url->host;
+	return { status => INVALID_URL } unless $url->host();
 
 	my $status = _check_link( $url );
 
@@ -194,7 +195,7 @@ sub _check_link {
 	my $transaction = $UA->head($link);
 	my $response = $transaction->res();
 
-	if(($response && (!defined($response->code())) || ($response->code() >= 400))) {
+	if(!$response || !defined($response->code()) || (($response->code() >= 400) && ($response->code() != 404))) {
 		$transaction = $UA->get($link);
 		$response = $transaction->res();
 	}
@@ -223,7 +224,7 @@ L<HTTP::SimpleLinkChecker>, L<Mojo::URL>
 
 brian d foy, C<< <bdfoy@cpan.org> >>
 
-Maintained by Nigel Horne, C<< <njh at bandsman.co.uk> >>
+Maintained by Nigel Horne, C<< <njh at nigelhorne.com> >>
 
 =head1 SUPPORT
 

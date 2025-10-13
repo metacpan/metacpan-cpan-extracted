@@ -59,18 +59,18 @@ class Mojo::Transaction::WebSocket extends Mojo::Transaction {
     
     my $options_h = Hash->new($msg->(object[]));
     
-    my $json  = $options_h->get_string("json");
+    my $json  = $options_h->{"json"}->(string);
     
     if ($json) {
       $options_h->set(text => JSON->new->encode($json));
     }
     
-    my $text = $options_h->get_string("text");
+    my $text = $options_h->{"text"}->(string);
     
     # Raw text or binary
     my $frame = (Mojo::WebSocket::Frame)undef;
     if ($text) { $frame = Mojo::WebSocket::Frame->new(1, 0, 0, 0, Mojo::WebSocket->WS_TEXT, $text); }
-    else { $frame = Mojo::WebSocket::Frame->new(1, 0, 0, 0, Mojo::WebSocket->WS_BINARY, $options_h->get_string("binary")); }
+    else { $frame = Mojo::WebSocket::Frame->new(1, 0, 0, 0, Mojo::WebSocket->WS_BINARY, $options_h->{"binary"}->(string)); }
     
     # "permessage-deflate" extension
     unless ($self->compressed) {

@@ -113,8 +113,8 @@ sub process
                 my $is_file = 0;
                 for my $h_line (@header)
                 {
-                    $name     = $1 if $h_line =~ /name=["'](.*?)["']/;
-                    $filename = $1 if $h_line =~ /filename=["'](.*?)["']/;
+                    $name     = $2 if $h_line =~ /name=(['"])(.*?)\1/;
+                    $filename = $2 if $h_line =~ /filename=(['"])(.*?)\1/;
                     $is_file  = 1  if $h_line =~ /filename=/;
                 }
 

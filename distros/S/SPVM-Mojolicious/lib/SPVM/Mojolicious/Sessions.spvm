@@ -116,9 +116,9 @@ class Mojolicious::Sessions {
     my $exists_expires = $session->exists("expires");
     
     # "expiration" value is inherited
-    my $expiration = $exists_expiration ? $session->get_int("expiration") : $self->default_expiration;
+    my $expiration = $exists_expiration ? $session->{"expiration"}->(int) : $self->default_expiration;
     
-    my $expires =  $session->get_long("expires");
+    my $expires =  $session->{"expires"}->(long);
     $session->delete("expires");
     
     if (!$expires && $expiration) {

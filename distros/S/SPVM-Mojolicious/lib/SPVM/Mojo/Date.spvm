@@ -113,7 +113,7 @@ class Mojo::Date {
     
     if (my $match = Re->m($date, "^\w+\W+(\d+)\W+(\w+)\W+(\d+)\W+(\d+):(\d+):(\d+)\W*\w+$")) {
       $day = (int)$match->cap1;
-      $month = (int)$MONTHS_H->get_string($match->cap2);
+      $month = (int)$MONTHS_H->{$match->cap2}->(string);
       $year = (int)$match->cap3;
       $h = (int)$match->cap4;
       $m = (int)$match->cap5;
@@ -145,7 +145,7 @@ class Mojo::Date {
     }
     # ANSI C asctime() (Sun Nov  6 08:49:37 1994)
     elsif (Re->m($date, "^\w+\s+(\w+)\s+(\d+)\s+(\d+):(\d+):(\d+)\s+(\d+)$")) {
-      $month = (int)$MONTHS_H->get_string($match->cap1);
+      $month = (int)$MONTHS_H->{$match->cap1}->(string);
       $day = (int)$match->cap2;
       $h = (int)$match->cap3;
       $m = (int)$match->cap4;

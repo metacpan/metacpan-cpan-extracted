@@ -5,7 +5,7 @@ use v5.40;
 use Data::Dumper;
 
 use Daje::Database::Model::ToolsProjects;
-use Daje::Database::Model::ToolsVersion;
+use Daje::Database::View::VToolsVersion;
 
 has 'db';
 
@@ -16,9 +16,9 @@ async sub load_treelist($self, $tools_projects_pkey) {
     # $self->_add_node($treelist, $project->{data}, 'tools_projects');
 
     my $versions = $self->_load_versions($tools_projects_pkey);
+
     my $length = scalar @{$versions->{data}};
     for (my $i = 0; $i < $length; $i++) {
-
 
         my $node = $self->_add_node($treelist, @{$versions->{data}}[$i], 'tools_version', 0);
         push (@{$treelist->{data}}, $node);
@@ -33,7 +33,7 @@ sub _add_node($self, $treelist, $data, $type, $level) {
 
     my $res->{id} = $data->{tools_version_pkey} . "-" . $type;
     $res->{label} = $data->{name} ;
-    $res->{data} = $data->{name} . ' ' . $data->{version} ;
+    $res->{data} = $data ;
     $res->{icon} = 'pi pi-fw pi-folder';
     $res->{children} = [];
 
@@ -42,7 +42,7 @@ sub _add_node($self, $treelist, $data, $type, $level) {
 }
 
 sub _load_versions($self, $tools_projects_pkey) {
-    return Daje::Database::Model::ToolsVersion->new(
+    return Daje::Database::View::VToolsVersion->new(
         db => $self->db
     )->load_tools_version_fkey($tools_projects_pkey)
 }

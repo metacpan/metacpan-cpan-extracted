@@ -24,6 +24,7 @@ t/data/cnb001410157-incorrect_field_020a_isbn_with_extra_characters.xml
 t/data/cnb001873805-incorrect_field_008_content-blank.xml
 t/data/cnb001880327-incorrect_260c.xml
 t/data/cnb001920818-incorrect_field_008_syntax_quote_mark.xml
+t/data/cnb002172297-leader_desc_cataloging_form_coolidate_with_rda.xml
 t/data/cnb003260113-incorrect_field_020a_isbn_bad.xml
 t/data/cnb003698545-incorrect_field_020a_isbn_formatting.xml
 t/data/fake1-incorrect_field_020a.xml
@@ -40,6 +41,11 @@ t/MARC-Validator-Plugin-Field020/02-version.t
 t/MARC-Validator-Plugin-Field020/03-new.t
 t/MARC-Validator-Plugin-Field020/04-name.t
 t/MARC-Validator-Plugin-Field020/05-struct.t
+t/MARC-Validator-Plugin-Field040/01-use.t
+t/MARC-Validator-Plugin-Field040/02-version.t
+t/MARC-Validator-Plugin-Field040/03-new.t
+t/MARC-Validator-Plugin-Field040/04-name.t
+t/MARC-Validator-Plugin-Field040/05-struct.t
 t/MARC-Validator-Plugin-Field260/01-use.t
 t/MARC-Validator-Plugin-Field260/02-version.t
 t/MARC-Validator-Plugin-Field260/03-new.t
@@ -58,6 +64,7 @@ Validator.pm
 Validator/Abstract.pm
 Validator/Plugin/Field008.pm
 Validator/Plugin/Field020.pm
+Validator/Plugin/Field040.pm
 Validator/Plugin/Field260.pm
 Validator/Plugin/Field264.pm
 Validator/Utils.pm
@@ -67,6 +74,8 @@ xt/MARC-Validator-Plugin-Field008/01-pod_coverage.t
 xt/MARC-Validator-Plugin-Field008/02-pod.t
 xt/MARC-Validator-Plugin-Field020/01-pod_coverage.t
 xt/MARC-Validator-Plugin-Field020/02-pod.t
+xt/MARC-Validator-Plugin-Field040/01-pod_coverage.t
+xt/MARC-Validator-Plugin-Field040/02-pod.t
 xt/MARC-Validator-Plugin-Field260/01-pod_coverage.t
 xt/MARC-Validator-Plugin-Field260/02-pod.t
 xt/MARC-Validator-Plugin-Field264/01-pod_coverage.t

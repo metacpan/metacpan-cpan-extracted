@@ -11,8 +11,14 @@ use Test::Exception;
 use Test::More tests => 3;
 
 {
-    sub a: Requires({strictness => 0}, Str, Maybe[Str]) ($hola, $adios, @extra)  {
-        ok 1, 'Got called a because the validation passed';
+    sub a:
+    Requires(
+            {strictness => 0},
+            Str,
+            Maybe[Str]
+    ) 
+    ($hola, $adios, @extra)  {
+            ok 1, 'Got called a because the validation passed';
     }
     lives_ok {
         a("hola", undef, 0..10);

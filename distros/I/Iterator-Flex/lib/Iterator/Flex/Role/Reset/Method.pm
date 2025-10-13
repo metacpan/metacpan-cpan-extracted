@@ -1,11 +1,12 @@
 package Iterator::Flex::Role::Reset::Method;
 
-# ABSTRACT: Implement C<reset> as a method
+# ABSTRACT: Implement reset as a method
 
+use v5.28;
 use strict;
 use warnings;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Role::Tiny;
 
@@ -57,11 +58,11 @@ __END__
 
 =head1 NAME
 
-Iterator::Flex::Role::Reset::Method - Implement C<reset> as a method
+Iterator::Flex::Role::Reset::Method - Implement reset as a method
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 METHODS
 
@@ -72,8 +73,6 @@ version 0.31
    $iterator->reset;
 
 Resets the iterator to its initial value.
-
-=head1 INTERNALS
 
 =head1 SUPPORT
 

@@ -1,5 +1,5 @@
 package Test::Selenium::Remote::Driver;
-$Test::Selenium::Remote::Driver::VERSION = '1.49';
+$Test::Selenium::Remote::Driver::VERSION = '1.50';
 # ABSTRACT: Useful testing subclass for Selenium::Remote::Driver
 
 use Moo;
@@ -110,7 +110,7 @@ functions. It is modeled on L<Test::WWW::Selenium>.
 
 Environment vars can be used to specify options to pass to
 L<Selenium::Remote::Driver>. ENV vars are prefixed with C<TWD_>.
-( After the old fork name, "Test::WebDriver" ). The explicity passed
+( After the old fork name, "Test::WebDriver" ). The explicitly passed
 options have precedence. ENV vars take only effect when they are
 actually set. This important e.g. for the option C<javascript>, which
 is turned on per default in L<Selenium::Remote::Driver>.

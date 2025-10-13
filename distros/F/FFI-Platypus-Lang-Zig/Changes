@@ -1,5 +1,9 @@
 Revision history for FFI-Platypus-Lang-Zig
 
+0.02      2025-10-05 22:50:15 -0600
+  - updated for zig version 0.15.1
+  - drop support for Perls prior to 5.20
+
 0.01      2022-10-27 22:02:16 -0600
   - initial version
 

@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [30.1.0] - 2025-10-08
+### Added
+- [Java] Add OSGi metadata ([#344](https://github.com/cucumber/messages/pull/344))
+
+## [30.0.0] - 2025-10-03
+### Changed
+- [Ruby] Updated minimum Ruby version to 3.2 ([#346](https://github.com/cucumber/messages/pull/346) [luke-hill](https://github.com/luke-hill))
+
+### Removed
+- [Python] Dropped legacy .egg-info metadata distribution artifacts ([#324](https://github.com/cucumber/messages/pull/324))
+
 ## [29.0.1] - 2025-09-08
 ### Fixed
 - [JavaScript] Include schemas in npm package ([#333](https://github.com/cucumber/messages/pull/333))
@@ -603,7 +614,9 @@ aggregated status.
 ### Added
 - Protobuf messages for Go, Java, JavaScript, TypeScript and Ruby
 
-[Unreleased]: https://github.com/cucumber/messages/compare/v29.0.1...HEAD
+[Unreleased]: https://github.com/cucumber/messages/compare/v30.1.0...HEAD
+[30.1.0]: https://github.com/cucumber/messages/compare/v30.0.0...v30.1.0
+[30.0.0]: https://github.com/cucumber/messages/compare/v29.0.1...v30.0.0
 [29.0.1]: https://github.com/cucumber/messages/compare/v29.0.0...v29.0.1
 [29.0.0]: https://github.com/cucumber/messages/compare/v28.1.0...v29.0.0
 [28.1.0]: https://github.com/cucumber/messages/compare/v28.0.0...v28.1.0

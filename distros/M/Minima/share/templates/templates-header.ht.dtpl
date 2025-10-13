@@ -25,7 +25,7 @@
 </head>
 <body>
 
-%% foreach p in view.pre_body
+%% foreach p in view.body_open
 %%   include $p
 %% end
 

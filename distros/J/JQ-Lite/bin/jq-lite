@@ -322,25 +322,73 @@ sub print_supported_functions {
     print <<'EOF';
 
 Supported Functions:
-  length           - Get number of elements in an array or keys in a hash
+  length           - Count array elements, hash keys, or characters in scalars
   keys             - Extract sorted keys from a hash
   values           - Extract values from a hash (v0.34)
   sort             - Sort array items
+  sort_desc        - Sort array items in descending order
   sort_by(KEY)     - Sort array of objects by key
+  pluck(KEY)       - Collect a key's value from each object in an array
+  pick(KEYS...)    - Build new objects containing only the supplied keys (arrays handled element-wise)
+  merge_objects()  - Merge arrays of objects into a single hash (last-write-wins)
   unique           - Remove duplicate values
+  unique_by(KEY)   - Remove duplicates by projecting each item on KEY
   reverse          - Reverse an array
   first / last     - Get first / last element of an array
   limit(N)         - Limit array to first N elements
+  drop(N)          - Skip the first N elements of an array
+  tail(N)          - Return the final N elements of an array
+  chunks(N)        - Split array into subarrays each containing up to N items
+  enumerate()      - Pair each array element with its zero-based index
   count            - Count total number of matching items
   map(EXPR)        - Map/filter array items with a subquery
+  add / sum        - Sum all numeric values in an array
+  sum_by(KEY)      - Sum numeric values projected from each array item
+  avg_by(KEY)      - Average numeric values projected from each array item
+  min_by(PATH)     - Return the element with the smallest projected value
+  max_by(PATH)     - Return the element with the largest projected value
+  product          - Multiply all numeric values in an array
+  min / max        - Return minimum / maximum numeric value in an array
+  avg              - Return the average of numeric values in an array
+  median           - Return the median of numeric values in an array
+  mode             - Return the most frequent value in an array (ties pick earliest occurrence)
+  variance         - Return the variance of numeric values in an array
+  stddev           - Return the standard deviation of numeric values in an array
+  abs              - Convert numbers (and array elements) to their absolute value
+  ceil()           - Round numbers up to the nearest integer
+  floor()          - Round numbers down to the nearest integer
+  round()          - Round numbers to the nearest integer (half-up semantics)
+  clamp(MIN, MAX)  - Clamp numeric values within an inclusive range
+  to_number()      - Coerce numeric-looking strings/booleans into numbers
+  nth(N)           - Get the Nth element of an array (zero-based index)
+  index(VALUE)     - Return the zero-based index of VALUE within arrays or strings
   group_by(KEY)    - Group array items by field
+  group_count(KEY) - Count grouped items by field
   join(SEPARATOR)  - Join array elements with a string
-  has              - Check if object has a given key
-  contains         - Check if array or string contains a value
+  split(SEPARATOR) - Split string values (and arrays of strings) by a literal separator
+  substr(START[, LENGTH])
+                   - Extract substring using zero-based indices (arrays handled element-wise)
+  slice(START[, LENGTH])
+                  - Return a subarray using zero-based indices (negative starts count from the end)
+  has              - Check if objects contain a key or arrays expose an index
+  contains         - Check if strings include a fragment, arrays contain an element, or hashes have a key
   match("pattern") - Match string using regex
   flatten          - Explicitly flatten arrays (same as .[])
+  flatten_all()    - Recursively flatten nested arrays into a single array
+  flatten_depth(N) - Flatten nested arrays up to N levels deep
+  del(KEY)         - Remove a key from objects in the result
+  compact          - Remove undefined values from arrays
+  path             - Return available keys for objects or indexes for arrays
+  is_empty         - Check if an array or object is empty
+  upper()          - Convert scalars and array elements to uppercase
+  lower()          - Convert scalars and array elements to lowercase
+  titlecase()      - Convert scalars and array elements to title case
+  trim()           - Strip leading/trailing whitespace from strings (recurses into arrays)
+  startswith(PFX)  - Check if a string (or array of strings) begins with PFX
+  endswith(SFX)    - Check if a string (or array of strings) ends with SFX
   empty            - Discard all output (for side-effect use)
   type()           - Return the type of value ("string", "number", "boolean", "array", "object", "null")
+  default(VALUE)   - Substitute VALUE when result is undefined
 
 EOF
 }

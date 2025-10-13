@@ -2,11 +2,12 @@ package Iterator::Flex::Permute;
 
 # ABSTRACT: Permute Iterator Class
 
+use v5.28;
 use strict;
 use warnings;
 use experimental qw( signatures postderef declared_refs );
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use parent 'Iterator::Flex::Base';
 use Iterator::Flex::Utils qw( :IterAttrs :IterStates throw_failure );
@@ -351,7 +352,7 @@ Iterator::Flex::Permute - Permute Iterator Class
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 METHODS
 
@@ -386,8 +387,6 @@ The returned iterator supports the following capabilities:
 =item reset
 
 =back
-
-=head1 INTERNALS
 
 =head1 SUPPORT
 

@@ -1,0 +1,54 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "David E. Condon"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "freebsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Matplotlib-Simple",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Capture::Tiny" : "0.5",
+            "Data::Printer" : "1.002001",
+            "Devel::Confess" : "0.009004",
+            "perl" : "5.012",
+            "strict" : "1",
+            "warnings" : "1"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/hhg7/MatPlotLib-Simple.git",
+         "web" : "https://github.com/hhg7/MatPlotLib-Simple"
+      }
+   },
+   "version" : 0.01,
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

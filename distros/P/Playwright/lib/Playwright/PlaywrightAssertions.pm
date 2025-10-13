@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::PlaywrightAssertions;
-$Playwright::PlaywrightAssertions::VERSION = '1.532';
+$Playwright::PlaywrightAssertions::VERSION = '1.551';
 use parent 'Playwright::Base';
 
 sub new {
@@ -22,11 +22,31 @@ sub spec {
     return $Playwright::spec->{'PlaywrightAssertions'}{members};
 }
 
+sub setDefaultAssertionTimeout {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'setDefaultAssertionTimeout',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
 sub expectAPIResponse {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
         command => 'expectAPIResponse',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub expectGeneric {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'expectGeneric',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -47,26 +67,6 @@ sub expectPage {
     return $self->_api_request(
         args    => [@_],
         command => 'expectPage',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub setDefaultAssertionTimeout {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'setDefaultAssertionTimeout',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub expectGeneric {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'expectGeneric',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -116,7 +116,7 @@ Playwright::PlaywrightAssertions - Automatically generated class for Playwright:
 
 =head1 VERSION
 
-version 1.532
+version 1.551
 
 =head1 CONSTRUCTOR
 
@@ -127,11 +127,23 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
+=head2 setDefaultAssertionTimeout(@args)
+
+Execute the PlaywrightAssertions::setDefaultAssertionTimeout playwright routine.
+
+See L<https://playwright.dev/docs/api/class-PlaywrightAssertions#PlaywrightAssertions-setDefaultAssertionTimeout> for more information.
+
 =head2 expectAPIResponse(@args)
 
 Execute the PlaywrightAssertions::expectAPIResponse playwright routine.
 
 See L<https://playwright.dev/docs/api/class-PlaywrightAssertions#PlaywrightAssertions-expectAPIResponse> for more information.
+
+=head2 expectGeneric(@args)
+
+Execute the PlaywrightAssertions::expectGeneric playwright routine.
+
+See L<https://playwright.dev/docs/api/class-PlaywrightAssertions#PlaywrightAssertions-expectGeneric> for more information.
 
 =head2 expectLocator(@args)
 
@@ -144,18 +156,6 @@ See L<https://playwright.dev/docs/api/class-PlaywrightAssertions#PlaywrightAsser
 Execute the PlaywrightAssertions::expectPage playwright routine.
 
 See L<https://playwright.dev/docs/api/class-PlaywrightAssertions#PlaywrightAssertions-expectPage> for more information.
-
-=head2 setDefaultAssertionTimeout(@args)
-
-Execute the PlaywrightAssertions::setDefaultAssertionTimeout playwright routine.
-
-See L<https://playwright.dev/docs/api/class-PlaywrightAssertions#PlaywrightAssertions-setDefaultAssertionTimeout> for more information.
-
-=head2 expectGeneric(@args)
-
-Execute the PlaywrightAssertions::expectGeneric playwright routine.
-
-See L<https://playwright.dev/docs/api/class-PlaywrightAssertions#PlaywrightAssertions-expectGeneric> for more information.
 
 =head2 on(@args)
 
@@ -210,7 +210,7 @@ George S. Baugh <teodesian@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2020 Troglodyne LLC
+Copyright (c) 2025 Troglodyne LLC
 
 
 Permission is hereby granted, free of charge, to any person obtaining a copy

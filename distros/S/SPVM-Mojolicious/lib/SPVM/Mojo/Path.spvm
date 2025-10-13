@@ -11,33 +11,7 @@ class Mojo::Path {
   interface Stringable;
   
   # Fields
-  has parts : virtual rw string[]
-    get {
-      return $self->parts_list->to_array;
-    }
-    
-    set {
-      unless ($_) {
-        die "The parts argument must be defined.";
-      }
-      $self->set_parts_list(StringList->new($_));
-    }
-  ;
-  
-  has parts_list : rw StringList
-    get {
-      $self->_parse;
-      return $self->{parts_list};
-    }
-    
-    set {
-      unless ($_) {
-        die "The parts_list argument must be defined.";
-      }
-      $self->{parts_list} = $_;
-      $self->{path} = undef;
-    }
-  ;
+  has parts : rw string[];
   
   has leading_slash : rw byte
     get {
@@ -83,23 +57,23 @@ class Mojo::Path {
     
     $self->_parse;
     
-    my $parts_list = $self->{parts_list};
+    my $parts = StringList->new_ref($self->{parts});
     
     my $i = 0;
-    while ($i < $parts_list->length) {
-      if    (!length $parts_list->get($i) || $parts_list->get($i) eq "." || $parts_list->get($i) eq "...") {
-        $parts_list->replace($i, 1, undef);
+    while ($i < $parts->length) {
+      if    (!length $parts->get($i) || $parts->get($i) eq "." || $parts->get($i) eq "...") {
+        $parts->replace($i, 1, undef);
       }
-      elsif ($i < 1 || $parts_list->get($i) ne ".." || $parts_list->get($i - 1) eq "..")           {
+      elsif ($i < 1 || $parts->get($i) ne ".." || $parts->get($i - 1) eq "..")           {
         $i++;
       }
       else {
         --$i;
-        $parts_list->replace($i, 2, undef);
+        $parts->replace($i, 2, undef);
       }
     }
     
-    if ($parts_list->length == 0) {
+    if ($parts->length == 0) {
       $self->set_trailing_slash(0);
     }
     
@@ -109,7 +83,7 @@ class Mojo::Path {
     
     # This method does not parse $path, parts method parse path field by calling _parse method.
     $self->{path} = $path;
-    $self->{parts_list} = undef;
+    $self->{parts} = undef;
   }
   
   method to_string : string () {
@@ -183,11 +157,10 @@ class Mojo::Path {
     
     my $clone = Mojo::Path->new;
     
-    if (my $parts_list = $self->{parts_list}) {
+    if ($self->{parts}) {
       $clone->{leading_slash} = $self->{leading_slash};
       $clone->{trailing_slash} = $self->{trailing_slash};
-      
-      $clone->{parts_list} = StringList->new($parts_list->to_array);
+      $clone->{parts} = Array->copy_string($self->{parts});
     }
     else {
       $clone->{path} = copy $self->{path};
@@ -218,15 +191,17 @@ class Mojo::Path {
       return;
     }
     
+    my $parts = StringList->new_ref($self->{parts});
+    
     # Merge
     unless ($self->trailing_slash) {
-      $self->{parts_list}->pop;
+      $parts->pop;
     }
     
     my $path_obj = Mojo::Path->new($path_string);
     
     for my $part (@{$path_obj->parts}) {
-      $self->{parts_list}->push($part);
+      $parts->push($part);
     }
     
     $self->set_trailing_slash($path_obj->trailing_slash);
@@ -236,8 +211,10 @@ class Mojo::Path {
     
     my $clone = $self->clone;
     
+    my $parts = StringList->new_ref($self->{parts});
+    
     unless ($clone->trailing_slash) {
-      $clone->{parts_list}->pop;
+      $parts->pop;
     }
     
     $clone->set_trailing_slash(!!@{$clone->parts});
@@ -247,9 +224,7 @@ class Mojo::Path {
   
   private method _parse : void (){
     
-    my $parts_list = $self->{parts_list};
-    
-    unless ($parts_list) {
+    unless ($self->{parts}) {
       my $path_url_encoded = $self->{path};
       $self->{path} = undef;
       unless ($path_url_encoded) {
@@ -258,7 +233,7 @@ class Mojo::Path {
       my $path = Mojo::Util->url_unescape($path_url_encoded);
       $self->{leading_slash} = (byte)!!Re->s($path, "^/", "");
       $self->{trailing_slash} = (byte)!!Re->s($path, "/$", "");
-      $self->{parts_list} = StringList->new(Fn->split("/", $path, -1));
+      $self->{parts} = Fn->split("/", $path, -1);
     }
     
   }

@@ -18,7 +18,7 @@ my %module_build_args = (
     "Thomas Klausner <domm\@plix.at>"
   ],
   "dist_name" => "Snig",
-  "dist_version" => "1.000",
+  "dist_version" => "1.001",
   "license" => "perl",
   "module_name" => "Snig",
   "recursive_test_files" => 1,

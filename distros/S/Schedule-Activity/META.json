@@ -1,5 +1,5 @@
 {
-	"version" : "0.1.0",
+	"version" : "0.1.1",
 	"name"    : "Schedule-Activity",
 	"author"  : ["Brian Blackmore <BBLACKM@cpan.org>"],
 	"abstract": "Generate activity schedules",

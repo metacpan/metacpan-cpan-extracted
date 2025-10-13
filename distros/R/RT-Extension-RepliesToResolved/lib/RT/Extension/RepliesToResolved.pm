@@ -2,7 +2,7 @@ use 5.008003; use strict; use warnings;
 
 package RT::Extension::RepliesToResolved;
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 =head1 NAME
 
@@ -10,7 +10,7 @@ RT::Extension::RepliesToResolved - intercept replies to resolved tickets
 
 =head1 RT VERSION
 
-Works with RT 4.4, 5.0
+Works with RT 4.4, 5.0, 6.0
 
 =head1 DESCRIPTION
 
@@ -48,7 +48,7 @@ in your database.
 If you are upgrading this module, check for upgrading instructions
 in case changes need to be made to your database.
 
-=item Edit your F</opt/rt5/etc/RT_SiteConfig.pm>
+=item Edit your F</opt/rt6/etc/RT_SiteConfig.pm>
 
 If you are using RT 4.2 or greater, add this line:
 
@@ -62,7 +62,7 @@ or add C<RT::Extension::RepliesToResolved> to your existing C<@Plugins> line.
 
 =item Clear your mason cache
 
-    rm -rf /opt/rt5/var/mason_data/obj
+    rm -rf /opt/rt6/var/mason_data/obj
 
 =item Restart your webserver
 
@@ -72,7 +72,7 @@ or add C<RT::Extension::RepliesToResolved> to your existing C<@Plugins> line.
 
 Configuration for this extension is defined in
 
-    /opt/rt5/local/plugins/RT-Extension-RepliesToResolved/etc/RepliesToResolved_Config.pm
+    /opt/rt6/local/plugins/RT-Extension-RepliesToResolved/etc/RepliesToResolved_Config.pm
 
 You can read about the options in that file and then set your own
 options in your RT_SiteConfig.pm file.
@@ -165,7 +165,7 @@ or via the web at
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2014-2022 by Best Practical Solutions
+This software is Copyright (c) 2014-2025 by Best Practical Solutions
 
 This is free software, licensed under:
 

@@ -1,0 +1,12 @@
+Revision history for HTML-Genealogy-Map
+
+0.03	Fri Oct  3 17:49:07 EDT 2025
+	Fix https://www.cpantesters.org/cpan/report/96d3899a-9ff8-11f0-bee0-9d09aee9520c
+	Use Object::Configure
+
+0.02	Fri Oct  3 13:04:06 EDT 2025
+	Remove unused modules in tests
+	Allow the height/width to be set
+
+0.01	Thu Oct  2 14:16:08 EDT 2025
+        First draft

@@ -56,7 +56,7 @@ EOS
       die $self->usage;
     }
     
-    my $nph = $values_h->get_int("nph");
+    my $nph = $values_h->{"nph"}->(int);
     
     my $server = Mojo::Server::CGI->new;
     

@@ -1,0 +1,296 @@
+#!/usr/bin/perl
+
+# Copyright (c) 2024-2025 Löwenfelsen UG (haftungsbeschränkt)
+
+# licensed under Artistic License 2.0 (see LICENSE file)
+
+# ABSTRACT: Script used to render a HTML page with font information
+
+use strict;
+use warnings;
+use v5.16;
+
+use Carp;
+use Fcntl qw(SEEK_SET);
+use Getopt::Long;
+use SIRTX::Font;
+use Template;
+use URI;
+use Encode ();
+use charnames ();
+
+my %config = (
+    output          => undef,
+    font            => undef,
+    default_aliases => undef,
+    gc              => undef,
+    show_found      => 1,
+    show_missing    => [],
+    also_missing    => [],
+);
+
+{
+    my %opts;
+
+    $opts{'output|o=s'}         = \$config{output};
+    $opts{'font=s'}             = \$config{font};
+    $opts{'default-aliases=s'}  = \$config{default_aliases};
+    $opts{'gc!'}                = \$config{gc};
+    $opts{'show-found!'}        = \$config{show_found};
+    $opts{'show-missing=s@'}    = \$config{show_missing};
+    $opts{'also-missing=s@'}    = \$config{also_missing};
+
+    $opts{'help|h'} = sub {
+        printf("Usage: %s [OPTIONS] -o output.html --font=input.sf\n", $0);
+        say '';
+        printf("OPTIONS:\n");
+        printf(" %s\n", $_) foreach sort keys %opts;
+        exit(0);
+    };
+
+    Getopt::Long::Configure('bundling');
+    GetOptions(%opts);
+}
+
+my $font = SIRTX::Font->new;
+
+if (defined($config{font})) {
+    open(my $in, '<:raw', $config{font}) or croak 'Cannot open: '.$config{font};
+    $font->read($in);
+}
+
+$font->add_default_aliases($config{default_aliases}) if defined $config{default_aliases};
+$font->gc if $config{gc};
+
+if (defined $config{output}) {
+    my $tt = Template->new;
+    my %rows;
+    my %missing_counts;
+
+    if ($config{show_found}) {
+        foreach my $codepoint (keys %{$font->{chars}}) { # TODO: FIXME! Internal API!
+            my $cp = build_codepoint($codepoint => \%rows);
+            my $img = $font->export_glyph_as_image_magick($font->glyph_for($codepoint));
+            my $uri = URI->new('data:');
+
+            $uri->media_type('image/png');
+            $uri->data($img->ImageToBlob(magick => 'png'));
+
+            $cp->{uri} = $uri;
+        }
+    }
+
+    foreach my $list (@{$config{show_missing}}) {
+        $missing_counts{$list} //= 0;
+
+        foreach my $codepoint ($font->missing_codepoints_from($list)) {
+            my $cp = build_codepoint($codepoint => \%rows);
+            $cp->{classes} = 'missing';
+            push(@{$cp->{missing_in} //= []}, $list);
+            $missing_counts{$list}++;
+        }
+    }
+    foreach my $list (@{$config{also_missing}}) {
+        $missing_counts{'also-missing'} //= 0;
+        foreach my $codepoint_pair (split /(?:\s*,\s*|\s+)/, $list) {
+            my ($start, $end);
+
+            if ($codepoint_pair =~ /^[Uu]\+([0-9a-fA-F]{4,6})(?:-[Uu]\+([0-9a-fA-F]{4,6}))?$/) {
+                $start = hex $1;
+                $end   = hex $2 if defined $2;
+            } else {
+                croak 'Bad code point: '.$codepoint_pair;
+            }
+            $end //= $start;
+            for (my $codepoint = $start; $codepoint <= $end; $codepoint++) {
+                my $cp = build_codepoint($codepoint => \%rows);
+                unless (defined $cp->{uri}) {
+                    $cp->{classes} = 'missing';
+                    $missing_counts{'also-missing'}++;
+                }
+            }
+        }
+    }
+
+
+    open(my $out, '>:utf8', $config{output}) or croak 'Cannot open output: '.$config{output};
+
+    $tt->process(\*DATA, {
+            info => {
+                width => $font->width,
+                height => $font->height,
+                bits => $font->bits,
+                codepoints => scalar($font->codepoints),
+                glyphs => scalar($font->glyphs),
+            },
+            missing_counts => \%missing_counts,
+            missing_counts_keys => [sort keys %missing_counts],
+            rows => [sort {$a->{first} <=> $b->{first}} values %rows],
+    }, $out);
+}
+
+sub build_codepoint {
+    my ($codepoint, $rows) = @_;
+    my $row = $rows->{int($codepoint / 16)} //= {first => ($codepoint & 0xFFFFF0), chars => []};
+    return $row->{chars}[$codepoint & 0xF] //= {
+        codepoint   => $codepoint,
+        is_print    => ($codepoint > 0x20 && ($codepoint < 0x7F || $codepoint > 0x9F) && scalar(chr($codepoint) !~ /^\s$/) && $codepoint != 0x00AD && $codepoint != 0x00A0),
+        is_space    => ($codepoint == 0x00A0 || $codepoint == 0x20 || scalar(chr($codepoint) =~ /^\s$/)),
+        as_utf8     => join('', map {sprintf('\\x%02X', ord($_))} split //, Encode::encode('UTF-8', chr($codepoint))),
+        name        => scalar(charnames::viacode($codepoint)),
+    };
+}
+
+#ll
+__DATA__
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Character list</title>
+        <meta charset="utf-8">
+        <style>
+:root {
+    --pattern-colour: #CCCCCC;
+}
+
+body {
+    background-color: white;
+    color: black;
+}
+
+a:link, a:visited {
+    color: unset;
+    text-decoration: unset;
+}
+a {
+    user-select: text;
+}
+
+table, tr, td, th {
+    border: 1px solid black;
+    border-collapse: collapse;
+    vertical-align: top;
+    background-color: white;
+}
+td, th {
+    padding: 5px;
+}
+td:hover {
+    scale: 2;
+    outline: 1px solid black;
+}
+
+.sf img {
+    scale: 2;
+    image-rendering: crisp-edges;
+    border: 1px solid black;
+    padding: 1px;
+    margin: 3px;
+}
+
+.char {
+    font-size: 150%;
+}
+
+.name, .utf8, .missing-in {
+    font-size: 50%;
+}
+
+.charinfo {
+    text-align: center;
+}
+
+.undef {
+    background-color: #CCCCCC;
+}
+.ascii {
+    background-color: #C0FFC0;
+}
+.missing {
+    background-color: #FFC0C0;
+}
+:target {
+    background-color: #C0C0FF;
+}
+.nonprint {
+    background-size: 20px 20px;
+    background-image: repeating-linear-gradient(45deg, var(--pattern-colour) 0, var(--pattern-colour) 2px, transparent 0, transparent 50%);
+}
+.space {
+    background-size: 20px 20px;
+    background-image: radial-gradient(var(--pattern-colour) 2px, transparent 2px);
+}
+        </style>
+    </head>
+    <body>
+        <h1>Font Information</h1>
+        <table>
+            <tr>
+                <th>Key</th>
+                <th>Value</th>
+            </tr>
+            <tr>
+                <th>Cell size</th>
+                <td>[% info.width | html %]x[% info.height | html %]</td>
+            </tr>
+            <tr>
+                <th>Bits per pixel</th>
+                <td>[% info.bits | html %]</td>
+            </tr>
+            <tr>
+                <th>Codepoints</th>
+                <td>[% info.codepoints | html %]</td>
+            </tr>
+            <tr>
+                <th>Glyphs</th>
+                <td>[% info.glyphs | html %]</td>
+            </tr>
+        </table>
+        [% IF missing_counts_keys.0 %]
+        <h2>Missing counts</h2>
+        <table>
+            <tr>
+                <th>List</th>
+                <th>Count</th>
+            </tr>
+            [% FOREACH key IN missing_counts_keys %]
+            <tr>
+                <th>[% key | html %]</th>
+                <td>[% missing_counts.$key | html %]</td>
+            </tr>
+            [% END %]
+        </table>
+        [% END %]
+        <h2>Character list</h2>
+        <table>
+            <tr>
+                <th>&nbsp;</th>
+                [% FOREACH x IN [0..15] %]
+                <th>[% x | format('_%X') | html %]</th>
+                [% END %]
+            </tr>
+            [% FOREACH row IN rows %]
+            <tr>
+                <th>[% (row.first / 16) | format('%X_') | html %]</th>
+                [% FOREACH x IN [0..15] %]
+                [% cp = row.chars.$x %]
+                [% IF cp %]
+                <td id="[% cp.codepoint | format('U+%04X') | html %]" class="charinfo [% cp.classes | html %] [% IF cp.codepoint < 128 %]ascii[% END %] [% IF cp.is_space %]space[% ELSIF cp.is_print %]print[% ELSE %]nonprint[% END %]">
+                    <a href="#[% cp.codepoint | format('U+%04X') | html %]" draggable="false">
+                        <div class="char">[% IF cp.is_print %]&#[% cp.codepoint | html %];[% ELSE %]&nbsp;[% END %]</div>
+                        <div class="cp">[% cp.codepoint | format('U+%04X') | html %]</div>
+                        [% IF cp.uri %]<div class="sf"><img src="[% cp.uri | html %]"></div>[% END %]
+                        <div class="utf8">"[% cp.as_utf8 | html %]"</div>
+                        <div class="name">[% cp.name | html %]</div>
+                        [% IF cp.missing_in %]<div class="missing-in">[% FOREACH list IN cp.missing_in %][% list | html %] [% END %]</div>[% END %]
+                    </a>
+                </td>
+                [% ELSE %]
+                <td class="undef"></td>
+                [% END %]
+                [% END %]
+            </tr>
+            [% END %]
+        </table>
+    </body>
+</html>

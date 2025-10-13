@@ -13,7 +13,7 @@ Iterator::Flex::Manual::Alien - Interfacing with non- Iterator::Flex things.
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 DESCRIPTION
 
@@ -31,8 +31,6 @@ lifting.
 
 There's also L<Iterator::Flex::ArrayLike>, which interfaces
 to objects which can provide a length and an element accessor.
-
-=head1 INTERNALS
 
 =head1 UNDER THE HOOD
 

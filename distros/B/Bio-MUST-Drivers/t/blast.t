@@ -23,6 +23,7 @@ Note: tests designed for:
 - blast 2.10.0, build Jan  8 2020 22:00:09
 - blast 2.11.0, build Nov  3 2020 16:32:26
 - blast 2.16.0, build Jun 25 2024 12:36:54
+- blast 2.17.0, build Jul  1 2025 12:49:33
 EOT
 
 my $qr_class = 'Bio::MUST::Core::Ali::Temporary';
@@ -189,6 +190,7 @@ sub filter {
     $line =~ s{\ +\t}{\t}xmsg;      # normalize whitespace
 
     # version- and job-dependent tags
+    return q{} if $line =~ m/xml \s version/xms;
     return q{} if $line =~ m/BlastOutput_version/xms;
     return q{} if $line =~ m/BlastOutput_db/xms;
     return q{} if $line =~ m/RID:/xms;

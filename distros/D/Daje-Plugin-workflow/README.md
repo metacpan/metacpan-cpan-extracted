@@ -7,6 +7,15 @@ Daje::Plugin::workflow - It's new $module
 
     use Daje::Plugin::workflow;
 
+    Expected config data
+
+    workflow => {
+        loader => {
+            path => '/home/xxxx/Project/Workflows',
+            type => 'workflow'
+        }
+    }
+
 # DESCRIPTION
 
 Daje::Plugin::workflow is the Mojolicious plugin for Daje::Workflow

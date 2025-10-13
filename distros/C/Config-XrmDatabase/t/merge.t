@@ -14,7 +14,12 @@ $db2->insert( $key, 'blue' );
 
 $db1->merge( $db2 );
 
-is ( $db1->query( 'Xmh.Paned.Box.Command.Foreground',
-                 'xmh.toc.messagefunctions.incorporate.activeForeground' ), 'blue' );
+is(
+    $db1->query(
+        'Xmh.Paned.Box.Command.Foreground',
+        'xmh.toc.messagefunctions.incorporate.activeForeground',
+    ),
+    'blue',
+);
 
 done_testing;

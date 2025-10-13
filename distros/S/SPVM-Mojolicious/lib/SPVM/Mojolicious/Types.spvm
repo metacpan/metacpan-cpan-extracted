@@ -71,9 +71,9 @@ class Mojolicious::Types {
       return;
     }
     
-    my $file = $options_h->get_string("file");
+    my $file = $options_h->{"file"}->(string);
     
-    my $ext = $options_h->get_string("ext");
+    my $ext = $options_h->{"ext"}->(string);
     
     my $type = $file ? $self->file_type($file) : $self->type($ext);
     
@@ -99,8 +99,8 @@ class Mojolicious::Types {
     
     my $detected = $types->keys;
     
-    Sort->sort_object($detected, [$types : Hash] method : int ($a : object, $b : object) {
-      return $types->get_int((string)$b) <=> $types->get_int((string)$a);
+    Sort->sort_object($detected, [$types : Hash] method : int ($a : string, $b : string) {
+      return $types->{$b}->(int) <=> $types->{$a}->(int);
     });
     
     # Detect extensions from MIME types
@@ -126,7 +126,7 @@ class Mojolicious::Types {
     
     my $exts_list = StringList->new;
     for my $detected_type (@$detected) {
-      my $ext = $reverse->get_string($detected_type);
+      my $ext = $reverse->{$detected_type}->(string);
       
       $exts_list->push($ext);
     }

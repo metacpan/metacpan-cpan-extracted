@@ -1,3 +1,39 @@
+Thu Oct  2 08:01:50 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.6.0]:
+	* VERSION: bump
+	* configure.ac
+	- ReadOnly, List::Util 1.33
+	* cpan/buildspec.yml
+	- cpan/*requires
+	* cpan/requires: -ReadonlyX, +Readonly
+	* src/main/perl/bin/make-cpan-dist.pl.in
+	- logging
+	(write_makefile)
+	- refactoring
+	- pass named args to get_requires
+	(parse_include_version)
+	- refactoring
+	(get_requires)
+	- logging
+	- fix version parsing
+	- force version ='0' if !include-version
+	(init_logger): new
+	(main)
+	- init_logger()
+	- log options at trace level
+	* src/main/perl/lib/CPAN/Maker.pm.in
+	- minor wording tweak in VERSION section
+	* src/main/perl/lib/README.md: generated
+
+Wed Aug 20 12:36:16 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.5.47]:
+	* VERSION: bump
+	* README.md: generated
+	* src/main/perl/lib/File/Process/Utils.pm.in
+	- really get rid of ReadonlyX
+
 Mon Jun 23 06:23:28 2025  Rob Lauer  <rlauer6@comcast.net>
 
 	[1.5.46]:

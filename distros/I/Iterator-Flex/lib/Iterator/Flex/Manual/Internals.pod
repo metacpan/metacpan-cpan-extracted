@@ -13,7 +13,7 @@ Iterator::Flex::Manual::Internals - How Things Work
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 DESCRIPTION
 
@@ -190,8 +190,6 @@ L<Iterator::Flex::Role::Prev::Closure>
 L<Iterator::Flex::Role::Error::Throw>
 
 =back
-
-=head1 INTERNALS
 
 =head1 SUPPORT
 

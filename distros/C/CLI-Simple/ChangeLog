@@ -1,3 +1,20 @@
+Tue Oct  7 14:23:24 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.8]:
+	* VERSION: bump
+	* src/main/perl/lib/CLI/Simple/README.md: generated
+	* src/main/perl/lib/CLI/Simple/Utils.pm.in
+	(choose): new
+	- export choose
+	- added pod
+	* src/main/perl/lib/CLI/Simple/Utils/README.md: generated
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	example.pl
+	quick-start.pl
+
+
 Sun Sep 28 15:43:18 2025  Rob Lauer  <rlauer6@comcast.net>
 
 	[1.0.7]:

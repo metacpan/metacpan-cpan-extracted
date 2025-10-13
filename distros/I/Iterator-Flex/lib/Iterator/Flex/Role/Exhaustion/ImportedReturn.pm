@@ -2,10 +2,11 @@ package Iterator::Flex::Role::Exhaustion::ImportedReturn;
 
 # ABSTRACT: Imported iterator returns a sentinel
 
+use v5.28;
 use strict;
 use warnings;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Iterator::Flex::Utils qw( :default REG_GENERAL REG_GP_INPUT_EXHAUSTION );
 
@@ -50,7 +51,7 @@ Iterator::Flex::Role::Exhaustion::ImportedReturn - Imported iterator returns a s
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 METHODS
 
@@ -59,8 +60,6 @@ version 0.31
   $sentinel = $iterator->sentinel
 
 returns the sentinel which the iterator will return to signal exhaustion
-
-=head1 INTERNALS
 
 =head1 SUPPORT
 

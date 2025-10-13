@@ -47,7 +47,7 @@ use PPIx::Regexp::Constant qw{
 
 use PPIx::Regexp::Util qw{ :width_one };
 
-our $VERSION = '0.090';
+our $VERSION = '0.091';
 
 sub __new {
     my ( $class, $content, %arg ) = @_;
@@ -202,7 +202,7 @@ my $white_space_re = $] >= 5.008 ?
 'qr< \\A [\\t\\n\\cK\\f\\r ]+ >smx';
 $white_space_re = eval $white_space_re;  ## no critic (ProhibitStringyEval)
 
-my %regex_pass_on = map { $_ => 1 } qw{ [ ] ( ) $ \ };
+my %regex_pass_on = map { $_ => 1 } ( qw{ [ ] ( ) $ }, "\\" );
 
 sub __PPIX_TOKENIZER__regexp {
     my ( undef, $tokenizer, $character ) = @_;	# Invocant, $char_type unused
@@ -264,6 +264,9 @@ sub __PPIX_TOKENIZER__regexp {
     my $heed_x = $tokenizer->get_mode() eq 'regexp';
     if ( $heed_x && $tokenizer->modifier( 'x*' ) &&
 	! $tokenizer->cookie( COOKIE_CLASS ) ) {
+	# We are parsing a regex (not a replacement) AND
+	# We have at least 1 /x modifier AND
+	# We are NOT inside a character class
 	my $accept;
 	$accept = $tokenizer->find_regexp( $white_space_re )
 	    and return $tokenizer->make_token(
@@ -274,6 +277,9 @@ sub __PPIX_TOKENIZER__regexp {
 		$accept, 'PPIx::Regexp::Token::Comment' );
     } elsif ( $heed_x && $tokenizer->modifier( 'xx' ) &&
 	$tokenizer->cookie( COOKIE_CLASS ) ) {
+	# We are parsing a regex (not a replacement) AND
+	# We have exactly two /x modifiers AND
+	# We are inside a character class
 	my $accept;
 	$accept = $tokenizer->find_regexp( qr{ \A [ \t] }smx )
 	    and return $tokenizer->make_token(
@@ -281,6 +287,7 @@ sub __PPIX_TOKENIZER__regexp {
 		{ perl_version_introduced => '5.025009' },
 	    );
     } else {
+	# Under any other circumstances
 	( $character eq '#' || $character =~ m/ \A \s \z /smx )
 	    and return 1;
     }

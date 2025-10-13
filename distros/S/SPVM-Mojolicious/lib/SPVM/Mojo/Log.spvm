@@ -69,15 +69,11 @@ class Mojo::Log extends Mojo::EventEmitter {
     return $handle;
   }
   
-  has history_list : List of Mojo::Log::Line;
-  
-  method history : Mojo::Log::Line[] () {
-    return $self->{history_list}->to_array->(Mojo::Log::Line[]);
-  }
+  has history : Mojo::Log::Line[];
   
   has level : rw string;
   
-  has max_history_list_size : rw int;
+  has max_history_size : rw int;
   
   has path : rw string;
   
@@ -95,11 +91,11 @@ class Mojo::Log extends Mojo::EventEmitter {
     
     my $self = new Mojo::Log;
     
-    $self->{history_list} = List->new(new Mojo::Log::Line[0]);
+    $self->{history} = new Mojo::Log::Line[0];
     
     $self->{level} = "trace";
     
-    $self->{max_history_list_size} = 10;
+    $self->{max_history_size} = 10;
     
     if (length (my $_ = Sys->env("MOJO_LOG_SHORT"))) {
       $self->{short} = (byte)$_;
@@ -136,48 +132,48 @@ class Mojo::Log extends Mojo::EventEmitter {
   
   method debug : void ($message : string|Mojo::Log::Callback::Message) {
     
-    if (2 >= $LEVEL->get_int($self->level)) {
+    if (2 >= $LEVEL->{$self->level}->(int)) {
       $self->_log($message, "debug");
     }
   }
   
   method error : void ($message : string|Mojo::Log::Callback::Message) {
     
-    if (5 >= $LEVEL->get_int($self->level)) {
+    if (5 >= $LEVEL->{$self->level}->(int)) {
       $self->_log($message, "error");
     }
   }
   
   method fatal : void ($message : string|Mojo::Log::Callback::Message) {
     
-    if (6 >= $LEVEL->get_int($self->level)) {
+    if (6 >= $LEVEL->{$self->level}->(int)) {
       $self->_log($message, "fatal");
     }
   }
   
   method info : void ($message : string|Mojo::Log::Callback::Message) {
     
-    if (3 >= $LEVEL->get_int($self->level)) {
+    if (3 >= $LEVEL->{$self->level}->(int)) {
       $self->_log($message, "info");
     }
   }
   
   method trace : void ($message : string|Mojo::Log::Callback::Message) {
     
-    if (1 >= $LEVEL->get_int($self->level)) {
+    if (1 >= $LEVEL->{$self->level}->(int)) {
       $self->_log($message, "trace");
     }
   }
   
   method warn : void ($message : string|Mojo::Log::Callback::Message) {
     
-    if (4 >= $LEVEL->get_int($self->level)) {
+    if (4 >= $LEVEL->{$self->level}->(int)) {
       $self->_log($message, "warn");
     }
   }
   
   method is_level : int ($level : string) {
-    return $LEVEL->get_int($level) >= $LEVEL->get_int($self->level);
+    return $LEVEL->{$level}->(int) >= $LEVEL->{$self->level}->(int);
   }
   
   # Private Instance Methods
@@ -203,8 +199,8 @@ class Mojo::Log extends Mojo::EventEmitter {
   
   private method _message : void ($level : string, $message : string)  {
     
-    my $max     = $self->max_history_list_size;
-    my $history_list = $self->{history_list};
+    my $max     = $self->max_history_size;
+    my $history = (List of Mojo::Log::Line)List->new_ref($self->{history});
     
     my $line = Mojo::Log::Line->new;
     my $time = Time::HiRes->time;
@@ -212,10 +208,10 @@ class Mojo::Log extends Mojo::EventEmitter {
     $line->{level} = $level;
     $line->{message} = $message;
     
-    $history_list->push($line);
+    $history->push($line);
     
-    while ($history_list->length > $max) {
-      $history_list->shift;
+    while ($history->length > $max) {
+      $history->shift;
     }
     
     $self->append($self->format->($time, $level, $message));
@@ -242,7 +238,7 @@ class Mojo::Log extends Mojo::EventEmitter {
   
   private method _short : string ($time : double, $level : string, $message : string) {
     
-    my $magic = "<" . $MAGIC->get_int("$level") . ">";
+    my $magic = "<" . $MAGIC->{"$level"}->(int) . ">";
     my $short = Fn->substr($level, 0, 1);
     
     my $short_message = "${magic}[" . Sys->process_id . "] [$short] $message\n";

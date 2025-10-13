@@ -20,7 +20,7 @@ our @EXPORT = qw(
                   print_report_from_file
                 );
 
-our $VERSION = '1.14';
+our $VERSION = '1.15';
 our $DEBUG;
 
 ##############################################################################
@@ -40,7 +40,7 @@ options:
                                -p DB/SELECT/USERS_TABLE
                                -p NETWORK
                                -p DISK/IO
-    -r             -- shows dispersion, requires -p!
+    -r metric-path -- shows dispersion for metric-path (see -p)
     -l level       -- limit display metric-level
     -d             -- increase DEBUG level (can be used multiple times)
     --             -- end of options
@@ -94,8 +94,9 @@ sub rtm_report_main
       }
     if( /^-r/ )
       {
+      $opt_metric_path = shift;
       $opt_dispersion++;
-      print STDERR "status: option: dispersion graph requested\n";
+      print STDERR "status: option: dispersion graph requested for [$opt_metric_path]\n";
       next;
       }
     if( /^-l/ )
@@ -149,11 +150,10 @@ sub print_report_from_file
       {
       my $k = shift @k;
       $data->{ $k } ||= {};
-#      $data->{ $k }{ '@' }{ 'D' } += $d->{ 'D' };
-#      $data->{ $k }{ '@' }{ 'C' } ++;
-      push @{ $data->{ $k }{ '@' }{ '@D' } }, $d->{ 'D' };
+#      push @{ $data->{ $k }{ '@' }{ '@D' } }, $d->{ 'D' };
       $data = $data->{ $k };
       }
+    push @{ $data->{ '@' }{ '@D' } }, $d->{ 'D' };
     }
 
   my @metric_path = split /\//, $opt_metric_path;
@@ -191,6 +191,8 @@ sub __precalc_item
 {
   my $hr = shift;
 
+  return 0 unless exists $hr->{ '@D' };
+  
   my @d = sort { $a <=> $b } @{ $hr->{ '@D' } };
   my $s;
   $s += $_ for @d;
@@ -219,10 +221,13 @@ sub __format_level
 
   return if $opt_level > 0 and $level > $opt_level - 1;
 
-  for my $e ( sort { $data->{ $b }{ '@' }{ $sort } <=> $data->{ $a }{ '@' }{ $sort } } grep { ! /\@/ } keys %$data )
+  for my $e ( sort { $data->{ $b }{ '@' }{ $sort } <=> $data->{ $a }{ '@' }{ $sort } || $a cmp $b } grep { ! /\@/ } keys %$data )
     {
     next if $path and $path->[ $level ] and $path->[ $level ] ne $e;
-    push @$table, [ ( ' ' x ( $level * 4 ) ) . $e, $data->{ $e }{ '@' }{ 'C' }, map { sprintf "%.6f", $data->{ $e }{ '@' }{ $_ } } qw[ D MD MS AD AS DI DX ] ];
+    my @row;
+    push @row, ( ' ' x ( $level * 4 ) ) . $e;
+    push( @row, $data->{ $e }{ '@' }{ 'C' }, map { sprintf "%.6f", $data->{ $e }{ '@' }{ $_ } } qw[ D MD MS AD AS DI DX ] ) if $data->{ $e }{ '@' }{ 'C' };
+    push @$table, \@row;
     __format_level( $data->{ $e }, $sort, $table, $path, $level + 1 );
     }
 }

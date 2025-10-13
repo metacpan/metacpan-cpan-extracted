@@ -1,5 +1,13 @@
 Revision history for Schedule::Activity
 
+0.1.1 - 2025-10-08
+	- Annotations are built and reported separately from buildSchedule
+	- Attributes for activity/action nodes, reported via buildSchedule
+	- Messages support strings, arrays, hashes
+	- Message attributes
+	- Set missing time values with a 3,4,5 ratio
+	- Add samples
+
 0.1.0 - 2025-09-28
 	- Core functionality
 

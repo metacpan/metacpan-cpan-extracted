@@ -2,7 +2,7 @@ package Bio::MUST::Drivers::CdHit;
 # ABSTRACT: Bio::MUST driver for running the CD-HIT program
 # CONTRIBUTOR: Amandine BERTRAND <amandine.bertrand@doct.uliege.be>
 # CONTRIBUTOR: Valerian LUPO <valerian.lupo@uliege.be>
-$Bio::MUST::Drivers::CdHit::VERSION = '0.251060';
+$Bio::MUST::Drivers::CdHit::VERSION = '0.252830';
 use Moose;
 use namespace::autoclean;
 
@@ -222,7 +222,7 @@ Bio::MUST::Drivers::CdHit - Bio::MUST driver for running the CD-HIT program
 
 =head1 VERSION
 
-version 0.251060
+version 0.252830
 
 =head1 SYNOPSIS
 

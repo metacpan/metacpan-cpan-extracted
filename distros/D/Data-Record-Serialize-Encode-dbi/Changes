@@ -1,3 +1,18 @@
+1.08      2025-10-07 19:08:23-04:00 America/New_York
+
+  [BUG FIX]
+
+    * tables were not recognized as existing if their names required quoting.
+
+  [BUILD]
+
+    * require version of Path::Tiny which provides 'mkdir'. (RT#158697) ++srezic
+
+  [TEST]
+
+    * bugfix: pass string rather than Path::Tiny object to 'use lib'; Perl < 5.38 doesn't
+      like objects in @INC which don't have an appropriate method. (RT#158698) ++srezic
+
 1.07      2025-01-30 16:46:05-05:00 America/New_York
 
   [ENHANCEMENT]

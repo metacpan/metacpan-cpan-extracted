@@ -5,7 +5,7 @@ use warnings;
 
 use 5.008;
 
-our $VERSION = '0.52';
+our $VERSION = '0.53';
 
 use Module::Implementation;
 
@@ -50,7 +50,7 @@ Specio - Type constraints and coercions for Perl
 
 =head1 VERSION
 
-version 0.52
+version 0.53
 
 =head1 SYNOPSIS
 

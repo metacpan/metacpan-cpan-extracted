@@ -5,8 +5,7 @@ use FFI::Build::File::Zig;
 use Path::Tiny qw( path );
 use Capture::Tiny qw( capture_merged );
 
-sub clean
-{
+sub clean {
   path('t/ffi/_build')->remove_tree;
   path('t/ffi/zig-cache')->remove_tree;
   path('t/ffi/zig-out')->remove_tree;

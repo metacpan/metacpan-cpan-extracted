@@ -1,5 +1,5 @@
 #!perl
-# gmitool - a utility for gemini, part of Net::Gemini
+# gmitool - a utility for gemini related things, part of Net::Gemini
 use strict;
 use warnings;
 use Cpanel::JSON::XS      qw(decode_json encode_json);
@@ -25,7 +25,7 @@ my $Show_Status;       # log various things to stderr
 
 die "gmitool: command [args ..]\n" unless @ARGV;
 
-my %commands = ( get => \&get, link => \&link );
+my %commands = ( file => \&file, get => \&get, link => \&link );
 
 my $cmd = shift;
 if ( $cmd =~ m{^gemini://} ) {
@@ -36,7 +36,28 @@ if ( $cmd =~ m{^gemini://} ) {
       join( ' ', sort keys %commands ),
       ")\n";
 }
-$commands{$cmd}->( \@ARGV );
+exit $commands{$cmd}->( \@ARGV );
+
+# puts file name(s) into a target file
+sub file {
+    my ($args) = @_;
+    GetOptionsFromArray( $args, 'f=s', \my $target ) or exit 64;
+    $target //= 'index.gmi';
+    open my $fh, '>>', $target or die "gmitool: open '$target': $!\n";
+    my $exit = 0;
+    for my $n (@$args) {
+        if (-f $n) {
+            print $fh "=> $n\n";
+        } elsif (-d $n) {
+			$n =~ s{/+$}{};
+            print $fh "=> $n/\n";
+        } else {
+            warn "gmitool: unknown file '$n'\n";
+            $exit = 1;
+        }
+    }
+    return $exit;
+}
 
 # gets a gemini page
 sub get {
@@ -190,6 +211,8 @@ sub get {
     if ($Hosts_Dirty) {
         write_text( $known_hosts_file, encode_json($Known_Hosts) );
     }
+
+    return 0;
 }
 
 # is it encoded in something besides UTF-8, or also besides US-ASCII of
@@ -232,6 +255,7 @@ sub link {
             print $u->canonical, "\n";
         }
     }
+    return 0;
 }
 
 # parse and qualify links out of what is assumed to be text/gemini
@@ -311,6 +335,7 @@ gmitool - a Net::Gemini command line tool
 
 =head1 SYNOPSIS
 
+  gmitool file [-f foo.gmi] bar.png baz/ ..
   gmitool get [-46] [-A] [-E encoding-layer] [-C cert-file -K key-file] \
               [-H sni-host] [-S] [-V peer|none] \
               [-f] [-l] [-q] [-t seconds] \
@@ -321,6 +346,11 @@ gmitool - a Net::Gemini command line tool
 
 B<gmitool> offers various gemini protocol related utilities. It is part
 of the L<Net::Gemini> module. Subcommands include:
+
+=head2 file
+
+Appends the given regular files or directories as links into by default
+C<index.gmi> or otherwise the filename given to the B<-f> flag.
 
 =head2 get
 

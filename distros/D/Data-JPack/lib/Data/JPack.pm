@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use feature ":all";
 
-our $VERSION="v0.2.1";
+our $VERSION="v0.2.2";
 
 use feature qw<say>;
 no warnings "experimental";
@@ -288,7 +288,7 @@ sub next_set_name {
   }
   else {
     # List all dirs with the correct formating in the name
-    @list= map {hex} sort grep {length == 32 } map {-d; basename $_ } <$dir/*>;
+    @list= map {hex} sort grep {length == 32 } map {-d; basename $_ } <"$dir"/*>;
 
     unless(@list){
       # create a new dir
@@ -330,7 +330,7 @@ sub next_file_name{
   }
   my $set_dir=$self->[current_set_]//$self->next_set_name;
 
-  my @list= map {hex} sort grep {length == 32 } map {s/\.jpack// ; basename $_ } <$set_dir/*.jpack>;
+  my @list= map {hex} sort grep {length == 32 } map {s/\.jpack// ; basename $_ } <"$set_dir"/*.jpack>;
 
   unless(@list){
     push @list, -1;

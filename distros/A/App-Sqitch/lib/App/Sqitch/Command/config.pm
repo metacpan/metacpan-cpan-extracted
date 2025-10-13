@@ -15,7 +15,7 @@ use Type::Utils qw(enum);
 use namespace::autoclean;
 extends 'App::Sqitch::Command';
 
-our $VERSION = 'v1.5.2'; # VERSION
+our $VERSION = 'v1.6.0'; # VERSION
 
 has file => (
     is      => 'ro',

@@ -1,5 +1,5 @@
 severity = brutal
-verbose = 9
+verbose = 1
 
 exclude = Freenode
 

@@ -13,7 +13,7 @@ use strict;
 use Carp;
 use Time::RTM::Scope;
 
-our $VERSION = '1.14';
+our $VERSION = '1.15';
 
 our %ATTRS =  (
               log             => 1,
@@ -60,8 +60,9 @@ sub __add_dt
   my $key  = shift;
   my $st   = shift;
   my $dt   = shift;
+  my $et   = shift; # should be used for debug only
 
-  push @{ $self->{ 'RTM' } }, "[RTM:K=$key;S=$st;D=$dt]";
+  push @{ $self->{ 'RTM' } }, "[RTM:K=$key;S=$st;D=$dt]"; # .= ";E=$et" if $DEBUG
 }
 
 sub save
@@ -109,7 +110,12 @@ Time::RTM - Run-time metrics stats
   
   # $_r can be restarted with new stats:
   $_r->restart();
-  
+
+  # if keys/name of the scope is not available upon begin_scope() it may be
+  # set later with:
+  $_r->set_keys( "PROCESSING/MESSAGE/$msg_id" );
+  # because $msg_id may be not known at the beginning of the scope, but
+  # figured out of the incoming data later in the scope...
   
   # to write down currently recorded stats to the logfile:
   $rtm->save();

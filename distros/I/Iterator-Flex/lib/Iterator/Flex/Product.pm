@@ -2,11 +2,12 @@ package Iterator::Flex::Product;
 
 # ABSTRACT: An iterator which produces a Cartesian product of iterators
 
+use v5.28;
 use strict;
 use warnings;
 use experimental qw( signatures declared_refs refaliasing );
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Iterator::Flex::Utils qw( RETURN STATE EXHAUSTION :IterAttrs :IterStates can_meth );
 use Iterator::Flex::Factory 'to_iterator';
@@ -241,7 +242,7 @@ Iterator::Flex::Product - An iterator which produces a Cartesian product of iter
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 METHODS
 
@@ -283,8 +284,6 @@ This iterator may be frozen only if all of the iterables support the
 C<prev> or C<__prev__> method.
 
 =back
-
-=head1 INTERNALS
 
 =head1 SUPPORT
 

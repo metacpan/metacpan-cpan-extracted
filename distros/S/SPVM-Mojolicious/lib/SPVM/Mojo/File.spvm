@@ -137,7 +137,7 @@ class Mojo::File {
         next;
       }
       
-      unless ($options_h->get_int("hidden")) {
+      unless ($options_h->{"hidden"}->(int)) {
         if (Re->m($file, "^\.")) {
           next;
         }
@@ -181,24 +181,24 @@ class Mojo::File {
         
         my $name = $info->name;
         
-        unless ($options_h->get_int("hidden")) {
+        unless ($options_h->{"hidden"}->(int)) {
           if (Re->m($name, "^\.")) {
             return;
           }
         }
         
-        if ($options_h->get_int("max_depth")) {
+        if ($options_h->{"max_depth"}->(int)) {
           my $rel = $name;
           
           Re->s(my $_ = [$rel], "^\Q$path\E/?", "");
           $rel = $_->[0];
           
-          if (@{File::Spec->splitdir($rel)} >= $options_h->get_int("max_depth")) {
+          if (@{File::Spec->splitdir($rel)} >= $options_h->{"max_depth"}->(int)) {
             $info->set_prune(1);
           }
         }
         
-        if ($options_h->get_int("dir") || !Sys->d($name)) {
+        if ($options_h->{"dir"}->(int) || !Sys->d($name)) {
           $all->set($name => 1);
         }
       };

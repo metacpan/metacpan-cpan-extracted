@@ -9,5 +9,9 @@
 </script>
 %% end
 
+%% foreach p in view.body_close
+%%   include $p
+%% end
+
 </body>
 </html>

@@ -2,11 +2,12 @@ package Iterator::Flex::Stack;
 
 # ABSTRACT: An iterator which concatenates a set of iterators
 
+use v5.28;
 use strict;
 use warnings;
 use experimental qw( signatures declared_refs refaliasing );
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Iterator::Flex::Utils qw( RETURN STATE EXHAUSTION :IterAttrs :IterStates );
 use Iterator::Flex::Factory 'to_iterator';
@@ -70,7 +71,7 @@ sub new ( $class, @args ) {
             depends                => \@args,
             current_iterator_index => undef,
         },
-        $pars
+        $pars,
     );
 }
 
@@ -234,7 +235,7 @@ Iterator::Flex::Stack - An iterator which concatenates a set of iterators
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 METHODS
 
@@ -251,7 +252,7 @@ iterator onto it will reset the state to the
 L<Iteration|/Iterator::Flex::Manual::Overview/Iteration State>
 state. The C<current> and C<prev> methods will return The next
 L</next> operation will retrieve the first element from the data
-stream,
+stream.
 
 It also provides a L<snapshot> method, which records the iterators 
 in the stack.  This snapshot is used when the C<rewind> or C<reset>
@@ -280,8 +281,6 @@ The iterator supports the following capabilities:
 Because the nature of the iterators on the stack may vary, the
 C<reset> and C<rewind> methods may throw at runtime if an iterator on
 the stack does not support the required facilities.
-
-=head1 INTERNALS
 
 =head1 SUPPORT
 

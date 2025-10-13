@@ -16,7 +16,7 @@ use List::MoreUtils qw(firstidx);
 
 extends 'App::Sqitch::Engine';
 
-our $VERSION = 'v1.5.2'; # VERSION
+our $VERSION = 'v1.6.0'; # VERSION
 
 has uri => (
     is       => 'ro',
@@ -544,8 +544,6 @@ sub _cid {
         die $_;
     };
 }
-
-1;
 
 1;
 

@@ -14,16 +14,7 @@ class Mojo::Server::Daemon extends Mojo::Server {
   use Mojo::Connection::Stream;
   
   # Fields
-  has acceptors : virtual rw Mojo::Connection::Server[]
-    get {
-      return $self->{acceptors_list}->to_array->(Mojo::Connection::Server[]);
-    }
-    set {
-      $self->{acceptors_list} = List->new((Mojo::Connection::Server[])$_);
-    }
-  ;
-  
-  has acceptors_list : rw List of Mojo::Connection::Server;
+  has acceptors : rw Mojo::Connection::Server[];
   
   has backlog : rw int;
   
@@ -79,7 +70,7 @@ class Mojo::Server::Daemon extends Mojo::Server {
     
     my $self = new Mojo::Server::Daemon;
     
-    $self->{acceptors_list} = List->new(new Mojo::Connection::Server[0]);
+    $self->{acceptors} = new Mojo::Connection::Server[0];
     
     return $self;
   }
@@ -388,7 +379,9 @@ class Mojo::Server::Daemon extends Mojo::Server {
     
     $c->listen($options);
     
-    $self->acceptors_list->push($c);
+    my $acceptors = (List of Mojo::Connection::Server)List->new_ref($self->{acceptors});
+    
+    $acceptors->push($c);
     
     if ($self->silent) {
       return;
@@ -404,7 +397,7 @@ class Mojo::Server::Daemon extends Mojo::Server {
       $url->set_port($self->ports->[@$self->ports - 1]) ;
     }
     
-    say "Web application available at " . ($options->get_string("path") // $url->to_string);
+    say "Web application available at " . ($options->{"path"}->(string) // $url->to_string);
   }
 
 }

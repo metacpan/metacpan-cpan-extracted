@@ -5,7 +5,7 @@ package Config::XrmDatabase::Util;
 use v5.26;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use Config::XrmDatabase::Failure ':all';
 
@@ -16,20 +16,20 @@ use Exporter 'import';
 use experimental qw( signatures postderef );
 
 my %CONSTANTS;
-our ( %META, %RMETA ); # these get exported
+our ( %META, %RMETA );    # these get exported
 
 BEGIN {
     %CONSTANTS = (
-        TIGHT       => '.',
-        SINGLE      => '?',
-        LOOSE       => '*',
+        TIGHT       => q{.},
+        SINGLE      => q{?},
+        LOOSE       => q{*},
         VALUE       => '!!VALUE',
         MATCH_COUNT => '!!MATCH_COUNT',
     );
 
     %META = (
         $CONSTANTS{VALUE}       => 'value',
-        $CONSTANTS{MATCH_COUNT} => 'match_count'
+        $CONSTANTS{MATCH_COUNT} => 'match_count',
     );
     %RMETA = reverse %META;
 
@@ -37,7 +37,7 @@ BEGIN {
 }
 
 # so we can use the scalars here without complaints
-use vars map { '$' . $_ } keys %CONSTANTS;
+use vars map { q{$} . $_ } keys %CONSTANTS;
 {
     no strict 'refs';    ## no critic(ProhibitNoStrict)
     *{$_} = \( $CONSTANTS{$_} ) for keys %CONSTANTS;
@@ -48,10 +48,10 @@ use constant \%CONSTANTS;
 our %EXPORT_TAGS = (
     scalar    => [ map "\$$_", keys( %CONSTANTS ) ],
     constants => [ keys( %CONSTANTS ) ],
-    hashes    => [ qw( %META %RMETA ) ],
+    hashes    => [qw( %META %RMETA )],
     funcs     => [
         qw( parse_resource_name parse_fq_resource_name
-          normalize_key name_arr_to_str is_wildcard )
+          normalize_key name_arr_to_str is_wildcard ),
     ],
 );
 
@@ -73,9 +73,9 @@ $EXPORT_TAGS{all} = \@EXPORT_OK;
 sub parse_resource_name ( $name ) {
 
     {
+        ## no critic (AmbiguousNames)
         my $last = substr( $name, -1 );
-        key_failure->throw(
-            "last component of name may not be a binding operator: $name" )
+        key_failure->throw( "last component of name may not be a binding operator: $name" )
           if $last eq TIGHT || $last eq SINGLE || $last eq LOOSE;
     }
 
@@ -91,7 +91,7 @@ sub parse_resource_name ( $name ) {
     #     or a leading binding operator
 
     return [
-        grep { $_ ne TIGHT && $_ ne '' }
+        grep { $_ ne TIGHT && $_ ne q{} }
           split( /([${TIGHT}${SINGLE}${LOOSE}])/, $name ) ];
 }
 
@@ -108,22 +108,21 @@ sub parse_resource_name ( $name ) {
 sub parse_fq_resource_name ( $name ) {
 
     key_failure->throw(
-        "cannot have '$LOOSE' or '$SINGLE' binding operators in a fully qualified name: $name"
-      )
+        "cannot have '$LOOSE' or '$SINGLE' binding operators in a fully qualified name: $name", )
       if index( $name, SINGLE ) != -1
       or index( $name, LOOSE ) != -1;
 
     key_failure->throw(
-        "cannot have multiple sequential '$TIGHT' binding operators in a fully qualified name: $name"
-    ) if $name =~ /[$TIGHT]{2,}/;
+        "cannot have multiple sequential '$TIGHT' binding operators in a fully qualified name: $name", )
+      if $name =~ /[$TIGHT]{2,}/;
 
     key_failure->throw(
-        "last component of a fully qualified name must not be a binding operator: $name"
-    ) if substr( $name, -1 ) eq TIGHT;
+        "last component of a fully qualified name must not be a binding operator: $name", )
+      if substr( $name, -1 ) eq TIGHT;
 
     key_failure->throw(
-        "first component of a fully qualified name must not be a binding operator: $name"
-    ) if substr( $name, 0, 1 ) eq TIGHT;
+        "first component of a fully qualified name must not be a binding operator: $name", )
+      if substr( $name, 0, 1 ) eq TIGHT;
 
     return [ split( /[$TIGHT]/, $name ) ];
 }
@@ -171,6 +170,16 @@ sub is_wildcard( $string ) {
 
 1;
 
+#
+# This file is part of Config-XrmDatabase
+#
+# This software is Copyright (c) 2021 by Smithsonian Astrophysical Observatory.
+#
+# This is free software, licensed under:
+#
+#   The GNU General Public License, Version 3, June 2007
+#
+
 __END__
 
 =pod
@@ -183,7 +192,7 @@ Config::XrmDatabase::Util - Constants that won't change, and other utilitarian t
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SUBROUTINES
 
@@ -234,7 +243,7 @@ MATCH_COUNT
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-config-xrmdatabase@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=Config-XrmDatabase
+Please report any bugs or feature requests to bug-config-xrmdatabase@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=Config-XrmDatabase>
 
 =head2 Source
 

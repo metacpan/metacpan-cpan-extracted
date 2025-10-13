@@ -12,7 +12,7 @@ use App::Sqitch::Types qw(DBH ArrayRef HashRef URIDB Str);
 
 extends 'App::Sqitch::Engine';
 
-our $VERSION = 'v1.5.2'; # VERSION
+our $VERSION = 'v1.6.0'; # VERSION
 
 sub key    { 'snowflake' }
 sub name   { 'Snowflake' }
@@ -66,7 +66,7 @@ has _snowcfg => (
     isa     => HashRef,
     lazy    => 1,
     default => sub {
-        my $hd = $^O eq 'MSWin32' && "$]" < '5.016' ? $ENV{HOME} || $ENV{USERPROFILE} : (glob('~'))[0];
+        my $hd = App::Sqitch::Config->home_dir;
         return {} if not $hd;
         my $fn = dir $hd, '.snowsql', 'config';
         return {} unless -e $fn;

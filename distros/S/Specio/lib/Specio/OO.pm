@@ -13,7 +13,7 @@ use Specio::Helpers     qw( perlstring );
 use Specio::PartialDump qw( partial_dump );
 use Specio::TypeChecks;
 
-our $VERSION = '0.52';
+our $VERSION = '0.53';
 
 use Exporter qw( import );
 
@@ -365,7 +365,7 @@ Specio::OO - A painfully poor reimplementation of Moo(se)
 
 =head1 VERSION
 
-version 0.52
+version 0.53
 
 =head1 DESCRIPTION
 

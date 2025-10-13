@@ -17,7 +17,7 @@ use Log::Log4perl qw(:easy);
 
 use Pod::Usage;
 
-our $VERSION              = '1.0.7';
+our $VERSION              = '1.0.8';
 our $GETOPT_EXIT_ON_ERROR = $TRUE;
 our $GETOPT_STATUS;
 our $GETOPT_ERROR_MESSAGE;
@@ -535,7 +535,7 @@ L<CLI::Simple::Constants>, which pairs naturally with this module.
 
 =head1 VERSION
 
-This documentation refers to version 1.0.7.
+This documentation refers to version 1.0.8.
 
 =head2 Features
 

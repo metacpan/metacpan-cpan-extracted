@@ -2,7 +2,7 @@
 # bin/gmitool tests
 use strict;
 use warnings;
-use Test2::V0;
+use Test2::V0 -no_srand => 1;
 use Test2::Tools::Command;
 
 use lib './t/lib';
@@ -48,6 +48,39 @@ command {
     munge_status => 1,
     status       => 1
 };
+
+########################################################################
+#
+# FILE
+
+@Test2::Tools::Command::command = ( @command, 'file' );
+
+unlink 'index.gmi', 'foo.gmi';
+{
+    command { args => [ 'lib/Net/Gemini.pm', 't' ], };
+
+    open my $fh, '<', 'index.gmi' or bail_out("index.gmi");
+    my $first  = readline $fh;
+    my $second = readline $fh;
+    ok $first eq "=> lib/Net/Gemini.pm\n";
+    ok $second eq "=> t/\n";
+
+    command { args => [ '-f', 'foo.gmi', 'lib' ], };
+
+    open $fh, '<', 'foo.gmi' or bail_out("foo.gmi");
+    $first = readline $fh;
+    ok $first eq "=> lib/\n";
+
+    # On the other hand, some benighted OS do put files into /var/empty,
+    # so hopefully not this one.
+    command {
+        args         => [ "/var/empty/gmitool." . int rand 2147483647 ],
+        stderr       => qr/gmitool: unknown file/,
+        munge_status => 1,
+        status       => 1
+    };
+}
+unlink 'index.gmi', 'foo.gmi';
 
 ########################################################################
 #

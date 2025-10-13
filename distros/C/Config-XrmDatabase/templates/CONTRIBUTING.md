@@ -88,7 +88,7 @@ to clean up the PERL5LIB environment variable when you are done!
 Working without Dist::Zilla
 ---------------------------
 
-This directory contains a working Makefile.PL that will allow you to
+This directory contains a working Build.PL that will allow you to
 work without `Dist::Zilla`.
 
 If you have installed dependencies into a local directory, make sure that
@@ -96,9 +96,9 @@ is in your `PERL5LIB` path.
 
 Then, as usual,
 
-  $ perl Makefile.PL
-  $ make
-  $ make test
+  $ perl Build.PL
+  $ ./Build
+  $ ./Build test
 
 Working with Dist::Zilla
 ------------------------
@@ -160,10 +160,10 @@ can submit an issue report
 Idiosyncracies
 --------------
 
-  * Some files are generated during the build and copied from the
-    release (see the [CopyFilesFromRelease] section in `dist.ini`]
+* Some files are generated during the build and copied from the
+  release (see the [CopyFilesFromRelease] section in `dist.ini`]
 
-  * Modify `templates/CONTRIBUTING.md` to change `CONTRIBUTING.md`
+* Modify `templates/CONTRIBUTING.md` to change `CONTRIBUTING.md`
 
 
 References

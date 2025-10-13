@@ -31,5 +31,7 @@ use v5.40;
 # janeskil1525 E<lt>janeskil1525@gmail.comE<gt>
 #
 
-
+async sub load_pkey_p($self, $tools_version_pkey) {
+    return $self->load_pkey($tools_version_pkey);
+}
 1;

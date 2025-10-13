@@ -106,3 +106,12 @@
 1.29    Sept 26, 2025
 
         More tokens and RGB color handling.
+
+1.30    Oct 06, 2025
+
+        Eliminated the need for unicode hash values
+
+1.31    Oct 06, 2025
+
+        Fixed testing error
+

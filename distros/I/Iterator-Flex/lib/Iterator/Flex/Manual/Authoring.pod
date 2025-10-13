@@ -13,7 +13,7 @@ Iterator::Flex::Manual::Authoring - How to write an iterator
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 DESCRIPTION
 
@@ -536,8 +536,6 @@ These indicate that the named capability is present and implemented as a closure
   ] );
 
   1;
-
-=head1 INTERNALS
 
 =head1 SUPPORT
 

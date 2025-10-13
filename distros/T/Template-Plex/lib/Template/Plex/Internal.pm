@@ -3,6 +3,7 @@ use strict;
 use warnings;
 
 use Template::Plex;
+use Error::Show;
 
 
 use feature qw<state refaliasing>;
@@ -220,19 +221,13 @@ sub _prepare_template{
 
   my $self=$plex;
 	my $prog=&Template::Plex::Internal::bootstrap;
+  local $@;
  	my $ref=eval $prog;
+  my $e=$@; #Save the error as require will nuke it
   use Scalar::Util qw<weaken>;
   weaken($self);
-	if($@ and !$ref){
-    my $e=$@; #Save the error as require will nuke it
-    require Error::Show;
-    my $context=Error::Show::context(error=>$e, program=>$prog,
-      start_mark=>'##__START',
-      end_mark=>'##__END',
-      start_offset=>2,
-      end_offset=>5,
-      limit=>1
-    );
+	if($e){
+    my $context=Error::Show::context($e);
     # Replace the pseudo filename with the file name if we have one 
     my $filename=$meta{file};
     $context=~s/(\(eval \d+\))/$filename/g;

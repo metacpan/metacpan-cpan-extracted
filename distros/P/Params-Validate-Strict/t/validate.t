@@ -162,7 +162,7 @@ subtest 'invalid regex in matches' => sub {
 
 	throws_ok {
 		validate_strict(schema => $schema, input => $input);
-	} qr/invalid regex/, 'invalid regex rejected';
+	} qr/regex .+ error/, 'invalid regex rejected';
 };
 
 # Test a string is given

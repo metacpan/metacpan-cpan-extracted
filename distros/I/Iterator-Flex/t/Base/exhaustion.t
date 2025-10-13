@@ -2,11 +2,7 @@
 
 # ABSTRACT: test translation of imported iterators
 
-use strict;
-use warnings;
-
-use 5.10.0;
-
+use v5.28;
 use Test2::V0;
 
 use Iterator::Flex::Common 'iterator';

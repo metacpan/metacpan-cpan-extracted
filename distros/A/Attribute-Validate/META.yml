@@ -17,7 +17,7 @@ name: Attribute-Validate
 provides:
   Attribute::Validate:
     file: lib/Attribute/Validate.pm
-    version: v0.0.5
+    version: v0.0.9
 requires:
   Attribute::Handlers: '0'
   Carp: '0'
@@ -28,5 +28,5 @@ resources:
   bugtracker: https://github.com/sergiotarxz/Perl-Attribute-Validate/issues
   license: http://www.opensource.org/licenses/mit-license.php
   repository: https://github.com/sergiotarxz/Perl-Attribute-Validate
-version: v0.0.5
+version: v0.0.9
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

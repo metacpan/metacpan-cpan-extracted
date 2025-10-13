@@ -2,10 +2,11 @@ package Iterator::Flex::Role::Wrap::Return;
 
 # ABSTRACT: wrap imported iterator which returns a sentinel on exhaustion
 
+use v5.28;
 use strict;
 use warnings;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Iterator::Flex::Utils qw( :default INPUT_EXHAUSTION );
 use Scalar::Util;
@@ -106,9 +107,7 @@ Iterator::Flex::Role::Wrap::Return - wrap imported iterator which returns a sent
 
 =head1 VERSION
 
-version 0.31
-
-=head1 INTERNALS
+version 0.32
 
 =head1 SUPPORT
 

@@ -4,7 +4,7 @@ DBD::Avatica - Driver for Apache Avatica compatible servers
 
 # VERSION
 
-version 0.2.2
+version 0.2.3
 
 # SYNOPSIS
 
@@ -893,6 +893,7 @@ Alexey Stavrov <logioniz@ya.ru>
 
 # CONTRIBUTORS
 
+- Andrey Khozov <avkhozov@gmail.com>
 - Denis Ibaev <dionys@gmail.com>
 - Ivan Putintsev <uid@rydlab.ru>
 - uid66 <19481514+uid66@users.noreply.github.com>

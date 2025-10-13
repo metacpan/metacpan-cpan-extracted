@@ -1,5 +1,5 @@
 package Playwright::Base;
-$Playwright::Base::VERSION = '1.532';
+$Playwright::Base::VERSION = '1.551';
 use strict;
 use warnings;
 
@@ -112,7 +112,7 @@ Playwright::Base - Object representing Playwright pages
 
 =head1 VERSION
 
-version 1.532
+version 1.551
 
 =head2 DESCRIPTION
 
@@ -173,7 +173,7 @@ George S. Baugh <teodesian@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2020 Troglodyne LLC
+Copyright (c) 2025 Troglodyne LLC
 
 
 Permission is hereby granted, free of charge, to any person obtaining a copy

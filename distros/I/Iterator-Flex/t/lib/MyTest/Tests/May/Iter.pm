@@ -1,5 +1,6 @@
 package MyTest::Tests::May::Iter;
 
+use v5.28;
 use strict;
 use warnings;
 use Role::Tiny ();

@@ -2,10 +2,11 @@ package Iterator::Flex::Array;
 
 # ABSTRACT: Array Iterator Class
 
+use v5.28;
 use strict;
 use warnings;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Iterator::Flex::Utils ':IterAttrs', ':IterStates', 'throw_failure';
 use Ref::Util;
@@ -165,7 +166,7 @@ Iterator::Flex::Array - Array Iterator Class
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 METHODS
 
@@ -195,8 +196,6 @@ The returned iterator supports the following capabilities:
 =item freeze
 
 =back
-
-=head1 INTERNALS
 
 =head1 SUPPORT
 

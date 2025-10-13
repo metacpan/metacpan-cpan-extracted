@@ -1,7 +1,7 @@
 package Bio::MUST::Drivers::Hmmer::Model::Temporary;
 # ABSTRACT: Internal class for HMMER3 driver
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
-$Bio::MUST::Drivers::Hmmer::Model::Temporary::VERSION = '0.251060';
+$Bio::MUST::Drivers::Hmmer::Model::Temporary::VERSION = '0.252830';
 use Moose;
 use namespace::autoclean;
 
@@ -97,7 +97,7 @@ Bio::MUST::Drivers::Hmmer::Model::Temporary - Internal class for HMMER3 driver
 
 =head1 VERSION
 
-version 0.251060
+version 0.252830
 
 =head1 SYNOPSIS
 

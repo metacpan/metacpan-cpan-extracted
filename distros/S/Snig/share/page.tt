@@ -1,36 +1,23 @@
 [%- USE format -%]
 [%- counter = format('%03d') -%]
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>[%- collection.name -%]</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="snig.css" rel="stylesheet" type="text/css" />
-  </head>
-  <body class="page">
-    <main>
-      <nav>
-        <ul id="menu">
-          <li class="collection-name"><a href="index.html" title="[% collection.name %]">[% collection.name %]</a></li>
-          <li class="counter">[% counter(image.pos) %] / [% counter( collection.size) %]</li>
-          <li><a href="index.html" title="[% collection.name %]">⇧</a></li>
-          <li><a href="[% image.url('orig') %]" download>⇓</a></li>
-          <li><a href="[% image.prev.html_file %]" title="previous">⇦</a></li>
-          <li><a href="[% image.next.html_file %]" title="next">⇨</a></li>
-        </ul>
-      </nav>
-      <a href="[% image.next.html_file %]"><img src="[% image.url('preview') %]" alt="[% image.file.basename %]" /></a>
-      <aside class="info">
-        <ul>
-          <li>[% image.file.basename %]</li>
-          <li>[% image.model %]</li>
-          <li>[% image.created %]</li>
-        </ul>
-      </aside>
-    </main>
-    <footer>
-      Created with S<sup>n</sup>ig.
-    </footer>
-  </body>
-</html>
+<main class="page">
+  <nav>
+    <ul id="menu">
+      <li class="collection-name"><a href="index.html" title="[% collection.name %]">[% collection.name %]</a></li>
+      <li class="counter">[% counter(image.pos) %] / [% counter( collection.size) %]</li>
+      <li><a href="index.html" title="[% collection.name %]">⇧</a></li>
+      <li><a href="[% image.url('orig') %]" download>⇓</a></li>
+      <li><a href="[% image.prev.html_file %]" title="previous">⇦</a></li>
+      <li><a href="[% image.next.html_file %]" title="next">⇨</a></li>
+      <li class="help">(or click image for next)</li>
+    </ul>
+  </nav>
+  <a href="[% image.next.html_file %]"><img src="[% image.url('preview') %]" alt="[% image.file.basename %]" /></a>
+  <aside class="info">
+    <ul>
+      <li>[% image.file.basename %]</li>
+      <li>[% image.model %]</li>
+      <li>[% image.created %]</li>
+    </ul>
+  </aside>
+</main>

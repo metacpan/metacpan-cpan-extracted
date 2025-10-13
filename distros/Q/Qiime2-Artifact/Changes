@@ -1,5 +1,14 @@
 # NOTE THAT v0.xx ARE PRE-RELEASES
 
+0.14.0	2024-03-21
+	* Added extract_file() method to extract files from artifacts
+	* Improved qzoom extraction functionality
+	* Enhanced error handling with colored output
+	* Fixed ambiguous command-line option for verbose (-v to -V)
+	* Added support for subdirectories during extraction
+	* Improved citation handling with better error reporting 
+	* Added autodie pragma for better error handling
+
 0.13.0	2024-02-18
 	* Drafted get_bib() method to retrieve bibliography
 

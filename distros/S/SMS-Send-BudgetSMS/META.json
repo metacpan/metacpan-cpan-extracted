@@ -1,0 +1,60 @@
+{
+   "abstract" : "SMS::Send driver for BudgetSMS",
+   "author" : [
+      "Lari Taskula <lari.taskula@hypernova.fi>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "SMS-Send-BudgetSMS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "LWP::UserAgent" : "5.837",
+            "Number::Phone::Normalize" : "0.220",
+            "SMS::Send" : "1.06"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Hypernova-Oy/SMS-Send-BudgetSMS/issues"
+      },
+      "homepage" : "https://github.com/Hypernova-Oy/SMS-Send-BudgetSMS",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Hypernova-Oy/SMS-Send-BudgetSMS.git",
+         "web" : "https://github.com/Hypernova-Oy/SMS-Send-BudgetSMS"
+      }
+   },
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

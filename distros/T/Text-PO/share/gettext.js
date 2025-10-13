@@ -1,11 +1,11 @@
 /*
 * ----------------------------------------------------------------------------
 * PO Files Manipulation - Text-PO/share/gettext.js
-* Version v0.2.5
+* Version v0.4.0
 * Copyright(c) 2021-2023 DEGUEST Pte. Ltd.
 * Author: Jacques Deguest <jack@deguest.jp>
 * Created 2021/06/29
-* Modified 2023/10/14
+* Modified 2024/12/22
 * All rights reserved
 * 
 * This program is free software; you can redistribute  it  and/or  modify  it
@@ -14,6 +14,1183 @@
 * Use perldoc gettext.js to see the inline documentation for this library
 */
 // 'use strict';
+
+// XXX Promise polyfill if necessary
+;(function()
+{
+    /*!
+     * @overview es6-promise - a tiny implementation of Promises/A+.
+     * @copyright Copyright (c) 2014 Yehuda Katz, Tom Dale, Stefan Penner and contributors (Conversion to ES6 API by Jake Archibald)
+     * @license   Licensed under MIT license
+     *            See https://raw.githubusercontent.com/stefanpenner/es6-promise/master/LICENSE
+     * @version   v4.2.8+1e68dce6
+     */
+    
+    (function (global, factory) {
+        typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+        typeof define === 'function' && define.amd ? define(factory) :
+        (global.ES6Promise = factory());
+    }(this, (function () { 'use strict';
+    
+    function objectOrFunction(x) {
+      var type = typeof x;
+      return x !== null && (type === 'object' || type === 'function');
+    }
+    
+    function isFunction(x) {
+      return typeof x === 'function';
+    }
+    
+    
+    
+    var _isArray = void 0;
+    if (Array.isArray) {
+      _isArray = Array.isArray;
+    } else {
+      _isArray = function (x) {
+        return Object.prototype.toString.call(x) === '[object Array]';
+      };
+    }
+    
+    var isArray = _isArray;
+    
+    var len = 0;
+    var vertxNext = void 0;
+    var customSchedulerFn = void 0;
+    
+    var asap = function asap(callback, arg) {
+      queue[len] = callback;
+      queue[len + 1] = arg;
+      len += 2;
+      if (len === 2) {
+        // If len is 2, that means that we need to schedule an async flush.
+        // If additional callbacks are queued before the queue is flushed, they
+        // will be processed by this flush that we are scheduling.
+        if (customSchedulerFn) {
+          customSchedulerFn(flush);
+        } else {
+          scheduleFlush();
+        }
+      }
+    };
+    
+    function setScheduler(scheduleFn) {
+      customSchedulerFn = scheduleFn;
+    }
+    
+    function setAsap(asapFn) {
+      asap = asapFn;
+    }
+    
+    var browserWindow = typeof window !== 'undefined' ? window : undefined;
+    var browserGlobal = browserWindow || {};
+    var BrowserMutationObserver = browserGlobal.MutationObserver || browserGlobal.WebKitMutationObserver;
+    var isNode = typeof self === 'undefined' && typeof process !== 'undefined' && {}.toString.call(process) === '[object process]';
+    
+    // test for web worker but not in IE10
+    var isWorker = typeof Uint8ClampedArray !== 'undefined' && typeof importScripts !== 'undefined' && typeof MessageChannel !== 'undefined';
+    
+    // node
+    function useNextTick() {
+      // node version 0.10.x displays a deprecation warning when nextTick is used recursively
+      // see https://github.com/cujojs/when/issues/410 for details
+      return function () {
+        return process.nextTick(flush);
+      };
+    }
+    
+    // vertx
+    function useVertxTimer() {
+      if (typeof vertxNext !== 'undefined') {
+        return function () {
+          vertxNext(flush);
+        };
+      }
+    
+      return useSetTimeout();
+    }
+    
+    function useMutationObserver() {
+      var iterations = 0;
+      var observer = new BrowserMutationObserver(flush);
+      var node = document.createTextNode('');
+      observer.observe(node, { characterData: true });
+    
+      return function () {
+        node.data = iterations = ++iterations % 2;
+      };
+    }
+    
+    // web worker
+    function useMessageChannel() {
+      var channel = new MessageChannel();
+      channel.port1.onmessage = flush;
+      return function () {
+        return channel.port2.postMessage(0);
+      };
+    }
+    
+    function useSetTimeout() {
+      // Store setTimeout reference so es6-promise will be unaffected by
+      // other code modifying setTimeout (like sinon.useFakeTimers())
+      var globalSetTimeout = setTimeout;
+      return function () {
+        return globalSetTimeout(flush, 1);
+      };
+    }
+    
+    var queue = new Array(1000);
+    function flush() {
+      for (var i = 0; i < len; i += 2) {
+        var callback = queue[i];
+        var arg = queue[i + 1];
+    
+        callback(arg);
+    
+        queue[i] = undefined;
+        queue[i + 1] = undefined;
+      }
+    
+      len = 0;
+    }
+    
+    function attemptVertx() {
+      try {
+        var vertx = Function('return this')().require('vertx');
+        vertxNext = vertx.runOnLoop || vertx.runOnContext;
+        return useVertxTimer();
+      } catch (e) {
+        return useSetTimeout();
+      }
+    }
+    
+    var scheduleFlush = void 0;
+    // Decide what async method to use to triggering processing of queued callbacks:
+    if (isNode) {
+      scheduleFlush = useNextTick();
+    } else if (BrowserMutationObserver) {
+      scheduleFlush = useMutationObserver();
+    } else if (isWorker) {
+      scheduleFlush = useMessageChannel();
+    } else if (browserWindow === undefined && typeof require === 'function') {
+      scheduleFlush = attemptVertx();
+    } else {
+      scheduleFlush = useSetTimeout();
+    }
+    
+    function then(onFulfillment, onRejection) {
+      var parent = this;
+    
+      var child = new this.constructor(noop);
+    
+      if (child[PROMISE_ID] === undefined) {
+        makePromise(child);
+      }
+    
+      var _state = parent._state;
+    
+    
+      if (_state) {
+        var callback = arguments[_state - 1];
+        asap(function () {
+          return invokeCallback(_state, child, callback, parent._result);
+        });
+      } else {
+        subscribe(parent, child, onFulfillment, onRejection);
+      }
+    
+      return child;
+    }
+    
+    /**
+      `Promise.resolve` returns a promise that will become resolved with the
+      passed `value`. It is shorthand for the following:
+    
+      ```javascript
+      let promise = new Promise(function(resolve, reject){
+        resolve(1);
+      });
+    
+      promise.then(function(value){
+        // value === 1
+      });
+      ```
+    
+      Instead of writing the above, your code now simply becomes the following:
+    
+      ```javascript
+      let promise = Promise.resolve(1);
+    
+      promise.then(function(value){
+        // value === 1
+      });
+      ```
+    
+      @method resolve
+      @static
+      @param {Any} value value that the returned promise will be resolved with
+      Useful for tooling.
+      @return {Promise} a promise that will become fulfilled with the given
+      `value`
+    */
+    function resolve$1(object) {
+      /*jshint validthis:true */
+      var Constructor = this;
+    
+      if (object && typeof object === 'object' && object.constructor === Constructor) {
+        return object;
+      }
+    
+      var promise = new Constructor(noop);
+      resolve(promise, object);
+      return promise;
+    }
+    
+    var PROMISE_ID = Math.random().toString(36).substring(2);
+    
+    function noop() {}
+    
+    var PENDING = void 0;
+    var FULFILLED = 1;
+    var REJECTED = 2;
+    
+    function selfFulfillment() {
+      return new TypeError("You cannot resolve a promise with itself");
+    }
+    
+    function cannotReturnOwn() {
+      return new TypeError('A promises callback cannot return that same promise.');
+    }
+    
+    function tryThen(then$$1, value, fulfillmentHandler, rejectionHandler) {
+      try {
+        then$$1.call(value, fulfillmentHandler, rejectionHandler);
+      } catch (e) {
+        return e;
+      }
+    }
+    
+    function handleForeignThenable(promise, thenable, then$$1) {
+      asap(function (promise) {
+        var sealed = false;
+        var error = tryThen(then$$1, thenable, function (value) {
+          if (sealed) {
+            return;
+          }
+          sealed = true;
+          if (thenable !== value) {
+            resolve(promise, value);
+          } else {
+            fulfill(promise, value);
+          }
+        }, function (reason) {
+          if (sealed) {
+            return;
+          }
+          sealed = true;
+    
+          reject(promise, reason);
+        }, 'Settle: ' + (promise._label || ' unknown promise'));
+    
+        if (!sealed && error) {
+          sealed = true;
+          reject(promise, error);
+        }
+      }, promise);
+    }
+    
+    function handleOwnThenable(promise, thenable) {
+      if (thenable._state === FULFILLED) {
+        fulfill(promise, thenable._result);
+      } else if (thenable._state === REJECTED) {
+        reject(promise, thenable._result);
+      } else {
+        subscribe(thenable, undefined, function (value) {
+          return resolve(promise, value);
+        }, function (reason) {
+          return reject(promise, reason);
+        });
+      }
+    }
+    
+    function handleMaybeThenable(promise, maybeThenable, then$$1) {
+      if (maybeThenable.constructor === promise.constructor && then$$1 === then && maybeThenable.constructor.resolve === resolve$1) {
+        handleOwnThenable(promise, maybeThenable);
+      } else {
+        if (then$$1 === undefined) {
+          fulfill(promise, maybeThenable);
+        } else if (isFunction(then$$1)) {
+          handleForeignThenable(promise, maybeThenable, then$$1);
+        } else {
+          fulfill(promise, maybeThenable);
+        }
+      }
+    }
+    
+    function resolve(promise, value) {
+      if (promise === value) {
+        reject(promise, selfFulfillment());
+      } else if (objectOrFunction(value)) {
+        var then$$1 = void 0;
+        try {
+          then$$1 = value.then;
+        } catch (error) {
+          reject(promise, error);
+          return;
+        }
+        handleMaybeThenable(promise, value, then$$1);
+      } else {
+        fulfill(promise, value);
+      }
+    }
+    
+    function publishRejection(promise) {
+      if (promise._onerror) {
+        promise._onerror(promise._result);
+      }
+    
+      publish(promise);
+    }
+    
+    function fulfill(promise, value) {
+      if (promise._state !== PENDING) {
+        return;
+      }
+    
+      promise._result = value;
+      promise._state = FULFILLED;
+    
+      if (promise._subscribers.length !== 0) {
+        asap(publish, promise);
+      }
+    }
+    
+    function reject(promise, reason) {
+      if (promise._state !== PENDING) {
+        return;
+      }
+      promise._state = REJECTED;
+      promise._result = reason;
+    
+      asap(publishRejection, promise);
+    }
+    
+    function subscribe(parent, child, onFulfillment, onRejection) {
+      var _subscribers = parent._subscribers;
+      var length = _subscribers.length;
+    
+    
+      parent._onerror = null;
+    
+      _subscribers[length] = child;
+      _subscribers[length + FULFILLED] = onFulfillment;
+      _subscribers[length + REJECTED] = onRejection;
+    
+      if (length === 0 && parent._state) {
+        asap(publish, parent);
+      }
+    }
+    
+    function publish(promise) {
+      var subscribers = promise._subscribers;
+      var settled = promise._state;
+    
+      if (subscribers.length === 0) {
+        return;
+      }
+    
+      var child = void 0,
+          callback = void 0,
+          detail = promise._result;
+    
+      for (var i = 0; i < subscribers.length; i += 3) {
+        child = subscribers[i];
+        callback = subscribers[i + settled];
+    
+        if (child) {
+          invokeCallback(settled, child, callback, detail);
+        } else {
+          callback(detail);
+        }
+      }
+    
+      promise._subscribers.length = 0;
+    }
+    
+    function invokeCallback(settled, promise, callback, detail) {
+      var hasCallback = isFunction(callback),
+          value = void 0,
+          error = void 0,
+          succeeded = true;
+    
+      if (hasCallback) {
+        try {
+          value = callback(detail);
+        } catch (e) {
+          succeeded = false;
+          error = e;
+        }
+    
+        if (promise === value) {
+          reject(promise, cannotReturnOwn());
+          return;
+        }
+      } else {
+        value = detail;
+      }
+    
+      if (promise._state !== PENDING) {
+        // noop
+      } else if (hasCallback && succeeded) {
+        resolve(promise, value);
+      } else if (succeeded === false) {
+        reject(promise, error);
+      } else if (settled === FULFILLED) {
+        fulfill(promise, value);
+      } else if (settled === REJECTED) {
+        reject(promise, value);
+      }
+    }
+    
+    function initializePromise(promise, resolver) {
+      try {
+        resolver(function resolvePromise(value) {
+          resolve(promise, value);
+        }, function rejectPromise(reason) {
+          reject(promise, reason);
+        });
+      } catch (e) {
+        reject(promise, e);
+      }
+    }
+    
+    var id = 0;
+    function nextId() {
+      return id++;
+    }
+    
+    function makePromise(promise) {
+      promise[PROMISE_ID] = id++;
+      promise._state = undefined;
+      promise._result = undefined;
+      promise._subscribers = [];
+    }
+    
+    function validationError() {
+      return new Error('Array Methods must be provided an Array');
+    }
+    
+    var Enumerator = function () {
+      function Enumerator(Constructor, input) {
+        this._instanceConstructor = Constructor;
+        this.promise = new Constructor(noop);
+    
+        if (!this.promise[PROMISE_ID]) {
+          makePromise(this.promise);
+        }
+    
+        if (isArray(input)) {
+          this.length = input.length;
+          this._remaining = input.length;
+    
+          this._result = new Array(this.length);
+    
+          if (this.length === 0) {
+            fulfill(this.promise, this._result);
+          } else {
+            this.length = this.length || 0;
+            this._enumerate(input);
+            if (this._remaining === 0) {
+              fulfill(this.promise, this._result);
+            }
+          }
+        } else {
+          reject(this.promise, validationError());
+        }
+      }
+    
+      Enumerator.prototype._enumerate = function _enumerate(input) {
+        for (var i = 0; this._state === PENDING && i < input.length; i++) {
+          this._eachEntry(input[i], i);
+        }
+      };
+    
+      Enumerator.prototype._eachEntry = function _eachEntry(entry, i) {
+        var c = this._instanceConstructor;
+        var resolve$$1 = c.resolve;
+    
+    
+        if (resolve$$1 === resolve$1) {
+          var _then = void 0;
+          var error = void 0;
+          var didError = false;
+          try {
+            _then = entry.then;
+          } catch (e) {
+            didError = true;
+            error = e;
+          }
+    
+          if (_then === then && entry._state !== PENDING) {
+            this._settledAt(entry._state, i, entry._result);
+          } else if (typeof _then !== 'function') {
+            this._remaining--;
+            this._result[i] = entry;
+          } else if (c === Promise$2) {
+            var promise = new c(noop);
+            if (didError) {
+              reject(promise, error);
+            } else {
+              handleMaybeThenable(promise, entry, _then);
+            }
+            this._willSettleAt(promise, i);
+          } else {
+            this._willSettleAt(new c(function (resolve$$1) {
+              return resolve$$1(entry);
+            }), i);
+          }
+        } else {
+          this._willSettleAt(resolve$$1(entry), i);
+        }
+      };
+    
+      Enumerator.prototype._settledAt = function _settledAt(state, i, value) {
+        var promise = this.promise;
+    
+    
+        if (promise._state === PENDING) {
+          this._remaining--;
+    
+          if (state === REJECTED) {
+            reject(promise, value);
+          } else {
+            this._result[i] = value;
+          }
+        }
+    
+        if (this._remaining === 0) {
+          fulfill(promise, this._result);
+        }
+      };
+    
+      Enumerator.prototype._willSettleAt = function _willSettleAt(promise, i) {
+        var enumerator = this;
+    
+        subscribe(promise, undefined, function (value) {
+          return enumerator._settledAt(FULFILLED, i, value);
+        }, function (reason) {
+          return enumerator._settledAt(REJECTED, i, reason);
+        });
+      };
+    
+      return Enumerator;
+    }();
+    
+    /**
+      `Promise.all` accepts an array of promises, and returns a new promise which
+      is fulfilled with an array of fulfillment values for the passed promises, or
+      rejected with the reason of the first passed promise to be rejected. It casts all
+      elements of the passed iterable to promises as it runs this algorithm.
+    
+      Example:
+    
+      ```javascript
+      let promise1 = resolve(1);
+      let promise2 = resolve(2);
+      let promise3 = resolve(3);
+      let promises = [ promise1, promise2, promise3 ];
+    
+      Promise.all(promises).then(function(array){
+        // The array here would be [ 1, 2, 3 ];
+      });
+      ```
+    
+      If any of the `promises` given to `all` are rejected, the first promise
+      that is rejected will be given as an argument to the returned promises's
+      rejection handler. For example:
+    
+      Example:
+    
+      ```javascript
+      let promise1 = resolve(1);
+      let promise2 = reject(new Error("2"));
+      let promise3 = reject(new Error("3"));
+      let promises = [ promise1, promise2, promise3 ];
+    
+      Promise.all(promises).then(function(array){
+        // Code here never runs because there are rejected promises!
+      }, function(error) {
+        // error.message === "2"
+      });
+      ```
+    
+      @method all
+      @static
+      @param {Array} entries array of promises
+      @param {String} label optional string for labeling the promise.
+      Useful for tooling.
+      @return {Promise} promise that is fulfilled when all `promises` have been
+      fulfilled, or rejected if any of them become rejected.
+      @static
+    */
+    function all(entries) {
+      return new Enumerator(this, entries).promise;
+    }
+    
+    /**
+      `Promise.race` returns a new promise which is settled in the same way as the
+      first passed promise to settle.
+    
+      Example:
+    
+      ```javascript
+      let promise1 = new Promise(function(resolve, reject){
+        setTimeout(function(){
+          resolve('promise 1');
+        }, 200);
+      });
+    
+      let promise2 = new Promise(function(resolve, reject){
+        setTimeout(function(){
+          resolve('promise 2');
+        }, 100);
+      });
+    
+      Promise.race([promise1, promise2]).then(function(result){
+        // result === 'promise 2' because it was resolved before promise1
+        // was resolved.
+      });
+      ```
+    
+      `Promise.race` is deterministic in that only the state of the first
+      settled promise matters. For example, even if other promises given to the
+      `promises` array argument are resolved, but the first settled promise has
+      become rejected before the other promises became fulfilled, the returned
+      promise will become rejected:
+    
+      ```javascript
+      let promise1 = new Promise(function(resolve, reject){
+        setTimeout(function(){
+          resolve('promise 1');
+        }, 200);
+      });
+    
+      let promise2 = new Promise(function(resolve, reject){
+        setTimeout(function(){
+          reject(new Error('promise 2'));
+        }, 100);
+      });
+    
+      Promise.race([promise1, promise2]).then(function(result){
+        // Code here never runs
+      }, function(reason){
+        // reason.message === 'promise 2' because promise 2 became rejected before
+        // promise 1 became fulfilled
+      });
+      ```
+    
+      An example real-world use case is implementing timeouts:
+    
+      ```javascript
+      Promise.race([ajax('foo.json'), timeout(5000)])
+      ```
+    
+      @method race
+      @static
+      @param {Array} promises array of promises to observe
+      Useful for tooling.
+      @return {Promise} a promise which settles in the same way as the first passed
+      promise to settle.
+    */
+    function race(entries) {
+      /*jshint validthis:true */
+      var Constructor = this;
+    
+      if (!isArray(entries)) {
+        return new Constructor(function (_, reject) {
+          return reject(new TypeError('You must pass an array to race.'));
+        });
+      } else {
+        return new Constructor(function (resolve, reject) {
+          var length = entries.length;
+          for (var i = 0; i < length; i++) {
+            Constructor.resolve(entries[i]).then(resolve, reject);
+          }
+        });
+      }
+    }
+    
+    /**
+      `Promise.reject` returns a promise rejected with the passed `reason`.
+      It is shorthand for the following:
+    
+      ```javascript
+      let promise = new Promise(function(resolve, reject){
+        reject(new Error('WHOOPS'));
+      });
+    
+      promise.then(function(value){
+        // Code here doesn't run because the promise is rejected!
+      }, function(reason){
+        // reason.message === 'WHOOPS'
+      });
+      ```
+    
+      Instead of writing the above, your code now simply becomes the following:
+    
+      ```javascript
+      let promise = Promise.reject(new Error('WHOOPS'));
+    
+      promise.then(function(value){
+        // Code here doesn't run because the promise is rejected!
+      }, function(reason){
+        // reason.message === 'WHOOPS'
+      });
+      ```
+    
+      @method reject
+      @static
+      @param {Any} reason value that the returned promise will be rejected with.
+      Useful for tooling.
+      @return {Promise} a promise rejected with the given `reason`.
+    */
+    function reject$1(reason) {
+      /*jshint validthis:true */
+      var Constructor = this;
+      var promise = new Constructor(noop);
+      reject(promise, reason);
+      return promise;
+    }
+    
+    function needsResolver() {
+      throw new TypeError('You must pass a resolver function as the first argument to the promise constructor');
+    }
+    
+    function needsNew() {
+      throw new TypeError("Failed to construct 'Promise': Please use the 'new' operator, this object constructor cannot be called as a function.");
+    }
+    
+    /**
+      Promise objects represent the eventual result of an asynchronous operation. The
+      primary way of interacting with a promise is through its `then` method, which
+      registers callbacks to receive either a promise's eventual value or the reason
+      why the promise cannot be fulfilled.
+    
+      Terminology
+      -----------
+    
+      - `promise` is an object or function with a `then` method whose behavior conforms to this specification.
+      - `thenable` is an object or function that defines a `then` method.
+      - `value` is any legal JavaScript value (including undefined, a thenable, or a promise).
+      - `exception` is a value that is thrown using the throw statement.
+      - `reason` is a value that indicates why a promise was rejected.
+      - `settled` the final resting state of a promise, fulfilled or rejected.
+    
+      A promise can be in one of three states: pending, fulfilled, or rejected.
+    
+      Promises that are fulfilled have a fulfillment value and are in the fulfilled
+      state.  Promises that are rejected have a rejection reason and are in the
+      rejected state.  A fulfillment value is never a thenable.
+    
+      Promises can also be said to *resolve* a value.  If this value is also a
+      promise, then the original promise's settled state will match the value's
+      settled state.  So a promise that *resolves* a promise that rejects will
+      itself reject, and a promise that *resolves* a promise that fulfills will
+      itself fulfill.
+    
+    
+      Basic Usage:
+      ------------
+    
+      ```js
+      let promise = new Promise(function(resolve, reject) {
+        // on success
+        resolve(value);
+    
+        // on failure
+        reject(reason);
+      });
+    
+      promise.then(function(value) {
+        // on fulfillment
+      }, function(reason) {
+        // on rejection
+      });
+      ```
+    
+      Advanced Usage:
+      ---------------
+    
+      Promises shine when abstracting away asynchronous interactions such as
+      `XMLHttpRequest`s.
+    
+      ```js
+      function getJSON(url) {
+        return new Promise(function(resolve, reject){
+          let xhr = new XMLHttpRequest();
+    
+          xhr.open('GET', url);
+          xhr.onreadystatechange = handler;
+          xhr.responseType = 'json';
+          xhr.setRequestHeader('Accept', 'application/json');
+          xhr.send();
+    
+          function handler() {
+            if (this.readyState === this.DONE) {
+              if (this.status === 200) {
+                resolve(this.response);
+              } else {
+                reject(new Error('getJSON: `' + url + '` failed with status: [' + this.status + ']'));
+              }
+            }
+          };
+        });
+      }
+    
+      getJSON('/posts.json').then(function(json) {
+        // on fulfillment
+      }, function(reason) {
+        // on rejection
+      });
+      ```
+    
+      Unlike callbacks, promises are great composable primitives.
+    
+      ```js
+      Promise.all([
+        getJSON('/posts'),
+        getJSON('/comments')
+      ]).then(function(values){
+        values[0] // => postsJSON
+        values[1] // => commentsJSON
+    
+        return values;
+      });
+      ```
+    
+      @class Promise
+      @param {Function} resolver
+      Useful for tooling.
+      @constructor
+    */
+    
+    var Promise$2 = function () {
+      function Promise(resolver) {
+        this[PROMISE_ID] = nextId();
+        this._result = this._state = undefined;
+        this._subscribers = [];
+    
+        if (noop !== resolver) {
+          typeof resolver !== 'function' && needsResolver();
+          this instanceof Promise ? initializePromise(this, resolver) : needsNew();
+        }
+      }
+    
+      /**
+      The primary way of interacting with a promise is through its `then` method,
+      which registers callbacks to receive either a promise's eventual value or the
+      reason why the promise cannot be fulfilled.
+       ```js
+      findUser().then(function(user){
+        // user is available
+      }, function(reason){
+        // user is unavailable, and you are given the reason why
+      });
+      ```
+       Chaining
+      --------
+       The return value of `then` is itself a promise.  This second, 'downstream'
+      promise is resolved with the return value of the first promise's fulfillment
+      or rejection handler, or rejected if the handler throws an exception.
+       ```js
+      findUser().then(function (user) {
+        return user.name;
+      }, function (reason) {
+        return 'default name';
+      }).then(function (userName) {
+        // If `findUser` fulfilled, `userName` will be the user's name, otherwise it
+        // will be `'default name'`
+      });
+       findUser().then(function (user) {
+        throw new Error('Found user, but still unhappy');
+      }, function (reason) {
+        throw new Error('`findUser` rejected and we're unhappy');
+      }).then(function (value) {
+        // never reached
+      }, function (reason) {
+        // if `findUser` fulfilled, `reason` will be 'Found user, but still unhappy'.
+        // If `findUser` rejected, `reason` will be '`findUser` rejected and we're unhappy'.
+      });
+      ```
+      If the downstream promise does not specify a rejection handler, rejection reasons will be propagated further downstream.
+       ```js
+      findUser().then(function (user) {
+        throw new PedagogicalException('Upstream error');
+      }).then(function (value) {
+        // never reached
+      }).then(function (value) {
+        // never reached
+      }, function (reason) {
+        // The `PedgagocialException` is propagated all the way down to here
+      });
+      ```
+       Assimilation
+      ------------
+       Sometimes the value you want to propagate to a downstream promise can only be
+      retrieved asynchronously. This can be achieved by returning a promise in the
+      fulfillment or rejection handler. The downstream promise will then be pending
+      until the returned promise is settled. This is called *assimilation*.
+       ```js
+      findUser().then(function (user) {
+        return findCommentsByAuthor(user);
+      }).then(function (comments) {
+        // The user's comments are now available
+      });
+      ```
+       If the assimliated promise rejects, then the downstream promise will also reject.
+       ```js
+      findUser().then(function (user) {
+        return findCommentsByAuthor(user);
+      }).then(function (comments) {
+        // If `findCommentsByAuthor` fulfills, we'll have the value here
+      }, function (reason) {
+        // If `findCommentsByAuthor` rejects, we'll have the reason here
+      });
+      ```
+       Simple Example
+      --------------
+       Synchronous Example
+       ```javascript
+      let result;
+       try {
+        result = findResult();
+        // success
+      } catch(reason) {
+        // failure
+      }
+      ```
+       Errback Example
+       ```js
+      findResult(function(result, err){
+        if (err) {
+          // failure
+        } else {
+          // success
+        }
+      });
+      ```
+       Promise Example;
+       ```javascript
+      findResult().then(function(result){
+        // success
+      }, function(reason){
+        // failure
+      });
+      ```
+       Advanced Example
+      --------------
+       Synchronous Example
+       ```javascript
+      let author, books;
+       try {
+        author = findAuthor();
+        books  = findBooksByAuthor(author);
+        // success
+      } catch(reason) {
+        // failure
+      }
+      ```
+       Errback Example
+       ```js
+       function foundBooks(books) {
+       }
+       function failure(reason) {
+       }
+       findAuthor(function(author, err){
+        if (err) {
+          failure(err);
+          // failure
+        } else {
+          try {
+            findBoooksByAuthor(author, function(books, err) {
+              if (err) {
+                failure(err);
+              } else {
+                try {
+                  foundBooks(books);
+                } catch(reason) {
+                  failure(reason);
+                }
+              }
+            });
+          } catch(error) {
+            failure(err);
+          }
+          // success
+        }
+      });
+      ```
+       Promise Example;
+       ```javascript
+      findAuthor().
+        then(findBooksByAuthor).
+        then(function(books){
+          // found books
+      }).catch(function(reason){
+        // something went wrong
+      });
+      ```
+       @method then
+      @param {Function} onFulfilled
+      @param {Function} onRejected
+      Useful for tooling.
+      @return {Promise}
+      */
+    
+      /**
+      `catch` is simply sugar for `then(undefined, onRejection)` which makes it the same
+      as the catch block of a try/catch statement.
+      ```js
+      function findAuthor(){
+      throw new Error('couldn't find that author');
+      }
+      // synchronous
+      try {
+      findAuthor();
+      } catch(reason) {
+      // something went wrong
+      }
+      // async with promises
+      findAuthor().catch(function(reason){
+      // something went wrong
+      });
+      ```
+      @method catch
+      @param {Function} onRejection
+      Useful for tooling.
+      @return {Promise}
+      */
+    
+    
+      Promise.prototype.catch = function _catch(onRejection) {
+        return this.then(null, onRejection);
+      };
+    
+      /**
+        `finally` will be invoked regardless of the promise's fate just as native
+        try/catch/finally behaves
+      
+        Synchronous example:
+      
+        ```js
+        findAuthor() {
+          if (Math.random() > 0.5) {
+            throw new Error();
+          }
+          return new Author();
+        }
+      
+        try {
+          return findAuthor(); // succeed or fail
+        } catch(error) {
+          return findOtherAuther();
+        } finally {
+          // always runs
+          // doesn't affect the return value
+        }
+        ```
+      
+        Asynchronous example:
+      
+        ```js
+        findAuthor().catch(function(reason){
+          return findOtherAuther();
+        }).finally(function(){
+          // author was either found, or not
+        });
+        ```
+      
+        @method finally
+        @param {Function} callback
+        @return {Promise}
+      */
+    
+    
+      Promise.prototype.finally = function _finally(callback) {
+        var promise = this;
+        var constructor = promise.constructor;
+    
+        if (isFunction(callback)) {
+          return promise.then(function (value) {
+            return constructor.resolve(callback()).then(function () {
+              return value;
+            });
+          }, function (reason) {
+            return constructor.resolve(callback()).then(function () {
+              throw reason;
+            });
+          });
+        }
+    
+        return promise.then(callback, callback);
+      };
+    
+      return Promise;
+    }();
+    
+    Promise$2.prototype.then = then;
+    Promise$2.all = all;
+    Promise$2.race = race;
+    Promise$2.resolve = resolve$1;
+    Promise$2.reject = reject$1;
+    Promise$2._setScheduler = setScheduler;
+    Promise$2._setAsap = setAsap;
+    Promise$2._asap = asap;
+    
+    /*global self*/
+    function polyfill() {
+      var local = void 0;
+    
+      if (typeof global !== 'undefined') {
+        local = global;
+      } else if (typeof self !== 'undefined') {
+        local = self;
+      } else {
+        try {
+          local = Function('return this')();
+        } catch (e) {
+          throw new Error('polyfill failed because global object is unavailable in this environment');
+        }
+      }
+    
+      var P = local.Promise;
+    
+      if (P) {
+        var promiseToString = null;
+        try {
+          promiseToString = Object.prototype.toString.call(P.resolve());
+        } catch (e) {
+          // silently ignored
+        }
+    
+        if (promiseToString === '[object Promise]' && !P.cast) {
+          return;
+        }
+      }
+    
+      local.Promise = Promise$2;
+    }
+    
+    // Strange compat..
+    Promise$2.polyfill = polyfill;
+    Promise$2.Promise = Promise$2;
+    
+    Promise$2.polyfill();
+    
+    return Promise$2;
+    
+    })));
+}());
 
 // XXX strftime
 //
@@ -394,7 +1571,7 @@
 // This is inspired from SO <https://stackoverflow.com/questions/11172801/static-variables-with-john-resigs-simple-class-pattern>
 // Added special __class__ to set the class level and object level className property, inspired by:
 // <https://github.com/pointofpresence/js-inherit>
-// XXX Class
+// XXX POBaseClass
 (function()
 {
     /**
@@ -442,29 +1619,39 @@
     
     var initializing = false, fnTest = /xyz/.test(function(){xyz;}) ? /\b_super\b/ : /.*/;
 
-    // The base Class implementation (does nothing)
-    this.Class = function(){};
+    // The base POBaseClass implementation (does nothing)
+    this.POBaseClass = function(){};
 
-    this.Class.prototype.isA = function(className)
+    this.POBaseClass.prototype.isA = function(className)
     {
-        if( !this.hasOwnProperty( 'className' ) )
+        if( !this.hasOwnProperty('className') )
         {
-            return( false );
+            return false;
         }
-        return( this.className === className );
+        return this.className === className;
     };
-    
-    // Create a new Class that inherits from this class
-    Class.extend = function(prop) 
+
+    // Create a new POBaseClass that inherits from this class
+    POBaseClass.extend = function(prop)
     {
         var _super = this.prototype;
- 
-        // Instantiate a base class (but only create the instance,
-        // don't run the init constructor)
+
+        // Dummy class constructor
         initializing = true;
-        var prototype = new this();
+        function POBaseClass()
+        {
+            // Initialize only if not currently in the process of initializing another object (avoid infinite loop)
+            if( !initializing && this.init )
+            {
+                this.init.apply(this, arguments);
+            }
+        };
         initializing = false;
-        
+
+        // Inherit from this class
+        POBaseClass.prototype = Object.create(this.prototype);
+        POBaseClass.prototype.constructor = POBaseClass;
+
         // Copy the properties over onto the new prototype
         for( var name in prop ) 
         {
@@ -473,16 +1660,16 @@
                 typeof _super[name] == "function" &&
                 fnTest.test(prop[name]) )
             {
-                prototype[name] = (function(name, fn)
+                POBaseClass.prototype[name] = (function(name, fn)
                 {
                     return function() 
                     {
                         var tmp = this._super;
-     
+
                         // Add a new ._super() method that is the same method
                         // but on the super-class
                         this._super = _super[name];
-     
+
                         // The method only need to be bound temporarily, so we
                         // remove it when we're done executing
                         var ret = fn.apply(this, arguments);        
@@ -493,145 +1680,311 @@
             }
             else if( name == '__class__' )
             {
-                prototype.className = prop[name];
+                POBaseClass.prototype.className = prop[name];
             }
             else if( name.substr(0, 1) == '_' )
             {
-                Class[ name.substr( 1 ) ] = prop[name];
+                POBaseClass[ name.substr(1) ] = prop[name];
             }
             else
             {
-                prototype[name] = prop[name];
+                POBaseClass.prototype[name] = prop[name];
             }
-        }
-
-        // The dummy class constructor
-        function Class() 
-        {
-            // All construction is actually done in the init method
-            if( !initializing && this.init )
-                return( this.init.apply(this, arguments) );
-        }
-    
-        // Copy static properties from base
-        for( var name in this )
-        {
-            if( name.substr( 0, 1 ) == '_' )
-            {
-                Class[ name.substr( 1 ) ] = this[name];
-            }
-        }
-
- 
-        // Populate our constructed prototype object
-        Class.prototype = prototype;
- 
-        // Enforce the constructor to be what we expect
-        Class.prototype.constructor = Class;
-        
-        // Add in the static members
-        // See SO answer: <https://stackoverflow.com/a/23458861/4814971>
-        for ( var name in this )
-        {
-            if( !Class[name] )
-            {
-                Class[name] = this[name];
-            }
-        }
-        
-        if( typeof( prototype.className ) !== 'undefined' )
-        {
-            Class.prototype.className = prototype.className;
-            Class.className = prototype.className;
         }
 
         // And make this class extendable
-        Class.extend = arguments.callee;
- 
-        return Class;
+        POBaseClass.extend = arguments.callee;
+
+        return POBaseClass;
     };
-    
-    window.URI = Class.extend(
+
+    if( !window.URI )
     {
-        init: function(url)
+        (function()
         {
-            var l = window.location;
-            if( typeof( url ) === 'undefined' || url === null )
+            (function(global)
             {
-                url = l.toString();
-            }
-            var u = new URL( url, l.toString() );
-            return( u );
-        }
-    });
+                'use strict';
     
-    URL.prototype.clone = function()
-    {
-        var newObject = new URL( this.toString() );
-        return( newObject );
-    };
+                // Define the URI class
+                /*
+                 * Instantiate a new URI object. All arguments are optional, and if none is provided, it defaults to window.location.href
+                 *
+                 * @throws TypeError
+                 * @param {String}  relativePath    A relative or absolute path, including one starting with http
+                 * @param {String}  base            An optional base URL to resolve the relative path provided as the first argument. Defaults to window.location.href
+                 * @return {URI} Returns a new URI object
+                 **/
+                function URI(relativePath, base)
+                {
+                    if( !(this instanceof URI) )
+                    {
+                        throw new TypeError( "Class constructors must be invoked with 'new'" );
+                    }
+    
+                    // Create a URL object
+                    var tempURL;
+                    if( !relativePath && !base )
+                    {
+                        base = window.location.href;
+                        tempURL = new URL(window.location.href);
+                    }
+                    else
+                    {
+                        // Use 'window.location.href' as the default base
+                        base = base || window.location.href;
+                        tempURL = new URL(relativePath, base);
+                    }
+    
+                    // Store the URL instance for internal reference
+                    this._url = tempURL;
+    
+                    // Define property accessors for URL properties
+                    var properties = ['href', 'protocol', 'host', 'hostname', 'port', 'pathname', 'search', 'hash', 'password', 'username'];
+                    properties.forEach(function(prop)
+                    {
+                        Object.defineProperty(this, prop,
+                        {
+                            get: function()
+                            {
+                                return this._url[prop];
+                            },
+                            set: function(value)
+                            {
+                                this._url[prop] = value;
+                            },
+                            enumerable: true,
+                            configurable: true
+                        });
+                    }, this);
+
+                    // Make origin read-only
+                    Object.defineProperty(this, 'origin',
+                    {
+                        get: function()
+                        {
+                            return this._url.origin;
+                        },
+                        set: function()
+                        {
+                            throw new Error( "The 'origin' property is read-only." );
+                        },
+                        enumerable: true,
+                        configurable: true
+                    });
+
+                    // searchParams returns a URLSearchParams object
+                    Object.defineProperty(this, 'searchParams',
+                    {
+                        get: function()
+                        {
+                            return this._url.searchParams;
+                        },
+                        enumerable: true,
+                        configurable: true
+                    });
+                }
+    
+                // Inherit from URL.prototype
+                URI.prototype = Object.create(URL.prototype);
+    
+                // Fix the constructor reference
+                URI.prototype.constructor = URI;
+    
+                // Override the `toString` method to delegate to the URL instance
+                URI.prototype.toString = function()
+                {
+                    return this._url.toString();
+                };
+    
+                // Static methods
+                URI.canParse = function(url, base)
+                {
+                    try
+                    {
+                        new URL(url, base);
+                        return true;
+                    }
+                    catch(e)
+                    {
+                        return false;
+                    }
+                };
+    
+                // Note: createObjectURL and revokeObjectURL are methods of URL but relate to Blobs, not URL manipulation
+                URI.createObjectURL = function(blob)
+                {
+                    return URL.createObjectURL(blob);
+                };
+    
+                URI.revokeObjectURL = function(objectURL)
+                {
+                    URL.revokeObjectURL(objectURL);
+                };
+    
+                URI.parse = function(url, base)
+                {
+                    return new URL(url, base);
+                };
+    
+                // Instance method
+                URI.prototype.toJSON = function()
+                {
+                    return this._url.toJSON();
+                };
+    
+                // Credits: Grok (xAI)
+                /*
+                 * This takes an array of segments that will be added to the current object pathname.
+                 * 
+                 * @param {Array}   segments    One or more path segments to append to the object pathname
+                 * @return {URI}    Returns the current URI object for chaining
+                 **/
+                URI.prototype.appendToPath = function()
+                {
+                    var segments = Array.prototype.slice.call(arguments, 0);
+    
+                    // Split path into segments, handling multiple slashes
+                    var path = this._url.pathname.split( /\/{1,}/ );
+    
+                    // Append new segments
+                    for( var i = 0; i < segments.length; i++ )
+                    {
+                        path.push(segments[i]);
+                    }
+    
+                    // Reconstruct the path
+                    this._url.pathname = path.join('/');
+    
+                    // Return this for method chaining
+                    return this;
+                };
+    
+                // Expose the URI class globally
+                global.URI = URI;
+            })(this);
+        })();
+    }
 
     /*
     See also <https://stackoverflow.com/a/33311143/4814971>
     to make private variables and class wide variables
     */
 
-    window.Generic = Class.extend(
+    // NOTE: POGenericClass class
+    // NOTE: POGenericClass class
+    window.POGenericClass = POBaseClass.extend(
     {
-        __class__: "Generic",
+        __class__: "POGenericClass",
+        
         init: function( opts )
         {
             var self = this;
-            this.params = {};
-            if( this.hasOwnProperty( 'debug_level' ) )
+            if( typeof( opts ) === 'undefined' )
             {
-                // console.debug( "class object already has a property 'debug_level'." );
+                opts = {};
             }
-            else
+            if( opts.hasOwnProperty( 'debug' ) )
             {
-                // console.debug( "class object does not have a debug_level property yet." );
-                this.debug_level = 0;
+                self.debug_level = parseInt( opts.debug );
+                delete( opts.debug );
             }
+            else if( opts.hasOwnProperty( 'debug_level' ) )
+            {
+                self.debug_level = parseInt( opts.debug_level );
+                delete( opts.debug_level );
+            }
+            else if( settings.hasOwnProperty( 'DEBUG' ) )
+            {
+                if( window.DEBUG == true )
+                {
+                    self.debug_level = 1;
+                }
+                else if( Number.isInteger( settings.DEBUG ) )
+                {
+                    self.debug_level = settings.DEBUG;
+                }
+            }
+            // self.debug = self.debug_level;
+            // this._super( opts );
             var tmpParams = opts || {};
             Object.keys(tmpParams).forEach(function(key)
             {
                 self[key] = tmpParams[key];
             });
+            
+            // For local storage and setSitePrefs() and getSitePrefs()
+            self.ai_data = 'ai_data';
+            // To contain cached data loaded from /public/l10n.json
+            self.l10n = {};
+            self.formatterCache = {};
             // this._super( opts );
-            return( this );
         },
-    
+
+        /**
+         * Logs a debug message to the console
+         *
+         * @param  {String} message  A debug message
+         */
         debug: function()
         {
+            var self = this;
             var args = Array.from(arguments);
             args.unshift( "debug" );
-            this.log.apply( this, args );
+            this.log_console.apply( self, args );
         },
-    
+
+        /**
+         * Logs an error to the console
+         *
+         * @param  {String} message  An error message
+         */
         error: function()
         {
+            var self = this;
             var args = Array.from(arguments);
             args.unshift( "error" );
-            this.log.apply( this, args );
+            self.log.apply( self, args );
         },
-    
+
+        /**
+         * Logs an info message to the console
+         *
+         * @param  {String} message  An info message
+         */
         info: function()
         {
+            var self = this;
             var args = Array.from(arguments);
             args.unshift( "info" );
-            this.log.apply( this, args );
+            this.log_console.apply( self, args );
         },
-    
+
+        /**
+         * Logs a message to the console
+         *
+         * @param  {String} message  A message
+         */
         log: function()
         {
             var self = this;
+            var args = Array.from(arguments);
+            args.unshift( "log" );
+            self.log_console.apply( self, args );
+        },
+
+        log_console: function()
+        {
+            var self = this;
+            // console.log( "self.debug_level is " + self.debug_level + " and settings.DEBUG is " + settings.DEBUG  );
             var logType = "log";
-            
+            // Credits: https://stackoverflow.com/a/19790505/4814971
             var toPrint = [];
             for( var i = 0; i < arguments.length; ++i ) 
             {
                 toPrint.push( arguments[i] );
             }
+            // console.log( "toPrint contains: " + JSON.stringify( toPrint, null, 4 ) );
             // If we have more than one argument and our first one is a keyword, we use it to know how to log
             if( arguments.length > 1 &&
                 typeof( toPrint[0] ) === "string" &&
@@ -639,12 +1992,10 @@
             {
                 logType = toPrint.shift();
             }
-            
             if( !self.debug_level && logType !== 'error' )
             {
-                return( false );
+                return(false);
             }
-            
             var callerFuncName = '';
             if( arguments.callee.caller !== null )
             {
@@ -661,10 +2012,12 @@
             {
                 var def = {};
                 var line = stackLines[i];
+                // console.log( "Checking line '" + line + "'" );
                 var chunk = line.split( "@" );
                 var functionInfo = chunk[0];
                 var locationInfo = chunk[1];
                 var matches = [];
+                // http://legal-server.test/js/jquery-1.11.2.min.js line 2 > eval:749:4
                 if( ( matches = locationInfo.match( /^(\S+)\s+line\s\d+\s+>\s+eval\:(\d+):(\d+)$/ ) ) !== null )
                 {
                     def.url = matches[1];
@@ -673,6 +2026,7 @@
                     def.line = matches[2];
                     def.col = matches[3];
                 }
+                // http://legal-server.test/js/desktop.js:502:38
                 else if( ( matches = locationInfo.match( /^(.*?):(\d+):(\d+)$/ ) ) !== null )
                 {
                     def.url = matches[1];
@@ -683,15 +2037,21 @@
                 }
                 else
                 {
-                    con.log( "Location no match for: '" + locationInfo + "'" );
+                    console.info( "Location no match for: '" + locationInfo + "'" );
                 }
+                // LegalTech</ui.legalTechProgressBar
+                // LegalTech/this.init/</<
+                // window.Account</ui.log
+                // send
                 def.object = null;
                 def.method = null;
-                if( ( matches = functionInfo.match( /^([a-zA-Z0-9_\.]+)[<\/]+([a-zA-Z0-9\._]+)/ ) ) !== null )
+                if( ( matches = functionInfo.match( /^([a-zA-Z0-9_\.]+)[\<\/]+([a-zA-Z0-9\._]+)/ ) ) !== null )
                 {
                     def.object = matches[1];
                     def.method = matches[2];
                 }
+                // success/</<
+                // $.fn.changeMenu
                 else if( ( matches = functionInfo.match( /^(\$?[a-zA-Z0-9_\.]+)/ ) ) !== null )
                 {
                     def.method = matches[1];
@@ -702,12 +2062,12 @@
                 }
                 stackTrace.push( def );
             }
+            // console.info( "stackTrace result is: " + JSON.stringify( stackTrace, null, 4 ) );
             /*
             var index = caller_line.indexOf( 'at ' );
             var clean = caller_line.slice( index + 2, caller_line.length );
             */
             // log.apply( null, arguments );
-            // Credits: <https://stackoverflow.com/a/19790505/4814971>
             logData.message = toPrint.join( '' );
             var isSprintf = false;
             if( typeof( toPrint[0] ) !== 'undefined' )
@@ -725,7 +2085,7 @@
                     isSprintf = true;
                 }
             }
-        
+            
             // offset 0 is our own function ui.log, so we check for our caller at offset 1
             var j = 1;
             var ref = stackTrace[j];
@@ -763,31 +2123,60 @@
             }
             logFunction.apply( null, toPrint );
         },
-    
+
+        /**
+         * Logs a trace to the console
+         *
+         * @param  {String} message  A trace message
+         */
         trace: function()
         {
+            var self = this;
             var args = Array.from(arguments);
             args.unshift( "trace" );
-            this.log.apply( this, args );
+            this.log_console.apply( self, args );
         },
-    
+
+        /**
+         * Logs a warning to the console
+         *
+         * @param  {String} message  A warning message
+         */
         warn: function()
         {
+            var self = this;
             var args = Array.from(arguments);
             args.unshift( "warn" );
-            this.log.apply( this, args );
+            this.log_console.apply( self, args );
         },
-        
+
+        /**
+         * Returns the latest error, or an empty string if there is none.
+         *
+         * @return {String} Returns an error string.
+         */
         getError: function()
         {
             return( typeof( this._error ) === 'undefined' ? '' : this._error );
         },
-        
+
+        /**
+         * Checks if there is an error set.
+         *
+         * @return {Boolean} Returns true if an error was set, or false otherwise.
+         */
         hasError: function()
         {
             return( this._error.length > 0 );
         },
-        
+
+        /**
+         * Sets an error, and makes it available both in the object, and as a global 'ERROR' variable.
+         *
+         * @param {Object} Either an object, or an array of text string to concatenate.
+         *
+         * @return {Void}
+         */
         setError: function()
         {
             var self = this;
@@ -852,7 +2241,7 @@
     };
     
     // NOTE: Gettext class
-    window.Gettext = Generic.extend(
+    window.Gettext = window.POGenericClass.extend(
     {
         __class__: "Gettext",
         _L10N: {},
@@ -875,6 +2264,7 @@
         init: function( opts )
         {
             var self = this;
+            opts = opts || {};
             this.domain = null;
             this.category = null;
             if( opts.hasOwnProperty( 'debug' ) )
@@ -900,15 +2290,18 @@
             Thus, if this.path was set to '/locale', we would resolve the full path to:
             /locale/en_GB/com.example.api.json
             */
-            this.isReady = false;
-            this.hasLoadError = false;
             this.path    = null;
             this.locale  = (typeof( document ) !== 'undefined' ? document.documentElement.getAttribute('lang') : false) || 'en';
             this._super( opts );
+            self.debug( "domain is: ", this.domain );
             self.debug( "Category value is: " + this.category );
             self.debug( "Initiating object." );
+
+            this.isReady = false;
+            this.hasLoadError = false;
             this.supported_languages = [];
-            if( this.domain == null )
+
+            if( typeof( self.domain ) === 'undefined' || self.domain == null )
             {
                 throw new Error( "No domain was provided for localisation" );
             }
@@ -929,19 +2322,38 @@
             {
                 throw new Error( "Language provided (\"" + this.locale + "\") is in an unsupported format. Use something like \"en_GB\", \"en-GB\" or simply \"en\" or even \"en_GB.utf-8\"." );
             }
-            
+
             this.locale = this.locale.replace( '-', '_' );
             this.path = new URI( this.path );
             this.plural = [];
-            var hash = this.setTextDomain( this.domain );
-            self.debug( "setTextDomain() returned: \"" + hash + "\"." );
-            if( typeof( hash ) === 'undefined' )
+            window.Gettext.L10N = window.Gettext.L10N || {};
+
+            // Start loading data but don't wait for it here
+            this._initPromise = this.setTextDomain( this.domain ).then(function( hash )
             {
-                return( this.getError() );
+                self.debug( "setTextDomain() returned: \"" + JSON.stringify( hash, null, 4 ) + "\"." );
+                if( typeof( hash ) === 'undefined' )
+                {
+                    throw self.getError();
+                }
+                self.isReady = true;
+                return(self);
+            }).catch(function( error )
+            {
+                self.hasLoadError = true;
+                self.setError( error );
+            });
+
+            // Check if promise return is requested
+            if( opts && opts.promise )
+            {
+                return this._initPromise;
             }
+
+            // Return this for backward compatibility
             return( this );
         },
-        
+
         /**
          * Translates a string using the default textdomain
          *
@@ -955,7 +2367,7 @@
         {
             return( this.dngettext( this.domain, msgid ) );
         },
-        
+
         /**
          * Given an original string, this return the sprintf formatted localised equivalent
          *
@@ -989,7 +2401,7 @@
         {
             return( this.dngettext( domain, msgid ) );
         },
-        
+
         /**
          * Translates a plural string using the default textdomain
          *
@@ -1025,7 +2437,6 @@
             // Force stringification of object, if any.
             msgid = msgid + "";
             var defaultTranslation = msgid;
-            var dict;
             var index;
             var args = Array.prototype.slice.call(arguments);
             if( typeof( args[ args.length - 1 ] ) === 'object' )
@@ -1043,29 +2454,28 @@
             }
             if( !opts.hasOwnProperty( 'locale' ) )
             {
-                opts.locale = this.locale;
+                opts.locale = self.locale;
             }
             
-            self.debug( "Fetching data has for domain \"" + domain + "\". and for locale \"" + opts.locale + "\"" );
-            var data = this.getDomainHash({ domain: domain });
-            var plural = this.plural;
+            self.debug( "Fetching data has for domain \"" + domain + "\". and for locale \"" + opts.locale + "\", and for msgid '" + msgid + "'" );
+            var data = self.getDomainHash({ domain: domain });
+            var plural = self.plural;
             if( !data.hasOwnProperty( opts.locale ) )
             {
                 this.warn( "No locale \"" + opts.locale + "\" found for the domain \"" + domain + "\"." );
                 return( new GettextString( defaultTranslation ) );
             }
-            var l10n = data[ opts.locale ];
-            dict = l10n[ msgid ];
-            if( dict )
+            self.debug( "Data for domain \"" + domain + "\" contains " + Object.keys( data[ opts.locale ] ).length + " elements." );
+            if( data[ opts.locale ].hasOwnProperty(msgid) )
             {
                 self.debug( "Plural is: " + JSON.stringify( plural ) );
                 if( plural.length == 0 )
                 {
-                    plural = this.getPlural();
+                    plural = self.getPlural();
                 }
-                if( Array.isArray( dict.msgstr ) )
+                if( Array.isArray( data[ opts.locale ][msgid].msgstr ) )
                 {
-                    self.debug( "msgid localised value is a plural aware text -> " + JSON.stringify( dict.msgstr ) );
+                    self.debug( "msgid localised value is a plural aware text -> " + JSON.stringify( data[ opts.locale ][msgid].msgstr ) );
                     if( typeof( count ) === 'number' &&
                         parseInt( plural[0] ) > 0 )
                     {
@@ -1081,25 +2491,26 @@
                         index = 0;
                     }
                     self.debug( "Count is \"" + count + "\" and plural offset computed is " + index );
-                    /*
-                    if( !Array.isArray( dict.msgstr ) )
-                    {
-                        throw new Error( "The plural value for this message \"" + msgid + "\" indicate there are more than 1 plural, and thus I was expecting an array for msgstr, but instead found \"" + typeof( dict.msgstr ) + "\"." );
-                    }
-                    */
-                    // return( dict.msgstr[index] || defaultTranslation );
-                    return( dict.msgstr[index] ? new GettextString( dict.msgstr[index], opts.locale ) : new GettextString( defaultTranslation ) );
+                    return data[ opts.locale ][msgid].msgstr[index]
+                        ? new GettextString( data[ opts.locale ][msgid].msgstr[index], opts.locale )
+                        : self.sourceLocale
+                            ? new GettextString( defaultTranslation, self.sourceLocale )
+                            : new GettextString( defaultTranslation );
                 }
-                // return( dict.msgstr || defaultTranslation );
-                return( dict.msgstr ? new GettextString( dict.msgstr, opts.locale ) : new GettextString( defaultTranslation ) );
+                return data[ opts.locale ][msgid].msgstr
+                    ? new GettextString( data[ opts.locale ][msgid].msgstr, opts.locale )
+                    : self.sourceLocale
+                        ? new GettextString( defaultTranslation, self.sourceLocale )
+                        : new GettextString( defaultTranslation );
             }
-            else if( !this.sourceLocale || opts.locale !== this.sourceLocale )
+            else if( !self.sourceLocale || opts.locale !== self.sourceLocale )
             {
-                this.warn( 'No dictionary was found for msgid "' + msgid + '" and domain "' + domain + '"' );
+                self.warn( 'No dictionary was found for msgid "' + msgid + '" and domain "' + domain + '"' );
+                // self.info( JSON.stringify( data[ opts.locale ], null, 4 ) );
             }
-            return( new GettextString( defaultTranslation ) );
+            return self.sourceLocale ? new GettextString( defaultTranslation, self.sourceLocale ) : new GettextString( defaultTranslation );
         },
-        
+
         /**
          * Provided with a locale, a msgid and its localised content, this will add it to the dictionary for this domain
          *
@@ -1127,7 +2538,7 @@
             hash[ locale ][ key ] = { msgid: key, msgstr: value };
             return( hash[ locale ][ key ] );
         },
-        
+
         /**
          * Returns the content type used in the po or mo file.
          *
@@ -1143,7 +2554,7 @@
             var def  = self.parseHeaderValue( type );
             return( def.params.charset );
         },
-        
+
         /**
          * Returns the encoding used in the po or mo file.
          *
@@ -1153,7 +2564,7 @@
          * @return {String} A string such as "8bit"
          */
         contentEncoding: function() { return( this.getMetaValue( 'Content-Transfer-Encoding' ) ); },
-        
+
         /**
          * Returns the content type used in the po or mo file.
          *
@@ -1163,7 +2574,7 @@
          * @return {String} A string such as "text/plain; charset=utf-8" or maybe just "text/plain"
          */
         contentType: function() { return( this.getMetaValue( 'Content-Type' ) ); },
-        
+
         /**
          * Read-only method that returns the current language in effet, i.e.
          *
@@ -1177,7 +2588,7 @@
             this.debug( "Returning '" + document.getElementsByTagName('html')[0].getAttribute('lang') + "'." );
             return( document.getElementsByTagName('html')[0].getAttribute('lang') );
         },
-        
+
         /**
          * Checks if a given locale exists, i.e. has been loaded already in the domain data
          *
@@ -1206,7 +2617,7 @@
             var hash = self.getDomainHash();
             return( hash.hasOwnProperty( lang ) );
         },
-        
+
         /**
          * Get an array of <span> html element each for one language and its related localised content
          *
@@ -1235,7 +2646,7 @@
             });
             return( spans );
         },
-    
+
         /**
          * Get an array of <span> html element each for one language and its related localised content depending on whether there is one or more than one elements
          *
@@ -1284,7 +2695,7 @@
             });
             return( spans );
         },
-    
+
         // Ref: <https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise#Example_using_new_XMLHttpRequest()>
         /**
          * Performs an http query
@@ -1298,14 +2709,14 @@
         getData: function( opts )
         {
             var self = this;
-            return( new Promise(function(resolve, reject)
+            return new Promise(function(resolve, reject)
             {
                 // default parameters are only available in ES6
                 if( typeof( opts ) === 'undefined' )
                 {
                     opts = {};
                 }
-            
+
                 if( !opts.hasOwnProperty( 'url' ) )
                 {
                     reject( new Error( "No \"url\" options was provided." ) );
@@ -1323,10 +2734,10 @@
                 {
                     reject( new Error( "\"method\" option provided is empty." ) );
                 }
-            
+
                 var url = new URI( opts.url );
                 var thisLoc = new URI();
-            
+
                 if( !opts.hasOwnProperty( 'async' ) )
                 {
                     opts.async = true;
@@ -1337,12 +2748,12 @@
                     opts.headers = {};
                     opts.headers['Content-Type'] = 'application/json';
                 }
-            
+
                 if( thisLoc.protocol == 'file:' )
                 {
                     reject( new Error( "You need to load the test html file from an http server and not as a file://. You can use python3 -m http.server or python -m SimpleHTTPServer" ) );
                 }
-            
+
                 var data, xhr;
                 if( ( xhr = self.getXhrObject() ) )
                 {
@@ -1365,7 +2776,7 @@
                     {
                         reject( new Error( "Unable to load data from uri \"" + opts.url + "\": (" + this.status + ") " + xhr.statusText ) );
                     };
-            
+
                     xhr.open(opts.method, opts.url, opts.async);
                     if( opts.responseType )
                     {
@@ -1383,7 +2794,7 @@
                             xhr.setRequestHeader(key, opts.headers[key]);
                         });
                     }
-                
+
                     // xhr.setRequestHeader( "Content-Type", "application/json" );
                     var params = opts.params;
                     if( params && typeof params === 'object' )
@@ -1399,9 +2810,9 @@
                         xhr.send(null);
                     }
                 }
-            }) );
+            });
         },
-        
+
         // example: <link rel="gettext" href="/local" />
         /**
          * Return the uri path of the localised content found in <rel> html tag if any
@@ -1424,7 +2835,7 @@
             }
             return;
         },
-        
+
         /**
          * Returns an array reference containing the 7 days of the week in their long representation.
          *
@@ -1444,7 +2855,7 @@
             }
             return( days );
         },
-        
+
         /**
          * Returns an array reference containing the 7 days of the week in their short representation.
          *
@@ -1464,7 +2875,7 @@
             }
             return( days );
         },
-        
+
         /**
          * Get the hash of all elements for a given domain
          *
@@ -1485,30 +2896,29 @@
             {
                 throw new Error( "Parameter provide must be an hash of option parameters." );
             }
-            
+
             opts.domain = opts.domain || this.domain;
-            
+
             var hash = window.Gettext.L10N;
             if( !hash.hasOwnProperty( opts.domain ) )
             {
                 throw new Error( "No locale data for domain \"" + opts.domain + "\"." );
             }
-            var l10n = hash[ opts.domain ];
             if( opts.hasOwnProperty( 'locale' ) && 
                 typeof( opts.locale ) !== 'undefined' )
             {
                 opts.locale = opts.locale.replace( '-', '_' );
-                self.debug( "Returning domain hash for domain \"" + opts.domain + "\" and locale \"" + opts.locale + "\" -> " + JSON.stringify( l10n ) );
+                self.debug( "Returning domain hash for domain \"" + opts.domain + "\" and locale \"" + opts.locale + "\" -> " + JSON.stringify( hash[ opts.domain ], null, 4 ) );
                 if( opts.locale.length == 0 )
                 {
                     throw new Error( "Locale was provided, but is empty." );
                 }
-                return( l10n[ opts.locale ] );
+                return( hash[ opts.domain ][ opts.locale ] );
             }
-            // self.debug( "Returning domain hash -> " + JSON.stringify( l10n ) );
-            return( l10n );
+            // self.debug( "Returning domain hash -> " + JSON.stringify( hash[ opts.domain ] ) );
+            return( hash[ opts.domain ] );
         },
-        
+
         // example: <link rel="gettext" lang="ja_JP" href="/locale/ja_JP" />
         /**
          * Return the uri path to localised content for a given language (a.k.a. locale) found in a <rel> html tag if any.
@@ -1529,9 +2939,9 @@
             {
                 throw new Error( "Local provided (" + lang + ") is of an unsupported format." );
             }
-            
+
             lang = lang.replace( '_', '-' );
-            
+
             var links = document.getElementsByTagName( 'link' );
             for( var i = 0, l = links.length; i < l; i++ )
             {
@@ -1576,7 +2986,7 @@
             }
             return( hash[ lang ] );
         },
-        
+
         /**
          * Get the locale to get translated messages for.
          *
@@ -1590,7 +3000,7 @@
             var locale = this.locale.replace( '_', '-' );
             return( locale );
         },
-        
+
         /**
          * Get a list of localised string in a <span> with each a lang attribute and return an array
          *
@@ -1660,7 +3070,7 @@
                 return( sprintf( thisKey, args ) );
             }
         },
-        
+
         /**
          * Given a po meta field representing a date, and this will return a Date object representing its value
          *
@@ -1684,7 +3094,7 @@
             }
             return( self.parseDateToObject( meta[ field ] ) );
         },
-        
+
         /**
          * Takes no argument and return the hash of the po file meta information has field name-value pairs.
          *
@@ -1697,10 +3107,10 @@
         {
             var self = this;
             var hash = self.getDomainHash({ locale: self.locale });
-            self.debug( "Domain hash found for locale \"" + self.locale + "\" is : " + JSON.stringify( hash ) );
+            self.debug( "Domain hash found for locale \"" + self.locale + "\" is : " + JSON.stringify( hash, null, 4 ) );
             return( hash._meta );
         },
-        
+
         /**
          * Takes no argument and return the array of the po file meta fields
          *
@@ -1715,7 +3125,7 @@
             var hash = self.getDomainHash({ locale: self.locale });
             return( hash._meta_keys );
         },
-        
+
         /**
          * Given a po meta field, and this will return its value
          *
@@ -1731,7 +3141,7 @@
             var meta = self.getMetaData();
             return( meta[ field ] );
         },
-        
+
         /**
          * Performs an http get query to get a .mo (machine object) data
          *
@@ -1752,7 +3162,7 @@
                 responseType: 'arraybuffer',
             }) );
         },
-        
+
         // <https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleDateString>
         /**
          * Returns an array reference containing the 12 months in their long representation.
@@ -1773,7 +3183,7 @@
             }
             return( months );
         },
-        
+
         /**
          * Returns an array reference containing the 12 months in their short representation.
          *
@@ -1793,7 +3203,7 @@
             }
             return( months );
         },
-        
+
         /**
          * Returns an hash reference containing the following properties:
          *      - currency
@@ -1817,7 +3227,7 @@
             def.decimal  = self._getSeparator( locale, 'decimal' );
             return( def );
         },
-        
+
         /**
          * Takes no arguments, and returns the value of the meta field "Plural-Forms"
          *
@@ -1853,7 +3263,7 @@
             }
             return( [] );
         },
-        
+
         /**
          * Provided with an original text and an optional language (locale), this return the localised equivalent if any, or the original string by default.
          *
@@ -1917,7 +3327,7 @@
             // return( sprintf.apply( null, args ) );
             return( new GettextString( sprintf.apply( null, args ), strLang ) );
         },
-        
+
         /**
          * Return the current domain used
          *
@@ -1930,7 +3340,7 @@
         {
             return( this.domain );
         },
-        
+
         /**
          * Return a XMLHttpRequest object
          *
@@ -1962,7 +3372,7 @@
             }
             return( null );
         },
-        
+
         /**
          * Provided with a language (locale) and this returns true if it is supported or false otherwise
          *
@@ -1983,7 +3393,7 @@
                 return( false );
             }
         },
-        
+
         /**
          * Returns the value of the header Language. To get the locale currently in use in the po object, use getLocale()
          * 
@@ -1993,7 +3403,7 @@
          * @return {String} Returns a string containing the value of the header Language
          */
         language: function() { return( this.getMetaValue( 'Language' ) ); },
-        
+
         /**
          * Returns the value of the header Language-Team.
          * 
@@ -2003,7 +3413,7 @@
          * @return {String} Returns a string containing the value of the header Language-Team
          */
         languageTeam: function() { return( this.getMetaValue( 'Language-Team' ) ); },
-        
+
         /**
          * Returns the value of the header Last-Translator.
          * 
@@ -2013,7 +3423,7 @@
          * @return {String} Returns a string containing the value of the header Last-Translator
          */
         lastTranslator: function() { return( this.getMetaValue( 'Last-Translator' ) ); },
-        
+
         /**
          * Get remote po data based on options provided as hash
          *
@@ -2022,47 +3432,40 @@
          *
          * @param  {Object} options      An hash of options
          */
-        loadDomainData: function( opts )
+        loadDomainData: function(opts)
         {
             var self = this;
-            if( typeof( opts ) === 'undefined' )
-            {
-                opts = {};
-            }
-            
+            opts = opts || {};
+        
             opts.path     = ( opts.path || this.path );
             opts.locale   = ( opts.locale || this.locale );
             opts.domain   = ( opts.domain || this.domain );
             opts.category = ( opts.category || this.category );
             opts.locale   = opts.locale.replace('-','_');
-            var hash = window.Gettext.L10N;
-            if( !hash.hasOwnProperty( this.domain ) )
-            {
-                hash[ this.domain ] = {};
-            }
-            if( !hash[ this.domain ].hasOwnProperty( opts.locale ) )
-            {
-                hash[ this.domain ][ opts.locale ] = {};
-            }
-            
+        
+            // var dataUri = opts.path + "/" + opts.locale + "/" + opts.domain + ".json";
             var dataUri = opts.path + "/" + opts.locale + "/" + ( ( typeof( opts.category ) === 'string' && opts.category.length > 0 ) ? opts.category + "/" : "" ) + opts.domain + ".json";
-            
+        
             return self.getData({ url: dataUri, method: "GET" }).then(function(data)
             {
-                // self.debug( "Data found is: " + JSON.stringify( data ) );
-                if( !data.hasOwnProperty( 'elements' ) )
+                self.debug( "Data retrieved is: " + JSON.stringify( data, null, 4 ) );
+                if( !data )
+                {
+                    throw new Error( "Invalid JSON data at " + dataUri );
+                }
+                else if( !data.elements )
                 {
                     throw new Error( "Missing property \"elements\" in po json file at uri \"" + dataUri + "\"." );
                 }
-                else if( !data.hasOwnProperty( 'meta' ) )
+                else if( !data.meta )
                 {
                     throw new Error( "Missing property \"meta\" in po json file at uri \"" + dataUri + "\"." );
                 }
-                else if( !data.hasOwnProperty( 'meta_keys' ) )
+                else if( !data.meta_keys )
                 {
                     throw new Error( "Missing property \"meta_keys\" in po json file at uri \"" + dataUri + "\"." );
                 }
-                else if( !Array.isArray( data.elements ) )
+                else if( !Array.isArray(data.elements) )
                 {
                     throw new Error( "Property elements found is not an array in po json file at uri \"" + dataUri + "\"." );
                 }
@@ -2074,14 +3477,22 @@
                 {
                     throw new Error( "Property meta_keys found is not an array in po json file at uri \"" + dataUri + "\"." );
                 }
-            
-                self.debug( "Adding meta information from uri \"" + dataUri + "\" for domain \"" + opts.domain + "\" and locale \"" + opts.locale + "\": " + JSON.stringify( data.meta ) );
-                var locales = hash[ opts.domain ][ opts.locale ] = {};
+
+                self.debug( "Successfully loaded data for domain \"" + opts.domain + "\" and locale \"" + opts.locale + "\"." );
+                var hash = window.Gettext.L10N;
+
+                if( !hash[opts.domain] ) hash[opts.domain] = {};
+                if( !hash[opts.domain][opts.locale] ) hash[opts.domain][opts.locale] = {};
+
+                self.debug( "Adding meta information from uri \"" + dataUri + "\" for domain \"" + opts.domain + "\" and locale \"" + opts.locale + "\": " + JSON.stringify( data.meta, null, 4 ) );
                 hash[ opts.domain ][ opts.locale ]._meta = data.meta;
                 hash[ opts.domain ][ opts.locale ]._meta_keys = data.meta_keys;
-                data.elements.forEach(function( elem, i )
+                self.debug( sprintf( "%d elements found for this JSON po.", data.elements.length ) );
+
+                for( var i = 0; i < data.elements.length; i++ )
                 {
-                    if( !elem.hasOwnProperty( 'msgid' ) || !elem.hasOwnProperty( 'msgstr' ) )
+                    var elem = data.elements[i];
+                    if( !elem.msgid || !elem.msgstr )
                     {
                         console.warn( "Element at offset " + i + " is missing either a msgid or msgstr property at uri \"" + dataUri + "\"." );
                         return;
@@ -2092,11 +3503,9 @@
                         return;
                     }
                     self.debug( "Adding msgid \"" + elem.msgid + "\" -> \"" + JSON.stringify(elem) + "\"." );
-                    locales[ elem.msgid ] = elem;
-                });
-                hash[ opts.domain ][ opts.locale ] = locales;
-                // self.debug( "Hash for domain \"" + opts.domain + "\" and locale \"" + opts.locale + "\" is " + JSON.stringify( hash[ opts.domain ][ opts.locale ] ) );
-                
+                    hash[opts.domain][opts.locale][elem.msgid] = elem;
+                }
+
                 if( data.meta.hasOwnProperty( 'Plural-Forms' ) && data.meta['Plural-Forms'].length > 0 )
                 {
                     self.debug( "Found plural value in meta: " + data.meta['Plural-Forms'] );
@@ -2122,14 +3531,15 @@
                 }
                 window.Gettext.L10N = hash;
                 self.isReady = true;
-                return( locales );
-            }).catch(function(e)
+                return hash[opts.domain][opts.locale];
+            }).catch(function(err)
             {
                 self.hasLoadError = true;
-                self.setError( new Error( "Failed to load localisation json data from uri \"" + dataUri + "\": " + e ) );
+                self.setError( new Error( "Failed to load localisation JSON data from uri \"" + dataUri + "\": " + err.message ) );
+                throw err;
             });
         },
-        
+
         /**
          * Returns the value of the header MIME-Version.
          * 
@@ -2139,7 +3549,7 @@
          * @return {String} Returns a string containing the value of the header MIME-Version
          */
         mimeVersion: function() { return( this.getMetaValue( 'MIME-Version' ) ); },
-        
+
         // 2019-10-03 19-44+0000
         // 2021-06-24 13:21+0100
         parseDateToObject: function(str)
@@ -2162,7 +3572,7 @@
             var d = new Date( sprintf.apply( null, matches ) );
             return( d );
         },
-        
+
         /*
          * Credits: <https://github.com/jshttp/content-type>
          * Adapted by Jacques Deguest
@@ -2194,7 +3604,7 @@
             {
                 throw new TypeError( 'Invalid media type "' + type + '"' );
             }
-            
+
             // Private class; see below
             var obj = new HeaderValue(type);
 
@@ -2235,7 +3645,7 @@
             }
             return( obj );
         },
-        
+
         /**
          * Returns the value of the header Plural-Forms.
          * 
@@ -2245,7 +3655,7 @@
          * @return {String} Returns a string containing the value of the header Plural-Forms
          */
         pluralForms: function() { return( this.getMetaValue( 'Plural-Forms' ) ); },
-        
+
         /**
          * Returns the value of the header PO-Revision-Date.
          * 
@@ -2255,7 +3665,7 @@
          * @return {String} Returns a string containing the value of the header PO-Revision-Date
          */
         poRevisionDate: function() { return( this.getMetaDate( 'PO-Revision-Date' ) ); },
-        
+
         /**
          * Returns the value of the header POT-Creation-Date.
          * 
@@ -2265,7 +3675,7 @@
          * @return {String} Returns a string containing the value of the header POT-Creation-Date
          */
         potCreationDate: function() { return( this.getMetaDate( 'POT-Creation-Date' ) ); },
-        
+
         /**
          * Returns the value of the header Project-Id-Version.
          * 
@@ -2275,7 +3685,7 @@
          * @return {String} Returns a string containing the value of the header Project-Id-Version
          */
         projectIdVersion: function() { return( this.getMetaValue( 'Project-Id-Version' ) ); },
-        
+
         /**
          * Provided with a callback function and this will execute once the data have been loaded
          * 
@@ -2286,25 +3696,47 @@
         ready: function(callback, errCallback)
         {
             var self = this;
-            if( self.isReady )
+            // Return a Promise that ensures data is fully loaded and accessible
+            // If we have a callback, use it as the promise's executor
+            return new Promise(function(resolve, reject)
             {
-                callback();
-                return;
-            }
-            else if( self.hasLoadError )
-            {
-                errCallback();
-                return;
-            }
-            else
-            {
-                setTimeout(function()
+                // Check if already ready
+                if( self.isReady )
                 {
-                    self.ready(callback, errCallback);
-                },100);
-            }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
+                    if( typeof( callback ) === 'function' ) callback(self);
+                    resolve(self);
+                }
+                // Check if an error occurred during initialization
+                else if( self.hasLoadError )
+                {
+                    var error = self.getError();
+                    if( typeof( errCallback ) === 'function' ) errCallback( error );
+                    reject( error );
+                }
+                // Wait for the _initPromise to resolve or reject
+                else
+                {
+                    self._initPromise.then(function()
+                    {
+                        if( !self.isReady ) // Ensure readiness
+                        {
+                            reject( new Error( "Translation data not available or incomplete for domain: " + self.domain + ", locale: " + self.locale ) );
+                            return;
+                        }
+
+                        if( typeof( callback ) === 'function' ) callback(self);
+                        resolve(self);
+                    }).catch(function(error)
+                    {
+                        self.hasLoadError = true;
+                        self.setError(error);
+                        if( typeof( errCallback ) === 'function' ) errCallback(error);
+                        reject(error);
+                    });
+                }
+            });
         },
-        
+
         /**
          * Returns the value of the header Report-Msgid-Bugs-To.
          * 
@@ -2314,7 +3746,7 @@
          * @return {String} Returns a string containing the value of the header Report-Msgid-Bugs-To
          */
         reportBugsTo: function() { return( this.getMetaValue( 'Report-Msgid-Bugs-To' ) ); },
-        
+
         /**
          * Sets the locale to get translated messages for.
          *
@@ -2336,14 +3768,14 @@
             {
                 this.warn( "The locale value you provided is actually empty." );
             }
-            
+
             locale = locale.trim();
-            
+
             if( !this.locale.match( /^[a-z]{2}(?:[_-][A-Z]{2}(?:\.[\w-]+)?)?$/ ) )
             {
                 throw new Error( "Language provided (\"" + this.locale + "\") is in an unsupported format. Use something like \"en_GB\", \"en-GB\" or simply \"en\" or even \"en_GB.utf-8\"." );
             }
-            
+
             this.locale = this.locale.replace( '-', '_' );
             var l10n = self.getDomainHash();
             if( locale != this.locale && !l10n.hasOwnProperty( locale ) )
@@ -2365,46 +3797,47 @@
         {
             var self = this;
             self.debug( "Fetching domain data for \"" + domain + "\"." );
+        
             if( typeof( domain ) !== 'string' )
             {
-                this.warn( "The domain provided \"" + domain + "\" is of type " + typeof( domain ) + " while I was expecting a string." );
-                return;
+                self.warn( "The domain provided \"" + domain + "\" is of type " + typeof( domain ) + " while I was expecting a string." );
+                return Promise.reject( new Error( "Invalid domain type" ) );
             }
-
+        
             if( domain.trim() === '' )
             {
-                this.warn( "The domain value you provided is actually empty." );
+                self.warn( "The domain value you provided is actually empty." );
+                return Promise.reject( new Error( "Empty domain provided" ) );
             }
-            
-            this.domain = domain;
+        
+            self.domain = domain;
             var hash = window.Gettext.L10N;
-            if( !hash.hasOwnProperty( this.domain ) )
+            if( !hash.hasOwnProperty( self.domain ) )
             {
-                hash[ this.domain ] = {};
+                hash[self.domain] = {};
             }
-            
-            if( !hash[ this.domain ].hasOwnProperty( this.locale ) || 
-                !Object.keys( hash[ this.domain ][ this.locale ] ).length == 0 )
-            {
-                return( this.loadDomainData({ domain: this.domain, locale: this.locale }) );
-            }
-            return( self.getDomainHash({ locale: this.locale }) );
-        },
         
-        /**
-         * Logs a warning to the console if debug mode is enabled.
-         *
-         * @ignore
-         * @param  {String} message  A warning message
-         */
-        warn: function(message)
-        {
-            if( this.debug )
+            if( !hash[ self.domain ].hasOwnProperty( self.locale ) || 
+                !Object.keys( hash[ self.domain ][ self.locale ] ).length == 0 )
             {
-                console.warn( message );
+                return self.loadDomainData({ domain: self.domain, locale: self.locale }).then(function()
+                {
+                    self.debug( "Domain \"" + domain + "\" for locale \"" + self.locale + "\" is loaded." );
+                    self.isReady = true; // Set readiness here
+                    return self.getDomainHash({ locale: self.locale });
+                }).catch(function(err)
+                {
+                    self.setError( new Error( "Failed to load translation data: " + err.message ) );
+                    throw err; // Propagate error
+                });
+            }
+            else
+            {
+                self.isReady = true; // Data is already available
+                return Promise.resolve(self.getDomainHash({ locale: self.locale }));
             }
         },
-        
+
         _getSeparator: function(locale, separatorType)
         {
             var self = this;
@@ -2417,7 +3850,7 @@
     });
     window.Gettext.L10N = {};
     window.Gettext.ERROR = '';
-    
+
     window.TEXTDOMAIN = ( window.TEXTDOMAIN || '' );
     function _( msgid )
     {
@@ -2429,7 +3862,7 @@
         {
             throw new Error( "msgid provided is null." );
         }
-        
+
         window.GETTEXT_PREFS = window.GETTEXT_PREFS || {};
         if( typeof( TEXTDOMAIN ) === 'undefined' ||
             typeof( TEXTDOMAIN ) == null ||
@@ -2478,13 +3911,13 @@
         });
         return( po.gettext( msgid ) );
     }
-    
+
     // XXX MOParser class
     /*
     Adapted from work by Oliver Hamlet (gettext mo parser)
     <https://github.com/Ortham/jed-gettext-parser>
     */
-    window.MOParser = Class.extend(
+    window.MOParser = POBaseClass.extend(
     {
         __class__: "MOParser",
         // var p = new MOParser();
@@ -2516,7 +3949,7 @@
             this._MAGIC = 0x950412de;
             return( this );
         },
-        
+
         /**
          * Find out if the binary data used little or big endian and set private object variable _littleEndian
          *
@@ -2688,7 +4121,7 @@
                 throw new Error( 'First argument must be an ArrayBuffer.' );
             }
             var encoding = options.encoding;
-            
+
             /* A mo file can be empty apart from its magic, revision, strings count,
                offsets and hash table size, but fields for these must all exist, so
                verify the file is large enough. */
@@ -2749,7 +4182,7 @@
      *
      * @param  {Object} HeaderValue      Returns an HeaderValue object
      */
-    window.HeaderValue = Generic.extend(
+    window.HeaderValue = POGenericClass.extend(
     {
         __class__: "HeaderValue",
         init: function( value, opts )
@@ -2757,12 +4190,12 @@
             this.value  = value;
             this._toString = null;
             this.params = {};
-            
+
             if( typeof( opts ) === 'undefined' )
             {
                 opts = {};
             }
-            
+
             if( opts.hasOwnProperty( 'debug' ) )
             {
                 opts.debug_level = opts.debug;
@@ -2776,27 +4209,27 @@
             this._super( opts );
             return( this );
         },
-        
+
         getParam: function(name)
         {
             return( this.params[name] );
         },
-        
+
         getValue: function()
         {
             return( this.value );
         },
-        
+
         setParam: function(name, value)
         {
             this.params[name] = value;
         },
-        
+
         setValue: function(value)
         {
             this.value = value;
         },
-        
+
         toString: function()
         {
             var self = this;
@@ -2834,7 +4267,7 @@
             }
             return( self._toString );
         },
-        
+
         /**
          * Quote a string if necessary.
          *
@@ -2887,10 +4320,41 @@ Gettext - A GNU Gettext JavaScript implementation
         path: "/locale",
         debug: true
     });
+    po.ready(function(poObject)
+    {
+        // Do something
+    },
+    function(errorObject)
+    {
+        // Do something
+    });
+
+Or:
+
+    po.ready().then(function(poObject)
+    {
+        // Do something
+    }).catch(function(errorObject)
+    {
+        // Do something
+    });
+
+    new Gettext({
+        domain: "com.example.api",
+        locale: document.documentElement.lang,
+        path: "/locale",
+        promise: true
+    }).then(function(poObject)
+    {
+        // Do something
+    }).catch(function(errorObject)
+    {
+        // Do something
+    });
 
 =head1 VERSION
 
-    v0.2.5
+    v0.4.0
 
 =head1 DESCRIPTION
 
@@ -2903,6 +4367,10 @@ The class model does not use ES6, but rather one smart invention by John Resig (
 Because on the service side, in Unix environments, the locale value uses underscore, such as C<ja_JP> while the web-side uses locale with a dash such as C<ja-JP>, to harmonise and given we are dealing with po files, we use internally the underscore version, converting it, if necessary.
 
 See the section L</TESTING> below for testing.
+
+Also, note that this class is ES5 compatible, and uses promise. If promise is not available in your environment, it uses a polyfill as a replacement.
+
+You have to be careful that the C<JSON> po file is loaded before you can start calling C<gettext> or other similar method, or else those method will fail to return the localised string. Thus, it is recommended to either use the C<promise> option upon instantiation, or use the C<ready> method as shown in the synopsis.
 
 =head1 CONSTRUCTOR
 
@@ -2927,6 +4395,10 @@ The uri path where the gettext localised data are.
 This is used to form a path along with the locale string. For example, with a locale of C<ja_JP> and a domain of C<com/example.api>, if the path were C</locale>, the data po json data would be fetched from C</locale/ja_JP/com.example.api.json>
 
 You will note that the path does not include C<LC_MESSAGES> since under the web context, it makes no sense at all. See the L<GNU documentation|https://www.gnu.org/software/libc/manual/html_node/Using-gettextized-software.html> for more information on this.
+
+=item * C<promise>
+
+If provided and set to a true value, then the constructor method will return a promise instead of C<Gettext> object.
 
 =back
 
@@ -3028,7 +4500,7 @@ Return the current globally used locale. This is the value found in
 
     <html lang="fr-FR">
 
-and thus, this is different from the C<locale> set in the Gettext class object using </setLocale> or upon class object instantiation.
+and thus, this is different from the C<locale> set in the Gettext class object using L</setLocale> or upon class object instantiation.
 
 =head2 exists
 
@@ -3280,7 +4752,10 @@ The value returned cannot exceed the integer.
 
 =head2 getText
 
-Provided with an original string, and this will return its localised equivalent if it exists, or by default, it will return the original string.
+    var str = po.getText( "Hello world" );
+    var str = po.getText( "Hello world", 'fr-FR' );
+
+Provided with an original string, and an optional locale, and this will return its localised equivalent if it exists, or by default, it will return the original string.
 
 From version v0.2.0, the string returned is a C<GettextString> object, which inherits from JavaScript standard C<String> and automatically stringifies. See L</gettext> above for more details.
 
@@ -3358,6 +4833,14 @@ Returns a string containing the value of the header C<Project-Id-Version>.
 
     p.projectIdVersion();
 
+=head2 ready
+
+This takes an optional callback, and error callback, and returns a promise.
+
+If an error occurs, the error callback is called with an error object, and the promise is rejected with that error object.
+
+When the promise resolves, the success callback is called with the C<Gettext> object, and the promise resolves with that C<Gettext> object.
+
 =head2 reportBugsTo
 
 Returns a string containing the value of the header C<Report-Msgid-Bugs-To>.
@@ -3375,6 +4858,65 @@ Sets a new locale to be used looking forward.
 Sets a new domain to be used looking forward. Setting a new domain, will trigger the Gettext class to fetch its data by executing an http C<GET> query using L</getData> unless the domain is already registered and loaded.
 
     po.setTextDomain( 'com.example.auth' );
+
+=head1 PROPERTIES
+
+=head2 category
+
+    var po = new Gettext({
+        category: 'LC_MESSAGES',
+        domain: 'com.example.api',
+        locale: 'en-GB',
+        path: "/some/where",
+    });
+    po.category; // "LC_MESSAGES"
+
+Returns the C<category> value provided upon object instantiation. Defaults to C<LC_MESSAGES>
+
+=head debug
+
+    var po = new Gettext({
+        domain: 'com.example.api',
+        locale: 'en-GB',
+        path: "/some/where",
+        debug: true,
+    });
+    po.debug; // true
+
+Returns the C<debug> value provided upon object instantiation. Defaults to C<false>
+
+=head2 domain
+
+    var po = new Gettext({
+        domain: 'com.example.api',
+        locale: 'en-GB',
+        path: "/some/where",
+    });
+    po.domain; // "com.example.api"
+
+Returns the C<domain> value provided upon object instantiation. 
+
+=head2 locale
+
+    var po = new Gettext({
+        domain: 'com.example.api',
+        locale: 'en-GB',
+        path: "/some/where",
+    });
+    po.locale; // "en-GB"
+
+Returns the C<locale> value provided upon object instantiation.
+
+=head2 path
+
+    var po = new Gettext({
+        domain: 'com.example.api',
+        locale: 'en-GB',
+        path: "/some/where",
+    });
+    po.path; // "/some/where"
+
+Returns the C<path> value provided upon object instantiation.
 
 =head1 GLOBAL FUNCTION
 

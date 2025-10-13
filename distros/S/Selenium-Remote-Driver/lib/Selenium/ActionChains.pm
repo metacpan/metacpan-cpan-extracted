@@ -1,5 +1,5 @@
 package Selenium::ActionChains;
-$Selenium::ActionChains::VERSION = '1.49';
+$Selenium::ActionChains::VERSION = '1.50';
 use strict;
 use warnings;
 
@@ -203,7 +203,7 @@ Selenium::ActionChains - Action chains for Selenium::Remote::Driver
 
 =head1 VERSION
 
-version 1.49
+version 1.50
 
 =head1 SYNOPSIS
 
@@ -338,7 +338,7 @@ LIMITATIONS.
 =head2 key_down
 
 Sends key presses only, without releasing them.
-Useful when modifier keys are requried
+Useful when modifier keys are required
 
 Will DWIM your input and accept either a string or ARRAYREF of keys.
 
@@ -354,7 +354,7 @@ Will DWIM your input and accept either a string or ARRAYREF of keys.
 =head2 key_up
 
 Releases prior key presses.
-Useful when modifier keys are requried
+Useful when modifier keys are required
 
 Will DWIM your input and accept either a string or ARRAYREF of keys.
 

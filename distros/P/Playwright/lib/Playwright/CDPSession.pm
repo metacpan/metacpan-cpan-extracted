@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::CDPSession;
-$Playwright::CDPSession::VERSION = '1.532';
+$Playwright::CDPSession::VERSION = '1.551';
 use parent 'Playwright::Base';
 
 sub new {
@@ -20,26 +20,6 @@ sub new {
 
 sub spec {
     return $Playwright::spec->{'CDPSession'}{members};
-}
-
-sub off {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'off',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub detach {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'detach',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
 }
 
 sub on {
@@ -67,6 +47,26 @@ sub event {
     return $self->_api_request(
         args    => [@_],
         command => 'event',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub off {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'off',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub detach {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'detach',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -106,7 +106,7 @@ Playwright::CDPSession - Automatically generated class for Playwright::CDPSessio
 
 =head1 VERSION
 
-version 1.532
+version 1.551
 
 =head1 CONSTRUCTOR
 
@@ -116,18 +116,6 @@ You shouldn't have to call this directly.
 Instead it should be returned to you as the result of calls on Playwright objects, or objects it returns.
 
 =head1 METHODS
-
-=head2 off(@args)
-
-Execute the CDPSession::off playwright routine.
-
-See L<https://playwright.dev/docs/api/class-CDPSession#CDPSession-off> for more information.
-
-=head2 detach(@args)
-
-Execute the CDPSession::detach playwright routine.
-
-See L<https://playwright.dev/docs/api/class-CDPSession#CDPSession-detach> for more information.
 
 =head2 on(@args)
 
@@ -146,6 +134,18 @@ See L<https://playwright.dev/docs/api/class-CDPSession#CDPSession-send> for more
 Execute the CDPSession::event playwright routine.
 
 See L<https://playwright.dev/docs/api/class-CDPSession#CDPSession-event> for more information.
+
+=head2 off(@args)
+
+Execute the CDPSession::off playwright routine.
+
+See L<https://playwright.dev/docs/api/class-CDPSession#CDPSession-off> for more information.
+
+=head2 detach(@args)
+
+Execute the CDPSession::detach playwright routine.
+
+See L<https://playwright.dev/docs/api/class-CDPSession#CDPSession-detach> for more information.
 
 =head2 evaluate(@args)
 
@@ -194,7 +194,7 @@ George S. Baugh <teodesian@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2020 Troglodyne LLC
+Copyright (c) 2025 Troglodyne LLC
 
 
 Permission is hereby granted, free of charge, to any person obtaining a copy

@@ -32,7 +32,7 @@ use App::Sqitch::Config;
 use Scalar::Util qw(blessed);
 use List::Util qw(first);
 
-our $VERSION = 'v1.5.2'; # VERSION
+our $VERSION = 'v1.6.0'; # VERSION
 
 # Inherit standard types.
 BEGIN { extends 'Types::Standard' };

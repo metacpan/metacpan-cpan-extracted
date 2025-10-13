@@ -18,34 +18,34 @@ name: Astro-Coords
 provides:
   Astro::Coords:
     file: lib/Astro/Coords.pm
-    version: '0.22'
+    version: '0.23'
   Astro::Coords::Angle:
     file: lib/Astro/Coords/Angle.pm
-    version: '0.22'
+    version: '0.23'
   Astro::Coords::Angle::Hour:
     file: lib/Astro/Coords/Angle/Hour.pm
-    version: '0.22'
+    version: '0.23'
   Astro::Coords::Calibration:
     file: lib/Astro/Coords/Calibration.pm
-    version: '0.22'
+    version: '0.23'
   Astro::Coords::Elements:
     file: lib/Astro/Coords/Elements.pm
-    version: '0.22'
+    version: '0.23'
   Astro::Coords::Equatorial:
     file: lib/Astro/Coords/Equatorial.pm
-    version: '0.22'
+    version: '0.23'
   Astro::Coords::Fixed:
     file: lib/Astro/Coords/Fixed.pm
-    version: '0.22'
+    version: '0.23'
   Astro::Coords::Interpolated:
     file: lib/Astro/Coords/Interpolated.pm
-    version: '0.22'
+    version: '0.23'
   Astro::Coords::Offset:
     file: lib/Astro/Coords/Offset.pm
-    version: '0.22'
+    version: '0.23'
   Astro::Coords::Planet:
     file: lib/Astro/Coords/Planet.pm
-    version: '0.22'
+    version: '0.23'
 requires:
   Astro::PAL: '0'
   Astro::Telescope: '0.71'
@@ -56,5 +56,5 @@ resources:
   homepage: https://github.com/timj/perl-Astro-Coords/tree/master
   license: http://opensource.org/licenses/gpl-3.0.html
   repository: https://github.com/timj/perl-Astro-Coords.git
-version: '0.22'
+version: '0.23'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

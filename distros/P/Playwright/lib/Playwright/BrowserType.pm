@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::BrowserType;
-$Playwright::BrowserType::VERSION = '1.532';
+$Playwright::BrowserType::VERSION = '1.551';
 use parent 'Playwright::Base';
 
 sub new {
@@ -32,31 +32,31 @@ sub name {
     );
 }
 
-sub executablePath {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'executablePath',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub launchPersistentContext {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'launchPersistentContext',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
 sub connectOverCDP {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
         command => 'connectOverCDP',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub launchServer {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'launchServer',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub executablePath {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'executablePath',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -82,11 +82,11 @@ sub connect {
     );
 }
 
-sub launchServer {
+sub launchPersistentContext {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'launchServer',
+        command => 'launchPersistentContext',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -136,7 +136,7 @@ Playwright::BrowserType - Automatically generated class for Playwright::BrowserT
 
 =head1 VERSION
 
-version 1.532
+version 1.551
 
 =head1 CONSTRUCTOR
 
@@ -153,23 +153,23 @@ Execute the BrowserType::name playwright routine.
 
 See L<https://playwright.dev/docs/api/class-BrowserType#BrowserType-name> for more information.
 
-=head2 executablePath(@args)
-
-Execute the BrowserType::executablePath playwright routine.
-
-See L<https://playwright.dev/docs/api/class-BrowserType#BrowserType-executablePath> for more information.
-
-=head2 launchPersistentContext(@args)
-
-Execute the BrowserType::launchPersistentContext playwright routine.
-
-See L<https://playwright.dev/docs/api/class-BrowserType#BrowserType-launchPersistentContext> for more information.
-
 =head2 connectOverCDP(@args)
 
 Execute the BrowserType::connectOverCDP playwright routine.
 
 See L<https://playwright.dev/docs/api/class-BrowserType#BrowserType-connectOverCDP> for more information.
+
+=head2 launchServer(@args)
+
+Execute the BrowserType::launchServer playwright routine.
+
+See L<https://playwright.dev/docs/api/class-BrowserType#BrowserType-launchServer> for more information.
+
+=head2 executablePath(@args)
+
+Execute the BrowserType::executablePath playwright routine.
+
+See L<https://playwright.dev/docs/api/class-BrowserType#BrowserType-executablePath> for more information.
 
 =head2 launch(@args)
 
@@ -183,11 +183,11 @@ Execute the BrowserType::connect playwright routine.
 
 See L<https://playwright.dev/docs/api/class-BrowserType#BrowserType-connect> for more information.
 
-=head2 launchServer(@args)
+=head2 launchPersistentContext(@args)
 
-Execute the BrowserType::launchServer playwright routine.
+Execute the BrowserType::launchPersistentContext playwright routine.
 
-See L<https://playwright.dev/docs/api/class-BrowserType#BrowserType-launchServer> for more information.
+See L<https://playwright.dev/docs/api/class-BrowserType#BrowserType-launchPersistentContext> for more information.
 
 =head2 on(@args)
 
@@ -242,7 +242,7 @@ George S. Baugh <teodesian@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2020 Troglodyne LLC
+Copyright (c) 2025 Troglodyne LLC
 
 
 Permission is hereby granted, free of charge, to any person obtaining a copy

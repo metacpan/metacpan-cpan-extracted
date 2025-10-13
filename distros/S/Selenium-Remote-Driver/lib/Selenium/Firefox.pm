@@ -1,5 +1,5 @@
 package Selenium::Firefox;
-$Selenium::Firefox::VERSION = '1.49';
+$Selenium::Firefox::VERSION = '1.50';
 use strict;
 use warnings;
 
@@ -139,7 +139,7 @@ Selenium::Firefox - Use FirefoxDriver without a Selenium server
 
 =head1 VERSION
 
-version 1.49
+version 1.50
 
 =head1 SYNOPSIS
 

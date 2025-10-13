@@ -37,9 +37,9 @@ use v5.40;
 # janeskil1525 E<lt>janeskil1525@gmail.com
 #
 
-sub load_version ($self) {
+sub load_versions_list ($self) {
 
-    $self->app->log->debug('Daje::Controller::Toolsprojects::load_projects');
+    $self->app->log->debug('Daje::Controller::ToolsVersion::load_versions_list');
     $self->render_later;
     # my ($companies_pkey, $users_pkey) = $self->jwt->companies_users_pkey(
     #     $self->req->headers->header('X-Token-Check')
@@ -48,9 +48,27 @@ sub load_version ($self) {
     $self->app->log->debug($self->req->headers->header('X-Token-Check'));
     # my $setting = $self->param('setting');
     $self->v_tools_versions->load_full_list_p()->then(sub($result) {
-        $self->render(json => $result->{data});
+        $self->render(json => { data => $result->{data}, result => => 1 });
     })->catch(sub($err) {
-        $self->render(json => { 'result' => 'failed', data => $err });
+        $self->render(json => { result => 0, data => $err });
+    })->wait;
+}
+
+sub load_versions ($self) {
+
+    $self->app->log->debug('Daje::Controller::ToolsVersion::load_versions');
+    my $tools_version_pkey = $self->param('tools_version_pkey');
+    $self->render_later;
+    # my ($companies_pkey, $users_pkey) = $self->jwt->companies_users_pkey(
+    #     $self->req->headers->header('X-Token-Check')
+    # );
+
+    $self->app->log->debug($self->req->headers->header('X-Token-Check'));
+    # my $setting = $self->param('setting');
+    $self->v_tools_versions->load_pkey_p($tools_version_pkey)->then(sub($result) {
+        $self->render(json => { data => $result->{data}, result => => 1 });
+    })->catch(sub($err) {
+        $self->render(json => { result => 0, data => $err });
     })->wait;
 }
 1;

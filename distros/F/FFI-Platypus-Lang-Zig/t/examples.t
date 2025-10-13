@@ -5,11 +5,9 @@ use Path::Tiny qw( path );
 use File::Glob qw( bsd_glob );
 use Capture::Tiny qw( capture_merged );
 
-sub cleanup
-{
+sub cleanup {
   path('examples/zig-cache')->remove_tree;
-  foreach my $path (path('examples')->children)
-  {
+  foreach my $path (path('examples')->children) {
     unlink "$path" if $path->basename =~ /\.dll$/i;
     unlink "$path" if $path->basename =~ /^lib/;
   }
@@ -20,8 +18,7 @@ cleanup();
 $ENV{PERL_FILE_SHAREDIR_DIST}="FFI-Platypus-Lang-Zig=$CWD/share";
 note "PERL_FILE_SHAREDIR_DIST=$ENV{PERL_FILE_SHAREDIR_DIST}";
 
-foreach my $dir (qw( examples ))
-{
+foreach my $dir (qw( examples )) {
 
   subtest $dir => sub {
 
@@ -33,8 +30,7 @@ foreach my $dir (qw( examples ))
 
       plan tests => 0+@zig_source_files;
 
-      foreach my $zig_source_file (@zig_source_files)
-      {
+      foreach my $zig_source_file (@zig_source_files) {
         my @cmd = ('zig', 'build-lib', '-dynamic', $zig_source_file);
         my($out, $ret) = capture_merged {
           print "+@cmd\n";
@@ -55,21 +51,17 @@ foreach my $dir (qw( examples ))
       my @scripts = bsd_glob '*.pl';
       plan tests => 0+@scripts;
 
-      foreach my $script (@scripts)
-      {
+      foreach my $script (@scripts) {
         subtest $script => sub {
           script_compiles $script;
 
           my($out,$err) = ('','');
           my $ok = script_runs $script, { stdout => \$out, stderr => \$err };
 
-          if($ok)
-          {
+          if($ok) {
             note "[out]\n$out" if $out;
             note "[err]\n$out" if $err;
-          }
-          else
-          {
+          } else {
             diag "[out]\n$out" if $out;
             diag "[err]\n$out" if $err;
           }

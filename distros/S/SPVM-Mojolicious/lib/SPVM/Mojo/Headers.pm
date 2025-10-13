@@ -247,7 +247,7 @@ Examples:
   my $single = $headers->to_hash;
   my $multi  = $headers->to_hash(1);
   
-  say $headers->to_hash->get_string("DNT");
+  say $headers->to_hash->{"DNT"}->(string);
 
 =head2 to_string
   
@@ -855,8 +855,8 @@ C<method links : L<Hash|SPVM::Hash> of Hash of string ();>
 Get web links from or to Link header according to L<RFC 5988|http://tools.ietf.org/html/rfc5988>.
 
   # Extract information about next page
-  say $headers->links->get("next")->get_string("link");
-  say $headers->links->get("next")->get_string("title");
+  say $headers->links->get("next")->{"link"}->(string);
+  say $headers->links->get("next")->{"title"}->(string);
 
 Examples:
 

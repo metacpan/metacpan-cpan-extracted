@@ -3,7 +3,7 @@ use warnings;
 
 use Test::Fatal;
 use Test::More 0.96;
-use Test::Specio qw( describe test_constraint :vars );
+use Test::Specio qw( create_BAR_handle_code describe test_constraint :vars );
 
 use Specio::Declare;
 use Specio::PartialDump qw( partial_dump );
@@ -22,8 +22,10 @@ my $GLOB_OVERLOAD = _T::GlobOverload->new( \*FOO );
 
 local *BAR;
 {
-    ## no critic (InputOutput::ProhibitBarewordFileHandles, InputOutput::RequireBriefOpen)
-    open BAR, '<', $^X or die "Could not open $^X for the test";
+    local $@;
+    ## no critic (BuiltinFunctions::ProhibitStringyEval, ErrorHandling::RequireCheckingReturnValueOfEval)
+    eval create_BAR_handle_code();
+    die $@ if $@;
 }
 my $GLOB_OVERLOAD_FH = _T::GlobOverload->new( \*BAR );
 

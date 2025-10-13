@@ -12,6 +12,20 @@ Daje::Workflow - It's a simple workflow engine
 
     my $context->{context}->{some_key_needed_by_some_activity}="";
 
+    my $context->{context}-{workflow}->{workflow} = "Workflow name";
+
+    my $context->{context}-{workflow}->{activity} = "Name of activity";
+
+    my $context->{context}-{workflow}->{workflow_pkey} = "If not 0 workflow will be loaded";
+
+    If workflow_pkey == 0 but connector_fkey > 0 and connector != "" connector data will
+    be used to try to load the workflow. If no workflow is found a new will be created.
+
+    my $context->{context}-{workflow}->{connector_fkey} = Number;
+
+    my $context->{context}-{workflow}->{connector} = "If not 0 workflow will be loaded";
+
+
     my $workflow = Daje::Workflow->new(
          pg            => $pg,
          loader        => $loader->loader,

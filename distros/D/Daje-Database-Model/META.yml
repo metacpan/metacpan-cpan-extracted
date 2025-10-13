@@ -26,7 +26,7 @@ no_index:
 provides:
   Daje::Database::Model:
     file: lib/Daje/Database/Model.pm
-    version: '0.03'
+    version: '0.05'
   Daje::Database::Model::Companies:
     file: lib/Daje/Database/Model/Companies.pm
   Daje::Database::Model::CompaniesUsers:
@@ -41,6 +41,8 @@ provides:
     file: lib/Daje/Database/Model/Super/CompaniesUsers.pm
   Daje::Database::Model::Super::CompanyType:
     file: lib/Daje/Database/Model/Super/CompanyType.pm
+  Daje::Database::Model::Super::DocumentBuilder:
+    file: lib/Daje/Database/Model/Super/DocumentBuilder.pm
   Daje::Database::Model::Super::Users:
     file: lib/Daje/Database/Model/Super/Users.pm
   Daje::Database::Model::Super::Workflow:
@@ -64,6 +66,6 @@ resources:
   bugtracker: https://github.com/janeskil1525/Daje-Database-Model/issues
   homepage: https://github.com/janeskil1525/Daje-Database-Model
   repository: https://github.com/janeskil1525/Daje-Database-Model.git
-version: '0.03'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

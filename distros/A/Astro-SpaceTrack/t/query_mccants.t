@@ -52,10 +52,10 @@ SKIP: {
 
     my $count = 2 + ( $do_cache_check ? 3 : 0 );
 
-    is_success_or_skip( $st, 'mccants', @opt, 'mcnames',
-	'Get molczan-style magnitudes', $count );
+    is_success_or_skip( $st, qw{ mccants quicksat },
+	'Get quicksat-style magnitudes', 2 );
 
-    is $st->content_type(), 'molczan', "Content type is 'molczan'";
+    is $st->content_type(), 'quicksat', "Content type is 'quicksat'";
 
     is $st->content_source(), 'mccants', "Content source is 'mccants'";
 
@@ -82,7 +82,7 @@ SKIP: {
 	SKIP: {
 
 	    is_success_or_skip( $st, qw{ mccants -file }, $temp->filename(),
-		'mcnames', 'Get molczan-style magnitudes from cache', 2 );
+		'quicksat', 'Get molczan-style magnitudes from cache', 2 );
 
 	    my $obj_pragmata = $st->{_pragmata};
 	    $dump
@@ -118,31 +118,11 @@ EOD
 }
 
 SKIP: {
-
-    is_success_or_skip( $st, qw{ mccants quicksat },
-	'Get quicksat-style magnitudes', 2 );
-
-    is $st->content_type(), 'quicksat', "Content type is 'quicksat'";
-
-    is $st->content_source(), 'mccants', "Content source is 'mccants'";
-}
-
-SKIP: {
     local $TODO = '404 2024-04-27';
 
     is_success_or_skip( $st, qw{ mccants rcs }, 'Get McCants-format RCS data', 2 );
 
     is $st->content_type(), 'rcs.mccants', "Content type is 'rcs.mccants'";
-
-    is $st->content_source(), 'mccants', "Content source is 'mccants'";
-}
-
-SKIP: {
-
-    is_success_or_skip( $st, qw{ mccants vsnames },
-	'Get molczan-style magnitudes for visual satellites', 2 );
-
-    is $st->content_type(), 'molczan', "Content type is 'molczan'";
 
     is $st->content_source(), 'mccants', "Content source is 'mccants'";
 }

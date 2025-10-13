@@ -1,5 +1,12 @@
 Revision history for Iterator-Flex
 
+0.32      2025-10-02 14:37:03 EDT
+
+  [TESTS]
+
+    * t/permute.t inadvertently asked for a Perl feature it didn't
+      need, precluding testing on Perl's < 5.36.  ++SREZIC.
+
 0.31      2025-09-20 17:51:23 EDT
 
   [ENHANCEMENT]

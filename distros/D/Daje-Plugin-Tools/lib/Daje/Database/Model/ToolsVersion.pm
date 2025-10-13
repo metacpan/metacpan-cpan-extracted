@@ -5,4 +5,3 @@ use Mojo::Base 'Daje::Database::Model::Super::ToolsVersion', -base, -signatures,
 
 1;
 
-1;

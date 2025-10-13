@@ -49,9 +49,9 @@ sub load_projects ($self) {
     $self->app->log->debug($self->req->headers->header('X-Token-Check'));
     # my $setting = $self->param('setting');
     $self->v_tools_projects->load_full_list_p()->then(sub($result) {
-        $self->render(json => $result->{data});
+        $self->render(json => { data => $result->{data}, result => => 1 });
     })->catch(sub($err) {
-        $self->render(json => { 'result' => 'failed', data => $err });
+        $self->render(json => { 'result' => 0, data => $err });
     })->wait;
 }
 

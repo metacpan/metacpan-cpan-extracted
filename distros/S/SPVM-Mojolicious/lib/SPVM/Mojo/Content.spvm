@@ -103,7 +103,7 @@ class Mojo::Content extends Mojo::EventEmitter {
     my $options_h = Hash->new($options);
     
     if ($options_h->exists("max_buffer_size")) {
-      my $max_buffer_size = $options_h->get_int("max_buffer_size");
+      my $max_buffer_size = $options_h->{"max_buffer_size"}->(int);
       
       unless ($max_buffer_size > 0) {
         die "The value of max_buffer_size option must be a positive value.";
@@ -114,7 +114,7 @@ class Mojo::Content extends Mojo::EventEmitter {
     }
     
     if ($options_h->exists("max_leftover_size")) {
-      my $max_leftover_size = $options_h->get_int("max_leftover_size");
+      my $max_leftover_size = $options_h->{"max_leftover_size"}->(int);
       
       unless ($max_leftover_size > 0) {
         die "The value of max_leftover_size option must be a positive value.";

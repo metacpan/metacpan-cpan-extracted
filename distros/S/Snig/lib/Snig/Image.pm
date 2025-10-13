@@ -4,7 +4,7 @@ no warnings "experimental::class";
 
 class Snig::Image {
 
-    our $VERSION = '1.000'; # VERSION
+    our $VERSION = '1.001'; # VERSION
     # ABSTRACT: Snig Image Class
     # PODNAME: Snig::Image
 
@@ -99,7 +99,8 @@ class Snig::Image {
             collection=> {
                 name => $collection->name,
                 size => scalar $collection->sorted,
-            }
+            },
+            version => Snig->VERSION,
         }, $output->child($self->html_file)->stringify) || die $tt->error;
 
     }
@@ -118,7 +119,7 @@ Snig::Image - Snig Image Class
 
 =head1 VERSION
 
-version 1.000
+version 1.001
 
 =head1 SYNOPSIS
 

@@ -2,11 +2,12 @@ package Iterator::Flex::Sequence;
 
 # ABSTRACT: Numeric Sequence Iterator Class
 
+use v5.28;
 use strict;
 use warnings;
 use experimental 'signatures', 'postderef';
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Scalar::Util;
 use List::Util;
@@ -95,7 +96,7 @@ sub construct ( $class, $state ) {
                 return $current;
             },
             ( +FREEZE ) => sub {
-                [
+                return [
                     $class,
                     {
                         begin   => $begin,
@@ -104,7 +105,7 @@ sub construct ( $class, $state ) {
                         current => $current,
                         next    => $next,
                     },
-                ]
+                ];
             },
         );
     }
@@ -120,7 +121,7 @@ sub construct ( $class, $state ) {
 
         %params = (
             ( +FREEZE ) => sub {
-                [
+                return [
                     $class,
                     {
                         begin   => $begin,
@@ -130,7 +131,8 @@ sub construct ( $class, $state ) {
                         prev    => $prev,
                         current => $current,
                         next    => $next,
-                    } ]
+                    },
+                ];
             },
 
             ( +NEXT ) => $begin < $end
@@ -214,7 +216,7 @@ Iterator::Flex::Sequence - Numeric Sequence Iterator Class
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 METHODS
 
@@ -247,8 +249,6 @@ The iterator supports the following capabilities:
 =item freeze
 
 =back
-
-=head1 INTERNALS
 
 =head1 SUPPORT
 

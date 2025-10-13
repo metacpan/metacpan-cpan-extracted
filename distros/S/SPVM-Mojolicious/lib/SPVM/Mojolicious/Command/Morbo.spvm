@@ -78,18 +78,18 @@ EOS
       die $self->usage;
     }
     
-    if ($values_h->get_int("help")) {
+    if ($values_h->{"help"}->(int)) {
       print $self->usage;
       Sys->exit(0);
     }
     
     if ($values_h->exists("backend")) {
-      my $backend = $values_h->get_string("backend");
+      my $backend = $values_h->{"backend"}->(string);
       Sys->set_env("SPVM_MOJO_MORBO_BACKEND", $backend);
     }
     
     if ($values_h->exists("mode")) {
-      my $mode = $values_h->get_string("mode");
+      my $mode = $values_h->{"mode"}->(string);
       Sys->set_env("SPVM_MOJO_MODE", $mode);
     }
     
@@ -97,7 +97,7 @@ EOS
     
     $server->daemon->set_app($self->app);
     
-    my $verbose = $values_h->get_int("verbose");
+    my $verbose = $values_h->{"verbose"}->(int);
     
     $server->set_silent(!$verbose);
     

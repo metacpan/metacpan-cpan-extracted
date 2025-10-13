@@ -4,9 +4,19 @@ error() {
     exit 1;
 }
 
-echo 'Installing CPANTS checker'
-cpan Module::CPANTS::Analyse
-cpan Path::Tiny
+if [ -z $INTERNET_AVAILABLE ]; then
+    INTERNET_AVAILABLE=1;
+fi
+echo 'CHECKING FOR INTERNET';
+ping -c1 8.8.8.8 || INTERNET_AVAILABLE=0
+
+if [[ $INTERNET_AVAILABLE == 1 ]]; then
+    echo 'Installing CPANTS checker and Path::Tiny'
+    cpan Module::CPANTS::Analyse
+    cpan Path::Tiny
+else
+    echo 'WARNING: Skipping internet connection';
+fi
 echo 'Installing deps current perl';
 perl Build.PL || error
 echo ./Build installdeps || error

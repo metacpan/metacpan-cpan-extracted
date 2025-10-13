@@ -145,7 +145,7 @@ class Mojo::Message::Response extends Mojo::Message {
       }
     }
     
-    my $message = $MESSAGES_H->get_string($code) // "";
+    my $message = $MESSAGES_H->{"$code"}->(string) // "";
     
     return $message;
   }

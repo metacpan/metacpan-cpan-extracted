@@ -20,7 +20,7 @@ Readonly::Scalar our $FALSE => 0;
 Readonly::Scalar our $DEFAULT_HOST => 'email-smtp.us-east-1.amazonaws.com';
 Readonly::Scalar our $DEFAULT_PORT => '465';
 
-our $VERSION = '1.0.0';
+our $VERSION = '1.0.1';
 
 ########################################################################
 sub new {

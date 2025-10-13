@@ -2,11 +2,12 @@ package Iterator::Flex::Cat;
 
 # ABSTRACT: An iterator which concatenates a set of iterators
 
+use v5.28;
 use strict;
 use warnings;
 use experimental qw( signatures declared_refs refaliasing );
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Iterator::Flex::Utils qw( RETURN STATE EXHAUSTION :IterAttrs :IterStates can_meth );
 use Iterator::Flex::Factory 'to_iterator';
@@ -61,7 +62,7 @@ sub new ( $class, @args ) {
             depends                => \@args,
             current_iterator_index => undef,
         },
-        $pars
+        $pars,
     );
 }
 
@@ -210,7 +211,7 @@ Iterator::Flex::Cat - An iterator which concatenates a set of iterators
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 METHODS
 
@@ -247,8 +248,6 @@ This iterator may be frozen only if all of the iterables support the
 C<prev> or C<__prev__> method.
 
 =back
-
-=head1 INTERNALS
 
 =head1 SUPPORT
 

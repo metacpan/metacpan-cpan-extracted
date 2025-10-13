@@ -1,11 +1,12 @@
 package Iterator::Flex::Role::Rewind::Method;
 
-# ABSTRACT: Implement C<rewind> as a method
+# ABSTRACT: Implement rewind as a method
 
+use v5.28;
 use strict;
 use warnings;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Role::Tiny;
 
@@ -58,11 +59,11 @@ __END__
 
 =head1 NAME
 
-Iterator::Flex::Role::Rewind::Method - Implement C<rewind> as a method
+Iterator::Flex::Role::Rewind::Method - Implement rewind as a method
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 METHODS
 
@@ -73,8 +74,6 @@ version 0.31
    $iterator->rewind;
 
 Rewind the iterator.
-
-=head1 INTERNALS
 
 =head1 SUPPORT
 

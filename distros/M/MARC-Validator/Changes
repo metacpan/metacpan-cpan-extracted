@@ -1,3 +1,6 @@
+0.04 2025-10-03T01:14:41+02:00
+ - Add plugin for field 040e with leader 018 a.
+
 0.03 2025-09-28T20:34:58+02:00
  - Add test for bad ISBN (field 020a).
  - Add test for record without ISB (field 020a).

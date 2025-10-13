@@ -34,7 +34,7 @@ subtest values => sub {
                 field 'xmh.toc*Command.activeForeground' => 'black';
                 end;
             },
-            'return'
+            'return',
         );
     };
 
@@ -50,7 +50,7 @@ subtest values => sub {
                 field 'xmh.toc*Command.activeForeground' => 1;
                 end;
             },
-            'return'
+            'return',
         );
     };
 
@@ -83,7 +83,7 @@ subtest values => sub {
                 };
                 end;
             },
-            'return'
+            'return',
         );
     };
 
@@ -102,7 +102,7 @@ subtest 'array keys' => sub {
             item [ [qw( xmh toc * Command activeForeground )]   => 'black' ];
             end;
         },
-        'return'
+        'return',
     );
 };
 

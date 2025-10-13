@@ -348,7 +348,7 @@ class Mojo::Message::Request extends Mojo::Message {
     my $url     = $self->url;
     my $base    = $url->base;
     for my $name (@{$env->keys}) {
-      my $value = $env->get_string($name);
+      my $value = $env->{$name}->(string);
       my $name_ref = [$name];
       unless (Re->s($name_ref, ["^HTTP_", "i"], "")) {
         next;
@@ -378,42 +378,42 @@ class Mojo::Message::Request extends Mojo::Message {
     }
     
     # Content-Type is a special case on some servers
-    if (length $env->get_string("CONTENT_TYPE")) {
-      $headers->set_content_type($env->get_string("CONTENT_TYPE")) ;
+    if (length $env->{"CONTENT_TYPE"}->(string)) {
+      $headers->set_content_type($env->{"CONTENT_TYPE"}->(string)) ;
     }
     
     # Content-Length is a special case on some servers
-    if (length $env->get_string("CONTENT_LENGTH")) {
-      $headers->set_content_length($env->get_string("CONTENT_LENGTH")) ;
+    if (length $env->{"CONTENT_LENGTH"}->(string)) {
+      $headers->set_content_length($env->{"CONTENT_LENGTH"}->(string)) ;
     }
     
     # Query
-    if (length $env->get_string("QUERY_STRING")) {
-      $url->query->parse($env->get_string("QUERY_STRING")) ;
+    if (length $env->{"QUERY_STRING"}->(string)) {
+      $url->query->parse($env->{"QUERY_STRING"}->(string)) ;
     }
     
     # Method
-    if (length $env->get_string("REQUEST_METHOD")) {
-      $self->{method} = $env->get_string("REQUEST_METHOD");
+    if (length $env->{"REQUEST_METHOD"}->(string)) {
+      $self->{method} = $env->{"REQUEST_METHOD"}->(string);
     }
     
     # Scheme/Version
-    if (my $_ = Re->m(($env->get_string("SERVER_PROTOCOL") // ""), "^([^/]+)/([^/]+)$")) {
+    if (my $_ = Re->m(($env->{"SERVER_PROTOCOL"}->(string) // ""), "^([^/]+)/([^/]+)$")) {
       $base->set_scheme($_->cap1);
       $self->{version} = $_->cap2 ;
     }
     
     # HTTPS
-    if (Fn->uc($env->get_string("HTTPS") // "") eq "ON") {
+    if (Fn->uc($env->{"HTTPS"}->(string) // "") eq "ON") {
       $base->set_scheme("https");
     }
     
     # Path
     my $path = $url->path;
-    $path->parse(length $env->get_string("PATH_INFO") ? $env->get_string("PATH_INFO") : "");
+    $path->parse(length $env->{"PATH_INFO"}->(string) ? $env->{"PATH_INFO"}->(string) : "");
     
     # Base path
-    if (my $value = $env->get_string("SCRIPT_NAME")) {
+    if (my $value = $env->{"SCRIPT_NAME"}->(string)) {
       
       # Make sure there is a trailing slash (important for merging)
       $base->path->parse(Re->m($value, "/$") ? $value : "$value/");

@@ -13,9 +13,7 @@ Iterator::Flex::Manual::Glossary - Glossary
 
 =head1 VERSION
 
-version 0.31
-
-=head1 INTERNALS
+version 0.32
 
 =head1 NAME
 

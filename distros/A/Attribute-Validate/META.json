@@ -38,7 +38,7 @@
    "provides" : {
       "Attribute::Validate" : {
          "file" : "lib/Attribute/Validate.pm",
-         "version" : "v0.0.5"
+         "version" : "v0.0.9"
       }
    },
    "release_status" : "stable",
@@ -53,6 +53,6 @@
          "url" : "https://github.com/sergiotarxz/Perl-Attribute-Validate"
       }
    },
-   "version" : "v0.0.5",
+   "version" : "v0.0.9",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

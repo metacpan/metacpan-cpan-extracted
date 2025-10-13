@@ -1,5 +1,5 @@
 package Selenium::Remote::Driver;
-$Selenium::Remote::Driver::VERSION = '1.49';
+$Selenium::Remote::Driver::VERSION = '1.50';
 use strict;
 use warnings;
 
@@ -1885,7 +1885,7 @@ Selenium::Remote::Driver - Perl Client for Selenium Remote Driver
 
 =head1 VERSION
 
-version 1.49
+version 1.50
 
 =head1 SYNOPSIS
 
@@ -1935,7 +1935,7 @@ And the
 L<WC3 WebDriver Protocol|https://www.w3.org/TR/webdriver/>
 to communicate with the Selenium Server. If an error occurs while
 executing the command then the server sends back an HTTP error code
-with a JSON encoded reponse that indicates the precise
+with a JSON encoded response that indicates the precise
 L<Response Error Code|https://github.com/SeleniumHQ/selenium/wiki/JsonWireProtocol#response-status-codes>.
 The module will then croak with the error message associated with this
 code. If no error occurred, then the subroutine called will return the
@@ -2382,7 +2382,7 @@ C<eval>, or use the parameterized versions find_element_*).
 Make a new session on the server.
 Called by new(), not intended for regular use.
 
-Occaisonally handy for recovering from brower crashes.
+Occaisonally handy for recovering from browser crashes.
 
 DANGER DANGER DANGER
 
@@ -3715,7 +3715,7 @@ Aditya Ivaturi <ivaturi@gmail.com>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Allen Lew A.MacLeay Andy Jack Bas Bloemsaat bernhard Blake GH Brian Horakh Charles Howes Chris Davies Daniel Fackrell Dave Rolsky Dmitry Karasik Doug Bell Dylan Streb Eric Johnson Gabor Szabo George S. Baugh Gerhard Jungwirth Gordon Child GreatFlamingFoo Ivan Kurmanov Joe Higton Jon Hermansen Keita Sugama Ken Swanson lembark Luke Closs Martin Gruner Matthew Spahr Max O'Cull Michael Prokop mk654321 Peter Mottram (SysPete) Phil Kania Mitchell Prateek Goyal Richard Sailer Robert Utter rouzier Tetsuya Tatsumi Tod Hagan Tom Hukins Vangelis Katsikaros Vishwanath Janmanchi Viťas Strádal Yuki Kimoto Yves Lavoie
+=for stopwords Allen Lew A.MacLeay Andrew Ruthven Andy Jack Bas Bloemsaat bernhard Blake GH Brian Horakh Charles Howes Chris Davies Daniel Fackrell Dave Rolsky Dmitry Karasik Doug Bell Dylan Streb Eric Johnson Gabor Szabo George S. Baugh Gerhard Jungwirth Gordon Child GreatFlamingFoo Ivan Kurmanov Joe Higton Jon Hermansen Keita Sugama Ken Swanson lembark Luke Closs Martin Gruner Mason James Matthew Spahr Max O'Cull Michael Prokop mk654321 Peter Mottram (SysPete) Phil Kania Mitchell Prateek Goyal Richard Sailer Robert Utter rouzier sunnavy Tetsuya Tatsumi Tod Hagan Tom Hukins Vangelis Katsikaros Vishwanath Janmanchi Viťas Strádal Yuki Kimoto Yves Lavoie
 
 =over 4
 
@@ -3726,6 +3726,10 @@ Allen Lew <allen@alew.org>
 =item *
 
 A.MacLeay <a.macleay@gmail.com>
+
+=item *
+
+Andrew Ruthven <andrew@etc.gen.nz>
 
 =item *
 
@@ -3837,6 +3841,10 @@ Martin Gruner <martin.gruner@otrs.com>
 
 =item *
 
+Mason James <mtj@kohaaloha.com>
+
+=item *
+
 Matthew Spahr <matthew.spahr@cpanel.net>
 
 =item *
@@ -3878,6 +3886,10 @@ Robert Utter <utter.robert@gmail.com>
 =item *
 
 rouzier <rouzier@gmail.com>
+
+=item *
+
+sunnavy <sunnavy@bestpractical.com>
 
 =item *
 

@@ -41,7 +41,7 @@
             "IO::File" : "1.41",
             "JSON" : "4.07",
             "JSON::XS" : "4.03",
-            "Module::Generic" : "v0.37.5",
+            "Module::Generic" : "v0.43.0",
             "POSIX" : "1.53_01",
             "Scalar::Util" : "1.50",
             "Text::Wrap" : "2021.0814",
@@ -74,6 +74,6 @@
          "web" : "https://gitlab.com/jackdeguest/Text-PO"
       }
    },
-   "version" : "v0.7.2",
+   "version" : "v0.8.0",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

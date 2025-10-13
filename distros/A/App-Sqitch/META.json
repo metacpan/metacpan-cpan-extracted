@@ -1,10 +1,10 @@
 {
    "abstract" : "Sensible database change management",
    "author" : [
-      "\"iovation Inc., David E. Wheeler\""
+      "\"David E. Wheeler, iovation Inc.\""
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -19,6 +19,18 @@
       ]
    },
    "optional_features" : {
+      "clickhouse" : {
+         "description" : "Support for managing ClickHouse databases",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "DBD::ODBC" : "1.59",
+                  "XML::Tiny" : "2.07",
+                  "YAML::Tiny" : "1.76"
+               }
+            }
+         }
+      },
       "exasol" : {
          "description" : "Support for managing Exasol databases",
          "prereqs" : {
@@ -168,7 +180,9 @@
             "Test::Pod::Coverage" : "1.08",
             "Test::Spelling" : "0",
             "Time::HiRes" : "0",
-            "Time::Local" : "0"
+            "Time::Local" : "0",
+            "XML::Tiny" : "2.07",
+            "YAML::Tiny" : "1.76"
          },
          "requires" : {
             "DBD::Firebird" : "1.11",
@@ -179,7 +193,9 @@
             "DBD::SQLite" : "1.37",
             "MySQL::Config" : "0",
             "Time::HiRes" : "0",
-            "Time::Local" : "0"
+            "Time::Local" : "0",
+            "XML::Tiny" : "2.07",
+            "YAML::Tiny" : "1.76"
          },
          "suggests" : {
             "DBD::Oracle" : "1.23"
@@ -245,6 +261,8 @@
             "URI::QueryParam" : "0",
             "URI::db" : "0.20",
             "User::pwent" : "0",
+            "XML::Tiny" : "2.07",
+            "YAML::Tiny" : "1.76",
             "constant" : "0",
             "locale" : "0",
             "namespace::autoclean" : "0.16",
@@ -264,13 +282,16 @@
             "DBD::SQLite" : "1.37",
             "MySQL::Config" : "0",
             "Time::HiRes" : "0",
-            "Time::Local" : "0"
+            "Time::Local" : "0",
+            "XML::Tiny" : "2.07",
+            "YAML::Tiny" : "1.76"
          }
       },
       "test" : {
          "requires" : {
             "Capture::Tiny" : "0.12",
             "Carp" : "0",
+            "Cwd" : "0",
             "DBD::Mem" : "0",
             "File::Find" : "0",
             "File::Spec" : "0",
@@ -290,6 +311,8 @@
             "Test::More" : "0.94",
             "Test::NoWarnings" : "0.083",
             "Test::Warn" : "0.31",
+            "XML::Tiny" : "2.07",
+            "YAML::Tiny" : "1.76",
             "base" : "0",
             "lib" : "0"
          }
@@ -305,9 +328,9 @@
          "url" : "https://github.com/sqitchers/sqitch/"
       }
    },
-   "version" : "v1.5.2",
-   "x_generated_by_perl" : "v5.40.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
+   "version" : "v1.6.0",
+   "x_generated_by_perl" : "v5.42.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
    "x_spdx_expression" : "MIT"
 }
 

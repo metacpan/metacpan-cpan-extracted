@@ -6,7 +6,7 @@ SMS::Send::BudgetSMS - SMS::Send driver to send messages via BudgetSMS, https://
 
 ## VERSION
 
-version 0.04
+version 0.05
 
 ## SYNOPSIS
 
@@ -19,6 +19,7 @@ version 0.04
       _login    => 'budgetsms_username',
       _userid   => 'budgetsms_userid',
       _password => 'budgetsms_handle',
+      _from     => 'my sender name',
   );
 
   # Send a message

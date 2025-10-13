@@ -11,9 +11,13 @@ use List::Util qw(none);
 
 use parent qw(Exporter);
 
-our @EXPORT_OK = qw( slurp slurp_json dump_json normalize_options dmp);
+our @EXPORT_OK = qw( slurp slurp_json dump_json normalize_options dmp choose);
 
-our $VERSION = '1.0.7';
+our $VERSION = '1.0.8';
+
+########################################################################
+sub choose (&) { return $_[0]->(); }  ## no critic
+########################################################################
 
 ########################################################################
 sub dmp {
@@ -98,3 +102,63 @@ sub args {
 }
 
 1;
+
+__END__
+
+=pod
+
+=head1 NAAME
+
+ CLI::Simple::Utils
+
+=head1 SYNOPSIS
+
+ CLI::Simple::Utils qw(choose);
+
+=head1 DESCRIPTION
+
+Utilities that might be useful when writing command line scripts.
+
+=head1 METHODS AND SUBROUTINES
+
+=head2 choose
+
+An anonymous subroutine disguising as a block level internal
+subroutine (of sorts). Use when a ternary or a cascading if/else block
+just seems wrong.
+
+ choose {
+   return "foo"
+     if $bar;
+
+   return "bar"
+     if $foo;
+ };
+
+=head2 dmp
+
+ dmp this => $this, that => $that;
+
+Shortcut for:
+
+ print {*STDERR} Dumper([this => $this, that => $that]);
+ 
+=head2 slurp_json
+
+ slurp_json($file)
+
+Returns a Perl object from a presumably JSON encoded file.
+
+=head2 slurp
+
+ slurp(file)
+
+Return the entire contents of a file.
+
+=head1 AUTHOR
+
+Rob Lauer - <bigfoot@cpan.org>
+
+=head1 SEE ALSO
+ 
+=cut

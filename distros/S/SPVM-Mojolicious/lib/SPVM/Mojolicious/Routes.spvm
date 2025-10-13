@@ -82,14 +82,14 @@ class Mojolicious::Routes extends Mojolicious::Routes::Route {
 
     my $stash = $c->stash;
     
-    if ($stash->get_int("mojo.rendered")) {
+    if ($stash->{"mojo.rendered"}->(int)) {
       return undef;
     }
     
     my $rendered = $c->render_maybe;
     
     unless ($rendered) {
-      unless ($stash->get_int("mojo.routed")) {
+      unless ($stash->{"mojo.routed"}->(int)) {
        die "Route without action and nothing to render";
       }
     }
@@ -206,7 +206,7 @@ class Mojolicious::Routes extends Mojolicious::Routes::Route {
     
     $self->match($c);
     
-    unless ($c->match->stack_list->length) {
+    unless (@{$c->match->stack}) {
       return 0;
     }
     

@@ -39,6 +39,7 @@ ok(utf8::is_utf8($a), 'utf8 enabled');
 #    dump($a), 'pack("H*","' . join('', map sprintf("%02x", $_), 128..255). '")');
 SKIP:
 {
+    local $Data::Pretty::SHOW_UTF8 = 0;
     skip( 'perl-5.10 required', 1 ) if( $] < 5.010 );
     is( dump($a), 'pack("H*","' . join('', map sprintf("%02x", $_), 128..255). '")' );
 };

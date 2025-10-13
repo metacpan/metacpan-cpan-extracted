@@ -4,10 +4,11 @@ package Iterator::Flex::Role::Wrap::Self;
 
 # is this actually used?
 
+use v5.28;
 use strict;
 use warnings;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Scalar::Util;
 use Iterator::Flex::Utils 'NEXT';
@@ -58,9 +59,7 @@ Iterator::Flex::Role::Wrap::Self - Construct a next() method for a coderef which
 
 =head1 VERSION
 
-version 0.31
-
-=head1 INTERNALS
+version 0.32
 
 =head1 SUPPORT
 

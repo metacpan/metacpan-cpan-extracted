@@ -49,11 +49,6 @@ It is HIGHLY encouraged for your terminal be set as UTF-8 for the advanced featu
     Shows the syumbols only
 ~~~
 
-### -**f** or --**full**
-```
-    Use the full token table.  This will increase the initialization time.
-```
-
 ## Author
 
 Richard Kelsch

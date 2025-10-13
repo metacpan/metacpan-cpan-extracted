@@ -1,12 +1,11 @@
 package Bio::MUST::Drivers::Exonerate::Aligned;
 # ABSTRACT: Bio::MUST driver for running the Exonerate alignment program
-$Bio::MUST::Drivers::Exonerate::Aligned::VERSION = '0.251060';
+$Bio::MUST::Drivers::Exonerate::Aligned::VERSION = '0.252830';
 use Moose;
 use namespace::autoclean;
 
 use autodie;
-use feature qw(say switch);
-use experimental qw(smartmatch);        # to suppress warnings about 'when'
+use feature qw(say);
 
 # use Smart::Comments '###';
 
@@ -277,43 +276,40 @@ sub _parse_outfile {
         chomp $line;
         ##### $line
 
-        given ($line) {
+        # header lines
+        if ($line =~ m/$NEW_HSP/xms) {
+            $hsp_n++;
+            last LINE if $hsp_n > 1;        # process only first HSP
+        }
+        elsif ($line =~ m/^\s*Raw \s score:\s (\d+)/xms) {
+            $self->_set_score( $1 );
+        }
+        elsif ($line =~ m/^\s*Query  \s range:\s (\d+) \s->\s (\d+)/xms) {
+            $self->_set_query_start( $1 + 1 );
+            $self->_set_query_end(   $2);
+        }   # Note: coordinates are converted to BLAST/GFF standard
+        elsif ($line =~ m/^\s*Target \s range:\s (\d+) \s->\s (\d+)/xms) {
+            $self->_set_target_start( $1 + 1 );
+            $self->_set_target_end(   $2);
+        }   # Note: coordinates are converted to BLAST/GFF standard
 
-            # header lines
-            when (/$NEW_HSP/xms) {
-                $hsp_n++;
-                last LINE if $hsp_n > 1;        # process only first HSP
+        # alignment lines
+        elsif ($line =~ m/^\s* $LEFT_NUM \s ($SEQ_STR) \s $RIGHT_NUM \s*$/xms) {
+            unless ($in_block) {
+                # this is query line
+                $query_seq .= $1;
+                $in_block = 1;
+                <$out>;             # skip midline (may be hard to parse)
             }
-            when (/^ \s*Raw \s score:\s (\d+) /xms) {
-                $self->_set_score( $1 );
+            else {
+                # this is DNA
+                $spliced_seq .= $1;
+                $in_block = 0;
             }
-            when (/^ \s*Query  \s range:\s (\d+) \s->\s (\d+) /xms) {
-                $self->_set_query_start( $1 + 1 );
-                $self->_set_query_end(   $2);
-            }   # Note: coordinates are converted to BLAST/GFF standard
-            when (/^ \s*Target \s range:\s (\d+) \s->\s (\d+) /xms) {
-                $self->_set_target_start( $1 + 1 );
-                $self->_set_target_end(   $2);
-            }   # Note: coordinates are converted to BLAST/GFF standard
-
-            # alignment lines
-            when (/^ \s* $LEFT_NUM \s ($SEQ_STR) \s $RIGHT_NUM \s* $/xms) {
-                unless ($in_block) {
-                    # this is query line
-                    $query_seq .= $1;
-                    $in_block = 1;
-                    <$out>;             # skip midline (may be hard to parse)
-                }
-                else {
-                    # this is DNA
-                    $spliced_seq .= $1;
-                    $in_block = 0;
-                }
-            }
-            when (/^ \s+              ($SEQ_STR)               \s* $/xms) {
-                # this is likely target line
-                $target_seq .= $1 if $in_block;
-            }
+        }
+        elsif ($line =~ m/^\s+              ($SEQ_STR)               \s*$/xms) {
+            # this is likely target line
+            $target_seq .= $1 if $in_block;
         }
     }
 
@@ -470,7 +466,7 @@ Bio::MUST::Drivers::Exonerate::Aligned - Bio::MUST driver for running the Exoner
 
 =head1 VERSION
 
-version 0.251060
+version 0.252830
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-our $VERSION = '1.000'; # VERSION
+our $VERSION = '1.001'; # VERSION
 # PODNAME: snig.pl
 # ABSTRACT: Generate a html image gallery from a directory of images
 
@@ -27,7 +27,7 @@ snig.pl - Generate a html image gallery from a directory of images
 
 =head1 VERSION
 
-version 1.000
+version 1.001
 
 =head1 SYNOPSIS
 

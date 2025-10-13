@@ -1,5 +1,5 @@
 package Playwright::Util;
-$Playwright::Util::VERSION = '1.532';
+$Playwright::Util::VERSION = '1.551';
 use strict;
 use warnings;
 
@@ -46,8 +46,14 @@ sub request ( $method, $url, $host, $port, $ua, %args ) {
     die "playwright server failed to spawn!"
       if $content =~ m/^Can't connect to/;
 
-    my $decoded = JSON::MaybeXS::decode_json($content);
-    my $msg     = $decoded->{message};
+    local $@;
+    my $decoded = eval { JSON::MaybeXS::decode_json($content) } or do {
+        confess(
+            qq[error decoding Playwright server response: $@\ncontent:\n$content\n]
+        );
+    };
+
+    my $msg = $decoded->{message};
 
     confess($msg) if $decoded->{error};
 
@@ -123,7 +129,7 @@ Playwright::Util - Common utility functions for the Playwright module
 
 =head1 VERSION
 
-version 1.532
+version 1.551
 
 =head2 request(STRING method, STRING url, STRING host, INTEGER port, LWP::UserAgent ua, HASH args) = HASH
 
@@ -164,7 +170,7 @@ George S. Baugh <teodesian@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2020 Troglodyne LLC
+Copyright (c) 2025 Troglodyne LLC
 
 
 Permission is hereby granted, free of charge, to any person obtaining a copy

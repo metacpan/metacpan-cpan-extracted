@@ -19,13 +19,14 @@ my %WriteMakefileArgs = (
     "IO::String" => 0,
     "Math::VectorReal" => "1.0",
     "Scalar::Util" => "1.01",
+    "Set::Object" => 0,
     "Text::Balanced" => 0
   },
   "TEST_REQUIRES" => {
     "Clone" => 0,
     "Test::Simple" => 0
   },
-  "VERSION" => "0.39",
+  "VERSION" => "0.40",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,6 +38,7 @@ my %FallbackPrereqs = (
   "IO::String" => 0,
   "Math::VectorReal" => "1.0",
   "Scalar::Util" => "1.01",
+  "Set::Object" => 0,
   "Test::Simple" => 0,
   "Text::Balanced" => 0
 );

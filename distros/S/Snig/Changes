@@ -1,4 +1,13 @@
 Changes for Snig
 
+1.001     2025-10-06 17:19:31+02:00
+    - properly display issues in dist.ini (Thomas Klausner)
+    - dist housekeeping, fix links in META.json (Thomas Klausner)
+    - link to snig.plix.at in footer (Thomas Klausner)
+    - css fix (Thomas Klausner)
+    - use wrapper for simpler templates, add hardcoded license and minimal help text (Thomas Klausner)
+    - base zip-file on output dir name (Thomas Klausner)
+
+
 1.000     2025-09-22 22:34:02+02:00
     - first release

@@ -1,5 +1,5 @@
 package Selenium::Remote::RemoteConnection;
-$Selenium::Remote::RemoteConnection::VERSION = '1.49';
+$Selenium::Remote::RemoteConnection::VERSION = '1.50';
 use strict;
 use warnings;
 
@@ -59,7 +59,8 @@ sub check_status {
     }
 
     unless ( $cmdOut eq 'OK' ) {
-        croak "Selenium server did not return proper status";
+        my $cr = $status->{cmd_return} // '';
+        croak "Selenium server did not return proper status: $cmdOut: $cr";
     }
 }
 
@@ -236,7 +237,7 @@ Selenium::Remote::RemoteConnection - Connect to a selenium server
 
 =head1 VERSION
 
-version 1.49
+version 1.50
 
 =head1 SYNOPSIS
 

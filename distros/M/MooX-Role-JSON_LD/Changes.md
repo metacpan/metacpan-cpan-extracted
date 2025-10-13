@@ -1,5 +1,11 @@
 # Change Log
 
+## [2.1.0] - 2025-10-07
+
+### Changed
+
+- Only emit the '@context' key for the top-level JSON-LD
+
 ## [2.0.0] - 2025-06-05
 
 ### Changed

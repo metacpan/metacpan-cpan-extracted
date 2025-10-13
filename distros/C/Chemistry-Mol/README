@@ -1,12 +1,13 @@
-Chemistry/Mol version 0.39
+Chemistry/Mol version 0.40
 ==========================
 
 This toolkit includes basic objects and methods to describe molecules. It
 consists of several modules: Chemistry::Mol, Chemistry::Atom, Chemistry::Bond,
 and Chemistry::File. These are the core modules of the PerlMol toolkit.
 
-CHANGES SINCE VERSION 0.38
-        - Implemented choice of backend for Chemistry::Mol::clone().
+CHANGES SINCE VERSION 0.39
+        - Rewrote Chemistry::Mol::separate() with Set::Object, removing
+          recursion.
 
 INSTALLATION
 
@@ -22,6 +23,7 @@ DEPENDENCIES
 This module requires these other modules and libraries:
     - perl-5.6.0 or more recent (5.8.0+ recommended)
     - Math::VectorReal
+    - Set::Object
     - Scalar::Util      (already a core module since perl 5.7.3)
     - Test::More        (already a core module since perl 5.7.3)
     - Text::Balanced    (already a core module since perl 5.7.3)

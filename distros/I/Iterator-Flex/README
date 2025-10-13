@@ -2,7 +2,7 @@ NAME
     Iterator::Flex - Iterators with flexible behaviors
 
 VERSION
-    version 0.31
+    version 0.32
 
 SYNOPSIS
 DESCRIPTION
@@ -47,7 +47,6 @@ DESCRIPTION
   What doesn't work?  What should frighten me away?
     Iterator::Flex::Manual::Caveats
 
-INTERNALS
 SUPPORT
   Bugs
     Please report any bugs or feature requests to

@@ -7,7 +7,7 @@ use warnings;
 use DBI;
 use vars qw($VERSION $err $errstr $sqlstate $drh);
 
-$VERSION = '0.2.2';
+$VERSION = '0.2.3';
 
 $drh = undef;
 
@@ -756,7 +756,7 @@ sub FETCH {
   }
   if ($attr eq 'NAME') {
     return $sth->{avatica_cache_name} ||=
-        [map { $_->get_column_name } @{$sth->{avatica_signature}->get_columns_list}];
+        [map { $_->get_label // $_->get_column_name } @{$sth->{avatica_signature}->get_columns_list}];
   }
   if ($attr eq 'TYPE') {
     my $dbh = $sth->{Database};
@@ -811,7 +811,7 @@ DBD::Avatica - Driver for Apache Avatica compatible servers
 
 =head1 VERSION
 
-version 0.2.2
+version 0.2.3
 
 =head1 SYNOPSIS
 
@@ -1717,9 +1717,13 @@ Alexey Stavrov <logioniz@ya.ru>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Denis Ibaev Ivan Putintsev uid66
+=for stopwords Andrey Khozov Denis Ibaev Ivan Putintsev uid66
 
 =over 4
+
+=item *
+
+Andrey Khozov <avkhozov@gmail.com>
 
 =item *
 

@@ -1,11 +1,12 @@
 package Iterator::Flex::Role::Prev::Method;
 
-# ABSTRACT: Implement C<prev> as a method
+# ABSTRACT: Implement prev as a method
 
+use v5.28;
 use strict;
 use warnings;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Role::Tiny;
 
@@ -45,11 +46,11 @@ __END__
 
 =head1 NAME
 
-Iterator::Flex::Role::Prev::Method - Implement C<prev> as a method
+Iterator::Flex::Role::Prev::Method - Implement prev as a method
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 METHODS
 
@@ -60,8 +61,6 @@ version 0.31
    $iterator->prev;
 
 Returns the previous value.
-
-=head1 INTERNALS
 
 =head1 SUPPORT
 

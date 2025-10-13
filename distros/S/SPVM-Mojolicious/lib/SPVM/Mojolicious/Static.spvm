@@ -42,17 +42,7 @@ class Mojolicious::Static {
     }
   ;
   
-  has paths_list : rw List of string;
-  
-  has paths : rw string[]
-    get {
-      unless (exists $self->{paths}) {
-        $self->{paths} = new string[0];
-      }
-      
-      return $self->{paths};
-    }
-  ;
+  has paths : rw string[];
   
   has prefix : rw string;
   
@@ -63,6 +53,8 @@ class Mojolicious::Static {
   static method new : Mojolicious::Static () {
     
     my $self = new Mojolicious::Static;
+    
+    $self->{paths} = new string[0];
     
     return $self;
   }
@@ -78,7 +70,7 @@ class Mojolicious::Static {
     
     my $assets = $self->{assets};
     
-    return $self->file_path("/" . $self->asset_dir . ($assets->get_string($asset) // $asset));
+    return $self->file_path("/" . $self->asset_dir . ($assets->{$asset}->(string) // $asset));
   }
   
   method file_path : string ($file : string) {

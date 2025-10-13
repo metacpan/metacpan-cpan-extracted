@@ -14,7 +14,7 @@ use constant DURATION_TYPE => 0x04;
 
 use DateTime::Format::Natural::Utils qw(trim);
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 my %grammar_durations = map { $_ => true } qw(for_count_unit);
 
@@ -78,15 +78,14 @@ sub _extract_expressions
     my $seen_expression;
     do {
         $seen_expression = false;
-        my $date_index;
+        my $date_index = undef;
         for (my $i = 0; $i < @tokens; $i++) {
             next if $skip{$i};
             if ($self->_check_for_date($tokens[$i], $i, \$date_index)) {
                 last;
             }
         }
-        GRAMMAR:
-        foreach my $keyword (sort { $lengths{$b} <=> $lengths{$a} } grep { $lengths{$_} <= @tokens } keys %entries) {
+        GRAMMAR: foreach my $keyword (sort { $lengths{$b} <=> $lengths{$a} } grep { $lengths{$_} <= @tokens } keys %entries) {
             my @grammar = @{$entries{$keyword}};
             my $types_entry = shift @grammar;
             my @grammars = [ [ @grammar ], false ];
@@ -104,7 +103,7 @@ sub _extract_expressions
                     my $matched = false;
                     my $pos = 0;
                     my @indexes;
-                    my $date_index;
+                    my $date_index = undef;
                     for (my $i = 0; $i < @tokens; $i++) {
                         next if $skip{$i};
                         last unless defined $types->[$pos];
@@ -207,15 +206,12 @@ sub _finalize_expressions
         my $prev = $expression->[0][0] - 1;
         my $next = $expression->[0][1] + 1;
 
-        if ($expression->[2]->{flags} & DATE_TYPE
-         || $expression->[2]->{flags} & GRAMMAR_TYPE
-        ) {
+        if ($expression->[2]->{flags} & (DATE_TYPE|GRAMMAR_TYPE)) {
             if (!$seen_duration
              && defined $tokens->[$next]
              &&         $tokens->[$next] =~ /^$timespan_sep$/i
              && defined $expressions[$i + 1]
-             &&        ($expressions[$i + 1]->[2]->{flags} & DATE_TYPE
-                     || $expressions[$i + 1]->[2]->{flags} & GRAMMAR_TYPE)
+             &&         $expressions[$i + 1]->[2]->{flags} & (DATE_TYPE|GRAMMAR_TYPE)
              &&         $expressions[$i + 1]->[0][0] - $next == 1
             ) {
                 push @duration_indexes, ($expression->[0][0] .. $expression->[0][1]);

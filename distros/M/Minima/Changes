@@ -1,3 +1,35 @@
+v0.7.4  2025-10-06
+
+        [Fixes]
+        - Fix default templates to use body_open and body_close blocks
+          instead of the outdated pre_body references.
+
+        [Changes]
+        - Minima::View::HTML: normalize extensions in add_body_open()
+          and add_body_close() so configured defaults (e.g. .ht) are
+          applied consistently. Added corresponding test coverage.
+
+v0.7.3  2025-10-04
+
+        [Fixes]
+        - Fix Static root path in app.psgi template. The middleware now
+          correctly points to _static/_ instead of using the obsolete
+          `$Dir` variable.
+
+        [Changes]
+        - Adjust indentation in the generated main.css template for
+          consistency with style conventions.
+
+v0.7.2  2025-10-03
+
+        [Changes]
+        - Minima::View::HTML: make add_directory() prepend include paths
+          so newly added directories take precedence. Expanded tests  to
+          cover this and custom list order.
+        - Minima::Router docs: note that controller prefix can also be
+          set via the `controller_prefix` config key when using
+          Minima::App.
+
 v0.7.1  2025-09-25
 
         [Fixes]

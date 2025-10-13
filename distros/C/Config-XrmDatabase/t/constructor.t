@@ -15,7 +15,7 @@ my $db = Config::XrmDatabase->new(
 is(
     $db->TO_HASH->{db},
     hash {
-        field '*' => hash {
+        field q{*} => hash {
             field 'b' => hash {
                 field VALUE()       => 'v1';
                 field MATCH_COUNT() => 0;

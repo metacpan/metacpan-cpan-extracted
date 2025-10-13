@@ -1,6 +1,6 @@
 package Chemistry::Mol;
 
-our $VERSION = '0.39'; # VERSION
+our $VERSION = '0.40'; # VERSION
 # $Id$
 
 =head1 NAME
@@ -40,6 +40,7 @@ use Chemistry::Atom;
 use Chemistry::Bond;
 use Carp;
 use base qw(Chemistry::Obj Exporter);
+use Set::Object qw(set);
 use Storable 'dclone';
 
 our @EXPORT_OK = qw(read_mol);
@@ -869,34 +870,46 @@ each one with a CH3.
 sub separate {
     my ($self) = @_;
     $self = $self->clone;
-    $self->{_paint_tab} = {};
+    my $unseen = set($self->atoms);
+    my $open = set;
+    my %colors;
     my $color = 0;
-    for my $atom ($self->atoms) {
-        next if defined $self->{_paint_tab}{$atom->id};
-        $self->_paint($atom, $color++);
+    while (!$unseen->is_null) {
+        my ($first) = $unseen->members;
+        $unseen->remove($first);
+        $open->insert($first);
+        while (!$open->is_null) {
+            my ($atom) = $open->members;
+            $colors{$atom->id} = $color;
+            $open->remove($atom);
+
+            my $neighbors = set($atom->neighbors);
+            my $newly_opened_atoms = $unseen * $neighbors;
+            $unseen -= $newly_opened_atoms;
+            $open += $newly_opened_atoms;
+        }
+        $color++;
     }
-    my @mols;
-    push @mols, $self->new for (1 .. $color);
+
+    $color = 0;
+    my %map;
     for my $atom ($self->atoms) {
-        $mols[$self->{_paint_tab}{$atom->id}]->add_atom($atom);
+        next if exists $map{$colors{$atom->id}};
+        $map{$colors{$atom->id}} = $color;
+        $color++;
+    }
+    $colors{$_} = $map{$colors{$_}} for (keys %colors);
+
+    my @mols;
+    push @mols, $self->new for (0 .. $color-1);
+    for my $atom ($self->atoms) {
+        $mols[$colors{$atom->id}]->add_atom($atom);
     }
     for my $bond ($self->bonds) {
-        $mols[$self->{_paint_tab}{$bond->id}]->add_bond($bond);
+        my ($atom) = $bond->atoms;
+        $mols[$colors{$atom->id}]->add_bond($bond);
     }
     @mols;
-}
-
-# this method fills the _paint_tab attribute for every atom connected
-# to the given start atom $atom with $color. Used for separating
-# connected fragments. Uses a depth-first search
-sub _paint {
-    my ($self, $atom, $color) = @_;
-    return if defined $self->{_paint_tab}{$atom->id};
-    $self->{_paint_tab}{$atom->id} = $color;
-    $self->{_paint_tab}{$_->id}    = $color for ($atom->bonds);
-    for my $neighbor ($atom->neighbors) {
-        $self->_paint($neighbor, $color);
-    }
 }
 
 =item $mol->sprout_hydrogens

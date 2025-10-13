@@ -12,6 +12,7 @@ lib/Daje/Database/Model/Super/ToolsObjects.pm
 lib/Daje/Database/Model/Super/ToolsProjects.pm
 lib/Daje/Database/Model/Super/ToolsTreelist.pm
 lib/Daje/Database/Model/Super/ToolsVersion.pm
+lib/Daje/Database/Model/ToolsObjects.pm
 lib/Daje/Database/Model/ToolsProjects.pm
 lib/Daje/Database/Model/ToolsVersion.pm
 lib/Daje/Database/View/Super/VToolsObjects.pm
@@ -23,6 +24,7 @@ lib/Daje/Database/View/VToolsProjects.pm
 lib/Daje/Database/View/VToolsVersion.pm
 lib/Daje/Database/View/VTreeList.pm
 lib/Daje/Plugin/Tools.pm
+lib/Daje/Workflow/Activity/Tools/Objects.pm
 lib/Daje/Workflow/Activity/Tools/Project.pm
 minil.toml
 t/00_compile.t

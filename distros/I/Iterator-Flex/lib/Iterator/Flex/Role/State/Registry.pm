@@ -2,10 +2,11 @@ package Iterator::Flex::Role::State::Registry;
 
 # ABSTRACT: Iterator State is kept in the registry
 
+use v5.28;
 use strict;
 use warnings;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Iterator::Flex::Utils qw( :default REG_ITERATOR REG_ITER_STATE :IterStates );
 
@@ -66,7 +67,7 @@ Iterator::Flex::Role::State::Registry - Iterator State is kept in the registry
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 METHODS
 
@@ -76,13 +77,11 @@ version 0.31
 
 Set the iterator's state to C<$state>
 
-=head2 set_state
+=head2 get_state
 
-  $iter->set_state( $state );
+  $state = $iter->get_state;
 
 Get the iterator's state;
-
-=head1 INTERNALS
 
 =head1 SUPPORT
 

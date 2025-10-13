@@ -23,17 +23,17 @@ no_index:
 provides:
   Log::Log4perl::Appender::AmazonSES:
     file: lib/Log/Log4perl/Appender/AmazonSES.pm
-    version: v1.0.0
+    version: v1.0.1
 requires:
-  List::Util: '0'
+  List::Util: '1.68'
   Log::Log4perl::Appender: '0'
-  Net::Domain: '0'
-  Net::SMTP: '0'
-  Readonly: '0'
+  Net::Domain: '3.11'
+  Net::SMTP: '3.11'
+  Readonly: '2.05'
   perl: '5.010'
 resources:
   bugtracker: http://github.com/rlauer6/Log-Log4perl-Appender-AmazonSES
   homepage: http://github.com/rlauer6/Log-Log4perl-Appender-AmazonSES
   repository: git://github.com/rlauer6/Log-Log4perl-Appender-AmazonSES
-version: v1.0.0
+version: v1.0.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

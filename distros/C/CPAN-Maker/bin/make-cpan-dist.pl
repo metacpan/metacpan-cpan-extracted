@@ -31,7 +31,7 @@ use Scalar::Util qw( reftype );
 use YAML::Tiny;
 use version;
 
-our $VERSION = '1.5.47';  ## no critic (RequireInterpolationOfMetachars)
+our $VERSION = '1.6.0';  ## no critic (RequireInterpolationOfMetachars)
 
 caller or __PACKAGE__->main();
 
@@ -398,31 +398,46 @@ sub write_makefile {
   local $Data::Dumper::Indent   = 2;
   local $Data::Dumper::Pad      = $SPACE x $INDENT;
 
-  # dependencies
+  # dependencies = key name taken as file name if not provided
   foreach my $d (qw(requires test-requires build-requires )) {
     $options{$d} = $options{$d} || $d;
   }
 
   $buildspec{dependencies} = {
-    $options{requires}       ? ( requires       => $options{requires} )         : (),
-    $options{test_requires}  ? ( test_requires  => $options{'test-requires'} )  : (),
-    $options{build_requires} ? ( build_requires => $options{'build-requires'} ) : (),
+    requires       => $options{requires},
+    test_requires  => $options{'test-requires'},
+    build_requires => $options{'build-requires'},
   };
 
   foreach (qw(requires test_requires build_requires)) {
-    next if !$buildspec{dependencies}->{$_};
+    my $dependency_file = $buildspec{dependencies}->{$_};
+    $dependency_file =~ s/$project_root\/?//xsm;
+    next if -s $dependency_file;
 
-    $buildspec{dependencies}->{$_} =~ s/$project_root\/?//xsm;
+    delete $buildspec{depdencies}->{$_};
   }
 
-  my $PRE_REQ = Dumper get_requires( $options{'requires'}, $core, $options{'min-perl-version'} );
+  my $MIN_PERL_VERSION = $options{'min-perl-version'} // $PERL_VERSION;
+
+  my $PRE_REQ = Dumper get_requires(
+    requires             => $options{requires},
+    include_core_modules => $core,
+    include_version      => $options{'require-versions'},
+    min_perl_version     => $MIN_PERL_VERSION,
+  );
+
   $PRE_REQ = trim($PRE_REQ);
   $PRE_REQ =~ s/([@]\d+)/== $2/xsmg;
 
   my $TEST_REQ = {};
 
   if ( $options{'test-requires'} && -s $options{'test-requires'} ) {
-    $TEST_REQ = Dumper get_requires( $options{'test-requires'}, $core, $options{'min-perl-version'} );
+    $TEST_REQ = Dumper get_requires(
+      requires             => $options{'test-requires'},
+      include_core_modules => $core,
+      include_version      => $options{'require-versions'},
+      min_perl_version     => $MIN_PERL_VERSION,
+    );
   }
   else {
     $TEST_REQ = '{}';
@@ -434,7 +449,12 @@ sub write_makefile {
   my $build_req = {};
 
   if ( $options{'build-requires'} && -s $options{'build-requires'} ) {
-    $build_req = get_requires( $options{'build-requires'}, $TRUE, $options{'min-perl-version'} );
+    $build_req = get_requires(
+      requires             => $options{'build-requires'},
+      include_core_modules => $TRUE,
+      include_version      => $options{'require-versions'},
+      min_perl_version     => $MIN_PERL_VERSION,
+    );
   }
 
   foreach my $m (qw( ExtUtils::MakeMaker File::ShareDir::Install)) {
@@ -510,8 +530,6 @@ sub write_makefile {
   }
 
   my $timestamp = scalar localtime;
-
-  my $MIN_PERL_VERSION = $options{'min-perl-version'} // $PERL_VERSION;
 
   $buildspec{'min-perl-version'} = $MIN_PERL_VERSION;
 
@@ -942,11 +960,13 @@ sub parse_include_version {
 ########################################################################
   my ( $version, %args ) = @_;
 
-  if ( defined $version ) {
-    if ( $version =~ /(no|0|off)/xsm ) {
-      $args{A} = $EMPTY;
-    }
+  return %args
+    if !defined $version;
+
+  if ( $version =~ /(no|0|off)/ixsm ) {
+    $args{A} = $EMPTY;
   }
+
   return %args;
 }
 
@@ -1147,7 +1167,17 @@ sub create_temp_filelist {
 ########################################################################
 sub get_requires {
 ########################################################################
-  my ( $requires, $core_modules, $min_perl_version ) = @_;
+  my (%args) = @_;
+
+  my ( $requires, $core_modules, $min_perl_version, $include_version )
+    = @args{qw(requires core_modules min_perl_version include_version)};
+
+  my $logger = Log::Log4perl->get_logger();
+
+  $logger->trace( sprintf 'processing %s file',       $requires );
+  $logger->trace( sprintf "\t include_version: [%s]", $include_version ? 'yes' : 'no' );
+  $logger->trace( sprintf "\tmin_perl_version: [%s]", $min_perl_version );
+  $logger->trace( sprintf "\t    core_modules: [%s]", $core_modules ? 'yes' : 'no' );
 
   my %modules;
 
@@ -1163,18 +1193,25 @@ sub get_requires {
       return $line if !defined $line;
       return $line if $core_modules;
       return $line if $line =~ /^[+]/xsm;
-
-      return is_core( $line, $min_perl_version )
-        ? undef
-        : $line;
+      return is_core( $line, $min_perl_version ) ? undef : $line;
     },
     process => sub {
       my $line = pop @_;
 
       $line =~ s/^[+]([^+]*)$/$1/xsm;
 
-      my ( $module, $version ) = split /\s/xsm, $line;
-      $version = $version || '0';
+      my ( $module, $version ) = split /\s+/xsm, $line;
+
+      $logger->trace( sprintf "\tprocessing line (%s): %s", basename($requires), $line );
+
+      $logger->trace( sprintf "\t\t[%s:%s]", $module, $version // $EMPTY );
+
+      if ( !$include_version ) {
+        $version = '0';
+      }
+      else {
+        $version ||= '0';
+      }
 
       $modules{$module} = $version;
 
@@ -1283,6 +1320,41 @@ sub slurp_file {
 }
 
 ########################################################################
+sub init_logger {
+########################################################################
+  my %options = @_;
+
+  my $log_level = $options{'log-level'};
+
+  if ($log_level) {
+    if ( $log_level =~ /\A[1-5]\z$/xsm ) {
+      $log_level = ( $ERROR, $WARN, $INFO, $DEBUG, $TRACE )[ $log_level - 1 ];
+    }
+    else {
+      $log_level = {
+        ERROR => $ERROR,
+        WARN  => $WARN,
+        INFO  => $INFO,
+        DEBUG => $DEBUG,
+        TRACE => $TRACE,
+      }->{ uc $options{'log-level'} };
+    }
+
+  }
+  elsif ( $options{debug} ) {
+    $log_level = $DEBUG;
+  }
+
+  if ( !$log_level ) {
+    $log_level = $ERROR;
+  }
+
+  Log::Log4perl->easy_init($log_level);
+
+  return Log::Log4perl->get_logger;
+}
+
+########################################################################
 sub main {
 ########################################################################
   my @option_specs = qw(
@@ -1326,6 +1398,10 @@ sub main {
 
   my $retval = GetOptions( \%options, @option_specs );
 
+  my $logger = init_logger(%options);
+
+  $logger->trace( sub { return Dumper( [ options => \%options ] ); } );
+
   if ( !$retval || $options{help} ) {
     help( \%options );
 
@@ -1358,36 +1434,13 @@ sub main {
     exit $SH_SUCCESS;
   }
 
-  my $log_level = $options{'log-level'};
-
-  if ($log_level) {
-    if ( $log_level =~ /\A[1-5]\z$/xsm ) {
-      $log_level = ( $ERROR, $WARN, $INFO, $DEBUG, $TRACE )[ $log_level - 1 ];
-    }
-    else {
-      $log_level = {
-        ERROR => $ERROR,
-        WARN  => $WARN,
-        INFO  => $INFO,
-        DEBUG => $DEBUG,
-        TRACE => $TRACE,
-      }->{ uc $options{'log-level'} };
-    }
-
-  }
-  elsif ( $options{debug} ) {
-    $log_level = $DEBUG;
-  }
-
-  if ( !$log_level ) {
-    $log_level = $ERROR;
-  }
-
-  Log::Log4perl->easy_init($log_level);
-
+  # processing a build specification...
   if ( $options{buildspec} ) {
 
+    # parse buildspec and then call the bash script which actually builds the CPAN tarball
     my %args = parse_buildspec(%options);
+
+    my $log_level = $logger->level;
 
     if ($log_level) {
       $args{'-L'} = {
@@ -1399,11 +1452,16 @@ sub main {
       }->{$log_level};
     }
 
+    my $cmd = join $SPACE, %args;
+
+    $logger->debug( sub { return Dumper( [ args    => \%args ] ); } );
+    $logger->trace( sub { return Dumper( [ command => $cmd ] ); } );
+
     if ( !$options{dryrun} ) {
-      exec 'make-cpan-dist ' . join $SPACE, %args;
+      exec 'make-cpan-dist ' . $cmd;
     }
     else {
-      print 'make-cpan-dist ' . ( join $SPACE, %args ) . $NL;
+      print {*STDOUT} sprintf "make-cpan-dist %s\n", $cmd;
     }
   }
   else {
@@ -1416,8 +1474,11 @@ sub main {
     $options{author}   = $options{author}   // 'Anonymouse <anonymouse@example.com>';
     $options{abstract} = $options{abstract} // 'my awesome Perl module!';
 
+    $logger->trace( sub { return Dumper( [ processed_options => \%options ] ); } );
+
     if ( !write_makefile(%options) ) {
       help();
+
       exit $SH_FAILURE;
     }
   }
@@ -1429,7 +1490,7 @@ sub main {
 
 __DATA__
 ---
-version: "1.5.47"
+version: "1.6.0"
 min_perl_version: "type:string"
 min-perl-version: "type:string"
 project:

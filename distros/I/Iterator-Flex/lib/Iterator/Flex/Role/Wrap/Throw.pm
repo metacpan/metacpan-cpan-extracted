@@ -2,10 +2,11 @@ package Iterator::Flex::Role::Wrap::Throw;
 
 # ABSTRACT: Role to add throw on exhaustion to an iterator which adapts another iterator
 
+use v5.28;
 use strict;
 use warnings;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use List::Util 'first';
 use Iterator::Flex::Utils qw( INPUT_EXHAUSTION PASSTHROUGH );
@@ -97,7 +98,7 @@ around _construct_next => sub ( $orig, $class, $ipar, $gpar ) {
         require Iterator::Flex::Failure;
         require Scalar::Util;
         Iterator::Flex::Failure::parameter->throw(
-            "internal error: unknown type for input exhaustion policy: ${ \Scalar::Util::reftype( $exception ) }"
+            "internal error: unknown type for input exhaustion policy: ${ \Scalar::Util::reftype( $exception ) }",
         );
 
     }
@@ -138,9 +139,7 @@ Iterator::Flex::Role::Wrap::Throw - Role to add throw on exhaustion to an iterat
 
 =head1 VERSION
 
-version 0.31
-
-=head1 INTERNALS
+version 0.32
 
 =head1 SUPPORT
 

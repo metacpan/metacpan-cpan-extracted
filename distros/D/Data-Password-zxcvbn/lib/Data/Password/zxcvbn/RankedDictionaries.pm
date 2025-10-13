@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Data::Password::zxcvbn::RankedDictionaries::Common;
 use Data::Password::zxcvbn::RankedDictionaries::English;
-our $VERSION = '1.1.2'; # VERSION
+our $VERSION = '1.1.3'; # VERSION
 # ABSTRACT: ranked dictionaries for common English words
 
 
@@ -26,7 +26,7 @@ Data::Password::zxcvbn::RankedDictionaries - ranked dictionaries for common Engl
 
 =head1 VERSION
 
-version 1.1.2
+version 1.1.3
 
 =head1 DESCRIPTION
 

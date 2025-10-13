@@ -18,7 +18,7 @@ use Data::Record::Serialize::Error {
   },
   -all;
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 use Data::Record::Serialize::Types -types;
 
@@ -304,7 +304,12 @@ sub _table_exists {
     # DBD::Sybase doesn't filter, so need to search
     my $matches
       = $self->_dbh->table_info( q{%}, $self->schema, $self->table, 'TABLE' )->fetchall_arrayref;
-    return any { $_->[2] eq $self->table } @{$matches};
+
+    # if $self->table needs to be quoted, table_info returns a quoted
+    # string (at least for DBD::Pg), so need an extra check...
+    return
+      any { $_->[2] eq $self->table or $_->[2] eq $self->_dbh->quote_identifier( $self->table ) }
+      @{$matches};
 }
 
 sub _fq_table_name {
@@ -767,7 +772,7 @@ Data::Record::Serialize::Encode::dbi - store a record in a database
 
 =head1 VERSION
 
-version 1.07
+version 1.08
 
 =head1 SYNOPSIS
 

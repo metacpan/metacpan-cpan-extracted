@@ -58,7 +58,7 @@ subtest 'path parameters' => sub {
       content => undef,
       errors => [
         {
-          instanceLocation => '/request/path',
+          instanceLocation => '/request/uri/path',
           keywordLocation => $keyword_path.'/required',
           absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
           error => 'missing path parameter: missing',
@@ -72,7 +72,7 @@ subtest 'path parameters' => sub {
       content => undef,
       errors => [
         {
-          instanceLocation => '/request/path',
+          instanceLocation => '/request/uri/path',
           keywordLocation => $keyword_path.'/required',
           absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
           error => 'missing path parameter: missing_json_content',
@@ -226,13 +226,13 @@ subtest 'path parameters' => sub {
       initial_schema_uri => $openapi->openapi_uri,
       traversed_keyword_path => '',
       keyword_path => $keyword_path,
+      data_path => '/request',
       errors => [],
       depth => 0,
     };
 
     my $name = $test->{param_obj}{name};
-    ()= $openapi->_validate_path_parameter({ %$state, data_path => '/request/path/'.$name },
-      $test->{param_obj}, $test->{path_captures});
+    ()= $openapi->_validate_path_parameter($state, $test->{param_obj}, $test->{path_captures});
 
     todo_maybe($test->{todo}, sub {
       is_equal(
@@ -280,7 +280,7 @@ subtest 'query parameters' => sub {
       content => undef,
       errors => [
         {
-          instanceLocation => '/request/query',
+          instanceLocation => '/request/uri/query',
           keywordLocation => $keyword_path.'/required',
           absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
           error => 'missing query parameter: missing_encoded_required',
@@ -298,7 +298,7 @@ subtest 'query parameters' => sub {
       content => undef,
       errors => [
         {
-          instanceLocation => '/request/query/reserved',
+          instanceLocation => '/request/uri/query/reserved',
           keywordLocation => $keyword_path.'/allowReserved',
           absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
           error => 'allowReserved: true is not yet supported',
@@ -372,13 +372,13 @@ subtest 'query parameters' => sub {
       initial_schema_uri => $openapi->openapi_uri,
       traversed_keyword_path => '',
       keyword_path => $keyword_path,
+      data_path => '/request',
       errors => [],
       depth => 0,
     };
 
     my $name = $test->{param_obj}{name};
-    ()= $openapi->_validate_query_parameter({ %$state, data_path => '/request/query/'.$name },
-      $test->{param_obj}, Mojo::URL->new('https://example.com/blah?'.$test->{queries}));
+    ()= $openapi->_validate_query_parameter($state, $test->{param_obj}, Mojo::URL->new('https://example.com/blah?'.$test->{queries}));
 
     todo_maybe($test->{todo}, sub {
       is_equal(
@@ -429,7 +429,7 @@ subtest 'header parameters' => sub {
       content => undef,
       errors => [
         {
-          instanceLocation => '/request/header',
+          instanceLocation => '/response/header',
           keywordLocation => $keyword_path.'/required',,
           absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
           error => 'missing header: Missing',
@@ -544,6 +544,7 @@ subtest 'header parameters' => sub {
       initial_schema_uri => $openapi->openapi_uri,
       traversed_keyword_path => '',
       keyword_path => $keyword_path,
+      data_path => '/response',
       errors => [],
       depth => 0,
     };
@@ -553,8 +554,7 @@ subtest 'header parameters' => sub {
     $headers->add($name, $test->{values}->@*) if defined $test->{values};
 
     my $exception = exception {
-      ()= $openapi->_validate_header_parameter({ %$state, data_path => '/request/header/'.$name },
-        $name, $test->{header_obj}, $headers);
+      ()= $openapi->_validate_header_parameter($state, $name, $test->{header_obj}, $headers);
     };
 
     todo_maybe($test->{todo}, sub {

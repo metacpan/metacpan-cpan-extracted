@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::ConsoleMessage;
-$Playwright::ConsoleMessage::VERSION = '1.532';
+$Playwright::ConsoleMessage::VERSION = '1.551';
 use parent 'Playwright::Base';
 
 sub new {
@@ -22,11 +22,31 @@ sub spec {
     return $Playwright::spec->{'ConsoleMessage'}{members};
 }
 
+sub text {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'text',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
 sub page {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
         command => 'page',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub args {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'args',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -42,31 +62,11 @@ sub location {
     );
 }
 
-sub text {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'text',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
 sub type {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
         command => 'type',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub args {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'args',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -116,7 +116,7 @@ Playwright::ConsoleMessage - Automatically generated class for Playwright::Conso
 
 =head1 VERSION
 
-version 1.532
+version 1.551
 
 =head1 CONSTRUCTOR
 
@@ -127,11 +127,23 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
+=head2 text(@args)
+
+Execute the ConsoleMessage::text playwright routine.
+
+See L<https://playwright.dev/docs/api/class-ConsoleMessage#ConsoleMessage-text> for more information.
+
 =head2 page(@args)
 
 Execute the ConsoleMessage::page playwright routine.
 
 See L<https://playwright.dev/docs/api/class-ConsoleMessage#ConsoleMessage-page> for more information.
+
+=head2 args(@args)
+
+Execute the ConsoleMessage::args playwright routine.
+
+See L<https://playwright.dev/docs/api/class-ConsoleMessage#ConsoleMessage-args> for more information.
 
 =head2 location(@args)
 
@@ -139,23 +151,11 @@ Execute the ConsoleMessage::location playwright routine.
 
 See L<https://playwright.dev/docs/api/class-ConsoleMessage#ConsoleMessage-location> for more information.
 
-=head2 text(@args)
-
-Execute the ConsoleMessage::text playwright routine.
-
-See L<https://playwright.dev/docs/api/class-ConsoleMessage#ConsoleMessage-text> for more information.
-
 =head2 type(@args)
 
 Execute the ConsoleMessage::type playwright routine.
 
 See L<https://playwright.dev/docs/api/class-ConsoleMessage#ConsoleMessage-type> for more information.
-
-=head2 args(@args)
-
-Execute the ConsoleMessage::args playwright routine.
-
-See L<https://playwright.dev/docs/api/class-ConsoleMessage#ConsoleMessage-args> for more information.
 
 =head2 on(@args)
 
@@ -210,7 +210,7 @@ George S. Baugh <teodesian@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2020 Troglodyne LLC
+Copyright (c) 2025 Troglodyne LLC
 
 
 Permission is hereby granted, free of charge, to any person obtaining a copy

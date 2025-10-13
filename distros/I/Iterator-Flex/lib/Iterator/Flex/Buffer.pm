@@ -2,10 +2,11 @@ package Iterator::Flex::Buffer;
 
 # ABSTRACT: Buffer Iterator Class
 
+use v5.28;
 use strict;
 use warnings;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Iterator::Flex::Utils ':IterAttrs', ':IterStates', ':SignalParameters', ':ExhaustionActions';
 use Iterator::Flex::Factory 'to_iterator';
@@ -65,7 +66,7 @@ sub new ( $class, $iterable, $capacity = 0, $pars = {} ) {
             capacity => $capacity,
             src      => $iterable,
         },
-        \%pars
+        \%pars,
     );
 }
 
@@ -225,7 +226,7 @@ Iterator::Flex::Buffer - Buffer Iterator Class
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 METHODS
 
@@ -263,8 +264,6 @@ The returned iterator supports the following capabilities:
 =item freeze
 
 =back
-
-=head1 INTERNALS
 
 =head1 SUPPORT
 

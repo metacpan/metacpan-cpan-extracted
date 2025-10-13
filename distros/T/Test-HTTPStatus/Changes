@@ -1,5 +1,12 @@
 Revision history for Perl module Test::HTTPStatus
 
+2.12	Fri Oct 10 15:12:12 EDT 2025
+	Fixed another unintialized variable
+	Perl6.org is down
+	Use '==' to compare numbers
+	Wasn't setting INVALID_URL when needed
+	If HEAD fails with 404 there is no need to GET
+
 2.11	Wed Jul 30 21:56:17 EDT 2025
 	Handle uninitialized variable
 		http://www.cpantesters.org/report/c4765a02-6a5c-11f0-bebe-d734df91eea4

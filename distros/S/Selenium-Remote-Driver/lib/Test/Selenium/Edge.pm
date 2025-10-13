@@ -1,5 +1,5 @@
 package Test::Selenium::Edge;
-$Test::Selenium::Edge::VERSION = '1.49';
+$Test::Selenium::Edge::VERSION = '1.50';
 use Moo;
 extends 'Selenium::Edge', 'Test::Selenium::Remote::Driver';
 
@@ -14,7 +14,7 @@ __END__
 
 =head1 NAME
 
-Test::Selenium::Edge
+Test::Selenium::Edge - Test using Selenium::Edge
 
 =head1 SYNOPSIS
 

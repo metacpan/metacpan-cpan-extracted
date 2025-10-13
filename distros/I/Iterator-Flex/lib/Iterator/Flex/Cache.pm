@@ -2,11 +2,12 @@ package Iterator::Flex::Cache;
 
 # ABSTRACT: Cache Iterator Class
 
+use v5.28;
 use strict;
 use warnings;
 use experimental qw( signatures postderef );
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use parent 'Iterator::Flex::Base';
 use Iterator::Flex::Utils qw( STATE :IterAttrs :IterStates throw_failure );
@@ -70,7 +71,7 @@ sub new ( $class, $iterable, $pars = {} ) {
             capacity => $capacity,
             depends  => [ to_iterator( $iterable ) ],
         },
-        \%pars
+        \%pars,
     );
 }
 
@@ -184,7 +185,7 @@ Iterator::Flex::Cache - Cache Iterator Class
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 METHODS
 
@@ -192,7 +193,7 @@ version 0.31
 
   $iterator = Iterator::Flex::Cache->new( $iterable, ?\%pars );
 
-The iterator caches values of C<$iterable> (by default, the previous and current values),
+The iterator caches values of C<$iterable> (by default, the previous and current values).
 
 C<$iterable> is converted into an iterator via L<Iterator::Flex::Factory/to_iterator> if required.
 
@@ -232,8 +233,6 @@ The returned iterator supports the following capabilities:
 
 Returns the cache value at $idx.  The most recent value is at C<$idx = 0>,
 and the last value is at C<$idx = $capacity - 1>.
-
-=head1 INTERNALS
 
 =head1 SUPPORT
 

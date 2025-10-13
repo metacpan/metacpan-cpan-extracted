@@ -1,11 +1,12 @@
 package Iterator::Flex::Role::Rewind::Closure;
 
-# ABSTRACT: Implement C<rewind> as a closure stored in the registry
+# ABSTRACT: Implement rewind as a closure stored in the registry
 
+use v5.28;
 use strict;
 use warnings;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Iterator::Flex::Base  ();
 use Iterator::Flex::Utils qw( :default REG_ITERATOR REG_ITER_REWIND );
@@ -58,11 +59,11 @@ __END__
 
 =head1 NAME
 
-Iterator::Flex::Role::Rewind::Closure - Implement C<rewind> as a closure stored in the registry
+Iterator::Flex::Role::Rewind::Closure - Implement rewind as a closure stored in the registry
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 METHODS
 
@@ -73,8 +74,6 @@ version 0.31
    $iterator->rewind;
 
 Rewind the iterator;
-
-=head1 INTERNALS
 
 =head1 SUPPORT
 

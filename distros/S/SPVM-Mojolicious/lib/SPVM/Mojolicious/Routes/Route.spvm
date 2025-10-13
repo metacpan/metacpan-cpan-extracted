@@ -40,24 +40,7 @@ class Mojolicious::Routes::Route {
   
   has partial : rw byte;
   
-  has children : rw Mojolicious::Routes::Route[]
-    get {
-      return (Mojolicious::Routes::Route[])$self->children_list->to_array;
-    }
-    set {
-      $self->{children_list} = List->new($_);
-    }
-  ;
-  
-  has children_list : rw List of Mojolicious::Routes::Route
-    get {
-      unless (exists $self->{children}) {
-        $self->{children_list} = List->new(new Mojolicious::Routes::Route[0]);
-      }
-      
-      return $self->{children_list};
-    }
-  ;
+  has children : rw Mojolicious::Routes::Route[];
   
   has parent : rw Mojolicious::Routes::Route
     get {
@@ -94,11 +77,11 @@ class Mojolicious::Routes::Route {
   has has_websocket : ro int
     get {
       unless (exists $self->{has_websocket}) {
-        my $chain_list = $self->_chain;
+        my $chain = $self->_chain;
         
         my $has_websocket = 0;
-        for (my $i = 0; $i < $chain_list->length; $i++) {
-          my $child = $chain_list->get($i);
+        for (my $i = 0; $i < $chain->length; $i++) {
+          my $child = $chain->get($i);
           
           if ($child->is_websocket) {
             $has_websocket = 1;
@@ -166,6 +149,8 @@ class Mojolicious::Routes::Route {
     
     my $self = new Mojolicious::Routes::Route;
     
+    $self->{children} = new Mojolicious::Routes::Route[0];
+    
     return $self;
   }
   
@@ -230,7 +215,9 @@ class Mojolicious::Routes::Route {
     
     $route->set_parent($self);
     
-    $self->children_list->push($route);
+    my $children = List->new_ref($self->{children});
+    
+    $children->push($route);
     
     $route->pattern->set_types($self->root->types);
   }
@@ -243,15 +230,15 @@ class Mojolicious::Routes::Route {
       return;
     }
     
-    my $new_children_list = List->new(new Mojolicious::Routes::Route[0]);
-    for (my $i = 0; $i < $parent->children_list->length; $i++) {
-      my $child = $parent->children_list->get($i);
+    my $new_children = List->new(new Mojolicious::Routes::Route[0]);
+    for (my $i = 0; $i < @{$parent->children}; $i++) {
+      my $child = $parent->children->[$i];
       
       unless ($child == $self) {
-        $new_children_list->push($child);
+        $new_children->push($child);
       }
     }
-    $parent->set_children_list($new_children_list);
+    $parent->set_children($new_children->get_array->(Mojolicious::Routes::Route[]));
     
     $self->set_parent(undef);
   }
@@ -282,10 +269,10 @@ class Mojolicious::Routes::Route {
     
     my $custom = Hash->new;
     
-    my $children_list = $self->children_list->clone;
+    my $children = (List of Mojolicious::Routes::Route)List->new_ref(Array->copy_object_address($self->children));
     
-    while (my $child = (Mojolicious::Routes::Route)$children_list->shift) {
-      if   ($child->has_custom_name) {
+    while (my $child = $children->shift) {
+      if ($child->has_custom_name) {
         unless ($custom->get($child->name)) {
           $custom->set($child->name, $child);
         }
@@ -296,7 +283,7 @@ class Mojolicious::Routes::Route {
         }
       }
       
-      $children_list->push_($child->children);
+      $children->push_($child->children);
     }
     
     my $ret = Hash->new;
@@ -327,7 +314,7 @@ class Mojolicious::Routes::Route {
   
   method is_endpoint : int () {
     
-    return $self->inline ? 0 : !$self->children_list->length;
+    return $self->inline ? 0 : !@{$self->children};
   }
   
   method parse : void ($args : object...) {
@@ -346,13 +333,13 @@ class Mojolicious::Routes::Route {
   
   method render : string ($values : Hash) {
     
-    my $chain_list = $self->_chain;
+    my $chain = $self->_chain;
     
     my $pattern_strings_list = StringList->new;
-    for (my $i = 0; $i < $chain_list->length; $i++) {
-      my $_ = $chain_list->get($i);
+    for (my $i = 0; $i < $chain->length; $i++) {
+      my $_ = $chain->get($i);
       
-      my $pattern_string = $_->pattern->render($values, !$_->children_list->length && !$_->partial);
+      my $pattern_string = $_->pattern->render($values, !@{$_->children} && !$_->partial);
       
       $pattern_strings_list->push($pattern_string);
     }
@@ -406,12 +393,12 @@ class Mojolicious::Routes::Route {
   
   method to_string : string () {
     
-    my $chain_list = $self->_chain;
+    my $chain = $self->_chain;
     
     my $pattern_unparseds_list = StringList->new;
     
-    for (my $i = 0; $i < $chain_list->length; $i++) {
-      my $chain = $chain_list->get($i);
+    for (my $i = 0; $i < $chain->length; $i++) {
+      my $chain = $chain->get($i);
       
       my $pattern_unparsed = $chain->pattern->unparsed // "";
       

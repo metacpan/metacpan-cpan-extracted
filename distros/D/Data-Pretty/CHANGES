@@ -1,5 +1,8 @@
 Revision history for Perl module Data::Pretty
 
+v0.2.0 2025-10-08T07:24:30+0900
+    - Improved the quoting of strings
+
 v0.1.9 2024-02-13T10:32:20+0900
     - Correction of a minor bug in _dump()
 

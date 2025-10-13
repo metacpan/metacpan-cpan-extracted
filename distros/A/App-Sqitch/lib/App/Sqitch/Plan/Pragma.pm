@@ -7,7 +7,7 @@ use Moo;
 use App::Sqitch::Types qw(Str);
 extends 'App::Sqitch::Plan::Line';
 
-our $VERSION = 'v1.5.2'; # VERSION
+our $VERSION = 'v1.6.0'; # VERSION
 
 has value => (
     is       => 'ro',

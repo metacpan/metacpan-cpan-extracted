@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::PageAssertions;
-$Playwright::PageAssertions::VERSION = '1.532';
+$Playwright::PageAssertions::VERSION = '1.551';
 use parent 'Playwright::Base';
 
 sub new {
@@ -22,11 +22,11 @@ sub spec {
     return $Playwright::spec->{'PageAssertions'}{members};
 }
 
-sub toHaveTitle {
+sub NotToHaveTitle {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'toHaveTitle',
+        command => 'NotToHaveTitle',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -37,6 +37,16 @@ sub NotToHaveURL {
     return $self->_api_request(
         args    => [@_],
         command => 'NotToHaveURL',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub not {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'not',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -62,21 +72,11 @@ sub toHaveScreenshot {
     );
 }
 
-sub NotToHaveTitle {
+sub toHaveTitle {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'NotToHaveTitle',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub not {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'not',
+        command => 'toHaveTitle',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -126,7 +126,7 @@ Playwright::PageAssertions - Automatically generated class for Playwright::PageA
 
 =head1 VERSION
 
-version 1.532
+version 1.551
 
 =head1 CONSTRUCTOR
 
@@ -137,17 +137,23 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
-=head2 toHaveTitle(@args)
+=head2 NotToHaveTitle(@args)
 
-Execute the PageAssertions::toHaveTitle playwright routine.
+Execute the PageAssertions::NotToHaveTitle playwright routine.
 
-See L<https://playwright.dev/docs/api/class-PageAssertions#PageAssertions-toHaveTitle> for more information.
+See L<https://playwright.dev/docs/api/class-PageAssertions#PageAssertions-NotToHaveTitle> for more information.
 
 =head2 NotToHaveURL(@args)
 
 Execute the PageAssertions::NotToHaveURL playwright routine.
 
 See L<https://playwright.dev/docs/api/class-PageAssertions#PageAssertions-NotToHaveURL> for more information.
+
+=head2 not(@args)
+
+Execute the PageAssertions::not playwright routine.
+
+See L<https://playwright.dev/docs/api/class-PageAssertions#PageAssertions-not> for more information.
 
 =head2 toHaveURL(@args)
 
@@ -161,17 +167,11 @@ Execute the PageAssertions::toHaveScreenshot playwright routine.
 
 See L<https://playwright.dev/docs/api/class-PageAssertions#PageAssertions-toHaveScreenshot> for more information.
 
-=head2 NotToHaveTitle(@args)
+=head2 toHaveTitle(@args)
 
-Execute the PageAssertions::NotToHaveTitle playwright routine.
+Execute the PageAssertions::toHaveTitle playwright routine.
 
-See L<https://playwright.dev/docs/api/class-PageAssertions#PageAssertions-NotToHaveTitle> for more information.
-
-=head2 not(@args)
-
-Execute the PageAssertions::not playwright routine.
-
-See L<https://playwright.dev/docs/api/class-PageAssertions#PageAssertions-not> for more information.
+See L<https://playwright.dev/docs/api/class-PageAssertions#PageAssertions-toHaveTitle> for more information.
 
 =head2 on(@args)
 
@@ -226,7 +226,7 @@ George S. Baugh <teodesian@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2020 Troglodyne LLC
+Copyright (c) 2025 Troglodyne LLC
 
 
 Permission is hereby granted, free of charge, to any person obtaining a copy

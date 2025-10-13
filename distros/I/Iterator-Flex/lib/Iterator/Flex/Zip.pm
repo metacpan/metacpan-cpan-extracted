@@ -2,11 +2,12 @@ package Iterator::Flex::Zip;
 
 # ABSTRACT: Zip Iterator Class
 
+use v5.28;
 use strict;
 use warnings;
 use experimental 'signatures', 'declared_refs';
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Iterator::Flex::Factory 'to_iterator';
 use Iterator::Flex::Utils qw[ THROW STATE EXHAUSTION :IterAttrs :IterStates throw_failure ];
@@ -381,7 +382,7 @@ Iterator::Flex::Zip - Zip Iterator Class
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 METHODS
 
@@ -453,8 +454,6 @@ The iterator supports the following capabilities:
 And optionally (if the iterables support it)
 
  reset
-
-=head1 INTERNALS
 
 =head1 SUPPORT
 

@@ -149,7 +149,7 @@ BEGIN {
   if ($ex_version < 5.57) {
     our @ISA = qw(Exporter);
   }
-  $VERSION = '1.028';
+  $VERSION = '1.029';
   require XSLoader;
   XSLoader::load(Imager => $VERSION);
 }
@@ -4721,7 +4721,6 @@ sub SCALAR {
 
 1;
 __END__
-# Below is the stub of documentation for your module. You better edit it!
 
 =head1 NAME
 

@@ -4,7 +4,7 @@ Snig - (Simple|Static|Small|S..) Image Gallery
 
 # VERSION
 
-version 1.000
+version 1.001
 
 # SYNOPSIS
 

@@ -1,5 +1,5 @@
 package Selenium::Remote::Mock::RemoteConnection;
-$Selenium::Remote::Mock::RemoteConnection::VERSION = '1.49';
+$Selenium::Remote::Mock::RemoteConnection::VERSION = '1.50';
 # ABSTRACT: utility class to mock the responses from Selenium server
 
 use strict;
@@ -181,7 +181,7 @@ Selenium::Remote::Mock::RemoteConnection - utility class to mock the responses f
 
 =head1 VERSION
 
-version 1.49
+version 1.50
 
 =head1 SYNOPSIS
 
@@ -314,7 +314,7 @@ a mock_cmd: a L<Selenium::Remote::Mock::Commands> object. This is used mainly to
 =head1 DESCRIPTION
 
 Selenium::Remote::Mock::RemoteConnection is a class to act as a short-circuit or a pass through to the connection to a Selenium Server.
-Using this class in place of L<Selenium::Remote::RemoteConnection> allows to:
+Using this class in place of L<Selenium::Remote::RemoteConnection> allows one to:
 
 =over
 

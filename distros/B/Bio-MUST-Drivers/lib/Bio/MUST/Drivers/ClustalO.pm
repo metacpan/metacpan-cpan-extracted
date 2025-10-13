@@ -1,7 +1,7 @@
 package Bio::MUST::Drivers::ClustalO;
 # ABSTRACT: Bio::MUST driver for running the Clustal Omega program
 # CONTRIBUTOR: Amandine BERTRAND <amandine.bertrand@doct.uliege.be>
-$Bio::MUST::Drivers::ClustalO::VERSION = '0.251060';
+$Bio::MUST::Drivers::ClustalO::VERSION = '0.252830';
 use Moose;
 use namespace::autoclean;
 
@@ -100,7 +100,7 @@ Bio::MUST::Drivers::ClustalO - Bio::MUST driver for running the Clustal Omega pr
 
 =head1 VERSION
 
-version 0.251060
+version 0.252830
 
 =head1 SYNOPSIS
 

@@ -2,23 +2,20 @@ package Config::XrmDatabase::Types;
 
 # ABSTRACT: Types for Config::XrmDatabase;
 
-use strict;
+use v5.26;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use Type::Utils -all;
 use Types::Standard qw( Enum CodeRef );
-use Type::Library -base,
-  -declare => qw( QueryReturnValue OnQueryFailure );
+use Type::Library -base, -declare => qw( QueryReturnValue OnQueryFailure );
 
 use namespace::clean;
 
-declare QueryReturnValue,
-  as Enum[ \1, 'value', 'reference', 'all' ];
+declare QueryReturnValue, as Enum [ \1, 'value', 'reference', 'all' ];
 
-declare OnQueryFailure,
-  as Enum( [ \1, 'undef', 'throw']) | CodeRef;
+declare OnQueryFailure, as Enum( [ \1, 'undef', 'throw' ] ) | CodeRef;
 
 #
 # This file is part of Config-XrmDatabase
@@ -44,13 +41,13 @@ Config::XrmDatabase::Types - Types for Config::XrmDatabase;
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SUPPORT
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-config-xrmdatabase@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=Config-XrmDatabase
+Please report any bugs or feature requests to bug-config-xrmdatabase@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=Config-XrmDatabase>
 
 =head2 Source
 

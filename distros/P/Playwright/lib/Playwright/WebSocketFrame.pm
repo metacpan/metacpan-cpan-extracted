@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::WebSocketFrame;
-$Playwright::WebSocketFrame::VERSION = '1.532';
+$Playwright::WebSocketFrame::VERSION = '1.551';
 use parent 'Playwright::Base';
 
 sub new {
@@ -86,7 +86,7 @@ Playwright::WebSocketFrame - Automatically generated class for Playwright::WebSo
 
 =head1 VERSION
 
-version 1.532
+version 1.551
 
 =head1 CONSTRUCTOR
 
@@ -162,7 +162,7 @@ George S. Baugh <teodesian@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2020 Troglodyne LLC
+Copyright (c) 2025 Troglodyne LLC
 
 
 Permission is hereby granted, free of charge, to any person obtaining a copy

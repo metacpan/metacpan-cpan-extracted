@@ -4,7 +4,7 @@
       "Alexey Stavrov <logioniz@ya.ru>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -71,14 +71,15 @@
          "web" : "https://github.com/skbkontur/perl-dbd-avatica"
       }
    },
-   "version" : "0.2.2",
+   "version" : "0.2.3",
    "x_contributors" : [
+      "Andrey Khozov <avkhozov@gmail.com>",
       "Denis Ibaev <dionys@gmail.com>",
       "Ivan Putintsev <uid@rydlab.ru>",
       "uid66 <19481514+uid66@users.noreply.github.com>"
    ],
-   "x_generated_by_perl" : "v5.34.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "x_generated_by_perl" : "v5.26.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
    "x_spdx_expression" : "MIT"
 }
 

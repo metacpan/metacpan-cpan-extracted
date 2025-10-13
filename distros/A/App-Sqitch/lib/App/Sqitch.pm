@@ -23,7 +23,7 @@ use IPC::System::Simple 1.17 qw(runx capturex $EXITVAL);
 use namespace::autoclean 0.16;
 use constant ISWIN => $^O eq 'MSWin32';
 
-our $VERSION = 'v1.5.2'; # VERSION
+our $VERSION = 'v1.6.0'; # VERSION
 
 BEGIN {
     # Force Locale::TextDomain to encode in UTF-8 and to decode all messages.
@@ -112,8 +112,9 @@ has user_email => (
             || $self->config->get( key => 'user.email' )
             || $ENV{ SQITCH_ORIG_EMAIL }
         || do {
-            my $sysname = $self->sysuser || hurl user => __(
-                'Cannot infer your email address; run sqitch config --user user.email you@host.com'
+            my $sysname = $self->sysuser || hurl user => __x(
+                'Cannot infer your email address; run sqitch config --user user.email {email}',
+                email => 'you@example.com',
             );
             require Sys::Hostname;
             "$sysname@" . Sys::Hostname::hostname();

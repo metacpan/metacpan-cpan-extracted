@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Data Dump Beautifier - ~/lib/Data/Pretty.pm
-## Version v0.1.9
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v0.2.0
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/08/06
-## Modified 2024/02/13
+## Modified 2025/10/08
 ## All rights reserved
 ## 
 ## 
@@ -28,7 +28,7 @@ BEGIN
     @EXPORT = qw( dd ddx );
     @EXPORT_OK = qw( dump pp dumpf literal quote );
     our $DEBUG = 0;
-    our $VERSION = 'v0.1.9';
+    our $VERSION = 'v0.2.0';
 };
 
 use strict;
@@ -265,21 +265,41 @@ my %esc = (
 );
 
 # put a string value in double quotes
-sub quote {
-    local($_) = $_[0];
-    # If there are many '"' we might want to use qq() instead
-    s/([\\\"\@\$])/\\$1/g;
-    return qq("$_") unless /[^\040-\176]/;  # fast exit
+sub quote
+{
+    local( $_ ) = $_[0];
 
+    # Escape backslash, double quote, and sigils
+    s/([\\\"\@\$])/\\$1/g;
+
+    # Fast exit if printable 7-bit ASCII only
+    return qq("$_") unless /[^\040-\176]/;
+
+    # Named C0 escapes first
     s/([\a\b\t\n\f\r\e])/$esc{$1}/g;
 
-    # no need for 3 digits in escape for these
-    s/([\0-\037])(?!\d)/sprintf('\\%o',ord($1))/eg;
+    # Remaining C0 controls: octal if NOT followed by a digit
+    s/([\0-\037])(?!\d)/sprintf('\\%o', ord($1))/eg;
 
-    s/([\0-\037\177-\377])/sprintf('\\x%02X',ord($1))/eg;
-    unless( $SHOW_UTF8 )
+    if( $SHOW_UTF8 && utf8::is_utf8( $_ ) )
     {
-        $_ =~ s/([^\040-\176])/sprintf('\\x{%X}',ord($1))/eg;
+        # Decoded text: escape only non-printables and DEL.
+        # Use \xHH for <= 0xFF; \x{...} for > 0xFF.
+        s/([^\p{Print}]|\x7F)/
+            ord($1) <= 0xFF
+                ? sprintf('\\x%02X', ord($1))
+                : sprintf('\\x{%X}',   ord($1))
+        /eg;
+    }
+    else
+    {
+        # Bytes / or we don't want to show glyphs:
+        # Convert any remaining controls and 0x7F..0xFF to \xHH first
+        # (this also handles the "control followed by digit" case as \x00).
+        s/([\0-\037\177-\377])/sprintf('\\x%02X', ord($1))/eg;
+
+        # Safety net: anything still outside printable ASCII -> \x{...}
+        s/([^\040-\176])/sprintf('\\x{%X}', ord($1))/eg;
     }
 
     return qq("$_");
@@ -684,7 +704,7 @@ sub _dump
             my $deparse = B::Deparse->new;
             my $code = $deparse->coderef2text( $rval );
             # Don't let our environment influence the code
-            1 while $code =~ s/^\{[\s\n]+use\s(warnings|strict);\n/\{\n/gs;
+            1 while $code =~ s/^\{[\s\n]+use\s(warnings|strict(?:\s'[^\']+')?);\n/\{\n/gs;
             $out = 'sub ' . $code;
         }
         else
@@ -783,7 +803,7 @@ Data::Pretty - Data Dump Beautifier
 
 =head1 VERSION
 
-    v0.1.9
+    v0.2.0
 
 =head1 DESCRIPTION
 

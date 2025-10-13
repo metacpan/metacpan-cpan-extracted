@@ -2,10 +2,9 @@ package Chrome::DevToolsProtocol::Target;
 use 5.020; # for signatures
 use strict;
 use warnings;
-use Moo;
+use Moo 2;
 
-no warnings 'experimental::signatures';
-use feature 'signatures';
+use experimental 'signatures';
 
 use Future;
 use Future::HTTP;
@@ -19,7 +18,7 @@ use PerlX::Maybe;
 
 with 'MooX::Role::EventEmitter';
 
-our $VERSION = '0.73';
+our $VERSION = '0.74';
 our @CARP_NOT;
 
 =head1 NAME
@@ -99,6 +98,17 @@ A premade L<Log::Log4perl> object to act as logger
 has 'receivers' => (
     is => 'ro',
     default => sub { {} },
+);
+
+=item B<app>
+
+If launching Chrome in app mode, connect to this page
+
+=cut
+
+has 'app' => (
+    is => 'ro',
+    default => sub { undef },
 );
 
 =back
@@ -200,7 +210,7 @@ sub add_listener( $self, $event, $callback ) {
     $self->listener->{ $event } ||= [];
     push @{ $self->listener->{ $event }}, $listener;
     weaken $self->listener->{ $event }->[-1];
-    $listener
+    return $listener
 }
 
 =head2 C<< ->remove_listener >>
@@ -290,7 +300,6 @@ sub connect( $self, %args ) {
 
         $done = $done->then(sub {
             my $id = $s->browserContextId;
-
             $s->createTarget(
                 url => $args{ start_url } || 'about:blank',
                 maybe browserContextId => $id,
@@ -332,7 +341,12 @@ sub connect( $self, %args ) {
             $s->getTargets()
         })->then(sub( @tabs ) {
             my $res;
-            my @visible_tabs = grep { $_->{type} eq 'page' && $_->{targetId} } @tabs;
+            my @visible_tabs;
+            if( $args{ app } // $self->app ) {
+                @visible_tabs = grep { $_->{type} eq 'app' && $_->{targetId} } @tabs;
+            } else {
+                @visible_tabs = grep { $_->{type} eq 'page' && $_->{targetId} } @tabs;
+            }
             if( ! @visible_tabs ) {
                 $res = $s->createTarget(
                     url => $args{ start_url } || 'about:blank',
@@ -378,7 +392,9 @@ Shut down the connection to our tab and close it.
 =cut
 
 sub close( $self ) {
-    $self->transport->closeTarget(targetId => $self->targetId );
+    if( my $t = $self->transport) {
+        $t->closeTarget(targetId => $self->targetId );
+    }
 }
 
 sub DESTROY( $self ) {
@@ -505,6 +521,8 @@ sub on_response( $self, $connection, $message ) {
 
         } elsif( $response->{error} ) {
             $self->log( 'debug', "Replying to error $response->{id}", $response );
+            # It would be nice if Future had ->croak(), so we could report
+            # the error on the line that originally called us maybe
             $receiver->die( join "\n", $response->{error}->{message},$response->{error}->{data} // '',$response->{error}->{code} // '');
         } else {
             $self->log( 'trace', "Replying to $response->{id}", $response );
@@ -571,18 +589,18 @@ sub _send_packet( $self, $response, $method, %params ) {
     weaken $s;
 
     my $payload = eval {
-        $self->json->encode({
+        $s->json->encode({
             id     => 0+$id,
             method => $method,
             params => \%params
         });
     };
     if( my $err = $@ ) {
-        $self->log('error', $@ );
-        $self->log('error', Dumper \%params );
+        $s->log('error', $@ );
+        $s->log('error', Dumper \%params );
     };
 
-    $self->log( 'trace', "Sent message", $payload );
+    $s->log( 'trace', "Sent message", $payload );
     my $result;
     try {
         # this is half right - we get an ack when the message was accepted
@@ -597,8 +615,9 @@ sub _send_packet( $self, $response, $method, %params ) {
             targetId => $s->targetId,
             maybe sessionId => $s->sessionId,
         );
+        $result->set_label('Target.sendMessageToTarget');
     } catch {
-        $self->log('error', $_ );
+        $s->log('error', $_ );
         $result = Future->fail( $_ );
     };
     return $result

@@ -2,11 +2,12 @@ package Iterator::Flex::ArrayLike;
 
 # ABSTRACT: ArrayLike Iterator Class
 
+use v5.28;
 use strict;
 use warnings;
 use experimental 'signatures';
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Ref::Util;
 use Iterator::Flex::Utils ':IterAttrs', 'resolve_meth';
@@ -180,7 +181,7 @@ Iterator::Flex::ArrayLike - ArrayLike Iterator Class
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 METHODS
 
@@ -239,8 +240,6 @@ The returned iterator supports the following capabilities:
 =item freeze
 
 =back
-
-=head1 INTERNALS
 
 =head1 SUPPORT
 

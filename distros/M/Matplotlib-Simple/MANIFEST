@@ -1,0 +1,27 @@
+Makefile.PL
+MANIFEST			This list of files
+mpl.examples.pl
+mpl.pm
+output.images/barplots.png
+output.images/boxplot.png
+output.images/hexbin.png
+output.images/hist2d.png
+output.images/histogram.png
+output.images/pie.png
+output.images/plot.png
+output.images/plot.single.png
+output.images/scatterplots.png
+output.images/single.array.png
+output.images/single.barplot.png
+output.images/single.boxplot.png
+output.images/single.hexbin.png
+output.images/single.hist2d.png
+output.images/single.pie.png
+output.images/single.violinplot.png
+output.images/single.wide.png
+output.images/violin.png
+output.images/wide.subplots.png
+README.md
+README.pod
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

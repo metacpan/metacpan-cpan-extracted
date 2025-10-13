@@ -12,6 +12,7 @@ lib/Daje/Database/Model/Super/Common/Base.pm
 lib/Daje/Database/Model/Super/Companies.pm
 lib/Daje/Database/Model/Super/CompaniesUsers.pm
 lib/Daje/Database/Model/Super/CompanyType.pm
+lib/Daje/Database/Model/Super/DocumentBuilder.pm
 lib/Daje/Database/Model/Super/Users.pm
 lib/Daje/Database/Model/Super/Workflow.pm
 lib/Daje/Database/Model/Users.pm

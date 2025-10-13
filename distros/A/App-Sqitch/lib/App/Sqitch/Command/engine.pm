@@ -18,7 +18,7 @@ use constant extra_target_keys => qw(target);
 extends 'App::Sqitch::Command';
 with 'App::Sqitch::Role::TargetConfigCommand';
 
-our $VERSION = 'v1.5.2'; # VERSION
+our $VERSION = 'v1.6.0'; # VERSION
 
 sub _chk_engine($) {
     my $engine = shift;

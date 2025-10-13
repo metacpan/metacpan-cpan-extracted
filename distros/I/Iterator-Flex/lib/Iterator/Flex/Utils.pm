@@ -2,14 +2,13 @@ package Iterator::Flex::Utils;
 
 # ABSTRACT: Internal utilities
 
-use 5.28.0;    # hash slices
-
+use v5.28;
 use strict;
 use warnings;
 
 use experimental 'signatures', 'postderef';
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Scalar::Util qw( refaddr );
 use Ref::Util    qw( is_hashref );
@@ -70,7 +69,7 @@ our %EXPORT_TAGS = (
     RegistryIndices   => [
         REGISTRY_INDICES,        REGISTRY_ITERATION_INDICES,
         '%RegIterationIndexMap', REGISTRY_GENPAR_INDICES,
-        '%RegGeneralParameterIndexMap'
+        '%RegGeneralParameterIndexMap',
     ],
     IterAttrs           => [ITER_ATTRS],
     IterStates          => [ITER_STATES],
@@ -83,7 +82,7 @@ our %EXPORT_TAGS = (
           can_meth
           resolve_meth
           load_role
-        )
+        ),
     ],
     default => [qw( %REGISTRY refaddr )],
 );
@@ -259,7 +258,7 @@ sub load_module ( $path, @namespaces ) {
 
     throw_failure(
         class => join q{ },
-        "unable to find a module for '$path' in @{[ join( ', ', @namespaces ) ]}"
+        "unable to find a module for '$path' in @{[ join( ', ', @namespaces ) ]}",
     );
 }
 
@@ -302,7 +301,7 @@ Iterator::Flex::Utils - Internal utilities
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 SUBROUTINES
 
@@ -367,7 +366,7 @@ Loads the named module.  If C<$module> begins with a C<+> it is
 assumed to be a fully qualified module name, otherwise it is searched
 for in the namespaces provided by C<@namespaces> (which defaults to
 the namespaces returned by the C<<
-L<_namespaces|Iterator::Flex::Base/_namespaces> >> class method.
+L<_namespaces|Iterator::Flex::Base/_namespaces> >> class method).
 
 Throws C<Iterator::Flex::Failure::class> if it couldn't require
 the module (for whatever reason).
@@ -379,8 +378,6 @@ the module (for whatever reason).
 Loads the named role.  If C<$role> begins with a C<+>, it is assumed
 to be a fully qualified name, otherwise it is searched for in the
 C<@namespaces>
-
-=head1 INTERNALS
 
 =head1 SUPPORT
 

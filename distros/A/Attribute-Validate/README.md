@@ -59,6 +59,50 @@ Enforces the caller to use this sub in Void Context and do nothing with the retu
 
 Enforces the caller to do something with the return of a sub to avoid programmer errors and assumptions.
 
+## ListContext
+
+    sub only_use_in_list_context: ListContext {
+        return (0..10);
+    }
+    my $list = only_use_in_list_context(); # Dies
+    only_use_in_list_context(); # Dies
+    my @list = only_use_in_list_context(); # Works
+
+Enforces the caller to use the subroutine in List Context to prevent errors and misunderstandings.
+
+## NoListContext
+
+    sub never_use_in_list_context: NoListContext {
+        return 'scalar_or_void';
+    }
+    my $list = never_use_in_list_context(); # Works
+    never_use_in_list_context(); # Works
+    my @list = never_use_in_list_context(); # Dies
+
+Enforces the caller to never use the subroutine in List Context to prevent errors and misunderstandings.
+
+## ScalarContext
+
+    sub only_use_in_scalar_context: ScalarContext {
+        return 'hey';
+    }
+    my @scalar = only_use_in_scalar_context(); # Dies
+    only_use_in_scalar_context(); # Dies
+    my $scalar = only_use_in_scalar_context(); # Works
+
+Enforces the caller to use the subroutine in Scalar Context to prevent errors and misunderstandings.
+
+## NoScalarContext
+
+    sub never_scalar_context: NoScalarContext {
+        return @array;
+    }
+    my @list = never_scalar_context(); # Works
+    never_scalar_context(); # Works
+    my $scalar = never_scalar_context(); # Dies
+
+Enforces the caller to never use the subroutine in Scalar Context to prevent errors and misunderstandings.
+
 # EXPORTABLE SUBROUTINES
 
 ## anon\_requires

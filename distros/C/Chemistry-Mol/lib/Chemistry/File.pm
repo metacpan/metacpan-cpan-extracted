@@ -1,6 +1,6 @@
 package Chemistry::File;
 
-our $VERSION = '0.39'; # VERSION
+our $VERSION = '0.40'; # VERSION
 
 =head1 NAME
 

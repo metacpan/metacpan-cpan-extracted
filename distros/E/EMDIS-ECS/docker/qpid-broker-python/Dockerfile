@@ -13,12 +13,12 @@
 #    directory.
 #
 #    cp ../dist/certfiles.tar.gz .
-#    docker build -t perlecs/qpid-broker-python:0.46-1 .
+#    docker build -t perlecs/qpid-broker-python:0.47-1 .
 #
 # 3) Run a Docker container based on the image.  This automatically starts the
 #    Python AMQP test broker.
 #
-#    docker run --rm -it --name=perlecs_qpid_broker_py  perlecs/qpid-broker-python:0.46-1
+#    docker run --rm -it --name=perlecs_qpid_broker_py  perlecs/qpid-broker-python:0.47-1
 #
 # 4) Optionally, open an interactive shell session in the running container
 #
@@ -29,7 +29,7 @@
 FROM rockylinux:9
 LABEL Maintainer="Joel Schneider <joel@joelschneider.net>"
 LABEL Description="Apache Qpid Broker - Python"
-LABEL Version="0.46"
+LABEL Version="0.47"
 
 # update installed packages
 RUN yum -y update

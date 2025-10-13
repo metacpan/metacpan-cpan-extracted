@@ -90,7 +90,7 @@ C<method : void ($ws : L<Mojo::Transaction::WebSocket|SPVM::Mojo::Transaction::W
 
 Examples:
 
-  $ws->on(json => method : void ($ws : Mojo::Transaction::WebSocket, $hash : object) { say "Message: " . $hash->(Hash)->get_string("msg"); });
+  $ws->on(json => method : void ($ws : Mojo::Transaction::WebSocket, $hash : object) { say "Message: " . $hash->(Hash)->{"msg"}->(string); });
 
 =head2 message
 

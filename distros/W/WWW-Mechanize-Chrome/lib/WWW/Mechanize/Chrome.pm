@@ -28,8 +28,9 @@ use POSIX ':sys_wait_h';
 use Future::Utils 'repeat';
 use Time::HiRes ();
 use Encode 'encode';
+use Text::ParseWords 'shellwords';
 
-our $VERSION = '0.73';
+our $VERSION = '0.74';
 our @CARP_NOT;
 
 # We don't yet inherit from Moo 2, so patch up things manually
@@ -207,6 +208,9 @@ Results my vary for your operating system. Use the full path to the browser's
 executable if you are having issues. You can also set the name of the executable
 file with the C<$ENV{CHROME_BIN}> environment variable.
 
+Additional arguments for the command are also read from the C<<$ENV{WWW_MECHANIZE_CHROME_ARGS}>>
+variable and prepended to the C<launch_arg> array.
+
 =item B<cleanup_signal>
 
     cleanup_signal => 'SIGKILL'
@@ -220,7 +224,8 @@ will be C<TERM>, on OSX and Windows it will be C<KILL>.
 
 By default, the browser will open with a blank tab. Use the C<start_url> option
 to open the browser to the specified URL. More typically, the C<< ->get >>
-method is use to navigate to URLs.
+method is use to navigate to URLs. Using C<start_url> means you don't
+get notified when the URL has finished loading.
 
 =item B<launch_arg>
 
@@ -239,7 +244,20 @@ Examples of other useful parameters include:
 
     '--load-extension'
     '--no-sandbox'
+
+If you don't want the browser to use your OS password store, add:
+
     '--password-store=basic'
+
+Also see
+L<https://peter.sh/experiments/chromium-command-line-switches/>
+for a list of command line arguments that Chrome actually has in the source
+code.
+
+Additional arguments for the command are also read from the
+C<<$ENV{WWW_MECHANIZE_CHROME_ARGS}>>
+variable and prepended to the C<launch_arg> array.
+
 
 =item B<separate_session>
 
@@ -443,8 +461,12 @@ sub build_command_line {
     $options->{ no_sandbox } = 1
         if $is_root;     # We need this when running as root
 
-    $options->{ launch_arg } ||= [];
+    $options->{ launch_arg } //= [];
     $options->{ exclude_switches } ||= [];
+
+    if( my $env = $ENV{WWW_MECHANIZE_CHROME_ARGS}) {
+        unshift $options->{launch_arg}->@*, shellwords( $env );
+    }
 
     # We want to read back the URL we can use to talk to Chrome
     if( $^O =~ /mswin/i ) {
@@ -501,6 +523,10 @@ sub build_command_line {
         push @{ $options->{ launch_arg }}, "--temp-profile";
     }
 
+    if( $options->{silent_launch}) {
+        push @{ $options->{ launch_arg }}, "--silent-launch";
+    }
+
     if( $options->{enable_automation}) {
         push @{ $options->{ launch_arg }}, "--enable-automation";
     };
@@ -521,12 +547,13 @@ sub build_command_line {
         push @{ $options->{ launch_arg }}, "--no-default-browser-check";
     };
 
-    my $no_sandbox = $options->{no_sandbox} || ! (exists $options->{no_zygote});
-    if( ! $no_sandbox) {
+    #my $no_sandbox = $options->{no_sandbox} || ! (exists $options->{no_zygote});
+    if( $options->{no_zygote}) {
         push @{ $options->{ launch_arg }}, "--no-zygote";
     };
 
-    if( $no_sandbox ) {
+    #my $no_sandbox = $options->{no_sandbox} || ! (exists $options->{no_zygote});
+    if( $options->{no_sandbox} || $is_root ) {
         push @{ $options->{ launch_arg }}, "--no-sandbox";
     };
 
@@ -579,6 +606,11 @@ sub build_command_line {
     if( $options->{ app } ) {
         $options->{start_url} //= 'data:text/html,<html></html>';
         push @{ $options->{ launch_arg }}, "--app=$options->{start_url}";
+
+    } elsif( my $dir = $options->{ app_dir } ) {
+        # Be Electron-like
+        #$options->{start_url} //= 'data:text/html,<html></html>';
+        push @{ $options->{ launch_arg }}, "--load-and-launch-app=$dir";
 
     } elsif( exists $options->{start_url}) {
         push @{ $options->{ launch_arg }}, "$options->{start_url}"
@@ -1042,8 +1074,7 @@ sub new_future($class, %options) {
               log         => $options{ log },
         maybe json_log_fh => delete $options{ json_log_fh },
     );
-
-    $options{ target } ||= Chrome::DevToolsProtocol::Target->new(
+    $options{ target } //= Chrome::DevToolsProtocol::Target->new(
         auto_close => 0,
         transport  => delete $options{ driver_transport },
         error_handler => sub {
@@ -1130,10 +1161,17 @@ sub new( $class, %args ) {
 }
 
 sub _setup_driver_future( $self, %options ) {
+    if( $options{ app_dir }) {
+        # Give Chrome a second to start up, even if that means our App
+        # starts slow
+        sleep 1;
+    };
+
     $self->target->connect(
         new_tab          => !$options{ existing_tab } || $options{ new_tab },
         tab              => $options{ tab },
         #reuse            => $options{ reuse_transport },
+        app              => $options{ app_dir },
         separate_session => $options{ separate_session },
         start_url        => $options{ start_url } ? "".$options{ start_url } : undef,
     )->catch( sub(@args) {
@@ -1143,7 +1181,7 @@ sub _setup_driver_future( $self, %options ) {
             $err .= $args[1]->{Reason};
         };
         Future->fail( $err );
-    })
+    });
 }
 
 # This (tries to) connects to the devtools in the browser
@@ -1189,8 +1227,8 @@ sub _connect( $self, %options ) {
             $s->target->send_message('Page.enable'),    # capture DOMLoaded
             $s->target->send_message('Network.enable'), # capture network
             $s->target->send_message('Runtime.enable'), # capture console messages
-            #$self->target->send_message('Debugger.enable'), # capture "script compiled" messages
-            $s->set_download_directory_future($self->{download_directory}),
+            $s->target->send_message('Debugger.enable'), # capture "script compiled" messages
+            $s->set_download_directory_future($s->{download_directory}),
 
             $s->_listen_for_popup_f(1),
 
@@ -1219,6 +1257,7 @@ sub _connect( $self, %options ) {
                 $s->_clear_cached_document;
             });
         });
+        return $res
     });
 
     return $res
@@ -1849,15 +1888,18 @@ This method is special to WWW::Mechanize::Chrome.
 
 =cut
 
-sub eval_in_page($self,$str, %options) {
+sub eval_in_page_future($self,$str, %options) {
     # Report errors from scope of caller
     # This feels weirdly backwards here, but oh well:
     local @Chrome::DevToolsProtocol::CARP_NOT
         = (@Chrome::DevToolsProtocol::CARP_NOT, (ref $self)); # we trust this
     local @CARP_NOT
         = (@CARP_NOT, 'Chrome::DevToolsProtocol', (ref $self)); # we trust this
-    my $result = $self->target->evaluate("$str", %options)->get;
+    return $self->target->evaluate("$str", %options);
+}
 
+sub eval_in_page( $self, $str, %options) {
+    my $result = $self->eval_in_page_future("$str", %options)->get;
     if( $result->{error} ) {
         $self->signal_condition(
             join "\n", grep { defined $_ }
@@ -1883,6 +1925,7 @@ sub eval_in_page($self,$str, %options) {
 {
     no warnings 'once';
     *eval = \&eval_in_page;
+    *eval_future = \&eval_in_page_future;
 }
 
 =head2 C<< $mech->eval_in_chrome $code, @args >>
@@ -2019,14 +2062,20 @@ Tear down all connections and shut down Chrome.
 
 =cut
 
+my @closing;
 sub close {
     my $pids = delete $_[0]->{pid};
     #if( $_[0]->{autoclose} and $_[0]->tab and my $tab_id = $_[0]->tab->{id} ) {
     #    $_[0]->target->close_tab({ id => $tab_id })->get();
     #};
     if( $_[0]->{autoclose} and $_[0]->target and $_[0]->tab  ) {
-        $_[0]->target->close->retain();
-        #$_[0]->target->close->get(); # just to see if there is an error
+        my $c = $_[0]->target->close;
+        $c->set_label('close()');
+        if( ${^GLOBAL_PHASE} eq 'DESTRUCT' ) {
+            $c->retain();
+        } else {
+            $c->get; # just to see if there is an error
+        }
     };
 
     #if( $pid and $_[0]->{cached_version} > 65) {
@@ -2105,7 +2154,6 @@ sub kill_child( $self, $signal, $pids, $wait_file ) {
 }
 
 sub DESTROY {
-    #warn "Closing mechanize";
     $_[0]->close();
     %{ $_[0] }= (); # clean out all other held references
 }
@@ -2933,14 +2981,15 @@ sub set_download_directory_future( $self, $dir="" ) {
     if( "" eq $dir ) {
         $res = $self->target->send_message('Page.setDownloadBehavior',
             behavior => 'deny',
-        )
+        );
+
     } else {
         $res = $self->target->send_message('Page.setDownloadBehavior',
             behavior => 'allow',
             downloadPath => $dir
         )
     };
-    $res
+    return $res
 };
 
 sub set_download_directory( $self, $dir="" ) {
@@ -3293,6 +3342,9 @@ sub _cached_document($self) {
             #warn "Have fresh document";
             $s->{_document} = $d;
             Future->done( $s->{_document} )
+        })->catch(sub(@error) {
+            use Data::Dumper;
+            warn "Error while retrieving document:".Dumper \@error;
         });
     }
 }
@@ -3453,9 +3505,9 @@ The value passed in as C<$html> will be stringified.
 
 =cut
 
-sub update_html( $self, $content ) {
+sub update_html_future( $self, $content ) {
     my $doc = $self->_cached_document;
-    $doc->then(sub( $root ) {
+    return $doc->then(sub( $root ) {
         # Find "HTML" child node:
         my $nodeId = $root->{root}->{children}->[0]->{nodeId};
         my $id;
@@ -3476,6 +3528,10 @@ sub update_html( $self, $content ) {
                 warn Dumper $nodeInfo;
                 $self->target->send_message('DOM.requestNode', objectId => $nodeInfo->{object}->{objectId})
                 #return Future->done( $nodeInfo->{node}->{nodeId} )
+            })->catch(sub( @error ) {
+                use Data::Dumper;
+                warn "Couldn't find node: @error";
+                warn Dumper \@error;
             })->then(sub ( $node ) {
 
                 # Implicitly, @parentNodes has been filled ...
@@ -3501,9 +3557,12 @@ sub update_html( $self, $content ) {
             # Also, we need to wait for a DOM.documentUpdated here before querying
             # again ... do we?!
         });
-     })->get;
+     });
 };
 
+sub update_html( $self, $content ) {
+    $self->update_html_future($content)->get
+}
 =head2 C<< $mech->base() >>
 
   print $mech->base;
@@ -6552,7 +6611,9 @@ sub _handleScreencastFrame( $self, $frame ) {
         sessionId => 0+$frame->{params}->{sessionId} )->then(sub {
             $s->log('trace', 'Screencast frame acknowledged');
             $frame->{params}->{data} = decode_base64( $frame->{params}->{data} );
-            $s->{ screenFrameCallback }->( $s, $frame->{params} );
+            if( my $cb = $s->{ screenFrameCallback }) {
+                $cb->( $s, $frame->{params} );
+            }
             Future->done();
     })->retain;
 }
@@ -6703,6 +6764,10 @@ See L<WWW::Mechanize::Chrome::Install>
 
 =item *
 
+L<https://chromedevtools.github.io/devtools-protocol/> - the Chrome DevTools Protocol
+
+=item *
+
 L<https://developer.chrome.com/devtools/docs/debugging-clients> - the Chrome
 DevTools homepage
 
@@ -6740,6 +6805,8 @@ browser
 L<https://multilogin.com/why-mimicking-a-device-is-almost-impossible/>
 
 L<https://github.com/berstend/puppeteer-extra/tree/master/packages/puppeteer-extra-plugin-stealth>
+
+L<https://rebrowser.net/blog/how-to-access-main-context-objects-from-isolated-context-in-puppeteer-and-playwright>
 
 =head1 REPOSITORY
 

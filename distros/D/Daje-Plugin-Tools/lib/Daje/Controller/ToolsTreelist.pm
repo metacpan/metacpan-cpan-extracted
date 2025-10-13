@@ -44,9 +44,9 @@ sub load_treelist($self) {
     my $tools_projects_pkey = $self->param('tools_projects_pkey');
 
     $self->tools_helper_treelist->load_treelist($tools_projects_pkey)->then(sub ($result){
-        $self->render(json => $result->{data});
+        $self->render(json => { data => $result->{data}, result => => 1 });
     })->catch(sub ($err) {
-        $self->render(json => { 'result' => 'failed', data => $err });
+        $self->render(json => { 'result' => 0, data => $err });
     });
 }
 

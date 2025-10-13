@@ -6,6 +6,7 @@ use warnings;
 use base qw{ PPIx::Regexp::Support };
 
 use Carp qw{ carp croak confess };
+use PPI::Document;
 use PPIx::Regexp::Constant qw{
     ARRAY_REF
     CODE_REF
@@ -57,7 +58,7 @@ use PPIx::Regexp::Util qw{
 
 use Scalar::Util qw{ looks_like_number };
 
-our $VERSION = '0.090';
+our $VERSION = '0.091';
 
 our $DEFAULT_POSTDEREF;
 defined $DEFAULT_POSTDEREF

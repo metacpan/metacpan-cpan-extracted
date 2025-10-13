@@ -59,6 +59,6 @@
          "url" : "https://github.com/nigelhorne/Test-HTTPStatus"
       }
    },
-   "version" : "2.11",
+   "version" : "2.12",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

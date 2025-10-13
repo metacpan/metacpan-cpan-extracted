@@ -1,3 +1,11 @@
+0.171		2025-10-06	T. R. Wyant
+    Deprecate mccants() arguments 'mcnames' and 'vsnames'. The
+    underlying files have been removed from the web site. This is an
+    accellerated deprecation. This commit causes the arguments to warn
+    on every use in addition to the 404 error caused by the removal. Six
+    months from the release of Astro-SpaceTrack 0.171 these arguments
+    will be made into a fatal error.
+
 0.170		2025-09-18	T. R. Wyant
     All iridium functionality now warns (at least) on all uses.
 

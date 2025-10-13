@@ -1,6 +1,6 @@
 package Bio::MUST::Drivers::Blast;
 # ABSTRACT: Bio::MUST driver for running the NCBI-BLAST+ suite of programs
-$Bio::MUST::Drivers::Blast::VERSION = '0.251060';
+$Bio::MUST::Drivers::Blast::VERSION = '0.252830';
 use strict;
 use warnings;
 
@@ -19,7 +19,7 @@ Bio::MUST::Drivers::Blast - Bio::MUST driver for running the NCBI-BLAST+ suite o
 
 =head1 VERSION
 
-version 0.251060
+version 0.252830
 
 =head1 SYNOPSIS
 

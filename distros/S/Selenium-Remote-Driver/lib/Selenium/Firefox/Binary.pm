@@ -1,5 +1,5 @@
 package Selenium::Firefox::Binary;
-$Selenium::Firefox::Binary::VERSION = '1.49';
+$Selenium::Firefox::Binary::VERSION = '1.50';
 use strict;
 use warnings;
 
@@ -32,14 +32,16 @@ q/We couldn't find a viable firefox.EXE; you may want to specify it via the bina
 
 sub _firefox_darwin_path {
     my $default_firefox =
+      '/Applications/Firefox.app/Contents/MacOS/firefox';
+    my $default_firefox_bin =
       '/Applications/Firefox.app/Contents/MacOS/firefox-bin';
 
-    if ( -e $default_firefox && -x $default_firefox ) {
-        return $default_firefox;
+    for my $path ( $default_firefox_bin, $default_firefox ) {
+        if ( -e $path && -x $path ) {
+            return $path;
+        }
     }
-    else {
-        return which('firefox-bin');
-    }
+    return which('firefox-bin') || which('firefox');
 }
 
 sub _firefox_unix_path {
@@ -126,7 +128,7 @@ Selenium::Firefox::Binary - Subroutines for locating and properly initializing t
 
 =head1 VERSION
 
-version 1.49
+version 1.50
 
 =head1 SUBROUTINES
 

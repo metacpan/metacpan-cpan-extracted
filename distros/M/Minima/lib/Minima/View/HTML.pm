@@ -45,15 +45,15 @@ ADJUST {
     if (exists $config->{templates_dir}) {
         if (ref $config->{templates_dir} eq ref []) {
             $self->add_directory($_)
-                for @{ $config->{templates_dir} };
+                for reverse @{ $config->{templates_dir} };
         }
     } else {
-        $self->add_directory('templates');
         $self->add_directory('js');
+        $self->add_directory('templates');
     }
 }
 
-method add_directory        ($d) { push @include, $app->path($d) }
+method add_directory        ($d) { unshift @include, $app->path($d) }
 method clear_directories         { @include = () }
 method set_template         ($t) { $template = $self->_ext($t) }
 method add_before_template  ($p) { push @before_template, $self->_ext($p) }
@@ -81,10 +81,18 @@ method set_compound_title ($t, $d = undef)
 method set_description      ($d) { $content{description} = $d }
 method add_header_script    ($s) { push @{$content{header_scripts}}, $s }
 method add_header_css       ($c) { push @{$content{header_css}}, $c }
-method add_body_open        ($p) { push @{$content{body_open}}, $p }
-method add_body_close       ($p) { push @{$content{body_close}}, $p }
 method add_script           ($s) { push @{$content{scripts}}, $s }
 method add_class            ($c) { push @{$content{classes}}, $c }
+
+method add_body_open ($p)
+{
+    push @{$content{body_open}}, $self->_ext($p)
+}
+
+method add_body_close ($p)
+{
+    push @{$content{body_close}}, $self->_ext($p)
+}
 
 method prepare_response ($response)
 {
@@ -371,12 +379,20 @@ Adds the passed template name to the pre-template list.
 Adds the passed template name to the template list for the insertion
 point immediatelly before the closing C<E<lt>/bodyE<gt>> tag.
 
+If no file extension is provided, the one defined by the
+L<C<template_ext>|/template_ext> configuration key is automatically
+added.
+
 =head2 add_body_open
 
     method add_body_open ($template)
 
 Adds the passed template name to the template list for the insertion
 point immediatelly after the opening C<E<lt>bodyE<gt>> tag.
+
+If no file extension is provided, the one defined by the
+L<C<template_ext>|/template_ext> configuration key is automatically
+added.
 
 =head2 add_class
 
@@ -388,9 +404,11 @@ Adds the passed class name to the list of L<C<classes>|/classes>.
 
     method add_directory ($directory)
 
-Adds the passed directory as a include path. This method can be called
-multiple times to add multiple paths. Emptying the include list is
-possible with L<C<clear_directories>|/clear_directories>.
+Adds the given directory to the include path, giving it precedence over
+previously added ones. This method can be called multiple times to build
+a search path where the most recently added directory is checked first.
+The include list can be emptied with
+L<C<clear_directories>|/clear_directories>.
 
 See also: L<C<templates_dir>|/templates_dir>.
 

@@ -8,7 +8,7 @@ use Scalar::Util 'weaken';
 use Mojo::IOLoop::Stream;
 use Future::Mojo;
 
-our $VERSION = '0.73';
+our $VERSION = '0.74';
 
 =head1 NAME
 
@@ -88,7 +88,10 @@ sub close( $self ) {
 }
 
 sub future {
-    Future::Mojo->new
+    my $f = Future::Mojo->new;
+    # for tracing where futures get lost later
+    # use Carp 'cluck'; cluck "new: $f";
+    return $f
 }
 
 =head2 C<< $transport->sleep( $seconds ) >>

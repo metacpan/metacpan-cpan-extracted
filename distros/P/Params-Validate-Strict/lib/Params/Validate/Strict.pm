@@ -18,11 +18,11 @@ Params::Validate::Strict - Validates a set of parameters against a schema
 
 =head1 VERSION
 
-Version 0.14
+Version 0.15
 
 =cut
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 =head1 SYNOPSIS
 
@@ -90,7 +90,7 @@ The schema can define the following rules for each parameter:
 =item * C<type>
 
 The data type of the parameter.
-Valid types are C<string>, C<integer>, C<number>, C<boolean>, C<hashref>, C<arrayref>, C<object> and C<coderef>.
+Valid types are C<string>, C<integer>, C<number>, C<float> C<boolean>, C<hashref>, C<arrayref>, C<object> and C<coderef>.
 
 =item * C<can>
 
@@ -152,7 +152,7 @@ Extends the validation to individual elements of arrays.
 
   tags => {
     type => 'arrayref',
-    element_type => 'number',
+    element_type => 'number',	# Float means the same
     min => 1,	# this is the length of the array, not the min value for each of the numbers. For that, add a C<schema> rule
     max => 5
   }
@@ -358,9 +358,9 @@ sub validate_strict
 							}
 						}
 						$value = int($value); # Coerce to integer
-					} elsif($type eq 'number') {
+					} elsif(($type eq 'number') || ($type eq 'float')) {
 						if(!defined($value)) {
-							next;	# Skip if string is undefined
+							next;	# Skip if number is undefined
 						}
 						if(!Scalar::Util::looks_like_number($value)) {
 							if($rules->{'error_message'}) {
@@ -402,7 +402,7 @@ sub validate_strict
 						} elsif(($value eq 'false') || ($value eq 'off')) {
 							$value = 0;
 						}
-						if(($value != 1) && ($value != 0)) {
+						if(($value ne '1') && ($value ne '0')) {	# Do string compare
 							if($rules->{'error_message'}) {
 								_error($logger, $rules->{'error_message'});
 							} else {
@@ -441,7 +441,7 @@ sub validate_strict
 							if($rules->{'error_message'}) {
 								_error($logger, $rules->{'error_message'});
 							} else {
-								_error($logger, "validate_strict: String parameter '$key' too short, must be at least length $rule_value");
+								_error($logger, "validate_strict: String parameter '$key' too short (" . length($value) . "), must be at least length $rule_value");
 							}
 						}
 					} elsif($rules->{'type'} eq 'arrayref') {
@@ -473,7 +473,7 @@ sub validate_strict
 								_error($logger, "validate_strict: Parameter '$key' must contain at least $rule_value keys");
 							}
 						}
-					} elsif(($rules->{'type'} eq 'integer') || ($rules->{'type'} eq 'number')) {
+					} elsif(($rules->{'type'} eq 'integer') || ($rules->{'type'} eq 'number') || ($rules->{'type'} eq 'float')) {
 						if(!defined($value)) {
 							next;	# Skip if hash is undefined
 						}
@@ -531,7 +531,7 @@ sub validate_strict
 								_error($logger, "validate_strict: Parameter '$key' must contain no more than $rule_value keys");
 							}
 						}
-					} elsif(($rules->{'type'} eq 'integer') || ($rules->{'type'} eq 'number')) {
+					} elsif(($rules->{'type'} eq 'integer') || ($rules->{'type'} eq 'number') || ($rules->{'type'} eq 'float')) {
 						if(!defined($value)) {
 							next;	# Skip if hash is undefined
 						}
@@ -568,7 +568,7 @@ sub validate_strict
 						}
 					};
 					if($@) {
-						_error($logger, "validate_strict: Parameter '$key' invalid regex '$rule_value': $@");
+						_error($logger, "validate_strict: Parameter '$key' regex '$rule_value' error: $@");
 					}
 				} elsif($rule_name eq 'nomatch') {
 					if($rules->{'type'} eq 'arrayref') {
@@ -592,7 +592,7 @@ sub validate_strict
 						next;	# Skip if string is undefined
 					}
 					if(ref($rule_value) eq 'ARRAY') {
-						if(($rules->{'type'} eq 'integer') || ($rules->{'type'} eq 'number')) {
+						if(($rules->{'type'} eq 'integer') || ($rules->{'type'} eq 'number') || ($rules->{'type'} eq 'float')) {
 							unless(List::Util::any { $_ == $value } @{$rule_value}) {
 								if($rules->{'error_message'}) {
 									_error($logger, $rules->{'error_message'});
@@ -674,7 +674,7 @@ sub validate_strict
 										_error($logger, "$key can only contain numbers (found $member)");
 									}
 								}
-							} elsif($rule_value eq 'number') {
+							} elsif(($rule_value eq 'number') || ($rule_value eq 'float')) {
 								if(ref($member) || ($member !~ /^[-+]?(\d*\.\d+|\d+\.?\d*)$/)) {
 									if($rules->{'error_message'}) {
 										_error($logger, $rules->{'error_message'});

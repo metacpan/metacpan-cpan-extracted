@@ -1,6 +1,8 @@
 Revision history for Perl extension Daje-Workflow
 
-0.13 2025-09-14T10:03:13Z
+0.16 2025-10-04T11:04:15Z
+    - 2025-10-04 Model bugfixed
+    - 2025-10-04 Improved documentation
     - Save workflow_pkey for next activity
     - original version
 

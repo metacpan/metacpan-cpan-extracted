@@ -1,11 +1,12 @@
 package Iterator::Flex::Role::Prev::Closure;
 
-# ABSTRACT: Implement C<prev> as a closure stored in the registry
+# ABSTRACT: Implement prev as a closure stored in the registry
 
+use v5.28;
 use strict;
 use warnings;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Iterator::Flex::Utils qw( :default REG_ITERATOR REG_ITER_PREV );
 use Role::Tiny;
@@ -48,11 +49,11 @@ __END__
 
 =head1 NAME
 
-Iterator::Flex::Role::Prev::Closure - Implement C<prev> as a closure stored in the registry
+Iterator::Flex::Role::Prev::Closure - Implement prev as a closure stored in the registry
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 METHODS
 
@@ -63,8 +64,6 @@ version 0.31
    $iterator->prev;
 
 Returns the previous value.
-
-=head1 INTERNALS
 
 =head1 SUPPORT
 

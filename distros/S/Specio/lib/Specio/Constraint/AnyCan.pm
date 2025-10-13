@@ -3,7 +3,7 @@ package Specio::Constraint::AnyCan;
 use strict;
 use warnings;
 
-our $VERSION = '0.52';
+our $VERSION = '0.53';
 
 use List::Util 1.33 ();
 use Role::Tiny::With;
@@ -81,7 +81,7 @@ Specio::Constraint::AnyCan - A class for constraints which require a class name 
 
 =head1 VERSION
 
-version 0.52
+version 0.53
 
 =head1 SYNOPSIS
 

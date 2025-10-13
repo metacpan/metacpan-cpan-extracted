@@ -2,5 +2,5 @@
 
 set -ex
 
-cip exec bash -c 'cd ~ && curl -L https://ziglang.org/download/0.9.1/zig-linux-x86_64-0.9.1.tar.xz | tar Jxf -'
-cip exec bash -c 'mv ~/zig-linux-x86_64-0.9.1 ~/bin'
+cip exec bash -c "cd ~ && curl -L https://ziglang.org/download/0.15.1/zig-x86_64-linux-$ZIG_VERSION.tar.xz | xz -d | tar xf -"
+cip exec bash -c "mv ~/zig-x86_64-linux-$ZIG_VERSION ~/bin"

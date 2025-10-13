@@ -26,6 +26,7 @@ for my $t (@types) {
     );
 }
 
+my $file = __FILE__;
 open my $fh, '<', 't/builtins-sanity.t' or die $!;
 ## no critic (BuiltinFunctions::ProhibitStringyEval, ErrorHandling::RequireCheckingReturnValueOfEval)
 eval do { local $/ = undef; <$fh> };

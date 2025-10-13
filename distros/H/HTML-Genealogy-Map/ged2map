@@ -1,0 +1,340 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use utf8;
+
+use open qw(:std :encoding(UTF-8));
+
+use autodie;
+use CHI;
+use Date::Cmp;
+use File::Basename;
+use File::HomeDir;
+use File::Spec;
+use Gedcom;
+use Geo::Coder::Free;
+use Geo::Coder::List;
+use Geo::Coder::OSM;
+use HTML::GoogleMaps::V3;
+use HTML::OSM;
+
+# Configuration
+my $gedcom_file = $ARGV[0] or die "Usage: $0 <gedcom_file>";
+my $output_file = $ARGV[1] || 'events_map.html';
+my $google_key = $ENV{GMAP_WEBSITE_KEY};
+
+# Initialize GEDCOM parser
+my $ged = Gedcom->new(gedcom_file => $gedcom_file, read_only => 1);
+
+# Initialize geocoder
+my $cache_dir;
+if(my $e = $ENV{'CACHE_DIR'}) {
+	$cache_dir = File::Spec->catfile($e, basename($0));
+} else {
+	$cache_dir = File::Spec->catfile(File::HomeDir->my_home(), '.cache', basename($0));
+}
+my $geocoder = Geo::Coder::List->new(
+	cache => CHI->new(
+		driver => 'File',
+		root_dir => $cache_dir,
+		l1_cache => { driver => 'RawMemory', global => 1, max_size => 1024*1024 }
+	),
+)->push(Geo::Coder::Free::Local->new())->push(Geo::Coder::Free->new())->push(Geo::Coder::OSM->new());
+
+# Storage for events
+my @events;
+
+print "Parsing GEDCOM file...\n";
+
+# Process all individuals
+foreach my $indi ($ged->individuals) {
+	my $name = $indi->name || 'Unknown';
+	$name =~ s/\///g;	# Remove GEDCOM name delimiters
+
+	# Birth events
+	if (my $birth = $indi->birth) {
+		if (ref($birth) && (my $place = $birth->place)) {
+			push @events, {
+				type => 'birth',
+				name => $name,
+				place => $place,
+				date => $birth->date || 'Unknown date',
+			};
+		}
+	}
+
+	# Death events
+	if (my $death = $indi->death) {
+		if (ref($death) && (my $place = $death->place)) {
+			push @events, {
+				type => 'death',
+				name => $name,
+				place => $place,
+				date => $death->date || 'Unknown date',
+			};
+		}
+	}
+}
+
+# Process all families (marriages)
+foreach my $fam ($ged->families) {
+	my $husband = $fam->husband ? ($fam->husband->name || 'Unknown') : 'Unknown';
+	my $wife = $fam->wife ? ($fam->wife->name || 'Unknown') : 'Unknown';
+	$husband =~ s/\///g;
+	$wife =~ s/\///g;
+
+	if (my $marriage = $fam->marriage) {
+		if (ref($marriage) && (my $place = $marriage->place)) {
+			push @events, {
+				type => 'marriage',
+				name => "$husband & $wife",
+				place => $place,
+				date => $marriage->date || 'Unknown date',
+			};
+		}
+	}
+}
+
+print 'Found ', scalar(@events), " events with location data.\n";
+print "Geocoding locations...\n";
+
+# Geocode all events
+my @geocoded_events;
+my %cache;
+
+foreach my $event (@events) {
+	my $place = $event->{place};
+
+	# Check cache
+	unless (exists $cache{$place}) {
+		my $location = $geocoder->geocode(location => $place);
+		if ($location && $location->{lat} && $location->{lon}) {
+			$cache{$place} = {
+				lat => $location->{lat},
+				lon => $location->{lon},
+			};
+			print "\tGeocoded: $place\n";
+			sleep 1 if($location->{'geocoder'} !~ /^Geo::Coder::Free/);	# Be nice to geocoding service
+
+		} else {
+			print "\tFailed to geocode: $place\n";
+			$cache{$place} = undef;
+			sleep 1;	# Be nice to geocoding service
+		}
+	}
+
+	if ($cache{$place}) {
+		push @geocoded_events, {
+			%$event,
+			lat => $cache{$place}{lat},
+			lon => $cache{$place}{lon},
+		};
+	}
+}
+
+print 'Successfully geocoded ', scalar(@geocoded_events), " events.\n";
+print "Generating map...\n";
+
+# Group events by location
+my %location_groups;
+foreach my $event (@geocoded_events) {
+	my $key = sprintf("%.6f,%.6f", $event->{lat}, $event->{lon});
+	push @{$location_groups{$key}}, $event;
+}
+
+# Generate map based on available API key
+if ($google_key) {
+	generate_google_map(\%location_groups, $output_file, $google_key);
+} else {
+	generate_osm_map(\%location_groups, $output_file);
+}
+
+print "Map saved to $output_file\n";
+
+# Generate HTML for grouped events
+sub generate_popup_html {
+	my ($events) = @_;
+
+	my $place = $events->[0]{place};
+	my $event_count = scalar(@$events);
+
+	# Add scrollable container if more than 5 events
+	my $container_start = '';
+	my $container_end = '';
+	if ($event_count > 5) {
+		$container_start = '<div style="max-height: 300px; overflow-y: auto;">';
+		$container_end = '</div>';
+	}
+
+	my $html = "<b>$place</b><br><br>$container_start";
+
+	# Group by type
+	my %by_type;
+	foreach my $event (@$events) {
+		push @{$by_type{$event->{type}}}, $event;
+	}
+
+	# Sort function for dates
+	my $sort_by_date = sub {
+		return 0 if(($a->{'date'} =~ /^Unknown/i) || ($b->{'date'} =~ /^Unknown/));
+		return Date::Cmp::datecmp($a->{'date'}, $b->{'date'});
+	};
+
+	# Add births
+	if ($by_type{birth}) {
+		$html .= "<b>Births:</b><br>";
+		foreach my $event (sort $sort_by_date @{$by_type{birth}}) {
+			$html .= sprintf(
+				'<span style="color: green; font-size: 20px;">●</span> %s (%s)<br>',
+				$event->{name},
+				$event->{date}
+			);
+		}
+		$html .= "<br>";
+	}
+
+	# Add marriages
+	if ($by_type{marriage}) {
+		$html .= "<b>Marriages:</b><br>";
+		foreach my $event (sort $sort_by_date @{$by_type{marriage}}) {
+			$html .= sprintf(
+				'<span style="color: blue; font-size: 20px;">●</span> %s (%s)<br>',
+				$event->{name},
+				$event->{date}
+			);
+		}
+		$html .= "<br>";
+	}
+
+	# Add deaths
+	if ($by_type{death}) {
+		$html .= "<b>Deaths:</b><br>";
+		foreach my $event (sort $sort_by_date @{$by_type{death}}) {
+			$html .= sprintf(
+				'<span style="color: red; font-size: 20px;">●</span> %s (%s)<br>',
+				$event->{name},
+				$event->{date}
+			);
+		}
+	}
+
+	$html .= $container_end;
+
+	return $html;
+}
+
+# Generate Google Maps
+sub generate_google_map {
+	my ($location_groups, $file, $key) = @_;
+
+	my $map = HTML::GoogleMaps::V3->new(
+		key => $key,
+		height => '600px',
+		width => '100%',
+	);
+
+	# Add markers for each location
+	my $first = 1;
+	foreach my $loc_key (keys %$location_groups) {
+		my $events = $location_groups->{$loc_key};
+		my ($lat, $lon) = split /,/, $loc_key;
+
+		my $html = generate_popup_html($events);
+
+		$map->add_marker(
+			point => [$lat, $lon],
+			html => $html,
+		);
+
+		# Center on first location
+		if ($first) {
+			$map->center([$lat, $lon]);
+			$map->zoom(4);
+			$first = 0;
+		}
+	}
+
+	# Generate and save HTML
+	open my $fh, '>', $file or die "Cannot open $file: $!";
+	print $fh render($map);
+	close $fh;
+}
+
+# Generate OpenStreetMap using HTML::OSM
+sub generate_osm_map {
+	my ($location_groups, $file) = @_;
+
+	# Create HTML::OSM object
+	my $osm = HTML::OSM->new(zoom => 12);
+
+	# Add markers for each location
+	foreach my $loc_key (keys %$location_groups) {
+		my $events = $location_groups->{$loc_key};
+		my ($lat, $lon) = split /,/, $loc_key;
+
+		my $html = generate_popup_html($events);
+
+		$osm->add_marker(
+			point => [$lat, $lon],
+			html => $html,
+		);
+	}
+
+	# Find location with most events
+	my ($center_lat, $center_lon) = (0, 0);
+	my $max_events = 0;
+	foreach my $loc_key (keys %$location_groups) {
+		my $event_count = scalar(@{$location_groups->{$loc_key}});
+		if ($event_count > $max_events) {
+			$max_events = $event_count;
+			($center_lat, $center_lon) = split /,/, $loc_key;
+		}
+	}
+
+	$osm->center([$center_lat, $center_lon]);
+
+	# Generate and save HTML
+	open my $fh, '>', $file or die "Cannot open $file: $!";
+	print $fh render($osm);
+	close $fh;
+}
+
+# Generate HTML
+sub render {
+	my $map = $_[0];
+	my ($head, $body) = $map->onload_render();
+
+	my $html = <<"HTML";
+<!DOCTYPE html>
+<html>
+<head>
+	<title>GEDCOM Events Map</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<style>
+		body { margin: 0; padding: 0; font-family: Arial, sans-serif; }
+		#map {
+			margin: 0 auto; /* This centers it horizontally */
+			height: 90vh;
+			width: 80% !important;
+		}
+		#map > * {
+			margin: 0 auto; /* This centers child elements */
+			width: 100% !important; /* Use 100% to fill the parent, not 80% */
+			height: 100% !important;
+		}
+	</style>
+	$head
+</head>
+<body>
+	<div id="map">
+	$body
+	</div>
+</body>
+</html>
+HTML
+
+	return $html;
+}

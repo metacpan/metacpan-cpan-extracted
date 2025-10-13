@@ -23,8 +23,6 @@ lib/Minima/View/JSON.pm
 lib/Minima/View/PlainText.pm
 LICENSE
 MANIFEST			This list of files
-META.json
-META.yml
 README
 README.md
 share/templates/+gitignore.stpl
@@ -52,3 +50,5 @@ t/50-live.t
 t/51-stream.t
 t/52-setup-from-psgi.t
 t/90-project.t
+META.yml
+META.json

@@ -1,6 +1,6 @@
 package Chemistry::Atom;
 
-our $VERSION = '0.39'; # VERSION
+our $VERSION = '0.40'; # VERSION
 # $Id$
 
 =head1 NAME
