@@ -1,5 +1,9 @@
 Revision history for Perl module Math::MPFR
 
+4.45
+  - Fix typo in MPFR.xs - s/WE_HAVE_BENDIAN/MPFR_HAVE_BENDIAN/g
+    See https://github.com/sisyphus/math-mpfr/issues/11. Thanks @gregoa.
+
 4.44
   - Add subnormalize_float32, subnormalize_float16 and subnormalize_bfloat16.
   - Add Rmpfr_get_BFLOAT16/Rmpfr_set_BFLOAT16, Rmpfr_get_FLOAT16/Rmpfr_set_FLOAT16

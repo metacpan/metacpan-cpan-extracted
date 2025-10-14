@@ -6,32 +6,105 @@ use JSON::PP;
 use IO::File;
 use FindBin;
 use Term::ANSIColor;
+use Getopt::Long qw(GetOptions :config no_ignore_case bundling no_pass_through);
 use lib "$FindBin::Bin/../lib";
 use JQ::Lite;
 
 my $decoder;
 my $decoder_module;
-my $decoder_debug = 0;
+my $decoder_debug   = 0;
 my $decoder_choice;
+my $raw_output      = 0;
+my $color_output    = 0;
 
-# Parse command-line args before anything else
-for (my $i = 0; $i < @ARGV; $i++) {
-    if ($ARGV[$i] eq '--debug') {
-        $decoder_debug = 1;
-        splice @ARGV, $i, 1;
-        redo;
-    }
-    if ($ARGV[$i] eq '--use') {
-        $decoder_choice = $ARGV[$i + 1];
-        splice @ARGV, $i, 2;
-        redo;
-    }
-    if ($ARGV[$i] eq '--help-functions') {
-        print_supported_functions();
-        exit 0;
-    }
+# ---------- Help text ----------
+my $USAGE = <<'USAGE';
+jq-lite - A lightweight jq-like JSON query tool written in pure Perl
+
+Usage:
+  jq-lite [options] '.query' [file.json]
+
+Options:
+  -r, --raw-output     Print raw strings instead of JSON-encoded values
+  --color              Colorize JSON output (keys, strings, numbers, booleans)
+  --use <Module>       Force JSON decoder module (e.g. JSON::PP, JSON::XS, Cpanel::JSON::XS)
+  --debug              Show which JSON module is being used
+  -h, --help           Show this help message
+  --help-functions     Show list of all supported functions
+  -v, --version        Show version information
+
+Examples:
+  cat users.json | jq-lite '.users[].name'
+  jq-lite '.users[] | select(.age > 25)' users.json
+  jq-lite -r '.users[] | .name' users.json
+  jq-lite '.meta has "version"' config.json
+  jq-lite --color '.items | sort | reverse | first' data.json
+
+Homepage:
+  https://metacpan.org/pod/JQ::Lite
+USAGE
+
+# ---------- Option parsing (Getopt::Long) ----------
+my ($want_help, $want_version, $help_functions) = (0, 0, 0);
+
+GetOptions(
+    'raw-output|r'    => \$raw_output,
+    'color'           => \$color_output,
+    'use=s'           => \$decoder_choice,
+    'debug'           => \$decoder_debug,
+    'help|h'          => \$want_help,
+    'help-functions'  => \$help_functions,
+    'version|v'       => \$want_version,
+) or die "[ERROR] Unknown option(s)\n";
+
+if ($help_functions) {
+    print_supported_functions();
+    exit 0;
 }
 
+if ($want_help) {
+    print $USAGE;
+    exit 0;
+}
+
+if ($want_version) {
+    print "jq-lite version $JQ::Lite::VERSION\n";
+    exit 0;
+}
+
+# ---------- Positional args: '.query' and [file.json] ----------
+# Unknown options are already rejected above; only query and file remain.
+my ($query, $filename);
+
+if (@ARGV == 0) {
+    # If no args, show help
+    print $USAGE;
+    exit 0;
+}
+elsif (@ARGV == 1) {
+    # Single arg: query or file
+    if (-f $ARGV[0]) {
+        $filename = $ARGV[0];
+        # No query -> go to interactive mode (handled later)
+    } else {
+        $query = $ARGV[0];
+    }
+}
+elsif (@ARGV == 2) {
+    # Two args: query + file (in this order)
+    $query = $ARGV[0];
+    my $f = $ARGV[1];
+    if (-f $f) {
+        $filename = $f;
+    } else {
+        die "Cannot open file '$f': $!\n";
+    }
+}
+else {
+    die "Usage: jq-lite [options] '.query' [file.json]\n";
+}
+
+# ---------- JSON decoder selection ----------
 if ($decoder_choice) {
     if ($decoder_choice eq 'JSON::MaybeXS') {
         require JSON::MaybeXS;
@@ -77,104 +150,9 @@ else {
     }
 }
 
-# debug
 warn "[DEBUG] Using $decoder_module\n" if $decoder_debug;
 
-# Show help if no arguments are given
-if (!@ARGV) {
-    print <<'USAGE';
-jq-lite - A lightweight jq-like JSON query tool written in pure Perl
-
-Usage:
-  jq-lite [options] '.query' [file.json]
-
-Options:
-  -r, --raw-output     Print raw strings instead of JSON-encoded values
-  --color              Colorize JSON output (keys, strings, numbers, booleans)
-  --use <Module>       Force JSON decoder module (e.g. JSON::PP, JSON::XS, Cpanel::JSON::XS)
-  --debug              Show which JSON module is being used
-  -h, --help           Show this help message
-  --help-functions     Show list of all supported functions
-  -v, --version        Show version information
-
-Examples:
-  cat users.json | jq-lite '.users[].name'
-  jq-lite '.users[] | select(.age > 25)' users.json
-  jq-lite -r '.users[] | .name' users.json
-  jq-lite '.meta has "version"' config.json
-  jq-lite --color '.items | sort | reverse | first' data.json
-
-Homepage:
-  https://metacpan.org/pod/JQ::Lite
-USAGE
-    exit 0;
-}
-
-# Argument parsing
-my $raw_output   = 0;
-my $color_output = 0;
-my $query;
-my $filename;
-
-while (@ARGV) {
-    my $arg = shift @ARGV;
-
-    if ($arg eq '--raw-output' || $arg eq '-r') {
-        $raw_output = 1;
-    }
-    elsif ($arg eq '--color') {
-        $color_output = 1;
-    }
-    elsif ($arg eq '--help' || $arg eq '-h') {
-        print <<'USAGE';
-jq-lite - A lightweight jq-like JSON query tool written in pure Perl
-
-Usage:
-  jq-lite [options] '.query' [file.json]
-
-Options:
-  -r, --raw-output     Print raw strings instead of JSON-encoded values
-  --color              Colorize JSON output (keys, strings, numbers, booleans)
-  --use <Module>       Force JSON decoder module (e.g. JSON::PP, JSON::XS, Cpanel::JSON::XS)
-  --debug              Show which JSON module is being used
-  -h, --help           Show this help message
-  --help-functions     Show list of all supported functions
-  -v, --version        Show version information
-
-Examples:
-  cat users.json | jq-lite '.users[].name'
-  jq-lite '.users[] | select(.age > 25)' users.json
-  jq-lite -r '.users[] | .name' users.json
-  jq-lite '.meta has "version"' config.json
-  jq-lite --color '.items | sort | reverse | first' data.json
-
-Homepage:
-  https://metacpan.org/pod/JQ::Lite
-USAGE
-        exit 0;
-    }
-    elsif ($arg eq '--version' || $arg eq '-v') {
-        print "jq-lite version $JQ::Lite::VERSION\n";
-        exit 0;
-    }
-    # First check if this argument is a file
-    elsif (!defined $filename && -f $arg) {
-        $filename = $arg;
-    }
-    # If not a file and query is not yet set, treat it as the query string
-    elsif (!defined $query) {
-        $query = $arg;
-    }
-    # Secondary filename fallback
-    elsif (!defined $filename && -f $arg) {
-        $filename = $arg;
-    }
-    else {
-        die "Usage: jq-lite [options] '.query' [file.json]\n";
-    }
-}
-
-# Load JSON from file or STDIN
+# ---------- Read JSON input ----------
 my $json_text;
 if (defined $filename) {
     open my $fh, '<', $filename or die "Cannot open file '$filename': $!\n";
@@ -183,14 +161,18 @@ if (defined $filename) {
     close $fh;
 }
 else {
+    # When no file is given, if STDIN is a TTY, error out to avoid blocking
+    if (-t STDIN) {
+        die "[ERROR] No input provided. Pass a file or pipe JSON via STDIN.\n";
+    }
     local $/;
     $json_text = <STDIN>;
 }
 
-# Create JQ::Lite object
+# ---------- JQ::Lite core ----------
 my $jq = JQ::Lite->new(raw => $raw_output);
 
-# Colorizing helper
+# ---------- Colorization ----------
 sub colorize_json {
     my $json = shift;
 
@@ -202,7 +184,7 @@ sub colorize_json {
     return $json;
 }
 
-# Output helper
+# ---------- Output ----------
 sub print_results {
     my @results = @_;
     my $pp = JSON::PP->new->utf8->canonical->pretty;
@@ -222,7 +204,7 @@ sub print_results {
     }
 }
 
-# Interactive mode
+# ---------- Interactive mode ----------
 if (!defined $query) {
     system("stty -icanon -echo");
 
@@ -261,7 +243,7 @@ if (!defined $query) {
         sysread(STDIN, $char, 1);
 
         my $ord = ord($char);
-        last if $ord == 27;
+        last if $ord == 27; # ESC
 
         if ($ord == 127 || $char eq "\b") {
             chop $input if length($input);
@@ -307,7 +289,7 @@ if (!defined $query) {
     exit 0;
 }
 
-# One-shot mode
+# ---------- One-shot mode ----------
 my @results = eval { $jq->run_query($json_text, $query) };
 if ($@) {
     die "[ERROR] Invalid query: $@\n";
@@ -324,6 +306,7 @@ sub print_supported_functions {
 Supported Functions:
   length           - Count array elements, hash keys, or characters in scalars
   keys             - Extract sorted keys from a hash
+  keys_unsorted    - Extract object keys without sorting (jq-compatible)
   values           - Extract values from a hash (v0.34)
   sort             - Sort array items
   sort_desc        - Sort array items in descending order
@@ -339,12 +322,19 @@ Supported Functions:
   drop(N)          - Skip the first N elements of an array
   tail(N)          - Return the final N elements of an array
   chunks(N)        - Split array into subarrays each containing up to N items
+  range(START; END[, STEP])
+                   - Emit numbers from START (default 0) up to but not including END using STEP (default 1)
   enumerate()      - Pair each array element with its zero-based index
+  transpose()      - Rotate arrays-of-arrays from rows into columns
   count            - Count total number of matching items
   map(EXPR)        - Map/filter array items with a subquery
+  map_values(FILTER)
+                   - Apply FILTER to each value in an object (dropping keys when FILTER yields no result)
+  walk(FILTER)     - Recursively apply FILTER to every value in arrays and objects
   add / sum        - Sum all numeric values in an array
   sum_by(KEY)      - Sum numeric values projected from each array item
   avg_by(KEY)      - Average numeric values projected from each array item
+  median_by(KEY)   - Return the median of numeric values projected from each array item
   min_by(PATH)     - Return the element with the smallest projected value
   max_by(PATH)     - Return the element with the largest projected value
   product          - Multiply all numeric values in an array
@@ -352,6 +342,7 @@ Supported Functions:
   avg              - Return the average of numeric values in an array
   median           - Return the median of numeric values in an array
   mode             - Return the most frequent value in an array (ties pick earliest occurrence)
+  percentile(P)    - Return the requested percentile (0-100 or 0-1) of numeric array values
   variance         - Return the variance of numeric values in an array
   stddev           - Return the standard deviation of numeric values in an array
   abs              - Convert numbers (and array elements) to their absolute value
@@ -359,9 +350,13 @@ Supported Functions:
   floor()          - Round numbers down to the nearest integer
   round()          - Round numbers to the nearest integer (half-up semantics)
   clamp(MIN, MAX)  - Clamp numeric values within an inclusive range
+  tostring()       - Convert values into their JSON string representation
+  tojson()         - Encode values as JSON text regardless of type
   to_number()      - Coerce numeric-looking strings/booleans into numbers
   nth(N)           - Get the Nth element of an array (zero-based index)
   index(VALUE)     - Return the zero-based index of VALUE within arrays or strings
+  rindex(VALUE)    - Return the zero-based index of the last VALUE within arrays or strings
+  indices(VALUE)   - Return every index where VALUE occurs within arrays or strings
   group_by(KEY)    - Group array items by field
   group_count(KEY) - Count grouped items by field
   join(SEPARATOR)  - Join array elements with a string
@@ -370,20 +365,35 @@ Supported Functions:
                    - Extract substring using zero-based indices (arrays handled element-wise)
   slice(START[, LENGTH])
                   - Return a subarray using zero-based indices (negative starts count from the end)
+  replace(OLD; NEW)
+                   - Replace literal substrings (arrays handled element-wise)
+  to_entries       - Convert objects/arrays into [{"key","value"}, ...] pairs
+  from_entries     - Convert entry arrays back into an object
+  with_entries(FILTER)
+                   - Transform entries using FILTER and rebuild an object
   has              - Check if objects contain a key or arrays expose an index
   contains         - Check if strings include a fragment, arrays contain an element, or hashes have a key
+  any([FILTER])    - Return true if any input (optionally filtered) is truthy
+  all([FILTER])    - Return true if every input (optionally filtered) is truthy
   match("pattern") - Match string using regex
+  explode()        - Convert strings to arrays of Unicode code points
+  implode()        - Turn arrays of code points back into strings
   flatten          - Explicitly flatten arrays (same as .[])
   flatten_all()    - Recursively flatten nested arrays into a single array
   flatten_depth(N) - Flatten nested arrays up to N levels deep
+  arrays           - Pass through inputs that are arrays, discarding others
   del(KEY)         - Remove a key from objects in the result
   compact          - Remove undefined values from arrays
   path             - Return available keys for objects or indexes for arrays
+  paths            - Emit every path to nested values as an array of keys/indices
+  getpath(PATH)    - Retrieve the value(s) at the supplied path array or expression
   is_empty         - Check if an array or object is empty
   upper()          - Convert scalars and array elements to uppercase
   lower()          - Convert scalars and array elements to lowercase
   titlecase()      - Convert scalars and array elements to title case
   trim()           - Strip leading/trailing whitespace from strings (recurses into arrays)
+  ltrimstr(PFX)    - Remove PFX when it appears at the start of strings (arrays handled element-wise)
+  rtrimstr(SFX)    - Remove SFX when it appears at the end of strings (arrays handled element-wise)
   startswith(PFX)  - Check if a string (or array of strings) begins with PFX
   endswith(SFX)    - Check if a string (or array of strings) ends with SFX
   empty            - Discard all output (for side-effect use)

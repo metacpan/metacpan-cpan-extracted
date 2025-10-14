@@ -150,12 +150,11 @@ class Mojo::URL {
   
   method set_host_port : void ($host_port : string) {
     
-    my $host_port_ref = [$host_port];
-    if (my $replace_info = Re->s($host_port_ref, ":(\d+)$", "")) {
+    my $host_port = copy $host_port;
+    if (my $replace_info = Re->s((mutable string)$host_port, ":(\d+)$", "")) {
       my $match = $replace_info->match;
       $self->set_port((int)$match->cap1);
     }
-    $host_port = $host_port_ref->[0];
     
     my $host = Mojo::Util->url_unescape($host_port);
     
@@ -239,12 +238,11 @@ class Mojo::URL {
       
       if (my $auth = $match->cap4) {
         
-        my $auth_ref = [$auth];
-        if (my $replace_info = Re->s($auth_ref, "^([^\@]+)\@", "")) {
+        my $auth =  copy $auth;
+        if (my $replace_info = Re->s((mutable string)$auth, "^([^\@]+)\@", "")) {
           my $match = $replace_info->match;
           $self->set_userinfo(Mojo::Util->url_unescape($match->cap1)) ;
         }
-        $auth = $auth_ref->[0];
         
         $self->set_host_port($auth);
       }

@@ -4,7 +4,7 @@ package Pod::Weaver::PluginBundle::Author::ETHER;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: A plugin bundle for pod woven by ETHER
 
-our $VERSION = '0.168';
+our $VERSION = '0.169';
 
 use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -55,6 +55,18 @@ sub configure {
         'Leftovers',
         [ 'Region' => 'postlude' ],
 
+        [ 'GenerateSection' => 'generate GIVING THANKS' => {
+                title => 'GIVING THANKS',
+                main_module_only => 0,
+                text => [ '='.<<'THANKS',
+for stopwords MetaCPAN GitHub
+
+If you found this module to be useful, please show your appreciation by
+adding a +1 in L<MetaCPAN|https://metacpan.org/dist/{{ $name }}>
+and a star in L<GitHub|{{ $repository_web }}>.
+THANKS
+                        ] },
+        ],
         [ 'GenerateSection' => 'generate SUPPORT' => {
                 title => 'SUPPORT',
                 main_module_only => 0,
@@ -174,7 +186,7 @@ Pod::Weaver::PluginBundle::Author::ETHER - A plugin bundle for pod woven by ETHE
 
 =head1 VERSION
 
-version 0.168
+version 0.169
 
 =head1 SYNOPSIS
 
@@ -194,7 +206,7 @@ It is also used automatically when your F<dist.ini> contains:
 
 =head1 DESCRIPTION
 
-=for stopwords optimizations
+=for stopwords optimizations GenerateSection
 
 =for Pod::Coverage configure mvp_bundle_config
 
@@ -237,6 +249,11 @@ following F<weaver.ini>, minus some optimizations:
 
     [Region / postlude]
 
+    [GenerateSection / generate GIVING THANKS]
+    title = GIVING THANkS
+    main_module_only = 0
+    text = <template>
+
     [GenerateSection / generate SUPPORT]
     title = SUPPORT
     main_module_only = 0
@@ -269,6 +286,11 @@ This is also equivalent (other than section ordering) to:
 
     [Collect / TYPES]
     command = type
+
+    [GenerateSection / generate GIVING THANKS]
+    title = GIVING THANKS
+    main_module_only = 0
+    text = <template>
 
     [GenerateSection / generate SUPPORT]
     title = SUPPORT
@@ -343,6 +365,14 @@ L<Dist::Zilla::MintingProfile::Author::ETHER>
 
 This distribution follows best practices for author-oriented plugin bundles; for more information,
 see L<KENTNL's distribution|Dist::Zilla::PluginBundle::Author::KENTNL/NAMING-SCHEME>.
+
+=head1 GIVING THANKS
+
+=for stopwords MetaCPAN GitHub
+
+If you found this module to be useful, please show your appreciation by
+adding a +1 in L<MetaCPAN|https://metacpan.org/dist/Dist-Zilla-PluginBundle-Author-ETHER>
+and a star in L<GitHub|https://github.com/karenetheridge/Dist-Zilla-PluginBundle-Author-ETHER>.
 
 =head1 SUPPORT
 

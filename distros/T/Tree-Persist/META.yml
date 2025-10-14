@@ -5,7 +5,8 @@ author:
 build_requires:
   DBD::SQLite: '1.39'
   DBI: '1.627'
-  ExtUtils::MakeMaker: '0'
+  Exporter: '5.78'
+  ExtUtils::MakeMaker: '7.7'
   File::Slurp: '9999.19'
   File::Spec: '0.01'
   File::Spec::Functions: '0.01'
@@ -19,7 +20,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -40,5 +41,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/ronsavage/Tree-Persist.git
-version: '1.14'
+version: '1.16'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

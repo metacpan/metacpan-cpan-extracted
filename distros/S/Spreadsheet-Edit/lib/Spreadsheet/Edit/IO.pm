@@ -11,8 +11,8 @@ package Spreadsheet::Edit::IO;
 
 # Allow "use <thismodule. VERSION ..." in development sandbox to not bomb
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 1999.999; }
-our $VERSION = '1000.026'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2024-12-22'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1000.027'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2025-10-13'; # DATE from Dist::Zilla::Plugin::OurDate
 
 # This module is derived from the old never-released Text:CSV::Spreadsheet
 
@@ -59,7 +59,7 @@ use Digest::MD5 qw/md5_base64/;
 use Data::Hexify qw/Hexify/;
 use Text::CSV ();
 # DDI 5.025 is needed for Windows-aware qsh()
-use Data::Dumper::Interp 5.025 qw/vis visq visO dvis dvisq dvisO ivis ivisq avis qsh qshlist u visnew/;
+use Data::Dumper::Interp 5.025 qw/vis visq visO dvis dvisq dvisO ivis ivisq avis hvis qsh qshlist u visnew/;
 
 use Spreadsheet::Edit::Log qw/log_call fmt_call log_methcall fmt_methcall oops/,
                            ':btw=IO${lno}:';
@@ -627,15 +627,15 @@ sub _runcmd($@) {
   if ($opts->{suppress_stdout}) {
     $redirs .= " >".devnull();
   }
-  my $cmdstr = join(" ", map{qsh} @cmd) . $redirs;
+  #my $cmdstr = join(" ", map{qsh} @cmd) . $redirs;
+  my $cmdstr = qshlist(@cmd)." $redirs";
+  warn "> $cmdstr\n" if $opts->{verbose};
   if ($redirs) {
     foreach (@cmd) {
       confess "Can not portably pass argument '$_'" if /["']/;
     }
-    warn "> $cmdstr\n" if $opts->{verbose};
     system $cmdstr;
   } else {
-    warn "> $cmdstr\n" if $opts->{verbose};
     system @cmd;
   }
   return $?
@@ -740,7 +740,7 @@ sub _convert_using_openlibre($$$) {
 
   # The --convert-to argument is "suffix:filtername:filteropts"
 
-  # I think (not certain) that we can only specify the encoding of CSV files,
+  # I think (RFFM_Members_2025-06-25.txtnot certain) that we can only specify the encoding of CSV files,
   # either as input or output;  .xlsx and .ods spreadsheets (which are based
   # on XML) could in principle use any encoding internally, but I'm not sure
   # we can control that, nor should anyone ever need to.
@@ -829,15 +829,20 @@ sub _convert_using_openlibre($$$) {
 
   my $ofilter = $opts->{soffice_outfilter} //= do{
     # OutputFilterName[:paramtoken,paramtoken,...]
-    if ($opts->{cvt_to} eq "csv") {
+    if ($opts->{cvt_to} =~ /^(?:csv|txt)$/) {
+      # Output is csv format.  If converting to "txt" then the output still
+      # uses the csv filter but with "FIX"ed width fields (no separators
+      # or quotes).  Note that we are converating a *spreadsheet* input, not
+      # a writer document.
+      # 6/12/2025: csv --> txt IS NOT WORKING (truncates wide columns)
       my $filter_name = $suf2ofilter->{$opts->{cvt_to}} or oops;
       #my $enc = $opts->{output_encoding};
       my ($enc) = ($opts->{output_binmode} =~ /:encoding\((.*?)\)/) or oops;
       my $charset = _name2LOcharsetnum($enc); # dies if unknown enc
       $filter_name.":"
-      # Tokens 1-4: FldSep=, TxtDelim=" Charset FirstLineNum
+      # Tokens 1-4: FldSep=,(or FIX for "txt") TxtDelim=" Charset FirstLineNum
       #."44,34,$charset,1"
-      . ord($opts->{sep_char}//",").","
+      . ($opts->{cvt_to} eq "txt" ? "FIX" : ord($opts->{sep_char}//",")).","
       . ord($opts->{quote_char}//'"').","
       . "$charset,1"
       # Token 5: Cell format codes.  Only used for import? (see above)
@@ -900,12 +905,13 @@ sub _convert_using_openlibre($$$) {
   # only way to detect errors is to notice that no files were written.
   # https://bugs.documentfoundation.org/show_bug.cgi?id=155415
   #
-  my $tdir = Path::Tiny->tempdir(path($dst)->basename."_XXXXX");
-  # will be deleted when $dirpath goes out of scope
+  my $tdir = Path::Tiny->tempdir(path($dst)->basename."_cvt-to_XXXXX");
+  # will be deleted when $tdir goes out of scope
 
   my @cmd = ($prog,
                     "--headless", "--invisible",
-                    "--nolockcheck", "--norestore",
+                    #"--nolockcheck",
+                    "--norestore",
                     "--view", # open read-only in case can't create lockfile
                     $ifilter ? ("--infilter=$ifilter") : (),
                     "--convert-to",
@@ -930,10 +936,18 @@ sub _convert_using_openlibre($$$) {
   my @result_files = path($tdir)->children;
   btw dvis '>> @result_files' if $debug;
   if (@result_files == 0) {
-    croak qsh($src)." is missing or unreadable\n", "cmd: @cmd\n"
+#####
+#sleep(2);
+#my @rf = path($tdir)->children;
+#croak "!?!? initially no output files, but now find @rf !?!?" if @rf;
+#####
+
+    croak qsh($src)." is missing or unreadable\n", "cmd: ",qshlist(@cmd),"\n"
       unless -r $src;
     croak "Something went wrong, ",path($prog)->basename," produced no output\n",
-          "cmd: @cmd\n"
+          "cmd: ", (map{" $_=".qsh($ENV{$_})}
+                    grep {/User|LIBRE/i} keys %ENV)," ", qshlist(@cmd), "\n",
+          "opts: ${\vis($opts)}\n",
   }
 
   if ($opts->{allsheets}) {
@@ -962,7 +976,10 @@ sub _convert_using_openlibre($$$) {
   } else {
     if ($opts->{allsheets}) {
       btw ">> dirmove $tdir -> $dst\n" if $debug;
-      rename($tdir, $dst) or File::Copy::dirmove($tdir, $dst);
+      # BUG HERE?  Do we _know_ the auto-remove mechanism uses only the
+      # pathname and won't remove the directory even after being renamed?
+      # (we could copy the directory and contents, but would be slower...)
+      rename($tdir, $dst) or File::Copy::Recursive::dirmove($tdir, $dst);
     } else {
       croak "Expecting only one result file, not @result_files"
         if @result_files > 1;
@@ -1463,7 +1480,7 @@ sub _preprocess($$) {
           #    This prevents conversion to the Unicode math minus when LO
           #    reads the CSV.  The assumption is that if the input has an ascii
           #    minus then the original spreadsheet format was "text" not
-          #    numeric.
+          #    numeric (TODO: Look for counterveiling certainly-numeric forms).
           if (/^[\x{2D}0]/) {
             recognized($cx,$rx,$_,"text");
             next CX;
@@ -1533,7 +1550,8 @@ sub _preprocess($$) {
     oops if defined($rows);
   }
 
-  if ($opts->{cvt_to} eq "csv") {
+  if ($opts->{cvt_to} =~ /^(?:csv|txt)$/) {
+    # 6/12/2025: csv --> txt IS NOT WORKING (truncates wide columns)
     if ($opts->{output_encoding}) {
       croak "Only one of {output_encoding} or {output_binmode} may be specified"
         if $opts->{output_binmode};

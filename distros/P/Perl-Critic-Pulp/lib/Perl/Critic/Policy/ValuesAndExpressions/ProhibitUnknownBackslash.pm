@@ -1,4 +1,4 @@
-# Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019, 2021 Kevin Ryde
+# Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019, 2021, 2025 Kevin Ryde
 
 # Perl-Critic-Pulp is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by the
@@ -30,7 +30,7 @@ use Perl::Critic::Pulp;
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
-our $VERSION = 99;
+our $VERSION = 100;
 
 use constant supported_parameters =>
   ({ name           => 'single',
@@ -50,6 +50,11 @@ use constant supported_parameters =>
    },
    { name           => 'charnames',
      description    => 'Checking of character names \\N{}.',
+     behavior       => 'string',
+     default_string => 'version',
+   },
+   { name           => 'foldcase',
+     description    => 'Checking of fold case \\F.',
      behavior       => 'string',
      default_string => 'version',
    });
@@ -125,11 +130,13 @@ my %explain = ('%' => '  (hashes are not interpolated)',
                '5' => '  (until Perl 5.6 octal wide chars)',
                '6' => '  (until Perl 5.6 octal wide chars)',
                '7' => '  (until Perl 5.6 octal wide chars)',
+               'F' => '  (until Perl 5.16)',
                'N' => '  (without "use charnames" in scope)',
               );
 
-my $v5016 = version->new('5.016');
 my $v5006 = version->new('5.006');
+my $v5010 = version->new('5.010');
+my $v5016 = version->new('5.016');
 
 sub violates {
   my ($self, $elem, $document) = @_;
@@ -182,6 +189,13 @@ sub violates {
     my $perlver = $document->highest_explicit_perl_version;
     if (! defined $perlver || $perlver >= $v5006) {
       $known .= '4567';
+    }
+
+    # \F is in 5.16 up.
+    if ($self->{_foldcase} ne 'disallow'
+        && ($self->{_foldcase} eq 'allow'
+            || (defined $perlver && $perlver >= $v5010))) {
+      $known .= 'F';
     }
   }
 
@@ -489,7 +503,7 @@ add-on.  It checks for unknown backslash escapes like
 
     print "\*.c";      # bad
 
-This is harmless, assuming the intention is a literal "*" (which it gives),
+This is harmless, assuming the intention is a literal "*" (which it becomes),
 but unnecessary, and on that basis this policy is under the C<cosmetic>
 theme (see L<Perl::Critic/POLICY THEMES>).  Sometimes it can be a
 misunderstanding or a typo though, for instance a backslashed newline is a
@@ -515,13 +529,11 @@ Control characters C<\cX> are checked and only the conventional A-Z a-z @ [
     print "\c*";       # bad
 
 Perl accepts any C<\c> and does an upcase xor 0x40, so C<\c*> is letter "j",
-at least on an ASCII system.  But that's obscure and likely to be a typo or
-error.
+at least on an ASCII system.  But that's obscure and likely to be a mistake.
 
 For reference, C<\c\> is the ASCII FS "file separator" and the second
 backslash is not an escape, except for a closing quote character, which it
-does escape (basically because Perl scans for a closing quote before
-considering interpolations).  Thus,
+does escape (Perl scans for unescaped closing quote first).  Thus,
 
     print " \c\  ";     # ok, control-\ FS
     print " \c\" ";     # bad, control-" is unknown
@@ -529,8 +541,8 @@ considering interpolations).  Thus,
 
 =head2 Ending Interpolation
 
-A backslashed colon, bracket, brace or dash is allowed after an interpolated
-variable or element, since this stops interpolation at that point.
+A backslashed C<:>, C<[>, C<{>, C<-> is allowed after an interpolated
+variable or element, since the backslash stops interpolation at that point.
 
     print "$foo\::bar";    # ok, $foo
     print "@foo\::";       # ok, @foo
@@ -575,8 +587,8 @@ L<perlop/Gory details of parsing quoted constructs>.
 
 Octal escapes C<\400> to C<\777> for wide chars 256 to 511 are new in Perl
 5.6.  They're considered unknown in 5.005 and earlier (where they end up
-chopped to 8-bits 0 to 255).  Currently if there's no C<use> etc Perl
-version then it's presumed a high octal is intentional and is allowed.
+chopped to 8-bits 0 to 255).  If there's no C<use> etc Perl version then
+it's presumed a high octal is intentional and is allowed.
 
     print "\400";    # ok
 
@@ -587,16 +599,32 @@ version then it's presumed a high octal is intentional and is allowed.
     print "\777";    # bad in 5.005 and earlier
 
 
+=head2 Fold Case
+
+The C<\F> fold case escape (equivalent to built-in function C<fc()>) is new
+in Perl 5.16.  It's considered unknown in earlier versions (and it provokes
+a warning when run there).
+
+    use 5.016;
+    print "\Fxyz";   # ok
+
+    use 5.010;
+    print "\Fxyz";   # bad prior to 5.16
+
+The C<foldcase> option (L</CONFIGURATION> below) can be set to "allow" to
+always allow C<\F>, as for instance if you always have Perl 5.16 up but
+without declaring that in a C<use> statement.
+
 =head2 Named Chars
 
 Named chars C<\N{SOME THING}> are added by L<charnames>, new in Perl 5.6.
 In Perl 5.16 up, that module is automatically loaded when C<\N> is used.
-C<\N> is considered known when C<use 5.016> or higher,
+C<\N> is considered known either when C<use 5.016> or higher,
 
     use 5.016;
     print "\N{EQUALS SIGN}";   # ok with 5.16 automatic charnames
 
-or if C<use charnames> is in the lexical scope,
+or when C<use charnames> is in the lexical scope,
 
     { use charnames ':full';
       print "\N{APOSTROPHE}";  # ok
@@ -604,18 +632,20 @@ or if C<use charnames> is in the lexical scope,
     print "\N{COLON}";         # bad, no charnames in lexical scope
 
 In Perl 5.6 through 5.14, a C<\N> without C<charnames> is a compile error so
-would be seen in those versions immediately anyway.  There's no check of the
-character name appearing in the C<\N>.  C<charnames> gives an error for
-unknown names.
+would be seen in those versions immediately anyway.
 
-The C<charnames> option (L</CONFIGURATION> below) can be allow to always
-allow named characters.  This can be used for instance if you always have
-Perl 5.16 up but without declaring that in a C<use> statement.
+There's no check of the character name appearing in C<\N>.  C<charnames>
+gives an error for unknown names.
 
-The C<charnames> option can be disallow to always disallow named characters.
-This is a blanket prohibition rather than an UnknownBackslash as such, but
-matches the allow option.  Disallowing can be matter of personal preference
-or perhaps aim to save a little memory or startup time.
+The C<charnames> option (L</CONFIGURATION> below) can be set to "allow" to
+always allow named characters, as for instance if you always have Perl
+5.16 up but without declaring that in a C<use> statement.
+
+The C<charnames> option can be "disallow" to always disallow named
+characters.  This is a blanket prohibition rather than an UnknownBackslash
+as such, but is opposite of the allow option.  Disallowing can be a matter
+of personal preference or perhaps aim to save a little memory or startup
+time.
 
 =head2 Other Notes
 
@@ -624,9 +654,9 @@ shown as hex like C<\{0x263A}>, to ensure the message is printable and
 unambiguous.
 
 Interpolated C<$foo> or C<@{expr}> variables and expressions are parsed like
-Perl does, so backslashes for refs within are ok, in particular tricks like
-C<${\scalar ...}> are fine (see L<perlfaq4/How do I expand function calls in
-a string?>).
+Perl does, so backslashes for refs within interpolation are fine, in
+particular tricks like C<${\scalar ...}>
+(see L<perlfaq4/How do I expand function calls in a string?>).
 
     print "this ${\(some()+thing())}";   # ok
 
@@ -658,12 +688,13 @@ The possible values are
 "alnum" does no more than compiling with C<perl -w>, but might be good for
 checking code you don't want to run.
 
-"quotemeta" reports escapes not produced by C<quotemeta()>.  For example
-C<quotemeta> escapes a C<*>, so C<\*> is not reported, but it doesn't escape
-an underscore C<_>, so C<\_> is reported.  The effect is to prohibit a few
-more escapes than "alnum".  One use is to check code generated by other code
-where you've used C<quotemeta> to produce double-quoted strings and thus may
-have escaping which is unnecessary but works fine.
+"quotemeta" reports escapes not produced by C<quotemeta()>.  For example,
+C<quotemeta> doesn't escape an underscore C<_>, so C<\_> is reported.  But
+C<quotemeta> does escape C<*>, so C<\*> is allowed.  The effect is to
+prohibit a few more escapes than "alnum".  One use is to check code
+generated by other code where you've used C<quotemeta> to produce
+double-quoted strings and thus may have escaping which is unnecessary but
+works fine.
 
 =item C<single> (string, default "none")
 
@@ -686,8 +717,17 @@ only as an option.
 
 For reference, single-quote here-documents C<E<lt>E<lt>'HERE'> don't have
 any backslash escapes and so are not considered by this policy.  C<qx{}>
-command backticks are double-quote but C<qx''> is single-quote.  They are
+command backticks are double-quote but C<qx''> is single-quote.  They're
 treated per the corresponding C<single> or C<double> option.
+
+=item C<foldcase> (string, default "version")
+
+Whether to treat the fold case escape C<\F> in double-quote strings as known
+or unknown,
+
+    version    known if use 5.016
+    allow      always allow
+    disallow   always disallow
 
 =item C<charnames> (string, default "version")
 
@@ -722,7 +762,7 @@ http://user42.tuxfamily.org/perl-critic-pulp/index.html
 
 =head1 COPYRIGHT
 
-Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019, 2021 Kevin Ryde
+Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019, 2021, 2025 Kevin Ryde
 
 Perl-Critic-Pulp is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

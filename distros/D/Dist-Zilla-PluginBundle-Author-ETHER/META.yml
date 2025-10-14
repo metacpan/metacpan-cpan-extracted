@@ -53,13 +53,13 @@ no_index:
 provides:
   Dist::Zilla::MintingProfile::Author::ETHER:
     file: lib/Dist/Zilla/MintingProfile/Author/ETHER.pm
-    version: '0.168'
+    version: '0.169'
   Dist::Zilla::PluginBundle::Author::ETHER:
     file: lib/Dist/Zilla/PluginBundle/Author/ETHER.pm
-    version: '0.168'
+    version: '0.169'
   Pod::Weaver::PluginBundle::Author::ETHER:
     file: lib/Pod/Weaver/PluginBundle/Author/ETHER.pm
-    version: '0.168'
+    version: '0.169'
 recommends:
   Dist::Zilla::Plugin::BlockRelease: '0'
   Dist::Zilla::Plugin::GitHub::Update: '0.40'
@@ -211,10 +211,10 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-PluginBundle-Author-ETHER
   homepage: https://github.com/karenetheridge/Dist-Zilla-PluginBundle-Author-ETHER
   repository: https://github.com/karenetheridge/Dist-Zilla-PluginBundle-Author-ETHER.git
-version: '0.168'
+version: '0.169'
 x_Dist_Zilla:
   perl:
-    version: '5.043002'
+    version: '5.043003'
   plugins:
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -305,6 +305,14 @@ x_Dist_Zilla:
       name: 'local author tests'
       version: '6.033'
     -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: develop
+          type: requires
+      name: 'build tools'
+      version: '6.033'
+    -
       class: Dist::Zilla::Plugin::DynamicPrereqs
       config:
         Dist::Zilla::Role::ModuleMetadata:
@@ -340,7 +348,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: 'default minting profile'
-      version: '2.051'
+      version: '2.052'
     -
       class: Dist::Zilla::Plugin::FileFinder::Filter
       name: skip_auto_share
@@ -378,6 +386,7 @@ x_Dist_Zilla:
             - CONTRIBUTING
             - INSTALL
             - LICENCE
+            - META.json
             - README.pod
           exclude_match: []
           include_dotfiles: 0
@@ -387,7 +396,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: '@Author::ETHER/Git::GatherDir'
-      version: '2.051'
+      version: '2.052'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Author::ETHER/MetaYAML'
@@ -648,6 +657,10 @@ x_Dist_Zilla:
               version: '4.020'
             -
               class: Pod::Weaver::Section::GenerateSection
+              name: '@Author::ETHER/generate GIVING THANKS'
+              version: '4.020'
+            -
+              class: Pod::Weaver::Section::GenerateSection
               name: '@Author::ETHER/generate SUPPORT'
               version: '4.020'
             -
@@ -822,7 +835,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20250820'
+          Module::CoreList: '5.20250923'
       name: '@Author::ETHER/EnsureLatestPerl'
       version: '0.010'
     -
@@ -850,7 +863,7 @@ x_Dist_Zilla:
           git_version: 2.50.1
           repo_root: .
       name: '@Author::ETHER/initial check'
-      version: '2.051'
+      version: '2.052'
     -
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
@@ -892,7 +905,7 @@ x_Dist_Zilla:
           git_version: 2.50.1
           repo_root: .
       name: '@Author::ETHER/after tests'
-      version: '2.051'
+      version: '2.052'
     -
       class: Dist::Zilla::Plugin::CheckIssues
       name: '@Author::ETHER/CheckIssues'
@@ -978,7 +991,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::ETHER/@Git::VersionManager/release snapshot'
-      version: '2.051'
+      version: '2.052'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -986,7 +999,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.168
+          tag: v0.169
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
@@ -995,7 +1008,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::ETHER/@Git::VersionManager/Git::Tag'
-      version: '2.051'
+      version: '2.052'
     -
       class: Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional
       config:
@@ -1032,7 +1045,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::ETHER/@Git::VersionManager/post-release commit'
-      version: '2.051'
+      version: '2.052'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -1052,7 +1065,7 @@ x_Dist_Zilla:
           git_version: 2.50.1
           repo_root: .
       name: '@Author::ETHER/Git::Push'
-      version: '2.051'
+      version: '2.052'
     -
       class: Dist::Zilla::Plugin::GitHub::Update
       config:
@@ -1176,7 +1189,7 @@ x_contributors:
   - 'Randy Stauner <rwstauner@cpan.org>'
   - 'Roy Ivy III <rivy@cpan.org>'
   - 'Сергей Романов <sromanov@cpan.org>'
-x_generated_by_perl: v5.43.2
+x_generated_by_perl: v5.43.3
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 0

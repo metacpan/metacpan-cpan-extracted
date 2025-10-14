@@ -23,12 +23,14 @@ resource config_name => literal => 'foo.yaml';
 push @line, __LINE__ - 1;
 
 resource config =>
+    dependencies    => ['config_path', 'config_name'],
     require         => 'YAML::XS',
     init            => sub {};
 push @line, __LINE__ - 1;
 
 resource dbh    =>
     require         => 'DBI',
+    dependencies    => ['config'],
     init            => sub {};
 push @line, __LINE__ - 1;
 
@@ -45,7 +47,7 @@ throws_ok {
 subtest "config_path" => sub {
     my $entry = $meta->show("config_path");
     # note explain $entry;
-    is_deeply $entry->{dependencies}, [], "first = no deps";
+    is_deeply $entry->{dependencies}, undef, "no deps specified";
     like $entry->{origin}, qr($file line $line[0]), "known where it's defined";
 
 };
@@ -65,7 +67,7 @@ subtest "config" => sub {
     like $entry->{origin}, qr($file line $line[2]), "known where it's defined";
     is_deeply [ sort @{ $entry->{dependencies} } ]
         , [sort qw[config_path config_name]]
-        , "auto-depends on already known resources";
+        , "has dependencies";
     is_deeply $entry->{require}, [qw[YAML::XS]], "required module retained";
     is $entry->{cleanup_order}, 0, "auto cleanup order = 0";
 };

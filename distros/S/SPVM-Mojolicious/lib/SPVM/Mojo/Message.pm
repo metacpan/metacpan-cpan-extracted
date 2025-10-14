@@ -170,7 +170,7 @@ Similar to L</"upload">, but returns all file uploads sharing the same name as a
 
 =head2 extract_start_line
 
-C<method extract_start_line : int ($str_ref : string[]);>
+C<method extract_start_line : int ($buf : mutable string);>
 
 Extract start-line from string. Meant to be overloaded in a subclass.
 

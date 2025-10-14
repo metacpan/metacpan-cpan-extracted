@@ -1,3 +1,25 @@
+0.013 2025-10-14
+  [Internal Changes]
+    * Refactor options.
+    
+0.012 2025-10-13
+  [Incompatible Changes]
+    * Change the following fields.
+    [Before]
+    has before_connect_SSL_cbs_list : ro List of IO::Socket::SSL::Callback::BeforeConnectSSL;
+    
+    has before_accept_SSL_cbs_list : ro List of IO::Socket::SSL::Callback::BeforeAcceptSSL;
+    
+    [After]
+    has before_connect_SSL_cbs : ro IO::Socket::SSL::Callback::BeforeConnectSSL[];
+    
+    has before_accept_SSL_cbs : ro IO::Socket::SSL::Callback::BeforeAcceptSSL[];
+    
+0.011 2025-10-13
+  [Internal Changes]
+    * Do internal changes to catch up latest SPVM.
+  [Requirement Changes]
+    * Require SPVM 0.990102.
 0.010 2025-01-30
   [Internal Changes]
     * Use Re class instead of Regex class.

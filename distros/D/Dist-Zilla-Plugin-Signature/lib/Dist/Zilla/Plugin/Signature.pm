@@ -1,5 +1,5 @@
 package Dist::Zilla::Plugin::Signature;
-$Dist::Zilla::Plugin::Signature::VERSION = '1.252770';
+$Dist::Zilla::Plugin::Signature::VERSION = '1.252860';
 use Moose;
 with 'Dist::Zilla::Role::FileGatherer';
 with 'Dist::Zilla::Role::BeforeArchive';
@@ -13,6 +13,8 @@ sub do_sign {
   my $self = shift;
   my $dir  = shift;
 
+  local %ENV = (%ENV, 'MODULE_SIGNATURE_AUTHOR', $self->zilla->authors->[0])
+      if( ! defined $ENV{MODULE_SIGNATURE_AUTHOR} );
   require Module::Signature;
   require File::chdir;
 
@@ -74,7 +76,7 @@ Dist::Zilla::Plugin::Signature - sign releases with Module::Signature
 
 =head1 VERSION
 
-version 1.252770
+version 1.252860
 
 =head1 DESCRIPTION
 

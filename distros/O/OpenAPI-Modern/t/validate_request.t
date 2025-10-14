@@ -14,7 +14,6 @@ use utf8;
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
 use JSON::Schema::Modern::Utilities qw(jsonp get_type);
-use Test::Warnings 0.033 qw(:no_end_test allow_patterns);
 
 use lib 't/lib';
 use Helper;
@@ -1153,6 +1152,31 @@ paths:
             schema:
               not: true
 YAML
+
+  $request = request('POST', 'http://example.com/foo',
+    [ 'Content-Type' => 'text/plain', 'Content-Length' => 4, 'Transfer-Encoding' => 'chunked' ],
+    "4\r\nabcd\r\n0\r\n\r\n");
+  cmp_result(
+    $openapi->validate_request($request)->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/request/header/Content-Length',
+          keywordLocation => jsonp(qw(/paths /foo post)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post)))->to_string,
+          error => 'Content-Length cannot appear together with Transfer-Encoding',
+        },
+        {
+          instanceLocation => '/request/body',
+          keywordLocation => jsonp(qw(/paths /foo post requestBody content text/plain schema const)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content text/plain schema const)))->to_string,
+          error => 'value does not match',
+        },
+      ],
+    },
+    'conflict between Content-Length + Transfer-Encoding headers (and body is still parseable)',
+  );
 
   # note: no content!
   $request = request('POST', 'http://example.com/foo');
@@ -2439,10 +2463,7 @@ SKIP: {
   # "Bad Content-Length: maybe client disconnect? (1 bytes remaining)"
   skip 'plack dies on this input', 3 if $::TYPE eq 'plack' or $::TYPE eq 'catalyst';
   cmp_result(
-    do {
-      my $x = allow_patterns(qr/^parse error when converting HTTP::Request/) if $::TYPE eq 'lwp';
-      $openapi->validate_request(request($_, 'http://example.com/foo', [ 'Content-Length' => 1 ]));
-    }->TO_JSON,
+    $openapi->validate_request(request($_, 'http://example.com/foo', [ 'Content-Length' => 1 ]))->TO_JSON,
     {
       valid => false,
       errors => [
@@ -2458,10 +2479,7 @@ SKIP: {
   ) foreach qw(GET HEAD);
 
   cmp_result(
-    do {
-      my $x = allow_patterns(qr/^parse error when converting HTTP::Request/) if $::TYPE eq 'lwp';
-      $openapi->validate_request(request('POST', 'http://example.com/foo', [ 'Content-Length' => 1 ]));
-    }->TO_JSON,
+    $openapi->validate_request(request('POST', 'http://example.com/foo', [ 'Content-Length' => 1 ]))->TO_JSON,
     { valid => true },
     'no errors from POST with Content-Length',
   );

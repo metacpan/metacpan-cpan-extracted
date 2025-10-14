@@ -6,6 +6,7 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   Storable: '0'
   Test::More: '0.88'
+  Test::Pod: '1.00'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -29,5 +30,5 @@ requires:
 resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Net-Patricia
   repository: git://github.com/tobez/Net-Patricia.git
-version: '1.23'
+version: '1.24'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

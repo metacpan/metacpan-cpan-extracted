@@ -1,0 +1,133 @@
+NAME
+
+    QRCode::Encoder - Create QR Codes in pure Perl
+
+VERSION
+
+    This document describes QRCode::Encoder version 0.003.
+
+SYNOPSIS
+
+       use QRCode::Encoder qr< qr_encode >;
+    
+       my $message = '...';
+       my $encoded = qr_encode($message, level => 'H'); # hash reference
+    
+       # The "plot" key is compatible with Text::QRCode
+       my $arrayref = $encoded->{plot};
+       print join "\n", map { join '', @$_ } @$arrayref;
+
+DESCRIPTION
+
+    Generate QR Codes, compatibly with Text::QRCode.
+
+    The output of function qr_encode is NOT an image file, although it can
+    be easily turned into one. As anticipated, much like Text::QRCode.
+
+INTERFACE
+
+ qr_encode
+
+       my $encoded = qr_encode($octets, %opts);  # OR
+       my $encoded = qr_encode(%opts);
+
+    Encode the message in $octets, with options in %opts.
+
+    Supported options are:
+
+      * level
+
+      The Error Correction level, expressed as a single-character string
+      with allowed values L, M, Q, and H, in increasing level of
+      correction. If not provided, level L is selected.
+
+      * mode
+
+      The mode of encoding, expressed as a string with allowed values
+      numeric, alphanumeric, byte, and kanji. If not provided, it is
+      automatically guessed based on the contents of the provided $octets.
+
+      * octets
+
+      In the first form, this is overwritten by the first argument.
+      Otherwise, it represents the sequence of octets that will be encoded
+      in the QR Code.
+
+      * version
+
+      The version of the QR Code, as an integer between 1 and 40. It is
+      automatically calculated if not provided, based on the input $octets
+      size.
+
+    The output is a hash reference with the following keys:
+
+      * level
+
+      The Error Correction level, expressed as a single-character string
+      with allowed values L, M, Q, and H, in increasing level of
+      correction.
+
+      * mode
+
+      The mode of encoding, expressed as a string with allowed values
+      numeric, alphanumeric, byte, and kanji.
+
+      * masked
+
+      An array reference with the list of the different masked alternatives
+      for the QR Code.
+
+      * mask_id
+
+      The identifier of the mask that has been selected as best. It is an
+      index for the masked array reference, leading to a matrix equal to
+      matrix.
+
+      * matrix
+
+      The matrix selected as the result of the encoding, expressed as an
+      array reference holding references to other arrays. Each position
+      (module in QR standard terms) holds an integer value, whose
+      least-significant bit is 0 for a white module and 1 for a black
+      module.
+
+      * plot
+
+      An equivalent of matrix, with the same disposition but where each
+      position holds a space character (0x20) for a white module and a star
+      character (0x2a) for a black module. This is compatible with the
+      output of the plot method in Text::QRCode.
+
+      * version
+
+      The version of the QR Code, as an integer between 1 and 40.
+
+BUGS AND LIMITATIONS
+
+    Minimul perl version 5.24.
+
+    Report bugs through GitHub (patches welcome) at
+    https://github.com/polettix/QRCode-Encoder.
+
+AUTHOR
+
+    Flavio Poletti <flavio@polettix.it>
+
+COPYRIGHT AND LICENSE
+
+    Copyright 2025 by Flavio Poletti <flavio@polettix.it>
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may
+    not use this file except in compliance with the License. You may obtain
+    a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+    implied. See the License for the specific language governing
+    permissions and limitations under the License.
+
+    Just to be clear: apache-2.0
+

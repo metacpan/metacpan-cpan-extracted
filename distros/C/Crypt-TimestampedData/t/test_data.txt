@@ -1,0 +1,6 @@
+Test data for Crypt::TimestampedData module
+This file contains UTF-8 characters: àáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿ
+Special characters: !@#$%^&*()_+-=[]{}|;':",./<>?
+Unicode symbols: ★☆♠♣♥♦♪♫☀☁☂☃
+Numbers: 0123456789
+Mixed content: Hello 世界! 🌍 Testing 123 €$£¥

@@ -103,8 +103,7 @@ class Mojolicious::Sessions {
       return;
     }
     
-    Re->s(my $_ = [$value], ["-", "g"], "=");
-    $value = $_->[0];
+    Re->s((mutable string)$value, ["-", "g"], "=");
     
     my $session = (Hash)$self->deserialize->(Mojo::Util->b64_decode($value));
     unless ($session) {

@@ -1,0 +1,176 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+QRCode::Encoder - Create QR Codes in pure Perl
+
+
+=head1 VERSION
+
+This document describes QRCode::Encoder version 0.003.
+
+=begin html
+
+<a href="https://travis-ci.org/polettix/QRCode-Encoder">
+<img alt="Build Status" src="https://travis-ci.org/polettix/QRCode-Encoder.svg?branch=master">
+</a>
+<a href="https://www.perl.org/">
+<img alt="Perl Version" src="https://img.shields.io/badge/perl-5.24+-brightgreen.svg">
+</a>
+<a href="https://badge.fury.io/pl/QRCode-Encoder">
+<img alt="Current CPAN version" src="https://badge.fury.io/pl/QRCode-Encoder.svg">
+</a>
+<a href="http://cpants.cpanauthors.org/dist/QRCode-Encoder">
+<img alt="Kwalitee" src="http://cpants.cpanauthors.org/dist/QRCode-Encoder.png">
+</a>
+<a href="http://www.cpantesters.org/distro/O/QRCode-Encoder.html?distmat=1">
+<img alt="CPAN Testers" src="https://img.shields.io/badge/cpan-testers-blue.svg">
+</a>
+<a href="http://matrix.cpantesters.org/?dist=QRCode-Encoder">
+<img alt="CPAN Testers Matrix" src="https://img.shields.io/badge/matrix-@testers-blue.svg">
+</a>
+
+=end html
+
+=head1 SYNOPSIS
+
+   use QRCode::Encoder qr< qr_encode >;
+
+   my $message = '...';
+   my $encoded = qr_encode($message, level => 'H'); # hash reference
+
+   # The "plot" key is compatible with Text::QRCode
+   my $arrayref = $encoded->{plot};
+   print join "\n", map { join '', @$_ } @$arrayref;
+
+
+=head1 DESCRIPTION
+
+Generate QR Codes, compatibly with L<Text::QRCode>.
+
+The output of function C<qr_encode> is NOT an image file, although it
+can be easily turned into one. As anticipated, much like
+L<Text::QRCode>.
+
+=head1 INTERFACE
+
+=head2 B<< qr_encode >>
+
+   my $encoded = qr_encode($octets, %opts);  # OR
+   my $encoded = qr_encode(%opts);
+
+Encode the message in C<$octets>, with options in C<%opts>.
+
+Supported options are:
+
+=over
+
+=item * C<level>
+
+The Error Correction level, expressed as a single-character string with
+allowed values C<L>, C<M>, C<Q>, and C<H>, in increasing level of
+correction. If not provided, level C<L> is selected.
+
+=item * C<mode>
+
+The mode of encoding, expressed as a string with allowed values
+C<numeric>, C<alphanumeric>, C<byte>, and C<kanji>. If not provided, it
+is automatically guessed based on the contents of the provided
+C<$octets>.
+
+=item * C<octets>
+
+In the first form, this is overwritten by the first argument. Otherwise,
+it represents the sequence of octets that will be encoded in the QR
+Code.
+
+=item * C<version>
+
+The I<version> of the QR Code, as an integer between C<1> and C<40>. It
+is automatically calculated if not provided, based on the input
+C<$octets> size.
+
+=back
+
+The output is a hash reference with the following keys:
+
+=over
+
+=item * C<level>
+
+The Error Correction level, expressed as a single-character string with
+allowed values C<L>, C<M>, C<Q>, and C<H>, in increasing level of
+correction.
+
+=item * C<mode>
+
+The mode of encoding, expressed as a string with allowed values
+C<numeric>, C<alphanumeric>, C<byte>, and C<kanji>.
+
+=item * C<masked>
+
+An array reference with the list of the different masked alternatives
+for the QR Code.
+
+=item * C<mask_id>
+
+The identifier of the mask that has been selected as best. It is an
+index for the C<masked> array reference, leading to a matrix equal to
+C<matrix>.
+
+=item * C<matrix>
+
+The matrix selected as the result of the encoding, expressed as an array
+reference holding references to other arrays. Each position (I<module>
+in QR standard terms) holds an integer value, whose least-significant
+bit is C<0> for a white module and C<1> for a black module.
+
+=item * C<plot>
+
+An equivalent of C<matrix>, with the same disposition but where each
+position holds a space character (C<0x20>) for a white module and a star
+character (C<0x2a>) for a black module. This is compatible with the
+output of the C<plot> method in L<Text::QRCode>.
+
+=item * C<version>
+
+The I<version> of the QR Code, as an integer between C<1> and C<40>.
+
+=back
+
+=head1 BUGS AND LIMITATIONS
+
+Minimul perl version 5.24.
+
+Report bugs through GitHub (patches welcome) at
+L<https://github.com/polettix/QRCode-Encoder>.
+
+=head1 AUTHOR
+
+Flavio Poletti <flavio@polettix.it>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2025 by Flavio Poletti <flavio@polettix.it>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+Just to be clear: apache-2.0
+
+
+=cut

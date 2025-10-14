@@ -24,8 +24,7 @@ class Mojolicious::Lite extends Mojolicious {
     
     my $moniker = Mojo::File->path($exe)->basename;
     
-    Re->s(my $_ = [$moniker], "\.(pl|pm|t)$", "");
-    $moniker = $_->[0];
+    Re->s((mutable string)$moniker, "\.(pl|pm|t)$", "");
     
     my $app = new Mojolicious::Lite;
     

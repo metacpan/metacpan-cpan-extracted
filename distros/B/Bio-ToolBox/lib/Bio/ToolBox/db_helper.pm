@@ -5,7 +5,7 @@ use strict;
 use Carp    qw(carp cluck croak confess);
 use English qw(-no_match_vars);
 use Module::Load;    # for dynamic loading during runtime
-use List::Util       qw(min max sum0 uniq);
+use List::Util       qw(min max sum0 uniqstr);
 use Statistics::Lite qw(median range stddevp);
 use IO::Prompt::Tiny qw(prompt);
 use Bio::ToolBox::db_helper::constants;
@@ -16,7 +16,7 @@ use Bio::ToolBox::utility qw(
 );
 require Exporter;
 
-our $VERSION = '2.00';
+our $VERSION = '2.03';
 
 # check values for dynamically loaded helper modules
 # these are loaded only when needed during runtime to avoid wasting resources
@@ -72,20 +72,16 @@ my %SCORE_CALCULATOR_SUB = (
 
 		# Convert names into unique counts
 		my $s = shift;
-		my %name2count;
-		foreach my $n ( @{$s} ) {
-			if ( ref($n) eq 'ARRAY' ) {
+		if ( ref( $s->[0] ) eq 'ARRAY' ) {
 
-				# this is likely from a ncount indexed hash
-				foreach ( @{$n} ) {
-					$name2count{$_} += 1;
-				}
-			}
-			else {
-				$name2count{$n} += 1;
-			}
+			# array of arrays, as may be collected from a positioned hash
+			# convert to a single array then count
+			my @scores = map { @{$_} } @{$s};
+			return scalar( uniqstr(@scores) );
 		}
-		return scalar( keys %name2count );
+		else {
+			return scalar( uniqstr( @{$s} ) );
+		}
 	},
 	'range' => sub {
 
@@ -123,6 +119,7 @@ our @EXPORT_OK = qw(
 	$BIG_ADAPTER
 	use_bam_adapter
 	use_big_adapter
+	use_minimum_mapq
 	open_db_connection
 	get_dataset_list
 	verify_or_request_feature_types
@@ -151,6 +148,19 @@ sub use_big_adapter {
 	my $a = shift || undef;
 	$BIG_ADAPTER = $a if $a;
 	return $BIG_ADAPTER;
+}
+
+sub use_minimum_mapq {
+	my $m = shift;
+	if ( defined $m ) {
+		$m = int $m;
+		unless ( 0 <= $m <= 255 ) {
+			carp " ERROR: requested mapping quality '$m' out of bounds (0..255).";
+			return;
+		}
+		$MAPQ = $m;
+	}
+	return $MAPQ;
 }
 
 sub open_db_connection {
@@ -613,7 +623,7 @@ sub get_dataset_list {
 
 		# sort the types in alphabetical order
 		# and discard duplicate types - which may occur with stranded entries
-		@types = uniq( sort { $a cmp $b } @types );
+		@types = uniqstr( sort { $a cmp $b } @types );
 	}
 
 	# some other database
@@ -912,14 +922,13 @@ sub check_dataset_for_rpm_support {
 	my $cpu     = shift;
 
 	# Calculate the total number of reads
-	# this uses the global variable $rpkm_read_sum
 	my $rpm_read_sum;
 
 	if ( exists $TOTAL_READ_NUMBER{$dataset} ) {
 
 		# this dataset has already been summed
 		# no need to do it again
-		$rpm_read_sum = $TOTAL_READ_NUMBER{$dataset};
+		return $TOTAL_READ_NUMBER{$dataset};
 	}
 
 	elsif ( $dataset =~ /\.bam$/ ) {
@@ -929,13 +938,30 @@ sub check_dataset_for_rpm_support {
 		_load_bam_helper_module() unless $BAM_OK;
 		if ($BAM_OK) {
 
-			# Bio::ToolBox::db_helper::bam was loaded ok
+			# adapter was loaded ok
 			# sum the number of reads in the dataset
-			$rpm_read_sum = sum_total_bam_alignments( $dataset, 0, 0, $cpu );
+			$rpm_read_sum = sum_total_bam_alignments( $dataset, $cpu );
 		}
 		else {
 			carp
 'ERROR: Bam support is not available! Is Bio::DB::Sam or Bio::DB::HTS installed?';
+			return;
+		}
+	}
+
+	elsif ( $dataset =~ /\.cram$/ ) {
+
+		# a cram file dataset
+
+		_load_bam_helper_module() unless $BAM_OK;
+		if ( $BAM_OK and lc $BAM_ADAPTER eq 'hts' ) {
+
+			# adapter was loaded ok
+			# sum the number of reads in the dataset
+			$rpm_read_sum = sum_total_bam_alignments( $dataset, $cpu );
+		}
+		else {
+			carp 'ERROR: Cram support requires Bio::DB::HTS to be installed';
 			return;
 		}
 	}
@@ -2148,6 +2174,20 @@ Values include the following:
 
 =back
 
+=item use_minimum_mapq
+
+Pass an integer (0..255 inclusive) representing the minimum alignment
+mapping quality to be counted in counting collection methods using a Bam
+file. Alignments with a C<MAPQ> value below the indicated value are
+skipped and not counted. Higher values indicate increased confidence
+in mapping placement in the genome; 0 indicates no confidence (usually
+multi-mapping). Default is 0.
+
+NOTE: This only affects alignment counting methods (C<count>, C<ncount>,
+and C<pcount>), not coverage methods, e.g. C<mean>.
+
+This always return the current value (default 0).
+
 =item open_db_connection
 
 	my $db_name = 'cerevisiae';
@@ -2377,13 +2417,6 @@ types.
 
 =item check_dataset_for_rpm_support($dataset, [$cpu])
 
-   # count the total number of alignments
-   my $dataset = '/path/to/file.bam';
-   my $total_count = check_dataset_for_rpm_support($dataset);
-   
-   # use multithreading
-   my $total_count = check_dataset_for_rpm_support($dataset, $cpu);
-
 This subroutine will check a dataset for RPM, or Reads Per Million mapped, 
 support. Only two types of database files support this, Bam files and 
 BigBed files. If the dataset is either one of these, or the name of a 
@@ -2393,14 +2426,22 @@ calculate the total number of mapped alignments (Bam file) or features
 not support RPM (because it is not a Bam or BigBed file, for example), 
 then it will return undefined.
 
-Pass this subroutine one or two values. The first is the name of the 
-dataset. Ideally it should be validated using verify_or_request_feature_types() 
-and have an appropriate prefix (file, http, or ftp). 
+Pass this subroutine one or two values. The first is the name of the
+dataset. Ideally it should be validated using
+L<verify_or_request_feature_types> and have an appropriate prefix (file,
+http, or ftp). For multi-threaded execution, optionally pass a second value
+for the number of CPU cores to use to count Bam files. This will speed up
+counting bam files considerably. The default is 2 for environments where
+L<Parallel::ForkManager> is installed, or 1 where it is not.
 
-For multi-threaded execution pass a second value, the number of CPU cores 
-available to count Bam files. This will speed up counting bam files 
-considerably. The default is 2 for environments where L<Parallel::ForkManager> 
-is installed, or 1 where it is not.
+The mapping quality of alignments may be filtered by setting a global
+filter using L</use_minimum_mapq> function. Example:
+
+   # count the total number of alignments
+   my $dataset = '/path/to/file.bam';
+   my $cpu = 4;
+   use_minimum_mapq(13);
+   my $total_count = check_dataset_for_rpm_support($dataset, $cpu);
 
 =item get_new_feature_list
 

@@ -9349,7 +9349,7 @@ void _unpack_float32(pTHX_ mpfr_t * f) {
 
   sp = mark;
 
-#ifdef WE_HAVE_BENDIAN /* Big Endian architecture */
+#ifdef MPFR_HAVE_BENDIAN /* Big Endian architecture */
   for (i = 0; i < n; i++) {
 #else
   for (i = n - 1; i >= 0; i--) {
@@ -9385,7 +9385,7 @@ void _unpack_float16(pTHX_ mpfr_t * f) {
 
   sp = mark;
 
-#ifdef WE_HAVE_BENDIAN /* Big Endian architecture */
+#ifdef MPFR_HAVE_BENDIAN /* Big Endian architecture */
   for (i = 0; i < n; i++) {
 #else
   for (i = n - 1; i >= 0; i--) {
@@ -9425,7 +9425,7 @@ void _unpack_bfloat16(pTHX_ mpfr_t * f) {
 
   sp = mark;
 
-#ifdef WE_HAVE_BENDIAN /* Big Endian architecture */
+#ifdef MPFR_HAVE_BENDIAN /* Big Endian architecture */
   for (i = 0; i < n; i++) {
 #else
   for (i = n - 1; i >= 0; i--) {

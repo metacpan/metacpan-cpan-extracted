@@ -145,7 +145,7 @@
             "Test::Mojo" : "0",
             "Test::More" : "0",
             "Test::Needs" : "0",
-            "Test::Warnings" : "0.033",
+            "Test::Warnings" : "0",
             "YAML::PP" : "0.005",
             "lib" : "0",
             "open" : "0",
@@ -237,15 +237,15 @@
    "provides" : {
       "JSON::Schema::Modern::Document::OpenAPI" : {
          "file" : "lib/JSON/Schema/Modern/Document/OpenAPI.pm",
-         "version" : "0.098"
+         "version" : "0.099"
       },
       "JSON::Schema::Modern::Vocabulary::OpenAPI" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/OpenAPI.pm",
-         "version" : "0.098"
+         "version" : "0.099"
       },
       "OpenAPI::Modern" : {
          "file" : "lib/OpenAPI/Modern.pm",
-         "version" : "0.098"
+         "version" : "0.099"
       }
    },
    "release_status" : "stable",
@@ -260,7 +260,7 @@
          "web" : "https://github.com/karenetheridge/OpenAPI-Modern"
       }
    },
-   "version" : "0.098",
+   "version" : "0.099",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.043003"
@@ -1149,7 +1149,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.098",
+                  "tag" : "v0.099",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },

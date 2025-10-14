@@ -4,13 +4,15 @@ Config::Abstraction - Merge and manage configuration data from different sources
 
 # VERSION
 
-Version 0.34
+Version 0.35
 
 # SYNOPSIS
 
-`Config::Abstraction` lets you load configuration from multiple sources—such as files, environment variables, and in-code defaults—and merge them with predictable precedence.
+`Config::Abstraction` lets you load configuration from multiple sources,
+such as files, environment variables, and in-code defaults,
+and merge them with predictable precedence.
 It provides a consistent API for accessing the configuration settings, regardless of where they came from,
-this helps keep your application’s or class's configuration flexible, centralized, and easy to override.
+this helps keep your application's or class's configuration flexible, centralized, and easy to override.
 
     use Config::Abstraction;
 
@@ -122,18 +124,21 @@ to configuration management.
 
 ## ENVIRONMENT VARIABLE HANDLING
 
-Configuration values can be overridden via environment variables. For
-instance, if you have a key in the configuration such as `database.user`,
-you can override it by setting the corresponding environment variable
-`APP_DATABASE__USER` in your system.
+Configuration values can be overridden via environment variables. Environment variables use double underscores (\_\_) to denote nested configuration keys and single underscores remain as part of the key name under the prefix namespace.
 
 For example:
 
-    $ export APP_DATABASE__USER="env_user"
+    APP_DATABASE__USER becomes database.user (nested structure)
 
-This will override any value set for `database.user` in the configuration files.
+      $ export APP_DATABASE__USER="env_user"
 
-## COMMAND LINE HANDLING
+will override any value set for \`database.user\` in the configuration files.
+
+    APP_LOGLEVEL becomes APP.loglevel (flat under prefix namespace)
+
+    APP_API__RATE_LIMIT becomes api.rate_limit (mixed usage)
+
+This allows you to override both top-level and nested configuration values using environment variables.
 
 Configuration values can be overridden via the command line (`@ARGV`).
 For instance, if you have a key in the configuration such as `database.user`,
@@ -348,6 +353,12 @@ when `sep_char` is set to '\_'.
 
     Keys explicitly set to `undef` in a later source override earlier values.
 
+- Environrment
+
+    When using environment variables,
+    remember that double underscores (\_\_) create nested structures,
+    while single underscores remain as part of the key name under the prefix namespace.
+
 # BUGS
 
 It should be possible to escape the separator character either with backslashes or quotes.
@@ -380,11 +391,3 @@ You can find documentation for this module with the perldoc command.
 # AUTHOR
 
 Nigel Horne, `<njh at nigelhorne.com>`
-
-# POD ERRORS
-
-Hey! **The above document had some coding errors, which are explained below:**
-
-- Around line 34:
-
-    Non-ASCII character seen before =encoding in 'sources—such'. Assuming UTF-8

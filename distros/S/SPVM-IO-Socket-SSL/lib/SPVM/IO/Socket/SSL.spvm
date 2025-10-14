@@ -2,7 +2,7 @@
 # MIT License
 
 class IO::Socket::SSL extends IO::Socket::IP {
-  version "0.010";
+  version "0.013";
   
   use IO::Socket::SSL::Callback::BeforeConnectSSL;
   use IO::Socket::SSL::Callback::BeforeAcceptSSL;
@@ -41,16 +41,14 @@ class IO::Socket::SSL extends IO::Socket::IP {
   
   has ssl : ro Net::SSLeay;
   
-  has before_connect_SSL_cbs_list : ro List of IO::Socket::SSL::Callback::BeforeConnectSSL;
+  has before_connect_SSL_cbs : ro IO::Socket::SSL::Callback::BeforeConnectSSL[];
   
-  has before_accept_SSL_cbs_list : ro List of IO::Socket::SSL::Callback::BeforeAcceptSSL;
+  has before_accept_SSL_cbs : ro IO::Socket::SSL::Callback::BeforeAcceptSSL[];
   
   # Undocumented Fields
   has SocketCategory : int;
   
   has SSL_startHandshake : int;
-  
-  has SSL_verify_mode_option : Int;
   
   has SSL_verify_mode : int;
   
@@ -121,74 +119,57 @@ class IO::Socket::SSL extends IO::Socket::IP {
   
   protected method init : void ($options : object[] = undef) {
     
-    my $options_h = Hash->new($options);
-    
     $self->SUPER::init($options);
     
-    $self->{before_connect_SSL_cbs_list} = List->new(new IO::Socket::SSL::Callback::BeforeConnectSSL[0]);
+    my $options = Hash->new($options);
     
-    $self->{before_accept_SSL_cbs_list} = List->new(new IO::Socket::SSL::Callback::BeforeAcceptSSL[0]);
+    $self->{before_connect_SSL_cbs} = new IO::Socket::SSL::Callback::BeforeConnectSSL[0];
     
-    my $SSL_verify_mode_option = $options_h->get("SSL_verify_mode");
-    $self->{SSL_verify_mode_option} = (Int)$SSL_verify_mode_option;
+    $self->{before_accept_SSL_cbs} = new IO::Socket::SSL::Callback::BeforeAcceptSSL[0];
     
-    my $SSL_verify_callback = (Net::SSLeay::Callback::Verify)$options_h->get_or_default("SSL_verify_callback", undef);
-    $self->{SSL_verify_callback} = $SSL_verify_callback;
+    if ($options->exists("SSL_verify_mode")) {
+      $self->{SSL_verify_mode} = $options->get("SSL_verify_mode")->(int);
+    }
     
-    my $SSL_hostname = $options_h->get_or_default_string("SSL_hostname", undef);
+    $self->{SSL_verify_callback} = $options->get_or_default("SSL_verify_callback", undef)->(Net::SSLeay::Callback::Verify);
     
-    $self->{SSL_hostname} = $SSL_hostname;
+    $self->{SSL_hostname} = $options->get_or_default("SSL_hostname", undef)->(string);
     
-    my $SSL_passwd_cb = (Net::SSLeay::Callback::PemPassword)$options_h->get_or_default("SSL_passwd_cb", undef);
-    $self->{SSL_passwd_cb} = $SSL_passwd_cb;
+    $self->{SSL_passwd_cb} = $options->get_or_default("SSL_passwd_cb", undef)->(Net::SSLeay::Callback::PemPassword);
     
-    my $SSL_crl_file = $options_h->get_or_default_string("SSL_crl_file", undef);
+    $self->{SSL_crl_file} = $options->get_or_default("SSL_crl_file", undef)->(string);
     
-    $self->{SSL_crl_file} = $SSL_crl_file;
+    $self->{SSL_check_crl} = $options->get_or_default("SSL_check_crl", 0)->(int);
     
-    my $SSL_check_crl = $options_h->get_or_default_int("SSL_check_crl", 0);
+    $self->{SSL_startHandshake} = $options->get_or_default("SSL_startHandshake", 1)->(int);
     
-    $self->{SSL_check_crl} = $SSL_check_crl;
+    $self->{SSL_ca} = $options->get_or_default("SSL_ca", undef)->(Net::SSLeay::X509[]);
     
-    my $SSL_startHandshake = $options_h->get_or_default_int("SSL_startHandshake", 1);
-    $self->{SSL_startHandshake} = $SSL_startHandshake;
+    $self->{SSL_ca_file} = $options->get_or_default("SSL_ca_file", undef)->(string);
     
-    my $SSL_ca = (Net::SSLeay::X509[])$options_h->get_or_default("SSL_ca", undef);
-    $self->{SSL_ca} = $SSL_ca;
+    $self->{SSL_ca_path} = $options->get_or_default("SSL_ca_path", undef)->(string);
     
-    my $SSL_ca_file = $options_h->get_or_default_string("SSL_ca_file", undef);
-    $self->{SSL_ca_file} = $SSL_ca_file;
-    
-    my $SSL_ca_path = $options_h->get_or_default_string("SSL_ca_path", undef);
-    $self->{SSL_ca_path} = $SSL_ca_path;
-    
-    if ($SSL_ca && ($SSL_ca_file || $SSL_ca_path)) {
+    if ($self->{SSL_ca} && ($self->{SSL_ca_file} || $self->{SSL_ca_path})) {
       die "If SSL_ca option is specified, SSL_ca_file option or SSL_ca_path option cannot be specified.";
     }
     
-    my $SSL_cert = (Net::SSLeay::X509[])$options_h->get_or_default("SSL_cert", undef);
-    $self->{SSL_cert} = $SSL_cert;
+    $self->{SSL_cert} = $options->get_or_default("SSL_cert", undef)->(Net::SSLeay::X509[]);
     
-    my $SSL_cert_file = $options_h->get_or_default_string("SSL_cert_file", undef);
-    $self->{SSL_cert_file} = $SSL_cert_file;
+    $self->{SSL_cert_file} = $options->get_or_default("SSL_cert_file", undef)->(string);
     
-    if ($SSL_cert && $SSL_cert_file) {
+    if ($self->{SSL_cert} && $self->{SSL_cert_file}) {
       die "If SSL_cert option is specified, SSL_cert_file option cannot be specified.";
     }
     
-    my $SSL_key = $options_h->get_or_default("SSL_key", undef);
-    $self->{SSL_key} = (Net::SSLeay::EVP_PKEY)$SSL_key;
+    $self->{SSL_key} = $options->get_or_default("SSL_key", undef)->(Net::SSLeay::EVP_PKEY);
     
-    my $SSL_key_file = $options_h->get_or_default_string("SSL_key_file", undef);
-    $self->{SSL_key_file} = $SSL_key_file;
+    $self->{SSL_key_file} = $options->get_or_default("SSL_key_file", undef)->(string);
     
-    if ($SSL_key && $SSL_key_file) {
+    if ($self->{SSL_key} && $self->{SSL_key_file}) {
       die "If SSL_key option is specified, SSL_key_file option cannot be specified.";
     }
     
-    my $SSL_alpn_protocols = (string[])$options_h->get_or_default("SSL_alpn_protocols", undef);
-    $self->{SSL_alpn_protocols} = $SSL_alpn_protocols;
-    
+    $self->{SSL_alpn_protocols} = $options->get_or_default("SSL_alpn_protocols", undef)->(string[]);
   }
   
   protected method configure : void () {
@@ -251,24 +232,18 @@ class IO::Socket::SSL extends IO::Socket::IP {
     my $ssl_ctx = Net::SSLeay::SSL_CTX->new($ssl_method);
     
     # SSL_verify_mode
-    my $SSL_verify_mode = -1;
-    my $SSL_verify_mode_option = $self->{SSL_verify_mode_option};
-    if ($SSL_verify_mode_option) {
-      $SSL_verify_mode = (int)$SSL_verify_mode_option;
-    }
-    else {
+    unless (exists $self->{SSL_verify_mode}) {
       if ($SocketCategory == &SOCKET_CATEGORY_SERVER) {
-        $SSL_verify_mode = SSL->SSL_VERIFY_NONE;
+        $self->{SSL_verify_mode} = SSL->SSL_VERIFY_NONE;
       }
       elsif ($SocketCategory == &SOCKET_CATEGORY_CLIENT) {
-        $SSL_verify_mode = SSL->SSL_VERIFY_PEER;
+        $self->{SSL_verify_mode} = SSL->SSL_VERIFY_PEER;
       }
     }
-    $self->{SSL_verify_mode} = $SSL_verify_mode;
     
     # SSL_verify_callback
     my $SSL_verify_callback = $self->{SSL_verify_callback};
-    $ssl_ctx->set_verify($SSL_verify_mode, $SSL_verify_callback);
+    $ssl_ctx->set_verify($self->{SSL_verify_mode}, $SSL_verify_callback);
     
     # verify_param
     my $verify_param = $ssl_ctx->get0_param;
@@ -368,7 +343,6 @@ class IO::Socket::SSL extends IO::Socket::IP {
     my $SSL_crl_file = $self->{SSL_crl_file};
     if ($SSL_crl_file) {
       my $bio = Net::SSLeay::BIO->new_file($SSL_crl_file, "r");
-      my $x509s_list = List->new(new Net::SSLeay::X509_CRL[0]);
       while (1) {
         my $x509_crl = (Net::SSLeay::X509_CRL)undef;
         
@@ -422,10 +396,10 @@ class IO::Socket::SSL extends IO::Socket::IP {
     
     $ssl->set_fd($fd);
     
-    my $before_connect_SSL_cbs_list = $self->{before_connect_SSL_cbs_list};
-    my $before_connect_SSL_cbs_length = $before_connect_SSL_cbs_list->length;
+    my $before_connect_SSL_cbs = (List of IO::Socket::SSL::Callback::BeforeConnectSSL)List->new_ref($self->{before_connect_SSL_cbs});
+    my $before_connect_SSL_cbs_length = @$before_connect_SSL_cbs;
     for (my $i = 0; $i < $before_connect_SSL_cbs_length; $i++) {
-      my $cb = (IO::Socket::SSL::Callback::BeforeConnectSSL)$before_connect_SSL_cbs_list->get($i);
+      my $cb = $before_connect_SSL_cbs->[$i];
       $cb->($self, $ssl);
     }
     
@@ -470,10 +444,10 @@ class IO::Socket::SSL extends IO::Socket::IP {
     
     $ssl->set_fd($fd);
     
-    my $before_accept_SSL_cbs_list = $self->{before_accept_SSL_cbs_list};
-    my $before_accept_SSL_cbs_length = $before_accept_SSL_cbs_list->length;
+    my $before_accept_SSL_cbs = (List of IO::Socket::SSL::Callback::BeforeAcceptSSL)List->new_ref($self->{before_accept_SSL_cbs});
+    my $before_accept_SSL_cbs_length = @$before_accept_SSL_cbs;
     for (my $i = 0; $i < $before_accept_SSL_cbs_length; $i++) {
-      my $cb = (IO::Socket::SSL::Callback::BeforeAcceptSSL)$before_accept_SSL_cbs_list->get($i);
+      my $cb = $before_accept_SSL_cbs->[$i];
       $cb->($self, $ssl);
     }
     
@@ -732,18 +706,12 @@ class IO::Socket::SSL extends IO::Socket::IP {
   
   method add_before_connect_SSL_cb : void ($cb : IO::Socket::SSL::Callback::BeforeConnectSSL) {
     
-    my $before_connect_SSL_cbs_list = $self->{before_connect_SSL_cbs_list};
-    
-    $before_connect_SSL_cbs_list->push($cb);
-    
+    List->new_ref($self->{before_connect_SSL_cbs})->push($cb);
   }
   
   method add_before_accept_SSL_cb : void ($cb : IO::Socket::SSL::Callback::BeforeAcceptSSL) {
     
-    my $before_accept_SSL_cbs_list = $self->{before_accept_SSL_cbs_list};
-    
-    $before_accept_SSL_cbs_list->push($cb);
-    
+    List->new_ref($self->{before_accept_SSL_cbs})->push($cb);
   }
   
   method stat : Sys::IO::Stat () {

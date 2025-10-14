@@ -49,7 +49,7 @@ use vars qw(
 @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 @EXPORT    = qw();
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 ################################################################################
 # - Subroutines
@@ -139,7 +139,8 @@ sub rand_chars {
         if ( $options{'set'} eq 'all' ) {
             @charset =
               ( 0 .. 9, 'a' .. 'z', 'A' .. 'Z', '#', ',',
-                qw(~ ! @ $ % ^ & * ( ) _ + = - { } | : " < > ? / . ' ; ] [ \ `)
+                qw(~ ! @ $ % ^ & * ( ) _ + = - { } | : " < > ? / . ' ; ] [ `),
+                "\\",
             );
         }
         elsif ( $options{'set'} eq 'alpha' ) {

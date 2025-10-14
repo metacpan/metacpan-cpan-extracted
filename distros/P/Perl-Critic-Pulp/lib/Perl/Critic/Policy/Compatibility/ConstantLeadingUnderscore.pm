@@ -27,7 +27,7 @@ use version (); # but don't import qv()
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
-our $VERSION = 99;
+our $VERSION = 100;
 
 use constant supported_parameters => ();
 use constant default_severity     => $Perl::Critic::Utils::SEVERITY_MEDIUM;

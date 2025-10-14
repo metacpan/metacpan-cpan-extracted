@@ -5,7 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
-  SPVM: '0.990048'
+  SPVM: '0.990102'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: mit
@@ -18,7 +18,7 @@ no_index:
     - t
     - inc
 requires:
-  SPVM: '0.990048'
+  SPVM: '0.990102'
   SPVM::Errno: '0.07'
   SPVM::File::Path: '0.011001'
   SPVM::File::Spec: '0.086'
@@ -26,5 +26,5 @@ requires:
   SPVM::Sys: '0.513'
 resources:
   repository: https://github.com/yuki-kimoto/SPVM-File-Temp.git
-version: '0.028'
+version: '0.029'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

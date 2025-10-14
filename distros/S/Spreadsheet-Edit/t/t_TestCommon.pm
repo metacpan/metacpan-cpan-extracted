@@ -429,7 +429,7 @@ my $testee_top_module;
 for (my $path=path(__FILE__);
              $path ne Path::Tiny->rootdir; $path=$path->parent) {
   if (-e (my $p = $path->child("dist.ini"))) {
-    $p->slurp_utf8() =~ /^ *name *= *(\S+)/i or oops;
+    $p->slurp_utf8() =~ /^ *name *= *(\S+)/im or oops;
     ($testee_top_module = $1) =~ s/-/::/g;
     last
   }
@@ -464,13 +464,19 @@ sub verif_no_internals_mentioned($) { # croaks if references found
   s#\b(\bt_\w+).pm(\W|$)#<$1 .pm>$2#gs;
 
   my $msg;
-  if (/\b(?<hit>${testee_top_module}::[\w:]*)/) {
-    $msg = "ERROR: Log msg or traceback mentions internal package '$+{hit}'"
+  if (/\b(?<hit>${testee_top_module}::)/) {
+    $msg = "ERROR: Log msg or traceback mentions internal sub '$+{hit}'"
+      ###TEMP
+      #.dvis('\n($testee_top_module)\n')
+      #."(IN:$_)\n"
+      ;
   }
   elsif (/(?<hit>[-.\w\/]+\.pm\b)/s) {
     $msg = "ERROR: Log msg or traceback mentions non-test .pm file '$+{hit}'"
   }
   if ($msg) {
+    ###TEMP
+    #die "---XXX---\n$msg\n$_\n---YYY---\n";
     my $start = $-[1]; # offset of start of item
     my $end   = $+[1]; # offset of end+1
     substr($_,$start,0) = "HERE>>>";

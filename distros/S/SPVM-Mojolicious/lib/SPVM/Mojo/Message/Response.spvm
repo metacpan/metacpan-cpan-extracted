@@ -150,10 +150,10 @@ class Mojo::Message::Response extends Mojo::Message {
     return $message;
   }
   
-  method extract_start_line : int ($bufref : string[]) {
+  method extract_start_line : int ($buf : mutable string) {
     
     # We have a full response line
-    my $_ = Re->s($bufref, "^(.*?)\x0d?\x0a", "");
+    my $_ = Re->s($buf, "^(.*?)\x0d?\x0a", "");
     unless ($_) {
       return 0;
     }

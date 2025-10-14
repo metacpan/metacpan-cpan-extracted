@@ -1,5 +1,15 @@
 -----
 
+11.8.0    2025-10-12
+    [Changed]
+       * Minimum versions of XDR::Gen and Protocol::Sys::Virt::Devel increased
+       * Updated to libvirt tag v11.8.0 (from 11.7.0 - no actual changes) 
+
+11.7.0    2025-09-06
+    [Changed]
+       * Updated to libvirt tag v11.7.0 (from 11.6.0)
+       * No actual changes
+
 11.6.0    2025-08-05
     [Breaking]
        * Structure member 'resource' renamed to 'bandwidth' in upstream

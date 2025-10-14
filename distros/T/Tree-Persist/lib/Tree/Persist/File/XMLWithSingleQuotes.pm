@@ -11,7 +11,7 @@ use Scalar::Util qw( blessed refaddr );
 
 use XML::Parser;
 
-our $VERSION = '1.14';
+our $VERSION = '1.16';
 
 # ----------------------------------------------
 

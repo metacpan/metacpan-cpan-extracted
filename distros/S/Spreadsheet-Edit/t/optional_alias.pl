@@ -64,7 +64,7 @@ die "colx{Xalias3} unexpectedly defined!\n  colx: $colx{Xalias3}\n  colx_desc: $
 die unless exists $colx_desc{Xalias3};
 apply {
   die if defined $Xalias3; # read returns undef
-  eval { $Xalias3 = "foo" }; verif_eval_err qr/optional.*alias.*not.*defined/i; # write
+  eval { $Xalias3 = "foo" }; verif_eval_err qr/write.*alias.*not.*defined/i; # write
 };
 
 say "Done." unless $silent;

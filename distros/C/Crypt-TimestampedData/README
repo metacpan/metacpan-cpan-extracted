@@ -1,0 +1,156 @@
+NAME
+
+    Crypt::TimestampedData - Read and write TimeStampedData files (.TSD,
+    RFC 5544)
+
+SYNOPSIS
+
+      use Crypt::TimestampedData;
+    
+      # Decode from .TSD file
+      my $tsd = Crypt::TimestampedData->read_file('/path/file.tsd');
+      my $version           = $tsd->{version};
+      my $data_uri          = $tsd->{dataUri};        # optional
+      my $meta              = $tsd->{metaData};       # optional
+      my $content_der       = $tsd->{content};        # optional (CMS ContentInfo DER)
+      my $evidence_content  = $tsd->{temporalEvidence};
+    
+      # Encode to .TSD file
+      Crypt::TimestampedData->write_file('/path/out.tsd', $tsd);
+
+DESCRIPTION
+
+    Minimal implementation of the TimeStampedData format (RFC 5544) using
+    Convert::ASN1. This version treats CMS constructs and TimeStampTokens
+    as opaque DER blobs. The goal is to enable reading/writing of .TSD
+    files, delegating CMS/TS handling to external libraries when available.
+
+METHODS
+
+ new(%args)
+
+    Creates a new Crypt::TimestampedData object with the provided
+    arguments.
+
+ read_file($filepath)
+
+    Reads and decodes a .TSD file from the specified path. Returns a hash
+    reference containing the decoded TimeStampedData structure.
+
+ write_file($filepath, $tsd_hashref)
+
+    Encodes and writes a TimeStampedData structure to the specified file
+    path.
+
+ decode_der($der)
+
+    Decodes DER-encoded TimeStampedData. Handles both direct TSD format and
+    CMS ContentInfo wrappers (id-ct-TSTData and pkcs7-signedData).
+
+ encode_der($tsd_hashref)
+
+    Encodes a TimeStampedData hash reference to DER format.
+
+ extract_content_der($tsd_hashref)
+
+    Extracts the embedded original content from TimeStampedData.content.
+    Returns raw bytes of the original file if available, otherwise undef.
+
+ extract_tst_tokens_der($tsd_hashref)
+
+    Extracts RFC 3161 TimeStampToken(s) as DER ContentInfo blobs. Returns
+    array reference of DER-encoded ContentInfo tokens.
+
+ write_content_file($tsd_hashref, $filepath)
+
+    Convenience method to write extracted content to a file.
+
+ extract_signed_content_bytes($tsd_hashref)
+
+    Extracts encapsulated content from a SignedData (p7m) stored in
+    TSD.content. Returns raw bytes of the signed payload (eContent) when
+    available.
+
+ write_signed_content_file($tsd_hashref, $filepath)
+
+    Convenience method to write extracted signed content to a file.
+
+ write_tst_files($tsd_hashref, $dirpath)
+
+    Writes extracted timestamp tokens to individual .tsr files in the
+    specified directory.
+
+ write_tds($marked_filepath, $tsr_input, $out_filepath_opt)
+
+    Creates and writes a TSD file from a marked file and one or more
+    RFC3161 TimeStampToken(s) provided as .TSR (DER CMS ContentInfo) blobs
+    or paths.
+
+EXAMPLES
+
+      # Read a TSD file
+      my $tsd = Crypt::TimestampedData->read_file('document.tsd');
+      print "Version: $tsd->{version}\n";
+      
+      # Extract the original content
+      Crypt::TimestampedData->write_content_file($tsd, 'original_document.pdf');
+      
+      # Extract timestamp tokens
+      my $tokens = Crypt::TimestampedData->extract_tst_tokens_der($tsd);
+      print "Found " . scalar(@$tokens) . " timestamp tokens\n";
+      
+      # Create a new TSD file
+      my $output = Crypt::TimestampedData->write_tds(
+        'document.pdf',           # original file
+        'timestamp.tsr',          # timestamp token
+        'document.tsd'           # output file
+      );
+
+COMMAND-LINE SCRIPTS
+
+    This distribution includes several command-line scripts for working
+    with TimeStampedData files:
+
+      * tsd-create - Create a .tsd file from a file and timestamp
+
+      * tsd-extract - Extract content and timestamps from a .tsd file
+
+      * tsd-info - Display information about a .tsd file
+
+ Windows Usage
+
+    On Windows systems, scripts must be executed with Perl explicitly:
+
+      perl tsd-create --help
+      perl tsd-extract document.tsd
+      perl tsd-info document.tsd
+
+ Unix/Linux Usage
+
+    On Unix/Linux systems, scripts can be executed directly:
+
+      tsd-create --help
+      tsd-extract document.tsd
+      tsd-info document.tsd
+
+REQUIREMENTS
+
+      * Convert::ASN1
+
+AUTHOR
+
+    Guido Brugnara <gdo@leader.it> - created with AI support.
+
+LICENSE
+
+    This module is released under the same terms as Perl itself.
+
+SEE ALSO
+
+      * RFC 5544 - TimeStampedData Format
+
+      * RFC 3161 - Internet X.509 Public Key Infrastructure Time-Stamp
+      Protocol
+
+      * RFC 5652 - Cryptographic Message Syntax (CMS)
+

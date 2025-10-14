@@ -292,7 +292,9 @@ sub check_titles($) {
 
 sub check_both($) {
   my $letters = shift;  # current column ordering
-  croak "Expected $num_cols columns" unless length($letters) == $num_cols;
+  my $exp_nc = length($letters);
+#warn "---check_both($letters) at ", (caller)[1], " line ", (caller)[2], "\n";
+  croak "Expected $exp_nc columns (got $num_cols)" unless $exp_nc == $num_cols;
 
   my %oldoptions  = options();
   my %oldoptions2 = options(verbose => 0);
@@ -887,6 +889,7 @@ foreach ([f => 0], [flt => 0, f => 1, flt => undef], [lt => $#rows],
     apply_torx { bug unless $Gtitle eq "G$rx" } 3;
 
     # After rename removed a title, automatic alias is no longer valid
+    #apply_torx { eval {my $x = $AAAtitle}; verif_eval_err; } 3;
     apply_torx { eval {my $x = $AAAtitle}; verif_eval_err; } 3;
 
     # However user-defined aliases remain valid

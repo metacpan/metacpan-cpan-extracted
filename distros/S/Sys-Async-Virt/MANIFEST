@@ -2,6 +2,9 @@ CHANGES
 CONTRIBUTING.md
 cpanfile
 eg/client.pl
+eg/cpumap.pl
+eg/getstate.pl
+eg/leases.pl
 eg/wait-domain-state.pl
 lib/Sys/Async/Virt.pm
 lib/Sys/Async/Virt/Callback.pm

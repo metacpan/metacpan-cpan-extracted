@@ -1,0 +1,83 @@
+{
+   "abstract" : "Create QR Codes in pure Perl",
+   "author" : [
+      "Flavio Poletti (flavio@polettix.it)"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.22, Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "QRCode-Encoder",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.22",
+            "Path::Tiny" : "0.084",
+            "Template::Perlish" : "1.52",
+            "Test::Pod" : "1.51",
+            "Test::Pod::Coverage" : "1.04"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Math::ReedSolomon::Encoder" : "0.001",
+            "perl" : "5.024000"
+         }
+      }
+   },
+   "provides" : {
+      "QRCode::Encoder" : {
+         "file" : "lib/QRCode/Encoder.pm",
+         "version" : "0.003"
+      },
+      "QRCode::Encoder::Matrix" : {
+         "file" : "lib/QRCode/Encoder/Matrix.pm",
+         "version" : "0.003"
+      },
+      "QRCode::Encoder::QRSpec" : {
+         "file" : "lib/QRCode/Encoder/QRSpec.pm",
+         "version" : "0.003"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://codeberg.org/polettix/QRCode-Encoder/issues"
+      },
+      "homepage" : "https://codeberg.org/polettix/QRCode-Encoder",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://codeberg.org/polettix/QRCode-Encoder.git",
+         "web" : "https://codeberg.org/polettix/QRCode-Encoder"
+      }
+   },
+   "version" : "0.003",
+   "x_contributors" : [
+      "Flavio Poletti <flavio@polettix.it>"
+   ],
+   "x_generated_by_perl" : "v5.36.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
+   "x_spdx_expression" : "Apache-2.0",
+   "x_static_install" : 1
+}
+

@@ -27,12 +27,12 @@
       },
       "configure" : {
          "requires" : {
-            "SPVM" : "0.990048"
+            "SPVM" : "0.990102"
          }
       },
       "runtime" : {
          "requires" : {
-            "SPVM" : "0.990048",
+            "SPVM" : "0.990102",
             "SPVM::Errno" : "0.07",
             "SPVM::File::Path" : "0.011001",
             "SPVM::File::Spec" : "0.086",
@@ -52,6 +52,6 @@
          "web" : "https://github.com/yuki-kimoto/SPVM-File-Temp"
       }
    },
-   "version" : "0.028",
+   "version" : "0.029",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

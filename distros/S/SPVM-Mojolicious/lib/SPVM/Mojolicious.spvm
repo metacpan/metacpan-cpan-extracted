@@ -2,7 +2,7 @@
 # MIT License
 
 class Mojolicious {
-  version "0.027";
+  version "0.030";
   
   use Mojo::Home;
   use Mojo::Loader;

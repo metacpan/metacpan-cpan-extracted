@@ -1,0 +1,172 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+Math::ReedSolomon::Encoder - Calculate Reed-Solomon Error Correction Codes
+
+
+=head1 VERSION
+
+This document describes Math::ReedSolomon::Encoder version 0.001.
+
+=begin html
+
+<a href="https://travis-ci.org/polettix/Math-ReedSolomon-Encoder">
+<img alt="Build Status" src="https://travis-ci.org/polettix/Math-ReedSolomon-Encoder.svg?branch=master">
+</a>
+<a href="https://www.perl.org/">
+<img alt="Perl Version" src="https://img.shields.io/badge/perl-5.24+-brightgreen.svg">
+</a>
+<a href="https://badge.fury.io/pl/Math-ReedSolomon-Encoder">
+<img alt="Current CPAN version" src="https://badge.fury.io/pl/Math-ReedSolomon-Encoder.svg">
+</a>
+<a href="http://cpants.cpanauthors.org/dist/Math-ReedSolomon-Encoder">
+<img alt="Kwalitee" src="http://cpants.cpanauthors.org/dist/Math-ReedSolomon-Encoder.png">
+</a>
+<a href="http://www.cpantesters.org/distro/O/Math-ReedSolomon-Encoder.html?distmat=1">
+<img alt="CPAN Testers" src="https://img.shields.io/badge/cpan-testers-blue.svg">
+</a>
+<a href="http://matrix.cpantesters.org/?dist=Math-ReedSolomon-Encoder">
+<img alt="CPAN Testers Matrix" src="https://img.shields.io/badge/matrix-@testers-blue.svg">
+</a>
+
+=end html
+
+=head1 SYNOPSIS
+
+   use Math::ReedSolomon::Encoder qw< :all >;
+
+   # message is an array of integers
+   my $message_aref = [ 0 .. 9 ];
+
+   # calculate 22 values of error correction
+   my $ecc_aref = rs_correction($message_aref, 22);
+
+   # calculate the message + correction overall array ref
+   my $expanded_aref = rs_encode($message_aref, 22);
+
+   # message is a string of octets
+   my $message_str = 'abcdefghij';
+
+   # calculate 17 octets of error correction 
+   my $ecc_string = rs_correction_string($message_str, 17);
+
+   # calculate the message + correction overall string
+   my $expanded_str = rs_encode_string($message_str, 17);
+
+=head1 DESCRIPTION
+
+Calculate the Reed-Solomon Error Correction Codes in a very specific
+(although very common) condition, namely with I<alpha> set to C<2> and
+the irreducible polynomial set to C<< x^8 + x^4 + x^3 + x^2 + 1 >>. This
+is not written on the stone, though, as it's possible to change these
+values through package variables C<$Math::ReedSolomon::Encoder::ALPHA>
+and C<$Math::ReedSolomon::Encoder::PRIME_POLY>.
+
+This module has no pretense of efficiency or optimization, but provides
+a pure-Perl way of doing the necessary calculations, which comes handy
+in non-heavy-duty situation where the most straightforward portabiity
+characteristics are of value. In other terms, this module is expressely
+geared at being embedded in a bigger program.
+
+=head1 INTERFACE
+
+There are a total of four exportable function, two depending on the data
+format (either arrays of integers, or strings of octets), and two
+orthogonal alternatives for calculating the Error Correction Codes only
+or the whole result of appending the ECCs after the input.
+
+=head2 B<< rs_correction >>
+
+   my $aref = rs_correction($message_aref, $n_ecc);
+
+Calculate the Error Correction Codes only, array-reference interface.
+The return value is an array reference that contains the generated ECCs
+only.
+
+=head2 B<< rs_correction_string >>
+
+   my $aref = rs_correction_string($message_string, $n_ecc);
+
+Calculate the Error Correction Codes only, string interface.
+The return value is a string of octets that contains the generated ECCs
+only.
+
+=head2 B<< rs_encode >>
+
+   my $aref = rs_encode($message_aref, $n_ecc);
+
+Encode the input message adding the Error Correction Codes,
+array-reference interface. The return value is an array reference that
+contains a copy of the input message value, followed by the generated
+ECCs.
+
+=head2 B<< rs_encode_string >>
+
+   my $aref = rs_encode_string($message_string, $n_ecc);
+
+Encode the input message adding the Error Correction Codes, string
+interface. The return value is string of octets that contains a copy of
+the input message value, followed by the generated ECCs.
+
+=head2 Alternative Parameters
+
+The Reed-Solomon ECC calculation techniques work equally well as long as
+the underlying mathematics are complied with, i.e. as long as the value
+of I<alpha> is a generator and a suitable I<irreducible polynomial> is
+selected for polynomial divisions. C<Math::ReedSolomon::Encoder> allows
+setting these two values via package variables:
+
+=over
+
+=item * C<$Math::ReedSolomon::Encoder::ALPHA>
+
+set to C<2> by default.
+
+=item * C<$Math::ReedSolomon::Encoder::PRIME_POLY>
+
+set to C<0x11d> by default. Each bit represents a coefficient in a
+base-2 polynomial, so C<0x11d> is the same as C<0b100011101>, that is 
+the irreducible polynomial in Z2: C<< x^8 + x^4 + x^3 + x^2 + 1 >>.
+
+=back
+
+The values above are commonly found in practical implementations, e.g.
+in QR Codes generation.
+
+=head1 BUGS AND LIMITATIONS
+
+Minimul perl version 5.24.
+
+Report bugs through GitHub (patches welcome) at
+L<https://codeberg.org/polettix/Math-ReedSolomon-Encoder>.
+
+=head1 AUTHOR
+
+Flavio Poletti <flavio@polettix.it>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2025 by Flavio Poletti <flavio@polettix.it>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+Just to be clear: apache-2.0
+
+
+=cut

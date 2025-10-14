@@ -8,9 +8,9 @@ use Log::ger;
 use Perinci::Exporter;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-08-29'; # DATE
+our $DATE = '2024-12-21'; # DATE
 our $DIST = 'App-ImageMagickUtils'; # DIST
-our $VERSION = '0.023'; # VERSION
+our $VERSION = '0.024'; # VERSION
 
 our %SPEC;
 
@@ -70,17 +70,17 @@ our %argspecs_delete = (
     delete_original => {
         summary => 'Delete (unlink) the original file after downsizing',
         schema => 'bool*',
-        description => <<'_',
+        description => <<'MARKDOWN',
 
 See also the `trash_original` option.
 
-_
+MARKDOWN
         cmdline_aliases => {D=>{}},
     },
     trash_original => {
         summary => 'Trash the original file after downsizing',
         schema => 'bool*',
-        description => <<'_',
+        description => <<'MARKDOWN',
 
 This option uses the <pm:File::Trash::FreeDesktop> module to do the trashing.
 Compared to deletion, with this option you can still restore the trashed
@@ -88,7 +88,7 @@ original files from the Trash directory.
 
 See also the `delete_original` option.
 
-_
+MARKDOWN
         cmdline_aliases => {T=>{}},
     },
 );
@@ -122,7 +122,7 @@ sub _nearest {
 $SPEC{downsize_image} = {
     v => 1.1,
     summary => 'Reduce image size, by default via compressing to JPEG quality 40 and downsizing to 1024p',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 This utility uses <prog:convert> utility to compress an image into JPEG with
 default quality of 40 and downsized to 1024p (shortest side to 1024px).
@@ -135,14 +135,14 @@ or (if downsizing is done):
 
     ORIGINAL_NAME.1024p-q40.jgp
 
-_
+MARKDOWN
     args => {
         %argspec0plus_files,
         %argspecopt_quality__def40,
         downsize_to => {
             schema => ['str*', in=>['', '640', '800', '1024', '1536', '2048']],
             default => '1024',
-            description => <<'_',
+            description => <<'MARKDOWN',
 
 Downsizing will only be done if the input image's shortest side is indeed larger
 then the target downsize.
@@ -150,7 +150,7 @@ then the target downsize.
 To disable downsizing, set `--downsize-to` to '' (empty string), or specify on
 `--dont-downsize` on the CLI.
 
-_
+MARKDOWN
             cmdline_aliases => {
                 dont_downsize => {summary=>"Alias for --downsize-to ''", is_flag=>1, code=>sub {$_[0]{downsize_to} = ''}},
                 no_downsize   => {summary=>"Alias for --downsize-to ''", is_flag=>1, code=>sub {$_[0]{downsize_to} = ''}},
@@ -164,28 +164,28 @@ _
             'summary.alt.bool.not' => 'Do not skip WhatsApp images',
             schema => 'bool*',
             default => 1,
-            description => <<'_',
+            description => <<'MARKDOWN',
 
 By default, assuming that WhatsApp already compresses images, when given a
 filename that matches a WhatsApp image filename, e.g. `IMG-20220508-WA0001.jpg`
-(will be checked using <pm:Regexp::Pattern::Filename::Image::WhatsApp>), will
-skip downsizing. The `--no-skip-whatsapp` option will process such filenames
-nevertheless.
+(will be checked using <pm:Regexp::Pattern::Filename::Type::Image::WhatsApp>),
+will skip downsizing. The `--no-skip-whatsapp` option will process such
+filenames nevertheless.
 
-_
+MARKDOWN
         },
         skip_downsized => {
             summary => 'Skip previously downsized images',
             'summary.alt.bool.not' => 'Do not skip previously downsized images',
             schema => 'bool*',
             default => 1,
-            description => <<'_',
+            description => <<'MARKDOWN',
 
 By default, when given a filename that looks like it's already downsized, e.g.
 `foo.1024-q40.jpg` or `foo.q40.jpg`, will skip downsizing. The
 `--no-skip-downsized` option will process such filenames nevertheless.
 
-_
+MARKDOWN
         },
         %argspecs_delete,
     },
@@ -214,7 +214,7 @@ sub downsize_image {
     require File::Which;
     require Image::Size;
     require IPC::System::Options;
-    #require Filename::Image;
+    #require Filename::Type::Image;
 
     my %args = @_;
 
@@ -240,7 +240,7 @@ sub downsize_image {
             next FILE;
         }
 
-        #my $res = Filename::Image::check_image_filename(filename => $file);
+        #my $res = Filename::Type::Image::check_image_filename(filename => $file);
         my ($width, $height, $fmt) = Image::Size::imgsize($file);
         unless ($width) {
             log_error "Filename '%s' is not image (%s), skipped", $file, $fmt;
@@ -248,8 +248,8 @@ sub downsize_image {
         }
 
         if ($skip_whatsapp) {
-            require Regexp::Pattern::Filename::Image::WhatsApp;
-            if ($file =~ $Regexp::Pattern::Filename::Image::WhatsApp::RE{filename_image_whatsapp}{pat}) {
+            require Regexp::Pattern::Filename::Type::Image::WhatsApp;
+            if ($file =~ $Regexp::Pattern::Filename::Type::Image::WhatsApp::RE{filename_type_image_whatsapp}{pat}) {
                 log_info "Filename '%s' looks like a WhatsApp image, skip downsizing due to --skip-whatsapp option is in effect", $file;
                 next FILE;
             }
@@ -323,7 +323,7 @@ sub downsize_image {
 $SPEC{convert_image_to} = {
     v => 1.1,
     summary => 'Convert images using ImageMagick\'s \'convert\' utility, with multiple file support and automatic output naming',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 This is a simple wrapper to ImageMagick's `convert` utility to let you process
 multiple files using a single command:
@@ -334,7 +334,7 @@ is basically equivalent to:
 
     % for f in *.jpg; do convert "$f" "$f.pdf"; done
 
-_
+MARKDOWN
     args => {
         %argspec0plus_files,
         %argspecopt_quality,
@@ -396,7 +396,7 @@ sub convert_image_to {
 $SPEC{convert_image_to_pdf} = {
     v => 1.1,
     summary => 'Convert images to PDF using ImageMagick\'s \'convert\' utility',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 This is a wrapper to `convert-image-to`, with `--to` set to `pdf`:
 
@@ -410,7 +410,7 @@ which in turn is equivalent to:
 
     % for f in *.jpg; do convert "$f" "$f.pdf"; done
 
-_
+MARKDOWN
     args => {
         %argspec0plus_files,
         %argspecs_delete,
@@ -432,7 +432,7 @@ sub convert_image_to_pdf {
 $SPEC{convert_image_to_jpg} = {
     v => 1.1,
     summary => 'Convert images to JPG using ImageMagick\'s \'convert\' utility',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 This is a wrapper to `convert-image-to`, with `--to` set to `jpg`:
 
@@ -446,7 +446,7 @@ which in turn is equivalent to:
 
     % for f in *.png; do convert "$f" "$f.jpg"; done
 
-_
+MARKDOWN
     args => {
         %argspec0plus_files,
         %argspecopt_quality,
@@ -469,7 +469,7 @@ sub convert_image_to_jpg {
 $SPEC{convert_image_to_png} = {
     v => 1.1,
     summary => 'Convert images to JPG using ImageMagick\'s \'convert\' utility',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 This is a wrapper to `convert-image-to`, with `--to` set to `png`:
 
@@ -483,7 +483,7 @@ which in turn is equivalent to:
 
     % for f in *.jpg; do convert "$f" "$f.png"; done
 
-_
+MARKDOWN
     args => {
         %argspec0plus_files,
         %argspecopt_quality,
@@ -518,7 +518,7 @@ App::ImageMagickUtils - Utilities related to ImageMagick
 
 =head1 VERSION
 
-This document describes version 0.023 of App::ImageMagickUtils (from Perl distribution App-ImageMagickUtils), released on 2024-08-29.
+This document describes version 0.024 of App::ImageMagickUtils (from Perl distribution App-ImageMagickUtils), released on 2024-12-21.
 
 =head1 DESCRIPTION
 
@@ -880,9 +880,9 @@ Skip WhatsApp images.
 
 By default, assuming that WhatsApp already compresses images, when given a
 filename that matches a WhatsApp image filename, e.g. C<IMG-20220508-WA0001.jpg>
-(will be checked using L<Regexp::Pattern::Filename::Image::WhatsApp>), will
-skip downsizing. The C<--no-skip-whatsapp> option will process such filenames
-nevertheless.
+(will be checked using L<Regexp::Pattern::Filename::Type::Image::WhatsApp>),
+will skip downsizing. The C<--no-skip-whatsapp> option will process such
+filenames nevertheless.
 
 =item * B<trash_original> => I<bool>
 
@@ -918,6 +918,12 @@ that contains extra information, much like how HTTP response headers provide add
 
 Return value:  (any)
 
+=head1 FAQ
+
+=head2 I got error message "attempt to perform an operation not allowed by the security policy `PDF' @ error/constitute.c/IsCoderAuthorized/426."
+
+See solutions like described in L<https://stackoverflow.com/questions/52998331/imagemagick-security-policy-pdf-blocking-conversion>
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/App-ImageMagickUtils>.
@@ -950,7 +956,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024, 2023, 2022, 2021, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

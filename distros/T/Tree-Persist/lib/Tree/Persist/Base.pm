@@ -5,7 +5,7 @@ use warnings;
 
 use Scalar::Util qw( blessed );
 
-our $VERSION = '1.14';
+our $VERSION = '1.16';
 
 # ----------------------------------------------
 

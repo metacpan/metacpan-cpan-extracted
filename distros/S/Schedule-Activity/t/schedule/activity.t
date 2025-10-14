@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use Schedule::Activity;
-use Test::More tests=>10;
+use Test::More tests=>12;
 
 subtest 'validation'=>sub {
 	plan tests=>2;
@@ -255,7 +255,7 @@ subtest 'Message randomization'=>sub {
 };
 
 subtest 'Message attributes'=>sub {
-	plan tests=>3;
+	plan tests=>4;
 	my %schedule;
 	my %configuration=(
 		node=>{
@@ -273,7 +273,7 @@ subtest 'Message attributes'=>sub {
 				attributes=>{action=>{incr=>1}},
 			},
 			'action 2'=>{
-				message=>{alternates=>[{message=>'Activity',attributes=>{messages=>{incr=>1}}}]},
+				message=>{alternates=>[{message=>'Activity',attributes=>{messages=>{incr=>1},attr2=>{incr=>1}}}]},
 				tmmin=>5,tmavg=>10,tmmax=>15,
 				next=>['Activity, conclude'],
 				attributes=>{action=>{incr=>1}},
@@ -294,6 +294,69 @@ subtest 'Message attributes'=>sub {
 	is_deeply($schedule{attributes}{activity}{xy},[[0,1],[25,2],[30,2]],'Activities');
 	is_deeply($schedule{attributes}{action}{xy},  [[0,0],[5,1],[15,2],[30,2]],'Actions');
 	is_deeply($schedule{attributes}{messages}{xy},[[0,1],[5,2],[15,3],[25,4],[30,4]],'Messages');
+	is($schedule{attributes}{attr2}{y},1,'Message-only attributes');
+};
+
+subtest 'Node+Message attributes'=>sub {
+	plan tests=>6;
+	my %schedule=Schedule::Activity::buildSchedule(activities=>[[20,'root']],configuration=>{node=>{
+		root=>{
+			next=>['step1'],
+			message=>{alternates=>[{message=>'One',attributes=>{boolA=>{set=>0},intA=>{set=>8}}}]},
+			tmavg=>5,
+			finish=>'finish',
+			attributes=>{
+				boolA=>{set=>1},
+				intA =>{set=>9},
+			},
+		},
+		step1=>{
+			next=>['step2'],
+			message=>{alternates=>[{message=>'Two',attributes=>{boolA=>{set=>1},intA=>{incr=>1}}}]},
+			tmavg=>5,
+			attributes=>{
+				boolA=>{set=>0},
+				intA =>{set=>9},
+			},
+		},
+		step2=>{
+			next=>['finish'],
+			message=>{name=>'named1'},
+			tmavg=>5,
+			attributes=>{
+				boolA=>{set=>0},
+				intA =>{incr=>9},
+			},
+		},
+		'finish'=>{
+			message=>{alternates=>[{message=>'Four',attributes=>{boolA=>{set=>0},intA=>{incr=>3}}}]},
+			tmavg=>5,
+			attributes=>{
+				boolA=>{set=>1},
+				intA =>{incr=>2},
+			},
+		}},
+		attributes=>{
+			boolA=>{type=>'bool'},
+			intA =>{type=>'int',value=>0},
+		},
+		messages=>{
+			named1=>{message=>'Three',attributes=>{boolA=>{set=>1},intA=>{set=>7}}},
+		},
+	});
+	is_deeply($schedule{attributes}{boolA}{xy},
+		[
+			[ 0,0],
+			[ 5,1],
+			[10,1],
+			[15,0],
+			[20,0],
+		],'Boolean:  set/set operations');
+	is_deeply($schedule{attributes}{intA}{xy}[0],[ 0,8], 'Integer:  set/set');
+	is_deeply($schedule{attributes}{intA}{xy}[1],[ 5,10],'Integer:  set/incr');
+	is_deeply($schedule{attributes}{intA}{xy}[2],[10,7], 'Integer:  incr/set');
+	is_deeply($schedule{attributes}{intA}{xy}[3],[15,12],'Integer:  incr/incr');
+	is_deeply($schedule{attributes}{intA}{xy}[4],[20,12],'Integer:  end of activity');
 };
 
 subtest 'Annotations'=>sub {
@@ -339,6 +402,56 @@ subtest 'Annotations'=>sub {
 	);
 	%schedule=Schedule::Activity::buildSchedule(configuration=>\%configuration,activities=>[[30,'Activity']]);
 	is_deeply($schedule{annotations},{apple=>{events=>[[10,{message=>'annotation 1'}]]}},'Annotations created, overlap removed');
+};
+
+subtest 'Named messages'=>sub {
+	plan tests=>2;
+	my %schedule;
+	my %configuration=(
+		node=>{
+			Activity=>{
+				message=>'Begin Activity',
+				next=>['action 1'],
+				tmmin=>5,tmavg=>5,tmmax=>5,
+				finish=>'Activity, conclude',
+			},
+			'action 1'=>{
+				message=>[qw/named1 named2/],
+				tmmin=>5,tmavg=>10,tmmax=>15,
+				next=>['action 2','Activity, conclude'],
+			},
+			'action 2'=>{
+				message=>[qw/named1 named2/],
+				tmmin=>5,tmavg=>10,tmmax=>15,
+				next=>['action 1','Activity, conclude'],
+			},
+			'Activity, conclude'=>{
+				message=>'Conclude Activity',
+				tmmin=>5,tmavg=>5,tmmax=>5,
+			},
+		},
+		messages=>{
+			named1=>{
+				message=>['Named one one','Named one two'],
+				attributes=>{attr1=>{incr=>1}},
+			},
+			named2=>{
+				message=>{alternates=>[
+					{message=>'Named two one',attributes=>{attr21=>{incr=>1}}},
+					{message=>'Named two two',attributes=>{attr22=>{incr=>1}}},
+				]},
+			},
+		},
+	);
+	%schedule=Schedule::Activity::buildSchedule(configuration=>\%configuration,activities=>[[300,'Activity']]);
+	my %result;
+	foreach my $message (map {$$_[1]{message}} @{$schedule{activities}}) { $result{string}{$message}=1 }
+	foreach my $attr (qw/attr1 attr21 attr22/) { $result{attr}{$attr}=($schedule{attributes}{$attr}{y}>0?1:0) }
+	is_deeply(
+		[sort keys %{$result{string}}],
+		['Begin Activity','Conclude Activity','Named one one','Named one two','Named two one','Named two two'],
+		'All messages');
+	is_deeply($result{attr},{attr1=>1,attr21=>1,attr22=>1},'All attributes');
 };
 
 subtest 'Markdown loading'=>sub {

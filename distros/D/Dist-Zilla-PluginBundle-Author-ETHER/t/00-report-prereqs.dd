@@ -9,10 +9,11 @@ do { my $x = {
                       },
        'develop' => {
                       'recommends' => {
-                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.167',
+                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.169',
                                         'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
+                                      'Archive::Tar::Wrapper' => '0',
                                       'Dist::Zilla::Plugin::BlockRelease' => '0',
                                       'Encode' => '0',
                                       'File::Spec' => '0',

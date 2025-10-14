@@ -10,7 +10,7 @@ use Storable;
 
 our $debug = 1;
 
-plan tests => 48;
+plan tests => 47;
 
 # Insert your test code below (better if it prints "ok 13"
 # (correspondingly "not ok 13") depending on the success of chunk 13
@@ -82,9 +82,6 @@ for my $o ({ name => "original", obj => $t }, { name => "thawed", obj => $thawed
 
     ok($o->{obj}->climb, "$o->{name}: climb");
 }
-
-eval '$t->add_string("_")'; # invalid key
-like($@, qr/invalid/, 'adding "_"');
 
 ok($t->add_string("0.0.0.0/0"), "add 0.0.0.0/0");
 

@@ -289,13 +289,9 @@ class Mojo::Parameters {
       $name  = Mojo::Util->url_escape($name, q'^*\\-.0-9A-Z_a-z');
       $value = Mojo::Util->url_escape($value, q'^*\\-.0-9A-Z_a-z');
       
-      my $name_ref = [$name];
-      Re->s($name_ref, ["%20", "g"], "+");
-      $name = $name_ref->[0];
+      Re->s((mutable string)$name, ["%20", "g"], "+");
       
-      my $value_ref = [$value];
-      Re->s($value_ref, ["%20", "g"], "+");
-      $value = $value_ref->[0];
+      Re->s((mutable string)$value, ["%20", "g"], "+");
       
       $key_values->push("$name=$value");
     }
@@ -318,13 +314,9 @@ class Mojo::Parameters {
           my $name = $match->cap1;
           my $value = $match->cap2;
           
-          my $name_ref = [$name];
-          Re->s($name_ref, ["\+", "g"], " ");
-          $name = $name_ref->[0];
+          Re->s((mutable string)$name, ["\+", "g"], " ");
           
-          my $value_ref = [$value];
-          Re->s($value_ref, ["\+", "g"], " ");
-          $value = $value_ref->[0];
+          Re->s((mutable string)$value, ["\+", "g"], " ");
           unless ($value) {
             $value = "";
           }

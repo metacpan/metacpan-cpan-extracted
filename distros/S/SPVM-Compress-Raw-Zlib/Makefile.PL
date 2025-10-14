@@ -18,7 +18,7 @@ unless ($meta) {
   # Do something such as environment check.
 }
 
-my %configure_and_runtime_requires = ('SPVM' => '0.990084', 'SPVM::Resource::Zlib' => '1.004');
+my %configure_and_runtime_requires = ('SPVM' => '0.990102', 'SPVM::Resource::Zlib' => '1.004');
 WriteMakefile(
   NAME => 'SPVM::Compress::Raw::Zlib',
   VERSION_FROM => 'lib/SPVM/Compress/Raw/Zlib.pm',

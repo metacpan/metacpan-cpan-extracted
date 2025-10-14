@@ -1,3 +1,6 @@
+package Net::Patricia;
+use utf8;
+
 #  Net::Patricia - Patricia Trie perl module for fast IP address lookups
 #  Copyright (C) 2000-2005  Dave Plonka
 #  Copyright (C) 2009       Dave Plonka & Philip Prindeville
@@ -22,8 +25,6 @@
 # Anton Berezin <tobez@tobez.org>
 # Andreas Vögele <andreas@andreasvoegele.com>
 
-package Net::Patricia;
-
 use strict;
 use warnings;
 
@@ -41,7 +42,7 @@ BEGIN {
   @EXPORT = qw(AF_INET AF_INET6);
 }
 
-'$Revision: 1.23 $' =~ m/(\d+)\.(\d+)((_\d+)|)/ && ( $VERSION = "$1.$2$3");
+'$Revision: 1.24 $' =~ m/(\d+)\.(\d+)((_\d+)|)/ && ( $VERSION = "$1.$2$3");
 
 bootstrap Net::Patricia $VERSION;
 
@@ -316,6 +317,8 @@ sub remove_integer {
 1;
 __END__
 
+=encoding utf8
+
 =head1 NAME
 
 Net::Patricia - Patricia Trie perl module for fast IP address lookups
@@ -550,6 +553,22 @@ relying on the climb return value to accurately report a count of the
 number of nodes in the Patricia Trie, it would be prudent to have your
 subroutine return a non-zero value.
 
+=head1 ACKNOWLEDGEMENTS
+
+Thanks to all who have contributed patches and reported bugs:
+
+Alexander Bluhm
+
+Neil Bowers
+
+Richard Bross
+
+Joelle Maslak
+
+Petr Písař
+
+Andreas Vögele
+
 =head1 AUTHOR
 
 Dave Plonka <plonka@doit.wisc.edu>
@@ -558,7 +577,7 @@ Philip Prindeville <philipp@redfish-solutions.com>
 
 Anton Berezin <tobez@tobez.org>
 
-Andreas Vögele <andreas@andreasvoegele.com>
+=head1 LICENSE AND COPYRIGHT
 
 Copyright (C) 2000-2005  Dave Plonka.  Copyright (C) 2009  Dave Plonka
 & Philip Prindeville.  This program is free software; you

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use Schedule::Activity::Message;
-use Test::More tests=>3;
+use Test::More tests=>5;
 
 subtest 'init'=>sub {
 	plan tests=>3;
@@ -58,7 +58,7 @@ subtest 'Random selection'=>sub {
 	#
 	%seen=();
 	$msg=$m->new(message=>[qw/efgh ijkl/]);
-	foreach (1..10) { ($string)=$msg->random(); $seen{$string}=1 }
+	foreach (1..20) { ($string)=$msg->random(); $seen{$string}=1 }
 	is_deeply(\%seen,{efgh=>1,ijkl=>1},'Message:  array');
 	#
 	%seen=();
@@ -72,3 +72,113 @@ subtest 'Random selection'=>sub {
 	is_deeply(\%seen,{'mnop'=>1,'qrst'=>1},'Message:  hash n=2');
 };
 
+subtest 'Attributes'=>sub {
+	plan tests=>3;
+	my ($message,$string,$msg,%seen);
+	my $m='Schedule::Activity::Message';
+	#
+	$message=$m->new(message=>'hi',attributes=>{string=>{incr=>1}});
+	($string,$msg)=$message->random();
+	is_deeply([sort keys %{$$msg{attributes}//{}}],[qw/string/],'String message');
+	#
+	%seen=();
+	$message=$m->new(message=>[qw/one two/],attributes=>{array=>{incr=>1}});
+	foreach (1..10) {
+		($string,$msg)=$message->random();
+		foreach my $k (keys %{$$msg{attributes}//{}}) { $seen{$k}++ }
+	}
+	is_deeply(\%seen,{array=>10},'Array message');
+	#
+	%seen=();
+	$message=$m->new(message=>
+		{alternates=>[{message=>'one',attributes=>{one=>{}}},{message=>'two',attributes=>{two=>{}}}]},
+		attributes=>{hash=>{incr=>1}});
+	foreach (1..10) {
+		($string,$msg)=$message->random();
+		foreach my $k (keys %{$$msg{attributes}//{}}) { $seen{$k}++ }
+	}
+	is_deeply([sort keys %seen],[qw/one two/],'Hash message');
+};
+
+subtest 'Named messages'=>sub {
+	plan tests=>8;
+	my ($msg,%results);
+	my %names=(
+		name1=>{
+			message=>'Message 1',
+			attributes=>{named=>{incr=>'value not honored in test'}},
+		},
+		name2=>{
+			message=>'Message 2',
+			attributes=>{named=>{incr=>'value not honored in test'}},
+		},
+		name3=>{
+			message=>{alternates=>[
+				{message=>'three one',attributes=>{one=>{incr=>1}}},
+				{message=>'three two',attributes=>{two=>{incr=>1}},names=>{'three two'=>{}}},
+			]},
+		},
+	);
+	#
+	$msg=Schedule::Activity::Message->new(
+		message=>'name1',
+		names=>\%names,
+	);
+	{
+		my ($string,$object)=$msg->random();
+		$results{string}{$string}++;
+		foreach my $k (keys %{$$object{attributes}}) { $results{attr}{$k}++ }
+	}
+	is_deeply([sort keys(%{$results{string}})],['Message 1'],'String:  All messages');
+	is_deeply([sort keys(%{$results{attr}})],  [qw/named/],  'String:  All attributes');
+	#
+	$msg=Schedule::Activity::Message->new(
+		message=>['name1','Plain message','name2','name3'],
+		names=>\%names,
+	);
+	%results=();
+	foreach (1..50) {
+		my ($string,$object)=$msg->random();
+		$results{string}{$string}++;
+		foreach my $k (keys %{$$object{attributes}}) { $results{attr}{$k}++ }
+	}
+	is_deeply(
+		[sort keys(%{$results{string}})],
+		['Message 1','Message 2','Plain message','three one','three two'],
+		'Array:  All messages');
+	is_deeply([sort keys(%{$results{attr}})],[qw/named one two/],'Array:  All attributes');
+	#
+	%results=();
+	$msg=Schedule::Activity::Message->new(
+		message=>{name=>'name1'},
+		names=>\%names,
+	);
+	{
+		my ($string,$object)=$msg->random();
+		$results{string}{$string}++;
+		foreach my $k (keys %{$$object{attributes}}) { $results{attr}{$k}++ }
+	}
+	is_deeply([sort keys(%{$results{string}})],['Message 1'],'Hash named:  All messages');
+	is_deeply([sort keys(%{$results{attr}})],  [qw/named/],  'Hash named:  All attributes');
+	#
+	$msg=Schedule::Activity::Message->new(
+		message=>{alternates=>[
+			{message=>'Plain message',attributes=>{unnamed=>{incr=>'value not honored in test'}}},
+			{name=>'name1'},
+			{name=>'name2'},
+		]},
+		names=>\%names,
+	);
+	%results=();
+	foreach (1..50) {
+		my ($string,$object)=$msg->random();
+		$results{string}{$string}++;
+		foreach my $k (keys %{$$object{attributes}}) { $results{attr}{$k}++ }
+	}
+	is_deeply([sort keys(%{$results{string}})],['Message 1','Message 2','Plain message'],'Hash alternates:  All messages');
+	is_deeply([sort keys(%{$results{attr}})],  [qw/named unnamed/],                      'Hash alternates:  All attributes');
+	#
+};
+
+# attributesFromConf is effectively tested through activity.t at this point,
+# but specific tests could be added to ensure that it's prevalidation safe.

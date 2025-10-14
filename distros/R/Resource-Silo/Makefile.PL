@@ -17,6 +17,8 @@ my %WriteMakefileArgs = (
     TEST_REQUIRES => {
         'Test::More'            => 1.302015,
         'Test::Exception'       => 0.29,
+        'JSON::PP'              => 0,
+        'lib::relative'         => 0,
     },
     PREREQ_PM => {
         'Module::Load'          => 0.32,

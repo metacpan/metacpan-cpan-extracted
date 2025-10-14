@@ -17,7 +17,7 @@ It allows you to extract, traverse, and filter JSON data using a simplified jq-l
 - ✅ Optional key access (`.nickname?`)
 - ✅ Array indexing and expansion (`.users[0]`, `.users[]`)
 - ✅ `select(...)` filters with `==`, `!=`, `<`, `>`, `and`, `or`
-- ✅ Built-in functions: `length`, `keys`, `values`, `first`, `last`, `reverse`, `sort`, `sort_desc`, `sort_by`, `min_by()`, `max_by()`, `unique`, `unique_by()`, `has`, `contains()`, `map`, `group_by`, `group_count`, `sum_by()`, `avg_by()`, `count`, `join`, `split()`, `substr()`, `slice()`, `replace()`, `empty()`, `median`, `mode`, `variance`, `stddev`, `add`, `sum`, `product`, `upper()`, `lower()`, `titlecase()`, `abs()`, `ceil()`, `floor()`, `round()`, `trim()`, `startswith()`, `endswith()`, `chunks()`, `enumerate()`, `flatten_all()`, `flatten_depth()`, `index()`, `clamp()`, `to_number()`, `pick()`, `merge_objects()`
+- ✅ Built-in functions: `length`, `keys`, `values`, `first`, `last`, `reverse`, `sort`, `sort_desc`, `sort_by`, `min_by()`, `max_by()`, `unique`, `unique_by()`, `has`, `contains()`, `any()`, `all()`, `map`, `map_values()`, `walk()`, `group_by`, `group_count`, `sum_by()`, `avg_by()`, `median_by()`, `count`, `join`, `split()`, `explode()`, `implode()`, `substr()`, `slice()`, `replace()`, `empty()`, `median`, `mode`, `percentile()`, `variance`, `stddev`, `add`, `sum`, `product`, `upper()`, `lower()`, `titlecase()`, `abs()`, `ceil()`, `floor()`, `round()`, `trim()`, `ltrimstr()`, `rtrimstr()`, `startswith()`, `endswith()`, `chunks()`, `enumerate()`, `transpose()`, `flatten_all()`, `flatten_depth()`, `range()`, `index()`, `rindex()`, `indices()`, `clamp()`, `tostring()`, `tojson()`, `to_number()`, `pick()`, `merge_objects()`, `to_entries()`, `from_entries()`, `with_entries()`, `paths()`, `leaf_paths()`, `getpath()`, `delpaths()`
 - ✅ Pipe-style queries with `.[]` (e.g. `.[] | select(...) | .name`) 
 - ✅ Command-line interface: `jq-lite`
 - ✅ Reads from STDIN or file
@@ -45,6 +45,7 @@ It allows you to extract, traverse, and filter JSON data using a simplified jq-l
 |----------------|-------------------------------------------------------|
 | `length`       | Get number of elements in an array, keys in a hash, or characters in scalars |
 | `keys`         | Extract sorted keys from a hash                      |
+| `keys_unsorted` | Extract object keys without sorting (jq-compatible) |
 | `values`       | Extract values from a hash (v0.34)                   |
 | `sort`         | Sort array items                                     |
 | `sort_desc`    | Sort array items in descending order (v0.61)         |
@@ -60,27 +61,42 @@ It allows you to extract, traverse, and filter JSON data using a simplified jq-l
 | `drop(n)`      | Skip the first `n` elements in an array              |
 | `tail(n)`      | Return the final `n` elements in an array (v0.79)    |
 | `chunks(n)`    | Split an array into subarrays with `n` items each (v0.64) |
+| `range(start; end[, step])` | Emit a numeric sequence from `start` (default `0`) up to but excluding `end`, advancing by `step` (default `1`) (v0.86) |
 | `enumerate()`  | Pair each array element with its zero-based index (v0.81) |
+| `transpose()`  | Convert arrays-of-arrays from rows into columns, truncating to the shortest length (v0.82) |
 | `map(expr)`    | Map/filter values using a subquery                   |
+| `map_values(filter)` | Apply a filter to every value in an object, dropping keys when the filter yields no result (v0.92) |
+| `walk(filter)` | Recursively apply a filter to every value within arrays and objects (v0.95) |
 | `pluck(key)`   | Extract values from an array of objects (v0.43)      |
 | `pick(keys...)` | Build objects containing only the specified keys (v0.74) |
 | `merge_objects()` | Shallow-merge arrays of objects into a single hash with last-write-wins semantics (v0.80) |
-| `add`, `sum`, `sum_by(path)`, `avg_by(path)`, `min`, `max`, `avg`, `median`, `mode`, `variance`, `stddev`, `product` | Numeric and statistical aggregation functions |
+| `to_entries()` | Convert objects/arrays into an array of `{key, value}` pairs (v0.84) |
+| `from_entries()` | Convert entry arrays back into an object (v0.84) |
+| `with_entries(filter)` | Apply a filter to each entry before rebuilding the object (v0.84) |
+| `add`, `sum`, `sum_by(path)`, `avg_by(path)`, `median_by(path)`, `min`, `max`, `avg`, `median`, `mode`, `percentile(p)`, `variance`, `stddev`, `product` | Numeric and statistical aggregation functions |
 | `abs`         | Convert numeric values to their absolute value (v0.49) |
 | `ceil`        | Round numbers up to the nearest integer (v0.53)        |
 | `floor`       | Round numbers down to the nearest integer (v0.53)      |
 | `round`       | Round numbers to the nearest integer (v0.54)           |
 | `clamp(min, max)` | Clamp numbers within an inclusive range (v0.73)        |
+| `tostring`    | Convert values to their JSON string representation (v0.85) |
+| `tojson`      | Encode any value as JSON text (unreleased)                |
 | `to_number`   | Convert numeric-looking strings/booleans to numbers (v0.72) |
 | `trim`        | Remove leading/trailing whitespace from strings (v0.50) |
+| `ltrimstr(prefix)` | Remove `prefix` from the start of strings when present (v0.87) |
+| `rtrimstr(suffix)` | Remove `suffix` from the end of strings when present (v0.87) |
 | `startswith(prefix)` | Check if a string (or array of strings) begins with `prefix` (v0.51) |
 | `endswith(suffix)` | Check if a string (or array of strings) ends with `suffix` (v0.51) |
 | `split(separator)` | Split a string (or array of strings) using a literal separator (v0.52) |
+| `explode()` | Convert strings into arrays of Unicode code points (v0.88) |
+| `implode()` | Turn arrays of code points back into strings (v0.88) |
 | `replace(old, new)` | Replace all occurrences of a literal substring with another value (arrays processed element-wise) (unreleased) |
 | `substr(start, length)` | Extract a substring using zero-based indexing (arrays are processed element-wise) (v0.57) |
 | `slice(start, length)` | Return a subarray using zero-based indexing with optional length (negative starts count from the end) (v0.66) |
 | `has(key)` | Check if objects contain a key or arrays have an index (v0.71) |
 | `contains(value)` | Check whether strings include the value or arrays contain an element (v0.56) |
+| `all([filter])` | Return true when every input (optionally filtered) is truthy (v0.94) |
+| `any([filter])` | Return true when any input (optionally filtered) is truthy (v0.90) |
 | `group_by(key)`| Group array items by field                           |
 | `group_count(key)` | Count how many items fall under each key (v0.46)   |
 | `sum_by(path)` | Sum numeric values projected from each array item (v0.68) |
@@ -91,15 +107,22 @@ It allows you to extract, traverse, and filter JSON data using a simplified jq-l
 | `flatten()`    | Flatten array one level deep (like `.[]`) (v0.35)    |
 | `flatten_all()`| Recursively flatten nested arrays into a single array (v0.67) |
 | `flatten_depth(n)` | Flatten nested arrays up to `n` levels deep (v0.70) |
+| `arrays`       | Emit input values only when they are arrays (v0.99) |
 | `type()`       | Return the type of the value ("string", "number", "boolean", "array", "object", "null") (v0.36) |
 | `nth(n)`       | Get the nth element of an array (v0.37)              |
 | `index(value)` | Return the zero-based index of the first match in arrays or strings (v0.65) |
+| `rindex(value)` | Return the zero-based index of the last match in arrays or strings (v0.98) |
+| `indices(value)` | Return every index where the value appears in arrays or strings (v0.91) |
 | `del(key)`     | Delete a specified key from a hash object (v0.38)    |
+| `delpaths(paths)` | Remove multiple keys or indices using path arrays (v0.93) |
 | `compact()`    | Remove undef/null values from arrays (v0.39)         |
 | `upper()`      | Convert scalars (and array elements) to uppercase (v0.47) |
 | `lower()`      | Convert scalars (and array elements) to lowercase (v0.47) |
 | `titlecase()`  | Convert scalars (and array elements) to title case (v0.69) |
 | `path()`       | Return keys (for objects) or indices (for arrays) (v0.40) |
+| `paths()`      | Emit every path to nested values as arrays of keys/indices (v0.89) |
+| `leaf_paths()` | Emit only the paths that terminate in non-container values (v0.96) |
+| `getpath(path)` | Retrieve the value(s) at the supplied path array or expression (unreleased) |
 | `is_empty`     | True when the value is an empty array or object (v0.41)   |
 | `default(value)` | Substitute a fallback value when the result is undef/null (v0.42) |
 

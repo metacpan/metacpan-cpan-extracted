@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.1203';
+our $VERSION = '0.1501';
 
 use Carp;
 use Scalar::Util qw( set_prototype );
@@ -44,7 +44,7 @@ sub import {
         };
     };
 
-    $target ||= __PACKAGE__."::container::".$caller;
+    $target //= __PACKAGE__."::container::".$caller;
 
     my $spec = Resource::Silo::Metadata->new($target);
     $metadata{$target} = $spec;
@@ -66,6 +66,12 @@ sub import {
     *{"${caller}::resource"} = $spec->_make_dsl;
     *{"${caller}::$shortcut"}     = $silo;
 };
+
+sub get_meta {
+    my ($self, $target) = @_;
+
+    return $metadata{$target};
+}
 
 1; # End of Resource::Silo
 
@@ -323,29 +329,23 @@ itself except that it's more explicit.
 
 =head3 dependencies => \@list
 
-List other resources that may be requested in the initializer.
-Unless C<loose_deps> is specified (see below),
-the dependencies I<must> be declared I<before> the dependant.
+List of other resources that may be requested in the initializer.
+Attempting to use a resource that was not listed will cause an exception.
 
-A resource with parameter may also depend on itself.
+Attempt to create a circular dependency will cause an exception as well.
+As an exception, a resource with parameter may depend on itself.
 
-The default is all eligible resources known so far.
+Lastly, having unresolved dependencies upon container instantiation
+will also cause an exception.
+
+If unspecified, any dependencies are allowed, but circular instantiation
+will still be prohibited.
 
 B<NOTE> This behavior was different prior to v.0.09
 and may be change again in the near future.
 
 This parameter has a different structure
 if C<class> parameter is in action (see below).
-
-=head3 loose_deps => 1|0
-
-Allow dependencies that have not been declared yet.
-
-Not specifying the C<dependencies> parameter would now mean
-there are no restrictions whatsoever.
-
-B<NOTE> Having to resort to this flag may be
-a sign of a deeper architectural problem.
 
 =head3 argument => C<sub { ... }> || C<qr( ... )>
 
@@ -379,6 +379,16 @@ E.g. when using L<Redis::Namespace>:
             );
         };
 
+=head3 check => sub { $container, $resource, $name, $argument }
+
+Check the resource after initialization.
+The function must throw an exception if the resource is invalid.
+
+It is applied after the resource is initialized and before it is put into the cache,
+both for normally initialized and overridden resources.
+
+B<NOTE> Experimental, name and semantics may change in the future.
+
 =head3 cleanup => sub { $resource_instance }
 
 Undo the init procedure.
@@ -402,6 +412,14 @@ The default is same as C<cleanup>.
 
 See L</FORKING>.
 
+=head3 fork_safe => 0 | 1
+
+If present, don't reinitialize resource if the process ID change is detected.
+E.g. in a daemon we don't want to re-read and re-parse the configuration
+every time a new worker starts.
+
+This is mutually exclusive with C<fork_cleanup>.
+
 =head3 cleanup_order => $number
 
 The higher the number, the later the resource will get destroyed.
@@ -419,7 +437,7 @@ you application
             Log::Any->get_logger;
         };
 
-=head3 derived => 1 | 0
+=head3 derived => 0 | 1
 
 Assume the resource introduces no side effects
 apart from those already handled by its dependencies.
@@ -436,18 +454,31 @@ either initialized, or overridden.
 
 See L<Resource::Silo::Container/lock>.
 
-=head3 ignore_cache => 1 | 0
-
-If set, don't cache resource, always create a fresh one instead.
-See also L<Resource::Silo::Container/fresh>.
-
-=head3 preload => 1 | 0
+=head3 preload => 0 | 1
 
 If set, try loading the resource when C<silo-E<gt>ctl-E<gt>preload> is called.
 Useful if you want to throw errors when a service is starting,
 not during request processing.
 
 See L<Resource::Silo::Container/preload>.
+
+=head3 nullable => 0 | 1
+
+Setting this flag allows returning C<undef> from the initializer
+without causing an exception.
+
+The undefined value will still be cached, so the initializer
+will not be called again for the same resource (and argument, if any).
+
+This may indicate e.g. that the resource is optional
+and is not required for normal operations.
+
+IF C<check> is present, it will be omitted for C<undef> value.
+
+=head3 loose_deps => 0 | 1
+
+Prior to v.0.14, this flag allowed forward dependencies.
+Currently does nothing except emitting a warning.
 
 =head2 silo
 
@@ -464,6 +495,13 @@ within the same interpreter without interference.>
 C<silo-E<gt>new> will create a new instance of the I<same> container class.
 The resource container class may therefore be viewed as an
 I<optional singleton>.
+
+=head1 UTILITY FUNCTIONS
+
+=head2 get_meta($package)
+
+Return a L<Resource::Silo::Metadata> object associated with the given package,
+if any.
 
 =head1 CAVEATS AND CONSIDERATIONS
 
@@ -626,6 +664,9 @@ Using L<DBIx::Class> together with a regular L<DBI> connection:
 
 L<Bread::Board> - a more mature IoC / DI framework.
 
+L<Bread::Board::Declare> - a declarative wrapper around
+L<Bread::Board> and L<Moose>, resulting in a DSL similar to this module's.
+
 =head1 BUGS
 
 This software is still in beta stage. Its interface is still evolving.
@@ -633,6 +674,10 @@ This software is still in beta stage. Its interface is still evolving.
 =over
 
 =item * Version 0.09 brings a breaking change that forbids forward dependencies.
+
+=item * Version 0.14 removes the C<ignore_cache> flag
+as it doesn't seem to have compelling use cases
+while complicating the implementation.
 
 =item * Forced re-exporting of C<silo> was probably a bad idea
 and should have been left as an exercise to the user.

@@ -231,8 +231,8 @@ class Mojo::Path {
         $path_url_encoded = "";
       }
       my $path = Mojo::Util->url_unescape($path_url_encoded);
-      $self->{leading_slash} = (byte)!!Re->s($path, "^/", "");
-      $self->{trailing_slash} = (byte)!!Re->s($path, "/$", "");
+      $self->{leading_slash} = (byte)!!Re->s((mutable string)$path, "^/", "");
+      $self->{trailing_slash} = (byte)!!Re->s((mutable string)$path, "/$", "");
       $self->{parts} = Fn->split("/", $path, -1);
     }
     

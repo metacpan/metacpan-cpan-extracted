@@ -16,16 +16,53 @@ Some features we need or want, plus some neat ideas that may not be too feasible
    * There will be a multiple of 3 args, each triple being branch, old hash, new hash, (depending on how many branches the client updates).
    * In order to facilitate the InterProcessCommunication to post-read, information should be stored in $IPC/info.txt until the post-read completes.
 
- - Provide branch, old hash, new hash, and common parent "fork" commit hash to pre-write hook and post-write hook args. (Requires man-in-the-middle sniffer)
+ - Provide branch, old hash, new hash, and common parent "fork" commit hash to pre-write hook and post-write hook args.
    * This fork hash can be used for debugging
    * or for callback webhook.
    * In order to facilitate the InterProcessCommunication between the pre-write and post-write, information should be stored in $IPC/info.txt until the post-write completes.
+
+ - Make a commandline configuration helper checker utility that verifies the git server configurations:
+   * XXX - Can we overload the "git-server" command to use -t STDIN to detect commandline TTY?
+   * Scripts and hooks installations
+   * Secured ~/.ssh/authorized_keys format, including "KEY" settings
+   * Files and Directories chmod permissions
+   * ADMIN and ACL Management
+   * List / Create / Remove repos
+   * SSHD Settings
+     1. "AcceptEnv XMODIFIERS" in case they want
+          to allow "--server-option" and/or "--push-option" and/or "-o" to have
+          $GIT_OPTION_COUNT and $GIT_OPTION_{NUM} to be available during pre-* hooks
+          or "git-deploy --max-delay <seconds>" for custom push notification timeout
+          or "git-client -O <name=val>"
+          or other DEBUG features
+     2. "AllowAgentForwarding yes" for proxy.url two-way auto-sync feature
+     3. "ExposeAuthInfo yes" to allow hooks to obtain public key info, if desired
+
+ - Pull out the iotrace utility into its own perl module IO::Trace.
+
+ - Convert git-client to use Getopt::Long instead of manually parsing @ARGV.
 
  - Fix git-deploy to handle split cheese case where git server uses both IPv4 and IPv6.
 
  - Add Support for HTTP protocol git read and write operations using Basic password Authorization (instead of only pubkeys over SSH protocol).
 
+ - Set REMOTE_ADDR env (from SSH_CONNECTION) to make it easier for any hooks to determine Client IP regardless of protocol.
+
+ - Set REMOTE_USER env (from KEY) to make it easier for any hooks to Client User regardless of protocol.
+
  - Integrate or convert to be compatible with Git::Hooks::* plugins.
+
+ - Augment Git::Hooks (maybe Git::Hooks::Server) to provide extra functionality
+   * Add Drivers to implement missing capabilities required
+     1. GITHOOKS_PRE_READ    / PRE_READ
+     2. GITHOOKS_PRE_WRITE   / PRE_WRITE
+     3. GITHOOKS_POST_READ   / POST_READ
+     4. GITHOOKS_POST_WRITE  / POST_WRITE
+   * Use same general compatible [githooks] syntax
+     1. git config --list | grep 'githooks\.plugin'
+     2. git config --add githooks.plugin WebHook
+     3. git config --add githooks."webhook".callbackurl https://website.com/post.cgi
+   * Use the same general githooks.pl format like: run_hook($0, @ARGV);
 
  - Monkey the core.hooksPath setting on the git server to point to these hooks provided.
 

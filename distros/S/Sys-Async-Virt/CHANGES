@@ -1,5 +1,30 @@
 -----
 
+0.1.7    2025-10-13
+   [Fixed]
+       * MANIFEST now lists the new examples
+
+0.1.6    2025-10-12
+   [Added]
+       * Examples:
+         * eg/cpumap.pl
+         * eg/getstate.pl
+         * eg/leases.pl
+   [Changed]
+       * Minimum version of development dependency
+         Protocol::Sys::Virt::Devel increased
+       * Updated libvirt to v11.8.0 (from v11.7.0)
+         * Adds CPU_STATS_GUEST constant for use with
+           node_get_cpu_stats()
+   [Fixed]
+       * `get_cpu_map` broken by migration to Object::Pad
+       * Connection closing time-out should have been relative
+       * Invocation of non-existing `Future->await_any` to `->wait_any`
+       * Missing `await` in `get_cpu_map` in call to async function
+       * Calling correct factory methods for instantiation of networks,
+         ports, pools, nwfilters, volumes, snapshots and secrets
+       * Experimental field enheritance warning from Object::Pad suppressed
+
 0.1.5    2025-09-06
    [Changed]
        * Updated to libvirt tag v11.7.0 (from v11.6.0)

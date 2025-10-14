@@ -2,6 +2,7 @@
 
 use strict;
 use warnings;
+use autodie qw(:all);
 
 use JSON::MaybeXS;
 use File::Glob ':glob';
@@ -27,7 +28,8 @@ if(my $total_info = $data->{summary}{Total}) {
 my $coverage_badge_url = "https://img.shields.io/badge/coverage-${coverage_pct}%25-${badge_color}";
 
 # Start HTML
-my $html = <<"HTML";
+my @html;	# build in array, join later
+push @html, <<"HTML";
 <!DOCTYPE html>
 <html>
 	<head>
@@ -170,7 +172,7 @@ for my $file (sort keys %{$data->{summary}}) {
 		? sprintf('<a href="%s" class="icon-link" title="View source on GitHub">&#128269;</a>', $source_url)
 		: '<span class="disabled-icon" title="No coverage data">&#128269;</span>';
 
-	$html .= sprintf(
+	push @html, sprintf(
 		qq{<tr class="%s"><td><a href="%s" title="View coverage line by line">%s</a> %s</td><td>%.1f</td><td>%.1f</td><td>%.1f</td><td>%.1f</td><td>%s</td>%s</tr>\n},
 		$row_class, $html_file, $file, $source_link,
 		$info->{statement}{percentage} // 0,
@@ -185,7 +187,7 @@ for my $file (sort keys %{$data->{summary}}) {
 # Summary row
 my $avg_coverage = $total_files ? int($total_coverage / $total_files) : 0;
 
-$html .= sprintf(
+push @html, sprintf(
 	qq{<tr class="summary-row"><td colspan="2"><strong>Summary</strong></td><td colspan="2">%d files</td><td colspan="3">Avg: %d%%, Low: %d</td></tr>\n},
 	$total_files, $avg_coverage, $low_coverage_count
 );
@@ -195,7 +197,7 @@ if (my $total_info = $data->{summary}{Total}) {
 	my $total_pct = $total_info->{total}{percentage} // 0;
 	my $class = $total_pct > 80 ? 'high' : $total_pct > 50 ? 'med' : 'low';
 
-	$html .= sprintf(
+	push @html, sprintf(
 		qq{<tr class="%s"><td><strong>Total</strong></td><td>%.1f</td><td>%.1f</td><td>%.1f</td><td>%.1f</td><td colspan="2"><strong>%.1f</strong></td></tr>\n},
 		$class,
 		$total_info->{statement}{percentage} // 0,
@@ -208,15 +210,13 @@ if (my $total_info = $data->{summary}{Total}) {
 
 my $timestamp = 'Unknown';
 if (my $stat = stat($cover_db)) {
-	$timestamp = strftime("%Y-%m-%d %H:%M:%S", localtime($stat->mtime));
+	$timestamp = strftime('%Y-%m-%d %H:%M:%S', localtime($stat->mtime));
 }
 
 my $commit_url = "https://github.com/nigelhorne/Config-Abstraction/commit/$commit_sha";
 my $short_sha = substr($commit_sha, 0, 7);
 
-$html .= <<"HTML";
-</table>
-HTML
+push @html, '</table>';
 
 # Parse historical snapshots
 my @history_files = bsd_glob("coverage_history/*.json");
@@ -246,12 +246,16 @@ open($log, '-|', 'git log --pretty=format:"%h %s"') or die "Can't run git log: $
 while (<$log>) {
 	chomp;
 	my ($short_sha, $message) = /^(\w+)\s+(.*)$/;
-	$commit_messages{$short_sha} = $message;
+	if($message =~ /^Merge branch /) {
+		delete $commit_times{$short_sha};
+	} else {
+		$commit_messages{$short_sha} = $message;
+	}
 }
 close $log;
 
-# Only display the last 10 commits
-my $elements_to_keep = 10;
+# Only display the last 15 commits
+my $elements_to_keep = 15;
 
 # Calculate the number of elements to remove from the beginning
 my $elements_to_remove = scalar(@history_files) - $elements_to_keep;
@@ -268,6 +272,8 @@ foreach my $file (@history_files) {
 	next unless $json && $json->{summary}{Total};
 
 	my ($sha) = $file =~ /-(\w{7})\.json$/;
+	next unless $commit_messages{$sha};
+
 	my $timestamp = $commit_times{$sha} // strftime('%Y-%m-%dT%H:%M:%S', localtime((stat($file))->mtime));
 	$timestamp =~ s/ /T/;
 	$timestamp =~ s/\s+([+-]\d{2}):?(\d{2})$/$1:$2/;	# Fix space before timezone
@@ -280,7 +286,7 @@ foreach my $file (@history_files) {
 	my $color = $delta > 0 ? 'green' : $delta < 0 ? 'red' : 'gray';
 	my $url = "https://github.com/nigelhorne/Config-Abstraction/commit/$sha";
 
-	my $comment = $commit_messages{$sha} // '';
+	my $comment = $commit_messages{$sha};
 	push @data_points, qq{{ x: "$timestamp", y: $pct, delta: $delta, url: "$url", label: "$timestamp", pointBackgroundColor: "$color", comment: "$comment" }};
 }
 
@@ -289,7 +295,7 @@ foreach my $file (@history_files) {
 my $js_data = join(",\n", @data_points);
 
 if(scalar(@data_points)) {
-	$html .= <<'HTML';
+	push @html, <<'HTML';
 <p>
 	<label>
 		<input type="checkbox" id="toggleTrend" checked>
@@ -299,7 +305,7 @@ if(scalar(@data_points)) {
 HTML
 }
 
-$html .= <<"HTML";
+push @html, <<"HTML";
 <canvas id="coverageTrend" width="600" height="300"></canvas>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
@@ -326,7 +332,7 @@ function linearRegression(data) {
 const dataPoints = [ $js_data ];
 HTML
 
-$html .= <<'HTML';
+push @html, <<'HTML';
 const regressionPoints = linearRegression(dataPoints);
 const ctx = document.getElementById('coverageTrend').getContext('2d');
 const chart = new Chart(ctx, {
@@ -409,7 +415,7 @@ document.getElementById('toggleTrend').addEventListener('change', function(e) {
 </script>
 HTML
 
-$html .= <<"HTML";
+push @html, <<"HTML";
 <footer>
 	<p>Project: <a href="https://github.com/nigelhorne/Config-Abstraction">Config-Abstraction</a></p>
 	<p><em>Last updated: $timestamp - <a href="$commit_url">commit <code>$short_sha</code></a></em></p>
@@ -419,4 +425,4 @@ $html .= <<"HTML";
 HTML
 
 # Write to index.html
-write_file($output, $html);
+write_file($output, join("\n", @html));

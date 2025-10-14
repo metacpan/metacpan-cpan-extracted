@@ -188,10 +188,9 @@ class Mojo::File {
         }
         
         if ($options_h->{"max_depth"}->(int)) {
-          my $rel = $name;
+          my $rel = copy $name;
           
-          Re->s(my $_ = [$rel], "^\Q$path\E/?", "");
-          $rel = $_->[0];
+          Re->s((mutable string)$rel, "^\Q$path\E/?", "");
           
           if (@{File::Spec->splitdir($rel)} >= $options_h->{"max_depth"}->(int)) {
             $info->set_prune(1);

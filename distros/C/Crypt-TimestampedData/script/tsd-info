@@ -1,0 +1,152 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use File::Spec;
+
+use Crypt::TSD;
+
+# Command line options
+my $help = 0;
+my $version = 0;
+my $verbose = 0;
+
+# Parse command line options
+GetOptions(
+    'help|h' => \$help,
+    'version' => \$version,
+    'verbose|v' => \$verbose,
+) or pod2usage(2);
+
+# Show help
+if ($help) {
+    pod2usage(-verbose => 2);
+    exit 0;
+}
+
+# Show version
+if ($version) {
+    print "tsd-info version $Crypt::TSD::VERSION\n";
+    exit 0;
+}
+
+# Get input file from command line
+my $input_file = shift @ARGV;
+if (!$input_file) {
+    print "Error: Input TSD file required\n";
+    pod2usage(1);
+}
+
+# Check if input file exists
+unless (-f $input_file) {
+    die "Error: Input file '$input_file' not found\n";
+}
+
+print "Analyzing TSD file: $input_file\n";
+print "=" x 50 . "\n";
+
+# Read TSD file
+my $tsd_data;
+eval {
+    $tsd_data = Crypt::TSD->read_file($input_file);
+};
+if ($@) {
+    die "Error reading TSD file: $@\n";
+}
+
+# Display basic information
+print "Version: " . ($tsd_data->{version} || 'N/A') . "\n";
+
+# Display metadata
+if ($tsd_data->{metaData}) {
+    my $meta = $tsd_data->{metaData};
+    print "Metadata:\n";
+    print "  Hash Protected: " . ($meta->{hashProtected} ? 'Yes' : 'No') . "\n";
+    print "  File Name: " . ($meta->{fileName} || 'N/A') . "\n";
+    print "  Media Type: " . ($meta->{mediaType} || 'N/A') . "\n";
+}
+
+# Display data URI
+if ($tsd_data->{dataUri}) {
+    print "Data URI: " . $tsd_data->{dataUri} . "\n";
+}
+
+# Check for embedded content
+my $content = Crypt::TSD->extract_content_der($tsd_data);
+if (defined $content) {
+    print "Embedded Content: Yes (" . length($content) . " bytes)\n";
+} else {
+    print "Embedded Content: No\n";
+}
+
+# Display temporal evidence
+if ($tsd_data->{temporalEvidence}) {
+    my $evidence = $tsd_data->{temporalEvidence};
+    
+    if ($evidence->{tstEvidence}) {
+        my $tokens = $evidence->{tstEvidence};
+        print "Timestamp Tokens: " . scalar(@$tokens) . "\n";
+        
+        if ($verbose && @$tokens > 0) {
+            for my $i (0..$#$tokens) {
+                my $token = $tokens->[$i];
+                if ($token->{timeStamp}) {
+                    print "  Token " . ($i + 1) . ":\n";
+                    print "    Content Type: " . ($token->{timeStamp}->{contentType} || 'N/A') . "\n";
+                    print "    Content Size: " . (length($token->{timeStamp}->{content} || '') . " bytes\n");
+                }
+            }
+        }
+    }
+    
+    if ($evidence->{ersEvidence}) {
+        print "Evidence Record: Yes\n";
+    }
+    
+    if ($evidence->{otherEvidence}) {
+        print "Other Evidence: Yes\n";
+    }
+}
+
+print "=" x 50 . "\n";
+print "Analysis complete.\n";
+
+__END__
+
+=head1 NAME
+
+tsd-info - Display information about a TimeStampedData (.tsd) file
+
+=head1 VERSION
+
+version 0.01
+
+=head1 SYNOPSIS
+
+tsd-info [options] input_file.tsd
+
+Options:
+    -v, --verbose           Verbose output with detailed token information
+    -h, --help              Show this help
+    --version               Show version
+
+=head1 DESCRIPTION
+
+Displays detailed information about a TimeStampedData (.tsd) file including
+version, metadata, embedded content, and timestamp tokens.
+
+=head1 EXAMPLES
+
+    # Basic information
+    tsd-info document.tsd
+
+    # Verbose information
+    tsd-info -v document.tsd
+
+=head1 SEE ALSO
+
+L<Crypt::TSD>, L<Crypt::TimestampedData>
+
+=cut

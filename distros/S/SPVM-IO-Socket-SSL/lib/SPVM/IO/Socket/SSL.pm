@@ -1,6 +1,6 @@
 package SPVM::IO::Socket::SSL;
 
-our $VERSION = "0.010";
+our $VERSION = "0.013";
 
 1;
 
@@ -61,15 +61,15 @@ C<has ssl : ro L<Net::SSLeay|SPVM::Net::SSLeay>;>
 
 A L<Net::SSLeay|SPVM::Net::SSLeay> object. This object is set after L</"connect_SSL"> method or L</"accept_SSL"> method succeeds.
 
-=head2 before_connect_SSL_cbs_list
+=head2 before_connect_SSL_cbs
 
-C<has before_connect_SSL_cbs_list : ro List of L<IO::Socket::SSL::Callback::BeforeConnectSSL|SPVM::IO::Socket::SSL::Callback::BeforeConnectSSL>;>
+C<has before_connect_SSL_cbs : ro L<IO::Socket::SSL::Callback::BeforeConnectSSL|SPVM::IO::Socket::SSL::Callback::BeforeConnectSSL>[];>
 
 A list of callbacks called before L</"connect_SSL"> method.
 
-=head2 before_accept_SSL_cbs_list
+=head2 before_accept_SSL_cbs
 
-C<has before_accept_SSL_cbs_list : ro List of L<IO::Socket::SSL::Callback::BeforeAcceptSSL|SPVM::IO::Socket::SSL::Callback::BeforeAcceptSSL>;>
+C<has before_accept_SSL_cbs : ro L<IO::Socket::SSL::Callback::BeforeAcceptSSL|SPVM::IO::Socket::SSL::Callback::BeforeAcceptSSL>[];>
 
 A list of callbacks called before L</"accept_SSL"> method.
 
@@ -249,7 +249,7 @@ C<method connect_SSL : void ();>
 
 Creates a new L<Net::SSLeay|SPVM::Net::SSLeay> object, and connects the SSL connection by calling L<Net::SSLeay#connect|SPVM::Net::SSLeay/"connect"> method.
 
-If there are callbacks in L</"before_connect_SSL_cbs_list"> field, these callbacks are performed given the instance, the new L<Net::SSLeay|SPVM::Net::SSLeay> object before calling L<Net::SSLeay#connect|SPVM::Net::SSLeay/"connect"> method.
+If there are callbacks in L</"before_connect_SSL_cbs"> field, these callbacks are performed given the instance, the new L<Net::SSLeay|SPVM::Net::SSLeay> object before calling L<Net::SSLeay#connect|SPVM::Net::SSLeay/"connect"> method.
 
 If an IO wait occurs, the program jumps to the L<goroutine scheduler|SPVM::Go>, and retries this operation until it succeeds or the timeout seconds set by L<Timeout|SPVM::IO::Socket/"Timeout"> field expires.
 
@@ -265,7 +265,7 @@ C<method accept_SSL : void ();>
 
 Creates a new L<Net::SSLeay|SPVM::Net::SSLeay> object, and accepts the SSL connection by calling L<Net::SSLeay#accept|SPVM::Net::SSLeay/"accept"> method.
 
-If there are callbacks in L</"before_accept_SSL_cbs_list"> field, these callbacks are performed given the instance, the new L<Net::SSLeay|SPVM::Net::SSLeay> object before calling L<Net::SSLeay#accept|SPVM::Net::SSLeay/"accept"> method.
+If there are callbacks in L</"before_accept_SSL_cbs"> field, these callbacks are performed given the instance, the new L<Net::SSLeay|SPVM::Net::SSLeay> object before calling L<Net::SSLeay#accept|SPVM::Net::SSLeay/"accept"> method.
 
 If an IO wait occurs, the program jumps to the L<goroutine scheduler|SPVM::Go>, and retries this operation until it succeeds or the timeout seconds set by L<Timeout|SPVM::IO::Socket/"Timeout"> field expires.
 
@@ -403,13 +403,13 @@ Exceptions thrown by L<Net::SSLeay#get_certificate|SPVM::Net::SSLeay/"get_certif
 
 C<method add_before_connect_SSL_cb : void ($cb : L<IO::Socket::SSL::Callback::BeforeConnectSSL|SPVM::IO::Socket::SSL::Callback::BeforeConnectSSL>);>
 
-Adds the callback $cb to the end of the elements of L</"before_connect_SSL_cb_list"> field.
+Adds the callback $cb to the end of the elements of L</"before_connect_SSL_cb"> field.
 
 =head2 add_before_accept_SSL_cb
 
 C<method add_before_accept_SSL_cb : void ($cb : L<IO::Socket::SSL::Callback::BeforeAcceptSSL|SPVM::IO::Socket::SSL::Callback::BeforeAcceptSSL>);>
 
-Adds the callback $cb to the end of the elements of L</"before_accept_SSL_cb_list"> field.
+Adds the callback $cb to the end of the elements of L</"before_accept_SSL_cb"> field.
 
 =head2 dump_peer_certificate
 
@@ -536,7 +536,7 @@ Server:
   
   $bio->write($ca_content);
   
-  my $cas_list = List->new(new Net::SSLeay::X509[0]);
+  my $cas = List->new(new Net::SSLeay::X509[0]);
   while (1) {
     my $ca = (Net::SSLeay::X509)undef;
     
@@ -551,12 +551,10 @@ Server:
       }
     }
     
-    $cas_list->push($ca);
+    $cas->push($ca);
   }
   
-  my $cas = (Net::SSLeay::X509[])$cas_list->to_array;
-  
-  my $SSL_ca = $cas;
+  my $SSL_ca = (Net::SSLeay::X509[])$cas->get_array;
 
 =head1 See Also
 

@@ -1,5 +1,12 @@
 Revision history for Schedule::Activity
 
+0.1.3 - 2025-10-12
+	- Attribute precedence
+
+0.1.2 - 2025-10-11
+	- Fixed attribute discovery within message configurations
+	- Named messages
+
 0.1.1 - 2025-10-08
 	- Annotations are built and reported separately from buildSchedule
 	- Attributes for activity/action nodes, reported via buildSchedule

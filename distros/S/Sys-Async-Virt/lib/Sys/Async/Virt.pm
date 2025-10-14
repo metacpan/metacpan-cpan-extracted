@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v0.3.1
-#                   and LibVirt version v11.7.0
+#                   and LibVirt version v11.8.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -19,7 +19,7 @@ use Future::AsyncAwait;
 use Object::Pad 0.821;
 use Sublike::Extended 0.29 'method', 'sub'; # From XS-Parse-Sublike, used by Future::AsyncAwait
 
-class Sys::Async::Virt v0.1.5;
+class Sys::Async::Virt v0.1.7;
 
 # inheriting from IO::Async::Notifier (a non-Object::Pad base class) implies ':repr(HASH)'
 inherit IO::Async::Notifier;
@@ -31,30 +31,30 @@ use Future::Queue;
 use Log::Any qw($log);
 use Scalar::Util qw(reftype weaken);
 
-use Protocol::Sys::Virt::Remote::XDR v11.7.0;
+use Protocol::Sys::Virt::Remote::XDR v11.8.0;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
-use Protocol::Sys::Virt::KeepAlive v11.7.0;
-use Protocol::Sys::Virt::Remote v11.7.0;
-use Protocol::Sys::Virt::Transport v11.7.0;
-use Protocol::Sys::Virt::URI v11.7.0; # imports parse_url
+use Protocol::Sys::Virt::KeepAlive v11.8.0;
+use Protocol::Sys::Virt::Remote v11.8.0;
+use Protocol::Sys::Virt::Transport v11.8.0;
+use Protocol::Sys::Virt::URI v11.8.0; # imports parse_url
 
-use Sys::Async::Virt::Connection::Factory v0.1.5;
-use Sys::Async::Virt::Domain v0.1.5;
-use Sys::Async::Virt::DomainCheckpoint v0.1.5;
-use Sys::Async::Virt::DomainSnapshot v0.1.5;
-use Sys::Async::Virt::Network v0.1.5;
-use Sys::Async::Virt::NetworkPort v0.1.5;
-use Sys::Async::Virt::NwFilter v0.1.5;
-use Sys::Async::Virt::NwFilterBinding v0.1.5;
-use Sys::Async::Virt::Interface v0.1.5;
-use Sys::Async::Virt::StoragePool v0.1.5;
-use Sys::Async::Virt::StorageVol v0.1.5;
-use Sys::Async::Virt::NodeDevice v0.1.5;
-use Sys::Async::Virt::Secret v0.1.5;
+use Sys::Async::Virt::Connection::Factory v0.1.7;
+use Sys::Async::Virt::Domain v0.1.7;
+use Sys::Async::Virt::DomainCheckpoint v0.1.7;
+use Sys::Async::Virt::DomainSnapshot v0.1.7;
+use Sys::Async::Virt::Network v0.1.7;
+use Sys::Async::Virt::NetworkPort v0.1.7;
+use Sys::Async::Virt::NwFilter v0.1.7;
+use Sys::Async::Virt::NwFilterBinding v0.1.7;
+use Sys::Async::Virt::Interface v0.1.7;
+use Sys::Async::Virt::StoragePool v0.1.7;
+use Sys::Async::Virt::StorageVol v0.1.7;
+use Sys::Async::Virt::NodeDevice v0.1.7;
+use Sys::Async::Virt::Secret v0.1.7;
 
-use Sys::Async::Virt::Callback v0.1.5;
-use Sys::Async::Virt::Stream v0.1.5;
+use Sys::Async::Virt::Callback v0.1.7;
+use Sys::Async::Virt::Stream v0.1.7;
 
 use constant {
     CLOSE_REASON_ERROR                                  => 0,
@@ -145,6 +145,7 @@ use constant {
     CPU_STATS_IDLE                                      => "idle",
     CPU_STATS_IOWAIT                                    => "iowait",
     CPU_STATS_INTR                                      => "intr",
+    CPU_STATS_GUEST                                     => "guest",
     CPU_STATS_UTILIZATION                               => "utilization",
     MEMORY_STATS_FIELD_LENGTH                           => 80,
     MEMORY_STATS_ALL_CELLS                              => -1,
@@ -989,7 +990,7 @@ method _network_instance($id) {
     my $c = $_networks->{$id->{uuid}};
     unless ($c) {
         $c = $_networks->{$id->{uuid}} =
-            network_factory(
+            _network_factory(
                 client => $self,
                 remote => $_remote,
                 id => $id );
@@ -1002,7 +1003,7 @@ method _network_port_instance($id) {
     my $c = $_network_ports->{$id->{uuid}};
     unless ($c) {
         $c = $_network_ports->{$id->{uuid}} =
-            network_port_factory(
+            _network_port_factory(
                 client => $self,
                 remote => $_remote,
                 id => $id );
@@ -1015,7 +1016,7 @@ method _nwfilter_instance($id) {
     my $c = $_nwfilters->{$id->{uuid}};
     unless ($c) {
         $c = $_nwfilters->{$id->{uuid}} =
-            nwfilter_factory(
+            _nwfilter_factory(
                 client => $self,
                 remote => $_remote,
                 id => $id );
@@ -1029,7 +1030,7 @@ method _nwfilter_binding_instance($id) {
     my $c = $_nwfilter_bindings->{$key};
     unless ($c) {
         $c = $_nwfilter_bindings->{$key} =
-            nwfilter_binding_factory(
+            _nwfilter_binding_factory(
                 client => $self,
                 remote => $_remote,
                 id => $id );
@@ -1043,7 +1044,7 @@ method _interface_instance($id) {
     my $c = $_interfaces->{$key};
     unless ($c) {
         $c = $_interfaces->{$key} =
-            interface_factory(
+            _interface_factory(
                 client => $self,
                 remote => $_remote,
                 id => $id );
@@ -1056,7 +1057,7 @@ method _storage_pool_instance($id) {
     my $c = $_storage_pools->{$id->{uuid}};
     unless ($c) {
         $c = $_storage_pools->{$id->{uuid}} =
-            storage_pool_factory(
+            _storage_pool_factory(
                 client => $self,
                 remote => $_remote,
                 id => $id );
@@ -1069,7 +1070,7 @@ method _storage_vol_instance($id) {
     my $c = $_storage_vols->{$id->{key}};
     unless ($c) {
         $c = $_storage_vols->{$id->{key}} =
-            storage_vol_factory->(
+            _storage_vol_factory->(
                 client => $self,
                 remote => $_remote,
                 id => $id );
@@ -1082,7 +1083,7 @@ method _node_device_instance($id) {
     my $c = $_node_devices->{$id->{name}};
     unless ($c) {
         $c = $_node_devices->{$id->{name}} =
-            node_device_factory(
+            _node_device_factory(
                 client => $self,
                 remote => $_remote,
                 id => $id );
@@ -1095,7 +1096,7 @@ method _secret_instance($id) {
     my $c = $_secrets->{$id->{uuid}};
     unless ($c) {
         $c = $_secrets->{$id->{uuid}} =
-            secret_factory(
+            _secret_factory(
                 client => $self,
                 remote => $_remote,
                 id => $id );
@@ -1583,13 +1584,13 @@ async method _close($reason) {
 
             # stop loops reading from and writing to the connection
             $_keepalive_future->cancel;
-            my $timeout = $self->loop->delay_future( at => 60 ); # 60s timeout
+            my $timeout = $self->loop->delay_future( after => 60 ); # 60s timeout
             $timeout->on_done(
                 sub {
                     $log->info( 'Server failed to close connection timely; '
                                 . 'forcibly closing client socket' );
                 });
-            await Future->await_any( $timeout, $_pump_future );
+            await Future->wait_any( $timeout, $_pump_future );
             $_connection->close;
         }
         catch ($e) {
@@ -1605,7 +1606,7 @@ async method _close($reason) {
                 $log->info( 'Server failed to close connection timely; '
                             . 'forcibly closing client socket' );
             });
-        await Future->await_any( $timeout, $_pump_future );
+        await Future->wait_any( $timeout, $_pump_future );
         $_connection->close;
     }
 
@@ -1674,14 +1675,14 @@ async method get_cpu_map() {
         $remote->PROC_NODE_GET_CPU_MAP,
         { need_map => 1, need_online => 1, flags => 0 } );
 
-    $self->{_cpus} = $rv->{ret};
-    $self->{_maplen} = length($rv->{cpumap});
+    $_cpus = $rv->{ret};
+    $_maplen = length($rv->{cpumap});
 
     return {
         totcpus => $rv->{ret},
         totonline => $rv->{online},
         maplen    => length($rv->{cpumap}),
-        onlinemap => $self->_from_cpumap( $rv->{cpumap} )
+        onlinemap => await $self->_from_cpumap( $rv->{cpumap} )
     };
 }
 
@@ -2350,9 +2351,9 @@ Sys::Async::Virt - LibVirt protocol implementation for clients
 
 =head1 VERSION
 
-v0.1.5
+v0.1.7
 
-Based on LibVirt tag v11.7.0
+Based on LibVirt tag v11.8.0
 
 =head1 SYNOPSIS
 
@@ -2409,7 +2410,7 @@ value.
 
 =head2 RUNNING AGAINST OLDER SERVERS
 
-The reference LibVirt version of this module is v11.7.0. This means
+The reference LibVirt version of this module is v11.8.0. This means
 all API entry points have been implemented as they are declared in the
 protocol of that version (except for the ones listed in the section
 L</UNIMPLEMENTED ENTRYPOINTS>).  The consequence of a server being of a lower
@@ -2418,7 +2419,7 @@ supported by the server.
 
 =head2 RUNNING AGAINST NEWER SERVERS
 
-The module can run against any version of LibVirt newer than v11.7.0;
+The module can run against any version of LibVirt newer than v11.8.0;
 any new entry points in the API will not be available, but all existing APIs
 can be used as per the stability guarantees.
 
@@ -3597,6 +3598,8 @@ See documentation of L<virStorageVolLookupByPath|https://libvirt.org/html/libvir
 =item CPU_STATS_IOWAIT
 
 =item CPU_STATS_INTR
+
+=item CPU_STATS_GUEST
 
 =item CPU_STATS_UTILIZATION
 

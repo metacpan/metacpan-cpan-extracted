@@ -46,13 +46,13 @@ class Mojo::SSE {
     return Fn->join("\x0d\x0a", Array->merge_string($parts->to_array, ["", ""]));
   }
   
-  static method parse_event : Mojo::SSE::Event ($buffer_ref : string[]) {
+  static method parse_event : Mojo::SSE::Event ($buffer : mutable string) {
     
     my $event = Mojo::SSE::Event->new;
     $event->set_type("message");
     $event->set_text("");
     
-    while (my $_ = Re->s($buffer_ref, ["^(.*?)(?:(?:\x0d\x0a|(?<!\x0d)\x0a|\x0d(?!\x0a)){2})", "s"], "")) {
+    while (my $_ = Re->s($buffer, ["^(.*?)(?:(?:\x0d\x0a|(?<!\x0d)\x0a|\x0d(?!\x0a)){2})", "s"], "")) {
       
       my $match = $_->match;
       

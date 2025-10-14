@@ -1,5 +1,9 @@
 Revision history for Perl module Module::Generic
 
+v1.1.1 2025-10-12T07:53:51+0900
+    - Correcting method _load_class to respect the 'no_import' option.
+    - Minor update in the documentation for Module::Generic::Global
+
 v1.1.0 2025-09-30T15:30:30+0900
     - Improved the methods checksum_md5, checksum_sha256, and checksum_sha512 in Module::Generic::File
 

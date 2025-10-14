@@ -323,10 +323,9 @@ class Mojolicious::Routes::Route {
     
     $pattern->parse($args);
     
-    my $name = $pattern->unparsed // "";
+    my $name = (mutable string)copy($pattern->unparsed // "");
     
-    Re->s(my $_ = [$name], ["\W+", "g"], "");
-    $name = $_->[0];
+    Re->s($name, ["\W+", "g"], "");
     
     $self->{name} = $name;
   }

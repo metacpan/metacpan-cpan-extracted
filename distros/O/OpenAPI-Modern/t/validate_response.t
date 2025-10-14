@@ -14,7 +14,6 @@ use utf8;
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
 use JSON::Schema::Modern::Utilities 'jsonp';
-use Test::Warnings 0.033 qw(:no_end_test allow_patterns);
 
 use lib 't/lib';
 use Helper;
@@ -100,46 +99,6 @@ YAML
     },
     qr/^\$response->request and \$options->\{request\} are inconsistent/,
     'if request is passed twice, it must be the same object (not just the same values)',
-  );
-
-
-  test_needs 'HTTP::Request', 'HTTP::Response';
-  cmp_result(
-    $openapi->validate_response(HTTP::Response->new(404),
-      { request => HTTP::Request->new(GET => 'http://example.com/', [ Host => 'example.com' ]) })->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          instanceLocation => '/request',
-          keywordLocation => '',
-          absoluteKeywordLocation => $doc_uri->to_string,
-          error => 'Failed to parse request: Bad request start-line',
-        },
-      ],
-    },
-    'invalid request object is detected before parsing the response',
-  );
-
-  my $req = Mojo::Message::Request->new(method => 'GET', url => Mojo::URL->new('http://example.com/'));
-  $req->headers->header('Host', 'example.com');
-  cmp_result(
-    # start line is missing "HTTP/1.1"
-    $openapi->validate_response(HTTP::Response->new(404), { request => $req })->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          instanceLocation => '/response',
-          keywordLocation => jsonp(qw(/paths / get)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths / get)))->to_string,
-          error => 'Failed to parse response: Bad response start-line',
-        },
-      ],
-    },
-    # checking definedness of $response->code is only a proxy to detecting errors, since
-    # $response->error is overloaded with the long form of the HTTP response code
-    'invalid response object is detected',
   );
 };
 
@@ -671,16 +630,25 @@ YAML
   $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+components:
+  responses:
+    my_default:
+      description: foo
+      content:
+        text/*:
+          schema:
+            type: string
+            maxLength: 3
 paths:
   /foo:
     get:
       responses:
         default:
-          description: foo
+          $ref: '#/components/responses/my_default'
 YAML
 
   cmp_result(
-    $openapi->validate_response(response($_, [ 'Transfer-Encoding' => 'blah' ]), { path_template => '/foo', method => 'GET' })->TO_JSON,
+    $openapi->validate_response(response($_, [ 'Content-Type' => 'text/plain', 'Transfer-Encoding' => 'chunked' ], "4\r\nabcd\r\n0\r\n\r\n"), { path_template => '/foo', method => 'GET' })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -690,14 +658,43 @@ YAML
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get)))->to_string,
           error => 'RFC9112 §6.1-10: "A server MUST NOT send a Transfer-Encoding header field in any response with a status code of 1xx (Informational) or 204 (No Content)"',
         },
+        {
+          instanceLocation => '/response/body',
+          keywordLocation => jsonp(qw(/paths /foo get responses default $ref content text/* schema maxLength)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/components responses my_default content text/* schema maxLength)))->to_string,
+          error => 'length is greater than 3',
+        },
       ],
     },
-    'Transfer-Encoding header is detected with status code '.$_,
+    'Transfer-Encoding header is detected with status code '.$_.' (and body is still parseable)',
   )
   foreach 102, 204;
 
   # TODO: test 'connect' method, once it's allowed by the spec.
 
+  cmp_result(
+    $openapi->validate_response(response(200,
+      [ 'Content-Type' => 'text/plain', 'Content-Length' => 4, 'Transfer-Encoding' => 'chunked' ],
+      "4\r\nabcd\r\n0\r\n\r\n"), { path_template => '/foo', method => 'GET' })->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/response/header/Content-Length',
+          keywordLocation => jsonp(qw(/paths /foo get)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get)))->to_string,
+          error => 'Content-Length cannot appear together with Transfer-Encoding',
+        },
+        {
+          instanceLocation => '/response/body',
+          keywordLocation => jsonp(qw(/paths /foo get responses default $ref content text/* schema maxLength)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/components responses my_default content text/* schema maxLength)))->to_string,
+          error => 'length is greater than 3',
+        },
+      ],
+    },
+    'conflict between Content-Length + Transfer-Encoding headers (and body is still parseable)',
+  );
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
@@ -747,10 +744,7 @@ YAML
   remove_header($response, 'Content-Length');
 
   cmp_result(
-    do {
-      my $x = allow_patterns(qr/^parse error when converting HTTP::Response/) if $::TYPE eq 'lwp';
-      $openapi->validate_response($response, { path_template => '/foo', method => 'POST' });
-    }->TO_JSON,
+    $openapi->validate_response($response, { path_template => '/foo', method => 'POST' })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -924,12 +918,9 @@ YAML
   );
 
   cmp_result(
-    do {
-      my $x = allow_patterns(qr/^parse error when converting HTTP::Response/) if $::TYPE eq 'lwp';
-      $openapi->validate_response(
-        response(400, [ 'Content-Length' => 12, 'Content-Type' => 'text/plain' ], ''), # Content-Length lies!
-          { path_template => '/foo', method => 'POST' });
-    }->TO_JSON,
+    $openapi->validate_response(
+      response(400, [ 'Content-Length' => 12, 'Content-Type' => 'text/plain' ], ''), # Content-Length lies!
+        { path_template => '/foo', method => 'POST' })->TO_JSON,
     {
       valid => false,
       errors => [
@@ -966,10 +957,7 @@ YAML
   remove_header($response, 'Content-Length');
 
   cmp_result(
-    do {
-      my $x = allow_patterns(qr/^parse error when converting HTTP::Response/) if $::TYPE eq 'lwp';
-      $openapi->validate_response($response, { path_template => '/foo', method => 'POST' });
-    }->TO_JSON,
+    $openapi->validate_response($response, { path_template => '/foo', method => 'POST' })->TO_JSON,
     {
       valid => false,
       errors => [

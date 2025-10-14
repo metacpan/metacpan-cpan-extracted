@@ -6,7 +6,7 @@ use JSON::PP;
 use List::Util qw(sum min max);
 use Scalar::Util qw(looks_like_number);
 
-our $VERSION = '0.81';
+our $VERSION = '0.99';
 
 sub new {
     my ($class, %opts) = @_;
@@ -86,6 +86,23 @@ sub run_query {
         if ($part eq 'keys') {
             @next_results = map {
                 ref $_ eq 'HASH' ? [ sort keys %$_ ] : undef
+            } @results;
+            @results = @next_results;
+            next;
+        }
+
+        # support for keys_unsorted
+        if ($part eq 'keys_unsorted' || $part eq 'keys_unsorted()') {
+            @next_results = map {
+                if (ref $_ eq 'HASH') {
+                    [ keys %$_ ];
+                }
+                elsif (ref $_ eq 'ARRAY') {
+                    [ 0 .. $#{$_} ];
+                }
+                else {
+                    undef;
+                }
             } @results;
             @results = @next_results;
             next;
@@ -286,6 +303,20 @@ sub run_query {
             next;
         }
 
+        # support for range(...)
+        if ($part =~ /^range\((.*)\)$/) {
+            my $args_raw = $1;
+            my @args     = _parse_range_arguments($args_raw);
+
+            @next_results = ();
+            for my $value (@results) {
+                push @next_results, _apply_range($value, \@args);
+            }
+
+            @results = @next_results;
+            next;
+        }
+
         # support for map(...)
         if ($part =~ /^map\((.+)\)$/) {
             my $filter = $1;
@@ -295,6 +326,22 @@ sub run_query {
                     : $_
             } @results;
             @results = @next_results;
+            next;
+        }
+
+        # support for map_values(filter)
+        if ($part =~ /^map_values\((.+)\)$/) {
+            my $filter = $1;
+            @next_results = map { _apply_map_values($self, $_, $filter) } @results;
+            @results      = @next_results;
+            next;
+        }
+
+        # support for walk(filter)
+        if ($part =~ /^walk\((.+)\)$/) {
+            my $filter = $1;
+            @next_results = map { _apply_walk($self, $_, $filter) } @results;
+            @results      = @next_results;
             next;
         }
 
@@ -308,6 +355,63 @@ sub run_query {
                         push @pairs, { index => $idx, value => $arr->[$idx] };
                     }
                     \@pairs;
+                } else {
+                    $_;
+                }
+            } @results;
+
+            @results = @next_results;
+            next;
+        }
+
+        # support for to_entries
+        if ($part eq 'to_entries') {
+            @next_results = map { _to_entries($_) } @results;
+            @results      = @next_results;
+            next;
+        }
+
+        # support for from_entries
+        if ($part eq 'from_entries') {
+            @next_results = map { _from_entries($_) } @results;
+            @results      = @next_results;
+            next;
+        }
+
+        # support for with_entries(filter)
+        if ($part =~ /^with_entries\((.+)\)$/) {
+            my $filter = $1;
+            @next_results = map { _apply_with_entries($self, $_, $filter) } @results;
+            @results      = @next_results;
+            next;
+        }
+
+        # support for transpose()
+        if ($part eq 'transpose()' || $part eq 'transpose') {
+            @next_results = map {
+                if (ref $_ eq 'ARRAY') {
+                    my $outer = $_;
+
+                    if (!@$outer) {
+                        [];
+                    }
+                    elsif (grep { ref $_ ne 'ARRAY' } @$outer) {
+                        $_;
+                    }
+                    else {
+                        my @lengths = map { scalar(@$_) } @$outer;
+                        my $limit   = @lengths ? min(@lengths) : 0;
+
+                        if ($limit <= 0) {
+                            [];
+                        } else {
+                            my @transposed;
+                            for my $idx (0 .. $limit - 1) {
+                                push @transposed, [ map { $_->[$idx] } @$outer ];
+                            }
+                            \@transposed;
+                        }
+                    }
                 } else {
                     $_;
                 }
@@ -421,6 +525,39 @@ sub run_query {
                     }
 
                     $has_number ? $sum : 0;
+                }
+                else {
+                    $_;
+                }
+            } @results;
+
+            @results = @next_results;
+            next;
+        }
+
+        # support for median_by(path)
+        if ($part =~ /^median_by\((.+)\)$/) {
+            my ($key_path, $use_entire_item) = _normalize_path_argument($1);
+
+            @next_results = map {
+                if (ref $_ eq 'ARRAY') {
+                    my @numbers;
+                    for my $element (@$_) {
+                        push @numbers, _project_numeric_values($element, $key_path, $use_entire_item);
+                    }
+
+                    if (@numbers) {
+                        @numbers = sort { $a <=> $b } @numbers;
+                        my $count  = @numbers;
+                        my $middle = int($count / 2);
+                        if ($count % 2) {
+                            $numbers[$middle];
+                        } else {
+                            ($numbers[$middle - 1] + $numbers[$middle]) / 2;
+                        }
+                    } else {
+                        undef;
+                    }
                 }
                 else {
                     $_;
@@ -606,6 +743,20 @@ sub run_query {
             next;
         }
 
+        # support for tostring()
+        if ($part eq 'tostring()' || $part eq 'tostring') {
+            @next_results = map { _apply_tostring($_) } @results;
+            @results = @next_results;
+            next;
+        }
+
+        # support for tojson()
+        if ($part eq 'tojson()' || $part eq 'tojson') {
+            @next_results = map { _apply_tojson($_) } @results;
+            @results = @next_results;
+            next;
+        }
+
         # support for to_number()
         if ($part eq 'to_number()' || $part eq 'to_number') {
             @next_results = map { _apply_to_number($_) } @results;
@@ -637,6 +788,35 @@ sub run_query {
                     $_;
                 }
             } @results;
+            @results = @next_results;
+            next;
+        }
+
+        # support for percentile(p)
+        if ($part =~ /^percentile(?:\((.*)\))?$/) {
+            my $args_raw = defined $1 ? $1 : '';
+            my @args     = length $args_raw ? _parse_arguments($args_raw) : ();
+            my $fraction = @args ? _normalize_percentile($args[0]) : 0.5;
+
+            @next_results = map {
+                if (ref $_ eq 'ARRAY' && @$_) {
+                    my @numbers = sort { $a <=> $b }
+                        map { 0 + $_ }
+                        grep { looks_like_number($_) }
+                        @$_;
+
+                    if (@numbers) {
+                        defined $fraction ? _percentile_value(\@numbers, $fraction) : undef;
+                    }
+                    else {
+                        undef;
+                    }
+                }
+                else {
+                    $_;
+                }
+            } @results;
+
             @results = @next_results;
             next;
         }
@@ -775,6 +955,26 @@ sub run_query {
             next;
         }
 
+        # support for all() / all(expr)
+        if ($part =~ /^all(?:\((.*)\))?$/) {
+            my $expr = defined $1 ? $1 : undef;
+            $expr = undef if defined($expr) && $expr eq '';
+
+            @next_results = map { _apply_all($self, $_, $expr) } @results;
+            @results      = @next_results;
+            next;
+        }
+
+        # support for any() / any(expr)
+        if ($part =~ /^any(?:\((.*)\))?$/) {
+            my $expr = defined $1 ? $1 : undef;
+            $expr = undef if defined($expr) && $expr eq '';
+
+            @next_results = map { _apply_any($self, $_, $expr) } @results;
+            @results      = @next_results;
+            next;
+        }
+
         # support for join(", ")
         if ($part =~ /^join\((.*?)\)$/) {
             my $sep = $1;
@@ -804,9 +1004,7 @@ sub run_query {
                     my @sorted = sort {
                         my $a_val = (_traverse($a, $key_path))[0] // '';
                         my $b_val = (_traverse($b, $key_path))[0] // '';
-        
-                        warn "[DEBUG] a=$a_val, b=$b_val => cmp=" . $cmp->($a_val, $b_val) . "\n";
-        
+
                         $cmp->($a_val, $b_val);
                     } @$item;
         
@@ -830,6 +1028,15 @@ sub run_query {
         if ($part eq 'values') {
             @next_results = map {
                 ref $_ eq 'HASH' ? [ values %$_ ] : $_
+            } @results;
+            @results = @next_results;
+            next;
+        }
+
+        # support for arrays
+        if ($part eq 'arrays()' || $part eq 'arrays') {
+            @next_results = map {
+                ref $_ eq 'ARRAY' ? $_ : ()
             } @results;
             @results = @next_results;
             next;
@@ -944,6 +1151,16 @@ sub run_query {
             next;
         }
 
+        # support for delpaths(paths_expr)
+        if ($part =~ /^delpaths\((.*)\)$/) {
+            my $filter = $1;
+            $filter =~ s/^\s+|\s+$//g;
+
+            @next_results = map { _apply_delpaths($self, $_, $filter) } @results;
+            @results      = @next_results;
+            next;
+        }
+
         # support for compact()
         if ($part eq 'compact()' || $part eq 'compact') {
             @next_results = map {
@@ -985,6 +1202,22 @@ sub run_query {
             next;
         }
 
+        # support for ltrimstr("prefix")
+        if ($part =~ /^ltrimstr\((.+)\)$/) {
+            my $needle = _parse_string_argument($1);
+            @next_results = map { _apply_trimstr($_, $needle, 'left') } @results;
+            @results      = @next_results;
+            next;
+        }
+
+        # support for rtrimstr("suffix")
+        if ($part =~ /^rtrimstr\((.+)\)$/) {
+            my $needle = _parse_string_argument($1);
+            @next_results = map { _apply_trimstr($_, $needle, 'right') } @results;
+            @results      = @next_results;
+            next;
+        }
+
         # support for has(key)
         if ($part =~ /^has\((.+)\)$/) {
             my @args   = _parse_arguments($1);
@@ -1019,6 +1252,20 @@ sub run_query {
             next;
         }
 
+        # support for explode()
+        if ($part eq 'explode()' || $part eq 'explode') {
+            @next_results = map { _apply_explode($_) } @results;
+            @results      = @next_results;
+            next;
+        }
+
+        # support for implode()
+        if ($part eq 'implode()' || $part eq 'implode') {
+            @next_results = map { _apply_implode($_) } @results;
+            @results      = @next_results;
+            next;
+        }
+
         # support for replace(old, new)
         if ($part =~ /^replace\((.+)\)$/) {
             my ($search, $replacement) = _parse_arguments($1);
@@ -1044,6 +1291,16 @@ sub run_query {
             my @args = _parse_arguments($args_raw);
             @next_results = map { _apply_substr($_, @args) } @results;
             @results = @next_results;
+            next;
+        }
+
+        # support for indices(value)
+        if ($part =~ /^indices\((.*)\)$/) {
+            my @args   = _parse_arguments($1);
+            my $needle = @args ? $args[0] : undef;
+
+            @next_results = map { _apply_indices($_, $needle) } @results;
+            @results      = @next_results;
             next;
         }
 
@@ -1076,6 +1333,61 @@ sub run_query {
             } @results;
 
             @results = @next_results;
+            next;
+        }
+
+        # support for rindex(value)
+        if ($part =~ /^rindex\((.*)\)$/) {
+            my @args   = _parse_arguments($1);
+            my $needle = @args ? $args[0] : undef;
+
+            @next_results = map {
+                if (ref $_ eq 'ARRAY') {
+                    my $array = $_;
+                    my $found;
+                    for (my $i = $#$array; $i >= 0; $i--) {
+                        if (_values_equal($array->[$i], $needle)) {
+                            $found = $i;
+                            last;
+                        }
+                    }
+                    defined $found ? $found : undef;
+                }
+                elsif (!ref $_ || ref($_) eq 'JSON::PP::Boolean') {
+                    my $haystack = defined $_ ? "$_" : '';
+                    my $fragment = defined $needle ? "$needle" : '';
+                    my $pos      = rindex($haystack, $fragment);
+                    $pos >= 0 ? $pos : undef;
+                }
+                else {
+                    undef;
+                }
+            } @results;
+
+            @results = @next_results;
+            next;
+        }
+
+        # support for paths()
+        if ($part eq 'paths()' || $part eq 'paths') {
+            @next_results = map { _apply_paths($_) } @results;
+            @results      = @next_results;
+            next;
+        }
+
+        # support for leaf_paths()
+        if ($part eq 'leaf_paths()' || $part eq 'leaf_paths') {
+            @next_results = map { _apply_leaf_paths($_) } @results;
+            @results      = @next_results;
+            next;
+        }
+
+        # support for getpath(path_expr)
+        if ($part =~ /^getpath\((.*)\)$/) {
+            my $path_expr = defined $1 ? $1 : '';
+
+            @next_results = map { _apply_getpath($self, $_, $path_expr) } @results;
+            @results      = @next_results;
             next;
         }
 
@@ -1147,6 +1459,90 @@ sub _map {
     return @mapped;
 }
 
+sub _apply_all {
+    my ($self, $value, $expr) = @_;
+
+    if (ref $value eq 'ARRAY') {
+        return JSON::PP::true unless @$value;
+
+        for my $item (@$value) {
+            if (defined $expr) {
+                my @evaluated = $self->run_query(encode_json($item), $expr);
+                return JSON::PP::false unless @evaluated;
+                return JSON::PP::false if grep { !_is_truthy($_) } @evaluated;
+            }
+            else {
+                return JSON::PP::false unless _is_truthy($item);
+            }
+        }
+
+        return JSON::PP::true;
+    }
+
+    if (defined $expr) {
+        my @evaluated = $self->run_query(encode_json($value), $expr);
+        return JSON::PP::false unless @evaluated;
+        return grep { !_is_truthy($_) } @evaluated ? JSON::PP::false : JSON::PP::true;
+    }
+
+    return _is_truthy($value) ? JSON::PP::true : JSON::PP::false;
+}
+
+sub _apply_any {
+    my ($self, $value, $expr) = @_;
+
+    if (ref $value eq 'ARRAY') {
+        return JSON::PP::false unless @$value;
+
+        for my $item (@$value) {
+            if (defined $expr) {
+                my @evaluated = $self->run_query(encode_json($item), $expr);
+                return JSON::PP::true if grep { _is_truthy($_) } @evaluated;
+            }
+            else {
+                return JSON::PP::true if _is_truthy($item);
+            }
+        }
+
+        return JSON::PP::false;
+    }
+
+    if (defined $expr) {
+        my @evaluated = $self->run_query(encode_json($value), $expr);
+        return grep { _is_truthy($_) } @evaluated ? JSON::PP::true : JSON::PP::false;
+    }
+
+    return _is_truthy($value) ? JSON::PP::true : JSON::PP::false;
+}
+
+sub _is_truthy {
+    my ($value) = @_;
+
+    return 0 unless defined $value;
+
+    if (ref($value) eq 'JSON::PP::Boolean') {
+        return $value ? 1 : 0;
+    }
+
+    if (ref $value eq 'ARRAY') {
+        return @$value ? 1 : 0;
+    }
+
+    if (ref $value eq 'HASH') {
+        return scalar(keys %$value) ? 1 : 0;
+    }
+
+    if (!ref $value) {
+        return 0 if $value eq '';
+        if (looks_like_number($value)) {
+            return $value != 0 ? 1 : 0;
+        }
+        return 1;
+    }
+
+    return 1;
+}
+
 sub _apply_case_transform {
     my ($value, $mode) = @_;
 
@@ -1194,6 +1590,262 @@ sub _apply_trim {
     }
 
     return $value;
+}
+
+sub _apply_trimstr {
+    my ($value, $needle, $mode) = @_;
+
+    if (!defined $value) {
+        return undef;
+    }
+
+    if (ref $value eq 'ARRAY') {
+        return [ map { _apply_trimstr($_, $needle, $mode) } @$value ];
+    }
+
+    if (ref $value) {
+        return $value;
+    }
+
+    $needle = '' unless defined $needle;
+    my $target = "$value";
+    my $pattern = "$needle";
+    my $len = length $pattern;
+
+    return $target if $len == 0;
+
+    if ($mode eq 'left') {
+        return $target if index($target, $pattern) != 0;
+        return substr($target, $len);
+    }
+
+    if ($mode eq 'right') {
+        return $target if $len > length($target);
+        return $target unless substr($target, -$len) eq $pattern;
+        return substr($target, 0, length($target) - $len);
+    }
+
+    return $target;
+}
+
+sub _apply_paths {
+    my ($value) = @_;
+
+    if (!ref $value || ref($value) eq 'JSON::PP::Boolean') {
+        return [ [] ];
+    }
+
+    my @paths;
+    _collect_paths($value, [], \@paths);
+    return \@paths;
+}
+
+sub _apply_leaf_paths {
+    my ($value) = @_;
+
+    if (_is_leaf_value($value)) {
+        return [ [] ];
+    }
+
+    my @paths;
+    _collect_leaf_paths($value, [], \@paths);
+    return \@paths;
+}
+
+sub _apply_getpath {
+    my ($self, $value, $expr) = @_;
+
+    return undef unless defined $value;
+
+    $expr //= '';
+    $expr =~ s/^\s+|\s+$//g;
+    return undef if $expr eq '';
+
+    my @paths;
+
+    my $decoded = eval { decode_json($expr) };
+    if (!$@ && defined $decoded) {
+        if (ref $decoded eq 'ARRAY') {
+            if (@$decoded && ref $decoded->[0] eq 'ARRAY') {
+                push @paths, map { [ @$_ ] } @$decoded;
+            }
+            else {
+                push @paths, [ @$decoded ];
+            }
+        }
+        else {
+            push @paths, [ $decoded ];
+        }
+    }
+
+    if (!@paths) {
+        my @outputs = $self->run_query(encode_json($value), $expr);
+        for my $output (@outputs) {
+            next unless defined $output;
+
+            if (ref $output eq 'ARRAY') {
+                if (@$output && ref $output->[0] eq 'ARRAY') {
+                    push @paths, grep { ref $_ eq 'ARRAY' } @$output;
+                }
+                elsif (!@$output || !ref $output->[0]) {
+                    push @paths, [ @$output ];
+                }
+            }
+            elsif (!ref $output || ref($output) eq 'JSON::PP::Boolean') {
+                push @paths, [ $output ];
+            }
+        }
+    }
+
+    return undef unless @paths;
+
+    my @values = map { _traverse_path_array($value, $_) } @paths;
+    return @values == 1 ? $values[0] : \@values;
+}
+
+sub _collect_paths {
+    my ($value, $current_path, $paths) = @_;
+
+    if (ref $value eq 'HASH') {
+        for my $key (sort keys %$value) {
+            my $child = $value->{$key};
+            my @next  = (@$current_path, $key);
+            push @$paths, [@next];
+
+            if (ref $child eq 'HASH' || ref $child eq 'ARRAY') {
+                _collect_paths($child, \@next, $paths);
+            }
+        }
+        return;
+    }
+
+    if (ref $value eq 'ARRAY') {
+        for my $index (0 .. $#$value) {
+            my $child = $value->[$index];
+            my @next  = (@$current_path, $index);
+            push @$paths, [@next];
+
+            if (ref $child eq 'HASH' || ref $child eq 'ARRAY') {
+                _collect_paths($child, \@next, $paths);
+            }
+        }
+        return;
+    }
+
+    push @$paths, [@$current_path];
+}
+
+sub _traverse_path_array {
+    my ($value, $path) = @_;
+
+    return undef unless defined $value;
+    return $value unless defined $path;
+    return $value if ref($path) ne 'ARRAY';
+
+    my $cursor = $value;
+    for my $segment (@$path) {
+        return undef unless defined $cursor;
+
+        if (ref $cursor eq 'HASH') {
+            my $key = defined $segment ? "$segment" : return undef;
+            return undef unless exists $cursor->{$key};
+            $cursor = $cursor->{$key};
+            next;
+        }
+
+        if (ref $cursor eq 'ARRAY') {
+            return undef unless defined $segment;
+
+            my $index = "$segment";
+            if ($index =~ /^-?\d+$/) {
+                my $numeric = int($index);
+                $numeric += @$cursor if $numeric < 0;
+                return undef if $numeric < 0 || $numeric > $#$cursor;
+                $cursor = $cursor->[$numeric];
+                next;
+            }
+
+            return undef;
+        }
+
+        return undef;
+    }
+
+    return $cursor;
+}
+
+sub _collect_leaf_paths {
+    my ($value, $current_path, $paths) = @_;
+
+    if (ref $value eq 'HASH') {
+        for my $key (sort keys %$value) {
+            my $child = $value->{$key};
+            my @next  = (@$current_path, $key);
+
+            if (_is_leaf_value($child)) {
+                push @$paths, [@next];
+            }
+            else {
+                _collect_leaf_paths($child, \@next, $paths);
+            }
+        }
+        return;
+    }
+
+    if (ref $value eq 'ARRAY') {
+        for my $index (0 .. $#$value) {
+            my $child = $value->[$index];
+            my @next  = (@$current_path, $index);
+
+            if (_is_leaf_value($child)) {
+                push @$paths, [@next];
+            }
+            else {
+                _collect_leaf_paths($child, \@next, $paths);
+            }
+        }
+        return;
+    }
+
+    push @$paths, [@$current_path];
+}
+
+sub _is_leaf_value {
+    my ($value) = @_;
+
+    return 1 unless ref $value;
+    return 1 if ref($value) eq 'JSON::PP::Boolean';
+    return 0 if ref($value) eq 'ARRAY';
+    return 0 if ref($value) eq 'HASH';
+    return 1;
+}
+
+sub _apply_tostring {
+    my ($value) = @_;
+
+    if (!defined $value) {
+        return 'null';
+    }
+
+    if (ref($value) eq 'JSON::PP::Boolean') {
+        return $value ? 'true' : 'false';
+    }
+
+    if (!ref $value) {
+        return "$value";
+    }
+
+    if (ref $value eq 'ARRAY' || ref $value eq 'HASH') {
+        return encode_json($value);
+    }
+
+    return encode_json($value);
+}
+
+sub _apply_tojson {
+    my ($value) = @_;
+
+    return encode_json($value);
 }
 
 sub _apply_numeric_function {
@@ -1277,6 +1929,54 @@ sub _apply_to_number {
     return $value;
 }
 
+sub _normalize_percentile {
+    my ($value) = @_;
+
+    return undef if !defined $value;
+
+    if (ref($value) eq 'JSON::PP::Boolean') {
+        $value = $value ? 1 : 0;
+    }
+
+    return undef if ref $value;
+    return undef unless looks_like_number($value);
+
+    my $fraction = 0 + $value;
+
+    if ($fraction > 1) {
+        $fraction /= 100 if $fraction <= 100;
+    }
+
+    $fraction = 0 if $fraction < 0;
+    $fraction = 1 if $fraction > 1;
+
+    return $fraction;
+}
+
+sub _percentile_value {
+    my ($numbers, $fraction) = @_;
+
+    return undef unless ref $numbers eq 'ARRAY';
+    return undef unless @$numbers;
+
+    $fraction = 0 if $fraction < 0;
+    $fraction = 1 if $fraction > 1;
+
+    return $numbers->[0] if @$numbers == 1;
+
+    my $rank        = $fraction * (@$numbers - 1);
+    my $lower_index = int($rank);
+    my $upper_index = $lower_index == @$numbers - 1 ? $lower_index : $lower_index + 1;
+    my $weight      = $rank - $lower_index;
+
+    return $numbers->[$lower_index] if $upper_index == $lower_index;
+
+    my $lower = $numbers->[$lower_index];
+    my $upper = $numbers->[$upper_index];
+
+    return $lower + ($upper - $lower) * $weight;
+}
+
 sub _apply_merge_objects {
     my ($value) = @_;
 
@@ -1298,6 +1998,246 @@ sub _apply_merge_objects {
     }
 
     return $value;
+}
+
+sub _to_entries {
+    my ($value) = @_;
+
+    if (ref $value eq 'HASH') {
+        return [ map { { key => $_, value => $value->{$_} } } sort keys %$value ];
+    }
+
+    if (ref $value eq 'ARRAY') {
+        return [ map { { key => $_, value => $value->[$_] } } 0 .. $#$value ];
+    }
+
+    return $value;
+}
+
+sub _from_entries {
+    my ($value) = @_;
+
+    return $value unless ref $value eq 'ARRAY';
+
+    my %result;
+    for my $entry (@$value) {
+        my $normalized = _normalize_entry($entry);
+        next unless $normalized;
+
+        my $key = $normalized->{key};
+        $result{$key} = $normalized->{value};
+    }
+
+    return \%result;
+}
+
+sub _apply_with_entries {
+    my ($self, $value, $filter) = @_;
+
+    return $value unless ref $value eq 'HASH' || ref $value eq 'ARRAY';
+
+    my $entries = _to_entries($value);
+    return $value unless ref $entries eq 'ARRAY';
+
+    my @transformed;
+    for my $entry (@$entries) {
+        my @results = $self->run_query(encode_json($entry), $filter);
+        for my $result (@results) {
+            my $normalized = _normalize_entry($result);
+            push @transformed, $normalized if $normalized;
+        }
+    }
+
+    return _from_entries(\@transformed);
+}
+
+sub _apply_map_values {
+    my ($self, $value, $filter) = @_;
+
+    return $value if !defined $value;
+
+    if (ref $value eq 'HASH') {
+        my %result;
+        for my $key (keys %$value) {
+            my $original = $value->{$key};
+            my @outputs  = $self->run_query(encode_json($original), $filter);
+            next unless @outputs;
+            $result{$key} = $outputs[0];
+        }
+        return \%result;
+    }
+
+    if (ref $value eq 'ARRAY') {
+        return [ map { _apply_map_values($self, $_, $filter) } @$value ];
+    }
+
+    return $value;
+}
+
+sub _apply_walk {
+    my ($self, $value, $filter) = @_;
+
+    if (ref $value eq 'HASH') {
+        my %copy;
+        for my $key (keys %$value) {
+            $copy{$key} = _apply_walk($self, $value->{$key}, $filter);
+        }
+        $value = \%copy;
+    }
+    elsif (ref $value eq 'ARRAY') {
+        my @copy = map { _apply_walk($self, $_, $filter) } @$value;
+        $value   = \@copy;
+    }
+
+    my @results = $self->run_query(encode_json($value), $filter);
+    return @results ? $results[0] : undef;
+}
+
+sub _apply_delpaths {
+    my ($self, $value, $filter) = @_;
+
+    return $value if !defined $value;
+    return $value if !ref $value || ref($value) eq 'JSON::PP::Boolean';
+
+    $filter //= '';
+    $filter =~ s/^\s+|\s+$//g;
+    return $value if $filter eq '';
+
+    my @paths;
+    my $decoded_paths = eval { decode_json($filter) };
+    if (!$@ && defined $decoded_paths) {
+        if (ref $decoded_paths eq 'ARRAY') {
+            if (@$decoded_paths && ref $decoded_paths->[0] eq 'ARRAY') {
+                push @paths, map { [ @$_ ] } @$decoded_paths;
+            }
+            elsif (!@$decoded_paths) {
+                # no paths supplied
+            }
+            else {
+                push @paths, [ @$decoded_paths ];
+            }
+        }
+    }
+
+    if (!@paths) {
+        my @outputs = $self->run_query(encode_json($value), $filter);
+        for my $output (@outputs) {
+            next unless defined $output;
+
+            if (ref $output eq 'ARRAY') {
+                if (@$output && ref $output->[0] eq 'ARRAY') {
+                    push @paths, grep { ref $_ eq 'ARRAY' } @$output;
+                } elsif (!@$output || !ref $output->[0]) {
+                    push @paths, $output;
+                }
+            }
+        }
+    }
+
+    return $value unless @paths;
+
+    if (grep { ref $_ eq 'ARRAY' && !@$_ } @paths) {
+        return undef;
+    }
+
+    my $clone = _deep_clone($value);
+
+    for my $path (@paths) {
+        next unless ref $path eq 'ARRAY';
+        next unless @$path;
+        _delete_path_inplace($clone, [@$path]);
+    }
+
+    return $clone;
+}
+
+sub _deep_clone {
+    my ($value) = @_;
+
+    return $value if !defined $value;
+    return $value if !ref $value || ref($value) eq 'JSON::PP::Boolean';
+
+    my $json = encode_json($value);
+    return decode_json($json);
+}
+
+sub _delete_path_inplace {
+    my ($value, $path) = @_;
+
+    return unless ref $value eq 'HASH' || ref $value eq 'ARRAY';
+    return unless ref $path eq 'ARRAY';
+    return unless @$path;
+
+    my @segments = @$path;
+    my $last     = pop @segments;
+
+    my $cursor = $value;
+    for my $segment (@segments) {
+        if (ref $cursor eq 'HASH') {
+            my $key = defined $segment ? "$segment" : return;
+            return unless exists $cursor->{$key};
+            $cursor = $cursor->{$key};
+            next;
+        }
+
+        if (ref $cursor eq 'ARRAY') {
+            my $index = _normalize_array_index($segment, scalar @$cursor);
+            return if !defined $index;
+            $cursor = $cursor->[$index];
+            next;
+        }
+
+        return;
+    }
+
+    if (ref $cursor eq 'HASH') {
+        my $key = defined $last ? "$last" : return;
+        delete $cursor->{$key};
+        return;
+    }
+
+    if (ref $cursor eq 'ARRAY') {
+        my $index = _normalize_array_index($last, scalar @$cursor);
+        return if !defined $index;
+        splice @$cursor, $index, 1;
+    }
+}
+
+sub _normalize_array_index {
+    my ($value, $length) = @_;
+
+    return if !defined $value;
+
+    if (ref($value) eq 'JSON::PP::Boolean') {
+        $value = $value ? 1 : 0;
+    }
+
+    return if ref $value;
+
+    return if $value !~ /^-?\d+$/;
+
+    my $index = int($value);
+    $index += $length if $index < 0;
+
+    return if $index < 0 || $index >= $length;
+
+    return $index;
+}
+
+sub _normalize_entry {
+    my ($entry) = @_;
+
+    if (ref $entry eq 'HASH') {
+        return unless exists $entry->{key};
+        return { key => $entry->{key}, value => $entry->{value} };
+    }
+
+    if (ref $entry eq 'ARRAY') {
+        return unless @$entry >= 2;
+        return { key => $entry->[0], value => $entry->[1] };
+    }
+
+    return;
 }
 
 sub _traverse {
@@ -1571,6 +2511,31 @@ sub _normalize_path_argument {
     return ($key_path, $use_entire_item);
 }
 
+sub _project_numeric_values {
+    my ($element, $key_path, $use_entire_item) = @_;
+
+    my @values = $use_entire_item
+        ? ($element)
+        : _traverse($element, $key_path);
+
+    my @numbers;
+    for my $value (@values) {
+        next unless defined $value;
+
+        if (ref($value) eq 'JSON::PP::Boolean') {
+            push @numbers, $value ? 1 : 0;
+            next;
+        }
+
+        next if ref $value;
+        next unless looks_like_number($value);
+
+        push @numbers, 0 + $value;
+    }
+
+    return @numbers;
+}
+
 sub _uniq {
     my %seen;
     return grep { !$seen{_key($_)}++ } @_;
@@ -1718,6 +2683,49 @@ sub _apply_split {
     return [ @parts ];
 }
 
+sub _apply_explode {
+    my ($value) = @_;
+
+    if (ref $value eq 'ARRAY') {
+        return [ map { _apply_explode($_) } @$value ];
+    }
+
+    return undef if !defined $value;
+
+    if (ref($value) eq 'JSON::PP::Boolean') {
+        $value = $value ? 'true' : 'false';
+    }
+
+    return $value if ref $value;
+
+    my @chars = split(//u, "$value");
+    return [ map { ord($_) } @chars ];
+}
+
+sub _apply_implode {
+    my ($value) = @_;
+
+    return undef if !defined $value;
+
+    if (ref $value eq 'ARRAY') {
+        my $has_nested = grep { ref $_ } @$value;
+
+        if ($has_nested) {
+            return [ map { _apply_implode($_) } @$value ];
+        }
+
+        my $string = '';
+        for my $code (@$value) {
+            next unless defined $code;
+            next unless looks_like_number($code);
+            $string .= chr(int($code));
+        }
+        return $string;
+    }
+
+    return $value;
+}
+
 sub _apply_substr {
     my ($value, @args) = @_;
 
@@ -1844,6 +2852,140 @@ sub _parse_arguments {
     return map { s/^\s+|\s+$//gr } @parts;
 }
 
+sub _parse_range_arguments {
+    my ($raw) = @_;
+
+    return () unless defined $raw;
+
+    $raw =~ s/^\s+|\s+$//g;
+    return () if $raw eq '';
+
+    my @segments;
+    my $current    = '';
+    my $in_single  = 0;
+    my $in_double  = 0;
+    my $escape     = 0;
+
+    for my $char (split //, $raw) {
+        if ($escape) {
+            $current .= $char;
+            $escape = 0;
+            next;
+        }
+
+        if ($char eq '\\' && $in_double) {
+            $current .= $char;
+            $escape = 1;
+            next;
+        }
+
+        if ($char eq '"' && !$in_single) {
+            $in_double = !$in_double;
+            $current  .= $char;
+            next;
+        }
+
+        if ($char eq "'" && !$in_double) {
+            $in_single = !$in_single;
+            $current  .= $char;
+            next;
+        }
+
+        if ($char eq ';' && !$in_single && !$in_double) {
+            push @segments, $current;
+            $current = '';
+            next;
+        }
+
+        $current .= $char;
+    }
+
+    push @segments, $current;
+
+    my @args;
+    for my $segment (@segments) {
+        next unless defined $segment;
+        my $clean = $segment;
+        $clean =~ s/^\s+|\s+$//g;
+        next if $clean eq '';
+
+        my @values = _parse_arguments($clean);
+        my $value  = @values ? $values[0] : undef;
+        push @args, $value;
+    }
+
+    return @args;
+}
+
+sub _apply_range {
+    my ($value, $args_ref) = @_;
+
+    my $sequence = _build_range_sequence($args_ref);
+    return defined $sequence ? @$sequence : ($value);
+}
+
+sub _build_range_sequence {
+    my ($args_ref) = @_;
+
+    my @args = @$args_ref;
+    return undef unless @args;
+
+    @args = @args[0 .. 2] if @args > 3;
+
+    my ($start, $end, $step);
+
+    if (@args == 1) {
+        $start = 0;
+        $end   = _coerce_range_number($args[0]);
+        $step  = 1;
+    }
+    elsif (@args == 2) {
+        $start = _coerce_range_number($args[0]);
+        $end   = _coerce_range_number($args[1]);
+        $step  = 1;
+    }
+    else {
+        $start = _coerce_range_number($args[0]);
+        $end   = _coerce_range_number($args[1]);
+        $step  = _coerce_range_number($args[2]);
+    }
+
+    return undef unless defined $start && defined $end;
+    return undef if !defined $step;
+    return []    if $step == 0;
+
+    if ($step > 0) {
+        return [] if $start >= $end;
+        my @sequence;
+        for (my $current = $start; $current < $end; $current += $step) {
+            push @sequence, 0 + $current;
+        }
+        return \@sequence;
+    }
+
+    # negative step
+    return [] if $start <= $end;
+
+    my @sequence;
+    for (my $current = $start; $current > $end; $current += $step) {
+        push @sequence, 0 + $current;
+    }
+
+    return \@sequence;
+}
+
+sub _coerce_range_number {
+    my ($value) = @_;
+
+    return undef if !defined $value;
+
+    if (ref($value) eq 'JSON::PP::Boolean') {
+        return $value ? 1 : 0;
+    }
+
+    return looks_like_number($value) ? 0 + $value : undef;
+}
+
 sub _apply_contains {
     my ($value, $needle) = @_;
 
@@ -1867,6 +3009,44 @@ sub _apply_contains {
     }
 
     return JSON::PP::false;
+}
+
+sub _apply_indices {
+    my ($value, $needle) = @_;
+
+    if (ref $value eq 'ARRAY') {
+        my @matches;
+        for my $i (0 .. $#$value) {
+            push @matches, $i if _values_equal($value->[$i], $needle);
+        }
+        return \@matches;
+    }
+
+    return [] if !defined $value;
+
+    if (!ref $value || ref($value) eq 'JSON::PP::Boolean') {
+        return [] unless defined $needle;
+
+        my $haystack = "$value";
+        my $fragment = "$needle";
+
+        my @positions;
+        if ($fragment eq '') {
+            @positions = (0 .. length($haystack));
+        }
+        else {
+            my $pos = -1;
+            while (1) {
+                $pos = index($haystack, $fragment, $pos + 1);
+                last if $pos == -1;
+                push @positions, $pos;
+            }
+        }
+
+        return \@positions;
+    }
+
+    return [];
 }
 
 sub _apply_has {
@@ -1972,7 +3152,7 @@ JQ::Lite - A lightweight jq-like JSON query engine in Perl
 
 =head1 VERSION
 
-Version 0.79
+Version 0.99
 
 =head1 SYNOPSIS
 
@@ -2009,9 +3189,9 @@ jq-like syntax — entirely within Perl, with no external binaries or XS modules
 
 =item * Pipe-style query chaining using | operator
 
-=item * Built-in functions: length, keys, values, first, last, reverse, sort, sort_desc, sort_by, min_by, max_by, unique, unique_by, has, contains, group_by, group_count, join, split, count, empty, type, nth, del, compact, upper, lower, titlecase, abs, ceil, floor, trim, substr, slice, startswith, endswith, add, sum, sum_by, avg_by, product, min, max, avg, median, mode, variance, stddev, drop, tail, chunks, enumerate, flatten_all, flatten_depth, clamp, to_number, pick, merge_objects
+=item * Built-in functions: length, keys, keys_unsorted, values, first, last, reverse, sort, sort_desc, sort_by, min_by, max_by, unique, unique_by, has, contains, any, all, group_by, group_count, join, split, explode, implode, count, empty, type, nth, del, delpaths, compact, upper, lower, titlecase, abs, ceil, floor, trim, ltrimstr, rtrimstr, substr, slice, startswith, endswith, add, sum, sum_by, avg_by, median_by, product, min, max, avg, median, mode, percentile, variance, stddev, drop, tail, chunks, range, enumerate, transpose, flatten_all, flatten_depth, clamp, tostring, tojson, to_number, pick, merge_objects, to_entries, from_entries, with_entries, map_values, walk, paths, leaf_paths, index, rindex, indices
 
-=item * Supports map(...), limit(n), drop(n), tail(n), chunks(n), and enumerate() style transformations
+=item * Supports map(...), map_values(...), walk(...), limit(n), drop(n), tail(n), chunks(n), range(...), and enumerate() style transformations
 
 =item * Interactive mode for exploring queries line-by-line
 
@@ -2065,6 +3245,10 @@ Returns a list of matched results. Each result is a Perl scalar
 
 =item * avg_by(.field) (average numeric values projected from each array item)
 
+=item * median_by(.field) (median of numeric values projected from each array item)
+
+=item * percentile(p) (return the requested percentile for numeric array values)
+
 =item * min_by(.field) / max_by(.field) (select array element with smallest/largest projected value)
 
 =item * sort_desc()
@@ -2109,12 +3293,96 @@ Results in:
 
   ["A", "l", "i", "c", "e"]
 
+=item * explode()
+
+Convert strings into arrays of Unicode code points. When applied to arrays the
+conversion happens element-wise, while non-string values (including hashes) are
+passed through untouched. This mirrors jq's C<explode> helper and pairs with
+C<implode> for round-trip transformations.
+
+Example:
+
+  .title | explode
+
+Returns:
+
+  [67, 79, 68, 69]
+
+=item * implode()
+
+Perform the inverse of C<explode> by turning arrays of Unicode code points back
+into strings. Nested arrays are processed recursively so pipelines like
+C<explode | implode> work over heterogeneous structures. Non-array inputs pass
+through unchanged.
+
+Example:
+
+  .codes | implode
+
+Returns:
+
+  "CODE"
+
+
+=item * keys_unsorted()
+
+Returns the keys of an object without sorting them, mirroring jq's
+C<keys_unsorted> helper. Arrays yield their zero-based indices, while
+non-object/array inputs return C<undef> to match the behaviour of C<keys>.
+
+Example:
+
+  .profile | keys_unsorted
+
 =item * values()
 
 Returns all values of a hash as an array.
 Example:
 
   .profile | values
+
+=item * paths()
+
+Enumerates every path within the current value, mirroring jq's C<paths>
+helper. Each path is emitted as an array of keys and/or indices leading to
+objects, arrays, and their nested scalars. Scalars (including booleans and
+null) yield a single empty path, while empty arrays and objects contribute only
+their immediate location.
+
+Example:
+
+  .user | paths
+
+Returns:
+
+  [ ["name"], ["tags"], ["tags",0], ["tags",1], ["active"] ]
+
+=item * leaf_paths()
+
+Enumerates only the paths that terminate in non-container values, mirroring
+jq's C<leaf_paths> helper. This is equivalent to C<paths(scalars)> in jq.
+
+Example:
+
+  .user | leaf_paths
+
+Returns:
+
+  [ ["name"], ["tags",0], ["tags",1], ["active"] ]
+
+=item * getpath(path)
+
+Retrieves the value referenced by the supplied path array (or filter producing
+path arrays), mirroring jq's C<getpath/1>. Literal JSON arrays can be passed
+directly while expressions such as C<paths()> are evaluated against the current
+input to collect candidate paths. When multiple paths are returned the helper
+yields an array of values in the same order.
+
+Examples:
+
+  .profile | getpath(["name"])          # => "Alice"
+  .profile | getpath(["emails", 1])     # => "alice.work\@example.com"
+  .profile | getpath(paths())
 
 =item * pick(key1, key2, ...)
 
@@ -2146,6 +3414,70 @@ Returns:
 
   { "name": "Widget", "value": 2, "active": true }
 
+=item * to_entries()
+
+Converts objects (and arrays) into an array of entry hashes, each consisting of
+C<key> and C<value> fields in the jq style. Array entries use zero-based index
+values for the key so they can be transformed uniformly.
+
+Example:
+
+  .profile | to_entries
+  .tags    | to_entries
+
+=item * from_entries()
+
+Performs the inverse of C<to_entries>. Accepts arrays containing
+C<{ key => ..., value => ... }> hashes or C<[key, value]> tuples and rebuilds a
+hash from them. Later entries overwrite earlier ones when duplicate keys are
+encountered.
+
+Example:
+
+  .pairs | from_entries
+
+=item * with_entries(filter)
+
+Transforms objects by mapping over their entries with the supplied filter,
+mirroring jq's C<with_entries>. Each entry is exposed as a C<{ key, value }>
+hash to the filter, and any entries filtered out are dropped prior to
+reconstruction.
+
+Example:
+
+  .profile | with_entries(select(.key != "password"))
+
+=item * map_values(filter)
+
+Applies the supplied filter to every value within an object, mirroring jq's
+C<map_values>. When the filter returns no results for a key the entry is
+removed, allowing constructs such as C<map_values(select(. > 0))> to prune
+falsy values. Arrays are processed element-wise, so arrays of objects can be
+transformed in a single step.
+
+Example:
+
+  .profile | map_values(tostring)
+
+Returns:
+
+  { "name": "Alice", "age": "42" }
+
+=item * walk(filter)
+
+Recursively traverses arrays and objects, applying the supplied filter to each
+value after its children have been transformed, matching jq's C<walk/1>
+behaviour. Arrays and hashes are rebuilt so nested values can be updated in a
+single pass, while scalars pass directly to the filter.
+
+Example:
+
+  .profile | walk(upper)
+
+Returns:
+
+  { "name": "ALICE", "note": "TEAM LEAD" }
+
 =item * empty()
 
 Discards all output. Compatible with jq.
@@ -2156,6 +3488,20 @@ Example:
   .users[] | select(.age > 25) | empty
 
 =item * .[] as alias for flattening top-level arrays
+
+=item * transpose()
+
+Pivots an array of arrays from row-oriented to column-oriented form. When
+rows have different lengths, the result truncates to the shortest row so that
+every column contains the same number of elements.
+
+Example:
+
+  [[1, 2, 3], [4, 5, 6]] | transpose
+
+Returns:
+
+  [[1, 4], [2, 5], [3, 6]]
 
 =item * flatten_all()
 
@@ -2182,6 +3528,19 @@ Example:
 Returns:
 
   [1, [2], 3, [4]]
+
+
+=item * arrays
+
+Emits its input only when the value is an array reference, mirroring jq's
+C<arrays> filter. Scalars and objects yield no output, making it convenient to
+select array inputs prior to additional processing.
+
+Example:
+
+  .items[] | arrays
+
+Returns only the array entries from C<.items>.
 
 =item * type()
 
@@ -2214,6 +3573,21 @@ Example:
 If the key does not exist, returns the original hash unchanged.
 
 If applied to a non-hash object, returns the object unchanged.
+
+=item * delpaths(paths)
+
+Removes multiple keys or indices identified by the supplied C<paths> expression.
+The expression is evaluated against the current input (for example by using
+C<paths()> or other jq-lite helpers) and should yield an array of path arrays,
+mirroring jq's C<delpaths/1> behaviour.
+
+Example:
+
+  .profile | delpaths([["password"], ["tokens", 0]])
+
+Paths can be generated dynamically using helpers such as C<paths()> before being
+passed to C<delpaths>. When a referenced path is missing it is ignored.
+Providing an empty path (C<[]> ) removes the entire input value, yielding C<null>.
 
 =item * compact()
 
@@ -2284,6 +3658,46 @@ Example:
   .tags  | contains("json")     # => true
   .meta  | contains("lang")     # => true
 
+=item * all([filter])
+
+Evaluates whether every element (optionally projected through C<filter>) is
+truthy, mirroring jq's C<all/1> helper.
+
+=over 4
+
+=item * For arrays without a filter, returns true when every element is truthy
+  (empty arrays yield true).
+
+=item * For arrays with a filter, applies the filter to each element and
+  requires every produced value to be truthy.
+
+=item * When the current input is a scalar, falls back to checking the value's
+  truthiness (or the filter's results when supplied).
+
+=back
+
+Examples:
+
+  .flags | all            # => true when every element is truthy (empty => true)
+  .users | all(.active)   # => true when every user is active
+
+=item * any([filter])
+
+Returns true when at least one value in the input is truthy. When a filter is
+provided, it is evaluated against each array element (or the current value when
+not operating on an array) and the truthiness of the filter's results is used.
+
+* For arrays without a filter, returns true if any element is truthy.
+* For arrays with a filter, returns true when the filter yields a truthy value
+  for any element.
+* For scalars, hashes, and other values, evaluates the value (or filter results)
+  directly.
+
+Example:
+
+  .flags | any            # => true when any element is truthy
+  .users | any(.active)   # => true when any user is active
+
 =item * unique_by(".key")
 
 Removes duplicate objects (or values) from an array by projecting each entry to
@@ -2350,6 +3764,20 @@ Examples:
   .users | tail(2)            # => last two users
   .users | tail(10)           # => full array when shorter than 10
 
+=item * range(start; end[, step])
+
+Emits a numeric sequence that begins at C<start> (default C<0>) and advances
+by C<step> (default C<1>) until reaching but not including C<end>. When the
+step is negative the helper counts downward and stops once the value is less
+than or equal to the exclusive bound. Non-numeric arguments result in the
+input being passed through unchanged so pipelines remain resilient.
+
+Examples:
+
+  null | range(5)           # => 0,1,2,3,4
+  null | range(2; 6; 2)     # => 2,4
+  null | range(10; 2; -4)   # => 10,6
+
 =item * enumerate()
 
 Converts arrays into an array of objects pairing each element with its
@@ -2374,6 +3802,34 @@ Example:
 
   .users | index("Alice")     # => 0
   .tags  | index("json")      # => 1
+
+=item * rindex(value)
+
+Returns the zero-based index of the final occurrence of the supplied value.
+Array inputs are scanned from the end using deep comparisons, while string
+inputs return the position of the last matching substring (or null when not
+found).
+
+Example:
+
+  .users | rindex("Alice")    # => 3
+  .tags  | rindex("perl")     # => 2
+  "banana" | rindex("an")    # => 3
+
+=item * indices(value)
+
+Returns every zero-based index where the supplied value appears. For arrays,
+deep comparisons are performed against each element and the matching indexes
+are collected into an array. For strings, the helper searches for literal
+substring matches (including overlapping ones) and emits each starting
+position. When the fragment is empty, positions for every character boundary
+are returned to mirror jq's behaviour.
+
+Example:
+
+  .users | indices("Alice")     # => [0, 3]
+  "banana" | indices("an")      # => [1, 3]
+  "perl"   | indices("")        # => [0, 1, 2, 3, 4]
 
 =item * abs()
 
@@ -2429,6 +3885,31 @@ Example:
   .score  | clamp(0, 100)       # => 87
   .deltas | clamp(-5, 5)        # => [-5, 2, 5, "n/a"]
 
+=item * tostring()
+
+Converts the current value into a JSON string representation. Scalars are
+stringified directly, booleans become C<"true">/C<"false">, and undefined
+values are rendered as C<"null">. Arrays and objects are encoded to their JSON
+text form so the output matches jq's behavior when applied to structured data.
+
+Example:
+
+  .score   | tostring   # => "42"
+  .profile | tostring   # => "{\"name\":\"Alice\"}"
+
+=item * tojson()
+
+Encodes the current value as JSON text regardless of its original type,
+mirroring jq's C<tojson>. Scalars, booleans, nulls, arrays, and objects all
+produce a JSON string, allowing raw string inputs to be re-escaped safely for
+embedding or subsequent decoding.
+
+Example:
+
+  .score   | tojson   # => "42"
+  .name    | tojson   # => "\"Alice\""
+  .profile | tojson   # => "{\"name\":\"Alice\"}"
+
 =item * to_number()
 
 Coerces values that look like numbers into actual numeric scalars. Strings are
@@ -2450,6 +3931,28 @@ Example:
 
   .title | trim          # => "Hello World"
   .tags  | trim          # => ["perl", "json"]
+
+=item * ltrimstr("prefix")
+
+Removes C<prefix> from the start of strings when present. Arrays are processed
+recursively so nested string values receive the same treatment. Inputs that do
+not begin with the supplied prefix are returned unchanged.
+
+Example:
+
+  .title | ltrimstr("Hello ")  # => "World"
+  .tags  | ltrimstr("#")       # => ["perl", "json"]
+
+=item * rtrimstr("suffix")
+
+Removes C<suffix> from the end of strings when present. Arrays are processed
+recursively so nested string values are handled consistently. Inputs that do
+not end with the supplied suffix are returned unchanged.
+
+Example:
+
+  .title | rtrimstr(" World")  # => "Hello"
+  .tags  | rtrimstr("ing")     # => ["perl", "json"]
 
 =back
 

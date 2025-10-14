@@ -132,7 +132,7 @@ use FindBin qw($Script $Bin);
 use Getopt::Long qw(GetOptions);
 use Fcntl qw(LOCK_EX LOCK_NB);
 
-our $VERSION = "0.033";
+our $VERSION = "0.034";
 
 my @invoked = ($0, @ARGV);
 my $cwd = getcwd();
@@ -181,8 +181,7 @@ sub run_output_include_err {
 }
 
 sub getps {
-    return run_output_ignore_err qw(ps fauwwx)
-        || run_output_include_err qw(ps auwwx);
+    return (run_output_ignore_err qw[ps fauwwx] or run_output_include_err qw[ps auwwx]);
 }
 
 sub rebuild {
@@ -230,11 +229,13 @@ if ($umask and $umask =~ /^(\d+)$/) {
     umask oct $1;
 }
 
+push @$opts, "deploy_patience=$maxpatience" if $maxpatience;
 if (@$opts) {
     push @$opts, $ENV{XMODIFIERS} if $ENV{XMODIFIERS};
     if (@$opts) {
         $ENV{XMODIFIERS} = join "\n", @$opts;
-        $ENV{GIT_SSH_COMMAND} = "ssh -o SendEnv=XMODIFIERS";
+        $ENV{GIT_SSH_COMMAND} //= "ssh";
+        $ENV{GIT_SSH_COMMAND} = "$ENV{GIT_SSH_COMMAND} -o SendEnv=XMODIFIERS";
     }
 }
 
@@ -249,11 +250,6 @@ if ($background) {
     close STDIN;
     close STDOUT;
     close STDERR;
-}
-
-if ($maxpatience) {
-    $ENV{GIT_SSH_COMMAND} = "ssh -o SendEnv=XMODIFIERS";
-    $ENV{XMODIFIERS} = "deploy_patience=$maxpatience";
 }
 
 while (1) {

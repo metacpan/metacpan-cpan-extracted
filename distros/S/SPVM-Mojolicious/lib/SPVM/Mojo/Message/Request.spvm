@@ -58,11 +58,9 @@ class Mojo::Message::Request extends Mojo::Message {
         
         my $b64 = Fn->substr(Digest::SHA->sha1_base64($seed . ($counter = ($counter + 1) % 0xffffff)), 0, 12);
         
-        Re->s(my $_ = [$b64], "+", "-");
-        $b64 = $_->[0];
+        Re->s((mutable string)$b64, "+", "-");
         
-        Re->s(my $_ = [$b64], "/", "_");
-        $b64 = $_->[0];
+        Re->s((mutable string)$b64, "/", "_");
         
         $self->{request_id} = $b64;
       }
@@ -161,10 +159,10 @@ class Mojo::Message::Request extends Mojo::Message {
   
   method query_params : Mojo::Parameters () { return $self->url->query; }
   
-  method extract_start_line : int ($bufref : string[]) {
+  method extract_start_line : int ($buf : mutable string) {
     
     # Ignore any leading empty lines
-    my $_ = Re->s($bufref, "^\s*(.*?)\x0d?\x0a", "");
+    my $_ = Re->s($buf, "^\s*(.*?)\x0d?\x0a", "");
     unless ($_) {
       return 0;
     }
@@ -349,11 +347,10 @@ class Mojo::Message::Request extends Mojo::Message {
     my $base    = $url->base;
     for my $name (@{$env->keys}) {
       my $value = $env->{$name}->(string);
-      my $name_ref = [$name];
-      unless (Re->s($name_ref, ["^HTTP_", "i"], "")) {
+      $name = copy $name;
+      unless (Re->s((mutable string)$name, ["^HTTP_", "i"], "")) {
         next;
       }
-      $name = $name_ref->[0];
       
       my $tmp_name = (mutable string)copy $name;
       Fn->replace_chars($tmp_name, '_', '-');
@@ -363,11 +360,9 @@ class Mojo::Message::Request extends Mojo::Message {
       
       # Host/Port
       if ($name eq "HOST") {
-        my $value_ref = [$value];
+        my $value = copy $value;
         
-        if (my $_ = Re->s($value_ref, ":(\d+)$", "")) {
-          $value = $value_ref->[0];
-          
+        if (my $_ = Re->s((mutable string)$value, ":(\d+)$", "")) {
           $base->set_host($value);
           $base->set_port((int)$_->match->cap1);
         }
@@ -420,13 +415,11 @@ class Mojo::Message::Request extends Mojo::Message {
       
       # Remove SCRIPT_NAME prefix if necessary
       my $buffer = $path->to_string;
-      my $value_ref = [$value];
-      Re->s($value_ref, ["^/|/$", "g"], "");
-      $value = $value_ref->[0];
-      my $buffer_ref = [$buffer];
-      Re->s($buffer_ref, "^/?\\Q$value\\E/?", "");
-      Re->s($buffer_ref, "^/", "");
-      $buffer = $buffer_ref->[0];
+      $value = copy $value;
+      Re->s((mutable string)$value, ["^/|/$", "g"], "");
+      $buffer = copy $buffer;
+      Re->s((mutable string)$buffer, "^/?\\Q$value\\E/?", "");
+      Re->s((mutable string)$buffer, "^/", "");
       $path->parse($buffer);
     }
   }

@@ -36,15 +36,15 @@ class Compress::Raw::Zlib::Inflate extends Compress::Raw::Zlib::Base {
     
     my $options_h = Hash->new($options);
     
-    $self->{WindowBits} = $options_h->get_or_default_int("WindowBits", ZLIB->MAX_WBITS);
+    $self->{WindowBits} = $options_h->get_or_default("WindowBits", ZLIB->MAX_WBITS)->(int);
     
-    $self->{Dictionary} = $options_h->get_or_default_string("Dictionary", undef);
+    $self->{Dictionary} = $options_h->get_or_default("Dictionary", undef)->(string);
     
-    $self->{Bufsize} = $options_h->get_or_default_int("Bufsize", 4096);
+    $self->{Bufsize} = $options_h->get_or_default("Bufsize", 4096)->(int);
     
-    $self->{LimitOutput} = (byte)$options_h->get_or_default_int("LimitOutput", 0);
+    $self->{LimitOutput} = (byte)$options_h->get_or_default("LimitOutput", 0)->(int);
     
-    $self->{AppendOutput} = (byte)$options_h->get_or_default_int("AppendOutput", 0);
+    $self->{AppendOutput} = (byte)$options_h->get_or_default("AppendOutput", 0)->(int);
     
     unless ($self->{Bufsize} >= 1) {
       die "The value of '-Bufsize' option must be >= 1.";

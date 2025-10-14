@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-08-29'; # DATE
+our $DATE = '2024-12-21'; # DATE
 our $DIST = 'App-ImageMagickUtils'; # DIST
-our $VERSION = '0.023'; # VERSION
+our $VERSION = '0.024'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/ImageMagickUtils/downsize_image",
@@ -39,7 +39,7 @@ downsize-image - Reduce image size, by default via compressing to JPEG quality 4
 
 =head1 VERSION
 
-This document describes version 0.023 of downsize-image (from Perl distribution App-ImageMagickUtils), released on 2024-08-29.
+This document describes version 0.024 of downsize-image (from Perl distribution App-ImageMagickUtils), released on 2024-12-21.
 
 =head1 SYNOPSIS
 
@@ -152,9 +152,9 @@ Do not skip WhatsApp images.
 
 By default, assuming that WhatsApp already compresses images, when given a
 filename that matches a WhatsApp image filename, e.g. C<IMG-20220508-WA0001.jpg>
-(will be checked using L<Regexp::Pattern::Filename::Image::WhatsApp>), will
-skip downsizing. The C<--no-skip-whatsapp> option will process such filenames
-nevertheless.
+(will be checked using L<Regexp::Pattern::Filename::Type::Image::WhatsApp>),
+will skip downsizing. The C<--no-skip-whatsapp> option will process such
+filenames nevertheless.
 
 
 =item B<--quality>=I<s>, B<-q>
@@ -491,7 +491,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024, 2023, 2022, 2021, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

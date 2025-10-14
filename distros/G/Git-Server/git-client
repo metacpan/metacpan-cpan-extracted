@@ -12,9 +12,13 @@ Wrapper around the real git provide additional functionality.
 
 =head2 GIT_CONFIG Override
 
-Allows for .gitconfig descent override.
-It will traverse up the parent directories until a .gitconfig
-is found, then it will use that instead of only looking at HOME.
+Allows for .gitconfig descent override files up until the $HOME directory.
+All descent .gitconfig files will be honored, although files closest
+to the git working directory will take precedence. All these descent
+.gitconfig files take precedence over --global config files,
+which take precedence over --system files in case of duplicate settings.
+And --local config files take precedence over all these descent files
+and all other --global and --system files.
 
 =head2 -O <OPTION>
 
@@ -53,9 +57,8 @@ Or as normal user, you could do this:
 =head1 SYNOPSIS
 
   cd ~/src/github/project
-  touch ../.gitconfig
-  git config --global user.email 'hookbot@github.com'
-  git config --global --list
+  git config --file ../.gitconfig user.email 'hookbot@github.com'
+  git config --list
 
 =head1 PURPOSE
 
@@ -79,17 +82,38 @@ This library is free software; you can redistribute it and/or modify it under th
 use strict;
 use Cwd qw(abs_path);
 
-our $VERSION = "0.033";
+our $VERSION = "0.034";
 
-if (@ARGV and $ARGV[0] =~ /^(clone|fetch|pull|ls-remote|push)$/) {
+# Locate the real "git" later in the $PATH (after myself)
+our $real_git = find_real_git();
+
+# By default, silence any error spewages for internal git usage.
+our $HANDLE_STDERR = sub { open STDERR, ">", "/dev/null" };
+
+# Grab special options for XMODIFIERS transport
+pass_options();
+
+# Scan for .gitconfig files in descent directories
+scan_descent_override();
+
+# XXX - Can this be handled using a custom "git-config" program?
+# XXX - Maybe, but isn't it already painful enough getting the dev guy just to install this "git-client" utility?
+handle_config(@ARGV);
+
+exec $real_git, @ARGV;
+
+# Provide special options through "SendEnv XMODIFIERS" to make available in pre-hooks prior to running the real git command on the server
+sub pass_options {
+    my ($op) = grep { /^(clone|fetch|pull|ls-remote|push)$/ } @ARGV;
+    return if !$op;
     # Need to search for special "-o" options
-    my $op = $1;
     my @options = ();
     push @options, "DEBUG=$ENV{DEBUG}" if defined $ENV{DEBUG};
     for (my $i = 1; $i < @ARGV; $i++) {
         my $pre = $ARGV[$i-1];
         my $option = $ARGV[$i];
         if ($option =~ /^(--server-option|--push-option)=(.*)$/i) {
+            # Split up the annoying "=" notation, then scan again.
             splice @ARGV, $i, 1, $1, $2;
             next;
         }
@@ -113,44 +137,245 @@ if (@ARGV and $ARGV[0] =~ /^(clone|fetch|pull|ls-remote|push)$/) {
     }
 }
 
-my $myself = (stat $0)[1] or die "$0: Can't find my inode?\n";
-my $real_git = "/usr/bin/git";
-$ENV{GIT_CLIENT_TRIED} ||= "";
-foreach my $path (split /:/,$ENV{PATH}) {
-    my $try = "$path/git";
-    if (my @stat = stat $try) {
-        if ($stat[1] == $myself) {
-            # Ignore myself
-        }
-        elsif ($ENV{GIT_CLIENT_TRIED} =~ /(?:^|:)\Q$try\E(?:$|:)/) {
-            # Already tried
-        }
-        else {
-            # First executable one in the path that isn't me is the winner
-            $real_git = $try;
-            $ENV{GIT_CLIENT_TRIED} = join ":", $real_git, split /:/, $ENV{GIT_CLIENT_TRIED};
-            last;
-        }
-    }
-}
-
--x $real_git or die "$real_git: Unable to execute\n";
-
-my $last = ".";
-$ENV{HOME} ||= (getpwnam $<)[7];
-while (1) {
-    my $scan = abs_path( $last eq "." && !-d "$last/.git" ? $last : "$last/.." );
-    last if $scan eq $last or $scan eq $ENV{HOME};
-    $last = $scan;
-    if (-r "$scan/.gitconfig") {
-        if (!$ENV{HOME} or system "diff -q $ENV{HOME}/.gitconfig $scan/.gitconfig >/dev/null") {
-            if (!$ENV{GIT_CONFIG_GLOBAL}) {
-                warn "$scan/.gitconfig: Override\n";
-                $ENV{GIT_CONFIG_GLOBAL} = "$scan/.gitconfig";
+sub find_real_git {
+    my $myself = (stat $0)[1] or die "$0: Can't find my inode?\n";
+    my $found_git = "";
+    $ENV{GIT_CLIENT_TRIED} ||= "";
+    foreach my $path (split /:/, $ENV{PATH}) {
+        my $try = "$path/git";
+        if (my @stat = stat $try) {
+            if ($stat[1] == $myself) {
+                # Ignore myself
+            }
+            elsif ($ENV{GIT_CLIENT_TRIED} =~ /(?:^|:)\Q$try\E(?:$|:)/) {
+                # Already tried
+            }
+            else {
+                # First executable one in the path that isn't me is the winner
+                $found_git = $try;
+                $ENV{GIT_CLIENT_TRIED} = join ":", $found_git, split /:/, $ENV{GIT_CLIENT_TRIED};
+                last;
             }
         }
-        last;
+    }
+
+    $found_git ||= "/usr/bin/git";
+    -x $found_git or die "$found_git: Unable to execute\n";
+    return $found_git;
+}
+
+# Capture "git" command output
+sub git {
+    return eval {
+        if (my $pid = open my $fh_out, "-|") {
+            # Parent: Read answer and wait for the child zombie to clear.
+            return [join("",<$fh_out>), waitpid($pid,0), close($fh_out)]->[0];
+        }
+        # Child runs the git command
+        $HANDLE_STDERR->();
+        # Secure exec @array method to avoid having to shell escape arguments containing spaces or other dangerous chars
+        exec $real_git, @_ or exit 1;
+    };
+}
+
+# Jam equivalent "-c" config settings into @ARGV for any descent .gitconfig files and set GET_CLIENT_OVERRIDE* env.
+sub scan_descent_override {
+    return if exists $ENV{GIT_CLIENT_OVERRIDE};
+    $ENV{GIT_CLIENT_OVERRIDE} = "";
+    my $descent_config_files = [];
+    my $last = ".";
+    $ENV{HOME} ||= (getpwnam $<)[7];
+    while (1) {
+        my $scan = abs_path( $last eq "." && !-d "$last/.git" ? $last : "$last/.." );
+        last if $scan eq $last or $scan eq $ENV{HOME};
+        $last = $scan;
+        my $try = "$scan/.gitconfig";
+        if (-r $try) {
+            warn "DEBUG: $try: Override\n" if $ENV{DEBUG};
+            unshift @$descent_config_files, $try;
+        }
+    }
+    if (@$descent_config_files) {
+        $ENV{GIT_CLIENT_OVERRIDE} = join "\n", @$descent_config_files;
+        my $cmd_settings = [];
+        my $descent_names = {};
+        my $descent_counter = 0;
+        foreach my $config_file (@$descent_config_files) {
+            my $settings = git(qw[ config --list --file ], $config_file);
+            $descent_counter++;
+            while ($settings =~ s/^([^=\r\n]+)=(.*?)\r?\n?$//m) {
+                my $name = $1;
+                my $value = $2;
+                push @$cmd_settings, "$name=$value";
+                $descent_names->{$name} = $value;
+                $ENV{"GIT_CLIENT_OVERRIDE_$descent_counter"}++;
+            }
+        }
+        if (my $local_settings = git(qw[ config --list --local ])) {
+            while ($local_settings =~ s/^([^=\r\n]+)=(.*?)\r?\n?$//m) {
+                my $name = $1;
+                my $value = $2;
+                if (defined $descent_names->{$name}) {
+                    # It seems better to double override than to completely leave out the duplicate descent setting
+                    push @$cmd_settings, "$name=$value";
+                    $ENV{GIT_CLIENT_OVERRIDE_0}++;
+                }
+            }
+        }
+        while (my $setting = pop @$cmd_settings) {
+            unshift @ARGV, -c => $setting;
+        }
+    }
+    else {
+        # No effective .gitconfig files found in descent, so nothing to do
     }
 }
 
-exec $real_git, @ARGV;
+# Special "config" handler to honor new --descent option
+sub handle_config {
+    my @args = @_;
+    # Don't try to handle the "--help"-first case.
+    return if join(" ", @args) =~ /config --help\b/;
+    if (grep {$_ eq "config"} @ARGV and
+        # Smells like special "git config" command
+        eval { require Getopt::Long; 1; } and
+        Getopt::Long::Configure("pass_through") and
+        Getopt::Long::GetOptionsFromArray(
+            \@args,
+            "c=s"          => (my $c=[]),
+            "C=s"          => \(my $chdir=[]),
+        ) and
+        $args[0] eq "config" and
+        do {
+            # Handle naked "git config" case to make sure the usage can be updated before sending it
+            push @_,"--usage" and push @args,"--usage" if 1 == @args;
+            # Also handle new-fangled git > 2.40.x "git config <command_without_dashes>" syntax:
+            $args[1]=~/^([a-z][a-z\-]+)$/ && ($args[1]="--$1") or
+            # If smells like a normal set or update, then default it to replace-all to count the actions.
+            $args[1]=~/^(\w+)\./ && splice @args, 1, 0, "--replace-all" if @args>1;
+            1;
+        } and
+        Getopt::Long::GetOptionsFromArray(
+            \@args,
+
+            # Scope
+            "descent"      => \(my $descent),
+            "global"       => \(my $global),
+            "system"       => \(my $system),
+            "local"        => \(my $local),
+            "worktree"     => \(my $work),
+            "f|file=s"     => \(my $file),
+
+            # Action
+            "l|list"       => \(my $list),
+            "e|edit"       => \(my $edit),
+            "get|get-all|get-regexp=s{1,2}" => \(my $get),
+            "remove-section=s{1}" => \(my $action_1_arg),
+            "set|get-urlmatch|rename-section=s{2}" => \(my $action_2_arg),
+            "get-color|get-colorbool=s{1,2}" => \(my $action_1_2_arg),
+            "replace-all=s{2,3}" => \(my $action_2_3_arg),
+
+            # Other
+            "all"          => \(my $all),
+            "fixed-value"  => \(my $fixed),
+            "z|null"       => \(my $null),
+            "name-only"    => \(my $nameonly),
+            "show-origin"  => \(my $origin),
+            "show-scope"   => \(my $scope),
+            "h|help|usage" => \(my $help),
+        )
+    ) {
+        # Looks like this "config" command may need special attention
+        my $descent_config_files = [ split /\n/, $ENV{GIT_CLIENT_OVERRIDE} ];
+        if ($descent) {
+            # Swap "--descent" for "--file <DESCENT_CONFIG_FILE>"
+            # If more than one descent file, then just use the closest one
+            @_ = map { $_ =~ /^--des/ ? ("--file" => ($descent_config_files->[-1] // "/dev/null")) : ($_) } @_;
+        }
+        # error: only one action at a time:
+        map { ($_ eq "config" and ++$help) ? ($_,"--list","--edit") : ($_) } @_ if 1 < !!$list + !!$edit + !!$get + !!$action_1_arg + !!$action_2_arg + !!$action_1_2_arg + !!$action_2_3_arg;
+        # error: only one config file at a time:
+        map { ($_ eq "config" and ++$help) ? ($_,"--system","--global") : ($_) } @_ if 1 < !!$file + !!$descent + !!$global + !!$system + !!$local;
+        # If it's not an implemented action or unrecognized args, then just let the regular git handle it:
+        return @ARGV = @_ if !$help && !$list && !$get;
+        # Keep STDERR in case the usage spewage needs to be tweaked to mention the --descent option.
+        require File::Temp;
+        my $tmp = File::Temp->new( UNLINK => 1, SUFFIX => '.err' );;
+        local $HANDLE_STDERR = sub { open STDERR, ">", "$tmp" };
+        my $out = git @_;
+        my $exit_status = $? >> 8;
+        $tmp->seek(0, 0);
+        my $err = join "", <$tmp>;
+        exit $exit_status if !length $out and !length $err;
+
+        if ($help or !length $out or $err =~ /usage: git config/) {
+            # Looks like the USAGE Spewage:
+            $err =~ s/^error: unknown option .usage.\s*//m;
+            $err =~ s/(Config file location\n)(( +)(\-.*global)(  +)\S.*global)/"$1"."$3--descent".(" "x(length("$4$5")-9))."use descent .gitconfig files\n$2"/e;
+            $err =~ s/\n?$/\n/;
+            warn $err;
+            print $out;
+            exit $exit_status;
+        }
+        # No more munging STDERR so just spit it out, if any
+        warn $err if $err;
+        # XXX - Do we also need to more-greacefully handle --show-scope or --show-origin with --get or --get-all or --get-regexp?
+        if (!$list) {
+            print $out;
+            exit $exit_status;
+        }
+
+        # Delim chars for --list output
+        my $top = $null ? "\x00" : "\n"; # Beginning char of the entry
+        my $end = $null ? "\x00" : "\t"; # Ending char for each field
+        if ($descent) {
+            # Special --descent --list means to list ALL descent config file settings (not just the closest one)
+            # But skip all other --system and --global and --local and commandline config settings
+            my $descent_left = [ @$descent_config_files ];
+            my $d = pop @$descent_left; # Already did the last one
+            while (my $config_file = pop @$descent_left) {
+                my @run = map { $_ eq $d ? $config_file : $_ } @_;
+                $out = git(@run) . $out;
+            }
+            $out = $top.$out;
+            if ($scope) {
+                my $this_scope = "descent";
+                $out =~ s/($top)\w+($end)/$top$this_scope$end/g;
+            }
+            # Remove the first $top char
+            $out =~ s/^$top//;
+            print $out;
+            exit $exit_status;
+        }
+
+        my $local_dir = git(qw[config --list --local --show-origin --null]) =~ /^([^\x00]*)\x00/ ? $1 : ".git/config";
+        $out = $top.$out;
+        my $descent_counter = 0;
+        my $descent_origins = [ map {"file:$_"} split /\n/, $ENV{GIT_CLIENT_OVERRIDE} ];
+        foreach my $this_origin (@$descent_origins, $local_dir) {
+            # Wrap around back to ZERO if hit the end
+            $descent_counter = 0 if ++$descent_counter > @$descent_origins;
+            my $s = "command";        # Old Scope
+            my $o = "command line:";  # Old Origin
+            my $this_scope = $descent_counter ? "descent" : "local";
+            for (1..$ENV{"GIT_CLIENT_OVERRIDE_$descent_counter"}) {
+                if ($scope && $origin) {
+                    $out =~ s/$top$s$end$o$end/$top$this_scope$end$this_origin$end/;
+                }
+                elsif ($scope) {
+                    $out =~ s/$top$s$end/$top$this_scope$end/;
+                }
+                elsif ($origin) {
+                    $out =~ s/$top$o$end/$top$this_origin$end/;
+                }
+                else {
+                    # Nothing "--show"ing in order to unmunge back to its true "descent" reference
+                }
+            }
+        }
+        # Remove the first $top char
+        $out =~ s/^$top//;
+        print $out;
+        exit $exit_status;
+    }
+}

@@ -44,21 +44,21 @@ class Compress::Raw::Zlib::Deflate extends Compress::Raw::Zlib::Base {
     
     my $options_h = Hash->new($options);
     
-    $self->{Level} = $options_h->get_or_default_int("Level", ZLIB->Z_DEFAULT_COMPRESSION);
+    $self->{Level} = $options_h->get_or_default("Level", ZLIB->Z_DEFAULT_COMPRESSION)->(int);
     
-    $self->{Method} = $options_h->get_or_default_int("Method", ZLIB->Z_DEFLATED);
+    $self->{Method} = $options_h->get_or_default("Method", ZLIB->Z_DEFLATED)->(int);
     
-    $self->{WindowBits} = $options_h->get_or_default_int("WindowBits", ZLIB->MAX_WBITS);
+    $self->{WindowBits} = $options_h->get_or_default("WindowBits", ZLIB->MAX_WBITS)->(int);
     
-    $self->{MemLevel} = $options_h->get_or_default_int("MemLevel", ZLIB->MAX_MEM_LEVEL);
+    $self->{MemLevel} = $options_h->get_or_default("MemLevel", ZLIB->MAX_MEM_LEVEL)->(int);
     
-    $self->{Strategy} = $options_h->get_or_default_int("Strategy", ZLIB->Z_DEFAULT_STRATEGY);
+    $self->{Strategy} = $options_h->get_or_default("Strategy", ZLIB->Z_DEFAULT_STRATEGY)->(int);
     
-    $self->{Dictionary} = $options_h->get_or_default_string("Dictionary", undef);
+    $self->{Dictionary} = $options_h->get_or_default("Dictionary", undef)->(string);
     
-    $self->{Bufsize} = $options_h->get_or_default_long("Bufsize", 4096);
+    $self->{Bufsize} = $options_h->get_or_default("Bufsize", 4096)->(long);
     
-    $self->{AppendOutput} = (byte)$options_h->get_or_default_int("AppendOutput", 0);
+    $self->{AppendOutput} = (byte)$options_h->get_or_default("AppendOutput", 0)->(int);
     
     unless ($self->{Bufsize} >= 1) {
       die "The value of '-Bufsize' option must be >= 1.";
@@ -85,10 +85,10 @@ class Compress::Raw::Zlib::Deflate extends Compress::Raw::Zlib::Base {
     my $options_h = Hash->new($options);
     
     if ($options_h->exists("Level")) {
-      $self->{Level} = $options_h->get_int("Level");
+      $self->{Level} = $options_h->{"Level"}->(int);
     }
     if ($options_h->exists("Strategy")) {
-      $self->{Strategy} = $options_h->get_int("Strategy");
+      $self->{Strategy} = $options_h->{"Strategy"}->(int);
     }
     
     $self->_deflateParams;

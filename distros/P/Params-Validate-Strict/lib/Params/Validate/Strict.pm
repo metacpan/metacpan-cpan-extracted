@@ -18,11 +18,11 @@ Params::Validate::Strict - Validates a set of parameters against a schema
 
 =head1 VERSION
 
-Version 0.15
+Version 0.16
 
 =cut
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 =head1 SYNOPSIS
 
@@ -199,6 +199,27 @@ You can validate nested hashrefs and arrayrefs using the C<schema> property:
         }
     };
 
+=item * C<validate>
+
+A snippet of code that validates the input.
+It's passed the input arguments,
+and return a string containing a reason for rejection,
+or undef if it's allowed.
+
+    my $schema = {
+      user => {
+        type => 'string',
+	validate => sub {
+	  if($_[0]->{'password'} eq 'bar') {
+	    return undef;
+	  }
+	  return 'Invalid password, try again';
+	}
+      }, password => {
+         type => 'string'
+      }
+    };
+
 =back
 
 If a parameter is optional and its value is C<undef>,
@@ -297,7 +318,7 @@ sub validate_strict
 		# Handle optional parameters
 		if((ref($rules) eq 'HASH') && $rules->{optional}) {
 			if(!exists($args->{$key})) {
-				if($rules->{'default'}) {
+				if(exists($rules->{'default'})) {
 					# Populate missing optional parameters with the specfied output values
 					$validated_args{$key} = $rules->{'default'};
 				}
@@ -397,9 +418,9 @@ sub validate_strict
 						if(!defined($value)) {
 							next;	# Skip if bool is undefined
 						}
-						if(($value eq 'true') || ($value eq 'on')) {
+						if(($value eq 'true') || ($value eq 'on') || ($value eq 'yes')) {
 							$value = 1;
-						} elsif(($value eq 'false') || ($value eq 'off')) {
+						} elsif(($value eq 'false') || ($value eq 'off') || ($value eq 'no')) {
 							$value = 0;
 						}
 						if(($value ne '1') && ($value ne '0')) {	# Do string compare
@@ -682,6 +703,8 @@ sub validate_strict
 										_error($logger, "$key can only contain numbers (found $member)");
 									}
 								}
+							} else {
+								_error($logger, "Bug: Add $rule_value to element_type list");
 							}
 						}
 					} else {
@@ -713,6 +736,15 @@ sub validate_strict
 						}
 					} else {
 						_error($logger, "validate_strict: Parameter '$key': 'schema' only supports arrayref and hashref, not $rules->{type}");
+					}
+				} elsif($rule_name eq 'validate') {
+					if(ref($rule_value) eq 'CODE') {
+						if(my $error = &{$rule_value}($args)) {
+							_error($logger, "validate_string: $key not valid: $error");
+						}
+					} else {
+						# _error($logger, "validate_strict: Parameter '$key': 'validate' only supports coderef, not " . ref($value));
+						_error($logger, "validate_strict: Parameter '$key': 'validate' only supports coderef, not $value");
 					}
 				} else {
 					_error($logger, "validate_strict: Unknown rule '$rule_name'");

@@ -41,4 +41,12 @@ lives_and {
     is silo->max_users, 42, "unoverridden resource instantiated after unlock";
 };
 
+subtest 'override via code' => sub {
+    my $n = 137;
+    silo->ctl->override( max_users => sub { $n++ } );
+
+    is silo->max_users, 137, "now initialization code";
+    is silo->ctl->fresh("max_users"), 138, "initializer works afresh for fresh";
+};
+
 done_testing;

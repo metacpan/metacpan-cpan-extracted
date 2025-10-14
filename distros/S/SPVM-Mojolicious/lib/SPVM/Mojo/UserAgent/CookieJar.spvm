@@ -32,7 +32,7 @@ class Mojo::UserAgent::CookieJar {
   ;
   
   # Undocumented Fields
-  has jar : Hash of List of Mojo::Cookie::Response;
+  has jar : Hash of Mojo::Cookie::Response[];
   
   # Class Methods
   static method new : Mojo::UserAgent::CookieJar () {
@@ -77,8 +77,8 @@ class Mojo::UserAgent::CookieJar {
     my $all_cookies_list = List->new(new Mojo::Cookie::Response[0]);
     
     for my $key (@$keys) {
-      my $jar_list = (List of Mojo::Cookie::Response)$jar->get($key);
-      $all_cookies_list->push_($jar_list->to_array);
+      my $jar = $jar->{$key};
+      $all_cookies_list->push_($jar);
     }
     
     return (Mojo::Cookie::Response[])$all_cookies_list->to_array;
@@ -130,21 +130,21 @@ class Mojo::UserAgent::CookieJar {
     my $domain = my $host = Fn->lc($url->ihost);
     my $path   = $url->path->to_abs_string;
     
-    for (my $tmp = 0; 1 ; (Re->s(my $_ = [$domain], "^[^.]*\.*", ""), $domain = $_->[0])) {
+    for (my $tmp = 0; 1 ; Re->s((mutable string)$domain, "^[^.]*\.*", "")) {
       
       unless (length $domain) {
         last;
       }
       
-      my $old = (List of Mojo::Cookie::Response)$self->{jar}->get($domain);
+      my $old = $self->{jar}->{$domain};
       unless ($old) {
         next ;
       }
       
       # Grab cookies
-      my $new = List->new(new Mojo::Cookie::Response[0]);
-      $self->{jar}->set($domain, $new);
-      for my $cookie (@{(Mojo::Cookie::Response[])$old->to_array}) {
+      my $new = new Mojo::Cookie::Response[0];
+      $self->{jar}->{$domain} = $new;
+      for my $cookie (@$old) {
         if ($cookie->host_only && $host ne $cookie->domain) {
           next;
         }
@@ -156,7 +156,7 @@ class Mojo::UserAgent::CookieJar {
             next;
           }
         }
-        $new->push($cookie);
+        List->new_ref($new)->push($cookie);
         
         # Taste cookie
         if ($cookie->secure && $url->protocol ne "https") {
@@ -235,27 +235,27 @@ class Mojo::UserAgent::CookieJar {
         next;
       }
       
-      my $jar_list = (List of Mojo::Cookie::Response)$self->{jar}->get($domain);
+      my $jar = $self->{jar}->{$domain};
       
-      unless ($jar_list) {
-        $jar_list = List->new(new Mojo::Cookie::Response[0]);
+      unless ($jar) {
+        $jar = new Mojo::Cookie::Response[0];
       }
       
       my $replaced = 0;
-      for (my $i = 0; $i < $jar_list->length; $i++) {
-        my $cookie_cur = (Mojo::Cookie::Response)$jar_list->get($i);
+      for (my $i = 0; $i < @$jar; $i++) {
+        my $cookie_cur = $jar->[$i];
         if (&_compare($cookie_cur, $path, $name, $domain)) {
-          $jar_list->set($i, $cookie);
+          $jar->[$i] = $cookie;
           $replaced = 1;
           last;
         }
       }
       
       unless ($replaced) {
-        $jar_list->push($cookie);
+        List->new_ref($jar)->push($cookie);
       }
       
-      $self->{jar}->set($domain, $jar_list);
+      $self->{jar}->{$domain} = $jar;
     }
     
   }

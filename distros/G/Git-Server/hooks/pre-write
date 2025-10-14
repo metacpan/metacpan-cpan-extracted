@@ -23,7 +23,7 @@ my $ip = $ssh =~ /^([\da-f\.:]+) /i ? $1 : "UNKNOWN";
 $conf !~ /^proxy/m or 0 == system "hooks/proxy", $Script or die localtime().": [$KEY\@$ip] git-server: proxy operation failure: $?\n";
 # Verify IP
 if (my $banned = system "hooks/restrictip") {
-    exit $banned;
+    exit ($banned >> 8 || 1);
 }
 # Cannot pass without writers access:
 my $allowed = $acl->{writers}->{$KEY};

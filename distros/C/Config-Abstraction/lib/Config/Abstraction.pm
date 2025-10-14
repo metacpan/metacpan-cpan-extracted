@@ -13,8 +13,8 @@ use JSON::MaybeXS 'decode_json';	# Doesn't behave well with require
 use File::Slurp qw(read_file);
 use File::Spec;
 use Hash::Merge qw(merge);
-use Params::Get 0.04;
-use Params::Validate::Strict;
+use Params::Get 0.13;
+use Params::Validate::Strict 0.11;
 use Scalar::Util;
 
 =head1 NAME
@@ -23,17 +23,19 @@ Config::Abstraction - Merge and manage configuration data from different sources
 
 =head1 VERSION
 
-Version 0.34
+Version 0.35
 
 =cut
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 =head1 SYNOPSIS
 
-C<Config::Abstraction> lets you load configuration from multiple sources—such as files, environment variables, and in-code defaults—and merge them with predictable precedence.
+C<Config::Abstraction> lets you load configuration from multiple sources,
+such as files, environment variables, and in-code defaults,
+and merge them with predictable precedence.
 It provides a consistent API for accessing the configuration settings, regardless of where they came from,
-this helps keep your application’s or class's configuration flexible, centralized, and easy to override.
+this helps keep your application's or class's configuration flexible, centralized, and easy to override.
 
   use Config::Abstraction;
 
@@ -160,18 +162,21 @@ The module supports loading INI files using C<Config::IniFiles>.
 
 =head2 ENVIRONMENT VARIABLE HANDLING
 
-Configuration values can be overridden via environment variables. For
-instance, if you have a key in the configuration such as C<database.user>,
-you can override it by setting the corresponding environment variable
-C<APP_DATABASE__USER> in your system.
+Configuration values can be overridden via environment variables. Environment variables use double underscores (__) to denote nested configuration keys and single underscores remain as part of the key name under the prefix namespace.
 
 For example:
 
-  $ export APP_DATABASE__USER="env_user"
+  APP_DATABASE__USER becomes database.user (nested structure)
 
-This will override any value set for C<database.user> in the configuration files.
+    $ export APP_DATABASE__USER="env_user"
 
-=head2 COMMAND LINE HANDLING
+will override any value set for `database.user` in the configuration files.
+
+  APP_LOGLEVEL becomes APP.loglevel (flat under prefix namespace)
+
+  APP_API__RATE_LIMIT becomes api.rate_limit (mixed usage)
+
+This allows you to override both top-level and nested configuration values using environment variables.
 
 Configuration values can be overridden via the command line (C<@ARGV>).
 For instance, if you have a key in the configuration such as C<database.user>,
@@ -378,7 +383,7 @@ sub new
 		$self->{'config'} = Params::Validate::Strict::validate_strict(schema => $schema, input => $self->{'config'});
 	}
 
-	if($self->{'config'} && scalar(keys %{$self->{'config'}})) {
+	if(defined($self->{'config'}) && scalar(keys %{$self->{'config'}})) {
 		return $self;
 	}
 	return undef;
@@ -415,6 +420,9 @@ sub _load_config
 	}
 	for my $dir (@dirs) {
 		next if(!defined($dir));
+		if(length($dir) && !-d $dir) {
+			next;
+		}
 
 		for my $file (qw/base.yaml base.yml base.json base.xml base.ini local.yaml local.yml local.json local.xml local.ini/) {
 			my $path = File::Spec->catfile($dir, $file);
@@ -422,6 +430,7 @@ sub _load_config
 				$logger->debug(ref($self), ' ', __LINE__, ": Looking for configuration $path");
 			}
 			next unless -f $path;
+			next unless -r $path;
 
 			if($logger) {
 				$logger->debug(ref($self), ' ', __LINE__, ": Loading data from $path");
@@ -589,10 +598,12 @@ sub _load_config
 								if((!$data) || (ref($data) ne 'HASH')) {
 									if($self->_load_driver('Config::Abstract')) {
 										# Handle RT#164587
-										open my $oldSTDERR, ">&STDERR";
+										open my $oldSTDERR, '>&STDERR';
 										close STDERR;
 										eval { $data = Config::Abstract->new($path) };
-										if($@) {
+										my $err = $@;
+										open STDERR, '>&', $oldSTDERR;
+										if($err) {
 											undef $data;
 										} elsif($data) {
 											$data = $data->get_all_settings();
@@ -600,7 +611,6 @@ sub _load_config
 												undef $data;
 											}
 										}
-										open STDERR, ">&", $oldSTDERR;
 										$self->{'type'} = 'Perl';
 									}
 								}
@@ -664,9 +674,13 @@ sub _load_config
 
 		my $path = lc($1);
 		my @parts = split(/__/, $path);
-		my $ref = \%merged;
-		$ref = ($ref->{$_} //= {}) for @parts[0..$#parts-1];
-		$ref->{ $parts[-1] } = $value;
+		if(scalar(@parts) > 0) {
+			my $ref = \%merged;
+			if(scalar(@parts) > 1) {
+				$ref = ($ref->{$_} //= {}) for @parts[0..$#parts-1];
+			}
+			$ref->{$parts[-1]} = $value;
+		}
 	}
 
 	if($self->{'flatten'}) {
@@ -896,6 +910,12 @@ Merging replaces entire nested hashes unless you enable deep merging.
 =item * Undef values
 
 Keys explicitly set to C<undef> in a later source override earlier values.
+
+=item * Environrment
+
+When using environment variables,
+remember that double underscores (__) create nested structures,
+while single underscores remain as part of the key name under the prefix namespace.
 
 =back
 

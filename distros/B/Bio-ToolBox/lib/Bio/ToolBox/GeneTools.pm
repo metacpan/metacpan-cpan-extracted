@@ -5,7 +5,7 @@ use strict;
 use Carp qw(carp cluck croak confess);
 require Exporter;
 
-our $VERSION = '2.00';
+our $VERSION = '2.03';
 
 ### Export
 our @ISA       = qw(Exporter);
@@ -1062,6 +1062,7 @@ sub gtf_string {
 
 sub ucsc_string {
 	my $feature = shift;
+	my $use_id  = shift || 0;
 	confess 'FATAL: not a SeqFeature object!' unless ref($feature) =~ /seqfeature/i;
 	my @ucsc_list;
 
@@ -1070,14 +1071,14 @@ sub ucsc_string {
 
 		# a gene object, we will need to process it's transcript subfeatures
 		foreach my $transcript ( get_transcripts($feature) ) {
-			my $ucsc = _process_ucsc_transcript( $transcript, $feature );
+			my $ucsc = _process_ucsc_transcript( $transcript, $feature, $use_id );
 			push @ucsc_list, $ucsc if $ucsc;
 		}
 	}
 	elsif ( $feature->primary_tag =~ m/rna | transcript/xi ) {
 
 		# some sort of RNA transcript
-		my $ucsc = _process_ucsc_transcript($feature);
+		my $ucsc = _process_ucsc_transcript( $feature, undef, $use_id );
 		push @ucsc_list, $ucsc if $ucsc;
 	}
 	else {
@@ -1107,6 +1108,7 @@ sub ucsc_string {
 
 sub bed12_string {
 	my $feature = shift;
+	my $use_id  = shift || 0;
 	confess 'FATAL: not a SeqFeature object!' unless ref($feature) =~ /seqfeature/i;
 	my @ucsc_list;
 
@@ -1115,14 +1117,14 @@ sub bed12_string {
 
 		# a gene object, we will need to process it's transcript subfeatures
 		foreach my $transcript ( get_transcripts($feature) ) {
-			my $ucsc = _process_ucsc_transcript( $transcript, $feature );
+			my $ucsc = _process_ucsc_transcript( $transcript, $feature, $use_id );
 			push @ucsc_list, $ucsc if $ucsc;
 		}
 	}
 	elsif ( $feature->primary_tag =~ m/rna | transcript/xi ) {
 
 		# some sort of RNA transcript
-		my $ucsc = _process_ucsc_transcript($feature);
+		my $ucsc = _process_ucsc_transcript( $feature, undef, $use_id );
 		push @ucsc_list, $ucsc if $ucsc;
 	}
 	else {
@@ -1275,13 +1277,13 @@ sub filter_transcript_gencode_basic {
 		my $tag = $t->get_tag_values('tag');
 		if ( ref($tag) eq 'ARRAY' ) {
 			foreach ( @{$tag} ) {
-				if ( $_ eq 'basic' ) {
+				if ( $_ eq 'basic' or $_ eq 'gencode_basic' ) {
 					push @keepers, $t;
 					last;
 				}
 			}
 		}
-		elsif ( $tag and $tag eq 'basic' ) {
+		elsif ( $tag and $tag eq 'basic' or $_ eq 'gencode_basic' ) {
 			push @keepers, $t;
 		}
 	}
@@ -1329,10 +1331,12 @@ sub filter_transcript_biotype {
 sub _process_ucsc_transcript {
 	my $transcript = shift;
 	my $gene       = shift || undef;
+	my $use_id     = shift || 0;
 
 	# initialize ucsc hash
 	my $ucsc = {
-		'name'       => $transcript->display_name || $transcript->primary_id,
+		'name' => $use_id ? $transcript->primary_id : $transcript->display_name
+			|| $transcript->primary_id,
 		'name2'      => undef,
 		'chr'        => $transcript->seq_id,
 		'strand'     => $transcript->strand < 0 ? '-' : '+',
@@ -1350,7 +1354,8 @@ sub _process_ucsc_transcript {
 	if ($gene) {
 
 		# use provided gene name
-		$ucsc->{'name2'} = $gene->display_name || $gene->primary_id;
+		$ucsc->{'name2'} =
+			$use_id ? $gene->primary_id : $gene->display_name || $gene->primary_id;
 	}
 	else {
 		# reuse the name
@@ -1464,9 +1469,10 @@ L<Bio::SeqFeatureI> convention with nested SeqFeature objects representing the
 gene, transcript, and exons. For example, 
 
     gene
-      transcript
-        exon
-        CDS
+       |--> transcript
+                     |--> exon
+                     |--> CDS
+                     |--> UTRs
 
 Depending upon how the SeqFeatures were generated or defined, subfeatures 
 may or may not be defined or be obvious. For example, UTRs or introns may 
@@ -1540,7 +1546,7 @@ Functions to get a list of exons from a gene or transcript
 This will return an array or array reference of all the exon subfeatures in 
 the SeqFeature object, either gene or transcript. No discrimination whether 
 they are used once or more than once. Non-defined exons can be assembled from 
-CDS and/or UTR subfeatures. Exons are sorted by start coordinate.
+CDS and/or UTR subfeatures if available. Exons are sorted by start coordinate.
 
 =item get_alt_exons
 
@@ -1673,7 +1679,8 @@ Pass either a gene or a list of transcripts to collapse.
 Calculates and returns the transcribed length of a transcript, i.e 
 the sum of its exon lengths. B<Warning!> If you pass a gene object, you 
 will get the maximum of all transcript exon lengths, which may not be 
-what you anticipate!
+what you anticipate! Try collapsing the transcripts for a gene first,
+then collecting the length.
 
 =item get_transcript_utr_length
 
@@ -1831,21 +1838,32 @@ This method will automatically recurse through all subfeatures.
 =item ucsc_string
 
 	my $string = ucsc_string($gene);
+	my $string = ucsc_string($gene, $use_id);
 
-This will export a gene or transcript model as a refFlat formatted Gene 
-Prediction line (11 columns). See L<http://genome.ucsc.edu/FAQ/FAQformat.html#format9>
-for details. Multiple transcript genes are exported as multiple text lines 
-concatenated together.
+This will export a gene or transcript model as a refFlat formatted Gene
+Prediction line (11 columns). See
+L<http://genome.ucsc.edu/FAQ/FAQformat.html#format9> for details. Multiple
+transcript genes are exported as multiple text lines concatenated together.
+Optionally pass a boolean value as to whether the feature's C<primary_id>
+(derived from C<gene_id> or <transcript_id>) is used or not in the output Name
+column. By default, the C<display_name> (derived from C<gene_name> or
+C<transcript_name>) is used preferentially if available.
+
 
 =item bed12_string
 
 	my $string = bed12_string($gene);
+	my $string = bed12_string($gene, $use_id);
 
-This will export a gene or transcript model as a UCSC Bed formatted transcript 
-line (12 columns). See L<http://genome.ucsc.edu/FAQ/FAQformat.html#format1>
-for details. Multiple transcript genes are exported as multiple text lines 
-concatenated together. Note that gene information is not preserved with Bed12 
-files; only the transcript name is used. The C<RGB> value is set to 0.
+This will export a gene or transcript model as a UCSC Bed formatted transcript
+line (12 columns). See L<http://genome.ucsc.edu/FAQ/FAQformat.html#format1> for
+details. Multiple transcript genes are exported as multiple text lines
+concatenated together. Note that gene information is not preserved with Bed12
+files; only the transcripts are output. The C<RGB> value is set to 0. Optionally
+pass a boolean value as to whether the feature's C<primary_id> (derived from
+C<gene_id> or <transcript_id>) is used or not in the output Name column. By
+default, the C<display_name> (derived from C<gene_name> or C<transcript_name>)
+is used preferentially if available.
 
 =back
 
@@ -1911,8 +1929,8 @@ transcripts is returned.
 	my @good_transcripts = filter_transcript_gencode_basic(\@transcripts);
 
 This will filter a gene object for transcripts for the Ensembl GENCODE 
-tag "basic", which indicates that a transcript is tagged as GENCODE Basic 
-transcript. 
+tag "basic" or "gencode_basic", which indicates that a transcript is tagged
+as GENCODE Basic transcript. 
 
 If a gene object was provided, a new gene object will be returned with 
 only the retained transcripts as subfeatures. If an array reference of 

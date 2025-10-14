@@ -1,3 +1,8 @@
+0.004 2025-10-13
+  [Internal Changes]
+    * Do internal changes to catch up latest SPVM.
+  [Requirement Changes]
+    * Require SPVM 0.990102.
 0.003 2025-09-02
   [Reauirement Changes]
     * Require SPVM::Resource::Zlib 1.004.

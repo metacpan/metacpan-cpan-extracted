@@ -74,7 +74,7 @@ class Mojo::Message extends Mojo::EventEmitter {
   
   has raw_size : int;
   
-  has buffer : string;
+  has buffer : mutable string;
   
   has _cache : Hash;
   
@@ -86,7 +86,7 @@ class Mojo::Message extends Mojo::EventEmitter {
     
     $self->{_cache} = Hash->new;
     
-    $self->{buffer} = "";
+    $self->{buffer} = (mutable string)copy "";
   }
   
   method body : string () {
@@ -168,7 +168,7 @@ class Mojo::Message extends Mojo::EventEmitter {
     return (Mojo::Upload[])$self->_cache("uploads", 1, $name);
   }
   
-  method extract_start_line : int ($str_ref : string[]) { die "Not implemented."; }
+  method extract_start_line : int ($str : mutable string) { die "Not implemented."; }
   
   method finish : void () {
     
@@ -255,7 +255,7 @@ class Mojo::Message extends Mojo::EventEmitter {
     
     $self->{raw_size} += length $chunk;
     
-    $self->{buffer} .= $chunk;
+    $self->{buffer} = (mutable string)($self->{buffer} . $chunk);
     
     # Start-line
     unless ($self->{state}) {
@@ -270,18 +270,16 @@ class Mojo::Message extends Mojo::EventEmitter {
         $self->_limit("Maximum start-line size exceeded");
         return;
       }
-      my $buffer_ref = [$self->{buffer}];
-      if ($self->extract_start_line($buffer_ref)) {
+      if ($self->extract_start_line((mutable string)$self->{buffer})) {
         $self->{state} = "content";
       }
-      $self->{buffer} = $buffer_ref->[0];
     }
     
     # Content
     my $state = $self->{state} // "";
     if ($state eq "content" || $state eq "finished") {
       my $buffer = $self->{buffer};
-      $self->{buffer} = "";
+      $self->{buffer} = (mutable string)copy "";
       my $content = $self->content;
       $content->parse($buffer);
       $self->{content} = $content;

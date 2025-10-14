@@ -1,8 +1,162 @@
+0.99  2025-10-13
+    [Feature]
+    - Added arrays helper mirroring jq's arrays/0 filter to pass through only
+      array inputs while dropping scalars and objects.
+    [Tests]
+    - Added regression coverage ensuring arrays() filters pipelines and
+      non-array inputs as jq does.
+    [Docs]
+    - Documented arrays across README, module POD, CLI helper listings, and
+      updated MANIFEST.
+
+0.98  2025-10-13
+    [Feature]
+    - Added rindex(value) helper mirroring jq's rindex/1 to locate the final
+      occurrence of a value within arrays (deep comparing elements) or strings.
+    [Tests]
+    - Added regression coverage ensuring rindex() handles arrays of scalars,
+      nested hashes, booleans, empty fragments, and missing values.
+    [Docs]
+    - Documented rindex() across README, module POD, CLI help listings, and
+      updated MANIFEST.
+
+0.97  2025-10-12
+    [Feature]
+    - Added getpath(path_expr) helper mirroring jq's getpath/1 to retrieve
+      values from literal path arrays or dynamically generated paths.
+    [Tests]
+    - Added regression coverage ensuring getpath handles nested hashes, array
+      indices (including negatives), boolean values, and filter-produced paths.
+    [Docs]
+    - Documented getpath() in README, module POD, CLI helper listings, and
+      updated MANIFEST.
+
+0.96  2025-10-12
+    [Feature]
+    - Added leaf_paths() helper mirroring jq's paths(scalars) traversal to
+      emit only terminal key/index chains.
+    [Tests]
+    - Added regression coverage for leaf_paths() to ensure arrays, objects,
+      and scalars produce the correct terminal paths.
+    [Docs]
+    - Documented leaf_paths() in README, module POD, and CLI helper listings.
+
+0.95  2025-10-12
+    [Feature]
+    - Added walk(filter) helper to recursively traverse arrays and objects while
+      applying jq-compatible filters to every value.
+    [Tests]
+    - Added regression coverage for walk() to ensure nested scalars and arrays
+      are transformed recursively.
+    [Docs]
+    - Documented walk() across README, POD, and --help-functions listings.
+
+0.94  2025-10-12
+    [Feature]
+    - Added all([filter]) helper mirroring jq's all/0 and all/1 semantics for
+      truthiness checks across arrays and scalars.
+    [Tests]
+    - Added regression coverage for all() with and without filters, including
+      edge cases for empty arrays and scalar inputs.
+    [Docs]
+    - Documented the new helper across README, POD, and --help-functions
+      listings.
+
+0.93  2025-10-12
+    [Feature]
+    - Added tojson() helper to encode any value as JSON text, mirroring jq's
+      tojson/0 behavior and complementing existing tostring(). Documented the
+      helper across README, POD, CLI help, and regression tests.
+    [Tests]
+    - Added regression coverage for tojson() to ensure strings, numbers,
+      booleans, nulls, arrays, and objects emit the expected JSON text.
+    [Docs]
+    - Documented tojson() across README, POD, CLI help listings, and function
+      tables alongside existing string helpers.
+    - Added delpaths(paths) helper to delete multiple keys or indices using
+      jq-compatible path arrays evaluated via arbitrary filters. Updated the
+      documentation and regression tests accordingly.
+
+0.92  2025-10-11
+    [Feature]
+    - Added map_values(filter) helper to transform every value within objects
+      using jq-compatible filter semantics, dropping keys when the filter
+      yields no result and recursing through arrays of objects. Documented the
+      helper across README, POD, CLI help, and regression tests.
+
+0.91  2025-10-11
+    [Feature]
+    - Added indices(value) helper to emit every index where the supplied value
+      occurs within arrays or strings, matching jq's behaviour for substring and
+      element searches. Documented the helper across README, POD, CLI help, and
+      regression tests.
+
+0.90  2025-10-11
+    [Feature]
+    - Added any([filter]) helper to mirror jq's any/0 and any/1 behaviour for
+      truthiness checks over arrays and scalars, including nested filter
+      evaluation. Documented the helper across README, POD, CLI help, and
+      regression tests.
+
+0.89  2025-10-11
+    [Feature]
+    - Added paths() helper to enumerate every nested key/index path in objects,
+      arrays, and scalars (empty path) matching jq's behaviour.
+    - Documented the helper across README, POD, and regression tests.
+
+0.88  2025-10-11
+    [Feature]
+    - Added explode() and implode() helpers to convert between strings and
+      arrays of Unicode code points, mirroring jq's functions and handling
+      nested arrays element-wise.
+    - Documented the helpers across README, POD, and regression tests.
+
+0.87  2025-10-11
+    [Feature]
+    - Added ltrimstr(prefix) and rtrimstr(suffix) helpers to remove literal
+      prefixes/suffixes from strings while preserving non-matching values and
+      recursively processing arrays.
+    - Documented the helpers across README, POD, CLI help, and regression tests.
+
+0.86  2025-10-11
+    [Feature]
+    - Added range(start; end[, step]) helper to emit numeric sequences matching
+      jq's range function, including descending and custom step behavior.
+    - Documented the helper across README, POD, CLI help, and regression tests.
+
+0.85  2025-10-11
+    [Feature]
+    - Added tostring() helper to convert values into their JSON string form,
+      matching jq's behavior for scalars, booleans, null, arrays, and objects.
+    - Documented the helper across README, POD, CLI help, and regression tests.
+    - Added keys_unsorted helper to expose jq's unsorted key traversal for
+      objects, along with documentation and regression tests.
+
+0.84  2025-10-11
+    [Feature]
+    - Added to_entries(), from_entries(), and with_entries(filter) helpers to
+      round out jq's entry transformation workflow for objects and arrays.
+    - Documented the helpers across README, POD, CLI help, and regression tests.
+
+0.83  2025-10-11
+    [Feature]
+    - Added median_by(path) helper to compute the median of numeric values
+      projected from array elements, mirroring the semantics of median.
+    - Documented the helper across README, POD, CLI help, and regression tests.
+
+0.82  2025-10-11
+    [Feature]
+    - Added percentile(p) helper to compute linear-interpolated percentiles for
+      numeric array values.
+    - Documented the helper across README, POD, CLI help, and regression tests.
+
 0.81  2025-10-11
     [Feature]
     - Added enumerate() helper to pair array elements with their zero-based
       index for downstream processing.
     - Documented the helper across README, POD, CLI help, and regression tests.
+    - Added transpose() helper to pivot arrays-of-arrays from rows into
+      columns, truncating to the shortest length for uneven input.
 
 0.80  2025-10-11
     [Feature]
@@ -416,6 +570,13 @@
     - Removed use of eval in _evaluate_condition for better performance and stability.
     - Refactored _traverse for readability and maintainability.
     - Added support for multi-level array traversal (e.g., .users[].friends[].name).
+
+
+
+
+
+
+
 
 
 

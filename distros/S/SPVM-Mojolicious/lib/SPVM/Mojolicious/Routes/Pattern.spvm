@@ -189,18 +189,16 @@ class Mojolicious::Routes::Pattern {
   
     my $args_list = List->new($args);
     
-    my $pattern = $args_list->length % 2 ? ($args_list->shift->(string) // "/") : "/";
+    my $pattern = (mutable string)copy($args_list->length % 2 ? ($args_list->shift->(string) // "/") : "/");
     
-    Re->s(my $_ = [$pattern], ["^/*|/+", "g"], "/");
-    $pattern = $_->[0];
+    Re->s($pattern, ["^/*|/+", "g"], "/");
     
     if ($pattern eq "/") {
       $self->set_constraints(Hash->new((object[])$args_list->get(0))) ;
       return;
     }
     
-    Re->s(my $_ = [$pattern], "!/$", "");
-    $pattern = $_->[0];
+    Re->s($pattern, "!/$", "");
     
     $self->set_constraints(Hash->new((object[])$args_list->get(0)));
     
@@ -365,7 +363,7 @@ class Mojolicious::Routes::Pattern {
         next;
       }
       
-      if (my $m = Re->m($token->[1], "^(.+)\Q$type_start\E(.+)$")) {
+      if (my $m = Re->m((string)$token->[1], "^(.+)\Q$type_start\E(.+)$")) {
         $token->[1] = [(object)$m->cap1, $m->cap2, undef];
       }
       else {

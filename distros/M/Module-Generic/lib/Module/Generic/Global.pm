@@ -1043,7 +1043,7 @@ Module::Generic::Global - Contextual global storage by namespace, class or objec
 
 =head1 SYNOPSIS
 
-    use Module::Generic::Global;
+    use Module::Generic::Global ':const';
 
     # Class-level global repository
     my $repo = Module::Generic::Global->new( 'errors' => 'My::Module' );

@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.167-6-g4d7c77c
+package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.168-4-g6b91920
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: A plugin bundle for distributions built by ETHER
 # KEYWORDS: author bundle distribution tool
 
-our $VERSION = '0.168';
+our $VERSION = '0.169';
 
 use Moose;
 with
@@ -392,7 +392,7 @@ sub configure {
         [ 'MojibakeTests'       => { ':version' => '0.8' } ],
         [ 'Test::ReportPrereqs' => { ':version' => '0.022', verify_prereqs => 1,
             version_extractor => ( ( any { $_ ne 'MakeMaker' } $self->installer ) ? 'Module::Metadata' : 'ExtUtils::MakeMaker' ),
-            include => [ sort qw(autodie Encode File::Temp JSON::PP Module::Runtime Sub::Name YAML) ] } ],
+            include => [ sort qw(autodie Encode File::Temp JSON::PP Module::Runtime Sub::Name YAML::XS YAML::PP) ] } ],
         [ 'Test::Portability'   => { ':version' => '2.000007' } ],
         [ 'Test::CleanNamespaces' => { ':version' => '0.006' } ],
 
@@ -670,7 +670,7 @@ Dist::Zilla::PluginBundle::Author::ETHER - A plugin bundle for distributions bui
 
 =head1 VERSION
 
-version 0.168
+version 0.169
 
 =head1 SYNOPSIS
 
@@ -800,7 +800,8 @@ following F<dist.ini> (following the preamble), minus some optimizations:
     include = Module::Runtime
     include = Pod::Coverage
     include = Sub::Name
-    include = YAML
+    include = YAML::XS
+    include = YAML::PP
     include = autodie
     [Test::Portability]
     :version = 2.000007
@@ -1314,6 +1315,14 @@ L<Dist::Zilla::MintingProfile::Author::ETHER>
 L<Dist::Zilla::PluginBundle::Git::VersionManager>
 
 =back
+
+=head1 GIVING THANKS
+
+=for stopwords MetaCPAN GitHub
+
+If you found this module to be useful, please show your appreciation by
+adding a +1 in L<MetaCPAN|https://metacpan.org/dist/Dist-Zilla-PluginBundle-Author-ETHER>
+and a star in L<GitHub|https://github.com/karenetheridge/Dist-Zilla-PluginBundle-Author-ETHER>.
 
 =head1 SUPPORT
 

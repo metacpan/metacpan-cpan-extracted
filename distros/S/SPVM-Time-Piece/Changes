@@ -1,3 +1,8 @@
+0.006 2025-10-13
+  [Internal Changes]
+    * Do internal changes to catch up latest SPVM.
+  [Requirement Changes]
+    * Require SPVM 0.990102.
 0.005 2025-01-29
   [Requirement Changes]
     * Require SPVM 0.990042.

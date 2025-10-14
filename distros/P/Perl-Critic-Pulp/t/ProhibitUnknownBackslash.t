@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019, 2021 Kevin Ryde
+# Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019, 2021, 2025 Kevin Ryde
 
 # This file is part of Perl-Critic-Pulp.
 #
@@ -21,7 +21,7 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More tests => 315;
+use Test::More tests => 327;
 
 use lib 't';
 use MyTestHelpers;
@@ -34,7 +34,7 @@ require Perl::Critic::Policy::ValuesAndExpressions::ProhibitUnknownBackslash;
 
 
 #-----------------------------------------------------------------------------
-my $want_version = 99;
+my $want_version = 100;
 is ($Perl::Critic::Policy::ValuesAndExpressions::ProhibitUnknownBackslash::VERSION, $want_version, 'VERSION variable');
 is (Perl::Critic::Policy::ValuesAndExpressions::ProhibitUnknownBackslash->VERSION, $want_version, 'VERSION class method');
 {
@@ -280,8 +280,8 @@ HERE
 HERE
 " ],
 
-     # Not sure if wide chars and/or non-ascii are supposed to be allowed in
-     # an input string, presumably yes, but some combination of perl 5.8.3
+     # Not sure whether wide chars and/or non-ascii are supposed to be allowed
+     # in an input string, presumably yes, but some combination of perl 5.8.3
      # and PPI 1.206 threw an error on wide chars.  It runs ok with 5.10.1.
      #
      #      [ 1, ($] >= 5.008
@@ -355,6 +355,30 @@ HERE
      [ 0, q{  "\\\\\\\\\\\\s"  } ],
      [ 1, q{  "\\\\\\\\\\\\\\s"  } ],
 
+    );
+
+  #-----------------------
+  # foldcase option
+
+  $policy->{_foldcase} = 'version';
+  $try_list->
+    (## no critic (RequireInterpolationOfMetachars)
+     [ 1, '           "\\Fxyz"  ' ],
+     [ 0, 'use 5.010; "\\Fxyz"  ' ],
+    );
+
+  $policy->{_foldcase} = 'allow';
+  $try_list->
+    (## no critic (RequireInterpolationOfMetachars)
+     [ 0, '           "\\Fxyz"  ' ],
+     [ 0, 'use 5.010; "\\Fxyz"  ' ],
+    );
+
+  $policy->{_foldcase} = 'disallow';
+  $try_list->
+    (## no critic (RequireInterpolationOfMetachars)
+     [ 1, '           "\\Fxyz"  ' ],
+     [ 1, 'use 5.010; "\\Fxyz"  ' ],
     );
 
   #-----------------------

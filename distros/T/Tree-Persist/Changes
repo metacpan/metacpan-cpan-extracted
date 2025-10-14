@@ -1,5 +1,14 @@
 Revision history for Perl distribution Tree::Persist
 
+1.16  2025-10-14T08:18:41
+	- Remove t::tests from Makefile.PL since it causes problems for some CPAN testers.
+	- Thanx to blb8 for the report
+
+1.15  2025-10-07T13:56:00
+	- Clean up this Changes file where it used to refer to cpanratings.perl.org,
+		but this site no longer exists.
+	- Update Makefile.PL.
+
 1.14  2016-08-07T13:10:00
 	- Add MIN_PERL_VERSION to Makefile.PL. Such a change is not worth a new release. Push to github.
 	- Some tests 'use t::test.pm', so for them add "use lib '.';" so when newer Perls default to
@@ -66,7 +75,7 @@ Revision history for Perl distribution Tree::Persist
 1.03  2013-06-11T17:04:00
 	- Fix some tests which had stopped working.
 	- Implement user-specified class names for deflation/inflation of objects.
-		This was requested in a module review: http://cpanratings.perl.org/dist/Tree-Persist#10829.
+		This was requested in an ancient module review, but cpanratings.perl.org just redirects to www.perl.org/cpan.html.
 		The new code uses Module::Runtime.
 		This also means the 'type' parameter to connect() and create_datastore() is no longer mandatory.
 		Instead, a 'class' parameter can be used to supply the name of a deflator/inflator class.

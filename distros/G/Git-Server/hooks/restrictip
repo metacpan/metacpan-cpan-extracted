@@ -8,11 +8,13 @@ use warnings;
 #   Exits with 0 if there are no problems.
 #   Exits with non-zero and prints message to STDERR if IP is not allowed.
 
-my $restrictip = `git config acl.restrictip` or exit 0;  # No config
+my $restrictip = `git config --get-all acl.restrictip` or exit 0;  # No config
 my $ssh = $ENV{SSH_CLIENT} or exit 0;              # Not from SSH?
 my $ip = $ssh =~ /^([\da-f\.:]+) /i ? $1 : die "restrictip: SSH Stank!\n";
 my $KEY = $ENV{KEY} || "UNKNOWN";
-$restrictip =~ s/\s+//g;
+$restrictip =~ s/\s+/,/g;
+$restrictip =~ s/,+/,/g;
+$restrictip =~ s/(,$|^,)//g;
 foreach my $cidr (split /,/, $restrictip) {
     if ($cidr =~ m{^(\d+\.\d+\.\d+\.\d+)(?:|/(\d+))$}) {
         # IPv4 check

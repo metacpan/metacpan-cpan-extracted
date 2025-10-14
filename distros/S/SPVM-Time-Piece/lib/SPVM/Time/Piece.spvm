@@ -2,7 +2,7 @@
 # MIT License
 
 class Time::Piece {
-  version "0.005";
+  version "0.006";
   
   use Sys;
   use Time::Seconds;
@@ -554,7 +554,7 @@ class Time::Piece {
     
     my $options_h = Hash->new($options);
     
-    my $to = $options_h->get_string("to");
+    my $to = $options_h->{"to"}->(string);
     
     unless ($to) {
       die "The \"to\" option must be defined.";

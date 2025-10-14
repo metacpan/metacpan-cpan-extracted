@@ -32,17 +32,17 @@ class File::Temp::Dir {
     my $options_h = Hash->new($options);
     
     if ($options_h->exists("CLEANUP")) {
-      $self->{CLEANUP} = (byte)$options_h->get_int("CLEANUP");
+      $self->{CLEANUP} = (byte)$options_h->get("CLEANUP")->(int);
     }
     else {
       $self->{CLEANUP} = 1;
     }
     
-    $self->{DIR} = $options_h->get_or_default_string("DIR", undef);
+    $self->{DIR} = $options_h->get_or_default("DIR", undef)->(string);
     
-    $self->{TMPDIR} = (byte)$options_h->get_or_default_int("TMPDIR", 0);
+    $self->{TMPDIR} = (byte)$options_h->get_or_default("TMPDIR", 0)->(int);
     
-    $self->{TEMPLATE} = $options_h->get_or_default_string("TEMPLATE", undef);
+    $self->{TEMPLATE} = $options_h->get_or_default("TEMPLATE", undef)->(string);
     
     my $process_id = Sys->process_id;
     

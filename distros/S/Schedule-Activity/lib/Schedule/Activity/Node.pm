@@ -5,7 +5,7 @@ use warnings;
 use List::Util qw/any/;
 use Scalar::Util qw/looks_like_number/;
 
-our $VERSION='0.1.1';
+our $VERSION='0.1.3';
 
 my %property=map {$_=>undef} qw/tmmin tmavg tmmax next finish message attribute note attributes/;
 
@@ -24,7 +24,11 @@ sub new {
 sub defaulting {
 	my ($node)=@_;
 	my $mult=sub { my ($x,$y)=@_; if(defined($y)) { return $x*$y } return };
-	my @lln=map {looks_like_number($$node{$_})} qw/tmmin tmavg tmmax/;
+	my @lln;
+	foreach my $k (qw/tmmin tmavg tmmax/) {
+		if(looks_like_number($$node{$k})) { push @lln,1 }
+		else { delete($$node{$k}); push @lln,0 }
+	}
 	if(any {!$_} @lln) {
 		if($lln[1]) {
 			$$node{tmmax}//=$$node{tmavg}*$defaults{'tmmax/tmavg'};

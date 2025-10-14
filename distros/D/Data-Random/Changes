@@ -1,5 +1,10 @@
 Revision history for Perl module Data::Random
 
+0.14      2025-10-11 03:23:58-07:00 America/Los_Angeles
+          - work around new warning in perl-5.43.2 about escaping whitespace
+          - fix repository URL typo in dist.ini that caused broken MetaCPAN links
+          Thanks to JKEENAN (James E Keenan) for both fixes
+
 0.13      2018-04-18 00:46:01-07:00 America/Los_Angeles
           - allow a single argument to `rand_enum` as long as it's an arrayref
           Thanks to NEILB (Neil Bowers) for the suggestion

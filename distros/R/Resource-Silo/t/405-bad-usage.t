@@ -8,15 +8,9 @@ use Scalar::Util qw( weaken );
 
 use Resource::Silo;
 
-resource self_trigger =>
-    argument            => qr([01]),
-    init                => sub { weaken $_[0]; \@_; },
-    cleanup             => sub {
-        my ($self, $name, $arg) = @{ +shift };
-        $self->$name(0) if $self and $arg;
-    };
-
-my $container = ref silo;
+throws_ok {
+    Resource::Silo::Container->new;
+} qr(iled to locate), "empty container = no go";
 
 throws_ok {
     silo->ctl->fresh('my_resource_$');
@@ -41,37 +35,5 @@ throws_ok {
 throws_ok {
     silo->ctl->override('not_there' => sub { 1 });
 } qr(override.*'not_there'), "can't override unknown resource";
-
-subtest "cannot instantiate in cleanup", sub {
-    # TODO use Test::Warnings ?
-    my @warn;
-    local $SIG{__WARN__} = sub { push @warn, shift };
-
-    lives_and {
-        is $container->new->self_trigger(0)->[2], 0, "resource instantiated correctly(0)";
-    };
-    is scalar @warn, 0, "no warnings";
-    diag "found unexpected warning: $_" for @warn;
-    @warn = ();
-
-    my $res = $container->new;
-    lives_and {
-        is $res->self_trigger(1)->[2], 1, "resource instantiated correctly(1)";
-        $res->ctl->cleanup;
-    };
-    is scalar @warn, 1, "there's one warning";
-    like $warn[0], qr('self_trigger'.*\bcleanup\b), "...and it is about cleanup";
-    like $warn[0], qr([Ff]ailed.*'self_trigger'.*but trying to continue),
-        "...and it complains about a failed cleanup";
-    like $warn[0], qr(line \d+.*line \d+.*line \d+)s,
-         "...and it looks like a stack trace";
-
-    @warn = ();
-    lives_ok {
-        $res->ctl->cleanup;
-    } "second cleanup lives";
-    is scalar @warn, 0, "no warnings after second cleanup";
-    diag "found unexpected warning: $_" for @warn;
-};
 
 done_testing;

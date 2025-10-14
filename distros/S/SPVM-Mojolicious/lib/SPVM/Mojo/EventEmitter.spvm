@@ -7,7 +7,7 @@ class Mojo::EventEmitter {
   use Mojo::Callback;
   
   # Undocumeted Fields
-  has events : Hash of List of Mojo::Callback;
+  has events : Hash of Mojo::Callback[];
   
   # Instance Methods
   method catch : void ($cb : Mojo::Callback) {
@@ -18,9 +18,9 @@ class Mojo::EventEmitter {
     
     my $events = $self->events;
     
-    if (my $cbs_list = (List of Mojo::Callback)$events->get($name)) {
-      for (my $i = 0; $i < $cbs_list->length; $i++) {
-        my $cb = (Mojo::Callback)$cbs_list->get($i);
+    if (my $cbs = $events->{$name}) {
+      for (my $i = 0; $i < @$cbs; $i++) {
+        my $cb = (Mojo::Callback)$cbs->[$i];
         
         $cb->($self, $arg1, $arg2, $arg3);
       }
@@ -43,14 +43,14 @@ class Mojo::EventEmitter {
     
     my $events = $self->events;
     
-    my $cbs_list = (List of Mojo::Callback)$events->get($name);
+    my $cbs = $events->{$name};
     
-    unless ($cbs_list) {
-      $cbs_list = List->new(new Mojo::Callback[0]);
-      $events->set($name, $cbs_list);
+    unless ($cbs) {
+      $cbs = new Mojo::Callback[0];
+      $events->set($name, $cbs);
     }
     
-    $cbs_list->push($cb);
+    List->new_ref($cbs)->push($cb);
   }
   
   method once : Mojo::Callback ($name : string, $cb : Mojo::Callback) {
@@ -70,15 +70,13 @@ class Mojo::EventEmitter {
     
     my $events = $self->events;
     
-    my $cbs_list = (List of Mojo::Callback)$events->get($name);
+    my $cbs = $events->{$name};
     
-    unless ($cbs_list) {
-      my $new_cbs_list = List->new(new Mojo::Callback[0]);
-      $events->set($name => $new_cbs_list);
-      $cbs_list = $new_cbs_list;
+    unless ($cbs) {
+      my $new_cbs = new Mojo::Callback[0];
+      $events->set($name => $new_cbs);
+      $cbs = $new_cbs;
     }
-    
-    my $cbs = (Mojo::Callback[])$cbs_list->to_array;
     
     return $cbs;
   }
@@ -89,13 +87,13 @@ class Mojo::EventEmitter {
     
     # One
     if ($cb) {
-      my $cbs_list = (List of Mojo::Callback)$events->get($name);
+      my $cbs = $events->{$name};
       
-      if ($cbs_list) {
-        for (my $i = 0; $i < $cbs_list->length; $i++) {
-          my $cur_cb = (Mojo::Callback)$cbs_list->get($i);
+      if ($cbs) {
+        for (my $i = 0; $i < @$cbs; $i++) {
+          my $cur_cb = $cbs->[$i];
           if ($cb == $cur_cb) {
-            $cbs_list->remove($i);
+            List->new_ref($cbs)->remove($i);
             last;
           }
         }
@@ -108,7 +106,7 @@ class Mojo::EventEmitter {
     }
   }
   
-  private method events : Hash of List of Mojo::Callback () {
+  private method events : Hash of Mojo::Callback[] () {
     
     unless ($self->{events}) {
       $self->{events} = Hash->new;

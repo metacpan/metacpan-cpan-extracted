@@ -1,0 +1,451 @@
+NAME
+    App::FilenameTypeUtils - CLIs for Filename::Type::*
+
+VERSION
+    This document describes version 0.003 of App::FilenameTypeUtils (from
+    Perl distribution App-FilenameTypeUtils), released on 2024-12-21.
+
+SYNOPSIS
+DESCRIPTION
+    This distribution includes several utilities related to
+    Filename::Type::* modules:
+
+    1. check-archive-filename
+    2. check-audio-filename
+    3. check-backup-filename
+    4. check-compressed-filename
+    5. check-ebook-filename
+    6. check-executable-filename
+    7. check-image-filename
+    8. check-media-filename
+    9. check-video-filename
+
+FUNCTIONS
+  check_archive_filename
+    Usage:
+
+     check_archive_filename(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Check whether filename indicates being an archive file.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   detail => *bool*
+
+        (No description)
+
+    *   filename* => *str*
+
+        (No description)
+
+    *   ignore_case => *bool* (default: 1)
+
+        Whether to match case-insensitively.
+
+    *   quiet => *bool*
+
+        (No description)
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (bool|hash)
+
+    Return false if no archive suffixes detected. Otherwise return a hash of
+    information, which contains these keys: "archive_name",
+    "archive_suffix", "compressor_info", "filename_without_suffix".
+
+  check_audio_filename
+    Usage:
+
+     check_audio_filename(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Check whether filename indicates being an audio file.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   detail => *bool*
+
+        (No description)
+
+    *   filename* => *filename*
+
+        (No description)
+
+    *   quiet => *bool*
+
+        (No description)
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (bool|hash)
+
+    Return false if no archive suffixes detected. Otherwise return a hash of
+    information.
+
+  check_backup_filename
+    Usage:
+
+     check_backup_filename(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Check whether filename indicates being a backup file.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   ci => *bool* (default: 1)
+
+        Whether to match case-insensitively.
+
+    *   detail => *bool*
+
+        (No description)
+
+    *   filename* => *str*
+
+        (No description)
+
+    *   quiet => *bool*
+
+        (No description)
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (bool|hash)
+
+    Return false if not detected as backup name. Otherwise return a hash,
+    which may contain these keys: "original_filename". In the future there
+    will be extra information returned, e.g. editor name (if filename
+    indicates backup from certain backup program), date (if filename
+    contains date information), and so on.
+
+  check_compressed_filename
+    Usage:
+
+     check_compressed_filename(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Check whether filename indicates being compressed.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   detail => *bool*
+
+        (No description)
+
+    *   filename* => *str*
+
+        (No description)
+
+    *   ignore_case => *bool* (default: 1)
+
+        Whether to match case-insensitively.
+
+    *   quiet => *bool*
+
+        (No description)
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (bool|hash)
+
+    Return false if no compressor suffixes detected. Otherwise return a hash
+    of information, which contains these keys: "compressor_name",
+    "compressor_suffix", "uncompressed_filename".
+
+  check_ebook_filename
+    Usage:
+
+     check_ebook_filename(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Check whether filename indicates being an e-book.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   ci => *bool* (default: 1)
+
+        Whether to match case-insensitively.
+
+    *   detail => *bool*
+
+        (No description)
+
+    *   filename* => *str*
+
+        (No description)
+
+    *   quiet => *bool*
+
+        (No description)
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  check_executable_filename
+    Usage:
+
+     check_executable_filename(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Check whether filename indicates being an executable program/script.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   ci => *bool* (default: 1)
+
+        Whether to match case-insensitively.
+
+    *   detail => *bool*
+
+        (No description)
+
+    *   filename* => *str*
+
+        (No description)
+
+    *   quiet => *bool*
+
+        (No description)
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (bool|hash)
+
+    Return false if no archive suffixes detected. Otherwise return a hash of
+    information, which contains these keys: "exec_type", "exec_ext",
+    "exec_name".
+
+  check_image_filename
+    Usage:
+
+     check_image_filename(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Check whether filename indicates being an image.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   detail => *bool*
+
+        (No description)
+
+    *   filename* => *filename*
+
+        (No description)
+
+    *   quiet => *bool*
+
+        (No description)
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (bool|hash)
+
+    Return false if no archive suffixes detected. Otherwise return a hash of
+    information.
+
+  check_media_filename
+    Usage:
+
+     check_media_filename(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Check whether filename indicates being a media (audio/video/image) file.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   detail => *bool*
+
+        (No description)
+
+    *   filename* => *filename*
+
+        (No description)
+
+    *   quiet => *bool*
+
+        (No description)
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (bool|hash)
+
+    Return false if no archive suffixes detected. Otherwise return a hash of
+    information.
+
+  check_video_filename
+    Usage:
+
+     check_video_filename(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Check whether filename indicates being a video file.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   detail => *bool*
+
+        (No description)
+
+    *   filename* => *filename*
+
+        (No description)
+
+    *   quiet => *bool*
+
+        (No description)
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (bool|hash)
+
+    Return false if no archive suffixes detected. Otherwise return a hash of
+    information.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-FilenameTypeUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-FilenameUtils>.
+
+SEE ALSO
+    "Filename::Type::*", e.g.: Filename::Type::Archive,
+    Filename::Type::Audio, etc.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-FilenameTypeUtils
+    >
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

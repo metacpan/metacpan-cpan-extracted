@@ -11,8 +11,8 @@ package Spreadsheet::Edit::Log;
 
 # Allow "use <thismodule. VERSION ..." in development sandbox to not bomb
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 1999.999; }
-our $VERSION = '1000.026'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2024-12-22'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1000.027'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2025-10-13'; # DATE from Dist::Zilla::Plugin::OurDate
 
 use Carp;
 use Scalar::Util qw/reftype refaddr blessed weaken openhandle/;
@@ -31,7 +31,7 @@ my %backup_defaults = (
   is_public_api   => sub{ $_[1][3] =~ /(?:::|^)[a-z][^:]*$/ },
 
   #fmt_object      => sub{ addrvis($_[1]) },
-  # Just show the address, sans class::name.  Note addrvis now wraps it in <...>
+  # Just show the address, sans class::name.  Note addrvis wraps it in <...>
   fmt_object      => sub{ addrvis(refaddr($_[1])) },
 );
 
@@ -44,11 +44,11 @@ my $default_pfx = '$lno';
 sub import {
   my $class = shift;
   my $pkg = caller;
-  state $prev_pkg;
+  state $first_pkg;
   my @remaining_args;
   foreach (@_) {
     local $_ = $_; # mutable copy
-    if (/btw/ && ($prev_pkg//=$pkg) ne $pkg) {
+    if (/btw/ && ($first_pkg//=$pkg) ne $pkg) {
       $default_pfx = '${pkg_space}$lno'; # show package if used in multiple
     }
     # Generate customized version of btwN() (called by btw) which uses an
@@ -73,6 +73,7 @@ sub import {
 
 sub _btwTN($$@) {
   my ($pfxexpr, $N, @strings) = @_;
+#die dvis '## TEX _btwTN: $pfxexpr $N\n';
   local $@;
   local $_ = join("", @strings);
   $pfxexpr = $default_pfx if $pfxexpr eq "__DEFAULT__";
@@ -113,12 +114,13 @@ sub _btwTN($$@) {
   if (ref($N) eq "") {
     foreach (2..$N) { $pfx .= "«" }
   }
-  my $fh = $backup_defaults{logdest};
+  my $fh = _getoptions()->{logdest};
   print $fh "${pfx}: $_\n";
 }#_btwTN
 
 sub _genbtw_funcs($$) {
   my ($pkg, $pfxexpr) = @_;
+#Carp::cluck dvis '## _gen $pkg $pfxexpr\n';
   no strict 'refs';
   my $btwN  = eval{ sub($@) { unshift @_,$pfxexpr; goto &_btwTN } } // die $@;
   my $btw   = eval{ sub(@)  { unshift @_,0 ; goto &{"${pkg}::btwN"} } } // die $@;
@@ -162,8 +164,10 @@ sub _getoptions {
   +{ %backup_defaults,
     (defined($r) ? %$r : ()),
     ((@_ && ref($_[0]) eq 'HASH') ? %{shift(@_)} : ())
-  }
+   }
 }
+
+sub get_effective_logdest() { _getoptions->{logdest} }
 
 # Format a usually-comma-separated list sans enclosing brackets.
 #
@@ -250,9 +254,11 @@ sub nearest_call(;$) {
 }
 
 sub _abbrev_call_fn_ln_subname($$) {
-  my @results = @{ &_nearest_call(@_) }[1,2,3]; # (fn, lno, subname)
+  my ($state, $opts) = @_;
+  my @results = @{ &_nearest_call($state, $opts) }[1,2,3]; # (fn, lno, subname)
   $results[0] = basename $results[0]; # filename
   $results[2] =~ s/.*:://;            # subname
+  $results[2] = $opts->{subname_override} if defined $opts->{subname_override};
   @results
 }
 sub abbrev_call_fn_ln_subname(;$) {
@@ -268,6 +274,7 @@ sub _fmt_call($;$$) {
 
   my $state = {};
   my ($fn, $lno, $subname) = _abbrev_call_fn_ln_subname($state, $opts);
+  # TODO: Allow supporessing $fn: for specified package(s)???
   my $msg = ">[$fn:$lno] ";
 
   my sub myequal($$) {
@@ -379,7 +386,7 @@ Spreadsheet::Edit::Log - log method/function calls, args, and return values
 be published as a stand-alone distribution rather than packaged with
 Spreadsheet-Edit.)
 
-This provides possibly-overkill convenience for "verbose logging" and/or debug
+Here are possibly-overkill convenience functions for "verbose logging" and/or debug
 tracing of subroutine calls.
 
 The resulting message string includes the location of the
@@ -393,7 +400,7 @@ The "public" function/method name shown is not necessarily the immediate caller 
 Prints the result of calling C<fmt_call> with the same arguments.
 
 The message is written to STDERR unless
-C<< logdest => FILEHANDLE >> is included in I<OPTIONS> or C<set_logdest()> is called.
+a different destination is specified as described in OPTIONS or Default OPTIONS.
 
 =head2 $msgstring = fmt_call {OPTIONS}, [INPUTS], [RESULTS]
 
@@ -433,7 +440,7 @@ the C<fmt_object> option described below.
 
 B<{OPTIONS}>
 
-(See "Default OPTIONS" below to specify most of these statically)
+(See "Default OPTIONS" below to specify some of these statically)
 
 =over
 
@@ -444,6 +451,12 @@ the the invocant will be displayed separately before the method name.
 To reduce clutter, the invocant is
 displayed for only the first of a series of consecutive calls with the
 same C<self> value.
+
+=item subname_override =E<gt> STRING
+
+STRING is shown instead of the name of the public entry-point function
+identified via calls to I<is_public_api()>
+(which is still invoked to locate where the entry-point was called from).
 
 =item fmt_object =E<gt> CODE
 
@@ -469,10 +482,13 @@ The second argument contains results from C<caller(N)>.
 Your sub should return True if the frame represents the call to be described
 in the message.
 
-The default callback is S<<< C<sub{ $_[1][3] =~ /(?:::|^)[a-z][^:]*$/ }> >>>,
-which looks for any sub named with an initial lower-case letter;
+The default callback looks for any sub named with an initial lower-case letter;
 in other words, it assumes that internal subs start with an underscore
 or capital letter (such as for constants).
+The actual code
+is S<<< C<sub{ $_[1][3] =~ /(?:::|^)[a-z][^:]*$/ }> >>>.
+
+=item logdest =E<gt> filehandle or *FILEHANDLE
 
 =back
 
@@ -512,12 +528,20 @@ and C<$subname> omits the Package:: prefix.
 =head2 Default OPTIONS
 
 B<our %SpreadsheetEdit_Log_Options = (...);> in your package
-will be used to override the built-in defaults (but are still
-overridden by C<{OPTIONS}> passed in individual calls).
+will be used to override the built-in defaults
+(but are overridden by C<{OPTIONS}> passed in individual calls
+to functions which accept an OPTIONS hash).
+
+The "logdest" option may also be set globally (affects all pacakges)
+by calling
+
+=head3 set_logdest($filehandle or *FILEHANDLE)
+
+Z<>
 
 =head1 DEBUG UTILITIES
 
-(Not related to the log functions above).
+(Not related to the log functions above, other than using I<logdest>).
 
 NOTE: None of these are exported by default.
 
@@ -529,7 +553,7 @@ NOTE: None of these are exported by default.
 
 Print debug trace messages.  I<btw> stands for "by the way...".
 
-C<btw> prints a message to STDERR (or as specified via C<set_logdest>)
+C<btw> prints a message to STDERR (or "logdest" - see OPTIONS and "Default OPTIONS").
 preceeded by "linenum:"
 giving the line number I<of the call to btw>.
 A newline is appended to the message unless the last STRING already
@@ -561,10 +585,11 @@ or abbrev. package name followed by a space, or nothing if the package is "main"
 Prepends "\n<your package name> oops:\n" to the message and then
 chains to Carp::confess for backtrace and death.
 
-=head2 set_logdest($filehandle or *FILEHANDLE)
+=head2 handlish = get_effective_logdest()
 
-Sets the filehandle (STDERR by default) for log messages and
-output from btw*.
+Returns the handle or glob specified in
+C<$SpreadsheetEdit_Log_Options{logdest}> in your package, or if not set
+then the value from calling C<set_logdest()>, or the built-in default.
 
 =head1 SEE ALSO
 

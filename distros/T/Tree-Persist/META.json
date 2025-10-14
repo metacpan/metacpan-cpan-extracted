@@ -4,7 +4,7 @@
       "Rob Kinyin <rkinyon@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -45,6 +45,8 @@
          "requires" : {
             "DBD::SQLite" : "1.39",
             "DBI" : "1.627",
+            "Exporter" : "5.78",
+            "ExtUtils::MakeMaker" : "7.7",
             "File::Slurp" : "9999.19",
             "File::Spec" : "0.01",
             "File::Spec::Functions" : "0.01",
@@ -69,6 +71,6 @@
          "web" : "https://github.com/ronsavage/Tree-Persist"
       }
    },
-   "version" : "1.14",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "1.16",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

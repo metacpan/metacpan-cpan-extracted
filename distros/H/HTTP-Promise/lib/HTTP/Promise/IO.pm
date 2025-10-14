@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise/IO.pm
-## Version v0.1.0
+## Version v0.1.1
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/05/02
-## Modified 2022/05/02
+## Modified 2025/10/12
 ## All rights reserved.
 ## 
 ## 
@@ -34,7 +34,7 @@ BEGIN
     our $IS_WIN32 = ( $^O eq 'MSWin32' );
     # This is for connect() so it knows
     our $INIT_PARAMS = [qw( buffer debug inactivity_timeout last_delimiter max_read_buffer ssl_opts stop_if timeout )];
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.1.1';
 };
 
 use strict;
@@ -163,17 +163,20 @@ sub connect
     my $stop_if = $self->_is_code( $opts->{stop_if} ) ? $opts->{stop_if} : sub{};
     $opts->{stop_if} = $stop_if;
     my $timeout = $opts->{timeout};
-    my( $sock_addr );
-    eval
+    local $@;
+    my $sock_addr = eval
     {
         local $SIG{ALRM} = sub{ die( "timeout\n" ); };
         alarm( $timeout ) if( defined( $timeout ) && $timeout > 0 );
         my $ipbin = Socket::inet_aton( $host ) || 
             return( $self->error( "Cannot resolve host name: ${host} (port: ${port}): $!" ) );
-        $sock_addr = Socket::pack_sockaddr_in( $port, $ipbin ) || 
-            return( $self->error( "Cannot resolve host name: ${host} (port: ${port}): $!" ) );
-        alarm(0);
+        Socket::pack_sockaddr_in( $port, $ipbin );
     };
+    alarm(0);
+    unless( $sock_addr )
+    {
+        return( $self->error( "Cannot resolve host name: ${host} (port: ${port}): $!" ) );
+    }
     return( $self->error( "Failed to resolve host name '$host': timeout" ) ) if( $@ =~ /timeout/i );
     
     my( $lport, $laddr );
@@ -270,7 +273,7 @@ sub connect_ssl
     # return( $self->error( "Cannot create SSL connection: timeout" ) ) if( $timeout <= 0 );
 
     my $ssl_opts = $new->_ssl_opts;
-    IO::Socket::SSL->start_SSL(
+    if( !IO::Socket::SSL->start_SSL(
         $sock,
         PeerHost => $host,
         PeerPort => $port,
@@ -278,7 +281,10 @@ sub connect_ssl
         ( defined( $opts->{local_host} ) ? ( LocalHost => $opts->{local_host} ) : () ),
         ( defined( $opts->{local_port} ) ? ( LocalPort => $opts->{local_port} ) : () ),
         %$ssl_opts,
-    ) or return( $self->error( "Cannot create SSL connection: " . IO::Socket::SSL::errstr() ) );
+        ) )
+    {
+        return( $self->error( "Cannot create SSL connection: ", IO::Socket::SSL::errstr() ) );
+    }
     $new->_set_sockopts( $sock );
     return( $new );
 }
@@ -1030,7 +1036,7 @@ HTTP::Promise::IO - I/O Handling Class for HTTP::Promise
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.1
 
 =head1 DESCRIPTION
 

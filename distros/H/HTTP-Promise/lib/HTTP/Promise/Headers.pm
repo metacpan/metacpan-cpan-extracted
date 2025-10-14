@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise/Headers.pm
-## Version v0.2.2
+## Version v0.3.0
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/03/21
-## Modified 2025/08/30
+## Modified 2025/10/12
 ## All rights reserved.
 ## 
 ## 
@@ -47,7 +47,7 @@ BEGIN
     use constant CRLF => "\015\012";
     our $EXCEPTION_CLASS = 'HTTP::Promise::Exception';
     our $SUPPORTED = {};
-    our $VERSION = 'v0.2.2';
+    our $VERSION = 'v0.3.0';
 };
 
 use strict;
@@ -346,7 +346,8 @@ sub content_is_json
     my $type = $self->type;
     return(0) if( !defined( $type ) || !length( "$type" ) );
     $type = lc( $type );
-    return( $type eq 'application/json' );
+    # Standard API error payload as per RFC9457: application/problem+json
+    return( $type eq 'application/json' || $type =~ m,^application/\w+\+json, );
 }
 
 sub content_is_text
@@ -2238,7 +2239,7 @@ HTTP::Promise::Headers - HTTP Headers Class
 
 =head1 VERSION
 
-    v0.2.2
+    v0.3.0
 
 =head1 DESCRIPTION
 

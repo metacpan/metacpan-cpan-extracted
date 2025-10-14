@@ -1,0 +1,50 @@
+---
+abstract: 'Provides device mapping between CPU and GPU using OpenMP'
+author:
+  - 'Christos Argyropoulos <chrisarg@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Inline: '0'
+  PDL::NiceSlice: '0'
+  Task::MemManager::View::PDL: '0'
+  Test::More: '0'
+  boolean: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Task-MemManager-Device
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Task::MemManager:
+    file: lib/Task/MemManager/Device.pm
+    version: '0.02'
+  Task::MemManager::Device:
+    file: lib/Task/MemManager/Device.pm
+    version: '0.02'
+requires:
+  Module::Find: '0'
+  Module::Runtime: '0'
+  constant: '0'
+  feature: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/chrisarg/Task-MemManager-Device
+  repository: https://github.com/chrisarg/Task-MemManager-Device.git
+version: '0.02'
+x_generated_by_perl: v5.38.0
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: MIT

@@ -14,7 +14,7 @@ use Bio::ToolBox::db_helper qw(
 );
 use Bio::ToolBox::db_helper::constants;
 
-our $VERSION = '2.00';
+our $VERSION = '2.03';
 
 my $GENETOOL_LOADED = 0;
 
@@ -321,18 +321,25 @@ sub _strand {
 
 sub _extract_coordinate_string {
 	my ( $self, $i ) = @_;
-	if ( $self->value($i) =~ /^ ([\w\.\-]+) : (\d+) (?: \.\. | \-) (\d+) $/x ) {
-
-		# chromosome:start-end or chromosome:start..end
-		$self->{seqid} = $1 unless exists $self->{seqid};
-		$self->{start} = $2 unless exists $self->{start};
-		$self->{end}   = $3 unless exists $self->{end};
-	}
-	elsif ( $self->value($i) =~ /^([\w\.\-]+) : (\d+) $/x ) {
-
-		# chromosome:start
-		$self->{seqid} = $1 unless exists $self->{seqid};
-		$self->{start} = $2 unless exists $self->{start};
+	my $v = $self->value($i);
+	$v =~ s/,//g;
+	if ( $v =~ /^ ([\w\.\-]+) : (\d+) (?: (?: \- | \.\. ) (\d+))? (?: : (\-|\+) )? $/x ) {
+		$self->{seqid} = $1;
+		$self->{start} = $2;
+		if (defined $3) {
+			$self->{end} = $3;
+		}
+		else {
+			$self->{end} = $2;
+		}
+		if (defined $4) {
+			if ($4 eq '+') {
+				$self->{strand} = 1;
+			}
+			else {
+				$self->{strand} = -1;
+			}
+		}
 	}
 }
 
@@ -1711,8 +1718,15 @@ object, for example a start column and a parsed SeqFeature object, the
 table value takes precedence and is returned. You can always obtain the 
 SeqFeature's value separately and directly.
 
-These methods do not set attribute values. If you need to change the 
-values in a table, use the L</value> method below.
+If there is a coordinate string column, or an ID column in the form of
+a coordinate string, with values such as "chr1:123-456", then coordinates
+will be automatically extracted from the string as necessary. Commas,
+missing end, and strand (+ or -) appended to the end are all handled
+appropriately.
+
+These methods can reset the value, but only if it an explicit column.
+To change a linked SeqFeature object, use the appropriate methods on the
+SeqFeature object itself.
 
 =over 4
 

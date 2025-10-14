@@ -30,7 +30,7 @@ class HTTP::Tiny::Handle {
     my $self = new HTTP::Tiny::Handle;
     
     # The timeout field
-    my $timeout = $options_h->delete_or_default_double("timeout", 60.0);
+    my $timeout = $options_h->get_or_default("timeout", 60.0)->(double);
     $self->{timeout} = $timeout;
     
     return $self;

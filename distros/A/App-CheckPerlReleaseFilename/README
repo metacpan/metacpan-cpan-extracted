@@ -3,9 +3,9 @@ NAME
     module release archive
 
 VERSION
-    This document describes version 0.001 of App::CheckPerlReleaseFilename
+    This document describes version 0.002 of App::CheckPerlReleaseFilename
     (from Perl distribution App-CheckPerlReleaseFilename), released on
-    2023-08-27.
+    2024-12-21.
 
 FUNCTIONS
   check_perl_release_filename
@@ -65,7 +65,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

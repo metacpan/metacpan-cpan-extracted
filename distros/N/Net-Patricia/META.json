@@ -44,7 +44,8 @@
       "test" : {
          "requires" : {
             "Storable" : "0",
-            "Test::More" : "0.88"
+            "Test::More" : "0.88",
+            "Test::Pod" : "1.00"
          }
       }
    },
@@ -59,6 +60,6 @@
          "web" : "https://github.com/tobez/Net-Patricia"
       }
    },
-   "version" : "1.23",
+   "version" : "1.24",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

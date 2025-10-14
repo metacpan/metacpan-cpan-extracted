@@ -1,5 +1,6 @@
 bin/config-dump
 Changes
+chatgpt.txt
 lib/Config/Abstraction.pm
 LICENSE
 Makefile.PL

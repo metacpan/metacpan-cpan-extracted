@@ -8,7 +8,7 @@ use Schedule::Activity::Attributes;
 use Schedule::Activity::Message;
 use Schedule::Activity::Node;
 
-our $VERSION='0.1.1';
+our $VERSION='0.1.3';
 
 sub buildConfig {
 	my (%base)=@_;
@@ -18,12 +18,13 @@ sub buildConfig {
 		else { $res{node}{$k}=$node }
 		$res{node}{$k}{keyname}=$k;
 	}
+	my $msgNames=$base{messages}//{};
 	while(my ($k,$node)=each %{$res{node}}) {
 		my @nexts=map {$res{node}{$_}} @{$$node{next}//[]};
 		if(@nexts) { $$node{next}=\@nexts }
 		else       { delete($$node{next}) }
 		if(defined($$node{finish})) { $$node{finish}=$res{node}{$$node{finish}} }
-		$$node{msg}=Schedule::Activity::Message->new(message=>$$node{message});
+		$$node{msg}=Schedule::Activity::Message->new(message=>$$node{message},names=>$msgNames);
 	}
 	return %res;
 }
@@ -36,6 +37,19 @@ sub validateConfig {
 		if(!is_hashref($config{attributes})) { push @errors,'Attributes invalid structure' }
 		else { while(my ($k,$v)=each %{$config{attributes}}) { push @errors,$attr->register($k,%$v) } }
 	}
+	if($config{messages}) {
+		if(!is_hashref($config{messages})) { push @errors,'Messages invalid structure' }
+		else {
+		while(my ($namea,$msga)=each %{$config{messages}}) {
+			if(!is_hashref($msga)) { push @errors,"Messages $namea invalid structure" }
+			elsif(defined($$msga{attributes})&&!is_hashref($$msga{attributes})) { push @errors,"Messages $namea invalid attributes" }
+			else { foreach my $kv (Schedule::Activity::Message::attributesFromConf($msga)) { push @errors,$attr->register($$kv[0],%{$$kv[1]}) } }
+			if(is_hashref($$msga{message})) {
+				if(defined($$msga{message}{alternates})&&!is_arrayref($$msga{message}{alternates})) { push @errors,"Messages $namea invalid alternates" }
+				else { foreach my $kv (Schedule::Activity::Message::attributesFromConf($$msga{message})) { push @errors,$attr->register($$kv[0],%{$$kv[1]}) } }
+			}
+		}
+	} } # messages
 	while(my ($k,$node)=each %{$config{node}}) {
 		if(!is_hashref($node)) { push @errors,"Node $k, Invalid structure"; next }
 		Schedule::Activity::Node::defaulting($node);
@@ -44,6 +58,7 @@ sub validateConfig {
 			if(!is_hashref($$node{attributes})) { push @nerrors,"attributes, Invalid structure" }
 			else { while(my ($k,$v)=each %{$$node{attributes}}) { push @nerrors,$attr->register($k,%$v) } }
 		}
+		foreach my $kv (Schedule::Activity::Message::attributesFromConf($$node{message})) { push @nerrors,$attr->register($$kv[0],%{$$kv[1]}) }
 		if(@nerrors) { push @errors,map {"Node $k, $_"} @nerrors; next }
 		@invalids=grep {!defined($config{node}{$_})} @{$$node{next}//[]};
 		if(@invalids) { push @errors,"Node $k, Undefined name in array:  next" }
@@ -144,28 +159,27 @@ sub scheduler {
 		$res[$i][3]=($res[$i][1]{tmmax}//0)-$dt;
 	}
 	#
-	# Materialize the messages and their attributes.
-	# This works for global attribute reporting, but note that findpath will
-	# need updated to support node filtering by attribute.  In particular,
-	# messages will need to be materialized when chosen, since they may
-	# after later node selection.
-	foreach my $node (@res) {
-		my $msg;
-		($$node[1]{message},$msg)=$$node[1]{msg}->random();
+	# Full materialization of messages and attributes occurs after all
+	# slack/buffer adjustments have been made.  Node attributes are
+	# the 'defaults', which message attributes applying later.  This
+	# means that all attributes will be applied, but 'set' operations in
+	# messages will 'win'.
+	#
+	# In the future, message selection may occur during path construction,
+	# to achieve goals of node filtering, but random message selection
+	# here will only see the single message in that result.
+	#
+	foreach my $i (0..$#res) {
+		my $node=$res[$i][1];
+		if($$node{attributes}) {
+			while(my ($k,$v)=each %{$$node{attributes}}) {
+				$opt{attr}->change($k,%$v,tm=>$res[$i][0]+$opt{tmoffset}) } }
+		my ($message,$msg)=$$node{msg}->random();
+		$res[$i][1]=Schedule::Activity::Node->new(%$node,message=>$message);
 		if(is_hashref($msg)) { while(my ($k,$v)=each %{$$msg{attributes}}) {
-			$opt{attr}->change($k,%$v,tm=>$$node[0]+$opt{tmoffset});
+			$opt{attr}->change($k,%$v,tm=>$res[$i][0]+$opt{tmoffset});
 		} }
 	}
-	#
-	# This works for global attribute reporting, but note that findpath will
-	# need updated to support node filtering by attribute.  In particular,
-	# a fully built result in this step may need to be completely abandoned
-	# if a node filter encounters a violation.  Filtering will only be possible
-	# if attributes are used to filter node->nextrandom
-	#
-	foreach my $item (grep {$$_[1]{attributes}} @res) {
-		while(my ($k,$v)=each %{$$item[1]{attributes}}) {
-			$opt{attr}->change($k,%$v,tm=>$$item[0]+$opt{tmoffset}) } }
 	return @res;
 }
 
@@ -196,7 +210,12 @@ sub buildSchedule {
 		my @schedule;
 		foreach my $note (@$notes) {
 			my $annotation=Schedule::Activity::Annotation->new(%$note);
-			push @schedule,$annotation->annotate(@{$res{activities}});
+			foreach my $note ($annotation->annotate(@{$res{activities}})) {
+				my ($message,$mobj)=Schedule::Activity::Message->new(message=>$$note[1]{message},names=>$opt{configuration}{messages}//{})->random();
+				my %node=(message=>$message);
+				if($$note[1]{annotations}) { $node{annotations}=$$note[1]{annotations} }
+				push @schedule,[$$note[0],\%node,@$note[2..$#$note]];
+			}
 		}
 		@schedule=sort {$$a[0]<=>$$b[0]} @schedule;
 		for(my $i=0;$i<$#schedule;$i++) {
@@ -261,7 +280,7 @@ Schedule::Activity - Generate random activity schedules
 
 =head1 VERSION
 
-Version 0.1.1
+Version 0.1.3
 
 =head1 SYNOPSIS
 
@@ -290,11 +309,13 @@ Version 0.1.1
           tmmin=>5,tmavg=>5,tmmax=>5,
         },
       },
-      attributes =>{},
-      annotations=>{},
+      annotations=>{...},
+      attributes =>{...},
+      messages   =>{...},
     },
     activities=>[
       [30,'Activity'],
+      ...
     ],
   );
   print join("\n",map {"$$_[0]:  $$_[1]{message}"} @{$schedule{activities}});
@@ -305,20 +326,20 @@ This module permits building schedules of I<activities> each containing randomly
 
 For additional examples, see the C<samples/> directory.
 
-EXPERIMENTAL:  This module is currently experimental and subject to change.  Core functionality is safe for use in this version, but there are still some exceptional cases that may C<die()>; callers should plan to trap and handle these exceptions accordingly.  Documentation per option below may note other areas subject to change.
+Areas subject to change are documented below.  Configurations and goals may lead to cases that currently C<die()>, so callers should plan to trap and handle these exceptions accordingly.
 
 =head1 CONFIGURATION
 
 A configuration for scheduling contains the following sections:
 
   %configuration=(
-    node=>{...}
+    node       =>{...}
     attributes =>...  # see below
     annotations=>...  # see below
-    messages   =>...  # not yet supported
+    messages   =>...  # see below
   )
 
-Both activities and actions are configured as named C<node> entries.  With this structure, an action and activity might have the same C<message>, but must use different key names.
+Both activities and actions are configured as named C<node> entries.  With this structure, an action and activity may have the same C<message>, but must use different key names.
 
   'activity name'=>{
     message=>...    # an optional message string or object
@@ -338,7 +359,7 @@ Both activities and actions are configured as named C<node> entries.  With this 
 
 The list of C<next> nodes is a list of names, which must be defined in the configuration.  During schedule construction, entries will be I<chosen randomly> from the list of C<next> nodes.  The conclusion must be reachable from the initial activity, or scheduling will fail.  There is no further restriction on the items in C<next>:  Scheduling specifically supports cyclic/recursive actions, including self-cycles.
 
-There is no functional difference between activities and actions, except that a node must contain C<finish> to be used for activity scheduling.  Nomenclature is primarily to support schedule organization:  A collection of random actions is used to build an activity; a sequence of activities is used to build a schedule.
+There is no functional difference between activities and actions except that a node must contain C<finish> to be used for activity scheduling.  Nomenclature is primarily to support schedule organization:  A collection of random actions is used to build an activity; a sequence of activities is used to build a schedule.
 
 =head2 Time specification
 
@@ -353,27 +374,29 @@ Values must be non-negative numbers.  All three values may be identical.  Note t
 
 The slack is the amount of time that could be reduced in an action before it would need to be removed/replaced in the schedule.  The buffer is the amount of time that could be added to an action before additional actions would be needed in the schedule.
 
-As of version 0.1.1, providing any time value will automatically set any missing values at the fixed ratios 3,4,5.  EG, specifying only C<tmmax=40> will set C<tmmin=24> and C<tmavg=32>.  If provided two time values, priority is given to C<tmavg> to set the third.
+Providing any time value will automatically set any missing values at the fixed ratios 3,4,5.  EG, specifying only C<tmmax=40> will set C<tmmin=24> and C<tmavg=32>.  If provided two time values, priority is given to C<tmavg> to set the third.
 
 Future changes may support adjusting these ratios, automatic slack/buffering, univeral slack/buffer ratios, and open-ended/relaxed slack/buffering.
 
 =head2 Messages
 
-Each activity/action node may contain an optional message.  Messages are provided so the caller can easily format the returned schedules, but nothing in the scheduled uses these messages.  Messages may be:
+Each activity/action node may contain an optional message.  Messages are provided so the caller can easily format the returned schedules.  While message attributes may be used during schedule, the message strings themselves are not used during scheduling.  Messages may be:
 
   message=>'A message string'
+  message=>'named message key'
   message=>['An array','of alternates','chosen randomly']
+  message=>{name=>'named message key'}
   message=>{
     alternates=>[
       {message=>'A hash containing an array', attributes=>{...}}
       {message=>'of alternates',              attributes=>{...}}
       {message=>'with optional attributes',   attributes=>{...}}
+      {message=>'named message key'}
+      {name=>'named message key'}
     ]
   }
 
 Message selection is randomized for arrays and a hash of alternates.  Any attributes are emitted with the attribute response values, described below.
-
-One proposal links the string in the C<message> to the collection of top-level C<configuration{message}> keys, to support better message reuse across activities.  While this structure has not been fully defined, carefully choose message strings that are unlikely to clash with potential future keynames.
 
 =head1 RESPONSE
 
@@ -417,7 +440,7 @@ Attributes permit tracking boolean or numeric values during schedule constructio
 
 =head2 Types
 
-The two types of attributes are C<bool> or C<int>, which is the default.  A boolean attribute is primarily used as a state flag.  An integer attribute can be used both as a counter or gauge, that is either to track the number of occurrences of an activity or event, or to log varying numeric values.
+The two types of attributes are C<bool> or C<int>, which is the default.  A boolean attribute is primarily used as a state flag.  An integer attribute can be used both as a counter or gauge, either to track the number of occurrences of an activity or event, or to log varying numeric values.
 
 =head2 Configuration
 
@@ -431,7 +454,7 @@ Multiple attributes can be referenced from any activity/action.  For example:
     },
   }
 
-Any attribute may include a C<note> for convenience, but this value is not stored or reported.  It is only for convenience.
+Any attribute may include a C<note> for convenience, but this value is not stored nor reported.
 
 The main configuration can also declare attribute names and starting values.  It is recommended to set any non-zero initial values in this fashion, since calling C<set> requires that activity to always be the first requested in the schedule.  Boolean values must be declared in this section:
 
@@ -439,11 +462,11 @@ The main configuration can also declare attribute names and starting values.  It
     attributes=>{
       flagA  =>{type=>'bool'},
       flagB  =>{type=>'bool', value=>1},
-      counter=>{type=>'int', value=>0},
+      counter=>{type=>'int',  value=>0},
     },
   )
 
-Attributes are verified before schedule construction, which will fail if an attribute name is referenced in a conflicting manner by different actions.
+Attributes within message alternate configurations and named messages are identified during configuration validation.  Together with activity/action configurations, attributes are verified before schedule construction, which will fail if an attribute name is referenced in a conflicting manner.
 
 =head2 Response values
 
@@ -458,9 +481,9 @@ The response from C<buildSchedule> includes an C<attributes> section as:
     ...
   }
 
-One key is included for each attribute declared in the C<%configuration> section or within an activity.  If an activity containing a unique attribute is not used during construction, the attribute will still be included in the response with its default and initial value.
-
 The C<y> value is the final value at the conclusion of the final activity in the schedule.  The C<xy> contains an array of all values and the times at which they changed; see Logging.  The C<avg> is roughly the time-weighted average of the value, but this depends on the attribute type.
+
+If an activity containing a unique attribute is not used during construction, the attribute will still be included in the response with its default and initial value.
 
 =head2 Integer attributes
 
@@ -477,6 +500,16 @@ The C<bool> type must be declared in C<%configuration>.  The value may be specif
 Boolean attributes within activity/actions support:  C<set>.  Currently there is no restriction on values, but the behavior is only defined for values 0/1.
 
 The reported C<avg> is the percentage of time in the schedule for which the flag was true.  That is, if C<tm=0, value=0>, and C<tm=7, value=1>, and C<tm=10, value=1> is the complete schedule, then the reported average for the boolean will be C<0.3>.
+
+=head2 Precedence
+
+When an activity/action node and a selected message both contain attributes, the value of the attribute is updated first from the action node and then from the message node.  For boolean attributes, this means the "value set in the message has precedence".  For integer attributes, suppose that the value is initially zero; then, if both the action and message have attribute operators, the result will be:
+
+  Action  Message  Value
+  set=1   set=2      2
+  incr=3  set=4      4
+  set=5   incr=6    11
+  incr=7  incr=8    15
 
 =head2 Logging
 
@@ -511,6 +544,25 @@ Scheduling I<annotations> are a collection of secondary events to be attached to
 Within an individual group, earlier annotations take priority if two events are scheduled at the same time.  Multiple groups of annotations may have conflicting event schedules with event overlap.  Note that the C<between> setting is only enforced for each annotation individually at this time.
 
 As of version 0.1.1, annotations do I<not> update the C<attributes> response from C<buildSchedule>.  Because annotations may themselves contain attributes, they are retained separately from the main schedule of activities to permit easier rebuilding.  At this time, however, the caller must verify that annotation schedules before merging them and their attributes into the schedule.  Annotations may also be built separately after schedule construction as described in L<Schedule::Activity::Annotation>.
+
+Annotations may use named messages, and messages in the annotations response structure are materialized using the named message configuration passed to C<buildSchedule>.
+
+=head1 NAMED MESSAGES
+
+A scheduling configuration may contain a list of common messages.  This is particularly useful when there are a large number of common alternate messages where copy/pasting through the scheduling configuration would be egregious.
+
+  %configuration=(
+    messages=>{
+      'key name'=>{ any regular message configuration }
+			...
+    },
+  )
+
+Any message configuration within activity/action nodes may then reference the message by its key as shown above.  During message selection, any string message or configured C<name> will return the message configuration for C<key=name>, if it exists, or will return the string message.  If a configured message string matches a referenced name, the name takes precedence.
+
+The configuration of a named message may only create string, array, or hash alternative messages; it cannot reference another name.
+
+This feature is experimental starting with version 0.1.2.
 
 =head1 IMPORT MECHANISMS
 

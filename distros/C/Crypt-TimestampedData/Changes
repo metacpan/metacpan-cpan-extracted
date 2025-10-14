@@ -1,0 +1,45 @@
+0.01 - 2025-10-11, Guido Brugnara
+
+    First stable release
+    - Removed tsd-timestamp script (out of scope, requires external TSA service)
+    - Converted script/README to POD format for consistency
+
+0.01_05 - 2025-10-02, Guido Brugnara
+
+    - Removed unused files
+    - Made timestamp directory (-d) mandatory for tsd-extract when using -t
+    - Use File::Temp to manage temporary directory
+    - Fixed test paths to follow Perl testing conventions (removed FindBin module)
+    - Converted README_BUILD.md to POD format and translated to English
+
+0.01_04 - 2025-10-01, Guido Brugnara
+
+    - Fixed Windows path quoting in script tests (array form of system())
+    - Removed "use lib" from scripts (fixes @INC misconfiguration)
+    - Excluded script/README from installation
+    - Switched to AutoPrereqs for dependency detection
+
+0.01_03 - 2025-09-30, Guido Brugnara
+
+    - Fixed Windows compatibility for script execution tests
+    - Scripts now work on both Windows (perl script.pl) and Unix/Linux (./script)
+    - Updated test suite to handle Windows MSWin32 platform differences
+    - Improved cross-platform compatibility for CPAN testers
+
+0.01_02 - 2025-09-30, Guido Brugnara
+
+    - Copy scripts in local binary dir when installed
+    - Fixed Convert::ASN1 dependency specification (now 0.30 minimum)
+    - Added RuntimeRequires for proper dependency installation
+    - Fixed ExecDir configuration to exclude README file 
+
+0.01_01 - 2025-09-29, Guido Brugnara
+
+    - Fixed test file inclusion (test_data_token.tsr now included in package)
+    - Fixed variable masking warning in 03_content_extraction.t
+    - Updated dist.ini to properly include test files
+    - All tests now pass successfully
+
+0.01-TRIAL - 2025-09-27, Guido Brugnara
+
+    The first version (unstable).

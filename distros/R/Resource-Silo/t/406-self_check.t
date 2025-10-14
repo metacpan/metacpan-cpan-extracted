@@ -17,7 +17,6 @@ subtest 'no problem' => sub {
         use Resource::Silo -class;
 
         resource foo    =>
-            loose_deps      => 1,
             require         => [ 'Test::More' ],
             dependencies    => [ 'bar' ],
             init            => sub { 42 };
@@ -27,7 +26,7 @@ subtest 'no problem' => sub {
     } "defining a valid setup works";
 
     lives_ok {
-        All::Good->new->ctl->meta->self_check;
+        All::Good->new->ctl->preload;
     } "setup was actually good";
 };
 
@@ -37,18 +36,16 @@ subtest 'bad dependencies' => sub {
         use Resource::Silo -class;
 
         resource foo    =>
-            loose_deps      => 1,
             dependencies    => ['bar'],
             init            => sub {};
     } "defining invalid setup is ok";
 
+    local $Carp::Internal{'Moo::Object'} = 1;
+    local $Carp::Internal{'Method::Generate::Constructor'}   = 1;
+    local $Carp::Internal{'Bad::Deps'} = 1;
     throws_ok {
-        Bad::Deps->new->ctl->meta->self_check;
-    } qr(resource 'foo': .*depend.*'bar'), "imcomplete dependencies = no go";
-
-    throws_ok {
-        Bad::Deps->new->ctl->preload;
-    } qr(resource 'foo': .*depend.*'bar'), "ditto with preload";
+        Bad::Deps->new;
+    } qr(unsatisfied)i, "imcomplete dependencies = no go";
 };
 
 subtest 'unloadable modules' => sub {
@@ -59,11 +56,12 @@ subtest 'unloadable modules' => sub {
 
         resource foo    =>
             require         => ['My::Module'],
-            init            => sub {};
+            init            => sub {},
+            preload         => 1;
     } "defining invalid setup is ok";
 
     throws_ok {
-        Bad::Mods->new->ctl->meta->self_check;
+        Bad::Mods->new->ctl->preload;
     } qr(resource 'foo': .*load.* 'My::Module'), "can't load modules = no go";
 
     throws_ok {

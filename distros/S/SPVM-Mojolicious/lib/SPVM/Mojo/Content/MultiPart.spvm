@@ -101,9 +101,8 @@ class Mojo::Content::MultiPart extends Mojo::Content {
         $boundary_ascii->[$i] = Fn->chr((int)Sys->rand(256))->[0];
       }
       $boundary = Mojo::Util->b64_encode($boundary_ascii);
-      my $boundary_ref = [$boundary];
-      Re->s($boundary_ref, ["\W", "g"], "X");
-      $boundary = $boundary_ref->[0];
+      $boundary = copy $boundary;
+      Re->s((mutable string)$boundary, ["\W", "g"], "X");
       
       unless ($self->body_contains($boundary)) {
         last;

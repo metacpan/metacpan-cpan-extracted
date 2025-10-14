@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise.pm
-## Version v0.6.3
+## Version v0.7.0
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/06
-## Modified 2025/08/30
+## Modified 2025/10/12
 ## All rights reserved.
 ## 
 ## 
@@ -60,7 +60,7 @@ BEGIN
     our $EXTENSION_VARY = 1;
     our $DEFAULT_MIME_TYPE = 'application/octet-stream';
     our $SERIALISER = $Promise::Me::SERIALISER;
-    our $VERSION = 'v0.6.3';
+    our $VERSION = 'v0.7.0';
 };
 
 use strict;
@@ -1021,6 +1021,7 @@ sub send
                 $self->_load_class( 'Crypt::Misc' ) || return( $self->pass_error );
                 $proxy_authorization = 'Basic ' . Crypt::Misc::encode_b64( join( ':', @$p{qw( proxy_user proxy_pass )} ), '' );
             }
+            local $HTTP::Promise::IO::DEBUG = $self->debug; # REMOVE ME
             if( $uri->scheme eq 'http' )
             {
                 $io = HTTP::Promise::IO->connect(
@@ -1031,7 +1032,7 @@ sub send
                     debug   => $self->debug,
                     ( defined( $p->{local_host} ) ? ( local_host => $p->{local_host} ) : () ),
                     ( defined( $p->{local_port} ) ? ( local_port => $p->{local_port} ) : () ),
-                ) || return( HTTP::Promise::IO->pass_error );
+                ) || return( $self->pass_error( HTTP::Promise::IO->error ) );
                 if( defined( $proxy_authorization ) )
                 {
                     $self->proxy_authorization( $proxy_authorization );
@@ -1050,11 +1051,12 @@ sub send
                     debug       => $self->debug,
                     ( defined( $p->{local_host} ) ? ( local_host => $p->{local_host} ) : () ),
                     ( defined( $p->{local_port} ) ? ( local_port => $p->{local_port} ) : () ),
-                ) || return( HTTP::Promise::IO->pass_error );
+                ) || return( $self->pass_error( HTTP::Promise::IO->error ) );
             }
         }
         else
         {
+            local $HTTP::Promise::IO::DEBUG = $self->debug; # REMOVE ME
             if( $uri->scheme eq 'http' )
             {
                 $io = HTTP::Promise::IO->connect(
@@ -1065,7 +1067,7 @@ sub send
                     debug   => $self->debug,
                     ( defined( $p->{local_host} ) ? ( local_host => $p->{local_host} ) : () ),
                     ( defined( $p->{local_port} ) ? ( local_port => $p->{local_port} ) : () ),
-                ) || return( HTTP::Promise::IO->pass_error );
+                ) || return( $self->pass_error( HTTP::Promise::IO->error ) );
             }
             else
             {
@@ -1079,7 +1081,7 @@ sub send
                     ( defined( $p->{local_host} ) ? ( local_host => $p->{local_host} ) : () ),
                     ( defined( $p->{local_port} ) ? ( local_port => $p->{local_port} ) : () ),
                     ( ( defined( $ssl_opts ) && scalar( keys( %$ssl_opts ) ) ) ? ( ssl_opts => $ssl_opts ) : () ),
-                ) || return( HTTP::Promise::IO->pass_error );
+                ) || return( $self->pass_error( HTTP::Promise::IO->error ) );
             }
         }
         # return( $self->pass_error ) unless( $io );
@@ -2341,7 +2343,7 @@ HTTP::Promise - Asynchronous HTTP Request and Promise
 
 =head1 VERSION
 
-    v0.6.3
+    v0.7.0
 
 =head1 DESCRIPTION
 
@@ -2555,6 +2557,19 @@ If environment variable C<PERL_LWP_SSL_CA_PATH> or C<HTTPS_CA_DIR> is set, then 
 =back
 
 Other options can be set and are processed directly by the SSL Socket implementation in use. See L<IO::Socket::SSL> or L<Net::SSL> for details.
+
+Example of C<ssl_opts>:
+
+    my $ssl_opts = 
+    {
+        SSL_ca_file          => "/usr/local/lib/perl5/site_perl/5.36.1/Mozilla/CA/cacert.pem",
+        SSL_verify_mode      => IO::Socket::SSL::SSL_VERIFY_PEER(),  # Explicit constant for clarity
+        SSL_verifycn_scheme  => "www",
+        SSL_hostname         => $host,  # Explicit SNI; prevents issues if PeerHost changes
+        SSL_version          => "TLSv1_2:TLSv1_3",  # Enforce modern TLS (adjust for legacy if needed)
+        # SSL_fingerprint    => "sha256$your_cert_fingerprint",  # If pinning a specific cert
+        # SSL_ocsp_mode      => IO::Socket::SSL::SSL_OCSP_TRY_STAPLE(),  # For revocation checks
+    };
 
 =item * C<threshold>
 

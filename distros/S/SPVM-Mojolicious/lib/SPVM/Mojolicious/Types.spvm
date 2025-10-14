@@ -115,8 +115,7 @@ class Mojolicious::Types {
       
       for my $type (@$types) {
         
-        Re->s(my $_ = [$type], "\;.*$", "");
-        $type = $_->[0];
+        Re->s((mutable string)$type, "\;.*$", "");
         
         $type = Fn->lc($type);
         

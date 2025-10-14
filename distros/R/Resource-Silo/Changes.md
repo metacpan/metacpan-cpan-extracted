@@ -1,5 +1,24 @@
 # Revision history for Resource::Silo
 
+- 0.1501  Mon Oct 13 2025
+    - [bug] Remove a stray dependency from tests
+
+- 0.15    Sun Oct 12 2025
+    - [api] Add nullable => 0|1 switch allowing undef value for resources
+    - [api] Add check => sub { $container, $resource } that dies if the resource is invalid
+    - [api][break] Allow forward dependencies by default; loose_deps becomes a no-op
+    - [api] Add Resource::Silo->get_meta('My::Package')
+
+- 0.14    Wed May 15 2024
+    - [api][break] remove 'ignore_cache', add more tricky test cases
+    - [api][break] Remove ->ctl weakening as it's unnecessary complication
+    - [repo] Add JSON::PP and lib::relative as test deps
+    - [ref] Simpler & cleaner logic in the core
+    - [test] Lots of tricky test cases added
+
+- 0.13    Sun Apr 14 2024
+    - [api] Add fork_safe => 0 | 1 flag to skip re-initialization after fork.
+
 - 0.1203  Tue Mar 05 2024
     - Add a dummy export(resource, silo) to hint IDEs
 

@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-08-27'; # DATE
+our $DATE = '2024-12-21'; # DATE
 our $DIST = 'App-CheckPerlReleaseFilename'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our %SPEC;
 
@@ -25,7 +25,7 @@ $SPEC{check_perl_release_filename} = {
     },
 };
 sub check_perl_release_filename {
-    require Filename::Perl::Release;
+    require Filename::Type::Perl::Release;
 
     my %args = @_;
     my $filenames = $args{filenames};
@@ -34,7 +34,7 @@ sub check_perl_release_filename {
     for my $filename (@$filenames) {
         my $rec = {filename => $filename};
         (my $basename = $filename) =~ s!.+/!!;
-        my $prres = Filename::Perl::Release::check_perl_release_filename(
+        my $prres = Filename::Type::Perl::Release::check_perl_release_filename(
             filename => $basename);
         if ($prres) {
             $rec->{is_release} = 1;
@@ -66,7 +66,7 @@ App::CheckPerlReleaseFilename - Check whether filenames look like perl module re
 
 =head1 VERSION
 
-This document describes version 0.001 of App::CheckPerlReleaseFilename (from Perl distribution App-CheckPerlReleaseFilename), released on 2023-08-27.
+This document describes version 0.002 of App::CheckPerlReleaseFilename (from Perl distribution App-CheckPerlReleaseFilename), released on 2024-12-21.
 
 =head1 FUNCTIONS
 
@@ -135,7 +135,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

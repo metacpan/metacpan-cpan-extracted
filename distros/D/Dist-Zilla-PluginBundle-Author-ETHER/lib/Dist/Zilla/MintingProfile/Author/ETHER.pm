@@ -4,7 +4,7 @@ package Dist::Zilla::MintingProfile::Author::ETHER;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Mint distributions like ETHER does
 
-our $VERSION = '0.168';
+our $VERSION = '0.169';
 
 use Moose;
 with 'Dist::Zilla::Role::MintingProfile' => { -version => '5.047' };
@@ -47,7 +47,7 @@ Dist::Zilla::MintingProfile::Author::ETHER - Mint distributions like ETHER does
 
 =head1 VERSION
 
-version 0.168
+version 0.169
 
 =head1 SYNOPSIS
 
@@ -107,6 +107,14 @@ L<Dist::Zilla::PluginBundle::Author::ETHER>
 L<Pod::Weaver::PluginBundle::Author::ETHER>
 
 =back
+
+=head1 GIVING THANKS
+
+=for stopwords MetaCPAN GitHub
+
+If you found this module to be useful, please show your appreciation by
+adding a +1 in L<MetaCPAN|https://metacpan.org/dist/Dist-Zilla-PluginBundle-Author-ETHER>
+and a star in L<GitHub|https://github.com/karenetheridge/Dist-Zilla-PluginBundle-Author-ETHER>.
 
 =head1 SUPPORT
 

@@ -32,7 +32,7 @@ require Perl::Critic::Policy::Modules::UseExporter;
 
 
 #-----------------------------------------------------------------------------
-my $want_version = 99;
+my $want_version = 100;
 is ($Perl::Critic::Policy::Modules::UseExporter::VERSION,
     $want_version, 'VERSION variable');
 is (Perl::Critic::Policy::Modules::UseExporter->VERSION,

@@ -2,7 +2,7 @@
 # MIT License
 
 class HTTP::Tiny {
-  version "0.013";
+  version "0.015";
   
   use Fn;
   use Re;
@@ -57,7 +57,7 @@ class HTTP::Tiny {
     my $self = new HTTP::Tiny;
     
     # timeout
-    my $timeout = $options_h->delete_or_default_double("timeout", 60.0);
+    my $timeout = $options_h->get_or_default("timeout", 60.0)->(double);
     $self->{timeout} = $timeout;
     unless ($timeout >= 0) {
       die "The timeout option must be greater than or equal to 0";
@@ -65,7 +65,7 @@ class HTTP::Tiny {
     
     # agent
     my $default_agent = $self->create_default_agent;
-    my $agent = $options_h->delete_or_default_string("agent", $default_agent);
+    my $agent = $options_h->get_or_default("agent", $default_agent)->(string);
     $self->{agent} = $agent;
     
     $self->{tmp_dir} = File::Temp->newdir;
@@ -271,8 +271,8 @@ class HTTP::Tiny {
   
   private static method _uri_escape : string ($input : string) {
     
-    my $input_ref = [$input];
-    Re->s($input_ref, "([^A-Za-z0-9\-\._~])", method : string ($re : Regex, $match : Regex::Match) {
+    my $output = copy $input;
+    Re->s((mutable string)$output, "([^A-Za-z0-9\-\._~])", method : string ($re : Regex, $match : Regex::Match) {
       my $bytes = $match->cap1;
       
       my $escaped_char_buffer = StringBuffer->new;
@@ -287,8 +287,6 @@ class HTTP::Tiny {
       
       return $escaped_char;
     });
-    
-    my $output = $input_ref->[0];
     
     return $output;
   }
@@ -308,11 +306,11 @@ class HTTP::Tiny {
     
     my $options_h = Hash->new($options);
     
-    my $data_callback = $options_h->delete_or_default("data_callback", undef);
+    my $data_callback = $options_h->get_or_default("data_callback", undef);
     
-    my $headers = (Mojo::Headers)$options_h->delete_or_default("headers", undef);
+    my $headers = (Mojo::Headers)$options_h->get_or_default("headers", undef);
     
-    my $timeout = $options_h->delete_or_default_double("timeout", $self->{timeout});
+    my $timeout = $options_h->get_or_default("timeout", $self->{timeout})->(double);
     
     for my $name (@{$options_h->keys}) {
       die "The \$name option is not available.";
@@ -385,7 +383,7 @@ class HTTP::Tiny {
       
     my $ssl_options_h = Hash->new($self->{SSL_options});
     
-    my $ca_file = $ssl_options_h->get_string("SSL_ca_file");
+    my $ca_file = $ssl_options_h->{"SSL_ca_file"}->(string);
     
     unless ($ca_file) {
       $ca_file = Sys->env("SSL_CERT_FILE");

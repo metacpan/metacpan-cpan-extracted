@@ -5,20 +5,8 @@
 
 use strict;
 use warnings;
-
-use Test::More;
-use Test::More;
-plan tests => 2;
+use Test::More tests => 1;
 
 # git is required
-my $try = `git --help`;
+my $try = `git --help 2>&1`;
 ok (!$?, "git installed");
-
-# strace can be used to help with more granular git hooks
-SKIP: {
-    # But strace is Linux-specific
-    skip "strace works on Linux, but not expected on [$^O]", 1 unless $^O =~ /linux/i;
-
-    $try = `strace --help`;
-    ok (!$?, "strace installed");
-};

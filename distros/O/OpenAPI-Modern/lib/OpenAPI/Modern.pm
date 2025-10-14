@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.097-15-g5b274315
+package OpenAPI::Modern; # git description: v0.098-9-gfd7b0d21
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.1 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.1 Swagger HTTP request response
 
-our $VERSION = '0.098';
+our $VERSION = '0.099';
 
 use 5.020;
 use utf8;
@@ -332,6 +332,12 @@ sub find_path ($self, $options, $state = {}) {
   $state->{depth} = 0;
   $state->{debug} = $options->{debug} = {} if $DEBUG or $self->debug;
 
+  return E({ %$state, exception => 1, recommended_response => [ 500 ] },
+      'at least one of $options->{request}, ($options->{path_template} and $options->{method}), or $options->{operation_id} must be provided')
+    if not $options->{request}
+      and not ($options->{path_template} and exists $options->{method})
+      and not exists $options->{operation_id};
+
   # now guaranteed to be a Mojo::Message::Request
   if ($options->{request}) {
     $options->{request} = _convert_request($options->{request});
@@ -356,13 +362,11 @@ sub find_path ($self, $options, $state = {}) {
     $method = $options->{method};
   }
 
-  my $operation_path;
-
   # method from operation_id from options
   if (exists $options->{operation_id}) {
     # FIXME: what if the operation is defined in another document? Need to look it up across
     # all documents, and localize $state->{initial_schema_uri}
-    $operation_path = $self->openapi_document->get_operationId_path($options->{operation_id});
+    my $operation_path = $self->openapi_document->get_operationId_path($options->{operation_id});
     return E({ %$state, recommended_response => [ 500 ] }, 'unknown operation_id "%s"', $options->{operation_id})
       if not $operation_path;
 
@@ -383,18 +387,22 @@ sub find_path ($self, $options, $state = {}) {
           (!exists $options->{request} && $options->{method} eq lc $options->{method}
               && exists $self->openapi_document->get($path_item_path)->{$options->{method}}
             ? (' (should be '.uc $options->{method}.')') : ''))
-      if $options->{method} and $options->{method} ne $method;
+      if exists $options->{method} and $options->{method} ne $method;
 
     $options->{method} = $method;
+
+    if (not $options->{path_template} and not $options->{request}) {
+      # some operations don't live under a /paths/$path_template (even via a $ref), e.g. webhooks or
+      # callbacks, but they are still usable via operationId for validating responses
+      $state->{keyword_path} = $path_item_path;
+      $options->{_path_item} = $self->document_get($path_item_path);
+
+      # FIXME: this is not accurate if the operation lives in another document
+      # (and in that case, get_operation_uri_by_id can be returned as-is)
+      $options->{operation_uri} = $state->{initial_schema_uri}->clone->fragment($operation_path);
+      return 1;
+    }
   }
-
-  # TODO: support passing $options->{operation_uri}
-
-  # by now we will have extracted method from request or operation_id (or we were provided with it)
-  return E({ %$state, exception => 1, recommended_response => [ 500 ] }, 'at least one of $options->{request}, ($options->{path_template} and $options->{method}), or $options->{operation_id} must be provided')
-    if not $options->{request}
-      and not ($options->{path_template} and $method)
-      and not $options->{operation_id};
 
   my $schema = $self->openapi_document->schema;
 
@@ -402,19 +410,6 @@ sub find_path ($self, $options, $state = {}) {
   return E({ %$state, (exists $options->{request} ? (data_path => '/request/uri') : ()),
         keyword => 'paths' }, 'missing path "%s"', $options->{path_template})
     if exists $options->{path_template} and not exists $schema->{paths}{$options->{path_template}};
-
-  if (not $options->{path_template} and not $options->{request}) {
-    # some operations don't exist directly under a /paths/$path_template - e.g. webhooks or
-    # callbacks, but they are still usable
-    my $path_item_path = $operation_path =~ s{/\L$method$}{}r;
-    $state->{keyword_path} = $path_item_path;
-    $options->{_path_item} = $self->document_get($path_item_path);
-
-    # FIXME: this is not accurate if the operation lives in another document
-    # (and in that case, get_operation_uri_by_id can be returned as-is)
-    $options->{operation_uri} = $state->{initial_schema_uri}->clone->fragment($operation_path);
-    return 1;
-  }
 
   my $captures;  # hashref of template variable names -> concrete values from the uri
 
@@ -1058,7 +1053,13 @@ sub _convert_request ($request) {
   my $req = Mojo::Message::Request->new;
 
   if ($request->isa('HTTP::Request')) {
-    $req->parse($request->as_string);
+    $req->method($request->method);
+    $req->url(Mojo::URL->new($request->uri));
+    $req->version($request->protocol =~ s{^HTTP/(\d\.\d)$}{$1}r) if $request->protocol;
+    $req->headers->add(@$_) foreach pairs $request->headers->flatten;
+
+    my $body = $request->content;
+    $req->body($body) if length $body;
   }
   elsif ($request->isa('Plack::Request') or $request->isa('Catalyst::Request')) {
     $req->parse($request->env);
@@ -1067,7 +1068,7 @@ sub _convert_request ($request) {
       : do { +require Plack::Request; Plack::Request->new($request->env) };
 
     my $body = $plack_request->content;
-    $req->parse($body) if length $body;
+    $req->body($body) if length $body;
 
     # Plack is unable to distinguish between %2F and /, so the raw (undecoded) uri can be passed
     # here. see PSGI::FAQ
@@ -1080,7 +1081,7 @@ sub _convert_request ($request) {
   # we could call $req->fix_headers here to add a missing Content-Length or Host, but proper
   # requests from the network should always have these set.
 
-  warn 'parse error when converting '.ref($request) if not $req->is_finished;
+  $req->finish;
   return $req;
 }
 
@@ -1091,13 +1092,16 @@ sub _convert_response ($response) {
   my $res = Mojo::Message::Response->new;
 
   if ($response->isa('HTTP::Response')) {
-    $res->parse($response->as_string);
-    warn 'parse error when converting HTTP::Response' if not $res->is_finished;
+    $res->code($response->code);
+    $res->version($response->protocol =~ s{^HTTP/(\d\.\d)$}{$1}r) if $response->protocol;
+    $res->headers->add(@$_) foreach pairs $response->headers->flatten;
+    my $body = $response->content;
+    $res->body($body) if length $body;
   }
   elsif ($response->isa('Plack::Response')) {
     $res->code($response->status);
     $res->headers->add(@$_) foreach pairs $response->headers->psgi_flatten_without_sort->@*;
-    my $body = $response->body;
+    my $body = $response->content;
     $res->body($body) if length $body;
   }
   elsif ($response->isa('Catalyst::Response')) {
@@ -1114,6 +1118,7 @@ sub _convert_response ($response) {
   # we could call $res->fix_headers here to add a missing Content-Length, but proper responses from
   # the network should always have it set.
 
+  $res->finish;
   return $res;
 }
 
@@ -1146,7 +1151,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.1 d
 
 =head1 VERSION
 
-version 0.098
+version 0.099
 
 =head1 SYNOPSIS
 
@@ -1387,28 +1392,34 @@ provided to the document constructor).
 The second argument is an optional hashref that contains extra information about the request
 corresponding to the response, as in L</validate_request> and L</find_path>.
 
-C<request> is also accepted as a key in the hashref, representing the original request object that
-corresponds to this response (as not all HTTP libraries link to the request in the response object).
+C<request> in the hashref represents the original request object that
+corresponds to this response, which can be used to find the appropriate section of the document if
+other values (such as C<operationId>) are not known.
 
 =head2 find_path
 
   $result = $self->find_path($options);
 
-Finds the appropriate entry in the OpenAPI document corresponding to a request. Called
+Finds the appropriate L<path-item|https://spec.openapis.org/oas/latest#path-item-object> entry
+in the OpenAPI document corresponding to a request. Called
 internally by both L</validate_request> and L</validate_response>.
 
-The single argument is a hashref that contains information about the request. Possible values
-include:
+The single argument is a hashref that contains information about the request. Various combinations
+of values can be provided; possible values are:
 
 =over 4
 
 =item *
 
-C<request>: the object representing the HTTP request. Should be provided when available. Supported types are: L<HTTP::Request>, L<Plack::Request>, L<Catalyst::Request>, L<Mojo::Message::Request>.
+C<request>: the object representing the HTTP request. Supported types are: L<HTTP::Request>, L<Plack::Request>, L<Catalyst::Request>, L<Mojo::Message::Request>. Converted to a L<Mojo::Message::Request>.
 
 =item *
 
-C<path_template>: a string representing the request URI, with placeholders in braces (e.g. C</pets/{petId}>); see L<https://spec.openapis.org/oas/v3.1#paths-object>.
+C<method>: the HTTP method used by the request (case-sensitive)
+
+=item *
+
+C<path_template>: a string representing the (possibly partial) path portion of the request URI, with placeholders in braces (e.g. C</pets/{petId}>); see L<https://spec.openapis.org/oas/v3.1#paths-object>.
 
 =item *
 
@@ -1418,26 +1429,9 @@ C<operation_id>: a string corresponding to the L<operationId|https://learn.opena
 
 C<path_captures>: a hashref mapping placeholders in the path template to their actual values in the request URI
 
-=item *
-
-C<method>: the HTTP method used by the request (case-sensitive)
-
-=item *
-
-C<debug>: when C<$OpenAPI::Modern::DEBUG> or L</debug> is set on the OpenAPI::Modern object, additional diagnostic information is stored here in separate keys:
-
-=over 4
-
-=item *
-
-C<uri_patterns>: an arrayref of patterns that were attempted to be matched against the URI
-
 =back
 
-=back
-
-All of these values are optional (unless C<request> is omitted), and will be derived from the
-request as needed (albeit less
+All values are optional, and will be derived from each other as needed (albeit less
 efficiently than if they were provided). All passed-in values MUST be consistent with each other and
 the request or the return value from this method is false and appropriate errors will be included
 in the C<$options> hash.
@@ -1467,7 +1461,15 @@ L<§4.8.10 of the specification|https://spec.openapis.org/oas/v3.1#operation-obj
 
 =item *
 
-C<request> (not necessarily what was passed in: this is always a L<Mojo::Message::Request>)
+C<debug>: when C<$OpenAPI::Modern::DEBUG> or L</debug> is set on the OpenAPI::Modern object, additional diagnostic information is stored here in separate keys:
+
+=over 4
+
+=item *
+
+C<uri_patterns>: an arrayref of patterns that were attempted to be matched against the URI
+
+=back
 
 =back
 
@@ -1619,11 +1621,11 @@ cookie parameters are not checked at all yet
 
 =item *
 
-C<application/x-www-form-urlencoded> and C<multipart/*> messages are not yet supported
+C<multipart/*> messages are not yet supported
 
 =item *
 
-OpenAPI descriptions must be contained in a single document; C<$ref>erences to other documents are not fully supported at this time.
+OpenAPI descriptions must be contained in a single document; while C<$ref>erences to other documents (such as within a C</components> structure) are supported, C</paths> entries in other documents are not considered at this time.
 
 =item *
 

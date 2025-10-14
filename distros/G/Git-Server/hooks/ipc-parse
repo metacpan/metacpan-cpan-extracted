@@ -13,6 +13,40 @@ sub crash {
     die "$0: $err_message\n";
 }
 
+# Escape String with default encoding
+sub e {
+    my $s = shift;
+    # Both \\ and \" really need to be escaped
+    # But add other helpful chars to make it easier for Perl to read too.
+    $s =~ s/([\\\"\'\$\@])/\\$1/g;
+    # Special backslash escape chars for easy legibility
+    $s =~ s/\t/\\t/g;
+    $s =~ s/\r/\\r/g;
+    $s =~ s/\n/\\n/g;
+    # Octal \000 format all NON-ASCII chars that are left
+    $s =~ s/([^\ -\~])/sprintf "\\%03o", ord $1/eg;
+    # Add QUOTEs
+    return qq{"$s"};
+}
+
+# Decode Trace String
+sub d {
+    my $s = shift;
+    # Remove QUOTEs
+    $s =~ s/^"(.*)"$/$1/s;
+    # Default octal \000 format
+    $s =~ s/\\([0-3][0-7]{2}|[0-7]{1,2})/chr oct $1/eg;
+    # -x or -xx Hex \x00 format
+    $s =~ s/\\x([0-9a-f]{2})/chr hex $1/eg;
+    # Special backslash escape chars for easy legibility
+    $s =~ s/\\t/\t/g;
+    $s =~ s/\\r/\r/g;
+    $s =~ s/\\n/\n/g;
+    # All other backslash escaped char renders exactly (such as \" or \' or \\ etc)
+    $s =~ s/\\(.)/$1/gs;
+    return $s;
+}
+
 # my $details_hash = commit_details($commit_id);
 sub commit_details {
     my $c = shift;
@@ -158,14 +192,12 @@ if (my $tracefile = "$ipc/log.trace") {
             my $envs = [];
             foreach my $key (sort keys %ENV) {
                 my $val = $ENV{$key};
-                $val =~ s/\\/\\\\/g;
-                $val =~ s/\n/\\n/g;
-                push @$envs, qq{"$key=$val"};
+                push @$envs, e("$key=$val");
             }
             $envs = join ", ", @$envs;
             print $fh qq{12:00:00 execve("fake-run", ["git-shell", "-c", "$ENV{SSH_ORIGINAL_COMMAND}"], [$envs]) = 0\n};
             my $exit_status = $ENV{GIT_PRE_EXIT_STATUS} || $ENV{GIT_EXIT_STATUS} // -1;
-            print $fh "22:27:08.618365 +++ exited with $exit_status +++\n";
+            print $fh "12:00:01.618365 +++ exited with $exit_status +++\n";
             close $fh;
         }
     }
@@ -196,26 +228,18 @@ if (open my $log_fh, "<", \$log) {
             while ($launch =~ s/\["([^=\"]+)=([^\"]*)",?\s?/\[/) {
                 my $key = $1;
                 my $val = $2;
-                $val =~ s/\\n/\n/g;
-                $val =~ s/\\\\/\\/g;
-                $ENV{$key} ||= $val;
+                $ENV{$key} ||= d($val);
             }
         }
         elsif (/.*\+\+\+ exited with (\d+) \+\+\+\s*$/) {
             # Found exit code
             $ENV{GIT_EXIT_STATUS} //= $1;
         }
-        elsif (/^[\s\d:\.\-]+?(read|write)\(([012]),\s*(.+)/) {
+        elsif (/^[\s\d:\.\-]*?(read|write)\(([012]),\s*(.+)/) {
             my $op = $1;
             my $fd = $2;
             my $s = $3;
-            $s = $1 if $s =~ /"(.*)"/;
-            $s =~ s/\\([0-3][0-7]{2}|[0-7]{1,2})/chr oct $1/eg;
-            $s =~ s/\\x([0-9a-f]{2})/chr hex $1/eg;
-            $s =~ s/\\t/\t/g;
-            $s =~ s/\\r/\r/g;
-            $s =~ s/\\n/\n/g;
-            $s =~ s/\\\\/\\/g;
+            $s = d($1) if $s =~ /(".*")/;
             if ($op eq "read" and $fd eq "0") {
                 $client_to_server .= $s;
             }

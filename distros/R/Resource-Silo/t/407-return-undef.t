@@ -13,17 +13,25 @@ use Test::Exception;
 
 use Resource::Silo;
 
-resource bare   => sub {};
+my $count = 0;
+
+resource bare   => sub { $count++; return };
 resource param  =>
     argument        => qr(.*),
     init            => sub {};
 
 my $no_reason = "declared at ".quotemeta(__FILE__)." line \\d+ "
-    ."failed for no apparent reason";
+    .".* for no apparent reason";
 
 throws_ok {
     silo->bare;
 } qr('bare' $no_reason), "undef return";
+
+throws_ok {
+    silo->bare;
+} qr('bare' $no_reason), "undef return (on second try too)";
+
+is $count, 2, "2 attempts to initialize";
 
 throws_ok {
     silo->param("foo_42");

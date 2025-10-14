@@ -1,0 +1,125 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use File::Spec;
+
+use Crypt::TSD;
+
+# Command line options
+my $help = 0;
+my $version = 0;
+my $timestamp_file;
+my $output_file;
+my $verbose = 0;
+
+# Parse command line options
+GetOptions(
+    'help|h' => \$help,
+    'version' => \$version,
+    'timestamp|t=s' => \$timestamp_file,
+    'output|o=s' => \$output_file,
+    'verbose|v' => \$verbose,
+) or pod2usage(2);
+
+# Show help
+if ($help) {
+    pod2usage(-verbose => 2);
+    exit 0;
+}
+
+# Show version
+if ($version) {
+    print "tsd-create version $Crypt::TSD::VERSION\n";
+    exit 0;
+}
+
+# Get input file from command line
+my $input_file = shift @ARGV;
+if (!$input_file) {
+    print "Error: Input file required\n";
+    pod2usage(1);
+}
+
+# Check if input file exists
+unless (-f $input_file) {
+    die "Error: Input file '$input_file' not found\n";
+}
+
+# Generate output filename if not provided
+unless ($output_file) {
+    $output_file = $input_file;
+    $output_file =~ s/\.([^.]+)$/.tsd/;
+}
+
+# Check if timestamp file is provided
+unless ($timestamp_file) {
+    die "Error: Timestamp file required. Use -t option or --timestamp\n";
+}
+
+# Check if timestamp file exists
+unless (-f $timestamp_file) {
+    die "Error: Timestamp file '$timestamp_file' not found\n";
+}
+
+print "Creating TSD file...\n" if $verbose;
+print "Input file: $input_file\n" if $verbose;
+print "Timestamp file: $timestamp_file\n" if $verbose;
+print "Output file: $output_file\n" if $verbose;
+
+# Create TSD file
+eval {
+    my $result = Crypt::TSD->write_tds($input_file, $timestamp_file, $output_file);
+    print "TSD file created successfully: $result\n";
+};
+if ($@) {
+    die "Error creating TSD file: $@\n";
+}
+
+print "Done!\n";
+
+__END__
+
+=head1 NAME
+
+tsd-create - Create a TimeStampedData (.tsd) file from a file and timestamp
+
+=head1 VERSION
+
+version 0.01
+
+=head1 SYNOPSIS
+
+tsd-create [options] input_file
+
+Options:
+    -t, --timestamp FILE    Timestamp file (.tsr) to use
+    -o, --output FILE       Output .tsd file (default: input_file.tsd)
+    -v, --verbose           Verbose output
+    -h, --help              Show this help
+    --version               Show version
+
+=head1 DESCRIPTION
+
+Creates a TimeStampedData (.tsd) file by combining an input file with a
+timestamp token (.tsr file). The timestamp file should be a valid RFC 3161
+TimeStampToken in DER format.
+
+=head1 EXAMPLES
+
+    # Create TSD file with timestamp
+    tsd-create -t timestamp.tsr document.pdf
+
+    # Specify output file
+    tsd-create -t timestamp.tsr -o document.tsd document.pdf
+
+    # Verbose output
+    tsd-create -v -t timestamp.tsr document.pdf
+
+=head1 SEE ALSO
+
+L<Crypt::TSD>, L<Crypt::TimestampedData>
+
+=cut

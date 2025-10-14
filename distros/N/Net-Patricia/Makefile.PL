@@ -24,6 +24,7 @@ my %WriteMakefileArgs = (
     'TEST_REQUIRES' => {
         'Storable'   => 0,
         'Test::More' => '0.88',
+        'Test::Pod'  => '1.00',
     },
     META_MERGE => {
         'meta-spec' => {version => 2},

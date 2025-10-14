@@ -31,7 +31,7 @@ require Perl::Critic::Policy::ValuesAndExpressions::ProhibitArrayAssignAref;
 
 
 #-----------------------------------------------------------------------------
-my $want_version = 99;
+my $want_version = 100;
 is ($Perl::Critic::Policy::ValuesAndExpressions::ProhibitArrayAssignAref::VERSION, $want_version, 'VERSION variable');
 is (Perl::Critic::Policy::ValuesAndExpressions::ProhibitArrayAssignAref->VERSION, $want_version, 'VERSION class method');
 {

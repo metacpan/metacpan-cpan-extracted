@@ -132,9 +132,8 @@ class Mojo::Cookie::Response extends Mojo::Cookie {
         
         if ($attr eq "domain") {
           if ($value) {
-            my $value_ref = [$value];
-            Re->s($value_ref, "^\.", "");
-            $value = $value_ref->[0];
+            $value = copy $value;
+            Re->s((mutable string)$value, "^\.", "");
             $cookie->{domain} = $value;
           }
         }

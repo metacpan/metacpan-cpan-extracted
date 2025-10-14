@@ -2,7 +2,7 @@
 
 =head1 DESCRIPTION
 
-Make sure that custom destrurction is executed correctly.
+Make sure that custom destruction is executed correctly.
 
 =cut
 

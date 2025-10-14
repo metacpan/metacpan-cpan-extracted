@@ -30,38 +30,39 @@ BEGIN{
 
 # Still in package main
 
-{ my ($out, $err) = my_capture {
-    run_perlscript('-wE', '
-       package Foo::Clash1;
-       sub TitleA { 42 };
-       use Spreadsheet::Edit::Preload '.$opthash_comma.vis($main::tdata1_path->stringify).';
-       apply {
-         print "Visiting rx $rx TitleA=$TitleA\n";
-       };
-       ');
-  };
-  # All {debug} messages go to stderr
-  note "Err:$err\nOut:$out\n"; # if $debug;
-  like($err, qr/TitleA.*clash.*Existing.*sub/s, "Detect clash with sub name",
-       dvis 'ERR:$err\nOUT:$out\n');
-  (my $filtered_out = $out) =~ s/^\d+: .*\n//gm; # remove "btw" messages
-  if ($debug) {
-    note dvis 'ERR:$err\nOUT:$out\n';
-  } else {
-    is($filtered_out, "", "Clash diags should be on stderr, not stdout",
-       dvis 'ERR:$err\nOUT:$out\n');
-  }
-}
-
-{ my ($out, $err) = my_capture {
-    run_perlscript('-wE', '
-       package Foo::Clash1;
-       use Spreadsheet::Edit::Preload '.$opthash_comma.vis($main::withINC_path->stringify).';
-       ');
-  };
-  like($err, qr/INC.*clash.*Existing.*Array/s, "Detect clash with main::INC",
-       dvis 'ERR:$err\nOUT:$out\n')
-}
+##No longer works since :safe logic was removed (it was pointless).
+#{ my ($out, $err) = my_capture {
+#    run_perlscript('-wE', '
+#       package Foo::Clash1;
+#       sub TitleA { 42 };
+#       use Spreadsheet::Edit::Preload '.$opthash_comma.vis($main::tdata1_path->stringify).';
+#       apply {
+#         print "Visiting rx $rx TitleA=$TitleA\n";
+#       };
+#       ');
+#  };
+#  # All {debug} messages go to stderr
+#  note "Err:$err\nOut:$out\n"; # if $debug;
+#  like($err, qr/TitleA.*clash.*Existing.*sub/s, "Detect clash with sub name",
+#       dvis 'ERR:$err\nOUT:$out\n');
+#  (my $filtered_out = $out) =~ s/^\d+: .*\n//gm; # remove "btw" messages
+#  if ($debug) {
+#    note dvis 'ERR:$err\nOUT:$out\n';
+#  } else {
+#    is($filtered_out, "", "Clash diags should be on stderr, not stdout",
+#       dvis 'ERR:$err\nOUT:$out\n');
+#  }
+#}
+#
+#{ my ($out, $err) = my_capture {
+#    run_perlscript('-wE', '
+#       package Foo::Clash1;
+#       use Spreadsheet::Edit::Preload '.$opthash_comma.vis($main::withINC_path->stringify).';
+#       ');
+#  };
+#  like($err, qr/INC.*clash.*Existing.*Array/s, "Detect clash with main::INC",
+#       dvis 'ERR:$err\nOUT:$out\n')
+#}
 
 package Foo::Default;
 

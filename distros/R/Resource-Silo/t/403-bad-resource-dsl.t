@@ -96,18 +96,11 @@ subtest 'cleanup' => sub {
     } qr(^resource '\w+': .*\bfork_cleanup\b.*function), 'wrong cleanup method spec';
 
     throws_ok {
-        resource cleanup_wo_cache =>
-            cleanup                 => sub {},
-            ignore_cache            => 1,
-            init                    => sub {};
-    } qr(^resource '\w+':.*'cleanup\*'.*'ignore_cache'), 'cleanup incompatible with nocache';
-
-    throws_ok {
-        resource cleanup_wo_cache_2 =>
-            fork_cleanup            => sub {},
-            ignore_cache            => 1,
-            init                    => sub {};
-    } qr(^resource '\w+':.*'cleanup\*'.*'ignore_cache'), 'cleanup incompatible with nocache';
+        resource fork_safe_with_cleanup =>
+            init         => sub {},
+            fork_cleanup => sub {},
+            fork_safe    => 1;
+    } qr(^resource '\w+':.*.*mutually exclusive);
 };
 
 subtest 'dependencies' => sub {
@@ -203,9 +196,23 @@ subtest 'literal' => sub {
     } qr(^resource '\w+': 'literal'.*incompatible.*'class'), "literal + init = no go";
 };
 
+subtest 'check' => sub {
+    throws_ok {
+        resource check_1 =>
+            check           => {},
+            init            => sub {};
+    } qr(^resource '\w+': 'check' .*function), "bad self-check type";
+
+    throws_ok {
+        resource check_2 =>
+            check           => "function",
+            init            => sub {};
+    } qr(^resource '\w+': 'check' .*function), "bad self-check type (2)";
+};
+
 my $leftover = [ silo->ctl->meta->list ];
 is_deeply $leftover, [ 'dup' ]
-    , "no resources except the duplicate one present"
+    , "(overall self-check) no resources made it through, except the first copy of the duplicate one"
     or note explain $leftover;
 
 done_testing;

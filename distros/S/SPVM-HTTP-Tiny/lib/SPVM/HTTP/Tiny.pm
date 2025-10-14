@@ -1,6 +1,6 @@
 package SPVM::HTTP::Tiny;
 
-our $VERSION = "0.013";
+our $VERSION = "0.015";
 
 1;
 

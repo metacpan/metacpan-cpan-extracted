@@ -138,7 +138,7 @@ class Mojo::Headers {
   
   has buffer : StringBuffer;
   
-  has cache : List of string[];
+  has cache : string[][];
   
   # Class Methods
   static method new : Mojo::Headers () {
@@ -309,17 +309,16 @@ class Mojo::Headers {
   
   method links : Hash of Hash of string () {
     
-    my $header = $self->link // "";
+    my $header = (mutable string)copy($self->link // "");
     my $data   = (Hash of Hash of string)Hash->new;
     while (1) {
-      if (my $r = Re->s(my $_ = [$header], "^[,\s]*<(.+?)>", "")) {
-        $header = $_->[0];
+      if (my $r = Re->s($header, "^[,\s]*<(.+?)>", "")) {
         
         my $m = $r->match;
         my $target = $m->cap1;
         my $params_and_header = Mojo::Util->header_params($header);
         my $params = (Hash)$params_and_header->[0];
-        $header = (string)$params_and_header->[1];
+        $header = (mutable string)$params_and_header->[1];
         
         if (my $rel = $params->{"rel"}->(string)) {
           unless ($data->get($rel)) {
@@ -366,7 +365,7 @@ class Mojo::Headers {
     
     $self->{state} = "headers";
     $self->{buffer}->push($chunk);
-    my $headers = $self->{cache} //= List->new(new string[][0]);
+    my $headers = $self->{cache} //= new string[][0];
     my $buffer = $self->{buffer};
     my $size    = $self->max_line_size;
     my $lines   = $self->max_lines;
@@ -374,7 +373,7 @@ class Mojo::Headers {
     my $offset = 0;
     while (1) {
       
-      my $_ = Re->s($buffer, "^(.*?)\x0d?\x0a", "");
+      my $_ = Re->s((mutable string)$buffer->get_string, "^(.*?)\x0d?\x0a", "");
       
       unless ($_) {
         last;
@@ -384,33 +383,33 @@ class Mojo::Headers {
       $line_buffer->push($_->match->cap1);
       
       # Check line size limit
-      if ($offset > $size || $headers->length >= $lines) {
+      if ($offset > $size || @$headers >= $lines) {
         $self->{state} = "finished";
         $self->{limit} = 1;
         return;
       }
       
       # New header
-      if (my $_ = Re->m($line_buffer, "^(\S[^:]*):\s*(.*)$")) {
+      if (my $_ = Re->m($line_buffer->get_string, "^(\S[^:]*):\s*(.*)$")) {
         
         my $name = $_->cap1;
         my $value = $_->cap2;
         
-        $headers->push([$name, $value]);
+        List->new_ref($headers)->push([$name, $value]);
       }
       
       # Multi-line
-      elsif ((my $_ = Re->s($line_buffer, "^\s+", "")) && $headers->length) {
-        my $last_header = (string[])$headers->get($headers->length - 1);
+      elsif ((my $_ = Re->s((mutable string)$line_buffer->get_string, "^\s+", "")) && @$headers) {
+        my $last_header = (string[])$headers->[-1];
         my $last_header_value = $last_header->[1];
         $last_header->[1] = $last_header_value . " " . $line_buffer->to_string;
       }
       
       # Empty line
       else {
-        for (my $i = 0; $i < $headers->length; $i++) {
+        for (my $i = 0; $i < @$headers; $i++) {
           
-          my $items = (string[])$headers->get($i);
+          my $items = $headers->[$i];
           
           my $name = (string)undef;
           for (my $item_index = 0; $item_index < @$items; $item_index++) {
@@ -426,7 +425,7 @@ class Mojo::Headers {
         }
         
         $self->{state} = "finished";
-        $self->{cache} = StringList->new;
+        $self->{cache} = new string[][0];
         
         return;
       }

@@ -5,7 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
-  SPVM: '0.990084'
+  SPVM: '0.990102'
   SPVM::Resource::Zlib: '1.004'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
@@ -19,10 +19,10 @@ no_index:
     - t
     - inc
 requires:
-  SPVM: '0.990084'
+  SPVM: '0.990102'
   SPVM::Regex: '0.248'
   SPVM::Resource::Zlib: '1.004'
 resources:
   repository: https://github.com/yuki-kimoto/SPVM-Compress-Raw-Zlib.git
-version: '0.003'
+version: '0.004'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

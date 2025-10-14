@@ -13,7 +13,7 @@ use Statistics::Lite qw(median range stddevp mode);
 use Bio::ToolBox::Data;
 use Bio::ToolBox::utility qw(format_with_commas parse_list ask_user_for_index);
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 print "\n A tool for manipulating datasets in data files\n";
 
@@ -166,6 +166,7 @@ Row manipulation
   B  Delete rows with values (B)elow threshold
   S  Delete rows with (S)pecific values
   K  (K)eep only rows with specific values
+  E  Filter rows by feature l(E)ngth
   M  Add new unique na(M)e to each row
 Conversions
   U  Convert n(U)ll values to a specific value
@@ -186,15 +187,14 @@ Mathematical manipulation
   Z  Generate (Z)-score values of a column
   r  Generate a (r)atio between two columns
   d  Generate a (d)ifference between two columns
-  z  Generate a normali(z)ed difference between two columns
   e  Median c(e)nter row values
 File
   W  Re(W)rite the file
   x  E(x)port into a simple tab-delimited text file
-  i  Export a .cdt file for Treev(i)ew or Cluster analysis
   Y  Write out a mean summar(Y) profile of the data
 Other
   t  Print S(t)atistics on a column
+  k  Print length statistics of feature intervals
   V  (V)iew table contents
   h  (h)elp
   q  (q)uit, saving changes if necessary
@@ -202,7 +202,7 @@ Other
 MENU
 
 	# unlisted option: print this (m)enu
-	# unused letters: E F H jJ k
+	# unused letters: F H i jJ z
 	return 0;    # return 0, nothing done
 }
 
@@ -2243,11 +2243,6 @@ sub difference_function {
 
 	# Generate a new difference between two datasets
 
-	# Determine whether the difference should be normalized
-	# normalization divides the difference by the square root of the sum, an
-	# estimation of standard deviation
-	my $normalization = shift;    # pass a true value to normalize
-
 	# Request datasets
 	my ( $experiment_index, $control_index );
 	if ( defined $opt_numerator and defined $opt_denominator ) {
@@ -2264,16 +2259,8 @@ sub difference_function {
 	}
 	else {
 		# request from user
-		my $line;
-		if ($normalization) {
-			$line =
-				" Enter two dataset index numbers to generate the normalized difference\n"
+		my $line = " Enter two dataset index numbers to generate the difference\n"
 				. " as 'experiment, control'\n  ";
-		}
-		else {
-			$line = " Enter two dataset index numbers to generate the difference\n"
-				. " as 'experiment, control'\n  ";
-		}
 		( $experiment_index, $control_index ) = _request_indices($line);
 		unless ( defined $experiment_index and defined $control_index ) {
 			print " WARNING: unknown index number(s); nothing done\n";
@@ -2288,12 +2275,6 @@ sub difference_function {
 		# this was an automatically executed function
 		# and a new name was specified on the command line
 		$new_name = $opt_name;
-	}
-	elsif ($normalization) {
-		$new_name =
-			  $Data->name($experiment_index) . '_'
-			. $Data->name($control_index)
-			. '_normdiff';
 	}
 	else {
 		$new_name =
@@ -2311,24 +2292,7 @@ sub difference_function {
 
 			# calculate difference
 			if ( looks_like_number($e) and looks_like_number($c) ) {
-				my $diff = $e - $c;
-				if ($normalization) {
-
-					# determine a normalized difference value
-					my $sum = $e + $c;
-					if ( $sum == 0 ) {
-
-						# avoid pesky divide-by-0 errors, the difference is also 0
-						$row->value( $new_position, 0 );
-					}
-					else {
-						$row->value( $new_position, ( $diff / sqrt($sum) ) );
-					}
-				}
-				else {
-					# determine a straight difference value
-					$row->value( $new_position, $diff );
-				}
+				$row->value( $new_position, $e - $c );
 			}
 			else {
 				# can't do anything with non-numbers, new value will be null
@@ -2339,35 +2303,18 @@ sub difference_function {
 	);
 
 	# Annotate the new medadata hash
-	$Data->metadata( $new_position, 'method',
-		$normalization ? 'normalized_difference' : 'difference' );
+	$Data->metadata( $new_position, 'method', 'difference' );
 	$Data->metadata( $new_position, 'experiment', $Data->name($experiment_index) );
 	$Data->metadata( $new_position, 'control',    $Data->name($control_index) );
 
 	# Print conclusion
-	printf "%s difference between %s and %s\n generated as new column\n",
-		$normalization ? ' normalized' : q(), $Data->name($experiment_index),
-		$Data->name($control_index);
+	printf " difference between %s and %s\n generated as new column\n",
+		$Data->name($experiment_index), $Data->name($control_index);
 	if ($failure_count) {
 		print " $failure_count rows could not generate ratios\n";
 	}
 
 	return 1;
-}
-
-sub normalized_difference_function {
-
-	# Generate a normalized difference between two datasets
-
-	# this actually calls the difference_function subroutine
-	# pass a true value to force normalization
-	if ( difference_function(1) ) {
-		return 1;
-	}
-	else {
-		print " WARNING: unable to generate a normalized difference\n";
-		return 0;
-	}
 }
 
 sub add_function {
@@ -2596,6 +2543,49 @@ sub number_function {
 	return 1;
 }
 
+sub filter_length_function {
+
+	unless ( $Data->feature_type eq 'coordinate' or $Data->coord_column ) {
+		print " Data table does not have coordinates to filter! Nothing done.\n";
+		return 0;
+	}
+
+	# identify the thresholds
+	my ($min, $max);
+	if ( defined $opt_target ) {
+
+		# specified on the command line
+		($min, $max) = split /,|\-/, $opt_target, 2;
+	}
+	else {
+		# interactively ask the user
+		my $p = ' Enter the minimum,maximum range of lengths to keep:  ';
+		my $threshold = prompt($p);
+		($min, $max) = split /,|\-/, $threshold, 2;
+	}
+	unless ( defined $min and defined $max ) {
+		print " Both minimum and maximum lengths must be defined. Nothing done.\n";
+		return 0;
+	}
+
+	# identify features to delete
+	my @to_delete;
+	$Data->iterate( sub {
+		my $row    = shift;
+		my $length = $row->length;
+		if ( $length < $min or $length > $max ) {
+			push @to_delete, $row->row_index;
+		}
+	} );
+	if (@to_delete) {
+		$Data->delete_row(@to_delete);
+	}
+	printf " %d rows were deleted\n", scalar(@to_delete);
+	printf " %d rows with size %d-%d bp inclusive were retained\n", $Data->number_rows,
+		$min, $max;
+	return 1;
+}
+
 sub write_summary_function {
 
 	# this will write out a summary file of the data
@@ -2660,7 +2650,7 @@ sub export_function {
 	# this will export the file into an even simpler text format
 
 	# generate a possible new name based on the input name
-	my $possible_name = $Data->path . $Data->basename . '_out.txt';
+	my $possible_name = $Data->path . $Data->basename . '.tsv';
 
 	# determine the export file name
 	my $outfilename;
@@ -2699,176 +2689,6 @@ sub export_function {
 	}
 
 	# since no changes have been made to the data structure, return
-	return 0;
-}
-
-sub export_treeview_function {
-
-	# this is a specialized function to export a datafile into a format
-	# compatible with the Treeview program
-
-	print " Exporting CDT file for Treeview and Cluster analysis\n";
-
-	# First check for previous modifications
-	if ( $modification and not $function ) {
-		print " There are existing unsaved changes to the data. Do you want to\n";
-		my $p = ' save these first before making required, irreversible changes? y/n:  ';
-		my $answer = prompt($p);
-		if ( lc $answer eq 'y' ) {
-			rewrite_function();
-		}
-	}
-
-	# Set options for placement for subsequent manipulations
-	$opt_placement = 'r';
-
-	### Get user information for processing
-	# Identify the dataset columns
-	# we need one unique name column, and a range of data columns
-	# the rest will be deleted
-	my @datasets = _request_indices(
-		" Enter one unique name column, followed by a range of data columns  ");
-	unless (@datasets) {
-		print " WARNING: Unknown datasets. Nothing done.\n";
-		return 0;
-	}
-
-	# Identify the manipulations requested
-	my @manipulations;
-	if ($function) {
-
-		# automatic function, use the command line target option
-		@manipulations = split /,/, $opt_target;
-	}
-	else {
-		# ask the user
-		print <<LIST;
-Available dataset manipulations
-  su - decreasing sort by sum of row values
-  sm - decreasing sort by mean of row values
-  cg - median center features (genes)
-  cd - median center datasets
-  zd - convert dataset to Z-scores
-  pd - convert dataset to percentile rank
-  L2 - convert dataset to log2
-  L10 - convert dataset to log10
-  n0 - convert null values to 0 
-LIST
-		my $p      = 'Enter the manipulation(s) in order of desired execution: ';
-		my $answer = prompt($p);
-		@manipulations = split /[,\s]+/, $answer;
-	}
-
-	### First, delete extraneous datasets or columns
-	# the CDT format for Treeview expects a unique ID and NAME column
-	# we will duplicate the first column
-	unshift @datasets, $datasets[0];
-
-	# perform a reordering of the columns
-	$Data->reorder_column(@datasets);
-
-	# rename the first two columns
-	$Data->name( 0, 'ID' );
-	$Data->name( 1, 'NAME' );
-
-	# we now have just the columns we want
-	# reset the dataset indices to what we currently have
-	# name and ID should be index 0 and 1
-	@datasets = ( 2 .. $Data->last_column );
-
-	### Second, perform dataset manipulations
-	foreach (@manipulations) {
-		if (/^su$/i) {
-
-			# decreasing sort by sum of row values
-			$opt_target = 'sum';
-			combine_function(@datasets);
-			my $i = $Data->last_column;
-			$opt_direction = 'd';
-			sort_function($i);
-			$Data->delete_column($i);
-		}
-		elsif (/^sm$/i) {
-
-			# decreasing sort by sum of row values
-			$opt_target = 'mean';
-			combine_function(@datasets);
-			my $i = $Data->last_column;
-			$opt_direction = 'd';
-			sort_function($i);
-			$Data->delete_column($i);
-		}
-		elsif (/^cg$/i) {
-
-			# Median center features
-			print " median centering features....\n";
-			center_function(@datasets);
-		}
-		elsif (/^cd$/i) {
-
-			# Median center datasets
-			print " median centering datasets....\n";
-			$opt_target = 'median';
-			$opt_zero   = 1;
-			subtract_function(@datasets);
-		}
-		elsif (/^zd$/i) {
-
-			# Z-score convert dataset
-			print " converting datasets to Z-scores....\n";
-			zscore_function(@datasets);
-		}
-		elsif (/^pd$/i) {
-
-			# convert dataset to percentile rank
-			print " converting datasets to percentile ranks....\n";
-			percentile_rank_function(@datasets);
-		}
-		elsif (/^l2$/i) {
-
-			# convert dataset to log2 values
-			print " converting datasets to log2 values....\n";
-			log_function( 2, @datasets );
-		}
-		elsif (/^l10$/i) {
-
-			# convert dataset to log10 values
-			print " converting datasets to log10 values....\n";
-			log_function( 10, @datasets );
-		}
-		elsif (/^n0$/i) {
-
-			# convert nulls to 0
-			print " converting null values to 0.0....\n";
-			$opt_target = '0.0';
-			$opt_zero   = 1 unless defined $opt_zero;    # convert 0s too
-			convert_nulls_function(@datasets);
-		}
-		else {
-			print " WARNING: unknown manipulation '$_'!\n";
-		}
-	}
-
-	### Third, export a simple file
-	if ($outfile) {
-		unless ( $outfile =~ /\.cdt$/i ) {
-
-			# make sure it has .cdt extension
-			$outfile .= '.cdt';
-		}
-	}
-	else {
-		# generate file name
-		$outfile = $Data->path . $Data->basename . '.cdt';
-	}
-	$gz = 0;
-	export_function();
-
-	### Finally, reset the modification status
-	# We don't to record these changes upon exit as they are specific to
-	# exporting for treeview, any pre-existing changes should have been
-	# saved earlier
-	$modification = 0;
 	return 0;
 }
 
@@ -3031,6 +2851,31 @@ sub addname_function {
 	return 1;
 }
 
+sub print_length_statistics_function {
+
+	unless ( $Data->feature_type eq 'coordinate' or $Data->coord_column ) {
+		print " Data table does not have coordinates to calculate lengths\n";
+		return 0;
+	}
+	my @lengths;
+	$Data->iterate( sub {
+		push @lengths, shift->length;
+	} );
+	
+	# calculate and print the statistics
+	print " Statistics on intervals lengths:\n";
+	my $sum = sum0(@lengths);
+	printf "   count    = %d\n", scalar(@lengths);
+	printf "   mean     = %.1f\n", $sum / ( scalar(@lengths) || 1 );
+	printf "   median   = %.1f\n", median(@lengths);
+	printf "   std dev  = %.1f\n", stddevp(@lengths);
+	printf "   min      = %d\n", min(@lengths);
+	printf "   max      = %d\n", max(@lengths);
+	printf "   mode     = %d\n", mode(@lengths);
+	printf "   sum      = %d\n", $sum;
+	return 0;
+}
+
 sub rewrite_function {
 
 	# check output file name
@@ -3111,52 +2956,52 @@ sub _get_letter_to_function_hash {
 	# the key is the menu letter
 	# the value is the function name
 	return (
-		't' => "stat",
-		'R' => "reorder",
-		'D' => "delete",
-		'n' => "rename",
-		'b' => "number",
-		'C' => "concatenate",
-		'T' => "split",
-		'O' => "coordinate",
-		'o' => "sort",
-		'g' => "gsort",
-		'N' => "null",
-		'P' => "duplicate",
-		'A' => "above",
-		'B' => "below",
-		'S' => "specific",
-		'K' => "keep",
-		'M' => "addname",
-		'U' => "cnull",
-		'G' => "absolute",
-		'I' => "minimum",
-		'X' => "maximum",
-		'a' => "add",
-		'u' => "subtract",
-		'y' => "multiply",
-		'v' => "divide",
-		's' => "scale",
-		'p' => "pr",
-		'Z' => "zscore",
-		'l' => "log",
-		'L' => "delog",
-		'f' => "format",
-		'c' => "combine",
-		'r' => "ratio",
-		'd' => "diff",
-		'z' => "normdiff",
-		'e' => "center",
-		'w' => "new",
-		'Y' => "summary",
-		'x' => "export",
-		'W' => "rewrite",
-		'i' => "treeview",
-		'h' => "help",
-		'V' => "view",
-		'q' => "write_quit",
-		'Q' => "quit",
-		'm' => "menu",
+		't' => 'stat',
+		'k' => 'lengthstat',
+		'R' => 'reorder',
+		'D' => 'delete',
+		'n' => 'rename',
+		'b' => 'number',
+		'C' => 'concatenate',
+		'T' => 'split',
+		'O' => 'coordinate',
+		'o' => 'sort',
+		'g' => 'gsort',
+		'N' => 'null',
+		'P' => 'duplicate',
+		'A' => 'above',
+		'B' => 'below',
+		'S' => 'specific',
+		'K' => 'keep',
+		'E' => 'lengthfilt',
+		'M' => 'addname',
+		'U' => 'cnull',
+		'G' => 'absolute',
+		'I' => 'minimum',
+		'X' => 'maximum',
+		'a' => 'add',
+		'u' => 'subtract',
+		'y' => 'multiply',
+		'v' => 'divide',
+		's' => 'scale',
+		'p' => 'pr',
+		'Z' => 'zscore',
+		'l' => 'log',
+		'L' => 'delog',
+		'f' => 'format',
+		'c' => 'combine',
+		'r' => 'ratio',
+		'd' => 'diff',
+		'e' => 'center',
+		'w' => 'new',
+		'Y' => 'summary',
+		'x' => 'export',
+		'W' => 'rewrite',
+		'h' => 'help',
+		'V' => 'view',
+		'q' => 'write_quit',
+		'Q' => 'quit',
+		'm' => 'menu',
 	);
 }
 
@@ -3167,6 +3012,7 @@ sub _get_function_to_subroutine_hash {
 	# the value is a scalar reference to the subroutine
 	return (
 		'stat'        => \&print_statistics_function,
+		'lengthstat'  => \&print_length_statistics_function,
 		'reorder'     => \&reorder_function,
 		'delete'      => \&delete_function,
 		'rename'      => \&rename_function,
@@ -3182,6 +3028,7 @@ sub _get_function_to_subroutine_hash {
 		'below'       => \&toss_below_threshold_function,
 		'specific'    => \&toss_specific_values_function,
 		'keep'        => \&keep_specific_values_function,
+		'lengthfilt'  => \&filter_length_function,
 		'addname'     => \&addname_function,
 		'cnull'       => \&convert_nulls_function,
 		'absolute'    => \&convert_absolute_function,
@@ -3202,13 +3049,11 @@ sub _get_function_to_subroutine_hash {
 		'combine'     => \&combine_function,
 		'ratio'       => \&ratio_function,
 		'diff'        => \&difference_function,
-		'normdiff'    => \&normalized_difference_function,
 		'center'      => \&center_function,
 		'new'         => \&new_column_function,
 		'summary'     => \&write_summary_function,
 		'export'      => \&export_function,
 		'rewrite'     => \&rewrite_function,
-		'treeview'    => \&export_treeview_function,
 		'view'        => \&view_function,
 		'help'        => \&print_online_help,
 		'menu'        => \&print_menu,
@@ -3423,11 +3268,11 @@ manipulate_datasets.pl [--options ...] <filename>
   Non-interactive functions:
   -f --func [ reorder | delete | rename | new | number | concatenate | 
               split | coordinate | sort | gsort | null | duplicate | 
-              above | below | specific | keep | addname | cnull | 
-              absolute | minimum | maximum | log | delog | format | pr | 
-              add | subtract | multiply | divide | combine | scale | 
-              zscore | ratio | diff | normdiff | center | rewrite | 
-              export | treeview | summary | stat ]
+              above | below | specific | keep | lengthfilt | addname | 
+              cnull | absolute | minimum | maximum | log | delog | format | 
+              pr | add | subtract | multiply | divide | combine | scale | 
+              zscore | ratio | diff | center | rewrite | export | 
+              summary | stat | lengthstat ]
   -x --index <integers>             column index to work on
   
   Operation options:
@@ -3494,12 +3339,11 @@ The program is designed to be run interactively. However, single manipulations
 may be performed on single datasets by specifying a function name and any 
 other required options. These functions include the following.
   
-B<reorder> B<delete> B<rename> B<new> B<number> B<concatenate>
-B<split> B<coordinate> B<sort> B<gsort> B<null> B<duplicate> B<above>
-B<below> B<specific> B<keep> B<cnull> B<absolute> B<minimum>
-B<maximum> B<log> B<delog> B<format> B<pr> B<add> B<subtract>
-B<multiply> B<divide> B<combine> B<scale> B<zscore> B<ratio> B<diff>
-B<normdiff> B<center> B<rewrite> B<export> B<treeview> B<summary> B<stat>
+B<reorder delete rename new number concatenate split coordinate>
+B<sort gsort null duplicate above below specific keep lengthfilt addname>
+B<cnull absolute minimum maximum log delog format pr>
+B<add subtract multiply divide combine scale zscore ratio diff center>
+B<rewrite export summary stat lengthstat>
   
 Refer to the FUNCTIONS section for details.
 
@@ -3547,7 +3391,7 @@ or 'n'):
   - (r)eplace the original column with new values
   - add as a (n)ew column
 
-Defaults to new placement when executed automatically using the --func 
+Defaults to new placement when executed automatically using the C<--func> 
 option, or prompts the user when executed interactively.
 
 =item --(no)zero
@@ -3568,7 +3412,7 @@ Specify the direction of a sort:
 
 Specify a new column name when re-naming a column using the rename function 
 from the command line. Also, when generating a new column using a defined 
-function (--func <function>) from the command line, the new column will use 
+function C<--func [function]> from the command line, the new column will use 
 this name.
 
 =item --log 
@@ -3615,12 +3459,6 @@ manipulations to be performed. Alternatively, single manipulations may be
 performed as specified using command line options. As such, the program can
 be called in shell scripts.
 
-Note that the datafile is loaded entirely in memory. For extremely large 
-datafiles, e.g. binned genomic data, it may be best to first split the 
-file into chunks (use C<split_data_file.pl>), perform the manipulations, 
-and recombine the file (use C<join_data_file.pl>). This could be done 
-through a simple shell script.
-
 The program keeps track of the number of manipulations performed, and if 
 any are performed, will write out to file the changed data. Unless an 
 output file name is provided, it will overwrite the input file (NO backup is
@@ -3630,7 +3468,7 @@ made!).
 
 This is a list of the functions available for manipulating columns. These may 
 be selected interactively from the main menu (note the case sensitivity!), 
-or specified on the command line using the --func option.
+or specified on the command line using the C<--func> option.
 
 =over 4
 
@@ -3639,6 +3477,11 @@ or specified on the command line using the --func option.
 Print some basic statistics for a column, including mean, 
 median, standard deviation, min, and max. If 0 values are present,
 indicate whether to include them (y or n)
+
+=item B<lengthstat> (menu option B<k>)
+
+Print basic statistics on interval lengths represented by the
+data table, which must include coordinate information.
 
 =item B<reorder> (menu option B<R>)
 
@@ -3653,9 +3496,9 @@ One or more column may be selected for deletion.
 
 =item B<rename> (menu option B<n>)
 
-Assign a new name to a column. For automatic execution, use the --name 
+Assign a new name to a column. For automatic execution, use the C<--name> 
 option to specify the new name. Also, for any automatically executed 
-function (using the --func option) that generates a new column, the 
+function (using the C<--func> option) that generates a new column, the 
 column's new name may be explicitly defined with this option.
 
 =item B<number> (menu option B<b>)
@@ -3668,14 +3511,14 @@ column index.
 
 Concatenate the values from two or more columns into a single new 
 column. The character used to join the values may be specified 
-interactively or by the command line option --target (default is '_' 
+interactively or by the command line option C<--target> (default is '_' 
 in automatic execution mode). The new column is appended at the end.
 
 =item B<split> (menu option B<T>)
 
 Split a column into two or more new columns using a specified character 
 as the delimiter. The character may be specified interactively or 
-with the --target command line option (default is '_' in automatic 
+with the C<--target> command line option (default is '_' in automatic 
 execution mode). The new columns are appended at the end. If the 
 number of split items are not equal amongst the rows, absent values 
 are appended with null values.
@@ -3690,16 +3533,20 @@ in making unique identifiers or working with genome browsers.
 =item B<sort> (menu option B<o>)
 
 The entire data table is sorted by a specific column, or by the 
-mean of a list of columns if more than one is provided. The first
-datapoint is checked for the presence of letters, and the data 
-table is then sorted either asciibetically or numerically. The 
-direction of sort, (i)ncreasing or (d)ecreasing, is requested. 
+mean of a list of (numeric only) columns if more than one is provided.
+A natural sort is employed, such that embedded numbers in a string
+are taken into account during sorting. The direction of sort,
+(i)ncreasing or (d)ecreasing, is requested. 
 
 =item B<gsort> (menu option B<g>)
 
 The entire data table is sorted by increasing genomic position, 
-first by chromosome then by start position. These columns must exist 
-and have recognizable names (e.g. 'chromo', 'chromosome', 'start').
+first by chromosome then by start position, then by end position
+(shortest length first). For GFF flavored files, however, features
+are sorted by decreasing length to accomodate parent features and
+tabix indexing. A sane chromosome sort order is employed that
+recognizes numeric values (including Roman numerals). Coordinate
+columns must exist.
 
 =item B<null> (menu option B<N>)
 
@@ -3707,7 +3554,7 @@ Delete rows that contain a null value in one or more
 columns. Some of the other functions may not work properly if
 a non-value is present. If 0 values are present, indicate whether
 to toss them (y or n). This may also be specified as a command line 
-option using the --except flag.
+option using the C<--except> flag.
 
 =item B<duplicate> (menu option B<P>)
 
@@ -3721,21 +3568,21 @@ deleted, always leaving the first row.
 Delete rows with values that are above a certain threshold value. 
 One or more columns may be selected to test values for the 
 threshold. The threshold value may be requested interactively or 
-specified with the --target option.
+specified with the C<--target> option.
 
 =item B<below> (menu option B<B>)
 
 Delete rows with values that are below a certain threshold value. 
 One or more columns may be selected to test values for the 
 threshold. The threshold value may be requested interactively or 
-specified with the --target option.
+specified with the C<--target> option.
 
 =item B<specific> (menu option B<S>)
 
 Delete rows with values that contain a specific value, either text 
 or number. One or more columns may be selected to check for values. 
 The specific values may be selected interactively from a list or 
-specified with the --target option.
+specified with the C<--target> option.
 
 =item B<keep> (menu option B<K>)
 
@@ -3744,20 +3591,28 @@ either text or number. One or more columns may be selected to check
 for values. The specific values may be selected interactively from a 
 list or specified with the --target option.
 
+=item B<lengthfilt> (menu option B<E>)
+
+Filter rows by their interval length. Input files must have coordinate
+columns (start and stop). Only rows with a length between specified
+minimum and maximum (inclusive) are retained; everything else is
+removed. The threshold values may specified interactively or specified
+as C<[minimum],[maxmimum]> with the C<--target> option.
+
 =item B<addname> (menu option B<M>)
 
 Add or update the name of each feature or row. If the data table 
 already has a Name column, the value will be updated. Otherwise a 
 new column will be added. The name will be a text prefix followed 
 by an integer (row index). The prefix may be defined by setting the 
---target option, interactively provided by the user, or taken from 
+C<--target> option, interactively provided by the user, or taken from 
 the general table feature metadata.
 
 =item B<cnull> (menu option B<U>)
 
 Convert null values to a specific value. One or more columns may 
 be selected to convert null values. The new value may be requested 
-interactively or defined with the --target option.  
+interactively or defined with the C<--target> option.  
 
 =item B<absolute> (menu option B<G>)
 
@@ -3769,14 +3624,14 @@ more columns may be selected to convert.
 Reset datapoints whose values are less than a specified minimum 
 value to the minimum value. One or more columns may be selected 
 to reset values to the minimum. The minimum value may be requested 
-interactively or specified with the --target option. 
+interactively or specified with the C<--target> option. 
 
 =item B<maximum> (menu option B<X>)
 
 Reset datapoints whose values are greater than a specified maximum 
 value to the maximum value. One or more columns may be selected 
 to reset values to the maximum. The maximum value may be requested 
-interactively or specified with the --target option. 
+interactively or specified with the C<--target> option. 
 
 =item B<add> (menu option B<a>)
 
@@ -3784,7 +3639,7 @@ Add a value to a column. A real number may be supplied, or the words
 'mean', 'median', or 'sum' may be entered as a proxy for those statistical
 values of the column. The column may either be replaced or added
 as a new one. For automatic execution, specify the number using the
---target option.
+C<--target> option.
 
 =item B<subtract> (menu option B<u>)
 
@@ -3792,7 +3647,7 @@ Subtract a value from a column. A real number may be supplied, or the words
 'mean', 'median', or 'sum' may be entered as a proxy for those statistical
 values of the column. The column may either be replaced or added
 as a new one. For automatic execution, specify the number using the
---target option.
+C<--target> option.
 
 =item B<multiply> (menu option B<y>)
 
@@ -3800,7 +3655,7 @@ Multiply a column by a value. A real number may be supplied, or the words
 'mean', 'median', or 'sum' may be entered as a proxy for those statistical
 values of the column. The column may either be replaced or added
 as a new one. For automatic execution, specify the number using the
---target option.
+C<--target> option.
 
 =item B<divide> (menu option B<v>)
 
@@ -3808,7 +3663,7 @@ Divide a column by a value. A real number may be supplied, or the words
 'mean', 'median', or 'sum' may be entered as a proxy for those statistical
 values of the column. The column may either be replaced or added
 as a new one. For automatic execution, specify the number using the
---target option.
+C<--target> option.
 
 =item B<scale> (menu option B<s>)
 
@@ -3817,7 +3672,7 @@ with other columns. The current median of the column requested is
 presented, and a new median target is requested. The column may 
 either be replaced with the median scaled values or added as a new 
 column. For automatic execution, specify the new median target 
-with the --target option.
+with the C<--target> option.
 
 =item B<pr> (menu option B<p>)
 
@@ -3839,13 +3694,13 @@ with disparate dynamic ranges.
 
 A column may be converted to log values. The column may either 
 be replaced with the log values or added as a new column. Use 
-the --target option to specify the base (usually 2 or 10).
+the C<--target> option to specify the base (usually 2 or 10).
 
 =item B<delog> (menu option B<L>)
 
 A column that is currently in log space may be converted back to
 normal numbers. The column may either be replaced with the 
-new values or added as a new column. Use the --target option to 
+new values or added as a new column. Use the C<--target> option to 
 specify the base (usually 2 or 10). The base may be obtained from the 
 metadata.
 
@@ -3853,7 +3708,7 @@ metadata.
 
 Format the numbers of a column to a given number of decimal places. 
 An integer must be provided. The column may either be replaced or 
-added as a new column. For automatic execution, use the --target 
+added as a new column. For automatic execution, use the C<--target> 
 option to specify the number decimal places.
 
 =item B<combine> (menu option B<c>)
@@ -3861,7 +3716,7 @@ option to specify the number decimal places.
 Mathematically combine the data values in two or more columns. The 
 methods for combining the values include mean, median, min, max, 
 stdev, or sum. The method may be specified on the command line 
-using the --target option. The combined data values are added as a 
+using the C<--target> option. The combined data values are added as a 
 new column.
 
 =item B<ratio> (menu option B<r>)
@@ -3881,34 +3736,21 @@ values in the 'experimental' column and recorded as a new column.
 For enumerated columns (e.g. tag counts from Next Generation 
 Sequencing), the columns should be subsampled to equalize the sums 
 of the two columns. The indices for the experimental and control columns 
-may either requested from the user or supplied by the --exp and 
---con command line options. 
-
-=item B<normdiff> (menu option B<z>)
-
-A normalized difference is generated between two existing columns. 
-The difference between 'control' and 'experimental' column values 
-is divided by the square root of the sum (an approximation of the 
-standard deviation). This is supposed to yield fewer false positives
-than a simple difference (see Nix et al, BMC Bioinformatics, 2008).
-For enumerated datasets (e.g. tag counts from Next Generation 
-Sequencing), the datasets should be subsampled to equalize the sums 
-of the two datasets. The indices for the experimental and control columns 
-may either requested from the user or supplied by the --exp and 
---con command line options. 
+may either requested from the user or supplied by the C<--exp> and 
+C<--con> command line options. 
 
 =item B<center> (menu option B<e>)
 
 Center normalize the datapoints in a row by subtracting the mean or
 median of the datapoints. The range of columns is requested or 
-provided by the --index option. Old values are replaced by new 
+provided by the C<--index> option. Old values are replaced by new 
 values. This is useful for visualizing data as a heat map, for example.
 
 =item B<new> (menu option B<w>)
 
 Generate a new column which contains an identical value for 
 each datapoint (row). The value may be either requested interactively or 
-supplied using the --target option. This function may be useful for 
+supplied using the C<--target> option. This function may be useful for 
 assigning a common value to all of the data points before joining the 
 data file with another.
 
@@ -3923,49 +3765,25 @@ column has start and stop metadata. The program will automatically
 identify available columns to summarize based on their name. In 
 interactive mode, it will request the contiguous range of start and 
 ending columns to summarize. The contiguous columns may also be 
-indicated using the --index option. The method of summarizing the 
-data can be specified interactively or with the --target option. 
+indicated using the C<--index> option. The method of summarizing the 
+data can be specified interactively or with the C<--target> option. 
 Methods include 'mean' (default), 'median', or 'trimmean', where
 the top and bottom 1% of values are discarded and a mean determined
 from the remaining 98% of values. By default, a new file using the 
 input file base name appended with '_<method>_summary' is written, or
-a filename may be specified using the --out option.
+a filename may be specified using the C<--out> option.
 
 =item B<export> (menu option B<x>)
 
-Export the data into a simple tab-delimited text file that contains no 
-metadata or header information. Non-values '.' are converted to  
-true nulls. If an output file name is specified using the --outfile 
+Export the data into a simple tab-delimited F<.tsv> text file that contains
+no metadata or header information. Non-values '.' are converted to  
+true nulls. If an output file name is specified using the C<--outfile> 
 option, it will be used. Otherwise, a possible filename will be 
 suggested based on the input file name. If any modifications are 
 made to the data structure, a normal data file will still be written. 
 Note that this could overwrite the exported file if the output file name
 was specified on the command line, as both file write subroutines will 
 use the same name!
-
-=item B<treeview> (menu option B<i>)
-
-Export the data to the CDT format compatible with both Treeview and 
-Cluster programs for visualizing and/or generating clusters. Specify the 
-columns containing a unique name and the columns to be analyzed (e.g. 
---index <name>,<start-stop>). Extraneous columns are removed. 
-Additional manipulations on the columns may be performed prior to 
-exporting. These may be chosen interactively or using the codes 
-listed below and specified using the --target option.
-  
-  su - decreasing sort by sum of row values
-  sm - decreasing sort by mean of row values
-  cg - median center features (rows)
-  cd - median center datasets (columns)
-  zd - convert columns to Z-scores
-  pd - convert columns to percentile ranks
-  L2 - convert values to log2
-  L10 - convert values to log10
-  n0 - convert nulls to 0.0
-
-A simple Cluster data text file is written (default file name 
-"<basename>.cdt"), but without the GWEIGHT column or EWEIGHT row. The 
-original file will not be rewritten.
 
 =item B<rewrite> (menu option B<W>)
 

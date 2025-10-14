@@ -2,11 +2,14 @@
 
 use warnings;
 use strict;
+use FindBin qw($Bin);
 
 my @run = ("git-shell", @ARGV);
 if (my $ipc = $ENV{IPC}) {
+    my $tracer = "$Bin/iotrace";
+    $tracer = "/usr/bin/strace" if -x "/usr/bin/strace";
     # Using strace -f imposes the danger of split brain trace logs.
-    exec strace => -v => -s => 32768 => -tt => -e => "execve,clone,open,read,write" => -o => "$ipc/log.trace" => @run;
-    # If strace fails to launch, then continue on to @run anyways
+    exec $tracer => -v => -s => 32768 => -tt => -e => "execve,clone,openat,close,read,write" => -o => "$ipc/log.trace" => @run;
+    # If strace or iotrace fail to launch, then continue on to @run anyways
 }
 exec @run or die "exec: Failed to spawn! $!\n";

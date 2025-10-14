@@ -2,7 +2,7 @@ package Resource::Silo::Container;
 
 use strict;
 use warnings;
-our $VERSION = '0.1203';
+our $VERSION = '0.1501';
 
 =head1 NAME
 
@@ -51,6 +51,10 @@ sub BUILD {
     my $spec = $Resource::Silo::metadata{ref $self}
         // _silo_find_metaclass($self);
 
+    # TODO Carp doesn't seem to work correctly from constructor with either Moo or Moose,
+    #      but at least we now generate pointers to where the offending resources are declared
+    $spec->run_pending_checks;
+
     $self->{-spec} = $spec;
     $self->{-pid} = $$;
 
@@ -63,7 +67,8 @@ sub BUILD {
 sub DEMOLISH {
     my $self = shift;
     delete $active_instances{ refaddr $self };
-    $self->ctl->cleanup;
+    $self->ctl->cleanup
+        if $self->{-spec};
 };
 
 # As container instances inside the silo() function will be available forever,
@@ -94,21 +99,15 @@ Example:
     silo->ctl->override( dbh => $fake_database_connection );
     silo->ctl->lock; # forbid instantiating new resources
 
-Returns a facade object.
-
-B<NOTE> Such object contains a weak reference to the parent object
-and thus must not be saved anywhere, lest you be surprised.
-Use it and discard immediately.
+Returns a facade object referencing the original container.
 
 =cut
 
 sub ctl {
     my $self = shift;
-    my $facade = bless \$self, 'Resource::Silo::Container::Dashboard';
-    weaken $$facade;
-    confess "Attempt to close over nonexistent value"
-        unless $$facade;
-    return $facade;
+    return bless \$self, 'Resource::Silo::Container::Dashboard';
+    # 'Clever' weaken-ing code was here
+    # Please don't do this again, it's unnecessary
 };
 
 # Instantiate resource $name with argument $argument.
@@ -136,9 +135,6 @@ sub _silo_instantiate_res {
             and !$spec->{derived}
             and !$self->{-override}{$name};
 
-    self->_silo_unexpected_dep($name)
-        if ($self->{-allow} && !$self->{-allow}{$name});
-
     # Detect circular dependencies
     my $key = $name . (length $arg ? "/$arg" : '');
     if ($self->{-pending}{$key}) {
@@ -157,36 +153,53 @@ sub _silo_instantiate_res {
     local $self->{-pending}{$key} = 1;
     local $self->{-allow} = $spec->{allowdeps};
 
-    ($self->{-override}{$name} // $spec->{init})->($self, $name, $arg)
-        // croak "Instantiating resource '$key' $spec->{origin} failed for no apparent reason";
+    my $init = $self->{-override}{$name} // $spec->{init};
+    my $entity = $init->($self, $name, $arg);
+    if (!defined $entity) {
+        return $entity if ($spec->{nullable});
+        croak "Instantiating resource '$key' $spec->{origin} returned undef for no apparent reason";
+    }
+    $spec->{check}->($self, $entity, $name, $arg)
+        if $spec->{check};
+    return $entity;
 };
 
 # use instead of delete $self->{-cache}{$name}
 sub _silo_cleanup_res {
-    my ($self, $name, @list) = @_;
+    my ($self, $name, %opt) = @_;
 
     # TODO Do we need to validate arguments here?
     my $spec = $self->{-spec}{resource}{$name};
+
+    return if $opt{fork} and not $opt{force} and $spec->{fork_safe};
+
+    # NOTE Be careful! cleanup must never ever die!
 
     my $action;
     if (!$self->{-override}{$name}) {
         # 1) skip resources that have overrides
         # 2) if we're in "no pid" mode, use fork_cleanup if available
-        $action = $self->{-pid} != $$
-            && $spec->{fork_cleanup}
-            || $spec->{cleanup};
+        $action = $opt{fork} ? $spec->{fork_cleanup} : $spec->{cleanup};
     };
     my $known = $self->{-cache}{$name};
 
-    @list = keys %$known
-        unless @list;
+    my @list = keys %$known;
 
-    foreach my $arg (@list) {
-        $arg //= '';
-        next unless defined $known->{$arg};
-        $action->($known->{$arg}) if $action;
-        delete $known->{$arg};
+    if ($action) {
+        foreach my $arg (@list) {
+            local $@; # don't pollute $@ if we're in destructor after an exception
+            eval {
+                $action->($known->{$arg});
+                1;
+            } or do {
+                my $err = $@;
+                Carp::cluck "Failed to cleanup resource '$name/$arg', but trying to continue: $err";
+            };
+        };
     };
+
+    # This will trigger the normal destructor(s) on resource instances, if any
+    delete $self->{-cache}{$name};
 };
 
 # We must create resource accessors in this package
@@ -195,20 +208,13 @@ sub _silo_cleanup_res {
 sub _silo_make_accessor {
     my ($name, $spec) = @_;
 
-    if ($spec->{ignore_cache}) {
-        return sub {
-            my ($self, $arg) = @_;
-            return $self->_silo_instantiate_res($name, $arg);
-        };
-    };
-
     return sub {
         my ($self, $arg) = @_;
 
         # If there was a fork, flush cache
-        if ($self->{-pid} != $$) {
-            $self->ctl->cleanup;
-            $self->{-pid} = $$;
+        if ($self->{-pid} != (my $pid = $$)) {
+            $self->ctl->_cleanup( fork => 1 );
+            $self->{-pid} = $pid;
         };
 
         # We must check dependencies even before going to the cache
@@ -218,7 +224,10 @@ sub _silo_make_accessor {
         # Stringify $arg ASAP, we'll validate it inside _silo_instantiate_res().
         # The cache entry for an invalid argument will never get populated.
         my $key = defined $arg && !ref $arg ? $arg : '';
-        $self->{-cache}{$name}{$key} //= $self->_silo_instantiate_res($name, $arg);
+        if (!exists $self->{-cache}{$name}{$key}) {
+            $self->{-cache}{$name}{$key} = $self->_silo_instantiate_res($name, $arg);
+        };
+        return $self->{-cache}{$name}{$key};
     };
 };
 
@@ -326,6 +335,8 @@ sub override {
     my ($self, %subst) = @_;
 
     $$self->_silo_check_overrides(\%subst);
+    $self->_cleanup( fork => 1 )
+        if $$ != $$self->{-pid};
     $$self->_silo_do_override(\%subst);
 
     return $self;
@@ -377,7 +388,7 @@ sub preload {
 
     my $meta = $$self->{-spec};
 
-    $meta->self_check;
+    $meta->preload;
 
     my $list = $meta->{preload};
     for my $name (@$list) {
@@ -396,7 +407,18 @@ Typically only useful for destruction.
 =cut
 
 sub cleanup {
-    my $self = ${ $_[0] };
+    my $self = shift;
+    # Don't give the user access to options (yet)
+
+    my @opt;
+    push @opt, fork => 1, force => 1 if $$ != $$self->{-pid};
+
+    $self->_cleanup(@opt);
+}
+
+sub _cleanup {
+    my $self = ${ +shift };
+    my %opt = @_;
     local $self->{-cleanup} = 1; # This is stronger than lock.
 
     # NOTE Be careful! cleanup must never ever die!
@@ -406,21 +428,11 @@ sub cleanup {
         $spec->{$a}{cleanup_order} <=> $spec->{$b}{cleanup_order};
     } keys %{ $self->{-cache} };
 
+
     foreach my $name (@order) {
-        local $@; # don't pollute $@ if we're in destructor after an exception
-        eval {
-            # We cannot afford to die here as if we do
-            #    a resource that causes exceptions in cleanup
-            #    would be stuck in cache forever
-            $self->_silo_cleanup_res($name);
-            1;
-        } or do {
-            my $err = $@;
-            Carp::cluck "Failed to cleanup resource '$name', but trying to continue: $err";
-        };
+        $self->_silo_cleanup_res($name, %opt);
     };
 
-    delete $self->{-cache};
     return $_[0];
 };
 

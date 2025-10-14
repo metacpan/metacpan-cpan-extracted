@@ -1,0 +1,519 @@
+NAME
+    Task::MemManager::Device - Device-specific memory management extensions
+    for Task::MemManager
+
+VERSION
+    version 0.02
+
+SYNOPSIS
+        use Task::MemManager::Device;
+    
+        # Use default NVIDIA_GPU device
+        my $buffer = Task::MemManager->new(1000, 4);
+    
+        # Map buffer to GPU
+        $buffer->device_movement(
+            action    => 'enter',
+            direction => 'to',
+            device    => 'NVIDIA_GPU',
+            device_id => 0
+        );
+    
+        # Perform GPU operations (using your C code)
+        my_gpu_function($buffer->get_buffer, $buffer->get_buffer_size);
+    
+        # Update buffer from GPU back to CPU
+        $buffer->device_movement(
+            action    => 'update',
+            direction => 'from'
+        );
+    
+        # Exit and deallocate from GPU
+        $buffer->device_movement(
+            action    => 'exit',
+            direction => 'from'
+        );
+
+DESCRIPTION
+    Task::MemManager::Device extends the "Task::MemManager" module by
+    providing device-specific memory management capabilities, particularly
+    for GPU computing using OpenMP target directives. It enables seamless
+    data movement between CPU and GPU memory spaces, supporting various
+    mapping strategies (to, from, tofrom, alloc) and update operations.
+
+    The module dynamically generates device-specific modules using Inline::C
+    and OpenMP pragmas, allowing for flexible device support. By default, it
+    provides NVIDIA GPU support with appropriate compilation flags, but can
+    be extended to support AMD GPUs and other devices.
+
+    Device modules are automatically loaded and compiled on first use, with
+    the generated code cached by Inline::C for subsequent runs. Each device
+    module implements a set of standard functions for entering data regions,
+    exiting data regions, and updating data between host and device.
+
+LOADING THE MODULE
+    The module can be loaded with or without specifying device modules:
+
+        # Load with default NVIDIA_GPU device
+        use Task::MemManager::Device;
+    
+        # Load with specific devices
+        use Task::MemManager::Device qw(NVIDIA_GPU AMD_GPU);
+    
+        # Load via Task::MemManager with device specification
+        use Task::MemManager Device => ['NVIDIA_GPU'];
+    
+        # Combine with allocator and view specifications
+        use Task::MemManager
+            Allocator => 'CMalloc',
+            View      => 'PDL',
+            Device    => 'NVIDIA_GPU';
+
+METHODS
+  device_movement
+        $buffer->device_movement(%options);
+
+    Manages data movement between CPU and device (GPU) memory spaces using
+    OpenMP target directives. This is the primary method for controlling
+    data placement and updates.
+
+    Parameters:
+
+    *   "action" - The type of operation to perform. Required. One of:
+
+        *   'enter' - Begin a data mapping region (allocate on device,
+            optionally copy)
+
+        *   'exit' - End a data mapping region (optionally copy back,
+            deallocate)
+
+        *   'update' - Update data between host and device without changing
+            mapping
+
+    *   "direction" - The data transfer direction. Required. One of:
+
+        *   'to' - Copy data from host to device
+
+        *   'from' - Copy data from device to host
+
+        *   'tofrom' - Copy data both ways (enter: to device, exit: from
+            device)
+
+        *   'alloc' - Allocate device memory without copying (enter only)
+
+        *   'release' - Deallocate device memory without copying (exit only)
+
+        *   'delete' - Deallocate device memory, discard changes (exit only)
+
+    *   "device" - Device module name. Optional. Default: 'NVIDIA_GPU'
+
+    *   "device_id" - Device ID number for multi-device systems. Optional.
+        Default: 0
+
+    *   "start" - Starting byte offset in buffer. Optional. Default: 0
+
+    *   "end" - Ending byte position in buffer. Optional. Default: buffer
+        size
+
+    Returns: Nothing (dies on error)
+
+    Throws:
+
+    *   Dies if action/direction combination is invalid
+
+    *   Dies if attempting to manage same device_id with different device
+        modules
+
+    *   Dies if attempting to enter-map the same buffer twice on same device
+
+    Examples:
+
+        # Map buffer to GPU, copying data
+        $buffer->device_movement(
+            action    => 'enter',
+            direction => 'to'
+        );
+    
+        # Allocate GPU memory without copying
+        $buffer->device_movement(
+            action    => 'enter',
+            direction => 'alloc'
+        );
+    
+        # Update partial buffer region from GPU
+        $buffer->device_movement(
+            action    => 'update',
+            direction => 'from',
+            start     => 0,
+            end       => 1000
+        );
+    
+        # Exit mapping, copying data back and deallocating
+        $buffer->device_movement(
+            action    => 'exit',
+            direction => 'from'
+        );
+    
+        # Exit mapping with release (keep mapping but allow reuse)
+        $buffer->device_movement(
+            action    => 'exit',
+            direction => 'release'
+        );
+
+DEVICE FUNCTIONS
+    Each device module provides the following functions (where <DEVICE> is
+    replaced with the device name, e.g., NVIDIA_GPU):
+
+    *   "<DEVICE>_enter_to_gpu" - Map data to device (copy from host)
+
+    *   "<DEVICE>_enter_tofrom_gpu" - Map data bidirectionally
+
+    *   "<DEVICE>_enter_alloc_gpu" - Allocate on device without copying
+
+    *   "<DEVICE>_exit_from_gpu" - Unmap data from device (copy to host)
+
+    *   "<DEVICE>_exit_tofrom_gpu" - Unmap bidirectional data
+
+    *   "<DEVICE>_exit_release_gpu" - Release mapping without copying
+
+    *   "<DEVICE>_exit_delete_gpu" - Delete mapping and discard data
+
+    *   "<DEVICE>_update_to_gpu" - Update data to device
+
+    *   "<DEVICE>_update_from_gpu" - Update data from device
+
+    These functions are automatically registered and called by the
+    "device_movement" method. They should not typically be called directly.
+
+COMPILATION OPTIONS
+    The module supports device-specific compilation options for optimal
+    performance:
+
+  NVIDIA_GPU (default)
+        COMPILER_FLAGS: -fno-stack-protector -fcf-protection=none -fopenmp 
+                        -std=c11 -fPIC -Wall -Wextra
+        CCEXFLAGS:      -foffload=nvptx-none
+        LINKER_FLAGS:   -fopenmp (with system lddlflags)
+        OPTIMIZE:       -O3 -march=native
+
+  AMD_GPU
+        COMPILER_FLAGS: (same as NVIDIA_GPU)
+        CCEXFLAGS:      (none - AMD offloading under development)
+        LINKER_FLAGS:   -fopenmp (with system lddlflags)
+        OPTIMIZE:       -O3 -march=native
+
+  DEFAULT (for other devices)
+        COMPILER_FLAGS: (same as NVIDIA_GPU)
+        CCEXFLAGS:      -fopenmp
+        LINKER_FLAGS:   -fopenmp (with system lddlflags)
+        OPTIMIZE:       -O3 -march=native
+
+EXAMPLES
+    Example 1 is a complete working example demonstrating basic GPU memory
+    mapping, computation, and retrieval of results. Example 2 shows how to
+    allocate GPU memory without initial data copy. Example 3 illustrates
+    combining device management with PDL views for seamless integration with
+    Perl Data Language. =head2 Example 1: Basic GPU Memory Mapping
+
+    This example demonstrates the fundamental pattern of mapping memory to
+    GPU, performing computations, and retrieving results.
+
+        use Task::MemManager::Device;
+        use Inline (
+        C => Config => ccflags => "-fno-stack-protector -fcf-protection=none "
+          . " -fopenmp  -Iinclude -std=c11 -fPIC "
+          . " -Wall -Wextra -Wno-unused-function -Wno-unused-variable"
+          . " -Wno-unused-but-set-variable ",
+        lddlflags => join( q{ }, $Config::Config{lddlflags}, q{-fopenmp} ),
+        ccflagsex => " -fopenmp ",
+        libs      => q{ -lm -foffload=-lm },
+        optimize  => "-O3 -march=native",
+        ); # replace with your OpenMP's device flags
+        use Inline C => 'DATA';
+    
+        my $buffer_length = 250000;
+        my $buffer = Task::MemManager->new($buffer_length, 4);
+    
+        # Map buffer to GPU
+        $buffer->device_movement(action => 'enter', direction => 'to');
+    
+        # Perform GPU computation
+        assign_as_float($buffer->get_buffer, $buffer->get_buffer_size);
+    
+        # Update results back to CPU
+        $buffer->device_movement(action => 'update', direction => 'from');
+    
+        # Verify results by printing some values
+        my @values = unpack("f*", $buffer->extract_buffer_region(0, 
+                            $buffer->get_buffer_size - 1));
+    
+        print "First 10 values: ", join(", ", @values[0..9]), "\n";
+        print "Last 10 values: ", join(", ", @values[-10..-1]), "\n";
+        # Exit GPU mapping
+        $buffer->device_movement(action => 'exit', direction => 'from');
+    
+        __DATA__
+        __C__
+        #include "omp.h"
+    
+        void assign_as_float(unsigned long arr, size_t n) {
+            float *array_addr = (float *)arr;
+            size_t len = n / sizeof(float);
+            #pragma omp target
+            for (int i = 0; i < len; i++) {
+                array_addr[i] = (float)i * 2.0f;
+            }
+        }
+
+  Example 2: GPU Memory Allocation Without Initial Copy
+    When you want to allocate GPU memory but don't need to copy initial data
+    (e.g., for output-only computations):
+
+        # look at Example 1 for the use statements and Inline C setup
+        my $buffer = Task::MemManager->new(1000000, 4);
+    
+        # Allocate GPU memory without copying
+        $buffer->device_movement(action => 'enter', direction => 'alloc');
+    
+        # Perform GPU computation that generates results
+        alloc_as_float($buffer->get_buffer, $buffer->get_buffer_size);
+    
+        # Copy results back to CPU
+        $buffer->device_movement(action => 'exit', direction => 'from');
+    
+        __DATA__
+        __C__
+        #include "omp.h"
+    
+        void alloc_as_float(unsigned long arr, size_t n) {
+            float *array_addr = (float *)arr;
+            size_t len = n / sizeof(float);
+            #pragma omp target
+            for (int i = 0; i < len; i++) {
+                array_addr[i] = (float)i * 3.0f;
+            }
+        }
+
+  Example 3: Working with PDL Views
+    Combining device management with PDL views for seamless integration with
+    Perl Data Language:
+
+        use Task::MemManager
+            Allocator => 'CMalloc',
+            View      => 'PDL',
+            Device    => 'NVIDIA_GPU';
+        use Inline (
+        C => Config => ccflags => "-fno-stack-protector -fcf-protection=none "
+          . " -fopenmp  -Iinclude -std=c11 -fPIC "
+          . " -Wall -Wextra -Wno-unused-function -Wno-unused-variable"
+          . " -Wno-unused-but-set-variable ",
+        lddlflags => join( q{ }, $Config::Config{lddlflags}, q{-fopenmp} ),
+        ccflagsex => " -fopenmp ",
+        libs      => q{ -lm -foffload=-lm },
+        optimize  => "-O3 -march=native",
+        ); # replace with your OpenMP's device flags
+        use Inline C => 'DATA';  
+    
+        my $buffer_length = 1000;
+        my $buffer = Task::MemManager->new($buffer_length, 4, 
+                                          {allocator => 'CMalloc'});
+    
+        # Create PDL view
+        my $pdl_view = $buffer->create_view('PDL',
+            {view_name => 'my_pdl_view', pdl_type => 'float'});
+    
+        # Initialize with random values in PDL
+        $pdl_view->inplace->random;
+    
+        # Clone the view for comparison
+        my $cloned_view = $buffer->clone_view('my_pdl_view');
+    
+        # Move to GPU and modify
+        $buffer->device_movement(action => 'enter', direction => 'to');
+        mod_as_float($buffer->get_buffer, $buffer->get_buffer_size);
+        $buffer->device_movement(action => 'exit', direction => 'from');
+    
+        # PDL view automatically reflects changes
+        my @values = list $pdl_view;
+        my @original = list $cloned_view;
+    
+        # Verify: values should be doubled
+        for my $i (0 .. $#values) {
+            die "Mismatch!" unless $values[$i] == $original[$i] * 2.0;
+        }
+
+        __DATA__
+        __C__
+        #include "omp.h"
+    
+        void mod_as_float(unsigned long arr, size_t n) {
+            float *array_addr = (float *)arr;
+            size_t len = n / sizeof(float);
+            #pragma omp target
+            for (int i = 0; i < len; i++) {
+                array_addr[i] *= 2.0f;
+            }
+        }
+
+  Example 4: Multiple Device Management
+    Managing multiple buffers across different devices (code snippet):
+
+        # Create multiple buffers
+        my $buf1 = Task::MemManager->new(1000, 4);
+        my $buf2 = Task::MemManager->new(2000, 4);
+    
+        # Map to different devices (if available)
+        $buf1->device_movement(
+            action    => 'enter',
+            direction => 'to',
+            device_id => 0
+        );
+    
+        $buf2->device_movement(
+            action    => 'enter',
+            direction => 'to',
+            device_id => 1  # Different device
+        );
+    
+        # Perform operations on each device - fictional C level functions
+        process_on_device($buf1->get_buffer, $buf1->get_buffer_size);
+        process_on_device($buf2->get_buffer, $buf2->get_buffer_size);
+    
+        # Retrieve results
+        $buf1->device_movement(action => 'exit', direction => 'from', device_id => 0);
+        $buf2->device_movement(action => 'exit', direction => 'from', device_id => 1);
+
+  Example 5: Partial Buffer Updates
+    Update only a portion of the buffer between host and device:
+
+        my $buffer = Task::MemManager->new(10000, 4);
+    
+        $buffer->device_movement(action => 'enter', direction => 'to');
+    
+        # Update only first 1000 bytes from GPU
+        $buffer->device_movement(
+            action    => 'update',
+            direction => 'from',
+            start     => 0,
+            end       => 1000
+        );
+    
+        # Later, update another region to GPU
+        $buffer->device_movement(
+            action    => 'update',
+            direction => 'to',
+            start     => 1000,
+            end       => 2000
+        );
+    
+        $buffer->device_movement(action => 'exit', direction => 'release');
+
+AUTOMATIC CLEANUP
+    The module automatically handles cleanup of device mappings when buffer
+    objects are destroyed. The DESTROY method ensures that:
+
+    *   All device mappings are properly released
+
+    *   Device memory is deallocated
+
+    *   No memory leaks occur on the device
+
+    *   Reference counts are properly maintained
+
+    Cleanup uses the "exit_release_gpu" operation, which allows the runtime
+    to manage the actual deallocation timing while ensuring proper cleanup.
+
+DIAGNOSTICS
+    If you set the environment variable DEBUG to a non-zero value, the
+    module will provide detailed information about when things go wrong
+
+DEPENDENCIES
+    The module depends on:
+
+    *   "Task::MemManager" - Base memory management functionality
+
+    *   "Inline::C" - For C code integration and compilation
+
+    *   "Module::Find" - For automatic discovery of device modules
+
+    *   "Module::Runtime" - For dynamic module loading
+
+    *   OpenMP-capable compiler (e.g., GCC 9+, Clang 10+) for GPU offloading
+
+    For NVIDIA GPU support, you need:
+
+    *   GCC with nvptx offload support, or
+
+    *   Clang with CUDA/NVPTX target support (not tested yet with the
+        relevant version of perl)
+
+LIMITATIONS AND CAVEATS
+    *   Cannot map the same buffer to the same device_id multiple times
+
+    *   Cannot manage the same device_id with different device modules
+
+    *   Device module compilation happens at first use (may take time)
+
+    *   Requires OpenMP 4.5+ for target directives
+
+    *   GPU offloading support varies by compiler and installation
+
+    *   AMD GPU support is experimental and may require additional setup
+
+TODO
+    *   Ensure that clang and icx compilers work correctly
+
+    *   Ensure AMD GPU offloading works correctly
+
+    *   Add support for additional devices (e.g., Intel GPUs, FPGAs)
+
+    *   Add support for asynchronous data transfers
+
+    *   Implement device-to-device direct transfers
+
+    *   Add support for unified memory management
+
+    *   Provide device property queries (memory available, etc.)
+
+    *   Add support for interfacing to other parallel programming models
+        (e.g., CUDA, HIP) using OpenMP's interoperability features
+
+    *   Implement automatic workload distribution across multiple devices
+
+    *   Device module loading and registration (when DEBUG = 1)
+
+    *   Function registration for each device (when DEBUG = 1)
+
+    *   Buffer mapping operations (enter/exit/update) (when DEBUG = 1)
+
+    *   Device ID management (when DEBUG = 1)
+
+    *   Buffer lifecycle events (when DEBUG = 1)
+
+SEE ALSO
+    *   Task::MemManager - Base memory management module
+
+    *   Task::MemManager::View - Memory view management
+
+    *   Inline::C - Inline C code in Perl
+
+    *   OpenMP Specification <https://www.openmp.org/specifications/> -
+        OpenMP target directives
+
+    *   GCC Offloading <https://gcc.gnu.org/wiki/Offloading> - GCC
+        offloading setup
+
+AUTHOR
+    Christos Argyropoulos, "<chrisarg at cpan.org>" Initial documentation
+    was created by Claude Sonnet 4.5 after providing the human generated
+    test files for the module and the documentation in the MemManager
+    distribution as context.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2025 by Christos Argyropoulos.
+
+    This is free software; you can redistribute it and/or modify it under
+    the MIT license. The full text of the license can be found in the
+    LICENSE file. See <https://en.wikipedia.org/wiki/MIT_License> for more
+    information.
+

@@ -88,7 +88,7 @@ Generate default response message for status code, defaults to using L</"code">.
 
 =head2 extract_start_line
 
-C<method extract_start_line : int ($bufref : string[]);>
+C<method extract_start_line : int ($buf : mutable string);>
 
 Extract status-line from string.
 

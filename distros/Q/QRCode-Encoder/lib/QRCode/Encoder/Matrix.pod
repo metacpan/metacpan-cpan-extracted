@@ -1,0 +1,101 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+QRCode::Encoder::Matrix - Matrix manipulation for QRCode::Encoder
+
+=head1 DESCRIPTION
+
+This module is not supposed to be used stand-alone, see L</QRCode::Encoder>.
+
+=head1 INTERFACE
+
+=head2 B<< add_matrix >>
+
+   add_matrix($hashref);
+
+Use data in C<$hashref> to add the matrix-related key/values.
+
+=begin HIDE
+
+=over
+
+=item * C<stringify_matrix>
+
+=item * C<stringify_matrix_2>
+
+=item * C<add_base_matrix>
+
+=item * C<add_finders>
+
+=item * C<add_quiet>
+
+=item * C<add_finder>
+
+=item * C<add_format_reservations>
+
+=item * C<add_version_reservations>
+
+=item * C<add_timing>
+
+=item * C<try_add_alignment_pattern>
+
+=item * C<add_alignments>
+
+=item * C<bits_iterator>
+
+=item * C<add_codewords>
+
+=item * C<evaluate_matrix>
+
+=item * C<__row>
+
+=item * C<__col>
+
+=item * C<evaluate_matrix_adjacents_and_11311>
+
+=item * C<evaluate_matrix_blocks>
+
+=item * C<evaluate_matrix_proportion>
+
+=item * C<masked_matrix>
+
+=item * C<add_mask>
+
+=item * C<add_format>
+
+=item * C<add_version>
+
+=back
+
+=end HIDE
+
+=head1 AUTHOR
+
+Flavio Poletti <flavio@polettix.it>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2025 by Flavio Poletti <flavio@polettix.it>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+Just to be clear: apache-2.0
+
+
+=cut

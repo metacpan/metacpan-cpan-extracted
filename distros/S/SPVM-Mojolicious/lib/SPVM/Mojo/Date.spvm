@@ -192,8 +192,7 @@ class Mojo::Date {
     
     if ($self->{epoch_nsec} > 0) {
       $string .= ".$self->{epoch_nsec}";
-      Re->s(my $_ = [$string], "0+$", "");
-      $string = $_->[0];
+      Re->s((mutable string)$string, "0+$", "");
     }
     
     $string .= "Z";

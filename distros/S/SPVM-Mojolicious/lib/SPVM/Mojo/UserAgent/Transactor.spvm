@@ -119,7 +119,7 @@ class Mojo::UserAgent::Transactor {
       $req->set_url((Mojo::URL)$url);
     }
     else {
-      if (Re->m($url, "^/|://")) {
+      if (Re->m((string)$url, "^/|://")) {
         $req->url->parse((string)$url);
       }
       else {

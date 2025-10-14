@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v1.1.0
+## Version v1.1.1
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2025/09/30
+## Modified 2025/10/12
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -99,7 +99,7 @@ BEGIN
         (?<ver>(?^:\.[0-9]+) (?^:_[0-9]+)?)
         )
     )/;
-    our $VERSION     = 'v1.1.0';
+    our $VERSION     = 'v1.1.1';
 };
 
 use v5.26.1;
@@ -2993,9 +2993,12 @@ sub _load_class
             return( $self->error( "Insufficient version ", $class->VERSION(), ", for class $class. $opts->{version} minimum is required." ) ) if( $@ );
         }
 
-        $pl = "package ${caller_class}; $class->import(" . ( scalar( @$args ) ? "'" . join( "', '", @$args ) . "'" : '' ) . ");";
-        eval( $pl );
-        return( $self->error( "Error importing class $class into caller's namespace ${caller_class}: $@" ) ) if( $@ );
+        unless( $opts->{no_import} )
+        {
+            $pl = "package ${caller_class}; $class->import(" . ( scalar( @$args ) ? "'" . join( "', '", @$args ) . "'" : '' ) . ");";
+            eval( $pl );
+            return( $self->error( "Error importing class $class into caller's namespace ${caller_class}: $@" ) ) if( $@ );
+        }
         $repo->set(1);
     }
 
@@ -11937,7 +11940,7 @@ Quick way to create a class with feature-rich methods
 
 =head1 VERSION
 
-    v1.1.0
+    v1.1.1
 
 =head1 DESCRIPTION
 

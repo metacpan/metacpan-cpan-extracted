@@ -5,6 +5,12 @@ This module was originally called Tree::PatriciaTrie::IPv4
 TODO
     - add POD describing Graham Barr's API improvements
 
+1.24 2025-10-05 09:32:28 CEST
+    - update the COPYING file
+    - add a license heading to the documentation
+    - fix the POD encoding
+    - remove a test that fails in certain DNS setups
+
 1.23 2025-04-27 11:00:00 CEST
     - do not link to the nsl library (CPAN RT 124088)
     - add test_dynamic and test_static targets (CPAN RT 117929)

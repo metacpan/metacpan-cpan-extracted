@@ -1,6 +1,6 @@
 package SPVM::File::Temp;
 
-our $VERSION = "0.028";
+our $VERSION = "0.029";
 
 1;
 
