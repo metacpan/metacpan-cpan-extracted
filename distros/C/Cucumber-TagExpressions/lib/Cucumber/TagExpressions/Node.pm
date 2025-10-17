@@ -1,6 +1,6 @@
 
 package Cucumber::TagExpressions::Node;
-$Cucumber::TagExpressions::Node::VERSION = '6.2.0';
+$Cucumber::TagExpressions::Node::VERSION = '8.0.0';
 =head1 NAME
 
 Cucumber::TagExpressions::Node - Cucumber Tag expression components
@@ -55,7 +55,7 @@ sub stringify { }
 =cut
 
 package Cucumber::TagExpressions::LiteralNode {
-$Cucumber::TagExpressions::LiteralNode::VERSION = '6.2.0';
+$Cucumber::TagExpressions::LiteralNode::VERSION = '8.0.0';
 =head2 Cucumber::TagExpressions::LiteralNode
 
 =head3 DESCRIPTION
@@ -91,7 +91,7 @@ The tag to test presence for.
 }
 
 package Cucumber::TagExpressions::AndNode {
-$Cucumber::TagExpressions::AndNode::VERSION = '6.2.0';
+$Cucumber::TagExpressions::AndNode::VERSION = '8.0.0';
 =head2 Cucumber::TagExpressions::AndNode
 
 =head3 DESCRIPTION
@@ -133,7 +133,7 @@ The sub-expressions to evaluate.
 }
 
 package Cucumber::TagExpressions::OrNode {
-$Cucumber::TagExpressions::OrNode::VERSION = '6.2.0';
+$Cucumber::TagExpressions::OrNode::VERSION = '8.0.0';
 =head2 Cucumber::TagExpressions::OrNode
 
 =head3 DESCRIPTION
@@ -175,7 +175,7 @@ The sub-expressions to evaluate.
 }
 
 package Cucumber::TagExpressions::NotNode {
-$Cucumber::TagExpressions::NotNode::VERSION = '6.2.0';
+$Cucumber::TagExpressions::NotNode::VERSION = '8.0.0';
 =head2 Cucumber::TagExpressions::NotNode
 
 =head3 DESCRIPTION
@@ -215,7 +215,7 @@ The wrapped node class instance for which to negate the result.
 }
 
 package Cucumber::TagExpressions::ExpressionNode {
-$Cucumber::TagExpressions::ExpressionNode::VERSION = '6.2.0';
+$Cucumber::TagExpressions::ExpressionNode::VERSION = '8.0.0';
 =head2 Cucumber::TagExpressions::ExpressionNode
 
 =head3 DESCRIPTION

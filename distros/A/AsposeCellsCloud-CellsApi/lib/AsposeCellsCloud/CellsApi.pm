@@ -1768,6 +1768,45 @@ sub compress_spreadsheet{
 }
 
 #
+# RepairSpreadsheetRequest
+#
+# 
+# 
+# @Spreadsheet  string (required)  Upload spreadsheet file.  
+# @outPath  string   (Optional) The folder path where the workbook is stored. The default is null.  
+# @outStorageName  string   Output file Storage Name.  
+# @region  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'RepairSpreadsheetRequest',
+            description => 'RepairSpreadsheet Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'repair_spreadsheet' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub repair_spreadsheet{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
 # ProtectSpreadsheetRequest
 #
 # Applies dual-layer password protection to Excel spreadsheets, supporting both open and modify passwords with encryption.
@@ -1837,6 +1876,45 @@ sub protect_spreadsheet{
 # @return string
 #
 sub unprotect_spreadsheet{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# SpreadsheetDigitalsignatureRequest
+#
+# 
+# 
+# @Spreadsheet  string (required)  Upload spreadsheet file.  
+# @password  string (required)    
+# @outPath  string   (Optional) The folder path where the workbook is stored. The default is null.  
+# @outStorageName  string   Output file Storage Name.  
+# @region  string   The spreadsheet region setting.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'SpreadsheetDigitalsignatureRequest',
+            description => 'SpreadsheetDigitalsignature Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'spreadsheet_digitalsignature' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub spreadsheet_digitalsignature{
     my ($self, %args) = @_;
     my $request = $args{'request'};
     my $response = $request->run_http_request('client' => $self->{api_client} );
@@ -2416,18 +2494,20 @@ sub codegen_spec{
 }
 
 #
-# TrimSpreadsheetContentRequest
+# TrimCharacterRequest
 #
 # The TrimSpreadsheetContent API is designed to process and trim content within a spreadsheet. This API allows users to remove extra spaces, line breaks, or other unnecessary characters from the content of selected cells. It is particularly useful for cleaning up data entries and ensuring consistency in spreadsheet formatting
 # 
 # @Spreadsheet  string (required)  Upload spreadsheet file.  
-# @trimContent  string     
-# @trimLeading  boolean     
-# @trimTrailing  boolean     
-# @trimSpaceBetweenWordTo1  boolean     
-# @trimNonBreakingSpaces  boolean     
-# @removeExtraLineBreaks  boolean     
-# @removeAllLineBreaks  boolean     
+# @trimContent  string   Specify the trim content.  
+# @trimLeading  boolean   Specify to trim content from the beginning.  
+# @trimTrailing  boolean   Specify to trim content from the end.  
+# @trimSpaceBetweenWordTo1  boolean   Remove excess spaces between words within a cell.  
+# @trimNonBreakingSpaces  boolean   Remove non-breaking spaces.  
+# @removeExtraLineBreaks  boolean   Remove extra line breaks.  
+# @removeAllLineBreaks  boolean   Remove all line breaks.  
+# @worksheet  string   Specify the worksheet of spreadsheet.  
+# @range  string   Specify the worksheet range of spreadsheet.  
 # @outPath  string   (Optional) The folder path where the workbook is stored. The default is null.  
 # @outStorageName  string   Output file Storage Name.  
 # @region  string   The spreadsheet region setting.  
@@ -2436,12 +2516,12 @@ sub codegen_spec{
 {
     my $params = {
        'request' =>{
-            data_type => 'TrimSpreadsheetContentRequest',
-            description => 'TrimSpreadsheetContent Request.',
+            data_type => 'TrimCharacterRequest',
+            description => 'TrimCharacter Request.',
             required => '0',
        }
     };
-    __PACKAGE__->method_documentation->{ 'trim_spreadsheet_content' } = { 
+    __PACKAGE__->method_documentation->{ 'trim_character' } = { 
     	summary => 'The TrimSpreadsheetContent API is designed to process and trim content within a spreadsheet. This API allows users to remove extra spaces, line breaks, or other unnecessary characters from the content of selected cells. It is particularly useful for cleaning up data entries and ensuring consistency in spreadsheet formatting',
         params => $params,
         returns => 'string',
@@ -2450,7 +2530,7 @@ sub codegen_spec{
 #
 # @return string
 #
-sub trim_spreadsheet_content{
+sub trim_character{
     my ($self, %args) = @_;
     my $request = $args{'request'};
     my $response = $request->run_http_request('client' => $self->{api_client} );
@@ -2462,20 +2542,14 @@ sub trim_spreadsheet_content{
 }
 
 #
-# TrimWorksheetRangeRequest
+# UpdateWordCaseRequest
 #
-# 
+# Specify changing the text case in a spreadsheet to switch between uppercase, lowercase, capitalizing the first letter of each word, or capitalizing the first letter of a sentence, and adjust the text according to specific needs.
 # 
 # @Spreadsheet  string (required)  Upload spreadsheet file.  
-# @worksheet  string (required)    
-# @range  string     
-# @trimContent  string     
-# @trimLeading  boolean     
-# @trimTrailing  boolean     
-# @trimSpaceBetweenWordTo1  boolean     
-# @trimNonBreakingSpaces  boolean     
-# @removeExtraLineBreaks  boolean     
-# @removeAllLineBreaks  boolean     
+# @wordCaseType  string (required)  Specify text case: Upper Case, Lower Case, Proper Case, Sentence Case.  
+# @worksheet  string   Specify the worksheet of spreadsheet.  
+# @range  string   Specify the worksheet range of spreadsheet.  
 # @outPath  string   (Optional) The folder path where the workbook is stored. The default is null.  
 # @outStorageName  string   Output file Storage Name.  
 # @region  string   The spreadsheet region setting.  
@@ -2484,12 +2558,401 @@ sub trim_spreadsheet_content{
 {
     my $params = {
        'request' =>{
-            data_type => 'TrimWorksheetRangeRequest',
-            description => 'TrimWorksheetRange Request.',
+            data_type => 'UpdateWordCaseRequest',
+            description => 'UpdateWordCase Request.',
             required => '0',
        }
     };
-    __PACKAGE__->method_documentation->{ 'trim_worksheet_range' } = { 
+    __PACKAGE__->method_documentation->{ 'update_word_case' } = { 
+    	summary => 'Specify changing the text case in a spreadsheet to switch between uppercase, lowercase, capitalizing the first letter of each word, or capitalizing the first letter of a sentence, and adjust the text according to specific needs.',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub update_word_case{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# RemoveCharactersRequest
+#
+# Perform operations or delete any custom characters, character sets, and substrings within a selected range for a specific position.
+# 
+# @Spreadsheet  string (required)  Upload spreadsheet file.  
+# @theFirstNCharacters  int (required)  Specify removing the first n characters from selected cells.  
+# @theLastNCharacters  int (required)  Specify removing the last n characters from selected cells.  
+# @allCharactersBeforeText  string (required)  Specify using targeted removal options to delete text that is located before certain characters.  
+# @allCharactersAfterText  string (required)  Specify using targeted removal options to delete text that is located after certain characters.  
+# @removeTextMethod  string (required)  Specify the removal of text method type.  
+# @characterSets  string (required)  Specify the character sets.  
+# @removeCustomValue  string (required)  Specify the remove custom value.  
+# @worksheet  string (required)  Specify the worksheet of spreadsheet.  
+# @range  string (required)  Specify the worksheet range of spreadsheet.  
+# @outPath  string   (Optional) The folder path where the workbook is stored. The default is null.  
+# @outStorageName  string   Output file Storage Name.  
+# @region  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'RemoveCharactersRequest',
+            description => 'RemoveCharacters Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'remove_characters' } = { 
+    	summary => 'Perform operations or delete any custom characters, character sets, and substrings within a selected range for a specific position.',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub remove_characters{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# AddTextRequest
+#
+# Specify appending text to multiple cells at once, allowing you to add prefixes, suffixes, labels, or any specific characters. You can choose the exact position of the text—in the beginning, at the end, or before or after certain characters in the cell.
+# 
+# @Spreadsheet  string (required)  Upload spreadsheet file.  
+# @text  string (required)  Specify the added text content.  
+# @position  string (required)  Indicates the specific location for adding text content.None, AtTheBeginning, AtTheEnd, BeforeText, AfterText.    
+# @selectText  string (required)  Indicates selecting the specific position to add text based on the content of the text.  
+# @skipEmptyCells  boolean   Indicates skip empty cells.  
+# @worksheet  string   Specify the worksheet of spreadsheet.  
+# @range  string   Specify the worksheet range of spreadsheet.  
+# @outPath  string   (Optional) The folder path where the workbook is stored. The default is null.  
+# @outStorageName  string   Output file Storage Name.  
+# @region  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'AddTextRequest',
+            description => 'AddText Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'add_text' } = { 
+    	summary => 'Specify appending text to multiple cells at once, allowing you to add prefixes, suffixes, labels, or any specific characters. You can choose the exact position of the text—in the beginning, at the end, or before or after certain characters in the cell.',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub add_text{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# ConvertTextRequest
+#
+# Indicates converting the numbers stored as text into the correct number format, replacing unwanted characters and line breaks with the desired characters, and converting accented characters to their equivalent characters without accents.
+# 
+# @Spreadsheet  string (required)  Upload spreadsheet file.  
+# @convertTextType  string (required)  Indicates the conversion of text type.  
+# @sourceCharacters  string (required)  Indicates the source characters.  
+# @targetCharacters  string (required)  Indicates the target characters.  
+# @worksheet  string   Specify the worksheet of spreadsheet.  
+# @range  string   Specify the worksheet range of spreadsheet.  
+# @outPath  string   (Optional) The folder path where the workbook is stored. The default is null.  
+# @outStorageName  string   Output file Storage Name.  
+# @region  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'ConvertTextRequest',
+            description => 'ConvertText Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'convert_text' } = { 
+    	summary => 'Indicates converting the numbers stored as text into the correct number format, replacing unwanted characters and line breaks with the desired characters, and converting accented characters to their equivalent characters without accents.',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub convert_text{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# ExtractTextRequest
+#
+# Indicates extracting substrings, text characters, and numbers from a spreadsheet cell into another cell without having to use complex FIND, MIN, LEFT, or RIGHT formulas.
+# 
+# @Spreadsheet  string (required)  Upload spreadsheet file.  
+# @extractTextType  string (required)  Indicates extract text type.  
+# @beforeText  string (required)  Indicates extracting the text before the specified characters or substrings.  
+# @afterText  string (required)  Indicates extracting the text after the specified characters or substrings.  
+# @beforePosition  int (required)  Indicates retrieving the first character or a specified number of characters from the left side of the selected cell.  
+# @afterPosition  int (required)  Indicates retrieving the first character or a specified number of characters from the right side of the selected cell.  
+# @outPositionRange  string (required)  Indicates the output location for the extracted text.  
+# @worksheet  string   Specify the worksheet of spreadsheet.  
+# @range  string   Specify the worksheet range of spreadsheet.  
+# @outPath  string   (Optional) The folder path where the workbook is stored. The default is null.  
+# @outStorageName  string   Output file Storage Name.  
+# @region  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'ExtractTextRequest',
+            description => 'ExtractText Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'extract_text' } = { 
+    	summary => 'Indicates extracting substrings, text characters, and numbers from a spreadsheet cell into another cell without having to use complex FIND, MIN, LEFT, or RIGHT formulas.',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub extract_text{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# SplitTextRequest
+#
+# Indicates performing text segmentation on the specified area according to the segmentation method, and outputting to the designated interval.
+# 
+# @Spreadsheet  string (required)  Upload spreadsheet file.  
+# @splitDelimitersType  string (required)  Indicates split delimiters type.  
+# @customDelimiter  string (required)  Indicates the custom delimiter.  
+# @keepDelimitersInResultingCells  boolean (required)  Indicates keep delimiters in resulting cells.  
+# @keepDelimitersPosition  string (required)  Indicates keep delimiters position.  
+# @HowToSplit  string (required)  Indicates  
+# @worksheet  string   Specify the worksheet of spreadsheet.  
+# @range  string   Specify the worksheet range of spreadsheet.  
+# @outPath  string   (Optional) The folder path where the workbook is stored. The default is null.  
+# @outStorageName  string   Output file Storage Name.  
+# @region  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'SplitTextRequest',
+            description => 'SplitText Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'split_text' } = { 
+    	summary => 'Indicates performing text segmentation on the specified area according to the segmentation method, and outputting to the designated interval.',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub split_text{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# RemoveSpreadsheetBlankRowsRequest
+#
+# Delete all blank rows that do not contain any data or other objects.
+# 
+# @Spreadsheet  string (required)  Upload spreadsheet file.  
+# @outPath  string   (Optional) The folder path where the workbook is stored. The default is null.  
+# @outStorageName  string   Output file Storage Name.  
+# @region  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'RemoveSpreadsheetBlankRowsRequest',
+            description => 'RemoveSpreadsheetBlankRows Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'remove_spreadsheet_blank_rows' } = { 
+    	summary => 'Delete all blank rows that do not contain any data or other objects.',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub remove_spreadsheet_blank_rows{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# RemoveSpreadsheetBlankColumnsRequest
+#
+# Delete all blank rows that do not contain any data or other objects.
+# 
+# @Spreadsheet  string (required)  Upload spreadsheet file.  
+# @outPath  string   (Optional) The folder path where the workbook is stored. The default is null.  
+# @outStorageName  string   Output file Storage Name.  
+# @region  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'RemoveSpreadsheetBlankColumnsRequest',
+            description => 'RemoveSpreadsheetBlankColumns Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'remove_spreadsheet_blank_columns' } = { 
+    	summary => 'Delete all blank rows that do not contain any data or other objects.',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub remove_spreadsheet_blank_columns{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# RemoveSpreadsheetBlankWorksheetsRequest
+#
+# Delete all blank rows that do not contain any data or other objects.
+# 
+# @Spreadsheet  string (required)  Upload spreadsheet file.  
+# @outPath  string   (Optional) The folder path where the workbook is stored. The default is null.  
+# @outStorageName  string   Output file Storage Name.  
+# @region  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'RemoveSpreadsheetBlankWorksheetsRequest',
+            description => 'RemoveSpreadsheetBlankWorksheets Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'remove_spreadsheet_blank_worksheets' } = { 
+    	summary => 'Delete all blank rows that do not contain any data or other objects.',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub remove_spreadsheet_blank_worksheets{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# RemoveDuplicatesRequest
+#
+# 
+# 
+# @Spreadsheet  string (required)  Upload spreadsheet file.  
+# @worksheet  string     
+# @range  string     
+# @table  string     
+# @outPath  string   (Optional) The folder path where the workbook is stored. The default is null.  
+# @outStorageName  string   Output file Storage Name.  
+# @region  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'RemoveDuplicatesRequest',
+            description => 'RemoveDuplicates Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'remove_duplicates' } = { 
     	summary => '',
         params => $params,
         returns => 'string',
@@ -2498,124 +2961,7 @@ sub trim_spreadsheet_content{
 #
 # @return string
 #
-sub trim_worksheet_range{
-    my ($self, %args) = @_;
-    my $request = $args{'request'};
-    my $response = $request->run_http_request('client' => $self->{api_client} );
-    if (!$response) {
-        return;
-    }
-    my $_response_object = $self->{api_client}->deserialize('string', $response);
-    return $_response_object;
-}
-
-#
-# DeleteSpreadsheetBlankRowsRequest
-#
-# Delete all blank rows that do not contain any data or other objects.
-# 
-# @Spreadsheet  string (required)  Upload spreadsheet file.  
-# @outPath  string   (Optional) The folder path where the workbook is stored. The default is null.  
-# @outStorageName  string   Output file Storage Name.  
-# @region  string   The spreadsheet region setting.  
-# @password  string   The password for opening spreadsheet file.   
-#
-{
-    my $params = {
-       'request' =>{
-            data_type => 'DeleteSpreadsheetBlankRowsRequest',
-            description => 'DeleteSpreadsheetBlankRows Request.',
-            required => '0',
-       }
-    };
-    __PACKAGE__->method_documentation->{ 'delete_spreadsheet_blank_rows' } = { 
-    	summary => 'Delete all blank rows that do not contain any data or other objects.',
-        params => $params,
-        returns => 'string',
-    };
-}
-#
-# @return string
-#
-sub delete_spreadsheet_blank_rows{
-    my ($self, %args) = @_;
-    my $request = $args{'request'};
-    my $response = $request->run_http_request('client' => $self->{api_client} );
-    if (!$response) {
-        return;
-    }
-    my $_response_object = $self->{api_client}->deserialize('string', $response);
-    return $_response_object;
-}
-
-#
-# DeleteSpreadsheetBlankColumnsRequest
-#
-# Delete all blank rows that do not contain any data or other objects.
-# 
-# @Spreadsheet  string (required)  Upload spreadsheet file.  
-# @outPath  string   (Optional) The folder path where the workbook is stored. The default is null.  
-# @outStorageName  string   Output file Storage Name.  
-# @region  string   The spreadsheet region setting.  
-# @password  string   The password for opening spreadsheet file.   
-#
-{
-    my $params = {
-       'request' =>{
-            data_type => 'DeleteSpreadsheetBlankColumnsRequest',
-            description => 'DeleteSpreadsheetBlankColumns Request.',
-            required => '0',
-       }
-    };
-    __PACKAGE__->method_documentation->{ 'delete_spreadsheet_blank_columns' } = { 
-    	summary => 'Delete all blank rows that do not contain any data or other objects.',
-        params => $params,
-        returns => 'string',
-    };
-}
-#
-# @return string
-#
-sub delete_spreadsheet_blank_columns{
-    my ($self, %args) = @_;
-    my $request = $args{'request'};
-    my $response = $request->run_http_request('client' => $self->{api_client} );
-    if (!$response) {
-        return;
-    }
-    my $_response_object = $self->{api_client}->deserialize('string', $response);
-    return $_response_object;
-}
-
-#
-# DeleteSpreadsheetBlankWorksheetsRequest
-#
-# Delete all blank rows that do not contain any data or other objects.
-# 
-# @Spreadsheet  string (required)  Upload spreadsheet file.  
-# @outPath  string   (Optional) The folder path where the workbook is stored. The default is null.  
-# @outStorageName  string   Output file Storage Name.  
-# @region  string   The spreadsheet region setting.  
-# @password  string   The password for opening spreadsheet file.   
-#
-{
-    my $params = {
-       'request' =>{
-            data_type => 'DeleteSpreadsheetBlankWorksheetsRequest',
-            description => 'DeleteSpreadsheetBlankWorksheets Request.',
-            required => '0',
-       }
-    };
-    __PACKAGE__->method_documentation->{ 'delete_spreadsheet_blank_worksheets' } = { 
-    	summary => 'Delete all blank rows that do not contain any data or other objects.',
-        params => $params,
-        returns => 'string',
-    };
-}
-#
-# @return string
-#
-sub delete_spreadsheet_blank_worksheets{
+sub remove_duplicates{
     my ($self, %args) = @_;
     my $request = $args{'request'};
     my $response = $request->run_http_request('client' => $self->{api_client} );

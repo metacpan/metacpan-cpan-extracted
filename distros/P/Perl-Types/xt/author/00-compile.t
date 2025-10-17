@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 97;
+plan tests => 99;
 
 my @module_files = (
     'Perl.pm',
@@ -76,7 +76,9 @@ my @module_files = (
     'Perl/Type/Unknown.pm',
     'Perl/Type/Void.pm',
     'Perl/Types.pm',
+    'class.pm',
     'perlapinames_generated.pm',
+    'perlclass.pm',
     'perlgmp.pm',
     'perlgsl.pm',
     'perlsse.pm',

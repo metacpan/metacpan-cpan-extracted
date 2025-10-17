@@ -2,8 +2,8 @@ NAME
     Text::Fragment - Manipulate fragments in text
 
 VERSION
-    This document describes version 0.110 of Text::Fragment (from Perl
-    distribution Text-Fragment), released on 2021-03-25.
+    This document describes version 0.111 of Text::Fragment (from Perl
+    distribution Text-Fragment), released on 2025-10-15.
 
 SYNOPSIS
      use Text::Fragment qw(list_fragments
@@ -46,9 +46,9 @@ SYNOPSIS
 
      $res = delete_fragment(text=>$res->[2], id=>'bar');
 
-    To list fragments:
+    To list fragments contained in a text:
 
-     $res = list_fragment(text=>$text);
+     $res = list_fragments(text=>$text);
 
     To get a fragment:
 
@@ -117,7 +117,7 @@ FUNCTIONS
   delete_fragment
     Usage:
 
-     delete_fragment(%args) -> [status, msg, payload, meta]
+     delete_fragment(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Delete fragment in text.
 
@@ -150,12 +150,15 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: A hash of result (hash)
 
@@ -173,7 +176,7 @@ FUNCTIONS
   get_fragment
     Usage:
 
-     get_fragment(%args) -> [status, msg, payload, meta]
+     get_fragment(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Get fragment with a certain ID in text.
 
@@ -201,12 +204,15 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: Fragment (array)
 
@@ -219,7 +225,7 @@ FUNCTIONS
   insert_fragment
     Usage:
 
-     insert_fragment(%args) -> [status, msg, payload, meta]
+     insert_fragment(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Insert or replace a fragment in text.
 
@@ -234,6 +240,8 @@ FUNCTIONS
     Arguments ('*' denotes required arguments):
 
     *   attrs => *hash* (default: {})
+
+        (No description)
 
     *   comment_style => *str* (default: "shell")
 
@@ -281,12 +289,15 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: A hash of result (hash)
 
@@ -302,7 +313,7 @@ FUNCTIONS
   list_fragments
     Usage:
 
-     list_fragments(%args) -> [status, msg, payload, meta]
+     list_fragments(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     List fragments in text.
 
@@ -324,12 +335,15 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: List of fragments (array)
 
@@ -341,7 +355,7 @@ FUNCTIONS
   set_fragment_attrs
     Usage:
 
-     set_fragment_attrs(%args) -> [status, msg, payload, meta]
+     set_fragment_attrs(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Set/unset attributes of a fragment.
 
@@ -374,12 +388,15 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: New text and other data (array)
 
@@ -389,6 +406,32 @@ FUNCTIONS
 
     Return 404 if fragment is not found.
 
+FAQ
+  Why is my fragment not found/listed?
+     foo=1 # FRAGMENT seq=1
+
+     # BEGIN FRAGMENT name=foo
+     blah
+     blah blah
+     # END FRAGMENT name=foo
+
+    You forgot to add the `id` attribute. It is required.
+
+  What if I need to have whitespace in my attribute name?
+    You can't. Attribute names need to be alphanums only.
+
+  What if I need to have whitespace in my attribute value?
+    You can encode, e.g. with URI encoding:
+
+     foo=1 # FRAGMENT id=1 comment=very%20simple
+
+  What if I forgot to properly close a multi-line fragment?
+     # BEGIN FRAGMENT id=1
+     blah
+
+    Currently "list_fragments" or "get_fragment" will not find your fragment
+    without emitting warning/error message.
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/Text-Fragment>.
@@ -397,20 +440,38 @@ SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-Text-Fragment>.
 
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://github.com/perlancar/perl-Text-Fragment/issues>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
-
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2017, 2016, 2015, 2014, 2012 by
-    perlancar@cpan.org.
+    This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Fragment>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

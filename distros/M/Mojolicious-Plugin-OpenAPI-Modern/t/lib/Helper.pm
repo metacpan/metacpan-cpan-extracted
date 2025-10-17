@@ -19,6 +19,9 @@ use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 use Test::Deep; # import symbols: ignore, re etc
 use Test2::API 'context_do';
 use JSON::Schema::Modern::Utilities qw(true false);
+use OpenAPI::Modern::Utilities 'SUPPORTED_OAD_VERSIONS';
+
+our $OAD_VERSION = SUPPORTED_OAD_VERSIONS->[-1]; # three-part OAS version to use in documents
 
 my $encoder = JSON::Schema::Modern::_JSON_BACKEND()->new
   ->allow_nonref(1)

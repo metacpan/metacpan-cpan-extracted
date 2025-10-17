@@ -3,7 +3,6 @@ MANIFEST
 Makefile.PL
 README
 lib/WebService/Careerjet.pm
-bin/jobsearch
 t/00-load.t
 t/boilerplate.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

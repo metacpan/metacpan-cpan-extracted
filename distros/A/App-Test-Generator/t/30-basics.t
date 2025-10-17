@@ -88,10 +88,13 @@ my $safe_conf = File::Spec->catfile($dir, 'safe.conf');
 open my $sfh, '>', $safe_conf or die $!;
 print $sfh <<'SAFE';
 # No unsafe operations
-$module = 'Scalar::Util';
-$function = 'blessed';
-%input = ( arg1 => 'string' );
-%output = 'undef';
+module: Scalar::Util
+function: blessed
+
+input:
+  arg1: string
+
+output: undef
 SAFE
 close $sfh;
 
@@ -102,9 +105,9 @@ lives_ok {
 } 'Safe-mode config loads cleanly';
 
 # Test configuration validation
-my $invalid_conf = File::Spec->catfile($dir, 'invalid.yml');
-open my $ifh, '>', $invalid_conf or die $!;
-print $ifh <<'SAFE';
+my $valid_conf = File::Spec->catfile($dir, 'outputonly.yml');
+open my $ofh, '>', $valid_conf or die $!;
+print $ofh <<'SAFE';
 # No input field
 module: 'Scalar::Util'
 function: 'blessed'
@@ -112,8 +115,18 @@ output:
   type:
     string
 SAFE
+close $ofh;
+lives_ok { App::Test::Generator::generate($valid_conf) } 'Output only loads';
+
+my $invalid_conf = File::Spec->catfile($dir, 'noio.yml');
+open my $ifh, '>', $invalid_conf or die $!;
+print $ifh <<'SAFE';
+# No input or field
+module: 'Scalar::Util'
+function: 'blessed'
+SAFE
 close $ifh;
-throws_ok { App::Test::Generator::generate($invalid_conf) } qr/Missing required 'input'/, 'Validates required input';
+throws_ok { App::Test::Generator::generate($invalid_conf) } qr/You must specify at least one of/, 'Validates required input';
 
 #------------------------------------------------------------------------------
 # Check no unexpected runtime warnings/errors

@@ -18,6 +18,7 @@ use Path::Tiny;
 use Test::Mojo;
 
 use lib 't/lib';
+use Helper;
 
 subtest 'raw schema' => sub {
   my $t = Test::Mojo->new(
@@ -25,7 +26,7 @@ subtest 'raw schema' => sub {
     {
       openapi => {
         schema => {
-          openapi => '3.1.0',
+          openapi => $::OAD_VERSION,
           info => {
             title => 'Test API with raw schema',
             version => '1.2.3',
@@ -44,8 +45,7 @@ subtest 'YAML schema' => sub {
   my $filename = Path::Tiny->tempfile;
   $filename->move($filename.'.yaml');
   $filename = path($filename.'.yaml');
-  $filename->spew_raw(<<'YAML');
-openapi: 3.1.0
+  $filename->spew_raw("openapi: $::OAD_VERSION\n".<<'YAML');
 info:
   title: Test API with yaml document
   version: 1.2.3
@@ -65,9 +65,9 @@ subtest 'JSON schema' => sub {
   my $filename = Path::Tiny->tempfile;
   $filename->move($filename.'.json');
   $filename = path($filename.'.json');
-  $filename->spew_raw(<<'JSON');
+  $filename->spew_raw(<<JSON);
 {
-  "openapi": "3.1.0",
+  "openapi": "$::OAD_VERSION",
   "info": {
     "title": "Test API with json document",
     "version": "1.2.3"
@@ -89,7 +89,7 @@ subtest 'override with our own object' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri    => '',
     openapi_schema => {
-      openapi => '3.1.0',
+      openapi => $::OAD_VERSION,
       info => {
         title => 'Test API with our own object',
         version => '1.2.3',

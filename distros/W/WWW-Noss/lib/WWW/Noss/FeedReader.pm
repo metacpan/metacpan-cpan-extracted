@@ -2,7 +2,7 @@ package WWW::Noss::FeedReader;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '1.09';
+our $VERSION = '1.10';
 
 use Exporter qw(import);
 our @EXPORT_OK = qw(read_feed);
@@ -10,8 +10,6 @@ our @EXPORT_OK = qw(read_feed);
 use WWW::Noss::FeedReader::Atom;
 use WWW::Noss::FeedReader::RSS;
 use WWW::Noss::TextToHtml qw(strip_tags unescape_html);
-
-# TODO: How to handle relative feed links? (like GingerBill's /article/)
 
 # What is with difference between 'title' and 'displaytitle'?
 # Prior to 1.09, there was only title, which served as both the title to use
@@ -27,6 +25,9 @@ use WWW::Noss::TextToHtml qw(strip_tags unescape_html);
 # title - Internal title used by noss for generating nossuids; should not
 #         change.
 # displaytitle - Title that will be shown to users; can be changed.
+
+# TODO: Add feed option to truncate display titles like we do when generating
+# titles from summaries?
 
 sub _title_from_desc {
 
@@ -79,6 +80,11 @@ sub read_feed {
         );
     } else {
         die sprintf "%s is not an RSS or Atom feed\n", $feed->name;
+    }
+
+    if (defined $channel->{ description }) {
+        $channel->{ description } =~ s/\s+/ /g;
+        $channel->{ description } =~ s/^ | $//g;
     }
 
     for my $i (0 .. $#$entries) {

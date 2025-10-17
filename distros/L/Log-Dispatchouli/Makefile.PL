@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Log::Dispatchouli",
   "PREREQ_PM" => {
     "Carp" => 0,
+    "Encode" => 0,
     "File::Spec" => 0,
     "Log::Dispatch" => 0,
     "Log::Dispatch::Array" => 0,
@@ -49,7 +50,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "utf8" => 0
   },
-  "VERSION" => "3.011",
+  "VERSION" => "3.013",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -58,6 +59,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
+  "Encode" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "File::Spec::Functions" => 0,

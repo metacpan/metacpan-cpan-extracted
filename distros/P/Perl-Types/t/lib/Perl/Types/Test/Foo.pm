@@ -2,12 +2,12 @@
 package Perl::Types::Test::Foo;
 use strict;
 use warnings;
-our $VERSION = 0.006_000;
 use types;
+our $VERSION = 0.006_000;
 
 # [[[ OO INHERITANCE ]]]
-use parent qw(Perl::Class);
-use Perl::Class;
+use parent qw(class);
+use class;
 
 # [[[ CRITICS ]]]
 ## no critic qw(ProhibitUselessNoCritic ProhibitMagicNumbers RequireCheckedSyscalls)  # USER DEFAULT 1: allow numeric values & print operator

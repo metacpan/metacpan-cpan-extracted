@@ -6,8 +6,8 @@ use strict;
 use warnings;
 
 use Carp;
-use Config::Abstraction 0.32;
-use Log::Abstraction 0.25;
+use Config::Abstraction 0.36;
+use Log::Abstraction 0.26;
 use Params::Get 0.13;
 use Return::Set;
 use Scalar::Util qw(blessed weaken);
@@ -28,11 +28,11 @@ Object::Configure - Runtime Configuration for an Object
 
 =head1 VERSION
 
-0.15
+0.16
 
 =cut
 
-our $VERSION = 0.15;
+our $VERSION = 0.16;
 
 =head1 SYNOPSIS
 
@@ -40,9 +40,10 @@ The C<Object::Configure> module is a lightweight utility designed to inject runt
 primarily by layering configuration and logging support,
 when instatiating objects.
 
-L<Log::Abstraction> and L<Config::Abstraction> are modules developed to solve a specific need:
+L<Log::Abstraction> and L<Config::Abstraction> are modules developed to solve a specific need,
 runtime configurability without needing to rewrite or hardcode behaviours.
-The goal is to allow individual modules to enable or disable features on the fly, and to do it using whatever configuration system the user prefers.
+The goal is to allow individual modules to enable or disable features on the fly,
+and to do it using whatever configuration system the user prefers.
 
 Although the initial aim was general configurability,
 the primary use case that's emerged has been fine-grained logging control,
@@ -195,9 +196,17 @@ A hashref containing default parameters to be used in the constructor.
 
 =item * C<carp_on_warn>
 
-If set to 1, call C<Carp:carp> on C<warn()>.
+If set to 1, call C<Carp::carp> on C<warn()>.
 This value is also read from the configuration file,
 which will take precedence.
+The default is 0.
+
+=item * C<croak_on_error>
+
+If set to 1, call C<Carp::croak> on C<error()>.
+This value is also read from the configuration file,
+which will take precedence.
+The default is 1.
 
 =item * C<logger>
 
@@ -218,10 +227,10 @@ Now you can set up a configuration file and environment variables to configure y
 
 sub configure {
 	my $class = $_[0];
-	my $params = $_[1] || {};
+	my $params = $_[1] || {};	# Contains the defaults, the run time config will overwrite them
 	my $array;
 
-	if (exists($params->{'logger'}) && (ref($params->{'logger'}) eq 'ARRAY')) {
+	if(exists($params->{'logger'}) && (ref($params->{'logger'}) eq 'ARRAY')) {
 		$array = delete $params->{'logger'};
 	}
 
@@ -272,12 +281,13 @@ sub configure {
 		}
 	}
 
-	my $carp_on_warn = $params->{'carp_on_warn'} || 0;
+	my $croak_on_error = exists($params->{'croak_on_error'}) ? $params->{'croak_on_error'} : 1;
+	my $carp_on_warn = exists($params->{'carp_on_warn'}) ? $params->{'carp_on_warn'} : 1;
 
 	# Load the default logger
 	if (my $logger = $params->{'logger'}) {
 		if ($params->{'logger'} ne 'NULL') {
-			if (ref($logger) eq 'HASH') {
+			if(ref($logger) eq 'HASH') {
 				if ($logger->{'syslog'}) {
 					$params->{'logger'} = Log::Abstraction->new({
 						carp_on_warn => $carp_on_warn,
@@ -290,7 +300,7 @@ sub configure {
 						%{$logger}
 					});
 				}
-			} elsif (!blessed($logger) || !$logger->isa('Log::Abstraction')) {
+			} elsif(!blessed($logger) || !$logger->isa('Log::Abstraction')) {
 				$params->{'logger'} = Log::Abstraction->new({
 					carp_on_warn => $carp_on_warn,
 					logger => $logger

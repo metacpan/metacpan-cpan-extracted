@@ -15,12 +15,25 @@ use parent qw(Perl::Type);
 use Perl::Type;
 
 # [[[ SUB-TYPES BEFORE SETUP ]]]
-# a filehandleref is "a reference to a newly allocated anonymous filehandle";  http://perldoc.perl.org/functions/open.html
-# we do not ever directly use filehandle type, only filehandleref
+
+# "If FILEHANDLE -- the first argument in a call to open -- is an undefined scalar variable
+# (or array or hash element), a new filehandle is autovivified, meaning that the variable is assigned
+# a reference to a newly allocated anonymous filehandle."
+# https://perldoc.perl.org/functions/open#Direct-versus-by-reference-assignment-of-filehandles
+
 package filehandleref;
 use strict;
 use warnings;
 use parent -norequire, qw(ref);
+
+# "Otherwise if FILEHANDLE is an expression, its value is the real filehandle.
+# (This is considered a symbolic reference, so use strict "refs" should not be in effect.)"
+# https://perldoc.perl.org/functions/open#Direct-versus-by-reference-assignment-of-filehandles
+
+package filehandle;
+use strict;
+use warnings;
+use parent qw(Perl::Type::FileHandle);
 
 # [[[ SWITCH CONTEXT BACK TO PRIMARY PACKAGE ]]]
 package Perl::Type::FileHandle;

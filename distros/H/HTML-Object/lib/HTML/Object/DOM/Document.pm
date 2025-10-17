@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/DOM/Document.pm
-## Version v0.2.3
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v0.3.0
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/13
-## Modified 2024/04/30
+## Modified 2025/10/16
 ## All rights reserved
 ## 
 ## 
@@ -20,8 +20,8 @@ BEGIN
     use vars qw( $VERSION );
     use HTML::Object::ErrorEvent;
     use Scalar::Util ();
-    use Want;
-    our $VERSION = 'v0.2.3';
+    use Wanted;
+    our $VERSION = 'v0.3.0';
 };
 
 use strict;
@@ -418,7 +418,7 @@ sub documentElement : lvalue
             last;
         }
     }
-    if( !$html && Want::want( 'OBJECT' ) )
+    if( !$html && want( 'OBJECT' ) )
     {
         require Module::Generic::Null;
         return( Module::Generic::Null->new( wants => 'OBJECT' ) );
@@ -979,7 +979,7 @@ sub _set_get_on_signal : lvalue
                 return( $self->{__lvalue_error} = undef );
             }
             return( $self->error({ message => $error, class => 'HTML::Object::TypeError' }) ) if( want( 'LVALUE' ) );
-            Want::rreturn( $self->error({ message => $error, class => 'HTML::Object::TypeError' }) );
+            Wanted::rreturn( $self->error({ message => $error, class => 'HTML::Object::TypeError' }) );
         }
         foreach my $sig ( @$sigs )
         {
@@ -1001,7 +1001,7 @@ sub _set_get_on_signal : lvalue
     }
     my $dummy = 1;
     return( $dummy ) if( want( 'LVALUE' ) );
-    Want::rreturn( $dummy );
+    Wanted::rreturn( $dummy );
 }
 
 1;
@@ -1022,7 +1022,7 @@ HTML::Object::DOM::Document - HTML Object DOM Document Class
 
 =head1 VERSION
 
-    v0.2.3
+    v0.3.0
 
 =head1 DESCRIPTION
 

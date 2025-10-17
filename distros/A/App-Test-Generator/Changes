@@ -1,5 +1,20 @@
 Revision history for App-Test-Generator
 
+0.08	Thu Oct 16 20:44:22 EDT 2025
+	Allow $new to be set but not defined, this will call new() with no arguments
+	Started to add support for "nomatch"
+	Allow specs that specify no input if they have output
+	If a routine takes no input, it won't die if it has no input
+
+0.07	Tue Oct 14 16:36:33 EDT 2025
+	Bump minimum versions
+	Added float that was missing some places
+	Use Data::Random
+	Fix GitHub#3
+	Show how to use this module to automatically schedule random tests
+	Test for code doing if($string) rather than if(defined($string)) which is confused if $string is '0'
+	Allow the special word "undef" in the YAML specification for output
+
 0.06	Fri Oct 10 08:55:36 EDT 2025
 	Allow real config files to be read
 	Validate the configuration file

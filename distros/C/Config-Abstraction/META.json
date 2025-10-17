@@ -66,8 +66,8 @@
    "resources" : {
       "bugtracker" : {
          "mailto" : "bug-Config-Abstraction@rt.cpan.org",
-         "web" : "https://github.com/nigelhorne/Config-Abstraction/issues",
-         "x_url" : "https://github.com/nigelhorne/Config-Abstraction/issues"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Config-Abstraction",
+         "x_url" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Config-Abstraction"
       },
       "homepage" : "https://metacpan.org/pod/Config::Abstraction",
       "repository" : {
@@ -77,6 +77,6 @@
          "x_repository" : "https://github.com/nigelhorne/Config-Abstraction"
       }
    },
-   "version" : "0.35",
+   "version" : "0.36",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

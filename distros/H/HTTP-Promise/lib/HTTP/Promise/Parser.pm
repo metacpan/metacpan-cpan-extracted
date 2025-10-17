@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise/Parser.pm
-## Version v0.2.1
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v0.2.2
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/03/25
-## Modified 2025/08/30
+## Modified 2025/10/15
 ## All rights reserved.
 ## 
 ## 
@@ -32,7 +32,7 @@ BEGIN
     # use Nice::Try;
     use URI;
     use URI::Encode::XS;
-    use Want;
+    use Wanted;
     use constant (
         TYPE_URL_ENCODED => 'application/x-www-form-urlencoded',
     );
@@ -74,7 +74,7 @@ BEGIN
     our $ERROR    = '';
     our $DEBUG    = 0;
     our $EXCEPTION_CLASS = 'HTTP::Promise::Exception';
-    our $VERSION = 'v0.2.1';
+    our $VERSION = 'v0.2.2';
 };
 
 use strict;
@@ -1113,7 +1113,7 @@ HTTP::Promise::Parser - Fast HTTP Request & Response Parser
 
 =head1 VERSION
 
-    v0.2.1
+    v0.2.2
 
 =head1 DESCRIPTION
 

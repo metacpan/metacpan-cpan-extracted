@@ -15,9 +15,6 @@ use Test::Warnings qw(:no_end_test warnings had_no_warnings);
 use lib 't/lib';
 use Helper;
 
-use constant STRICT_DIALECT_URI => 'https://raw.githubusercontent.com/karenetheridge/OpenAPI-Modern/master/share/strict-dialect.json';
-use constant STRICT_METASCHEMA_URI => 'https://raw.githubusercontent.com/karenetheridge/OpenAPI-Modern/master/share/strict-schema.json';
-
 my $yamlpp = YAML::PP->new(boolean => 'JSON::PP');
 
 subtest 'basic construction' => sub {
@@ -25,7 +22,7 @@ subtest 'basic construction' => sub {
     [ warnings {
       JSON::Schema::Modern::Document::OpenAPI->new(
         canonical_uri => 'http://localhost:1234/api',
-        schema => {},
+        schema => $yamlpp->load_string(OPENAPI_PREAMBLE."\npaths: {}\n"),
         json_schema_dialect => 'https://example.com/metaschema',
       )
     } ],
@@ -35,9 +32,7 @@ subtest 'basic construction' => sub {
 
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
-paths: {}
-YAML
+    schema => $yamlpp->load_string(OPENAPI_PREAMBLE."\npaths: {}\n"));
 
   cmp_result([ $doc->errors ], [], 'no errors when loading empty document');
   cmp_result(
@@ -104,33 +99,17 @@ YAML
   );
 
 
-  $doc = JSON::Schema::Modern::Document::OpenAPI->new(
-    canonical_uri => 'http://localhost:1234/api',
-    schema => {},
-  );
-  cmp_result(
-    [ map $_->TO_JSON, $doc->errors ],
-    [
-      {
-        instanceLocation => '',
-        keywordLocation => '/required',
-        absoluteKeywordLocation => DEFAULT_METASCHEMA.'#/required',
-        error => 'object is missing property: openapi',
-      },
-    ],
+  die_result(
+    sub { $doc = JSON::Schema::Modern::Document::OpenAPI->new(schema => {}) },
+    qr/missing openapi version/,
     'missing openapi',
-  );
-  is(
-    document_result($doc),
-    q!'': object is missing property: openapi!,
-    'stringified errors',
   );
 
 
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
     schema => {
-      openapi => OAS_VERSION,
+      openapi => OAD_VERSION,
       info => {},
       paths => {},
     },
@@ -141,13 +120,13 @@ YAML
       {
         instanceLocation => '/info',
         keywordLocation => '/$ref/properties/info/$ref/required',
-        absoluteKeywordLocation => DEFAULT_METASCHEMA.'#/$defs/info/required',
+        absoluteKeywordLocation => DEFAULT_METASCHEMA->{+OAS_VERSION}.'#/$defs/info/required',
         error => 'object is missing properties: title, version',
       },
       {
         instanceLocation => '',
         keywordLocation => '/$ref/properties',
-        absoluteKeywordLocation => DEFAULT_METASCHEMA.'#/properties',
+        absoluteKeywordLocation => DEFAULT_METASCHEMA->{+OAS_VERSION}.'#/properties',
         error => 'not all properties are valid',
       },
     ],
@@ -162,34 +141,7 @@ ERRORS
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
     schema => {
-      openapi => '2.1.3',
-    },
-  );
-
-  cmp_result(
-    [ map $_->TO_JSON, $doc->errors ],
-    [
-      {
-        instanceLocation => '/openapi',
-        keywordLocation => '/properties/openapi/pattern',
-        absoluteKeywordLocation => DEFAULT_METASCHEMA.'#/properties/openapi/pattern',
-        error => 'unrecognized/unsupported openapi version 2.1.3',
-      },
-      {
-        instanceLocation => '',
-        keywordLocation => '/properties',
-        absoluteKeywordLocation => DEFAULT_METASCHEMA.'#/properties',
-        error => 'not all properties are valid',
-      },
-    ],
-    'invalid openapi version',
-  );
-
-
-  $doc = JSON::Schema::Modern::Document::OpenAPI->new(
-    canonical_uri => 'http://localhost:1234/api',
-    schema => {
-      openapi => OAS_VERSION,
+      openapi => OAD_VERSION,
       info => {
         title => 'my title',
         version => '1.2.3',
@@ -201,23 +153,40 @@ ERRORS
     [ map $_->TO_JSON, $doc->errors ],
     [
       {
-        instanceLocation => '/jsonSchemaDialect',
-        keywordLocation => '/properties/jsonSchemaDialect/type',
-        absoluteKeywordLocation => DEFAULT_METASCHEMA.'#/properties/jsonSchemaDialect/type',
-        error => 'got null, not string',
-      },
-      {
         instanceLocation => '',
-        keywordLocation => '/properties',
-        absoluteKeywordLocation => DEFAULT_METASCHEMA.'#/properties',
-        error => 'not all properties are valid',
+        keywordLocation => '/jsonSchemaDialect',
+        absoluteKeywordLocation => 'http://localhost:1234/api#/jsonSchemaDialect',
+        error => 'jsonSchemaDialect value is not a string',
       },
     ],
     'null jsonSchemaDialect is rejected',
   );
   is(document_result($doc), substr(<<'ERRORS', 0, -1), 'stringified errors');
-'/jsonSchemaDialect': got null, not string
-'': not all properties are valid
+'/jsonSchemaDialect': jsonSchemaDialect value is not a string
+ERRORS
+
+
+  $doc = JSON::Schema::Modern::Document::OpenAPI->new(
+    canonical_uri => 'http://localhost:1234/api',
+    schema => {
+      openapi => '3.1.0',
+      info => { title => '', version => '' },
+      '$self' => 'https://example.com/api',
+    },
+  );
+  cmp_result(
+    [ map $_->TO_JSON, $doc->errors ],
+    [
+      {
+        instanceLocation => '',
+        keywordLocation => '/$self',
+        error => 'additional property not permitted',
+      },
+    ],
+    '$self is not permitted before OAS version 3.2.0',
+  );
+  is(document_result($doc), substr(<<'ERRORS', 0, -1), 'stringified errors');
+'/$self': additional property not permitted
 ERRORS
 
 
@@ -226,30 +195,33 @@ ERRORS
     schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 $self: '#frag\\ment'
 YAML
-
   cmp_result(
     [ map $_->TO_JSON, $doc->errors ],
     [
       {
-        instanceLocation => '/$self',
-        keywordLocation => '/properties/$self/pattern',
-        absoluteKeywordLocation => DEFAULT_METASCHEMA.'#/properties/$self/pattern',
-        error => '$self cannot contain a fragment',
-      },
-      {
-        instanceLocation => '/$self',
-        keywordLocation => '/properties/$self/format',
-        absoluteKeywordLocation => DEFAULT_METASCHEMA.'#/properties/$self/format',
-        error => 'not a valid uri-reference string',
-      },
-      {
         instanceLocation => '',
-        keywordLocation => '/properties',
-        absoluteKeywordLocation => DEFAULT_METASCHEMA.'#/properties',
-        error => 'not all properties are valid',
+        keywordLocation => '/$self',
+        error => re(qr/^\$self value is not a valid URI-reference$/i),
       },
     ],
-    'invalid $self uri, with custom error message',
+    '$self must be a uri-reference',
+  );
+
+  $doc = JSON::Schema::Modern::Document::OpenAPI->new(
+    canonical_uri => 'http://localhost:1234/api',
+    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+$self: '#fragment'
+YAML
+  cmp_result(
+    [ map $_->TO_JSON, $doc->errors ],
+    [
+      {
+        instanceLocation => '',
+        keywordLocation => '/$self',
+        error => '$self cannot contain a fragment',
+      },
+    ],
+    '$self cannot contain a fragment',
   );
 
 
@@ -263,19 +235,13 @@ YAML
     [ map $_->TO_JSON, $doc->errors ],
     [
       {
-        instanceLocation => '/jsonSchemaDialect',
-        keywordLocation => '/properties/jsonSchemaDialect/format',
-        absoluteKeywordLocation => DEFAULT_METASCHEMA.'#/properties/jsonSchemaDialect/format',
-        error => 'not a valid uri-reference string',
-      },
-      {
         instanceLocation => '',
-        keywordLocation => '/properties',
-        absoluteKeywordLocation => DEFAULT_METASCHEMA.'#/properties',
-        error => 'not all properties are valid',
+        keywordLocation => '/jsonSchemaDialect',
+        absoluteKeywordLocation => 'http://localhost:1234/api#/jsonSchemaDialect',
+        error => re(qr/^jsonSchemaDialect value is not a valid URI-reference$/i),
       },
     ],
-    'invalid jsonSchemaDialect uri',
+    'jsonSchemaDialect must be a uri-reference',
   );
 
 
@@ -321,7 +287,10 @@ ERRORS
 };
 
 subtest 'openapi version checks' => sub {
-  foreach my $version (qw(3.1.3 3.1.9 3.1.10)) {    # TODO: 3.2.5 4.0.0 4.1.0
+  foreach my $version (map {
+        my @oad_version = split /\./, $_;
+        map join('.', @oad_version[0..1], $_), 0 .. $oad_version[2]
+      } SUPPORTED_OAD_VERSIONS->@*) {
     cmp_result(
       [ warnings {
         JSON::Schema::Modern::Document::OpenAPI->new(
@@ -334,8 +303,49 @@ info:
 paths: {}
 YAML
       } ],
-    [ re(qr/^\QWARNING: your document was written for version $version but this implementation has only been tested up to ${\ OAS_VERSION }: this may be okay but you should upgrade your OpenAPI::Modern installation soon\E/) ],
-      'warning (not error) is given when the OAD version ('.$version.') exceeds what we know about',
+      [],
+      'no warnings when the OAD version ('.$version.') is within support range',
+    );
+  }
+
+  foreach my $version (map {
+        my @oad_version = split /\./, $_;
+        map join('.', @oad_version[0..1], $_), (map $oad_version[2]+$_, 1..10)
+      } SUPPORTED_OAD_VERSIONS->@*) {
+    my $prefix = join('.', (split(/\./, $version))[0..1], '');
+    my ($tested_version) = grep /^\Q$prefix\E/, SUPPORTED_OAD_VERSIONS->@*;
+    cmp_result(
+      [ warnings {
+        JSON::Schema::Modern::Document::OpenAPI->new(
+          schema => $yamlpp->load_string(<<"YAML"))
+---
+openapi: $version
+info:
+  title: Test API
+  version: 1.2.3
+paths: {}
+YAML
+      } ],
+    [ re(qr/^\QWARNING: your document was written for version $version but this implementation has only been tested up to $tested_version: this may be okay but you should upgrade your OpenAPI::Modern installation soon\E/) ],
+      'warning (not error) is given when the OAD version ('.$version.') surpasses what we know about',
+    );
+  }
+
+  foreach my $version (qw(3.0.3 3.3.5 4.0.0 4.1.0 4.1.1)) {
+    die_result(
+      sub {
+        JSON::Schema::Modern::Document::OpenAPI->new(
+          schema => $yamlpp->load_string(<<"YAML"))
+---
+openapi: $version
+info:
+  title: Test API
+  version: 1.2.3
+paths: {}
+YAML
+      },
+      qr{unrecognized/unsupported openapi version $version},
+      'exception is thrown when the OAD version ('.$version.') has an unsupported major or minor version',
     );
   }
 };
@@ -350,7 +360,7 @@ paths: {}
 YAML
 
   cmp_result([ $doc->errors ], [], 'no errors with default jsonSchemaDialect');
-  is($doc->metaschema_uri, DEFAULT_BASE_METASCHEMA, 'default metaschema is saved for the document');
+  is($doc->metaschema_uri, DEFAULT_BASE_METASCHEMA->{+OAS_VERSION}, 'default metaschema is saved for the document');
 
   $js->add_document($doc);
   cmp_result(
@@ -365,8 +375,8 @@ YAML
         vocabularies => bag(OAS_VOCABULARIES->@*),
       },
       # the oas vocabulary, and the dialect that uses it
-      DEFAULT_DIALECT() => {
-        canonical_uri => str(DEFAULT_DIALECT),
+      DEFAULT_DIALECT->{+OAS_VERSION} => {
+        canonical_uri => str(DEFAULT_DIALECT->{+OAS_VERSION}),
         path => '',
         specification_version => 'draft2020-12',
         document => ignore,
@@ -375,13 +385,13 @@ YAML
         anchors => {
           meta => {
             path => '',
-            canonical_uri => str(DEFAULT_DIALECT),
+            canonical_uri => str(DEFAULT_DIALECT->{+OAS_VERSION}),
             dynamic => 1,
           },
         },
       },
-      OAS_VOCABULARY() => {
-        canonical_uri => str(OAS_VOCABULARY),
+      OAS_VOCABULARY->{+OAS_VERSION} => {
+        canonical_uri => str(OAS_VOCABULARY->{+OAS_VERSION}),
         path => '',
         specification_version => 'draft2020-12',
         document => ignore,
@@ -390,7 +400,7 @@ YAML
         anchors => {
           meta => {
             path => '',
-            canonical_uri => str(OAS_VOCABULARY),
+            canonical_uri => str(OAS_VOCABULARY->{+OAS_VERSION}),
             dynamic => 1,
           },
         },
@@ -413,7 +423,7 @@ YAML
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
     evaluator => $js,
-    metaschema_uri => DEFAULT_METASCHEMA, # '#meta' is now just {"type": ["object","boolean"]}
+    metaschema_uri => DEFAULT_METASCHEMA->{+OAS_VERSION}, # '#meta' is now just {"type": ["object","boolean"]}
     schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 jsonSchemaDialect: https://mymetaschema
 components:
@@ -423,7 +433,7 @@ components:
 YAML
 
   cmp_result([ $doc->errors ], [], 'no errors with a custom jsonSchemaDialect');
-  is($doc->metaschema_uri, DEFAULT_METASCHEMA, 'default (permissive) metaschema is saved');
+  is($doc->metaschema_uri, DEFAULT_METASCHEMA->{+OAS_VERSION}, 'default (permissive) metaschema is saved');
 
   $js->add_document($doc);
   cmp_result(
@@ -520,7 +530,7 @@ YAML
     canonical_uri => 'https://example.com',
     evaluator => $js,
     # metaschema_uri cannot be autogenerated, as jsonSchemaDialect uri-reference will not match
-    metaschema_uri => DEFAULT_METASCHEMA,
+    metaschema_uri => DEFAULT_METASCHEMA->{+OAS_VERSION},
     schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 $self: api
 jsonSchemaDialect: mymetaschema   # this is a relative uri
@@ -558,7 +568,7 @@ YAML
 
 subtest 'custom dialects, via metaschema_uri' => sub {
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
-    metaschema_uri => STRICT_METASCHEMA_URI,
+    metaschema_uri => STRICT_METASCHEMA->{+OAS_VERSION},
     schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 components:
   schemas:
@@ -573,7 +583,7 @@ YAML
     {
       instanceLocation => '/components/schemas/Foo/blah',
       keywordLocation => '/$ref/properties/components/$ref/properties/schemas/additionalProperties/$dynamicRef/$ref/unevaluatedProperties',
-      absoluteKeywordLocation => STRICT_DIALECT_URI.'#/unevaluatedProperties',
+      absoluteKeywordLocation => STRICT_DIALECT->{+OAS_VERSION}.'#/unevaluatedProperties',
       error => 'additional property not permitted',
     },
     'subschemas identified, and error found',
@@ -582,9 +592,9 @@ YAML
 
 subtest 'custom dialects, via metaschema_uri and jsonSchemaDialect' => sub {
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
-    metaschema_uri => STRICT_METASCHEMA_URI,
+    metaschema_uri => STRICT_METASCHEMA->{+OAS_VERSION},
     schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<YAML));
-jsonSchemaDialect: ${\ STRICT_DIALECT_URI() }
+jsonSchemaDialect: ${\ STRICT_DIALECT->{+OAS_VERSION} }
 components:
   schemas:
     Foo:
@@ -598,7 +608,7 @@ YAML
     {
       instanceLocation => '/components/schemas/Foo/blah',
       keywordLocation => '/$ref/properties/components/$ref/properties/schemas/additionalProperties/$dynamicRef/$ref/unevaluatedProperties',
-      absoluteKeywordLocation => STRICT_DIALECT_URI.'#/unevaluatedProperties',
+      absoluteKeywordLocation => STRICT_DIALECT->{+OAS_VERSION}.'#/unevaluatedProperties',
       error => 'additional property not permitted',
     },
     'subschemas identified, and error found',

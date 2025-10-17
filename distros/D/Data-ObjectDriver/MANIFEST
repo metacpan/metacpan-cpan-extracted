@@ -44,6 +44,7 @@ t/07-has-a.t
 t/08-iterator.t
 t/09-resultset.t
 t/10-resultset-peek.t
+t/11-sql-with-models.t
 t/11-sql.t
 t/12-windows.t
 t/20-driver-sqlite.t
@@ -71,11 +72,15 @@ t/lib/escape/Foo.pm
 t/lib/multiplexed/Ingredient2Recipe.pm
 t/lib/partitioned/Ingredient.pm
 t/lib/partitioned/Recipe.pm
+t/lib/sql/Blog.pm
+t/lib/sql/Entry.pm
 t/lib/views/Ingredient.pm
 t/lib/views/Ingredient2Recipe.pm
 t/lib/views/IngredientsWeighted.pm
 t/lib/views/Recipe.pm
 t/perf/inflate.pl
+t/schemas/blog.sql
+t/schemas/entry.sql
 t/schemas/error_test.sql
 t/schemas/foo.sql
 t/schemas/ingredient2recipe.sql

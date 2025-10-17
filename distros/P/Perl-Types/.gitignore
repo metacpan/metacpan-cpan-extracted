@@ -1,6 +1,6 @@
 # [[[ EXCLUDE ALL AUTOMATICALLY-GENERATED FILES FROM GIT ]]]
 # DEV NOTE, CORRELATION #gt06: copy all automatically-generated files between '.gitignore' & '.dockerignore'
-# v0.300_000
+# v0.310_000
 
 # NEED DELETE, TMP DEBUG: ignore generated diff and snapshot files from perl_types_refactor_names
 /bin/dev/perl_types_refactor_names/
@@ -51,6 +51,9 @@ _cover
 
 # [ POD ]
 pod2htmd.tmp
+
+# [ PLX ]
+.plx
 
 # [ GitLab Pages ]
 public

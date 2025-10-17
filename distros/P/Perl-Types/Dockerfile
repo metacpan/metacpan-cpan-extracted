@@ -1,4 +1,5 @@
 # this is the Docker base image for Perl projects with cpanminus, local::lib, Dist::Zilla, and Perl::Types
+# v0.100_000
 
 # DEV NOTE: prefer "perl" upstream Docker image over "perldocker/perl-tester", due to more updates & better team
 # https://hub.docker.com/_/perl
@@ -62,6 +63,9 @@ RUN apt-get update && \
     python3-full \
     python3-pip \
     python3-venv \
+    ruby \
+    ruby-bundler \
+    ruby-dev \
     gosu && \
     rm -rf /var/lib/apt/lists/*
 
@@ -102,7 +106,7 @@ ENV PERL_MM_OPT="INSTALL_BASE=${LOCAL_LIB}"
 ENV PERL_MM_USE_DEFAULT=1
 ENV PERL_CPANM_OPT="--verbose --notest --skip-satisfied --local-lib=${LOCAL_LIB}"
 
-# switch to non-root for all subsequent steps
+# switch to non-root for all subsequent steps, except where specified
 USER ${USER}
 WORKDIR /app
 
@@ -110,7 +114,18 @@ WORKDIR /app
 RUN cpanm local::lib Dist::Zilla
 
 # copy minimal files first, for better Docker layer cache
-COPY --chown=${UID}:${GID} cpanfile ./
+COPY --chown=${UID}:${GID} debianfile cpanfile pythonfile rubyfile ./
+
+# install project-specific Debian dependencies using `apt-get`,
+# accepting as input our custom-named 'debianfile' Debian dependency specification file;
+# use `test` to check if the 'debianfile' exists and is not empty;
+# if the file is valid, then use `sed` to read its contents and filter out comments,
+# use `xargs` to pass the package names to `apt-get` for installation, and
+# clean up the apt cache to minimize the final Docker image size;
+# run all commands as root then switch back to normal user
+USER root
+RUN test -s debianfile && sed 's/#.*//' debianfile | xargs apt-get install --no-install-recommends -y && rm -rf /var/lib/apt/lists/*
+USER ${USER}
 
 # install all Perl dependencies declared in 'cpanfile':
 # developers AKA authors (Dist::Zilla plugins & author test deps), configure (Alien or other build-only requirements),
@@ -119,13 +134,26 @@ COPY --chown=${UID}:${GID} cpanfile ./
 # both `dzil authordeps | cpanm` and `dzil listdeps | cpanm`, and thereby removed tons of
 # Dist::Zilla plugin cruft in this RUN command, which created fake '.git' & 'Changes' & main module etc;
 # however there is no easy way to use `cpanm` to show the dependencies without installing, so we will just install
-RUN cpanm --notest --installdeps . --with-develop --with-configure
+RUN test -s cpanfile && cpanm --notest --installdeps . --with-develop --with-configure
 
-# activate Python virtual environment & install Python dependencies from PyPI via Pip,
+# activate Python virtual environment & install Python dependencies from PyPI using Python's `pip` package manager,
+# accepting as input our custom-named 'pythonfile' Python dependency specification file;
 # use `.` command because we are in the old `/bin/sh` Bourne shell by default, instead of Bash-only `source` command;
-# DEV NOTE: replace `tiktoken` with your Python dependencies, or disable 2 following lines if none
-RUN python3 -m venv /app/venv && . /app/venv/bin/activate && pip install -U pip && pip install tiktoken
-ENV PATH="/app/venv/bin:${PATH}"
+# DEV NOTE: disable the 2 following lines if your project does not have any Python dependencies
+RUN test -s pythonfile && python3 -m venv /app/python-venv && . /app/python-venv/bin/activate && pip install -U pip && pip install --requirement pythonfile
+# if distributions were installed, the new path will exist; if not, the shell will simply ignore it
+ENV PATH="/app/python-venv/bin:${PATH}"
+
+# install Ruby dependencies to the '/app/ruby-gems' directory, using Ruby's `gem` package manager,
+# accepting as input our custom-named 'rubyfile' Ruby dependency specification file;
+# Ruby is configured system-wide to install and find gems in '/app/ruby-gems', by setting this directory
+# as the value of the "GEM_HOME" and "GEM_PATH" environment variables respectively;
+# DEV NOTE: disable the 4 following lines if your project does not have any Ruby dependencies
+ENV GEM_HOME=/app/ruby-gems
+ENV GEM_PATH=/app/ruby-gems
+RUN test -s rubyfile && gem install --file rubyfile
+# if distributions were installed, the new path will exist; if not, the shell will simply ignore it
+ENV PATH="/app/ruby-gems/bin:${PATH}"
 
 # copy the rest of the project
 COPY --chown=${UID}:${GID} . .

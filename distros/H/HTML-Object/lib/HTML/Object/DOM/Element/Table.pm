@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/DOM/Element/Table.pm
-## Version v0.2.1
+## Version v0.3.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/23
-## Modified 2022/09/20
+## Modified 2025/10/16
 ## All rights reserved
 ## 
 ## 
@@ -19,8 +19,8 @@ BEGIN
     use parent qw( HTML::Object::DOM::Element );
     use vars qw( $VERSION );
     use HTML::Object::DOM::Element::Shared qw( :table );
-    use Want;
-    our $VERSION = 'v0.2.1';
+    use Wanted;
+    our $VERSION = 'v0.3.0';
 };
 
 use strict;
@@ -589,7 +589,7 @@ HTML::Object::DOM::Element::Table - HTML Object DOM Table Class
 
 =head1 VERSION
 
-    v0.2.1
+    v0.3.0
 
 =head1 DESCRIPTION
 

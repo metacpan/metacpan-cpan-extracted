@@ -85,11 +85,9 @@ if ($version < $min_cxx_versions->{$cxx_real}) {
 }
 
 # fix read-only blib/lib in MS Windows
-BEGIN {
-    require ExtUtils::MakeMaker;  # ensure EUMM is actually loaded before modifying "@ExtUtils::MakeMaker::Overridable"
-    if ( $OSNAME eq 'MSWin32' ) {
-        push( @ExtUtils::MakeMaker::Overridable, qw(pm_to_blib) );
-    }
+if ( $OSNAME eq 'MSWin32' ) {
+    # DEV NOTE, CORRELATION #gt01: Dist::Zilla::Plugin::AutoPrereqs incorrectly finds ExtUtils::MakeMaker as dependency
+    push( @ExtUtils::MakeMaker::Overridable, qw(pm_to_blib) );
 }
 
 my %WriteMakefileArgs = (
@@ -159,14 +157,15 @@ my %WriteMakefileArgs = (
     "Cwd" => 0,
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
+    "Test2::Tools::LoadModule" => 0,
     "Test2::V0" => 0,
     "Test::Exception" => 0,
     "Test::More" => 0,
     "Test::Number::Delta" => 0
   },
-  "VERSION" => "0.300",
+  "VERSION" => "0.400",
   "test" => {
-    "TESTS" => "t/*.t t/author/*.t"
+    "TESTS" => "t/*.t"
   }
 );
 
@@ -192,6 +191,7 @@ my %FallbackPrereqs = (
   "PadWalker" => 0,
   "Scalar::Util" => 0,
   "Term::ReadLine" => 0,
+  "Test2::Tools::LoadModule" => 0,
   "Test2::V0" => 0,
   "Test::Exception" => 0,
   "Test::More" => 0,

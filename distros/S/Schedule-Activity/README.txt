@@ -1,8 +1,17 @@
-"Schedule::Activity" Version 0.1.3
+"Schedule::Activity" Version 0.1.5
 
 Abstract:
 ---------
 This package provides a mechanism to construct "random" schedules of events using a graph-based configuration of activities and actions.  Action scheduling allows cycles/recursion to meet activity schedule goals.
+
+What's new in version 0.1.5:
+--------------------------
+* Attributes use rolling averages for efficiency.
+* The 0.1.4 update fixed attribute historic entry, but it never really worked "properly" and has been removed as it is not needed in the scheduler.
+
+What's new in version 0.1.4:
+--------------------------
+* Attributes can log historic changes, but they no longer update the 'value', which should always be the most recent logged value.
 
 What's new in version 0.1.3:
 --------------------------
@@ -11,12 +20,6 @@ What's new in version 0.1.3:
 What's new in version 0.1.2:
 --------------------------
 * Named message support
-
-What's new in version 0.1.1:
---------------------------
-* Attributes for activity/action nodes and messages
-* Message strings, arrays, and hashes
-* Basic annotation configuration and build
 
 Copyright & License:
 --------------------

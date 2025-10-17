@@ -8,7 +8,7 @@ use Schedule::Activity::Attributes;
 use Schedule::Activity::Message;
 use Schedule::Activity::Node;
 
-our $VERSION='0.1.3';
+our $VERSION='0.1.5';
 
 sub buildConfig {
 	my (%base)=@_;
@@ -280,7 +280,7 @@ Schedule::Activity - Generate random activity schedules
 
 =head1 VERSION
 
-Version 0.1.3
+Version 0.1.5
 
 =head1 SYNOPSIS
 
@@ -515,7 +515,12 @@ When an activity/action node and a selected message both contain attributes, the
 
 The reported C<xy> is an array of values of the form C<(tm, value)>, with each representing an activity/action referencing that attribute built into the schedule.  Each attribute will have its initial value of C<(0, value)>, either the default or the value specified in C<configuration{attributes}>.
 
-Undecided behavior:  As of version 0.1.1, attribute logging will also occur at the end of every activity, so changes in attributes across activity boundaries do not affect the average value calculation.  In particular, the starting value in any given activity is the most recent value in the previous activity, adjusted by any operator in the activity node itself.  For example, suppose two activities go from C<tm=0> to 10, and from C<tm=10> to 20.  If an attribute is set to C<tm=0, value=5> and not set again until C<tm=15, value=0>, then the average in the first activity is five.
+For integers, attributes may be fixed in the log at their current value by calling C<incr=0>.  There is currently no similar mechanism for booleans.
+
+(Approaching a decision):  As of version 0.1.1, attribute logging will also occur at the end of every activity, so changes in attributes across activity boundaries do not affect the average value calculation.  In particular, the starting value in any given activity is the most recent value in the previous activity, adjusted by any operator in the activity node itself.  For example, suppose two activities go from C<tm=0> to 10, and from C<tm=10> to 20.  If an attribute is set to C<tm=0, value=5> and not set again until C<tm=15, value=0>, then the average in the first activity is five.
+
+Proposed:  Because C<incr=0> can fix the value of an integer attribute in the final action node of an activity, this permits the user to choose the behavior.  For Boolean attributes, they are already fixed until the next C<set> event, so the average value should be equivalent whether these are pinned at the end of the activity or not.
+
 
 =head1 ANNOTATIONS
 
@@ -543,7 +548,7 @@ Scheduling I<annotations> are a collection of secondary events to be attached to
 
 Within an individual group, earlier annotations take priority if two events are scheduled at the same time.  Multiple groups of annotations may have conflicting event schedules with event overlap.  Note that the C<between> setting is only enforced for each annotation individually at this time.
 
-As of version 0.1.1, annotations do I<not> update the C<attributes> response from C<buildSchedule>.  Because annotations may themselves contain attributes, they are retained separately from the main schedule of activities to permit easier rebuilding.  At this time, however, the caller must verify that annotation schedules before merging them and their attributes into the schedule.  Annotations may also be built separately after schedule construction as described in L<Schedule::Activity::Annotation>.
+Annotations do I<not> update the C<attributes> response from C<buildSchedule>.  Because annotations may themselves contain attributes, they are retained separately from the main schedule of activities to permit easier rebuilding.  At this time, however, the caller must verify that annotation schedules before merging them and their attributes into the schedule.  Annotations may also be built separately after schedule construction as described in L<Schedule::Activity::Annotation>.
 
 Annotations may use named messages, and messages in the annotations response structure are materialized using the named message configuration passed to C<buildSchedule>.
 

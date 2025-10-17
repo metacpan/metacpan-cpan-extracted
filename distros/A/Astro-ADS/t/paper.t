@@ -48,7 +48,7 @@ subtest 'Create every Paper attribute' => sub {
             $attributes->{$list} = ['Dummy value'];
         }
 
-        ok my $paper = Astro::ADS::Paper->new( $attributes );
+        ok my $paper = Astro::ADS::Paper->new( $attributes ), 'Creates new Paper object';
 };
 
 done_testing();

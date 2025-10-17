@@ -4,14 +4,14 @@ use strict;
 use warnings;
 use Schedule::Activity::Attribute;
 
-our $VERSION='0.1.3';
+our $VERSION='0.1.5';
 
 sub new {
 	my ($ref,%opt)=@_;
 	my $class=ref($ref)||$ref;
 	my %self=(
-		attr    =>{},
-		# internal=>{}, # not yet needed
+		attr =>{},
+		stack=>[],
 	);
 	return bless(\%self,$class);
 }
@@ -35,7 +35,7 @@ sub register {
 sub log {
 	my ($self,$tm)=@_;
 	if(!defined($tm)) { return $self }
-	foreach my $A (values %{$$self{attr}}) { $A->log($tm) }
+	foreach my $A (values %{$$self{attr}}) { $A->change(tm=>$tm,_log=>1) }
 	return $self;
 }
 
@@ -52,6 +52,23 @@ sub report {
 	my %res;
 	while(my ($k,$v)=each %{$$self{attr}}) { %{$res{$k}}=$v->report() }
 	return %res;
+}
+
+sub push {
+	my ($self)=@_;
+	my %state;
+	while(my ($k,$v)=each %{$$self{attr}}) { %{$state{$k}}=$v->dump() }
+	push @{$$self{stack}},\%state;
+	return $self;
+}
+
+sub pop {
+	my ($self)=@_;
+	if(!@{$$self{stack}}) { return $self }
+	my %state=%{pop @{$$self{stack}}};
+	%{$$self{attr}}=();
+	while(my ($k,$v)=each %state) { $$self{attr}{$k}=Schedule::Activity::Attribute->restore(%$v) }
+	return $self;
 }
 
 1;

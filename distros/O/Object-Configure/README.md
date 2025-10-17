@@ -7,7 +7,7 @@ Object::Configure - Runtime Configuration for an Object
 
 # VERSION
 
-0.15
+0.16
 
 # SYNOPSIS
 
@@ -15,9 +15,10 @@ The `Object::Configure` module is a lightweight utility designed to inject runti
 primarily by layering configuration and logging support,
 when instatiating objects.
 
-[Log::Abstraction](https://metacpan.org/pod/Log%3A%3AAbstraction) and [Config::Abstraction](https://metacpan.org/pod/Config%3A%3AAbstraction) are modules developed to solve a specific need:
+[Log::Abstraction](https://metacpan.org/pod/Log%3A%3AAbstraction) and [Config::Abstraction](https://metacpan.org/pod/Config%3A%3AAbstraction) are modules developed to solve a specific need,
 runtime configurability without needing to rewrite or hardcode behaviours.
-The goal is to allow individual modules to enable or disable features on the fly, and to do it using whatever configuration system the user prefers.
+The goal is to allow individual modules to enable or disable features on the fly,
+and to do it using whatever configuration system the user prefers.
 
 Although the initial aim was general configurability,
 the primary use case that's emerged has been fine-grained logging control,
@@ -167,9 +168,17 @@ Takes arguments:
 
 - `carp_on_warn`
 
-    If set to 1, call `Carp:carp` on `warn()`.
+    If set to 1, call `Carp::carp` on `warn()`.
     This value is also read from the configuration file,
     which will take precedence.
+    The default is 0.
+
+- `croak_on_error`
+
+    If set to 1, call `Carp::croak` on `error()`.
+    This value is also read from the configuration file,
+    which will take precedence.
+    The default is 1.
 
 - `logger`
 

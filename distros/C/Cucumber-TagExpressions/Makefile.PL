@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.014004",
   "NAME" => "Cucumber::TagExpressions",
   "PREREQ_PM" => {
-    "List::Util" => "1.69",
+    "List::Util" => "1.70",
     "Moo" => 0
   },
   "TEST_REQUIRES" => {
@@ -25,7 +25,7 @@ my %WriteMakefileArgs = (
     "Test2::V0" => 0,
     "YAML" => 0
   },
-  "VERSION" => "6.2.0",
+  "VERSION" => "8.0.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -33,7 +33,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "List::Util" => "1.69",
+  "List::Util" => "1.70",
   "Moo" => 0,
   "Test2::Tools::Exception" => 0,
   "Test2::V0" => 0,

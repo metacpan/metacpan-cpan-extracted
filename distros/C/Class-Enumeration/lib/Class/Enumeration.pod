@@ -1,0 +1,97 @@
+=pod
+
+=head1 NAME
+
+Class::Enumeration - Abstract parent class of enum classes
+
+=head1 SYNOPSIS
+
+  use strict;
+  use warnings;
+
+  package TurnstileState;
+
+  use parent 'Class::Enumeration';
+
+  # Define list of enum objects
+  my @values;
+  sub _values { ## no critic( ProhibitUnusedPrivateSubroutines )
+    my $ordinal = 0;
+    @values = map { __PACKAGE__->_new( $ordinal++, $_ ) } qw( Locked Unlocked )
+      unless @values;
+    @values
+  }
+
+  1
+
+=head1 CAVEAT
+
+This class is abstract. It defines and partially implements the API
+of enum classes. It should not be used directly. You should use the
+L<Class::Enumeration::Builder> module instead.
+
+=head1 DESCRIPTION
+
+An enum class is a list of enum objects. Each enum object is immutable and
+has a C<name> and an C<ordinal> attribute.
+
+Each enum class has a C<name()> getter method (an object method), that
+returns the C<name> of the enum object, exactly as defined.
+
+Each enum class has an C<ordinal()> getter method (an object method), that
+returns the C<ordinal> of the enum object (its position in its definition,
+where the initial object is assigned an ordinal of zero).
+
+Each enum class has a C<names()> class method, that returns the list of
+names of the enum objects in the order they were defined.
+
+Each enum class has a C<values()> class method, that returns the list of
+the enum objects in the order they were defined.
+
+Each enum class has a C<value_of( $name )> factory method (a class method),
+that returns the enum object with the specified name.
+
+Each enum class inherits stringification C<'""'> from its C<Class::Enumeration>
+parent class. By default the string representation of an enum object returns
+its C<name>. If you want to override this behaviour, you have to provide an
+C<to_string()> implementation in your enum class.
+
+The parent class C<Class::Enumeration> overloads the operators C<'=='>,
+and C<'!='> too. Magic auto-generation of overload implementations for
+other operators is turned off. An enum class can add its own overload
+implementations.
+
+=head1 SEE ALSO
+
+=over 2
+
+=item *
+
+L<Class::Enum>
+
+=item *
+
+L<Class::Type::Enum>
+
+=item *
+
+L<Data::Enum>
+
+=item *
+
+L<Object::Enum>
+
+=back
+
+=head1 AUTHOR
+
+Sven Willenbuecher <sven.willenbuecher@gmx.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2025 by Sven Willenbuecher.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

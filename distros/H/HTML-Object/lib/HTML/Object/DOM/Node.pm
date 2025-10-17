@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/DOM/Node.pm
-## Version v0.2.3
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v0.3.0
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/13
-## Modified 2024/04/20
+## Modified 2025/10/16
 ## All rights reserved
 ## 
 ## 
@@ -18,7 +18,7 @@ BEGIN
     use warnings;
     use parent qw( HTML::Object::EventTarget );
     use vars qw( @EXPORT $XP $VERSION );
-    use Want;
+    use Wanted;
     use constant {
         DOCUMENT_POSITION_IDENTICAL     => 0,
         DOCUMENT_POSITION_DISCONNECTED  => 1,
@@ -72,7 +72,7 @@ BEGIN
         'eq'    => \&isSameNode,
     );
     our $XP;
-    our $VERSION = 'v0.2.3';
+    our $VERSION = 'v0.3.0';
 };
 
 use strict;
@@ -1402,7 +1402,7 @@ HTML::Object::DOM::Node - HTML Object DOM Node Class
 
 =head1 VERSION
 
-    v0.2.3
+    v0.3.0
 
 =head1 DESCRIPTION
 

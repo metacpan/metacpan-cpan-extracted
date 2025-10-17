@@ -1,5 +1,8 @@
 # Revision history for Resource::Silo
 
+- 0.1502  Thu Oct 16 2025
+    - [test] Fix tests in 5.010
+
 - 0.1501  Mon Oct 13 2025
     - [bug] Remove a stray dependency from tests
 

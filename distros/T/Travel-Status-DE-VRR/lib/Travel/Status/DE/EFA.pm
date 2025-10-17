@@ -5,7 +5,7 @@ use warnings;
 use 5.010;
 use utf8;
 
-our $VERSION = '3.16';
+our $VERSION = '3.17';
 
 use Carp qw(confess cluck);
 use DateTime;
@@ -20,6 +20,7 @@ use Travel::Status::DE::EFA::Services;
 use Travel::Status::DE::EFA::Stop;
 use Travel::Status::DE::EFA::Trip;
 use LWP::UserAgent;
+use URI::Escape qw(uri_escape);
 
 sub new_p {
 	my ( $class, %opt ) = @_;
@@ -43,7 +44,8 @@ sub new_p {
 				say $self->{json}->pretty->encode( $self->{response} );
 			}
 
-			$self->check_for_ambiguous();
+			$self->check_for_ambiguous;
+			$self->check_for_error;
 
 			if ( $self->{errstr} ) {
 				$promise->reject( $self->{errstr}, $self );
@@ -67,6 +69,7 @@ sub new_p {
 sub new {
 	my ( $class, %opt ) = @_;
 
+	my $encoding     = 'UTF-8';
 	my $tls_insecure = 0;
 	$opt{timeout} //= 10;
 	if ( $opt{timeout} <= 0 ) {
@@ -109,6 +112,9 @@ sub new {
 			$opt{time_zone} //= $service->{time_zone};
 			if ( not $service->{tls_verify} ) {
 				$tls_insecure = 1;
+			}
+			if ( $service->{encoding} ) {
+				$encoding = $service->{encoding};
 			}
 		}
 	}
@@ -231,14 +237,16 @@ sub new {
 			itdDateYear       => $dt->year,
 			itdTimeHour       => $dt->hour,
 			itdTimeMinute     => $dt->minute,
-			name_dm           => encode( 'UTF-8', $opt{name} ),
+			name_dm           =>
+			  uri_escape( encode( $encoding, $opt{name} ), '^A-Za-z0-9-._~ ' ),
 		};
 	}
 
 	if ( $opt{place} ) {
 		$self->{post}{placeInfo_dm}  = 'invalid';
 		$self->{post}{placeState_dm} = 'empty';
-		$self->{post}{place_dm}      = encode( 'UTF-8', $opt{place} );
+		$self->{post}{place_dm}
+		  = uri_escape( encode( $encoding, $opt{place} ), '^A-Za-z0-9-._~ ' );
 	}
 
 	if ( $opt{full_routes} ) {
@@ -297,7 +305,8 @@ sub new {
 		say $self->{json}->pretty->encode( $self->{response} );
 	}
 
-	$self->check_for_ambiguous();
+	$self->check_for_ambiguous;
+	$self->check_for_error;
 
 	return $self;
 }
@@ -415,6 +424,23 @@ sub place_candidates {
 	if ( $self->{place_candidates} ) {
 		return @{ $self->{place_candidates} };
 	}
+	return;
+}
+
+sub check_for_error {
+	my ($self) = @_;
+
+	my $json = $self->{response};
+
+	my %kv;
+	for my $m ( @{ $json->{dm}{message} // [] } ) {
+		$kv{ $m->{name} } = $m->{value};
+	}
+
+	if ( $kv{error} ) {
+		$self->{errstr} = "Backend error: $kv{error}";
+	}
+
 	return;
 }
 
@@ -724,7 +750,7 @@ Travel::Status::DE::EFA - unofficial EFA departure monitor
 
 =head1 VERSION
 
-version 3.16
+version 3.17
 
 =head1 DESCRIPTION
 
@@ -787,12 +813,6 @@ B<stop> (stop/station name).
 
 Request departures for the date/time specified by I<DateTime object>.
 Default: now.
-
-=item B<efa_encoding> => I<encoding>
-
-Some EFA servers do not correctly specify their response encoding. If you
-observe encoding issues, you can manually specify it here. Example:
-iso-8859-15.
 
 =item B<full_routes> => B<0>|B<1>
 

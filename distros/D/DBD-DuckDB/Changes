@@ -1,0 +1,25 @@
+Revision history for Perl extension DBD::DuckDB.
+
+0.13 2025-10-14
+	- Improved "AutoCommit", "$dbh->commit" and "$dbh->rollback"
+	- Added "foreign_key_info" helper
+	- Updated documentations
+
+0.12  2025-10-13
+	- Improved DuckDB appender
+	- Added "primary_key_info" helper
+	- Added all "duckdb_append_*" and "ducldb_bind_*" C functions
+	- FIX CI
+
+0.11  2025-10-13
+	- Added experimental "appender" utilities via "$dbh->x_duckdb_appender"
+
+0.10  2025-10-13
+	- First public release on GH
+	- Use vector instead of deprecated "duckdb_value_*" functions
+	- Added support for "array" and "struct" DuckDB type
+	- General optimizations
+	- Added "DBD::DuckDB::GetInfo"
+
+0.01  2024-07-22
+	- Internal/testing release

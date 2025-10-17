@@ -1,0 +1,6 @@
+{
+  "page_token": "",
+  "return_total_results_count": true,
+  "summary_row_setting": "no_SUMMARY_ROW",
+  "query": "SELECT ad_group.id, segments.ad_network_type, metrics.content_impression_share, metrics.content_rank_lost_impression_share, segments.date FROM ad_group WHERE campaign.id = 19646730605 AND segments.date = '2023-05-25'"
+}

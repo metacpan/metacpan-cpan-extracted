@@ -150,10 +150,14 @@ sub run_http_request {
     my $_body_data;
 
 
-    $form_params->{basename($self->datafile)} = [$self->datafile ,basename($self->datafile),'application/octet-stream'];
+    if (defined $self->datafile) {   
+        $form_params->{basename($self->datafile)} = [$self->datafile ,basename($self->datafile),'application/octet-stream'];
+    }
 
 
-    $form_params->{basename($self->spreadsheet)} = [$self->spreadsheet ,basename($self->spreadsheet),'application/octet-stream'];
+    if (defined $self->spreadsheet) {   
+        $form_params->{basename($self->spreadsheet)} = [$self->spreadsheet ,basename($self->spreadsheet),'application/octet-stream'];
+    }
  
 
     # authentication setting, if any

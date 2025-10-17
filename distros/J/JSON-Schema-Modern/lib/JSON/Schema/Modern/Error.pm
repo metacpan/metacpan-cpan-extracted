@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Error;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains a single error from a JSON Schema evaluation
 
-our $VERSION = '0.619';
+our $VERSION = '0.620';
 
 use 5.020;
 use Moo;
@@ -58,6 +58,15 @@ sub stringify ($self) {
     : '\''.$self->instance_location.'\': '.$self->error;
 }
 
+sub clone ($self, %overrides) {
+  $self->new(
+    $self->%{qw(instance_location keyword_location keyword depth)},
+    (map +(exists $self->{$_} ? $self->%{$_} : ()), qw(absolute_keyword_location _uri recommended_response)),
+    $self->%{qw(error exception mode)},
+    %overrides,
+  );
+}
+
 sub __thing { 'error' }
 
 around BUILDARGS => sub ($orig, $class, @args) {
@@ -86,7 +95,7 @@ JSON::Schema::Modern::Error - Contains a single error from a JSON Schema evaluat
 
 =head1 VERSION
 
-version 0.619
+version 0.620
 
 =head1 SYNOPSIS
 
@@ -172,6 +181,20 @@ if the distinction is important to you.)
 
 Returns a JSON string representing the error object, according to
 the L<specification|https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.10>.
+
+=head2 clone
+
+  my $new_error = $error->clone(instance_location => '/new/location');
+
+Creates a clone of an existing error object, with some optional modifications to existing properties.
+
+=head1 GIVING THANKS
+
+=for stopwords MetaCPAN GitHub
+
+If you found this module to be useful, please show your appreciation by
+adding a +1 in L<MetaCPAN|https://metacpan.org/dist/JSON-Schema-Modern>
+and a star in L<GitHub|https://github.com/karenetheridge/JSON-Schema-Modern>.
 
 =head1 SUPPORT
 

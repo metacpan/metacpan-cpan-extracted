@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/DOM/Collection.pm
-## Version v0.2.0
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.3.0
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/24
-## Modified 2022/09/18
+## Modified 2025/10/16
 ## All rights reserved
 ## 
 ## 
@@ -20,7 +20,7 @@ BEGIN
     use vars qw( $AUTOLOAD $VERSION );
     use Module::Generic::Null;
     use Scalar::Util ();
-    use Want;
+    use Wanted;
     use overload (
         'eq' => sub{ Scalar::Util::refaddr( $_[0] ) eq Scalar::Util::refaddr( $_[1] ) },
         '==' => sub{ Scalar::Util::refaddr( $_[0] ) eq Scalar::Util::refaddr( $_[1] ) },
@@ -28,7 +28,7 @@ BEGIN
         fallback => 1,
     );
     our $AUTOLOAD;
-    our $VERSION = 'v0.2.0';
+    our $VERSION = 'v0.3.0';
 };
 
 use strict;
@@ -45,23 +45,23 @@ sub namedItem
         return( $_ ) if( $self->_can( $_ => 'id' ) && $_->id eq $name );
         return( $_ ) if( $self->_can( $_ => 'name' ) && $_->name eq $name );
     }
-    if( Want::want( 'OBJECT' ) )
+    if( want( 'OBJECT' ) )
     {
         return( Module::Generic::Null->new( @_ ) );
     }
-    elsif( Want::want( 'ARRAY' ) )
+    elsif( want( 'ARRAY' ) )
     {
         return( [] );
     }
-    elsif( Want::want( 'HASH' ) )
+    elsif( want( 'HASH' ) )
     {
         return( {} );
     }
-    elsif( Want::want( 'CODE' ) )
+    elsif( want( 'CODE' ) )
     {
         return( sub{ return; } );
     }
-    elsif( Want::want( 'REFSCALAR' ) )
+    elsif( want( 'REFSCALAR' ) )
     {
         return( \undef );
     }
@@ -145,7 +145,7 @@ HTML::Object::DOM::Collection - HTML Object DOM Collection
 
 =head1 VERSION
 
-    v0.2.0
+    v0.3.0
 
 =head1 DESCRIPTION
 

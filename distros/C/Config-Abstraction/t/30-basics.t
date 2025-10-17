@@ -21,6 +21,7 @@ write_file("$test_dir/base.yaml", <<'YAML');
 database:
   user: base_user
   pass: base_pass
+  empty:
 YAML
 
 # local.json
@@ -87,6 +88,11 @@ is $config->get('database.pass'), 'local_pass', 'local.json overrides base.yaml'
 ok $config->get('feature.enabled'), 'feature.enabled from JSON';
 is $config->get('extra.debug'), '1', 'extra.debug from ENV';
 is($config->all()->{'database'}{'user'}, 'env_user', 'all() works, when not flattened');
+ok(exists($config->all()->{'database'}{'empty'}), 'empty exists');
+ok(!defined($config->all()->{'database'}{'empty'}), 'empty is not defined');
+
+ok(!$config->get('database.empty'), 'getting an undef value returns false');
+ok($config->exists('database.empty'), 'checking if an undef value exists returns true');
 
 # XML merge
 is($config->get('api.url'), 'https://api.example.com', 'API URL from base.xml');

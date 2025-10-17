@@ -1,5 +1,5 @@
 {
-   "abstract" : "Extract and map genealogical events from GEDCOM file",
+   "abstract" : "Extract and map genealogical events from a GEDCOM file",
    "author" : [
       "Nigel Horne <njh@nigelhorne.com>"
    ],
@@ -37,14 +37,16 @@
             "HTML::GoogleMaps::V3" : "0",
             "HTML::OSM" : "0",
             "Object::Configure" : "0.15",
-            "Params::Get" : "0",
-            "Params::Validate::Strict" : "0",
+            "Params::Get" : "0.13",
+            "Params::Validate::Strict" : "0.16",
             "autodie" : "0",
             "perl" : "5.008"
          }
       },
       "test" : {
          "requires" : {
+            "Class::Simple" : "0",
+            "Data::Random" : "0",
             "IPC::System::Simple" : "0",
             "Test::DescribeMe" : "0",
             "Test::Most" : "0",
@@ -58,8 +60,8 @@
    "resources" : {
       "bugtracker" : {
          "mailto" : "bug-HTML-Genealogy-Map@rt.cpan.org",
-         "web" : "https://github.com/nigelhorne/HTML-Genealogy-Map/issues",
-         "x_url" : "https://github.com/nigelhorne/HTML-Genealogy-Map/issues"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=HTML-Genealogy-Map",
+         "x_url" : "https://rt.cpan.org/Public/Dist/Display.html?Name=HTML-Genealogy-Map"
       },
       "homepage" : "https://metacpan.org/pod/HTML::Genealogy::Map",
       "repository" : {
@@ -69,6 +71,6 @@
          "x_repository" : "https://github.com/nigelhorne/HTML-Genealogy-Map"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

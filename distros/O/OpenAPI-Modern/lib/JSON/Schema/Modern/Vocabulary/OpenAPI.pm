@@ -3,7 +3,7 @@ package JSON::Schema::Modern::Vocabulary::OpenAPI;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema OpenAPI vocabulary
 
-our $VERSION = '0.099';
+our $VERSION = '0.100';
 
 use 5.020;
 use utf8;
@@ -25,6 +25,7 @@ with 'JSON::Schema::Modern::Vocabulary';
 
 sub vocabulary {
   'https://spec.openapis.org/oas/3.1/vocab/base' => 'draft2020-12',
+  'https://spec.openapis.org/oas/3.2/vocab/base' => 'draft2020-12',
 }
 
 sub keywords {
@@ -85,8 +86,8 @@ sub _eval_keyword_discriminator ($self, $data, $schema, $state) {
     );
   }
   else {
-    # §4.8.25.4: "If the discriminator value does not match an implicit or explicit mapping, no
-    # schema can be determined and validation SHOULD fail."
+    # v3.2.0 §4.25.5, "Discriminator Property": If the discriminating value does not match an
+    # implicit or explicit mapping, no schema can be determined and validation SHOULD fail.
     return E({ %$state, data_path => jsonp($state->{data_path}, $discriminator_key) },
       'invalid %s: "%s"', $discriminator_key, $discriminator_value);
   }
@@ -122,7 +123,7 @@ JSON::Schema::Modern::Vocabulary::OpenAPI - Implementation of the JSON Schema Op
 
 =head1 VERSION
 
-version 0.099
+version 0.100
 
 =head1 DESCRIPTION
 
@@ -131,11 +132,13 @@ version 0.099
 =for stopwords metaschema
 
 Implementation of the JSON Schema "OpenAPI" vocabulary, indicated in metaschemas
-with the URI C<https://spec.openapis.org/oas/3.1/vocab/base> and formally specified in
-L<https://spec.openapis.org/oas/v3.1#schema-object>.
+with the URI C<https://spec.openapis.org/oas/3.1/vocab/base>
+or C<https://spec.openapis.org/oas/3.2/vocab/base>
+and formally specified in L<https://spec.openapis.org/oas/latest#schema-object>.
 
 This vocabulary is normally made available by using the default OpenAPI metaschema
-(currently L<https://spec.openapis.org/oas/3.1/schema/2025-09-15>).
+(currently L<https://spec.openapis.org/oas/3.1/schema/2025-09-15> and
+L<https://spec.openapis.org/oas/3.2/schema/2025-09-17>).
 
 =head1 SEE ALSO
 
@@ -171,9 +174,17 @@ L<https://learn.openapis.org/>
 
 =item *
 
-L<https://spec.openapis.org/oas/v3.1>
+L<https://spec.openapis.org/oas/latest>
 
 =back
+
+=head1 GIVING THANKS
+
+=for stopwords MetaCPAN GitHub
+
+If you found this module to be useful, please show your appreciation by
+adding a +1 in L<MetaCPAN|https://metacpan.org/dist/OpenAPI-Modern>
+and a star in L<GitHub|https://github.com/karenetheridge/OpenAPI-Modern>.
 
 =head1 SUPPORT
 

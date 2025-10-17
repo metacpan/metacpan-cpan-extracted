@@ -1,6 +1,5 @@
 package Astro::ADS::Search;
-# ABSTRACT: Queries the ADS Search endpoint and collects the results
-$Astro::ADS::Search::VERSION = '1.90';
+$Astro::ADS::Search::VERSION = '1.91';
 use Moo;
 extends 'Astro::ADS';
 with 'Astro::ADS::Role::ResultMapper';
@@ -14,8 +13,6 @@ use Mojo::URL;
 use Mojo::Util qw( quote );
 use PerlX::Maybe;
 use Types::Standard qw( Int Str ArrayRef HashRef ); # InstanceOf ConsumerOf
-
-no warnings 'experimental'; # suppress warning for native perl 5.36 try/catch
 
 has [qw/q fq fl sort/] => (
     is       => 'rw',
@@ -67,7 +64,12 @@ sub query {
     my $response = $self->get_response( $url );
     if ( $response->is_error ) {
         carp $response->message;
-        return Astro::ADS::Result->new( {error => $response->message} );
+        my $error_obj = {
+            message => $response->message,
+            query   => $search_terms,
+            url     => $url,
+        };
+        return Astro::ADS::Result->new( {error => $error_obj} );
     }
 
     my $json = $response->json;
@@ -160,8 +162,6 @@ sub add_objects {
 
 1;
 
-__END__
-
 =pod
 
 =encoding UTF-8
@@ -172,7 +172,7 @@ Astro::ADS::Search - Queries the ADS Search endpoint and collects the results
 
 =head1 VERSION
 
-version 1.90
+version 1.91
 
 =head1 SYNOPSIS
 
@@ -244,19 +244,15 @@ available with the author and title fields
 
 =over 4
 
-=item *L<Astro::ADS>
+=item * L<Astro::ADS>
 
-=item *L<Astro::ADS::Result>
+=item * L<Astro::ADS::Result>
 
-=item *L<ADS API|https://ui.adsabs.harvard.edu/help/api/>
+=item * L<ADS API|https://ui.adsabs.harvard.edu/help/api/>
 
-=item *L<Search Syntax|https://ui.adsabs.harvard.edu/help/search/search-syntax>
+=item * L<Search Syntax|https://ui.adsabs.harvard.edu/help/search/search-syntax>
 
 =back
-
-=head1 AUTHOR
-
-Boyd Duffee <duffee@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 

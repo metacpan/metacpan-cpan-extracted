@@ -1,7 +1,7 @@
 This archive contains the distribution OpenAPI-Modern,
-version 0.099:
+version 0.100:
 
-  Validate HTTP requests and responses against an OpenAPI v3.1 document
+  Validate HTTP requests and responses against an OpenAPI v3.1 or v3.2 document
 
 This software is copyright (c) 2021 by Karen Etheridge.
 

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## DateTime Format Relative Time - ~/lib/DateTime/Format/RelativeTime.pm
-## Version v0.1.6
+## Version v0.2.0
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/12/30
-## Modified 2025/01/05
+## Modified 2025/10/16
 ## All rights reserved
 ## 
 ## 
@@ -26,8 +26,8 @@ BEGIN
     use Locale::Intl;
     use Locale::Unicode::Data v1.3.2;
     use Scalar::Util ();
-    use Want;
-    our $VERSION = 'v0.1.6';
+    use Wanted;
+    our $VERSION = 'v0.2.0';
 };
 
 use strict;
@@ -304,11 +304,11 @@ sub error
         else
         {
             warn( $def->{message}  ) if( warnings::enabled() );
-            if( Want::want( 'ARRAY' ) )
+            if( want( 'ARRAY' ) )
             {
                 rreturn( [] );
             }
-            elsif( Want::want( 'OBJECT' ) )
+            elsif( want( 'OBJECT' ) )
             {
                 rreturn( DateTime::Format::RelativeTime::NullObject->new );
             }
@@ -607,7 +607,7 @@ sub pass_error
         return( $self->error( @_ ) );
     }
     
-    if( Want::want( 'OBJECT' ) )
+    if( want( 'OBJECT' ) )
     {
         rreturn( DateTime::Format::RelativeTime::NullObject->new );
     }
@@ -1049,7 +1049,7 @@ sub TO_JSON { return( shift->as_string ); }
             '""'    => sub{ '' },
             fallback => 1,
         );
-        use Want;
+        use Wanted;
     };
     use strict;
     use warnings;
@@ -1065,7 +1065,7 @@ sub TO_JSON { return( shift->as_string ); }
     {
         my( $method ) = our $AUTOLOAD =~ /([^:]+)$/;
         my $self = shift( @_ );
-        if( Want::want( 'OBJECT' ) )
+        if( want( 'OBJECT' ) )
         {
             rreturn( $self );
         }
@@ -1158,7 +1158,7 @@ For users requiring exact decimal representation beyond this precision, consider
 
 =head1 VERSION
 
-    v0.1.6
+    v0.2.0
 
 =head1 DESCRIPTION
 

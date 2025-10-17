@@ -20,7 +20,7 @@ if ( $^O eq 'MSWin32' ) {
 my $has_xs = eval { require Term::Choose::LineFold::XS };
 my %prereqs_xs;
 if ( $has_xs ) {
-    %prereqs_xs = ( 'Term::Choose::LineFold::XS' => '0.003', );
+    %prereqs_xs = ( 'Term::Choose::LineFold::XS' => '0.004', );
 }
 
 

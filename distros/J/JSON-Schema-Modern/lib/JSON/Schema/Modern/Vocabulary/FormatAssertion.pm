@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::FormatAssertion;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Format-Assertion vocabulary
 
-our $VERSION = '0.619';
+our $VERSION = '0.620';
 
 use 5.020;
 use Moo;
@@ -278,7 +278,7 @@ JSON::Schema::Modern::Vocabulary::FormatAssertion - Implementation of the JSON S
 
 =head1 VERSION
 
-version 0.619
+version 0.620
 
 =head1 DESCRIPTION
 
@@ -344,6 +344,14 @@ L<JSON::Schema::Modern/Format Validation>
 L<JSON::Schema::Modern::Vocabulary::FormatAnnotation>
 
 =back
+
+=head1 GIVING THANKS
+
+=for stopwords MetaCPAN GitHub
+
+If you found this module to be useful, please show your appreciation by
+adding a +1 in L<MetaCPAN|https://metacpan.org/dist/JSON-Schema-Modern>
+and a star in L<GitHub|https://github.com/karenetheridge/JSON-Schema-Modern>.
 
 =head1 SUPPORT
 

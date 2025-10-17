@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.618-6-g02532570
+package JSON::Schema::Modern; # git description: v0.619-10-g01d8c75f
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema using a JSON Schema
 # KEYWORDS: JSON Schema validator data validation structure specification
 
-our $VERSION = '0.619';
+our $VERSION = '0.620';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -248,7 +248,7 @@ sub add_document {
 
     # this might croak if there are duplicates or malformed entries.
     $self->_add_resource($uri_string => $new_resource);
-    @root = ( $uri_string => $new_resource ) if $new_resource->{path} eq '' and $uri_string !~ /#./;
+    @root = ($uri_string => $new_resource) if $new_resource->{path} eq '' and $uri_string !~ /#./;
   }
 
   # associate the root resource with the base uri we were provided, if it does not already exist
@@ -377,7 +377,7 @@ sub evaluate ($self, $data, $schema_reference, $config_override = {}) {
   croak 'evaluate called in void context' if not defined wantarray;
 
   my %overrides = %$config_override;
-  delete @overrides{qw(validate_formats validate_content_schemas short_circuit collect_annotations scalarref_booleans stringy_numbers strict callbacks effective_base_uri data_path traversed_keyword_path _strict_schema_data)};
+  delete @overrides{qw(validate_formats validate_content_schemas short_circuit collect_annotations scalarref_booleans stringy_numbers strict callbacks data_path traversed_keyword_path _strict_schema_data)};
   croak join(', ', sort keys %overrides), ' not supported as a config override in evaluate'
     if keys %overrides;
 
@@ -389,13 +389,6 @@ sub evaluate ($self, $data, $schema_reference, $config_override = {}) {
     errors => [],
     depth => 0,
   };
-
-  # resolve locations against this for errors and annotations, if locations are not already absolute
-  if (length $config_override->{effective_base_uri}) {
-    $state->{effective_base_uri} = Mojo::URL->new($config_override->{effective_base_uri});
-    croak 'it is meaningless for effective_base_uri to have a fragment'
-      if defined $state->{effective_base_uri}->fragment;
-  }
 
   my $valid;
   try {
@@ -428,7 +421,7 @@ sub evaluate ($self, $data, $schema_reference, $config_override = {}) {
       evaluator => $self,
       (map {
         my $val = $config_override->{$_} // $self->$_;
-        defined $val ? ( $_ => $val ) : ()
+        defined $val ? ($_ => $val) : ()
         # note: this is a subset of the allowed overrides defined above
       } qw(validate_formats validate_content_schemas short_circuit collect_annotations scalarref_booleans stringy_numbers strict)),
     };
@@ -1286,7 +1279,7 @@ __END__
 
 =encoding UTF-8
 
-=for stopwords schema subschema metaschema validator evaluator listref
+=for stopwords schema subschema metaschema validator evaluator
 
 =head1 NAME
 
@@ -1294,7 +1287,7 @@ JSON::Schema::Modern - Validate data against a schema using a JSON Schema
 
 =head1 VERSION
 
-version 0.619
+version 0.620
 
 =head1 SYNOPSIS
 
@@ -1550,10 +1543,6 @@ C<traversed_keyword_path>: adjusts the accumulated path as of the start of evalu
 
 C<initial_schema_uri>: adjusts the recorded absolute keyword location of the start of evaluation
 
-=item *
-
-C<effective_base_uri>: locations in errors and annotations are resolved against this URI (only useful when providing an inline schema that does not declare an absolute base URI for itself)
-
 =back
 
 The return value is a L<JSON::Schema::Modern::Result> object, which can also be used as a boolean.
@@ -1599,10 +1588,6 @@ C<data_path>: adjusts the effective path of the data instance as of the start of
 =item *
 
 C<traversed_keyword_path>: adjusts the accumulated path as of the start of evaluation (or last C<$id> or C<$ref>)
-
-=item *
-
-C<effective_base_uri>: locations in errors and annotations are resolved against this URI (only useful when providing an inline schema that does not declare an absolute base URI for itself)
 
 =back
 
@@ -1742,7 +1727,10 @@ the data type(s) supported by that format may not be changed.
 Be careful to not mutate the type of the value while checking it -- for example, if it is a string,
 do not apply arithmetic operators to it -- or subsequent type checks on this value may fail.
 
-See L<https://spec.openapis.org/registry/format/> for a registry of known and useful formats; for
+=for stopwords OpenAPI
+
+See the official L<OpenAPI Format Registry|https://spec.openapis.org/registry/format>
+for a registry of known and useful formats; for
 compatibility reasons, avoid defining a format listed here with different semantics.
 
 Format definitions cannot be overridden with a new definition.
@@ -1809,6 +1797,10 @@ C<text/*> - passes strings through unchanged
 =back
 
 Media-type definitions can be overridden with a new call to C<add_media_type>.
+
+See the official L<OpenAPI Media Type Registry|https://spec.openapis.org/registry/media-type>
+for a registry of known and useful media types; for
+compatibility reasons, avoid defining a media type listed here with different semantics.
 
 =head2 get_media_type
 
@@ -2194,12 +2186,28 @@ L<Mojolicious::Plugin::OpenAPI::Modern>: a Mojolicious plugin providing OpenAPI 
 
 L<Test::Mojo::Role::OpenAPI::Modern>: test your Mojolicious application's OpenAPI compliance
 
+=item *
+
+L<https://spec.openapis.org/registry/format>
+
+=item *
+
+L<https://spec.openapis.org/registry/media-type>
+
 =back
 
 =head1 AVAILABILITY
 
 This distribution and executable is available on modern Debian versions (via C<apt-get>) as the
 C<libjson-schema-modern-perl> package.
+
+=head1 GIVING THANKS
+
+=for stopwords MetaCPAN GitHub
+
+If you found this module to be useful, please show your appreciation by
+adding a +1 in L<MetaCPAN|https://metacpan.org/dist/JSON-Schema-Modern>
+and a star in L<GitHub|https://github.com/karenetheridge/JSON-Schema-Modern>.
 
 =head1 SUPPORT
 

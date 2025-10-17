@@ -2,21 +2,25 @@
 
 App::Test::Generator - Generate fuzz and corpus-driven test harnesses
 
+# VERSION
+
+Version 0.08
+
 # SYNOPSIS
 
 From the command line:
 
-    fuzz-harness-generator t/conf/add.conf > t/add_fuzz.t
+    fuzz-harness-generator t/conf/add.yml > t/add_fuzz.t
 
 From Perl:
 
     use App::Test::Generator qw(generate);
 
     # Generate to STDOUT
-    App::Test::Generator::generate("t/conf/add.conf");
+    App::Test::Generator::generate("t/conf/add.yml");
 
     # Generate directly to a file
-    App::Test::Generator::generate('t/conf/add.conf', 't/add_fuzz.t');
+    App::Test::Generator::generate('t/conf/add.yml', 't/add_fuzz.t');
 
 # OVERVIEW
 
@@ -42,9 +46,10 @@ This module implements the logic behind [fuzz-harness-generator](https://metacpa
 It parses configuration files (fuzz and/or corpus YAML), and
 produces a ready-to-run `.t` test script using [Test::Most](https://metacpan.org/pod/Test%3A%3AMost).
 
-It reads configuration files (Perl `.conf` with `our` variables,
-and optional YAML corpus files), and generates a [Test::Most](https://metacpan.org/pod/Test%3A%3AMost)-based
-fuzzing harness combining:
+It reads configuration files in any format
+(including Perl `.conf` with `our` variables, though this format will be deprecated in a future release)
+and optional YAML corpus files,
+and generates a [Test::Most](https://metacpan.org/pod/Test%3A%3AMost)-based fuzzing harness combining:
 
 - Randomized fuzzing of inputs (with edge cases)
 - Optional static corpus tests from Perl `%cases` or YAML file (`yaml_cases` key)
@@ -93,10 +98,20 @@ Supported constraint types:
 
 - `memberof` - arrayref of allowed values for a parameter:
 
-        our %input = (
-            status => { type => 'string', memberof => [ 'ok', 'error', 'pending' ] },
-            level => { type => 'integer', memberof => [ 1, 2, 3 ] },
-        );
+        ---
+        input:
+          status:
+            type: string
+            memberof:
+              - ok
+              - error
+              - pending
+          level:
+            type: integer
+            memberof:
+              - 1
+              - 5
+              - 111
 
     The generator will automatically create test cases for each allowed value (inside the member list),
     and at least one value outside the list (which should die, `_STATUS = 'DIES'`).
@@ -104,9 +119,9 @@ Supported constraint types:
 
 - `boolean` - automatic boundary tests for boolean fields
 
-        our %input = (
-            flag => { type => 'boolean' },
-        );
+        input:
+          flag:
+            type: boolean
 
     The generator will automatically create test cases for 0 and 1; true and false; off and on, and values that should trigger `_STATUS = 'DIES'`.
 
@@ -119,7 +134,7 @@ without relying solely on randomness.
 The configuration file is either a file that can be read by [Config::Abstraction](https://metacpan.org/pod/Config%3A%3AAbstraction) or a **trusted input** Perl file that should set variables with `our`.
 
 The documentation here covers the old trusted input style input, but that will go away so you are recommended to use
-Config::Abstraction files.
+[Config::Abstraction](https://metacpan.org/pod/Config%3A%3AAbstraction) files.
 Example: the generator expects your config to use `our %input`, `our $function`, etc.
 
 Recognized items:
@@ -127,10 +142,14 @@ Recognized items:
 - `%input` - input params with keys => type/optional specs:
 
     When using named parameters
-    	our %input = (
-    		name => { type => 'string', optional => 0 },
-    		age => { type => 'integer', optional => 1 },
-    	);
+
+        input:
+          name:
+            type: string
+            optional: false
+          age:
+            type: integer
+            optional: true
 
     Supported basic types used by the fuzzer: `string`, `integer`, `number`, `boolean`, `arrayref`, `hashref`.
     (You can add more types; they will default to `undef` unless extended.)
@@ -152,7 +171,17 @@ Recognized items:
     If the output hash contains the key \_STATUS, and if that key is set to DIES,
     the routine should die with the given arguments; otherwise, it should live.
     If it's set to WARNS,
-    the routine should warn with the given arguments
+    the routine should warn with the given arguments.
+    The output can be set to the string 'undef' if the routine should return the undefined value:
+
+        ---
+        module: Scalar::Util
+        function: blessed
+
+        input:
+          arg1: string
+
+        output: undef
 
 - `$module` - module name (optional).
 
@@ -166,6 +195,13 @@ Recognized items:
 
     To ensure new is called with no arguments, you still need to define new, thus:
 
+        module: MyModule
+        function: my_function
+
+        new:
+
+    For the legacy Perl variable syntax, use the empty string:
+
         our $new = '';
 
 - `%cases` - optional Perl static corpus, when the output is a simple string (expected => \[ args... \]):
@@ -173,7 +209,7 @@ Recognized items:
     Maps the expected output string to the input and \_STATUS
 
         our %cases = (
-          'ok'   => {
+          'ok' => {
               input => 'ping',
               status => 'OK',
           'error' =>
@@ -189,7 +225,7 @@ Recognized items:
             # Two named parameters
             our %edge_cases = (
                     name => [ '', 'a' x 1024, \"\x{263A}" ],
-                    age  => [ -1, 0, 99999999 ],
+                    age => [ -1, 0, 99999999 ],
             );
 
             # Takes a string input
@@ -203,8 +239,8 @@ Recognized items:
 - `%type_edge_cases` - optional hash mapping types to arrayrefs of extra values to try for any field of that type:
 
             our %type_edge_cases = (
-                    string  => [ '', ' ', "\t", "\n", "\0", 'long' x 1024, chr(0x1F600) ],
-                    number  => [ 0, 1.0, -1.0, 1e308, -1e308, 1e-308, -1e-308, 'NaN', 'Infinity' ],
+                    string => [ '', ' ', "\t", "\n", "\0", 'long' x 1024, chr(0x1F600) ],
+                    number => [ 0, 1.0, -1.0, 1e308, -1e308, 1e-308, -1e-308, 'NaN', 'Infinity' ],
                     integer => [ 0, 1, -1, 2**31-1, -(2**31), 2**63-1, -(2**63) ],
             );
 
@@ -227,10 +263,10 @@ Functional fuzz + Perl corpus + seed:
     our %input = ( a => { type => 'integer' }, b => { type => 'integer' } );
     our %output = ( type => 'integer' );
     our %cases = (
-      '3'     => [1, 2],
-      '0'     => [0, 0],
-      '-1'    => [-2, 1],
-      '_STATUS:DIES'  => [ 'a', 'b' ],     # non-numeric args should die
+      '3' => [1, 2],
+      '0' => [0, 0],
+      '-1' => [-2, 1],
+      '_STATUS:DIES' => [ 'a', 'b' ],     # non-numeric args should die
       '_STATUS:WARNS' => [ undef, undef ], # undef args should warn
     );
     our $seed = 12345;
@@ -262,7 +298,7 @@ A YAML mapping of expected -> args array:
 ## Example with arrayref + hashref
 
     our %input = (
-      tags   => { type => 'arrayref', optional => 1 },
+      tags => { type => 'arrayref', optional => 1 },
       config => { type => 'hashref' },
     );
     our %output = ( type => 'hashref' );
@@ -277,9 +313,15 @@ A YAML mapping of expected -> args array:
 
 This will generate fuzz cases for 'ok', 'error', 'pending', and one invalid string that should die.
 
-## New format input
+## Adding Scheduled fuzz Testing with GitHub Actions to Your Code
 
-Testing [HTML::Genealogy::Map](https://metacpan.org/pod/HTML%3A%3AGenealogy%3A%3AMap):
+To automatically create and run tests on a regular basis on GitHub Actions,
+you need to create a configuration file for each method and subroutine that you're testing,
+and a GitHub Actions configuration file.
+
+This example takes you through testing the online\_render method of [HTML::Genealogy::Map](https://metacpan.org/pod/HTML%3A%3AGenealogy%3A%3AMap).
+
+### t/conf/online\_render.yml
 
     ---
 
@@ -306,12 +348,57 @@ Testing [HTML::Genealogy::Map](https://metacpan.org/pod/HTML%3A%3AGenealogy%3A%3
     config:
       test_undef: 0
 
+### .github/actions/fuzz.t
+
+    ---
+    name: Fuzz Testing
+
+    permissions:
+      contents: read
+
+    on:
+      push:
+        branches: [main, master]
+      pull_request:
+        branches: [main, master]
+      schedule:
+        - cron: '29 5 14 * *'
+
+    jobs:
+      generate-fuzz-tests:
+        runs-on: ubuntu-latest
+
+        steps:
+          - uses: actions/checkout@v5
+
+          - name: Set up Perl
+            uses: shogo82148/actions-setup-perl@v1
+            with:
+              perl-version: '5.38'
+
+          - name: Install App::Test::Generator this module's dependencies
+            run: |
+              cpanm App::Test::Generator
+              cpanm --installdeps .
+
+          - name: Generate fuzz tests
+            run: |
+              mkdir t/fuzz
+              find t/conf -name '*.yml' | while read config; do
+                test_name=$(basename "$config" .conf)
+                fuzz-harness-generator "$config" > "t/fuzz/${test_name}_fuzz.t"
+              done
+
+          - name: Run generated fuzz tests
+            run: |
+              prove -lr t/fuzz/
+
 # OUTPUT
 
 By default, writes `t/fuzz.t`.
 The generated test:
 
-- Seeds RNG (if configured) for reproducible fuzz runs
+- Seeds RND (if configured) for reproducible fuzz runs
 - Uses edge cases (per-field and per-type) with configurable probability
 - Runs `$iterations` fuzz cases plus appended edge-case runs
 - Validates inputs with Params::Get / Params::Validate::Strict

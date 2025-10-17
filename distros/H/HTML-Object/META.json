@@ -36,6 +36,8 @@
             "Config" : "0",
             "Data::UUID" : "1.226",
             "DateTime::Format::Strptime" : "1.79",
+            "DateTime::Format::Unicode" : "v0.1.0",
+            "DateTime::Locale::FromCLDR" : "v0.3.0",
             "Digest::MD5" : "2.58",
             "Encode" : "3.08",
             "Exporter" : "5.74",
@@ -44,14 +46,15 @@
             "HTML::Selector::XPath" : "0.28",
             "JSON" : "4.10",
             "List::Util" : "1.56",
-            "Locale::Unicode" : "v0.3.6",
-            "Module::Generic" : "v0.37.5",
+            "Locale::Unicode" : "v0.3.11",
+            "Locale::Unicode::Data" : "v1.4.0",
+            "Module::Generic" : "v1.1.1",
             "POSIX" : "0",
-            "Promise::Me" : "v0.5.0",
+            "Promise::Me" : "v0.6.0",
             "Scalar::Util" : "1.60",
             "Time::HiRes" : "1.9764",
             "URI" : "5.28",
-            "Want" : "0.29",
+            "Wanted" : "v0.1.0",
             "constant" : "1.33",
             "curry" : "1.001000",
             "overload" : "1.30",
@@ -85,6 +88,6 @@
          "web" : "https://gitlab.com/jackdeguest/HTML-Object"
       }
    },
-   "version" : "v0.5.1",
+   "version" : "v0.6.0",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

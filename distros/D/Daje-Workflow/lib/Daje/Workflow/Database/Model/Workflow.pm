@@ -1,5 +1,5 @@
 package Daje::Workflow::Database::Model::Workflow;
-use Mojo::Base -base, -signatures;
+use Mojo::Base 'Daje::Database::Model::Super::Common::Defaults', -base, -signatures;
 use v5.40;
 
 # NAME
@@ -34,6 +34,8 @@ use v5.40;
 #
 # janeskil1525 E<lt>janeskil1525@gmail.comE<gt>
 #
+
+use Data::Dumper;
 
 has 'db';
 has 'workflow_pkey';
@@ -72,6 +74,7 @@ sub save ($self, $data) {
     try {
         $data->{workflow_pkey} = 0 unless exists $data->{workflow_pkey};
         if ($data->{workflow_pkey} > 0) {
+            $data = $self->update_defaults($data);
             $self->db->update(
                 'workflow',
                 {
@@ -100,6 +103,7 @@ sub save ($self, $data) {
     return $workflow_pkey;
 }
 1;
+
 
 
 

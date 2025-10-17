@@ -2,18 +2,20 @@ package QRCode::Encoder;
 use v5.24;
 use warnings;
 use experimental qw< signatures >;
-{ our $VERSION = '0.003' }
+{ our $VERSION = '0.005' }
 
 use Math::ReedSolomon::Encoder qw< rs_correction_string >;
 use QRCode::Encoder::QRSpec qw< :all >;
 use QRCode::Encoder::Matrix qw< add_matrix >; 
 use Exporter qw< import >;
 our @EXPORT_OK = qw<
+   qr_best_params
    qr_encode
+   qr_mode
 >;
 our %EXPORT_TAGS = (all => [ @EXPORT_OK ]);
 
-sub _qr_type ($octets) {
+sub qr_mode ($octets) {
    return 'numeric' if $octets =~ m{\A \d* \z}mxs;
    return 'alphanumeric'
       if $octets =~ m{\A [0-9A-Z\x20\x24\x25\x2a\x2b\x2d-\x2f\x3a]+ \z}mxs;
@@ -27,10 +29,71 @@ sub _qr_type ($octets) {
    return 'byte';
 }
 
-sub qr_encode (@args) {
+sub qr_best_params (@args) {
+   state $rank_for = { L => 1, M => 2, Q => 3, H => 4 };
    my %args = scalar(@args) % 2 ? (octets => @args) : @args;
-   my $mode = $args{mode} //= _qr_type($args{octets});
-   my $level = $args{level} //= 'L';
+   my $size = length($args{octets});
+   my $mode = $args{mode} // qr_mode($args{octets});
+
+   my $version = $args{version};
+   my $min_version = $args{'min-version'} // 1;
+   $version //= 40 if $min_version eq 40;
+
+   my $level = $args{level};
+   my $min_level = $args{min_level} // 'L';
+   $level //= 'H' if $min_level eq 'H';
+
+   if (defined($level)) {
+      my $minv = qrspec_min_version_for($mode, $size, $level)
+         or die "no suitable version for $mode/$size/$level";
+      if (defined($version)) { # just check
+         die "version $version insufficient for $mode/$size/$level"
+            if $version < $minv;
+      }
+      else {
+         my $req = $args{min_version} // 1;
+         $version =  $minv < $req ? $req : $minv;
+      }
+   }
+   elsif (defined($version)) {
+      my $min_rank = $rank_for->{$min_level};
+      for my $candidate (qw< H Q M L >) {
+         last if $rank_for->{$candidate} < $min_rank;
+         my $minv = qrspec_min_version_for($mode, $size, $candidate);
+         if ($minv <= $version) {
+            $level = $candidate;
+            last;
+         }
+      }
+      die "no level for $mode/$size/$version (min rank: $min_rank)"
+         unless defined $level;
+   }
+   else { # nothing is defined, go for the smaller size
+      $level = $min_level;
+      my $min_rank = $rank_for->{$level};
+      my $minv = qrspec_min_version_for($mode, $size, $level);
+      my $req = $args{'min-version'} // 1;
+      $version = $minv <= $req ? $req : $minv;
+      for my $candidate (qw< L M Q H >) {
+         next if $rank_for->{$candidate} <= $min_rank;
+         my $altv = qrspec_min_version_for($mode, $size, $candidate);
+         last if $altv > $minv;
+         $level = $candidate;
+      }
+   }
+
+   return (
+      %args,
+      mode    => $mode,
+      level   => $level,
+      version => $version,
+   );
+}
+
+sub qr_encode (@args) {
+   my %args = qr_best_params(@args);
+   my $mode = $args{mode};
+   my $level = $args{level};
    my $size = length($args{octets});
    $args{version} //= qrspec_min_version_for($mode, $size, $level);
    _add_encoded(\%args);

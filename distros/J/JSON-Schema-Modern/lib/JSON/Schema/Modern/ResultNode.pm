@@ -4,7 +4,7 @@ package JSON::Schema::Modern::ResultNode;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Common code for nodes of a JSON::Schema::Modern::Result
 
-our $VERSION = '0.619';
+our $VERSION = '0.620';
 
 use 5.020;
 use Moo::Role;
@@ -39,22 +39,19 @@ has absolute_keyword_location => (
   lazy => 1,
   default => sub ($self) {
     # _uri contains data as populated from A() and E():
-    # [ $state->{initial_schema_uri}, $state->{keyword_path}, @extra_path, $state->{effective_base_uri} ]
+    # [ $state->{initial_schema_uri}, $state->{keyword_path}, @extra_path ]
     # we do the equivalent of:
-    # canonical_uri($state, @extra_path)->to_abs($state->{effective_base_uri});
+    # canonical_uri($state, @extra_path);
     if (my $uri_bits = delete $self->{_uri}) {
-      my $effective_base_uri = pop @$uri_bits;
       my ($initial_schema_uri, $keyword_path, @extra_path) = @$uri_bits;
 
       return($initial_schema_uri eq '' && $self->{keyword_location} eq '' ? undef : $initial_schema_uri)
-        if not @extra_path and not length($keyword_path) and not length $effective_base_uri;
+        if not @extra_path and not length($keyword_path);
 
       my $uri = $initial_schema_uri->clone;
       my $fragment = ($uri->fragment//'').(@extra_path ? jsonp($keyword_path, @extra_path) : $keyword_path);
       undef $fragment if not length($fragment);
       $uri->fragment($fragment);
-
-      $uri = $uri->to_abs($effective_base_uri) if length $effective_base_uri;
 
       undef $uri if $uri eq '' and $self->{keyword_location} eq ''
         or ($uri->fragment // '') eq $self->{keyword_location} and $uri->clone->fragment(undef) eq '';
@@ -91,7 +88,7 @@ sub TO_JSON ($self) {
     instanceLocation => $self->instance_location,
     keywordLocation => $self->keyword_location,
     !defined($self->absolute_keyword_location) ? ()
-      : ( absoluteKeywordLocation => $self->absolute_keyword_location->to_string ),
+      : (absoluteKeywordLocation => $self->absolute_keyword_location->to_string),
     $thing => $self->$thing,  # TODO: allow localization in error message
   };
 }
@@ -121,7 +118,7 @@ JSON::Schema::Modern::ResultNode - Common code for nodes of a JSON::Schema::Mode
 
 =head1 VERSION
 
-version 0.619
+version 0.620
 
 =head1 SYNOPSIS
 
@@ -133,6 +130,14 @@ version 0.619
 This module is for internal use only.
 
 =for Pod::Coverage BUILD TO_JSON absolute_keyword_location depth dump instance_location keyword keyword_location
+
+=head1 GIVING THANKS
+
+=for stopwords MetaCPAN GitHub
+
+If you found this module to be useful, please show your appreciation by
+adding a +1 in L<MetaCPAN|https://metacpan.org/dist/JSON-Schema-Modern>
+and a star in L<GitHub|https://github.com/karenetheridge/JSON-Schema-Modern>.
 
 =head1 SUPPORT
 

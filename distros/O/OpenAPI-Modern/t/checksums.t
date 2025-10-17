@@ -27,8 +27,16 @@ foreach my $line (<DATA>) {
 done_testing;
 
 __DATA__
+share/3.1/strict-dialect.json d13df15c1f7475a477cdff7c3dfa0bca
+share/3.1/strict-schema.json 94554b65920faa88f89d0e65d2e099c1
+share/3.2/strict-dialect.json 11c94716eb238cd21d84a4eea7c3e1ce
+share/3.2/strict-schema.json 3b89643225eced6ce7d3f1a923e91624
+share/oas/3.1/dialect.json 06cea984f8807c13e2916914251e22c3
+share/oas/3.1/schema-base.json c7384a02a8fa98ba83488c09d76a1df1
+share/oas/3.1/schema.json 724962b927e62a5a578604093e5ecc78
+share/oas/3.1/vocabulary.json ecd6e7cbcc29cdabd9c445a2752fc394
+share/oas/3.2/dialect.json 9535fe7b9329795d5fc0796d0f934e89
+share/oas/3.2/schema-base.json 6889b580da74bc193eefd5f57d1234f0
+share/oas/3.2/schema.json e236d7ccdb52e28372f4f03dd8382838
+share/oas/3.2/vocabulary.json 8bc0eea7bd6d14fcc1bb66f6b3e99fdf
 share/oas/LICENSE 7a3f5fcd4ca489b5555f5f92ec054a0a
-share/oas/dialect/base.schema.json 06cea984f8807c13e2916914251e22c3
-share/oas/meta/base.schema.json ecd6e7cbcc29cdabd9c445a2752fc394
-share/oas/schema-base.json c7384a02a8fa98ba83488c09d76a1df1
-share/oas/schema.json 724962b927e62a5a578604093e5ecc78

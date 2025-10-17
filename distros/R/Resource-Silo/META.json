@@ -4,7 +4,7 @@
       "Konstantin Uvarin <khedin@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "artistic_2"
    ],
@@ -58,6 +58,5 @@
          "web" : "https://github.com/dallaylaen/resource-silo-p5"
       }
    },
-   "version" : "0.1501",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.1502"
 }

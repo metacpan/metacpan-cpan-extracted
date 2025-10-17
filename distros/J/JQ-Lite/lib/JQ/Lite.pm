@@ -6,7 +6,9 @@ use JSON::PP;
 use List::Util qw(sum min max);
 use Scalar::Util qw(looks_like_number);
 
-our $VERSION = '0.99';
+our $VERSION = '1.02';
+
+my $FROMJSON_DECODER = JSON::PP->new->allow_nonref;
 
 sub new {
     my ($class, %opts) = @_;
@@ -25,7 +27,11 @@ sub run_query {
     }
     
     # instead of: my @parts = split /\|/, $query;
-    my @parts = map { s/^\s+|\s+$//gr } split /\|/, $query;
+    my @parts = map {
+        my $part = $_;
+        $part =~ s/^\s+|\s+$//g;
+        $part;
+    } split /\|/, $query;
     
     # detect .[] and convert to pseudo-command
     @parts = map {
@@ -104,6 +110,18 @@ sub run_query {
                     undef;
                 }
             } @results;
+            @results = @next_results;
+            next;
+        }
+
+        # support for assignment (e.g., .spec.replicas = 3)
+        if (_looks_like_assignment($part)) {
+            my ($path, $value_spec, $operator) = _parse_assignment_expression($part);
+
+            @next_results = map {
+                _apply_assignment($_, $path, $value_spec, $operator)
+            } @results;
+
             @results = @next_results;
             next;
         }
@@ -341,6 +359,17 @@ sub run_query {
         if ($part =~ /^walk\((.+)\)$/) {
             my $filter = $1;
             @next_results = map { _apply_walk($self, $_, $filter) } @results;
+            @results      = @next_results;
+            next;
+        }
+
+        # support for recurse([filter])
+        if ($part =~ /^recurse(?:\((.*)\))?$/) {
+            my $filter = defined $1 ? $1 : '';
+            $filter =~ s/^\s+|\s+$//g;
+            $filter = undef if $filter eq '';
+
+            @next_results = map { _apply_recurse($self, $_, $filter) } @results;
             @results      = @next_results;
             next;
         }
@@ -757,6 +786,13 @@ sub run_query {
             next;
         }
 
+        # support for fromjson()
+        if ($part eq 'fromjson()' || $part eq 'fromjson') {
+            @next_results = map { _apply_fromjson($_) } @results;
+            @results = @next_results;
+            next;
+        }
+
         # support for to_number()
         if ($part eq 'to_number()' || $part eq 'to_number') {
             @next_results = map { _apply_to_number($_) } @results;
@@ -1037,6 +1073,32 @@ sub run_query {
         if ($part eq 'arrays()' || $part eq 'arrays') {
             @next_results = map {
                 ref $_ eq 'ARRAY' ? $_ : ()
+            } @results;
+            @results = @next_results;
+            next;
+        }
+
+        # support for scalars
+        if ($part eq 'scalars()' || $part eq 'scalars') {
+            @next_results = map {
+                if (!defined $_) {
+                    undef;
+                }
+                elsif (!ref $_ || ref($_) eq 'JSON::PP::Boolean') {
+                    $_;
+                }
+                else {
+                    ();
+                }
+            } @results;
+            @results = @next_results;
+            next;
+        }
+
+        # support for objects
+        if ($part eq 'objects()' || $part eq 'objects') {
+            @next_results = map {
+                ref $_ eq 'HASH' ? $_ : ()
             } @results;
             @results = @next_results;
             next;
@@ -1419,13 +1481,44 @@ sub run_query {
             next;
         }
 
+        # support for not (logical negation)
+        if ($part eq 'not' || $part eq 'not()') {
+            @next_results = map {
+                _is_truthy($_) ? JSON::PP::false : JSON::PP::true
+            } @results;
+            @results = @next_results;
+            next;
+        }
+
+        # support for jq's alternative operator: lhs // rhs
+        my $coalesce_expr = $part;
+        if (defined $coalesce_expr) {
+            my $stripped = $coalesce_expr;
+            while ($stripped =~ /^\((.*)\)$/) {
+                $stripped = $1;
+                $stripped =~ s/^\s+|\s+$//g;
+            }
+
+            if ($stripped =~ /^(.*?)\s*\/\/\s*(.+)$/) {
+                my ($lhs_raw, $rhs_raw) = ($1, $2);
+                my $lhs_expr = $lhs_raw;
+                my $rhs_expr = $rhs_raw;
+                $lhs_expr =~ s/^\s+|\s+$//g;
+                $rhs_expr =~ s/^\s+|\s+$//g;
+
+                @next_results = map { _apply_coalesce($self, $_, $lhs_expr, $rhs_expr) } @results;
+                @results      = @next_results;
+                next;
+            }
+        }
+
         # support for default(value)
         if ($part =~ /^default\((.+)\)$/) {
             my $default_value = $1;
-            $default_value =~ s/^['"](.*?)['"]$/$1/; 
-        
+            $default_value =~ s/^['"](.*?)['"]$/$1/;
+
             @results = @results ? @results : (undef);
-        
+
             @next_results = map {
                 defined($_) ? $_ : $default_value
             } @results;
@@ -1441,6 +1534,275 @@ sub run_query {
     }
 
     return @results;
+}
+
+sub _looks_like_assignment {
+    my ($expr) = @_;
+
+    return 0 unless defined $expr;
+    return 0 if $expr =~ /[()]/;
+    return 0 if $expr =~ /(?:==|!=|>=|<=|=>|=<)/;
+    return ($expr =~ /=/);
+}
+
+sub _parse_assignment_expression {
+    my ($expr) = @_;
+
+    $expr //= '';
+
+    my ($lhs, $op, $rhs) = ($expr =~ /^(.*?)\s*([+\-*\/]?=)\s*(.*)$/);
+
+    $lhs //= '';
+    $rhs //= '';
+    $op  //= '=';
+
+    $lhs =~ s/^\s+|\s+$//g;
+    $rhs =~ s/^\s+|\s+$//g;
+
+    $lhs =~ s/^\.//;
+
+    my $value_spec = _parse_assignment_value($rhs);
+
+    return ($lhs, $value_spec, $op);
+}
+
+sub _parse_assignment_value {
+    my ($raw) = @_;
+
+    $raw //= '';
+    $raw =~ s/^\s+|\s+$//g;
+
+    if ($raw =~ /^\.(.+)$/) {
+        return { type => 'path', value => $1 };
+    }
+
+    my $decoded = eval { decode_json($raw) };
+    if (!$@) {
+        return { type => 'literal', value => $decoded };
+    }
+
+    if ($raw =~ /^'(.*)'$/) {
+        return { type => 'literal', value => $1 };
+    }
+
+    return { type => 'literal', value => $raw };
+}
+
+sub _apply_assignment {
+    my ($item, $path, $value_spec, $operator) = @_;
+
+    return $item unless defined $item;
+    return $item unless defined $path && length $path;
+
+    $operator //= '=';
+
+    my $value = _resolve_assignment_value($item, $value_spec);
+
+    if ($operator ne '=') {
+        my $current = _clone_for_assignment(_get_path_value($item, $path));
+        my $current_num = _coerce_number($current);
+        my $value_num   = _coerce_number($value);
+
+        return $item unless defined $current_num && defined $value_num;
+
+        my $result;
+        if ($operator eq '+=') {
+            $result = $current_num + $value_num;
+        }
+        elsif ($operator eq '-=') {
+            $result = $current_num - $value_num;
+        }
+        elsif ($operator eq '*=') {
+            $result = $current_num * $value_num;
+        }
+        elsif ($operator eq '/=') {
+            return $item if $value_num == 0;
+            $result = $current_num / $value_num;
+        }
+        else {
+            return $item;
+        }
+
+        $value = $result;
+    }
+
+    _set_path_value($item, $path, $value);
+
+    return $item;
+}
+
+sub _get_path_value {
+    my ($target, $path) = @_;
+
+    return undef unless defined $target;
+    return undef unless defined $path && length $path;
+
+    my @segments = _parse_path_segments($path);
+    return undef unless @segments;
+
+    my $cursor = $target;
+    for my $index (0 .. $#segments) {
+        my $segment = $segments[$index];
+        my $is_last = ($index == $#segments);
+
+        if ($segment->{type} eq 'key') {
+            return undef unless ref $cursor eq 'HASH';
+            my $key = $segment->{value};
+
+            return $cursor->{$key} if $is_last;
+
+            return undef unless exists $cursor->{$key};
+            $cursor = $cursor->{$key};
+            next;
+        }
+
+        if ($segment->{type} eq 'index') {
+            return undef unless ref $cursor eq 'ARRAY';
+
+            my $idx = $segment->{value};
+            my $numeric = int($idx);
+            if ($idx =~ /^-?\d+$/) {
+                $numeric += @$cursor if $numeric < 0;
+            }
+
+            return undef if $numeric < 0 || $numeric > $#$cursor;
+
+            return $cursor->[$numeric] if $is_last;
+
+            $cursor = $cursor->[$numeric];
+            next;
+        }
+    }
+
+    return undef;
+}
+
+sub _coerce_number {
+    my ($value) = @_;
+
+    return 0 if !defined $value;
+
+    if (ref($value) eq 'JSON::PP::Boolean') {
+        return $value ? 1 : 0;
+    }
+
+    return 0 + $value if looks_like_number($value);
+
+    return undef;
+}
+
+sub _resolve_assignment_value {
+    my ($item, $value_spec) = @_;
+
+    return undef unless defined $value_spec;
+
+    if ($value_spec->{type} && $value_spec->{type} eq 'path') {
+        my $path = $value_spec->{value} // '';
+        $path =~ s/^\.//;
+
+        my @values = _traverse($item, $path);
+        return _clone_for_assignment($values[0]);
+    }
+
+    return _clone_for_assignment($value_spec->{value});
+}
+
+sub _set_path_value {
+    my ($target, $path, $value) = @_;
+
+    return unless defined $target;
+
+    my @segments = _parse_path_segments($path);
+    return unless @segments;
+
+    my $cursor = $target;
+    for my $index (0 .. $#segments) {
+        my $segment = $segments[$index];
+        my $is_last = ($index == $#segments);
+
+        if ($segment->{type} eq 'key') {
+            return unless ref $cursor eq 'HASH';
+            my $key = $segment->{value};
+
+            if ($is_last) {
+                $cursor->{$key} = $value;
+                last;
+            }
+
+            if (!exists $cursor->{$key} || !defined $cursor->{$key}) {
+                my $next = $segments[$index + 1];
+                $cursor->{$key} = ($next->{type} eq 'index') ? [] : {};
+            }
+
+            $cursor = $cursor->{$key};
+            next;
+        }
+
+        if ($segment->{type} eq 'index') {
+            return unless ref $cursor eq 'ARRAY';
+
+            my $idx = $segment->{value};
+            my $numeric = int($idx);
+            if ($idx =~ /^-?\d+$/) {
+                $numeric += @$cursor if $numeric < 0;
+            }
+
+            return if $numeric < 0;
+
+            if ($is_last) {
+                $cursor->[$numeric] = $value;
+                last;
+            }
+
+            if (!defined $cursor->[$numeric]) {
+                my $next = $segments[$index + 1];
+                $cursor->[$numeric] = ($next->{type} eq 'index') ? [] : {};
+            }
+
+            $cursor = $cursor->[$numeric];
+            next;
+        }
+    }
+
+    return;
+}
+
+sub _parse_path_segments {
+    my ($path) = @_;
+
+    $path //= '';
+    $path =~ s/^\s+|\s+$//g;
+
+    my @segments;
+    for my $chunk (split /\./, $path) {
+        next if $chunk eq '';
+
+        while (length $chunk) {
+            if ($chunk =~ s/^\[(\-?\d+)\]//) {
+                push @segments, { type => 'index', value => $1 };
+                next;
+            }
+
+            if ($chunk =~ s/^([^\[]+)//) {
+                push @segments, { type => 'key', value => $1 };
+                next;
+            }
+
+            last;
+        }
+    }
+
+    return @segments;
+}
+
+sub _clone_for_assignment {
+    my ($value) = @_;
+
+    return undef unless defined $value;
+    return $value unless ref $value;
+
+    my $json = encode_json($value);
+    return decode_json($json);
 }
 
 sub _map {
@@ -1848,6 +2210,23 @@ sub _apply_tojson {
     return encode_json($value);
 }
 
+sub _apply_fromjson {
+    my ($value) = @_;
+
+    return undef if !defined $value;
+
+    if (ref $value eq 'ARRAY') {
+        return [ map { _apply_fromjson($_) } @$value ];
+    }
+
+    return $value if ref $value;
+
+    my $text = "$value";
+    my $decoded = eval { $FROMJSON_DECODER->decode($text) };
+
+    return $@ ? $value : $decoded;
+}
+
 sub _apply_numeric_function {
     my ($value, $callback) = @_;
 
@@ -2093,6 +2472,40 @@ sub _apply_walk {
     return @results ? $results[0] : undef;
 }
 
+sub _apply_recurse {
+    my ($self, $value, $filter) = @_;
+
+    my @stack   = ($value);
+    my @outputs;
+
+    while (@stack) {
+        my $current = pop @stack;
+        push @outputs, $current;
+
+        next unless defined $current;
+
+        my @children;
+        if (defined $filter) {
+            my $json = encode_json($current);
+            @children = $self->run_query($json, $filter);
+        }
+        elsif (ref $current eq 'ARRAY') {
+            @children = @$current;
+        }
+        elsif (ref $current eq 'HASH') {
+            @children = map { $current->{$_} } sort keys %$current;
+        }
+
+        next unless @children;
+
+        for my $child (reverse @children) {
+            push @stack, $child;
+        }
+    }
+
+    return @outputs;
+}
+
 sub _apply_delpaths {
     my ($self, $value, $filter) = @_;
 
@@ -2238,6 +2651,65 @@ sub _normalize_entry {
     }
 
     return;
+}
+
+sub _apply_coalesce {
+    my ($self, $value, $lhs_expr, $rhs_expr) = @_;
+
+    my @lhs_values = _evaluate_coalesce_operand($self, $value, $lhs_expr);
+    for my $candidate (@lhs_values) {
+        return $candidate if defined $candidate;
+    }
+
+    my @rhs_values = _evaluate_coalesce_operand($self, $value, $rhs_expr);
+    for my $candidate (@rhs_values) {
+        return $candidate if defined $candidate;
+    }
+
+    return undef;
+}
+
+sub _evaluate_coalesce_operand {
+    my ($self, $context, $expr) = @_;
+
+    return () unless defined $expr;
+
+    my $copy = $expr;
+    $copy =~ s/^\s+|\s+$//g;
+    return () if $copy eq '';
+
+    while ($copy =~ /^\((.*)\)$/) {
+        $copy = $1;
+        $copy =~ s/^\s+|\s+$//g;
+    }
+
+    if ($copy =~ /^(.*?)\s*\/\/\s*(.+)$/) {
+        my ($lhs, $rhs) = ($1, $2);
+        my $result = _apply_coalesce($self, $context, $lhs, $rhs);
+        return ($result);
+    }
+
+    if ($copy eq '.') {
+        return ($context);
+    }
+
+    my $decoded = eval { decode_json($copy) };
+    if (!$@) {
+        return ($decoded);
+    }
+
+    if ($copy =~ /^'(.*)'$/) {
+        my $text = $1;
+        $text =~ s/\\'/'/g;
+        return ($text);
+    }
+
+    return () unless defined $context;
+
+    my $path = $copy;
+    $path =~ s/^\.//;
+
+    return _traverse($context, $path);
 }
 
 sub _traverse {
@@ -2849,7 +3321,11 @@ sub _parse_arguments {
     }
 
     my @parts = split /,/, $raw;
-    return map { s/^\s+|\s+$//gr } @parts;
+    return map {
+        my $part = $_;
+        $part =~ s/^\s+|\s+$//g;
+        $part;
+    } @parts;
 }
 
 sub _parse_range_arguments {
@@ -3152,7 +3628,7 @@ JQ::Lite - A lightweight jq-like JSON query engine in Perl
 
 =head1 VERSION
 
-Version 0.99
+Version 1.02
 
 =head1 SYNOPSIS
 
@@ -3189,7 +3665,7 @@ jq-like syntax — entirely within Perl, with no external binaries or XS modules
 
 =item * Pipe-style query chaining using | operator
 
-=item * Built-in functions: length, keys, keys_unsorted, values, first, last, reverse, sort, sort_desc, sort_by, min_by, max_by, unique, unique_by, has, contains, any, all, group_by, group_count, join, split, explode, implode, count, empty, type, nth, del, delpaths, compact, upper, lower, titlecase, abs, ceil, floor, trim, ltrimstr, rtrimstr, substr, slice, startswith, endswith, add, sum, sum_by, avg_by, median_by, product, min, max, avg, median, mode, percentile, variance, stddev, drop, tail, chunks, range, enumerate, transpose, flatten_all, flatten_depth, clamp, tostring, tojson, to_number, pick, merge_objects, to_entries, from_entries, with_entries, map_values, walk, paths, leaf_paths, index, rindex, indices
+=item * Built-in functions: length, keys, keys_unsorted, values, first, last, reverse, sort, sort_desc, sort_by, min_by, max_by, unique, unique_by, has, contains, any, all, not, group_by, group_count, join, split, explode, implode, count, empty, type, nth, del, delpaths, compact, upper, lower, titlecase, abs, ceil, floor, trim, ltrimstr, rtrimstr, substr, slice, startswith, endswith, add, sum, sum_by, avg_by, median_by, product, min, max, avg, median, mode, percentile, variance, stddev, drop, tail, chunks, range, enumerate, transpose, flatten_all, flatten_depth, clamp, tostring, tojson, fromjson, to_number, pick, merge_objects, to_entries, from_entries, with_entries, map_values, walk, paths, leaf_paths, index, rindex, indices, arrays, objects, scalars
 
 =item * Supports map(...), map_values(...), walk(...), limit(n), drop(n), tail(n), chunks(n), range(...), and enumerate() style transformations
 
@@ -3478,6 +3954,23 @@ Returns:
 
   { "name": "ALICE", "note": "TEAM LEAD" }
 
+=item * recurse([filter])
+
+Performs a depth-first traversal mirroring jq's C<recurse>. Each invocation
+emits the current value and then evaluates either the optional child filter or,
+when omitted, the object's values and array elements. This makes it easy to
+walk arbitrary tree structures:
+
+Example:
+
+  .users[0] | recurse(.children[]?) | .name
+
+Returns:
+
+  "Alice"
+  "Bob"
+  "Carol"
+
 =item * empty()
 
 Discards all output. Compatible with jq.
@@ -3542,6 +4035,31 @@ Example:
 
 Returns only the array entries from C<.items>.
 
+=item * objects
+
+Emits its input only when the value is a hash reference, mirroring jq's
+C<objects> filter. Scalars and arrays yield no output, letting you isolate
+objects inside heterogeneous streams.
+
+Example:
+
+  .items[] | objects
+
+Returns only the object entries from C<.items>.
+
+=item * scalars
+
+Emits its input only when the value is a scalar (including strings, numbers,
+booleans, or null/undef), mirroring jq's C<scalars> helper. Arrays and objects
+yield no output, making it easy to focus on terminal values within mixed
+streams.
+
+Example:
+
+  .items[] | scalars
+
+Returns only the scalar entries from C<.items>.
+
 =item * type()
 
 Returns the type of the value as a string:
@@ -3552,6 +4070,30 @@ Example:
   .name | type     # => "string"
   .tags | type     # => "array"
   .profile | type  # => "object"
+
+=item * lhs // rhs
+
+Implements jq's alternative operator. The left-hand side is returned when it
+produces a defined value (including false or empty arrays); otherwise the
+right-hand expression is evaluated as a fallback.
+
+Example:
+
+  .users[] | (.nickname // .name)
+
+Returns the nickname when present, otherwise the name field.
+
+=item * default(value)
+
+Provides a convenience helper to replace undefined or null pipeline values
+with a literal fallback.
+
+Example:
+
+  .nickname | default("unknown")
+
+Ensures the string C<"unknown"> is emitted when C<.nickname> is missing or
+null.
 
 =item * nth(n)
 
@@ -3697,6 +4239,19 @@ Example:
 
   .flags | any            # => true when any element is truthy
   .users | any(.active)   # => true when any user is active
+
+=item * not
+
+Performs logical negation using jq's truthiness rules. Returns C<true> when the
+current input is falsy (e.g. C<false>, C<null>, empty string, empty array, or
+empty object) and C<false> otherwise. Arrays and objects are considered truthy
+when they contain at least one element or key, respectively.
+
+Examples:
+
+  true  | not   # => false
+  []    | not   # => true
+  .ok   | not   # => negates the truthiness of .ok
 
 =item * unique_by(".key")
 
@@ -3910,6 +4465,18 @@ Example:
   .name    | tojson   # => "\"Alice\""
   .profile | tojson   # => "{\"name\":\"Alice\"}"
 
+=item * fromjson()
+
+Parses JSON text back into native Perl data structures. Plain strings are
+decoded directly, while arrays are processed element-by-element to mirror jq's
+convenient broadcasting behaviour. Invalid JSON inputs are passed through
+unchanged so pipelines remain lossless.
+
+Example:
+
+  .raw   | fromjson   # => {"name":"Bob"}
+  .lines | fromjson   # => [1, true, null]
+
 =item * to_number()
 
 Coerces values that look like numbers into actual numeric scalars. Strings are
@@ -4012,4 +4579,6 @@ Kawamura Shingo E<lt>pannakoota1@gmail.comE<gt>
 Same as Perl itself.
 
 =cut
+
+
 

@@ -1,6 +1,6 @@
 # [[[ PREPROCESSOR ]]]
 # <<< PARSE_ERROR: 'ERROR ECOPAPL02' >>>
-# <<< PARSE_ERROR: 'Global symbol "$TYPED_PIE" requires explicit use Perl::Types;
+# <<< PARSE_ERROR: 'Global symbol "$TYPED_PIE" requires explicit "use types;"
 package name' >>>
 
 # [[[ HEADER ]]]

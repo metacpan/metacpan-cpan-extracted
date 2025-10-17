@@ -1,6 +1,5 @@
 package Astro::ADS::Paper;
-# ABSTRACT: A class for holding the document attributes for the results of a Search
-$Astro::ADS::Paper::VERSION = '1.90';
+$Astro::ADS::Paper::VERSION = '1.91';
 use Moo;
 
 use Carp;
@@ -8,8 +7,6 @@ use Data::Dumper::Concise;
 use Mojo::Base -strict; # do we want -signatures
 use PerlX::Maybe;
 use Types::Standard qw( Int Str StrMatch ArrayRef HashRef Any ); # InstanceOf ConsumerOf
-
-no warnings 'experimental'; # suppress warning for native perl 5.36 try/catch
 
 #declare "Bibcode",
 #   was StrMatch[ qr{^\d{4} [\w.&]{5} [\d.]{4} [ELP-Z\d.] [\d.]{4} [A-Z]$}x ];
@@ -75,8 +72,6 @@ sub summary {
 
 1;
 
-__END__
-
 =pod
 
 =encoding UTF-8
@@ -87,7 +82,7 @@ Astro::ADS::Paper - A class for holding the document attributes for the results 
 
 =head1 VERSION
 
-version 1.90
+version 1.91
 
 =head1 SYNOPSIS
 
@@ -139,10 +134,6 @@ v1 had the following methods
 all of which grepped $self->links for either REFERENCES, CITATIONS, AR or TOC
 
 These are returned in the links_data field, but we should be using the Links service to get this data
-
-=head1 AUTHOR
-
-Boyd Duffee <duffee@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 

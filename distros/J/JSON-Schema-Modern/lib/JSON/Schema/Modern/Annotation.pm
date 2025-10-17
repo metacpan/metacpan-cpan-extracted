@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Annotation;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains a single annotation from a JSON Schema evaluation
 
-our $VERSION = '0.619';
+our $VERSION = '0.620';
 
 use 5.020;
 use Moo;
@@ -62,7 +62,7 @@ JSON::Schema::Modern::Annotation - Contains a single annotation from a JSON Sche
 
 =head1 VERSION
 
-version 0.619
+version 0.620
 
 =head1 SYNOPSIS
 
@@ -136,6 +136,14 @@ if the distinction is important to you.)
 
 Returns a JSON string representing the error object, according to
 the L<specification|https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.10>.
+
+=head1 GIVING THANKS
+
+=for stopwords MetaCPAN GitHub
+
+If you found this module to be useful, please show your appreciation by
+adding a +1 in L<MetaCPAN|https://metacpan.org/dist/JSON-Schema-Modern>
+and a star in L<GitHub|https://github.com/karenetheridge/JSON-Schema-Modern>.
 
 =head1 SUPPORT
 

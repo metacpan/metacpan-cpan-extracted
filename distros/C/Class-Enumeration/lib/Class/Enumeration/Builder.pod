@@ -1,0 +1,89 @@
+=pod
+
+=head1 NAME
+
+Class::Enumeration::Builder - Builder module for enum classes
+
+=head1 SYNOPSIS
+
+  # Setup enum class in a separate module and build it at compile time
+  use strict;
+  use warnings;
+
+  package TrafficLight;
+
+  # Pre-declare the to_string() method to prepare overriding stringification
+  use subs 'to_string';
+
+  # 'action' is a custom attribute
+  use Class::Enumeration::Builder (
+    GREEN  => { action => 'go' },
+    ORANGE => { action => 'slow down' },
+    RED    => { action => 'stop' }
+  );
+
+  sub to_string {
+    my ( $self ) = @_;
+
+    $self->action . ' if ' . $self->name
+  }
+
+  1
+
+  # Build enum class at compile time and export enum constants
+  use strict;
+  use warnings;
+
+  package ToastStatus;
+
+  # Choose an exporter module and set the 'export' option to true
+  use Exporter qw( import );
+  use Class::Enumeration::Builder { export => 1 }, qw( bread toasting toast burnt );
+
+  1
+
+  # Build enum class at runtime
+  my $class = Class::Enumeration::Builder->import(
+    { class => 'CoffeeSize' },
+    BIG          => { ounces => 8 },
+    HUGE         => { ounces => 10 },
+    OVERWHELMING => { ounces => 16 }
+  );
+
+=head1 DESCRIPTION
+
+C<Class::Enumration::Builder> builds enum classes. Each such class will be a
+child class of the abstract parent class L<Class::Enumeration>.  The builder
+creates getters for custom attributes and as a final mandatory step prepares
+a list of enum objects.
+
+The C<import()> class method implements the build process. Its first
+argument is an optional HASH reference. The allowed options are C<class>
+(a non-empty string) and C<export> (a boolean value).  The C<import()>
+method returns the name of the enum class.
+
+If the C<export> option is set to true, the builder will prepare enum constants
+that are stored in the variable C<@EXPORT_OK> and it will create an C<:all>
+that is part of the variable C<%EXPORT_TAGS>. Any exporter module chosen
+and loaded separately enables the feature to export enum constants.
+
+An enum class build setup can be part of a separate module. In this case
+the build process happens at compile time. The enum class name equals the
+package name.  If you want to override the default stringification you have
+to pre-declare the C<to_string()> before loading the builder.
+
+An enum class can be build at runtime too.  The C<class> option should be
+used to set the enum class name.
+
+=head1 AUTHOR
+
+Sven Willenbuecher <sven.willenbuecher@gmx.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2025 by Sven Willenbuecher.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

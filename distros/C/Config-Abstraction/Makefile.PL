@@ -56,9 +56,10 @@ WriteMakefile(
 				web => 'https://github.com/nigelhorne/Config-Abstraction'
 			}, bugtracker => {
 				mailto => 'bug-Config-Abstraction@rt.cpan.org',
-				url => 'https://github.com/nigelhorne/Config-Abstraction/issues',
-				# web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Config-Abstraction',
-				web => 'https://github.com/nigelhorne/Config-Abstraction/issues'
+				url => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Config-Abstraction',
+				web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Config-Abstraction',
+				# web => 'https://github.com/nigelhorne/Config-Abstraction/issues'
+				# url => 'https://github.com/nigelhorne/Config-Abstraction/issues',
 			}
 		},
 	}, TEST_REQUIRES => {

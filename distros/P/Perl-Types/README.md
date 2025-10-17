@@ -1,8 +1,6 @@
 # perl-types
 
-Perl::Types
-
-The Perl data type system
+Perl::Types - the Perl data type system
 
 ```perl
     # the following three styles are functionally equivalent,
@@ -20,7 +18,7 @@ The Perl data type system
     my arrayref::integer $arr = [1, 2, 3];
 ```
 
-[comment]: # DEV NOTE, CORRELATION #gt00: copy all project description changes between 'README.md' & 'lib/Perl/Types.pm' POD
+[comment]: # DEV NOTE, CORRELATION #gt00: copy all project abstract changes between 'README.md' header & "# ABSTRACT" & POD in main module; copy all description changes between 'README.md' header & main module POD
 
 ```console
 $ docker run -it perlcommunity/perl-types
@@ -146,6 +144,28 @@ Perl::warn('This is a warning message.');
 Warning Note: the pragma `use warnings;` enables warnings from the Perl interpreter, whereas `Perl::warn()` generates warnings from the developer.
 
 Diagnostics Note: when writing Perl tests, please use the `diag()` provided by Test2::V0 (or equivalent) instead of `Perl::diag()`, which is meant for use in normal non-test source code.
+
+## DEVELOPERS: Perl::Tidy & Perl::Critic & Code::TidyAll
+
+Please utilize the Perl::Tidy application `perltidy` to help format and clean up your Perl source code files.
+Please utilize the Perl::Critic application `perlcritic` to help lint and improve your Perl source code files.
+Please utilize the Code::TidyAll application `tidyall` to optionally help launch `perltidy` and `perlcritic` across multiple files.
+
+Default settings for each of these 3 applications are provided in the `.perltidyrc`, `.perlcriticrc`, and `.tidyallrc` files, respectively.
+
+```console
+# tidy one Perl source code file
+$ perltidy <PERL_FILE_PATH>
+
+# criticize one Perl source code file
+$ perlcritic <PERL_FILE_PATH>
+
+# process all Perl files in the current directory
+$ tidyall --all
+
+# process added & modified Perl files in the current Git repository
+$ tidyall --git
+```
 
 ## DEVELOPERS: Formatting in Markdown vs Comments vs POD
 

@@ -1,3 +1,6 @@
+0.02 2025-10-17T00:48:39+02:00
+ - Add check_array_strings() check.
+
 0.01 2025-08-02T12:57:24+02:00
  - Add test for finish coverage testing of check_array_object().
  - Finish testing of check_array().

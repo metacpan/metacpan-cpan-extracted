@@ -15,8 +15,8 @@ our $VERSION = 0.001_000;
 
 plan tests => 4;
 
+# enable for any debugging output
 #diag '<<< DEBUG >>> have $foo = ', $foo, "\n";
-
 
 ok ( (my integer $foo = 1), 'my integer $foo = 1');
 ok ( (my string $bar = 'howdy'), 'my string $bar = ...');

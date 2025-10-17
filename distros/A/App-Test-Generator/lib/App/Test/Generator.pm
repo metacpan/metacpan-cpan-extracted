@@ -1,6 +1,7 @@
 package App::Test::Generator;
 
 # TODO: Support routines that take more than one unnamed parameter
+# TODO: Test validator from Params::Validate::Strict 0.16
 
 use strict;
 use warnings;
@@ -13,7 +14,7 @@ binmode STDERR, ':utf8';
 use open qw(:std :encoding(UTF-8));
 
 use Carp qw(carp croak);
-use Config::Abstraction;
+use Config::Abstraction 0.36;
 use Data::Dumper;
 use Data::Section::Simple;
 use File::Basename qw(basename);
@@ -25,27 +26,31 @@ use Exporter 'import';
 
 our @EXPORT_OK = qw(generate);
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
 =head1 NAME
 
 App::Test::Generator - Generate fuzz and corpus-driven test harnesses
 
+=head1 VERSION
+
+Version 0.08
+
 =head1 SYNOPSIS
 
 From the command line:
 
-  fuzz-harness-generator t/conf/add.conf > t/add_fuzz.t
+  fuzz-harness-generator t/conf/add.yml > t/add_fuzz.t
 
 From Perl:
 
   use App::Test::Generator qw(generate);
 
   # Generate to STDOUT
-  App::Test::Generator::generate("t/conf/add.conf");
+  App::Test::Generator::generate("t/conf/add.yml");
 
   # Generate directly to a file
-  App::Test::Generator::generate('t/conf/add.conf', 't/add_fuzz.t');
+  App::Test::Generator::generate('t/conf/add.yml', 't/add_fuzz.t');
 
 =head1 OVERVIEW
 
@@ -77,9 +82,10 @@ This module implements the logic behind L<fuzz-harness-generator>.
 It parses configuration files (fuzz and/or corpus YAML), and
 produces a ready-to-run F<.t> test script using L<Test::Most>.
 
-It reads configuration files (Perl C<.conf> with C<our> variables,
-and optional YAML corpus files), and generates a L<Test::Most>-based
-fuzzing harness combining:
+It reads configuration files in any format
+(including Perl C<.conf> with C<our> variables, though this format will be deprecated in a future release)
+and optional YAML corpus files,
+and generates a L<Test::Most>-based fuzzing harness combining:
 
 =over 4
 
@@ -141,10 +147,20 @@ of keys).
 
 =item * C<memberof> - arrayref of allowed values for a parameter:
 
-    our %input = (
-        status => { type => 'string', memberof => [ 'ok', 'error', 'pending' ] },
-        level => { type => 'integer', memberof => [ 1, 2, 3 ] },
-    );
+  ---
+  input:
+    status:
+      type: string
+      memberof:
+        - ok
+        - error
+        - pending
+    level:
+      type: integer
+      memberof:
+        - 1
+        - 5
+        - 111
 
 The generator will automatically create test cases for each allowed value (inside the member list),
 and at least one value outside the list (which should die, C<_STATUS = 'DIES'>).
@@ -152,9 +168,9 @@ This works for strings, integers, and numbers.
 
 =item * C<boolean> - automatic boundary tests for boolean fields
 
-    our %input = (
-        flag => { type => 'boolean' },
-    );
+  input:
+    flag:
+      type: boolean
 
 The generator will automatically create test cases for 0 and 1; true and false; off and on, and values that should trigger C<_STATUS = 'DIES'>.
 
@@ -169,7 +185,7 @@ without relying solely on randomness.
 The configuration file is either a file that can be read by L<Config::Abstraction> or a B<trusted input> Perl file that should set variables with C<our>.
 
 The documentation here covers the old trusted input style input, but that will go away so you are recommended to use
-Config::Abstraction files.
+L<Config::Abstraction> files.
 Example: the generator expects your config to use C<our %input>, C<our $function>, etc.
 
 Recognized items:
@@ -179,10 +195,14 @@ Recognized items:
 =item * C<%input> - input params with keys => type/optional specs:
 
 When using named parameters
-	our %input = (
-		name => { type => 'string', optional => 0 },
-		age => { type => 'integer', optional => 1 },
-	);
+
+  input:
+    name:
+      type: string
+      optional: false
+    age:
+      type: integer
+      optional: true
 
 Supported basic types used by the fuzzer: C<string>, C<integer>, C<number>, C<boolean>, C<arrayref>, C<hashref>.
 (You can add more types; they will default to C<undef> unless extended.)
@@ -204,7 +224,17 @@ Currently, routines with more than one unnamed parameter are not supported.
 If the output hash contains the key _STATUS, and if that key is set to DIES,
 the routine should die with the given arguments; otherwise, it should live.
 If it's set to WARNS,
-the routine should warn with the given arguments
+the routine should warn with the given arguments.
+The output can be set to the string 'undef' if the routine should return the undefined value:
+
+  ---
+  module: Scalar::Util
+  function: blessed
+
+  input:
+    arg1: string
+
+  output: undef
 
 =item * C<$module> - module name (optional).
 
@@ -219,6 +249,13 @@ C<My-Widget.conf> -> C<My::Widget>.
 
 To ensure new is called with no arguments, you still need to define new, thus:
 
+  module: MyModule
+  function: my_function
+
+  new:
+
+For the legacy Perl variable syntax, use the empty string:
+
   our $new = '';
 
 =item * C<%cases> - optional Perl static corpus, when the output is a simple string (expected => [ args... ]):
@@ -226,7 +263,7 @@ To ensure new is called with no arguments, you still need to define new, thus:
 Maps the expected output string to the input and _STATUS
 
   our %cases = (
-    'ok'   => {
+    'ok' => {
 	input => 'ping',
 	status => 'OK',
     'error' =>
@@ -245,7 +282,7 @@ Maps the expected output string to the input and _STATUS
 	# Two named parameters
 	our %edge_cases = (
 		name => [ '', 'a' x 1024, \"\x{263A}" ],
-		age  => [ -1, 0, 99999999 ],
+		age => [ -1, 0, 99999999 ],
 	);
 
 	# Takes a string input
@@ -259,8 +296,8 @@ Note that this only works with routines that take named parameters.
 =item * C<%type_edge_cases> - optional hash mapping types to arrayrefs of extra values to try for any field of that type:
 
 	our %type_edge_cases = (
-		string  => [ '', ' ', "\t", "\n", "\0", 'long' x 1024, chr(0x1F600) ],
-		number  => [ 0, 1.0, -1.0, 1e308, -1e308, 1e-308, -1e-308, 'NaN', 'Infinity' ],
+		string => [ '', ' ', "\t", "\n", "\0", 'long' x 1024, chr(0x1F600) ],
+		number => [ 0, 1.0, -1.0, 1e308, -1e308, 1e-308, -1e-308, 'NaN', 'Infinity' ],
 		integer => [ 0, 1, -1, 2**31-1, -(2**31), 2**63-1, -(2**63) ],
 	);
 
@@ -291,10 +328,10 @@ Functional fuzz + Perl corpus + seed:
   our %input = ( a => { type => 'integer' }, b => { type => 'integer' } );
   our %output = ( type => 'integer' );
   our %cases = (
-    '3'     => [1, 2],
-    '0'     => [0, 0],
-    '-1'    => [-2, 1],
-    '_STATUS:DIES'  => [ 'a', 'b' ],     # non-numeric args should die
+    '3' => [1, 2],
+    '0' => [0, 0],
+    '-1' => [-2, 1],
+    '_STATUS:DIES' => [ 'a', 'b' ],     # non-numeric args should die
     '_STATUS:WARNS' => [ undef, undef ], # undef args should warn
   );
   our $seed = 12345;
@@ -326,7 +363,7 @@ A YAML mapping of expected -> args array:
 =head2 Example with arrayref + hashref
 
   our %input = (
-    tags   => { type => 'arrayref', optional => 1 },
+    tags => { type => 'arrayref', optional => 1 },
     config => { type => 'hashref' },
   );
   our %output = ( type => 'hashref' );
@@ -341,9 +378,15 @@ A YAML mapping of expected -> args array:
 
 This will generate fuzz cases for 'ok', 'error', 'pending', and one invalid string that should die.
 
-=head2 New format input
+=head2 Adding Scheduled fuzz Testing with GitHub Actions to Your Code
 
-Testing L<HTML::Genealogy::Map>:
+To automatically create and run tests on a regular basis on GitHub Actions,
+you need to create a configuration file for each method and subroutine that you're testing,
+and a GitHub Actions configuration file.
+
+This example takes you through testing the online_render method of L<HTML::Genealogy::Map>.
+
+=head3 t/conf/online_render.yml
 
   ---
 
@@ -370,6 +413,51 @@ Testing L<HTML::Genealogy::Map>:
   config:
     test_undef: 0
 
+=head3 .github/actions/fuzz.t
+
+  ---
+  name: Fuzz Testing
+
+  permissions:
+    contents: read
+
+  on:
+    push:
+      branches: [main, master]
+    pull_request:
+      branches: [main, master]
+    schedule:
+      - cron: '29 5 14 * *'
+
+  jobs:
+    generate-fuzz-tests:
+      runs-on: ubuntu-latest
+
+      steps:
+        - uses: actions/checkout@v5
+
+        - name: Set up Perl
+          uses: shogo82148/actions-setup-perl@v1
+          with:
+            perl-version: '5.38'
+
+        - name: Install App::Test::Generator this module's dependencies
+          run: |
+            cpanm App::Test::Generator
+            cpanm --installdeps .
+
+        - name: Generate fuzz tests
+          run: |
+            mkdir t/fuzz
+            find t/conf -name '*.yml' | while read config; do
+              test_name=$(basename "$config" .conf)
+              fuzz-harness-generator "$config" > "t/fuzz/${test_name}_fuzz.t"
+            done
+
+        - name: Run generated fuzz tests
+          run: |
+            prove -lr t/fuzz/
+
 =head1 OUTPUT
 
 By default, writes C<t/fuzz.t>.
@@ -377,7 +465,7 @@ The generated test:
 
 =over 4
 
-=item * Seeds RNG (if configured) for reproducible fuzz runs
+=item * Seeds RND (if configured) for reproducible fuzz runs
 
 =item * Uses edge cases (per-field and per-type) with configurable probability
 
@@ -433,8 +521,11 @@ sub generate
 		if($config) {
 			%input = %{$config->{input}} if(exists($config->{input}));
 			if(exists($config->{output})) {
-				croak("$conf_file: output should be a hash") unless(ref($config->{output}) eq 'HASH');
-				%output = %{$config->{output}}
+				if(ref($config->{output}) eq 'HASH') {
+					%output = %{$config->{output}}
+				} elsif($config->{'output'} ne 'undef') {
+					croak("$conf_file: output should be a hash");
+				}
 			}
 			%config = %{$config->{config}} if(exists($config->{config}));
 			%cases = %{$config->{cases}} if(exists($config->{cases}));
@@ -443,7 +534,9 @@ sub generate
 
 			$module = $config->{module} if(exists($config->{module}));
 			$function = $config->{function} if(exists($config->{function}));
-			$new = $config->{new} if(exists($config->{new}));
+			if(exists($config->{new})) {
+				$new = defined($config->{'new'}) ? $config->{new} : '_UNDEF';
+			}
 			$yaml_cases = $config->{yaml_cases} if(exists($config->{yaml_cases}));
 			$seed = $config->{seed} if(exists($config->{seed}));
 			$iterations = $config->{iterations} if(exists($config->{iterations}));
@@ -554,10 +647,16 @@ sub generate
 	sub _validate_config {
 		my $config = $_[0];
 
-		for my $key('module', 'function', 'input') {
+		for my $key('module', 'function') {
 			croak "Missing required '$key' specification" unless $config->{$key};
 		}
-		croak 'Invalid input specification' unless(ref $config->{input} eq 'HASH');
+		if((!defined($config->{'input'})) && (!defined($config->{'output'}))) {
+			# Routine takes no input and no output, so there's nothing that would be gained using this software
+			croak('You must specify at least one of input and output');
+		}
+		if($config->{'input'}) {
+			croak('Invalid input specification') unless(ref $config->{input} eq 'HASH');
+		}
 
 		# Validate types, constraints, etc.
 		for my $param (keys %{$config->{input}}) {
@@ -787,11 +886,11 @@ sub generate
 
 	if ($outfile) {
 		open my $fh, '>:encoding(UTF-8)', $outfile or die "Cannot open $outfile: $!";
-		print $fh $test;
+		print $fh "$test\n";
 		close $fh;
 		print "Generated $outfile for $module\::$function with fuzzing + corpus support\n";
 	} else {
-		print $test;
+		print "$test\n";
 	}
 }
 
@@ -829,6 +928,7 @@ use utf8;
 use open qw(:std :encoding(UTF-8));	# https://github.com/nigelhorne/App-Test-Generator/issues/1
 
 use Data::Dumper;
+use Data::Random qw(:all);
 use Test::Most;
 use Test::Returns 0.02;
 use JSON::MaybeXS;
@@ -909,6 +1009,7 @@ sub rand_unicode_char {
 # Generate a string: mostly ASCII, sometimes unicode, sometimes nul bytes or combining marks
 sub rand_str {
 	my $len = shift || int(rand(10)) + 1;
+
 	my @chars;
 	for (1..$len) {
 		my $r = rand();
@@ -937,16 +1038,18 @@ sub rand_str {
 # Random character either upper or lower case
 sub rand_char
 {
-	my $char = '';
-	my $upper_chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-	my $lower_chars = 'abcdefghijklmnopqrstuvwxyz';
-	my $combined_chars = $upper_chars . $lower_chars;
+	return rand_chars(set => 'all', min => 1, max => 1);
 
-	# Generate a random index between 0 and the length of the string minus 1
-	my $rand_index = int(rand(length($combined_chars)));
+	# my $char = '';
+	# my $upper_chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+	# my $lower_chars = 'abcdefghijklmnopqrstuvwxyz';
+	# my $combined_chars = $upper_chars . $lower_chars;
 
-	# Get the character at that index
-	return substr($combined_chars, $rand_index, 1);
+	# # Generate a random index between 0 and the length of the string minus 1
+	# my $rand_index = int(rand(length($combined_chars)));
+
+	# # Get the character at that index
+	# return substr($combined_chars, $rand_index, 1);
 }
 
 # Integer generator: mix typical small ints with large limits
@@ -1035,7 +1138,13 @@ sub fuzz_inputs {
 				# Is hello allowed?
 				if(!defined($input{'memberof'}) || (grep { $_ eq 'hello' } @{$input{'memberof'}})) {
 					push @cases, { _input => 'hello' };
+				} elsif(defined($input{'memberof'}) && !defined($input{'max'})) {
+					# Data::Random
+					push @cases, { _input => rand_set(set => $input{'memberof'}, size => 1) }
 				} else {
+					if((!defined($input{'min'})) || ($input{'min'} >= 1)) {
+						push @cases, { _input => '0' } if(!defined($input{'memberof'}));
+					}
 					push @cases, { _input => 'hello', _STATUS => 'DIES' };
 				}
 				push @cases, { _input => '' } if((!exists($input{'min'})) || ($input{'min'} == 0));
@@ -1083,6 +1192,9 @@ sub fuzz_inputs {
 						if('hello' =~ $re) {
 							if(!defined($spec->{'memberof'}) || (grep { $_ eq 'hello' } @{$spec->{'memberof'}})) {
 								push @cases, { %mandatory_strings, %mandatory_objects, ( $field => 'hello' ) };
+							} elsif(defined($spec->{'memberof'}) && !defined($spec->{'max'})) {
+								# Data::Random
+								push @cases, { %mandatory_strings, %mandatory_objects, _input => rand_set(set => $spec->{'memberof'}, size => 1) }
 							} else {
 								push @cases, { %mandatory_strings, %mandatory_objects, ( $field => 'hello', _STATUS => 'DIES' ) };
 							}
@@ -1100,6 +1212,9 @@ sub fuzz_inputs {
 						# '' should die unless it's in the memberof list
 						if(defined($spec->{'memberof'}) && (!grep { $_ eq '' } @{$spec->{'memberof'}})) {
 							push @cases, { %mandatory_strings, %mandatory_objects, ( $field => '', _name => $field, _STATUS => 'DIES' ) }
+						} elsif(defined($spec->{'memberof'}) && !defined($spec->{'max'})) {
+							# Data::Random
+							push @cases, { %mandatory_strings, %mandatory_objects, _input => rand_set(set => $spec->{'memberof'}, size => 1) }
 						} else {
 							push @cases, { %mandatory_strings, %mandatory_objects, ( $field => '', _name => $field ) } if((!exists($spec->{min})) || ($spec->{min} == 0));
 						}
@@ -1144,8 +1259,15 @@ sub fuzz_inputs {
 				# --- matches (regex) ---
 				if (defined $spec->{matches}) {
 					my $regex = $spec->{matches};
-					push @cases, { $field => 'match123' } if "match123" =~ $regex;
+					push @cases, { $field => 'match123' } if 'match123' =~ $regex;
 					push @cases, { $field => 'nope', _STATUS => 'DIES' } unless 'nope' =~ $regex;
+				}
+
+				# --- nomatch (regex) ---
+				if (defined $spec->{nomatch}) {
+					my $regex = $spec->{nomatch};
+					push @cases, { $field => 'match123' } if "match123" !~ $regex;
+					push @cases, { $field => 'nope', _STATUS => 'DIES' } unless 'nope' !~ $regex;
 				}
 
 				# --- memberof ---
@@ -1179,7 +1301,7 @@ sub fuzz_inputs {
 					$case_input = rand_str();
 				} elsif($type eq 'integer') {
 					$case_input = rand_int();
-				} elsif($type eq 'number') {
+				} elsif(($type eq 'number') || ($type eq 'float')) {
 					$case_input = rand_num();
 				} elsif($type eq 'boolean') {
 					$case_input = rand_bool();
@@ -1262,7 +1384,11 @@ sub fuzz_inputs {
 		push @cases, { '_STATUS' => 'DIES' };	# At least one argument is needed
 	}
 
-	push @cases, { '_STATUS' => 'DIES', map { $_ => undef } keys %input } if($config{'test_undef'});
+	if(scalar keys %input) {
+		push @cases, { '_STATUS' => 'DIES', map { $_ => undef } keys %input } if($config{'test_undef'});
+	} else {
+		push @cases, { };	# Takes no input
+	}
 
 	# If it's not in mandatory_strings it sets to 'undef' which is the idea, to test { value => undef } in the args
 	push @cases, { map { $_ => $mandatory_strings{$_} } keys %input, %mandatory_objects } if($config{'test_undef'});
@@ -1279,7 +1405,7 @@ sub fuzz_inputs {
 			}
 			# outside value
 			my $outside;
-			if ($type eq 'integer' || $type eq 'number') {
+			if(($type eq 'integer') || ($type eq 'number') || ($type eq 'float')) {
 				$outside = (sort { $a <=> $b } @{$input{memberof}})[-1] + 1;
 			} else {
 				$outside = 'INVALID_MEMBEROF';
@@ -1306,11 +1432,17 @@ sub fuzz_inputs {
 					my $len = $input{min};
 					push @cases, { _input => 'a' x ($len + 1) };	# just inside
 					if($len == 0) {
-						push @cases, { _input => '' };
+						push @cases, { _input => '' }
 					} else {
 						# outside
 						push @cases, { _input => 'a' x $len };	# border
 						push @cases, { _input => 'a' x ($len - 1), _STATUS => 'DIES' };
+					}
+					if($len >= 1) {
+						# Test checking of 'defined'/'exists' rather than if($string)
+						push @cases, { _input => '0' }
+					} else {
+						push @cases, { _input => '0', _STATUS => 'DIES' }
 					}
 				} else {
 					push @cases, { _input => '' };	# No min, empty string should be allowable
@@ -1340,6 +1472,24 @@ sub fuzz_inputs {
 					}
 					push @cases, { _input => undef, _STATUS => 'DIES' } if($config{'test_undef'});
 					push @cases, { _input => "\0", _STATUS => 'DIES' } if($config{'test_nuls'});
+				}
+				if(defined $input{nomatch}) {
+					my $re = $input{nomatch};
+
+					# --- Positive controls ---
+					foreach my $val (@candidate_good) {
+						if ($val !~ $re) {
+							push @cases, { _input => $val };
+							last; # one good match is enough
+						}
+					}
+
+					# --- Negative controls ---
+					foreach my $val (@candidate_bad) {
+						if ($val =~ $re) {
+							push @cases, { _input => $val, _STATUS => 'DIES' };
+						}
+					}
 				}
 			} elsif ($type eq 'arrayref') {
 				if (defined $input{min}) {
@@ -1427,7 +1577,7 @@ sub fuzz_inputs {
 						push @cases, { $field => $spec->{max} };	# border
 						push @cases, { $field => $spec->{max} + 1, _STATUS => 'DIES' }; # outside
 					}
-				} elsif ($type eq 'string') {
+				} elsif($type eq 'string') {
 					if (defined $spec->{min}) {
 						my $len = $spec->{min};
 						if(my $re = $spec->{matches}) {
@@ -1444,10 +1594,16 @@ sub fuzz_inputs {
 							push @cases, { %mandatory_strings, ( $field => 'a' x ($len + 1) ) };	# just inside
 							push @cases, { %mandatory_strings, ( $field => 'a' x $len ) };	# border
 							if($len > 0) {
-								# outside
-								push @cases, { %mandatory_strings, ( $field => 'a' x ($len - 1), _STATUS => 'DIES' ) }
+								push @cases, (
+									# outside
+									{ %mandatory_strings, ( $field => 'a' x ($len - 1), _STATUS => 'DIES' ) },
+									# Test checking of 'defined'/'exists' rather than if($string)
+									{ %mandatory_strings, ( $field => '0' ) }
+								);
 							} else {
 								push @cases, { %mandatory_strings, ( $field => '' ) };	# min == 0, empty string should be allowable
+								# Don't confuse if() with if(defined())
+								push @cases, { %mandatory_strings, ( $field => '0' ), _STATUS => 'DIES' };
 							}
 						}
 					} else {
@@ -1460,9 +1616,9 @@ sub fuzz_inputs {
 								for my $count ($len - 1, $len, $len + 1) {
 									my $str = rand_char() x $count;
 									if($str =~ $re) {
-										push @cases, { %mandatory_strings, ( $field => $str ) };
+										push @cases, { %mandatory_strings, ( $field => $str ), _LINE => __LINE__ };
 									} else {
-										push @cases, { %mandatory_strings, ( $field => $str, _STATUS => 'DIES' ) };
+										push @cases, { %mandatory_strings, ( $field => $str, _STATUS => 'DIES', _LINE => __LINE__ ) };
 									}
 								}
 							} else {
@@ -1491,6 +1647,24 @@ sub fuzz_inputs {
 						}
 						push @cases, { $field => undef, _STATUS => 'DIES' } if($config{'test_undef'});
 						push @cases, { $field => "\0", _STATUS => 'DIES' } if($config{'test_nuls'});
+					}
+					if(defined $spec->{nomatch}) {
+						my $re = $spec->{nomatch};
+
+						# --- Positive controls ---
+						foreach my $val (@candidate_good) {
+							if ($val !~ $re) {
+								push @cases, { $field => $val };
+								last; # one good match is enough
+							}
+						}
+
+						# --- Negative controls ---
+						foreach my $val (@candidate_bad) {
+							if ($val =~ $re) {
+								push @cases, { $field => $val, _STATUS => 'DIES' };
+							}
+						}
 					}
 				} elsif ($type eq 'arrayref') {
 					if (defined $spec->{min}) {
@@ -1604,7 +1778,11 @@ foreach my $case (@{fuzz_inputs()}) {
 		$mess = "[% function %] %s";
 	}
 
-	if(my $status = delete $case->{'_STATUS'} || delete $output{'_STATUS'}) {
+	if(my $line = (delete $case->{'_LINE'} || delete $output{'_LINE'})) {
+		diag("Test case from line number $line") if($ENV{'TEST_VERBOSE'});
+	}
+
+	if(my $status = (delete $case->{'_STATUS'} || delete $output{'_STATUS'})) {
 		if($status eq 'DIES') {
 			dies_ok { [% call_code %] } sprintf($mess, 'dies');
 		} elsif($status eq 'WARNS') {
@@ -1625,5 +1803,4 @@ foreach my $case (@{fuzz_inputs()}) {
 [% corpus_code %]
 
 done_testing();
-
 __END__

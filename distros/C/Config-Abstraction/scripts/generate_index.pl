@@ -4,17 +4,26 @@ use strict;
 use warnings;
 use autodie qw(:all);
 
-use JSON::MaybeXS;
 use File::Glob ':glob';
 use File::Slurp;
-use POSIX qw(strftime);
 use File::stat;
+use JSON::MaybeXS;
+use POSIX qw(strftime);
+use Readonly;
 
-my $cover_db = 'cover_db/cover.json';
-my $output = 'cover_html/index.html';
+Readonly my %config => (
+	github_user => 'nigelhorne',
+	github_repo => 'Config-Abstraction',
+	package_name => 'Config::Abstraction',
+	low_threshold => 70,
+	med_threshold => 90,
+	max_points => 10,	# Only display the last 10 commits in the coverage trend graph
+	cover_db => 'cover_db/cover.json',
+	output => 'cover_html/index.html'
+);
 
 # Read and decode coverage data
-my $json_text = read_file($cover_db);
+my $json_text = read_file($config{cover_db});
 my $data = decode_json($json_text);
 
 my $coverage_pct = 0;
@@ -25,7 +34,7 @@ if(my $total_info = $data->{summary}{Total}) {
 	$badge_color = $coverage_pct > 80 ? 'brightgreen' : $coverage_pct > 50 ? 'yellow' : 'red';
 }
 
-my $coverage_badge_url = "https://img.shields.io/badge/coverage-${coverage_pct}%25-${badge_color}";
+Readonly my $coverage_badge_url => "https://img.shields.io/badge/coverage-${coverage_pct}%25-${badge_color}";
 
 # Start HTML
 my @html;	# build in array, join later
@@ -33,7 +42,7 @@ push @html, <<"HTML";
 <!DOCTYPE html>
 <html>
 	<head>
-	<title>Config::Abstraction Coverage Report</title>
+	<title>$config{package_name} Coverage Report</title>
 	<style>
 		body { font-family: sans-serif; }
 		table { border-collapse: collapse; width: 100%; }
@@ -71,19 +80,60 @@ push @html, <<"HTML";
 		td.positive { color: green; font-weight: bold; }
 		td.negative { color: red; font-weight: bold; }
 		td.neutral { color: gray; }
+		// Show cursor points on the headers to show that they are clickable
+		th { background-color: #f2f2f2; cursor: pointer; }
+		th.sortable {
+			cursor: pointer;
+			user-select: none;
+			white-space: nowrap;
+		}
+		th .arrow {
+			color: #aaa;	/* dimmed for inactive */
+			font-weight: normal;
+		}
+		th .arrow.active {
+			color: #000;	/* dark for active */
+			font-weight: bold;
+		}
+		.sparkline {
+			display: inline-block;
+			vertical-align: middle;
+		}
 	</style>
 </head>
 <body>
 <div class="badges">
-	<a href="https://github.com/nigelhorne/Config-Abstraction">
-		<img src="https://img.shields.io/github/stars/nigelhorne/Config-Abstraction?style=social" alt="GitHub stars">
+	<a href="https://github.com/$config{github_user}/$config{github_repo}">
+		<img src="https://img.shields.io/github/stars/$config{github_user}/$config{github_repo}?style=social" alt="GitHub stars">
 	</a>
 	<img src="$coverage_badge_url" alt="Coverage badge">
 </div>
-<h1>Config::Abstraction</h1><h2>Coverage Report</h2>
-<table>
-<tr><th>File</th><th>Stmt</th><th>Branch</th><th>Cond</th><th>Sub</th><th>Total</th><th>&Delta;</th></tr>
+<h1>$config{package_name}</h1><h2>Coverage Report</h2>
+<table data-sort-col="0" data-sort-order="asc">
+<!-- Make the column headers clickable -->
+<thead>
+<tr>
+	<th class="sortable" onclick="sortTable(0)"><span class="label">File</span> <span class="arrow active">&#x25B2;</span></th>
+	<th class="sortable" onclick="sortTable(1)"><span class="label">Stmt</span> <span class="arrow">&#x25B2;</span></th>
+	<th class="sortable" onclick="sortTable(2)"><span class="label">Branch</span> <span class="arrow">&#x25B2;</span></th>
+	<th class="sortable" onclick="sortTable(3)"><span class="label">Cond</span> <span class="arrow">&#x25B2;</span></th>
+	<th class="sortable" onclick="sortTable(4)"><span class="label">Sub</span> <span class="arrow">&#x25B2;</span></th>
+	<th class="sortable" onclick="sortTable(5)"><span class="label">Total</span> <span class="arrow">&#x25B2;</span></th>
+	<th class="sortable" onclick="sortTable(6)"><span class="label">&Delta;</span> <span class="arrow">&#x25B2;</span></th>
+</tr>
+</thead>
+
+<tbody>
 HTML
+
+my @history_files = bsd_glob("coverage_history/*.json");
+
+# Cache historical data instead of reading for each file
+my %historical_cache;
+for my $hist_file (@history_files) {
+	my $json = eval { decode_json(read_file($hist_file)) };
+	$historical_cache{$hist_file} = $json if $json;
+}
 
 # Load previous snapshot for delta comparison
 my @history = sort { $a cmp $b } bsd_glob("coverage_history/*.json");
@@ -91,10 +141,9 @@ my $prev_data;
 
 if (@history >= 1) {
 	my $prev_file = $history[-1];	# Most recent before current
-	eval {
-		$prev_data = decode_json(read_file($prev_file));
-	};
+	$prev_data = $historical_cache{$prev_file};
 }
+
 my %deltas;
 if ($prev_data) {
 	for my $file (keys %{$data->{summary}}) {
@@ -108,7 +157,7 @@ if ($prev_data) {
 
 my $commit_sha = `git rev-parse HEAD`;
 chomp $commit_sha;
-my $github_base = "https://github.com/nigelhorne/Config-Abstraction/blob/$commit_sha/";
+my $github_base = "https://github.com/$config{github_user}/$config{github_repo}/blob/$commit_sha/";
 
 # Add rows
 my ($total_files, $total_coverage, $low_coverage_count) = (0, 0, 0);
@@ -126,18 +175,18 @@ for my $file (sort keys %{$data->{summary}}) {
 	my $total = $info->{total}{percentage} // 0;
 	$total_files++;
 	$total_coverage += $total;
-	$low_coverage_count++ if $total < 70;
+	$low_coverage_count++ if $total < $config{low_threshold};
 
-	my $badge_class = $total >= 90 ? 'badge-good'
-					: $total >= 70 ? 'badge-warn'
+	my $badge_class = $total >= $config{med_threshold} ? 'badge-good'
+					: $total >= $config{low_threshold} ? 'badge-warn'
 					: 'badge-bad';
 
-	my $tooltip = $total >= 90 ? 'Excellent coverage'
-				 : $total >= 70 ? 'Moderate coverage'
+	my $tooltip = $total >= $config{med_threshold} ? 'Excellent coverage'
+				 : $total >= $config{low_threshold} ? 'Moderate coverage'
 				 : 'Needs improvement';
 
-	my $row_class = $total >= 90 ? 'high'
-			: $total >= 70 ? 'med'
+	my $row_class = $total >= $config{med_threshold} ? 'high'
+			: $total >= $config{low_threshold} ? 'med'
 			: 'low';
 
 	my $badge_html = sprintf(
@@ -172,8 +221,26 @@ for my $file (sort keys %{$data->{summary}}) {
 		? sprintf('<a href="%s" class="icon-link" title="View source on GitHub">&#128269;</a>', $source_url)
 		: '<span class="disabled-icon" title="No coverage data">&#128269;</span>';
 
+	# Create the sparkline
+	# There's probably some duplication of code here
+	my @file_history;
+	my @history_files = sort <coverage_history/*.json>;
+
+	my %history;
+	for my $hist_file (sort @history_files) {
+		my $json = $historical_cache{$hist_file};
+
+		$history{$hist_file} = $json;
+
+		if($json->{summary}{$file}) {
+			my $pct = $json->{summary}{$file}{total}{percentage} // 0;
+			push @file_history, sprintf('%.1f', $pct);
+		}
+	}
+	my $points_attr = join(',', @file_history);
+
 	push @html, sprintf(
-		qq{<tr class="%s"><td><a href="%s" title="View coverage line by line">%s</a> %s</td><td>%.1f</td><td>%.1f</td><td>%.1f</td><td>%.1f</td><td>%s</td>%s</tr>\n},
+		qq{<tr class="%s"><td><a href="%s" title="View coverage line by line" target="_blank">%s</a> %s<canvas class="sparkline" width="80" height="20" data-points="$points_attr"></canvas></td><td>%.1f</td><td>%.1f</td><td>%.1f</td><td>%.1f</td><td>%s</td>%s</tr>\n},
 		$row_class, $html_file, $file, $source_link,
 		$info->{statement}{percentage} // 0,
 		$info->{branch}{percentage} // 0,
@@ -188,7 +255,7 @@ for my $file (sort keys %{$data->{summary}}) {
 my $avg_coverage = $total_files ? int($total_coverage / $total_files) : 0;
 
 push @html, sprintf(
-	qq{<tr class="summary-row"><td colspan="2"><strong>Summary</strong></td><td colspan="2">%d files</td><td colspan="3">Avg: %d%%, Low: %d</td></tr>\n},
+	qq{<tr class="summary-row nosort"><td colspan="2"><strong>Summary</strong></td><td colspan="2">%d files</td><td colspan="3">Avg: %d%%, Low: %d</td></tr>\n},
 	$total_files, $avg_coverage, $low_coverage_count
 );
 
@@ -198,7 +265,7 @@ if (my $total_info = $data->{summary}{Total}) {
 	my $class = $total_pct > 80 ? 'high' : $total_pct > 50 ? 'med' : 'low';
 
 	push @html, sprintf(
-		qq{<tr class="%s"><td><strong>Total</strong></td><td>%.1f</td><td>%.1f</td><td>%.1f</td><td>%.1f</td><td colspan="2"><strong>%.1f</strong></td></tr>\n},
+		qq{<tr class="%s nosort"><td><strong>Total</strong></td><td>%.1f</td><td>%.1f</td><td>%.1f</td><td>%.1f</td><td colspan="2"><strong>%.1f</strong></td></tr>\n},
 		$class,
 		$total_info->{statement}{percentage} // 0,
 		$total_info->{branch}{percentage} // 0,
@@ -209,22 +276,21 @@ if (my $total_info = $data->{summary}{Total}) {
 }
 
 my $timestamp = 'Unknown';
-if (my $stat = stat($cover_db)) {
+if (my $stat = stat($config{cover_db})) {
 	$timestamp = strftime('%Y-%m-%d %H:%M:%S', localtime($stat->mtime));
 }
 
-my $commit_url = "https://github.com/nigelhorne/Config-Abstraction/commit/$commit_sha";
+Readonly my $commit_url => "https://github.com/$config{github_user}/$config{github_repo}/commit/$commit_sha";
 my $short_sha = substr($commit_sha, 0, 7);
 
-push @html, '</table>';
+push @html, '</tbody></table>';
 
 # Parse historical snapshots
-my @history_files = bsd_glob("coverage_history/*.json");
 my @trend_points;
 
 foreach my $file (sort @history_files) {
-	my $json = eval { decode_json(read_file($file)) };
-	next unless $json && $json->{summary}{Total};
+	my $json = $historical_cache{$file};
+	next unless $json->{summary}{Total};
 
 	my $pct = $json->{summary}{Total}{total}{percentage} // 0;
 	my ($date) = $file =~ /(\d{4}-\d{2}-\d{2})/;
@@ -254,25 +320,18 @@ while (<$log>) {
 }
 close $log;
 
-# Only display the last 15 commits
-my $elements_to_keep = 15;
+# Collect data points from non-merge commits
+my @data_points_with_time;
+my $processed_count = 0;
 
-# Calculate the number of elements to remove from the beginning
-my $elements_to_remove = scalar(@history_files) - $elements_to_keep;
+foreach my $file (reverse sort @history_files) {
+	last if $processed_count >= $config{max_points};
 
-# Use splice to remove elements from the beginning of the array
-@history_files = sort(@history_files);
-splice(@history_files, 0, $elements_to_remove);
-
-my @data_points;
-my $prev_pct;
-
-foreach my $file (@history_files) {
-	my $json = eval { decode_json(read_file($file)) };
-	next unless $json && $json->{summary}{Total};
+	my $json = $historical_cache{$file};
+	next unless $json->{summary}{Total};
 
 	my ($sha) = $file =~ /-(\w{7})\.json$/;
-	next unless $commit_messages{$sha};
+	next unless $commit_messages{$sha};	# Skip merge commits
 
 	my $timestamp = $commit_times{$sha} // strftime('%Y-%m-%dT%H:%M:%S', localtime((stat($file))->mtime));
 	$timestamp =~ s/ /T/;
@@ -280,34 +339,65 @@ foreach my $file (@history_files) {
 	$timestamp =~ s/ //g;	# Remove any remaining spaces
 
 	my $pct = $json->{summary}{Total}{total}{percentage} // 0;
-	my $delta = defined $prev_pct ? sprintf('%.1f', $pct - $prev_pct) : 0;
-	$prev_pct = $pct;
-
-	my $color = $delta > 0 ? 'green' : $delta < 0 ? 'red' : 'gray';
-	my $url = "https://github.com/nigelhorne/Config-Abstraction/commit/$sha";
-
+	my $color = 'gray';	# Will be set properly after sorting
+	my $url = "https://github.com/$config{github_user}/$config{github_repo}/commit/$sha";
 	my $comment = $commit_messages{$sha};
-	push @data_points, qq{{ x: "$timestamp", y: $pct, delta: $delta, url: "$url", label: "$timestamp", pointBackgroundColor: "$color", comment: "$comment" }};
+
+	# Store with timestamp for sorting
+	push @data_points_with_time, {
+		timestamp => $timestamp,
+		pct => $pct,
+		url => $url,
+		comment => $comment
+	};
+
+	$processed_count++;
 }
 
-@data_points = sort { $a cmp $b } @data_points;
+# Sort by timestamp to ensure chronological order
+@data_points_with_time = sort { $a->{timestamp} cmp $b->{timestamp} } @data_points_with_time;
+
+# Now calculate deltas and create JavaScript data points
+my @data_points;
+my $prev_pct;
+
+foreach my $point (@data_points_with_time) {
+	my $delta = defined $prev_pct ? sprintf('%.1f', $point->{pct} - $prev_pct) : 0;
+	$prev_pct = $point->{pct};
+
+	my $color = $delta > 0 ? 'green' : $delta < 0 ? 'red' : 'gray';
+
+	push @data_points, qq{{ x: "$point->{timestamp}", y: $point->{pct}, delta: $delta, url: "$point->{url}", label: "$point->{timestamp}", pointBackgroundColor: "$color", comment: "$point->{comment}" }};
+}
 
 my $js_data = join(",\n", @data_points);
 
 if(scalar(@data_points)) {
 	push @html, <<'HTML';
-<p>
-	<label>
-		<input type="checkbox" id="toggleTrend" checked>
-		Show regression trend
-	</label>
-</p>
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1em;">
+	<div>
+		<h2>Coverage Trend</h2>
+		<label>
+			<input type="checkbox" id="toggleTrend" checked>
+			Show regression trend
+		</label>
+		<div>
+		</div>
+	</div>
+	<div id="zoomControls" style="margin-top:8px;">
+		<input type="button" value="Refresh" onClick="refresh(this)">
+		<button id="resetZoomBtn" type="button">Reset Zoom</button>
+	</div>
+</div>
 HTML
 }
 
 push @html, <<"HTML";
 <canvas id="coverageTrend" width="600" height="300"></canvas>
+<!-- Zoom controls for the trend chart -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Add chartjs-plugin-zoom (required for wheel/pinch/drag zoom & pan) -->
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom\@2.1.1/dist/chartjs-plugin-zoom.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
 <script>
 function linearRegression(data) {
@@ -334,6 +424,20 @@ HTML
 
 push @html, <<'HTML';
 const regressionPoints = linearRegression(dataPoints);
+// Try to register the zoom plugin (handles different UMD builds)
+(function registerZoomPlugin(){
+	try {
+		const candidates = ['chartjsPluginZoom','ChartZoom','zoomPlugin','chartjs_plugin_zoom','ChartjsPluginZoom','chartjsPluginZoom'];
+		for (const name of candidates) {
+			if (window[name]) {
+				try { Chart.register(window[name]); console.log('Registered zoom plugin:', name); return; } catch(e) { console.warn('zoom register failed for', name, e); }
+			}
+		}
+		// Some CDN builds auto-register the plugin; if nothing found that's OK (feature disabled).
+	} catch(e) {
+		console.warn('registerZoomPlugin error', e);
+	}
+})();
 const ctx = document.getElementById('coverageTrend').getContext('2d');
 const chart = new Chart(ctx, {
 	type: 'line',
@@ -366,9 +470,9 @@ const chart = new Chart(ctx, {
 				type: 'time',
 				time: {
 					tooltipFormat: 'MMM d, yyyy HH:mm:ss',
-					unit: 'minute'
+					unit: 'day'
 				},
-				title: { display: true, text: 'Timestamp' }
+				title: { display: true, text: 'Commit Date' }
 			},
 			y: { beginAtZero: true, max: 100, title: { display: true, text: 'Coverage (%)' } }
 		}, plugins: {
@@ -396,6 +500,17 @@ const chart = new Chart(ctx, {
 						return commentLine ? [baseLine, commentLine] : [baseLine];
 					}
 				}
+			} , zoom: {	// Enable zoom & pan on the x-axis for the trend chart
+				pan: {
+					enabled: true,
+					mode: 'x'
+				}, zoom: {
+					wheel: {
+						enabled: true
+					}, pinch: {
+						enabled: true
+					}, mode: 'x'
+				}
 			}
 		}, onClick: (e) => {
 			const points = chart.getElementsAtEventForMode(e, 'nearest', { intersect: true }, true);
@@ -406,18 +521,169 @@ const chart = new Chart(ctx, {
 		}
 	}
 });
+
 document.getElementById('toggleTrend').addEventListener('change', function(e) {
 	const show = e.target.checked;
 	const trendDataset = chart.data.datasets.find(ds => ds.label === 'Regression Line');
 	trendDataset.hidden = !show;
 	chart.update();
 });
+
+// Reset Zoom button handler (calls plugin API if available)
+const resetBtn = document.getElementById('resetZoomBtn');
+if (resetBtn) {
+	resetBtn.addEventListener('click', function() {
+		try {
+			if (chart && typeof chart.resetZoom === 'function') {
+				chart.resetZoom();
+			} else {
+				console.warn('resetZoom not available; zoom plugin may not be registered.');
+			}
+		} catch (e) {
+			console.warn('resetZoom call failed', e);
+		}
+	});
+}
+
+function sortTable(n) {
+	const table = document.querySelector("table");
+	if (!table || !table.tBodies || !table.tBodies[0]) return;
+
+	// All rows in tbody
+	const allBodyRows = Array.from(table.tBodies[0].rows);
+
+	// Separate normal (sortable) rows and fixed (nosort) rows.
+	const normalRows = allBodyRows.filter(r => !r.classList.contains("nosort"));
+	const fixedRows = allBodyRows.filter(r => r.classList.contains("nosort"));
+
+	// Decide numeric vs text column (column 0 = File => text)
+	const isNumeric = n > 0;
+
+	// Determine ascending/descending toggle logic
+	const prevCol = table.getAttribute("data-sort-col");
+	const prevOrder = table.getAttribute("data-sort-order") || "desc";
+	const asc = (prevCol != n) ? true : (prevOrder === "desc");
+
+	normalRows.sort((a, b) => {
+		let x = (a.cells[n] && a.cells[n].innerText) ? a.cells[n].innerText.trim() : "";
+		let y = (b.cells[n] && b.cells[n].innerText) ? b.cells[n].innerText.trim() : "";
+
+		if (isNumeric) {
+			// Remove non-number characters (arrows, percent signs, bullets, etc.)
+			x = parseFloat(x.replace(/[^0-9.\-+eE]/g, '')) || 0;
+			y = parseFloat(y.replace(/[^0-9.\-+eE]/g, '')) || 0;
+		} else {
+			// Text compare (case-insensitive)
+			x = x.toLowerCase();
+			y = y.toLowerCase();
+		}
+
+		if (x < y) return asc ? -1 : 1;
+		if (x > y) return asc ? 1 : -1;
+		return 0;
+	});
+
+	// Reattach rows: sorted normalRows first, then fixedRows (keeps summary/total last)
+	normalRows.forEach(r => table.tBodies[0].appendChild(r));
+	fixedRows.forEach(r => table.tBodies[0].appendChild(r));
+
+	// Update header arrows
+	const headers = table.tHead.rows[0].cells;
+	for (let i = 0; i < headers.length; i++) {
+		const arrow = headers[i].querySelector(".arrow");
+		if (!arrow) continue;
+		if (i === n) {
+			// active column: bold arrow, direction ▲ or ▼
+			arrow.textContent = asc ? "▲" : "▼";
+			arrow.classList.add("active");
+		} else {
+			// inactive column: always ▲, dimmed
+			arrow.textContent = "▲";
+			arrow.classList.remove("active");
+		}
+	}
+
+	// Remember state (so clicking same column toggles)
+	table.setAttribute("data-sort-col", n);
+	table.setAttribute("data-sort-order", asc ? "asc" : "desc");
+}
+
+// Initial display.
+// The table has been set up sorted in ascending order on the filename; reflect that in the GUI
+document.addEventListener("DOMContentLoaded", () => {
+	const table = document.querySelector("table");
+	if (!table) return;
+
+	const headers = table.tHead.rows[0].cells;
+	for (let i = 0; i < headers.length; i++) {
+		const arrow = headers[i].querySelector(".arrow");
+		if (!arrow) continue;
+
+		if (i === 0) {
+			arrow.textContent = "▲";
+			arrow.classList.add("active");
+		} else {
+			arrow.textContent = "▲";
+			arrow.classList.remove("active");
+		}
+	}
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+	document.querySelectorAll("canvas.sparkline").forEach(canvas => {
+		const raw = canvas.getAttribute("data-points");
+		if (!raw) return;
+		const points = raw.split(",").map(v => parseFloat(v));
+
+		new Chart(canvas.getContext("2d"), {
+			type: 'line',
+			data: {
+				labels: points.map((_, i) => i+1),
+				datasets: [{
+					data: points,
+					borderColor: points.length > 1 && points[points.length-1] >= points[0] ? "green" : "red",
+					borderWidth: 1,
+					fill: false,
+					tension: 0.3,
+					pointRadius: 0
+				}]
+			}, options: {
+				responsive: false,
+				maintainAspectRatio: false,
+				elements: { line: { borderJoinStyle: 'round' } },
+				plugins: {
+					legend: { display: false },
+					tooltip: { enabled: false },
+					zoom: {	// Enable zoom and pan
+						pan: {
+							enabled: true,
+							mode: 'x',
+						}, zoom: {
+							wheel: {
+								enabled: true,
+							},
+							pinch: {
+								enabled: true
+							},
+							mode: 'x',
+						}
+					}
+				}, scales: { x: { display: false }, y: { display: false } }
+			}
+		});
+	});
+});
+
+function refresh(){
+	window.location.reload("Refresh")
+}
 </script>
 HTML
 
 push @html, <<"HTML";
 <footer>
-	<p>Project: <a href="https://github.com/nigelhorne/Config-Abstraction">Config-Abstraction</a></p>
+	<p><span style="margin-left:8px;color:#666;font-size:0.9em;">Use mouse wheel or pinch to zoom; drag to pan</span></p>
+	<p>Project: <a href="https://github.com/$config{github_user}/$config{github_repo}">$config{github_repo}</a></p>
 	<p><em>Last updated: $timestamp - <a href="$commit_url">commit <code>$short_sha</code></a></em></p>
 </footer>
 </body>
@@ -425,4 +691,4 @@ push @html, <<"HTML";
 HTML
 
 # Write to index.html
-write_file($output, join("\n", @html));
+write_file($config{output}, join("\n", @html));

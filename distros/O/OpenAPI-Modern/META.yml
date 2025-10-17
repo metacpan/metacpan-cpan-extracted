@@ -1,5 +1,5 @@
 ---
-abstract: 'Validate HTTP requests and responses against an OpenAPI v3.1 document'
+abstract: 'Validate HTTP requests and responses against an OpenAPI v3.1 or v3.2 document'
 author:
   - 'Karen Etheridge <ether@cpan.org>'
 build_requires:
@@ -38,6 +38,7 @@ keywords:
   - Schema
   - OpenAPI
   - v3.1
+  - v3.2
   - Swagger
   - HTTP
   - request
@@ -57,17 +58,21 @@ no_index:
 provides:
   JSON::Schema::Modern::Document::OpenAPI:
     file: lib/JSON/Schema/Modern/Document/OpenAPI.pm
-    version: '0.099'
+    version: '0.100'
   JSON::Schema::Modern::Vocabulary::OpenAPI:
     file: lib/JSON/Schema/Modern/Vocabulary/OpenAPI.pm
-    version: '0.099'
+    version: '0.100'
   OpenAPI::Modern:
     file: lib/OpenAPI/Modern.pm
-    version: '0.099'
+    version: '0.100'
+  OpenAPI::Modern::Utilities:
+    file: lib/OpenAPI/Modern/Utilities.pm
+    version: '0.100'
 requires:
   Carp: '0'
   Digest::MD5: '0'
   Encode: '2.89'
+  Exporter: '0'
   Feature::Compat::Try: '0'
   File::ShareDir: '0'
   JSON::Schema::Modern: '0.603'
@@ -102,7 +107,7 @@ resources:
   bugtracker: https://github.com/karenetheridge/OpenAPI-Modern/issues
   homepage: https://github.com/karenetheridge/OpenAPI-Modern
   repository: https://github.com/karenetheridge/OpenAPI-Modern.git
-version: '0.099'
+version: '0.100'
 x_Dist_Zilla:
   perl:
     version: '5.043003'
@@ -429,6 +434,10 @@ x_Dist_Zilla:
               version: '4.020'
             -
               class: Pod::Weaver::Section::GenerateSection
+              name: '@Author::ETHER/generate GIVING THANKS'
+              version: '4.020'
+            -
+              class: Pod::Weaver::Section::GenerateSection
               name: '@Author::ETHER/generate SUPPORT'
               version: '4.020'
             -
@@ -514,6 +523,7 @@ x_Dist_Zilla:
             - Schema
             - OpenAPI
             - v3.1
+            - v3.2
             - Swagger
             - HTTP
             - request
@@ -781,7 +791,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.099
+          tag: v0.100
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
@@ -862,7 +872,7 @@ x_Dist_Zilla:
           fatal_errors: 0
           quiet: 0
           run:
-            - 'cpanm https://pause.perl.org/pub/PAUSE/authors/id/E/ET/ETHER/%a'
+            - REDACTED
           version: '0.050'
       name: '@Author::ETHER/install release'
       version: '0.050'

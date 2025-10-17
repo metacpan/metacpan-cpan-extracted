@@ -6,6 +6,7 @@ build_requires:
   English: 0
   Error::Pure::Utils: 0
   ExtUtils::MakeMaker: 6.59
+  Readonly: 0
   Test::MockObject: 0
   Test::More: 0
   Test::NoWarnings: 0
@@ -28,6 +29,7 @@ no_index:
 requires:
   Error::Pure: 0.15
   Exporter: 0
+  List::Util: 1.33
   Readonly: 0
   Scalar::Util: 0
   perl: 5.6.2
@@ -36,4 +38,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Mo-utils-Array
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Mo-utils-Array
-version: '0.01'
+version: '0.02'

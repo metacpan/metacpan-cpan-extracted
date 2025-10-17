@@ -1,6 +1,15 @@
+29.0.0 - 2025-10-15
+-------------------
+- Added support for Google Ads API v22.
+- Fixed a typo in the BudgetPerDayMinimumErrorDetails.minimum_budget_amount_micros
+  field.
+- Updated PMax-related examples to remove the use of urlExpansionOptOut.
+
 28.0.0 - 2025-08-06
 -------------------
 - Added support for Google Ads API v21.
+- Added support for Google Ads API v19_2 and v20_1, which contain EU
+  political advertising-related changes.
 - Removed support for Google Ads API v18.
 - Added code example: add_demand_gen_campaign.
 - Updated campaign-related examples to set the containsEuPoliticalAdvertising

@@ -47,7 +47,6 @@ paths:
                 minimum: 3
       responses:
         default:
-          description: success
           content:
             application/json:
               schema:

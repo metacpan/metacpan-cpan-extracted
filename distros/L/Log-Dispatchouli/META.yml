@@ -25,6 +25,7 @@ meta-spec:
 name: Log-Dispatchouli
 requires:
   Carp: '0'
+  Encode: '0'
   File::Spec: '0'
   Log::Dispatch: '0'
   Log::Dispatch::Array: '0'
@@ -47,7 +48,7 @@ resources:
   bugtracker: https://github.com/rjbs/Log-Dispatchouli/issues
   homepage: https://github.com/rjbs/Log-Dispatchouli
   repository: https://github.com/rjbs/Log-Dispatchouli.git
-version: '3.011'
+version: '3.013'
 x_Dist_Zilla:
   perl:
     version: '5.040001'
@@ -65,7 +66,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: '@RJBS/Git::GatherDir'
-      version: '2.051'
+      version: '2.052'
     -
       class: Dist::Zilla::Plugin::CheckPrereqsIndexed
       name: '@RJBS/CheckPrereqsIndexed'
@@ -166,7 +167,7 @@ x_Dist_Zilla:
           git_version: '2.39.5 (Apple Git-154)'
           repo_root: .
       name: '@RJBS/Git::NextVersion'
-      version: '2.051'
+      version: '2.052'
     -
       class: Dist::Zilla::Plugin::PkgVersion
       name: '@RJBS/PkgVersion'
@@ -322,7 +323,7 @@ x_Dist_Zilla:
           git_version: '2.39.5 (Apple Git-154)'
           repo_root: .
       name: '@RJBS/@Git/Check'
-      version: '2.051'
+      version: '2.052'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -342,7 +343,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@RJBS/@Git/Commit'
-      version: '2.051'
+      version: '2.052'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -350,7 +351,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '3.011'
+          tag: '3.013'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -359,7 +360,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@RJBS/@Git/Tag'
-      version: '2.051'
+      version: '2.052'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -371,7 +372,7 @@ x_Dist_Zilla:
           git_version: '2.39.5 (Apple Git-154)'
           repo_root: .
       name: '@RJBS/@Git/Push'
-      version: '2.051'
+      version: '2.052'
     -
       class: Dist::Zilla::Plugin::Git::Contributors
       config:

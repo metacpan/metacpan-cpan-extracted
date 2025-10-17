@@ -1,0 +1,5 @@
+# 'pythonfile' serves as a list of items to be installed by Python's `pip`;
+# all Python dependencies should be listed in this file using the 'requirements.txt' file format
+
+# needed for `tiktoken` command; PLACEHOLDER, REPLACE WITH YOUR ACTUAL PYTHON DEPENDENCIES
+tiktoken

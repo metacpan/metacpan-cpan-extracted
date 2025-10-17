@@ -1,6 +1,9 @@
 Revision history for Term::Choose::LineFold::XS
 
 
+0.004   2025-10-15
+    - Set the width of all format code points to zero.
+
 0.003   2025-09-26
     - Unicode 17.
 

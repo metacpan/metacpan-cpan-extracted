@@ -2,11 +2,12 @@ NAME
     Mo::utils::Array - Mo array utilities.
 
 SYNOPSIS
-     use Mo::utils::Array qw(check_array check_array_object check_array_required);
+     use Mo::utils::Array qw(check_array check_array_object check_array_required check_array_strings);
 
      check_array($self, $key);
      check_array_object($self, $key, $class);
      check_array_required($self, $key);
+     check_array_strings($self, $key, $strings_ar);
 
 DESCRIPTION
     Mo array utilities for checking of data objects.
@@ -47,6 +48,18 @@ SUBROUTINES
 
     Returns undef.
 
+  "check_array_strings"
+     check_array_strings($self, $key, $strings_ar);
+
+    *Since version 0.02.*
+
+    Check parameter defined by $key which is reference to array with strings
+    defined by $strings_ar which is reference to array.
+
+    Put error if check isn't ok.
+
+    Returns undef.
+
 ERRORS
      check_array():
              Parameter '%s' must be a array.
@@ -67,6 +80,19 @@ ERRORS
                      Value: %s
                      Reference: %s
              Parameter '%s' with array must have at least one item.
+
+     check_array_strings():
+             Parameter '%s' must be a array.
+                     Value: %s
+                     Reference: %s
+             Parameter '%s' must be one of the defined strings.
+                     Value: %s
+                     Possible strings: %s
+             Parameter '%s' must contain a list of strings.
+                     Value: %s
+                     Reference: %s
+             Parameter '%s' must have right string definition.
+             Parameter '%s' must have strings definition.
 
 EXAMPLE1
      use strict;
@@ -184,8 +210,45 @@ EXAMPLE6
      # Output like:
      # #Error [..Array.pm:?] Parameter 'key' with array must have at least one item.
 
+EXAMPLE7
+     use strict;
+     use warnings;
+
+     use Mo::utils::Array qw(check_array_strings);
+
+     my $self = {
+             'key' => ['value'],
+     };
+     check_array_strings($self, 'key', ['value']);
+
+     # Print out.
+     print "ok\n";
+
+     # Output:
+     # ok
+
+EXAMPLE8
+     use strict;
+     use warnings;
+
+     use Error::Pure;
+     use Mo::utils::Array qw(check_array_strings);
+
+     $Error::Pure::TYPE = 'Error';
+
+     my $self = {
+             'key' => ['bad'],
+     };
+     check_array_strings($self, 'key', ['value']);
+
+     # Print out.
+     print "ok\n";
+
+     # Output like:
+     # #Error [..Array.pm:?] Parameter 'key' must be one of the defined strings.
+
 DEPENDENCIES
-    Exporter, Error::Pure, Readonly, Scalar::Util.
+    Exporter, Error::Pure, List::Util, Readonly, Scalar::Util.
 
 SEE ALSO
     Mo  Micro Objects. Mo is less.
@@ -219,5 +282,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.01
+    0.02
 

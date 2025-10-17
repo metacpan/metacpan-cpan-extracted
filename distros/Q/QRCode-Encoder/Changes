@@ -1,3 +1,10 @@
+0.005  2025-10-15 22:53:46 CEST
+   - Fix fatal issue with version >= 7
+
+0.004  2025-10-15 22:29:37 CEST
+   - Refactor some methods from Matrix to QRSpec
+   - add qr_best_params
+
 0.003  2025-10-14 09:33:00 CEST
    - Real initial release, after creating the repository in Codeberg
 

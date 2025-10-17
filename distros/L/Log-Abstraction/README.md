@@ -4,7 +4,7 @@ Log::Abstraction - Logging Abstraction Layer
 
 # VERSION
 
-0.25
+0.26
 
 # SYNOPSIS
 
@@ -42,6 +42,14 @@ The following arguments can be provided:
     and `logger` is not given,
     call `Carp:carp` on `warn()`.
 
+    Causes `error()` to `carp` if `croak_on_error` is not given.
+
+- `croak_on_error`
+
+    If set to 1,
+    and `logger` is not given,
+    call `Carp:croak` on `error()`.
+
 - `config_file`
 
     Points to a configuration file which contains the parameters to `new()`.
@@ -67,11 +75,21 @@ The following arguments can be provided:
     A logger can be one or more of:
 
     - a code reference
+
+        The code will be called with a hashref containing:
+
+        - class
+        - file
+        - line
+        - level
+        - message - an arrayref of messages
+
     - an object
     - a hash of options
     - sendmail - send higher priority messages to an email address
 
-        To send an e-mail you need ["require Email::Simple"](#require-email-simple), ["require Email::Sender::Simple"](#require-email-sender-simple) and [Email::Sender::Transport::SMTP](https://metacpan.org/pod/Email%3A%3ASender%3A%3ATransport%3A%3ASMTP).
+        To send an e-mail,
+        you need ["require Email::Simple"](#require-email-simple), ["require Email::Sender::Simple"](#require-email-sender-simple) and [Email::Sender::Transport::SMTP](https://metacpan.org/pod/Email%3A%3ASender%3A%3ATransport%3A%3ASMTP).
 
     - array - a reference to an array
     - fd - containing a file descriptor to log to
@@ -159,7 +177,7 @@ Returns the current level, as an integer.
 ## is\_debug
 
 Are we at a debug level that will emit debug messages?
-For compatability with [Log::Any](https://metacpan.org/pod/Log%3A%3AAny).
+For compatibility with [Log::Any](https://metacpan.org/pod/Log%3A%3AAny).
 
 ## messages
 
@@ -214,6 +232,10 @@ Helper to handle important messages.
 # AUTHOR
 
 Nigel Horne `njh@nigelhorne.com`
+
+# SEE ALSO
+
+- Test coverage report: [https://nigelhorne.github.io/Log-Abstraction/coverage/](https://nigelhorne.github.io/Log-Abstraction/coverage/)
 
 # SUPPORT
 

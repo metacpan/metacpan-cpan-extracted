@@ -31,7 +31,7 @@ my %WriteMakefileArgs = (
         'POSIX'                         => 0,
         'Scalar::Util'                  => 0,
         # Version compatible with perl v5.10
-        'Want'                          => '0.17',
+        'Wanted'                        => 'v0.1.0',
     },
     TEST_REQUIRES =>
     {

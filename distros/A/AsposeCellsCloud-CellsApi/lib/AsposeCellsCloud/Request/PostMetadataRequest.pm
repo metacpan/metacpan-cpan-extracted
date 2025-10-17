@@ -122,10 +122,13 @@ sub run_http_request {
 
     # body params
     if (defined $self->cells_documents) {
-         $form_params->{'cellsDocuments'} = JSON->new->convert_blessed->encode( $self->cells_documents) ;
+         $_body_data = JSON->new->convert_blessed->encode( $self->cells_documents);
+         $form_params->{'cellsDocuments'} = $_body_data ;
     }
 
-    $form_params->{basename($self->file)} = [$self->file ,basename($self->file),'application/octet-stream'];
+    if (defined $self->file) {   
+        $form_params->{basename($self->file)} = [$self->file ,basename($self->file),'application/octet-stream'];
+    }
  
 
     # authentication setting, if any

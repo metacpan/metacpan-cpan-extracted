@@ -19,7 +19,7 @@ Module::Build->new(
 		'Cache::File'   => 0,
 		'GIS::Distance' => 0,
 	},
-	requires    => {
+	requires => {
 		'perl'                       => '5.10.1',
 		'Carp'                       => 0,
 		'Class::Accessor'            => 0,
@@ -30,6 +30,7 @@ Module::Build->new(
 		'List::Util'                 => 0,
 		'LWP::UserAgent'             => 0,
 		'LWP::Protocol::https'       => 0,
+		'URI::Escape'                => 0,
 	},
 	sign       => 1,
 	meta_merge => {

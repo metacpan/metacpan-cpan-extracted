@@ -1,0 +1,34 @@
+---
+abstract: 'DuckDB database driver for the DBI module'
+author:
+  - 'Giuseppe Di Terlizzi <gdt@cpan.org>'
+build_requires:
+  Alien::DuckDB: '0'
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBD-DuckDB
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DBI: '1.623'
+  FFI::CheckLib: '0.30'
+  FFI::Platypus: '2.00'
+  FFI::Platypus::Record: '0'
+  Scalar::Util: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/giterlizzi/perl-DBI-DuckDB/issues
+  repository: git://github.com/giterlizzi/perl-DBI-DuckDB
+version: '0.13'
+x_purl: pkg:cpan/GDT/DBI-DuckDB
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

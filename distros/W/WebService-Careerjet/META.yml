@@ -1,31 +1,31 @@
 ---
-abstract: "Perl interface to Careerjet's public job offers search API"
+abstract: "Perl interface to Careerjet's public job search API"
 author:
   - 'Thomas Busch <api@careerjet.com>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.76, CPAN::Meta::Converter version 2.120351'
-license: unknown
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.143240'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: WebService-Careerjet
 no_index:
   directory:
     - t
     - inc
 requires:
-  Carp: 1.03
-  Class::AutoAccess: 0.02
-  Encode: 2.08
-  Getopt::Std: 1.05
-  HTTP::Request: 1.4
-  JSON: 2.07
-  LWP::UserAgent: 2.033
-  Test::More: 0
-  Text::Wrap: 2001.09292
-  URI::Escape: 3.28
-version: 3.1
+  Carp: '1.03'
+  Class::AutoAccess: '0.02'
+  Encode: '2.08'
+  Getopt::Std: '1.05'
+  HTTP::Request: '1.4'
+  JSON: '2.07'
+  LWP::UserAgent: '2.033'
+  Test::More: '0'
+  Text::Wrap: '2001.09292'
+  URI::Escape: '3.28'
+version: '4.2'

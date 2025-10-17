@@ -1,9 +1,16 @@
 Revision history for Perl-Types.
 
+0.400     2025-10-14 03:13:31-05:00 America/Chicago
+
+  - HOLIDAY EDITION: Happy Columbus Day & Indigenous Peoples' Day!
+  - Add "use class;" pragma
+  - Documentation, class declarations
+  - Add "filehandle" data type
+  - Documentation, filehandles by reference & by value
+
 0.300     2025-09-21 23:58:37-05:00 America/Chicago
 
   - Upgrade to GitLab::Template
-  - Docker Hub release
   - Add missing dependencies to 'cpanfile'
 
 0.210     2025-06-06 05:10:53-05:00 America/Chicago

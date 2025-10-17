@@ -1,0 +1,24 @@
+Changes
+cpanfile
+lib/Class/Enumeration.pm
+lib/Class/Enumeration.pod
+lib/Class/Enumeration/Builder.pm
+lib/Class/Enumeration/Builder.pod
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/api.t
+t/Builder.t
+t/CoffeeSize.t
+t/lib/CoffeeSize.pm
+t/lib/ToastStatus.pm
+t/lib/TrafficLight.pm
+t/lib/TurnstileState.pm
+t/lib/TurnstileStateMachine.pm
+t/ToastStatus.t
+t/TrafficLight.t
+t/TurnstileState.t
+t/TurnstileStateMachine.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

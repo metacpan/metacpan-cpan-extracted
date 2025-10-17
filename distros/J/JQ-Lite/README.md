@@ -17,7 +17,8 @@ It allows you to extract, traverse, and filter JSON data using a simplified jq-l
 - ✅ Optional key access (`.nickname?`)
 - ✅ Array indexing and expansion (`.users[0]`, `.users[]`)
 - ✅ `select(...)` filters with `==`, `!=`, `<`, `>`, `and`, `or`
-- ✅ Built-in functions: `length`, `keys`, `values`, `first`, `last`, `reverse`, `sort`, `sort_desc`, `sort_by`, `min_by()`, `max_by()`, `unique`, `unique_by()`, `has`, `contains()`, `any()`, `all()`, `map`, `map_values()`, `walk()`, `group_by`, `group_count`, `sum_by()`, `avg_by()`, `median_by()`, `count`, `join`, `split()`, `explode()`, `implode()`, `substr()`, `slice()`, `replace()`, `empty()`, `median`, `mode`, `percentile()`, `variance`, `stddev`, `add`, `sum`, `product`, `upper()`, `lower()`, `titlecase()`, `abs()`, `ceil()`, `floor()`, `round()`, `trim()`, `ltrimstr()`, `rtrimstr()`, `startswith()`, `endswith()`, `chunks()`, `enumerate()`, `transpose()`, `flatten_all()`, `flatten_depth()`, `range()`, `index()`, `rindex()`, `indices()`, `clamp()`, `tostring()`, `tojson()`, `to_number()`, `pick()`, `merge_objects()`, `to_entries()`, `from_entries()`, `with_entries()`, `paths()`, `leaf_paths()`, `getpath()`, `delpaths()`
+- ✅ Built-in functions: `length`, `keys`, `values`, `first`, `last`, `reverse`, `sort`, `sort_desc`, `sort_by`, `min_by()`, `max_by()`, `unique`, `unique_by()`, `has`, `contains()`, `any()`, `all()`, `not`, `map`, `map_values()`, `walk()`, `recurse()`, `group_by`, `group_count`, `sum_by()`, `avg_by()`, `median_by()`, `count`, `join`, `split()`, `explode()`, `implode()`, `substr()`, `slice()`, `replace()`, `empty()`, `median`, `mode`, `percentile()`, `variance`, `stddev`, `add`, `sum`, `product`, `upper()`, `lower()`, `titlecase()`, `abs()`, `ceil()`, `floor()`, `round()`, `trim()`, `ltrimstr()`, `rtrimstr()`, `startswith()`, `endswith()`, `chunks()`, `enumerate()`, `transpose()`, `flatten_all()`, `flatten_depth()`, `range()`, `index()`, `rindex()`, `indices()`, `clamp()`, `tostring()`, `tojson()`, `fromjson()`, `to_number()`, `pick()`, `merge_objects()`, `to_entries()`, `from_entries()`, `with_entries()`, `paths()`, `leaf_paths()`, `getpath()`, `delpaths()`, `arrays`, `objects`, `scalars`
+- ✅ jq-style alternative operator (`lhs // rhs`) for concise default values
 - ✅ Pipe-style queries with `.[]` (e.g. `.[] | select(...) | .name`) 
 - ✅ Command-line interface: `jq-lite`
 - ✅ Reads from STDIN or file
@@ -67,6 +68,7 @@ It allows you to extract, traverse, and filter JSON data using a simplified jq-l
 | `map(expr)`    | Map/filter values using a subquery                   |
 | `map_values(filter)` | Apply a filter to every value in an object, dropping keys when the filter yields no result (v0.92) |
 | `walk(filter)` | Recursively apply a filter to every value within arrays and objects (v0.95) |
+| `recurse([filter])` | Depth-first traversal of nested structures using an optional child filter (v0.103) |
 | `pluck(key)`   | Extract values from an array of objects (v0.43)      |
 | `pick(keys...)` | Build objects containing only the specified keys (v0.74) |
 | `merge_objects()` | Shallow-merge arrays of objects into a single hash with last-write-wins semantics (v0.80) |
@@ -81,6 +83,7 @@ It allows you to extract, traverse, and filter JSON data using a simplified jq-l
 | `clamp(min, max)` | Clamp numbers within an inclusive range (v0.73)        |
 | `tostring`    | Convert values to their JSON string representation (v0.85) |
 | `tojson`      | Encode any value as JSON text (unreleased)                |
+| `fromjson`    | Decode JSON text into native values (arrays handled element-wise) (unreleased) |
 | `to_number`   | Convert numeric-looking strings/booleans to numbers (v0.72) |
 | `trim`        | Remove leading/trailing whitespace from strings (v0.50) |
 | `ltrimstr(prefix)` | Remove `prefix` from the start of strings when present (v0.87) |
@@ -97,6 +100,7 @@ It allows you to extract, traverse, and filter JSON data using a simplified jq-l
 | `contains(value)` | Check whether strings include the value or arrays contain an element (v0.56) |
 | `all([filter])` | Return true when every input (optionally filtered) is truthy (v0.94) |
 | `any([filter])` | Return true when any input (optionally filtered) is truthy (v0.90) |
+| `not` | Logical negation following jq truthiness semantics (v0.102) |
 | `group_by(key)`| Group array items by field                           |
 | `group_count(key)` | Count how many items fall under each key (v0.46)   |
 | `sum_by(path)` | Sum numeric values projected from each array item (v0.68) |
@@ -108,6 +112,8 @@ It allows you to extract, traverse, and filter JSON data using a simplified jq-l
 | `flatten_all()`| Recursively flatten nested arrays into a single array (v0.67) |
 | `flatten_depth(n)` | Flatten nested arrays up to `n` levels deep (v0.70) |
 | `arrays`       | Emit input values only when they are arrays (v0.99) |
+| `objects`      | Emit input values only when they are objects (v0.100) |
+| `scalars`      | Emit input values only when they are scalars (strings, numbers, booleans, null) (unreleased) |
 | `type()`       | Return the type of the value ("string", "number", "boolean", "array", "object", "null") (v0.36) |
 | `nth(n)`       | Get the nth element of an array (v0.37)              |
 | `index(value)` | Return the zero-based index of the first match in arrays or strings (v0.65) |
@@ -124,6 +130,7 @@ It allows you to extract, traverse, and filter JSON data using a simplified jq-l
 | `leaf_paths()` | Emit only the paths that terminate in non-container values (v0.96) |
 | `getpath(path)` | Retrieve the value(s) at the supplied path array or expression (unreleased) |
 | `is_empty`     | True when the value is an empty array or object (v0.41)   |
+| `expr // fallback` | Use jq's alternative operator to supply defaults when the left side is null or missing (v1.02) |
 | `default(value)` | Substitute a fallback value when the result is undef/null (v0.42) |
 
 ---
@@ -166,6 +173,69 @@ curl -fsSL https://raw.githubusercontent.com/kawamurashingo/JQ-Lite/main/install
 > ```sh
 > export PATH="$HOME/.local/bin:$PATH"
 > ```
+
+---
+
+## 🌍 Environment Compatibility
+
+`JQ::Lite` (Perl-based jq alternative) runs in almost **any Linux environment** where Perl is available — even when installing `jq` itself is difficult or impossible.
+
+### 🧱 1. Legacy Distributions (CentOS 6 / RHEL 6 / Ubuntu 12.04, etc.)
+
+| Distribution | jq-lite Support | Notes |
+|---------------|----------------|-------|
+| **CentOS 6 / RHEL 6** | ⚠️ Almost works | Default Perl 5.10.1 works fine. SSL/TLS errors may occur during CPAN install; use `--local-lib` or tarball install. |
+| **Ubuntu 12.04 / 14.04** | ✅ Works | Perl 5.14–5.18; installable via `cpan install JQ::Lite`. |
+| **Debian 7 (Wheezy)** | ✅ Works | Perl 5.14.2 standard; `apt-get install cpanminus` → `cpanm JQ::Lite` runs cleanly. |
+| **SLES 11 and earlier** | ⚠️ Conditional | Perl 5.10–5.12 works, but CPAN TLS issues may require offline installation. |
+
+✅ **Conclusion:**  
+Even on legacy environments without jq, `JQ::Lite` runs as long as Perl ≥ 5.10.1 is available.
+
+---
+
+### 🐧 2. Minimalist Distributions (Alpine / BusyBox / TinyCore)
+
+| Distribution | jq-lite Support | Notes |
+|---------------|----------------|-------|
+| **Alpine Linux (3.x+)** | ✅ Works | Install with `apk add perl perl-utils build-base`. Excellent compatibility. |
+| **BusyBox-based (Buildroot, OpenWRT)** | ⚠️ Difficult | Usually no Perl or CPAN; requires prebuilt Perl or cross-compilation. |
+| **TinyCore Linux** | ⚠️ Conditional | Install `tce-load -wi perl5.tcz` first. Limited storage may be a constraint. |
+
+✅ **Conclusion:**  
+Except BusyBox-only systems, lightweight distros like Alpine can run `jq-lite` smoothly.
+
+---
+
+### ☁️ 3. Restricted / Enterprise Networks
+
+| Environment | jq-lite Support | Notes |
+|--------------|----------------|-------|
+| **No internet (CPAN disabled)** | ✅ Works (offline) | Copy tarball (`cpanm --look JQ::Lite`) and install manually via `perl Makefile.PL && make install`. |
+| **Proxy environment** | ✅ Supported | Example: `cpanm -v --proxy http://sysworks101z.prod.jp.local:3128 JQ::Lite`. |
+| **No root privilege** | ✅ Supported | Use `cpanm --local-lib ~/perl5 JQ::Lite` for user-space installation. |
+
+✅ **Conclusion:**  
+`jq-lite` can be installed and used in **closed, proxy, and non-root environments** where jq cannot.
+
+---
+
+### 🔧 Summary
+
+| Environment Type     | jq | jq-lite |
+|----------------------|----|---------|
+| Legacy CentOS / RHEL | ❌  | ✅       |
+| Older Ubuntu / Debian| ⚠️  | ✅       |
+| Alpine Linux         | ⚠️  | ✅       |
+| BusyBox / OpenWRT    | ❌  | ⚠️ (Perl required) |
+| Air-gapped Servers   | ❌  | ✅       |
+| No Root Privilege    | ⚠️  | ✅       |
+
+---
+
+### ✅ Overall Conclusion
+
+> **`jq-lite` works in almost every Linux environment** — including legacy, lightweight, or isolated systems where installing jq is impractical.
 
 ---
 
@@ -287,6 +357,7 @@ jq-lite '.users[] | select(.age > 25)' users.json
 jq-lite '.users[] | select(.profile.active == true) | .name' users.json
 jq-lite '.users | sort_by(.age)' users.json
 jq-lite '.users | map(.name) | join(", ")' users.json
+jq-lite '.users[] | (.nickname // .name)' users.json
 jq-lite '.users | drop(1)' users.json
 jq-lite '.users[] | select(.age > 25) | empty' users.json
 jq-lite '.users[0] | values' users.json
@@ -320,4 +391,5 @@ This module is released under the same terms as Perl itself.
 **Kawamura Shingo**  
 📧 pannakoota1@gmail.com  
 🔗 [GitHub @kawamurashingo](https://github.com/kawamurashingo/JQ-Lite)
+
 

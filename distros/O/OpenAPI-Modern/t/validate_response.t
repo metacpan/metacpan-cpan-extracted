@@ -31,8 +31,7 @@ paths:
     get:
       operationId: my_op
       responses:
-        default:
-          description: foo
+        default: {}
 YAML
 
   like(
@@ -124,18 +123,15 @@ components:
               post:
                 operationId: my_components_pathItem_callback_operation
                 responses:
-                  200:
-                    description: success
+                  200: {}
         responses:
-          200:
-            description: success
+          200: {}
     my_path_item2:
       description: this should be useable, as it is $ref'd by a /paths/<template> path item
       post:
         operationId: my_reffed_component_operation
         responses:
           default:
-            description: my response
             headers:
               Alpha:
                 required: true
@@ -151,16 +147,14 @@ paths:
             post:
               operationId: my_paths_pathItem_callback_operation
               responses:
-                200:
-                  description: success
+                200: {}
 webhooks:
   my_hook:  # note this is a path-item
     description: good luck here too
     post:
       operationId: my_webhook_operation
       responses:
-        200:
-          description: success
+        200: {}
 YAML
 
   my $res = response(400);
@@ -431,10 +425,8 @@ paths:
   /foo:
     post:
       responses:
-        200:
-          description: success
-        2XX:
-          description: other success
+        200: {}
+        2XX: {}
 YAML
 
   cmp_result(
@@ -471,11 +463,9 @@ YAML
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 components:
   responses:
-    foo:
-      description: foo
+    foo: {}
   headers:
     foo:
-      description: foo
       schema: {}
 paths:
   /foo:
@@ -510,7 +500,6 @@ components:
     foo:
       $ref: '#/i_do_not_exist'
     default:
-      description: unexpected failure
       headers:
         Content-Type:
           # this is ignored!
@@ -590,7 +579,6 @@ paths:
     get:
       responses:
         default:
-          description: foo
           headers:
             MultipleValuesAsArray:
               schema:
@@ -633,7 +621,6 @@ YAML
 components:
   responses:
     my_default:
-      description: foo
       content:
         text/*:
           schema:
@@ -702,7 +689,6 @@ YAML
 components:
   responses:
     default:
-      description: unexpected failure
       content:
         application/json:
           schema:
@@ -856,7 +842,6 @@ paths:
     post:
       responses:
         200:
-          description: no content permitted
           headers:
             Content-Length:
               description: if present, the value must be 0
@@ -887,7 +872,6 @@ paths:
             '*/*':
               schema: false
         default:
-          description: default
           headers:
             Content-Length:
               required: true
@@ -1046,7 +1030,6 @@ paths:
     post:
       responses:
         default:
-          description: no content permitted
           content:
             '*/*':
               schema:
@@ -1081,7 +1064,6 @@ paths:
     post:
       responses:
         200:
-          description: success
           content:
             application/json:
               schema:
@@ -1125,7 +1107,6 @@ paths:
     post:
       responses:
         200:
-          description: success
           headers:
             a:
               schema:
@@ -1166,7 +1147,6 @@ paths:
     post:
       responses:
         200:
-          description: blah
           headers:
             Foo:
               schema: false

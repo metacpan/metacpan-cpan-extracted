@@ -2,6 +2,11 @@ package QRCode::Encoder::Matrix;
 use v5.24;
 use experimental qw< signatures >;
 use List::Util qw< sum >;
+use QRCode::Encoder::QRSpec qw<
+   qrspec_version_pattern
+   qrspec_format_pattern
+   qrspec_alignment_patterns
+>;
 
 use Exporter qw< import >;
 our @EXPORT_OK = qw< add_matrix >;
@@ -151,33 +156,12 @@ sub try_add_alignment_pattern ($data, $x, $y) {
 }
 
 sub add_alignments ($data) {
-   state $alignment_pattern_for = [
-                [18    ], [22    ], [26    ], [30    ], #  2- 5
-      [34    ], [22, 38], [24, 42], [26, 46], [28, 50], #  6-10
-      [30, 54], [32, 58], [34, 62], [26, 46], [26, 48], # 11-15
-      [26, 50], [30, 54], [30, 56], [30, 58], [34, 62], # 16-20
-      [28, 50], [26, 50], [30, 54], [28, 54], [32, 58], # 21-25
-      [30, 58], [34, 62], [26, 50], [30, 54], [26, 52], # 26-30
-      [30, 56], [34, 60], [30, 58], [34, 62], [30, 54], # 31-35
-      [24, 50], [28, 54], [32, 58], [26, 54], [30, 58], # 35-40
-   ];
-   my $version = $data->{version};
-   return if $version <= 1;
-
-   my $side_size = $data->{side_size};
-   my @offset = (6, $alignment_pattern_for->[$version - 2]->@*);
-   while ('necessary') {
-      my $next = 2 * $offset[-1] - $offset[-2];
-      last if $next + 2 >= $side_size;
-      push @offset, $next;
-   }
-
+   my @offset = qrspec_alignment_patterns($data->{version});
    for my $y_center (@offset) {
       for my $x_center (@offset) {
          try_add_alignment_pattern($data, $x_center - 2, $y_center - 2);
       }
    }
-
    return $data;
 }
 
@@ -359,15 +343,7 @@ sub add_mask ($data) {
 }
 
 sub add_format ($matrix, $level, $mask_id) {
-
-   # FIXME Move into QRSpec?
-   state $formats_for = {
-      L => [0x77c4, 0x72f3, 0x7daa, 0x789d, 0x662f, 0x6318, 0x6c41, 0x6976],
-      M => [0x5412, 0x5125, 0x5e7c, 0x5b4b, 0x45f9, 0x40ce, 0x4f97, 0x4aa0],
-      Q => [0x355f, 0x3068, 0x3f31, 0x3a06, 0x24b4, 0x2183, 0x2eda, 0x2bed],
-      H => [0x1689, 0x13be, 0x1ce7, 0x19d0, 0x0762, 0x0255, 0x0d0c, 0x083b],
-   };
-   my $fmt = $formats_for->{$level}[$mask_id];
+   my $fmt = qrspec_format_pattern($level, $mask_id);
    my $es = $matrix->[0]->@*;
 
    # 1st copy
@@ -403,22 +379,7 @@ sub add_format ($matrix, $level, $mask_id) {
 }
 
 sub add_version ($data) {
-
-   # FIXME Move into QRSpec?
-   state $version_pattern_for = [ 
-               0x07c94, 0x085bc, 0x09a99, 0x0a4d3,  #  7-10
-      0x0bbf6, 0x0c762, 0x0d847, 0x0e60d, 0x0f928,  # 11-15
-      0x10b78, 0x1145d, 0x12a17, 0x13532, 0x149a6,  # 16-20
-      0x15683, 0x168c9, 0x177ec, 0x18ec4, 0x191e1,  # 21-25
-      0x1afab, 0x1b08e, 0x1cc1a, 0x1d33f, 0x1ed75,  # 26-30
-      0x1f250, 0x209d5, 0x216f0, 0x228ba, 0x2379f,  # 31-35
-      0x24b0b, 0x2542e, 0x26a64, 0x27541, 0x28c69,  # 36-40
-   ];
-
-   my $version = $data->{version};
-   return if $version <= 6;
-
-   my $vp = $version_pattern_for->[$version - 7];
+   my $vp = qrspec_version_pattern($data->{version}) // return;
    my $matrix = $data->{matrix};
    my $ecstart = $data->{eside_size} - 4 - 7 - 4;
    for my $i (4 .. 9) {
@@ -427,7 +388,6 @@ sub add_version ($data) {
          $vp >>= 1;
       }
    }
-
    return $data;
 }
 

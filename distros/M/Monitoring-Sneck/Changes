@@ -1,5 +1,8 @@
 Revision history for Monitoring-Sneck
 
+1.2.0   2025-10-14/17:45
+		- add -d to src_bin/sneck to print debugging info when run is called
+
 1.1.0   2025-07-25/01:45
 		- add run_time variables for total, checks, and debug
 		- fix an issue that could result in it complaining about undef

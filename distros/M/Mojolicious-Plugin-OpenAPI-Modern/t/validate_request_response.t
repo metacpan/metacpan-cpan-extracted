@@ -26,7 +26,7 @@ use lib 't/lib';
 use Helper;
 
 my $openapi_preamble = {
-  openapi => '3.1.0',
+  openapi => $::OAD_VERSION,
   info => {
     title => 'Test API with raw schema',
     version => '1.2.3',
@@ -41,8 +41,7 @@ subtest 'validate_request helper' => sub {
     {
       openapi => {
         document_uri => $doc_uri_rel,
-        schema => YAML::PP->new(boolean => 'JSON::PP')->load_string(<<'YAML')} });
-openapi: 3.1.1
+        schema => YAML::PP->new(boolean => 'JSON::PP')->load_string("openapi: $::OAD_VERSION\n".<<'YAML')} });
 info:
   title: Test API with raw schema
   version: 1.2.3
@@ -112,7 +111,7 @@ YAML
             instanceLocation => '/request',
             keywordLocation => '/paths',
             absoluteKeywordLocation => $doc_uri_rel->clone->fragment('/paths')->to_string,
-            error => 'no match found for request POST "/foo/hi/there"',
+            error => 'no match found for request POST /foo/hi/there',
           },
         ],
       },
@@ -153,7 +152,7 @@ YAML
             instanceLocation => '/request',
             keywordLocation => '/paths',
             absoluteKeywordLocation => $doc_uri_rel->clone->fragment('/paths')->to_string,
-            error => 'no match found for request GET "/foo/hi"',
+            error => 'no match found for request GET /foo/hi',
           },
         ],
       },

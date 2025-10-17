@@ -1,3 +1,12 @@
+Travel::Status::DE::VRR 3.17 - Wed Oct 15 2025
+
+    * New dependency: URI::Escape
+    * URL-Escape umlauts in name/place parameters sent to EFA backends.
+      This fixes umlaut-related issues in LinzAG and VVO requests.
+    * EFA: Detect "invalid stop" backend errors.
+    * EFA(3pm): Remove efa_encoding, which has been unsupported for a long
+      time already.
+
 Travel::Status::DE::VRR 3.16 - Sat Sep 20 2025
 
     * Add AVV ("AVV Augsburg", not Aachen) service definition

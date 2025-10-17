@@ -1,0 +1,7 @@
+# 'rubyfile' serves as a list of items to be installed by Ruby's `gem`;
+# all Ruby dependencies should be listed in this file using the 'Gemfile' file format
+
+source 'https://rubygems.org'
+
+# needed for `pastel` command; PLACEHOLDER, REPLACE WITH YOUR ACTUAL RUBY DEPENDENCIES
+gem 'pastel-cli'

@@ -1,10 +1,10 @@
 use strictures 2;
-package Mojolicious::Plugin::OpenAPI::Modern; # git description: v0.017-4-ga539d8d
+package Mojolicious::Plugin::OpenAPI::Modern; # git description: v0.018-4-gf47457e
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Mojolicious plugin providing access to an OpenAPI document and parser
 # KEYWORDS: validation evaluation JSON Schema OpenAPI Swagger HTTP request response
 
-our $VERSION = '0.018';
+our $VERSION = '0.019';
 
 use 5.020;
 use utf8;
@@ -20,7 +20,7 @@ use YAML::PP;
 use Path::Tiny;
 use Mojo::JSON 'decode_json';
 use Safe::Isa;
-use OpenAPI::Modern 0.096;
+use OpenAPI::Modern 0.100;
 use namespace::clean;
 
 # we store data in two places: on the app (persistent storage, for the OpenAPI::Modern object
@@ -107,7 +107,7 @@ Mojolicious::Plugin::OpenAPI::Modern - Mojolicious plugin providing access to an
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 
@@ -125,7 +125,7 @@ version 0.018
     openapi => {
       document_uri => 'https://example.com/api/main.json',
       schema => {
-        openapi => '3.1.1',
+        openapi => '3.2.0',
         info => {
           title => 'Test API with raw schema',
           version => '1.2.3',
@@ -262,7 +262,7 @@ consistently across release versions. Values that may be used by controllers and
 
 =item *
 
-C<path_template>: Set by the first call to L</validate_request> or L</validate_response>. A string representing the request URI, with placeholders in braces (e.g. C</pets/{petId}>); see L<https://spec.openapis.org/oas/v3.1.0#paths-object>.
+C<path_template>: Set by the first call to L</validate_request> or L</validate_response>. A string representing the request URI, with placeholders in braces (e.g. C</pets/{petId}>); see L<https://spec.openapis.org/oas/latest#paths-object>.
 
 =item *
 
@@ -315,6 +315,14 @@ L<https://learn.openapis.org/>
 L<https://spec.openapis.org/oas/latest.html>
 
 =back
+
+=head1 GIVING THANKS
+
+=for stopwords MetaCPAN GitHub
+
+If you found this module to be useful, please show your appreciation by
+adding a +1 in L<MetaCPAN|https://metacpan.org/dist/Mojolicious-Plugin-OpenAPI-Modern>
+and a star in L<GitHub|https://github.com/karenetheridge/Mojolicious-Plugin-OpenAPI-Modern>.
 
 =head1 SUPPORT
 

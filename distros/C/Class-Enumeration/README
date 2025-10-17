@@ -1,0 +1,43 @@
+NAME
+
+Class::Enumeration - Abstract parent class of enum classes
+
+INSTALLATION
+
+To install this module, use your preferred CPAN client. If this is "cpanm" then
+run the command
+
+  cpanm Class::Enumeration
+
+DOCUMENTATION
+
+After the installation, you can find further documentation using the command
+
+  perldoc Class::Enumeration
+
+DEVELOPMENT
+
+After the download of the source code, you have to install the module
+dependencies first. The dependencies are described in a "cpanfile".
+
+It follows the "configure" step that creates a "Makefile"
+
+  perl Makefile.PL
+
+You may explicitly trigger the "build" step, calling
+
+  make
+
+before executing all test scripts
+
+  make test # in lexicographic order
+  prove t   # in random order
+
+The "RELEASE_TESTING" flag enables the release testing context.
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2025 by Sven Willenbuecher.
+
+This is free software; you can redistribute it and/or modify it under the same
+terms as the Perl 5 programming language system itself.

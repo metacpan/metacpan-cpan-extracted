@@ -4,7 +4,7 @@ Config::Abstraction - Merge and manage configuration data from different sources
 
 # VERSION
 
-Version 0.35
+Version 0.36
 
 # SYNOPSIS
 
@@ -271,6 +271,11 @@ If just one argument is given, it is assumed to be the name of a file.
 Retrieve a configuration value using dotted key notation (e.g.,
 `'database.user'`). Returns `undef` if the key doesn't exist.
 
+## exists(key)
+
+Does a configuration value using dotted key notation (e.g., `'database.user'`) exist?
+Returns 0 or 1.
+
 ## all()
 
 Returns the entire configuration hash,
@@ -353,7 +358,7 @@ when `sep_char` is set to '\_'.
 
     Keys explicitly set to `undef` in a later source override earlier values.
 
-- Environrment
+- Environment
 
     When using environment variables,
     remember that double underscores (\_\_) create nested structures,
@@ -387,6 +392,7 @@ You can find documentation for this module with the perldoc command.
 - [Hash::Merge](https://metacpan.org/pod/Hash%3A%3AMerge)
 - [Log::Abstraction](https://metacpan.org/pod/Log%3A%3AAbstraction)
 - Test Dashboard [https://nigelhorne.github.io/Config-Abstraction/coverage/](https://nigelhorne.github.io/Config-Abstraction/coverage/)
+- Development version on GitHub [https://github.com/nigelhorne/Config-Abstraction](https://github.com/nigelhorne/Config-Abstraction)
 
 # AUTHOR
 

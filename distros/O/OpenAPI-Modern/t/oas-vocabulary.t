@@ -18,46 +18,43 @@ use Config;
 use lib 't/lib';
 use Helper;
 
-my $accepter = Test::JSON::Schema::Acceptance->new(
-  verbose => 1,
-  test_schemas => 0,  # some schemas are not valid, as we are testing error handling in traverse()
-  specification => 'draft2020-12',
-  test_dir => 't/oas-vocabulary',
-);
-$accepter->json_decoder->allow_bignum if Test::JSON::Schema::Acceptance->VERSION < '1.022';
+foreach my $oas_version (map $_->basename, path('t/oas-vocabulary')->children) {
+  my $accepter = Test::JSON::Schema::Acceptance->new(
+    verbose => 1,
+    test_schemas => 0,  # some schemas are not valid, as we are testing error handling in traverse()
+    specification => 'draft2020-12',
+    test_dir => 't/oas-vocabulary/'.$oas_version,
+  );
+  $accepter->json_decoder->allow_bignum if Test::JSON::Schema::Acceptance->VERSION < '1.022';
 
-my $js = JSON::Schema::Modern->new(
-  specification_version => 'draft2020-12',
-  validate_formats => 1,
-);
+  my $js = JSON::Schema::Modern->new(
+    specification_version => 'draft2020-12',
+    validate_formats => 1,
+  );
 
-# construct a minimal document in order to get the vocabulary and formats loaded
-my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
-  evaluator => $js,
-  schema => YAML::PP->new(boolean => 'JSON::PP')->load_string(OPENAPI_PREAMBLE.<<'YAML'));
-paths: {}
-YAML
+  OpenAPI::Modern::Utilities::add_vocab_and_default_schemas($js, $oas_version);
 
-$accepter->acceptance(
-  validate_data => sub ($schema, $instance_data) {
-    my $result = $js->evaluate($instance_data, $schema);
+  $accepter->acceptance(
+    validate_data => sub ($schema, $instance_data) {
+      my $result = $js->evaluate($instance_data, $schema);
 
-    my $encoder = JSON::Schema::Modern::_JSON_BACKEND()->new->allow_nonref(1)->utf8(0)->convert_blessed(1)->canonical(1)->pretty(1);
-    $encoder->indent_length(2) if $encoder->can('indent_length');
-    note 'result: ', $encoder->encode($result);
+      my $encoder = JSON::Schema::Modern::_JSON_BACKEND()->new->allow_nonref(1)->utf8(0)->convert_blessed(1)->canonical(1)->pretty(1);
+      $encoder->indent_length(2) if $encoder->can('indent_length');
+      note 'result: ', $encoder->encode($result);
 
-    warn('evaluation generated an exception: '.$encoder->encode($_))
-      foreach
-        grep +($_->{error} =~ /^EXCEPTION/),
-          ($result->TO_JSON->{errors}//[])->@*;
+      warn('evaluation generated an exception: '.$encoder->encode($_))
+        foreach
+          grep +($_->{error} =~ /^EXCEPTION/),
+            ($result->TO_JSON->{errors}//[])->@*;
 
-    $result->valid;
-  },
-  @ARGV ? (tests => { file => \@ARGV }) : (),
-);
+      $result->valid;
+    },
+    @ARGV ? (tests => { file => \@ARGV }) : (),
+  );
 
-path('t/results/oas-vocabulary.txt')->spew_utf8($accepter->results_text)
-  if -d '.git' or $ENV{AUTHOR_TESTING} or $ENV{RELEASE_TESTING};
+  path('t/results/oas-vocabulary-'.$oas_version.'.txt')->spew_utf8($accepter->results_text)
+    if -d '.git' or $ENV{AUTHOR_TESTING} or $ENV{RELEASE_TESTING};
+}
 
 done_testing;
 __END__

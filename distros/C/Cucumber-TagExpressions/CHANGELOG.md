@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [8.0.0] - 2025-10-14
+### Fixed
+- [Perl] Fix building release artifacts ([#214](https://github.com/cucumber/tag-expressions/pull/214))
+
+### Removed
+- [Python] Dropped support for end-of-life Python versions from `2` to `3.9` ([#215](https://github.com/cucumber/tag-expressions/pull/215))
+
+## [7.0.0] - 2025-10-03
+### Changed
+- [Ruby] Minimum ruby version is now bumped from `2.3` to `2.6` (With minor refactors to the parser) ([#204](https://github.com/cucumber/tag-expressions/pull/204))
+- [Ruby] Speed up `Parser#parse` by removing redundant `nil` safety check
+- [Python] PEP 639 licence metadata specification ([#211](https://github.com/cucumber/tag-expressions/pull/211))
+
 ## [6.2.0] - 2025-05-25
 ### Added
 - [PHP] Add new implementation ([#194](https://github.com/cucumber/tag-expressions/pull/194))
@@ -85,7 +98,7 @@ restricting testdata based tests to run in development only ([ehuelsmann](https:
 - [Perl] Fixed missing dependency as well as new syntax in the tests
 ([#15](https://github.com/cucumber/tag-expressions/pull/15) [ehuelsmann](https://github.com/ehuelsmann))
 - Document escaping. ([#16](https://github.com/cucumber/tag-expressions/issues/16), [#17](https://github.com/cucumber/tag-expressions/pull/17))
-- [Ruby], [Perl] Empty expression evaluates to true
+- [Ruby, Perl] Empty expression evaluates to true
 - [Go] Fix module name ([#82](https://github.com/cucumber/tag-expressions/pull/82))
 
 ### Removed
@@ -96,7 +109,7 @@ restricting testdata based tests to run in development only ([ehuelsmann](https:
 ([#1782](https://github.com/cucumber/common/pull/1782) [ehuelsmann](https://github.com/ehuelsmann))
 
 ### Fixed
-- [Go], [JavaScript], [Java], [Ruby] Support backslash-escape in tag expressions
+- [Go, JavaScript, Java, Ruby] Support backslash-escape in tag expressions
 ([#1778](https://github.com/cucumber/common/pull/1778) [yusuke-noda](https://github.com/yusuke-noda))
 
 ## [4.0.2] - 2021-09-13
@@ -147,13 +160,13 @@ restricting testdata based tests to run in development only ([ehuelsmann](https:
 
 ## [2.0.0] - 2019-07-10
 ### Added
-- Go: New implementation.
+- [Go] New implementation.
 ([#339](https://github.com/cucumber/cucumber/pull/339)
 [charlierudolph](https://github.com/charlierudolph))
 
 ### Changed
-- JavaScript: Changed API to return a `parse` function rather than a class with a `parse` method.
-- JavaScript: Refactored to TypeScript
+- [JavaScript] Changed API to return a `parse` function rather than a class with a `parse` method.
+- [JavaScript] Refactored to TypeScript
 
 ### Fixed
 - Documentation links now point to new website (cucumber.io)
@@ -161,19 +174,19 @@ restricting testdata based tests to run in development only ([ehuelsmann](https:
 [luke-hill](https://github.com/luke-hill))
 
 ### Removed
-- Java: OSGi support has been removed.
+- [Java] OSGi support has been removed.
 ([#412](https://github.com/cucumber/cucumber/issues/412)
 [aslakhellesoy](https://github.com/aslakhellesoy))
 
 ## [1.1.1] - 2017-12-01
 ### Fixed
-- Java: Fix OSGI exported package
+- [Java] Fix OSGI exported package
 ([#309](https://github.com/cucumber/cucumber/pull/309)
 by [mpkorstanje](https://github.com/mpkorstanje))
 
 ## [1.1.0] - 2017-11-28
 ### Added
-- Ruby: Added `tag-expressions` command-line tool for tag expressions
+- [Ruby] Added `tag-expressions` command-line tool for tag expressions
 ([#282](https://github.com/cucumber/cucumber/pull/282)
 by [aslakhellesoy](https://github.com/aslakhellesoy))
 - Escape special chars in tags
@@ -191,12 +204,11 @@ by [aslakhellesoy](https://github.com/aslakhellesoy))
 
 ## [1.0.1] - 2017-05-28
 ### Fixed
-- javascript:
-([#76](https://github.com/cucumber/cucumber/pull/76)
+- [JavaScript]([#76](https://github.com/cucumber/cucumber/pull/76)
 [#78](https://github.com/cucumber/cucumber/pull/78)
 [#104](https://github.com/cucumber/cucumber/issues/104)
 by [charlierudolph](https://github.com/charlierudolph))
-- java: Make the jar a bundle to support OSGi
+- [Java] Make the jar a bundle to support OSGi
 ([#99](https://github.com/cucumber/cucumber/pull/99)
 by [brasmusson](https://github.com/brasmusson))
 - Add a [changelog](keepachangelog.com)
@@ -207,7 +219,9 @@ by [aslakhellesoy](https://github.com/aslakhellesoy))
 ### Added
 - First stable release!
 
-[Unreleased]: https://github.com/cucumber/tag-expressions/compare/v6.2.0...HEAD
+[Unreleased]: https://github.com/cucumber/tag-expressions/compare/v8.0.0...HEAD
+[8.0.0]: https://github.com/cucumber/tag-expressions/compare/v7.0.0...v8.0.0
+[7.0.0]: https://github.com/cucumber/tag-expressions/compare/v6.2.0...v7.0.0
 [6.2.0]: https://github.com/cucumber/tag-expressions/compare/v6.1.2...v6.2.0
 [6.1.2]: https://github.com/cucumber/tag-expressions/compare/v6.1.1...v6.1.2
 [6.1.1]: https://github.com/cucumber/tag-expressions/compare/v6.1.0...v6.1.1
@@ -232,3 +246,4 @@ by [aslakhellesoy](https://github.com/aslakhellesoy))
 [1.1.0]: https://github.com/cucumber/tag-expressions/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/cucumber/tag-expressions/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/cucumber/tag-expressions/releases/tag/v1.0.0
+umber/tag-expressions/releases/tag/v1.0.0

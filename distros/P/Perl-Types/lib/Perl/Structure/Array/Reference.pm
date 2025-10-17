@@ -20,4 +20,4 @@ our hashref $properties = {};
 
 #our $properties = {};
 
-1;    # end of class
+1;  # end of class

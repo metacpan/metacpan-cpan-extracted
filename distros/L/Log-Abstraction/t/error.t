@@ -22,6 +22,10 @@ throws_ok { $logger->warn({}) } qr//, 'warn() should require a warning key';
 my $logger_no_output = Log::Abstraction->new(carp_on_warn => 1);
 # throws_ok { $logger_no_output->warn({ warning => 'No logger set' }) } qr/No logger set/, 'warn() should fallback to Carp';
 does_carp_that_matches(sub { $logger_no_output->warn({ warning => 'No logger set' }) }, qr/No logger set/);
+does_carp_that_matches(sub { $logger_no_output->error({ warning => 'No logger set' }) }, qr/No logger set/);
+
+$logger_no_output = Log::Abstraction->new(carp_on_warn => 1, croak_on_error => 1);
+does_croak_that_matches(sub { $logger_no_output->error({ warning => 'No logger set' }) }, qr/No logger set/);
 
 # Done testing
 done_testing();

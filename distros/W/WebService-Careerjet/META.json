@@ -1,12 +1,12 @@
 {
-   "abstract" : "Perl interface to Careerjet's public job offers search API",
+   "abstract" : "Perl interface to Careerjet's public job search API",
    "author" : [
       "Thomas Busch <api@careerjet.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.76, CPAN::Meta::Converter version 2.120351",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.143240",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -46,5 +46,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "3.1"
+   "version" : "4.2"
 }

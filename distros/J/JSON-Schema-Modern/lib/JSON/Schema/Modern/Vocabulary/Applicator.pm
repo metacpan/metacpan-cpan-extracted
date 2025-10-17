@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Applicator;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Applicator vocabulary
 
-our $VERSION = '0.619';
+our $VERSION = '0.620';
 
 use 5.020;
 use Moo;
@@ -389,9 +389,9 @@ sub _eval_keyword_contains ($class, $data, $schema, $state) {
   # here, to be evaluated after 'contains'
   if ($state->{specification_version} !~ /^draft[467]$/
       and grep $_ eq 'JSON::Schema::Modern::Vocabulary::Validation', $state->{vocabularies}->@*) {
-    $valid = E($state, 'array contains more than %d matching items', $schema->{maxContains})
+    $valid = E($state, 'array contains more than %d matching item%s', $schema->{maxContains}, $schema->{maxContains} != 1 ? 's' : '')
       if exists $schema->{maxContains} and $state->{_num_contains} > $schema->{maxContains};
-    $valid = E($state, 'array contains fewer than %d matching items', $schema->{minContains}) && $valid
+    $valid = E($state, 'array contains fewer than %d matching item%s', $schema->{minContains}, $schema->{minContains} != 1 ? 's' : '') && $valid
       if exists $schema->{minContains} and $state->{_num_contains} < $schema->{minContains};
   }
 
@@ -547,7 +547,7 @@ JSON::Schema::Modern::Vocabulary::Applicator - Implementation of the JSON Schema
 
 =head1 VERSION
 
-version 0.619
+version 0.620
 
 =head1 DESCRIPTION
 
@@ -580,6 +580,14 @@ the equivalent Draft 6 keywords that correspond to this vocabulary and are forma
 the equivalent Draft 4 keywords that correspond to this vocabulary and are formally specified in L<https://json-schema.org/draft-04/draft-fge-json-schema-validation-00#rfc.section.5>.
 
 =back
+
+=head1 GIVING THANKS
+
+=for stopwords MetaCPAN GitHub
+
+If you found this module to be useful, please show your appreciation by
+adding a +1 in L<MetaCPAN|https://metacpan.org/dist/JSON-Schema-Modern>
+and a star in L<GitHub|https://github.com/karenetheridge/JSON-Schema-Modern>.
 
 =head1 SUPPORT
 

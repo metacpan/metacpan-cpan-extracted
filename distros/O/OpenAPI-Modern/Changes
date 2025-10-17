@@ -1,5 +1,10 @@
 Revision history for OpenAPI-Modern
 
+0.100     2025-10-15 19:38:38Z
+          - support added for OpenAPI v3.2 documents!
+            See https://github.com/OAI/OpenAPI-Specification/releases/tag/3.2.0
+            for what is new or changed.
+
 0.099     2025-10-13 19:44:43Z
           - fixed bug: properly support operation_id = '0'
 

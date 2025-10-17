@@ -1,3 +1,87 @@
+1.02   2025-10-16
+    [Maintenance]
+    - Promote the release version to 1.02 to ensure Perl's version parsing
+      keeps this release newer than the historical 0.99.
+    [Feature]
+    - Added fromjson() helper to decode JSON text back into native data
+      structures, mirroring jq's behaviour and complementing tojson().
+    - Implemented jq's `//` alternative operator so pipelines can fall back to
+      secondary expressions when the primary value is null or missing.
+    [Tests]
+    - Added regression coverage asserting fromjson() handles objects, arrays,
+      invalid JSON text, and null propagation.
+    - Added coalesce-focused regression tests covering literals, booleans, and
+      chained fallbacks.
+    [Docs]
+    - Documented fromjson() across README, CLI helper listings, and module POD.
+    - Documented the new alternative operator in README, CLI help, and module
+      POD alongside examples.
+
+1.01   2025-10-16
+    [Maintenance]
+    - Promote the release version to 1.01 to ensure Perl's version parsing
+      keeps this release newer than the historical 0.99.
+    [Feature]
+    - Added fromjson() helper to decode JSON text back into native data
+      structures, mirroring jq's behaviour and complementing tojson().
+    [Tests]
+    - Added regression coverage asserting fromjson() handles objects, arrays,
+      invalid JSON text, and null propagation.
+    [Docs]
+    - Documented fromjson() across README, CLI helper listings, and module POD.
+
+0.104  2025-10-13
+    [Feature]
+    - Added assignment support for simple jq-style expressions such as
+      `.path = value`, allowing in-place updates of decoded data structures
+      within pipelines.
+    [Tests]
+    - Added regression coverage for assignments across scalars, nested hashes,
+      arrays, and null literals.
+
+0.103  2025-10-13
+    [Feature]
+    - Added recurse helper mirroring jq's recurse/0 and recurse/1 to emit the
+      current value alongside depth-first descendants using optional child
+      filters.
+    [Tests]
+    - Added regression coverage ensuring recurse() traverses nested objects,
+      arrays, and custom child relationships.
+    [Docs]
+    - Documented recurse across README, module POD, and CLI helper listings.
+
+0.102  2025-10-13
+    [Feature]
+    - Added not helper mirroring jq's logical negation semantics, yielding
+      JSON booleans based on jq-lite's truthiness rules across scalars,
+      arrays, and objects.
+    [Tests]
+    - Added regression coverage ensuring not() inverts truthiness for
+      booleans, nulls, arrays, and objects.
+    [Docs]
+    - Documented not across README, module POD, and CLI helper listings.
+
+0.101  2025-10-13
+    [Feature]
+    - Added scalars helper mirroring jq's scalars/0 filter to pass through only
+      scalar inputs while skipping arrays and objects.
+    [Tests]
+    - Added regression coverage ensuring scalars() keeps strings, numbers,
+      booleans, and nulls while dropping containers.
+    [Docs]
+    - Documented scalars across README, module POD, and helper listings.
+
+0.100  2025-10-13
+    [Feature]
+    - Added objects helper mirroring jq's objects/0 filter to pass through only
+      hash inputs while skipping scalars and arrays.
+    [Tests]
+    - Added regression coverage ensuring objects() mirrors jq semantics for
+      arrays, scalars, and nested objects.
+    [Docs]
+    - Documented objects across README, module POD, helper listings, and
+      updated MANIFEST.
+
 0.99  2025-10-13
     [Feature]
     - Added arrays helper mirroring jq's arrays/0 filter to pass through only
@@ -570,6 +654,9 @@
     - Removed use of eval in _evaluate_condition for better performance and stability.
     - Refactored _traverse for readability and maintainability.
     - Added support for multi-level array traversal (e.g., .users[].friends[].name).
+
+
+
 
 
 

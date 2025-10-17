@@ -7,7 +7,7 @@ do { my $x = {
                       },
        'develop' => {
                       'recommends' => {
-                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.168',
+                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.169',
                                         'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
@@ -38,6 +38,7 @@ do { my $x = {
                                       'Carp' => '0',
                                       'Digest::MD5' => '0',
                                       'Encode' => '2.89',
+                                      'Exporter' => '0',
                                       'Feature::Compat::Try' => '0',
                                       'File::ShareDir' => '0',
                                       'JSON::Schema::Modern' => '0.603',

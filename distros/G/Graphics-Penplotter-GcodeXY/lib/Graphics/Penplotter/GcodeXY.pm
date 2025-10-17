@@ -1,4 +1,4 @@
-package Graphics::Penplotter::GcodeXY v0.5.16;
+package Graphics::Penplotter::GcodeXY v0.5.17;
 
 use v5.38.2;  # required by List::Util and Term::ANSIcolor (perl testers matrix)
 use strict;
@@ -4142,7 +4142,7 @@ sub split {
             $current   = $EMPTY_STR;
             $penstate  = $PENUP;
             # open a graphics object to write output file
-            my $f = new GcodeXY(
+            my $f = Graphics::Penplotter::GcodeXY->new(
                 header     => $self->{header},
                 trailer    => $self->{trailer},
                 penupcmd   => $self->{penupcmd},
@@ -4235,7 +4235,7 @@ sub split {
                     }
                     else {    # op == $G01
                         if ( $penstate == $PENDOWN ) { $f->do_penup() }
-                        $f->addfastmove( $x1, $y1 );
+                        $f->_addfastmove( $x1, $y1 );
                         $f->do_pendown();
                         $f->_addslowmove( $x2, $y2 );
                     }

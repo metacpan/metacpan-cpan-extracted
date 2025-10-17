@@ -9,7 +9,7 @@ BEGIN { $ENV{PERL_WARNINGS} = 0; }
 use strict;
 use warnings;
 use Perl::Types;
-our $VERSION = 0.012_000;
+our $VERSION = 0.012_100;
 
 # [[[ CRITICS ]]]
 ## no critic qw(ProhibitUselessNoCritic ProhibitMagicNumbers RequireCheckedSyscalls)  # USER DEFAULT 1: allow numeric values & print operator
@@ -248,6 +248,7 @@ foreach my $test_file ( sort keys %{$test_files} ) {
 
     my $test_exit_status = $CHILD_ERROR >> 8;
 
+# DEV NOTE: uncomment following lines for useful debugging output
 #    Perl::diag( 'in 09_interpret_execute.t, have $CHILD_ERROR = ' . $CHILD_ERROR . "\n" );
 #    Perl::diag( 'in 09_interpret_execute.t, have $test_exit_status = ' . $test_exit_status . "\n" );
 
@@ -393,6 +394,7 @@ FOREACH_STDOUT_LINE: foreach my string $stdout_generated_line ( @{$stdout_genera
 #            else { Perl::diag( 'in 09_interpret_execute.t success_match(), no regex, NO MATCH' . "\n" ); }
         }
     }
+# DEV NOTE: uncomment following line for useful debugging output
 #    Perl::diag( 'in 09_interpret_execute.t success_match(), have missing successes =' . "\n" . Dumper( $test_file_successes ) . "\n" );
     ok( ( ( scalar @{ $test_file_successes } ) == 0 ), 'Program interprets and executes without errors & with expected output:' . ( q{ } x 10 ) . $test_file );
 #    $number_of_tests_run++;

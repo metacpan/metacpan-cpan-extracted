@@ -23,7 +23,7 @@ no_index:
     - inc
 requires:
   Scalar::Util: '0'
-  Want: '0.17'
+  Wanted: v0.1.0
   overload: '1.06'
   overloading: '0'
   perl: '5.010001'
@@ -34,5 +34,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jackdeguest/Locale-Unicode/issues
   repository: https://gitlab.com/jackdeguest/Locale-Unicode
-version: v0.3.11
+version: v0.4.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

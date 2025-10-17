@@ -10,7 +10,7 @@ apt-get -y install \
 	apt-file dh-make-perl libmodule-build-perl \
 	libclass-accessor-perl libdatetime-perl libdatetime-format-strptime-perl \
 	libexception-class-perl libfile-slurp-perl libwww-perl \
-	libjson-perl libjson-xs-perl \
+	libjson-perl libjson-xs-perl liburi-perl \
 	libtest-compile-perl libtest-pod-perl \
 	libtest-fatal-perl libtest-simple-perl
 

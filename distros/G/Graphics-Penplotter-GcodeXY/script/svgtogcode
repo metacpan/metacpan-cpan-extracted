@@ -1,0 +1,28 @@
+#!/usr/bin/perl
+
+# convert an svg file to gcode, using Graphics::Penplotter::GcodeXY
+# use: svgimport filename
+# output goes to filename.gcode
+
+use strict;
+use warnings;
+use Graphics::Penplotter::GcodeXY;
+
+# create a gcode object
+my $g = Graphics::Penplotter::GcodeXY->new(
+   papersize => "A3",
+   units     => "pt",
+   optimize  => 1,
+   opt_debug  => 0,
+   #check     => 1,
+   #warn      => 1
+   );
+
+# file name
+my $f = shift or die "no input file provided";
+# import it
+$g->importsvg($f);
+# create the gcode
+$g->output("$f.gcode");
+
+exit 1;

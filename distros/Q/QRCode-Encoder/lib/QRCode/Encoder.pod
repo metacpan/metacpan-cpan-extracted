@@ -12,7 +12,7 @@ QRCode::Encoder - Create QR Codes in pure Perl
 
 =head1 VERSION
 
-This document describes QRCode::Encoder version 0.003.
+This document describes QRCode::Encoder version 0.005.
 
 =begin html
 
@@ -58,6 +58,13 @@ can be easily turned into one. As anticipated, much like
 L<Text::QRCode>.
 
 =head1 INTERFACE
+
+=head2 B<< qr_best_params >>
+
+   my %args = qr_best_params($octets, %opts);  # OR
+   my %args = qr_best_params(%opts);
+
+Guess the best params that are not already defined in C<%opts>.
 
 =head2 B<< qr_encode >>
 
@@ -142,6 +149,14 @@ output of the C<plot> method in L<Text::QRCode>.
 The I<version> of the QR Code, as an integer between C<1> and C<40>.
 
 =back
+
+=head2 B<< qr_mode >>
+
+   my $mode = qr_mode($octets);
+
+Guess the best mode from the octets, returns a string among C<numeric>,
+C<alphanumeric>, C<kanji>, and C<byte>.
+
 
 =head1 BUGS AND LIMITATIONS
 

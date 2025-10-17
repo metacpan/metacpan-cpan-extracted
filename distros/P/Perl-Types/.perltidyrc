@@ -1,0 +1,10 @@
+# load Perl Best Practices default settings
+--perl-best-practices
+# allow comments without including in line length character count
+--ignore-side-comment-lengths
+# tidy repeatedly until file does not change
+--converge
+# allow long lines, twice as long as standard 80-character terminal width
+--maximum-line-length=160
+# enable nicer indentation for statements continued across multiple lines
+--extended-continuation-indentation

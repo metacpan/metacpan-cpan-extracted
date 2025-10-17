@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.098-9-gfd7b0d21
+package OpenAPI::Modern; # git description: v0.099-15-g69ac84b0
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
-# ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.1 document
-# KEYWORDS: validation evaluation JSON Schema OpenAPI v3.1 Swagger HTTP request response
+# ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.1 or v3.2 document
+# KEYWORDS: validation evaluation JSON Schema OpenAPI v3.1 v3.2 Swagger HTTP request response
 
-our $VERSION = '0.099';
+our $VERSION = '0.100';
 
 use 5.020;
 use utf8;
@@ -31,6 +31,7 @@ use Feature::Compat::Try;
 use Encode 2.89 ();
 use JSON::Schema::Modern;
 use JSON::Schema::Modern::Utilities qw(jsonp unjsonp canonical_uri E abort is_equal is_elements_unique true false);
+use OpenAPI::Modern::Utilities qw(add_vocab_and_default_schemas);
 use JSON::Schema::Modern::Document::OpenAPI;
 use MooX::TypeTiny 0.002002;
 use Types::Standard qw(InstanceOf Bool);
@@ -82,7 +83,7 @@ around BUILDARGS => sub ($orig, $class, @args) {
   );
 
   # add the OpenAPI vacabulary, formats and metaschemas to the evaluator if they weren't there already
-  $args->{openapi_document}->_add_vocab_and_default_schemas($args->{evaluator}) if $had_document;
+  add_vocab_and_default_schemas($args->{evaluator}) if $had_document;
 
   # if there were errors, this will die with a JSON::Schema::Modern::Result object
   $args->{evaluator}->add_document($args->{openapi_document});
@@ -149,12 +150,14 @@ sub validate_request ($self, $request, $options = {}) {
           : $param_obj->{in} eq 'query' ? $self->_validate_query_parameter({ %$state, depth => $state->{depth}+1 }, $param_obj, $request->url)
           : $param_obj->{in} eq 'header' ? $self->_validate_header_parameter({ %$state, depth => $state->{depth}+1 }, $param_obj->{name}, $param_obj, $request->headers)
           : $param_obj->{in} eq 'cookie' ? $self->_validate_cookie_parameter({ %$state, depth => $state->{depth}+1 }, $param_obj)
+          : $param_obj->{in} eq 'querystring' ? $self->_validate_querystring_parameter({ %$state, depth => $state->{depth}+1 }, $param_obj)
           : abort($state, 'unrecognized "in" value "%s"', $param_obj->{in});
       }
     }
 
-    # §3.5: "Each template expression in the path MUST correspond to a path parameter that is
-    # included in the Path Item itself and/or in each of the Path Item’s Operations."
+    # v3.2.0 §4.8.2, "Path Templating": "Each template expression in the path MUST correspond to a path
+    # parameter that is included in the Path Item itself and/or in each of the Path Item’s
+    # Operations."
     # We could validate this at document parse time, except the path-item can also be reached via a
     # $ref and the referencing path could be from another document and is therefore unknowable until
     # runtime.
@@ -300,6 +303,9 @@ sub validate_response ($self, $response, $options = {}) {
         $header_name, $header_obj, $response->headers);
     }
 
+    # FIXME: can we have a 'required' property here, just like in request?
+    # why do we check for the 'content' property here, and Content-Length, but not for request?
+
     $self->_validate_body_content({ %$state, data_path => '/response/body', depth => $state->{depth}+1 },
         $response_obj->{content}, $response)
       if exists $response_obj->{content} and $response->headers->content_length // $response->body_size;
@@ -366,7 +372,7 @@ sub find_path ($self, $options, $state = {}) {
   if (exists $options->{operation_id}) {
     # FIXME: what if the operation is defined in another document? Need to look it up across
     # all documents, and localize $state->{initial_schema_uri}
-    my $operation_path = $self->openapi_document->get_operationId_path($options->{operation_id});
+    my $operation_path = $self->openapi_document->operationId_path($options->{operation_id});
     return E({ %$state, recommended_response => [ 500 ] }, 'unknown operation_id "%s"', $options->{operation_id})
       if not $operation_path;
 
@@ -598,8 +604,9 @@ sub _match_uri ($self, $method, $uri, $path_template, $state) {
   # path within the origin-form of request-target."
   $uri_path = '/' if not length $uri_path;
 
-  # §3.5: "The value for these path parameters MUST NOT contain any unescaped “generic syntax”
-  # characters described by [RFC3986]: forward slashes (/), question marks (?), or hashes (#)."
+  # v3.2.0 §4.8.2, "Path Templating": "The value for these path parameters MUST NOT contain any
+  # unescaped “generic syntax” characters described by [RFC3986]: forward slashes (/), question
+  # marks (?), or hashes (#)."
   my $path_pattern = join '',
     map +(substr($_, 0, 1) eq '{' ? '([^/?#]*)' : quotemeta($_)), # { for the editor
     split /(\{[^}]+\})/, $path_template;
@@ -618,7 +625,8 @@ sub _match_uri ($self, $method, $uri, $path_template, $state) {
     $local_state->{path_item} = $self->_resolve_ref('path-item', $ref, $local_state);
   }
 
-  # §4.8.8.1: "In case of ambiguous matching, it’s up to the tooling to decide which one to use."
+  # v3.2.0 §4.8.1, "Patterned Fields": "In case of ambiguous matching, it’s up to the tooling to
+  # decide which one to use."
   # There could be another paths entry that matches this URI that does have this method
   # implemented, so we return false and keep searching. Since we may still match to the wrong URI,
   # the correct operation can be forced to match by explicitly passing the corresponding
@@ -638,8 +646,9 @@ sub _match_uri ($self, $method, $uri, $path_template, $state) {
         ? ($self->openapi_document->schema->{servers}, [], $self->openapi_uri)
     : ();
 
-  # §4.8.1.1 "If the servers field is not provided, or is an empty array, the default value would
-  # be [an array consisting of a single] Server Object with a url value of `/`."
+  # v3.2.0 §4.1.1, "OpenAPI Object -> servers": "If the servers field is not provided, or is an
+  # empty array, the default value would be an array consisting of a single Server Object with a
+  # url value of `/`."
   $servers = [{ url => '/' }] if not $servers or not @$servers;
 
   foreach my $index_and_server (pairs indexed @$servers) {
@@ -760,9 +769,9 @@ sub _validate_query_parameter ($self, $state, $param_obj, $uri) {
   return $self->_validate_parameter_content({ %$state, depth => $state->{depth}+1 }, $param_obj, \$data)
     if exists $param_obj->{content};
 
-  # §4.8.12.2.1: "If `true`, clients MAY pass a zero-length string value in place of parameters that
-  # would otherwise be omitted entirely, which the server SHOULD interpret as the parameter being
-  # unused."
+  # v3.2.0 §4.12, "Parameter Object -> allowEmptyValue": "If `true`, clients MAY pass a zero-length
+  # string value in place of parameters that would otherwise be omitted entirely, which the server
+  # SHOULD interpret as the parameter being unused."
   return if $param_obj->{allowEmptyValue}
     and ($param_obj->{style}//'form') eq 'form'
     and not length($data);
@@ -860,6 +869,12 @@ sub _validate_cookie_parameter ($self, $state, $param_obj, @args) {
   return E($state, 'cookie parameters not yet supported');
 }
 
+sub _validate_querystring_parameter ($self, $state, $param_obj, @args) {
+  $state->{data_path} = '/request/uri/query';
+
+  return E($state, 'querystring parameters not yet supported');
+}
+
 sub _validate_parameter_content ($self, $state, $param_obj, $content_ref) {
   abort({ %$state, keyword => 'content' }, 'more than one media type entry present')
     if keys $param_obj->{content}->%* > 1;  # TODO: remove, when the spec schema is updated
@@ -885,12 +900,13 @@ sub _validate_body_content ($self, $state, $content_obj, $message) {
       'incorrect Content-Type "%s"', $content_type)
     if not defined $media_type;
 
-  # §4.8.14.1: "The encoding field SHALL only apply to Request Body Objects, and only when the media
-  # type is multipart or application/x-www-form-urlencoded."
+  # §4.14, "Media Type Object -> encoding": "The encoding field SHALL only apply when the media type
+  # is multipart or application/x-www-form-urlencoded."
   if ($content_type =~ m{^\Fmultipart/} or fc($content_type) eq 'application/x-www-form-urlencoded') {
     if (exists $content_obj->{$media_type}{encoding}) {
       my $state = { %$state, keyword_path => jsonp($state->{keyword_path}, 'content', $media_type) };
-      # §4.8.14.1: "The key, being the property name, MUST exist in the schema as a property."
+      # v3.1 §4.8.14.1: "The key, being the property name, MUST exist in the schema as a property."
+      # TODO: encoding semantics have been changed and improved; see the 3.2 spec.
       foreach my $property (sort keys $content_obj->{$media_type}{encoding}->%*) {
         ()= E({ $state, keyword_path => jsonp($state->{keyword_path}, 'schema', 'properties', $property) },
             'encoding property "%s" requires a matching property definition in the schema')
@@ -1147,18 +1163,19 @@ __END__
 
 =head1 NAME
 
-OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.1 document
+OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.1 or v3.2 document
 
 =head1 VERSION
 
-version 0.099
+version 0.100
 
 =head1 SYNOPSIS
 
   my $openapi = OpenAPI::Modern->new(
-    openapi_uri => 'https://prod.example.com/api',
+    openapi_uri => 'https://prod.example.com',  # adjust for each deployment environment
     openapi_schema => YAML::PP->new(boolean => 'JSON::PP')->load_string(<<'YAML'));
-  openapi: 3.1.1
+  $self: /api         # canonical_uri will become https://prod.example.com/api
+  openapi: 3.2.0
   info:
     title: Test API
     version: 1.2.3
@@ -1272,10 +1289,9 @@ prints:
 =head1 DESCRIPTION
 
 This module provides various tools for working with an
-L<OpenAPI Specification v3.1 document|https://spec.openapis.org/oas/v3.1#openapi-document> within
+L<OpenAPI Specification v3.1 or v3.2 document|https://spec.openapis.org/oas/latest#openapi-document> within
 your application. The JSON Schema evaluator is fully specification-compliant; the OpenAPI evaluator
-aims to be but some features are not yet available. My belief is that missing features are better
-than features that seem to work but actually cut corners for simplicity.
+aims to be but some features are not yet available.
 
 =for Pod::Coverage BUILDARGS FREEZE THAW
 
@@ -1306,8 +1322,8 @@ It is strongly recommended that this resulting URI is absolute.
 
 =head2 openapi_schema
 
-The data structure describing the OpenAPI v3.1 document (as specified at
-L<https://spec.openapis.org/oas/v3.1>); an alias to C<< ->openapi_document->schema >>.
+The data structure describing the OpenAPI document (as specified at
+L<https://spec.openapis.org/oas/latest>; an alias to C<< ->openapi_document->schema >>.
 See L<JSON::Schema::Modern::Document::OpenAPI/schema>.
 Ignored if L</openapi_document> is provided, otherwise required.
 
@@ -1359,7 +1375,7 @@ L</recursive_get>.
   );
 
 Validates an L<HTTP::Request>, L<Plack::Request>, L<Catalyst::Request> or L<Mojo::Message::Request>
-object against the corresponding OpenAPI v3.1 document, returning a
+object against the corresponding OpenAPI document, returning a
 L<JSON::Schema::Modern::Result> object.
 
 Absolute URIs in the result object are constructed by resolving the openapi document path against
@@ -1382,7 +1398,7 @@ to improve performance.
   );
 
 Validates an L<HTTP::Response>, L<Plack::Response>, L<Catalyst::Response> or L<Mojo::Message::Response>
-object against the corresponding OpenAPI v3.1 document, returning a
+object against the corresponding OpenAPI document, returning a
 L<JSON::Schema::Modern::Result> object.
 
 Absolute URIs in the result object are constructed by resolving the openapi document path against
@@ -1419,7 +1435,7 @@ C<method>: the HTTP method used by the request (case-sensitive)
 
 =item *
 
-C<path_template>: a string representing the (possibly partial) path portion of the request URI, with placeholders in braces (e.g. C</pets/{petId}>); see L<https://spec.openapis.org/oas/v3.1#paths-object>.
+C<path_template>: a string representing the (possibly partial) path portion of the request URI, with placeholders in braces (e.g. C</pets/{petId}>); see L<https://spec.openapis.org/oas/latest#paths-object>.
 
 =item *
 
@@ -1457,7 +1473,7 @@ C<operation_uri>: a URI indicating the document location of the operation object
 
 (See the documentation for an operation at L<https://learn.openapis.org/specification/paths.html#the-endpoints-list>
 or in the specification at
-L<§4.8.10 of the specification|https://spec.openapis.org/oas/v3.1#operation-object>.)
+L<§4.10 of the specification|https://spec.openapis.org/oas/latest#operation-object>.)
 
 =item *
 
@@ -1474,8 +1490,8 @@ C<uri_patterns>: an arrayref of patterns that were attempted to be matched again
 =back
 
 You can find the associated operation object in the OpenAPI document by using either C<operation_uri>,
-or by calling C<< $openapi->openapi_document->get_operationId_path($operation_id) >>
-(see L<JSON::Schema::Modern::Document::OpenAPI/get_operationId_path>) (note that the latter will
+or by calling C<< $openapi->openapi_document->operationId_path($operation_id) >>
+(see L<JSON::Schema::Modern::Document::OpenAPI/operationId_path>) (note that the latter will
 be changed in a subsequent release, in order to support operations existing in other documents).
 
 =head2 recursive_get
@@ -1563,7 +1579,7 @@ L<https://spec.openapis.org/#openapi-specification-schemas>.
 The default metaschema used by this tool does not permit the use of C<$schema> keywords
 in subschemas (where the value differs from the default OAS dialect), but a more permissive
 dialect is also available (or you can define your own), which you declare by providing the
-C<L<jsonSchemaDialect/https://spec.openapis.org/oas/v3.1#fixed-fields>> property in your OpenAPI
+C<L<jsonSchemaDialect/https://spec.openapis.org/oas/latest#openapi-object>> property in your OpenAPI
 Document.
 
 The schemas are also available under the URIs C<< s/<date>/latest/ >> so you don't have to change your
@@ -1573,10 +1589,10 @@ code or configurations to keep pace with internal changes.
 
 Embedded JSON Schemas, through the use of the C<schema> keyword, are fully draft2020-12-compliant,
 as per the spec, and implemented with L<JSON::Schema::Modern>. Unless overridden with the use of the
-L<jsonSchemaDialect|https://spec.openapis.org/oas/v3.1#specifying-schema-dialects> keyword, their
-metaschema is L<https://spec.openapis.org/oas/3.1/dialect/2024-11-10>, which allows for use of the
+L<jsonSchemaDialect|https://spec.openapis.org/oas/latest#specifying-schema-dialects> keyword, their
+metaschema is the "dialect" schema listed at L<https://spec.openapis.org/oas/#schema-iterations>, which allows for use of the
 OpenAPI-specific keywords (C<discriminator>, C<xml>, C<externalDocs>, and C<example>), as defined in
-L<the specification/https://spec.openapis.org/oas/v3.1#schema-object>. Format validation is turned
+L<the specification/https://spec.openapis.org/oas/latest#schema-object>. Format validation is turned
 B<on>, and the use of content* keywords is off (see
 L<JSON::Schema::Modern/validate_content_schemas>).
 
@@ -1673,7 +1689,23 @@ L<https://learn.openapis.org/>
 
 L<https://spec.openapis.org/oas/v3.1>
 
+=item *
+
+L<https://spec.openapis.org/oas/v3.2>
+
+=item *
+
+L<https://spec.openapis.org/oas/>
+
 =back
+
+=head1 GIVING THANKS
+
+=for stopwords MetaCPAN GitHub
+
+If you found this module to be useful, please show your appreciation by
+adding a +1 in L<MetaCPAN|https://metacpan.org/dist/OpenAPI-Modern>
+and a star in L<GitHub|https://github.com/karenetheridge/OpenAPI-Modern>.
 
 =head1 SUPPORT
 

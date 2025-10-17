@@ -1,15 +1,16 @@
 ---
-abstract: 'a simple console-based L<RDAP|https://about.rdap.org> client.'
+abstract: 'a command-line L<RDAP|https://about.rdap.org> client.'
 author:
   - 'Gavin Brown <gavin.brown@fastmail.uk>'
 build_requires:
   ExtUtils::MakeMaker: '0'
   Test::More: '0'
+  common::sense: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.72, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,13 +23,14 @@ no_index:
 requires:
   File::ShareDir: '0'
   File::ShareDir::Install: '0'
+  File::Slurp: '0'
   Getopt::Long: '0'
   JSON: '0'
   List::Util: '1.33'
   Locale::Maketext::Gettext: '0'
   Net::ASN: '0'
   Net::DNS::Domain: '0'
-  Net::IDN::Encode: '0'
+  Net::IDN::PP: '0'
   Net::IP: '0'
   Net::RDAP: '0.40'
   Pod::Usage: '0'
@@ -39,5 +41,5 @@ requires:
 resources:
   bugtracker: https://github.com/gbxyz/rdapper/issues
   repository: https://github.com/gbxyz/rdapper.git
-version: '1.19'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '1.20'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

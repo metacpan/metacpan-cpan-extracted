@@ -39,7 +39,7 @@
       },
       "develop" : {
          "recommends" : {
-            "Dist::Zilla::PluginBundle::Author::ETHER" : "0.168",
+            "Dist::Zilla::PluginBundle::Author::ETHER" : "0.169",
             "Dist::Zilla::PluginBundle::Git::VersionManager" : "0.007"
          },
          "requires" : {
@@ -74,7 +74,7 @@
             "JSON::Schema::Modern::Document::OpenAPI" : "0.024",
             "Mojo::Base" : "0",
             "Mojo::JSON" : "0",
-            "OpenAPI::Modern" : "0.096",
+            "OpenAPI::Modern" : "0.100",
             "Path::Tiny" : "0",
             "Safe::Isa" : "0",
             "YAML::PP" : "0",
@@ -94,6 +94,7 @@
             "File::Spec" : "0",
             "JSON::Schema::Modern::Utilities" : "0",
             "Module::Metadata" : "0",
+            "OpenAPI::Modern::Utilities" : "0",
             "Test2::API" : "0",
             "Test::Deep" : "0",
             "Test::Memory::Cycle" : "0",
@@ -189,7 +190,7 @@
    "provides" : {
       "Mojolicious::Plugin::OpenAPI::Modern" : {
          "file" : "lib/Mojolicious/Plugin/OpenAPI/Modern.pm",
-         "version" : "0.018"
+         "version" : "0.019"
       }
    },
    "release_status" : "stable",
@@ -204,7 +205,7 @@
          "web" : "https://github.com/karenetheridge/Mojolicious-Plugin-OpenAPI-Modern"
       }
    },
-   "version" : "0.018",
+   "version" : "0.019",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.043003"
@@ -265,7 +266,7 @@
                }
             },
             "name" : "@Author::ETHER/Git::GatherDir",
-            "version" : "2.051"
+            "version" : "2.052"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaYAML",
@@ -599,6 +600,11 @@
                      },
                      {
                         "class" : "Pod::Weaver::Section::GenerateSection",
+                        "name" : "@Author::ETHER/generate GIVING THANKS",
+                        "version" : "4.020"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::GenerateSection",
                         "name" : "@Author::ETHER/generate SUPPORT",
                         "version" : "4.020"
                      },
@@ -881,7 +887,7 @@
                }
             },
             "name" : "@Author::ETHER/initial check",
-            "version" : "2.051"
+            "version" : "2.052"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts",
@@ -937,7 +943,7 @@
                }
             },
             "name" : "@Author::ETHER/after tests",
-            "version" : "2.051"
+            "version" : "2.052"
          },
          {
             "class" : "Dist::Zilla::Plugin::CheckIssues",
@@ -1052,7 +1058,7 @@
                }
             },
             "name" : "@Author::ETHER/@Git::VersionManager/release snapshot",
-            "version" : "2.051"
+            "version" : "2.052"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Tag",
@@ -1061,7 +1067,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.018",
+                  "tag" : "v0.019",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },
@@ -1074,7 +1080,7 @@
                }
             },
             "name" : "@Author::ETHER/@Git::VersionManager/Git::Tag",
-            "version" : "2.051"
+            "version" : "2.052"
          },
          {
             "class" : "Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional",
@@ -1124,7 +1130,7 @@
                }
             },
             "name" : "@Author::ETHER/@Git::VersionManager/post-release commit",
-            "version" : "2.051"
+            "version" : "2.052"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -1152,7 +1158,7 @@
                }
             },
             "name" : "@Author::ETHER/Git::Push",
-            "version" : "2.051"
+            "version" : "2.052"
          },
          {
             "class" : "Dist::Zilla::Plugin::GitHub::Update",

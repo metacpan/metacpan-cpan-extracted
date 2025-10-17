@@ -53,11 +53,12 @@ sub read_attributes {
 sub set_attributes {
     my ( $sf ) = @_;
     return [
-        { name => 'odbc_utf8_on', default => 0, values => [ 0, 1 ] },
-        { name => 'LongTruncOk',  default => 0, values => [ 0, 1 ] },
-        { name => 'ChopBlanks',   default => 0, values => [ 0, 1 ] },
+        { name => 'odbc_utf8_on',                   default => 0, values => [ 0, 1 ] },
+        { name => 'LongTruncOk',                    default => 0, values => [ 0, 1 ] },
+        { name => 'ChopBlanks',                     default => 0, values => [ 0, 1 ] },
+        { name => 'odbc_ignore_named_placeholders', default => 0, values => [ 0, 1 ] },
         #{ name => 'odbc_array_operations', default => 0, values => [ 0, 1 ] },
-        #{ name => 'odbc_ignore_named_placeholders', default => 0, values => [ 0, 1 ] },
+
     ];
 }
 

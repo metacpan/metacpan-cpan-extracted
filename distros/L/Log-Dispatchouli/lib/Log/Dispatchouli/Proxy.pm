@@ -1,6 +1,6 @@
 use v5.20;
 use warnings;
-package Log::Dispatchouli::Proxy 3.011;
+package Log::Dispatchouli::Proxy 3.013;
 # ABSTRACT: a simple wrapper around Log::Dispatch
 
 # Not dangerous.  Accepted without change.
@@ -205,7 +205,7 @@ Log::Dispatchouli::Proxy - a simple wrapper around Log::Dispatch
 
 =head1 VERSION
 
-version 3.011
+version 3.013
 
 =head1 DESCRIPTION
 

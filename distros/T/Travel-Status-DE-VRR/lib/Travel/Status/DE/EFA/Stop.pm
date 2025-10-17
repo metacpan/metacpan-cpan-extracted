@@ -6,7 +6,7 @@ use 5.010;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '3.16';
+our $VERSION = '3.17';
 
 Travel::Status::DE::EFA::Stop->mk_ro_accessors(
 	qw(sched_arr rt_arr arr arr_delay
@@ -93,7 +93,7 @@ in a Travel::Status::DE::EFA::Result's route
 
 =head1 VERSION
 
-version 3.16
+version 3.17
 
 =head1 DESCRIPTION
 

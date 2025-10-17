@@ -19,25 +19,31 @@ The following functions are present and can be imported:
 
 =over
 
-=item * C<qrspec_ecc_spec>
+=item * C<qrspec_alignment_patterns>
 
 =item * C<qrspec_data_size>
 
 =item * C<qrspec_ecc_size>
 
-=item * C<qrspec_width>
+=item * C<qrspec_ecc_spec>
 
-=item * C<qrspec_remainder>
-
-=item * C<qrspec_min_version>
-
-=item * C<qrspec_min_version_for>
+=item * C<qrspec_format_pattern>
 
 =item * C<qrspec_length_indicator>
 
 =item * C<qrspec_maximum_words>
 
-=item * C<qrspec_mode_indicator >
+=item * C<qrspec_min_version>
+
+=item * C<qrspec_min_version_for>
+
+=item * C<qrspec_mode_indicator>
+
+=item * C<qrspec_remainder>
+
+=item * C<qrspec_version_pattern>
+
+=item * C<qrspec_width>
 
 =back
 

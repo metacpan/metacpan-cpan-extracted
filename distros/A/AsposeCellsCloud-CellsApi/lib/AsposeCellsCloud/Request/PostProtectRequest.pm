@@ -106,10 +106,15 @@ sub run_http_request {
 
 
     # body params
-    if (defined $self->protect_workbook_request) {         
-         $form_params->{'protectWorkbookRequest'} = JSON->new->convert_blessed->encode( $self->protect_workbook_request) ;
+    if (defined $self->protect_workbook_request) {
+         $_body_data = JSON->new->convert_blessed->encode( $self->protect_workbook_request);
+         $form_params->{'protectWorkbookRequest'} = $_body_data ;
     }
-    $form_params->{basename($self->file)} = [$self->file ,basename($self->file),'application/octet-stream'];
+
+    if (defined $self->file) {   
+        $form_params->{basename($self->file)} = [$self->file ,basename($self->file),'application/octet-stream'];
+    }
+ 
 
     # authentication setting, if any
     my $auth_settings = [qw()];

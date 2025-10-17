@@ -32,8 +32,8 @@ WriteMakefile(
 	}, PREREQ_PM => {			# Dependencies (with versions)
 		'Carp' => 0,
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
-		'Config::Abstraction' => 0.32,
-		'Log::Abstraction' => 0.25,
+		'Config::Abstraction' => 0.36,
+		'Log::Abstraction' => 0.26,
 		'Params::Get' => 0.13,
 		'Return::Set' => 0,
 		'Scalar::Util' => 0,
@@ -41,9 +41,11 @@ WriteMakefile(
 		'autodie' => 0,
 		'File::Temp' => 0,
 		'File::Spec' => 0,
+		'File::stat' => 0,
 		'IO::Handle' => 0,
 		'IPC::System::Simple' => 0,
 		'Readonly' => 0,
+		'POSIX' => 0,
 		'Test::DescribeMe' => 0,
 		'Test::Most' => 0,
 		'Test::Needs' => 0,
@@ -63,9 +65,10 @@ WriteMakefile(
 				web => 'https://github.com/nigelhorne/Object-Configure'
 			}, bugtracker => {
 				mailto => 'bug-Object-Configure@rt.cpan.org',
-				url => 'https://github.com/nigelhorne/Object-Configure/issues',
-				# web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Object-Configure',
-				web => 'https://github.com/nigelhorne/Object-Configure/issues'
+				url => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Object-Configure',
+				web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Object-Configure',
+				# url => 'https://github.com/nigelhorne/Object-Configure/issues',
+				# web => 'https://github.com/nigelhorne/Object-Configure/issues'
 			}
 		},
 	},

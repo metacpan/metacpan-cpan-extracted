@@ -18,7 +18,7 @@ use lib 't/lib';
 use Helper;
 
 my $minimal_schema = {
-  openapi => OAS_VERSION,
+  openapi => OAD_VERSION,
   info => {
     title => 'Test API',
     version => '1.2.3',
@@ -233,13 +233,13 @@ subtest 'construct with document' => sub {
   );
 
   cmp_result(
-    scalar $openapi->evaluator->get('https://spec.openapis.org/oas/3.1/schema/latest#/type'),
+    scalar $openapi->evaluator->get('https://spec.openapis.org/oas/'.OAS_VERSION.'/schema/latest#/type'),
     'object',
     'the main OAD schema is available from the evaluator used in OpenAPI::Modern construction',
   );
 
   cmp_result(
-    $openapi->evaluator->_get_vocabulary_class('https://spec.openapis.org/oas/3.1/vocab/base'),
+    $openapi->evaluator->_get_vocabulary_class('https://spec.openapis.org/oas/'.OAS_VERSION.'/vocab/base'),
     [
       'draft2020-12',
       'JSON::Schema::Modern::Vocabulary::OpenAPI',

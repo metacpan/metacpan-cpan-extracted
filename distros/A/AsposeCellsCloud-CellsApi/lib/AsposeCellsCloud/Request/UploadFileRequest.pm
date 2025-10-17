@@ -109,7 +109,9 @@ sub run_http_request {
     my $_body_data;
 
 
-    $form_params->{basename($self->upload_files)} = [$self->upload_files ,basename($self->upload_files),'application/octet-stream'];
+    if (defined $self->upload_files) {   
+        $form_params->{basename($self->upload_files)} = [$self->upload_files ,basename($self->upload_files),'application/octet-stream'];
+    }
  
 
     # authentication setting, if any

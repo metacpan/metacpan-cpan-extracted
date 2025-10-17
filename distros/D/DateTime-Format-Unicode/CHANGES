@@ -1,5 +1,8 @@
 Revision history for Perl module DateTime::Format::Unicode
 
+v0.3.0 2025-10-16T09:10:27+0900
+    - Update dependency from Want to Wanted
+
 v0.2.0 2025-04-20T17:30:47+0900
     - New release with unit tests in accordance with new Unicode data.
 

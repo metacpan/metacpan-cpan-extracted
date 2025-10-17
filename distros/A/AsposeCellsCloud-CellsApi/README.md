@@ -1,6 +1,8 @@
-![Aspose.Cells Cloud SDK for Perl](https://img.shields.io/badge/aspose.cells%20Cloud%20SDK-25.9-green?style=for-the-badge&logo=perl) [![Product Page](https://img.shields.io/badge/Product-0288d1?style=for-the-badge&logo=Google-Chrome&logoColor=white)](https://products.aspose.cloud/cells/perl/) [![Documentation](https://img.shields.io/badge/Documentation-388e3c?style=for-the-badge&logo=Hugo&logoColor=white)](https://docs.aspose.cloud/cells/) [![API Ref](https://img.shields.io/badge/Reference-f39c12?style=for-the-badge&logo=html5&logoColor=white)](https://reference.aspose.cloud/cells/) [![Examples](https://img.shields.io/badge/Examples-1565c0?style=for-the-badge&logo=Github&logoColor=white)](https://github.com/aspose-cells-cloud/aspose-cells-cloud-perl/tree/master/examples) [![Blog](https://img.shields.io/badge/Blog-d32f2f?style=for-the-badge&logo=WordPress&logoColor=white)](https://blog.aspose.cloud/categories/aspose.cells-cloud-product-family/) [![Support](https://img.shields.io/badge/Support-7b1fa2?style=for-the-badge&logo=Discourse&logoColor=white)](https://forum.aspose.cloud/c/cells/7) [![License](https://img.shields.io/github/license/aspose-cells-cloud/aspose-cells-cloud-go?style=for-the-badge&logo=rocket&logoColor=white)](https://github.com/aspose-cells-cloud/aspose-cells-cloud-go/blob/master/LICENSE) ![CPAN](https://img.shields.io/cpan/v/AsposeCellsCloud-CellsApi?style=for-the-badge&logo=rocket&logoColor=white)
+![Aspose.Cells Cloud SDK for Perl](https://img.shields.io/badge/aspose.cells%20Cloud%20SDK-25.10-green?style=for-the-badge&logo=perl) [![Product Page](https://img.shields.io/badge/Product-0288d1?style=for-the-badge&logo=Google-Chrome&logoColor=white)](https://products.aspose.cloud/cells/perl/) [![Documentation](https://img.shields.io/badge/Documentation-388e3c?style=for-the-badge&logo=Hugo&logoColor=white)](https://docs.aspose.cloud/cells/) [![API Ref](https://img.shields.io/badge/Reference-f39c12?style=for-the-badge&logo=html5&logoColor=white)](https://reference.aspose.cloud/cells/) [![Examples](https://img.shields.io/badge/Examples-1565c0?style=for-the-badge&logo=Github&logoColor=white)](https://github.com/aspose-cells-cloud/aspose-cells-cloud-perl/tree/master/examples) [![Blog](https://img.shields.io/badge/Blog-d32f2f?style=for-the-badge&logo=WordPress&logoColor=white)](https://blog.aspose.cloud/categories/aspose.cells-cloud-product-family/) [![Support](https://img.shields.io/badge/Support-7b1fa2?style=for-the-badge&logo=Discourse&logoColor=white)](https://forum.aspose.cloud/c/cells/7) [![License](https://img.shields.io/github/license/aspose-cells-cloud/aspose-cells-cloud-go?style=for-the-badge&logo=rocket&logoColor=white)](https://github.com/aspose-cells-cloud/aspose-cells-cloud-go/blob/master/LICENSE) ![CPAN](https://img.shields.io/cpan/v/AsposeCellsCloud-CellsApi?style=for-the-badge&logo=rocket&logoColor=white)
 
-# Quick Start Guide
+[Aspose.Cells Cloud SDK for Perl](https://products.aspose.cloud/cells/perl) is a cloud-first REST API that lets Perl applications create, read, edit, convert, and repair [Excel, ODS, CSV, JSON, and other spreadsheet files](https://docs.aspose.cloud/cells/supported-file-formats/) without installing Microsoft Office. It supports advanced features, including cell formatting, formulas, pivot tables, conditional styling, charts, hyperlinks, comments, data validation, document splitting, and merging, and runs on AWS, Azure, and Google Cloud, while ensuring data integrity.
+
+## Quick Start Guide
 
 To begin with Aspose.Cells Cloud, here's what you need to do:
 
@@ -82,26 +84,31 @@ close($fh);
 
 ## Manipulate Excel and other spreadsheet files in the Cloud
 
-- File Manipulation: Users can upload, download, delete, and manage Excel files stored in the cloud.
-- Formatting: Supports formatting of cells, fonts, colors, and alignment modes in Excel files to cater to users' specific requirements.
-- Data Processing: Powerful functions for data processing including reading, writing, modifying cell data, performing formula calculations, and formatting data.
-- Formula Calculation: Built-in formula engine handles complex formula calculations in Excel and returns accurate results.
-- Chart Manipulation: Users can create, edit, and delete charts from Excel files for data analysis and visualization needs.
-- Table Processing: Offers robust processing capabilities for various form operations such as creation, editing, formatting, and conversion, meeting diverse form processing needs.
-- Data Verification: Includes data verification function to set cell data type, range, uniqueness, ensuring data accuracy and integrity.
-- Batch Processing: Supports batch processing of multiple Excel documents, such as batch format conversion, data extraction, and style application..
-- Import/Export: Facilitates importing data from various sources into spreadsheets and exporting spreadsheet data to other formats.
-- Security Management: Offers a range of security features like data encryption, access control, and permission management to safeguard the security and integrity of spreadsheet data.
+- **File Manipulation**: Users can upload, download, delete, and manage Excel files stored in the cloud.
+- **File Formatting**: Supports formatting of cells, fonts, colors, and alignment modes in Excel files to cater to users' specific requirements.
+- **Data Processing**: Powerful functions for data processing including reading, writing, modifying cell data, performing formula calculations, and formatting data.
+- **Formula Calculation**: Built-in formula engine handles complex formula calculations in Excel and returns accurate results.
+- **Chart Manipulation**: Users can create, edit, and delete charts from Excel files for data analysis and visualization needs.
+- **Table Processing**: Offers robust processing capabilities for various form operations such as creation, editing, formatting, and conversion, meeting diverse form processing needs.
+- **Data Verification**: Includes data verification function to set cell data type, range, uniqueness, ensuring data accuracy and integrity.
+- **Batch Processing**: Supports batch processing of multiple Excel documents, such as batch format conversion, data extraction, and style application..
+- **Import/Export Data**: Facilitates importing data from various sources into spreadsheets and exporting spreadsheet data to other formats.
+- **Security Management**: Offers a range of security features like data encryption, access control, and permission management to safeguard the security and integrity of spreadsheet data.
 
-## Feature & Enhancements in Version v25.9
+## Feature & Enhancements in Version v25.10
 
 Full list of issues covering all changes in this release:
 
-|**Summary**|**Category**|
-| :- | :- |
-| Support trim spreadsheet content in Cells Cloud 4.0. | Improvement  |
-| Support trim worksheet range content in Cells Cloud 4.0. | Improvement  |
-| Fix few issues about spelling error. | Bug  |
+|**ID**|**Summary**|**Category**|
+| :- | :- | :- |
+| 57421 | Optimize data Transform API: replace delete with remove. | Improvement  |
+| 57574 | Support to update the spreadsheet content words case in Cells Cloud 4.0. | Improvement  |
+| 57575 | Support to remove characters from spreadsheet content in Cells Cloud 4.0. | Improvement  |
+| 57576 | Support to add text for spreadsheet content in Cells Cloud 4.0. | Improvement  |
+| 57577 | Support to convert text for spreadsheet content in Cells Cloud 4.0. | Improvement  |
+| 57578 | Support to extract text for spreadsheet content in Cells Cloud 4.0. | Improvement  |
+| 57579 | Support to extract text for spreadsheet content in Cells Cloud 4.0. | Improvement  |
+| 57580 | Support to split text for spreadsheet content in Cells Cloud 4.0. | Improvement  |
 
 ## Available SDKs
 
@@ -123,4 +130,4 @@ The Aspose.Cells Cloud SDK is available in multiple popular programming language
 
 [![Ruby](https://img.shields.io/badge/Ruby-CC342D.svg?style=for-the-badge&logo=ruby&logoColor=white)](https://github.com/aspose-cells-cloud/aspose-cells-cloud-ruby) [![Ruby](https://img.shields.io/badge/Gem-install%20aspose__cells__cloud-red?logo=ruby&style=for-the-badge)](https://rubygems.org/gems/aspose_cells_cloud)
 
-## [Release history version](HistoryVersion.md)
+## [Release history version](CHANGELOG.md)

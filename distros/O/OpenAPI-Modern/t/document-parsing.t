@@ -21,7 +21,7 @@ subtest 'basic document validation' => sub {
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
     schema => {
-      openapi => OAS_VERSION,
+      openapi => OAD_VERSION,
       info => {
         title => 'my title',
         version => '1.2.3',
@@ -37,13 +37,13 @@ subtest 'basic document validation' => sub {
       (map +{
         instanceLocation => '',
         keywordLocation => '/$ref/anyOf/'.$iter.'/required',
-        absoluteKeywordLocation => DEFAULT_METASCHEMA.'#/anyOf/'.$iter++.'/required',
+        absoluteKeywordLocation => DEFAULT_METASCHEMA->{+OAS_VERSION}.'#/anyOf/'.$iter++.'/required',
         error => 'object is missing property: '.$_,
       }, qw(paths components webhooks)),
       {
         instanceLocation => '',
         keywordLocation => '/$ref/anyOf',
-        absoluteKeywordLocation => DEFAULT_METASCHEMA.'#/anyOf',
+        absoluteKeywordLocation => DEFAULT_METASCHEMA->{+OAS_VERSION}.'#/anyOf',
         error => 'no subschemas are valid',
       },
       do {
@@ -77,7 +77,7 @@ subtest 'basic document validation' => sub {
       {
         instanceLocation => '',
         keywordLocation => "/\$ref/properties",
-        absoluteKeywordLocation => DEFAULT_METASCHEMA.'#/properties',
+        absoluteKeywordLocation => DEFAULT_METASCHEMA->{+OAS_VERSION}.'#/properties',
         error => 'not all properties are valid',
       },
     ],
@@ -104,7 +104,7 @@ ERRORS
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
     schema => {
-      openapi => OAS_VERSION,
+      openapi => OAD_VERSION,
       info => {
         title => 'my title',
         version => '1.2.3',
@@ -124,7 +124,7 @@ ERRORS
       {
         instanceLocation => '',
         keywordLocation => '/$ref/properties',
-        absoluteKeywordLocation => DEFAULT_METASCHEMA.'#/properties',
+        absoluteKeywordLocation => DEFAULT_METASCHEMA->{+OAS_VERSION}.'#/properties',
         error => 'not all properties are valid',
       },
     ],
@@ -144,7 +144,7 @@ subtest '/paths correctness' => sub {
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
     schema => {
-      openapi => OAS_VERSION,
+      openapi => OAD_VERSION,
       info => {
         title => 'my title',
         version => '1.2.3',
@@ -301,7 +301,7 @@ subtest 'bad subschemas' => sub {
     canonical_uri => 'http://localhost:1234/api',
     schema => {
       $yamlpp->load_string(OPENAPI_PREAMBLE)->%*,
-      jsonSchemaDialect => DEFAULT_DIALECT,
+      jsonSchemaDialect => DEFAULT_DIALECT->{+OAS_VERSION},
       components => {
         schemas => {
           alpha_schema => {
@@ -429,7 +429,7 @@ YAML
 
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    metaschema_uri => 'https://spec.openapis.org/oas/3.1/schema/latest',  # needed to override $schema
+    metaschema_uri => DEFAULT_METASCHEMA->{+OAS_VERSION},  # needed to override $schema
     schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 components:
   schemas:
@@ -460,7 +460,6 @@ components:
             $id: parameter2_id
   responses:
     my_response4:
-      description: bad response
       content:
         media_type_4:
           schema:
@@ -486,7 +485,6 @@ components:
                 $id: pathItem0_get_requestBody_id
         responses:
           200:
-            description: normal response
             content:
               media_type_2:
                 schema:
@@ -594,6 +592,7 @@ YAML
       '/components/parameters/my_param1/schema' => 0,
       '/components/parameters/my_param1/schema/properties/foo' => 0,
       '/components/parameters/my_param2' => 2,
+      '/components/parameters/my_param2/content/media_type_0' => 10,
       '/components/parameters/my_param2/content/media_type_0/schema' => 0,
       '/components/pathItems/path0' => 9,
       '/components/pathItems/path0/get/callbacks/my_callback' => 8,
@@ -601,14 +600,18 @@ YAML
       '/components/pathItems/path0/get/parameters/0' => 2,
       '/components/pathItems/path0/get/parameters/0/schema' => 0,
       '/components/pathItems/path0/get/requestBody' => 4,
+      '/components/pathItems/path0/get/requestBody/content/media_type_1' => 10,
       '/components/pathItems/path0/get/requestBody/content/media_type_1/schema' => 0,
       '/components/pathItems/path0/get/responses/200' => 1,
+      '/components/pathItems/path0/get/responses/200/content/media_type_2' => 10,
       '/components/pathItems/path0/get/responses/200/content/media_type_2/schema' => 0,
+      '/components/pathItems/path0/get/responses/200/content/media_type_3' => 10,
       '/components/pathItems/path0/get/responses/200/content/media_type_3/schema' => 0,
       '/components/pathItems/path0/get/responses/default' => 1,
       '/components/pathItems/path0/parameters/0' => 2,
       '/components/pathItems/path0/parameters/0/schema' => 0,
       '/components/responses/my_response4' => 1,
+      '/components/responses/my_response4/content/media_type_4' => 10,
       '/components/responses/my_response4/content/media_type_4/schema' => 0,
       '/components/schemas/anchor1' => 0,
       '/components/schemas/anchor2' => 0,

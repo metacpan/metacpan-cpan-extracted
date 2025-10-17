@@ -33,7 +33,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Config::Abstraction" : "0.25",
+            "Config::Abstraction" : "0.36",
             "Data::Dumper" : "0",
             "ExtUtils::MakeMaker" : "6.64",
             "Log::Log4perl" : "0",
@@ -48,8 +48,15 @@
       },
       "test" : {
          "requires" : {
+            "File::Glob" : "0",
+            "File::Slurp" : "0",
             "File::Spec" : "0",
             "File::Temp" : "0",
+            "File::stat" : "0",
+            "IPC::System::Simple" : "0",
+            "JSON::MaybeXS" : "0",
+            "POSIX" : "0",
+            "Readonly" : "0",
             "Test::DescribeMe" : "0",
             "Test::Mockingbird" : "0",
             "Test::Most" : "0",
@@ -63,8 +70,8 @@
    "resources" : {
       "bugtracker" : {
          "mailto" : "bug-Log-Abstraction@rt.cpan.org",
-         "web" : "https://github.com/nigelhorne/Log-Abstraction/issues",
-         "x_url" : "https://github.com/nigelhorne/Log-Abstraction/issues"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Log-Abstraction",
+         "x_url" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Log-Abstraction"
       },
       "homepage" : "https://metacpan.org/pod/Log::Abstraction",
       "repository" : {
@@ -74,6 +81,6 @@
          "x_repository" : "https://github.com/nigelhorne/Log-Abstraction"
       }
    },
-   "version" : 0.25,
+   "version" : 0.26,
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

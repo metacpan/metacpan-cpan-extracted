@@ -1,5 +1,12 @@
 Revision history for HTML-Genealogy-Map
 
+0.04	Tue Oct 14 19:59:34 EDT 2025
+	Sanity check on the gedcom
+	Added fuzz testing in GitHub Actions
+	Put unknown dates at the end
+	Run basic entities on names
+	Bump version of Params::Validate::Strict
+
 0.03	Fri Oct  3 17:49:07 EDT 2025
 	Fix https://www.cpantesters.org/cpan/report/96d3899a-9ff8-11f0-bee0-9d09aee9520c
 	Use Object::Configure

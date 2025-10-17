@@ -1,5 +1,13 @@
 Revision history for noss (WWW::Noss)
 
+1.10  Oct 16 2025
+  - noss now attempts to resolve relative URLs ('/foo' and '//foo').
+  - Trim whitespace for %e feed descriptions.
+  - noss no longer ignores Atom feed entries with no summary/content.
+  - Fix "<atom feed> contains no posts" error message.
+  - Require List::Util 1.45 for uniq().
+  - Document --autoclean in usage message.
+
 1.09  Sep 16 2025
   - Add support for MRSS (MediaRSS) feeds, like those used by YouTube.
   - Added ability to specify a negative post ID in open, read, cat, and post

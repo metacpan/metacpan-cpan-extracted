@@ -6,7 +6,7 @@ use File::Spec;
 use Carp;
 use Data::Dumper;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 sub new{
 	my ($class,%opts) = @_;
@@ -26,6 +26,7 @@ sub new{
         die_on_bad_params => 1,
         escape_char => "\\",
         token_placeholder => '',
+        file_encoding => undef, # UTF-8, latin1
     };
 
 	bless $self,$class;
@@ -77,6 +78,14 @@ sub token_placeholder{
         $self->{token_placeholder} = $token;
     }
     return $self->{token_placeholder};
+}
+
+sub file_encoding {
+    my ($self, $enc) = @_;
+    if (defined $enc) {
+        $self->{file_encoding} = $enc;
+    }
+    return $self->{file_encoding};
 }
 
 sub defaults_namespace_char{
@@ -264,7 +273,13 @@ sub _get_template{
         );
 
         my $fh;
-        open $fh,'<',$filename or confess "Could not open file $filename: $!";
+        if ($self->{file_encoding}) {
+            open $fh, "<:encoding($self->{file_encoding})", $filename
+                or confess "Could not open file $filename: $!";
+        } else {
+            open $fh, '<', $filename
+                or confess "Could not open file $filename: $!";
+        }
 
         my $text = '';
         while( my $line = <$fh> ){
@@ -1332,6 +1347,21 @@ would mean that L<Template::Nest> would now recognise and interpolate tokens in 
     [% token_name %]
 
 The default token_delims are the mason style delimiters C<<%> and C<%>>. Note that for C<HTML> the token delimiters C<<!--%> and C<%-->> make a lot of sense, since they allow raw templates (ie that have not had values filled in) to render as good C<HTML>.
+
+
+
+=head2 file_encoding
+
+Optional. Specifies the character encoding used when reading template
+files from disk.
+
+Example:
+
+    my $nest = Template::Nest->new(
+        template_dir  => 'templates',
+        file_encoding => 'UTF-8',
+    );
+
 
 
 =head1 SEE ALSO

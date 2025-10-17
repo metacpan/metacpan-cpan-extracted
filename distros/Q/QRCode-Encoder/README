@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    This document describes QRCode::Encoder version 0.003.
+    This document describes QRCode::Encoder version 0.005.
 
 SYNOPSIS
 
@@ -25,6 +25,13 @@ DESCRIPTION
     be easily turned into one. As anticipated, much like Text::QRCode.
 
 INTERFACE
+
+ qr_best_params
+
+       my %args = qr_best_params($octets, %opts);  # OR
+       my %args = qr_best_params(%opts);
+
+    Guess the best params that are not already defined in %opts.
 
  qr_encode
 
@@ -101,6 +108,13 @@ INTERFACE
       * version
 
       The version of the QR Code, as an integer between 1 and 40.
+
+ qr_mode
+
+       my $mode = qr_mode($octets);
+
+    Guess the best mode from the octets, returns a string among numeric,
+    alphanumeric, kanji, and byte.
 
 BUGS AND LIMITATIONS
 

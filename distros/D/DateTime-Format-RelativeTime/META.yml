@@ -39,5 +39,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jackdeguest/DateTime-Format-RelativeTime/issues
   repository: https://gitlab.com/jackdeguest/DateTime-Format-RelativeTime
-version: v0.1.6
+version: v0.2.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

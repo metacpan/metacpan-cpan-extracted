@@ -1,0 +1,148 @@
+package App::ClipboardUtils::Manual::HowTo::ClipaddCookbook; # just to make podweaver happy
+
+use strict;
+
+# AUTHORITY
+# DATE
+our $DIST = 'App-ClipboardUtils'; # DIST
+# VERSION
+
+1;
+# ABSTRACT: Cookbook for clipadd
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+App::ClipboardUtils::Manual::HowTo::ClipaddCookbook - Cookbook for clipadd
+
+=head1 VERSION
+
+This document describes version 0.014 of App::ClipboardUtils::Manual::HowTo::ClipaddCookbook (from Perl distribution App-ClipboardUtils), released on 2025-10-16.
+
+=head1 DESCRIPTION
+
+L<clipadd> lets you add items to the clipboard. It is
+clipboard-manager-agnostic, supporting backends like B<xclip> and B<Klipper>. It
+also has some convenient features which will be demonstrated in this document.
+
+=head1 RECIPES
+
+=head2 Adding ouput from command-line, one line at a time
+
+ % clipadd -c COMMAND
+ % clipadd -c COMMAND -t ; # to see the output on stdout as well
+
+This is convenient because it lets you feed input to a command interactively and
+immediately get the output as clipboard content.
+
+For example, using with L<safer>:
+
+ % clipadd -c safer -t
+ Foo Bar, Inc.
+ foo-bar-inc
+
+I can paste company names and get a slug name to use in file manager to create
+directory, etc.
+
+=head2 Adding entries from a text file
+
+ % clipadd --split-by '\n---\n' < FILENAME
+
+For example, adding FAQ entries from a file with this text file:
+
+ Question 1
+ Answer 1
+ ---
+ Question 2
+ Answer 2
+ ---
+ Question 3
+ Answer 3
+
+then you can setup keyboard shortcuts like C<Ctrl-Alt-Up> and C<Ctrl-Alt-Down>
+in B<Klipper> to quickly access those FAQ entries to provide quick answers in
+chats.
+
+=head2 Adding text fragments from a text file as clipboard contents
+
+ % clipadd --fragments < FILENAME
+
+This is a variation from the previous recipe. Using fragments allows you to only
+add certain entries and in custom order. Example content of text file:
+
+ FAQS
+ ====
+
+ Question 1
+ # BEGIN clipadd id=2
+ Answer 1
+ # END clipadd id=2
+
+ Question 2
+ # BEGIN clipadd id=1
+ Answer 2
+ # END clipadd id=1
+
+ Question 3
+ # BEGIN clipadd id=3
+ Answer 3
+ # END clipadd id=3
+
+ Question 4
+ Answer 4
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-ClipboardUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-ClipboardUtils>.
+
+=head1 SEE ALSO
+
+L<clipadd> (a.k.a. L<add-clipboard-content>, a.k.a. L<ca>).
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ClipboardUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

@@ -9,6 +9,7 @@ my $modules = [
   "JSON::Schema::Modern::Document::OpenAPI",
   "JSON::Schema::Modern::Vocabulary::OpenAPI",
   "OpenAPI::Modern",
+  "OpenAPI::Modern::Utilities",
 ];
 
 plan tests => scalar @$modules;

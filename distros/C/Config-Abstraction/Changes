@@ -1,5 +1,9 @@
 Revision history for Config::Abstraction - Merge and manage configuration data from different sources
 
+0.36	Wed Oct 15 08:12:49 EDT 2025
+	Ignore files that don't parse
+	Added the exists() method
+
 0.35	Mon Oct 13 18:38:37 EDT 2025
 	Bump some minimum versions - GitHub#6
 	Fix remote possibility where STDERR could close if Config::Abstract dies

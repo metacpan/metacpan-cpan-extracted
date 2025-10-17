@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Unicode Locale Identifier - ~/lib/Locale/Unicode.pm
-## Version v0.3.11
+## Version v0.4.0
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/05/11
-## Modified 2025/01/05
+## Modified 2025/10/16
 ## All rights reserved
 ## 
 ## 
@@ -33,7 +33,7 @@ BEGIN
         fallback => 1,
     );
     use Scalar::Util ();
-    use Want;
+    use Wanted;
     # ""root" is treated as a special unicode_language_subtag"
     # <https://unicode.org/reports/tr35/tr35.html#Unicode_language_identifier>
     # NOTE: $LOCALE_BCP47_RE
@@ -407,7 +407,7 @@ BEGIN
     our $PROP_TO_SUB = {};
     # False, by default
     our $EXPLICIT_BOOLEAN = 0;
-    our $VERSION = 'v0.3.11';
+    our $VERSION = 'v0.4.0';
 };
 
 use strict;
@@ -1050,7 +1050,7 @@ sub error
         else
         {
             warn( $msg ) if( warnings::enabled() );
-            rreturn( Locale::Unicode::NullObject->new ) if( Want::want( 'OBJECT' ) );
+            rreturn( Locale::Unicode::NullObject->new ) if( want( 'OBJECT' ) );
             return;
         }
     }
@@ -1579,7 +1579,7 @@ sub pass_error
         return( $self->error( @_ ) );
     }
     
-    if( Want::want( 'OBJECT' ) )
+    if( want( 'OBJECT' ) )
     {
         rreturn( Locale::Unicode::NullObject->new );
     }
@@ -1898,7 +1898,7 @@ sub _set_get_prop
         $self->{ $field } = $val
     }
     # So chaining works
-    rreturn( $self ) if( Want::want( 'OBJECT' ) );
+    rreturn( $self ) if( want( 'OBJECT' ) );
     # Returns undef in scalar context and an empty list in list context
     return if( !defined( $self->{ $field } ) );
     return( $self->{ $field } );
@@ -3910,7 +3910,7 @@ sub TO_JSON { return( shift->as_string ); }
             '""'    => sub{ '' },
             fallback => 1,
         );
-        use Want;
+        use Wanted;
     };
     use strict;
     use warnings;
@@ -3926,7 +3926,7 @@ sub TO_JSON { return( shift->as_string ); }
     {
         my( $method ) = our $AUTOLOAD =~ /([^:]+)$/;
         my $self = shift( @_ );
-        if( Want::want( 'OBJECT' ) )
+        if( want( 'OBJECT' ) )
         {
             rreturn( $self );
         }
@@ -4000,7 +4000,7 @@ In Scalar or in list context, the value returned is the last value set.
 
 =head1 VERSION
 
-    v0.3.11
+    v0.4.0
 
 =head1 DESCRIPTION
 
@@ -4012,7 +4012,7 @@ The only requirement is to provide a proper L<language|https://unicode.org/repor
 
 For your convenience, summary of key elements of the standard can be found in this documentation.
 
-It is lightweight and fast with no dependency outside of L<Scalar::Util> and L<Want>. It requires perl C<v5.10.1> minimum to operate.
+It is lightweight and fast with no dependency outside of L<Scalar::Util> and L<Wanted>. It requires perl C<v5.10.1> minimum to operate.
 
 The object stringifies, and once its string value is computed, it is cached and re-used until it is changed. Thus repetitive call to L<as_string|/as_string> or to stringification does not incur any speed penalty by recomputing what has not changed.
 

@@ -23,11 +23,11 @@ Config::Abstraction - Merge and manage configuration data from different sources
 
 =head1 VERSION
 
-Version 0.35
+Version 0.36
 
 =cut
 
-our $VERSION = '0.35';
+our $VERSION = '0.36';
 
 =head1 SYNOPSIS
 
@@ -488,6 +488,18 @@ sub _load_config
 				}
 			}
 			if($data) {
+				if(!ref($data)) {
+					if($logger) {
+						$logger->debug(ref($self), ' ', __LINE__, ": ignoring data from $path ($data)");
+					}
+					next;
+				}
+				if(ref($data) ne 'HASH') {
+					if($logger) {
+						$logger->debug(ref($self), ' ', __LINE__, ": ignoring data from $path (not a hashref)");
+					}
+					next;
+				}
 				if($logger) {
 					$logger->debug(ref($self), ' ', __LINE__, ": Loaded data from $path");
 				}
@@ -562,6 +574,13 @@ sub _load_config
 							# foreach my($k, $v) (%{$data}) {
 							foreach my $k (keys %{$data}) {
 								my $v = $data->{$k};
+								if(!defined($v)) {
+									# e.g. a simple line
+									#	foo:
+									# with nothing under it
+									$data->{$k} = undef;
+									next;
+								}
 								next if($v =~ /^".+"$/);	# Quotes to keep in one field
 								if($v =~ /,/) {
 									my @vals = split(/\s*,\s*/, $v);
@@ -720,6 +739,29 @@ sub get
 		}
 	}
 	return $ref;
+}
+
+=head2 exists(key)
+
+Does a configuration value using dotted key notation (e.g., C<'database.user'>) exist?
+Returns 0 or 1.
+
+=cut
+
+sub exists
+{
+	my ($self, $key) = @_;
+
+	if($self->{flatten}) {
+		return exists($self->{config}{$key});
+	}
+	my $ref = $self->{'config'};
+	for my $part (split qr/\Q$self->{sep_char}\E/, $key) {
+		return 0 unless ref $ref eq 'HASH';
+		return 0 if(!exists($ref->{$part}));
+		$ref = $ref->{$part};
+	}
+	return 1;
 }
 
 =head2 all()
@@ -911,7 +953,7 @@ Merging replaces entire nested hashes unless you enable deep merging.
 
 Keys explicitly set to C<undef> in a later source override earlier values.
 
-=item * Environrment
+=item * Environment
 
 When using environment variables,
 remember that double underscores (__) create nested structures,
@@ -953,6 +995,8 @@ You can find documentation for this module with the perldoc command.
 =item * L<Log::Abstraction>
 
 =item * Test Dashboard L<https://nigelhorne.github.io/Config-Abstraction/coverage/>
+
+=item * Development version on GitHub L<https://github.com/nigelhorne/Config-Abstraction>
 
 =back
 

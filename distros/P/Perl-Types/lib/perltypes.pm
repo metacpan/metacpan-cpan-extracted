@@ -1,6 +1,6 @@
 # [[[ HEADER ]]]
 ## no critic qw(Capitalization ProhibitMultiplePackages ProhibitReusedNames)  # SYSTEM DEFAULT 3: allow multiple & lower case package names
-package perltypes;  # creating the first useful Perl pragma in decades, you're welcome!
+package perltypes;  # creating the first useful Perl pragmas in decades, you're welcome!
 use strict;
 use warnings;
 use Perl::Config;

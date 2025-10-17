@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::RemoveCharactersByPosition;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**TheFirstNCharacters** | **int** | This property allows access to a public integer named "TheFirstNCharacters" for getting and setting its value. |
+**TheFirstNCharacters** | **int** |  |
 **TheLastNCharacters** | **int** |  |
 **AllCharactersBeforeText** | **string** |  |
 **AllCharactersAfterText** | **string** |  |  

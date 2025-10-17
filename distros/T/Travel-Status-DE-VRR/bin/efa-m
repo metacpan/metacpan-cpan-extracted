@@ -4,7 +4,7 @@ use warnings;
 use 5.010;
 use utf8;
 
-our $VERSION = '3.16';
+our $VERSION = '3.17';
 
 binmode( STDOUT, ':encoding(utf-8)' );
 
@@ -16,7 +16,6 @@ use Travel::Status::DE::EFA;
 
 my $service = 'VRR';
 my $efa_url;
-my $efa_encoding;
 my $use_cache = 1;
 my $cache;
 my ( $json_output, $raw_json_output );
@@ -159,8 +158,7 @@ elsif ($service) {
 		);
 		exit 1;
 	}
-	$efa_encoding = $service_ref->{encoding};
-	$efa_url      = undef;
+	$efa_url = undef;
 }
 
 sub new_efa {
@@ -171,7 +169,6 @@ sub new_efa {
 		cache          => $cache,
 		date           => $date,
 		developer_mode => $developer_mode,
-		efa_encoding   => $efa_encoding,
 		full_routes    => $full_routes,
 		place          => $place,
 		name           => $input,
@@ -636,7 +633,7 @@ B<efa-m> [B<-s> I<service>] I<tripid>
 
 =head1 VERSION
 
-version 3.16
+version 3.17
 
 =head1 DESCRIPTION
 

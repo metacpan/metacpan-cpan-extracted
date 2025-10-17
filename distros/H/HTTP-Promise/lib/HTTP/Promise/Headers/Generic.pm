@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise/Headers/Generic.pm
-## Version v0.1.2
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v0.1.3
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/05/06
-## Modified 2025/08/30
+## Modified 2025/10/15
 ## All rights reserved.
 ## 
 ## 
@@ -21,7 +21,7 @@ BEGIN
     use vars qw( $VERSION $QV_ELEMENT $QV_VALUE );
     use Encode ();
     use URI::Escape::XS ();
-    use Want;
+    use Wanted;
     use overload (
         '""'    => 'as_string',
         'bool'  => sub{1},
@@ -30,7 +30,7 @@ BEGIN
     # Accept: audio/*; q=0.2, audio/basic
     our $QV_ELEMENT = qr/(?:[^\;\,]+)/;
     our $QV_VALUE   = qr/(?:0(?:\.[0-9]{0,3})?|1(?:\.0{0,3})?)/;
-    our $VERSION = 'v0.1.2';
+    our $VERSION = 'v0.1.3';
 };
 
 use strict;
@@ -700,7 +700,7 @@ HTTP::Promise::Headers::Generic - Generic HTTP Header Class
 
 =head1 VERSION
 
-    v0.1.2
+    v0.1.3
 
 =head1 DESCRIPTION
 

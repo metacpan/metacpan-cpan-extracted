@@ -1,0 +1,5 @@
+# 'debianfile' serves as a list of items to be installed by Debian's `apt-get`;
+# all Debian dependencies should be listed in this file using a plain-text file format
+
+# needed for `test` command; PLACEHOLDER, REPLACE WITH YOUR ACTUAL DEBIAN DEPENDENCIES
+coreutils

@@ -8,7 +8,6 @@
 # <<< EXECUTE_SUCCESS: "have $row_3_column_0_separated = 9" >>>
 
 # [[[ HEADER ]]]
-#use perltypes;
 use strict;
 use warnings;
 use types;

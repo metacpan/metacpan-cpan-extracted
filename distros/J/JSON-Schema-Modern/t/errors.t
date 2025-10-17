@@ -53,6 +53,17 @@ subtest 'multiple types' => sub {
     },
     'result object serializes correctly',
   );
+
+  cmp_result(
+    my $e = ($result->errors)[0]->clone(error => 'oh noes'),
+    methods(
+      instance_location => '',
+      keyword_location => '/type',
+      absolute_keyword_location => undef,
+      error => 'oh noes',
+    ),
+    'cloning leaves absolute_keyword_location as-is',
+  );
 };
 
 subtest 'multipleOf' => sub {
@@ -1360,42 +1371,9 @@ subtest 'numbers in output' => sub {
   );
 };
 
-subtest 'effective_base_uri and overriding starting locations' => sub {
-  cmp_result(
-    $js->evaluate(
-      5,
-      {
-        '$id' => 'foo',
-        '$defs' => { bar => false },
-        '$ref' => '#/$defs/bar',
-        not => true,
-      },
-      {
-        effective_base_uri => 'https://example.com',
-      },
-    )->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          instanceLocation => '',
-          keywordLocation => '/$ref',
-          absoluteKeywordLocation => 'https://example.com/foo#/$defs/bar',
-          error => 'subschema is false',
-        },
-        {
-          instanceLocation => '',
-          keywordLocation => '/not',
-          absoluteKeywordLocation => 'https://example.com/foo#/not',
-          error => 'subschema is true',
-        },
-      ],
-    },
-    'error locations are relative to the effective_base_uri, but $ref usage is not restricted',
-  );
-
+subtest 'overriding starting locations' => sub {
   # evaluating this document from its root would do nothing, as it is only definitions
-  $js->add_schema('/api', {
+  my $doc = $js->add_schema('/api', my $schema = {
     '$defs' => {
       alpha => {
         items => {
@@ -1407,15 +1385,15 @@ subtest 'effective_base_uri and overriding starting locations' => sub {
       },
     },
   });
+  $js->add_document('https://example.com/api', $doc);
 
   cmp_result(
     $js->evaluate(
       [ 5 ],
-      '/api#/$defs/alpha',
+      'https://example.com/api#/$defs/alpha',
       {
         data_path => '/html/body/div/div/h1/div/p',     # reported data location
         traversed_keyword_path => '/some/other/document/$ref',   # reported keywords passed through before we start
-        effective_base_uri => 'https://example.com',    # base uri to use for document locations
       },
     )->TO_JSON,
     {
@@ -1435,7 +1413,7 @@ subtest 'effective_base_uri and overriding starting locations' => sub {
         },
       ],
     },
-    'can alter locations with data_path, traversed_keyword_path, effective_base_uri',
+    'can alter locations with data_path, traversed_keyword_path, and add_schema()',
   );
 };
 
@@ -1495,6 +1473,15 @@ subtest 'recommended_response' => sub {
     $result3->recommended_response,
     [ 401, 'Unauthorized' ],
     'recommended_response uses the one from the error that is explicitly set',
+  );
+
+  cmp_result(
+    my $e = ($result3->errors)[-1]->clone(error => 'oh noes'),
+    methods(
+      error => 'oh noes',
+      recommended_response => [ 401, 'Unauthorized' ],
+    ),
+    'cloning copies recommended_response',
   );
 };
 

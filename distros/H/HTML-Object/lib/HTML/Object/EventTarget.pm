@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/EventTarget.pm
-## Version v0.2.2
+## Version v0.3.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/11
-## Modified 2022/11/11
+## Modified 2025/10/16
 ## All rights reserved
 ## 
 ## 
@@ -23,11 +23,11 @@ BEGIN
     use vars qw( $PACK_SUB_RE $SIGNALS $VERSION );
     use HTML::Object::EventListener;
     use Scalar::Util ();
-    use Want;
+    use Wanted;
     our $PACK_SUB_RE = qr/^(((?<pack>[a-zA-Z\_]\w*(?:\:\:\w+)*)\:\:)?(?<sub>\w+))$/;
     # Hash reference of signal to array of object to remove their listeners
     our $SIGNALS = {};
-    our $VERSION = 'v0.2.2';
+    our $VERSION = 'v0.3.0';
 };
 
 use strict;
@@ -466,7 +466,7 @@ HTML::Object::EventTarget - HTML Object Event Target Class
 
 =head1 VERSION
 
-    v0.2.2
+    v0.3.0
 
 =head1 DESCRIPTION
 

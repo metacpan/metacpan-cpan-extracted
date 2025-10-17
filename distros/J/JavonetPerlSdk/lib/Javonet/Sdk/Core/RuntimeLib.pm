@@ -16,7 +16,7 @@ my %runtimes = (
     'Nodejs'    => 7,
     'Cpp'       => 8,
     'Php'       => 9,
-    'Python2'   => 10
+    'Python27'   => 10
 );
 
 sub get_runtime {

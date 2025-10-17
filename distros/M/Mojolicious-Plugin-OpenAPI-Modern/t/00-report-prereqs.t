@@ -65,7 +65,8 @@ my @include = qw(
   JSON::PP
   Module::Runtime
   Sub::Name
-  YAML
+  YAML::PP
+  YAML::XS
   autodie
   JSON::PP
   Cpanel::JSON::XS

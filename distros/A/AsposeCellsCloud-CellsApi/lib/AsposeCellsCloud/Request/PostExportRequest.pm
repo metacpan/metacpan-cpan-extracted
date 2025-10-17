@@ -129,7 +129,9 @@ sub run_http_request {
     my $_body_data;
 
 
-    $form_params->{basename($self->file)} = [$self->file ,basename($self->file),'application/octet-stream'];
+    if (defined $self->file) {   
+        $form_params->{basename($self->file)} = [$self->file ,basename($self->file),'application/octet-stream'];
+    }
  
 
     # authentication setting, if any

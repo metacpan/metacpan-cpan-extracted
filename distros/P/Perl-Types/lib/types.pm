@@ -8,15 +8,14 @@
 #   The GNU General Public License, Version 3, June 2007
 #
 # [[[ HEADER ]]]
-# ABSTRACT: the Perl data type system
-package types;
+package types;  # creating the first useful Perl pragmas in decades, you're welcome!
 use strict;
 use warnings;
 use Perl::Config;
 our $VERSION = 0.007_000;
 
 # [[[ INCLUDES ]]]
-# DEV NOTE: `use types;` is just a shortened syntax-sugar wrapper around the `use perltypes;` pragma
+# DEV NOTE: "use types;" is just a shortened syntax-sugar wrapper around the "use perltypes;" pragma
 use perltypes;
 
 # [[[ EXPORTS ]]]

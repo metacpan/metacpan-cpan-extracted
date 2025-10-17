@@ -7,6 +7,7 @@
 #
 #   The GNU General Public License, Version 3, June 2007
 #
+# ABSTRACT: the Perl OO base class
 # [[[ HEADER ]]]
 package Perl::Class;
 use strict;

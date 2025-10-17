@@ -1,0 +1,34 @@
+Key: uploadKeyType, Value: CONTACT_INFO
+Key: crmBasedUserList, Value: Google::Ads::GoogleAds::V15::Common::CrmBasedUserListInfo=HASH(0x5617ccd0f9f0)
+Key: name, Value: Customer Match list #jcKczRvndO2t
+Key: description, Value: A list of customers that originated from email and physical addresses
+Key: membershipLifeSpan, Value: 30
+Key: create, Value: Google::Ads::GoogleAds::V15::Resources::UserList=HASH(0x5617cbf1bba0)
+HASH(0x5617cce2b540)HASH(0x5617ccdb3358)HASH(0x5617ccdb3370)User list with resource name 'customers/7421427762/userLists/8460691552' was created.
+Key: userList, Value: customers/7421427762/userLists/8460691552
+Key: consent, Value: 
+Key: customerMatchUserListMetadata, Value: Google::Ads::GoogleAds::V15::Common::CustomerMatchUserListMetadata=HASH(0x5617ccdd6d08)
+Key: type, Value: CUSTOMER_MATCH_USER_LIST
+HASH(0x5617cd5b1fa0)HASH(0x5617cd5b1a18)Created an offline user data job with resource name: 'customers/7421427762/offlineUserDataJobs/34328195353'.
+Key: hashedEmail, Value: 07e2f1394b0ea80e2adca010ea8318df697001a005ba7452720edda4b0ce57b3
+Key: hashedEmail, Value: 61d6c2976b5d92b1ad63073a12fddd26040cd980067d03a93dd1cc50f1a3ac68
+Key: userIdentifiers, Value: ARRAY(0x5617cd5b1fa0)
+Key: create, Value: Google::Ads::GoogleAds::V15::Common::UserData=HASH(0x5617cd62c9e8)
+Key: hashedEmail, Value: 97a24240e3c76dfc0abdb63a3d73468ff8d94b81fd3dc084cc32994ba4fad7fe
+Key: hashedEmail, Value: c5383c2eeada28210d27f011bc127d4f9562cf38ff0c9bba33dd45ae79b9fe7c
+Key: postalCode, Value: 94045
+Key: hashedLastName, Value: c512ca0c5c1e71be19f3356821e56732b5fb3ac894b0dbc5846d0b6920106fb3
+Key: hashedFirstName, Value: 4135aa9dc1b842a653dea846903ddb95bfb8c5a10c504a7fa16e10bc31d1fdf0
+Key: countryCode, Value: US
+Key: addressInfo, Value: Google::Ads::GoogleAds::V15::Common::OfflineUserAddressInfo=HASH(0x5617cd62cc88)
+Key: userIdentifiers, Value: ARRAY(0x5617cd62c9a0)
+Key: create, Value: Google::Ads::GoogleAds::V15::Common::UserData=HASH(0x5617cd62ce68)
+Key: hashedEmail, Value: add7232b65bb559f896cbcfa9a600170a7ca381a0366789dcf59ad986bdf4a98
+Key: userIdentifiers, Value: ARRAY(0x5617cd630828)
+Key: create, Value: Google::Ads::GoogleAds::V15::Common::UserData=HASH(0x5617cd62d330)
+HASH(0x5617cd5b1a18)HASH(0x5617cd6ec820)HASH(0x5617cd8716e0)HASH(0x5617cd8716e0)HASH(0x5617cd5b1a18)HASH(0x5617cd6ec820)HASH(0x5617cd8716e0)HASH(0x5617cd8716e0)HASH(0x5617cd8716e0)HASH(0x5617cd4e3070)HASH(0x5617cd5b1a18)HASH(0x5617cd6ec820)HASH(0x5617cd8716e0)Successfully added 3 operations to the offline user data job.
+Not running offline user data job customers/7421427762/offlineUserDataJobs/34328195353, as requested.
+Key: customerId, Value: 7421427762
+Key: query, Value: SELECT user_list.size_for_display, user_list.size_for_search FROM user_list WHERE user_list.resource_name = 'customers/7421427762/userLists/8460691552'
+HASH(0x5617ccf10250)The estimated number of users that the user list 'customers/7421427762/userLists/8460691552' has is 0 for Display and 0 for Search.
+Reminder: It may take several hours for the user list to be populated with the users so getting zeros for the estimations is expected.

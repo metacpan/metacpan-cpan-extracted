@@ -19,6 +19,7 @@ lib/Graphics/Penplotter/GcodeXY.pm
 minil.toml
 script/gcode-simulator.pl
 script/manifest-gen.sh
+script/svgtogcode
 script/template.pl
 t/00_compile.t
 t/01-gcode.t

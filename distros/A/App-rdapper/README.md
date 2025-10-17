@@ -1,24 +1,6 @@
 # NAME
 
-App::rdapper - a simple console-based [RDAP](https://about.rdap.org) client.
-
-# INSTALLATION
-
-To install, run:
-
-    cpanm --sudo App::rdapper
-
-# RUNNING VIA DOCKER
-
-The [git repository](https://github.com/gbxyz/rdapper) contains a
-`Dockerfile` that can be used to build an image on your local system.
-
-Alternatively, you can pull the [image from Docker
-Hub](https://hub.docker.com/r/gbxyz/rdapper):
-
-    $ docker pull gbxyz/rdapper
-
-    $ docker run -it gbxyz/rdapper --help
+App::rdapper - a command-line [RDAP](https://about.rdap.org) client.
 
 # SYNOPSIS
 
@@ -40,10 +22,8 @@ Examples:
 
 # DESCRIPTION
 
-`rdapper` is a simple RDAP client. It uses [Net::RDAP](https://metacpan.org/pod/Net%3A%3ARDAP) to retrieve data about
-internet resources (domain names, IP addresses, and autonymous systems) and
-outputs the information in a human-readable format. If you want to consume this
-data in your own program you should use [Net::RDAP](https://metacpan.org/pod/Net%3A%3ARDAP) directly.
+`rdapper` retrieves data about internet resources (domain names, IP addresses,
+and autonymous systems) and outputs the information in a human-readable format.
 
 # OPTIONS
 
@@ -140,7 +120,26 @@ arguments the program runs with. So if it contained
     --short
     --bypass-cache
 
-Then running `rdapper EXAMPLE.COM` will behave like `rdapper EXAMPLE.COM --short --bypass-cache`.
+Then running `rdapper EXAMPLE.COM` will behave like
+`rdapper EXAMPLE.COM --short --bypass-cache`.
+
+# INSTALLATION
+
+To install, run:
+
+    cpanm --sudo App::rdapper
+
+# RUNNING VIA DOCKER
+
+The [git repository](https://github.com/gbxyz/rdapper) contains a
+`Dockerfile` that can be used to build an image on your local system.
+
+Alternatively, you can pull the [image from Docker
+Hub](https://hub.docker.com/r/gbxyz/rdapper):
+
+    $ docker pull gbxyz/rdapper
+
+    $ docker run -it gbxyz/rdapper --help
 
 # COPYRIGHT & LICENSE
 

@@ -1,5 +1,9 @@
 Revision history for Object::Configure - Runtime Configuration for an Object
 
+0.16	Thu Oct 16 19:10:49 EDT 2025
+	Set croak_on_error
+	Latest testing console
+
 0.15	Wed Sep 17 07:28:24 EDT 2025
 	Allow the logger to be NULL, in which case nothing is set up
 	Scalar::Utils was used but not imported

@@ -1,0 +1,42 @@
+# medium severity "harsh", achievable with good discipline and the disable policies below
+severity = 3
+# almost maximum verbosity
+verbose = 8
+
+# USER DEFAULT 1: allow numeric values & print operator
+[-Miscellanea::ProhibitUselessNoCritic]
+[-ValuesAndExpressions::ProhibitMagicNumbers]
+[-InputOutput::RequireCheckedSyscalls]
+
+# USER DEFAULT 2: allow single-quoted control characters & sigils
+[-ValuesAndExpressions::RequireInterpolationOfMetachars]
+
+# USER DEFAULT 3: allow constants
+[-ValuesAndExpressions::ProhibitConstantPragma]
+[-ValuesAndExpressions::ProhibitMagicNumbers]
+
+# USER DEFAULT 4: allow <STDIN> prompt
+[-InputOutput::ProhibitExplicitStdin]
+
+# USER DEFAULT 5: allow open() in perltidy-expanded code
+[-InputOutput::RequireBriefOpen]
+
+# USER DEFAULT 6: allow C-style for() loop headers
+[-ControlStructures::ProhibitCStyleForLoops]
+
+# USER DEFAULT 7: allow explicit parens, provides clearer order-of-operations
+[-CodeLayout::ProhibitParensWithBuiltins]
+
+# USER DEFAULT 8: allow multiple packages within a single file
+[-Modules::ProhibitMultiplePackages]
+[-Variables::ProhibitReusedNames]
+[-Variables::ProhibitPackageVars]
+
+# USER DEFAULT 9: allow long conditional chains
+[-ControlStructures::ProhibitCascadingIfElse]
+
+# USER DEFAULT 10: allow lists ('of', 'quoted', 'words')
+[-CodeLayout::ProhibitQuotedWordLists]
+
+# USER DEFAULT 11: no trailing commas in our Perl lists
+[-CodeLayout::RequireTrailingCommas]

@@ -8,7 +8,7 @@ use Sys::Hostname qw(hostname);
 use IPC::Open3    qw(open3);
 use Symbol        qw(gensym);
 use IO::Select;
-use Time::HiRes;
+use Time::HiRes qw(time);
 
 =head1 NAME
 
@@ -16,11 +16,11 @@ Monitoring::Sneck - a boopable LibreNMS JSON style SNMP extend for remotely runn
 
 =head1 VERSION
 
-Version 1.1.0
+Version 1.2.0
 
 =cut
 
-our $VERSION = '1.1.0';
+our $VERSION = '1.2.0';
 
 =head1 SYNOPSIS
 
@@ -191,9 +191,12 @@ This is meant to be rock solid and always work, meaning LibreNMS
 style JSON is always returned(provided Perl and the other modules
 are working).
 
+If 'debug' is true, when run is called, debugging info will be
+printed.
+
     my $sneck;
     eval{
-        $sneck=Monitoring::Sneck->new({config=>$file}, include=>0);
+        $sneck=Monitoring::Sneck->new({config=>$file, include=>0, debug=>0});
     };
     if ($@){
         die($@);
@@ -232,6 +235,7 @@ sub new {
 		checks => {},
 		vars   => {},
 		good   => 1,
+		debug  => 0,
 	};
 	bless $self;
 
@@ -250,6 +254,10 @@ sub new {
 		&& $args{include} )
 	{
 		$self->{to_return}{data}{config} = $config_raw;
+	}
+
+	if ( defined( $args{debug} ) ) {
+		$self->{debug} = $args{debug};
 	}
 
 	# split the file and ignore any comments
@@ -352,9 +360,15 @@ sub run {
 	my $self = $_[0];
 
 	my $run_start_time = Time::HiRes::time;
+	if ( $self->{debug} ) {
+		warn( 'run started at ' . $run_start_time );
+	}
 
 	# if something went wrong with new, just return
 	if ( !$self->{good} ) {
+		if ( $self->{debug} ) {
+			warn('$self->{good} false... returning $self->{to_return}');
+		}
 		return $self->{to_return};
 	}
 
@@ -362,18 +376,28 @@ sub run {
 	$self->{to_return}{data}{time} = time;
 
 	my @vars   = keys( %{ $self->{vars} } );
-	my @checks = keys( %{ $self->{checks} } );
+	my @checks = sort( keys( %{ $self->{checks} } ) );
 	foreach my $name (@checks) {
 		my $check_start_time = Time::HiRes::time;
+		if ( $self->{debug} ) {
+			warn( $name . ' processing started at ' . $check_start_time );
+		}
 
 		my $type = 'checks';
 		if ( $name =~ /^\%/ ) {
 			$type = 'debugs';
 		}
+		if ( $self->{debug} ) {
+			warn( $name . ' is of type ' . $type );
+		}
 
 		my $check = $self->{checks}{$name};
 		$name =~ s/^\%//;
 		$self->{to_return}{data}{$type}{$name} = { check => $check };
+
+		if ( $self->{debug} ) {
+			warn( $name . ' check string: "' . $check . '"' );
+		}
 
 		# put the variables in place
 		foreach my $var_name (@vars) {
@@ -381,8 +405,14 @@ sub run {
 			$check =~ s/%+$var_name%+/$value/g;
 		}
 		$self->{to_return}{data}{$type}{$name}{ran} = $check;
+		if ( $self->{debug} ) {
+			warn( $name . ' check string post variable replacement: "' . $check . '"' );
+		}
 
 		my $check_pid = open3( my $std_in, my $std_out, my $std_err = gensym, $check );
+		if ( $self->{debug} ) {
+			warn( $name . ' open3 called' );
+		}
 
 		my $s = IO::Select->new();
 		$s->add($std_out);
@@ -396,6 +426,10 @@ sub run {
 					$s->remove($handle);
 				}
 			}
+		}
+
+		if ( $self->{debug} ) {
+			warn( $name . ' IO::Select for open3 done... output is... "' . $output . '"' );
 		}
 
 		# call wait pid so we can get the exit code
@@ -420,46 +454,79 @@ sub run {
 		}
 		$self->{to_return}{data}{$type}{$name}{exit} = $exit_code;
 
+		if ( $self->{debug} ) {
+			warn( $name . ' exit code is ' . $exit_code );
+		}
+
 		# anything other than 0, 1, 2, or 3 is a error
 		if ( $type eq 'checks' ) {
 			if ( $self->{to_return}{data}{checks}{$name}{exit} == 0 ) {
 				$self->{to_return}{data}{ok}++;
+				if ( $self->{debug} ) {
+					warn( $name . ' is ok' );
+				}
 			} elsif ( $self->{to_return}{data}{checks}{$name}{exit} == 1 ) {
 				$self->{to_return}{data}{warning}++;
 				$self->{to_return}{data}{alert} = 1;
+				if ( $self->{debug} ) {
+					warn( $name . ' is warning' );
+				}
 			} elsif ( $self->{to_return}{data}{checks}{$name}{exit} == 2 ) {
 				$self->{to_return}{data}{critical}++;
 				$self->{to_return}{data}{alert} = 1;
+				if ( $self->{debug} ) {
+					warn( $name . ' is critical' );
+				}
 			} elsif ( $self->{to_return}{data}{checks}{$name}{exit} == 3 ) {
 				$self->{to_return}{data}{unknown}++;
 				$self->{to_return}{data}{alert} = 1;
+				if ( $self->{debug} ) {
+					warn( $name . ' is unknown' );
+				}
 			} else {
 				$self->{to_return}{data}{errored}++;
 				$self->{to_return}{data}{alert} = 1;
+				if ( $self->{debug} ) {
+					warn( $name . ' is errored' );
+				}
 			}
 
 			# add it to the alert string if it is a warning
 			if ( $exit_code == 1 || $exit_code == 2 || $exit_code == 3 ) {
 				$self->{to_return}{data}{alertString}
-				  = $self->{to_return}{data}{alertString} . $self->{to_return}{data}{checks}{$name}{output} . "\n";
+					= $self->{to_return}{data}{alertString} . $self->{to_return}{data}{checks}{$name}{output} . "\n";
 			}
 		} ## end if ( $type eq 'checks' )
 
 		# figure out how long the run took
-		my $check_stop_time=Time::HiRes::time;
+		my $check_stop_time = Time::HiRes::time;
+		if ( $self->{debug} ) {
+			warn( $name . ' finished at ' . $check_stop_time );
+		}
 		my $check_time = $check_stop_time - $check_start_time;
 		# round to the 9th place to avoid scientific notation
-		$self->{to_return}{data}{$type}{$name}{run_time} = sprintf('%.9f', $check_time);
+		$self->{to_return}{data}{$type}{$name}{run_time} = sprintf( '%.9f', $check_time );
 	} ## end foreach my $name (@checks)
 
 	$self->{to_return}{data}{vars} = $self->{vars};
 
 	# figure out how long the run took
-	my $run_stop_time=Time::HiRes::time;
-	my $run_time = $run_stop_time - $run_start_time;
-	# round to the 9th place to avoid scientific notation
-	$self->{to_return}{data}{run_time} = sprintf('%.9f', $run_time);
+	my $run_stop_time = Time::HiRes::time;
+	if ( $self->{debug} ) {
+		warn( 'run finished at ' . $run_stop_time );
+	}
 
+	my $run_time = $run_stop_time - $run_start_time;
+	if ( $self->{debug} ) {
+		warn( 'run time was ' . $run_time );
+	}
+
+	# round to the 9th place to avoid scientific notation
+	$self->{to_return}{data}{run_time} = sprintf( '%.9f', $run_time );
+
+	if ( $self->{debug} ) {
+		warn('run is returning now');
+	}
 	return $self->{to_return};
 } ## end sub run
 

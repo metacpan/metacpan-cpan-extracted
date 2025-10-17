@@ -4,13 +4,13 @@
       "Samuel Young <samyoung12788@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "WWW-Noss",
    "no_index" : {
@@ -42,7 +42,7 @@
             "File::Temp" : "0.10",
             "Getopt::Long" : "0",
             "JSON" : "0",
-            "List::Util" : "1.33",
+            "List::Util" : "1.45",
             "POSIX" : "0",
             "Parallel::ForkManager" : "v0.7.6",
             "Pod::Usage" : "0",
@@ -70,5 +70,6 @@
          "web" : "https://codeberg.org/1-1sam/noss"
       }
    },
-   "version" : "1.09"
+   "version" : "1.10",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

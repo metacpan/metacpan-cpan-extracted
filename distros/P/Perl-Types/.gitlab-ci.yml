@@ -1,4 +1,5 @@
 ---
+# v0.100_000
 # enable standard stages
 stages:
   - .pre
@@ -31,7 +32,10 @@ linux-perl-docker-base-build:
     - changes:
         - .gitlab-ci.yml # base image's 'Dockerfile' is called by `docker build`, so yes need to rebuild on changes here
         - Dockerfile # base image's 'Dockerfile' configures Docker build, so yes need to rebuild on changes there
+        - debianfile # base image's 'Dockerfile' does call `apt-get`, so yes need to rebuild on 'debianfile' changes
         - cpanfile   # base image's 'Dockerfile' does call `cpanm`, so yes need to rebuild on 'cpanfile' changes
+        - pythonfile # base image's 'Dockerfile' does call `pip`, so yes need to rebuild on 'pythonfile' changes
+        - rubyfile   # base image's 'Dockerfile' does call `gem`, so yes need to rebuild on 'rubyfile' changes
 #        - dist.ini  # base image's 'Dockerfile' does NOT call `dzil`, so no need to rebuild on 'dist.ini' changes
     # OR on release tags, so Docker base image is freshly rebuilt for each release
     - if: '$CI_COMMIT_TAG =~ /^v?\d+\.\d+(\.\d+)?$/'
@@ -163,9 +167,10 @@ linux-perl-test:
 
     # testing via `prove` works;
     # use TAP::Harness::JUnit to format Perl test output into GitLab-compatible XML 'junit.xml' file;
+    # include both 't/' and 'xt/' test directories;
     # DEV NOTE: explicitly pass '_build-dir/lib' rather than adding to PERL5LIB, to avoid possible version conflicts etc
     - export JUNIT_OUTPUT_FILE=$CI_PROJECT_DIR/junit.xml
-    - prove --harness TAP::Harness::JUnit -I _build-dir/lib -v -r t/
+    - prove --harness TAP::Harness::JUnit -I _build-dir/lib --verbose --recurse t/ xt/
 
     # testing via `perl` works, but prefer `prove` as it is the standard practice
 #    - perl -I _build-dir/lib t/00_foo.t
@@ -209,7 +214,7 @@ linux-perl-cover:
     # DEV NOTE: since we cd into '_build-dir/' before executing the `prove` command, we can specify the 'cover_db'
     # path directly without the '_build-dir/' prefix; the path will be relative to the new current directory
     - cd _build-dir/
-    - HARNESS_PERL_SWITCHES="-MDevel::Cover=-db,cover_db,-ignore_re,^t/,-silent,0" prove -Ilib -r . || true
+    - HARNESS_PERL_SWITCHES="-MDevel::Cover=-db,cover_db,-ignore_re,^t/,-silent,0" prove -Ilib --recurse . || true
     # call `cover` command to generate XML (machine-readable) & HTML (human-readable) reports
     - cover -report cobertura
     - cover -report html

@@ -6,8 +6,10 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
   File::Temp: '0'
+  File::stat: '0'
   IO::Handle: '0'
   IPC::System::Simple: '0'
+  POSIX: '0'
   Readonly: '0'
   Test::DescribeMe: '0'
   Test::Most: '0'
@@ -31,16 +33,16 @@ no_index:
     - inc
 requires:
   Carp: '0'
-  Config::Abstraction: '0.32'
+  Config::Abstraction: '0.36'
   ExtUtils::MakeMaker: '6.64'
-  Log::Abstraction: '0.25'
+  Log::Abstraction: '0.26'
   Params::Get: '0.13'
   Return::Set: '0'
   Scalar::Util: '0'
   perl: '5.008'
 resources:
-  bugtracker: https://github.com/nigelhorne/Object-Configure/issues
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Object-Configure
   homepage: https://metacpan.org/pod/Object::Configure
   repository: git://github.com/nigelhorne/Object-Configure.git
-version: 0.15
+version: 0.16
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

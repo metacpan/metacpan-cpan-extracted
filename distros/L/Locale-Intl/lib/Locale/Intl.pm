@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Locale Intl - ~/lib/Locale/Intl.pm
-## Version v0.2.0
+## Version v0.3.0
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/09/16
-## Modified 2025/04/20
+## Modified 2025/10/16
 ## All rights reserved
 ## 
 ## 
@@ -21,8 +21,8 @@ BEGIN
     use parent qw( Locale::Unicode );
     use vars qw( $VERSION $ERROR $DEBUG );
     use Locale::Unicode::Data;
-    use Want;
-    our $VERSION = 'v0.2.0';
+    use Wanted;
+    our $VERSION = 'v0.3.0';
 };
 
 use strict;
@@ -131,7 +131,7 @@ sub baseName
         return( $core );
     }
     # Otherwise, as per the specs, we return undef
-    if( Want::want( 'OBJECT' ) )
+    if( want( 'OBJECT' ) )
     {
         return( Locale::Intl::NullObject->new );
     }
@@ -152,7 +152,7 @@ sub calendar
         return( $col );
     }
     # Otherwise, as per the specs, we return undef
-    if( Want::want( 'OBJECT' ) )
+    if( want( 'OBJECT' ) )
     {
         return( Locale::Intl::NullObject->new );
     }
@@ -167,7 +167,7 @@ sub caseFirst
         return( $cf );
     }
     # Otherwise, as per the specs, we return undef
-    if( Want::want( 'OBJECT' ) )
+    if( want( 'OBJECT' ) )
     {
         return( Locale::Intl::NullObject->new );
     }
@@ -188,7 +188,7 @@ sub collation
         return( $col );
     }
     # Otherwise, as per the specs, we return undef
-    if( Want::want( 'OBJECT' ) )
+    if( want( 'OBJECT' ) )
     {
         return( Locale::Intl::NullObject->new );
     }
@@ -212,11 +212,11 @@ sub error
         else
         {
             warn( $msg ) if( warnings::enabled() );
-            if( Want::want( 'ARRAY' ) )
+            if( want( 'ARRAY' ) )
             {
                 rreturn( [] );
             }
-            elsif( Want::want( 'OBJECT' ) )
+            elsif( want( 'OBJECT' ) )
             {
                 rreturn( Locale::Intl::NullObject->new );
             }
@@ -511,7 +511,7 @@ sub hourCycle
         return( $hc );
     }
     # Otherwise, as per the specs, we return undef
-    if( Want::want( 'OBJECT' ) )
+    if( want( 'OBJECT' ) )
     {
         return( Locale::Intl::NullObject->new );
     }
@@ -542,7 +542,7 @@ sub language
     {
         return( $loc );
     }
-    if( Want::want( 'OBJECT' ) )
+    if( want( 'OBJECT' ) )
     {
         return( Locale::Intl::NullObject->new );
     }
@@ -720,7 +720,7 @@ sub numberingSystem
         return( $num );
     }
 
-    if( Want::want( 'OBJECT' ) )
+    if( want( 'OBJECT' ) )
     {
         return( Locale::Intl::NullObject->new );
     }
@@ -735,7 +735,7 @@ sub numeric
         return( $bool ? Locale::Intl::Boolean->true : Locale::Intl::Boolean->false );
     }
 
-    if( Want::want( 'OBJECT' ) )
+    if( want( 'OBJECT' ) )
     {
         return( Locale::Intl::NullObject->new );
     }
@@ -808,7 +808,7 @@ sub pass_error
         return( $self->error( @_ ) );
     }
     
-    if( Want::want( 'OBJECT' ) )
+    if( want( 'OBJECT' ) )
     {
         rreturn( Locale::Intl::NullObject->new );
     }
@@ -828,7 +828,7 @@ sub region
         return( $rg );
     }
 
-    if( Want::want( 'OBJECT' ) )
+    if( want( 'OBJECT' ) )
     {
         return( Locale::Intl::NullObject->new );
     }
@@ -849,7 +849,7 @@ sub script
         return( $script );
     }
 
-    if( Want::want( 'OBJECT' ) )
+    if( want( 'OBJECT' ) )
     {
         return( Locale::Intl::NullObject->new );
     }
@@ -1161,7 +1161,7 @@ sub TO_JSON
             '""'    => sub{ '' },
             fallback => 1,
         );
-        use Want;
+        use Wanted;
     };
     use strict;
     use warnings;
@@ -1177,7 +1177,7 @@ sub TO_JSON
     {
         my( $method ) = our $AUTOLOAD =~ /([^:]+)$/;
         my $self = shift( @_ );
-        if( Want::want( 'OBJECT' ) )
+        if( want( 'OBJECT' ) )
         {
             rreturn( $self );
         }
@@ -1225,7 +1225,7 @@ Locale::Intl - A Web Intl.Locale Class Implementation
 
 =head1 VERSION
 
-    v0.2.0
+    v0.3.0
 
 =head1 DESCRIPTION
 

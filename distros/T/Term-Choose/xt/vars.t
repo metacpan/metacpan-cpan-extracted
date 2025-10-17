@@ -6,6 +6,8 @@ use Test::Vars tests => $^O eq 'MSWin32'? 13 : 12;
 
 vars_ok( 'lib/Term/Choose/Screen.pm', ignore_vars => [ '$size' ] );
 
+vars_ok( 'lib/Term/Choose/Linux.pm', ignore_vars => [ '$mode_stty' ] ); ##
+
 
 my @modules = qw(
 lib/Term/Choose.pm
@@ -14,7 +16,6 @@ lib/Term/Choose/LineFold.pm
 lib/Term/Choose/LineFold/PP.pm
 lib/Term/Choose/LineFold/PP/CharWidthAmbiguousWide.pm
 lib/Term/Choose/LineFold/PP/CharWidthDefault.pm
-lib/Term/Choose/Linux.pm
 lib/Term/Choose/Opt/Mouse.pm
 lib/Term/Choose/Opt/Search.pm
 lib/Term/Choose/Opt/SkipItems.pm

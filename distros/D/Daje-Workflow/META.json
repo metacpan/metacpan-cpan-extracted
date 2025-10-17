@@ -60,7 +60,7 @@
    "provides" : {
       "Daje::Workflow" : {
          "file" : "lib/Daje/Workflow.pm",
-         "version" : "0.16"
+         "version" : "0.18"
       },
       "Daje::Workflow::Activities" : {
          "file" : "lib/Daje/Workflow/Activities.pm"
@@ -123,7 +123,7 @@
          "web" : "https://github.com/janeskil1525/Daje-Workflow"
       }
    },
-   "version" : "0.16",
+   "version" : "0.18",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

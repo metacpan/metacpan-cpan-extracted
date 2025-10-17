@@ -6,6 +6,8 @@ examples/check_array_object_ok.pl
 examples/check_array_ok.pl
 examples/check_array_required_fail.pl
 examples/check_array_required_ok.pl
+examples/check_array_strings_fail.pl
+examples/check_array_strings_ok.pl
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm
@@ -28,5 +30,6 @@ t/Mo-utils-Array/02-version.t
 t/Mo-utils-Array/03-check_array.t
 t/Mo-utils-Array/04-check_array_object.t
 t/Mo-utils-Array/05-check_array_required.t
+t/Mo-utils-Array/06-check_array_strings.t
 xt/Mo-utils-Array/01-pod_coverage.t
 xt/Mo-utils-Array/02-pod.t

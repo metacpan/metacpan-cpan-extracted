@@ -1,4 +1,4 @@
-package Net::IDN::PP 0.01;
+package Net::IDN::PP 0.02;
 # ABSTRACT: A pure-Perl implementation of the Punycode algorithm for encoding internationalized domain names (IDNs)
 use common::sense;
 
@@ -206,7 +206,7 @@ Net::IDN::PP - A pure-Perl implementation of the Punycode algorithm for encoding
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

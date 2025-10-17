@@ -1,0 +1,47 @@
+---
+abstract: 'Abstract parent class of enum classes'
+author:
+  - 'Sven Willenbuecher <sven.willenbuecher@gmx.de>'
+build_requires:
+  Exporter: '0'
+  ExtUtils::MakeMaker: '0'
+  Test::API: '0'
+  Test::Fatal: '0'
+  Test::Lib: '0'
+  Test::More: '1.001005'
+  parent: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.76'
+  ExtUtils::MakeMaker::CPANfile: '0.09'
+  File::Spec: '0'
+  strict: '0'
+  warnings: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Class-Enumeration
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Class::Enumeration:
+    file: lib/Class/Enumeration.pm
+    version: v1.0.1
+  Class::Enumeration::Builder:
+    file: lib/Class/Enumeration/Builder.pm
+    version: v1.0.1
+requires:
+  Scalar::Util: '0'
+  Sub::Util: '1.40'
+  overload: '0'
+  perl: '5.010001'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/XSven/Class-Enumeration/issues
+  repository: https://github.com/XSven/Class-Enumeration.git
+version: v1.0.1

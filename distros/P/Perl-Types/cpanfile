@@ -16,13 +16,18 @@ on 'develop' => sub {
     requires 'Software::License::GPL_3';
     # DEV NOTE, CORRELATION #gt02: enable the following line for projects using Inline::C, Inline::CPP, or XS
     requires 'Dist::Zilla::Plugin::MakeMaker::Awesome';
+    requires 'Perl::Tidy';     # includes `perltidy`
+    requires 'Perl::Critic';   # includes `perlcritic`
+    requires 'Code::TidyAll';  # includes `tidyall`
+    requires 'Code::TidyAll::Plugin::PerlTidy';
+    requires 'Code::TidyAll::Plugin::PerlCritic';
 
-    # DEV NOTE, CORRELATION #gt03: copy all author dependencies between 'cpanfile' & 't/author/00_depend.t';
-    # used by 't/author/01_changes_lint.t'
+    # DEV NOTE, CORRELATION #gt03: copy all author dependencies between 'cpanfile' & 'xt/author/00_depend.t';
+    # used by 'xt/author/01_changes_lint.t'
     requires 'CPAN::Changes';
     requires 'version';
 
-    # used by 't/author/02_markdown_lint.t'
+    # used by 'xt/author/02_markdown_lint.t'
 # DEV NOTE, CORRELATION #gt05: deps of both author & normal tests must be in 'cpanfile' in both "develop" & "test"
 #    requires 'File::Find';  # dependency from Perl core distribuion, don't actually try to install separately
     requires 'IPC::Run3';
@@ -68,6 +73,7 @@ on 'test' => sub {
 # NEED UPGRADE: migrate from Test to Test2
     requires 'Test2::V0';
 #    requires 'Test2::Tools::Exception';
+    requires 'Test2::Tools::LoadModule';
 #    requires 'Test2::Tools::PerlCritic';
 #    requires 'Test2::Plugin::Cover';
     requires 'Test::More';

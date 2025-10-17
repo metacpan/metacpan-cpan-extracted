@@ -1,5 +1,8 @@
 Revision history for Perl extension Graphics-Penplotter-GcodeXY
 
+v0.5.17 2025-10-14T15:12:44Z
+    - bug fixes
+
 v0.5.16 2025-09-14T10:33:56Z
     - svg test added
     - fixed output bug

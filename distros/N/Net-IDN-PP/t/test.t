@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
-use Test::More;
 use open qw(:std :encoding(UTF-8));
+use Test::More;
 use vars qw(@ENCODE_TESTS @DECODE_TESTS);
 use common::sense;
 

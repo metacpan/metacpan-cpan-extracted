@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Modern
 
-our $VERSION = '0.619';
+our $VERSION = '0.620';
 
 use 5.020;
 use strictures 2;
@@ -65,8 +65,8 @@ use constant _BUILTIN_BOOLS => 0;
 use constant {
   _BUILTIN_BOOLS && HAVE_BUILTIN && eval { +require Storable; Storable->VERSION(3.27); 1 }
       && Mojo::JSON::JSON_XS && eval { Cpanel::JSON::XS->VERSION(4.38); 1 }
-    ? ( true => builtin::true, false => builtin::false )
-    : ( true => JSON::PP::true, false => JSON::PP::false )
+    ? (true => builtin::true, false => builtin::false)
+    : (true => JSON::PP::true, false => JSON::PP::false)
 };
 
 # supports the six core types, plus integer (which is also a number)
@@ -326,7 +326,6 @@ sub canonical_uri ($state, @extra_path) {
 # shorthand for creating error objects
 # uses these keys from $state:
 # - initial_schema_uri
-# - effective_base_uri (optional)
 # - keyword (optional)
 # - data_path
 # - traversed_keyword_path
@@ -348,7 +347,7 @@ sub E ($state, $error_string, @args) {
 
   # we store the absolute uri in unresolved form until needed,
   # and perform the rest of the calculations later.
-  my $uri = [ $state->@{qw(initial_schema_uri keyword_path)}, $state->{keyword}//(), @keyword_path_suffix, $state->{effective_base_uri} ];
+  my $uri = [ $state->@{qw(initial_schema_uri keyword_path)}, $state->{keyword}//(), @keyword_path_suffix ];
 
   my $keyword_location = $state->{traversed_keyword_path}
     .jsonp($state->@{qw(keyword_path keyword)}, @keyword_path_suffix);
@@ -386,7 +385,7 @@ sub A ($state, $annotation) {
 
   # we store the absolute uri in unresolved form until needed,
   # and perform the rest of the calculations later.
-  my $uri = [ $state->@{qw(initial_schema_uri keyword_path keyword effective_base_uri)} ];
+  my $uri = [ $state->@{qw(initial_schema_uri keyword_path keyword)} ];
 
   my $keyword_location = $state->{traversed_keyword_path}.jsonp($state->@{qw(keyword_path keyword)});
 
@@ -398,7 +397,7 @@ sub A ($state, $annotation) {
     # we calculate absolute_keyword_location when instantiating the Annotation object for Result
     _uri => $uri,
     annotation => $annotation,
-    $state->{_unknown} ? ( unknown => 1 ) : (),
+    $state->{_unknown} ? (unknown => 1) : (),
   };
 
   return 1;
@@ -443,7 +442,7 @@ sub assert_uri_reference ($state, $schema) {
   croak 'assert_uri_reference called in void context' if not defined wantarray;
 
   my $string = $schema->{$state->{keyword}};
-  return E($state, '%s value is not a valid uri-reference', $state->{keyword})
+  return E($state, '%s value is not a valid URI-reference', $state->{keyword})
     # see also uri-reference format sub
     if fc(Mojo::URL->new($string)->to_unsafe_string) ne fc($string)
       or $string =~ /[^[:ascii:]]/            # ascii characters only
@@ -490,10 +489,11 @@ sub sprintf_num ($value) {
 
 # returns a reusable Types::Standard type for json pointers
 # TODO: move this off into its own distribution, see JSON::Schema::Types
-use constant json_pointer_type => Str->where('!length || m{^/} && !m{~(?![01])}');
+sub json_pointer_type () { Str->where('!length || m{^/} && !m{~(?![01])}'); }
 
-use constant canonical_uri_type =>
+sub canonical_uri_type () {
   (InstanceOf['Mojo::URL'])->where(q{!defined($_->fragment) || $_->fragment =~ m{^/} && $_->fragment !~ m{~(?![01])}});
+}
 
 1;
 
@@ -509,7 +509,7 @@ JSON::Schema::Modern::Utilities - Internal utilities for JSON::Schema::Modern
 
 =head1 VERSION
 
-version 0.619
+version 0.620
 
 =head1 SYNOPSIS
 
@@ -522,6 +522,14 @@ This class contains internal utilities to be used by L<JSON::Schema::Modern>.
 =for Pod::Coverage is_type get_type is_bignum is_bool is_schema is_equal is_elements_unique jsonp unjsonp local_annotations
 canonical_uri E A abort assert_keyword_exists assert_keyword_type assert_pattern assert_uri_reference assert_uri
 annotate_self sprintf_num HAVE_BUILTIN true false json_pointer_type canonical_uri_type
+
+=head1 GIVING THANKS
+
+=for stopwords MetaCPAN GitHub
+
+If you found this module to be useful, please show your appreciation by
+adding a +1 in L<MetaCPAN|https://metacpan.org/dist/JSON-Schema-Modern>
+and a star in L<GitHub|https://github.com/karenetheridge/JSON-Schema-Modern>.
 
 =head1 SUPPORT
 

@@ -12,20 +12,20 @@ use Date::Cmp;
 use HTML::GoogleMaps::V3;
 use HTML::OSM;
 use Object::Configure 0.15;
-use Params::Get;
-use Params::Validate::Strict;
+use Params::Get 0.13;
+use Params::Validate::Strict 0.16;
 
 =head1 NAME
 
-HTML::Genealogy::Map - Extract and map genealogical events from GEDCOM file
+HTML::Genealogy::Map - Extract and map genealogical events from a GEDCOM file
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 DESCRIPTION
 
@@ -145,8 +145,10 @@ sub onload_render
 
 	# Process all individuals
 	foreach my $indi ($ged->individuals) {
+		next unless(ref($indi));
 		my $name = $indi->name || 'Unknown';
 		$name =~ s/\///g;	# Remove GEDCOM name delimiters
+		$name =~ s/'/&apos;/g;	# Probably this is enough HTML::Entities
 
 		# Birth events
 		if (my $birth = $indi->birth) {
@@ -175,16 +177,21 @@ sub onload_render
 
 	# Process all families (marriages)
 	foreach my $fam ($ged->families) {
-		my $husband = $fam->husband ? ($fam->husband->name || 'Unknown') : 'Unknown';
-		my $wife = $fam->wife ? ($fam->wife->name || 'Unknown') : 'Unknown';
+		next unless defined($fam) && ref($fam);	# Yes, really
+
+		my $husband = (ref($fam->husband) && $fam->husband->name) ? $fam->husband->name : 'Unknown';
+		my $wife = (ref($fam->wife) && $fam->wife->name) ? $fam->wife->name : 'Unknown';
+
 		$husband =~ s/\///g;
 		$wife =~ s/\///g;
 
 		if (my $marriage = $fam->marriage) {
 			if (ref($marriage) && (my $place = $marriage->place)) {
+				$husband =~ s/'/&apos;/;
+				$wife =~ s/'/&apos;/;
 				push @events, {
 					type => 'marriage',
-					name => "$husband & $wife",
+					name => "$husband &amp; $wife",
 					place => $place,
 					date => $marriage->date || 'Unknown date',
 				};
@@ -197,7 +204,7 @@ sub onload_render
 
 	# Geocode all events
 	my @geocoded_events;
-	my %cache;
+	my %cache;	# TODO allow use of params->{cache} if given
 
 	foreach my $event (@events) {
 		my $place = $event->{place};
@@ -242,21 +249,19 @@ sub onload_render
 		push @{$location_groups{$key}}, $event;
 	}
 
-	print "Generating map\n" if($debug);
-
 	# Generate map based on available API key
 	my $map;
 	if ($google_key) {
-		$map = generate_google_map(\%location_groups, $height, $width, $google_key);
+		$map = _generate_google_map(\%location_groups, $height, $width, $google_key);
 	} else {
-		$map = generate_osm_map(\%location_groups, $height, $width);
+		$map = _generate_osm_map(\%location_groups, $height, $width);
 	}
 
 	return $map->onload_render();
 }
 
 # Generate HTML for grouped events
-sub generate_popup_html {
+sub _generate_popup_html {
 	my ($events) = @_;
 
 	my $place = $events->[0]{place};
@@ -280,8 +285,15 @@ sub generate_popup_html {
 
 	# Sort function for dates
 	my $sort_by_date = sub {
-		return 0 if(($a->{'date'} =~ /^Unknown/i) || ($b->{'date'} =~ /^Unknown/));
-		return Date::Cmp::datecmp($a->{'date'}, $b->{'date'});
+		my $date_a = $a->{'date'};
+		my $date_b = $b->{'date'};
+
+		# Put unknown dates at the end
+		return 1 if $date_a =~ /^Unknown/i && $date_b !~ /^Unknown/i;
+		return -1 if $date_b =~ /^Unknown/i && $date_a !~ /^Unknown/i;
+		return 0 if $date_a =~ /^Unknown/i && $date_b =~ /^Unknown/i;
+
+		return Date::Cmp::datecmp($date_a, $date_b);
 	};
 
 	# Add births
@@ -289,7 +301,7 @@ sub generate_popup_html {
 		$html .= '<b>Births:</b><br>';
 		foreach my $event (sort $sort_by_date @{$by_type{birth}}) {
 			$html .= sprintf(
-				'<span style="color: green; font-size: 20px;">●</span> %s (%s)<br>',
+				'<span style="color: green; font-size: 20px;">&#x25CF;</span> %s (%s)<br>',
 				$event->{name},
 				$event->{date}
 			);
@@ -302,7 +314,7 @@ sub generate_popup_html {
 		$html .= '<b>Marriages:</b><br>';
 		foreach my $event (sort $sort_by_date @{$by_type{marriage}}) {
 			$html .= sprintf(
-				'<span style="color: blue; font-size: 20px;">●</span> %s (%s)<br>',
+				'<span style="color: blue; font-size: 20px;">&#x25CF;</span> %s (%s)<br>',
 				$event->{name},
 				$event->{date}
 			);
@@ -315,7 +327,7 @@ sub generate_popup_html {
 		$html .= '<b>Deaths:</b><br>';
 		foreach my $event (sort $sort_by_date @{$by_type{death}}) {
 			$html .= sprintf(
-				'<span style="color: red; font-size: 20px;">●</span> %s (%s)<br>',
+				'<span style="color: red; font-size: 20px;">&#x25CF;</span> %s (%s)<br>',
 				$event->{name},
 				$event->{date}
 			);
@@ -328,8 +340,8 @@ sub generate_popup_html {
 }
 
 # Generate Google Maps
-sub generate_google_map {
-	my ($location_groups, $file, $key, $height, $width) = @_;
+sub _generate_google_map {
+	my ($location_groups, $height, $width, $key) = @_;
 
 	my $map = HTML::GoogleMaps::V3->new(
 		key => $key,
@@ -343,7 +355,7 @@ sub generate_google_map {
 		my $events = $location_groups->{$loc_key};
 		my ($lat, $lon) = split /,/, $loc_key;
 
-		my $html = generate_popup_html($events);
+		my $html = _generate_popup_html($events);
 
 		$map->add_marker(
 			point => [$lat, $lon],
@@ -362,8 +374,8 @@ sub generate_google_map {
 }
 
 # Generate OpenStreetMap using HTML::OSM
-sub generate_osm_map {
-	my ($location_groups, $file, $height, $width) = @_;
+sub _generate_osm_map {
+	my ($location_groups, $height, $width) = @_;
 
 	# Create HTML::OSM object
 	my $osm = HTML::OSM->new(zoom => 12, height => $height, width => $width);
@@ -373,7 +385,7 @@ sub generate_osm_map {
 		my $events = $location_groups->{$loc_key};
 		my ($lat, $lon) = split /,/, $loc_key;
 
-		my $html = generate_popup_html($events);
+		my $html = _generate_popup_html($events);
 
 		$osm->add_marker(
 			point => [$lat, $lon],

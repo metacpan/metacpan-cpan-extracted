@@ -35,7 +35,7 @@ my %WriteMakefileArgs = (
         'File::Temp' => '0.10',
         'JSON' => '0',
         # for any, none, all
-        'List::Util' => '1.33',
+        'List::Util' => '1.45',
         # for retrieving data structures from children
         'Parallel::ForkManager' => '0.7.6',
         'Pod::Usage' => '0',
@@ -90,6 +90,9 @@ delete $WriteMakefileArgs{META_MERGE}
     unless eval { ExtUtils::MakeMaker->VERSION('6.46'); 1 };
 
 # for RETURNING clause
+# NOTE: noss no longer actually uses the RETURNING clause, but we'll continue
+# to stick with 3.35.0 as the minimum supported version anyway, for the sake of
+# consistency.
 unless ($DBD::SQLite::sqlite_version_number >= 3035000) {
     die "noss requires at least sqlite version 3.35.0\n";
 }

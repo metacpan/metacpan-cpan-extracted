@@ -2,7 +2,7 @@ package WWW::Noss::Timestamp;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '1.09';
+our $VERSION = '1.10';
 
 use Time::Piece;
 

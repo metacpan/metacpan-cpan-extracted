@@ -26,7 +26,7 @@ no_index:
 requires:
   Locale::Unicode: v0.3.11
   Locale::Unicode::Data: v1.3.2
-  Want: '0.17'
+  Wanted: v0.1.0
   parent: '0'
   perl: '5.010001'
   strict: '0'
@@ -34,5 +34,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jackdeguest/Locale-Intl/issues
   repository: https://gitlab.com/jackdeguest/Locale-Intl
-version: v0.2.0
+version: v0.3.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

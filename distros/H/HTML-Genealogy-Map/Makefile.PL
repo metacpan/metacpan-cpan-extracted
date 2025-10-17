@@ -26,13 +26,6 @@ WriteMakefile(
 	EXE_FILES => ['bin/ged2map'],
 	CONFIGURE_REQUIRES => {
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
-	}, TEST_REQUIRES => {
-		'IPC::System::Simple' => 0,
-		'Test::DescribeMe' => 0,
-		'Test::Most' => 0,
-		'Test::Needs' => 0,
-		'Test::NoWarnings' => 0,
-		'Test::Returns' => 0,
 	}, PREREQ_PM => {
 		'autodie' => 0,
 		'Date::Cmp' => 0,
@@ -40,8 +33,17 @@ WriteMakefile(
 		'HTML::OSM' => 0,
 		'Gedcom' => 0,
 		'Object::Configure' => 0.15,
-		'Params::Get' => 0,
-		'Params::Validate::Strict' => 0,
+		'Params::Get' => 0.13,
+		'Params::Validate::Strict' => 0.16,
+	}, TEST_REQUIRES => {
+		'Class::Simple' => 0,
+		'Data::Random' => 0,
+		'IPC::System::Simple' => 0,
+		'Test::DescribeMe' => 0,
+		'Test::Most' => 0,
+		'Test::Needs' => 0,
+		'Test::NoWarnings' => 0,
+		'Test::Returns' => 0,
 	}, dist => $dist,
 	clean		=> { FILES => 'HTML-Genealogy-Map-*' },
 	# META_ADD => {
@@ -59,9 +61,10 @@ WriteMakefile(
 				# license    => 'http://dev.perl.org/licenses/',
 			}, bugtracker => {
 				mailto => 'bug-HTML-Genealogy-Map@rt.cpan.org',
-				url => 'https://github.com/nigelhorne/HTML-Genealogy-Map/issues',
-				# web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=HTML-Genealogy-Map',
-				web => 'https://github.com/nigelhorne/HTML-Genealogy-Map/issues'
+				url => 'https://rt.cpan.org/Public/Dist/Display.html?Name=HTML-Genealogy-Map',
+				web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=HTML-Genealogy-Map',
+				# url => 'https://github.com/nigelhorne/HTML-Genealogy-Map/issues',
+				# web => 'https://github.com/nigelhorne/HTML-Genealogy-Map/issues'
 			}
 		},
 	},

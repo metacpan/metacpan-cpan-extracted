@@ -1,5 +1,8 @@
 Revision history for Perl module Locale::Intl
 
+v0.3.0 2025-10-16T09:04:05+0900
+    - Update dependency from Want to Wanted
+
 v0.2.0 2025-04-20T17:44:56+0900
     - New release with unit tests in accordance with new Unicode data.
 

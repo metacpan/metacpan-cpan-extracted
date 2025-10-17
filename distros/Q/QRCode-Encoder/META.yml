@@ -23,13 +23,13 @@ no_index:
 provides:
   QRCode::Encoder:
     file: lib/QRCode/Encoder.pm
-    version: '0.003'
+    version: '0.005'
   QRCode::Encoder::Matrix:
     file: lib/QRCode/Encoder/Matrix.pm
-    version: '0.003'
+    version: '0.005'
   QRCode::Encoder::QRSpec:
     file: lib/QRCode/Encoder/QRSpec.pm
-    version: '0.003'
+    version: '0.005'
 requires:
   Math::ReedSolomon::Encoder: '0.001'
   perl: '5.024000'
@@ -37,7 +37,7 @@ resources:
   bugtracker: https://codeberg.org/polettix/QRCode-Encoder/issues
   homepage: https://codeberg.org/polettix/QRCode-Encoder
   repository: https://codeberg.org/polettix/QRCode-Encoder.git
-version: '0.003'
+version: '0.005'
 x_contributors:
   - 'Flavio Poletti <flavio@polettix.it>'
 x_generated_by_perl: v5.36.0

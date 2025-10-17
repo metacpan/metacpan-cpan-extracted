@@ -149,7 +149,7 @@ ok( !$s->is_success( HTTP_NOT_FOUND ), 'is_success' );
 
 is( $s->status_message(0), undef, 'status_message' );
 is( $s->status_message(200), 'OK', 'status_message' );
-is( $s->status_message(404), 'Not Found', 'status_message' );
+is( $s->status_message(404), 'Object not found!', 'status_message' );
 is( $s->status_message(999), undef, 'status_message' );
 
 

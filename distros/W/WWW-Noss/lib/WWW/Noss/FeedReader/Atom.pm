@@ -2,7 +2,7 @@ package WWW::Noss::FeedReader::Atom;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '1.09';
+our $VERSION = '1.10';
 
 use WWW::Noss::FeedReader::MediaRSS qw(parse_media_node);
 use WWW::Noss::TextToHtml qw(text2html unescape_html strip_tags);
@@ -186,8 +186,6 @@ sub _read_entry {
         $entry->{ summary } = $summary;
     }
 
-    return undef unless defined $entry->{ summary };
-
     $entry->{ title } //= $entry->{ link };
 
     return $entry;
@@ -260,7 +258,7 @@ sub read_feed {
     }
 
     unless (@$entries) {
-        die sprintf "%s contains no posts\n";
+        die sprintf "%s contains no posts\n", $feed->name;
     }
 
     @$entries =

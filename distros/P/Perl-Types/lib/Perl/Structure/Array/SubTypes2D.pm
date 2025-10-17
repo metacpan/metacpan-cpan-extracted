@@ -3,7 +3,7 @@ package Perl::Structure::Array::SubTypes2D;
 use strict;
 use warnings;
 use Perl::Config;  # don't use Perl::Types inside itself, in order to avoid circular includes
-our $VERSION = 0.017_100;
+our $VERSION = 0.018_000;
 
 # [[[ CRITICS ]]]
 ## no critic qw(ProhibitUselessNoCritic ProhibitMagicNumbers RequireCheckedSyscalls)  # USER DEFAULT 1: allow numeric values & print operator
@@ -143,6 +143,27 @@ use strict;
 use warnings;
 use parent -norequire, qw(arrayref);
 
+# START HERE: implement new() constructors for arrayref::hashref::* types; add missing arrayref::hashref::boolean etc
+# START HERE: implement new() constructors for arrayref::hashref::* types; add missing arrayref::hashref::boolean etc
+# START HERE: implement new() constructors for arrayref::hashref::* types; add missing arrayref::hashref::boolean etc
+
+# (ref to array) of (refs to (hashes of integers))
+package arrayref::hashref::integer;
+use strict;
+use warnings;
+use parent -norequire, qw(arrayref::hashref);
+
+# (ref to array) of (refs to (hashes of numbers))
+package arrayref::hashref::number;
+use strict;
+use warnings;
+use parent -norequire, qw(arrayref::hashref);
+
+# (ref to array) of (refs to (hashes of strings))
+package arrayref::hashref::string;
+use strict;
+use warnings;
+use parent -norequire, qw(arrayref::hashref);
 
 # NEED ANSWER: are object arrays really 2-D, or are they 1-D???
 

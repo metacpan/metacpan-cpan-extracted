@@ -1,7 +1,6 @@
-# astro-ads
+# Astro::ADS
 
 Perl interface to the Harvard Astrophysics Data System (ADS) abstract service
-
 
 ## Getting Started
 
@@ -9,8 +8,9 @@ Perl interface to the Harvard Astrophysics Data System (ADS) abstract service
 
 2. When you get your API key, save it to a file called ~/.ads/dev_key or save it as an environment variable named ADS_DEV_KEY
 
-3. From a terminal type `cpan install Astro::ADS`
+3. From a terminal type `cpan install Astro::ADS` (or checkout [cpanm](https://metacpan.org/pod/App::cpanminus))
 
+4. Get the documentation using `perldoc Astro::ADS` or going to [MetaCPAN](https://metacpan.org/pod/Astro::ADS)
 
 
 ## Acknowledgements
@@ -26,7 +26,6 @@ Originally written by Alasdair Allan
 (http://www.astro.ex.ac.uk/) as part of his work for the eSTAR project
 with Tim Jenness <timj@jach.hawaii.edu> of the Joint Astronomy Centre (JAC)
 in Hawaii.
-
 
 # Terms and Conditions
 

@@ -103,8 +103,8 @@ for my $c ( 0x0 .. 0x10ffff ) {
     my $east_asian_width = width_east_asian( $east_asian_width_table, $c );
     my $print_width;
     if ( $category =~ /^(?:Cc|Cs)\z/ ) {
-        # Other, control
-        # Other, surrogate
+        # Cc = Control
+        # Cs = Surrogate
         $print_width = [ -1, -1 ];
     }
     elsif ( $c == 0x00AD ) {
@@ -113,20 +113,15 @@ for my $c ( 0x0 .. 0x10ffff ) {
         # Ambiguous
         $print_width = [ 1, 2 ];
     }
-    elsif ( $category =~ /^(?:Mn|Me)\z/ ) {
-        # Mn = Mark, nonspacing
-        # Me = Mark, enclosing
-        # categories might not be up to date
-        $print_width = [ 0, 0 ];
-    }
-    elsif ( $category eq 'Cf' && $bidi_class ne 'AN' ) {
-        # Cf = Other, format
-        # AN = bidi clas arbic number
-        # https://www.unicode.org/versions/Unicode14.0.0/ch09.pdf # 9.2 Arabic -> Signs Spanning Numbers -> Unlike ...
-        $print_width = [ 0, 0 ];
-    }
     elsif ( $c >= 0x1160 && $c <= 0x11FF || $c >= 0x0D7B0 && $c <= 0x0D7FF ) {
-#        # https://devblogs.microsoft.com/oldnewthing/20201009-00/?p=104351
+        # https://devblogs.microsoft.com/oldnewthing/20201009-00/?p=104351
+        $print_width = [ 0, 0 ];
+    }
+    elsif ( $category =~ /^(?:Cf|Me|Mn)\z/ ) {
+        # Cf = Format
+        # Me = Enclosing Mark
+        # Mn = Nonspacing Mark
+        # categories might not be up to date
         $print_width = [ 0, 0 ];
     }
     elsif ( $east_asian_width =~ /^(?:W|F)\z/ ) {
@@ -135,7 +130,7 @@ for my $c ( 0x0 .. 0x10ffff ) {
         $print_width = [ 2, 2 ];
     }
     elsif ( $east_asian_width eq 'A' ) {
-        # A = Ambiguous,
+        # A = Ambiguous
         $print_width = [ 1, 2 ];
     }
     else {

@@ -7,16 +7,18 @@
 #
 #   The GNU General Public License, Version 3, June 2007
 #
-# [[[ HEADER ]]]
 # ABSTRACT: the Perl data type system
+# DEV NOTE, CORRELATION #gt00: copy all project abstract changes between 'README.md' header & "# ABSTRACT" & POD in main module; copy all description changes between 'README.md' header & main module POD
+
+# [[[ HEADER ]]]
 package Perl::Types;
 use strict;
 use warnings;
 use Perl::Config;
-our $VERSION = 0.008_000;
+our $VERSION = 0.009_000;
 
 # [[[ INCLUDES ]]]
-# DEV NOTE: `use Perl::Types;` is just an object-oriented wrapper around the `use perltypes;` pragma
+# DEV NOTE: "use Perl::Types;" is just an object-oriented wrapper around the "use perltypes;" pragma
 use perltypes;
 
 # [[[ EXPORTS ]]]
@@ -32,21 +34,44 @@ __END__
 
 Perl::Types - the Perl data type system
 
+=for comment
+# DEV NOTE, CORRELATION #gt00: copy all project abstract changes between 'README.md' header & "# ABSTRACT" & POD in main module; copy all description changes between 'README.md' header & main module POD
+
 =head1 SYNOPSIS
 
     # the following three styles are functionally equivalent,
     # only choose one:
-    use Perl::Types;  # OO style
+    use types;        # pragma style, short
+    use class;
     # OR
-    use perltypes;    # pragma style
+    use perltypes;    # pragma style, medium
+    use perlclass;
     # OR
-    use types;        # pragma style, shortened
+    use Perl::Types;  # OO style, long
+    use Perl::Class;
 
-    # declare a typed scalar
+    # declare & define a typed scalar
     my integer $i = 42;
 
-    # declare a typed compound reference
+    # declare & define a typed compound reference
     my arrayref::integer $arr = [1, 2, 3];
+
+    # define an OO class
+    package Some::Class;
+    use types;
+    use parent qw(class);
+    use class;
+    our hashref $properties = { bar => my integer $TYPED_bar = 23 };
+    sub multiply_bar {
+        { my number $RETURN_TYPE };
+        ( my Some::Class $self, my number $multiplier ) = @ARG;
+        return ($self->{bar} * $multiplier);
+    }
+    1;  # end of class
+
+    # declare & instantiate an OO object
+    my Some::Class $my_object = Some::Class->new();
+    print $my_object->multiply_bar(5.6), "\n";
 
 =head1 DESCRIPTION
 
@@ -54,7 +79,7 @@ Perl::Types defines package namespaces for core Perl data types and nested compo
 reference types using the C<::> scope resolution operator.  It enables explicit typing
 of scalars, arrays, and hashes in your Perl code.
 
-Note that `use Perl::Types;` and `use perltypes;` and `use types;` all have the exact
+Note that "use Perl::Types;" and "use perltypes;" and "use types;" all have the exact
 same effect; these options are provided to please both OO and pragma style preferences.
 Please choose one and use it throughout your entire codebase, to avoid confusion.
 
@@ -223,10 +248,62 @@ Declaring subroutine input parameters & output return values:
 
 =head2 Object-Orientation
 
-Declaring & instantiating objects:
+Defining OO classes:
+
+    # [[[ HEADER ]]]
+    package Some::Class;
+    use strict;
+    use warnings;
+    use types;
+    our $VERSION = 0.001_000;
+
+    # [[[ OO INHERITANCE ]]]
+    use parent qw(class);
+    use class;
+
+    # [[[ OO PROPERTIES ]]]
+    our hashref $properties = { bar => my integer $TYPED_bar = 23 };
+
+    # [[[ SUBROUTINES & OO METHODS ]]]
+    sub multiply_bar {
+        { my number $RETURN_TYPE };
+        ( my Some::Class $self, my number $multiplier ) = @ARG;
+        return ($self->{bar} * $multiplier);
+    }
+
+    1;  # end of class
+
+Declaring & instantiating OO objects:
 
     my Some::Class $my_object = Some::Class->new();
-    $my_object->some_method(5);
+    print $my_object->multiply_bar(5.6), "\n";
+
+=head2 Filehandles
+
+Declaring & defining filehandles by reference:
+
+    # variables with data type "filehandleref" must be undefined,
+    # thereby making the filehandle into "a reference to a newly allocated anonymous filehandle"
+
+    use strict;
+    use warnings;
+    use types;
+    open(my filehandleref $FH, '>&STDOUT') or die $OS_ERROR;
+    print $FH 'HOWDY', "\n";
+
+Declaring & defining filehandles by value (not suggested, incompatible with "use strict"):
+
+    # variables with data type "filehandle" must be defined and set to a string value,
+    # thereby making the filehandle into "an expression" and requiring "use strict" to NOT be in effect
+
+    # use strict;  # disable to avoid the error... Can't use string ("MYFH") as a symbol ref while "strict refs" in use
+    use warnings;
+    use types;
+    open(my filehandle $FH = 'MYFH', '>&STDOUT') or die $OS_ERROR;
+    print $FH  'HOWDY', "\n";
+    print MYFH 'DOODY', "\n";
+
+L<Perldoc open() For More Info|https://perldoc.perl.org/functions/open#Direct-versus-by-reference-assignment-of-filehandles>
 
 =head1 COMING SOON
 
@@ -242,8 +319,6 @@ Documentation:
 
 =item * Arrays & hashes of objects
 
-=item * Class definitions
-
 =back
 
 The following data types are partially implemented and planned for future releases:
@@ -253,8 +328,6 @@ The following data types are partially implemented and planned for future releas
 =item * nonsigned_integer
 
 =item * gmp_integer
-
-=item * filehandleref
 
 =item * void
 

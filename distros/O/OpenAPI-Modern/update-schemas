@@ -16,27 +16,12 @@ use Mojo::UserAgent;
 use Digest::MD5 'md5_hex';
 use JSON::Schema::Modern;
 use lib 'lib';  # make sure we load the newly-patched version of our modules
+use OpenAPI::Modern::Utilities qw(BUNDLED_SCHEMAS OAS_SCHEMAS OAS_VERSIONS);
 
-# see https://spec.openapis.org/#openapi-specification-schemas for the latest links
-# these are updated automatically at build time via 'update-schemas'
-
-# note that these entries are duplicated in JSON::Schema::Modern::Document::OpenAPI
+# { download URL -> filename (in share) }
 my %files = (
-  # metaschema for json schemas contained within openapi documents:
-  # standard json schema (presently draft2020-12) + OAD vocabulary
-  'oas/dialect/base.schema.json' => 'https://spec.openapis.org/oas/3.1/dialect/2024-11-10',
-
-  # OAD vocabulary definition
-  'oas/meta/base.schema.json' => 'https://spec.openapis.org/oas/3.1/meta/2024-11-10',
-
-  # openapi document schema that forces the use of the json schema dialect (no $schema overrides
-  # permitted)
-  'oas/schema-base.json' => 'https://spec.openapis.org/oas/3.1/schema-base/2025-09-15',
-
-  # the main openapi document schema, with permissive (unvalidated) json schemas
-  'oas/schema.json' => 'https://spec.openapis.org/oas/3.1/schema/2025-09-15',
-
-  'oas/LICENSE' => 'https://raw.githubusercontent.com/OAI/OpenAPI-Specification/main/LICENSE',
+  (map +(BUNDLED_SCHEMAS->{$_}->%{OAS_SCHEMAS->{$_}->@*}), OAS_VERSIONS->@*),
+  'https://raw.githubusercontent.com/OAI/OpenAPI-Specification/main/LICENSE' => 'oas/LICENSE',
 );
 
 my $web_url = 'https://spec.openapis.org/oas';
@@ -46,7 +31,7 @@ say "# fetching   $web_url" if $ENV{DEBUG};
 my $res = $ua->get($web_url)->result;
 die "Failed to fetch $web_url", $res->code, " ", $res->message if $res->is_error;
 
-# keys are existing OAS schema URLs, as found above
+# keys are existing OAS schema URLs, as listed in OpenAPI::Modern::Utilities
 # values is the list of all schemas found on the website of the same type
 my %new_schemas;
 
@@ -54,12 +39,12 @@ my %new_schemas;
 my $links;
 foreach my $e ($res->dom->find('a[href]')->each) {
   my $link = $e->{href};
-  next if $link !~ m{^/oas/3.1/[a-z-]+/\d{4}-\d{2}-\d{2}$};
+  next if $link !~ m{^/oas/(?:${\ join('|', map quotemeta($_), OAS_VERSIONS->@*)})/[a-z-]+/\d{4}-\d{2}-\d{2}$};
 
   ++$links;
-  $link = Mojo::URL->new($web_url)->path($link)->to_string; # normalize slashes
+  $link = Mojo::URL->new($web_url)->path($link)->to_string; # get full URL, normalizing slashes
 
-  if (my ($existing) = grep !/github/ && $link =~ m{^\Q${\substr($_, 0, -10)}\E}, values %files) {
+  if (my ($existing) = grep !/github/ && $link =~ m{^\Q${\substr($_, 0, -10)}\E}, keys %files) {
     $new_schemas{$existing} //= [];
     push $new_schemas{$existing}->@*, $link if $existing lt $link;
   }
@@ -92,11 +77,9 @@ if (my @outdated_schemas = grep $new_schemas{$_}->@*, reverse sort keys %new_sch
 
   # update the values of %files for all schemas that are outdated
   # we want to download even unchanged files to make sure the checksum matches
-  my %inverted_files = reverse %files;
   foreach my $outdated (@outdated_schemas) {
-    $inverted_files{$new_schemas{$outdated}} = delete $inverted_files{$outdated};
+    $files{$new_schemas{$outdated}} = delete $files{$outdated};
   }
-  %files = reverse %inverted_files;
 }
 
 my $json_decoder = JSON::Schema::Modern::_JSON_BACKEND()->new->utf8(1);
@@ -104,8 +87,8 @@ my $js = JSON::Schema::Modern->new;
 my %checksums;
 
 # download fresh copies of all files, validate against their schemas
-foreach my $target (sort keys %files) {
-  my $uri = $files{$target};
+foreach my $uri (sort keys %files) {
+  my $target = $files{$uri};
 
   say "# fetching   $uri -> share/$target" if $ENV{DEBUG};
   my $res = $ua->get($uri)->result;
@@ -113,7 +96,9 @@ foreach my $target (sort keys %files) {
 
   $target = path('share', $target);
   $target->parent->mkpath;
+  my $exists = $target->exists;
   $target->spew_raw(my $content = $res->body);
+  system('git add '.$target) if not $exists;
   $checksums{$target} = md5_hex($content);
 
   next if $target->basename eq 'LICENSE';
@@ -126,24 +111,33 @@ foreach my $target (sort keys %files) {
   die $result->dump if not $result->valid;
 }
 
-# compute checksums and record them in the test
+# compute checksums and record them in the test, preserving unaffected entries
 path('t/checksums.t')->edit_raw(sub {
   m/^__DATA__$/mg;
+  %checksums = ((split /\s/, substr($_, pos()+1)), %checksums);
   $_ = substr($_, 0, pos()+1).join("\n", map $_.' '.$checksums{$_}, sort keys %checksums)."\n";
 });
 
 # only edit Changes file if there are updated files to be committed
-if (system('git diff --quiet --stat share/') >> 8) {
+my @changed_versions = grep +(
+  system('git diff --quiet --stat share/oas/'.$_) >> 8
+), OAS_VERSIONS->@*;
+
+if (@changed_versions) {
   my ($seen_next, $seen_blank);
-  say '# edited Changes file' if $ENV{DEBUG};
+  my $versions = (@changed_versions > 1 ? 's ' : ' ').join(', ', @changed_versions);
+  say '# edited Changes file for OAS version'.$versions if $ENV{DEBUG};
   path('Changes')->edit_lines_utf8(sub {
     if ($seen_next ||= /^\{\{\$NEXT\}\}/ and not $seen_blank and /^$/) {
-      s/^$/          - updated bundled schemas to their latest published versions\n/;
+      my $leader = ' 'x10;
+      my @string = ("updated bundled schemas for OAS version${versions} to their latest", 'published versions');
+
+      s/^$/$leader- $string[0]\n$leader  $string[1]/;
       $seen_blank = 1;
     }
   });
 
-  exec 'git commit -m"update bundled schemas to latest versions" Changes lib share t update-schemas';
+  exec 'git commit -m"update bundled schemas for OAS '.join(', ', @changed_versions).' to latest versions" Changes lib share t';
 }
 else {
   say '# no changes to bundled schemas';

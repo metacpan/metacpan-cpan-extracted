@@ -642,6 +642,13 @@ paths:
         required: false
         schema:
           type: string
+      - name: qs
+        in: querystring
+        required: false
+        content:
+          text/plain:
+            schema:
+              type: string
 YAML
 
   cmp_result(
@@ -655,9 +662,15 @@ YAML
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post parameters 0)))->to_string,
           error => 'cookie parameters not yet supported',
         },
+        {
+          instanceLocation => '/request/uri/query',
+          keywordLocation => jsonp(qw(/paths /foo post parameters 1)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post parameters 1)))->to_string,
+          error => 'querystring parameters not yet supported',
+        },
       ],
     },
-    'cookies are not yet supported',
+    'neither cookies nor querystrings are yet supported',
   );
 
 
@@ -2627,7 +2640,7 @@ YAML
     JSON::Schema::Modern::Document::OpenAPI->new(
       canonical_uri => '/otherdoc/api/definitions', # intentionally relative, to see how uris resolve
       evaluator => $openapi->evaluator,
-      metaschema_uri => DEFAULT_METASCHEMA, # more lax, as we use multiple $schema values in schemas
+      metaschema_uri => DEFAULT_METASCHEMA->{+OAS_VERSION}, # more lax, as we use multiple $schema values in schemas
       schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML')));
 jsonSchemaDialect: https://mymetaschema
 components:

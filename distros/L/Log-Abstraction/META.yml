@@ -4,8 +4,15 @@ author:
   - 'Nigel Horne <njh@nigelhorne.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  File::Glob: '0'
+  File::Slurp: '0'
   File::Spec: '0'
   File::Temp: '0'
+  File::stat: '0'
+  IPC::System::Simple: '0'
+  JSON::MaybeXS: '0'
+  POSIX: '0'
+  Readonly: '0'
   Test::DescribeMe: '0'
   Test::Mockingbird: '0'
   Test::Most: '0'
@@ -27,7 +34,7 @@ no_index:
     - inc
 requires:
   Carp: '0'
-  Config::Abstraction: '0.25'
+  Config::Abstraction: '0.36'
   Data::Dumper: '0'
   ExtUtils::MakeMaker: '6.64'
   Log::Log4perl: '0'
@@ -39,8 +46,8 @@ requires:
   Sys::Syslog: '0.28'
   perl: '5.008'
 resources:
-  bugtracker: https://github.com/nigelhorne/Log-Abstraction/issues
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Log-Abstraction
   homepage: https://metacpan.org/pod/Log::Abstraction
   repository: git://github.com/nigelhorne/Log-Abstraction.git
-version: 0.25
+version: 0.26
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

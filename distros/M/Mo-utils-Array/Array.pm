@@ -5,13 +5,14 @@ use strict;
 use warnings;
 
 use Error::Pure qw(err);
+use List::Util 1.33 qw(none);
 use Readonly;
 use Scalar::Util qw(blessed);
 
 Readonly::Array our @EXPORT_OK => qw(check_array check_array_object
-	check_array_required);
+	check_array_required check_array_strings);
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 sub check_array {
 	my ($self, $key) = @_;
@@ -66,6 +67,41 @@ sub check_array_required {
 	return;
 }
 
+sub check_array_strings {
+	my ($self, $key, $strings_ar) = @_;
+
+	if (! exists $self->{$key}) {
+		return;
+	}
+
+	if (! defined $strings_ar) {
+		err "Parameter '$key' must have strings definition.";
+	}
+	if (ref $strings_ar ne 'ARRAY') {
+		err "Parameter '$key' must have right string definition.";
+	}
+
+	check_array($self, $key);
+
+	foreach my $value (@{$self->{$key}}) {
+		if (ref $value ne '') {
+			err "Parameter '$key' must contain a list of strings.",
+				'Value', $value,
+				'Reference', (ref $value),
+			;
+		}
+		if (none { $value eq $_ } @{$strings_ar}) {
+			err "Parameter '$key' must be one of the defined strings.",
+				'Value', $value,
+				'Possible strings', "'".(join "', '", @{$strings_ar})."'",
+			;
+		}
+	}
+
+	return;
+}
+
+
 # XXX Move to common utils.
 sub _check_object {
 	my ($value, $class, $message, $message_params_ar) = @_;
@@ -109,11 +145,12 @@ Mo::utils::Array - Mo array utilities.
 
 =head1 SYNOPSIS
 
- use Mo::utils::Array qw(check_array check_array_object check_array_required);
+ use Mo::utils::Array qw(check_array check_array_object check_array_required check_array_strings);
 
  check_array($self, $key);
  check_array_object($self, $key, $class);
  check_array_required($self, $key);
+ check_array_strings($self, $key, $strings_ar);
 
 =head1 DESCRIPTION
 
@@ -159,6 +196,19 @@ Put error if check isn't ok.
 
 Returns undef.
 
+=head2 C<check_array_strings>
+
+ check_array_strings($self, $key, $strings_ar);
+
+I<Since version 0.02.>
+
+Check parameter defined by C<$key> which is reference to array with strings
+defined by C<$strings_ar> which is reference to array.
+
+Put error if check isn't ok.
+
+Returns undef.
+
 =head1 ERRORS
 
  check_array():
@@ -180,6 +230,19 @@ Returns undef.
                  Value: %s
                  Reference: %s
          Parameter '%s' with array must have at least one item.
+
+ check_array_strings():
+         Parameter '%s' must be a array.
+                 Value: %s
+                 Reference: %s
+         Parameter '%s' must be one of the defined strings.
+                 Value: %s
+                 Possible strings: %s
+         Parameter '%s' must contain a list of strings.
+                 Value: %s
+                 Reference: %s
+         Parameter '%s' must have right string definition.
+         Parameter '%s' must have strings definition.
 
 =head1 EXAMPLE1
 
@@ -315,10 +378,54 @@ Returns undef.
  # Output like:
  # #Error [..Array.pm:?] Parameter 'key' with array must have at least one item.
 
+=head1 EXAMPLE7
+
+=for comment filename=check_array_strings_ok.pl
+
+ use strict;
+ use warnings;
+
+ use Mo::utils::Array qw(check_array_strings);
+
+ my $self = {
+         'key' => ['value'],
+ };
+ check_array_strings($self, 'key', ['value']);
+
+ # Print out.
+ print "ok\n";
+
+ # Output:
+ # ok
+
+=head1 EXAMPLE8
+
+=for comment filename=check_array_strings_fail.pl
+
+ use strict;
+ use warnings;
+
+ use Error::Pure;
+ use Mo::utils::Array qw(check_array_strings);
+
+ $Error::Pure::TYPE = 'Error';
+
+ my $self = {
+         'key' => ['bad'],
+ };
+ check_array_strings($self, 'key', ['value']);
+
+ # Print out.
+ print "ok\n";
+
+ # Output like:
+ # #Error [..Array.pm:?] Parameter 'key' must be one of the defined strings.
+
 =head1 DEPENDENCIES
 
 L<Exporter>,
 L<Error::Pure>,
+L<List::Util>,
 L<Readonly>,
 L<Scalar::Util>.
 
@@ -370,6 +477,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

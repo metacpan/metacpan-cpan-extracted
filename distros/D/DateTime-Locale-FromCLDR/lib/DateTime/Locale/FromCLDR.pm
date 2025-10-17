@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Unicode Locale Identifier - ~/lib/DateTime/Locale/FromCLDR.pm
-## Version v0.7.0
+## Version v0.8.0
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/07/07
-## Modified 2025/04/20
+## Modified 2025/10/16
 ## All rights reserved
 ## 
 ## 
@@ -30,11 +30,11 @@ BEGIN
     use Locale::Unicode;
     use Locale::Unicode::Data;
     use Scalar::Util ();
-    use Want;
+    use Wanted;
     # "If a given short metazone form is known NOT to be understood in a given locale and the parent locale has this value such that it would normally be inherited, the inheritance of this value can be explicitly disabled by use of the 'no inheritance marker' as the value, which is 3 simultaneous empty set characters (U+2205)."
     # <https://unicode.org/reports/tr35/tr35-dates.html#Metazone_Names>
     our $EMPTY_SET = "∅∅∅";
-    our $VERSION = 'v0.7.0';
+    our $VERSION = 'v0.8.0';
 };
 
 use strict;
@@ -480,11 +480,11 @@ sub error
         else
         {
             warn( $msg ) if( warnings::enabled() );
-            if( Want::want( 'ARRAY' ) )
+            if( want( 'ARRAY' ) )
             {
                 rreturn( [] );
             }
-            elsif( Want::want( 'OBJECT' ) )
+            elsif( want( 'OBJECT' ) )
             {
                 rreturn( DateTime::Locale::FromCLDR::NullObject->new );
             }
@@ -2093,7 +2093,7 @@ sub pass_error
         return( $self->error( @_ ) );
     }
     
-    if( Want::want( 'OBJECT' ) )
+    if( want( 'OBJECT' ) )
     {
         rreturn( DateTime::Locale::FromCLDR::NullObject->new );
     }
@@ -3451,7 +3451,7 @@ sub _set_get_prop
         $self->{ $field } = $val
     }
     # So chaining works
-    rreturn( $self ) if( Want::want( 'OBJECT' ) );
+    rreturn( $self ) if( want( 'OBJECT' ) );
     # Returns undef in scalar context and an empty list in list context
     return if( !defined( $self->{ $field } ) );
     return( $self->{ $field } );
@@ -4032,7 +4032,7 @@ sub TO_JSON { return( shift->as_string ); }
             '""'    => sub{ '' },
             fallback => 1,
         );
-        use Want;
+        use Wanted;
     };
     use strict;
     use warnings;
@@ -4048,7 +4048,7 @@ sub TO_JSON { return( shift->as_string ); }
     {
         my( $method ) = our $AUTOLOAD =~ /([^:]+)$/;
         my $self = shift( @_ );
-        if( Want::want( 'OBJECT' ) )
+        if( want( 'OBJECT' ) )
         {
             rreturn( $self );
         }
@@ -4255,7 +4255,7 @@ Or, you could set the global variable C<$FATAL_EXCEPTIONS> instead:
 
 =head1 VERSION
 
-    v0.7.0
+    v0.8.0
 
 =head1 DESCRIPTION
 

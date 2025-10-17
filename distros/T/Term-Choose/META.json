@@ -39,7 +39,7 @@
          "requires" : {
             "Carp" : "0",
             "Exporter" : "0",
-            "Term::Choose::LineFold::XS" : "0.003",
+            "Term::Choose::LineFold::XS" : "0.004",
             "constant" : "0",
             "perl" : "5.010001",
             "strict" : "0",
@@ -58,6 +58,6 @@
          "web" : "https://github.com/kuerbis/Term-Choose"
       }
    },
-   "version" : "1.776",
+   "version" : "1.777",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

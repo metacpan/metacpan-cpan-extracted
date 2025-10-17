@@ -1,19 +1,18 @@
 package Text::Fragment;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-03-25'; # DATE
-our $DIST = 'Text-Fragment'; # DIST
-our $VERSION = '0.110'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 use Log::ger;
 
 use Data::Clone;
+use Exporter qw(import);
 
-require Exporter;
-our @ISA       = qw(Exporter);
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2025-10-15'; # DATE
+our $DIST = 'Text-Fragment'; # DIST
+our $VERSION = '0.111'; # VERSION
+
 our @EXPORT_OK = qw(
                        list_fragments
                        get_fragment
@@ -347,7 +346,7 @@ sub _doit {
 $SPEC{':package'} = {
     v => 1.1,
     summary     => 'Manipulate fragments in text',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 A fragment is a single line or a group of lines (called payload) with a metadata
 encoded in the comment that is put adjacent to it (for a single line fragment)
@@ -402,7 +401,7 @@ Another example (using `ini`-style comment):
     allow_url_fopen=0
     ; END FRAGMENT
 
-_
+MARKDOWN
 };
 
 my $arg_comment_style = {
@@ -445,14 +444,14 @@ $SPEC{list_fragments} = {
     result => {
         summary => 'List of fragments',
         schema  => 'array*',
-        description => <<'_',
+        description => <<'MARKDOWN',
 
 Will return status 200 if operation is successful. Result will be an array of
 fragments, where each fragment is a hash containing these keys: `raw` (string),
 `payload` (string), `attrs` (hash), `id` (string, can also be found in
 attributes).
 
-_
+MARKDOWN
     },
 };
 sub list_fragments {
@@ -462,11 +461,11 @@ sub list_fragments {
 $SPEC{get_fragment} = {
     v => 1.1,
     summary => 'Get fragment with a certain ID in text',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 If there are multiple occurences of the fragment with the same ID ,
 
-_
+MARKDOWN
     args => {
         text          => {
             summary => 'The text which contain fragments',
@@ -481,7 +480,7 @@ _
     result => {
         summary => 'Fragment',
         schema  => 'array*',
-        description => <<'_',
+        description => <<'MARKDOWN',
 
 Will return status 200 if fragment is found. Result will be a hash with the
 following keys: `raw` (string), `payload` (string), `attrs` (hash), `id`
@@ -489,7 +488,7 @@ following keys: `raw` (string), `payload` (string), `attrs` (hash), `id`
 
 Return 404 if fragment is not found.
 
-_
+MARKDOWN
     },
 };
 sub get_fragment {
@@ -499,11 +498,11 @@ sub get_fragment {
 $SPEC{set_fragment_attrs} = {
     v => 1.1,
     summary => 'Set/unset attributes of a fragment',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 If there are multiple occurences of the fragment with the same ID ,
 
-_
+MARKDOWN
     args => {
         text          => {
             summary => 'The text which contain fragments',
@@ -516,18 +515,18 @@ _
         id            => $arg_id,
         attrs         => {
             schema => 'hash*',
-            description => <<'_',
+            description => <<'MARKDOWN',
 
 To delete an attribute in the fragment, you can set the value to undef.
 
-_
+MARKDOWN
             req    => 1,
         },
     },
     result => {
         summary => 'New text and other data',
         schema  => 'array*',
-        description => <<'_',
+        description => <<'MARKDOWN',
 
 Will return status 200 if fragment is found. Result will be a hash containing
 these keys: `text` (string, the modified text), `orig_attrs` (hash, the old
@@ -535,7 +534,7 @@ attributes before being modified).
 
 Return 404 if fragment is not found.
 
-_
+MARKDOWN
     },
 };
 sub set_fragment_attrs {
@@ -545,14 +544,14 @@ sub set_fragment_attrs {
 $SPEC{insert_fragment} = {
     v => 1.1,
     summary => 'Insert or replace a fragment in text',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 Newline insertion behaviour: if fragment is inserted at the bottom and text does
 not end with newline (which is considered bad style), the inserted fragment will
 also not end with newline. Except when original text is an empty string, in
 which case an ending newline will still be added.
 
-_
+MARKDOWN
     args => {
         text      => {
             summary => 'The text to insert fragment into',
@@ -566,7 +565,7 @@ _
             summary => 'Whether to append fragment at beginning of file '.
                 'instead of at the end',
             schema  => [bool => { default=>0 }],
-            description => <<'_',
+            description => <<'MARKDOWN',
 
 Default is false, which means to append at the end of file.
 
@@ -574,20 +573,20 @@ Note that this only has effect if `replace_pattern` is not defined or replace
 pattern is not found in file. Otherwise, fragment will be inserted to replace
 the pattern.
 
-_
+MARKDOWN
         },
         replace_pattern => {
             summary => 'Regex pattern which if found will be used for '.
                 'placement of fragment',
             schema  => 'str',
-            description => <<'_',
+            description => <<'MARKDOWN',
 
 If fragment needs to be inserted into file, then if `replace_pattern` is defined
 then it will be searched. If found, fragment will be placed to replace the
 pattern. Otherwise, fragment will be inserted at the end (or beginning, see
 `top_style`) of file.
 
-_
+MARKDOWN
         },
         good_pattern => {
             summary => 'Regex pattern which if found means fragment '.
@@ -603,7 +602,7 @@ _
     result => {
         summary => 'A hash of result',
         schema  => 'hash*',
-        description => <<'_',
+        description => <<'MARKDOWN',
 
 Will return status 200 if operation is successful and text is changed. The
 result is a hash with the following keys: `text` will contain the new text,
@@ -615,7 +614,7 @@ result is a hash with the following keys: `text` will contain the new text,
 Will return status 304 if nothing is changed (i.e. if fragment with the
 same payload that needs to be inserted already exists in the text).
 
-_
+MARKDOWN
     },
 };
 sub insert_fragment {
@@ -625,7 +624,7 @@ sub insert_fragment {
 $SPEC{delete_fragment} = {
     v => 1.1,
     summary => 'Delete fragment in text',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 If there are multiple occurences of fragment (which is considered an abnormal
 condition), all occurences will be deleted.
@@ -634,7 +633,7 @@ Newline deletion behaviour: if fragment at the bottom of text does not end with
 newline (which is considered bad style), the text after the fragment is deleted
 will also not end with newline.
 
-_
+MARKDOWN
     args => {
         text => {
             summary => 'The text to delete fragment from',
@@ -660,7 +659,7 @@ _
     result => {
         summary => 'A hash of result',
         schema  => 'hash*',
-        description => <<'_',
+        description => <<'MARKDOWN',
 
 Will return status 200 if operation is successful and text is deleted. The
 result is a hash with the following keys: `text` will contain the new text,
@@ -672,7 +671,7 @@ fragment will be returned in `orig_payload` and `orig_fragment`.
 Will return status 304 if nothing is changed (i.e. when the fragment that needs
 to be deleted already does not exist in the text).
 
-_
+MARKDOWN
     },
 };
 sub delete_fragment {
@@ -694,7 +693,7 @@ Text::Fragment - Manipulate fragments in text
 
 =head1 VERSION
 
-This document describes version 0.110 of Text::Fragment (from Perl distribution Text-Fragment), released on 2021-03-25.
+This document describes version 0.111 of Text::Fragment (from Perl distribution Text-Fragment), released on 2025-10-15.
 
 =head1 SYNOPSIS
 
@@ -738,9 +737,9 @@ To delete a fragment:
 
  $res = delete_fragment(text=>$res->[2], id=>'bar');
 
-To list fragments:
+To list fragments contained in a text:
 
- $res = list_fragment(text=>$text);
+ $res = list_fragments(text=>$text);
 
 To get a fragment:
 
@@ -813,7 +812,7 @@ Another example (using C<ini>-style comment):
 
 Usage:
 
- delete_fragment(%args) -> [status, msg, payload, meta]
+ delete_fragment(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Delete fragment in text.
 
@@ -851,12 +850,12 @@ The text to delete fragment from.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value: A hash of result (hash)
 
@@ -877,7 +876,7 @@ to be deleted already does not exist in the text).
 
 Usage:
 
- get_fragment(%args) -> [status, msg, payload, meta]
+ get_fragment(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Get fragment with a certain ID in text.
 
@@ -910,12 +909,12 @@ The text which contain fragments.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value: Fragment (array)
 
@@ -932,7 +931,7 @@ Return 404 if fragment is not found.
 
 Usage:
 
- insert_fragment(%args) -> [status, msg, payload, meta]
+ insert_fragment(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Insert or replace a fragment in text.
 
@@ -948,6 +947,8 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<attrs> => I<hash> (default: {})
+
+(No description)
 
 =item * B<comment_style> => I<str> (default: "shell")
 
@@ -997,12 +998,12 @@ the pattern.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value: A hash of result (hash)
 
@@ -1022,7 +1023,7 @@ same payload that needs to be inserted already exists in the text).
 
 Usage:
 
- list_fragments(%args) -> [status, msg, payload, meta]
+ list_fragments(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List fragments in text.
 
@@ -1049,12 +1050,12 @@ The text which contain fragments.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value: List of fragments (array)
 
@@ -1070,7 +1071,7 @@ attributes).
 
 Usage:
 
- set_fragment_attrs(%args) -> [status, msg, payload, meta]
+ set_fragment_attrs(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 SetE<sol>unset attributes of a fragment.
 
@@ -1107,12 +1108,12 @@ The text which contain fragments.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value: New text and other data (array)
 
@@ -1123,6 +1124,37 @@ attributes before being modified).
 
 Return 404 if fragment is not found.
 
+=head1 FAQ
+
+=head2 Why is my fragment not found/listed?
+
+ foo=1 # FRAGMENT seq=1
+
+ # BEGIN FRAGMENT name=foo
+ blah
+ blah blah
+ # END FRAGMENT name=foo
+
+You forgot to add the `id` attribute. It is required.
+
+=head2 What if I need to have whitespace in my attribute name?
+
+You can't. Attribute names need to be alphanums only.
+
+=head2 What if I need to have whitespace in my attribute value?
+
+You can encode, e.g. with URI encoding:
+
+ foo=1 # FRAGMENT id=1 comment=very%20simple
+
+=head2 What if I forgot to properly close a multi-line fragment?
+
+ # BEGIN FRAGMENT id=1
+ blah
+
+Currently L</list_fragments> or L</get_fragment> will not find your fragment
+without emitting warning/error message.
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Text-Fragment>.
@@ -1131,23 +1163,47 @@ Please visit the project's homepage at L<https://metacpan.org/release/Text-Fragm
 
 Source repository is at L<https://github.com/perlancar/perl-Text-Fragment>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Text-Fragment/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2017, 2016, 2015, 2014, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Fragment>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

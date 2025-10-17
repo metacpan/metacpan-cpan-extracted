@@ -5,7 +5,7 @@ package Log::Abstraction;
 use strict;
 use warnings;
 use Carp;	# Import Carp for warnings
-use Config::Abstraction 0.25;
+use Config::Abstraction 0.36;
 use Data::Dumper;
 use Params::Get 0.13;	# Import Params::Get for parameter handling
 use POSIX qw(strftime);
@@ -22,11 +22,11 @@ Log::Abstraction - Logging Abstraction Layer
 
 =head1 VERSION
 
-0.25
+0.26
 
 =cut
 
-our $VERSION = 0.25;
+our $VERSION = 0.26;
 
 =head1 SYNOPSIS
 
@@ -66,6 +66,14 @@ If set to 1,
 and C<logger> is not given,
 call C<Carp:carp> on C<warn()>.
 
+Causes C<error()> to C<carp> if C<croak_on_error> is not given.
+
+=item * C<croak_on_error>
+
+If set to 1,
+and C<logger> is not given,
+call C<Carp:croak> on C<error()>.
+
 =item * C<config_file>
 
 Points to a configuration file which contains the parameters to C<new()>.
@@ -94,13 +102,30 @@ A logger can be one or more of:
 
 =item * a code reference
 
+The code will be called with a hashref containing:
+
+=over
+
+=item * class
+
+=item * file
+
+=item * line
+
+=item * level
+
+=item * message - an arrayref of messages
+
+=back
+
 =item * an object
 
 =item * a hash of options
 
 =item * sendmail - send higher priority messages to an email address
 
-To send an e-mail you need L<require Email::Simple>, L<require Email::Sender::Simple> and L<Email::Sender::Transport::SMTP>.
+To send an e-mail,
+you need L<require Email::Simple>, L<require Email::Sender::Simple> and L<Email::Sender::Transport::SMTP>.
 
 =item * array - a reference to an array
 
@@ -588,7 +613,7 @@ sub level
 =head2	is_debug
 
 Are we at a debug level that will emit debug messages?
-For compatability with L<Log::Any>.
+For compatibility with L<Log::Any>.
 
 =cut
 
@@ -661,7 +686,6 @@ falls back to C<Carp>.
 
 =cut
 
-# TODO: do similar things to warn()
 sub error {
 	my $self = shift;
 
@@ -732,13 +756,23 @@ sub _high_priority
 	}
 
 	if($self eq __PACKAGE__) {
-		# If called from a class method, use Carp to warn
+		# If called from a class method, use Croak/Carp to warn
+		if($syslog_values{$level} <= $syslog_values{'error'}) {
+			Carp::croak($warning);
+		}
 		Carp::carp($warning);
 		return;
 	}
 
 	# Log the warning message
 	$self->_log($level, $warning);
+
+	if($syslog_values{$level} <= $syslog_values{'error'}) {
+		# Fallback to Croak if no logger or syslog is defined
+		if($self->{'croak_on_error'} || !defined($self->{logger})) {
+			Carp::croak($warning);
+		}
+	}
 
 	if($self->{'carp_on_warn'} || !defined($self->{logger})) {
 		# Fallback to Carp if no logger or syslog is defined
@@ -759,6 +793,14 @@ sub DESTROY {
 =head1 AUTHOR
 
 Nigel Horne C<njh@nigelhorne.com>
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * Test coverage report: L<https://nigelhorne.github.io/Log-Abstraction/coverage/>
+
+=back
 
 =head1 SUPPORT
 

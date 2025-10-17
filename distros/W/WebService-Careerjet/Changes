@@ -1,5 +1,16 @@
 Revision history for WebService-Careerjet
 
+4.2     16 Oct 2025
+        Fixed endpoint.
+
+4.1     16 Oct 2025
+        Added documentation for th_TH and en_TH.
+
+4.0     16 Oct 2025
+        Adapted module to Search API v4.
+        Added backwards compatibility for prior versions.
+        Removed jobsearch command line tool.
+
 3.1     9 Dec 2015
         Updated documentation for en_CN and fr_CA.
 

@@ -1,6 +1,10 @@
 Revision history for App-DBBrowser
 
 
+2.435  2025-10-14
+        - Input filter empty columns: bugfix and update.
+        - DBD::ODBC: added odbc_ignore_named_placeholders attribute.
+
 2.434  2025-10-05
         - Allow existing CTEs to be used in the WHERE clause of UPDATE and DELETE statements.
         - DBD::Oracle: fixed DSN setup.

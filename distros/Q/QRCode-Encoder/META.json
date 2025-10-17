@@ -48,15 +48,15 @@
    "provides" : {
       "QRCode::Encoder" : {
          "file" : "lib/QRCode/Encoder.pm",
-         "version" : "0.003"
+         "version" : "0.005"
       },
       "QRCode::Encoder::Matrix" : {
          "file" : "lib/QRCode/Encoder/Matrix.pm",
-         "version" : "0.003"
+         "version" : "0.005"
       },
       "QRCode::Encoder::QRSpec" : {
          "file" : "lib/QRCode/Encoder/QRSpec.pm",
-         "version" : "0.003"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -71,7 +71,7 @@
          "web" : "https://codeberg.org/polettix/QRCode-Encoder"
       }
    },
-   "version" : "0.003",
+   "version" : "0.005",
    "x_contributors" : [
       "Flavio Poletti <flavio@polettix.it>"
    ],

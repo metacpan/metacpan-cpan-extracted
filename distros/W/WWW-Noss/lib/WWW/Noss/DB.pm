@@ -2,7 +2,7 @@ package WWW::Noss::DB;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '1.09';
+our $VERSION = '1.10';
 
 use List::Util qw(all any max none);
 
@@ -21,6 +21,32 @@ my %DAY_MAP = (
     5 => 'Friday',
     6 => 'Saturday',
 );
+
+sub _resolve_url {
+
+    my ($url, $from) = @_;
+
+    my ($proto, $root, $path) = $from =~ /^(\w+:\/\/)?([^\/]+)(.*)$/;
+    $proto //= '';
+
+    if ($url =~ /^\w+:\/\//) {
+        return $url;
+    }
+
+    if ($proto eq 'shell://' or $proto eq 'file://') {
+        return undef;
+    }
+
+    if ($url =~ /^\/\//) {
+        $url =~ s/^\/\///;
+        return $proto . $url;
+    } elsif ($url =~ /^\//) {
+        return $proto . $root . $url;
+    } else {
+        return $url;
+    }
+
+}
 
 sub _initialize {
 
@@ -429,6 +455,9 @@ WHERE
         defined $row->{ skipdays }
         ? decode_json($row->{ skipdays })
         : [];
+    if (defined $row->{ link }) {
+        $row->{ link } = _resolve_url($row->{ link }, $row->{ nosslink });
+    }
 
     if ($param{ post_info }) {
 
@@ -499,6 +528,9 @@ FROM
             defined $f->{ skipdays }
             ? decode_json($f->{ skipdays })
             : [];
+        if (defined $f->{ link }) {
+            $f->{ link } = _resolve_url($f->{ link }, $f->{ nosslink });
+        }
     }
 
     return @$feeds;
@@ -612,6 +644,15 @@ WHERE
         defined $postref->{ category }
         ? decode_json($postref->{ category })
         : [];
+    # Convert '/foo' and '//foo' relative links
+    if (defined $postref->{ link } and $postref->{ link } =~ /^\//) {
+        my $feed_info = $self->feed($feed);
+        my $conf = _resolve_url(
+            $postref->{ link },
+            $feed_info->{ link } // $feed_info->{ nosslink }
+        );
+        $postref->{ link } = $conf if defined $conf;
+    }
 
     return $postref;
 
@@ -660,6 +701,15 @@ ORDER BY
         defined $postref->{ category }
         ? decode_json($postref->{ category })
         : [];
+    # Convert '/foo' and '//foo' relative links
+    if (defined $postref->{ link } and $postref->{ link } =~ /^\//) {
+        my $feed_info = $self->feed($feed);
+        my $conf = _resolve_url(
+            $postref->{ link },
+            $feed_info->{ link } // $feed_info->{ nosslink }
+        );
+        $postref->{ link } = $conf if defined $conf;
+    }
 
     return $postref;
 
@@ -817,11 +867,26 @@ $limit_clause;
 
     my $n = 0;
 
+    my %cache;
+
     while (my $p = $sth->fetchrow_hashref) {
         $p->{ category } =
             defined $p->{ category }
             ? decode_json($p->{ category })
             : [];
+        if (defined $p->{ link } and $p->{ link } =~ /^\//) {
+            my $feed_info;
+            if (exists $cache{ $p->{ feed } }) {
+                $feed_info = $cache{ $p->{ feed } };
+            } else {
+                $feed_info = $self->feed($p->{ feed });
+                $cache{ $p->{ feed } } = $feed_info;
+            }
+            my $conv = _resolve_url(
+                $p->{ link },
+                $feed_info->{ link } // $feed_info->{ nosslink }
+            );
+        }
         next unless all {
             my $t = $_;
             any { $_ =~ $t } @{ $p->{ category } };

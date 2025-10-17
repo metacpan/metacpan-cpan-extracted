@@ -42,6 +42,7 @@ Global options:
   -D|--data=<dir>          Specify path to data directory
   -f|--feeds=<file>        Specify path to feeds file
   -z|--time-format=<fmt>   Specify default strftime format for time strings
+  -a|--autoclean[=1|0]     Toggle autoclean
 
   -h|--help      Print usage message
   -v|--version   Print version and copyright information

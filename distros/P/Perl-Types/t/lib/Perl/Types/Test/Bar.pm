@@ -1,8 +1,8 @@
 package Perl::Types::Test::Bar;
 use strict;
 use warnings;
-our $VERSION = 0.001_000;
 use types;
+our $VERSION = 0.001_000;
 
 ## no critic qw(ProhibitUselessNoCritic ProhibitMagicNumbers RequireCheckedSyscalls)  # USER DEFAULT 1: allow numeric values & print operator
 

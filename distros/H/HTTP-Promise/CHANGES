@@ -1,5 +1,8 @@
 Revision history for Perl module HTTP::Promise
 
+v0.7.1 2025-10-15T03:04:06+0900
+    - Replaced dependency Want for Wanted, and corrected unti test. Thanks to Slaven Rezić. Gitlab #6, and #7
+
 v0.7.0 2025-10-12T07:29:08+0900
     - Updated HTTP::Promise::Headers to account for RFC9457 mime-type: application/problem+json
     - Correction in error handling in HTTP::Promise::IO

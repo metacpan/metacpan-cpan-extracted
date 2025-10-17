@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/Element.pm
-## Version v0.2.9
+## Version v0.3.0
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/04/25
-## Modified 2024/04/30
+## Modified 2025/10/16
 ## All rights reserved
 ## 
 ## 
@@ -25,7 +25,7 @@ BEGIN
     use Digest::MD5 ();
     use Encode ();
     use Scalar::Util ();
-    use Want;
+    use Wanted;
     use overload (
         'eq'    => \&_same_as,
         '=='    => \&_same_as,
@@ -34,7 +34,7 @@ BEGIN
     our $LOOK_LIKE_HTML = qr/^[[:blank:]\h]*\<\w+.*?\>/;
     our $LOOK_LIKE_IT_HAS_HTML = qr/\<\w+.*?\>/;
     our $ATTRIBUTE_NAME_RE = qr/\w[\w\-]*/;
-    our $VERSION = 'v0.2.9';
+    our $VERSION = 'v0.3.0';
 };
 
 use strict;
@@ -1646,7 +1646,7 @@ HTML::Object::Element - HTML Element Object
 
 =head1 VERSION
 
-    v0.2.9
+    v0.3.0
 
 =head1 DESCRIPTION
 

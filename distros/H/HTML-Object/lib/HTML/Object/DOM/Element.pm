@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/DOM/Element.pm
-## Version v0.3.2
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v0.4.0
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/13
-## Modified 2024/04/20
+## Modified 2025/10/16
 ## All rights reserved
 ## 
 ## 
@@ -22,13 +22,13 @@ BEGIN
     use HTML::Object::Exception;
     use Scalar::Util ();
     use URI;
-    use Want;
+    use Wanted;
     our @EXPORT_OK = qw(
         DOCUMENT_POSITION_IDENTICAL DOCUMENT_POSITION_DISCONNECTED 
         DOCUMENT_POSITION_PRECEDING DOCUMENT_POSITION_FOLLOWING DOCUMENT_POSITION_CONTAINS 
         DOCUMENT_POSITION_CONTAINED_BY DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC
     );
-    our $VERSION = 'v0.3.2';
+    our $VERSION = 'v0.4.0';
 };
 
 use strict;
@@ -2088,7 +2088,7 @@ HTML::Object::DOM::Element - HTML Object
 
 =head1 VERSION
 
-    v0.3.2
+    v0.4.0
 
 =head1 DESCRIPTION
 

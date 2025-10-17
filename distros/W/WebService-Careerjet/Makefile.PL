@@ -5,10 +5,10 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME                => 'WebService::Careerjet',
     AUTHOR              => 'Thomas Busch <api@careerjet.com>',
+    LICENSE             => 'perl',
     VERSION_FROM        => 'lib/WebService/Careerjet.pm',
     ABSTRACT_FROM       => 'lib/WebService/Careerjet.pm',
     PL_FILES            => {},
-    EXE_FILES           => [ 'bin/jobsearch' ] ,
     PREREQ_PM => {
         'Class::AutoAccess' => 0.02,
         'Encode' => 2.08,

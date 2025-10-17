@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Unevaluated;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Unevaluated vocabulary
 
-our $VERSION = '0.619';
+our $VERSION = '0.620';
 
 use 5.020;
 use Moo;
@@ -161,7 +161,7 @@ JSON::Schema::Modern::Vocabulary::Unevaluated - Implementation of the JSON Schem
 
 =head1 VERSION
 
-version 0.619
+version 0.620
 
 =head1 DESCRIPTION
 
@@ -177,6 +177,14 @@ Support is also provided for the equivalent Draft 2019-09 keywords in the
 JSON Schema Draft 2019-09 "Applicator" vocabulary, indicated in metaschemas
 with the URI C<https://json-schema.org/draft/2019-09/vocab/applicator> and formally specified in
 L<https://datatracker.ietf.org/doc/html/draft-handrews-json-schema-02#section-9>.
+
+=head1 GIVING THANKS
+
+=for stopwords MetaCPAN GitHub
+
+If you found this module to be useful, please show your appreciation by
+adding a +1 in L<MetaCPAN|https://metacpan.org/dist/JSON-Schema-Modern>
+and a star in L<GitHub|https://github.com/karenetheridge/JSON-Schema-Modern>.
 
 =head1 SUPPORT
 

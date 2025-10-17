@@ -7,7 +7,7 @@ use JSON;
 use List::Util qw(any min max uniq);
 use Net::ASN;
 use Net::DNS::Domain;
-use Net::IDN::Encode qw(domain_to_ascii domain_to_unicode);
+use Net::IDN::PP;
 use Net::IP;
 use Net::RDAP::EPPStatusMap;
 use Net::RDAP 0.40;
@@ -32,7 +32,7 @@ use locale;
 use vars qw($VERSION $LH);
 use strict;
 
-$VERSION = '1.19';
+$VERSION = '1.20';
 
 $LH = App::rdapper::l10n->get_handle;
 
@@ -71,6 +71,7 @@ my %opts = (
     'debug'         => \$debug,
     'autnum'        => sub { $type = 'autnum' },
     'domain'        => sub { $type = 'domain' },
+    'nameserver'    => sub { $type = 'nameserver' },
     'entity'        => sub { $type = 'entity' },
     'ip'            => sub { $type = 'ip' },
     'tld'           => sub { $type = 'tld' },
@@ -344,10 +345,10 @@ sub lookup {
         $response = $rdap->autnum(Net::ASN->new($asn), %args);
 
     } elsif ('domain' eq $type) {
-        $response = $rdap->domain(Net::DNS::Domain->new(domain_to_ascii($object)), %args);
+        $response = $rdap->domain(Net::DNS::Domain->new($package->encode_idn($object)), %args);
 
     } elsif ('nameserver' eq $type) {
-        my $url = Net::RDAP::Registry->get_url(Net::DNS::Domain->new(domain_to_ascii($object)));
+        my $url = Net::RDAP::Registry->get_url(Net::DNS::Domain->new($package->encode_idn($object)));
 
         #
         # munge path
@@ -362,7 +363,7 @@ sub lookup {
         $response = $rdap->entity($object, %args);
 
     } elsif ('tld' eq $type) {
-        $response = $rdap->fetch(URI->new(IANA_BASE_URL.'domain/'.domain_to_ascii($object)), %args);
+        $response = $rdap->fetch(URI->new(IANA_BASE_URL.'domain/'.$package->encode_idn($object)), %args);
 
     } elsif ('url' eq $type) {
         my $uri = URI->new($object);
@@ -979,6 +980,11 @@ sub export_strings {
     exit;
 }
 
+sub encode_idn {
+    my ($package, $name) = @_;
+    return Net::IDN::PP->encode($name);
+}
+
 1;
 
 __END__
@@ -987,25 +993,7 @@ __END__
 
 =head1 NAME
 
-App::rdapper - a simple console-based L<RDAP|https://about.rdap.org> client.
-
-=head1 INSTALLATION
-
-To install, run:
-
-    cpanm --sudo App::rdapper
-
-=head1 RUNNING VIA DOCKER
-
-The L<git repository|https://github.com/gbxyz/rdapper> contains a
-C<Dockerfile> that can be used to build an image on your local system.
-
-Alternatively, you can pull the L<image from Docker
-Hub|https://hub.docker.com/r/gbxyz/rdapper>:
-
-    $ docker pull gbxyz/rdapper
-
-    $ docker run -it gbxyz/rdapper --help
+App::rdapper - a command-line L<RDAP|https://about.rdap.org> client.
 
 =head1 SYNOPSIS
 
@@ -1027,10 +1015,8 @@ Examples:
 
 =head1 DESCRIPTION
 
-C<rdapper> is a simple RDAP client. It uses L<Net::RDAP> to retrieve data about
-internet resources (domain names, IP addresses, and autonymous systems) and
-outputs the information in a human-readable format. If you want to consume this
-data in your own program you should use L<Net::RDAP> directly.
+C<rdapper> retrieves data about internet resources (domain names, IP addresses,
+and autonymous systems) and outputs the information in a human-readable format.
 
 =head1 OPTIONS
 
@@ -1161,7 +1147,26 @@ arguments the program runs with. So if it contained
     --short
     --bypass-cache
 
-Then running C<rdapper EXAMPLE.COM> will behave like C<rdapper EXAMPLE.COM --short --bypass-cache>.
+Then running C<rdapper EXAMPLE.COM> will behave like
+C<rdapper EXAMPLE.COM --short --bypass-cache>.
+
+=head1 INSTALLATION
+
+To install, run:
+
+    cpanm --sudo App::rdapper
+
+=head1 RUNNING VIA DOCKER
+
+The L<git repository|https://github.com/gbxyz/rdapper> contains a
+C<Dockerfile> that can be used to build an image on your local system.
+
+Alternatively, you can pull the L<image from Docker
+Hub|https://hub.docker.com/r/gbxyz/rdapper>:
+
+    $ docker pull gbxyz/rdapper
+
+    $ docker run -it gbxyz/rdapper --help
 
 =head1 COPYRIGHT & LICENSE
 

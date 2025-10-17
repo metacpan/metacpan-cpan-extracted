@@ -7,6 +7,7 @@ requires 'JSON';
 requires 'List::Util';
 requires 'LWP::UserAgent';
 requires 'LWP::Protocol::https';
+requires 'URI::Escape';
 
 on test => sub {
 	requires 'File::Slurp';

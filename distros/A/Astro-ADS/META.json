@@ -4,7 +4,7 @@
       "Boyd Duffee <duffee@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -21,11 +21,15 @@
       },
       "develop" : {
          "recommends" : {
+            "Dist::Zilla::Plugin::GithubMeta" : "0",
             "Dist::Zilla::Plugin::MetaProvides::Package" : "0",
+            "Dist::Zilla::Plugin::NextRelease" : "0",
             "Dist::Zilla::Plugin::RPM" : "0",
-            "Dist::Zilla::Plugin::Repository" : "0"
+            "Dist::Zilla::Plugin::Repository" : "0",
+            "Dist::Zilla::PluginBundle::Git" : "0"
          },
          "requires" : {
+            "Dist::Zilla" : "0",
             "FindBin" : "0",
             "Mojo::File" : "0",
             "perl" : "5.026"
@@ -35,42 +39,51 @@
          "requires" : {
             "Data::Dumper::Concise" : "0",
             "Feature::Compat::Try" : "0",
+            "Mojo::File" : "0",
+            "Mojo::URL" : "0",
+            "Mojo::Util" : "0",
             "Mojolicious" : "0",
             "Moo" : "0",
             "Moo::Role" : "0",
             "PerlX::Maybe" : "0",
             "Types::Standard" : "0",
+            "perl" : "5.004",
             "strictures" : "0"
          }
       },
       "test" : {
          "requires" : {
             "Mojo::UserAgent::Mockable" : "0",
-            "Test2::Tools::Compare" : "0",
-            "Test2::V0" : "0"
+            "Test2::Tools::Compare" : "1.302196",
+            "Test2::V0" : "0.000139",
+            "Type::Tiny" : "0"
          }
       }
    },
    "provides" : {
       "Astro::ADS" : {
          "file" : "lib/Astro/ADS.pm",
-         "version" : "1.90"
+         "version" : "1.91"
+      },
+      "Astro::ADS::Metrics" : {
+         "file" : "lib/Astro/ADS/Metrics.pm",
+         "version" : "1.91"
       },
       "Astro::ADS::Paper" : {
          "file" : "lib/Astro/ADS/Paper.pm",
-         "version" : "1.90"
+         "version" : "1.91"
       },
       "Astro::ADS::Result" : {
          "file" : "lib/Astro/ADS/Result.pm",
-         "version" : "1.90"
+         "version" : "1.91"
       },
       "Astro::ADS::Role::ResultMapper" : {
          "file" : "lib/Astro/ADS/Role/ResultMapper.pm",
-         "version" : "1.90"
+         "version" : "1.91"
       },
       "Astro::ADS::Search" : {
          "file" : "lib/Astro/ADS/Search.pm",
-         "version" : "1.90"
+         "version" : "1.91"
       }
    },
    "release_status" : "stable",
@@ -85,7 +98,7 @@
          "web" : "https://github.com/duffee/astro-ads"
       }
    },
-   "version" : "1.90",
+   "version" : "1.91",
    "x_generated_by_perl" : "v5.38.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "MIT"

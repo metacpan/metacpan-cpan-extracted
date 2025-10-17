@@ -1,10 +1,10 @@
 use strictures 2;
 package JSON::Schema::Modern::Document::OpenAPI;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
-# ABSTRACT: One OpenAPI v3.1 document
+# ABSTRACT: One OpenAPI v3.1 or v3.2 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.099';
+our $VERSION = '0.100';
 
 use 5.020;
 use utf8;
@@ -19,12 +19,11 @@ no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 no if "$]" >= 5.041009, feature => 'smartmatch';
 no feature 'switch';
-use JSON::Schema::Modern::Utilities qw(E canonical_uri jsonp is_equal);
+use JSON::Schema::Modern::Utilities qw(E canonical_uri jsonp is_equal json_pointer_type assert_keyword_type assert_uri_reference);
+use OpenAPI::Modern::Utilities qw(:constants add_vocab_and_default_schemas load_bundled_document);
 use Carp qw(croak carp);
 use Digest::MD5 'md5_hex';
 use Storable 'dclone';
-use File::ShareDir 'dist_dir';
-use Path::Tiny;
 use Ref::Util 'is_plain_hashref';
 use builtin::compat 'blessed';
 use MooX::TypeTiny 0.002002;
@@ -35,28 +34,6 @@ extends 'JSON::Schema::Modern::Document';
 
 our @CARP_NOT = qw(Sereal Sereal::Decoder JSON::Schema::Modern::Document);
 
-# schema files to add by default
-# these are also available as URIs with 'latest' instead of the timestamp.
-use constant DEFAULT_SCHEMAS => [
-  'oas/dialect/base.schema.json', # metaschema for json schemas contained within openapi documents
-  'oas/meta/base.schema.json',    # vocabulary definition
-  'oas/schema-base.json',         # the main openapi document schema + draft2020-12 jsonSchemaDialect
-  'oas/schema.json',              # the main openapi document schema + permissive jsonSchemaDialect
-  'strict-schema.json',
-  'strict-dialect.json',
-];
-
-# these are all pre-loaded, and also made available as s/<date>/latest/
-use constant DEFAULT_DIALECT => 'https://spec.openapis.org/oas/3.1/dialect/2024-11-10';
-use constant DEFAULT_BASE_METASCHEMA => 'https://spec.openapis.org/oas/3.1/schema-base/2025-09-15';
-use constant DEFAULT_METASCHEMA => 'https://spec.openapis.org/oas/3.1/schema/2025-09-15';
-use constant OAS_VOCABULARY => 'https://spec.openapis.org/oas/3.1/meta/2024-11-10';
-
-# it is likely the case that we can support a version beyond what's stated here -- but we may not,
-# so we'll warn to that effect. Every effort will be made to upgrade this implementation to fully
-# support the latest version as soon as possible.
-use constant OAS_VERSION => '3.1.2';
-
 has '+schema' => (
   isa => HashRef,
 );
@@ -64,18 +41,26 @@ has '+schema' => (
 # json pointer => entity name (indexed by integer); overrides parent
 # these aren't all the different types of objects; for now we only track those that are the valid
 # target of a $ref keyword in an openapi document.
-sub __entities { qw(schema response parameter example request-body header security-scheme link callbacks path-item) }
+sub __entities { qw(schema response parameter example request-body header security-scheme link callbacks path-item media-type) }
 
 # operationId => document path
 has _operationIds => (
   is => 'ro',
-  isa => HashRef[Str],
+  isa => HashRef[json_pointer_type],
   lazy => 1,
   default => sub { {} },
 );
 
-sub get_operationId_path { $_[0]->_operationIds->{$_[1]} }
-sub _add_operationId { $_[0]->_operationIds->{$_[1]} = Str->($_[2]) }
+*get_operationId_path = \&operationId_path; # deprecated
+
+sub operationId_path { $_[0]->_operationIds->{$_[1]} }
+sub _add_operationId { $_[0]->_operationIds->{$_[1]} = json_pointer_type->($_[2]) }
+
+# the minor.major version of the OpenAPI specification used for this document
+has oas_version => (
+  is => 'rwp',
+  isa => Str->where(q{/^[1-9]\.(?:0|[1-9][0-9]*)$/}),
+);
 
 # we define the sub directly, rather than using an 'around', since our root base class is not
 # Moo::Object, so we never got a BUILDARGS to modify
@@ -101,11 +86,29 @@ sub traverse ($self, $evaluator, $config_override = {}) {
   croak join(', ', sort keys %$config_override), ' not supported as a config override in traverse'
     if keys %$config_override;
 
-  $self->_add_vocab_and_default_schemas($evaluator);
-
   my $schema = $self->schema;
+
+  croak 'missing openapi version' if not exists $schema->{openapi};
+  croak 'bad openapi version format ', $schema->{openapi}
+    if $schema->{openapi} !~ /^[0-9]+\.[0-9]+\.[0-9]+(-.+)?$/;
+
+  my @oad_version = split /[.-]/, $schema->{openapi};
+  $self->_set_oas_version(join('.', @oad_version[0..1]));
+
+  my ($max_supported) = grep {
+    my @supported = split /\./;
+    $supported[0] == $oad_version[0] && $supported[1] == $oad_version[1]
+  } reverse SUPPORTED_OAD_VERSIONS->@*;
+
+  croak 'unrecognized/unsupported openapi version ', $schema->{openapi} if not defined $max_supported;
+  carp 'WARNING: your document was written for version ', $schema->{openapi},
+      ' but this implementation has only been tested up to ', $max_supported,
+      ': this may be okay but you should upgrade your OpenAPI::Modern installation soon'
+    if defined $oad_version[2] and (split(/\./, $max_supported))[2] < $oad_version[2];
+
+  add_vocab_and_default_schemas($evaluator, $self->oas_version);
+
   my $state = {
-    # initial_schema_uri calculated from '$self' below
     traversed_keyword_path => '',
     keyword_path => '',
     data_path => '',
@@ -120,81 +123,53 @@ sub traverse ($self, $evaluator, $config_override = {}) {
     traverse => 1,
   };
 
-  # this is an abridged form of https://spec.openapis.org/oas/3.1/schema/<date>
-  # just to validate the parts of the document we need to verify before parsing jsonSchemaDialect
-  # and switching to the real metaschema for this document
-  state $top_schema = {
-    '$schema' => 'https://json-schema.org/draft/2020-12/schema',
-    type => 'object',
-    required => ['openapi'],
-    properties => {
-      '$self' => {    # not in 3.1, but we patch our schema to allow it so we can test
-        type => 'string',
-        format => 'uri-reference',
-        pattern => '',  # just here for the callback so we can customize the error
-      },
-      openapi => {
-        type => 'string',
-        pattern => '',  # just here for the callback so we can customize the error
-      },
-      jsonSchemaDialect => {
-        type => 'string',
-        format => 'uri-reference',
-      },
-    },
-  };
+  if (exists $schema->{'$self'}) {
+    my $state = { %$state, keyword => '$self', initial_schema_uri => Mojo::URL->new };
 
-  my $top_result = $evaluator->evaluate(
-    $schema, $top_schema,
-    {
-      effective_base_uri => DEFAULT_METASCHEMA,
-      collect_annotations => 0,
-      validate_formats => 1,
-      callbacks => {
-        pattern => sub ($data, $schema, $state) {
-          return E($state, '$self cannot contain a fragment')
-            if $state->{data_path} eq '/$self' and $data =~ /#/;
+    if ($oad_version[0] == 3 and $oad_version[1] < 2) {
+      ()= E($state, 'additional property not permitted');
+      return $state;
+    }
 
-          if ($state->{data_path} eq '/openapi') {
-            return E($state, 'unrecognized/unsupported openapi version %s', $data)
-              if $data !~ /^3\.1\.[0-9]+(-.+)?$/;
-
-            my @oad_version = split /\./, $data;
-            my @supported_version = split /\./, OAS_VERSION;
-
-            if ($oad_version[0] > $supported_version[0]
-                || $oad_version[0] == $supported_version[0]
-                  && ($oad_version[1] > $supported_version[1]
-                || $oad_version[1] == $supported_version[1] && $oad_version[2] > $supported_version[2])) {
-              carp 'WARNING: your document was written for version ', $data,
-                ' but this implementation has only been tested up to ', OAS_VERSION,
-                ': this may be okay but you should upgrade your OpenAPI::Modern installation soon';
-            }
-          }
-
-          return 1;
-        },
-      },
-    },
-  );
-  if (not $top_result->valid) {
-    push $state->{errors}->@*, $top_result->errors;
-    return $state;
+    return $state
+      if not assert_keyword_type($state, $schema, 'string')
+        or not assert_uri_reference($state, $schema)
+        or not ($schema->{'$self'} !~ /#/ || E($state, '$self cannot contain a fragment'));
   }
 
-  # determine canonical uri using rules from §?? (v3.2) "Establishing the Base URI"
+  # determine canonical uri using rules from v3.2.0 §4.1.2.2.1, "Establishing the Base URI"
   $self->_set_canonical_uri($state->{initial_schema_uri} =
     Mojo::URL->new($schema->{'$self'}//())->to_abs($self->retrieval_uri));
 
-  # /jsonSchemaDialect: https://spec.openapis.org/oas/v3.1#specifying-schema-dialects
+  # /jsonSchemaDialect: https://spec.openapis.org/oas/latest#specifying-schema-dialects
   {
-    # §4.8.24.5: "If [jsonSchemaDialect] is not set, then the OAS dialect schema id MUST be used for
-    # these Schema Objects."
-    # §4.6: "Unless specified otherwise, all fields that are URIs MAY be relative references as
-    # defined by [RFC3986] Section 4.2."
+    if (exists $schema->{jsonSchemaDialect}) {
+      my $state = { %$state, keyword => 'jsonSchemaDialect' };
+      return $state
+        if not assert_keyword_type($state, $schema, 'string')
+          or not assert_uri_reference($state, $schema);
+    }
+
+    # v3.2.0 §4.24.7, "Specifying Schema Dialects": "If [jsonSchemaDialect] is not set, then the OAS
+    # dialect schema id MUST be used for these Schema Objects."
+    # v3.2.0 §4.1.2.2, "Relative References in API Description URIs": "Unless specified otherwise,
+    # all fields that are URIs MAY be relative references as defined by RFC3986 Section 4.2."
     my $json_schema_dialect = exists $schema->{jsonSchemaDialect}
       ? Mojo::URL->new($schema->{jsonSchemaDialect})->to_abs($self->canonical_uri)
-      : DEFAULT_DIALECT;
+      : DEFAULT_DIALECT->{$self->oas_version};
+
+    # continue to support the old strict dialect and metaschema which didn't have "3.1" in the $id
+    if ($json_schema_dialect eq (STRICT_DIALECT->{3.1} =~ s{/3.1/}{/}r)) {
+      $json_schema_dialect =~ s{share/\K}{3.1/};
+      $schema->{jsonSchemaDialect} = $json_schema_dialect;
+    }
+    $self->_set_metaschema_uri($self->metaschema_uri =~ s{share/\K}{3.1/}r)
+      if $self->_has_metaschema_uri and $self->metaschema_uri eq (STRICT_METASCHEMA->{3.1} =~ s{/3.1/}{/}r);
+
+    # we used to always preload these, so we need to do it as needed for users who are using them
+    load_bundled_document($evaluator, STRICT_DIALECT->{$self->oas_version})
+      if $self->_has_metaschema_uri and $self->metaschema_uri eq STRICT_METASCHEMA->{$self->oas_version}
+        or $json_schema_dialect eq STRICT_DIALECT->{$self->oas_version};
 
     # traverse an empty schema with this dialect uri to confirm it is valid, and add an entry in
     # the evaluator's _metaschema_vocabulary_classes
@@ -214,9 +189,12 @@ sub traverse ($self, $evaluator, $config_override = {}) {
     $state->{json_schema_dialect} = $json_schema_dialect; # subsequent '$schema' keywords can still override this
 
     $self->_set_metaschema_uri(
-          $json_schema_dialect eq DEFAULT_DIALECT ? DEFAULT_BASE_METASCHEMA
+          $json_schema_dialect eq DEFAULT_DIALECT->{$self->oas_version} ? DEFAULT_BASE_METASCHEMA->{$self->oas_version}
         : $self->_dynamic_metaschema_uri($json_schema_dialect, $evaluator))
       if not $self->_has_metaschema_uri;
+
+    load_bundled_document($evaluator, STRICT_METASCHEMA->{$self->oas_version})
+      if $self->_has_metaschema_uri and $self->metaschema_uri eq STRICT_METASCHEMA->{$self->oas_version};
   }
 
   $state->{identifiers}{$state->{initial_schema_uri}} = {
@@ -228,7 +206,7 @@ sub traverse ($self, $evaluator, $config_override = {}) {
 
   # evaluate the document against its metaschema to find any errors, to identify all schema
   # resources within to add to the global resource index, and to extract all operationIds
-  my (@json_schema_paths, @operation_paths, %bad_path_item_refs, @servers_paths);
+  my (@json_schema_paths, @operation_paths, %bad_path_item_refs, @additional_operations_paths, @servers_paths);
   my $result = $evaluator->evaluate(
     $schema, $self->metaschema_uri,
     {
@@ -240,7 +218,7 @@ sub traverse ($self, $evaluator, $config_override = {}) {
         # properties are valid" etc
         '$dynamicRef' => sub ($, $schema, $state) {
           # Note that if we are using the default metaschema
-          # https://spec.openapis.org/oas/3.1/schema/<date>, we will only find the root of each
+          # https://spec.openapis.org/oas/<version>/schema/<date>, we will only find the root of each
           # schema, not all subschemas. We will traverse each of these schemas later using
           # jsonSchemaDialect to find all subschemas and their $ids.
           push @json_schema_paths, $state->{data_path} if $schema->{'$dynamicRef'} eq '#meta';
@@ -264,6 +242,9 @@ sub traverse ($self, $evaluator, $config_override = {}) {
             $bad_path_item_refs{$state->{data_path}} = join(', ', sort keys %path_item) if keys %path_item;
           }
 
+          push @additional_operations_paths, $state->{data_path}.'/additionalOperations'
+            if $entity and $entity eq 'path-item' and exists $data->{additionalOperations};
+
           # will contain duplicates; filter out later
           push @servers_paths, ($state->{data_path} =~ s{/[0-9]+$}{}r)
             if $schema->{'$ref'} eq '#/$defs/server';
@@ -279,8 +260,8 @@ sub traverse ($self, $evaluator, $config_override = {}) {
     return $state;
   }
 
-  # §4.8.8.1: "Templated paths with the same hierarchy but different templated names MUST NOT exist
-  # as they are identical."
+  # v3.2.0 §4.8.1, "Patterned Fields": "Templated paths with the same hierarchy but different
+  # templated names MUST NOT exist as they are identical."
   my %seen_path;
   foreach my $path (sort keys(($schema->{paths}//{})->%*)) {
     next if $path =~ '^x-';
@@ -306,6 +287,10 @@ sub traverse ($self, $evaluator, $config_override = {}) {
   foreach my $path_item (sort keys %bad_path_item_refs) {
     ()= E({ %$state, keyword_path => $path_item },
       'invalid keywords used adjacent to $ref in a path-item: %s', $bad_path_item_refs{$path_item});
+  }
+
+  foreach my $aop (sort @additional_operations_paths) {
+    ()= E({ %$state, schema_path => $aop }, 'not-yet-supported use of additionalOperations');
   }
 
   my %seen_servers;
@@ -382,7 +367,7 @@ sub traverse ($self, $evaluator, $config_override = {}) {
 
   foreach my $pair (@operation_paths) {
     my ($operation_id, $path) = @$pair;
-    if (my $existing = $self->get_operationId_path($operation_id)) {
+    if (my $existing = $self->operationId_path($operation_id)) {
       ()= E({ %$state, keyword_path => $path .'/operationId' },
         'duplicate of operationId at %s', $existing);
     }
@@ -403,63 +388,7 @@ sub validate ($class, @args) {
 
 ######## NO PUBLIC INTERFACES FOLLOW THIS POINT ########
 
-# simple runtime-wide cache of metaschema document objects that are sourced from disk
-my $metaschema_cache = {};
-
-sub _add_vocab_and_default_schemas ($self, $evaluator) {
-  $evaluator->add_vocabulary('JSON::Schema::Modern::Vocabulary::OpenAPI');
-
-  $evaluator->add_format_validation(int32 => +{
-    type => 'number',
-    sub => sub ($x) {
-      require Math::BigInt; Math::BigInt->VERSION(1.999701);
-      $x = Math::BigInt->new($x);
-      return if $x->is_nan;
-      my $bound = Math::BigInt->new(2) ** 31;
-      $x >= -$bound && $x < $bound;
-    }
-  });
-
-  $evaluator->add_format_validation(int64 => +{
-    type => 'number',
-    sub => sub ($x) {
-      require Math::BigInt; Math::BigInt->VERSION(1.999701);
-      $x = Math::BigInt->new($x);
-      return if $x->is_nan;
-      my $bound = Math::BigInt->new(2) ** 63;
-      $x >= -$bound && $x < $bound;
-    }
-  });
-
-  $evaluator->add_format_validation(float => +{ type => 'number', sub => sub ($x) { 1 } });
-  $evaluator->add_format_validation(double => +{ type => 'number', sub => sub ($x) { 1 } });
-  $evaluator->add_format_validation(password => +{ type => 'string', sub => sub ($) { 1 } });
-
-  foreach my $filename (DEFAULT_SCHEMAS->@*) {
-    my $document;
-    if ($document = $metaschema_cache->{$filename}) {
-      $evaluator->add_document($document);
-    }
-    else {
-      my $file = path(dist_dir('OpenAPI-Modern'), $filename);
-      my $schema = $evaluator->_json_decoder->decode($file->slurp_raw);
-      $metaschema_cache->{$filename} = $document = $evaluator->add_schema($schema);
-    }
-
-    $evaluator->add_document($`.'/latest', $document)
-      if $document->canonical_uri =~ m{/\d{4}-\d{2}-\d{2}$};
-  }
-
-  # dirty hack! patch in support for $self, until v3.2
-  $evaluator->{_resource_index}{DEFAULT_METASCHEMA()}{document}->schema->{properties}{'$self'} = {
-    type => 'string',
-    format => 'uri-reference',
-    '$comment' => 'MUST NOT be empty, and MUST NOT contain a fragment',
-    pattern => '^[^#]+$',
-  } if exists $self->schema->{'$self'};
-}
-
-# https://spec.openapis.org/oas/v3.1#schema-object
+# https://spec.openapis.org/oas/latest#schema-object
 # traverse this JSON Schema and identify all errors, subschema locations, and referenceable
 # identifiers
 sub _traverse_schema ($self, $state) {
@@ -517,9 +446,9 @@ sub _dynamic_metaschema_uri ($self, $json_schema_dialect, $evaluator) {
   my $dialect_uri = 'https://custom-dialect.example.com/' . md5_hex($json_schema_dialect);
   return $dialect_uri if $evaluator->_get_resource($dialect_uri);
 
-  # we use the definition of https://spec.openapis.org/oas/3.1/schema-base/<date> but swap out the
-  # dialect reference.
-  my $schema = dclone($evaluator->_get_resource(DEFAULT_BASE_METASCHEMA)->{document}->schema);
+  # we use the definition of https://spec.openapis.org/oas/<version>/schema-base/<date> but swap out
+  # the dialect reference.
+  my $schema = dclone($evaluator->_get_resource(DEFAULT_BASE_METASCHEMA->{$self->oas_version})->{document}->schema);
   $schema->{'$id'} = $dialect_uri;
   $schema->{'$defs'}{dialect}{const} = $json_schema_dialect;
   $schema->{'$defs'}{schema}{'$ref'} = $json_schema_dialect;
@@ -564,11 +493,11 @@ __END__
 
 =head1 NAME
 
-JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.1 document
+JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.1 or v3.2 document
 
 =head1 VERSION
 
-version 0.099
+version 0.100
 
 =head1 SYNOPSIS
 
@@ -578,7 +507,7 @@ version 0.099
     canonical_uri => 'https://example.com/v1/api',
     schema => decode_json(<<JSON),
 {
-  "openapi": "3.1",
+  "openapi": "3.2.0",
   "info": {
     "title": "my title",
     "version": "1.2.3"
@@ -604,12 +533,21 @@ Provides structured parsing of an OpenAPI document, suitable as the base for mor
 request and response validation, code generation or form generation.
 
 The provided document must be a valid OpenAPI document, as specified by the schema identified by
-L<https://spec.openapis.org/oas/3.1/schema-base/2025-09-15> (which is a wrapper around
-L<https://spec.openapis.org/oas/3.1/schema/2025-09-15>),
-and the L<OpenAPI v3.1.x specification|https://spec.openapis.org/oas/v3.1>.
+one of:
 
-=for Pod::Coverage THAW DEFAULT_BASE_METASCHEMA DEFAULT_DIALECT DEFAULT_METASCHEMA DEFAULT_SCHEMAS
-OAS_VOCABULARY OAS_VERSION
+=over 4
+
+=item *
+
+for v3.2 documents: L<https://spec.openapis.org/oas/3.2/schema-base/2025-09-17> (which is a wrapper around L<https://spec.openapis.org/oas/3.2/schema/2025-09-17>), and the L<OpenAPI v3.2.x specification|https://spec.openapis.org/oas/v3.2>
+
+=item *
+
+for v3.1 documents: L<https://spec.openapis.org/oas/3.1/schema-base/2025-09-15> (which is a wrapper around L<https://spec.openapis.org/oas/3.1/schema/2025-09-15>), and the L<OpenAPI v3.1.x specification|https://spec.openapis.org/oas/v3.1>
+
+=back
+
+=for Pod::Coverage THAW get_operationId_path
 
 =head1 CONSTRUCTOR ARGUMENTS
 
@@ -641,16 +579,19 @@ may be other L<JSON::Schema::Modern::Document::OpenAPI> objects).
 
 This is the identifier that the document is known by, which is used to resolve any relative C<$ref>
 keywords in the document (unless overridden by a subsequent C<$id> in a schema).
-See L<§4.6/https://spec.openapis.org/oas/v3.1#relative-references-in-api-description-uris>.
+See L<Specification Reference: Relative References in API Description URIs/https://spec.openapis.org/oas/latest#relative-references-in-api-description-uris>.
 It is strongly recommended that this URI is absolute.
+
+In v3.2+ documents, it is used to resolve the C<$self> value in the document itself, which then
+replaces this C<canonical_uri> value.
 
 See also L</retrieval_uri>.
 
 =head2 metaschema_uri
 
 The URI of the schema that describes the OpenAPI document itself. Defaults to
-L<https://spec.openapis.org/oas/3.1/schema-base/2025-09-15> when the
-C<L<jsonSchemaDialect/https://spec.openapis.org/oas/v3.1#fixed-fields>>
+L<https://spec.openapis.org/oas/3.2/schema-base/2025-09-17> when the
+C<L<jsonSchemaDialect/https://spec.openapis.org/oas/latest#openapi-object>>
 is not changed from its default; otherwise defaults to a dynamically generated metaschema that uses
 the correct value of C<jsonSchemaDialect>, so you don't need to write one yourself.
 
@@ -669,9 +610,19 @@ Also available as L<JSON::Schema::Modern::Document/original_uri>, this is known 
 URI" in the OAS specification: the URL the document was originally sourced from, or the URI that
 was used to add the document to the L<OpenAPI::Modern> instance.
 
-In OpenAPI version 3.1.x, this is the same as L</canonical_uri>.
+In OpenAPI version 3.1.x (but not in 3.2+), this is the same as L</canonical_uri>.
 
-=head2 get_operationId_path
+=head2 oas_version
+
+The C<major.minor> version of the OpenAPI specification being used; derived from the C<openapi>
+field at the top of the document. Used to determine the required document format and all derived
+behaviours.
+
+Read-only.
+
+=head2 operationId_path
+
+  my $path = $document->operationId_path($operation_id);
 
 Returns the json pointer location of the operation containing the provided C<operationId> (suitable
 for passing to C<< $document->get(..) >>), or C<undef> if the operation does not exist in the
@@ -711,9 +662,21 @@ L<https://learn.openapis.org/>
 
 =item *
 
-L<https://spec.openapis.org/oas/v3.1>
+L<https://spec.openapis.org/oas/latest>
+
+=item *
+
+L<https://spec.openapis.org/oas/#schema-iterations>
 
 =back
+
+=head1 GIVING THANKS
+
+=for stopwords MetaCPAN GitHub
+
+If you found this module to be useful, please show your appreciation by
+adding a +1 in L<MetaCPAN|https://metacpan.org/dist/OpenAPI-Modern>
+and a star in L<GitHub|https://github.com/karenetheridge/OpenAPI-Modern>.
 
 =head1 SUPPORT
 

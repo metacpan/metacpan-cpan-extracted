@@ -6,7 +6,7 @@ sneck - a boopable LibreNMS JSON style SNMP extend for remotely running nagios s
 
 =head1 SYNOPSIS
 
-sneck -u [B<-C> <cache file] [B<-f> <config file>] [B<-p>] [B<-i>]
+sneck -u [B<-C> <cache file] [B<-f> <config file>] [B<-p>] [B<-i>] [B<-d>]
 
 sneck -c [B<-C> <cache file] [B<-b>]
 
@@ -58,6 +58,10 @@ style compression.
 
 Includes the config file used.
 
+=head2 -d
+
+Print debugging info if called with -u.
+
 =cut
 
 use strict;
@@ -89,6 +93,7 @@ my $version;
 my $pretty;
 my $include;
 my $compress;
+my $debug;
 Getopt::Long::Configure('no_ignore_case');
 Getopt::Long::Configure('bundling');
 GetOptions(
@@ -103,6 +108,7 @@ GetOptions(
 	'u'       => \$update,
 	'i'       => \$include,
 	'b'       => \$compress,
+	'd'       => \$debug,
 );
 
 # print version or help if requested
@@ -135,7 +141,7 @@ if ($print_cache) {
 	exit;
 } ## end if ($print_cache)
 
-my $sneck    = Monitoring::Sneck->new( { config => $config_file, include => $include } );
+my $sneck    = Monitoring::Sneck->new( { config => $config_file, include => $include, debug => $debug } );
 my $returned = $sneck->run;
 
 # encode it and print it

@@ -331,6 +331,8 @@ Supported Functions:
   map_values(FILTER)
                    - Apply FILTER to each value in an object (dropping keys when FILTER yields no result)
   walk(FILTER)     - Recursively apply FILTER to every value in arrays and objects
+  recurse([FILTER])
+                   - Emit the current value and depth-first descendants using optional FILTER for children
   add / sum        - Sum all numeric values in an array
   sum_by(KEY)      - Sum numeric values projected from each array item
   avg_by(KEY)      - Average numeric values projected from each array item
@@ -352,6 +354,7 @@ Supported Functions:
   clamp(MIN, MAX)  - Clamp numeric values within an inclusive range
   tostring()       - Convert values into their JSON string representation
   tojson()         - Encode values as JSON text regardless of type
+  fromjson()       - Decode JSON text into native values (arrays handled element-wise)
   to_number()      - Coerce numeric-looking strings/booleans into numbers
   nth(N)           - Get the Nth element of an array (zero-based index)
   index(VALUE)     - Return the zero-based index of VALUE within arrays or strings
@@ -375,6 +378,7 @@ Supported Functions:
   contains         - Check if strings include a fragment, arrays contain an element, or hashes have a key
   any([FILTER])    - Return true if any input (optionally filtered) is truthy
   all([FILTER])    - Return true if every input (optionally filtered) is truthy
+  not              - Logical negation following jq truthiness rules
   match("pattern") - Match string using regex
   explode()        - Convert strings to arrays of Unicode code points
   implode()        - Turn arrays of code points back into strings
@@ -398,6 +402,7 @@ Supported Functions:
   endswith(SFX)    - Check if a string (or array of strings) ends with SFX
   empty            - Discard all output (for side-effect use)
   type()           - Return the type of value ("string", "number", "boolean", "array", "object", "null")
+  lhs // rhs       - jq-style alternative operator yielding rhs when lhs is null/missing
   default(VALUE)   - Substitute VALUE when result is undefined
 
 EOF

@@ -5,7 +5,7 @@ use warnings;
 use strict;
 use 5.016;
 
-use List::MoreUtils qw( any );
+use List::MoreUtils qw( any uniq );
 
 use Term::Choose            qw();
 use Term::Choose::Constants qw( EXTRA_W );
@@ -48,6 +48,7 @@ sub input_filter {
     my $join_columns  = 'Join_Columns';
     my $fill_up_rows  = 'Fill_up_Rows';
     my $empty_to_null = ' Empty_2_null';
+    my $empty_cols    = 'Empty_Columns';
     my $choose_cols   = 'Choose_Columns';
     my $append_col    = 'Append_Columns';
     my $cols_to_rows  = 'Columns_to_Rows';
@@ -63,7 +64,7 @@ sub input_filter {
         my $skip = ' ';
         my $menu = [
             undef,          $choose_rows,   $range_rows,   $row_groups,
-            $confirm,       $choose_cols,   $empty_rows,   $skip,
+            $confirm,       $choose_cols,   $empty_rows,   $empty_cols,
             $reset,         $s_and_replace, $convert_date, $skip,
             $reparse,       $remove_cell,   $insert_cell,  $skip,
             $empty_to_null, $join_columns,  $split_column, $append_col,
@@ -122,6 +123,9 @@ sub input_filter {
         }
         elsif ( $filter eq $empty_rows ) {
             $sf->__remove_empty_rows( $sql, $filter_str, $working );
+        }
+        elsif ( $filter eq $empty_cols ) {
+            $sf->__remove_empty_columns( $sql, $filter_str, $working );
         }
         elsif ( $filter eq $remove_cell ) {
             $sf->__remove_cell( $sql, $filter_str, $working );
@@ -198,21 +202,11 @@ sub __choose_columns {
     my $aoa = $sql->{insert_args};
     my $is_empty = $sf->__search_empty_cols( $aoa );
     my $header = $sf->__prepare_header( $aoa, $is_empty );
-    my $col_count = @{$aoa->[0]};
-    my $non_empty_cols = [];
-    for my $col_idx ( 0 .. $col_count - 1 ) {
-        if ( ! $is_empty->[$col_idx] ) {
-            push @$non_empty_cols, $col_idx;
-        }
-    }
-    if ( @$non_empty_cols == $col_count ) {
-        $non_empty_cols = undef; # no preselect if all cols have entries
-    }
     my $info = $sf->__get_filter_info( $sql, $filter_str );
     # Choose
     my $col_idx = $tu->choose_a_subset(
         $header,
-        { cs_label => 'Cols: ', layout => 0, order => 0, mark => $non_empty_cols, all_by_default => 1, index => 1,
+        { cs_label => 'Cols: ', layout => 0, order => 0, all_by_default => 1, index => 1,
           info => $info, keep_chosen => 1, busy_string => $working }
     );
     $sf->__print_busy_string( $working );
@@ -224,14 +218,61 @@ sub __choose_columns {
 }
 
 
-sub __remove_empty_rows {
+sub __remove_empty_columns {
     my ( $sf, $sql, $filter_str, $working ) = @_;
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    my $menu = [ undef, '- Remove empty rows', '- Remove rows where all fields are empty or undef' ];
+    my $remove_completely_empty_cols = '- Remove completely empty columns';
+    my $remove_cols_with_no_data = '- Remove columns without data';
+    my $menu = [ undef, $remove_completely_empty_cols, $remove_cols_with_no_data ];
     my $info = $sf->__get_filter_info( $sql, $filter_str );
     my $choice = $tc->choose(
         $menu,
-        { info => $info, index => 1, layout => 2, busy_string => $working }
+        { info => $info, layout => 2, busy_string => $working }
+    );
+    $sf->__print_busy_string( $working );
+    if ( ! $choice ) {
+        return;
+    }
+    else {
+        my $aoa = $sql->{insert_args};
+        my $col_count = @{$aoa->[0]};
+        my $cols_with_data = [];
+        my $cols_with_header = [];
+        my $is_empty = $sf->__search_empty_cols( $aoa, 1 );
+
+        for my $col_idx ( 0 .. $col_count - 1 ) {
+            if ( ! $is_empty->[$col_idx] ) {
+                push @$cols_with_data, $col_idx;
+            }
+            if ( length $aoa->[0][$col_idx] ) {
+                push @$cols_with_header, $col_idx;
+            }
+        }
+        my $non_empty_cols = [];
+        if ( $choice eq $remove_completely_empty_cols ) {
+            $non_empty_cols = [ uniq @$cols_with_header, @$cols_with_data ];
+        }
+        else {
+            $non_empty_cols = $cols_with_data;
+
+        }
+        if ( @$non_empty_cols != $col_count ) {
+            $sql->{insert_args} = [ map { [ @{$_}[@$non_empty_cols] ] } @$aoa ];
+        }
+        return 1;
+    }
+}
+
+sub __remove_empty_rows {
+    my ( $sf, $sql, $filter_str, $working ) = @_;
+    my $tc = Term::Choose->new( $sf->{i}{tc_default} );
+    my $remove_completely_empty_rows = '- Remove completely empty rows';
+    my $remove_all_fields_empty_rows =  '- Remove rows with all fields empty or undefined';
+    my $menu = [ undef, $remove_completely_empty_rows, $remove_all_fields_empty_rows ];
+    my $info = $sf->__get_filter_info( $sql, $filter_str );
+    my $choice = $tc->choose(
+        $menu,
+        { info => $info, layout => 2, busy_string => $working }
     );
     $sf->__print_busy_string( $working );
     if ( ! $choice ) {
@@ -242,7 +283,7 @@ sub __remove_empty_rows {
         my $tmp = [];
 
         ROW: for my $row ( @$aoa ) {
-            if ( $choice == 1 && @$row > 1 ) {
+            if ( $choice eq $remove_completely_empty_rows && @$row > 1 ) {
                 push @$tmp, $row;
                 next ROW;
             }
@@ -841,12 +882,13 @@ sub __empty_to_null {
 }
 
 
-
 sub __search_empty_cols {
-    my ( $sf, $aoa ) = @_;
+    my ( $sf, $aoa, $first_row ) = @_;
+    $first_row //= 0;
     my $is_empty ;
-    COL: for my $col_idx ( 0 .. $#$aoa ) {
-        for my $row_idx ( 0 .. $#{$aoa->[0]} ) {
+
+    COL: for my $col_idx ( 0 .. $#{$aoa->[0]} ) {
+        for my $row_idx ( $first_row .. $#$aoa ) {
             if ( length $aoa->[$row_idx][$col_idx] ) {
                 $is_empty->[$col_idx] = 0;
                 next COL;

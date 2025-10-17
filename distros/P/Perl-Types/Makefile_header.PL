@@ -76,9 +76,7 @@ if ($version < $min_cxx_versions->{$cxx_real}) {
 }
 
 # fix read-only blib/lib in MS Windows
-BEGIN {
-    require ExtUtils::MakeMaker;  # ensure EUMM is actually loaded before modifying "@ExtUtils::MakeMaker::Overridable"
-    if ( $OSNAME eq 'MSWin32' ) {
-        push( @ExtUtils::MakeMaker::Overridable, qw(pm_to_blib) );
-    }
+if ( $OSNAME eq 'MSWin32' ) {
+    # DEV NOTE, CORRELATION #gt01: Dist::Zilla::Plugin::AutoPrereqs incorrectly finds ExtUtils::MakeMaker as dependency
+    push( @ExtUtils::MakeMaker::Overridable, qw(pm_to_blib) );
 }

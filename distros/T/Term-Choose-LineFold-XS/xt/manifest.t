@@ -5,4 +5,5 @@ use Test::More;
 
 use Test::CheckManifest;
 
-ok_manifest();
+
+ok_manifest( { filter => [ qr/\.(?:bs|c|o)$/ ] } );

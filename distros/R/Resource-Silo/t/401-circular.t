@@ -56,16 +56,16 @@ subtest 'forward dependencies end up in a loop' => sub {
 
         resource l1      =>
             dependencies => [ 'l2' ],
-            init         => sub { ... };
+            init         => sub {};
         resource l2      =>
             dependencies => [ 'l3' ],
-            init         => sub { ... };
+            init         => sub {};
         resource l3      =>
             dependencies => [ 'l4' ],
-            init         => sub { ... };
+            init         => sub {};
         resource l4 =>
             dependencies => [ 'l1' ],
-            init         => sub { ... };
+            init         => sub {};
 
         1;
     } qr/[Cc]ircular dependency/, 'circularity detected in forward deps';

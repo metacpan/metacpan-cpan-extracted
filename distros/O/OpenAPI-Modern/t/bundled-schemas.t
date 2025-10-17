@@ -15,23 +15,22 @@ use JSON::Schema::Modern::Document::OpenAPI;
 use lib 't/lib';
 use Helper;
 
-use constant STRICT_METASCHEMA => 'https://raw.githubusercontent.com/karenetheridge/OpenAPI-Modern/master/share/strict-schema.json';
-
 my $oad_schema = {
-  openapi => OAS_VERSION,
+  openapi => OAD_VERSION,
   info => { title => 'my api', version => '1.0' },
   components => {},
 };
 
-subtest 'OAS metaschemas sanity check' => sub {
+subtest 'OAS metaschemas sanity check for version '.$_ => sub {
+  my $version = $_;
   my $evaluator = JSON::Schema::Modern->new(validate_formats => 1);
   foreach my $metaschema_uri (
-      DEFAULT_METASCHEMA,
-      DEFAULT_BASE_METASCHEMA,
-      STRICT_METASCHEMA,
+      DEFAULT_METASCHEMA->{$version},
+      DEFAULT_BASE_METASCHEMA->{$version},
+      STRICT_METASCHEMA->{$version},
     ) {
     my $result = JSON::Schema::Modern::Document::OpenAPI->validate(
-      schema => $oad_schema,
+      schema => { %$oad_schema, openapi => $version.'.0' },
       metaschema_uri => $metaschema_uri,
       evaluator => $evaluator,
     );
@@ -47,19 +46,35 @@ subtest 'OAS metaschemas sanity check' => sub {
     JSON::Schema::Modern::METASCHEMA_URIS->{'draft2020-12'},
     $_.' uses the correct JSON Schema specification metaschema',
   )
-  foreach (DEFAULT_METASCHEMA, DEFAULT_BASE_METASCHEMA);
+  foreach (DEFAULT_METASCHEMA->{$version}, DEFAULT_BASE_METASCHEMA->{$version});
 
   is(
-    $evaluator->get_document(DEFAULT_METASCHEMA)->get('/properties/jsonSchemaDialect/default'),
-    DEFAULT_DIALECT,
-    DEFAULT_METASCHEMA.' uses the correct jsonSchemaDialect default',
+    $evaluator->get_document(DEFAULT_METASCHEMA->{$version})->get('/properties/jsonSchemaDialect/default'),
+    DEFAULT_DIALECT->{$version},
+    DEFAULT_METASCHEMA->{$version}.' uses the correct jsonSchemaDialect default',
   );
 
   is(
-    $evaluator->get_document(DEFAULT_BASE_METASCHEMA)->get($_),
-    DEFAULT_DIALECT,
-    DEFAULT_BASE_METASCHEMA.' forces the use of the correct jsonSchemaDialect in '.$_,
+    $evaluator->get_document(DEFAULT_BASE_METASCHEMA->{$version})->get($_),
+    DEFAULT_DIALECT->{$version},
+    DEFAULT_BASE_METASCHEMA->{$version}.' forces the use of the correct jsonSchemaDialect in '.$_,
   ) foreach ('/$defs/dialect/const', '/$defs/schema/$ref');
+}
+foreach OAS_VERSIONS->@*;
+
+subtest 'customized 3.1 strict schema and dialect when version is omitted' => sub {
+  my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
+    evaluator => my $evaluator = JSON::Schema::Modern->new,
+    metaschema_uri => (STRICT_METASCHEMA->{3.1} =~ s{/3\.1/}{/}r),
+    schema => {
+      %$oad_schema,
+      openapi => '3.1.0',
+      jsonSchemaDialect => (STRICT_DIALECT->{3.1} =~ s{/3\.1/}{/}r),
+    },
+  );
+
+  cmp_result([ map $_->TO_JSON, $doc->errors ], [], 'no document errors');
+  is($doc->metaschema_uri, STRICT_METASCHEMA->{3.1}, '3.1-identified strict metaschema is swapped in');
 };
 
 done_testing;

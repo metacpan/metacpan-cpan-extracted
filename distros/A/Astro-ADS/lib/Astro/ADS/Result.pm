@@ -1,8 +1,6 @@
 package Astro::ADS::Result;
-# ABSTRACT: A class for the results of a Search
-$Astro::ADS::Result::VERSION = '1.90';
+$Astro::ADS::Result::VERSION = '1.91';
 use Moo;
-#extends 'Astro::ADS';
 
 use Carp;
 use Data::Dumper::Concise;
@@ -13,8 +11,6 @@ use Mojo::URL;
 use Mojo::Util qw( quote );
 use PerlX::Maybe;
 use Types::Standard qw( Int Str ArrayRef HashRef Bool ); # InstanceOf ConsumerOf
-
-no warnings 'experimental'; # suppress warning for native perl 5.36 try/catch
 
 has [qw/q fq fl sort/] => (
     is       => 'rw',
@@ -34,7 +30,7 @@ has [qw/start rows/] => (
 );
 has error => (
     is       => 'rw',
-    isa      => Str,
+    isa      => HashRef[]
 );
 has docs => (
     is      => 'rw',
@@ -48,7 +44,7 @@ has docs => (
 before [qw/numFound numFoundExact start rows docs/] => sub {
    my ($self) = @_;
    if ($self->error ) {
-       carp 'Empty Result object: ', $self->error;
+       carp 'Empty Result object: ', $self->error->{message};
    }
 };
 
@@ -102,8 +98,6 @@ sub get_papers {
 
 1;
 
-__END__
-
 =pod
 
 =encoding UTF-8
@@ -114,7 +108,7 @@ Astro::ADS::Result - A class for the results of a Search
 
 =head1 VERSION
 
-version 1.90
+version 1.91
 
 =head1 SYNOPSIS
 
@@ -161,19 +155,15 @@ If given an argument, it takes that as the number of rows to fetch.
 
 =over 4
 
-=item *L<Astro::ADS>
+=item * L<Astro::ADS>
 
-=item *L<Astro::ADS::Search>
+=item * L<Astro::ADS::Search>
 
-=item *L<ADS API|https://ui.adsabs.harvard.edu/help/api/>
+=item * L<ADS API|https://ui.adsabs.harvard.edu/help/api/>
 
-=item *L<Available fields for Results|https://ui.adsabs.harvard.edu/help/search/comprehensive-solr-term-list>
+=item * L<Available fields for Results|https://ui.adsabs.harvard.edu/help/search/comprehensive-solr-term-list>
 
 =back
-
-=head1 AUTHOR
-
-Boyd Duffee <duffee@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,0 +1,12 @@
+; load plugin Code::TidyAll::Plugin::PerlTidy;
+; criticize all executables, libraries, and tests;
+; configuration resides in '.perltidyrc'
+[PerlTidy]
+select = **/*.{pl,pm,t}
+
+; load plugin Code::TidyAll::Plugin::PerlCritic;
+; criticize all libraries;
+; configuration resides in '.perlcriticrc'
+[PerlCritic]
+select = lib/**/*.pm
+;ignore = lib/Ignore/This/File.pm

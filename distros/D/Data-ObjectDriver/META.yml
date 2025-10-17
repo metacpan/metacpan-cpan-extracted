@@ -5,6 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '6.59'
   Test::Exception: '0'
+  Tie::IxHash: '0'
   version: '0'
 configure_requires:
   Module::Build::Tiny: '0.035'
@@ -59,7 +60,7 @@ optional_features:
 provides:
   Data::ObjectDriver:
     file: lib/Data/ObjectDriver.pm
-    version: '0.25'
+    version: '0.26'
   Data::ObjectDriver::BaseObject:
     file: lib/Data/ObjectDriver/BaseObject.pm
   Data::ObjectDriver::BaseView:
@@ -125,7 +126,7 @@ resources:
   bugtracker: https://github.com/sixapart/data-objectdriver/issues
   homepage: https://github.com/sixapart/data-objectdriver
   repository: https://github.com/sixapart/data-objectdriver.git
-version: '0.25'
+version: '0.26'
 x_authority: cpan:SIXAPART
 x_contributors:
   - 'Adam Thomason <athomason@sixapart.com>'

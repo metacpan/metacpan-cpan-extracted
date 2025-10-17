@@ -56,9 +56,8 @@ my %efa_instance = (
 	},
 	KVV    => { load_instance('de/kvv') },
 	LinzAG => {
-		url      => 'https://www.linzag.at/static',
-		name     => 'Linz AG',
-		encoding => 'iso-8859-15',
+		url  => 'https://www.linzag.at/static',
+		name => 'Linz AG',
 	},
 	MVV  => { load_instance('de/mvv') },
 	NVBW => {
@@ -114,7 +113,7 @@ use warnings;
 use 5.014;
 use utf8;
 
-our $VERSION = '3.16';
+our $VERSION = '3.17';
 
 # Most of these have been adapted from
 # <https://github.com/public-transport/transport-apis> and

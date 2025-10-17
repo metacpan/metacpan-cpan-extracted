@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## DateTime::Format::Unicode - ~/lib/DateTime/Format/Unicode.pm
-## Version v0.2.0
+## Version v0.3.0
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/07/21
-## Modified 2025/04/20
+## Modified 2025/10/16
 ## All rights reserved
 ## 
 ## 
@@ -25,8 +25,8 @@ BEGIN
     use DateTime::Locale::FromCLDR;
     use POSIX ();
     use Scalar::Util;
-    use Want;
-    our $VERSION = 'v0.2.0';
+    use Wanted;
+    our $VERSION = 'v0.3.0';
 };
 
 use strict;
@@ -139,7 +139,7 @@ sub error
                 die( $self->{error} );
             }
         }
-        rreturn( DateTime::Format::Unicode::NullObject->new ) if( Want::want( 'OBJECT' ) );
+        rreturn( DateTime::Format::Unicode::NullObject->new ) if( want( 'OBJECT' ) );
         return;
     }
     return( ref( $self ) ? $self->{error} : $ERROR );
@@ -419,7 +419,7 @@ sub pass_error
         return( $self->error( @_ ) );
     }
     
-    if( Want::want( 'OBJECT' ) )
+    if( want( 'OBJECT' ) )
     {
         rreturn( DateTime::Format::Unicode::NullObject->new );
     }
@@ -1966,7 +1966,7 @@ sub TO_JSON { return( shift->as_string ); }
             '""'    => sub{ '' },
             fallback => 1,
         );
-        use Want;
+        use Wanted;
     };
     use strict;
     use warnings;
@@ -1982,7 +1982,7 @@ sub TO_JSON { return( shift->as_string ); }
     {
         my( $method ) = our $AUTOLOAD =~ /([^:]+)$/;
         my $self = shift( @_ );
-        if( Want::want( 'OBJECT' ) )
+        if( want( 'OBJECT' ) )
         {
             rreturn( $self );
         }
@@ -2039,7 +2039,7 @@ You can also override the C<locale>'s default number system, by another one, as 
 
 =head1 VERSION
 
-    v0.2.0
+    v0.3.0
 
 =head1 DESCRIPTION
 

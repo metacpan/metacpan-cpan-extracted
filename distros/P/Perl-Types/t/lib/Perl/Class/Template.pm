@@ -26,8 +26,8 @@ our $VERSION = 0.001_000;
 
 # [[[ OO INHERITANCE ]]]
 # <<< CHANGE_ME: leave as base class for no inheritance, or replace with real parent class name >>>
-use parent qw(Perl::Class);
-use Perl::Class;
+use parent qw(class);
+use class;
 
 # [[[ CRITICS ]]]
 # <<< CHANGE_ME: delete unused directives >>>
@@ -237,8 +237,8 @@ our $VERSION = 0.001_000;
 
 # [[[ OO INHERITANCE ]]]
 # <<< CHANGE_ME: leave as base class for no inheritance, or replace with real parent class name >>>
-use parent qw(Perl::Class);
-use Perl::Class;
+use parent qw(class);
+use class;
 
 # [[[ CRITICS ]]]
 # <<< CHANGE_ME: delete for no directives, or add real directives >>>
