@@ -28,5 +28,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/VVelox/Monitoring-Sneck.git
-version: v1.2.0
+version: v1.2.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

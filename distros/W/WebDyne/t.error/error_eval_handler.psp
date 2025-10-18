@@ -1,0 +1,6 @@
+<start_html>
+<perl method="handler"/>
+__PERL__
+sub handler {
+    return eval("1/0")
+}

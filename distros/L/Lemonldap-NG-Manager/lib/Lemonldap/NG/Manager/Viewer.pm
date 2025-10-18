@@ -12,7 +12,7 @@ extends 'Lemonldap::NG::Manager::Conf';
 has diffRule => ( is => 'rw', default => sub { 0 } );
 has brwRule  => ( is => 'rw', default => sub { 0 } );
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.22.0';
 
 #############################
 # I. INITIALIZATION METHODS #
@@ -58,7 +58,7 @@ sub init {
       applicationList oidcOPMetaDataNodes oidcRPMetaDataNodes
       casSrvMetaDataNodes casAppMetaDataNodes sfExtra
       authChoiceModules grantSessionRules combModules
-      openIdIDPList);
+      openIdIDPList keyNodes);
 
     foreach (@keys) {
 

@@ -38,6 +38,8 @@
               </TMPL_IF>
 
               <li><a class="link hidden-xs" ng-click="setShowHelp()"><i class="glyphicon" ng-class="{'glyphicon-eye-close': showH,'glyphicon-eye-open': !showH}" ></i> {{ translate((showH ? 'hideHelp' : 'showHelp')) }}</a></li>
+              <li><a class="link hidden-xs" ng-if="clipboardAvailable && breadCrumb"  ng-click="copyPath()"><i class="glyphicon glyphicon-copy" ng-class="{'flash': copySuccess}"> </i> {{ translate('copyPath') }}</a></li>
+              <li ng-repeat="button in menu()" ng-include="'menubutton.html'"></li>
               <li uib-dropdown class="visible-xs">
                 <a id="langmenu" name="menu" uib-dropdown-toggle data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{translate('menu')}} <span class="caret"></span></a>
                 <ul uib-dropdown-menu aria-labelled-by="langmenu" role="grid">
@@ -56,6 +58,13 @@
             </ul>
           </div>
         </div>
+
+        <div id="breadcrumb">
+          <div class="">
+            <p class="small">{{ breadCrumb.slice(0,-1).join(" » ") }} </p>
+          </div>
+        </div>
+
           <form class="form-group slide-animate-container" ng-include="formPrefix+form+'.html'" scope="$scope" />
       </div>
       <!-- Help container -->

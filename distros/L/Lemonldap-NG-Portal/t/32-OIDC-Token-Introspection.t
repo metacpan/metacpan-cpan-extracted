@@ -15,8 +15,7 @@ BEGIN {
 my $debug = 'error';
 
 # Initialization
-my $op = LLNG::Manager::Test->new(
-    {
+my $op = LLNG::Manager::Test->new( {
         ini => {
             logLevel                           => $debug,
             domain                             => 'op.com',
@@ -141,7 +140,10 @@ ok(
 );
 
 expectOK($res);
+#diag $res->[2]->[0];
+ok( $res->[2]->[0] =~ /"exp":\d/, 'Number are well encoded' );
 $json = from_json( $res->[2]->[0] );
+
 ok( $json->{active}, "Token is valid" );
 is( $json->{sub}, "french", "Response contains the correct sub" );
 is( $json->{iss}, "http://auth.op.com/",

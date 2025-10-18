@@ -16,10 +16,6 @@ sub init {
 
     my $h = Lemonldap::NG::Handler::Server->new( {} );
     $h->init( {
-            configStorage => {
-                type    => 'File',
-                dirName => 't',
-            },
             cookieName    => 'lemonldap',
             securedCookie => 0,
             https         => 0,
@@ -28,8 +24,9 @@ sub init {
             logLevel      => $main::debug,
             portal        => 'http://auth.idp.com',
             configStorage => {
-                type    => 'File',
-                dirName => 't',
+                type     => 'File',
+                dirName  => 't',
+                confFile => '/dev/null',
             },
             globalStorageOptions => {
                 Directory      => $LLNG::TMPDIR,

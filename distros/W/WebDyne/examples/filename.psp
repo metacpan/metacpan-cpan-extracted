@@ -1,0 +1,4 @@
+<start_html>
+Filename is ^{filename}
+<p>
+Filename is !{! shift()->filename() !}

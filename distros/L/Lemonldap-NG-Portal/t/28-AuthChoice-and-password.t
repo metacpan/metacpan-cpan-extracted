@@ -23,8 +23,7 @@ SKIP: {
     $dbh->do('CREATE TABLE users (user text,password text,name text)');
     $dbh->do("INSERT INTO users VALUES ('dwho','dwho','Doctor who')");
 
-    my $client = LLNG::Manager::Test->new(
-        {
+    my $client = LLNG::Manager::Test->new( {
             ini => {
                 logLevel                 => 'error',
                 useSafeJail              => 1,
@@ -38,6 +37,7 @@ SKIP: {
                     ldap  => 'LDAP;LDAP;LDAP',
                     sql   => 'DBI;DBI;DBI',
                     slave => 'Slave;LDAP;LDAP',
+                    gpg   => 'GPG;Demo;Null'
                 },
 
                 dbiAuthChain        => "dbi:SQLite:dbname=$userdb",

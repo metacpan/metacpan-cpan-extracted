@@ -7,20 +7,18 @@ use strict;
 use JSON;
 require 't/test-lib.pm';
 
-my $struct    = 't/jsonfiles/12-modified.json';
-my $confFiles = [ 't/conf/lmConf-1.json', 't/conf/lmConf-2.json' ];
+my $struct = 't/jsonfiles/12-modified.json';
+my $confFiles =
+  [ "$main::tmpdir/conf/lmConf-1.json", "$main::tmpdir/conf/lmConf-2.json" ];
 
-sub body {
-    return IO::File->new( $struct, 'r' );
-}
-
-# Delete lmConf-2.json if exists
-eval { unlink $confFiles->[1]; };
-mkdir 't/sessions';
+my ( $len, $body ) = substitute_io_handle($struct);
 
 my ( $res, $resBody );
-ok( $res = &client->_post( '/confs/', 'cfgNum=1', &body, 'application/json' ),
-    "Request succeed" );
+ok(
+    $res =
+      &client->_post( '/confs/', 'cfgNum=1', $body, 'application/json', $len ),
+    "Request succeed"
+);
 ok( $res->[0] == 200,                       "Result code is 200" );
 ok( $resBody = from_json( $res->[2]->[0] ), "Result body contains JSON text" );
 ok( $resBody->{result} == 1, "JSON response contains \"result:1\"" )
@@ -113,15 +111,11 @@ count(2);
 
 unlink $confFiles->[1];
 
-#eval { rmdir 't/sessions'; };
+#eval { rmdir$main::tmpdir; };
 done_testing( count() );
 
-# Remove sessions directory
-`rm -rf t/sessions`;
-
 sub changes {
-    return [
-        {
+    return [ {
             'key' => 'portal',
             'new' => 'http://auth2.example.com/',
             'old' => 'http://auth.example.com/'

@@ -2,7 +2,7 @@ use warnings;
 use Test::More;
 use strict;
 use IO::String;
-use Crypt::JWT qw(decode_jwt);
+use Crypt::JWT  qw(decode_jwt);
 use Digest::SHA qw(sha256_hex);
 use Lemonldap::NG::Portal::Main::Constants ':all';
 
@@ -24,6 +24,9 @@ my $test_ini = {
     oidcServicePrivateKeySig          => oidc_key_op_private_sig(),
     oidcServicePublicKeySig           => oidc_cert_op_public_sig(),
     oidcServiceKeyIdSig               => "abc",
+    oidcServiceOldKeyIdSig            => "zzzxxx",
+    oidcServiceOldPrivateKeySig       => alt_oidc_key_op_private_sig(),
+    oidcServiceOldPublicKeySig        => alt_oidc_cert_op_public_sig(),
 };
 
 my $client = LLNG::Manager::Test->new( {
@@ -70,6 +73,21 @@ sub testAsapKeyServer {
 
     # BEGIN CERTIFICATE / BEGIN RSA PUBLIC KEY are not supported by jitsi
     like( $res->[2]->[0], qr/BEGIN PUBLIC KEY/, "Found correct format" );
+    my $key1 = $res->[2]->[0];
+
+    ok(
+        $res = $client->_get(
+            '/jitsi/asap/' . sha256_hex('zzzxxx') . '.pem',
+            accept => 'text/html',
+            %extra,
+        ),
+        'ASAP request with valid key id hash (old key)'
+    );
+    is( $res->[0], 200, "OK" );
+    my $key2 = $res->[2]->[0];
+
+    isnt( $key1, $key2, "Received keys are not the same" );
+
 }
 
 subtest "ASAP key server (PUBLIC KEY)" => sub {

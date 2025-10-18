@@ -1,38 +1,51 @@
-<start_html lang="en-US">
+<start_html>
 <p>
 <perl method="hello0">${hello} ${hello}</perl>
+
 <p>
 <perl method="hello1">${hello} ${hello}</perl>
-<perl method="hello2"><p>${hello}</perl>
+
 <p>
-<form action="">
+<perl method="hello2"><p>${hello}</perl>
+
+<p>
+<form action="post">
 <popup_menu values="@{qw(red blue)}" name="popup_array"/>
+
 <p>
 <popup_menu values="!{[qw(red blue)]}" name="popup_array"/>
+
 <p>
-<popup_menu values="!{tie(my %h, 'Tie::IxHash', ( red=>Red, blue=>Blue, green=>Green )); \%h}" name="popup_hash"/>
+<popup_menu values="!{tie(my %h, 'Tie::IxHash', ( red=>Red, blue=>Blue, green=>Green )); [keys %h], \%h}" name="popup_hash0"/>
+
 <p>
-<popup_menu values="%{red=>'Red', blue=>'Blue', green=>Green}" name="popup_hash"/>
+<popup_menu values="%{blue=>'Blue', green=>Green, red=>'Red' }" name="popup_hash1"/>
+
 <p>
 <popup_menu values="!{! [keys %{${__PACKAGE__.'::TEST_HR'}} ] !}" /></td>
+
 <p>
 <perl method="popup0">
 <popup_menu values="${popup_ar}" name="${name}"/>
 </perl>
+
 <p>
 <perl method="popup1">
 <popup_menu values="${popup_hr}" name="${name}"/>
 </perl>
+
 <perl method="iterate">
 <p>i ${i}
 </perl>
 <perl method="submit1">
+<p>
 <submit name="foo=bar;car=${i};dar=${dar}"/>
 <submit name="i=${i};dar=${dar}"/>
 <submit name="foo=bar&car=${i}&dar=${dar}"/>
 <submit name="i=${i}&dar=${dar}"/>
 <submit name="${i}=1&dar=${dar}"/>
 <submit name="*{ASDF}"/>
+<p>
 Text *{ASDF} ${dar} 
 </perl>
 </form>

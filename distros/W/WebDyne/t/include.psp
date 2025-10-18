@@ -1,15 +1,17 @@
 <html lang="en-US">
 <head>
-<include file="include.html" head=1/>
+<include file="include.html.inc" head=1/>
 </head>
 <body>
 <p>
 Include PSP Test Body
+</p>
 <p>
 <include file="include.txt"/>
+</p>
 <perl method="include"/>
 <p>
-<include file="include.html" body=1/>
+<include file="include.html.inc" body=1/>
 </body>
 </html>
 __PERL__

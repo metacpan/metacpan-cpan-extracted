@@ -29,7 +29,8 @@ sub init {
         my $safe = Safe->new;
         foreach my $id ( sort keys %$rules ) {
             my $sub =
-              $safe->reval( 'sub{my($env)=@_;return (' . $rules->{$id} . ')}' );
+              $safe->reval(
+                'sub{my($env)=@_;local *_;return (' . $rules->{$id} . ')}' );
             if ($@) {
                 $self->logger->error(
                     'Bad Autologin rule "' . $rules->{$id} . ": $@" );

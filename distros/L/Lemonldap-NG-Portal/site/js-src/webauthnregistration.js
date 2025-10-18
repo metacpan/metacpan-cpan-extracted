@@ -16,11 +16,11 @@ setMsg = function(msg, level) {
 
 displayError = function(j, status, err) {
   var res;
-  console.log('Error', err);
+  console.error('Error', err);
   res = JSON.parse(j.responseText);
   if (res && res.error) {
     res = res.error.replace(/.* /, '');
-    console.log('Returned error', res);
+    console.error('Returned error', res);
     return setMsg(res, 'danger');
   }
 };
@@ -65,7 +65,7 @@ register = function() {
                 keyName: $('#keyName').val()
               },
               headers: {
-                  "X-CSRF-Check": "1"
+                "X-CSRF-Check": "1"
               },
               dataType: 'json',
               success: function(resp) {
@@ -77,11 +77,9 @@ register = function() {
                   }
                 } else if (resp.result) {
                   e = jQuery.Event("mfaAdded");
-                  $(document).trigger(e, [
-                    {
-                      "type": "webauthn"
-                    }
-                  ]);
+                  $(document).trigger(e, [{
+                    "type": "webauthn"
+                  }]);
                   if (!e.isDefaultPrevented()) {
                     return window.location.href = window.portal + "2fregisters?continue=1";
                   }
@@ -134,7 +132,7 @@ verify = function() {
             credential: JSON.stringify(response)
           },
           headers: {
-              "X-CSRF-Check": "1"
+            "X-CSRF-Check": "1"
           },
           dataType: 'json',
           success: function(resp) {

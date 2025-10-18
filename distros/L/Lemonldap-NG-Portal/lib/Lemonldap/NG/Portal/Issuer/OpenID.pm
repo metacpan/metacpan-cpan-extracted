@@ -16,7 +16,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OID_SERVICE_NOT_ALLOWED
 );
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.22.0';
 
 extends 'Lemonldap::NG::Portal::Main::Issuer';
 
@@ -91,7 +91,7 @@ sub _redirect {
         my $mode = $req->param('openid.mode');
         unless ($mode) {
             $self->logger->debug('OpenID SP test');
-            return $self->p->do( $req, [ sub { PE_OPENID_EMPTY } ] );
+            return $self->p->doPE($req, PE_OPENID_EMPTY);
         }
         if ( $mode eq 'associate' ) {
             return $self->_openIDResponse( $req,

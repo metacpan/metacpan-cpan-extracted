@@ -14,22 +14,22 @@ $(document).ready(function() {
       }
       return results;
     } catch (error) {
-      //console.log 'values=', values[k]
+      //console.debug 'values=', values[k]
       e = error;
-      return console.log('Parsing error', e);
+      console.error('Parsing error', e);
     }
   });
   // Initialize JS communication channel
   return window.addEventListener("message", function(e) {
     var client_id, message, salt, session_state, ss, stat;
     message = e.data;
-    console.log('message=', message);
+    console.debug('message=', message);
     client_id = decodeURIComponent(message.split(' ')[0]);
-    //console.log 'client_id=', client_id
+    //console.debug 'client_id=', client_id
     session_state = decodeURIComponent(message.split(' ')[1]);
-    //console.log 'session_state=', session_state
+    //console.debug 'session_state=', session_state
     salt = decodeURIComponent(session_state.split('.')[1]);
-    //console.log 'salt=', salt
+    //console.debug 'salt=', salt
     // hash ??????
     //ss = hash.toString(CryptoJS.enc.Base64) + '.'  + salt
     ss = btoa(client_id + ' ' + e.origin + ' ' + salt) + '.' + salt;

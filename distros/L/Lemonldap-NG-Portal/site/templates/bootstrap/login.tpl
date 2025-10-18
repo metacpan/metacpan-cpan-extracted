@@ -33,7 +33,7 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto">
         <TMPL_LOOP NAME="AUTH_LOOP">
-          <li class="nav-item" title="<TMPL_VAR NAME="key">"><a class="nav-link" href="#<TMPL_VAR NAME="key">"><TMPL_VAR NAME="name"></a></li>
+          <li class="nav-item" title="<TMPL_VAR NAME="key">"><a class="nav-link" href="#id_<TMPL_VAR NAME="key">"><TMPL_VAR NAME="name"></a></li>
         </TMPL_LOOP>
       </ul>
     </div>
@@ -44,7 +44,7 @@
       <!-- Forms -->
       <TMPL_LOOP NAME="AUTH_LOOP">
 
-        <div id="<TMPL_VAR NAME="key">">
+        <div id="id_<TMPL_VAR NAME="key">">
 
           <form id="lform<TMPL_VAR NAME="module">" action="<TMPL_VAR NAME="url">" method="post" class="login <TMPL_VAR NAME="module">">
 

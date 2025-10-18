@@ -5,8 +5,8 @@ use URI;
 use Mouse;
 use JSON;
 use MIME::Base64 qw/decode_base64url encode_base64url/;
-use Crypt::JWT qw(encode_jwt);
-use Digest::SHA qw(sha256_hex);
+use Crypt::JWT   qw(encode_jwt);
+use Digest::SHA  qw(sha256_hex);
 use Crypt::OpenSSL::X509;
 use Crypt::OpenSSL::RSA;
 
@@ -17,9 +17,10 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
 );
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.22.0';
 
 extends 'Lemonldap::NG::Portal::Main::Issuer';
+with 'Lemonldap::NG::Portal::Lib::Key';
 
 has rule => ( is => 'rw' );
 
@@ -109,16 +110,14 @@ sub asap {
     my $filename = $path[0];
 
     my $hash = $filename =~ s/\.pem$//r;
-    my %loop = (
-        oidcServiceKeyIdSig    => 'oidcServicePublicKeySig',
-        oidcServiceOldKeyIdSig => 'oidcServiceOldPublicKeySig',
-        oidcServiceNewKeyIdSig => 'oidcServiceNewPublicKeySig',
-    );
 
-    while ( my ( $id, $pub ) = each %loop ) {
-        if ( $self->conf->{$id} and $hash eq sha256_hex( $self->conf->{$id} ) )
+    for my $key_id ( split( /\s*,\s*/, $self->conf->{jitsiSigningKey} ) ) {
+        my $key = $self->get_public_key($key_id);
+        if (    $key
+            and $key->{external_id}
+            and $hash eq sha256_hex( $key->{external_id} ) )
         {
-            return $self->_sendAsap( $req, $self->conf->{$pub} );
+            return $self->_sendAsap( $req, $key->{public} );
         }
     }
 
@@ -253,17 +252,27 @@ sub jitsi {
 
     }
     else {
-        if ( !$self->conf->{oidcServicePrivateKeySig} ) {
-            $self->logger->error("OIDC Signature key is not defined");
+        my ($key_id) = split( /\s*,\s*/, $self->conf->{jitsiSigningKey} );
+        if ( !$key_id ) {
+            $self->logger->error("jitsiSigningKey is not set");
             return PE_ERROR;
         }
-        if ( !$self->conf->{oidcServiceKeyIdSig} ) {
-            $self->logger->error("OIDC Signature key ID is not defined");
+
+        my $pkey = $self->get_private_key($key_id);
+        if ( !$pkey ) {
+            $self->logger->error("Jitsi signing key $key_id was not found");
             return PE_ERROR;
         }
-        @extra_headers = ( kid => $self->conf->{oidcServiceKeyIdSig} );
-        my $pkey = $self->conf->{oidcServicePrivateKeySig};
-        $key = \$pkey;
+
+        if ( !$pkey->{external_id} ) {
+            $self->logger->error(
+                    "Jitsi signing key does not have an identified."
+                  . " You must set oidcServiceKeyIdSig" );
+            return PE_ERROR;
+        }
+        @extra_headers = ( kid => $pkey->{external_id} );
+        my $private = $pkey->{private};
+        $key = \$private;
     }
 
     my $jwt = eval {
@@ -276,7 +285,7 @@ sub jitsi {
     };
     if ($@) {
         $self->logger->error("Could not encode JWT: $@");
-        return $self->p->do( $req, [ sub { PE_ERROR } ] );
+        return $self->p->doPE( $req, PE_ERROR );
     }
 
     $u->query_form( jwt => $jwt );

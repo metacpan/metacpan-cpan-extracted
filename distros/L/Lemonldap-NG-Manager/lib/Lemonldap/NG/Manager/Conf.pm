@@ -20,7 +20,7 @@ extends qw(
   Lemonldap::NG::Common::Conf::RESTServer
 );
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.22.0';
 
 #############################
 # I. INITIALIZATION METHODS #
@@ -30,6 +30,7 @@ use constant defaultRoute => 'manager.html';
 use constant icon         => 'cog';
 
 has defaultNewKeySize => ( is => 'rw', default => 2048, );
+has defaultCurve => ( is => 'rw', default => 'prime256v1', );
 
 sub init {
     my ( $self, $conf ) = @_;
@@ -51,7 +52,7 @@ sub init {
                   applicationList oidcOPMetaDataNodes oidcRPMetaDataNodes
                   casSrvMetaDataNodes casAppMetaDataNodes
                   authChoiceModules grantSessionRules combModules sfExtra
-                  openIdIDPList)
+                  openIdIDPList keyNodes)
             ]
         },
         ['GET']
@@ -65,6 +66,7 @@ sub init {
         confs => {
             newRSAKey      => 'newRSAKey',
             newCertificate => 'newCertificate',
+            newEcCertificate => 'newEcCertificate',
             newEcKeys      => 'newEcKeys',
             sendTestMail   => 'sendTestMail',
             raw            => 'newRawConf',
@@ -99,7 +101,18 @@ sub newCertificate {
       if (@others);
     my $query = $req->jsonBodyToObj;
 
-    my $keys = $self->_generateX509( $query->{password} );
+    my $keys = $self->_generateX509( $query->{password}, "RSA" );
+    return $self->sendJSONresponse( $req, $keys );
+}
+
+sub newEcCertificate {
+    my ( $self, $req, @others ) = @_;
+    return $self->sendError( $req, 'There is no subkey for "newEcCertificate"',
+        400 )
+      if (@others);
+    my $query = $req->jsonBodyToObj;
+
+    my $keys = $self->_generateX509( $query->{password}, "EC" );
     return $self->sendJSONresponse( $req, $keys );
 }
 
@@ -119,10 +132,11 @@ sub newRSAKey {
       if (@others);
 
     my $key_size = $self->defaultNewKeySize;
-    my $query = $req->jsonBodyToObj;
+    my $query    = $req->jsonBodyToObj;
     my $password = $query->{password};
 
-    my $keys = Lemonldap::NG::Common::Util::Crypto::genRsaKey($key_size, $password);
+    my $keys =
+      Lemonldap::NG::Common::Util::Crypto::genRsaKey( $key_size, $password );
 
     return $self->sendJSONresponse( $req, $keys );
 }
@@ -138,7 +152,7 @@ sub newRSAKey {
 sub newEcKeys {
     my ( $self, $req, @others ) = @_;
 
-    my $keys = Lemonldap::NG::Common::Util::Crypto::genEcKey('secp256r1');
+    my $keys = Lemonldap::NG::Common::Util::Crypto::genEcKey('prime256v1');
     return $self->sendJSONresponse( $req, $keys );
 }
 
@@ -147,13 +161,20 @@ sub newEcKeys {
 # and adapter to work on old platforms (CentOS7)
 
 sub _generateX509 {
-    my ( $self, $password ) = @_;
-    my $conf = $self->confAcc->getConf();
-    my $key_size = $self->defaultNewKeySize;
+    my ( $self, $password, $type ) = @_;
+    my $conf        = $self->confAcc->getConf();
     my $portal_uri  = new URI::URL( $conf->{portal} || "http://localhost" );
     my $portal_host = $portal_uri->host;
 
-    return Lemonldap::NG::Common::Util::Crypto::genCertKey($key_size, $password, $portal_host);
+    if ($type eq "EC") {
+    my $curve    = $self->defaultCurve;
+    return Lemonldap::NG::Common::Util::Crypto::genEcCertKey( $curve,
+        $password, $portal_host );
+    } else {
+    my $key_size    = $self->defaultNewKeySize;
+    return Lemonldap::NG::Common::Util::Crypto::genCertKey( $key_size,
+        $password, $portal_host );
+    }
 }
 
 #      Sending a test Email
@@ -443,7 +464,9 @@ sub newRawConf {
             $self->auditLog(
                 $req,
                 message => (
-                    'User ' . $self->p->userId($req) . " has stored (raw) conf $s"
+                        'User '
+                      . $self->p->userId($req)
+                      . " has stored (raw) conf $s"
                 ),
                 code   => "CONF_STORED_RAW",
                 user   => $self->p->userId($req),

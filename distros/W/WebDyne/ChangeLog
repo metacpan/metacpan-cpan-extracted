@@ -1,8 +1,1516 @@
-commit 333c07b7ba7315f8810bfac297ac785129fffca9
+commit f34dace6205873d32395f8d6efa377880ecbf690
 Author: Andrew Speer <andrew.speer@isolutions.com.au>
-Date:   Fri Sep 15 23:41:42 2017 +0930
+Date:   Sat Oct 18 17:27:37 2025 +1030
+
+    VERSION increment: 2.014
+
+commit 082391864d6ec4538207ef679d94a3466139ef76
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat Oct 18 17:17:54 2025 +1030
+
+    VERSION increment: 2.013_358
+
+commit c6490f86172a7a7b9aeea4124300146e9d25b750
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat Oct 18 17:17:48 2025 +1030
+
+    Update MANIFEST to reflect name change in test files
+
+commit 054f1e81d7897a26d318f88884427f0e1608b7dc
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat Oct 18 17:09:35 2025 +1030
+
+    Manually fix README.md in prep for migration to main branch
+
+commit cba9358af4816fb7d291dbe49c12a6713f3cc4fb
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat Oct 18 12:08:28 2025 +1030
+
+    Update error.psp page to name dumper blocks (instead of ) and add WebDyne Git ref
+
+commit ccf4214745c3ac2d9961b763f3b3fd5e4ba80a2f
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat Oct 18 11:27:13 2025 +1030
+
+    Fix PSGI code to send text/plain MIME type header on text error message, fix error.psp to supply own CGI object
+
+commit 9474c816e8d95ae694bebf30a53f8fdba882d850
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Oct 17 22:22:46 2025 +1030
+
+    Add render_time method and dump report of elapsed time to module
+
+commit 31e2378d121affc1f28e465189dbe82c835095c6
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Oct 17 21:57:39 2025 +1030
+
+    Revert to not supplying CGI and r objects to perl handlers - self and param only again, user can get from methods if wanted
+
+commit f413bad77a5ed17c0fff69faaa3bcaa303b81808
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Thu Oct 16 21:44:03 2025 +1030
+
+    WebDyne::Session minor code cleanup
+
+commit f0b7a499a6d7294e226d687e93d9f4c13596df34
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Thu Oct 16 21:30:55 2025 +1030
+
+    Initial code port from CGI.pm to CGI::Simple for WebDyne::Session module
+
+commit 7fe9fb306f71aabdd3e83318a2a07ee0aad15b8b
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Oct 15 23:25:16 2025 +1030
+
+    More tweaks to MANIFEST and modernise WebDyne::Chain to use WebDyne::Util
+
+commit c414306790ea03d35edd65052c026d23cf58d012
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Oct 15 22:52:35 2025 +1030
+
+    Update MANIFEST to include WebDyne::Template, Makefile.PL to include CGI::Cookie
+
+commit 6be8cc0b066f5081daf2f9345e540757a933fcce
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Oct 15 22:29:57 2025 +1030
+
+    Add WebDyne::Template into core WebDyne module
+
+commit 5669c8df95555c260a0758ba01996846643223ea
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Oct 15 22:09:32 2025 +1030
+
+    Add code to load WebDyne::Compile module in include section if compiling
+
+commit 3a8fedbbf66b6f9c4110c220a9c358209c8d6034
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Oct 15 14:42:21 2025 +1030
+
+    Add code to allow static files to be served from webdyne.psgi via --static flag
+
+commit c2bec9502fd3df8cb7b5bc4c8be720e9ded1049b
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Tue Oct 14 23:50:38 2025 +1030
+
+    Optimise file include code to cache file content after first load unless nocache attrib given
+
+commit 551cd965974b50eb8a17b97397bc22cacc5155a1
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Tue Oct 14 23:36:24 2025 +1030
+
+    improve file include slurp code
+
+commit af12c49e44e75d932cf787f655a1b589f21c5e59
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Tue Oct 14 23:20:39 2025 +1030
+
+    Refactor include code again, this time usin implicit_body_p_tag in compile flag options to ensure no automatic <p> code, add compile params to allow change to this behaviour
+
+commit d4a3e28f4c2e84aabe76a1399e5e4215beaf6195
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon Oct 13 23:27:46 2025 +1030
+
+    Fix include section to strip leading/trailing <p></p> and temporarily not cache results
+
+commit 96a987b1adf8c781389e91808a99eceba74a9beb
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Oct 8 23:49:32 2025 +1030
+
+    Initial code to add include=<filename> flag into <start_html> tag
+
+commit b8b7296e9a086aea5c360577f90e4ff6253424b4
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Oct 8 22:52:26 2025 +1030
+
+    Fix meta tag generation, add more test for meta data, cgi persistence
+
+commit f656f8bf561ee377e5400351c046ad7c5b9c8031
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Oct 3 22:47:45 2025 +0930
+
+    Minor tidy-up to HTML::Tiny new() code to not call CGI::Simple->new each time
+
+commit 209d94604674ddccc4823f41b76f43ffba499f91
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Oct 3 22:37:50 2025 +0930
+
+    First attempt at adding persistence back into CGI form generation tags
+
+commit 1561fb18a80b9fa8021292ff4bce6871e868c15a
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Oct 1 21:28:45 2025 +0930
+
+    Update dump() tag to be more granular and just show CGI param and WebDyne ver by default. Add command line option in wdrender to simulate a GET request
+
+commit aefd9d8c0513e52ce200a134daed86930f313e9f
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Tue Sep 30 15:51:46 2025 +0930
+
+    Update dump tag to give more info, sort hash + fix minor undefined var issue in popup_menu tag
+
+commit f947b581c59ab009e7695b3d7b02c59c3a71a098
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Sep 28 22:39:18 2025 +0930
+
+    Cleanup up printing code, add some more tests
+
+commit 44e470c22bacf3ab58324dbbc659ad1dafb7b58f
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Sep 28 20:37:31 2025 +0930
+
+    Initial commit of say() and autonewline() code + simplify eval printing
+
+commit 91830edcd17654381381d56892f0070f0c0981e7
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Sep 28 11:21:48 2025 +0930
+
+    Add chomp attribute parser and logic
+
+commit 05e413de87af492d34eccb917f38446c2381cd05
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Sep 26 22:52:22 2025 +0930
+
+    Start to clean up and remove global Text_fg variable
+
+commit 8f956ba1f630be51aaa2cb17aa001ab1a5484d4b
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Sep 26 22:48:05 2025 +0930
+
+    Start to clean up and remove global Text_fg variable
+
+commit d2d3ee3d03ad0ad00b6ec1288aaf5eb4ecfabf8f
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Sep 26 22:42:44 2025 +0930
+
+    Start to clean up and remove global Text_fg variable
+
+commit 5eda58618d19165c104d694596eb67e0f1ae9084
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Sep 26 20:30:45 2025 +0930
+
+    Added logic to not close tags before a <div data-webdyne-perl> block, added a couple more tests to check for thi
+
+commit b808b0c016e1bc30a6d06ef809f8718dc8559b49
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon Sep 22 23:21:38 2025 +0930
+
+    Fixed issues with dynamic cache code after refactor of what was supplied to code eval from ->(, ) to ->(, , , ) broke cache code
+
+commit 3c38e391f391fa1e3d73aa71d4a6188a4ec0deb2
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon Sep 22 17:38:24 2025 +0930
+
+    Sync MANIFEST to include new files
+
+commit 4f73c519de26998800a4a738125c97e2a9b619a7
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon Sep 22 17:37:42 2025 +0930
+
+    Add some more test units for JSON, fix missing Data::Dumper module in maketest.pl
+
+commit 2fee76a90cd1f4707e58ff4fb92e65d6037a8dc6
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon Sep 22 16:02:18 2025 +0930
+
+    Add handling of script attribute to start_html shortcut, bring in WebDyne::Chain and WebDyne::Session to base module, start Constant.pm file cleanup
+
+commit 00d9bad3450b1c1ac43da1e14cd94e9602aae5b3
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon Sep 22 11:57:35 2025 +0930
+
+    Fix typo when looking for ENV{'psgi.version'}
+
+commit c71e65dd11dec8c78878b25fa860b7a4721bc0d4
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon Sep 22 11:31:25 2025 +0930
+
+    Fix 500 error when trying to render webdyne static files under PSGI
+
+commit 761c5c49c41b52a8edab8ace1b3b04dfcddca250
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Sep 21 23:56:35 2025 +0930
+
+    Cleanup way we clear  after eval and fix CGI::Simple->new() throwing an error during eval('require mod_perl which is caught by our __DIE__ handler
+
+commit c70e4e34b3fa3bf36728c2226d2640f80ed66c27
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Sep 21 23:29:02 2025 +0930
+
+    Add utility accessor methods for WebDyne::Request::Fake to better support ^{method} mod_perl equivalence in PSGI
+
+commit ca334d94b178d31da827ee0c33dfc52cfb908845
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Sep 21 17:27:11 2025 +0930
+
+    Update Github workflows to rebuild on any change in lib or bin directory
+
+commit 894b9d90c437e05c9570b439494daf78bb59811d
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Sep 21 17:18:23 2025 +0930
+
+    Added WEBDYNE_HEAD_INSERT variable to wedge in stylesheets and other data in <head> tag if wanted
+
+commit e9f660cc26890207508d21197e5abc84b2a6ab43
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat Sep 20 17:54:01 2025 +0930
+
+    Added html, html_sr exported functions to WebDyne.pm, added WebDyne.pm.xml docbook man page
+
+commit 9ebc57da64b2c6bffaac2dd8e452f2c89558eafd
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat Sep 13 12:50:22 2025 +0930
+
+    Added webdyne.md, removed webdyne.pdf
+
+commit d6c7a3cfa034075444e8b2f4cf70e0a1216902f6
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Sep 12 20:59:55 2025 +0930
+
+    Updated documentation from XML files
+
+commit 48cab4bbd01258724704c354ff99a41722125723
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Sep 12 20:54:36 2025 +0930
+
+    Start to use xml documentation files in source
+
+commit a479e23a2baa31cb7e7c4c8ae19bcbb89c68356b
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat Sep 6 12:39:58 2025 +0930
+
+    Tidy up Makefile.PL, bring in man files for utilitioes
+
+commit 636f51cb6ea4f6f2b4af49076ecca4ee08cd01cc
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Tue Aug 5 23:55:42 2025 +0930
+
+    Create Markdown variant of README file
+
+commit 3d8477a85883e3a1dbdcdf7a933b9d5ee7ec78cc
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Tue Aug 5 23:54:54 2025 +0930
+
+    Create Markdown variant of README file
+
+commit 27feb9e64a81e8618818e175383ad9115e9145af
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Tue Aug 5 23:54:16 2025 +0930
+
+    Create Markdown variant of README file
+
+commit eb552fb32f2fac756d5a847bf6f56286001eab3b
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Tue Aug 5 23:51:08 2025 +0930
+
+    Create Markdown variant of README file
+
+commit 17ef73ef20897abb20a147a91986cd50c7977597
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Tue Aug 5 23:15:53 2025 +0930
+
+    Create Markdown variant of README file
+
+commit b5e3dd783fa1e0ecbe131474900a5d4d74176e7f
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon Aug 4 22:54:38 2025 +0930
+
+    Cleanup github action and try to tag debian version last
+
+commit 9aa6b27b6b01f1dcd58de2f39924e223312775bc
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon Aug 4 14:52:51 2025 +0930
+
+    Minor ambiguous code fix in WebDyne.pm, update Dockerfile build with all variants, debian tagged as default
+
+commit 41f32293323f9043b982afef0eba08fdcf0dba3b
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Aug 3 23:58:49 2025 +0930
+
+    Test Dockerfile build with all variants, debian tagged as default
+
+commit 21dc672ccddc76d38f9d670c728bfded71e61410
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Aug 3 23:29:47 2025 +0930
+
+    Test Dockerfile tagging
+
+commit a77eb7ba423273374f14d2e898092aaae7bfe2fe
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Aug 3 23:14:51 2025 +0930
+
+    Test Dockerfile tagging
+
+commit 5cfd1c858d40d00b134655f6414e3a25f099aabe
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Aug 3 23:11:38 2025 +0930
+
+    Test Dockerfile tagging
+
+commit 7accf29a2c106a78f9cf2410830e2b04307f8908
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Aug 3 23:03:25 2025 +0930
+
+    Test Dockerfile tagging
+
+commit a994ca1a234003467572ec1fbcc25bbf7987295b
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Aug 3 22:27:36 2025 +0930
+
+    Test Dockerfile tagging
+
+commit 0676ae73262dc0089da48eca275462af7335f07a
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Aug 3 22:19:34 2025 +0930
+
+    Test Dockerfile tagging
+
+commit e27f45f409219fab3f44cece45884e6ad2c2e639
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Aug 3 21:51:32 2025 +0930
+
+    Test Dockerfile tagging
+
+commit fe0fe3eb2643cc317fdcba9dc98525d6bbbc3b6f
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Aug 3 21:41:03 2025 +0930
+
+    Test Dockerfile tagging
+
+commit cf7e04492a77bb2bddff49c19f094a1c1db55cdd
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Aug 3 21:25:46 2025 +0930
+
+    Test Dockerfile tagging
+
+commit 01f99d73214656513f046ef1881b7cd8b2aaff00
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Aug 3 21:23:43 2025 +0930
+
+    Test Dockerfile tagging
+
+commit 706ba15c34505b5150322d2c753e9b677982d8ac
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Aug 3 21:20:20 2025 +0930
+
+    Test Dockerfile tagging
+
+commit 0d98e2cca277c39443bc248b7bbae111999133dd
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Aug 3 20:54:22 2025 +0930
+
+    Test Dockerfile tagging
+
+commit 0e1e7d32a95c0df9feb0274385aeb02b794f3f77
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Aug 3 20:53:12 2025 +0930
+
+    Test Dockerfile tagging
+
+commit 856afa3706f5d42f224c0bda4c5362dbf0280255
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Aug 3 20:23:38 2025 +0930
+
+    Test Dockerfile tagging
+
+commit ba34ff905decd7e9f8d19a76eb5c003137e4acaf
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Aug 3 20:19:16 2025 +0930
+
+    Test Dockerfile tagging
+
+commit d418055e8155e654e873a7464407ac2e9acb551e
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Aug 3 18:31:54 2025 +0930
+
+    Test AMD64 Dockerfile
+
+commit d4cfd76ab30a343c8d932bfdcb5f28dcd3ebd567
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Aug 3 18:10:40 2025 +0930
+
+    Test AMD64 Dockerfile
+
+commit 1ac7a2a4a65cf0901ffcc4db7b2c668f59ca4388
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Aug 3 15:23:50 2025 +0930
+
+    Test AMD64 Dockerfile
+
+commit b725024ba7f046e918bcd24aff86d3b3b280479e
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Aug 3 15:20:52 2025 +0930
+
+    Test AMD64 Dockerfile
+
+commit adcfaa98253b770101da6ca1c89e21f04f6c8377
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Aug 3 15:00:33 2025 +0930
+
+    Test AMD64 Dockerfile
+
+commit e48a821a503a08380f8b8889c1d43b7551de5988
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Aug 3 14:48:37 2025 +0930
+
+    Test AMD64 Dockerfile
+
+commit dfb9c09e2f4161e82a06eb265c354b1998f21227
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Aug 3 14:38:58 2025 +0930
+
+    Test AMD64 Dockerfile
+
+commit d72c7db72e5aa3a3315fe05ec05375a30e374e66
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Aug 3 14:22:02 2025 +0930
+
+    Test AMD64 Dockerfile
+
+commit 1d85be913c3b76ad0304e838f3ab8cdbfd27d7f8
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Aug 3 14:16:49 2025 +0930
+
+    Test AMD64 Dockerfile
+
+commit f0e67b8c6513313ead3503af7259844e72249494
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Aug 3 14:00:02 2025 +0930
+
+    Attempt ARM64 build
+
+commit b82df577d52fbf7309cd73be4467bbd8ba17d5be
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Aug 3 13:49:40 2025 +0930
+
+    Add debugging to Carton build to try and find why failing on ARM64 build in Github - curl
+
+commit 14ce78f17e96057f99e312811ff95c7104cf1869
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Aug 3 13:48:03 2025 +0930
+
+    Add debugging to Carton build to try and find why failing on ARM64 build in Github - still failing
+
+commit 10fdebf226cc676c811b6315da82a046596309ef
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Aug 3 13:42:54 2025 +0930
+
+    Add debugging to Carton build to try and find why failing on ARM64 build in Github - no direct download
+
+commit fe2be4cf36104a70a5e8baa198f7ee9d34fdd521
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Aug 3 13:39:19 2025 +0930
+
+    Add debugging to Carton build to try and find why failing on ARM64 build in Github - LWP::UserAgent
+
+commit 9a811b7aee35146e873133fce6eba2253eaea211
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Aug 3 13:26:14 2025 +0930
+
+    Add debugging to Carton build to try and find why failing on ARM64 build in Github - now pulling Carton directly from Github repo
+
+commit f0a448d72384103d685e135d03c9570d458e6533
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Aug 3 12:10:05 2025 +0930
+
+    Add debugging to Carton build to try and find why failing on ARM64 build in Github
+
+commit 1a11070b6dffbc6e3c116e13dbe44b647cbe1385
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Aug 3 11:04:02 2025 +0930
+
+    More adjustments to Docker build action and Dockerfile
+
+commit 31eaca0f2c8dfc206034cdaf8cef6a4fea65986b
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Aug 3 10:31:16 2025 +0930
+
+    Try to fix github docker build action
+
+commit c93183377eaebfca8aca5dcdde7dedd30ed7421a
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Aug 3 01:41:18 2025 +0930
+
+    More adjustments to Dockerfiles
+
+commit d29fe46d4dc31ed4628c6ca3c2a26bf9a53e7a14
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Aug 3 01:31:36 2025 +0930
+
+    Update Dockerfiles to use working repo rather than clone
+
+commit d1dabb2734395bdf4c62e18cdc6ad32e7f34f1d1
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat Aug 2 12:20:21 2025 +0930
+
+    Change name of global webdyne config file, set Dockerfile to use /app as DOCUMENT_DEFAULT, start fixing LABELs in Dockerfile
+
+commit 1f6c36787a348901e2ff231b84c614ef5ddda2ca
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Aug 1 19:27:43 2025 +0930
+
+    Better determination of DOCUMENT_ROOT in webdybe.pgsi, check for Mac and use port 5001 by default on that arch
+
+commit 684adc947c9069fed6ad0bef94b6eb5260bdad2c
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Thu Jul 31 15:40:50 2025 +0930
+
+    Added retention action
+
+commit b3078e29db40986f4989217cbc961fc10726d7f6
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Thu Jul 31 14:50:13 2025 +0930
+
+    Adjust github action for Docker build again
+
+commit ec40898b7625066e035bae158c033275d4143104
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Thu Jul 31 14:49:03 2025 +0930
+
+    VERSION increment: 2.012_265
+
+commit f45204dc95124eaffd3864811648ae508901ea7d
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Thu Jul 31 14:48:32 2025 +0930
+
+    VERSION increment: 2.011_264
+
+commit c5c0f46cc7c1362c715057994e7cc6856974dd7c
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Thu Jul 31 14:48:01 2025 +0930
+
+    Try again
+
+commit 93b550e7768be5299907dd87166c029376be4038
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Thu Jul 31 14:47:42 2025 +0930
+
+    VERSION increment: 2.010_262
+
+commit 9486098420c54fe48adcec0e7c903b30b7d50161
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Thu Jul 31 14:47:30 2025 +0930
+
+    VERSION increment: 2.009_261
+
+commit 2ffcfcd358d135486fb28e4c38a1475f7e5de5ee
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Thu Jul 31 14:46:58 2025 +0930
+
+    Try docker actions again ..
+
+commit 3a3ff42433356a96ddf02e56b134ed135d17aa32
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Thu Jul 31 14:43:55 2025 +0930
+
+    Update build file to create docker on push
+
+commit 6bdcaa2e13eea2ef43da4abf2c9acf530686d3ce
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Jul 30 23:57:45 2025 +0930
+
+    Modified workflow
+
+commit 1f46f9e22251b04c5883297182d64c6c8598b50b
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Jul 30 23:36:08 2025 +0930
+
+    Updated workflow
+
+commit 462755de9f1c2c05e324bb75117e5c2b786c3aad
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Jul 30 23:35:59 2025 +0930
+
+    VERSION increment: 2.008_256
+
+commit 486f1c7acc63991fb644b00faa71296add48237e
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Jul 30 23:33:55 2025 +0930
+
+    Fixed Dockerfile LABELS to work with github actions Docker build
+
+commit 4fb535cfc7aa5ebd068da88a50770d8f1f2be476
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Jul 30 22:51:04 2025 +0930
+
+    Update github build file
+
+commit 6fda7e1c420deeae96a051f9f107fbddca5d8791
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Jul 30 22:26:23 2025 +0930
+
+    Added manual kickoff of workflow in githib action
+
+commit ce2ec17fbd597c4d3fbd772f6b23a8e0ed37c053
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Jul 30 20:14:39 2025 +0930
+
+    VERSION increment: 2.007_252
+
+commit 9f38e1d12a30dbb17878e56371b276473f0706ac
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Jul 30 20:12:53 2025 +0930
+
+    Added github action
+
+commit cb3d1b5b8c0af2fb51d609d8d18030bfaed7fc73
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Jul 30 11:45:35 2025 +0930
+
+    Update webdyne.psgi to server static files when started standalone, capability to add Plack middleware if required
+
+commit 5052b737ff5d5adc76719df5f818eee3432900d8
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon Jul 28 12:53:40 2025 +0930
+
+    VERSION increment: 2.006_249
+
+commit e3f42bafd3a58ae1f1a655b9fb1c862a5a8e7c0e
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon Jul 28 12:53:09 2025 +0930
+
+    Updated MANIFEST with other included files
+
+commit 40bbdaf1bdbabec82e2d766ffee15428f19eba20
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon Jul 28 01:01:02 2025 +0930
+
+    Let webdyne local config file name be set by environment var WEBDYNE_CONF, otherwise get from /etc
+
+commit 8f4f44f8b0cf0955cb9c0b5d8e2e6c0ee5c7f71b
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon Jul 28 00:45:05 2025 +0930
+
+    Changed /etc/webdyne.pm config file to /etc/webdyne.conf.pl and tidied up Dockerfiles to create a cache dir when running
+
+commit eedf0d0de6101df8f10fd49fec26c6abb9e47c38
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Jul 27 22:34:01 2025 +0930
+
+    Update webdyne.psgi to default to --test if no DOCUMENT_ROOT supplied
+
+commit 3efb0f32c55a83fcb41b5f6c9ebe35e1c8ce469a
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Jul 27 22:08:20 2025 +0930
+
+    Fix syntax error in webdyne.psgi
+
+commit 21151bf0016c6637e7995aaf9f2159e3257a5b79
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Jul 27 22:03:58 2025 +0930
+
+    Fixed up typo in Dockerfile template, updated ENTRYPOINT to look for cpanfile and install dependencies if found, run --test if no DOCUMENT_ROOT given
+
+commit 60c481935c67a12b929adb7f84660f5d740ed271
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Jul 27 16:10:35 2025 +0930
+
+    Added default Dockerfile and Makefile in docker dir
+
+commit b5261d977392b5af9efcb9321f2ac6dcc870a2c9
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Jul 27 14:36:39 2025 +0930
+
+    Fix PSGI static page serving, add --test option to webdyne.psgi to server up simple time.psp page
+
+commit 8fe1b146647acd49518593221b65e6b9af9aa6ce
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Thu May 22 00:03:14 2025 +0930
+
+    Fix typo in Dockerfile.tt fedora section
+
+commit 1400e91bbc1c5a102bf41fc69b666a2a24fea062
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed May 21 23:50:33 2025 +0930
+
+    Removed unused .tmp file from MANIFEST
+
+commit 6eaea12bb8d292a5f2feeefb145b9259b15f1d3d
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed May 21 23:47:38 2025 +0930
+
+    Added/updated Docker build files for various iterations of docker container + added nixpacks.toml sample file
+
+commit 079c3e14d7385c226d650d4e19fa66f10c37e3fa
+Merge: d016470 aec5d5d
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon May 12 21:42:23 2025 +0930
+
+    Merge branch 'development' of gitea.isolutions.com.au:aspeer/pm-WebDyne into development
+    
+    Merge from gitea upstream
+
+commit d01647006da04b849d9b2e52f90e3bb0a8a68d09
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon May 12 21:42:06 2025 +0930
+
+    Added cpanfile.snapshot
+
+commit aec5d5d932c4c39e35fb4d4d2d589b1a31ca711e
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Tue Apr 22 23:45:06 2025 +0930
+
+    Convert PSGI handler to use WebDyne::HTML::Tiny and remove CGI.pm dependency
+
+commit 2b77f88c873cbd5d7feb225a363213531b78110d
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Tue Apr 22 18:40:06 2025 +0930
+
+    Add Devel::Confess module
+
+commit 200e7aad4ca74513dab9dcc54ed2522adc792305
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Tue Apr 22 18:21:52 2025 +0930
+
+    Add error.psp file to packer
+
+commit 8fa0ab06fb60c401bb459579563ad932480bcb37
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Tue Apr 22 18:02:47 2025 +0930
+
+    Update to use port 8080
+
+commit 27d1664b53926cb3fd376c980a6be78ca7ab0581
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Tue Apr 22 17:38:32 2025 +0930
+
+    Adjust Dockerfile.build
+
+commit 2fbcd6dbba78e65d1fbee9925d2c2235b0431018
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Tue Apr 22 16:51:34 2025 +0930
+
+    Fixed nixpack.toml syntax
+
+commit a4a7f50ac7b40038af6f4971c4418760478b0120
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Tue Apr 22 16:48:45 2025 +0930
+
+    Added initial nixpacks.toml file to root for testing
+
+commit 6f196e26bc87aa81bcffaede390b1f854b8a8175
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon Apr 21 23:30:30 2025 +0930
+
+    Fix lib path in packer
+
+commit a77778bb1901f946cb011bdac703e0eea45adc65
+Author: Super User <root@localhost.localdomain>
+Date:   Mon Apr 21 21:13:14 2025 +0930
+
+    Working on fixing packer and docker setups
+
+commit 94f338743a28146bb77565b0d0f9fdd8836d4067
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Apr 20 22:12:00 2025 +0930
+
+    Update Makefile.PL to take 10 char git ref to match up with Gitea short refs
+
+commit 77082d21f34852941c85616c6a76a9678fa44747
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Apr 20 22:06:59 2025 +0930
+
+    VERSION increment: 2.005_225
+
+commit 0ca809d91293107d2a33aca9a74aa0aa3f7aa7a9
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Apr 20 17:35:00 2025 +0930
+
+    VERSION increment: 2.004_224
+
+commit 2f68613d05196e2115d59389337ec6bee2f65eec
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Apr 20 17:34:14 2025 +0930
+
+    Attempt introduction of VERSION_GIT_REF var that is populated by Makefile.PL if in git repo, ignored if not
+
+commit e3e1bf994a8accc7856ef167f9557af0401c70c2
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Apr 20 14:11:11 2025 +0930
+
+    VERSION increment: 2.003_222
+
+commit a8772bba981dbad87b73ccea81dd386b31aec844
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Apr 20 14:10:22 2025 +0930
+
+    Added in new test files, sync'd git and MANIFEST
+
+commit 03beeb9530bbc2f10c5f68dfb533cf079f11d85c
+Merge: a7167b8 cd9de43
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Apr 6 21:38:18 2025 +0930
+
+    Fix merge conflict
+
+commit a7167b8a8d6fbcf77ea4564def8f6f9661069012
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Apr 6 21:35:23 2025 +0930
+
+    Doc updated
+
+commit cd9de4315a7a8717ae1d7985491574c70208d321
+Merge: 70ac03b e568a99
+Author: Super User <root@localhost.localdomain>
+Date:   Sun Apr 6 20:30:24 2025 +0930
+
+    Fix merge conflict on folding commit
+
+commit 70ac03bf845fef4ed091073eb550f62a9f00c3a0
+Author: Super User <root@localhost.localdomain>
+Date:   Sun Apr 6 20:24:37 2025 +0930
+
+    First attempt at constant folding _IX vars
+
+commit e568a993f32b3870af6865ebc539142f01f0c2cc
+Author: Super User <root@localhost.localdomain>
+Date:   Sun Apr 6 17:11:46 2025 +0930
+
+    Update PSGI::Constant files
+
+commit 7fd682318fe1f86d200ab69cd25783c6fe34ffd1
+Author: Super User <root@localhost.localdomain>
+Date:   Sun Mar 16 18:01:33 2025 +1030
+
+    Tidy up Constant files and add dump() routine to import so can do perl -MWebDyne::Constant=dump to see content
+
+commit 44de393c7d36ac13f344ed057ef2dbcf3f95fd1d
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Mar 16 11:07:36 2025 +1030
+
+    Add documentation, minor fix to Fake request handler to accept header_in parameters
+
+commit 3688336e50cd698ba9bb5ddf3e53e8556909533f
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Mar 14 22:57:51 2025 +1030
+
+    Attempt to support DOCUMENT_ROOT from command line, DOCUMENT_DEFAULT also via ENV or Constant.pm entry
+
+commit 0714202eef9df13f6610d9b1b0683178561a3eb3
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Mar 12 22:40:43 2025 +1030
+
+    Allow PSGI to spec DOCUMENT_ROOT (~/public_html) or just specific file (~/public_html/time.psp) on command line
+
+commit 84ce33f9e2fc658bca550ef5e2f64e25a8972127
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon Mar 10 11:20:57 2025 +1030
+
+    First attempt at folding PSGI files into main WebDyne repo
+
+commit 95b488f06e83e3678fbc8b68b2928d53e3baf0fa
+Author: Super User <root@localhost.localdomain>
+Date:   Sun Mar 9 12:54:24 2025 +1030
+
+    Add APR::Pool into list of modules we attempt to load, try to add default attrs to bar <html> tag, optimise calling HTML::Tiny without empty hash if non attr hash supplier
+
+commit fa1e1f2cd4d92d7c510969fe9dd11f670d676a78
+Author: Super User <root@localhost.localdomain>
+Date:   Sun Mar 9 12:15:41 2025 +1030
+
+    Comment out some of the content security headers
+
+commit ef6398181ef4b9ebda3ee67978978ab5bbcd7a02
+Author: Super User <root@localhost.localdomain>
+Date:   Sun Mar 9 11:17:33 2025 +1030
+
+    Tweak Apache installer
+
+commit d4269d5273ccefcfb999f3f9cb5966e1c32521a0
+Author: Super User <root@localhost.localdomain>
+Date:   Sun Mar 9 11:01:41 2025 +1030
+
+    Move Apache webdyne constants to separate file
+
+commit b021062f9e2d29b35d01d9888b2ba398546f4e78
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Mar 9 10:37:08 2025 +1030
+
+    Update Apache installer to seperate out webdybe config vars into separate file
+
+commit 4a39f50f0a18646aed0c4e2f3db267dd0f13ac92
+Author: Super User <root@localhost.localdomain>
+Date:   Sat Mar 8 19:46:25 2025 +1030
+
+    Tweak Apache installer to not put cache under /usr/local as protected by systemd
+
+commit 12159b8294e8cb846ed69a8a97732f52a5ff350f
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Mar 7 22:10:54 2025 +1030
+
+    Convert remaining references of WebDyne::Base => WebDyne::Util
+
+commit d14bbea06b1409cf1b94f14916e1b9e49f267203
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Mar 7 21:53:08 2025 +1030
+
+    Updated Makefile.PL
+
+commit fa6cadafc3deb64a5591d9ee61888cc3316a012a
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Feb 28 00:54:21 2025 +1030
+
+    Add args() method to Fake handler to emulate Apache2::RequestRec option used by CGI::Simple
+
+commit 0db19ec4ffcb7ce0b9556a7c9d33d78343239e57
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Feb 26 22:46:41 2025 +1030
+
+    Perltidy
+
+commit 77e4ce1faab2d5cf50d93df4ab0ff5528bf45432
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Feb 26 22:35:21 2025 +1030
+
+    Clean up error handler
+
+commit 65bc016ee81da91b0ac8cb961ec0aac26d981c96
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Tue Feb 25 10:19:03 2025 +1030
+
+    Interim error handler update checkin - working but needs cleanup
+
+commit 3d2986ab2466520ed8e1cdc97f7cfbde8208ce3f
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Feb 23 15:34:16 2025 +1030
+
+    Fix line number skew if HTML file prefixed by #comments
+
+commit db65895948ab489775bef760af9aa43d88eee24f
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Feb 23 15:24:59 2025 +1030
+
+    Cleanup error handler code and HTML, add environment and WebDyne::Constant dump
+
+commit 4bf5a802c8c4a73f8a1dd652cd784bf101459292
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Feb 23 12:10:48 2025 +1030
+
+    Minor fixes on error handling, start working on error output
+
+commit 3847c6a723909de92caf0c8d61697226ef2a1c59
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat Feb 22 19:55:03 2025 +1030
+
+    Add cwd() optimisation in Fake handler, fix loop/repeat problem in wdrender
+
+commit 6b8433868362995d88585d72e670c90e2c22682e
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat Feb 22 17:34:40 2025 +1030
+
+    Rename WebDyne::Base to WebDyne::Util, make debug() a regular sub without any *debug stuff, fix up bug in error handler if WEBDYNE_RELOAD run and error happens twice, remove unneccessary perl_init
+
+commit 3494c1ea914d62726988f51d84a2f5bba5afc803
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon Feb 17 21:23:54 2025 +1030
+
+    Update to supply request handler and cgi object to perl routines as parameters, instead of having to get them from ->r() etc.
+
+commit 97be33796d5c9f57205ced05552d094d5b625262
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Thu Feb 13 15:35:58 2025 +1030
+
+    Add code (stubbed out) to check for leaks in wdrender
+
+commit ca53c6e4f702193f48cf5e682104f982a5cdff25
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Feb 2 21:21:58 2025 +1030
+
+    Small update to WebDyne::Request::Fake to support PSGI callbacks when running under Apache mod_perl Plack PSGI handler
+
+commit cdcfc40b11ccf039fe3f55d90501385b9b877430
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat Feb 1 10:55:50 2025 +1030
+
+    Fix up/modernise Apache install template to allow for local::lib, Apache 2.4
+
+commit e902a14ee80ad6457ae142e7a270dfeaeed3bee8
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Jan 31 23:52:46 2025 +1030
+
+    Add table_plain test
+
+commit a93f93f18b69e8c1eaf48a9abf6135c4be0e4251
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Jan 31 23:50:47 2025 +1030
+
+    Add perl_table test
+
+commit 0d9e094d27d40530375e277556fc95db417ab95b
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Jan 31 23:48:49 2025 +1030
+
+    More changes to subst_attr
+
+commit 827efd32973201bc9f5490d9e887a4636058d373
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Jan 31 23:40:43 2025 +1030
+
+    Revert to old way of doing perl_init and eval_code eval as subroutines to avoid variable leak. Fix bug in subst_attr that was not deterministic if more than one attribute needed substitution, cleanup some WebDyne::HTML::Tiny code
+
+commit d36519fedf211b3ebd5282b23ce9680903caa9ba
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Jan 31 10:16:23 2025 +1030
+
+    Run perltidy over code
+
+commit 89aec318e738c4c5f60c4d8ab30e1aa53c516862
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Jan 31 10:13:38 2025 +1030
+
+    Add perl_hash test files to MANIFEST
+
+commit 912e24e3bd06e712f66977cd42af52d09029a1be
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Jan 31 10:09:02 2025 +1030
+
+    Add facility to just return hash ref from perl code have vars pulled from there for render
+
+commit b3593e7ad6e5d0fde920898f27cff30d5b44aee3
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Thu Jan 30 14:48:56 2025 +1030
+
+    Tidy up of WebDyne::Compile code, addition of WEBDYNE_HTML_TINY_MODE var, defaults to html
+
+commit ea11bf8530edef03c8a2a38610a546ed5b2de049
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Thu Jan 30 14:42:03 2025 +1030
+
+    Tidy up of WebDyne code
+
+commit e4f291bba30ae00eee52efdadf8024c5ec5d8bff
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Thu Jan 30 14:24:14 2025 +1030
+
+    Cleanup of dead code in WebDyne::HTML::Treebuilder
+
+commit 8a854e67bf202735d17b66e466e23e102d7f2d32
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Thu Jan 30 14:12:04 2025 +1030
+
+    Optimise/fix a couple of regexps, move @HTML_Wedge into ->{'_html_wedge_ar'} so not global var
+
+commit 3f7fcb74248ad08a99c3623415642c7ecb2a7234
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Thu Jan 30 00:07:00 2025 +1030
+
+    Very small regexp optimisations
+
+commit 2e87ed7cde3d8f75aac1667b23460f9d2ac43a3e
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Jan 29 23:45:40 2025 +1030
+
+    Code cleanup, fix substitution.psp test now we are not autoescaping dynamically created attributes
+
+commit c467e374937c706fe9856dc4a44eb08332d50619
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Jan 29 23:32:19 2025 +1030
+
+    Don't autoescape (defang) attribute values that are dynamically generated. Assume safe
+
+commit 771b36cbe3ec4eb11c9196c65e515ae97b6e33e9
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Jan 29 22:44:00 2025 +1030
+
+    Make eval code return scalar if running inline perl code, array if tag (e.g. popup_menu values=@{1,2,3}
+
+commit ac7d0dac1468090efd6116c07be0b1cf8e3da18a
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Tue Jan 28 20:58:03 2025 +1030
+
+    Added test files to MANIFEST
+
+commit bdcc4447bf182b5ae2e81f2c0e52e98eb95d6fd3
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Tue Jan 28 20:54:38 2025 +1030
+
+    Added test for printing, whitespace, pre tag formatting
+
+commit 0af95ce0c78d9d52ff855cf3e58b796a5b0a9648
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Tue Jan 28 20:52:29 2025 +1030
+
+    Clean up print functionality, make work more reliably when mixed with other methods
+
+commit 1840bd7d32930c58eb928522592660fe61061ee9
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Tue Jan 28 12:41:43 2025 +1030
+
+    Change way we handle whitespace - do not ignore text fields that only have a CR as it breaks formating inside <pre> blocks. Update code and tests to reflect
+
+commit 15dcd49ed903bb06affd1f763163a14e1d612d95
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon Jan 27 23:52:56 2025 +1030
+
+    Don't ignore CR/LF in psp files to make sure <pre> sections work OK. Fix regexp in Treebuilder code
+
+commit 8090d61297931dd2b4648c19c457caadab0b6dde
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon Jan 27 20:49:46 2025 +1030
+
+    Convert CGI->init to CGI::Simple->_initialize
+
+commit 62443f1f68ddf2b33040795982e10a3845dfe4fb
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Jan 10 12:16:04 2025 +1030
+
+    VERSION increment: 2.002_58801625
+
+commit 3813dd976e1f5886238f206e20fe66fcf0536f6d
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Jan 10 12:15:53 2025 +1030
+
+    Update MANIFEST
+
+commit 1726b62976c21212b20d6f67d2d2cff1e301b58c
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Jan 10 12:15:18 2025 +1030
+
+    Add test data files
+
+commit b9364555648742d551e0dea46d4a2887018aaf5c
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Jan 10 12:14:13 2025 +1030
+
+    Update HTTP headers for CSP to allow external and inline style sheets
+
+commit 481bbf16c1817fbe6c64015a2b0571a565b75191
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Jan 10 11:57:46 2025 +1030
+
+    Fix logic error with script end tags, update HTTP headers returned to be more modern, add some nest dive tests
+
+commit 924ae3312f4b012f25228708fe763c7b24b45eb6
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Jan 10 01:15:10 2025 +1030
+
+    Fix logic error on closing div and script tags with Treebuilder end call
+
+commit 092ce813c63843e84a1d3b5d1cfe86559ab4d9cc
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Thu Jan 9 23:00:02 2025 +1030
+
+    Add perl_pi data files
+
+commit 49346760582048270d603f097310ab6eccfbc2d1
+Merge: 9587a0f ff4f403
+Author: Super User <root@fedora40-e688.isolutions.com.au>
+Date:   Thu Jan 9 22:48:10 2025 +1030
+
+    Merge branch 'development' of https://gitea.isolutions.com.au/aspeer/pm-WebDyne into development
+    
+    Add local test file
+
+commit 9587a0f1ff8f09876fe13c05e8041038818e3bdf
+Author: Super User <root@fedora40-e688.isolutions.com.au>
+Date:   Thu Jan 9 22:46:26 2025 +1030
+
+    Add perl_pi.psp
+
+commit ff4f403bf5faecd176f09c8e9badf37403a1e1a4
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Thu Jan 9 22:32:51 2025 +1030
+
+    Minor adjustments to Apache config template to include local::lib libraries if present
+
+commit 44d3d5a32b95076ba20038279757369a17a3b94d
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Thu Jan 9 22:24:25 2025 +1030
+
+    Add more tests and include examples directory
+
+commit 498c96eb4b2f256dcd59ca9cbcbd829635310f58
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Thu Jan 9 18:05:43 2025 +1030
+
+    Fix some popup_menu issues with disabled options, whole menup
+
+commit 86d322ebcb9f32cea3c1d040675c672bad093661
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Thu Jan 9 15:40:29 2025 +1030
+
+    support <script type='application/perl'> ...perl code.. </script> in psp files
+
+commit f2902e950561fcaa8e127479b8858e0e2d3fd7c3
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Thu Jan 9 13:43:07 2025 +1030
+
+    Better sanity check on eval return for incorrect format, draft support for <script type="application/perl"> syntax
+
+commit 886bbfeeb271028f9b313f79b37cbf7072aae40f
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Thu Jan 9 12:33:47 2025 +1030
+
+    if div format of webdyne syntax is used without wrap attrib - but with class, id, style etc. then wrap in <div> tag and preserve those attr
+
+commit af9f9e76f96d241779785ea2fd90c9541319a3d3
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Thu Jan 9 11:46:31 2025 +1030
+
+    Remove 'class' as a Webdyne perl attribute as clashes with CSS styles, added 'wrap' attribute to div style to allow any output to be wrapped in that tag
+
+commit e954d2fbfc124b8fe0da70c7d5f7af7a3ff31330
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Thu Jan 9 00:37:30 2025 +1030
+
+    adjusted + substitution to call ->CGI rather than ->{_CGI} for instance
+
+commit 2378dc17497af2c85b4abf178f7c7156f361e6d6
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Thu Jan 9 00:28:54 2025 +1030
+
+    Comment out legacy apache config directives
+
+commit 663c29d8b34b66133fc591301739bf9bfb2d6f8b
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Thu Jan 9 00:13:44 2025 +1030
+
+    Add IO::String dependency
+
+commit 4bfd27526dc12d059568c70dbb8c1bfc89aacdbc
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Thu Jan 9 00:11:52 2025 +1030
+
+    Update dependencies to include HTML::Tiny and JSON modules
+
+commit a4386e558bb9a37d21e981c32c527c7aa6aff822
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Thu Jan 9 00:02:30 2025 +1030
+
+    Rebuild cpanfile
+
+commit 484ae26a29abf727a5133ec87480f8da007b58c3
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Jan 8 23:49:44 2025 +1030
+
+    Add examples dir
+
+commit e084c558af1f966aabf70bf6c117d921ea1b9553
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Jan 8 23:48:46 2025 +1030
+
+    Add CGI::Simple as a dependency
+
+commit fe7a50460cd53ee84de3d299085fa96fab08eca2
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Jan 8 23:45:56 2025 +1030
+
+    VERSION increment: 2.001_70227895
+
+commit 42f97b71146a1ea56c1682a1185f06fa9d051a37
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Jan 8 23:44:56 2025 +1030
+
+    Update error.psp to use CGI::Simple
+
+commit 91d90eba1785b2dbced5a7863bbb53b8ae33b302
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Jan 8 23:02:27 2025 +1030
+
+    Rebuilt tests
+
+commit 886fafa7882ec7225ffb2b015d2f9926b42a2800
+Author: Super User <root@fedora40-e688.isolutions.com.au>
+Date:   Wed Jan 8 23:01:17 2025 +1030
+
+    Fixed psp not being interpreted correctly if not terminated with CR/LF, fixed some dependencies on Apache2::Request* modules
+
+commit dcc016c99208e26a2b8f32485c7f28369aa05eea
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Jan 8 20:33:09 2025 +1030
+
+    Version increment to 2.0
+
+commit ea29370f8a6fd3343fc0e71f970db4c475b07b5a
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Jan 8 20:31:55 2025 +1030
+
+    Updated copyright year, sync'd MANIFEST with git
+
+commit c4f2558159c13d115e2a4afd2d499581ba4728d5
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Jan 8 20:27:24 2025 +1030
+
+    remove extraneous file from test dir
+
+commit 991a25e54521ec066c8ecda854b6d34d032bba00
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Jan 8 20:25:08 2025 +1030
+
+    Added popup_menu tied hash test
+
+commit 9ae07c3d1f4fa20f29adbf819b137de224799a69
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Jan 8 17:07:59 2025 +1030
+
+    Cleanup of deleted files before push
+
+commit 4151174545afea5831bbcfc21e2b1b3ddc72b9b0
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Jan 8 17:07:13 2025 +1030
+
+    Remove filename.psp from test as gives variable answer depending on install location
+
+commit 3d0f1ff9cfe70d797d00cd38db6da21e11fc060d
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Jan 8 17:06:10 2025 +1030
+
+    Add test files
+
+commit 3631dd4fb72691815a84af7893a29d9b04fee34c
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Jan 8 17:01:15 2025 +1030
+
+    Add nomanifest option
+
+commit 0f13d8ab3101c457e9a3c47dc0e534f4fe1428eb
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Jan 8 17:00:30 2025 +1030
+
+    Remove test 02-render and replace with renamed 03-compare
+
+commit be3d996eb7899bb533f60ae70cb60eff375b1984
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Jan 8 16:58:27 2025 +1030
+
+    Remove obsolete BEGIN section
+
+commit 9be7f19c505661328b9e10eff266319dd9b38fc3
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Jan 8 16:58:12 2025 +1030
+
+    Remove obsolete BEGIN section
+
+commit d2fbb5c73557cd2b577473ba9f58c9f7fae1c1ad
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Jan 8 16:57:31 2025 +1030
+
+    Support for Apache 2.4 syntax
+
+commit 589c2584cda4faec2ed03d278b6f3c77e83f773f
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Jan 8 16:55:31 2025 +1030
+
+    Small adjustments to WebDyne::Base to allow for different environment var syntax
+
+commit c04b9b477c4596747316d4570c0c85b0b15ce5bf
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Jan 8 16:53:52 2025 +1030
+
+    Big refactor of WebDyne::HTML::Treebuilder, first implementation of alternate div syntax
+
+commit 1608f11c5063048232961464fd4a83ef7c3af0b3
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Jan 8 16:52:48 2025 +1030
+
+    Update WebDyne::Constant with more relevant definitions
+
+commit 816edc900ffecf4227ede5a835e0c5535ea31beb
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Jan 8 16:51:54 2025 +1030
+
+    Add 03-compare.t test routine
+
+commit 3e608617b732390204d41558dc7c1215dd4d903b
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Jan 8 16:37:56 2025 +1030
+
+    Refactor to make sure files put in correct location
+
+commit 193d618c69b11f84b49c3ad62a06590716e93411
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Jan 8 16:33:44 2025 +1030
+
+    remove of debug die
+
+commit 7633191c3a721e7d4ebf1c473221ace33dc1f5c6
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Jan 8 16:32:24 2025 +1030
+
+    Rename cgi_or to html_tiny_or to reflect change of backend for generating tags
+
+commit 909dd997fdd8c26a4edd43291b2a9ecf1bc849be
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Jan 8 16:29:02 2025 +1030
+
+    Refactor of WebDyne::Compile to support HTML::Tiny generation of tags
+
+commit 202d063381807d16d704c9b7401baa8297d35340
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Jan 8 16:15:55 2025 +1030
+
+    Add CGI::Simple instead of CGI
+
+commit 960ceea14a21c758858604c92515fb313e4a2b30
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Jan 8 16:11:19 2025 +1030
+
+    Refactor comment to ~comment, fix @meta logic error in start_html tag
+
+commit f6a657eddca8bdce14eeb35ed3b1236bf4859220
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Jan 8 16:09:34 2025 +1030
+
+    Big refactor of WebDyne file to support CGI::Simple, refactor eval, perl and require sections
+
+commit 24a7dc3ef3c88921fb4c5c9062a857b8c0d9db12
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat Jan 4 12:43:30 2025 +1030
+
+    Very rough first implementation of alternate div syntax
+
+commit 63c3d9f4dd73ddd468d5d7b1bcb0a09e40e4cc77
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Thu Jan 2 09:13:32 2025 +1030
+
+    Add json tag and perl require attribute. Start implementation of "div" alternate syntax
+
+commit c3eb88612adb3623b12546dfc8198b537f55acac
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Tue Dec 31 11:06:56 2024 +1030
+
+    Convert to using CGI::Simple, fix checkbox_group and popup_menu functions
+
+commit a46105aa8a8d6207946d870d0b35af04cb3db871
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Tue Dec 31 01:05:20 2024 +1030
+
+    Interim commit - getting somewhere
+
+commit 5f85412c4e0a9013ea038c542264be4e5580a703
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon Dec 23 22:10:08 2024 +1030
+
+    Draft version of WebDyne::HTML::Tiny
+
+commit d167d9737fc7c73cee8709204c32a7b3db3847f0
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Tue Dec 10 23:00:40 2024 +1030
+
+    Ignore # at start of .psp files (added by copyright handler etc)
+
+commit b71b0ae5c66a6848d0b4c8178e3f9f895af63898
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat Dec 7 16:35:06 2024 +1030
+
+    VERSION increment: 1.251
+
+commit c6ca9da0ba42d99624ee937e134f1fab5ab3f15e
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat Dec 7 16:35:02 2024 +1030
 
     VERSION increment: 1.250
+
+commit 40cc4f6bf6ef0120cf7d9113c73f267d7dfa570c
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat Dec 7 16:34:26 2024 +1030
+
+    Fixed test cases to cater for changes in CGI.pm
+
+commit 27bcde7be8ca84ec2dd4b77e99ec1228ca02b1f3
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Nov 27 18:42:00 2024 +1030
+
+    Update SIG{__DIE__} behaviour
 
 commit 284ba9a9c0a89fdfd11115c20a8f90900704b7fd
 Author: Andrew Speer <andrew.speer@isolutions.com.au>

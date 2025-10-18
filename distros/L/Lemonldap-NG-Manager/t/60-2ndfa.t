@@ -6,20 +6,17 @@ use JSON;
 use strict;
 use Lemonldap::NG::Common::Session;
 
-eval { mkdir 't/sessions' };
-`rm -rf t/sessions/*`;
 require 't/test-lib.pm';
 
 sub newSession {
     my ( $uid, $ip, $kind, $sfaDevices ) = splice @_;
     my $tmp;
     ok(
-        $tmp = Lemonldap::NG::Common::Session->new(
-            {
+        $tmp = Lemonldap::NG::Common::Session->new( {
                 storageModule        => 'Apache::Session::File',
                 storageModuleOptions => {
-                    Directory      => 't/sessions',
-                    LockDirectory  => 't/sessions',
+                    Directory      => "$main::tmpdir/sessions",
+                    LockDirectory  => "$main::tmpdir/sessions",
                     generateModule =>
 'Lemonldap::NG::Common::Apache::Session::Generate::SHA256',
                 },
@@ -28,8 +25,7 @@ sub newSession {
         'Sessions module'
     );
     count(1);
-    $tmp->update(
-        {
+    $tmp->update( {
             ipAddr        => $ip,
             _whatToTrace  => $uid,
             uid           => $uid,
@@ -53,8 +49,7 @@ $ids[0] = newSession( 'dwho', '127.10.0.1', 'SSO', $sfaDevices );
 
 # Peristent sesssions
 $ids[1] = newSession( 'msmith', '127.10.0.1', 'Persistent', $sfaDevices );
-$sfaDevices = [
-    {
+$sfaDevices = [ {
         "name"       => "MyU2FKey",
         "type"       => "U2F",
         "_userKey"   => "123456",
@@ -69,8 +64,7 @@ $sfaDevices = [
     }
 ];
 $ids[2] = newSession( 'rtyler', '127.10.0.1', 'Persistent', $sfaDevices );
-$sfaDevices = [
-    {
+$sfaDevices = [ {
         "name"       => "MyU2FKey",
         "type"       => "U2F",
         "_userKey"   => "123456",
@@ -91,8 +85,7 @@ $sfaDevices = [
     }
 ];
 $ids[3] = newSession( 'dwho', '127.10.0.1', 'Persistent', $sfaDevices );
-$sfaDevices = [
-    {
+$sfaDevices = [ {
         "name"       => "MyU2FKey",
         "type"       => "U2F",
         "_userKey"   => "123456",
@@ -107,8 +100,7 @@ $sfaDevices = [
     }
 ];
 $ids[4] = newSession( 'davros', '127.10.0.1', 'Persistent', $sfaDevices );
-$sfaDevices = [
-    {
+$sfaDevices = [ {
         "name"       => "MyU2FKey",
         "type"       => "U2F",
         "_userKey"   => "123456",
@@ -128,8 +120,7 @@ count(2);
 # Single Persistent sessions access
 for ( my $i = 1 ; $i < 6 ; $i++ ) {
     $res = &client->jsonResponse("/sessions/persistent/$ids[$i]");
-    ok(
-        (
+    ok( (
                   $res->{uid}
               and $res->{uid} =~ /^(?:dwho|rtyler|msmith|davros|tof)$/
         ),
@@ -366,6 +357,3 @@ like( $res->[2]->[0],
 count(2);
 
 done_testing( count() );
-
-# Remove sessions directory
-`rm -rf t/sessions`;

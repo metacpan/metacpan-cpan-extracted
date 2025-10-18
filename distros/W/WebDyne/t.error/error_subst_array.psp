@@ -1,0 +1,2 @@
+<start_html>
+<popup_menu values="@{qw(1 2), do { die }}">

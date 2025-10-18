@@ -1,0 +1,4 @@
+<html> @0 (IMPLICIT)
+  <head> @0.0 (IMPLICIT)
+  <body> @0.1 (IMPLICIT)
+    "__PERL__sub json { my $self=shift(); my %chart=( labels =>['Janua..."

@@ -1,15 +1,14 @@
 #
 #  This file is part of WebDyne.
 #
-#  This software is Copyright (c) 2017 by Andrew Speer <andrew@webdyne.org>.
+#  This software is copyright (c) 2025 by Andrew Speer <andrew.speer@isolutions.com.au>.
 #
-#  This is free software, licensed under:
-#
-#    The GNU General Public License, Version 2, June 1991
+#  This is free software; you can redistribute it and/or modify it under
+#  the same terms as the Perl 5 programming language system itself.
 #
 #  Full license text is available at:
 #
-#  <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+#  <http://dev.perl.org/licenses/>
 #
 package WebDyne::Handler;
 
@@ -17,7 +16,7 @@ package WebDyne::Handler;
 #  Compiler Pragma
 #
 use strict qw(vars);
-use vars qw($VERSION);
+use vars   qw($VERSION);
 use warnings;
 no warnings qw(uninitialized);
 
@@ -25,12 +24,12 @@ no warnings qw(uninitialized);
 #  WebDyne Modules.
 #
 use WebDyne::Constant;
-use WebDyne::Base;
+use WebDyne::Util;
 
 
 #  Version information
 #
-$VERSION='1.250';
+$VERSION='2.014';
 
 
 #  Debug
@@ -52,7 +51,7 @@ sub import {
     #
     my ($class, @param)=@_;
     my $self_cr=UNIVERSAL::can(scalar caller, 'self') || return;
-    my $self=$self_cr->() || return;
+    my $self=$self_cr->()                             || return;
     my %param=(@param == 1) ? (handler => @param) : @param;
     $self->set_handler($param{'handler'});
 

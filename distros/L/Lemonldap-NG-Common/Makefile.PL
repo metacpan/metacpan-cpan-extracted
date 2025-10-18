@@ -4,6 +4,20 @@ use ExtUtils::MakeMaker;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 
+# Autodiscover needed man1 files
+opendir D, 'scripts' or die $!;
+my $man1 = {};
+while ( my $file = readdir D ) {
+    next if $file =~ /^\./;
+    open my $fh, '<', "scripts/$file" or die $!;
+    while (<$fh>) {
+        if (/^=head1/) {
+            $man1->{"scripts/$file"} = "blib/man1/$file.1p";
+            last;
+        }
+    }
+}
+
 sub MY::top_targets {
     my $self = shift;
     my $r    = $self->MM::top_targets(@_);
@@ -121,15 +135,5 @@ WriteMakefile(
     clean => {
         FILES => 't/lmConf*'
     },
-    MAN1PODS => {
-        'scripts/convertConfig'               => 'blib/man1/convertConfig.1p',
-        'scripts/convertSessions'             => 'blib/man1/convertSessions.1p',
-        'scripts/convertToHashSessionStorage' =>
-          'blib/man1/convertToHashSessionStorage.1p',
-        'scripts/encryptTotpSecrets'    => 'blib/man1/encryptTotpSecrets.1p',
-        'scripts/lemonldap-ng-cli'      => 'blib/man1/lemonldap-ng-cli.1p',
-        'scripts/lemonldap-ng-sessions' => 'blib/man1/lemonldap-ng-sessions.1p',
-        'scripts/rotateOidcKeys'        => 'blib/man1/rotateOidcKeys.1p',
-        'scripts/importMetadata'        => 'blib/man1/importMetadata.1p',
-    },
+    MAN1PODS => $man1,
 );

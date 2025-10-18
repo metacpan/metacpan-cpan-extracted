@@ -50,7 +50,7 @@
             $scope[button.action]();
             break;
           default:
-            console.log(typeof button.action);
+            console.warn('Unknown action type', typeof button.action);
         }
       }
       return $scope.showM = false;
@@ -76,13 +76,12 @@
             $scope.cfg[b] = response.data;
             date = new Date(response.data.cfgDate * 1000);
             $scope.cfg[b].date = date.toLocaleString();
-            console.log(`Metadatas of cfg ${n} loaded`);
+            console.debug(`Metadatas of cfg ${n} loaded`);
             return d.resolve('OK');
           } else {
             return d.reject(response);
           }
         }, function (response) {
-          console.log(response);
           return d.reject('NOK');
         });
       } else {
@@ -98,7 +97,7 @@
       $scope.currentNode = null;
       $q.all([$translator.init($scope.lang), $http.get(`${staticPrefix}reverseTree.json`).then(function (response) {
         response.data;
-        return console.log("Structure loaded");
+        console.debug("Structure loaded");
       })]).then(function () {
         $q.defer();
         return $http.get(`${scriptname}view/diff/${$scope.cfg[0].cfgNum}/${$scope.cfg[1].cfgNum}`).then(function (response) {
@@ -167,7 +166,7 @@
             if (v.constructor === 'array') {
               tmp.newvalue = v;
             } else {
-              console.log("Iteration");
+              console.debug("Iteration");
               tmp.newnodes = toNodes(v, 'new');
             }
           } else {
@@ -258,7 +257,7 @@
         $scope.waiting = true;
         $q.all([$translator.init($scope.lang), $http.get(`${staticPrefix}reverseTree.json`).then(function (response) {
           reverseTree = response.data;
-          return console.log("Structure loaded");
+          console.debug("Structure loaded");
         }), getCfg(0, n[1]), n[2] != null ? getCfg(1, n[2]) : void 0]).then(function () {
           if (n[2] != null) {
             return init();

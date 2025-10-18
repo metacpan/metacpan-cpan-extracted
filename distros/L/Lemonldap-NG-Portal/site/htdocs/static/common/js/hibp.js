@@ -34,7 +34,7 @@
                   return setResult('ppolicy-checkhibp-feedback', "bad");
                 } else {
                   // unexpected error
-                  console.log('checkhibp: backend error: ', msg);
+                  console.error('checkhibp: backend error: ', msg);
                   return setResult('ppolicy-checkhibp-feedback', "unknown");
                 }
               }
@@ -42,13 +42,13 @@
             error: function error(j, status, err) {
               var res;
               if (err) {
-                console.log('checkhibp: frontend error: ', err);
+                console.error('checkhibp: frontend error: ', err);
               }
               if (j) {
                 res = JSON.parse(j.responseText);
               }
               if (res && res.error) {
-                return console.log('checkhibp: returned error: ', res);
+                console.error('checkhibp: returned error: ', res);
               }
             }
           });

@@ -1,0 +1,8 @@
+#  This is
+#  some lead-in
+#  comments
+#
+<start_html>
+!{! die("Bang !") !}
+__PERL__
+1;

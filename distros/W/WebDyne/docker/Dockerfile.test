@@ -1,0 +1,60 @@
+#  
+# WebDyne docker image for Fedora
+#
+# ====
+#
+# Override with --build-arg
+#
+ARG BASE=debian:bookworm
+ARG PORT=8080
+ARG WORKERS=8
+
+
+# Default paths
+#
+ARG PERL_CARTON_PATH="/opt/webdyne"
+ARG DOCUMENT_ROOT="/app"
+
+
+# ====
+#
+# Build stages
+#
+
+
+# Using Fedora as base
+#
+FROM ${BASE}
+
+
+# Redeclare ARGS
+#
+ARG PERL_CARTON_PATH
+
+
+# Install build tools and core Perl modules
+#
+RUN apt-get update && \
+    apt-get install -y \
+    build-essential \
+    libssl-dev \
+    libperl-dev \
+    curl \
+    perl \
+    cpanminus \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+
+# Set up app
+#
+WORKDIR /app
+
+#  Install Carton
+#
+RUN cpanm --notest Carton
+
+
+#  Done
+#
+CMD []

@@ -1,5 +1,8 @@
 Revision history for WebService-Careerjet
 
+4.3     17 Oct 2025
+        Pass referrer to API.
+
 4.2     16 Oct 2025
         Fixed endpoint.
 

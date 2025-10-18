@@ -130,4 +130,5 @@ ENDKEY
 
 }
 
+clean_sessions();
 done_testing();

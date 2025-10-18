@@ -122,6 +122,9 @@ site/htdocs/static/forms/home.html
 site/htdocs/static/forms/homeViewer.html
 site/htdocs/static/forms/int.html
 site/htdocs/static/forms/intOrNull.html
+site/htdocs/static/forms/KeyMaterial.html
+site/htdocs/static/forms/keyNode.html
+site/htdocs/static/forms/keyNodeContainer.html
 site/htdocs/static/forms/keyText.html
 site/htdocs/static/forms/keyTextContainer.html
 site/htdocs/static/forms/longtext.html
@@ -269,6 +272,7 @@ t/11-save-changed-conf-with-confirmation.t
 t/12-save-changed-conf.t
 t/14-bad-changes-in-conf.t
 t/15-combination.t
+t/15-keys.t
 t/16-cli.t
 t/17-extra2f.t
 t/20-test-coverage.t
@@ -283,6 +287,7 @@ t/71-viewer-without-diff.t
 t/72-appList-diff.t
 t/80-attributes.t
 t/90-translations.t
+t/91-no-console.log.t
 t/99-pod.t
 t/conf/lmConf-1.json
 t/jsonfiles/01-base-tree.json

@@ -8,7 +8,7 @@
 #                  of lemonldap-ng.ini) and underlying handler configuration
 package Lemonldap::NG::Portal::Main::Init;
 
-our $VERSION = '2.21.0';
+our $VERSION = '2.22.0';
 
 package Lemonldap::NG::Portal::Main;
 
@@ -34,6 +34,7 @@ has _userDB         => ( is => 'rw' );
 has _passwordDB     => ( is => 'rw' );
 
 has _loadedServices => ( is => 'rw', default => sub { {} } );
+has _loadedPlugins  => ( is => 'rw', default => sub { {} } );
 
 # Legacy
 sub _captcha        { $_[0]->getService('captcha') }
@@ -122,6 +123,7 @@ sub _resetPluginsAndServices {
     my ($self) = @_;
     $self->loadedModules( {} );
     $self->_loadedServices( {} );
+    $self->_loadedPlugins( {} );
     $self->afterSub( {} );
     $self->aroundSub( {} );
     $self->spRules( {} );
@@ -325,6 +327,19 @@ sub reloadConf {
     $self->logger->debug(
         "Cookies will use SameSite=" . $self->cookieSameSite );
 
+    # Set asset tag from version and optional salt
+    my $cacheTagSalt = $self->conf->{cacheTagSalt} // "";
+    my $key          = $self->conf->{key}          // "";
+    my $digest = substr(
+        MIME::Base64::encode_base64url(
+            Digest::SHA::hmac_sha256(
+                $Lemonldap::NG::Portal::VERSION . $cacheTagSalt, $key
+            )
+        ),
+        0, 8
+    );
+    $self->cacheTag($digest);
+
     # Load menu
     # ---------
     $self->displayInit;
@@ -441,37 +456,7 @@ sub reloadConf {
     }
 
     # Clean $req->pdata after authentication
-    push @{ $self->endAuth }, sub {
-        my $tmp = $_[0]->pdata->{keepPdata} //= [];
-        foreach my $k ( keys %{ $_[0]->pdata } ) {
-            unless ( grep { $_ eq $k } @$tmp ) {
-                $self->logger->debug("Removing $k from pdata");
-                delete $_[0]->pdata->{$k};
-            }
-        }
-        my $user_log    = $_[0]->{sessionInfo}->{ $self->conf->{whatToTrace} };
-        my $auth_module = $_[0]->{sessionInfo}->{_auth};
-        my $ipAddr      = $_[0]->{sessionInfo}->{ipAddr};
-
-        if ($user_log) {
-            $self->auditLog(
-                $_[0],
-                message => (
-                        "User "
-                      . $user_log
-                      . " connected from $auth_module ($ipAddr)"
-                ),
-                code => "LOGIN",
-                user => $user_log,
-            );
-        }
-        if (@$tmp) {
-            $self->logger->debug(
-                'Add ' . join( ',', @$tmp ) . ' in keepPdata' );
-            $_[0]->pdata->{keepPdata} = $tmp;
-        }
-        return PE_OK;
-    };
+    push @{ $self->endAuth }, "cleanPdata";
 
     # Failsafe: allow handler access to portal in case it's missing in conf
     my $default_portal_uri  = URI->new( HANDLER->tsv->{portal}->() );
@@ -479,19 +464,6 @@ sub reloadConf {
     if ($default_portal_host) {
         HANDLER->tsv->{defaultCondition}->{$default_portal_host} ||= sub { 1 };
     }
-
-    # Set asset tag from version and optional salt
-    my $cacheTagSalt = $self->conf->{cacheTagSalt} // "";
-    my $key          = $self->conf->{key}          // "";
-    my $digest       = substr(
-        MIME::Base64::encode_base64url(
-            Digest::SHA::hmac_sha256(
-                $Lemonldap::NG::Portal::VERSION . $cacheTagSalt, $key
-            )
-        ),
-        0, 8
-    );
-    $self->cacheTag($digest);
 
     1;
 }
@@ -540,23 +512,45 @@ sub loadPlugin {
 sub findEP {
     my ( $self, $plugin, $obj ) = @_;
 
+    my $module = $plugin =~ /^::/ ? "Lemonldap::NG::Portal$plugin" : $plugin;
+
+    # Register the plugin's instance so that callbacks can be refered by a
+    # serializable string
+    # DEPRECATED: is_only=0 should no longer be supported after LLNG 3.
+    # Corresponding code paths must be removed
+    my $is_only = 1;
+    if ( $self->_loadedPlugins->{$module} ) {
+        $self->logger->debug( "Plugin $module has already been loaded once." );
+        $is_only = 0;
+    }
+    else {
+        $self->_loadedPlugins->{$module} = $obj;
+    }
+
     # Standards entry points
     foreach my $sub (@entryPoints) {
         if ( $obj->can($sub) ) {
-            $self->logger->debug(" Found $sub entry point:");
+            $self->logger->debug(" Found $sub entry point in $module");
             if ( my $callback = $obj->$sub ) {
-                push @{ $self->{$sub} }, sub {
-                    eval {
-                        $obj->logger->debug("Launching ${plugin}::$callback");
+
+                if ($is_only) {
+                    push @{ $self->{$sub} }, "${module}::${callback}";
+                }
+                else {
+                    push @{ $self->{$sub} }, sub {
+                        eval {
+                            $obj->logger->debug(
+                                "Launching ${module}::$callback");
+                        };
+                        $obj->$callback(@_);
                     };
-                    $obj->$callback(@_);
-                };
+                }
                 $self->logger->debug("  -> $callback");
             }
         }
     }
     if ( $obj->can('afterSub') ) {
-        $self->logger->debug("Found afterSub in $plugin");
+        $self->logger->debug("Found afterSub in $module");
         my $h = $obj->afterSub;
         unless ( ref $h and ref($h) eq 'HASH' ) {
             $self->logger->error(
@@ -565,18 +559,23 @@ sub findEP {
         else {
             foreach my $ep ( keys %$h ) {
                 my $callback = $h->{$ep};
-                push @{ $self->afterSub->{$ep} }, sub {
-                    eval {
-                        $obj->logger->debug(
-                            "Launching ${plugin}::$callback afterSub $ep");
+                if ($is_only) {
+                    push @{ $self->afterSub->{$ep} }, "${module}::${callback}";
+                }
+                else {
+                    push @{ $self->afterSub->{$ep} }, sub {
+                        eval {
+                            $obj->logger->debug(
+                                "Launching ${module}::$callback afterSub $ep");
+                        };
+                        $obj->$callback(@_);
                     };
-                    $obj->$callback(@_);
-                };
+                }
             }
         }
     }
     if ( $obj->can('aroundSub') ) {
-        $self->logger->debug("Found aroundSub in $plugin");
+        $self->logger->debug("Found aroundSub in $module");
         my $h = $obj->aroundSub;
         unless ( ref $h and ref($h) eq 'HASH' ) {
             $self->logger->error(
@@ -587,19 +586,19 @@ sub findEP {
                 my $callback    = $h->{$ep};
                 my $previousSub = $self->aroundSub->{$ep} ||= sub {
                     $self->logger->debug(
-                        "$ep launched inside ${plugin}::$callback");
+                        "$ep launched inside ${module}::$callback");
                     $self->$ep(@_);
                 };
                 $self->aroundSub->{$ep} = sub {
                     $self->logger->debug(
-                        "Launching ${plugin}::$callback instead of $ep");
+                        "Launching ${module}::$callback instead of $ep");
                     $obj->$callback( $previousSub, @_ );
                 };
             }
         }
     }
     if ( $obj->can('hook') ) {
-        $self->logger->debug("Found hook in $plugin");
+        $self->logger->debug("Found hook in $module");
         my $h = $obj->hook;
         unless ( ref $h and ref($h) eq 'HASH' ) {
             $self->logger->error('"hook" endpoint must be a hashref, skipped');
@@ -610,7 +609,7 @@ sub findEP {
                 push @{ $self->hook->{$hookname} }, sub {
                     eval {
                         $obj->logger->debug(
-                            "Launching ${plugin}::$callback on hook $hookname");
+                            "Launching ${module}::$callback on hook $hookname");
                     };
                     $obj->$callback(@_);
                 };
@@ -664,7 +663,7 @@ sub findEP {
         }
     }
 
-    $self->logger->debug("Plugin $plugin initialized");
+    $self->logger->debug("Plugin $module initialized");
 
     return $obj;
 }
@@ -675,11 +674,14 @@ sub loadModule {
     my $obj;
     $module = "Lemonldap::NG::Portal$module" if ( $module =~ /^::/ );
 
-    eval "require $module";
-    if ($@) {
-        $self->logger->error("$module load error: $@");
-        $self->error("$module load error: $@");
-        return 0;
+    # If module is not already in namespace, try to load it
+    unless ( $module->can('new') ) {
+        eval "require $module";
+        if ($@) {
+            $self->logger->error("$module load error: $@");
+            $self->error("$module load error: $@");
+            return 0;
+        }
     }
     eval {
         $obj = $module->new( { p => $self, conf => $conf, %args } );

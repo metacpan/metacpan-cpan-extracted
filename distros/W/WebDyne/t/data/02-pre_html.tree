@@ -1,0 +1,75 @@
+<html> @0 (IMPLICIT)
+  <head> @0.0 (IMPLICIT)
+  <body> @0.1 (IMPLICIT)
+    <pre> @0.1.0
+      <span class="h-ab"> @0.1.0.0
+        "&lt;"
+      <span class="h-tag"> @0.1.0.1
+        "html"
+      <span class="h-ab"> @0.1.0.2
+        "&gt;"
+      <span class="h-ab"> @0.1.0.3
+        "&lt;"
+      <span class="h-tag"> @0.1.0.4
+        "head"
+      <span class="h-ab"> @0.1.0.5
+        "&gt;"
+      <span class="h-ab"> @0.1.0.6
+        "&lt;"
+      <span class="h-tag"> @0.1.0.7
+        "title"
+      <span class="h-ab"> @0.1.0.8
+        "&gt;"
+      "Hello World"
+      <span class="h-ab"> @0.1.0.10
+        "&lt;/"
+      <span class="h-tag"> @0.1.0.11
+        "title"
+      <span class="h-ab"> @0.1.0.12
+        "&gt;"
+      <span class="h-ab"> @0.1.0.13
+        "&lt;/"
+      <span class="h-tag"> @0.1.0.14
+        "head"
+      <span class="h-ab"> @0.1.0.15
+        "&gt;"
+      <span class="h-ab"> @0.1.0.16
+        "&lt;"
+      <span class="h-tag"> @0.1.0.17
+        "body"
+      <span class="h-ab"> @0.1.0.18
+        "&gt;"
+      <span class="h-ab"> @0.1.0.19
+        "&lt;"
+      <span class="h-tag"> @0.1.0.20
+        "p"
+      <span class="h-ab"> @0.1.0.21
+        "&gt;"
+      <span class="h-com"> @0.1.0.22
+        "&lt;!-- Note the perl tags --&gt;"
+      "Hello World "
+      <span class="h-ab"> @0.1.0.24
+        "&lt;"
+      <span class="h-webdyne_tag"> @0.1.0.25
+        "perl"
+      <span class="h-ab"> @0.1.0.26
+        "&gt;"
+      "localtime() "
+      <span class="h-ab"> @0.1.0.28
+        "&lt;/"
+      <span class="h-webdyne_tag"> @0.1.0.29
+        "perl"
+      <span class="h-ab"> @0.1.0.30
+        "&gt;"
+      <span class="h-ab"> @0.1.0.31
+        "&lt;/"
+      <span class="h-tag"> @0.1.0.32
+        "body"
+      <span class="h-ab"> @0.1.0.33
+        "&gt;"
+      <span class="h-ab"> @0.1.0.34
+        "&lt;/"
+      <span class="h-tag"> @0.1.0.35
+        "html"
+      <span class="h-ab"> @0.1.0.36
+        "&gt;"

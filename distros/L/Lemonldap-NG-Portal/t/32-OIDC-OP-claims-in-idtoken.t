@@ -189,7 +189,7 @@ sub op {
                         oidcRPMetaDataOptionsUserIDAttr         => "",
                         oidcRPMetaDataOptionsAccessTokenExpiration  => 3600,
                         oidcRPMetaDataOptionsPostLogoutRedirectUris =>
-                          "http://auth.rp.com/?logout=1",
+                          "http://auth.rp.com/oauth2/rlogoutreturn",
                         oidcRPMetaDataOptionsRule         => '$uid eq "french"',
                         oidcRPMetaDataOptionsRedirectUris =>
                           'http://auth.rp.com/?openidconnectcallback=1',
@@ -239,14 +239,14 @@ sub rp {
                         oidcOPMetaDataOptionsAcrValues => "loa-32 customacr-1",
                         oidcOPMetaDataOptionsClientSecret => "rpsecret",
                         oidcOPMetaDataOptionsScope => "openid profile email",
-                        oidcOPMetaDataOptionsStoreIDToken       => 0,
-                        oidcOPMetaDataOptionsMaxAge             => 30,
-                        oidcOPMetaDataOptionsDisplay            => "",
-                        oidcOPMetaDataOptionsClientID           => "rpid",
-                        oidcOPMetaDataOptionsStoreIDToken       => 1,
-                        oidcOPMetaDataOptionsUseNonce           => 1,
-                        oidcOPMetaDataOptionsUserinfoSource     => 'id_token',
-                        oidcOPMetaDataOptionsConfigurationURI   =>
+                        oidcOPMetaDataOptionsStoreIDToken     => 0,
+                        oidcOPMetaDataOptionsMaxAge           => 30,
+                        oidcOPMetaDataOptionsDisplay          => "",
+                        oidcOPMetaDataOptionsClientID         => "rpid",
+                        oidcOPMetaDataOptionsStoreIDToken     => 1,
+                        oidcOPMetaDataOptionsUseNonce         => 1,
+                        oidcOPMetaDataOptionsUserinfoSource   => 'id_token',
+                        oidcOPMetaDataOptionsConfigurationURI =>
                           "https://auth.op.com/.well-known/openid-configuration"
                     }
                 },

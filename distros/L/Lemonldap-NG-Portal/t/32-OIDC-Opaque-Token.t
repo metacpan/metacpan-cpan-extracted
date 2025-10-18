@@ -15,8 +15,7 @@ BEGIN {
 my $debug = 'error';
 
 # Initialization
-my $op = LLNG::Manager::Test->new(
-    {
+my $op = LLNG::Manager::Test->new( {
         ini => {
             logLevel                        => $debug,
             domain                          => 'idp.com',
@@ -122,6 +121,10 @@ my $refresh_token = $json->{refresh_token};
 ok( $refresh_token, 'Refresh token present' );
 my $id_token_payload = id_token_payload($id_token);
 is( $id_token_payload->{id_token_hook}, 1, "Found hooked claim in ID token" );
+is( $id_token_payload->{id_token_hook_uid},
+    "french", "Found hooked claim in ID token" );
+is( $id_token_payload->{id_token_hook_rp},
+    "rp", "Found hooked claim in ID token" );
 
 # Get userinfo
 $res = $op->_post(

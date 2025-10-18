@@ -1,16 +1,16 @@
 #
 #  This file is part of WebDyne.
 #
-#  This software is Copyright (c) 2017 by Andrew Speer <andrew@webdyne.org>.
+#  This software is copyright (c) 2025 by Andrew Speer <andrew.speer@isolutions.com.au>.
 #
-#  This is free software, licensed under:
-#
-#    The GNU General Public License, Version 2, June 1991
+#  This is free software; you can redistribute it and/or modify it under
+#  the same terms as the Perl 5 programming language system itself.
 #
 #  Full license text is available at:
 #
-#  <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+#  <http://dev.perl.org/licenses/>
 #
+
 
 package WebDyne::Install::Constant;
 
@@ -24,7 +24,8 @@ no warnings qw(uninitialized);
 
 #  Vars to use
 #
-use vars qw($VERSION @ISA %EXPORT_TAGS @EXPORT_OK @EXPORT %Constant);
+#use vars qw($VERSION @ISA %EXPORT_TAGS @EXPORT_OK @EXPORT %Constant);
+use vars qw($VERSION @ISA %Constant);
 
 
 #  External Modules
@@ -35,7 +36,7 @@ use File::Spec;
 
 #  Version information
 #
-$VERSION='1.250';
+$VERSION='2.014';
 
 
 #------------------------------------------------------------------------------
@@ -67,11 +68,6 @@ else {
 %Constant=(
 
 
-    #  Where perl5 library dirs are sourced from
-    #
-    FILE_PERL5LIB => 'perl5lib.pl',
-
-
     #  Default cache directory
     #
     DIR_CACHE_DEFAULT => $cache_default_dn
@@ -80,16 +76,23 @@ else {
 );
 
 
+sub import {
+    
+    goto &WebDyne::Constant::import;
+    
+}
+
+
 #  Finalise and export vars
 #
-require Exporter;
+#require Exporter;
 require WebDyne::Constant;
 @ISA=qw(Exporter WebDyne::Constant);
 
 #  Local constants override globals
-+__PACKAGE__->local_constant_load(\%Constant);
-foreach (keys %Constant) {${$_}=$Constant{$_}}
-@EXPORT=map {'$' . $_} keys %Constant;
-@EXPORT_OK=@EXPORT;
-%EXPORT_TAGS=(all => [@EXPORT_OK]);
-$_=\%Constant;
+#+__PACKAGE__->local_constant_load(\%Constant);
+#foreach (keys %Constant) {${$_}=$Constant{$_}}
+#@EXPORT=map {'$' . $_} keys %Constant;
+#@EXPORT_OK=@EXPORT;
+#%EXPORT_TAGS=(all => [@EXPORT_OK]);
+#$_=\%Constant;

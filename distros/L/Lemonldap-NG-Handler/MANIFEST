@@ -76,6 +76,7 @@ t/13-Lemonldap-NG-Handler-Fake-Safe.t
 t/14-Lemonldap-NG-Handler-Rule-Building.t
 t/20-Default-Broker-with-cache.t
 t/20-Default-Broker.t
+t/30-Missing-conf.t
 t/50-Lemonldap-NG-Handler-SecureToken.t
 t/51-Lemonldap-NG-Handler-Zimbra.t
 t/60-Lemonldap-NG-Handler-PSGI-unprotected.t

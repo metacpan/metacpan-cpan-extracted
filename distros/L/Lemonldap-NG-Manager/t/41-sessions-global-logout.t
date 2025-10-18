@@ -7,19 +7,18 @@ use JSON;
 use strict;
 use Lemonldap::NG::Common::Session;
 
-`rm -rf t/sessions/*`;
-eval { mkdir 't/sessions' };
-eval { mkdir 't/sessions/oidc' };
-eval { mkdir 't/sessions/lock' };
 require 't/test-lib.pm';
+
+eval { mkdir "$main::tmpdir/sessions/oidc" };
+eval { mkdir "$main::tmpdir/sessions/lock" };
 
 $LLNG::Manager::Test::defaultIni = {
     protection                      => 'none',
     issuerDBOpenIDConnectActivation => 1,
     oidcStorage                     => 'Apache::Session::File',
     oidcStorageOptions              => {
-        Directory      => 't/sessions/oidc',
-        LockDirectory  => 't/sessions/oidc',
+        Directory      => "$main::tmpdir/sessions/oidc",
+        LockDirectory  => "$main::tmpdir/sessions/oidc",
         generateModule =>
           'Lemonldap::NG::Common::Apache::Session::Generate::SHA256'
     },
@@ -28,13 +27,13 @@ $LLNG::Manager::Test::defaultIni = {
 sub newSession {
     my ( $uid, $ip, $kind, $storage ) = @_;
     my $tmp;
-    $storage ||= 't/sessions';
+    $storage ||= "$main::tmpdir/sessions";
     ok(
         $tmp = Lemonldap::NG::Common::Session->new( {
                 storageModule        => 'Apache::Session::File',
                 storageModuleOptions => {
                     Directory      => $storage,
-                    LockDirectory  => 't/sessions/lock',
+                    LockDirectory  => "$main::tmpdir/sessions/lock",
                     generateModule =>
 'Lemonldap::NG::Common::Apache::Session::Generate::SHA256',
                 },
@@ -60,8 +59,8 @@ $ids[0] = newSession( 'dwho', '127.10.0.1' );
 $ids[1] = newSession( 'dwho', '127.2.0.2' );
 $ids[2] = newSession( 'foo',  '127.3.0.3' );
 $ids[3] = newSession( 'foo',  '127.3.0.3' );
-$ids[4] = newSession( 'dwho', '127.2.3.4', 'OIDCI', 't/sessions/oidc' );
-$ids[4] = newSession( 'dwho', '127.2.3.4', 'OIDCI', 't/sessions/oidc' );
+$ids[4] = newSession( 'dwho', '127.2.3.4', 'OIDCI', "$main::tmpdir/oidc" );
+$ids[4] = newSession( 'dwho', '127.2.3.4', 'OIDCI', "$main::tmpdir/oidc" );
 
 # Delete sessions using globalLogout
 foreach ( $ids[0], $ids[2] ) {
@@ -82,20 +81,18 @@ foreach ( $ids[0], $ids[2] ) {
     count(4);
 }
 
-opendir D, 't/sessions/oidc' or die $!;
+opendir D, "$main::tmpdir/sessions/oidc" or die $!;
 my @files = grep { not /(?:^(?:(?:lock|oidc)$|\.)|\.lock$)/ } readdir D;
 ok( @files == 0, "OIDC Session directory is empty" )
   or print STDERR "Files found:\n" . join( "\n", @files ) . "\n";
 closedir D;
 count(1);
-opendir D, 't/sessions' or die $!;
-@files = grep { not /(?:^(?:(?:lock|oidc)$|\.)|\.lock$)/ } readdir D;
+opendir D, "$main::tmpdir/sessions" or die $!;
+@files =
+  grep { not /(?:^(?:(?:lock|oidc)$|\.)|\.lock$)/ } readdir D;
 ok( @files == 0, "Session directory is empty" )
   or print STDERR "Files found:\n" . join( "\n", @files ) . "\n";
 closedir D;
 count(1);
 
 done_testing( count() );
-
-# Remove sessions directory
-`rm -rf t/sessions`;

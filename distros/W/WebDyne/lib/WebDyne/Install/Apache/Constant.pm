@@ -1,15 +1,14 @@
 #
 #  This file is part of WebDyne.
 #
-#  This software is Copyright (c) 2017 by Andrew Speer <andrew@webdyne.org>.
+#  This software is copyright (c) 2025 by Andrew Speer <andrew.speer@isolutions.com.au>.
 #
-#  This is free software, licensed under:
-#
-#    The GNU General Public License, Version 2, June 1991
+#  This is free software; you can redistribute it and/or modify it under
+#  the same terms as the Perl 5 programming language system itself.
 #
 #  Full license text is available at:
 #
-#  <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+#  <http://dev.perl.org/licenses/>
 #
 package WebDyne::Install::Apache::Constant;
 
@@ -23,7 +22,8 @@ no warnings qw(uninitialized);
 
 #  Vars to use
 #
-use vars qw($VERSION @ISA %EXPORT_TAGS @EXPORT_OK @EXPORT %Constant);
+#use vars qw($VERSION @ISA %EXPORT_TAGS @EXPORT_OK @EXPORT %Constant);
+use vars qw($VERSION @ISA %Constant);
 
 
 #  External modules
@@ -33,7 +33,7 @@ use File::Spec;
 use IO::File;
 use Cwd qw(realpath);
 use Env::Path;
-use WebDyne::Base;
+use WebDyne::Util;
 use Data::Dumper;
 
 
@@ -60,7 +60,7 @@ my $ServerRoot;
 
 #  Version information
 #
-$VERSION='1.250';
+$VERSION='2.014';
 
 
 #------------------------------------------------------------------------------
@@ -125,6 +125,8 @@ my $mp2_installed=&mp2_installed();
     #
     FILE_WEBDYNE_CONF_TEMPLATE => 'webdyne.conf.inc',
     FILE_WEBDYNE_CONF          => 'webdyne.conf',
+    FILE_WEBDYNE_CONF_PL_TEMPLATE       => 'webdyne_conf.pl.inc',
+    FILE_WEBDYNE_CONF_PL       => 'webdyne_conf.pl',
     FILE_APACHE_CONF_TEMPLATE  => 'apache.conf.inc',
     FILE_APACHE_CONF_DELIM     => '#*WebDyne*',
     FILE_MOD_PERL_1_99_COMPAT  => 'webdyne-mod_perl-1_99-compat.pl',
@@ -230,7 +232,7 @@ sub httpd_bin {
         #  without getting root's path
         #
         $path=join(Env::Path->PathSeparator, $ENV{'PATH'}, @{+PATH});
-        @name_bin=qw(httpd httpd2 httpd2.2 apache apache2 apache2.2);
+        @name_bin=qw(httpd httpd2 httpd2.2 httpd2.4 apache apache2 apache2.2 apache2.4);
     }
     debug("apache final search path: '$path'");
     debug('apache names %s', Dumper(\@name_bin));
@@ -242,7 +244,7 @@ sub httpd_bin {
     unless ($httpd_bin=$ENV{'HTTPD_BIN'}) {
 
         my @dir=grep {-d $_} split(Env::Path->PathSeparator, $path);
-        my %dir=map {$_ => 1} @dir;
+        my %dir=map  {$_ => 1} @dir;
         DIR: foreach my $dir (@dir) {
             next unless delete $dir{$dir};
             next unless -d $dir;
@@ -280,7 +282,7 @@ sub find_bin {
     my $fn;
     unless ($fn=$ENV{"${bin}_BIN"}) {
         my @dir=grep {-d $_} split(Env::Path->PathSeparator, $path);
-        my %dir=map {$_ => 1} @dir;
+        my %dir=map  {$_ => 1} @dir;
         foreach my $dir (@dir) {
             next unless delete $dir{$dir};
             next unless -d $dir;
@@ -312,7 +314,8 @@ sub httpd_config {
     #  Need to get httpd config as series of key/val pairs
     #
     my %config;
-    my @httpd_config=qx(\"$Httpd_Bin\" -V);
+    my $devnull=File::Spec->devnull();
+    my @httpd_config=qx(\"$Httpd_Bin\" -V 2>$devnull);
     debug('httpd_config: %s', Dumper(\@httpd_config));
 
 
@@ -320,13 +323,17 @@ sub httpd_config {
     #
     foreach my $httpd_config (@httpd_config) {
 
+        if ($httpd_config=~/Apache\/(\d+\.\d+)/) {
+            $config{'HTTPD_VER'}=$1;
+            next;
+        }
         next unless ($httpd_config=~/\s*\-D\s*(.*)/);
         my ($key, $value)=split(/\=/, $1);
         $key=~s/\s+.*$//g;
         $value ||= '';
         $value=~s/^\"//;
         $value=~s/\"$//;
-        $key=~/^HTTPD/ || ($key="HTTPD_${key}");
+        $key=~/^HTTPD/       || ($key="HTTPD_${key}");
         $config{$key}=$value || 1;
 
     }
@@ -561,17 +568,25 @@ sub mp2_installed {
 }
 
 
+sub import {
+    
+    goto &WebDyne::Constant::import;
+    
+}
+
+
 #  Finalise and export vars
 #
 debug('final constants: %s', Dumper(\%Constant));
-require Exporter;
+#require Exporter;
 require WebDyne::Constant;
-@ISA=qw(Exporter WebDyne::Constant);
+#@ISA=qw(Exporter WebDyne::Constant);
+@ISA=qw(WebDyne::Constant);
 
 #  Local constants override globals
-+__PACKAGE__->local_constant_load(\%Constant);
-foreach (keys %Constant) {${$_}=$Constant{$_}}
-@EXPORT=map {'$' . $_} keys %Constant;
-@EXPORT_OK=@EXPORT;
-%EXPORT_TAGS=(all => [@EXPORT_OK]);
-$_=\%Constant;
+#+__PACKAGE__->local_constant_load(\%Constant);
+#foreach (keys %Constant) {${$_}=$Constant{$_}}
+#@EXPORT=map {'$' . $_} keys %Constant;
+#@EXPORT_OK=@EXPORT;
+#%EXPORT_TAGS=(all => [@EXPORT_OK]);
+#$_=\%Constant;

@@ -23,7 +23,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   portalConsts
 );
 
-our $VERSION = '2.21.0';
+our $VERSION = '2.22.0';
 
 has resend_interval => (
     is      => 'rw',
@@ -118,7 +118,7 @@ sub _resend {
         );
 
         $req->noLoginDisplay(1);
-        return $self->p->do( $req, [ sub { PE_NOTOKEN } ] );
+        return $self->p->doPE($req, PE_NOTOKEN);
     }
 
     my $session;
@@ -135,7 +135,7 @@ sub _resend {
             type         => $self->prefix,
         );
         $req->noLoginDisplay(1);
-        return $self->p->do( $req, [ sub { PE_TOKENEXPIRED } ] );
+        return $self->p->doPE($req, PE_TOKENEXPIRED);
     }
 
     my $code = $session->{ '__' . $self->prefix . '2fcode' };
@@ -157,7 +157,7 @@ sub _resend {
 
         # Resend code and update last retry
         unless ( $self->sendCode( $req, $req->sessionInfo, $code ) ) {
-            return $self->p->do( $req, [ sub { PE_ERROR } ] );
+            return $self->p->doPE($req, PE_ERROR);
         }
         $self->ott->updateToken( $token, __lastRetry => time );
     }

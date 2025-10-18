@@ -2,7 +2,7 @@
 # into "plugins" list in lemonldap-ng.ini, section "portal"
 package Lemonldap::NG::Portal::Main::Plugins;
 
-our $VERSION = '2.21.0';
+our $VERSION = '2.22.0';
 
 package Lemonldap::NG::Portal::Main;
 
@@ -28,6 +28,7 @@ our @pList = (
     upgradeSession                      => '::Plugins::Upgrade',
     autoSigninRules                     => '::Plugins::AutoSignin',
     checkState                          => '::Plugins::CheckState',
+    webCronSecret                       => '::Plugins::WebCron',
     portalForceAuthn                    => '::Plugins::ForceAuthn',
     checkUser                           => '::Plugins::CheckUser',
     checkDevOps                         => '::Plugins::CheckDevOps',
@@ -39,13 +40,16 @@ our @pList = (
     checkHIBP                           => '::Plugins::CheckHIBP',
     checkEntropy                        => '::Plugins::CheckEntropy',
     initializePasswordReset             => '::Plugins::InitializePasswordReset',
+    oidcOfflineTokens                   => '::Plugins::OidcOfflineTokens',
     adaptativeAuthenticationLevelRules  =>
       '::Plugins::AdaptativeAuthenticationLevel',
-    refreshSessions     => '::Plugins::Refresh',
-    crowdsec            => '::Plugins::CrowdSec',
-    locationDetect      => '::Plugins::LocationDetect',
-    globalLogoutRule    => '::Plugins::GlobalLogout',
-    samlFederationFiles => '::Plugins::SamlFederation',
+    refreshSessions         => '::Plugins::Refresh',
+    crowdsec                => '::Plugins::CrowdSec',
+    crowdsecAgent           => '::Plugins::CrowdSecAgent',
+    locationDetect          => '::Plugins::LocationDetect',
+    globalLogoutRule        => '::Plugins::GlobalLogout',
+    samlFederationFiles     => '::Plugins::SamlFederation',
+    adminLogoutServerSecret => '::Plugins::AdminLogout',
     'or::oidcRPMetaDataOptions/*/oidcRPMetaDataOptionsAllowNativeSso' =>
       '::Plugins::OIDCNativeSso',
     'or::oidcOPMetaDataOptions/*/oidcOPMetaDataOptionsRequirePkce' =>

@@ -22,7 +22,7 @@
       return;
     }
     if (window.webauthnAbort) {
-      console.log("Aborting conditional mediation");
+      console.debug("Aborting conditional mediation");
       window.webauthnAbort.abort();
     }
     e = jQuery.Event("webauthnAttempt");
@@ -64,7 +64,7 @@
   };
   setupConditional = function setupConditional() {
     var request;
-    console.log("Setting up conditional mediation");
+    console.debug("Setting up conditional mediation");
     window.webauthnAbort = new AbortController();
     request = {
       publicKey: window.datas.request,

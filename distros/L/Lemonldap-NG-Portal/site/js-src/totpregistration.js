@@ -17,11 +17,11 @@ setMsg = function(msg, level) {
 
 displayError = function(j, status, err) {
   var res;
-  console.log('Error', err);
+  console.error('Error', err);
   res = JSON.parse(j.responseText);
   if (res && res.error) {
     res = res.error.replace(/.* /, '');
-    console.log('Returned error', res);
+    console.error('Returned error', res);
     return setMsg(res, 'warning');
   }
 };
@@ -109,11 +109,9 @@ verify = function() {
           }
         } else {
           e = jQuery.Event("mfaAdded");
-          $(document).trigger(e, [
-            {
-              "type": "totp"
-            }
-          ]);
+          $(document).trigger(e, [{
+            "type": "totp"
+          }]);
           if (!e.isDefaultPrevented()) {
             return window.location.href = window.portal + "2fregisters?continue=1";
           }

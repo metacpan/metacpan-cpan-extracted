@@ -10,7 +10,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
 );
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.22.0';
 
 extends 'Lemonldap::NG::Portal::Main::Auth';
 
@@ -53,7 +53,7 @@ sub auth_route {
     }
     else {
         $req->wantErrorRender(1);
-        return $self->p->do( $req, [ sub { PE_CERTIFICATEREQUIRED } ] );
+        return $self->p->doPE($req, PE_CERTIFICATEREQUIRED);
     }
 }
 

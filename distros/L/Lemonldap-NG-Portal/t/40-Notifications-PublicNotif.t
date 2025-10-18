@@ -51,6 +51,21 @@ ok( $res->[2]->[0] =~ qr%Test title%, 'Notification displayed' )
   or print STDERR Dumper( $res->[2]->[0] );
 count(2);
 
+# Display login page with public notifications after bad auth
+# -------------------
+ok(
+    $res = $client->_post(
+        '/',
+        IO::String->new('user=dwho&password=ohwd'),
+        length => 23,
+        accept => 'text/html',
+    ),
+    'Bad Auth query'
+);
+ok( $res->[2]->[0] =~ qr%Test title%, 'Notification displayed' )
+  or print STDERR Dumper( $res->[2]->[0] );
+count(2);
+
 clean_sessions();
 
 # Display login page without public notifications

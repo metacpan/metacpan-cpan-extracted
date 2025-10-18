@@ -1,0 +1,184 @@
+#!/usr/bin/perl
+#=============================================================================
+# Cleaner for LemonLDAP::NG: removes old persistent sessions
+#
+# This is part of LemonLDAP::NG product, released under GPL-2+
+#=============================================================================
+
+use strict;
+use Getopt::Long;
+use Pod::Usage;
+
+use Lemonldap::NG::Common::Session::Purge;
+
+my %cli_opts;
+my $result = GetOptions(
+    \%cli_opts,         'debug|d',
+    'json|j',           'help|h',
+    'audit|a',          'creation=i',
+    'last-update=i',    'recent-login=i',
+    'no-login-success', 'no-registered-2fa'
+);
+pod2usage(0) if $cli_opts{help};
+
+my $opts = {
+    ( $cli_opts{debug} ? ( logLevel => 'debug' ) : () ),
+    ( $cli_opts{json}  ? ( json     => 1 )       : () ),
+    ( $cli_opts{audit} ? ( audit    => 1 )       : () ),
+};
+
+my $filters = {
+    ( defined( $cli_opts{creation} ) ? ( age => $cli_opts{creation} ) : () ),
+    (
+        defined( $cli_opts{'last-update'} )
+        ? ( update => $cli_opts{'last-update'} )
+        : ()
+    ),
+    (
+        defined( $cli_opts{'recent-login'} )
+        ? ( login => $cli_opts{'recent-login'} )
+        : ()
+    ),
+    (
+        defined( $cli_opts{'no-login-success'} ) ? ( login => undef )
+        : ()
+    ),
+
+    ( defined( $cli_opts{'no-registered-2fa'} ) ? ( sfdevice => 1 ) : () ),
+};
+
+my $res =
+  Lemonldap::NG::Common::Session::Purge->new($opts)->persistentPurge($filters);
+
+exit 1 unless $res->{success};
+
+__END__
+
+=head1 NAME
+
+=encoding utf8
+
+purgePersistentSessions - Remove persistent sessions that match a certain filter
+
+=head1 SYNOPSIS
+
+  purgePersistentSessions [options] [filters]
+
+=head1 DESCRIPTION
+
+LemonLDAP::NG stores user information in an object called a persistent session.
+While it is not required to purge them, on larger installations with high user
+turnover, persistent sessions may end up accumulating and purging them might
+make sense. This script lets you automatically remove persistent sessions
+that match one or several filters.
+
+=head1 OPTIONS
+
+=head2 GENERAL OPTIONS
+
+=over 8
+
+=item B<--help>, B<-h>
+
+Print a brief help message and exit.
+
+=item B<--debug>, B<-d>
+
+Print additional diagnostics to STDERR
+
+=item B<--json>, B<-j>
+
+Log execution stats as JSON instead of human-readable text
+
+=item B<--audit>, B<-j>
+
+Emit an audit log for each removed persistent session
+
+=back
+
+=head2 FILTERS
+
+Filters are ways to select which persistent sessions you want to remove. You
+need to specify at least one filter. If you don't, nothing will be removed.
+
+Multiple filters may be specified, when this is the case, ALL filters must match
+in order for a persistent session to be deleted.
+
+=over 8
+
+=item B<--creation=I<SECONDS>>
+
+The persistent session will be deleted if it was created more than SECONDS ago
+
+=item B<--last-update=I<SECONDS>>
+
+The persistent session will be deleted if it was last updated more than SECONDS
+ago
+
+=item B<--recent-login=I<SECONDS>>
+
+The persistent session will be deleted if the login history's most recent
+successful login happened more than SECONDS ago.
+
+If there are no successful logins at all, the persistent session will also be
+deleted.
+
+=item B<--no-login-success>
+
+The persistent session will be deleted if its login history does not contain
+any successful logins.
+
+This is useful to remove persistent sessions created when a user inputs an
+non-existing username in the login form.
+
+=item B<--no-registered-2fa>
+
+The persistent session will be deleted if the user has not registered a second
+factor device.
+
+=back
+
+=head1 SEE ALSO
+
+L<http://lemonldap-ng.org/>
+
+=head1 AUTHORS
+
+=over
+
+=item Maxime Besson, E<lt>maxime.besson@worteks.comE<gt>
+
+=back
+
+=head1 BUG REPORT
+
+Use OW2 system to report bug or ask for features:
+L<https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng/issues>
+
+=head1 DOWNLOAD
+
+Lemonldap::NG is available at
+L<https://lemonldap-ng.org/download>
+
+=head1 COPYRIGHT AND LICENSE
+
+=over
+
+=item Copyright (C) 2024 by Xavier Guimard, E<lt>yadd@debian.orgE<gt>
+
+=back
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2, or (at your option)
+any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see L<http://www.gnu.org/licenses/>.
+
+=cut

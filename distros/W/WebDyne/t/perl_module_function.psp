@@ -1,0 +1,2 @@
+<start_html>
+<perl handler="Digest::SHA::sha256_hex()"/>

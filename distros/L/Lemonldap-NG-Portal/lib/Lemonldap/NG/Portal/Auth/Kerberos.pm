@@ -12,7 +12,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.21.0';
+our $VERSION = '2.22.0';
 
 extends 'Lemonldap::NG::Portal::Main::Auth';
 
@@ -217,7 +217,7 @@ sub _handle_ajax_response {
     }
     else {
         $req->wantErrorRender(1);
-        return $self->p->do( $req, [ sub { PE_BADCREDENTIALS } ] );
+        return $self->p->doPE($req, PE_BADCREDENTIALS);
     }
 }
 

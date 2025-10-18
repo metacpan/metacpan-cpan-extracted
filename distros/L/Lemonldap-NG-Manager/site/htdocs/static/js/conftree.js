@@ -205,11 +205,45 @@ function templates(tpl,key) {
             "get" : tpl+"s/"+key+"/"+"casSrvMetaDataOptionsSortNumber",
             "id" : tpl+"s/"+key+"/"+"casSrvMetaDataOptionsSortNumber",
             "title" : "casSrvMetaDataOptionsSortNumber",
-            "type" : "intOrNull"
+            "type" : "int"
          }
       ],
       "id" : "casSrvMetaDataOptionsDisplay",
       "title" : "casSrvMetaDataOptionsDisplay",
+      "type" : "simpleInputContainer"
+   }
+]
+;
+  case 'keyNode':
+    return [
+   {
+      "get" : [
+         tpl+"s/"+key+"/"+"keyPrivate",
+         tpl+"s/"+key+"/"+"keyPrivatePwd",
+         tpl+"s/"+key+"/"+"keyPublic"
+      ],
+      "id" : tpl+"s/"+key+"/"+"KeyMaterial",
+      "title" : "KeyMaterial",
+      "type" : "KeyMaterial"
+   },
+   {
+      "_nodes" : [
+         {
+            "default" : "",
+            "get" : tpl+"s/"+key+"/"+"keyId",
+            "id" : tpl+"s/"+key+"/"+"keyId",
+            "title" : "keyId"
+         },
+         {
+            "default" : "",
+            "get" : tpl+"s/"+key+"/"+"keyComment",
+            "id" : tpl+"s/"+key+"/"+"keyComment",
+            "title" : "keyComment"
+         }
+      ],
+      "help" : "keys.html#options",
+      "id" : "keyOptions",
+      "title" : "keyOptions",
       "type" : "simpleInputContainer"
    }
 ]
@@ -473,6 +507,74 @@ function templates(tpl,key) {
                   "type" : "select"
                },
                {
+                  "default" : "RS256",
+                  "get" : tpl+"s/"+key+"/"+"oidcOPMetaDataOptionsTokenEndpointAuthSigAlg",
+                  "id" : tpl+"s/"+key+"/"+"oidcOPMetaDataOptionsTokenEndpointAuthSigAlg",
+                  "select" : [
+                     {
+                        "k" : "HS256",
+                        "v" : "HS256"
+                     },
+                     {
+                        "k" : "HS384",
+                        "v" : "HS384"
+                     },
+                     {
+                        "k" : "HS512",
+                        "v" : "HS512"
+                     },
+                     {
+                        "k" : "RS256",
+                        "v" : "RS256"
+                     },
+                     {
+                        "k" : "RS384",
+                        "v" : "RS384"
+                     },
+                     {
+                        "k" : "RS512",
+                        "v" : "RS512"
+                     },
+                     {
+                        "k" : "PS256",
+                        "v" : "PS256"
+                     },
+                     {
+                        "k" : "PS384",
+                        "v" : "PS384"
+                     },
+                     {
+                        "k" : "PS512",
+                        "v" : "PS512"
+                     },
+                     {
+                        "k" : "ES256",
+                        "v" : "ES256"
+                     },
+                     {
+                        "k" : "ES384",
+                        "v" : "ES384"
+                     },
+                     {
+                        "k" : "ES512",
+                        "v" : "ES512"
+                     },
+                     {
+                        "k" : "EdDSA",
+                        "v" : "EdDSA"
+                     }
+                  ],
+                  "title" : "oidcOPMetaDataOptionsTokenEndpointAuthSigAlg",
+                  "type" : "select"
+               },
+               {
+                  "default" : "",
+                  "get" : tpl+"s/"+key+"/"+"oidcOPMetaDataOptionsSigningKey",
+                  "help" : "Signature key used with this OP",
+                  "id" : tpl+"s/"+key+"/"+"oidcOPMetaDataOptionsSigningKey",
+                  "title" : "oidcOPMetaDataOptionsSigningKey"
+               },
+               {
                   "default" : 1,
                   "get" : tpl+"s/"+key+"/"+"oidcOPMetaDataOptionsCheckJWTSignature",
                   "id" : tpl+"s/"+key+"/"+"oidcOPMetaDataOptionsCheckJWTSignature",
@@ -565,7 +667,7 @@ function templates(tpl,key) {
             "get" : tpl+"s/"+key+"/"+"oidcOPMetaDataOptionsSortNumber",
             "id" : tpl+"s/"+key+"/"+"oidcOPMetaDataOptionsSortNumber",
             "title" : "oidcOPMetaDataOptionsSortNumber",
-            "type" : "intOrNull"
+            "type" : "int"
          }
       ],
       "help" : "authopenidconnect.html#display",
@@ -759,6 +861,7 @@ function templates(tpl,key) {
                   "type" : "bool"
                },
                {
+                  "default" : 0,
                   "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAllowNativeSso",
                   "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsAllowNativeSso",
                   "title" : "oidcRPMetaDataOptionsAllowNativeSso",
@@ -1361,10 +1464,17 @@ function templates(tpl,key) {
                   "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsJwks",
                   "title" : "oidcRPMetaDataOptionsJwks",
                   "type" : "file"
+               },
+               {
+                  "default" : "",
+                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsSigningKey",
+                  "help" : "Signature key used with this OP",
+                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsSigningKey",
+                  "title" : "oidcRPMetaDataOptionsSigningKey"
                }
             ],
-            "id" : "keys",
-            "title" : "keys"
+            "id" : "oidcRpKeys",
+            "title" : "oidcRpKeys"
          },
          {
             "_nodes" : [
@@ -1391,6 +1501,13 @@ function templates(tpl,key) {
                   "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsOfflineSessionExpiration",
                   "title" : "oidcRPMetaDataOptionsOfflineSessionExpiration",
                   "type" : "intOrNull"
+               },
+               {
+                  "default" : 0,
+                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsRtActivity",
+                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsRtActivity",
+                  "title" : "oidcRPMetaDataOptionsRtActivity",
+                  "type" : "int"
                }
             ],
             "id" : "oidcRPMetaDataOptionsTimeouts",
@@ -1564,6 +1681,12 @@ function templates(tpl,key) {
             ],
             "title" : "samlIDPMetaDataOptionsSignatureMethod",
             "type" : "select"
+         },
+         {
+            "default" : "",
+            "get" : tpl+"s/"+key+"/"+"samlIDPMetaDataOptionsSignatureKey",
+            "id" : tpl+"s/"+key+"/"+"samlIDPMetaDataOptionsSignatureKey",
+            "title" : "samlIDPMetaDataOptionsSignatureKey"
          },
          {
             "default" : -1,
@@ -1821,6 +1944,11 @@ function templates(tpl,key) {
             "type" : "simpleInputContainer"
          },
          {
+            "get" : tpl+"s/"+key+"/"+"samlIDPMetaDataOptionsURL",
+            "id" : tpl+"s/"+key+"/"+"samlIDPMetaDataOptionsURL",
+            "title" : "samlIDPMetaDataOptionsURL"
+         },
+         {
             "get" : tpl+"s/"+key+"/"+"samlIDPMetaDataOptionsComment",
             "id" : tpl+"s/"+key+"/"+"samlIDPMetaDataOptionsComment",
             "title" : "samlIDPMetaDataOptionsComment",
@@ -1859,7 +1987,7 @@ function templates(tpl,key) {
             "get" : tpl+"s/"+key+"/"+"samlIDPMetaDataOptionsSortNumber",
             "id" : tpl+"s/"+key+"/"+"samlIDPMetaDataOptionsSortNumber",
             "title" : "samlIDPMetaDataOptionsSortNumber",
-            "type" : "intOrNull"
+            "type" : "int"
          }
       ],
       "help" : "authsaml.html#display",
@@ -2008,6 +2136,12 @@ function templates(tpl,key) {
                   "type" : "select"
                },
                {
+                  "default" : "",
+                  "get" : tpl+"s/"+key+"/"+"samlSPMetaDataOptionsSignatureKey",
+                  "id" : tpl+"s/"+key+"/"+"samlSPMetaDataOptionsSignatureKey",
+                  "title" : "samlSPMetaDataOptionsSignatureKey"
+               },
+               {
                   "default" : -1,
                   "get" : tpl+"s/"+key+"/"+"samlSPMetaDataOptionsSignSSOMessage",
                   "id" : tpl+"s/"+key+"/"+"samlSPMetaDataOptionsSignSSOMessage",
@@ -2134,6 +2268,11 @@ function templates(tpl,key) {
             "id" : "samlSPMetaDataOptionsFederation",
             "title" : "samlSPMetaDataOptionsFederation",
             "type" : "simpleInputContainer"
+         },
+         {
+            "get" : tpl+"s/"+key+"/"+"samlSPMetaDataOptionsURL",
+            "id" : tpl+"s/"+key+"/"+"samlSPMetaDataOptionsURL",
+            "title" : "samlSPMetaDataOptionsURL"
          },
          {
             "get" : tpl+"s/"+key+"/"+"samlSPMetaDataOptionsComment",

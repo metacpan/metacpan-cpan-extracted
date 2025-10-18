@@ -7,8 +7,8 @@
     var e, form, path;
     form = $(myevent.currentTarget).closest('form');
     path = window.location.pathname;
-    console.log('path -> ', path);
-    console.log('Call URL -> ', window.datas.sslHost);
+    console.debug('path -> ', path);
+    console.debug('Call URL -> ', window.datas.sslHost);
     e = jQuery.Event("sslAttempt");
     $(document).trigger(e);
     if (!e.isDefaultPrevented()) {
@@ -20,7 +20,7 @@
         // If request succeed, posting form to get redirection
         // or menu
         success: function success(data) {
-          console.log('Success -> ', data);
+          console.debug('Success -> ', data);
           e = jQuery.Event("sslSuccess");
           $(document).trigger(e, [data]);
           if (!e.isDefaultPrevented()) {
@@ -34,7 +34,7 @@
         // Case else, will display PE_BADCREDENTIALS or fallback to next auth
         // backend
         error: function error(result) {
-          console.log('Error during AJAX SSL authentication', result);
+          console.error('Error during AJAX SSL authentication', result);
           e = jQuery.Event("sslFailure");
           $(document).trigger(e, [result]);
           if (!e.isDefaultPrevented()) {
@@ -73,7 +73,7 @@
     } else {
       form_url = form_url + path;
     }
-    console.log('form action URL -> ', form_url);
+    console.debug('form action URL -> ', form_url);
     form.attr('action', form_url);
     return form.submit();
   };

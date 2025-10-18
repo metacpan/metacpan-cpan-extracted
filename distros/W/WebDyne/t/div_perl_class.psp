@@ -1,0 +1,7 @@
+<start_html>
+<div data-webdyne-perl class="test" wrap="pre">
+return \'Hello World'
+</div>
+<div data-webdyne-perl class="test">
+return \'Hello World'
+</div>

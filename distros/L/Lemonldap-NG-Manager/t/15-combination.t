@@ -8,16 +8,14 @@ require 't/test-lib.pm';
 
 my $struct = 't/jsonfiles/15-combination.json';
 
-sub body {
-    return IO::File->new( $struct, 'r' );
-}
-
-unlink 't/conf/lmConf-2.json';
-mkdir 't/sessions';
+my ( $len, $body ) = substitute_io_handle($struct);
 
 my ( $res, $resBody );
-ok( $res = &client->_post( '/confs/', 'cfgNum=1', &body, 'application/json' ),
-    "Request succeed" );
+ok(
+    $res =
+      &client->_post( '/confs/', 'cfgNum=1', $body, 'application/json', $len ),
+    "Request succeed"
+);
 ok( $res->[0] == 200,                       "Result code is 200" );
 ok( $resBody = from_json( $res->[2]->[0] ), "Result body contains JSON text" );
 ok( $resBody->{result} == 1, "JSON response contains \"result:1\"" )
@@ -38,7 +36,3 @@ ok(
 count(9);
 
 done_testing( count() );
-
-unlink 't/conf/lmConf-2.json';
-
-`rm -rf t/sessions`;

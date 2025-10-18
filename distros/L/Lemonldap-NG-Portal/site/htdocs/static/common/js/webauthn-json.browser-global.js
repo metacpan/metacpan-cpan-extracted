@@ -1,4 +1,4 @@
-console.log("begin");
+console.debug("begin");
 (() => {
   var __defProp = Object.defineProperty;
   var __export = (target, all) => {
@@ -228,9 +228,9 @@ console.log("begin");
   }
 
   // src/webauthn-json/browser-global.ts
-    console.log("about");
+    console.debug("about");
   globalThis.webauthnJSON = webauthn_json_exports;
-    console.log(globalThis.webauthnJSON);
+    console.debug(globalThis.webauthnJSON);
 })();
-console.log("done");
+console.debug("done");
 //# sourceMappingURL=webauthn-json.browser-global.js.map

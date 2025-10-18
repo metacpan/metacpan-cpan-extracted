@@ -1,4 +1,6 @@
 Changes
+eg/llng-pubsub-server
+eg/lokiSender
 lemonldap-ng.ini
 lib/Lemonldap/NG/Common.pm
 lib/Lemonldap/NG/Common/Apache/Session.pm
@@ -24,6 +26,7 @@ lib/Lemonldap/NG/Common/Conf/Backends/LDAP.pm
 lib/Lemonldap/NG/Common/Conf/Backends/Local.pm
 lib/Lemonldap/NG/Common/Conf/Backends/MongoDB.pm
 lib/Lemonldap/NG/Common/Conf/Backends/Overlay.pm
+lib/Lemonldap/NG/Common/Conf/Backends/Patroni.pm
 lib/Lemonldap/NG/Common/Conf/Backends/RDBI.pm
 lib/Lemonldap/NG/Common/Conf/Backends/REST.pm
 lib/Lemonldap/NG/Common/Conf/Backends/SOAP.pm
@@ -36,6 +39,7 @@ lib/Lemonldap/NG/Common/Conf/RESTServer.pm
 lib/Lemonldap/NG/Common/Conf/SAML/Metadata.pm
 lib/Lemonldap/NG/Common/Conf/Serializer.pm
 lib/Lemonldap/NG/Common/Conf/Wrapper.pm
+lib/Lemonldap/NG/Common/CrowdSec.pm
 lib/Lemonldap/NG/Common/Crypto.pm
 lib/Lemonldap/NG/Common/EmailAddress.pm
 lib/Lemonldap/NG/Common/EmailTransport.pm
@@ -58,6 +62,7 @@ lib/Lemonldap/NG/Common/MessageBroker/MQTT.pm
 lib/Lemonldap/NG/Common/MessageBroker/NoBroker.pm
 lib/Lemonldap/NG/Common/MessageBroker/Pg.pm
 lib/Lemonldap/NG/Common/MessageBroker/Redis.pm
+lib/Lemonldap/NG/Common/MessageBroker/Web.pm
 lib/Lemonldap/NG/Common/Module.pm
 lib/Lemonldap/NG/Common/Notifications.pm
 lib/Lemonldap/NG/Common/Notifications/DBI.pm
@@ -77,6 +82,7 @@ lib/Lemonldap/NG/Common/PSGI/SOAPService.pm
 lib/Lemonldap/NG/Common/Regexp.pm
 lib/Lemonldap/NG/Common/Safelib.pm
 lib/Lemonldap/NG/Common/Session.pm
+lib/Lemonldap/NG/Common/Session/Purge.pm
 lib/Lemonldap/NG/Common/Session/REST.pm
 lib/Lemonldap/NG/Common/TOTP.pm
 lib/Lemonldap/NG/Common/UserAgent.pm
@@ -102,6 +108,7 @@ t/02-Common-Conf-File.t
 t/02-Common-Conf-Overlay.t
 t/02-Common-Conf-ServerEnv.t
 t/03-Common-Conf-CDBI.t
+t/03-Common-Conf-Patroni.t
 t/03-Common-Conf-RDBI.t
 t/05-Common-Conf-LDAP.t
 t/10-PSGI-Request.t
@@ -114,12 +121,16 @@ t/30-Common-Safelib.t
 t/35-Common-Crypto.t
 t/36-Common-Regexp.t
 t/37-Common-TOTP.t
+t/38-SAML-Metadata.t
 t/40-Common-Session.t
 t/41-Common-EmailAddress.t
 t/45-importMetadata-config.t
 t/45-importMetadata.t
 t/50-Combination-Parser.t
+t/60-Cli-JSON.t
 t/60-Hashed-Session.t
+t/60-Purge-Persistent.t
+t/60-Purge.t
 t/60-Session-Cache.t
 t/60-Session-Cli.t
 t/60-U2F-Migrate.t
@@ -132,6 +143,12 @@ t/log4perl.ini
 t/overlay_test/lmConf-1.json
 t/overlay_test/overlay/globalStorage
 t/overlay_test/overlay/globalStorageOptions
+t/saml-lib.pm
+t/saml-schemas/saml-schema-assertion-2.0.xsd
+t/saml-schemas/saml-schema-metadata-2.0.xsd
+t/saml-schemas/xenc-schema.xsd
+t/saml-schemas/xml.xsd
+t/saml-schemas/xmldsig-core-schema.xsd
 t/TestAuditLogger.pm
 t/TestConfBackend.pm
 t/TestLogger.pm

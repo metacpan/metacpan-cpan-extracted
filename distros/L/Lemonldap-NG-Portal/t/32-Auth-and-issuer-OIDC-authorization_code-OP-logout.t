@@ -192,6 +192,7 @@ expectOK($res);
 $tmp = expectCookie($res);
 ok( ( defined $tmp and $tmp == 0 ), 'Cookie set to 0' );
 count(2);
+expectXpath($res, '//img[@src="/static/common/icons/ok.png"]');
 
 ok(
     $res = $rp->_get(

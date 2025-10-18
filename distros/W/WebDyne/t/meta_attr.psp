@@ -1,0 +1,2 @@
+<start_html meta="%{ viewport => 'width=device-width, initial-scale=1.0', author => 'Bob Foobar', 'http-equiv=X-UA-Compatible' => 'IE=edge', 'http-equiv=refresh' => '5; url=https://www.example.com' }" >
+Hello World

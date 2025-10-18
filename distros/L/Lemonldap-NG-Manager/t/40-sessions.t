@@ -6,8 +6,6 @@ use JSON;
 use strict;
 use Lemonldap::NG::Common::Session;
 
-eval { mkdir 't/sessions' };
-`rm -rf t/sessions/*`;
 require 't/test-lib.pm';
 
 sub newSession {
@@ -17,8 +15,8 @@ sub newSession {
         $tmp = Lemonldap::NG::Common::Session->new( {
                 storageModule        => 'Apache::Session::File',
                 storageModuleOptions => {
-                    Directory      => 't/sessions',
-                    LockDirectory  => 't/sessions',
+                    Directory      => "$main::tmpdir/sessions",
+                    LockDirectory  => "$main::tmpdir/sessions",
                     generateModule =>
 'Lemonldap::NG::Common::Apache::Session::Generate::SHA256',
                 },
@@ -62,8 +60,8 @@ count(5);
 $res = &client->jsonResponse( '/sessions/global', 'groupBy=substr(uid,1)' );
 ok( $res->{result} == 1, 'Result code = 1' );
 ok( $res->{count} == 1,  'Found 1 entry' );
-ok( $res->{values}->[0]->{value} && $res->{values}->[0]->{value} eq 'd',
-    'Result match "uid=d"' )
+ok( $res->{values}->[0]->{value} && $res->{values}->[0]->{value} eq 'dwho',
+    'Result match "uid=dwho"' )
   or print STDERR Dumper($res);
 ok( $res->{values}->[0]->{count} == 2, 'Found 2 sessions starting with "d"' );
 count(4);
@@ -156,12 +154,9 @@ foreach (@ids) {
     count(3);
 }
 
-opendir D, 't/sessions' or die 'Unknown dir';
-my @files = grep { not /(?:^\.|.lock$)/ } readdir D;
+opendir D, "$main::tmpdir/sessions" or die 'Unknown dir';
+my @files = grep { not /(?:^\.|\.lock$)/ } readdir D;
 ok( @files == 0, "Session directory is empty" );
 count(1);
 
 done_testing( count() );
-
-# Remove sessions directory
-`rm -rf t/sessions`;

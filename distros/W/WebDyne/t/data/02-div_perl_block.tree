@@ -1,0 +1,6 @@
+<html> @0 (IMPLICIT)
+  <head> @0.0 (IMPLICIT)
+  <body> @0.1 (IMPLICIT)
+    <div data-webdyne-perl="data-webdyne-perl" handler="hello"> @0.1.0
+      "Server says: ${hello}"
+    "__PERL__sub hello { return shift()->render( hello=>'Hello World' ..."

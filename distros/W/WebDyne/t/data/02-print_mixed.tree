@@ -1,0 +1,6 @@
+<html> @0 (IMPLICIT)
+  <head> @0.0 (IMPLICIT)
+  <body> @0.1 (IMPLICIT)
+    <pre> @0.1.0
+      "Hello World 0 loop iteration ${i}."
+    "__PERL__sub hello { my $self=shift(); print 'Hello World Start'; ..."

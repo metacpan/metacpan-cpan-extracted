@@ -24,7 +24,7 @@ scheme = [
 overScheme = function(v, level, over) {
   // "v.length > over" avoids a loop if one user opened more than "max"
   // notifications
-  console.log('overScheme => level', level, 'over', over);
+  console.debug('overScheme => level', level, 'over', over);
   if (level === 1 && v.length > over) {
     return `uid=${v}*&groupBy=substr(uid,${level + over + 1})`;
   } else {
@@ -34,24 +34,18 @@ overScheme = function(v, level, over) {
 
 // Session menu
 menu = {
-  actives: [
-    {
-      title: 'markAsDone',
-      icon: 'check'
-    }
-  ],
-  done: [
-    {
-      title: 'deleteNotification',
-      icon: 'trash'
-    }
-  ],
-  new: [
-    {
-      title: 'save',
-      icon: 'save'
-    }
-  ],
+  actives: [{
+    title: 'markAsDone',
+    icon: 'check'
+  }],
+  done: [{
+    title: 'deleteNotification',
+    icon: 'trash'
+  }],
+  new: [{
+    title: 'save',
+    icon: 'save'
+  }],
   home: []
 };
 
@@ -67,14 +61,14 @@ llapp.controller('NotificationsExplorerCtrl', [
   '$http',
   '$uibModal',
   function($scope,
-  $translator,
-  $location,
-  $q,
-  $http,
-  $uibModal) {
+    $translator,
+    $location,
+    $q,
+    $http,
+    $uibModal) {
     var autoId,
-  c,
-  dateToString;
+      c,
+      dateToString;
     $scope.links = links;
     $scope.menulinks = menulinks;
     $scope.staticPrefix = staticPrefix;
@@ -96,7 +90,7 @@ llapp.controller('NotificationsExplorerCtrl', [
     $scope.translate = $translator.translate;
     $scope.translateTitle = function(node) {
       return $translator.translateField(node,
-  'title');
+        'title');
     };
     // Handler menu items
     $scope.menuClick = function(button) {
@@ -107,13 +101,13 @@ llapp.controller('NotificationsExplorerCtrl', [
         switch (typeof button.action) {
           case 'function':
             button.action($scope.currentNode,
-  $scope);
+              $scope);
             break;
           case 'string':
             $scope[button.action]();
             break;
           default:
-            console.log(typeof button.action);
+            console.warn('Unknown action type', typeof button.action);
         }
       }
       return $scope.showM = false;
@@ -121,50 +115,49 @@ llapp.controller('NotificationsExplorerCtrl', [
     // Notification management
     $scope.markAsDone = function() {
       $scope.waiting = true;
-      return $http.put(`${scriptname}notifications/${$scope.type}/${$scope.currentNotification.uid}_${$scope.currentNotification.reference}`,
-  {
+      return $http.put(`${scriptname}notifications/${$scope.type}/${$scope.currentNotification.uid}_${$scope.currentNotification.reference}`, {
         done: 1
       }).then(function(response) {
-        $scope.currentNotification = null;
-        $scope.currentScope.remove();
-        $scope.message = {
-          title: 'notificationDeleted'
-        };
-        $scope.showModal("alert.html");
-        $scope.waiting = false;
-        return $scope.init();
-      },
-  function(response) {
-        $scope.message = {
-          title: 'notificationNotDeleted',
-          message: response.statusText
-        };
-        $scope.showModal("alert.html");
-        $scope.waiting = false;
-        return $scope.init();
-      });
+          $scope.currentNotification = null;
+          $scope.currentScope.remove();
+          $scope.message = {
+            title: 'notificationDeleted'
+          };
+          $scope.showModal("alert.html");
+          $scope.waiting = false;
+          return $scope.init();
+        },
+        function(response) {
+          $scope.message = {
+            title: 'notificationNotDeleted',
+            message: response.statusText
+          };
+          $scope.showModal("alert.html");
+          $scope.waiting = false;
+          return $scope.init();
+        });
     };
     $scope.deleteNotification = function() {
       $scope.waiting = true;
       return $http['delete'](`${scriptname}notifications/${$scope.type}/${$scope.currentNotification.uid}_${$scope.currentNotification.reference}_${$scope.currentNotification.done}`).then(function(response) {
-        $scope.currentNotification = null;
-        $scope.currentScope.remove();
-        $scope.message = {
-          title: 'notificationPurged'
-        };
-        $scope.showModal("alert.html");
-        $scope.waiting = false;
-        return $scope.init();
-      },
-  function(response) {
-        $scope.message = {
-          title: 'notificationNotPurged',
-          message: response.statusText
-        };
-        $scope.showModal("alert.html");
-        $scope.waiting = false;
-        return $scope.init();
-      });
+          $scope.currentNotification = null;
+          $scope.currentScope.remove();
+          $scope.message = {
+            title: 'notificationPurged'
+          };
+          $scope.showModal("alert.html");
+          $scope.waiting = false;
+          return $scope.init();
+        },
+        function(response) {
+          $scope.message = {
+            title: 'notificationNotPurged',
+            message: response.statusText
+          };
+          $scope.showModal("alert.html");
+          $scope.waiting = false;
+          return $scope.init();
+        });
     };
     // Open node
     $scope.stoggle = function(scope) {
@@ -172,11 +165,11 @@ llapp.controller('NotificationsExplorerCtrl', [
       node = scope.$modelValue;
       if (node.nodes.length === 0) {
         $scope.updateTree(node.value,
-  node.nodes,
-  node.level,
-  node.over,
-  node.query,
-  node.count);
+          node.nodes,
+          node.level,
+          node.over,
+          node.query,
+          node.count);
       }
       return scope.toggle();
     };
@@ -185,16 +178,16 @@ llapp.controller('NotificationsExplorerCtrl', [
       if (s != null) {
         if (s.match(/(\d{4})-(\d{2})-(\d{2})/)) {
           s = s.substr(0,
-  4) + s.substr(5,
-  2) + s.substr(8,
-  2);
+            4) + s.substr(5,
+            2) + s.substr(8,
+            2);
         }
         d = new Date(s.substr(0,
-  4),
-  s.substr(4,
-  2) - 1,
-  s.substr(6,
-  2));
+            4),
+          s.substr(4,
+            2) - 1,
+          s.substr(6,
+            2));
         return d.toLocaleDateString();
       }
       return '';
@@ -210,36 +203,36 @@ llapp.controller('NotificationsExplorerCtrl', [
       return $scope.showM = false;
     };
     $scope.$on('$locationChangeSuccess',
-  function(event,
-  next,
-  current) {
-      var n;
-      n = next.match(/#!?\/(\w+)/);
-      $scope.type = n != null ? n[1] : 'actives';
-      if ($scope.type === 'new') {
-        return $scope.displayCreateForm();
-      } else {
-        $scope.showForm = false;
-        return $scope.init();
-      }
-    });
+      function(event,
+        next,
+        current) {
+        var n;
+        n = next.match(/#!?\/(\w+)/);
+        $scope.type = n != null ? n[1] : 'actives';
+        if ($scope.type === 'new') {
+          return $scope.displayCreateForm();
+        } else {
+          $scope.showForm = false;
+          return $scope.init();
+        }
+      });
     autoId = 0;
     $scope.updateTree = function(value,
-  node,
-  level,
-  over,
-  currentQuery,
-  count) {
+      node,
+      level,
+      over,
+      currentQuery,
+      count) {
       var query,
-  tmp;
+        tmp;
       $scope.waiting = true;
       query = scheme[level](value,
-  currentQuery);
+        currentQuery);
       // If number of notifications exceeds "max", call it
       if (count > max) {
         if (tmp = overScheme(value,
-  level,
-  over)) {
+            level,
+            over)) {
           over++;
           query = tmp;
           level = level - 1;
@@ -252,39 +245,38 @@ llapp.controller('NotificationsExplorerCtrl', [
       // Launch HTTP query
       if ($scope.type === 'done' || $scope.type === 'actives') {
         $http.get(`${scriptname}notifications/${$scope.type}?${query}`).then(function(response) {
-          var data,
-  i,
-  len,
-  n,
-  ref;
-          data = response.data;
-          if (data.result) {
-            ref = data.values;
-            for (i = 0, len = ref.length; i < len; i++) {
-              n = ref[i];
-              autoId++;
-              n.id = `node${autoId}`;
-              if (level < scheme.length - 1) {
-                n.nodes = [];
-                n.level = level + 1;
-                n.query = query;
-                n.over = over;
+            var data,
+              i,
+              len,
+              n,
+              ref;
+            data = response.data;
+            if (data.result) {
+              ref = data.values;
+              for (i = 0, len = ref.length; i < len; i++) {
+                n = ref[i];
+                autoId++;
+                n.id = `node${autoId}`;
+                if (level < scheme.length - 1) {
+                  n.nodes = [];
+                  n.level = level + 1;
+                  n.query = query;
+                  n.over = over;
+                }
+                node.push(n);
               }
-              node.push(n);
+              if (value === '') {
+                $scope.total = data.total;
+              }
             }
-            if (value === '') {
-              $scope.total = data.total;
-            }
-          }
-          return $scope.waiting = false;
-        },
-  function(resp) {
-          return $scope.waiting = false;
-        });
+            return $scope.waiting = false;
+          },
+          function(resp) {
+            return $scope.waiting = false;
+          });
       }
       // Highlight current selection
-      console.log("Selection",
-  $scope.type);
+      console.debug("Selection", $scope.type);
       $scope.activesStyle = {
         color: '#777'
       };
@@ -307,49 +299,49 @@ llapp.controller('NotificationsExplorerCtrl', [
     };
     $scope.displayNotification = function(scope) {
       var node,
-  notificationId;
+        notificationId;
       $scope.waiting = true;
       $scope.currentScope = scope;
       node = scope.$modelValue;
       notificationId = node.notification.replace(/#/g,
-  '_');
+        '_');
       if ($scope.type === 'actives') {
         notificationId = `${node.uid}_${node.reference}`;
       }
       $http.get(`${scriptname}notifications/${$scope.type}/${notificationId}`).then(function(response) {
-        var notif;
-        $scope.currentNotification = {
-          uid: node.uid,
-          reference: node.reference
-        };
-        if ($scope.type === 'done') {
-          $scope.currentNotification.done = response.data.done;
-        }
-        try {
-          console.log("Try to parse a JSON formated notification...");
-          notif = JSON.parse(response.data.notifications);
-          $scope.currentNotification.date = $scope.notifDate(notif.date);
-          $scope.currentNotification.condition = notif.condition;
-          $scope.currentNotification.text = notif.text;
-          $scope.currentNotification.title = notif.title;
-          $scope.currentNotification.subtitle = notif.subtitle;
-          $scope.currentNotification.check = notif.check;
-        } catch (error) {
-          console.log("Unable to parse JSON");
-          $scope.currentNotification.notifications = response.data.notifications;
-        }
-        return $scope.waiting = false;
-      },
-  function(resp) {
-        return $scope.waiting = false;
-      });
+          var notif;
+          $scope.currentNotification = {
+            uid: node.uid,
+            reference: node.reference
+          };
+          if ($scope.type === 'done') {
+            $scope.currentNotification.done = response.data.done;
+          }
+          try {
+            console.debug("Try to parse a JSON formated notification...");
+            notif = JSON.parse(response.data.notifications);
+            $scope.currentNotification.date = $scope.notifDate(notif.date);
+            $scope.currentNotification.condition = notif.condition;
+            $scope.currentNotification.text = notif.text;
+            $scope.currentNotification.title = notif.title;
+            $scope.currentNotification.subtitle = notif.subtitle;
+            $scope.currentNotification.check = notif.check;
+          } catch (error) {
+            console.error("Unable to parse JSON");
+            $scope.currentNotification.notifications = response.data.notifications;
+          }
+          return $scope.waiting = false;
+        },
+        function(resp) {
+          return $scope.waiting = false;
+        });
       return $scope.showT = false;
     };
     // Modal launcher
     $scope.showModal = function(tpl,
-  init) {
+      init) {
       var d,
-  modalInstance;
+        modalInstance;
       modalInstance = $uibModal.open({
         templateUrl: tpl,
         controller: 'ModalInstanceCtrl',
@@ -362,7 +354,7 @@ llapp.controller('NotificationsExplorerCtrl', [
           },
           set: function() {
             return function(f,
-  s) {
+              s) {
               return $scope[f] = s;
             };
           },
@@ -373,19 +365,19 @@ llapp.controller('NotificationsExplorerCtrl', [
       });
       d = $q.defer();
       return modalInstance.result.then(function(msgok) {
-        $scope.message = {
-          title: '',
-          message: ''
-        };
-        return d.resolve(msgok);
-      },
-  function(msgnok) {
-        $scope.message = {
-          title: '',
-          message: ''
-        };
-        return d.reject(msgnok);
-      });
+          $scope.message = {
+            title: '',
+            message: ''
+          };
+          return d.resolve(msgok);
+        },
+        function(msgnok) {
+          $scope.message = {
+            title: '',
+            message: ''
+          };
+          return d.reject(msgnok);
+        });
     };
     $scope.save = function() {
       if ($scope.form.uid && $scope.form.reference && $scope.form.xml) {
@@ -398,33 +390,33 @@ llapp.controller('NotificationsExplorerCtrl', [
         $scope.formPost.condition = $scope.form.condition;
         $scope.formPost.xml = $scope.form.xml;
         $http.post('notifications/actives',
-  $scope.formPost).then(function(response) {
-          var data;
-          data = response.data;
-          $scope.form = {};
-          if (data.result === 1) {
-            $scope.message = {
-              title: 'notificationCreated'
-            };
-          } else {
+          $scope.formPost).then(function(response) {
+            var data;
+            data = response.data;
+            $scope.form = {};
+            if (data.result === 1) {
+              $scope.message = {
+                title: 'notificationCreated'
+              };
+            } else {
+              $scope.message = {
+                title: 'notificationNotCreated',
+                message: data.error
+              };
+            }
+            $scope.showModal("alert.html");
+            $scope.waiting = false;
+            return $scope.form.date = new Date();
+          },
+          function(response) {
             $scope.message = {
               title: 'notificationNotCreated',
-              message: data.error
+              message: response.statusText
             };
-          }
-          $scope.showModal("alert.html");
-          $scope.waiting = false;
-          return $scope.form.date = new Date();
-        },
-  function(response) {
-          $scope.message = {
-            title: 'notificationNotCreated',
-            message: response.statusText
-          };
-          $scope.showModal("alert.html");
-          $scope.waiting = false;
-          return $scope.form.date = new Date();
-        });
+            $scope.showModal("alert.html");
+            $scope.waiting = false;
+            return $scope.form.date = new Date();
+          });
       } else {
         $scope.message = {
           title: 'incompleteForm'
@@ -441,15 +433,16 @@ llapp.controller('NotificationsExplorerCtrl', [
       $scope.currentScope = null;
       $scope.currentNotification = null;
       $q.all([$translator.init($scope.lang),
-  $scope.updateTree('',
-  $scope.data,
-  0,
-  0)]).then(function() {
-        return $scope.waiting = false;
-      },
-  function(resp) {
-        return $scope.waiting = false;
-      });
+        $scope.updateTree('',
+          $scope.data,
+          0,
+          0)
+      ]).then(function() {
+          return $scope.waiting = false;
+        },
+        function(resp) {
+          return $scope.waiting = false;
+        });
       // Colorized link
       $scope.activeModule = "notifications";
       return $scope.myStyle = {
@@ -491,8 +484,8 @@ llapp.controller('NotificationsExplorerCtrl', [
     // Date conversion
     return dateToString = function(dt) {
       var day,
-  month,
-  year;
+        month,
+        year;
       year = dt.getFullYear();
       month = dt.getMonth() + 1;
       if (month < 10) {

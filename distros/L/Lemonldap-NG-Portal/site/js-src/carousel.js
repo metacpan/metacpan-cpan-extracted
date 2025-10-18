@@ -1,11 +1,10 @@
-$(window).on("load", function () {
+$(window).on("load", function() {
   // Adapt some class to fit Bootstrap theme
   $("div.carousel").addClass("slide");
   const today = new Date().toISOString().split("T")[0];
 
-  const publicNotifications = window.datas["publicNotifications"]
-    ? window.datas["publicNotifications"]
-    : {};
+  const publicNotifications = window.datas["publicNotifications"] ?
+    window.datas["publicNotifications"] : {};
   const public_errors = publicNotifications["public_errors"]
     .filter((notif) => notif.date <= today)
     .sort((a, b) => a.date < b.date);

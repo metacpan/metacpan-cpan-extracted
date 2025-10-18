@@ -1,0 +1,50 @@
+<start_html>
+<table>
+<perl method="hello">
+<thead>
+<tr><td>Table Head</td></tr>
+</thead>
+
+<tbody>
+<tr><td>Table Body</td></tr>
+</tbody>
+</perl>
+</table>
+
+<pre>
+
+</pre>
+
+<perl method="hello">
+<table>
+<thead>
+<tr><td>Table Head</td></tr>
+</thead>
+
+<tbody>
+<tr><td>Table Body</td></tr>
+</tbody>
+</table>
+</perl>
+
+
+<pre>
+
+</pre>
+
+<perl method="hello">
+<table>
+<thead>
+<tr><td>Table Head</td></tr>
+</thead>
+
+<tbody>
+<tr><td>Table Body</td></tr>
+</tbody>
+</table>
+</perl>
+
+
+__PERL__
+
+sub hello { shift()->render() }

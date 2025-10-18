@@ -5,8 +5,11 @@ our $VERSION = '2.19.0';
 package Lemonldap::NG::Manager::Api;
 
 use strict;
+use Exporter 'import';
 use Lemonldap::NG::Manager::Build::Attributes;
 use Lemonldap::NG::Manager::Build::CTrees;
+
+our @EXPORTS = qw(&_listAttributes);
 
 # use Scalar::Util 'weaken'; ?
 

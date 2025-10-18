@@ -4,7 +4,7 @@ use warnings;
 
 require Exporter;
 
-our $VERSION = '2.20.0';
+our $VERSION = '2.22.0';
 our @ISA     = qw(Exporter);
 our @EXPORT_OK = qw(genRsaKey);
 
@@ -49,16 +49,17 @@ sub genRsaKey {
     return $keys;
 }
 
+sub _genSelfSignedCertificate {
+    my ( $password, $cn, $assign_key_func ) = @_;
 
-sub genCertKey {
-    my ( $key_size, $password, $cn ) = @_;
     Net::SSLeay::SSLeay_add_ssl_algorithms();
     $cn ||= "localhost";
 
     # Generate 2048 bits RSA key
     my $key = Net::SSLeay::EVP_PKEY_new();
-    Net::SSLeay::EVP_PKEY_assign_RSA( $key,
-        Net::SSLeay::RSA_generate_key( $key_size, 0x10001 ) );
+
+    # Populate private key using supplied coderef
+    $assign_key_func->($key);
 
     my $cert = Net::SSLeay::X509_new();
 
@@ -78,8 +79,8 @@ sub genCertKey {
         time() + 20 * 365 * 86400 );
 
     # set subject
-    my $subj_e      = Net::SSLeay::X509_get_subject_name($cert);
-    my $subj        = { commonName => $cn, };
+    my $subj_e = Net::SSLeay::X509_get_subject_name($cert);
+    my $subj   = { commonName => $cn, };
 
     while ( my ( $k, $v ) = each %$subj ) {
 
@@ -119,7 +120,38 @@ sub genCertKey {
     Net::SSLeay::X509_free($cert);
     Net::SSLeay::EVP_PKEY_free($key);
 
-    return { private => $strPrivate, public => $strCert, hash => md5_base64 ($strCert) };
+    return {
+        private => $strPrivate,
+        public  => $strCert,
+        hash    => md5_base64($strCert)
+    };
+}
+
+sub genCertKey {
+    my ( $key_size, $password, $cn ) = @_;
+    return _genSelfSignedCertificate(
+        $password,
+        $cn,
+        sub {
+            my $key = shift;
+            Net::SSLeay::EVP_PKEY_assign_RSA( $key,
+                Net::SSLeay::RSA_generate_key( $key_size, 0x10001 ) );
+        }
+    );
+}
+
+sub genEcCertKey {
+    my ( $curve, $password, $cn ) = @_;
+
+    return _genSelfSignedCertificate(
+        $password,
+        $cn,
+        sub {
+            my $key = shift;
+            Net::SSLeay::EVP_PKEY_assign_EC_KEY( $key,
+                Net::SSLeay::EC_KEY_generate_key($curve) );
+        }
+    );
 }
 
 sub genEcKey {

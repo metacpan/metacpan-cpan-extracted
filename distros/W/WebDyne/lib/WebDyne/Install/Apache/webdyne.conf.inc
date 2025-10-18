@@ -1,15 +1,14 @@
 #
 #  This file is part of WebDyne.
 #
-#  This software is Copyright (c) 2017 by Andrew Speer <andrew@webdyne.org>.
+#  This software is copyright (c) 2025 by Andrew Speer <andrew.speer@isolutions.com.au>.
 #
-#  This is free software, licensed under:
-#
-#    The GNU General Public License, Version 2, June 1991
+#  This is free software; you can redistribute it and/or modify it under
+#  the same terms as the Perl 5 programming language system itself.
 #
 #  Full license text is available at:
 #
-#  <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+#  <http://dev.perl.org/licenses/>
 #
 
 #------------------------------------------------------------------------------
@@ -46,25 +45,24 @@ $OUT=join($/, @out);
 
 -->
 
-
+<!--
 #  Fix up @INC path, do any other init stuff before loading WebDyne
 #  module
 #
-<!--
-use Config;
-
-my $installbin_dn=$DIR_INSTALLBIN || $Config{'installbin'};
-my $perl5lib_fn;
-
-unless ($perl5lib_fn=$INC{$FILE_PERL5LIB}) {
-	$perl5lib_fn=File::Spec->catfile($installbin_dn, $FILE_PERL5LIB);
-}
-else {
-	$perl5lib_fn=File::Spec->canonpath($perl5lib_fn);
-}
-
-$OUT=qq[PerlRequire "$perl5lib_fn"]
-
+##use Config;
+##
+##my $installbin_dn=$DIR_INSTALLBIN || $Config{'installbin'};
+##my $perl5lib_fn;
+##
+##unless ($perl5lib_fn=$INC{$FILE_PERL5LIB}) {
+##	$perl5lib_fn=File::Spec->catfile($installbin_dn, $FILE_PERL5LIB);
+##}
+##else {
+##	$perl5lib_fn=File::Spec->canonpath($perl5lib_fn);
+##}
+##
+##$OUT=qq[#PerlRequire "$perl5lib_fn"]
+##
 -->
 
 
@@ -76,10 +74,22 @@ use Config;
 my $installbin_dn=$DIR_INSTALLBIN || $Config{'installbin'};
 
 my $mod_perl_1_99_compat_fn=File::Spec->catfile($installbin_dn, $FILE_MOD_PERL_1_99_COMPAT);
-$OUT=qq[PerlRequire "$mod_perl_1_99_compat_fn"]
+$OUT=qq[#PerlRequire "$mod_perl_1_99_compat_fn"]
 
 -->
 
+
+#  Adjust and/or uncomment if using local::lib for installs
+#
+<!--
+if (my $perl5lib=$ENV{'PERL5LIB'}) {
+    $OUT=sprintf('PerlSwitches -I%s', $perl5lib);
+}
+else {
+    $OUT='#PerlSwitches -I/opt/perl5'
+}
+-->
+#
 
 #  Load WebDyne modules
 #
@@ -92,7 +102,7 @@ PerlModule	WebDyne WebDyne::Compile
 my @out;
 if ($MP2_INSTALLED) {
 	@out=(
-		'AddHandler	perl-script	.psp',
+		'AddHandler	modperl	.psp',
 		'PerlHandler	WebDyne'
         );
 }
@@ -105,122 +115,87 @@ else {
        	);
 }
 $OUT=join($/, @out);
-
 -->
 
 
 #  Block access to any module .pm files that might available in public
 #  areas as a precaution
 #
-<Files ~ "\.pm$">
+
+<!-- 
+
+if ($HTTPD_VER eq '2.2') {
+$OUT=<<__PM_DENY_22__;
+
+#  Apache 2.2 block config
+#
+<Files ~ "\.pm\$">
 Order allow,deny
 Deny from all
 </Files>
+__PM_DENY_22__
 
+}
+elsif ($HTTPD_VER eq '2.4') {
+
+$OUT=<<__PM_DENY_24__;
+
+#  Apache 2.4 block config
+#
+<Files ~ "\.pm\$">
+Require all denied
+</Files>
+
+__PM_DENY_24__
+
+}
+
+-->
 
 #  Set disk cache dir and allow apache access
 #
 PerlSetVar WEBDYNE_CACHE_DN "<!-- $WEBDYNE_CACHE_DN -->"
-<Directory "<!-- $WEBDYNE_CACHE_DN -->">
+
+<!-- 
+
+if ($HTTPD_VER eq '2.2') {
+$OUT=<<"__CACHE_ALLOW_22__";
+
+#  Apache 2.2 cache allow config
+#
+<Directory "$WEBDYNE_CACHE_DN">
 Order allow,deny
 Allow from all
 Deny from none
 </Directory>
 
+__CACHE_ALLOW_22__
+}
+elsif ($HTTPD_VER eq '2.4') {
+$OUT=<<"__CACHE_ALLOW_24__";
+
+#  Apache 2.4 cache allow config
+#
+<Directory "$WEBDYNE_CACHE_DN">
+Require all granted
+</Directory>
+__CACHE_ALLOW_24__
+}
+
+-->
+
 
 #  Some config setting defaults. See documentation for full range. Commented out
 #  options represent defaults
 #
-<Perl>
-
-#  Error display/extended display on/off. More granular options below. 
-#  Set to 1 to enable, 0 to disable
-#
-#  $WebDyne::WEBDYNE_ERROR_SHOW=<!-- $WEBDYNE_ERROR_SHOW -->;
-#  $WebDyne::WEBDYNE_ERROR_SHOW_EXTENDED=<!-- $WEBDYNE_ERROR_SHOW_EXTENDED -->;
+PerlRequire "<!-- File::Spec->catfile($DIR_APACHE_CONF, 'webdyne_conf.pl') -->"
 
 
-#  Extended error control.
+#  Optional debugging. Everything or some things. Note debugging only enabled if
+#  WebDybe installed with WEBDYNE_DEBUG=1; perl Makefile.PL; make install
 #
-#  $WebDyne::WEBDYNE_ERROR_SOURCE_CONTEXT_SHOW=<!-- $WEBDYNE_ERROR_SOURCE_CONTEXT_SHOW -->;
-#  $WebDyne::WEBDYNE_ERROR_SOURCE_CONTEXT_LINES_PRE=<!-- $WEBDYNE_ERROR_SOURCE_CONTEXT_LINES_PRE -->;
-#  $WebDyne::WEBDYNE_ERROR_SOURCE_CONTEXT_LINES_POST=<!-- $WEBDYNE_ERROR_SOURCE_CONTEXT_LINES_POST -->;
-#
-#
-#  Max length of source line to show in ouput. 0 for unlimited.
-#
-#  $WebDyne::WEBDYNE_ERROR_SOURCE_CONTEXT_LINE_FRAGMENT_MAX=<!-- $WEBDYNE_ERROR_SOURCE_CONTEXT_LINE_FRAGMENT_MAX -->;
-#
-#
-#  Show filename (including full filesystem path)
-#
-#
-#  $WebDyne::WEBDYNE_ERROR_SOURCE_FILENAME_SHOW=<!-- $WEBDYNE_ERROR_SOURCE_FILENAME_SHOW -->;
-#
-#
-#  Show backtrace, show full or brief backtrace
-#
-#  $WebDyne::WEBDYNE_ERROR_BACKTRACE_SHOW=<!-- $WEBDYNE_ERROR_BACKTRACE_SHOW -->;
-#  $WebDyne::WEBDYNE_ERROR_BACKTRACE_SHORT=<!-- $WEBDYNE_ERROR_BACKTRACE_SHORT -->;
-#
-#
-#  Show eval trace. Uses SOURCE_CONTEXT_LINES to determine number of lines to show
-#
-#  $WebDyne::WEBDYNE_ERROR_EVAL_CONTEXT_SHOW=<!-- $WEBDYNE_ERROR_EVAL_CONTEXT_SHOW -->;
-#
-#
-#
-#  CGI Params
-#
-#  $WebDyne::WEBDYNE_ERROR_CGI_PARAM_SHOW=<!-- $WEBDYNE_ERROR_CGI_PARAM_SHOW -->;
-#
-#
-#  URI and version
-#
-#  $WebDyne::WEBDYNE_ERROR_URI_SHOW=<!-- $WEBDYNE_ERROR_URI_SHOW -->;
-#  $WebDyne::WEBDYNE_ERROR_VERSION_SHOW=<!-- $WEBDYNE_ERROR_VERSION_SHOW -->;
+#PerlSetEnv WEBDYNE_DEBUG 1
+#PerlSetEnv WEBDYNE_DEBUG "render,perl"
+#PerlSetEnv WEBDYNE_DEBUG_FILE "/var/log/webdyne_debug.log"
 
 
-#  CGI Upload facility. Set to 0 to enable, max post size as required
-#
-#  $WebDyne::WEBDYNE_CGI_DISABLE_UPLOADS=<!-- $WEBDYNE_CGI_DISABLE_UPLOADS -->;
-#  $WebDyne::WEBDYNE_CGI_POST_MAX=<!-- $WEBDYNE_CGI_POST_MAX -->; #(512 * 1024); #512Kb
-
-
-#  Send no-cache headers ?
-#
-#  $WebDyne::WEBDYNE_NO_CACHE=<!-- $WEBDYNE_NO_CACHE -->;
-
-
-#  Warnings fatal ? 
-#
-#  $WebDyne::WEBDYNE_WARNINGS_FATAL=<!-- $WEBDYNE_WARNINGS_FATAL -->;
-
-
-#  Encoding
-#
-#  $WebDyne::WEBDYNE_CHARSET='<!-- $WEBDYNE_CHARSET -->';
-
-
-#  Include a Content-Type meta tag ?
-#
-#  $WebDyne::WEBDYNE_CONTENT_TYPE_HTML_META=<!-- $WEBDYNE_CONTENT_TYPE_HTML_META -->;
-
-
-#  Default <html> tag paramaters, eg { lang	=>'en-US' }
-#
-#  $WebDyne::WEBDYNE_HTML_PARAM=<!-- $WEBDYNE_HTML_PARAM || 'undef'-->;
-
-
-#  CGI Paramater expansion. Will make POST submit strings of "foo=bar&car=dar" into
-#  individual paramaters. Set to 0 if not desired
-#
-#  $WebDyne::WEBDYNE_CGI_PARAM_EXPAND=<!-- $WEBDYNE_CGI_PARAM_EXPAND -->;
-
-
-#  Reload modules from disk if changed ?
-#
-#
-#  $WebDyne::WENDYNE_RELOAD=<!-- $WEBDYNE_RELOAD -->;
-
-</Perl>

@@ -12,8 +12,7 @@ sub testUserTokenSSLAuth {
     my %params = @_;
     my $choice = $params{'choice'};
 
-    my $client = LLNG::Manager::Test->new(
-        {
+    my $client = LLNG::Manager::Test->new( {
             ini => {
                 logLevel    => 'error',
                 useSafeJail => 1,
@@ -39,6 +38,7 @@ sub testUserTokenSSLAuth {
                 sslByAjax         => 1,
                 sslHost           => 'https://authssl.example.com/authssl',
                 restSessionServer => 1,
+                customPlugins     => "t::CheckUserEncoding",
             }
         }
     );
@@ -70,13 +70,6 @@ sub testUserTokenSSLAuth {
 
     # FIXME
     subtest "Check workaround for #3180" => sub {
-        push @{ $client->p->afterSub->{extractFormInfo} }, sub {
-            my ($req) = @_;
-            is( utf8::is_utf8( $req->user ) || 0,
-                0, '$req->user is a binary string' );
-            return 0;
-        };
-
         ok(
             $res = $client->_get(
                 '/authssl',
@@ -145,8 +138,7 @@ sub testUserTokenSSLAuth {
 sub testLegacyAjaxSSL {
     my %params = @_;
     my $choice = $params{'choice'};
-    my $client = LLNG::Manager::Test->new(
-        {
+    my $client = LLNG::Manager::Test->new( {
             ini => {
                 logLevel    => 'error',
                 useSafeJail => 1,
@@ -244,8 +236,7 @@ subtest
 
 subtest 'Regular SSL Auth' => sub {
     &Lemonldap::NG::Handler::Main::cfgNum( 0, 0 );
-    my $client = LLNG::Manager::Test->new(
-        {
+    my $client = LLNG::Manager::Test->new( {
             ini => {
                 logLevel       => 'error',
                 useSafeJail    => 1,
@@ -282,8 +273,7 @@ sub testSSLVarIf {
 
 subtest 'SSLVarIf mechanism' => sub {
     &Lemonldap::NG::Handler::Main::cfgNum( 0, 0 );
-    my $client = LLNG::Manager::Test->new(
-        {
+    my $client = LLNG::Manager::Test->new( {
             ini => {
                 logLevel       => 'error',
                 useSafeJail    => 1,
@@ -324,3 +314,16 @@ subtest 'SSLVarIf mechanism' => sub {
 };
 
 done_testing();
+
+package t::CheckUserEncoding;
+use Test::More;
+use Mouse;
+extends 'Lemonldap::NG::Portal::Main::Plugin';
+
+use constant afterSub => { extractFormInfo => 'mysub', };
+
+sub mysub {
+    my ( $self, $req ) = @_;
+    is( utf8::is_utf8( $req->user ) || 0, 0, '$req->user is a binary string' );
+    return 0;
+}

@@ -2,6 +2,7 @@
 
 use URI::Escape qw/uri_escape/;
 use Time::HiRes qw/usleep/;
+use POSIX 'strftime';
 use Test::More;
 use Net::LDAP;
 use IPC::Run;
@@ -40,10 +41,26 @@ if ( $ENV{LLNGTESTLDAP} ) {
     eval { mkdir "$main::tmpDir/slapd.d" };
     eval { mkdir "$main::tmpDir/data" };
     cp( "t/testslapd/slapd.ldif", "$main::tmpDir/slapd-test.ldif" );
+    cp( "t/testslapd/users.ldif", "$main::tmpDir/users.ldif" );
     system(
         "/bin/sed", "-i",
         "s:__SCHEMA_DIR__:$slapd_schema_dir:",
         "$main::tmpDir/slapd-test.ldif"
+    );
+
+    # Set expiresoon account to expire in 1 day
+    my $twenty_nine_days_ago =
+      strftime( "%Y%m%d%H%M%SZ", gmtime( time - 29 * 86400 ) );
+    my $twenty_five_days_ago =
+      strftime( "%Y%m%d%H%M%SZ", gmtime( time - 25 * 86400 ) );
+    system(
+        "/bin/sed",
+        "-i",
+        "-e",
+        "s:TWENTYNINEDAYSAGO:$twenty_nine_days_ago:",
+        "-e",
+        "s:TWENTYFIVEDAYSAGO:$twenty_five_days_ago:",
+        "$main::tmpDir/users.ldif"
     );
 
     # Remove ppolicy schema on newer OpenLDAP versions
@@ -59,7 +76,16 @@ if ( $ENV{LLNGTESTLDAP} ) {
     system( $slapadd_bin, "-F", "$main::tmpDir/slapd.d", "-n", "0",
         "-l", "$main::tmpDir/slapd-test.ldif" );
     system( $slapadd_bin, "-F", "$main::tmpDir/slapd.d", "-n", "1",
-        "-l", "t/testslapd/users.ldif" );
+        "-l", "$main::tmpDir/users.ldif" );
+    startLdapServer();
+}
+
+sub resetLdapData {
+
+    stopLdapServer();
+    unlink glob "$main::tmpDir/data/*";
+    system( $slapadd_bin, "-F", "$main::tmpDir/slapd.d", "-n", "1",
+        "-l", "$main::tmpDir/users.ldif" );
     startLdapServer();
 }
 

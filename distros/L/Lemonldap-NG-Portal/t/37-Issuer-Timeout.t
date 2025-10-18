@@ -91,7 +91,7 @@ subtest "Request RP1, wait for timeout, request RP2" => sub {
 
     ok(
         $res->[2]->[0] =~
-qr%<input name="code" value="" type="text" class="form-control" id="extcode" trplaceholder="code" autocomplete="one-time-code" />%,
+qr%<input name="code" value="" type="text" class="form-control" id="extcode" trplaceholder="code"%,
         'Found EXTCODE input'
     ) or print STDERR Dumper( $res->[2]->[0] );
 
@@ -174,7 +174,7 @@ subtest "Request RP1, wait for timeout, complete login" => sub {
 
     ok(
         $res->[2]->[0] =~
-qr%<input name="code" value="" type="text" class="form-control" id="extcode" trplaceholder="code" autocomplete="one-time-code" />%,
+qr%<input name="code" value="" type="text" class="form-control" id="extcode" trplaceholder="code"%,
         'Found EXTCODE input'
     ) or print STDERR Dumper( $res->[2]->[0] );
 
@@ -212,6 +212,109 @@ qr%<input name="code" value="" type="text" class="form-control" id="extcode" trp
     $pdata = expectCookie( $res, 'lemonldappdata' );
     ok( !$pdata, "pdata was cleared" );
 
+};
+
+subtest "Within timeout, abandonned access to rp1 does not interfere" => sub {
+
+    # Request for RP1
+    my $authrequest1 = buildForm( {
+            scope         => "openid",
+            response_type => "code",
+            client_id     => "rpid",
+            redirect_uri  => "http://rp1.example.com/",
+        }
+    );
+    ok(
+        $res = $op->_get(
+            '/oauth2/authorize',
+            accept => 'text/html',
+            query  => $authrequest1
+        ),
+        'Authorization request to RP1'
+    );
+
+    my $pdata = expectCookie( $res, 'lemonldappdata' );
+
+    # Request for RP2 with previous pdata still around
+    my $authrequest2 = buildForm( {
+            scope         => "openid",
+            response_type => "code",
+            client_id     => "rp2id",
+            redirect_uri  => "http://rp2.example.com/",
+        }
+    );
+    ok(
+        $res = $op->_get(
+            '/oauth2/authorize',
+            accept => 'text/html',
+            query  => $authrequest2,
+            cookie => "lemonldappdata=$pdata",
+
+        ),
+        'Authorization request to RP2'
+    );
+
+    $pdata = expectCookie( $res, 'lemonldappdata' );
+    my ( $host, $url, $query ) =
+      expectForm( $res, '#', undef, 'user', 'password' );
+
+    $query =~ s/user=/user=dwho/;
+    $query =~ s/password=/password=dwho/;
+
+    # Login to OP
+    ok(
+        $res = $op->_post(
+            '/oauth2/authorize',
+            IO::String->new($query),
+            query  => $authrequest2,
+            accept => 'text/html',
+            length => length($query),
+            cookie => "lemonldappdata=$pdata",
+
+        ),
+        'Authorization request to RP2'
+    );
+
+    $pdata = expectCookie( $res, 'lemonldappdata' );
+
+    # Process second factor
+    ( $host, $url, $query ) =
+      expectForm( $res, undef, '/ext2fcheck?skin=bootstrap', 'token', 'code' );
+
+    ok(
+        $res->[2]->[0] =~
+qr%<input name="code" value="" type="text" class="form-control" id="extcode" trplaceholder="code"%,
+        'Found EXTCODE input'
+    ) or print STDERR Dumper( $res->[2]->[0] );
+
+    $query =~ s/code=/code=A1b2C0/;
+    ok(
+        $res = $op->_post(
+            '/ext2fcheck',
+            IO::String->new($query),
+            length => length($query),
+            accept => 'text/html',
+            cookie => "lemonldappdata=$pdata",
+
+        ),
+        'Post code'
+    );
+
+    # We now should be logged in, but lost the original URL
+    expectRedirection( $res, "http://auth.op.com/oauth2" );
+    my $id = expectCookie($res);
+
+    ok(
+        $res = $op->_get(
+            '/oauth2',
+            accept => 'text/html',
+            cookie => "lemonldap=$id; lemonldappdata=$pdata",
+        ),
+        'Authorization request to RP1'
+    );
+
+    # We should be redirected to RP2
+    expectRedirection( $res, qr#^http://rp2.example.com/# );
 };
 
 clean_sessions();
@@ -259,9 +362,9 @@ sub op {
                         oidcRPMetaDataOptionsAccessTokenExpiration  => 3600,
                         oidcRPMetaDataOptionsBypassConsent          => 1,
                         oidcRPMetaDataOptionsPostLogoutRedirectUris =>
-                          "http://auth.rp.com/?logout=1",
+                          "http://auth.rp.com/oauth2/rlogoutreturn",
                         oidcRPMetaDataOptionsRedirectUris =>
-                          'http://rp.example.com/',
+                          'http://rp1.example.com/',
                     },
                     rp2 => {
                         oidcRPMetaDataOptionsDisplayName       => "RP",
@@ -274,7 +377,7 @@ sub op {
                         oidcRPMetaDataOptionsAccessTokenExpiration  => 3600,
                         oidcRPMetaDataOptionsBypassConsent          => 1,
                         oidcRPMetaDataOptionsPostLogoutRedirectUris =>
-                          "http://auth.rp2.com/?logout=1",
+                          "http://auth.rp2.com/oauth2/rlogoutreturn",
                         oidcRPMetaDataOptionsRedirectUris =>
                           'http://rp2.example.com/',
                     }

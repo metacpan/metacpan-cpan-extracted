@@ -38,14 +38,14 @@ llapp.provider('$translator', function() {
     }
     for (j = 0, len = nlangs.length; j < len; j++) {
       nl = nlangs[j];
-      console.log('Navigator lang', nl);
+      console.debug('Navigator lang', nl);
       ref = window.availableLanguages;
       for (k = 0, len1 = ref.length; k < len1; k++) {
         al = ref[k];
-        console.log(' Available lang', al);
+        console.debug(' Available lang', al);
         re = new RegExp('^' + al + '-?');
         if (nl.match(re)) {
-          console.log('  Matching lang =', al);
+          console.debug('  Matching lang =', al);
           langs.push(al);
         } else if (al.substring(0, 1) === nl.substring(0, 1)) {
           langs2.push(al);
@@ -56,7 +56,7 @@ llapp.provider('$translator', function() {
   } else {
     res.lang = 'en';
   }
-  console.log('Selected lang ->', res.lang);
+  console.debug('Selected lang ->', res.lang);
   // Internal properties
   res.deferredTr = [];
   res.translationFields = {};
@@ -86,7 +86,7 @@ llapp.provider('$translator', function() {
     '$q',
     '$http',
     function($q,
-    $http) {
+      $http) {
       res.last = '';
       res.init = function(lang) {
         var d;
@@ -100,22 +100,22 @@ llapp.provider('$translator', function() {
         if (res.last !== lang) {
           res.last = lang;
           $http.get(`${window.staticPrefix}languages/${lang}.json`).then(function(response) {
-            var h,
-    l,
-    len2,
-    ref1;
-            res.translationFields = response.data;
-            ref1 = res.deferredTr;
-            for (l = 0, len2 = ref1.length; l < len2; l++) {
-              h = ref1[l];
-              h.e[h.f](res.translationFields[h.m]);
-            }
-            res.deferredTr = [];
-            return d.resolve("Translation files loaded");
-          },
-    function(response) {
-            return d.reject('');
-          });
+              var h,
+                l,
+                len2,
+                ref1;
+              res.translationFields = response.data;
+              ref1 = res.deferredTr;
+              for (l = 0, len2 = ref1.length; l < len2; l++) {
+                h = ref1[l];
+                h.e[h.f](res.translationFields[h.m]);
+              }
+              res.deferredTr = [];
+              return d.resolve("Translation files loaded");
+            },
+            function(response) {
+              return d.reject('');
+            });
         } else {
           d.resolve("No change");
         }
@@ -139,8 +139,8 @@ llapp.directive('trspan', [
         trspan: "@"
       },
       link: function(scope,
-  elem,
-  attr) {
+        elem,
+        attr) {
         if ($translator.translationFields.portal) {
           attr.trspan = $translator.translate(attr.trspan);
         } else {
@@ -190,18 +190,14 @@ llapp.directive('script', [
     return {
       restrict: 'E',
       terminal: true,
-      compile: function(element,
-  attr) {
-        var e,
-  t;
+      compile: function(element, attr) {
+        var e, t;
         if (attr.type && (t = attr.type.match(/text\/(menu|parameters)/))) {
           try {
-            return $htmlParams.set(t[1],
-  JSON.parse(element[0].text));
+            return $htmlParams.set(t[1], JSON.parse(element[0].text));
           } catch (error) {
             e = error;
-            console.log("Parsing error:",
-  e);
+            console.error("Parsing error:", e);
           }
         }
       }
@@ -217,12 +213,12 @@ llapp.controller('ModalInstanceCtrl', [
   'set',
   'init',
   function($scope,
-  $uibModalInstance,
-  elem,
-  set,
-  init) {
+    $uibModalInstance,
+    elem,
+    set,
+    init) {
     var currentNode,
-  oldValue;
+      oldValue;
     $scope.elem = elem;
     $scope.set = set;
     $scope.result = init;
@@ -235,7 +231,7 @@ llapp.controller('ModalInstanceCtrl', [
     }
     $scope.ok = function() {
       set('result',
-  $scope.result);
+        $scope.result);
       return $uibModalInstance.close(true);
     };
     $scope.cancel = function() {
@@ -247,9 +243,9 @@ llapp.controller('ModalInstanceCtrl', [
     // test if value is in select
     return $scope.inSelect = function(value) {
       var i,
-  j,
-  len,
-  ref;
+        j,
+        len,
+        ref;
       ref = $scope.currentNode.select;
       for (j = 0, len = ref.length; j < len; j++) {
         i = ref[j];
@@ -276,24 +272,23 @@ llapp.directive('onReadFile', [
       restrict: 'A',
       scope: false,
       link: function(scope,
-  element,
-  attrs) {
+        element,
+        attrs) {
         var fn;
         fn = $parse(attrs.onReadFile);
         return element.on('change',
-  function(onChangeEvent) {
-          var reader;
-          reader = new FileReader();
-          reader.onload = function(onLoadEvent) {
-            return scope.$apply(function() {
-              return fn(scope,
-  {
-                $fileContent: onLoadEvent.target.result
+          function(onChangeEvent) {
+            var reader;
+            reader = new FileReader();
+            reader.onload = function(onLoadEvent) {
+              return scope.$apply(function() {
+                return fn(scope, {
+                  $fileContent: onLoadEvent.target.result
+                });
               });
-            });
-          };
-          return reader.readAsText((onChangeEvent.srcElement || onChangeEvent.target).files[0]);
-        });
+            };
+            return reader.readAsText((onChangeEvent.srcElement || onChangeEvent.target).files[0]);
+          });
       }
     };
   }
@@ -306,30 +301,30 @@ llapp.directive('resizer', [
   '$document',
   function($document) {
     var hsize,
-  rsize;
+      rsize;
     hsize = null;
     rsize = null;
     return function($scope,
-  $element,
-  $attrs) {
+      $element,
+      $attrs) {
       var mousemove,
-  mouseup;
+        mouseup;
       $element.on('mousedown',
-  function(event) {
-        if ($attrs.resizer === 'vertical') {
-          rsize = $($attrs.resizerRight).width() + $($attrs.resizerLeft).width();
-        } else {
-          hsize = $($attrs.resizerTop).height() + $($attrs.resizerBottom).height();
-        }
-        event.preventDefault();
-        $document.on('mousemove',
-  mousemove);
-        return $document.on('mouseup',
-  mouseup);
-      });
+        function(event) {
+          if ($attrs.resizer === 'vertical') {
+            rsize = $($attrs.resizerRight).width() + $($attrs.resizerLeft).width();
+          } else {
+            hsize = $($attrs.resizerTop).height() + $($attrs.resizerBottom).height();
+          }
+          event.preventDefault();
+          $document.on('mousemove',
+            mousemove);
+          return $document.on('mouseup',
+            mouseup);
+        });
       mousemove = function(event) {
         var x,
-  y;
+          y;
         // Handle vertical resizer
         if ($attrs.resizer === 'vertical') {
           x = event.pageX;
@@ -355,9 +350,9 @@ llapp.directive('resizer', [
       };
       return mouseup = function() {
         $document.unbind('mousemove',
-  mousemove);
+          mousemove);
         return $document.unbind('mouseup',
-  mouseup);
+          mouseup);
       };
     };
   }
@@ -373,12 +368,12 @@ llapp.factory('$lmhttp', [
   '$q',
   '$location',
   function($q,
-  $location) {
+    $location) {
     return {
       responseError: function(rejection) {
         if (rejection.status === 401 && window.portal) {
           return window.location = `${window.portal}?url=` + window.btoa(window.location).replace(/\//,
-  '_');
+            '_');
         } else {
           return $q.reject(rejection);
         }

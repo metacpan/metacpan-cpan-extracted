@@ -1,0 +1,22 @@
+<start_html>
+
+<pre>
+<perl method="hello">
+Hello World 0 loop iteration ${i}.
+</perl>
+</pre>
+
+__PERL__
+
+sub hello {
+	
+	my $self=shift();
+	print 'Hello World Start';
+	for (my $i=0; $i<3; $i++) { 
+		print $self->render( i=>$i) 
+	};
+	print $/;
+	print 'Hello World End';
+	return \undef;
+}
+

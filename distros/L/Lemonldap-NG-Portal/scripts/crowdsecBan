@@ -1,0 +1,100 @@
+#!/usr/bin/perl
+
+use strict;
+use Getopt::Long;
+use Lemonldap::NG::Portal;
+use Regexp::Common qw(net);
+
+use constant CROWDSECPLUGIN => 'Lemonldap::NG::Portal::Plugins::CrowdSec';
+use constant VALIDIP        => qr/^(?:$RE{net}{IPv4}|$RE{net}{IPv6})$/;
+
+sub usage {
+    print STDERR "Tool to push a IP-ban decision to CrowdSec
+
+Usage:
+\$ $0 <options> <IP>
+
+Options:
+ -v, --version:  display version
+ -h, --help:     display this
+ -d, --debug:    enable debug mode
+ -u, --user:     override config to fix Crowdsec 'machine-id'
+ -p, --password: override config to fix Crowdsec password
+ --loglevel:    fix logLevel (default: error)
+";
+}
+
+sub error {
+    print STDERR join "\n", @_, "\n";
+    usage;
+    exit 1;
+}
+
+my %opts;
+
+unless (
+    GetOptions(
+        \%opts,         'h|help',
+        'v|version',    'u|user=s',
+        'p|password=s', 'loglevel|log-level=s'
+    )
+  )
+{
+    usage;
+    exit 1;
+}
+
+# HELP
+if ( $opts{h} ) {
+    usage;
+    exit;
+}
+
+# VERSION
+if ( $opts{v} ) {
+    print $Lemonldap::NG::Portal::VERSION. "\n";
+    exit;
+}
+
+unless ( @ARGV >= 1 ) {
+    error 'Missing IP';
+}
+
+my $exitCode = 0;
+$opts{loglevel} ||= 'error';
+
+my $p = Lemonldap::NG::Portal->new or error('Unable to create portal');
+$p->init( {
+        logLevel => $opts{d} ? 'debug' : $opts{loglevel},
+        ( $opts{u} ? ( crowdsecMachineId => $opts{u} ) : () ),
+        ( $opts{p} ? ( crowdsecPassword  => $opts{p} ) : () ),
+    }
+) or error('Unable to create portal');
+
+unless ( $p->loadedModules->{&CROWDSECPLUGIN} ) {
+    $p->loadModule(CROWDSECPLUGIN)
+      or error( 'Unable to load ' . CROWDSECPLUGIN );
+}
+my $crowdSecPlugin = $p->loadedModules->{&CROWDSECPLUGIN};
+
+foreach my $ip (@ARGV) {
+    unless ( $ip =~ VALIDIP ) {
+        print STDERR "Invalid IP: $ip\n";
+        $exitCode++;
+        next;
+    }
+    unless (
+        $crowdSecPlugin->ban(
+            $ip,
+            ( $opts{m} || "Manual ban via LLNG" ),
+            { scenario => 'Manual ban via LLNG' },
+        )
+      )
+    {
+        print STDERR "Decision to ban $ip refused\n";
+        $exitCode++;
+        next;
+    }
+}
+
+exit $exitCode;

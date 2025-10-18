@@ -5,7 +5,7 @@ use Lemonldap::NG::Common::OpenIDConnect::Constants;
 use JSON;
 use Mouse::Role;
 
-our $VERSION = '2.21.0';
+our $VERSION = '2.22.0';
 
 sub metadataDoc {
     my ( $self, $issuer, $conf, $path ) = @_;
@@ -20,6 +20,7 @@ sub metadataDoc {
     my $checksession_uri          = $conf->{oidcServiceMetaDataCheckSessionURI};
     my $disallowNoneAlg           = $conf->{oidcServiceMetaDataDisallowNoneAlg};
     my $introspection_uri = $conf->{oidcServiceMetaDataIntrospectionURI};
+    my $revoke_uri        = $conf->{oidcServiceMetaDataRevokeURI};
 
     $path ||= $self->path . '/';
     $path = "/" . $path unless ( $issuer =~ /\/$/ );
@@ -109,6 +110,7 @@ sub metadataDoc {
 
         #check_session_iframe   => $baseUrl . $checksession_uri,
         introspection_endpoint => $baseUrl . $introspection_uri,
+        revocation_endpoint    => $baseUrl . $revoke_uri,
 
         # Scopes
         scopes_supported         => [qw/openid profile email address phone/],

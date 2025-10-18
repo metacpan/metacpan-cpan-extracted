@@ -127,7 +127,7 @@ m%<form id="lformKerberos" action="#" method="post" class="login Kerberos">%,
         '<img src="/static/common/logos/logo_llng_old.png"' );
 
     ok(getHtmlElement( $res,
-            '//div[@id="2_sql"]//input[@id="userfield"]/@autofocus' ), "User field has focus") ;
+            '//div[@id="id_2_sql"]//input[@id="userfield"]/@autofocus' ), "User field has focus") ;
     is (getHtmlElement($res, '//input/@autofocus')->size, 1, "Only one field has focus");
     count(2);
 
@@ -146,15 +146,15 @@ m%<form id="lformKerberos" action="#" method="post" class="login Kerberos">%,
     );
     count(1);
     my $n = getHtmlElement( $res,
-        '//div[@id="3_demo"]//input[@id="userfield"]/@value' )->pop();
+        '//div[@id="id_3_demo"]//input[@id="userfield"]/@value' )->pop();
     is( $n->value, "dwho", "login autofilled in SQL form" );
     $n = getHtmlElement( $res,
-        '//div[@id="2_sql"]//input[@id="userfield"]/@value' )->pop();
+        '//div[@id="id_2_sql"]//input[@id="userfield"]/@value' )->pop();
     is( $n->value, "", "login not autofilled in SQL form" );
     count(2);
 
     ok(getHtmlElement( $res,
-            '//div[@id="3_demo"]//input[@id="passwordfield"]/@autofocus' ), "Password field has focus") ;
+            '//div[@id="id_3_demo"]//input[@id="passwordfield"]/@autofocus' ), "Password field has focus") ;
     is (getHtmlElement($res, '//input/@autofocus')->size, 1, "Only one field has focus");
     count(2);
 

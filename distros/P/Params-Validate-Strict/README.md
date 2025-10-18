@@ -4,7 +4,7 @@ Params::Validate::Strict - Validates a set of parameters against a schema
 
 # VERSION
 
-Version 0.16
+Version 0.17
 
 # SYNOPSIS
 
@@ -164,7 +164,7 @@ The schema can define the following rules for each parameter:
                         type => 'arrayref',
                         schema => {
                             type => 'string',
-                            matches => qr/^[a-z]+$/
+                            matches => qr/^[a-z]+$/ # Or you can say matches => '^[a-z]+$'
                         }
                     }
                 }

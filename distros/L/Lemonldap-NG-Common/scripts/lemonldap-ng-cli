@@ -5,26 +5,30 @@ use strict;
 use POSIX;
 use Getopt::Long qw(:config pass_through);
 use Pod::Usage;
+use constant booleanOptions => qr/^(?:json)$/;
 
 our $opt_user  = '__APACHEUSER__';
 our $opt_group = '__APACHEGROUP__';
+our $opt_json;
 GetOptions(
     "user=s"  => \$opt_user,
-    "group=s" => \$opt_group
+    "group=s" => \$opt_group,
 ) or pod2usage("Error in command line arguments");
 
 my $action;
 
 eval {
-    POSIX::setgid( scalar( getgrnam($opt_group) ) );
-    POSIX::setuid( scalar( getpwnam($opt_user) ) );
-    my (undef, undef, undef, undef, undef, undef, undef, $homedir, undef) = getpwnam($opt_user);
+    POSIX::setgid( scalar( getgrnam($opt_group) ) ) if getgrnam($opt_group);
+    POSIX::setuid( scalar( getpwnam($opt_user) ) )  if getpwnam($opt_user);
+    my ( undef, undef, undef, undef, undef, undef, undef, $homedir, undef ) =
+      getpwnam($opt_user);
     $ENV{HOME} = $homedir if $homedir;
 };
 
 for ( my $i = 0 ; $i < @ARGV ; $i++ ) {
-    if ( $ARGV[$i] =~ /^-/ ) {
-        $i++;
+    my $arg = $ARGV[$i];
+    if ( $arg =~ s/^-+// ) {
+        $i++ unless $arg =~ booleanOptions;
         next;
     }
     $action = $ARGV[$i];
@@ -34,7 +38,7 @@ for ( my $i = 0 ; $i < @ARGV ; $i++ ) {
 $action ||= "usage";
 
 if ( $action =~
-/^(?:[gs]et|del|(?:add|del)Key|(?:add|del)PostVars|merge|save|restore|rollback)$/
+/^(?:[gs]et|del|(?:add|del)Key|(?:add|del)PostVars|merge|save|restore|rollback|purge)$/
   )
 {
     eval { require Lemonldap::NG::Manager::Cli; };
@@ -84,6 +88,7 @@ Available actions:
  addPostVars HOST URI KEY VALUE  : add post vars for form replay
  delPostVars HOST URI KEY        : delete post vars for form replay
  merge FILE [FILE ...]           : merge JSON/YAML files with existing configuration
+ purge [PURGE OPTIONS]           : delete old configurations
  save                            : export configuration to STDOUT
  restore -                       : import configuration from STDIN
  restore FILE                    : import configuration from file
@@ -93,11 +98,13 @@ Options:
 
  -yes 0|1                     : accept confirmation prompt automatically
  -log msg                     : set configuration log message
- -safe 0|1                    : fail in case the requested configuration is invalid
+ -safe 1|0                    : fail in case the requested configuration is invalid (default)
+ -unsafe 0|1                  : don't fail in case the requested configuration is invalid
  -force 0|1                   : allow overwrite of existing config number
  -cfgNum NUM                  : set new configuration number (requires -force 1)
  -sep CHAR                    : separator of hierarchical values (by default: /)
  -iniFile FILE                : path to an alternate lemonldap-ng.ini file
+ -json                        : print result in JSON format
 
 Additional options:
 
@@ -250,9 +257,10 @@ Skip confirmation prompt (default: 0)
 
 Allows you to set the log message that will be displayed in the manager
 
-=item B<-safe I<0|1>>
+=item B<--safe>, B<-unsafe> I<(0|1)>
 
-The configuration change will be aborted if it contains errors (default: 0)
+With B<--unsafe> the configuration change will be stored even if it contains
+errors. By default I<(B<--safe>)>, invalid configuration are rejected.
 
 =item B<-force I<0|1>>
 
@@ -277,6 +285,10 @@ Run the script under the I<USER> system user identity
 =item B<-g I<GROUP>, --group=I<GROUP>>
 
 Run the script under the I<GROUP> system group identity
+
+=item B<-json>
+
+Display result in JSON format
 
 =back
 

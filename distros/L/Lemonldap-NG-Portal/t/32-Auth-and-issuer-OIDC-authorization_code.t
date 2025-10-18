@@ -185,7 +185,8 @@ ok(
 $res = expectJSON($res);
 ok( $res->{name} eq 'Frédéric Accents', 'UTF-8 values' )
   or explain( $res, 'name => Frédéric Accents' );
-count(2);
+ok( $res->{sid}, "get sid in userinfo" ) or print Dumper($res);
+count(3);
 
 ok( getSession($spId)->data->{cn} eq 'Frédéric Accents', 'UTF-8 values' )
   or explain( $res, 'cn => Frédéric Accents' );
@@ -356,12 +357,13 @@ ok(
     $res = $op->_get(
         '/oauth2/logout',
         accept => 'text/html',
-        query  => 'post_logout_redirect_uri=http://auth.rp.com/?logout=1'
+        query  =>
+          'post_logout_redirect_uri=http://auth.rp.com/oauth2/rlogoutreturn'
     ),
     'logout endpoint with redirect, endpoint /oauth2/logout'
 );
 count(1);
-expectRedirection( $res, 'http://auth.rp.com/?logout=1' );
+expectRedirection( $res, 'http://auth.rp.com/oauth2/rlogoutreturn' );
 
 ok( $res = $op->_get('/oauth2/logout'),
     'logout endpoint,               endpoint /oauth2/logout' );
@@ -419,9 +421,80 @@ ok(
 count(1);
 $idpId = expectCookie($res);
 
-#expectRedirection( $res, qr#^http://auth.rp.com/# );
+($query) = expectRedirection( $res, qr#^http://auth.rp.com/?\?(.*)$# );
 
-#print STDERR Dumper($res);
+# Push OP response to RP
+ok( $res = $rp->_get( '/', query => $query, accept => 'text/html' ),
+    'Call openidconnectcallback on RP' );
+count(1);
+$spId = expectCookie($res);
+
+# Test logout with target URL
+ok(
+    $res = $rp->_get(
+        '/',
+        query => {
+            'logout' => 1,
+            url      => encodeUrl("http://test1.example.com"),
+        },
+        cookie => "lemonldap=$spId",
+        accept => 'text/html'
+    ),
+    'Query RP for logout'
+);
+count(1);
+( $url, $query ) = expectRedirection( $res,
+    qr#http://auth.op.com(/oauth2/logout)\?.*(post_logout_redirect_uri=.+)$# );
+
+$removedCookie = expectCookie($res);
+is( $removedCookie, 0, "SSO cookie removed (RP)" );
+
+# Push logout to OP
+
+ok(
+    $res = $op->_get(
+        $url,
+        query  => $query,
+        cookie => "lemonldap=$idpId",
+        accept => 'text/html'
+    ),
+    "Push logout request to OP,     endpoint $url"
+);
+count(1);
+
+( $host, $tmp, $query ) = expectForm( $res, '#', undef, 'confirm' );
+
+ok(
+    $res = $op->_post(
+        $url, IO::String->new($query),
+        length => length($query),
+        cookie => "lemonldap=$idpId",
+        accept => 'text/html',
+    ),
+    "Confirm logout,                endpoint $url"
+);
+count(1);
+
+( $url, $query ) = expectRedirection( $res,
+    qr,http://auth.rp.com(/oauth2/rlogoutreturn)\?(.*), );
+
+$removedCookie = expectCookie($res);
+is( $removedCookie, 0, "SSO cookie removed (OP)" );
+count(1);
+
+# Push return to RP
+ok(
+    $res = $rp->_get(
+        $url,
+        query  => $query,
+        accept => 'text/html',
+    ),
+    "Confirm logout,                endpoint $url"
+);
+count(1);
+expectRedirection( $res, "http://test1.example.com", "Correctly redirected" );
+
+count(1);
 
 # Test OIDC auth retry (#3427)
 ok(
@@ -526,7 +599,7 @@ sub op {
                         oidcRPMetaDataOptionsUserIDAttr        => "",
                         oidcRPMetaDataOptionsAccessTokenExpiration  => 3600,
                         oidcRPMetaDataOptionsPostLogoutRedirectUris =>
-                          "http://auth.rp.com/?logout=1",
+                          "http://auth.rp.com/oauth2/rlogoutreturn",
                         oidcRPMetaDataOptionsRule         => '$uid eq "french"',
                         oidcRPMetaDataOptionsRedirectUris =>
                           'http://auth.rp.com/?openidconnectcallback=1',

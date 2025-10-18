@@ -51,6 +51,12 @@ my $op = LLNG::Manager::Test->new( {
                     oidcRPMetaDataOptionsAllowOffline          => 1,
                     oidcRPMetaDataOptionsRedirectUris => 'http://rp2.com/',
                 },
+                'dev-rp' => {
+                    oidcRPMetaDataOptionsClientID      => "dev-rp",
+                    oidcRPMetaDataOptionsClientSecret  => "rpid",
+                    oidcRPMetaDataOptionsBypassConsent => 1,
+                    oidcRPMetaDataOptionsRedirectUris  => 'http://dev.com/',
+                },
                 oauth => {
                     oidcRPMetaDataOptionsDisplayName  => "oauth",
                     oidcRPMetaDataOptionsClientID     => "oauth",
@@ -79,6 +85,66 @@ ok(
     "Post authentication"
 );
 my $idpId = expectCookie($res);
+
+# Test Redirect URI validation
+ok(
+    $res = $op->_get(
+        "/oauth2/authorize",
+        query => {
+            response_type => "code",
+            scope         => "openid",
+            client_id     => "dev-rp",
+            redirect_uri  => "http://dev.com/",
+        },
+        accept => 'text/html',
+        cookie => "lemonldap=$idpId",
+    ),
+    "Authorized URL is denied by hook during login"
+);
+expectPortalError( $res, 108, "Declared URL was denied by hook" );
+
+ok(
+    $res = $op->_get(
+        "/oauth2/logout",
+        query => {
+            client_id                => "dev-rp",
+            post_logout_redirect_uri => "http://dev.com/",
+        },
+        accept => 'text/html',
+        cookie => "lemonldap=$idpId",
+    ),
+    "Authorized URL is denied by hook during logout"
+);
+expectPortalError( $res, 108, "Declared URL was denied by hook" );
+
+ok(
+    $res = $op->_get(
+        "/oauth2/logout",
+        query => {
+            client_id                => "dev-rp",
+            post_logout_redirect_uri => "http://dev.com/",
+        },
+        accept => 'text/html',
+    ),
+    "Authorized URL is denied by hook during unauth logout"
+);
+expectPortalError( $res, 9, "Declared URL was denied by hook" );
+
+ok(
+    $res = $op->_get(
+        "/oauth2/authorize",
+        query => {
+            response_type => "code",
+            scope         => "openid",
+            client_id     => "dev-rp",
+            redirect_uri  => "http://localhost:123/456",
+        },
+        accept => 'text/html',
+        cookie => "lemonldap=$idpId",
+    ),
+    "Unauthorized URL is allowed by hook during login"
+);
+expectRedirection( $res, qr#http://localhost:123/456\?.*code=([^\&]*)# );
 
 # Get code for RP1
 $query =
@@ -123,10 +189,15 @@ my $customToken = $json->{custom_token};
 is( $customToken, 'CustomToken', 'Found custom token in token response' );
 my $id_token_payload = id_token_payload($id_token);
 is( $id_token_payload->{id_token_hook}, 1, "Found hooked claim in ID token" );
+is( $id_token_payload->{id_token_hook_uid},
+    "french", "Found hooked claim in ID token" );
+is( $id_token_payload->{id_token_hook_rp},
+    "rp", "Found hooked claim in ID token" );
 
 # 3084
 my $id_token_header = id_token_header($id_token);
 ok( !exists $id_token_header->{kid}, "HS** ID token has no kid header" );
+is( $id_token_header->{id_token_hook_header}, 1, "Found hooked JWT header" );
 
 # Reset conf to make sure lazy loading works
 $op->p->HANDLER->checkConf(1);
@@ -150,6 +221,8 @@ is( $json->{email}, 'fa@badwolf.org',
 like( $json->{_scope}, qr/\bopenid\b/, "Scopes are visible in hook" );
 
 expectJWT( $token, access_token_hook => 1 );
+
+is( getJWTHeader($token)->{typ}, "at+JWT+hook", "hooked access token type" );
 
 # Reset conf to make sure lazy loading works
 $op->p->HANDLER->checkConf(1);

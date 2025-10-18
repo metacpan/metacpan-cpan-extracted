@@ -17,11 +17,11 @@ setMsg = function(msg, level) {
 
 displayError = function(j, status, err) {
   var res;
-  console.log('Error', err);
+  console.error('Error', err);
   res = JSON.parse(j.responseText);
   if (res && res.error) {
     res = res.error.replace(/.* /, '');
-    console.log('Returned error', res);
+    console.error('Returned error', res);
     return setMsg(res, 'warning');
   }
 };
@@ -42,20 +42,20 @@ verify = function() {
         generic: generic
       },
       headers: {
-          "X-CSRF-Check": "1"
+        "X-CSRF-Check": "1"
       },
       error: displayError,
       success: function(data) {
-          if (data.error) {
-              if (data.error.match(/PE79/)) {
-                  return setMsg(data.error, 'warning');
-              } else {
-                  return setMsg(data.error, 'danger');
-              }
+        if (data.error) {
+          if (data.error.match(/PE79/)) {
+            return setMsg(data.error, 'warning');
           } else {
-              $('#token').val(data.token);
-              return setMsg('genericCheckCode', 'success');
+            return setMsg(data.error, 'danger');
           }
+        } else {
+          $('#token').val(data.token);
+          return setMsg('genericCheckCode', 'success');
+        }
       }
     });
   }
@@ -96,11 +96,9 @@ register = function() {
           }
         } else {
           e = jQuery.Event("mfaAdded");
-          $(document).trigger(e, [
-            {
-              "type": prefix
-            }
-          ]);
+          $(document).trigger(e, [{
+            "type": prefix
+          }]);
           if (!e.isDefaultPrevented()) {
             return window.location.href = window.portal + "2fregisters?continue=1";
           }

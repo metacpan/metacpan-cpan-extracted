@@ -99,7 +99,7 @@ sub try_connect_with_persistent_cookie {
         'Try to auth with persistent cookie'
     );
     expectOK($res);
-    if ( $res->[2]->[0] =~ qr/Register browser/ ) {
+    if ( $res->[2]->[0] =~ qr/id="fg"/ ) {
         my ( $host, $url, $query ) =
           expectForm( $res, '#', undef, 'fg', 'token' );
 

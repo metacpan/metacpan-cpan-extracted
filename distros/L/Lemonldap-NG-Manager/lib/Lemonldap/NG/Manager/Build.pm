@@ -15,6 +15,15 @@ use JSON;
 use Getopt::Std;
 use IO::String;
 
+my %peOkValues = (
+    PE_2FWAIT       => 'Wait for second factor',
+    PE_IDPCHOICE    => 'Prompt to choose identity provider',
+    PE_SENDRESPONSE => 'Send response given in $req->response',
+    PE_INFO         => 'Prompt to display $req->info',
+    PE_REDIRECT     => 'Redirect user to $req->urldc',
+    PE_DONE         => "Don't launch next steps",
+);
+
 has structFile                 => ( isa => 'Str', is => 'ro', required => 1 );
 has confTreeFile               => ( isa => 'Str', is => 'ro', required => 1 );
 has managerConstantsFile       => ( isa => 'Str', is => 'ro', required => 1 );
@@ -61,12 +70,12 @@ $Data::Dumper::Sortkeys = sub {
         ( defined $hash->{title} ? ( 'title', ) : () ),
         (
             grep { /^(?:id|title)$/ ? 0 : 1 }
-              sort {
+            sort {
                 return 1
                   if ( $a =~ /node/ and $b !~ /node/ );
                 return -1 if ( $b =~ /node/ );
                 lc($a) cmp lc($b);
-              } keys %$hash
+            } keys %$hash
         )
     ];
 };
@@ -192,6 +201,7 @@ our \$specialNodeHash = {
     oidcRPMetaDataNodes  => [qw(oidcRPMetaDataOptions oidcRPMetaDataExportedVars oidcRPMetaDataOptionsExtraClaims oidcRPMetaDataMacros oidcRPMetaDataScopeRules)],
     casSrvMetaDataNodes  => [qw(casSrvMetaDataOptions casSrvMetaDataExportedVars)],
     casAppMetaDataNodes  => [qw(casAppMetaDataOptions casAppMetaDataExportedVars casAppMetaDataMacros)],
+    keyNodes  => [qw(keys)],
 };
 
 EOF
@@ -279,6 +289,7 @@ $defaultAttr}
     foreach ( qw(
         exportedHeaders locationRules post vhostOptions
         samlIDPMetaDataXML samlIDPMetaDataExportedAttributes
+        samlIDPMetaDataURL samlSPMetaDataURL
         samlIDPMetaDataOptions samlSPMetaDataXML
         samlSPMetaDataExportedAttributes samlSPMetaDataMacros
         samlSPMetaDataOptions oidcOPMetaDataJSON
@@ -597,8 +608,17 @@ EOF
             "    ``"
           . $key . "``,"
           . $portalConstants{$key} . ','
-          . ( %details ? '"' . $details{"PE$portalConstants{$key}"} . '"' : '' )
-          . "\n";
+          . (
+            %details
+            ? '"'
+              . (
+                     $details{"PE$portalConstants{$key}"}
+                  || $peOkValues{$key}
+                  || [ $key =~ /PE_(.*)$/ ]->[0]
+              )
+              . '"'
+            : ''
+          ) . "\n";
     }
 
     open( F, '>', $self->docConstantsFile ) or die($!);
@@ -638,7 +658,7 @@ sub scanTree {
                 id    => "$prefix$leaf->{title}",
                 title => $leaf->{title},
                 type  => $leaf->{form},
-                get   => $leaf->{group}
+                get   => [ map { "${prefix}$_" } @{ $leaf->{group} } ]
               };
         }
 
@@ -846,7 +866,7 @@ system.
 =head1 SYNOPSIS
 
   use Lemonldap::NG::Manager::Build;
-  
+
   Lemonldap::NG::Manager::Build->run(
     structFile            => "site/htdocs/static/struct.json",
     confTreeFile          => "site/htdocs/static/js/conftree.js",

@@ -7,7 +7,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_MUSTAUTHN
 );
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.22.0';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -22,7 +22,7 @@ sub run {
     if (    $req->env->{HTTP_HOST}
         and $req->portal =~ /\Q$req->{env}->{HTTP_HOST}/ )
     {
-        my $delta = time - $req->{sessionInfo}->{_utime};
+        my $delta = time - $req->{sessionInfo}->{_lastAuthnUTime};
         $self->logger->debug( "Delta with last Authn -> " . $delta );
 
         return $delta <= $self->conf->{portalForceAuthnInterval}

@@ -1,0 +1,9 @@
+<start_html>
+<p>
+<perl require="Digest::SHA" handler="sha256_hex()" import="sha256_hex"/>
+<p>
+<perl require="Digest::SHA" handler="Digest::SHA::sha256_hex()"/>
+<p>
+<perl require="perl_require_module.pm" handler="hello"/>
+<p>
+<perl handler="hello"/>

@@ -2,11 +2,12 @@ package Lemonldap::NG::Common::PSGI;
 
 use strict;
 use Mouse;
+use HTTP::Status;
 use JSON;
 use Lemonldap::NG::Common::PSGI::Constants;
 use Lemonldap::NG::Common::PSGI::Request;
 
-our $VERSION = '2.21.0';
+our $VERSION = '2.22.0';
 
 our $_json = JSON->new->allow_nonref;
 
@@ -229,13 +230,20 @@ sub sendJSONresponse {
         };
         return $self->sendError( $req, $@ ) if ($@);
     }
-    return [ $args{code}, [ 'Content-Type' => $type, @{ $args{headers} } ],
-        [$j] ];
+    return [
+        $args{code},
+        [
+            'Content-Type'   => $type,
+            'Content-Length' => length($j),
+            @{ $args{headers} }
+        ],
+        [$j]
+    ];
 }
 
 sub sendError {
     my ( $self, $req, $err, $code ) = @_;
-    $err  ||= $req->error;
+    $err  ||= $req->error || '';
     $code ||= 500;
     $self->lmLog( "Error $code: $err", $code > 499 ? 'error' : 'notice' );
 
@@ -269,13 +277,8 @@ sub sendError {
 
     # Default response: HTML
     else {
-        my $title = (
-              $code >= 500 ? 'Server error'
-            : $code == 403 ? 'Forbidden'
-            : $code == 401 ? 'Authentication required'
-            : $code == 400 ? 'Bad request'
-            :                'Error'
-        );
+        my $title = eval { HTTP::Status::status_message($code) } || 'Error';
+        print STDERR $@ if $@;
 
         # TODO: this should probably use a template instead
         my $s = "<html><head><title>$title</title>
@@ -417,7 +420,7 @@ sub run {
     $args //= {};
     unless ( ref $self ) {
         $self = $self->new($args);
-        return $self->abort( $self->error ) unless ( $self->init($args) );
+        $self->init($args) or $self->logger->error('Initialization failed');
     }
     return $self->_run;
 }
@@ -500,7 +503,7 @@ Use Lemonldap::NG::Common::PSGI::Router for REST API.
     $self->logLevel('info');
     # It is possible to use syslog for user actions
     $self->syslog('daemon');
-  
+
     # Return a boolean. If false, then error message has to be stored in
     # $self->error
     return 1;
@@ -510,7 +513,7 @@ Use Lemonldap::NG::Common::PSGI::Router for REST API.
     my ( $self, $req ) = @_;
     # Do something and return a PSGI response
     # NB: $req is a Lemonldap::NG::Common::PSGI::Request object
-    
+  
     return [ 200, [ 'Content-Type' => 'text/plain' ], [ 'Body lines' ] ];
   }
 
@@ -520,7 +523,7 @@ This package could then be called as a CGI, using FastCGI,...
   
   use My::PSGI;
   use Plack::Handler::FCGI; # or Plack::Handler::CGI
-
+  
   Plack::Handler::FCGI->new->run( My::PSGI->run() );
 
 =head1 DESCRIPTION

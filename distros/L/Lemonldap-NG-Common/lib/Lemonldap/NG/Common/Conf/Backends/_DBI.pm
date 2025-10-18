@@ -1,16 +1,18 @@
 package Lemonldap::NG::Common::Conf::Backends::_DBI;
 
 use strict;
+no strict 'refs';
 use utf8;
 use DBI;
-use Lemonldap::NG::Common::Conf::Constants;    #inherits
+use Lemonldap::NG::Common::Conf::Constants;
 
-our $VERSION = '2.18.0';
+our $VERSION = '2.22.0';
 our @ISA     = qw(Lemonldap::NG::Common::Conf::Constants);
 our ( @EXPORT, %EXPORT_TAGS );
 
 BEGIN {
-    *Lemonldap::NG::Common::Conf::_dbh = \&_dbh;
+    *Lemonldap::NG::Common::Conf::_dbh     = \&_dbh;
+    *Lemonldap::NG::Common::Conf::_execute = \&_execute;
     push @EXPORT, @Lemonldap::NG::Common::Conf::Constants::EXPORT;
     %EXPORT_TAGS = %Lemonldap::NG::Common::Conf::Constants::EXPORT_TAGS;
     push @EXPORT,
@@ -34,11 +36,9 @@ sub prereq {
 sub available {
     my $self = shift;
     my $sth =
-      $self->_dbh->prepare( "SELECT DISTINCT cfgNum from "
+      $self->_execute( "SELECT DISTINCT cfgNum from "
           . $self->{dbiTable}
-          . " order by cfgNum" )
-      or $self->logError;
-    $sth->execute() or $self->logError;
+          . " order by cfgNum" );
     my @conf;
     while ( my @row = $sth->fetchrow_array ) {
         push @conf, $row[0];
@@ -48,8 +48,8 @@ sub available {
 
 sub lastCfg {
     my $self = shift;
-    my @row  = $self->_dbh->selectrow_array(
-        "SELECT max(cfgNum) from " . $self->{dbiTable} );
+    my $sth = $self->_execute( "SELECT max(cfgNum) from " . $self->{dbiTable} );
+    my @row = $sth->fetchrow_array();
     return $row[0];
 }
 
@@ -57,8 +57,21 @@ sub _dbh {
     my $self = shift;
     $self->{dbiTable} ||= "lmConfig";
     return $self->{_dbh} if ( $self->{_dbh} and $self->{_dbh}->ping );
-    $self->{_dbh} = DBI->connect_cached( $self->{dbiChain}, $self->{dbiUser},
-        $self->{dbiPassword}, { RaiseError => 1, AutoCommit => 1, } );
+    eval {
+        $self->{_dbh} =
+          DBI->connect_cached( $self->{dbiChain}, $self->{dbiUser},
+            $self->{dbiPassword}, { RaiseError => 1, AutoCommit => 1, } );
+    };
+    if ( $@ and &{ $self->{type} . "::beforeRetry" }($self) ) {
+        eval {
+            $self->{_dbh} =
+              DBI->connect_cached( $self->{dbiChain}, $self->{dbiUser},
+                $self->{dbiPassword}, { RaiseError => 1, AutoCommit => 1, } );
+        };
+    }
+    if ($@) {
+        die $@;
+    }
     if ( $self->{dbiChain} =~ /^dbi:sqlite/i ) {
         $self->{_dbh}->{sqlite_unicode} = 1;
     }
@@ -93,20 +106,38 @@ sub unlock {
 
 sub delete {
     my ( $self, $cfgNum ) = @_;
-    my $req =
-         $self->_dbh->prepare("DELETE FROM $self->{dbiTable} WHERE cfgNum=?")
-      or $self->logError;
-    my $res = $req->execute($cfgNum) or $self->logError;
-    $Lemonldap::NG::Common::Conf::msg .=
-      "Unable to find conf $cfgNum (" . $self->_dbh->errstr . ")"
-      unless ($res);
-    return $res;
+    my $res = $self->_execute( "DELETE FROM $self->{dbiTable} WHERE cfgNum=?",
+        $cfgNum );
+    return ( $res > 0 );
 }
 
 sub logError {
     my $self = shift;
     $Lemonldap::NG::Common::Conf::msg .=
       "Database error: " . $DBI::errstr . "\n";
+}
+
+sub _execute {
+    my ( $self, $query, @prms ) = @_;
+    my $req = $self->_dbh->prepare($query);
+    unless ($req) {
+        $self->logError;
+        return UNKNOWN_ERROR;
+    }
+    my $execute = eval { $req->execute(@prms) };
+    if ( !$execute and &{ $self->{type} . "::beforeRetry" }($self) ) {
+        $req     = $self->_dbh->prepare($query);
+        $execute = eval { $req->execute(@prms) };
+    }
+    unless ($execute) {
+        $self->logError;
+        return UNKNOWN_ERROR;
+    }
+    return ( 1, $req );
+}
+
+sub beforeRetry {
+    return !$_[0]->{noRetry};
 }
 
 1;

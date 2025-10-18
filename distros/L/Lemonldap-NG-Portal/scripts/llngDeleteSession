@@ -6,7 +6,7 @@
 # This script is written to be used by cron to clean old sessions from
 # Apache::Session. It does not work with Apache::Session::Memcached
 #
-# This is part of LemonLDAP::NG product, released under GPL
+# This is part of LemonLDAP::NG product, released under GPL-2+
 #=============================================================================
 
 use Lemonldap::NG::Common::Conf;

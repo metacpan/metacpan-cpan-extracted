@@ -15,7 +15,7 @@ Class::Enumeration - Abstract parent class of enum classes
 
   # Define list of enum objects
   my @values;
-  sub _values { ## no critic( ProhibitUnusedPrivateSubroutines )
+  sub values { no critic ( ProhibitBuiltinHomonyms )
     my $ordinal = 0;
     @values = map { __PACKAGE__->_new( $ordinal++, $_ ) } qw( Locked Unlocked )
       unless @values;
@@ -46,7 +46,8 @@ Each enum class has a C<names()> class method, that returns the list of
 names of the enum objects in the order they were defined.
 
 Each enum class has a C<values()> class method, that returns the list of
-the enum objects in the order they were defined.
+the enum objects in the order they were defined. This method is abstract
+and gets implemented by the C<Class::Enumeration::Builder> module.
 
 Each enum class has a C<value_of( $name )> factory method (a class method),
 that returns the enum object with the specified name.

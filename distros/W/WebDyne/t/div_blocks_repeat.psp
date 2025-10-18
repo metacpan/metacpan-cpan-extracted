@@ -1,0 +1,63 @@
+<start_html lang="en-US" title="blocks">
+
+<p>BLOCK1:</p>
+<div data-webdyne-perl handler="hello0">
+<div data-webdyne-block name="hello0">
+<p>
+Hello World 1
+</div>
+</div>
+
+<p>BLOCK2:</p>
+<div data-webdyne-perl handler="hello1">
+<div data-webdyne-block name="hello1">
+<p>
+Hello World ${i}
+</div>
+</div>
+
+<div data-webdyne-perl handler="hello2">
+
+<p>BLOCK3:</p>
+<div data-webdyne-block name="hello2">
+<p>
+Hello World 1
+</div>
+
+<p>BLOCK4:</p>
+<div data-webdyne-block name="hello3">
+<p>
+Hello World ${i}
+</div>
+</div>
+
+
+__PERL__
+
+sub hello0 {
+    my $s=shift();
+    for (0..3) {
+        $s->render_block('hello0');
+    }
+    $s->render();
+}
+
+
+sub hello1 {
+    my $s=shift();
+    for (0..3) {
+        $s->render_block('hello1', i=> $_);
+    }
+    $s->render();
+}
+
+
+sub hello2 {
+    my $s=shift();
+    for (0..3) {
+        $s->render_block('hello2', i=> $_);
+        $s->render_block('hello3', i=> $_);
+    }
+    $s->render();
+}
+1;

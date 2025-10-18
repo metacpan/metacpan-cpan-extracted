@@ -17,7 +17,7 @@
   /*
   Main AngularJS controller
   */
-  llapp.controller('TreeCtrl', ['$scope', '$http', '$location', '$q', '$uibModal', '$translator', '$cookies', '$htmlParams', function ($scope, $http, $location, $q, $uibModal, $translator, $cookies, $htmlParams) {
+  llapp.controller('TreeCtrl', ['$scope', '$http', '$location', '$q', '$uibModal', '$translator', '$cookies', '$htmlParams', '$timeout', function ($scope, $http, $location, $q, $uibModal, $translator, $cookies, $htmlParams, $timeout) {
     var _download, _stoggle, c, id, pathEvent, readError, setHelp;
     $scope.links = window.links;
     $scope.menu = $htmlParams.menu;
@@ -30,6 +30,7 @@
     $scope.showT = false;
     $scope.form = 'homeViewer';
     $scope.currentCfg = {};
+    $scope.clipboardAvailable = Boolean(navigator.clipboard);
     $scope.viewPrefix = window.viewPrefix;
     $scope.allowDiff = window.allowDiff;
     $scope.message = {};
@@ -71,7 +72,7 @@
           items: []
         };
       } else if (e === 401) {
-        console.log('Authentication needed');
+        console.debug('Authentication needed');
         $scope.message = {
           title: 'authenticationNeeded',
           message: '__waitOrF5__',
@@ -158,7 +159,7 @@
             $scope[button.action]();
             break;
           default:
-            console.log(typeof button.action);
+            console.warn('Unknown action type', typeof button.action);
         }
       }
       return $scope.showM = false;
@@ -313,7 +314,7 @@
       d = $q.defer();
       d.notify('Trying to get datas');
       $scope.waiting = true;
-      console.log(`Trying to get key ${node.cnodes}`);
+      console.debug(`Trying to get key ${node.cnodes}`);
       uri = encodeURI(node.cnodes);
       $http.get(`${window.viewPrefix}${$scope.currentCfg.cfgNum}/${uri}`).then(function (response) {
         var a, data, l, len;
@@ -362,11 +363,47 @@
         return scope.toggle();
       });
     };
+    $scope.copyPath = function () {
+      var text = $scope.breadCrumb.join(" » ");
+      navigator.clipboard.writeText(text).then(function () {
+        $scope.$apply(function () {
+          $scope.copySuccess = true;
+          $timeout(function () {
+            $scope.copySuccess = false;
+          }, 400);
+        });
+      });
+    };
     setHelp = function (scope) {
       while (!scope.$modelValue.help && scope.$parentNodeScope) {
         scope = scope.$parentNodeScope;
       }
       return $scope.helpUrl = scope.$modelValue.help || 'start.html#configuration';
+    };
+    // Form management
+
+    // `currentNode` contains the last select node
+
+    // method `diplayForm()`:
+    //	- set the `form` property to the name of the form to download
+    //		(`text` by default or `home` for node without `type` property)
+    //	- launch getKeys to set `node.data`
+    //	- hide tree when in XS size
+
+    $scope.getTrPath = function (scope) {
+      var path = [];
+      var trpath = [];
+      var current = scope;
+      var safetycount = 0;
+      while (current && current.$modelValue && safetycount < 100) {
+        safetycount = safetycount + 1;
+        if (current.$modelValue.title && current.$modelValue.title != path[0]) {
+          trpath.unshift(scope.translate(current.$modelValue.title));
+          path.unshift(current.$modelValue.title);
+        }
+        current = current.$parent;
+      }
+      return trpath;
     };
     $scope.displayForm = function (scope) {
       var f, l, len, n, node, ref;
@@ -395,6 +432,7 @@
         }
       }
       $scope.showT = false;
+      $scope.breadCrumb = $scope.getTrPath(scope);
       return setHelp(scope);
     };
     $scope.keyWritable = function (scope) {
@@ -435,7 +473,8 @@
           for (i = l = 0, len = ref.length; l < len; i = ++l) {
             n = ref[i];
             node.data[i] = {
-              title: n,
+              title: n.split("/").pop(),
+              get: n,
               id: n
             };
             tmp.push($scope.getKey(node.data[i]));
@@ -449,10 +488,10 @@
         } else {
           uri = '';
           if (node.get) {
-            console.log(`Trying to get key ${node.get}`);
+            console.debug(`Trying to get key ${node.get}`);
             uri = encodeURI(node.get);
           } else {
-            console.log(`Trying to get title ${node.title}`);
+            console.debug(`Trying to get title ${node.title}`);
           }
           $http.get(`${window.viewPrefix}${$scope.currentCfg.cfgNum}/${node.get ? uri : node.title}`).then(function (response) {
             var data;
@@ -504,7 +543,7 @@
       if (n === null) {
         return $location.path('/view/latest');
       } else {
-        console.log(`Trying to get cfg number ${n[1]}`);
+        console.debug(`Trying to get cfg number ${n[1]}`);
         return $scope.getCfg(n[1]);
       }
     };
@@ -518,7 +557,7 @@
           $scope.currentCfg = response.data;
           d = new Date($scope.currentCfg.cfgDate * 1000);
           $scope.currentCfg.date = d.toLocaleString();
-          console.log(`Metadatas of cfg ${n} loaded`);
+          console.debug(`Metadatas of cfg ${n} loaded`);
           $location.path(`/view/${n}`);
           return $scope.init();
         }, function (response) {
@@ -549,14 +588,15 @@
       var tmp;
       tmp = null;
       $scope.waiting = true;
+      $scope.breadCrumb = null;
       $scope.data = [];
       $scope.confirmNeeded = false;
       $scope.forceSave = false;
       $q.all([$translator.init($scope.lang), $http.get(`${window.staticPrefix}struct.json`).then(function (response) {
         tmp = response.data;
-        return console.log("Structure loaded");
+        console.debug("Structure loaded");
       })]).then(function () {
-        console.log("Starting structure binding");
+        console.debug("Starting structure binding");
         $scope.data = tmp;
         tmp = null;
         if ($scope.currentCfg.cfgNum !== 0) {
@@ -579,7 +619,7 @@
     };
     c = $location.path().match(new RegExp('^/view/(latest|[0-9]+)'));
     if (!c) {
-      console.log("Redirecting to /view/latest");
+      console.debug("Redirecting to /view/latest");
       return $location.path('/view/latest');
     }
   }]);

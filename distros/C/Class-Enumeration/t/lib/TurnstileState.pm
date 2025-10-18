@@ -8,7 +8,7 @@ use parent 'Class::Enumeration';
 
 my @values;
 
-sub _values { ## no critic ( ProhibitUnusedPrivateSubroutines )
+sub values { ## no critic ( ProhibitBuiltinHomonyms )
   unless ( @values ) {
     my $ordinal = 0;
     @values = map { __PACKAGE__->_new( $ordinal++, $_ ) } qw( Locked Unlocked )

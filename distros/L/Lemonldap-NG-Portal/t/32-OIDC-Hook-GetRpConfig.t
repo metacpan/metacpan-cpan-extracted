@@ -131,6 +131,25 @@ subtest "Test persistent behavior" => sub {
     };
 };
 
+subtest "Check broken config" => sub {
+    my $op    = op();
+    my $idpId = $op->login("french");
+    Time::Fake->reset;
+    plugin($op)->rule("brokenrule'");
+
+    authorizeFails( $op, $idpId, 107 );
+    is( plugin($op)->callCount, 1, "Called once" );
+
+    Time::Fake->offset("+5m");
+    authorizeFails( $op, $idpId, 107 );
+    is( plugin($op)->callCount, 1, "Not called again" );
+
+    plugin($op)->rule(1);
+    Time::Fake->offset("+15m");
+    authorizeWorks( $op, $idpId );
+    is( plugin($op)->callCount, 2, "Called again" );
+};
+
 subtest "Make sure token endpoint loads RP" => sub {
     subtest "client id + password" => sub {
         my $op  = op();

@@ -23,9 +23,9 @@ requires:
   FindBin: '0'
   JSON::PP: '0'
   Test::More: '0'
-  perl: '5.010'
+  perl: '5.014'
 resources:
   bugtracker: https://github.com/kawamurashingo/JQ-Lite/issues
   repository: https://github.com/kawamurashingo/JQ-Lite.git
-version: '1.02'
+version: '1.15'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

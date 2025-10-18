@@ -15,7 +15,7 @@ ok( $types = Lemonldap::NG::Manager::Build::Attributes::types(), 'Get types' );
 $count += 2;
 
 foreach my $attr ( keys %$attrs ) {
-    next if ( $attr =~ /^virtualHosts|.*MetaDataNodes|applicationList$/ );
+    next if ( $attr =~ /^virtualHosts|.*MetaDataNodes|keyNodes|applicationList$/ );
     ok(
         (
                  ref( $attrs->{$attr}->{test} )

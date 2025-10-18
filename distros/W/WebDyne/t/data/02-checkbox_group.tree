@@ -1,0 +1,15 @@
+<html> @0 (IMPLICIT)
+  <head> @0.0 (IMPLICIT)
+  <body> @0.1 (IMPLICIT)
+    <p> @0.1.0
+      "Checkbox Group 1:"
+    <p> @0.1.1
+      "Checkbox Group 2:"
+    <p> @0.1.2
+      "Checkbox Group 3:"
+    <p> @0.1.3
+      "Checkbox Group 4:"
+    <p> @0.1.4
+      "Checkbox Group 5:"
+    <p> @0.1.5
+    <p> @0.1.6

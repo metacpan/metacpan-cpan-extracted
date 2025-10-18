@@ -5,6 +5,8 @@ use IO::String;
 use LWP::UserAgent;
 use LWP::Protocol::PSGI;
 use MIME::Base64;
+use URI;
+use URI::QueryParam;
 
 BEGIN {
     require 't/test-lib.pm';
@@ -100,6 +102,15 @@ ok( $res = $rp->_get( '/', accept => 'text/html' ), 'Unauth RP request' );
 count(1);
 my ( $url, $query ) =
   expectRedirection( $res, qr#http://auth.op.com(/oauth2/authorize)\?(.*)$# );
+
+my $u = URI->new;
+$u->query($query);
+ok(
+    my $request = $u->query_param("request"),
+    "Authorization request is encoded as JWT"
+);
+is( getJWTHeader($request)->{alg}, "HS256", "Alg can be changed in config" );
+count(2);
 
 # Push request to OP
 ok( $res = $op->_get( $url, query => $query, accept => 'text/html' ),
@@ -252,7 +263,7 @@ sub rp {
                 userDB                     => 'Same',
                 restSessionServer          => 1,
                 oidcOPMetaDataExportedVars => {
-                    op => {
+                    myop => {
                         cn   => "name",
                         uid  => "sub",
                         sn   => "family_name",
@@ -261,7 +272,7 @@ sub rp {
                 },
                 oidcServiceMetaDataBackChannelURI => 'blogout',
                 oidcOPMetaDataOptions             => {
-                    op => {
+                    myop => {
                         oidcOPMetaDataOptionsCheckJWTSignature => 1,
                         oidcOPMetaDataOptionsJWKSTimeout       => 0,
                         oidcOPMetaDataOptionsClientSecret      => "rpsecret",
@@ -279,10 +290,10 @@ sub rp {
                 },
                 oidcServiceKeyIdSig => 'aabbcc',
                 oidcOPMetaDataJWKS  => {
-                    op => $jwks,
+                    myop => $jwks,
                 },
                 oidcOPMetaDataJSON => {
-                    op => $metadata,
+                    myop => $metadata,
                 }
             }
         }

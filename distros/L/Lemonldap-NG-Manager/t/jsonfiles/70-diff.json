@@ -1072,12 +1072,12 @@
       }, {
         "cnodes": "globalStorageOptions",
         "default": [{
-          "data": "t/sessions",
+          "data": "TMPDIR/sessions",
           "id": "globalStorageOptions/Directory",
           "title": "Directory",
           "type": "keyText"
         }, {
-          "data": "t/sessions",
+          "data": "TMPDIR/sessions",
           "id": "globalStorageOptions/LockDirectory",
           "title": "LockDirectory",
           "type": "keyText"

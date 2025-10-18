@@ -5,7 +5,11 @@ use strict;
 our @ISA = ('Lemonldap::NG::Handler::PSGI');
 
 our $defaultIni = {
-    configStorage       => { type => 'File', dirName => 't' },
+    configStorage => {
+        confFile => "/dev/null",
+        type     => 'File',
+        dirName  => "t",
+    },
     localSessionStorage => '',
     logLevel            => 'error',
     https               => 0,

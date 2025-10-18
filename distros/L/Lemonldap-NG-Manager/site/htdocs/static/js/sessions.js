@@ -59,9 +59,6 @@
     }, function (t, v) {
       return `${t}=${v}*&groupBy=_whatToTrace`;
     }, function (t, v, q) {
-      console.log(t);
-      console.log(v);
-      console.log(q);
       return q.replace(/\&groupBy.*$/, '') + `&_whatToTrace=${v}`;
     }],
     doubleIp: [function (t, v) {
@@ -91,7 +88,10 @@
     _whatToTrace: function (t, v, level, over) {
       // "v.length > over" avoids a loop if one user opened more than "max"
       // sessions
-      console.log('overScheme => level', level, 'over', over);
+      console.debug('overScheme => level', level, 'over', over);
+
+      // no overScheme when over reached the length of previous result
+      if (v.length >= level + over) return null;
       if (level === 1 && v.length > over) {
         return `${t}=${v}*&groupBy=substr(${t},${level + over + 1})`;
       } else {
@@ -100,7 +100,7 @@
     },
     // Note: IPv4 only
     ipAddr: function (t, v, level, over) {
-      console.log('overScheme => level', level, 'over', over);
+      console.debug('overScheme => level', level, 'over', over);
       if (level > 0 && level < 4 && !v.match(/^\d+\.\d/) && over < 2) {
         return `${t}=${v}*&groupBy=net(${t},${16 * level + 4 * (over + 1)},${1 + level + over})`;
       } else {
@@ -108,7 +108,7 @@
       }
     },
     _startTime: function (t, v, level, over) {
-      console.log('overScheme => level', level, 'over', over);
+      console.debug('overScheme => level', level, 'over', over);
       if (level > 3) {
         return `${t}=${v}*&groupBy=substr(${t},${10 + level + over})`;
       } else {
@@ -116,7 +116,7 @@
       }
     },
     _session_uid: function (t, v, level, over) {
-      console.log('overScheme => level', level, 'over', over);
+      console.debug('overScheme => level', level, 'over', over);
       if (level === 1 && v.length > over) {
         return `${t}=${v}*&groupBy=substr(${t},${level + over + 1})`;
       } else {
@@ -194,7 +194,7 @@
             $scope[button.action]();
             break;
           default:
-            console.log(typeof button.action);
+            console.warn('Unknown action type', typeof button.action);
         }
       }
       return $scope.showM = false;
@@ -484,10 +484,10 @@
         for (p = 0, len5 = tmp.length; p < len5; p++) {
           element = tmp[p];
           if (element.title.match(new RegExp('^' + $scope.impPrefix + '.+$'))) {
-            console.log(element, '-> real attribute');
+            console.debug(element, '-> real attribute');
             real.push(element);
           } else {
-            //console.log element, '-> spoofed attribute'
+            //console.debug element, '-> spoofed attribute'
             spoof.push(element);
           }
         }
@@ -518,20 +518,20 @@
       var isValid, now, path;
       path = $location.path();
       now = Date.now() / 1000;
-      console.log("Path", path);
-      console.log("Session epoch", epoch);
-      console.log("Current date", now);
-      console.log("Session TTL", sessionTTL);
+      console.debug("Path", path);
+      console.debug("Session epoch", epoch);
+      console.debug("Current date", now);
+      console.debug("Session TTL", sessionTTL);
       isValid = now - epoch < sessionTTL || $location.path().match(/^\/persistent/);
       if (type === 'msg') {
-        console.log("Return msg");
+        console.debug("Return msg");
         if (isValid) {
           return "info";
         } else {
           return "warning";
         }
       } else if (type === 'style') {
-        console.log("Return style");
+        console.debug("Return style");
         if (isValid) {
           return {};
         } else {
@@ -541,7 +541,7 @@
           };
         }
       } else {
-        console.log("Return isValid");
+        console.debug("Return isValid");
         return isValid;
       }
     };
@@ -604,12 +604,11 @@
       }
       // Launch HTTP query
       $http.get(`${scriptname}sessions/${sessionType}?${query}`).then(function (response) {
-        var data, i, len, n, ref;
+        var data, i, n;
         data = response.data;
         if (data.result) {
-          ref = data.values;
-          for (i = 0, len = ref.length; i < len; i++) {
-            n = ref[i];
+          for (i = 0; i < data.values.length; i++) {
+            n = data.values[i];
             autoId++;
             n.id = `node${autoId}`;
             if (level < scheme.length - 1) {
@@ -640,7 +639,7 @@
         return $scope.waiting = false;
       });
       // Highlight current selection
-      console.log("Selection", sessionType);
+      console.debug("Selection", sessionType);
       $scope.navssoStyle = {
         color: '#777'
       };

@@ -2,46 +2,27 @@
 #
 #  This file is part of WebDyne.
 #
-#  This software is Copyright (c) 2017 by Andrew Speer <andrew@webdyne.org>.
+#  This software is copyright (c) 2025 by Andrew Speer <andrew.speer@isolutions.com.au>.
 #
-#  This is free software, licensed under:
-#
-#    The GNU General Public License, Version 2, June 1991
+#  This is free software; you can redistribute it and/or modify it under
+#  the same terms as the Perl 5 programming language system itself.
 #
 #  Full license text is available at:
 #
-#  <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+#  <http://dev.perl.org/licenses/>
 #
+
 
 #
 #  Dump the compiled version of WebDyne HTML scripts, as stored in the cache dir
 #
-package main;
-
-
-#  Compiler pragma
-#
-sub BEGIN {
-
-    #  Massage warnings and @INC path
-    $^W=0;
-    use File::Spec;
-    use FindBin qw($RealBin $Script);
-    foreach my $dn ($RealBin, File::Spec->path()) {
-        if (-f (my $fn=File::Spec->catfile($dn, 'perl5lib.pl'))) {
-            require $fn;
-            perl5lib->import(File::Spec->catdir($dn, File::Spec->updir()));
-            last;
-        }
-    }
-}
 use strict qw(vars);
-use vars qw($VERSION);
+use vars   qw($VERSION);
 
 
 #  Use the base module
 #
-use WebDyne::Base;
+use WebDyne::Util;
 
 
 #  External modules
@@ -50,11 +31,12 @@ use Getopt::Long;
 use Pod::Usage;
 use Data::Dumper;
 use Storable;
+use FindBin qw($RealBin $Script);
 
 
 #  Version Info, must be all one line for MakeMaker, CPAN.
 #
-$VERSION='1.250';
+$VERSION='2.014';
 
 
 #  Run main
@@ -78,8 +60,8 @@ sub main {
     my %opt;
     GetOptions(\%opt, 'help|?', 'man', 'version') ||
         pod2usage(2);
-    pod2usage(-verbose => 99, -sections => 'Synopsis|Options', -exitval => 1) if $opt{'help'};
-    pod2usage(-verbose => 2) if $opt{'man'};
+    pod2usage(-verbose => 99, -sections => 'SYNOPSIS|OPTIONS', -exitval => 1) if $opt{'help'};
+    pod2usage(-verbose => 2)                                                  if $opt{'man'};
     $opt{'version'} && do {print "$Script version: $VERSION\n"; exit 0};
 
     #  Get srce file
@@ -106,53 +88,64 @@ sub main {
 
 }
 
-__END__
+__END__# https://github.com/aspeer/pl-markpod.git 
 
-=head1 Name
+
+
+
+
+=pod
+
+=head1 wddump(1)
+
+=head1 NAME
 
 wddump - dump the data structure of a WebDyne page in the cache
-directory
+    directory
 
-=head1 Synopsis
+=head1 SYNOPSIS
 
-B<wddump> B<[OPTIONS]> B<FILE>
-
-=head1 Options
-
--h, --help
-Show brief help message.
+C<<<< wddump [OPTIONS] FILE >>>>
 
 =head1 Description
 
-The B<wddump> command displays internal the data structure of a compiled
-WebDyne psp file from the WebDyne cache directory.  B<wddump> is of
-limited diagnostic use - the B<wdcompile> tool is more suitable for
-troubleshooting HTML tree errors.
+The  C<<<< wddump >>>>  command displays internal the data structure of a compiled WebDyne psp file from the WebDyne cache directory. C<<<< wddump >>>>  is of limited diagnostic use - the C<<<< wdcompile >>>>  tool is more suitable for troubleshooting HTML tree errors.
 
-B<wddump> can be useful to see a picture of the final data structure looks
-like on complex pages built via many filters, combining static and
-dynamic blocks etc.
+C<<<< wddump >>>>  can be useful to see a picture of the final data structure looks like on complex pages built via many filters,
+ combining static and dynamic blocks etc.
+
+=head1 Options
+
+=over
+
+=item * B<<< -h, --help >>>
+
+Show brief help message.
+
+=back
 
 =head1 Examples
 
-B<wdrender> B</var/webdyne/cache/26f2c4edc8bfd52fbde915290db96779>
+C<<<< wdrender
+    /var/webdyne/cache/26f2c4edc8bfd52fbde915290db96779 >>>>
 
 Display the data structure from a compiled, cached webdyne file.
 
 =head1 Author
 
-Written by Andrew Speer, andrew@webdyne.org
+Written by Andrew Speer,  <andrew@webdyne.org>
 
 =head1 LICENSE and COPYRIGHT
 
 This file is part of WebDyne.
 
-This software is Copyright (c) 2017 by Andrew Speer <andrew@webdyne.org>.
+This software is copyright (c) 2025 by Andrew Speer L<mailto:andrew.speer@isolutions.com.au>.
 
-This is free software, licensed under:
-
-  The GNU General Public License, Version 2, June 1991
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 Full license text is available at:
-L<http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
 
+L<http://dev.perl.org/licenses/>
+
+=cut

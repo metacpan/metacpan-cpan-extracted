@@ -28,7 +28,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 
 use Lemonldap::NG::Common::Util qw/display2F filterKey2F/;
 
-our $VERSION = '2.21.0';
+our $VERSION = '2.22.0';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 with qw(
@@ -54,8 +54,7 @@ has ott => (
     default => sub {
         my $ott =
           $_[0]->{p}->loadModule('Lemonldap::NG::Portal::Lib::OneTimeToken');
-        $ott->timeout( $_[0]->{conf}->{sfLoginTimeout}
-              || $_[0]->{conf}->{formTimeout} );
+        $ott->timeout( $_[0]->{conf}->{formTimeout} );
         return $ott;
     }
 );
@@ -454,10 +453,10 @@ sub run {
     delete $req->{authResult};
 
     $req->data->{_2fRetries} = $self->conf->{sfRetries};
-    my $token = $self->ott->createToken( $self->save2faSessionInfo($req) );
 
     # If only one 2F is authorized, display it
     unless ($#am) {
+        my $token = $am[0]->ott->createToken( $self->save2faSessionInfo($req) );
         $self->auditLog(
             $req,
             message => (
@@ -477,6 +476,7 @@ sub run {
     }
 
     # More than 1 2F has been found, display choice
+    my $token = $self->ott->createToken( $self->save2faSessionInfo($req) );
     $self->logger->debug("Prepare 2F choice");
     my $res = $self->p->sendHtml(
         $req,
@@ -552,7 +552,7 @@ sub display2fRegisters {
 sub _choice {
     my ( $self, $req ) = @_;
 
-    my ( $tokres, $session ) = $self->_check_token($req);
+    my ( $tokres, $session ) = $self->_check_token( $req, $self->ott );
     if ( $tokres != PE_OK ) {
         $self->auditLog(
             $req,
@@ -562,7 +562,7 @@ sub _choice {
             reason       => "Token validation failed",
             portal_error => portalConsts->{$tokres},
         );
-        return $self->p->do( $req, [ sub { $tokres } ] );
+        return $self->p->doPE( $req, $tokres );
     }
 
     $req->sessionInfo($session);
@@ -584,14 +584,14 @@ sub _choice {
             );
 
             # New token
-            my $token = $self->ott->createToken( $req->sessionInfo );
+            my $token = $m->{m}->ott->createToken( $req->sessionInfo );
             my $res   = $m->{m}->run( $req, $token );
             $req->authResult($res);
             return $self->p->do(
                 $req,
                 [
-                    sub { $res },  'controlUrl',
-                    'buildCookie', @{ $self->p->endAuth },
+                    [ returnPE => $res ], 'controlUrl',
+                    'buildCookie',        @{ $self->p->endAuth },
                 ]
             );
         }
@@ -605,7 +605,7 @@ sub _choice {
         portal_error => portalConsts->{PE_ERROR},
         type         => $ch,
     );
-    return $self->p->do( $req, [ sub { PE_ERROR } ] );
+    return $self->p->doPE( $req, PE_ERROR );
 }
 
 sub _redirect {
@@ -863,7 +863,7 @@ sub continueLoginAfterRegistration {
     # Check if registration was done
     if ( !$req->sessionInfo->{_2f} ) {
         $self->logger->error("2FA registration was not completed");
-        return $self->p->do( $req, [ sub { PE_ERROR } ] );
+        return $self->p->doPE( $req, PE_ERROR );
     }
 
     # Else restore session
@@ -888,7 +888,7 @@ sub _continueLogin {
         if ( my $error = $self->p->process($req) ) {
             $self->logger->debug("SFA: Process returned error: $error");
             $req->error($error);
-            return $self->p->do( $req, [ sub { $error } ] );
+            return $self->p->doPE( $req, $error );
         }
         $self->logger->debug("De-duplicate groups...");
         $req->sessionInfo->{groups} = join $self->conf->{multiValuesSeparator},
@@ -914,6 +914,7 @@ sub _continueLogin {
                 groups              => $req->sessionInfo->{groups},
                 hGroups             => $req->sessionInfo->{hGroups},
                 _2f                 => $prefix,
+                _lastAuthnUTime     => time,
                 %macros
             }
         );
@@ -923,7 +924,8 @@ sub _continueLogin {
         $self->p->updateSession(
             $req,
             {
-                _2f => $prefix,
+                _lastAuthnUTime => time,
+                _2f             => $prefix,
             }
         );
     }
@@ -935,7 +937,7 @@ sub _continueLogin {
             @{ $self->p->afterData },
             $self->p->validSession,
             @{ $self->p->endAuth },
-            sub { PE_OK }
+            [ returnPE => PE_OK ],
         ]
     );
 }
@@ -950,7 +952,7 @@ sub _verify {
       unless $m;
     my $module = $m->{m};
 
-    my ( $tokres, $session ) = $self->_check_token($req);
+    my ( $tokres, $session ) = $self->_check_token( $req, $module->ott );
     if ( $tokres != PE_OK ) {
         $self->auditLog(
             $req,
@@ -963,7 +965,7 @@ sub _verify {
             type         => $prefix,
             portal_error => portalConsts->{$tokres},
         );
-        return $self->p->do( $req, [ sub { $tokres } ] );
+        return $self->p->doPE( $req, $tokres );
     }
 
     my $user = $session->{ $self->conf->{whatToTrace} };
@@ -974,7 +976,7 @@ sub _verify {
           $self->p->processHook( $req, 'sfBeforeVerify', $module, $session );
         if ( $h != PE_OK ) {
             $req->noLoginDisplay(1);
-            return $self->p->do( $req, [ sub { $h } ] );
+            return $self->p->doPE( $req, $h );
         }
     }
 
@@ -999,7 +1001,7 @@ sub _verify {
             $verify_result );
         if ( $h != PE_OK ) {
             $req->noLoginDisplay(1);
-            return $self->p->do( $req, [ sub { $h } ] );
+            return $self->p->doPE( $req, $h );
         }
     }
 
@@ -1030,7 +1032,7 @@ sub _verify {
         # Set the failed 2f type in case you want to store it in history
         # through sessionDataToRemember
         $req->sessionInfo->{'_2f'} = $prefix;
-        return $self->p->do( $req, [ 'storeHistory', sub { $res } ] );
+        return $self->p->do( $req, [ 'storeHistory', [ returnPE => $res ] ] );
     }
     elsif ($res) {
         $req->data->{_2fRetries} = (
@@ -1044,7 +1046,7 @@ sub _verify {
             my $h = $self->p->processHook( $req, 'sfBeforeRetry', $module );
             if ( $h != PE_OK ) {
                 $req->noLoginDisplay(1);
-                return $self->p->do( $req, [ sub { $h } ] );
+                return $self->p->doPE( $req, $h );
             }
         }
 
@@ -1052,11 +1054,12 @@ sub _verify {
             "Retrying 2FA: " . $req->data->{_2fRetries} . " retries left" );
 
         $req->error(PE_RETRY_2FA);
-        my $token = $self->ott->createToken( $self->save2faSessionInfo($req) );
-        my $res   = $module->run( $req, $token );
+        my $token =
+          $module->ott->createToken( $self->save2faSessionInfo($req) );
+        my $res = $module->run( $req, $token );
         $req->authResult($res);
 
-        return $self->p->do( $req, [ sub { $res } ] );
+        return $self->p->doPE( $req, $res );
     }
 
     # Else restore session
@@ -1278,7 +1281,7 @@ sub get2fTplParams {
 }
 
 sub _check_token {
-    my ( $self, $req ) = @_;
+    my ( $self, $req, $ott ) = @_;
 
     my $token;
     unless ( $token = $req->param('token') ) {
@@ -1288,7 +1291,7 @@ sub _check_token {
     }
 
     my $session;
-    unless ( $session = $self->ott->getToken($token) ) {
+    unless ( $session = $ott->getToken($token) ) {
         $self->logger->error('Invalid 2F choice form token');
         $req->noLoginDisplay(1);
         return PE_TOKENEXPIRED;

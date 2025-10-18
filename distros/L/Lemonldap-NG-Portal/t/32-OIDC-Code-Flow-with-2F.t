@@ -1,6 +1,7 @@
 use warnings;
 use Test::More;
 use strict;
+use Time::Fake;
 use IO::String;
 use LWP::UserAgent;
 use LWP::Protocol::PSGI;
@@ -23,7 +24,6 @@ LWP::Protocol::PSGI->register(
         my $host = $1;
         my $url  = $2;
         my ( $res, $client );
-        count(1);
         if ( $host eq 'op' ) {
             pass("  Request from RP to OP,     endpoint $url");
             $client = $op;
@@ -62,11 +62,9 @@ LWP::Protocol::PSGI->register(
         ok( getHeader( $res, 'Content-Type' ) =~ m#^application/json#,
             '  Content is JSON' )
           or explain( $res->[1], 'Content-Type => application/json' );
-        count(4);
         if ( $res->[2]->[0] =~ /"access_token":"(.*?)"/ ) {
             $access_token = $1;
             pass "Found access_token $access_token";
-            count(1);
         }
         return $res;
     }
@@ -85,22 +83,18 @@ ok(
 );
 expectOK($res);
 my $metadata = $res->[2]->[0];
-count(3);
 
 &Lemonldap::NG::Handler::Main::cfgNum( 0, 0 );
 ok( $rp = register( 'rp', sub { rp( $jwks, $metadata ) } ), 'RP portal' );
-count(1);
 
 # Query RP for auth
 ok( $res = $rp->_get( '/', accept => 'text/html' ), 'Unauth SP request' );
-count(1);
 my ( $url, $query ) =
   expectRedirection( $res, qr#http://auth.op.com(/oauth2/authorize)\?(.*)$# );
 
 # Push request to OP
 ok( $res = $op->_get( $url, query => $query, accept => 'text/html' ),
     "Push request to OP,         endpoint $url" );
-count(1);
 expectOK($res);
 my $pdata = expectCookie( $res, 'lemonldappdata' );
 
@@ -116,7 +110,6 @@ ok(
     ),
     "Post authentication,        endpoint $url"
 );
-count(1);
 
 $pdata = expectCookie( $res, 'lemonldappdata' );
 
@@ -126,10 +119,9 @@ $pdata = expectCookie( $res, 'lemonldappdata' );
 
 ok(
     $res->[2]->[0] =~
-qr%<input name="code" value="" type="text" class="form-control" id="extcode" trplaceholder="code" autocomplete="one-time-code" />%,
+qr%<input name="code" value="" type="text" class="form-control" id="extcode" trplaceholder="code"%,
     'Found EXTCODE input'
 ) or print STDERR Dumper( $res->[2]->[0] );
-count(1);
 
 $query =~ s/code=/code=123456/;
 
@@ -143,7 +135,6 @@ ok(
     ),
     'Post code'
 );
-count(1);
 
 my $idpId = expectCookie($res);
 $pdata = expectCookie( $res, 'lemonldappdata' );
@@ -157,11 +148,9 @@ ok(
     ),
     "Follow redirection to Oauth2 issuer"
 );
-count(1);
 
 $pdata = expectCookie( $res, 'lemonldappdata' );
 is( $pdata, '', "Pdata was cleared" );
-count(1);
 
 my $tmp;
 ( $host, $url, $query ) =
@@ -177,7 +166,6 @@ ok(
     ),
     "Post confirmation,          endpoint $url"
 );
-count(1);
 
 ($query) = expectRedirection( $res, qr#^http://auth.rp.com/?\?(.*)$# );
 
@@ -185,20 +173,17 @@ count(1);
 
 ok( $res = $rp->_get( '/', query => $query, accept => 'text/html' ),
     'Call openidconnectcallback on RP' );
-count(1);
 my $spId = expectCookie($res);
 
 ok(
     $res = $op->_get( '/oauth2/checksession.html', accept => 'text.html' ),
     'Check session,      endpoint /oauth2/checksession.html'
 );
-count(1);
 expectOK($res);
 ok( getHeader( $res, 'Content-Security-Policy' ) !~ /frame-ancestors/,
     ' Frame can be embedded' )
   or explain( $res->[1],
     'Content-Security-Policy does not contain a frame-ancestors' );
-count(1);
 
 # Verify UTF-8
 ok(
@@ -210,11 +195,9 @@ ok(
 $res = expectJSON($res);
 ok( $res->{name} eq 'Frédéric Accents', 'UTF-8 values' )
   or explain( $res, 'name => Frédéric Accents' );
-count(2);
 
 ok( getSession($spId)->data->{cn} eq 'Frédéric Accents', 'UTF-8 values' )
   or explain( $res, 'cn => Frédéric Accents' );
-count(1);
 
 # Logout initiated by RP
 ok(
@@ -226,7 +209,6 @@ ok(
     ),
     'Query RP for logout'
 );
-count(1);
 ( $url, $query ) = expectRedirection( $res,
     qr#http://auth.op.com(/oauth2/logout)\?(post_logout_redirect_uri=.+)$# );
 
@@ -241,7 +223,6 @@ ok(
     ),
     "Push logout request to OP,     endpoint $url"
 );
-count(1);
 
 ( $host, $tmp, $query ) = expectForm( $res, '#', undef, 'confirm' );
 
@@ -254,29 +235,26 @@ ok(
     ),
     "Confirm logout,                endpoint $url"
 );
-count(1);
 
 ( $url, $query ) = expectRedirection( $res, qr#.# );
 
 my $removedCookie = expectCookie($res);
 is( $removedCookie, 0, "SSO cookie removed" );
-count(1);
 
 # Test logout endpoint without session
 ok(
     $res = $op->_get(
         '/oauth2/logout',
         accept => 'text/html',
-        query  => 'post_logout_redirect_uri=http://auth.rp.com/?logout=1'
+        query  =>
+          'post_logout_redirect_uri=http://auth.rp.com/oauth2/rlogoutreturn'
     ),
     'logout endpoint with redirect, endpoint /oauth2/logout'
 );
-count(1);
-expectRedirection( $res, 'http://auth.rp.com/?logout=1' );
+expectRedirection( $res, 'http://auth.rp.com/oauth2/rlogoutreturn' );
 
 ok( $res = $op->_get('/oauth2/logout'),
     'logout endpoint,               endpoint /oauth2/logout' );
-count(1);
 expectReject($res);
 
 # Test if logout is done
@@ -286,7 +264,6 @@ ok(
     ),
     'Test if user is reject on IdP'
 );
-count(1);
 expectReject($res);
 
 ok(
@@ -297,12 +274,150 @@ ok(
     ),
     'Test if user is reject on SP'
 );
-count(1);
 ( $url, $query ) =
   expectRedirection( $res, qr#^http://auth.op.com(/oauth2/authorize)\?(.*)$# );
 
+subtest "Test reauth by prompt=login" => sub {
+
+    Time::Fake->reset;
+    clean_sessions();
+
+    ok(
+        my $res = $op->_post(
+            '/',
+            {
+                user     => "french",
+                password => "french",
+            },
+            accept => 'text/html',
+        ),
+        "Post authentication",
+    );
+
+    my ( $host, $url, $query ) =
+      expectForm( $res, undef, '/ext2fcheck?skin=bootstrap', 'token', 'code',
+        'checkLogins' );
+
+    $query =~ s/code=/code=123456/;
+
+    ok(
+        $res = $op->_post(
+            '/ext2fcheck',
+            IO::String->new($query),
+            length => length($query),
+            accept => 'text/html',
+        ),
+        'Post code'
+    );
+
+    my $idpId = expectCookie($res);
+
+    Time::Fake->offset("+3600s");
+    ok(
+        $res = $op->_get(
+            '/oauth2/authorize',
+            query => {
+                scope         => 'openid profile',
+                client_id     => 'rpid',
+                redirect_uri  => 'http://auth.rp.com/?openidconnectcallback=1',
+                response_type => 'code',
+                state         => "xyz",
+                prompt        => "login",
+            },
+            cookie => "lemonldap=$idpId",
+            accept => "text/html",
+        ),
+        'Test reauth'
+    );
+
+    my $pdata = "lemonldappdata=" . expectCookie( $res, 'lemonldappdata' );
+
+    ( $host, my $tmp, $query ) =
+      expectForm( $res, undef, '/renewsession', 'confirm' );
+    ok( $res->[2]->[0] =~ /trspan="askToRenew"/, 'Propose to renew session' );
+    ok(
+        $res = $op->_post(
+            '/renewsession',
+            IO::String->new($query),
+            accept => 'text/html',
+            length => length($query),
+            cookie => "lemonldap=$idpId;$pdata",
+        ),
+        'Ask to renew'
+    );
+    $pdata = "lemonldappdata=" . expectCookie( $res, 'lemonldappdata' );
+
+    ( $host, $tmp, $query ) =
+      expectForm( $res, '#', undef, 'upgrading', 'url' );
+
+    $query =~ s/password=/password=french/g;
+    ok(
+        $res = $op->_post(
+            '/renewsession',
+            IO::String->new($query),
+            accept => 'text/html',
+            length => length($query),
+            cookie => "lemonldap=$idpId;$pdata",
+        ),
+        'Ask to renew'
+    );
+
+    $pdata = "lemonldappdata=" . expectCookie( $res, 'lemonldappdata' );
+    ( $host, $url, $query ) =
+      expectForm( $res, undef, '/ext2fcheck?skin=bootstrap', 'token', 'code',
+        'checkLogins' );
+
+    $query =~ s/code=/code=123456/;
+
+    # Filling 2FA takes a while
+    Time::Fake->offset("+3700s");
+    ok(
+        $res = $op->_post(
+            '/ext2fcheck',
+            IO::String->new($query),
+            length => length($query),
+            accept => 'text/html',
+            cookie => "lemonldap=$idpId;$pdata",
+        ),
+        'Post code'
+    );
+
+    $idpId = expectCookie($res);
+    $pdata = "lemonldappdata=" . expectCookie( $res, 'lemonldappdata' );
+    expectRedirection( $res, qr#http://auth.op.com/oauth2/authorize# );
+
+    # Push request to OP
+    ok(
+        $res = $op->_get(
+            "/oauth2/authorize",
+            accept => 'text/html',
+            cookie => "lemonldap=$idpId;$pdata"
+        ),
+        "Push request to OP,         endpoint $url"
+    );
+    expectOK($res);
+
+    # Consent form
+    ( $host, $url, $query ) =
+      expectForm( $res, undef, qr#/oauth2/authorize.*#, 'confirm', 'client_id',
+        'scope' );
+
+    ok(
+        $res = $op->_post(
+            '/oauth2/authorize',
+            IO::String->new($query),
+            accept => 'text/html',
+            cookie => "lemonldap=$idpId",
+            length => length($query),
+        ),
+        "Post confirmation,          endpoint $url"
+    );
+    expectRedirection( $res, qr#^http://auth.rp.com/?\?(.*)$# );
+
+};
+
 clean_sessions();
-done_testing( count() );
+done_testing();
 
 sub op {
     return LLNG::Manager::Test->new( {
@@ -313,6 +428,7 @@ sub op {
                 authentication                  => 'Demo',
                 userDB                          => 'Same',
                 issuerDBOpenIDConnectActivation => 1,
+                portalForceAuthnInterval        => 30,
                 ext2fActivation                 => 1,
                 ext2fCodeActivation             => '123456',
                 ext2FSendCommand                => 't/sendOTP.pl -uid dwho',
@@ -339,7 +455,7 @@ sub op {
                         oidcRPMetaDataOptionsUserIDAttr        => "",
                         oidcRPMetaDataOptionsAccessTokenExpiration  => 3600,
                         oidcRPMetaDataOptionsPostLogoutRedirectUris =>
-                          "http://auth.rp.com/?logout=1",
+                          "http://auth.rp.com/oauth2/rlogoutreturn",
                         oidcRPMetaDataOptionsRedirectUris =>
                           'http://auth.rp.com/?openidconnectcallback=1',
                     }

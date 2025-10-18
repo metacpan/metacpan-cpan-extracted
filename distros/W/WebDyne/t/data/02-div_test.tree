@@ -1,0 +1,7 @@
+<html> @0 (IMPLICIT)
+  <head> @0.0 (IMPLICIT)
+  <body> @0.1 (IMPLICIT)
+    <div> @0.1.0
+      "Div 1"
+      <div> @0.1.0.1
+        "Div 2"

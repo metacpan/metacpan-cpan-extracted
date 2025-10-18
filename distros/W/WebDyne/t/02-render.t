@@ -1,127 +1,275 @@
-#!perl
+#!/bin/perl
+# 
+#  Compare generated files with frozen reference files
+#
+use strict qw(vars);
+use warnings;
+use vars   qw($VERSION);
 
 
 #  Load
 #
 use Test::More qw(no_plan);
-BEGIN { use_ok( 'HTML::TreeBuilder' ); }
-use WebDyne::Request::Fake;
 use FindBin qw($RealBin $Script);
 use File::Temp qw(tempfile);
-use Digest::MD5;
 use File::Find qw(find);
 use Data::Dumper;
 use IO::File;
+use IO::String;
+use Cwd qw(abs_path);
 $Data::Dumper::Indent=1;
+use Storable qw(lock_retrieve freeze);
+$Storable::canonical=1;
 
 
 #  Load WebDyne
 #
-require_ok('WebDyne');
+require_ok('WebDyne::Compile');
+require_ok('WebDyne::Request::Fake');
+use WebDyne::Util;
 
 
-#  Get test files
+#  Setup environment for this test if not already present
 #
-my @test_fn;
-my $wanted_sr=sub { push (@test_fn, $File::Find::name) if /\.psp$/ };
-find($wanted_sr, $RealBin);
-foreach my $test_fn (sort {$a cmp $b } @test_fn) {
-    my ($temp_fh, $temp_fn)=tempfile();
-    #diag("test file $test_fn, temp_fh $temp_fh, temp_fn $temp_fn");
-    my $r=WebDyne::Request::Fake->new( filename=>$test_fn, select=>$temp_fh, noheader=>1 );
-    #$r->notes('noheader', 1);
-    ok($r, 'request created');
+$ENV{'WEBDYNE_TEST_FILE_PREFIX'} ||= '02';
+#die Dumper(\%INC, \@INC);
+
+
+#  Run
+#
+exit(${&main(\@ARGV) || die err ()} || 0);    # || 0 stops warnings
+
+#==================================================================================================
+
+
+sub err_carp {
+
+    require Carp;
+    $Carp::CarpLevel=0;
+    $Carp::RefArgFormatter = sub {
+        require Data::Dumper;                                                                                                                                                
+        $Data::Dumper::Indent=1;
+        Data::Dumper->Dump(\@_); # not necessarily safe                                                                                                                    
+    };
+    &Carp::confess &diag(@_);
+    
+}
 
 
 
-    #  run handler which sends output to file
+sub main {
+
+    #  Get list of files either from command line or from *.psp if no
+    #  command line given
     #
-    ok(defined(WebDyne->handler($r)), 'webdyne handler');
-    is($r->status, 200, 'webdyne handler status');
-    $r->DESTROY();
-    seek($temp_fh,0,0);
-
-
-    #  Create TreeBuilder dump of rendered text
-    #
-    my ($tree_fh, $tree_fn)=tempfile();
-    my $tree_or=HTML::TreeBuilder->new();
-    while (my $html=<$temp_fh>) {
-	#  Do this way to get rid of extraneous CR's older version of CGI insert.
-	$html=~s/\n+$//;
-	$html=~s/>\s+/>/g;
-	#diag($html);
-	$tree_or->parse($html);
+    my @test_fn=@{shift()};
+    if (my $test_fn=$ENV{'WEBDYNE_TEST_FILE'}) {
+        @test_fn=map { glob $_ } split(/[;,]/, $test_fn);
     }
-    $tree_or->eof();
-    $temp_fh->close();
-    ok($tree_or, 'HTML::TreeBuilder object');
-    $tree_or->dump($tree_fh);
-    $tree_or->delete();
-    #diag("tree_fn $tree_fn");
-    seek($tree_fh,0,0);
+    my $wanted_cr=sub { push (@test_fn, $File::Find::name) if /\.psp$/ };
+    find($wanted_cr, $RealBin) unless @test_fn;
 
 
-    #  Get MD5 of file we just rendered
+    #  Create a new compile instance
     #
-    my $md5_or=Digest::MD5->new();
-    $md5_or->addfile($tree_fh);
-    my $md5_tree=$md5_or->hexdigest();
-
-
-    #  Now of reference dump in test directory
+    my $compile_or=WebDyne::Compile->new() ||
+        return err();
+        
+        
+    #  Data dir
     #
-    (my $dump_fn=$test_fn)=~s/\.psp$/\.dmp/;
-    my $dump_fh=IO::File->new($dump_fn, O_RDONLY);
-    ok($dump_fh, "loaded render dump file for $dump_fn");
-    binmode($dump_fh);
-    $md5_or->reset();
-    $md5_or->addfile($dump_fh);
-    my $md5_dump=$md5_or->hexdigest();
-    #diag("tree $md5_tree, dump $md5_dump");
-    if ($md5_tree eq $md5_dump) {
-        pass("render $test_fn");
-    }
-    else {
-    #ok($md5_tree eq $md5_dump, "render $test_fn") || do {
-        seek($tree_fh,0,0);
-        seek($dump_fh,0,0);
-        my @diff;
-        my $line;
-        while (my $made=<$tree_fh>) {
-            my $test=<$dump_fh>;
-            $line++;
-            if ($made ne $test) {
-                #  Hacks for HTML::Tree 3.13 which renders tags differently
-                #
-                #   '13 [gen]:         <option value=2> @0.1.3.0.1
-                # ',
-                #   '13 [ref]:         <option value="2"> @0.1.3.0.1
-                # ',
-                #   '15 [gen]:       <input type="submit"> @0.1.3.1
-                # ',
-                #   '15 [ref]:       <input type="submit" /> @0.1.3.1
-                $test=~s/\s?\/>/>/g;
-                $test=~s/\"(\d+)\"/$1/g;
+    my $data_freeze_dn='data';
+
+
+    #  Iterate over files
+    #
+    diag('');
+    FILE: foreach my $test_fn (sort {$a cmp $b } @test_fn) {
+
+
+        #  Create WebDyne render of PSP file and capture to file
+        #
+        debug("processing $test_fn");
+        my $test_cn=abs_path($test_fn) ||
+            return err("unable to determine full path of $test_fn");
+        (-f $test_cn) ||
+            return err("unable to find file: $test_fn");
+        diag("processing: $test_fn");
+        
+        for (0..1) {
+        foreach my $stage ((0..5), 'final') {
+
+
+            #  Get data file
+            #
+            my ($data_dn, $data_fn)=(File::Spec->splitpath($test_cn))[1,2];
+
+
+            #  Enables variations on a single source file
+            #
+            $data_fn=join('-', grep {$_} $ENV{'WEBDYNE_TEST_FILE_PREFIX'},  $data_fn);
+            my $data_cn=File::Spec->catfile($data_dn, $data_freeze_dn, $data_fn);
+            $data_cn=~s/\.psp$/\.dat\.${stage}/;
+
+
+            #  Compile to desired stage
+            #
+            my $stage_name=($stage eq 'final') ? $stage : "stage${stage}";
+
+
+            #  Options. Use test_fn rather than test_fp so manifest only has file name
+            #
+            my %opt=(
+
+                srce        	=> $test_cn,
+                nofilter	=> 1,
+                noperl		=> 1,
+                notimestamp	=> 1,
+                nomanifest	=> 1,
+                $stage_name     => 1
+                
+            );
+            
+            
+            #  Get it
+            #
+            my $data_live_ar=$compile_or->compile(\%opt) ||
+                return err ();
+            debug("data_live_ar %s", Dumper($data_live_ar));
+            
+            
+            #  Get previous version
+            #
+            (-f $data_cn) || do {
+                diag("skipping $test_fn, no data file - run maketest.pl");
+                return err();
+                #next FILE;
+            };
+            my $data_thaw_ar=lock_retrieve($data_cn) ||
+                return err();
+
+
+
+            #  Now compare
+            #
+            my $string_live=freeze($data_live_ar);
+            my $string_thaw=freeze($data_thaw_ar);
+            
+            if ($string_live eq $string_thaw) {
+                pass("$test_fn pass on stage: $stage");
             }
-            unless ($made eq $test) {
-                push @diff, "$line [gen]: $made", "$line [ref]: $test";
+            else {
+                fail(diag("$test_fn fail on stage: $stage"));
+                eval { require Text::Diff } || do {
+                    diag('unable to load Text::Diff module to show comparison');
+                    next;
+                };
+                my $diff=Text::Diff::diff(
+                    \Dumper($data_live_ar),
+                    \Dumper($data_thaw_ar),
+                    { STYLE => 'Unified' }
+                );
+                diag("diff: $diff");
+                #diag(sprintf('%s:%s', Dumper($data_live_ar, $data_thaw_ar)));
             }
-        }
-        if (@diff) {
-            diag('  diff: - ', Dumper(\@diff));
-            fail("render $test_fn");
+
+        } #foreach stage
+        
+        
+        #  Now HTML
+        #
+        #diag("processing: $test_fn stage: HTML render");
+        my ($data_dn, $data_fn)=(File::Spec->splitpath($test_cn))[1,2];
+        $data_fn=join('-', grep {$_} $ENV{'WEBDYNE_TEST_FILE_PREFIX'},  $data_fn);
+
+        my $data_cn=File::Spec->catfile($data_dn, $data_freeze_dn, $data_fn);
+        $data_cn=~s/\.psp$/\.html/;
+
+
+        my $html_live_sr=&render($test_cn) ||
+            return err();
+        #diag("render: *${$html_live_sr}*");
+
+        (-f $data_cn) || do {
+            diag("skipping $test_fn, no data file - run maketest.pl");
+            next;
+        };
+        my $html_thaw_fh=IO::File->new($data_cn, O_RDONLY) ||
+            return err("unable to open $data_cn, $!");
+        local $/;
+        my $html_thaw=<$html_thaw_fh>;
+        $html_thaw_fh->close();
+
+        if (${$html_live_sr} eq $html_thaw) {
+            pass("$test_fn pass on stage: HTML render");
         }
         else {
-            pass("render $test_fn");
+            fail(diag("$test_fn fail on stage: HTML render"));
+            eval { require Text::Diff } || do {
+                diag('unable to load Text::Diff module to show comparison');
+                next;
+            };
+            my $diff=Text::Diff::diff(
+                \Dumper(${$html_live_sr}),
+                \Dumper($html_thaw),
+                { STYLE => 'Unified' }
+            );
+            diag("diff: $diff");
+            diag(sprintf('%s:%s', Dumper($html_live_sr, \$html_thaw)));
         }
-    };
+        }
+
+        #ok(${$html_sr} eq $html, "$test_fn pass on stage: render");
+        ##die ${$html_sr};
 
 
-    #  Clean up
+    }
+    
+
+
+    #  Done
     #
-    $tree_fh->close();
-    $dump_fh->close();
-    unlink($temp_fn, $tree_fn);
+    return \undef
+    
 }
+
+
+sub render {
+
+
+    #  Where is our source and dest
+    #
+    my $srce_fn=shift();
+
+
+    #  Get scalar we can select to
+    #
+    my $html;
+    my $html_fh=IO::String->new($html);
+
+
+    #  Render to dest file
+    #
+    my $r=WebDyne::Request::Fake->new( 
+        filename	=> $srce_fn, 
+        select		=> $html_fh,
+        noheader	=> 1 
+    );
+    defined(WebDyne->handler($r)) ||
+        return err('render error');
+    $r->DESTROY();
+    $html_fh->close();
+
+
+    #  Manual cleanup
+    #
+    #diag('render: ok');
+
+
+    #  Done, return success
+    #
+    return \$html;
+
+}
+
 

@@ -265,7 +265,7 @@ div.input-group > p.form-control > label {
 #floating-menu {
   position: fixed;
   bottom: 30px;
-  left: -100px;
+  left: -50px;
   display: block;
   transform: scale(.7);
   cursor: move;

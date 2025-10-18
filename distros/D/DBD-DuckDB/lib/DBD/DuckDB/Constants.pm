@@ -126,7 +126,7 @@ __END__
 DBD::DuckDB::Constants - Constants for DuckDB
 
     use DBI;
-    use DBD::DuckDB::Constants qw(duckdb_types);
+    use DBD::DuckDB::Constants qw(:duckdb_types);
 
 =head1 CONSTANTS
 

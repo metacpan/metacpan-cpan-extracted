@@ -50,10 +50,10 @@ module is loaded.  There are two common ways to satisfy this requirement.
 
         $ sudo ldconfig
 
-## Use [Alien::DuckDB](https://metacpan.org/pod/Alien%3A%3ADuckDB)
+## Use Alien::DuckDB
 
-[Alien::DuckDB](https://metacpan.org/pod/Alien%3A%3ADuckDB) is a CPAN module that automatically downloads,
-builds, and installs the native DuckDB library for the current platform.
+[Alien::DuckDB](https://metacpan.org/pod/Alien%3A%3ADuckDB) is a CPAN module that automatically downloads and
+installs the native DuckDB C library for the current platform.
 
 - Install the Alien module
 
@@ -67,7 +67,7 @@ builds, and installs the native DuckDB library for the current platform.
 
     No environment variables or manual copying of \*.so files are needed;
     when you `use DBD::DuckDB`, the module calls
-    `Alien::DuckDB-`dynamic\_lib> to obtain the correct library path.
+    `Alien::DuckDB->dynamic_lib` to obtain the correct library path.
 
 # THE DBI CLASS
 

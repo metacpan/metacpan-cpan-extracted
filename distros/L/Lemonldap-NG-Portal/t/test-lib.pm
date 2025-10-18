@@ -14,11 +14,11 @@ test-lib.pm - Test framework for LLNG portal
   use Test::More;
   use strict;
   use IO::String;
-  
+
   require 't/test-lib.pm';
-  
+
   my $res;
-  
+
   my $client = LLNG::Manager::Test->new( {
       ini => {
           logLevel => 'error',
@@ -26,7 +26,7 @@ test-lib.pm - Test framework for LLNG portal
       }
     }
   );
-  
+
   ok(
       $res = $client->_post(
           '/',
@@ -38,7 +38,7 @@ test-lib.pm - Test framework for LLNG portal
   count(1);
   expectOK($res);
   my $id = expectCookie($res);
-  
+
   clean_sessions();
   done_testing( count() );
 
@@ -85,10 +85,7 @@ use File::Temp 'tempfile', 'tempdir';
 use File::Copy 'copy';
 our $tmpDir = $LLNG::TMPDIR
   || tempdir( 'tmpSessionXXXXX', DIR => 't/sessions', CLEANUP => 1 );
-mkdir "$tmpDir/lock";
-mkdir "$tmpDir/saml";
-mkdir "$tmpDir/saml/lock";
-copy( "t/lmConf-1.json", "$tmpDir/lmConf-1.json" );
+reset_tmpdir();
 
 =head4 count($inc)
 
@@ -129,6 +126,20 @@ sub main::explain {
     my ( $get, $ref ) = @_;
     $get = Dumper($get) if ( ref $get );
     diag("Expect $ref, get $get\n");
+}
+
+=head4 reset_tmpdir()
+
+Reinitialize temp directory, useful for cleaning state when multiple subtests may interfere with each other
+
+=cut
+
+sub reset_tmpdir {
+    find( sub { unlink if -f }, $tmpDir );
+    mkdir "$tmpDir/lock";
+    mkdir "$tmpDir/saml";
+    mkdir "$tmpDir/saml/lock";
+    copy( "t/lmConf-1.json", "$tmpDir/lmConf-1.json" );
 }
 
 =head4 clean_sessions()
@@ -536,7 +547,8 @@ sub expectReject {
     ok( not($@), ' Content is JSON' )
       or explain( $res->[2]->[0], 'JSON content' );
     if ( defined $code ) {
-        is( $res->{error}, $code, " Error code is $code" );
+        is( $res->{error}, $code, " Error code is $code" )
+          or explain( $res->[0], $code );
     }
     else {
         pass("Error code is $res->{error}");
@@ -881,14 +893,15 @@ unless ( -d $templateDir ) {
 
 our $defaultIni = {
     configStorage => {
-        type    => 'File',
-        dirName => "$tmpDir",
+        confFile => "/dev/null",
+        type     => 'File',
+        dirName  => "$tmpDir",
     },
     localSessionStorage        => 'Cache::FileCache',
     localSessionStorageOptions => {
-        namespace   => 'lemonldap-ng-session',
-        cache_root  => $tmpDir,
-        cache_depth => 0,
+        namespace            => 'lemonldap-ng-session',
+        cache_root           => $tmpDir,
+        cache_depth          => 0,
         allow_cache_for_root => 1,
     },
     logLevel              => 'error',

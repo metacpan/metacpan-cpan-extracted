@@ -1,3 +1,123 @@
+1.15   2025-10-18
+    [Feature]
+    - Implement jq-compatible addition handling so `+` performs numeric sums
+      and string concatenations across filters and value expressions.
+
+    [Tests]
+    - Extend arithmetic coverage to assert array mapping and concatenation
+      queries that rely on addition semantics.
+
+1.14   2025-10-18
+    [Fixes]
+    - Expand jq-style object constructor shorthand (e.g. `{name, age}`) to
+      explicit key/value pairs so map projections emit the expected hashes.
+    - Ensure `map(...)` evaluates its filter against each array element,
+      allowing comparisons like `(.age >= 20)` to yield booleans instead of
+      null.
+
+    [Tests]
+    - Extend the map regression coverage to lock in shorthand object
+      projections and boolean evaluation on each element.
+
+1.13   2025-10-18
+    [Feature]
+    - Promote the release to 1.13 to ship jq-style object constructors so
+      filters like `{ "name": .name }` emit hashes for each pipeline item.
+
+    [Tests]
+    - Include regression coverage for object constructor queries to lock in the
+      new behavior.
+
+1.12   2025-10-18
+    [Feature]
+    - Added jq-compatible array constructors so filters like `[.name, .age]`
+      emit collected values for each input.
+
+    [Tests]
+    - Added regression coverage for array construction, including empty
+      constructors and multi-value element expressions.
+
+1.11   2025-10-18
+    [Feature]
+    - Added jq-compatible `--from-file` (`-f`) option so filters can be read
+      from standalone jq scripts instead of the command line.
+
+    [Tests]
+    - Added CLI regression coverage ensuring queries loaded from files execute
+      successfully and honor `--null-input` constraints.
+
+    [Docs]
+    - Documented the new `--from-file` flag across README and CLI usage text.
+
+1.10   2025-10-18
+    [Feature]
+    - Added jq-style `if ... then ... elif ... else ... end` conditional
+      expressions so queries can branch using familiar jq syntax, including
+      cascading elif clauses and optional fallbacks.
+
+    [Tests]
+    - Added regression coverage for if/elif/else handling, including nested
+      branches and expressions without an else clause.
+
+    [Docs]
+    - Documented conditional expressions across README, module POD, and the CLI
+      help output.
+
+1.09   2025-10-18
+    - Promote the release version to 1.09 after adding jq-compatible
+      foreach folding and test() helper support.
+
+1.08   2025-10-18
+    [Feature]
+    - Added jq-compatible `foreach expr as $var (init; update [; extract])`
+      folding with optional emitters so streaming reductions mirror jq.
+    - Added jq-compatible `--slurp` (`-s`) option to wrap every JSON document
+      from the input stream in a single array before executing filters.
+    - Added jq's `test(pattern[, flags])` helper for regex matching with
+      optional `imxs` modifiers.
+
+    [Tests]
+    - Added regression coverage ensuring foreach accumulates values and
+      supports extract expressions referencing the iteration variable.
+    - Added tests covering regex matches, flag handling, and array mapping via
+      the new test() helper.
+
+    [Docs]
+    - Documented foreach across README, module POD, and CLI helper listings.
+    - Documented test() in README, POD, and CLI help output.
+
+1.06   2025-10-18
+    - Added jq-compatible `--compact-output` (`-c`) flag to emit single-line
+      JSON results from the jq-lite CLI.
+
+1.05   2025-10-18
+    - Added jq-style reduce syntax (`reduce expr as $var (init; update)`) with
+      lexical variable bindings and `. +` arithmetic support.
+
+1.04   2025-10-18
+    [Features]
+    - Added jq-compatible --null-input (-n) option to jq-lite so filters can
+      run against null without providing input data.
+    - Implemented jq's setpath(path; value) helper to create/update nested
+      structures using literal paths or filter-generated path arrays.
+
+    [Refactor]
+    - Refactored JQ::Lite to delegate query parsing and filter execution to
+      dedicated modules, keeping only orchestration logic in the main package.
+    - Introduced JQ::Lite::Parser to normalize query strings before execution,
+      handling trimming and shorthand conversions such as `.[]` into flatten
+      semantics.
+    - Centralized jq-style filter implementations in JQ::Lite::Filters, wiring
+      each command to shared utility routines and standardizing result handling.
+    - Moved shared helper functions into JQ::Lite::Util, consolidating common
+      operations like assignments, traversal, and numeric utilities.
+
+    [Maintenance]
+    - Improved internal structure for clarity, maintainability, and easier
+      extension of jq-compatible features in future releases.
+    - No user-facing behavior changes; this refactor is fully backward
+      compatible.
+
 1.02   2025-10-16
     [Maintenance]
     - Promote the release version to 1.02 to ensure Perl's version parsing
@@ -654,6 +774,10 @@
     - Removed use of eval in _evaluate_condition for better performance and stability.
     - Refactored _traverse for readability and maintainability.
     - Added support for multi-level array traversal (e.g., .users[].friends[].name).
+
+
+
+
 
 
 

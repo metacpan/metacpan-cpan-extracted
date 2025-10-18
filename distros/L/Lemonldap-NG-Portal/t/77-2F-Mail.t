@@ -92,13 +92,13 @@ sub init_login {
     return $res;
 }
 
-my $client = LLNG::Manager::Test->new(
-    {
+my $client = LLNG::Manager::Test->new( {
         ini => {
             logLevel             => 'error',
             mail2fActivation     => 1,
             mail2fCodeRegex      => '\d{4}',
             mail2fResendInterval => 30,
+            mail2fTimeout        => 600,
             authentication       => 'Demo',
             userDB               => 'Same',
         }
@@ -109,23 +109,26 @@ my $client = LLNG::Manager::Test->new(
 # -------------------
 
 subtest 'Login on first try' => sub {
+    Time::Fake->reset;
 
     # Login on first try
     my $res  = init_login($client);
     my $code = expectSentCode($res);
+    Time::Fake->offset('+5m');
     $res = validateCode( $res, $client, $code );
     my $id = expectCookie($res);
     $client->logout($id);
 };
 
 subtest 'Login after several resend' => sub {
+    Time::Fake->reset;
     my $res  = init_login($client);
     my $code = expectSentCode($res);
 
     $res = resendCode( $res, $client );
     expectTooSoon($res);
 
-    Time::Fake->offset("+1m");
+    Time::Fake->offset("+8m");
 
     $res = resendCode( $res, $client );
     my $new_code = expectSentCode($res);
@@ -134,6 +137,23 @@ subtest 'Login after several resend' => sub {
     $res = validateCode( $res, $client, $code );
     my $id = expectCookie($res);
     $client->logout($id);
+};
+
+subtest 'Timeout after several resend' => sub {
+    Time::Fake->reset;
+    my $res  = init_login($client);
+    my $code = expectSentCode($res);
+
+    $res = resendCode( $res, $client );
+    expectTooSoon($res);
+
+    Time::Fake->offset("+8m");
+
+    $res = resendCode( $res, $client );
+
+    Time::Fake->offset("+16m");
+    $res = resendCode( $res, $client );
+    expectPortalError( $res, 82 );
 };
 
 clean_sessions();

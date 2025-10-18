@@ -1,8 +1,22 @@
 var barWidth, bootstrapClasses, displayEntropyBar, displayEntropyBarMsg;
 
-bootstrapClasses = new Map([["Err", "bg-danger"], ["0", "bg-danger"], ["1", "bg-warning"], ["2", "bg-info"], ["3", "bg-primary"], ["4", "bg-success"]]);
+bootstrapClasses = new Map([
+  ["Err", "bg-danger"],
+  ["0", "bg-danger"],
+  ["1", "bg-warning"],
+  ["2", "bg-info"],
+  ["3", "bg-primary"],
+  ["4", "bg-success"]
+]);
 
-barWidth = new Map([["Err", "0"], ["0", "20"], ["1", "40"], ["2", "60"], ["3", "80"], ["4", "100"]]);
+barWidth = new Map([
+  ["Err", "0"],
+  ["0", "20"],
+  ["1", "40"],
+  ["2", "60"],
+  ["3", "80"],
+  ["4", "100"]
+]);
 
 // display entropy bar with correct level
 displayEntropyBar = function(level) {
@@ -90,13 +104,13 @@ $(document).on('checkpassword', function(event, context) {
         error: function(j, status, err) {
           var res;
           if (err) {
-            console.log('checkentropy: frontend error: ', err);
+            console.debug('checkentropy: frontend error: ', err);
           }
           if (j) {
             res = JSON.parse(j.responseText);
           }
           if (res && res.error) {
-            return console.log('checkentropy: returned error: ', res);
+            console.debug('checkentropy: returned error: ', res);
           }
         }
       });

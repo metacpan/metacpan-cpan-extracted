@@ -6,7 +6,7 @@ package DBD::DuckDB {
 
     use DBD::DuckDB::FFI qw(duckdb_library_version);
 
-    our $VERSION = '0.13';
+    our $VERSION = '0.14';
     $VERSION =~ tr/_//d;
 
     our $drh;
@@ -24,6 +24,10 @@ package DBD::DuckDB {
 
             DBD::DuckDB::db->install_method('x_duckdb_appender');
             DBD::DuckDB::db->install_method('x_duckdb_version');
+
+            DBD::DuckDB::db->install_method('x_duckdb_read_csv');
+            DBD::DuckDB::db->install_method('x_duckdb_read_json');
+            DBD::DuckDB::db->install_method('x_duckdb_read_xlsx');
 
             $methods_are_installed++;
 
@@ -152,6 +156,144 @@ package    # hide from PAUSE
         $schema //= 'main';
 
         return DBD::DuckDB::Appender->new(schema => $schema, table => $table, dbh => $dbh);
+
+    }
+
+    sub x_duckdb_read_json {
+
+        my ($dbh, $file, $params) = @_;
+
+        # read_json(VARCHAR,
+        #     convert_strings_to_integers : BOOLEAN,
+        #     maximum_sample_files : BIGINT,
+        #     timestamp_format : VARCHAR,
+        #     field_appearance_threshold : DOUBLE,
+        #     timestampformat : VARCHAR,
+        #     map_inference_threshold : BIGINT,
+        #     date_format : VARCHAR,
+        #     filename : ANY,
+        #     union_by_name : BOOLEAN,
+        #     compression : VARCHAR,
+        #     maximum_depth : BIGINT,
+        #     columns : ANY,
+        #     sample_size : BIGINT,
+        #     hive_types : ANY,
+        #     hive_types_autocast : BOOLEAN,
+        #     maximum_object_size : UINTEGER,
+        #     format : VARCHAR,
+        #     ignore_errors : BOOLEAN,
+        #     hive_partitioning : BOOLEAN,
+        #     auto_detect : BOOLEAN,
+        #     records : VARCHAR,
+        #     dateformat : VARCHAR
+        # )
+
+        my @placeholders = map {"$_ = ?"} sort keys %$params;
+        my @bind         = map { $params->{$_} } sort keys %$params;
+
+        unshift @bind,         $file;
+        unshift @placeholders, '?';
+
+        my $sql = sprintf 'SELECT * FROM read_json(%s)', join(', ', @placeholders);
+
+        my $sth = $dbh->prepare($sql) or return;
+        $sth->execute(@bind)          or return;
+        return $sth;
+
+    }
+
+    sub x_duckdb_read_csv {
+
+        my ($dbh, $file, $params) = @_;
+
+        # read_csv(VARCHAR
+        #     thousands : VARCHAR
+        #     strict_mode : BOOLEAN
+        #     dtypes : ANY
+        #     column_types : ANY
+        #     null_padding : BOOLEAN
+        #     column_names : VARCHAR[]
+        #     buffer_size : UBIGINT
+        #     parallel : BOOLEAN
+        #     force_not_null : VARCHAR[]
+        #     hive_types : ANY
+        #     new_line : VARCHAR
+        #     files_to_sniff : BIGINT
+        #     dateformat : VARCHAR
+        #     delim : VARCHAR
+        #     sep : VARCHAR
+        #     decimal_separator : VARCHAR
+        #     nullstr : ANY
+        #     escape : VARCHAR
+        #     compression : VARCHAR
+        #     encoding : VARCHAR
+        #     hive_types_autocast : BOOLEAN
+        #     all_varchar : BOOLEAN
+        #     columns : ANY
+        #     hive_partitioning : BOOLEAN
+        #     auto_detect : BOOLEAN
+        #     comment : VARCHAR
+        #     quote : VARCHAR
+        #     max_line_size : VARCHAR
+        #     store_rejects : BOOLEAN
+        #     union_by_name : BOOLEAN
+        #     header : BOOLEAN
+        #     types : ANY
+        #     skip : BIGINT
+        #     filename : ANY
+        #     sample_size : BIGINT
+        #     timestampformat : VARCHAR
+        #     normalize_names : BOOLEAN
+        #     ignore_errors : BOOLEAN
+        #     names : VARCHAR[]
+        #     allow_quoted_nulls : BOOLEAN
+        #     maximum_line_size : VARCHAR
+        #     rejects_table : VARCHAR
+        #     auto_type_candidates : ANY
+        #     rejects_scan : VARCHAR
+        #     rejects_limit : BIGINT
+        # )
+
+        my @placeholders = map {"$_ = ?"} sort keys %$params;
+        my @bind         = map { $params->{$_} } sort keys %$params;
+
+        unshift @bind,         $file;
+        unshift @placeholders, '?';
+
+        my $sql = sprintf 'SELECT * FROM read_csv(%s)', join(', ', @placeholders);
+
+        my $sth = $dbh->prepare($sql) or return;
+        $sth->execute(@bind)          or return;
+        return $sth;
+
+    }
+
+    sub x_duckdb_read_xlsx {
+
+        my ($dbh, $file, $params) = @_;
+
+        # read_xlsx(VARCHAR
+        #     normalize_names : BOOLEAN
+        #     empty_as_varchar : BOOLEAN
+        #     stop_at_empty : BOOLEAN
+        #     sheet : VARCHAR
+        #     range : VARCHAR
+        #     ignore_errors : BOOLEAN
+        #     all_varchar : BOOLEAN
+        #     header : BOOLEAN
+        # )
+
+        my @placeholders = map {"$_ = ?"} sort keys %$params;
+        my @bind         = map { $params->{$_} } sort keys %$params;
+
+        unshift @bind,         $file;
+        unshift @placeholders, '?';
+
+        my $sql = sprintf 'SELECT * FROM read_xlsx(%s)', join(', ', @placeholders);
+
+        my $sth = $dbh->prepare($sql) or return;
+        $sth->execute(@bind)          or return;
+        return $sth;
 
     }
 
@@ -697,33 +839,28 @@ package    # hide from PAUSE
         my $vector_data = duckdb_vector_get_data($vector);
         my $type_id     = duckdb_get_type_id($logical_type);
 
-        return _vector_u8($vector_data, $row_idx) ? \1 : \0 if ($type_id == DUCKDB_TYPE_BOOLEAN);
-        return _vector_i8($vector_data, $row_idx)           if ($type_id == DUCKDB_TYPE_TINYINT);
-        return _vector_i16($vector_data, $row_idx)          if ($type_id == DUCKDB_TYPE_SMALLINT);
-        return _vector_i32($vector_data, $row_idx)          if ($type_id == DUCKDB_TYPE_INTEGER);
-        return _vector_i64($vector_data, $row_idx)          if ($type_id == DUCKDB_TYPE_BIGINT);
-        return _vector_u8($vector_data, $row_idx)           if ($type_id == DUCKDB_TYPE_UTINYINT);
-        return _vector_u16($vector_data, $row_idx)          if ($type_id == DUCKDB_TYPE_USMALLINT);
-        return _vector_u32($vector_data, $row_idx)          if ($type_id == DUCKDB_TYPE_UINTEGER);
-        return _vector_u64($vector_data, $row_idx)          if ($type_id == DUCKDB_TYPE_UBIGINT);
-        return _vector_f32($vector_data, $row_idx)          if ($type_id == DUCKDB_TYPE_FLOAT);
-        return _vector_f64($vector_data, $row_idx)          if ($type_id == DUCKDB_TYPE_DOUBLE);
-
-        return _vector_varchar($vector_data, $row_idx)
-            if ($type_id == DUCKDB_TYPE_VARCHAR || $type_id == DUCKDB_TYPE_BLOB);
-
-        return _vector_date($vector_data, $row_idx) if ($type_id == DUCKDB_TYPE_DATE);
-
-        return _vector_timestamp($vector_data, $row_idx, $type_id)
-            if ($type_id == DUCKDB_TYPE_TIMESTAMP || $type_id == DUCKDB_TYPE_TIMESTAMP_TZ);
-
-        return _vector_array($logical_type, $vector, $row_idx)
-            if ($type_id == DUCKDB_TYPE_ARRAY || $type_id == DUCKDB_TYPE_LIST);
-
-        return _vector_struct($logical_type, $vector, $row_idx) if ($type_id == DUCKDB_TYPE_STRUCT);
-        return _vector_union($logical_type, $vector, $row_idx)  if ($type_id == DUCKDB_TYPE_UNION);
-
-        # TODO DUCKDB_TYPE_MAP
+        return _vector_array($logical_type, $vector, $row_idx)              if ($type_id == DUCKDB_TYPE_ARRAY);
+        return _vector_date($vector_data, $row_idx)                         if ($type_id == DUCKDB_TYPE_DATE);
+        return _vector_decimal($logical_type, $vector_data, $row_idx)       if ($type_id == DUCKDB_TYPE_DECIMAL);
+        return _vector_f32($vector_data, $row_idx)                          if ($type_id == DUCKDB_TYPE_FLOAT);
+        return _vector_f64($vector_data, $row_idx)                          if ($type_id == DUCKDB_TYPE_DOUBLE);
+        return _vector_i16($vector_data, $row_idx)                          if ($type_id == DUCKDB_TYPE_SMALLINT);
+        return _vector_i32($vector_data, $row_idx)                          if ($type_id == DUCKDB_TYPE_INTEGER);
+        return _vector_i64($vector_data, $row_idx)                          if ($type_id == DUCKDB_TYPE_BIGINT);
+        return _vector_i8($vector_data, $row_idx)                           if ($type_id == DUCKDB_TYPE_TINYINT);
+        return _vector_list($logical_type, $vector, $vector_data, $row_idx) if ($type_id == DUCKDB_TYPE_LIST);
+        return _vector_map($logical_type, $vector, $vector_data, $row_idx)  if ($type_id == DUCKDB_TYPE_MAP);
+        return _vector_struct($logical_type, $vector, $row_idx)             if ($type_id == DUCKDB_TYPE_STRUCT);
+        return _vector_timestamp($vector_data, $row_idx, 0)                 if ($type_id == DUCKDB_TYPE_TIMESTAMP);
+        return _vector_timestamp($vector_data, $row_idx, 1)                 if ($type_id == DUCKDB_TYPE_TIMESTAMP_TZ);
+        return _vector_u16($vector_data, $row_idx)                          if ($type_id == DUCKDB_TYPE_USMALLINT);
+        return _vector_u32($vector_data, $row_idx)                          if ($type_id == DUCKDB_TYPE_UINTEGER);
+        return _vector_u64($vector_data, $row_idx)                          if ($type_id == DUCKDB_TYPE_UBIGINT);
+        return _vector_u8($vector_data, $row_idx)                           if ($type_id == DUCKDB_TYPE_UTINYINT);
+        return _vector_u8($vector_data, $row_idx) ? !!1 : !!0               if ($type_id == DUCKDB_TYPE_BOOLEAN);
+        return _vector_union($logical_type, $vector, $row_idx)              if ($type_id == DUCKDB_TYPE_UNION);
+        return _vector_varchar($vector_data, $row_idx)                      if ($type_id == DUCKDB_TYPE_BLOB);
+        return _vector_varchar($vector_data, $row_idx)                      if ($type_id == DUCKDB_TYPE_VARCHAR);
 
         Carp::carp "Unknown type ($type_id)";
         return undef;
@@ -771,19 +908,22 @@ package    # hide from PAUSE
     }
 
     sub _vector_date {
+
         my ($vector_data, $row_idx) = @_;
 
+        # Decode duckdb_date struct
         my $days  = _vector_i32($vector_data, $row_idx);
         my $epoch = 0 + 86400 * $days;
 
         my $t = Time::Piece->new($epoch);
         return $t->date;
+
     }
 
     sub _vector_timestamp {
-        my ($vector_data, $row_idx, $type_id) = @_;
+        my ($vector_data, $row_idx, $tz) = @_;
         my $epoch = int(_vector_i64($vector_data, $row_idx) / 1_000_000);
-        return ($type_id == DUCKDB_TYPE_TIMESTAMP_TZ) ? localtime($epoch)->datetime : gmtime($epoch)->datetime;
+        return ($tz == 1) ? localtime($epoch)->datetime : gmtime($epoch)->datetime;
     }
 
     sub _vector_array {
@@ -796,6 +936,31 @@ package    # hide from PAUSE
 
         my $begin = $row_idx * $size;
         my $end   = $begin + $size;
+
+        my @out = ();
+
+        for (my $i = $begin; $i < $end; $i++) {
+            push @out, _fetch_vector_value($child_vector, $i, $child_logical_type);
+        }
+
+        duckdb_destroy_logical_type(\$child_logical_type);
+
+        return \@out;
+
+    }
+
+    sub _vector_list {
+
+        my ($logical_type, $vector, $vector_data, $row_idx) = @_;
+
+        my $child_logical_type = duckdb_list_type_child_type($logical_type);
+        my $child_vector       = duckdb_list_vector_get_child($vector);
+
+        # Decode duckdb_list_entry struct
+        my ($offset, $length) = unpack('Q< Q<', buffer_to_scalar($vector_data + $row_idx * 16, 16));
+
+        my $begin = $offset;
+        my $end   = $offset + $length;
 
         my @out = ();
 
@@ -836,18 +1001,76 @@ package    # hide from PAUSE
 
     sub _vector_union {
 
+        my $struct = _vector_struct(@_);
+
+        return undef unless $struct && ref $struct eq 'HASH';
+
+        for my $key (sort keys %{$struct}) {
+            next if $key eq '';
+
+            return $struct->{$key} if defined $struct->{$key};
+        }
+
+        return undef;
+
+    }
+
+    sub _vector_map {
+
+        my ($logical_type, $vector, $vector_data, $row_idx) = @_;
+
+        my $key_logical_type   = duckdb_map_type_key_type($logical_type);
+        my $value_logical_type = duckdb_map_type_value_type($logical_type);
+
+        # Decode duckdb_list_entry struct
+        my ($offset, $length) = unpack('Q< Q<', buffer_to_scalar($vector_data + $row_idx * 16, 16));
+
+        my $begin = $offset;
+        my $end   = $offset + $length;
+
+        my %out = ();
+
+        my $child        = duckdb_list_vector_get_child($vector);
+        my $key_vector   = duckdb_struct_vector_get_child($child, 0);
+        my $value_vector = duckdb_struct_vector_get_child($child, 1);
+
+        for (my $i = $begin; $i < $end; ++$i) {
+
+            my $key   = _fetch_vector_value($key_vector,   $i, $key_logical_type);
+            my $value = _fetch_vector_value($value_vector, $i, $value_logical_type);
+
+            $out{$key} = $value;
+
+        }
+
+        duckdb_destroy_logical_type(\$key_logical_type);
+        duckdb_destroy_logical_type(\$value_logical_type);
+
+        return \%out;
+
+    }
+
+    sub _vector_decimal {
+
         my ($logical_type, $vector_data, $row_idx) = @_;
 
-        my $type_vector = duckdb_struct_vector_get_child($vector_data, 0);
-        my $data        = duckdb_vector_get_data($type_vector);
-        my $index       = int(_vector_u8($data, $row_idx));
+        my $width = duckdb_decimal_width($logical_type);
+        my $scale = duckdb_decimal_scale($logical_type);
+        my $type  = duckdb_decimal_internal_type($logical_type);
+        my $value = undef;
 
-        my $child_logical_type = duckdb_union_type_member_type($logical_type, $index);
-        my $vector_value       = duckdb_struct_vector_get_child($vector_data, $index + 1);
-        my $value              = _fetch_vector_value($vector_value, $row_idx, $child_logical_type);
+        $value = _vector_i32($vector_data, $row_idx) if ($type == DUCKDB_TYPE_INTEGER);
+        $value = _vector_i16($vector_data, $row_idx) if ($type == DUCKDB_TYPE_SMALLINT);
+        $value = _vector_i64($vector_data, $row_idx) if ($type == DUCKDB_TYPE_BIGINT);
 
-        duckdb_destroy_logical_type(\$child_logical_type);
-        return $value;
+        # TODO Add other numeric types
+
+        if ($value) {
+            return sprintf("%.${scale}f", $value / (10**$scale));
+        }
+
+        Carp::carp "Unknown decimal internal type ($type)";
+        return undef;
 
     }
 
@@ -864,8 +1087,6 @@ package    # hide from PAUSE
         }
 
         my @row = ();
-
-        use Data::Dumper;
 
         if (!defined $sth->{duckdb_chunk}) {
 
@@ -899,7 +1120,7 @@ package    # hide from PAUSE
         if ($sth->{duckdb_chunk_row} >= $sth->{duckdb_chunk_size}) {
             my $tmp = $sth->{chunk};
             duckdb_destroy_data_chunk(\$tmp);
-            $sth->{chunk} = undef;
+            $sth->{duckdb_chunk} = undef;
         }
 
         map {s/\s+$//} @row if $sth->FETCH('ChopBlanks');
@@ -996,10 +1217,10 @@ or add the directory to C</etc/ld.so.conf> and run:
 
 =back
 
-=head2 Use L<Alien::DuckDB>
+=head2 Use Alien::DuckDB
 
-L<Alien::DuckDB> is a CPAN module that automatically downloads,
-builds, and installs the native DuckDB library for the current platform.
+L<Alien::DuckDB> is a CPAN module that automatically downloads and
+installs the native DuckDB C library for the current platform.
 
 =over
 
@@ -1015,7 +1236,7 @@ builds, and installs the native DuckDB library for the current platform.
 
 No environment variables or manual copying of *.so files are needed;
 when you C<use DBD::DuckDB>, the module calls
-C<Alien::DuckDB->dynamic_lib> to obtain the correct library path.
+C<Alien::DuckDB-E<gt>dynamic_lib> to obtain the correct library path.
 
 =back
 
@@ -1336,6 +1557,38 @@ much faster than using prepared statements or individual INSERT INTO statements.
 
 See L<DBD::DuckDB::Appender>.
 
+=head3 B<x_duckdb_read_csv>
+
+    $dbh->x_duckdb_read_csv( $file );
+    $dbh->x_duckdb_read_csv( $file, \%params );
+
+Helper method for C<read_csv> function (L<https://duckdb.org/docs/stable/data/csv/overview>).
+
+    $sth = $dbh->x_duckdb_read_csv('https://duckdb.org/data/flights.csv' => {sep => '|'}) or Carp::croak $dbh->errstr;
+
+    while (my $row = $sth->fetchrow_hashref) {
+        say sprintf '%s --> %s', $row->{OriginCityName}, $row->{DestCityName}; 
+    }
+
+=head3 B<x_duckdb_read_json>
+
+    $dbh->x_duckdb_read_json( $file );
+    $dbh->x_duckdb_read_json( $file, \%params );
+
+Helper method for C<read_json> function (L<https://duckdb.org/docs/stable/data/json/loading_json>).
+
+    $sth = $dbh->x_duckdb_read_json('https://duckdb.org/data/json/todos.json') or Carp::croak $dbh->errstr;
+
+    while (my $row = $sth->fetchrow_hashref) {
+        say sprintf '[%s] %s', ($row->{completed} ? '✓' : ' '), $row->{title};
+    }
+
+=head3 B<x_duckdb_read_xlsx>
+
+    $dbh->x_duckdb_read_xlsx( $file );
+    $dbh->x_duckdb_read_xlsx( $file, \%params );
+
+Helper method for C<read_xlsx> function (L<https://duckdb.org/docs/stable/core_extensions/excel>).
 
 
 =head1 DBI STATEMENT HANDLE OBJECTS

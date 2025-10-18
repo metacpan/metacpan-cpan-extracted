@@ -1,206 +1,133 @@
 use warnings;
 use Test::More;
 use strict;
-use IO::String;
-use LWP::UserAgent;
-use LWP::Protocol::PSGI;
-use MIME::Base64;
+use URI;
+use URI::QueryParam;
 
 BEGIN {
     require 't/test-lib.pm';
     require 't/oidc-lib.pm';
 }
 
-my $debug = 'error';
-my ( $op, $rp, $res );
-
-LWP::Protocol::PSGI->register(
-    sub {
-        my $req = Plack::Request->new(@_);
-        ok( $req->uri =~ m#http://auth.((?:o|r)p).com(.*)#, ' REST request' );
-        my $host = $1;
-        my $url  = $2;
-        my ( $res, $client );
-        count(1);
-        if ( $host eq 'op' ) {
-            pass("  Request from RP to OP,     endpoint $url");
-            $client = $op;
-        }
-        elsif ( $host eq 'rp' ) {
-            pass('  Request from OP to RP');
-            $client = $rp;
-        }
-        else {
-            fail('  Aborting REST request (external)');
-            return [ 500, [], [] ];
-        }
-        if ( $req->method =~ /^post$/i ) {
-            my $s = $req->content;
-            ok(
-                $res = $client->_post(
-                    $url, IO::String->new($s),
-                    length => length($s),
-                    type   => $req->header('Content-Type'),
-                ),
-                '  Execute request'
-            );
-        }
-        else {
-            ok(
-                $res = $client->_get(
-                    $url,
-                    custom => {
-                        HTTP_AUTHORIZATION => $req->header('Authorization'),
-                    }
-                ),
-                '  Execute request'
-            );
-        }
-        ok( $res->[0] == 200, '  Response is 200' );
-        ok( getHeader( $res, 'Content-Type' ) =~ m#^application/json#,
-            '  Content is JSON' )
-          or explain( $res->[1], 'Content-Type => application/json' );
-        count(4);
-        return $res;
-    }
-);
+my $op;
 
 # Initialization
 ok( $op = register( 'op', sub { op() } ), 'OP portal' );
 
-ok( $res = $op->_get('/oauth2/jwks'), 'Get JWKS,     endpoint /oauth2/jwks' );
-expectOK($res);
-my $jwks = $res->[2]->[0];
+sub test {
+    my ( $params, $expected_error, $description ) = @_;
+    subtest $description => sub {
 
-ok(
-    $res = $op->_get('/.well-known/openid-configuration'),
-    'Get metadata, endpoint /.well-known/openid-configuration'
-);
-expectOK($res);
-my $metadata = $res->[2]->[0];
-count(3);
+        my $redirect = $params->{post_logout_redirect_uri};
+        my $res;
 
-&Lemonldap::NG::Handler::Main::cfgNum( 0, 0 );
-ok( $rp = register( 'rp', sub { rp( $jwks, $metadata ) } ), 'RP portal' );
-count(1);
+        ok(
+            $res = $op->_post(
+                "/",
+                {
+                    user     => "french",
+                    password => "french",
+                },
+                accept => 'text/html',
+            ),
+            "Post authentication",
+        );
+        my $idpId = expectCookie($res);
 
-# Query RP for auth
-ok( $res = $rp->_get( '/', accept => 'text/html' ), 'Unauth SP request' );
-count(1);
-my ( $url, $query ) =
-  expectRedirection( $res, qr#http://auth.op.com(/oauth2/authorize)\?(.*)$# );
+        # Automatically set id_token_hint to an actual ID token
+        if ( $params->{id_token_hint} ) {
+            ok(
+                $res = $op->_get(
+                    "/oauth2/authorize",
+                    query => {
+                        client_id    => "rpid",
+                        redirect_uri =>
+                          "http://auth.rp.com/?openidconnectcallback=1",
+                        response_type => "id_token",
+                        nonce         => 123,
+                        scope         => "openid",
+                    },
+                    cookie => "lemonldap=$idpId",
+                    accept => 'text/html',
+                ),
+                "Try to obtain ID token",
+            );
 
-# Push request to OP
-ok( $res = $op->_get( $url, query => $query, accept => 'text/html' ),
-    "Push request to OP,         endpoint $url" );
-count(1);
-expectOK($res);
+            my ($redir) = expectRedirection( $res,
+                qr,(http://auth.rp.com/\?openidconnectcallback=1.*), );
+            my $uri = URI->new($redir);
+            $uri->query( $uri->fragment );
+            ok( my $id_token = $uri->query_param('id_token'),
+                "Found ID token" );
+            $params->{id_token_hint} = $id_token;
+        }
 
-# Try to authenticate to IdP
-$query = "user=french&password=french&$query";
-ok(
-    $res = $op->_post(
-        $url,
-        IO::String->new($query),
-        accept => 'text/html',
-        length => length($query),
-    ),
-    "Post authentication,        endpoint $url"
-);
-count(1);
-my $idpId = expectCookie($res);
-my ( $host, $tmp );
-( $host, $tmp, $query ) = expectForm( $res, '#', undef, 'confirm' );
+        $res = $op->_get(
+            '/oauth2/logout',
+            accept => 'text/html',
+            cookie => "lemonldap=$idpId",
+            query  => {
+                state => 123,
+                %$params,
+            }
 
-ok(
-    $res = $op->_post(
-        $url,
-        IO::String->new($query),
-        accept => 'text/html',
-        cookie => "lemonldap=$idpId",
-        length => length($query),
-    ),
-    "Post confirmation,          endpoint $url"
-);
-count(1);
+        );
+        if ($expected_error) {
+            expectPortalError( $res, $expected_error );
+        }
+        else {
+            expectRedirection( $res, "$redirect?state=123" );
+        }
+    };
+}
 
-($query) = expectRedirection( $res, qr#^http://auth.rp.com/?\?(.*)$# );
-
-# Push OP response to RP
-
-ok( $res = $rp->_get( '/', query => $query, accept => 'text/html' ),
-    'Call openidconnectcallback on RP' );
-count(1);
-my $spId = expectCookie($res);
-
-ok(
-    $res = $op->_get( '/oauth2/checksession.html', accept => 'text.html' ),
-    'Check session,      endpoint /oauth2/checksession.html'
-);
-count(1);
-expectOK($res);
-ok( getHeader( $res, 'Content-Security-Policy' ) !~ /frame-ancestors/,
-    ' Frame can be embedded' )
-  or explain( $res->[1],
-    'Content-Security-Policy does not contain a frame-ancestors' );
-count(1);
-
-# Verify UTF-8
-ok( getSession($spId)->data->{cn} eq 'Frédéric Accents', 'UTF-8 values' )
-  or explain( $res, 'cn => Frédéric Accents' );
-count(1);
-
-# Logout initiated by RP
-ok(
-    $res = $rp->_get(
-        '/',
-        query  => 'logout',
-        cookie => "lemonldap=$spId",
-        accept => 'text/html'
-    ),
-    'Query RP for logout'
-);
-( $url, $query ) = expectRedirection( $res,
-    qr#http://auth.op.com(/oauth2/logout)\?(post_logout_redirect_uri=.+)$# );
-count(1);
-
-like( $query, qr/client_id=rpid/, "Found client ID in logout request" );
-count(1);
-
-# Push logout to OP
-
-ok(
-    $res = $op->_get(
-        $url,
-        query  => $query,
-        cookie => "lemonldap=$idpId",
-        accept => 'text/html'
-    ),
-    "Push logout request to OP,     endpoint $url"
+test( {
+        post_logout_redirect_uri => "http://unauthorized",
+    },
+    108,
+    "Specifying an unauthorized logout URL stops the logout"
 );
 
-( $host, $tmp, $query ) = expectForm( $res, '#', undef, 'confirm' );
-
-ok(
-    $res = $op->_post(
-        $url, IO::String->new($query),
-        length => length($query),
-        cookie => "lemonldap=$idpId",
-        accept => 'text/html',
-    ),
-    "Confirm logout,                endpoint $url"
+test( {
+        post_logout_redirect_uri => "http://auth.rp2.com/oauth2/rlogoutreturn",
+        client_id                => "rpid",
+    },
+    108,
+    "Redirect URI is allowed for a different RP than specified"
 );
 
-count(2);
-expectPortalError( $res, 108, "Unauthorized URL" );
+test( {
+        post_logout_redirect_uri => "http://auth.rp2.com/oauth2/rlogoutreturn",
+        id_token_hint            => "xxx",
+    },
+    108,
+    "Redirect URI is allowed for a different RP than specified"
+);
+
+test( {
+        post_logout_redirect_uri => "http://auth.rp.com/oauth2/rlogoutreturn",
+        id_token_hint            => "xxx",
+        client_id                => "rpid2",
+    },
+    24,
+    "Mismatch between id_token_hint and client_id"
+);
+
+test( {
+        post_logout_redirect_uri => "http://auth.rp2.com/oauth2/rlogoutreturn",
+        id_token_hint            => "xxx",
+        client_id                => "rpid2",
+    },
+    24,
+    "Mismatch between id_token_hint and client_id"
+);
 
 clean_sessions();
-done_testing( count() );
+done_testing();
 
 sub op {
     return LLNG::Manager::Test->new( {
             ini => {
-                logLevel                        => $debug,
                 domain                          => 'idp.com',
                 portal                          => 'http://auth.op.com/',
                 authentication                  => 'Demo',
@@ -222,6 +149,22 @@ sub op {
                         oidcRPMetaDataOptionsIDTokenExpiration => 3600,
                         oidcRPMetaDataOptionsClientID          => "rpid",
                         oidcRPMetaDataOptionsIDTokenSignAlg    => "HS512",
+                        oidcRPMetaDataOptionsBypassConsent     => 1,
+                        oidcRPMetaDataOptionsClientSecret      => "rpsecret",
+                        oidcRPMetaDataOptionsUserIDAttr        => "",
+                        oidcRPMetaDataOptionsAccessTokenExpiration  => 3600,
+                        oidcRPMetaDataOptionsLogoutSessionRequired  => 0,
+                        oidcRPMetaDataOptionsLogoutBypassConfirm    => 0,
+                        oidcRPMetaDataOptionsPostLogoutRedirectUris =>
+                          "http://auth.rp.com/oauth2/rlogoutreturn",
+                        oidcRPMetaDataOptionsRedirectUris =>
+                          'http://auth.rp.com/?openidconnectcallback=1',
+                    },
+                    rp2 => {
+                        oidcRPMetaDataOptionsDisplayName       => "RP",
+                        oidcRPMetaDataOptionsIDTokenExpiration => 3600,
+                        oidcRPMetaDataOptionsClientID          => "rpid2",
+                        oidcRPMetaDataOptionsIDTokenSignAlg    => "HS512",
                         oidcRPMetaDataOptionsBypassConsent     => 0,
                         oidcRPMetaDataOptionsClientSecret      => "rpsecret",
                         oidcRPMetaDataOptionsUserIDAttr        => "",
@@ -229,9 +172,9 @@ sub op {
                         oidcRPMetaDataOptionsLogoutSessionRequired  => 0,
                         oidcRPMetaDataOptionsLogoutBypassConfirm    => 0,
                         oidcRPMetaDataOptionsPostLogoutRedirectUris =>
-                          "http://auth.rpother.com/?logout=1",
+                          "http://auth.rp2.com/oauth2/rlogoutreturn",
                         oidcRPMetaDataOptionsRedirectUris =>
-                          'http://auth.rp.com/?openidconnectcallback=1',
+                          'http://auth.rp2.com/?openidconnectcallback=1',
                     }
                 },
                 oidcOPMetaDataOptions           => {},
@@ -246,48 +189,6 @@ sub op {
                 },
                 oidcServicePrivateKeySig => oidc_key_op_private_sig,
                 oidcServicePublicKeySig  => oidc_cert_op_public_sig,
-            }
-        }
-    );
-}
-
-sub rp {
-    my ( $jwks, $metadata ) = @_;
-    return LLNG::Manager::Test->new( {
-            ini => {
-                logLevel                   => $debug,
-                domain                     => 'rp.com',
-                portal                     => 'http://auth.rp.com/',
-                authentication             => 'OpenIDConnect',
-                userDB                     => 'Same',
-                restSessionServer          => 1,
-                oidcOPMetaDataExportedVars => {
-                    op => {
-                        cn   => "name",
-                        uid  => "sub",
-                        sn   => "family_name",
-                        mail => "email"
-                    }
-                },
-                oidcOPMetaDataOptions => {
-                    op => {
-                        oidcOPMetaDataOptionsCheckJWTSignature => 1,
-                        oidcOPMetaDataOptionsJWKSTimeout       => 0,
-                        oidcOPMetaDataOptionsClientSecret      => "rpsecret",
-                        oidcOPMetaDataOptionsScope        => "openid profile",
-                        oidcOPMetaDataOptionsStoreIDToken => 0,
-                        oidcOPMetaDataOptionsDisplay      => "",
-                        oidcOPMetaDataOptionsClientID     => "rpid",
-                        oidcOPMetaDataOptionsConfigurationURI =>
-                          "https://auth.op.com/.well-known/openid-configuration"
-                    }
-                },
-                oidcOPMetaDataJWKS => {
-                    op => $jwks,
-                },
-                oidcOPMetaDataJSON => {
-                    op => $metadata,
-                }
             }
         }
     );

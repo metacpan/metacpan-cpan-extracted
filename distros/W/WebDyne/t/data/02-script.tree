@@ -1,0 +1,6 @@
+<html> @0 (IMPLICIT)
+  <head> @0.0 (IMPLICIT)
+    <script> @0.0.0
+      "document.write("Hello World");document.write("</perl>"); // check..."
+    <script src="script.js"> @0.0.1
+  <body> @0.1 (IMPLICIT)

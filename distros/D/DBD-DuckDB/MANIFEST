@@ -1,4 +1,5 @@
 Changes
+examples/cpan-packages.pl
 INSTALL.md
 lib/DBD/DuckDB.pm
 lib/DBD/DuckDB/Appender.pm
@@ -7,7 +8,7 @@ lib/DBD/DuckDB/FFI.pm
 lib/DBD/DuckDB/GetInfo.pm
 LICENSE
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
 README.md
 t/00-load.t
 t/01-basic.t
@@ -16,9 +17,11 @@ t/11-appender.t
 t/12-metadata.t
 t/13-transaction.t
 t/14-foreign-key-info.t
-t/20-array.t
-t/21-timestamp.t
-t/22-struct.t
+t/99-array.t
+t/99-map.t
+t/99-struct.t
+t/99-timestamp.t
+t/99-union.t
 t/kwalitee.t
 t/lib/DuckDBTest.pm
 t/manifest.t

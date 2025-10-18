@@ -71,6 +71,9 @@ our @EXPORT_OK = qw(
     duckdb_connect
     duckdb_data_chunk_get_size
     duckdb_data_chunk_get_vector
+    duckdb_decimal_internal_type
+    duckdb_decimal_scale
+    duckdb_decimal_width
     duckdb_destroy_data_chunk
     duckdb_destroy_logical_type
     duckdb_destroy_prepare
@@ -81,7 +84,10 @@ our @EXPORT_OK = qw(
     duckdb_free
     duckdb_get_type_id
     duckdb_library_version
+    duckdb_list_type_child_type
     duckdb_list_vector_get_child
+    duckdb_map_type_key_type
+    duckdb_map_type_value_type
     duckdb_open
     duckdb_prepare
     duckdb_prepare_error
@@ -134,22 +140,22 @@ sub init {
     $ffi->type('record(DBD::DuckDB::FFI::uHugeInt)' => 'duckdb_uhugeint');
 
     # Open Connect
-    $ffi->attach(duckdb_connect         => ['duckdb_database', 'duckdb_connection*'] => 'duckdb_state');
-    $ffi->attach(duckdb_open            => ['string', 'duckdb_database*']            => 'duckdb_state');
     $ffi->attach(duckdb_close           => ['duckdb_database*']                      => 'void');
+    $ffi->attach(duckdb_connect         => ['duckdb_database', 'duckdb_connection*'] => 'duckdb_state');
     $ffi->attach(duckdb_disconnect      => ['duckdb_connection*']                    => 'void');
     $ffi->attach(duckdb_library_version => []                                        => 'string');
+    $ffi->attach(duckdb_open            => ['string', 'duckdb_database*']            => 'duckdb_state');
 
     # Query Execution
+    $ffi->attach(duckdb_column_count        => ['duckdb_result*']          => 'idx_t');
+    $ffi->attach(duckdb_column_logical_type => ['duckdb_result*', 'idx_t'] => 'duckdb_logical_type');
+    $ffi->attach(duckdb_column_name         => ['duckdb_result*', 'idx_t'] => 'string');
+    $ffi->attach(duckdb_column_type         => ['duckdb_result*', 'idx_t'] => 'duckdb_type');
+    $ffi->attach(duckdb_destroy_result      => ['duckdb_result*']          => 'void');
     $ffi->attach(duckdb_query               => ['duckdb_connection', 'string', 'duckdb_result*'] => 'duckdb_state');
-    $ffi->attach(duckdb_destroy_result      => ['duckdb_result*']                                => 'void');
     $ffi->attach(duckdb_result_error        => ['duckdb_result*']                                => 'string');
     $ffi->attach(duckdb_row_count           => ['duckdb_result*']                                => 'idx_t');
     $ffi->attach(duckdb_rows_changed        => ['duckdb_result*']                                => 'idx_t');
-    $ffi->attach(duckdb_column_count        => ['duckdb_result*']                                => 'idx_t');
-    $ffi->attach(duckdb_column_name         => ['duckdb_result*', 'idx_t']                       => 'string');
-    $ffi->attach(duckdb_column_type         => ['duckdb_result*', 'idx_t']                       => 'duckdb_type');
-    $ffi->attach(duckdb_column_logical_type => ['duckdb_result*', 'idx_t'] => 'duckdb_logical_type');
 
     # Prepared Statements
     $ffi->attach(duckdb_prepare => ['duckdb_connection', 'string', 'duckdb_prepared_statement*'] => 'duckdb_state');
@@ -195,29 +201,34 @@ sub init {
     $ffi->attach(duckdb_validity_row_is_valid => ['uint64_t', 'idx_t'] => 'bool');
 
     # Logical Type Interface
-    $ffi->attach(duckdb_struct_type_child_type  => ['duckdb_logical_type', 'idx_t'] => 'duckdb_logical_type');
-    $ffi->attach(duckdb_destroy_logical_type    => ['duckdb_logical_type*']         => 'void');
-    $ffi->attach(duckdb_union_type_member_count => ['duckdb_logical_type']          => 'idx_t');
-    $ffi->attach(duckdb_union_type_member_type  => ['duckdb_logical_type', 'idx_t'] => 'duckdb_logical_type');
-    $ffi->attach(duckdb_struct_type_child_name  => ['duckdb_logical_type', 'idx_t'] => 'string');
-    $ffi->attach(duckdb_struct_type_child_count => ['duckdb_logical_type']          => 'idx_t');
     $ffi->attach(duckdb_array_type_array_size   => ['duckdb_logical_type']          => 'idx_t');
     $ffi->attach(duckdb_array_type_child_type   => ['duckdb_logical_type']          => 'duckdb_logical_type');
+    $ffi->attach(duckdb_decimal_internal_type   => ['duckdb_logical_type']          => 'duckdb_type');
+    $ffi->attach(duckdb_decimal_scale           => ['duckdb_logical_type']          => 'uint8_t');
+    $ffi->attach(duckdb_decimal_width           => ['duckdb_logical_type']          => 'uint8_t');
+    $ffi->attach(duckdb_destroy_logical_type    => ['duckdb_logical_type*']         => 'void');
     $ffi->attach(duckdb_get_type_id             => ['duckdb_logical_type']          => 'duckdb_type');
+    $ffi->attach(duckdb_list_type_child_type    => ['duckdb_logical_type', 'idx_t'] => 'duckdb_logical_type');
+    $ffi->attach(duckdb_map_type_key_type       => ['duckdb_logical_type']          => 'duckdb_logical_type');
+    $ffi->attach(duckdb_map_type_value_type     => ['duckdb_logical_type']          => 'duckdb_logical_type');
+    $ffi->attach(duckdb_struct_type_child_count => ['duckdb_logical_type']          => 'idx_t');
+    $ffi->attach(duckdb_struct_type_child_name  => ['duckdb_logical_type', 'idx_t'] => 'string');
+    $ffi->attach(duckdb_struct_type_child_type  => ['duckdb_logical_type', 'idx_t'] => 'duckdb_logical_type');
+    $ffi->attach(duckdb_union_type_member_count => ['duckdb_logical_type']          => 'idx_t');
+    $ffi->attach(duckdb_union_type_member_type  => ['duckdb_logical_type', 'idx_t'] => 'duckdb_logical_type');
 
     # Data Chunk Interface
-    $ffi->attach(duckdb_destroy_data_chunk    => ['duckdb_data_chunk*']         => 'void');
-    $ffi->attach(duckdb_data_chunk_get_vector => ['duckdb_data_chunk', 'idx_t'] => 'opaque');
     $ffi->attach(duckdb_data_chunk_get_size   => ['duckdb_data_chunk']          => 'idx_t');
-
+    $ffi->attach(duckdb_data_chunk_get_vector => ['duckdb_data_chunk', 'idx_t'] => 'opaque');
+    $ffi->attach(duckdb_destroy_data_chunk    => ['duckdb_data_chunk*']         => 'void');
 
     # Vector Interface
-    $ffi->attach(duckdb_vector_get_column_type  => ['duckdb_vector'] => 'duckdb_logical_type');
-    $ffi->attach(duckdb_struct_vector_get_child => ['duckdb_vector'] => 'duckdb_vector');
-    $ffi->attach(duckdb_array_vector_get_child  => ['duckdb_vector'] => 'duckdb_vector');
-    $ffi->attach(duckdb_list_vector_get_child   => ['duckdb_vector'] => 'duckdb_vector');
-    $ffi->attach(duckdb_vector_get_validity     => ['duckdb_vector'] => 'uint64_t');
-    $ffi->attach(duckdb_vector_get_data         => ['duckdb_vector'] => 'opaque');
+    $ffi->attach(duckdb_array_vector_get_child  => ['duckdb_vector']          => 'duckdb_vector');
+    $ffi->attach(duckdb_list_vector_get_child   => ['duckdb_vector']          => 'duckdb_vector');
+    $ffi->attach(duckdb_struct_vector_get_child => ['duckdb_vector', 'idx_t'] => 'duckdb_vector');
+    $ffi->attach(duckdb_vector_get_column_type  => ['duckdb_vector']          => 'duckdb_logical_type');
+    $ffi->attach(duckdb_vector_get_data         => ['duckdb_vector']          => 'opaque');
+    $ffi->attach(duckdb_vector_get_validity     => ['duckdb_vector']          => 'uint64_t');
 
     # Appender
     $ffi->attach(duckdb_append_blob        => ['duckdb_appender', 'opaque', 'idx_t'] => 'duckdb_state');
@@ -383,7 +394,271 @@ DBD::DuckDB::FFI - DuckDB C functions
 
 L<DBD::DuckDB> use L<FFI::Platypus> for access to C<libduckdb> C library.
 
+=head1 FUNCTIONS
 
+=head2 Open Connect
+
+=over
+
+=item duckdb_close
+
+=item duckdb_connect
+
+=item duckdb_disconnect
+
+=item duckdb_library_version
+
+=item duckdb_open
+
+=back
+
+=head2 Query Execution
+
+=over
+
+=item duckdb_column_count
+
+=item duckdb_column_logical_type
+
+=item duckdb_column_name
+
+=item duckdb_column_type
+
+=item duckdb_destroy_result
+
+=item duckdb_query
+
+=item duckdb_result_error
+
+=item duckdb_row_count
+
+=item duckdb_rows_changed
+
+=back
+
+=head2 Prepared Statements
+
+=over
+
+=item duckdb_prepare
+
+=item duckdb_prepare_error
+
+=item duckdb_destroy_prepare
+
+=back
+
+=head2 Bind Values to Prepared Statements
+
+=over
+
+=item duckdb_bind_blob
+
+=item duckdb_bind_boolean
+
+=item duckdb_bind_date
+
+=item duckdb_bind_decimal
+
+=item duckdb_bind_double
+
+=item duckdb_bind_float
+
+=item duckdb_bind_hugeint
+
+=item duckdb_bind_int16
+
+=item duckdb_bind_int32
+
+=item duckdb_bind_int64
+
+=item duckdb_bind_int8
+
+=item duckdb_bind_interval
+
+=item duckdb_bind_null
+
+=item duckdb_bind_time
+
+=item duckdb_bind_timestamp
+
+=item duckdb_bind_timestamp_tz
+
+=item duckdb_bind_uhugeint
+
+=item duckdb_bind_uint16
+
+=item duckdb_bind_uint32
+
+=item duckdb_bind_uint64
+
+=item duckdb_bind_uint8
+
+=item duckdb_bind_value
+
+=item duckdb_bind_varchar
+
+=back
+
+=head2 Execute Prepared Statements
+
+=over
+
+=item duckdb_execute_prepared
+
+=back
+
+=head2 Result Functions
+
+=over
+
+=item duckdb_fetch_chunk
+
+=item duckdb_result_return_type
+
+=back
+
+=head2 Helpers
+
+=over
+
+=item duckdb_free
+
+=back
+
+=head2 Validity Mask Functions
+
+=over
+
+=item duckdb_validity_row_is_valid
+
+=back
+
+=head2 Logical Type Interface
+
+=over
+
+=item duckdb_array_type_array_size
+
+=item duckdb_array_type_child_type
+
+=item duckdb_destroy_logical_type
+
+=item duckdb_get_type_id
+
+=item duckdb_decimal_internal_type
+
+=item duckdb_decimal_scale
+
+=item duckdb_decimal_width
+
+=item duckdb_list_type_child_type
+
+=item duckdb_map_type_key_type
+
+=item duckdb_map_type_value_type
+
+=item duckdb_struct_type_child_count
+
+=item duckdb_struct_type_child_name
+
+=item duckdb_struct_type_child_type
+
+=item duckdb_union_type_member_count
+
+=item duckdb_union_type_member_type
+
+=back
+
+=head2 Data Chunk Interface
+
+=over
+
+=item duckdb_data_chunk_get_size
+
+=item duckdb_data_chunk_get_vector
+
+=item duckdb_destroy_data_chunk
+
+=back
+
+=head2 Vector Interface
+
+=over
+
+=item duckdb_array_vector_get_child
+
+=item duckdb_list_vector_get_child
+
+=item duckdb_struct_vector_get_child
+
+=item duckdb_vector_get_column_type
+
+=item duckdb_vector_get_data
+
+=item duckdb_vector_get_validity
+
+=back
+
+=head2 Appender
+
+=over
+
+=item duckdb_append_blob
+
+=item duckdb_append_bool
+
+=item duckdb_append_date
+
+=item duckdb_append_double
+
+=item duckdb_append_float
+
+=item duckdb_append_hugeint
+
+=item duckdb_append_int16
+
+=item duckdb_append_int32
+
+=item duckdb_append_int64
+
+=item duckdb_append_int8
+
+=item duckdb_append_interval
+
+=item duckdb_append_null
+
+=item duckdb_append_time
+
+=item duckdb_append_timestamp
+
+=item duckdb_append_uhugeint
+
+=item duckdb_append_uint16
+
+=item duckdb_append_uint32
+
+=item duckdb_append_uint64
+
+=item duckdb_append_uint8
+
+=item duckdb_append_varchar
+
+=item duckdb_appender_begin_row
+
+=item duckdb_appender_close
+
+=item duckdb_appender_create
+
+=item duckdb_appender_destroy
+
+=item duckdb_appender_end_row
+
+=item duckdb_appender_error
+
+=item duckdb_appender_flush
+
+=back
 
 =head1 SUPPORT
 

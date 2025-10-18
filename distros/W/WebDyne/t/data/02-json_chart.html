@@ -1,0 +1,17 @@
+<!DOCTYPE html><html lang="en"><head><title>JSON Chart Example</title><meta charset="UTF-8"><script src="https://cdn.jsdelivr.net/npm/chart.js"></script></head>
+<body><p> Sales Data: <script id="chart-data" type="application/json">{"datasets":[{"data":[10,20,15,30,25],"label":"Sales"}],"labels":["Jan","Feb","Mar","Apr","May"]}</script><!--  Canvas for the chart  --><canvas height="200" id="myChart" width="400"></canvas><script>
+  // Get JSON data from script tag
+  const jsonData = JSON.parse(document.getElementById("chart-data").textContent);
+
+  // Draw chart
+  new Chart(document.getElementById("myChart"), {
+    type: "bar", // change to "line" for a line chart
+    data: jsonData,
+    options: {
+      responsive: true,
+      scales: {
+        y: { beginAtZero: true }
+      }
+    }
+  });
+</script></p></body></html>

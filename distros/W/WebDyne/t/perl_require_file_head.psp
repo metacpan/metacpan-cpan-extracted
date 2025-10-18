@@ -1,0 +1,9 @@
+<html lang="en">
+<head><title>Untitled Document</title>
+<perl require="perl_require_file.pm"/>
+</head>
+<body>
+<p>
+<perl handler="hello"/>
+<p>
+<perl handler="goodbye"/>

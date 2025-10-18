@@ -5,7 +5,7 @@
 
 package Lemonldap::NG::Manager::Build::PortalConstants;
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.22.0';
 
 sub portalConstants {
     return {
@@ -121,6 +121,7 @@ sub portalConstants {
         PE_UNPROTECTEDURL                    => 109,
         PE_RETRY_2FA                         => 110,
         PE_PP_PASSWORD_TOO_LONG              => 111,
+        PE_PP_PASSWORD_EXPIRES_SOON          => 112,
     };
 }
 

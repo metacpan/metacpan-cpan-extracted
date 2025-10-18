@@ -15,7 +15,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_TOKENEXPIRED
 );
 
-our $VERSION = '2.21.0';
+our $VERSION = '2.22.0';
 
 extends 'Lemonldap::NG::Portal::Lib::Code2F';
 with 'Lemonldap::NG::Portal::Lib::Okta';
@@ -284,7 +284,7 @@ sub _issueFactor {
         $self->userLogger->error( $self->prefix . ' 2F access without token' );
         eval { $self->setSecurity($req) };
         $req->mustRedirect(1);
-        return $self->p->do( $req, [ sub { PE_NOTOKEN } ] );
+        return $self->p->doPE($req, PE_NOTOKEN);
     }
 
     my $session;
@@ -292,7 +292,7 @@ sub _issueFactor {
         $self->userLogger->info(
             'Invalid token during ' . $self->prefix . '2f choice' );
         $req->noLoginDisplay(1);
-        return $self->p->do( $req, [ sub { PE_TOKENEXPIRED } ] );
+        return $self->p->doPE($req, PE_TOKENEXPIRED);
     }
 
     my $okta_userid     = $session->{__oktaUserId};
@@ -304,7 +304,7 @@ sub _issueFactor {
     unless ($issue_factor_response) {
         eval { $self->setSecurity($req) };
         $req->mustRedirect(1);
-        return $self->p->do( $req, [ sub { PE_ERROR } ] );
+        return $self->p->doPE($req, PE_ERROR);
     }
 
     $self->logger->debug(
@@ -320,7 +320,7 @@ sub _issueFactor {
         my $tmp = $self->sendCodeForm( $req, TOKEN => $token );
         $req->response($tmp);
 
-        return $self->p->do( $req, [ sub { PE_SENDRESPONSE } ] );
+        return $self->p->doPE($req, PE_SENDRESPONSE);
     }
 
     elsif ( $okta_issue->{factorResult} eq "WAITING" ) {
@@ -345,7 +345,7 @@ sub _issueFactor {
 
     eval { $self->setSecurity($req) };
     $req->mustRedirect(1);
-    return $self->p->do( $req, [ sub { PE_ERROR } ] );
+    return $self->p->doPE($req, PE_ERROR);
 }
 
 1;

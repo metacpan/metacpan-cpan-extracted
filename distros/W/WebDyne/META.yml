@@ -1,14 +1,14 @@
 ---
-abstract: 'create web pages with embedded Perl'
+abstract: 'Dynamic Perl web application framework with template     compilation and modular design'
 author:
-  - 'Andrew Speer <andrew@webdyne.org>'
+  - 'Andrew Speer <andrew.speer@isolutions.com.au>'
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
-license: gpl
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -18,20 +18,26 @@ no_index:
     - t
     - inc
 requires:
-  CGI: '0'
+  CGI::Simple: '0'
+  Capture::Tiny: '0'
+  Devel::Confess: '0'
   Digest::MD5: '0'
   Env::Path: '0'
   HTML::Tagset: '0'
+  HTML::Tiny: '0'
   HTML::TreeBuilder: '0'
   HTTP::Status: '0'
+  IO::String: '0'
+  JSON: '0'
   Storable: '0'
   Test::More: '0'
+  Test::Simple: '0.44'
   Text::Template: '0'
   Tie::IxHash: '0'
   perl: '5.006'
 resources:
-  homepage: https://webdyne.org
-  license: http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
-  repository: https://github.com/aspeer/WebDyne.git
-version: '1.250'
+  homepage: https://github.com/aspeer/pm-WebDyne
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/aspeer/pm-WebDyne.git
+version: '2.014'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

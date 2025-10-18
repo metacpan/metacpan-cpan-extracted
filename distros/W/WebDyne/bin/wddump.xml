@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<refentry><refmeta><refentrytitle>wddump</refentrytitle><manvolnum>1</manvolnum></refmeta><refnamediv><refname>wddump</refname><refpurpose>dump the data structure of a WebDyne page in the cache
+    directory</refpurpose></refnamediv><refsynopsisdiv><cmdsynopsis><command>wddump [OPTIONS] FILE</command></cmdsynopsis></refsynopsisdiv><refsection><title>Description</title><para>The <command>wddump</command> command displays internal the data
+    structure of a compiled WebDyne psp file from the WebDyne cache directory.
+    <command>wddump</command> is of limited diagnostic use - the
+    <command>wdcompile</command> tool is more suitable for troubleshooting
+    HTML tree errors.</para><para><command>wddump</command> can be useful to see a picture of the
+    final data structure looks like on complex pages built via many filters,
+    combining static and dynamic blocks etc.</para></refsection><refsection><title>Options</title><para><variablelist><varlistentry><term>-h, --help</term><listitem><para>Show brief help message.</para></listitem></varlistentry></variablelist></para></refsection><refsection><title>Examples</title><para><command>wdrender
+    /var/webdyne/cache/26f2c4edc8bfd52fbde915290db96779</command></para><para>Display the data structure from a compiled, cached webdyne
+    file.</para></refsection><refsection><title>Author</title><para>Written by Andrew Speer, <email>andrew@webdyne.org</email></para></refsection><refsection><title>LICENSE and COPYRIGHT</title><para>This file is part of WebDyne.</para><para>This software is copyright (c) 2025 by Andrew Speer &lt;andrew.speer@isolutions.com.au>.</para><para>This is free software; you can redistribute it and/or modify it underthe same terms as the Perl 5 programming language system itself.</para><para>Full license text is available at:</para><para>&lt;http://dev.perl.org/licenses/></para></refsection></refentry>

@@ -37,7 +37,7 @@
             "FindBin" : "0",
             "JSON::PP" : "0",
             "Test::More" : "0",
-            "perl" : "5.010"
+            "perl" : "5.014"
          }
       }
    },
@@ -52,6 +52,6 @@
          "web" : "https://github.com/kawamurashingo/JQ-Lite"
       }
    },
-   "version" : "1.02",
+   "version" : "1.15",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,0 +1,27 @@
+<html> @0 (IMPLICIT)
+  <head> @0.0 (IMPLICIT)
+  <body> @0.1 (IMPLICIT)
+    <h1> @0.1.0
+      "A Simple Example"
+    <p> @0.1.1
+      "What's your name ? "
+    <p> @0.1.2
+      "What's the combination ? "
+    <p> @0.1.3
+      "What's your favourite color ? "
+      <button> @0.1.3.1
+        "FooBar Gherkin"
+      <hr /> @0.1.3.2
+    <p> @0.1.4
+      "Your name is: "
+      <em> @0.1.4.1
+        "+{name}"
+    <p> @0.1.5
+      "The keywords are: "
+      <em> @0.1.5.1
+        "${words}"
+    <p> @0.1.6
+      "Your favorite color is: "
+      <em> @0.1.6.1
+        "+{color}"
+      "__PERL__sub answers { my $self=shift(); my $cgi_or=$self->CGI(); ..."

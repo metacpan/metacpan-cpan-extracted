@@ -10,7 +10,7 @@ BEGIN {
 
 BEGIN {
 	$Type::Tiny::AUTHORITY  = 'cpan:TOBYINK';
-	$Type::Tiny::VERSION    = '2.008003';
+	$Type::Tiny::VERSION    = '2.008004';
 	$Type::Tiny::XS_VERSION = '0.016';
 }
 
@@ -2621,6 +2621,8 @@ Will throw a L<Error::TypeTiny::WrongNumberOfParameters> exception referencing
 C<< "$lib::\$typename\[]" >> if C<< $args >> is greater than C<< $max >> or
 less than C<< $min >>, if they're defined. If C<< $args >> is an arrayref,
 will use the length of the array.
+
+=back
 
 =head2 Overloading
 

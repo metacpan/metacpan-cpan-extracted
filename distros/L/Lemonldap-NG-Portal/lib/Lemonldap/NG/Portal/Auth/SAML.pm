@@ -25,12 +25,14 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.21.0';
+our $VERSION = '2.22.0';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Auth
   Lemonldap::NG::Portal::Lib::SAML
 );
+
+with 'Lemonldap::NG::Portal::Lib::Key';
 
 # INTERFACE
 
@@ -807,14 +809,11 @@ sub extractFormInfo {
                         [$slo_body]
                     ]
                 );
+                $req->data->{_continueLogout} = 1;
                 $req->steps( [
                         @{ $self->p->beforeLogout },
-                        sub {
-                            my ($req) = @_;
-                            my $res = $self->p->deleteSession($req);
-                            return (
-                                $res eq PE_LOGOUT_OK ? PE_SENDRESPONSE : $res );
-                        }
+                        'deleteSession',
+                        [ returnPE => PE_SENDRESPONSE ]
                     ]
                 );
 

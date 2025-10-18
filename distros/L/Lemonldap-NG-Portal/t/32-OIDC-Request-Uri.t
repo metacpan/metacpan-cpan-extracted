@@ -178,7 +178,7 @@ sub op {
                         oidcRPMetaDataOptionsRedirectUris =>
                           "http://redirect.uri/",
                         oidcRPMetaDataOptionsPostLogoutRedirectUris =>
-                          "http://auth.rp.com/?logout=1"
+                          "http://auth.rp.com/oauth2/rlogoutreturn",
                     }
                 },
                 oidcOPMetaDataOptions           => {},

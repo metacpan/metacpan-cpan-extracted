@@ -24,21 +24,23 @@ llapp.controller('TreeCtrl', [
   '$translator',
   '$cookies',
   '$htmlParams',
+  '$timeout',
   function($scope,
-  $http,
-  $location,
-  $q,
-  $uibModal,
-  $translator,
-  $cookies,
-  $htmlParams) {
+    $http,
+    $location,
+    $q,
+    $uibModal,
+    $translator,
+    $cookies,
+    $htmlParams,
+    $timeout) {
     var _download,
-  _stoggle,
-  c,
-  id,
-  pathEvent,
-  readError,
-  setHelp;
+      _stoggle,
+      c,
+      id,
+      pathEvent,
+      readError,
+      setHelp;
     $scope.links = window.links;
     $scope.menu = $htmlParams.menu;
     $scope.menulinks = window.menulinks;
@@ -50,6 +52,7 @@ llapp.controller('TreeCtrl', [
     $scope.showT = false;
     $scope.form = 'homeViewer';
     $scope.currentCfg = {};
+    $scope.clipboardAvailable = Boolean(navigator.clipboard);
     $scope.viewPrefix = window.viewPrefix;
     $scope.allowDiff = window.allowDiff;
     $scope.message = {};
@@ -57,7 +60,7 @@ llapp.controller('TreeCtrl', [
     // Import translations functions
     $scope.translateTitle = function(node) {
       return $translator.translateField(node,
-  'title');
+        'title');
     };
     $scope.translateP = $translator.translateP;
     $scope.translate = $translator.translate;
@@ -72,10 +75,9 @@ llapp.controller('TreeCtrl', [
       d = new Date(Date.now());
       d.setFullYear(d.getFullYear() + 1);
       return $cookies.put('showhelp',
-  (val ? 'true' : 'false'),
-  {
-        "expires": d
-      });
+        (val ? 'true' : 'false'), {
+          "expires": d
+        });
     };
     $scope.showH = $cookies.get('showhelp') === 'false' ? false : true;
     if ($scope.showH == null) {
@@ -84,7 +86,7 @@ llapp.controller('TreeCtrl', [
     // INTERCEPT AJAX ERRORS
     readError = function(response) {
       var e,
-  j;
+        j;
       e = response.status;
       j = response.statusLine;
       $scope.waiting = false;
@@ -95,7 +97,7 @@ llapp.controller('TreeCtrl', [
           items: []
         };
       } else if (e === 401) {
-        console.log('Authentication needed');
+        console.debug('Authentication needed');
         $scope.message = {
           title: 'authenticationNeeded',
           message: '__waitOrF5__',
@@ -124,9 +126,9 @@ llapp.controller('TreeCtrl', [
     };
     // Modal launcher
     $scope.showModal = function(tpl,
-  init) {
+      init) {
       var d,
-  modalInstance;
+        modalInstance;
       modalInstance = $uibModal.open({
         templateUrl: tpl,
         controller: 'ModalInstanceCtrl',
@@ -139,7 +141,7 @@ llapp.controller('TreeCtrl', [
           },
           set: function() {
             return function(f,
-  s) {
+              s) {
               return $scope[f] = s;
             };
           },
@@ -150,21 +152,21 @@ llapp.controller('TreeCtrl', [
       });
       d = $q.defer();
       modalInstance.result.then(function(msgok) {
-        $scope.message = {
-          title: '',
-          message: '',
-          items: []
-        };
-        return d.resolve(msgok);
-      },
-  function(msgnok) {
-        $scope.message = {
-          title: '',
-          message: '',
-          items: []
-        };
-        return d.reject(msgnok);
-      });
+          $scope.message = {
+            title: '',
+            message: '',
+            items: []
+          };
+          return d.resolve(msgok);
+        },
+        function(msgnok) {
+          $scope.message = {
+            title: '',
+            message: '',
+            items: []
+          };
+          return d.reject(msgnok);
+        });
       return d.promise;
     };
     // FORM DISPLAY FUNCTIONS
@@ -181,13 +183,13 @@ llapp.controller('TreeCtrl', [
         switch (typeof button.action) {
           case 'function':
             button.action($scope.currentNode,
-  $scope);
+              $scope);
             break;
           case 'string':
             $scope[button.action]();
             break;
           default:
-            console.log(typeof button.action);
+            console.warn('Unknown action type', typeof button.action);
         }
       }
       return $scope.showM = false;
@@ -224,13 +226,13 @@ llapp.controller('TreeCtrl', [
     };
     $scope.down = function() {
       var i,
-  ind,
-  l,
-  len,
-  n,
-  p,
-  ref,
-  tmp;
+        ind,
+        l,
+        len,
+        n,
+        p,
+        ref,
+        tmp;
       id = $scope.currentNode.id;
       p = $scope.currentScope.$parentNodeScope.$modelValue;
       ind = p.nodes.length;
@@ -250,13 +252,13 @@ llapp.controller('TreeCtrl', [
     };
     $scope.up = function() {
       var i,
-  ind,
-  l,
-  len,
-  n,
-  p,
-  ref,
-  tmp;
+        ind,
+        l,
+        len,
+        n,
+        p,
+        ref,
+        tmp;
       id = $scope.currentNode.id;
       p = $scope.currentScope.$parentNodeScope.$modelValue;
       ind = -1;
@@ -277,9 +279,9 @@ llapp.controller('TreeCtrl', [
     // test if value is in select
     $scope.inSelect = function(value) {
       var l,
-  len,
-  n,
-  ref;
+        len,
+        n,
+        ref;
       ref = $scope.currentNode.select;
       for (l = 0, len = ref.length; l < len; l++) {
         n = ref[l];
@@ -299,16 +301,16 @@ llapp.controller('TreeCtrl', [
     $scope.filters = {};
     $scope.execFilters = function(scope) {
       var filter,
-  func,
-  ref;
+        func,
+        ref;
       scope = scope ? scope : $scope;
       ref = $scope.filters;
       for (filter in ref) {
         func = ref[filter];
         if ($scope.filters.hasOwnProperty(filter)) {
           return window.filterFunctions[filter](scope,
-  $q,
-  func);
+            $q,
+            func);
         }
       }
       return false;
@@ -322,16 +324,16 @@ llapp.controller('TreeCtrl', [
     };
     _stoggle = function(node) {
       var a,
-  l,
-  len,
-  len1,
-  len2,
-  m,
-  n,
-  o,
-  ref,
-  ref1,
-  ref2;
+        l,
+        len,
+        len1,
+        len2,
+        m,
+        n,
+        o,
+        ref,
+        ref1,
+        ref2;
       ref = ['nodes', 'nodes_cond'];
       for (l = 0, len = ref.length; l < len; l++) {
         n = ref[l];
@@ -370,62 +372,73 @@ llapp.controller('TreeCtrl', [
     };
     _download = function(node) {
       var d,
-  uri;
+        uri;
       d = $q.defer();
       d.notify('Trying to get datas');
       $scope.waiting = true;
-      console.log(`Trying to get key ${node.cnodes}`);
+      console.debug(`Trying to get key ${node.cnodes}`);
       uri = encodeURI(node.cnodes);
       $http.get(`${window.viewPrefix}${$scope.currentCfg.cfgNum}/${uri}`).then(function(response) {
-        var a,
-  data,
-  l,
-  len;
-        data = response.data;
-        // Manage datas errors
-        if (!data) {
-          d.reject('Empty response from server');
-        } else if (data.error) {
-          if (data.error.match(/setDefault$/)) {
-            if (node['default']) {
-              node.nodes = node['default'].slice(0);
+          var a,
+            data,
+            l,
+            len;
+          data = response.data;
+          // Manage datas errors
+          if (!data) {
+            d.reject('Empty response from server');
+          } else if (data.error) {
+            if (data.error.match(/setDefault$/)) {
+              if (node['default']) {
+                node.nodes = node['default'].slice(0);
+              } else {
+                node.nodes = [];
+              }
+              delete node.cnodes;
+              d.resolve('Set data to default value');
             } else {
-              node.nodes = [];
+              d.reject(`Server return an error: ${data.error}`);
             }
-            delete node.cnodes;
-            d.resolve('Set data to default value');
           } else {
-            d.reject(`Server return an error: ${data.error}`);
-          }
-        } else {
-          // Store datas
-          delete node.cnodes;
-          if (!node.type) {
-            node.type = 'keyTextContainer';
-          }
-          node.nodes = [];
-// TODO: try/catch
-          for (l = 0, len = data.length; l < len; l++) {
-            a = data[l];
-            if (a.template) {
-              a._nodes = templates(a.template,
-  a.title);
+            // Store datas
+            delete node.cnodes;
+            if (!node.type) {
+              node.type = 'keyTextContainer';
             }
-            node.nodes.push(a);
+            node.nodes = [];
+            // TODO: try/catch
+            for (l = 0, len = data.length; l < len; l++) {
+              a = data[l];
+              if (a.template) {
+                a._nodes = templates(a.template,
+                  a.title);
+              }
+              node.nodes.push(a);
+            }
+            d.resolve('OK');
           }
-          d.resolve('OK');
-        }
-        return $scope.waiting = false;
-      },
-  function(response) {
-        readError(response);
-        return d.reject('');
-      });
+          return $scope.waiting = false;
+        },
+        function(response) {
+          readError(response);
+          return d.reject('');
+        });
       return d.promise;
     };
     $scope.openCnode = function(scope) {
       return $scope.download(scope).then(function() {
         return scope.toggle();
+      });
+    };
+    $scope.copyPath = function() {
+      var text = $scope.breadCrumb.join(" » ");
+      navigator.clipboard.writeText(text).then(function () {
+        $scope.$apply(function () {
+        $scope.copySuccess = true;
+        $timeout(function() {
+          $scope.copySuccess = false;
+        }, 400);
+        });
       });
     };
     setHelp = function(scope) {
@@ -434,13 +447,39 @@ llapp.controller('TreeCtrl', [
       }
       return $scope.helpUrl = scope.$modelValue.help || 'start.html#configuration';
     };
+    // Form management
+
+    // `currentNode` contains the last select node
+
+    // method `diplayForm()`:
+    //	- set the `form` property to the name of the form to download
+    //		(`text` by default or `home` for node without `type` property)
+    //	- launch getKeys to set `node.data`
+    //	- hide tree when in XS size
+
+    $scope.getTrPath = function(scope) {
+      var path = [];
+      var trpath = [];
+      var current = scope;
+      var safetycount = 0;
+      while (current && current.$modelValue && safetycount < 100) {
+        safetycount = safetycount + 1;
+        if (current.$modelValue.title && current.$modelValue.title != path[0]) {
+          trpath.unshift(scope.translate(current.$modelValue.title));
+          path.unshift(current.$modelValue.title);
+        }
+        current = current.$parent;
+      }
+      return trpath;
+    };
+
     $scope.displayForm = function(scope) {
       var f,
-  l,
-  len,
-  n,
-  node,
-  ref;
+        l,
+        len,
+        n,
+        node,
+        ref;
       node = scope.$modelValue;
       if (node.cnodes) {
         $scope.download(scope);
@@ -466,6 +505,7 @@ llapp.controller('TreeCtrl', [
         }
       }
       $scope.showT = false;
+      $scope.breadCrumb = $scope.getTrPath(scope);
       return setHelp(scope);
     };
     $scope.keyWritable = function(scope) {
@@ -496,13 +536,13 @@ llapp.controller('TreeCtrl', [
 
     $scope.getKey = function(node) {
       var d,
-  i,
-  l,
-  len,
-  n,
-  ref,
-  tmp,
-  uri;
+        i,
+        l,
+        len,
+        n,
+        ref,
+        tmp,
+        uri;
       d = $q.defer();
       if (!node.data) {
         $scope.waiting = true;
@@ -513,60 +553,61 @@ llapp.controller('TreeCtrl', [
           for (i = l = 0, len = ref.length; l < len; i = ++l) {
             n = ref[i];
             node.data[i] = {
-              title: n,
+              title: n.split("/").pop(),
+              get: n,
               id: n
             };
             tmp.push($scope.getKey(node.data[i]));
           }
           $q.all(tmp).then(function() {
-            return d.resolve(node.data);
-          },
-  function(response) {
-            d.reject(response.statusLine);
-            return $scope.waiting = false;
-          });
+              return d.resolve(node.data);
+            },
+            function(response) {
+              d.reject(response.statusLine);
+              return $scope.waiting = false;
+            });
         } else {
           uri = '';
           if (node.get) {
-            console.log(`Trying to get key ${node.get}`);
+            console.debug(`Trying to get key ${node.get}`);
             uri = encodeURI(node.get);
           } else {
-            console.log(`Trying to get title ${node.title}`);
+            console.debug(`Trying to get title ${node.title}`);
           }
           $http.get(`${window.viewPrefix}${$scope.currentCfg.cfgNum}/${node.get ? uri : node.title}`).then(function(response) {
-            var data;
-            // Set default value if response is null or if asked by server
-            data = response.data;
-            if ((data.value === null || (data.error && data.error.match(/setDefault$/))) && node['default'] !== null) {
-              node.data = node['default'];
-            } else {
-              node.data = data.value;
-            }
-            if (node.data && node.data.toString().match(/_Hidden_$/)) {
-              node.type = 'text';
-              node.data = '######';
-            }
-            // Cast int as int (remember that booleans are int for Perl)
-            if (node.type && node.type.match(/^(bool|trool|boolOrExpr)$/)) {
-              if (typeof node.data === 'string' && node.data.match(/^(?:-1|0|1)$/)) {
-                node.data = parseInt(node.data,
-  10);
+              var data;
+              // Set default value if response is null or if asked by server
+              data = response.data;
+              if ((data.value === null || (data.error && data.error.match(/setDefault$/))) && node['default'] !== null) {
+                node.data = node['default'];
+              } else {
+                node.data = data.value;
               }
-            }
-            if (node.type && node.type.match(/^int$/)) {
-              node.data = parseInt(node.data,
-  10);
-            // Split SAML types
-            } else if (node.type && node.type.match(/^(saml(Service|Assertion)|blackWhiteList)$/) && !(typeof node.data === 'object')) {
-              node.data = node.data.split(';');
-            }
-            $scope.waiting = false;
-            return d.resolve(node.data);
-          },
-  function(response) {
-            readError(response);
-            return d.reject(response.status);
-          });
+              if (node.data && node.data.toString().match(/_Hidden_$/)) {
+                node.type = 'text';
+                node.data = '######';
+              }
+              // Cast int as int (remember that booleans are int for Perl)
+              if (node.type && node.type.match(/^(bool|trool|boolOrExpr)$/)) {
+                if (typeof node.data === 'string' && node.data.match(/^(?:-1|0|1)$/)) {
+                  node.data = parseInt(node.data,
+                    10);
+                }
+              }
+              if (node.type && node.type.match(/^int$/)) {
+                node.data = parseInt(node.data,
+                  10);
+                // Split SAML types
+              } else if (node.type && node.type.match(/^(saml(Service|Assertion)|blackWhiteList)$/) && !(typeof node.data === 'object')) {
+                node.data = node.data.split(';');
+              }
+              $scope.waiting = false;
+              return d.resolve(node.data);
+            },
+            function(response) {
+              readError(response);
+              return d.reject(response.status);
+            });
         }
       } else {
         if (node.data.toString().match(/_Hidden_$/)) {
@@ -581,38 +622,38 @@ llapp.controller('TreeCtrl', [
     // Called when $location.path() change, launch getCfg() with the new
     // configuration number
     pathEvent = function(event,
-  next,
-  current) {
+      next,
+      current) {
       var n;
       n = next.match(new RegExp('#!?/view/(latest|[0-9]+)'));
       if (n === null) {
         return $location.path('/view/latest');
       } else {
-        console.log(`Trying to get cfg number ${n[1]}`);
+        console.debug(`Trying to get cfg number ${n[1]}`);
         return $scope.getCfg(n[1]);
       }
     };
     $scope.$on('$locationChangeSuccess',
-  pathEvent);
+      pathEvent);
     // function `getCfg(n)`:
     // Download configuration metadatas
     $scope.getCfg = function(n) {
       if ($scope.currentCfg.cfgNum !== n) {
         return $http.get(`${window.viewPrefix}${n}`).then(function(response) {
-          var d;
-          $scope.currentCfg = response.data;
-          d = new Date($scope.currentCfg.cfgDate * 1000);
-          $scope.currentCfg.date = d.toLocaleString();
-          console.log(`Metadatas of cfg ${n} loaded`);
-          $location.path(`/view/${n}`);
-          return $scope.init();
-        },
-  function(response) {
-          return readError(response).then(function() {
-            $scope.currentCfg.cfgNum = 0;
+            var d;
+            $scope.currentCfg = response.data;
+            d = new Date($scope.currentCfg.cfgDate * 1000);
+            $scope.currentCfg.date = d.toLocaleString();
+            console.debug(`Metadatas of cfg ${n} loaded`);
+            $location.path(`/view/${n}`);
             return $scope.init();
+          },
+          function(response) {
+            return readError(response).then(function() {
+              $scope.currentCfg.cfgNum = 0;
+              return $scope.init();
+            });
           });
-        });
       } else {
         return $scope.waiting = false;
       }
@@ -635,6 +676,7 @@ llapp.controller('TreeCtrl', [
       var tmp;
       tmp = null;
       $scope.waiting = true;
+      $scope.breadCrumb = null;
       $scope.data = [];
       $scope.confirmNeeded = false;
       $scope.forceSave = false;
@@ -642,25 +684,25 @@ llapp.controller('TreeCtrl', [
         $translator.init($scope.lang),
         $http.get(`${window.staticPrefix}struct.json`).then(function(response) {
           tmp = response.data;
-          return console.log("Structure loaded");
+          console.debug("Structure loaded");
         })
       ]).then(function() {
-        console.log("Starting structure binding");
-        $scope.data = tmp;
-        tmp = null;
-        if ($scope.currentCfg.cfgNum !== 0) {
-          setScopeVars($scope);
-        } else {
-          $scope.message = {
-            title: 'emptyConf',
-            message: '__zeroConfExplanations__'
-          };
-          $scope.showModal('message.html');
-        }
-        $scope.form = 'homeViewer';
-        return $scope.waiting = false;
-      },
-  readError);
+          console.debug("Starting structure binding");
+          $scope.data = tmp;
+          tmp = null;
+          if ($scope.currentCfg.cfgNum !== 0) {
+            setScopeVars($scope);
+          } else {
+            $scope.message = {
+              title: 'emptyConf',
+              message: '__zeroConfExplanations__'
+            };
+            $scope.showModal('message.html');
+          }
+          $scope.form = 'homeViewer';
+          return $scope.waiting = false;
+        },
+        readError);
       // Colorized link
       $scope.activeModule = "viewer";
       return $scope.myStyle = {
@@ -669,7 +711,7 @@ llapp.controller('TreeCtrl', [
     };
     c = $location.path().match(new RegExp('^/view/(latest|[0-9]+)'));
     if (!c) {
-      console.log("Redirecting to /view/latest");
+      console.debug("Redirecting to /view/latest");
       return $location.path('/view/latest');
     }
   }

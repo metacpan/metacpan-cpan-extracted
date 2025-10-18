@@ -1,0 +1,4 @@
+<start_html>
+Hello World
+<perl>
+die ('Bang !');

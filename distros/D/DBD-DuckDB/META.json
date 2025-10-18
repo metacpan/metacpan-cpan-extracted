@@ -36,7 +36,6 @@
             "FFI::CheckLib" : "0.30",
             "FFI::Platypus" : "2.00",
             "FFI::Platypus::Record" : "0",
-            "Scalar::Util" : "0",
             "perl" : "5.010"
          }
       },
@@ -50,15 +49,15 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/giterlizzi/perl-DBI-DuckDB/issues"
+         "web" : "https://github.com/giterlizzi/perl-DBD-DuckDB/issues"
       },
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/giterlizzi/perl-DBI-DuckDB",
-         "web" : "https://github.com/giterlizzi/perl-DBI-DuckDB"
+         "url" : "git://github.com/giterlizzi/perl-DBD-DuckDB",
+         "web" : "https://github.com/giterlizzi/perl-DBD-DuckDB"
       }
    },
-   "version" : "0.13",
+   "version" : "0.14",
    "x_purl" : "pkg:cpan/GDT/DBI-DuckDB",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

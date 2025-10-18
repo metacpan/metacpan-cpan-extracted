@@ -512,6 +512,7 @@ $test = "cat - Entity should not be found after clean up";
 checkDeleteNotFound( $test, 'cat', 'mycat1' );
 
 # Clean up generated conf files, except for "lmConf-1.json"
-unlink grep { $_ ne "t/conf/lmConf-1.json" } glob "t/conf/lmConf-*.json";
+unlink grep { $_ ne "$main::tmpdir/conf/lmConf-1.json" }
+  glob "$main::tmpdir/conf/lmConf-*.json";
 
 done_testing();

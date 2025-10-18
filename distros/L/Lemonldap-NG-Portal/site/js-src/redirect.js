@@ -13,7 +13,7 @@ document.onreadystatechange = function() {
         return document.location.href = redirect;
       }
     } else {
-      return console.log('No redirection !');
+      console.error('No redirection !');
     }
   }
 };

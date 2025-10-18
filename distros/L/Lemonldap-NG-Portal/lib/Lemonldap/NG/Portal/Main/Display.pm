@@ -2,7 +2,7 @@
 # Display functions for LemonLDAP::NG Portal
 package Lemonldap::NG::Portal::Main::Display;
 
-our $VERSION = '2.21.0';
+our $VERSION = '2.22.0';
 
 package Lemonldap::NG::Portal::Main;
 use strict;
@@ -400,7 +400,9 @@ sub display {
             and $req->{error} != PE_FIRSTACCESS
             and $req->{error} != PE_BADCREDENTIALS
             and $req->{error} != PE_PP_CHANGE_AFTER_RESET
-            and $req->{error} != PE_PP_PASSWORD_EXPIRED )
+            and $req->{error} != PE_PP_PASSWORD_EXPIRED
+            and $req->{error} != PE_BADOLDPASSWORD
+            and $req->{error} != PE_PP_PASSWORD_EXPIRES_SOON )
       )
     {
         $skinfile       = 'error';
@@ -446,6 +448,7 @@ sub display {
                 ) ? ( STAYCONNECTED => 1 )
                 : ()
             ),
+            BROWSER_ALREADY_TRUSTED => $req->{data}->{browserAlreadyTrusted},
             (
                 $self->rememberAuthChoice->( $req, $req->sessionInfo )
                 ? ( REMEMBERAUTHCHOICE => 1 )
@@ -507,6 +510,7 @@ sub display {
             or $req->{error} == PE_PASSWORD_MISMATCH
             or $req->{error} == PE_BADOLDPASSWORD
             or $req->{error} == PE_PASSWORDFORMEMPTY
+            or $req->{error} == PE_PP_PASSWORD_EXPIRES_SOON
             or (    $req->{error} == PE_PP_PASSWORD_EXPIRED
                 and $self->conf->{ldapAllowResetExpiredPassword} )
           )

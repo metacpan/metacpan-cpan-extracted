@@ -21,7 +21,7 @@ BEGIN {
     require 't/saml-lib.pm';
 }
 
-my $maintests = 17;
+my $maintests = 18;
 my $debug     = 'error';
 
 #my $debug     = 'error';
@@ -228,7 +228,6 @@ SKIP: {
     ( $url, $query ) =
       expectRedirection( $res, qr#^http://auth.op.com(/.*)\?(.*)$# );
 
-
     ok(
         $res = $op->_get(
             $url,
@@ -261,7 +260,6 @@ SKIP: {
     ( $url, $query ) =
       expectRedirection( $res, qr#^http://auth.idp.com(/.*)\?(.*)$# );
 
-
     ok(
         $res = $idp->_get(
             $url,
@@ -279,7 +277,6 @@ SKIP: {
     ( $url, $query ) =
       expectRedirection( $res, qr#^http://auth.op.com(/.*)\?(.*)$# );
 
-
     ok(
         $res = $op->_get(
             $url,
@@ -290,7 +287,17 @@ SKIP: {
         'redirect to OP'
     );
 
-    expectOK($res);
+    expectRedirection( $res, "http://auth.rp.com/oauth2/rlogoutreturn" );
+    ok(
+        $res = $rp->_get(
+            '/oauth2/rlogoutreturn',
+            cookie => "lemonldap=$cookierp",
+            accept => 'text/html',
+        ),
+        'follow post-logout redirection'
+    );
+
+    expectRedirection( $res, "http://auth.rp.com/?logout=1" );
 
 }
 
@@ -299,8 +306,7 @@ clean_sessions();
 done_testing( count() );
 
 sub op {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel                        => $debug,
                 domain                          => 'op.com',
@@ -330,6 +336,10 @@ sub op {
                         oidcRPMetaDataOptionsAccessTokenExpiration => 3600,
                         oidcRPMetaDataOptionsRedirectUris          =>
                           'http://auth.rp.com/?openidconnectcallback=1',
+
+                        oidcRPMetaDataOptionsPostLogoutRedirectUris =>
+                          "http://auth.rp.com/oauth2/rlogoutreturn",
+
                     }
                 },
                 oidcOPMetaDataOptions           => {},
@@ -399,8 +409,7 @@ sub op {
 
 sub rp {
     my ( $jwks, $metadata ) = @_;
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel                   => $debug,
                 domain                     => 'rp.com',
@@ -440,8 +449,7 @@ sub rp {
 }
 
 sub idp {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel               => $debug,
                 domain                 => 'idp.com',

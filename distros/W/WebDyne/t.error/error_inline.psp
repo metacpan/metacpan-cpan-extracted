@@ -1,0 +1,9 @@
+<start_html>
+<perl>
+#
+# Comments and random code then throw error
+#
+my $a=1+1;
+my $b=$a/0
+</perl>
+

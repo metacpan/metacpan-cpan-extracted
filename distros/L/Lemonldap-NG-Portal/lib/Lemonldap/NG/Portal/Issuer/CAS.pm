@@ -20,7 +20,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 );
 use URI;
 
-our $VERSION = '2.21.0';
+our $VERSION = '2.22.0';
 
 extends 'Lemonldap::NG::Portal::Main::Issuer',
   'Lemonldap::NG::Portal::Lib::CAS';
@@ -58,6 +58,7 @@ sub init {
             serviceValidate => 'serviceValidate',
             relayLogout     => 'relayLogout',
             validate        => 'validate',
+            logout          => 'unauthlogout',
             proxyValidate   => 'proxyValidate',
             proxy           => 'proxy',
             p3              => {
@@ -234,7 +235,7 @@ sub run {
         # Renew
         if (    $renew
             and $renew eq 'true'
-            and time - $req->sessionInfo->{_utime} >
+            and time - $req->sessionInfo->{_lastAuthnUTime} >
             $self->conf->{portalForceAuthnInterval} )
         {
 
@@ -388,8 +389,10 @@ sub run {
             }
         }
 
-        # Delete local session
-        if ( my $session = $self->p->getApacheSession($session_id) ) {
+        # Legacy code without logout propagation for CAS 2.0
+        if ($logout_url) {
+            my $session = $self->p->getApacheSession($session_id);
+            return PE_LOGOUT_OK unless ($session);
 
            # This will call Issuer logout methods, incluing our own
            # TODO: call authLogout and deleteSession instead of duplicating code
@@ -399,30 +402,39 @@ sub run {
                 $self->logger->error("Fail to delete session $session_id ");
             }
 
-            if ($logout_url) {
+            # Display a link to the provided URL
+            $self->logger->debug("Logout URL $logout_url will be displayed");
 
-                # Display a link to the provided URL
-                $self->logger->debug(
-                    "Logout URL $logout_url will be displayed");
+            $req->info(
+                $self->loadTemplate(
+                    $req, 'casBack2Url', params => { url => $logout_url }
+                )
+            );
+            $req->data->{activeTimer} = 0;
 
-                $req->info(
-                    $self->loadTemplate(
-                        $req, 'casBack2Url',
-                        params => { url => $logout_url }
-                    )
-                );
-                $req->data->{activeTimer} = 0;
+            delete $req->pdata->{_url};
+            return PE_INFO;
+        }
+        else {
+            $req->{issuerNextUrl} = $logout_service if $logout_service;
+            $req->data->{nofail} = 1;
+            $req->steps(
+                [ @{ $self->p->beforeLogout }, "authLogout", "deleteSession" ]
+            );
+            my $res = $self->p->process($req);
 
-                delete $req->pdata->{_url};
-                return PE_INFO;
+            $req->error($res);
+            if ( $res and $res != PE_LOGOUT_OK ) {
+                if ( $res > 0 ) {
+                    $self->logger->error(
+                        "Logout process returns error code $res");
+                }
+                return $res;
             }
-
             if ($logout_service) {
                 return $self->_redirectUser( $req, $logout_service );
             }
-        }
-        else {
-            $self->logger->info("Unknown session $session_id");
+
         }
 
         return PE_LOGOUT_OK;
@@ -1221,6 +1233,52 @@ sub _redirectUser {
     $req->{urldc} = $destination;
     $req->steps( [] );
     return PE_OK;
+}
+
+sub unauthlogout {
+    my ( $self, $req ) = @_;
+    $self->logger->debug(
+        "URL " . $req->path_info . " detected as an CAS LOGOUT URL" );
+
+    # GET parameters
+    my $logout_url     = $req->param('url');        # CAS 2.0
+    my $logout_service = $req->param('service');    # CAS 3.0
+    $logout_service = ''
+      if ( $self->p->checkXSSAttackUrldc( 'service', $logout_service ) );
+
+    # If we use access control, check that the service URL is trusted
+    if ( $self->conf->{casAccessControlPolicy} =~ /^(error|faketicket)$/i ) {
+        if ( $logout_service
+            and not $self->p->isTrustedUrl($logout_service) )
+        {
+            $self->userLogger->error(
+                    "Untrusted service URL $logout_service"
+                  . "specified for CAS Logout" );
+            return $self->p->do( $req, [ [ returnPE => PE_UNAUTHORIZEDURL ] ] );
+        }
+    }
+
+    # Legacy code without logout propagation for CAS 2.0
+    if ($logout_url) {
+
+        # Display a link to the provided URL
+        $self->logger->debug("Logout URL $logout_url will be displayed");
+
+        $req->info(
+            $self->loadTemplate(
+                $req, 'casBack2Url', params => { url => $logout_url }
+            )
+        );
+        $req->data->{activeTimer} = 0;
+
+        delete $req->pdata->{_url};
+        return $self->p->do( $req, [ [ returnPE => PE_INFO ] ] );
+    }
+    elsif ($logout_service) {
+        $self->_redirectUser( $req, $logout_service );
+    }
+
+    return $self->p->unauthLogout($req);
 }
 
 1;

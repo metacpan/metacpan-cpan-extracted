@@ -1,0 +1,81 @@
+<start_html>
+<form>
+<p>
+
+Textfield: 
+<p>
+<textfield name="textfield" value="default textfield text" />
+<hr>
+
+Textarea field, 10 col 20 lines:
+<p>
+<textarea name="textarea" default="default textarea text" columns=10 lines=20 />
+<hr>
+
+Password field:
+<p>
+<password_field name="password" value="default password" />
+<hr>
+
+Hidden field:
+<p>
+<hidden name="hidden" value="default hidden" />
+<hr>
+
+File upload field:
+<p>
+<filefield name="photo" default="default filefied name" size=50 maxlength=80 />
+<hr>
+
+Single Checkbox (checked):
+<p>
+<checkbox name="checkbox_checked" checked/>
+<p>
+
+Single Checkbox (un-checked):
+<p>
+<checkbox name="checkbox_unchecked"/>
+<hr>
+
+Checkbox Group (red and yellow checked, indigo disabled):
+<p>
+<checkbox_group name="checkbox_group" values="%{ red=>'Red', orange=>'Orange', yellow=>'Yellow', green=>'Green', blue=>'Blue', indigo=>'Indigo', violet=>'Violet'}" defaults="@{qw(red yellow)}" disabled='indigo' />
+<hr>
+
+Radio Group (orange checked):
+<p>
+<radio_group name="radio_group" values="%{ red=>'Red', orange=>'Orange', yellow=>'Yellow', green=>'Green', blue=>'Blue', indigo=>'Indigo', violet=>'Violet'}" defaults="orange" disabled='indigo' />
+<hr>
+
+Popup Menu (single option, green selected, indigo disabled):
+<p>
+<popup_menu name="popup_menu_single" values="%{ red=>'Red', orange=>'Orange', yellow=>'Yellow', green=>'Green', blue=>'Blue', indigo=>'Indigo', violet=>'Violet'}" default="green" disabled="indigo"  />
+<p>
+
+Popup Menu (multiple option, orange and green selected, blue and indigo disabled):
+<p>
+<popup_menu multiple name="popup_menu_multiple" values="%{ red=>'Red', orange=>'Orange', yellow=>'Yellow', green=>'Green', blue=>'Blue', indigo=>'Indigo', violet=>'Violet'}" default="@{qw(orange green)}" disabled="@{qw(blue indigo)}" multiple />
+<hr>
+
+Scrolling List (orange, violet disabled):
+<p>
+<scrolling_list name="scrolling_list" size=4 values="%{ red=>'Red', orange=>'Orange', yellow=>'Yellow', green=>'Green', blue=>'Blue', indigo=>'Indigo', violet=>'Violet'}" default="@{qw(orange green)}" disabled="violet"/>
+<hr>
+
+Image Button:
+<p>
+<image_button name="image_button" src="https://upload.wikimedia.org/wikipedia/commons/7/73/Flat_tick_icon.svg" align="middle"/>
+<p>
+
+Reset Button:
+<p>
+<reset name="reset_button" />
+<p>
+
+Submit Button:
+<p>
+<defaults name="submit_button" />
+<p>
+
+__PERL__
+1;

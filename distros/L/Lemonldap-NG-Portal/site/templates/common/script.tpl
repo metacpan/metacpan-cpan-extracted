@@ -27,6 +27,7 @@
 
  <script type="application/init">
  {
+ "authError":"<TMPL_VAR NAME="AUTH_ERROR" ESCAPE="HTML">",
  "choicetab":"<TMPL_VAR NAME="CHOICE_VALUE">",
  "language": "<TMPL_VAR NAME="LANGUAGE">",
  "newwindow":<TMPL_VAR NAME="NEWWINDOW" DEFAULT="0">,

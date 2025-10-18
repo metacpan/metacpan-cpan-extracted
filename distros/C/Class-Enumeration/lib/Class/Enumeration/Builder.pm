@@ -5,7 +5,7 @@ use warnings;
 
 package Class::Enumeration::Builder;
 
-$Class::Enumeration::Builder::VERSION = 'v1.0.1';
+$Class::Enumeration::Builder::VERSION = 'v1.0.3';
 
 use subs '_is_equal';
 
@@ -72,7 +72,9 @@ sub import {
   {
     no strict 'refs'; ## no critic ( ProhibitNoStrict )
     # Inject list of enum objects
-    *{ "$class\::_values" } = sub { @values };
+    *{ "$class\::values" } = sub {
+      sort { $a->ordinal <=> $b->ordinal } @values
+    };
     # Optionally build enum constants and set @EXPORT_OK and %EXPORT_TAGS
     if ( delete $options->{ export } ) {
       my @names;

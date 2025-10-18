@@ -34,7 +34,7 @@ my ( $host, $url, $query ) =
   expectForm( $res, '#', undef, 'uid', 'guy', 'cn', 'token' );
 ok(
     $res->[2]->[0] =~
-      m%<input id="token" type="hidden" name="token" value="([\d_]+?)" />%,
+      m%<input type="hidden" id="token" name="token" value="([\d_]+?)" />%,
     'Token value found'
 ) or explain( $res->[2]->[0], 'Token value' );
 my $count = $res->[2]->[0] =~ s/$1//g;

@@ -1754,7 +1754,7 @@
           "type": "keyText"
         },
         {
-          "data": "t/sessions",
+          "data": "TMPDIR/sessions",
           "id": "globalStorageOptions/LockDirectory",
           "title": "LockDirectory",
           "type": "keyText"

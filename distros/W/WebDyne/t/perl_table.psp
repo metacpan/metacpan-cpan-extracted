@@ -1,0 +1,79 @@
+<start_html>
+
+<perl handler="table">
+<table>
+
+<block name="thead">
+<thead>
+<tr>
+
+<block name="thead_tr">
+<td>
+${thead_tr}
+</td>
+</block>
+
+</tr>
+</thead>
+</block>
+
+
+<block name="tbody">
+<tbody>
+<block name="tbody_tr">
+<tr>
+<block name="tbody_td">
+<td>
+${tbody_td}
+</td>
+</block>
+</tr>
+</block>
+</tbody>
+</block>
+
+
+</table>
+</perl>
+
+__PERL__
+
+sub table {
+
+    #  Data we want to render
+    #
+    my $self=shift();
+    my @data=(
+        [qw(a b c)],
+        [qw(1 2 3)],
+        [qw(4 5 6)]
+    );
+    
+
+    #  Header
+    #
+    my $thead_ar=shift(@data);
+    foreach my $tr (@{$thead_ar}) {
+        $self->render_block('thead_tr', thead_tr=>$tr);
+    }
+    $self->render_block('thead');
+    
+    
+    #  Body
+    #
+    foreach my $tbody_ar (@data) {
+        foreach my $td (@{$tbody_ar}) {
+            $self->render_block('tbody_td', tbody_td=>$td);
+        }
+        $self->render_block('tbody_tr');
+    }
+    $self->render_block('tbody');
+    
+    
+    #  Assemble the whole lot
+    #
+    return $self->render();
+    
+}
+
+1;

@@ -17,17 +17,17 @@ llapp.controller('DiffCtrl', [
   '$translator',
   '$location',
   function($scope,
-  $http,
-  $q,
-  $translator,
-  $location) {
+    $http,
+    $q,
+    $translator,
+    $location) {
     var buildTree,
-  getCfg,
-  init,
-  pathEvent,
-  readDiff,
-  reverseTree,
-  toNodes;
+      getCfg,
+      init,
+      pathEvent,
+      readDiff,
+      reverseTree,
+      toNodes;
     $scope.links = links;
     $scope.menulinks = menulinks;
     $scope.staticPrefix = staticPrefix;
@@ -42,7 +42,7 @@ llapp.controller('DiffCtrl', [
     // Import translations functions
     $scope.translateTitle = function(node) {
       return $translator.translateField(node,
-  'title');
+        'title');
     };
     $scope.translateP = $translator.translateP;
     $scope.translate = $translator.translate;
@@ -50,7 +50,7 @@ llapp.controller('DiffCtrl', [
       return scope.toggle();
     };
     $scope.stoggle = function(scope,
-  node) {
+      node) {
       $scope.currentNode = node;
       return scope.toggle();
     };
@@ -65,13 +65,13 @@ llapp.controller('DiffCtrl', [
         switch (typeof button.action) {
           case 'function':
             button.action($scope.currentNode,
-  $scope);
+              $scope);
             break;
           case 'string':
             $scope[button.action]();
             break;
           default:
-            console.log(typeof button.action);
+            console.warn('Unknown action type', typeof button.action);
         }
       }
       return $scope.showM = false;
@@ -87,27 +87,25 @@ llapp.controller('DiffCtrl', [
 
     //@param b local conf (0 or 1)
     //@param n cfgNumber
-    getCfg = function(b,
-  n) {
+    getCfg = function(b, n) {
       var d;
       d = $q.defer();
       if (($scope.cfg[b] == null) || $scope.cfg[b] !== n) {
         $http.get(`${confPrefix}${n}`).then(function(response) {
-          var date;
-          if (response && response.data) {
-            $scope.cfg[b] = response.data;
-            date = new Date(response.data.cfgDate * 1000);
-            $scope.cfg[b].date = date.toLocaleString();
-            console.log(`Metadatas of cfg ${n} loaded`);
-            return d.resolve('OK');
-          } else {
-            return d.reject(response);
-          }
-        },
-  function(response) {
-          console.log(response);
-          return d.reject('NOK');
-        });
+            var date;
+            if (response && response.data) {
+              $scope.cfg[b] = response.data;
+              date = new Date(response.data.cfgDate * 1000);
+              $scope.cfg[b].date = date.toLocaleString();
+              console.debug(`Metadatas of cfg ${n} loaded`);
+              return d.resolve('OK');
+            } else {
+              return d.reject(response);
+            }
+          },
+          function(response) {
+            return d.reject('NOK');
+          });
       } else {
         d.resolve();
       }
@@ -123,22 +121,21 @@ llapp.controller('DiffCtrl', [
         $translator.init($scope.lang),
         $http.get(`${staticPrefix}reverseTree.json`).then(function(response) {
           response.data;
-          return console.log("Structure loaded");
+          console.debug("Structure loaded");
         })
       ]).then(function() {
         $q.defer();
         return $http.get(`${scriptname}diff/${$scope.cfg[0].cfgNum}/${$scope.cfg[1].cfgNum}`).then(function(response) {
-          var data;
-          data = [];
-          data = readDiff(response.data[0],
-  response.data[1]);
-          $scope.data = buildTree(data);
-          $scope.message = '';
-          return $scope.waiting = false;
-        },
-  function(response) {
-          return $scope.message = `${$scope.translate('error')} : ${response.statusLine}`;
-        });
+            var data;
+            data = [];
+            data = readDiff(response.data[0], response.data[1]);
+            $scope.data = buildTree(data);
+            $scope.message = '';
+            return $scope.waiting = false;
+          },
+          function(response) {
+            return $scope.message = `${$scope.translate('error')} : ${response.statusLine}`;
+          });
       });
       // Colorized link
       $scope.activeModule = "conf";
@@ -147,12 +144,12 @@ llapp.controller('DiffCtrl', [
       };
     };
     readDiff = function(c1,
-  c2,
-  tr = true) {
+      c2,
+      tr = true) {
       var k,
-  res,
-  tmp,
-  v;
+        res,
+        tmp,
+        v;
       res = [];
       for (k in c1) {
         v = c1[k];
@@ -173,11 +170,11 @@ llapp.controller('DiffCtrl', [
               tmp.newvalue = c2[k];
             } else if (typeof c2[k] === 'object') {
               tmp.nodes = readDiff(c1[k],
-  c2[k],
-  false);
+                c2[k],
+                false);
             } else {
               tmp.oldnodes = toNodes(v,
-  'old');
+                'old');
             }
           } else {
             tmp.oldvalue = v;
@@ -203,9 +200,7 @@ llapp.controller('DiffCtrl', [
             if (v.constructor === 'array') {
               tmp.newvalue = v;
             } else {
-              console.log("Iteration");
-              tmp.newnodes = toNodes(v,
-  'new');
+              tmp.newnodes = toNodes(v, 'new');
             }
           } else {
             tmp.newvalue = v;
@@ -216,11 +211,11 @@ llapp.controller('DiffCtrl', [
       return res;
     };
     toNodes = function(c,
-  s) {
+      s) {
       var k,
-  res,
-  tmp,
-  v;
+        res,
+        tmp,
+        v;
       res = [];
       for (k in c) {
         v = c[k];
@@ -232,7 +227,7 @@ llapp.controller('DiffCtrl', [
             tmp[`${s}value`] = v;
           } else {
             tmp[`${s}nodes`] = toNodes(c[k],
-  s);
+              s);
           }
         } else {
           tmp[`${s}value`] = v;
@@ -244,19 +239,19 @@ llapp.controller('DiffCtrl', [
     reverseTree = [];
     buildTree = function(data) {
       var elem,
-  found,
-  i,
-  j,
-  l,
-  len,
-  len1,
-  len2,
-  m,
-  n,
-  node,
-  offset,
-  path,
-  res;
+        found,
+        i,
+        j,
+        l,
+        len,
+        len1,
+        len2,
+        m,
+        n,
+        node,
+        offset,
+        path,
+        res;
       if (reverseTree == null) {
         return data;
       }
@@ -304,9 +299,7 @@ llapp.controller('DiffCtrl', [
     $scope.newDiff = function() {
       return $location.path(`/${$scope.cfg[0].cfgNum}/${$scope.cfg[1].cfgNum}`);
     };
-    pathEvent = function(event,
-  next,
-  current) {
+    pathEvent = function(event, next, current) {
       var n;
       n = next.match(new RegExp('#!?/(latest|[0-9]+)(?:/(latest|[0-9]+))?$'));
       if (n === null) {
@@ -317,36 +310,34 @@ llapp.controller('DiffCtrl', [
           $translator.init($scope.lang),
           $http.get(`${staticPrefix}reverseTree.json`).then(function(response) {
             reverseTree = response.data;
-            return console.log("Structure loaded");
+            console.debug("Structure loaded");
           }),
           getCfg(0,
-          n[1]),
+            n[1]),
           n[2] != null ? getCfg(1,
-          n[2]) : void 0
+            n[2]) : void 0
         ]).then(function() {
-          if (n[2] != null) {
-            return init();
-          } else {
-            if ($scope.cfg[0].prev) {
-              $scope.cfg[1] = $scope.cfg[0];
-              return getCfg(0,
-  $scope.cfg[1].prev).then(function() {
-                return init();
-              });
+            if (n[2] != null) {
+              return init();
             } else {
-              $scope.data = [];
-              return $scope.waiting = false;
+              if ($scope.cfg[0].prev) {
+                $scope.cfg[1] = $scope.cfg[0];
+                return getCfg(0, $scope.cfg[1].prev).then(function() {
+                  return init();
+                });
+              } else {
+                $scope.data = [];
+                return $scope.waiting = false;
+              }
             }
-          }
-        },
-  function() {
-          $scope.message = $scope.translate('error');
-          return $scope.waiting = false;
-        });
+          },
+          function() {
+            $scope.message = $scope.translate('error');
+            return $scope.waiting = false;
+          });
       }
       return true;
     };
-    return $scope.$on('$locationChangeSuccess',
-  pathEvent);
+    return $scope.$on('$locationChangeSuccess', pathEvent);
   }
 ]);

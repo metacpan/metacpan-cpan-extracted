@@ -142,8 +142,9 @@ sub sp {
                 authentication => 'Demo',
                 userDB         => 'Same',
                 configStorage  => {
-                    type  => 'SOAP',
-                    proxy => 'http://auth.idp.com/config',
+                    type     => 'SOAP',
+                    proxy    => 'http://auth.idp.com/config',
+                    confFile => '/dev/null',
                 },
             },
         }

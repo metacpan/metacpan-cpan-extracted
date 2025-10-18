@@ -1,0 +1,33 @@
+<html> @0 (IMPLICIT)
+  <head> @0.0 (IMPLICIT)
+  <body> @0.1 (IMPLICIT)
+    <table> @0.1.0
+      <thead> @0.1.0.0
+        <tr> @0.1.0.0.0
+          <td> @0.1.0.0.0.0
+            "Table Head"
+      <tbody> @0.1.0.1
+        <tr> @0.1.0.1.0
+          <td> @0.1.0.1.0.0
+            "Table Body"
+    <pre> @0.1.1
+    <table> @0.1.2
+      <thead> @0.1.2.0
+        <tr> @0.1.2.0.0
+          <td> @0.1.2.0.0.0
+            "Table Head"
+      <tbody> @0.1.2.1
+        <tr> @0.1.2.1.0
+          <td> @0.1.2.1.0.0
+            "Table Body"
+    <pre> @0.1.3
+    <table> @0.1.4
+      <thead> @0.1.4.0
+        <tr> @0.1.4.0.0
+          <td> @0.1.4.0.0.0
+            "Table Head"
+      <tbody> @0.1.4.1
+        <tr> @0.1.4.1.0
+          <td> @0.1.4.1.0.0
+            "Table Body"
+    "__PERL__sub hello { shift()->render() }"

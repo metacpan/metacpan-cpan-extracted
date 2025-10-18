@@ -86,6 +86,7 @@ SKIP: {
             'AJAX query'
         );
         $pdata = 'lemonldappdata=' . expectCookie( $res, 'lemonldappdata' );
+        is( $res->[0], 401, "HTTP code 401 received" );
         is( getHeader( $res, 'WWW-Authenticate' ), 'Negotiate' ),
 
           ok(

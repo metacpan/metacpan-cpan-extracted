@@ -1,5 +1,8 @@
 Revision history for Params-Validate-Strict
 
+0.17	Fri Oct 17 21:00:50 EDT 2025
+	Allow regexes in a schema to be a simple string
+
 0.16	Sat Oct 11 18:35:15 EDT 2025
 	Added 'validate' to the schema language
 	Allow yes/no for booleans

@@ -1,0 +1,6 @@
+<start_html>
+<start_form>
+Your Name:<textfield name=name>
+<submit name=submit>
+<end_form>
+<dump force="+{submit}">

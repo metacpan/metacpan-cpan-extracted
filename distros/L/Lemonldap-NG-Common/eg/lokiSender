@@ -1,0 +1,429 @@
+#!/usr/bin/perl
+
+use strict;
+use Getopt::Long;
+use POSIX;
+use Pod::Usage;
+
+our $VERSION = "2.22.0";
+
+# Options
+my $opts = {};
+my $help;
+my $opt_user  = '__APACHEUSER__';
+my $opt_group = '__APACHEGROUP__';
+
+my @CMDLINE = @ARGV;
+
+GetOptions(
+    'daemon'          => \$opts->{daemon},
+    'defer-dir=s'     => \$opts->{deferDir},
+    'debug'           => \$opts->{debug},
+    'delay=s'         => \$opts->{delay},
+    'group|g=s'       => \$opts->{group},
+    'help|h'          => \$help,
+    'ini-file=s'      => \$opts->{iniFile},
+    'syslog-facility' => \$opts->{syslogFacility},
+    'user|u=s'        => \$opts->{user},
+) or pod2usage( -exitcode => 1, -verbose => 0 );
+
+foreach my $opt ( keys %$opts ) {
+    $opts->{$opt} //= $ENV{ 'LLNG_LOKI_' . uc($opt) };
+}
+
+pod2usage( -exitcode => 0, -verbose => 2 ) if $help;
+
+$opts->{delay}    ||= 60 if $opts->{daemon};
+$opts->{deferDir} ||= &_getDeferDir;
+mkdir $opts->{deferDir}                   unless -e $opts->{deferDir};
+die "Missing directory $opts->{deferDir}" unless -d $opts->{deferDir};
+die "Cannot write into $opts->{deferDir}" unless -w $opts->{deferDir};
+
+die 'Missing --defer-dir' unless $opts->{deferDir};
+
+# Change owner if asked
+POSIX::nice(10);
+if ( $opts->{group} || $opts->{user} ) {
+    eval {
+        no warnings;
+        my ( $gid, $uid );
+        if ( $opts->{group} ) {
+            $gid = getgrnam( $opts->{group} );
+            POSIX::setgid($gid);
+        }
+        if ( $opts->{user} ) {
+            $uid = getpwnam( $opts->{user} );
+            chown( $uid, ( $gid // [ stat( $opts->{deferDir} ) ]->[5] ),
+                $opts->{deferDir} )
+              and chmod( 0700, $opts->{deferDir} );
+            POSIX::setuid( scalar( getpwnam( $opts->{user} ) ) )
+              if $opts->{user};
+            my (
+                undef, undef, undef,    undef, undef,
+                undef, undef, $homedir, undef
+            ) = getpwnam( $opts->{user} );
+            $ENV{HOME} = $homedir if $homedir;
+        }
+    };
+}
+
+&daemonize if $opts->{daemon};
+
+require HTTP::Request;
+require JSON;
+require LWP::UserAgent;
+require Sys::Syslog;
+
+my $j = JSON->new->canonical;
+
+my $syslogOpened;
+
+sub _log {
+    my ( $level, $msg ) = @_;
+    if ( $opts->{daemon} ) {
+        unless ($syslogOpened) {
+            Sys::Syslog::openlog( 'LLNG-Loki', 'cons,pid,ndelay',
+                $opts->{syslogFacility} || 'daemon' );
+            $syslogOpened++;
+        }
+        Sys::Syslog::syslog( $level, $msg );
+    }
+    else {
+        print STDERR "[$level] $msg\n";
+    }
+}
+
+sub debug {
+    map { _log( 'debug', $_ ) } @_ if $opts->{debug};
+}
+
+sub warning {
+    map { _log( 'warning', $_ ) } @_;
+}
+
+sub error {
+    map { _log( 'err', $_ ) } @_;
+}
+
+sub _getDeferDir {
+
+    require Lemonldap::NG::Common::Conf;
+    my $ca = Lemonldap::NG::Common::Conf->new( { (
+                $opts->{iniFile}
+                ? ( confFile => $opts->{iniFile} )
+                : ()
+            )
+        }
+    );
+
+    no warnings;
+    die $Lemonldap::NG::Common::Conf::msg unless ($ca);
+    my $conf      = $ca->getConf('all');
+    my $localConf = $ca->getLocalConf( 'all', $_[0]->{iniFile} );
+    $conf = { %$conf, %$localConf };
+
+    unless ( $conf->{lokiDeferDir} ) {
+        die 'Missing lokiDeferDir';
+    }
+    debug "Conf downloaded from Lemonldap::NG::Common::Conf: $conf->{cfgNum}";
+    return $conf->{lokiDeferDir};
+}
+
+sub sendLogs {
+    my $i;
+    my $ret = 1;
+    if ( opendir my $dh, $opts->{deferDir} ) {
+        debug "Checking for logs into $opts->{deferDir}";
+        my $i = 0;
+        my ( %logs, %filesToDel, @headers, $hdr_done, %streams, %urls );
+        while ( my $name = readdir($dh) ) {
+            $i++;
+            my $fn = "$opts->{deferDir}/$name";
+            next if $name =~ m#^\.# or !-f $fn;
+            my $fh;
+            unless ( open $fh, '<', $fn ) {
+                error "Unable to open $fn: $!";
+                $ret = 0;
+                goto END;
+            }
+            my $tmp = <$fh>;
+            unless ($tmp) {
+                warning "Empty file $fn";
+                goto END;
+            }
+            chomp $tmp;
+            my ( $meth, $url ) = split( /\s+/, $tmp, 2 );
+            unless ( $meth and $url and $meth eq 'POST' ) {
+                warning "Not a valid file $fn";
+                goto END;
+            }
+
+            # Get headers;
+            while ( my $line = <$fh> ) {
+                chomp $line;
+                $line =~ s/\r//g;
+                unless ($line) {
+                    $hdr_done = 1;
+                    last;
+                }
+                next if $hdr_done;
+                my ( $k, $v ) = split( /:\s+/, $line );
+                push @headers, $k, $v if $v and lc($k) ne 'content-length';
+            }
+
+            # Get content
+            my $content;
+            {
+                local $/ = undef;
+                while ( my $line = <$fh> ) {
+                    chomp $line;
+                    $line =~ s/[\r\n]//g;
+                    next unless $line;
+                    $content = eval { $j->decode($line)->{streams} };
+                    if ( $@ or not $content ) {
+                        warning "Malformed line ($fn): $line";
+                        last;
+                    }
+                }
+            }
+            next unless $content;
+            foreach my $stream (@$content) {
+                my $k = $j->encode( $stream->{stream} );
+                push @{ $logs{$k} },       @{ $stream->{values} };
+                push @{ $filesToDel{$k} }, $fn;
+                $streams{$k} ||= $stream->{stream};
+                $urls{$k}    ||= $url;
+            }
+          END: close $fh;
+        }
+        my $ua = LWP::UserAgent->new;
+        $ua->env_proxy;
+        foreach my $key ( keys %logs ) {
+            my $req = HTTP::Request->new(
+                POST => $urls{$key},
+                \@headers,
+
+                #HTTP::Headers->new(@{$headers{$key}}),
+                $j->encode( {
+                        streams => [ {
+                                stream => $streams{$key},
+                                values => $logs{$key},
+                            },
+                        ]
+                    }
+                )
+            );
+            my $resp = $ua->request($req);
+            if ( $resp->is_success ) {
+                debug "Logs $key sent";
+                unlink( @{ $filesToDel{$key} } ) or warning $!;
+            }
+            else {
+                $ret = 0;
+                error "Fail to send logs: " . $resp->status_line;
+            }
+        }
+    }
+    else {
+        error "Unable to open $opts->{deferDir}: $!";
+    }
+    return $ret;
+}
+
+sub daemonize {
+    open STDIN,  '<', '/dev/null' or die "Can't read /dev/null: $!";
+    open STDOUT, '>', '/dev/null' or die "Can't write to /dev/null: $!";
+    open STDERR, '>', '/dev/null' or die "Can't write to /dev/null: $!";
+
+    defined( my $pid = fork ) or die "Can't fork: $!";
+    exit if $pid;
+
+    setsid() or die "Can't start a new session: $!";
+
+    defined( $pid = fork ) or die "Can't fork again: $!";
+    exit if $pid;
+
+    umask 0;
+
+    if ( $opts->{pidFile} ) {
+        open my $fh, '>', $opts->{pidFile}
+          or die "Can't write $opts->{pidFile} $!";
+        print $fh "$$\n";
+        close $fh;
+    }
+    $0 = join ' ', $0, @CMDLINE;
+}
+
+## MAIN
+
+if ( $opts->{delay} ) {
+    $SIG{$_} = \&sendLogs foreach (qw(ALRM USR1 USR2));
+    $SIG{$_} = sub {
+        debug "End asked";
+        exit( &sendLogs ? 0 : 1 );
+      }
+      foreach (qw(INT TERM QUIT KILL ABRT HUP));
+    while (1) {
+        &sendLogs;
+        sleep $opts->{delay};
+    }
+}
+else {
+    &sendLogs || exit 1;
+}
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+lokiSender - daemon I<(or cron job)> to send to L<Loki> API the logs stored in
+a temporary directory by L<Lemonldap-ng|https://lemonldap-ng.org/> Loki logger.
+
+=head1 SYNOPSIS
+
+  $ lokiSender --defer-dir /tmp/loki --daemon --delay 60
+
+=head1 DESCRIPTION
+
+B<lokiSender> is a web-based pub/sub server designed for L<LemonLDAP::NG|https://lemonldap-ng.org>
+when the Loki logger is configured to store logs into a temporary directory.
+
+=head2 Options
+
+All options except B<--help> can have default value overriden by an
+environment variable.
+
+=head3 Start options
+
+When launched without B<--delay> or B<--daemon>, lokiSender just send all logs
+to Loki API I<(grouped)>. This can be used as cron task.
+
+=over
+
+=item * B<--daemon>
+
+Daemonize the server.
+
+Environment variable: B<LLNG_LOKI_DAEMON>
+
+=item * B<--delay E<lt>valueE<gt>>
+
+With or without B<--daemon>, send all pending logs to Loki API every
+E<lt>valueE<gt> seconds.
+
+Environment variable: B<LLNG_LOKI_DELAY>
+
+=item * B<--defer-dir E<lt>valueE<gt>>
+
+Define the directory where B<Lemonldap-NG> stores its Loki logs
+I<(option B<lokiDeferDir>)>. When not given, B<lokiSender> tries to find it
+inside Lemonldap-NG configuration.
+
+Environment variable: B<LLNG_LOKI_DEFERDIR>
+
+=item * B<--ini-file E<lt>valueE<gt>>
+
+When B<--defer-dir> isn't defined, you can override here the default place of
+B<lemonldap-ng.ini> file to find the B<lokiDeferDir> parameter.
+
+Environment variable: B<LLNG_LOKI_INIFILE>
+
+=back
+
+=head3 Daemon options
+
+=over
+
+=item * B<--pid-file E<lt>valueE<gt>>
+
+When B<--daemon> is set, write the processus number into the given file.
+
+Environment variable: B<LLNG_LOKI_PID_FILE>
+
+=item * B<--user> E<lt>valueE<gt>>
+
+Change uid to the given value after opening socket.
+
+Environment variable: B<LLNG_LOKI_USER>
+
+=item * B<--group> E<lt>valueE<gt>>
+
+Change gid to the given value after opening socket.
+
+Environment variable: B<LLNG_LOKI_GROUP>
+
+=back
+
+=head3 Logging options
+
+=over
+
+
+=item * B<--debug>
+
+Display additional information.
+
+Environment variable: B<LLNG_LOKI_DEBUG>
+
+=item * B<--syslog-facility E<lt>valueE<gt>>
+
+When launched as daemon, logs are sent to syslog instead of stderr.
+
+Environment variable: B<LLNG_LOKI_SYSLOGFACILITY
+
+=back
+
+=head3 Other
+
+=over
+
+=item * B<--help>
+
+Display this.
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<Lemonldap::NG logs|https://lemonldap-ng.org/documentation/latest/logs.html>
+
+=item * L<http://lemonldap-ng.org/>
+
+=back
+
+=head1 BUG REPORT
+
+Use OW2 system to report bug or ask for features:
+L<https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng/issues>
+
+
+=head1 AUTHORS
+
+=over
+
+=item Xavier Guimard, E<lt>yadd@debian.orgE<gt>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+See COPYING file for details.
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2, or (at your option)
+any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see L<http://www.gnu.org/licenses/>.
+
+=cut

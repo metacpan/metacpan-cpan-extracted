@@ -1,0 +1,14 @@
+<start_html>
+<pre>
+<span class="h-ab">&lt;</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
+<span class="h-ab">&lt;</span><span class="h-tag">head</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">title</span><span class="h-ab">&gt;</span>Hello World<span class="h-ab">&lt;/</span><span class="h-tag">title</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;/</span><span class="h-tag">head</span><span class="h-ab">&gt;</span>
+<span class="h-ab">&lt;</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
+<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
+
+<span class="h-com">&lt;!-- Note the perl tags --&gt;</span>
+
+Hello World <span class="h-ab">&lt;</span><span class="h-webdyne_tag">perl</span><span class="h-ab">&gt;</span> localtime() <span class="h-ab">&lt;/</span><span class="h-webdyne_tag">perl</span><span class="h-ab">&gt;</span>
+
+<span class="h-ab">&lt;/</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
+<span class="h-ab">&lt;/</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
+</pre>

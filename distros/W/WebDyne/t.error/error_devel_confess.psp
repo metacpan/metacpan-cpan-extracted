@@ -1,0 +1,16 @@
+<start_html>
+!{! &handler !};
+__PERL__
+#use Devel::Confess qw(source builtin dump);
+#local $SIG{__DIE__};
+#$Devel::Confess::NoTrace{'WebDyne'}++;
+#$Devel::Confess::NoTrace{'WebDyne::Err'}++;
+#$Devel::Confess::NoTrace{'WebDyne::err'}++;
+#$Devel::Confess::NoTrace{'WebDyne::perl_init_eval'}++;
+sub handler {
+    my $self=shift();
+    my $foo=1;
+    eval {$self->print($foo/0)}
+    return err();
+}
+    

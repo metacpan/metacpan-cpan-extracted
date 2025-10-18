@@ -1,15 +1,14 @@
 #
 #  This file is part of WebDyne.
 #
-#  This software is Copyright (c) 2017 by Andrew Speer <andrew@webdyne.org>.
+#  This software is copyright (c) 2025 by Andrew Speer <andrew.speer@isolutions.com.au>.
 #
-#  This is free software, licensed under:
-#
-#    The GNU General Public License, Version 2, June 1991
+#  This is free software; you can redistribute it and/or modify it under
+#  the same terms as the Perl 5 programming language system itself.
 #
 #  Full license text is available at:
 #
-#  <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+#  <http://dev.perl.org/licenses/>
 #
 package WebDyne::Err::Constant;
 
@@ -17,7 +16,8 @@ package WebDyne::Err::Constant;
 #  Pragma
 #
 use strict qw(vars);
-use vars qw($VERSION @ISA %EXPORT_TAGS @EXPORT_OK @EXPORT %Constant);
+#use vars   qw($VERSION @ISA %EXPORT_TAGS @EXPORT_OK @EXPORT %Constant);
+use vars   qw($VERSION @ISA %Constant);
 use warnings;
 no warnings qw(uninitialized);
 local $^W=0;
@@ -30,7 +30,7 @@ use File::Spec;
 
 #  Version information
 #
-$VERSION='1.250';
+$VERSION='2.014';
 
 
 #  Hash of constants
@@ -75,14 +75,22 @@ sub class_dn {
 }
 
 
+sub import {
+    
+    goto &WebDyne::Constant::import;
+    
+}
+
+
 #  Export constants to namespace, place in export tags
 #
-require Exporter;
+#require Exporter;
 require WebDyne::Constant;
-@ISA=qw(Exporter WebDyne::Constant);
-+__PACKAGE__->local_constant_load(\%Constant);
-foreach (keys %Constant) {${$_}=$Constant{$_}}
-@EXPORT=map {'$' . $_} keys %Constant;
-@EXPORT_OK=@EXPORT;
-%EXPORT_TAGS=(all => [@EXPORT_OK]);
-$_=\%Constant;
+#@ISA=qw(Exporter WebDyne::Constant);
+@ISA=qw(WebDyne::Constant);
+#+__PACKAGE__->local_constant_load(\%Constant);
+#foreach (keys %Constant) {${$_}=$Constant{$_}}
+#@EXPORT=map {'$' . $_} keys %Constant;
+#@EXPORT_OK=@EXPORT;
+#%EXPORT_TAGS=(all => [@EXPORT_OK]);
+#$_=\%Constant;

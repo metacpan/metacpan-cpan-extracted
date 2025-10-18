@@ -10,9 +10,10 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_PP_PASSWORD_EXPIRED
   PE_PP_CHANGE_AFTER_RESET
   PE_BADCREDENTIALS
+  PE_PP_PASSWORD_EXPIRES_SOON
 );
 
-our $VERSION = '2.0.14';
+our $VERSION = '2.22.0';
 
 extends 'Lemonldap::NG::Portal::Auth::LDAP';
 
@@ -125,31 +126,36 @@ sub authenticate {
         {
 
             # calculating remaining time before password expiration
-            my $remainingTime = $_pwdExpire - $timestamp;
-            $req->info(
-                $self->loadTemplate(
-                    $req,
-                    'pwdWillExpire',
-                    params => {
-                        time => join(
-                            ',',
-                            $self->ldap->convertSec(
-                                substr(
-                                    $remainingTime, 0,
-                                    length($remainingTime) - 7
-                                )
-                            )
-                        )
-                    }
-                )
-            );
+            my $remainingTime    = $_pwdExpire - $timestamp;
+            my $remainingSeconds = int( $remainingTime / 10000000 );
+            if (    $self->{conf}->{ldapForcePasswordChangeExpirationWarning}
+                and $remainingSeconds <
+                $self->{conf}->{ldapForcePasswordChangeExpirationWarning} )
+            {
+                $self->logger->debug(
+                    "Force password change on expiration warning");
+                $res = PE_PP_PASSWORD_EXPIRES_SOON;
+            }
+            else {
+                $req->info(
+                    $self->loadTemplate(
+                        $req,
+                        'pwdWillExpire',
+                        params => {
+                            time => join( ',',
+                                $self->ldap->convertSec($remainingSeconds) )
+                        }
+                    )
+                );
+            }
         }
 
     }
 
     # Remember password if password reset needed
     if (
-        $res == PE_PP_CHANGE_AFTER_RESET
+           $res == PE_PP_CHANGE_AFTER_RESET
+        or $res == PE_PP_PASSWORD_EXPIRES_SOON
         or (    $res == PE_PP_PASSWORD_EXPIRED
             and $self->conf->{ldapAllowResetExpiredPassword} )
       )

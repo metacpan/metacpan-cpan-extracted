@@ -17,11 +17,11 @@ WebService::Careerjet - Perl interface to Careerjet's public job search API
 
 =head1 VERSION
 
-Version 4.2
+Version 4.3
 
 =cut
 
-our $VERSION = '4.2';
+our $VERSION = '4.3';
 
 =head1 SYNOPSIS
 
@@ -324,6 +324,9 @@ sub query {
 
   my $req = HTTP::Request->new('GET' => $url);
   $req->authorization_basic($self->api_key, '');
+  if ($args->{referrer} || $args->{referer}) {
+    $req->header('Referer' => $args->{referrer} || $args->{referer});
+  }
 
   my $res = $self->{'agent'}->request($req);
   my $content = $res->content();

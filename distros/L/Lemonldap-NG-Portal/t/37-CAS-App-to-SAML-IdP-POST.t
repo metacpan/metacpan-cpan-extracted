@@ -11,8 +11,7 @@ BEGIN {
     require 't/saml-lib.pm';
 }
 
-my $maintests = 9;
-my $debug     = 'error';
+my $debug = 'error';
 my ( $idp, $proxy, $app, $res );
 
 # Redefine LWP methods for tests
@@ -56,16 +55,15 @@ LWP::Protocol::PSGI->register(
     }
 );
 
-SKIP: {
-    eval "use Lasso";
-    if ($@) {
-        skip 'Lasso not found', $maintests;
-    }
+sub test {
+    my ($wayf) = @_;
+
+    reset_tmpdir;
 
     # Initialization
-    $idp   = register( 'idp',   \&idp );
-    $proxy = register( 'proxy', \&proxy );
-    $app   = register( 'app',   \&app );
+    $idp   = register( 'idp',   sub { idp() } );
+    $proxy = register( 'proxy', sub { proxy($wayf) } );
+    $app   = register( 'app',   sub { app() } );
 
     # Query RP for auth
     ok( $res = $app->_get( '/', accept => 'text/html' ),
@@ -85,6 +83,26 @@ SKIP: {
         "Push request to proxy"
     );
     my $proxyPdata = 'lemonldappdata=' . expectCookie( $res, 'lemonldappdata' );
+
+    if ($wayf) {
+        ( $url, $query ) =
+          expectRedirection( $res, qr#^http://discovery.example.com/# );
+
+        # Return from WAYF
+        ok(
+            $res = $proxy->_get(
+                "/",
+                query => "idp="
+                  . uri_escape("http://auth.idp.com/saml/metadata"),
+                accept => 'text/html',
+                cookie => $proxyPdata,
+            ),
+            "Return from WAYF"
+        );
+
+        $proxyPdata =
+          'lemonldappdata=' . expectCookie( $res, 'lemonldappdata' );
+    }
 
     my ( $host, $tmp );
     ( $host, $url, $query ) =
@@ -160,15 +178,74 @@ SKIP: {
     ok( $res = $app->_get( '/', query => $query, accept => 'text/html' ),
         'Follow redirection to RP' );
     my $appId = expectCookie($res);
+
+    # Initiate logout on proxy
+    ok(
+        $res = $proxy->_get(
+            '/cas/logout',
+            query  => { service => "http://auth.app.com/?logout=1" },
+            cookie => "lemonldap=$spId",
+            accept => 'text/html'
+        ),
+        'Initiate logout from proxy'
+    );
+
+    # Propagate SAML request to IDP
+    ( $host, $url, $query ) =
+      expectAutoPost( $res, 'auth.idp.com', '/saml/singleLogout',
+        'SAMLRequest', 'RelayState' );
+    ok(
+        $res = $idp->_post(
+            $url,
+            IO::String->new($query),
+            cookie => "lemonldap=$idpId",
+            length => length($query),
+            accept => 'text/html',
+        ),
+        'Send SAML logout request'
+    );
+
+    # Return SAML response to proxy
+    ( $host, $url, $query ) =
+      expectAutoPost( $res, 'auth.proxy.com', '/saml/proxySingleLogoutReturn',
+        'SAMLResponse', 'RelayState' );
+    ok(
+        $res = $proxy->_post(
+            $url,
+            IO::String->new($query),
+            cookie => "lemonldap=$spId",
+            length => length($query),
+            accept => 'text/html',
+        ),
+        'Receive SAML logout response'
+    );
+
+    # Expect redirection to initial service
+    expectRedirection( $res, qr#http://auth.app.com/\?logout=1# );
+
+    is_deeply( getSession($spId)->data,  {}, "SP session was removed" );
+    is_deeply( getSession($idpId)->data, {}, "IDP session was removed" );
+
 }
 
-count($maintests);
+SKIP: {
+    eval "use Lasso";
+    if ($@) {
+        skip 'Lasso not found';
+    }
+    subtest 'Test without WAYF' => sub {
+        test(0);
+    };
+    subtest 'Test with WAYF' => sub {
+        test(1);
+    };
+}
+
 clean_sessions();
-done_testing( count() );
+done_testing();
 
 sub idp {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel               => $debug,
                 domain                 => 'idp.com',
@@ -212,8 +289,8 @@ sub idp {
 }
 
 sub proxy {
-    return LLNG::Manager::Test->new(
-        {
+    my ($wayf) = @_;
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel              => $debug,
                 domain                => 'proxy.com',
@@ -223,8 +300,17 @@ sub proxy {
                 issuerDBCASActivation => 1,
                 casAttr               => 'uid',
                 casAttributes => { cn => 'cn', uid => 'uid', mail => 'mail', },
-                casAccessControlPolicy            => 'none',
-                multiValuesSeparator              => ';',
+                casAccessControlPolicy => 'none',
+                multiValuesSeparator   => ';',
+                (
+                    $wayf
+                    ? (
+                        samlDiscoveryProtocolURL =>
+                          'http://discovery.example.com/',
+                        samlDiscoveryProtocolActivation => 1,
+                      )
+                    : ()
+                ),
                 samlIDPMetaDataExportedAttributes => {
                     idp => {
                         mail => "0;mail;;",
@@ -271,8 +357,7 @@ sub proxy {
 
 sub app {
     my ( $jwks, $metadata ) = @_;
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel                   => $debug,
                 domain                     => 'app.com',

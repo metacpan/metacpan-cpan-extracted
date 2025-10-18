@@ -1,0 +1,33 @@
+<start_html title="Test of JSON embedding">
+
+<!-- Generate JSON -->
+<json id="json-data" handler=json/>
+
+<!-- JSON tag should be implicit -->
+<json id="json-data-implicit" handler=json>
+
+<!-- Test explicit close -->
+<json id="json-data-closed" handler=json></json>
+
+<div id="output">
+<script src="json.js"/>
+__PERL__
+use JSON;
+
+sub json {
+
+    my $self=shift();
+    my %json=(
+        array       => [qw(red green blue)],
+        hash        => {red=>Red, green=>Green, blue=>Blue},
+        string      => 'Red',
+        array_array => [[0,1,2],[3,4,5]],
+        hash_hash   => { 'a'=>{ red=>Red, green=>Green }, b=>{blue=>Blue}},
+        null        => undef,
+        number      => 30,
+        boolean_false => \0,
+        boolean_true => \1
+    );
+    return \%json
+    
+}

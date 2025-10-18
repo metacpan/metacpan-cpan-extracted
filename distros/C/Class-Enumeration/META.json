@@ -58,11 +58,11 @@
    "provides" : {
       "Class::Enumeration" : {
          "file" : "lib/Class/Enumeration.pm",
-         "version" : "v1.0.1"
+         "version" : "v1.0.3"
       },
       "Class::Enumeration::Builder" : {
          "file" : "lib/Class/Enumeration/Builder.pm",
-         "version" : "v1.0.1"
+         "version" : "v1.0.3"
       }
    },
    "release_status" : "stable",
@@ -76,5 +76,5 @@
          "web" : "https://github.com/XSven/Class-Enumeration"
       }
    },
-   "version" : "v1.0.1"
+   "version" : "v1.0.3"
 }

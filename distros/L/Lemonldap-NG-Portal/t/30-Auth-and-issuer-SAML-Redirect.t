@@ -289,11 +289,15 @@ sub issuer {
                 samlOrganizationName        => "IDP",
                 samlOrganizationURL         => "http://www.idp.com/",
                 samlServicePrivateKeyEnc    => saml_key_idp_private_enc,
-                samlServicePrivateKeySig    => saml_key_idp_private_sig,
                 samlServicePublicKeyEnc     => saml_key_idp_public_enc,
-                samlServicePublicKeySig     => saml_key_idp_public_sig,
-                samlServiceSignatureMethod  => "RSA_SHA1",
-                samlSPMetaDataXML           => {
+                keys                        => {
+                    "default-saml-sig" => {
+                        keyPrivate => saml_key_idp_private_sig,
+                        keyPublic  => saml_key_idp_public_sig,
+                    }
+                },
+                samlServiceSignatureMethod => "RSA_SHA1",
+                samlSPMetaDataXML          => {
                     "sp.com" => {
                         samlSPMetaDataXML =>
                           samlSPMetaDataXML( 'sp', 'HTTP-Redirect' )

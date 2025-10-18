@@ -1,0 +1,10 @@
+<start_html>
+Hello World
+__PERL__
+# Comment
+# Again
+#
+#
+#
+die('Bang !');
+1;

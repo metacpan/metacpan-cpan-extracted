@@ -222,12 +222,13 @@ ok(
     $res = $op->_get(
         '/oauth2/logout',
         accept => 'text/html',
-        query  => 'post_logout_redirect_uri=http://auth.rp.com/?logout=1'
+        query  =>
+          'post_logout_redirect_uri=http://auth.rp.com/oauth2/rlogoutreturn'
     ),
     'logout endpoint with redirect, endpoint /oauth2/logout'
 );
 count(1);
-expectRedirection( $res, 'http://auth.rp.com/?logout=1' );
+expectRedirection( $res, 'http://auth.rp.com/oauth2/rlogoutreturn' );
 
 ok( $res = $op->_get('/oauth2/logout'),
     'logout endpoint,               endpoint /oauth2/logout' );
@@ -318,7 +319,7 @@ sub op {
                         oidcRPMetaDataOptionsUserIDAttr        => "",
                         oidcRPMetaDataOptionsAccessTokenExpiration  => 3600,
                         oidcRPMetaDataOptionsPostLogoutRedirectUris =>
-                          "http://auth.rp.com/?logout=1",
+                          "http://auth.rp.com/oauth2/rlogoutreturn",
                         oidcRPMetaDataOptionsRedirectUris =>
                           'http://auth.rp.com/?openidconnectcallback=1',
                     }

@@ -80,6 +80,26 @@ userPassword: expire
 pwdPolicySubentry: cn=passwordexpire,ou=ppolicies,dc=example,dc=com
 pwdChangedTime: 20190101000000Z
 
+dn: uid=expirverysoon,ou=users,dc=example,dc=com
+objectClass: inetOrgPerson
+uid: expireverysoon
+cn: expireverysoon
+sn: expireverysoon
+mail: expireverysoon@badwolf.org
+userPassword: expireverysoon
+pwdPolicySubentry: cn=passwordexpire,ou=ppolicies,dc=example,dc=com
+pwdChangedTime: TWENTYNINEDAYSAGO
+
+dn: uid=expiresoon,ou=users,dc=example,dc=com
+objectClass: inetOrgPerson
+uid: expiresoon
+cn: expiresoon
+sn: expiresoon
+mail: expiresoon@badwolf.org
+userPassword: expiresoon
+pwdPolicySubentry: cn=passwordexpire,ou=ppolicies,dc=example,dc=com
+pwdChangedTime: TWENTYFIVEDAYSAGO
+
 dn: uid=lock,ou=users,dc=example,dc=com
 objectClass: inetOrgPerson
 uid: lock
@@ -131,7 +151,10 @@ cn: passwordexpire
 pwdAttribute: userPassword
 pwdAllowUserChange: TRUE
 pwdCheckQuality: 0
-pwdMaxAge: 5
+# 30 days
+pwdMaxAge: 2592000
+# 7 days
+pwdExpireWarning: 604800
 
 dn: cn=passwordlock,ou=ppolicies,dc=example,dc=com
 objectClass: device

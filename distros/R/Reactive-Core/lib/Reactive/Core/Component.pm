@@ -203,7 +203,7 @@ sub _split_property_and_index {
     my $self = shift;
     my $arg = shift;
 
-    my ($property, $index, $subproperty) = $arg =~ /^([A-Z]*)(?:\[(\d+)\])?(?:\.([A-Z]+))?$/i;
+    my ($property, $index, $subproperty) = $arg =~ /^([A-Z_]*)(?:\[(\d+)\])?(?:\.([A-Z_]+))?$/i;
 
     return ($property, $index, $subproperty);
 }

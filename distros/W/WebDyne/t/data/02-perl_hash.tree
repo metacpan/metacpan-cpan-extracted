@@ -1,0 +1,4 @@
+<html> @0 (IMPLICIT)
+  <head> @0.0 (IMPLICIT)
+  <body> @0.1 (IMPLICIT)
+    "Hello ${name}__PERL__sub hello { my %data=( name =>'World' ); ret..."

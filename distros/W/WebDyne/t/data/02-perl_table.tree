@@ -1,0 +1,13 @@
+<html> @0 (IMPLICIT)
+  <head> @0.0 (IMPLICIT)
+  <body> @0.1 (IMPLICIT)
+    <table> @0.1.0
+      <thead> @0.1.0.0
+        <tr> @0.1.0.0.0
+          <td> @0.1.0.0.0.0
+            "${thead_tr}"
+      <tbody> @0.1.0.1
+        <tr> @0.1.0.1.0
+          <td> @0.1.0.1.0.0
+            "${tbody_td}"
+    "__PERL__sub table { # Data we want to render # my $self=shift(); ..."

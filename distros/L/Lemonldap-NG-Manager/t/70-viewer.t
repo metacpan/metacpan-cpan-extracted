@@ -10,12 +10,7 @@ require 't/test-lib.pm';
 
 my $struct = 't/jsonfiles/70-diff.json';
 
-# Remove new conf
-unlink 't/conf/lmConf-2.json';
-
-sub body {
-    return IO::File->new( $struct, 'r' );
-}
+my ( $len, $body ) = substitute_io_handle($struct);
 
 # Test that key value is sent
 my $res = &client->jsonResponse('/view/1/portalDisplayOidcConsents');
@@ -40,7 +35,7 @@ count(1);
 
 ok(
     $res = &client->_post(
-        '/confs/', 'cfgNum=1&force=1', &body, 'application/json'
+        '/confs/', 'cfgNum=1&force=1', $body, 'application/json', $len
     ),
     "Request succeed"
 );
@@ -72,9 +67,6 @@ $res = &client->jsonResponse('/view/1');
 ok( $res->{cfgNum} eq '1', 'Browser is allowed' )
   or print STDERR Dumper($res);
 count(1);
-
-# Remove new conf
-unlink 't/conf/lmConf-2.json';
 
 done_testing( count() );
 

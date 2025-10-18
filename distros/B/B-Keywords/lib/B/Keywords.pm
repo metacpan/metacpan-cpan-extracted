@@ -14,7 +14,7 @@ use vars qw( @EXPORT_OK %EXPORT_TAGS );
 %EXPORT_TAGS = ( 'all' => \@EXPORT_OK );
 
 use vars '$VERSION';
-$VERSION = '1.28';
+$VERSION = '1.29';
 my $CPERL = $^V =~ /c$/ ? 1 : 0;
 
 use vars '@Scalars';
@@ -30,8 +30,10 @@ use vars '@Scalars';
     qw( $* $MULTILINE_MATCHING) : ()),
     qw( $. $INPUT_LINE_NUMBER $NR
         $/ $INPUT_RECORD_SEPARATOR $RS
-        $| $OUTPUT_AUTOFLUSH ), '$,', qw( $OUTPUT_FIELD_SEPARATOR $OFS
-        $\ $OUTPUT_RECORD_SEPARATOR $ORS
+        $| $OUTPUT_AUTOFLUSH ),
+        '$,', qw( $OUTPUT_FIELD_SEPARATOR $OFS ),
+        '$\\', qw( $OUTPUT_RECORD_SEPARATOR $ORS ),
+    qw(
         $" $LIST_SEPARATOR
         $; $SUBSCRIPT_SEPARATOR $SUBSEP
     ), '$#', qw( $OFMT
@@ -46,8 +48,8 @@ use vars '@Scalars';
         $@ $EVAL_ERROR
         $$ $PROCESS_ID $PID
         $< $REAL_USER_ID $UID
-        $> $EFFECTIVE_USER_ID $EUID ), 
-       '$(', qw( $REAL_GROUP_ID $GID ), 
+        $> $EFFECTIVE_USER_ID $EUID ),
+       '$(', qw( $REAL_GROUP_ID $GID ),
        '$)', qw( $EFFECTIVE_GROUP_ID $EGID
         $0 $PROGRAM_NAME
         $[

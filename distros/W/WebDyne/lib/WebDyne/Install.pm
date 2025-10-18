@@ -1,15 +1,14 @@
 #
 #  This file is part of WebDyne.
 #
-#  This software is Copyright (c) 2017 by Andrew Speer <andrew@webdyne.org>.
+#  This software is copyright (c) 2025 by Andrew Speer <andrew.speer@isolutions.com.au>.
 #
-#  This is free software, licensed under:
-#
-#    The GNU General Public License, Version 2, June 1991
+#  This is free software; you can redistribute it and/or modify it under
+#  the same terms as the Perl 5 programming language system itself.
 #
 #  Full license text is available at:
 #
-#  <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+#  <http://dev.perl.org/licenses/>
 #
 package WebDyne::Install;
 
@@ -18,7 +17,7 @@ package WebDyne::Install;
 #
 sub BEGIN {$^W=0}
 use strict qw(vars);
-use vars qw($VERSION @EXPORT_OK @ISA);
+use vars   qw($VERSION @EXPORT_OK @ISA);
 use warnings;
 no warnings qw(uninitialized);
 
@@ -32,7 +31,7 @@ require Exporter;
 
 #  WebDyne Modules
 #
-use WebDyne::Base;
+use WebDyne::Util;
 
 
 #  Constants
@@ -51,7 +50,7 @@ use Config;
 
 #  Version information
 #
-$VERSION='1.250';
+$VERSION='2.014';
 
 
 #  Debug
@@ -119,11 +118,12 @@ sub uninstall {
         message "removing cache directory '$cache_dn'";
         rmdir $cache_dn unless ($cache_dn eq File::Spec->tmpdir);
     }
-    if ($prefix) {
-        message "updating perl5lib config.";
-        &perl5lib::del($prefix) if $prefix;
-        rmdir($prefix) if $prefix;
-    }
+
+    #if ($prefix) {
+    #    message "updating perl5lib config.";
+    #    &perl5lib::del($prefix) if $prefix;
+    #    rmdir($prefix) if $prefix;
+    #}
 
 
     #  Done
@@ -141,7 +141,8 @@ sub install {
     #  Get prefix, discard class
     #
     my (undef, $prefix)=@_;
-    $prefix=undef if ($prefix eq $Config{'prefix'});
+    #$prefix=undef if ($prefix eq $Config{'prefix'});
+    $prefix=undef if ($prefix=~/^$Config{'prefix'}/);
 
     message;
     message sprintf(q[installation source directory '%s'.], $prefix || $Config{'prefix'});
@@ -155,7 +156,7 @@ sub install {
         #
         message "creating cache directory '$cache_dn'.";
         File::Path::mkpath($cache_dn, 0, 0755) || do {
-            return err ("unable to create dir $cache_dn") unless (-d $cache_dn)
+            return err("unable to create dir $cache_dn") unless (-d $cache_dn)
         };
 
     }
@@ -168,8 +169,8 @@ sub install {
 
     #  Add prefix to perl5lib store
     #
-    message "updating perl5lib config.";
-    &perl5lib::add($prefix) if $prefix;
+    #message "updating perl5lib config.";
+    #&perl5lib::add($prefix) if $prefix;
 
 
     # Done
@@ -203,12 +204,15 @@ sub cache_dn {
     #
     if ($WEBDYNE_CACHE_DN) {
         $cache_dn=$WEBDYNE_CACHE_DN;
+        debug("using WEBDYNE_CACHE_DN: $WEBDYNE_CACHE_DN for cache_dn");
     }
 
     #  If installed into custom location via PREFIX, but not the same
     #  as the Perl instal,
-    elsif ($prefix && ($prefix ne $Config{'prefix'})) {
+    #elsif ($prefix && ($prefix ne $Config{'prefix'})) {
+    elsif ($prefix && ($prefix !~ /^$Config{'prefix'}/)) {
         $cache_dn=File::Spec->catdir($prefix, 'cache');
+        debug("using prefix: $prefix for cache_dn");
     }
 
 
@@ -217,6 +221,7 @@ sub cache_dn {
     #
     else {
         $cache_dn=$DIR_CACHE_DEFAULT;
+        debug("using DIR_CACHE_DEFAULT: $DIR_CACHE_DEFAULT as cache_dn");
     }
 
 

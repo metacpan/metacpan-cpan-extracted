@@ -6,7 +6,7 @@
     </button>
   </TMPL_IF>
 
-  <div class="col-6" id="floating-menu"></div>
+  <div class="col-3 d-none d-xl-block" id="floating-menu"></div>
 
   <div id="footer">
     <div class="row">

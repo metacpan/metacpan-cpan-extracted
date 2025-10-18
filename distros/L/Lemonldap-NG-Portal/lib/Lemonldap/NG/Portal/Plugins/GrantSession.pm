@@ -76,7 +76,8 @@ sub run {
                       . $req->{sessionInfo}->{ $self->conf->{whatToTrace} }
                       . '" was not granted to open session (rule ->'
                       . "$rule)" );
-                $req->urldc( $req->portal );
+                $req->urldc(
+                    $self->p->buildUrl( $req->portal, { cancel => 1 } ) );
                 return $req->authResult(PE_SESSIONNOTGRANTED);
             }
             else {

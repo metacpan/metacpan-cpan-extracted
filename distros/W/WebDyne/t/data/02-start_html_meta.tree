@@ -1,0 +1,4 @@
+<html> @0 (IMPLICIT)
+  <head> @0.0 (IMPLICIT)
+    <meta content="bar1" name="foo1" /> @0.0.0
+  <body> @0.1 (IMPLICIT)

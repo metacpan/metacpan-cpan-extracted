@@ -1,0 +1,12 @@
+<start_html>
+<p>
+Para 1
+<script type="application/perl">
+sub hello {
+    return 'Hello World'
+}
+</script>
+<p>
+Para 2
+<p>
+<perl handler="hello"/>

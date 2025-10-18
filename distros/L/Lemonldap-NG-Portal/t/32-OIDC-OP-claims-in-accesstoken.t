@@ -12,7 +12,6 @@ BEGIN {
     require 't/oidc-lib.pm';
 }
 
-my $debug = 'error';
 my ( $op, $rp, $res );
 
 my $access_token;
@@ -24,7 +23,6 @@ LWP::Protocol::PSGI->register(
         my $host = $1;
         my $url  = $2;
         my ( $res, $client );
-        count(1);
         if ( $host eq 'op' ) {
             pass("  Request from RP to OP,     endpoint $url");
             $client = $op;
@@ -42,7 +40,6 @@ LWP::Protocol::PSGI->register(
             if ( $req->uri eq '/token/oauth2' ) {
                 is( $req->param("my_param"),
                     "my value", "oidcGenerateTokenRequest called" );
-                count(1);
             }
             ok(
                 $res = $client->_post(
@@ -68,11 +65,16 @@ LWP::Protocol::PSGI->register(
         ok( getHeader( $res, 'Content-Type' ) =~ m#^application/json#,
             '  Content is JSON' )
           or explain( $res->[1], 'Content-Type => application/json' );
-        count(4);
         if ( $res->[2]->[0] =~ /"access_token":"(.*?)"/ ) {
             $access_token = $1;
-            pass "Found access_token $access_token";
-            count(1);
+            pass "Found access_token";
+            my $json;
+            ok( $json = id_token_payload($access_token),
+                'access_token is a JWT' );
+            ok( $json->{family_name} eq 'Frédéric Accents',
+                'Found claims into access_token' );
+            ok( ( $json->{iat} and $json->{exp} ), 'Found iat and exp' );
+            ok( !$json->{nbf}, "nbf isn't part of access_token" );
         }
         return $res;
     }
@@ -91,11 +93,9 @@ ok(
 );
 expectOK($res);
 my $metadata = $res->[2]->[0];
-count(3);
 
 &Lemonldap::NG::Handler::Main::cfgNum( 0, 0 );
 ok( $rp = register( 'rp', sub { rp( $jwks, $metadata ) } ), 'RP portal' );
-count(1);
 
 eval '
     no warnings;
@@ -104,14 +104,12 @@ eval '
 
 # Query RP for auth
 ok( $res = $rp->_get( '/', accept => 'text/html' ), 'Unauth SP request' );
-count(1);
 my ( $url, $query ) =
   expectRedirection( $res, qr#http://auth.op.com(/oauth2/authorize)\?(.*)$# );
 
 # Push request to OP
 ok( $res = $op->_get( $url, query => $query, accept => 'text/html' ),
     "Push request to OP,         endpoint $url" );
-count(1);
 expectOK($res);
 
 $query = "user=french&password=french&$query";
@@ -124,7 +122,6 @@ ok(
     ),
     "Post authentication,        endpoint $url"
 );
-count(1);
 my $idpId = expectCookie($res);
 my ( $host, $tmp );
 ( $host, $tmp, $query ) = expectForm( $res, '#', undef, 'confirm' );
@@ -139,7 +136,6 @@ ok(
     ),
     "Post confirmation,          endpoint $url"
 );
-count(1);
 
 ($query) = expectRedirection( $res, qr#^http://auth.rp.com/?\?(.*)$# );
 
@@ -147,16 +143,14 @@ count(1);
 
 ok( $res = $rp->_get( '/', query => $query, accept => 'text/html' ),
     'Call openidconnectcallback on RP' );
-count(1);
 my $spId = expectCookie($res);
 
 clean_sessions();
-done_testing( count() );
+done_testing();
 
 sub op {
     return LLNG::Manager::Test->new( {
             ini => {
-                logLevel                        => $debug,
                 domain                          => 'idp.com',
                 portal                          => 'http://auth.op.com/',
                 authentication                  => 'Demo',
@@ -178,19 +172,19 @@ sub op {
                 oidcServiceAllowAuthorizationCodeFlow => 1,
                 oidcRPMetaDataOptions                 => {
                     rp => {
-                        oidcRPMetaDataOptionsDisplayName        => "RP",
-                        oidcRPMetaDataOptionsIDTokenExpiration  => 3600,
-                        oidcRPMetaDataOptionsClientID           => "rpid",
-                        oidcRPMetaDataOptionsIDTokenSignAlg     => "HS512",
-                        oidcRPMetaDataOptionsBypassConsent      => 0,
-                        oidcRPMetaDataOptionsClientSecret       => "rpsecret",
-                        oidcRPMetaDataOptionsRefreshToken       => 1,
-                        oidcRPMetaDataOptionsAccessTokenJWT     => 1,
-                        oidcRPMetaDataOptionsAccessTokenClaims  => 1,
-                        oidcRPMetaDataOptionsUserIDAttr         => "",
+                        oidcRPMetaDataOptionsDisplayName       => "RP",
+                        oidcRPMetaDataOptionsIDTokenExpiration => 3600,
+                        oidcRPMetaDataOptionsClientID          => "rpid",
+                        oidcRPMetaDataOptionsIDTokenSignAlg    => "HS512",
+                        oidcRPMetaDataOptionsBypassConsent     => 0,
+                        oidcRPMetaDataOptionsClientSecret      => "rpsecret",
+                        oidcRPMetaDataOptionsRefreshToken      => 1,
+                        oidcRPMetaDataOptionsAccessTokenJWT    => 1,
+                        oidcRPMetaDataOptionsAccessTokenClaims => 1,
+                        oidcRPMetaDataOptionsUserIDAttr        => "",
                         oidcRPMetaDataOptionsAccessTokenExpiration  => 3600,
                         oidcRPMetaDataOptionsPostLogoutRedirectUris =>
-                          "http://auth.rp.com/?logout=1",
+                          "http://auth.rp.com/oauth2/rlogoutreturn",
                         oidcRPMetaDataOptionsRule         => '$uid eq "french"',
                         oidcRPMetaDataOptionsRedirectUris =>
                           'http://auth.rp.com/?openidconnectcallback=1',
@@ -217,7 +211,6 @@ sub rp {
     my ( $jwks, $metadata ) = @_;
     return LLNG::Manager::Test->new( {
             ini => {
-                logLevel                   => $debug,
                 domain                     => 'rp.com',
                 portal                     => 'http://auth.rp.com/',
                 authentication             => 'OpenIDConnect',
@@ -240,14 +233,14 @@ sub rp {
                         oidcOPMetaDataOptionsAcrValues => "loa-32 customacr-1",
                         oidcOPMetaDataOptionsClientSecret => "rpsecret",
                         oidcOPMetaDataOptionsScope => "openid profile email",
-                        oidcOPMetaDataOptionsStoreIDToken       => 0,
-                        oidcOPMetaDataOptionsMaxAge             => 30,
-                        oidcOPMetaDataOptionsDisplay            => "",
-                        oidcOPMetaDataOptionsClientID           => "rpid",
-                        oidcOPMetaDataOptionsStoreIDToken       => 1,
-                        oidcOPMetaDataOptionsUseNonce           => 1,
-                        oidcOPMetaDataOptionsUserinfoSource     => 'access_token',
-                        oidcOPMetaDataOptionsConfigurationURI   =>
+                        oidcOPMetaDataOptionsStoreIDToken     => 0,
+                        oidcOPMetaDataOptionsMaxAge           => 30,
+                        oidcOPMetaDataOptionsDisplay          => "",
+                        oidcOPMetaDataOptionsClientID         => "rpid",
+                        oidcOPMetaDataOptionsStoreIDToken     => 1,
+                        oidcOPMetaDataOptionsUseNonce         => 1,
+                        oidcOPMetaDataOptionsUserinfoSource   => 'access_token',
+                        oidcOPMetaDataOptionsConfigurationURI =>
                           "https://auth.op.com/.well-known/openid-configuration"
                     }
                 },

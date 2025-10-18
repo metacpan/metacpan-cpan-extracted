@@ -10,9 +10,7 @@ require 't/test-lib.pm';
 
 my $struct = 't/jsonfiles/70-diff.json';
 
-sub body {
-    return IO::File->new( $struct, 'r' );
-}
+my ( $len, $body ) = substitute_io_handle($struct);
 
 # Load lemonldap-ng-noDiff.ini
 my $client2;
@@ -31,7 +29,7 @@ ok(
 # Try to compare confs 1 & 2
 ok(
     my $res = $client2->_post(
-        '/confs/', 'cfgNum=1&force=1', &body, 'application/json'
+        '/confs/', 'cfgNum=1&force=1', $body, 'application/json', $len
     ),
     "Request succeed"
 );
@@ -82,9 +80,6 @@ $res = $client2->jsonResponse('/view/1');
 ok( $res->{value} eq '_Hidden_', 'Browser is NOT allowed' )
   or print STDERR Dumper($res);
 count(2);
-
-# Remove new conf
-`rm -rf t/conf/lmConf-2.json`;
 
 done_testing( count() );
 

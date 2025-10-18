@@ -159,9 +159,11 @@ subtest "JWKS test (certificate)", sub {
     # Test previous key
     $key = $res->{keys}->[1];
     is( $key->{kid}, 'previousKey', 'Correct previous key ID' );
-    $previousPublicKey =~ s/-+.*?-+//g;
-    $previousPublicKey =~ s/\n//g;
-    is( $key->{x5c}->[0], $previousPublicKey, 'Correct previous certificate' );
+    my $normalizedPreviousPublicKey = $previousPublicKey;
+    $normalizedPreviousPublicKey =~ s/-+.*?-+//g;
+    $normalizedPreviousPublicKey =~ s/\n//g;
+    is( $key->{x5c}->[0],
+        $normalizedPreviousPublicKey, 'Correct previous certificate' );
 };
 
 subtest "JWKS test (pubkey)", sub {

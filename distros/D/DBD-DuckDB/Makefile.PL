@@ -9,27 +9,21 @@ WriteMakefile(
     AUTHOR           => q{Giuseppe Di Terlizzi <gdt@cpan.org>},
     LICENSE          => 'artistic_2',
     MIN_PERL_VERSION => 5.010,
-    PREREQ_PM        => {
-        'DBI'                   => '1.623',
-        'FFI::Platypus'         => '2.00',
-        'FFI::CheckLib'         => '0.30',
-        'FFI::Platypus::Record' => 0,
-        'Scalar::Util'          => 0,
-    },
+    PREREQ_PM => {'DBI' => '1.623', 'FFI::Platypus' => '2.00', 'FFI::CheckLib' => '0.30', 'FFI::Platypus::Record' => 0},
     CONFIGURE_REQUIRES => {'ExtUtils::MakeMaker' => '0'},
     TEST_REQUIRES      => {'Test::More'          => '0', 'Alien::DuckDB' => 0},
     META_MERGE         => {
         'meta-spec' => {version => 2},
         'resources' => {
-            bugtracker => {web => 'https://github.com/giterlizzi/perl-DBI-DuckDB/issues'},
+            bugtracker => {web => 'https://github.com/giterlizzi/perl-DBD-DuckDB/issues'},
             repository => {
                 type => 'git',
-                url  => 'git://github.com/giterlizzi/perl-DBI-DuckDB',
-                web  => 'https://github.com/giterlizzi/perl-DBI-DuckDB'
+                url  => 'git://github.com/giterlizzi/perl-DBD-DuckDB',
+                web  => 'https://github.com/giterlizzi/perl-DBD-DuckDB'
             },
         },
         x_purl => 'pkg:cpan/GDT/DBI-DuckDB'
     },
     dist  => {COMPRESS => 'gzip -9f', SUFFIX => 'gz'},
-    clean => {FILES    => 'DBI-DuckDB-*'},
+    clean => {FILES    => 'DBD-DuckDB-*'},
 );

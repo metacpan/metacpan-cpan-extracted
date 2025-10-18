@@ -17,7 +17,7 @@
   /*
   Main AngularJS controller
   */
-  llapp.controller('TreeCtrl', ['$scope', '$http', '$location', '$q', '$uibModal', '$translator', '$cookies', '$htmlParams', function ($scope, $http, $location, $q, $uibModal, $translator, $cookies, $htmlParams) {
+  llapp.controller('TreeCtrl', ['$scope', '$http', '$location', '$q', '$uibModal', '$translator', '$cookies', '$htmlParams', '$timeout', function ($scope, $http, $location, $q, $uibModal, $translator, $cookies, $htmlParams, $timeout) {
     var _checkSaveResponse, _download, _getAll, _stoggle, c, idinc, pathEvent, readError, setDefault, setHelp;
     $scope.links = window.links;
     $scope.menu = $htmlParams.menu;
@@ -30,6 +30,7 @@
     $scope.showT = false;
     $scope.form = 'home';
     $scope.currentCfg = {};
+    $scope.clipboardAvailable = Boolean(navigator.clipboard);
     $scope.confPrefix = window.confPrefix;
     $scope.message = {};
     $scope.result = '';
@@ -70,7 +71,7 @@
           items: []
         };
       } else if (e === 401) {
-        console.log('Authentication needed');
+        console.debug('Authentication needed');
         $scope.message = {
           title: 'authenticationNeeded',
           message: '__waitOrF5__',
@@ -157,7 +158,7 @@
             $scope[button.action]();
             break;
           default:
-            console.log(typeof button.action);
+            console.warn('Unknown action type', typeof button.action);
         }
       }
       return $scope.showM = false;
@@ -195,19 +196,19 @@
                 message: m,
                 items: data.details[m]
               });
-              console.log('NeedConfirmation:', $scope.message.itemsNC);
+              console.debug('NeedConfirmation:', $scope.message.itemsNC);
             } else if (m === '__warnings__') {
               $scope.message.itemsW.push({
                 message: m,
                 items: data.details[m]
               });
-              console.log('Warnings:', $scope.message.itemsW);
+              console.debug('Warnings:', $scope.message.itemsW);
             } else {
               $scope.message.itemsE.push({
                 message: m,
                 items: data.details[m]
               });
-              console.log('Errors:', $scope.message.itemsE);
+              console.debug('Errors:', $scope.message.itemsE);
             }
           }
         }
@@ -252,7 +253,7 @@
           return $scope.data.pop();
         });
       }, function () {
-        return console.log('Saving canceled');
+        console.debug('Saving canceled');
       });
       return $scope.showM = false;
     };
@@ -449,7 +450,7 @@
     $scope.newChoiceOver = function () {
       var d;
       d = $scope.currentNode.data;
-      console.log("data", d);
+      console.debug("data", d);
       if (!d[5]) {
         d[5] = [];
       }
@@ -538,6 +539,9 @@
     };
     $scope.addCasApp = function () {
       return $scope.newTemplateNode('casAppMetaDataNode', 'casPartnerName', 'app-example');
+    };
+    $scope.addKey = function () {
+      return $scope.newTemplateNode('keyNode', 'keyName', 'key-example');
     };
     $scope.newTemplateNode = function (type, title, init) {
       $scope.message = {
@@ -763,7 +767,7 @@
       d = $q.defer();
       d.notify('Trying to get datas');
       $scope.waiting = true;
-      console.log(`Trying to get key ${node.cnodes}`);
+      console.debug(`Trying to get key ${node.cnodes}`);
       uri = encodeURI(node.cnodes);
       $http.get(`${window.confPrefix}${$scope.currentCfg.cfgNum}/${uri}`).then(function (response) {
         var a, data, len, o;
@@ -798,7 +802,7 @@
             }
             node.nodes.push(a);
             if (a.type.match(/^rule$/)) {
-              console.log("Parse rule AuthnLevel as integer");
+              console.debug("Parse rule AuthnLevel as integer");
               if (a.level && typeof a.level === 'string') {
                 a.level = parseInt(a.level, 10);
               }
@@ -818,6 +822,17 @@
         return scope.toggle();
       });
     };
+    $scope.copyPath = function () {
+      var text = $scope.breadCrumb.join(" » ");
+      navigator.clipboard.writeText(text).then(function () {
+        $scope.$apply(function () {
+          $scope.copySuccess = true;
+          $timeout(function () {
+            $scope.copySuccess = false;
+          }, 400);
+        });
+      });
+    };
     setHelp = function (scope) {
       while (!scope.$modelValue.help && scope.$parentNodeScope) {
         scope = scope.$parentNodeScope;
@@ -834,6 +849,21 @@
     //	- launch getKeys to set `node.data`
     //	- hide tree when in XS size
 
+    $scope.getTrPath = function (scope) {
+      var path = [];
+      var trpath = [];
+      var current = scope;
+      var safetycount = 0;
+      while (current && current.$modelValue && safetycount < 100) {
+        safetycount = safetycount + 1;
+        if (current.$modelValue.title && current.$modelValue.title != path[0]) {
+          trpath.unshift(scope.translate(current.$modelValue.title));
+          path.unshift(current.$modelValue.title);
+        }
+        current = current.$parent;
+      }
+      return trpath;
+    };
     $scope.displayForm = function (scope) {
       var f, len, n, node, o, ref;
       node = scope.$modelValue;
@@ -861,6 +891,7 @@
         }
       }
       $scope.showT = false;
+      $scope.breadCrumb = $scope.getTrPath(scope);
       return setHelp(scope);
     };
     $scope.keyWritable = function (scope) {
@@ -919,7 +950,7 @@
           return $scope.showModal('message.html');
         }, readError);
       }, function () {
-        return console.log('Error sending test email');
+        console.error('Error sending test email');
       });
     };
     // RSA keys generation
@@ -938,7 +969,25 @@
           return $scope.waiting = false;
         }, readError);
       }, function () {
-        return console.log('New key cancelled');
+        console.debug('New key cancelled');
+      });
+    };
+    $scope.newEcCertificate = function () {
+      return $scope.showModal('password.html').then(function () {
+        var currentNode, password;
+        $scope.waiting = true;
+        currentNode = $scope.currentNode;
+        password = $scope.result;
+        return $http.post(`${window.confPrefix}/newEcCertificate`, {
+          "password": password
+        }).then(function (response) {
+          currentNode.data[0].data = response.data.private;
+          currentNode.data[1].data = password;
+          currentNode.data[2].data = response.data.public;
+          return $scope.waiting = false;
+        }, readError);
+      }, function () {
+        console.debug('New key cancelled');
       });
     };
     $scope.newEcKeys = function () {
@@ -992,7 +1041,7 @@
           return $scope.waiting = false;
         }, readError);
       }, function () {
-        return console.log('New key cancelled');
+        console.debug('New key cancelled');
       });
     };
     // - return a promise with the data:
@@ -1011,7 +1060,8 @@
           for (i = o = 0, len = ref.length; o < len; i = ++o) {
             n = ref[i];
             node.data[i] = {
-              title: n,
+              title: n.split("/").pop(),
+              get: n,
               id: n
             };
             tmp.push($scope.getKey(node.data[i]));
@@ -1025,10 +1075,10 @@
         } else {
           uri = '';
           if (node.get) {
-            console.log(`Trying to get key ${node.get}`);
+            console.debug(`Trying to get key ${node.get}`);
             uri = encodeURI(node.get);
           } else {
-            console.log(`Trying to get title ${node.title}`);
+            console.debug(`Trying to get title ${node.title}`);
           }
           $http.get(`${window.confPrefix}${$scope.currentCfg.cfgNum}/${node.get ? uri : node.title}`).then(function (response) {
             var data;
@@ -1075,7 +1125,7 @@
       if (n === null) {
         return $location.path('/confs/latest');
       } else {
-        console.log(`Trying to get cfg number ${n[1]}`);
+        console.debug(`Trying to get cfg number ${n[1]}`);
         return $scope.getCfg(n[1]);
       }
     };
@@ -1089,7 +1139,7 @@
           $scope.currentCfg = response.data;
           d = new Date($scope.currentCfg.cfgDate * 1000);
           $scope.currentCfg.date = d.toLocaleString();
-          console.log(`Metadatas of cfg ${n} loaded`);
+          console.debug(`Metadatas of cfg ${n} loaded`);
           $location.path(`/confs/${n}`);
           return $scope.init();
         }, function (response) {
@@ -1120,14 +1170,15 @@
       var tmp;
       tmp = null;
       $scope.waiting = true;
+      $scope.breadCrumb = null;
       $scope.data = [];
       $scope.confirmNeeded = false;
       $scope.forceSave = false;
       $q.all([$translator.init($scope.lang), $http.get(`${window.staticPrefix}struct.json`).then(function (response) {
         tmp = response.data;
-        return console.log("Structure loaded");
+        console.debug("Structure loaded");
       })]).then(function () {
-        console.log("Starting structure binding");
+        console.debug("Starting structure binding");
         $scope.data = tmp;
         tmp = null;
         if ($scope.currentCfg.cfgNum !== 0) {
@@ -1150,7 +1201,7 @@
     };
     c = $location.path().match(new RegExp('^/confs/(latest|[0-9]+)'));
     if (!c) {
-      console.log("Redirecting to /confs/latest");
+      console.debug("Redirecting to /confs/latest");
       $location.path('/confs/latest');
     }
     // File form function

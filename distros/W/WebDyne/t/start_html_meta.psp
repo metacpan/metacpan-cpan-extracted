@@ -1,0 +1,2 @@
+<start_html style="@{qw(https://example.com/test.css local.css)}" meta="%{ foo0=>'bar0', 'http-equiv=refresh'=>'5; url=https://www.example.com', 'http-equiv=default-style'=>undef  }">
+<meta name=foo1 content=bar1>

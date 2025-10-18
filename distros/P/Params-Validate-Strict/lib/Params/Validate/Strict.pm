@@ -18,11 +18,11 @@ Params::Validate::Strict - Validates a set of parameters against a schema
 
 =head1 VERSION
 
-Version 0.16
+Version 0.17
 
 =cut
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 =head1 SYNOPSIS
 
@@ -192,7 +192,7 @@ You can validate nested hashrefs and arrayrefs using the C<schema> property:
                     type => 'arrayref',
                     schema => {
                         type => 'string',
-                        matches => qr/^[a-z]+$/
+                        matches => qr/^[a-z]+$/	# Or you can say matches => '^[a-z]+$'
                     }
                 }
             }
@@ -502,7 +502,7 @@ sub validate_strict
 							if($rules->{'error_message'}) {
 								_error($logger, $rules->{'error_message'});
 							} else {
-								_error($logger, "validate_strict: Parameter '$key' must be at least $rule_value");
+								_error($logger, "validate_strict: Parameter '$key' ($value) must be at least $rule_value");
 							}
 						}
 					} else {
@@ -571,8 +571,9 @@ sub validate_strict
 						next;	# Skip if string is undefined
 					}
 					eval {
+						my $re = (ref($rule_value) eq 'Regexp') ? $rule_value : qr/\Q$rule_value\E/;
 						if($rules->{'type'} eq 'arrayref') {
-							my @matches = grep { /$rule_value/ } @{$value};
+							my @matches = grep { $_ =~ $re } @{$value};
 							if(scalar(@matches) != scalar(@{$value})) {
 								if($rules->{'error_message'}) {
 									_error($logger, $rules->{'error_message'});
@@ -580,13 +581,14 @@ sub validate_strict
 									_error($logger, "validate_strict: All members of parameter '$key' [", join(', ', @{$value}), "] must match pattern '$rule_value'");
 								}
 							}
-						} elsif($value !~ $rule_value) {
+						} elsif($value !~ $re) {
 							if($rules->{'error_message'}) {
 								_error($logger, $rules->{'error_message'});
 							} else {
-								_error($logger, "validate_strict: Parameter '$key' ($value) must match pattern '$rule_value'");
+								_error($logger, "validate_strict: Parameter '$key' ($value) must match pattern '$re'");
 							}
 						}
+						1;
 					};
 					if($@) {
 						_error($logger, "validate_strict: Parameter '$key' regex '$rule_value' error: $@");
@@ -715,7 +717,7 @@ sub validate_strict
 				} elsif($rule_name eq 'default') {
 					# Handled earlier
 				} elsif($rule_name eq 'error_message') {
-					# Handled in line
+					# Handled inline
 				} elsif($rule_name eq 'schema') {
 					# Nested schema Run the given schema against each element of the array
 					if($rules->{'type'} eq 'arrayref') {

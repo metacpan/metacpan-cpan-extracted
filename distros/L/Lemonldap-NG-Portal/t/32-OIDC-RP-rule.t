@@ -111,11 +111,16 @@ count(1);
 my $idpId = expectCookie($res);
 expectPortalError( $res, 84, 'PE_UNAUTHORIZEDPARTNER' );
 
-$query =~ s/client_id=rpid/client_id=unknownrp/;
 ok(
     $res = $op->_get(
         $url,
-        query  => $query,
+        query => {
+            response_type => 'code',
+            client_id     => 'unknownrp',
+            state         => '1745782655_25359',
+            redirect_uri  => 'http://auth.rp.com/?openidconnectcallback=1',
+            scope         => 'openid+profile',
+        },
         accept => 'text/html',
         cookie => "lemonldap=$idpId",
     ),
@@ -125,12 +130,31 @@ count(1);
 
 expectPortalError( $res, 107, "Unknown client ID" );
 
+ok(
+    $res = $op->_get(
+        $url,
+        query => {
+            response_type => 'code',
+            client_id     => 'brokenrp',
+            state         => '1745782655_25359',
+            redirect_uri  => 'http://auth.rp.com/?openidconnectcallback=1',
+            scope         => 'openid+profile',
+        },
+        accept => 'text/html',
+        cookie => "lemonldap=$idpId",
+    ),
+    "Post access to broken RP",
+);
+count(1);
+
+expectPortalError( $res, 107,
+    "Invalid config returns unknown client ID error" );
+
 clean_sessions();
 done_testing( count() );
 
 sub op {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel                        => $debug,
                 domain                          => 'idp.com',
@@ -160,6 +184,17 @@ sub op {
                         oidcRPMetaDataOptionsUserIDAttr        => "",
                         oidcRPMetaDataOptionsAccessTokenExpiration => 3600,
                         oidcRPMetaDataOptionsRule => '$uid eq "dwho"',
+                    },
+                    broken => {
+                        oidcRPMetaDataOptionsDisplayName       => "RP",
+                        oidcRPMetaDataOptionsIDTokenExpiration => 3600,
+                        oidcRPMetaDataOptionsClientID          => "brokenrp",
+                        oidcRPMetaDataOptionsIDTokenSignAlg    => "HS512",
+                        oidcRPMetaDataOptionsBypassConsent     => 0,
+                        oidcRPMetaDataOptionsClientSecret      => "rpsecret",
+                        oidcRPMetaDataOptionsUserIDAttr        => "",
+                        oidcRPMetaDataOptionsAccessTokenExpiration => 3600,
+                        oidcRPMetaDataOptionsRule => '$uid eq "',
                     }
                 },
                 oidcOPMetaDataOptions           => {},
@@ -181,8 +216,7 @@ sub op {
 
 sub rp {
     my ( $jwks, $metadata ) = @_;
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel                   => $debug,
                 domain                     => 'rp.com',

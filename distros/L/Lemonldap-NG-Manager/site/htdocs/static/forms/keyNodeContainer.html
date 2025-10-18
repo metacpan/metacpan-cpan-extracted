@@ -1,0 +1,25 @@
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title" trspan="keyNodes"></h3>
+  </div>
+  <table class="table table-striped">
+    <thead>
+      <tr><th trspan="keyName"></th><th></th></tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="s in currentNode.nodes">
+        <td><input class="form-control" ng-model="s.title"/></td>
+        <td>
+          <span class="link text-danger glyphicon glyphicon-minus-sign" ng-click="del(currentNode.nodes,$index)"></span>
+          <span ng-if="$last" class="link text-success glyphicon glyphicon-plus-sign" ng-click="menuClick({title:'addOidcRp'})"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<script type="text/menu">
+[{
+  "title": "addKey",
+  "icon": "plus-sign"
+}]
+</script>

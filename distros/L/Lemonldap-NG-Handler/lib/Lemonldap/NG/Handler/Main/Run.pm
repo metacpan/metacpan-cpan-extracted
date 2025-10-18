@@ -1,7 +1,7 @@
 # Main running methods file
 package Lemonldap::NG::Handler::Main::Run;
 
-our $VERSION = '2.21.0';
+our $VERSION = '2.22.0';
 
 package Lemonldap::NG::Handler::Main;
 
@@ -71,7 +71,7 @@ sub checkEvent {
                 $ret = $msg->{action};
             }
             else {
-                $class->logger->error("Unkown action $msg->{action}");
+                $class->logger->debug("Unknown action $msg->{action}");
             }
         }
         else {
@@ -889,6 +889,35 @@ sub localUnlog {
             }
         }
     }
+}
+
+## @rmethod buildAndLoadType(string package)
+# Try to load type or build it
+my %alreadyBuilt;
+
+sub buildAndLoadType {
+    my ( $class, $package ) = @_;
+    unless ( $package =~ /^[\w:]+$/ ) {
+        $class->logger->error("Bad clas name: $package");
+        return;
+    }
+    return if $alreadyBuilt{$package};
+    eval "require $package";
+    if ($@) {
+        my $lastError = $@;
+        my $main      = $package;
+        $main =~ s/::([^:]*)$/::Main/;
+        my $type = $1 or die "Malformed package $package";
+        eval <<EOF;
+package $package;
+use base 'Lemonldap::NG::Handler::Lib::$type',
+  '$main';
+1;
+EOF
+        die "Unable to build wrapper.\n First try: $lastError\n Auto-build: $@"
+          if ($@);
+    }
+    $alreadyBuilt{$package} = 1;
 }
 
 ## @rmethod protected postOutputFilter(string uri)

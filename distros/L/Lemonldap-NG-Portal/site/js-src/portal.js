@@ -22,8 +22,8 @@ setResult = function(field, result) {
   displayIcon(field, result);
   // Compute form validity from all previous results
   if (Object.values(ppolicyResults).every((value) => {
-    return value === "good" || value === "info";
-  })) {
+      return value === "good" || value === "info";
+    })) {
     if ((ref = $('#newpassword').get(0)) != null) {
       ref.setCustomValidity('');
     }
@@ -67,9 +67,9 @@ updateBorder = function() {
 translatePage = function(lang) {
 
   if (lang) {
-      window.currentLanguage = lang
+    window.currentLanguage = lang
   } else {
-      lang = window.currentLanguage
+    lang = window.currentLanguage
   }
 
   return $.getJSON(`${window.staticPrefix}languages/${lang}.json`, function(data) {
@@ -162,11 +162,10 @@ getValues = function() {
       return results;
     } catch (error1) {
       e = error1;
-      console.log('Parsing error', e);
-      return console.log('JSON', $(this).text());
+      console.error('Parsing error', e);
+      console.debug('JSON', $(this).text());
     }
   });
-  console.log(values);
   return values;
 };
 
@@ -200,7 +199,7 @@ removeOidcConsent = function(partner) {
   // Success
   return delKey("_oidcConsents", partner, function() {
     return $(`[partner='${partner}']`).hide();
-  // Error
+    // Error
   }, e);
 };
 
@@ -387,7 +386,7 @@ $(window).on('load', function() {
   }
   // If there are no auto-focused fields, focus on first visible input
   if ($("input[autofocus]").length === 0) {
-    $("input[type!=hidden]:first").focus();
+    $("input[type=text], input[type=password]").first().focus();
   }
   // Open links in new windows if required
   if (datas['newwindow']) {
@@ -397,18 +396,18 @@ $(window).on('load', function() {
   if ($("p.removeOther").length) {
     action = $("#form").attr("action");
     method = $("#form").attr("method");
-    console.log('method=', method);
+    console.debug('method=', method);
     hiddenParams = "";
     if ($("#form input[type=hidden]")) {
-      console.log('Parse hidden values');
+      console.debug('Parse hidden values');
       $("#form input[type=hidden]").each(function(index) {
-        console.log(' ->', $(this).attr("name"), $(this).val());
+        console.debug(' ->', $(this).attr("name"), $(this).val());
         return hiddenParams += "&" + $(this).attr("name") + "=" + $(this).val();
       });
     }
     back_url = "";
     if (action) {
-      console.log('action=', action);
+      console.debug('action=', action);
       if (action.indexOf("?") !== -1) {
         action.substring(0, action.indexOf("?")) + "?";
       } else {
@@ -429,37 +428,37 @@ $(window).on('load', function() {
   if (window.location.search) {
     queryLang = getQueryParam('llnglanguage');
     if (queryLang) {
-      console.log('Get lang from parameter');
+      console.debug('Get lang from parameter');
     }
     setCookieLang = getQueryParam('setCookieLang');
     if (setCookieLang === 1) {
-      console.log('Set lang cookie');
+      console.debug('Set lang cookie');
     }
   }
   if (!lang) {
     lang = window.datas['language'];
     if (lang && !queryLang) {
-      console.log('Get lang from server');
+      console.debug('Get lang from server');
     }
   } else if (indexOf.call(window.availableLanguages, lang) < 0) {
     lang = window.datas['language'];
     if (!queryLang) {
-      console.log('Lang not available -> Get lang from server');
+      console.debug('Lang not available -> Get lang from server');
     }
   }
   if (queryLang) {
     if (indexOf.call(window.availableLanguages, queryLang) < 0) {
-      console.log('Lang not available -> Get lang from server');
+      console.debug('Lang not available -> Get lang from server');
       queryLang = window.language;
     }
-    console.log('Selected lang ->', queryLang);
+    console.debug('Selected lang ->', queryLang);
     if (setCookieLang) {
-      console.log('Set cookie lang ->', queryLang);
+      console.debug('Set cookie lang ->', queryLang);
       setCookie('llnglanguage', queryLang, 3650);
     }
     translatePage(queryLang);
   } else {
-    console.log('Selected lang ->', lang);
+    console.debug('Selected lang ->', lang);
     translatePage(lang);
   }
   // Build language icons
@@ -559,7 +558,7 @@ $(window).on('load', function() {
       $(".toggle-password").on('mousedown touchstart', function() {
         field = $(this).attr('id');
         field = field.replace(/^toggle_/, '');
-        console.log('Display', field);
+        console.debug('Display', field);
         $(this).toggleClass("fa-eye fa-eye-slash");
         return $(`input[name=${field}]`).attr('class', 'form-control');
       });
@@ -573,7 +572,7 @@ $(window).on('load', function() {
       $(".toggle-password").on('mousedown touchstart', function() {
         field = $(this).attr('id');
         field = field.replace(/^toggle_/, '');
-        console.log('Display', field);
+        console.debug('Display', field);
         $(this).toggleClass("fa-eye fa-eye-slash");
         return $(`input[name=${field}]`).attr("type", "text");
       });
@@ -587,7 +586,7 @@ $(window).on('load', function() {
   $('#reset').change(function() {
     var checked, ref1, ref2, ref3, ref4, ref5;
     checked = $(this).prop('checked');
-    console.log('Reset is checked', checked);
+    console.debug('Reset is checked', checked);
     if (checked === true) {
       $('#ppolicy').hide();
       $('#newpasswords').hide();
@@ -638,12 +637,12 @@ $(window).on('load', function() {
   //$('#formpass').on 'submit', changePwd
   $('.clear-finduser-field').on('click', function() {
     return $(this).parent().find(':input').each(function() {
-      console.log('Clear search field ->', $(this).attr('name'));
+      console.debug('Clear search field ->', $(this).attr('name'));
       return $(this).val('');
     });
   });
   $('#closefinduserform').on('click', function() {
-    console.log('Clear modal');
+    console.debug('Clear modal');
     return $('#finduserForm').trigger('reset');
   });
   $('#finduserbutton').on('click', function(event) {
@@ -651,7 +650,7 @@ $(window).on('load', function() {
     event.preventDefault();
     document.body.style.cursor = 'progress';
     str = $("#finduserForm").serialize();
-    console.log('Send findUser request with parameters', str);
+    console.debug('Send findUser request with parameters', str);
     return $.ajax({
       type: "POST",
       url: `${scriptname}finduser`,
@@ -662,7 +661,7 @@ $(window).on('load', function() {
         var user;
         document.body.style.cursor = 'default';
         user = data.user;
-        console.log('Suggested spoofId=', user);
+        console.debug('Suggested spoofId=', user);
         $("input[name=spoofId]").each(function() {
           return $(this).val(user);
         });
@@ -678,19 +677,19 @@ $(window).on('load', function() {
         var res;
         document.body.style.cursor = 'default';
         if (err) {
-          console.log('Error', err);
+          console.error('Error', err);
         }
         if (j) {
           res = JSON.parse(j.responseText);
         }
         if (res && res.error) {
-          return console.log('Returned error', res);
+          console.error('Returned error', res);
         }
       }
     });
   });
   $('#btn-back-to-top').on('click', function() {
-    console.log('Back to top');
+    console.debug('Back to top');
     document.body.scrollTop = 0;
     return document.documentElement.scrollTop = 0;
   });
@@ -701,16 +700,24 @@ $(window).on('load', function() {
       return $('#btn-back-to-top').css("display", "none");
     }
   });
-  $('.btn-single-submit').on('click', function(event) {
+  $('form[data-property=single-submit]').on('submit', function(event) {
     if ($(this).data('data-submitted') === true) {
       event.preventDefault();
-      return $(this).prop('disabled', true);
     } else {
+      $(this).find(':submit').prop('disabled', true);
       return $(this).data('data-submitted', true);
     }
   });
   $(`.category[name=\"${datas['floatingCategory']}\"]`).appendTo('#floating-menu').find("i").remove();
   $(`.category[name=\"${datas['floatingCategory']}\"]`).draggable();
+  const parent = document.getElementById('floating-menu');
+  const divs = parent.querySelectorAll('.col-md-4');
+  divs.forEach(
+    (div, index) => {
+      div.classList.remove("col-md-4");
+      div.classList.add("col-md-12");
+    }
+  );
   $(document).trigger("portalLoaded");
   return true;
 });

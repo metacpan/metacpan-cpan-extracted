@@ -30,10 +30,10 @@ no_index:
 provides:
   Class::Enumeration:
     file: lib/Class/Enumeration.pm
-    version: v1.0.1
+    version: v1.0.3
   Class::Enumeration::Builder:
     file: lib/Class/Enumeration/Builder.pm
-    version: v1.0.1
+    version: v1.0.3
 requires:
   Scalar::Util: '0'
   Sub::Util: '1.40'
@@ -44,4 +44,4 @@ requires:
 resources:
   bugtracker: https://github.com/XSven/Class-Enumeration/issues
   repository: https://github.com/XSven/Class-Enumeration.git
-version: v1.0.1
+version: v1.0.3

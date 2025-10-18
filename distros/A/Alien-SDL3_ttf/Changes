@@ -1,0 +1,6 @@
+Revision history for Perl extension Alien::SDL3_ttf
+
+0.05 2025-10-17T20:08:14Z
+
+    - Split from Alien::SDL3
+    - Installs SDL3_ttf 3.2.2

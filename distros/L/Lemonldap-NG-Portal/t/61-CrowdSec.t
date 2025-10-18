@@ -33,10 +33,10 @@ my $res;
 my $client = LLNG::Manager::Test->new(
     {
         ini => {
-            logLevel       => 'error',
             authentication => 'Demo',
             userDB         => 'Same',
             crowdsec       => 1,
+            crowdsecKey    => 'aaa',
             crowdsecAction => 'reject',
         }
     }
@@ -51,7 +51,6 @@ ok(
     'Auth query'
 );
 expectReject($res);
-count(1);
 
 $reject = 0;
 ok(
@@ -63,8 +62,7 @@ ok(
     'Auth query'
 );
 expectOK($res);
-count(1);
 
 clean_sessions();
 
-done_testing( count() );
+done_testing();

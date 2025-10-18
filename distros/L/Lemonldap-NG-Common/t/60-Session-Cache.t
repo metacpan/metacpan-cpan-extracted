@@ -13,7 +13,7 @@ BEGIN {
     use_ok('Lemonldap::NG::Common::Session');
 }
 
-my $dir         = File::Temp::tempdir();
+my $dir         = File::Temp::tempdir( CLEANUP => 1 );
 my $sessionsdir = "$dir/sessions";
 my $cachedir    = "$dir/cache";
 

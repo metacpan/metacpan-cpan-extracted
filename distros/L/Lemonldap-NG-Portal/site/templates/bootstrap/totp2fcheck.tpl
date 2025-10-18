@@ -10,7 +10,7 @@
 
 <div class="card">
 
-<form action="<TMPL_VAR NAME="TARGET">" method="post" class="password" role="form">
+<form action="<TMPL_VAR NAME="TARGET">" method="post" class="password" role="form" data-property="single-submit">
   <div class="form">
     <input type="hidden" id="token" name="token" value="<TMPL_VAR NAME="TOKEN">" />
     <input type="hidden" id="checkLogins" name="checkLogins" value="<TMPL_VAR NAME="CHECKLOGINS">" />
@@ -20,11 +20,11 @@
       <div class="input-group-prepend">
         <span class="input-group-text"><label for="extcode" class="mb-0"><i class="fa fa-lock"></i></label></span>
       </div>
-      <input name="code" value="" type="text" class="form-control" id="extcode" trplaceholder="code" autocomplete="one-time-code" />
+      <input name="code" value="" type="text" class="form-control" id="extcode" trplaceholder="code" autocomplete="one-time-code" required />
     </div>
   </div>
   <div class="buttons mb-3">
-    <button type="submit" class="btn btn-success btn-single-submit">
+    <button type="submit" class="btn btn-success">
       <span class="fa fa-sign-in"></span>
       <span trspan="connect">Connect</span>
     </button>

@@ -1235,12 +1235,12 @@
         "data": "Apache::Session::File"
       }, {
         "default": [{
-          "data": "t/sessions/",
+          "data": "TMPDIR/sessions/",
           "id": "globalStorageOptions/Directory",
           "title": "Directory",
           "type": "keyText"
         }, {
-          "data": "t/sessions",
+          "data": "TMPDIR/sessions",
           "id": "globalStorageOptions/LockDirectory",
           "title": "LockDirectory",
           "type": "keyText"
@@ -1254,12 +1254,12 @@
         "title": "globalStorageOptions",
         "type": "keyTextContainer",
         "nodes": [{
-          "data": "t/sessions",
+          "data": "TMPDIR/sessions",
           "title": "Directory",
           "type": "keyText",
           "id": "globalStorageOptions/Directory"
         }, {
-          "data": "t/sessions",
+          "data": "TMPDIR/sessions",
           "title": "LockDirectory",
           "type": "keyText",
           "id": "globalStorageOptions/LockDirectory"
@@ -1331,9 +1331,9 @@
           "title": "Directory",
           "id": "persistentStorageOptions/Directory",
           "type": "keyText",
-          "data": "t/sessions"
+          "data": "TMPDIR/sessions"
 	}, {
-          "data": "t/sessions",
+          "data": "TMPDIR/sessions",
           "id": "persistentStorageOptions/LockDirectory",
           "title": "LockDirectory",
           "type": "keyText"

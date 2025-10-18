@@ -90,13 +90,13 @@
           error: function error(j, status, err) {
             var res;
             if (err) {
-              console.log('checkentropy: frontend error: ', err);
+              console.debug('checkentropy: frontend error: ', err);
             }
             if (j) {
               res = JSON.parse(j.responseText);
             }
             if (res && res.error) {
-              return console.log('checkentropy: returned error: ', res);
+              console.debug('checkentropy: returned error: ', res);
             }
           }
         });

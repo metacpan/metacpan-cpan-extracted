@@ -5,363 +5,115 @@
 # This module is written to be used by cron to clean old sessions from
 # Apache::Session. It does not works with Apache::Session::Memcached
 #
-# This is part of LemonLDAP::NG product, released under GPL
+# This is part of LemonLDAP::NG product, released under GPL-2+
 #=============================================================================
 
-use Lemonldap::NG::Common::Conf;
-use Lemonldap::NG::Common::Conf::Constants;
-use Lemonldap::NG::Common::Apache::Session;
-use Lemonldap::NG::Common::Session;
 use strict;
-use Getopt::Std;
+use Getopt::Long;
+use Pod::Usage;
+
+use Lemonldap::NG::Common::Session::Purge;
 
 # Options
 # -d: debug mode
 # -f: force delete of corrupted sessions
-our $opt_d;
-our $opt_f;
-getopts('df');
+# -j: log statistics as JSON
+my %cli_opts;
+my $result = GetOptions( \%cli_opts, 'debug|d', 'force|f', 'help|h', 'json|j' );
+pod2usage(0) if $cli_opts{help};
 
-my $debug     = $opt_d;
-my $force     = $opt_f;
-my $nb_purged = 0;
-my $nb_error  = 0;
+my $opts = {
+    ( $cli_opts{debug} ? ( logLevel => 'debug' ) : () ),
+    ( $cli_opts{force} ? ( force    => 1 )       : () ),
+    ( $cli_opts{json} ? ( json    => 1 )       : () ),
+};
 
-sub debug {
-    if ($debug) {
-        local $/ = "\n";
-        local $\ = "\n";
-        print STDERR @_;
-    }
-}
 
-#=============================================================================
-# Load configuration
-#=============================================================================
-my $lmconf = Lemonldap::NG::Common::Conf->new()
-  or die $Lemonldap::NG::Common::Conf::msg;
-my $conf      = $lmconf->getConf or die "Unable to get configuration ($!)";
-my $localconf = $lmconf->getLocalConf(PORTALSECTION)
-  or die "Unable to get local configuration ($!)";
+my $res = Lemonldap::NG::Common::Session::Purge->new($opts)->purge();
 
-if ($localconf) {
-    $conf->{$_} = $localconf->{$_} foreach ( keys %$localconf );
-}
+exit 1 unless $res->{success};
 
-debug "Configuration loaded";
+__END__
 
-#=============================================================================
-# Timeout
-#=============================================================================
-debug "Timeout value: " . $conf->{timeout};
+=head1 NAME
 
-#=============================================================================
-# Apache::Session backends
-#=============================================================================
-my @backends;
-my $module;
+=encoding utf8
 
-# Sessions
-if ( $conf->{globalStorage} ) {
+purgeCentralCache - Remove expired LemonLDAP::NG sessions from central storage
 
-    # Load module
-    $module = $conf->{globalStorage};
-    eval "use $module";
-    die $@ if ($@);
-    $conf->{globalStorageOptions}->{backend} = $module;
+=head1 SYNOPSIS
 
-    # Add module in managed backends
-    push @backends, $conf->{globalStorageOptions};
+  purgeCentralCache [options]
 
-    debug "Session backend $module will be used";
-}
+=head1 DESCRIPTION
 
-# SAML
-if ( $conf->{samlStorage}
-    or keys %{ $conf->{samlStorageOptions} ||= {} } )
-{
+This script must be run periodically on at least one LemonLDAP::NG hosts.
+It will search for expired SSO sessions, as well as secondary (SAML, CAS, OIDC)
+and utility (Captcha, Token) sessions, and remove them from the session backend.
 
-    # Load module
-    $module = $conf->{samlStorage} || $conf->{globalStorage};
-    eval "use $module";
-    die $@ if ($@);
-    $conf->{samlStorageOptions}->{backend} = $module;
+=head1 OPTIONS
 
-    # Add module in managed backends
-    push @backends, $conf->{samlStorageOptions};
+=over 8
 
-    debug "SAML backend $module will be used";
-}
+=item B<--help>, B<-h>
 
-# CAS
-if ( $conf->{casStorage}
-    or keys %{ $conf->{casStorageOptions} ||= {} } )
-{
+Print a brief help message and exit.
 
-    # Load module
-    $module = $conf->{casStorage} || $conf->{globalStorage};
-    eval "use $module";
-    die $@ if ($@);
-    $conf->{casStorageOptions}->{backend} = $module;
+=item B<--debug>, B<-d>
 
-    # Add module in managed backends
-    push @backends, $conf->{casStorageOptions};
+Print additional diagnostics to STDERR
 
-    debug "CAS backend $module will be used";
-}
+=item B<--force>, B<-f>
 
-# Captcha
-if ( $conf->{captchaStorage}
-    or keys %{ $conf->{captchaStorageOptions} ||= {} } )
-{
+Remove sessions if an error happened during their processing
 
-    # Load module
-    $module = $conf->{captchaStorage} || $conf->{globalStorage};
-    eval "use $module";
-    die $@ if ($@);
-    $conf->{captchaStorageOptions}->{backend} = $module;
+=item B<--json>, B<-j>
 
-    # Add module in managed backends
-    push @backends, $conf->{captchaStorageOptions};
+Log execution stats as JSON instead of human-readable text
 
-    debug "Captcha backend $module will be used";
-}
+=back
 
-# OpenIDConnect
-if ( $conf->{oidcStorage}
-    or keys %{ $conf->{oidcStorageOptions} ||= {} } )
-{
+=head1 SEE ALSO
 
-    # Load module
-    $module = $conf->{oidcStorage} || $conf->{globalStorage};
-    eval "use $module";
-    die $@ if ($@);
-    $conf->{oidcStorageOptions}->{backend} = $module;
+L<http://lemonldap-ng.org/>
 
-    # Add module in managed backends
-    push @backends, $conf->{oidcStorageOptions};
+=head1 AUTHORS
 
-    debug "OIDC backend $module will be used";
-}
+=over
 
-#=============================================================================
-# Load and purge sessions
-#=============================================================================
-for my $options (@backends) {
+=item Xavier Guimard, E<lt>yadd@debian.orgE<gt>
 
-    next if ( $options->{backend} eq "Apache::Session::Memcached" );
-    my @t;
-    if ( $options->{backend}->can('deleteIfLowerThan') ) {
-        debug "Found deleteIfLowerThan() in backend, using it";
-        my ( $success, $rows ) = $options->{backend}->deleteIfLowerThan(
-            $options,
-            {
-                not => { '_session_kind' => 'Persistent' },
-                or  => {
-                    _utime => time - $conf->{timeout},
-                    (
-                        $conf->{timeoutActivity}
-                        ? ( _lastSeen => time - $conf->{timeoutActivity} )
-                        : ()
-                    )
-                }
-            }
-        );
+=back
 
-        if ($success) {
-            if ($rows) {
-                $nb_purged += $rows;
-            }
-            next;
-        }
-    }
+=head1 BUG REPORT
 
-    # Get all expired sessions
-    Lemonldap::NG::Common::Apache::Session->get_key_from_all_sessions(
-        $options,
-        sub {
-            my $entry = shift;
-            my $id    = shift;
-            my $time  = time;
+Use OW2 system to report bug or ask for features:
+L<https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng/issues>
 
-            debug "Check session $id";
+=head1 DOWNLOAD
 
-            # Empty session need to be removed
-            unless ($entry) {
-                push @t, $id;
-                debug "Session $id is empty (corrupted?), delete forced";
-            }
+Lemonldap::NG is available at
+L<https://lemonldap-ng.org/download>
 
-            # Do net check sessions without _utime
-            return undef unless $entry->{_utime};
+=head1 COPYRIGHT AND LICENSE
 
-            # Do not expire persistent sessions
-            return undef if ( $entry->{_session_kind} eq "Persistent" );
+=over
 
-            # Session expired
-            if ( $time - $entry->{_utime} > $conf->{timeout} ) {
-                push @t, $id;
-                debug "Session $id expired";
-            }
+=item Copyright (C) 2024 by Xavier Guimard, E<lt>yadd@debian.orgE<gt>
 
-            # User has no activity, so considere the session has expired
-            elsif ( $conf->{timeoutActivity}
-                and $entry->{_lastSeen}
-                and $time - $entry->{_lastSeen} > $conf->{timeoutActivity} )
-            {
-                push @t, $id;
-                debug "Session $id inactive";
-            }
-            undef;
-        }
-    );
+=back
 
-    # Delete sessions
-    my @errors;
-    for my $id (@t) {
+This library is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2, or (at your option)
+any later version.
 
-        my $session = Lemonldap::NG::Common::Session->new(
-            storageModule        => $options->{backend},
-            storageModuleOptions => $options,
-            cacheModule          => $conf->{localSessionStorage},
-            cacheModuleOptions   => $conf->{localSessionStorageOptions},
-            id                   => $id,
-        );
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-        unless ( $session->data ) {
-            debug "Error while opening session $id";
-            print STDERR "Error on session $id\n";
-            $nb_error++;
-            push @errors, $id;
-            next;
-        }
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see L<http://www.gnu.org/licenses/>.
 
-        unless ( $session->remove ) {
-            debug "Error while deleting session $id";
-            print STDERR "Error on session $id\n";
-            $nb_error++;
-            push @errors, $id;
-            next;
-        }
-        debug "Session $id has been purged\n";
-        $nb_purged++;
-    }
-
-    # Remove lock files for File backend
-    if ( $options->{backend} =~ /^Apache::Session::(?:Browseable::)?File$/i ) {
-        require Apache::Session::Lock::File;
-        my $l              = new Apache::Session::Lock::File;
-        my $lock_directory = $options->{LockDirectory} || $options->{Directory};
-        $l->clean( $lock_directory, $conf->{timeout} );
-    }
-
-    # Force deletion of corrupted sessions for File backend
-    if (    $options->{backend} =~ /^Apache::Session::(?:Browseable::)?File$/i
-        and $force )
-    {
-        foreach (@errors) {
-            my $id = $_;
-            eval { unlink $options->{Directory} . "/$id"; };
-            if ($@) {
-                print STDERR "Unable to remove session $id\n";
-            }
-            else {
-                print STDERR "Session $id removed with force\n";
-                $nb_error--;
-            }
-        }
-    }
-
-    # Force deletion of corrupted sessions for DBI backend
-    if ( $options->{backend} =~
-/^Apache::Session::(?:Browseable::)?(MySQL|Postgres|DBI|Oracle|Informix|MySQLJSON|PgHstore|PgJSON|SQLLite|Sybase)$/i
-        and $force )
-    {
-        my $dbi = DBI->connect_cached( $options->{DataSource},
-            $options->{UserName}, $options->{Password} );
-        my $table = $options->{TableName} || "sessions";
-        my $req   = $dbi->prepare("DELETE from $table WHERE id=?");
-        foreach (@errors) {
-            my $id  = $_;
-            my $res = $req->execute($id);
-            unless ( $res == 1 ) {
-                print STDERR "Fail to delete session $id with force\n";
-            }
-            else {
-                print STDERR "Session $id removed with force\n";
-                $nb_error--;
-            }
-        }
-    }
-
-    # Force deletion of corrupted sessions for LDAP backend
-    if (    $options->{backend} =~ /^Apache::Session::(?:Browseable::)?LDAP$/i
-        and $force )
-    {
-        my $useTls = 0;
-        my $tlsParam;
-        my @servers = ();
-        foreach my $server ( split /[\s,]+/, $options->{ldapServer} ) {
-            if ( $server =~ m{^ldap\+tls://([^/]+)/?\??(.*)$} ) {
-                $useTls   = 1;
-                $server   = $1;
-                $tlsParam = $2 || "";
-            }
-            else {
-                $useTls = 0;
-            }
-            push @servers, $server;
-        }
-        my $ldap =
-          Net::LDAP->new( \@servers, keepalive => 1, onerror => undef, );
-        unless ($ldap) {
-            print STDERR "Unable to connect to LDAP server\n";
-            $nb_error++;
-            next;
-        }
-
-        # Start TLS if needed
-        if ($useTls) {
-            my %h = split( /[&=]/, $tlsParam );
-            $h{verify} ||= $options->{ldapVerify} || "require";
-            $h{cafile} ||= $options->{ldapCAFile} if ( $options->{ldapCAFile} );
-            $h{capath} ||= $options->{ldapCAPath} if ( $options->{ldapCAPath} );
-            my $start_tls = $ldap->start_tls(%h);
-            if ( $start_tls->code ) {
-                print STDERR "STARTTLS error: "
-                  . $start_tls->code . ': '
-                  . $start_tls->error;
-                $nb_error++;
-                next;
-            }
-        }
-
-        my $bind = $ldap->bind( $options->{ldapBindDN},
-            password => $options->{ldapBindPassword} );
-        my $attrId = $options->{ldapAttributeId} | "cn";
-        foreach (@errors) {
-            my $id = $_;
-            my $sessionDn =
-              $attrId . "=" . $id . "," . $options->{ldapConfBase};
-            my $delete = $ldap->delete($sessionDn);
-            if ( $delete->is_error ) {
-                print STDERR "Fail to delete session $id with force\n";
-            }
-            else {
-                print STDERR "Session $id removed with force\n";
-                $nb_error--;
-            }
-        }
-    }
-}
-
-#=============================================================================
-# Exit
-#=============================================================================
-debug "$nb_purged sessions have been purged";
-print STDERR
-  "$nb_error sessions remaining, try to purge them with force (option -f)\n"
-  if $nb_error;
-
-my $exit = $nb_error ? 1 : 0;
-exit $exit;
+=cut

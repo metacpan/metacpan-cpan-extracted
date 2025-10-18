@@ -2,101 +2,71 @@ package Lemonldap::NG::Portal::Plugins::CrowdSec;
 
 use strict;
 use Mouse;
-use JSON qw(from_json);
-use Lemonldap::NG::Common::UserAgent;
 use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
-  PE_ERROR
   PE_SESSIONNOTGRANTED
 );
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.22.0';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
+with 'Lemonldap::NG::Common::CrowdSec';
 
 # Entrypoint
-use constant beforeAuth => 'check';
+use constant beforeAuth => 'checkIpStatus';
 
-has ua => (
-    is      => 'rw',
-    lazy    => 1,
-    builder => sub {
-
-        # TODO : LWP options to use a proxy for example
-        my $ua = Lemonldap::NG::Common::UserAgent->new( $_[0]->{conf} );
-        $ua->env_proxy();
-        return $ua;
-    }
-);
-has crowdsecUrl => ( is => 'rw' );
+has rule => ( is => 'rw', default => sub { 0 } );
 
 sub init {
     my ($self) = @_;
-    if ( $self->conf->{crowdsecUrl} ) {
-        my $tmp = $self->conf->{crowdsecUrl};
-        $tmp =~ s#/+$##;
-        $self->crowdsecUrl($tmp);
+    $self->_init or return 0;
+
+    # Parse activation rule
+    unless ( $self->conf->{crowdsecKey} ) {
+        $self->logger->error('Missing Crowdsec Bouncer key');
+        return 0;
     }
-    else {
-        $self->logger->warn(
-            "crowdsecUrl isn't set, fallback to http://localhost:8080");
-        $self->crowdsecUrl('http://localhost:8080');
-    }
-    $self->logger->info( 'CrowdSec policy is: '
-          . ( $self->conf->{crowdsecAction} ? 'reject' : 'warn' ) );
+    $self->logger->info(
+        'CrowdSec policy is: ' . ( $self->conf->{crowdsecAction} || 'warn' ) );
+    $self->rule( $self->p->buildRule( $self->conf->{crowdsec}, 'crowdsec' ) );
     return 1;
 }
 
-sub check {
+sub checkIpStatus {
     my ( $self, $req ) = @_;
-    my $ip   = $req->address;
-    my $resp = $self->ua->get(
-        $self->crowdsecUrl . "/v1/decisions?ip=$ip",
-        'Accept'    => 'application/json',
-        'X-Api-Key' => $self->conf->{crowdsecKey},
-    );
-    if ( $resp->is_error and not !$self->conf->{crowdsecIgnoreFailures} ) {
-        $self->logger->error( 'Bad CrowdSec response: ' . $resp->message );
-        $self->logger->debug( $resp->content );
-        return PE_ERROR;
-    }
-    my $content = $resp->decoded_content;
-    if ( !$content or $content eq 'null' ) {
-        $self->userLogger->debug("$ip isn't known by CrowdSec");
+    if ( !$self->rule->( $req, $req->sessionInfo ) ) {
+        $self->logger->debug('Crowdsec disabled for this env');
         return PE_OK;
     }
-    my $json_hash;
-    eval { $json_hash = from_json( $content, { allow_nonref => 1 } ); };
-    if ($@) {
-        $self->logger->error("Unable to decode CrowdSec response: $content");
-        $self->logger->debug($@);
-        return PE_ERROR;
-    }
-    $self->logger->debug("CrowdSec response: $content");
+    my $ip = $req->address;
+    my ( $ok, $err ) = $self->bouncer($ip);
 
-    # Response is "null" when IP is unknown
-    if ($json_hash) {
+    # bouncer() answer $ok=0 only when Crowdsec response rejects the given IP
+    return PE_OK if ( $ok and $err and $self->conf->{crowdsecIgnoreFailures} );
 
-        # CrowdSec may return more than one decision
-        foreach my $decision (@$json_hash) {
-            if ( $decision->{type} and $decision->{type} eq 'ban' ) {
-                $self->userLogger->warn( "$ip banned by CrowdSec ('"
-                      . $decision->{scenario}
-                      . "' for $decision->{duration})" );
-                if ( $self->conf->{crowdsecAction} eq 'reject' ) {
-                    $self->userLogger->error("$ip rejected by CrowdSec");
-                    return PE_SESSIONNOTGRANTED;
-                }
-                else {
-                    $self->userLogger->error("$ip is banned by CrowdSec");
-                    $req->env->{CROWDSEC_REJECT} = 1;
-                    return PE_OK;
-                }
-            }
+    # When $ok==0, $err contains the Crowdsec decision
+    unless ($ok) {
+        if ( $self->conf->{crowdsecAction} eq 'reject' ) {
+            $self->auditLog(
+                $req,
+                code    => 403,
+                message => $err,
+                ip      => $ip,
+            );
+            return PE_SESSIONNOTGRANTED;
         }
-        $self->userLogger->info("$ip not banned by CrowdSec");
-        return PE_OK;
+        else {
+            $self->auditLog(
+                $req,
+                code    => 200,
+                message => "$err (ignored)",
+                ip      => $ip,
+            );
+            $req->env->{CROWDSEC_REJECT} = 1;
+            return PE_OK;
+        }
     }
+    return $err ? $err : PE_OK;
 }
 
 1;

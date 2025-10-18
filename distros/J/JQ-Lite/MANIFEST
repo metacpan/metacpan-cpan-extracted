@@ -2,6 +2,9 @@ bin/jq-lite
 Changes
 CONTRIBUTING.md
 lib/JQ/Lite.pm
+lib/JQ/Lite/Filters.pm
+lib/JQ/Lite/Parser.pm
+lib/JQ/Lite/Util.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
@@ -13,6 +16,7 @@ t/aggregate.t
 t/all.t
 t/any.t
 t/arithmetic.t
+t/array_constructor.t
 t/arrays.t
 t/assignment.t
 t/avg_by.t
@@ -23,6 +27,7 @@ t/chunks.t
 t/clamp.t
 t/coalesce.t
 t/compact.t
+t/compact_output_cli.t
 t/contains.t
 t/contains_function.t
 t/count.t
@@ -38,13 +43,16 @@ t/first_last.t
 t/flatten.t
 t/flatten_all.t
 t/flatten_depth.t
+t/foreach.t
 t/friends.t
+t/from_file_cli.t
 t/fromjson.t
 t/getpath.t
 t/group_by.t
 t/group_count.t
 t/has.t
 t/has_function.t
+t/if_then_else.t
 t/index.t
 t/indices.t
 t/is_empty.t
@@ -64,6 +72,8 @@ t/min_max_by.t
 t/mode.t
 t/not.t
 t/nth.t
+t/null_input_cli.t
+t/object_constructor.t
 t/objects.t
 t/path.t
 t/paths.t
@@ -73,12 +83,15 @@ t/pipe_select_name.t
 t/pluck.t
 t/range.t
 t/recurse.t
+t/reduce.t
 t/replace.t
 t/reverse.t
 t/rindex.t
 t/round.t
 t/scalars.t
+t/setpath.t
 t/slice.t
+t/slurp_cli.t
 t/sort_by.t
 t/sort_desc.t
 t/sort_unique.t
@@ -87,6 +100,7 @@ t/startswith_endswith.t
 t/substr.t
 t/sum_by.t
 t/tail.t
+t/test_function.t
 t/to_number.t
 t/tojson.t
 t/tostring.t

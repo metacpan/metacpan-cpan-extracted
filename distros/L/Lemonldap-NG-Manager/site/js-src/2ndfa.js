@@ -14,11 +14,11 @@ max = 25;
 schemes = {
   _whatToTrace: [
     function(t,
-    v) {
+      v) {
       return `groupBy=substr(${t},1)`;
     },
     function(t,
-    v) {
+      v) {
       return `${t}=${v}*`;
     }
   ]
@@ -26,7 +26,7 @@ schemes = {
 
 overScheme = {
   _whatToTrace: function(t, v, level, over) {
-    console.log('overSchema => level', level, 'over', over);
+    console.debug('overSchema => level', level, 'over', over);
     if (level === 1 && v.length > over) {
       return `${t}=${v}*&groupBy=substr(${t},${level + over + 1})`;
     } else {
@@ -58,14 +58,14 @@ llapp.controller('SessionsExplorerCtrl', [
   '$q',
   '$http',
   function($scope,
-  $translator,
-  $location,
-  $q,
-  $http) {
+    $translator,
+    $location,
+    $q,
+    $http) {
     var autoId,
-  c,
-  pathEvent,
-  sessionType;
+      c,
+      pathEvent,
+      sessionType;
     $scope.links = links;
     $scope.menulinks = menulinks;
     $scope.staticPrefix = staticPrefix;
@@ -86,7 +86,7 @@ llapp.controller('SessionsExplorerCtrl', [
     $scope.translate = $translator.translate;
     $scope.translateTitle = function(node) {
       return $translator.translateField(node,
-  'title');
+        'title');
     };
     sessionType = 'persistent';
     // Handle menu items
@@ -100,14 +100,14 @@ llapp.controller('SessionsExplorerCtrl', [
         switch (typeof button.action) {
           case 'function':
             button.action($scope.currentNode,
-  $scope);
+              $scope);
             $scope[button.action]();
             break;
           case 'string':
             $scope[button.action]();
             break;
           default:
-            console.log(typeof button.action);
+            console.warn('Unknown action type', typeof button.action);
         }
       }
       return $scope.showM = false;
@@ -121,18 +121,18 @@ llapp.controller('SessionsExplorerCtrl', [
       $scope.currentSession = null;
       $scope.data = [];
       return $scope.updateTree2('',
-  $scope.data,
-  0,
-  0);
+        $scope.data,
+        0,
+        0);
     };
-    
+
     // Delete 2FA device
     $scope.delete2FA = function(type,
-  epoch) {
+      epoch) {
       var e,
-  i,
-  items,
-  len;
+        i,
+        items,
+        len;
       items = document.querySelectorAll(`.data-${epoch}`);
       for (i = 0, len = items.length; i < len; i++) {
         e = items[i];
@@ -140,11 +140,11 @@ llapp.controller('SessionsExplorerCtrl', [
       }
       $scope.waiting = true;
       $http['delete'](`${scriptname}sfa/${sessionType}/${$scope.currentSession.id}?type=${type}&epoch=${epoch}`).then(function(response) {
-        return $scope.waiting = false;
-      },
-  function(resp) {
-        return $scope.waiting = false;
-      });
+          return $scope.waiting = false;
+        },
+        function(resp) {
+          return $scope.waiting = false;
+        });
       return $scope.showT = false;
     };
     // Open node
@@ -153,47 +153,47 @@ llapp.controller('SessionsExplorerCtrl', [
       node = scope.$modelValue;
       if (node.nodes.length === 0) {
         $scope.updateTree(node.value,
-  node.nodes,
-  node.level,
-  node.over,
-  node.query,
-  node.count);
+          node.nodes,
+          node.level,
+          node.over,
+          node.query,
+          node.count);
       }
       return scope.toggle();
     };
     // Display selected session
     $scope.displaySession = function(scope) {
       var sessionId,
-  transformSession;
+        transformSession;
       // Private functions
 
       // Session preparation
       transformSession = function(session) {
         var _stToStr,
-  array,
-  arrayDate,
-  attr,
-  attrs,
-  category,
-  epoch,
-  i,
-  k,
-  key,
-  len,
-  len1,
-  name,
-  pattern,
-  res,
-  sfDevice,
-  subres,
-  time,
-  type,
-  value;
+          array,
+          arrayDate,
+          attr,
+          attrs,
+          category,
+          epoch,
+          i,
+          k,
+          key,
+          len,
+          len1,
+          name,
+          pattern,
+          res,
+          sfDevice,
+          subres,
+          time,
+          type,
+          value;
         _stToStr = function(s) {
           return s;
         };
         time = session._utime;
-// 1. Replace values if needed
+        // 1. Replace values if needed
         for (key in session) {
           value = session[key];
           if (!value) {
@@ -217,7 +217,7 @@ llapp.controller('SessionsExplorerCtrl', [
           }
         }
         res = [];
-// 2. Push session keys in result, grouped by categories
+        // 2. Push session keys in result, grouped by categories
         for (category in categories) {
           attrs = categories[category];
           subres = [];
@@ -304,8 +304,8 @@ llapp.controller('SessionsExplorerCtrl', [
     };
     // URI local path management
     pathEvent = function(event,
-  next,
-  current) {
+      next,
+      current) {
       var n;
       n = next.match(/#!?\/(\w+)/);
       if (n === null || n[1].match(/^(persistent)$/)) {
@@ -314,18 +314,18 @@ llapp.controller('SessionsExplorerCtrl', [
       return $scope.init();
     };
     $scope.$on('$locationChangeSuccess',
-  pathEvent);
+      pathEvent);
     // Functions to update tree: download value of opened subkey
     autoId = 0;
     $scope.updateTree = function(value,
-  node,
-  level,
-  over,
-  currentQuery,
-  count) {
+      node,
+      level,
+      over,
+      currentQuery,
+      count) {
       var query,
-  scheme,
-  tmp;
+        scheme,
+        tmp;
       $scope.waiting = true;
       // Query scheme selection:
 
@@ -334,15 +334,15 @@ llapp.controller('SessionsExplorerCtrl', [
       scheme = schemes[$scope.type] ? schemes[$scope.type] : schemes._whatToTrace;
       // Build query using schemes
       query = scheme[level]($scope.type,
-  value,
-  currentQuery);
+        value,
+        currentQuery);
       // If number of session exceeds "max" and overScheme exists, call it
       if (count > max && overScheme[$scope.type]) {
         if (tmp = overScheme[$scope.type]($scope.type,
-  value,
-  level,
-  over,
-  currentQuery)) {
+            value,
+            level,
+            over,
+            currentQuery)) {
           over++;
           query = tmp;
           level = level - 1;
@@ -360,47 +360,47 @@ llapp.controller('SessionsExplorerCtrl', [
           return "";
         }
       }).join("")).then(function(response) {
-        var data,
-  i,
-  len,
-  n,
-  ref;
-        data = response.data;
-        if (data.result) {
-          ref = data.values;
-          for (i = 0, len = ref.length; i < len; i++) {
-            n = ref[i];
-            autoId++;
-            n.id = `node${autoId}`;
-            if (level < scheme.length - 1) {
-              n.nodes = [];
-              n.level = level + 1;
-              n.query = query;
-              n.over = over;
+          var data,
+            i,
+            len,
+            n,
+            ref;
+          data = response.data;
+          if (data.result) {
+            ref = data.values;
+            for (i = 0, len = ref.length; i < len; i++) {
+              n = ref[i];
+              autoId++;
+              n.id = `node${autoId}`;
+              if (level < scheme.length - 1) {
+                n.nodes = [];
+                n.level = level + 1;
+                n.query = query;
+                n.over = over;
+              }
+              node.push(n);
             }
-            node.push(n);
+            if (value === '') {
+              $scope.total = data.total;
+            }
           }
-          if (value === '') {
-            $scope.total = data.total;
-          }
-        }
-        return $scope.waiting = false;
-      },
-  function(resp) {
-        return $scope.waiting = false;
-      });
+          return $scope.waiting = false;
+        },
+        function(resp) {
+          return $scope.waiting = false;
+        });
     };
-    
+
     // Functions to filter U2F sessions tree : download value of opened subkey
     $scope.updateTree2 = function(value,
-  node,
-  level,
-  over,
-  currentQuery,
-  count) {
+      node,
+      level,
+      over,
+      currentQuery,
+      count) {
       var query,
-  scheme,
-  tmp;
+        scheme,
+        tmp;
       $scope.waiting = true;
       // Query scheme selection:
 
@@ -410,15 +410,15 @@ llapp.controller('SessionsExplorerCtrl', [
       scheme = schemes[$scope.type] ? schemes[$scope.type] : $scope.type === '_updateTime' ? schemes._startTime : schemes._whatToTrace;
       // Build query using schemes
       query = scheme[level]($scope.type,
-  value,
-  currentQuery);
+        value,
+        currentQuery);
       // If number of session exceeds "max" and overScheme exists, call it
       if (count > max && overScheme[$scope.type]) {
         if (tmp = overScheme[$scope.type]($scope.type,
-  value,
-  level,
-  over,
-  currentQuery)) {
+            value,
+            level,
+            over,
+            currentQuery)) {
           over++;
           query = tmp;
           level = level - 1;
@@ -436,35 +436,35 @@ llapp.controller('SessionsExplorerCtrl', [
           return "";
         }
       }).join("")).then(function(response) {
-        var data,
-  i,
-  len,
-  n,
-  ref;
-        data = response.data;
-        if (data.result) {
-          ref = data.values;
-          for (i = 0, len = ref.length; i < len; i++) {
-            n = ref[i];
-            autoId++;
-            n.id = `node${autoId}`;
-            if (level < scheme.length - 1) {
-              n.nodes = [];
-              n.level = level + 1;
-              n.query = query;
-              n.over = over;
+          var data,
+            i,
+            len,
+            n,
+            ref;
+          data = response.data;
+          if (data.result) {
+            ref = data.values;
+            for (i = 0, len = ref.length; i < len; i++) {
+              n = ref[i];
+              autoId++;
+              n.id = `node${autoId}`;
+              if (level < scheme.length - 1) {
+                n.nodes = [];
+                n.level = level + 1;
+                n.query = query;
+                n.over = over;
+              }
+              node.push(n);
             }
-            node.push(n);
+            if (value === '') {
+              $scope.total = data.total;
+            }
           }
-          if (value === '') {
-            $scope.total = data.total;
-          }
-        }
-        return $scope.waiting = false;
-      },
-  function(resp) {
-        return $scope.waiting = false;
-      });
+          return $scope.waiting = false;
+        },
+        function(resp) {
+          return $scope.waiting = false;
+        });
     };
     // Intialization function
     // Simply set $scope.waiting to false during $translator and tree root
@@ -473,15 +473,16 @@ llapp.controller('SessionsExplorerCtrl', [
       $scope.waiting = true;
       $scope.data = [];
       $q.all([$translator.init($scope.lang),
-  $scope.updateTree('',
-  $scope.data,
-  0,
-  0)]).then(function() {
-        return $scope.waiting = false;
-      },
-  function(resp) {
-        return $scope.waiting = false;
-      });
+        $scope.updateTree('',
+          $scope.data,
+          0,
+          0)
+      ]).then(function() {
+          return $scope.waiting = false;
+        },
+        function(resp) {
+          return $scope.waiting = false;
+        });
       // Colorized link
       $scope.activeModule = "2ndFA";
       return $scope.myStyle = {

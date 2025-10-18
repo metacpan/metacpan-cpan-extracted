@@ -14,7 +14,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_IMPERSONATION_SERVICE_NOT_ALLOWED
 );
 
-our $VERSION = '2.21.0';
+our $VERSION = '2.22.0';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -90,7 +90,7 @@ sub display {
         unless ( $realSession = $self->p->getApacheSession($realSessionId) ) {
             $self->userLogger->info(
                 "ContextSwitching: session $realSessionId expired");
-            return $self->p->do( $req, [ sub { PE_SESSIONEXPIRED } ] );
+            return $self->p->doPE( $req, PE_SESSIONEXPIRED );
         }
     }
 
@@ -99,8 +99,7 @@ sub display {
         || $req->userData->{ $self->prefixedSId } )
     {
         $self->userLogger->warn('ContextSwitching service NOT authorized');
-        return $self->p->do( $req,
-            [ sub { PE_IMPERSONATION_SERVICE_NOT_ALLOWED } ] );
+        return $self->p->doPE( $req, PE_IMPERSONATION_SERVICE_NOT_ALLOWED );
     }
 
     if ( $req->userData->{ $self->prefixedSId } ) {
@@ -118,7 +117,7 @@ sub display {
             $req = $self->_abortImpersonation( $req, $req->{user},
                 $realSession->data->{ $self->conf->{whatToTrace} }, 0 );
             $self->p->updateSession( $req, $req->userData );
-            return $self->p->do( $req, [ sub { PE_REDIRECT } ] );
+            return $self->p->doPE( $req, PE_REDIRECT );
         }
     }
 
@@ -150,12 +149,12 @@ sub run {
         my $token = $req->param('token');
         unless ($token) {
             $self->userLogger->warn('ContextSwitching called without token');
-            return $self->p->do( $req, [ sub { PE_NOTOKEN } ] );
+            return $self->p->doPE( $req, PE_NOTOKEN );
         }
         unless ( $self->ott->getToken($token) ) {
             $self->userLogger->warn(
                 'ContextSwitching called with an expired/bad token');
-            return $self->p->do( $req, [ sub { PE_TOKENEXPIRED } ] );
+            return $self->p->doPE( $req, PE_TOKENEXPIRED );
         }
     }
 
@@ -163,8 +162,7 @@ sub run {
     unless ( $self->rule->( $req, $req->userData ) ) {
         $self->userLogger->warn('ContextSwitching service NOT authorized');
         $spoofId = '';
-        return $self->p->do( $req,
-            [ sub { PE_IMPERSONATION_SERVICE_NOT_ALLOWED } ] );
+        return $self->p->doPE( $req, PE_IMPERSONATION_SERVICE_NOT_ALLOWED );
     }
 
     # ContextSwitching required -> Check user Id
@@ -174,13 +172,13 @@ sub run {
             $self->userLogger->warn('Malformed spoofed Id');
             $self->logger->debug(
                 "ContextSwitching tried with spoofed Id: $spoofId");
-            return $self->p->do( $req, [ sub { PE_MALFORMEDUSER } ] );
+            return $self->p->doPE( $req, PE_MALFORMEDUSER );
         }
     }
     else {
         $self->logger->debug("contextSwitching NOT required");
         $req->urldc( $req->portal );
-        return $self->p->do( $req, [ sub { PE_OK } ] );
+        return $self->p->doPE( $req, PE_OK );
     }
 
     # Create spoofed session
@@ -196,7 +194,7 @@ sub run {
     );
 
     $req->mustRedirect(1);
-    return $self->p->do( $req, [ sub { $statut } ] );
+    return $self->p->doPE( $req, $statut );
 }
 
 sub _switchContext {

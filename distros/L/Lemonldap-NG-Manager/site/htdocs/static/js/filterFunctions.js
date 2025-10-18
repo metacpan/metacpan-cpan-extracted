@@ -51,7 +51,7 @@
           nd = n._nodes ? n._nodes : n.nodes;
           // Case "Choice"
           if (node.nodes[0].data === 'Choice' && n.id === 'choiceParams') {
-            console.log('Choice is selected');
+            console.debug('Choice is selected');
             if (nd[1].cnodes) {
               restart++;
             } else {
@@ -69,7 +69,7 @@
             }
             // Case "Combination"
           } else if (node.nodes[0].data === 'Combination' && n.id === 'combinationParams') {
-            console.log('Combination is selected');
+            console.debug('Combination is selected');
             if (nd[1].cnodes) {
               restart++;
             } else {

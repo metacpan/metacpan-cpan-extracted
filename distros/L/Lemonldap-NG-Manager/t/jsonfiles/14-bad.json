@@ -1222,12 +1222,12 @@
         "data": "Apache::Session::File"
       }, {
         "default": [{
-          "data": "t/sessions",
+          "data": "TMPDIR/sessions",
           "id": "globalStorageOptions/Directory",
           "title": "Directory",
           "type": "keyText"
         }, {
-          "data": "t/sessions",
+          "data": "TMPDIR/sessions",
           "id": "globalStorageOptions/LockDirectory",
           "title": "LockDirectory",
           "type": "keyText"
@@ -1241,7 +1241,7 @@
         "title": "globalStorageOptions",
         "type": "keyTextContainer",
         "nodes": [{
-          "data": "t/sessions",
+          "data": "TMPDIR/sessions",
           "title": "Directory",
           "type": "keyText",
           "id": "globalStorageOptions/Directory"

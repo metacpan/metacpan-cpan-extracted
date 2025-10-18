@@ -7,12 +7,14 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_DONE
   PE_ERROR
   PE_LDAPCONNECTFAILED
+  PE_BADOLDPASSWORD
   PE_PP_ACCOUNT_LOCKED
   PE_PP_PASSWORD_EXPIRED
   PE_PP_CHANGE_AFTER_RESET
+  PE_PP_PASSWORD_EXPIRES_SOON
 );
 
-our $VERSION = '2.0.14';
+our $VERSION = '2.22.0';
 
 # Inheritance: UserDB::LDAP provides all needed ldap functions
 extends qw(
@@ -82,7 +84,8 @@ sub authenticate {
 
     # Remember password if password reset needed
     if (
-        $res == PE_PP_CHANGE_AFTER_RESET
+           $res == PE_PP_CHANGE_AFTER_RESET
+        or $res == PE_PP_PASSWORD_EXPIRES_SOON
         or (    $res == PE_PP_PASSWORD_EXPIRED
             and $self->conf->{ldapAllowResetExpiredPassword} )
       )
@@ -109,6 +112,8 @@ sub stop {
     return 1
       if ( $res == PE_PP_PASSWORD_EXPIRED
         or $res == PE_PP_ACCOUNT_LOCKED
+        or $res == PE_PP_PASSWORD_EXPIRES_SOON
+        or $res == PE_BADOLDPASSWORD
         or $res == PE_PP_CHANGE_AFTER_RESET );
     return 0;
 }

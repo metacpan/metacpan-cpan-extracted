@@ -1,4 +1,4 @@
-use Test::More tests => 4;
+use Test::More tests => 5;
 
 BEGIN { use_ok('Lemonldap::NG::Common::Util::Crypto') }
 use Crypt::OpenSSL::RSA;
@@ -93,12 +93,12 @@ subtest "Check genCertKey" => sub {
 
 SKIP: {
     eval { require Crypt::PK::ECC };
-    skip "Crypt::PK::ECC missing", 1 if $@;
+    skip "Crypt::PK::ECC missing", 2 if $@;
     subtest "Check genEcKey" => sub {
 
         my ( $result, $checkpriv, $checkpub );
 
-        $result    = Lemonldap::NG::Common::Util::Crypto::genEcKey('secp256r1');
+        $result = Lemonldap::NG::Common::Util::Crypto::genEcKey('prime256v1');
         $checkpriv = Crypt::PK::ECC->new( \$result->{private} );
         $checkpub  = Crypt::PK::ECC->new( \$result->{public} );
         is(
@@ -107,6 +107,46 @@ SKIP: {
             "Public and private keys match"
         );
         ok( $result->{hash}, "Hash is non empty" );
+    };
+
+  SKIP: {
+        skip "Net::SSLeay too old", 1 if $Net::SSLeay::VERSION < 1.75;
+        subtest "Check genEcCertKey" => sub {
+
+            my ( $result, $checkpriv, $checkpub );
+
+            $result =
+              Lemonldap::NG::Common::Util::Crypto::genEcCertKey('prime256v1');
+            $checkpriv = Crypt::PK::ECC->new( \$result->{private} );
+            $checkcert =
+              Crypt::OpenSSL::X509->new_from_string( $result->{public},
+                Crypt::OpenSSL::X509::FORMAT_PEM );
+            $checkpub = Crypt::PK::ECC->new( \( $checkcert->pubkey() ) );
+            is(
+                $checkpriv->export_key_pem('public'),
+                $checkpub->export_key_pem('public'),
+                "Public and private keys match"
+            );
+            ok( $result->{hash}, "Hash is non empty" );
+            is( $checkcert->subject(), "CN=localhost", "Correct subject" );
+
+            $result =
+              Lemonldap::NG::Common::Util::Crypto::genEcCertKey( 'prime256v1',
+                "mytestkey" );
+            $checkpriv =
+              Crypt::PK::ECC->new( \$result->{private}, "mytestkey" );
+            $checkcert =
+              Crypt::OpenSSL::X509->new_from_string( $result->{public},
+                Crypt::OpenSSL::X509::FORMAT_PEM );
+            $checkpub = Crypt::PK::ECC->new( \( $checkcert->pubkey() ) );
+            is(
+                $checkpriv->export_key_pem('public'),
+                $checkpub->export_key_pem('public'),
+                'Public key matches private key'
+            );
+            is( $checkcert->subject(), "CN=localhost", "Correct subject" );
+            ok( $result->{hash}, "Hash is non empty" );
+        };
     }
 }
 

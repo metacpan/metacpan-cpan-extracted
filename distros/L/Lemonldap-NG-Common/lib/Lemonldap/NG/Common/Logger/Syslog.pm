@@ -1,9 +1,9 @@
 package Lemonldap::NG::Common::Logger::Syslog;
 
 use strict;
-use Sys::Syslog qw(:standard);
+use Sys::Syslog qw(:standard :extended);
 
-our $VERSION = '2.18.0';
+our $VERSION = '2.22.0';
 
 sub new {
     my ( $class, $conf, %args ) = @_;
@@ -18,9 +18,15 @@ sub new {
         $self->{facility} = $conf->{syslogFacility} || 'daemon';
         $self->{options}  = $conf->{syslogOptions}  || 'cons,pid,ndelay';
     }
-    # Avoid to launch openlog multiple times, to prevent mech degradation from native to unix
-    # See also https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng/-/issues/2771
+
+    # Avoid to launch openlog multiple times, to prevent mech degradation
+    # from native to unix. See also
+    # https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng/-/issues/2771
     unless ($done) {
+        if ( $conf->{syslogSockOptions} ) {
+            $conf->{syslogSockOptions}->{type} ||= 'udp';
+            setlogsock( $conf->{syslogSockOptions} );
+        }
         eval {
             openlog( 'LLNG', $self->{options}, $self->{facility} );
             $done = 1;

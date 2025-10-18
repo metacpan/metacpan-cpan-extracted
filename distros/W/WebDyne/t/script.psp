@@ -1,5 +1,7 @@
-<start_html lang="en-US">
+<start_html>
 <script>
-Hello World
+document.write("Hello World");
+document.write("</perl>"); // check parser doesn't see this as real tag
+document.write("<p>"); // check parser doesn't see this as real tag
 </script>
-<script src="Hello"/>
+<script src="script.js">

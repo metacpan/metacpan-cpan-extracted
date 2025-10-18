@@ -1,0 +1,17 @@
+<start_html>
+<p>
+<? return 'Hello World 1' ?>
+<p>
+<? return \'Hello World 2' ?>
+<p>
+<? return [('Hello', ' ', 'World 3')] ?>
+<perl>
+sub hello {
+    return 'Hello World 4'
+}
+</perl>
+<? &hello() ?>
+<p>
+<? print 'Hello World 5' ?>
+<p>
+<? print 'Hello', ' ', 'World 6' ?>

@@ -177,8 +177,7 @@ clean_sessions();
 done_testing( count() );
 
 sub op {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel      => $debug,
                 locationRules => {
@@ -186,6 +185,7 @@ sub op {
                         '^/mysession' => '$_scope =~ /(?<!\S)llngapi(?!\S)/',
                         default       => 'accept',
                     },
+
                     # Fix this when the test lib correctly transmits HTTP_HOST
                     "auth.example.com" => {
                         "default" => "accept"
@@ -220,7 +220,7 @@ sub op {
                         oidcRPMetaDataOptionsUserIDAttr        => "",
                         oidcRPMetaDataOptionsAccessTokenExpiration  => 3600,
                         oidcRPMetaDataOptionsPostLogoutRedirectUris =>
-                          "http://auth.rp.com/?logout=1",
+                          "http://auth.rp.com/oauth2/rlogoutreturn",
                         oidcRPMetaDataOptionsRule         => '$uid eq "french"',
                         oidcRPMetaDataOptionsRedirectUris =>
                           'http://auth.rp.com/?openidconnectcallback=1',
@@ -245,8 +245,7 @@ sub op {
 
 sub rp {
     my ( $jwks, $metadata ) = @_;
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel                   => $debug,
                 domain                     => 'rp.com',

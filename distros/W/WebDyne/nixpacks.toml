@@ -1,0 +1,37 @@
+[phases.setup]
+nixPkgs = [
+  "perl",
+  "perlPackages.AppCpanminus",
+  "git",
+  "unzip",
+  "tzdata",
+  "joe",
+  "gcc",
+  "make",
+  "perlPackages.ModuleBuild"
+]
+
+[phases.install]
+cmds = [
+  "git clone https://github.com/aspeer/WebDyne.git .",
+  "git checkout development",
+  "cpanm --installdeps ."
+]
+
+[phases.build]
+cmds = [
+  "cd packer",
+  "cpanm --installdeps .",
+  "sh packer.sh",
+  "cp packer/webdyne.psgi.pp /app/",
+  "cp examples/server_time.psp /app/",
+]
+
+[start]
+cmd = "/app/webdyne.psgi.pp /app/server_time.psp"
+
+[variables]
+DOCUMENT_ROOT = "~"
+
+[ports]
+start = 5000

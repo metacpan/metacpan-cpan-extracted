@@ -27,7 +27,7 @@ use Config::IniFiles;
 #inherits Lemonldap::NG::Common::Conf::Backends::SOAP
 #inherits Lemonldap::NG::Common::Conf::Backends::LDAP
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.22.0';
 our $msg     = '';
 our $iniObj;
 
@@ -74,6 +74,8 @@ sub new {
             # Use local conf to get configStorage and localStorage
             my $localConfAccessPrms =
               $self->getLocalConf( CONFSECTION, $self->{confFile}, 0 );
+            $self->replacePlaceholders($localConfAccessPrms)
+              if $localConfAccessPrms->{useServerEnv};
             if ( defined $localConfAccessPrms ) {
                 %$self = ( %$self, %$localConfAccessPrms );
             }
@@ -125,10 +127,26 @@ sub saveConf {
 
     # If configuration was modified, return an error
     if ( not $args{force} ) {
-        return CONFIG_WAS_CHANGED
-          if ( $conf->{cfgNum} ne $last
-            || $args{cfgDate} && $args{cfgDate} ne $args{currentCfgDate} );
-        return DATABASE_LOCKED if ( $self->isLocked() or not $self->lock() );
+        if (   $conf->{cfgNum} ne $last
+            || $args{cfgDate} && $args{cfgDate} ne $args{currentCfgDate} )
+        {
+
+            if ( $conf->{cfgNum} ne $last ) {
+                $msg .=
+                  "Configuration $last was changed since $conf->{cfgNum}.\n";
+            }
+            if ( $args{cfgDate} ) {
+                $msg .=
+                    "Configuration date $args{currentCfgDate}"
+                  . " was changed since $args{cfgDate}.\n";
+            }
+
+            return CONFIG_WAS_CHANGED;
+        }
+        if ( $self->isLocked() or not $self->lock() ) {
+            $msg .= "Configuration is locked.\n";
+            return DATABASE_LOCKED;
+        }
     }
     $conf->{cfgNum} = $last + 1 unless ( $args{cfgNumFixed} );
     delete $conf->{cipher};
@@ -172,15 +190,16 @@ sub saveConf {
 sub getConf {
     my ( $self, $args ) = @_;
     my $res;
-    my $local    = $args->{local};
-    my $cfgNum   = $args->{cfgNum};
-    my $localPrm = $args->{localPrm};
-    my $noCache  = $args->{noCache};
-    my $raw      = $args->{raw};
-    my $allow_cache_for_root =
-      (   $self->{localStorageOptions}
+    my $local                = $args->{local};
+    my $cfgNum               = $args->{cfgNum};
+    my $localPrm             = $args->{localPrm};
+    my $noCache              = $args->{noCache};
+    my $raw                  = $args->{raw};
+    my $allow_cache_for_root = (
+          $self->{localStorageOptions}
         ? $self->{localStorageOptions}->{allow_cache_for_root}
-        : 0 );
+        : 0
+    );
 
     # If running as UID=0, disabled the cache unless explicitely allowed
     if ( $> == 0 and !$allow_cache_for_root ) {
@@ -391,27 +410,27 @@ sub getLocalConf {
         }
     }
 
-    # Stop if the requested section is the default section
-    return $r if ( $section eq DEFAULTSECTION );
+    # If we have an additional section to load
+    if ( $section ne DEFAULTSECTION and $cfg->SectionExists($section) ) {
 
-    # Check if requested section exists
-    return $r unless $cfg->SectionExists($section);
+        # Check if requested section exists
+        # Load section parameters
+        foreach ( $cfg->Parameters($section) ) {
+            $r->{$_} = $cfg->val( $section, $_ );
 
-    # Load section parameters
-    foreach ( $cfg->Parameters($section) ) {
-        $r->{$_} = $cfg->val( $section, $_ );
-
-        # Remove spaces before and after value (#1488)
-        $r->{$_} =~ s/^\s*(.+?)\s*/$1/;
-        if ( $r->{$_} =~ /^[{\[].*[}\]]$/ || $r->{$_} =~ /^sub\s*{.*}$/ ) {
-            eval "\$r->{$_} = $r->{$_}";
-            if ($@) {
-                $msg .= "Warn: error in file $file: $@.\n";
-                return $r;
+            # Remove spaces before and after value (#1488)
+            $r->{$_} =~ s/^\s*(.+?)\s*/$1/;
+            if ( $r->{$_} =~ /^[{\[].*[}\]]$/ || $r->{$_} =~ /^sub\s*{.*}$/ ) {
+                eval "\$r->{$_} = $r->{$_}";
+                if ($@) {
+                    $msg .= "Warn: error in file $file: $@.\n";
+                    return $r;
+                }
             }
         }
     }
 
+    $self->replacePlaceholders($r) if $self->{useServerEnv};
     return $r;
 }
 

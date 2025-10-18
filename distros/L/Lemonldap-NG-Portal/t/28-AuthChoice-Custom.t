@@ -1,6 +1,6 @@
+use strict;
 use warnings;
 use Test::More;
-use strict;
 use IO::String;
 use JSON qw(from_json);
 
@@ -20,7 +20,7 @@ my $client = LLNG::Manager::Test->new( {
             authChoiceParam   => 'test',
             authChoiceModules => {
                 '1_securenull' =>
-'Custom;Custom;Null;;;{"nullAuthnLevel": 3, "customAuth": "::Auth::Null", "customUserDB": "::UserDB::Null"}',
+'Custom;Custom;Null;;;{"nullAuthnLevel": 3, "customAuth": "t::SecureNull", "customUserDB": "::UserDB::Null"}',
                 '2_null' =>
 'Custom;Custom;Null;;;{"customAuth": "::Auth::Null", "customUserDB": "::UserDB::Null"}',
             },
@@ -31,6 +31,8 @@ my $client = LLNG::Manager::Test->new( {
 ok( $res = $client->_get( '/', accept => 'text/html' ), 'Get Menu' );
 ok( $res->[2]->[0] =~ /1_securenull/, '1_securenull displayed' );
 ok( $res->[2]->[0] =~ /2_null/,       '2_null displayed' );
+ok( $res->[2]->[0] =~ /input type="checkbox" id="checkLogins1_securenull"/, '1_securenull checkbox displayed' );
+ok( $res->[2]->[0] =~ /input type="checkbox" id="checkLogins2_null"/,       '2_null checkbox displayed' );
 
 # Authenticate on first choice
 my $postString = 'user=dwho&password=dwho&test=1_securenull';
@@ -45,8 +47,11 @@ ok(
 );
 expectOK($res);
 my $id = expectCookie($res);
-is( getSession($id)->data->{authenticationLevel},
+my $session = getSession($id)->data;
+is( $session->{authenticationLevel},
     3, "Overriden authentication level" );
+is( $session->{_auth},
+    "SecureNull", "Allow custom modules to override their name" );
 $client->logout($id);
 
 # Authenticate on second choice
@@ -64,8 +69,22 @@ ok(
 );
 expectOK($res);
 $id = expectCookie($res);
-is( getSession($id)->data->{authenticationLevel},
+$session = getSession($id)->data;
+is( $session->{authenticationLevel},
     1, "Default authentication level" );
+is( $session->{_auth},
+    "Null", "Correct fallback when no name is defined" );
 $client->logout($id);
+
 clean_sessions();
 done_testing();
+
+BEGIN {
+    package t::SecureNull;
+    use Mouse;
+    extends 'Lemonldap::NG::Portal::Auth::Null';
+
+    use constant name => "SecureNull";
+}
+
+1;

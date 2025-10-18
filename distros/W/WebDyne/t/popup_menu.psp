@@ -1,0 +1,13 @@
+<start_html title="Test of popup_menu tag">
+<start_form>
+<p>Popup Menu 1:
+<popup_menu name="menu1" values="@{qw(red green blue)}"/>
+<p>Popup Menu 2:
+<popup_menu name="menu2" values="%{(red=>'Red', green=>'Green', blue=>'Blue')}"/>
+<p>Popup Menu 3:
+<popup_menu name="menu3" values="@{qw(red green blue)}" labels="%{(red=>'Red', green=>'Green')}"/>
+<p>
+<submit name="submit">
+<end_form>
+<dump force="+{submit}">
+<end_html>

@@ -74,7 +74,7 @@ sub runTestWithCode {
 
     ok(
         $res->[2]->[0] =~
-qr%<input name="code" value="" type="text" class="form-control" id="extcode" trplaceholder="code" autocomplete="one-time-code" />%,
+qr%<input name="code" value="" type="text" class="form-control" id="extcode" trplaceholder="code"%,
         'Found EXTCODE input'
     ) or print STDERR Dumper( $res->[2]->[0] );
 

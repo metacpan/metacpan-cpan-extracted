@@ -1,0 +1,8 @@
+<html lang="en-US"> @0
+  <head> @0.0
+    <title> @0.0.0
+      "Head ${hello}"
+  <body> @0.1
+    <p> @0.1.0
+      "Body ${hello}"
+    "__PERL__sub head { shift()->render( hello=>'Hello' ) }sub body { ..."

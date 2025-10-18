@@ -8,14 +8,14 @@ require 't/test-lib.pm';
 
 my $res;
 
-my $client = LLNG::Manager::Test->new(
-    {
+my $client = LLNG::Manager::Test->new( {
         confFailure => 1,
         ini         => {
             configStorage => {
                 type        => 'Timeout',
                 dirName     => 't',
                 confTimeout => 1,
+                confFile    => '/dev/null',
             },
             logLevel             => 'error',
             useSafeJail          => 1,

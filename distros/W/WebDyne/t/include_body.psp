@@ -1,0 +1,4 @@
+<start_html>
+Body text above include
+<include file="include_body.inc" body>
+Body text below include

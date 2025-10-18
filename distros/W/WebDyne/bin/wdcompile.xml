@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<refentry><refmeta><refentrytitle>wdcompile</refentrytitle><manvolnum>1</manvolnum></refmeta><refnamediv><refname><command>wdcompile</command></refname><refpurpose>parse and compile WebDyne pages</refpurpose></refnamediv><refsynopsisdiv><cmdsynopsis><command>wdcompile [OPTIONS] FILE</command></cmdsynopsis><cmdsynopsis><command>wdcompile --stage0 time.psp</command></cmdsynopsis></refsynopsisdiv><refsection><title>Description</title><para>The <command>wdcompile</command> command displays the internal data
+    structure used by WebDyne when compiling psp pages.</para><para>WebDyne uses the same parsing and compilation routines as
+    <command>wdcompile</command>. After compilation WebDyne optionally stores
+    the resulting data structure to a cache directory using the Perl
+    <classname>Storable</classname> module to speed up subsequent rendering
+    operations.</para><para>If the tree structure does not appear correct when debugging with
+    <command>wdcompile</command> then it will probably not display as expected
+    when rendered with WebDyne. Missing end quotes, closing tags and general
+    HTML syntax problems can all make the parse tree misplace (or omit
+    completely) blocks of HTML/WebDyne code.</para><para>By default <command>wdcompile</command> will show the data structure
+    after all parsing and optimisation stages have been completed. You can
+    display various intermediate stages using the options below.</para></refsection><refsection><title>Options</title><para><variablelist><varlistentry><term>-h, --help</term><listitem><para>Show brief help message.</para></listitem></varlistentry><varlistentry><term>--stage0 | -0</term><listitem><para>Compile to stage 0. This the first parse of the source file
+            and has no optimisations.</para></listitem></varlistentry><varlistentry><term>--stage1 | -1</term><listitem><para>Compile to stage 1. Metadata is added to the data
+            structure.</para></listitem></varlistentry><varlistentry><term>--stage2 | -2</term><listitem><para>Compile to stage 2. Any WebDyne Filters are applied.</para></listitem></varlistentry><varlistentry><term>--stage3 | -3</term><listitem><para>Compile to stage 3. First optimisation is performed.</para></listitem></varlistentry><varlistentry><term>--stage4 | -4</term><listitem><para>Compile to stage 4. Second optimisation is run</para></listitem></varlistentry><varlistentry><term>--stage5 | --final | -5</term><listitem><para>Compile to stage 5. Final data structure</para></listitem></varlistentry><varlistentry><term>--meta | -m</term><listitem><para>Only show the metadata of the compiled page. This is the
+            manifest or attributes held in <markup>&lt;meta></markup>
+            sections with the name "WebDyne" (used to alter WebDyne
+            behaviour). If found such meta data is removed from the resulting
+            HTML parse tree and stored in a separate data structure. This
+            option will show that data structure if it exists.</para></listitem></varlistentry><varlistentry><term>--data</term><listitem><para>Only show the data structure of the compiled page.</para></listitem></varlistentry><varlistentry><term>--nomanifest</term><listitem><para>Do not generate or store a manifest in the compiled page.
+            The manifest contains the path to the source file(s), and is
+            stored in the metadata area.</para></listitem></varlistentry><varlistentry><term>--dest | --dest_fn</term><listitem><para>Specify a destination file for the compiled page, with data
+            stored in Perl Storable format. Once saved it can be reviewed
+            later with the <command>wddump</command> command</para></listitem></varlistentry><varlistentry><term>--all</term><listitem><para>Show all data in the compiled page</para></listitem></varlistentry><varlistentry><term>--timestamp</term><listitem><para>Include a timestamp</para></listitem></varlistentry><varlistentry><term>--version</term><listitem><para>Display the script version and exit</para></listitem></varlistentry><varlistentry><term>--man</term><listitem><para>Display this man page</para></listitem></varlistentry></variablelist></para></refsection><refsection><title>Examples</title><para><programlisting language="sh"># Show the compiled version of the time.psp page with all optimisations.
+wdcompile time.psp</programlisting></para><para>Compile and display the completed internal WebDyne data structure of
+    the file called time.psp. The resulting output shows the data structure
+    after the file is parsed, then rebuilt around any dynamic WebDyne
+    tags.</para><para><programlisting language="sh">#  Show the compiled version of time.psp as the early HTML tree
+wdcompile --stage0 widget.psp</programlisting></para><para>Parse and display the very data structure of the time.psp file at
+    the lowest level - as interpreted by the HTML::Treebuilder module, with no
+    optimisation at all.</para></refsection><refsection><title>Notes</title><para>The wdcompile will not run any code in the <code>__PERL__</code>
+    section of a psp file. It will also not execute any WebDyne filters that
+    may be called by the source file.</para></refsection><refsection><title>Author</title><para>Written by Andrew Speer, <email>andrew@webdyne.org</email></para></refsection><refsection><title>LICENSE and COPYRIGHT</title><para>This file is part of WebDyne.</para><para>This software is copyright (c) 2025 by Andrew Speer &lt;andrew.speer@isolutions.com.au>.</para><para>This is free software; you can redistribute it and/or modify it underthe same terms as the Perl 5 programming language system itself.</para><para>Full license text is available at:</para><para>&lt;http://dev.perl.org/licenses/></para></refsection></refentry>

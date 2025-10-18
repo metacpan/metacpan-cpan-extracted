@@ -5,7 +5,7 @@ use Mouse;
 use JSON qw(from_json to_json);
 use Crypt::URandom;
 
-our $VERSION = '2.0.12';
+our $VERSION = '2.22.0';
 
 extends 'Lemonldap::NG::Common::Module';
 
@@ -138,16 +138,23 @@ sub updateToken {
         }
         my $h = from_json( $data, { allow_nonref => 1 } );
         $h->{$k} = $v;
-        $self->cache->set( $id, to_json($h), $self->timeout . ' s' );
+        $self->cache->set( $id, to_json($h), ($h->{tokenTimeoutTimestamp} - time) . ' s' );
         return $id;
     }
     else {
-        $self->p->getApacheSession(
-            $id,
-            kind => "TOKEN",
-            info => { $k => $v }
-        );
-        return $id;
+        if (
+            $self->p->getApacheSession(
+                $id,
+                kind => "TOKEN",
+                info => { $k => $v }
+            )
+          )
+        {
+            return $id;
+        }
+        else {
+            return undef;
+        }
     }
 }
 

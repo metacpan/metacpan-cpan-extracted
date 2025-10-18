@@ -1,0 +1,23 @@
+<start_html>
+<start_form>
+<p>
+Checkbox Group 1:
+<checkbox_group name="group1" values="@{qw(eenie meenie minie moe)}"/>
+<p>
+Checkbox Group 2:
+<checkbox_group name="group2" values="@{qw(eenie meenie minie moe)}" defaults="@{qw(eenie minie)}"/>
+<p>
+Checkbox Group 3:
+<checkbox_group name="group3" values="@{qw(eenie meenie minie moe)}" labels="%{(eenie=>'Eenie', meenie=>'Meenie')}" defaults="@{qw(eenie minie)}"/>
+<p>
+Checkbox Group 4:
+<checkbox_group name="group4" values="%{(eenie=>'Eenie', meenie=>'Meenie')}" defaults="@{qw(eenie minie)}"/>
+<p>
+Checkbox Group 5:
+<checkbox_group name="group5" values="%{(eenie=>'Eenie', meenie=>'Meenie', minie=>'', moe=>'')}" defaults="@{qw(eenie minie)}"/>
+<p>
+<submit name="submit">
+<p>
+<end_form>
+<dump force="+{submit}">
+<end_html>

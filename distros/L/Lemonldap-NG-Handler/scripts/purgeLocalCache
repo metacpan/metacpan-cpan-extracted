@@ -5,37 +5,18 @@
 # This module is written to be used by cron to clean cache objects used
 # by Handler.
 #
-# This is part of LemonLDAP::NG product, released under GPL
+# This is part of LemonLDAP::NG product, released under GPL-2+
 #=============================================================================
 
-use Lemonldap::NG::Common::Conf;
-use Lemonldap::NG::Common::Conf::Constants;
 use strict;
+use Getopt::Std;
+use Lemonldap::NG::Common::Session::Purge;
 
-my $debug = 0;
+# Options
+# -d: debug mode
+our $opt_d;
+getopts('d');
 
-#=============================================================================
-# Load configuration
-#=============================================================================
-my $lmconf = Lemonldap::NG::Common::Conf->new()
-  or die $Lemonldap::NG::Common::Conf::msg;
-my $conf = $lmconf->getConf or die "Unable to get configuration ($!)";
-my $localconf = $lmconf->getLocalConf(HANDLERSECTION)
-  or die "Unable to get local configuration ($!)";
+my $opts = { ( $opt_d ? ( logLevel => 'debug' ) : () ), };
 
-if ($localconf) {
-    $conf->{$_} = $localconf->{$_} foreach ( keys %$localconf );
-}
-
-print "Configuration loaded\n" if $debug;
-
-# Session cache
-if ( $conf->{localSessionStorage} ) {
-    eval "require $conf->{localSessionStorage}";
-    $conf->{localSessionStorageOptions}->{default_expires_in} ||= 600;
-    my $s =
-      $conf->{localSessionStorage}->new( $conf->{localSessionStorageOptions} );
-    $s->purge();
-}
-
-exit 0;
+exit 1 unless Lemonldap::NG::Common::Session::Purge->new($opts)->localPurge();

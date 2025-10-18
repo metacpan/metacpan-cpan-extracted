@@ -1,0 +1,6 @@
+<start_html>
+Hello World
+<end_html>
+__PERL__
+my $c=1;
+}

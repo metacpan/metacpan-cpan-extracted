@@ -12,7 +12,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_TOKENEXPIRED
 );
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.22.0';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -218,7 +218,7 @@ sub removeOther {
         $res = PE_NOTOKEN;
     }
 
-    return $self->p->do( $req, [ sub { $res } ] ) if $res;
+    return $self->p->doPE( $req, $res ) if $res;
     $self->userLogger->info("$count remaining session(s) removed");
     $req->mustRedirect(1);
     return $self->p->autoRedirect($req);
@@ -234,8 +234,9 @@ sub _mkRemoveOtherLink {
         $req,
         'removeOther',
         params => {
-            link =>
-              $self->p->buildUrl( $req->portal, "removeOther", { token => $token } ),
+            link => $self->p->buildUrl(
+                $req->portal, "removeOther", { token => $token }
+            ),
         }
     );
 }

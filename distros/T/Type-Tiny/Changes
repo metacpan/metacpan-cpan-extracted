@@ -7,6 +7,15 @@ Home page:    <https://metacpan.org/release/Type-Tiny>
 Bug tracker:  <https://github.com/tobyink/p5-type-tiny/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+2.008004	2025-10-17
+
+ [ Documentation ]
+ - Type::Tiny pod syntax fix.
+
+ [ Other ]
+ - Added: Type::Tiny::Duck (used by HasMethods) now includes a
+   new_intersection constructor.
+
 2.008003	2025-09-02
 
  [ Bug Fixes ]

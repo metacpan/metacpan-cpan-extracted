@@ -5,7 +5,7 @@ use utf8;
 use JSON;
 use Lemonldap::NG::Common::Conf::Backends::_DBI;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.22.0';
 our @ISA     = qw(Lemonldap::NG::Common::Conf::Backends::_DBI);
 
 sub store {
@@ -16,34 +16,23 @@ sub store {
 
     $fields = to_json($fields);
 
-    if ( $lastCfg == $cfgNum ) {
-        $req = $self->_dbh->prepare(
-            "UPDATE $self->{dbiTable} SET data=? WHERE cfgNum=?");
-    }
-    else {
-        $req = $self->_dbh->prepare(
-            "INSERT INTO $self->{dbiTable} (data,cfgNum) VALUES (?,?)");
-    }
-    unless ($req) {
-        $self->logError;
-        return UNKNOWN_ERROR;
-    }
-    my $execute;
-    eval { $execute = $req->execute( $fields, $cfgNum ); };
-    unless ($execute) {
-        $self->logError;
-        return UNKNOWN_ERROR;
-    }
-    return $cfgNum;
+    my $query =
+      $lastCfg == $cfgNum
+      ? "UPDATE $self->{dbiTable} SET data=? WHERE cfgNum=?"
+      : "INSERT INTO $self->{dbiTable} (data,cfgNum) VALUES (?,?)";
+    my $res = $self->_execute( $query, $fields, $cfgNum );
+    return $res > 0 ? $cfgNum : $res;
 }
 
 sub load {
     my ( $self, $cfgNum, $fields ) = @_;
     $fields = $fields ? join( ",", @$fields ) : '*';
-    my $row = $self->_dbh->selectrow_arrayref(
-        "SELECT data from " . $self->{dbiTable} . " WHERE cfgNum=?",
-        {}, $cfgNum );
-    unless ($row) {
+    my ( $res, $row ) = $self->_execute(
+        "SELECT data from " . $self->{dbiTable} . " WHERE cfgNum=?", $cfgNum );
+    if ( $res > 0 ) {
+        $row = $row->fetchrow_arrayref();
+    }
+    else {
         $self->logError;
         return 0;
     }

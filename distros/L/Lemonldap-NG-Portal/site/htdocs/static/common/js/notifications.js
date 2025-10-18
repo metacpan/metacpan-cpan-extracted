@@ -18,7 +18,7 @@
   };
   displayError = function displayError(j, status, err) {
     setMsg('notificationRetrieveFailed', 'warning');
-    return console.log('Error:', err, 'Status:', status);
+    console.error('Error:', err, 'Status:', status);
   };
   toggle_eye = function toggle_eye(slash) {
     if (slash) {
@@ -71,9 +71,9 @@
 
   // viewNotif function (launched by "verify" button)
   viewNotif = function viewNotif(notif, epoch, button) {
-    console.log('Ref:', notif, 'epoch:', epoch);
+    console.debug('Ref:', notif, 'epoch:', epoch);
     if (notif && epoch) {
-      console.log('Send AJAX request');
+      console.debug('Send AJAX request');
       return $.ajax({
         type: "GET",
         url: "".concat(scriptname, "mynotifications/").concat(notif),
@@ -85,7 +85,7 @@
         success: function success(resp) {
           var myDate;
           if (resp.result) {
-            console.log('Notification:', resp.notification);
+            console.debug('Notification:', resp.notification);
             toggle(button, notif, epoch);
             $('#displayNotif').html(resp.notification);
             $('#notifRef').text(notif);

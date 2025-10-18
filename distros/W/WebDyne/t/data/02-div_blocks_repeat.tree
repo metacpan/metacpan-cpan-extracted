@@ -1,0 +1,27 @@
+<html> @0 (IMPLICIT)
+  <head> @0.0 (IMPLICIT)
+  <body> @0.1 (IMPLICIT)
+    <p> @0.1.0
+      "BLOCK1:"
+    <div data-webdyne-perl="data-webdyne-perl" handler="hello0"> @0.1.1
+      <div data-webdyne-block="data-webdyne-block" name="hello0"> @0.1.1.0
+        <p> @0.1.1.0.0
+          "Hello World 1"
+    <p> @0.1.2
+      "BLOCK2:"
+    <div data-webdyne-perl="data-webdyne-perl" handler="hello1"> @0.1.3
+      <div data-webdyne-block="data-webdyne-block" name="hello1"> @0.1.3.0
+        <p> @0.1.3.0.0
+          "Hello World ${i}"
+    <div data-webdyne-perl="data-webdyne-perl" handler="hello2"> @0.1.4
+      <p> @0.1.4.0
+        "BLOCK3:"
+      <div data-webdyne-block="data-webdyne-block" name="hello2"> @0.1.4.1
+        <p> @0.1.4.1.0
+          "Hello World 1"
+      <p> @0.1.4.2
+        "BLOCK4:"
+      <div data-webdyne-block="data-webdyne-block" name="hello3"> @0.1.4.3
+        <p> @0.1.4.3.0
+          "Hello World ${i}"
+    "__PERL__sub hello0 { my $s=shift(); for (0..3) { $s->render_block..."

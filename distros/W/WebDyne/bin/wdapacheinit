@@ -2,45 +2,34 @@
 #
 #  This file is part of WebDyne.
 #
-#  This software is Copyright (c) 2017 by Andrew Speer <andrew@webdyne.org>.
+#  This software is copyright (c) 2025 by Andrew Speer <andrew.speer@isolutions.com.au>.
 #
-#  This is free software, licensed under:
-#
-#    The GNU General Public License, Version 2, June 1991
+#  This is free software; you can redistribute it and/or modify it under
+#  the same terms as the Perl 5 programming language system itself.
 #
 #  Full license text is available at:
 #
-#  <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+#  <http://dev.perl.org/licenses/>
 #
+
 
 
 #  Init Apache config files
 #
-sub BEGIN {
-
-    #  Massage warnings and @INC path
-    $^W=0;
-    use File::Spec;
-    use FindBin qw($RealBin $Script);
-    foreach my $dn ($RealBin, File::Spec->path()) {
-        if (-f (my $fn=File::Spec->catfile($dn, 'perl5lib.pl'))) {
-            require $fn;
-            perl5lib->import(File::Spec->catdir($dn, File::Spec->updir()));
-            last;
-        }
-    }
-}
 use strict qw(vars);
-use vars qw($VERSION);
-use Cwd qw(realpath);
-use WebDyne::Base;
+use vars   qw($VERSION);
+use Cwd    qw(realpath);
+use WebDyne::Util;
 use Getopt::Long;
 use Pod::Usage;
+use FindBin qw($RealBin $Script);
+use Data::Dumper;
+$Data::Dumper::Indent=1;
 
 
 #  Version info
 #
-$VERSION='1.250';
+$VERSION='2.014';
 
 
 #  Get command line options, add them to environment so picked up
@@ -66,7 +55,7 @@ GetOptions(
         'text|print',
         'version'
     )) || pod2usage(2);
-pod2usage(-verbose => 99, -sections => 'Synopsis|Options', -exitval => 1)
+pod2usage(-verbose => 99, -sections => 'SYNOPSIS|OPTIONS', -exitval => 1)
     if $opt{'help'};
 pod2usage(-verbose => 2) if $opt{'man'};
 $opt{'version'} && do {print "$Script version: $VERSION\n"; exit 0};
@@ -101,6 +90,7 @@ require WebDyne::Install::Apache;
 #  Get location prefile, call install/uninstall routine
 #
 my $prefix_dn=realpath(File::Spec->rel2abs(File::Spec->updir(), $RealBin));
+debug("about to call install/uninstall with prefix_dn: $prefix_dn, RealBin: $RealBin, opt: %s", Dumper(\%opt));
 if ($opt{'uninstall'}) {
     exit ${WebDyne::Install::Apache->uninstall($prefix_dn, $RealBin, \%opt) || die errstr()}
 }
@@ -110,135 +100,279 @@ else {
 
 __END__
 
-=head1 Name
+# Documentation in Markdown. Convert to POD using markpod from 
+#
+# https://github.com/aspeer/pl-markpod.git 
 
-wdapacheinit - configure Apache to process .psp files through WebDyne
+=begin markdown
 
-=head1 Synopsis
+# NAME
 
-B<wdapacheinit> B<[options]>
+wdapacheinit - Install or uninstall WebDyne Apache configuration files
 
-=head1 Options
+# SYNOPSIS
 
--?, --help
-Show brief help message
+`wdapacheinit [--option]`
 
+`wdapacheinit --cache /var/www/cache`
 
-=over 5
+# DESCRIPTION
 
+`wdapacheinit` will install or uninstall the WebDyne Apache configuration files. 
+It will create the necessary configuration files and directories for Apache to serve WebDyne pages. 
+The script will also attempt to set the correct permissions on the cache directory.
 
-=item --man
+NOTE: Apache must be restarted after running this script !
 
+# OPTIONS
 
+- `--help | -?`
+  Display a brief help message and exit.
 
+- `--man`
+  Display the full manual.
 
-Display the manual page
+- `--apache_uname | --uname`
+  Specify the Apache user name.
 
+- `--apache_gname | --gname`
+  Specify the Apache group name.
 
-=item --uname
+- `--httpd_bin | --httpd`
+  Specify the path to the httpd binary.
 
+- `--dir_apache_conf | --apache_conf | --conf`
+  Specify the directory for Apache configuration files.
 
+- `--dir_apache_modules | --apache_modules | --modules`
+  Specify the directory for Apache modules.
 
+- `--file_mod_perl_lib | --mod_perl_lib | --mod_perl`
+  Specify the path to the mod_perl library.
 
-The user name that the Apache daemon runs under when started, e.g.
-"varname", "httpd", "apache" etc.
+- `--mp2`
+  Use mod_perl 2.
 
+- `--webdyne_cache_dn | --webdyne_cache | --cache_dn | --cache | --dir_webdyne_cache`
+  Specify the directory for WebDyne cache.
 
-=item --gname
+- `--silent`
+  Run the script in silent mode.
 
+- `--setcontext`
+  Set the context for the script.
 
+- `--uninstall`
+  Uninstall the WebDyne Apache configuration.
 
+- `--text | --print`
+  Print the configuration.
 
-The group name that the Apache daemons runs under when started
-
-
-=item --httpd_bin
-
-
-
-
-Full path and filename of Apache httpd executable,
-e.g./opt/apache/bin/httpd
-
-
-=item --mod_perl_lib
-
-
-
-
-Full path and filename of the Apache mod_perl library, e.g.
-/opt/apache/lib/modules/mod_perl.so
-
-
-=item --dir_apache_conf
-
-
-
-
-Location (directory name) where the main Apache config file
-resides, e.g /opt/apache/etc/conf
-
-
-=item --dir_webdyne_cache
-
-
+- `--version`
+  Display the script version and exit.
 
 
-Location (directort name) where partially compiled psp files will
-be cached
+# EXAMPLES
+
+The script will attempt to automatically detect the correct settings for your system, so in most cases you will not need to specify any options. However, you can override the defaults by specifying the options on the command line.
+
+`wdapacheinit`
+
+`wdapacheinit --cache /var/www/cache`
+
+# NOTES
+
+Apache installation of WebDyne is split into two components. The first is the installation of the WebDyne Apache configuration files, which is done by this script. The second is the installation of the configuration files for the WebDyne framework to enable renderings
+of WebDyne pages. 
+
+The second component is of configuration variables that can be set to change behaviour of the WebdDyne system, 
+
+# AUTHOR
+
+Andrew Speer <andrew.speer@isolutions.com.au>
+
+# LICENSE and COPYRIGHT
+
+This file is part of WebDyne.
+
+This software is copyright (c) 2025 by Andrew Speer <andrew.speer@isolutions.com.au>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+Full license text is available at:
+
+<http://dev.perl.org/licenses/>
+
+=end markdown
 
 
-=item --silent
+=head1 NAME
+
+wdapacheinit - Install or uninstall WebDyne Apache configuration files
+
+
+=head1 SYNOPSIS
+
+C<wdapacheinit [--option]>
+
+C<wdapacheinit --cache /var/www/cache>
+
+
+=head1 DESCRIPTION
+
+C<wdapacheinit> will install or uninstall the WebDyne Apache configuration files. 
+It will create the necessary configuration files and directories for Apache to serve WebDyne pages. 
+The script will also attempt to set the correct permissions on the cache directory.
+
+NOTE: Apache must be restarted after running this script !
+
+
+=head1 OPTIONS
+
+=over
+
+=item -
+
+C<--help | -?>
+  Display a brief help message and exit.
 
 
 
+=item -
 
-No output
-
-
-=item --uninstall
-
+C<--man>
+  Display the full manual.
 
 
 
-Remove references to WebDyne from Apache config files
+=item -
+
+C<--apache_uname | --uname>
+  Specify the Apache user name.
+
+
+
+=item -
+
+C<--apache_gname | --gname>
+  Specify the Apache group name.
+
+
+
+=item -
+
+C<--httpd_bin | --httpd>
+  Specify the path to the httpd binary.
+
+
+
+=item -
+
+C<--dir_apache_conf | --apache_conf | --conf>
+  Specify the directory for Apache configuration files.
+
+
+
+=item -
+
+C<--dir_apache_modules | --apache_modules | --modules>
+  Specify the directory for Apache modules.
+
+
+
+=item -
+
+C<--file_mod_perl_lib | --mod_perl_lib | --mod_perl>
+  Specify the path to the mod_perl library.
+
+
+
+=item -
+
+C<--mp2>
+  Use mod_perl 2.
+
+
+
+=item -
+
+C<--webdyne_cache_dn | --webdyne_cache | --cache_dn | --cache | --dir_webdyne_cache>
+  Specify the directory for WebDyne cache.
+
+
+
+=item -
+
+C<--silent>
+  Run the script in silent mode.
+
+
+
+=item -
+
+C<--setcontext>
+  Set the context for the script.
+
+
+
+=item -
+
+C<--uninstall>
+  Uninstall the WebDyne Apache configuration.
+
+
+
+=item -
+
+C<--text | --print>
+  Print the configuration.
+
+
+
+=item -
+
+C<--version>
+  Display the script version and exit.
+
+
 
 =back
 
 
-=head1 Description
+=head1 EXAMPLES
 
-B<wdapacheinit> will attempt to locate Apache configuration files and
-modify them so that requests for .psp pages are processed through the
-perl-handler WebDyne module.
+The script will attempt to automatically detect the correct settings for your system, so in most cases you will not need to specify any options. However, you can override the defaults by specifying the options on the command line.
 
-Where Apache uses a conf.d configuration file structure the installer
-will simply create a webdyne.conf file with the appropriate
-configuration int the conf.d directory. Where no conf.d structure can
-be found the installer will create the webdyne.conf file in the same
-location as the main Apachehttpd.conf file, then modify httpd.conf to
-append an include reference to the Webdyne config file.
+C<wdapacheinit>
 
-The installer will attempt to locate the necessary files and other
-information using common defaults - however if it can not discover the
-required information automatically (e.g. the path to the Apache binary)
-it will be necessary to specify it explicitly using the appropriate
-command line option.
+C<wdapacheinit --cache /var/www/cache>
 
-=head1 Author
 
-Written by Andrew Speer, andrew@webdyne.org
+=head1 NOTES
+
+Apache installation of WebDyne is split into two components. The first is the installation of the WebDyne Apache configuration files, which is done by this script. The second is the installation of the configuration files for the WebDyne framework to enable renderings
+of WebDyne pages. 
+
+The second component is of configuration variables that can be set to change behaviour of the WebdDyne system, 
+
+
+=head1 AUTHOR
+
+Andrew Speer L<mailto:andrew.speer@isolutions.com.au>
+
 
 =head1 LICENSE and COPYRIGHT
 
 This file is part of WebDyne.
 
-This software is Copyright (c) 2017 by Andrew Speer <andrew@webdyne.org>.
+This software is copyright (c) 2025 by Andrew Speer L<mailto:andrew.speer@isolutions.com.au>.
 
-This is free software, licensed under:
-
-  The GNU General Public License, Version 2, June 1991
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 Full license text is available at:
-L<http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
 
+L<http://dev.perl.org/licenses/>
+
+=cut

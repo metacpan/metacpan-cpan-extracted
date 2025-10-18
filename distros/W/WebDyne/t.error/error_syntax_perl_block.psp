@@ -1,0 +1,5 @@
+<start_html>
+<perl>
+my $c=1;
+print foo(
+</perl>

@@ -259,6 +259,46 @@ subtest "Test redirect URL filtering" => sub {
     checkUrlAllowed( $issuer, "http://attack.com/",         0 );
 };
 
+subtest "Unauthenticated logout" => sub {
+    ok( $issuer = issuer(), 'Issuer portal' );
+
+    # Logout with no destination
+    ok(
+        my $res = $issuer->_get(
+            '/cas/logout', accept => 'text/html',
+        ),
+        'Initiate logout'
+    );
+    expectPortalError( $res, 47 );
+
+    # Logout with unallowed destination
+    ok(
+        $res = $issuer->_get(
+            '/cas/logout',
+            query => {
+                service => "http://attack.com",
+            },
+            accept => 'text/html',
+        ),
+        'Initiate logout'
+    );
+    expectPortalError( $res, 108 );
+
+    # Logout with allowed destination
+    ok(
+        $res = $issuer->_get(
+            '/cas/logout',
+            query => {
+                service => "http://test1.example.com/",
+            },
+            accept => 'text/html',
+        ),
+        'Initiate logout'
+    );
+    expectRedirection( $res, "http://test1.example.com/" );
+
+};
+
 clean_sessions();
 done_testing();
 

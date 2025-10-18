@@ -1,0 +1,6 @@
+<start_html>
+<pre>
+Hello
+<perl chomp/>
+World
+</pre>

@@ -177,7 +177,7 @@ sub op {
                         oidcRPMetaDataOptionsUserIDAttr        => "",
                         oidcRPMetaDataOptionsAccessTokenExpiration  => 3600,
                         oidcRPMetaDataOptionsPostLogoutRedirectUris =>
-                          "http://auth.rp.com/?logout=1",
+                          "http://auth.rp.com/oauth2/rlogoutreturn",
                         oidcRPMetaDataOptionsRule => '$uid eq "french"',
                     }
                 },
@@ -240,7 +240,6 @@ sub rp {
                 oidcOPMetaDataJSON => {
                     op => $metadata,
                 },
-                customPlugins => 't::OidcHookPlugin',
             }
         }
     );

@@ -19,4 +19,25 @@ is_deeply(
     'id + 5 > 20 selects only 25'
 );
 
+my @incremented = $jq->run_query($json, 'map(.id + 1)');
+
+is_deeply(
+    $incremented[0],
+    [ 2, 6, 16, 26 ],
+    'map(.id + 1) increments each id'
+);
+
+my $people = q([
+  { "name": "Alice", "city": "Tokyo" },
+  { "name": "Bob",   "city": "Osaka" }
+]);
+
+my @joined = $jq->run_query($people, 'map(.name + "@" + .city)');
+
+is_deeply(
+    $joined[0],
+    [ 'Alice@Tokyo', 'Bob@Osaka' ],
+    'map(.name + "@" + .city) concatenates name and city'
+);
+
 done_testing;

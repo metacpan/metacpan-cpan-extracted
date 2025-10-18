@@ -6,6 +6,11 @@ Home page:    <https://metacpan.org/release/Sub-MultiMethod>
 Bug tracker:  <https://github.com/tobyink/p5-sub-multimethod/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+1.003	2025-10-17
+
+ [ Documentation ]
+ - Minor documentation improvements.
+
 1.002	2025-09-28
 
  - Added: Added `die` option as a shortcut for `code => sub { croak ... }`.

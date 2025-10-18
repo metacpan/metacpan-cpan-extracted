@@ -17,7 +17,7 @@
 
 package Lemonldap::NG::Manager::Build::Tree;
 
-our $VERSION = '2.21.0';
+our $VERSION = '2.22.0';
 
 sub tree {
     return [ {
@@ -39,6 +39,7 @@ sub tree {
                                         'portalDisplayLoginHistory',
                                         'portalDisplayChangePassword',
                                         'portalDisplayOidcConsents',
+                                        'portalDisplayOfflineTokens',
                                         'portalDisplayLogout',
                                         'portalDisplayOrder'
                                     ]
@@ -71,6 +72,7 @@ sub tree {
                                         'portalDisplayResetPassword'
                                     ]
                                 },
+                                'portalCustomTplParams',
                                 {
                                     title => 'passwordManagement',
                                     help  =>
@@ -120,6 +122,7 @@ sub tree {
                         {
                             title => 'portalCaptcha',
                             help  => 'captcha.html#configuration',
+                            form  => 'simpleInputContainer',
                             nodes => [
                                 'captcha_login_enabled',
                                 'captcha_mail_enabled',
@@ -151,6 +154,7 @@ sub tree {
                         {
                             title => 'choiceParams',
                             help  => 'authchoice.html',
+                            form  => 'simpleInputContainer',
                             nodes => [
                                 'authChoiceParam',     'authChoiceModules',
                                 'authChoiceAuthBasic', 'authChoiceFindUser',
@@ -305,6 +309,7 @@ sub tree {
                                         'ldapPasswordResetAttributeValue',
                                         'ldapAllowResetExpiredPassword',
                                         'ldapGetUserBeforePasswordChange',
+'ldapForcePasswordChangeExpirationWarning',
                                         'ldapITDS'
                                     ]
                                 },
@@ -418,6 +423,7 @@ sub tree {
                         {
                             title => 'remoteParams',
                             help  => 'authremote.html',
+                            form  => 'simpleInputContainer',
                             nodes => [
                                 'remotePortal',
                                 'remoteCookieName',
@@ -428,6 +434,7 @@ sub tree {
                         {
                             title => 'slaveParams',
                             help  => 'authslave.html',
+                            form  => 'simpleInputContainer',
                             nodes => [
                                 'slaveAuthnLevel',    'slaveUserHeader',
                                 'slaveMasterIP',      'slaveHeaderName',
@@ -438,10 +445,11 @@ sub tree {
                         {
                             title => 'sslParams',
                             help  => 'authssl.html',
+                            form  => 'simpleInputContainer',
                             nodes => [
                                 'SSLAuthnLevel', 'SSLVar',
-                                'SSLIssuerVar',  'SSLVarIf',
-                                'sslByAjax',     'sslHost',
+                                'SSLIssuerVar',  'sslByAjax',
+                                'sslHost',       'SSLVarIf',
                             ]
                         },
                         {
@@ -457,6 +465,7 @@ sub tree {
                         {
                             title => 'webidParams',
                             help  => 'authwebid.html',
+                            form  => 'simpleInputContainer',
                             nodes => [
                                 'webIDAuthnLevel', 'webIDExportedVars',
                                 'webIDWhitelist'
@@ -465,6 +474,7 @@ sub tree {
                         {
                             title => 'customParams',
                             help  => 'authcustom.html',
+                            form  => 'simpleInputContainer',
                             nodes => [
                                 'customAuth',            'customUserDB',
                                 'customPassword',        'customRegister',
@@ -508,6 +518,7 @@ sub tree {
                         {
                             title => 'issuerDBOpenID',
                             help  => 'idpopenid.html',
+                            form  => 'simpleInputContainer',
                             nodes => [
                                 'issuerDBOpenIDActivation',
                                 'issuerDBOpenIDPath',
@@ -540,6 +551,7 @@ sub tree {
                         {
                             title => 'issuerDBGet',
                             help  => 'issuerdbget.html',
+                            form  => 'simpleInputContainer',
                             nodes => [
                                 'issuerDBGetActivation',
                                 'issuerDBGetPath',
@@ -550,17 +562,20 @@ sub tree {
                         {
                             title => 'issuerDBJitsiMeetTokens',
                             help  => 'idpjitsimeettokens.html',
+                            form  => 'simpleInputContainer',
                             nodes => [
                                 'issuerDBJitsiMeetTokensActivation',
                                 'issuerDBJitsiMeetTokensPath',
                                 'issuerDBJitsiMeetTokensRule',
                                 {
                                     title => 'jitsiOptions',
+                                    form  => 'simpleInputContainer',
                                     nodes => [
                                         'jitsiDefaultServer',
                                         'jitsiAppId',
                                         'jitsiAppSecret',
                                         'jitsiSigningAlg',
+                                        'jitsiSigningKey',
                                         'jitsiExpiration',
                                         {
                                             title => 'jitsiAttributes',
@@ -611,8 +626,8 @@ sub tree {
                         'timeout',
                         'timeoutActivity',
                         'timeoutActivityInterval',
-                        'grantSessionRules',
                         'appAccessHistoryEnabled',
+                        'grantSessionRules',
                         {
                             title => 'sessionStorage',
                             help  => 'start.html#sessions-database',
@@ -654,6 +669,11 @@ sub tree {
                             help  => 'checkstate.html',
                             form  => 'simpleInputContainer',
                             nodes => [ 'checkState', 'checkStateSecret', ],
+                        },
+                        {
+                            title => 'webCron',
+                            form  => 'simpleInputContainer',
+                            nodes => [ 'webCronSecret', ],
                         },
                         {
                             title => 'portalServers',
@@ -946,8 +966,17 @@ sub tree {
                         {
                             title => 'customPluginsNode',
                             help  => 'plugincustom.html#plugin-options',
-                            nodes => [ 'customPlugins', 'customPluginsParams', 'disabledPlugins' ]
+                            form  => 'simpleInputContainer',
+                            nodes => [
+                                'customPlugins', 'customPluginsParams',
+                                'disabledPlugins'
+                            ]
                         },
+                        {
+                            title => 'adminLogoutServer',
+                            nodes => ['adminLogoutServerSecret']
+                        },
+                        'oidcOfflineTokens',
                     ]
                 },
                 {
@@ -1175,15 +1204,33 @@ sub tree {
                                 'strictTransportSecurityMax_Age',
                                 'hashedSessionStore',
                                 {
-                                    title => 'CrowdSecPlugin',
+                                    title => 'Crowdsec',
                                     help  => 'crowdsec.html',
-                                    form  => 'simpleInputContainer',
-                                    nodes => [
-                                        'crowdsec',
-                                        'crowdsecAction',
-                                        'crowdsecUrl',
-                                        'crowdsecKey',
-                                        'crowdsecIgnoreFailures',
+                                    nodes => [ {
+                                            title => 'CrowdSecBouncer',
+                                            form  => 'simpleInputContainer',
+                                            nodes => [
+                                                'crowdsec',
+                                                'crowdsecIgnoreFailures',
+                                                'crowdsecAction',
+                                                'crowdsecUrl',
+                                                'crowdsecKey',
+                                            ],
+                                        },
+                                        {
+                                            title => 'CrowdSecAgent',
+                                            form  => 'simpleInputContainer',
+                                            nodes => [
+                                                'crowdsecAgent',
+                                                'crowdsecMachineId',
+                                                'crowdsecPassword',
+                                                'crowdsecMaxFailures',
+                                                'crowdsecBlockDelay',
+                                                'crowdsecFilters',
+                                                'crowdSecAgentResponseCode',
+                                                'crowdSecAgentResponseValue',
+                                            ],
+                                        },
                                     ],
                                 },
                                 {
@@ -1306,7 +1353,8 @@ sub tree {
                             ]
                         },
                     ]
-                }
+                },
+                'keyNodes',
             ]
         },
         {
@@ -1342,8 +1390,10 @@ sub tree {
                                 'samlServicePublicKeyEnc'
                             ]
                         },
+                        'samlServiceSignatureMethod',
                         'samlServiceUseCertificateInResponse',
-                        'samlServiceSignatureMethod'
+                        'samlServiceSignatureKey',
+                        'samlServiceEncryptionKey',
                     ]
                 },
                 {
@@ -1459,8 +1509,7 @@ sub tree {
                         'samlRelayStateTimeout',
                         'samlUseQueryStringSpecific',
                         'samlOverrideIDPEntityID',
-                        'samlStorage',
-                        'samlStorageOptions',
+
                         {
                             title => 'samlCommonDomainCookie',
                             form  => 'simpleInputContainer',
@@ -1472,11 +1521,6 @@ sub tree {
                             ]
                         },
                         {
-                            title => 'samlFederation',
-                            form  => 'simpleInputContainer',
-                            nodes => [ 'samlFederationFiles', ]
-                        },
-                        {
                             title => 'samlDiscoveryProtocol',
                             form  => 'simpleInputContainer',
                             nodes => [
@@ -1486,8 +1530,19 @@ sub tree {
                                 'samlDiscoveryProtocolIsPassive'
                             ]
                         },
+                        {
+                            title => 'samlFederation',
+                            form  => 'simpleInputContainer',
+                            help  => 'samlfederation.html',
+                            nodes => [ 'samlFederationFiles', ]
+                        },
                     ]
-                }
+                },
+                {
+                    title => 'samlServiceMetaDataSessions',
+                    help  => 'samlservice.html#sessions',
+                    nodes => [ 'samlStorage', 'samlStorageOptions', ]
+                },
             ]
         },
         'samlIDPMetaDataNodes',
@@ -1509,10 +1564,12 @@ sub tree {
                         'oidcServiceMetaDataJWKSURI',
                         'oidcServiceMetaDataRegistrationURI',
                         'oidcServiceMetaDataIntrospectionURI',
+                        'oidcServiceMetaDataRevokeURI',
                         'oidcServiceMetaDataEndSessionURI',
                         'oidcServiceMetaDataCheckSessionURI',
                         'oidcServiceMetaDataFrontChannelURI',
                         'oidcServiceMetaDataBackChannelURI',
+                        'oidcServiceMetaDataRpLogoutReturnURI',
                     ]
                 },
                 'oidcServiceMetaDataAuthnContext',
@@ -1565,6 +1622,13 @@ sub tree {
                                 },
                             ],
                         },
+                        {
+                            title => 'oidcServiceMetaDataAdvancedKeys',
+                            nodes => [
+                                'oidcServiceSignatureKey',
+                                'oidcServiceEncryptionKey',
+                            ],
+                        },
                         'oidcServiceAllowAuthorizationCodeFlow',
                         'oidcServiceAllowImplicitFlow',
                         'oidcServiceAllowHybridFlow',
@@ -1607,9 +1671,12 @@ sub tree {
                 'casStrictMatching',
                 'casTicketExpiration',
                 'casBackChannelSingleLogout',
-                'casStorage',
-                'casStorageOptions',
                 'casAttributes',
+                {
+                    title => "casServiceMetaDataSessions",
+                    help  => 'idpcas.html#sessions',
+                    nodes => [ 'casStorage', 'casStorageOptions' ],
+                },
             ]
         },
         'casSrvMetaDataNodes',

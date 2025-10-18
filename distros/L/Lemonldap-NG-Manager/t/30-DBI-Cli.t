@@ -7,8 +7,10 @@ use IO::String;
 use JSON qw(from_json);
 use Test::More;
 
+require 't/test-lib.pm';
+
 my $count     = 0;
-my $file      = 't/conf.db';
+my $file      = "$main::tmpdir/conf/conf.db";
 my $maintests = 8;
 my ( $res, $client );
 eval { unlink $file };
@@ -32,8 +34,7 @@ SKIP: {
     use_ok('Lemonldap::NG::Common::Conf');
     my $h;
     ok(
-        $h = new Lemonldap::NG::Common::Conf(
-            {
+        $h = new Lemonldap::NG::Common::Conf( {
                 type        => 'RDBI',
                 dbiChain    => "DBI:SQLite:dbname=$file",
                 dbiUser     => '',
@@ -44,7 +45,7 @@ SKIP: {
     );
     {
         local $/ = undef;
-        open my $f, '<', 't/conf/lmConf-1.json';
+        open my $f, '<', "$main::tmpdir/conf/lmConf-1.json";
         my $content = <$f>;
         close $f;
         ok( $h->store( from_json($content) ), 'Conf 1 saved' );
@@ -53,7 +54,7 @@ SKIP: {
     use_ok('Lemonldap::NG::Manager::Cli::Lib');
     ok(
         $client = Lemonldap::NG::Manager::Cli::Lib->new(
-            iniFile => 't/lemonldap-ng-DBI-conf.ini'
+            iniFile => "$main::tmpdir/lemonldap-ng-DBI-conf.ini"
         ),
         'Client object'
     );
@@ -61,7 +62,7 @@ SKIP: {
     use_ok('Lemonldap::NG::Manager::Cli');
 
     my @args = (qw(-yes 1 -force 1 set ldapSetPassword 0));
-    $ENV{LLNG_DEFAULTCONFFILE} = 't/lemonldap-ng-DBI-conf.ini';
+    $ENV{LLNG_DEFAULTCONFFILE} = "$main::tmpdir/lemonldap-ng-DBI-conf.ini";
     Lemonldap::NG::Manager::Cli->run(@args);
     my $res = $dbh->selectrow_hashref(
         "SELECT * FROM lmConfig WHERE field='ldapSetPassword'");

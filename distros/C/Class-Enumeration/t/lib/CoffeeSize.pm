@@ -8,7 +8,7 @@ use parent 'Class::Enumeration';
 
 my @values;
 
-sub _values { ## no critic ( ProhibitUnusedPrivateSubroutines )
+sub values { ## no critic ( ProhibitBuiltinHomonyms )
   unless ( @values ) {
     my $ordinal = 0;
     my @tmp     = ( BIG => { ounces => 8 }, HUGE => { ounces => 10 }, OVERWHELMING => { ounces => 16 } );

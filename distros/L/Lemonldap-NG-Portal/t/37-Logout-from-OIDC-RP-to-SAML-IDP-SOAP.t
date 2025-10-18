@@ -21,7 +21,7 @@ BEGIN {
     require 't/saml-lib.pm';
 }
 
-my $maintests = 17;
+my $maintests = 18;
 my $debug     = 'error';
 
 #my $debug     = 'error';
@@ -232,7 +232,6 @@ SKIP: {
     ( $url, $query ) =
       expectRedirection( $res, qr#^http://auth.op.com(/.*)\?(.*)$# );
 
-
     ok(
         $res = $op->_get(
             $url,
@@ -262,13 +261,11 @@ SKIP: {
     $cookieop = expectCookie( $res, 'lemonldap' );
     ok( $cookieop eq "0", 'Test empty cookie on OP' );
 
-    ( $url, $query ) =
-      expectRedirection( $res, qr#^http://auth.rp.com(/?.*)\?(.*)$# );
-
+    expectRedirection( $res, qr#^http://auth.rp.com/oauth2/rlogoutreturn# );
 
     ok(
         $res = $rp->_get(
-            $url,
+            "/oauth2/rlogoutreturn",
             query  => $query,
             accept => 'text/html',
             cookie => "lemonldap=$cookierp",
@@ -276,6 +273,16 @@ SKIP: {
         'redirect to RP'
     );
 
+    expectRedirection( $res, qr#^http://auth.rp.com/\?logout=1# );
+    ok(
+        $res = $rp->_get(
+            "/",
+            query  => "logout=1",
+            accept => 'text/html',
+            cookie => "lemonldap=$cookierp",
+        ),
+        'Follow redirection to logout"'
+    );
     expectOK($res);
 
     # test connexion on IDP
@@ -300,8 +307,7 @@ clean_sessions();
 done_testing( count() );
 
 sub op {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel                        => $debug,
                 domain                          => 'op.com',
@@ -330,7 +336,7 @@ sub op {
                         oidcRPMetaDataOptionsUserIDAttr        => "",
                         oidcRPMetaDataOptionsAccessTokenExpiration  => 3600,
                         oidcRPMetaDataOptionsPostLogoutRedirectUris =>
-                          'http://auth.rp.com/?logout=1',
+                          'http://auth.rp.com/oauth2/rlogoutreturn',
                         oidcRPMetaDataOptionsRedirectUris =>
                           'http://auth.rp.com/?openidconnectcallback=1',
                     }
@@ -403,8 +409,7 @@ sub op {
 
 sub rp {
     my ( $jwks, $metadata ) = @_;
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel                   => $debug,
                 domain                     => 'rp.com',
@@ -444,8 +449,7 @@ sub rp {
 }
 
 sub idp {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel               => $debug,
                 domain                 => 'idp.com',

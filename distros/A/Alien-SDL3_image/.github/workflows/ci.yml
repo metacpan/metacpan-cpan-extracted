@@ -1,0 +1,163 @@
+---
+jobs:
+  etc:
+    name: 'FreeBSD/v${{matrix.perl}}'
+    needs:
+      - setup
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - architecture: x86-64
+            host: ubuntu-20.04
+            name: freebsd
+            pkg: pkg install -y
+            version: 13.2
+          - architecture: arm64
+            host: ubuntu-20.04
+            name: freebsd
+            pkg: pkg install -y
+            version: 13.2
+          - architecture: x86-64
+            host: ubuntu-latest
+            name: freebsd
+            pkg: pkg install -y
+            version: 14.1
+          - architecture: arm64
+            host: ubuntu-latest
+            name: freebsd
+            pkg: pkg install -y
+            version: 14.1
+        perl:
+          - "5.40"
+      max-parallel: 5
+    uses: sanko/actions/.github/workflows/affix-cross.yml@main
+    with:
+      arch: '${{ matrix.os.architecture }}'
+      host: '${{ matrix.os.host }}'
+      os: '${{ matrix.os.name }}'
+      perl: '${{ matrix.perl }}'
+      pkg: '${{ matrix.os.pkg }}'
+      version: '${{ matrix.os.version }}'
+  linux:
+    name: 'Linux/v${{matrix.perl}}'
+    needs:
+      - setup
+    strategy:
+      fail-fast: false
+      matrix:
+        flags:
+          - ''
+          - -Dusethreads
+          - -Duselongdouble
+          - -Dusequadmath
+        os:
+          - ubuntu-22.04
+        perl: '${{ fromJSON(needs.setup.outputs.matrix).perl }}'
+      max-parallel: 25
+    uses: sanko/actions/.github/workflows/affix-unix.yml@main
+    with:
+      flags: '${{ matrix.flags }}'
+      os: '${{ matrix.os }}'
+      perl: '${{ matrix.perl }}'
+  macos:
+    name: "[${{ matrix.os == 'macos-14' && 'M1' || 'Intel' }}] macOS/v${{matrix.perl}}"
+    needs:
+      - setup
+    strategy:
+      fail-fast: false
+      matrix:
+        exclude:
+          - flags: -Dusequadmath
+          - flags: -Dusethreads
+        flags: '${{ fromJSON(needs.setup.outputs.matrix).flags }}'
+        os:
+          - macos-14
+          - macos-latest
+        perl: '${{ fromJSON(needs.setup.outputs.matrix).perl }}'
+      max-parallel: 25
+    uses: sanko/actions/.github/workflows/affix-unix.yml@main
+    with:
+      flags: '${{ matrix.flags }}'
+      os: '${{ matrix.os }}'
+      perl: '${{ matrix.perl }}'
+  results:
+    name: Results
+    needs:
+      - macos
+      - win32
+      - linux
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Download test results
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - name: Report test results
+        run: |
+          # Function to process a directory
+          process_dir() {
+            local dir="$1"
+            # Loop through each element in the directory
+            for file in "$dir"/*; do
+              # Check if it's a directory
+              if [ -d "$file" ]; then
+                # Recursively call process_dir for subdirectories (except .)
+                if [ "$file" != "." ]; then
+                  process_dir "$file"
+                fi
+              # If it's a regular file, print its content
+              elif [ -f "$file" ]; then
+                echo "================> $file <================"
+                cat "$file"
+                echo ""  # Add an empty line between files
+              fi
+            done
+          }
+          # Get the directory path from the first argument (or current directory)
+          dir=${1:-.}
+          # Process the specified directory
+          process_dir "artifacts"
+  setup:
+    name: Generate Testing Matrix
+    outputs:
+      matrix: '${{ steps.matrix.outputs.matrix }}'
+    runs-on: ubuntu-22.04
+    steps:
+      - env:
+          DATA: |
+            {
+              "perl":  ["5.38.2", "5.40.0"],
+              "flags": ["", "-Dusethreads", "-Duselongdouble", "-Dusequadmath"]
+            }
+        id: matrix
+        run: "jq -rn 'env.DATA | fromjson | @json \"matrix=\\(.)\"' > $GITHUB_OUTPUT\n"
+  win32:
+    name: 'Windows/v${{matrix.perl}}'
+    needs:
+      - setup
+    strategy:
+      fail-fast: false
+      matrix:
+        exclude:
+          - flags: -Duselongdouble
+          - flags: -Dusequadmath
+        flags:
+          - -Dusethreads
+          - ''
+        os:
+          - windows-2022
+        perl: '${{ fromJSON(needs.setup.outputs.matrix).perl }}'
+      max-parallel: 25
+    uses: sanko/actions/.github/workflows/affix-win32.yml@main
+    with:
+      flags: '${{ matrix.flags }}'
+      os: '${{ matrix.os }}'
+      perl: '${{ matrix.perl }}'
+name: CI Matrix
+on:
+  pull_request: ~
+  push: ~
+  schedule:
+    - cron: 42 5 * * 0
+  workflow_dispatch: ~

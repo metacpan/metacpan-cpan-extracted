@@ -7,20 +7,17 @@ use strict;
 use JSON;
 require 't/test-lib.pm';
 
-my $struct    = 't/jsonfiles/11-modified-with-confirmation.json';
-my $confFiles = [ 't/conf/lmConf-1.json', 't/conf/lmConf-2.json' ];
-
-sub body {
-    return IO::File->new( $struct, 'r' );
-}
-
-# Delete lmConf-2.json if exists
-eval { unlink $confFiles->[1]; };
-mkdir 't/sessions';
+my $struct = 't/jsonfiles/11-modified-with-confirmation.json';
+my $confFiles =
+  [ "$main::tmpdir/conf/lmConf-1.json", "$main::tmpdir/conf/lmConf-2.json" ];
 
 my ( $res, $resBody );
-ok( $res = &client->_post( '/confs/', 'cfgNum=1', &body, 'application/json' ),
-    "Request succeed" );
+my ( $len, $body ) = substitute_io_handle($struct);
+ok(
+    $res =
+      &client->_post( '/confs/', 'cfgNum=1', $body, 'application/json', $len ),
+    "Request succeed"
+);
 ok( $res->[0] == 200,                       "Result code is 200" );
 ok( $resBody = from_json( $res->[2]->[0] ), "Result body contains JSON text" );
 
@@ -52,9 +49,10 @@ ok(
 ) or print STDERR Dumper($resBody);
 
 #print STDERR Dumper($resBody);
+( $len, $body ) = substitute_io_handle($struct);
 ok(
     $res = &client->_post(
-        '/confs/', 'cfgNum=1&force=1', &body, 'application/json'
+        '/confs/', 'cfgNum=1&force=1', $body, 'application/json', $len
     ),
     "Request succeed"
 );
@@ -112,15 +110,11 @@ count(5);
 
 unlink $confFiles->[1];
 
-#eval { rmdir 't/sessions'; };
+#eval { rmdir$main::tmpdir; };
 done_testing( count() );
 
-# Remove sessions directory
-`rm -rf t/sessions`;
-
 sub changes {
-    return [
-        {
+    return [ {
             'key' => 'portal',
             'new' => 'http://auth2.example.com/',
             'old' => 'http://auth.example.com/'

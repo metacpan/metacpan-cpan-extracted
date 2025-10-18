@@ -1,0 +1,10 @@
+<html> @0 (IMPLICIT)
+  <head> @0.0 (IMPLICIT)
+  <body> @0.1 (IMPLICIT)
+    <div data-webdyne-block="data-webdyne-block" display="1" name="foo"> @0.1.0
+      <p> @0.1.0.0
+        "Hello World"
+    <div data-webdyne-block="data-webdyne-block" name="bar"> @0.1.1
+      <p> @0.1.1.0
+        "${hello}"
+    "__PERL__sub hello { return shift()->render_block('bar', (hello=>'..."

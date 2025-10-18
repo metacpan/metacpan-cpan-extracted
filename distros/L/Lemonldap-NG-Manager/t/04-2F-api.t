@@ -8,9 +8,6 @@ use IO::String;
 use Lemonldap::NG::Common::Session;
 use Lemonldap::NG::Common::TOTP;
 
-eval { mkdir 't/sessions' };
-`rm -rf t/sessions/*`;
-
 require 't/test-lib.pm';
 
 our $_json = JSON->new->allow_nonref;
@@ -22,8 +19,8 @@ sub newSession {
         $tmp = Lemonldap::NG::Common::Session->new( {
                 storageModule        => 'Apache::Session::File',
                 storageModuleOptions => {
-                    Directory      => 't/sessions',
-                    LockDirectory  => 't/sessions',
+                    Directory      => "$main::tmpdir/sessions",
+                    LockDirectory  => "$main::tmpdir/sessions",
                     backend        => 'Apache::Session::File',
                     generateModule =>
 'Lemonldap::NG::Common::Apache::Session::Generate::SHA256',
@@ -61,8 +58,8 @@ sub get2fDevices {
         $tmp = Lemonldap::NG::Common::Session->new( {
                 storageModule        => 'Apache::Session::File',
                 storageModuleOptions => {
-                    Directory      => 't/sessions',
-                    LockDirectory  => 't/sessions',
+                    Directory      => "$main::tmpdir/sessions",
+                    LockDirectory  => "$main::tmpdir/sessions",
                     backend        => 'Apache::Session::File',
                     generateModule =>
 'Lemonldap::NG::Common::Apache::Session::Generate::SHA256',
@@ -675,7 +672,7 @@ checkGetList( 1, 'unknownt', 'TOTP' );
 
 # 2FA search
 
-`rm -rf t/sessions/*`;
+unlink glob $main::tmpdir . '/sessions/*';
 
 checkSearchNotFound;
 

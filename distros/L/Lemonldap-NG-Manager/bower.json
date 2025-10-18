@@ -3,7 +3,7 @@
   "description": "Lemonldap::NG manager with AngularJS",
   "version": "1.9.0",
   "homepage": "https://lemonldap-ng.org",
-  "license": "GPL2",
+  "license": "GPL-2+",
   "private": true,
   "dependencies": {
     "angular": "1.7.x",

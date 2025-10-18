@@ -6,14 +6,14 @@ use strict;
 require 't/test-lib.pm';
 
 my $res;
-my $maintests = 16;
+my $maintests = 15;
+
 SKIP: {
     eval 'use GD::SecurityImage;use Image::Magick;';
     if ($@) {
         skip 'Image::Magick not found', $maintests;
     }
-    my $client = LLNG::Manager::Test->new(
-        {
+    my $client = LLNG::Manager::Test->new( {
             ini => {
                 logLevel              => 'error',
                 useSafeJail           => 1,
@@ -41,11 +41,6 @@ SKIP: {
     ok( $token = $1, ' Token value is defined' );
     ok( $res->[2]->[0] =~ m#<img id="captcha" src="data:image/png;base64#,
         ' Captcha image inserted' );
-    ok(
-        $res->[2]->[0] =~
-m#<img class="renewcaptchaclick" src="/static/common/icons/arrow_refresh.png"#,
-        ' Renew Captcha button found'
-    ) or explain( $res->[2]->[0], 'Renew captcha button not found' );
     ok( $res->[2]->[0] =~ /captcha\.(?:min\.)?js/, 'Get captcha javascript' );
 
     my @form = ( $res->[2]->[0] =~ m#<form.*?</form>#sg );
@@ -107,6 +102,7 @@ m#<img class="renewcaptchaclick" src="/static/common/icons/arrow_refresh.png"#,
     my $id = expectCookie($res);
     $client->logout($id);
 }
+
 count($maintests);
 clean_sessions();
 done_testing( count() );

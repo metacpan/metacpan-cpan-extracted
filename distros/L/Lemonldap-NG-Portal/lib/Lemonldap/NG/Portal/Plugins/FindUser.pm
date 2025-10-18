@@ -9,7 +9,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_TOKENEXPIRED
 );
 
-our $VERSION = '2.0.14';
+our $VERSION = '2.22.0';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -218,7 +218,7 @@ sub _sendResult {
 
     return $req->wantJSON
       ? $self->p->sendJSONresponse( $req, $res )
-      : $self->p->do( $req, [ sub { $error } ] );
+      : $self->p->doPE( $req, $error );
 }
 
 1;

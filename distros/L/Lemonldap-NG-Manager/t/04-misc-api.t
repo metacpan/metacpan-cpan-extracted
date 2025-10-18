@@ -20,11 +20,11 @@ sub LLNG::Manager::Test::getStatus {
 my $client = LLNG::Manager::Test->new;
 
 # "break" config file
-rename 't/conf/lmConf-1.json', 't/conf/lmConf-1.json.broken';
+rename "$main::tmpdir/conf/lmConf-1.json", "$main::tmpdir/conf/lmConf-1.json.broken";
 my $brokenconfig = $client->getStatus( "Broken config backend", 503 );
 is( $brokenconfig->{status},        'ko', 'Got expected global status' );
 is( $brokenconfig->{status_config}, 'ko', 'Got expected config status' );
-rename 't/conf/lmConf-1.json.broken', 't/conf/lmConf-1.json';
+rename "$main::tmpdir/conf/lmConf-1.json.broken", "$main::tmpdir/conf/lmConf-1.json";
 
 my $allfine = $client->getStatus("Back to normal");
 is( $allfine->{status},           'ok',      'Got expected global status' );
@@ -33,6 +33,7 @@ is( $allfine->{status_sessions},  'unknown', 'Not implemented yet' );
 is( $allfine->{status_psessions}, 'unknown', 'Not implemented yet' );
 
 # Clean up generated files, except for "lmConf-1.json"
-unlink grep { $_ ne "t/conf/lmConf-1.json" } glob "t/conf/lmConf-*.json";
+unlink grep { $_ ne "$main::tmpdir/conf/lmConf-1.json" }
+  glob "$main::tmpdir/conf/lmConf-*.json";
 
 done_testing();

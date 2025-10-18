@@ -225,7 +225,7 @@ subtest 'Store browser, then reuse it' => sub {
         3, "Authentication level was set" );
 
     Time::Fake->offset("+15d");
-    $res = init_login( $client, 'dwho', $stay, 1, 0 );
+    $res = init_login( $client, 'dwho', $stay, 0, 0 );
     $res = browserChallenge( $res, $client, $stay, $secret );
     $id  = expectCookie($res);
     is( getSession($id)->data->{authenticationLevel},
@@ -288,7 +288,7 @@ subtest 'Store browser, then try to reuse it with wrong TOTP secret' => sub {
     my $id   = expectCookie($res);
     my $stay = expectCookie( $res, 'llngconnection' );
 
-    $res = init_login( $client, 'dwho', $stay, 1, 0 );
+    $res = init_login( $client, 'dwho', $stay, 0, 0 );
     $res = browserChallenge( $res, $client, $stay,
         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" );
     expectPortalError( $res, 24 );
@@ -309,7 +309,7 @@ subtest 'Store browser, then try to reuse as different user' => sub {
     my $id   = expectCookie($res);
     my $stay = expectCookie( $res, 'llngconnection' );
 
-    $res  = init_login( $client, 'rtyler', $stay, 1, 1 );
+    $res  = init_login( $client, 'rtyler', $stay, 0, 1 );
     $res  = expect_2fa_choice( $client, $res, "mail" );
     $code = expectSentCode($res);
     $res  = validateCode( $res, $client, $code );

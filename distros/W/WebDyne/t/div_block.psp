@@ -1,0 +1,14 @@
+<start_html>
+<div data-webdyne-block name="foo" display=1>
+<p>Hello World
+</div>
+<perl method="hello">
+<div data-webdyne-block name="bar">
+<p>${hello}
+</div>
+</perl>
+__PERL__
+
+sub hello {
+    return shift()->render_block('bar', (hello=>'Hello World'));
+}

@@ -1,0 +1,5 @@
+<start_html>
+<perl inline=1>
+print "Hello World"
+</perl>
+<end_html>

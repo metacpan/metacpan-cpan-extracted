@@ -1,0 +1,11 @@
+<start_html>
+<p>
+<popup_menu disabled="@{qw(red)}" values="%{(red => 'Red', blue=> 'Blue')}"/>
+<p>
+<popup_menu disabled="@{}" values="%{(red => 'Red', blue=> 'Blue')}"/>
+<p>
+<popup_menu disabled="blue" values="%{(red => 'Red', blue=> 'Blue')}"/>
+<p>
+<popup_menu selected="blue" values="%{(red => 'Red', blue=> 'Blue')}"/>
+<p>
+<popup_menu selected="@{qw(red blue)}" multiple values="%{(red => 'Red', blue=> 'Blue')}"/>

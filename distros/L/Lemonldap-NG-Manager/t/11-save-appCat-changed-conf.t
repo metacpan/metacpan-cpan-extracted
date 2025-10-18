@@ -7,27 +7,21 @@ use strict;
 use JSON;
 require 't/test-lib.pm';
 
-my @struct    = qw[t/jsonfiles/03-base-tree-appCat-modifed.json];
-my @desc      = ('Changed conf with deleted Category');
-my $confFiles = [ 't/conf/lmConf-1.json', 't/conf/lmConf-2.json' ];
-
-sub body {
-    return 0 unless (@struct);
-    my $t = shift @struct;
-    return IO::File->new( $t, 'r' );
-}
-
-# Delete lmConf-2.json if exists
-eval { unlink $confFiles->[1]; };
-mkdir 't/sessions';
+my @struct = qw[t/jsonfiles/03-base-tree-appCat-modifed.json];
+my @desc   = ('Changed conf with deleted Category');
+my $confFiles =
+  [ "$main::tmpdir/conf/lmConf-1.json", "$main::tmpdir/conf/lmConf-2.json" ];
 
 # Try to save a modified conf
-while ( my $body = &body() ) {
+for my $filename (@struct) {
+
+    my ( $len, $body ) = substitute_io_handle($filename);
     my $desc = shift @desc;
     my ( $res, $resBody );
     ok(
-        $res =
-          &client->_post( '/confs/', 'cfgNum=1', $body, 'application/json' ),
+        $res = &client->_post(
+            '/confs/', 'cfgNum=1', $body, 'application/json', $len
+        ),
         "$desc: positive result"
     );
     ok( $res->[0] == 200, "$desc: result code is 200" )
@@ -62,10 +56,6 @@ while ( my $body = &body() ) {
     #print STDERR Dumper($resBody);
     count(9);
 }
-eval { unlink $confFiles->[1]; rmdir 't/sessions'; };
+eval { unlink $confFiles->[1]; rmdir $main::tmpdir; };
 
 done_testing( count() );
-
-# Remove sessions directory
-`rm -rf t/sessions`;
-

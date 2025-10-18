@@ -1,0 +1,22 @@
+<start_html>
+<json id="data" handler="json"/>
+<end_html>
+
+__PERL__
+
+sub json {
+
+    my $self=shift();
+    my %chart=(
+        labels      => ['January', 'February', 'March', 'April', 'May', 'June'],
+        datasets    => [{
+                label => 'Sales over time',
+                data => [12, 19, 3, 5, 2, 32], # Y-axis data
+                fill => 0, # Line chart (no filling under the line)
+                borderColor => 'rgb(75, 192, 192)',
+                tension => 0.1
+        }]
+    );
+    return \%chart;
+    
+}

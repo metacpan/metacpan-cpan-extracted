@@ -5,7 +5,7 @@ use warnings;
 
 package Class::Enumeration;
 
-$Class::Enumeration::VERSION = 'v1.0.1';
+$Class::Enumeration::VERSION = 'v1.0.3';
 
 use overload
   '""'     => 'to_string',
@@ -39,10 +39,7 @@ sub value_of {
 }
 
 sub values { ## no critic ( ProhibitBuiltinHomonyms )
-  my ( $class ) = @_;
-
-  no strict 'refs'; ## no critic ( ProhibitNoStrict )
-  sort { $a->ordinal <=> $b->ordinal } $class->_values
+  Carp::croak "'values()' method not implemented by child class, stopped"
 }
 
 sub names {
@@ -71,10 +68,6 @@ sub _new { ## no critic ( ProhibitUnusedPrivateSubroutines )
   }
 
   bless { ordinal => $ordinal, name => $name, %$attributes }, $class
-}
-
-sub _values {
-  Carp::croak "'_values()' method not implemented by child class, stopped"
 }
 
 sub _is_identical_to {

@@ -6,8 +6,9 @@ use_ok('Lemonldap::NG::Portal::Main');
 my ( $p, $app );
 my $ini = {
     configStorage => {
-        type    => 'File',
-        dirName => 't',
+        type     => 'File',
+        dirName  => 't',
+        confFile => '/dev/null',
     },
     localSessionStorage        => 'Cache::FileCache',
     localSessionStorageOptions => {

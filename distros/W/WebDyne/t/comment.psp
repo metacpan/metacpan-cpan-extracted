@@ -1,0 +1,9 @@
+<start_html>
+<!-- This is a simple comment -->
+<p>This is a visible paragraph.</p>
+
+<!-- 
+    This is a multi-line comment.
+    It spans multiple lines.
+-->
+<p>This is another visible paragraph.</p>

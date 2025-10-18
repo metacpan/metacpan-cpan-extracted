@@ -17,10 +17,19 @@ It allows you to extract, traverse, and filter JSON data using a simplified jq-l
 - ✅ Optional key access (`.nickname?`)
 - ✅ Array indexing and expansion (`.users[0]`, `.users[]`)
 - ✅ `select(...)` filters with `==`, `!=`, `<`, `>`, `and`, `or`
-- ✅ Built-in functions: `length`, `keys`, `values`, `first`, `last`, `reverse`, `sort`, `sort_desc`, `sort_by`, `min_by()`, `max_by()`, `unique`, `unique_by()`, `has`, `contains()`, `any()`, `all()`, `not`, `map`, `map_values()`, `walk()`, `recurse()`, `group_by`, `group_count`, `sum_by()`, `avg_by()`, `median_by()`, `count`, `join`, `split()`, `explode()`, `implode()`, `substr()`, `slice()`, `replace()`, `empty()`, `median`, `mode`, `percentile()`, `variance`, `stddev`, `add`, `sum`, `product`, `upper()`, `lower()`, `titlecase()`, `abs()`, `ceil()`, `floor()`, `round()`, `trim()`, `ltrimstr()`, `rtrimstr()`, `startswith()`, `endswith()`, `chunks()`, `enumerate()`, `transpose()`, `flatten_all()`, `flatten_depth()`, `range()`, `index()`, `rindex()`, `indices()`, `clamp()`, `tostring()`, `tojson()`, `fromjson()`, `to_number()`, `pick()`, `merge_objects()`, `to_entries()`, `from_entries()`, `with_entries()`, `paths()`, `leaf_paths()`, `getpath()`, `delpaths()`, `arrays`, `objects`, `scalars`
+- ✅ Built-in functions: `length`, `keys`, `values`, `first`, `last`, `reverse`, `sort`, `sort_desc`, `sort_by`, `min_by()`, `max_by()`, `unique`, `unique_by()`, `has`, `contains()`, `test()`, `any()`, `all()`, `not`, `map`, `map_values()`, `walk()`, `recurse()`, `group_by`, `group_count`, `sum_by()`, `avg_by()`, `median_by()`, `count`, `join`, `split()`, `explode()`, `implode()`, `substr()`, `slice()`, `replace()`, `empty()`, `median`, `mode`, `percentile()`, `variance`, `stddev`, `add`, `sum`, `product`, `upper()`, `lower()`, `titlecase()`, `abs()`, `ceil()`, `floor()`, `round()`, `trim()`, `ltrimstr()`, `rtrimstr()`, `startswith()`, `endswith()`, `chunks()`, `enumerate()`, `transpose()`, `flatten_all()`, `flatten_depth()`, `range()`, `index()`, `rindex()`, `indices()`, `clamp()`, `tostring()`, `tojson()`, `fromjson()`, `to_number()`, `pick()`, `merge_objects()`, `to_entries()`, `from_entries()`, `with_entries()`, `paths()`, `leaf_paths()`, `getpath()`, `setpath()`, `delpaths()`, `arrays`, `objects`, `scalars`
+- ✅ `reduce expr as $var (init; update)` for jq-style accumulation with lexical variable bindings
+- ✅ `foreach expr as $var (init; update [; extract])` for jq-compatible streaming accumulation with optional emitters
 - ✅ jq-style alternative operator (`lhs // rhs`) for concise default values
-- ✅ Pipe-style queries with `.[]` (e.g. `.[] | select(...) | .name`) 
+- ✅ Conditional branching with jq-style `if ... then ... elif ... else ... end`
+  ```jq
+  if .score >= 90 then "A" elif .score >= 80 then "B" else "C" end
+  ```
+- ✅ Pipe-style queries with `.[]` (e.g. `.[] | select(...) | .name`)
 - ✅ Command-line interface: `jq-lite`
+- ✅ jq-compatible `--null-input` (`-n`) flag to start from `null` without providing JSON input
+- ✅ jq-compatible `--slurp` (`-s`) flag to collect every JSON document from the input stream into a single array
+- ✅ jq-compatible `--from-file` (`-f`) option to load filters from reusable script files
 - ✅ Reads from STDIN or file
 - ✅ **Interactive mode** for exploring JSON line-by-line
 - ✅ `--use` option to select decoder (JSON::PP, JSON::XS, etc.)
@@ -98,6 +107,7 @@ It allows you to extract, traverse, and filter JSON data using a simplified jq-l
 | `slice(start, length)` | Return a subarray using zero-based indexing with optional length (negative starts count from the end) (v0.66) |
 | `has(key)` | Check if objects contain a key or arrays have an index (v0.71) |
 | `contains(value)` | Check whether strings include the value or arrays contain an element (v0.56) |
+| `test(pattern[, flags])` | Match strings against Perl-compatible regular expressions with optional `imxs` flags (unreleased) |
 | `all([filter])` | Return true when every input (optionally filtered) is truthy (v0.94) |
 | `any([filter])` | Return true when any input (optionally filtered) is truthy (v0.90) |
 | `not` | Logical negation following jq truthiness semantics (v0.102) |
@@ -129,6 +139,7 @@ It allows you to extract, traverse, and filter JSON data using a simplified jq-l
 | `paths()`      | Emit every path to nested values as arrays of keys/indices (v0.89) |
 | `leaf_paths()` | Emit only the paths that terminate in non-container values (v0.96) |
 | `getpath(path)` | Retrieve the value(s) at the supplied path array or expression (unreleased) |
+| `setpath(path; value)` | Set or create a value at the specified path using literal or filter input (unreleased) |
 | `is_empty`     | True when the value is an empty array or object (v0.41)   |
 | `expr // fallback` | Use jq's alternative operator to supply defaults when the left side is null or missing (v1.02) |
 | `default(value)` | Substitute a fallback value when the result is undef/null (v0.42) |
@@ -184,13 +195,13 @@ curl -fsSL https://raw.githubusercontent.com/kawamurashingo/JQ-Lite/main/install
 
 | Distribution | jq-lite Support | Notes |
 |---------------|----------------|-------|
-| **CentOS 6 / RHEL 6** | ⚠️ Almost works | Default Perl 5.10.1 works fine. SSL/TLS errors may occur during CPAN install; use `--local-lib` or tarball install. |
+| **CentOS 6 / RHEL 6** | ⚠️ Requires upgrade | Default Perl 5.10.1 is too old; upgrade Perl to ≥ 5.14 (e.g. via perlbrew) before installing. |
 | **Ubuntu 12.04 / 14.04** | ✅ Works | Perl 5.14–5.18; installable via `cpan install JQ::Lite`. |
 | **Debian 7 (Wheezy)** | ✅ Works | Perl 5.14.2 standard; `apt-get install cpanminus` → `cpanm JQ::Lite` runs cleanly. |
-| **SLES 11 and earlier** | ⚠️ Conditional | Perl 5.10–5.12 works, but CPAN TLS issues may require offline installation. |
+| **SLES 11 and earlier** | ❌ Not supported | System Perl 5.10–5.12 is below the minimum requirement; upgrade Perl to ≥ 5.14 to use JQ::Lite. |
 
 ✅ **Conclusion:**  
-Even on legacy environments without jq, `JQ::Lite` runs as long as Perl ≥ 5.10.1 is available.
+Even on legacy environments without jq, `JQ::Lite` runs as long as Perl ≥ 5.14 is available.
 
 ---
 
@@ -259,6 +270,7 @@ print join("\n", @names), "\n";
 cat users.json | jq-lite '.users[].name'
 jq-lite '.users[] | select(.age > 25)' users.json
 jq-lite -r '.users[].name' users.json
+jq-lite -c '.users[0]' users.json
 ```
 
 For Windows:
@@ -269,6 +281,9 @@ jq-lite -r ".users[].name" users.json
 ```
 
 > ⚠️ `jq-lite` is named to avoid conflict with the original `jq`.
+
+Use `-c` / `--compact-output` when you need jq-style single-line JSON that is
+easier to pipe into other tools or compare in scripts.
 
 ---
 

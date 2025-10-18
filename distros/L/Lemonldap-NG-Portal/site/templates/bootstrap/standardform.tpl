@@ -1,5 +1,5 @@
 <TMPL_IF NAME="TOKEN">
-<input id="token" type="hidden" name="token" value="<TMPL_VAR NAME="TOKEN">" />
+<input type="hidden" id="token<TMPL_VAR NAME="key">" name="token" value="<TMPL_VAR NAME="TOKEN">" />
 </TMPL_IF>
 
 <TMPL_IF NAME="WAITING_MESSAGE">

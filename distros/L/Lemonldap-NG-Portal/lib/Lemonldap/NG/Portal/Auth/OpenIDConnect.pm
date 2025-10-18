@@ -2,21 +2,26 @@ package Lemonldap::NG::Portal::Auth::OpenIDConnect;
 
 use strict;
 use Mouse;
-use MIME::Base64                           qw/encode_base64 decode_base64/;
-use Scalar::Util                           qw/looks_like_number/;
-use Lemonldap::NG::Common::JWT             qw(getJWTPayload);
+use MIME::Base64 qw/encode_base64 decode_base64/;
+use Scalar::Util qw/looks_like_number/;
+use Lemonldap::NG::Common::JWT qw(getJWTPayload);
 use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
   PE_IDPCHOICE
   PE_OIDC_AUTH_ERROR
   PE_SENDRESPONSE
+  PE_REDIRECT
 );
 
-our $VERSION = '2.21.0';
+our $VERSION = '2.22.0';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Auth
   Lemonldap::NG::Portal::Lib::OpenIDConnect
+);
+
+with qw(
+  Lemonldap::NG::Portal::Lib::Key
 );
 
 # INTERFACE
@@ -89,7 +94,11 @@ sub init {
         oidcServiceMetaDataBackChannelURI  => 'backLogout',
         oidcServiceMetaDataJWKSURI         => 'jwks',
     );
-    $self->addRouteFromConf( 'Unauth', oidcServiceMetaDataJWKSURI => 'jwks', );
+    $self->addRouteFromConf(
+        'Unauth',
+        oidcServiceMetaDataJWKSURI           => 'jwks',
+        oidcServiceMetaDataRpLogoutReturnURI => 'rpLogoutReturn',
+    );
 
     @list =
       sort {
@@ -442,11 +451,18 @@ sub authLogout {
     my $client_id = $self->opOptions->{$op}->{oidcOPMetaDataOptionsClientID};
 
     if ($endsession_endpoint) {
-        my $logout_url = $self->p->buildUrl( $req->portal, { logout => 1 } );
+        my $logout_url = $self->p->buildUrl( $req->portal, $self->path,
+            $self->conf->{oidcServiceMetaDataRpLogoutReturnURI} );
+
+        my $state;
+        if ( my $next_url = ( $req->{issuerNextUrl} || $req->urldc ) ) {
+            $state = $self->state_ott->createToken( { next_url => $next_url } );
+        }
+
         $req->urldc(
             $self->buildLogoutRequest(
                 $endsession_endpoint, $req->{sessionInfo}->{_oidc_id_token},
-                $logout_url, undef, $client_id,
+                $logout_url, $state, $client_id,
             )
         );
 
@@ -457,6 +473,26 @@ sub authLogout {
         $self->logger->debug("No end session endpoint found for $op");
     }
     return PE_OK;
+}
+
+sub rpLogoutReturn {
+    my ( $self, $req ) = @_;
+
+    my $url = $self->p->buildUrl( $req->portal, { logout => 1 } );
+
+    if ( my $state = $req->param('state') ) {
+
+        $state = $self->state_ott->getToken($state);
+        if ($state) {
+            $url = $state->{next_url};
+        }
+        else {
+            $self->logger->warn("Post logout state is no longer valid");
+        }
+    }
+
+    $req->urldc($url);
+    return $self->p->do( $req, [ [ returnPE => PE_REDIRECT ] ] );
 }
 
 sub getDisplayType {
@@ -545,17 +581,18 @@ sub frontLogout {
     if ($badRequest) {
         return $self->p->sendError( $req, 'Bad OIDC Logout Request', 200 );
     }
+
+    # Ignore beforeLogout errors
     $req->steps( $self->p->beforeLogout );
     my $res = $self->p->process($req);
+
+    $req->data->{_continueLogout} = 1;
+    $req->response($response);
     return $self->p->do(
         $req,
         [
-            'authLogout',
-            'deleteSession',
-            sub {
-                $req->response($response);
-                return $res ? $res : PE_SENDRESPONSE;
-            }
+            'authLogout', 'deleteSession',
+            [ returnPE => ( $res ? $res : PE_SENDRESPONSE ) ]
         ]
     );
 }

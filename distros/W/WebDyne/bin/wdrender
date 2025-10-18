@@ -2,16 +2,16 @@
 #
 #  This file is part of WebDyne.
 #
-#  This software is Copyright (c) 2017 by Andrew Speer <andrew@webdyne.org>.
+#  This software is copyright (c) 2025 by Andrew Speer <andrew.speer@isolutions.com.au>.
 #
-#  This is free software, licensed under:
-#
-#    The GNU General Public License, Version 2, June 1991
+#  This is free software; you can redistribute it and/or modify it under
+#  the same terms as the Perl 5 programming language system itself.
 #
 #  Full license text is available at:
 #
-#  <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+#  <http://dev.perl.org/licenses/>
 #
+
 
 #
 #  Compile and/or show compiled version of WebDyne HTML scripts
@@ -21,20 +21,13 @@ package main;
 
 #  Compiler pragma
 #
-sub BEGIN {
-
-    #  Massage warnings and @INC path
-    $^W=0;
-    use File::Spec;
-    use FindBin qw($RealBin $Script);
-}
 use strict qw(vars);
-use vars qw($VERSION);
+use vars   qw($VERSION);
 
 
 #  Use the base module
 #
-use WebDyne::Base;
+use WebDyne::Util;
 
 
 #  Other external modules
@@ -44,11 +37,20 @@ use WebDyne::Request::Fake;
 use Getopt::Long;
 use Pod::Usage;
 use IO::File;
+use File::Spec;
+use FindBin qw($RealBin $Script);
+use URI::Escape;
+
+
+#  Error handling
+#
+use Carp;
+$SIG{__DIE__}=\&Carp::confess;
 
 
 #  Version Info, must be all one line for MakeMaker, CPAN.
 #
-$VERSION='1.250';
+$VERSION='2.014';
 
 
 #  Run main
@@ -56,7 +58,6 @@ $VERSION='1.250';
 exit ${&main(\@ARGV) || die errdump()};
 
 #===================================================================================================
-
 
 sub main {
 
@@ -72,8 +73,8 @@ sub main {
 
         handler => $ENV{'WebDyneHandler'} || 'WebDyne',
         error   => 'text',
-        header  => 1,
-        warn    => 1,
+        header  => 0,
+        warn    => 0,
 
     );
 
@@ -88,17 +89,20 @@ sub main {
         'header!',
         'warn!',
         'error=s',
-        'header_out=s@',
-        'header_in=s@',
+        'headers_out|header_out=s@',
+        'headers_in|header_in=s@',
         'outfile=s',
+        'repeat|r|num|n=s',
+        'loop',
+        'get=s@',
         'man',
         'version'
     ) || pod2usage(2);
-    pod2usage(-verbose => 99, -sections => 'Synopsis|Options', -exitval => 1) if $opt{'help'};
-    pod2usage(-verbose => 2) if $opt{'man'};
+    pod2usage(-verbose => 99, -sections => 'SYNOPSIS|OPTIONS', -exitval => 1) if $opt{'help'};
+    pod2usage(-verbose => 2)                                                  if $opt{'man'};
     $opt{'version'} && do {
         print "$Script version: $VERSION\n";
-        print "WebDyne version: $WebDyne::VERSION\n";
+        print "WebDyne version: $WebDyne::VERSION ($WebDyne::VERSION_GIT_REF)\n";
         exit 0
     };
 
@@ -108,7 +112,8 @@ sub main {
     my $dest_fh;
     if (my $dest_fn=$opt{'outfile'}) {
         $dest_fh=IO::File->new($dest_fn, O_CREAT | O_TRUNC | O_WRONLY) ||
-            return err ("unable to open file $dest_fn for output, $!");
+            return err("unable to open file $dest_fn for output, $!");
+        $opt{'select'}=$dest_fh;
     }
 
 
@@ -120,60 +125,106 @@ sub main {
         pod2usage("$Script: input file not found !");
 
 
+    #  Split out header in/out arrays as Request::Fake uses hash to hold them (should be array one day)
+    #
+    my ($header_out_ar, $header_in_ar)=map {delete $opt{$_}} qw(
+        headers_out
+        headers_in
+    );
+    
+    
+    #  Simulate a GET request with parameters if supplied
+    #
+    if (my $query_opt_ar=delete $opt{'get'}) {
+        my @query_string;
+        my @query_opt=map { split(/[;&]/) } @{$query_opt_ar};
+        foreach my $query_opt (@query_opt) {
+            my ($key, $value)=split(/=/, $query_opt);
+            push @query_string, join('=', map { uri_escape($_) } ($key, $value));
+        }
+        my $query_string=join('&', @query_string );
+        $ENV{'QUERY_STRING'}=$query_string;
+        $ENV{'REQUEST_METHOD'}='GET';
+    }
+
+
     #  Get new request object
     #
-    my $r=WebDyne::Request::Fake->new(
+    LOOP: while (1) {
+        for (1..($opt{'repeat'} || 1)) {
 
-        filename => $srce_fn,
+            #  Get new request handler
+            #
+            my $r=WebDyne::Request::Fake->new(
 
-        #select          =>  $dest_fh,
-        #status          =>  $opt{'status'},
+                filename => $srce_fn,
+                %opt
 
-    ) || return err ();
+                #select          =>  $dest_fh,
+                #status          =>  $opt{'status'},
+
+            ) || return err();
+            
+
+            #  Set headers
+            #
+            foreach my $header_out (@{$header_out_ar}) {
+                my ($k, $v)=split(/\s*:\s*/, $header_out);
+                $r->headers_out($k, $v);
+            }
+            foreach my $header_in (@{$header_in_ar}) {
+                my ($k, $v)=split(/\s*:\s*/, $header_in);
+                $r->headers_in($k, $v);
+            }
 
 
-    #  Set headers
-    #
-    foreach my $header_out (@{$opt{'header_out0'}}) {
-        my ($k, $v)=split(/\s*:\s*/, $header_out);
-        $r->headers_out($k, $v);
+            #  Get handler
+            #
+            my $handler=$opt{'handler'};
+
+
+            #  Load up whichever handler we are using
+            #
+            eval("require $handler") ||
+                return err("$Script: unable to load handler $handler, $@");
+
+
+            #  Set text errors only
+            #
+            $WebDyne::Err::WEBDYNE_ERROR_TEXT=1 if ($opt{'error'} eq 'text');
+
+
+            #  Set header, warning output
+            #
+            #$r->notes('noheader', $opt{'header'} ? 0 : 1);
+            #$r->notes('nowarn',   $opt{'warn'} ? 0 : 1);
+
+
+            #  Run it and display results, or any error generated
+            #
+            defined($handler->handler($r)) || return err();
+            print $/;
+
+            
+            #  If looking for leak
+            #
+            #my $gladiator_ar=Devel::Gladiator::walk_arena();
+
+
+            #  Manual cleanup
+            #
+            $r->DESTROY();
+            
+            
+            #  Leak detection
+            #
+            #print("SV: ",  scalar @{$gladiator_ar}, "\n") if $opt{'leak'};
+            #@{$gladiator_ar} = ();
+
+        }
+
+        last LOOP unless $opt{'loop'};
     }
-    foreach my $header_in (@{$opt{'header_in0'}}) {
-        my ($k, $v)=split(/\s*:\s*/, $header_in);
-        $r->headers_in($k, $v);
-    }
-
-
-    #  Get handler
-    #
-    my $handler=$opt{'handler'};
-
-
-    #  Load up whichever handler we are using
-    #
-    eval("require $handler") ||
-        return err ("$Script: unable to load handler $handler, $@");
-
-
-    #  Set text errors only
-    #
-    $WebDyne::Err::WEBDYNE_ERROR_TEXT=1 if ($opt{'error'} eq 'text');
-
-
-    #  Set header, warning output
-    #
-    $r->notes('noheader', !$opt{'header'});
-    $r->notes('nowarn',   !$opt{'warn'});
-
-
-    #  Run it and display results, or any error generated
-    #
-    defined($handler->handler($r)) || return err ();
-
-
-    #  Manual cleanup
-    #
-    $r->DESTROY();
 
 
     #  Done, return success
@@ -183,127 +234,118 @@ sub main {
 }
 
 
-__END__
+__END__# https://github.com/aspeer/pl-markpod.git 
 
-=head1 Name
+
+
+
+
+=pod
+
+=head1 wdrender(1)
+
+=head1 NAME
 
 wdrender - parse and render WebDyne pages
 
-=head1 Synopsis
+=head1 SYNOPSIS
 
-B<wdrender> B<[OPTIONS]> B<FILE>
-
-=head1 Options
-
--h, --help
-Show brief help message.
-
--v, --version
-Show version information.
-
-
-=over 5
-
-=item --handler
-
-Use a different WebDyne handler module. Currently the only other
-handler module available is WebDyne::Chain.
-
-=back
-
-=over 5
-
-=item --header
-
-Show HTTP status headers (default). User --noheader to disable.
-
-=back
-
-=over 5
-
-=item --error=text[|html]
-
-Show text error messages. User --error=html to HTML error message.
-
-=back
-
-=item --outfile=<filename>
-
-Send output to <filename> instead of STDOUT
-
-=back
-
-=item --header_in="Header: Value"
-
-Set simulated input header name to value. Can be set multiple times
-
-=back
-
-=item --header_out="Header: Value"
-
-Send output header with value (if header output enabled). Can be set multiple times
-
-=back
-
-=item --status=value
-
-Send status code x (e.g. 200,500,404) with header (if header output enabled)
-
-=back
-
+C<<<< wdrender [OPTIONS] FILE >>>>
 
 =head1 Description
 
-The B<wdrender> command displays the HTML that would be generated from a
-psp page using the WebDyne perl module.
+The  C<<<< wdrender >>>>  command displays the HTML that would be generated from a psp page using the WebDyne perl module.
 
-By default B<wdrender> will use the internal WebDyne handler when building
-the output, but can optionally use other WebDyne modules (such as
-WebDyne::Chain) by using the B<--handler> option..
+By default  C<<<< wdrender >>>>  will use the internal WebDyne handler when building the output, but can optionally use other WebDyne
+ modules (such as  C<<<< WebDyne::Chain >>>> ) by using the C<<<< --handler >>>>  option..
 
-=head1 Notes
+=head1 Options
 
-The B<wdrender> command will attempt to build the HTML as faithfully as
-possible from the command line environment, but may not be able to
-exactly duplicate the HTML generated under a real Web Server. As an
-example if a psp page takes advantge of the Apache request handler when
-generating HTML, the B<wdrender> commend will not be able to duplicate
-that environment.
+=over
+
+=item * B<<< -h, --help >>>
+
+Show brief help message.
+
+=item * B<<< --handler >>>
+
+Use a different WebDyne handler module. Currently the only other handler module available is C<<<< WebDyne::Chain >>>> .
+
+=item * B<<< --status >>>
+
+Specify the status.
+
+=item * B<<< --header >>>
+
+Include headers in the output.
+
+=item * B<<< --error >>>
+
+Specify the error format (default: text).
+
+=item * B<<< --headers_out | --header_out >>>
+
+Specify headers to include in the output.
+
+=item * B<<< --headers_in | --header_in >>>
+
+Specify headers to include in the input.
+
+=item * B<<< --outfile >>>
+
+Specify the output file.
+
+=item * B<<< --repeat | --r | --num | --n >>>
+
+Specify the number of times to repeat the rendering.
+
+=item * B<<< --loop >>>
+
+Enable looping. Used for leak testing.
+
+=item * B<<< --man >>>
+
+Display the full manual.
+
+=item * B<<< --version >>>
+
+Display the script version and exit.
+
+=back
 
 =head1 Examples
 
-B<wdrender> B<widget.psp>
+    # Show the HTML rendered version of time.psp
+    wdrender time.psp
 
-Display the HTML that would be generated by WebDyne from the widget.psp
-file.
+    # Show the HTML rendered version of time.psp with headers
+    wdrender --header time.psp
 
-B<wdrender> B<--handler=WebDyne::Chain> B<widget.psp>
+    # Show the HTML rendered version of time.psp chaining with the WebDyne::Session module
+    WebDyneChain=WebDyne::Session wdrender --header --handler WebDyne::Chain time.psp
 
-Display the HTML that would be generated by WebDyne from the widget.psp
-file, but this time using the WebDyne::Chain handler. In this case the
-example would fail, as WebDyne::Chain expects to get a list of modules
-it will chain the page throught. Normally it would get that from the
-Web Server configuration file, but the WebDyne::Chain module can take
-the list of modules from the environment also. So a better example
-would be:
+=head1 Notes
 
-B<WebDyneChain=WebDyne::Session> B<wdrender> B<--handler=WebDyne::Chain>
-B<widget.psp>
+The  C<<<< wdrender >>>>  command will attempt to build the HTML as faithfully as possible from the command line environment, but may
+ not be able to exactly duplicate the HTML generated under a real Web
+ Server. As an example if a psp page takes advantge of the Apache request
+ handler when generating HTML, the  C<<<< wdrender >>>>  commend will not be able to duplicate that environment.
 
 =head1 Author
 
-Written by Andrew Speer, andrew@webdyne.org
+Written by Andrew Speer,  <andrew@webdyne.org>
 
 =head1 LICENSE and COPYRIGHT
 
 This file is part of WebDyne.
 
-This software is Copyright (c) 2017 by Andrew Speer <andrew@webdyne.org>.
+This software is copyright (c) 2025 by Andrew Speer L<mailto:andrew.speer@isolutions.com.au>.
 
-This is free software, licensed under:
-
-  The GNU General Public License, Version 2, June 1991
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 Full license text is available at:
-L<http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
 
+L<http://dev.perl.org/licenses/>
+
+=cut

@@ -8,7 +8,9 @@ use JSON;
 use Hash::Merge::Simple;
 use Lemonldap::NG::Common::Conf::ReConstants;
 
-our $VERSION = '2.0.12';
+use constant booleanOptions => qr/^(?:json)$/;
+
+our $VERSION = '2.22.0';
 $Data::Dumper::Useperl = 1;
 
 extends('Lemonldap::NG::Manager::Cli::Lib');
@@ -28,18 +30,31 @@ has req    => ( is => 'ro' );
 has sep    => ( is => 'rw', isa => 'Str',  default => '/' );
 has format => ( is => 'rw', isa => 'Str',  default => "%-25s | %-25s | %-25s" );
 has yes    => ( is => 'rw', isa => 'Bool', default => 0 );
-has safe   => ( is => 'rw', isa => 'Bool', default => 0 );
+has safe   => ( is => 'rw', isa => 'Bool' );
+has unsafe => ( is => 'rw', isa => 'Bool', default => 0 );
 has force  => ( is => 'rw', isa => 'Bool', default => 0 );
 has logger => ( is => 'ro', lazy => 1, builder => sub { $_[0]->mgr->logger } );
 has userLogger =>
   ( is => 'ro', lazy => 1, builder => sub { $_[0]->mgr->userLogger } );
 has localConf => ( is => 'ro', lazy => 1, builder => sub { $_[0]->mgr } );
+has json      => ( is => 'rw' );
+has jsonConverter => (
+    is      => 'rw',
+    default => sub { JSON->new->allow_nonref->canonical->pretty },
+);
+has keep_last   => ( is => 'rw' );
+has keep_recent => ( is => 'rw' );
 
 sub get {
     my ( $self, @keys ) = @_;
+    my $res = {};
     die 'get requires at least one key' unless (@keys);
   L: foreach my $key (@keys) {
         my $value = $self->_getKey($key);
+        if ( $self->json ) {
+            $res->{$key} = $value;
+            next;
+        }
         if ( ref $value eq 'HASH' ) {
             print "$key has the following keys:\n";
             print "   $_\n" foreach ( sort keys %$value );
@@ -66,6 +81,10 @@ sub get {
             print "$key = $value\n";
         }
     }
+    if ( @keys == 1 ) {
+        $res = $res->{ $keys[0] };
+    }
+    print $self->jsonConverter->encode($res) if $self->json;
 }
 
 sub set {
@@ -75,12 +94,27 @@ sub set {
     my @list;
     foreach my $key ( keys %pairs ) {
         my $oldValue = $self->_getKey($key);
+        my $value    = $pairs{$key};
         if ( ref $oldValue ) {
-            die "$key seems to be a hash, modification refused";
+            if ( $self->json ) {
+                $value = eval { $self->jsonConverter->decode( $pairs{$key} ) };
+                die "Bad value $pairs{$key}: $@" if $@;
+                $oldValue = $self->jsonConverter->encode($oldValue);
+            }
+            else {
+                die "$key seems to be a hash, modification refused";
+            }
+        }
+        elsif ( $pairs{$key} =~ /^\s*[\{\[]/ ) {
+            $value = eval { $self->jsonConverter->decode( $pairs{$key} ) };
+            if ($@) {
+                warn "Unable to decode: $pairs{$key}";
+                $value = $pairs{$key};
+            }
         }
         $oldValue //= '';
         $self->logger->info("CLI: Set key $key with $pairs{$key}");
-        push @list, [ $key, $oldValue, $pairs{$key} ];
+        push @list, [ $key, $oldValue, $pairs{$key}, $value ];
     }
     unless ( $self->yes ) {
         print "Proposed changes:\n";
@@ -96,8 +130,8 @@ sub set {
     }
     require Clone;
     my $new = Clone::clone( $self->mgr->hLoadedPlugins->{conf}->currentConf );
-    foreach my $key ( keys %pairs ) {
-        $self->_setKey( $new, $key, $pairs{$key} );
+    foreach (@list) {
+        $self->_setKey( $new, $_->[0], $_->[3] );
     }
     return $self->_save($new);
 }
@@ -385,9 +419,8 @@ sub lastCfg {
 
 sub save {
     my ($self) = @_;
-    my $conf   = $self->jsonResponse( '/confs/' . $self->cfgNum, 'full=1' );
-    my $json   = JSON->new->indent->canonical;
-    print $json->encode($conf);
+    my $conf = $self->jsonResponse( '/confs/' . $self->cfgNum, 'full=1' );
+    print $self->jsonConverter->encode($conf);
 }
 
 sub restore {
@@ -465,6 +498,75 @@ sub rollback {
     }
 }
 
+sub purge {
+    my ($self) = @_;
+    unless ( $self->keep_last xor $self->keep_recent ) {
+        die
+'usage: purge --keep-last <value> | --keep-recent <number of seconds to keep>';
+    }
+    my @configs  = $self->mgr->confAcc->available();
+    my $n_config = scalar @configs;
+
+    if ( $self->keep_last ) {
+        if ( $n_config < $self->keep_last ) {
+            $self->logger->warn(
+"The number of configs to keep ($self->{keep_last}) is more than the number of available configs ($n_config)"
+            );
+        }
+
+        my @to_delete = @configs[ 0 .. $#configs - $self->keep_last ];
+        if ( scalar @to_delete == $n_config ) {
+            die 'This would delete all configs';
+        }
+        _config_delete( $self, @to_delete );
+    }
+    if ( $self->keep_recent ) {
+
+# The keep-recent argument is a relative number of seconds to keep. Compute an absolute offset to keep
+        my $absoluteOffset = time() - $self->keep_recent;
+        my @to_delete      = grep {
+            my $r = $self->mgr->confAcc->getConf( { cfgNum => $_ } );
+            $r && ref $r && $r->{cfgDate} < $absoluteOffset
+        } @configs;
+        if ( scalar @to_delete == $n_config ) {
+            die 'This would delete all configs';
+        }
+        _config_delete( $self, @to_delete );
+    }
+}
+
+sub _config_delete {
+    my ( $self, @to_delete ) = @_;
+    unless ( $self->yes ) {
+        print "Configs that will be deleted: "
+          . _format_to_delete(@to_delete) . "\n";
+        print "Confirm (N/y)? ";
+        my $c = <STDIN>;
+        unless ( $c =~ /^y(?:es)?$/ ) {
+            die "Aborting";
+        }
+    }
+    for my $config_id (@to_delete) {
+        $self->mgr->confAcc->delete($config_id);
+    }
+    $self->logger->info( "CLI: Deleted " . scalar @to_delete . " configs" );
+    print STDERR "Deleted " . scalar(@to_delete) . " configs\n";
+}
+
+sub _format_to_delete {
+    my (@to_delete) = (@_);
+    if ( @to_delete > 100 ) {
+        my @sorted = sort { $a <=> $b } @to_delete;
+        my $min    = join( ", ", @sorted[ 0 .. 4 ] );
+        my $max    = join( ", ", @sorted[ -5 .. -1 ] );
+        my $inter  = @to_delete - 10;
+        return "$min .. [ $inter more ] .. $max";
+    }
+    else {
+        return join( ", ", @to_delete );
+    }
+}
+
 sub _getKey {
     my ( $self, $key ) = @_;
     my $sep = $self->sep;
@@ -517,7 +619,7 @@ sub _save {
     unless ( $parser->testNewConf( $self->localConf ) ) {
         my $msg = "Configuration rejected with message: " . $parser->message;
         $self->logger->error("CLI: $msg");
-        if ( $self->safe ) {
+        unless ( $self->unsafe or ( defined $self->safe and !$self->safe ) ) {
             die "$msg";
         }
         else {
@@ -562,9 +664,9 @@ sub _save {
     my $langFile = $self->mgr->templateDir . "/languages/en.json";
     $langFile =~ s/templates/static/;
     my $langMessages;
-    if ( open my $json, "<", $langFile ) {
+    if ( open my $_json, "<", $langFile ) {
         local $/ = undef;
-        $langMessages = JSON::from_json(<$json>);
+        $langMessages = $self->jsonConverter->decode(<$_json>);
     }
 
     # Display result
@@ -583,19 +685,29 @@ sub run {
 
     # Options simply call corresponding accessor
     my $args = {};
-    while ( $_[0] =~ s/^--?// ) {
-        my $k = shift;
-        my $v = shift;
-        if ( ref $self ) {
-            eval { $self->$k($v) };
-            if ($@) {
-                die "Unknown option -$k or bad value ($@)";
+    my @REST;
+    for ( my $i = 0 ; $i < @_ ; $i++ ) {
+        if ( $_[$i] =~ s/^--?(\w)/$1/ ) {
+            $_[$i] =~ s/-/_/g;
+            my $k    = $_[$i];
+            my $bool = ( $k =~ booleanOptions );
+            my $v    = $bool ? 1 : $_[ $i + 1 ];
+            $i++ unless $bool;
+            if ( ref $self ) {
+                eval { $self->$k($v) };
+                if ($@) {
+                    die "Unknown option -$k or bad value ($@)";
+                }
+            }
+            else {
+                $args->{$k} = $v;
             }
         }
         else {
-            $args->{$k} = $v;
+            push @REST, $_[$i];
         }
     }
+    @_ = @REST;
     unless ( ref $self ) {
         $self = $self->new($args);
     }
@@ -604,11 +716,11 @@ sub run {
     }
     my $action = shift;
     unless ( $action =~
-/^(?:get|set|del|addKey|delKey|addPostVars|delPostVars|merge|save|restore|rollback)$/
+/^(?:get|set|del|addKey|delKey|addPostVars|delPostVars|merge|save|restore|rollback|purge)$/
       )
     {
         die
-"Unknown action $action. Only get, set, del, addKey, delKey, addPostVars, delPostVars, merge, save, restore, rollback allowed";
+"Unknown action $action. Only get, set, del, addKey, delKey, addPostVars, delPostVars, merge, save, restore, rollback, purge allowed";
     }
 
     unless ( $action eq "restore" ) {
@@ -645,14 +757,14 @@ system.
 =head1 SYNOPSIS
 
   #!/usr/bin/env perl
-  
+
   use warnings;
   use strict;
   use Lemonldap::NG::Manager::Cli;
-  
+
   # Optional: you can specify here some parameters
   my $cli = Lemonldap::NG::Manager::Cli->new(iniFile=>'t/lemonldap-ng.ini');
-  
+
   $cli->run(@ARGV);
 
 or use llng-manager-cli provides with this package.
@@ -721,6 +833,18 @@ subroutine.
 Using get, you can read several keys. Example:
 
   llng-manager-cli get portal cookieName domain
+
+=head4 purge
+
+Use purge to delete configurations
+
+=over
+
+=item * The "B<C<purge --keep-last E<lt>NE<gt>>>" command keeps only the Nth latest configurations.
+
+=item * The "B<C<purge --keep-recent E<lt>NE<gt>>>" command keeps only the configurations that have been created less than N seconds ago.
+
+=back
 
 =head1 SEE ALSO
 

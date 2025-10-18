@@ -14,7 +14,7 @@
 
 package Lemonldap::NG::Manager::Build::CTrees;
 
-our $VERSION = '2.21.0';
+our $VERSION = '2.22.0';
 
 sub cTrees {
     return {
@@ -56,6 +56,7 @@ sub cTrees {
                 form  => 'simpleInputContainer',
                 nodes => [
                     'samlIDPMetaDataOptionsSignatureMethod',
+                    'samlIDPMetaDataOptionsSignatureKey',
                     'samlIDPMetaDataOptionsSignSSOMessage',
                     'samlIDPMetaDataOptionsCheckSSOMessageSignature',
                     'samlIDPMetaDataOptionsSignSLOMessage',
@@ -96,6 +97,7 @@ sub cTrees {
                         form  => 'simpleInputContainer',
                         nodes => ['samlIDPMetaDataOptionsFederationEntityID']
                     },
+                    'samlIDPMetaDataOptionsURL',
                     'samlIDPMetaDataOptionsComment'
                 ],
             },
@@ -135,6 +137,7 @@ sub cTrees {
                         form  => 'simpleInputContainer',
                         nodes => [
                             'samlSPMetaDataOptionsSignatureMethod',
+                            'samlSPMetaDataOptionsSignatureKey',
                             'samlSPMetaDataOptionsSignSSOMessage',
                             'samlSPMetaDataOptionsCheckSSOMessageSignature',
                             'samlSPMetaDataOptionsSignSLOMessage',
@@ -160,6 +163,7 @@ sub cTrees {
                             'samlSPMetaDataOptionsFederationRequiredAttributes',
                         ]
                     },
+                    'samlSPMetaDataOptionsURL',
                     'samlSPMetaDataOptionsComment'
                 ]
             },
@@ -198,6 +202,8 @@ sub cTrees {
                             'oidcOPMetaDataOptionsAuthnEndpointAuthMethod',
                             'oidcOPMetaDataOptionsAuthnEndpointAuthSigAlg',
                             'oidcOPMetaDataOptionsTokenEndpointAuthMethod',
+                            'oidcOPMetaDataOptionsTokenEndpointAuthSigAlg',
+                            'oidcOPMetaDataOptionsSigningKey',
                             'oidcOPMetaDataOptionsCheckJWTSignature',
                             'oidcOPMetaDataOptionsIDTokenMaxAge',
                             'oidcOPMetaDataOptionsUseNonce',
@@ -296,10 +302,11 @@ sub cTrees {
                         ],
                     },
                     {
-                        title => 'keys',
+                        title => 'oidcRpKeys',
                         nodes => [
                             'oidcRPMetaDataOptionsJwksUri',
                             'oidcRPMetaDataOptionsJwks',
+                            'oidcRPMetaDataOptionsSigningKey',
                         ],
                     },
                     {
@@ -310,6 +317,7 @@ sub cTrees {
                             'oidcRPMetaDataOptionsIDTokenExpiration',
                             'oidcRPMetaDataOptionsAccessTokenExpiration',
                             'oidcRPMetaDataOptionsOfflineSessionExpiration',
+                            'oidcRPMetaDataOptionsRtActivity',
                         ]
                     },
                     {
@@ -384,6 +392,18 @@ sub cTrees {
                 nodes => [ 'casAppMetaDataOptionsDisplayName', ],
             },
             'casAppMetaDataMacros',
+        ],
+        keyNode => [ {
+                title => 'KeyMaterial',
+                form  => 'KeyMaterial',
+                group => [ 'keyPrivate', 'keyPrivatePwd', 'keyPublic' ]
+            },
+            {
+                title => 'keyOptions',
+                help  => 'keys.html#options',
+                form  => 'simpleInputContainer',
+                nodes => [ 'keyId', 'keyComment', ],
+            },
         ],
     };
 }

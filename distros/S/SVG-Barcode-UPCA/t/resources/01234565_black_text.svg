@@ -1,0 +1,23 @@
+<svg viewBox="0 0 73 72" xmlns="http://www.w3.org/2000/svg">
+  <rect width="100%" height="100%" fill="white"/>
+  <rect x="11" y="2" width="1" height="55" fill="black"/>
+  <rect x="13" y="2" width="1" height="55" fill="black"/>
+  <rect x="15" y="2" width="2" height="50" fill="black"/>
+  <rect x="19" y="2" width="2" height="50" fill="black"/>
+  <rect x="23" y="2" width="1" height="50" fill="black"/>
+  <rect x="26" y="2" width="2" height="50" fill="black"/>
+  <rect x="29" y="2" width="4" height="50" fill="black"/>
+  <rect x="34" y="2" width="1" height="50" fill="black"/>
+  <rect x="37" y="2" width="3" height="50" fill="black"/>
+  <rect x="41" y="2" width="1" height="50" fill="black"/>
+  <rect x="43" y="2" width="3" height="50" fill="black"/>
+  <rect x="48" y="2" width="1" height="50" fill="black"/>
+  <rect x="50" y="2" width="1" height="50" fill="black"/>
+  <rect x="52" y="2" width="4" height="50" fill="black"/>
+  <rect x="57" y="2" width="1" height="55" fill="black"/>
+  <rect x="59" y="2" width="1" height="55" fill="black"/>
+  <rect x="61" y="2" width="1" height="55" fill="black"/>
+  <text x="2" y="60" font-size="10" fill="black">0</text>
+  <text x="21" y="60" font-size="10" fill="black">123456</text>
+  <text x="66" y="60" font-size="10" fill="black">5</text>
+</svg>

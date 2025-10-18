@@ -189,6 +189,52 @@ ok(
 ok( $res->[2]->[0] eq 'CN', ' CN is good' );
 count(2);
 
+# Insert a key using named key in URL
+ok(
+    $res = $issuer->app->( {
+            HTTP_ACCEPT          => 'application/json',
+            HTTP_ACCEPT_LANGUAGE => 'fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3',
+            HTTP_HOST            => 'auth.idp.com',
+            PATH_INFO            => "/sessions/global/"
+              . (
+                $ENV{LLNG_HASHED_SESSION_STORE} ? id2storage($newId) : $newId
+              ).'/zz',
+            REMOTE_ADDR    => '127.0.0.1',
+            REQUEST_METHOD => 'PUT',
+            REQUEST_URI    => "/sessions/global/"
+              . (
+                $ENV{LLNG_HASHED_SESSION_STORE} ? id2storage($newId) : $newId
+              ).'/zz',
+            SCRIPT_NAME            => '',
+            SERVER_NAME            => 'auth.example.com',
+            SERVER_PORT            => '80',
+            SERVER_PROTOCOL        => 'HTTP/1.1',
+            'psgix.input.buffered' => 0,
+            'psgi.input'           => IO::String->new('"ZZ value"'),
+            CONTENT_TYPE           => 'application/json',
+            CONTENT_LENGTH         => 10,
+        }
+    ),
+    'Put a new key'
+);
+expectOK($res);
+ok( $res = eval { JSON::from_json( $res->[2]->[0] ) }, ' GET JSON' )
+  or print STDERR $@;
+ok( $res->{result} == 1, ' Result is 1' );
+count(3);
+
+# Verify new key
+ok(
+    $res = $issuer->_get(
+            "/sessions/global/"
+          . ( $ENV{LLNG_HASHED_SESSION_STORE} ? id2storage($newId) : $newId )
+          . "/zz"
+    ),
+    'Verify cn'
+);
+ok( $res->[2]->[0] eq 'ZZ value', ' ZZ is good' );
+count(2);
+
 use_ok('Lemonldap::NG::Common::Apache::Session::REST');
 ok(
     $res =

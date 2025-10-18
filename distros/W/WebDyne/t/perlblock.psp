@@ -1,6 +1,0 @@
-<start_html lang="en-US">
-!{! no strict; $i !}
-!{! no strict; $i !}
-<end_html>
-__PERL__
-our $i=5;

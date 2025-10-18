@@ -245,7 +245,6 @@ sub op {
                     'loa-2' => 2,
                     'loa-3' => 3
                 },
-                oidcServiceKeyTypeSig    => 'EC',
                 oidcServicePrivateKeySig => &oidc_key_op_private_ec_sig,
                 oidcServicePublicKeySig  => &oidc_key_op_public_ec_sig,
             }
@@ -288,7 +287,6 @@ sub rp {
                 oidcServicePrivateKeyEnc => &oidc_key_op_private_ec_sig,
                 oidcServicePublicKeyEnc  => &oidc_key_op_public_ec_sig,
                 oidcServiceKeyIdEnc      => 'aabbcc',
-                oidcServiceKeyTypeEnc    => 'EC',
                 oidcOPMetaDataJWKS       => {
                     op => $jwks,
                 },

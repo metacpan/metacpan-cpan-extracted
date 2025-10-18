@@ -9,8 +9,7 @@ require 't/test-lib.pm';
 my $res;
 my $json;
 my $token;
-my $client = LLNG::Manager::Test->new(
-    {
+my $client = LLNG::Manager::Test->new( {
         ini => {
             logLevel          => 'error',
             authentication    => 'Choice',
@@ -35,6 +34,14 @@ my $client = LLNG::Manager::Test->new(
 
 ## Simple access
 ok( $res = $client->_get( '/', accept => 'text/html' ), 'Get Portal', );
+ok( $res->[2]->[0] =~ /input type="checkbox" id="checkLogins1_demo"/,
+    'token id found' )
+or explain( $res->[2]->[0], 'Token id' );
+ok(
+    $res->[2]->[0] =~
+m%<input type="hidden" id="token1_demo" name="token" value="([\d_]+?)" />%,
+    'Token value found'
+) or explain( $res->[2]->[0], 'Token value' );
 my ( $host, $url, $query ) =
   expectForm( $res, '#', undef, 'user', 'password', 'spoofId', 'token' );
 ( $host, $url, $query ) =
@@ -44,7 +51,7 @@ ok( @form == 3, 'Display 3 forms' )
   or explain( $res->[2]->[0], 'Forms are missing' );
 ok( $query =~ /lmAuth=2_ssl/, 'lmAuth=2_ssl' )
   or explain( $query, 'lmAuth is not well defined' );
-count(3);
+count(5);
 
 $query =~ s/uid=/uid=dwho/;
 ok(

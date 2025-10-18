@@ -1,32 +1,22 @@
 #
 #  This file is part of WebDyne.
 #
-#  This software is Copyright (c) 2017 by Andrew Speer <andrew@webdyne.org>.
+#  This software is copyright (c) 2025 by Andrew Speer <andrew.speer@isolutions.com.au>.
 #
-#  This is free software, licensed under:
-#
-#    The GNU General Public License, Version 2, June 1991
+#  This is free software; you can redistribute it and/or modify it under
+#  the same terms as the Perl 5 programming language system itself.
 #
 #  Full license text is available at:
 #
-#  <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+#  <http://dev.perl.org/licenses/>
 #
 package WebDyne::Compile;
-
-
-#  Packace init, attempt to load optional Time::HiRes module
-#
-sub BEGIN {
-    local $SIG{__DIE__};
-    $^W=0;
-    eval("use Time::HiRes qw(time)") || eval {undef};
-}
 
 
 #  Pragma
 #
 use strict qw(vars);
-use vars qw($VERSION %CGI_TAG_WEBDYNE %CGI_TAG_IMPLICIT);
+use vars   qw($VERSION %CGI_TAG_WEBDYNE %CGI_TAG_FORM %CGI_TAG_IMPLICIT);
 use warnings;
 no warnings qw(uninitialized redefine once);
 
@@ -37,20 +27,19 @@ use WebDyne;
 use WebDyne::HTML::TreeBuilder;
 use Storable;
 use IO::File;
-use CGI qw(-no_xhtml);
-use CGI::Util;
 use Data::Dumper;
 
 
 #  WebDyne Modules
 #
+use WebDyne::HTML::Tiny;
 use WebDyne::Constant;
-use WebDyne::Base;
+use WebDyne::Util;
 
 
 #  Version information
 #
-$VERSION='1.250';
+$VERSION='2.014';
 
 
 #  Debug load
@@ -58,25 +47,11 @@ $VERSION='1.250';
 debug("Loading %s version $VERSION", __PACKAGE__);
 
 
-#  Tags that are case sensitive
-#
-our %CGI_Tag_Ucase=map {$_ => ucfirst($_)} (
-
-    qw(select tr link delete accept sub header button)
-
-);
-
-
 #  Get WebDyne and CGI tags from TreeBuilder module
 #
 *CGI_TAG_WEBDYNE=\%WebDyne::CGI_TAG_WEBDYNE;
+*CGI_TAG_FORM=\%WebDyne::HTML::TreeBuilder::CGI_TAG_FORM;
 *CGI_TAG_IMPLICIT=\%WebDyne::HTML::TreeBuilder::CGI_TAG_IMPLICIT;
-
-
-#  Need the start/end_html code ref for later on
-#
-my $CGI_start_html_cr=UNIVERSAL::can(CGI, 'start_html');
-my $CGI_end_html_cr=UNIVERSAL::can(CGI, 'end_html');
 
 
 #  Var to hold package wide hash, for data shared across package
@@ -92,6 +67,15 @@ my %Package;
 #==================================================================================================
 
 
+#  Packace init, attempt to load optional Time::HiRes module
+#
+BEGIN {
+    eval {require Time::HiRes;    Time::HiRes->import('time')};
+    eval {require Devel::Confess; Devel::Confess->import()};
+    eval {} if $@;
+}
+
+
 sub new {
 
 
@@ -100,7 +84,13 @@ sub new {
     #  example. wdcompile is only used for debugging - we do some q&d stuff here
     #  to make it work
     #
-    my $class=shift();
+    my ($class, $opt_hr)=@_;
+
+
+    #  Get appropriate cgi_or
+    #
+    my $html_tag_or=WebDyne::HTML::Tiny->new(mode => 'html') ||
+        return err('unable to get new WebDyne::HTML::Tiny object');
 
 
     #  Init WebDyne module
@@ -114,9 +104,9 @@ sub new {
     #
     my %self=(
 
-        _r    => $r,
-        _CGI  => CGI->new(),
-        _time => time()
+        _r => $r,
+
+        #_CGI  => $html_tag_or,
 
     );
 
@@ -139,13 +129,13 @@ sub compile {
 
     #  Start timer so we can log how long it takes us to compile a file
     #
-    my $time=time();
+    my $time=($self->{'_time'}=time());
 
 
     #  Init class if not yet done
     #
     (ref($self))->{_compile_init} ||= do {
-        $self->compile_init() || return err ()
+        $self->compile_init() || return err()
     };
 
 
@@ -161,81 +151,128 @@ sub compile {
 
     #  Need request object ref
     #
-    my $r=$self->{'_r'} || $self->r() || return err ();
-
-
-    #  Get CGI ref
-    #
-    my $cgi_or=$self->{'_CGI'} || $self->CGI() || return err ();
-
-
-    #  Turn off xhtml in CGI - should work in pragma, seems dodgy - seems like
-    #  we must do every time we compile a page
-    #
-    $CGI::XHTML=0;
-
-
-    #  Nostick
-    #
-    $CGI::NOSTICKY=1;
+    my $r=$self->{'_r'} || $self->r() || return err();
 
 
     #  Open the file
     #
     my $html_fh=IO::File->new($html_cn, O_RDONLY) ||
-        return err ("unable to open file $html_cn, $!");
+        return err("unable to open file $html_cn, $!");
 
 
-    #  Get new TreeBuilder object
+    #  Read over file handle until we get to the first non-comment line (ignores auto added copyright statements). Update - do
+    #  this in Treebuilder code now so can account for comments when counting line numbers
     #
-    my $html_ox=WebDyne::HTML::TreeBuilder->new(
+    while (0) {
+        my $pos=tell($html_fh);
+        my $line=<$html_fh>;
+        if ($line=~/^#/) {
+            next;
+        }
+        else {
+            seek($html_fh, $pos, 0);
+            last;
+        }
+    }
+
+
+    #  Get new TreeBuilder object. Note api_version flows through to HTML::Parser constructor
+    #
+    my $tree_or=WebDyne::HTML::TreeBuilder->new(
 
         api_version => 3,
+        webdyne	    => $self
 
-    ) || return err ('unable to create HTML::TreeBuilder object');
+    ) || return err('unable to create HTML::TreeBuilder object');
+
+
+    #  Make sure this is off
+    #
+    $tree_or->unbroken_text(0);
 
 
     #  Tell HTML::TreeBuilder we do *not* want to ignore tags it
     #  considers "unknown". Since we use <PERL> and <BLOCK> tags,
     #  amongst other things, we need these to be in the tree
     #
-    $html_ox->ignore_unknown(0);
+    $tree_or->ignore_unknown(0);
 
 
     #  Tell it if we also want to see comments, use XML mode
     #
-    $html_ox->store_comments($WEBDYNE_STORE_COMMENTS);
-    $html_ox->xml_mode(1);
+    $tree_or->store_comments(exists($param_hr->{'store_comments'})
+        ? $param_hr->{'store_comments'}
+        : $WEBDYNE_STORE_COMMENTS
+    );
+    $tree_or->xml_mode(1);    # Older versions on HTML::TreeBuilder
 
 
     #  No space compacting ?
     #
-    $html_ox->ignore_ignorable_whitespace($WEBDYNE_COMPILE_IGNORE_WHITESPACE);
-    $html_ox->no_space_compacting($WEBDYNE_COMPILE_NO_SPACE_COMPACTING);
+    $tree_or->ignore_ignorable_whitespace(exists($param_hr->{'ignore_ignorable_whitespace'})
+        ? $param_hr->{'ignore_ignorable_whitespace'}
+        : $WEBDYNE_COMPILE_IGNORE_WHITESPACE
+    );
+    $tree_or->no_space_compacting(exists($param_hr->{'no_space_compacting'})
+        ? $param_hr->{'no_space_compacting'}
+        : $WEBDYNE_COMPILE_NO_SPACE_COMPACTING
+    );
 
 
     #  Get code ref closure of file to be parsed
     #
-    my $parse_cr=$html_ox->parse_fh($html_fh) ||
-        return err ();
+    my $parse_cr=$tree_or->parse_fh($html_fh) ||
+        return err();
 
 
     #  Muck around with strictness of P tags
     #
-    #$html_ox->implicit_tags(0);
-    $html_ox->p_strict(1);
+    #$tree_or->implicit_tags(0);
+    $tree_or->p_strict(
+        exists($param_hr->{'p_strict'}) 
+            ? $param_hr->{'p_strict'} 
+            : $WEBDYNE_COMPILE_P_STRICT
+    );
+    $tree_or->implicit_body_p_tag(
+        exists($param_hr->{'implicit_body_p_tag'})
+            ? $param_hr->{'implicit_body_p_tag'}
+            : $WEBDYNE_COMPILE_IMPLICIT_BODY_P_TAG
+    );
 
 
     #  Now parse through the file, running eof at end as per HTML::TreeBuilder
     #  man page.
     #
-    $html_ox->parse($parse_cr);
-    $html_ox->eof();
+    $tree_or->parse($parse_cr);
 
 
-    #  And close the file handle
+    #  Close handler if anything goes wrong below
     #
+    my $close_cr=sub {
+
+        $tree_or->delete;
+        undef $tree_or;
+
+    };
+
+
+    #  Any errors ? Make sure clean-up before throwing error.
+    #
+    if (errstr()) {
+        return err($close_cr->())
+    }
+
+
+    #  So far so good. Close tree and file
+    #
+    $tree_or->eof();
     $html_fh->close();
+
+
+    #  Elementify
+    #
+    $tree_or->elementify() ||
+        return $close_cr->();
 
 
     #  Now start iterating through the treebuilder object, creating
@@ -243,25 +280,20 @@ sub compile {
     #  is rentrant as the tree is descended
     #
     my %meta=(
-
-        manifest => [\$html_cn]
-
+        manifest => $param_hr->{'nomanifest'} ? undef : [$html_cn]
     );
-    my $data_ar=$self->parse($html_ox, \%meta) || do {
-        $html_ox->delete;
-        undef $html_ox;
-        return err ();
+    my $data_ar=$self->parse($tree_or, \%meta) || do {
+        return err($close_cr->());
     };
     debug("meta after parse %s", Dumper(\%meta));
 
 
     #  Now destroy the HTML::Treebuilder object, or else mem leak occurs
     #
-    $html_ox=$html_ox->delete;
-    undef $html_ox;
+    $close_cr->();
 
 
-    #  Meta block
+    #  Meta block. Add any webdyne meta data to parse tree
     #
     my $head_ar=$self->find_node(
         {
@@ -269,7 +301,7 @@ sub compile {
             data_ar => $data_ar,
             tag     => 'head',
 
-        }) || return err ();
+        }) || return err();
     my $meta_ar=$self->find_node(
         {
 
@@ -277,10 +309,10 @@ sub compile {
             tag     => 'meta',
             all_fg  => 1,
 
-        }) || return err ();
+        }) || return err();
     foreach my $tag_ar (@{$meta_ar}) {
-        my $attr_hr=$tag_ar->[$WEBDYNE_NODE_ATTR_IX] || next;
-        if ($attr_hr->{'name'} eq 'WebDyne') {
+        my $attr_hr=$tag_ar->[WEBDYNE_NODE_ATTR_IX] || next;
+        if ($attr_hr->{'name'}=~/^webdyne$/i) {
             my @meta=split(/;/, $attr_hr->{'content'});
             debug('meta %s', Dumper(\@meta));
             foreach my $meta (@meta) {
@@ -289,7 +321,7 @@ sub compile {
 
                 #  Eval any meta attrs like @{}, %{}..
                 my $hr=$self->subst_attr(undef, {$name => $value}) ||
-                    return err ();
+                    return err();
                 $meta{$name}=$hr->{$name};
             }
 
@@ -300,7 +332,7 @@ sub compile {
                     data_ar => $data_ar,
                     node_ar => $tag_ar
 
-                }) || return err ();
+                }) || return err();
         }
     }
 
@@ -309,7 +341,7 @@ sub compile {
     my @container=(keys %meta ? \%meta : undef, $data_ar);
 
 
-    #  Quit if user wants to see tree at this stage
+    #  Quit if user wants to see tree at this stage (stage0 | opt0)
     #
     $param_hr->{'stage0'} && (return \@container);
 
@@ -324,7 +356,7 @@ sub compile {
         #  block are seen
         #
         my $perl_debug_ar=$meta{'perl_debug'};
-        $self->perl_init($perl_ar, $perl_debug_ar) || return err ();
+        $self->perl_init($perl_ar, $perl_debug_ar) || return err();
 
 
     }
@@ -348,18 +380,13 @@ sub compile {
         foreach my $filter (@filter) {
             $filter=~s/::filter$//;
             eval("require $filter") ||
-                return err ("unable to load filter $filter, " . lcfirst($@));
+                return err("unable to load filter $filter, " . lcfirst($@));
             UNIVERSAL::can($filter, 'filter') ||
-                return err ("custom filter '$filter' does not seem to have a 'filter' method to call");
+                return err("custom filter '$filter' does not seem to have a 'filter' method to call");
             $filter.='::filter';
-            $data_ar=$self->$filter($data_ar, \%meta) || return err ();
+            $data_ar=$self->$filter($data_ar, \%meta) || return err();
         }
     }
-
-
-    #  Optimise tree, first step
-    #
-    $data_ar=$self->optimise_one($data_ar) || return err ();
 
 
     #  Quit if user wants to see tree at this stage
@@ -367,15 +394,26 @@ sub compile {
     $param_hr->{'stage2'} && (return \@container);
 
 
+    #  Optimise tree, first step
+    #
+    $data_ar=$self->optimise_one($data_ar) || return err();
+    $container[1]=$data_ar;
+
+
+    #  Quit if user wants to see tree at this stage (stage3|opt1)
+    #
+    ($param_hr->{'stage3'} || $param_hr->{'opt1'}) && (return \@container);
+
+
     #  Optimise tree, second step
     #
-    $data_ar=$self->optimise_two($data_ar) ||
-        return err ();
+    $data_ar=$self->optimise_two($data_ar) || return err();
+    $container[1]=$data_ar;
 
 
-    #  Quit if user wants to see tree at this stage
+    #  Quit if user wants to see tree at this stage (stage4|opt2)
     #
-    $param_hr->{'stage3'} && (return \@container);
+    ($param_hr->{'stage4'} || $param_hr->{'opt2'}) && (return \@container);
 
 
     #  Is there any dynamic data ? If not, set meta html flag to indicate
@@ -391,9 +429,9 @@ sub compile {
     @container=(keys %meta ? \%meta : undef, $data_ar);
 
 
-    #  Quit if user wants to final container
+    #  Quit if user wants to final container (stage5|final)
     #
-    $param_hr->{'stage4'} && (return \@container);
+    $param_hr->{'stage5'} && (return \@container);
 
 
     #  Save compiled object. Can't store code based cache refs, will be
@@ -439,8 +477,12 @@ sub compile {
 
     #  Work out the page compile time, log
     #
-    my $time_render=sprintf('%0.4f', time()-$time);
-    debug("form $html_cn compile time $time_render");
+    my $time_compile=sprintf('%0.4f', time()-$time);
+    $meta{'time_compile_elapsed'}=$time_compile unless
+        $param_hr->{'notimestamp'};
+    $meta{'time_compile'}=$time unless
+        $param_hr->{'notimestamp'};
+    debug("form $html_cn compile time $time_compile");
 
 
     #  Destroy self
@@ -464,41 +506,14 @@ sub compile_init {
     debug("in compile_init class $class");
 
 
-    #  Init some CGI custom routines we need for correct compilation etc.
+    #  Used to do some custom stuff here but now stub. Add anything wanted
     #
-    *{'CGI::~comment'}=sub {sprintf('<!--%s-->', $_[1]->{'text'})};
-    $CGI::XHTML=0;
-    $CGI::NOSTICKY=1;
-    *CGI::start_html_cgi=$CGI_start_html_cr;
-    *CGI::end_html_cgi=$CGI_end_html_cr;
-    *CGI::start_html=sub {
-        my ($self, $attr_hr)=@_;
-
-        #CORE::print Data::Dumper::Dumper($attr_hr);
-        keys %{$attr_hr} || ($attr_hr=$WEBDYNE_HTML_PARAM);
-        my $html_attr=join(' ', map {qq($_="$attr_hr->{$_}")} keys %{$attr_hr});
-        return $WEBDYNE_DTD . ($html_attr ? "<html $html_attr>" : '<html>');
-    };
-    *CGI::end_html=sub {
-        '</html>'
-    };
-    *CGI::html=sub {
-        my ($self, $attr_hr, @html)=@_;
-        return join(undef, CGI->start_html($attr_hr), @html, $self->end_html);
-    };
-
-
-    #  Get rid of the simple escape routine, which mangles attribute characters we
-    #  want to keep
-    #
-    *CGI::Util::simple_escape=sub {shift()};
-
-
-    #  Get rid of compiler warnings on start and end routines
-    #
-    #0 && *CGI::start_html;
-    #0 && *CGI::end_html;
-
+    #*WebDyne::HTML::Tiny::start_html0=sub {
+    #    my ($self, $attr_hr)=@_;
+    #    keys %{$attr_hr} || ($attr_hr=$WEBDYNE_HTML_PARAM);
+    #    my $html_attr=join(' ', map {qq($_="$attr_hr->{$_}")} keys %{$attr_hr});
+    #    return $WEBDYNE_DTD . ($html_attr ? "<html $html_attr>" : '<html>');
+    #};
 
     #  All done
     #
@@ -521,10 +536,12 @@ sub optimise_one {
     debug('optimise stage one');
 
 
-    #  Get CGI object
+    #  Get CGI object and disable shortcut tags (e.g. start_html);
     #
-    my $cgi_or=$self->{'_CGI'} ||
-        return err ("unable to get CGI object from self ref");
+    my $html_tiny_or=$self->{'_html_tiny_or'} ||= $self->html_tiny() ||
+        return err("unable to get CGI object from self ref");
+    debug("CGI $html_tiny_or");
+    $html_tiny_or->shortcut_disable();
 
 
     #  Recursive anon sub to do the render
@@ -541,17 +558,17 @@ sub optimise_one {
         #  it will spring into existance as empty array ref, which we then have to
         #  wastefully store
         #
-        if ($data_ar->[$WEBDYNE_NODE_CHLD_IX]) {
+        if ($data_ar->[WEBDYNE_NODE_CHLD_IX]) {
 
 
             #  Process sub nodes to get child html data
             #
-            foreach my $data_chld_ix (0..$#{$data_ar->[$WEBDYNE_NODE_CHLD_IX]}) {
+            foreach my $data_chld_ix (0..$#{$data_ar->[WEBDYNE_NODE_CHLD_IX]}) {
 
 
                 #  Get data child
                 #
-                my $data_chld_ar=$data_ar->[$WEBDYNE_NODE_CHLD_IX][$data_chld_ix];
+                my $data_chld_ar=$data_ar->[WEBDYNE_NODE_CHLD_IX][$data_chld_ix];
                 debug("data_chld_ar $data_chld_ar");
 
 
@@ -563,7 +580,7 @@ sub optimise_one {
                     #  Run through compile sub-process
                     #
                     my $data_chld_xv=$compile_cr->($compile_cr, $data_chld_ar) ||
-                        return err ();
+                        return err();
                     if (ref($data_chld_xv) eq 'SCALAR') {
                         $data_chld_xv=${$data_chld_xv}
                     }
@@ -571,9 +588,9 @@ sub optimise_one {
 
                     #  Replace in tree
                     #
-                    $data_ar->[$WEBDYNE_NODE_CHLD_IX][$data_chld_ix]=$data_chld_xv;
+                    $data_ar->[WEBDYNE_NODE_CHLD_IX][$data_chld_ix]=$data_chld_xv;
 
-                    }
+                }
 
             }
 
@@ -583,8 +600,9 @@ sub optimise_one {
         #  Get this node tag and attrs
         #
         my ($html_tag, $attr_hr)=
-            @{$data_ar}[$WEBDYNE_NODE_NAME_IX, $WEBDYNE_NODE_ATTR_IX];
+            @{$data_ar}[WEBDYNE_NODE_NAME_IX, WEBDYNE_NODE_ATTR_IX];
         debug("tag $html_tag, attr %s", Dumper($attr_hr));
+
 
         #  Store data block as hint to error handler should something go wrong
         #
@@ -594,11 +612,8 @@ sub optimise_one {
         #  Check to see if any of the attributes will require a subst to be carried out
         #
         my @subst_oper;
-
-        #my $subst_fg=grep { $_=~/([$|@|%|!|+|^|*]{1})\{([$|@|%|!|+|^|*]?)(.*?)\2\}/s && push (@subst_oper, $1) } values %{$attr_hr};
-        #my $subst_fg=grep { $_=~/([\$@%!+*^]){1}{(\1?)(.*?)\2}/ && push (@subst_oper, $1) } values %{$attr_hr};
-        my $subst_fg=$data_ar->[$WEBDYNE_NODE_SBST_IX] || delete $attr_hr->{'subst'} ||
-            grep {$_=~/([\$@%!+*^]){1}{(\1?)(.*?)\2}/ && push(@subst_oper, $1)} values %{$attr_hr};
+        my $subst_fg=$data_ar->[WEBDYNE_NODE_SBST_IX] || delete $attr_hr->{'subst'} ||
+            grep {$_=~/([\$@%!+*^])\{(\1?)(.*?)\2\}/ && push(@subst_oper, $1)} values %{$attr_hr};
 
 
         #  Do not subst comments
@@ -608,13 +623,13 @@ sub optimise_one {
 
         #  If subst_fg present, means we must do a subst on attr vars. Flag
         #
-        $subst_fg && ($data_ar->[$WEBDYNE_NODE_SBST_IX]=1);
+        $subst_fg && ($data_ar->[WEBDYNE_NODE_SBST_IX]=1);
 
 
         #  A CGI tag can be marked static, means that we can pre-render it for efficieny
         #
         my $static_fg=$attr_hr->{'static'};
-        debug("tag $html_tag, static_fg $static_fg, subst_fg $subst_fg, subst_oper %s", Dumper(\@subst_oper));
+        debug("tag $html_tag, static_fg: $static_fg, subst_fg: $subst_fg, subst_oper %s", Dumper(\@subst_oper));
 
 
         #  If static, but subst requires an eval, we can do now *only* if @ or % tags though,
@@ -631,25 +646,27 @@ sub optimise_one {
             #  Do it
             #
             $attr_hr=$self->WebDyne::subst_attr(undef, $attr_hr) ||
-                return err ();
+                return err();
 
         }
 
 
         #  If not special WebDyne tag, see if we can render node
         #
-        #if ((!$CGI_TAG_WEBDYNE{$html_tag} && !$CGI_TAG_IMPLICIT{$html_tag} && !$subst_fg) || $static_fg) {
-        if ((!$CGI_TAG_WEBDYNE{$html_tag} && !$subst_fg) || $static_fg) {
+        if ((!$CGI_TAG_WEBDYNE{$html_tag} && !$CGI_TAG_FORM{$html_tag} && !$subst_fg) || $static_fg) {
+        #if ((!$CGI_TAG_WEBDYNE{$html_tag} && !$subst_fg) || $static_fg) {
 
 
             #  Check all child nodes to see if ref or scalar
             #
-            my $ref_fv=$data_ar->[$WEBDYNE_NODE_CHLD_IX] &&
-                grep {ref($_)} @{$data_ar->[$WEBDYNE_NODE_CHLD_IX]};
+            debug("if 1");
+            my $ref_fv=$data_ar->[WEBDYNE_NODE_CHLD_IX] &&
+                grep {ref($_)} @{$data_ar->[WEBDYNE_NODE_CHLD_IX]};
 
 
             #  If all scalars (ie no refs found)t, we can simply pre render all child nodes
             #
+            debug("ref_fv: $ref_fv");
             unless ($ref_fv) {
 
 
@@ -667,25 +684,36 @@ sub optimise_one {
                     #
                     debug("about to render tag $html_tag, attr %s", Dumper($attr_hr));
                     my $html_sr=$self->$html_tag($data_ar, $attr_hr) ||
-                        return err ();
+                        return err();
                     debug("html *$html_sr*, *${$html_sr}*");
                     return $html_sr;
 
 
                 }
+                else {
+                    debug('not CGI_TAG_WEBDYNE')
+                }
 
 
                 #  Wrap up in our HTML tag. Do in eval so we can catch errors from invalid tags etc
                 #
-                my @data_child_ar=$data_ar->[$WEBDYNE_NODE_CHLD_IX] ? @{$data_ar->[$WEBDYNE_NODE_CHLD_IX]} : undef;
+                #
+                my @data_child=$data_ar->[WEBDYNE_NODE_CHLD_IX] ? @{$data_ar->[WEBDYNE_NODE_CHLD_IX]} : undef;
+                debug("about to call $html_tag with attr_hr:%s, data_child: %s", Dumper($attr_hr, \@data_child));
                 my $html=eval {
-                    $cgi_or->$html_tag(grep {$_} $attr_hr, join(undef, @data_child_ar))
+                    $attr_hr=undef unless keys %{$attr_hr};
+                    $html_tiny_or->$html_tag(grep {$_} $attr_hr, join(undef, @data_child))
+
+                    #  Older attempts
+                    #
+                    #$html_tiny_or->$html_tag(grep {$_} $attr_hr || {}, join(undef, @data_child))
+                    #$html_tiny_or->$html_tag($attr_hr || {}, join(undef, grep {$_} @data_child))
                 } ||
 
                     #  Use errsubst as CGI may have DIEd during eval and be caught by WebDyne SIG handler
                     return errsubst(
                     "CGI tag '<$html_tag>': %s",
-                    $@ || "undefined error rendering tag '$html_tag'"
+                    $@ || sprintf("undefined error rendering tag '$html_tag', attr_hr:%s, data_child:%s", Dumper($attr_hr, \@data_child))
                     );
 
 
@@ -701,6 +729,9 @@ sub optimise_one {
             }
 
         }
+        else {
+            debug('fell through node render, no webdyne, subst tags etc.');
+        }
 
 
         #  Return current node, perhaps now somewhat optimised
@@ -712,7 +743,7 @@ sub optimise_one {
 
     #  Run it
     #
-    $data_ar=$compile_cr->($compile_cr, $data_ar) || return err ();
+    $data_ar=$compile_cr->($compile_cr, $data_ar) || return err();
 
 
     #  If scalar ref returned it is all HTML - return as plain scalar
@@ -724,7 +755,7 @@ sub optimise_one {
 
     #  Done
     #
-    $data_ar;
+    return $data_ar;
 
 }
 
@@ -742,10 +773,11 @@ sub optimise_two {
     debug('optimise stage two');
 
 
-    #  Get CGI object
+    #  Get CGI object and turn off shortcuts like start_html
     #
-    my $cgi_or=$self->{'_CGI'} ||
-        return err ("unable to get CGI object from self ref");
+    my $html_tiny_or=$self->{'_html_tiny_or'} ||= $self->html_tiny() ||
+        return err("unable to get CGI object from self ref");
+    $html_tiny_or->shortcut_disable();
 
 
     #  Recursive anon sub to do the render
@@ -762,14 +794,14 @@ sub optimise_two {
         #  it will spring into existance as empty array ref, which we then have to
         #  wastefully store
         #
-        if ($data_ar->[$WEBDYNE_NODE_CHLD_IX]) {
+        if ($data_ar->[WEBDYNE_NODE_CHLD_IX]) {
 
 
             #  Process sub nodes to get child html data
             #
-            my @data_child_ar=$data_ar->[$WEBDYNE_NODE_CHLD_IX]
+            my @data_child_ar=$data_ar->[WEBDYNE_NODE_CHLD_IX]
                 ?
-                @{$data_ar->[$WEBDYNE_NODE_CHLD_IX]}
+                @{$data_ar->[WEBDYNE_NODE_CHLD_IX]}
                 : undef;
             foreach my $data_chld_ar (@data_child_ar) {
 
@@ -787,9 +819,9 @@ sub optimise_two {
                     #  Run through compile sub-process
                     #
                     $data_ar=$compile_cr->($compile_cr, $data_chld_ar, $data_ar) ||
-                        return err ();
+                        return err();
 
-                    }
+                }
 
 
             }
@@ -800,7 +832,7 @@ sub optimise_two {
         #  Get this tag and attrs
         #
         my ($html_tag, $attr_hr)=
-            @{$data_ar}[$WEBDYNE_NODE_NAME_IX, $WEBDYNE_NODE_ATTR_IX];
+            @{$data_ar}[WEBDYNE_NODE_NAME_IX, WEBDYNE_NODE_ATTR_IX];
         debug("tag $html_tag");
 
 
@@ -811,14 +843,13 @@ sub optimise_two {
 
         #  Check if this tag attributes will need substitution (eg ${foo});
         #
-        #my $subst_fg=grep { $_=~/([$|@|%|!|+|^|*]{1})\{([$|@|%|!|+|^|*]?)(.*?)\2\}/s } values %{$attr_hr};
-        my $subst_fg=$data_ar->[$WEBDYNE_NODE_SBST_IX] || delete $attr_hr->{'subst'} ||
-            grep {$_=~/([\$@%!+*^]){1}{(\1?)(.*?)\2}/so} values %{$attr_hr};
+        my $subst_fg=$data_ar->[WEBDYNE_NODE_SBST_IX] || delete $attr_hr->{'subst'} ||
+            grep {$_=~/([\$@%!+*^])\{(\1?)(.*?)\2\}/so} values %{$attr_hr};
 
 
         #  If subst_fg present, means we must do a subst on attr vars. Flag, also get static flag
         #
-        $subst_fg && ($data_ar->[$WEBDYNE_NODE_SBST_IX]=1);
+        $subst_fg && ($data_ar->[WEBDYNE_NODE_SBST_IX]=1);
         my $static_fg=delete $attr_hr->{'static'};
 
 
@@ -830,9 +861,10 @@ sub optimise_two {
 
             #  Get nodes into array now, removes risk of iterating over shifting ground
             #
-            my @data_child_ar=$data_uppr_ar->[$WEBDYNE_NODE_CHLD_IX]
+            debug("compile_cr: if 1");
+            my @data_child_ar=$data_uppr_ar->[WEBDYNE_NODE_CHLD_IX]
                 ?
-                @{$data_uppr_ar->[$WEBDYNE_NODE_CHLD_IX]}
+                @{$data_uppr_ar->[WEBDYNE_NODE_CHLD_IX]}
                 : undef;
 
 
@@ -866,8 +898,9 @@ sub optimise_two {
                 #  Translate tags into HTML
                 #
                 my ($html_start, $html_end)=map {
+                    debug("render tag $_");
                     eval {
-                        $cgi_or->$_(grep {$_} $attr_hr)
+                        $html_tiny_or->$_(grep {$_} $attr_hr)
                     } ||
 
                         #  Use errsubst as CGI may have DIEd during eval and be caught by WebDyne SIG handler
@@ -880,9 +913,9 @@ sub optimise_two {
 
                 #  Splice start and end tags for this HTML into appropriate place
                 #
-                splice @{$data_uppr_ar->[$WEBDYNE_NODE_CHLD_IX]}, $data_chld_ix, 1,
+                splice @{$data_uppr_ar->[WEBDYNE_NODE_CHLD_IX]}, $data_chld_ix, 1,
                     $html_start,
-                    @{$data_ar->[$WEBDYNE_NODE_CHLD_IX]},
+                    @{$data_ar->[WEBDYNE_NODE_CHLD_IX]},
                     $html_end;
 
                 #  Done, no need to iterate any more
@@ -901,9 +934,9 @@ sub optimise_two {
             #  Repopulate data child array, as probably changed in above foreach
             #  block.
             #
-            @data_child_ar=$data_uppr_ar->[$WEBDYNE_NODE_CHLD_IX]
+            @data_child_ar=$data_uppr_ar->[WEBDYNE_NODE_CHLD_IX]
                 ?
-                @{$data_uppr_ar->[$WEBDYNE_NODE_CHLD_IX]}
+                @{$data_uppr_ar->[WEBDYNE_NODE_CHLD_IX]}
                 : undef;
 
             #@data_child_ar=@{$data_uppr_ar->[$WEBDYNE_NODE_CHLD_IX]};
@@ -941,7 +974,7 @@ sub optimise_two {
 
             #  Replace with new optimised array
             #
-            $data_uppr_ar->[$WEBDYNE_NODE_CHLD_IX]=\@data_uppr;
+            $data_uppr_ar->[WEBDYNE_NODE_CHLD_IX]=\@data_uppr;
 
 
         }
@@ -950,17 +983,18 @@ sub optimise_two {
 
             #  Now render to make HTML and modify the data arrat above us with the rendered code
             #
+            debug("compile_cr: if 2");
             my $html_sr=$self->render(
                 {
                     data => [$data_ar],
-                }) || return err ();
-            my @data_child_ar=$data_uppr_ar->[$WEBDYNE_NODE_CHLD_IX]
+                }) || return err();
+            my @data_child_ar=$data_uppr_ar->[WEBDYNE_NODE_CHLD_IX]
                 ?
-                @{$data_uppr_ar->[$WEBDYNE_NODE_CHLD_IX]}
+                @{$data_uppr_ar->[WEBDYNE_NODE_CHLD_IX]}
                 : undef;
             foreach my $ix (0..$#data_child_ar) {
-                if ($data_uppr_ar->[$WEBDYNE_NODE_CHLD_IX][$ix] eq $data_ar) {
-                    $data_uppr_ar->[$WEBDYNE_NODE_CHLD_IX][$ix]=${$html_sr};
+                if ($data_uppr_ar->[WEBDYNE_NODE_CHLD_IX][$ix] eq $data_ar) {
+                    $data_uppr_ar->[WEBDYNE_NODE_CHLD_IX][$ix]=${$html_sr};
                     last;
                 }
             }
@@ -973,6 +1007,7 @@ sub optimise_two {
             #  Must be at top node, as nothing above us,
             #  get start and end tag methods
             #
+            debug("compile_cr: if 3");
             my ($html_tag_start, $html_tag_end)=
                 ("start_${html_tag}", "end_${html_tag}");
 
@@ -980,8 +1015,9 @@ sub optimise_two {
             #  Get resulting start and ending HTML
             #
             my ($html_start, $html_end)=map {
+                debug("render tag $_");
                 eval {
-                    $cgi_or->$_(grep {$_} $attr_hr)
+                    $html_tiny_or->$_(grep {$_} $attr_hr)
                 } ||
                     return errsubst(
                     "CGI tag '<$_>': %s",
@@ -990,9 +1026,9 @@ sub optimise_two {
 
                 #return err("$@" || "no html returned from tag $_")
             } ($html_tag_start, $html_tag_end);
-            my @data_child_ar=$data_ar->[$WEBDYNE_NODE_CHLD_IX]
+            my @data_child_ar=$data_ar->[WEBDYNE_NODE_CHLD_IX]
                 ?
-                @{$data_ar->[$WEBDYNE_NODE_CHLD_IX]}
+                @{$data_ar->[WEBDYNE_NODE_CHLD_IX]}
                 : undef;
 
             #  Place start and end tags for this HTML into appropriate place
@@ -1040,12 +1076,13 @@ sub optimise_two {
     #  single HTML string. In which case return as array ref to allow for correct storage
     #  and rendering.
     #
-    return ref($data_ar)
-        ?
-        $compile_cr->($compile_cr, $data_ar, undef) || err ()
-        :
-        [$data_ar];
-
+    if (ref($data_ar)) {
+        return $compile_cr->($compile_cr, $data_ar, undef) ||
+            err()
+    }
+    else {
+        return [$data_ar];
+    }
 
 }
 
@@ -1059,23 +1096,21 @@ sub parse {
     #
     my ($self, $html_or, $meta_hr)=@_;
     my ($line_no, $line_no_tag_end)=@{$html_or}{'_line_no', '_line_no_tag_end'};
-    my $html_fn_sr=$meta_hr->{'manifest'}[0];
+    my $html_fn_sr=\$meta_hr->{'manifest'}[0];
     debug("parse $self, $html_or line_no $line_no line_no_tag_end $line_no_tag_end");
-
-    #debug("parse $html_or, %s", Dumper($html_or));
 
 
     #  Create array to hold this data node
     #
     my @data;
     @data[
-        $WEBDYNE_NODE_NAME_IX,
-        $WEBDYNE_NODE_ATTR_IX,
-        $WEBDYNE_NODE_CHLD_IX,
-        $WEBDYNE_NODE_SBST_IX,
-        $WEBDYNE_NODE_LINE_IX,
-        $WEBDYNE_NODE_LINE_TAG_END_IX,
-        $WEBDYNE_NODE_SRCE_IX
+        WEBDYNE_NODE_NAME_IX,            # Tag Name
+        WEBDYNE_NODE_ATTR_IX,            # Attributes
+        WEBDYNE_NODE_CHLD_IX,            # Child nodes
+        WEBDYNE_NODE_SBST_IX,            # Substitution Required
+        WEBDYNE_NODE_LINE_IX,            # Source Line Number
+        WEBDYNE_NODE_LINE_TAG_END_IX,    # What line this tag ends on
+        WEBDYNE_NODE_SRCE_IX             # Source file name
         ]=(
         #undef, undef, undef, undef, $line_no, $line_no_tag_end, $meta_hr->{'manifest'}[0]
         undef, undef, undef, undef, $line_no, $line_no_tag_end, $html_fn_sr
@@ -1085,19 +1120,6 @@ sub parse {
     #  Get tag
     #
     my $html_tag=$html_or->tag();
-
-
-    #  Check special cases like tr that need to be uppercased (Tr) to work correctly
-    #  in CGI
-    #
-    $html_tag=$CGI_Tag_Ucase{$html_tag} || $html_tag;
-
-
-    #  Check valid
-    #
-    unless (UNIVERSAL::can('CGI', $html_tag) || $CGI_TAG_WEBDYNE{$html_tag}) {
-        return err ("unknown CGI/WebDyne tag: <$html_tag>, line $line_no in source file ${$html_fn_sr}")
-    }
 
 
     #  Get tag attr
@@ -1113,11 +1135,11 @@ sub parse {
         #  Is this the inline perl __PERL__ block ?
         #
         if ($html_or->{'_code'} && $attr{'perl'}) {
-            push @{$meta_hr->{'perl'}}, \$attr{'perl'};
+            push @{$meta_hr->{'perl'}},       \$attr{'perl'};
             push @{$meta_hr->{'perl_debug'}}, [$line_no, $html_fn_sr];
         }
         else {
-            @data[$WEBDYNE_NODE_NAME_IX, $WEBDYNE_NODE_ATTR_IX]=($html_tag, \%attr);
+            @data[WEBDYNE_NODE_NAME_IX, WEBDYNE_NODE_ATTR_IX]=($html_tag, \%attr);
         }
 
     }
@@ -1126,7 +1148,7 @@ sub parse {
 
         #  No attr, just save tag
         #
-        $data[$WEBDYNE_NODE_NAME_IX]=$html_tag;
+        $data[WEBDYNE_NODE_NAME_IX]=$html_tag;
 
     }
 
@@ -1152,13 +1174,13 @@ sub parse {
             #
             $line_no=$html_child_or->{'_line_no'};
             my $data_ar=$self->parse($html_child_or, $meta_hr) ||
-                return err ();
+                return err();
 
 
             #  If no node name returned is not an error, just a no-op
             #
-            if ($data_ar->[$WEBDYNE_NODE_NAME_IX]) {
-                push @{$data[$WEBDYNE_NODE_CHLD_IX]}, $data_ar;
+            if ($data_ar->[WEBDYNE_NODE_NAME_IX]) {
+                push @{$data[WEBDYNE_NODE_CHLD_IX]}, $data_ar;
             }
 
         }
@@ -1168,7 +1190,7 @@ sub parse {
             #  stuffed up <pre> sections that use \n for spacing/formatting. Now we
             #  are more careful
             #
-            push(@{$data[$WEBDYNE_NODE_CHLD_IX]}, $html_child_or)
+            push(@{$data[WEBDYNE_NODE_CHLD_IX]}, $html_child_or)
                 unless (
                 $html_child_or=~/^\s*$/
                 &&
@@ -1186,3 +1208,12 @@ sub parse {
 
 }
 
+
+sub html_tiny {
+
+    my $self=shift();
+    debug("$self html_tiny instantiate, mode:$WEBDYNE_HTML_TINY_MODE, existing: %s", $self->{'_html_tiny_or'});
+    return (shift()->{'_html_tiny_or'} ||= WebDyne::HTML::Tiny->new(mode => $WEBDYNE_HTML_TINY_MODE)) ||
+        err('unable to instantiate new WebDybe::HTML::Tiny object');
+
+}

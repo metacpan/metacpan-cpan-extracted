@@ -1,0 +1,7 @@
+<start_html>
+<div data-webdyne-perl handler="hello">
+Server says: ${hello}
+</div>
+__PERL__
+sub hello { return shift()->render( hello=>'Hello World' ) }
+1;

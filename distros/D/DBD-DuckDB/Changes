@@ -1,5 +1,11 @@
 Revision history for Perl extension DBD::DuckDB.
 
+0.14 2025-10-17
+	- Improved support for LIST, UNION, MAP and DECIMAL
+	- Added "x_duckdb_read_*" helper functions for read CSV, JSON and Excel
+	- Added new tests
+	- Added examples directory
+
 0.13 2025-10-14
 	- Improved "AutoCommit", "$dbh->commit" and "$dbh->rollback"
 	- Added "foreign_key_info" helper
@@ -8,7 +14,7 @@ Revision history for Perl extension DBD::DuckDB.
 0.12  2025-10-13
 	- Improved DuckDB appender
 	- Added "primary_key_info" helper
-	- Added all "duckdb_append_*" and "ducldb_bind_*" C functions
+	- Added all "duckdb_append_*" and "duckdb_bind_*" C functions
 	- FIX CI
 
 0.11  2025-10-13

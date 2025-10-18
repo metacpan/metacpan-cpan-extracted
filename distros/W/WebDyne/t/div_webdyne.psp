@@ -1,0 +1,17 @@
+<start_html>
+<perl>
+print "Hello World\n"
+</perl>
+
+<div data-webdyne-perl>
+print "Hello World\n"
+</div>
+<div>
+someting else
+</div>
+<div>
+someting else again
+</div>
+
+<p>
+Hello World

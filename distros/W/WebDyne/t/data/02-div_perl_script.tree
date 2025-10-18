@@ -1,0 +1,10 @@
+<html> @0 (IMPLICIT)
+  <head> @0.0 (IMPLICIT)
+  <body> @0.1 (IMPLICIT)
+    <p> @0.1.0
+      "Para 1"
+      <script type="application/perl"> @0.1.0.1
+        "sub hello {    return 'Hello World'}"
+    <p> @0.1.1
+      "Para 2"
+    <p> @0.1.2

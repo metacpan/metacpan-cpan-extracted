@@ -19,7 +19,7 @@ use Net::LDAP qw(LDAP_PP_PASSWORD_EXPIRED LDAP_PP_ACCOUNT_LOCKED
 
 use utf8;
 
-our $VERSION = '2.17.0';
+our $VERSION = '2.22.0';
 
 # INITIALIZATION
 
@@ -275,22 +275,25 @@ sub userBind {
                 );
             }
 
-            if ( $resp->time_before_expiration ) {
+            if ( my $time_before_exp = $resp->time_before_expiration ) {
                 $self->{portal}->logger->debug(
                     "LDAP password policy - time before expiration: "
-                      . $resp->time_before_expiration );
+                      . $time_before_exp );
+                if ( $self->{conf}->{ldapForcePasswordChangeExpirationWarning}
+                    and $time_before_exp <
+                    $self->{conf}->{ldapForcePasswordChangeExpirationWarning} )
+                {
+                    $self->{portal}->logger->debug(
+                        "Force password change on expiration warning");
+                    return PE_PP_PASSWORD_EXPIRES_SOON;
+                }
                 $req->info(
                     $self->{portal}->loadTemplate(
                         $req,
                         'simpleInfo',
                         params => {
                             trspan => 'pwdWillExpire,'
-                              . join(
-                                ',',
-                                $self->convertSec(
-                                    $resp->time_before_expiration
-                                )
-                              )
+                              . join( ',', $self->convertSec($time_before_exp) )
                         }
                     )
                 );

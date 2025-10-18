@@ -15,7 +15,11 @@ my $decoder_module;
 my $decoder_debug   = 0;
 my $decoder_choice;
 my $raw_output      = 0;
+my $compact_output  = 0;
 my $color_output    = 0;
+my $null_input      = 0;
+my $slurp_input     = 0;
+my $query_file;
 
 # ---------- Help text ----------
 my $USAGE = <<'USAGE';
@@ -23,12 +27,17 @@ jq-lite - A lightweight jq-like JSON query tool written in pure Perl
 
 Usage:
   jq-lite [options] '.query' [file.json]
+  jq-lite [options] -f query.jq [file.json]
 
 Options:
   -r, --raw-output     Print raw strings instead of JSON-encoded values
+  -c, --compact-output Print JSON results on a single line (no pretty-printing)
   --color              Colorize JSON output (keys, strings, numbers, booleans)
   --use <Module>       Force JSON decoder module (e.g. JSON::PP, JSON::XS, Cpanel::JSON::XS)
   --debug              Show which JSON module is being used
+  -f, --from-file FILE Read jq filter from FILE instead of the command line
+  -n, --null-input     Use null as input instead of reading JSON data
+  -s, --slurp          Read entire input stream as an array of JSON values
   -h, --help           Show this help message
   --help-functions     Show list of all supported functions
   -v, --version        Show version information
@@ -49,12 +58,16 @@ my ($want_help, $want_version, $help_functions) = (0, 0, 0);
 
 GetOptions(
     'raw-output|r'    => \$raw_output,
+    'compact-output|c'=> \$compact_output,
     'color'           => \$color_output,
     'use=s'           => \$decoder_choice,
     'debug'           => \$decoder_debug,
+    'null-input|n'    => \$null_input,
+    'slurp|s'         => \$slurp_input,
     'help|h'          => \$want_help,
     'help-functions'  => \$help_functions,
     'version|v'       => \$want_version,
+    'from-file|f=s'   => \$query_file,
 ) or die "[ERROR] Unknown option(s)\n";
 
 if ($help_functions) {
@@ -76,23 +89,57 @@ if ($want_version) {
 # Unknown options are already rejected above; only query and file remain.
 my ($query, $filename);
 
+if ($query_file) {
+    my $fh = IO::File->new($query_file, 'r')
+      or die "Cannot open query file '$query_file': $!\n";
+    local $/;
+    $query = <$fh> // '';
+    $fh->close;
+}
+
 if (@ARGV == 0) {
-    # If no args, show help
-    print $USAGE;
-    exit 0;
+    if (!defined $query) {
+        if ($null_input) {
+            $query = '.';
+        } else {
+            # If no args and no query file, show help
+            print $USAGE;
+            exit 0;
+        }
+    }
 }
 elsif (@ARGV == 1) {
     # Single arg: query or file
-    if (-f $ARGV[0]) {
+    if (!$null_input && -f $ARGV[0] && !defined $query) {
         $filename = $ARGV[0];
         # No query -> go to interactive mode (handled later)
-    } else {
+    }
+    elsif (!defined $query) {
         $query = $ARGV[0];
+    }
+    else {
+        # Query already provided via -f; treat arg as filename if it exists
+        my $f = $ARGV[0];
+        if ($null_input) {
+            die "[ERROR] --null-input cannot be combined with file input\n";
+        }
+        if (-f $f) {
+            $filename = $f;
+        } else {
+            die "Cannot open file '$f': $!\n";
+        }
     }
 }
 elsif (@ARGV == 2) {
     # Two args: query + file (in this order)
-    $query = $ARGV[0];
+    die "[ERROR] --null-input cannot be combined with file input\n" if $null_input;
+
+    if (!defined $query) {
+        $query = $ARGV[0];
+    } else {
+        die "[ERROR] Cannot provide both --from-file and a query argument\n";
+    }
+
     my $f = $ARGV[1];
     if (-f $f) {
         $filename = $f;
@@ -101,7 +148,8 @@ elsif (@ARGV == 2) {
     }
 }
 else {
-    die "Usage: jq-lite [options] '.query' [file.json]\n";
+    die "Usage: jq-lite [options] '.query' [file.json]\n"
+      . "       jq-lite [options] -f query.jq [file.json]\n";
 }
 
 # ---------- JSON decoder selection ----------
@@ -154,7 +202,10 @@ warn "[DEBUG] Using $decoder_module\n" if $decoder_debug;
 
 # ---------- Read JSON input ----------
 my $json_text;
-if (defined $filename) {
+if ($null_input) {
+    $json_text = $slurp_input ? '[]' : 'null';
+}
+elsif (defined $filename) {
     open my $fh, '<', $filename or die "Cannot open file '$filename': $!\n";
     local $/;
     $json_text = <$fh>;
@@ -169,6 +220,32 @@ else {
     $json_text = <STDIN>;
 }
 
+if ($slurp_input && !$null_input) {
+    my $text   = $json_text // '';
+    my $length = length $text;
+    my $offset = 0;
+    my @values;
+    my $decoder = JSON::PP->new->allow_nonref;
+
+    while (1) {
+        while ($offset < $length && substr($text, $offset, 1) =~ /\s/) {
+            $offset++;
+        }
+        last if $offset >= $length;
+
+        my ($value, $consumed);
+        my $ok = eval { ($value, $consumed) = $decoder->decode_prefix(substr($text, $offset)); 1 };
+        if (!$ok) {
+            die "[ERROR] Failed to decode JSON stream for --slurp: $@\n";
+        }
+
+        push @values, $value;
+        $offset += $consumed;
+    }
+
+    $json_text = JSON::PP->new->encode(\@values);
+}
+
 # ---------- JQ::Lite core ----------
 my $jq = JQ::Lite->new(raw => $raw_output);
 
@@ -177,9 +254,9 @@ sub colorize_json {
     my $json = shift;
 
     $json =~ s/"([^"]+)"(?=\s*:)/color("cyan")."\"$1\"".color("reset")/ge;
-    $json =~ s/: "([^"]*)"/": ".color("green")."\"$1\"".color("reset")/ge;
-    $json =~ s/: (\d+(\.\d+)?)/": ".color("yellow")."$1".color("reset")/ge;
-    $json =~ s/: (true|false|null)/": ".color("magenta")."$1".color("reset")/ge;
+    $json =~ s/(:\s*)"([^"]*)"/$1.color("green")."\"$2\"".color("reset")/ge;
+    $json =~ s/(:\s*)(-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)/$1.color("yellow")."$2".color("reset")/ge;
+    $json =~ s/(:\s*)(true|false|null)/$1.color("magenta")."$2".color("reset")/ge;
 
     return $json;
 }
@@ -187,7 +264,8 @@ sub colorize_json {
 # ---------- Output ----------
 sub print_results {
     my @results = @_;
-    my $pp = JSON::PP->new->utf8->canonical->pretty;
+    my $pp = JSON::PP->new->utf8->canonical;
+    $pp->pretty unless $compact_output;
 
     for my $r (@results) {
         if (!defined $r) {
@@ -200,6 +278,7 @@ sub print_results {
             my $json = $pp->encode($r);
             $json = colorize_json($json) if $color_output;
             print $json;
+            print "\n" unless $json =~ /\n\z/;
         }
     }
 }
@@ -330,6 +409,10 @@ Supported Functions:
   map(EXPR)        - Map/filter array items with a subquery
   map_values(FILTER)
                    - Apply FILTER to each value in an object (dropping keys when FILTER yields no result)
+  if COND then A [elif COND then B ...] [else Z] end
+                  - jq-style conditional branching across optional elif/else chains
+  foreach(EXPR as $var (init; update [; extract]))
+                   - jq-compatible streaming reducer with lexical bindings and optional emitters
   walk(FILTER)     - Recursively apply FILTER to every value in arrays and objects
   recurse([FILTER])
                    - Emit the current value and depth-first descendants using optional FILTER for children
@@ -379,7 +462,7 @@ Supported Functions:
   any([FILTER])    - Return true if any input (optionally filtered) is truthy
   all([FILTER])    - Return true if every input (optionally filtered) is truthy
   not              - Logical negation following jq truthiness rules
-  match("pattern") - Match string using regex
+  test("pattern"[, "flags"]) - Check strings against regexes (flags: i, m, s, x)
   explode()        - Convert strings to arrays of Unicode code points
   implode()        - Turn arrays of code points back into strings
   flatten          - Explicitly flatten arrays (same as .[])
@@ -391,6 +474,8 @@ Supported Functions:
   path             - Return available keys for objects or indexes for arrays
   paths            - Emit every path to nested values as an array of keys/indices
   getpath(PATH)    - Retrieve the value(s) at the supplied path array or expression
+  setpath(PATH; VALUE)
+                   - Set or create value(s) at a path using literal or filter input
   is_empty         - Check if an array or object is empty
   upper()          - Convert scalars and array elements to uppercase
   lower()          - Convert scalars and array elements to lowercase

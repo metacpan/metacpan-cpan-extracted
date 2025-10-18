@@ -23,7 +23,7 @@
   };
   overScheme = {
     _whatToTrace: function (t, v, level, over) {
-      console.log('overSchema => level', level, 'over', over);
+      console.debug('overSchema => level', level, 'over', over);
       if (level === 1 && v.length > over) {
         return `${t}=${v}*&groupBy=substr(${t},${level + over + 1})`;
       } else {
@@ -87,7 +87,7 @@
             $scope[button.action]();
             break;
           default:
-            console.log(typeof button.action);
+            console.warn('Unknown action type', typeof button.action);
         }
       }
       return $scope.showM = false;

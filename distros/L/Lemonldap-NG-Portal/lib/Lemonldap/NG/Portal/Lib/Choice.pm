@@ -3,12 +3,15 @@ package Lemonldap::NG::Portal::Lib::Choice;
 use strict;
 use Mouse;
 use Safe;
-use Lemonldap::NG::Portal::Main::Constants qw(PE_OK);
+use Lemonldap::NG::Portal::Main::Constants qw(
+  PE_OK
+  URIRE
+);
 
 extends 'Lemonldap::NG::Portal::Lib::Wrapper';
 with 'Lemonldap::NG::Portal::Lib::OverConf';
 
-our $VERSION = '2.21.0';
+our $VERSION = '2.22.0';
 
 has modules    => ( is => 'rw', default => sub { {} } );
 has rules      => ( is => 'rw', default => sub { {} } );
@@ -17,13 +20,14 @@ has catch      => ( is => 'rw', default => sub { {} } );
 has sessionKey => ( is => 'ro', default => '_choice' );
 
 my $_choiceRules;
+my $_disabledModules = {};
 
 # INITIALIZATION
 
 # init() must be called by module::init() with a number:
 #  - 0 for auth
 #  - 1 for userDB
-#  - 2 for passwordDB ?
+#  - 2 for passwordDB
 sub init {
     my ( $self, $type ) = @_;
     $self->type($type);
@@ -55,8 +59,11 @@ sub init {
                   . " module $name selected" );
         }
         else {
-            $self->logger->error(
-                "Choice: unable to load $name, disabling it: " . $self->error );
+            $_disabledModules->{$name}->{$type} = 1;
+            $self->logger->error( "Choice: unable to load $name ("
+                  . [ 'Auth', 'UserDB', 'Password' ]->[$type]
+                  . "), disabling it: "
+                  . $self->error );
             $self->error('');
         }
 
@@ -71,7 +78,7 @@ sub init {
         my $cond = $mods[4];
         if ( defined $cond and $cond ne "" ) {    # 0 is a valid rule!
             my $rule =
-              $self->p->buildRule( $cond, "choice condition for $name" );
+              $self->p->buildRule( $cond, "Choice condition for $name" );
             return 0 unless $rule;
             $_choiceRules->{$name} = $rule;
         }
@@ -81,7 +88,7 @@ sub init {
         }
     }
     unless ( keys %{ $self->modules } ) {
-        $self->error('Choice: no available modules found, aborting');
+        $self->error('Choice: no available module found, aborting');
         return 0;
     }
     return 1;
@@ -91,7 +98,6 @@ sub init {
 
 sub checkChoice {
     my ( $self, $req ) = @_;
-
     my ( $name, $how ) = $self->_getChoiceFromReq($req);
 
     return 0 unless ($name);
@@ -187,9 +193,16 @@ sub name {
     unless ($req) {
         return 'Choice';
     }
-    my $n = ref( $req->data->{ "enabledMods" . $self->type }->[0] );
-    $n =~ s/^Lemonldap::NG::Portal::(?:(?:UserDB|Auth)::)?//;
-    return $n;
+
+    my $module = $req->data->{ "enabledMods" . $self->type }->[0];
+    if ( my $sub = eval { $module->can('name') } ) {
+        return $sub->($module, $req, $type );
+    }
+    else {
+        my $n = ref($module);
+        $n =~ s/^Lemonldap::NG::Portal::(?:(?:UserDB|Auth)::)?//;
+        return $n;
+    }
 }
 
 package Lemonldap::NG::Portal::Main;
@@ -228,18 +241,18 @@ sub _buildAuthLoop {
                   . " will not be displayed" );
         }
         else {
-            $self->logger->debug("Displaying authentication choice $_");
-            if ( $auth and $userDB and $passwordDB ) {
+            if (    $auth
+                and not $_disabledModules->{$_}->{0}
+                and $userDB
+                and not $_disabledModules->{$_}->{1}
+                and $passwordDB
+                and not $_disabledModules->{$_}->{2} )
+            {
+                $self->logger->debug("Displaying authentication choice $_");
 
                 # Default URL
                 $req->data->{cspFormAction} ||= {};
-                if (
-                    defined $url
-                    and $url =~
-                    q%^(https?://)?[^\s/.?#$].[^\s]+$% # URL must be well formatted
-                  )
-                {
-
+                if ( defined $url and $url =~ URIRE ) {
                     my $csp_uri = $self->cspGetHost($url);
                     $req->data->{cspFormAction}->{$csp_uri} = 1;
                 }
@@ -331,11 +344,14 @@ sub _buildAuthLoop {
                 push @authLoop, $optionsLoop;
 
                 $self->logger->debug(
-                    "Authentication choice $name will be displayed");
+                    "Authentication choice $name_without_space will be displayed");
             }
             else {
-                $req->error("Authentication choice $_ value is invalid");
-                return 0;
+                $self->logger->debug(
+"Authentication choice $_ is invalid and will not be displayed"
+                );
+                $req->error("Authentication choice $_ is invalid");
+                next;
             }
         }
 

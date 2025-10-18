@@ -1,0 +1,84 @@
+<start_html>
+
+<pre>
+<perl method="hello0">
+Hello World 0 loop iteration ${i}.
+</perl>
+</pre>
+
+<pre>
+<perl method="hello1">
+Hello World 1 loop iteration ${i}.
+</perl>
+</pre>
+
+<pre>
+<perl method="hello2"/>
+</pre>
+
+<pre>
+<perl method="hello3"/>
+</pre>
+
+<pre>
+<perl method="hello4"/>
+</pre>
+
+__PERL__
+
+sub hello0 {
+	
+	my $self=shift();
+	my @html;
+	for (my $i=0; $i<3; $i++) { 
+		push @html, $self->render( i=>$i) 
+	};
+	return \@html;
+}
+
+sub hello1 {
+	
+	#  Alternate syntax using print
+	#
+	my $self=shift();
+	for (my $i=0; $i<3; $i++) { 
+		print $self->render( i=>$i)
+	};
+	return \undef
+}
+
+
+sub hello2 {
+	
+	#  Alternate syntax using printf
+	#
+	my $self=shift();
+	for (my $i=0; $i<3; $i++) { 
+		printf("Hello World 2 loop iteration %s.\n", $i);
+	};
+	return \undef
+}
+
+
+sub hello3 {
+	
+	#  Alternate syntax using $self->print
+	#
+	my $self=shift();
+	for (my $i=0; $i<3; $i++) { 
+		$self->print(sprintf("Hello World 3 loop iteration %s.\n", $i));
+	};
+	return \undef
+}
+
+
+sub hello4 {
+	
+	#  Alternate syntax using $self->printf
+	#
+	my $self=shift();
+	for (my $i=0; $i<3; $i++) { 
+		$self->printf("Hello World 4 loop iteration %s.\n", $i);
+	};
+	return \undef
+}

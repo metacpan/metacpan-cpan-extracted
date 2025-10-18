@@ -5,7 +5,7 @@ package Lemonldap::NG::Manager::Build::OpenApi;
 our $VERSION = '2.20.0';
 
 use Lemonldap::NG::Manager::Attributes;
-use Lemonldap::NG::Manager::Api::Common qw/_listAttributes/;
+use Lemonldap::NG::Manager::Api::Common;
 use Lemonldap::NG::Common;
 use JSON;
 

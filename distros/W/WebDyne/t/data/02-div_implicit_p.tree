@@ -1,0 +1,7 @@
+<html> @0 (IMPLICIT)
+  <head> @0.0 (IMPLICIT)
+  <body> @0.1 (IMPLICIT)
+    "Server localtime is: "
+    <div data-webdyne-perl="data-webdyne-perl"> @0.1.1
+      "print 'sometime' "
+    "here"

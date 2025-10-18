@@ -14,9 +14,11 @@ sub new {
 
     $module = "Lemonldap::NG::Portal$module" if ( $module =~ /^::/ );
 
-    eval "require $module";
-    if ($@) {
-        die "Custom $name module failed to compile: $@";
+    unless ( $module->can('new') ) {
+        eval "require $module";
+        if ($@) {
+            die "Custom $name module failed to compile: $@";
+        }
     }
 
     my $obj = eval { $module->new($self); };

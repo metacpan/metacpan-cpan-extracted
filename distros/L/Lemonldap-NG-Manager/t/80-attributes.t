@@ -19,7 +19,7 @@ my @notManagedAttributes = (
     # Complex nodes
     'samlSPMetaDataOptions', 'samlIDPMetaDataOptions', 'oidcRPMetaDataOptions',
     'oidcOPMetaDataOptions', 'casSrvMetaDataOptions',  'casAppMetaDataOptions',
-    'vhostOptions',
+    'vhostOptions', 'keys',
 
     # Second factor engine, lists of 2F modules and other parameters
     'sfEngine', 'available2FSelfRegistration', 'available2F', 'max2FDevices',
@@ -35,9 +35,9 @@ my @notManagedAttributes = (
     'staticPrefix',
 
     # Loggers
-    'log4perlConfFile', 'userSyslogFacility', 'logger', 'sentryDsn',
-    'syslogFacility',   'userLogger',         'logLevel',
-    'lokiUserService',  'lokiTenant',         'lokiUrl', 'lokiTenantHeader',
+    'log4perlConfFile', 'userSyslogFacility', 'logger',     'sentryDsn',
+    'syslogFacility',   'syslogSockOptions',  'userLogger', 'logLevel',
+    'lokiUserService',  'lokiTenant',         'lokiUrl',    'lokiTenantHeader',
     'lokiLabel', 'lokiService', 'lokiInstance', 'lokiEnv', 'lokiAuthorization',
 
     # Plugins parameters

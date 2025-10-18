@@ -5,7 +5,7 @@ use utf8;
 use strict;
 use Lemonldap::NG::Common::Conf::Serializer;
 
-our $VERSION = '2.0.1';
+our $VERSION = '2.22.0';
 our $initDone;
 
 sub prereq {
@@ -93,7 +93,7 @@ sub load {
 sub delete {
     my ( $self, $cfgNum ) = @_;
     die "cfgNum required" unless ($cfgNum);
-    $self->_mongoColl->remove( { _id => $cfgNum } );
+    $self->_mongoColl->delete_one( { _id => $cfgNum } );
 }
 
 1;

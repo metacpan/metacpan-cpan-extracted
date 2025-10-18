@@ -22,7 +22,7 @@
   overScheme = function (v, level, over) {
     // "v.length > over" avoids a loop if one user opened more than "max"
     // notifications
-    console.log('overScheme => level', level, 'over', over);
+    console.debug('overScheme => level', level, 'over', over);
     if (level === 1 && v.length > over) {
       return `uid=${v}*&groupBy=substr(uid,${level + over + 1})`;
     } else {
@@ -89,7 +89,7 @@
             $scope[button.action]();
             break;
           default:
-            console.log(typeof button.action);
+            console.warn('Unknown action type', typeof button.action);
         }
       }
       return $scope.showM = false;
@@ -226,7 +226,7 @@
         });
       }
       // Highlight current selection
-      console.log("Selection", $scope.type);
+      console.debug("Selection", $scope.type);
       $scope.activesStyle = {
         color: '#777'
       };
@@ -266,7 +266,7 @@
           $scope.currentNotification.done = response.data.done;
         }
         try {
-          console.log("Try to parse a JSON formated notification...");
+          console.debug("Try to parse a JSON formated notification...");
           notif = JSON.parse(response.data.notifications);
           $scope.currentNotification.date = $scope.notifDate(notif.date);
           $scope.currentNotification.condition = notif.condition;
@@ -275,7 +275,7 @@
           $scope.currentNotification.subtitle = notif.subtitle;
           $scope.currentNotification.check = notif.check;
         } catch (error) {
-          console.log("Unable to parse JSON");
+          console.error("Unable to parse JSON");
           $scope.currentNotification.notifications = response.data.notifications;
         }
         return $scope.waiting = false;

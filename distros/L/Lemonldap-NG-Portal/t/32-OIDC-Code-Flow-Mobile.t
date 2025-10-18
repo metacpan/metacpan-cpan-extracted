@@ -50,8 +50,7 @@ clean_sessions();
 done_testing();
 
 sub op {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel                        => $debug,
                 domain                          => 'idp.com',
@@ -84,7 +83,7 @@ sub op {
                         oidcRPMetaDataOptionsRedirectUris          =>
                           "my.mobile.app://callback",
                         oidcRPMetaDataOptionsPostLogoutRedirectUris =>
-                          "http://auth.rp.com/?logout=1"
+                          "http://auth.rp.com/oauth2/rlogoutreturn",
                     }
                 },
                 oidcOPMetaDataOptions           => {},

@@ -86,7 +86,7 @@ ok(
     "Get authorization code"
 );
 
-my ($code) =
+($code) =
   expectRedirection( $res, qr#http://rp\.com/\?.*code=([^\&]*)# );
 
 clean_sessions();

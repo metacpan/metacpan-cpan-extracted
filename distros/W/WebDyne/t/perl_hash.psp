@@ -1,0 +1,11 @@
+<start_html>
+<perl method="hello">
+Hello ${name}
+</perl>
+
+__PERL__
+
+sub hello {
+    my %data=( name => 'World' );
+    return \%data;
+}

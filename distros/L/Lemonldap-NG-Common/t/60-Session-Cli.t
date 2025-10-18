@@ -48,7 +48,6 @@ my $cli = Lemonldap::NG::Common::CliSessions->new(
 sub backup {
     my $file = shift;
     open F, '>', $file or die $!;
-    diag 2;
     Lemonldap::NG::Common::CliSessions->new(
         conf => {
             globalStorage        => "Apache::Session::File",

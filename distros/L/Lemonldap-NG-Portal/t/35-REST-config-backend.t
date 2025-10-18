@@ -235,8 +235,9 @@ sub sp {
                 authentication => 'Demo',
                 userDB         => 'Same',
                 configStorage  => {
-                    type    => 'REST',
-                    baseUrl => 'http://auth.idp.com/config',
+                    type     => 'REST',
+                    baseUrl  => 'http://auth.idp.com/config',
+                    confFile => '/dev/null',
                 },
             },
         }

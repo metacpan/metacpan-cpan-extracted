@@ -1,0 +1,2 @@
+<popup_menu values="!{tie(my %h, 'Tie::IxHash', ( purple=>Purple, red=>Red, green=>Green, blue=>Blue  )); [keys %h], \%h}" name="popup_hash0"/>
+__PERL__

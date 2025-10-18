@@ -1,0 +1,6 @@
+<start_html>
+<perl handler="hello"/>
+__PERL__
+sub hello {
+    print 'Hello World'
+}

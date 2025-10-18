@@ -1,0 +1,12 @@
+<html> @0 (IMPLICIT)
+  <head> @0.0 (IMPLICIT)
+  <body> @0.1 (IMPLICIT)
+    <form> @0.1.0
+      <p> @0.1.0.0
+        "Textfield: "
+      <p> @0.1.0.1
+        <hr /> @0.1.0.1.0
+        "Textarea field, 10 col 20 lines:"
+      <p> @0.1.0.2
+        <textarea columns="10" default="default textarea text" lines="20" name="textarea"> @0.1.0.2.0
+          "<hr>Password field:<p><password_field name="password" value="defa..."

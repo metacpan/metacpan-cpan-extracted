@@ -1,0 +1,10 @@
+<html> @0 (IMPLICIT)
+  <head> @0.0 (IMPLICIT)
+  <body> @0.1 (IMPLICIT)
+    <pre> @0.1.0
+      <span> @0.1.0.0
+        "Line 1"
+      <span> @0.1.0.1
+        "Line 2"
+      <span> @0.1.0.2
+        "Line 3"

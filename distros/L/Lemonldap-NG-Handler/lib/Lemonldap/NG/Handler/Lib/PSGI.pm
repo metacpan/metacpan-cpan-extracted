@@ -5,7 +5,7 @@ use Mouse;
 
 #use Lemonldap::NG::Handler::Main qw(:jailSharedVars);
 
-our $VERSION = '2.20.0';
+our $VERSION = '2.22.0';
 
 has protection => ( is => 'rw', isa => 'Str' );
 has rule       => ( is => 'rw', isa => 'Str' );
@@ -104,6 +104,9 @@ sub reload {
 # response is 200.
 sub _authAndTrace {
     my ( $self, $req, $noCall ) = @_;
+    unless ( eval { $self->api->tsv->{portal} } ) {
+        $self->api->checkConf(1);
+    }
 
     # TODO: handle types
     my $type = $self->api->checkType($req);
@@ -113,7 +116,7 @@ sub _authAndTrace {
     my $tmp = $self->api;
     $tmp =~ s/::\w+$/::/;
     $type = $tmp . $type;
-    eval "require $type";
+    Lemonldap::NG::Handler::Main->buildAndLoadType($type);
     die $@ if ($@);
     my ( $res, $session ) = $type->run( $req, $self->{rule} );
     my $portal = eval { $type->tsv->{portal}->($req) };

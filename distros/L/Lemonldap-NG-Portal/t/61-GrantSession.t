@@ -76,6 +76,7 @@ ok( $res->[2]->[0] =~ /<h3 trspan="dwho not allowed">dwho not allowed<\/h3>/,
     'dwho rejected with custom message and session data' )
   or print STDERR Dumper( $res->[2]->[0] );
 count(1);
+expectXpath( $res, '//form[@action="http://auth.example.com/?cancel=1"]' );
 
 expectXpath(
     $res,
@@ -113,7 +114,7 @@ ok(
 count(1);
 ok(
     $res->[2]->[0] =~ /<span trmsg="41">/,
-    'rtyler rejected with PE_SESSIONNOTGRANTED'
+    'msmith rejected with PE_SESSIONNOTGRANTED'
 ) or print STDERR Dumper( $res->[2]->[0] );
 count(1);
 

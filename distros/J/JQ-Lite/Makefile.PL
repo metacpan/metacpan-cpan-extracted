@@ -8,7 +8,7 @@ WriteMakefile(
     ABSTRACT         => 'A lightweight jq-like JSON query engine in Perl',
     AUTHOR           => 'Kawamura Shingo <pannakoota1@gmail.com>',
     LICENSE          => 'perl',
-    MIN_PERL_VERSION => '5.010',
+    MIN_PERL_VERSION => '5.014',
     PREREQ_PM        => {
         'JSON::PP'   => 0,
         'Test::More' => 0,

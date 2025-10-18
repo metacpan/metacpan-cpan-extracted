@@ -4,7 +4,7 @@
 #
 # This script is written to be used by cron to rotate keys.
 #
-# This is part of LemonLDAP::NG product, released under GPL
+# This is part of LemonLDAP::NG product, released under GPL-2+
 #=============================================================================
 
 use strict;
@@ -68,7 +68,7 @@ print "Type is $type\n" if $debug;
 my $keys;
 
 if ( $type eq 'EC' ) {
-    $keys = Lemonldap::NG::Common::Util::Crypto::genEcKey('secp256r1');
+    $keys = Lemonldap::NG::Common::Util::Crypto::genEcKey('prime256v1');
 }
 else {
     $keys = Lemonldap::NG::Common::Util::Crypto::genCertKey( 2048, undef, $cn );
@@ -111,7 +111,7 @@ $conf->{oidcServiceNewKeyTypeSig}    = $type;
 if ( $conf->{oidcServicePrivateKeyEnc} ) {
     $type = $conf->{oidcServiceKeyTypeEnc} || 'RSA';
     if ( $type eq 'EC' ) {
-        $keys = Lemonldap::NG::Common::Util::Crypto::genEcKey('secp256r1');
+        $keys = Lemonldap::NG::Common::Util::Crypto::genEcKey('prime256v1');
     }
     else {
         $keys =
