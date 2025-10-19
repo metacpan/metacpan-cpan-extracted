@@ -15,19 +15,21 @@ Configuration classes used by L<Config::Model>
 
 =head2 Description
 
-A short human readable title of the unit. This may be used by
-systemd (and other UIs) as a user-visible label for the unit, so this string
-should identify the unit rather than describe it, despite the name. This string also shouldn't just
-repeat the unit name. C<Apache2 Web Server> is a good example. Bad examples are
-C<high-performance lightweight HTTP server> (too generic) or
-C<Apache2> (meaningless for people who do not know Apache, duplicates the unit
-name). systemd may use this string as a noun in status messages (C<Starting
-description...>, C<Started
-description.>, C<Reached target
-description.>, C<Failed to start
-description.>), so it should be capitalized, and should not be a
-full sentence, or a phrase with a continuous verb. Bad examples include C<exiting the
-container> or C<updating the database once per day.>. I< Optional. Type uniline.  > 
+A brief, meaningful, human-readable text identifying the unit. This may be used by
+systemd (and suitable UIs) as a user-visible label for the unit, so this string
+should identify the unit rather than just describe it, despite the name. This string also should not
+just repeat the unit name. C<Apache HTTP Server> or C<Postfix Mail
+Server> are good examples. Bad examples are C<high-performance lightweight HTTP
+server> (too generic) or C<Apache> (meaningless for people who do not know
+the Apache HTTP server project, duplicates the unit name). systemd may use this
+string as a noun in status messages (C<Starting
+Description...>, C<Started
+Description.>, C<Reached target
+Description.>, C<Failed to start
+Description.>), so it should be capitalized, and should not be a
+full sentence, or a phrase with a verb conjugated in the present continuous, or end in a full
+stop. Bad examples include C<exiting the container>, C<updating the database
+once per day.>, or C<OpenSSH server second instance daemon>. I< Optional. Type uniline.  > 
 
 =head2 Documentation
 
@@ -164,13 +166,13 @@ C<b.service>. I< Optional. Type uniline.  >
 =head2 Conflicts
 
 A space-separated list of unit names. Configures negative requirement
-dependencies. If a unit has a C<Conflicts> setting on another unit, starting the
-former will stop the latter and vice versa.
+dependencies. If a unit has a C<Conflicts> requirement on a set of other units,
+then starting it will stop all of them and starting any of them will stop it.
 
 Note that this setting does not imply an ordering dependency, similarly to the
 C<Wants> and C<Requires> dependencies described above. This means
 that to ensure that the conflicting unit is stopped before the other unit is started, an
-C<After> or C<Before> dependency must be declared. It doesn't
+C<After> or C<Before> dependency must be declared. It does not
 matter which of the two ordering dependencies is used, because stop jobs are always ordered before
 start jobs, see the discussion in C<Before>/C<After> below.
 
@@ -200,8 +202,8 @@ When two units with an ordering dependency between them are shut down, the inver
 start-up order is applied. I.e. if a unit is configured with C<After> on another
 unit, the former is stopped before the latter if both are shut down. Given two units with any
 ordering dependency between them, if one unit is shut down and the other is started up, the shutdown
-is ordered before the start-up. It doesn't matter if the ordering dependency is
-C<After> or C<Before>, in this case. It also doesn't matter which
+is ordered before the start-up. It does not matter if the ordering dependency is
+C<After> or C<Before>, in this case. It also does not matter which
 of the two is shut down, as long as one is shut down and the other is started up; the shutdown is
 ordered before the start-up in all cases. If two units have no ordering dependencies between them,
 they are shut down or started up simultaneously, and no ordering takes place. It depends on the unit
@@ -238,8 +240,8 @@ When two units with an ordering dependency between them are shut down, the inver
 start-up order is applied. I.e. if a unit is configured with C<After> on another
 unit, the former is stopped before the latter if both are shut down. Given two units with any
 ordering dependency between them, if one unit is shut down and the other is started up, the shutdown
-is ordered before the start-up. It doesn't matter if the ordering dependency is
-C<After> or C<Before>, in this case. It also doesn't matter which
+is ordered before the start-up. It does not matter if the ordering dependency is
+C<After> or C<Before>, in this case. It also does not matter which
 of the two is shut down, as long as one is shut down and the other is started up; the shutdown is
 ordered before the start-up in all cases. If two units have no ordering dependencies between them,
 they are shut down or started up simultaneously, and no ordering takes place. It depends on the unit
@@ -400,6 +402,16 @@ requested their shut down. If this option is set, a unit will
 be automatically cleaned up if no other active unit requires
 it. Defaults to C<false>. I< Optional. Type boolean.  > 
 
+=over 4
+
+=item upstream_default value :
+
+no
+
+=back
+
+
+
 =head2 RefuseManualStart
 
 Takes a boolean argument. If
@@ -466,6 +478,16 @@ C<argv[0][0] = '@'> as described at
 L<systemd and Storage Daemons for the Root File
 System|https://systemd.io/ROOT_STORAGE_DAEMONS>, which however continues to be supported. I< Optional. Type boolean.  > 
 
+=over 4
+
+=item upstream_default value :
+
+no
+
+=back
+
+
+
 =head2 CollectMode
 
 Tweaks the "garbage collection" algorithm for this unit. Takes one of C<inactive>
@@ -474,7 +496,7 @@ in the C<inactive> state and is not referenced by clients, jobs or other units �
 is not unloaded if it is in the C<failed> state. In C<failed> mode, failed
 units are not unloaded until the user invoked systemctl reset-failed on them to reset the
 C<failed> state, or an equivalent command. This behaviour is altered if this option is set to
-C<inactive-or-failed>: in this case the unit is unloaded even if the unit is in a
+C<inactive-or-failed>: in this case, the unit is unloaded even if the unit is in a
 C<failed> state, and thus an explicitly resetting of the C<failed> state is
 not necessary. Note that if this mode is used unit results (such as exit codes, exit signals, consumed
 resources, …) are flushed out immediately after the unit completed, except for what is stored in the logging
@@ -485,7 +507,7 @@ subsystem. Defaults to C<inactive>. I< Optional. Type enum. choice: 'inactive', 
 Controls the exit status to propagate back to an invoking container manager (in case of a
 system service) or service manager (in case of a user manager) when the
 C<FailureAction>/C<SuccessAction> are set to C<exit> or
-C<exit-force> and the action is triggered. By default the exit status of the main process of the
+C<exit-force> and the action is triggered. By default, the exit status of the main process of the
 triggering unit (if this applies) is propagated. Takes a value in the range 0…255 or the empty string to
 request default behaviour. I< Optional. Type uniline.  > 
 
@@ -494,7 +516,7 @@ request default behaviour. I< Optional. Type uniline.  >
 Controls the exit status to propagate back to an invoking container manager (in case of a
 system service) or service manager (in case of a user manager) when the
 C<FailureAction>/C<SuccessAction> are set to C<exit> or
-C<exit-force> and the action is triggered. By default the exit status of the main process of the
+C<exit-force> and the action is triggered. By default, the exit status of the main process of the
 triggering unit (if this applies) is propagated. Takes a value in the range 0…255 or the empty string to
 request default behaviour. I< Optional. Type uniline.  > 
 
@@ -671,13 +693,14 @@ by prepending an exclamation mark. I< Optional. Type list of uniline.  >
 
 =head2 ConditionHost
 
-C<ConditionHost> may be used to match against the hostname or
-machine ID of the host. This either takes a hostname string (optionally with shell style globs)
-which is tested against the locally set hostname as returned by
+C<ConditionHost> may be used to match against the hostname,
+machine ID, boot ID or product UUID of the host. This either takes a hostname string (optionally
+with shell style globs) which is tested against the locally set hostname as returned by
 L<gethostname(2)>, or
-a machine ID formatted as string (see
-L<machine-id(5)>).
-The test may be negated by prepending an exclamation mark. I< Optional. Type list of uniline.  > 
+a 128bit ID or UUID, formatted as string. The latter is compared against machine ID, boot ID and the
+firmware product UUID if there is any. See
+L<machine-id(5)> for
+details about the machine ID. The test may be negated by prepending an exclamation mark. I< Optional. Type list of uniline.  > 
 
 =head2 ConditionKernelCommandLine
 
@@ -707,6 +730,19 @@ are supported by a kernel, because of the widespread practice of backporting dri
 fixes from newer upstream kernels into older versions provided by distributions. Hence, this check
 is inherently unportable and should not be used for units which may be used on different
 distributions. I< Optional. Type list of uniline.  > 
+
+=head2 ConditionVersion
+
+C<ConditionVersion> may be used to check whether a software
+version matches a certain expression, or if prefixed with the exclamation mark, does not match.
+The first argument is the software whose version has to be checked. Currently
+C<kernel>, C<systemd> and C<glibc> are supported.
+If this argument is omitted, C<kernel> is implied. The second argument must be a
+list of (potentially quoted) expressions. Each expression starts with one of C<=>
+or C<!=> for string comparisons, C<< < >>, C<< <= >>,
+C<==>, C<< <> >>, C<< >= >>,
+C<< > >> for version comparisons, or C<$=>, C<!$=>
+for a shell-style glob match. If no operator is specified, C<$=> is implied. I< Optional. Type list of uniline.  > 
 
 =head2 ConditionCredential
 
@@ -907,7 +943,7 @@ C<@system>. I< Optional. Type list of uniline.  >
 Check whether given cgroup controllers (e.g. C<cpu>) are available
 for use on the system or whether the legacy v1 cgroup or the modern v2 cgroup hierarchy is used.
 
-Multiple controllers may be passed with a space separating them; in this case the condition
+Multiple controllers may be passed with a space separating them; in this case, the condition
 will only pass if all listed controllers are available for use. Controllers unknown to systemd are
 ignored. Valid controllers are C<cpu>, C<io>,
 C<memory>, and C<pids>. Even if available in the kernel, a
@@ -1068,6 +1104,11 @@ Optionally, the threshold value can be prefixed with the slice unit under which 
 followed by a C<:>. If the slice unit is not specified, the overall system pressure will be measured,
 instead of a particular cgroup's. I< Optional. Type list of uniline.  > 
 
+=head2 ConditionKernelModuleLoaded
+
+Test whether the specified kernel module has been loaded and is already fully
+initialized. I< Optional. Type list of uniline.  > 
+
 =head2 AssertArchitecture
 
 Similar to the C<ConditionArchitecture>,
@@ -1117,6 +1158,18 @@ requirements are not met, and when this is something the administrator or user s
 into. I< Optional. Type uniline.  > 
 
 =head2 AssertKernelVersion
+
+Similar to the C<ConditionArchitecture>,
+C<ConditionVirtualization>, …, condition settings described above, these settings
+add assertion checks to the start-up of the unit. However, unlike the conditions settings, any
+assertion setting that is not met results in failure of the start job (which means this is logged
+loudly). Note that hitting a configured assertion does not cause the unit to enter the
+C<failed> state (or in fact result in any state change of the unit), it affects
+only the job queued for it. Use assertion expressions for units that cannot operate when specific
+requirements are not met, and when this is something the administrator or user should look
+into. I< Optional. Type uniline.  > 
+
+=head2 AssertVersion
 
 Similar to the C<ConditionArchitecture>,
 C<ConditionVirtualization>, …, condition settings described above, these settings
@@ -1441,6 +1494,18 @@ requirements are not met, and when this is something the administrator or user s
 into. I< Optional. Type uniline.  > 
 
 =head2 AssertIOPressure
+
+Similar to the C<ConditionArchitecture>,
+C<ConditionVirtualization>, …, condition settings described above, these settings
+add assertion checks to the start-up of the unit. However, unlike the conditions settings, any
+assertion setting that is not met results in failure of the start job (which means this is logged
+loudly). Note that hitting a configured assertion does not cause the unit to enter the
+C<failed> state (or in fact result in any state change of the unit), it affects
+only the job queued for it. Use assertion expressions for units that cannot operate when specific
+requirements are not met, and when this is something the administrator or user should look
+into. I< Optional. Type uniline.  > 
+
+=head2 AssertKernelModuleLoaded
 
 Similar to the C<ConditionArchitecture>,
 C<ConditionVirtualization>, …, condition settings described above, these settings

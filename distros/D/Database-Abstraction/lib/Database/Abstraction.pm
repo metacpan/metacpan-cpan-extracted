@@ -25,6 +25,7 @@ package Database::Abstraction;
 # TODO:	Other databases e.g., Redis, noSQL, remote databases such as MySQL, PostgresSQL
 # TODO: The no_entry/entry terminology is confusing.  Replace with no_id/id_column
 # TODO: Add support for DBM::Deep
+# TODO: Log queries and the time that they took to execute per database
 
 use warnings;
 use strict;
@@ -38,8 +39,8 @@ use Fcntl;	# For O_RDONLY
 use File::Spec;
 use File::pfopen 0.03;	# For $mode and list context
 use File::Temp;
-use Log::Abstraction 0.24;
-use Object::Configure 0.12;
+use Log::Abstraction 0.26;
+use Object::Configure 0.16;
 use Params::Get 0.13;
 # use Error::Simple;	# A nice idea to use this, but it doesn't play well with "use lib"
 use Scalar::Util;
@@ -53,11 +54,11 @@ Database::Abstraction - Read-only Database Abstraction Layer (ORM)
 
 =head1 VERSION
 
-Version 0.32
+Version 0.33
 
 =cut
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 =head1 DESCRIPTION
 
@@ -885,13 +886,6 @@ sub selectall_array
 			# throw Error::Simple("$query: argument is not a string: " . ref($arg));
 			$self->_fatal("selectall_array(): $query: argument is not a string: ", ref($arg));
 		}
-		if(!defined($arg)) {
-			my @call_details = caller(0);
-			# throw Error::Simple("$query: value for $c1 is not defined in call from " .
-				# $call_details[2] . ' of ' . $call_details[1]);
-			Carp::croak("$query: value for $c1 is not defined in call from ",
-				$call_details[2], ' of ', $call_details[1]);
-		}
 
 		my $keyword;
 		if($done_where) {
@@ -900,12 +894,16 @@ sub selectall_array
 			$keyword = 'WHERE';
 			$done_where = 1;
 		}
-		if($arg =~ /[%_]/) {
-			$query .= " $keyword $c1 LIKE ?";
+		if(!defined($arg)) {
+			$query .= " $keyword $c1 IS NULL"
 		} else {
-			$query .= " $keyword $c1 = ?";
+			if($arg =~ /[%_]/) {
+				$query .= " $keyword $c1 LIKE ?";
+			} else {
+				$query .= " $keyword $c1 = ?";
+			}
+			push @query_args, $arg;
 		}
-		push @query_args, $arg;
 	}
 	if(!$self->{no_entry}) {
 		$query .= ' ORDER BY ' . $self->{'id'};
@@ -1100,6 +1098,10 @@ sub count
 
 Returns a hash reference for a single row in a table.
 
+It searches for the given arguments, searching IS NULL if the value is C<undef>
+
+   my $res = $foo->fetchrow_hashref(entry => 'one');
+
 Special argument: table: determines the table to read from if not the default,
 which is worked out from the class name
 
@@ -1158,32 +1160,33 @@ sub fetchrow_hashref {
 	}
 	my @query_args;
 	foreach my $c1(sort keys(%{$params})) {	# sort so that the key is always the same
-		if(my $arg = $params->{$c1}) {
-			my $keyword;
+		my $keyword;
 
+		if($done_where) {
+			$keyword = 'AND';
+		} else {
+			$keyword = 'WHERE';
+			$done_where = 1;
+		}
+		if(my $arg = $params->{$c1}) {
 			if(ref($arg)) {
 				# throw Error::Simple("$query: argument is not a string: " . ref($arg));
 				$self->_fatal("fetchrow_hash(): $query: argument is not a string: ", ref($arg));
 			}
 
-			if($done_where) {
-				$keyword = 'AND';
-			} else {
-				$keyword = 'WHERE';
-				$done_where = 1;
-			}
 			if($arg =~ /[%_]/) {
 				$query .= " $keyword $c1 LIKE ?";
 			} else {
 				$query .= " $keyword $c1 = ?";
 			}
 			push @query_args, $arg;
-		} elsif(!defined($arg)) {
-			my @call_details = caller(0);
-			# throw Error::Simple("$query: value for $c1 is not defined in call from " .
-				# $call_details[2] . ' of ' . $call_details[1]);
-			Carp::croak("$query: value for $c1 is not defined in call from ",
-				$call_details[2], ' of ', $call_details[1]);
+		} else {
+			$query .= " $keyword $c1 IS NULL";
+			# my @call_details = caller(0);
+			# # throw Error::Simple("$query: value for $c1 is not defined in call from " .
+				# # $call_details[2] . ' of ' . $call_details[1]);
+			# Carp::croak("$query: value for $c1 is not defined in call from ",
+				# $call_details[2], ' of ', $call_details[1]);
 		}
 	}
 	# $query .= ' ORDER BY entry LIMIT 1';

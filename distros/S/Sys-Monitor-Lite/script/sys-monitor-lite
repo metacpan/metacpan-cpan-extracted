@@ -1,0 +1,120 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use Getopt::Long qw(GetOptions);
+use Pod::Usage;
+use Sys::Monitor::Lite;
+
+my $interval = 0;
+my $once     = 0;
+my $collect  = undef;
+my $output   = 'json';
+my $pretty   = 0;
+my $help     = 0;
+
+GetOptions(
+    'interval=f' => \$interval,
+    'once'       => \$once,
+    'collect=s'  => \$collect,
+    'output=s'   => \$output,
+    'pretty!'    => \$pretty,
+    'help'       => \$help,
+) or pod2usage(2);
+
+pod2usage(0) if $help;
+
+my @metrics = defined $collect ? split(/,/, $collect) : ();
+my %valid   = map { $_ => 1 } Sys::Monitor::Lite::available_metrics();
+if (@metrics) {
+    my @unknown = grep { !$valid{$_} } @metrics;
+    if (@unknown) {
+        die "Unknown metrics: " . join(', ', @unknown) . "\n";
+    }
+}
+
+$output = lc $output;
+die "Unsupported output format: $output\n"
+    unless $output eq 'json' || $output eq 'jsonl';
+
+my $encoder_pretty = $output eq 'jsonl' ? 0 : $pretty;
+
+my $run_once = $once || $interval <= 0;
+my $sleep_interval = $interval > 0 ? $interval : 5;
+
+while (1) {
+    my $data = @metrics
+        ? Sys::Monitor::Lite::collect(\@metrics)
+        : Sys::Monitor::Lite::collect_all();
+
+    my %opts = $encoder_pretty ? (pretty => 1) : ();
+    my $json = Sys::Monitor::Lite::to_json($data, %opts);
+    if ($output eq 'jsonl') {
+        $json =~ s/\s+\z//;
+        print $json, "\n";
+    } else {
+        print $json;
+        print "\n" unless $json =~ /\n\z/;
+    }
+
+    last if $run_once;
+    sleep $sleep_interval;
+}
+
+__END__
+
+=head1 NAME
+
+sys-monitor-lite - Collect lightweight system metrics as JSON
+
+=head1 SYNOPSIS
+
+  sys-monitor-lite --once
+  sys-monitor-lite --interval 5 --collect cpu,mem --output jsonl
+
+=head1 DESCRIPTION
+
+Collects metrics exposed by L<Sys::Monitor::Lite> and prints them as JSON or
+JSON Lines. Use C<--collect> to limit which subsystems are gathered.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--interval NUM>
+
+Collect every NUM seconds. Defaults to 5 seconds when running continuously.
+
+=item B<--once>
+
+Collect a single sample (default when C<--interval> is not provided).
+
+=item B<--collect LIST>
+
+Comma-separated list of metrics to gather (e.g. C<cpu,mem,disk>). Available
+metrics: system, cpu, load, mem, disk, net.
+
+=item B<--output FORMAT>
+
+Output format: C<json> (default) or C<jsonl> for JSON Lines.
+
+=item B<--pretty>
+
+Pretty-print JSON output (ignored for JSON Lines).
+
+=item B<--help>
+
+Show this help message.
+
+=back
+
+=head1 AUTHOR
+
+Shingo Kawamura E<lt>kawamurashingo@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+MIT License. See the F<LICENSE> file bundled with this distribution.
+
+

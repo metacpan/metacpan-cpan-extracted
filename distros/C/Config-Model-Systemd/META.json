@@ -4,7 +4,7 @@
       "Dominique Dumont"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "lgpl_2_1"
    ],
@@ -68,9 +68,9 @@
          "web" : "http://github.com/dod38fr/config-model-systemd"
       }
    },
-   "version" : "0.257.2",
+   "version" : "0.258.1",
    "x_generated_by_perl" : "v5.40.1",
-   "x_serialization_backend" : "JSON::XS version 4.03",
+   "x_serialization_backend" : "JSON::XS version 4.04",
    "x_spdx_expression" : "LGPL-2.1"
 }
 

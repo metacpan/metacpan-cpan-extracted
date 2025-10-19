@@ -70,9 +70,9 @@ C<notify-reload>, or C<idle>:
 
 It is recommended to use C<Type>=C<exec> for long-running
 services, as it ensures that process setup errors (e.g. errors such as a missing service
-executable, or missing user) are properly tracked. However, as this service type won't propagate
+executable, or missing user) are properly tracked. However, as this service type will not propagate
 the failures in the service's own startup code (as opposed to failures in the preparatory steps the
-service manager executes before execve()) and doesn't allow ordering of other
+service manager executes before execve()) and does not allow ordering of other
 units against completion of initialization of the service code itself (which for example is useful
 if clients need to connect to the service through some form of IPC, and the IPC channel is only
 established by the service itself \x{2014} in contrast to doing this ahead of time through socket or bus
@@ -82,7 +82,7 @@ provides a D-Bus interface) are the preferred options as they allow service prog
 precisely schedule when to consider the service started up successfully and when to proceed with
 follow-up units. The C<notify>/C<notify-reload> service types require
 explicit support in the service codebase (as sd_notify() or an equivalent API
-needs to be invoked by the service at the appropriate time) \x{2014} if it's not supported, then
+needs to be invoked by the service at the appropriate time) \x{2014} if it is not supported, then
 C<forking> is an alternative: it supports the traditional heavy-weight UNIX service
 start-up protocol. Note that using any type other than C<simple> possibly delays the
 boot process, as the service manager needs to wait for at least some service initialization to
@@ -117,6 +117,7 @@ such as graphical applications inside of a desktop environment.',
 the service shall be considered active even when all its
 processes exited. Defaults to C<no>.',
         'type' => 'leaf',
+        'upstream_default' => 'no',
         'value_type' => 'boolean',
         'write_as' => [
           'no',
@@ -137,6 +138,7 @@ the main PID cannot be determined, failure detection and
 automatic restarting of a service will not work reliably.
 Defaults to C<yes>.',
         'type' => 'leaf',
+        'upstream_default' => 'yes',
         'value_type' => 'boolean',
         'write_as' => [
           'no',
@@ -145,15 +147,17 @@ Defaults to C<yes>.',
       },
       'PIDFile',
       {
-        'description' => 'Takes a path referring to the PID file of the service. Usage of this option is recommended for
-services where C<Type> is set to C<forking>. The path specified typically points
-to a file below C</run/>. If a relative path is specified it is hence prefixed with
-C</run/>. The service manager will read the PID of the main process of the service from this
-file after start-up of the service. The service manager will not write to the file configured here, although it
-will remove the file after the service has shut down if it still exists. The PID file does not need to be owned
-by a privileged user, but if it is owned by an unprivileged user additional safety restrictions are enforced:
-the file may not be a symlink to a file owned by a different user (neither directly nor indirectly), and the
-PID file must refer to a process already belonging to the service.
+        'description' => 'Takes a path referring to the PID file of the service. Usage of this option is
+recommended for services where C<Type> is set to C<forking>. The path
+specified typically points to a file below C</run/>. If a relative path is
+specified for system service, then it is hence prefixed with C</run/>, and prefixed
+with C<$XDG_RUNTIME_DIR> if specified in a user service. The service manager will
+read the PID of the main process of the service from this file after start-up of the service. The
+service manager will not write to the file configured here, although it will remove the file after
+the service has shut down if it still exists. The PID file does not need to be owned by a privileged
+user, but if it is owned by an unprivileged user additional safety restrictions are enforced: the
+file may not be a symlink to a file owned by a different user (neither directly nor indirectly), and
+the PID file must refer to a process already belonging to the service.
 
 Note that PID files should be avoided in modern projects. Use C<Type=notify>,
 C<Type=notify-reload> or C<Type=simple> where possible, which does not
@@ -365,7 +369,7 @@ asynchronous one.
 Note that the commands specified in C<ExecStop> are only executed when the service
 started successfully first. They are not invoked if the service was never started at all, or in case its
 start-up failed, for example because any of the commands specified in C<ExecStart>,
-C<ExecStartPre> or C<ExecStartPost> failed (and weren\'t prefixed with
+C<ExecStartPre> or C<ExecStartPost> failed (and were not prefixed with
 C<->, see above) or timed out. Use C<ExecStopPost> to invoke commands when a
 service failed to start up correctly and is shut down again. Also note that the stop operation is always
 performed if the service started successfully, even if the processes in the service terminated on their
@@ -461,7 +465,7 @@ provided the service repeats C<EXTEND_TIMEOUT_USEC=\x{2026}> within the interval
 until the service startup status is finished by C<READY=1>. (see
 L<sd_notify(3)>).
 
-Note that the start timeout is also applied to service reloads, regardless if implemented
+Note that the start timeout is also applied to service reloads, regardless of whether implemented
 through C<ExecReload> or via the reload logic enabled via C<Type=notify-reload>.
 If the reload does not complete within the configured time, the reload will be considered failed and
 the service will continue running with the old configuration. This will not affect the running service,
@@ -476,7 +480,7 @@ C<ExecStop> command. If any of them times out, subsequent C<ExecStop> commands
 are skipped and the service will be terminated by C<SIGTERM>. If no C<ExecStop>
 commands are specified, the service gets the C<SIGTERM> immediately. This default behavior
 can be changed by the C<TimeoutStopFailureMode> option. Second, it configures the time
-to wait for the service itself to stop. If it doesn't terminate in the specified time, it will be forcibly terminated
+to wait for the service itself to stop. If it does not terminate in the specified time, it will be forcibly terminated
 by C<SIGKILL> (see C<KillMode> in
 L<systemd.kill(5)>).
 Takes a unit-less value in seconds, or a time span value such
@@ -727,7 +731,7 @@ a failed/inactive state.If set to C<direct>, the service transitions to the acti
 state directly during auto-restart, skipping failed/inactive state.
 C<ExecStopPost> is still invoked.
 C<OnSuccess> and C<OnFailure> are skipped.This option is useful in cases where a dependency can fail temporarily but we
-don\'t
+do not
 want these temporary failures to make the dependent units fail. Dependent units are not
 notified of these temporary failures.If set to C<debug>, the service manager will log messages that are
 related to this unit at debug level while automated restarts are attempted, until either the
@@ -819,6 +823,7 @@ and C<ExecStopPost> commands. If false, the
 setting is applied to all configured commands the same way.
 Defaults to false.',
         'type' => 'leaf',
+        'upstream_default' => 'no',
         'value_type' => 'boolean',
         'write_as' => [
           'no',
@@ -1064,7 +1069,7 @@ If the path is a socket, we call connect() on it.
 See L<sd_listen_fds(3)>
 for more details on how to retrieve these file descriptors.
 
-This setting is useful to allow services to access files/sockets that they can\'t access themselves
+This setting is useful to allow services to access files/sockets that they cannot access themselves
 (due to running in a separate mount namespace, not having privileges, ...).
 
 This setting can be specified multiple times, in which case all the specified paths are opened and the file descriptors

@@ -1,0 +1,11 @@
+Changes
+lib/Sys/Monitor/Lite.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+script/sys-monitor-lite
+t/monitor.t
+VISION.md
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

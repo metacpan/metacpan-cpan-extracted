@@ -1,11 +1,12 @@
 ^images/
 ^install\.sh$
-^.*\.json$
+^(?!META\.json$).+\.json$
 ^MANIFEST\.bak$
-^Makefile$
+^Makefile(\.old)?$
 ^MYMETA\..*$
 ^pm_to_blib$
 ^blib/
-^\.git
-^\.github
+^\.git/
+^\.github/
+^\.gitignore$
 ^.*\.swp$

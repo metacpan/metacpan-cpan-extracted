@@ -2,7 +2,6 @@
 
 # JQ::Lite
 
-[![MetaCPAN](https://img.shields.io/cpan/v/JQ::Lite?color=blue)](https://metacpan.org/pod/JQ::Lite)
 [![GitHub](https://img.shields.io/github/stars/kawamurashingo/JQ-Lite?style=social)](https://github.com/kawamurashingo/JQ-Lite)
 
 **JQ::Lite** is a lightweight, pure-Perl JSON query engine inspired by the [`jq`](https://stedolan.github.io/jq/) command-line tool.  
@@ -17,6 +16,7 @@ It allows you to extract, traverse, and filter JSON data using a simplified jq-l
 - ✅ Optional key access (`.nickname?`)
 - ✅ Array indexing and expansion (`.users[0]`, `.users[]`)
 - ✅ `select(...)` filters with `==`, `!=`, `<`, `>`, `and`, `or`
+- ✅ Arithmetic expressions (`+`, `-`, `*`, `/`, `%`) with parentheses and numeric helpers (`floor()`, `ceil()`, `round()`, `tonumber()`)
 - ✅ Built-in functions: `length`, `keys`, `values`, `first`, `last`, `reverse`, `sort`, `sort_desc`, `sort_by`, `min_by()`, `max_by()`, `unique`, `unique_by()`, `has`, `contains()`, `test()`, `any()`, `all()`, `not`, `map`, `map_values()`, `walk()`, `recurse()`, `group_by`, `group_count`, `sum_by()`, `avg_by()`, `median_by()`, `count`, `join`, `split()`, `explode()`, `implode()`, `substr()`, `slice()`, `replace()`, `empty()`, `median`, `mode`, `percentile()`, `variance`, `stddev`, `add`, `sum`, `product`, `upper()`, `lower()`, `titlecase()`, `abs()`, `ceil()`, `floor()`, `round()`, `trim()`, `ltrimstr()`, `rtrimstr()`, `startswith()`, `endswith()`, `chunks()`, `enumerate()`, `transpose()`, `flatten_all()`, `flatten_depth()`, `range()`, `index()`, `rindex()`, `indices()`, `clamp()`, `tostring()`, `tojson()`, `fromjson()`, `to_number()`, `pick()`, `merge_objects()`, `to_entries()`, `from_entries()`, `with_entries()`, `paths()`, `leaf_paths()`, `getpath()`, `setpath()`, `delpaths()`, `arrays`, `objects`, `scalars`
 - ✅ `reduce expr as $var (init; update)` for jq-style accumulation with lexical variable bindings
 - ✅ `foreach expr as $var (init; update [; extract])` for jq-compatible streaming accumulation with optional emitters
@@ -31,6 +31,7 @@ It allows you to extract, traverse, and filter JSON data using a simplified jq-l
 - ✅ jq-compatible `--slurp` (`-s`) flag to collect every JSON document from the input stream into a single array
 - ✅ jq-compatible `--from-file` (`-f`) option to load filters from reusable script files
 - ✅ Reads from STDIN or file
+- ✅ Reads YAML via `--yaml` or `.yml`/`.yaml` files (auto-converted to JSON on the fly)
 - ✅ **Interactive mode** for exploring JSON line-by-line
 - ✅ `--use` option to select decoder (JSON::PP, JSON::XS, etc.)
 - ✅ `--debug` option to show active JSON module
@@ -94,6 +95,7 @@ It allows you to extract, traverse, and filter JSON data using a simplified jq-l
 | `tojson`      | Encode any value as JSON text (unreleased)                |
 | `fromjson`    | Decode JSON text into native values (arrays handled element-wise) (unreleased) |
 | `to_number`   | Convert numeric-looking strings/booleans to numbers (v0.72) |
+| `tonumber`    | Strict numeric conversion that raises on invalid input (v1.19) |
 | `trim`        | Remove leading/trailing whitespace from strings (v0.50) |
 | `ltrimstr(prefix)` | Remove `prefix` from the start of strings when present (v0.87) |
 | `rtrimstr(suffix)` | Remove `suffix` from the end of strings when present (v0.87) |
@@ -143,6 +145,27 @@ It allows you to extract, traverse, and filter JSON data using a simplified jq-l
 | `is_empty`     | True when the value is an empty array or object (v0.41)   |
 | `expr // fallback` | Use jq's alternative operator to supply defaults when the left side is null or missing (v1.02) |
 | `default(value)` | Substitute a fallback value when the result is undef/null (v0.42) |
+
+### 🔢 Arithmetic expressions
+
+`JQ::Lite` understands numeric expressions with the usual operator precedence:
+
+- `*`, `/`, and `%` bind tighter than `+` and `-`
+- Parentheses force explicit grouping
+- Unary minus (`-expr`) works for negation
+
+The math helpers `floor()`, `ceil()`, `round()`, and the strict `tonumber()` converter are available both as pipeline filters and inside expressions. Division or modulo by zero raises a descriptive error so mistakes are caught early.
+
+```bash
+# Convert bytes to mebibytes and drop the fractional part
+jq-lite '.mem.used_bytes / 1048576 | floor' stats.json
+
+# Explicit conversions before adding numbers stored as strings
+jq-lite 'tonumber(.s) + 1' sample.json
+
+# Parentheses give you full control over evaluation order
+jq-lite '(1 + 2) * 3'
+```
 
 ---
 
@@ -223,7 +246,7 @@ Except BusyBox-only systems, lightweight distros like Alpine can run `jq-lite` s
 | Environment | jq-lite Support | Notes |
 |--------------|----------------|-------|
 | **No internet (CPAN disabled)** | ✅ Works (offline) | Copy tarball (`cpanm --look JQ::Lite`) and install manually via `perl Makefile.PL && make install`. |
-| **Proxy environment** | ✅ Supported | Example: `cpanm -v --proxy http://sysworks101z.prod.jp.local:3128 JQ::Lite`. |
+| **Proxy environment** | ✅ Supported | Example: `cpanm -v JQ::Lite`. |
 | **No root privilege** | ✅ Supported | Use `cpanm --local-lib ~/perl5 JQ::Lite` for user-space installation. |
 
 ✅ **Conclusion:**  
@@ -271,6 +294,9 @@ cat users.json | jq-lite '.users[].name'
 jq-lite '.users[] | select(.age > 25)' users.json
 jq-lite -r '.users[].name' users.json
 jq-lite -c '.users[0]' users.json
+# YAML input (auto-detected by extension or by using --yaml)
+jq-lite '.users[].name' users.yaml
+cat users.yaml | jq-lite --yaml '.users[].name'
 ```
 
 For Windows:
@@ -284,6 +310,10 @@ jq-lite -r ".users[].name" users.json
 
 Use `-c` / `--compact-output` when you need jq-style single-line JSON that is
 easier to pipe into other tools or compare in scripts.
+
+When parsing YAML, `jq-lite` automatically selects `YAML::XS`, `YAML::PP`, or the
+core `CPAN::Meta::YAML` parser (in that order of preference) and converts the
+data to JSON before running filters.
 
 ---
 
@@ -406,5 +436,8 @@ This module is released under the same terms as Perl itself.
 **Kawamura Shingo**  
 📧 pannakoota1@gmail.com  
 🔗 [GitHub @kawamurashingo](https://github.com/kawamurashingo/JQ-Lite)
+
+
+
 
 

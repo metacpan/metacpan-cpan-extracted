@@ -281,7 +281,7 @@ Note that timers do not necessarily expire at the precise time configured with t
 it is subject to the C<AccuracySec> setting below.
 
 May be specified more than once, in which case the timer unit will trigger whenever any of the
-specified expressions elapse. Moreover calendar timers and monotonic timers (see above) may be
+specified expressions elapse. Moreover, calendar timers and monotonic timers (see above) may be
 combined within the same timer unit.
 
 If the empty string is assigned to any of these options, the list of timers is reset (both
@@ -344,13 +344,13 @@ and explanations and how both settings play together, see below.',
       {
         'description' => 'Delay the timer by a randomly selected, evenly distributed amount of time between 0
 and the specified time value. Defaults to 0, indicating that no randomized delay shall be applied.
-Each timer unit will determine this delay randomly before each iteration, and the delay will simply
-be added on top of the next determined elapsing time, unless modified with
-C<FixedRandomDelay>, see below.
+Each timer unit will determine this delay randomly before each iteration, unless modified with
+C<FixedRandomDelay>, see below. The delay is added on top of the next determined
+elapsing time or the service manager\'s startup time, whichever is later.
 
 This setting is useful to stretch dispatching of similarly configured timer events over a
 certain time interval, to prevent them from firing all at the same time, possibly resulting in
-resource congestion.
+resource congestion on the local system.
 
 Note the relation to C<AccuracySec> above: the latter allows the service
 manager to coalesce timer events within a specified time range in order to minimize wakeups, while
@@ -368,21 +368,50 @@ C<AccuracySec=1us> and C<RandomizedDelaySec> to some higher value.
       },
       'FixedRandomDelay',
       {
-        'description' => 'Takes a boolean argument. When enabled, the randomized offset specified by
-C<RandomizedDelaySec> is reused for all firings of the same timer. For a given timer
-unit, the offset depends on the machine ID, user identifier and timer name, which means that it is
-stable between restarts of the manager. This effectively creates a fixed offset for an individual
-timer, reducing the jitter in firings of this timer, while still avoiding firing at the same time as
-other similarly configured timers.
+        'description' => 'Takes a boolean argument. When enabled, the randomized delay specified by
+C<RandomizedDelaySec> is chosen deterministically, and remains stable between all
+firings of the same timer, even if the manager is restarted. The delay is derived from the machine
+ID, the manager\'s user identifier, and the timer unit\'s name. This effectively creates a unique fixed
+offset for each timer, reducing the jitter in firings of an individual timer while still avoiding
+firing at the same time as other similarly configured timers.
 
-This setting has no effect if C<RandomizedDelaySec> is set to 0. Defaults to
+This setting has an effect only if C<RandomizedDelaySec> is not 0. Defaults to
 C<false>.',
         'type' => 'leaf',
+        'upstream_default' => 'no',
         'value_type' => 'boolean',
         'write_as' => [
           'no',
           'yes'
         ]
+      },
+      'RandomizedOffsetSec',
+      {
+        'description' => 'Offsets the timer by a stable, randomly-selected, and evenly distributed amount of
+time between 0 and the specified time value. Defaults to 0, indicating that no such offset shall be
+applied. The offset is chosen deterministically, and is derived the same way as
+C<FixedRandomDelay>, see above. The offset is added on top of the next determined
+elapsing time. This setting only has an effect on timers configured with C<OnCalendar>,
+and it can be combined with C<RandomizedDelaySec>.
+
+Much like C<RandomizedDelaySec>, this setting is for distributing timer events
+to prevent them from firing all at once. However, this setting is most useful to prevent resource
+congestion on a remote service, from a fleet of similarly-configured clients. Unlike
+C<RandomizedDelaySec>, this setting applies its offset with no regard to manager
+startup time. This maintains the periodicity of configured C<OnCalendar> events
+across manager restarts.
+
+For example, let\'s say you\'re running a backup service and have a fleet of laptops that wish
+to make backups weekly. To distribute load on the backup service, each laptop should randomly pick
+a weekday to upload its backups. This could be achieved by setting C<OnCalendar> to
+C<weekly>, and then configuring a C<RandomizedDelaySec> of
+C<5 days> with C<FixedRandomDelay> enabled. Let\'s say that some
+laptop randomly chooses a delay of 4 days. If this laptop is restarted more often than that, then the
+timer will never fire: on each fresh boot, the 4 day delay is restarted and will not be finished by
+the time of the next shutdown. Instead, you should use C<RandomizedOffsetSec>, which
+will maintain the configured weekly cadence of timer events, even across reboots.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
       },
       'DeferReactivation',
       {
@@ -396,9 +425,10 @@ finishes running. This happens because the timer schedules the next elapse based
 time, and since the interval is shorter than the service runtime, that elapse will be in the past,
 causing it to immediately trigger once done.
 
-This setting has no effect if a realtime timer has not been specified with
+This setting has an effect only if a realtime timer has been specified with
 C<OnCalendar>. Defaults to C<false>.',
         'type' => 'leaf',
+        'upstream_default' => 'no',
         'value_type' => 'boolean',
         'write_as' => [
           'no',
@@ -454,6 +484,7 @@ unit. See
 L<systemctl(1)> for
 details.",
         'type' => 'leaf',
+        'upstream_default' => 'no',
         'value_type' => 'boolean',
         'write_as' => [
           'no',
@@ -480,6 +511,7 @@ advancing during system suspend (C<CLOCK_BOOTTIME>), see
 L<clock_getres(2)> for
 details.',
         'type' => 'leaf',
+        'upstream_default' => 'no',
         'value_type' => 'boolean',
         'write_as' => [
           'no',
@@ -498,6 +530,7 @@ if C<RemainAfterElapse> is off and the timer unit was already unloaded, it can b
 started again, and thus the service can be triggered multiple times. Defaults to
 C<true>.',
         'type' => 'leaf',
+        'upstream_default' => 'yes',
         'value_type' => 'boolean',
         'write_as' => [
           'no',
@@ -505,7 +538,7 @@ C<true>.',
         ]
       }
     ],
-    'generated_by' => 'parse-man.pl from systemd 257 doc',
+    'generated_by' => 'parse-man.pl from systemd 258 doc',
     'license' => 'LGPLv2.1+',
     'name' => 'Systemd::Section::Timer'
   }

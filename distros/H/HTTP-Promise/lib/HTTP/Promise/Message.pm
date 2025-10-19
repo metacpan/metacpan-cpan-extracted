@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise/Message.pm
-## Version v0.3.1
-## Copyright(c) 2024 DEGUEST Pte. Ltd.
+## Version v0.3.2
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/03/21
-## Modified 2025/08/30
+## Modified 2025/10/19
 ## All rights reserved.
 ## 
 ## 
@@ -18,7 +18,7 @@ BEGIN
     use warnings;
     warnings::register_categories( 'HTTP::Promise' );
     use parent qw( Module::Generic );
-    use vars qw( $DEBUG $ERROR $AUTOLOAD $CRLF $HTTP_VERSION );
+    use vars qw( $DEBUG $AUTOLOAD $CRLF $HTTP_VERSION );
     use Data::UUID;
     require HTTP::Promise::Headers;
     # use Nice::Try;
@@ -26,7 +26,7 @@ BEGIN
     our $CRLF = "\015\012";
     # HTTP/1.0, HTTP/1.1, HTTP/2
     our $HTTP_VERSION  = qr/(?<http_protocol>HTTP\/(?<http_version>(?<http_vers_major>[0-9])(?:\.(?<http_vers_minor>[0-9]))?))/;
-    our $VERSION = 'v0.3.1';
+    our $VERSION = 'v0.3.2';
 };
 
 use strict;
@@ -1154,7 +1154,7 @@ HTTP::Promise::Message - HTTP Message Class
 
 =head1 VERSION
 
-    v0.3.1
+    v0.3.2
 
 =head1 DESCRIPTION
 

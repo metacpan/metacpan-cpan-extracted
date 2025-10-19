@@ -4,15 +4,15 @@
 
 =head2 Scheduling
 
-Schedule construction is rudimentary.  Node filtering requires updating the scheduler to build per-action instead of per-activity.  Multiple proposals are being considered for rescheduling, scheduling adjustment to target different attributes, as well as attribute-level goals.  Other feature improvements below are related to scheduling.
+Multiple proposals are being considered for rescheduling, scheduling adjustment to target different attributes, as well as attribute-level goals.  Other feature improvements below are related to scheduling.
 
 =head2 Message support
 
-No additional features planned.  As of version 0.1.2, messages can be strings, arrays, a hash of alternates, a named message key, or a hash named message.  Named messages are supported for action nodes and annotations.  Attributes are supported in hash-alternate configurations and within named messages.
+No additional features planned.  Messages can be strings, arrays, a hash of alternates, a named message key, or a hash named message.  Named messages are supported for action nodes and annotations.  Attributes are supported in hash-alternate configurations and within named messages.
 
 =head2 Attributes
 
-Planned improvements include helpers to merge annotation attributes into schedules, additional reporting functions, node filtering, and automatic mapping of attributes for some action node parameters (eg limits).  As of 0.1.2, attributes are fully supported in messages and action nodes.  As of 0.1.3, precedence has been established for node/message attribute overlap.  As of 0.1.5, average values have moved to a rolling algorithm to improve efficiency, which means that no historic/past entry of a value is possible.
+Planned improvements include helpers to merge annotation attributes into schedules, additional reporting functions, and automatic mapping of attributes for some action node parameters (eg limits).  As of 0.1.2, attributes are fully supported in messages and action nodes.  As of 0.1.3, precedence has been established for node/message attribute overlap.  As of 0.1.5, average values have moved to a rolling algorithm to improve efficiency, which means that no historic/past entry of a value is possible.
 
 =head2 Annotations
 
@@ -20,15 +20,23 @@ Planned improvements include helpers to merge annotation attributes into schedul
 
 =head2 Node filtering
 
-Node filtering has been prototyped and is almost ready!  This will provide node activation conditional upon current attribute values using common operators (lt/gt/eq/ne/le/ge), support booleans over filter lists, as well as checking elapsed time since last attribute update.  Proposed is conditioning upon the current attribute average value, but this requires some updates to the nodes to improve performance.  No mechanism has yet been decided to automatically track repeat counts per node.
+Node filtering is experimental starting in 0.1.6.  Filters support Booleans and attribute numeric comparisons.  Average value filtering should work but is not well tested.  Because per-node limits differ between limit-per-activity and limit-per-schedule, it's not clear that a special mechanism will be created to provide these limits, which can be achieved by setting the attribute to zero at the appropriate point and filtering normally.
+
+=head2 Near-buffer limitation
+
+See L<Schedule::Activity/BUGS>.  If a conclusion node can be reached, there are more circumstances where it should be chosen to complete scheduling.  The arithmetic for available buffer time should be updated to include the tmmax of the final node, where applicable.
+
+=head2 Tutorial
+
+In addition to the samples listed below, a tutorial is planned to take an existing, linear schedule, and deconstruct it into activities/actions, messages, and annotation groups.
 
 =head2 Action limits
 
-As a special case of Attributes, a shortcut of the form C<limit=N> can be supported.  While the case C<limit=1> is not the primary/initial use case of the scheduler, it makes sense that some events would specifically never be repeated.  Implementation requires Attributes and Node filtering.
+The case C<limit=1> is not the primary/initial use case of this scheduler, but some events will likely never be repeated.  This can already be achieved by setting the attribute to zero initially, incrementing as appropriate, and then filtering.  Because there's a difference between limit-per-activity and limit-per-schedule, it's not clear that a special mechanism will be created.
 
 =head2 Tension configuration
 
-Scheduling tension is currently only available for buffer time, but it should also be configurable for slack time.
+Scheduling tension is currently only available for buffer time, but it should also be configurable for slack time.  Note that this setting is related to the current one-alternative bug, because it restricts finding an otherwise-filtered node when scheduling near the maximum buffer.
 
 =head2 Slack/buffer defaults
 

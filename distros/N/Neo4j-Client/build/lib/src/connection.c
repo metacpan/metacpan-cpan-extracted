@@ -64,7 +64,9 @@ static int ack_failure(neo4j_connection_t *connection  );
 static int ack_failure_callback(void *cdata, neo4j_message_type_t type,
        const neo4j_value_t *argv, uint16_t argc);
 
-static int hello(neo4j_connection_t *connection);
+#if __has_attribute(unused)
+static int hello(neo4j_connection_t *connection) __attribute__((unused));
+#endif
 static int goodbye(neo4j_connection_t *connection);
 
 static neo4j_map_entry_t xtra[2];
@@ -317,8 +319,8 @@ neo4j_connection_t *establish_connection(const char *hostname,
 
     neo4j_log_info(logger, "connected (%p) to %s:%u%s", (void *)connection,
             hostname, port, connection->insecure? " (insecure)" : "");
-    neo4j_log_debug(logger, "connection %p using protocol version %d",
-            (void *)connection, protocol_version);
+    neo4j_log_debug(logger, "connection %p using protocol version %d.%d",
+            (void *)connection, protocol_version, protocol_minor_version);
     neo4j_atomic_bool_set(&(connection->poison_tx),false);
     return connection;
 
@@ -455,8 +457,8 @@ int negotiate_protocol_version(neo4j_iostream_t *iostream,
         return -1;
     }
     agreed_version = ntohl(agreed_version);
-    *protocol_version = agreed_version & 0007;
-    *protocol_minor_version = (agreed_version & 0700) >> 8;
+    *protocol_version = agreed_version & 0x0007;
+    *protocol_minor_version = (agreed_version & 0x0700) >> 8;
     return 0;
 }
 
@@ -1230,6 +1232,19 @@ int initialize(neo4j_connection_t *connection)
       req->argv = req->_argv;
       req->argc = 2;
       }
+    else if (connection->version == 4 && connection->minor_version == 4)
+      {
+        neo4j_value_t patch_bolt[1] = {neo4j_string("utc")};
+        neo4j_map_entry_t auth_token[5] =
+          { neo4j_map_entry("user_agent", neo4j_string(config->client_id)),
+            neo4j_map_entry("scheme", neo4j_string("basic")),
+            neo4j_map_entry("principal", neo4j_string(config->username)),
+            neo4j_map_entry("credentials", neo4j_string(config->password)),
+            neo4j_map_entry("patch_bolt", neo4j_list(patch_bolt, 1)) };
+        req->_argv[0] = neo4j_map(auth_token, 5);
+        req->argv = req->_argv;
+        req->argc = 1;
+      }
     else
       {
         neo4j_map_entry_t auth_token[4] =
@@ -1283,10 +1298,12 @@ cleanup:
 
 // hello - alias for initialize (Bolt 3.0)
 
+#if __has_attribute(unused)
 int hello(neo4j_connection_t *connection)
 {
     return initialize(connection);
 }
+#endif
 
 // Note (Bolt 3.0)
 // The GOODBYE message does not generate a server response. It signals a graceful
@@ -1744,6 +1761,12 @@ int parse_version_string(char *version_string, version_spec_t *vs) {
     break;
   case 3:
     m1 = 0;
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L
+    [[fallthrough]];
+#elif __has_attribute(fallthrough)
+    __attribute__((fallthrough));
+#endif
+    /* FALLTHROUGH */
   case 4:
     if (M0 != M1) {
       // Only minor version ranges within a single major version allowed

@@ -1,0 +1,16 @@
+Revision history for IO::Trace
+
+0.021 2025-10-18 21:00:00
+ - Copy hooks/iotrace from Git::Server to act like strace
+ * Retain git history from github.com/hookbot/git-server
+ * Also replay partial git history for t/*iotrace*.t tests
+ * Support: -v -vv+ -x -xx -o<FILE>
+ * Emulate: -f -ff
+ * Ignore: -e -q -qq -qqq -qqqq -s<SIZE>
+ - Rename hooks/iotrace to bin/iotrace
+ - Move code from iotrace to IO::Trace
+ - Reduce race condition dangers in tests
+
+0.01  2025-10-09 15:17:12
+ - original version; created by h2xs 1.23:
+   h2xs -b 5.6.0 -Afn IO::Trace

@@ -69,7 +69,7 @@ struct neo4j_transaction
   neo4j_value_t extra; // client-side message arguments
   int timeout; // client-side timeout in ms requested
   const char *mode; // client-side mode string : "w" write, "r" read
-  const char *dbname; // client-side database name string (Bolt 4+)
+  char *dbname; // client-side database name string (Bolt 4+)
   neo4j_value_t failure_code; // server-side failure code (neo4j_string)
   neo4j_value_t failure_message; // server-side failure message (neo4j_string)
 };

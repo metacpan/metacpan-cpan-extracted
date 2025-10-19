@@ -1,5 +1,8 @@
 Revision history for Perl module DateTime::Format::RelativeTime
 
+v0.2.1 2025-10-19T16:05:48+0900
+    - Corrected missing dependency declaration for Wanted. Gitlab #2
+
 v0.2.0 2025-10-16T09:15:09+0900
     - Update dependency from Want to Wanted
 

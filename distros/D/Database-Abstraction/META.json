@@ -40,8 +40,8 @@
             "File::Spec" : "0",
             "File::Temp" : "0",
             "File::pfopen" : "0.03",
-            "Log::Abstraction" : "0.24",
-            "Object::Configure" : "0.12",
+            "Log::Abstraction" : "0.26",
+            "Object::Configure" : "0.16",
             "Params::Get" : "0.13",
             "Scalar::Util" : "0",
             "autodie" : "0",
@@ -91,6 +91,6 @@
          "x_repository" : "https://github.com/nigelhorne/Database-Abstraction"
       }
    },
-   "version" : "0.32",
+   "version" : "0.33",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -15,7 +15,7 @@ use parent 'File::Information::Base';
 
 use Carp;
 
-our $VERSION = v0.13;
+our $VERSION = v0.14;
 
 my @_copy_properties = (
     qw(dos_device dos_path),
@@ -95,7 +95,7 @@ File::Information::Filesystem - generic module for extracting information from f
 
 =head1 VERSION
 
-version v0.13
+version v0.14
 
 =head1 SYNOPSIS
 

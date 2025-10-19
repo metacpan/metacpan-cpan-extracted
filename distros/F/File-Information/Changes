@@ -1,3 +1,10 @@
+v0.14  2025-10-19Z
+    - Added --wellknown to file-information-dump
+    - Added support to peek to file-information-dump
+      including new --peek-limit
+    - Added chunk logic
+    - Added support to read chunks from vmv0 files
+
 v0.13  2025-09-22Z
     - Added support to read GIMP palette files
     - Added support to read X11 rgb.txt files

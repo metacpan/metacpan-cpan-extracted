@@ -29,6 +29,7 @@
 #pragma GCC diagnostic ignored "-Wcast-qual"
 #include <openssl/x509v3.h>
 #include <openssl/err.h>
+#include <openssl/crypto.h>
 #pragma GCC diagnostic pop
 
 #define NEO4J_CYPHER_LIST "HIGH:!EXPORT:!aNULL@STRENGTH"
@@ -431,7 +432,7 @@ int cert_fingerprint(X509* cert, char *buf, size_t n, neo4j_logger_t *logger)
     unsigned int dlen;
     if (sha512_digest(digest, &dlen, der, derlen, logger))
     {
-        free(der);
+        OPENSSL_free(der);
         return -1;
     }
     assert(dlen <= EVP_MAX_MD_SIZE);
@@ -443,6 +444,7 @@ int cert_fingerprint(X509* cert, char *buf, size_t n, neo4j_logger_t *logger)
         c += 2;
     }
 
+    OPENSSL_free(der);
     return 0;
 }
 

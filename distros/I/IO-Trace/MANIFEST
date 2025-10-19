@@ -1,0 +1,27 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+TODO
+LICENSE
+lib/IO/Trace.pm
+bin/iotrace
+t/01-compile-modules.t
+t/02-compile-scripts.t
+t/11-iotrace-usage.t
+t/12-iotrace-exit.t
+t/14-iotrace-time.t
+t/15-iotrace-quiet.t
+t/16-iotrace-verbose.t
+t/19-iotrace-slow-fds.t
+t/20-iotrace-target-close-0.t
+t/21-iotrace-target-close-1.t
+t/22-iotrace-target-close-2.t
+t/23-iotrace-implicit.t
+t/24-iotrace-closeall.t
+t/25-iotrace-background.t
+t/30-iotrace-caller-close-0.t
+t/31-iotrace-caller-close-1.t
+t/32-iotrace-caller-close-2.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

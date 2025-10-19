@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use Schedule::Activity;
-use Test::More tests=>12;
+use Test::More tests=>13;
 
 subtest 'validation'=>sub {
 	plan tests=>2;
@@ -452,6 +452,69 @@ subtest 'Named messages'=>sub {
 		['Begin Activity','Conclude Activity','Named one one','Named one two','Named two one','Named two two'],
 		'All messages');
 	is_deeply($result{attr},{attr1=>1,attr21=>1,attr22=>1},'All attributes');
+};
+
+subtest 'Node filtering'=>sub {
+	plan tests=>3;
+	my (%schedule,%seen,$pass);
+	my %configuration=(
+		node=>{
+			Activity=>{
+				message=>'Begin Activity',
+				next=>['action 1'],
+				tmmin=>5,tmavg=>5,tmmax=>5,
+				finish=>'Activity, conclude',
+				attributes=>{act1=>{set=>0},act2=>{set=>0}},
+			},
+			'action 1'=>{
+				message=>['Begin action 1'],
+				tmmin=>5,tmavg=>5,tmmax=>5,
+				next=>['action 1','action 2','Activity, conclude'],
+				attributes=>{act1=>{incr=>1}},
+			},
+			'action 2'=>{
+				message=>'Begin action 2',
+				tmmin=>0,tmavg=>10,tmmax=>30,
+				next=>['Activity, conclude'],
+				require=>{attr=>'act1',op=>'ge',value=>3},
+			},
+			'Activity, conclude'=>{
+				message=>'Conclude Activity',
+				tmmin=>0,tmavg=>5,tmmax=>10,
+			},
+		},
+	);
+	$pass=1;
+	foreach (1..20) {
+		%schedule=Schedule::Activity::buildSchedule(configuration=>\%configuration,activities=>[[20,'Activity']]);
+		%seen=map {$$_[1]{message}=>1} @{$schedule{activities}};
+		if(!defined($seen{'Begin action 1'})||defined($seen{'Begin action 2'})) { $pass=0 }
+	}
+	ok($pass,'Blocked node never appears');
+	#
+	$pass=1;
+	$configuration{node}{'action 2'}{require}{value}=4;
+	foreach (1..20) {
+		if(!$pass) { next }
+		%schedule=Schedule::Activity::buildSchedule(configuration=>\%configuration,activities=>[[40,'Activity']]);
+		%seen=();
+		foreach my $message (map {$$_[1]{message}} @{$schedule{activities}}) {
+			if($message eq 'Begin action 2') { if($seen{'Begin action 1'}<4) { $pass=0 } }
+			else { $seen{$message}++ }
+		}
+	}
+	ok($pass,'Require prereq node count');
+	#
+	$pass=1;
+	$configuration{node}{'action 1'}{next}=['Activity, conclude','action 1',map {'action 2'} (1..99)];
+	$configuration{node}{'action 2'}{require}={attr=>'act2',op=>'ge',value=>1};
+	foreach (1..20) {
+		if(!$pass) { next }
+		%schedule=Schedule::Activity::buildSchedule(configuration=>\%configuration,activities=>[[40,'Activity']]);
+		%seen=map {$$_[1]{message}=>1} @{$schedule{activities}};
+		if($seen{'Begin action 2'}) { $pass=0 }
+	}
+	ok($pass,'Always blocked node never appears');
 };
 
 subtest 'Markdown loading'=>sub {

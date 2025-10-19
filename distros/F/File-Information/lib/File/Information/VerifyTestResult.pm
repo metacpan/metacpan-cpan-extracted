@@ -15,7 +15,7 @@ use parent 'File::Information::VerifyBase';
 
 use Carp;
 
-our $VERSION = v0.13;
+our $VERSION = v0.14;
 
 use constant {
     CLASS_METADATA  => 'meatdata',
@@ -141,7 +141,7 @@ File::Information::VerifyTestResult - generic module for extracting information 
 
 =head1 VERSION
 
-version v0.13
+version v0.14
 
 =head1 SYNOPSIS
 

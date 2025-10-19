@@ -15,7 +15,7 @@ use Carp;
 use Data::Identifier v0.08;
 use parent 'Data::Identifier::Interface::Known';
 
-our $VERSION = v0.07;
+our $VERSION = v0.08;
 
 my @wellknown = (
     Data::Identifier->new(uuid => '54bf8af4-b1d7-44da-af48-5278d11e8f32', displayname => 'ValueFile'),
@@ -87,7 +87,7 @@ File::ValueFile - module for reading and writing ValueFile files
 
 =head1 VERSION
 
-version v0.07
+version v0.08
 
 =head1 SYNOPSIS
 

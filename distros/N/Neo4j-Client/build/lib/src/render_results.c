@@ -520,8 +520,9 @@ int write_value(FILE *stream, const neo4j_value_t *value,
     assert(*bufcap >= 2);
     do
     {
-        size_t required = neo4j_ntostring(*value, *buf, *bufcap);
-        if (required < *bufcap)
+        ssize_t required = neo4j_ntostring(*value, *buf, *bufcap);
+        assert(required >= 0);
+        if ((size_t)required < *bufcap)
         {
             break;
         }

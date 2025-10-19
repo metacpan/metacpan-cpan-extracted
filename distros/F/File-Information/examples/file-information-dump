@@ -14,8 +14,9 @@ unshift(@as_types, 'DateTime')          if eval { require DateTime;         1 };
 unshift(@as_types, 'Data::Identifier');
 
 my %config = (
-    digest_as => undef,
+    digest_as  => undef,
     key_length => undef,
+    peek_limit => 16,
 );
 
 my $instance;
@@ -33,11 +34,16 @@ my $instance;
         } elsif ($opt eq '--extractor') {
             require Data::URIID;
             $settings{extractor} = Data::URIID->new;
+        } elsif ($opt eq '--wellknown') {
+            require Data::Identifier::Wellknown;
+            Data::Identifier::Wellknown->import(':all');
         } elsif ($opt eq '--digest-as' && scalar(@ARGV)) {
             $config{digest_as} = shift(@ARGV);
         } elsif ($opt eq '--key-length' && scalar(@ARGV)) {
             $config{key_length} = int(shift(@ARGV));
-        } elsif ($opt =~ /^--skip-(?:inode|deep|filesystem|tagpool)$/) {
+        } elsif ($opt eq '--peek-limit' && scalar(@ARGV)) {
+            $config{peek_limit} = int(shift(@ARGV));
+        } elsif ($opt =~ /^--skip-(?:inode|deep|filesystem|tagpool|chunk)$/) {
             $config{$opt =~ s/^--//r =~ s/-/_/gr} = 1;
         } elsif ($opt eq '--tagpool-rc' && scalar(@ARGV)) {
             push(@{$settings{tagpool_rc} //= []}, shift(@ARGV));
@@ -53,11 +59,14 @@ my $instance;
             say 'OPTIONS:';
             say '   --database DSN              - Opens the given database via Data::TagDB';
             say '   --extractor                 - Creates an extractor (experimental!)';
+            say '   --wellknown                 - Load additional well known tags';
             say '   --digest-as TYPE            - Selects the digest rendering';
             say '                                 Common values are: hex (default), b64, and utag';
             say '   --key-length NUM            - The assumed length for all keys';
             say '                                 Set to 0 for most diff-able output.';
-            say ' * --skip-{inode|deep|filesystem|tagpool}';
+            say '   --peek-limit NUM            - How many bytes at most should be reported for peeks';
+            say '                                 Set to 0 to disable peeks.';
+            say ' * --skip-{inode|deep|filesystem|tagpool|chunk}';
             say '                               - Skips display of the named subobject';
             say ' * --tagpool-rc FILE           - Selects the tagpool config to use';
             say ' * --tagpool-path PATH         - Selects the tagpool paths to use';
@@ -81,6 +90,8 @@ shift(@ARGV) if scalar(@ARGV) && $ARGV[0] eq '--';
 
 foreach my $filename (@ARGV) {
     my $link = $instance->for_link(path => $filename, symlinks => 'follow');
+    my %chunks;
+    my %chunks_seen;
 
     say $filename;
     say '-' x length($filename);
@@ -88,16 +99,31 @@ foreach my $filename (@ARGV) {
     eval {$link->deep};
 
     dump_base($link);
-    dump_base(scalar eval {$link->inode})       unless $config{skip_inode};
-    dump_base(scalar eval {$link->deep})        unless $config{skip_deep};
-    dump_base(scalar eval {$link->filesystem})  unless $config{skip_filesystem};
+    dump_base(scalar eval {$link->inode}, \%chunks)         unless $config{skip_inode};
+    dump_base(scalar eval {$link->deep}, \%chunks)          unless $config{skip_deep};
+    dump_base(scalar eval {$link->filesystem}, \%chunks)    unless $config{skip_filesystem};
     unless ($config{skip_tagpool}) {
-        dump_base($_) foreach eval {$link->tagpool};
+        dump_base($_, \%chunks) foreach eval {$link->tagpool};
+    }
+
+    unless ($config{skip_chunk}) {
+        while (1) {
+            my $found_new;
+
+            foreach my $chunk (keys %chunks) {
+                next if exists $chunks_seen{$chunk};
+                $found_new = 1;
+                $chunks_seen{$chunk} = undef;
+                dump_base($chunks{$chunk}, \%chunks);
+            }
+
+            last unless $found_new;
+        }
     }
 }
 
 sub dump_base {
-    my ($base) = @_;
+    my ($base, $chunks) = @_;
     my File::Information $instance;
     my @hashes;
     my @properties;
@@ -144,6 +170,11 @@ sub dump_base {
                 }
             }
         }
+
+        if (eval {$base->peek(wanted => 16); 1}) {
+            my $l = length('peek <>');
+            $max_len = $l if $l > $max_len;
+        }
     }
 
     # Print properties:
@@ -180,12 +211,26 @@ sub dump_base {
                         $value = sprintf('Colour <%s>', $value->rgb);
                     } elsif ($value->isa('File::FStore::File')) {
                         $value = sprintf('Store File <%s>', $value->dbname);
+                    } elsif ($value->isa('File::Information::Chunk')) {
+                        $chunks->{$value->get('chunk_cachehash')} = $value;
+                        $value = sprintf('Chunk <%s, %u bytes, %s, %s>',
+                            $value->get('chunk_cachehash'),
+                            $value->get('size'),
+                            scalar(eval {$value->get('chunk_outer_type', as => 'Data::Identifier', default => undef)->displayname}) // '?',
+                            scalar(eval {$value->get('chunk_inner_type', as => 'Data::Identifier', default => undef)->displayname}) // '?',
+                        );
                     }
                 } elsif ($type eq 'bool') {
                     $value = $value ? 'true' : 'false';
                 } elsif (looks_like_number($value)) {
                     # no-op
                 } else {
+                    if ($value =~ /[\0-\x1f\xc0\xc1\xf5-\xff]/) { # TODO: Improve regex!
+                        # Handle non-printable chars.
+                        print_hexdump($lifecycle, $max_len, $key, $value);
+                        next;
+                    }
+
                     $value = sprintf('\'%s\'', $value);
                 }
                 if ($first) {
@@ -226,6 +271,38 @@ sub dump_base {
                 }
             }
         }
+    }
+
+    if ($config{peek_limit} && defined(my $data = eval {$base->peek(wanted => $config{peek_limit})})) {
+        print_hexdump('current', $max_len, 'peek <>', $data, $config{peek_limit});
+    }
+}
+
+sub print_hexdump {
+    my ($lifecycle, $max_len, $key, $in, $limit) = @_;
+    my $line;
+    my $first = 1;
+    my $offset = 0;
+
+    $in = substr($in, 0, $limit) if defined $limit;
+
+    while (length(my $data = substr($in, 0, 16, ''))) {
+        $line = unpack('H*', $data);
+
+        $line =~ s/(....)/$1 /g;
+        $line =~ s/^((?:.... ){4})(\S)/$1 $2/;
+
+        $line .= ' ' x (41 - length($line));
+        $line .= '| '.($data =~ tr/\x20-\x7E/./cr);
+
+        if ($first) {
+            printf("  %7s :: %-*s = %06x: %s\n", $lifecycle, $max_len, $key, $offset, $line);
+            $first = undef;
+        } else {
+            printf("%s & %06x: %s\n", ' ' x ($max_len + 7 + 6), $offset, $line);
+        }
+
+        $offset += length($data);
     }
 }
 

@@ -4,7 +4,7 @@ use strict;
 use FindBin qw($Bin);
 
 use File::Spec;
-use Test::Most tests => 22;
+use Test::Most tests => 25;
 use Test::NoWarnings;
 
 use lib 't/lib';
@@ -43,7 +43,9 @@ if($ENV{'TEST_VERBOSE'}) {
 	diag(Data::Dumper->new([\@rc])->Dump());
 }
 
-cmp_ok(scalar(@rc), '==', 4, 'selectall_hashref returns all entries');
+cmp_ok(scalar(@rc), '==', 4, 'selectall_hash returns all entries');
+
+cmp_ok(scalar(@{$test1->selectall_arrayref()}), '==', 4, 'selectall_arrayref returns all entries');
 
 my $entry = $test1->entry(number => 2);
 cmp_ok($test1->count(number => 2), '==', 1, 'count returns 1');
@@ -70,3 +72,7 @@ like($@, qr/There is no column foo in test1/, 'Correct test message for invalid 
 my $unknown;
 lives_ok(sub { $unknown = $test1->number('empty') }, 'AUTOLOAD survives empty column');
 ok(!defined($unknown));
+
+# Test undef
+lives_ok(sub { my $res = $test1->fetchrow_hashref({ number => undef }) }, 'fetchrow_hashref: undef can be used, will search IS NULL');
+lives_ok(sub { my @rc = $test1->selectall_hash(number => undef) }, 'selectall_hash: undef can be used, will search IS NULL');

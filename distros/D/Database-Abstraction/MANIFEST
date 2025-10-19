@@ -50,6 +50,7 @@ t/pod-spelling.t
 t/pod-synopsis.t
 t/pod.t
 t/psv.t
+t/strict.t
 t/tabs.t
 t/test7.t
 t/test8.t

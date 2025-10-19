@@ -1,3 +1,39 @@
+1.20  2025-10-19
+    [Feature]
+    - Introduce a dedicated arithmetic expression engine with numeric operators,
+      precedence-aware parsing, and builtin math helpers.
+
+    [Maintenance]
+    - Ensure expression evaluation defers to existing filter handlers for
+      non-math builtins so prior queries remain compatible.
+
+1.19  2025-10-19
+    - Fixed Kwalitee issue: "no_files_to_be_skipped"
+    - Updated MANIFEST.SKIP to correctly preserve META.json while excluding other JSON files
+    - Ensured proper handling of .git/, .github/ and temporary files
+    - Rebuilt META.json and MANIFEST to align with CPAN packaging standards
+    - No functional code changes; this release focuses on distribution quality improvements
+
+1.18   2025-10-19
+    [Maintenance]
+    - Bump version to 1.18.
+
+1.17   2025-10-19
+    [Feature]
+    - Add optional YAML parsing to the jq-lite CLI via a --yaml flag and
+      automatic .yml/.yaml detection.
+
+    [Docs]
+    - Document YAML workflows, module fallbacks, and examples in the README.
+
+    [Tests]
+    - Add CLI regression coverage that exercises YAML input handling.
+
+1.16   2025-10-18
+    [Fixes]
+    - Configure the shared JSON::PP decoder with `allow_nonref` so Perl 5.22.3
+      environments accept scalar-only documents without dying.
+
 1.15   2025-10-18
     [Feature]
     - Implement jq-compatible addition handling so `+` performs numeric sums
@@ -774,6 +810,11 @@
     - Removed use of eval in _evaluate_condition for better performance and stability.
     - Refactored _traverse for readability and maintainability.
     - Added support for multi-level array traversal (e.g., .users[].friends[].name).
+
+
+
+
+
 
 
 

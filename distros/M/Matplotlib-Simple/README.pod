@@ -1,0 +1,53 @@
+=head1 NAME
+Matplotlib::Simple
+=head1 AUTHOR
+David E. Condon
+=head1 LICENSE
+FreeBSD
+=head1 SYNOPSIS
+Simplest possible use case:
+
+	use Matplotlib::Simple 'plot';
+	plot({
+		'output.filename' => '/tmp/gospel.word.counts.png',
+		'plot.type'       => 'bar',
+		data              => {
+			Matthew => 18345,
+			Mark    => 11304,
+			Luke    => 19482,
+			John    => 15635,
+		}
+	});
+	
+Having a `plots` argument as an array lets the module know to create subplots:
+
+	use Matplotlib::Simple 'plot';
+	plot({
+		'output.filename'	=> 'svg/pies.png',
+		plots             => [
+			{
+				data	=> {
+				 Russian => 106_000_000,  # Primarily European Russia
+				 German => 95_000_000,    # Germany, Austria, Switzerland, etc.
+				},
+				'plot.type'	=> 'pie',
+				title       => 'Top Languages in Europe',
+				suptitle    => 'Pie in subplots',
+			},
+			{
+				data	=> {
+				 Russian => 106_000_000,  # Primarily European Russia
+				 German => 95_000_000,    # Germany, Austria, Switzerland, etc.
+				},
+				'plot.type'	=> 'pie',
+				title       => 'Top Languages in Europe',
+			},
+		],
+		ncols    => 2,
+	});
+
+See https://github.com/hhg7/MatPlotLib-Simple for more detailed use cases (with images)
+
+
+=cut
+

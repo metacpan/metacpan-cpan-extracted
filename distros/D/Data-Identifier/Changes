@@ -1,3 +1,8 @@
+v0.19  2025-10-19Z
+    - Added basic support for host defined identifiers and user defined identifiers
+    - Added new SID and SNI values
+    - Added support for $identifier->as() to take a Data::Identifier as 'as'
+
 v0.18  2025-09-22Z
     - Added additional media subtypes to well known list
     - Updated sirtx-numerical-identifier list

@@ -1,0 +1,37 @@
+---
+abstract: 'Lightweight system monitoring toolkit with JSON output'
+author:
+  - 'Shingo Kawamura'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - system
+  - monitor
+  - json
+  - linux
+  - proc
+  - metrics
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Sys-Monitor-Lite
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  JSON::PP: '0'
+  Scalar::Util: '0'
+  Time::HiRes: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/kawamurashingo/sys-monitor-lite/issues
+  homepage: https://github.com/kawamurashingo/sys-monitor-lite
+  repository: https://github.com/kawamurashingo/sys-monitor-lite.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

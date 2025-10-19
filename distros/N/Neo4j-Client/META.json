@@ -4,7 +4,7 @@
       "Mark A. Jensen (majensen -at- cpan -dot- org)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "apache_2_0"
    ],
@@ -22,6 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "Alien::Base" : "0.036",
             "Alien::Build::MM" : "0.25",
             "Alien::Build::Plugin::Gather::IsolateDynamic" : "0.48",
             "Config" : "0",
@@ -32,23 +33,25 @@
       "configure" : {
          "requires" : {
             "Alien::Build" : "1.19",
-            "Alien::Build::MM" : "0.25",
+            "Alien::Build::MM" : "1.19",
             "Alien::Build::Plugin::Fetch::LocalDir" : "0.72",
-            "Alien::OpenSSL" : "0",
+            "Alien::OpenSSL" : "0.09",
             "Capture::Tiny" : "0",
             "Env" : "0",
+            "ExtUtils::MakeMaker" : "6.64",
             "File::Which" : "0",
-            "Path::Tiny" : "0"
+            "Path::Tiny" : "0.014"
          }
       },
       "runtime" : {
          "requires" : {
-            "Alien::Build" : "0.25",
-            "Alien::OpenSSL" : "0",
+            "Alien::Build" : "1.19",
+            "Alien::OpenSSL" : "0.09",
             "Capture::Tiny" : "0",
             "Env" : "0",
             "File::Which" : "0",
-            "Path::Tiny" : "0"
+            "Path::Tiny" : "0.014",
+            "perl" : "5.006"
          }
       },
       "test" : {
@@ -68,9 +71,9 @@
          "url" : "https://github.com/majensen/neoclient.git"
       }
    },
-   "version" : "0.54",
+   "version" : "0.55",
    "x_alienfile" : {
-      "generated_by" : "Alien::Build::MM version 2.83",
+      "generated_by" : "Alien::Build::MM version 2.84",
       "requires" : {
          "share" : {
             "Alien::Build::Plugin::Gather::IsolateDynamic" : "0.48",

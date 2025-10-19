@@ -3,7 +3,7 @@ package Schedule::Activity::Attribute;
 use strict;
 use warnings;
 
-our $VERSION='0.1.5';
+our $VERSION='0.1.6';
 
 my %types=(
 	int=>{
@@ -65,7 +65,7 @@ sub report {
 	return (
 		y  =>$$self{value},
 		xy =>[$self->_xy()],
-		avg=>$self->average(),
+		avg=>($self->average())[0],
 	);
 }
 
@@ -78,14 +78,15 @@ sub value {
 sub average {
 	my ($self)=@_;
 	if(defined($$self{avg})) { return $$self{avg} }
-	return &{$types{$$self{type}}{average}}($$self{log});
+	($$self{avg},$$self{tmsum})=&{$types{$$self{type}}{average}}($$self{log});
+	return $$self{avg};
 }
 
 sub dump {
 	my ($self)=@_;
 	my %res=(
 		log=>{ %{$$self{log}} },
-		(map {$_=>$$self{$_}} qw/type value tmmax/),
+		(map {$_=>$$self{$_}} qw/type value tmmax avg tmsum/),
 	);
 	return %res;
 }
@@ -101,6 +102,8 @@ sub restore {
 		value=>$opt{value}//0,
 		log  =>$opt{log}//{},
 		tmmax=>$opt{tmmax}//0,
+		avg  =>$opt{avg},
+		tmsum=>$opt{tmsum},
 	);
 	return bless(\%self,$ref);
 }
@@ -123,7 +126,7 @@ sub _changeInt {
 	if($opt{_log})         { }
 	#
 	my $dt=($opt{tm}//$$self{tmmax})-$$self{tmmax};
-	if($dt==0) { $$self{avg}=$$self{tmsum}=undef }
+	if($dt==0) { $$self{avg}=$$self{tmsum}=undef; $self->average() }
 	elsif(defined($$self{avg})) {
 		$$self{avg}=$$self{avg}*($$self{tmsum}/($$self{tmsum}+$dt))+0.5*($ya+$$self{value})*($dt/($$self{tmsum}+$dt));
 		$$self{tmsum}+=$dt;
@@ -141,7 +144,7 @@ sub _changeBool {
 	if($opt{_log})         { }
 	#
 	my $dt=($opt{tm}//$$self{tmmax})-$$self{tmmax};
-	if($dt==0) { $$self{avg}=$$self{tmsum}=undef }
+	if($dt==0) { $$self{avg}=$$self{tmsum}=undef; $self->average() }
 	elsif(defined($$self{avg})) {
 		$$self{avg}=$$self{avg}*$$self{tmsum}/($$self{tmsum}+$dt)+$dt*$ya/($$self{tmsum}+$dt);
 		$$self{tmsum}+=$dt;
@@ -161,7 +164,8 @@ sub _avgInt {
 		$lasttm=$tm;
 		$lasty=$$log{$tm};
 	}
-	return $avg;
+	if($weight==0) { return (undef,undef) }
+	return ($avg,$weight);
 }
 
 sub _avgBool {
@@ -175,8 +179,8 @@ sub _avgBool {
 		$lasttm=$tm;
 		$lasty=$$log{$tm};
 	}
-	if($weight==0) { return 0 }
-	return $sum/$weight;
+	if($weight==0) { return (undef,undef) }
+	return ($sum/$weight,$weight);
 }
 
 1;

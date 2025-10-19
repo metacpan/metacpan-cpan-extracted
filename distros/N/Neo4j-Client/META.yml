@@ -3,6 +3,7 @@ abstract: 'Build and use the libneo4j-omni library'
 author:
   - 'Mark A. Jensen (majensen -at- cpan -dot- org)'
 build_requires:
+  Alien::Base: '0.036'
   Alien::Build::MM: '0.25'
   Alien::Build::Plugin::Gather::IsolateDynamic: '0.48'
   Config: '0'
@@ -12,15 +13,16 @@ build_requires:
   tool::AM: '0'
 configure_requires:
   Alien::Build: '1.19'
-  Alien::Build::MM: '0.25'
+  Alien::Build::MM: '1.19'
   Alien::Build::Plugin::Fetch::LocalDir: '0.72'
-  Alien::OpenSSL: '0'
+  Alien::OpenSSL: '0.09'
   Capture::Tiny: '0'
   Env: '0'
+  ExtUtils::MakeMaker: '6.64'
   File::Which: '0'
-  Path::Tiny: '0'
+  Path::Tiny: '0.014'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,18 +33,19 @@ no_index:
     - t
     - inc
 requires:
-  Alien::Build: '0.25'
-  Alien::OpenSSL: '0'
+  Alien::Build: '1.19'
+  Alien::OpenSSL: '0.09'
   Capture::Tiny: '0'
   Env: '0'
   File::Which: '0'
-  Path::Tiny: '0'
+  Path::Tiny: '0.014'
+  perl: '5.006'
 resources:
   bugtracker: https://github.com/majensen/neoclient/issues
   repository: https://github.com/majensen/neoclient.git
-version: '0.54'
+version: '0.55'
 x_alienfile:
-  generated_by: 'Alien::Build::MM version 2.83'
+  generated_by: 'Alien::Build::MM version 2.84'
   requires:
     share:
       Alien::Build::Plugin::Gather::IsolateDynamic: '0.48'
@@ -52,4 +55,4 @@ x_alienfile:
     system: {}
 x_contributors:
   - 'Mohawk (ETJ)'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

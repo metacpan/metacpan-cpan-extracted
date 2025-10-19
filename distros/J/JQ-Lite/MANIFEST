@@ -2,6 +2,7 @@ bin/jq-lite
 Changes
 CONTRIBUTING.md
 lib/JQ/Lite.pm
+lib/JQ/Lite/Expression.pm
 lib/JQ/Lite/Filters.pm
 lib/JQ/Lite/Parser.pm
 lib/JQ/Lite/Util.pm
@@ -111,5 +112,6 @@ t/type.t
 t/unique_by.t
 t/values.t
 t/walk.t
+t/yaml_cli.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

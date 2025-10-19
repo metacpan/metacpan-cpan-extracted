@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise/Headers.pm
-## Version v0.3.0
+## Version v0.3.1
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/03/21
-## Modified 2025/10/12
+## Modified 2025/10/19
 ## All rights reserved.
 ## 
 ## 
@@ -47,7 +47,7 @@ BEGIN
     use constant CRLF => "\015\012";
     our $EXCEPTION_CLASS = 'HTTP::Promise::Exception';
     our $SUPPORTED = {};
-    our $VERSION = 'v0.3.0';
+    our $VERSION = 'v0.3.1';
 };
 
 use strict;
@@ -779,7 +779,9 @@ sub error
     {
         # Found an exception object using Module::Generic::Global
     }
-    elsif( !CAN_THREADS && CORE::defined( ${ $class . '::ERROR' } ) )
+    elsif( !CAN_THREADS &&
+        CORE::defined( ${ $class . '::ERROR' } ) &&
+        CORE::length( ${ $class . '::ERROR' } ) )
     {
         $o = ${ $class . '::ERROR' };
         warn( "Accessing ${class}::ERROR is deprecated; use ${class}->error instead" ) if( warnings::enabled( 'HTTP::Promise' ) );
@@ -2239,7 +2241,7 @@ HTTP::Promise::Headers - HTTP Headers Class
 
 =head1 VERSION
 
-    v0.3.0
+    v0.3.1
 
 =head1 DESCRIPTION
 

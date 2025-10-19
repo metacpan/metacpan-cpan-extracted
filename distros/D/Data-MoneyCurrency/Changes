@@ -1,5 +1,10 @@
 Revision history for Data-MoneyCurrency
 
+0.28    Sat Oct 18 12:11:23 CEST 2025
+        - new currecy xcg in SX and CW
+        - ZWG is iso currency
+        - minor config tweaks for a few other currencies
+
 0.27    Mon May 13 21:24:03 CEST 2024
         - ZWG not ZIG
 

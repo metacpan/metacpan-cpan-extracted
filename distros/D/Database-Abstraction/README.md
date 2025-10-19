@@ -15,7 +15,7 @@ Database::Abstraction - Read-only Database Abstraction Layer (ORM)
 
 # VERSION
 
-Version 0.32
+Version 0.33
 
 # DESCRIPTION
 
@@ -268,6 +268,10 @@ Return the number items/rows matching the given criteria
 ## fetchrow\_hashref
 
 Returns a hash reference for a single row in a table.
+
+It searches for the given arguments, searching IS NULL if the value is `undef`
+
+    my $res = $foo->fetchrow_hashref(entry => 'one');
 
 Special argument: table: determines the table to read from if not the default,
 which is worked out from the class name

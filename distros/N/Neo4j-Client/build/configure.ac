@@ -14,12 +14,12 @@
 #
 dnl Process this file with autoconf to produce a configure script
 AC_PREREQ([2.69])
-AC_INIT([libneo4j-client],[5.0.4])
+AC_INIT([libneo4j-client],[5.0.7])
 AC_CONFIG_SRCDIR([lib/src/neo4j-client.h.in])
 AC_CONFIG_AUX_DIR([build-aux])
-AC_CONFIG_MACRO_DIR([build-aux/m4])
+AC_CONFIG_MACRO_DIRS([build-aux/m4])
 AM_INIT_AUTOMAKE([foreign])
-AC_CONFIG_HEADER([config.h])
+AC_CONFIG_HEADERS([config.h])
 AM_MAINTAINER_MODE([enable])
 
 DECLARE_VERSIONS
@@ -47,6 +47,7 @@ AC_PROG_CPP
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
+AC_PROG_EGREP
 
 AC_C_CONST
 AC_C_INLINE
@@ -57,7 +58,6 @@ AS_IF([test "X$ac_cv_c_vararrays" != "Xyes"],
   [AC_MSG_ERROR([compiler support for variable-length arrays is required])])
 
 AC_HEADER_ASSERT
-AC_HEADER_STDC
 AC_HEADER_STDBOOL
 AC_CHECK_HEADERS([endian.h sys/endian.h libkern/OSByteOrder.h])
 AC_CHECK_HEADERS([stdatomic.h])

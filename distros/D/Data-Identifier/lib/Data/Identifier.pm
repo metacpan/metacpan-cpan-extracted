@@ -19,7 +19,7 @@ use Carp;
 use Math::BigInt lib => 'GMP';
 use URI;
 
-our $VERSION = v0.18;
+our $VERSION = v0.19;
 
 use constant {
     RE_UUID => qr/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/,
@@ -46,6 +46,8 @@ use constant {
     WK_FC   => 'd576b9d1-47d4-43ae-b7ec-bbea1fe009ba', # factgrid-identifier
     WK_UNICODE_CP => '5f167223-cc9c-4b2f-9928-9fe1b253b560', # unicode-code-point
     WK_SNI  => '039e0bb7-5dd3-40ee-a98c-596ff6cce405', # sirtx-numerical-identifier
+    WK_HDI  => 'f8eb04ef-3b8a-402c-ad7c-1e6814cb1998', # host-defined-identifier
+    WK_UDI  => '05af99f9-4578-4b79-aabe-946d8e6f5888', # user-defined-identifier
 
     NS_WD   => '9e10aca7-4a99-43ac-9368-6cbfa43636df', # Wikidata-namespace
     NS_FC   => '6491f7a9-0b29-4ef1-992c-3681cea18182', # factgrid-namespace
@@ -86,6 +88,9 @@ my %well_known = (
 
     # Unofficial, not part of public API:
     unicodecp => __PACKAGE__->new($well_known_uuid => WK_UNICODE_CP, validate => RE_UNICODE, namespace => NS_UNICODE_CP, generate => 'id-based'),
+
+    hdi => __PACKAGE__->new($well_known_uuid => WK_HDI, validate => RE_UINT),
+    udi => __PACKAGE__->new($well_known_uuid => WK_UDI, validate => RE_UINT),
 );
 
 my %registered;
@@ -184,6 +189,8 @@ foreach my $ise (NS_WD, NS_INT, NS_DATE) {
         WK_FC()                                 => 'factgrid-identifier',
         WK_UNICODE_CP()                         => 'unicode-code-point',
         WK_SNI()                                => 'sirtx-numerical-identifier',
+        WK_HDI()                                => 'host-defined-identifier',
+        WK_UDI(),                               => 'user-defined-identifier',
         NS_WD()                                 => 'Wikidata-namespace',
         NS_FC()                                 => 'factgrid-namespace',
         NS_INT()                                => 'integer-namespace',
@@ -580,6 +587,27 @@ sub as {
 
     $as = $opts{rawtype} if $as eq 'raw' && defined($opts{rawtype});
 
+    if (ref($as) && eval {$as->isa(__PACKAGE__)}) {
+        my $type_uuid = $as->uuid;
+        my $next_type;
+
+        foreach my $test (qw(uuid oid uri sid)) {
+            if ($as == $well_known{$test}) {
+                $next_type = $test;
+                last;
+            }
+        }
+
+        if (defined $next_type) {
+            return $self->{id_cache}{$type_uuid} if !$opts{no_defaults} && defined($self->{id_cache}) && defined($self->{id_cache}{$type_uuid});
+            $as = $next_type;
+        } else {
+            return $self->{id_cache}{$type_uuid} if defined($self->{id_cache}) && defined($self->{id_cache}{$type_uuid});
+            return $opts{default} if exists $opts{default};
+            croak 'Unknown/Unsupported as: '.$as;
+        }
+    }
+
     return $self if ($as =~ /^[A-Z]/ || $as =~ /::/) && eval {$self->isa($as)};
 
     if ($self->isa('Data::Identifier::Interface::Subobjects')) {
@@ -889,7 +917,7 @@ Data::Identifier - format independent identifier object
 
 =head1 VERSION
 
-version v0.18
+version v0.19
 
 =head1 SYNOPSIS
 
@@ -1207,6 +1235,7 @@ Supports all options also supported by L</uuid>, L</oid>, and L</uri>.
 This method converts the given identifier to another type of object.
 
 C<$as> must be a name of the package (containing C<::> or starting with an uppercase letter),
+an instance of L<Data::Identifier> (since v0.19),
 or one of the special values.
 
 Currently the following packages are supported:
@@ -1225,6 +1254,10 @@ The folliwng special values are supported:
 C<uuid>, C<oid>, C<uri>, C<sid>, C<ise>, and C<raw>.
 All but C<raw> are aliases to the corresponding functions.
 C<raw> is an alias for the type set with the C<rawtype> option (see below).
+
+If C<$as> is an instance of L<Data::Identifier> the value for this type of identifier is returned
+as per a special value if available.
+This can be used as a more generic form of special values.
 
 If C<$identifier> is or may not be an L<Data::Identifier> this method can be called like
 C<$identifier-E<gt>Data::Identifier::as($as...)>.

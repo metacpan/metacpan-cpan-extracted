@@ -1,8 +1,12 @@
-"Schedule::Activity" Version 0.1.5
+"Schedule::Activity" Version 0.1.6
 
 Abstract:
 ---------
 This package provides a mechanism to construct "random" schedules of events using a graph-based configuration of activities and actions.  Action scheduling allows cycles/recursion to meet activity schedule goals.
+
+What's new in version 0.1.6:
+--------------------------
+* Node filtering is now supported in scheduling configurations.
 
 What's new in version 0.1.5:
 --------------------------

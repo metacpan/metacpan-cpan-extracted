@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v1.1.1
+## Version v1.1.2
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2025/10/12
+## Modified 2025/10/19
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -99,7 +99,7 @@ BEGIN
         (?<ver>(?^:\.[0-9]+) (?^:_[0-9]+)?)
         )
     )/;
-    our $VERSION     = 'v1.1.1';
+    our $VERSION     = 'v1.1.2';
 };
 
 use v5.26.1;
@@ -1388,7 +1388,11 @@ sub error
     {
         # Found an exception object using Module::Generic::Global
     }
-    elsif( !CAN_THREADS && CORE::defined( ${ $class . '::ERROR' } ) )
+    elsif( !CAN_THREADS &&
+        CORE::defined( ${ $class . '::ERROR' } ) &&
+        # clear_error() set this to an empty string, so it is no undefined
+        # Other inheriting moduls might do the same
+        CORE::length( ${ $class . '::ERROR' } ) )
     {
         $o = ${ $class . '::ERROR' };
         warn( "Accessing ${class}::ERROR is deprecated; use ${class}->error instead" ) if( $self->_warnings_is_enabled );
@@ -11940,7 +11944,7 @@ Quick way to create a class with feature-rich methods
 
 =head1 VERSION
 
-    v1.1.1
+    v1.1.2
 
 =head1 DESCRIPTION
 

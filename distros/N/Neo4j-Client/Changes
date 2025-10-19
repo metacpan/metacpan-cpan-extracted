@@ -1,4 +1,19 @@
 Revision history for Perl module Neo4j::Client
+
+0.55  2025-10-19
+    - Update libneo4j-omni to version 5.0.7, comprising the following changes:
+        - Change the preferred Bolt v4 version from 4.0 to 4.4
+        - Fix bug causing a Bolt protocol violation when using certain temporal
+          instant values by using the patch_bolt flag on Bolt 4.4 connections
+        - Fix Bolt protocol minor version not being reported
+        - Fix several memory leaks in neo4j_config_set_supported_versions(),
+          neo4j_connect(), neo4j_begin_tx(), neo4j_free_tx()
+        - Fix bugs in neo4j_ntostring() that could cause incorrect output or
+          unspecified behaviour when called with certain byte array values,
+          temporal instant values, or spatial values
+        - Improve compiler compatibility and reduce number of build warnings
+    - Add minimum required software versions to dist metadata
+
 0.54 2024-11-01
      - Add compatibility with Neo4j 5
      - switch to majensen/libneo4j-omni (fork from cleishm/libneo4j-client)

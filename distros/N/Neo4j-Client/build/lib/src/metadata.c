@@ -77,8 +77,9 @@ void neo4j_metadata_log(neo4j_logger_t *logger, uint_fast8_t level,
         const char *msg, neo4j_value_t metadata)
 {
     char detail[1024];
-    size_t n = neo4j_ntostring(metadata, detail, sizeof(detail));
-    if (n >= sizeof(detail))
+    ssize_t n = neo4j_ntostring(metadata, detail, sizeof(detail));
+    assert(n >= 0);
+    if (n >= (ssize_t)sizeof(detail))
     {
         // TODO: dynamically allocate `detail` if static size is insufficient
         detail[sizeof(detail)-1] = '\0';

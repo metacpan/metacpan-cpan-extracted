@@ -10,27 +10,30 @@ WriteMakefile($mm->mm_args(
   NAME => 'Neo4j::Client',
   VERSION_FROM => 'lib/Neo4j/Client.pm',
   LICENSE => 'apache_2_0',
+  MIN_PERL_VERSION => '5.006',  # our
   CONFIGURE_REQUIRES => {
-    'Alien::Build::MM' => 0,
-    'Alien::OpenSSL' => 0,
-    'Path::Tiny' => 0,
-    'Env' => 0,
+    'Alien::Build::MM' => '1.19',
+    'Alien::OpenSSL' => '0.09',
     'Capture::Tiny' => 0,
+    'Env' => 0,
+    'ExtUtils::MakeMaker' => '6.64',
     'File::Which' => 0,
+    'Path::Tiny' => '0.014',
   },
   BUILD_REQUIRES => {
+    'Alien::Base' => '0.036',
   },
   TEST_REQUIRES => {
     'Test2::V0' => 0,
     'Test::Alien' => 0,
   },
   PREREQ_PM => {
-    'Alien::Build' => 0,
-    'Alien::OpenSSL' => 0,
-    'Path::Tiny' => 0,
-    'Env' => 0,
+    'Alien::Build' => '1.19',
+    'Alien::OpenSSL' => '0.09',
     'Capture::Tiny' => 0,
+    'Env' => 0,
     'File::Which' => 0,
+    'Path::Tiny' => '0.014',
   },
   META_MERGE => {
     'meta-spec' => { version => 2 },

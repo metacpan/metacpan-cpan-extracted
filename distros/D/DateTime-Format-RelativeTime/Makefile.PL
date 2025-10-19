@@ -33,7 +33,7 @@ my %WriteMakefileArgs = (
         'Locale::Unicode::Data'         => 'v1.3.2',
         'Scalar::Util'                  => 0,
         # Version compatible with perl v5.10.1
-        'Want'                          => '0.17',
+        'Wanted'                        => 'v0.1.0',
     },
     TEST_REQUIRES =>
     {

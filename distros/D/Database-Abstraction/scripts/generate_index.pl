@@ -4,19 +4,26 @@ use strict;
 use warnings;
 use autodie qw(:all);
 
-use JSON::MaybeXS;
 use File::Glob ':glob';
 use File::Slurp;
 use File::stat;
+use JSON::MaybeXS;
 use POSIX qw(strftime);
 use Readonly;
 
-Readonly my $cover_db => 'cover_db/cover.json';
-Readonly my $output => 'cover_html/index.html';
-Readonly my $max_points => 10;	# Only display the last 10 commits in the coverage trend graph
+Readonly my %config => (
+	github_user => 'nigelhorne',
+	github_repo => 'Database-Abstraction',
+	package_name => 'Database::Abstraction',
+	low_threshold => 70,
+	med_threshold => 90,
+	max_points => 10,	# Only display the last 10 commits in the coverage trend graph
+	cover_db => 'cover_db/cover.json',
+	output => 'cover_html/index.html'
+);
 
 # Read and decode coverage data
-my $json_text = read_file($cover_db);
+my $json_text = read_file($config{cover_db});
 my $data = decode_json($json_text);
 
 my $coverage_pct = 0;
@@ -35,7 +42,7 @@ push @html, <<"HTML";
 <!DOCTYPE html>
 <html>
 	<head>
-	<title>Database::Abstraction Coverage Report</title>
+	<title>$config{package_name} Coverage Report</title>
 	<style>
 		body { font-family: sans-serif; }
 		table { border-collapse: collapse; width: 100%; }
@@ -96,12 +103,12 @@ push @html, <<"HTML";
 </head>
 <body>
 <div class="badges">
-	<a href="https://github.com/nigelhorne/Database-Abstraction">
-		<img src="https://img.shields.io/github/stars/nigelhorne/Database-Abstraction?style=social" alt="GitHub stars">
+	<a href="https://github.com/$config{github_user}/$config{github_repo}">
+		<img src="https://img.shields.io/github/stars/$config{github_user}/$config{github_repo}?style=social" alt="GitHub stars">
 	</a>
 	<img src="$coverage_badge_url" alt="Coverage badge">
 </div>
-<h1>Database::Abstraction</h1><h2>Coverage Report</h2>
+<h1>$config{package_name}</h1><h2>Coverage Report</h2>
 <table data-sort-col="0" data-sort-order="asc">
 <!-- Make the column headers clickable -->
 <thead>
@@ -119,16 +126,24 @@ push @html, <<"HTML";
 <tbody>
 HTML
 
+my @history_files = bsd_glob("coverage_history/*.json");
+
+# Cache historical data instead of reading for each file
+my %historical_cache;
+for my $hist_file (@history_files) {
+	my $json = eval { decode_json(read_file($hist_file)) };
+	$historical_cache{$hist_file} = $json if $json;
+}
+
 # Load previous snapshot for delta comparison
 my @history = sort { $a cmp $b } bsd_glob("coverage_history/*.json");
 my $prev_data;
 
 if (@history >= 1) {
 	my $prev_file = $history[-1];	# Most recent before current
-	eval {
-		$prev_data = decode_json(read_file($prev_file));
-	};
+	$prev_data = $historical_cache{$prev_file};
 }
+
 my %deltas;
 if ($prev_data) {
 	for my $file (keys %{$data->{summary}}) {
@@ -142,7 +157,7 @@ if ($prev_data) {
 
 my $commit_sha = `git rev-parse HEAD`;
 chomp $commit_sha;
-my $github_base = "https://github.com/nigelhorne/Database-Abstraction/blob/$commit_sha/";
+my $github_base = "https://github.com/$config{github_user}/$config{github_repo}/blob/$commit_sha/";
 
 # Add rows
 my ($total_files, $total_coverage, $low_coverage_count) = (0, 0, 0);
@@ -160,18 +175,18 @@ for my $file (sort keys %{$data->{summary}}) {
 	my $total = $info->{total}{percentage} // 0;
 	$total_files++;
 	$total_coverage += $total;
-	$low_coverage_count++ if $total < 70;
+	$low_coverage_count++ if $total < $config{low_threshold};
 
-	my $badge_class = $total >= 90 ? 'badge-good'
-					: $total >= 70 ? 'badge-warn'
+	my $badge_class = $total >= $config{med_threshold} ? 'badge-good'
+					: $total >= $config{low_threshold} ? 'badge-warn'
 					: 'badge-bad';
 
-	my $tooltip = $total >= 90 ? 'Excellent coverage'
-				 : $total >= 70 ? 'Moderate coverage'
+	my $tooltip = $total >= $config{med_threshold} ? 'Excellent coverage'
+				 : $total >= $config{low_threshold} ? 'Moderate coverage'
 				 : 'Needs improvement';
 
-	my $row_class = $total >= 90 ? 'high'
-			: $total >= 70 ? 'med'
+	my $row_class = $total >= $config{med_threshold} ? 'high'
+			: $total >= $config{low_threshold} ? 'med'
 			: 'low';
 
 	my $badge_html = sprintf(
@@ -212,16 +227,15 @@ for my $file (sort keys %{$data->{summary}}) {
 	my @history_files = sort <coverage_history/*.json>;
 
 	my %history;
-	for my $file (@history_files) {
-		my $json = eval { decode_json(read_file($file)) };
-		next unless $json;
-		$history{$file} = $json;
-	}
 	for my $hist_file (sort @history_files) {
-		my $json = eval { decode_json(read_file($hist_file)) };
-		next unless $json && $json->{summary}{$file};
-		my $pct = $json->{summary}{$file}{total}{percentage} // 0;
-		push @file_history, sprintf('%.1f', $pct);
+		my $json = $historical_cache{$hist_file};
+
+		$history{$hist_file} = $json;
+
+		if($json->{summary}{$file}) {
+			my $pct = $json->{summary}{$file}{total}{percentage} // 0;
+			push @file_history, sprintf('%.1f', $pct);
+		}
 	}
 	my $points_attr = join(',', @file_history);
 
@@ -262,22 +276,21 @@ if (my $total_info = $data->{summary}{Total}) {
 }
 
 my $timestamp = 'Unknown';
-if (my $stat = stat($cover_db)) {
+if (my $stat = stat($config{cover_db})) {
 	$timestamp = strftime('%Y-%m-%d %H:%M:%S', localtime($stat->mtime));
 }
 
-Readonly my $commit_url => "https://github.com/nigelhorne/Database-Abstraction/commit/$commit_sha";
+Readonly my $commit_url => "https://github.com/$config{github_user}/$config{github_repo}/commit/$commit_sha";
 my $short_sha = substr($commit_sha, 0, 7);
 
 push @html, '</tbody></table>';
 
 # Parse historical snapshots
-my @history_files = bsd_glob("coverage_history/*.json");
 my @trend_points;
 
 foreach my $file (sort @history_files) {
-	my $json = eval { decode_json(read_file($file)) };
-	next unless $json && $json->{summary}{Total};
+	my $json = $historical_cache{$file};
+	next unless $json->{summary}{Total};
 
 	my $pct = $json->{summary}{Total}{total}{percentage} // 0;
 	my ($date) = $file =~ /(\d{4}-\d{2}-\d{2})/;
@@ -312,10 +325,10 @@ my @data_points_with_time;
 my $processed_count = 0;
 
 foreach my $file (reverse sort @history_files) {
-	last if $processed_count >= $max_points;
+	last if $processed_count >= $config{max_points};
 
-	my $json = eval { decode_json(read_file($file)) };
-	next unless $json && $json->{summary}{Total};
+	my $json = $historical_cache{$file};
+	next unless $json->{summary}{Total};
 
 	my ($sha) = $file =~ /-(\w{7})\.json$/;
 	next unless $commit_messages{$sha};	# Skip merge commits
@@ -327,7 +340,7 @@ foreach my $file (reverse sort @history_files) {
 
 	my $pct = $json->{summary}{Total}{total}{percentage} // 0;
 	my $color = 'gray';	# Will be set properly after sorting
-	my $url = "https://github.com/nigelhorne/Database-Abstraction/commit/$sha";
+	my $url = "https://github.com/$config{github_user}/$config{github_repo}/commit/$sha";
 	my $comment = $commit_messages{$sha};
 
 	# Store with timestamp for sorting
@@ -361,23 +374,27 @@ my $js_data = join(",\n", @data_points);
 
 if(scalar(@data_points)) {
 	push @html, <<'HTML';
-<p>
-	<h2>Coverage Trend</h2>
-	<label>
-		<input type="checkbox" id="toggleTrend" checked>
-		Show regression trend
-	</label>
-</p>
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1em;">
+	<div>
+		<h2>Coverage Trend</h2>
+		<label>
+			<input type="checkbox" id="toggleTrend" checked>
+			Show regression trend
+		</label>
+		<div>
+		</div>
+	</div>
+	<div id="zoomControls" style="margin-top:8px;">
+		<input type="button" value="Refresh" onClick="refresh(this)">
+		<button id="resetZoomBtn" type="button">Reset Zoom</button>
+	</div>
+</div>
 HTML
 }
 
 push @html, <<"HTML";
 <canvas id="coverageTrend" width="600" height="300"></canvas>
 <!-- Zoom controls for the trend chart -->
-<div id="zoomControls" style="margin-top:8px;">
-	<button id="resetZoomBtn" type="button">Reset Zoom</button>
-	<span style="margin-left:8px;color:#666;font-size:0.9em;">Use mouse wheel or pinch to zoom; drag to pan</span>
-</div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <!-- Add chartjs-plugin-zoom (required for wheel/pinch/drag zoom & pan) -->
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom\@2.1.1/dist/chartjs-plugin-zoom.min.js"></script>
@@ -657,12 +674,16 @@ document.addEventListener("DOMContentLoaded", () => {
 	});
 });
 
+function refresh(){
+	window.location.reload("Refresh")
+}
 </script>
 HTML
 
 push @html, <<"HTML";
 <footer>
-	<p>Project: <a href="https://github.com/nigelhorne/Database-Abstraction">Database-Abstraction</a></p>
+	<p><span style="margin-left:8px;color:#666;font-size:0.9em;">Use mouse wheel or pinch to zoom; drag to pan</span></p>
+	<p>Project: <a href="https://github.com/$config{github_user}/$config{github_repo}">$config{github_repo}</a></p>
 	<p><em>Last updated: $timestamp - <a href="$commit_url">commit <code>$short_sha</code></a></em></p>
 </footer>
 </body>
@@ -670,4 +691,4 @@ push @html, <<"HTML";
 HTML
 
 # Write to index.html
-write_file($output, join("\n", @html));
+write_file($config{output}, join("\n", @html));

@@ -1,5 +1,5 @@
-# Copyright (c) 2024 Löwenfelsen UG (haftungsbeschränkt)
-# Copyright (c) 2024 Philipp Schafft
+# Copyright (c) 2024-2025 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2024-2025 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -30,7 +30,7 @@ use constant {
     DOT_REPEAT_ISE => '2ec67bbe-4698-4a0c-921d-1f0951923ee6',
 };
 
-our $VERSION = v0.07;
+our $VERSION = v0.08;
 
 
 
@@ -400,7 +400,7 @@ File::ValueFile::Simple::Reader - module for reading and writing ValueFile files
 
 =head1 VERSION
 
-version v0.07
+version v0.08
 
 =head1 SYNOPSIS
 

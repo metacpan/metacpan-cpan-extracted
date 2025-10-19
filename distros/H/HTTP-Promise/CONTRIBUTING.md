@@ -43,7 +43,7 @@ Issues are currently reported using CPAN [bug tracker](https://gitlab.com/jackde
 
 ## More information
 
-Please refer to the [README](https://metacpan.org/source/JDEGUEST/HTTP-Promise-v0.7.0/README.md)
+Please refer to the [README](https://metacpan.org/source/JDEGUEST/HTTP-Promise-v0.7.1/README.md)
 
 ## Author
 

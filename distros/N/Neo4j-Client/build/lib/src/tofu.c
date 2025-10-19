@@ -42,10 +42,10 @@ int neo4j_check_known_hosts(const char * restrict hostname, int port,
         const char * restrict fingerprint, const neo4j_config_t *config,
         uint_fast8_t flags)
 {
+    REQUIRE(strlen(hostname) < 256 && hostname[0] != '\0', -1);
+
     int result = -1;
     neo4j_logger_t *logger = neo4j_get_logger(config, "tofu");
-
-    REQUIRE(strlen(hostname) < 256 && hostname[0] != '\0', -1);
 
     char *buf = NULL;
     const char *file = config->known_hosts_file;

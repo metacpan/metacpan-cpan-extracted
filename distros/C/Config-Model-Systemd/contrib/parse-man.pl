@@ -241,7 +241,7 @@ sub setup_element ($meta_root, $config_class, $element, $desc, $extra_info, $sup
     $desc =~ s/[\s\n]+/ /g;
 
     my $value_type
-        = $desc =~ /Takes a boolean (argument\s)?or/ ? 'enum'
+        = $desc =~ /Takes a boolean (argument,?\s)?or/ ? 'enum'
         : $desc =~ /Takes an? (boolean|integer)/ ? $1
         : $desc =~ /Takes time \(in seconds\)/   ? 'integer'
         : $desc =~ /allowed range/i              ? 'integer'
@@ -293,8 +293,8 @@ sub setup_element ($meta_root, $config_class, $element, $desc, $extra_info, $sup
         elsif ($extra_info =~ /\w\|\w/) {
             @choices = split /\|/, $extra_info ;
         }
-        elsif ($desc =~ /Takes a boolean (argument )?or /) {
-            my ($choices) = ($desc =~ /Takes a boolean (?:argument )?or (?:the )?(?:special values|architecture identifiers\s*)?([^.]+?)\./);
+        elsif ($desc =~ /Takes a boolean (argument,? )?or /) {
+            my ($choices) = ($desc =~ /Takes a boolean (?:argument,? )?or (?:the )?(?:special values|architecture identifiers\s*)?([^.]+?)\./);
             @choices = ('no','yes');
             push @choices, extract_choices($choices);
             push @load, qw/replace:false=no replace:true=yes replace:0=no replace:1=yes/;
@@ -317,6 +317,19 @@ sub setup_element ($meta_root, $config_class, $element, $desc, $extra_info, $sup
 
     if ($value_type eq 'integer' and $desc =~ /defaults? (?:value )?(?:to|is) (\d+)/i) {
         push @load_extra, "upstream_default=$1" ;
+    }
+
+    if ($value_type eq 'enum' and $desc =~ /Defaults? (?:value )?(?:to|is) (\w+)\./) {
+        my $v = ($1 =~ s/true|on/yes/r);
+        $v =~ s/false|off/no/;
+        push @load_extra, "upstream_default=$v" ;
+    }
+
+    if ($value_type eq 'boolean' and $desc =~ /Defaults? (?:value )?(?:to|is) (C<)?(true|on|yes)>?\./) {
+        push @load_extra, "upstream_default=yes" ;
+    }
+    if ($value_type eq 'boolean' and $desc =~ /Defaults? (?:value )?(?:to|is) (C<)?(false|off|no)>?\./) {
+        push @load_extra, "upstream_default=no" ;
     }
 
     if ($supersedes) {
@@ -464,6 +477,13 @@ $meta_root->load(
        element:IOSchedulingClass value_type=enum
                                  choice=0,1,2,3,none,realtime,best-effort,idle'
 );
+
+# doc for Exec/SetLoginEnvironment is misleading
+$meta_root->load(
+    '! class:Systemd::Common::Exec
+       element:SetLoginEnvironment upstream_default~'
+);
+
 
 # these warping instructions are used for most services. Services are
 # disabled when a service file is a symlink to /dev/null

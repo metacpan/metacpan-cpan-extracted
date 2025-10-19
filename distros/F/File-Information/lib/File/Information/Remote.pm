@@ -15,7 +15,7 @@ use parent 'File::Information::Base';
 
 use Carp;
 
-our $VERSION = v0.13;
+our $VERSION = v0.14;
 
 my %_properties = (
     data_uriid_attr_displayname     => {loader => \&_load_data_uriid},
@@ -101,7 +101,7 @@ File::Information::Remote - generic module for extracting information from files
 
 =head1 VERSION
 
-version v0.13
+version v0.14
 
 =head1 SYNOPSIS
 

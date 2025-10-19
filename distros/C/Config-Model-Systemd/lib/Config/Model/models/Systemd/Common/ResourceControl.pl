@@ -53,26 +53,6 @@ by L<parse-man.pl|https://github.com/dod38fr/config-model-systemd/contrib/parse-
       '2016 Dominique Dumont'
     ],
     'element' => [
-      'CPUAccounting',
-      {
-        'description' => 'Turn on CPU usage accounting for this unit. Takes a
-boolean argument. Note that turning on CPU accounting for
-one unit will also implicitly turn it on for all units
-contained in the same slice and for all its parent slices
-and the units contained therein. The system default for this
-setting may be controlled with
-C<DefaultCPUAccounting> in
-L<systemd-system.conf(5)>.
-
-Under the unified cgroup hierarchy, CPU accounting is available for all units and this
-setting has no effect.',
-        'type' => 'leaf',
-        'value_type' => 'boolean',
-        'write_as' => [
-          'no',
-          'yes'
-        ]
-      },
       'CPUWeight',
       {
         'description' => 'These settings control the C<cpu> controller in the unified hierarchy.
@@ -155,7 +135,7 @@ Example: C<CPUQuotaPeriodSec=10ms> to request that the CPU quota is measured in 
 Restrict processes to be executed on specific CPUs. Takes a list of CPU indices or ranges separated by either
 whitespace or commas. CPU ranges are specified by the lower and upper CPU indices separated by a dash.
 
-Setting C<AllowedCPUs> or C<StartupAllowedCPUs> doesn\'t guarantee that all
+Setting C<AllowedCPUs> or C<StartupAllowedCPUs> does not guarantee that all
 of the CPUs will be used by the processes as it may be limited by parent units. The effective configuration is
 reported as C<EffectiveCPUs>.
 
@@ -175,7 +155,7 @@ This setting is supported only with the unified control group hierarchy.',
 Restrict processes to be executed on specific CPUs. Takes a list of CPU indices or ranges separated by either
 whitespace or commas. CPU ranges are specified by the lower and upper CPU indices separated by a dash.
 
-Setting C<AllowedCPUs> or C<StartupAllowedCPUs> doesn\'t guarantee that all
+Setting C<AllowedCPUs> or C<StartupAllowedCPUs> does not guarantee that all
 of the CPUs will be used by the processes as it may be limited by parent units. The effective configuration is
 reported as C<EffectiveCPUs>.
 
@@ -490,6 +470,7 @@ compressed pages in Zswap. See the kernel\'s
 L<Zswap|https://docs.kernel.org/admin-guide/mm/zswap.html> documentation
 for more details.',
         'type' => 'leaf',
+        'upstream_default' => 'yes',
         'value_type' => 'boolean',
         'write_as' => [
           'no',
@@ -504,7 +485,7 @@ Restrict processes to be executed on specific memory NUMA nodes. Takes a list of
 or ranges separated by either whitespace or commas. Memory NUMA nodes ranges are specified by the lower and upper
 NUMA nodes indices separated by a dash.
 
-Setting C<AllowedMemoryNodes> or C<StartupAllowedMemoryNodes> doesn\'t
+Setting C<AllowedMemoryNodes> or C<StartupAllowedMemoryNodes> does not
 guarantee that all of the memory NUMA nodes will be used by the processes as it may be limited by parent units.
 The effective configuration is reported as C<EffectiveMemoryNodes>.
 
@@ -525,7 +506,7 @@ Restrict processes to be executed on specific memory NUMA nodes. Takes a list of
 or ranges separated by either whitespace or commas. Memory NUMA nodes ranges are specified by the lower and upper
 NUMA nodes indices separated by a dash.
 
-Setting C<AllowedMemoryNodes> or C<StartupAllowedMemoryNodes> doesn\'t
+Setting C<AllowedMemoryNodes> or C<StartupAllowedMemoryNodes> does not
 guarantee that all of the memory NUMA nodes will be used by the processes as it may be limited by parent units.
 The effective configuration is reported as C<EffectiveMemoryNodes>.
 
@@ -565,7 +546,7 @@ number of tasks accounted for the unit (see above) stays below a specific limit.
 an absolute number of tasks or a percentage value that is taken relative to the configured maximum
 number of tasks on the system. If assigned the special value C<infinity>, no tasks
 limit is applied. This controls the C<pids.max> control group attribute. For
-details about this control group attribute, the
+details about this control group attribute, see the
 L<pids controller|https://docs.kernel.org/admin-guide/cgroup-v2.html#pid>.
 The effective configuration is reported as C<EffectiveTasksMax>.
 
@@ -798,7 +779,7 @@ IPv6).
 The access lists configured with this option are applied to all sockets created by processes
 of this unit (or in the case of socket units, associated with it). The lists are implicitly
 combined with any lists configured for any of the parent slice units this unit might be a member
-of. By default both access lists are empty. Both ingress and egress traffic is filtered by these
+of. By default, both access lists are empty. Both ingress and egress traffic is filtered by these
 settings. In case of ingress traffic the source IP address is checked against these access lists,
 in case of egress traffic the destination IP address is checked. The following rules are applied in
 turn:
@@ -844,7 +825,7 @@ IPv6).
 The access lists configured with this option are applied to all sockets created by processes
 of this unit (or in the case of socket units, associated with it). The lists are implicitly
 combined with any lists configured for any of the parent slice units this unit might be a member
-of. By default both access lists are empty. Both ingress and egress traffic is filtered by these
+of. By default, both access lists are empty. Both ingress and egress traffic is filtered by these
 settings. In case of ingress traffic the source IP address is checked against these access lists,
 in case of egress traffic the destination IP address is checked. The following rules are applied in
 turn:
@@ -1059,7 +1040,7 @@ Examples:
       'RestrictNetworkInterfaces',
       {
         'description' => 'Takes a list of space-separated network interface names. This option restricts the network
-interfaces that processes of this unit can use. By default processes can only use the network interfaces
+interfaces that processes of this unit can use. By default, processes can only use the network interfaces
 listed (allow-list). If the first character of the rule is C<~>, the effect is inverted:
 the processes can only use network interfaces not listed (deny-list).
 
@@ -1165,7 +1146,7 @@ The filters configured with this option are applied to all sockets created by pr
 of this unit (or in the case of socket units, associated with it). The filters are loaded in addition
 to filters any of the parent slice units this unit might be a member of as well as any
 C<IPAddressAllow> and C<IPAddressDeny> filters in any of these units.
-By default there are no filters specified.
+By default, there are no filters specified.
 
 If these settings are used multiple times in the same unit all the specified programs are attached. If an
 empty string is assigned to these settings the program list is reset and all previous specified programs ignored.
@@ -1200,7 +1181,7 @@ The filters configured with this option are applied to all sockets created by pr
 of this unit (or in the case of socket units, associated with it). The filters are loaded in addition
 to filters any of the parent slice units this unit might be a member of as well as any
 C<IPAddressAllow> and C<IPAddressDeny> filters in any of these units.
-By default there are no filters specified.
+By default, there are no filters specified.
 
 If these settings are used multiple times in the same unit all the specified programs are attached. If an
 empty string is assigned to these settings the program list is reset and all previous specified programs ignored.
@@ -1409,7 +1390,7 @@ unprivileged services on the legacy hierarchy, even when requested.
 
 Not all of these controllers are available on all kernels however, and some are specific to
 the unified hierarchy while others are specific to the legacy hierarchy. Also note that the kernel
-might support further controllers, which aren\'t covered here yet as delegation is either not
+might support further controllers, which are not covered here yet, as delegation is either not
 supported at all for them or not defined cleanly.
 
 Note that because of the hierarchical nature of cgroup hierarchy, any controllers that are
@@ -1435,7 +1416,7 @@ C<.control>. The specified subgroup is automatically created (and potentially
 ownership is passed to the unit\'s configured user/group) when a process is started in it.
 
 This option is useful to avoid manually moving the invoked process into a subgroup after it
-has been started. Since no processes should live in inner nodes of the control group tree it\'s
+has been started. Since no processes should live in inner nodes of the control group tree it is
 almost always necessary to run the main ("supervising") process of a unit that has delegation
 turned on in a subgroup.',
         'type' => 'leaf',
@@ -1615,7 +1596,7 @@ value is set the protocol is enabled if memory accounting is anyway enabled for 
 disabled otherwise. If set to C<skip> the logic is neither enabled, nor disabled and
 the two environment variables are not set.
 
-Note that services are free to use the two environment variables, but it\'s unproblematic if
+Note that services are free to use the two environment variables, but it is unproblematic if
 they ignore them. Memory pressure handling must be implemented individually in each service, and
 usually means different things for different software. For further details on memory pressure
 handling see L<Memory Pressure Handling in
@@ -1641,7 +1622,7 @@ L<systemd-system.conf(5)>.',
       {
         'description' => "Sets the memory pressure threshold time for memory pressure monitor as configured via
 C<MemoryPressureWatch>. Specifies the maximum allocation latency before a memory
-pressure event is signalled to the service, per 2s window. If not specified defaults to the
+pressure event is signalled to the service, per 2s window. If not specified, defaults to the
 C<DefaultMemoryPressureThresholdSec> setting in
 L<systemd-system.conf(5)>
 (which in turn defaults to 200ms). The specified value expects a time unit such as
@@ -1663,6 +1644,7 @@ and C<Delegate=yes>, then systemd-coredump will attempt to forward
 the coredump to systemd-coredump within the container. See also
 L<systemd-coredump(8)>.',
         'type' => 'leaf',
+        'upstream_default' => 'no',
         'value_type' => 'boolean',
         'write_as' => [
           'no',
@@ -1670,7 +1652,7 @@ L<systemd-coredump(8)>.',
         ]
       }
     ],
-    'generated_by' => 'parse-man.pl from systemd 257 doc',
+    'generated_by' => 'parse-man.pl from systemd 258 doc',
     'license' => 'LGPLv2.1+',
     'name' => 'Systemd::Common::ResourceControl'
   }

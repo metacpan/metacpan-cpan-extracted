@@ -534,17 +534,26 @@ notation. Defaults to 0755.',
 connection and only the connection socket is passed to it. If no, all listening sockets themselves
 are passed to the started service unit, and only one service unit is spawned for all connections
 (also see above). This value is ignored for datagram sockets and FIFOs where a single service unit
-unconditionally handles all incoming traffic. Defaults to C<no>. For performance
-reasons, it is recommended to write new daemons only in a way that is suitable for
-C<Accept=no>. A daemon listening on an C<AF_UNIX> socket may, but
-does not need to, call
+unconditionally handles all incoming traffic. Defaults to C<no>.
+
+Typically, for performance sensitive services, a choice of C<Accept=no> is
+preferable, since that way only the first connection will have to pay the activation resource
+cost. On the other hand, for sporadically used services C<Accept=yes> can be preferable
+as it simplifies the implementation (as the service program code only has to process a single
+connection instead of handling multiple) and enables stronger security (since the various sandboxing
+options can be used to isolate parallel connections from each other, as each is serviced by a
+separate service instance and process).
+
+A service listening on an C<AF_UNIX> socket may, but does not need to, call
 L<close(2)> on the
 received socket before exiting. However, it must not unlink the socket from a file system. It should
 not invoke
 L<shutdown(2)> on
 sockets it got with C<Accept=no>, but it may do so for sockets it got with
-C<Accept=yes> set. Setting C<Accept=yes> is mostly useful to allow
-daemons designed for usage with L<inetd(8)> to work
+C<Accept=yes> set.
+
+Setting C<Accept=yes> is in particular useful for allowing daemons designed for
+usage with L<inetd(8)> to work
 unmodified with systemd socket activation.
 
 Note that depending on this setting the services activated by units of this type are either
@@ -553,19 +562,25 @@ services (in case of C<Accept>=C<yes>). See the Description section
 above for a more detailed discussion of the naming rules of triggered services.
 
 For IPv4 and IPv6 connections, the C<$REMOTE_ADDR> environment variable will
-contain the remote IP address, and C<$REMOTE_PORT> will contain the remote port. This
-is the same as the format used by CGI. For C<SOCK_RAW>, the port is the IP
-protocol.
+contain the remote IP address, and C<$REMOTE_PORT> will contain the remote port
+number. These two variables correspond to those defined by the CGI interface for web services (see
+L<RFC 3875|https://datatracker.ietf.org/doc/html/rfc3875>).
 
 For C<AF_UNIX> socket connections, the C<$REMOTE_ADDR>
 environment variable will contain either the remote socket\'s file system path starting with a slash
 (C</>) or its address in the abstract namespace starting with an at symbol
-(C<@>). If the socket is unnamed, C<$REMOTE_ADDR> won\'t be set.
+(C<@>). If the socket is unnamed, C<$REMOTE_ADDR> will not be
+set.
+
+If C<Accept=yes> is used, the activated service process will have set the
+C<$SO_COOKIE> environment variable to the Linux socket cookie, formatted as decimal
+integer. The socket cookie can otherwise be acquired via L<getsockopt(7)>.
 
 It is recommended to set C<CollectMode=inactive-or-failed> for service
 instances activated via C<Accept=yes>, to ensure that failed connection services are
 cleaned up and released from memory, and do not accumulate.',
         'type' => 'leaf',
+        'upstream_default' => 'no',
         'value_type' => 'boolean',
         'write_as' => [
           'no',
@@ -579,6 +594,7 @@ conjunction with C<ListenSpecial>. If true,
 the specified special file is opened in read-write mode, if
 false, in read-only mode. Defaults to false.',
         'type' => 'leaf',
+        'upstream_default' => 'no',
         'value_type' => 'boolean',
         'write_as' => [
           'no',
@@ -591,11 +607,12 @@ false, in read-only mode. Defaults to false.',
 C<Accept=no>. If yes, the socket\'s buffers are cleared after the
 triggered service exited. This causes any pending data to be
 flushed and any pending incoming connections to be rejected. If no, the
-socket\'s buffers won\'t be cleared, permitting the service to handle any
+socket\'s buffers will not be cleared, permitting the service to handle any
 pending connections after restart, which is the usually expected behaviour.
 Defaults to C<no>.
 ',
         'type' => 'leaf',
+        'upstream_default' => 'no',
         'value_type' => 'boolean',
         'write_as' => [
           'no',
@@ -629,6 +646,7 @@ socket. This controls the C<SO_KEEPALIVE> socket option (see L<socket(7)> and
 the L<TCP Keepalive
 HOWTO|http://www.tldp.org/HOWTO/html_single/TCP-Keepalive-HOWTO/> for details.) Defaults to C<false>.',
         'type' => 'leaf',
+        'upstream_default' => 'no',
         'value_type' => 'boolean',
         'write_as' => [
           'no',
@@ -682,6 +700,7 @@ TCP_NODELAY socket option (see
 L<tcp(7)>).
 Defaults to C<false>.',
         'type' => 'leaf',
+        'upstream_default' => 'no',
         'value_type' => 'boolean',
         'write_as' => [
           'no',
@@ -845,6 +864,7 @@ that this option is useful only when MLS/MCS SELinux policy
 is deployed. Defaults to
 C<false>.',
         'type' => 'leaf',
+        'upstream_default' => 'no',
         'value_type' => 'boolean',
         'write_as' => [
           'no',
@@ -881,6 +901,7 @@ C<IP_FREEBIND>/C<IPV6_FREEBIND> socket option. For robustness
 reasons it is recommended to use this option whenever you bind a socket to a specific IP
 address. Defaults to C<false>.',
         'type' => 'leaf',
+        'upstream_default' => 'no',
         'value_type' => 'boolean',
         'write_as' => [
           'no',
@@ -893,6 +914,7 @@ address. Defaults to C<false>.',
 C<IP_TRANSPARENT>/C<IPV6_TRANSPARENT> socket option. Defaults to
 C<false>.',
         'type' => 'leaf',
+        'upstream_default' => 'no',
         'value_type' => 'boolean',
         'write_as' => [
           'no',
@@ -905,6 +927,7 @@ C<false>.',
 option, which allows broadcast datagrams to be sent from this socket. Defaults to
 C<false>.',
         'type' => 'leaf',
+        'upstream_default' => 'no',
         'value_type' => 'boolean',
         'write_as' => [
           'no',
@@ -917,6 +940,20 @@ C<false>.',
 option, which allows C<AF_UNIX> sockets to receive the credentials of the sending
 process in an ancillary message. Defaults to C<false>.',
         'type' => 'leaf',
+        'upstream_default' => 'no',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
+      },
+      'PassPIDFD',
+      {
+        'description' => 'Takes a boolean value. This controls the C<SO_PASSPIDFD> socket
+option, which allows C<AF_UNIX> sockets to receive the pidfd of the sending
+process in an ancillary message. Defaults to C<false>.',
+        'type' => 'leaf',
+        'upstream_default' => 'no',
         'value_type' => 'boolean',
         'write_as' => [
           'no',
@@ -929,6 +966,7 @@ process in an ancillary message. Defaults to C<false>.',
 option, which allows C<AF_UNIX> sockets to receive the security context of the
 sending process in an ancillary message.  Defaults to C<false>.',
         'type' => 'leaf',
+        'upstream_default' => 'no',
         'value_type' => 'boolean',
         'write_as' => [
           'no',
@@ -944,6 +982,21 @@ metadata as ancillary message, on C<AF_INET>, C<AF_INET6>,
 C<AF_UNIX> and C<AF_PACKET> sockets.  Defaults to
 C<false>.',
         'type' => 'leaf',
+        'upstream_default' => 'no',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
+      },
+      'AcceptFileDescriptors',
+      {
+        'description' => 'Takes a boolean value. This controls the C<SO_PASSRIGHTS> socket
+option, which when disabled prohibits the peer from sending C<SCM_RIGHTS>
+ancillary messages (aka file descriptors) via C<AF_UNIX> sockets. Defaults to
+C<true>.',
+        'type' => 'leaf',
+        'upstream_default' => 'yes',
         'value_type' => 'boolean',
         'write_as' => [
           'no',
@@ -1084,6 +1137,7 @@ recommended as services might continue to run after the socket unit has been ter
 still be possible to communicate with them via their file system node. Defaults to
 off.',
         'type' => 'leaf',
+        'upstream_default' => 'no',
         'value_type' => 'boolean',
         'write_as' => [
           'no',
@@ -1175,7 +1229,7 @@ options, and can be disabled the same way.
 
 If the polling limit is hit polling is temporarily disabled on it until the specified time
 window passes. The polling limit hence slows down connection attempts if hit, but unlike the trigger
-limit won\'t cause permanent failures. It\'s the recommended mechanism to deal with DoS attempts
+limit will not cause permanent failures. It\'s the recommended mechanism to deal with DoS attempts
 through packet flooding.
 
 The polling limit is enforced per file descriptor to listen on, as opposed to the trigger limit
@@ -1200,7 +1254,7 @@ options, and can be disabled the same way.
 
 If the polling limit is hit polling is temporarily disabled on it until the specified time
 window passes. The polling limit hence slows down connection attempts if hit, but unlike the trigger
-limit won\'t cause permanent failures. It\'s the recommended mechanism to deal with DoS attempts
+limit will not cause permanent failures. It\'s the recommended mechanism to deal with DoS attempts
 through packet flooding.
 
 The polling limit is enforced per file descriptor to listen on, as opposed to the trigger limit
@@ -1214,6 +1268,45 @@ unless one of them is reconfigured or disabled.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
+      'DeferTrigger',
+      {
+        'choice' => [
+          'no',
+          'patient',
+          'yes'
+        ],
+        'description' => 'Takes a boolean argument, or C<patient>. May only be used when C<Accept=no>.
+If enabled, job mode C<lenient> instead of C<replace> is used when
+triggering the service, which means currently activating/running units that conflict with the service
+won\'t be disturbed/brought down. Furthermore, if a conflict exists, the socket unit will wait for
+current job queue to complete and potentially defer the activation by then. An upper limit of total time
+to wait can be configured via C<DeferTriggerMaxSec>. If set to C<yes>,
+the socket unit will fail if all jobs have finished or the timeout has been reached but the conflict remains.
+If C<patient>, always wait until C<DeferTriggerMaxSec> elapses.
+Defaults to no.
+
+This setting is particularly useful if the socket unit should stay active across switch-root/soft-reboot
+operations while the triggered service is stopped.',
+        'replace' => {
+          '0' => 'no',
+          '1' => 'yes',
+          'false' => 'no',
+          'true' => 'yes'
+        },
+        'type' => 'leaf',
+        'upstream_default' => 'no',
+        'value_type' => 'enum'
+      },
+      'DeferTriggerMaxSec',
+      {
+        'description' => 'Configures the maximum time to defer the triggering when C<DeferTrigger>
+is enabled. If the service cannot be activated within the specified time, the socket will be considered
+failed and get terminated. Takes a unit-less value in seconds, or a time span value such as "5min 20s".
+Pass C<0> or C<infinity> to disable the timeout logic (the default).
+',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
       'PassFileDescriptorsToExec',
       {
         'description' => 'Takes a boolean argument. Defaults to off. If enabled, file descriptors created by
@@ -1224,6 +1317,7 @@ L<sd_listen_fds(3)> as
 if the commands were invoked from the associated service units.  Note that
 C<ExecStartPre> command cannot access socket file descriptors.',
         'type' => 'leaf',
+        'upstream_default' => 'no',
         'value_type' => 'boolean',
         'write_as' => [
           'no',
@@ -1231,7 +1325,7 @@ C<ExecStartPre> command cannot access socket file descriptors.',
         ]
       }
     ],
-    'generated_by' => 'parse-man.pl from systemd 257 doc',
+    'generated_by' => 'parse-man.pl from systemd 258 doc',
     'license' => 'LGPLv2.1+',
     'name' => 'Systemd::Section::Socket'
   }

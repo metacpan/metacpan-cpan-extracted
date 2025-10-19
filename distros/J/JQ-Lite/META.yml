@@ -21,11 +21,16 @@ no_index:
     - inc
 requires:
   FindBin: '0'
+  Getopt::Long: '0'
+  IO::File: '0'
   JSON::PP: '0'
+  List::Util: '0'
+  Scalar::Util: '0'
+  Term::ANSIColor: '0'
   Test::More: '0'
   perl: '5.014'
 resources:
   bugtracker: https://github.com/kawamurashingo/JQ-Lite/issues
   repository: https://github.com/kawamurashingo/JQ-Lite.git
-version: '1.15'
+version: '1.20'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

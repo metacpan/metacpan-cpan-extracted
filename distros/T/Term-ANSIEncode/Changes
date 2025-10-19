@@ -115,3 +115,10 @@
 
         Fixed testing error
 
+1.32    Oct 17, 2025
+
+        Improved unicode output with -s & -d
+
+1.33    Oct 18, 2025
+
+        Added a plethora of colors

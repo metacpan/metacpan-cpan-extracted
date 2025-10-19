@@ -1,5 +1,8 @@
 Revision history for Perl module Module::Generic
 
+v1.1.2 2025-10-19T16:37:01+0900
+    - Corrected method error(9 to also check for non-empty . Gitlab #5
+
 v1.1.1 2025-10-12T07:53:51+0900
     - Correcting method _load_class to respect the 'no_import' option.
     - Minor update in the documentation for Module::Generic::Global

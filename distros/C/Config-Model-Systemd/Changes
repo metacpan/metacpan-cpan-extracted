@@ -1,3 +1,16 @@
+0.258.1 2025-10-18
+
+  Model update:
+    * update model from systemd 258 doc
+
+  Model generator (parse-man.pl) changes:
+    * fix SetLoginEnvironment upstream_default values
+    * improve detection of upstream_default values
+    * fix enum detection in description
+
+  Other Changes:
+    * dist.ini: remove generated pod file on dzil clean
+
 0.257.2 2025-04-23
 
   Bug fix:

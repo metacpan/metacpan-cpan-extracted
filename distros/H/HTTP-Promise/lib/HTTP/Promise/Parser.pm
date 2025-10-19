@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise/Parser.pm
-## Version v0.2.2
+## Version v0.2.3
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/03/25
-## Modified 2025/10/15
+## Modified 2025/10/19
 ## All rights reserved.
 ## 
 ## 
@@ -18,7 +18,7 @@ BEGIN
     use warnings;
     warnings::register_categories( 'HTTP::Promise' );
     use parent qw( Module::Generic );
-    use vars qw( @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION $ERROR $DEBUG $EXCEPTION_CLASS
+    use vars qw( @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION $DEBUG $EXCEPTION_CLASS
                  $CRLF $LWS $TEXT $TOKEN $HEADER $HTTP_VERSION $REQUEST $RESPONSE 
                  $MAX_HEADERS_SIZE $MAX_READ_BUFFER $MAX_BODY_IN_MEMORY_SIZE 
                  $DEFAULT_MIME_TYPE );
@@ -71,10 +71,9 @@ BEGIN
     # 100Kb
     our $MAX_BODY_IN_MEMORY_SIZE = 102400;
     our $DEFAULT_MIME_TYPE = 'application/octet-stream';
-    our $ERROR    = '';
     our $DEBUG    = 0;
     our $EXCEPTION_CLASS = 'HTTP::Promise::Exception';
-    our $VERSION = 'v0.2.2';
+    our $VERSION = 'v0.2.3';
 };
 
 use strict;
@@ -1113,7 +1112,7 @@ HTTP::Promise::Parser - Fast HTTP Request & Response Parser
 
 =head1 VERSION
 
-    v0.2.2
+    v0.2.3
 
 =head1 DESCRIPTION
 

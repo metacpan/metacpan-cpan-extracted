@@ -7,7 +7,7 @@
 
 package File::Information::Deep;
 
-use v5.10;
+use v5.20;
 use strict;
 use warnings;
 
@@ -15,8 +15,9 @@ use parent 'File::Information::Base';
 
 use Carp;
 use Scalar::Util qw(weaken);
+use Fcntl qw(SEEK_SET);
 
-our $VERSION = v0.13;
+our $VERSION = v0.14;
 
 my %_PNG_colour_types = ( # namespace: 4c11d438-f6f3-417f-85e3-e56e46851dae
     0   => {ise => 'a3934b85-5bec-5cd7-a571-727e4cecfcb1', displayname => 'Greyscale'},
@@ -38,6 +39,21 @@ my %_PNG_compression_method = ( # namespace: b2b8b4bf-3b0f-4037-9bbc-96e6b53ae73
     0   => {ise => 'f47c8ff3-5218-555d-bf89-ba30706c29e1', displayname => 'deflate'},
 );
 
+my %_vmv0_section_types = (
+    1   => {ise => 'bc0dc85a-8c72-5ab6-a60b-377fdf76f678', displayname => 'init'},
+    2   => {ise => '18b7bfe0-5e3a-5fe4-ad69-a317e6b2445c', displayname => 'header'},
+    3   => {ise => '5460c878-23d6-56b9-8600-9375d76fefc5', displayname => 'rodata'},
+    4   => {ise => '0520d8d6-3a85-56d2-ae2b-77c517cff2ce', displayname => 'text'},
+    5   => {ise => '95f7f330-a72d-5e0b-ab0f-d46f37edbc9a', displayname => 'trailer'},
+    6   => {ise => '9bbc79eb-5a31-5797-8a05-56e58c530289', displayname => 'resources'},
+);
+
+# Extra tags that do not belong into one of the other lists.
+my %_wk = (
+    '.section'  => {ise => 'dad2de0d-9711-5b57-9a31-562122d756ba', displayname => '.section'},
+    '.chunk'    => {ise => 'bff479fa-a818-58dc-b5df-539852fa8b80', displayname => '.chunk'},
+);
+
 my %_properties = (
     pdf_version                 => {loader => \&_load_pdf},
     pdf_pages                   => {loader => \&_load_pdf},
@@ -45,6 +61,7 @@ my %_properties = (
     data_uriid_barcodes         => {loader => \&_load_barcodes, rawtype => 'Data::URIID::Barcode'},
     vmv0_filesize               => {loader => \&_load_vmv0},
     vmv0_section_pointer        => {loader => \&_load_vmv0},
+    vmv0_section                => {loader => \&_load_vmv0, rawtype => 'File::Information::Chunk'},
     vmv0_minimum_handles        => {loader => \&_load_vmv0},
     vmv0_minimum_ram            => {loader => \&_load_vmv0},
     vmv0_boundary_text          => {loader => \&_load_vmv0},
@@ -118,7 +135,13 @@ $_properties{image_info_extra_thumb_uri}{rawtype} = 'uri';
 
 
 # Register well known:
-foreach my $value (values(%_PNG_colour_types), values(%_PNG_filter_method), values(%_PNG_compression_method)) {
+foreach my $value (
+    values(%_PNG_colour_types),
+    values(%_PNG_filter_method),
+    values(%_PNG_compression_method),
+    values(%_vmv0_section_types),
+    values(%_wk),
+) {
     Data::Identifier->new(ise => $value->{ise}, displayname => $value->{displayname})->register;
 }
 
@@ -299,6 +322,125 @@ sub _load_odf {
     }
 }
 
+sub _load_vmv0_decode_opcode {
+    my ($self, $in) = @_;
+    my ($op0, $op1) = unpack('CC', $in);
+    my $code  = ($op0 & 0370) >> 3;
+    my $P     = ($op0 & 0007) >> 0;
+    my $codeX = ($op1 & 0300) >> 6;
+    my $S     = ($op1 & 0070) >> 3;
+    my $T     = ($op1 & 0007) >> 0;
+
+    return {code => $code, P => $P, codeX => $codeX, S => $S, T => $T, first => $op0, second => $op1};
+}
+
+sub _load_vmv0__load_chunks {
+    my ($self, %opts) = @_;
+    my $fh    = delete $opts{fh};
+    my $start = delete $opts{start};
+    my @res;
+
+    return undef unless $fh;
+
+    while (1) {
+        $fh->seek($start, SEEK_SET) or die $!;
+        if (read($fh, my $in, 2) != 2) {
+            last;
+        } else {
+            my $opcode = $self->_load_vmv0_decode_opcode($in);
+            my $opcode_length = 2;
+            my $outer_length;
+            my $inner_offset;
+            my $length;
+            my %new_opts = %opts;
+            my $flags;
+            my $type;
+            my $identifier;
+
+            last unless $opcode->{first} == 6 && $opcode->{codeX} == 0 && $opcode->{S} && $opcode->{T} < 4;
+
+            # Read length:
+            if ($opcode->{T} == 1) {
+                last unless read($fh, $in, 2) == 2;
+                $length = unpack('n', $in) * 2;
+                $opcode_length += 2;
+            } elsif ($opcode->{T} == 2) {
+                last unless read($fh, $in, 4) == 4;
+                $length = unpack('N', $in) * 2;
+                $opcode_length += 4;
+            }
+
+            next unless defined $length;
+            $inner_offset = $opcode_length;
+
+            # Read flags and type:
+            last unless read($fh, $in, 4) == 4;
+            ($flags, $type) = unpack('nn', $in);
+            $inner_offset += 4;
+
+            # Read identifier (if any):
+            if ($flags & 0x0002) {
+                last unless read($fh, $in, 2) == 2;
+                $identifier = unpack('n', $in);
+                $inner_offset += 2;
+            }
+
+            if (($flags & 0xC000) == 0x0000) { # SNI
+                $type = Data::Identifier->new('039e0bb7-5dd3-40ee-a98c-596ff6cce405' => $type);
+            } elsif (($flags & 0xC000) == 0x4000) { # SID
+                $type = Data::Identifier->new(sid => $type);
+            } else {
+                $type = undef;
+            }
+
+            $outer_length = $length + $opcode_length;
+            push(@res, File::Information::Chunk->_new(%opts,
+                    start => $start,
+                    size => $outer_length,
+                    outer_type => {ise => $_wk{'.chunk'}->{ise}},
+                    inner_type => {raw => $type, ise => $type->ise},
+                    inner_start => $start + $inner_offset,
+                    inner_size => $outer_length - $inner_offset - ($flags & 0x1 ? 1 : 0),
+                ));
+
+            $start += $outer_length;
+        }
+    }
+
+    return undef unless scalar @res;
+    return \@res;
+}
+
+sub _load_vmv0__chunk {
+    my ($self, %opts) = @_;
+
+    if (defined(my $fh = delete $opts{fh})) {
+        $fh->seek($opts{start}, SEEK_SET) or die $!;
+        if (read($fh, my $in, 2) == 2) {
+            my $opcode = $self->_load_vmv0_decode_opcode($in);
+            if ($opcode->{first} == 0 && $opcode->{codeX} == 0 && ($opcode->{T} & 0x4)) {
+                my $n = $opcode->{T} - 4;
+
+                if ($n > 0) {
+                    $n *= 2;
+                    (read($fh, my $magic, $n) == $n) or croak 'IO error: Cannot read '.$n.' bytes';
+                    if (length($magic) == $n) {
+                        $opts{outer_magic} = {raw => $magic};
+                    }
+                }
+
+                my $section_type = $opcode->{S};
+                if ($section_type == 5 || $section_type == 6) {
+                    $opts{subchunks} = $self->_load_vmv0__load_chunks(%opts, start => $fh->tell, fh => $fh);
+                }
+                $opts{outer_type} = {ise => $_wk{'.section'}->{ise}};
+                $opts{inner_type} = {ise => $_vmv0_section_types{$section_type}->{ise}};
+            }
+        }
+    }
+
+    return File::Information::Chunk->_new(%opts);
+}
 sub _load_vmv0 {
     my ($self, $key, %opts) = @_;
     my $pv = ($self->{properties_values} //= {})->{current} //= {};
@@ -314,12 +456,8 @@ sub _load_vmv0 {
         my %section_pointer;
 
         while (length($data)) {
-            my ($op0, $op1) = unpack('CC', substr($data, 0, 2, ''));
-            my $code  = ($op0 & 0370) >> 3;
-            my $P     = ($op0 & 0007) >> 0;
-            my $codeX = ($op1 & 0300) >> 6;
-            my $S     = ($op1 & 0070) >> 3;
-            my $T     = ($op1 & 0007) >> 0;
+            my $opcode = $self->_load_vmv0_decode_opcode(substr($data, 0, 2, ''));
+            my ($op0, $op1, $code, $P, $codeX, $S, $T) = $opcode->@{qw(first second code P codeX S T)};
             my $extra_as_num;
             my $extra_len = 0;
             my $extra;
@@ -360,7 +498,25 @@ sub _load_vmv0 {
         }
 
         if (scalar keys %section_pointer) {
-            $pv->{vmv0_section_pointer} = [map {{raw => $_}} keys %section_pointer];
+            my @pointers = sort {$a <=> $b} keys %section_pointer;
+            my $fh = $inode->_get_fh;
+            my @sections;
+            my $last;
+
+            $pv->{vmv0_section_pointer} = [map {{raw => $_}} @pointers];
+
+            require File::Information::Chunk;
+
+            foreach my $c (@pointers) {
+                if (defined $last) {
+                    push(@sections, $self->_load_vmv0__chunk(instance => $self->instance, path => $self->{path}, parent => $self, inode => $inode, start => $last, end => $c, fh => $fh));
+                }
+                $last = $c;
+            }
+            if (defined $last) {
+                push(@sections, $self->_load_vmv0__chunk(instance => $self->instance, path => $self->{path}, parent => $self, inode => $inode, start => $last, end => scalar($inode->get('size')), fh => $fh));
+            }
+            $pv->{vmv0_section} = [map {{raw => $_}} @sections];
         }
     }
 }
@@ -671,7 +827,7 @@ File::Information::Deep - generic module for extracting information from filesys
 
 =head1 VERSION
 
-version v0.13
+version v0.14
 
 =head1 SYNOPSIS
 

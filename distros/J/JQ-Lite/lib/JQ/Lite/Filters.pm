@@ -31,6 +31,32 @@ sub apply {
             return 1;
         }
 
+        if (JQ::Lite::Util::_looks_like_expression($normalized)) {
+            my @evaluated;
+            my $all_ok = 1;
+
+            for my $item (@results) {
+                my ($values, $ok) = JQ::Lite::Util::_evaluate_value_expression($self, $item, $normalized);
+                if ($ok) {
+                    if (@$values) {
+                        push @evaluated, $values->[0];
+                    }
+                    else {
+                        push @evaluated, undef;
+                    }
+                }
+                else {
+                    $all_ok = 0;
+                    last;
+                }
+            }
+
+            if ($all_ok) {
+                @$out_ref = @evaluated;
+                return 1;
+            }
+        }
+
         # support for addition (. + expr)
         if ($normalized =~ /^\.\s*\+\s*(.+)$/s) {
             my $rhs_expr = $1;
@@ -1039,6 +1065,12 @@ sub apply {
         # support for to_number()
         if ($part eq 'to_number()' || $part eq 'to_number') {
             @next_results = map { JQ::Lite::Util::_apply_to_number($_) } @results;
+            @$out_ref = @next_results;
+            return 1;
+        }
+
+        if ($part eq 'tonumber()' || $part eq 'tonumber') {
+            @next_results = map { JQ::Lite::Util::_tonumber($_) } @results;
             @$out_ref = @next_results;
             return 1;
         }

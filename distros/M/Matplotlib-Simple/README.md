@@ -1,6 +1,8 @@
 # Synopsis
 
 Take a data structure in Perl, and automatically write a Python3 script using matplotlib to generate an image.  The Python3 script is saved in `/tmp`, to be edited at the user's discretion.
+Requires python3 and matplotlib installations.
+
 ## Single Plots
 Simplest use case:
 ```
@@ -53,8 +55,8 @@ which produces the following subplots image:
 
 <img width="651" height="424" alt="pies" src="https://github.com/user-attachments/assets/49d3e28b-f897-4b01-9e72-38afa12fa538" />
 
-`bar`, `barh`, `boxplot`, `hexbin`, `hist`, `pie`, `plot`, `scatter`, `violinplot` all match the methods in matplotlib itself.
-# Examples
+`bar`, `barh`, `boxplot`, `hexbin`, `hist`, `hist2d`, `imshow`, `pie`, `plot`, `scatter`, and `violinplot` all match the methods in matplotlib itself.
+# Examples/Plot Types
 Consider the following helper subroutines to generate data to plot:
 
 ```
@@ -101,22 +103,8 @@ sub rand_between {
 }
 ```
 ## Barplot/bar/barh
-```
-use Matplotlib::Simple 'plot';
-plot({
-	'output.filename'			=> 'output.images/single.barplot.png',
-	data	=> { # simple hash
-		Fri => 76, Mon	=> 73, Sat => 26, Sun => 11, Thu	=> 94, Tue	=> 93, Wed	=> 77
-	},
-	'plot.type'	=> 'bar',
-	xlabel		=> '# of Days',
-	ylabel		=> 'Count',
-	title		=> 'Customer Calls by Days'
-});
-```
-where `xlabel`, `ylabel`, `title`, etc. are axis methods in matplotlib itself. `plot.type`, `data`, `input.file` are all specific to `MatPlotLib::Simple`.
-<img width="651" height="491" alt="single barplot" src="https://github.com/user-attachments/assets/eae009a8-5571-4608-abdb-1016e3cff5fd" />
 ### Options
+
 | Option | Description | Example |
 | -------- | ------- | ------- 
 |color| :mpltype:`color` or list of :mpltype:`color`, optional; The colors of the bar faces. This is an alias for *facecolor*. If both are given, *facecolor* takes precedence # if entering multiple colors, quoting isn't needed|`color => ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'fuchsia'],` or a single color for all bars `color => 'red'`
@@ -131,6 +119,26 @@ where `xlabel`, `ylabel`, `title`, etc. are axis methods in matplotlib itself. `
 
 an example of multiple plots, showing many options:
 
+### single, simple plot
+
+```
+use Matplotlib::Simple 'plot';
+plot({
+	'output.filename'			=> 'output.images/single.barplot.png',
+	data	=> { # simple hash
+		Fri => 76, Mon	=> 73, Sat => 26, Sun => 11, Thu	=> 94, Tue	=> 93, Wed	=> 77
+	},
+	'plot.type'	=> 'bar',
+	xlabel		=> '# of Days',
+	ylabel		=> 'Count',
+	title		=> 'Customer Calls by Days'
+});
+```
+
+where `xlabel`, `ylabel`, `title`, etc. are axis methods in matplotlib itself. `plot.type`, `data`, `input.file` are all specific to `MatPlotLib::Simple`.
+<img width="651" height="491" alt="single barplot" src="https://github.com/user-attachments/assets/eae009a8-5571-4608-abdb-1016e3cff5fd" />
+
+### multiple plots
 ```
 plot({
 	'input.file'		=> $tmp_filename,
@@ -302,9 +310,29 @@ plot({
 which produces the plot:
 
 <img width="2678" height="849" alt="barplots" src="https://github.com/user-attachments/assets/6d87d13b-dabd-485d-92f7-1418f4acc65b" />
-
+## boxplot
+### options
+### single, simple plot
+### multiple plots
 ## hexbin
-### single plot
+see https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.hexbin.html
+### options
+
+| Option | Description | Example |
+| -------- | ------- | ------- 
+| cb_logscale | colorbar log scale `from matplotlib.colors import LogNorm` | default 0, any value > 0 enables |
+|cmap| The Colormap instance or registered colormap name used to map scalar data to colors | default `gist_rainbow` |
+|key.order|  define the keys in an order (an array reference)|`'key.order' => ['X-rays', 'Yak Butter'],`
+| marginals | integer, by default off = 0 | `marginals => 1` |
+| mincnt | int >= 0, default: None; If not None, only display cells with at least mincnt number of points in the cell. |  `mincnt => 2`|
+| vmax  | The normalization method used to scale scalar data to the [0, 1] range before mapping to colors using cmap | `'asinh', 'function', 'functionlog', 'linear', 'log', 'logit', 'symlog'` default `linear` |
+| vmin  | The normalization method used to scale scalar data to the [0, 1] range before mapping to colors using cmap | `'asinh', 'function', 'functionlog', 'linear', 'log', 'logit', 'symlog'` default `linear` |
+| xbins | integer that accesses horizontal gridsize | default is 15 |
+| xscale.hexbin | 'linear', 'log'}, default: 'linear': Use a linear or log10 scale on the horizontal axis | `'xscale.hexbin' => 'log'`|
+| ybins | integer that accesses vertical gridsize | default is 15 |
+| yscale.hexbin | 'linear', 'log'}, default: 'linear': Use a linear or log10 scale on the vertical axis | `'yscale.hexbin' => 'log'`|
+
+### single, simple plot
 ```
 plot({
 	data	=> {
@@ -330,31 +358,120 @@ plot(
         plots             => [
             {
                 data => {
-                    E => generate_normal_dist( 100, 15, 3 * 210 ),
-                    B => generate_normal_dist( 85,  15, 3 * 210 )
+                    E => @e,
+                    B => @b
                 },
                 'plot.type'  => 'hexbin',
                 title        => 'Simple Hexbin',
-                xlabel       => 'xlabel',
-                set_figwidth => 12,
             },
             {
                 data => {
-                    E => generate_normal_dist( 100, 15, 3 * 210 ),
-                    B => generate_normal_dist( 85,  15, 3 * 210 )
+                    E => @e,
+                    B => @b
                 },
                 'plot.type' => 'hexbin',
                 title       => 'colorbar logscale',
                 cb_logscale => 1
-            }
+            },
+            {
+                cmap => 'jet',
+                data => {
+                    E => @e,
+                    B => @b
+                },
+                'plot.type'  => 'hexbin',
+                title        => 'cmap is jet',
+                xlabel       => 'xlabel',
+            },
+             {
+                data => {
+                    E => @e,
+                    B => @b
+                },
+                'key.order'  => ['E', 'B'],
+                'plot.type'  => 'hexbin',
+                title        => 'Switch axes with key.order',
+            },
+             {
+                data => {
+                    E => @e,
+                    B => @b
+                },
+                'plot.type'  => 'hexbin',
+                title        => 'vmax set to 25',
+                vmax         => 25
+            },
+             {
+                data => {
+                    E => @e,
+                    B => @b
+                },
+                'plot.type'  => 'hexbin',
+                title        => 'vmin set to -4',
+                vmin         => -4
+            },
+            {
+                data => {
+                    E => @e,
+                    B => @b
+                },
+                'plot.type'  => 'hexbin',
+                title        => 'mincnt set to 7',
+                mincnt       => 7
+            },
+            {
+                data => {
+                    E => @e,
+                    B => @b
+                },
+                'plot.type'  => 'hexbin',
+                title        => 'xbins set to 9',
+                xbins        => 9
+            },
+            {
+                data => {
+                    E => @e,
+                    B => @b
+                },
+                'plot.type'  => 'hexbin',
+                title        => 'ybins set to 9',
+                ybins        => 9
+            },
+            {
+                data => {
+                    E => @e,
+                    B => @b
+                },
+                'plot.type'  => 'hexbin',
+                title        => 'marginals = 1',
+                marginals    => 1
+            },
         ],
         ncols => 2
     }
 );
 ```
-<img width="1210" height="491" alt="hexbin" src="https://github.com/user-attachments/assets/819a2525-d03b-467f-b886-69df0870d1c9" />
+which produces the following image:
+<img width="2010" height="1511" alt="hexbin" src="https://github.com/user-attachments/assets/71412ab1-e869-4913-a8cf-e39df15c9590" />
+## hist
+### options
+### single, simple plot
+### multiple plots
+## hist2d
+### options
+### single, simple plot
+### multiple plots
+## imshow
+### options
+### single, simple plot
+### multiple plots
+## pie
+### options
+### single, simple plot
+### multiple plots
 ## plot
 ### single, simple
+
 ```
 plot(
     {
@@ -383,7 +500,10 @@ plot(
     }
 );
 ```
+
 which makes the following "plot" plot: <img width="651" height="491" alt="plot single" src="https://github.com/user-attachments/assets/6cbd6aad-c464-4703-b962-b420ec08bb66" />
+
+### multiple sub-plots
 
 ```
 my $pi = atan2( 0, -1 );
@@ -446,5 +566,78 @@ plot(
 );
 ```
 which makes <img width="1211" height="491" alt="plot" src="https://github.com/user-attachments/assets/a8312147-e13d-4aa9-9997-49430bb5c74a" />
-
+## scatter
+### options
+### single, simple plot
+### multiple plots
+## violin
+### options
+### single, simple plot
+### multiple plots
+## wide
+### options
+### single, simple plot
+### multiple plots
 # Advanced
+## Notes in Files
+all files that can have notes with them, give notes about how the file was written.  For example, SVG files have the following:
+`<dc:title>made/written by /mnt/ceph/dcondon/ui/gromacs/tut/dup.2puy/1.plot.gromacs.pl called using "plot" in /mnt/ceph/dcondon/perl5/perlbrew/perls/perl-5.42.0/lib/site_perl/5.42.0/x86_64-linux/Matplotlib/Simple.pm</dc:title>`
+## Speed
+To improve speed, all data can be written into a single temp python3 file thus:
+```
+use File::Temp 'tempfile';
+
+my ( $fh, $tmp_filename ) =  tempfile( DIR => '/tmp', SUFFIX => '.py', UNLINK => 0 );
+close $fh;
+# all files will be written to $tmp_filename; be sure to put `execute => 0`
+plot(
+    {
+        data => {
+            Clinical => [
+                [
+                    [@xw],    # x
+                    [@y]      # y
+                ],
+                [ [@xw], [ map { $_ + rand_between( -0.5, 0.5 ) } @y ] ],
+                [ [@xw], [ map { $_ + rand_between( -0.5, 0.5 ) } @y ] ]
+            ],
+            HGI => [
+                [
+                    [@xw],                            # x
+                    [ map { 1.9 - 1.1 / $_ } @xw ]    # y
+                ],
+                [ [@xw], [ map { $_ + rand_between( -0.5, 0.5 ) } @y ] ],
+                [ [@xw], [ map { $_ + rand_between( -0.5, 0.5 ) } @y ] ]
+            ]
+        },
+        'output.filename' => 'output.images/single.wide.png',
+        'plot.type'       => 'wide',
+        color             => {
+            Clinical => 'blue',
+            HGI      => 'green'
+        },
+        title        => 'Visualization of similar lines plotted together',
+        'input.file' => $tmp_filename,
+        execute      => 0,
+    }
+);
+# the last plot should have `execute => 1`
+plot(
+    {
+        data => [
+            [
+                [@xw],    # x
+                [@y]      # y
+            ],
+            [ [@xw], [ map { $_ + rand_between( -0.5, 0.5 ) } @y ] ],
+            [ [@xw], [ map { $_ + rand_between( -0.5, 0.5 ) } @y ] ]
+        ],
+        'output.filename' => 'output.images/single.array.png',
+        'plot.type'       => 'wide',
+        color             => 'red',
+        title             => 'Visualization of similar lines plotted together',
+        'input.file'      => $tmp_filename,
+        execute           => 1,
+    }
+);
+```

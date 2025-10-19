@@ -76,10 +76,10 @@ const struct neo4j_plan_table_colors *neo4j_plan_table_ansi_colors =
         &_neo4j_plan_table_ansi_colors;
 
 static version_spec_t neo4j_supported_versions[4] = {
-  {5, 0, 0}, {4, 0, 0}, {3, 0, 0}, {1, 0, 0}
+  {5, 0, 0}, {4, 4, 0}, {3, 0, 0}, {1, 0, 0}
 };
 
-static const char neo4j_supported_versions_string[] = "5.0,4.0,3.0,1.0";
+static const char neo4j_supported_versions_string[] = "5.0,4.4,3.0,1.0";
 
 static ssize_t default_password_callback(void *userdata, char *buf, size_t n);
 
@@ -722,9 +722,9 @@ int neo4j_config_set_supported_versions(neo4j_config_t *config, const char *vers
       if (parse_version_string(p, config->supported_versions+n) != 0)
 	{
 	  // set default
-	  int i;
 	  neo4j_config_set_supported_versions(config, neo4j_supported_versions_string);
 	  fprintf(stderr, "%s\n", neo4j_config_get_supported_versions(config));
+      free(vs);
 	  return -1;
 	}
       p = strtok(NULL, ",");
@@ -736,6 +736,7 @@ int neo4j_config_set_supported_versions(neo4j_config_t *config, const char *vers
     (config->supported_versions+n)->and_lower = 0;
     n++;
   }
+  free(vs);
   return 0;
 }
 

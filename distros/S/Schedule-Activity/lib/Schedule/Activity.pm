@@ -7,8 +7,9 @@ use Schedule::Activity::Annotation;
 use Schedule::Activity::Attributes;
 use Schedule::Activity::Message;
 use Schedule::Activity::Node;
+use Schedule::Activity::NodeFilter;
 
-our $VERSION='0.1.5';
+our $VERSION='0.1.6';
 
 sub buildConfig {
 	my (%base)=@_;
@@ -25,6 +26,7 @@ sub buildConfig {
 		else       { delete($$node{next}) }
 		if(defined($$node{finish})) { $$node{finish}=$res{node}{$$node{finish}} }
 		$$node{msg}=Schedule::Activity::Message->new(message=>$$node{message},names=>$msgNames);
+		if(is_plain_hashref($$node{require})) { $$node{require}=Schedule::Activity::NodeFilter->new(%{$$node{require}}) }
 	}
 	return %res;
 }
@@ -67,40 +69,59 @@ sub validateConfig {
 	return @errors;
 }
 
+sub nodeMessage {
+	my ($optattr,$tm,$node)=@_;
+	my ($message,$msg)=$$node{msg}->random();
+	if($$node{attributes}) {
+		while(my ($k,$v)=each %{$$node{attributes}}) {
+			$optattr->change($k,%$v,tm=>$tm) } }
+	if(is_hashref($msg)) { while(my ($k,$v)=each %{$$msg{attributes}}) {
+		$optattr->change($k,%$v,tm=>$tm);
+	} }
+	#
+	return Schedule::Activity::Message->new(message=>$message,attributes=>$$msg{attributes}//{});
+}
+
 sub findpath {
 	my (%opt)=@_;
 	my ($tm,$slack,$buffer,@res)=(0,0,0);
 	my $tension=1-($opt{tension}//0.5);
 	my ($node,$conclusion)=($opt{start},$opt{finish});
+	$opt{attr}->push();
 	while($node&&($node ne $conclusion)) {
 		push @res,[$tm,$node];
+		push @{$res[-1]},nodeMessage($opt{attr},$tm+$opt{tmoffset},$node);
 		$node->increment(\$tm,\$slack,\$buffer);
 		if(
 			($tm+$tension*$buffer>=$opt{goal})
-			&&($opt{goal}-$tm>=$buffer)
+			&&($opt{goal}-$tm<=$buffer)
 			&&($node->hasnext($conclusion))
 		) {
 			push @res,[$tm,$conclusion];
+			push @{$res[-1]},nodeMessage($opt{attr},$tm+$opt{tmoffset},$conclusion);
 			$conclusion->increment(\$tm,\$slack,\$buffer);
 			$node=undef;
 		}
 		elsif($tm>=$opt{goal}) {
 			if($node->hasnext($conclusion)) {
 				push @res,[$tm,$conclusion];
+				push @{$res[-1]},nodeMessage($opt{attr},$tm+$opt{tmoffset},$conclusion);
 				$conclusion->increment(\$tm,\$slack,\$buffer);
 				$node=undef;
 			}
-			elsif($tm-$opt{goal}<$slack) { $node=$node->nextrandom() }
-			elsif($opt{backtracks}>0) { return (retry=>1,error=>"No backtracking support") }
+			elsif($tm-$opt{goal}<$slack) { $node=$node->nextrandom(tm=>$tm,attr=>$opt{attr}{attr}) }
+			elsif($opt{backtracks}>0) { $opt{attr}->pop(); return (retry=>1,error=>"No backtracking support") }
 			else { die 'this needs to backtrack or retry' }
 		}
-		else { $node=$node->nextrandom(not=>$conclusion) }
+		else { $node=$node->nextrandom(not=>$conclusion,tm=>$tm,attr=>$opt{attr}{attr}) }
 	}
 	if($node&&($node eq $conclusion)) {
 		push @res,[$tm,$conclusion];
+		push @{$res[-1]},nodeMessage($opt{attr},$tm+$opt{tmoffset},$conclusion);
 		$conclusion->increment(\$tm,\$slack,\$buffer);
 		$node=undef;
 	}
+	$opt{attr}->pop();
 	return (
 		steps =>\@res,
 		tm    =>$tm,
@@ -130,6 +151,8 @@ sub scheduler {
 		tension   =>$opt{tension},
 		retries   =>$opt{retries},
 		backtracks=>2*$opt{retries},
+		attr      =>$opt{attr},
+		tmoffset  =>$opt{tmoffset},
 	);
 	if($path{retry}) { return scheduler(%opt,retries=>$opt{retries},error=>$path{error}//'Retries exhausted') }
 	my @res=@{$path{steps}};
@@ -155,8 +178,8 @@ sub scheduler {
 		my $dt;
 		if($i<$#res) { $dt=$res[$i+1][0]-$res[$i][0] }
 		else         { $dt=$opt{goal}-$res[$i][0] }
-		$res[$i][2]=$dt-($res[$i][1]{tmmin}//0);
-		$res[$i][3]=($res[$i][1]{tmmax}//0)-$dt;
+		$res[$i][3]=$dt-($res[$i][1]{tmmin}//0);
+		$res[$i][4]=($res[$i][1]{tmmax}//0)-$dt;
 	}
 	#
 	# Full materialization of messages and attributes occurs after all
@@ -174,7 +197,7 @@ sub scheduler {
 		if($$node{attributes}) {
 			while(my ($k,$v)=each %{$$node{attributes}}) {
 				$opt{attr}->change($k,%$v,tm=>$res[$i][0]+$opt{tmoffset}) } }
-		my ($message,$msg)=$$node{msg}->random();
+		my ($message,$msg)=$res[$i][2]->random();
 		$res[$i][1]=Schedule::Activity::Node->new(%$node,message=>$message);
 		if(is_hashref($msg)) { while(my ($k,$v)=each %{$$msg{attributes}}) {
 			$opt{attr}->change($k,%$v,tm=>$res[$i][0]+$opt{tmoffset});
@@ -280,7 +303,7 @@ Schedule::Activity - Generate random activity schedules
 
 =head1 VERSION
 
-Version 0.1.5
+Version 0.1.6
 
 =head1 SYNOPSIS
 
@@ -569,6 +592,33 @@ The configuration of a named message may only create string, array, or hash alte
 
 This feature is experimental starting with version 0.1.2.
 
+=head1 FILTERING
+
+Experimental starting with version 0.1.6.
+
+Action nodes may include prerequisites before they will be selected during scheduling:
+
+  'action name'=>{
+    require=>{
+      ...
+    }
+    ...
+  }
+
+During schedule construction, the list of C<next> actions will be filtered by C<require> to identify candidate actions.  The current attribute values at the time of selection will be used to perform the evaluation.  The available filtering criteria are fully described in L<Schedule::Activity::NodeFilter> and include attribute numeric comparison and Boolean operators.
+
+Action filtering may be used, together with attribute setting and increments, to prevent certain actions from appearing if others have not previously occurred, or vice versa.  This mechanism may also be used to specify global or per-activity limits on certain actions.
+
+=head2 Slack and Buffer
+
+During scheduling, filtering is evaluated as a I<single pass> only, per activity:  When finding a sequence of actions to fulfill a scheduling goal for an activity, candidates (from C<next>) are checked based on the current attributes.  Action times during construction are based on C<tmavg>, so any filter using attribute average values will be computed as if the action sequence only used C<tmavg>.  After a solution is found, however, actions are adjusted across the total slack/buffer available, so the "materialized average" attribute values can be slightly different.
+
+This should never affect attributes used for a stateful/flag/counter-based filter, because those value changes will still occur in the same sequence.
+
+=head2 Bugs
+
+Note:  As of version 0.1.6, there is an optimization that a C<next> list of only a single item will I<always> select that as the next action.  See BUGS for more details.  As a workaround, duplicate that entry in the next list to force filtering.
+
 =head1 IMPORT MECHANISMS
 
 =head2 Markdown
@@ -595,6 +645,8 @@ The full settings needed to build a schedule can be loaded with C<%settings=load
 =head1 BUGS
 
 It is possible for some settings to get stuck in an infinite loop:  Be cautious setting C<tmavg=0> for actions.
+
+There is currently a limitation with scheduling to the maximum buffer that is dependent on the behavior that a list of next actions with only a single entry will return that entry (even if it would have been otherwise filtered).  The exceptions need to be updated so that the maximum buffer includes the tmmax of the conclusion node itself, otherwise the conclusion node will get filtered out and scheduling will fail.
 
 =head1 SEE ALSO
 

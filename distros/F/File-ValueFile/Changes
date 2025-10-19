@@ -1,3 +1,7 @@
+v0.08   2025-10-19Z
+    - Automatically add a comment to tag-generator-hint if available
+    - Added experimental style option 'tag_relation' in File::ValueFile::Simple::Writer
+
 v0.07   2025-05-15Z
     - Handle arrayrefs as generator hints
     - Register those identifiers we hold in memory anyway

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## DateTime Format Relative Time - ~/lib/DateTime/Format/RelativeTime.pm
-## Version v0.2.0
+## Version v0.2.1
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/12/30
-## Modified 2025/10/16
+## Modified 2025/10/19
 ## All rights reserved
 ## 
 ## 
@@ -27,7 +27,7 @@ BEGIN
     use Locale::Unicode::Data v1.3.2;
     use Scalar::Util ();
     use Wanted;
-    our $VERSION = 'v0.2.0';
+    our $VERSION = 'v0.2.1';
 };
 
 use strict;
@@ -1158,7 +1158,7 @@ For users requiring exact decimal representation beyond this precision, consider
 
 =head1 VERSION
 
-    v0.2.0
+    v0.2.1
 
 =head1 DESCRIPTION
 

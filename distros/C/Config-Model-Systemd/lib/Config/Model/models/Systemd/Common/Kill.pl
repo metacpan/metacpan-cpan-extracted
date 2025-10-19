@@ -119,6 +119,7 @@ shells and shell-like programs that their connection has been
 severed. Takes a boolean value. Defaults to C<no>.
 ',
         'type' => 'leaf',
+        'upstream_default' => 'no',
         'value_type' => 'boolean',
         'write_as' => [
           'no',
@@ -138,6 +139,7 @@ processes from prior services exist within the control group.
 Takes a boolean value. Defaults to C<yes>.
 ',
         'type' => 'leaf',
+        'upstream_default' => 'yes',
         'value_type' => 'boolean',
         'write_as' => [
           'no',
@@ -171,7 +173,7 @@ C<WatchdogSec>). Defaults to C<SIGABRT>.
         'value_type' => 'uniline'
       }
     ],
-    'generated_by' => 'parse-man.pl from systemd 257 doc',
+    'generated_by' => 'parse-man.pl from systemd 258 doc',
     'license' => 'LGPLv2.1+',
     'name' => 'Systemd::Common::Kill'
   }

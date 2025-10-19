@@ -12,6 +12,7 @@ dist.ini
 examples/file-information-dump
 lib/File/Information.pm
 lib/File/Information/Base.pm
+lib/File/Information/Chunk.pm
 lib/File/Information/Deep.pm
 lib/File/Information/Editor.pm
 lib/File/Information/Filesystem.pm

@@ -3,13 +3,13 @@ package JQ::Lite;
 use strict;
 use warnings;
 
-use JSON::PP;
+use JSON::PP ();
 
 use JQ::Lite::Filters;
 use JQ::Lite::Parser;
 use JQ::Lite::Util ();
 
-our $VERSION = '1.15';
+our $VERSION = '1.20';
 
 sub new {
     my ($class, %opts) = @_;
@@ -22,7 +22,7 @@ sub new {
 
 sub run_query {
     my ($self, $json_text, $query) = @_;
-    my $data = decode_json($json_text);
+    my $data = JQ::Lite::Util::_decode_json($json_text);
 
     return ($data) if !defined $query || $query =~ /^\s*\.\s*$/;
 
@@ -57,7 +57,7 @@ JQ::Lite - A lightweight jq-like JSON query engine in Perl
 
 =head1 VERSION
 
-Version 1.15
+Version 1.20
 
 =head1 SYNOPSIS
 

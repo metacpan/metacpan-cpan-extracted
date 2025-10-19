@@ -30,13 +30,37 @@ use constant {
 
 my %_default_style = (
     generator_hint              => 'auto',
+    tag_relation                => 'tag-relation',
     degenerate_generator_hint   => undef,
     tag_ise_no_ise_retry        => undef,
     tag_ise_no_ise_one          => 1,
     tag_ise_no_ise_no_uriid     => 1,
 );
 
-our $VERSION = v0.07;
+my %_generator_comments = (
+    '97b7f241-e1c5-4f02-ae3c-8e31e501e1dc' => 'gregorian-date',
+    '7da02209-0cf5-4bd2-9ce9-50bd0b7d76e3' => 'owner',
+    '5714e8d8-913a-4193-9de0-eb6ba9e13e1f' => 'favourite',
+    '283511f7-1c0d-44d4-abd8-6ed1e1fc5d66' => 'like',
+    'fd7eb1c9-2840-467c-a77b-afa6f925f0c3' => 'dislike',
+    'f2bd1194-d658-4741-b1b1-b4cfd0d6ddea' => 'todo',
+    'bd471aca-8b37-483c-8569-a84444b34cfc' => 'background',
+    'd511f370-0e49-42d5-ad18-bf280dc97e08' => 'body',
+    'bd1a1966-2e71-43cc-a7ce-f7a4547df450' => 'character',
+    'f616e3e2-7779-4172-ae26-865b979b4d0c' => 'artist',
+    'ee60545c-5415-474d-abe9-6de941045460' => 'fertilization',
+    '2b85ca08-921c-4683-a102-f18748c88fda' => 'birth',
+    '3e1c709e-32bf-4943-a9fa-8c25cb37dc92' => 'death',
+    '8b864ce6-e034-432d-8803-c95cd6da53b6' => 'tagcombiner',
+);
+
+my %_old_style_relation = (
+    '7f265548-81dc-4280-9550-1bd0aa4bf748' => 'tag-type',
+    'e48cd5c6-83d7-411e-9640-cb370f3502fc' => 'tag-implies',
+    'd926eb95-6984-415f-8892-233c13491931' => 'tag-links',
+);
+
+our $VERSION = v0.08;
 
 
 
@@ -407,6 +431,11 @@ sub write_tag_relation {
         }
     }
 
+    if ($self->{style}{tag_relation} eq 'mixed' && !defined($context) && !defined($filter) && defined(my $old_style = $_old_style_relation{$relation->ise})) {
+        $self->write_with_comment($old_style, $tag, $related, $comment);
+        return;
+    }
+
     $self->write_with_comment('tag-relation', $tag, $relation, $related, $context, $filter, $comment);
 }
 
@@ -468,7 +497,7 @@ sub write_tag_metadata {
 
 
 sub write_tag_generator_hint {
-    my ($self, $tag, $generator, $hint) = @_;
+    my ($self, $tag, $generator, $hint, $comment) = @_;
 
     $generator //= Data::Identifier->new(from => $tag)->generator(default => undef);
     $hint      //= Data::Identifier->new(from => $tag)->request(default => undef);
@@ -498,7 +527,15 @@ sub write_tag_generator_hint {
         $self->write_tag_metadata($tag, $generator_request, $hint);
         $self->write_tag_relation($tag, $generated_by, Data::Identifier->new(from => $generator));
     } else {
-        $self->write('tag-generator-hint', $tag, $generator, $hint);
+        if (defined $generator) {
+            $comment //= $_generator_comments{ref($generator) ? $generator->ise : $generator};
+        }
+
+        if (defined $comment) {
+            $self->write_with_comment('tag-generator-hint', $tag, $generator, $hint, $comment);
+        } else {
+            $self->write('tag-generator-hint', $tag, $generator, $hint);
+        }
     }
 }
 
@@ -536,7 +573,7 @@ File::ValueFile::Simple::Writer - module for reading and writing ValueFile files
 
 =head1 VERSION
 
-version v0.07
+version v0.08
 
 =head1 SYNOPSIS
 
@@ -649,6 +686,14 @@ Boolean, default true (only use the first).
 
 Whether or not L<https://uriid.org/> backup values should be skipped if C<tag_ise_no_ise_retry> is active.
 Boolean, default true.
+
+=item C<tag_relation>
+
+(experimental since v0.08)
+
+The style to use for tag relations.
+This can be C<tag-relation> (always use C<tag-relation>),
+or C<mixed> (use old style commands for some relations, fall back to C<tag-relation>).
 
 =back
 
@@ -776,7 +821,7 @@ Each method must also tolerable the options C<default>, C<no_defaults>, and C<as
 
 =head2 write_tag_generator_hint
 
-    $writer->write_tag_generator_hint($tag, $generator, $hint);
+    $writer->write_tag_generator_hint($tag, $generator, $hint [, $comment]);
     # or:
     $writer->write_tag_generator_hint($tag); # requires Data::Identifier v0.13
 
@@ -785,6 +830,9 @@ C<$tag> and C<$generator> may be an ISE or an instances of L<Data::Identifier>.
 C<$hint> is the raw hint.
 
 If only C<$tag> is given the other values will be extracted if $tag is a L<Data::Identifier> and includes them.
+
+If C<$comment> is given it is added if supported by the output format.
+If no C<$comment> is given one is added automatically if available.
 
 This method automatically selects the best command to write depending on the format and features.
 

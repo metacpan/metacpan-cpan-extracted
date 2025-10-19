@@ -295,6 +295,14 @@ struct neo4j_logger_provider
  *
  * If no flags are required, pass 0 or `NEO4J_STD_LOGGER_DEFAULT`.
  *
+ * @warning **Thread-Safety Warning:** The logger provider instance returned by
+ * this function is **NOT thread-safe**.
+ *
+ * It is unsafe to share a single `neo4j_config_t` object containing this
+ * provider across multiple threads if those threads will be creating
+ * connections (`neo4j_connect` or `neo4j_tcp_connect`) concurrently. Doing so may
+ * lead to race conditions, memory corruption or memory leak.
+ *
  * @param [stream] The stream to output to.
  * @param [level] The default level to log at.
  * @param [flags] A bitmask of flags for the standard logger output.
@@ -684,12 +692,13 @@ char *neo4j_tostring(neo4j_value_t value, char *strbuf, size_t n);
  * ensuring it is always `NULL` terminated.
  *
  * @param [value] The neo4j value.
- * @param [strbuf] A buffer to write the string representation into.
+ * @param [strbuf] A buffer to write the string representation into, or
+           `NULL` if no string representation should be written.
  * @param [n] The length of the buffer.
  * @return The number of bytes that would have been written into the buffer
- *         had the buffer been large enough.
+ *         had the buffer been large enough, or -1 on error (errno will be set).
  */
-size_t neo4j_ntostring(neo4j_value_t value, char *strbuf, size_t n);
+ssize_t neo4j_ntostring(neo4j_value_t value, char *strbuf, size_t n);
 
 /**
  * Print a UTF-8 string representation of a neo4j value to a stream.
@@ -828,14 +837,16 @@ unsigned int neo4j_string_length(neo4j_value_t value);
 /**
  * Return a pointer to a UTF-8 string.
  *
- * The pointer will be to a UTF-8 string, and will NOT be `NULL` terminated.
- * The length of the string, in bytes, can be obtained using
- * neo4j_ustring_length(value).
+ * The return value depends on the length of the string, which can be obtained,
+ * in bytes, using neo4j_string_length(). For strings with a non-zero length,
+ * the pointer will be to a UTF-8 string, and will NOT be `NULL` terminated.
+ * For empty strings, `NULL` is returned.
  *
  * Note that the result is undefined if the value is not of type NEO4J_STRING.
  *
  * @param [value] The neo4j string.
- * @return A pointer to a UTF-8 string, which will not be terminated.
+ * @return A pointer to a UTF-8 string, which will not be terminated,
+ *         or `NULL` if the value is not a non-empty string.
  */
 __neo4j_const
 const char *neo4j_ustring_value(neo4j_value_t value);
@@ -1983,7 +1994,7 @@ neo4j_transaction_t *neo4j_begin_tx(neo4j_connection_t *connection,
  * @attention This function is available when server protocol is Bolt 3 or higher.
  *
  * @param [transaction] The transaction (obtained from `neo4j_begin_tx`)
- * @return int: 0 on success, 1 on failure.
+ * @return int: 0 on success, non-zero on failure.
  *
  */
 __neo4j_must_check
@@ -1994,7 +2005,7 @@ int neo4j_commit(neo4j_transaction_t *tx);
  * @attention This function is available when server protocol is Bolt 3 or higher.
  *
  * @param [transaction] The transaction (obtained from `neo4j_begin_tx`)
- * @return int: 0 on success, 1 on failure.
+ * @return int: 0 on success, non-zero on failure.
  *
  */
 __neo4j_must_check
@@ -2056,7 +2067,7 @@ bool neo4j_tx_defunct(neo4j_transaction_t *tx);
  * and neo4j_tx_failure_message().
  *
  * @param [tx] The transaction.
- * @return 1 if transaction has failed; 0 if not.
+ * @return A non-zero value (errno) if the transaction has failed; 0 if not.
  */
 __neo4j_must_check
 int neo4j_tx_failure(neo4j_transaction_t *tx);

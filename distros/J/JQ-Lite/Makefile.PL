@@ -10,9 +10,14 @@ WriteMakefile(
     LICENSE          => 'perl',
     MIN_PERL_VERSION => '5.014',
     PREREQ_PM        => {
-        'JSON::PP'   => 0,
-        'Test::More' => 0,
-        'FindBin'    => 0,
+        'JSON::PP'        => 0,
+        'Test::More'      => 0,
+        'FindBin'         => 0,
+        'Getopt::Long'    => 0,
+        'IO::File'        => 0,
+        'List::Util'      => 0,
+        'Scalar::Util'    => 0,
+        'Term::ANSIColor' => 0,
     },
     EXE_FILES        => ['bin/jq-lite'],
     META_MERGE       => {

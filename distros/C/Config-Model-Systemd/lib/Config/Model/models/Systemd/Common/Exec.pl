@@ -388,7 +388,7 @@ C<CAP_SYS_PTRACE> capability, which also allows a process to bypass this feature
 cannot be used for services that need to access metainformation about other users\' processes. This
 option implies C<MountAPIVFS>.
 
-If the kernel doesn\'t support per-mount point C<hidepid=> mount options this
+If the kernel does not support per-mount point C<hidepid=> mount options this
 setting remains without effect, and the unit\'s processes will be able to access and see other process
 as if the option was not used.',
         'type' => 'leaf',
@@ -440,14 +440,14 @@ C<BindPaths> creates regular writable bind mounts (unless the source file system
 is already marked read-only), while C<BindReadOnlyPaths> creates read-only bind mounts. These
 settings may be used more than once, each usage appends to the unit\'s list of bind mounts. If the empty string
 is assigned to either of these two options the entire list of bind mounts defined prior to this is reset. Note
-that in this case both read-only and regular bind mounts are reset, regardless which of the two settings is
+that, in this case, both read-only and regular bind mounts are reset, regardless which of the two settings is
 used.
 
 Using this option implies that a mount namespace is allocated for the unit, i.e. it implies the
 effect of C<PrivateMounts> (see below).
 
 This option is particularly useful when C<RootDirectory>/C<RootImage>
-is used. In this case the source path refers to a path on the host file system, while the destination path
+is used. In this case, the source path refers to a path on the host file system, while the destination path
 refers to a path below the root directory of the unit.
 
 Note that the destination directory must exist or systemd must be able to create it. Thus, it
@@ -479,14 +479,14 @@ C<BindPaths> creates regular writable bind mounts (unless the source file system
 is already marked read-only), while C<BindReadOnlyPaths> creates read-only bind mounts. These
 settings may be used more than once, each usage appends to the unit\'s list of bind mounts. If the empty string
 is assigned to either of these two options the entire list of bind mounts defined prior to this is reset. Note
-that in this case both read-only and regular bind mounts are reset, regardless which of the two settings is
+that, in this case, both read-only and regular bind mounts are reset, regardless which of the two settings is
 used.
 
 Using this option implies that a mount namespace is allocated for the unit, i.e. it implies the
 effect of C<PrivateMounts> (see below).
 
 This option is particularly useful when C<RootDirectory>/C<RootImage>
-is used. In this case the source path refers to a path on the host file system, while the destination path
+is used. In this case, the source path refers to a path on the host file system, while the destination path
 refers to a path below the root directory of the unit.
 
 Note that the destination directory must exist or systemd must be able to create it. Thus, it
@@ -583,6 +583,17 @@ L<os-release(5)>.
 To disable the safety check that the extension-release file name matches the image file name, the
 C<x-systemd.relax-extension-release-check> mount option may be appended.
 
+This option can be used together with a C<notify-reload> service type and
+L<systemd.v(7)>
+to manage configuration updates. When such a service carrying confext images is reloaded via
+systemctl reload foo.service or equivalent D-Bus method, the confext itself will
+be reloaded to pick up any changes. This only applies to confext extensions. Note that in case a
+service has this configuration enabled at first, and then it is subsequently removed in an update
+followed by a daemon-reload operation, reloading the confexts will be a no-op, and a full service
+restart is required instead. See
+L<systemd.service(5)>
+also for details.
+
 When C<DevicePolicy> is set to C<closed> or
 C<strict>, or set to C<auto> and C<DeviceAllow> is
 set, then this setting adds C</dev/loop-control> with C<rw> mode,
@@ -623,6 +634,17 @@ file while each confext directory must carry a C</etc/extension-release.d/extens
 file, with the appropriate metadata which matches C<RootImage>/C<RootDirectory>
 or the host. See:
 L<os-release(5)>.
+
+This option can be used together with a C<notify-reload> service type and
+L<systemd.v(7)>
+to manage configuration updates. When such a service carrying confext directories is reloaded via
+systemctl reload foo.service or equivalent D-Bus method, the confext itself will
+be reloaded to pick up any changes. This only applies to confext extensions. Note that in case a
+service has this configuration enabled at first, and then it is subsequently removed in an update
+followed by a daemon-reload operation, reloading the confexts will be a no-op, and a full service
+restart is required instead. See
+L<systemd.service(5)>
+also for details.
 
 Note that usage from user units requires overlayfs support in unprivileged user namespaces,
 which was first introduced in kernel v5.11.',
@@ -735,11 +757,11 @@ would be implied. This ensures that a unit making use of dynamic user/group allo
 leave files around after unit termination. Furthermore
 C<NoNewPrivileges> and C<RestrictSUIDSGID> are implicitly enabled
 (and cannot be disabled), to ensure that processes invoked cannot take benefit or create SUID/SGID
-files or directories. Moreover C<ProtectSystem=strict> and
+files or directories. Moreover, C<ProtectSystem=strict> and
 C<ProtectHome=read-only> are implied, thus prohibiting the service to write to
 arbitrary file system locations. In order to allow the service to write to certain directories, they
 have to be allow-listed using C<ReadWritePaths>, but care must be taken so that
-UID/GID recycling doesn't create security issues involving files created by the service. Use
+UID/GID recycling does not create security issues involving files created by the service. Use
 C<RuntimeDirectory> (see below) in order to assign a writable runtime directory to a
 service, owned by the dynamic user/group and removed automatically when the unit is terminated. Use
 C<StateDirectory>, C<CacheDirectory> and
@@ -754,6 +776,7 @@ service. Note that this option is currently incompatible with D-Bus policies, th
 this option may currently not allocate a D-Bus service name (note that this does not affect calling
 into other D-Bus services). Defaults to off.",
         'type' => 'leaf',
+        'upstream_default' => 'no',
         'value_type' => 'boolean',
         'write_as' => [
           'no',
@@ -813,7 +836,16 @@ will however be associated with the session scope unit only. This has implicatio
 with C<NotifyAccess>=C<all>, as these child processes will not be able to affect
 changes in the original unit through notification messages. These messages will be considered belonging to the
 session scope unit and not the original unit. It is hence not recommended to use C<PAMName> in
-combination with C<NotifyAccess>=C<all>.',
+combination with C<NotifyAccess>=C<all>.
+
+If a PAM module interactively requests input (a password or suchlike) it will be attempted to
+be read from a service credential (as configured via C<SetCredential>,
+C<ImportCredential> and related calls) under the name
+C<pam.authtok.pamservice>, where
+pamservice is replaced by the PAM service name as configured with
+C<PAMName>. (Note that the credential remains accessible for the runtime of the
+service!) If no matching credential is set, the user is prompted for it interactively via the L<Password
+Agent|https://systemd.io/PASSWORD_AGENTS> logic.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -870,9 +902,9 @@ settings have no effect. If set to C<~> (without any further argument), the ambi
 set is reset to the full set of available capabilities, also undoing any previous settings. Note that adding
 capabilities to the ambient capability set adds them to the process\'s inherited capability set.
 
-Ambient capability sets are useful if you want to execute a process as a non-privileged user but still want to
-give it some capabilities. Note that in this case option C<keep-caps> is automatically added
-to C<SecureBits> to retain the capabilities over the user
+Ambient capability sets are useful if you want to execute a process as a non-privileged user but
+still want to give it some capabilities. Note that, in this case, option C<keep-caps>
+is automatically added to C<SecureBits> to retain the capabilities over the user
 change. C<AmbientCapabilities> does not affect commands prefixed with
 C<+>.',
         'type' => 'leaf',
@@ -894,6 +926,7 @@ L<crontab(1)>,
 L<systemd-run(1)>, or
 arbitrary IPC services.',
         'type' => 'leaf',
+        'upstream_default' => 'no',
         'value_type' => 'boolean',
         'write_as' => [
           'no',
@@ -917,8 +950,8 @@ details.',
         'description' => 'Set the SELinux security context of the executed process. If set, this will override the
 automated domain transition. However, the policy still needs to authorize the transition. This directive is
 ignored if SELinux is disabled. If prefixed by C<->, failing to set the SELinux
-security context will be ignored, but it\'s still possible that the subsequent
-execve() may fail if the policy doesn\'t allow the transition for the
+security context will be ignored, but it is still possible that the subsequent
+execve() may fail if the policy does not allow the transition for the
 non-overridden context. This does not affect commands prefixed with C<+>. See
 L<setexeccon(3)>
 for details.',
@@ -1925,7 +1958,7 @@ non-service units and for services of the user service manager.',
 executed processes. Takes an integer between -1000 (to disable OOM killing of processes of this unit)
 and 1000 (to make killing of processes of this unit under memory pressure very likely). See L<The /proc
 Filesystem|https://docs.kernel.org/filesystems/proc.html> for
-details. If not specified defaults to the OOM score adjustment level of the service manager itself,
+details. If not specified, defaults to the OOM score adjustment level of the service manager itself,
 which is normally at 0.
 
 Use the C<OOMPolicy> setting of service units to configure how the service
@@ -2041,6 +2074,7 @@ and can hence not leak into child processes. See
 L<sched_setscheduler(2)>
 for details. Defaults to false.',
         'type' => 'leaf',
+        'upstream_default' => 'no',
         'value_type' => 'boolean',
         'write_as' => [
           'no',
@@ -2162,6 +2196,7 @@ C</var/tmp/> will be writable.",
           'true' => 'yes'
         },
         'type' => 'leaf',
+        'upstream_default' => 'no',
         'value_type' => 'enum'
       },
       'ProtectHome',
@@ -2806,6 +2841,117 @@ discussion of the meaning of permission bits.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
+      'StateDirectoryQuota',
+      {
+        'description' => 'Specifies the storage limits for the directories specified in C<StateDirectory>,
+C<CacheDirectory>, or C<LogsDirectory> respectively.
+
+The storage quota is defined in terms of disk blocks and inodes, as per
+L<quotactl|https://man7.org/linux/man-pages/man2/quotactl.2.html>. Takes an absolute size limit
+in bytes. If the value is suffixed with K, M, G or T, the specified size is parsed as Kilobytes, Megabytes, Gigabytes,
+or Terabytes (with the base 1024), respectively. If an absolute size limit is specified, only the block quota is set
+(rounded up to the nearest block). Alternatively, a percentage value may be specified, which applies the same percent
+quota to both blocks and inodes. Defaults to C<off>, in which case no storage limits will be set.
+
+Only hard limits are set, not soft limits. If the underlying filesystem for the specified directories does not
+support project quotas, the specified storage limits will not be set. In addition to enabling per-unit quotas with
+these settings, it is necessary to enable C<prjquota> on the file system level as well
+(i.e. tune2fs -Q prjquota). Quotas must also be turned on with
+L<quotaon.|https://linux.die.net/man/8/quotaon>',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'CacheDirectoryQuota',
+      {
+        'description' => 'Specifies the storage limits for the directories specified in C<StateDirectory>,
+C<CacheDirectory>, or C<LogsDirectory> respectively.
+
+The storage quota is defined in terms of disk blocks and inodes, as per
+L<quotactl|https://man7.org/linux/man-pages/man2/quotactl.2.html>. Takes an absolute size limit
+in bytes. If the value is suffixed with K, M, G or T, the specified size is parsed as Kilobytes, Megabytes, Gigabytes,
+or Terabytes (with the base 1024), respectively. If an absolute size limit is specified, only the block quota is set
+(rounded up to the nearest block). Alternatively, a percentage value may be specified, which applies the same percent
+quota to both blocks and inodes. Defaults to C<off>, in which case no storage limits will be set.
+
+Only hard limits are set, not soft limits. If the underlying filesystem for the specified directories does not
+support project quotas, the specified storage limits will not be set. In addition to enabling per-unit quotas with
+these settings, it is necessary to enable C<prjquota> on the file system level as well
+(i.e. tune2fs -Q prjquota). Quotas must also be turned on with
+L<quotaon.|https://linux.die.net/man/8/quotaon>',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'LogsDirectoryQuota',
+      {
+        'description' => 'Specifies the storage limits for the directories specified in C<StateDirectory>,
+C<CacheDirectory>, or C<LogsDirectory> respectively.
+
+The storage quota is defined in terms of disk blocks and inodes, as per
+L<quotactl|https://man7.org/linux/man-pages/man2/quotactl.2.html>. Takes an absolute size limit
+in bytes. If the value is suffixed with K, M, G or T, the specified size is parsed as Kilobytes, Megabytes, Gigabytes,
+or Terabytes (with the base 1024), respectively. If an absolute size limit is specified, only the block quota is set
+(rounded up to the nearest block). Alternatively, a percentage value may be specified, which applies the same percent
+quota to both blocks and inodes. Defaults to C<off>, in which case no storage limits will be set.
+
+Only hard limits are set, not soft limits. If the underlying filesystem for the specified directories does not
+support project quotas, the specified storage limits will not be set. In addition to enabling per-unit quotas with
+these settings, it is necessary to enable C<prjquota> on the file system level as well
+(i.e. tune2fs -Q prjquota). Quotas must also be turned on with
+L<quotaon.|https://linux.die.net/man/8/quotaon>',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'StateDirectoryAccounting',
+      {
+        'description' => 'Takes a boolean argument. If true, a project ID is assigned to the directories specified in
+C<StateDirectory>, C<CacheDirectory>, or C<LogsDirectory>
+respectively, which is used for tracking disk usage when disk quotas are turned on
+(see L<repquota|https://man7.org/linux/man-pages/man8/repquota.8.html>). Defaults to false.
+
+To set and enforce disk quotas, C<StateDirectoryQuota>, C<CacheDirectoryQuota>,
+or C<LogsDirectoryQuota> must be specified.',
+        'type' => 'leaf',
+        'upstream_default' => 'no',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
+      },
+      'CacheDirectoryAccounting',
+      {
+        'description' => 'Takes a boolean argument. If true, a project ID is assigned to the directories specified in
+C<StateDirectory>, C<CacheDirectory>, or C<LogsDirectory>
+respectively, which is used for tracking disk usage when disk quotas are turned on
+(see L<repquota|https://man7.org/linux/man-pages/man8/repquota.8.html>). Defaults to false.
+
+To set and enforce disk quotas, C<StateDirectoryQuota>, C<CacheDirectoryQuota>,
+or C<LogsDirectoryQuota> must be specified.',
+        'type' => 'leaf',
+        'upstream_default' => 'no',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
+      },
+      'LogsDirectoryAccounting',
+      {
+        'description' => 'Takes a boolean argument. If true, a project ID is assigned to the directories specified in
+C<StateDirectory>, C<CacheDirectory>, or C<LogsDirectory>
+respectively, which is used for tracking disk usage when disk quotas are turned on
+(see L<repquota|https://man7.org/linux/man-pages/man8/repquota.8.html>). Defaults to false.
+
+To set and enforce disk quotas, C<StateDirectoryQuota>, C<CacheDirectoryQuota>,
+or C<LogsDirectoryQuota> must be specified.',
+        'type' => 'leaf',
+        'upstream_default' => 'no',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
+      },
       'RuntimeDirectoryPreserve',
       {
         'choice' => [
@@ -3267,40 +3413,58 @@ C</var/lib/systemd> or its contents.',
       },
       'PrivateTmp',
       {
+        'choice' => [
+          'disconnected',
+          'no',
+          'yes'
+        ],
         'description' => 'Takes a boolean argument, or C<disconnected>. If enabled, a new
 file system namespace will be set up for the executed processes, and C</tmp/>
 and C</var/tmp/> directories inside it are not shared with processes outside of
-the namespace, plus all temporary files created by a service in these directories will be removed after
-the service is stopped. If C<true>, the backing storage of the private temporary directories
-will remain on the host\'s C</tmp/> and C</var/tmp/> directories.
-If C<disconnected>, the directories will be backed by a completely new tmpfs instance,
-meaning that the storage is fully disconnected from the host namespace. Defaults to false.
+the namespace, plus all temporary files created by a service in these directories will be removed
+after the service is stopped. For this setting, the same restrictions regarding mount propagation
+and privileges apply as for C<ReadOnlyPaths> and related calls, see above. This
+setting is useful to secure access to temporary files of the process, but makes sharing between
+processes via C</tmp/> or C</var/tmp/> impossible. If
+C<DynamicUser> is enabled, C<disconnected> is implied. Otherwise,
+defaults to false.
 
-This setting is useful to secure access to temporary files of the process, but makes sharing
-between processes via C</tmp/> or C</var/tmp/> impossible.
-If not set to C<disconnected>, it is possible to run two or more units within
-the same private C</tmp/> and C</var/tmp/> namespace by using
-the C<JoinsNamespaceOf> directive, see
-L<systemd.unit(5)>
-for details. This setting is implied if C<DynamicUser> is set. For this setting,
-the same restrictions regarding mount propagation and privileges apply as for
-C<ReadOnlyPaths> and related calls, see above. If set to C<true>
-(as opposed to C<disconnected>), this has the side effect of adding
-C<Requires> and C<After> dependencies on all mount units necessary
-to access C</tmp/> and C</var/tmp/> on the host. Moreover an
-implicitly C<After> ordering on
+If C<true>, the backing storage of the private temporary directories will
+remain on the host\'s C</tmp/> and C</var/tmp/> directories. It is
+possible to run two or more units within the same private C</tmp/> and
+C</var/tmp/> namespace by using the C<JoinsNamespaceOf> directive,
+see L<systemd.unit(5)>
+for details. This has the side effect of adding C<Wants> and
+C<After> dependencies on all mount units necessary to access
+C</tmp/> and C</var/tmp/> on the host. Moreover, an implicit
+C<After> ordering on
 L<systemd-tmpfiles-setup.service(8)>
 is added.
+
+If C<disconnected>, the directories will be backed by a completely new tmpfs
+instance, meaning that the storage is fully disconnected from the host namespace. The tmpfs instance
+does not shared with other units even if the C<JoinsNamespaceOf> directive is used.
+If C<DefaultDependencies=no> is specified,
+C<RequiresMountsFor=/WantsMountsFor=> for C</var/> is not
+specified, and C<RootDirectory=/RootImage=> is not specified, then a new tmpfs is
+mounted only on C</tmp/>, hence the host\'s
+C</var/tmp> is still accessible from the unit. In that case,
+C<$TMPDIR> environment variable is set to C</tmp> to suggest the
+processes in the unit to use C</tmp/>. This automatically adds
+C<WantsMountsFor=/var/> dependency, unless C<DefaultDependencies=no>
+and/or C<RootDirectory=/RootImage=> are specified.
 
 Note that the implementation of this setting might be impossible (for example if mount namespaces are not
 available), and the unit should be written in a way that does not solely rely on this setting for
 security.',
+        'replace' => {
+          '0' => 'no',
+          '1' => 'yes',
+          'false' => 'no',
+          'true' => 'yes'
+        },
         'type' => 'leaf',
-        'value_type' => 'boolean',
-        'write_as' => [
-          'no',
-          'yes'
-        ]
+        'value_type' => 'enum'
       },
       'PrivateDevices',
       {
@@ -3335,6 +3499,7 @@ setting might be used instead. See
 L<systemd.resource-control(5)>.
 ',
         'type' => 'leaf',
+        'upstream_default' => 'no',
         'value_type' => 'boolean',
         'write_as' => [
           'no',
@@ -3370,6 +3535,7 @@ bound within a private network namespace. This may be combined with
 C<JoinsNamespaceOf> to listen on sockets inside of network namespaces of other
 services.',
         'type' => 'leaf',
+        'upstream_default' => 'no',
         'value_type' => 'boolean',
         'write_as' => [
           'no',
@@ -3424,6 +3590,7 @@ Note that the implementation of this setting might be impossible (for example if
 not available), and the unit should be written in a way that does not solely rely on this setting for
 security.',
         'type' => 'leaf',
+        'upstream_default' => 'no',
         'value_type' => 'boolean',
         'write_as' => [
           'no',
@@ -3454,7 +3621,7 @@ L<Kernel Samepage Merging|https://docs.kernel.org/admin-guide/mm/ksm.html> in th
 kernel documentation.
 
 Note that this functionality might not be available, for example if KSM is disabled in the
-kernel, or the kernel doesn\'t support controlling KSM at the process level through
+kernel, or the kernel does not support controlling KSM at the process level through
 L<prctl(2)>.',
         'type' => 'leaf',
         'value_type' => 'boolean',
@@ -3483,6 +3650,7 @@ L<systemd-nspawn(1)> does).
 This is due to a kernel restriction not allowing unprivileged user namespaces to mount a less restrictive
 instance of C</proc/>.',
         'type' => 'leaf',
+        'upstream_default' => 'no',
         'value_type' => 'boolean',
         'write_as' => [
           'no',
@@ -3492,13 +3660,14 @@ instance of C</proc/>.',
       'PrivateUsers',
       {
         'choice' => [
+          'full',
           'identity',
           'no',
           'self',
           'yes'
         ],
-        'description' => 'Takes a boolean argument or one of C<self> or
-C<identity>. Defaults to false. If enabled, sets up a new user namespace for the
+        'description' => 'Takes a boolean argument or one of C<self>, C<identity>,
+or C<full>. Defaults to false. If enabled, sets up a new user namespace for the
 executed processes and configures a user and group mapping. If set to a true value or
 C<self>, a minimal user and group mapping is configured that maps the
 C<root> user and group as well as the unit\'s own user and group to themselves and
@@ -3514,8 +3683,15 @@ C<nobody> user and group, respectively. While this does not provide UID/GID isol
 since all UIDs/GIDs are chosen identically it does provide process capability isolation, and hence is
 often a good choice if proper user namespacing with distinct UID maps is not appropriate.
 
+If the parameter is C<full>, user namespacing is set up with an identity
+mapping for all UIDs/GIDs. In addition, for system services, C<full> allows the unit
+to call setgroups() system calls (by setting
+C</proc/pid/setgroups> to C<allow>).
+Similar to C<identity>, this does not provide UID/GID isolation, but it does provide
+process capability isolation.
+
 If this mode is enabled, all unit processes are run without privileges in the host user
-namespace (regardless if the unit\'s own user/group is C<root> or not). Specifically
+namespace (regardless of whether the unit\'s own user/group is C<root> or not). Specifically
 this means that the process will have zero process capabilities on the host\'s user namespace, but
 full capabilities within the service\'s user namespace. Settings such as
 C<CapabilityBoundingSet> will affect only the latter, and there\'s no way to acquire
@@ -3531,11 +3707,7 @@ normally supported by the per-user instances of the service manager.
 This setting is particularly useful in conjunction with
 C<RootDirectory>/C<RootImage>, as the need to synchronize the user and group
 databases in the root directory and on the host is reduced, as the only users and groups who need to be matched
-are C<root>, C<nobody> and the unit\'s own user and group.
-
-Note that the implementation of this setting might be impossible (for example if user namespaces are not
-available), and the unit should be written in a way that does not solely rely on this setting for
-security.',
+are C<root>, C<nobody> and the unit\'s own user and group.',
         'replace' => {
           '0' => 'no',
           '1' => 'yes',
@@ -3543,12 +3715,23 @@ security.',
           'true' => 'yes'
         },
         'type' => 'leaf',
+        'upstream_default' => 'no',
         'value_type' => 'enum'
       },
       'ProtectHostname',
       {
-        'description' => 'Takes a boolean argument. When set, sets up a new UTS namespace for the executed
-processes. In addition, changing hostname or domainname is prevented. Defaults to off.
+        'choice' => [
+          'no',
+          'private',
+          'yes'
+        ],
+        'description' => 'Takes a boolean argument or C<private>. If enabled, sets up a new UTS
+namespace for the executed processes. If enabled, a hostname can be optionally specified following a
+colon (e.g. C<yes:foo> or C<private:host.example.com>), and the
+hostname is set in the new UTS namespace for the unit. If set to a true value, changing hostname or
+domainname via sethostname() and setdomainname() system
+calls is prevented. If set to C<private>, changing hostname or domainname is allowed
+but only affects the unit\'s UTS namespace. Defaults to off.
 
 Note that the implementation of this setting might be impossible (for example if UTS namespaces
 are not available), and the unit should be written in a way that does not solely rely on this setting
@@ -3556,13 +3739,22 @@ for security.
 
 Note that when this option is enabled for a service hostname changes no longer propagate from
 the system into the service, it is hence not suitable for services that need to take notice of system
-hostname changes dynamically.',
+hostname changes dynamically.
+
+Note that this option does not prevent changing system hostname via hostnamectl.
+However, C<User> and C<Group> may be used to run as an unprivileged user
+to disallow changing system hostname. See SetHostname() in
+L<org.freedesktop.hostname1(5)>
+for more details.',
+        'replace' => {
+          '0' => 'no',
+          '1' => 'yes',
+          'false' => 'no',
+          'true' => 'yes'
+        },
         'type' => 'leaf',
-        'value_type' => 'boolean',
-        'write_as' => [
-          'no',
-          'yes'
-        ]
+        'upstream_default' => 'no',
+        'value_type' => 'enum'
       },
       'ProtectClock',
       {
@@ -3580,6 +3772,7 @@ for the details about C<DeviceAllow>.
 It is recommended to turn this on for most services that do not need modify the clock or check
 its state.',
         'type' => 'leaf',
+        'upstream_default' => 'no',
         'value_type' => 'boolean',
         'write_as' => [
           'no',
@@ -3599,11 +3792,12 @@ L<sysctl.d(5)> mechanism. Few
 services need to write to these at runtime; it is hence recommended to turn this on for most services. For this
 setting the same restrictions regarding mount propagation and privileges apply as for
 C<ReadOnlyPaths> and related calls, see above. Defaults to off.
-Note that this option does not prevent indirect changes to kernel tunables effected by IPC calls to
+Note that this option does not prevent indirect changes to kernel tunables affected by IPC calls to
 other processes. However, C<InaccessiblePaths> may be used to make relevant IPC file system
 objects inaccessible. If C<ProtectKernelTunables> is set,
 C<MountAPIVFS=yes> is implied.',
         'type' => 'leaf',
+        'upstream_default' => 'no',
         'value_type' => 'boolean',
         'write_as' => [
           'no',
@@ -3625,6 +3819,7 @@ both privileged and unprivileged. To disable module auto-load feature please see
 L<sysctl.d(5)>C<kernel.modules_disabled> mechanism and
 C</proc/sys/kernel/modules_disabled> documentation.',
         'type' => 'leaf',
+        'upstream_default' => 'no',
         'value_type' => 'boolean',
         'write_as' => [
           'no',
@@ -3680,6 +3875,7 @@ as for C<ReadOnlyPaths> and related settings, see above.',
           'true' => 'yes'
         },
         'type' => 'leaf',
+        'upstream_default' => 'no',
         'value_type' => 'enum'
       },
       'RestrictAddressFamilies',
@@ -3687,30 +3883,39 @@ as for C<ReadOnlyPaths> and related settings, see above.',
         'description' => 'Restricts the set of socket address families accessible to the processes of this
 unit. Takes C<none>, or a space-separated list of address family names to
 allow-list, such as C<AF_UNIX>, C<AF_INET> or
-C<AF_INET6>. When C<none> is specified, then all address
+C<AF_INET6>, see
+L<address_families(7)>
+for all possible options. When C<none> is specified, then all address
 families will be denied. When prefixed with C<~> the listed address
-families will be applied as deny list, otherwise as allow list. Note that this restricts access
-to the
-L<socket(2)>
+families will be applied as deny list, otherwise as allow list.
+
+By default, no restrictions apply, all address families are accessible to processes. If
+assigned the empty string, any previous address family restriction changes are undone. This setting
+does not affect commands prefixed with C<+>.
+
+Use this option to limit exposure of processes to remote access, in particular via exotic and
+sensitive network protocols, such as C<AF_PACKET>. Note that in most cases, the
+local C<AF_UNIX> address family should be included in the configured allow list as
+it is frequently used for local communication, including for
+L<syslog(2)>
+logging.
+
+Note that this restricts access to the L<socket(2)>
 system call only. Sockets passed into the process by other means (for example, by using socket
 activation with socket units, see
 L<systemd.socket(5)>)
 are unaffected. Also, sockets created with socketpair() (which creates connected
-AF_UNIX sockets only) are unaffected. Note that this option has no effect on 32-bit x86, s390, s390x,
-mips, mips-le, ppc, ppc-le, ppc64, ppc64-le and is ignored (but works correctly on other ABIs,
-including x86-64). Note that on systems supporting multiple ABIs (such as x86/x86-64) it is
-recommended to turn off alternative ABIs for services, so that they cannot be used to circumvent the
-restrictions of this option. Specifically, it is recommended to combine this option with
-C<SystemCallArchitectures=native> or similar. By default, no restrictions apply, all
-address families are accessible to processes. If assigned the empty string, any previous address family
-restriction changes are undone. This setting does not affect commands prefixed with C<+>.
+AF_UNIX sockets) or the
+L<io_uring(7)>
+functions, are not affected. Thus, it is recommended to combined this setting with
+C<SystemCallFilter=@service>, to only allow a limited subset of system calls.
 
-Use this option to limit exposure of processes to remote access, in particular via exotic and sensitive
-network protocols, such as C<AF_PACKET>. Note that in most cases, the local
-C<AF_UNIX> address family should be included in the configured allow list as it is frequently
-used for local communication, including for
-L<syslog(2)>
-logging.',
+Note that this option is limited to some ABIs, in particular x86-64, but currently has no
+effect on 32-bit x86, s390, s390x, mips, mips-le, ppc, ppc-le, ppc64, or ppc64-le, and is ignored. On
+systems supporting multiple ABIs (such as x86/x86-64) it is recommended to turn off alternative ABIs
+for services, so that they cannot be used to circumvent the restrictions of this option.
+Specifically, it is recommended to combine this option with
+C<SystemCallArchitectures=native> or similar.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -3771,15 +3976,15 @@ takes a boolean argument, or a space-separated list of namespace type identifier
 restrictions on namespace creation and switching are made. If true, access to any kind of namespacing is
 prohibited. Otherwise, a space-separated list of namespace type identifiers must be specified, consisting of
 any combination of: C<cgroup>, C<ipc>, C<net>,
-C<mnt>, C<pid>, C<user> and C<uts>. Any
-namespace type listed is made accessible to the unit's processes, access to namespace types not listed is
-prohibited (allow-listing). By prepending the list with a single tilde character (C<~>) the
-effect may be inverted: only the listed namespace types will be made inaccessible, all unlisted ones are
-permitted (deny-listing). If the empty string is assigned, the default namespace restrictions are applied,
-which is equivalent to false. This option may appear more than once, in which case the namespace types are
-merged by C<OR>, or by C<AND> if the lines are prefixed with
-C<~> (see examples below). Internally, this setting limits access to the
-L<unshare(2)>,
+C<mnt>, C<pid>, C<user>, C<uts>, and
+C<time>. Any namespace type listed is made accessible to the unit's processes, access to
+namespace types not listed is prohibited (allow-listing). By prepending the list with a single tilde
+character (C<~>) the effect may be inverted: only the listed namespace types will be made
+inaccessible, all unlisted ones are permitted (deny-listing). If the empty string is assigned, the default
+namespace restrictions are applied, which is equivalent to false. This option may appear more than once, in
+which case the namespace types are merged by C<OR>, or by C<AND> if the
+lines are prefixed with C<~> (see examples below). Internally, this setting limits access to
+the L<unshare(2)>,
 L<clone(2)> and
 L<setns(2)> system calls, taking
 the specified flags parameters into account. Note that \x{2014} if this option is used \x{2014} in addition to restricting
@@ -3800,6 +4005,115 @@ If the second line is prefixed with C<~>, e.g.,
     RestrictNamespaces=~cgroup net
 
 then, only C<ipc> is set.",
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'DelegateNamespaces',
+      {
+        'description' => 'Delegates ownership of the given namespace types to the user namespace of the
+processes of this unit. For details about Linux namespaces, see L<namespaces(7)>.
+Either takes a boolean argument, or a space-separated list of namespace type identifiers. If false
+(the default), the unit\'s processes\' user namespace will not have ownership over any namespaces
+created during setup of the unit\'s sandboxed environment. If true, ownership of all namespace types
+(except for user namespaces, where the concept doesn\'t apply) created during setup of the unit\'s
+sandboxed environment is delegated to the unit\'s processes\' user namespace. Otherwise, a
+space-separated list of namespace type identifiers must be specified, consisting of any combination
+of: C<cgroup>, C<ipc>, C<net>,
+C<mnt>, C<pid>, and C<uts>. All namespaces of
+the listed types will be owned by the unit\'s processes\' user namespace if they are created during
+setup of the unit\'s sandboxed environment (allow-listing). By prepending the list with a single tilde
+character (C<~>) the effect may be inverted: all namespaces of types not listed and
+created during setup of the unit\'s sandboxed environment will be owned by the unit\'s processes\' user
+namespace (deny-listing). If the empty string is assigned, the default namespace ownership is
+applied, which is equivalent to false. This option may appear more than once, in which case the
+namespace types are merged by C<OR>, or by C<AND> if the lines
+are prefixed with C<~> (see examples below). Internally, this setting controls the
+order in which namespaces are unshared by systemd. Namespace types that should be owned by the unit\'s
+processes\' user namespace will be unshared after unsharing the user namespace. Internally, this
+setting controls the order in which namespaces are unshared. Delegated namespaces will be unshared
+after the user namespace is unshared. Other namespaces will be unshared before the user namespace is
+unshared.
+
+Delegating any namespace with C<DelegateNamespaces> implies
+C<PrivateUsers=self> unless C<PrivateUsers> is explicitly enabled
+already by the unit. Delegating a namespace does not imply that the namespace is unshared, that is
+done with the namespace specific unit setting such as C<PrivateNetwork> or
+C<PrivateMounts>.
+
+Note that some namespace sandboxing options might entail mount namespace for private API VFS instances,
+such as C<PrivatePIDs>, C<ProtectControlGroups=private/strict>, or
+C<PrivateNetwork>. If any of the mentioned options are enabled, mount namespace
+is implicitly delegated.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'PrivateBPF',
+      {
+        'description' => 'Takes a boolean argument. If set, mount a private instance of the BPF filesystem
+on C</sys/fs/bpf/>, effectively hiding the host bpffs which contains information
+about loaded programs and maps. Otherwise, if C<ProtectKernelTunables> is set, the
+instance from the host is inherited but mounted read-only. Defaults to false.
+
+This can be used together with the bpffs delegate feature to choose what BPF functions are
+available to the unit\'s processes. When mounting the BPF filesystem with the fsopen() API, four mount
+options can be specified to set a list of BPF commands, maps, programs and attachment types that are
+allowed to be used. Processes needs to get a file descriptor for the bpffs mountpoint and use that to
+get a token which will enable for that user namespace the BPF functionalities chosen upon bpffs mount.
+A more detailed explanation of the feature can be found in this
+L<LWN post|https://lwn.net/Articles/947173/>.',
+        'type' => 'leaf',
+        'upstream_default' => 'no',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
+      },
+      'BPFDelegateCommands',
+      {
+        'description' => 'Accepts a list of BPF commands to allow or C<any> to allow everything.
+Defaults to none. The accepted values are:
+
+This will set the C<delegate_cmds> bpffs mount option.
+
+Requires C<PrivateBPF=yes> to be effective,
+see C<PrivateBPF> more details.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'BPFDelegateMaps',
+      {
+        'description' => 'Accepts a list of BPF maps to allow or C<any> to allow everything.
+Defaults to none. The accepted values are:
+
+This will set the C<delegate_maps> bpffs mount option.
+
+Requires C<PrivateBPF=yes> to be effective,
+see C<PrivateBPF> more details.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'BPFDelegatePrograms',
+      {
+        'description' => 'Accepts a list of BPF programs to allow or C<any> to allow everything.
+Defaults to none. The accepted values are:
+
+This will set the C<delegate_progs> bpffs mount option.
+
+Requires C<PrivateBPF=yes> to be effective,
+see C<PrivateBPF> more details.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'BPFDelegateAttachments',
+      {
+        'description' => 'Accepts a list of BPF attach points to allow or C<any> to allow everything.
+Defaults to none. The accepted values are:
+
+This will set the C<delegate_attachs> bpffs mount option.
+
+Requires C<PrivateBPF=yes> to be effective,
+see C<PrivateBPF> more details.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -3861,6 +4175,7 @@ time for longer periods of time, and may hence be used to lock up or otherwise t
 situations on the system. It is hence recommended to restrict access to realtime scheduling to the few programs
 that actually require them. Defaults to off.',
         'type' => 'leaf',
+        'upstream_default' => 'no',
         'value_type' => 'boolean',
         'write_as' => [
           'no',
@@ -3877,7 +4192,11 @@ identity of other users, it is recommended to restrict creation of SUID/SGID fil
 programs that actually require them. Note that this restricts marking of any type of file system
 object with these bits, including both regular files and directories (where the SGID is a different
 meaning than for files, see documentation). This option is implied if C<DynamicUser>
-is enabled. Defaults to off.',
+is enabled.
+
+In other cases, this setting defaults to the value set with C<DefaultRestrictSUIDSGID> in
+L<systemd-system.conf(5)>, which
+defaults to off.',
         'type' => 'leaf',
         'value_type' => 'boolean',
         'write_as' => [
@@ -3932,6 +4251,7 @@ C<BindPaths>, C<BindReadOnlyPaths>, \x{2026} \x{2014} also enable file system
 namespacing in a fashion equivalent to this option. Hence it is primarily useful to explicitly
 request this behaviour if none of the other settings are used.",
         'type' => 'leaf',
+        'upstream_default' => 'no',
         'value_type' => 'boolean',
         'write_as' => [
           'no',
@@ -3959,7 +4279,7 @@ first, propagation from the unit's processes to the host is still turned off.
 
 It is not recommended to use C<private> mount propagation for units, as this means
 temporary mounts (such as removable media) of the host will stay mounted and thus indefinitely busy in forked
-off processes, as unmount propagation events won't be received by the file system namespace of the unit.
+off processes, as unmount propagation events will not be received by the file system namespace of the unit.
 
 Usually, it is best to leave this setting unmodified, and use higher level file system namespacing
 options instead, in particular C<PrivateMounts>, see above.",
@@ -3972,39 +4292,42 @@ options instead, in particular C<PrivateMounts>, see above.",
           'type' => 'leaf',
           'value_type' => 'uniline'
         },
-        'description' => "Takes a space-separated list of system call names. If this setting is used, all
-system calls executed by the unit processes except for the listed ones will result in immediate
-process termination with the C<SIGSYS> signal (allow-listing). (See
-C<SystemCallErrorNumber> below for changing the default action). If the first
-character of the list is C<~>, the effect is inverted: only the listed system calls
-will result in immediate process termination (deny-listing). Deny-listed system calls and system call
-groups may optionally be suffixed with a colon (C<:>) and C<errno>
-error number (between 0 and 4095) or errno name such as C<EPERM>,
-C<EACCES> or C<EUCLEAN> (see L<errno(3)> for a
-full list). This value will be returned when a deny-listed system call is triggered, instead of
-terminating the processes immediately. Special setting C<kill> can be used to
-explicitly specify killing. This value takes precedence over the one given in
-C<SystemCallErrorNumber>, see below. This feature makes use of the Secure Computing Mode 2
-interfaces of the kernel ('seccomp filtering') and is useful for enforcing a minimal sandboxing environment.
-Note that the execve(), exit(), exit_group(),
-getrlimit(), rt_sigreturn(), sigreturn()
-system calls and the system calls for querying time and sleeping are implicitly allow-listed and do not
-need to be listed explicitly. This option may be specified more than once, in which case the filter masks are
+        'description' => "Takes a space-separated list of system call names or system call groups. If this
+setting is used, system calls executed by the unit processes except for the listed ones will result
+in the system call being denied (allow-listing). If the first character of the list is
+C<~>, the effect is inverted: only the listed system calls will be denied
+(deny-listing). This option may be specified more than once, in which case the filter masks are
 merged. If the empty string is assigned, the filter is reset, all prior assignments will have no
-effect. This does not affect commands prefixed with C<+>.
+effect.
 
-Note that on systems supporting multiple ABIs (such as x86/x86-64) it is recommended to turn off
-alternative ABIs for services, so that they cannot be used to circumvent the restrictions of this
+Commands prefixed with C<+> are not subject to filtering. The
+execve(), exit(), exit_group(),
+getrlimit(), rt_sigreturn(),
+sigreturn() system calls and the system calls for querying time and sleeping are
+implicitly allow-listed and do not need to be listed explicitly.
+
+The default action when a system call is denied is to terminate the processes with a
+C<SIGSYS> signal. This can changed using C<SystemCallErrorNumber>,
+see below. In addition, deny-listed system calls and system call groups may optionally be suffixed
+with a colon (C<:>) and an argument in the same format as
+C<SystemCallErrorNumber>, to take this action when the matching system call is made.
+This takes precedence over the action specified in C<SystemCallErrorNumber>.
+
+This feature makes use of the Secure Computing Mode 2 interfaces of the kernel ('seccomp
+filtering') and is useful for enforcing a minimal sandboxing environment.
+
+Note that on systems supporting multiple ABIs (such as x86/x86-64) it is recommended to turn
+off alternative ABIs for services, so that they cannot be used to circumvent the restrictions of this
 option. Specifically, it is recommended to combine this option with
 C<SystemCallArchitectures=native> or similar.
 
-Note that strict system call filters may impact execution and error handling code paths of the service
-invocation. Specifically, access to the execve() system call is required for the execution
-of the service binary \x{2014} if it is blocked service invocation will necessarily fail. Also, if execution of the
-service binary fails for some reason (for example: missing service executable), the error handling logic might
-require access to an additional set of system calls in order to process and log this failure correctly. It
-might be necessary to temporarily disable system call filters in order to simplify debugging of such
-failures.
+Note that strict system call filters may impact execution and error handling code paths of the
+service invocation. Specifically, access to the execve() system call is required
+for the execution of the service binary \x{2014} if it is blocked service invocation will necessarily fail.
+Also, if execution of the service binary fails for some reason (for example: missing service
+executable), the error handling logic might require access to an additional set of system calls in
+order to process and log this failure correctly. It might be necessary to temporarily disable system
+call filters in order to allow debugging of such failures.
 
 If you specify both types of this option (i.e. allow-listing and deny-listing), the first
 encountered will take precedence and will dictate the default action (termination or approval of a
@@ -4014,8 +4337,8 @@ example, if you have started with an allow list rule for read() and
 write(), and right after it add a deny list rule for write(),
 then write() will be removed from the set.)
 
-As the number of possible system calls is large, predefined sets of system calls are provided. A set
-starts with C<\@> character, followed by name of the set.
+As the number of possible system calls is large, predefined groups of system calls are
+provided. A group starts with C<\@> character, followed by name of the set.
 Currently predefined system call setsSetDescription\@aioAsynchronous I/O (L<io_setup(2)>, L<io_submit(2)>, and related
 calls)\@basic-ioSystem calls for basic I/O: reading, writing, seeking, file descriptor duplication and closing
 (L<read(2)>, L<write(2)>, and related calls)\@chownChanging file ownership (L<chown(2)>, L<fchownat(2)>, and related
@@ -4422,7 +4745,7 @@ two options above but copy the output to the system console as well.
 The C<file:path> option may be used to connect a specific file
 system object to standard output. The semantics are similar to the same option of
 C<StandardInput>, see above. If path refers to a regular file
-on the filesystem, it is opened (created if it doesn't exist yet using privileges of the user executing the
+on the filesystem, it is opened (created if it does not exist yet using privileges of the user executing the
 systemd process) for writing at the beginning of the file, but without truncating it.
 If standard input and output are directed to the same file path, it is opened only once \x{2014} for reading as well
 as writing \x{2014} and duplicated. This is particularly useful when the specified path refers to an
@@ -4465,7 +4788,7 @@ for more details about named descriptors and their ordering.
 If the standard output (or error output, see below) of a unit is connected to the journal or
 the kernel log buffer, the unit will implicitly gain a dependency of type C<After>
 on C<systemd-journald.socket> (also see the \"Implicit Dependencies\" section
-above). Also note that in this case stdout (or stderr, see below) will be an
+above). Also note that, in this case, stdout (or stderr, see below) will be an
 C<AF_UNIX> stream socket, and not a pipe or FIFO that can be reopened. This means
 when executing shell scripts the construct echo \"hello\" > /dev/stderr for
 writing text to stderr will not work. To mitigate this use the construct echo \"hello\"
@@ -4585,22 +4908,28 @@ details). This is particularly useful for large data configured with these two o
       },
       'LogLevelMax',
       {
-        'description' => 'Configures filtering by log level of log messages generated by this unit. Takes a
-syslog log level, one of C<emerg> (lowest log level, only highest priority
-messages), C<alert>, C<crit>, C<err>, C<warning>,
-C<notice>, C<info>, C<debug> (highest log level, also lowest priority
-messages). See L<syslog(3)> for
-details. By default no filtering is applied (i.e. the default maximum log level is C<debug>). Use
-this option to configure the logging system to drop log messages of a specific service above the specified
-level. For example, set C<LogLevelMax>=C<info> in order to turn off debug logging
-of a particularly chatty unit. Note that the configured level is applied to any log messages written by any
-of the processes belonging to this unit, as well as any log messages written by the system manager process
-(PID 1) in reference to this unit, sent via any supported logging protocol. The filtering is applied
-early in the logging pipeline, before any kind of further processing is done. Moreover, messages which pass
-through this filter successfully might still be dropped by filters applied at a later stage in the logging
-subsystem. For example, C<MaxLevelStore> configured in
-L<journald.conf(5)> might
-prohibit messages of higher log levels to be stored on disk, even though the per-unit
+        'description' => 'Sets the maximum log level for log messages generated by this unit. Takes a
+syslog log level, one of C<emerg> (lowest log level, only highest
+priority messages), C<alert>, C<crit>, C<err>,
+C<warning>, C<notice>, C<info>, C<debug>
+(highest log level, also lowest priority messages). See L<syslog(3)> for
+details. By default, the maximum log level is not overridden.
+
+This option can be used to configure the logging system to drop log messages of a specific
+service above the specified level. For example, set
+C<LogLevelMax>=C<info> in order to turn off debug logging of a
+particularly chatty unit. Alternatively, this option can be used to enable extra logging about a
+specific unit by the system or user manager processes without changing the global log level for the
+system or user manager processes by setting C<LogLevelMax>=C<debug>.
+
+Note that the configured level is applied to any log messages written by any of the processes
+belonging to this unit, as well as any log messages written by the system or user manager processes
+in reference to this unit, sent via any supported logging protocol. The override is applied early in
+the logging pipeline, before any kind of further processing is done. Moreover, messages which pass
+through this filter successfully might still be dropped by filters applied at a later stage in the
+logging subsystem. For example, C<MaxLevelStore> configured in
+L<journald.conf(5)>
+might prohibit messages of higher log levels to be stored on disk, even though the per-unit
 C<LogLevelMax> permitted it to be processed.',
         'type' => 'leaf',
         'value_type' => 'uniline'
@@ -4690,7 +5019,7 @@ messages are processed directly after going through denied filters.
 Filtering is based on the unit for which C<LogFilterPatterns> is defined, meaning log
 messages coming from
 L<systemd(1)> about the
-unit are not taken into account. Filtered log messages won\'t be forwarded to traditional syslog daemons,
+unit are not taken into account. Filtered log messages will not be forwarded to traditional syslog daemons,
 the kernel log buffer (kmsg), the systemd console, or sent as wall messages to all logged-in
 users.
 
@@ -4705,7 +5034,7 @@ services.',
 user-defined string identifying the namespace. If not used the processes of the service are run in
 the default journal namespace, i.e. their log stream is collected and processed by
 C<systemd-journald.service>. If this option is used any log data generated by
-processes of this unit (regardless if via the syslog(), journal native logging
+processes of this unit (regardless of whether via the syslog(), journal native logging
 or stdout/stderr logging) is collected and processed by an instance of the
 C<systemd-journald@.service> template unit, which manages the specified
 namespace. The log data is stored in a data store independent from the default log namespace\'s data
@@ -4785,6 +5114,7 @@ this prefixing see
 L<sd-daemon(3)>.
 Defaults to true.',
         'type' => 'leaf',
+        'upstream_default' => 'yes',
         'value_type' => 'boolean',
         'write_as' => [
           'no',
@@ -4841,37 +5171,43 @@ made to clear the screen via ANSI sequences. Defaults to C<no>.',
       'LoadCredential',
       {
         'description' => "Pass a credential to the unit. Credentials are limited-size binary or textual objects
-that may be passed to unit processes. They are primarily used for passing cryptographic keys (both
-public and private) or certificates, user account information or identity information from host to
-services. The data is accessible from the unit's processes via the file system, at a read-only
-location that (if possible and permitted) is backed by non-swappable memory. The data is only
-accessible to the user associated with the unit, via the
-C<User>/C<DynamicUser> settings (as well as the superuser). When
-available, the location of credentials is exported as the C<\$CREDENTIALS_DIRECTORY>
-environment variable to the unit's processes.
+that may be passed to unit processes. They are primarily intended for passing cryptographic keys
+(both public and private) or certificates, user account information or identity information from host
+to services, but can be freely used to pass any kind of limited-size information to a service. The
+data is accessible from the unit's processes via the file system, at a read-only location that (if
+possible and permitted) is backed by non-swappable memory. The data is only accessible to the user
+associated with the unit, via the C<User>/C<DynamicUser> settings
+(as well as the superuser). When available, the location of credentials is exported as the
+C<\$CREDENTIALS_DIRECTORY> environment variable to the unit's processes.
 
 The C<LoadCredential> setting takes a textual ID to use as name for a
 credential plus a file system path, separated by a colon. The ID must be a short ASCII string
 suitable as filename in the filesystem, and may be chosen freely by the user. If the specified path
 is absolute it is opened as regular file and the credential data is read from it. If the absolute
 path refers to an C<AF_UNIX> stream socket in the file system a connection is made
-to it (only once at unit start-up) and the credential data read from the connection, providing an
+to it (once at process invocation) and the credential data read from the connection, providing an
 easy IPC integration point for dynamically transferring credentials from other services.
 
 If the specified path is not absolute and itself qualifies as valid credential identifier it is
 attempted to find a credential that the service manager itself received under the specified name \x{2014}
 which may be used to propagate credentials from an invoking environment (e.g. a container manager
-that invoked the service manager) into a service. If no matching system credential is found, the
-directories C</etc/credstore/>, C</run/credstore/> and
-C</usr/lib/credstore/> are searched for files under the credential's name \x{2014} which
-hence are recommended locations for credential data on disk. If
+that invoked the service manager) into a service. If no matching passed credential is found, the
+system service manager will search the directories C</etc/credstore/>,
+C</run/credstore/> and C</usr/lib/credstore/> for files under the
+credential's name \x{2014} which hence are recommended locations for credential data on disk. If
 C<LoadCredentialEncrypted> is used C</run/credstore.encrypted/>,
 C</etc/credstore.encrypted/>, and
-C</usr/lib/credstore.encrypted/> are searched as well.
+C</usr/lib/credstore.encrypted/> are searched as well. The per-user service manager
+will search C<\$XDG_CONFIG_HOME/credstore/>,
+C<\$XDG_RUNTIME_DIR/credstore/>, C<\$HOME/.local/lib/credstore/>
+(and the counterparts ending with C<\x{2026}/credstore.encrypted/>) instead. The
+L<systemd-path(1)> tool
+may be used to query the precise credential store search path.
 
 If the file system path is omitted it is chosen identical to the credential name, i.e. this is
-a terse way to declare credentials to inherit from the service manager into a service. This option
-may be used multiple times, each time defining an additional credential to pass to the unit.
+a terse way to declare credentials to inherit from the service manager or credstore directories into
+a service. This option may be used multiple times, each time defining an additional credential to
+pass to the unit.
 
 Note that if the path is not specified or a valid credential identifier is given, i.e.
 in the above two cases, a missing credential is not considered fatal.
@@ -4893,15 +5229,11 @@ credential is loaded, decrypted, authenticated and then passed to the applicatio
 in the same way a regular credential specified via C<LoadCredential> would be. A
 credential configured this way may be symmetrically encrypted/authenticated with a secret key derived
 from the system's TPM2 security chip, or with a secret key stored in
-C</var/lib/systemd/credentials.secret>, or with both. Using encrypted and
+C</var/lib/systemd/credential.secret>, or with both. Using encrypted and
 authenticated credentials improves security as credentials are not stored in plaintext and only
 authenticated and decrypted into plaintext the moment a service requiring them is started. Moreover,
 credentials may be bound to the local hardware and installations, so that they cannot easily be
-analyzed offline, or be generated externally. When C<DevicePolicy> is set to
-C<closed> or C<strict>, or set to C<auto> and
-C<DeviceAllow> is set, or C<PrivateDevices> is set, then this
-setting adds C</dev/tpmrm0> with C<rw> mode to
-C<DeviceAllow>. See
+analyzed offline, or be generated externally. See
 L<systemd.resource-control(5)>
 for the details about C<DevicePolicy> or C<DeviceAllow>.
 
@@ -4911,7 +5243,7 @@ manager without the C<--user> switch. Encrypted credentials are always targeted 
 specific user or the system as a whole, and it is ensured that per-user service managers cannot
 decrypt secrets intended for the system or for other users.
 
-The credential files/IPC sockets must be accessible to the service manager, but don't have to
+The credential files/IPC sockets must be accessible to the service manager, but do not have to
 be directly accessible to the unit's processes: the credential data is read and copied into separate,
 read-only copies for the unit that are accessible to appropriately privileged processes. This is
 particularly useful in combination with C<DynamicUser> as this way privileged data
@@ -4938,7 +5270,7 @@ about the former. For the latter, pass L<DMI/SMBIOS|https://www.dmtf.org/standar
 (field type
 11) with a prefix of C<io.systemd.credential:> or
 C<io.systemd.credential.binary:>. In both cases a key/value pair separated by
-C<=> is expected, in the latter case the right-hand side is Base64 decoded when
+C<=> is expected. In the latter case, the right-hand side is Base64 decoded when
 parsed (thus permitting binary data to be passed in). Example
 L<qemu|https://www.qemu.org/docs/master/system/index.html> switch: C<-smbios
 type=11,value=io.systemd.credential:xx=yy>, or C<-smbios
@@ -4976,37 +5308,43 @@ Credentials|https://systemd.io/CREDENTIALS> documentation.",
       'LoadCredentialEncrypted',
       {
         'description' => "Pass a credential to the unit. Credentials are limited-size binary or textual objects
-that may be passed to unit processes. They are primarily used for passing cryptographic keys (both
-public and private) or certificates, user account information or identity information from host to
-services. The data is accessible from the unit's processes via the file system, at a read-only
-location that (if possible and permitted) is backed by non-swappable memory. The data is only
-accessible to the user associated with the unit, via the
-C<User>/C<DynamicUser> settings (as well as the superuser). When
-available, the location of credentials is exported as the C<\$CREDENTIALS_DIRECTORY>
-environment variable to the unit's processes.
+that may be passed to unit processes. They are primarily intended for passing cryptographic keys
+(both public and private) or certificates, user account information or identity information from host
+to services, but can be freely used to pass any kind of limited-size information to a service. The
+data is accessible from the unit's processes via the file system, at a read-only location that (if
+possible and permitted) is backed by non-swappable memory. The data is only accessible to the user
+associated with the unit, via the C<User>/C<DynamicUser> settings
+(as well as the superuser). When available, the location of credentials is exported as the
+C<\$CREDENTIALS_DIRECTORY> environment variable to the unit's processes.
 
 The C<LoadCredential> setting takes a textual ID to use as name for a
 credential plus a file system path, separated by a colon. The ID must be a short ASCII string
 suitable as filename in the filesystem, and may be chosen freely by the user. If the specified path
 is absolute it is opened as regular file and the credential data is read from it. If the absolute
 path refers to an C<AF_UNIX> stream socket in the file system a connection is made
-to it (only once at unit start-up) and the credential data read from the connection, providing an
+to it (once at process invocation) and the credential data read from the connection, providing an
 easy IPC integration point for dynamically transferring credentials from other services.
 
 If the specified path is not absolute and itself qualifies as valid credential identifier it is
 attempted to find a credential that the service manager itself received under the specified name \x{2014}
 which may be used to propagate credentials from an invoking environment (e.g. a container manager
-that invoked the service manager) into a service. If no matching system credential is found, the
-directories C</etc/credstore/>, C</run/credstore/> and
-C</usr/lib/credstore/> are searched for files under the credential's name \x{2014} which
-hence are recommended locations for credential data on disk. If
+that invoked the service manager) into a service. If no matching passed credential is found, the
+system service manager will search the directories C</etc/credstore/>,
+C</run/credstore/> and C</usr/lib/credstore/> for files under the
+credential's name \x{2014} which hence are recommended locations for credential data on disk. If
 C<LoadCredentialEncrypted> is used C</run/credstore.encrypted/>,
 C</etc/credstore.encrypted/>, and
-C</usr/lib/credstore.encrypted/> are searched as well.
+C</usr/lib/credstore.encrypted/> are searched as well. The per-user service manager
+will search C<\$XDG_CONFIG_HOME/credstore/>,
+C<\$XDG_RUNTIME_DIR/credstore/>, C<\$HOME/.local/lib/credstore/>
+(and the counterparts ending with C<\x{2026}/credstore.encrypted/>) instead. The
+L<systemd-path(1)> tool
+may be used to query the precise credential store search path.
 
 If the file system path is omitted it is chosen identical to the credential name, i.e. this is
-a terse way to declare credentials to inherit from the service manager into a service. This option
-may be used multiple times, each time defining an additional credential to pass to the unit.
+a terse way to declare credentials to inherit from the service manager or credstore directories into
+a service. This option may be used multiple times, each time defining an additional credential to
+pass to the unit.
 
 Note that if the path is not specified or a valid credential identifier is given, i.e.
 in the above two cases, a missing credential is not considered fatal.
@@ -5028,15 +5366,11 @@ credential is loaded, decrypted, authenticated and then passed to the applicatio
 in the same way a regular credential specified via C<LoadCredential> would be. A
 credential configured this way may be symmetrically encrypted/authenticated with a secret key derived
 from the system's TPM2 security chip, or with a secret key stored in
-C</var/lib/systemd/credentials.secret>, or with both. Using encrypted and
+C</var/lib/systemd/credential.secret>, or with both. Using encrypted and
 authenticated credentials improves security as credentials are not stored in plaintext and only
 authenticated and decrypted into plaintext the moment a service requiring them is started. Moreover,
 credentials may be bound to the local hardware and installations, so that they cannot easily be
-analyzed offline, or be generated externally. When C<DevicePolicy> is set to
-C<closed> or C<strict>, or set to C<auto> and
-C<DeviceAllow> is set, or C<PrivateDevices> is set, then this
-setting adds C</dev/tpmrm0> with C<rw> mode to
-C<DeviceAllow>. See
+analyzed offline, or be generated externally. See
 L<systemd.resource-control(5)>
 for the details about C<DevicePolicy> or C<DeviceAllow>.
 
@@ -5046,7 +5380,7 @@ manager without the C<--user> switch. Encrypted credentials are always targeted 
 specific user or the system as a whole, and it is ensured that per-user service managers cannot
 decrypt secrets intended for the system or for other users.
 
-The credential files/IPC sockets must be accessible to the service manager, but don't have to
+The credential files/IPC sockets must be accessible to the service manager, but do not have to
 be directly accessible to the unit's processes: the credential data is read and copied into separate,
 read-only copies for the unit that are accessible to appropriately privileged processes. This is
 particularly useful in combination with C<DynamicUser> as this way privileged data
@@ -5073,7 +5407,7 @@ about the former. For the latter, pass L<DMI/SMBIOS|https://www.dmtf.org/standar
 (field type
 11) with a prefix of C<io.systemd.credential:> or
 C<io.systemd.credential.binary:>. In both cases a key/value pair separated by
-C<=> is expected, in the latter case the right-hand side is Base64 decoded when
+C<=> is expected. In the latter case, the right-hand side is Base64 decoded when
 parsed (thus permitting binary data to be passed in). Example
 L<qemu|https://www.qemu.org/docs/master/system/index.html> switch: C<-smbios
 type=11,value=io.systemd.credential:xx=yy>, or C<-smbios
@@ -5110,7 +5444,7 @@ Credentials|https://systemd.io/CREDENTIALS> documentation.",
       },
       'ImportCredential',
       {
-        'description' => "Pass one or more credentials to the unit. Takes a credential name for which we'll
+        'description' => "Pass one or more credentials to the unit. Takes a credential name for which we will
 attempt to find a credential that the service manager itself received under the specified name \x{2014}
 which may be used to propagate credentials from an invoking environment (e.g. a container manager
 that invoked the service manager) into a service. If the credential name is a glob, all credentials
@@ -5140,7 +5474,14 @@ end up with the same name after renaming, the first one is kept and later ones a
 
 When multiple credentials of the same name are found, credentials found by
 C<LoadCredential> and C<LoadCredentialEncrypted> take priority over
-credentials found by C<ImportCredential>.",
+credentials found by C<ImportCredential>.
+
+Note that if decryption or authentication of a credential picked up as result of
+C<ImportCredential> fails it will be skipped gracefully (a warning is generated, but
+the credential will not be made available to the invoked service). This is different for those
+configured via
+C<SetCredentialEncrypted>/C<LoadCredentialEncrypted>, where failed
+decryption/authentication will result in service failure.",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -5167,7 +5508,7 @@ When multiple credentials of the same name are found, credentials found by
 C<LoadCredential>, C<LoadCredentialEncrypted> and
 C<ImportCredential> take priority over credentials found by
 C<SetCredential>. As such, C<SetCredential> will act as default if
-no credentials are found by any of the former. In this case not being able to retrieve the credential
+no credentials are found by any of the former. In this case, not being able to retrieve the credential
 from the path specified in C<LoadCredential> or
 C<LoadCredentialEncrypted> is not considered fatal.',
         'type' => 'leaf',
@@ -5196,7 +5537,7 @@ When multiple credentials of the same name are found, credentials found by
 C<LoadCredential>, C<LoadCredentialEncrypted> and
 C<ImportCredential> take priority over credentials found by
 C<SetCredential>. As such, C<SetCredential> will act as default if
-no credentials are found by any of the former. In this case not being able to retrieve the credential
+no credentials are found by any of the former. In this case, not being able to retrieve the credential
 from the path specified in C<LoadCredential> or
 C<LoadCredentialEncrypted> is not considered fatal.',
         'type' => 'leaf',
@@ -5238,7 +5579,7 @@ leader. Defaults to C<init>.',
         'value_type' => 'enum'
       }
     ],
-    'generated_by' => 'parse-man.pl from systemd 257 doc',
+    'generated_by' => 'parse-man.pl from systemd 258 doc',
     'license' => 'LGPLv2.1+',
     'name' => 'Systemd::Common::Exec'
   }

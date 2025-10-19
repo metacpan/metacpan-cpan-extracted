@@ -180,7 +180,7 @@ const char *neo4j_typestr(const neo4j_type_t type)
 
 struct neo4j_value_vt
 {
-    size_t (*str)(const neo4j_value_t *self, char *strbuf, size_t n);
+    ssize_t (*str)(const neo4j_value_t *self, char *strbuf, size_t n);
     ssize_t (*fprint)(const neo4j_value_t *self, FILE *stream);
     int (*serialize)(const neo4j_value_t *self, neo4j_iostream_t *stream);
     bool (*eq)(const neo4j_value_t *self, const neo4j_value_t *other);
@@ -396,7 +396,7 @@ char *neo4j_tostring(neo4j_value_t value, char *strbuf, size_t n)
 }
 
 
-size_t neo4j_ntostring(neo4j_value_t value, char *strbuf, size_t n)
+ssize_t neo4j_ntostring(neo4j_value_t value, char *strbuf, size_t n)
 {
     REQUIRE(value._vt_off < _MAX_VT_OFF, -1);
     REQUIRE(value._type < _MAX_TYPE, -1);
@@ -801,9 +801,9 @@ neo4j_value_t neo4j_node(const neo4j_value_t fields[4])
 {
     if (neo4j_type(fields[0]) != NEO4J_IDENTITY ||
             neo4j_type(fields[1]) != NEO4J_LIST ||
-            neo4j_type(fields[2]) != NEO4J_MAP 
-//	    || neo4j_type(fields[3]) != NEO4J_ELEMENTID
-	)
+            neo4j_type(fields[2]) != NEO4J_MAP ||
+            neo4j_type(fields[3]) != NEO4J_ELEMENTID
+        )
     {
         errno = EINVAL;
         return neo4j_null;
@@ -875,11 +875,11 @@ neo4j_value_t neo4j_relationship(const neo4j_value_t fields[8])
             (neo4j_type(fields[2]) != NEO4J_IDENTITY &&
                 !neo4j_is_null(fields[1])) ||
             neo4j_type(fields[3]) != NEO4J_STRING ||
-            neo4j_type(fields[4]) != NEO4J_MAP
-//	    || neo4j_type(fields[5]) != NEO4J_ELEMENTID ||
-//	    neo4j_type(fields[6]) != NEO4J_ELEMENTID ||
-//	    neo4j_type(fields[7]) != NEO4J_ELEMENTID
-	)
+            neo4j_type(fields[4]) != NEO4J_MAP ||
+            neo4j_type(fields[5]) != NEO4J_ELEMENTID ||
+            neo4j_type(fields[6]) != NEO4J_ELEMENTID ||
+            neo4j_type(fields[7]) != NEO4J_ELEMENTID
+        )
     {
         errno = EINVAL;
         return neo4j_null;
@@ -897,9 +897,9 @@ neo4j_value_t neo4j_unbound_relationship(const neo4j_value_t fields[4])
 {
     if (neo4j_type(fields[0]) != NEO4J_IDENTITY ||
             neo4j_type(fields[1]) != NEO4J_STRING ||
-            neo4j_type(fields[2]) != NEO4J_MAP
-//   	    // neo4j_type(fields[3]) != NEO4J_ELEMENTID
-	)
+            neo4j_type(fields[2]) != NEO4J_MAP ||
+            neo4j_type(fields[3]) != NEO4J_ELEMENTID
+        )
     {
         errno = EINVAL;
         return neo4j_null;

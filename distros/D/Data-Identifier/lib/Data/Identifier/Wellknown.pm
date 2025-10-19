@@ -20,7 +20,7 @@ use Data::Identifier::Generate;
 
 use parent 'Data::Identifier::Interface::Known';
 
-our $VERSION = v0.18;
+our $VERSION = v0.19;
 
 use constant {
     WK_UUID => '8be115d2-dc2f-4a98-91e1-a6e3075cbc31', # uuid
@@ -229,7 +229,7 @@ Data::Identifier::Wellknown - format independent identifier object
 
 =head1 VERSION
 
-version v0.18
+version v0.19
 
 =head1 SYNOPSIS
 
@@ -1165,10 +1165,10 @@ $namespace 47dd950c-9089-4956-87c1-54c122533219
 .   af      Afrikaans
 .   ar      Arabic
 .   bn      Bengali
-.   de      German
-.   en      English
+.   de      German          sid=71
+.   en      English         sid=70
 .   eo      Esperanto
-.   es      Spanish
+.   es      Spanish         sid=73
 .   fi      Finnish
 .   fr      French
 .   he      Hebrew
@@ -1176,7 +1176,7 @@ $namespace 47dd950c-9089-4956-87c1-54c122533219
 .   ia      Interlingua
 .   ie      Interlingue
 .   it      Italian
-.   nl      Dutch
+.   nl      Dutch           sid=72
 .   no      Norwegian
 .   pt      Portuguese
 .   ru      Russian
@@ -1184,6 +1184,7 @@ $namespace 47dd950c-9089-4956-87c1-54c122533219
 .   sw      Swahili
 .   th      Thai
 .   zu      Zulu
+.   zh      Chinese         sid=74
 
 
 $class mediatype
@@ -1209,9 +1210,9 @@ $generator style=name-based,namespace=50d7c533-2d9b-4208-b560-bcbbf75ce3f9
 .   application/http
 .   application/json
 .   application/ld+json
-.   application/octet-stream
+.   application/octet-stream                                    .   sid=224,sni=197
 .   application/ogg
-.   application/pdf
+.   application/pdf                                             .   sid=229
 .   application/vnd.debian.binary-package
 .   application/vnd.oasis.opendocument.base
 .   application/vnd.oasis.opendocument.chart
@@ -1231,23 +1232,23 @@ $generator style=name-based,namespace=50d7c533-2d9b-4208-b560-bcbbf75ce3f9
 .   application/vnd.oasis.opendocument.text-master-template
 .   application/vnd.oasis.opendocument.text-template
 .   application/vnd.oasis.opendocument.text-web
-.   application/vnd.sirtx.vmv0
+.   application/vnd.sirtx.vmv0                                  .   sni=198
 .   application/xhtml+xml
 .   application/xml
 .   audio/flac
 .   audio/matroska
 .   audio/ogg
-.   image/bmp
+.   image/bmp                                                   .   sni=209
 .   image/gif
 .   image/jpeg
-.   image/png
-.   image/svg+xml
+.   image/png                                                   .   sid=227
+.   image/svg+xml                                               .   sid=228
 .   image/vnd.microsoft.icon
-.   image/vnd.wap.wbmp
+.   image/vnd.wap.wbmp                                          .   sni=199
 .   image/webp
 .   message/http
-.   text/html
-.   text/plain
+.   text/html                                                   .   sid=226
+.   text/plain                                                  .   sid=225
 .   video/matroska
 .   video/matroska-3d
 .   video/ogg

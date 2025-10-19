@@ -40,4 +40,23 @@ is_deeply(
     'map(.name + "@" + .city) concatenates name and city'
 );
 
+my $numbers = '{"a":10,"b":3,"s":"42"}';
+
+my @precedence = $jq->run_query($numbers, '1+2*3');
+is($precedence[0], 7, 'multiplication binds tighter than addition');
+
+my @grouped = $jq->run_query($numbers, '(1+2)*3');
+is($grouped[0], 9, 'parentheses override precedence');
+
+my @divided = $jq->run_query($numbers, '.a/.b | floor');
+is($divided[0], 3, 'division result is floored');
+
+my @tonumber = $jq->run_query($numbers, 'tonumber(.s) + 1');
+is($tonumber[0], 43, 'tonumber() converts to numeric value');
+
+my $ok = eval { $jq->run_query($numbers, '1/0'); 1 };
+my $error = $@;
+ok(!$ok, 'division by zero throws');
+like($error, qr/Division by zero/, 'division by zero error message');
+
 done_testing;

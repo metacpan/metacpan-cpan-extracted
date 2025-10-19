@@ -1,0 +1,12 @@
+\.perltidyrc
+\.git
+.*\.old$
+.*\.bak$
+\.tar\.gz$
+^Makefile$
+^MYMETA\.
+^blib
+^pm_to_blib
+\B\.DS_Store
+script
+README.md # just for Github

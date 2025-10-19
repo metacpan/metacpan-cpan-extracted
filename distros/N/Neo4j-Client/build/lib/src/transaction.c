@@ -375,7 +375,7 @@ neo4j_transaction_t *new_transaction(neo4j_config_t *config, neo4j_connection_t 
   tx->run = tx_run;
 
   tx->timeout = timeout;
-  tx->mode = ( mode == NULL ? "w" : strdup(mode) );
+  tx->mode = ( (mode == NULL || strcmp(mode, "r")) ? "w" : "r" );
   tx->dbname = strdup(dbname);
   tx->is_open = 0;
   tx->is_expired = 0;
@@ -532,9 +532,12 @@ const char *neo4j_tx_commit_bookmark(neo4j_transaction_t *tx)
 void neo4j_free_tx(neo4j_transaction_t *tx)
 {
   // free bookmarks array space
-  // free tx space
   if (tx->num_bookmarks > 0) {
     neo4j_free(tx->allocator, (void *)tx->bookmarks);
   }
+  free(tx->dbname);
+  neo4j_mpool_drain(&tx->mpool);
+  neo4j_logger_release(tx->logger);
+  // free tx space
   neo4j_free(tx->allocator, tx);
 }
