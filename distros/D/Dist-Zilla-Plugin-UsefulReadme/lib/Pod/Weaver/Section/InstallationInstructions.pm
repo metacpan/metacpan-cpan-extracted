@@ -21,7 +21,7 @@ use experimental qw( lexical_subs postderef signatures );
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.5.1';
+our $VERSION = 'v0.5.2';
 
 
 has header => (
@@ -203,7 +203,7 @@ Pod::Weaver::Section::InstallationInstructions - generate POD with installation 
 
 =head1 VERSION
 
-version v0.5.1
+version v0.5.2
 
 =head1 SYNOPSIS
 
@@ -316,7 +316,7 @@ then see F<SECURITY.md> for instructions how to report security vulnerabilities.
 =head1 SOURCE
 
 The development version is on github at L<https://github.com/robrwo/perl-Dist-Zilla-Plugin-UsefulReadme>
-and may be cloned from L<git://github.com/robrwo/perl-Dist-Zilla-Plugin-UsefulReadme.git>
+and may be cloned from L<https://github.com/robrwo/perl-Dist-Zilla-Plugin-UsefulReadme.git>
 
 =head1 AUTHOR
 

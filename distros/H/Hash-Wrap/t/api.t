@@ -119,11 +119,14 @@ SKIP: {
 
     {
         package My::Import::Default::LValue;
-
         use if $HAS_LVALUE, 'Hash::Wrap', ( { -base => 1, -lvalue => 1 } );
+
     }
 
-    is( $My::Import::Default::LValue::meta->{-lvalue}, 1, "lvalue" );
+    my $x = My::Import::Default::LValue->new;
+    $x->{a} = 1;
+    $x->a = 2;
+    is( $x->a, '2', 'lvalue set' );
 }
 
 subtest '-into' => sub {

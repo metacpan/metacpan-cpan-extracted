@@ -5,12 +5,12 @@ use strict;
 use warnings;
 
 use Exporter 'import';
-use Time::Local qw(timelocal_posix);
+use Time::Local qw(timelocal_posix timegm_posix);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-12-21'; # DATE
+our $DATE = '2025-10-20'; # DATE
 our $DIST = 'Filename-Timestamp'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our @EXPORT_OK = qw(extract_timestamp_from_filename);
 
@@ -21,6 +21,11 @@ $SPEC{extract_timestamp_from_filename} = {
     summary => 'Extract date/timestamp from filename, if any',
     description => <<'MARKDOWN',
 
+*Handling of timezone.* If timestmap contains timezone indication, e.g. `+0700`,
+will return `tz_offset` key in the result hash as well as `epoch`. Otherwise,
+will return `tz` key in the result hash with the value of `floating` and
+`epoch_local` calculated using <pm:Time::Local>'s `timelocal_posix` as well as
+`epoch_utc` calculated using `timegm_posix`.
 
 MARKDOWN
     args => {
@@ -77,10 +82,13 @@ sub extract_timestamp_from_filename {
     my $filename = $args{filename};
 
     my $res = {};
-    if ($filename =~ /(\d{4})[_.-](\d{2})[_.-](\d{2})
+    if ($filename =~ /(\d{4})[_.-](\d{2})[_.-](\d{2})      # 1 (year), 2 (mon), 3 (day)
                       (?:
                           [T-]
-                          (\d{2})[_.-](\d{2})[_.-](\d{2})
+                          (\d{2})[_.-](\d{2})[_.-](\d{2})  # 4 (hour), 5 (minute), 6 (second)
+                          (?:
+                              ([+-])(\d{2})[_-]?(\d{2})    # 7 (timestamp sign), 8 (timestamp hour), 9 (timestamp minute)
+                          )?
                       )?
                      /x) {
         $res->{year} = $1+0;
@@ -95,10 +103,16 @@ sub extract_timestamp_from_filename {
             $res->{minute} = 0;
             $res->{second} = 0;
         }
-    } elsif ($filename =~ /(\d{4})(\d{2})(\d{2})
+        if ($7) {
+            $res->{tz_offset} = ($7 eq '+' ? 1:-1) * $8*3600 + $9*60;
+        }
+    } elsif ($filename =~ /(\d{4})(\d{2})(\d{2})                # 1 (year), 2 (mon), 3 (day)
                            (?:
                                [_-]
-                               (\d{2})(\d{2})(\d{2})
+                               (\d{2})(\d{2})(\d{2})            # 4 (hour), 5 (min), 6 (second)
+                               (?:
+                                   ([+-])(\d{2})[_-]?(\d{2})    # 7 (timestamp sign), 8 (timestamp hour), 9 (timestamp minute)
+                               )?
                            )?
                           /x) {
         $res->{year} = $1+0;
@@ -113,18 +127,41 @@ sub extract_timestamp_from_filename {
             $res->{minute} = 0;
             $res->{second} = 0;
         }
+        if ($7) {
+            $res->{tz_offset} = ($7 eq '+' ? 1:-1) * $8*3600 + $9*60;
+        }
     } else {
         return 0;
     }
 
-    $res->{epoch} = timelocal_posix(
-        $res->{second},
-        $res->{minute},
-        $res->{hour},
-        $res->{day},
-        $res->{month} - 1,
-        $res->{year} - 1900,
-    );
+    if (defined $res->{tz_offset}) {
+        $res->{epoch} = timegm_posix(
+            $res->{second},
+            $res->{minute},
+            $res->{hour},
+            $res->{day},
+            $res->{month} - 1,
+            $res->{year} - 1900,
+        ) + $res->{tz_offset};
+    } else {
+        $res->{epoch_local} = $res->{epoch} = timelocal_posix(
+            $res->{second},
+            $res->{minute},
+            $res->{hour},
+            $res->{day},
+            $res->{month} - 1,
+            $res->{year} - 1900,
+        );
+        $res->{tz} = 'floating';
+        $res->{epoch_utc} = timegm_posix(
+            $res->{second},
+            $res->{minute},
+            $res->{hour},
+            $res->{day},
+            $res->{month} - 1,
+            $res->{year} - 1900,
+        );
+    }
 
     $res;
 }
@@ -144,18 +181,16 @@ Filename::Timestamp - Extract date/timestamp from filename, if any
 
 =head1 VERSION
 
-This document describes version 0.001 of Filename::Timestamp (from Perl distribution Filename-Timestamp), released on 2024-12-21.
+This document describes version 0.003 of Filename::Timestamp (from Perl distribution Filename-Timestamp), released on 2025-10-20.
 
 =head1 SYNOPSIS
 
- use Filename::Archive qw(check_archive_filename);
- my $res = check_archive_filename(filename => "foo.tar.gz");
+ use Filename::Timestamp qw(extract_timestamp_from_filename);
+ my $res = extract_timestamp_from_filename(filename => "foo.tar.gz");
  if ($res) {
-     printf "File is an archive (type: %s, compressed: %s)\n",
-         $res->{archive_name},
-         $res->{compressor_info} ? "yes":"no";
+     printf "Filename contains timestamp: %s\n", $res->{epoch};
  } else {
-     print "File is not an archive\n";
+     print "Filename does not contain timestamp\n";
  }
 
 =head1 DESCRIPTION
@@ -182,13 +217,14 @@ Examples:
 Result:
 
  {
-   day    => 8,
-   epoch  => 1725773748,
-   hour   => 12,
-   minute => 35,
-   month  => 9,
-   second => 48,
-   year   => 2024,
+   day       => 8,
+   epoch     => 1725824148,
+   hour      => 12,
+   minute    => 35,
+   month     => 9,
+   second    => 48,
+   tz_offset => 25200,
+   year      => 2024,
  }
 
 =item * Example #2:
@@ -198,13 +234,16 @@ Result:
 Result:
 
  {
-   day    => 8,
-   epoch  => 1725764084,
-   hour   => 9,
-   minute => 54,
-   month  => 9,
-   second => 44,
-   year   => 2024,
+   day         => 8,
+   epoch       => 1725764084,
+   epoch_local => 1725764084,
+   epoch_utc   => 1725789284,
+   hour        => 9,
+   minute      => 54,
+   month       => 9,
+   second      => 44,
+   tz          => "floating",
+   year        => 2024,
  }
 
 =item * Example #3:
@@ -214,13 +253,16 @@ Result:
 Result:
 
  {
-   day    => 8,
-   epoch  => 1725762266,
-   hour   => 9,
-   minute => 24,
-   month  => 9,
-   second => 26,
-   year   => 2024,
+   day         => 8,
+   epoch       => 1725762266,
+   epoch_local => 1725762266,
+   epoch_utc   => 1725787466,
+   hour        => 9,
+   minute      => 24,
+   month       => 9,
+   second      => 26,
+   tz          => "floating",
+   year        => 2024,
  }
 
 =item * Example #4:
@@ -230,13 +272,16 @@ Result:
 Result:
 
  {
-   day    => 1,
-   epoch  => 1725165644,
-   hour   => 11,
-   minute => 40,
-   month  => 9,
-   second => 44,
-   year   => 2024,
+   day         => 1,
+   epoch       => 1725165644,
+   epoch_local => 1725165644,
+   epoch_utc   => 1725190844,
+   hour        => 11,
+   minute      => 40,
+   month       => 9,
+   second      => 44,
+   tz          => "floating",
+   year        => 2024,
  }
 
 =item * Example #5:
@@ -246,13 +291,16 @@ Result:
 Result:
 
  {
-   day    => 4,
-   epoch  => 1733245200,
-   hour   => 0,
-   minute => 0,
-   month  => 12,
-   second => 0,
-   year   => 2024,
+   day         => 4,
+   epoch       => 1733245200,
+   epoch_local => 1733245200,
+   epoch_utc   => 1733270400,
+   hour        => 0,
+   minute      => 0,
+   month       => 12,
+   second      => 0,
+   tz          => "floating",
+   year        => 2024,
  }
 
 =item * Example #6:
@@ -260,6 +308,12 @@ Result:
  extract_timestamp_from_filename(filename => "foo.txt"); # -> 0
 
 =back
+
+I<Handling of timezone.> If timestmap contains timezone indication, e.g. C<+0700>,
+will return C<tz_offset> key in the result hash as well as C<epoch>. Otherwise,
+will return C<tz> key in the result hash with the value of C<floating> and
+C<epoch_local> calculated using L<Time::Local>'s C<timelocal_posix> as well as
+C<epoch_utc> calculated using C<timegm_posix>.
 
 This function is not exported by default, but exportable.
 
@@ -297,8 +351,6 @@ Source repository is at L<https://github.com/perlancar/perl-Filename-Timestamp>.
 
 =head1 SEE ALSO
 
-L<Filename::Compressed>
-
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
@@ -323,7 +375,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

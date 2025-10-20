@@ -1,17 +1,24 @@
 Revision history for Hash-Wrap
 
+1.05      2025-10-19 22:22:19-04:00 America/New_York
+
+  [ENHANCEMENT]
+
+    * -immutable can take an arrayref of attributes, which will add
+      any not defined to the object before it is locked.
+
 1.04      2025-01-06 10:19:52-05:00 America/New_York
 
   [BUG FIX]
 
-      * fix rt #156087: "Syntax error with perl < 5.18". ++srezic!
+    * fix rt #156087: "Syntax error with perl < 5.18". ++srezic!
 
 1.03      2024-05-09 15:25:05-04:00 America/New_York
 
   [BUG FIX]
 
-      * incorrect value was returned first time an object at a lower
-        level was returned for an immutable, recursive, copied wrapper.
+    * incorrect value was returned first time an object at a lower
+      level was returned for an immutable, recursive, copied wrapper.
 
 1.02      2024-05-03 13:21:48-04:00 America/New_York
 

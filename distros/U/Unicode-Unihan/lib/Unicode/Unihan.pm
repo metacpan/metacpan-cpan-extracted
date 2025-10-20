@@ -4,7 +4,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = '0.045';
+our $VERSION = '0.046';
 our $DEBUG = 0;
 
 use Carp;
@@ -85,7 +85,7 @@ __END__
 
 =head1 NAME
 
-Unicode::Unihan - The Unihan Data Base 5.1.0
+Unicode::Unihan - The Unihan Data Base 5.1.0 (legacy)
 
 =head1 SYNOPSIS
 
@@ -94,6 +94,8 @@ Unicode::Unihan - The Unihan Data Base 5.1.0
   print join("," => $uh->Mandarin("\x{5c0f}\x{98fc}\x{5f3e}")), "\n";
 
 =head1 ABSTRACT
+
+This is a legacy module kept fresh for legacy applications.
 
 This module provides a user-friendly interface to the Unicode Unihan
 Database 5.1.  With this module, the Unihan database is as easy as
@@ -141,7 +143,7 @@ the value field, see L<http://www.unicode.org/reports/tr38/>.
 
 =item L<perlunicode>
 
-=item The Unihand Database
+=item The Unihan Database
 
 L<http://www.unicode.org/Public/UNIDATA/Unihan.html>
 

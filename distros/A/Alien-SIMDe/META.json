@@ -1,0 +1,100 @@
+{
+   "abstract" : "Provides the SIMDe library",
+   "author" : [
+      "Christos Argyropoulos <chrisarg@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alien-SIMDe",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::Build" : "0.32",
+            "Alien::Build::MM" : "0.32",
+            "ExtUtils::MakeMaker" : "6.52"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Build" : "1.40",
+            "Alien::Build::MM" : "0.32",
+            "Alien::Meson" : "0",
+            "Carp" : "0",
+            "ExtUtils::MakeMaker" : "6.52",
+            "File::Copy::Recursive" : "0",
+            "HTTP::Tiny" : "0",
+            "Path::Tiny" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.52",
+            "File::Spec" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::SIMDe" : {
+         "file" : "lib/Alien/SIMDe.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/chrisarg/Alien-SIMDe",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/chrisarg/Alien-SIMDe.git",
+         "web" : "https://github.com/chrisarg/Alien-SIMDe"
+      },
+      "x_IRC" : "irc://irc.perl.org/#native"
+   },
+   "version" : "0.01",
+   "x_alienfile" : {
+      "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.33",
+      "requires" : {
+         "share" : {
+            "HTTP::Tiny" : "0.044",
+            "IO::Socket::SSL" : "1.56",
+            "Mozilla::CA" : "0",
+            "Net::SSLeay" : "1.49",
+            "URI" : "0"
+         },
+         "system" : {}
+      }
+   },
+   "x_generated_by_perl" : "v5.38.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
+   "x_spdx_expression" : "MIT"
+}
+

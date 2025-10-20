@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document::OpenAPI;
 # ABSTRACT: One OpenAPI v3.1 or v3.2 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 use 5.020;
 use utf8;
@@ -89,8 +89,8 @@ sub traverse ($self, $evaluator, $config_override = {}) {
   my $schema = $self->schema;
 
   croak 'missing openapi version' if not exists $schema->{openapi};
-  croak 'bad openapi version format ', $schema->{openapi}
-    if $schema->{openapi} !~ /^[0-9]+\.[0-9]+\.[0-9]+(-.+)?$/;
+  croak 'bad openapi version: "', $schema->{openapi}//'', '"'
+    if ($schema->{openapi}//'') !~ /^[0-9]+\.[0-9]+\.[0-9]+(-.+)?$/;
 
   my @oad_version = split /[.-]/, $schema->{openapi};
   $self->_set_oas_version(join('.', @oad_version[0..1]));
@@ -256,7 +256,21 @@ sub traverse ($self, $evaluator, $config_override = {}) {
   );
 
   if (not $result->valid) {
-    push $state->{errors}->@*, $result->errors;
+    foreach my $e ($result->errors) {
+      if ($e->keyword eq 'not'
+          and $e->absolute_keyword_location->fragment eq '/$defs/parameters/not'
+          and $e->absolute_keyword_location->clone->fragment(undef) eq DEFAULT_METASCHEMA->{$self->oas_version}
+      ) {
+        push $state->{errors}->@*, $e->clone(
+          keyword_location => '',
+          absolute_keyword_location => undef,
+          error => 'cannot use query and querystring together',
+        );
+      }
+
+      push $state->{errors}->@*, $e;
+    }
+
     return $state;
   }
 
@@ -474,6 +488,7 @@ sub THAW ($class, $serializer, $data) {
   }
 
   my $self = bless($data, $class);
+  $self->{oas_version} = '3.1' if not exists $self->{oas_version};
 
   foreach my $attr (qw(schema _entities)) {
     croak "serialization missing attribute '$attr': perhaps your serialized data was produced for an older version of $class?"
@@ -497,7 +512,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.1 or v3.2 document
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 SYNOPSIS
 

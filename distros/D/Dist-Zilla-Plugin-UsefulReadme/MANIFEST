@@ -35,6 +35,7 @@ weaver.ini
 xt/00-compile.t
 xt/author/clean-namespaces.t
 xt/author/critic.t
+xt/author/cve.t
 xt/author/distmeta.t
 xt/author/eof.t
 xt/author/eol.t

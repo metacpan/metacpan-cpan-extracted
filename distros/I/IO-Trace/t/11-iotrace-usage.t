@@ -6,22 +6,32 @@
 use strict;
 use warnings;
 our (@filters, $test_points);
-use Test::More tests => 1 + (@filters = qw[iotrace strace]) * ($test_points = 13);
+use Test::More tests => 1 + (@filters = qw[iotrace strace]) * ($test_points = 18);
 use File::Temp ();
+use File::Which qw(which);
 
 my $run = "";
 my $line = "";
 my $tmp = File::Temp->new( UNLINK => 1, SUFFIX => '.trace' );
 ok("$tmp", "tracefile[$tmp]");
 
-SKIP: for my $try (@filters) {
-    my $prog = $try =~ /(\w+)$/ && $1;
-    skip "no strace", $test_points if $prog eq "strace" and !-x "/usr/bin/strace"; # Skip strace tests if doesn't exist
+SKIP: for my $prog (@filters) {
+    my $try = which $prog;
+    skip "no strace", $test_points if $prog eq "strace" and !$try; # Skip strace tests if doesn't exist
+    ok($try, "$prog: Full path [$try]");
 
-    # run simple cases and test option: -o <output_log>
+    # run simple cases and test options: -h and -o <output_log>
 
-    ($run = `$try 2>&1`) =~ s/\n+/ /g;
-    ok (!!$?, "$prog: Args required: $run");
+    ($run = `$try 2>&1`) =~ s/\n+/ /g; # No args spews to STDERR
+    $run =~ s/^(.{1,40}).*/$1/;
+    ok (!!$?, "$prog: Args required: $run"); # No args is error
+    ok (!$!, "$prog: No Errno: $!");
+
+    ($run = `$try -h`) =~ s/\n+/ /g; # view help is not error
+    $run =~ s/^(.{1,40}).*/$1/;
+    ok ($run, "$prog: Help screen: $run"); # Help screen to STDOUT
+    ok (!$?, "$prog: Help no error: $?"); # Help shouldn't error
+    ok (!$!, "$prog: Help screen: $!");
 
     $run = `$try /BoGuS-CommAnd 2>&1`;
     chomp $run;

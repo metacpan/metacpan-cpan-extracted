@@ -1,5 +1,11 @@
 Revision history for IO::Trace
 
+0.022 2025-10-20 03:00:00
+ - Add iotrace { --help | -h } to behave like strace.
+ - Handle legacy old kernels not setting Errno EPIPE
+   when trying to close() an unconsumed stream.
+ - Patch t/18 for -f option test to be more general.
+
 0.021 2025-10-18 21:00:00
  - Copy hooks/iotrace from Git::Server to act like strace
  * Retain git history from github.com/hookbot/git-server

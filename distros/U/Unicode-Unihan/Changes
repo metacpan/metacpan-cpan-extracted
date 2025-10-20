@@ -1,5 +1,8 @@
 # Revision history for Perl extension Unicode::Unihan.
 
+0.046 2025-10-19T23:35:04Z
+	* minor updates to the docs
+
 0.045 2025-01-26T22:19:22Z
 	* refresh distro and move to BRIANDFOY
 

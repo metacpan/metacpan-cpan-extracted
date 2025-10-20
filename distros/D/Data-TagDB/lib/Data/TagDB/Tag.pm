@@ -1,5 +1,5 @@
-# Copyright (c) 2024 Löwenfelsen UG (haftungsbeschränkt)
-# Copyright (c) 2024 Philipp Schafft
+# Copyright (c) 2024-2025 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2024-2025 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -14,7 +14,7 @@ use warnings;
 use Carp;
 use URI;
 
-our $VERSION = v0.09;
+our $VERSION = v0.10;
 
 my $HAVE_DATA_IDENTIFIER = eval {require Data::Identifier; 1;};
 
@@ -498,7 +498,7 @@ Data::TagDB::Tag - Work with Tag databases
 
 =head1 VERSION
 
-version v0.09
+version v0.10
 
 =head1 SYNOPSIS
 

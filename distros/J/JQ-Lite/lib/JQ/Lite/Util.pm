@@ -10,6 +10,7 @@ use JQ::Lite::Expression ();
 
 my $JSON_DECODER     = JSON::PP->new->utf8->allow_nonref;
 my $FROMJSON_DECODER = JSON::PP->new->utf8->allow_nonref;
+my $TOJSON_ENCODER   = JSON::PP->new->utf8->allow_nonref;
 
 sub _decode_json {
     my ($text) = @_;
@@ -1798,16 +1799,16 @@ sub _apply_tostring {
     }
 
     if (ref $value eq 'ARRAY' || ref $value eq 'HASH') {
-        return encode_json($value);
+        return $TOJSON_ENCODER->encode($value);
     }
 
-    return encode_json($value);
+    return $TOJSON_ENCODER->encode($value);
 }
 
 sub _apply_tojson {
     my ($value) = @_;
 
-    return encode_json($value);
+    return $TOJSON_ENCODER->encode($value);
 }
 
 sub _apply_fromjson {

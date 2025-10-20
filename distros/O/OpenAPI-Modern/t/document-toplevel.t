@@ -101,10 +101,21 @@ YAML
 
   die_result(
     sub { $doc = JSON::Schema::Modern::Document::OpenAPI->new(schema => {}) },
-    qr/missing openapi version/,
+    qr/missing openapi version at /,
     'missing openapi',
   );
 
+  die_result(
+    sub { $doc = JSON::Schema::Modern::Document::OpenAPI->new(schema => { openapi => undef }) },
+    qr/bad openapi version: "" at /,
+    'empty openapi',
+  );
+
+  die_result(
+    sub { $doc = JSON::Schema::Modern::Document::OpenAPI->new(schema => { openapi => 'blah' }) },
+    qr/bad openapi version: "blah" at /,
+    'bad openapi',
+  );
 
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',

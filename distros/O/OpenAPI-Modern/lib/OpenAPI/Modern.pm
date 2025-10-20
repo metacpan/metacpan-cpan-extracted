@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.099-15-g69ac84b0
+package OpenAPI::Modern; # git description: v0.100-9-g75ad8474
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.1 or v3.2 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.1 v3.2 Swagger HTTP request response
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 use 5.020;
 use utf8;
@@ -114,23 +114,23 @@ sub validate_request ($self, $request, $options = {}) {
 
     $request = $options->{request};   # now guaranteed to be a Mojo::Message::Request
 
-    my $method = lc $request->method;
     my $path_item = delete $options->{_path_item};  # after following path-item $refs
-    my $operation = $path_item->{$method};
+    my $operation = $path_item->{lc $request->method};
 
     # PARAMETERS
-    # { $in => { $name => 'path-item'|$method } }  as we process each one.
+    # { $in => { $name => path-item|operation } }  as we process each one.
     my $request_parameters_processed = {};
+    my %seen_q;
 
     # first, consider parameters at the operation level.
     # parameters at the path-item level are also considered, if not already seen at the operation level
     SECTION:
-    foreach my $section ($method, 'path-item') {
+    foreach my $section (qw(operation path-item)) {
       ENTRY:
-      foreach my $idx (0 .. (($section eq $method ? $operation : $path_item)->{parameters}//[])->$#*) {
+      foreach my $idx (0 .. (($section eq 'operation' ? $operation : $path_item)->{parameters}//[])->$#*) {
         my $state = { %$state, keyword_path => jsonp($state->{keyword_path},
-          ($section eq $method ? $method : ()), 'parameters', $idx) };
-        my $param_obj = ($section eq $method ? $operation : $path_item)->{parameters}[$idx];
+          ($section eq 'operation' ? lc $request->method : ()), 'parameters', $idx) };
+        my $param_obj = ($section eq 'operation' ? $operation : $path_item)->{parameters}[$idx];
         while (defined(my $ref = $param_obj->{'$ref'})) {
           $param_obj = $self->_resolve_ref('parameter', $ref, $state);
         }
@@ -139,6 +139,13 @@ sub validate_request ($self, $request, $options = {}) {
 
         abort($state, 'duplicate %s parameter "%s"', $param_obj->{in}, $param_obj->{name})
           if (($request_parameters_processed->{$param_obj->{in}}//{})->{$fc_name} // '') eq $section;
+
+        ++$seen_q{$param_obj->{in}};
+        abort({ %$state, data_path => '/request/uri/query' }, 'cannot use query and querystring together')
+          if $seen_q{query} and $seen_q{querystring};
+
+        abort({ %$state, data_path => '/request/uri/query' }, 'cannot use more than one querystring')
+          if ($seen_q{querystring}//0) >= 2;
 
         { use autovivification qw(exists store);
           next ENTRY if exists $request_parameters_processed->{$param_obj->{in}}{$fc_name};
@@ -150,7 +157,7 @@ sub validate_request ($self, $request, $options = {}) {
           : $param_obj->{in} eq 'query' ? $self->_validate_query_parameter({ %$state, depth => $state->{depth}+1 }, $param_obj, $request->url)
           : $param_obj->{in} eq 'header' ? $self->_validate_header_parameter({ %$state, depth => $state->{depth}+1 }, $param_obj->{name}, $param_obj, $request->headers)
           : $param_obj->{in} eq 'cookie' ? $self->_validate_cookie_parameter({ %$state, depth => $state->{depth}+1 }, $param_obj)
-          : $param_obj->{in} eq 'querystring' ? $self->_validate_querystring_parameter({ %$state, depth => $state->{depth}+1 }, $param_obj)
+          : $param_obj->{in} eq 'querystring' ? $self->_validate_querystring_parameter({ %$state, depth => $state->{depth}+1 }, $param_obj, $request->url)
           : abort($state, 'unrecognized "in" value "%s"', $param_obj->{in});
       }
     }
@@ -167,7 +174,7 @@ sub validate_request ($self, $request, $options = {}) {
         if not exists(($request_parameters_processed->{path}//{})->{$path_name});
     }
 
-    $state->{keyword_path} = jsonp($state->{keyword_path}, $method);
+    $state->{keyword_path} = jsonp($state->{keyword_path}, lc $request->method);
 
     # RFC9112 §6.2-2: "A sender MUST NOT send a Content-Length header field in any message that
     # contains a Transfer-Encoding header field."
@@ -869,16 +876,36 @@ sub _validate_cookie_parameter ($self, $state, $param_obj, @args) {
   return E($state, 'cookie parameters not yet supported');
 }
 
-sub _validate_querystring_parameter ($self, $state, $param_obj, @args) {
+sub _validate_querystring_parameter ($self, $state, $param_obj, $uri) {
   $state->{data_path} = '/request/uri/query';
 
-  return E($state, 'querystring parameters not yet supported');
+  # note: if something has caused the Mojo::Parameters object to be normalized (e.g. calling
+  # 'pairs'), the raw string value is lost
+  return E({ %$state, keyword => 'required' }, 'missing querystring')
+    if $param_obj->{required} and not length $uri->query->{string};
+
+  # Replace "+" with whitespace, unescape and decode as in Mojo::Parameters::pairs
+  my $content = url_unescape($uri->query->{string} =~ s/\+/ /gr);
+
+  $self->_validate_parameter_content({ %$state, depth => $state->{depth}+1 }, $param_obj, \$content)
 }
 
 sub _validate_parameter_content ($self, $state, $param_obj, $content_ref) {
-  abort({ %$state, keyword => 'content' }, 'more than one media type entry present')
-    if keys $param_obj->{content}->%* > 1;  # TODO: remove, when the spec schema is updated
   my ($media_type) = keys $param_obj->{content}->%*;  # there can only be one key
+
+  # FIXME: handle media-type parameters better when selecting for a decoder, see RFC9110 8.3.1
+
+  if ($media_type =~ m{^text/}
+      and my $charset = ($media_type =~ /\bcharset\s*=\s*"?([^"\s;]+)"?/i ? $1 : undef)) {
+    try {
+      # we don't use Mojo::Util::decode because it doesn't die on failure
+      $content_ref = \ Encode::decode($charset, $content_ref->$*, Encode::DIE_ON_ERR);
+    }
+    catch ($e) {
+      return E({ %$state, keyword => 'content', _keyword_path_suffix => $media_type },
+        'could not decode content as %s: %s', $charset, $e =~ s/^(.*)\n/$1/r);
+    }
+  }
 
   my $media_type_decoder = $self->get_media_type($media_type);  # case-insensitive, wildcard lookup
 
@@ -892,6 +919,8 @@ sub _validate_body_content ($self, $state, $content_obj, $message) {
   return E({ %$state, data_path => $state->{data_path} =~ s{body$}{header}r, keyword => 'content' },
       'missing header: Content-Type')
     if not length $content_type;
+
+  # FIXME: needs to handle media-type parameters when selecting for a decoder, see RFC9110 8.3.1
 
   my $media_type = (first { fc($content_type) eq fc } keys $content_obj->%*)
     // (first { m{([^/]+)/\*$} && fc($content_type) =~ m{^\F\Q$1\E/[^/]+$} } keys $content_obj->%*);
@@ -1032,10 +1061,11 @@ sub _evaluate_subschema ($self, $dataref, $schema, $state) {
     my @location = unjsonp($state->{data_path});
     my $location =
         $location[-1] eq 'body' ? join(' ', @location[-2..-1])
-      : $location[-2] eq 'query' ? 'query parameter'
-      : $location[-2] eq 'path' ? 'path parameter'  # this should never happen
+      : $location[-2] eq 'query' ? 'query parameter'  # query
+      : $location[-2] eq 'path' ? 'path parameter'    # this should never happen
       : $location[-2] eq 'header' ? join(' ', @location[-3..-2])
-      : $location[-2];  # cookie
+      : $location[-1] eq 'query' ? 'query parameter'  # querystring
+      : die 'unknown location';  # cookie TBD
     return E($state, '%s not permitted', $location);
   }
 
@@ -1167,7 +1197,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.1 o
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 SYNOPSIS
 
@@ -1469,10 +1499,10 @@ C<uri_captures>: a hashref mapping placeholders in the entire uri template (serv
 
 C<operation_uri>: a URI indicating the document location of the operation object for the request, after following any references (usually something under C</paths/>, but may be in another document). Use C<< $openapi->evaluator->get($uri) >> to fetch this content (see L<JSON::Schema::Modern/get>). Note that this is the same as:
 
-    $openapi->document_get(Mojo::URL->new($openapi->openapi_uri)->fragment(< path to operation >);
+    $openapi->document_get(Mojo::URL->new($openapi->openapi_uri)->fragment($path_to_operation);
 
-(See the documentation for an operation at L<https://learn.openapis.org/specification/paths.html#the-endpoints-list>
-or in the specification at
+(See the L<documentation for an operation/https://learn.openapis.org/specification/paths.html#the-endpoints-list>
+or in
 L<§4.10 of the specification|https://spec.openapis.org/oas/latest#operation-object>.)
 
 =item *
@@ -1483,7 +1513,7 @@ C<debug>: when C<$OpenAPI::Modern::DEBUG> or L</debug> is set on the OpenAPI::Mo
 
 =item *
 
-C<uri_patterns>: an arrayref of patterns that were attempted to be matched against the URI
+C<uri_patterns>: an arrayref of patterns that were attempted to be matched against the URI, in match order
 
 =back
 
@@ -1577,13 +1607,18 @@ you need earlier versions, you can find them at
 L<https://spec.openapis.org/#openapi-specification-schemas>.
 
 The default metaschema used by this tool does not permit the use of C<$schema> keywords
-in subschemas (where the value differs from the default OAS dialect), but a more permissive
+in subschemas (unless the value is equal to the default OAS dialect), but a more permissive
 dialect is also available (or you can define your own), which you declare by providing the
 C<L<jsonSchemaDialect/https://spec.openapis.org/oas/latest#openapi-object>> property in your OpenAPI
 Document.
 
 The schemas are also available under the URIs C<< s/<date>/latest/ >> so you don't have to change your
 code or configurations to keep pace with internal changes.
+
+An even stricter schema and dialect are available, via the metaschema_uri
+C<https://raw.githubusercontent.com/karenetheridge/OpenAPI-Modern/master/share/3.2/strict-schema.json>,
+which prevents any unknown keywords from being used in JSON Schemas. This is useful to avoid
+spelling mistakes from going unnoticed and resulting in false positive results.
 
 =head1 ON THE USE OF JSON SCHEMAS
 

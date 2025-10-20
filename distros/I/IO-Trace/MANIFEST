@@ -13,6 +13,7 @@ t/12-iotrace-exit.t
 t/14-iotrace-time.t
 t/15-iotrace-quiet.t
 t/16-iotrace-verbose.t
+t/17-iotrace-signal.t
 t/19-iotrace-slow-fds.t
 t/20-iotrace-target-close-0.t
 t/21-iotrace-target-close-1.t

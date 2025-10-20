@@ -15,7 +15,7 @@ use overload '""' => \&rgb;
 use Carp;
 use Scalar::Util qw(weaken blessed);
 
-our $VERSION = v0.17;
+our $VERSION = v0.18;
 
 use parent qw(Data::URIID::Base Data::Identifier::Interface::Known);
 
@@ -129,7 +129,7 @@ Data::URIID::Colour - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.17
+version v0.18
 
 =head1 SYNOPSIS
 

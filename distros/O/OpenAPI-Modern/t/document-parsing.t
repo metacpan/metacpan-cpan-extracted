@@ -12,6 +12,7 @@ no feature 'switch';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
 use Test::Memory::Cycle;
+use JSON::Schema::Modern::Utilities 'jsonp';
 use lib 't/lib';
 use Helper;
 
@@ -817,6 +818,41 @@ YAML
 ERRORS
 
   memory_cycle_ok($doc, 'no leaks in the document object');
+};
+
+subtest 'query and querystring' => sub {
+  my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
+    canonical_uri => 'http://localhost:1234/api',
+    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+paths:
+  /foo:
+    get:
+      parameters:
+      - name: q
+        in: query
+        schema: {}
+      - name: qs
+        in: querystring
+        content:
+          application/x-www-form-urlencoded:
+            schema: {}
+YAML
+
+  cmp_result(
+    ($doc->errors)[0]->TO_JSON,
+    {
+      instanceLocation => jsonp(qw(/paths /foo get parameters)),
+      keywordLocation => '',
+      error => 'cannot use query and querystring together',
+    },
+    'using query and querystring together gives a user-friendly error',
+  );
+
+  is(
+    (split(/\R/, document_result($doc)))[0],
+    '\'/paths/~1foo/get/parameters\': cannot use query and querystring together',
+    'stringified error',
+  ),
 };
 
 done_testing;

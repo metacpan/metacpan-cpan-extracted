@@ -1,10 +1,124 @@
 ==================================================
-Changes from 2024-02-26 00:00:00 +0000 to present.
+Changes from 2024-10-20 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.100 at 2025-02-25 08:54:56 +0000
+version 0.101 at 2025-10-20 07:14:13 +0000
 ------------------------------------------
+
+  Change: 5f19792929aa895c90953bf8437f40cb81ad6012
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2025-10-20 09:04:02 +0000
+
+    - removed readme-files because produced on the fly by distzilla 
+
+  Change: f8a92b957facf40cd40781a8a87300dbdb4ac787
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2025-10-20 09:02:22 +0000
+
+    - added section about Backward Compatibility 
+
+  Change: 382be4cd2d877d951c29f0a5c89fbe492123a8fc
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2025-10-20 08:50:10 +0000
+
+    - refactoring, joining three for loops into one, also reusing var
+    resulting in higer processing throughput and reduced complexity 
+
+  Change: 6c717c176b758f73b5bcc10fd0208c4bd93710e3
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2025-10-20 08:39:37 +0000
+
+    - refactoring, moved compound statement to statement with modifier to
+    increase readability 
+
+  Change: 6863fed038c586d02f8673659b0a21fa2dc4c32b
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2025-10-17 17:28:38 +0000
+
+    - refactoring, removed nested ifs 
+
+  Change: 957ba1a775a251129b2b327c7cb6f951c0a12162
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2025-10-17 17:28:19 +0000
+
+    - added nocritic hint for perlcritic 
+
+  Change: f9d5c14d07e83ddb373ddb048083632d439f50fe
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2025-10-17 17:27:11 +0000
+
+    - refactoring, removed nested ifs 
+
+  Change: 2f83bef072390585a28ed9014263458e4ecdc724
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2025-10-17 17:24:14 +0000
+
+    - minor 
+
+  Change: 047dc9bccc8be96d4ad4acd01975c8ba086cc07f
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2025-10-17 16:50:53 +0000
+
+    - refactoring, reduce complexity of _verify_baginfo() 
+
+  Change: b553ea364ed6b470da765f022c3872747beacf5e
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2025-10-17 16:11:51 +0000
+
+    - fixed perlcritic warning 
+
+  Change: 6976c6173188757924eff68cf819798a5d103aa3
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2025-10-17 16:11:28 +0000
+
+    - added nocritic hint for perlcritic 
+
+  Change: 9ebcf88fa389add717f08294ccd0d07758b09c97
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2025-10-17 16:10:51 +0000
+
+    - removed unused module import 
+
+  Change: b64accd3c68f44f730b4c3d53c12b92fba595ae8
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2025-10-17 16:10:07 +0000
+
+    - removed unused module import 
+
+  Change: bf022082e05825ab90ac3534f3f154e0b1b98ef7
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2025-03-12 19:30:37 +0000
+
+    - use class explicitely 
+
+  Change: e5f2429d5b693c1886e4a2dca66b602a0ff0a2b5
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2025-03-12 19:30:14 +0000
+
+    - fix class loading if in test environment 
+
+  Change: daa4945592108a9669e87b58a2d6099df1473e84
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2025-03-12 19:29:38 +0000
+
+    - remove parallel support, because unstable 
+
+  Change: 9bc482184efed3c36eab4c549a0b28224e9140fd
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2025-03-12 19:28:35 +0000
+
+    - use async IO by default 
+
+------------------------------------------
+version 0.100 at 2025-02-25 08:55:49 +0000
+------------------------------------------
+
+  Change: cc1bd60c64a46fbb5eaf39bd3f89eec5b3fe9aba
+  Author: art1@andreas-romeyke.de <art1pirat@fsfe.org>
+  Date : 2025-02-25 09:55:49 +0000
+
+    Released 0.100 
 
   Change: 0b176a133eb125b794aaa3de6d0f6146ff37ae14
   Author: Andreas Romeyke <art1@andreas-romeyke.de>
@@ -148,37 +262,6 @@ version 0.096 at 2025-01-29 08:02:59 +0000
 
     - fixed outdated README 
 
-  Change: 5184aae156e919d1d76afdcb95c480cfb4f98777
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2022-12-28 15:25:06 +0000
-
-    Released 0.095 
-
-  Change: 68f16f156fbd29645c758a1aa4418bb316816bdd
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2022-12-28 15:04:40 +0000
-
-    - improved string test 
-
-  Change: 3a71c40a02cdf56332499efc637df6f240aa0b8d
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2022-12-28 14:20:34 +0000
-
-    - improved check 
-
-  Change: bab58340b1de904b1bebe2f38cef472f57f59a4f
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2022-12-28 14:11:42 +0000
-
-    - improved regex in is_baginfo_key_reserved_as_uniq - improved regex
-    in is_baginfo_key_reserved 
-
-  Change: 3f37245ce420d2003921c0295b46b340823ee96b
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2022-12-28 13:37:31 +0000
-
-    - minor, improved string compare 
-
 =================================================
-Plus 44 releases after 2024-02-26 00:00:00 +0000.
+Plus 45 releases after 2024-10-20 00:00:00 +0000.
 =================================================

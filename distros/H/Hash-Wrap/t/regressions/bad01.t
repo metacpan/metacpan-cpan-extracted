@@ -7,11 +7,11 @@
 use v5.10;
 use Test2::V0;
 use Scalar::Util 'refaddr';
-use Hash::Wrap ({
-    -immutable => 1,
+use Hash::Wrap ( {
+    -immutable =>  1,
     -recurse   => -1,
     -copy      => !!1,
-});
+} );
 
 
 my $obj     = wrap_hash( { a => { b => { c => 1 } } } );

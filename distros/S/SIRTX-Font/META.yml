@@ -21,7 +21,7 @@ no_index:
 provides:
   SIRTX::Font:
     file: lib/SIRTX/Font.pm
-    version: v0.3.0
+    version: v0.4.0
 recommends:
   File::Spec: '3.84'
   Image::Magick: '0'
@@ -30,7 +30,7 @@ requires:
   perl: v5.20.0
 resources:
   repository: ssh://gitea@gitea.dev.loewenfelsen.net/11201-Loewenfelsen/SIRTX-Font.git
-version: v0.03
+version: v0.04
 x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: Artistic-2.0

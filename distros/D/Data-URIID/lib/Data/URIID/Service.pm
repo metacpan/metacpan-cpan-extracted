@@ -24,7 +24,7 @@ use Data::Identifier::Generate;
 use Data::URIID::Result;
 use Data::URIID::Colour;
 
-our $VERSION = v0.17;
+our $VERSION = v0.18;
 
 use parent 'Data::URIID::Base';
 
@@ -339,6 +339,7 @@ sub _own_well_known {
                 application/ogg
                 application/pdf
                 application/vnd.debian.binary-package
+                application/vnd.sirtx.vmv0
                 application/vnd.oasis.opendocument.base
                 application/vnd.oasis.opendocument.chart
                 application/vnd.oasis.opendocument.chart-template
@@ -367,6 +368,8 @@ sub _own_well_known {
                 image/png
                 image/svg+xml
                 image/webp
+                image/bmp
+                image/vnd.wap.wbmp
                 message/http
                 text/html
                 text/plain
@@ -379,6 +382,12 @@ sub _own_well_known {
         'language-tag-identifier' => {
             en => {attributes => {displayname => {'*' => 'English'}}},
             de => {attributes => {displayname => {'*' => 'German'}}},
+            nl => {attributes => {displayname => {'*' => 'Dutch'}}},
+            es => {attributes => {displayname => {'*' => 'Spanish'}}},
+            zh => {attributes => {displayname => {'*' => 'Chinese'}}},
+            af => {attributes => {displayname => {'*' => 'Afrikaans'}}},
+            ar => {attributes => {displayname => {'*' => 'Arabic'}}},
+            sw => {attributes => {displayname => {'*' => 'Swahili'}}},
         },
         'small-identifier' => {
             map {$_->{sid} => {
@@ -430,7 +439,9 @@ sub _own_well_known {
                 # Unassigned: 42
                 {uuid => '4e855294-4b4f-443e-b67b-8cb9d733a889', sid => 43, name => 'backwards'},
                 {uuid => '6ad2c921-7a3e-4859-ae02-98e42522e2f8', sid => 44, name => 'forwards'},
-                # Unassigned: 45 - 47
+                {uuid => '6d34d4a1-8fbc-4e22-b3e0-d50f43d97cb1', sid => 45, name => 'false'},
+                {uuid => 'eb50b3dc-28be-4cfc-a9ea-bd7cee73aed5', sid => 46, name => 'true'},
+                # Unassigned: 47
                 {uuid => 'dd8e13d3-4b0f-5698-9afa-acf037584b20', sid => 48, name => 'zero'},
                 {uuid => 'bd27669b-201e-51ed-9eb8-774ba7fef7ad', sid => 49, name => 'one'},
                 {uuid => '73415b5a-31fb-5b5a-bb82-8ea5eb3b12f7', sid => 50, name => 'two'},
@@ -449,7 +460,12 @@ sub _own_well_known {
                 {uuid => 'f9bb5cd8-d8e6-4f29-805f-cc6f2b74802d', sid => 63, name => 'grey'},
                 {uuid => 'dd708015-0fdd-4543-9751-7da42d19bc6a', sid => 64, name => 'Sun'},
                 {uuid => '23026974-b92f-4820-80f6-c12f4dd22fca', sid => 65, name => 'Luna'},
-                # Unassigned: 66 - 74
+                # Unassigned: 66 - 69
+                {uuid => 'c50134ca-0a32-5c5c-833c-2686043c0b3f', sid => 70, name => 'English'},
+                {uuid => '6895ad9b-2ba6-5933-8455-968aa781a88b', sid => 71, name => 'German'},
+                {uuid => 'da816af7-e49b-5406-b712-8dc96d968541', sid => 72, name => 'Dutch'},
+                {uuid => '52b75ef6-f7fd-5786-8512-0e6cb8374675', sid => 73, name => 'Spanish'},
+                {uuid => 'a27015a5-e6f1-5d38-b00e-a65f7ddd39a3', sid => 74, name => 'Chinese'},
                 {uuid => 'd642eff3-bee6-5d09-aea9-7c47b181dd83', sid => 75, name => 'male'},
                 {uuid => 'db9b0db1-a451-59e8-aa3b-9994e683ded3', sid => 76, name => 'female'},
                 {uuid => 'f6249973-59a9-47e2-8314-f7cf9a5f77bf', sid => 77, name => 'person'},
@@ -488,7 +504,8 @@ sub _own_well_known {
                 {uuid => 'b17f36c6-c397-4e84-bd32-1eccb3f00671', sid => 110, name => 'set'},
                 {uuid => 'aa9d311a-89b7-44cc-a356-c3fc93dfa951', sid => 111, name => 'category'},
                 {uuid => '2c7e15ed-aa2f-4e2f-9a1d-64df0c85875a', sid => 112, name => 'chat-0-word-identifier'},
-                # Unassigned: 113 - 118
+                {uuid => '039e0bb7-5dd3-40ee-a98c-596ff6cce405', sid => 113, name => 'sirtx-numerical-identifier'},
+                # Unassigned: 114 - 118
                 {uuid => 'c9ec3bea-558e-4992-9b76-91f128b6cf29', sid => 119, name => 'red'},
                 {uuid => 'c0e957d0-b5cf-4e53-8e8a-ff0f5f2f3f03', sid => 120, name => 'green'},
                 {uuid => '3dcef9a3-2ecc-482d-a98b-afffbc2f64b9', sid => 121, name => 'blue'},
@@ -508,6 +525,7 @@ sub _own_well_known {
                 {uuid => '7cb67873-33bc-4a93-b53f-072ce96c6f1a', sid => 159, name => 'hrair'},
                 {uuid => '82d529be-0f00-4b4f-a43f-4a22de5f5312', sid => 160, name => 'gtin'},
                 {uuid => 'e8c156be-4fe7-4b13-b4fa-e207213caef8', sid => 161, name => 'subject-type'},
+                {uuid => '931f155e-5a24-499b-9fbb-ed4efefe27fe', sid => 162, name => 'doi'},
                 # Unassigned: 163 - 175
                 {uuid => 'c44ee482-0fb7-421b-9aad-a6c8f099a4b6', sid => 176, name => 'Universe'},
                 {uuid => '0ac40a25-d20f-42ed-ae1c-64e62a56d673', sid => 177, name => 'Observable universe'},
@@ -528,6 +546,45 @@ sub _own_well_known {
                 {uuid => '39be7db6-1dc7-41c3-acd2-de19ad17a97f', sid => 213, name => 'northwest'},
                 {uuid => '33233365-20ec-4073-9962-0cb4b1b1e48d', sid => 214, name => 'southeast'},
                 {uuid => 'b47ecfde-02b1-4790-85dd-c2e848c89d2e', sid => 215, name => 'southwest'},
+                # Unassigned: 216 - 223
+                {uuid => '4076d9f9-ca42-5976-b41b-e54aa912ccf3', sid => 224, name => 'application/octet-stream'},
+                {uuid => '552ec0dc-8678-5657-9422-8a71ea8e5cd0', sid => 225, name => 'text/plain'},
+                {uuid => 'ecd556c0-7ecb-5b88-ab0a-ec4e09d61782', sid => 226, name => 'text/html'},
+                {uuid => '7c859f1d-693b-5070-a928-dfd051a4f93d', sid => 227, name => 'image/png'},
+                {uuid => '3970f481-591e-530a-b962-a2e87b2efde2', sid => 228, name => 'image/svg+xml'},
+                {uuid => '03e6c035-e046-5b7e-a016-55b51c4836ea', sid => 229, name => 'application/pdf'},
+            ),
+        },
+        'sirtx-numerical-identifier' => {
+            map {$_->{sni} => {
+                    ids => {
+                        uuid => $_->{uuid},
+                    },
+                    attributes => {
+                        displayname => {'*' => $_->{name}},
+                    },
+                }} (
+                {uuid => '039e0bb7-5dd3-40ee-a98c-596ff6cce405', sni =>  10, name => 'sirtx-numerical-identifier'},
+                {uuid => 'f87a38cb-fd13-4e15-866c-e49901adbec5', sni => 115, name => 'small-identifier'},
+                {uuid => '2bffc55d-7380-454e-bd53-c5acd525d692', sni => 116, name => 'roaraudio-error-number'},
+                {uuid => '66beb503-9159-41cb-9e7f-2c3eb6b4b5ff', sni => 117, name => 'roaraudio-error-symbol'},
+                {uuid => '2c7e15ed-aa2f-4e2f-9a1d-64df0c85875a', sni => 118, name => 'chat-0-word-identifier'},
+                {uuid => '8be115d2-dc2f-4a98-91e1-a6e3075cbc31', sni => 119, name => 'uuid'},
+                {uuid => 'd08dc905-bbf6-4183-b219-67723c3c8374', sni => 120, name => 'oid'},
+                {uuid => 'a8d1637d-af19-49e9-9ef8-6bc1fbcf6439', sni => 121, name => 'uri'},
+                {uuid => 'f4b073ff-0b53-4034-b4e4-4affe5caf72c', sni => 122, name => 'ascii-code-point'},
+                {uuid => 'ce7aae1e-a210-4214-926a-0ebca56d77e3', sni => 123, name => 'wikidata-identifier'},
+                {uuid => 'd73b6550-5309-46ad-acc9-865c9261065b', sni => 127, name => 'sirtx-function-number'},
+                {uuid => 'd690772e-de18-4714-aa4e-73fd35e8efc9', sni => 128, name => 'sirtx-function-name'},
+                {uuid => '5e80c7b7-215e-4154-b310-a5387045c336', sni => 129, name => 'sirtx-logical'},
+                {uuid => 'e54d427b-e18f-5d43-ac38-da26173633a0', sni => 185, name => 'sha-1-160'},
+                {uuid => 'ed34c363-6fd3-5b68-9520-986e773e27c0', sni => 186, name => 'sha-3-512'},
+                {uuid => '6d34d4a1-8fbc-4e22-b3e0-d50f43d97cb1', sni => 189, name => 'false'},
+                {uuid => 'eb50b3dc-28be-4cfc-a9ea-bd7cee73aed5', sni => 190, name => 'true'},
+                {uuid => '4076d9f9-ca42-5976-b41b-e54aa912ccf3', sni => 197, name => 'application/octet-stream'},
+                {uuid => 'f718f85b-6b41-53c0-9c66-8796df90c725', sni => 198, name => 'application/vnd.sirtx.vmv0'},
+                {uuid => 'ba4e7f37-467c-5a36-910c-b32974642fa8', sni => 199, name => 'image/vnd.wap.wbmp'},
+                {uuid => '7e7750e4-ab50-50ba-8c9c-b3158e1f47e0', sni => 209, name => 'image/bmp'},
             ),
         },
         'uuid' => {
@@ -1514,7 +1571,7 @@ Data::URIID::Service - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.17
+version v0.18
 
 =head1 SYNOPSIS
 

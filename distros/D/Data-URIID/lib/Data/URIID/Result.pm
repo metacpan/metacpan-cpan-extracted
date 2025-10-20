@@ -35,7 +35,7 @@ use constant {
 use constant RE_UUID => qr/^[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$/;
 use constant RE_UINT => qr/^[1-9][0-9]*$/;
 
-our $VERSION = v0.17;
+our $VERSION = v0.18;
 
 use parent 'Data::URIID::Base';
 
@@ -320,6 +320,9 @@ my %url_templates = (
         ['danbooru2chanjp-post-identifier' => 'https://danbooru.2chan.jp/index.php?page=post&s=view&id=%s', undef, [qw(info render)]],
         ['danbooru2chanjp-post-identifier' => 'https://danbooru.2chan.jp/image_data.php?start=%s&limit=1', undef, [qw(metadata)]],
     ],
+    'sirtxkeepcoolorg' => [
+        ['sirtx-numerical-identifier' => 'https://sirtx.keep-cool.org/lists.html#sni:%s', undef, [qw(info)]],
+    ],
 );
 my %digest_url_templates = (
     'e621' => [
@@ -388,6 +391,32 @@ my %url_parser = (
 
                     return sprintf('%u%u', $isbn, 10 - ($sum % 10));
                 }
+            },
+        },
+    ],
+    tag => [
+        {
+            ise_order => ISEORDER_RUO,
+            type => 'uri',
+            id => sub {
+                my ($self, $uri, $rule, $res) = @_;
+                return $uri->as_string;
+            },
+        },
+    ],
+    acct => [
+        {
+            ise_order => ISEORDER_RUO,
+            type => 'uri',
+            id => sub {
+                my ($self, $uri, $rule, $res) = @_;
+                if (defined(my $opaque = eval {$uri->opaque})) {
+                    if ($opaque =~ /^([^\@]+)\@[^\@]+$/) {
+                        $self->{primary} //= {};
+                        $self->{primary}{displayname} = uri_unescape($1);
+                    }
+                }
+                return $uri->as_string;
             },
         },
     ],
@@ -803,6 +832,23 @@ my %url_parser = (
                 return undef;
             }
         },
+        {
+            # urn:uuid:039e0bb7-5dd3-40ee-a98c-596ff6cce405
+            # https://sirtx.keep-cool.org/lists.html#sni:10
+            host => 'sirtx.keep-cool.org',
+            path => qr#^/lists\.html$#,
+            source => 'sirtxkeepcoolorg',
+            type => 'sirtx-numerical-identifier',
+            action => 'info',
+            id => sub {
+                my ($self, $uri, $rule, $res) = @_;
+                my $fragment = $uri->fragment;
+                if ($fragment =~ /^sni:([1-9][0-9]*|0)$/) {
+                    return int $1;
+                }
+                return undef;
+            }
+        },
     ],
 );
 
@@ -841,7 +887,7 @@ my %syntax = (
     'fefe-blog-post-identifier'     => qr/^[0-9a-f]{8}$/,
     'danbooru2chanjp-tag'           => qr/./,
     (map {'osm-'.$_ => RE_UINT} qw(node way relation)),
-    (map {$_        => RE_UINT} qw(e621-post-identifier e621-pool-identifier xkcd-num ngv-artist-identifier ngv-artwork-identifier find-a-grave-identifier libraries-australia-identifier nla-trove-people-identifier agsa-creator-identifier a-p-and-p-artist-identifier geonames-identifier small-identifier chat-0-word-identifier furaffinity-post-identifier notalwaysright-post-identifier ruthede-comic-post-identifier danbooru2chanjp-post-identifier)),
+    (map {$_        => RE_UINT} qw(e621-post-identifier e621-pool-identifier xkcd-num ngv-artist-identifier ngv-artwork-identifier find-a-grave-identifier libraries-australia-identifier nla-trove-people-identifier agsa-creator-identifier a-p-and-p-artist-identifier geonames-identifier small-identifier chat-0-word-identifier sirtx-numerical-identifier furaffinity-post-identifier notalwaysright-post-identifier ruthede-comic-post-identifier danbooru2chanjp-post-identifier)),
 );
 
 my %fellig_tables = (
@@ -856,6 +902,7 @@ my %media_subtype_to_ext = (
     'application/ogg'       => 'ogg',
     'application/pdf'       => 'pdf',
     'application/vnd.debian.binary-package' => 'deb',
+    'application/vnd.sirtx.vmv0' => 'vmv0',
     'application/xml'       => 'xml',
     'audio/flac'            => 'flac',
     'audio/matroska'        => 'mkv',
@@ -865,6 +912,8 @@ my %media_subtype_to_ext = (
     'image/png'             => 'png',
     'image/svg+xml'         => 'svg',
     'image/svg+xml'         => 'svg',
+    'image/bmp'             => 'bmp',
+    'image/vnd.wap.wbmp'    => 'wbmp',
     'text/html'             => 'html',
     'text/plain'            => 'txt',
     'video/matroska'        => 'mkv',
@@ -921,6 +970,7 @@ sub _set {
     }
 
     $self->{primary} = {
+        %{$self->{primary}//{}},
         service      => $service,
         type         => $type,
         id           => $id,
@@ -1780,7 +1830,7 @@ Data::URIID::Result - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.17
+version v0.18
 
 =head1 SYNOPSIS
 

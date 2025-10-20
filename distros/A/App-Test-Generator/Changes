@@ -1,5 +1,9 @@
 Revision history for App-Test-Generator
 
+0.09	Sun Oct 19 21:14:29 EDT 2025
+	Better handling of false/true in config files
+	Better handling of regex into the input structure
+
 0.08	Thu Oct 16 20:44:22 EDT 2025
 	Allow $new to be set but not defined, this will call new() with no arguments
 	Started to add support for "nomatch"

@@ -1,7 +1,7 @@
   use strict;
   use warnings;
   package Alien::Bit;
-$Alien::Bit::VERSION = '0.07';
+$Alien::Bit::VERSION = '0.08';
 use parent qw( Alien::Base );
 
 =head1 NAME
@@ -10,9 +10,26 @@ Alien::Bit - Find or install the Bit library
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
+
+ use Alien::Bit;
+ use Alien qw( Alien::Bit );
+
+ # Get compiler flags for XS/C compilation
+ my $cflags = Alien::Bit->cflags;
+ # Returns: path to include directory
+
+ # Get linker flags 
+ my $libs = Alien::Bit->libs;
+ # Returns: the linker flags to link to the Bit library statically
+
+ # For FFI::Platypus usage
+ use FFI::Platypus;
+ my $ffi = FFI::Platypus->new( api => 2 );
+ $ffi->lib(Alien::Bit->dynamic_libs);
+
 
 Installs the Bit library, used to manipulate bitsets and their packed containers
 

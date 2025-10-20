@@ -1,3 +1,8 @@
+v0.18  2025-10-19Z
+    - Added support for tag: and acct:-URIs
+    - Updated list of well known identifiers
+    - Added support for sirtx-numerical-identifier
+
 v0.17  2025-05-15Z
     - Implement Data::Identifier::Interface::Known in Data::URIID
     - Improved support for Data::Identifier in Data::URIID::Colour

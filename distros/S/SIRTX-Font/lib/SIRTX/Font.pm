@@ -177,7 +177,7 @@ $_default_alias_lists{'common-all'} = {
     0x00A0 => 0x0020, # NO-BREAK SPACE      -> SPACE
 };
 
-our $VERSION = v0.03;
+our $VERSION = v0.04;
 
 
 
@@ -549,6 +549,47 @@ sub _import_glyph_wbmp {
 }
 
 
+sub import_alias_map {
+    my ($self, $filename, %opts) = @_;
+    my $chars = $self->{chars};
+
+    croak 'Stray options passed' if scalar keys %opts;
+
+    open(my $in, '<:utf8', $filename) or croak 'Cannot open: '.$filename.': '.$!;
+    while (defined(my $line = <$in>)) {
+        my ($pg, $sg);
+        my $primary;
+
+        $line =~ s/\r?\n$//;
+        $line =~ s/^\s+//;
+        $line =~ s/\s+$//;
+        $line =~ s/^(?:;|\/\/|#).*$//;
+        $line =~ s/\s+/ /g;
+
+        ($pg, $sg) = $line =~ /^(.+?\S)(?:\s+(?:--|<-|->|=>|<=)\s+(\S.+))?$/;
+
+        croak 'Invalid format' unless defined $pg;
+
+        $_ = [map {$self->_parse_codepoint($_)} grep {length} split/\s*,\s*|\s+/, $_ // ''] foreach $pg, $sg;
+
+        croak 'Invalid primary list: list is empty' unless scalar @{$pg};
+
+        # Alias all of primary, and then primary to secondary.
+        foreach my $char (@{$pg}) {
+            $primary //= $chars->{$char};
+        }
+        if (defined $primary) {
+            $chars->{$pg->[0]} = $primary;
+            foreach my $char (@{$pg}, @{$sg}) {
+                $chars->{$char} //= $primary;
+            }
+        }
+    }
+
+    return $self;
+}
+
+
 sub import_directory {
     my ($self, $directory, %opts) = @_;
     my $chars = $self->{chars};
@@ -600,6 +641,26 @@ sub export_glyph_as_image_magick {
 }
 
 
+sub export_alias_map {
+    my ($self, $filename, %opts) = @_;
+    my $chars = $self->{chars};
+    my %glyph_map;
+    local $, = ' ';
+
+    croak 'Stray options passed' if scalar keys %opts;
+
+    foreach my $char (keys %{$chars}) {
+        push(@{$glyph_map{$chars->{$char}} //= []}, $char);
+    }
+
+    open(my $out, '>:utf8', $filename) or croak 'Cannot open file: '.$filename.': '.$!;
+
+    foreach my $chars (grep {scalar(@{$_}) > 1} values %glyph_map) {
+        $out->say(map {sprintf('U+%04X', $_)} sort {$a <=> $b} @{$chars});
+    }
+}
+
+
 sub render {
     require List::Util;
     require Image::Magick;
@@ -643,7 +704,7 @@ SIRTX::Font - module for working with SIRTX font files
 
 =head1 VERSION
 
-version v0.03
+version v0.04
 
 =head1 SYNOPSIS
 
@@ -916,6 +977,25 @@ The glyph index is returned.
 The supported formats depend on the installed modules.
 See also L<Image::Magick>.
 
+=head2 import_alias_map
+
+    $font->import_alias_map($filename);
+
+(experimental)
+
+Imports an alias map from the given file.
+
+The format is one alias group per line.
+Each line is formatted into two sections.
+The first section lists all the code points that are aliased to each other.
+The second part (seperated by a C<-->) lists all the code points that
+are only aliased to (that is they will share the glyph from the first part,
+but the code points from the first part will not share glyph with the second part).
+
+Each part is a list of codepoints in C<U+NNNN> format, seperated by space, comma or both.
+
+This method will ignore if a mapped glyph does not exists alike L</default_glyph_for>.
+
 =head2 import_directory
 
     $font->import_directory($filename [, %opts ]);
@@ -944,6 +1024,21 @@ In order to deduplicate entries a call to L</gc> might be considered.
 (experimental)
 
 Exports a single glyph as a image object.
+
+=head2 export_alias_map
+
+    $self->export_alias_map($filename);
+
+(experimental)
+
+Exports the map of all aliases found in the font.
+This is the inverse of L</import_alias_map>.
+
+B<Note:>
+This method cannot know which code points are aliases one way and which are aliased both ways.
+This information is not included in the binary format.
+Therefore this method exports all aliases as both way aliases.
+This is the same behaviour as known from hardlinks.
 
 =head2 render
 

@@ -45,5 +45,11 @@ async sub load_full_list_p($self) {
     return $result;
 }
 
+sub load_tools_objects_fkey($self, $tools_version_pkey) {
+
+    return $self->load_fkey(
+        $self->view_name, $self->fields(), "tools_version_fkey", $tools_version_pkey
+    );
+}
 
 1;

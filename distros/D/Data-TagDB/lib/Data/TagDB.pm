@@ -1,5 +1,5 @@
-# Copyright (c) 2024 Löwenfelsen UG (haftungsbeschränkt)
-# Copyright (c) 2024 Philipp Schafft
+# Copyright (c) 2024-2025 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2024-2025 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -25,7 +25,7 @@ use Data::TagDB::WellKnown;
 use Data::TagDB::Cloudlet;
 use Data::URIID::Colour;
 
-our $VERSION = v0.09;
+our $VERSION = v0.10;
 
 
 
@@ -151,6 +151,9 @@ sub tag_by_specification {
         if ($specification =~ /^\/([0-9]+)$/) {
             $id = $1;
             $type = $wk->sirtx_function_number;
+        } elsif ($specification =~ /^\/([a-z_]+)$/) {
+            $id = $1;
+            $type = $wk->sirtx_function_name;
         } elsif ($specification =~ /^\*([0-9]+)$/) {
             @candidates = ($opts{sirtx_local_ids}{int $1});
         } elsif ($specification eq '*') {
@@ -792,7 +795,7 @@ Data::TagDB - Work with Tag databases
 
 =head1 VERSION
 
-version v0.09
+version v0.10
 
 =head1 SYNOPSIS
 
@@ -820,7 +823,7 @@ L<Data::TagDB::Factory> (via L</factory>) is provided for easy creation of new t
 
 B<Note:>
 Correct transaction management can improve performance I<significantly>. Sometimes the improvement can be by a factor of a few thousand.
-Applications should therefore consider to group requests into transactions. This is also true for ready only requests.
+Applications should therefore consider to group requests into transactions. This is also true for read only requests.
 
 B<Note:>
 Future versions of this module will depend on L<Data::Identifier>.

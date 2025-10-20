@@ -1,0 +1,204 @@
+use alienfile;
+use strict;
+use warnings;
+
+# Define metadata and build requirements
+configure {
+    requires 'Path::Tiny';
+    requires 'File::Copy::Recursive';
+    requires 'HTTP::Tiny';
+    requires 'Carp';
+    requires 'Alien::Meson';
+};
+
+# Always use the share approach (build from source)
+# since there's no reliable system package detection
+probe sub { 'share' };
+
+share {
+    # Import necessary modules
+    use HTTP::Tiny;
+    use Path::Tiny            qw( path );
+    use File::Copy::Recursive qw( dircopy fcopy );
+    use Carp                  qw( croak );
+    use Alien::Meson;
+
+    # Set source repository information
+    my $repo_url;
+    my $repo_response;
+
+    $repo_url =
+      'https://github.com/simd-everywhere/simde/archive/refs/heads/master.zip';
+    $repo_response = HTTP::Tiny->new->head($repo_url);
+    unless ( $repo_response->{success} )
+    {    ## failed original download, try my fork
+        $repo_url =
+          'https://github.com/chrisarg/simde/archive/refs/heads/master.zip';
+        $repo_response = HTTP::Tiny->new->head($repo_url);
+        croak "Failed to download SIMDe from either location"
+          unless $repo_response->{success};
+    }
+
+    # Configure download
+    start_url $repo_url;
+    plugin 'Download';
+    plugin 'Extract' => 'zip';
+
+    # Build configuration using Meson
+    my $build_dir = path(Path::Tiny->cwd,'_build')->stringify;
+    build sub {
+            print "Starting SIMDe build process in $build_dir\n";
+            print "Using Meson executable: ", Alien::Meson->exe, "\n";
+            if (system(Alien::Meson->exe, 'setup', $build_dir)) {
+                croak("Meson setup failed for SIMDe build");
+            }
+
+            if (system(Alien::Meson->exe, 'compile', qw(-C), $build_dir)) {
+                croak("Meson compile failed for SIMDe build");
+            }
+
+            my $output       = qx{  Alien::Meson->exe  test -C $build_dir };
+            my $failed_tests = $output =~ /Fail:\s+(\d+)/gm;
+            if ( $failed_tests && $failed_tests > 0 ) {
+                croak("Some tests failed during SIMDe build");
+            }
+        };
+
+    # Post-build file handling - copy files to staging directory
+    after 'build' => sub {
+        my ($build) = @_;
+
+        # Determine destination directory
+        my $stage_dir  = path( $build->install_prop->{stage} );
+        my $source_dir = path( $build->install_prop->{extract} );
+
+        # Create include directories
+        my $include_dir = $stage_dir->child('include');
+        $include_dir->mkpath;
+
+        # Copy header files
+        my $headers_dir = $source_dir->child('simde');
+        my $dest        = $include_dir->child('simde');
+        dircopy( $headers_dir, $dest )
+          or croak "Failed to copy $headers_dir to $dest: $!";
+        print "Copied header directory: ", $headers_dir->basename, "\n";
+    };
+
+    # Set runtime properties for client code
+    gather sub {
+        my ($build) = @_;
+        my $prefix = $build->runtime_prop->{prefix};
+
+        # Set include and library paths
+        my $include_dir = path( $prefix, 'include' )->stringify;
+        my $lib_dir     = path( $prefix, 'lib' )->stringify;
+
+        # Set compiler flags
+        $build->runtime_prop->{cflags} = "-I$include_dir";
+
+        # Store raw paths
+        $build->runtime_prop->{include_dir} = $include_dir;
+
+        # Print confirmation
+        print "Alien::SIMDe configured with:\n";
+        print "  cflags: ",      $build->runtime_prop->{cflags},      "\n";
+        print "  include_dir: ", $build->runtime_prop->{include_dir}, "\n";
+    };
+
+    # Run tests after installation
+
+=pod
+    test sub {
+        my ($build) = @_;
+        my $lib_dir = path( $build->install_prop->{stage}, 'lib' );
+
+        # Define test executable names based on platform
+        my $test_exe   = $^O eq 'MSWin32' ? 'test_bit.exe'   : 'test_bit';
+        my $bench_exe  = $^O eq 'MSWin32' ? 'benchmark.exe'  : 'benchmark';
+        my $openmp_exe = $^O eq 'MSWin32' ? 'openmp_bit.exe' : 'openmp_bit';
+
+        # Get full paths
+        my $test_path   = $lib_dir->child($test_exe);
+        my $bench_path  = $lib_dir->child($bench_exe);
+        my $openmp_path = $lib_dir->child($openmp_exe);
+
+        # Run main tests if available
+        if ( -x $test_path ) {
+            print "\n**************** Running Bit Tests ****************\n";
+            my $test_output = `$test_path 2>&1`;
+            print $test_output;
+
+            if ( $test_output =~ /All tests passed/m ) {
+                print
+"\n**************** Bit tests passed successfully ****************\n";
+            }
+            else {
+                croak("Bit tests failed");
+            }
+        }
+        else {
+            print "Test executable not found at $test_path - skipping tests\n";
+        }
+        unlink $test_path;    # Clean up test executable
+                              # Run benchmarks if available
+        if ( -x $bench_path ) {
+            print
+              "\n**************** Running Bit Benchmarks ****************\n";
+            my $bench_output = `$bench_path 2>&1`;
+            print $bench_output;
+            unlink $bench_path;    # Clean up benchmark executable
+        }
+        else {
+            print
+"Benchmark executable not found at $bench_path - skipping benchmarks\n";
+        }
+
+        # Run OpenMP benchmarks if available
+        if ( -x $openmp_path ) {
+            print
+"\n**************** Running Bit OpenMP Benchmarks ****************\n";
+            my $openmp_output = `$openmp_path 1024 1000 1000 4 2>&1`;
+            print $openmp_output;
+            unlink $openmp_path;    # Clean up OpenMP benchmark executable
+        }
+        else {
+            print
+"OpenMP benchmark executable not found at $openmp_path - skipping OpenMP benchmarks\n";
+        }
+
+        # delete object files that end in .o
+        my @object_files = $lib_dir->children(qr/\.o$/);
+        foreach my $obj_file (@object_files) {
+            $obj_file->remove;
+            print "Removed object file: ", $obj_file->basename, "\n";
+        }
+    };
+=cut
+
+};
+
+=pod
+    build [
+        sub {
+            my $build = shift;
+            Alien::Build::CommandSequence->new(
+                [ Alien::Meson->exe, 'setup', $build_dir, ] )->execute($build);
+        },
+        sub {
+            my $build = shift;
+            Alien::Build::CommandSequence->new(
+                [ Alien::Meson->exe, 'compile', qw(-C), $build_dir, ] )
+              ->execute($build);
+        },
+        sub {
+            my $build  = shift;
+            my $output = Alien::Build::CommandSequence->new(
+                [ Alien::Meson->exe, 'test', qw(-C), $build_dir, ] )
+              ->execute($build);
+            my $failed_tests = $output =~ /Fail:\s+(\d+)/gm;
+            if ( $failed_tests && $failed_tests > 0 ) {
+                croak("Some tests failed during SIMDe build");
+            }
+        },
+    ];
+=cut

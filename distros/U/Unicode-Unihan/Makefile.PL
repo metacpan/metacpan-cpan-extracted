@@ -61,6 +61,7 @@ my %WriteMakefile = (
 		},
 
 	'BUILD_REQUIRES' => {
+		'version' => '0.86',
 		},
 
 	'TEST_REQUIRES' => {

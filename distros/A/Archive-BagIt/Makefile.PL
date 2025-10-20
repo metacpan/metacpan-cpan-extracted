@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010;
+use 5.021008;
 
 use ExtUtils::MakeMaker;
 
@@ -14,11 +14,14 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Archive-BagIt",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.010",
+  "MIN_PERL_VERSION" => "5.021008",
   "NAME" => "Archive::BagIt",
   "PREREQ_PM" => {
     "Class::Load" => 0,
     "File::Find" => 0,
+    "IO::Async" => 0,
+    "IO::Async::Loop" => 0,
+    "IO::Async::Stream" => 0,
     "List::Util" => "1.450",
     "Moo" => 0,
     "Net::SSLeay" => "1.43",
@@ -34,7 +37,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Warnings" => 0
   },
-  "VERSION" => "0.100",
+  "VERSION" => "0.101",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,6 +49,9 @@ my %FallbackPrereqs = (
   "File::Find" => 0,
   "File::Slurp" => 0,
   "File::Spec" => 0,
+  "IO::Async" => 0,
+  "IO::Async::Loop" => 0,
+  "IO::Async::Stream" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "List::Util" => "1.450",

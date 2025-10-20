@@ -97,11 +97,13 @@ cmp_deeply $plugin->dump_config, {
     "Dist::Zilla::Plugin::UsefulReadme" => {
         'sections' => [
             'name',                                         #
+            'status',                                       #
             'synopsis',                                     #
             'description',                                  #
             'recent changes',                               #
             'requirements',                                 #
             'installation',                                 #
+            'security considerations',                      #
             '/support|bugs/',                               #
             'source',                                       #
             '/authors?/',                                   #

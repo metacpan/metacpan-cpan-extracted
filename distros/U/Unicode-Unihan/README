@@ -1,4 +1,6 @@
-This module is maintain for legacy support.
+This module is maintained for legacy support and there are no plans for
+further development.
+
 
 NAME
     Unicode::Unihan - The Unihan Data Base 5.1.0

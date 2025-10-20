@@ -4,7 +4,7 @@ Archive::BagIt - The main module to handle bags.
 
 # VERSION
 
-version 0.100
+version 0.101
 
 # NAME
 
@@ -42,6 +42,18 @@ See [https://datatracker.ietf.org/doc/rfc8493/?include\_text=1](https://datatrac
 - use modern perl code
 - add flag to enable very strict verify
 
+# Backward Compatibility
+
+To reduce the complexity of code in current module the support for
+
+- parallel processing
+=item synchronous I/O
+
+is removed. The existing code is very fast, so there is no performance loss.
+
+In near future the support for [Archive::BagIt::Fast](https://metacpan.org/pod/Archive%3A%3ABagIt%3A%3AFast) will be  removed, because it needs hooks, which increase code
+complexity in current module without any performance benefit.
+
 # FAQ
 
 ## How to access the manifest-entries directly?
@@ -65,8 +77,7 @@ I have made great efforts to optimize Archive::BagIt for high throughput. There 
 - calculation of checksums, by switching from the module "Digest" to OpenSSL by using [Net::SSLeay](https://metacpan.org/pod/Net%3A%3ASSLeay) a significant
    speed increase could be achieved.
 - loading the files referenced in the manifest files was previously done serially and using synchronous I/O. By
-   using the [IO::Async](https://metacpan.org/pod/IO%3A%3AAsync) module, the files are loaded asynchronously and the checksums are calculated in parallel.
-   If the underlying file system supports parallel accesses, the performance gain is huge.
+   using the [IO::Async](https://metacpan.org/pod/IO%3A%3AAsync) module, the files are loaded asynchronously, the performance gain is huge.
 
 On my system with 8cores, SSD and a large 9GB bag with 568 payload files the results for `verify_bag()` are:
 
@@ -112,9 +123,7 @@ Hint: The better way is to use only portable filenames. See [perlport](https://m
 
 # BUGS
 
-There are problems related to Parallel::parallel\_map and IO::AIO under MS Windows. The tests are skipped there. Use the
- parallel feature or the [Archive::BagIt::Fast](https://metacpan.org/pod/Archive%3A%3ABagIt%3A%3AFast) at your own risks on a MS Window System.
- If you are a MS Windows developer, feel free to send me patches or hints to fix the issues.
+None known yet.
 
 # THANKS
 
@@ -191,9 +200,6 @@ The arguments are:
 
 - `bag_path` - path to bag-directory
 - `force_utf8` - if set the warnings about non portable filenames are disabled (default: enabled)
-- `use_async` - if set it uses IO::Async to read payload files asynchronly, only useful under Linux.
-- `use_parallel` - if set it uses Parallel::parallel\_map to calculate digests of payload files in parallel,
-      only useful if underlying filesystem supports parallel read and if multiple CPU cores available.
 - `use_plugins` - expected manifest plugin strings, if set it uses the requested plugins,
       example `Archive::BagIt::Plugin::Manifest::SHA256`.
       HINT: this option \*disables\* the forced fixity check in `verify_bag()`!
@@ -201,14 +207,6 @@ The arguments are:
 The bag object will use $bag\_dir, BUT an existing $bag\_dir is not read. If you use `store()` an existing bag will be overwritten!
 
 See `load()` if you want to parse/modify an existing bag.
-
-## use\_parallel()
-
-if set it uses parallel digest processing, default: false
-
-## use\_async()
-
-if set it uses async IO, default: false
 
 ## has\_force\_utf8()
 

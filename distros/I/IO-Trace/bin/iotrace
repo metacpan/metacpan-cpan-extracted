@@ -17,4 +17,4 @@ iotrace - Like strace enough to log STDIN STDOUT STDERR I/O
 use strict;
 use warnings;
 use IO::Trace qw(iotrace);
-exit iotrace @ARGV;
+iotrace;

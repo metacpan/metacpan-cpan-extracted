@@ -9,6 +9,7 @@ lib/Daje/Database/Model/CompaniesUsers.pm
 lib/Daje/Database/Model/CompanyType.pm
 lib/Daje/Database/Model/Postgres.pm
 lib/Daje/Database/Model/Super/Common/Base.pm
+lib/Daje/Database/Model/Super/Common/Defaults.pm
 lib/Daje/Database/Model/Super/Companies.pm
 lib/Daje/Database/Model/Super/CompaniesUsers.pm
 lib/Daje/Database/Model/Super/CompanyType.pm

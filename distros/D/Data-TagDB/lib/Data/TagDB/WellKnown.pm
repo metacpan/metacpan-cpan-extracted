@@ -1,5 +1,5 @@
-# Copyright (c) 2024 Löwenfelsen UG (haftungsbeschränkt)
-# Copyright (c) 2024 Philipp Schafft
+# Copyright (c) 2024-2025 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2024-2025 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -15,7 +15,7 @@ use Carp;
 
 use parent 'Data::TagDB::WeakBaseObject';
 
-our $VERSION = v0.09;
+our $VERSION = v0.10;
 
 my %wk_ise = (
     # Hints as taken from tagdb-cgi-import;
@@ -87,7 +87,14 @@ my %wk_ise = (
     ascii_code_point            => 'f4b073ff-0b53-4034-b4e4-4affe5caf72c',
     unicode_code_point          => '5f167223-cc9c-4b2f-9928-9fe1b253b560',
     proto_file                  => '52a516d0-25d8-47c7-a6ba-80983e576c54',
+    earth                       => '3c2c155f-a4a0-49f3-bdaf-7f61d25c6b8c',
+    language_tag_identifier     => 'd0a4c6e2-ce2f-4d4c-b079-60065ac681f1', # sid=8
+    text_fragment               => '6085f87e-4797-4bb2-b23d-85ff7edc1da0', # sid=19
 
+
+    # Boolans:
+    false                       => '6d34d4a1-8fbc-4e22-b3e0-d50f43d97cb1', # sid=45,sni=189
+    true                        => 'eb50b3dc-28be-4cfc-a9ea-bd7cee73aed5', # sid=46,sni=190
 
     # Number related:
     unsigned_integer            => 'dea3782c-6bcb-4ce9-8a39-f8dab399d75d',
@@ -106,9 +113,13 @@ my %wk_ise = (
 
 
     # SIRTX:
-    sirtx_logical               => '5e80c7b7-215e-4154-b310-a5387045c336',
+    sirtx_logical               => '5e80c7b7-215e-4154-b310-a5387045c336', # sid=113,sni=10
     sirtx_function_number       => 'd73b6550-5309-46ad-acc9-865c9261065b',
     sirtx_function_name         => 'd690772e-de18-4714-aa4e-73fd35e8efc9',
+
+
+    # Chat 0:
+    chat_0_word_identifier      => '2c7e15ed-aa2f-4e2f-9a1d-64df0c85875a', # sid=112,sni=118
 );
 
 my %aliases = (
@@ -147,18 +158,18 @@ my %wk_sid = (
     uri                         =>   5,
     oid                         =>   6,
     #unassigned                      7
-    # language-tag-identifier        8
+    language_tag_identifier     =>   8,
     wikidata_identifier         =>   9,
     specialises                 =>  10,
     unicode_string              =>  11,
     # integer                       12
-    # unsigned-integer              13
+    unsigned_integer            =>  13,
     #unassigned                     14
     #unassigned                     15
     default_context             =>  16,
     proto_file                  =>  17,
     final_file_size             =>  18,
-    # text-fragment                 19
+    text_fragment               =>  19,
     also_list_contains_also     =>  20,
     # proto-message                 21
     # proto-entity                  22
@@ -173,6 +184,9 @@ my %wk_sid = (
     #unassigned                     31
     final_file_encoding         =>  32,
     final_file_hash             =>  33,
+    # ...
+    false                       =>  45,
+    true                        =>  46,
 );
 
 my %wk_default_type = (
@@ -262,7 +276,7 @@ Data::TagDB::WellKnown - Work with Tag databases
 
 =head1 VERSION
 
-version v0.09
+version v0.10
 
 =head1 SYNOPSIS
 

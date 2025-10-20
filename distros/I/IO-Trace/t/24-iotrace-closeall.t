@@ -144,7 +144,10 @@ SKIP: for my $try (@filters) {
     $got_piped = 0;
     $! = 0;
     ok(!close($in_fh),  t." $prog: explicit close STDIN should fail after broken write: $!");
-    is(0+$!, EPIPE, t." $prog: END: close STDIN with broken buffer got EPIPE: $!");
+    SKIP: {
+        skip t." $prog: END: crusty kernel pipe stream broken close detection not supported yet", 1 if !$!;
+        is(0+$!, EPIPE, t." $prog: END: close STDIN with broken buffer got EPIPE: $!");
+    }
 
     # Test #LineH: p;close STDOUT
     # STDOUT should still be empty

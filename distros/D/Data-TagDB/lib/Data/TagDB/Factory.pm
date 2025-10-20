@@ -1,5 +1,5 @@
-# Copyright (c) 2024 Löwenfelsen UG (haftungsbeschränkt)
-# Copyright (c) 2024 Philipp Schafft
+# Copyright (c) 2024-2025 Löwenfelsen UG (haftungsbeschränkt)
+# Copyright (c) 2024-2025 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -21,7 +21,7 @@ use parent 'Data::TagDB::WeakBaseObject';
 use constant NS_DATE => 'fc43fbba-b959-4882-b4c8-90a288b7d416';
 use constant RE_UUID => qr/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/;
 
-our $VERSION = v0.09;
+our $VERSION = v0.10;
 
 
 
@@ -510,7 +510,7 @@ Data::TagDB::Factory - Work with Tag databases
 
 =head1 VERSION
 
-version v0.09
+version v0.10
 
 =head1 SYNOPSIS
 

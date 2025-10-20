@@ -1,5 +1,15 @@
 Release history for Dist-Zilla-Plugin-UsefulReadme:
 
+v0.5.2    2025-10-19 12:48:46+01:00 Europe/London
+  [Enhancements]
+  - The STATUS and SECURITY CONSIDERATIONS sections are included by default.
+
+  [Documentation]
+  - Updated the SUPPORT section to clarify the minimum Perl version.
+
+  [Tests]
+  - Add more author tests.
+
 v0.5.1    2025-08-16 12:11:19+01:00 Europe/London
   [Enhancements]
   - Added add_prereqs option.

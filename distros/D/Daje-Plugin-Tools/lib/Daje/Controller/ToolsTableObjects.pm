@@ -1,12 +1,11 @@
-package Daje::Controller::ToolsVersion;
+package Daje::Controller::ToolsTableObjects;
 use Mojo::Base 'Mojolicious::Controller', -signatures;
 use v5.40;
-
 
 # NAME
 # ====
 #
-# Daje::Controller::ToolsVersion - Mojolicious Plugin
+# Daje::Controller::ToolsTableObjects - Mojolicious Controller
 #
 # SYNOPSIS
 # ========
@@ -16,12 +15,12 @@ use v5.40;
 # DESCRIPTION
 # ===========
 #
-# Daje::Controller::ToolsVersion is a Mojolicious Controller.
+# Daje::Controller::ToolsTableObjects is a Mojolicious Controller.
 #
 # METHODS
 # =======
 #
-#
+# load_table_objects($self)
 #
 # LICENSE
 # =======
@@ -37,38 +36,41 @@ use v5.40;
 # janeskil1525 E<lt>janeskil1525@gmail.com
 #
 
-sub load_versions_list ($self) {
+sub load_table_object($self) {
 
-    $self->app->log->debug('Daje::Controller::ToolsVersion::load_versions_list');
+    $self->app->log->debug('Daje::Controller::ToolsTableObjects::load_table_objects');
+    my $tools_object_tables_pkey = $self->param('tools_object_tables_pkey');
     $self->render_later;
     # my ($companies_pkey, $users_pkey) = $self->jwt->companies_users_pkey(
     #     $self->req->headers->header('X-Token-Check')
     # );
 
     $self->app->log->debug($self->req->headers->header('X-Token-Check'));
-    # my $setting = $self->param('setting');
-    $self->v_tools_versions->load_full_list_p()->then(sub($result) {
+
+    $self->tools_objects_tables->load_tools_objects_tables_pkey_p($tools_object_tables_pkey)->then(sub($result) {
         $self->render(json => { data => $result->{data}, result => => 1 });
     })->catch(sub($err) {
         $self->render(json => { result => 0, data => $err });
     })->wait;
+
 }
 
-sub load_versions ($self) {
+sub load_table_objects($self) {
 
-    $self->app->log->debug('Daje::Controller::ToolsVersion::load_versions');
-    my $tools_version_pkey = $self->param('tools_version_pkey');
+    $self->app->log->debug('Daje::Controller::ToolsTableObjects::load_table_objects');
+    my $tools_objects_fkey = $self->param('tools_objects_fkey');
     $self->render_later;
     # my ($companies_pkey, $users_pkey) = $self->jwt->companies_users_pkey(
     #     $self->req->headers->header('X-Token-Check')
     # );
 
     $self->app->log->debug($self->req->headers->header('X-Token-Check'));
-    # my $setting = $self->param('setting');
-    $self->v_tools_versions->load_pkey_p($tools_version_pkey)->then(sub($result) {
+
+    $self->tools_objects_tables->load_tools_objects_tables_fkey_p($tools_objects_fkey)->then(sub($result) {
         $self->render(json => { data => $result->{data}, result => => 1 });
     })->catch(sub($err) {
         $self->render(json => { result => 0, data => $err });
     })->wait;
+
 }
 1;

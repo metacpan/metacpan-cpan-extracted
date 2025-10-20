@@ -136,7 +136,10 @@ SKIP: for my $try (@filters) {
 
     ok($line=~s/<(\d+)>//, t." $prog: close: [$line] Errno=$1");
     $!=$1;
-    is(0+$!, EPIPE,        t." $prog: close: Got EPIPE: $!");
+    SKIP: {
+        skip t." $prog: END: crusty kernel pipe stream broken close detection not supported yet", 1 if !$!;
+        is(0+$!, EPIPE,    t." $prog: close with broken buffer got EPIPE: $!");
+    }
 
     # Test #LineJ: p;
     # Prog should exit in under 1 seconds...

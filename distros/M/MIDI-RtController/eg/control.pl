@@ -20,3 +20,6 @@ __END__
 > perl -MMIDI::RtController -E \
   '$c = MIDI::RtController->new(input=>shift, output=>shift, verbose=>1); $c->run' \
   keyboard usb
+
+# BUT:
+> perl -Midi -E 'i(@ARGV)' keyboard usb

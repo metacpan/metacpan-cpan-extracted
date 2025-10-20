@@ -5,7 +5,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 use v5.36;
 
-our $VERSION = '0.0801';
+our $VERSION = '0.0802';
 
 use Moo;
 use strictures 2;
@@ -203,7 +203,7 @@ MIDI::RtController - Control your MIDI controller
 
 =head1 VERSION
 
-version 0.0801
+version 0.0802
 
 =head1 SYNOPSIS
 
@@ -330,9 +330,11 @@ C<pitch_wheel_change>, etc.).
 
   $rtc->send_it($event);
 
-Send a MIDI B<event> to the output port, where the MIDI event is an
-ARRAY reference like, C<['note_on', 0, 40, 107]> or
-C<['control_change', 0, 1, 24]>, etc.
+Send a MIDI B<event> to the output port. The MIDI event is an ARRAY
+reference like, C<['note_on', 0, 40, 107]> or
+C<['control_change', 0, 1, 24]>, etc. Where the C<0> is the MIDI
+channel, C<40> or C<1> is the note number or control change number,
+and C<107> and C<24> are the values of the event.
 
 =head2 delay_send
 

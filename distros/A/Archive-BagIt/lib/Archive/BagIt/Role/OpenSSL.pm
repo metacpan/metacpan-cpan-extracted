@@ -1,13 +1,13 @@
 package Archive::BagIt::Role::OpenSSL;
 use strict;
 use warnings;
-use Archive::BagIt::Role::OpenSSL::Sync;
+use Archive::BagIt::Role::OpenSSL::Async;
 use Class::Load qw(load_class);
 use Carp qw(carp);
 use Moo::Role;
 use namespace::autoclean;
 # ABSTRACT: A role that handles plugin loading
-our $VERSION = '0.100'; # VERSION
+our $VERSION = '0.101'; # VERSION
 
 
 has 'async_support' => (
@@ -16,18 +16,6 @@ has 'async_support' => (
     predicate => 1,
     lazy      => 1,
 );
-
-sub _check_async_support {
-    my $self = shift;
-    if (! exists $INC{'IO/Async.pm'}) {
-        carp "Module 'IO::Async' not available, disable async support";
-        $self->bagit->use_async(0);
-        return 0;
-    }
-    load_class('IO::Async');
-    return 1;
-}
-
 
 
 sub _get_hash_string_sync {
@@ -39,28 +27,16 @@ sub _get_hash_string_sync {
 sub _get_hash_string_async {
     my ($self, $fh, $blksize) = @_;
     my $result;
-    if ($self->has_async_support()) {
-        my $class = 'Archive::BagIt::Role::OpenSSL::Async';
-        load_class($class) or croak("could not load class $class");
-        my $obj = $class->new(name => $self->name);
-        $result = $obj->calc_digest($fh, $blksize);
-    } else {
-        $result = $self->_get_hash_string_sync($fh, $blksize);
-    }
-    return $result;
+    my $obj = Archive::BagIt::Role::OpenSSL::Async->new(name => $self->name);
+    return $obj->calc_digest($fh, $blksize);
 }
 
 
 sub get_hash_string {
     my ($self, $fh) = @_;
     my $blksize = $self->get_optimal_bufsize($fh);
-    my $bagobj = $self->bagit;
-    if ($bagobj->use_async) {
-        return $self->_get_hash_string_async($fh, $blksize);
-    }
-    return $self->_get_hash_string_sync($fh, $blksize);
+    return $self->_get_hash_string_async($fh, $blksize);
 }
-
 
 no Moo;
 1;
@@ -77,7 +53,7 @@ Archive::BagIt::Role::OpenSSL - A role that handles plugin loading
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head2 has_async_support()
 

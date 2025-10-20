@@ -1,7 +1,6 @@
 package Archive::BagIt;
 use strict;
 use warnings;
-use utf8;
 use open ':std', ':encoding(UTF-8)';
 use Encode qw( decode );
 use File::Spec ();
@@ -11,7 +10,7 @@ use POSIX qw( strftime );
 use Moo;
 with "Archive::BagIt::Role::Portability";
 
-our $VERSION = '0.100'; # VERSION
+our $VERSION = '0.101'; # VERSION
 
 # ABSTRACT: The main module to handle bags.
 
@@ -35,24 +34,6 @@ sub BUILD {
     }
     return $self->load_plugins($self->use_plugins());
 }
-
-###############################################
-
-
-has 'use_parallel' => (
-    is => 'rw',
-    lazy => 1,
-    default => 0,
-);
-
-###############################################
-
-
-has 'use_async' => (
-    is => 'rw',
-    lazy => 1,
-    default => 0,
-);
 
 ###############################################
 
@@ -308,64 +289,83 @@ sub _find_baginfo_idx {
     }
     return;
 }
+
 ###############################################
 
+sub _collect_errors {
+    my ($self, $res) = @_;
+    push @{$self->{errors}}, $res;
+    return;
+}
 
-sub _verify_baginfo {
+###############################################
+
+sub _if_error_push {
+    my ($self, $res) = @_;
+    if ($res ne "") {
+        return $self->_collect_errors($res);
+    }
+    return 1;
+}
+
+###############################################
+
+sub _check_baginfo_keys_generically {
     my ($self, $info) = @_;
     my %keys;
-    my $ret = 1;
-    if (defined $info) {
-        foreach my $entry (@{$info}) {
-            my ($key, $value) = %{$entry};
-            my $res = _check_key($key); # check key
-            if ($res ne "") {
-                push @{$self->{errors}}, $res;
-                $ret = undef;
-            }
-            $res = _check_value($value); # check value
-            if ($res ne "") {
-                push @{$self->{errors}}, $res;
-                $ret = undef;
-            }
-            # code to prepare check of uniqueness
-            if ($self->is_baginfo_key_reserved($key)) {
-                $keys{ lc $key }++;
-            }
-            else {
-                $keys{ $key }++
-            }
+    my $ret=1;
+    foreach my $entry (@{$info}) {
+        my ($key, $value) = %{$entry};
+        my $res = _check_key($key); # check key
+        $ret &&= $self->_if_error_push($res);
+        $res = _check_value($value); # check value
+        $ret &&= $self->_if_error_push($res);
+        # code to prepare check of uniqueness
+        if ($self->is_baginfo_key_reserved($key)) {
+            $keys{ lc $key }++;
+        } else {
+            $keys{ $key }++
         }
-        # check for uniqueness
-        foreach my $key (keys %keys) {
-            if ($self->is_baginfo_key_reserved_as_uniq($key)) {
-                if ($keys{$key} > 1) {
-                    push @{$self->{errors}}, "Baginfo key '$key' exists $keys{$key}, but should be uniq!";
-                    $ret = undef;
-                }
-            }
-        }
-
-        # check for payload oxum
-        my ($loaded_payloadoxum) = $self->get_baginfo_values_by_key('Payload-Oxum');
-        if (defined $loaded_payloadoxum) {
-            my ($octets, $streamcount) = $self->calc_payload_oxum();
-            if ("$octets.$streamcount" ne $loaded_payloadoxum) {
-                push @{$self->{errors}}, "Payload-Oxum differs, calculated $octets.$streamcount but $loaded_payloadoxum was expected by bag-info.txt";
-                $ret = undef;
-            }
-        }
-        else {
-            push @{$self->{warnings}}, "Payload-Oxum was expected in bag-info.txt, but not found!"; # payload-oxum is recommended, but optional
-        }
-    } else {
-        if (exists $self->{bag_info_file}) {
-            push @{$self->{errors}}, "'bag-info.txt' exists, but is not (partially) parseable!";
-            $ret = undef;
+    }
+    # check for uniqueness
+    foreach my $key (keys %keys) {
+        if (
+            ($self->is_baginfo_key_reserved_as_uniq($key))
+                and ($keys{$key} > 1)
+        ) {
+            $ret &&=$self->_collect_errors("Baginfo key '$key' exists $keys{$key}, but should be uniq!");
         }
     }
     return $ret;
 }
+
+###############################################
+
+sub _verify_baginfo {
+    my ($self, $info) = @_;
+    my $ret = 1;
+
+    if (!defined $info) {
+        if (exists $self->{bag_info_file}) {
+            $ret &&= $self->_collect_errors("'bag-info.txt' exists, but is not (partially) parseable!");
+        }
+    } else {
+        $ret &&= $self->_check_baginfo_keys_generically($info);
+        # check for payload oxum
+        my ($loaded_payloadoxum) = $self->get_baginfo_values_by_key('Payload-Oxum');
+        if (!defined $loaded_payloadoxum) {
+            push @{$self->{warnings}}, "Payload-Oxum was expected in bag-info.txt, but not found!"; # payload-oxum is recommended, but optional
+        } else {
+            my ($octets, $streamcount) = $self->calc_payload_oxum();
+            if ("$octets.$streamcount" ne $loaded_payloadoxum) {
+                $ret &&= $self->_collect_errors( "Payload-Oxum differs, calculated $octets.$streamcount but $loaded_payloadoxum was expected by bag-info.txt");
+            }
+        }
+    }
+    return $ret;
+}
+
+###############################################
 
 sub verify_baginfo {
     my ($self) = @_;
@@ -458,17 +458,18 @@ sub _check_value_or_croak {
 
 sub append_baginfo_by_key {
     my ($self, $searchkey, $newvalue) = @_;
-    if (_check_key_or_croak($searchkey)) {
-        if (defined $newvalue) {
-            if (-1 < index($searchkey, ":")) {croak "key should not contain a colon! (searchkey='$searchkey')";}
-            if ($self->is_baginfo_key_reserved_as_uniq($searchkey)) {
-                if (defined $self->get_baginfo_values_by_key($searchkey)) {
-                    # hmm, search key is marked as uniq and still exists
-                    return;
-                }
+    if (
+        _check_key_or_croak($searchkey)
+            and  (defined $newvalue)
+    ) {
+        if (-1 < index($searchkey, ":")) {croak "key should not contain a colon! (searchkey='$searchkey')";}
+        if ($self->is_baginfo_key_reserved_as_uniq($searchkey)) {
+            if (defined $self->get_baginfo_values_by_key($searchkey)) {
+                # hmm, search key is marked as uniq and still exists
+                return;
             }
-            push @{$self->{bag_info}}, { $searchkey => $newvalue };
         }
+        push @{$self->{bag_info}}, { $searchkey => $newvalue };
     }
     return 1;
 }
@@ -638,6 +639,8 @@ sub __handle_nonportable_local_entry {
         if ((!$self->has_force_utf8)) {
             my $hexdump = "0x" . unpack('H*', $local_entry);
             $local_entry =~m/[^a-zA-Z0-9._-]/; # to find PREMATCH, needed nextline
+            ## no critic (Variables::ProhibitMatchVars)
+            # the slowdown using prematch is accepatable, because only triggered in failure path
             my $prematch_position = $`;
             carp "possible non portable pathname detected in $dir,\n",
                 "got path (hexdump)='$hexdump'(hex),\n",
@@ -650,16 +653,15 @@ sub __handle_nonportable_local_entry {
 }
 
 
-
-sub __file_find { # own implementation, because File::Find has problems with UTF8 encoded Paths under MSWin32
-    # finds recursively all files in given directory.
-    # if $excludedir is defined, the content will be excluded
+# own implementation, because File::Find has problems with UTF8 encoded Paths under MSWin32
+# finds recursively all files in given directory.
+# if $excludedir is defined, the content will be excluded
+sub __file_find { ## no critic (CognitiveComplexity::ProhibitExcessCognitiveComplexity)
     my ($self,$dir, $excludedir) = @_;
     if (defined $excludedir) {
         $excludedir = File::Spec->rel2abs( $excludedir);
     }
     my @file_paths;
-
     my $finder;
     $finder = sub {
         my ($current_dir) = @_; #absolute path
@@ -670,10 +672,11 @@ sub __file_find { # own implementation, because File::Find has problems with UTF
         closedir $dh;
         foreach my $local_entry (@paths) {
             my $path_entry = File::Spec->catdir($current_dir, $self->__handle_nonportable_local_entry($local_entry, $dir));
-            if (-f $path_entry) {
+            if ((defined $excludedir) && ($path_entry eq $excludedir)) {
+                # ignore it, because excluded
+            } elsif (-f $path_entry) {
                 push @tmp_file_paths, $path_entry;
             } elsif (-d $path_entry) {
-                next if ((defined $excludedir) && ($path_entry eq $excludedir));
                 push @todo, $path_entry;
             } else {
                 croak "not a file nor a dir found '$path_entry'";
@@ -812,7 +815,8 @@ sub _extract_value_from_textblob {
     return ($value, $textblob);
 }
 
-sub _parse_bag_info { # parses a bag-info textblob
+# parses a bag-info textblob
+sub _parse_bag_info { ## no critic (CognitiveComplexity::ProhibitExcessCognitiveComplexity)
     my ($self, $textblob) = @_;
     #    metadata elements are OPTIONAL and MAY be repeated.  Because "bag-
     #    info.txt" is intended for human reading and editing, ordering MAY be
@@ -907,12 +911,19 @@ sub _build_forced_fixity_algorithm {
 
 sub load_plugins {
     my ($self, @plugins) = @_;
-
-    #p(@plugins);
     my $loaded_plugins = $self->plugins;
-    @plugins = grep { not exists $loaded_plugins->{$_} } @plugins;
-
+    if (defined $loaded_plugins) {
+        @plugins = grep {not exists $loaded_plugins->{$_}} @plugins;
+    }
     return if @plugins == 0;
+    if (exists $ENV{TEST_ACTIVE}) {
+        use Cwd;
+        my $dir = getcwd();
+        my @dirs = File::Spec->splitdir($dir);
+        if ($dirs[-1] eq 't') {
+            push @INC, "../lib";
+        }
+    }
     foreach my $plugin (@plugins) {
         load_class ($plugin) or croak ("Can't load $plugin");
         $plugin->new({bagit => $self});
@@ -968,7 +979,6 @@ sub verify_bag {
     unless ($version > .95) {
         croak ("Bag Version $version is unsupported");
     }
-
 
     my @errors;
 
@@ -1131,7 +1141,7 @@ Archive::BagIt - The main module to handle bags.
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 NAME
 
@@ -1186,6 +1196,22 @@ See L<https://datatracker.ietf.org/doc/rfc8493/?include_text=1> for details.
 
 =back
 
+=head1 Backward Compatibility
+
+To reduce the complexity of code in current module the support for
+
+=over
+
+=item parallel processing
+=item synchronous I/O
+
+=back
+
+is removed. The existing code is very fast, so there is no performance loss.
+
+In near future the support for L<Archive::BagIt::Fast> will be  removed, because it needs hooks, which increase code
+complexity in current module without any performance benefit.
+
 =head1 FAQ
 
 =head2 How to access the manifest-entries directly?
@@ -1212,8 +1238,7 @@ I have made great efforts to optimize Archive::BagIt for high throughput. There 
    speed increase could be achieved.
 
 =item loading the files referenced in the manifest files was previously done serially and using synchronous I/O. By
-   using the L<IO::Async> module, the files are loaded asynchronously and the checksums are calculated in parallel.
-   If the underlying file system supports parallel accesses, the performance gain is huge.
+   using the L<IO::Async> module, the files are loaded asynchronously, the performance gain is huge.
 
 =back
 
@@ -1261,9 +1286,7 @@ Hint: The better way is to use only portable filenames. See L<perlport> for deta
 
 =head1 BUGS
 
-There are problems related to Parallel::parallel_map and IO::AIO under MS Windows. The tests are skipped there. Use the
- parallel feature or the L<Archive::BagIt::Fast> at your own risks on a MS Window System.
- If you are a MS Windows developer, feel free to send me patches or hints to fix the issues.
+None known yet.
 
 =head1 THANKS
 
@@ -1344,11 +1367,6 @@ The arguments are:
 
 =item C<force_utf8> - if set the warnings about non portable filenames are disabled (default: enabled)
 
-=item C<use_async> - if set it uses IO::Async to read payload files asynchronly, only useful under Linux.
-
-=item C<use_parallel> - if set it uses Parallel::parallel_map to calculate digests of payload files in parallel,
-      only useful if underlying filesystem supports parallel read and if multiple CPU cores available.
-
 =item C<use_plugins> - expected manifest plugin strings, if set it uses the requested plugins,
       example C<Archive::BagIt::Plugin::Manifest::SHA256>.
       HINT: this option *disables* the forced fixity check in C<verify_bag()>!
@@ -1358,14 +1376,6 @@ The arguments are:
 The bag object will use $bag_dir, BUT an existing $bag_dir is not read. If you use C<store()> an existing bag will be overwritten!
 
 See C<load()> if you want to parse/modify an existing bag.
-
-=head2 use_parallel()
-
-if set it uses parallel digest processing, default: false
-
-=head2 use_async()
-
-if set it uses async IO, default: false
 
 =head2 has_force_utf8()
 

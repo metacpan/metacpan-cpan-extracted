@@ -8,7 +8,7 @@ use Moo::Role;
 with 'Archive::BagIt::Role::Plugin';
 with 'Archive::BagIt::Role::Portability';
 # ABSTRACT: A role that handles all manifest files for a specific Algorithm
-our $VERSION = '0.100'; # VERSION
+our $VERSION = '0.101'; # VERSION
 
 has 'algorithm' => (
     is => 'rw',
@@ -25,9 +25,7 @@ sub _build_manifest_file {
     my $self = shift;
     my $algorithm = $self->algorithm()->name;
     my $file = File::Spec->catfile($self->bagit->metadata_path, "manifest-$algorithm.txt");
-    if (-f $file) {
-        return $file;
-    }
+    return $file if (-f $file);
     return;
 }
 
@@ -42,9 +40,7 @@ sub _build_tagmanifest_file {
     my $self = shift;
     my $algorithm = $self->algorithm()->name;
     my $file = File::Spec->catfile( $self->bagit->metadata_path, "tagmanifest-$algorithm.txt");
-    if (-f $file) {
-        return $file;
-    }
+    return $file if (-f $file);
     return;
 }
 
@@ -55,32 +51,6 @@ after BUILD => sub {
     my $algorithm = $self->algorithm->name;
     $self->{bagit}->{manifests}->{$algorithm} = $self;
 };
-
-has 'parallel_support' => (
-    is        => 'ro',
-    builder   => '_check_parallel_support',
-    predicate => 1,
-    lazy      => 1,
-);
-
-sub _check_parallel_support {
-    my $self = shift;
-    my $class = 'Parallel::parallel_map';
-    if (!exists $INC{'Parallel/parallel_map.pm'}) {
-        carp "Module '$class' not available, disable parallel support";
-        $self->bagit->use_parallel( 0 );
-        return 0;
-    }
-    load_class($class);
-    $class->import( 'parallel_map' );
-    return 1;
-}
-
-sub check_pluggable_modules() {
-    my $self = shift;
-    return ($self->has_parallel_support() && $self->has_async_support());
-}
-
 
 
 has 'manifest_entries' => (
@@ -114,27 +84,20 @@ sub __build_xxxmanifest_entries {
 sub _build_tagmanifest_entries {
     my ($self) = @_;
     my $tm_file = $self->tagmanifest_file();
-    if (defined $tm_file) {
-        return $self->__build_xxxmanifest_entries($tm_file);
-    }
+    return $self->__build_xxxmanifest_entries($tm_file) if (defined $tm_file);
     return;
 }
 
 sub _build_manifest_entries {
     my ($self) = @_;
     my $m_file = $self->manifest_file();
-    if (defined $m_file) {
-        return $self->__build_xxxmanifest_entries($m_file);
-    }
+    return $self->__build_xxxmanifest_entries($m_file) if (defined $m_file);
     return;
 }
 
 sub _fill_digest_hashref { # should be handle if empty values and ignore it (because parallel map)
     my ($self, $bagit, $localname) = @_;
-    if ((!defined $localname) or (0 == length($localname)) ) {
-        # croak "empty localname used!";
-        return;
-    }
+    return if ((!defined $localname) or (0 == length($localname)));
     my $digest_hashref;
     my $fullname = File::Spec->catfile($bagit, $localname);
     my $calc_digest = $self->bagit->digest_callback();
@@ -156,28 +119,10 @@ sub _fill_digest_hashref { # should be handle if empty values and ignore it (bec
 # $tmp->{filename} = $filename;
 sub calc_digests {
     my ($self, $bagit, $filenames_ref) = @_;
-    $self->check_pluggable_modules(); # handles Modules
     my @digest_hashes;
     my %digest_results;
-    if ($self->bagit->use_parallel()) {
-        # Parallel::Map does not work at the moment, potential bug in Parallel::Map or IO::Async
-        # @digest_hashes = pmap_scalar {
-        #     $self->_fill_digest_hashref($bagit, $_);
-        # } foreach => $filenames_ref;
-        # works as expected:
-
-        my $anon_sub = sub {
-            my $filename = shift;
-            return $self->_fill_digest_hashref($bagit, $filename);
-        };
-        ## no critic (ProhibitStringyEval);
-        @digest_hashes = eval 'Parallel::parallel_map::parallel_map (
-            sub { my $filename = shift; &$anon_sub($filename);}  , @{ $filenames_ref}
-        )';
-    } else {
-        # serial variant
-        @digest_hashes = map {$self->_fill_digest_hashref($bagit, $_)} @{$filenames_ref}
-    }
+    # serial variant
+    @digest_hashes = map {$self->_fill_digest_hashref($bagit, $_)} @{$filenames_ref};
     return \@digest_hashes;
 }
 
@@ -197,8 +142,10 @@ sub _verify_XXX_manifests {
         }
         return;
     };
-    # Test readability
+    my $local_xxfilename = "${xxprefix}-${algorithm}.txt";
+    my %normalised_files;
     foreach my $local_name (@files) {
+        #### Test readability
         # local_name is relative to bagit base
         my $filepath = File::Spec->catfile($bagit, $local_name);
         unless (-r $filepath) {
@@ -206,34 +153,26 @@ sub _verify_XXX_manifests {
                 "cannot read $local_name (bag-path:$bagit)",
             );
         }
-    }
-    # Evaluate each file against the manifest
-
-    my $local_xxfilename = "${xxprefix}-${algorithm}.txt";
-
-    # first check if each file from payload exists in manifest_entries for given alg
-    foreach my $local_name (@files) {
+        ### Evaluate each file against the manifest
+        # first check if each file from payload exists in manifest_entries for given alg
         my $normalized_local_name = normalize_payload_filepath($local_name);
         # local_name is relative to bagit base
         unless (exists $xxmanifest_entries->{$normalized_local_name}) { # localname as value should exist!
             &$subref_invalid_report_or_die(
                 "file '$local_name' (normalized='$normalized_local_name') found, which is not in '$local_xxfilename' (bag-path:'$bagit')!"
-                    #."DEBUG: \n".join("\n", keys %{$xxmanifest_entries->{$algorithm}})
+                #."DEBUG: \n".join("\n", keys %{$xxmanifest_entries->{$algorithm}})
             );
         }
+        ### second check if each file from manifest_entries for given alg exists in payload
+        $normalised_files{ $normalized_local_name } = 1;
     }
-    # second check if each file from manifest_entries for given alg exists in payload
-    my %normalised_files;
-    foreach my $file (@files) {
-        $normalised_files{ normalize_payload_filepath( $file )} = 1;
-    }
+
     foreach my $local_mf_entry_path (keys %{$xxmanifest_entries}) {
         if ( # to avoid escapes via manifest-files
             check_if_payload_filepath_violates($local_mf_entry_path)
         ) {
             &$subref_invalid_report_or_die("file '$local_mf_entry_path' not allowed in '$local_xxfilename' (bag-path:'$bagit'")
-        }
-        else {
+        } else {
             unless (exists $normalised_files{$local_mf_entry_path}) {
                 &$subref_invalid_report_or_die(
                     "file '$local_mf_entry_path' NOT found, but expected via '$local_xxfilename' (bag-path:'$bagit')!"
@@ -248,7 +187,7 @@ sub _verify_XXX_manifests {
         foreach my $digest_entry (@{$digest_hashes_ref}) {
             my $normalized = normalize_payload_filepath($digest_entry->{local_name});
             $digest_entry->{expected_digest} = $xxmanifest_entries->{$normalized};
-            if (! defined $digest_entry->{expected_digest} ) { next; } # undef expected digests only occur if all preconditions fullfilled but return_all_errors was set, we should ignore it!
+            next unless (defined $digest_entry->{expected_digest}); # undef expected digests only occur if all preconditions fullfilled but return_all_errors was set, we should ignore it!
             if ($digest_entry->{calculated_digest} ne $digest_entry->{expected_digest}) {
                 my $xxfilename = File::Spec->catfile($bagit, $local_xxfilename);
                 &$subref_invalid_report_or_die(
@@ -353,7 +292,7 @@ Archive::BagIt::Role::Manifest - A role that handles all manifest files for a sp
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head2 manifest_entries()
 

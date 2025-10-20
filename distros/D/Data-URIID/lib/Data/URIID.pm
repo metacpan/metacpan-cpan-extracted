@@ -25,7 +25,7 @@ use Data::URIID::Service;
 
 use parent 'Data::Identifier::Interface::Known';
 
-our $VERSION = v0.17;
+our $VERSION = v0.18;
 
 my %names = (
     service => {
@@ -74,6 +74,7 @@ my %names = (
         'purlorg'           => '53f8ea47-1de3-4562-9459-5f093782ae10', # purl.org
         'ruthede'           => '6c7dba44-dd07-4928-874e-f076e98cc96b', # ruthe.de
         'danbooru2chanjp'   => 'dac7a0ba-9090-4db7-bb94-373fabf98103', # danbooru.2chan.jp
+        'sirtxkeepcoolorg'  => '0d7be696-accc-4d52-9cea-9c2362a57d62', # sirtx.keep-cool.org
     },
     type => {
         'uuid'                          => '8be115d2-dc2f-4a98-91e1-a6e3075cbc31',
@@ -122,6 +123,7 @@ my %names = (
         'small-identifier'              => 'f87a38cb-fd13-4e15-866c-e49901adbec5',
         'language-tag-identifier'       => 'd0a4c6e2-ce2f-4d4c-b079-60065ac681f1',
         'chat-0-word-identifier'        => '2c7e15ed-aa2f-4e2f-9a1d-64df0c85875a',
+        'sirtx-numerical-identifier'    => '039e0bb7-5dd3-40ee-a98c-596ff6cce405',
         'furaffinity-post-identifier'   => 'b8dd10ec-d46b-4316-b3f3-2bc28cff9d35',
         'imgur-post-identifier'         => 'f2425e42-0083-4205-aa0b-2005f1fa62a3',
         'notalwaysright-post-identifier' => '700a0082-0201-46f1-b0a1-37e2caf76cc2',
@@ -502,7 +504,7 @@ Data::URIID - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.17
+version v0.18
 
 =head1 SYNOPSIS
 

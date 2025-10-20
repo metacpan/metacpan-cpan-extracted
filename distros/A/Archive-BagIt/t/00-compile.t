@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 12 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 13 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Archive/BagIt.pm',
@@ -18,6 +18,7 @@ my @module_files = (
     'Archive/BagIt/Role/Algorithm.pm',
     'Archive/BagIt/Role/Manifest.pm',
     'Archive/BagIt/Role/OpenSSL.pm',
+    'Archive/BagIt/Role/OpenSSL/Async.pm',
     'Archive/BagIt/Role/OpenSSL/Sync.pm',
     'Archive/BagIt/Role/Plugin.pm',
     'Archive/BagIt/Role/Portability.pm'

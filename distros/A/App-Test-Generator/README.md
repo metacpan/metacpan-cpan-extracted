@@ -4,7 +4,7 @@ App::Test::Generator - Generate fuzz and corpus-driven test harnesses
 
 # VERSION
 
-Version 0.08
+Version 0.09
 
 # SYNOPSIS
 
@@ -156,17 +156,15 @@ Recognized items:
 
     For routines with one unnamed parameter
 
-        our %input = (
-           type => 'string'
-        );
+        input:
+          type: string
 
     Currently, routines with more than one unnamed parameter are not supported.
 
 - `%output` - output param types for Return::Set checking:
 
-            our %output = (
-                    type => 'string'
-            );
+        output:
+          type: string
 
     If the output hash contains the key \_STATUS, and if that key is set to DIES,
     the routine should die with the given arguments; otherwise, it should live.
@@ -191,9 +189,11 @@ Recognized items:
 - `$function` - function/method to test (defaults to `run`).
 - `$new` - optional hashref of args to pass to the module's constructor (object mode):
 
-            our $new = { api_key => 'ABC123', verbose => 1 };
+        new:
+          api_key: ABC123
+          verbose: true
 
-    To ensure new is called with no arguments, you still need to define new, thus:
+    To ensure `new()` is called with no arguments, you still need to define new, thus:
 
         module: MyModule
         function: my_function
@@ -374,12 +374,19 @@ This example takes you through testing the online\_render method of [HTML::Genea
           - name: Set up Perl
             uses: shogo82148/actions-setup-perl@v1
             with:
-              perl-version: '5.38'
+              perl-version: '5.42'
 
           - name: Install App::Test::Generator this module's dependencies
             run: |
               cpanm App::Test::Generator
               cpanm --installdeps .
+
+          - name: Make Module
+            run: |
+              perl Makefile.PL
+              make
+            env:
+              AUTOMATED_TESTING: 1
 
           - name: Generate fuzz tests
             run: |
@@ -392,6 +399,8 @@ This example takes you through testing the online\_render method of [HTML::Genea
           - name: Run generated fuzz tests
             run: |
               prove -lr t/fuzz/
+            env:
+              AUTOMATED_TESTING: 1
 
 # OUTPUT
 

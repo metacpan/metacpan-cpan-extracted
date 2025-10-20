@@ -24,6 +24,7 @@ my %config = (
     incremental     => undef,
     gc              => undef,
     default_aliases => undef,
+    alias_map       => [],
     remove_codepoint=> [],
 );
 
@@ -38,6 +39,7 @@ my %config = (
     $opts{'incremental!'}       = \$config{incremental};
     $opts{'gc!'}                = \$config{gc};
     $opts{'default-aliases=s'}  = \$config{default_aliases};
+    $opts{'alias-map=s@'}       = \$config{alias_map};
     $opts{'remove-codepoint=s@'}= \$config{remove_codepoint};
 
     $opts{'help|h'} = sub {
@@ -103,6 +105,10 @@ foreach my $list (@{$config{remove_codepoint}}) {
             $font->remove_codepoint($codepoint);
         }
     }
+}
+
+foreach my $map (@{$config{alias_map}}) {
+    $font->import_alias_map($map);
 }
 
 $font->add_default_aliases($config{default_aliases}) if defined $config{default_aliases};

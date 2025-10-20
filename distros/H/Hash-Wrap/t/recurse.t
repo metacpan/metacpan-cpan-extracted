@@ -279,13 +279,13 @@ subtest '-recurse with object' => sub {
     );
 
     my ( $func ) = Hash::Wrap->import( {
-        -as        => '-return',
-        -recurse   => -1,
+        -as      => '-return',
+        -recurse => -1,
     } );
 
     my $wrap = $func->( \%hash );
 
-    is ( $wrap->a->b->c->foo, 'bar' );
+    is( $wrap->a->b->c->foo, 'bar' );
 
 };
 

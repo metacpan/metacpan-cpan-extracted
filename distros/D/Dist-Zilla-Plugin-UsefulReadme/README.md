@@ -36,10 +36,12 @@ This was written as a successor to [Pod::Readme](https://metacpan.org/pod/Pod%3A
 
 # RECENT CHANGES
 
-Changes for version v0.5.1 (2025-08-16)
+Changes for version v0.5.2 (2025-10-19)
 
 - Enhancements
-    - Added add\_prereqs option.
+    - The STATUS and SECURITY CONSIDERATIONS sections are included by default.
+- Documentation
+    - Updated the SUPPORT section to clarify the minimum Perl version.
 - Tests
     - Add more author tests.
 
@@ -107,8 +109,7 @@ For more information, see [How to install CPAN modules](https://www.cpan.org/mod
 
 Only the latest version of this module will be supported.
 
-This module requires Perl v5.20 or later.  Future releases may only support Perl versions released in the last ten
-years.
+This module requires Perl v5.20 or later, based on the minimum Perl supported by [Dist::Zilla](https://metacpan.org/pod/Dist%3A%3AZilla).
 
 ## Reporting Bugs and Submitting Feature Requests
 
@@ -125,7 +126,7 @@ then see `SECURITY.md` for instructions how to report security vulnerabilities.
 # SOURCE
 
 The development version is on github at [https://github.com/robrwo/perl-Dist-Zilla-Plugin-UsefulReadme](https://github.com/robrwo/perl-Dist-Zilla-Plugin-UsefulReadme)
-and may be cloned from [git://github.com/robrwo/perl-Dist-Zilla-Plugin-UsefulReadme.git](git://github.com/robrwo/perl-Dist-Zilla-Plugin-UsefulReadme.git)
+and may be cloned from [https://github.com/robrwo/perl-Dist-Zilla-Plugin-UsefulReadme.git](https://github.com/robrwo/perl-Dist-Zilla-Plugin-UsefulReadme.git)
 
 # AUTHOR
 

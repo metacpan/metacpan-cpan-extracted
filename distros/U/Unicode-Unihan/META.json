@@ -1,5 +1,5 @@
 {
-   "abstract" : "The Unihan Data Base 5.1.0",
+   "abstract" : "The Unihan Data Base 5.1.0 (legacy)",
    "author" : [
       "Dan Kogai <dankogai@dan.co.jp>"
    ],
@@ -25,7 +25,9 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {}
+         "requires" : {
+            "version" : "0.86"
+         }
       },
       "configure" : {
          "requires" : {
@@ -57,6 +59,6 @@
          "web" : "https://github.com/briandfoy/unicode-unihan"
       }
    },
-   "version" : "0.045",
+   "version" : "0.046",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

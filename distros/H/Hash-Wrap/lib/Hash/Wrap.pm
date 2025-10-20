@@ -9,7 +9,7 @@ use warnings;
 
 use Scalar::Util;
 use Digest::MD5;
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 our @EXPORT = qw[ wrap_hash ];
 
@@ -125,13 +125,13 @@ sub _can {
 
     my $method = "${class}::$key";
 
-    ## no critic (ProhibitNoStrict Subroutines::ProtectPrivateSubs)
+    ## no critic (ProhibitNoStrict PrivateSubs)
     no strict 'refs';
     return *{$method}{CODE}
       || Hash::Wrap::_generate_accessor( $CLASS, $class, $key );
 }
 
-sub import {    ## no critic(Subroutines::ProhibitExcessComplexity)
+sub import {    ## no critic(ExcessComplexity)
     shift;
 
     my @imports = @_;
@@ -142,14 +142,14 @@ sub import {    ## no critic(Subroutines::ProhibitExcessComplexity)
     for my $args ( @imports ) {
         if ( !ref $args ) {
             _croak( "$args is not exported by ", __PACKAGE__ )
-              unless grep { /$args/ } @EXPORT;    ## no critic (BuiltinFunctions::ProhibitBooleanGrep)
+              unless grep { /$args/ } @EXPORT;    ## no critic (BooleanGrep)
 
             $args = { -as => $args };
         }
 
         elsif ( 'HASH' ne ref $args ) {
             _croak( 'argument to ', __PACKAGE__, '::import must be string or hash' )
-              unless grep { /$args/ } @EXPORT;    ## no critic (BuiltinFunctions::ProhibitBooleanGrep)
+              unless grep { /$args/ } @EXPORT;    ## no critic (BooleanGrep)
         }
         else {
             # make a copy as it gets modified later on
@@ -218,7 +218,7 @@ sub import {    ## no critic(Subroutines::ProhibitExcessComplexity)
     return @return;
 }
 
-sub _build_class {    ## no critic(Subroutines::ProhibitExcessComplexity)
+sub _build_class {    ## no critic(ExcessComplexity)
     my ( $target, $name, $attr ) = @_;
 
     # in case we're called inside a recursion and the recurse count
@@ -233,7 +233,7 @@ sub _build_class {    ## no critic(Subroutines::ProhibitExcessComplexity)
 
     if ( !defined $attr->{-class} ) {
 
-        ## no critic (BuiltinFunctions::ProhibitComplexMappings)
+        ## no critic (ComplexMappings)
         my @class = map {
             ( my $key = $_ ) =~ s/-//;
             ( $key, defined $attr->{$_} ? $attr->{$_} : '<undef>' )
@@ -265,7 +265,6 @@ sub _build_class {    ## no critic(Subroutines::ProhibitExcessComplexity)
         set                   => '$self->{q[\<<KEY>>]} = $_[0] if @_;',
         return_value          => '$self->{q[\<<KEY>>]}',
         recursion_constructor => q{},
-        meta                  => [ map { ( qq[q($_) => q($attr->{$_}),] ) } keys %$attr ],
         predicate_template    => q{},
     );
 
@@ -398,8 +397,6 @@ package <<CLASS>>;
 
 use Scalar::Util ();
 
-our $meta = { <<META>> };
-
 our $validate = sub {
     my ( $self, $key ) = @_;
     return <<VALIDATE_METHOD>>;
@@ -491,7 +488,7 @@ END
     return $class;
 }
 
-sub _build_constructor {
+sub _build_constructor {    ## no critic (ExcessComplexity)
     my ( $package, $name, $args ) = @_;
 
     # closure for user provided clone sub
@@ -548,24 +545,43 @@ sub _build_constructor {
     $dict{copy} = join "\n", @copy;
 
     $dict{lock} = do {
-        if ( $args->{-immutable} ) {
+        my @eval;
+
+        if ( defined( my $opts = $args->{-immutable} ) ) {
+
             push @USE, q[use Hash::Util ();];
-            'Hash::Util::lock_hash(%$hash)';
+
+            if ( 'ARRAY' eq ref $opts ) {
+                _croak( "-immutable: attribute name ($_) is not a valid Perl identifier" )
+                  for grep { $_ !~ PerlIdentifier } @{$opts};
+
+                push @eval,
+                  'Hash::Util::lock_keys_plus(%$hash, qw{ ' . join( q{ }, @{$opts} ) . ' });',
+                  '@{$hash}{Hash::Util::hidden_keys(%$hash)} = ();',
+                  ;
+            }
+
+            push @eval, 'Hash::Util::lock_hash(%$hash)';
         }
         elsif ( defined $args->{-lockkeys} ) {
+
+            push @USE, q[use Hash::Util ();];
 
             if ( 'ARRAY' eq ref $args->{-lockkeys} ) {
                 _croak( "-lockkeys: attribute name ($_) is not a valid Perl identifier" )
                   for grep { $_ !~ PerlIdentifier } @{ $args->{-lockkeys} };
 
-                push @USE, q[use Hash::Util ();];
-                'Hash::Util::lock_keys_plus(%$hash, qw{ ' . join( q{ }, @{ $args->{-lockkeys} } ) . ' });';
+                push @eval,
+                  'Hash::Util::lock_keys_plus(%$hash, qw{ ' . join( q{ }, @{ $args->{-lockkeys} } ) . ' });';
             }
             elsif ( $args->{-lockkeys} ) {
-                push @USE, q[use Hash::Util ();];
-                'Hash::Util::lock_keys(%$hash)';
+
+                push @eval, 'Hash::Util::lock_keys(%$hash)';
             }
         }
+
+        join( "\n", @eval );
+
     };
 
     # return the constructor sub from the factory and don't insert the
@@ -640,7 +656,7 @@ sub _compile_from_tpl {
     if ( $DEBUG ) {
         my $lcode = $$code;
         _line_number_code( \$lcode );
-        print STDERR $lcode;    ## no critic (InputOutput::RequireCheckedSyscalls)
+        print STDERR $lcode;    ## no critic (CheckedSyscalls)
     }
 
     _clean_eval( $code, exists $dict->{closures} ? $closures : () );
@@ -649,9 +665,9 @@ sub _compile_from_tpl {
 
 # eval in a clean lexical space.
 sub _clean_eval {
-    ## no critic (ProhibitStringyEval ErrorHandling::RequireCheckingReturnValueOfEval )
+    ## no critic (StringyEval RequireCheckingReturnValueOfEval )
     if ( @_ > 1 ) {
-        ## no critic (Variables::ProhibitUnusedVarsStricter)
+        ## no critic (UnusedVars)
         my $CLOSURES = $_[1];
         eval( ${ $_[0] } );
     }
@@ -715,7 +731,7 @@ Hash::Wrap - create on-the-fly objects from hashes
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =head1 SYNOPSIS
 
@@ -1046,10 +1062,20 @@ C<$coderef> must return a plain hashref.
 
 By default, the object uses the hash directly.
 
-=item C<-immutable> => I<boolean>
+=item C<-immutable> => I<boolean> | I<arrayref>
 
-The object's attributes and values are locked and may not be
-altered. Note that this locks the underlying hash.
+If the value is I<true>, the object's attributes and values are locked
+and may not be altered. Note that this locks the underlying hash.
+
+If the value is an array reference, it specifies which attributes are
+allowed, I<in addition to existing attributes>.  Attributes which are
+not set when the object is created are set to C<undef>. For example,
+
+  use Hash::Wrap { -immutable => [ qw( a b c ) ] };
+
+  my $obj = wrap_hash( { a => 1, b => 2 } );
+
+  ! defined( $obj->c ) == true;  # true statement.
 
 =item C<-lockkeys> => I<boolean> | I<arrayref>
 

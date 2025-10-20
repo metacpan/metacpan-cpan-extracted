@@ -2,18 +2,16 @@ NAME
     Filename::Timestamp - Extract date/timestamp from filename, if any
 
 VERSION
-    This document describes version 0.001 of Filename::Timestamp (from Perl
-    distribution Filename-Timestamp), released on 2024-12-21.
+    This document describes version 0.003 of Filename::Timestamp (from Perl
+    distribution Filename-Timestamp), released on 2025-10-20.
 
 SYNOPSIS
-     use Filename::Archive qw(check_archive_filename);
-     my $res = check_archive_filename(filename => "foo.tar.gz");
+     use Filename::Timestamp qw(extract_timestamp_from_filename);
+     my $res = extract_timestamp_from_filename(filename => "foo.tar.gz");
      if ($res) {
-         printf "File is an archive (type: %s, compressed: %s)\n",
-             $res->{archive_name},
-             $res->{compressor_info} ? "yes":"no";
+         printf "Filename contains timestamp: %s\n", $res->{epoch};
      } else {
-         print "File is not an archive\n";
+         print "Filename does not contain timestamp\n";
      }
 
 DESCRIPTION
@@ -34,13 +32,14 @@ FUNCTIONS
         Result:
 
          {
-           day    => 8,
-           epoch  => 1725773748,
-           hour   => 12,
-           minute => 35,
-           month  => 9,
-           second => 48,
-           year   => 2024,
+           day       => 8,
+           epoch     => 1725824148,
+           hour      => 12,
+           minute    => 35,
+           month     => 9,
+           second    => 48,
+           tz_offset => 25200,
+           year      => 2024,
          }
 
     *   Example #2:
@@ -50,13 +49,16 @@ FUNCTIONS
         Result:
 
          {
-           day    => 8,
-           epoch  => 1725764084,
-           hour   => 9,
-           minute => 54,
-           month  => 9,
-           second => 44,
-           year   => 2024,
+           day         => 8,
+           epoch       => 1725764084,
+           epoch_local => 1725764084,
+           epoch_utc   => 1725789284,
+           hour        => 9,
+           minute      => 54,
+           month       => 9,
+           second      => 44,
+           tz          => "floating",
+           year        => 2024,
          }
 
     *   Example #3:
@@ -66,13 +68,16 @@ FUNCTIONS
         Result:
 
          {
-           day    => 8,
-           epoch  => 1725762266,
-           hour   => 9,
-           minute => 24,
-           month  => 9,
-           second => 26,
-           year   => 2024,
+           day         => 8,
+           epoch       => 1725762266,
+           epoch_local => 1725762266,
+           epoch_utc   => 1725787466,
+           hour        => 9,
+           minute      => 24,
+           month       => 9,
+           second      => 26,
+           tz          => "floating",
+           year        => 2024,
          }
 
     *   Example #4:
@@ -82,13 +87,16 @@ FUNCTIONS
         Result:
 
          {
-           day    => 1,
-           epoch  => 1725165644,
-           hour   => 11,
-           minute => 40,
-           month  => 9,
-           second => 44,
-           year   => 2024,
+           day         => 1,
+           epoch       => 1725165644,
+           epoch_local => 1725165644,
+           epoch_utc   => 1725190844,
+           hour        => 11,
+           minute      => 40,
+           month       => 9,
+           second      => 44,
+           tz          => "floating",
+           year        => 2024,
          }
 
     *   Example #5:
@@ -98,18 +106,28 @@ FUNCTIONS
         Result:
 
          {
-           day    => 4,
-           epoch  => 1733245200,
-           hour   => 0,
-           minute => 0,
-           month  => 12,
-           second => 0,
-           year   => 2024,
+           day         => 4,
+           epoch       => 1733245200,
+           epoch_local => 1733245200,
+           epoch_utc   => 1733270400,
+           hour        => 0,
+           minute      => 0,
+           month       => 12,
+           second      => 0,
+           tz          => "floating",
+           year        => 2024,
          }
 
     *   Example #6:
 
          extract_timestamp_from_filename(filename => "foo.txt"); # -> 0
+
+    *Handling of timezone.* If timestmap contains timezone indication, e.g.
+    +0700, will return "tz_offset" key in the result hash as well as
+    "epoch". Otherwise, will return "tz" key in the result hash with the
+    value of "floating" and "epoch_local" calculated using Time::Local's
+    "timelocal_posix" as well as "epoch_utc" calculated using
+    "timegm_posix".
 
     This function is not exported by default, but exportable.
 
@@ -140,8 +158,6 @@ SOURCE
     <https://github.com/perlancar/perl-Filename-Timestamp>.
 
 SEE ALSO
-    Filename::Compressed
-
 AUTHOR
     perlancar <perlancar@cpan.org>
 
@@ -162,7 +178,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

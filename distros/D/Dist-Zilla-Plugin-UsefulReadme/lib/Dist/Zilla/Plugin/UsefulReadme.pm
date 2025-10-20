@@ -34,7 +34,7 @@ use experimental qw( lexical_subs postderef signatures );
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.5.1';
+our $VERSION = 'v0.5.2';
 
 sub mvp_multivalue_args { qw( regions sections ) }
 
@@ -93,11 +93,13 @@ has sections => (
             map { s/_/ /gr }
               qw(
               name
+              status
               synopsis
               description
               recent_changes
               requirements
               installation
+              security_considerations
               /support|bugs/
               source
               /authors?/
@@ -452,7 +454,7 @@ Dist::Zilla::Plugin::UsefulReadme - generate a README file with the useful bits
 
 =head1 VERSION
 
-version v0.5.1
+version v0.5.2
 
 =head1 SYNOPSIS
 
@@ -527,11 +529,13 @@ This can either be a case-insensitive string, or a regex that implicitly matches
 The default is equivalent to specifying
 
     section = name
+    section = status
     section = synopsis
     section = description
     section = recent changes
     section = requirements
     section = installation
+    section = security considerations
     section = /support|bugs/
     section = source
     section = /authors?/
@@ -639,8 +643,7 @@ L<Dist::Zilla::Plugin::ReadmeAnyFromPod>
 
 Only the latest version of this module will be supported.
 
-This module requires Perl v5.20 or later.  Future releases may only support Perl versions released in the last ten
-years.
+This module requires Perl v5.20 or later, based on the minimum Perl supported by L<Dist::Zilla>.
 
 =head2 Reporting Bugs and Submitting Feature Requests
 
@@ -657,7 +660,7 @@ then see F<SECURITY.md> for instructions how to report security vulnerabilities.
 =head1 SOURCE
 
 The development version is on github at L<https://github.com/robrwo/perl-Dist-Zilla-Plugin-UsefulReadme>
-and may be cloned from L<git://github.com/robrwo/perl-Dist-Zilla-Plugin-UsefulReadme.git>
+and may be cloned from L<https://github.com/robrwo/perl-Dist-Zilla-Plugin-UsefulReadme.git>
 
 =head1 AUTHOR
 

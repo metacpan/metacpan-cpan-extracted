@@ -42,9 +42,12 @@
             "Pod::Coverage::TrustPod" : "0",
             "Pod::Wordlist" : "0",
             "Software::Security::Policy::Individual" : "0.10",
+            "Test2::Require::AuthorTesting" : "0",
             "Test2::Tools::Basic" : "1.302200",
+            "Test2::V0" : "0",
             "Test::CPAN::Changes" : "0.19",
             "Test::CPAN::Meta" : "0",
+            "Test::CVE" : "0.10",
             "Test::CleanNamespaces" : "0.15",
             "Test::DistManifest" : "0",
             "Test::EOF" : "0",
@@ -124,19 +127,19 @@
    "provides" : {
       "Dist::Zilla::Plugin::UsefulReadme" : {
          "file" : "lib/Dist/Zilla/Plugin/UsefulReadme.pm",
-         "version" : "v0.5.1"
+         "version" : "v0.5.2"
       },
       "Pod::Weaver::Section::InstallationInstructions" : {
          "file" : "lib/Pod/Weaver/Section/InstallationInstructions.pm",
-         "version" : "v0.5.1"
+         "version" : "v0.5.2"
       },
       "Pod::Weaver::Section::RecentChanges" : {
          "file" : "lib/Pod/Weaver/Section/RecentChanges.pm",
-         "version" : "v0.5.1"
+         "version" : "v0.5.2"
       },
       "Pod::Weaver::Section::Requirements" : {
          "file" : "lib/Pod/Weaver/Section/Requirements.pm",
-         "version" : "v0.5.1"
+         "version" : "v0.5.2"
       }
    },
    "release_status" : "stable",
@@ -150,10 +153,10 @@
          "web" : "https://github.com/robrwo/perl-Dist-Zilla-Plugin-UsefulReadme"
       }
    },
-   "version" : "v0.5.1",
+   "version" : "v0.5.2",
    "x_authority" : "cpan:RRWO",
    "x_generated_by_perl" : "v5.34.3",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

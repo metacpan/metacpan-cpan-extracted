@@ -15,7 +15,7 @@ use Carp;
 
 use Data::Identifier v0.08;
 
-our $VERSION = v0.17;
+our $VERSION = v0.18;
 
 
 
@@ -121,7 +121,7 @@ Data::URIID::Base - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.17
+version v0.18
 
 =head1 SYNOPSIS
 

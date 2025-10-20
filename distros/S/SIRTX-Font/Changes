@@ -1,3 +1,6 @@
+v0.04  2025-10-19Z
+    - Added support to import and export alias maps
+
 v0.03  2025-10-10Z
     - Updated lists of default aliases
     - Added render()

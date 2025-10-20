@@ -4,14 +4,14 @@ use 5.006000;
 use strict;
 use warnings;
 use base qw(Exporter);
-use Getopt::Long qw(GetOptionsFromArray);
+use Getopt::Long qw(GetOptionsFromArray Configure);
 use IPC::Open3 qw(open3);
 use IO::Select;
 use IO::Handle;
 use IO::File qw(O_WRONLY O_TRUNC O_CREAT);
 
 our @EXPORT = qw(iotrace);
-our $VERSION = '0.021';
+our $VERSION = '0.022';
 
 # Magic Timer Settings
 our $has_hires = eval { require Time::HiRes; 1 };
@@ -25,13 +25,14 @@ our $patience_zombie_breather = $has_hires ? 5.6 : 7; # Maximum Seconds of unint
 sub now { $has_hires ? Time::HiRes::time() : time }
 
 sub usage {
-    die "Usage> $0 -o <output_log> CMD [ARGS]\n";
+    $0 =~ /([^\/]+)$/ and return "Usage> $1 -o <output_log> CMD [ARGS]\n";
 }
 
 sub iotrace {
     my $self = __PACKAGE__->new;
-    my @args = @_ ? @_ : @ARGV or usage;
-    $self->parse_commandline(@args) or usage;
+    my @args = @_ ? @_ : @ARGV or die usage; # No args is Error
+    $self->parse_commandline(@args) or die usage; # Broken args parsing is Error
+    $self->{help} and print usage and exit; # Showing --help usage is not Error
     $self->{child_died} = 0;
     local $SIG{CHLD} = sub { $self->{child_died} = now; };
     $self->run_trace;
@@ -50,10 +51,10 @@ sub new {
 
 sub parse_commandline {
     my $self = shift;
-    Getopt::Long::Configure("require_order");
-    Getopt::Long::Configure("bundling");
-    GetOptionsFromArray
-        \@_,
+    Configure("require_order");
+    Configure("bundling");
+    return GetOptionsFromArray
+        $self->{run} = \@_,
         "o=s"   => \($self->{output_log_file}),
         "v+"    => \($self->{verbose} = 0),
         "x+"    => \($self->{heX_ify} = 0),
@@ -62,9 +63,7 @@ sub parse_commandline {
         "q+"    => \($self->{quiet} = 0), # Ignored
         "s=i"   => \($self->{size_of_strings}), # Ignored
         "e=s"   => \($self->{events}),  # Ignored
-        or return;
-    $self->{run} = [@_];
-    return @_;
+        "help|h"=> \($self->{help}),
 }
 
 sub t {

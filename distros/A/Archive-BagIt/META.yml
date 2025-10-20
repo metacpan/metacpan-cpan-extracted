@@ -11,7 +11,7 @@ build_requires:
   Test::File: '0'
   Test::More: '0'
   Test::Warnings: '0'
-  perl: '5.010'
+  perl: '5.021008'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.010'
@@ -30,62 +30,59 @@ no_index:
 provides:
   Archive::BagIt:
     file: lib/Archive/BagIt.pm
-    version: '0.100'
+    version: '0.101'
   Archive::BagIt::Base:
     file: lib/Archive/BagIt/Base.pm
-    version: '0.100'
+    version: '0.101'
   Archive::BagIt::Plugin::Algorithm::MD5:
     file: lib/Archive/BagIt/Plugin/Algorithm/MD5.pm
-    version: '0.100'
+    version: '0.101'
   Archive::BagIt::Plugin::Algorithm::SHA512:
     file: lib/Archive/BagIt/Plugin/Algorithm/SHA512.pm
-    version: '0.100'
+    version: '0.101'
   Archive::BagIt::Plugin::Manifest::MD5:
     file: lib/Archive/BagIt/Plugin/Manifest/MD5.pm
-    version: '0.100'
+    version: '0.101'
   Archive::BagIt::Plugin::Manifest::SHA512:
     file: lib/Archive/BagIt/Plugin/Manifest/SHA512.pm
-    version: '0.100'
+    version: '0.101'
   Archive::BagIt::Role::Algorithm:
     file: lib/Archive/BagIt/Role/Algorithm.pm
-    version: '0.100'
+    version: '0.101'
   Archive::BagIt::Role::Manifest:
     file: lib/Archive/BagIt/Role/Manifest.pm
-    version: '0.100'
+    version: '0.101'
   Archive::BagIt::Role::OpenSSL:
     file: lib/Archive/BagIt/Role/OpenSSL.pm
-    version: '0.100'
+    version: '0.101'
   Archive::BagIt::Role::OpenSSL::Async:
     file: lib/Archive/BagIt/Role/OpenSSL/Async.pm
-    version: '0.100'
+    version: '0.101'
   Archive::BagIt::Role::OpenSSL::Sync:
     file: lib/Archive/BagIt/Role/OpenSSL/Sync.pm
-    version: '0.100'
+    version: '0.101'
   Archive::BagIt::Role::Plugin:
     file: lib/Archive/BagIt/Role/Plugin.pm
-    version: '0.100'
+    version: '0.101'
   Archive::BagIt::Role::Portability:
     file: lib/Archive/BagIt/Role/Portability.pm
-    version: '0.100'
-recommends:
-  IO::Async: '0'
-  IO::Async::Loop: '0'
-  IO::Async::Stream: '0'
-  Parallel::parallel_map: '0'
+    version: '0.101'
 requires:
   Class::Load: '0'
   File::Find: '0'
+  IO::Async: '0'
+  IO::Async::Loop: '0'
+  IO::Async::Stream: '0'
   List::Util: '1.450'
   Moo: '0'
   Net::SSLeay: '1.43'
   namespace::autoclean: '0'
-  perl: '5.010'
+  perl: '5.021008'
 resources:
   repository: https://git.fsfe.org/art1pirat/Archive-BagIt.git
-version: '0.100'
+version: '0.101'
 x_contributors:
   - 'Andreas Romeyke <art1@andreas-romeyke.de>'
-  - 'art1@andreas-romeyke.de <art1pirat@fsfe.org>'
   - 'Michiel Beijen <michiel.beijen@gmail.com>'
   - 'Patrick Hochstenbach <patrick.hochstenbach@ugent.be>'
   - 'Robert Schmidt <rjeschmi@gmail.com>'
@@ -93,6 +90,6 @@ x_contributors:
   - 'Robert Schmidt <rob@c7a.ca>'
   - 'Russell McOrmond <rmcormond@crkn.ca>'
   - 'Russell McOrmond <russell.mcormond@canadiana.ca>'
-x_generated_by_perl: v5.36.0
-x_serialization_backend: 'YAML::Tiny version 1.73'
+x_generated_by_perl: v5.38.2
+x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

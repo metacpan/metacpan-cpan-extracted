@@ -38,7 +38,9 @@ if($@) {
 
 	ok($? == 0, 'Generated test script exits successfully');
 
-	if ($? != 0) {
+	if($? == 0) {
+		unlink $outfile;
+	} else {
 		diag("STDERR:\n$stderr");
 		diag("STDOUT:\n$stdout");
 	}
@@ -46,10 +48,6 @@ if($@) {
 	like($stderr, qr/HTML::Genealogy::Map->onload_render test case created/);
 	like($stdout, qr/^ok \d/sm, 'At least one created test passed');
 	unlike($stdout, qr/^not ok \d/sm, 'No created test failed');
-
-	# diag($stdout);
-
-	unlink $outfile;
 }
 
 done_testing();
