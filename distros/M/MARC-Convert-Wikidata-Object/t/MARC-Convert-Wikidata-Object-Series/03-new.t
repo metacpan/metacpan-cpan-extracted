@@ -5,7 +5,7 @@ use English;
 use Error::Pure::Utils qw(clean);
 use MARC::Convert::Wikidata::Object::Publisher;
 use MARC::Convert::Wikidata::Object::Series;
-use Test::More 'tests' => 5;
+use Test::More 'tests' => 6;
 use Test::NoWarnings;
 
 # Test.
@@ -42,4 +42,15 @@ eval {
 };
 is($EVAL_ERROR, "Parameter 'publisher' must be a 'MARC::Convert::Wikidata::Object::Publisher' object.\n",
 	"Parameter 'publisher' must be a 'MARC::Convert::Wikidata::Object::Publisher' object (bad).");
+clean();
+
+# Test.
+eval {
+	MARC::Convert::Wikidata::Object::Series->new(
+		'name' => 'Series',
+		'series_ordinal' => 'kn. 2',
+	);
+};
+is($EVAL_ERROR, "Parameter 'series_ordinal' has bad value.\n",
+	"Parameter 'series_ordinal' has bad value (kn. 2).");
 clean();

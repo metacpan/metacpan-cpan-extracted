@@ -17,8 +17,8 @@
 ]>
 <ISBNRangeMessage>
   <MessageSource>International ISBN Agency</MessageSource>
-  <MessageSerialNumber>c227a374-ef47-4801-b0a5-efa2c197bf18</MessageSerialNumber>
-  <MessageDate>Thu, 9 Oct 2025 04:45:30 BST</MessageDate>
+  <MessageSerialNumber>21034c1a-9cf7-460b-bbe0-7044f06a0a2a</MessageSerialNumber>
+  <MessageDate>Tue, 21 Oct 2025 04:47:04 BST</MessageDate>
   <EAN.UCCPrefixes>
     <EAN.UCC>
       <Prefix>978</Prefix>
@@ -8545,11 +8545,11 @@
       <Agency>Ethiopia</Agency>
       <Rules>
         <Rule>
-          <Range>0000000-0999999</Range>
+          <Range>0000000-1999999</Range>
           <Length>1</Length>
         </Rule>
         <Rule>
-          <Range>1000000-4999999</Range>
+          <Range>2000000-4999999</Range>
           <Length>0</Length>
         </Rule>
         <Rule>

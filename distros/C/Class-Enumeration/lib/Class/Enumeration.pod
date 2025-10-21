@@ -38,16 +38,18 @@ has a C<name> and an C<ordinal> attribute.
 Each enum class has a C<name()> getter method (an object method), that
 returns the C<name> of the enum object, exactly as defined.
 
-Each enum class has an C<ordinal()> getter method (an object method), that
-returns the C<ordinal> of the enum object (its position in its definition,
-where the initial object is assigned an ordinal of zero).
+Each enum class has an C<ordinal()> getter method (an object method),
+that returns the C<ordinal> number of the enum object. It defaults to the
+position in its definition, where the initial object is assigned an ordinal
+number of zero.
 
 Each enum class has a C<names()> class method, that returns the list of
 names of the enum objects in the order they were defined.
 
-Each enum class has a C<values()> class method, that returns the list of
-the enum objects in the order they were defined. This method is abstract
-and gets implemented by the C<Class::Enumeration::Builder> module.
+Each enum class has a C<values()> class method, that returns the list of the
+enum objects sorted according to their ordinal number (lowest to highest). This
+method is abstract and gets implemented by the C<Class::Enumeration::Builder>
+module.
 
 Each enum class has a C<value_of( $name )> factory method (a class method),
 that returns the enum object with the specified name.

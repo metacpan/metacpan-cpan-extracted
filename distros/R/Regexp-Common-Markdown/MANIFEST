@@ -1,9 +1,10 @@
-Changes
+CHANGES
 CONTRIBUTING.md
 lib/Regexp/Common/Markdown.pm
 LICENSE
 Makefile.PL
 MANIFEST
+README
 README.md
 t/001.load.t
 t/002.bold.t
@@ -37,3 +38,4 @@ t/999.pod.t
 t/functions.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

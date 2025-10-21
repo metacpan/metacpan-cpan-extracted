@@ -9,14 +9,17 @@ Class::Enumeration::Builder - Builder module for enum classes
   # Setup enum class in a separate module and build it at compile time
   use strict;
   use warnings;
+  use feature 'state';
 
   package TrafficLight;
 
   # Pre-declare the to_string() method to prepare overriding stringification
   use subs 'to_string';
 
+  # The 'counter' option overwrites the default ordinal number generator
   # 'action' is a custom attribute
   use Class::Enumeration::Builder (
+    { counter => sub { state $i = 0; my $r = $i; $i += 2; $r } },
     GREEN  => { action => 'go' },
     ORANGE => { action => 'slow down' },
     RED    => { action => 'stop' }
@@ -57,15 +60,20 @@ child class of the abstract parent class L<Class::Enumeration>.  The builder
 creates getters for custom attributes and as a final mandatory step prepares
 a list of enum objects.
 
-The C<import()> class method implements the build process. Its first
-argument is an optional HASH reference. The allowed options are C<class>
-(a non-empty string) and C<export> (a boolean value).  The C<import()>
-method returns the name of the enum class.
+The C<import()> class method implements the build process. Its first argument
+is an optional HASH reference. The allowed options are C<class> (a non-empty
+string), C<counter> (a CODE reference), and C<export> (a boolean value).
+The C<import()> method returns the name of the enum class.
 
 If the C<export> option is set to true, the builder will prepare enum constants
 that are stored in the variable C<@EXPORT_OK> and it will create an C<:all>
 that is part of the variable C<%EXPORT_TAGS>. Any exporter module chosen
 and loaded separately enables the feature to export enum constants.
+
+The C<counter> option can be used to overwrite the default ordinal number
+generator. It should return a unique value for each enum object in the list.
+The values should be numeric and comparable in pairs using the C<E<lt>=E<gt>>
+operator.
 
 An enum class build setup can be part of a separate module. In this case
 the build process happens at compile time. The enum class name equals the

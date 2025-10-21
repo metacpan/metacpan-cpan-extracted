@@ -31,7 +31,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.231';
+our $VERSION = '1.232';
 
 use Quiq::Option;
 use Quiq::FileHandle;
@@ -599,8 +599,8 @@ sub duplicate {
 
 =head4 Synopsis
 
-  $changed = $this->edit($file,@opt);
-  $changed = $this->edit(\$data,@opt);
+  $changed = $this->edit($file,%options);
+  $changed = $this->edit(\$data,%options);
 
 =head4 Arguments
 
@@ -613,6 +613,16 @@ Datei, die bearbeitet werden soll.
 =item $data
 
 Daten, die bearbeitet werden sollen.
+
+=back
+
+=head4 Options
+
+=over 4
+
+=item -create => $bool (Default: 0)
+
+Erzeuge die Datei, wenn sie nicht existiert.
 
 =back
 
@@ -636,14 +646,29 @@ andernfalls falsch.
 
 sub edit {
     my $this = shift;
-    my ($file,$dataR) = ref $_[0]? (undef,shift): (shift,undef);
     # @_: $file -or- \$data
+
+    # Parameter
+
+    my $create = 0;
+
+    my $argA = $this->parameters(1,1,\@_,
+        -create => \$create,
+    );
+    my $arg = shift @$argA;
+    my ($file,$dataR) = ref $arg? (undef,$arg): ($arg,undef);
+
+    # Operation ausführen
 
     my $encoding = 'utf-8';
     my $changed = 0;
     my $tmpFile = Quiq::TempFile->new;
 
     if ($file) {
+        if (!$this->exists($file)) {
+            $this->write($file,'');
+        }
+
         # Erzeuge eine temporäre Kopie
         $this->copy($file,$tmpFile);
     }
@@ -4565,7 +4590,7 @@ sub uid {
 
 =head1 VERSION
 
-1.231
+1.232
 
 =head1 AUTHOR
 

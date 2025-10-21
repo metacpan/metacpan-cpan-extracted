@@ -3,7 +3,7 @@
 Thank you for considering contributing to this distribution.
 I welcome any contribution to Regexp::Common::Markdown, including, but not limited to bug reports, feature requests, general comments, and patches.
 
-Feel free to clone it from its gitlab repository at <https://git.deguest.jp/jack/Regexp-Common-Markdown> and issue a pull request.
+Feel free to clone it from its gitlab repository at <https://gitlab.com/jackdeguest/Regexp-Common-Markdown> and issue a pull request.
 
 I am very flexible to collaboration and always eager to learn from others.
 
@@ -11,7 +11,7 @@ All contributions are assumed to be provided under the terms of [perl5 license](
 
 ### Issues
 
-File [an issue on CPAN bug tracker](https://rt.cpan.org/Public/Dist/Display.html?Name=Regexp-Common-Markdown) if you think you've found a bug. Please describe
+File [an issue on bug tracker](https://rt.cpan.org/Public/Dist/Display.html?Name=Regexp-Common-Markdown) if you think you've found a bug. Please describe
 
 1. How can it be reproduced
 
@@ -43,7 +43,7 @@ Issues are currently reported using CPAN [bug tracker](https://rt.cpan.org/Publi
 
 ## More information
 
-Please refer to the [README](https://metacpan.org/source/JDEGUEST/Regexp-Common-Markdown-v0.1.5/README.md)
+Please refer to the [README](https://metacpan.org/source/JDEGUEST/Regexp-Common-Markdown-v0.1.6/README.md)
 
 ## Author
 

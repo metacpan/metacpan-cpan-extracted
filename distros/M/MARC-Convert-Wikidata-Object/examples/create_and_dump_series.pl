@@ -14,6 +14,7 @@ my $obj = MARC::Convert::Wikidata::Object::Series->new(
                 'name' => decode_utf8('Mladá Fronta'),
         ),
         'series_ordinal' => 5,
+        'series_ordinal_raw' => 'kn. 5',
 );
 
 p $obj;

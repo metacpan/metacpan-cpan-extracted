@@ -1,7 +1,7 @@
 package Perl5::TestEachCommit;
 use 5.014;
 use warnings;
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 $VERSION = eval $VERSION;
 use Carp;
 use Data::Dump ( qw| dd pp| );
@@ -60,6 +60,15 @@ merge of the branch into C<blead>.
 If, for any reason (*e.g.,* bisection), some other developer in the future
 needs to say F<git checkout 3cdef>, they will discover that at that commit the
 build was actually broken.
+
+=head2 Additional Functionality
+
+As of version 0.06, this distribution now provides the functionality to
+analyze breakage at the F<miniperl> level.  If it is known (or suspected) that
+tests will break during F<make minitest_prep> or F<make minitest>, then runtime
+can be considerably reduced from the more typical case where breakage occurs
+during F<make test_prep> or F<make test_harness>.  However, the two cases
+cannot be mixed.
 
 =head1 METHODS
 
@@ -134,6 +143,22 @@ series of commits in a branch or pull request, the C<make test_harness> stage
 will be skipped on the assumption that any significant failures are going to
 appear in the first two stages.
 
+* C<make_minitest_prep_command>
+
+String holding arguments to be passed to F<make minitest_prep>.  Defaults to
+C<make minitest_prep>.  Add < 1<Egt>/dev/null> to that string if you don't
+need voluminous output to C<STDOUT>. B<Note:> If this key-value pair is passed
+to C<new()>, then any value passed to C<make_test_prep_command> or
+C<make_test_harness_command> is ignored.
+
+* C<make_minitest_command>
+
+String holding arguments to be passed to F<make minitest>.  Defaults to C<make
+minitest>.  Add < 1<Egt>/dev/null> to that string if you don't need voluminous
+output to C<STDOUT>.  B<Note:> If this key-value pair is passed to C<new()>,
+then any value passed to C<make_test_prep_command> or
+C<make_test_harness_command> is ignored.
+
 * C<verbose>
 
 True/false value.  Defaults to false.  If true, prints to C<STDOUT> a summary of
@@ -173,12 +198,24 @@ sub new {
     $data{configure_command} = $args->{configure_command}
         ? delete $args->{configure_command}
         : 'sh ./Configure -des -Dusedevel';
+
     $data{make_test_prep_command} = $args->{make_test_prep_command}
         ? delete $args->{make_test_prep_command}
         : 'make test_prep';
     $data{make_test_harness_command} = $args->{make_test_harness_command}
         ? delete $args->{make_test_harness_command}
         : 'make test_harness';
+
+    if ($args->{make_minitest_prep_command} or $args->{make_minitest_command}) {
+        delete $data{make_test_prep_command};
+        delete $data{make_test_harness_command};
+        $data{make_minitest_prep_command} = $args->{make_minitest_prep_command}
+            ? delete $args->{make_minitest_prep_command}
+            : 'make minitest_prep';
+        $data{make_minitest_command} = $args->{make_minitest_command}
+            ? delete $args->{make_minitest_command}
+            : 'make minitest';
+    }
 
     $data{skip_test_harness} = defined $args->{skip_test_harness}
         ? delete $args->{skip_test_harness}
@@ -264,20 +301,33 @@ The output will look like this:
     make_test_prep_command:    make test_prep 1>/dev/null
     make_test_harness_command: make_test_harness 1>/dev/null
 
+Or like this, if you are doing F<miniperl>-level testing on a debugging build:
+
+    branch:                        blead
+    configure_command:             sh ./Configure -des -Dusedevel -DDEBUGGING 1>/dev/null
+    make_minitest_prep_command:    make minitest_prep 1>/dev/null
+    make_minitest_command:         make minitest 1>/dev/null
+
 =back
 
 =cut
 
 sub display_plan {
     my $self = shift;
-    say "branch:                    $self->{branch}";
-    say "configure_command:         $self->{configure_command}";
-    say "make_test_prep_command:    $self->{make_test_prep_command}";
-    if ($self->{skip_test_harness}) {
-        say "Skipping 'make test_harness'";
+    say "branch:                        $self->{branch}";
+    say "configure_command:             $self->{configure_command}";
+    if ($self->{make_minitest_prep_command}) {
+        say "make_minitest_prep_command:    $self->{make_minitest_prep_command}";
+        say "make_minitest_command:         $self->{make_minitest_command}";
     }
     else {
-        say "make_test_harness_command: $self->{make_test_harness_command}";
+        say "make_test_prep_command:        $self->{make_test_prep_command}";
+        if ($self->{skip_test_harness}) {
+            say "Skipping 'make test_harness'";
+        }
+        else {
+            say "make_test_harness_command: $self->{make_test_harness_command}";
+        }
     }
     return 1;
 }
@@ -501,7 +551,9 @@ sub examine_one_commit {
     undef $rv;
     my $commit_score = 0;
 
-    say STDERR "Configuring $c" if $self->{verbose};
+    say STDERR "Configuring at $c" if $self->{verbose};
+
+    # first stage: configuration
     $rv = system($self->{configure_command});
     if ($rv) {
         carp "Unable to configure at $c";
@@ -511,30 +563,61 @@ sub examine_one_commit {
     else {
         $commit_score++;
 
-        say STDERR "Building $c" if $self->{verbose};
-        $rv = system($self->{make_test_prep_command});
-        if ($rv) {
-            carp "Unable to make_test_prep at $c";
-            push @{$self->{results}}, { commit => $c, score => $commit_score };
-            return;
-        }
-        else {
-            $commit_score++;
+        # miniperl-level testing
+        # second and third levels are 'make minitest_prep' and 'make minitest'
+        if ($self->{make_minitest_prep_command}) {
 
-            if ($self->{skip_test_harness}) {
-                say STDERR "Skipping 'make test_harness'" if $self->{verbose};
+            say STDERR "Building miniperl at $c" if $self->{verbose};
+            $rv = system($self->{make_minitest_prep_command});
+            if ($rv) {
+                carp "Unable to make_minitest_prep at $c";
+                push @{$self->{results}}, { commit => $c, score => $commit_score };
+                return;
             }
             else {
-                say STDERR "Testing $c" if $self->{verbose};
-                $rv = system($self->{make_test_harness_command});
+                $commit_score++;
+
+                say STDERR "Running minitest at $c" if $self->{verbose};
+                $rv = system($self->{make_minitest_command});
                 if ($rv) {
-                    carp "Unable to make_test_harness at $c";
+                    carp "Unable to make_minitest at $c";
                 }
                 else {
                     $commit_score++;
                 }
+                push @{$self->{results}}, { commit => $c, score => $commit_score };
             }
-            push @{$self->{results}}, { commit => $c, score => $commit_score };
+        }
+        # regular testing
+        # second and third levels are 'make test_prep' and 'make test_harness'
+        # option to skip 'make test_harness'
+        else {
+
+            say STDERR "Building $c" if $self->{verbose};
+            $rv = system($self->{make_test_prep_command});
+            if ($rv) {
+                carp "Unable to make_test_prep at $c";
+                push @{$self->{results}}, { commit => $c, score => $commit_score };
+                return;
+            }
+            else {
+                $commit_score++;
+
+                if ($self->{skip_test_harness}) {
+                    say STDERR "Skipping 'make test_harness'" if $self->{verbose};
+                }
+                else {
+                    say STDERR "Testing $c" if $self->{verbose};
+                    $rv = system($self->{make_test_harness_command});
+                    if ($rv) {
+                        carp "Unable to make_test_harness at $c";
+                    }
+                    else {
+                        $commit_score++;
+                    }
+                }
+                push @{$self->{results}}, { commit => $c, score => $commit_score };
+            }
         }
     }
 }

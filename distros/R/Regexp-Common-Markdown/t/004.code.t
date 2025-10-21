@@ -11,7 +11,8 @@ use lib './lib';
 use Regexp::Common qw( Markdown );
 require( "./t/functions.pl" ) || BAIL_OUT( "Unable to find library \"functions.pl\"." );
 
-## https://regex101.com/r/toEboU/3
+# NOTE: indented line code blocks tests
+# https://regex101.com/r/toEboU/3
 my $tests_line = 
 [
     {
@@ -65,7 +66,8 @@ EOT
     },
 ];
 
-## https://regex101.com/r/M6W99K/7
+# NOTE: backticks code blocks tests
+# https://regex101.com/r/M6W99K/7
 my $tests_block =
 [
     {
@@ -95,7 +97,7 @@ EOT
     },
     {
         code_all => "```\n\n\n<Fenced>\n\n\n```\n",
-        code_content => "<Fenced>",
+        code_content => "\n\n<Fenced>\n\n",
         code_start => "```",
         test => <<EOT,
 Code block starting and ending with empty lines:
@@ -169,9 +171,14 @@ abbreviation definitions:
 *[HTML]: HyperText Markup Language
 ```
 EOT
-    }
+    },
+    {
+        fail => 1,
+        test => "```baz```",
+    },
 ];
 
+# NOTE: inline code tests
 my $tests_inline =
 [
     {
@@ -180,6 +187,7 @@ my $tests_inline =
         code_start => "`",
         test => "foo `bar`",
     },
+    # Inline code span should not capture any of this.
     {
         fail => 1,
         test => <<EOT,
@@ -189,6 +197,12 @@ my $tests_inline =
 <p>```
 ```
 EOT
+    },
+    {
+        code_all => "```baz```",
+        code_content => "baz",
+        code_start => "```",
+        test => "bar ```baz```",
     },
     {
         code_all => "`<test a=\"`",
@@ -218,6 +232,7 @@ run_tests( $tests_line,
 });
 
 run_tests( $tests_block,
+#dump_tests( $tests_block,
 {
     debug => 1,
     re => $RE{Markdown}{CodeBlock},
@@ -225,6 +240,7 @@ run_tests( $tests_block,
 });
 
 run_tests( $tests_inline,
+# dump_tests( $tests_inline,
 {
     debug => 1,
     re => $RE{Markdown}{CodeSpan},

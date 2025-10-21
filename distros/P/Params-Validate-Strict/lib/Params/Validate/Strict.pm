@@ -18,11 +18,11 @@ Params::Validate::Strict - Validates a set of parameters against a schema
 
 =head1 VERSION
 
-Version 0.17
+Version 0.18
 
 =cut
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 =head1 SYNOPSIS
 
@@ -440,6 +440,9 @@ sub validate_strict
 							}
 						}
 					} elsif($type eq 'object') {
+						if(!defined($value)) {
+							next;	# Skip if object is undefined
+						}
 						if(!Scalar::Util::blessed($value)) {
 							if($rules->{'error_message'}) {
 								_error($logger, $rules->{'error_message'});
@@ -556,11 +559,19 @@ sub validate_strict
 						if(!defined($value)) {
 							next;	# Skip if hash is undefined
 						}
-						if($value > $rule_value) {
+						if(Scalar::Util::looks_like_number($value)) {
+							if($value > $rule_value) {
+								if($rules->{'error_message'}) {
+									_error($logger, $rules->{'error_message'});
+								} else {
+									_error($logger, "validate_strict: Parameter '$key' ($value) must be no more than $rule_value");
+								}
+							}
+						} else {
 							if($rules->{'error_message'}) {
 								_error($logger, $rules->{'error_message'});
 							} else {
-								_error($logger, "validate_strict: Parameter '$key' ($value) must be no more than $rule_value");
+								_error($logger, "validate_strict: Parameter '$key' ($value) must be a number");
 							}
 						}
 					} else {
@@ -660,6 +671,9 @@ sub validate_strict
 						_error($logger, "validate_strict: Parameter '$key' has meaningless isa value $rule_value");
 					}
 				} elsif($rule_name eq 'can') {
+					if(!defined($value)) {
+						next;	# Skip if object not given
+					}
 					if($rules->{'type'} eq 'object') {
 						if(ref($rule_value) eq 'ARRAY') {
 							# List of methods

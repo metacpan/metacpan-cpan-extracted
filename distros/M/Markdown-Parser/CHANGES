@@ -1,5 +1,9 @@
 Revision history for Perl module Markdown::Parser
 
+v0.5.0 2025-10-21T15:25:24+0900
+    - Improve parsing algorithm, and handling of international URI (IDN), and code span and code block
+    - Resolved Gitlab issue #3 (thanks to Andrew Speer)
+
 v0.4.1 2024-09-05T16:05:38+0900
     - Corrected overlooked dependency that needed to be removed
 

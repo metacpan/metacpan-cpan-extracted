@@ -1,6 +1,36 @@
 Revision history for Perl module Regexp::Common::Markdown
 
-0.1.5 2020-08-17T22:18:23+0900
+v0.1.7 2025-10-21T11:54:34+0900
+    - Improved code span to prevent it from capturing fenced blocks and indented codes
+    - Improved code block, and extended code block to not include leading indentation
+
+v0.1.6 2025-10-19T17:30:36+0900
+    - Added safeguards $MD_SKIP_FENCED, $MD_SKIP_INDENTED, $MD_SKIP_INLINE_CODE
+    - code span: improved content catching
+    - headers: added safeguards, other change avoids “#######” lines with no content and the occasional 7+ “#” oddity.
+    - setext-style headers: Added safeguards $MD_SKIP_FENCED and $MD_SKIP_INDENTED
+    - html: Added safeguards to exclude html embedded within code blocks
+    - image: Added safeguard $MD_SKIP_INLINE_CODE
+    - line: group the repeated unit atomically.
+    - Link: Added safeguard $MD_SKIP_INLINE_CODE
+    - link auto: Added safeguard $MD_SKIP_INLINE_CODE
+    - link auto: Added labels 'link_idn_http', 'link_idn_https', 'link_v6_http', and 'link_v6_https'
+    - link reference: Added safeguard $MD_SKIP_INLINE_CODE
+    - paragraph: updated to add safeguard, and improved 'para_content' to avoid swallowing definitions/footnotes/HTML starts.
+    - header extended: Added safeguard $MD_SKIP_FENCED, $MD_SKIP_INDENTED, limited level to 6. Must have some text in 'header_content'
+    - setext-style headers extended: Added safeguard $MD_SKIP_FENCED, $MD_SKIP_INDENTED. Added a limit to the number of header marker: up to 3
+    - image extended: Added safeguard $MD_SKIP_INLINE_CODE
+    - insertion extended: Added safeguard $MD_SKIP_INLINE_CODE
+    - katex dollar: Added safeguard $MD_SKIP_INLINE_CODE
+    - katex bracket: Added safeguard $MD_SKIP_INLINE_CODE
+    - katex parens: Added safeguard $MD_SKIP_INLINE_CODE
+    - link extended: Added safeguard $MD_SKIP_INLINE_CODE
+    - subscript extended: Added safeguard $MD_SKIP_INLINE_CODE
+    - superscript extended: Added safeguard $MD_SKIP_INLINE_CODE
+    - strikethrough extended: Added safeguard $MD_SKIP_INLINE_CODE
+    - table extended: Added safeguard $MD_SKIP_FENCED, $MD_SKIP_INDENTED
+
+v0.1.5 2020-08-17T22:18:23+0900
     - Added suport for Katex math expression
     - Improved Emphasis regular expression <https://regex101.com/r/eDb6RN/4>
     - Improved bold regular expression to refine what non-space character means <https://regex101.com/r/Jp2Kos/3>
@@ -19,20 +49,20 @@ Revision history for Perl module Regexp::Common::Markdown
     - Change extended code block regular expression to become a combined version with the non-extended one. See here <https://regex101.com/r/Y9lPAz/10>
     - Updated link to avoid catching image. See <https://regex101.com/r/sGsOIv/7>
 
-0.1.4 2020-08-16T12:45:26+0900
+v0.1.4 2020-08-16T12:45:26+0900
     - Updated the paragrah regular expression to be more accurate to make distinction between unordered list (*) and bold (**) or emphasis (*)
     - Corrected function.pl to remove dependency
 
-0.1.3 2020-08-15T16:38:53+0900
+v0.1.3 2020-08-15T16:38:53+0900
     - Updated the regular expression for the extended code block. See <https://regex101.com/r/Y9lPAz/2>
 
-0.1.2 2020-08-14T21:16:06+0900
+v0.1.2 2020-08-14T21:16:06+0900
     - Added missing dependency for Regexp::Common::Email::Address and Regexp::Common::URI
     - Added support for superscript and subscript
     - Added capture name for line break: br_all
 
-0.1.1 2020-08-10T21:26:16+0900
+v0.1.1 2020-08-10T21:26:16+0900
     - Added support for superscript, including for Microsoft version of superscript.
 
-0.1.0 2020-08-10T21:09:23+0900
+v0.1.0 2020-08-10T21:09:23+0900
     - original version; created by ExtUtils::ModuleMaker 0.63

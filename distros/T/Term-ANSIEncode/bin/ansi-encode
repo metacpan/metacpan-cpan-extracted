@@ -132,10 +132,10 @@ $greydient .= '[% RESET %]';
 ###
 my $to = <<'TOKENS';
 [% CLS %]Tokens have to be encapsulated inside [ % TOKEN % ] (the TOKEN must be
-surrounded by at least one space on each side).  Colors beyond the standard 8
-will require a terminal that supports 256 colors.  It is also recommended that
-your terminal supports UTF-8 for advanced character/symbol support.  Some
-terminals may not support some features.
+surrounded by at least one space on each side).  Colors beyond the standard 16
+will require a terminal that supports 256 colors, up to 16 million colors.  It
+is also highly recommended that your terminal supports UTF-8 for advanced
+character/symbol support.  Some terminals may not support some features.
 
 NOTE:  Use "less -r" to view ANSI in "less"
 
@@ -157,7 +157,7 @@ $to .= '│' . colored(['bright_yellow'], q{                  MMM     "YMMMMMP" 
 			$to .= '╞══ ' . colored(['bold','bright_white'],uc($code)) . ' ' . '═' x (29 - (2 + length($code))) . '═╪════════════════════════════════════════════════════════╡' . "\n";
 		}
 		if ($code eq 'horizontal rules') {
-			$to .= '│  ' . sprintf('%-29s', 'HORIZONTAL RULE color') . ' │ ' . sprintf('%-54s','Horizontal rule (screen width)') . ' │' . "\n";
+			$to .= '│  ' . sprintf('%-29s', 'HORIZONTAL RULE color') . ' │ ' . sprintf('%-54s','Horizontal rule the width of the screen') . ' │' . "\n";
 		} else {
 			my @names = (sort(keys %{$ansi->{'ansi_meta'}->{$code}}));
 			while(scalar(@names)) {
@@ -433,13 +433,15 @@ ANSI Encode
 
 =head1 SYNOPSIS
 
-A markup language to generate basic ANSI text
+A markup language to generate basic ANSI text.  A terminal that supports UTF-8 is highly recommended for graphics characters.
 
 =head1 USAGE
 
- ansi_encode.pl file
+ ansi_encode.pl [options] [file/search]
 
 =head1 OPTIONS
+
+Using no options expects a file name.
 
 =over 4
 
@@ -461,11 +463,11 @@ Raw dump of useable tokens.
 
 =item --B<symbols> or -B<s> [search]
 
-Similar to "tokens", but instead shows special symbol character tokens names.
+Similar to "tokens", but instead shows special symbol character token names.
 
 You may also add a search string to shorten the list.
 
-IT IS HIGHLY SUGGESTED YOU USE A SEARCH STRING.
+IT IS HIGHLY SUGGESTED YOU USE A SEARCH STRING.  There are a lot of Unicode characters.  Each character has its own token.
 
 =item --B<unicode> or -B<u> [search]
 
@@ -493,6 +495,8 @@ B<RESET> changes output text to normal.
 
 =head2 GENERAL
 
+=over 4
+
 =item B<[% RETURN %]>
 
 ASCII RETURN (13)
@@ -515,7 +519,7 @@ Clear screen only, cursor remains where it was
 
 =item B<[% CLEAR LINE %]>
 
-Clear to the end of line
+Clear to the end of line from current cursor position
 
 =item B<[% CLEAR DOWN %]>
 
@@ -527,33 +531,33 @@ Clear up from current cursor position
 
 =item B<[% RESET %]>
 
-Reset all colors and attributes
+Reset all colors and attributes to their defaults
 
 =head2 CURSOR
 
 =item B<[% HOME %]>
 
-Moves the cursor to the location 1,1.
+Moves the cursor to the location 1,1 (Top left of screen)
 
-=item B<[% UP %]>
+=item B<[% UP %]> (Non-destructive)
 
 Moves cursor up one step
 
-=item B<[% DOWN %]>
+=item B<[% DOWN %]> (Non-destructive)
 
 Moves cursor down one step
 
-=item B<[% RIGHT %]>
+=item B<[% RIGHT %]> (Non-destructive)
 
 Moves cursor right one step
 
-=item B<[% LEFT %]>
+=item B<[% LEFT %]> (Non-destructive)
 
 Moves cursor left one step
 
 =item B<[% SAVE %]>
 
-Save cursor position
+Save current cursor position (overwrites previous save, only one at a time)
 
 =item B<[% RESTORE %]>
 
@@ -581,7 +585,7 @@ Slow cursor blink
 
 =item B<[% RAPID BLINK %]>
 
-Rapid cursor blink
+Rapid cursor blink (Some terminals just do a slow blink)
 
 =item B<[% LOCATE column,row %]>
 
@@ -595,21 +599,21 @@ Invert text (flip background and foreground attributes)
 
 =item B<[% REVERSE %]>
 
-Reverse
+Invert text (flip background and foreground attributes)
 
 =item B<[% CROSSED OUT %]>
 
-Crossed out
+Crossed out.  Text with a line through the middle.
 
 =item B<{% DEFAULT FONT %]>
 
-Default font
+Default font.  If the font was changed, then restore to the default font.
 
 =head2 FRAMES
 
 =item B<[% BOX color,x,y,width,height,type %]> text here B<[% ENDBOX %]>
 
-Draw a frame around text
+Draw a frame around text.  There are many types to choose from.
 
 =head2 COLORS
 
@@ -617,7 +621,13 @@ Draw a frame around text
 
 Sets colors to default
 
+=back
+
 =head2 FOREGROUND
+
+There are many more foreground colors available than the ones below.  However, the ones below should work on any color terminal.  Other colors may requite 256 and 16 million color support.  Most Linux X-Windows and Wayland terminal software should support the extra colors.  Some Windows terminal software should have "Term256" features.  You can used the "-t" option for all of the color tokens available or use the "RGB" token for access to 16 million colors.
+
+=over 4
 
 =item BLACK          = Black
 =item RED            = Red
@@ -640,7 +650,13 @@ Sets colors to default
 =item BRIGHT CYAN    = Bright cyan
 =item BRIGHT WHITE   = Bright white
 
+=back
+
 =head2 BACKGROUND
+
+There are many more background colors available than the ones below.  However, the ones below should work on any color terminal.  Other colors may requite 256 and 16 million color support.  Most Linux X-Windows and Wayland terminal software should support the extra colors.  Some Windows terminal software should have "Term256" features.  You can used the "-t" option for all of the color tokens available or use the "B_RGB" token for access to 16 million colors.
+
+=over 4
 
 =item B_BLACK          = Black
 =item B_RED            = Red
@@ -663,26 +679,21 @@ Sets colors to default
 =item BRIGHT B_CYAN    = Bright cyan
 =item BRIGHT B_WHITE   = Bright white
 
+=back
+
 =head2 HORIZONAL RULES
 
-Makes a solid blank line, the full width of the screen with the selected background color
+Makes a solid blank line, the full width of the screen with the selected color
 
-=item HORIZONTAL RULE RED             = A solid line of red background
-=item HORIZONTAL RULE GREEN           = A solid line of green background
-=item HORIZONTAL RULE YELLOW          = A solid line of yellow background
-=item HORIZONTAL RULE BLUE            = A solid line of blue background
-=item HORIZONTAL RULE MAGENTA         = A solid line of magenta background
-=item HORIZONTAL RULE CYAN            = A solid line of cyan background
-=item HORIZONTAL RULE PINK            = A solid line of hot pink background
-=item HORIZONTAL RULE ORANGE          = A solid line of orange background
-=item HORIZONTAL RULE WHITE           = A solid line of white background
-=item HORIZONTAL RULE BRIGHT RED      = A solid line of bright red background
-=item HORIZONTAL RULE BRIGHT GREEN    = A solid line of bright green background
-=item HORIZONTAL RULE BRIGHT YELLOW   = A solid line of bright yellow background
-=item HORIZONTAL RULE BRIGHT BLUE     = A solid line of bright blue background
-=item HORIZONTAL RULE BRIGHT MAGENTA  = A solid line of bright magenta background
-=item HORIZONTAL RULE BRIGHT CYAN     = A solid line of bright cyan background
-=item HORIZONTAL RULE BRIGHT WHITE    = A solid line of bright white background
+For example, for a color of blue, use the following
+
+  [% HORIZONTAL RULE BLUE %]
+
+=over 4
+
+=item HORIZONTAL RULE [color]             = A solid line of [color] background
+
+=back
 
 =head1 AUTHOR & COPYRIGHT
 

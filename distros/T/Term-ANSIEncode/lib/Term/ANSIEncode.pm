@@ -13,22 +13,13 @@ package Term::ANSIEncode;
 #                        All Rights Reserved                          #
 #######################################################################
 # This program is free software: you can redistribute it and/or       #
-# modify it under the terms of the GNU General Public License as      #
-# published by the Free Software Foundation, either version 3 of the  #
-# License, or (at your option) any later version.                     #
-#                                                                     #
-# This program is distributed in the hope that it will be useful, but #
-# WITHOUT ANY WARRANTY; without even the implied warranty of          #
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU   #
-# General Public License for more details.                            #
-#                                                                     #
-# You should have received a copy of the GNU General Public License   #
-# along with this program.  If not, see:                              #
-#                                     <http://www.gnu.org/licenses/>. #
+# modify it under the terms of the Perl Artistic License which can be #
+# viewed here:                                                        #
+#                  http://www.perlfoundation.org/artistic_license_2_0 #
 #######################################################################
 
 use strict;
-use utf8;
+use utf8; # REQUIRED
 use charnames();
 use constant {
     TRUE  => 1,
@@ -48,9 +39,10 @@ binmode(STDOUT, ":encoding(UTF-8)");
 binmode(STDIN,  ":encoding(UTF-8)");
 
 BEGIN {
-    our $VERSION = '1.33';
+    our $VERSION = '1.34';
 }
 
+# Returns a description of a token using the meta data.
 sub ansi_description {
 	my $self = shift;
 	my $code = shift;
@@ -63,65 +55,65 @@ sub ansi_decode {
     my $self = shift;
     my $text = shift;
 
-    if (length($text) > 1) {
+    if (length($text) > 1) { # Special token handling requiring "smarts"
         my $csi = $self->{'ansi_sequences'}->{'CSI'};
-        while ($text =~ /\[\%\s+LOCATE (\d+),(\d+)\s+\%\]/) {
+        while ($text =~ /\[\%\s+LOCATE (\d+),(\d+)\s+\%\]/) { # Sets the cursor to a specific location.
             my ($c, $r) = ($1, $2);
             my $replace = $csi . "$r;$c" . 'H';
             $text =~ s/\[\%\s+LOCATE $c,$r\s+\%\]/$replace/;
         }
-        while ($text =~ /\[\%\s+SCROLL UP (\d+)\s+\%\]/) {
+        while ($text =~ /\[\%\s+HORIZONTAL RULE (.*?)\s+\%\]/) { # Generates a horizontal rule in the specified color
+            my $color = $1;
+            my $new   = '[% RETURN %][% B_' . $color . ' %][% CLEAR LINE %][% RESET %]';
+            $text =~ s/\[\%\s+HORIZONTAL RULE (.*?)\s+\%\]/$new/;
+        }
+        while ($text =~ /\[\%\s+SCROLL UP (\d+)\s+\%\]/) { # Scrolls the screen up the specified number of lines
             my $s       = $1;
             my $replace = $csi . $s . 'S';
             $text =~ s/\[\%\s+SCROLL UP $s\s+\%\]/$replace/;
         }
-        while ($text =~ /\[\%\s+SCROLL DOWN (\d+)\s+\%\]/) {
+        while ($text =~ /\[\%\s+SCROLL DOWN (\d+)\s+\%\]/) { # Scrolls the screen down a specified number of lines
             my $s       = $1;
             my $replace = $csi . $s . 'T';
             $text =~ s/\[\%\s+SCROLL DOWN $s\s+\%\]/$replace/;
         }
-        while ($text =~ /\[\%\s+RGB (\d+),(\d+),(\d+)\s+\%\]/) {
+        while ($text =~ /\[\%\s+RGB (\d+),(\d+),(\d+)\s+\%\]/) { # Sets the foreground color to a specific Red, Green and BLue value
             my ($r, $g, $b) = ($1 & 255, $2 & 255, $3 & 255);
             my $replace = $csi . "38:2:$r:$g:$b" . 'm';
             $text =~ s/\[\%\s+RGB $r,$g,$b\s+\%\]/$replace/;
         }
-        while ($text =~ /\[\%\s+B_RGB (\d+),(\d+),(\d+)\s+\%\]/) {
+        while ($text =~ /\[\%\s+B_RGB (\d+),(\d+),(\d+)\s+\%\]/) { # Sets the background color to a specific Red, Green and BLue value
             my ($r, $g, $b) = ($1 & 255, $2 & 255, $3 & 255);
             my $replace = $csi . "48:2:$r:$g:$b" . 'm';
             $text =~ s/\[\%\s+B_RGB $r,$g,$b\s+\%\]/$replace/;
         }
-        while ($text =~ /\[\%\s+(COLOR|COLOUR) (\d+)\s+\%\]/) {
+        while ($text =~ /\[\%\s+(COLOR|COLOUR) (\d+)\s+\%\]/) { # Sets the foreground color to a 256 color specific.  Use -c to see the codes
             my $n       = $1;
             my $c       = $2 & 255;
             my $replace = $csi . "38:5:$c" . 'm';
             $text =~ s/\[\%\s+$n $c\s+\%\]/$replace/;
         }
-        while ($text =~ /\[\%\s+(B_COLOR|B_COLOUR) (\d+)\s+\%\]/) {
+        while ($text =~ /\[\%\s+(B_COLOR|B_COLOUR) (\d+)\s+\%\]/) { # Sets the background color to a 256 color specific.  Use -c to see the codes
             my $n       = $1;
             my $c       = $2 & 255;
             my $replace = $csi . "48:5:$c" . 'm';
             $text =~ s/\[\%\s+$n $c\s+\%\]/$replace/;
         }
-        while ($text =~ /\[\%\s+GREY (\d+)\s+\%\]/) {
+        while ($text =~ /\[\%\s+GREY (\d+)\s+\%\]/) { # Sets the foreground color to a specific shade of grey.  Use -c to see the codes.
             my $g       = $1;
             my $replace = $csi . '38:5:' . (232 + $g) . 'm';
             $text =~ s/\[\%\s+GREY $g\s+\%\]/$replace/;
         }
-        while ($text =~ /\[\%\s+B_GREY (\d+)\s+\%\]/) {
+        while ($text =~ /\[\%\s+B_GREY (\d+)\s+\%\]/) { # Sets the background color to a specific shade of grey.  Use -c to see the codes.
             my $g       = $1;
             my $replace = $csi . '48:5:' . (232 + $g) . 'm';
             $text =~ s/\[\%\s+B_GREY $g\s+\%\]/$replace/;
         }
-        while ($text =~ /\[\%\s+BOX (.*?),(\d+),(\d+),(\d+),(\d+),(.*?)\s+\%\](.*?)\[\%\s+ENDBOX\s+\%\]/i) {
+        while ($text =~ /\[\%\s+BOX (.*?),(\d+),(\d+),(\d+),(\d+),(.*?)\s+\%\](.*?)\[\%\s+ENDBOX\s+\%\]/i) { # Parses the BOX token.
             my $replace = $self->box($1, $2, $3, $4, $5, $6, $7);
             $text =~ s/\[\%\s+BOX.*?\%\].*?\[\%\s+ENDBOX.*?\%\]/$replace/;
         }
-        while ($text =~ /\[\%\s+HORIZONTAL RULE (.*?)\s+\%\]/) {
-            my $color = $1;
-            my $new   = '[% RETURN %][% B_' . $color . ' %][% CLEAR LINE %][% RESET %]';
-            $text =~ s/\[\%\s+HORIZONTAL RULE (.*?)\s+\%\]/$new/;
-        }
-		while ($text =~ /\[\%\s+(.*?)\s+\%\]/ && (exists($self->{'ansi_sequences'}->{$1}) || defined(charnames::string_vianame($1)))) {
+		while ($text =~ /\[\%\s+(.*?)\s+\%\]/ && (exists($self->{'ansi_sequences'}->{$1}) || defined(charnames::string_vianame($1)))) { # Parse the rest of the tokens
 			my $string = $1;
 			if (exists($self->{'ansi_sequences'}->{$string})) {
 				$text =~ s/\[\%\s+$string\s+\%\]/$self->{'ansi_sequences'}->{$string}/gsi;
@@ -140,11 +132,12 @@ sub ansi_output {
     my $text = shift;
 
     $text = $self->ansi_decode($text);
-    $text =~ s/\[ \% TOKEN \% \]/\[\% TOKEN \%\]/;
+    $text =~ s/\[ \% TOKEN \% \]/\[\% TOKEN \%\]/; # Special token to show [% TOKEN %] on output
     print $text;
     return (TRUE);
 } ## end sub ansi_output
 
+# Draws a box with text in it.
 sub box {
     my $self   = shift;
     my $color  = '[% ' . shift . ' %]';
@@ -246,6 +239,7 @@ sub box {
         $vl  = '⏹';
         $vr  = '⏹';
     } ## end elsif ($type =~ /SQUARE/i)
+
     my $text = '';
     my $xx   = $x;
     my $yy   = $y;
@@ -1707,132 +1701,225 @@ __END__
 
 =head1 NAME
 
-ANSI Encode
+Term::ANSIEncode
 
 =head1 SYNOPSIS
 
-A markup language to generate basic ANSI text
-This module is for use with the executable file
+A markup language to generate basic ANSI text.  A terminal that supports UTF-8 is required if you wish to have special characters, both graphical and international.
 
 =head1 USAGE
 
- my $obj = Term::ANSIEncode->new();
- $obj->output($string); # $string contains the markup to be converted and sent to STDOUT.
+ my $ansi = Term::ANSIEncode->new;
 
-See the manual for "ansi-encode" to use a script to load a file directly.
+ my $string = '[% CLS %]Some markup encoded string';
+
+ $ansi->ansi_output($string);
 
 =head1 TOKENS
 
 =head2 GENERAL
 
- RETURN     = ASCII RETURN (13)
- LINEFEED   = ASCII LINEFEED (10)
- NEWLINE    = RETURN + LINEFEED (13 + 10)
- CLEAR      = Places cursor at top left, screen cleared
- CLS        = Same as CLEAR
- CLEAR LINE = Clear to the end of line
- CLEAR DOWN = Clear down from current cursor position
- CLEAR UP   = Clear up from current cursor position
- RESET      = Reset all colors and attributes
+=over 4
+
+=item B<[% RETURN %]>
+
+ASCII RETURN (13)
+
+=item B<[% LINEFEED %]>
+
+ASCII LINEFEED (10)
+
+=item B<[% NEWLINE %]>
+
+RETURN + LINEFEED (13 + 10)
+
+=item B<[% CLS %]>
+
+Places cursor at top left, screen cleared
+
+=item B<[% CLEAR %]>
+
+Clear screen only, cursor remains where it was
+
+=item B<[% CLEAR LINE %]>
+
+Clear to the end of line
+
+=item B<[% CLEAR DOWN %]>
+
+Clear down from current cursor position
+
+=item B<[% CLEAR UP %]>
+
+Clear up from current cursor position
+
+=item B<[% RESET %]>
+
+Reset all colors and attributes
 
 =head2 CURSOR
 
- HOME        = Moves the cursor home to location 1,1.
- UP          = Moves cursor up one step
- DOWN        = Moves cursor down one step
- RIGHT       = Moves cursor right one step
- LEFT        = Moves cursor left one step
- SAVE        = Save cursor position
- RESTORE     = Place cursor at saved position
- BOLD        = Bold text (not all terminals support this)
- FAINT       = Faded text (not all terminals support this)
- ITALIC      = Italicized text (not all terminals support this)
- UNDERLINE   = Underlined text
- SLOW BLINK  = Slow cursor blink
- RAPID BLINK = Rapid cursor blink
- LOCATE      = Set cursor position
+=item B<[% HOME %]>
+
+Moves the cursor to the location 1,1.
+
+=item B<[% UP %]>
+
+Moves cursor up one step
+
+=item B<[% DOWN %]>
+
+Moves cursor down one step
+
+=item B<[% RIGHT %]>
+
+Moves cursor right one step
+
+=item B<[% LEFT %]>
+
+Moves cursor left one step
+
+=item B<[% SAVE %]>
+
+Save cursor position
+
+=item B<[% RESTORE %]>
+
+Place cursor at saved position
+
+=item B<[% BOLD %]>
+
+Bold text (not all terminals support this)
+
+=item B<[% FAINT %]>
+
+Faded text (not all terminals support this)
+
+=item B<[% ITALIC %]>
+
+Italicized text (not all terminals support this)
+
+=item B<[% UNDERLINE %]>
+
+Underlined text
+
+=item B<[% SLOW BLINK %]>
+
+Slow cursor blink
+
+=item B<[% RAPID BLINK %]>
+
+Rapid cursor blink
+
+=item B<[% LOCATE column,row %]>
+
+Set cursor position
 
 =head2 ATTRIBUTES
 
- INVERT       = Invert text (flip background and foreground attributes)
- REVERSE      = Reverse
- CROSSED OUT  = Crossed out
- DEFAULT FONT = Default font
+=item B<[% INVERT %]>
+
+Invert text (flip background and foreground attributes)
+
+=item B<[% REVERSE %]>
+
+Reverse
+
+=item B<[% CROSSED OUT %]>
+
+Crossed out
+
+=item B<{% DEFAULT FONT %]>
+
+Default font
 
 =head2 FRAMES
 
- BOX & ENDBOX = Draw a frame
+=item B<[% BOX color,x,y,width,height,type %]> text here B<[% ENDBOX %]>
+
+Draw a frame around text
+
+Types = THIN, ROUND, THICK, BLOCK, WEDGE, DOTS, DIAMOND, STAR, SQUARE
 
 =head2 COLORS
 
- NORMAL = Sets colors to default
+=item B<[% NORMAL %]>
+
+Sets colors to default
+
+=back
 
 =head2 FOREGROUND
 
- BLACK          = Black
- RED            = Red
- PINK           = Hot pink
- ORANGE         = Orange
- NAVY           = Deep blue
- GREEN          = Green
- YELLOW         = Yellow
- BLUE           = Blue
- MAGENTA        = Magenta
- CYAN           = Cyan
- WHITE          = White
- DEFAULT        = Default foreground color
- BRIGHT BLACK   = Bright black (dim grey)
- BRIGHT RED     = Bright red
- BRIGHT GREEN   = Lime
- BRIGHT YELLOW  = Bright Yellow
- BRIGHT BLUE    = Bright blue
- BRIGHT MAGENTA = Bright magenta
- BRIGHT CYAN    = Bright cyan
- BRIGHT WHITE   = Bright white
+There are many more foreground colors available than the ones below.  However, the ones below should work on any color terminal.  Other colors may requite 256 and 16 million color support.  Most Linux X-Windows and Wayland terminal software should support the extra colors.  Some Windows terminal software should have "Term256" features.  You can used the "-t" option for all of the color tokens available or use the "RGB" token for access to 16 million colors.
+
+=over 4
+
+=item BLACK          = Black
+=item RED            = Red
+=item PINK           = Hot pink
+=item ORANGE         = Orange
+=item NAVY           = Deep blue
+=item GREEN          = Green
+=item YELLOW         = Yellow
+=item BLUE           = Blue
+=item MAGENTA        = Magenta
+=item CYAN           = Cyan
+=item WHITE          = White
+=item DEFAULT        = Default foreground color
+=item BRIGHT BLACK   = Bright black (dim grey)
+=item BRIGHT RED     = Bright red
+=item BRIGHT GREEN   = Lime
+=item BRIGHT YELLOW  = Bright Yellow
+=item BRIGHT BLUE    = Bright blue
+=item BRIGHT MAGENTA = Bright magenta
+=item BRIGHT CYAN    = Bright cyan
+=item BRIGHT WHITE   = Bright white
+
+=back
 
 =head2 BACKGROUND
 
- B_BLACK          = Black
- B_RED            = Red
- B_GREEN          = Green
- B_YELLOW         = Yellow
- B_BLUE           = Blue
- B_MAGENTA        = Magenta
- B_CYAN           = Cyan
- B_WHITE          = White
- B_DEFAULT        = Default background color
- B_PINK           = Hot pink
- B_ORANGE         = Orange
- B_NAVY           = Deep blue
- B_BRIGHT BLACK   = Bright black (grey)
- B_BRIGHT RED     = Bright red
- B_BRIGHT GREEN   = Lime
- B_BRIGHT YELLOW  = Bright yellow
- B_BRIGHT BLUE    = Bright blue
- B_BRIGHT MAGENTA = Bright magenta
- B_BRIGHT CYAN    = Bright cyan
- B_BRIGHT WHITE   = Bright white
+There are many more background colors available than the ones below.  However, the ones below should work on any color terminal.  Other colors may requite 256 and 16 million color support.  Most Linux X-Windows and Wayland terminal software should support the extra colors.  Some Windows terminal software should have "Term256" features.  You can used the "-t" option for all of the color tokens available or use the "B_RGB" token for access to 16 million colors.
+
+=over 4
+
+=item B_BLACK          = Black
+=item B_RED            = Red
+=item B_GREEN          = Green
+=item B_YELLOW         = Yellow
+=item B_BLUE           = Blue
+=item B_MAGENTA        = Magenta
+=item B_CYAN           = Cyan
+=item B_WHITE          = White
+=item B_DEFAULT        = Default background color
+=item B_PINK           = Hot pink
+=item B_ORANGE         = Orange
+=item B_NAVY           = Deep blue
+=item BRIGHT B_BLACK   = Bright black (grey)
+=item BRIGHT B_RED     = Bright red
+=item BRIGHT B_GREEN   = Lime
+=item BRIGHT B_YELLOW  = Bright yellow
+=item BRIGHT B_BLUE    = Bright blue
+=item BRIGHT B_MAGENTA = Bright magenta
+=item BRIGHT B_CYAN    = Bright cyan
+=item BRIGHT B_WHITE   = Bright white
+
+=back
 
 =head2 HORIZONAL RULES
 
-Makes a solid blank line, the full width of the screen with the selected background color
+Makes a solid blank line, the full width of the screen with the selected color
 
- HORIZONTAL RULE RED             = A solid line of red background
- HORIZONTAL RULE GREEN           = A solid line of green background
- HORIZONTAL RULE YELLOW          = A solid line of yellow background
- HORIZONTAL RULE BLUE            = A solid line of blue background
- HORIZONTAL RULE MAGENTA         = A solid line of magenta background
- HORIZONTAL RULE CYAN            = A solid line of cyan background
- HORIZONTAL RULE PINK            = A solid line of hot pink background
- HORIZONTAL RULE ORANGE          = A solid line of orange background
- HORIZONTAL RULE WHITE           = A solid line of white background
- HORIZONTAL RULE BRIGHT RED      = A solid line of bright red background
- HORIZONTAL RULE BRIGHT GREEN    = A solid line of bright green background
- HORIZONTAL RULE BRIGHT YELLOW   = A solid line of bright yellow background
- HORIZONTAL RULE BRIGHT BLUE     = A solid line of bright blue background
- HORIZONTAL RULE BRIGHT MAGENTA  = A solid line of bright magenta background
- HORIZONTAL RULE BRIGHT CYAN     = A solid line of bright cyan background
- HORIZONTAL RULE BRIGHT WHITE    = A solid line of bright white background
+For example, for a color of blue, use the following
+
+  [% HORIZONTAL RULE BLUE %]
+
+=over 4
+
+=item HORIZONTAL RULE [color]             = A solid line of [color] background
+
+=back
 
 =head1 AUTHOR & COPYRIGHT
 

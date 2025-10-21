@@ -1,3 +1,8 @@
+0.15 2025-10-21T00:17:01+02:00
+ - Add 'series_ordinal_raw' parameter.
+ - Add check for strict 'series_ordinal' parameter.
+ - Improve comments.
+
 0.14 2025-08-02T23:52:22+02:00
  - Move check_array* to Mo::utils::Array.
  - Rewrite to use of List::Util.

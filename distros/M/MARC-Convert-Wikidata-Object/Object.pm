@@ -12,7 +12,7 @@ use Readonly;
 
 Readonly::Array our @COVERS => qw(hardback paperback);
 
-our $VERSION = 0.14;
+our $VERSION = 0.15;
 
 has authors => (
 	default => [],
@@ -163,24 +163,24 @@ sub full_name {
 sub BUILD {
 	my $self = shift;
 
-	# Check authors.
+	# Check 'authors'.
 	check_array_object($self, 'authors', 'MARC::Convert::Wikidata::Object::People');
 
-	# Check authors of introduction.
+	# Check 'authors_of_introduction'.
 	check_array_object($self, 'authors_of_afterword', 'MARC::Convert::Wikidata::Object::People');
 
-	# Check authors of introduction.
+	# Check 'authors_of_introduction'.
 	check_array_object($self, 'authors_of_introduction', 'MARC::Convert::Wikidata::Object::People');
 
-	# Check compilers.
+	# Check 'compilers'.
 	check_array_object($self, 'compilers', 'MARC::Convert::Wikidata::Object::People');
 
-	# Check cover.
+	# Check 'cover'.
 	if (defined $self->{'cover'} && none { $_ eq $self->{'cover'} } @COVERS) {
 		err "Book cover '".$self->{'cover'}."' doesn't exist.";
 	}
 
-	# Check covers.
+	# Check 'covers'.
 	# XXX Common check.
 	foreach my $cover (@{$self->covers}) {
 		if (! defined $cover && none { $_ eq $cover } @COVERS) {
@@ -188,58 +188,58 @@ sub BUILD {
 		}
 	}
 
-	# Check cycles.
+	# Check 'cycles'.
 	check_array_object($self, 'cycles', 'MARC::Convert::Wikidata::Object::Series');
 
-	# Check directors.
+	# Check 'directors'.
 	check_array_object($self, 'directors', 'MARC::Convert::Wikidata::Object::People');
 
-	# Check dml id
+	# Check 'dml',
 	check_number($self, 'dml');
 
-	# Check edition_of_work.
+	# Check 'edition_of_work'.
 	check_isa($self, 'edition_of_work', 'MARC::Convert::Wikidata::Object::Work');
 
-	# Check editors.
+	# Check 'editors'.
 	check_array_object($self, 'editors', 'MARC::Convert::Wikidata::Object::People');
 
-	# Check end_time.
+	# Check 'end_time'.
 	check_number($self, 'end_time');
 
-	# Check external_ids.
+	# Check 'external_ids'.
 	check_array_object($self, 'external_ids', 'MARC::Convert::Wikidata::Object::ExternalId');
 
-	# Check illustrators.
+	# Check 'illustrators'.
 	check_array_object($self, 'illustrators', 'MARC::Convert::Wikidata::Object::People');
 
-	# Check isbns.
+	# Check 'isbns'.
 	check_array_object($self, 'isbns', 'MARC::Convert::Wikidata::Object::ISBN');
 
-	# Check languages.
+	# Check 'languages'.
 	check_array($self, 'languages');
 
-	# Check Kramerius systems.
+	# Check 'krameriues'.
 	check_array_object($self, 'krameriuses', 'MARC::Convert::Wikidata::Object::Kramerius');
 
-	# Check narrators.
+	# Check 'narrators'.
 	check_array_object($self, 'narrators', 'MARC::Convert::Wikidata::Object::People');
 
-	# Check photographers.
+	# Check 'photographers'.
 	check_array_object($self, 'photographers', 'MARC::Convert::Wikidata::Object::People');
 
-	# Check list of publishers.
+	# Check 'publishers'.
 	check_array_object($self, 'publishers', 'MARC::Convert::Wikidata::Object::Publisher');
 
-	# Check series.
+	# Check 'series'.
 	check_array_object($self, 'series', 'MARC::Convert::Wikidata::Object::Series');
 
-	# Check start_time.
+	# Check 'start_time'.
 	check_number($self, 'start_time');
 
-	# Check series.
+	# Check 'subtitles'.
 	check_array($self, 'subtitles');
 
-	# Check translators.
+	# Check 'translators'.
 	check_array_object($self, 'translators',
 		'MARC::Convert::Wikidata::Object::People', 'Translator');
 
@@ -932,6 +932,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.14
+0.15
 
 =cut

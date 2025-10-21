@@ -67,7 +67,7 @@
          "web" : "https://github.com/ingydotnet/yamlscript"
       }
    },
-   "version" : "0.2.4",
+   "version" : "0.2.7",
    "x_alienfile" : {
       "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.32",
       "requires" : {

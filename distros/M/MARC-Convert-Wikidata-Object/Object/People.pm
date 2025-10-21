@@ -7,7 +7,7 @@ use Mo qw(build default is);
 use Mo::utils::Array qw(check_array_object);
 use Mo::utils::Date 0.04 qw(check_date check_date_order);
 
-our $VERSION = 0.14;
+our $VERSION = 0.15;
 
 has date_of_birth => (
 	is => 'ro',
@@ -55,16 +55,25 @@ sub full_name {
 sub BUILD {
 	my $self = shift;
 
+	# Check 'date_of_birth'.
 	check_date($self, 'date_of_birth');
+
+	# Check 'date_of_death'.
 	check_date($self, 'date_of_death');
 
+	# Check date order.
 	check_date_order($self, 'date_of_birth', 'date_of_death');
 
+	# Check 'external_ids'.
 	check_array_object($self, 'external_ids', 'MARC::Convert::Wikidata::Object::ExternalId');
 
+	# Check 'work_period_start'.
 	check_date($self, 'work_period_start');
+
+	# Check 'work_period_end'.
 	check_date($self, 'work_period_end');
 
+	# Check date workd date order.
 	check_date_order($self, 'work_period_start', 'work_period_end');
 
 	return;
@@ -310,6 +319,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.14
+0.15
 
 =cut

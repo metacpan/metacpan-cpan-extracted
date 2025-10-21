@@ -1,0 +1,79 @@
+# NAME
+
+Crypt::Fernet - Perl extension for Fernet (symmetric encryption) 
+
+# SYNOPSIS
+
+    use Crypt::Fernet;
+
+    my $key = Crypt::Fernet::generate_key();
+    my $plaintext = 'This is a test';
+    my $token = Crypt::Fernet::encrypt($key, $plaintext);
+    my $verify = Crypt::Fernet::verify($key, $token);
+    my $decrypttext = Crypt::Fernet::decrypt($key, $token);
+
+    my $old_key = 'cJ3Fw3ehXqef-Vqi-U8YDcJtz8Gv-ZHyxultoAGHi4c=';
+    my $old_token = 'gAAAAABT8bVcdaked9SPOkuQ77KsfkcoG9GvuU4SVWuMa3ewrxpQdreLdCT6cc7rdqkavhyLgqZC41dW2vwZJAHLYllwBmjgdQ==';
+
+    my $ttl = 10;
+    my $old_verify = Crypt::Fernet::verify($old_key, $old_token, $ttl);
+    my $old_decrypttext = Crypt::Fernet::decrypt($old_key, $old_token, $ttl);
+
+    my $ttl_verify = Crypt::Fernet::verify($key, $token, $ttl);
+    my $ttl_decrypttext = Crypt::Fernet::decrypt($key, $token, $ttl);
+
+# DESCRIPTION
+
+Fernet provides guarantees that a message encrypted using it cannot be manipulated or read without the key. Fernet is an implementation of symmetric (also known as "secret key") authenticated cryptography.
+This is the Perl Implementation
+
+More Detail:
+   https://github.com/fernet/spec/blob/master/Spec.md
+
+## EXPORT
+
+None by default.
+
+# SEE ALSO
+
+More Detail on the Fernet Spec:
+   https://github.com/fernet/spec/blob/master/Spec.md
+
+Source of this project:
+   https://github.com/wanleung/Crypt-Fernet
+
+# DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    use Crypt::CBC;
+    use Digest::SHA qw(hmac_sha256);
+    use MIME::Base64::URLSafe;
+
+# AUTHOR
+
+Wan Leung Wong, <me@wanleung.com>
+
+# COPYRIGHT AND LICENSE
+
+The MIT License (MIT)
+
+Copyright (C) 2014 LinkOmnia Ltd (Wan Leung Wong wanleung@linkomnia.com)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

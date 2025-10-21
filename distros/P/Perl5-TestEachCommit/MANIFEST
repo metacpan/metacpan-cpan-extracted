@@ -12,5 +12,6 @@ t/02-util.t
 t/03-prepare-repository.t
 Todo
 xt/101-examine-all-commits.t
+xt/102-miniperl-examine-all-commits.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

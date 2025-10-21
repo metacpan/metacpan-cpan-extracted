@@ -19,7 +19,7 @@ use Carp;
 use Math::BigInt lib => 'GMP';
 use URI;
 
-our $VERSION = v0.19;
+our $VERSION = v0.20;
 
 use constant {
     RE_UUID => qr/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/,
@@ -591,6 +591,8 @@ sub as {
         my $type_uuid = $as->uuid;
         my $next_type;
 
+        return $self->id if $self->type->eq($as);
+
         foreach my $test (qw(uuid oid uri sid)) {
             if ($as == $well_known{$test}) {
                 $next_type = $test;
@@ -917,7 +919,7 @@ Data::Identifier - format independent identifier object
 
 =head1 VERSION
 
-version v0.19
+version v0.20
 
 =head1 SYNOPSIS
 

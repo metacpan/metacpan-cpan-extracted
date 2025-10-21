@@ -6,10 +6,11 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   Test::More: '1.302162'
   Test::Pod: '1.52'
+  open: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,17 +21,17 @@ no_index:
     - t
     - inc
 requires:
-  Regexp::Common: '2017060201'
+  Regexp::Common: '2024080801'
   Regexp::Common::Email::Address: '1.01'
-  Regexp::Common::URI: '2017060201'
-  URI::tel: v0.800.1
+  Regexp::Common::URI: '2024080801'
+  URI::tel: v0.801.1
   parent: '0'
   perl: '5.030000'
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://git.deguest.jp/jack/Regexp-Common-Markdown/issues
+  bugtracker: https://gitlab.com/jackdeguest/Regexp-Common-Markdown/issues
   license: http://dev.perl.org/licenses/
-  repository: https://git.deguest.jp/jack/Regexp-Common-Markdown
-version: v0.1.5
+  repository: https://gitlab.com/jackdeguest/Regexp-Common-Markdown
+version: v0.1.7
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

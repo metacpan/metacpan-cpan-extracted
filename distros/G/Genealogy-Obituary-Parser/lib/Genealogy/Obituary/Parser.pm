@@ -3,10 +3,10 @@ package Genealogy::Obituary::Parser;
 use strict;
 use warnings;
 
+use Carp;
 use DateTime::Format::Text;
 use Exporter 'import';
-use Geo::Coder::Free;
-use Geo::Coder::List;
+use JSON::MaybeXS;
 use Params::Get 0.13;
 use Return::Set 0.03;
 use Params::Validate::Strict;
@@ -24,15 +24,15 @@ Genealogy::Obituary::Parser - Extract structured family relationships from obitu
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 SYNOPSIS
 
-  use Genealogy::Obituary::Parse qw(parse_obituary);
+  use Genealogy::Obituary::Parser qw(parse_obituary);
 
   my $text = 'She is survived by her husband Paul, daughters Anna and Lucy, and grandchildren Jake and Emma.';
   my $data = parse_obituary($text);
@@ -59,6 +59,7 @@ with each family member's data organized into distinct categories such as childr
 
 Takes a string, or a ref to a string.
 
+
 =head3 API SPECIFICATION
 
 =head4 INPUT
@@ -68,6 +69,10 @@ Takes a string, or a ref to a string.
       'type' => 'string',	# or stringref
       'min' => 1,
       'max' => 10000
+    }, 'geocoder' => {	# used to geocode locations to verify they exist
+      'type' => 'object',
+      'can' => 'geocode',
+      'optional' => 1,
     }
   }
 
@@ -96,10 +101,21 @@ sub parse_obituary
 				'type' => 'string',
 				'min' => 1,
 				'max' => 10000
+			}, 'geocoder' => {
+				'type' => 'object',
+				'can' => 'geocode',
+				'optional' => 1,
 			}
 		}
 	});
+
 	my $text = $params->{'text'};
+
+	if(my $geo = $params->{'geocoder'}) {
+		$geocoder = $geo;
+	}
+
+	Carp::croak(__PACKAGE__, ': Usage: parse_obituary($text)') unless defined($text);
 
 	if(ref($text) eq 'SCALAR') {
 		$text = ${$text};
@@ -251,6 +267,25 @@ sub parse_obituary
 		}
 		$family{children} = \@children if @children;
 		$family{grandchildren} = \@grandchildren if @grandchildren;
+	} elsif($text =~ /Surviving are (?:a )?daughters?,\s*Mrs\.\s+(\w+)\s+\(([^)]+)\)\s+(\w+),\s+([^;]+?);/i) {
+		# Handle "Surviving are a daughter, Mrs. Walter (Ruth Ann) Gerke, Fort Wayne"
+		my @children;
+		my $spouse_first = $1;
+		my $daughter_name = $2;
+		my $spouse_last = $3;
+		my $location = $4;
+		$location =~ s/,\s*$//;
+		
+		push @children, {
+			name => $daughter_name,
+			location => $location,
+			sex => 'F',
+			spouse => { 
+				name => "$spouse_first $spouse_last", 
+				sex => 'M' 
+			}
+		};
+		$family{children} = \@children;
 	} else {
 		my @children;
 
@@ -414,6 +449,7 @@ sub parse_obituary
 			if($name) {
 				push @{$family{sisters}}, {
 					name => $name,
+					sex => 'F',
 					status => ($text =~ /\bpredeceased by.*?$name/i) ? 'deceased' : 'living',
 				};
 			}
@@ -450,6 +486,17 @@ sub parse_obituary
 				}
 			}
 		}
+
+		if($family{'sisters'}) {
+			# Deduplicate by serializing hashes for comparison
+			my %seen;
+			my @sisters = grep { 
+				my $key = JSON::MaybeXS->new->canonical(1)->encode($_);
+				!$seen{$key}++
+			} @{$family{sisters}};
+
+			$family{sisters} = \@sisters;
+		}
 	}
 
 	if($text =~ /predeceased by (his|her) brothers?\s*([^;\.]+);?/i) {
@@ -458,8 +505,6 @@ sub parse_obituary
 		$family{brothers} = extract_people_section($brothers_text);
 		# TODO: mark all statuses to deceased
 	} else {
-		my @siblings;
-
 		while ($text =~ /\bbrother,\s*([A-Z][a-z]+(?:\s+[A-Z][a-z.]+)*)(?:,\s*([A-Z][a-z]+))?/g) {
 			$family{'brothers'} ||= [];
 			push @{$family{brothers}}, {
@@ -512,6 +557,27 @@ sub parse_obituary
 				}
 			}
 		}
+	}
+
+	if(!exists($family{'brothers'}) && $text =~ /\b(?:two|three|four)\s+brothers?,\s*(.+?)(?:,\s*a\s+(?:sister|half-sister)|;)/i) {
+		# Pattern for "two brothers, Name and Name"
+		my $brothers_text = $1;
+		my @brothers;
+		
+		# Handle "Charles F. Harris and Berton Harris"
+		if($brothers_text =~ /\band\b/) {
+			my @names = split /\s+and\s+/, $brothers_text;
+			foreach my $name (@names) {
+				$name =~ s/^\s+|\s+$//g;
+				$name =~ s/,\s*$//;
+				push @brothers, {
+					name => $name,
+					sex => 'M',
+					status => 'living'
+				};
+			}
+		}
+		$family{brothers} = \@brothers if(scalar @brothers);
 	}
 
 	# Detect nieces/nephews
@@ -746,7 +812,15 @@ sub _extract_date
 sub _extract_location {
 	my $place_text = shift;
 
-	$geocoder ||= Geo::Coder::List->new()->push(Geo::Coder::Free->new());
+	unless($geocoder) {
+		eval { require Geo::Coder::Free };
+		if($@) {
+			Carp::carp(__PACKAGE__, ' (', __LINE__, "): geocoding locations disabled: $@");
+			return;
+		}
+		$geocoder = Geo::Coder::Free->new();
+	}
+
 	my @locations = $geocoder->geocode(location => $place_text);	# Use array to improve caching
 
 	return unless scalar(@locations);

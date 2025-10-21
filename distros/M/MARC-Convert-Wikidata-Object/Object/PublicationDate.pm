@@ -12,7 +12,7 @@ use Readonly;
 Readonly::Array our @SOURCING_CIRCUMSTANCES => qw(circa near presumably disputed);
 Readonly::Array our @PRECISION => qw(day month year decade century millenium);
 
-our $VERSION = 0.14;
+our $VERSION = 0.15;
 
 has copyright => (
 	is => 'ro',
@@ -63,26 +63,34 @@ sub BUILD {
 	_check_conflict($self, 'precision', 'earliest_date');
 	_check_conflict($self, 'precision', 'latest_date');
 
+	# Check 'copyright'.
 	if (! defined $self->{'copyright'}) {
 		$self->{'copyright'} = 0;
 	}
 	check_bool($self, 'copyright');
 
+	# Check 'date'.
 	check_date($self, 'date');
 
+	# Check 'earliest_date'.
 	check_date($self, 'earliest_date');
 
+	# Check 'end_time'.
 	check_date($self, 'end_time');
 
+	# Check 'latest_date'.
 	check_date($self, 'latest_date');
 
+	# Check 'precision'.
 	if (! defined $self->{'precision'} && defined $self->{'date'}) {
 		$self->{'precision'} = 'day';
 	}
 	check_strings($self, 'precision', \@PRECISION);
 
+	# Check 'sourcing_circumstances'.
 	check_strings($self, 'sourcing_circumstances', \@SOURCING_CIRCUMSTANCES);
 
+	# Check 'start_time'.
 	check_date($self, 'start_time');
 
 	return;
@@ -594,6 +602,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.14
+0.15
 
 =cut

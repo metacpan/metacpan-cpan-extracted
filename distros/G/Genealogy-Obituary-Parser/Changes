@@ -1,5 +1,13 @@
 Revision history for Genealogy::Obituary::Parser
 
+0.04	Mon Oct 20 20:32:42 EDT 2025
+	Fix version consistency
+	Latest test dashboard
+	Improved parsing of sisters and brothers
+	Added fuzz testing
+	Allow a geocoder to be passed in
+	No need for Geo::Coder::List
+
 0.03	Fri Sep 19 07:40:27 EDT 2025
 	Allow a ref to the string to be passed in
 	Support lack of space after "sons,"

@@ -7,7 +7,7 @@ use File::Spec::Unix;
 use Getopt::Long;
 use locale; # make \w work right in non-ASCII lands
 
-our $VERSION = 0.05; # Please keep in synch with lib/Perl5/TestEachCommit.pm
+our $VERSION = 0.06; # Please keep in synch with lib/Perl5/TestEachCommit.pm
 $VERSION = eval $VERSION;
 our @EXPORT_OK = qw( process_command_line );
 
@@ -19,9 +19,12 @@ Perl5::TestEachCommit::Util - helper functions for Perl5::TestEachCommit
 
 =head2 C<process_command_line()>
 
-Process command-line switches (options).  Returns a reference to a hash.  Will
-provide usage message if C<--help> switch is present or if parameters are
-invalid.
+Process command-line switches (options).  Returns a reference to a hash.
+
+B<Note:> This function is little more than a wrapper around
+C<Getopt::Long::GetOptions()>.  As such, it performs no evaluation of any
+interactions among the various command-line switches.  That evaluation is
+deferred until C<Perl5::TestEachCommit::new() is called.
 
 =cut
 
@@ -38,6 +41,8 @@ sub process_command_line {
         make_test_harness_command
         skip_test_harness
         verbose
+        make_minitest_prep_command
+        make_minitest_command
     | );
 
     my $result = GetOptions(
@@ -50,6 +55,8 @@ sub process_command_line {
         "make_test_harness_command=s" =>     \$opts{make_test_harness_command},
         "skip_test_harness" =>     \$opts{skip_test_harness},
         "verbose" =>     \$opts{verbose},
+        "make_minitest_prep_command=s" =>     \$opts{make_minitest_prep_command},
+        "make_minitest_command=s" =>     \$opts{make_minitest_command},
     ) or croak "Error in command line arguments";
 
     return \%opts;

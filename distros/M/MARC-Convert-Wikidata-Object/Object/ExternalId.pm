@@ -9,7 +9,7 @@ use Readonly;
 
 Readonly::Array our @NAMES => qw(cnb lccn nkcr_aut);
 
-our $VERSION = 0.14;
+our $VERSION = 0.15;
 
 has deprecated => (
 	is => 'ro',
@@ -26,14 +26,17 @@ has value => (
 sub BUILD {
 	my $self = shift;
 
+	# Check 'deprecated'.
 	if (! $self->{'deprecated'}) {
 		$self->{'deprecated'} = 0;
 	}
 	check_bool($self, 'deprecated');
 
+	# Check 'name'.
 	check_required($self, 'name');
 	check_strings($self, 'name', \@NAMES);
 
+	# Check 'value'.
 	check_required($self, 'value');
 
 	return;
@@ -216,6 +219,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.14
+0.15
 
 =cut

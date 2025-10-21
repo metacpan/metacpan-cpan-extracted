@@ -1,4 +1,58 @@
-1.132 2025-09-21
+1.132 2025-10-20
+================
+
+[Quiq::DirHandle]
+* Doku ergänzt
+
+[Quiq::Eog]
+* moveToEnd(): Methode hinzugefügt
+
+[Quiq::FileHandle]
+* captureStderr(): verbessert
+
+[Quiq::Hash]
+* validate() in validateKeys() umbenannt
+
+[Quiq::Logger]
+* write(): Meldung verbessert
+
+[Quiq::Mustang]
+* validate(): verbessert
+* getResult(): verbessert
+* visualize(): verbessert
+
+[Quiq::Option]
+* Exception-Text verbessert
+
+[Quiq::Path]
+* copy(): Option -log hinzugefügt
+* copyToDir(): Option -log hinzugefügt
+
+[Quiq::StreamServe::Block]
+* concat(): Methode hinzugefügt
+* getFirst(): Methode hinzugefügt
+
+[Quiq::StreamServe::Stream]
+* numberOfStreams(): Methode hinzugefügt
+
+[Quiq::String]
+* concat(): Methode hinzugefügt
+
+[Quiq::Zugferd]
+* resolvePlaceholders(): Debugmeldungen verbessert
+* en16931/template.xml: Business Terms ergänzt
+* business-term.csv: Ergänzug vorgenommen
+
+[Quiq::Zugferd_::Entity::Kaeufer]
+* Attribute auftragsreferenz, umsatzsteuerId hinzugefügt
+
+[Quiq::Zugferd_::Entity::Rechnung]
+* Attribut bestellnummer entfernt
+
+[Quiq::Zugferd_::Entity::Verkaeufer]
+* Attribut auftragsreferenz hinzugefügt
+
+1.131 2025-09-21
 ================
 
 [Quiq::StreamServe::Block]
@@ -29,7 +83,7 @@
 [Quiq::Hash]
 * validate(): in validateKeys() umbenannt
 
-[Quiq::LOgger]
+[Quiq::Logger]
 * Kosmetik
 
 [Quiq::Mustang]

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Markdown Parser Only - ~/lib/Markdown/Parser.pm
-## Version v0.4.1
+## Version v0.5.0
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/08/23
-## Modified 2024/09/05
+## Modified 2025/10/21
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -22,18 +22,18 @@ BEGIN
     use CSS::Object;
     use Scalar::Util ();
     our $DEBUG = 0;
-    our $VERSION = 'v0.4.1';
+    our $VERSION = 'v0.5.0';
     # Including vertical space like new lines
     our $ELEMENTS_DICTIONARY =
     {
-    block => [qw( blockquote code_block code_line header html line list paragraph )],
-    inline => [qw( abbr bold code_span emphasis image link_auto line_break link )],
+        block => [qw( blockquote code_block code_line header html line list paragraph )],
+        inline => [qw( abbr bold code_span emphasis image link_auto line_break link )],
     };
     $ELEMENTS_DICTIONARY->{all} = [@{$ELEMENTS_DICTIONARY->{block}}, @{$ELEMENTS_DICTIONARY->{inline}}];
     our $ELEMENTS_DICTIONARY_EXTENDED =
     {
-    block => [qw( code_block header katex )],
-    inline => [qw( abbr checkbox footnote insert katex strikethrough superscript subscript )],
+        block => [qw( code_block header katex )],
+        inline => [qw( abbr checkbox footnote insert katex strikethrough superscript subscript )],
     };
     $ELEMENTS_DICTIONARY_EXTENDED->{all} = [@{$ELEMENTS_DICTIONARY_EXTENDED->{block}}, @{$ELEMENTS_DICTIONARY_EXTENDED->{inline}}];
 };
@@ -61,7 +61,7 @@ sub init
     $self->{katex_delimiter}                = ['$$','$$','$','$','\[','\]','\(','\)'];
     $self->{list_level}                     = 0;
     $self->{mode}                           = 'all';
-    ## Top scope as specified by the user
+    # Top scope as specified by the user
     $self->{scope}                          = '';
     $self->{_init_strict_use_sub}           = 1;
     use utf8;
@@ -427,17 +427,23 @@ sub mode
     {
         my $mode = shift( @_ );
         my $curr = $self->_set_get_scalar( 'mode' );
+        my $ref  = $self->new_array( [split( /[[:blank:]]+/, $curr )] );
         if( substr( $mode, 0, 1 ) eq '+' )
         {
-            if( length( $curr ) )
-            {
-                $curr .= ' ' . substr( $mode, 1 );
-            }
-            else
-            {
-                $curr = $mode;
-            }
+            $mode =~ s/^\++//g;
+            $ref->push( $mode );
         }
+        elsif( substr( $mode, 0, 1 ) eq '-' )
+        {
+            $mode =~ s/^\-+//g;
+            $ref->remove( $mode );
+        }
+        else
+        {
+            $ref->push( $mode );
+        }
+        $ref->unique(1);
+        $curr = $ref->join( ' ' )->scalar;
         $self->_set_get_scalar( 'mode', $curr );
     }
     return( $self->_set_get_scalar( 'mode' ) );
@@ -458,7 +464,7 @@ sub parse
     {
         return( $self->error( "Callback set (${cb}) is not a code reference." ) );
     }
-    
+
     unless( $opts->{element} )
     {
         # Standardise the new lines characters
@@ -481,7 +487,8 @@ sub parse
             $data .= ( "\n" x ( 2 - $nth_nl ) );
         }
     }
-    
+
+
     pos( $data ) = 0;
     # all excludes extended markdowns
     my $mode = $self->mode || 'all';
@@ -508,36 +515,43 @@ sub parse
         $top = $doc;
     };
     $self->messagef_colour( 3, "%s %d bytes of data with mode set to '{green}%s{/}' with container being '{green}%s{/}'.", ( $opts->{element} ? "Sub-parsing" : "Parsing" ), length( $data ), $mode, $top->tag_name );
-    
+
     # Previous element added. We store it here to keep track of context
     my $context;
     # pos( $data ) = 0;
     pos( $data ) = $opts->{pos} if( length( $opts->{pos} ) && $opts->{pos} =~ /^\d+$/ );
     $opts->{scope_cond} = 'any';
+    # If the 'scope' option has not been provided, or is not an array
     if( !$self->_is_array( $opts->{scope} ) )
     {
+        # Split the scope option to make it an array, or else split the object 'mode' option
         $opts->{scope} = length( $opts->{scope} ) ? [split( /\s+/, $opts->{scope} )] : [split( /\s+/, $mode )];
     }
-    elsif( $self->_is_array( $opts->{scope} ) && !$self->_to_array_object( $opts->{scope} )->length )
+    # The option 'scope' is an array, but it is empty
+    elsif( $self->_is_array( $opts->{scope} ) &&
+        !$self->_to_array_object( $opts->{scope} )->length )
     {
-        $opts->{scope} = [$mode];
+        $opts->{scope} = $self->_is_empty( $mode ) ? [] : $self->_is_array( $mode ) ? $mode : ["$mode"];
     }
-    
+
     if( length( $opts->{scope} ) && $self->_is_array( $opts->{scope} ) )
     {
         my $scopes = $self->new_array;
         $self->_to_array_object( $opts->{scope} )->foreach(sub
         {
+            # OR
             if( s/\|{1,2}/ /g )
             {
                 $scopes->push( split( /\s+/, $_ ) );
                 $opts->{scope_cond} = 'any';
             }
+            # AND
             elsif( s/(?:\&{1,2}|\+)/ /g )
             {
                 $scopes->push( split( /\s+/, $_ ) );
                 $opts->{scope_cond} = 'all';
             }
+            # Scope term
             else
             {
                 $scopes->push( $_ );
@@ -545,7 +559,7 @@ sub parse
         });
         $opts->{scope} = $scopes;
     }
-    
+
     my $scope = Markdown::Parser::Scope->new( $opts->{scope}, debug => $self->debug, condition => $opts->{scope_cond} );
     $self->scope( $scope ) if( $top->tag_name eq 'top' && !$self->scope );
     
@@ -554,8 +568,9 @@ sub parse
     # Need to remove the link definition from the document
     if( $top->tag_name eq 'top' )
     {
+        # NOTE: html
         # Need to isolate html code blocks, because their indentation can be mistaken for code blocks.
-        # Then, we parsing for code block, we re-instate the html block found and isolated.
+        # Then, we parse for code block, we re-instate the html block found and isolated.
         if( $scope->has( [qw( html )]) )
         {
             $data =~ s{$RE{Markdown}{Html}}
@@ -574,7 +589,8 @@ sub parse
                 "!!HTML[$id]!!";
             }xgems;
         }
-        
+
+        # NOTE: extended code_block
         # Code blocks trumps everything else, so they come first
         # First, check the parts that are surrounded by backticks or equivalents
         $self->message_colour( 3, "Does scope have '{green}extended code_block{/}' ? ", $scope->has( [qw( extended code_block )] ) ? '{green}yes{/}' : '{red}no{/}' );
@@ -606,13 +622,14 @@ sub parse
                     }
                 }xgems;
         
-                $code_def =~ s/^[[:blank:]\h]+|[[:blank:]\h]+$//gs;
-                $code_class =~ s/^[\.[:blank:]\h]+//gs;
+                $code_def =~ s/^[[:blank:]\h]+|[[:blank:]\h]+$//gs if( defined( $code_def ) );
+                $code_class =~ s/^[\.[:blank:]\h]+//gs if( defined( $code_class ) );
         
                 my $code = $top->create_code({
                     class => [split( /\./, $code_class )],
                     pos => $pos,
                     raw => $raw,
+                    fenced => 1,
                 });
                 $code->add_element( $top->create_text({
                     text => $content,
@@ -623,6 +640,7 @@ sub parse
                 "${PH_PREFIX}${id}${PH_SUFFIX}\n";
             }xgems;
         }
+        # NOTE: code_block
         elsif( $self->message_colour( 3, "Does scope have '{green}code_block{/}' ? ", $scope->has( 'code_block' ) ? '{green}yes{/}' : '{red}no{/}' ) && $scope->has( 'code_block' ) )
         {
             $data =~ s{$RE{Markdown}{CodeBlock}}
@@ -652,6 +670,7 @@ sub parse
                 my $code = $top->create_code({
                     pos => $pos,
                     raw => $raw,
+                    fenced => 1,
                 });
                 $code->add_element( $top->create_text({
                     text => $content,
@@ -661,7 +680,8 @@ sub parse
                 "${PH_PREFIX}${id}${PH_SUFFIX}\n";
             }xgems;
         }
-    
+
+        # NOTE: code_line
         $self->message_colour( 3, "Does scope have '{green}code_line{/}' ? ", $scope->has( 'code_line' ) ? '{green}yes{/}' : '{red}no{/}' );
         # Code single line. If it is a series of them treat them as a block
         if( $scope->has( 'code_line' ) )
@@ -709,7 +729,8 @@ sub parse
                 "${PH_PREFIX}${id}${PH_SUFFIX}\n";
             }xgems;
         }
-        
+
+        # NOTE: Restore any html blocks if any
         # Restore any html blocks if any
         $data =~ s{\!{2}HTML\[(?<obj_id>\d+)\]\!{2}}
         {
@@ -727,6 +748,7 @@ sub parse
 
         
         pos( $data ) = 0;
+        # NOTE: code_span
         # Inline code `some thing`
         if( $scope->has( 'code_span' ) )
         {
@@ -758,6 +780,7 @@ sub parse
        
         $self->messagef_colour( 3, "%d objects found so far.", $top->objects->length );
         
+        # NOTE: extended link
         $self->message_colour( 3, "Processing possible {green}link{/} definitions." );
         $data =~ s{$RE{Markdown}{ExtLinkDefinition}}
         {
@@ -783,7 +806,8 @@ sub parse
             $top->register_link_definition( $lnk );
             '';
         }gme;
-        
+
+        # NOTE: link
         $data =~ s{$RE{Markdown}{LinkDefinition}}
         {
             my $re = { %+ };
@@ -805,8 +829,9 @@ sub parse
             $top->register_link_definition( $lnk );
             '';
         }gme;
-        
+
         pos( $data ) = 0;
+        # NOTE: extended abbr
         $self->message_colour( 3, "Does scope have '{green}abbr{/}' ? ", $scope->has( [qw( extended abbr )] ) ? '{green}yes{/}' : '{red}no{/}' );
         if( $scope->has( [qw( extended abbr )] ) )
         {
@@ -827,7 +852,8 @@ sub parse
                 '';
             }gme;
         }
-        
+
+        # NOTE: extended footnote
         $self->message_colour( 3, "Does scope have '{green}footnote{/}' ? ", $scope->has( [qw( extended footnote )] ) ? '{green}yes{/}' : '{red}no{/}' );
         if( $scope->has( [qw( extended footnote )] ) )
         {
@@ -849,7 +875,8 @@ sub parse
                 '';
             }gme;
         }
-        
+
+        # NOTE: footnote reference extended
         $self->message_colour( 3, "Does scope have '{green}footnote{/}' ? ", $scope->has( [qw( footnote extended )] ) ? '{green}yes{/}' : '{red}no{/}' );
         if( $scope->has( [qw( footnote extended )] ) )
         {
@@ -962,6 +989,7 @@ sub parse
                     class => [split( /\./, $code_class )],
                     pos => $pos,
                     raw => $raw,
+                    fenced => 1,
                 });
                 $code->add_element( $top->create_text({
                     text => $content,
@@ -989,6 +1017,7 @@ sub parse
                 my $code = $top->create_code({
                     pos => $pos,
                     raw => $raw,
+                    fenced => 1,
                 });
                 $code->add_element( $top->create_text({
                     text => $content,
@@ -1359,14 +1388,14 @@ sub parse
             $text =~ s/^\n+|\n+$//gs;
             # Replace new lines that are not preceded by 2 space or more with 1 space.
             $text =~ s/(?<![ ]{2})\n/ /gs;
-            $self->message_colour( 3, "Found {green}${nth_nl}{/} trailing new lines." );
+            $self->message_colour( 3, "Found {green}${nth_nl}{/} trailing new line(s)." );
             my $p = $top->create_paragraph({
                 pos => $pos,
                 raw => $raw,
             });
             # Position ourself before the trailing new lines
             my $id = $self->document->add_object( $p );
-            $self->message_colour( 3, "Sub parsing paragraph content '{green}", $text, "{/}'" );
+            # $self->message_colour( 3, "Sub parsing paragraph content '{green}", quotemeta( $text ), "{/}'" );
             $self->parse( $text, { scope => $self->scope_inline, element => $p } );
             # We remove one new line to account for the new line added by as_markdown() method
             # $trailing_nl-- if( $trailing_nl > 1 );
@@ -1824,7 +1853,7 @@ sub parse
 #             "${PH_PREFIX}${id}${PH_SUFFIX}";
 #         }xgems;
 #     }
-    
+
     # NOTE: line break
     $self->message_colour( 3, "Does scope have '{green}line break{/}' ? ", $scope->has( [qw( line_break )] ) ? '{green}yes{/}' : '{red}no{/}' );
     if( $scope->has( 'line_break' ) )
@@ -1856,7 +1885,7 @@ sub parse
         }) );
         "${PH_PREFIX}${id}${PH_SUFFIX}";
     }xgems;
-    
+
     # NOTE: abbreviation
     $self->message_colour( 3, "Does scope have '{green}abbr{/}' ? ", $scope->has( [qw( extended abbr )] ) ? '{green}yes{/}' : '{red}no{/}' );
     # Now find and replace any match with its corresponding expanded name
@@ -1881,9 +1910,9 @@ sub parse
             }
         }xge;
     }
-    
+
     $self->message_colour( 3, "{orange}", ( $top->tag_name eq 'top' ? 'Parsing' : 'Sub-parsing' ), " done.{/}" );
-    
+
     if( $top->tag_name eq 'top' )
     {
         # We need to separate parsing of footnotes' text in a second step, so we do this here
@@ -1892,12 +1921,13 @@ sub parse
             $_->parse( $self );
         });
     }
-    
+
     # NOTE: ultra fast parsing
-    my $parts = [ split( m/\Q${PH_PREFIX}\E(?<object_id>\d+)\Q${PH_SUFFIX}\E\n?/, $data ) ];
+    my $object_re = qr/\Q${PH_PREFIX}\E(?<object_id>\d+)\Q${PH_SUFFIX}\E/;
+    my $parts = [ split( m/${object_re}\n?/, $data ) ];
     $self->message( 3, "Parts are: '", join( "', '", @$parts ), "'." ); 
     my $objects = $self->document->objects;
-    for( my $n = 0; $n <= scalar( @$parts ); $n++ )
+    for( my $n = 0; $n < scalar( @$parts ); $n++ )
     {
         # When $n is an even number, it means this is a text, otherwise it is an object id
         # If this is a text, we create a text object and add it to the tree
@@ -1925,6 +1955,82 @@ sub parse
             $top->add_element( $obj );
         }
     }
+
+    # Depth-first expansion, repeat until no changes (handles cascades)
+    my $changed = 1;
+
+    my $walk;
+    $walk = sub
+    {
+        my( $node ) = @_;
+
+        # Recurse into container children first (depth-first)
+        if( $node->can( 'children' ) && $node->children->length )
+        {
+            # Children list may mutate while we insert; iterate by index
+            my $i = 0;
+            while( $i < $node->children->length )
+            {
+                my $child = $node->children->get( $i );
+                $walk->( $child );
+                # If structure changed, do not increment blindly
+                $i++;
+            }
+        }
+
+        # Only interested in Text nodes that might contain placeholders
+        return if( !$node->isa( 'Markdown::Parser::Text' ) );
+
+        my $txt = $node->text->scalar // '';
+        return if( $txt !~ /$object_re/ );
+
+        # Split into text / id / text / id / ... / text
+        my @parts = split( /$object_re/, $txt );
+
+        # First piece stays in current node
+        my $head = shift( @parts );
+        $node->text( $head );
+
+        my $cursor = $node;
+        while( @parts )
+        {
+            my $id    = shift( @parts );
+            # may be undef at end
+            my $after = shift( @parts );
+
+            my $obj = $self->document->objects->get( $id );
+
+            if( $obj )
+            {
+                # Splice the referenced object right after the cursor
+                $node->parent->insert_after( $cursor, $obj );
+                $cursor = $obj;
+                $changed = 1;
+            }
+            else
+            {
+                # Unknown id: keep literal placeholder (safer than dropping)
+                my $lit = $node->parent->create_text({ text => "${PH_PREFIX}${id}${PH_SUFFIX}" });
+                $node->parent->insert_after( $cursor, $lit );
+                $cursor = $lit;
+            }
+
+            if( defined( $after ) && length( $after ) )
+            {
+                my $tail = $node->parent->create_text({ text => $after });
+                $node->parent->insert_after( $cursor, $tail );
+                $cursor = $tail;
+                # will be caught next pass
+                $changed = 1 if( $after =~ /$object_re/ );
+            }
+        }
+    };
+
+    while( $changed )
+    {
+        $changed = 0;
+        $walk->( $top );
+    }
     return( $top );
 }
 
@@ -1941,7 +2047,7 @@ sub parse_file
     $io->binmode( ":encode(${charset})" ) if( length( $charset ) );
     my $data = join( '', $io->getlines );
     $io->close;
-    return( $self->parse( $data ) );
+    return( $self->parse( $data, @_ ) );
 }
 
 sub parse_list_item
@@ -2439,13 +2545,14 @@ sub has
 {
     my $self  = shift( @_ );
     my $check = shift( @_ ) || return;
-    ## We clone the object, because we might modify it for the purpose of our checks
+    # We clone the object, because we might modify it for the purpose of our checks
     my $scope = $self->scope->clone;
     my $what  = $self->new_array( $self->_is_array( $check ) ? $check : [ $check ] );
     my $cache = $self->cache;
     my $scope_cond = $self->condition || 'any';
     my $term_cond  = 'all';
     my $new   = $self->new_array;
+    # Go through the required tokens
     $what->foreach(sub
     {
         if( s/\|{1,2}/ /g )
@@ -2475,77 +2582,64 @@ sub has
         }
     });
     $what = $new;
-    ## Expected positive hits should be equal to the number of array elements for the scope terms being checked
-    ## Ex: [qw( header extended )] requires 2 hits, but
-    ## [qw( header||extended )] requires just 1 hit
+    # Expected positive hits should be equal to the number of array elements for the scope terms being checked
+    # Ex: [qw( header extended )] requires 2 hits, but
+    # [qw( header||extended )] requires just 1 hit
     my $expect = $what->length;
     my $hits = 0;
-    my $is_ext = $what->has( 'extended' );
-    if( $scope_cond eq 'all' )
+    my $is_ext = $scope->has( 'extended' );
+
+    my $dict;
+    if( $is_ext )
     {
-        my $dict;
-        my $is_ext = 0;
-        if( $scope->has( 'extended' ) )
-        {
-            $dict = $ELEMENTS_DICTIONARY_EXTENDED;
-            $scope->delete( 'extended' );
-            $is_ext++;
-        }
-        else
-        {
-            $dict = $ELEMENTS_DICTIONARY;
-        }
-        
-        $scope->foreach(sub
-        {
-            my $scope_key = shift( @_ );
-            my $check_res = 0;
-            $what->foreach(sub
-            {
-                my $scope_check = shift( @_ );
-                if( $scope_key eq $scope_check ||
-                    (
-                        ( $scope_key eq 'all' || $scope_key eq 'block' || $scope_key eq 'inline' ) &&
-                        exists( $dict->{ $scope_key } ) &&
-                        ref( $dict->{ $scope_key } ) eq 'ARRAY' &&
-                        scalar( grep( /^$scope_check$/i, @{$dict->{ $scope_key }} ) )
-                    ) ||
-                    ( $scope_key eq 'all' && ( $scope_check eq 'block' || $scope_check eq 'inline' ) && exists( $dict->{ $scope_check } ) ) ||
-                    ( $is_ext && $scope_check eq 'extended' ) )
-                {
-                    $check_res++;
-                }
-                else
-                {
-                }
-            });
-            $hits++ if( $check_res == $what->length );
-        });
-        $cache->{ $cache_key } = $hits > 0 ? 1 : 0;
-        return( $hits > 0 ? 1 : 0 );
+        $dict = $ELEMENTS_DICTIONARY_EXTENDED;
+        # We remove it so it does not interfere. It is ok, since $scope here is a clone.
+        $scope->delete( 'extended' );
     }
     else
     {
+        $dict = $ELEMENTS_DICTIONARY;
+    }
+
+    $scope->foreach(sub
+    {
+        my $scope_key = shift( @_ );
         $what->foreach(sub
         {
-            my $term = shift( @_ );
-            ## If the scope is explicitly included; or
-            ## if the scope is all, but excluding extended features and the query item is not an extended feature; or
-            ## if the scope is extended ONLY and the query item is an extended feature; or
-            ## if the scope is extended and it does not matter what the query item is
-            ## $hits++ if( $scope->has( $term ) || ( $term ne 'extended' && $scope->has( 'all' ) ) );
-            if( $scope->has( $term ) ||
-                ( $scope->has( 'block' ) && scalar( grep( /^$term$/i, @{$ELEMENTS_DICTIONARY->{block}} ) ) ) ||
-                ( $scope->has( 'inline' ) && scalar( grep( /^$term$/i, @{$ELEMENTS_DICTIONARY->{inline}} ) ) ) ||
-                ( $scope->has( 'extended' ) && scalar( grep( /^$term$/i, @{$ELEMENTS_DICTIONARY_EXTENDED->{all}} ) ) ) ||
-                ( $term ne 'extended' && $scope->has( 'all' ) ) )
+            my $scope_check = shift( @_ );
+            # If the scope is explicitly included; or
+            # if the scope is all, but excluding extended features and the query item is not an extended feature; or
+            # if the scope is extended ONLY and the query item is an extended feature; or
+            # if the scope is extended and it does not matter what the query item is
+
+            if( $scope_key eq $scope_check ||
+                (
+                    ( $scope_key eq 'all' || $scope_key eq 'block' || $scope_key eq 'inline' ) &&
+                    exists( $dict->{ $scope_key } ) &&
+                    ref( $dict->{ $scope_key } ) eq 'ARRAY' &&
+                    scalar( grep( /^$scope_check$/i, @{$dict->{ $scope_key }} ) )
+                )
+                ||
+                (
+                    $scope_key eq 'all' &&
+                    ( $scope_check eq 'block' || $scope_check eq 'inline' ) &&
+                    exists( $dict->{ $scope_check } )
+                )
+                ||
+                ( $scope_check ne 'extended' && $scope_key eq 'all' )
+                ||
+                ( $is_ext && $scope_check eq 'extended' ) )
             {
                 $hits++;
             }
+            else
+            {
+                # No match
+            }
         });
-        $cache->{ $cache_key } = ( $term_cond eq 'all' && $expect == $hits ) || ( $term_cond eq 'any' && $hits );
-        return( ( $term_cond eq 'all' && $expect == $hits ) || ( $term_cond eq 'any' && $hits ) );
-    }
+    });
+    $cache->{ $cache_key } = ( ( $term_cond eq 'all' && $expect == $hits ) || ( $term_cond eq 'any' && $hits ) ) ? 1 : 0;
+    return( ( ( $term_cond eq 'all' && $expect == $hits ) || ( $term_cond eq 'any' && $hits ) ) ? 1 : 0 );
 }
 
 sub scope { return( shift->_set_get_hash_as_mix_object( 'scope', @_ ) ); }
@@ -2591,7 +2685,7 @@ Markdown::Parser - Markdown Parser Only
 
 =head1 VERSION
 
-    v0.4.1
+    v0.5.0
 
 =head1 DESCRIPTION
 
@@ -2770,9 +2864,9 @@ This method can be accessed as a regular method, or as a lvalue method, such as:
 
 =head2 mode
 
-Sets or gets the mode for the parser. Possible value is C<strict> or C<extended>
+Sets or gets the mode for the parser. Possible values are C<strict> or C<extended>
 
-If set to C<extended>, the the scope of the parser will included non-standard markdown formattings.
+If set to C<extended>, the the scope of the parser will include non-standard markdown formattings.
 
 =head2 parse
 

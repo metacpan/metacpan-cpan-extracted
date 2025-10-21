@@ -32,23 +32,46 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
             "DateTime::Format::Text" : "0",
-            "Geo::Coder::Free" : "0",
-            "Geo::Coder::List" : "0",
+            "JSON::MaybeXS" : "0",
             "Params::Get" : "0.13",
             "Params::Validate::Strict" : "0.1",
-            "Return::Set" : "0.02"
+            "Return::Set" : "0.03",
+            "perl" : "5.008"
          }
       },
       "test" : {
          "requires" : {
+            "Data::Random" : "0",
+            "File::Glob" : "0",
+            "File::Slurp" : "0",
+            "File::stat" : "0",
+            "IPC::System::Simple" : "0",
+            "POSIX" : "0",
+            "Readonly" : "0",
             "Test::DescribeMe" : "0",
             "Test::Most" : "0",
-            "Test::Needs" : "0"
+            "Test::Needs" : "0",
+            "Test::Returns" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.03",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Genealogy-Obituary-Parser@rt.cpan.org",
+         "web" : "https://github.com/nigelhorne/Genealogy-Obituary-Parser/issues",
+         "x_url" : "https://github.com/nigelhorne/Genealogy-Obituary-Parser/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/Genealogy::Obituary::Parser",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/nigelhorne/Genealogy-Obituary-Parser.git",
+         "web" : "https://github.com/nigelhorne/Genealogy-Obituary-Parser",
+         "x_repository" : "https://github.com/nigelhorne/Genealogy-Obituary-Parser"
+      }
+   },
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

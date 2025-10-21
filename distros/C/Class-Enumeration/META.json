@@ -38,6 +38,7 @@
          "requires" : {
             "Scalar::Util" : "0",
             "Sub::Util" : "1.40",
+            "feature" : "0",
             "overload" : "0",
             "perl" : "5.010001",
             "strict" : "0",
@@ -58,11 +59,11 @@
    "provides" : {
       "Class::Enumeration" : {
          "file" : "lib/Class/Enumeration.pm",
-         "version" : "v1.0.3"
+         "version" : "v1.1.0"
       },
       "Class::Enumeration::Builder" : {
          "file" : "lib/Class/Enumeration/Builder.pm",
-         "version" : "v1.0.3"
+         "version" : "v1.1.0"
       }
    },
    "release_status" : "stable",
@@ -76,5 +77,5 @@
          "web" : "https://github.com/XSven/Class-Enumeration"
       }
    },
-   "version" : "v1.0.3"
+   "version" : "v1.1.0"
 }

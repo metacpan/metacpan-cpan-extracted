@@ -20,3 +20,6 @@ Revision history for Perl module Perl5::TestEachCommit
 0.05 Tue Sep  9 04:46:57 PM EDT 2025
     - Fix bug in new(): failure to check for Perl-truth of argument rather
       than mere definedness.
+
+0.06 Mon Oct 20 10:03:33 AM EDT 2025
+    - Enable user to track at the miniperl/minitest level.

@@ -12,6 +12,7 @@ on configure => sub {
 on runtime => sub {
   requires 'Scalar::Util' => '0';
   requires 'Sub::Util'    => '1.40';
+  requires 'feature'      => '0';
   requires 'overload'     => '0';
   requires 'strict'       => '0';
   requires 'warnings'     => '0'

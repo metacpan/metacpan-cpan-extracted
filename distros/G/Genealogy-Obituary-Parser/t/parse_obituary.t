@@ -31,7 +31,7 @@ cmp_deeply($rel,
 			{ 'name' => 'Liam' },
 			{ 'name' => 'Ava' }
 		], 'sisters' => [
-			{ 'name' => 'Claire', 'status' => 'living' },
+			{ 'name' => 'Claire', 'status' => 'living', 'sex' => 'F' },
 		]
 	}
 );

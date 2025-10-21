@@ -1,3 +1,6 @@
+v0.20  2025-10-20Z
+    - Fixed $identifier->as($type) if $identifiers->type->eq($type) is true
+
 v0.19  2025-10-19Z
     - Added basic support for host defined identifiers and user defined identifiers
     - Added new SID and SNI values

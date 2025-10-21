@@ -3,10 +3,18 @@ abstract: 'Extract structured family relationships from obituary text'
 author:
   - 'Nigel Horne <njh@nigelhorne.com>'
 build_requires:
+  Data::Random: '0'
   ExtUtils::MakeMaker: '0'
+  File::Glob: '0'
+  File::Slurp: '0'
+  File::stat: '0'
+  IPC::System::Simple: '0'
+  POSIX: '0'
+  Readonly: '0'
   Test::DescribeMe: '0'
   Test::Most: '0'
   Test::Needs: '0'
+  Test::Returns: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -21,11 +29,16 @@ no_index:
     - t
     - inc
 requires:
+  Carp: '0'
   DateTime::Format::Text: '0'
-  Geo::Coder::Free: '0'
-  Geo::Coder::List: '0'
+  JSON::MaybeXS: '0'
   Params::Get: '0.13'
   Params::Validate::Strict: '0.1'
-  Return::Set: '0.02'
-version: '0.03'
+  Return::Set: '0.03'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/nigelhorne/Genealogy-Obituary-Parser/issues
+  homepage: https://metacpan.org/pod/Genealogy::Obituary::Parser
+  repository: git://github.com/nigelhorne/Genealogy-Obituary-Parser.git
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

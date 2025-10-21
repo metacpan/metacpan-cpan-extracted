@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.25, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.28, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   Daje::Workflow:
     file: lib/Daje/Workflow.pm
-    version: '0.18'
+    version: '0.19'
   Daje::Workflow::Activities:
     file: lib/Daje/Workflow/Activities.pm
   Daje::Workflow::Activities::Closed:
@@ -39,6 +39,9 @@ provides:
     file: lib/Daje/Workflow/Common/Activity/Base.pm
   Daje::Workflow::Common::Checks::Base:
     file: lib/Daje/Workflow/Common/Checks/Base.pm
+  Daje::Workflow::Config:
+    file: lib/Daje/Workflow/Config.pm
+    version: '0.02'
   Daje::Workflow::Create::State:
     file: lib/Daje/Workflow/Create/State.pm
     version: '0.01'
@@ -56,22 +59,26 @@ provides:
     file: lib/Daje/Workflow/Database/Model/Workflow.pm
   Daje::Workflow::Database::Model::WorkflowConnection:
     file: lib/Daje/Workflow/Database/Model/WorkflowConnection.pm
+  Daje::Workflow::Details::Analyser:
+    file: lib/Daje/Workflow/Details/Analyser.pm
   Daje::Workflow::Errors::Error:
     file: lib/Daje/Workflow/Errors/Error.pm
+  Daje::Workflow::Loader:
+    file: lib/Daje/Workflow/Loader.pm
+    version: '0.13'
   Daje::Workflow::Observers:
     file: lib/Daje/Workflow/Observers.pm
+  Daje::Workflow::Roadmap::Load:
+    file: lib/Daje/Workflow/Roadmap/Load.pm
 requires:
-  Daje::Workflow::Config: '0'
-  Daje::Workflow::Database: '0.05'
-  Daje::Workflow::Database::Model: '0'
-  Daje::Workflow::Loader: '0'
+  Daje::Database::Model: '0.07'
   Mojo::Loader: '0'
   Mojo::Pg: '0'
-  perl: v5.40.0
+  perl: '5.042000'
 resources:
   bugtracker: https://github.com/janeskil1525/Daje-Workflow/issues
   homepage: https://github.com/janeskil1525/Daje-Workflow
   repository: https://github.com/janeskil1525/Daje-Workflow.git
-version: '0.18'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '0.19'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
 x_static_install: 1

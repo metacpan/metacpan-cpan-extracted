@@ -2,16 +2,18 @@
 BEGIN { require 5.010_001 }; ## no critic ( RequireUseStrict, RequireUseWarnings )
 use strict;
 use warnings;
+use feature 'state';
 
 package Class::Enumeration::Builder;
 
-$Class::Enumeration::Builder::VERSION = 'v1.0.3';
+$Class::Enumeration::Builder::VERSION = 'v1.1.0';
 
-use subs '_is_equal';
+use subs qw( _create_enum_object _is_equal );
 
-use Carp               qw( croak );
+use Carp      qw( croak );
+use Sub::Util qw( set_subname );
+
 use Class::Enumeration ();
-use Sub::Util          qw( set_subname );
 
 sub import {
   shift;
@@ -32,8 +34,7 @@ sub import {
   }
 
   my @values;
-  my $ordinal = 0;
-  # https://metacpan.org/pod/Class::Enum#Advanced-usage
+  my $counter = exists $options->{ counter } ? delete $options->{ counter } : sub { state $i = 0; $i++ };
   # Check if custom attributes were provided
   if ( ref $_[ 1 ] eq 'HASH' ) {
     my ( $reference_name, $reference_attributes ) = @_[ 0 .. 1 ];
@@ -41,14 +42,7 @@ sub import {
     while ( my ( $name, $attributes ) = splice @_, 0, 2 ) {
       croak "'$reference_name' enum and '$name' enum have different custom attributes, stopped"
         unless _is_equal $reference_attributes, $attributes;
-      # Put each enum object in its own (dedicated) child class of the parent
-      # enum class
-      my $child_class = "$class\::$name";
-      {
-        no strict 'refs'; ## no critic ( ProhibitNoStrict )
-        push @{ "$child_class\::ISA" }, $class
-      }
-      push @values, $child_class->_new( $ordinal++, $name, $attributes )
+      push @values, _create_enum_object $class, $counter, $name, $attributes
     }
     # Build getters for custom attributes
     for my $getter ( keys %$reference_attributes ) {
@@ -58,14 +52,7 @@ sub import {
   } else {
     # Build list (@values) of enum objects
     foreach my $name ( @_ ) {
-      # Put each enum object in its own (dedicated) child class of the parent
-      # enum class
-      my $child_class = "$class\::$name";
-      {
-        no strict 'refs'; ## no critic ( ProhibitNoStrict )
-        push @{ "$child_class\::ISA" }, $class
-      }
-      push @values, $child_class->_new( $ordinal++, $name );
+      push @values, _create_enum_object $class, $counter, $name;
     }
   }
 
@@ -91,6 +78,20 @@ sub import {
     if %$options;
 
   $class
+}
+
+sub _create_enum_object ( $$$;$ ) {
+  my ( $class, $counter, $name, $attributes ) = @_;
+
+  # Put each enum object in its own (dedicated) child class of the parent
+  # enum class
+  my $child_class = "$class\::$name";
+  {
+    no strict 'refs'; ## no critic ( ProhibitNoStrict )
+    push @{ "$child_class\::ISA" }, $class
+  }
+
+  $child_class->_new( $counter->(), $name, $attributes )
 }
 
 # Compare 2 sets of hash keys

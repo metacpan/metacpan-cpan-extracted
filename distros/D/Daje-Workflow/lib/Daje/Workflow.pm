@@ -85,7 +85,7 @@ use Daje::Workflow::Errors::Error;
 # janeskil1525 E<lt>janeskil1525@gmail.comE<gt>
 #
 
-our $VERSION = "0.18";
+our $VERSION = "0.19";
 
 has 'workflow_name';    #
 has 'workflow_pkey';    #

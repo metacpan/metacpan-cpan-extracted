@@ -11,6 +11,7 @@ lib/Daje/Workflow/Checks.pm
 lib/Daje/Workflow/Checks/Mandatory.pm
 lib/Daje/Workflow/Common/Activity/Base.pm
 lib/Daje/Workflow/Common/Checks/Base.pm
+lib/Daje/Workflow/Config.pm
 lib/Daje/Workflow/Create/State.pm
 lib/Daje/Workflow/Database.pm
 lib/Daje/Workflow/Database/Model.pm
@@ -18,11 +19,15 @@ lib/Daje/Workflow/Database/Model/Context.pm
 lib/Daje/Workflow/Database/Model/History.pm
 lib/Daje/Workflow/Database/Model/Workflow.pm
 lib/Daje/Workflow/Database/Model/WorkflowConnection.pm
+lib/Daje/Workflow/Details/Analyser.pm
 lib/Daje/Workflow/Errors/Error.pm
+lib/Daje/Workflow/Loader.pm
 lib/Daje/Workflow/Observers.pm
+lib/Daje/Workflow/Roadmap/Load.pm
 minil.toml
 script/documents.pl
 script/generate.pl
+script/loader.pl
 script/runner.pl
 t/00_compile.t
 META.json

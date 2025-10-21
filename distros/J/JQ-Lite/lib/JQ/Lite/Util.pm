@@ -3,7 +3,7 @@ package JQ::Lite::Util;
 use strict;
 use warnings;
 
-use JSON::PP qw(encode_json);
+use JSON::PP ();
 use List::Util qw(sum min max);
 use Scalar::Util qw(looks_like_number);
 use JQ::Lite::Expression ();
@@ -11,6 +11,11 @@ use JQ::Lite::Expression ();
 my $JSON_DECODER     = JSON::PP->new->utf8->allow_nonref;
 my $FROMJSON_DECODER = JSON::PP->new->utf8->allow_nonref;
 my $TOJSON_ENCODER   = JSON::PP->new->utf8->allow_nonref;
+
+sub _encode_json {
+    my ($value) = @_;
+    return $TOJSON_ENCODER->encode($value);
+}
 
 sub _decode_json {
     my ($text) = @_;
@@ -789,7 +794,7 @@ sub _evaluate_value_expression {
                 $lhs = @$lhs_values ? $lhs_values->[0] : undef;
             }
             else {
-                my @outputs = $self->run_query(encode_json($context), $lhs_expr);
+                my @outputs = $self->run_query(_encode_json($context), $lhs_expr);
                 $lhs = @outputs ? $outputs[0] : undef;
             }
 
@@ -799,7 +804,7 @@ sub _evaluate_value_expression {
                 $rhs = @$rhs_values ? $rhs_values->[0] : undef;
             }
             else {
-                my @outputs = $self->run_query(encode_json($context), $rhs_expr);
+                my @outputs = $self->run_query(_encode_json($context), $rhs_expr);
                 $rhs = @outputs ? $outputs[0] : undef;
             }
 
@@ -1191,7 +1196,7 @@ sub _clone_for_assignment {
     return undef unless defined $value;
     return $value unless ref $value;
 
-    my $json = encode_json($value);
+    my $json = _encode_json($value);
     return _decode_json($json);
 }
 
@@ -1205,7 +1210,7 @@ sub _map {
 
     my @mapped;
     for my $item (@$data) {
-        push @mapped, $self->run_query(encode_json($item), $filter);
+        push @mapped, $self->run_query(_encode_json($item), $filter);
     }
 
     return @mapped;
@@ -1219,7 +1224,7 @@ sub _apply_all {
 
         for my $item (@$value) {
             if (defined $expr) {
-                my @evaluated = $self->run_query(encode_json($item), $expr);
+                my @evaluated = $self->run_query(_encode_json($item), $expr);
                 return JSON::PP::false unless @evaluated;
                 return JSON::PP::false if grep { !_is_truthy($_) } @evaluated;
             }
@@ -1232,7 +1237,7 @@ sub _apply_all {
     }
 
     if (defined $expr) {
-        my @evaluated = $self->run_query(encode_json($value), $expr);
+        my @evaluated = $self->run_query(_encode_json($value), $expr);
         return JSON::PP::false unless @evaluated;
         return grep { !_is_truthy($_) } @evaluated ? JSON::PP::false : JSON::PP::true;
     }
@@ -1248,7 +1253,7 @@ sub _apply_any {
 
         for my $item (@$value) {
             if (defined $expr) {
-                my @evaluated = $self->run_query(encode_json($item), $expr);
+                my @evaluated = $self->run_query(_encode_json($item), $expr);
                 return JSON::PP::true if grep { _is_truthy($_) } @evaluated;
             }
             else {
@@ -1260,7 +1265,7 @@ sub _apply_any {
     }
 
     if (defined $expr) {
-        my @evaluated = $self->run_query(encode_json($value), $expr);
+        my @evaluated = $self->run_query(_encode_json($value), $expr);
         return grep { _is_truthy($_) } @evaluated ? JSON::PP::true : JSON::PP::false;
     }
 
@@ -1431,7 +1436,7 @@ sub _apply_getpath {
     }
 
     if (!@paths) {
-        my @outputs = $self->run_query(encode_json($value), $expr);
+        my @outputs = $self->run_query(_encode_json($value), $expr);
         for my $output (@outputs) {
             next unless defined $output;
 
@@ -1505,7 +1510,7 @@ sub _resolve_paths_from_expr {
     }
 
     if (!@paths) {
-        my @outputs = $self->run_query(encode_json($value), $clean);
+        my @outputs = $self->run_query(_encode_json($value), $clean);
         for my $output (@outputs) {
             next unless defined $output;
 
@@ -1552,7 +1557,7 @@ sub _evaluate_setpath_value {
         return @values ? $values[0] : undef;
     }
 
-    my @outputs = $self->run_query(encode_json($context), $clean);
+    my @outputs = $self->run_query(_encode_json($context), $clean);
     return @outputs ? $outputs[0] : undef;
 }
 
@@ -2021,7 +2026,7 @@ sub _apply_with_entries {
 
     my @transformed;
     for my $entry (@$entries) {
-        my @results = $self->run_query(encode_json($entry), $filter);
+        my @results = $self->run_query(_encode_json($entry), $filter);
         for my $result (@results) {
             my $normalized = _normalize_entry($result);
             push @transformed, $normalized if $normalized;
@@ -2040,7 +2045,7 @@ sub _apply_map_values {
         my %result;
         for my $key (keys %$value) {
             my $original = $value->{$key};
-            my @outputs  = $self->run_query(encode_json($original), $filter);
+            my @outputs  = $self->run_query(_encode_json($original), $filter);
             next unless @outputs;
             $result{$key} = $outputs[0];
         }
@@ -2069,7 +2074,7 @@ sub _apply_walk {
         $value   = \@copy;
     }
 
-    my @results = $self->run_query(encode_json($value), $filter);
+    my @results = $self->run_query(_encode_json($value), $filter);
     return @results ? $results[0] : undef;
 }
 
@@ -2087,7 +2092,7 @@ sub _apply_recurse {
 
         my @children;
         if (defined $filter) {
-            my $json = encode_json($current);
+            my $json = _encode_json($current);
             @children = $self->run_query($json, $filter);
         }
         elsif (ref $current eq 'ARRAY') {
@@ -2134,7 +2139,7 @@ sub _apply_delpaths {
     }
 
     if (!@paths) {
-        my @outputs = $self->run_query(encode_json($value), $filter);
+        my @outputs = $self->run_query(_encode_json($value), $filter);
         for my $output (@outputs) {
             next unless defined $output;
 
@@ -2171,7 +2176,7 @@ sub _deep_clone {
     return $value if !defined $value;
     return $value if !ref $value || ref($value) eq 'JSON::PP::Boolean';
 
-    my $json = encode_json($value);
+    my $json = _encode_json($value);
     return _decode_json($json);
 }
 
@@ -2577,7 +2582,7 @@ sub _value_to_comparable {
     }
 
     if (ref($value) eq 'HASH' || ref($value) eq 'ARRAY') {
-        return encode_json($value);
+        return _encode_json($value);
     }
 
     return undef;

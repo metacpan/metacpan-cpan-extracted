@@ -2,6 +2,7 @@
 BEGIN
 {
     use strict;
+    our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
 
 sub run_tests
@@ -50,7 +51,7 @@ sub dump_tests
     my $tests = shift( @_ );
     eval
     {
-        require Data::Dump;
+        require Data::Pretty;
     };
     return if( $@ );
     my $opts  = {};
@@ -60,7 +61,7 @@ sub dump_tests
         my $expect = $tests->[$i];
         my $test = $expect->{test};
         my $name = $expect->{name};
-        printf( "Checking test %d%s\n", $i + 1, ( length( $name ) ? " ($name)" : '' ) );
+        printf( "Checking test %d%s\n", $i + 1, ( length( $name ) ? " ($name)" : '' ) ) if( $DEBUG );
         
         if( $test =~ /$opts->{re}/g )
         {
@@ -69,7 +70,7 @@ sub dump_tests
             $re->{test} = $test;
             $re->{name} = $name if( length( $name ) );
             # print( "bold_all => $+{bold_all}\nbold_type => $+{bold_type}\nbold_text => $+{bold_text}\n" );
-            print( Data::Dump::dump( $re ), ",\n\n" );
+            print( Data::Pretty::dump( $re ), ",\n\n" );
         }
         else
         {

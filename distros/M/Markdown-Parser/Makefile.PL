@@ -28,9 +28,9 @@ my %WriteMakefileArgs = (
         'vars'              => 0,
         'CSS::Object'       => 'v0.1.6',
         'HTML::Object'      => 'v0.5.0',
-        'Module::Generic'   => 'v0.37.3',
+        'Module::Generic'   => 'v0.43.0',
     	'POSIX'             => '1.53_01',
-    	'Regexp::Common::Markdown' => 'v0.1.5',
+    	'Regexp::Common::Markdown' => 'v0.1.7',
         'URI'               => '5.21',
     },
     TEST_REQUIRES       => {

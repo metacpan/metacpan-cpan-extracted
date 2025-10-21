@@ -1,5 +1,5 @@
 package Daje::Database::Model;
-use v5.40;
+use v5.42;
 
 # NAME
 # ====
@@ -31,11 +31,9 @@ use v5.40;
 #
 #
 
-our $VERSION = "0.06";
+our $VERSION = "0.07";
 
-sub test  {
 
-}
 
 
 

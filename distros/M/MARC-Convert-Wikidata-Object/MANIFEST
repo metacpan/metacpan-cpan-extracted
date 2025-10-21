@@ -94,6 +94,7 @@ t/MARC-Convert-Wikidata-Object-Series/04-issn.t
 t/MARC-Convert-Wikidata-Object-Series/05-name.t
 t/MARC-Convert-Wikidata-Object-Series/06-publisher.t
 t/MARC-Convert-Wikidata-Object-Series/07-series_ordinal.t
+t/MARC-Convert-Wikidata-Object-Series/08-series_ordinal_raw.t
 t/MARC-Convert-Wikidata-Object-Work/01-use.t
 t/MARC-Convert-Wikidata-Object-Work/02-version.t
 t/MARC-Convert-Wikidata-Object-Work/03-new.t

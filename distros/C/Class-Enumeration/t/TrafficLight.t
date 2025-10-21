@@ -45,11 +45,11 @@ subtest 'Access enum attributes' => sub {
 
   $self = $class->value_of( 'ORANGE' );
   cmp_ok $self->name,    'eq', 'ORANGE',    'Get name';
-  cmp_ok $self->ordinal, '==', 1,           'Get ordinal';
+  cmp_ok $self->ordinal, '==', 2,           'Get ordinal';
   cmp_ok $self->action,  'eq', 'slow down', 'Get action';
 
   $self = $class->value_of( 'RED' );
   cmp_ok $self->name,    'eq', 'RED',  'Get name';
-  cmp_ok $self->ordinal, '==', 2,      'Get ordinal';
+  cmp_ok $self->ordinal, '==', 4,      'Get ordinal';
   cmp_ok $self->action,  'eq', 'stop', 'Get action'
 }

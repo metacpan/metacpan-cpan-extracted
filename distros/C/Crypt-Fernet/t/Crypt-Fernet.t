@@ -8,7 +8,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 12;
+use Test::More tests => 14;
 BEGIN { 
     use_ok('Crypt::CBC');
     use_ok('Digest::SHA');
@@ -29,6 +29,9 @@ my $ttl = 10;
 my $old_verify = Crypt::Fernet::verify($old_key, $old_token, $ttl);
 my $old_decrypttext = Crypt::Fernet::decrypt($old_key, $old_token, $ttl);
 
+my $ov = Crypt::Fernet::verify($old_key, $old_token);
+my $o_d = Crypt::Fernet::decrypt($old_key, $old_token);
+
 my $ttl_verify = Crypt::Fernet::verify($key, $token, $ttl);
 my $ttl_decrypttext = Crypt::Fernet::decrypt($key, $token, $ttl);
 
@@ -36,6 +39,8 @@ ok( $key );
 ok( $token );
 ok( $verify );
 ok( $decrypttext eq $plaintext );
+ok( $ov == 1);
+ok( $o_d eq $plaintext );
 ok( $old_verify == 0);
 ok( !defined $old_decrypttext);
 ok( $ttl_verify );

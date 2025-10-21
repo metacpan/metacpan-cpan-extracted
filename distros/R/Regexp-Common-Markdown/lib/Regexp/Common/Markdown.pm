@@ -1,11 +1,14 @@
 ##----------------------------------------------------------------------------
 ## Markdown Common Regular Expressions - ~/lib/Regexp/Common/Markdown.pm
-## Version v0.1.5
-## Copyright(c) 2020 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Version v0.1.7
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/08/01
-## Modified 2020/08/17
+## Modified 2025/10/21
+## All rights reserved
 ## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 package Regexp::Common::Markdown;
 BEGIN
@@ -16,15 +19,46 @@ BEGIN
     use Regexp::Common qw( pattern );
     use Regexp::Common qw( URI );
     use Regexp::Common qw( Email::Address );
+    use Regexp::Common::URI::RFC2396 qw /$host $port $path_segments $query/;
     ## We use URI::tel instead of Regexp::Common::tel because its regular expression is antiquated
     ## URI::tel uses the latest rfc3966
     use URI::tel;
     # no warnings qw( experimental::vlb );
-    our $VERSION = 'v0.1.5';
+    our $VERSION = 'v0.1.7';
 
     our $SPACE_RE = qr/[[:blank:]\h]/;
     ## Including vertical space like new lines
     our $SPACE_EXTENDED_RE = qr/[[:blank:]\h\v]/;
+    # Guards to keep other patterns from firing inside code
+    our $MD_SKIP_FENCED = qr/
+        (?:(?<=\n)|\A)
+        [ ]{0,3}
+        (?<fence>`{3,}|~{3,})[^\n]*\n
+        (?:
+            (?![ ]{0,3}\k<fence>[ \t]*\r?(?:\n|\z))
+            .*(?:\n|\z)
+        )*
+        [ ]{0,3}\k<fence>[ \t]*\r?(?:\n|\z)
+        (*SKIP)(*F)
+    /xms;
+
+    our $MD_SKIP_INDENTED = qr/
+        (?:(?<=\n)|\A)
+        (?:
+            (?:[ ]{4}|\t).*(?:\n|\z)
+        )+
+        (*SKIP)(*F)
+    /xms;
+
+    # `code` and `` code with ` inside ``
+    our $MD_SKIP_INLINE_CODE = qr/
+        (?<!`)
+        (`+)(?!`)
+        (?: .*? )
+        \1(?!`)
+        (*SKIP)(*F)
+    /xms;
+
     our $ATTRIBUTE_RE = qr/
         [\w\-]+
         $SPACE_EXTENDED_RE*
@@ -40,7 +74,7 @@ BEGIN
         $SPACE_EXTENDED_RE*
     /x;
     our $LIST_TYPE_ORDERED = qr/(?<list_ordered>\d+[\.])/;
-    
+
     our $LIST_TYPE_UNORDERED_MINUS = qr/
         (?<list_unordered_minus>
             [\-]
@@ -51,9 +85,9 @@ BEGIN
             )
         )
     /x;
-    
+
     our $LIST_TYPE_UNORDERED_PLUS = qr/(?<list_unordered_plus>[\+])/;
-    
+
     our $LIST_TYPE_UNORDERED_STAR = qr/
         (?<list_unordered_star>
             [\*]
@@ -64,7 +98,7 @@ BEGIN
             )
         )
     /x;
-    
+
     our $LIST_TYPE_UNORDERED = qr/
         $LIST_TYPE_UNORDERED_STAR
         |
@@ -72,9 +106,9 @@ BEGIN
         |
         $LIST_TYPE_UNORDERED_PLUS
     /x;
-    
-    ## Taken from Markdown original author, John Gruber's original regular expression
-    ## See <https://regex101.com/r/RfhRVg/4/tests> to see it in action
+
+    # Taken from Markdown original author, John Gruber's original regular expression
+    # See <https://regex101.com/r/RfhRVg/4/> to see it in action
     our $LIST_ALL = qr/
         (?<list_all>                                                            # whole list
             (?<list_prefix>                                                     # list prefix and type
@@ -123,10 +157,81 @@ $LIST_TYPE_ORDERED
         )
     /mx;
 
+    # NOTE: global variables to build URI regular expressions compatible with IDN (rfc3986)
+    our $HTTP_RFC2396_HOST = qr/$host/;
+    # RFC 3986 / IDN host helpers
+    # Accept "." and the IDNA dot equivalents
+    our $IDN_DOT = qr/[.\x{3002}\x{FF0E}\x{FF61}]/;
+    # ACE punycode prefix
+    our $ACE     = qr/xn--/i;
+
+    # RFC 3986: IPv6 literal inside [ ... ]
+    # (very permissive; we only need the bracketed form to avoid false positives)
+    our $IP_LITERAL = qr/\[(?:[0-9A-Fa-f:.]+)\]/;
+
+    # IDN label (≤63 chars) with ACE or Unicode 3rd–4th hyphen rule
+    our $IDN_U_LABEL = qr/
+        (?:                                     # punycode label… (xn--)
+            $ACE [\p{L}\p{N}\p{M}\p{Pc}-]{1,59}
+            |
+            (?! [\p{L}\p{N}]{2}-- )             # forbid "--" at pos 3–4 unless ACE
+            [\p{L}\p{N}]                        # first
+            [\p{L}\p{N}\p{M}\p{Pc}-]{0,61}      # middle
+            (?<!-)                              # no trailing hyphen
+        )
+    /ux;
+
+    # IDN hostname: one or more labels separated by IDNA dots (atomic to reduce backtracking)
+    our $IDN_HOST = qr/(?>$IDN_U_LABEL(?:$IDN_DOT$IDN_U_LABEL)*)/ux;
+    # our $IDN_HOST = qr/(?>$IDN_U_LABEL(?:$IDN_DOT$IDN_U_LABEL)* $IDN_DOT?)/ux;
+
+    # Unicode-friendly “tail” for path/query in inline links (non-<…> case).
+    # RFC 3986 pchar allows pct-enc; for Markdown it is usually safer to “stop at obvious enders”.
+    our $UNICODE_PATHQ = qr{ [^<>"'\s\)]* }ux;
+
+    # RFC3986/IDN superset host: ASCII host-or-IPv4 (previous one based on RFC2396), or IDN host, or IPv6 literal
+    my $HTTP_RFC3986_HOST = qr/
+        (?:
+            # (1) previous ASCII host-or-IPv4 branch based on RFC2396:
+            $HTTP_RFC2396_HOST
+            |
+            # (2) New: Unicode IDN hostname
+            $IDN_HOST
+            |
+            # (3) New: IPv6 literal in brackets
+            $IP_LITERAL
+        )
+    /x;
+
+    # Full HTTP(S) URI using RFC2396 path/query (strict ASCII), suitable for angle-bracket autolinks.
+    our $HTTP_RFC3986_URI = qr{
+        (?:
+            (?:http|https)://
+            $HTTP_RFC3986_HOST
+            (?:: $port )?
+            (?: /
+                (?:
+                    $path_segments
+                    (?: \? $query )?
+                )
+            )?
+        )
+    }x;
+
+    our $HTTP_R3986_URI_INLINE = qr{
+        (?:
+            (?:http|https)://
+            $HTTP_RFC3986_HOST
+            (?:: $port )?
+            (?: / $UNICODE_PATHQ )?
+            (?: \? $UNICODE_PATHQ )?
+        )
+    }x;
+
     our $REGEXP =
     {
-    ## Bold
-    ## https://regex101.com/r/Jp2Kos/3
+    # NOTE: Bold
+    # https://regex101.com/r/Jp2Kos/3
     bold => qr/
         (?<!\\)                         # Check it was not escaped with a \
         (?<bold_all>
@@ -143,9 +248,10 @@ $LIST_TYPE_ORDERED
             \g{bold_type}               # Balanced closing tag
         )
     /x,
-    
-    ## Code borrowed from original Markdown author: John Gruber
-    ## https://regex101.com/r/TdKq0K/1
+
+    # NOTE: blockquote
+    # Code borrowed from original Markdown author: John Gruber
+    # https://regex101.com/r/TdKq0K/1
     bquote => qr/
         (?<bquote_all>                  # Wrap whole match in $1
             (?>
@@ -156,31 +262,39 @@ $LIST_TYPE_ORDERED
             )+
         )
     /xm,
-    
-    ## ```
-    ## Some code
-    ## ```
-    ## https://regex101.com/r/M6W99K/7
+
+    # NOTE: code block
+    # ```
+    # Some code
+    # ```
+    # https://regex101.com/r/M6W99K/7
+    # 2025-10-21: Updated
+    # - Allows optional info string after the opening fence (ignored in base mode)
+    # - Closes with the same fence run length & char
+    # - Works with up to 3 leading spaces per CommonMark
     code_block => qr/
-        (?:(?<=\n)|(?<=\A))                # Necessarily at the begining of a new line or start of string
+        (?:(?<=\n)|(?<=\A))            # Necessarily at the begining of a new line or start of string
         (?<code_all>
-            (?<code_start>
-                [ ]{0,3}                    # Possibly up to 3 leading spaces
-                \`{3,}                      # 3 code marks (backticks) or more
+            [ ]{0,3}                   # Possibly up to 3 leading spaces
+            (?<code_start>             # CAPTURE ONLY the fence run
+                \`{3,}
             )
-            \n+
-            (?<code_content>.*?)            # enclosed content
-            \n+
-            (?<!`)
-            \g{code_start}                  # balanced closing block marks
-            (?!`)
-            [ \t]*                          # possibly followed by some space
+            [ \t]* [^\n]*              # optional info string (ignored in base)
             \n
+            (?<code_content>.*?)       # enclosed content
+            \n
+            [ ]{0,3}                   # up to 3 leading spaces on the closer line
+            (?<!`)                     # closer not preceded by a backtick
+            \g{code_start}             # close with the SAME fence run
+            (?!`)                      # not followed by a backtick
+            [ \t]*                     # optional trailing spaces
+            \n                         # final newline (keep strict like your original)
         )
     /xms,
-    
-    ## Marked by left hand indentation
-    ## https://regex101.com/r/toEboU/3
+
+    # NOTE: code line
+    # Marked by left hand indentation
+    # https://regex101.com/r/toEboU/3
     code_line => qr/
         (?:(?<=^\n)|(?<=\A))            # Starting at beginning of string or with 2 new lines
         (?<code_all>
@@ -199,20 +313,29 @@ $LIST_TYPE_ORDERED
             \Z                          # or end of doc
         )
     /xm,
-    
-    ## \x{0060} is ` in unicode; see perl -le 'printf "\\x%x", ord( "`" )'
-    code_span => qr/
-        (?<!\\)                     # Ensuring this is not escaped
+
+    # NOTE: code span
+    # \x{0060} is ` in unicode; see perl -le 'printf "\\x%x", ord( "`" )'
+    # Updated on 2025-10-19 to change the 'code_start', and 'code_content'
+    # from (?<code_content>.+?) to (?:[^`]|`(?!\g{code_start}))*?
+    # Updated on 2025-10-21 to guard from capturing fenced blocks and indented codes
+    code_span => qr{
+        (?: $MD_SKIP_FENCED | $MD_SKIP_INDENTED )
+        |
+        (?<!\\)                             # Ensuring this is not escaped
         (?<code_all>
-            (?<code_start>\`{1,})   # One or more backtick(s)
-            (?<code_content>.+?)    # Code content inbetween back sticks
-            (?<!`)                  # Not preceded by a backtick
-            \g{code_start}          # Balanced closing backtick(s)
-            (?!`)                   # And not followed by a backtick
+            (?!^[ ]{0,3}`{3,}[^\n]*\n)      # not a fence opener (needs /m)
+            (?<code_start>`+)               # opening, capture N backticks
+            (?<code_content>                # allow single ` inside when using more ticks
+                (?:[^`]|`(?!\g{code_start}))*?
+            )
+            (?<!`)                          # close not preceded by `
+            \g{code_start}                  # balanced closing ticks
         )
-    /x,
-    
-    ## https://regex101.com/r/eDb6RN/5
+    }xms,
+
+    # NOTE: emphasis
+    # https://regex101.com/r/eDb6RN/5
     em => qr/
         (?<!\\|\*|\_)               # Check it was not escaped with a \
         (?<em_all>
@@ -224,27 +347,34 @@ $LIST_TYPE_ORDERED
             \g{em_type}             # Balanced closing tag
         )
    /x,
-    
-    ## Headers: #, ##, ###, ####, #####, ###### become h1..6
+
+    # NOTE: headers
+    # Headers: #, ##, ###, ####, #####, ###### become h1..6
     # atx-style headers:
     #   # Header 1
     #   ## Header 2
     #   ## Header 2 with closing hashes ##
     #   ...
     #   ###### Header 6
-    ## https://regex101.com/r/9uQwBk/6
+    # https://regex101.com/r/9uQwBk/6
+    # 2025-10-19: Added safeguards $MD_SKIP_FENCED and $MD_SKIP_INDENTED
+    # other change avoids “#######” lines with no content and the occasional 7+ “#” oddity.
     header => qr/
+        (?: $MD_SKIP_FENCED | $MD_SKIP_INDENTED )
+        |
         (?<header_all>
             ^
-            (?<!\\)                     # Make sure this is not escaped
-            (?<header_level>\#+)        # one or more #
-            [ \t]*                      # Possibly followed by some spaces or tabs
-            (?<header_content>.+?)      # Header content enclosed
-            [ \t\#]*                    # Possibly followed by some spaces or tabs or some dashes (don't need to match the opening ones)
-            \n                          # Terminated by a new line
+            (?<!\\)                         # Make sure this is not escaped
+            (?<header_level>\#{1,6})        # 1..6 # only
+            [ \t]*                          # Possibly followed by some spaces or tabs
+            (?![ \t]*$)                     # must have some content
+            (?<header_content>.*?)          # Possibly followed by some spaces or tabs or some dashes (don't need to match the opening ones)
+            [ \t\#]*                        # optional closing hashes or spaces
+            \n
         )
     /mx,
-    
+
+    # NOTE: setext-style headers
     # Setext-style headers:
     #     Header 1
     #     ========
@@ -252,23 +382,52 @@ $LIST_TYPE_ORDERED
     #     Header 2
     #     --------
     #
-    ## This is to be on a single line of its own
-    ## https://regex101.com/r/sQLEqz/4
+    # This is to be on a single line of its own
+    # https://regex101.com/r/sQLEqz/4
+    # 2025-10-19: Added safeguards $MD_SKIP_FENCED and $MD_SKIP_INDENTED
     header_line => qr/
+        (?: $MD_SKIP_FENCED | $MD_SKIP_INDENTED ) |
         (?<header_all>
             ^
-            (?<header_content>.+)       # Header content
-            [ \t]*                      # Possibly followed by spaces or tabs
-            \n                          # With then a new line
-            (?<!\\)                     # Making sure this is not escaped
-            (?<header_type>[\=|\-]+)    # Multiple = or -
-            [ \t]*                      # Possibly followed by spaces or tabs
-            \n                          # Terminated by a new line
+            (?<header_content>.+?)          # Header content
+            [ \t]*                          # Possibly followed by spaces or tabs
+            \n                              # With then a new line
+            (?<!\\)                         # Making sure this is not escaped
+            (?<header_type>={3,}|-{3,})     # underline, 3+ to avoid list dashes noise
+            [ \t]*                          # Possibly followed by spaces or tabs
+            \n                              # Terminated by a new line
         )
     /mx,
-    
-    ## https://regex101.com/r/SH8ki3/4
+
+    # NOTE: html
+    # https://regex101.com/r/SH8ki3/4
+    # 2025-10-18: Added safeguards to exclude html embedded within code blocks
     html => qr/
+        #---------------------------------------------------------
+        # 0) Indented-code guard
+        #---------------------------------------------------------
+        $MD_SKIP_INDENTED
+        |
+        #---------------------------------------------------------
+        # 1) Ignore fenced code blocks (```lang … ``` or ~~~ … ~~~)
+        #    We match them first, then (*SKIP)(*F) so the engine
+        #    jumps past the whole block and resumes searching after it.
+        #---------------------------------------------------------
+        (?:
+            (?<=\n) | \A                  # start of line or start of string
+        )
+        [ ]{0,3}                          # up to 3 leading spaces per CommonMark
+        (?<fence>`{3,}|~{3,})[^\n]*\n     # opening fence with optional info string
+        (?:
+            (?![ ]{0,3}\k<fence>[ \t]*\r?(?:\n|\z))   # not the closing fence line
+            .*(?:\n|\z)                               # consume a whole line
+        )*
+        [ ]{0,3}\k<fence>[ \t]*\r?(?:\n|\z) # closing fence
+        (*SKIP)(*F)                         # skip this whole region and fail this alt
+        |
+        #---------------------------------------------------------
+        # 2) The actual HTML matcher
+        #---------------------------------------------------------
         (?:(?<=\n)|(?<=\A))                # Necessarily at the begining of a new line or start of string
         (?<leading_space>[ ]{0,3})
         (?<tag_all>
@@ -335,11 +494,15 @@ $LIST_TYPE_ORDERED
             )
         )
     /xsm,
-    
-    ## Basically same as link, except there is an exclamation mark (!) just before:
-    ## Ex: ![alt text](url "optional title")
-    ## https://regex101.com/r/z0yH2F/10
+
+    # NOTE: image
+    # Basically same as link, except there is an exclamation mark (!) just before:
+    # Ex: ![alt text](url "optional title")
+    # https://regex101.com/r/z0yH2F/10
+    # 2025-10-19: Added safeguard $MD_SKIP_INLINE_CODE
     img => qr/
+        $MD_SKIP_INLINE_CODE
+        |
         (?<!\\)                                             # Check it was not escaped with a \
         (?<img_all>
             \!\[(?<img_alt>.+?)\]                           # image alternative text, i.e. the text used when the image does not
@@ -386,36 +549,44 @@ $LIST_TYPE_ORDERED
             )
         )
     /xm,
-    
+
 #     ^[ ]{0,2}([ ]?\*[ ]?){3,}[ \t]*$
-    ## Horizontal line
-    ## https://daringfireball.net/projects/markdown/syntax#hr
-    ## https://regex101.com/r/Vlew4X/2
+    # NOTE: line
+    # Horizontal line
+    # https://daringfireball.net/projects/markdown/syntax#hr
+    # https://regex101.com/r/Vlew4X/2
+    # 20215-10-19: group the repeated unit atomically.
     line => qr/
-        ^                           # At start of line
-        $SPACE_RE{0,2}              # with up to 3 spaces before
-        (?<!\\)                     # Make sure this is not escaped
+        ^                               # At start of line
+        $SPACE_RE{0,2}                  # with up to 3 spaces before
+        (?<!\\)                         # Make sure this is not escaped
         (?<line_all>
-            $SPACE_RE?
-            (?<line_type>\*|\-|\_)  # asterisk, hyphen or underscore
-            $SPACE_RE?              # possibly followed by spaces
-        ){3,}                       # 3 or more occurences
+            (?:
+                $SPACE_RE?
+                (?<line_type>\*|\-|\_)  # asterisk, hyphen or underscore
+                $SPACE_RE?              # possibly followed by spaces
+            ){3,}                       # 3 or more occurences
+        )
         [ \t]*
-        $                           # end of line or end of string
+        $                               # end of line or end of string
     /mx,
-    
-    ## https://regex101.com/r/6VG46H/1
+
+    # NOTE: line break
+    # https://regex101.com/r/6VG46H/1
     line_break => qr/
         (?<br_all>
             [ ]{2,}\n
         )
     /mx,
-    
-    ## Link
-    ## https://daringfireball.net/projects/markdown/syntax#link
-    ## https://regex101.com/r/sGsOIv/10
-    ## Links' id can be multiline, so we need the /s modifier
+
+    # NOTE: Link
+    # https://daringfireball.net/projects/markdown/syntax#link
+    # https://regex101.com/r/sGsOIv/10
+    # Links' id can be multiline, so we need the /s modifier
+    # 2025-10-19 Added safeguard $MD_SKIP_INLINE_CODE
     link => qr/
+        $MD_SKIP_INLINE_CODE
+        |
         (?<link_all>                                        # Check it was not escaped with a \
             (?:(?:\\|\!)\[(*SKIP)(*FAIL)|\[)                # Cannot be preceded by an anti-slash nor an exclamation mark (image)
             (?<link_name>
@@ -441,7 +612,7 @@ $LIST_TYPE_ORDERED
                             <(?<link_url>.*?)>              # link url within <>; or
                             |
                             (?<link_url>                    # link url without <>
-        (?:(?:http|https):\/\/(?:(?:(?:(?:(?:(?:[a-zA-Z0-9][-a-zA-Z0-9]*)?[a-zA-Z0-9])[.])*(?:[a-zA-Z][-a-zA-Z0-9]*[a-zA-Z0-9]|[a-zA-Z])[.]?)|(?:[0-9]+[.][0-9]+[.][0-9]+[.][0-9]+)))(?::(?:(?:[0-9]*)))?(?:\/(?:(?:(?:(?:(?:(?:[a-zA-Z0-9\-_.!~*'():@&=+\$,]+|(?:%[a-fA-F0-9][a-fA-F0-9]))*)(?:;(?:(?:[a-zA-Z0-9\-_.!~*'():@&=+\$,]+|(?:%[a-fA-F0-9][a-fA-F0-9]))*))*)(?:\/(?:(?:(?:[a-zA-Z0-9\-_.!~*'():@&=+\$,]+|(?:%[a-fA-F0-9][a-fA-F0-9]))*)(?:;(?:(?:[a-zA-Z0-9\-_.!~*'():@&=+\$,]+|(?:%[a-fA-F0-9][a-fA-F0-9]))*))*))*))(?:[?](?:(?:(?:[;\/?:@&=+\$,a-zA-Z0-9\-_.!~*'()]+|(?:%[a-fA-F0-9][a-fA-F0-9]))*)))?))?)
+                                $HTTP_R3986_URI_INLINE
                             )
                             |
                             (?<link_url>.*?)
@@ -459,9 +630,14 @@ $LIST_TYPE_ORDERED
             )
         )
     /xms,
-    
-    ## https://regex101.com/r/bAUu1E/4/tests
-    link_auto => qr/
+
+    # NOTE: link auto
+    # https://regex101.com/r/bAUu1E/4/
+    # 2025-10-19: Added safeguard $MD_SKIP_INLINE_CODE
+    #             Added labels 'link_idn_http', 'link_idn_https', 'link_v6_http', and 'link_v6_https'
+    link_auto => qr{
+        $MD_SKIP_INLINE_CODE
+        |
         (?<!\\)                     # Make sure this is not escaped
         (?<link_all>
             <
@@ -479,14 +655,23 @@ $LIST_TYPE_ORDERED
                 (?<link_news>$RE{URI}{news})                        # news
                 |
                 (?<link_mailto>(?:mailto\:)?$RE{Email}{Address})    # email address: mailto:john@example.com or simply john@example.com
+                |
+                (?<link_idn_http>  http://  $IDN_HOST  (?::(?:$port))?(?:/(?:(?:$path_segments)(?:[?](?:$query))?))? )  # IDN http hosts
+                |
+                (?<link_idn_https> https:// $IDN_HOST  (?::(?:$port))?(?:/(?:(?:$path_segments)(?:[?](?:$query))?))? )  # IDN https hosts
+                |
+                (?<link_v6_http>   http://  $IP_LITERAL (?::(?:$port))?(?:/(?:(?:$path_segments)(?:[?](?:$query))?))? ) # IPv6 http hosts
+                |
+                (?<link_v6_https>  https:// $IP_LITERAL (?::(?:$port))?(?:/(?:(?:$path_segments)(?:[?](?:$query))?))? ) # IPv6 https hosts
             )
             >
         )
-    /x,
-    
-    ## Definition
-    ## https://daringfireball.net/projects/markdown/syntax#link
-    ## https://regex101.com/r/edg2F7/3
+    }x,
+
+    # NOTE: link definition
+    # Definition
+    # https://daringfireball.net/projects/markdown/syntax#link
+    # https://regex101.com/r/edg2F7/3
     link_def => qr/
         ^[ ]{0,3}                                       # Leading space up to 3
         (?<link_all>
@@ -522,12 +707,16 @@ $LIST_TYPE_ORDERED
         )
         (?:\n+|\Z)                      # terminated by a new line or end of file
     /xm,
-    
-    ## Link with reference to link definition id
-    ## https://daringfireball.net/projects/markdown/syntax#link
-    ## https://regex101.com/r/QmyfnH/1/tests
-    ## The /s switch is required for link name spawning multiple lines: [Some\nlink][]
+
+    # NOTE: link reference
+    # Link with reference to link definition id
+    # https://daringfireball.net/projects/markdown/syntax#link
+    # https://regex101.com/r/QmyfnH/1/
+    # The /s switch is required for link name spawning multiple lines: [Some\nlink][]
+    # 2025-10-19: Added safeguard $MD_SKIP_INLINE_CODE
     link_ref => qr/
+        $MD_SKIP_INLINE_CODE
+        |
         (?<link_all>
             (?<!\\)\[(?<link_name>.+?)(?<!\\)\] # link name in brackets, but could also be used as the link id if link id is empty
             [ ]?                                # possibly followed by some spaces
@@ -535,31 +724,37 @@ $LIST_TYPE_ORDERED
             (?<!\\)\[(?<link_id>.*?)(?<!\\)\]   # with the link id in brackets, but may be empty
         )
     /xms,
-    
-    ## regular expression for list, ordered or unordered
+
+    # NOTE: list type ordered
+    # regular expression for list, ordered or unordered
     list_type_ordered => $LIST_TYPE_ORDERED,
-    
+
+    # NOTE: list type unordered
     list_type_unordered => $LIST_TYPE_UNORDERED,
-    
-    ## Taken from Markdown original author, John Gruber's original regular expression
+
+    # NOTE: list all
+    # Taken from Markdown original author, John Gruber's original regular expression
     list => $LIST_ALL,
-    
-    ## https://regex101.com/r/RfhRVg/5
+
+    # NOTE: list first level
+    # https://regex101.com/r/RfhRVg/5
     list_first_level => qr/
         (?:(?<=^\n)|(?<=\A))
         $LIST_ALL
     /mx,
-    
+
+    # NOTE: list nth level
     list_nth_level => qr/
         ^
         $LIST_ALL
     /mx,
-    
-    ## Minor deviation from John Gruber's original regular expression
-    ## Changed [ \t]+ to [ \t]* and .+? to .*? so that it catches empty list item, like:
-    ## *
-    ## * Something
-    ## https://regex101.com/r/bulBCP/1/tests
+
+    # NOTE: list item
+    # Minor deviation from John Gruber's original regular expression
+    # Changed [ \t]+ to [ \t]* and .+? to .*? so that it catches empty list item, like:
+    # *
+    # * Something
+    # https://regex101.com/r/bulBCP/1/
     list_item => qr/
         (?<li_all>
             (?<li_lead_line>\n)?                                                        # leading line
@@ -609,10 +804,14 @@ $LIST_TYPE_UNORDERED_PLUS
 $LIST_TYPE_ORDERED
         )
     /xm,
-    
-    ## https://regexr.com/5929n
-    ## https://regex101.com/r/0B3gR4/5
+
+    # NOTE: paragraph
+    # https://regexr.com/5929n
+    # https://regex101.com/r/0B3gR4/5
+    # 2025-10-19: updated to add safeguard, and improved 'para_content' to avoid swallowing definitions/footnotes/HTML starts.
     paragraph => qr/
+        (?: $MD_SKIP_FENCED | $MD_SKIP_INDENTED )
+        |
         (?:(?<=^\n)|(?<=\A))                        # Needs 1 or more new lines or start of string
         (?<para_all>
             (?<para_prefix>[ ]{0,3})                # Possibly some leading spaces, but less than a tab worth
@@ -621,38 +820,46 @@ $LIST_TYPE_ORDERED
                     (?!                             # some line content not starting with those exceptions
                         [[:blank:]\h]{0,3}
                         (?:
-                            \*{1}[ \t]+             # a list
+                            \*{1}[ \t]+                 # a list
                             |
-                            (?:\*(?:[ ]?\*){2,})     # a horizontal line
+                            (?:\*(?:[ ]?\*){2,})        # a horizontal line
                             |
-                            (?:\-*(?:[ ]?\-){2,})     # a horizontal line
+                            (?:\-*(?:[ ]?\-){2,})       # a horizontal line
                             |
-                            (?:\_*(?:[ ]?\_){2,})     # a horizontal line
+                            (?:\_*(?:[ ]?\_){2,})       # a horizontal line
                             |
-                            [>+-=\#]
+                            [>+-=\#]                    # bq, heading, setext line, etc.
                             |
-                            \d+\.                   # ordered list
+                            \d+\.                       # ordered list
                             |
-                            \`{3,}                  # code block
+                            \`{3,}                      # code block (fenced)
                             |
-                            \~{3,}                  # code block extended
+                            \~{3,}                      # code block extended
+                            |
+                            \[ [^\]\n]+ \] [ \t]*:      # link def [id]:
+                            |
+                            \[\^ [^\]\n]+ \] [ \t]*:    # footnote def [^id]:
+                            |
+                            <[A-Za-z]                   # HTML block start
                         )
                     )
-                )
-                .+
-                (?!\n(?:[=-]+))
-                (?:\n|$)
-            )+
+                    .+
+                    (?!\n(?:[=-]+))
+                    (?:\n|$)
+                )+
+            )
         )
     /mx
     };
-    
-    ## Extended regular expression
+
+    # NOTE: extended regular expressions
+    # Extended regular expression
     our $REGEXP_EXT =
     {
-    ## Ex: *[HTML]: Hyper Text Markup Language
-    ## This is similar, but different from definitions
-    ## https://regex101.com/r/ztM2Pw/2/tests
+    # NOTE: abbreviation
+    # Ex: *[HTML]: Hyper Text Markup Language
+    # This is similar, but different from definitions
+    # https://regex101.com/r/ztM2Pw/2/
     ex_abbr => qr/
         (?<abbr_all>
             (?<!\\)\*
@@ -664,8 +871,9 @@ $LIST_TYPE_ORDERED
             (?:\n|\z)
         )
     /x,
-    
-    ## https://regex101.com/r/ezMwsv/1/
+
+    # NOTE: checkbox
+    # https://regex101.com/r/ezMwsv/1/
     ex_checkbox => qr/
         (?<check_all>
             [ ]?
@@ -674,50 +882,48 @@ $LIST_TYPE_ORDERED
             (?=\S+)
         )
     /xi,
-    
-    ## This is same as the regular code block, except this allows for a code class or a code definition with class, id, etc.
-    ## https://regex101.com/r/Y9lPAz/10
+
+    # NOTE: code block extended
+    # This is same as the regular code block, except this allows for a code class or a code definition with class, id, etc.
+    # https://regex101.com/r/Y9lPAz/10
+    # 2025-10-21: Updated
     ex_code_block => qr/
         (?:(?<=\n)|(?<=\A))                            # Necessarily at the begining of a new line or start of string
         (?<code_all>
-            (?<code_start>
-                [ ]{0,3}                                # Possibly up to 3 leading spaces
-                (?:
-                    (?<with_backtick>[`]{3,})           # 3 code marks (backticks) or more
-                    |
-                    (?<with_tilde>[~]{3,})              # or 3 code marks (tilde) or more
-                )
+            [ ]{0,3}                                   # Possibly up to 3 leading spaces
+            (?<code_start>                             # CAPTURE ONLY the fence run
+                (?<with_backtick>[`]{3,})              # 3 code marks (backticks) or more
+                |
+                (?<with_tilde>[~]{3,})                 # or 3 code marks (tilde) or more
             )
             [ \t]*
             (?:
-                (?:
+                (?:                                    # .class[.class] {attrs}?   OR   .class only
                     (?<code_class>(?&_code_class))
                     (?:
                         [ \t]*
-                        \{[[:blank:]\h]*(?<code_attr>(?&_code_attr))[[:blank:]\h]*\}
+                        \{ [[:blank:]\h]* (?<code_attr>(?&_code_attr)) [[:blank:]\h]* \}
                     )?
                 )
-                |
-                (?:
-                    \{[[:blank:]\h]*(?<code_attr>(?&_code_attr))[[:blank:]\h]*\}
-                )
+              |                                        # OR  {attrs} only
+                \{ [[:blank:]\h]* (?<code_attr>(?&_code_attr)) [[:blank:]\h]* \}
             )?
             \n+
-            (?<code_content>.*?)                        # enclosed content
+            (?<code_content>.*?)                       # enclosed content
             \n+
-            (?<!`)
-            \g{code_start}                              # balanced closing block marks
-            (?!`)
-            [ \t]*                                      # possibly followed by some space
-            (?:\n|\Z)                                   # contrary to the vanilla version, we allow for no double line-break
+            [ ]{0,3}                                   # Possibly up to 3 leading spaces on the closing line
+            \g{code_start}                             # balanced closing block marks (backticks or tildes)
+            [ \t]*                                     # possibly followed by some space
+            (?:\n|\Z)                                  # contrary to the vanilla version, we allow for no double line-break
         )
         (?(DEFINE)
-            (?<_code_class>     [\w\-\.]+)
-            (?<_code_attr>      [^\}]+)
+            (?<_code_class>     [\w\-.]+)
+            (?<_code_attr>      [^}]+)
         )
     /xms,
-    
-    ## https://regex101.com/r/WuB1FR/2/
+
+    # NOTE: footnote extended
+    # https://regex101.com/r/WuB1FR/2/
     ex_footnote => qr/
         (?<footnote_all>
             ^[ ]{0,3}
@@ -736,8 +942,9 @@ $LIST_TYPE_ORDERED
             )
         )
     /xm,
-    
-    ## https://regex101.com/r/3eO7rJ/1/
+
+    # NOTE: footnote reference extended
+    # https://regex101.com/r/3eO7rJ/1/
     ex_footnote_ref => qr/
         (?<footnote_all>                        # 3 possible patterns
             (?:
@@ -756,23 +963,30 @@ $LIST_TYPE_ORDERED
             )
         )
     /xms,
-    
+
+    # NOTE: header extended
     # atx-style headers:
     #   # Header 1
     #   ## Header 2
     #   ## Header 2 with closing hashes ##
     #   ...
     #   ###### Header 6
-    ## ## Le Site ##    {.main .shine #the-site lang=fr}
-    ## Same as regular header + parameters insides curly braces in between
-    ## https://regex101.com/r/GyzbR2/3
+    # ## Le Site ##    {.main .shine #the-site lang=fr}
+    # Same as regular header + parameters insides curly braces in between
+    # https://regex101.com/r/GyzbR2/3
+    # 2025-10-19: Added safeguard
+    #             Limited level to 6
+    #             Must have some text in 'header_content'
     ex_header => qr/
+        (?: $MD_SKIP_FENCED | $MD_SKIP_INDENTED )
+        |
         (?<header_all>
             ^
             (?<!\\)                     # Make sure this is not escaped
-            (?<header_level>\#+)        # one or more #
+            (?<header_level>\#{1,6})    # one or more #
             [ \t]*                      # Possibly followed by some spaces or tabs
-            (?<header_content>.*?)      # Header content enclosed
+            (?![ \t]*\{)                # Do not allow only attributes as “content”
+            (?<header_content>.+?)      # Header content enclosed
             [ \t\#]*                    # Possibly followed by some spaces or tabs or some dashes (don't need to match the opening ones)
             (?<!\\)                     # Making sure it is not escaped
             \{
@@ -782,7 +996,8 @@ $LIST_TYPE_ORDERED
             \n                          # Terminated by a new line
         )
     /xm,
-    
+
+    # NOTE: setext-style headers
     # Setext-style headers:
     #     Header 1 {.main .shine #the-site lang=fr}
     #     ========
@@ -790,9 +1005,13 @@ $LIST_TYPE_ORDERED
     #     Header 2 {.main .shine #the-site lang=fr}
     #     --------
     #
-    ## This is to be on a single line of its own
-    ## https://regex101.com/r/berfAR/4
+    # This is to be on a single line of its own
+    # https://regex101.com/r/berfAR/4
+    # 2025-10-19: Added safeguard
+    #             Added a limit to the number of header marker: up to 3
     ex_header_line => qr/
+        (?: $MD_SKIP_FENCED | $MD_SKIP_INDENTED )
+        |
         (?<header_all>
             ^
             (?<header_content>.+)       # Header content
@@ -806,13 +1025,14 @@ $LIST_TYPE_ORDERED
             [ \t]*                      # Possibly followed by spaces or tabs
             \n                          # With then a new line
             (?<!\\)                     # Making sure this is not escaped
-            (?<header_type>[\=|\-]+)    # Multiple = or -
+            (?<header_type>={3,}|-{3,}) # Multiple = or -, up to 3
             [ \t]*                      # Possibly followed by spaces or tabs
             \n                          # Terminated by a new line
         )
     /mx,
-    
-    ## https://regex101.com/r/M6KCjp/3
+
+    # NOTE: html extended
+    # https://regex101.com/r/M6KCjp/3
     ex_html_markdown => qr/
         (?<html_markdown_all>
             (?<mark_pat1>
@@ -865,9 +1085,13 @@ $LIST_TYPE_ORDERED
             )
         )
     /xms,
-    
-    ## https://regex101.com/r/xetHV1/4
+
+    # NOTE: image extended
+    # https://regex101.com/r/xetHV1/4
+    # 2025-10-19: Added safeguard $MD_SKIP_INLINE_CODE
     ex_img => qr/
+        $MD_SKIP_INLINE_CODE
+        |
         (?<!\\)                                             # Check it was not escaped with a \
         (?<img_all>
             \!\[(?<img_alt>.+?)\]                           # image alternative text, i.e. the text used when the image does not
@@ -921,9 +1145,13 @@ $LIST_TYPE_ORDERED
             \}
         )
     /x,
-    
-    ## https://regex101.com/r/IZw4YU/1/
+
+    # NOTE: insertion extended
+    # https://regex101.com/r/IZw4YU/1/
+    # 2025-10-19: Added safeguard $MD_SKIP_INLINE_CODE
     ex_insertion => qr/
+        $MD_SKIP_INLINE_CODE
+        |
         (?<ins_all>                     # insertion can be multilines
             (?<!\\)\+{2}                # Start with 2 +
             (?!\n)                      # but not followed by a new line to avoid any previous + getting caught
@@ -933,9 +1161,13 @@ $LIST_TYPE_ORDERED
             (?<!\\)\+{2}                # terminated by 2 +
         )
     /xm,
-    
-    ## https://regex101.com/r/43OuNT/1/
+
+    # NOTE: katex dollar
+    # https://regex101.com/r/43OuNT/1/
+    # 2025-10-19: Added safeguard $MD_SKIP_INLINE_CODE
     ex_katex_dollar2 => qr/
+        $MD_SKIP_INLINE_CODE
+        |
         (?<!\\|\$)
         (?<katex_open>\${2})
         (?!\$)
@@ -947,6 +1179,8 @@ $LIST_TYPE_ORDERED
         \n?
     /mxs,
     ex_katex_dollar1 => qr/
+        $MD_SKIP_INLINE_CODE
+        |
         (?<!\\|\$)
         (?<katex_open>\${1})
         (?!\$)
@@ -957,7 +1191,10 @@ $LIST_TYPE_ORDERED
         (?!\$)
         \n?
     /mxs,
+    # NOTE: katex bracket
     ex_katex_bracket => qr/
+        $MD_SKIP_INLINE_CODE
+        |
         (?<!\\)
         (?<katex_open>\\\[)
         \n?
@@ -967,7 +1204,10 @@ $LIST_TYPE_ORDERED
             \\\]
         )\n?
     /mxs,
+    # NOTE: katex parens
     ex_katex_parens => qr/
+        $MD_SKIP_INLINE_CODE
+        |
         (?<!\\)
         (?<katex_open>\\\()
         \n?
@@ -977,11 +1217,23 @@ $LIST_TYPE_ORDERED
             \\\)
         )\n?
     /mxs,
-    
+
+    # NOTE: line break extended
+    # https://regex101.com/r/6VG46H/1
+    ex_line_break => qr/
+        (?<br_all>
+            (?:[ ]{2,}\n|\n)
+        )
+    /mx,
+
+    # NOTE: link extended
     # [Hyperlinked text](http://www.example.com)
     # [Hyperlinked text](http://www.example.com "Example Site")
-    ## https://regex101.com/r/7mLssJ/7
+    # https://regex101.com/r/7mLssJ/7
+    # 2025-10-19: Added safeguard $MD_SKIP_INLINE_CODE
     ex_link => qr/
+        $MD_SKIP_INLINE_CODE
+        |
         (?<link_all>
             (?:(?:\\|\!)\[(*SKIP)(*FAIL)|\[)                # Cannot be preceded by an anti-slash nor an exclamation mark (image)
                 (?<link_name>
@@ -1006,7 +1258,7 @@ $LIST_TYPE_ORDERED
                             <(?<link_url>.*?)>
                             |
                             (?<link_url>                    # link url without <>
-        (?:(?:http|https):\/\/(?:(?:(?:(?:(?:(?:[a-zA-Z0-9][-a-zA-Z0-9]*)?[a-zA-Z0-9])[.])*(?:[a-zA-Z][-a-zA-Z0-9]*[a-zA-Z0-9]|[a-zA-Z])[.]?)|(?:[0-9]+[.][0-9]+[.][0-9]+[.][0-9]+)))(?::(?:(?:[0-9]*)))?(?:\/(?:(?:(?:(?:(?:(?:[a-zA-Z0-9\-_.!~*'():@&=+\$,]+|(?:%[a-fA-F0-9][a-fA-F0-9]))*)(?:;(?:(?:[a-zA-Z0-9\-_.!~*'():@&=+\$,]+|(?:%[a-fA-F0-9][a-fA-F0-9]))*))*)(?:\/(?:(?:(?:[a-zA-Z0-9\-_.!~*'():@&=+\$,]+|(?:%[a-fA-F0-9][a-fA-F0-9]))*)(?:;(?:(?:[a-zA-Z0-9\-_.!~*'():@&=+\$,]+|(?:%[a-fA-F0-9][a-fA-F0-9]))*))*))*))(?:[?](?:(?:(?:[;\/?:@&=+\$,a-zA-Z0-9\-_.!~*'()]+|(?:%[a-fA-F0-9][a-fA-F0-9]))*)))?))?)
+                                $HTTP_R3986_URI_INLINE
                             )
                             |
                             (?<link_url>.*?)
@@ -1031,8 +1283,9 @@ $LIST_TYPE_ORDERED
             \}
         )
     /x,
-    
-    ## https://regex101.com/r/hVfXCe/3
+
+    # NOTE: link definition extended
+    # https://regex101.com/r/hVfXCe/3
     ex_link_def => qr/
         ^[ ]{0,3}                                       # Leading space up to 3
         (?<link_all>
@@ -1075,12 +1328,17 @@ $LIST_TYPE_ORDERED
         )
         (?:\n+|\Z)                      # terminated by a new line or end of file
     /xm,
-    
-    ## Ex: {#id1} or {.cl} or {#id.cl.class}
+
+    # NOTE: markdown attributes
+    # Ex: {#id1} or {.cl} or {#id.cl.class}
     md_attributes1 => qr/(?<!\\)\{$SPACE_RE*(?<attr>[^\}]*)\}/,
-    
-    ## https://regex101.com/r/gF6wVe/2
+
+    # NOTE: subscript extended
+    # https://regex101.com/r/gF6wVe/2
+    # 2025-10-19: Added safeguard $MD_SKIP_INLINE_CODE
     ex_subscript => qr/
+        $MD_SKIP_INLINE_CODE
+        |
         (?<sub_all>
             (?:
                 (?<!\\)\~
@@ -1099,9 +1357,13 @@ $LIST_TYPE_ORDERED
             )
         )
     /x,
-    
-    ## https://regex101.com/r/yAcNcX/1/tests
+
+    # NOTE: superscript extended
+    # https://regex101.com/r/yAcNcX/1/
+    # 2025-10-19: Added safeguard $MD_SKIP_INLINE_CODE
     ex_superscript => qr/
+        $MD_SKIP_INLINE_CODE
+        |
         (?<sup_all>
             (?:
                 (?<!\\)\^
@@ -1120,9 +1382,13 @@ $LIST_TYPE_ORDERED
             )
         )
     /x,
-    
-    ## https://regex101.com/r/4Z3h4F/1/
+
+    # NOTE: strikethrough extended
+    # https://regex101.com/r/4Z3h4F/1/
+    # 2025-10-19: Added safeguard $MD_SKIP_INLINE_CODE
     ex_strikethrough => qr/
+        $MD_SKIP_INLINE_CODE
+        |
         (?<strike_all>                  # strikethrough can be multilines
             (?<!\\)\~{2}                # Start with 2 tilde
             (?!\n)                      # but not followed by a new line to avoid any previous tildes getting caught
@@ -1132,9 +1398,13 @@ $LIST_TYPE_ORDERED
             (?<!\\)\~{2}                # terminated by 2 tildes
         )
     /x,
-    
-    ## https://regex101.com/r/01XCqB/13
+
+    # NOTE: table extended
+    # https://regex101.com/r/01XCqB/13
+    # 2025-10-19: Added safeguard
     ex_table => qr/
+        (?: $MD_SKIP_FENCED | $MD_SKIP_INDENTED )
+        |
         (?:(?<=^\n)|(?<=\A))
         (?<table>
             (?<table_caption>(?&t_caption))?                    # maybe some caption at the top?
@@ -1332,6 +1602,9 @@ pattern name    => [qw( Markdown ExtKatex ), "-delimiter=\$\$,\$\$,\$,\$,\\\[,\\
             $re;
         };
 
+pattern name    => [qw( Markdown ExtLineBreak ) ],
+        create  => $REGEXP_EXT->{ex_line_break};
+
 pattern name    => [qw( Markdown ExtLink ) ],
         create  => $REGEXP_EXT->{ex_link};
 
@@ -1351,7 +1624,7 @@ pattern name    => [qw( Markdown ExtTable ) ],
         create  => $REGEXP_EXT->{ex_table};
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -1375,7 +1648,7 @@ Regexp::Common::Markdown - Markdown Common Regular Expressions
 
 =head1 VERSION
 
-    v0.1.5
+    v0.1.7
 
 =head1 DESCRIPTION
 
@@ -1420,7 +1693,7 @@ For example:
     >
     > foo
 
-You can see example of this regular expression along with test units here: L<https://regex101.com/r/TdKq0K/1/tests>
+You can see example of this regular expression along with test units here: L<https://regex101.com/r/TdKq0K/1>
 
 The capture names are:
 
@@ -1551,7 +1824,7 @@ For example:
 
     This is some `inline code`
 
-You can see example of this regular expression along with test units here: L<https://regex101.com/r/C2Vl9M/1/tests>
+You can see example of this regular expression along with test units here: L<https://regex101.com/r/C2Vl9M/1>
 
 The capture names are:
 
@@ -1978,7 +2251,7 @@ Phone numbers:
 
     <tel:+81-90-1234-5678>
 
-You can see example of this regular expression along with test units here: L<https://regex101.com/r/bAUu1E/3/tests>
+You can see example of this regular expression along with test units here: L<https://regex101.com/r/bAUu1E/3>
 
 The capture names are:
 
@@ -2087,7 +2360,7 @@ Example:
     [1]: /url/  "Title"
     [Foo]: https://www.example.com
 
-You can see example of this regular expression along with test units here: L<https://regex101.com/r/QmyfnH/1/tests>
+You can see example of this regular expression along with test units here: L<https://regex101.com/r/QmyfnH/1>
 
 The capture names are:
 
@@ -2221,7 +2494,7 @@ You can see also L<Markdown::Parser::List>
 
     $RE{Markdown}{ListItem}
 
-You can see example of this regular expression along with test units here: L<https://regex101.com/r/bulBCP/1/tests>
+You can see example of this regular expression along with test units here: L<https://regex101.com/r/bulBCP/1>
 
 The capture names are:
 
@@ -2341,7 +2614,7 @@ For example:
     *[HTML]: Hyper Text Markup Language
     *[SGML]: Standard Generalized Markup Language
 
-You can see example of this regular expression along with test units here: L<https://regex101.com/r/ztM2Pw/2/tests>
+You can see example of this regular expression along with test units here: L<https://regex101.com/r/ztM2Pw/2>
 
 The capture names are:
 

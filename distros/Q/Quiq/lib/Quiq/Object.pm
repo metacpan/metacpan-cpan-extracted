@@ -22,7 +22,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.231';
+our $VERSION = '1.232';
 
 use Scalar::Util ();
 use Hash::Util ();
@@ -254,7 +254,7 @@ sub parameters {
     # Parameterliste bestimmen
 
     my $paramA = shift;
-    if (!@$paramA) {
+    if (!@$paramA && $minArgs == 0) {
         # Wenn die Parameterliste leer ist, kehren wir sofort mit einer
         # leeren Argumentliste zurück. Die Optionsvariblen behalten
         # einfach ihren Wert.
@@ -682,7 +682,7 @@ sub this {
 
 =head1 VERSION
 
-1.231
+1.232
 
 =head1 AUTHOR
 

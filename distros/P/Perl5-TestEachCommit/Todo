@@ -1,41 +1,24 @@
 TODO list for Perl module Perl5::TestEachCommit
 
-Decide whether we should offer a method which, upon completion of work, will
-automatically or optionally reset the workdir to a clean checkout of blead.
-DONE Sep 08: cleanup_repository() added in 0a2687467f.
-
-Decide whether to set PERL_CORE=1 so that all tests are run on the assumption
-that we're working within the Perl core distribution.  This would, I believe,
-eliminate some output from testing Term::Tables which is cluttering up the
-terminal.
-DONE Sep 08: added in c9e2eb9d21.
-
-File a P5P issue or p.r. to eliminate this extraneous STDERR output I'm noticing in runs:
-
-    $ ack 'TODO: examine kid' .
-    ext/XS-APItest/APItest.xs
-    1227:  fprintf(stderr, "TODO: examine kid %p (optype=%s)\n", kid, PL_op_name[kid->op_type]);
-
-UPDATE (Sep 08): @leonerd has agreed to this and has it in a pending p.r.
-UPDATE (Sep 09): He did so in 4521b3ce4a6347e5b77358c28b615e08987c60e1.
-
-Write a 'dryrun' option for process_command_line which will construct the
+* Write a 'dryrun' option for process_command_line which will construct the
 object, prepare the repository (but then it wouldn't be completely dry, would
 it?), display the plan, display the commits and exit.  BUT:  should this be an
 option for process_command_line() or for a program (e.g.,
-'test-each-commit-p5p' that creates a P5::TEC object and methods?
+'test-each-commit-p5p') that creates a P5::TEC object and methods?
 
-Write a program which will appear under scripts in the tarball and be
+RESPONSE: (10/06): It should be an option for a caller program such as test-each-commit-p5p.
+
+* Write a program which will appear under scripts in the tarball and be
 installable under /usr/local/bin which will call
 Perl5::TestEachCommit::Util::process_command_line() to process switches, then
 call a sensible collection of Perl5::TestEachCommit methods.  Have begun
 writing such a program locally.  When polished, we'll include it in the
 distro.
 
-Write a subclass which during Configure, make test_prep and make test_harness
+* Write a subclass which during Configure, make test_prep and make test_harness
 will divert all STDOUT to /dev/null.  Perl5::TestEachCommit::Quietly.
 
-Testing p.r.s with many commits is time-consuming.  You don't want to have to
+* Testing p.r.s with many commits is time-consuming.  You don't want to have to
 keep a terminal open on your laptop to run an instance.  That suggests you
 probably want to do this (i) on a server (unless your laptop has more cores
 than your server); (ii) in a 'screen' session.  But when you re-attach to the
@@ -44,3 +27,30 @@ to display the scores of all commits.  That suggests we will want to offer the
 option of logging the output somewhere -- which in turn suggests we may want
 to resurrect the 'resultsdir' command-line option.
 
+* If our caller program is (as is likely) running in a screen session, we may
+want to peek at it periodically and ask, "Out of N total commits to be tested,
+what commit are we currently running?"  Add that functionality.  Should that
+be in a caller program or provided by the module itself?
+
+* There are situations where running test-each-commit-p5p over a multi-commit
+pull request will reveal test failures in non-final commits that arise from
+following our "standard operating procedures."  For example, pull requests
+from first-time competitors will typically have a porting test failure because
+the author is not yet listed in AUTHORS.  The author will then be prompted to
+run Porting/update_AUTHORS.pl and the defect will be corrected -- but
+generally in the next commit, which means the first commit is still a FAIL
+from the point-of-view of 'make test_harness'.  Another situation occurs when
+a p.r. modifies data used in our own compilation process and generated files
+that ship with the repository need to be updated via one or more of the
+Porting scripts.  Here, too, commit A will show a porting test failure.  That
+failure will be fixed in commit B or C or ... and the p.r. as a whole will
+test correctly and merge satisfactorily, but a checkout at commit A will still
+be graded FAIL.  The only way to avoid this is for guts programmers to run
+'make test_porting' after each commit.
+
+* It sometimes happens that within a series of commits (e.g., a pull request)
+test failures can be detected merely by running 'make minitest', obviating the
+need for a full 'make test_prep' or 'make test_harness'.  We need to allow for
+this possibility with a 'make_minitest_command' option.
+
+RESPONSE: Implemented in 0.06 (10/20/2025).

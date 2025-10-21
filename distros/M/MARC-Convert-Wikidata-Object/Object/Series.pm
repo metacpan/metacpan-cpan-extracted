@@ -3,10 +3,11 @@ package MARC::Convert::Wikidata::Object::Series;
 use strict;
 use warnings;
 
+use Error::Pure qw(err);
 use Mo qw(build is);
 use Mo::utils 0.08 qw(check_isa check_required);
 
-our $VERSION = 0.14;
+our $VERSION = 0.15;
 
 has issn => (
 	is => 'ro',
@@ -24,12 +25,31 @@ has series_ordinal => (
 	is => 'ro',
 );
 
+has series_ordinal_raw => (
+	is => 'ro',
+);
+
 sub BUILD {
 	my $self = shift;
 
+	# Check 'name'.
 	check_required($self, 'name');
 
+	# Check 'publisher'.
 	check_isa($self, 'publisher', 'MARC::Convert::Wikidata::Object::Publisher');
+
+	# Check 'series_ordinal'.
+	if (defined $self->{'series_ordinal'}
+		&& $self->{'series_ordinal'} !~ m/^\d+$/ms
+		&& $self->{'series_ordinal'} !~ m/^\d+\-\d+$/ms
+		&& $self->{'series_ordinal'} !~ m/^(?i)M{0,3}(CM|CD|D?C{0,3})
+			(XC|XL|L?X{0,3})
+			(IX|IV|V?I{0,3})$/x) {
+
+		err "Parameter 'series_ordinal' has bad value.",
+			'Value', $self->{'series_ordinal'},
+		;
+	}
 
 	return;
 }
@@ -55,6 +75,7 @@ MARC::Convert::Wikidata::Object::Series - Bibliographic Wikidata object for seri
  my $name = $obj->name;
  my $publisher = $obj->publisher;
  my $series_ordinal = $obj->series_ordinal;
+ my $series_ordinal_raw = $obj->series_ordinal_raw;
 
 =head1 METHODS
 
@@ -90,6 +111,14 @@ Default value is undef.
 
 Series ordinal.
 
+Could be a number, range of numbers or roman number.
+
+Default value is undef.
+
+=item * C<series_ordinal_raw>
+
+Series ordinal raw string.
+
 Default value is undef.
 
 =back
@@ -116,6 +145,14 @@ Returns L<MARC::Convert::Wikidata::Object::Publisher> object.
 
 Get series ordinal.
 
+Returns number.
+
+=head2 C<series_ordinal_raw>
+
+ my $series_ordinal_raw = $obj->series_ordinal_raw;
+
+Get series ordinal raw string.
+
 Returns string.
 
 =head1 ERRORS
@@ -127,6 +164,8 @@ Returns string.
                          Reference: %s
          From Mo::utils::check_required():
                  Parameter 'name' is required.
+         Parameter 'series_ordinal' has bad value.
+                 Value: %s
 
 =head1 EXAMPLE1
 
@@ -146,6 +185,7 @@ Returns string.
                  'name' => decode_utf8('Mladá Fronta'),
          ),
          'series_ordinal' => 5,
+         'series_ordinal_raw' => 'kn. 5',
  );
  
  p $obj;
@@ -195,6 +235,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.14
+0.15
 
 =cut

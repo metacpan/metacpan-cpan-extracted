@@ -4,7 +4,7 @@
       "janeskil1525 <janeskil1525@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.25",
+   "generated_by" : "Minilla/v3.1.28",
    "license" : [
       "perl_5"
    ],
@@ -42,7 +42,7 @@
       },
       "runtime" : {
          "requires" : {
-            "perl" : "v5.40.0"
+            "perl" : "v5.42.0"
          }
       },
       "test" : {
@@ -54,59 +54,13 @@
    "provides" : {
       "Daje::Database::Model" : {
          "file" : "lib/Daje/Database/Model.pm",
-         "version" : "0.06"
-      },
-      "Daje::Database::Model::Companies" : {
-         "file" : "lib/Daje/Database/Model/Companies.pm"
-      },
-      "Daje::Database::Model::CompaniesUsers" : {
-         "file" : "lib/Daje/Database/Model/CompaniesUsers.pm"
-      },
-      "Daje::Database::Model::CompanyType" : {
-         "file" : "lib/Daje/Database/Model/CompanyType.pm"
+         "version" : "0.07"
       },
       "Daje::Database::Model::Super::Common::Base" : {
          "file" : "lib/Daje/Database/Model/Super/Common/Base.pm"
       },
       "Daje::Database::Model::Super::Common::Defaults" : {
          "file" : "lib/Daje/Database/Model/Super/Common/Defaults.pm"
-      },
-      "Daje::Database::Model::Super::Companies" : {
-         "file" : "lib/Daje/Database/Model/Super/Companies.pm"
-      },
-      "Daje::Database::Model::Super::CompaniesUsers" : {
-         "file" : "lib/Daje/Database/Model/Super/CompaniesUsers.pm"
-      },
-      "Daje::Database::Model::Super::CompanyType" : {
-         "file" : "lib/Daje/Database/Model/Super/CompanyType.pm"
-      },
-      "Daje::Database::Model::Super::DocumentBuilder" : {
-         "file" : "lib/Daje/Database/Model/Super/DocumentBuilder.pm"
-      },
-      "Daje::Database::Model::Super::Users" : {
-         "file" : "lib/Daje/Database/Model/Super/Users.pm"
-      },
-      "Daje::Database::Model::Super::Workflow" : {
-         "file" : "lib/Daje/Database/Model/Super/Workflow.pm"
-      },
-      "Daje::Database::Model::Users" : {
-         "file" : "lib/Daje/Database/Model/Users.pm",
-         "version" : "0.01"
-      },
-      "Daje::Database::View::Super::VCompaniesUsers" : {
-         "file" : "lib/Daje/Database/View/Super/VCompaniesUsers.pm"
-      },
-      "Daje::Database::View::Super::VUsersInCompany" : {
-         "file" : "lib/Daje/Database/View/Super/VUsersInCompany.pm"
-      },
-      "Daje::Database::View::VCompaniesUsers" : {
-         "file" : "lib/Daje/Database/View/VCompaniesUsers.pm"
-      },
-      "Daje::Database::View::VUsersInCompany" : {
-         "file" : "lib/Daje/Database/View/VUsersInCompany.pm"
-      },
-      "Database::Model::Postgres" : {
-         "file" : "lib/Daje/Database/Model/Postgres.pm"
       }
    },
    "release_status" : "stable",
@@ -121,7 +75,7 @@
          "web" : "https://github.com/janeskil1525/Daje-Database-Model"
       }
    },
-   "version" : "0.06",
+   "version" : "0.07",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

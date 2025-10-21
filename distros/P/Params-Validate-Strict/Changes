@@ -1,5 +1,8 @@
 Revision history for Params-Validate-Strict
 
+0.18	Mon Oct 20 11:56:19 EDT 2025
+	Handle when an undefined object is passed in
+
 0.17	Fri Oct 17 21:00:50 EDT 2025
 	Allow regexes in a schema to be a simple string
 

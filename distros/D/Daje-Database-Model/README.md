@@ -1,4 +1,4 @@
-[![Actions Status](https://github.com/janeskil1525/Daje-Database-Model/actions/workflows/test.yml/badge.svg)](https://github.com/janeskil1525/Daje-Database-Model/actions)
+[![Actions Status](https://github.com/janeskil1525/Daje-Database-Model/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/janeskil1525/Daje-Database-Model/actions?workflow=test)
 # NAME
 
 Daje::Database::Model - It's the Daje database classes

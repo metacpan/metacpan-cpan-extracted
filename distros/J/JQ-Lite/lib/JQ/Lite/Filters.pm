@@ -3,7 +3,6 @@ package JQ::Lite::Filters;
 use strict;
 use warnings;
 
-use JSON::PP qw(encode_json);
 use List::Util qw(sum min max);
 use Scalar::Util qw(looks_like_number);
 use JQ::Lite::Util ();
@@ -106,7 +105,7 @@ sub apply {
                         next;
                     }
 
-                    my $json = encode_json($item);
+                    my $json = JQ::Lite::Util::_encode_json($item);
                     my @outputs = $self->run_query($json, $element);
                     if (@outputs) {
                         push @built, @outputs;
@@ -158,7 +157,7 @@ sub apply {
                         $value = @$values ? $values->[0] : undef;
                     }
                     else {
-                        my $json = encode_json($item);
+                        my $json = JQ::Lite::Util::_encode_json($item);
                         my @outputs = $self->run_query($json, $value_expr);
                         $value = @outputs ? $outputs[0] : undef;
                     }
@@ -181,7 +180,7 @@ sub apply {
             @next_results = ();
 
             for my $value (@results) {
-                my $json = encode_json($value);
+                my $json = JQ::Lite::Util::_encode_json($value);
                 my @items = $self->run_query($json, $foreach->{generator});
 
                 my ($init_values, $init_ok) = JQ::Lite::Util::_evaluate_value_expression($self, $value, $foreach->{init_expr});
@@ -197,7 +196,7 @@ sub apply {
                         $next = @$updated_values ? $updated_values->[0] : undef;
                     }
                     else {
-                        my @outputs = $self->run_query(encode_json($acc), $foreach->{update_expr});
+                        my @outputs = $self->run_query(JQ::Lite::Util::_encode_json($acc), $foreach->{update_expr});
                         $next = @outputs ? $outputs[0] : undef;
                     }
 
@@ -210,7 +209,7 @@ sub apply {
                             $output = @$extract_values ? $extract_values->[0] : undef;
                         }
                         else {
-                            my @extracted = $self->run_query(encode_json($acc), $foreach->{extract_expr});
+                            my @extracted = $self->run_query(JQ::Lite::Util::_encode_json($acc), $foreach->{extract_expr});
                             $output = @extracted ? $extracted[0] : undef;
                         }
 
@@ -230,7 +229,7 @@ sub apply {
             @next_results = ();
 
             for my $value (@results) {
-                my $json     = encode_json($value);
+                my $json     = JQ::Lite::Util::_encode_json($value);
                 my $matched  = 0;
 
                 BRANCH: for my $branch (@{ $if_expr->{branches} }) {
@@ -287,7 +286,7 @@ sub apply {
             @next_results = ();
 
             for my $value (@results) {
-                my $json = encode_json($value);
+                my $json = JQ::Lite::Util::_encode_json($value);
                 my @items = $self->run_query($json, $reduce->{generator});
 
                 my ($init_values, $init_ok) = JQ::Lite::Util::_evaluate_value_expression($self, $value, $reduce->{init_expr});
@@ -303,7 +302,7 @@ sub apply {
                         $next = @$updated_values ? $updated_values->[0] : undef;
                     }
                     else {
-                        my @outputs = $self->run_query(encode_json($acc), $reduce->{update_expr});
+                        my @outputs = $self->run_query(JQ::Lite::Util::_encode_json($acc), $reduce->{update_expr});
                         $next = @outputs ? $outputs[0] : undef;
                     }
 
@@ -609,7 +608,7 @@ sub apply {
             my $filter = $1;
             @next_results = map {
                 ref $_ eq 'ARRAY'
-                    ? [ grep { defined($_) } map { $self->run_query(encode_json($_), $filter) } @$_ ]
+                    ? [ grep { defined($_) } map { $self->run_query(JQ::Lite::Util::_encode_json($_), $filter) } @$_ ]
                     : $_
             } @results;
             @$out_ref = @next_results;

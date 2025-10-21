@@ -1,0 +1,15 @@
+---
+# Pass through App::Test::Generator/fuzz-harness-generator
+
+module: Genealogy::Obituary::Parser
+function: parse_obituary
+
+input:
+  text:
+    type: string
+    min: 1
+    max: 10000
+  geocoder:
+    type: object
+    can: geocode
+    optional: 1
