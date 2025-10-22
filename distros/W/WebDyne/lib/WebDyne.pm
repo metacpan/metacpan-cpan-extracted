@@ -58,7 +58,7 @@ use Exporter qw(import);
 
 #  Version information
 #
-$VERSION='2.014';
+$VERSION='2.015';
 chomp($VERSION_GIT_REF=do { local (@ARGV, $/) = ($_=__FILE__.'.tmp'); <> if -f $_ });
 
 
@@ -3652,7 +3652,20 @@ sub cwd {
 
     #  Return cwd of current psp file
     #
-    (File::Spec->splitpath(shift()->{'_r'}->filename()))[1] || getcwd();
+    my $self=shift();
+    debug($self);
+    my $dn=(File::Spec->splitpath($self->{'_r'}->filename()))[1];
+    return File::Spec->rel2abs($dn) || getcwd(); 
+    #return (File::Spec->splitpath(shift()->{'_r'}->filename()))[1] || getcwd();
+
+}
+
+
+sub cwd0 {
+
+    #  Return cwd of current psp file
+    #
+    return (File::Spec->splitpath(shift()->{'_r'}->filename()))[1] || getcwd();
 
 }
 

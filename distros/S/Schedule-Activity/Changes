@@ -1,5 +1,10 @@
 Revision history for Schedule::Activity
 
+0.1.7 - 2025-10-21
+	- Schedule::Activity uses object interface
+	- Tension settings for slack/buffer (undocumented)
+	- Fix bug, scheduling to maximum buffer
+
 0.1.6 - 2025-10-18
 	- Node filtering
 	- Attributes rolling average, fix dump/restore/reset

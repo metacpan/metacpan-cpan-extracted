@@ -12,7 +12,8 @@ bin/wdrender
 bin/wdrender.md                          
 bin/wdrender.xml                         
 bin/webdyne.psgi
-bin/webdyne.psgi.md                      
+bin/webdyne.psgi.md
+bin/wdlint
 cpanfile
 cpanfile.snapshot                        
 docker/build.pl                          
@@ -70,6 +71,8 @@ lib/WebDyne/Session.pm
 lib/WebDyne/Static.pm
 lib/WebDyne/Template.pm                  
 lib/WebDyne/time.psp
+lib/WebDyne/index.psp
+lib/WebDyne/index.css
 lib/WebDyne/Util.pm
 LICENSE
 Makefile.PL

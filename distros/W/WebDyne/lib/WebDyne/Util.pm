@@ -42,12 +42,18 @@ require Exporter;
 
 #  Version information
 #
-$VERSION='2.014';
+$VERSION='2.015';
 
 
 #  Var to hold package wide hash, for data shared across package, and error stack
 #
 my (%Package, @Err);
+
+
+#  Bring the WEBDYNE_DEBUG env var into package var so available via Plack handler,
+#  which normally replaces env with its own
+#
+$Package{'WEBDYNE_DEBUG'}=$ENV{'WEBDYNE_DEBUG'};
 
 
 #  All done. Positive return
@@ -219,6 +225,7 @@ sub debug {
         return undef;
     my $method=(caller(1))[3] || 'main';
     (my $subroutine=$method)=~s/^.*:://;
+    (my $class=$method)=~s/::\Q${subroutine}\E$//;
 
 
     #  Time in human readable format
@@ -236,17 +243,20 @@ sub debug {
 
     #  Filtering ?
     #
-    if ($ENV{'WEBDYNE_DEBUG'} && ($ENV{'WEBDYNE_DEBUG'} ne '1')) {
+    #if ($ENV{'WEBDYNE_DEBUG'} && ($ENV{'WEBDYNE_DEBUG'} ne '1')) {
+    if ($Package{'WEBDYNE_DEBUG'} && ($Package{'WEBDYNE_DEBUG'} ne '1')) {
 
 
         #  Yes - check we are getting from caller we are interested in
         #
-        my @debug_target=split(/[,;]/, $ENV{'WEBDYNE_DEBUG'});
+        #my @debug_target=split(/[,;]/, $ENV{'WEBDYNE_DEBUG'});
+        my @debug_target=split(/[,;]/, $Package{'WEBDYNE_DEBUG'});
         foreach my $debug_target (@debug_target) {
             if (($caller eq $debug_target) || ($method=~/\Q$debug_target\E$/)) {
 
                 #CORE::print $debug_fh "[$timestamp $subroutine] ", $_[1] ? sprintf(shift(), @_) : $_[0], $/;
-                CORE::print $debug_fh "[$timestamp $subroutine] ", $debug, $/;
+                #CORE::print $debug_fh "[$timestamp $subroutine] ", $debug, $/;
+                CORE::print $debug_fh "[$timestamp $class ($subroutine)] ", $debug, $/;
             }
         }
     }
@@ -255,7 +265,8 @@ sub debug {
         #  No filtering. Open floodgates
         #
         #CORE::print $debug_fh "[$timestamp $subroutine] ", $_[1] ? sprintf(shift(), @_) : $_[0], $/;
-        CORE::print $debug_fh "[$timestamp $subroutine] ", $debug, $/;
+        #CORE::print $debug_fh "[$timestamp $subroutine] ", $debug, $/;
+        CORE::print $debug_fh "[$timestamp $class $subroutine] ", $debug, $/;
     }
 
 }

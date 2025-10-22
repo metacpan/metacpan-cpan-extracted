@@ -632,6 +632,12 @@ paths:
       responses:
         default:
           $ref: '#/components/responses/my_default'
+    additionalOperations:
+      CONNECT:
+        operationId: foo_connect_response
+        responses:
+          default:
+            $ref: '#/components/responses/my_default'
 YAML
 
   cmp_result(
@@ -657,7 +663,29 @@ YAML
   )
   foreach 102, 204;
 
-  # TODO: test 'connect' method, once it's allowed by the spec.
+  cmp_result(
+    $openapi->validate_response(
+      response(200, [ 'Content-Type' => 'text/plain', 'Transfer-Encoding' => 'chunked' ], "4\nabcd\n0\n\n"),
+      { operation_id => 'foo_connect_response' })->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/response/header/Transfer-Encoding',
+          keywordLocation => jsonp(qw(/paths /foo additionalOperations CONNECT)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo additionalOperations CONNECT)))->to_string,
+          error => 'RFC9112 §6.1-10: "A server MUST NOT send a Transfer-Encoding header field in any 2xx (Successful) response to a CONNECT request"',
+        },
+        {
+          instanceLocation => '/response/body',
+          keywordLocation => jsonp(qw(/paths /foo additionalOperations CONNECT responses default $ref content text/* schema maxLength)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/components responses my_default content text/* schema maxLength)))->to_string,
+          error => 'length is greater than 3',
+        },
+      ],
+    },
+    'Transfer-Encoding header is detected in response to a CONNECT request (and body is still parseable)',
+  );
 
   cmp_result(
     $openapi->validate_response(response(200,

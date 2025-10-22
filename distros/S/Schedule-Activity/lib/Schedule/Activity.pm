@@ -9,7 +9,181 @@ use Schedule::Activity::Message;
 use Schedule::Activity::Node;
 use Schedule::Activity::NodeFilter;
 
-our $VERSION='0.1.6';
+our $VERSION='0.1.7';
+
+sub new {
+	my ($ref,%opt)=@_;
+	my $class=ref($ref)||$ref;
+	my %self=(
+		config  =>$opt{configuration}//{},
+		attr    =>undef,
+		valid   =>0,
+		built   =>undef,
+		reach   =>undef,
+	);
+	return bless(\%self,$class);
+}
+
+# validate()
+# compile()
+# schedule(activities=>[...])
+
+sub _attr {
+	my ($self)=@_;
+	$$self{attr}//=Schedule::Activity::Attributes->new();
+	return $$self{attr};
+}
+
+sub validate {
+	my ($self,$force)=@_;
+	if($$self{valid}&&!$force) { return }
+	$$self{config}//={}; if(!is_hashref($$self{config})) { return ('Configuration must be a hash') }
+	my @errors=validateConfig($self->_attr(),%{$$self{config}});
+	if(!@errors) { $$self{valid}=1 }
+	return @errors;
+}
+
+sub _reachability { # UNTESTED (directly)
+	my ($self)=@_;
+	my $changed;
+	my %reach=(min=>{},max=>{});
+	foreach my $namea (keys %{$$self{built}{node}}) {
+		my $nodea=$$self{built}{node}{$namea};
+		foreach my $nodeb (@{$$nodea{next}}) {
+			$reach{min}{$nodea}{$nodeb}=$$nodea{tmmin};
+			$reach{max}{$nodea}{$nodeb}=(($nodea eq $nodeb)?'+':$$nodea{tmmax});
+		}
+	}
+	$changed=1;
+	while($changed) { $changed=0;
+		foreach my $nodea (keys %{$reach{min}}) {
+		foreach my $nodeb (keys %{$reach{min}{$nodea}}) {
+		foreach my $nodec (keys %{$reach{min}{$nodeb}}) {
+			my $x=$reach{min}{$nodea}{$nodec};
+			my $y=$reach{min}{$nodea}{$nodeb}+$reach{min}{$nodeb}{$nodec};
+			if(!defined($x)||($x>$y)) {
+				$reach{min}{$nodea}{$nodec}=$y;
+				$changed=1;
+			}
+		} } }
+	}
+	my $triadd=sub {
+		my ($x,$y)=@_;
+		if($x eq '+') { return '+' }
+		if($y eq '+') { return '+' }
+		return $x+$y;
+	};
+	$changed=1;
+	while($changed) { $changed=0;
+		foreach my $nodea (keys %{$reach{max}}) {
+		foreach my $nodeb (keys %{$reach{max}{$nodea}}) {
+		foreach my $nodec (keys %{$reach{max}{$nodeb}}) {
+			my $x=$reach{max}{$nodea}{$nodec};
+			if(defined($x)&&($x eq '+')) { next }
+			my $y=&$triadd($reach{max}{$nodea}{$nodeb},$reach{max}{$nodeb}{$nodec});
+			if(!defined($x)||($y eq '+')||($x<$y)) {
+				$reach{max}{$nodea}{$nodec}=$y;
+				$changed=1;
+			}
+		} } }
+	}
+	$$self{reach}=\%reach;
+	return $self;
+}
+
+# These checks ignore any filtering that might be active during construction; these are only sanity checks.
+# Recommend stashing the reachability results in $self for later.
+#
+# Here are the tests and their defined orders.
+# 1.  Activity that cannot reach finish
+# 2.  Orphaned actions (no activity reaches them)
+# 3.  Dual-parent action nodes (with more than a single root activity)  NOT(item2)
+# 4.  Dual-finish action nodes  NOT(item3)
+# 5.  Dangling actions (cannot reach their finish node)  NOT(item1||item4)
+# 6.  Action nodes with tmavg=0  NOT(activity|finish) (this is only a problem if there's a cycle)
+#
+sub safetyChecks {
+	my ($self)=@_;
+	my (@errors,$changed);
+	$self->_reachability();
+	my %reach=%{$$self{reach}};
+	#
+	# Be very cautious about names versus stringified references.
+	my $builtNode=$$self{built}{node};
+	my %activities=map {$$builtNode{$_}=>$$builtNode{$_}{finish}} grep {defined($$builtNode{$_}{finish})} keys(%$builtNode);
+	my %finishes=map {$_=>1} values(%activities);
+	my %actions=map {$_=>$$builtNode{$_}} grep {!exists($activities{$$builtNode{$_}})&&!exists($finishes{$$builtNode{$_}})} keys(%$builtNode);
+	#
+	my %incompleteActivities=map {$_=>1} grep{!defined($reach{min}{$_}{$activities{$_}})} keys(%activities);
+	push @errors,map {"Finish for activity $_ is unreachable"} keys(%incompleteActivities);
+	#
+	my (%orphans,%dualParent,%dualFinish,%dangling,%infiniteCycle);
+	foreach my $action (keys %actions) {
+		my $parents=0;
+		my $terminals=0;
+		foreach my $activity (keys %activities) { if($reach{min}{$activity}{$actions{$action}}) { $parents++ } }
+		foreach my $finish   (keys %finishes)   { if($reach{min}{$actions{$action}}{$finish})   { $terminals++ } }
+		if($parents==0)    { $orphans{$action}=1 }
+		elsif($parents>1)  { $dualParent{$action}=1 }
+		if($terminals>1)   { $dualFinish{$action}=1 }
+		elsif(!$terminals) { $dangling{$action}=1 }
+		if(($actions{$action}{tmavg}==0)&&(defined($reach{min}{$actions{$action}}{$actions{$action}}))) { $infiniteCycle{$action}=1 }
+	}
+	push @errors,map {"Action $_ belongs to no activity"} keys(%orphans);
+	push @errors,map {"Action $_ belongs to multiple activities"} keys(%dualParent);
+	push @errors,map {"Action $_ reaches multiple finish nodes"} keys(%dualFinish);
+	push @errors,map {"Dangling action $_"} keys(%dangling);
+	push @errors,map {"No progress will be made for action $_"} keys(%infiniteCycle);
+	return @errors;
+}
+
+sub compile {
+	my ($self)=@_;
+	if($$self{built}) { return }
+	my @errors=$self->validate();
+	if(@errors) { return (error=>\@errors) }
+	%{$$self{built}}=buildConfig(%{$$self{config}});
+	# @errors=$self->safetyChecks();
+	# if(@errors) { return (error=>\@errors) }
+	return;
+}
+
+sub schedule {
+	my ($self,%opt)=@_;
+	delete($$self{attr});
+	my %check=$self->compile(); if($check{error}) { return (error=>$check{error}) }
+	if(!is_arrayref($opt{activities}))            { return (error=>'Activities must be an array') }
+	my ($tmoffset,%res)=(0);
+	foreach my $activity (@{$opt{activities}}) {
+		foreach my $entry (scheduler(goal=>$$activity[0],node=>$$self{built}{node}{$$activity[1]},config=>$$self{built},attr=>$self->_attr(),tmoffset=>$tmoffset)) {
+			push @{$res{activities}},[$$entry[0]+$tmoffset,@$entry[1..$#$entry]];
+		}
+		$tmoffset+=$$activity[0];
+		$self->_attr()->log($tmoffset); # potentially overwritten by subsequent nodes
+	}
+	%{$res{attributes}}=$self->_attr()->report();
+	while(my ($group,$notes)=each %{$$self{config}{annotations}}) {
+		my @schedule;
+		foreach my $note (@$notes) {
+			my $annotation=Schedule::Activity::Annotation->new(%$note);
+			foreach my $note ($annotation->annotate(@{$res{activities}})) {
+				my ($message,$mobj)=Schedule::Activity::Message->new(message=>$$note[1]{message},names=>$$self{config}{messages}//{})->random();
+				my %node=(message=>$message);
+				if($$note[1]{annotations}) { $node{annotations}=$$note[1]{annotations} }
+				push @schedule,[$$note[0],\%node,@$note[2..$#$note]];
+			}
+		}
+		@schedule=sort {$$a[0]<=>$$b[0]} @schedule;
+		for(my $i=0;$i<$#schedule;$i++) {
+			if($schedule[$i+1][0]==$schedule[$i][0]) {
+				splice(@schedule,$i+1,1); $i-- } }
+		$res{annotations}{$group}{events}=\@schedule;
+	}
+	return %res;
+}
+
+
+# --------------- older, static functions past here ---------------
 
 sub buildConfig {
 	my (%base)=@_;
@@ -66,6 +240,10 @@ sub validateConfig {
 		if(@invalids) { push @errors,"Node $k, Undefined name in array:  next" }
 		if(defined($$node{finish})&&!defined($config{node}{$$node{finish}})) { push @errors,"Node $k, Undefined name:  finish" }
 	}
+	$config{annotations}//={};
+	if(!is_hashref($config{annotations})) { push @errors,'Annotations must be a hash' }
+	else { while(my ($k,$notes)=each %{$config{annotations}}) {
+		push @errors,map {"Annotation $k:  $_"} map {Schedule::Activity::Annotation::validate(%$_)} @$notes } }
 	return @errors;
 }
 
@@ -85,35 +263,21 @@ sub nodeMessage {
 sub findpath {
 	my (%opt)=@_;
 	my ($tm,$slack,$buffer,@res)=(0,0,0);
-	my $tension=1-($opt{tension}//0.5);
+	my %tension=(
+		slack =>1-($opt{tensionslack} //$opt{tension}//0.5),
+		buffer=>1-($opt{tensionbuffer}//$opt{tension}//0.5),
+	);
+	foreach my $k (qw/slack buffer/) { if($tension{$k}>1){$tension{$k}=1}; if($tension{$k}<0){$tension{$k}=0} }
 	my ($node,$conclusion)=($opt{start},$opt{finish});
 	$opt{attr}->push();
 	while($node&&($node ne $conclusion)) {
 		push @res,[$tm,$node];
 		push @{$res[-1]},nodeMessage($opt{attr},$tm+$opt{tmoffset},$node);
 		$node->increment(\$tm,\$slack,\$buffer);
-		if(
-			($tm+$tension*$buffer>=$opt{goal})
-			&&($opt{goal}-$tm<=$buffer)
-			&&($node->hasnext($conclusion))
-		) {
-			push @res,[$tm,$conclusion];
-			push @{$res[-1]},nodeMessage($opt{attr},$tm+$opt{tmoffset},$conclusion);
-			$conclusion->increment(\$tm,\$slack,\$buffer);
-			$node=undef;
-		}
-		elsif($tm>=$opt{goal}) {
-			if($node->hasnext($conclusion)) {
-				push @res,[$tm,$conclusion];
-				push @{$res[-1]},nodeMessage($opt{attr},$tm+$opt{tmoffset},$conclusion);
-				$conclusion->increment(\$tm,\$slack,\$buffer);
-				$node=undef;
-			}
-			elsif($tm-$opt{goal}<$slack) { $node=$node->nextrandom(tm=>$tm,attr=>$opt{attr}{attr}) }
-			elsif($opt{backtracks}>0) { $opt{attr}->pop(); return (retry=>1,error=>"No backtracking support") }
-			else { die 'this needs to backtrack or retry' }
-		}
-		else { $node=$node->nextrandom(not=>$conclusion,tm=>$tm,attr=>$opt{attr}{attr}) }
+		if($tm+$tension{buffer}*$buffer<$opt{goal})  { $node=$node->nextrandom(not=>$conclusion,tm=>$tm,attr=>$opt{attr}{attr})//$node->nextrandom(tm=>$tm,attr=>$opt{attr}{attr}) }
+		elsif($tm-$tension{slack}*$slack<$opt{goal}) { $node=$node->nextrandom(tm=>$tm,attr=>$opt{attr}{attr}) } # tm+buffer>=goal
+		elsif($node->hasnext($conclusion)) { $node=$conclusion }
+		else { $node=$node->nextrandom(not=>$conclusion,tm=>$tm,attr=>$opt{attr}{attr})//$node->nextrandom(tm=>$tm,attr=>$opt{attr}{attr}) }
 	}
 	if($node&&($node eq $conclusion)) {
 		push @res,[$tm,$conclusion];
@@ -148,16 +312,17 @@ sub scheduler {
 		start     =>$opt{node},
 		finish    =>$opt{node}{finish},
 		goal      =>$opt{goal},
-		tension   =>$opt{tension},
 		retries   =>$opt{retries},
 		backtracks=>2*$opt{retries},
 		attr      =>$opt{attr},
 		tmoffset  =>$opt{tmoffset},
+		tensionslack =>$opt{tensionslack} //$opt{tension},
+		tensionbuffer=>$opt{tensionbuffer}//$opt{tension},
 	);
 	if($path{retry}) { return scheduler(%opt,retries=>$opt{retries},error=>$path{error}//'Retries exhausted') }
 	my @res=@{$path{steps}};
 	my ($tm,$slack,$buffer)=@path{qw/tm slack buffer/};
-	if($res[-1][1] ne $opt{node}{finish}) { die "Didn't reach finish node" }
+	if($res[-1][1] ne $opt{node}{finish}) { return scheduler(%opt,retries=>$opt{retries},error=>"Didn't reach finish node") }
 	#
 	my $excess=$tm-$opt{goal};
 	if(abs($excess)>0.5) {
@@ -208,45 +373,7 @@ sub scheduler {
 
 sub buildSchedule {
 	my (%opt)=@_;
-	my $attr=Schedule::Activity::Attributes->new();
-	if(!is_hashref($opt{configuration})) { $opt{configuration}={} }
-	if(!is_arrayref($opt{activities}))   { $opt{activities}=[] }
-	if(!is_hashref($opt{configuration}{annotations})) { $opt{configuration}{annotations}={} }
-	#
-	my @errors=validateConfig($attr,%{$opt{configuration}});
-	while(my ($k,$notes)=each %{$opt{configuration}{annotations}}) {
-		push @errors,map {"Annotation $k:  $_"} map {Schedule::Activity::Annotation::validate(%$_)} @$notes }
-
-	if(@errors) { return (error=>\@errors) }
-	my %config=buildConfig(%{$opt{configuration}});
-	#
-	my ($tmoffset,%res)=(0);
-	foreach my $activity (@{$opt{activities}}) {
-		foreach my $entry (scheduler(goal=>$$activity[0],node=>$config{node}{$$activity[1]},config=>\%config,attr=>$attr,tmoffset=>$tmoffset)) {
-			push @{$res{activities}},[$$entry[0]+$tmoffset,@$entry[1..$#$entry]];
-		}
-		$tmoffset+=$$activity[0];
-		$attr->log($tmoffset); # potentially overwritten by subsequent nodes
-	}
-	%{$res{attributes}}=$attr->report();
-	while(my ($group,$notes)=each %{$opt{configuration}{annotations}}) {
-		my @schedule;
-		foreach my $note (@$notes) {
-			my $annotation=Schedule::Activity::Annotation->new(%$note);
-			foreach my $note ($annotation->annotate(@{$res{activities}})) {
-				my ($message,$mobj)=Schedule::Activity::Message->new(message=>$$note[1]{message},names=>$opt{configuration}{messages}//{})->random();
-				my %node=(message=>$message);
-				if($$note[1]{annotations}) { $node{annotations}=$$note[1]{annotations} }
-				push @schedule,[$$note[0],\%node,@$note[2..$#$note]];
-			}
-		}
-		@schedule=sort {$$a[0]<=>$$b[0]} @schedule;
-		for(my $i=0;$i<$#schedule;$i++) {
-			if($schedule[$i+1][0]==$schedule[$i][0]) {
-				splice(@schedule,$i+1,1); $i-- } }
-		$res{annotations}{$group}{events}=\@schedule;
-	}
-	return %res;
+	return __PACKAGE__->new(configuration=>$opt{configuration})->schedule(activities=>$opt{activities});
 }
 
 sub loadMarkdown {
@@ -303,12 +430,12 @@ Schedule::Activity - Generate random activity schedules
 
 =head1 VERSION
 
-Version 0.1.6
+Version 0.1.7
 
 =head1 SYNOPSIS
 
   use Schedule::Activity;
-  my %schedule=Schedule::Activity::buildSchedule(
+  my $scheduler=Schedule::Activity->new(
     configuration=>{
       node=>{
         Activity=>{
@@ -335,12 +462,13 @@ Version 0.1.6
       annotations=>{...},
       attributes =>{...},
       messages   =>{...},
-    },
-    activities=>[
-      [30,'Activity'],
-      ...
-    ],
-  );
+    }
+	);
+  my %schedule=$scheduler->schedule(activities=>[
+		[30,'Activity'],
+		...
+	]);
+  if($schedule{error}) { die join("\n",@{$schedule{error}}) }
   print join("\n",map {"$$_[0]:  $$_[1]{message}"} @{$schedule{activities}});
 
 =head1 DESCRIPTION
@@ -350,6 +478,8 @@ This module permits building schedules of I<activities> each containing randomly
 For additional examples, see the C<samples/> directory.
 
 Areas subject to change are documented below.  Configurations and goals may lead to cases that currently C<die()>, so callers should plan to trap and handle these exceptions accordingly.
+
+Note:  The static method C<Schedule::Activity::buildSchedule> will be removed in version 0.2.0.
 
 =head1 CONFIGURATION
 
@@ -423,7 +553,7 @@ Message selection is randomized for arrays and a hash of alternates.  Any attrib
 
 =head1 RESPONSE
 
-The response from C<buildSchedule> is:
+The response from C<schedule(activities=>[...])> is:
 
   %schedule=(
     error=>['list of validation errors, if any',...],
@@ -459,7 +589,7 @@ Caution:  While startup/conclusion of activities may have fixed time specificati
 
 =head1 ATTRIBUTES
 
-Attributes permit tracking boolean or numeric values during schedule construction.  The result of C<buildSchedule> contains attribute information that can be used to verify or adjust the schedule.
+Attributes permit tracking boolean or numeric values during schedule construction.  The result of C<schedule> contains attribute information that can be used to verify or adjust the schedule.
 
 =head2 Types
 
@@ -493,7 +623,7 @@ Attributes within message alternate configurations and named messages are identi
 
 =head2 Response values
 
-The response from C<buildSchedule> includes an C<attributes> section as:
+The response from C<schedule> includes an C<attributes> section as:
 
   attributes=>{
     name=>{
@@ -558,7 +688,7 @@ A scheduling configuration may contain a list of annotations:
     },
   )
 
-Scheduling I<annotations> are a collection of secondary events to be attached to the built schedule and are configured as described in L<Schedule::Activity::Annotation>.  Each named group can have one or more annotation.  Each annotation will be inserted around the matching actions in the schedule and be reported from C<buildSchedule> in the annotations section as:
+Scheduling I<annotations> are a collection of secondary events to be attached to the built schedule and are configured as described in L<Schedule::Activity::Annotation>.  Each named group can have one or more annotation.  Each annotation will be inserted around the matching actions in the schedule and be reported from C<schedule> in the annotations section as:
 
   annotations=>{
     'group'=>{
@@ -571,9 +701,9 @@ Scheduling I<annotations> are a collection of secondary events to be attached to
 
 Within an individual group, earlier annotations take priority if two events are scheduled at the same time.  Multiple groups of annotations may have conflicting event schedules with event overlap.  Note that the C<between> setting is only enforced for each annotation individually at this time.
 
-Annotations do I<not> update the C<attributes> response from C<buildSchedule>.  Because annotations may themselves contain attributes, they are retained separately from the main schedule of activities to permit easier rebuilding.  At this time, however, the caller must verify that annotation schedules before merging them and their attributes into the schedule.  Annotations may also be built separately after schedule construction as described in L<Schedule::Activity::Annotation>.
+Annotations do I<not> update the C<attributes> response from C<schedule>.  Because annotations may themselves contain attributes, they are retained separately from the main schedule of activities to permit easier rebuilding.  At this time, however, the caller must verify that annotation schedules before merging them and their attributes into the schedule.  Annotations may also be built separately after schedule construction as described in L<Schedule::Activity::Annotation>.
 
-Annotations may use named messages, and messages in the annotations response structure are materialized using the named message configuration passed to C<buildSchedule>.
+Annotations may use named messages, and messages in the annotations response structure are materialized using the named message configuration passed to C<schedule>.
 
 =head1 NAMED MESSAGES
 
@@ -582,7 +712,7 @@ A scheduling configuration may contain a list of common messages.  This is parti
   %configuration=(
     messages=>{
       'key name'=>{ any regular message configuration }
-			...
+      ...
     },
   )
 
@@ -615,10 +745,6 @@ During scheduling, filtering is evaluated as a I<single pass> only, per activity
 
 This should never affect attributes used for a stateful/flag/counter-based filter, because those value changes will still occur in the same sequence.
 
-=head2 Bugs
-
-Note:  As of version 0.1.6, there is an optimization that a C<next> list of only a single item will I<always> select that as the next action.  See BUGS for more details.  As a workaround, duplicate that entry in the next list to force filtering.
-
 =head1 IMPORT MECHANISMS
 
 =head2 Markdown
@@ -640,13 +766,13 @@ Any list identification markers may be used interchangably (number plus period, 
 
 The imported configuration permits an activity to be followed by any of its actions, and any action can be followed by any other action within the activity (but not itself).  Any action can terminate the activity.
 
-The full settings needed to build a schedule can be loaded with C<%settings=loadMarkdown(text)>, and both C<$settings{configuration}> and C<$settings{activities}> will be defined so an immediate call to C<%schedule=buildSchedule(%settings)> can be made.
+The full settings needed to build a schedule can be loaded with C<%settings=loadMarkdown(text)>, and both C<$settings{configuration}> and C<$settings{activities}> will be defined so an immediate call to C<schedule(%settings)> can be made.
 
 =head1 BUGS
 
 It is possible for some settings to get stuck in an infinite loop:  Be cautious setting C<tmavg=0> for actions.
 
-There is currently a limitation with scheduling to the maximum buffer that is dependent on the behavior that a list of next actions with only a single entry will return that entry (even if it would have been otherwise filtered).  The exceptions need to be updated so that the maximum buffer includes the tmmax of the conclusion node itself, otherwise the conclusion node will get filtered out and scheduling will fail.
+(This should be fixed in 0.1.7).  There is currently a limitation with scheduling to the maximum buffer that is dependent on the behavior that a list of next actions with only a single entry will return that entry (even if it would have been otherwise filtered).  The exceptions need to be updated so that the maximum buffer includes the tmmax of the conclusion node itself, otherwise the conclusion node will get filtered out and scheduling will fail.
 
 =head1 SEE ALSO
 

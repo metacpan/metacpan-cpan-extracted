@@ -1,5 +1,8 @@
 Revision history for OpenAPI-Modern
 
+0.102     2025-10-21 21:33:40Z
+          - support added for additional HTTP methods, new in OpenAPI 3.2
+
 0.101     2025-10-19 20:09:38Z
           - support added for "in: querystring" in parameter descriptions, new
             in OpenAPI 3.2

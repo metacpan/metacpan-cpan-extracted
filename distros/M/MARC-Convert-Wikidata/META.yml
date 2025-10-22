@@ -41,7 +41,7 @@ requires:
   MARC::Convert::Wikidata::Object::Kramerius: 0
   MARC::Convert::Wikidata::Object::People: 0
   MARC::Convert::Wikidata::Object::Publisher: 0
-  MARC::Convert::Wikidata::Object::Series: 0.09
+  MARC::Convert::Wikidata::Object::Series: 0.15
   MARC::Field008: 0.03
   MARC::Leader: 0.05
   Mo::utils: 0.08
@@ -56,4 +56,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/MARC-Convert-Wikidata
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/MARC-Convert-Wikidata
-version: '0.31'
+version: '0.32'

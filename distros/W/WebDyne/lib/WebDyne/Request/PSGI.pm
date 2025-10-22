@@ -44,7 +44,7 @@ use WebDyne::Request::Fake;
 
 #  Version information
 #
-$VERSION='2.014';
+$VERSION='2.015';
 
 
 #  Debug load
@@ -178,7 +178,10 @@ sub location {
         }
     }
     else {
-        $location=File::Spec::Unix->rootdir();
+        
+        #  Actually mod_perl spec says location blank if not positively given - don't default to '/'
+        #
+        #$location=File::Spec::Unix->rootdir();
     }
     return $location;
 
@@ -196,7 +199,8 @@ sub lookup_file {
 
     my ($r, $fn)=@_;
     my $r_child;
-    if ($fn=~/\.html$/) {
+    if ($fn!~/\.psp$/) {
+    #if ($fn=~/\.html$/) {
 
 
         #  Static file
@@ -230,67 +234,94 @@ sub lookup_uri {
 }
 
 
-sub new0 {
-    
-    
-    #  Create self ref
-    #
-    my ($class, $param)=@_;
-    debug('initiating %s', Dumper($param));
-    return bless(ref($param)?$param:\$param, $class);
-
-}
-
 sub new {
 
+
+    #  New PSGI request
+    #
     my ($class, %r)=@_;
-
+    debug("$class, r: %s", Dumper(\%r));
+    
+    
+    #  Try to figure out filename user wants
+    #
     unless ($r{'filename'}) {
+    
+    
+        #  Not supplied - need to work out
+        #
+        debug('filename not supplied, determining from request');
 
+
+        #  Iterate through options. If *not* supplied by SCRIPT_FILENAME keep going.
+        #
         my $fn;
         unless (($fn=$ENV{'SCRIPT_FILENAME'}) && !$r{'uri'}) {
-
+        
+        
+            #  Need to calc from document root in PSGI environment
+            #
+            debug('not supplied in SCRIPT_FILENAME or r{uri}. calculating');
             if (my $dn=($r{'document_root'} || $Dir_config_env{'DOCUMENT_ROOT'} || $DOCUMENT_ROOT)) {
-            #if (my $dn=($ENV{'DOCUMENT_ROOT'} || $DOCUMENT_ROOT)) {
+            
+                #  Get from URI and location
+                #
                 my $uri=$r{'uri'} || $ENV{'REQUEST_URI'};
+                debug("uri: $uri");
                 if (my $location=$class->location()) {
+                    debug("location: $location");
                     $uri=~s/^\Q$location\E//;
+                    debug("uri now: $uri");
                 }
                 my $uri_or=URI->new($uri);
-                $fn=File::Spec->catfile($dn, $uri_or->path());
+                #$fn=File::Spec->catfile($dn, $uri_or->path());
+                $fn=File::Spec->catfile($dn, split m{/+}, $uri_or->path());
+                debug("fn: $fn from dn: $dn, uri: $uri");
                 
                 #  If PSP file spec'd on command line get rid of trailing /
-                debug("fn: $fn derived from uri: $uri, dn: $dn");
-                $fn=~s/\.psp\/$/.psp/;
+                #$fn=~s/\.psp\/$/.psp/;
             }
             
+            
+            #  IIS/FastCGI, not tested recently unsure if works
+            #
             elsif ($fn=$ENV{'PATH_TRANSLATED'}) {
 
                 #  Feel free to let me know a better way under IIS/FastCGI ..
                 my $script_fn=(File::Spec::Unix->splitpath($ENV{'SCRIPT_NAME'}))[2];
                 $fn=~s/\Q$script_fn\E.*/$script_fn/;
-                debug("fn: $fn derived from script_fn: $script_fn");
+                debug("fn: $fn derived from PATH_TRANSLATED script_fn: $script_fn");
             }
-
-            if ($fn=~/\/$/) {
+            
+            
+            #  Need to add default psp file ?
+            #
+            #if ($fn=~/\/$/) {
+            unless ($fn=~/\.psp$/) {
             
                 #  Append default doc to path, which appears at moment to be a directory ?
                 #
-                debug("appending document default %s to fn:$fn", $r{'document_default'} || $Dir_config_env{'DOCUMENT_DEFAULT'} || $DOCUMENT_DEFAULT);
-                $fn=File::Spec->catfile(grep {$_} $fn,  $r{'document_default'} || $Dir_config_env{'DOCUMENT_DEFAULT'} || $DOCUMENT_DEFAULT);
+                my $document_default=$r{'document_default'} || $Dir_config_env{'DOCUMENT_DEFAULT'} || $DOCUMENT_DEFAULT;
+                debug("appending document default $document_default to fn:$fn");
+                $fn=File::Spec->catfile($fn, split m{/+}, $document_default); #/
                 
             }
 
         }
-        debug("final fn: $fn");
 
+        #  Final sanity check
+        #
+        debug("final fn: $fn");
         $r{'filename'}=$fn || do {
             #my $env=join("\n", map {"$_=$ENV{$_}"} keys %ENV);
             return err("unable to determine filename for request from environment:%s, Dir_config_env: %s", Dumper(\%ENV, \%Dir_config_env))
         };
-
+        
     }
-
+    
+    
+    #  Finished, pass back
+    #
     bless \%r, $class;
 
 }
@@ -311,6 +342,7 @@ sub run {
 
     my ($r, $self)=@_;
     if (-f $r->{'filename'}) {
+        debug('file is %s', $r->{'filename'});
         return ref($self)->handler($r);
     }
     else {

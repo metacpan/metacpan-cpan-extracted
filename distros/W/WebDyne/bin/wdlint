@@ -1,0 +1,98 @@
+#!/usr/bin/perl
+#
+#  This file is part of WebDyne.
+#
+#  This software is copyright (c) 2025 by Andrew Speer <andrew.speer@isolutions.com.au>.
+#
+#  This is free software; you can redistribute it and/or modify it under
+#  the same terms as the Perl 5 programming language system itself.
+#
+#  Full license text is available at:
+#
+#  <http://dev.perl.org/licenses/>
+#
+
+
+#
+#  Dump the compiled version of WebDyne HTML scripts, as stored in the cache dir
+#
+use strict qw(vars);
+use vars   qw($VERSION);
+
+
+#  Use the base module
+#
+use WebDyne::Util;
+
+
+#  External modules
+#
+use File::Temp qw(tempfile);
+use IO::File;
+use Capture::Tiny qw(capture);
+use FindBin qw($Script);
+
+
+#  Version Info, must be all one line for MakeMaker, CPAN.
+#
+$VERSION='2.015';
+
+
+#  Run main
+#
+exit ${&main(\@ARGV) || die errdump()};
+
+#============================================================================
+
+
+sub main {
+
+
+    #  Get argv array ref
+    #
+    my $argv_ar=shift();
+
+
+    #  Get srce file
+    #
+    my $srce_pn=pop(@{$argv_ar}) ||
+        pod2usage("$Script: no source file specified !");
+    my ($temp_fh, $temp_fn)=tempfile( UNLINK=> 0);
+    
+    
+    #  Write to temp file looking for __PERL__ signal
+    #
+    my $line_no;
+    my $srce_fh=IO::File->new($srce_pn, O_RDONLY) ||
+        return err("unable to open file $srce_pn, $!");
+    while (my $line=<$srce_fh>) {
+        $line_no++;
+        print $temp_fh $line;
+        if ($line=~/^__PERL__/) {
+            print $temp_fh '#!perl', $/;
+            $line_no++;
+            print $temp_fh "#line ${line_no}", $/;
+        }
+    }
+    $temp_fh->close();
+    $srce_fh->close();
+    
+    
+    #  Run perl check
+    #
+    my ($stdout, $stderr, $exit)=capture{
+        system($^X, qw(-c -w -x), @{$argv_ar}, $temp_fn)
+    };
+    $stderr=~s/\Q$temp_fn\E/$srce_pn/gs;
+    print $stderr;
+    unlink($temp_fn);
+    
+
+    #  Done
+    #
+    return \($exit >> 8);
+
+
+}
+
+__END__

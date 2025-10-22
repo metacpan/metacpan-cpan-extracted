@@ -16,7 +16,7 @@ use File::Find qw(find);
 use File::Spec;
 use IO::File;
 use HTML::TreeBuilder;
-use Storable qw(lock_store);
+use Storable qw(lock_nstore);
 use FindBin qw($RealBin $Script);
 use Cwd qw(abs_path);
 use Carp qw(confess);
@@ -149,7 +149,7 @@ sub main {
             #  Save result
             #
             debug("writing output to $dest_cn");
-            lock_store($data_ar, $dest_cn);
+            lock_nstore($data_ar, $dest_cn);
 
         }
         

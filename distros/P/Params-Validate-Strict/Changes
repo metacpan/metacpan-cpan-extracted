@@ -1,5 +1,8 @@
 Revision history for Params-Validate-Strict
 
+0.19	Tue Oct 21 15:34:58 EDT 2025
+	Allow a parameter to have different allowable types
+
 0.18	Mon Oct 20 11:56:19 EDT 2025
 	Handle when an undefined object is passed in
 

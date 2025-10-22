@@ -241,7 +241,7 @@ ok $authdb->export_data($file_out), "Export data to JSON file" or diag $authdb->
 subtest 'User' => sub {
 
     # Alice
-    my $alice = $authdb->cached_user("alice", 'd1b919$c1');
+    my $alice = $authdb->user("alice", 'd1b919$c1');
     ok $alice->is_valid, "User is valid";
     is $alice->username, 'alice', "Username";
     #note explain $alice;
@@ -256,7 +256,7 @@ subtest 'User' => sub {
 subtest 'Group' => sub {
 
     # Manager
-    my $manager = $authdb->cached_group("manager");
+    my $manager = $authdb->group("manager");
     ok $manager->is_valid, "Group is valid";
     is $manager->groupname, 'manager', "Groupname";
     #note explain $manager;
@@ -267,7 +267,7 @@ subtest 'Group' => sub {
 subtest 'Realm' => sub {
 
     # Default realm
-    my $default = $authdb->cached_realm("Default");
+    my $default = $authdb->realm("Default");
     ok $default->is_valid, "Realm is valid";
     is $default->realmname, 'Default', "Realmname";
     #note explain $default;
@@ -278,7 +278,7 @@ subtest 'Realm' => sub {
 subtest 'Routes' => sub {
 
     # Routes
-    my $routes = $authdb->cached_routes("http://localhost");
+    my $routes = $authdb->routes("http://localhost");
     ok !$authdb->error, "Get routes";
     #note explain $routes;
 
@@ -288,7 +288,7 @@ subtest 'Routes' => sub {
 subtest 'Cached user' => sub {
 
     # Alice
-    my $alice = $authdb->cached_user("alice", 'd1b919$c1');
+    my $alice = $authdb->user("alice", 'd1b919$c1');
     ok $alice->is_cached, "User is cached";
     #note explain $alice;
 

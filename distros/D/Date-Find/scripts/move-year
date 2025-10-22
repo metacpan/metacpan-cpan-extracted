@@ -1,0 +1,127 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Getopt::Long;
+use File::Copy 'mv';
+use File::Basename;
+use File::Path 'make_path';
+use File::Spec;
+use lib '/home/corion/Projekte/App-moveyear/lib';
+use Date::Find 'find_ymd', 'guess_ymd', '%date_type', '%longname';
+
+=head1 NAME
+
+move-year - Move files to directories according to a date in their filename
+
+=cut
+
+my $date_type;
+GetOptions(
+    'dry-run|n'            => \my $dry_run,
+    'verbose'              => \my $verbose,
+
+    'date-regex|d=s'       => \my $date_regex,
+    'date-regex-order|o=s' => \my $date_regex_order,
+    'date-type|t=s'        => \$date_type,
+    'ymd'                  => sub { $date_type = 'ymd' },
+    'dmy'                  => sub { $date_type = 'dmy' },
+    'ym'                   => sub { $date_type = 'ym' },
+    'my'                   => sub { $date_type = 'my' },
+    'y'                    => sub { $date_type = 'y' },
+    'force|f'              => \my $force,
+    'create'               => \my $create_directories,
+    'directory-style|s=s'  => \my $directory_style,
+    'part-separator'       => \my $part_separator,
+
+    'i'                    => \my $dont_overwrite,
+
+    'strict'               => \my $strict,
+);
+
+=head1 SYNOPSIS
+
+  move-year --create foo-2025.pdf /home/user/documents/
+  # creates /home/user/documents/2025
+  # Moves foo-2025.pdf to /home/user/documents/2025/foo-2025.pdf
+
+  move-year --create --directory-style=sprintf foo-2025.pdf "/home/user/documents/documents %y/"
+  # creates /home/user/documents/documents 2025/
+  # Moves foo-2025.pdf to /home/user/documents/documents 2025/foo-2025.pdf
+
+=head1 OPTIONS
+
+=cut
+
+$verbose //= $dry_run;
+
+$part_separator //= '-';
+$directory_style //= 'y';
+
+$date_type //= 'ymd';
+
+my $target = pop @ARGV;
+
+if( ! -d $target and $directory_style ne 'sprintf') {
+    die "'$target' is not a directory";
+}
+
+sub move_file {
+    my( $source,$target,%ymd ) = @_;
+    my $target_dir;
+    if( $directory_style eq 'sprintf' ) {
+        $target_dir = $target =~ s/%([ymd])/$ymd{ $longname{ $1 }}/reg;
+
+    } else {
+
+        $target_dir = File::Spec->catdir( $target,
+                        map { $ymd{ $_ } }
+                        map { $longname{ $_ } }
+                        split //, $directory_style
+        );
+    }
+    if( ! -d $target_dir ) {
+        if( $create_directories ) {
+            if( $verbose ) {
+                print "Creating '$target_dir'\n";
+            }
+            if( ! $dry_run ) {
+                make_path $target_dir;
+            };
+        } else {
+            die "'$target_dir' does not exist (forgot --create ?)\n";
+        }
+    }
+    my $name = basename($source);
+    my $target_file = "$target_dir/$name";
+    if(($dry_run || -d $target_dir)) {
+        if( not( -e $target_file) || $force) {
+            if( $verbose ) {
+                print "Moving '$source' to '$target_file'\n";
+            }
+            if( ! $dry_run ) {
+                mv $source => $target_file or warn "$source: $!";
+            };
+        } else {
+            if( $verbose ) {
+                print "'$target_file' already exists, skipped\n";
+            }
+        }
+    }
+}
+
+for my $file (@ARGV) {
+    my $ymd;
+    if( $date_regex ) {
+        $ymd = find_ymd( $date_regex, $file, $date_regex_order );
+
+    } else {
+        $ymd = guess_ymd( $file, components => $date_type, mode => 'strict' );
+    }
+    if( keys %$ymd ) {
+        move_file( $file, $target, %$ymd )
+    } elsif( $strict ) {
+        die "Could not find a date in '$file'\n";
+    } else {
+        warn "Skipping '$file' (no date found)\n";
+    }
+}

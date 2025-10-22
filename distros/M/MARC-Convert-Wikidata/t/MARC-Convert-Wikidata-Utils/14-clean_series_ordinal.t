@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use MARC::Convert::Wikidata::Utils qw(clean_series_ordinal);
-use Test::More 'tests' => 15;
+use Test::More 'tests' => 19;
 use Test::NoWarnings;
 use Unicode::UTF8 qw(decode_utf8 encode_utf8);
 
@@ -75,3 +75,23 @@ is($ret, 80, encode_utf8("Series ordinal '$input_series_ordinal' after cleanup."
 $input_series_ordinal = decode_utf8('Výstava 48');
 $ret = clean_series_ordinal($input_series_ordinal);
 is($ret, 48, encode_utf8("Series ordinal '$input_series_ordinal' after cleanup."));
+
+# Test.
+$input_series_ordinal = decode_utf8('kn. 43');
+$ret = clean_series_ordinal($input_series_ordinal);
+is($ret, 43, encode_utf8("Series ordinal '$input_series_ordinal' after cleanup."));
+
+# Test
+$input_series_ordinal = decode_utf8('kniha 75.');
+$ret = clean_series_ordinal($input_series_ordinal);
+is($ret, 75, encode_utf8("Series ordinal '$input_series_ordinal' after cleanup."));
+
+# Test
+$input_series_ordinal = decode_utf8('kn. 71, 72');
+$ret = clean_series_ordinal($input_series_ordinal);
+is($ret, '71-72', encode_utf8("Series ordinal '$input_series_ordinal' after cleanup."));
+
+# Test
+$input_series_ordinal = decode_utf8('díl. I');
+$ret = clean_series_ordinal($input_series_ordinal);
+is($ret, 'I', encode_utf8("Series ordinal '$input_series_ordinal' after cleanup."));

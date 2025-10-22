@@ -483,7 +483,7 @@ Does a raw dump of the symbols.
 
 =back
 
-=over 8
+=over 4
 
 [% RED %]This is written in red[% RESET %]
 
@@ -533,7 +533,11 @@ Clear up from current cursor position
 
 Reset all colors and attributes to their defaults
 
+=back
+
 =head2 CURSOR
+
+=over 4
 
 =item B<[% HOME %]>
 
@@ -591,7 +595,11 @@ Rapid cursor blink (Some terminals just do a slow blink)
 
 Set cursor position
 
+=back
+
 =head2 ATTRIBUTES
+
+=over 4
 
 =item B<[% INVERT %]>
 
@@ -609,13 +617,21 @@ Crossed out.  Text with a line through the middle.
 
 Default font.  If the font was changed, then restore to the default font.
 
+=back
+
 =head2 FRAMES
+
+=over 4
 
 =item B<[% BOX color,x,y,width,height,type %]> text here B<[% ENDBOX %]>
 
 Draw a frame around text.  There are many types to choose from.
 
+=back
+
 =head2 COLORS
+
+=over 4
 
 =item B<[% NORMAL %]>
 

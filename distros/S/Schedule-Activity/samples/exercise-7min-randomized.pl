@@ -6,8 +6,7 @@ use Schedule::Activity;
 
 print "This is a randomized 7-minute exercise schedule grouped by muscle group.\n";
 
-my %schedule=Schedule::Activity::buildSchedule(
-	activities=>[[7*60,'7min program']],
+my $scheduler=Schedule::Activity->new(
 	configuration=>{node=>{
 
 		'7min program'=>{
@@ -48,6 +47,8 @@ my %schedule=Schedule::Activity::buildSchedule(
 		},
 	}},
 );
+
+my %schedule=$scheduler->schedule(activities=>[[7*60,'7min program']]);
 
 my @materialized;
 foreach my $entry (@{$schedule{activities}}) {

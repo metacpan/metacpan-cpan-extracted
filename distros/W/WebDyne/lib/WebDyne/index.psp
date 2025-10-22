@@ -1,0 +1,246 @@
+#  Quick and dirty facsimile of Apache mod_index
+#
+<start_html title="File Index" include="index.css" style="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" meta="%{ viewport=>'width=device-width, initial-scale=1.0' }">
+
+<perl handler="index">
+<header>
+  <h1>Index of <span id="current-path">${rel_cwd}</span></h1>
+  <hr>
+</header>
+
+<main>
+  <table role="grid">
+    <thead>
+      <tr>
+        <th><a href="${sort_name_href}">Filename</a></th>
+        <th><a href="${sort_mtime_href}">Last Modified</a></th>
+        <th><a href="${sort_size_href}">Size</a></th>
+      </tr>
+    </thead>
+    <tbody>
+      <block name="index">
+      <tr>
+        <td><a href="${href}">${filename}</a></td>
+        <td>${date}</td>
+        <td>${size}</td>
+      </tr>
+      </block>
+    </tbody>
+  </table>
+</main>
+
+<footer>
+  <hr>
+  <small>Generated on ${timestamp} by WebDyne Indexer in ${sec} sec.</small>
+</footer>
+</perl>
+
+__PERL__
+
+use strict;
+use File::stat;
+use File::Spec::Unix;
+use File::Basename qw(dirname);
+use POSIX qw(strftime);
+use WebDyne::Util;
+use Cwd qw(realpath);
+
+sub index {
+
+    #  Index current directory
+    #
+    my $self=shift();
+    
+    
+    #  Get request object
+    #
+    my $r=$self->r() || 
+      return err('unable to get request object');
+
+
+    #  Where do we want to be ? Use File::Spec::Unix rather than URI, 
+    #  it's not happy when we don't have a base component.
+    #
+    my $rel_cwd=File::Spec::Unix->catdir(grep {$_} ('/', $_{'dn'}));
+        
+    
+    #  Now get real dn and check not higher than document root
+    #    
+    my $dn_root=$r->document_root();
+    my $dn=File::Spec->catdir($dn_root, split(m{/+}, $_{'dn'}));
+    $dn=realpath($dn);
+    if (!defined($dn) || (index($dn,$dn_root) !=0)) {
+        # Bad person, trying to escape
+        $dn=$dn_root;
+    }
+    
+    
+    #  And iterate over it to get file names and stat info
+    #
+    opendir(my $dh, $dn) ||
+        return err("unable to open directory $dn, $!");
+    my @fn;
+    my %fn;
+    while (my $fn=readdir($dh)) {
+        # Skip any special files, [.],[..] etc.
+        next if ($fn=~/^\./);
+        $fn.='/' if (-d File::Spec->catfile($dn, $fn));
+        my $fn_or=stat(File::Spec->catfile($dn,$fn)) || next;
+        debug("fn: $fn");
+        push @fn, $fn;
+        map { $fn{$fn}{$_}=$fn_or->$_ } qw(size mtime);
+        $fn{$fn}{'name'}=$fn;
+    }
+    
+    
+    #  Create Parent Directory link unless we're at top level
+    #
+    unless (!$_{'dn'}) {
+        my $dn_up=dirname($_{'dn'});
+        $dn_up=undef if ($dn_up eq '/');
+        
+        $self->render_block('index',
+            filename   => 'Parent Directory',
+            href       => $dn_up ? "?dn=${dn_up}" : '/',
+            date       => '',
+            size       => ''
+            
+        );
+    }
+    
+
+    #  Sort by user selected sort field, or by name if no sort selected
+    #
+    my $fn_ar;
+    my $sort_fg;
+    foreach my $sort_type (qw(name size mtime)) {
+        if ($_{"sort_${sort_type}"}) {
+            $fn_ar=$self->sort_file(\@fn, \%fn, $sort_type, $_{"sort_${sort_type}_order"});
+            $sort_fg++;
+            last; 
+        }
+    }
+    unless ($sort_fg) {
+        #  Default sort is by name
+        $fn_ar=$self->sort_file(\@fn, \%fn, 'name', $_{'sort_name_order'});
+    }
+        
+    
+    #  Now go over every file in sort order and format info, build output
+    #        
+    foreach my $fn (@{$fn_ar}) {
+    
+        
+        #  Mtime and Size in human readable format
+        #
+        #my $mtime=strftime('%X', localtime($fn{$fn}{'mtime'}));
+        my $mtime=strftime('%Y-%m-%d %H:%M:%S', localtime($fn{$fn}{'mtime'}));
+        my $size=$self->human_size($fn{$fn}{'size'});
+        
+        
+        #  Build file href differently if dir vs file
+        #
+        my $href;
+        if ($fn=~m{/$}) {
+            #  Dir - add as param
+            my $href_dn=File::Spec->catdir($_{'dn'}, split(m{/+}, $fn));
+            $href="?dn=$href_dn";
+        }
+        elsif ($_{'dn'}) {
+            #  Normal file
+            $href=File::Spec->catfile($_{'dn'}, $fn);
+        }
+        
+        
+        #  Now render info about file into page
+        #
+        $self->render_block('index',
+            filename    => $fn,
+            href        => $href || $fn,
+            date        => $mtime,
+            size        => $size
+        );
+    }
+    
+    
+    #  Construct the sort hrefs
+    #
+    use URI;
+    my $cgi_or=$self->CGI() ||
+        return err();
+    my %query=$cgi_or->Vars();
+    #  Delete any existing sort params when creating href lower/
+    map {delete @query{("sort_${_}", "sort_${_}_order")} } qw(name size mtime);
+    my %sort_href;
+    foreach my $sort_type (qw(name size mtime)) {
+        my $uri_or=URI->new();
+        $uri_or->query_form(%{{%query, "sort_${sort_type}"=>1, "sort_${sort_type}_order"=>$_{"sort_${sort_type}_order"}?0:1 }});
+        $sort_href{"sort_${sort_type}_href"}=$uri_or;
+    }
+    
+
+    #  And fill out page
+    #
+    my %param=(
+        rel_cwd         => $rel_cwd,
+        timestamp       => strftime('%X', localtime()),
+        sec             => sprintf('%.3f', $self->render_time()),
+        %sort_href
+    );
+    
+    
+    #  Done
+    #
+    return $self->render(%param);
+    
+}
+
+
+sub sort_file {
+
+    #  Sort by name, size, mtime but keep directories at top
+    #
+    my ($self, $fn_ar, $fn_hr, $field, $desc)=@_;
+    my @fn=sort {
+
+        # Keep folders at top
+        #
+        my $dn_a = ($fn_hr->{$a}{'name'} =~ m{/$}) ? 1 : 0;
+        my $dn_b = ($fn_hr->{$b}{'name'} =~ m{/$}) ? 1 : 0;
+        if ($dn_a && !$dn_b) { return -1 }
+        if ($dn_b && !$dn_a) { return 1 }
+        
+        my $cmp;
+        if ($field eq 'name') {
+            $cmp=lc($fn_hr->{$a}{$field}) cmp lc($fn_hr->{$b}{$field})
+        }
+        else {
+            $cmp=$fn_hr->{$a}{$field} <=> $fn_hr->{$b}{$field};
+            if ($cmp == 0) {
+                #  Secondary sort by name if size or mtime equal
+                $cmp=lc($fn_hr->{$a}{'name'}) cmp lc($fn_hr->{$b}{'name'})
+            }
+        }
+        $desc ? -$cmp : $cmp
+    } @{$fn_ar};
+    return \@fn;
+    
+}
+
+
+sub human_size {
+
+    #  Return human readable bytes size suffixes
+    #
+    my ($self, $size)=@_;
+    #return '0' unless $size && $size > 0;
+
+    my @units = (undef, qw(K M G T P));
+    my $i = 0;
+
+    while (($size >= 1024) && ($i < (@units - 1))) {
+        $size /= 1024;
+        $i++;
+    }
+    return $units[$i] ? sprintf("%.1f%s", $size, $units[$i]) : $size;
+}

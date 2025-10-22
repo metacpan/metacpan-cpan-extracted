@@ -5,7 +5,7 @@ use warnings;
 use List::Util qw/any/;
 use Scalar::Util qw/looks_like_number/;
 
-our $VERSION='0.1.6';
+our $VERSION='0.1.7';
 
 my %property=map {$_=>undef} qw/tmmin tmavg tmmax next finish message attribute note attributes require/;
 
@@ -95,7 +95,6 @@ sub increment {
 sub nextrandom {
 	my ($self,%opt)=@_;
 	if(!$$self{next}) { return }
-	if($#{$$self{next}}==0) { return $$self{next}[0] } # this shouldn't be needed
 	my @candidates;
 	foreach my $next (@{$$self{next}}) {
 		if($opt{not}&&($opt{not} eq $next)) { next }

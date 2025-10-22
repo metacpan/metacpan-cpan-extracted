@@ -1,4 +1,4 @@
-[% CLS %]For Best results, make sure your terminal type supports 256 colors like
+[% CLS %]For Best results, make sure your terminal type supports 256 (or more) colors like
 'xterm-256color'
 
 [% BOX BRIGHT YELLOW,1,3,17,5,DOUBLE  %]This is a text box with a DOUBLE frame[% ENDBOX %]
@@ -13,14 +13,14 @@
 [% BOX RED,35,13,17,5,SQUARE          %]This is a text box with a SQUARE frame[% ENDBOX %]
 
 [% LOCATE 1,18 %][% RED           %]  .oooooo..o                                        oooo            [% RESET %]
-[% ORANGE        %] d8P'    `Y8                                        `888            [% RESET %]
-[% BRIGHT YELLOW %] Y88bo.       .oooo.   ooo. .oo.  .oo.   oo.ooooo.   888   .ooooo.  [% RESET %]
-[% GREEN         %]  `"Y8888o.  `P  )88b  `888P"Y88bP"Y88b   888' `88b  888  d88' `88b [% RESET %]
-[% CYAN          %]      `"Y88b  .oP"888   888   888   888   888   888  888  888ooo888 [% RESET %]
-[% BLUE          %] oo     .d8P d8(  888   888   888   888   888   888  888  888    .o [% RESET %]
-[% NAVY          %] 8""88888P'  `Y888""8o o888o o888o o888o  888bod8P' o888o `Y8bod8P' [% RESET %]
-[% MAGENTA       %]                                          888                       [% RESET %]
-[% PINK          %]                                         o888o                      [% RESET %]
+[% ORANGE                         %] d8P'    `Y8                                        `888            [% RESET %]
+[% BRIGHT YELLOW                  %] Y88bo.       .oooo.   ooo. .oo.  .oo.   oo.ooooo.   888   .ooooo.  [% RESET %]
+[% GREEN                          %]  `"Y8888o.  `P  )88b  `888P"Y88bP"Y88b   888' `88b  888  d88' `88b [% RESET %]
+[% CYAN                           %]      `"Y88b  .oP"888   888   888   888   888   888  888  888ooo888 [% RESET %]
+[% BLUE                           %] oo     .d8P d8(  888   888   888   888   888   888  888  888    .o [% RESET %]
+[% NAVY                           %] 8""88888P'  `Y888""8o o888o o888o o888o  888bod8P' o888o `Y8bod8P' [% RESET %]
+[% MAGENTA                        %]                                          888                       [% RESET %]
+[% PINK                           %]                                         o888o                      [% RESET %]
 
 [% B_RGB 40,0,0  %][% BRIGHT WHITE %]  .oooooo..o                                        oooo            [% RESET %]
 [% B_RGB 40,16,0 %][% BRIGHT WHITE %] d8P'    `Y8                                        `888            [% RESET %]

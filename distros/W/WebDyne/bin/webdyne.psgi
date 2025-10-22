@@ -39,7 +39,7 @@ use WebDyne::Request::PSGI::Constant;
 
 #  Version information
 #
-$VERSION='2.014';
+$VERSION='2.015';
 
 
 #  Test file to use if no DOCUMENT_ROOT found
@@ -74,6 +74,16 @@ if (!caller || exists $ENV{PAR_TEMP}) {
     if ($static_fg=grep {/^--static$/} @ARGV) {
         @ARGV=grep {!/^--static$/} @ARGV;
     }
+    
+    
+    #  Indexing ?
+    #
+    if (grep {/^--index$/} @ARGV) {
+        @ARGV=grep {!/^--index$/} @ARGV;
+        #  Get index file path, same dn as test file
+        #
+        $DOCUMENT_DEFAULT=File::Spec->catfile($test_dn, 'index.psp');
+    }
 
 
     #  Mac conflicts with Plack default port of 5000 - choose 5001
@@ -93,6 +103,7 @@ if (!caller || exists $ENV{PAR_TEMP}) {
     if ($test_fg || !$DOCUMENT_ROOT) {
         $DOCUMENT_ROOT=$test_fn;
     }
+    $DOCUMENT_ROOT=&normalize_dn($DOCUMENT_ROOT);
     
 
     #  Done - run it
@@ -108,6 +119,7 @@ else {
     #
     $DOCUMENT_ROOT=$ENV{'DOCUMENT_ROOT'} 
         || $DOCUMENT_ROOT || $test_fn;
+    $DOCUMENT_ROOT=&normalize_dn($DOCUMENT_ROOT);
 
 }
 
@@ -119,6 +131,17 @@ else {
 
 #==================================================================================================
 
+sub normalize_dn {
+
+    #  Normal dir, normally document_root
+    #
+    my $rel_dn=shift();
+    my $abs_dn=File::Spec->rel2abs($rel_dn);
+    $abs_dn =~ s{/$}{} unless $abs_dn eq '/';
+    return $abs_dn;
+    
+}
+    
 
 #  Build a Plack::Build ref if there is middleware requested
 #
@@ -188,7 +211,6 @@ sub handler {
     #
     my $env_hr=shift();
     local *ENV=$env_hr;
-    #$ENV{'DOCUMENT_ROOT'} ||= $DOCUMENT_ROOT;
     debug('in handler, env: %s', Dumper(\%ENV));
 
 
@@ -202,7 +224,7 @@ sub handler {
     #
     my $html;
     my $html_fh=IO::String->new($html);
-    my $r=WebDyne::Request::PSGI->new(select => $html_fh, document_root => $DOCUMENT_ROOT) ||
+    my $r=WebDyne::Request::PSGI->new(select => $html_fh, document_root => $DOCUMENT_ROOT, document_default => $DOCUMENT_DEFAULT) ||
         return err('unable to create new WebDyne::Request::PSGI object: %s', 
 			$@ || errclr() || 'unknown error');
     debug("r: $r");

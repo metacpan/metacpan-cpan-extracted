@@ -1,3 +1,8 @@
+0.32 2025-10-21T13:17:51+02:00
+ - Add 'series_ordinal_raw' parameter to Series object.
+ - Add tests.
+ - Improve clean_series_ordinal() function.
+
 0.31 2025-09-30T13:58:20+02:00
  - Add clean_isbn() function.
  - Fix ISBN processing (cleanup of extra separator).

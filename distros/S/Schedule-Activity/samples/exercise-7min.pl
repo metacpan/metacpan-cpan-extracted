@@ -7,8 +7,7 @@ use Schedule::Activity;
 print "This is an entirely-linear 7-minute exercise list.\n";
 print "Note that no messages are provided for rest periods in this example.\n\n";
 
-my %schedule=Schedule::Activity::buildSchedule(
-	activities=>[[7*60,'7min program']],
+my $scheduler=Schedule::Activity->new(
 	configuration=>{node=>{
 		'7min program'=>{
 			message=>'Good luck!',
@@ -80,8 +79,9 @@ my %schedule=Schedule::Activity::buildSchedule(
 			message=>'You made it!',
 			tmmin=>0,tmavg=>0,tmmax=>0,
 		},
-	}},
-);
+	}});
+
+my %schedule=$scheduler->schedule(activities=>[[7*60,'7min program']]);
 
 my @materialized;
 foreach my $entry (@{$schedule{activities}}) {

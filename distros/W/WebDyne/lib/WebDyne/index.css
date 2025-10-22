@@ -1,0 +1,26 @@
+<style>
+  :root {
+    --pico-font-size: 85%;
+  }
+  body {
+    margin: 1rem auto;
+    max-width: 900px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  th, td {
+    text-align: left;
+    padding: 0.5rem;
+  }
+  th {
+    font-weight: bold;
+  }
+  tr:nth-child(even) {
+    background-color: var(--pico-background-color-hover);
+  }
+  hr {
+    margin: 1.5rem 0;
+  }
+</style>

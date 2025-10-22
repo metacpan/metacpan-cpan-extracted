@@ -303,7 +303,7 @@ sub api {
     my $is_authorized = 0;
     my $user = undef;
     if ($username) {
-        $user = $self->authdb->cached_user($username, $cachekey);
+        $user = $self->authdb->user($username, $cachekey);
         return $self->reply->json_error($self->authdb->code, $self->authdb->error) if $self->authdb->error;
         $is_authorized = $user->is_authorized;
     }

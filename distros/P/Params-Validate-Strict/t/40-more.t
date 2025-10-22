@@ -609,7 +609,7 @@ subtest 'Input validation and error handling' => sub {
 			schema => {bad => []},  # Array instead of hash or string
 			args => {bad => 'value'}
 		);
-	} qr/must be a hash reference or string/, 'Invalid rule type rejected';
+	} qr/schema is empty arrayref/, 'Invalid rule type rejected';
 
 	# Invalid type in schema
 	throws_ok {

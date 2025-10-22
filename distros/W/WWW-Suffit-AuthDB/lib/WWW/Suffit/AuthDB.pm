@@ -142,32 +142,19 @@ Get cache instance
 
 =head2 cached_group
 
-    my $group = $authdb->cached_group("manager");
-    my $group = $authdb->cached_group("manager", 'd1b919c1');
-
-This method returns cached data of specified groupname as L<WWW::Suffit::AuthDB::Group> object by cachekey
+This method is deprecated. See L</group> method
 
 =head2 cached_realm
 
-    my $realm = $authdb->cached_realm("default");
-    my $realm = $authdb->cached_realm("default", 'd1b919c1');
-
-This method returns cached data of specified realm name as L<WWW::Suffit::AuthDB::Realm> object by cachekey
-s
+This method is deprecated. See L</realm> method
 
 =head2 cached_routes
 
-    my $routes = $authdb->cached_routes("http://localhost/");
-    my $routes = $authdb->cached_routes("http://localhost/", 'd1b919c1');
-
-Returns cached hash of routes by base URL and cachekey optionaly
+This method is deprecated. See L</routes> method
 
 =head2 cached_user
 
-    my $user = $authdb->cached_user("alice");
-    my $user = $authdb->cached_user("alice", 'd1b919c1');
-
-This method returns cached data of specified username as L<WWW::Suffit::AuthDB::User> object by cachekey
+This method is deprecated. See L</user> method
 
 =head2 checksum
 
@@ -201,6 +188,15 @@ Returns JSON dump of loaded authentication database
     my $group = $authdb->group("manager");
 
 This method returns data of specified groupname as L<WWW::Suffit::AuthDB::Group> object
+
+    my $group = $authdb->group("manager", 'd1b919c1');
+
+With this data (with pair of arguments) the method returns cached data of specified groupname
+as L<WWW::Suffit::AuthDB::Group> object by cachekey
+
+    my $group = $authdb->group("manager", 'd1b919c1', 1);
+
+The third parameter (ForceUpdate=true) allows you to forcefully get data from the database
 
 =head2 is_connected
 
@@ -239,6 +235,25 @@ Sets error string and returns false status (undef). Also this method can perform
 
 This method returns data of specified realm name as L<WWW::Suffit::AuthDB::Realm> object
 
+    my $realm = $authdb->realm("default", 'd1b919c1');
+
+With this data (with pair of arguments) the method returns cached data of specified realm name
+as L<WWW::Suffit::AuthDB::Realm> object by cachekey
+
+    my $realm = $authdb->realm("default", 'd1b919c1', 1);
+
+The third parameter (ForceUpdate=true) allows you to forcefully get data from the database
+
+=head2 routes
+
+    my $routes = $authdb->routes("http://localhost/");
+    my $routes = $authdb->routes("http://localhost/", 'd1b919c1');
+    my $routes = $authdb->routes("http://localhost/", 'd1b919c1', 1);
+
+This method returns hash of routes by base URL and cachekey (optionaly).
+With pair of arguments the method returns cached data by cachekey.
+The third parameter (ForceUpdate=true) allows you to forcefully get data from the database
+
 =head2 save
 
     $authdb->save(); # to `sourcefile`
@@ -256,6 +271,14 @@ Performs flush database to file that specified directly
     my $user = $authdb->user("alice");
 
 This method returns data of specified username as L<WWW::Suffit::AuthDB::User> object
+
+    my $user = $authdb->user("alice", 'd1b919c1');
+
+Returns cached data of specified username as L<WWW::Suffit::AuthDB::User> object by cachekey
+
+    my $user = $authdb->user("alice", 'd1b919c1', 1);
+
+The third parameter (ForceUpdate=true) allows you to forcefully get data from the database
 
 =head2 META KEYS
 
@@ -401,17 +424,17 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 use Mojo::Base -base;
-use Mojo::Util qw/md5_sum decode encode steady_time/;
+use Mojo::Util qw/md5_sum decode encode steady_time deprecated/;
 use Mojo::File qw/path/;
 use Mojo::JSON qw/from_json to_json/;
 use Mojo::URL;
 
 use Digest::SHA qw/sha1_hex sha224_hex sha256_hex sha384_hex sha512_hex/;
 
-use Acrux::RefUtil qw/is_integer is_hash_ref is_true_flag/;
+use Acrux::RefUtil qw/is_integer is_hash_ref is_true_flag is_void isnt_void/;
 
 use WWW::Suffit::Cache;
 
@@ -469,8 +492,8 @@ sub clean {
 sub cache {
     my $self = shift;
     $self->{cache} ||= WWW::Suffit::Cache->new(
-            max_keys    => $self->max_keys,
-            expiration  => $self->expiration,
+            max_keys    => $self->max_keys // MAX_CACHE_KEYS,
+            expiration  => $self->expiration // CACHE_EXPIRES,
         );
     return $self->{cache};
 }
@@ -584,242 +607,376 @@ sub checksum {
     return $h;
 }
 
-# Methods that returns sub-objects
+# Methods that returns sub-objects and hashes
 sub user {
     my $self = shift;
     my $username = shift // '';
-    $self->clean; # Flush error
+    my $cachekey = shift // '';
+       $cachekey =~ s/[^a-z0-9]/?/gi;
+    my $forceupdate = shift || 0;
+    my $key = $cachekey ? sprintf('u.%s.%s', $username || '__anonymous', $cachekey) : '';
+    $self->clean; # Flush errors
 
     # Check username
     return WWW::Suffit::AuthDB::User->new() unless length($username); # No user specified
 
-    # Get model
-    my $model = $self->model;
+    # Get cached data
+    my $cached_data = $key ? $self->cache->get($key) : {};
+    my %data = ();
+    if (isnt_void($cached_data) && !$forceupdate) { # Data from cache unless defined $forceupdate
+        %data = isnt_void($cached_data) ? (%$cached_data) : ();
+    } else { # Data from model
+        # Get model
+        my $model = $self->model;
 
-    # Get data from model
-    my %data = $model->user_get($username);
-    if ($model->error) {
-        $self->raise(500 => "E1333: %s", $model->error);
-        return WWW::Suffit::AuthDB::User->new(error => $self->error);
+        # Get data from model
+        %data = $model->user_get($username);
+        if ($model->error) {
+            $self->raise(500 => "E1333: %s", $model->error);
+            return WWW::Suffit::AuthDB::User->new(error => $self->error);
+        }
+        return WWW::Suffit::AuthDB::User->new() unless $data{id}; # No user found - empty user data, no errors
+
+        # Get groups list of user
+        my @grpusr = $model->grpusr_get( username => $username );
+        if ($model->error) {
+            $self->raise(500 => "E1357: %s", $model->error);
+            return WWW::Suffit::AuthDB::User->new(error => $self->error);
+        }
+        $data{groups} = [sort map {$_->{groupname}} @grpusr];
+
+        # Set data from database to cache
+        if ($key) {
+            $data{is_cached} = 1;
+            $data{cached} = steady_time();
+            $data{cachekey} = $cachekey;
+            $self->cache->set($key, {%data});
+        }
     }
-    return WWW::Suffit::AuthDB::User->new() unless $data{id}; # No user found - empty user data, no errors
 
-    # Get groups list of user
-    my @grpusr = $model->grpusr_get( username => $username );
-    #print STDERR Mojo::Util::dumper({ username => $username, groups => \@grpusr});
-    if ($model->error) {
-        $self->raise(500 => "E1357: %s", $model->error);
-        return WWW::Suffit::AuthDB::User->new(error => $self->error);
-    }
-    $data{groups} = [sort map {$_->{groupname}} @grpusr];
-
+    # Return User instance with %data
     return WWW::Suffit::AuthDB::User->new(%data);
 }
 sub group {
     my $self = shift;
     my $groupname = shift // '';
-    $self->clean; # Flush error
+    my $cachekey = shift // '';
+       $cachekey =~ s/[^a-z0-9]/?/gi;
+    my $forceupdate = shift || 0;
+    my $key = $cachekey ? sprintf('g.%s.%s', $groupname || '__default', $cachekey) : '';
+    $self->clean; # Flush errors
 
-    # Check username
-    return WWW::Suffit::AuthDB::Group->new() unless length($groupname); # No user specified
+    # Check groupname
+    return WWW::Suffit::AuthDB::Group->new() unless length($groupname); # No group specified
 
-    # Get model
-    my $model = $self->model;
+    # Get cached data
+    my $cached_data = $key ? $self->cache->get($key) : {};
+    my %data = ();
+    if (isnt_void($cached_data) && !$forceupdate) { # Data from cache unless defined $forceupdate
+        %data = isnt_void($cached_data) ? (%$cached_data) : ();
+    } else { # Data from model
+        # Get model
+        my $model = $self->model;
 
-    # Get data from model
-    my %data = $model->group_get($groupname);
-    if ($model->error) {
-        $self->raise(500 => "E1348: %s", $model->error);
-        return WWW::Suffit::AuthDB::Group->new(error => $self->error);
+        # Get data from model
+        %data = $model->group_get($groupname);
+        if ($model->error) {
+            $self->raise(500 => "E1348: %s", $model->error);
+            return WWW::Suffit::AuthDB::Group->new(error => $self->error);
+        }
+        return WWW::Suffit::AuthDB::Group->new() unless $data{id}; # No group found - empty group data, no errors
+
+        # Get users list of group
+        my @grpusr = $model->grpusr_get( groupname => $groupname );
+        if ($model->error) {
+            $self->raise(500 => "E1357: %s", $model->error);
+            return WWW::Suffit::AuthDB::Group->new(error => $self->error);
+        }
+        $data{users} = [sort map {$_->{username}} @grpusr];
+
+        # Set data from database to cache
+        if ($key) {
+            $data{is_cached} = 1;
+            $data{cached} = steady_time();
+            $data{cachekey} = $cachekey;
+            $self->cache->set($key, {%data});
+        }
     }
-    return WWW::Suffit::AuthDB::Group->new() unless $data{id}; # No group found - empty group data, no errors
 
-    # Get users list of group
-    my @grpusr = $model->grpusr_get( groupname => $groupname );
-    if ($model->error) {
-        $self->raise(500 => "E1357: %s", $model->error);
-        return WWW::Suffit::AuthDB::Group->new(error => $self->error);
-    }
-    $data{users} = [sort map {$_->{username}} @grpusr];
-
+    # Return Group instance with %data
     return WWW::Suffit::AuthDB::Group->new(%data);
 }
 sub realm {
     my $self = shift;
     my $realmname = shift // '';
+    my $cachekey = shift // '';
+       $cachekey =~ s/[^a-z0-9]/?/gi;
+    my $forceupdate = shift || 0;
+    my $key = $cachekey ? sprintf('r.%s.%s', $realmname || '__default', $cachekey) : '';
     $self->clean; # Flush error
 
     # Check realmname
     return WWW::Suffit::AuthDB::Realm->new() unless length($realmname); # No realm specified
 
-    # Get model
-    my $model = $self->model;
+    # Get cached data
+    my $cached_data = $key ? $self->cache->get($key) : {};
+    my %data = ();
+    if (isnt_void($cached_data) && !$forceupdate) { # Data from cache unless defined $forceupdate
+        %data = isnt_void($cached_data) ? (%$cached_data) : ();
+    } else { # Data from model
+        # Get model
+        my $model = $self->model;
 
-    # Get data from model
-    my %data = $model->realm_get($realmname);
-    if ($model->error) {
-        $self->raise(500 => "E1359: %s", $model->error);
-        return WWW::Suffit::AuthDB::Realm->new(error => $self->error);
+        # Get data from model
+        %data = $model->realm_get($realmname);
+
+        if ($model->error) {
+            $self->raise(500 => "E1359: %s", $model->error);
+            return WWW::Suffit::AuthDB::Realm->new(error => $self->error);
+        }
+        return WWW::Suffit::AuthDB::Realm->new() unless $data{id}; # No realm found - empty realm data, no errors
+
+        # Get requirements
+        my @requirements = $model->realm_requirements($realmname);
+        if ($model->error) {
+            $self->raise(500 => "E1371: %s", $model->error);
+            return WWW::Suffit::AuthDB::Realm->new(error => $self->error);
+        }
+
+        # Segregate by provider
+        my %providers;
+        foreach my $rec (@requirements) {
+            my $prov = $rec->{provider} or next;
+            my $box = ($providers{$prov} //= []);
+            push @$box, {
+                entity  => $rec->{entity} // '',
+                op      => lc($rec->{op} // ''),
+                value   => $rec->{value} // '',
+            };
+        }
+
+        # Set as requirements
+        $data{requirements} = {%providers};
+
+        # Set data from database to cache
+        if ($key) {
+            $data{is_cached} = 1;
+            $data{cached} = steady_time();
+            $data{cachekey} = $cachekey;
+            $self->cache->set($key, {%data});
+        }
     }
-    return WWW::Suffit::AuthDB::Realm->new() unless $data{id}; # No realm found - empty group data, no errors
 
-    # Get requirements
-    my @requirements = $model->realm_requirements($realmname);
-    if ($model->error) {
-        $self->raise(500 => "E1371: %s", $model->error);
-        return WWW::Suffit::AuthDB::Realm->new(error => $self->error);
-    }
-
-    # Segregate by provider
-    my %providers;
-    foreach my $rec (@requirements) {
-        my $prov = $rec->{provider} or next;
-        my $box = ($providers{$prov} //= []);
-        push @$box, {
-            entity  => $rec->{entity} // '',
-            op      => lc($rec->{op} // ''),
-            value   => $rec->{value} // '',
-        };
-    }
-
-    # Set as requirements
-    $data{requirements} = {%providers};
-
+    # Return Realm instance with %data
     return WWW::Suffit::AuthDB::Realm->new(%data);
+}
+sub routes {
+    my $self = shift;
+    my $url = _url_fix_localhost(shift(@_)); # Base URL (fixed!)
+    my $cachekey = shift // '';
+       $cachekey =~ s/[^a-z0-9]/?/gi;
+    my $forceupdate = shift || 0;
+    my $key = $cachekey ? sprintf('rts.%s.%s', $url || '__default', $cachekey) : '';
+    my $now = time;
+    $self->clean; # Flush error
+
+    # Get cached data
+    my $cached_data = $key ? $self->cache->get($key) : {};
+    $cached_data = {} if is_hash_ref($cached_data)
+        && is_hash_ref($cached_data->{data})
+        && $cached_data->{expires} < $now;
+
+    my %data = ();
+    if (isnt_void($cached_data) && !$forceupdate) { # Data from cache unless defined $forceupdate
+        %data = isnt_void($cached_data) ? (%$cached_data) : ();
+    } else { # Data from model
+        # Get model
+        my $model = $self->model;
+
+        # Get routes list
+        my @routes = $model->route_getall;
+        return $self->raise(500 => "E1376: %s", $model->error) if $model->error;
+
+        # Convert to hash
+        my $ret = {}; # `id`,`realmname`,`routename`,`method`,`url`,`base`,`path`
+        foreach my $r (@routes) {
+            my $base_url_fixed = _url_fix_localhost($r->{base});
+            next unless $r->{realmname} && $base_url_fixed eq $url;
+            $ret->{$r->{routename}} = {
+                routename   => $r->{routename},
+                realmname   => $r->{realmname},
+                method      => $r->{method},
+                path        => $r->{path},
+            };
+        }
+
+        # Set result data hash
+        %data = (
+            data        => $ret,
+            is_cached   => 0,
+            cached      => 0,
+            expires     => 0,
+            cachekey    => '',
+        );
+
+        # Set data from database to cache
+        if ($key) {
+            $data{is_cached}= 1;
+            $data{cached}   = steady_time();
+            $data{cachekey} = $cachekey;
+            $data{expires}  = $now + $self->expiration,
+            $self->cache->set($key, {%data});
+        }
+    }
+
+    # Return data only!
+    return $data{data};
 }
 
 # Methods that returns cached sub-objects (cached methods)
 sub cached_user {
-    my $self = shift;
-    my $username = shift // '';
-    my $cachekey = shift // '';
-    my $now = time;
+    deprecated 'The "WWW::Suffit::AuthDB::cached_user" is deprecated in favor of "user"';
+    goto &user;
 
-    # Get user object from cache by key
-    $cachekey =~ s/[^a-z0-9]/?/gi;
-    my $key = $cachekey
-        ? sprintf('user.%s.%s', $cachekey, $username || '__anonymous')
-        : sprintf('user.%s', $username // '__anonymous');
-    #my $upd = $self->meta(sprintf("%s.updated", $key)) // 0;
-    #my $obj = (($upd + CACHE_EXPIRES) < time) ? $self->cache->get($key) : undef;
-    my $obj = $self->cache->get($key);
-    return $obj if $obj && $obj->is_valid; # Return user object from cache if exists
-
-    # Get real object (not cached) otherwise
-    $obj = $self->user($username);
-    return $obj if $self->error;
-
-    # Set expires time and marks object as cached
-    $obj->expires($now + $self->expiration)->mark(steady_time);
-    $obj->cachekey($cachekey) if $cachekey;
-    $self->cache->set($key, $obj) if $obj->is_valid;
-
-    # Return object
-    return $obj;
+    #    my $self = shift;
+    #    my $username = shift // '';
+    #    my $cachekey = shift // '';
+    #    my $now = time;
+    #
+    #    # Get user object from cache by key
+    #    $cachekey =~ s/[^a-z0-9]/?/gi;
+    #    my $key = $cachekey
+    #        ? sprintf('user.%s.%s', $cachekey, $username || '__anonymous')
+    #        : sprintf('user.%s', $username // '__anonymous');
+    #    #my $upd = $self->meta(sprintf("%s.updated", $key)) // 0;
+    #    #my $obj = (($upd + CACHE_EXPIRES) < time) ? $self->cache->get($key) : undef;
+    #    my $obj = $self->cache->get($key);
+    #    return $obj if $obj && $obj->is_valid; # Return user object from cache if exists
+    #
+    #    # Get real object (not cached) otherwise
+    #    $obj = $self->user($username);
+    #    return $obj if $self->error;
+    #
+    #    # Set expires time and marks object as cached
+    #    $obj->expires($now + $self->expiration)->mark(steady_time);
+    #    $obj->cachekey($cachekey) if $cachekey;
+    #    $self->cache->set($key, $obj) if $obj->is_valid;
+    #
+    #    # Return object
+    #    return $obj;
 }
 sub cached_group {
-    my $self = shift;
-    my $groupname = shift // '';
-    my $cachekey = shift // '';
-    my $now = time;
+    deprecated 'The "WWW::Suffit::AuthDB::cached_group" is deprecated in favor of "group"';
+    goto &group;
 
-    # Get group object from cache by key
-    $cachekey =~ s/[^a-z0-9]/?/gi;
-    my $key = $cachekey
-        ? sprintf('group.%s.%s', $cachekey, $groupname // '__default')
-        : sprintf('group.%s', $groupname // '__default');
-    #my $upd = $self->meta(sprintf("%s.updated", $key)) // 0;
-    #my $obj = (($upd + CACHE_EXPIRES) < time) ? $self->cache->get($key) : undef;
-    my $obj = $self->cache->get($key);
-    return $obj if $obj && $obj->is_valid; # Return group object from cache if exists
-
-    # Get real object (not cached) otherwise
-    $obj = $self->group($groupname);
-    return $obj if $self->error;
-
-    # Set expires time
-    $obj->expires($now + $self->expiration)->mark(steady_time);
-    $obj->cachekey($cachekey) if $cachekey;
-    $self->cache->set($key, $obj) if $obj->is_valid;
-
-    # Return object
-    return $obj;
+    #    my $self = shift;
+    #    my $groupname = shift // '';
+    #    my $cachekey = shift // '';
+    #    my $now = time;
+    #
+    #    # Get group object from cache by key
+    #    $cachekey =~ s/[^a-z0-9]/?/gi;
+    #    my $key = $cachekey
+    #        ? sprintf('group.%s.%s', $cachekey, $groupname // '__default')
+    #        : sprintf('group.%s', $groupname // '__default');
+    #    #my $upd = $self->meta(sprintf("%s.updated", $key)) // 0;
+    #    #my $obj = (($upd + CACHE_EXPIRES) < time) ? $self->cache->get($key) : undef;
+    #    my $obj = $self->cache->get($key);
+    #    return $obj if $obj && $obj->is_valid; # Return group object from cache if exists
+    #
+    #    # Get real object (not cached) otherwise
+    #    $obj = $self->group($groupname);
+    #    return $obj if $self->error;
+    #
+    #    # Set expires time
+    #    $obj->expires($now + $self->expiration)->mark(steady_time);
+    #    $obj->cachekey($cachekey) if $cachekey;
+    #    $self->cache->set($key, $obj) if $obj->is_valid;
+    #
+    #    # Return object
+    #    return $obj;
 }
 sub cached_realm {
-    my $self = shift;
-    my $realmname = shift // '';
-    my $cachekey = shift // '';
-    my $now = time;
+    deprecated 'The "WWW::Suffit::AuthDB::cached_realm" is deprecated in favor of "realm"';
+    goto &realm;
 
-    # Get realm object from cache by key
-    $cachekey =~ s/[^a-z0-9]/?/gi;
-    my $key = $cachekey
-        ? sprintf('realm.%s.%s', $cachekey, $realmname // '__default')
-        : sprintf('realm.%s', $realmname // '__default');
-    #my $upd = $self->meta(sprintf("%s.updated", $key)) // 0;
-    #my $obj = (($upd + CACHE_EXPIRES) < time) ? $self->cache->get($key) : undef;
-    my $obj = $self->cache->get($key);
-    return $obj if $obj && $obj->is_valid; # Return realm object from cache if exists
-
-    # Get real object (not cached) otherwise
-    $obj = $self->realm($realmname);
-    return $obj if $self->error;
-
-    # Set expires time
-    $obj->expires($now + $self->expiration)->mark(steady_time);
-    $obj->cachekey($cachekey) if $cachekey;
-    $self->cache->set($key, $obj) if $obj->is_valid;
-
-    # Return object
-    return $obj;
+    #    my $self = shift;
+    #    my $realmname = shift // '';
+    #    my $cachekey = shift // '';
+    #    my $now = time;
+    #
+    #    # Get realm object from cache by key
+    #    $cachekey =~ s/[^a-z0-9]/?/gi;
+    #    my $key = $cachekey
+    #        ? sprintf('realm.%s.%s', $cachekey, $realmname // '__default')
+    #        : sprintf('realm.%s', $realmname // '__default');
+    #    #my $upd = $self->meta(sprintf("%s.updated", $key)) // 0;
+    #    #my $obj = (($upd + CACHE_EXPIRES) < time) ? $self->cache->get($key) : undef;
+    #    my $obj = $self->cache->get($key);
+    #    return $obj if $obj && $obj->is_valid; # Return realm object from cache if exists
+    #
+    #    # Get real object (not cached) otherwise
+    #    $obj = $self->realm($realmname);
+    #    return $obj if $self->error;
+    #
+    #    # Set expires time
+    #    $obj->expires($now + $self->expiration)->mark(steady_time);
+    #    $obj->cachekey($cachekey) if $cachekey;
+    #    $self->cache->set($key, $obj) if $obj->is_valid;
+    #
+    #    # Return object
+    #    return $obj;
 }
 sub cached_routes {
-    my $self = shift;
-    my $url = _url_fix_localhost(shift(@_)); # Base URL (fixed!)
-    my $cachekey = shift // '';
-    my $now = time;
-    $self->clean; # Flush error
+    deprecated 'The "WWW::Suffit::AuthDB::cached_routes" is deprecated in favor of "routes"';
+    goto &routes;
 
-    # Get from cache
-    $cachekey =~ s/[^a-z0-9]/?/gi;
-    my $key = $cachekey
-        ? sprintf('routes.%s.%s', $cachekey, $url // '__default')
-        : sprintf('routes.%s', $url // '__default');
-
-    #my $upd = $self->meta(sprintf("%s.updated", $key)) // 0;
-    #my $val = (($upd + CACHE_EXPIRES) < time) ? $self->cache->get($key) : undef;
-    my $val = $self->cache->get($key);
-    return $val->{data} if $val && is_hash_ref($val) && $val->{exp} < $now;
-
-    # Get model
-    my $model = $self->model;
-
-    # Get routes list
-    my @routes = $model->route_getall;
-    return $self->raise(500 => "E1376: %s", $model->error) if $model->error;
-
-    my $ret = {}; # `id`,`realmname`,`routename`,`method`,`url`,`base`,`path`
-    foreach my $r (@routes) {
-        my $base_url_fixed = _url_fix_localhost($r->{base});
-        next unless $r->{realmname} && $base_url_fixed eq $url;
-        $ret->{$r->{routename}} = {
-            routename   => $r->{routename},
-            realmname   => $r->{realmname},
-            method      => $r->{method},
-            path        => $r->{path},
-        };
-    }
-
-    # Set cache record
-    $self->cache->set($key, {
-        data        => $ret,
-        exp         => $now + $self->expiration,
-        cached      => steady_time,
-        cachekey    => $cachekey,
-    });
-
-    # Return data only!
-    return $ret;
+    #    my $self = shift;
+    #    my $url = _url_fix_localhost(shift(@_)); # Base URL (fixed!)
+    #    my $cachekey = shift // '';
+    #    my $now = time;
+    #    $self->clean; # Flush error
+    #
+    #    # Get from cache
+    #    $cachekey =~ s/[^a-z0-9]/?/gi;
+    #    my $key = $cachekey
+    #        ? sprintf('routes.%s.%s', $cachekey, $url // '__default')
+    #        : sprintf('routes.%s', $url // '__default');
+    #
+    #    #my $upd = $self->meta(sprintf("%s.updated", $key)) // 0;
+    #    #my $val = (($upd + CACHE_EXPIRES) < time) ? $self->cache->get($key) : undef;
+    #    my $val = $self->cache->get($key);
+    #    return $val->{data} if $val && is_hash_ref($val) && $val->{exp} < $now;
+    #
+    #    # Get model
+    #    my $model = $self->model;
+    #
+    #    # Get routes list
+    #    my @routes = $model->route_getall;
+    #    return $self->raise(500 => "E1376: %s", $model->error) if $model->error;
+    #
+    #    my $ret = {}; # `id`,`realmname`,`routename`,`method`,`url`,`base`,`path`
+    #    foreach my $r (@routes) {
+    #        my $base_url_fixed = _url_fix_localhost($r->{base});
+    #        next unless $r->{realmname} && $base_url_fixed eq $url;
+    #        $ret->{$r->{routename}} = {
+    #            routename   => $r->{routename},
+    #            realmname   => $r->{realmname},
+    #            method      => $r->{method},
+    #            path        => $r->{path},
+    #        };
+    #    }
+    #
+    #    # Set cache record
+    #    $self->cache->set($key, {
+    #        data        => $ret,
+    #        exp         => $now + $self->expiration,
+    #        cached      => steady_time,
+    #        cachekey    => $cachekey,
+    #    });
+    #
+    #    # Return data only!
+    #    return $ret;
 }
 
 sub _url_fix_localhost {

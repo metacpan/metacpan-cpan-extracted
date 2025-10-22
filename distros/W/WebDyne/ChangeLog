@@ -1,3 +1,45 @@
+commit e8764bd97863fb999c837dd362409083b00f6330
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Oct 22 00:43:29 2025 +1030
+
+    VERSION increment: 2.015
+
+commit 0d52da6925a9f6cce51ea792e391a5c51432eb0c
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Oct 22 00:40:51 2025 +1030
+
+    Update test files to use lock_nstore to cater for perl compiled with long doubles
+
+commit 23d463d412f2eb92b95cad3c7361b4765962b2f9
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Oct 22 00:30:32 2025 +1030
+
+    Add basic file index page and --index option to webdyne.psgi utility
+
+commit e8e329036d57295959b8088461423ee8f21a36d1
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Oct 19 13:17:40 2025 +1030
+
+    Fix debug() in WebDyne::Util so WEBDYNE_DEBUG environment var still works in Plack when %ENV replaced in handler
+
+commit 8f55ccf1f0028ca79d35e373f59015548e58aa6b
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Oct 19 11:39:34 2025 +1030
+
+    Add wdlint binary to Makefile, adjust stderr output to remove stray newline
+
+commit 83dd6fc67906b57166a1a33d60c19437f2da7479
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Oct 19 11:35:04 2025 +1030
+
+    Add wdlint utility to check perl syntax in .psp files
+
+commit 3d2ff152a6bfcaecf6eb64baaf0991719b376124
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat Oct 18 17:38:36 2025 +1030
+
+    Fix minor typo in README.md, update Github actions to build from main branch
+
 commit f34dace6205873d32395f8d6efa377880ecbf690
 Author: Andrew Speer <andrew.speer@isolutions.com.au>
 Date:   Sat Oct 18 17:27:37 2025 +1030

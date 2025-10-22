@@ -6,7 +6,7 @@ WebDyne is a dynamic content generation engine for Apache/mod_perl and PSGI web 
  embedded Perl code are processed to produce dynamic HTML output. 
 
 An installer is included in the base WebDyne module for Apache, or a PSGI variant is included for use with Plack. Once WebDyne is installed any
- file with a  `.psp`  extension is treated as a WebDyne source file. It is parsed for WebDyne tags \(such as `<perl>;`  and  `<block>` ) which are interpreted and executed on the server as appropriate to generate a
+ file with a  `.psp`  extension is treated as a WebDyne source file. It is parsed for WebDyne tags \(such as `<perl>`  and  `<block>` ) which are interpreted and executed on the server as appropriate to generate a
  compliant HTML document. The resulting output is then sent to the browser.
 
 Once parsed paged are are optionally stored in a partially compiled format, speeding up subsequent processing. The aim of WebDyne is to make

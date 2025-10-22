@@ -1,5 +1,8 @@
 # Version/Revision history
 
+1.04 Tue 21 Oct 2025 16:58:53 MSK
+    * Removed all `cache_` prefixes from `AAA` calls
+
 1.03 Wed 05 Mar 2025 10:58:43 MSK
     * Added description field to `/api/user/token` API methods
 

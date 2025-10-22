@@ -13,7 +13,7 @@ use MARC::Convert::Wikidata::Object::ISBN;
 use MARC::Convert::Wikidata::Object::Kramerius;
 use MARC::Convert::Wikidata::Object::People;
 use MARC::Convert::Wikidata::Object::Publisher;
-use MARC::Convert::Wikidata::Object::Series 0.09;
+use MARC::Convert::Wikidata::Object::Series 0.15;
 use MARC::Convert::Wikidata::Utils qw(clean_cover clean_date clean_edition_number
 	clean_isbn clean_issn clean_number_of_pages clean_oclc clean_publication_date
 	clean_publisher_name clean_publisher_place clean_series_name clean_series_ordinal
@@ -39,7 +39,7 @@ Readonly::Hash our %PEOPLE_TYPE => {
 	'trl' => 'translators',
 };
 
-our $VERSION = 0.31;
+our $VERSION = 0.32;
 
 # Constructor.
 sub new {
@@ -191,6 +191,7 @@ sub _cycles {
 						'publisher' => $publisher,
 					) : (),
 					'series_ordinal' => $cycle_ordinal,
+					'series_ordinal_raw' => $cycle_ordinal,
 				);
 			}
 		}
@@ -574,8 +575,8 @@ sub _series {
 	foreach my $series_490 (@series_490) {
 		my $series_name = $series_490->subfield('a');
 		$series_name = clean_series_name($series_name);
-		my $series_ordinal = $series_490->subfield('v');
-		$series_ordinal = clean_series_ordinal($series_ordinal);
+		my $series_ordinal_raw = $series_490->subfield('v');
+		my $series_ordinal = clean_series_ordinal($series_ordinal_raw);
 		my $issn = $series_490->subfield('x');
 		$issn = clean_issn($issn);
 
@@ -590,6 +591,7 @@ sub _series {
 					'publisher' => $publisher,
 				) : (),
 				'series_ordinal' => $series_ordinal,
+				'series_ordinal_raw' => $series_ordinal_raw,
 			);
 		}
 	}

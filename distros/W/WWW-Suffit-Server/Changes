@@ -1,5 +1,8 @@
 # Version/Revision history
 
+1.12 Tue 21 Oct 2025 16:58:53 MSK
+    * The authdbcacheexpire/authdbcacheexpiration directives are now processed only if they exist
+
 1.11 Wed 21 Aug 2024 18:02:20 MSK
     * Added new version of WWW::Suffit::AuthDB supported
     * Added clientid helper

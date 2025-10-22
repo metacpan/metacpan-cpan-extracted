@@ -18,11 +18,11 @@ Params::Validate::Strict - Validates a set of parameters against a schema
 
 =head1 VERSION
 
-Version 0.18
+Version 0.19
 
 =cut
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 =head1 SYNOPSIS
 
@@ -51,6 +51,8 @@ our $VERSION = '0.18';
 =head2 validate_strict
 
 Validates a set of parameters against a schema.
+
+The schema can then be plumbed into L<App::Test::Generator> to automatically create a set of black-box test cases.
 
 This function takes two mandatory arguments:
 
@@ -91,6 +93,15 @@ The schema can define the following rules for each parameter:
 
 The data type of the parameter.
 Valid types are C<string>, C<integer>, C<number>, C<float> C<boolean>, C<hashref>, C<arrayref>, C<object> and C<coderef>.
+
+A type can be an arrayref when a parameter could have different types (e.g. a string or an object).
+
+  $schema = {
+    username => [
+      { type => 'string', min => 3, max => 50 },	# Name
+      { type => 'integer', 'min' => 1 },	# UID that isn't root
+    ]
+  };
 
 =item * C<can>
 
@@ -319,7 +330,7 @@ sub validate_strict
 		if((ref($rules) eq 'HASH') && $rules->{optional}) {
 			if(!exists($args->{$key})) {
 				if(exists($rules->{'default'})) {
-					# Populate missing optional parameters with the specfied output values
+					# Populate missing optional parameters with the specified output values
 					$validated_args{$key} = $rules->{'default'};
 				}
 				next;	# optional and missing
@@ -605,6 +616,9 @@ sub validate_strict
 						_error($logger, "validate_strict: Parameter '$key' regex '$rule_value' error: $@");
 					}
 				} elsif($rule_name eq 'nomatch') {
+					if(!defined($value)) {
+						next;	# Skip if string is undefined
+					}
 					if($rules->{'type'} eq 'arrayref') {
 						my @matches = grep { /$rule_value/ } @{$value};
 						if(scalar(@matches)) {
@@ -756,7 +770,7 @@ sub validate_strict
 				} elsif($rule_name eq 'validate') {
 					if(ref($rule_value) eq 'CODE') {
 						if(my $error = &{$rule_value}($args)) {
-							_error($logger, "validate_string: $key not valid: $error");
+							_error($logger, "validate_strict: $key not valid: $error");
 						}
 					} else {
 						# _error($logger, "validate_strict: Parameter '$key': 'validate' only supports coderef, not " . ref($value));
@@ -765,6 +779,35 @@ sub validate_strict
 				} else {
 					_error($logger, "validate_strict: Unknown rule '$rule_name'");
 				}
+			}
+		} elsif(ref($rules) eq 'ARRAY') {
+			if(scalar(@{$rules})) {
+				# An argument can be one of several different type
+				my $rc = 0;
+				my @types;
+				foreach my $rule(@{$rules}) {
+					if(ref($rule) ne 'HASH') {
+						_error($logger, "validate_strict: Parameter '$key' rules must be a hash reference");
+						next;
+					}
+					if(!defined($rule->{'type'})) {
+						_error($logger, "validate_strict: Parameter '$key' is missing a type in an alternative");
+						next;
+					}
+					push @types, $rule->{'type'};
+					eval {
+						validate_strict({ input => { $key => $value }, schema => { $key => $rule }, logger => undef });
+					};
+					if(!$@) {
+						$rc = 1;
+						last;
+					}
+				}
+				if(!$rc) {
+					_error($logger, "validate_strict: Parameter: '$key': must be one of " . join(', ', @types));
+				}
+			} else {
+				_error($logger, "validate_strict: Parameter: '$key': schema is empty arrayref");
 			}
 		} elsif(ref($rules)) {
 			_error($logger, 'rules must be a hash reference or string');
@@ -799,7 +842,7 @@ sub _warn
 	if($logger) {
 		$logger->warn(__PACKAGE__, ": $message");
 	} else {
-		carp(__PACKAGE__ . ": $message");
+		carp(__PACKAGE__, ": $message");
 	}
 }
 
@@ -865,6 +908,8 @@ Nigel Horne, C<< <njh at nigelhorne.com> >>
 =item * L<Params::Validate>
 
 =item * L<Return::Set>
+
+=item * L<App::Test::Generator>
 
 =back
 

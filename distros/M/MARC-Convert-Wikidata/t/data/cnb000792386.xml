@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<collection
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"
+  xmlns="http://www.loc.gov/MARC21/slim">
+
+<record>
+  <leader>02044nam a22004691i 4500</leader>
+  <controlfield tag="001">bk193201001</controlfield>
+  <controlfield tag="003">CZ PrNK</controlfield>
+  <controlfield tag="005">20251006140827.0</controlfield>
+  <controlfield tag="007">ta</controlfield>
+  <controlfield tag="008">990428s1932    xr     g      000 f cze  </controlfield>
+  <datafield tag="015" ind1=" " ind2=" ">
+    <subfield code="a">cnb000792386</subfield>
+  </datafield>
+  <datafield tag="020" ind1=" " ind2=" ">
+    <subfield code="q">(Vázáno)</subfield>
+  </datafield>
+  <datafield tag="035" ind1=" " ind2=" ">
+    <subfield code="a">(OCoLC)85514723</subfield>
+  </datafield>
+  <datafield tag="040" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+    <subfield code="b">cze</subfield>
+    <subfield code="c">PNA001</subfield>
+    <subfield code="d">ABA001</subfield>
+    <subfield code="e">rda</subfield>
+  </datafield>
+  <datafield tag="041" ind1="1" ind2=" ">
+    <subfield code="a">cze</subfield>
+    <subfield code="h">ger</subfield>
+  </datafield>
+  <datafield tag="072" ind1=" " ind2="7">
+    <subfield code="a">821.112.2-3</subfield>
+    <subfield code="x">Německá próza, německy psaná</subfield>
+    <subfield code="2">Konspekt</subfield>
+    <subfield code="9">25</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">821.112.2-3</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">(0:82-3)</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="100" ind1="1" ind2=" ">
+    <subfield code="a">Goethe, Johann Wolfgang von,</subfield>
+    <subfield code="d">1749-1832</subfield>
+    <subfield code="7">jn19990002740</subfield>
+    <subfield code="4">aut</subfield>
+  </datafield>
+  <datafield tag="245" ind1="1" ind2="0">
+    <subfield code="a">Spříznění volbou a jiné prosy /</subfield>
+    <subfield code="c">J.W. Goethe</subfield>
+  </datafield>
+  <datafield tag="264" ind1=" " ind2="1">
+    <subfield code="a">V Praze :</subfield>
+    <subfield code="b">Fr. Borový,</subfield>
+    <subfield code="c">1932</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">655 stran ;</subfield>
+    <subfield code="c">17 cm</subfield>
+  </datafield>
+  <datafield tag="336" ind1=" " ind2=" ">
+    <subfield code="a">text</subfield>
+    <subfield code="b">txt</subfield>
+    <subfield code="2">rdacontent</subfield>
+  </datafield>
+  <datafield tag="337" ind1=" " ind2=" ">
+    <subfield code="a">bez média</subfield>
+    <subfield code="b">n</subfield>
+    <subfield code="2">rdamedia</subfield>
+  </datafield>
+  <datafield tag="338" ind1=" " ind2=" ">
+    <subfield code="a">svazek</subfield>
+    <subfield code="b">nc</subfield>
+    <subfield code="2">rdacarrier</subfield>
+  </datafield>
+  <datafield tag="490" ind1="1" ind2=" ">
+    <subfield code="a">Pantheon ;</subfield>
+    <subfield code="v">kniha 70.</subfield>
+  </datafield>
+  <datafield tag="490" ind1="1" ind2=" ">
+    <subfield code="a">Spisů svazek 9. / J.W. Goethe</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Přeloženo z němčiny</subfield>
+  </datafield>
+  <datafield tag="505" ind1="0" ind2="0">
+    <subfield code="t">Spříznění volbou --</subfield>
+    <subfield code="t">Padesátiletý --</subfield>
+    <subfield code="t">Pohádka --</subfield>
+    <subfield code="t">Novela --</subfield>
+    <subfield code="t">Pedagogická provincie --</subfield>
+    <subfield code="t">Z maxim a reflexí</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="7">
+    <subfield code="a">německé prózy</subfield>
+    <subfield code="7">fd132943</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="700" ind1="1" ind2="2">
+    <subfield code="a">Goethe, Johann Wolfgang von,</subfield>
+    <subfield code="d">1749-1832.</subfield>
+    <subfield code="t">Wahlverwandtschaften.</subfield>
+    <subfield code="l">Česky</subfield>
+    <subfield code="7">aun2017963654</subfield>
+  </datafield>
+  <datafield tag="700" ind1="1" ind2="2">
+    <subfield code="a">Goethe, Johann Wolfgang von,</subfield>
+    <subfield code="d">1749-1832.</subfield>
+    <subfield code="t">Mann von funfzig Jahren.</subfield>
+    <subfield code="l">Česky</subfield>
+    <subfield code="7">aun20251252741</subfield>
+  </datafield>
+  <datafield tag="700" ind1="1" ind2="2">
+    <subfield code="a">Goethe, Johann Wolfgang von,</subfield>
+    <subfield code="d">1749-1832.</subfield>
+    <subfield code="t">Märchen.</subfield>
+    <subfield code="l">Česky</subfield>
+    <subfield code="7">aun20211134621</subfield>
+  </datafield>
+  <datafield tag="700" ind1="1" ind2="2">
+    <subfield code="a">Goethe, Johann Wolfgang von,</subfield>
+    <subfield code="d">1749-1832.</subfield>
+    <subfield code="t">Novelle.</subfield>
+    <subfield code="l">Česky</subfield>
+    <subfield code="7">aun20241243384</subfield>
+  </datafield>
+  <datafield tag="700" ind1="1" ind2="2">
+    <subfield code="a">Goethe, Johann Wolfgang von,</subfield>
+    <subfield code="d">1749-1832.</subfield>
+    <subfield code="t">Pädagogische Provinz.</subfield>
+    <subfield code="l">Česky</subfield>
+    <subfield code="7">aun20251252744</subfield>
+  </datafield>
+  <datafield tag="700" ind1="1" ind2="2">
+    <subfield code="a">Goethe, Johann Wolfgang von,</subfield>
+    <subfield code="d">1749-1832.</subfield>
+    <subfield code="t">Maximen und Reflexionen.</subfield>
+    <subfield code="l">Česky</subfield>
+    <subfield code="7">aun20251252746</subfield>
+  </datafield>
+  <datafield tag="740" ind1="0" ind2="2">
+    <subfield code="a">Maximy a reflexe</subfield>
+  </datafield>
+  <datafield tag="800" ind1="1" ind2=" ">
+    <subfield code="a">Goethe, Johann Wolfgang von,</subfield>
+    <subfield code="d">1749-1832.</subfield>
+    <subfield code="t">Spisy (Fr. Borový)</subfield>
+  </datafield>
+  <datafield tag="830" ind1=" " ind2="0">
+    <subfield code="a">Pantheon (Fr. Borový)</subfield>
+  </datafield>
+  <datafield tag="856" ind1="4" ind2="1">
+    <subfield code="u">http://krameriusndk.nkp.cz/search/handle/uuid:4e6027b0-f852-11e6-aa6c-005056827e52</subfield>
+    <subfield code="y">Digitalizovaný dokument</subfield>
+  </datafield>
+  <datafield tag="910" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+  </datafield>
+  <datafield tag="998" ind1=" " ind2=" ">
+    <subfield code="a">000792386</subfield>
+  </datafield>
+</record>
+
+</collection>

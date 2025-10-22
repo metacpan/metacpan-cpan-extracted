@@ -113,5 +113,6 @@ t/unique_by.t
 t/values.t
 t/walk.t
 t/yaml_cli.t
+VISION.md
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

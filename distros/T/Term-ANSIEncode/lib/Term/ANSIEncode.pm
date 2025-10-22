@@ -39,7 +39,7 @@ binmode(STDOUT, ":encoding(UTF-8)");
 binmode(STDIN,  ":encoding(UTF-8)");
 
 BEGIN {
-    our $VERSION = '1.34';
+    our $VERSION = '1.35';
 }
 
 # Returns a description of a token using the meta data.
@@ -1757,7 +1757,11 @@ Clear up from current cursor position
 
 Reset all colors and attributes
 
+=back
+
 =head2 CURSOR
+
+=over 4
 
 =item B<[% HOME %]>
 
@@ -1815,7 +1819,11 @@ Rapid cursor blink
 
 Set cursor position
 
+=back
+
 =head2 ATTRIBUTES
+
+=over 4
 
 =item B<[% INVERT %]>
 
@@ -1833,7 +1841,11 @@ Crossed out
 
 Default font
 
+=back
+
 =head2 FRAMES
+
+=over 4
 
 =item B<[% BOX color,x,y,width,height,type %]> text here B<[% ENDBOX %]>
 
@@ -1841,7 +1853,11 @@ Draw a frame around text
 
 Types = THIN, ROUND, THICK, BLOCK, WEDGE, DOTS, DIAMOND, STAR, SQUARE
 
+=back
+
 =head2 COLORS
+
+=over 4
 
 =item B<[% NORMAL %]>
 

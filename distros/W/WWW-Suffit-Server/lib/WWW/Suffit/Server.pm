@@ -1144,7 +1144,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 
 use Mojo::Base 'Mojolicious';
 
@@ -1343,11 +1343,12 @@ sub startup {
         my $authdb_uri = $authdb_opts->{uri} || $authdb_opts->{url}
             || $self->conf->latest("/authdburl") || $self->conf->latest("/authdburi")
             || qq{sqlite://$authdb_file?sqlite_unicode=1};
+        my $cacheexpiration = $self->conf->latest("/authdbcacheexpire") || $self->conf->latest("/authdbcacheexpiration");
         $self->plugin('AuthDB' => {
             ds          => $authdb_uri,
             cached      => $authdb_opts->{cachedconnection} // $self->conf->latest("/authdbcachedconnection") // 'on',
             expiration  => $authdb_opts->{cacheexpire} || $authdb_opts->{cacheexpiration} ||
-                           parse_time_offset($self->conf->latest("/authdbcacheexpire") || $self->conf->latest("/authdbcacheexpiration")),
+                           (defined($cacheexpiration) ? parse_time_offset($cacheexpiration) : undef),
             max_keys    => $authdb_opts->{cachemaxkeys} || $self->conf->latest("/authdbcachemaxkeys"),
             sourcefile  => $authdb_opts->{sourcefile} || $self->conf->latest("/authdbsourcefile"),
         });

@@ -15,7 +15,7 @@ Readonly::Array our @EXPORT_OK => qw(clean_cover clean_date clean_isbn clean_iss
 	clean_subtitle clean_title look_for_external_id);
 Readonly::Array our @COVERS => qw(hardback paperback);
 
-our $VERSION = 0.31;
+our $VERSION = 0.32;
 our $DEBUG = 0;
 
 sub clean_cover {
@@ -528,6 +528,12 @@ sub clean_series_ordinal {
 	$ret_series_ordinal =~ s/^$c\s*//ms;
 	$c = decode_utf8('(Výstava|Výst)');
 	$ret_series_ordinal =~ s/$c\.?\s*//ms;
+	$c = decode_utf8('(kniha|kn)');
+	$ret_series_ordinal =~ s/$c\.?\s*//ms;
+	$c = decode_utf8('(díl)');
+	$ret_series_ordinal =~ s/$c\.?\s*//ms;
+
+	$ret_series_ordinal =~ s/(\d+),\s*(\d+)/$1-$2/ms;
 
 	$ret_series_ordinal =~ s/^(\d+)\.$/$1/ms;
 
@@ -902,6 +908,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.31
+0.32
 
 =cut

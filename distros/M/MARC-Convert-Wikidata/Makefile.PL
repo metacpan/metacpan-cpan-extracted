@@ -29,7 +29,7 @@ requires 'MARC::Convert::Wikidata::Object::ISBN' => 0.07;
 requires 'MARC::Convert::Wikidata::Object::Kramerius' => 0;
 requires 'MARC::Convert::Wikidata::Object::People' => 0;
 requires 'MARC::Convert::Wikidata::Object::Publisher' => 0;
-requires 'MARC::Convert::Wikidata::Object::Series' => 0.09;
+requires 'MARC::Convert::Wikidata::Object::Series' => 0.15;
 requires 'MARC::Field008' => 0.03;
 requires 'MARC::Leader' => 0.05;
 requires 'Mo::utils' => 0.08;
@@ -51,7 +51,7 @@ test_requires 'Test::NoWarnings' => 0;
 test_requires 'Test::Warn' => 0;
 test_requires 'Unicode::UTF8' => 0;
 tests_recursive;
-version '0.31';
+version '0.32';
 
 # Run.
 WriteAll();

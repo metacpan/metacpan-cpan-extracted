@@ -1,0 +1,44 @@
+
+[![Windows](https://github.com/Corion/Date-Find/workflows/windows/badge.svg)](https://github.com/Corion/Date-Find/actions?query=workflow%3Awindows)
+[![MacOS](https://github.com/Corion/Date-Find/workflows/macos/badge.svg)](https://github.com/Corion/Date-Find/actions?query=workflow%3Amacos)
+[![Linux](https://github.com/Corion/Date-Find/workflows/linux/badge.svg)](https://github.com/Corion/Date-Find/actions?query=workflow%3Alinux)
+
+# NAME
+
+Date::Find - find year, month, day from (filename) strings
+
+# SYNOPSIS
+
+    use 5.020;
+
+    my $info = guess_ymd('statement_20221201.pdf');
+    say "$info->{value} - $info->{year} - $info->{month} - $info->{day}";
+    # statement_20221201.pdf - 2022 - 12 - 01
+
+    my @dates = guess_ymd(['statement_20221201.pdf',
+                           'statement_02.12.2022.pdf',
+                           'random.pdf',
+                         ], components => 'ym');
+    for my $info (@dates) {
+        say "$info->{value} - $info->{year} - $info->{month}";
+    }
+    # statement_20221201.pdf - 2022 - 12 - 00
+    # statement_02.12.2022.pdf - 2022 - 12 - 00
+
+    my @dates = guess_ymd(['statement_20221201.pdf',
+                           'statement_02.12.2022.pdf',
+                           'random.pdf',
+                         ], components => 'ym', mode => 'strict');
+    for my $info (@dates) {
+        say "$info->{value} - $info->{year} - $info->{month}";
+    }
+    # statement_20221201.pdf - 2022 - 12 - 00
+    # statement_02.12.2022.pdf - 2022 - 12 - 00
+
+## `find_ymd`
+
+# SEE ALSO
+
+[Date::Extract](https://metacpan.org/pod/Date%3A%3AExtract) - extract dates from more arbitrary text
+
+[Filename::Timestamp](https://metacpan.org/pod/Filename%3A%3ATimestamp) - extract date and time from filenames, with timezone

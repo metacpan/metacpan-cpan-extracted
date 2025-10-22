@@ -296,7 +296,7 @@ sub authn {
     my $encrypted = $self->req->json('/encrypted') || 0;
     my $cachekey = $self->stash('cachekey');
     my $authdb = $self->authdb;
-    my $acc_user = $authdb->cached_user($self->stash('username'), $cachekey);
+    my $acc_user = $authdb->user($self->stash('username'), $cachekey);
     my $public_key = $acc_user->public_key // '';
     my $private_key = $acc_user->private_key // '';
     $authdb->clean;
@@ -383,7 +383,7 @@ sub public_key {
     my $username = $self->stash('username');
     my $cachekey = $self->stash('cachekey');
     my $authdb = $self->authdb;
-    my $public_key = $authdb->cached_user($username, $cachekey)->public_key // '';
+    my $public_key = $authdb->user($username, $cachekey)->public_key // '';
     return $self->reply->json_error(404 => "E1100" => "No RSA public key found") unless length $public_key;
     return $self->reply->json_ok({public_key => $public_key});
 }

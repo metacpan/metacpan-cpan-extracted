@@ -10,22 +10,20 @@ print "There are no cycles in this example.\n\n";
 
 my %times=(tmmin=>1,tmavg=>10,tmmax=>99);
 
-my %schedule=Schedule::Activity::buildSchedule(
-	activities=>[[30,'root']],
-	configuration=>{node=>{
-		'root'=>{message=>'root',next=>[qw/A B/],finish=>'terminal',%times},
-		'A'   =>{message=>'A',   next=>[qw/A-A A-B/],%times},
-		'B'   =>{message=>'B',   next=>[qw/B-A B-B/],%times},
-		'A-A' =>{message=>'A-A', next=>['terminal'],%times},
-		'A-B' =>{message=>'A-B', next=>['terminal'],%times},
-		'B-A' =>{message=>'B-A', next=>['terminal'],%times},
-		'B-B' =>{message=>'B-B', next=>['terminal'],%times},
-		terminal=>{
-			message=>'terminal',
-			tmmin=>0,tmavg=>0,tmmax=>0,
-		},
-	}},
-);
+my $scheduler=Schedule::Activity->new(configuration=>{node=>{
+	'root'=>{message=>'root',next=>[qw/A B/],finish=>'terminal',%times},
+	'A'   =>{message=>'A',   next=>[qw/A-A A-B/],%times},
+	'B'   =>{message=>'B',   next=>[qw/B-A B-B/],%times},
+	'A-A' =>{message=>'A-A', next=>['terminal'],%times},
+	'A-B' =>{message=>'A-B', next=>['terminal'],%times},
+	'B-A' =>{message=>'B-A', next=>['terminal'],%times},
+	'B-B' =>{message=>'B-B', next=>['terminal'],%times},
+	terminal=>{
+		message=>'terminal',
+		tmmin=>0,tmavg=>0,tmmax=>0,
+	},
+}});
+my %schedule=$scheduler->schedule(activities=>[[30,'root']]);
 
 my @materialized;
 foreach my $entry (@{$schedule{activities}}) {

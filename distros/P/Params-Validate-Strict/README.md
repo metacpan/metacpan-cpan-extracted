@@ -4,7 +4,7 @@ Params::Validate::Strict - Validates a set of parameters against a schema
 
 # VERSION
 
-Version 0.18
+Version 0.19
 
 # SYNOPSIS
 
@@ -33,6 +33,8 @@ Version 0.18
 ## validate\_strict
 
 Validates a set of parameters against a schema.
+
+The schema can then be plumbed into [App::Test::Generator](https://metacpan.org/pod/App%3A%3ATest%3A%3AGenerator) to automatically create a set of black-box test cases.
 
 This function takes two mandatory arguments:
 
@@ -63,6 +65,15 @@ The schema can define the following rules for each parameter:
 
     The data type of the parameter.
     Valid types are `string`, `integer`, `number`, `float` `boolean`, `hashref`, `arrayref`, `object` and `coderef`.
+
+    A type can be an arrayref when a parameter could have different types (e.g. a string or an object).
+
+        $schema = {
+          username => [
+            { type => 'string', min => 3, max => 50 },        # Name
+            { type => 'integer', 'min' => 1 },        # UID that isn't root
+          ]
+        };
 
 - `can`
 
@@ -285,6 +296,7 @@ Nigel Horne, `<njh at nigelhorne.com>`
 - [Params::Get](https://metacpan.org/pod/Params%3A%3AGet)
 - [Params::Validate](https://metacpan.org/pod/Params%3A%3AValidate)
 - [Return::Set](https://metacpan.org/pod/Return%3A%3ASet)
+- [App::Test::Generator](https://metacpan.org/pod/App%3A%3ATest%3A%3AGenerator)
 
 # SUPPORT
 

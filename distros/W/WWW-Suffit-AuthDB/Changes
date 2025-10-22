@@ -1,5 +1,9 @@
 # Version/Revision history
 
+1.03 Tue 21 Oct 2025 15:37:47 MSK
+    * The user method has been updated, cache arguments and forced retrieval of data from the database have been added.
+    * The cached_user method marked as deprecated
+
 1.02 Thu 06 Mar 2025 10:30:25 MSK
     * Documentation modified
     * Was removed `WWW::Suffit::RefUtil` from all packages of this module

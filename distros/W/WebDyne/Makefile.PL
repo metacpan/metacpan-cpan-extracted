@@ -17,7 +17,8 @@ my %WriteMakefile=(
             'bin/wddump',
             'bin/wdapacheinit',
             'bin/wddebug',
-            'bin/webdyne.psgi',
+            'bin/wdlint',
+            'bin/webdyne.psgi'
         ]
     },
     LICENSE          => 'perl',

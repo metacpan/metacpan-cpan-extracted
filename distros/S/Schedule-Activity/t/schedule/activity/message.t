@@ -49,7 +49,7 @@ subtest 'Primary messages'=>sub {
 
 subtest 'Random selection'=>sub {
 	plan tests=>3;
-	my ($msg,$string,%seen);
+	my ($msg,$string,$countdown,%seen);
 	my $m='Schedule::Activity::Message';
 	#
 	$msg=$m->new(message=>'abcd');
@@ -68,13 +68,16 @@ subtest 'Random selection'=>sub {
 			{message=>'qrst',attributes=>{two=>1}},
 		],
 	});
-	foreach (1..10) { ($string)=$msg->random(); $seen{$string}=1 }
+	foreach my $expect (qw/mnop qrst/) {
+		$countdown=30;
+		while(($countdown>0)&&!$seen{$expect}) { $countdown--; ($string)=$msg->random(); $seen{$string}=1 }
+	}
 	is_deeply(\%seen,{'mnop'=>1,'qrst'=>1},'Message:  hash n=2');
 };
 
 subtest 'Attributes'=>sub {
 	plan tests=>3;
-	my ($message,$string,$msg,%seen);
+	my ($message,$string,$msg,$countdown,%seen);
 	my $m='Schedule::Activity::Message';
 	#
 	$message=$m->new(message=>'hi',attributes=>{string=>{incr=>1}});
@@ -93,16 +96,20 @@ subtest 'Attributes'=>sub {
 	$message=$m->new(message=>
 		{alternates=>[{message=>'one',attributes=>{one=>{}}},{message=>'two',attributes=>{two=>{}}}]},
 		attributes=>{hash=>{incr=>1}});
-	foreach (1..10) {
-		($string,$msg)=$message->random();
-		foreach my $k (keys %{$$msg{attributes}//{}}) { $seen{$k}++ }
+	foreach my $expect (qw/one two/) {
+		$countdown=30;
+		while(($countdown>0)&&!$seen{$expect}) {
+			$countdown--;
+			($string,$msg)=$message->random();
+			foreach my $k (keys %{$$msg{attributes}//{}}) { $seen{$k}++ }
+		}
 	}
 	is_deeply([sort keys %seen],[qw/one two/],'Hash message');
 };
 
 subtest 'Named messages'=>sub {
 	plan tests=>8;
-	my ($msg,%results);
+	my ($msg,$countdown,%results);
 	my %names=(
 		name1=>{
 			message=>'Message 1',
@@ -136,12 +143,16 @@ subtest 'Named messages'=>sub {
 		message=>['name1','Plain message','name2','name3'],
 		names=>\%names,
 	);
-	%results=();
-	foreach (1..50) {
-		my ($string,$object)=$msg->random();
-		$results{string}{$string}++;
-		foreach my $k (keys %{$$object{attributes}}) { $results{attr}{$k}++ }
-	}
+	%results=(string=>{});
+	foreach my $expect ('Message 1','Message 2','Plain message','three one','three two') {
+		$countdown=50;
+		while(($countdown>0)&&!$results{string}{$expect}) {
+			$countdown--;
+			my ($string,$object)=$msg->random();
+			$results{string}{$string}++;
+			foreach my $k (keys %{$$object{attributes}}) { $results{attr}{$k}++ }
+		}
+	} # expected string
 	is_deeply(
 		[sort keys(%{$results{string}})],
 		['Message 1','Message 2','Plain message','three one','three two'],
@@ -169,12 +180,16 @@ subtest 'Named messages'=>sub {
 		]},
 		names=>\%names,
 	);
-	%results=();
-	foreach (1..50) {
-		my ($string,$object)=$msg->random();
-		$results{string}{$string}++;
-		foreach my $k (keys %{$$object{attributes}}) { $results{attr}{$k}++ }
-	}
+	%results=(string=>{});
+	foreach my $expect ('Message 1','Message 2','Plain message') {
+		$countdown=40;
+		while(($countdown>0)&&!$results{string}{$expect}) {
+			$countdown--;
+			my ($string,$object)=$msg->random();
+			$results{string}{$string}++;
+			foreach my $k (keys %{$$object{attributes}}) { $results{attr}{$k}++ }
+		}
+	} # expect
 	is_deeply([sort keys(%{$results{string}})],['Message 1','Message 2','Plain message'],'Hash alternates:  All messages');
 	is_deeply([sort keys(%{$results{attr}})],  [qw/named unnamed/],                      'Hash alternates:  All attributes');
 	#

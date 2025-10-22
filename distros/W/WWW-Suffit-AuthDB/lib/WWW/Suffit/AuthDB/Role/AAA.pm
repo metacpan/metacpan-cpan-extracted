@@ -189,7 +189,7 @@ sub authn {
         unless length($password) <= 256; # HTTP_REQUEST_ENTITY_TOO_LARGE
 
     # Get user data from AuthDB
-    my $user = $self->cached_user($username, $cachekey);
+    my $user = $self->user($username, $cachekey);
     return if $self->error;
 
     # Check consistency
@@ -238,7 +238,7 @@ sub authz {
         unless length($username) <= 256; # HTTP_REQUEST_ENTITY_TOO_LARGE
 
     # Get user data from AuthDB
-    my $user = $self->cached_user($username, $cachekey);
+    my $user = $self->user($username, $cachekey);
     return if $self->error;
 
     # Check consistency
@@ -279,7 +279,7 @@ sub access {
     #$controller->log->warn($url_base);
 
     # Get routes list for $url_base
-    my $routes = $self->cached_routes($url_base, $cachekey);
+    my $routes = $self->routes($url_base, $cachekey);
     return if $self->error;
 
     # Route based checks
@@ -324,13 +324,13 @@ sub access {
     $controller->log->debug(sprintf("[access] The route \"%s\" was detected %s", $route{routename} // '', $route{rule}));
 
     # Get realm instance
-    my $realm = $self->cached_realm($route{realmname}, $cachekey);
+    my $realm = $self->realm($route{realmname}, $cachekey);
     return if $self->error;
     return 1 unless $realm->id; # No realm - no authorization :-)
     $controller->log->debug(sprintf("[access] Use realm \"%s\"", $route{realmname}));
 
     # Get user data
-    my $user = $self->cached_user($username, $cachekey);
+    my $user = $self->user($username, $cachekey);
     return if $self->error;
     #$controller->log->debug($controller->dumper($user));
 

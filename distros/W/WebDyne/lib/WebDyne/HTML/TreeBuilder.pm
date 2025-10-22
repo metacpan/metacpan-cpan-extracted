@@ -46,7 +46,7 @@ use Data::Dumper;
 
 #  Version information
 #
-$VERSION='2.014';
+$VERSION='2.015';
 
 
 #  Debug load
@@ -284,7 +284,7 @@ sub tag_parse {
 
     #  Debug
     #
-    debug("tag_parse $method, *$tag*, line $Line_no, attr_hr:%s line_no_start $Line_no_start", Dumper($attr_hr));
+    debug("tag_parse $method, *%s*, line $Line_no, attr_hr:%s line_no_start $Line_no_start", $tag, Dumper($attr_hr));
 
 
     #  Get the parent tag
@@ -801,7 +801,7 @@ sub text {
     #  get self ref, text we will process
     #
     my ($self, $text)=@_;
-    debug("text *$text*, text_block_tag %s, pos: " . $self->{'_pos'}, $self->_text_block_tag());
+    debug('text *%s*, text_block_tag %s, pos: %s', $text, $self->_text_block_tag(), $self->{'_pos'});
     
     
     #  Are we chomping text ?

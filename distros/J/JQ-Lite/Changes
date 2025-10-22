@@ -1,3 +1,22 @@
+1.24  2025-10-22
+    [Tests]
+    - Rewrite t/yaml_cli.t to remove dependency on YAML::XS.
+      The test now parses YAML via core CPAN::Meta::YAML and converts
+      it to JSON with core JSON::PP before invoking jq-lite.
+      This makes the test suite pass on Perl 5.24 and 5.26 where
+      YAML::XS may be unavailable and JSON::PP requires hash/array refs.
+    - Stop asserting "YAML files are auto-detected by extension" and
+      the --yaml STDIN path in this test; those behaviors are now
+      independent of YAML::XS and no longer required for this file.
+      (Runtime autodetection/--yaml can be covered by a separate,
+      optional test when YAML::XS is present.)
+    - Add small helpers and stricter assertions; ensure no spurious
+      warnings are emitted when feeding JSON to jq-lite.
+
+1.23  2025-10-21
+    - Allowed the CLI’s JSON encoder to handle scalar values when printing results,
+      eliminating YAML processing warnings on older Perl versions.
+
 1.22  2025-10-20
     [Fixes]
     - Ensure nested filter helpers and the CLI YAML decoder encode scalars
@@ -820,6 +839,8 @@
     - Removed use of eval in _evaluate_condition for better performance and stability.
     - Refactored _traverse for readability and maintainability.
     - Added support for multi-level array traversal (e.g., .users[].friends[].name).
+
+
 
 
 
