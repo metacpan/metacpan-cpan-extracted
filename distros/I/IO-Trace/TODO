@@ -3,8 +3,6 @@ TODO
 
 Some desired features to implement or known issues to fix with iotrace:
 
- - Redirecting to a file prematurely closes the file handle because it appears as can_read from the select loop for some reason.
-
- - TTY terminal for STDIN breaks when open3 converts it to a pipe.
+ - Handle TTY terminal for STDIN so it won't break when open3 converts it to a pipe.
 
  - Handle signals by forwarding them on to the target process, such as SIGTERM SIGINT SIGHUP SIGUSR1 etc.

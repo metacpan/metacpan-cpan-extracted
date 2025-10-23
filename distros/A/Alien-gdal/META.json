@@ -99,7 +99,7 @@
          "url" : "https://github.com/shawnlaffan/perl-alien-gdal"
       }
    },
-   "version" : "1.42",
+   "version" : "1.43",
    "x_alienfile" : {
       "generated_by" : "Alien::Build::MM version 2.84",
       "requires" : {

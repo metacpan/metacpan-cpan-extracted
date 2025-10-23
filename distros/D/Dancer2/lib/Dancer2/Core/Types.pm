@@ -1,6 +1,6 @@
 package Dancer2::Core::Types;
 # ABSTRACT: Type::Tiny types for Dancer2 core.
-$Dancer2::Core::Types::VERSION = '2.0.0';
+$Dancer2::Core::Types::VERSION = '2.0.1';
 use strict;
 use warnings;
 use Type::Library -base;
@@ -90,7 +90,7 @@ Dancer2::Core::Types - Type::Tiny types for Dancer2 core.
 
 =head1 VERSION
 
-version 2.0.0
+version 2.0.1
 
 =head1 DESCRIPTION
 

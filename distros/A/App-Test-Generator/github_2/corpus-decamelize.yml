@@ -1,4 +1,0 @@
-# corpus-decamelize.yml
-"db_ix-class":       ["DbIx::Class"]
-"json_rpc":          ["JSONRPC"]
-"foo_-_bar":         ["Foo-Bar"]

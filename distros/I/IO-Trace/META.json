@@ -32,8 +32,10 @@
       },
       "runtime" : {
          "requires" : {
+            "Config" : "0",
             "File::Which" : "0",
             "Getopt::Long" : "2.36",
+            "IO::File" : "0",
             "IO::Handle" : "0",
             "IO::Select" : "0",
             "IPC::Open3" : "0",
@@ -42,6 +44,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.022",
+   "version" : "0.023",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

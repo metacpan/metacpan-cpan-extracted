@@ -14,7 +14,7 @@ Dancer2::Manual - A guide to building web applications with Dancer2
 
 =head1 VERSION
 
-version 2.0.0
+version 2.0.1
 
 =head1 Introduction to Dancer2: Managing Danceyland
 

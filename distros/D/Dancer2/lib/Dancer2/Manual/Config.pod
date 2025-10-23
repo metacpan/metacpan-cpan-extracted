@@ -13,7 +13,7 @@ Dancer2::Config - Dancer2 Configuration Reference
 
 =head1 VERSION
 
-version 2.0.0
+version 2.0.1
 
 =head1 DESCRIPTION
 

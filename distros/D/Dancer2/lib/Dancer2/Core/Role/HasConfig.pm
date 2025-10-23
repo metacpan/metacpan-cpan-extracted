@@ -1,6 +1,6 @@
 # ABSTRACT: Role that represents the config of Dancer2 App
 package Dancer2::Core::Role::HasConfig;
-$Dancer2::Core::Role::HasConfig::VERSION = '2.0.0';
+$Dancer2::Core::Role::HasConfig::VERSION = '2.0.1';
 use Moo::Role;
 
 use File::Spec;
@@ -121,7 +121,7 @@ Dancer2::Core::Role::HasConfig - Role that represents the config of Dancer2 App
 
 =head1 VERSION
 
-version 2.0.0
+version 2.0.1
 
 =head1 DESCRIPTION
 

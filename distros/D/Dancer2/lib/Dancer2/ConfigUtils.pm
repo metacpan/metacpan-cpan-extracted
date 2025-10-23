@@ -1,6 +1,6 @@
 package Dancer2::ConfigUtils;
 # ABSTRACT: Config utility helpers
-$Dancer2::ConfigUtils::VERSION = '2.0.0';
+$Dancer2::ConfigUtils::VERSION = '2.0.1';
 use strict;
 use warnings;
 
@@ -52,7 +52,7 @@ Dancer2::ConfigUtils - Config utility helpers
 
 =head1 VERSION
 
-version 2.0.0
+version 2.0.1
 
 =head1 AUTHOR
 

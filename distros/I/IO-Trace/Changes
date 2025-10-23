@@ -1,5 +1,8 @@
 Revision history for IO::Trace
 
+0.023 2025-10-22 20:00:00
+ - Allow redirecting to a file
+
 0.022 2025-10-20 03:00:00
  - Add iotrace { --help | -h } to behave like strace.
  - Handle legacy old kernels not setting Errno EPIPE

@@ -1,3 +1,13 @@
+0.12.1 2025-10-22
+
+    - Do not remove square brackets from atom if its normal valence is
+      ambiguous.
+    - Fix a bug in handling of disconnected molecular entities in
+      parentheses.
+    - Warn about 2 aromatic atoms in a cycle not having an aromatic bond
+      between them.
+    - Warn about aromatic atoms with less than 2 aromatic bonds.
+
 0.12.0 2025-04-25
 
     - Ceasing to output aromatic bonds, excess parentheses and explicit

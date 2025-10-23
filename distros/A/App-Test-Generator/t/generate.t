@@ -10,7 +10,7 @@ binmode STDERR, ':utf8';
 
 use open qw(:std :encoding(UTF-8));
 
-my $conf_file = 't/conf/add.conf';
+my $conf_file = 't/conf/max.conf';
 ok(-e $conf_file, 'config file exists: $conf_file');
 
 # Generate into a scalar

@@ -1,0 +1,12 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Pod::Markdown;
+use feature qw(say);
+
+my $parser = Pod::Markdown->new;
+$parser->parse_from_file('lib/Cron/Toolkit.pm', '-');
+open my $fh, '>', 'README.md';
+print $fh $parser->as_markdown;
+close $fh;
+say "README.md ← POD SYNCED!";

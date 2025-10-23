@@ -17,7 +17,7 @@ configure_requires:
   File::Copy: '0'
   Getopt::Long: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,74 +30,74 @@ no_index:
 provides:
   LWP:
     file: lib/LWP.pm
-    version: '6.80'
+    version: '6.81'
   LWP::Authen::Basic:
     file: lib/LWP/Authen/Basic.pm
-    version: '6.80'
+    version: '6.81'
   LWP::Authen::Digest:
     file: lib/LWP/Authen/Digest.pm
-    version: '6.80'
+    version: '6.81'
   LWP::Authen::Ntlm:
     file: lib/LWP/Authen/Ntlm.pm
-    version: '6.80'
+    version: '6.81'
   LWP::ConnCache:
     file: lib/LWP/ConnCache.pm
-    version: '6.80'
+    version: '6.81'
   LWP::Debug:
     file: lib/LWP/Debug.pm
-    version: '6.80'
+    version: '6.81'
     x_deprecated: 1
   LWP::Debug::TraceHTTP:
     file: lib/LWP/Debug/TraceHTTP.pm
-    version: '6.80'
+    version: '6.81'
   LWP::DebugFile:
     file: lib/LWP/DebugFile.pm
-    version: '6.80'
+    version: '6.81'
   LWP::MemberMixin:
     file: lib/LWP/MemberMixin.pm
-    version: '6.80'
+    version: '6.81'
   LWP::Protocol:
     file: lib/LWP/Protocol.pm
-    version: '6.80'
+    version: '6.81'
   LWP::Protocol::cpan:
     file: lib/LWP/Protocol/cpan.pm
-    version: '6.80'
+    version: '6.81'
   LWP::Protocol::data:
     file: lib/LWP/Protocol/data.pm
-    version: '6.80'
+    version: '6.81'
   LWP::Protocol::file:
     file: lib/LWP/Protocol/file.pm
-    version: '6.80'
+    version: '6.81'
   LWP::Protocol::ftp:
     file: lib/LWP/Protocol/ftp.pm
-    version: '6.80'
+    version: '6.81'
   LWP::Protocol::gopher:
     file: lib/LWP/Protocol/gopher.pm
-    version: '6.80'
+    version: '6.81'
   LWP::Protocol::http:
     file: lib/LWP/Protocol/http.pm
-    version: '6.80'
+    version: '6.81'
   LWP::Protocol::loopback:
     file: lib/LWP/Protocol/loopback.pm
-    version: '6.80'
+    version: '6.81'
   LWP::Protocol::mailto:
     file: lib/LWP/Protocol/mailto.pm
-    version: '6.80'
+    version: '6.81'
   LWP::Protocol::nntp:
     file: lib/LWP/Protocol/nntp.pm
-    version: '6.80'
+    version: '6.81'
   LWP::Protocol::nogo:
     file: lib/LWP/Protocol/nogo.pm
-    version: '6.80'
+    version: '6.81'
   LWP::RobotUA:
     file: lib/LWP/RobotUA.pm
-    version: '6.80'
+    version: '6.81'
   LWP::Simple:
     file: lib/LWP/Simple.pm
-    version: '6.80'
+    version: '6.81'
   LWP::UserAgent:
     file: lib/LWP/UserAgent.pm
-    version: '6.80'
+    version: '6.81'
 requires:
   Digest::MD5: '0'
   Encode: '2.12'
@@ -110,10 +110,11 @@ requires:
   HTML::HeadParser: '3.71'
   HTTP::Cookies: '6'
   HTTP::Date: '6'
+  HTTP::Message: '7.01'
   HTTP::Negotiate: '6'
-  HTTP::Request: '6.18'
+  HTTP::Request: '7.01'
   HTTP::Request::Common: '6.18'
-  HTTP::Response: '6.18'
+  HTTP::Response: '7.01'
   HTTP::Status: '6.18'
   IO::Select: '0'
   IO::Socket: '0'
@@ -137,10 +138,10 @@ resources:
   bugtracker: https://github.com/libwww-perl/libwww-perl/issues
   homepage: https://github.com/libwww-perl/libwww-perl
   repository: https://github.com/libwww-perl/libwww-perl.git
-version: '6.80'
+version: '6.81'
 x_Dist_Zilla:
   perl:
-    version: '5.040000'
+    version: '5.038002'
   plugins:
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
@@ -158,11 +159,11 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: Git::GatherDir
-      version: '2.051'
+      version: '2.052'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: MetaConfig
-      version: '6.032'
+      version: '6.033'
     -
       class: Dist::Zilla::Plugin::MetaProvides::Package
       config:
@@ -171,7 +172,7 @@ x_Dist_Zilla:
             -
               class: Dist::Zilla::Plugin::FinderCode
               name: MetaProvides::Package/AUTOVIV/:InstallModulesPM
-              version: '6.032'
+              version: '6.033'
           include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
           $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
@@ -179,26 +180,26 @@ x_Dist_Zilla:
           inherit_version: 1
           meta_noindex: 1
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000038'
+          Module::Metadata: '1.000037'
           version: '0.006'
       name: MetaProvides::Package
       version: '2.004003'
     -
       class: Dist::Zilla::Plugin::MetaNoIndex
       name: MetaNoIndex
-      version: '6.032'
+      version: '6.033'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: MetaYAML
-      version: '6.032'
+      version: '6.033'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: MetaJSON
-      version: '6.032'
+      version: '6.033'
     -
       class: Dist::Zilla::Plugin::MetaResources
       name: MetaResources
-      version: '6.032'
+      version: '6.033'
     -
       class: Dist::Zilla::Plugin::Deprecated
       config:
@@ -226,23 +227,23 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Manifest
       name: Manifest
-      version: '6.032'
+      version: '6.033'
     -
       class: Dist::Zilla::Plugin::License
       name: License
-      version: '6.032'
+      version: '6.033'
     -
       class: Dist::Zilla::Plugin::InstallGuide
       config:
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000038'
+          Module::Metadata: '1.000037'
           version: '0.006'
       name: InstallGuide
       version: '1.200014'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: ExecDir
-      version: '6.032'
+      version: '6.033'
     -
       class: Dist::Zilla::Plugin::Prereqs::FromCPANfile
       name: Prereqs::FromCPANfile
@@ -252,10 +253,10 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::MakeMaker:
           make_path: make
-          version: '6.032'
+          version: '6.033'
         Dist::Zilla::Role::TestRunner:
           default_jobs: '8'
-          version: '6.032'
+          version: '6.033'
       name: MakeMaker::Awesome
       version: '0.49'
     -
@@ -284,7 +285,8 @@ x_Dist_Zilla:
           phase: develop
           script_finder:
             - ':PerlExecFiles'
-          skips: []
+          skips:
+            - LWP::Protocol::mailto
           switch: []
       name: Test::Compile
       version: '2.058'
@@ -321,7 +323,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: PodSyntaxTests
-      version: '6.032'
+      version: '6.033'
     -
       class: Dist::Zilla::Plugin::Test::Pod::Coverage::Configurable
       name: Test::Pod::Coverage::Configurable
@@ -469,7 +471,7 @@ x_Dist_Zilla:
           git_version: 2.43.0
           repo_root: .
       name: Git::Check
-      version: '2.051'
+      version: '2.052'
     -
       class: Dist::Zilla::Plugin::CheckStrictVersion
       name: CheckStrictVersion
@@ -492,11 +494,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: TestRelease
-      version: '6.032'
+      version: '6.033'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: UploadToCPAN
-      version: '6.032'
+      version: '6.033'
     -
       class: Dist::Zilla::Plugin::ReadmeAnyFromPod
       config:
@@ -521,7 +523,7 @@ x_Dist_Zilla:
           phase: develop
           type: recommends
       name: '@Git::VersionManager/pluginbundle version'
-      version: '6.032'
+      version: '6.033'
     -
       class: Dist::Zilla::Plugin::RewriteVersion::Transitional
       config:
@@ -569,7 +571,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Git::VersionManager/release snapshot'
-      version: '2.051'
+      version: '2.052'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -577,7 +579,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v6.80
+          tag: v6.81
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -586,7 +588,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Git::VersionManager/Git::Tag'
-      version: '2.051'
+      version: '2.052'
     -
       class: Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional
       config:
@@ -602,7 +604,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: '@Git::VersionManager/NextRelease'
-      version: '6.032'
+      version: '6.033'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -624,7 +626,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Git::VersionManager/post-release commit'
-      version: '2.051'
+      version: '2.052'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -636,60 +638,60 @@ x_Dist_Zilla:
           git_version: 2.43.0
           repo_root: .
       name: Git::Push
-      version: '2.051'
+      version: '2.052'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: ConfirmRelease
-      version: '6.032'
+      version: '6.033'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.032'
+      version: '6.033'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.032'
+      version: '6.033'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.032'
+      version: '6.033'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.032'
+      version: '6.033'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.032'
+      version: '6.033'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.032'
+      version: '6.033'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.032'
+      version: '6.033'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.032'
+      version: '6.033'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.032'
+      version: '6.033'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.032'
+      version: '6.033'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: MetaProvides::Package/AUTOVIV/:InstallModulesPM
-      version: '6.032'
+      version: '6.033'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: 0
-    version: '6.032'
+    version: '6.033'
 x_contributors:
   - 'Adam Kennedy <adamk@cpan.org>'
   - 'Adam Sjogren <asjo@koldfront.dk>'
@@ -765,6 +767,7 @@ x_contributors:
   - 'Michal Josef Špaček <mspacek@redhat.com>'
   - 'Michiel Beijen <michiel.beijen@otrs.com>'
   - 'Mike Schilli <github@perlmeister.com>'
+  - 'Mikko Johannes Koivunalho <mikko.koivunalho@iki.fi>'
   - 'Moritz Onken <onken@netcubed.de>'
   - 'murphy <murphy@genome.chop.edu>'
   - 'Naveed Massjouni <naveedm9@gmail.com>'
@@ -788,7 +791,6 @@ x_contributors:
   - 'Sergey Romanov <sromanov-dev@yandex.ru>'
   - 'Shoichi Kaji <skaji@cpan.org>'
   - 'Slaven Rezic <slaven@rezic.de>'
-  - 'Slaven Rezic <slaven.rezic@idealo.de>'
   - 'Spiros Denaxas <s.denaxas@gmail.com>'
   - 'Steffen Ullrich <Steffen_Ullrich@genua.de>'
   - 'Steve Hay <SteveHay@planit.com>'
@@ -809,6 +811,6 @@ x_contributors:
   - 'Yury Zavarin <yury.zavarin@gmail.com>'
   - 'Yves Orton <yves.orton@booking.com>'
   - 'Zefram <zefram@fysh.org>'
-x_generated_by_perl: v5.40.0
+x_generated_by_perl: v5.38.2
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

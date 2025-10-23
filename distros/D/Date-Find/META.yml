@@ -4,7 +4,6 @@ author:
   - 'Max Maischein <corion@cpan.org>'
 build_requires:
   Data::Dumper: '0'
-  Date::Extract: '0'
   ExtUtils::MakeMaker: '0'
   Test2::V0: '0'
   Test::More: '0'
@@ -29,12 +28,13 @@ requires:
   File::Path: '0'
   File::Spec: '0'
   Getopt::Long: '0'
+  Pod::Usage: '0'
   experimental: '0.036'
   perl: '5.020'
 resources:
   bugtracker: https://github.com/Corion/Date-Find/issues
   license: https://dev.perl.org/licenses/
   repository: git://github.com/Corion/Date-Find.git
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

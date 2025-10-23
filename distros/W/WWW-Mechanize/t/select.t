@@ -1,4 +1,4 @@
-#!perl -T
+#!perl
 
 use warnings;
 use strict;
@@ -98,5 +98,23 @@ is( $rv, 1, 'return 1 after successful select' );
 like warning { $rv = $mech->select( 'missing_list', 1 ) }, qr/not found/,
     'warning when field is not found';
 is( $rv, undef, 'return undef after failed select' );
+
+# test setting a number
+$mech->select( 'exists_twice', 'two',  1 );
+$mech->select( 'exists_twice', 'four', 2 );
+@return = $form->param('exists_twice');
+is_deeply(
+    \@return, [ 'two', 'four' ],
+    'select exists twice, set both and values are ' . join( ' ', @return )
+);
+
+$mech->select( 'exists_twice', 'one', 1 );
+$mech->select( 'exists_twice', 'one', 2 );
+@return = $form->param('exists_twice');
+is_deeply(
+    \@return, [ 'one', 'one' ],
+    'select exists twice, set to double values and they are '
+        . join( ' ', @return )
+);
 
 done_testing;

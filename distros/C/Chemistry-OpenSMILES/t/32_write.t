@@ -14,6 +14,14 @@ my @cases = (
     # See https://github.com/opensmiles/OpenSMILES/issues/10
     [ '[C@H](Br)(Cl)[F:1]', '[F:1][C@@H](Br)Cl' ],
     [ '[C@H](Br)(Cl)F', '[C@H](Br)(Cl)F', ],
+
+    # Examples from OpenSMILES specification, "3.7. Disconnected Structures"
+    [ 'c1cc(O.NCCO)ccc1', 'c1cc(O)ccc1.NCCO' ],
+    [ 'Oc1cc(.NCCO)ccc1', 'Oc1ccccc1.NCCO' ],
+
+    # Synthetic examples for connectivity in disconnected SMILES
+    [ 'C(C.CCC.CCCC.CCCCC)', 'CC.CCC.CCCC.CCCCC' ],
+    [ 'CC(.CCC.CCCC.CCCCC)', 'CC.CCC.CCCC.CCCCC' ],
 );
 
 plan tests => scalar @cases;

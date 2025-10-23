@@ -4,7 +4,7 @@
       "Timothy Parnell <parnell.tj@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4234",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
@@ -21,23 +21,22 @@
       },
       "runtime" : {
          "recommends" : {
+            "Bio::DB::Big" : "1",
+            "Bio::DB::HTS" : "3.01",
+            "Bio::DB::SeqFeature::Store" : "0",
             "Bio::DB::USeq" : "0.25",
+            "BioPerl" : "1.007002",
             "Parallel::ForkManager" : "1.02",
             "Set::IntSpan::Fast" : "1.15",
             "Set::IntervalTree" : "0.1"
          },
          "requires" : {
-            "Bio::DB::Big" : "1",
-            "Bio::DB::BigFile" : "1.07",
-            "Bio::DB::HTS" : "3.01",
-            "Bio::DB::Sam" : "1.36",
-            "Bio::Root::Version" : "1.006924",
             "Config::Simple" : "4.58",
             "File::Which" : "1.17",
             "Getopt::Long" : "2.24",
             "IO::Prompt::Tiny" : "0.003",
             "List::MoreUtils" : "0.4",
-            "List::Util" : "1.45",
+            "List::Util" : "1.55",
             "Module::Load" : "0.32",
             "Scalar::Util" : "1.45",
             "Statistics::Descriptive" : "3",
@@ -46,15 +45,15 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "1.302",
-            "Test::Warn" : "0.36"
+            "Test2::V0" : "1.302",
+            "Test::Script" : "1.29"
          }
       }
    },
    "provides" : {
       "Bio::ToolBox" : {
          "file" : "lib/Bio/ToolBox.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Bio::ToolBox::Data" : {
          "file" : "lib/Bio/ToolBox/Data.pm",
@@ -110,7 +109,7 @@
       },
       "Bio::ToolBox::big_helper" : {
          "file" : "lib/Bio/ToolBox/big_helper.pm",
-         "version" : "2.02"
+         "version" : "2.04"
       },
       "Bio::ToolBox::db_helper" : {
          "file" : "lib/Bio/ToolBox/db_helper.pm",
@@ -168,7 +167,7 @@
       },
       "Bio::ToolBox::utility" : {
          "file" : "lib/Bio/ToolBox/utility.pm",
-         "version" : "2.02"
+         "version" : "2.04"
       }
    },
    "release_status" : "stable",
@@ -180,6 +179,6 @@
          "url" : "https://github.com/tjparnell/biotoolbox"
       }
    },
-   "version" : "2.03",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : "2.04",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

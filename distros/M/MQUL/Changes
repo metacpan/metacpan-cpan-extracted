@@ -1,5 +1,8 @@
 Revision history for MQUL
 
+3.000001  2025-10-22 18:46:22-06:00 America/Denver
+        - Bugfix: matching a string of digits against an empty string can fail.
+
 3.000000  2025-06-11 13:43:40+03:00 Asia/Jerusalem
         - Bugfix: warnings printed when doc_matches compares strings with
           numbers.

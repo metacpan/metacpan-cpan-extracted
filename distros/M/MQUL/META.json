@@ -53,8 +53,8 @@
          "web" : "https://github.com/ido50/MQUL"
       }
    },
-   "version" : "3.000000",
-   "x_generated_by_perl" : "v5.40.2",
+   "version" : "3.000001",
+   "x_generated_by_perl" : "v5.42.0",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_spdx_expression" : "Apache-2.0"
 }

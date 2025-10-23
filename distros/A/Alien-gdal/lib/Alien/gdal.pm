@@ -11,7 +11,7 @@ use Path::Tiny qw /path/;
 use List::Util qw /uniq/;
 use Alien::proj;
 
-our $VERSION = '1.42';
+our $VERSION = '1.43';
 
 my ($have_geos, $have_proj, $have_spatialite);
 my @have_aliens;
@@ -282,6 +282,13 @@ Alien::gdal - Compile GDAL, the Geographic Data Abstraction Library
 =head1 DESCRIPTION
 
 GDAL is the Geographic Data Abstraction Library.  See L<http://www.gdal.org>.
+
+=head1 Environment Variables
+
+User defined CMake arguments can be passed using the C<< ALIEN_GDAL_CMAKE_ARGS >>
+environment variable. e.g. to disable the search for PDF and KML libs, set it to
+C<< "-DGDAL_ENABLE_DRIVER_PDF:BOOL=OFF -DGDAL_USE_LIBKML=OFF" >>.
+
 
 
 =head1 REPORTING BUGS

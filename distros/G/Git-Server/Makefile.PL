@@ -7,7 +7,10 @@ WriteMakefile
     VERSION_FROM  => 'lib/Git/Server.pm',
     ABSTRACT_FROM  => 'lib/Git/Server.pm',
     PREREQ_PM     => {
-        Cwd => 0,
+        'Cwd'          => 0,
+        'Getopt::Long' => 0,
+        'File::Which'  => 0,
+        'IO::Trace'    => 0,
     },
     dist => {
         COMPRESS => "gzip -9 -vf",

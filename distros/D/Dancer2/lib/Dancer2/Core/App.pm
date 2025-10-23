@@ -1,6 +1,6 @@
 # ABSTRACT: encapsulation of Dancer2 packages
 package Dancer2::Core::App;
-$Dancer2::Core::App::VERSION = '2.0.0';
+$Dancer2::Core::App::VERSION = '2.0.1';
 use Moo;
 use Carp               qw<croak carp>;
 use Scalar::Util       'blessed';
@@ -1838,7 +1838,7 @@ Dancer2::Core::App - encapsulation of Dancer2 packages
 
 =head1 VERSION
 
-version 2.0.0
+version 2.0.1
 
 =head1 DESCRIPTION
 

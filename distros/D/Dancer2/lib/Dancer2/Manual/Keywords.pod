@@ -13,7 +13,7 @@ Dancer2::Manual::Keywords - Dancer2 DSL Keyword Reference
 
 =head1 VERSION
 
-version 2.0.0
+version 2.0.1
 
 =head1 Dancer2 Keyword Guide
 

@@ -13,7 +13,7 @@ Dancer2::Manual::QuickStart - Quickly install Dancer2 and boostrap a new applica
 
 =head1 VERSION
 
-version 2.0.0
+version 2.0.1
 
 =head1 Installing Dancer2
 

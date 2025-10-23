@@ -16,7 +16,6 @@ if (!-f $spec) { open my $fh, ">>", $spec; }
 my @cmd = (
     "cpan2rpm",
     "--force",
-    "--no-fixin",
     "--spec-only",
     "--spec", $spec,
     "."

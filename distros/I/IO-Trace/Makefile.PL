@@ -3,10 +3,13 @@ use 5.006000;
 use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME              => 'IO::Trace',
-    VERSION_FROM      => 'lib/IO/Trace.pm', # finds $VERSION, requires EU::MM from perl >= 5.5
+    VERSION_FROM      => 'lib/IO/Trace.pm',
     PREREQ_PM         => {
+        # Please only use stock core modules:
+        'Config'        => 0,
         'Test::More'    => 0,
         'Getopt::Long'  => 2.36, # For GetOptionsFromArray
+        'IO::File'      => 0,
         'IO::Handle'    => 0,
         'IO::Select'    => 0,
         'IPC::Open3'    => 0,

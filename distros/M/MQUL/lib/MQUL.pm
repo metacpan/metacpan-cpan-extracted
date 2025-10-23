@@ -16,7 +16,7 @@ use DateTime::Format::W3CDTF;
 use Scalar::Util qw/blessed/;
 use Try::Tiny;
 
-our $VERSION = "3.000000";
+our $VERSION = "3.000001";
 $VERSION = eval $VERSION;
 
 =head1 NAME
@@ -363,7 +363,7 @@ sub _attribute_matches {
             return;
         }
     } elsif ( ref $value eq 'HASH' )
-    {               # if the value is a hash, than it either contains
+    {               # if the value is a hash, then it either contains
                     # advanced queries, or it's just a hash that we
                     # want the document to have as-is
         unless ( &_has_adv_que($value) ) {
@@ -390,46 +390,38 @@ sub _attribute_matches {
                 {
                     return unless defined $virt{$key} && !ref $virt{$key};
 
-                    # If the values are not of the same type, do not bother
-                    # comparing.
-                    if ( is_float( $virt{$key} ) && !is_float($term)
-                        || ( !is_float( $virt{$key} ) && is_float($term) ) )
-                    {
-                        return;
-                    }
-
                     if ( $q eq '$gt' ) {
-                        if ( is_float( $virt{$key} ) ) {
+                        if ( is_float( $virt{$key} && is_float($term) ) ) {
                             return unless $virt{$key} > $term;
                         } else {
                             return unless $virt{$key} gt $term;
                         }
                     } elsif ( $q eq '$gte' ) {
-                        if ( is_float( $virt{$key} ) ) {
+                        if ( is_float( $virt{$key} && is_float($term) ) ) {
                             return unless $virt{$key} >= $term;
                         } else {
                             return unless $virt{$key} ge $term;
                         }
                     } elsif ( $q eq '$lt' ) {
-                        if ( is_float( $virt{$key} ) ) {
+                        if ( is_float( $virt{$key} ) && is_float($term) ) {
                             return unless $virt{$key} < $term;
                         } else {
                             return unless $virt{$key} lt $term;
                         }
                     } elsif ( $q eq '$lte' ) {
-                        if ( is_float( $virt{$key} ) ) {
+                        if ( is_float( $virt{$key} ) && is_float($term) ) {
                             return unless $virt{$key} <= $term;
                         } else {
                             return unless $virt{$key} le $term;
                         }
                     } elsif ( $q eq '$eq' ) {
-                        if ( is_float( $virt{$key} ) ) {
+                        if ( is_float( $virt{$key} ) && is_float($term) ) {
                             return unless $virt{$key} == $term;
                         } else {
                             return unless $virt{$key} eq $term;
                         }
                     } elsif ( $q eq '$ne' ) {
-                        if ( is_float( $virt{$key} ) ) {
+                        if ( is_float( $virt{$key} ) && is_float($term) ) {
                             return unless $virt{$key} != $term;
                         } else {
                             return unless $virt{$key} ne $term;

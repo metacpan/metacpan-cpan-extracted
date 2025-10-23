@@ -1,6 +1,6 @@
 # ABSTRACT: Role for application environment name
 package Dancer2::Core::Role::HasEnvironment;
-$Dancer2::Core::Role::HasEnvironment::VERSION = '2.0.0';
+$Dancer2::Core::Role::HasEnvironment::VERSION = '2.0.1';
 use Moo::Role;
 use Dancer2::Core::Types;
 
@@ -32,7 +32,7 @@ Dancer2::Core::Role::HasEnvironment - Role for application environment name
 
 =head1 VERSION
 
-version 2.0.0
+version 2.0.1
 
 =head1 AUTHOR
 

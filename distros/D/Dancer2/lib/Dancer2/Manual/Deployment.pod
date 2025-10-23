@@ -13,7 +13,7 @@ Dancer2::Manual::Deployment - A non-exhaustive guide to put your Dancer2 app int
 
 =head1 VERSION
 
-version 2.0.0
+version 2.0.1
 
 =head1 Dancer2 Deployment Guide
 

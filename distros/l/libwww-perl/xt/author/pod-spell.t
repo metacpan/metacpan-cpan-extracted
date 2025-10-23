@@ -139,6 +139,7 @@ Jeremy
 Joao
 Joe
 Joerg
+Johannes
 Johannessen
 John
 Johnson
@@ -164,6 +165,7 @@ Kilzer
 Klar
 Knop
 Koenig
+Koivunalho
 Konojacki
 Koster
 Kronengold
@@ -205,6 +207,7 @@ Michael
 Michal
 Michiel
 Mike
+Mikko
 Moritz
 Moshe
 Murrell
@@ -412,6 +415,7 @@ me
 michael
 michealgong
 michiel
+mikko
 mmcleric
 mspacek
 murphy

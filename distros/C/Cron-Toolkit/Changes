@@ -1,0 +1,21 @@
+Revision history for Cron::Toolkit
+
+0.04  2025-10-22
+    - Added new_from_crontab for multi-line tabs (@aliases mapped to Quartz).
+    - Symmetric bounded next/previous (auto-clamp defaults to begin/end).
+    - time_zone setter with DateTime::TimeZone validate/recalc (DST-aware).
+    - next_n max_iter guard (default 10000, die on exceed).
+    - Phase 2: next_occurrences alias, as_string/to_json, dump_tree, locale stub in describe.
+    - 50+ tests green; aliases/TZ edges covered.
+
+0.03  2025-10-15
+    - Renamed from Cron::Describe; full Quartz L/W/# support.
+    - Bounded searches, natural English fusions.
+    - AST architecture with extensible visitors.
+
+0.02  2025-10-10
+    - Initial Quartz support (seconds, L/W/#).
+    - Unix auto-convert.
+
+0.01  2025-10-01
+    - First release.

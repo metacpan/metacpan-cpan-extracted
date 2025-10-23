@@ -6,8 +6,9 @@ use File::Copy 'mv';
 use File::Basename;
 use File::Path 'make_path';
 use File::Spec;
-use lib '/home/corion/Projekte/App-moveyear/lib';
 use Date::Find 'find_ymd', 'guess_ymd', '%date_type', '%longname';
+use Pod::Usage;
+
 
 =head1 NAME
 
@@ -19,6 +20,7 @@ my $date_type;
 GetOptions(
     'dry-run|n'            => \my $dry_run,
     'verbose'              => \my $verbose,
+    'help'                 => \my $help,
 
     'date-regex|d=s'       => \my $date_regex,
     'date-regex-order|o=s' => \my $date_regex_order,
@@ -36,7 +38,9 @@ GetOptions(
     'i'                    => \my $dont_overwrite,
 
     'strict'               => \my $strict,
-);
+) or pod2usage(2);
+pod2usage(1) if $help;
+pod2usage("$0: No files given.")  if (@ARGV == 0);
 
 =head1 SYNOPSIS
 
@@ -49,6 +53,70 @@ GetOptions(
   # Moves foo-2025.pdf to /home/user/documents/documents 2025/foo-2025.pdf
 
 =head1 OPTIONS
+
+=over 4
+
+=item B<--dry-run>, B<-n>
+
+Only output actions, do not perform them. Implies B<--verbose>.
+
+=item B<--verbose>
+
+Output the actions.
+
+=item B<--force>, B<-f>
+
+Overwrite files if they already exist.
+
+=item B<--i>, B<-i>
+
+Don't overwrite files if they already exist.
+
+=item B<--strict>
+
+Be strict in the detection. When a file fails to detect properly, stop
+the program.
+
+=item B<--create>
+
+Create directories if they don't exist.
+
+=item B<--directory-style>
+
+Elements of the intermediate directory to be created. Defaults to B<y>.
+
+=item B<--part-separator>
+
+Separator for the elements of the intermediate directory. Defaults to B<->.
+
+=item B<--date-type>, B<t>
+
+Type of the date to find. May be a combination of B<y>, B<m>, B<x>, B<d>.
+Shorthands exist as the options C<--ymd>, C<--dmy>. B<x> stands for the month
+name.
+
+    ymd
+    dmy
+    ym
+    my
+    y
+
+=item B<--date-regex>, B<-d>
+
+Regular expression to extract a date. This should be a capturing regular
+expression that captures into named groups C<year>, C<month>, C<monthname>
+or C<day>.
+
+Most likely you want to use a premade one instead.
+
+=item B<--date-regex-order>, B<-o>
+
+Order of year, month and day in your filename strings if your custom
+regular expression does not use named captures.
+
+Default is C<ymd>.
+
+=back
 
 =cut
 

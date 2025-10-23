@@ -131,7 +131,8 @@ while (my $row = $Collection->Next) {
             $val;
         } @$col;
         for (my $j = 0; $j < @row_values; $j++) {
-            $worksheet->write($current_row, $j, $row_values[$j]);
+            my $write_method = $row_values[$j] =~ /^(-|\+|=|\@|")/ ? 'write_string' : 'write';
+            $worksheet->$write_method($current_row, $j, $row_values[$j]);
         }
         $current_row++;
     }

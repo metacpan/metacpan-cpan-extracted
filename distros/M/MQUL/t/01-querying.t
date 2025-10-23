@@ -792,4 +792,9 @@ ok(
     'max with dot notation from different fields works'
 );
 
+ok(
+    doc_matches( { hello => '0123456' }, { hello => { '$ne' => '' } } ),
+    'matching numerical string against an empty string works'
+);
+
 done_testing();

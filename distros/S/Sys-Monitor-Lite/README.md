@@ -1,11 +1,11 @@
 # Sys::Monitor::Lite
 
-A lightweight system monitoring toolkit. Using the `script/sys-monitor-lite` script you can collect CPU, memory, disk, network, and other Linux metrics in JSON format. It runs entirely on Perl with no external dependencies.
+A lightweight system monitoring toolkit. Using the `script/sys-monitor-lite` script you can collect CPU, memory, disk capacity, disk I/O, network, and other Linux metrics in JSON format. It runs entirely on Perl with no external dependencies.
 
 ## Features
 
 - Lightweight implementation that simply reads data from `/proc`
-- Collects CPU, load average, memory, disk, network, and system information
+- Collects CPU, load average, memory, disk capacity, disk I/O, network, and system information
 - Allows you to choose which metrics to collect from the CLI
 - Supports JSON / JSON Lines output, with `--pretty` for formatted JSON
 - Reusable as a module (`Sys::Monitor::Lite`) so scripts can integrate it easily
@@ -54,7 +54,7 @@ script/sys-monitor-lite --interval 10 --collect cpu,mem,disk --output jsonl
 | ----------- | ---- |
 | `--interval <seconds>` | Interval for repeated collection. Defaults to 5 seconds. Values ≤ 0 collect only once. |
 | `--once` | Collects metrics once. Equivalent to omitting `--interval`. |
-| `--collect <list>` | Comma-separated list selecting from `system,cpu,load,mem,disk,net`. |
+| `--collect <list>` | Comma-separated list selecting from `system,cpu,load,mem,disk,disk_io,net`. |
 | `--output <format>` | Choose `json` (default) or `jsonl`. |
 | `--pretty` | Format JSON output (`jsonl` ignores this). |
 | `--help` | Show help (POD). |
@@ -83,6 +83,7 @@ Instead of `collect_all`, you can pass an array reference like `collect(["cpu", 
 - `load`: Load average over 1, 5, and 15 minutes
 - `mem`: Total, used, and free memory, plus swap usage
 - `disk`: Total capacity, used capacity, and utilization for each mount point
+- `disk_io`: Block device read/write I/O counters (bytes, sectors, operations)
 - `net`: Received/sent bytes and packets per interface
 
 ## License

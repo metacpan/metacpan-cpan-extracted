@@ -11,7 +11,7 @@ BEGIN {
 }
 use Pod::Coverage::TrustPod;
 
-my %skip = map { $_ => 1 } qw( LWP LWP::Debug LWP::Debug::TraceHTTP LWP::Authen::Basic LWP::Authen::Digest LWP::Authen::Ntlm LWP::DebugFile );
+my %skip = map { $_ => 1 } qw( LWP LWP::Debug LWP::Debug::TraceHTTP LWP::Authen::Basic LWP::Authen::Digest LWP::Authen::Ntlm LWP::DebugFile LWP::Protocol::mailto );
 
 my @modules;
 for my $module ( all_modules() ) {

@@ -1,2 +1,6 @@
+0.02 2025-10-23
+    * Fixed wrong prerequisite
+    * Added options documentation and output to C<move-year> script
+
 0.01 2025-10-22
     * Released on an unsuspecting world

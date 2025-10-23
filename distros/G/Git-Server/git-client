@@ -82,7 +82,7 @@ This library is free software; you can redistribute it and/or modify it under th
 use strict;
 use Cwd qw(abs_path);
 
-our $VERSION = "0.034";
+our $VERSION = "0.035";
 
 # Locate the real "git" later in the $PATH (after myself)
 our $real_git = find_real_git();
@@ -236,14 +236,16 @@ sub handle_config {
     my @args = @_;
     # Don't try to handle the "--help"-first case.
     return if join(" ", @args) =~ /config --help\b/;
-    if (grep {$_ eq "config"} @ARGV and
+    if (grep {$_ eq "config"} @args and
         # Smells like special "git config" command
         eval { require Getopt::Long; 1; } and
         Getopt::Long::Configure("pass_through") and
+        Getopt::Long::Configure("no_ignore_case") and
+        Getopt::Long::Configure("require_order") and
         Getopt::Long::GetOptionsFromArray(
             \@args,
             "c=s"          => (my $c=[]),
-            "C=s"          => \(my $chdir=[]),
+            "C=s"          => (my $chdir=[]), # XXX - Do we need to honor chdir (-C) option to locate the right descent config files?
         ) and
         $args[0] eq "config" and
         do {
@@ -255,6 +257,7 @@ sub handle_config {
             $args[1]=~/^(\w+)\./ && splice @args, 1, 0, "--replace-all" if @args>1;
             1;
         } and
+        Getopt::Long::Configure("no_require_order") and
         Getopt::Long::GetOptionsFromArray(
             \@args,
 
@@ -319,7 +322,7 @@ sub handle_config {
         }
         # No more munging STDERR so just spit it out, if any
         warn $err if $err;
-        # XXX - Do we also need to more-greacefully handle --show-scope or --show-origin with --get or --get-all or --get-regexp?
+        # XXX - Do we also need to more-gracefully handle --show-scope or --show-origin with --get or --get-all or --get-regexp?
         if (!$list) {
             print $out;
             exit $exit_status;

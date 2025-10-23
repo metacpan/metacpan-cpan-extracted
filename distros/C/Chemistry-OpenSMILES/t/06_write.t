@@ -23,7 +23,7 @@ my @cases = (
     [ 'c1(c(cccc1)F)C(=O)[O-]', 'c1(c(c(c(c(c1))))(F))(C(=O)([O-]))' ],
     # Cyclooctatetraene adapted from OpenSMILES v1.0 specification:
     [ 'C/1=C/C=C\C=C/C=C\1', 'C/1(=C(/C(=C(\C(=C(/C(=C\1)))))))' ],
-    # A regression test for impropertly recorded fact that 0 H atoms are present:
+    # A regression test for improperly recorded fact that 0 H atoms are present:
     [ '[C]#[O]', '[C](#[O])' ],
 );
 

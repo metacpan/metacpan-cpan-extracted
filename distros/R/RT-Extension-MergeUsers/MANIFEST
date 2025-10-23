@@ -21,6 +21,7 @@ inc/YAML/Tiny.pm
 lib/RT/Extension/MergeUsers.pm
 lib/RT/Extension/MergeUsers/Test.pm
 lib/RT/Extension/MergeUsers/Test.pm.in
+lib/RT/REST2/Resource/User_Overlay.pm
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP

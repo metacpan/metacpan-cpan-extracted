@@ -169,8 +169,9 @@ chain: atom
             $_[3]->{graph} = $g;
             $_[3]->{index} = @{$_[0]->{USER}{GRAPHS}}-1;
 
-            return { first => $_[3],
-                     last  => $_[3] };
+            $_[1]->{last} = $_[3];
+
+            return $_[1];
         }
      | chain '(' chain ')'
         {
@@ -387,57 +388,57 @@ sub parse
         for my $atom (sort { $a->{number} <=> $b->{number} } $graph->vertices) {
             delete $atom->{graph};
             delete $atom->{index};
-            if( !$options->{raw} ) {
-                # Promote implicit hydrogen atoms into explicit ones
-                if( !exists $atom->{hcount} ) {
-                    next if !exists $normal_valence{$atom->{symbol}};
-                    my $degree = sum0 map { $_ ne ':' && exists $bond_symbol_to_order{$_} ? $bond_symbol_to_order{$_} : 1 }
-                                      map { $graph->has_edge_attribute( $atom, $_, 'bond' )
-                                                ? $graph->get_edge_attribute( $atom, $_, 'bond' )
-                                                : '-' }
-                                         $graph->neighbours( $atom );
-                    my $valence = first { $degree <= $_ }
-                                        @{$normal_valence{$atom->{symbol}}};
-                    next unless defined $valence;
-                    $atom->{hcount} = $valence - $degree;
-                }
-                for (1..$atom->{hcount}) {
-                    my $hydrogen = { symbol => 'H',
-                                     class  => 0,
-                                     number => $self->{USER}{ATOMNO} };
-                    $graph->add_edge( $atom, $hydrogen );
-                    $self->{USER}{ATOMNO} ++;
-                    if( is_chiral $atom ) {
-                        if( $atom->{chirality_neighbours} ) {
-                            if( any { $_->{number} < $atom->{number} } @{$atom->{chirality_neighbours}} ) {
-                                splice @{$atom->{chirality_neighbours}}, 1, 0, $hydrogen;
-                            } else {
-                                _unshift_chirality_neighbour( $atom, $hydrogen );
-                            }
-                        } else {
-                            # This only happens if chiral atom does not have neighbours other than implicit hydrogens.
-                            # This is degenerate case anyway.
-                            _push_chirality_neighbour( $atom, $hydrogen );
-                        }
-                    }
-                }
-                delete $atom->{hcount};
+            next if $options->{raw};
 
-                # Unify the representation of chirality
+            # Promote implicit hydrogen atoms into explicit ones
+            if( !exists $atom->{hcount} ) {
+                next if !exists $normal_valence{$atom->{symbol}};
+                my $degree = sum0 map { $_ ne ':' && exists $bond_symbol_to_order{$_} ? $bond_symbol_to_order{$_} : 1 }
+                                  map { $graph->has_edge_attribute( $atom, $_, 'bond' )
+                                            ? $graph->get_edge_attribute( $atom, $_, 'bond' )
+                                            : '-' }
+                                     $graph->neighbours( $atom );
+                my $valence = first { $degree <= $_ }
+                                    @{$normal_valence{$atom->{symbol}}};
+                next unless defined $valence;
+                $atom->{hcount} = $valence - $degree;
+            }
+            for (1..$atom->{hcount}) {
+                my $hydrogen = { symbol => 'H',
+                                 class  => 0,
+                                 number => $self->{USER}{ATOMNO} };
+                $graph->add_edge( $atom, $hydrogen );
+                $self->{USER}{ATOMNO} ++;
                 if( is_chiral $atom ) {
-                    if( $atom->{chirality} =~ /^@@?$/ ) {
-                        if(      $graph->degree( $atom ) == 2 ) {
-                            $atom->{chirality} =~ s/@+/'@AL' . length $&/e;
-                        } elsif( $graph->degree( $atom ) == 5 ) {
-                            $atom->{chirality} =~ s/@+/'@TB' . length $&/e;
-                        } elsif( $graph->degree( $atom ) == 6 ) {
-                            $atom->{chirality} =~ s/@+/'@OH' . length $&/e;
+                    if( $atom->{chirality_neighbours} ) {
+                        if( any { $_->{number} < $atom->{number} } @{$atom->{chirality_neighbours}} ) {
+                            splice @{$atom->{chirality_neighbours}}, 1, 0, $hydrogen;
+                        } else {
+                            _unshift_chirality_neighbour( $atom, $hydrogen );
                         }
+                    } else {
+                        # This only happens if chiral atom does not have neighbours other than implicit hydrogens.
+                        # This is degenerate case anyway.
+                        _push_chirality_neighbour( $atom, $hydrogen );
                     }
-
-                    $atom->{chirality} =~ s/^\@TH1$/@/;
-                    $atom->{chirality} =~ s/^\@TH2$/@@/;
                 }
+            }
+            delete $atom->{hcount};
+
+            # Unify the representation of chirality
+            if( is_chiral $atom ) {
+                if( $atom->{chirality} =~ /^@@?$/ ) {
+                    if(      $graph->degree( $atom ) == 2 ) {
+                        $atom->{chirality} =~ s/@+/'@AL' . length $&/e;
+                    } elsif( $graph->degree( $atom ) == 5 ) {
+                        $atom->{chirality} =~ s/@+/'@TB' . length $&/e;
+                    } elsif( $graph->degree( $atom ) == 6 ) {
+                        $atom->{chirality} =~ s/@+/'@OH' . length $&/e;
+                    }
+                }
+
+                $atom->{chirality} =~ s/^\@TH1$/@/;
+                $atom->{chirality} =~ s/^\@TH2$/@@/;
             }
         }
     }

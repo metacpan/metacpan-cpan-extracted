@@ -55,7 +55,7 @@ use RT::Shredder;
 
 package RT::Extension::MergeUsers;
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 
 =head1 NAME
 
@@ -77,6 +77,155 @@ which allow you to programmatically accomplish the same thing from your code.
 It also provides a version of L<CanonicalizeEmailAddress>, which means that
 all e-mail sent from secondary users is displayed as coming from the primary
 user.
+
+=head1 REST2 API
+
+RT::Extension::MergeUsers provides REST2 API endpoints for programmatically
+merging and unmerging users.
+
+=head2 Authentication and Permissions
+
+All REST2 endpoints require authentication and the C<AdminUsers> right on the
+system object.
+
+=head2 POST /user/{id}/merge
+
+Merge a user into another user. The user specified in the URL path will be
+merged into the user specified in the request body.
+
+B<Request Format:>
+
+Content-Type: application/json
+
+    {
+        "User": "target_user_id_or_name"
+    }
+
+The C<User> field is required and can be either a user ID or username.
+
+B<Response Format (Success):>
+
+    {
+        "message": "Merged users successfully",
+        "merged_user": {
+            "id": 123,
+            "name": "user1"
+        },
+        "target_user": {
+            "id": 456,
+            "name": "user2"
+        }
+    }
+
+B<Example:>
+
+    curl -X POST https://rt.example.com/REST/2.0/user/123/merge \
+         -H "Authorization: token YOUR_TOKEN" \
+         -H "Content-Type: application/json" \
+         -d '{"User": "456"}'
+
+=head2 POST /user/{id}/unmerge
+
+Unmerge users that have been merged into the specified user. This endpoint
+supports two modes of operation:
+
+=over
+
+=item * B<Unmerge all merged users> (default)
+
+When called with an empty JSON body or no C<User> parameter, this will unmerge
+ALL users that have been merged into the specified user.
+
+B<Request Format:>
+
+Content-Type: application/json
+
+    {}
+
+B<Response Format (Success):>
+
+    {
+        "message": "Unmerged 2 user(s) from primary_user",
+        "unmerged_users": [
+            {
+                "id": 123,
+                "name": "user1",
+                "message": "Unmerged user1 <user1@example.com> from primary_user <primary@example.com>"
+            },
+            {
+                "id": 124,
+                "name": "user2",
+                "message": "Unmerged user2 <user2@example.com> from primary_user <primary@example.com>"
+            }
+        ],
+        "primary_user": {
+            "id": 456,
+            "name": "primary_user"
+        }
+    }
+
+B<Example:>
+
+    curl -X POST https://rt.example.com/REST/2.0/user/456/unmerge \
+         -H "Authorization: token YOUR_TOKEN" \
+         -H "Content-Type: application/json" \
+         -d '{}'
+
+=item * B<Unmerge a specific user>
+
+When called with a C<User> parameter, this will unmerge only the specified
+secondary user from the primary user.
+
+B<Request Format:>
+
+Content-Type: application/json
+
+    {
+        "User": "secondary_user_id_or_name"
+    }
+
+The C<User> field can be either a user ID or username.
+
+B<Response Format (Success):>
+
+    {
+        "message": "Unmerged user1 <user1@example.com> from primary_user <primary@example.com>",
+        "unmerged_user": {
+            "id": 123,
+            "name": "user1"
+        },
+        "from_primary_user": {
+            "id": 456,
+            "name": "primary_user"
+        }
+    }
+
+B<Example:>
+
+    curl -X POST https://rt.example.com/REST/2.0/user/456/unmerge \
+         -H "Authorization: token YOUR_TOKEN" \
+         -H "Content-Type: application/json" \
+         -d '{"User": "123"}'
+
+=back
+
+B<Error Responses:>
+
+All endpoints return appropriate HTTP status codes and JSON error messages:
+
+=over
+
+=item * C<400 Bad Request> - Invalid parameters or merge/unmerge operation failed
+
+=item * C<403 Forbidden> - User lacks AdminUsers permission
+
+=back
+
+Example error response:
+
+    {
+        "message": "User is a required field"
+    }
 
 =head1 INSTALLATION
 

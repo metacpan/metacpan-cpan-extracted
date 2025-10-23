@@ -11,7 +11,7 @@ use Bio::ToolBox::db_helper         qw(get_chromosome_list);
 use Bio::ToolBox::db_helper::config qw($BTB_CONFIG);
 require Exporter;
 
-our $VERSION = '2.02';
+our $VERSION = '2.04';
 
 ### Export
 our @ISA       = qw(Exporter);
@@ -281,7 +281,7 @@ sub open_wig_to_bigwig_fh {
 	# open the filehandle
 	my $command = sprintf "%s stdin %s %s", $bwapp, $args{chromo}, $args{bw};
 	my $bwfh    = IO::File->new("| $command")
-		or croak sprintf( "cannot open %s! $OS_ERROR", $args{bwapppath} );
+		or croak sprintf( "cannot open %s! $OS_ERROR", $bwapp );
 
 	# wigToBigWig will always die anyway if something is wrong
 	# cannot trap it with an eval, since it doesn't just error out
@@ -312,25 +312,15 @@ sub open_bigwig_to_wig_fh {
 
 	# Identify bigwig conversion utility
 	my $bwapp = $args{bwapppath} || get_bigwig_to_wig_app() || undef;
-	unless ($bwapp) {
-
-		# check for an entry in the configuration file
-		$args{bwapppath} = $BTB_CONFIG->param('applications.bigWigToWig') || undef;
-	}
-	unless ( $args{bwapppath} ) {
-
-		# try checking the system path
-		$args{bwapppath} = which('bigWigToWig') || which('bigWigToBedGraph');
-	}
-	unless ( $args{bwapppath} =~ /bigWigTo(?: Wig | BedGraph)$/x ) {
+	unless ( defined $bwapp and $bwapp =~ /bigWigTo(?: Wig | BedGraph)$/x ) {
 		carp q(Utility 'bigWigToWig' not specified and can not be found!);
 		return;
 	}
 
 	# open the filehandle
-	my $command = sprintf "%s %s stdout", $args{bwapppath}, $args{bw};
+	my $command = sprintf "%s %s stdout", $bwapp, $args{bw};
 	my $bwfh    = IO::File->new("$command |")
-		or croak sprintf( "cannot open %s! $OS_ERROR", $args{bwapppath} );
+		or croak sprintf( "cannot open %s! $OS_ERROR", $bwapp );
 
 	# bigWigToWig will always die anyway if something is wrong
 	# cannot trap it with an eval, since it doesn't just error out
@@ -360,19 +350,8 @@ sub bed_to_bigbed_conversion {
 	}
 
 	# identify bigbed conversion utility
-	$args{bbapppath} ||= undef;
-	unless ( $args{bbapppath} ) {
-
-		# check for an entry in the configuration file
-		$args{bbapppath} = $BTB_CONFIG->param('applications.bedToBigBed')
-			|| undef;
-	}
-	unless ( $args{bbapppath} ) {
-
-		# try checking the system path
-		$args{bbapppath} = which('bedToBigBed');
-	}
-	unless ( $args{bbapppath} ) {
+	my $bbapp = $args{bbapppath} ||= get_bed_to_bigbed_app() || undef;
+	unless ( defined $bbapp and $bbapp =~ / bedToBigBed $/x ) {
 		carp q(Utility 'bedToBigBed' not specified and can not be found!);
 		return;
 	}
@@ -401,7 +380,7 @@ sub bed_to_bigbed_conversion {
 
 	# Generate the bigBed file using Jim Kent's utility
 	printf " converting %s to BigBed....\n", $args{bed};
-	system( $args{bbapppath}, $args{bed}, $args{chromo}, $bb_file );
+	system( $bbapp, $args{bed}, $args{chromo}, $bb_file );
 
 	# Check the result
 	if ( -e $bb_file and -s $bb_file ) {
@@ -499,12 +478,12 @@ compatibility).
 
 =head3 Note regarding compatibility
 
-Some of these methods open a pipe to these external utilities, either
-for reading (L</open_wig_to_bigwig_fh>) or writing (L<open_bigwig_to_wig_fh>). 
-Newer (current) versions of these utilities, for
-example C<wigToBigWig> or C<bedGraphToBigWig>, no longer support reading from 
-standard input, resulting in failure with L<open_bigwig_to_wig_fh>. This change
-occurred with version release 439 of the UCSC UserApps, released circa 2022-11-14.
+Some of these methods open a pipe to these external utilities, either for
+reading (L<open_bigwig_to_wig_fh>) or writing (L</open_wig_to_bigwig_fh>). Newer
+(current) versions of the C<wigToBigWig> utility no longer support reading from
+standard input, resulting in failure with L<open_wig_to_bigwig_fh>. This change
+occurred with version release 439 of the UCSC UserApps, released circa
+2022-11-14.
 
 Being able to write to the utility directly has its advantages, namely avoiding 
 writing an intermediate text file and speed. 
@@ -526,7 +505,7 @@ names of the subroutines to export. None are automatically exported.
 
 	use Bio::ToolBox::big_helper qw(wig_to_bigwig_conversion);
 
-There are are nine available exported subroutines.
+There are are nine available exportable subroutines.
 
 =head2 Find and check applications
 

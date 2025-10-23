@@ -9,6 +9,8 @@ Some features we need or want, plus some neat ideas that may not be too feasible
 
  - Add [log.verbosity] 0 or 1 or 2 feature to control level of messaging spewage to the git client.
 
+ - Make git-client handle "git config { --show-scope | show-origin } { --get | --get-* } <name>" to label "descent" entries better instead of saying "command" for everything.
+
  - Investigate converting get_fork_hash common fork sniffer scan to use "git merge-base --fork-point <ref> <commit>" instead of grinding through the logs.
 
  - Provide branch, old hash, and new hash (for every branch updated by the git client) to post-read hook args (Requires man-in-the-middle sniffer)
@@ -37,6 +39,7 @@ Some features we need or want, plus some neat ideas that may not be too feasible
           or other DEBUG features
      2. "AllowAgentForwarding yes" for proxy.url two-way auto-sync feature
      3. "ExposeAuthInfo yes" to allow hooks to obtain public key info, if desired
+     4. Enable "any-user"@server feature, if desired.
 
  - Pull out the iotrace utility into its own perl module IO::Trace.
 
@@ -63,6 +66,9 @@ Some features we need or want, plus some neat ideas that may not be too feasible
      2. git config --add githooks.plugin WebHook
      3. git config --add githooks."webhook".callbackurl https://website.com/post.cgi
    * Use the same general githooks.pl format like: run_hook($0, @ARGV);
+   * Provide a seemless way to transport information between hooks.
+     1. For example, the ability to export ENV variables from a PRE* hook to a POST* hook.
+     2. Allow data in $git->stash to persist among all hooks where the $git object is the first argument passed to each custom block hook.
 
  - Monkey the core.hooksPath setting on the git server to point to these hooks provided.
 

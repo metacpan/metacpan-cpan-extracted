@@ -30,7 +30,7 @@ WriteMakefile(
 		'File::Spec' => 0,
 		'Getopt::Long' => 0,
 		'Params::Get' => 0.13,
-		'Params::Validate::Strict' => 0.17,
+		'Params::Validate::Strict' => 0.18,
 		'Pod::Usage' => 0,
 		'Return::Set' => 0.03,
 		'Template' => 0,

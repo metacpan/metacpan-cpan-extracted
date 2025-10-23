@@ -1,5 +1,8 @@
 Revision history for RT-Client-CLI
 
+6.0.2 2025-10-22
+ - Sync with RT 6.0.2
+
 5.0.6 2024-05-06
  - Fix typo
 

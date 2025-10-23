@@ -83,13 +83,14 @@ EOT
 #print $f->dump;
 #print $f->click->as_string;
 
-is( $f->click->as_string, <<'EOT');
+chomp(my $expected_advanced = <<'EOT');
 POST http://localhost/
 Content-Length: 86
 Content-Type: application/x-www-form-urlencoded
 
 i.x=1&i.y=1&c=on&r=b&t=&p=&tel=&date=&h=xyzzy&f=&x=&a=%0D%0Aabc%0D%0A+++&s=bar&m=a&m=b
 EOT
+is( $f->click->as_string, $expected_advanced);
 
 is( @warn, 1 );
 like( $warn[0], qr/^Unknown input type 'xyzzy'/ );
@@ -463,22 +464,24 @@ EOT
 ok( $f->find_input("randomkey") );
 is( $f->find_input("randomkey")->challenge, "1234567890" );
 is( $f->find_input("randomkey")->keytype,   "rsa" );
-is( $f->click->as_string,                   <<EOT);
+chomp(my $expected_keygen = <<EOT);
 POST http://example.com/secure/keygen/test.cgi
 Content-Length: 19
 Content-Type: application/x-www-form-urlencoded
 
 Field1=Default+Text
 EOT
+is( $f->click->as_string, $expected_keygen);
 
 $f->value( randomkey => "foo" );
-is( $f->click->as_string, <<EOT);
+chomp(my $expected_keygen_foo = <<EOT);
 POST http://example.com/secure/keygen/test.cgi
 Content-Length: 33
 Content-Type: application/x-www-form-urlencoded
 
 randomkey=foo&Field1=Default+Text
 EOT
+is( $f->click->as_string, $expected_keygen_foo);
 
 $f = HTML::Form->parse( <<EOT, "http://www.example.com" );
 <form  ACTION="http://example.com/">
@@ -602,13 +605,14 @@ $f = HTML::Form->parse( <<EOT, base => "http://localhost/" );
 </form>
 EOT
 
-is( $f->click->as_string, <<EOT);
+chomp(my $expected_button_go = <<EOT);
 POST http://localhost/
 Content-Length: 9
 Content-Type: application/x-www-form-urlencoded
 
 submit=go
 EOT
+is( $f->click->as_string, $expected_button_go);
 
 $f = HTML::Form->parse( <<EOT, base => "http://localhost/" );
 <form method=post>
@@ -617,13 +621,14 @@ $f = HTML::Form->parse( <<EOT, base => "http://localhost/" );
 </form>
 EOT
 
-is( $f->click->as_string, <<EOT);
+chomp(my $expected_button_empty = <<EOT);
 POST http://localhost/
 Content-Length: 7
 Content-Type: application/x-www-form-urlencoded
 
 submit=
 EOT
+is( $f->click->as_string, $expected_button_empty);
 
 # select with a name followed by select without a name GH#2
 $f = HTML::Form->parse( <<EOT, "http://localhost/" );

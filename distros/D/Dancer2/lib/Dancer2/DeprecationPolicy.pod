@@ -14,7 +14,7 @@ Dancer2::DeprecationPolicy - Define the process by which outdated, broken, or un
 
 =head1 VERSION
 
-version 2.0.0
+version 2.0.1
 
 =head1 DESCRIPTION
 

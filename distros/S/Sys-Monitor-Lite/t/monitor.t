@@ -7,7 +7,7 @@ use Sys::Monitor::Lite;
 
 subtest 'available metrics' => sub {
     my @metrics = Sys::Monitor::Lite::available_metrics();
-    is_deeply(\@metrics, [qw(cpu disk load mem net system)], 'expected metric list');
+    is_deeply(\@metrics, [qw(cpu disk disk_io load mem net system)], 'expected metric list');
 };
 
 subtest 'collect_all structure' => sub {
@@ -15,7 +15,7 @@ subtest 'collect_all structure' => sub {
     isa_ok($data, 'HASH', 'collect_all returns hashref');
     ok($data->{timestamp}, 'timestamp present');
 
-    for my $key (qw(system cpu load mem disk net)) {
+    for my $key (qw(system cpu load mem disk disk_io net)) {
         ok(exists $data->{$key}, "$key metric present");
     }
 
@@ -29,6 +29,21 @@ subtest 'collect_all structure' => sub {
     isa_ok($disk, 'HASH', 'disk entry structure');
     for my $field (qw(mount filesystem type total_bytes used_bytes free_bytes used_pct)) {
         ok(exists $disk->{$field}, "disk entry has $field");
+    }
+    isa_ok($data->{disk_io}, 'ARRAY', 'disk_io data');
+    if (@{ $data->{disk_io} }) {
+        my $io = $data->{disk_io}[0];
+        isa_ok($io, 'HASH', 'disk_io entry structure');
+        for my $field (qw(device sector_size reads writes in_progress io_ms weighted_io_ms)) {
+            ok(exists $io->{$field}, "disk_io entry has $field");
+        }
+        isa_ok($io->{reads}, 'HASH', 'disk_io reads structure');
+        isa_ok($io->{writes}, 'HASH', 'disk_io writes structure');
+        for my $rw (qw(reads writes)) {
+            for my $field (qw(ios merged sectors bytes ms)) {
+                ok(exists $io->{$rw}{$field}, "disk_io $rw has $field");
+            }
+        }
     }
     isa_ok($data->{net}, 'ARRAY', 'net data');
 };

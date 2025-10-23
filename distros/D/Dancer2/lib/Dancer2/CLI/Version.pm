@@ -1,6 +1,6 @@
 package Dancer2::CLI::Version;
 # ABSTRACT: Display Dancer2 version
-$Dancer2::CLI::Version::VERSION = '2.0.0';
+$Dancer2::CLI::Version::VERSION = '2.0.1';
 use Moo;
 use CLI::Osprey
     desc => 'Display version of Dancer2';
@@ -24,7 +24,7 @@ Dancer2::CLI::Version - Display Dancer2 version
 
 =head1 VERSION
 
-version 2.0.0
+version 2.0.1
 
 =head1 AUTHOR
 

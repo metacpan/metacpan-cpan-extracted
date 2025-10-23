@@ -3,7 +3,7 @@ package WWW::Mechanize::Link;
 use strict;
 use warnings;
 
-our $VERSION = '2.19';
+our $VERSION = '2.20';
 
 #ABSTRACT: Link object for WWW::Mechanize
 
@@ -65,12 +65,11 @@ WWW::Mechanize::Link - Link object for WWW::Mechanize
 
 =head1 VERSION
 
-version 2.19
+version 2.20
 
 =head1 SYNOPSIS
 
-Link object to encapsulate all the stuff that Mech needs but nobody
-wants to deal with as an array.
+Link object to encapsulate all the stuff that Mech needs but nobody wants to deal with as an array.
 
 =head1 Constructor
 

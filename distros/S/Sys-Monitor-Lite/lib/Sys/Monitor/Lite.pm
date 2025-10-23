@@ -6,15 +6,16 @@ use Time::HiRes qw(sleep);
 use JSON::PP ();
 use Scalar::Util qw(looks_like_number);
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 my %COLLECTORS = (
-    system => \&_system_info,
-    cpu    => \&_cpu_usage,
-    load   => \&_load_average,
-    mem    => \&_memory_usage,
-    disk   => \&_disk_usage,
-    net    => \&_network_io,
+    system  => \&_system_info,
+    cpu     => \&_cpu_usage,
+    load    => \&_load_average,
+    mem     => \&_memory_usage,
+    disk    => \&_disk_usage,
+    disk_io => \&_disk_io,
+    net     => \&_network_io,
 );
 
 sub collect_all {
@@ -25,7 +26,7 @@ sub collect {
     my ($which) = @_;
     my @names;
     if (!defined $which) {
-        @names = qw(system cpu load mem disk net);
+        @names = qw(system cpu load mem disk disk_io net);
     } elsif (ref $which eq 'ARRAY') {
         @names = @$which;
     } else {
@@ -183,6 +184,57 @@ sub _disk_usage {
     return \@disks;
 }
 
+sub _disk_io {
+    open my $fh, '<', '/proc/diskstats' or return [];
+    my @devices;
+    while (my $line = <$fh>) {
+        chomp $line;
+        my @fields = split /\s+/, $line;
+        next unless @fields >= 14;
+        my (
+            $major,          $minor,          $name,
+            $reads_completed, $reads_merged,   $sectors_read, $read_ms,
+            $writes_completed,$writes_merged,  $sectors_written, $write_ms,
+            $io_in_progress,  $io_ms,          $weighted_io_ms
+        ) = @fields[0..13];
+
+        next unless defined $name && length $name;
+        next unless -r "/sys/block/$name/stat";
+
+        my $sector_size = _sector_size($name);
+        my $reads_sectors  = _maybe_number($sectors_read);
+        my $writes_sectors = _maybe_number($sectors_written);
+        my $reads_bytes    = defined $reads_sectors  ? $reads_sectors  * $sector_size : undef;
+        my $writes_bytes   = defined $writes_sectors ? $writes_sectors * $sector_size : undef;
+
+        push @devices, {
+            device      => $name,
+            major       => _maybe_number($major),
+            minor       => _maybe_number($minor),
+            sector_size => $sector_size,
+            reads       => {
+                ios     => _maybe_number($reads_completed),
+                merged  => _maybe_number($reads_merged),
+                sectors => $reads_sectors,
+                bytes   => defined $reads_bytes ? 0 + $reads_bytes : undef,
+                ms      => _maybe_number($read_ms),
+            },
+            writes      => {
+                ios     => _maybe_number($writes_completed),
+                merged  => _maybe_number($writes_merged),
+                sectors => $writes_sectors,
+                bytes   => defined $writes_bytes ? 0 + $writes_bytes : undef,
+                ms      => _maybe_number($write_ms),
+            },
+            in_progress     => _maybe_number($io_in_progress),
+            io_ms           => _maybe_number($io_ms),
+            weighted_io_ms  => _maybe_number($weighted_io_ms),
+        };
+    }
+    close $fh;
+    return \@devices;
+}
+
 sub _network_io {
     open my $fh, '<', '/proc/net/dev' or return [];
     my @ifaces;
@@ -278,6 +330,21 @@ sub _maybe_number {
     my ($value) = @_;
     return undef unless defined $value;
     return looks_like_number($value) ? 0 + $value : $value;
+}
+
+sub _sector_size {
+    my ($device) = @_;
+    return 512 unless defined $device && length $device;
+    my $path = "/sys/block/$device/queue/hw_sector_size";
+    if (open my $fh, '<', $path) {
+        my $size = <$fh>;
+        close $fh;
+        if (defined $size) {
+            $size =~ s/\s+//g;
+            return looks_like_number($size) ? 0 + $size : 512;
+        }
+    }
+    return 512;
 }
 
 1;

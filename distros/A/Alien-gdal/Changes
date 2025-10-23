@@ -1,5 +1,8 @@
 Revision history for Alien::gdal
 
+1.43 2025-10-23
+    - CMake flags can be passed using an env var ALIEN_GDAL_CMAKE_ARGS
+
 1.42 2025-07-25
     - MacOS: Disable some dependencies for share builds under Homebrew.
       These cause build failures.

@@ -45,7 +45,7 @@ You have questions. We have answers.
 
 - Quick Start
 
-    Want to get going faster? [Quick Start](https://somewhere) will help
+    Want to get going faster? [Quick Start](https://metacpan.org/dist/Dancer2/view/lib/Dancer2/Manual/QuickStart.pod) will help
     you install Dancer2 and bootstrap a new application quickly.
 
 - Manual
@@ -71,7 +71,7 @@ You have questions. We have answers.
 
 - Cookbook
 
-    How do I...? Our [cookbook](https://metacpan.org/pod/Dancer2%3A%3ACookbook)
+    How do I...? Our [cookbook](https://metacpan.org/dist/Dancer2/view/lib/Dancer2/Manual/Cookbook.pod)
     comes with various recipes in many tasty flavors!
 
 - Plugins
@@ -104,7 +104,7 @@ You have questions. We have answers.
 
 - Contributing
 
-    The [contribution guidelines](https://github.com/PerlDancer/Dancer2/blob/master/Contributing.md) describe
+    The [contribution guidelines](https://github.com/PerlDancer/Dancer2/blob/main/CONTRIBUTING.md) describe
     how to set up your development environment to contribute to the development of Dancer2,
     Dancer2's Git workflow, submission guidelines, and various coding standards.
 

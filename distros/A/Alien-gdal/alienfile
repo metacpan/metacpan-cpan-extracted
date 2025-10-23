@@ -317,10 +317,15 @@ share {
       #  should add an env flag for this
       push @with_args, '-DGDAL_USE_CURL=OFF';
     }    
-    
-    my $config_args = $ENV{ALIEN_GDAL_CONFIG_ARGS} // '';
-    $config_args =~ s/[^-\s\w,=+]//g;  #  overkill?
-    $config_args = join (' ', @with_args) . " $config_args";
+
+    my @env_args;
+    if (my $env_arg_str = $ENV{ALIEN_GDAL_CMAKE_ARGS} // '') {
+        Alien::Build->log("\$ENV{ALIEN_GDAL_CMAKE_ARGS} is $env_arg_str");
+        $env_arg_str =~ s/[^-\s\w:=]//g;  #  overkill?
+        #  could use shellwords for the split
+        @env_args = grep {/^\-[UD]/} (split /\s+/, $env_arg_str);
+    }
+    Alien::Build->log('CMake args from env var: ' . join ' ', @env_args);
     
     meta->around_hook( build => \&remove_gitfw_from_path );
     plugin 'PkgConfig::PPWrapper';
@@ -371,6 +376,7 @@ share {
       '-DCMAKE_INSTALL_PREFIX:PATH=%{.install.prefix}',
       '-DCMAKE_BUILD_TYPE=Release',
       @drivers_to_disable,
+      @env_args,
       '..'
     ];
     

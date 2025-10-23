@@ -1,4 +1,4 @@
-#!perl -T
+#!perl
 
 use warnings;
 use strict;
@@ -36,6 +36,7 @@ Content-Type: application/x-www-form-urlencoded
 foo=bye&no_value=&submit=Submit
 EOT
 
+chomp($wanted);
 is( $reqstring, $wanted, 'Proper posting' );
 
 like(

@@ -1,6 +1,6 @@
 package Dancer2::CLI;
 # ABSTRACT: Dancer2 CLI application
-$Dancer2::CLI::VERSION = '2.0.0';
+$Dancer2::CLI::VERSION = '2.0.1';
 use Moo;
 use CLI::Osprey;
 use Path::Tiny;
@@ -65,7 +65,7 @@ Dancer2::CLI - Dancer2 CLI application
 
 =head1 VERSION
 
-version 2.0.0
+version 2.0.1
 
 =head1 AUTHOR
 

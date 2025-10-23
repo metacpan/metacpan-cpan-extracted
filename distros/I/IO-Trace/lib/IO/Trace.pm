@@ -8,10 +8,10 @@ use Getopt::Long qw(GetOptionsFromArray Configure);
 use IPC::Open3 qw(open3);
 use IO::Select;
 use IO::Handle;
-use IO::File qw(O_WRONLY O_TRUNC O_CREAT);
+use IO::File qw(O_WRONLY O_TRUNC O_CREAT SEEK_CUR);
 
 our @EXPORT = qw(iotrace);
-our $VERSION = '0.022';
+our $VERSION = '0.023';
 
 # Magic Timer Settings
 our $has_hires = eval { require Time::HiRes; 1 };
@@ -163,6 +163,15 @@ sub spawn {
     $self->{implicitly_closed} = {};
     $self->{sel} = IO::Select->new(values %{ $self->{proxy} });
     $self->{writers} = IO::Select->new($self->{in}, \*STDOUT, \*STDERR);
+    foreach my $fh ($self->{writers}->handles) {
+        # Test if writer handle is seek()able
+        if (seek $fh, 0, SEEK_CUR) { # Offset +0 from Current Position doesn't actually move the pointer
+            # YUP! Must be a real file. Don't monitor it since nobody will be able to close() the "other end" anyways.
+            # We must remove it from the Select loop to prevent super grinding since we always "can_read" a real file.
+            $self->{sel}->remove($fh);
+            $self->{writers}->remove($fh);
+        }
+    }
     return $self->{pid};
 }
 
@@ -171,11 +180,11 @@ sub open_output_log {
     my $output_log_file = $self->{output_log_file};
     if (defined $output_log_file) {
         $output_log_file .= ".$self->{pid}" if $self->{follow_fork} > 1;
-        $self->{log} = IO::File->new($output_log_file, O_WRONLY | O_TRUNC | O_CREAT ) or die "$output_log_file: open failure: $!\n";;
+        $self->{log} = IO::File->new($output_log_file, O_WRONLY | O_TRUNC | O_CREAT ) or die "$output_log_file: open failure: $!\n";
     }
     else {
-        # XXX - Is it ok to spew all the trace lines out to STDERR if no -o option provided?
-        $self->{log} = IO::File->new(">&STDERR");
+        # Spew all the trace info mixed in with the normal STDERR stream if no -o option provided:
+        $self->{log} = IO::Handle->new_from_fd(fileno(STDERR), ">");
     }
     $self->{log}->autoflush(1);
     return $self->{log};

@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More 0.94;
 
-plan tests => 28;
+plan tests => 27;
 
 my @module_files = (
     'LWP.pm',
@@ -26,7 +26,6 @@ my @module_files = (
     'LWP/Protocol/gopher.pm',
     'LWP/Protocol/http.pm',
     'LWP/Protocol/loopback.pm',
-    'LWP/Protocol/mailto.pm',
     'LWP/Protocol/nntp.pm',
     'LWP/Protocol/nogo.pm',
     'LWP/RobotUA.pm',

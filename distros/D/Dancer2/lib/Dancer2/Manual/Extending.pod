@@ -14,7 +14,7 @@ Dancer2::Manual::Extending - A guide to extending Dancer2 via engines and plugin
 
 =head1 VERSION
 
-version 2.0.0
+version 2.0.1
 
 =head1 Name
 

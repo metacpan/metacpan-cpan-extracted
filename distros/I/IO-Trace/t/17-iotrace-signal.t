@@ -6,7 +6,8 @@
 use strict;
 use warnings;
 our (@filters, @sigs, $test_points);
-use Test::More tests => 2 + (@filters = qw[none iotrace strace]) * (1 + (@sigs = qw[TERM INT IO USR1 USR2 HUP INFO SEGV ALRM FPE XCPU WINCH PWR]) * ($test_points = 17));
+# Special signals sent directly by the kernel do not need to be manually forwarded to the target process: SEGV CHLD XCPU
+use Test::More tests => 2 + (@filters = qw[none iotrace strace]) * (1 + (@sigs = qw[TERM INT IO USR1 USR2 HUP INFO ALRM FPE WINCH PWR]) * ($test_points = 17));
 
 use File::Which qw(which);
 use File::Temp ();
@@ -75,7 +76,7 @@ my $fatal_sig = {};
 SKIP: for my $prog (@filters) {
     my $try = $prog ne "none" ? which $prog : "n/a";
     skip "no strace", 1 + (@sigs * $test_points) if $prog eq "strace" and !$try; # Skip strace tests if doesn't exist
-    ok($try, "$prog: Full path [$try]");
+    ok($try, t." $prog: Full path [$try]");
 
     my @run = ($^X, "-e", $test_prog);
     # Ensure behavior of $test_prog is the same with or without tracing it.
@@ -122,7 +123,7 @@ SKIP: for my $prog (@filters) {
         alarm 5;
         ok(canread($out_fh, 3.9), t." $prog: SIG$sig: PRE: STDOUT ready: $!");
         alarm 5;
-        # Only flag $prog "none" fatal behavior Flag SIG if fatal and prog "none":
+        # Only flag $prog "none" SIG fatal behavior
         defined($line = <$out_fh>) or $prog ne "none" or $fatal_sig->{$sig} = $system_sig->{$sig};
         ok(($line || $fatal_sig->{$sig}), t." $prog: SIG$sig: MID: Detected DEFAULT signal behavior: ".($fatal_sig->{$sig} ? "Fatal" : "Proceed"));
 

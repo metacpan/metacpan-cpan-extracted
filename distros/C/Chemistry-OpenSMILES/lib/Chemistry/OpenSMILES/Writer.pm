@@ -1,7 +1,7 @@
 package Chemistry::OpenSMILES::Writer;
 
 # ABSTRACT: OpenSMILES format writer
-our $VERSION = '0.12.0'; # VERSION
+our $VERSION = '0.12.1'; # VERSION
 
 =head1 NAME
 
@@ -445,8 +445,7 @@ sub _depict_atom
     if(  $is_simple && $graph && !$raw && $normal_valence{ucfirst $atom} &&
         !$vertex->{charge} &&
         !$vertex->{class} ) {
-        my $valence = valence( $graph, $vertex );
-        if( any { $_ == $valence } @{$normal_valence{ucfirst $atom}} ) {
+        if( _has_unambiguous_normal_valence( $graph, $vertex, $hcount ) ) {
             # Usual valence detected, no need to keep hcount
             $hcount = 0 if $options->{remove_implicit_hydrogens};
         } else {
@@ -505,6 +504,21 @@ sub _has_more_unseen_children
         $orders->remove( keys %{$rings->{$order_by_vertex->($vertex)}} );
     }
     return $orders->size;
+}
+
+sub _has_unambiguous_normal_valence
+{
+    my( $graph, $vertex, $hcount ) = @_;
+    my $element = ucfirst $vertex->{symbol};
+    return '' unless exists $normal_valence{$element};
+
+    my $valence = valence( $graph, $vertex );
+    my $normal_valence = first { $_ == $valence } @{$normal_valence{$element}};
+    return '' unless $normal_valence;
+
+    my $derived_valence = first { $_ >= $normal_valence - $hcount }
+                                @{$normal_valence{$element}};
+    return $derived_valence && $derived_valence == $normal_valence;
 }
 
 # Reorder a permutation of elements 0, 1, 2 and 3 by taking an element

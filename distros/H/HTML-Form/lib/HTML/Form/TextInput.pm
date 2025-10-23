@@ -3,7 +3,7 @@ package HTML::Form::TextInput;
 use strict;
 use parent 'HTML::Form::Input';
 
-our $VERSION = '6.12';
+our $VERSION = '6.13';
 
 # ABSTRACT: An HTML form text input element for use with HTML::Form
 
@@ -45,7 +45,7 @@ HTML::Form::TextInput - An HTML form text input element for use with HTML::Form
 
 =head1 VERSION
 
-version 6.12
+version 6.13
 
 =head1 AUTHOR
 

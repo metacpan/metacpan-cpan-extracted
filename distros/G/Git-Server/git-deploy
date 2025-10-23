@@ -132,7 +132,7 @@ use FindBin qw($Script $Bin);
 use Getopt::Long qw(GetOptions);
 use Fcntl qw(LOCK_EX LOCK_NB);
 
-our $VERSION = "0.034";
+our $VERSION = "0.035";
 
 my @invoked = ($0, @ARGV);
 my $cwd = getcwd();

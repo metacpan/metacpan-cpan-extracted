@@ -5,11 +5,11 @@ use Test::More;
 use IPC::System::Simple qw(system);
 use App::Test::Generator qw(generate);
 
-use Test::Needs 'Math::Simple';
+use Test::Needs 'Data::Text';
 
-my $conf_file = "t/conf/math_simple_add.conf";
-my $corpus    = "t/conf/math_simple_add.yml";
-my $outfile   = "t/tmp_math_simple_add.t";
+my $conf_file = "t/conf/data_text_set.conf";
+my $corpus    = "t/conf/data_text_set.yml";
+my $outfile   = "t/tmp_data_text_set.t";
 
 plan skip_all => 'no corpus config available' unless -e $conf_file && -e $corpus;
 
@@ -22,7 +22,8 @@ open my $fh, '<', $outfile or die $!;
 my $contents = do { local $/; <$fh> };
 close $fh;
 
-like($contents, qr/get_time_zone/, 'mentions function under test');
+like($contents, qr/set/, 'mentions function under test');
+like($contents, qr/diag\(/, 'fuzz test has diag line');
 
 eval {
 	system("$^X -c $outfile");

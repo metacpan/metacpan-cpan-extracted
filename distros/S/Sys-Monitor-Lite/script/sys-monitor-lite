@@ -93,7 +93,7 @@ Collect a single sample (default when C<--interval> is not provided).
 =item B<--collect LIST>
 
 Comma-separated list of metrics to gather (e.g. C<cpu,mem,disk>). Available
-metrics: system, cpu, load, mem, disk, net.
+metrics: system, cpu, load, mem, disk, disk_io, net.
 
 =item B<--output FORMAT>
 

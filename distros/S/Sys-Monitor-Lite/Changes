@@ -1,4 +1,7 @@
 Revision history for Sys-Monitor-Lite
 
+0.02  2025-10-22
+    - Add disk I/O metrics collector and documentation updates.
+
 0.01  2025-10-19
     - Initial release to CPAN.

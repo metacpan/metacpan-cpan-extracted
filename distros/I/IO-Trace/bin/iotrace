@@ -8,8 +8,8 @@ iotrace - Like strace enough to log STDIN STDOUT STDERR I/O
 
 =head1 SYNOPSYS
 
-  $ iotrace -v -s9000 -tt -e execve,clone,openat,close,read,write -o /tmp/sort.iotrace sort < /etc/passwd | tee /tmp/passwd.sorted
-  $ iotrace -v -s9000 -o /tmp/perl.iotrace perl -n -e 'print if /./' < /etc/bashrc | tee /tmp/bashrc.nonblanklines.txt
+  $ iotrace -v -s9000 -tt -e execve,clone,openat,close,read,write -o /tmp/sort.iotrace sort < /etc/passwd > /tmp/passwd.sorted
+  $ iotrace -v -s9000 -o /tmp/perl.iotrace perl -n -e 'print if /./' < /etc/bashrc > /tmp/bashrc.nonblanklines.txt
   $ diff -wui /etc/bashrc /tmp/bashrc.nonblanklines.txt
 
 =cut

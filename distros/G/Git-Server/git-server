@@ -73,7 +73,7 @@ use warnings;
 use Cwd qw(abs_path);
 use FindBin qw($Bin);
 
-our $VERSION = "0.034";
+our $VERSION = "0.035";
 
 my $ssh = $ENV{SSH_CLIENT} or die "Only SSH allowed\n";
 $SIG{PIPE} = sub { exit 1; };

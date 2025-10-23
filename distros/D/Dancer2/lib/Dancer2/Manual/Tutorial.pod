@@ -13,7 +13,7 @@ Dancer2::Tutorial - A step-by-step guide to get you dancing
 
 =head1 VERSION
 
-version 2.0.0
+version 2.0.1
 
 =head1 Dancer2 Tutorial
 

@@ -1,0 +1,14 @@
+^Cron-Toolkit-[\d\.\-]*
+^_build
+^blib
+^Build$
+^MYMETA\.
+^cover_db
+prototype-tree
+code_share\.sh
+grok_prompts
+MAKEFILE\.skip
+\.git
+\.gitignore
+\.swp$
+~$

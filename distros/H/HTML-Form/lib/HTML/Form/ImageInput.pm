@@ -3,7 +3,7 @@ package HTML::Form::ImageInput;
 use strict;
 use parent 'HTML::Form::SubmitInput';
 
-our $VERSION = '6.12';
+our $VERSION = '6.13';
 
 # ABSTRACT: An HTML form image input element for use with HTML::Form
 
@@ -34,7 +34,7 @@ HTML::Form::ImageInput - An HTML form image input element for use with HTML::For
 
 =head1 VERSION
 
-version 6.12
+version 6.13
 
 =head1 AUTHOR
 

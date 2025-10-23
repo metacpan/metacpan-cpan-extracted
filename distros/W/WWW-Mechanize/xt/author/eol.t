@@ -100,7 +100,6 @@ my @files = (
     't/select.html',
     't/select.t',
     't/submit_form.t',
-    't/taint.t',
     't/tick.html',
     't/tick.t',
     't/upload.html',
