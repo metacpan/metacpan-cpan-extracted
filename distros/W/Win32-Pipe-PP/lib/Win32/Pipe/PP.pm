@@ -13,7 +13,7 @@ use warnings;
 
 # version '...'
 our $version = '0.026';
-our $VERSION = 'v0.1.1';
+our $VERSION = 'v0.2.2';
 $VERSION = eval $VERSION;
 
 # authority '...'
@@ -24,9 +24,12 @@ our $AUTHORITY = 'cpan:BRICKPOOL';
 # Used Modules
 # ------------
 
+require bytes;
 use Carp qw( croak );
 use Win32;
 use Win32::API;
+use Win32::Event;
+use Win32::IPC qw( INFINITE );
 use Win32API::File qw(
   :FILE_ATTRIBUTE_
   :FILE_FLAG_
@@ -45,6 +48,8 @@ my $CreateNamedPipeA;
 my $DisconnectNamedPipe;
 my $FlushFileBuffers;
 my $WaitNamedPipeA;
+my $PeekNamedPipe;
+my $GetNamedPipeInfo;
 BEGIN {
   $ConnectNamedPipe = Win32::API::More->new('Kernel32',
     'BOOL ConnectNamedPipe(
@@ -84,6 +89,27 @@ BEGIN {
       DWORD  nTimeOut
     )'
   ) or die "Import WaitNamedPipeA: $^E";
+
+  $PeekNamedPipe = Win32::API::More->new('Kernel32',
+    'BOOL PeekNamedPipe(
+      HANDLE  hNamedPipe,
+      LPVOID  lpBuffer,
+      DWORD   nBufferSize,
+      LPDWORD lpBytesRead,
+      LPDWORD lpTotalBytesAvail,
+      LPDWORD lpBytesLeftThisMessage
+    )'
+  ) or die "Import PeekNamedPipe: $^E";
+
+  $GetNamedPipeInfo = Win32::API::More->new('Kernel32',
+    'BOOL GetNamedPipeInfo(
+      HANDLE  hNamedPipe,
+      LPDWORD lpFlags,
+      LPDWORD lpOutBufferSize,
+      LPDWORD lpInBufferSize,
+      LPDWORD lpMaxInstances
+    )'
+  ) or die "Import GetNamedPipeInfo: $^E";
 }
 
 # -------
@@ -102,11 +128,13 @@ our @EXPORT = qw(
 
 # Exportable constants
 use constant {
+  # DEFAULT_WAIT_TIME => INFINITE,
   DEFAULT_WAIT_TIME => 10000,
 };
 
 # Windows system error codes
 use constant {
+  ERROR_INVALID_FUNCTION   => 1,
   ERROR_INVALID_HANDLE     => 6,
   ERROR_WRITE_FAULT        => 29,
   ERROR_NOT_SUPPORTED      => 50,
@@ -117,6 +145,7 @@ use constant {
   ERROR_PIPE_NOT_CONNECTED => 233,
   ERROR_MORE_DATA          => 234,
   ERROR_PIPE_CONNECTED     => 535,
+  ERROR_IO_PENDING         => 997,
 };
 
 # Windows pipe constants
@@ -148,33 +177,32 @@ our $ErrorText = '';
 # ----------------------
 
 sub new {
-  my ($class, $name, $wait) = @_;
-  croak qq(usage: new(\$class, \$name, \$wait);\n) 
+  my ($class, $name, $timeout) = @_;
+  croak qq(usage: new(\$class, \$name [, \$timeout]);\n) 
     unless @_ >= 2 && @_ <= 3 && $class;
 
-  $wait = DEFAULT_WAIT_TIME unless defined $wait;
+  $timeout = DEFAULT_WAIT_TIME unless defined $timeout;
+
+  # Reset error state
+  _fail(0, '');
 
   if (length $name >= PIPE_NAME_SIZE) {
-    ($ErrorNum, $ErrorText) = (ERROR_INVALID_PARAMETER, 
-      "Pipe Name is too long");
-    return;
+    return _fail(ERROR_INVALID_PARAMETER, "Pipe Name is too long");
   }
 
-
   my $self = {
-    hPipe       => 0,
-    bufferSize  => BUFFER_SIZE,
-    pipeType    => '',
-    errorNum    => 0,
-    errorText   => '',
+    hPipe      => 0,
+    bufferSize => BUFFER_SIZE,
+    pipeType   => '',
+    errorNum   => 0,
+    errorText  => '',
+    blocking   => 0,
+    event      => \0,
   };
 
-  ($ErrorNum, $ErrorText) = (0, '');
   if ($name =~ /^\\\\/) {
     if (length $name <= length PIPE_NAME_PREFIX) {
-      ($ErrorNum, $ErrorText) 
-        = (ERROR_INVALID_PARAMETER, "Pipe Name is too short");
-      return;
+      return _fail(ERROR_INVALID_PARAMETER, "Pipe Name is too short");
     }
 
     # CLIENT: full path like \\.\pipe\ -> use CreateFile
@@ -187,13 +215,16 @@ sub new {
         FILE_SHARE_READ	| FILE_SHARE_WRITE,
         [],
         OPEN_EXISTING,
-        FILE_ATTRIBUTE_NORMAL | FILE_FLAG_WRITE_THROUGH,
+        # FILE_FLAG_WRITE_THROUGH on the client: This is not usually necessary 
+        # for named pipes; it only reduces throughput and does not help against 
+        # blockages. We will omit this flag.
+        FILE_ATTRIBUTE_NORMAL,
         []
       );
 
-      # Success -> break
+      # Exit loop on success
       if ($hPipe && $hPipe != INVALID_HANDLE_VALUE) {
-        $self->{hPipe} = $hPipe;
+        $self->{hPipe} = 0+$hPipe;
         last;
       }
 
@@ -201,19 +232,16 @@ sub new {
       
       # Wait/retry when all instances are busy
       if ($err == ERROR_PIPE_BUSY) {
-        next if $WaitNamedPipeA->Call($name, $wait);    # retry
+        next if $WaitNamedPipeA->Call($name, $timeout);    # retry
       }
 
-      # Error -> return
-      ($ErrorNum, $ErrorText) = ($err, "CreateFile failed");
-      return;
+      # Return on error
+      return _fail($err, "CreateFile failed");
     }
   }
   else {
     unless (length $name) {
-      ($ErrorNum, $ErrorText)
-        = (ERROR_INVALID_PARAMETER, "Pipe Name cannot be empty");
-      return;
+      return _fail(ERROR_INVALID_PARAMETER, "Pipe Name cannot be empty");
     }
 
     # SERVER: logical name without \\.\pipe\ -> prefix and CreateNamedPipe
@@ -228,18 +256,22 @@ sub new {
       PIPE_UNLIMITED_INSTANCES,
       $self->{bufferSize},
       $self->{bufferSize},
-      $wait, 
+      $timeout, 
       undef
     );
 
     unless ($hPipe && $hPipe != INVALID_HANDLE_VALUE) {
-      ($ErrorNum, $ErrorText)
-        = (Win32::GetLastError(), "CreateNamedPipe failed");
-      return;
+      return _fail(Win32::GetLastError(), "CreateNamedPipe failed");
     }
 
     $self->{hPipe} = $hPipe;
   }
+
+  my $event = Win32::Event->new();
+  unless ($event && $$event && $$event != INVALID_HANDLE_VALUE) {
+    return _fail(Win32::GetLastError(), "CreateEvent failed");
+  }
+  $self->{event} = $event;
 
   bless $self, $class;
 }
@@ -260,15 +292,7 @@ sub Write {
   croak "usage: Write(\$pipe, \$data);\n" unless @_ == 2 && ref $self;
 
   # Reset last error state for this call
-  ($self->{errorNum}, $self->{errorText}) = (0, '');
-
-  # Validate handle
-  my $hPipe = $self->{hPipe} || 0;
-  unless ($hPipe && $hPipe != INVALID_HANDLE_VALUE) {
-    ($self->{errorNum}, $self->{errorText}) 
-      = (ERROR_INVALID_HANDLE, "Write failed: invalid handle");
-    return;
-  }
+  $self->_fail(0, '');
 
   # Treat undef or empty string as a successful no-op (like WriteFile)
   return 1 unless defined $data && length($data);
@@ -282,10 +306,11 @@ sub Write {
     my $to_send = $len - $total;
     $to_send = $bufsize if $to_send > $bufsize;
 
-    my $chunk   = substr($data, $total, $to_send);
+    my $chunk   = bytes::substr($data, $total, $to_send);
     my $written = 0;
 
-    my $r = WriteFile($hPipe, $chunk, $to_send, $written, []);
+    Win32::SetLastError(0);
+    my $r = WriteFile($self->{hPipe}, $chunk, $to_send, $written, []);
 
     if (!$r) {
       my $err = Win32::GetLastError();
@@ -295,20 +320,15 @@ sub Write {
         || $err == ERROR_NO_DATA
         || $err == ERROR_PIPE_NOT_CONNECTED
       ) {
-        ($self->{errorNum}, $self->{errorText}) 
-          = ($err, "Write failed: peer closed/not connected");
-      } else {
-        ($self->{errorNum}, $self->{errorText}) 
-          = ($err, "Write failed");
+        return $self->_fail($err, "Write failed: peer closed/not connected");
       }
-      return;
+      return $self->_fail($err, "Write failed");
     }
 
     # Safety: successful call should advance unless zero-length write
     if ($written == 0 && $to_send > 0) {
-      ($self->{errorNum}, $self->{errorText}) 
-        = (ERROR_WRITE_FAULT, "WriteFile wrote 0 bytes unexpectedly");
-      return;
+      return $self->_fail(ERROR_WRITE_FAULT, 
+        "WriteFile wrote 0 bytes unexpectedly");
     }
 
     $total += $written;
@@ -322,25 +342,44 @@ sub Read {
   croak "usage: Read(\$pipe)\n" unless @_ == 1 && ref $self;
 
   # Reset last error state for this call
-  ($self->{errorNum}, $self->{errorText}) = (0, '');
-
-  # Validate handle
-  my $hPipe = $self->{hPipe} || 0;
-  unless ($hPipe && $hPipe != INVALID_HANDLE_VALUE) {
-    ($self->{errorNum}, $self->{errorText}) 
-      = (ERROR_INVALID_HANDLE, "Write failed");
-    return;
-  }
+  $self->_fail(0, '');
 
   my $bufsize = $self->{bufferSize} || BUFFER_SIZE;
 
-  my $data   = '';
-  my $chunk  = "\0" x $bufsize;  # pre-allocate buffer
-  my $read   = 0;
+  my $data  = '';
+  my $read  = 0;
 
-  while (1) {
-    my $r = ReadFile($self->{hPipe}, $chunk, $bufsize, $read, []);
+  unless ($self->{blocking}) {
+    # Mode: non-blocking
+    if ($self->get_Win32_IPC_HANDLE() == INVALID_HANDLE_VALUE) {
+      return $self->_fail(ERROR_INVALID_HANDLE, "ResetEvent failed");
+    }
 
+    my $avail = 0;
+    my $r = $PeekNamedPipe->Call($self->{hPipe}, undef, 0, undef, $avail, 
+      undef);
+    if (!$r) {
+      return $self->_fail(Win32::GetLastError(), "PeekNamedPipe failed");
+    }
+
+    if ($avail == 0) {
+      # Valid, but zero bytes: fast return
+      return '';
+    } 
+    elsif ($avail < $bufsize) {
+      # If necessary, adjust the buffer size to the expected message size
+      $bufsize = $avail;
+    }
+    $self->{event}->set();
+  }
+
+  while (length($data) < $bufsize) {
+    my $remaining  = $bufsize - length($data);
+    my $chunk_size = $remaining > $bufsize ? $bufsize : $remaining;
+    my $chunk = "\0" x $chunk_size;    # pre-allocate buffer
+
+    Win32::SetLastError(0);
+    my $r = ReadFile($self->{hPipe}, $chunk, $chunk_size, $read, []);
     if ($r) {
       # Successful read; $read may be 0 (EOF/peer closed).
       if ($read == 0) {
@@ -351,24 +390,37 @@ sub Read {
       $data .= substr($chunk, 0, $read);
       last;
     }
-    else {
-      my $err = Win32::GetLastError();
 
-      if ($err == ERROR_MORE_DATA) {
-        # Partial message: append what we got and continue reading the rest
-        $data .= substr($chunk, 0, $read) if $read;
-        next;
-      }
-      elsif ($err == ERROR_BROKEN_PIPE || $err == ERROR_PIPE_NOT_CONNECTED) {
-        # Peer closed while reading: return data collected so far
-        last;
-      }
-      else {
-        # Genuine error
-        ($self->{errorNum}, $self->{errorText}) = ($err, "Read failed");
-        return;
-      }
+    my $err = Win32::GetLastError();
+    if ($err == ERROR_MORE_DATA) {
+      # Partial message: append what was received and read the rest, 
+      # or leave the loop immediately in non-blocking mode
+      $data .= bytes::substr($chunk, 0, $read) if $read;
+      $self->{blocking} ? next : last;
     }
+
+    # Error
+    if ( $err == ERROR_BROKEN_PIPE
+      || $err == ERROR_NO_DATA
+      || $err == ERROR_PIPE_NOT_CONNECTED
+    ) {
+      # Peer closed while reading: return data collected so far
+      return $self->_fail($err, "Read failed: peer closed/not connected");
+    } 
+    # Genuine error
+    return $self->_fail($err, "Read failed");
+  }
+
+  unless ($self->{blocking}) {
+    # After reading: check whether data is still there
+    my $avail = 0;
+    my $r = $PeekNamedPipe->Call($self->{hPipe}, undef, 0, undef, $avail, 
+      undef);
+    if (!$r) {
+      return $self->_fail(Win32::GetLastError(), "PeekNamedPipe failed");
+    }
+    # Data still available: Set event
+    $self->{event}->set() if $avail > 0;
   }
 
   return $data;
@@ -377,7 +429,7 @@ sub Read {
 # Internal error handling
 sub Error {
   my ($self) = @_;
-  croak "usage: Error([\$pipe]);\n" if @_ > 1;
+  croak "usage: Error([\$class | \$pipe]);\n" if @_ > 1;
 
   my ($no, $msg);
   if (ref $self) {
@@ -394,7 +446,7 @@ sub Close {
   croak "usage: Close(\$pipe);\n" unless @_ == 1 && ref $self;
 
   # Reset last error state for this call
-  ($self->{errorNum}, $self->{errorText}) = (0, '');
+  $self->_fail(0, '');
 
   # already closed -> success (no-op)
   return 1 unless $self->{hPipe} && $self->{hPipe} != INVALID_HANDLE_VALUE;
@@ -431,11 +483,10 @@ sub Connect {
   my $r = $ConnectNamedPipe->Call($self->{hPipe}, undef);
 	if (!$r) {
     my $err = Win32::GetLastError();
-    # Treat "already connected" as success
-    unless ($err == ERROR_PIPE_CONNECTED) {
-      ($self->{errorNum}, $self->{errorText}) = ($err, "Connect failed");
-      return;
-    }
+    # Success scenarios (asynchronous/timing):
+    return 1 if $err == ERROR_PIPE_CONNECTED;  # Client was faster
+    return 1 if $err == ERROR_IO_PENDING;      # Overlapped pending
+    return $self->_fail($err, "Connect failed");
 	}
   return 1;
 }
@@ -446,7 +497,7 @@ sub Disconnect {
     unless @_ >= 1 && @_ <= 2 && ref $self;
 
   # Clear last error for this operation
-  ($self->{errorNum}, $self->{errorText}) = (0, '');
+  $self->_fail(0, '');
 
   my $hPipe = $self->{hPipe} || 0;
 
@@ -459,7 +510,7 @@ sub Disconnect {
     if (!$r) {
       my $err = Win32::GetLastError();
       # Tolerate common benign cases; still proceed to disconnect/close.
-      if ($err != ERROR_INVALID_HANDLE
+      if ( $err != ERROR_INVALID_HANDLE
         && $err != ERROR_BROKEN_PIPE
         && $err != ERROR_NOT_SUPPORTED
       ) {
@@ -516,15 +567,27 @@ sub Disconnect {
 sub BufferSize {
   my ($self, $size) = @_;
   croak "usage: BufferSize(\$pipe);\n" unless @_ == 1 && ref $self;
-
-  return 0+$self->{bufferSize};
+  return $self->{bufferSize};
 }
 
 sub ResizeBuffer {
   my ($self, $size) = @_;
   croak "usage: ResizeBuffer(\$pipe, \$size);\n" unless @_ == 2 && ref $self;
+  $size += 0;
 
-  $self->{bufferSize} = 0+$size;
+  # Buffer sizes are only advisory values in CreateNamedPipe anyway and are 
+  # specified during creation.
+  my ($in, $out) = (0, 0);
+  unless ($GetNamedPipeInfo->Call($self->{hPipe}, undef, $out, $in, undef)) {
+    return _fail(Win32::GetLastError(), "GetNamedPipeInfo failed");
+  }
+
+  # TODO: ResizeBuffer() is only implemented correctly if you re-instantiate 
+  # when necessary (e.g., if the kernel buffer is too small) – because the 
+  # kernel buffer size cannot be changed dynamically. 
+  $size = $out if $size > $out;
+  $size = $in  if $size > $in;
+  $self->{bufferSize} = $size;
   return 1;
 }
 
@@ -543,34 +606,101 @@ sub Info {
 sub Credit { ... }
 sub Center { ... }
 
+# Extensions
+
+sub blocking {
+  my ($self, $value) = @_;
+  croak "usage: blocking(\$pipe [, \$value]);\n" 
+    unless @_ >= 1 && @_ <= 2 && ref $self;
+  if (@_ == 2) {
+    $self->{blocking} = $value ? 1 : 0;
+  }
+  return $self->{blocking};
+}
+
+# Wait for Win32::Event to be signalled. See Win32::IPC.
+sub wait {
+  my ($self, $timeout) = @_;
+  croak "usage: wait(\$pipe [, \$timeout]);\n" 
+    unless @_ >= 1 && @_ <= 2 && ref $self;
+
+  $timeout = INFINITE unless defined $timeout;
+
+  # Reset last error state for this call
+  $self->_fail(0, '');
+
+  if ($self->{blocking}) {
+    return $self->_fail(ERROR_INVALID_FUNCTION, "SetEvent failed");
+  }
+  if ($self->get_Win32_IPC_HANDLE() == INVALID_HANDLE_VALUE) {
+    return $self->_fail(ERROR_INVALID_HANDLE, "WaitForSingleObject failed");
+  }
+
+  my $start = Win32::GetTickCount();
+  my $wait = 50;
+  while (1) {
+    my $avail = 0;
+    my $r = $PeekNamedPipe->Call($self->{hPipe}, undef, 0, undef, $avail, 
+      undef);
+    if (!$r) {
+      # An error occurred
+      return $self->_fail(Win32::GetLastError(), "PeekNamedPipe failed");
+    }
+    if ($avail > 0) {
+      # Signal external listeners und exit
+      $self->{event}->set();
+      return 1;
+    }
+
+    unless ($timeout == INFINITE) {
+      # Exit the loop when the time is elapsed
+      my $elapsed = Win32::GetTickCount() - $start;
+      last if $elapsed >= $timeout;
+
+      # Adjust wait time if less than 50 ms remain
+      my $remaining = $timeout - $elapsed;
+      $wait = $remaining if $remaining < 50;
+    }
+
+    # Waiting for external signal (max 50ms)
+    last if $self->{event}->wait($wait);
+  }
+
+  return 0;
+}
+
 # Win32::IPC support
 sub get_Win32_IPC_HANDLE {
   my ($self) = @_;
-  return INVALID_HANDLE_VALUE unless ref $self && defined $self->{handle};
-  return $self->{handle};
+  my $hEvent = ${$self->{event}} if ref $self && $self->{event};
+  return INVALID_HANDLE_VALUE unless defined $hEvent;
+  return $hEvent;
+}
+
+# Private Methods
+sub _fail {
+  if (@_ == 3 && ref $_[0]) {
+    my $self = shift;
+    ($self->{errorNum}, $self->{errorText}) = @_;
+    Win32::SetLastError($^E = $self->{errorNum});
+  } 
+  elsif (@_ == 2) {
+    ($ErrorNum, $ErrorText) = @_;
+    Win32::SetLastError($^E = $ErrorNum);
+  }
+  return;
 }
 
 {
   package    # hide from CPAN
     Win32::Pipe;
-  no strict 'refs';
-  no warnings 'redefine';
-  *new          = \&Win32::Pipe::PP::new;
-  *DESTROY      = \&Win32::Pipe::PP::DESTROY;
-  *Write        = \&Win32::Pipe::PP::Write;
-  *Read         = \&Win32::Pipe::PP::Read;
-  *Error        = \&Win32::Pipe::PP::Error;
-  *Close        = \&Win32::Pipe::PP::Close;
-  *Connect      = \&Win32::Pipe::PP::Connect;
-  *Disconnect   = \&Win32::Pipe::PP::Disconnect;
-  *BufferSize   = \&Win32::Pipe::PP::BufferSize;
-  *ResizeBuffer = \&Win32::Pipe::PP::ResizeBuffer;
-  *Info         = \&Win32::Pipe::PP::Info;
-  *Credit       = \&Win32::Pipe::PP::Credit
-                    unless defined \&Win32::Pipe::Credit;
-  *Center       = \&Win32::Pipe::PP::Center
-                    unless defined \&Win32::Pipe::Center;
-  *get_Win32_IPC_HANDLE = \&Win32::Pipe::PP::get_Win32_IPC_HANDLE;
+  no warnings;
+  if ($ENV{WIN32_PIPE_IMPLEMENTATION} ne 'XS') {
+    our @ISA = qw( Win32::Pipe::PP );
+    no strict 'refs';
+    *Error       = \&Win32::Pipe::PP::Error;
+    *BUFFER_SIZE = \&Win32::Pipe::PP::BUFFER_SIZE;
+  }
 }
 
 1;
@@ -641,9 +771,13 @@ Resizes the internal buffer.
 
 Returns a array with internal metadata.
 
+=item wait
+
+Wait for Read to be signalled. See L<Win32::IPC>.
+
 =item get_Win32_IPC_HANDLE
 
-Returns the raw handle for IPC integration.
+Returns the raw handle for L<Win32::IPC> integration.
 
 =back
 

@@ -1,5 +1,10 @@
 # Version/Revision history
 
+1.02 Thu 23 Oct 2025 20:33:38 MSK
+    * Added address param to suffitauth.authenticate helper
+    * Added support for human-readable expiration values
+    * Documentation modified
+
 1.01 Tue 16 Apr 2024 21:00:40 MSK
     * Added method suffitauth.options that returns options-set
     * Added method suffitauth.unauthorize for unauthorize

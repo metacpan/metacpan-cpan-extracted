@@ -5,7 +5,7 @@
       "Steffen Mueller <smueller@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -56,8 +56,8 @@
          "web" : "https://github.com/mbarbon/devel-statprofiler"
       }
    },
-   "version" : "0.53",
-   "x_generated_by_perl" : "v5.24.4",
+   "version" : "0.55",
+   "x_generated_by_perl" : "v5.36.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }

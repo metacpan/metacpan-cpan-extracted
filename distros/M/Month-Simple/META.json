@@ -4,13 +4,13 @@
       "Moritz Lenz <moritz.lenz@noris.de>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Month-Simple",
    "no_index" : {
@@ -33,10 +33,11 @@
       "runtime" : {
          "requires" : {
             "Date::Simple" : "0",
-            "perl" : "5.01"
+            "perl" : "5.010"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.04"
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

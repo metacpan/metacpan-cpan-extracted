@@ -9,7 +9,7 @@ use warnings;
 
 use Scalar::Util;
 use Digest::MD5;
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 our @EXPORT = qw[ wrap_hash ];
 
@@ -547,7 +547,7 @@ sub _build_constructor {    ## no critic (ExcessComplexity)
     $dict{lock} = do {
         my @eval;
 
-        if ( defined( my $opts = $args->{-immutable} ) ) {
+        if ( defined( my $opts = $args->{-immutable} || undef ) ) {
 
             push @USE, q[use Hash::Util ();];
 
@@ -563,7 +563,7 @@ sub _build_constructor {    ## no critic (ExcessComplexity)
 
             push @eval, 'Hash::Util::lock_hash(%$hash)';
         }
-        elsif ( defined $args->{-lockkeys} ) {
+        elsif ( defined( $opts = $args->{-lockkeys} || undef ) ) {
 
             push @USE, q[use Hash::Util ();];
 
@@ -731,7 +731,7 @@ Hash::Wrap - create on-the-fly objects from hashes
 
 =head1 VERSION
 
-version 1.05
+version 1.06
 
 =head1 SYNOPSIS
 

@@ -73,7 +73,7 @@ err_out:
 EXPORT_SYMBOL(csnappy_get_uncompressed_length);
 #endif
 
-#if defined(__arm__) && !(ARCH_ARM_HAVE_UNALIGNED)
+#if defined(__arm__) && !defined(ARCH_ARM_HAVE_UNALIGNED)
 int csnappy_decompress_noheader(
 	const char	*src_,
 	uint32_t	src_remaining,
@@ -266,12 +266,12 @@ SAW__AppendFastPath(struct SnappyArrayWriter *this_,
 		    const char *ip, uint32_t len)
 {
 	char *op = this_->op;
-	const int space_left = this_->op_limit - op;
+	const uint32_t space_left = this_->op_limit - op;
 	if (likely(space_left >= 16)) {
 		UnalignedCopy64(ip, op);
 		UnalignedCopy64(ip + 8, op + 8);
 	} else {
-                if (unlikely(space_left < (int32_t)len))
+                if (unlikely(space_left < len))
 			return CSNAPPY_E_OUTPUT_OVERRUN;
 		memcpy(op, ip, len);
 	}
@@ -284,8 +284,8 @@ SAW__Append(struct SnappyArrayWriter *this_,
 	    const char *ip, uint32_t len)
 {
 	char *op = this_->op;
-	const int space_left = this_->op_limit - op;
-        if (unlikely(space_left < (int32_t)len))
+	const uint32_t space_left = this_->op_limit - op;
+        if (unlikely(space_left < len))
 		return CSNAPPY_E_OUTPUT_OVERRUN;
 	memcpy(op, ip, len);
 	this_->op = op + len;
@@ -297,7 +297,7 @@ SAW__AppendFromSelf(struct SnappyArrayWriter *this_,
 		    uint32_t offset, uint32_t len)
 {
 	char *op = this_->op;
-	const int space_left = this_->op_limit - op;
+	const uint32_t space_left = this_->op_limit - op;
 	/* -1u catches offset==0 */
 	if (op - this_->base <= offset - 1u)
 		return CSNAPPY_E_DATA_MALFORMED;
@@ -305,10 +305,10 @@ SAW__AppendFromSelf(struct SnappyArrayWriter *this_,
 	if (len <= 16 && offset >= 8 && space_left >= 16) {
 		UnalignedCopy64(op - offset, op);
 		UnalignedCopy64(op - offset + 8, op + 8);
-        } else if (space_left >= (int32_t)(len + kMaxIncrementCopyOverflow)) {
+        } else if (space_left >= (len + kMaxIncrementCopyOverflow)) {
 		IncrementalCopyFastPath(op - offset, op, len);
 	} else {
-                if (space_left < (int32_t)len)
+                if (space_left < len)
 			return CSNAPPY_E_OUTPUT_OVERRUN;
 		IncrementalCopy(op - offset, op, len);
 	}

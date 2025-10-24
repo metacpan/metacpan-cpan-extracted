@@ -1,13 +1,13 @@
 ---
 abstract: 'Non-blocking MikroTik API client'
 author:
-  - 'Andre Parker <andreparker@gmail.com>'
+  - 'Andre Parker <anparker@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,11 +19,11 @@ no_index:
     - inc
     - t
 requires:
-  AnyEvent: '7.00'
-  perl: '5.012000'
+  Mojolicious: '7.054'
+  perl: '5.016'
 resources:
-  bugtracker: https://github.com/anparker/mikrotik-client/issues
-  license: http://www.opensource.org/licenses/artistic-license-2.0
-  repository: https://github.com/anparker/mikrotik-client.git
-version: v0.530
+  bugtracker: https://codeberg.org/anparker/mikrotik-client/issues
+  license: https://www.perlfoundation.org/artistic-license-20.html
+  repository: https://codeberg.org/anparker/mikrotik-client.git
+version: v0.601
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

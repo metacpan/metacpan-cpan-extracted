@@ -1,5 +1,15 @@
 Revision history for Params-Validate-Strict
 
+0.21	Thu Oct 23 20:12:51 EDT 2025
+	Added cross_validation parameter for validating relationships between fields
+	Added notmemberof to blacklist items
+	Added case_sensitive flag (defaults to 1)
+
+0.20	Thu Oct 23 08:22:29 EDT 2025
+	Added conditional validation rules
+	Added custom types
+	Added transformation/sanitization rules
+
 0.19	Tue Oct 21 15:34:58 EDT 2025
 	Allow a parameter to have different allowable types
 

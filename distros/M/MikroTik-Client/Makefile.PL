@@ -7,26 +7,26 @@ WriteMakefile(
     NAME         => 'MikroTik::Client',
     VERSION_FROM => 'lib/MikroTik/Client.pm',
     ABSTRACT     => 'Non-blocking MikroTik API client',
-    AUTHOR       => 'Andre Parker <andreparker@gmail.com>',
+    AUTHOR       => 'Andre Parker <anparker@cpan.org>',
     LICENSE      => 'artistic_2',
     META_MERGE   => {
         dynamic_config => 0,
         'meta-spec'    => {version => 2},
         no_index       => {directory => ['t']},
-        prereqs        => {runtime => {requires => {perl => '5.012000'}}},
+        prereqs        => {runtime => {requires => {perl => '5.016'}}},
         resources      => {
             bugtracker =>
-                {web => 'https://github.com/anparker/mikrotik-client/issues'},
+                {web => 'https://codeberg.org/anparker/mikrotik-client/issues'},
             license =>
-                ['http://www.opensource.org/licenses/artistic-license-2.0'],
+                ['https://www.perlfoundation.org/artistic-license-20.html'],
             repository => {
                 type => 'git',
-                url  => 'https://github.com/anparker/mikrotik-client.git',
-                web  => 'https://github.com/anparker/mikrotik-client',
+                url  => 'https://codeberg.org/anparker/mikrotik-client.git',
+                web  => 'https://codeberg.org/anparker/mikrotik-client',
             },
         },
     },
-    PREREQ_PM => {'AnyEvent' => '7.00'},
-    test      => {TESTS      => 't/*.t'},
+    PREREQ_PM => {'Mojolicious' => '7.054'},
+    test      => {TESTS         => 't/*.t'},
 );
 

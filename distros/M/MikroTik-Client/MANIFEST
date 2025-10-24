@@ -7,6 +7,7 @@ lib/MikroTik/Client/Sentence.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.bak
 MANIFEST.SKIP
 README.md
 t/certs/ca.crt

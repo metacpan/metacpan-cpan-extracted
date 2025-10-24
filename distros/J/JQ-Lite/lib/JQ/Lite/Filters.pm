@@ -328,7 +328,56 @@ sub apply {
         # support for select(...)
         if ($part =~ /^select\((.+)\)$/) {
             my $cond = $1;
-            @next_results = grep { JQ::Lite::Util::_evaluate_condition($_, $cond) } @results;
+            @next_results = ();
+
+            my $has_wildcard_array = index($cond, '[]') != -1;
+            my $has_comparison = ($cond =~ /(==|!=|>=|<=|>|<|\band\b|\bor\b|\bcontains\b|\bhas\b|\bmatch\b)/i);
+            my $use_streaming_eval = $has_wildcard_array || !$has_comparison;
+
+            VALUE: for my $value (@results) {
+                my $simple = JQ::Lite::Util::_evaluate_condition($value, $cond) ? 1 : 0;
+
+                if ($use_streaming_eval) {
+                    my $json = JQ::Lite::Util::_encode_json($value);
+                    my $error;
+                    my @cond_results;
+
+                    {
+                        local $@;
+                        @cond_results = eval { $self->run_query($json, $cond) };
+                        $error = $@;
+                    }
+
+                    if ($error) {
+                        if ($simple) {
+                            push @next_results, $value;
+                        }
+
+                        next VALUE;
+                    }
+
+                    if (@cond_results) {
+                        my $truthy = 0;
+
+                        for my $cond_value (@cond_results) {
+                            if (JQ::Lite::Util::_is_truthy($cond_value)) {
+                                $truthy++;
+                            }
+                        }
+
+                        if ($truthy) {
+                            push @next_results, (($value) x $truthy);
+                        }
+
+                        next VALUE;
+                    }
+                }
+
+                if ($simple) {
+                    push @next_results, $value;
+                }
+            }
+
             @$out_ref = @next_results;
             return 1;
         }

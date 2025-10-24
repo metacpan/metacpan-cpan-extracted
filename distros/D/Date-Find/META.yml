@@ -35,6 +35,6 @@ resources:
   bugtracker: https://github.com/Corion/Date-Find/issues
   license: https://dev.perl.org/licenses/
   repository: git://github.com/Corion/Date-Find.git
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

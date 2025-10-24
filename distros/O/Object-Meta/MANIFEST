@@ -1,6 +1,7 @@
 lib/Object/Meta.pm
 lib/Object/Meta/List.pm
 LICENSE
+Makefile.PL
 MANIFEST			This list of files
 README.md
 t/test_object-list.t

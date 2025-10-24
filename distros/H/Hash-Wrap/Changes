@@ -1,5 +1,12 @@
 Revision history for Hash-Wrap
 
+1.06      2025-10-23 17:45:42-04:00 America/New_York
+
+  [ENHANCEMENT]
+
+    * version 1.05 introduced a bug  making hashes immutable if the
+    -immutable attribute was specified, regardless of its value.
+
 1.05      2025-10-19 22:22:19-04:00 America/New_York
 
   [ENHANCEMENT]

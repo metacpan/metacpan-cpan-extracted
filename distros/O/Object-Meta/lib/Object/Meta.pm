@@ -1,7 +1,7 @@
 #
 # @author Bodo (Hugo) Barwich
-# @version 2023-05-07
-# @package Indexed List
+# @version 2025-10-21
+# @package Object::Meta
 # @subpackage Object/Meta.pm
 
 # This Module defines Classes to manage Data in an indexed List
@@ -25,7 +25,7 @@ Object::Meta - Library to manage data and meta data as one object but keeping it
 
 package Object::Meta;
 
-our $VERSION = '1.0.0';
+our $VERSION = '1.0.1';
 
 #----------------------------------------------------------------------------
 #Dependencies
@@ -110,8 +110,6 @@ C<DATA> is a list which is passed in a hash like fashion, using key and value pa
 =cut
 
 sub set {
-
-    #Take the Method Parameters
     my ( $self, %hshprms ) = @_;
 
     foreach ( keys %hshprms ) {
@@ -138,8 +136,6 @@ C<DATA> is a list which is passed in a hash like fashion, using key and value pa
 =cut
 
 sub setMeta {
-
-    #Take the Method Parameters
     my ( $self, %hshprms ) = @_;
 
     foreach ( keys %hshprms ) {

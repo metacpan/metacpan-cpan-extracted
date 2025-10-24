@@ -1,4 +1,4 @@
-package Date::Find 0.02;
+package Date::Find 0.03;
 use 5.020;
 use experimental 'signatures';
 
@@ -27,7 +27,7 @@ Date::Find - find year, month, day from (filename) strings
                          'random.pdf',
                        ], components => 'ym');
   for my $info (@dates) {
-      say "$info->{value} - $info->{year} - $info->{month}";
+      say "$info->{value} - $info->{year} - $info->{month} - $info->{day}";
   }
   # statement_20221201.pdf - 2022 - 12 - 00
   # statement_02.12.2022.pdf - 2022 - 12 - 00
@@ -37,7 +37,7 @@ Date::Find - find year, month, day from (filename) strings
                          'random.pdf',
                        ], components => 'ym', mode => 'strict');
   for my $info (@dates) {
-      say "$info->{value} - $info->{year} - $info->{month}";
+      say "$info->{value} - $info->{year} - $info->{month} - $info->{day}";
   }
   # statement_20221201.pdf - 2022 - 12 - 00
   # statement_02.12.2022.pdf - 2022 - 12 - 00
@@ -95,11 +95,11 @@ our $xdy =
     ;
 
 our %date_type = (
-    ymd => qr/(?<year>(?:20)\d\d)([-]?)(?<month>0\d|1[012])(\2)(?<day>[012]\d|3[01])/,
+    ymd => qr/(?<year>(?:20)\d\d)([-.]?)(?<month>0\d|1[012])(\2)(?<day>[012]\d|3[01])/,
     dmy => qr/(?<day>[012]\d|3[01])([-.]?)(?<month>0\d|1[012])(\2)(?<year>(?:20)\d\d)/,
     dxy => $dxy,
     xdy => $xdy,
-    ym  => qr/(?<year>(?:20)\d\d)([-]?)(?<month>0\d|1[012])/,
+    ym  => qr/(?<year>(?:20)\d\d)([-.]?)(?<month>0\d|1[012])/,
     my  => qr/(?<month>0\d|1[012])([-.]?)(?<year>(?:20)\d\d)/,
     y   => [qr/\D(?<year>(?:20)\d\d)\D/, qr/(?<year>(?:20)\d\d)/],
 );
@@ -220,7 +220,18 @@ sub guess_ymd( $sources, %options ) {
     } elsif( $options{ components }) {
         # Find all entries that have the wanted components and be done with it
         my $s = join "", sort split //, $options{ components };
+
         my %res;
+
+        # First, fill in from what the user specified, then fill in the remaining
+        # components from other guesses
+        if( $values->{ $options{ components }}) {
+            my $dt = $options{ components };
+            $res{ $_->{value} } //= $_
+                for @{$values->{$dt}};
+        }
+
+        # Fill in the remaining stuff from other guesses
         for my $dt (sort { length $b <=> length $a || $a cmp $b } keys %$values) {
             my $comp = join "", sort split //, $dt;
             if( $comp =~ /$s/ ) {
@@ -230,7 +241,6 @@ sub guess_ymd( $sources, %options ) {
         }
         my @res = map { $res{ $_ } ? $res{ $_ } : () } @$sources;
         return wantarray ? @res : $res[0];
-
 
     } else {
         (my $max) = sort { @$b <=> @$a } values %$values;

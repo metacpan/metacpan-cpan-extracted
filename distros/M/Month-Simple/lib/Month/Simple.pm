@@ -9,7 +9,7 @@ use Carp qw/croak/;
 
 use Data::Dumper;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use overload
     q[""] => sub { my $d = shift->first_day; return substr "$d", 0, 7 },
@@ -95,7 +95,7 @@ Month::Simple - Simple month-based date arithmetics
 
 =head1 VERSION
 
-Version 0.03
+Version 0.05
 
 =head1 SYNOPSIS
 
@@ -157,6 +157,10 @@ Returns the year as an integer.
 =head2 first_day
 
 Returns a L<Date::Simple> object for the first day of the month.
+
+=head2 last_day
+
+Returns a L<Date::Simple> object for the last day of the month.
 
 =head1 State of this module
 

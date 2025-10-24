@@ -1,5 +1,5 @@
 {
-   "abstract" : "Pure Perl Win32::Pipe replacement using Win32::API",
+   "abstract" : "Pure Perl replacement for Win32::Pipe using Win32::API",
    "author" : [
       "J. Schneider"
    ],
@@ -27,29 +27,37 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.56"
          }
       },
       "runtime" : {
          "requires" : {
             "Carp" : "0",
             "Exporter" : "0",
-            "Test::More" : "0",
             "Win32" : "0",
-            "Win32::API" : "0",
+            "Win32::API" : "0.77",
+            "Win32::IPC" : "1.06",
             "Win32API::File" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Config" : "0",
+            "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/yourname/Win32-Pipe-PP/issues"
+         "web" : "https://github.com/brickpool/Win32-Pipe-PP/issues"
       },
       "repository" : {
-         "url" : "https://github.com/yourname/Win32-Pipe-PP"
+         "type" : "git",
+         "url" : "https://github.com/brickpool/Win32-Pipe-PP.git",
+         "web" : "https://github.com/brickpool/Win32-Pipe-PP"
       }
    },
-   "version" : "v0.1.1",
+   "version" : "v0.2.2",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

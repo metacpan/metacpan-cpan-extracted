@@ -1,6 +1,7 @@
 bin/jq-lite
 Changes
 CONTRIBUTING.md
+FUNCTIONS.md
 lib/JQ/Lite.pm
 lib/JQ/Lite/Expression.pm
 lib/JQ/Lite/Filters.pm
@@ -90,6 +91,7 @@ t/reverse.t
 t/rindex.t
 t/round.t
 t/scalars.t
+t/select_stream.t
 t/setpath.t
 t/slice.t
 t/slurp_cli.t

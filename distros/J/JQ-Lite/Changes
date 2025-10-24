@@ -1,3 +1,29 @@
+1.26  2025-10-24
+  [Behavior]
+  - Run select() predicates as streaming filters so inputs pass once for each
+    truthy predicate result while preserving compatibility with comparison
+    expressions.
+
+1.25  2025-10-23
+  [CLI]
+  - Fix YAML input handling in jq-lite: allow scalar (non-ref) results to be
+    encoded without warnings or failure by adding `allow_nonref` to the
+    JSON::PP encoder in `print_results`. This resolves failures in
+    t/yaml_cli.t:
+      * YAML files auto-detected by extension now work as expected.
+      * No warnings are emitted when parsing YAML (file or STDIN with --yaml).
+      * Process exits successfully (status 0) on valid YAML input.
+    (PR: GH#XX)
+
+  [Behavior]
+  - Output behavior for JSON inputs is unchanged; raw/compact/color options
+    continue to work as before. YAML input is first converted to JSON and
+    scalar top-level values are now treated correctly.
+
+  [Internals]
+  - Minimal code change: `JSON::PP->new->utf8->allow_nonref->canonical`
+    in `print_results`.
+
 1.24  2025-10-22
     [Tests]
     - Rewrite t/yaml_cli.t to remove dependency on YAML::XS.
@@ -839,6 +865,8 @@
     - Removed use of eval in _evaluate_condition for better performance and stability.
     - Refactored _traverse for readability and maintainability.
     - Added support for multi-level array traversal (e.g., .users[].friends[].name).
+
+
 
 
 

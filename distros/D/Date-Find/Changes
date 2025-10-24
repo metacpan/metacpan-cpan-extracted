@@ -1,3 +1,16 @@
+0.03 2025-10-24
+    * 0.02 never was indexed on MetaCPAN
+    * Support environment variables MOVE_YEAR_CREATE and MOVE_YEAR_TARGET
+      for configuration (suggested by Toby Inkster)
+    * More tests re-enabled
+    * Synopsis improved
+    * Dot is also allowed as date separator in addition to "-"
+    * The user-specified date specification takes precedence over other,
+      equivalent specifications. This helps if both a dmy and ymd date are
+      found within the filename
+    * Name offending file in error message when the target directory does
+      not exist
+
 0.02 2025-10-23
     * Fixed wrong prerequisite
     * Added options documentation and output to C<move-year> script

@@ -1,3 +1,7 @@
+v0.600
+    - Switch back to Mojo::IOLoop for event loop backend
+    - Update some links and contact info
+
 v0.530
     - Fix handling of newlines in responses.
     - Update certificates for TLS tests.

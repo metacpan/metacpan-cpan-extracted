@@ -1,7 +1,6 @@
-# MikroTik::Client - Non-blocking interface to MikroTik API. [![Build Status](https://travis-ci.org/anparker/mikrotik-client.svg?branch=master)](https://travis-ci.org/anparker/mikrotik-client)
+# MikroTik::Client - Non-blocking interface to MikroTik API.
 
-Blocking and non-blocking API interface with queries, command subscriptions
-and Promises/A.
+Blocking and non-blocking API interface with queries and command subscriptions.
 
 ```perl
   my $api = MikroTik::Client->new();
@@ -17,16 +16,14 @@ and Promises/A.
 
 
   # Non-blocking
-  my $cv = AE::cv;
   my $tag = $api->command(
       '/system/resource/print',
       {'.proplist' => 'board-name,version,uptime'} => sub {
           my ($api, $err, $list) = @_;
           ...;
-          $cv->send;
       }
   );
-  $cv->recv;
+  Mojo::IOLoop->start();
 
   # Subscribe
   $tag = $api->subscribe(
@@ -35,7 +32,8 @@ and Promises/A.
           ...;
       }
   );
-  my $t = AE::timer 3, 0, sub { $api->cancel($tag) };
+  Mojo::IOLoop->timer(3 => sub { $api->cancel($tag) });
+  Mojo::IOLoop->start();
 
   # Errors handling
   $api->command(
@@ -50,11 +48,11 @@ and Promises/A.
           ...;
       }
   );
+  Mojo::IOLoop->start();
 
   # Promises
-  $cv  = AE::cv;
   $api->cmd_p('/interface/print')
       ->then(sub { my $res = shift }, sub { my ($err, $attr) = @_ })
-      ->finally($cv);
-  $cv->recv;
+      ->finally(sub { Mojo::IOLoop->stop() });
+  Mojo::IOLoop->start();
 ```

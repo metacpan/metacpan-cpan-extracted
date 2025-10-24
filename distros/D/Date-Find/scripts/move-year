@@ -9,6 +9,7 @@ use File::Spec;
 use Date::Find 'find_ymd', 'guess_ymd', '%date_type', '%longname';
 use Pod::Usage;
 
+our $VERSION = '0.03';
 
 =head1 NAME
 
@@ -85,6 +86,9 @@ Create directories if they don't exist.
 
 Elements of the intermediate directory to be created. Defaults to B<y>.
 
+Use B<--directory-style=sprintf> to specify your own template. B<%y>, B<%m> and B<%d>
+will be replaced by their respective values in the target directory name.
+
 =item B<--part-separator>
 
 Separator for the elements of the intermediate directory. Defaults to B<->.
@@ -127,7 +131,11 @@ $directory_style //= 'y';
 
 $date_type //= 'ymd';
 
-my $target = pop @ARGV;
+$create_directories //= $ENV{'MOVE_YEAR_CREATE'};
+
+my $target = ( -f $ARGV[-1] and exists $ENV{'MOVE_YEAR_TARGET'})
+  ? $ENV{'MOVE_YEAR_TARGET'}
+  : pop(@ARGV);
 
 if( ! -d $target and $directory_style ne 'sprintf') {
     die "'$target' is not a directory";
@@ -136,6 +144,7 @@ if( ! -d $target and $directory_style ne 'sprintf') {
 sub move_file {
     my( $source,$target,%ymd ) = @_;
     my $target_dir;
+
     if( $directory_style eq 'sprintf' ) {
         $target_dir = $target =~ s/%([ymd])/$ymd{ $longname{ $1 }}/reg;
 
@@ -156,7 +165,7 @@ sub move_file {
                 make_path $target_dir;
             };
         } else {
-            die "'$target_dir' does not exist (forgot --create ?)\n";
+            die "'$target_dir' does not exist for $source (forgot --create ?)\n";
         }
     }
     my $name = basename($source);
@@ -193,3 +202,19 @@ for my $file (@ARGV) {
         warn "Skipping '$file' (no date found)\n";
     }
 }
+
+=head1 ENVIRONMENT VARIABLES
+
+=over 4
+
+=item B<MOVE_YEAR_CREATE>
+
+Set the C<<--create>> option from the environment
+
+=item B<MOVE_YEAR_TARGET>
+
+Set the target directory
+
+=back
+
+=cut

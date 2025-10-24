@@ -4,7 +4,7 @@
       "Bodo (Hugo) Barwich <b.barwich@hotmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -22,7 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.46"
          }
       },
       "configure" : {
@@ -37,6 +37,16 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v1.0.0",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/bodo-hugo-barwich/object-meta/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/bodo-hugo-barwich/object-meta.git",
+         "web" : "https://github.com/bodo-hugo-barwich/object-meta"
+      }
+   },
+   "version" : "v1.0.1",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

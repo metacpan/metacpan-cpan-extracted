@@ -1,10 +1,10 @@
 {
    "abstract" : "Non-blocking MikroTik API client",
    "author" : [
-      "Andre Parker <andreparker@gmail.com>"
+      "Andre Parker <anparker@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -33,25 +33,25 @@
       },
       "runtime" : {
          "requires" : {
-            "AnyEvent" : "7.00",
-            "perl" : "5.012000"
+            "Mojolicious" : "7.054",
+            "perl" : "5.016"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/anparker/mikrotik-client/issues"
+         "web" : "https://codeberg.org/anparker/mikrotik-client/issues"
       },
       "license" : [
-         "http://www.opensource.org/licenses/artistic-license-2.0"
+         "https://www.perlfoundation.org/artistic-license-20.html"
       ],
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/anparker/mikrotik-client.git",
-         "web" : "https://github.com/anparker/mikrotik-client"
+         "url" : "https://codeberg.org/anparker/mikrotik-client.git",
+         "web" : "https://codeberg.org/anparker/mikrotik-client"
       }
    },
-   "version" : "v0.530",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "v0.601",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

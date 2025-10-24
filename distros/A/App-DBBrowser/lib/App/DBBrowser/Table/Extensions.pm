@@ -206,10 +206,14 @@ sub __choose_extension {
     EXTENSION: while ( 1 ) {
         my $info = $ax->get_sql_info( $sql ) . $sf->nested_func_info( $r_data );
         my $extension;
-        #if ( @$extensions == 1 ) { ##
-        #    $extension = $extensions->[0];
-        #}
-        #else {
+        if ( @$extensions == 1 && (
+               ( $caller eq 'value' && ! $sf->{o}{enable}{extended_values} )
+            || ( $caller eq 'argument' && ! $sf->{o}{enable}{extended_args} )
+        ) ) {
+            $extension = $extensions->[0];
+        }
+        else {
+
             my $empty;
             if ( $caller eq 'column' && $clause eq 'where' ) {
                 $empty = 'skip'; ##
@@ -233,7 +237,8 @@ sub __choose_extension {
                 $old_idx = $idx;
             }
             $extension = $extensions->[$idx-@pre];
-        #}
+
+        }
         my $cols = $sf->__avail_cols_in_extenstions( $sql, $clause, $extension );
         if ( $extension eq $e_const ) {
             my $prompt = $opt->{prompt} // 'Value: ';

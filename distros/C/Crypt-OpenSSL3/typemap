@@ -1,0 +1,77 @@
+TYPEMAP
+
+INPUT
+T_MAGICEXT
+	{
+	SV* arg = $arg;
+	MAGIC* magic = SvROK(arg) && SvMAGICAL(SvRV(arg)) ? mg_findext(SvRV(arg), PERL_MAGIC_ext, &${type}_magic) : NULL;
+	if (magic)
+		$var = ($type)magic->mg_ptr;
+	else
+		Perl_croak(aTHX_ \"%s object is lacking magic\", \"$ntype\");
+	}
+
+T_MAGICEXT_BASE
+	{
+	SV* arg = $arg;
+	MAGIC* magic = SvROK(arg) && SvMAGICAL(SvRV(arg)) ? mg_find(SvRV(arg), PERL_MAGIC_ext) : NULL;
+	if (magic && magic->mg_virtual)
+		$var = ($type)magic->mg_ptr;
+	else
+		Perl_croak(aTHX_ \"%s object is lacking magic\", \"$ntype\");
+	}
+
+T_MAGICBUF
+	{
+	SV* arg = $arg;
+	MAGIC* magic = SvROK(arg) && SvRMAGICAL(SvRV(arg)) ? mg_findext(SvRV(arg), PERL_MAGIC_ext, NULL) : NULL;
+	if (magic)
+		$var = ($type)magic->mg_ptr;
+	else
+		Perl_croak(aTHX_ \"%s object is lacking magic\", \"$ntype\");
+	}
+
+T_INTOBJ
+    {
+		SV * sv = $arg;
+		if (SvROK(sv) && sv_derived_from(sv, \"$ntype\"))
+			$var = ($type)SvUV(SvRV(sv));
+		else
+			croak(\"%s: %s is not of type %s\", ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]}, \"$var\", \"$ntype\");
+    }
+
+T_INTREF
+    {
+		SV * sv = $arg;
+		if (SvROK(sv) && SvIOK(SvRV(sv)))
+			$var = ($type)SvUV(SvRV(sv));
+		else 
+			croak(\"%s: %s is not a reference\", ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]}, \"$var\");
+    }
+
+
+OUTPUT
+T_MAGICEXT
+	{
+	MAGIC* magic = sv_magicext(newSVrv($arg, "$ntype"), NULL, PERL_MAGIC_ext, &${type}_magic, (const char*)$var, 0);
+	magic->mg_flags |= MGf_COPY|MGf_DUP;
+	}
+
+T_MAGICBUF
+	{
+	MAGIC* magic = sv_magicext(newSVrv($arg, "$ntype"), NULL, PERL_MAGIC_ext, NULL, (const char*)$var, 0);
+	magic->mg_len = sizeof(*$var);
+	}
+
+T_INTOBJ
+	{
+		sv_setref_uv($arg, \"$ntype\", (UV)$var);
+		SvREADONLY_on(SvRV($arg));
+	}
+
+T_INTREF
+	{
+		sv_setref_uv($arg, NULL, (UV)$var);
+		SvREADONLY_on(SvRV($arg));
+	}
+

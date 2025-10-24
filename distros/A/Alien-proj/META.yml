@@ -48,7 +48,7 @@ configure_requires:
   PkgConfig: '0'
   Sort::Versions: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -65,9 +65,9 @@ requires:
 resources:
   bugtracker: https://github.com/shawnlaffan/perl-alien-proj/issues/
   repository: https://github.com/shawnlaffan/perl-alien-proj
-version: '1.30'
+version: '1.31'
 x_alienfile:
-  generated_by: 'Alien::Build::MM version 2.83'
+  generated_by: 'Alien::Build::MM version 2.84'
   requires:
     share:
       Alien::MSYS: '0.07'
@@ -85,4 +85,4 @@ x_alienfile:
       URI: '0'
       URI::Escape: '0'
     system: {}
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

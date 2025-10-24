@@ -10,7 +10,7 @@ BEGIN {
 my $pipe = Win32::Pipe->new("\\\\.\\pipe\\", 0);    # invalid Name
 ok(!$pipe, 'Pipe creation fails');
 
-my ($code, $msg) = Win32::Pipe::Error();
+my ($code, $msg) = Win32::Pipe->Error();
 ok($code, 'Error code set');
 like($msg, 
   qr/Name is too short|CreateFile failed|CreateNamedPipe failed/i,

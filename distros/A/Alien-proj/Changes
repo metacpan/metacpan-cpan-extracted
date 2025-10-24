@@ -1,7 +1,10 @@
 Revision history for Alien::proj
 
+1.31 2025-10-24
+    - Fix rpath specification in share builds.
+
 1.30 2024-12-04
-    - Ensure Alien::sqlite system aliens are not pass to Plugin::SearchDeps.
+    - Ensure Alien::sqlite system aliens are not passed to Plugin::SearchDeps.
       This was missed in the previous release.  
 
 1.29 2024-10-24

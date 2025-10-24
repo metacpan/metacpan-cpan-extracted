@@ -20,7 +20,7 @@ Date::Find - find year, month, day from (filename) strings
                            'random.pdf',
                          ], components => 'ym');
     for my $info (@dates) {
-        say "$info->{value} - $info->{year} - $info->{month}";
+        say "$info->{value} - $info->{year} - $info->{month} - $info->{day}";
     }
     # statement_20221201.pdf - 2022 - 12 - 00
     # statement_02.12.2022.pdf - 2022 - 12 - 00
@@ -30,7 +30,7 @@ Date::Find - find year, month, day from (filename) strings
                            'random.pdf',
                          ], components => 'ym', mode => 'strict');
     for my $info (@dates) {
-        say "$info->{value} - $info->{year} - $info->{month}";
+        say "$info->{value} - $info->{year} - $info->{month} - $info->{day}";
     }
     # statement_20221201.pdf - 2022 - 12 - 00
     # statement_02.12.2022.pdf - 2022 - 12 - 00

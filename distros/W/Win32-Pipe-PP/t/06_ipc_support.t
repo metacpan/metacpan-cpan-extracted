@@ -18,8 +18,9 @@ SKIP: {
   skip 'Win32::IPC not installed', 1 unless eval q( use Win32::IPC; !$@ );
 
   # Test wait_any compatibility (structurally only, no real signal)
-  my $index = Win32::IPC::wait_any([$pipe], 100);
-  ok(!defined $index, 'wait_any returns undef on timeout');
+  my $handles = [ $pipe ];
+  my $r = Win32::IPC::wait_any(@$handles, 100);
+  ok(defined($r), 'wait_any returns a defined value');
 };
 
 done_testing;

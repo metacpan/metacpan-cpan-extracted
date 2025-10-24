@@ -1,11 +1,13 @@
 ---
-abstract: 'Pure Perl Win32::Pipe replacement using Win32::API'
+abstract: 'Pure Perl replacement for Win32::Pipe using Win32::API'
 author:
   - 'J. Schneider'
 build_requires:
+  Config: '0'
   ExtUtils::MakeMaker: '0'
+  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '6.56'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150010'
 license: mit
@@ -20,12 +22,12 @@ no_index:
 requires:
   Carp: '0'
   Exporter: '0'
-  Test::More: '0'
   Win32: '0'
-  Win32::API: '0'
+  Win32::API: '0.77'
+  Win32::IPC: '1.06'
   Win32API::File: '0'
 resources:
-  bugtracker: https://github.com/yourname/Win32-Pipe-PP/issues
-  repository: https://github.com/yourname/Win32-Pipe-PP
-version: v0.1.1
+  bugtracker: https://github.com/brickpool/Win32-Pipe-PP/issues
+  repository: https://github.com/brickpool/Win32-Pipe-PP.git
+version: v0.2.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

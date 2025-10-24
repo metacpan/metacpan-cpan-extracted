@@ -1,0 +1,7 @@
+Revision history for Crypt-OpenSSL3
+
+0.002     2025-10-23 23:30:37+02:00 Europe/Brussels
+          - Various compilation fixes for clang and C++
+
+0.001     2025-10-23 21:07:16+02:00 Europe/Brussels
+          - Initial release

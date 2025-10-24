@@ -1,7 +1,7 @@
 #
 # @author Bodo (Hugo) Barwich
-# @version 2023-05-20
-# @package Indexed List
+# @version 2025-10-21
+# @package Object::Meta
 # @subpackage Object/Meta/List.pm
 
 # This Module defines Classes to manage Data in an indexed List
@@ -189,7 +189,8 @@ sub _indexMetaObject {
 #print "idx nm: '$hshidxcnf->{'indexname'}'; chk fld: '$hshidxcnf->{'checkfield'}'; fld vl: '$slstchkvl'; idx vl: '$slstidxvl'\n";
 
                 if ( $slstidxvl ne '' ) {
-                    $self->[LIST_ENTRIES_INDEXED]{ $hshidxcnf->{'indexname'} } = ()
+                    $self->[LIST_ENTRIES_INDEXED]{ $hshidxcnf->{'indexname'} }
+                      = ()
                       unless (
                         defined $self->[LIST_ENTRIES_INDEXED]
                         { $hshidxcnf->{'indexname'} } );
@@ -198,8 +199,8 @@ sub _indexMetaObject {
                         defined $self->[LIST_ENTRIES_INDEXED]
                         { $hshidxcnf->{'indexname'} }{$slstidxvl} )
                     {
-                        $self->[LIST_ENTRIES_INDEXED]{ $hshidxcnf->{'indexname'} }
-                          {$slstidxvl} = $mtaety;
+                        $self->[LIST_ENTRIES_INDEXED]
+                          { $hshidxcnf->{'indexname'} }{$slstidxvl} = $mtaety;
 
                         #Count the Entries
                         if ( defined $hshidxcnf->{'count'}

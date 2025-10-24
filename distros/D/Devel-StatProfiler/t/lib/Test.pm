@@ -35,10 +35,15 @@ our @EXPORT = (
         temp_profile_file
         visual_test
         sub_at_line
+        $TEST_PM
+        $SLOWOPS_PM
+        %Config
   )
 );
 
-our $TAKE_SAMPLE_LINE;
+our ($TAKE_SAMPLE_LINE, $SPAWN_LINE);
+our $TEST_PM = $INC{'t/lib/Test.pm'};
+our $SLOWOPS_PM; # assigned in Slowops.pm
 
 sub import {
     unshift @INC, 't/lib';
@@ -223,7 +228,7 @@ sub run_ctests {
 }
 
 sub spawn {
-    my ($sub, @args) = @_;
+    my ($sub, @args) = @_; BEGIN { $SPAWN_LINE = __LINE__ }
 
     if ($Config{usethreads}) {
         return threads->create($sub);

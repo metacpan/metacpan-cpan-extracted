@@ -14,11 +14,16 @@ t/50-even-more.t
 t/alternative.t
 t/array.t
 t/comment-spelling.t
+t/cross_validation.t
+t/custom_types.t
+t/custom_validation.t
 t/default.t
 t/eof.t
 t/eol.t
 t/get.t
+t/memberof.t
 t/nested.t
+t/notmemberof.t
 t/pod-cm.t
 t/pod-coverage.t
 t/pod-spelling.t
@@ -27,6 +32,7 @@ t/pod.t
 t/prereq.t
 t/strict.t
 t/tabs.t
+t/transform.t
 t/validate.t
 t/vars.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

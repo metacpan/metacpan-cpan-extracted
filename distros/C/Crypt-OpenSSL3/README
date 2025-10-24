@@ -1,0 +1,91 @@
+NAME
+
+    Crypt::OpenSSL3 - A modern OpenSSL wrapper
+
+DESCRIPTION
+
+    This distribution provides access to the SSL implementation and
+    cryptography provided by OpenSSL. Key packages in this distribution
+    include:
+
+      * Crypt::OpenSSL3::SSL - actual SSL connections
+
+      * Crypt::OpenSSL3::PKey - Assymetrical keys
+
+      * Crypt::OpenSSL3::Cipher - Symmetric ciphers
+
+      * Crypt::OpenSSL3::MD - Message digests
+
+      * Crypt::OpenSSL3::MAC - Message Authentication Codes
+
+      * Crypt::OpenSSL3::KDF - Key Derivation Functions
+
+      * Crypt::OpenSSL3::X509 - X509 certificates
+
+    This package itself only two pieces of functionality: error handling
+    and build configuration introspection.
+
+RECENT CHANGES
+
+    Changes for version 0.002 (2025-10-23)
+
+      * Various compilation fixes for clang and C++
+
+    See the Changes file for more details.
+
+REQUIREMENTS
+
+    This module lists the following modules as runtime dependencies:
+
+      * XSLoader
+
+      * perl version 5.010 or later
+
+      * strict
+
+      * warnings
+
+    See the META.json file for the full list of prerequisites.
+
+INSTALLATION
+
+    The latest version of this module (along with any dependencies) can be
+    installed from CPAN <https://www.cpan.org> with the cpan tool that is
+    included with Perl:
+
+        cpan Crypt::OpenSSL3
+
+    You can also extract the distribution archive and install this module
+    (along with any dependencies):
+
+        cpan .
+
+    You can also install this module manually using the following commands:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+    If you are working with the source repository, then it may not have a
+    Makefile.PL file. But you can use the Dist::Zilla <https://dzil.org/>
+    tool in anger to build and install this module:
+
+        dzil build
+        dzil test
+        dzil install --install-command="cpan ."
+
+    For more information, see the INSTALL file included with this
+    distribution.
+
+AUTHOR
+
+    Leon Timmermans <fawaka@gmail.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2025 by Leon Timmermans.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

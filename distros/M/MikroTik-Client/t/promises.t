@@ -5,59 +5,56 @@ use strict;
 
 BEGIN {
     $ENV{MIKROTIK_CLIENT_CONNTIMEOUT} = 0.5;
+    $ENV{MOJO_NO_TLS}                 = 1;
 }
 
 use FindBin;
 use lib './';
 use lib "$FindBin::Bin/lib";
 
-use AE;
 use Errno qw(ECONNREFUSED);
 use MikroTik::Client;
 use MikroTik::Client::Mockup;
+use Mojo::IOLoop;
 use Test::More;
 
-plan skip_all => 'Promises v0.99+ required for this test.'
-    unless MikroTik::Client->PROMISES;
-
 my $mockup = MikroTik::Client::Mockup->new();
-$mockup->server;
-my $port   = $mockup->port;
-
+my $port   = Mojo::IOLoop->acceptor($mockup->server)->port;
 my $api    = MikroTik::Client->new(
     user     => 'test',
     password => 'tset',
     host     => '127.0.0.1',
-    port     => 0,
+    port     => $port,
     tls      => 0,
 );
 
-my $p = $api->cmd_p('/resp');
-isa_ok $p, 'Promises::Promise', 'right result type';
+my ($err, $p, $res);
 
 # connection errors
-my ($cv, $err, $res);
-$cv = AE::cv;
-$p->catch(sub { ($err, $res) = @_ })->finally($cv);
-$cv->recv;
+$api->port(0);
+$p
+    = $api->cmd_p('/resp')
+    ->catch(sub { ($err, $res) = @_ })
+    ->finally(sub { Mojo::IOLoop->stop() });
+Mojo::IOLoop->start();
 ok $! == ECONNREFUSED, 'connection error';
-ok !$res, 'no error attributes';
+ok !$res,              'no error attributes';
 $api->port($port);
 
+# result type
+isa_ok $p, 'Mojo::Promise', 'right result type';
+
 # error
-$cv = AE::cv;
-$api->cmd_p('/err')->catch(sub { ($err, $res) = @_ })
-    ->finally($cv);
-$cv->recv;
+$api->cmd_p('/err')
+    ->catch(sub { ($err, $res) = @_ })
+    ->finally(sub { Mojo::IOLoop->stop() });
+Mojo::IOLoop->start();
 is $err, 'random error', 'right error';
-is_deeply $res, [{message => 'random error', category => 0}],
-    'right error attributes';
+is_deeply $res, [{message => 'random error', category => 0}], 'right error attributes';
 
 # request
-$cv  = AE::cv;
-$api->cmd_p('/resp')->then(sub { $res = $_[0] })
-    ->finally($cv);
-$cv->recv;
+$api->cmd_p('/resp')->then(sub { $res = $_[0] })->finally(sub { Mojo::IOLoop->stop() });
+Mojo::IOLoop->start();
 is_deeply $res, _gen_result(), 'right result';
 
 done_testing();
@@ -66,3 +63,4 @@ sub _gen_result {
     my $attr = MikroTik::Client::Mockup::_gen_attr(@_);
     return [$attr, $attr];
 }
+

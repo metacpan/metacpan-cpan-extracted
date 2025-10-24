@@ -79,7 +79,7 @@ Devel::StatProfiler::NameMap
 
 =head1 VERSION
 
-version 0.53
+version 0.55
 
 =head1 AUTHORS
 

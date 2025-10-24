@@ -1,5 +1,19 @@
 Revision history for Win32::Pipe::PP
 
+0.2.2  2025-10-24
+    - README and POD adjustment
+    - Update Makefile.PL
+
+0.2.1  2025-10-12
+    - Inject Win32::Pipe::PP as base class for Win32::Pipe
+    - Update tests for threads and ipc support
+    - POD adjustment
+
+0.2.0  2025-10-09
+    - Add non-blocking support (only for 'Read')
+    - Add new methods 'blocking' and 'wait'
+    - The pipe handle is validated by a Windows API call
+
 0.1.1  2025-10-04
     - Hide my Win32::Pipe package from CPAN
 

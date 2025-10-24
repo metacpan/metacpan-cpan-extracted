@@ -1,3 +1,12 @@
+0.6.1  2025-10-23
+
+   - Added to remove command a default safety check preventing
+     removal of packages with dependents
+   - Added '-r' remove flag to remove package dependencies that
+     are safe to remove
+   - Added '-b' query flag to print path to packages local dir
+   - Overhauled the UI, removing features to make it much simpler
+
 0.5.1  2025-09-03
 
    - Added -m query flag to print all packages with no parents

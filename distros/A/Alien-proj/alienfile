@@ -315,9 +315,9 @@ share {
   my $install_path = $h->{install}{prefix};
   my @rpath;
   if (!$on_windows && defined $install_path && @alien_rpaths) {
-    my $origin_string = $^O =~ /darwin/ ? '@loader_path' : '\$ORIGIN';
+    my $origin_string = $^O =~ /darwin/ ? '@loader_path' : '$ORIGIN';
     my $alien_rpath_text
-      = join ':',
+      = join ';',
         (map {$origin_string . '/../' . path ($_)->relative($install_path)->stringify} @alien_rpaths),
         @alien_rpaths;
     @rpath = (qq{-DCMAKE_INSTALL_RPATH='$alien_rpath_text'});
@@ -377,6 +377,7 @@ sub remove_gitfw_from_path {
 
   @PATH
     = grep {path($_)->stringify =~ m|/usr/bin$| && path($_) ne $msys_path ? () : $_}
+      grep {length}
       @PATH;
 
   my $removed = $count - @PATH;

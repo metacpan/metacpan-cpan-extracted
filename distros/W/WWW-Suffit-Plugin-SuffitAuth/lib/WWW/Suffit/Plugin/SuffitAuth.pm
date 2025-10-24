@@ -1,5 +1,6 @@
 package WWW::Suffit::Plugin::SuffitAuth;
 use strict;
+use warnings;
 use utf8;
 
 =encoding utf8
@@ -13,10 +14,11 @@ WWW::Suffit::Plugin::SuffitAuth - The Suffit plugin for Suffit API authenticatio
     sub startup {
         my $self = shift->SUPER::startup();
         $self->plugin('SuffitAuth', {
-            configsection => 'suffitauth',
-            expiration => SESSION_EXPIRATION,
-            public_key_file => 'suffitauth_pub.key',
-            userfile_format => 'user-%s.json',
+            configsection    => 'SuffitAuth',
+            expiration       => 3600, # 1h
+            cache_expiration => 300, # 5m
+            public_key_file  => 'suffitauth_pub.key',
+            userfile_format  => 'user-%s.json',
         });
 
         # . . .
@@ -45,6 +47,7 @@ This plugin supports the following options
 =head2 cache_expiration
 
     cache_expiration => 300
+    cache_expiration => '5m'
 
 This option sets default cache expiration time for keep user data in cache
 
@@ -53,6 +56,7 @@ Default: 300 (5 min)
 =head2 configsection
 
     configsection => 'suffitauth'
+    configsection => 'SuffitAuth'
 
 This option sets a section name of the config file for define
 namespace of configuration directives for this plugin
@@ -61,6 +65,8 @@ Default: 'suffitauth'
 
 =head2 expiration
 
+    expiration => 3600
+    expiration => '1h'
     expiration => SESSION_EXPIRATION
 
 This option performs set a default expiration time of session
@@ -92,14 +98,16 @@ This plugin provides the following helpers
 =head2 suffitauth.authenticate
 
     my $auth = $self->suffitauth->authenticate({
+        address     => $self->remote_ip($self->app->trustedproxies),
+        method      => $self->req->method, # 'ANY'
         base_url    => $self->base_url,
         referer     => $self->req->headers->header("Referer"),
         username    => $username,
         password    => $password,
         loginpage   => 'login', # -- To login-page!!
         expiration  => $remember ? SESSION_EXPIRE_MAX : SESSION_EXPIRATION,
-        realm       => "Test zone",
-        options     => {},
+        realm       => "Test zone", # Reserved. Now is not supported
+        options     => {}, # Reserved. Now is not supported
     });
     if (my $err = $auth->get('/error')) {
         if (my $location = $auth->get('/location')) { # Redirect
@@ -127,13 +135,28 @@ result object (L<Mojo::JSON::Pointer>) that contains data structure:
         location    => undef,       # Location URL for redirects
     }
 
+This method is typically called in a handler responsible for the authentication and authorization
+process, such as `login`. The call is typically made before a session is established, for eg.:
+
+    # Set session
+    $self->session(
+            username => $username,
+            remember => $remember ? 1 : 0,
+            logged   => time,
+            $remember ? (expiration => SESSION_EXPIRE_MAX) : (),
+        );
+    $self->flash(message => 'Thanks for logging in.');
+
+    # Go to protected page (/root)
+    $self->redirect_to('root');
+
 =head2 suffitauth.authorize
 
     my $auth = $self->suffitauth->authorize({
         referer     => $referer,
         username    => $username,
         loginpage   => 'login', # -- To login-page!!
-        options     => {},
+        options     => {}, # Reserved. Now is not supported
     });
     if (my $err = $auth->get('/error')) {
         if (my $location = $auth->get('/location')) {
@@ -193,6 +216,20 @@ The 'user' is structure that describes found user. For eg.:
         "username": "admin"
     }
 
+Typically, this method is called in the handler responsible for session accounting (logged_in).
+The call is accompanied by staking of the authorization data into the corresponding
+project templates, for example:
+
+    # Stash user data
+    $self->stash(
+        username => $username,
+        name     => $auth->get('/user/name') // 'Anonymous',
+        email_md5=> $auth->get('/user/email_md5') // '',
+        role     => $auth->get('/user/role') // 'User',
+        user     => $auth->get('/user') || {},
+    );
+
+
 =head2 suffitauth.client
 
     my $client = $self->suffitauth->client;
@@ -246,6 +283,23 @@ result object (L<Mojo::JSON::Pointer>) that contains data structure:
         code        => 'E0000',     # The Suffit error code
         username    => $username,   # User name
     }
+
+This method is typically called in the handler responsible for the logout process.
+The call usually occurs before the redirect to the `login` page, for example:
+
+    # Remove session
+    $self->session(expires => 1);
+
+    # Unauthorize
+    if (my $username = $self->session('username')) {
+        my $authdata = $self->suffitauth->unauthorize(username => $username);
+        if (my $err = $authdata->get('/error')) {
+            $self->reply->error($authdata->get('/status'), $authdata->get('/code'), $err);
+        }
+    }
+
+    # To login-page!
+    $self->redirect_to('login');
 
 =head1 METHODS
 
@@ -308,7 +362,7 @@ Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<g
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2024 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2025 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -321,7 +375,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 use Mojo::Base 'Mojolicious::Plugin';
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use File::stat;
 use Mojo::File qw/path/;
@@ -329,7 +383,7 @@ use Mojo::Util qw/encode md5_sum hmac_sha1_sum/;
 use Mojo::JSON::Pointer;
 use WWW::Suffit::Client::V1;
 use WWW::Suffit::Const qw/ :session /;
-use WWW::Suffit::Util qw/json_load json_save/;
+use WWW::Suffit::Util qw/json_load json_save parse_time_offset/;
 
 use constant {
     SUFFITAUTH_PREFIX   => 'suffitauth',
@@ -343,8 +397,9 @@ has _options => sub { {} };
 sub register {
     my ($plugin, $app, $opts) = @_; # $self = $plugin
     $opts //= {};
-    my $configsection = $opts->{configsection} || SUFFITAUTH_PREFIX;
-    my $expiration = $opts->{expiration} // SESSION_EXPIRATION;
+    my $configsection = lc($opts->{configsection} || SUFFITAUTH_PREFIX);
+    my $expiration = parse_time_offset($opts->{expiration} // SESSION_EXPIRATION);
+    my $cache_expiration = parse_time_offset($opts->{cache_expiration} // CACHE_EXPIRATION);
     my $public_key_file = $opts->{public_key_file} || PUBLIC_KEY_FILE;
        $public_key_file = path($app->app->datadir, $public_key_file)->to_string
             unless path($public_key_file)->is_abs;
@@ -353,7 +408,7 @@ sub register {
     # Options
     $plugin->_options->{ 'configsection' } = $configsection;
     $plugin->_options->{ 'expiration' } = $expiration; # Session & Userdata expiration (3600)
-    $plugin->_options->{ 'cache_expiration' } = $opts->{cache_expiration} || CACHE_EXPIRATION;
+    $plugin->_options->{ 'cache_expiration' } = $cache_expiration; # Cache expiration (300)
     $plugin->_options->{ 'public_key_file' } = $public_key_file;
     $plugin->_options->{ 'userfile_format' } = $opts->{userfile_format} || USERFILE_FORMAT;
     $app->helper( 'suffitauth.options' => sub { state $opts = $plugin->_options } );
@@ -440,7 +495,8 @@ sub _authenticate {
        $password = encode('UTF-8', $password) if length $password; # chars to bytes
     my $referer = $args{referer} // $self->req->headers->header("Referer") // '';
     my $loginpage = $args{loginpage} // '';
-    my $expiration = $args{expiration} || $self->suffitauth->options->{expiration} || 0;
+    my $expiration = parse_time_offset($args{expiration} || 0) || $self->suffitauth->options->{expiration} || 0;
+    my $address = $args{address} || $self->remote_ip($self->app->trustedproxies);
     my %payload = ( # Ok by default
         error       => '',          # Error message
         status      => 200,         # HTTP status code
@@ -475,7 +531,7 @@ sub _authenticate {
     my $client = $self->suffitauth->client;
 
     # Authentication
-    unless ($client->authn($username, $password)) { # Error
+    unless ($client->authn($username, $password, $address)) { # Error
         my $code = $client->res->json("/code") || 'E7005';
         $self->log->error(sprintf("[%s] %s: %s", $code, $client->code, $client->apierr));
         $payload{error}     = $client->apierr;
@@ -490,7 +546,7 @@ sub _authenticate {
             $args{base_url} || $self->base_url,
             { # Error
                 username    => $username,
-                address     => $self->remote_ip($self->app->trustedproxies),
+                address     => $address,
                 verbose     => 1,
             })
     ) {
