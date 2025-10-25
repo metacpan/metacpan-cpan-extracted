@@ -25,7 +25,6 @@ our @DUCKDB_TYPES = qw(
     DUCKDB_TYPE_TIME
     DUCKDB_TYPE_INTERVAL
     DUCKDB_TYPE_HUGEINT
-    DUCKDB_TYPE_UHUGEINT
     DUCKDB_TYPE_VARCHAR
     DUCKDB_TYPE_BLOB
     DUCKDB_TYPE_DECIMAL
@@ -36,12 +35,13 @@ our @DUCKDB_TYPES = qw(
     DUCKDB_TYPE_LIST
     DUCKDB_TYPE_STRUCT
     DUCKDB_TYPE_MAP
-    DUCKDB_TYPE_ARRAY
     DUCKDB_TYPE_UUID
     DUCKDB_TYPE_UNION
     DUCKDB_TYPE_BIT
     DUCKDB_TYPE_TIME_TZ
     DUCKDB_TYPE_TIMESTAMP_TZ
+    DUCKDB_TYPE_UHUGEINT
+    DUCKDB_TYPE_ARRAY
     DUCKDB_TYPE_ANY
     DUCKDB_TYPE_BIGNUM
     DUCKDB_TYPE_SQLNULL
@@ -80,7 +80,6 @@ use constant {
     DUCKDB_TYPE_TIME            => 14,    # duckdb_time
     DUCKDB_TYPE_INTERVAL        => 15,    # duckdb_interval
     DUCKDB_TYPE_HUGEINT         => 16,    # duckdb_hugeint
-    DUCKDB_TYPE_UHUGEINT        => 32,    # duckdb_uhugeint
     DUCKDB_TYPE_VARCHAR         => 17,    # const char*
     DUCKDB_TYPE_BLOB            => 18,    # duckdb_blob
     DUCKDB_TYPE_DECIMAL         => 19,    # duckdb_decimal
@@ -91,12 +90,13 @@ use constant {
     DUCKDB_TYPE_LIST            => 24,    # list type, only useful as logical type
     DUCKDB_TYPE_STRUCT          => 25,    # struct type, only useful as logical type
     DUCKDB_TYPE_MAP             => 26,    # map type, only useful as logical type
-    DUCKDB_TYPE_ARRAY           => 33,    # duckdb_array, only useful as logical type
     DUCKDB_TYPE_UUID            => 27,    # duckdb_hugeint
     DUCKDB_TYPE_UNION           => 28,    # union type, only useful as logical type
     DUCKDB_TYPE_BIT             => 29,    # duckdb_bit
     DUCKDB_TYPE_TIME_TZ         => 30,    # duckdb_time_tz
     DUCKDB_TYPE_TIMESTAMP_TZ    => 31,    # duckdb_timestamp (microseconds)
+    DUCKDB_TYPE_UHUGEINT        => 32,    # duckdb_uhugeint
+    DUCKDB_TYPE_ARRAY           => 33,    # duckdb_array, only useful as logical type
     DUCKDB_TYPE_ANY             => 34,    # enum type, only useful as logical type
     DUCKDB_TYPE_BIGNUM          => 35,    # duckdb_bignum
     DUCKDB_TYPE_SQLNULL         => 36,    # enum type, only useful as logical type
@@ -112,6 +112,12 @@ use constant {
     DUCKDB_RESULT_TYPE_NOTHING      => 2,
     DUCKDB_RESULT_TYPE_QUERY_RESULT => 3,
 };
+
+my $_i = 0;
+our %DUCKDB_TYPE_IDS = map { $_i++ => $_ } @DUCKDB_TYPES;
+
+sub DUCKDB_TYPE { $DUCKDB_TYPE_IDS{$_[1]} }
+
 
 1;
 

@@ -1,4 +1,6 @@
-1.6.0  xx.xx.2024
+1.6.1  24.10.2025
+           - fix pod chapter references
+1.6.0  18.03.2025
            - add sv_defined() function to replace perl's SvOK() which doesn't work properly with magical variables ($1, etc)
            - remove legacy code
            - adopt for ExtUtils::ParseXS >= 3.53 (perl 5.41)

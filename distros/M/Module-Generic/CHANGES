@@ -1,5 +1,9 @@
 Revision history for Perl module Module::Generic
 
+v1.1.3 2025-10-24T21:08:39+0900
+    - Improved method colour_parse(), and related unit tests
+    - Added methods force_tty() to affect colour messaging output, and colour_max_depth() used in colour_parse() for coloured debugging output.
+
 v1.1.2 2025-10-19T16:37:01+0900
     - Corrected method error(9 to also check for non-empty . Gitlab #5
 

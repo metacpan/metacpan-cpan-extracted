@@ -1,6 +1,6 @@
 =head1 NAME
 
-XS::Framework::Manual::recipe06 - XS::Framework advanced topic
+XS::Framework::Manual::recipe11 - XS::Framework advanced topic
 
 =cut
 

@@ -5,21 +5,21 @@ use warnings;
 require Exporter ;
 use bytes;
 
-use IO::Compress::Base 2.213 ;
+use IO::Compress::Base 2.214 ;
 
-use IO::Compress::Base::Common  2.213 qw(createSelfTiedObject);
-use IO::Compress::Adapter::Lzf  2.213 ;
+use IO::Compress::Base::Common  2.214 qw(createSelfTiedObject);
+use IO::Compress::Adapter::Lzf  2.214 ;
 #use Compress::Lzf ;
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $LzfError);
 
-$VERSION = '2.213';
+$VERSION = '2.214';
 $LzfError = '';
 
 @ISA    = qw( IO::Compress::Base Exporter );
 @EXPORT_OK = qw( $LzfError lzf ) ;
 %EXPORT_TAGS = %IO::Compress::Base::EXPORT_TAGS ;
-push @{ $EXPORT_TAGS{all} }, @EXPORT_OK ;
+$EXPORT_TAGS{all} = [ defined $EXPORT_TAGS{all} ? @{ $EXPORT_TAGS{all} } : (), @EXPORT_OK ] ;
 Exporter::export_ok_tags('all');
 
 sub new
@@ -824,7 +824,7 @@ See the Changes file.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2005-2024 Paul Marquess. All rights reserved.
+Copyright (c) 2005-2025 Paul Marquess. All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

@@ -10,8 +10,9 @@ build_requires:
   Test::Differences: '0'
 configure_requires:
   Module::Build: '0.3601'
+  Module::Build::WithXSpp: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +27,7 @@ requires:
 resources:
   homepage: https://github.com/mbarbon/devel-statprofiler
   repository: https://github.com/mbarbon/devel-statprofiler.git
-version: '0.55'
-x_generated_by_perl: v5.36.0
+version: '0.56'
+x_generated_by_perl: v5.34.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

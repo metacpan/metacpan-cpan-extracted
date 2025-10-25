@@ -44,6 +44,7 @@ Functions are grouped by purpose for easier lookup.
 | `split(sep)`, `join(sep)`            | Split and join                       |
 | `substr(start, len)`                 | Substring extraction                 |
 | `replace(old, new)`                  | Replace substring (literal)          |
+| `@csv`, `@tsv`                       | Format array or value as CSV/TSV row |
 | `explode()`, `implode()`             | String ↔ Unicode code points         |
 | `tostring`, `tojson`, `fromjson`     | Serialization utilities              |
 

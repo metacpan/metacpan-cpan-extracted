@@ -1,0 +1,77 @@
+{
+   "node" : {
+      "A" : {
+         "message" : "A",
+         "next" : [
+            "A-A",
+            "A-B"
+         ],
+         "tmavg" : 10,
+         "tmmax" : 99,
+         "tmmin" : 1
+      },
+      "A-A" : {
+         "message" : "A-A",
+         "next" : [
+            "terminal"
+         ],
+         "tmavg" : 10,
+         "tmmax" : 99,
+         "tmmin" : 1
+      },
+      "A-B" : {
+         "message" : "A-B",
+         "next" : [
+            "terminal"
+         ],
+         "tmavg" : 10,
+         "tmmax" : 99,
+         "tmmin" : 1
+      },
+      "B" : {
+         "message" : "B",
+         "next" : [
+            "B-A",
+            "B-B"
+         ],
+         "tmavg" : 10,
+         "tmmax" : 99,
+         "tmmin" : 1
+      },
+      "B-A" : {
+         "message" : "B-A",
+         "next" : [
+            "terminal"
+         ],
+         "tmavg" : 10,
+         "tmmax" : 99,
+         "tmmin" : 1
+      },
+      "B-B" : {
+         "message" : "B-B",
+         "next" : [
+            "terminal"
+         ],
+         "tmavg" : 10,
+         "tmmax" : 99,
+         "tmmin" : 1
+      },
+      "root" : {
+         "finish" : "terminal",
+         "message" : "root",
+         "next" : [
+            "A",
+            "B"
+         ],
+         "tmavg" : 10,
+         "tmmax" : 99,
+         "tmmin" : 1
+      },
+      "terminal" : {
+         "message" : "terminal",
+         "tmavg" : 0,
+         "tmmax" : 0,
+         "tmmin" : 0
+      }
+   }
+}

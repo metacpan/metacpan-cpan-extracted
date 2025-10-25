@@ -69,11 +69,13 @@ our @EXPORT_OK = qw(
     duckdb_column_name
     duckdb_column_type
     duckdb_connect
+    duckdb_create_config
     duckdb_data_chunk_get_size
     duckdb_data_chunk_get_vector
     duckdb_decimal_internal_type
     duckdb_decimal_scale
     duckdb_decimal_width
+    duckdb_destroy_config
     duckdb_destroy_data_chunk
     duckdb_destroy_logical_type
     duckdb_destroy_prepare
@@ -82,6 +84,10 @@ our @EXPORT_OK = qw(
     duckdb_execute_prepared
     duckdb_fetch_chunk
     duckdb_free
+    duckdb_from_date
+    duckdb_from_time
+    duckdb_from_time_tz
+    duckdb_from_timestamp
     duckdb_get_type_id
     duckdb_library_version
     duckdb_list_type_child_type
@@ -89,6 +95,7 @@ our @EXPORT_OK = qw(
     duckdb_map_type_key_type
     duckdb_map_type_value_type
     duckdb_open
+    duckdb_open_ext
     duckdb_prepare
     duckdb_prepare_error
     duckdb_query
@@ -96,6 +103,7 @@ our @EXPORT_OK = qw(
     duckdb_result_return_type
     duckdb_row_count
     duckdb_rows_changed
+    duckdb_set_config
     duckdb_struct_type_child_count
     duckdb_struct_type_child_name
     duckdb_struct_type_child_type
@@ -122,6 +130,7 @@ sub init {
     $ffi->type(int64_t => 'duckdb_time');
     $ffi->type(int64_t => 'duckdb_timestamp');
     $ffi->type(opaque  => 'duckdb_appender');
+    $ffi->type(opaque  => 'duckdb_config');
     $ffi->type(opaque  => 'duckdb_connection');
     $ffi->type(opaque  => 'duckdb_data_chunk');
     $ffi->type(opaque  => 'duckdb_database');
@@ -133,18 +142,28 @@ sub init {
 
     # TODO  Use record for duckdb_time, duckdb_date and duckdb_timestamp ???
 
-    $ffi->type('record(DBD::DuckDB::FFI::Decimal)'  => 'duckdb_decimal');
-    $ffi->type('record(DBD::DuckDB::FFI::HugeInt)'  => 'duckdb_hugeint');
-    $ffi->type('record(DBD::DuckDB::FFI::Interval)' => 'duckdb_interval');
-    $ffi->type('record(DBD::DuckDB::FFI::Result)'   => 'duckdb_result');
-    $ffi->type('record(DBD::DuckDB::FFI::uHugeInt)' => 'duckdb_uhugeint');
+    $ffi->type('record(DBD::DuckDB::FFI::Decimal)'   => 'duckdb_decimal');
+    $ffi->type('record(DBD::DuckDB::FFI::HugeInt)'   => 'duckdb_hugeint');
+    $ffi->type('record(DBD::DuckDB::FFI::Interval)'  => 'duckdb_interval');
+    $ffi->type('record(DBD::DuckDB::FFI::Result)'    => 'duckdb_result');
+    $ffi->type('record(DBD::DuckDB::FFI::uHugeInt)'  => 'duckdb_uhugeint');
+    $ffi->type('record(DBD::DuckDB::FFI::TimeTZ)'    => 'duckdb_time_tz_struct');
+    $ffi->type('record(DBD::DuckDB::FFI::Time)'      => 'duckdb_time_struct');
+    $ffi->type('record(DBD::DuckDB::FFI::Date)'      => 'duckdb_date_struct');
+    $ffi->type('record(DBD::DuckDB::FFI::Timestamp)' => 'duckdb_timestamp_struct');
 
     # Open Connect
-    $ffi->attach(duckdb_close           => ['duckdb_database*']                      => 'void');
-    $ffi->attach(duckdb_connect         => ['duckdb_database', 'duckdb_connection*'] => 'duckdb_state');
-    $ffi->attach(duckdb_disconnect      => ['duckdb_connection*']                    => 'void');
-    $ffi->attach(duckdb_library_version => []                                        => 'string');
-    $ffi->attach(duckdb_open            => ['string', 'duckdb_database*']            => 'duckdb_state');
+    $ffi->attach(duckdb_close           => ['duckdb_database*']                                => 'void');
+    $ffi->attach(duckdb_connect         => ['duckdb_database', 'duckdb_connection*']           => 'duckdb_state');
+    $ffi->attach(duckdb_disconnect      => ['duckdb_connection*']                              => 'void');
+    $ffi->attach(duckdb_library_version => []                                                  => 'string');
+    $ffi->attach(duckdb_open            => ['string', 'duckdb_database*']                      => 'duckdb_state');
+    $ffi->attach(duckdb_open_ext => ['string', 'duckdb_database*', 'duckdb_config', 'string*'] => 'duckdb_state');
+
+    # Configuration
+    $ffi->attach(duckdb_create_config  => ['duckdb_config*']                    => 'duckdb_state');
+    $ffi->attach(duckdb_destroy_config => ['duckdb_config*']                    => 'void');
+    $ffi->attach(duckdb_set_config     => ['duckdb_config', 'string', 'string'] => 'duckdb_state');
 
     # Query Execution
     $ffi->attach(duckdb_column_count        => ['duckdb_result*']          => 'idx_t');
@@ -196,6 +215,12 @@ sub init {
 
     # Helpers
     $ffi->attach(duckdb_free => ['opaque'] => 'void');
+
+    # Date Time Timestamp Helpers
+    $ffi->attach(duckdb_from_date      => ['opaque'] => 'duckdb_date_struct');
+    $ffi->attach(duckdb_from_time      => ['opaque'] => 'duckdb_time_struct');
+    $ffi->attach(duckdb_from_time_tz   => ['opaque'] => 'duckdb_time_tz_struct');
+    $ffi->attach(duckdb_from_timestamp => ['opaque'] => 'duckdb_timestamp_struct');
 
     # Validity Mask Functions
     $ffi->attach(duckdb_validity_row_is_valid => ['uint64_t', 'idx_t'] => 'bool');
@@ -374,6 +399,81 @@ package    # hide from PAUSE
 
 }
 
+package    # hide from PAUSE
+    DBD::DuckDB::FFI::Time {
+
+    use strict;
+    use warnings;
+    use FFI::Platypus::Record qw(record_layout_1);
+
+    # C struct (ABI v1.4):
+    # typedef struct {
+    #     int8_t hour;
+    #     int8_t min;
+    #     int8_t sec;
+    #     int32_t micros;
+    # } duckdb_time_struct;
+    record_layout_1(int8_t => 'hour', int8_t => 'min', int8_t => 'sec', int32_t => 'micros');
+
+}
+
+package    # hide from PAUSE
+    DBD::DuckDB::FFI::TimeTZ {
+
+    use strict;
+    use warnings;
+    use FFI::Platypus::Record qw(record_layout_1);
+
+    # C struct (ABI v1.4):
+    # typedef struct {
+    #     duckdb_time_struct time;
+    #     int32_t offset;
+    # } duckdb_time_tz_struct;
+    record_layout_1(int8_t => 'hour', int8_t => 'min', int8_t => 'sec', int32_t => 'micros', int32_t => 'offset');
+
+}
+
+package    # hide from PAUSE
+    DBD::DuckDB::FFI::Date {
+
+    use strict;
+    use warnings;
+    use FFI::Platypus::Record qw(record_layout_1);
+
+    # C struct (ABI v1.4):
+    # typedef struct {
+    #     int32_t year;
+    #     int8_t month;
+    #     int8_t day;
+    # } duckdb_date_struct;
+    record_layout_1(int32_t => 'year', int8_t => 'month', int8_t => 'day');
+
+}
+
+package    # hide from PAUSE
+    DBD::DuckDB::FFI::Timestamp {
+
+    use strict;
+    use warnings;
+    use FFI::Platypus::Record qw(record_layout_1);
+
+    # C struct (ABI v1.4):
+    # typedef struct {
+    #     duckdb_date_struct date;
+    #     duckdb_time_struct time;
+    # } duckdb_timestamp_struct;
+    record_layout_1(
+        int32_t => 'year',
+        int8_t  => 'month',
+        int8_t  => 'day',
+        int8_t  => 'hour',
+        int8_t  => 'min',
+        int8_t  => 'sec',
+        int32_t => 'micros'
+    );
+
+}
+
 1;
 
 __END__
@@ -409,6 +509,20 @@ L<DBD::DuckDB> use L<FFI::Platypus> for access to C<libduckdb> C library.
 =item duckdb_library_version
 
 =item duckdb_open
+
+=item duckdb_open_ext
+
+=back
+
+=head2 Configuration
+
+=over
+
+=item duckdb_create_config
+
+=item duckdb_destroy_config
+
+=item duckdb_set_config
 
 =back
 
@@ -523,6 +637,20 @@ L<DBD::DuckDB> use L<FFI::Platypus> for access to C<libduckdb> C library.
 =over
 
 =item duckdb_free
+
+=back
+
+=head2 Date Time Timestamp Helpers
+
+=over
+
+=item duckdb_from_date
+
+=item duckdb_from_time
+
+=item duckdb_from_time_tz
+
+=item duckdb_from_timestamp
 
 =back
 

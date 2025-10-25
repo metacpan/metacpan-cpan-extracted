@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Role::ShallowClone;
-$Bitcoin::Crypto::Role::ShallowClone::VERSION = '3.001';
+$Bitcoin::Crypto::Role::ShallowClone::VERSION = '3.002';
 use v5.10;
 use strict;
 use warnings;

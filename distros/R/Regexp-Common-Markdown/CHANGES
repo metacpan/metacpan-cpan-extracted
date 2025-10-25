@@ -1,5 +1,8 @@
 Revision history for Perl module Regexp::Common::Markdown
 
+v0.1.8 2025-10-24T22:31:14+0900
+    - Made a small correction for the HTML regular expressionm (vanilla and extended versions)
+
 v0.1.7 2025-10-21T11:54:34+0900
     - Improved code span to prevent it from capturing fenced blocks and indented codes
     - Improved code block, and extended code block to not include leading indentation

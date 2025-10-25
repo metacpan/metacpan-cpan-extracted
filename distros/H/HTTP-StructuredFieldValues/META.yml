@@ -1,0 +1,41 @@
+---
+abstract: 'Encode and decode HTTP Structured Field Values (RFC 9651) in Perl'
+author:
+  - 'SHIRAKATA Kentaro <argrath@ub32.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.27, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTTP-StructuredFieldValues
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  HTTP::StructuredFieldValues:
+    file: lib/HTTP\StructuredFieldValues.pm
+    version: '0.01'
+requires:
+  MIME::Base32: '0'
+  Tie::IxHash: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/argrath/HTTP-StructuredFieldValues/issues
+  homepage: https://github.com/argrath/HTTP-StructuredFieldValues
+  repository: https://github.com/argrath/HTTP-StructuredFieldValues.git
+version: '0.01'
+x_authority: cpan:ARGRATH
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
+x_static_install: 1

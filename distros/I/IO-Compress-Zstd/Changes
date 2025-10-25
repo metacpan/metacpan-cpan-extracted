@@ -1,6 +1,24 @@
 CHANGES
 -------
 
+  2.214 24 October 2025
+
+      * version 2.214
+        Fri Oct 24 16:56:19 2025 +0100
+        82a4cadec53b73b8aa14cd345bf1a54654690890
+
+      * Fix for IO-Compress#64
+        Fri Oct 24 15:52:38 2025 +0100
+        94a2541a925465008ebeeb482edb2a4621c75f86
+
+      * Add dependabot.yml to police workflow files
+        Thu Sep 4 17:26:04 2025 +0100
+        bbc809d66ec05476b446011666c8fed617f80032
+
+      * Add perl 5.42 to workflow files
+        Thu Sep 4 17:25:29 2025 +0100
+        56f53edfa34af8a73979074148d8fa8d6d37c988
+
   2.213 28 August 2024
 
       * no functional changes

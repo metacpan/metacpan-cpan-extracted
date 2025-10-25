@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Key::ExtPrivate;
-$Bitcoin::Crypto::Key::ExtPrivate::VERSION = '3.001';
+$Bitcoin::Crypto::Key::ExtPrivate::VERSION = '3.002';
 use v5.10;
 use strict;
 use warnings;
@@ -213,15 +213,17 @@ Bitcoin::Crypto::Key::ExtPrivate - Bitcoin extended private keys
 
 =head1 DESCRIPTION
 
-This class allows you to create an extended private key instance.
+This class allows you to create an extended private key instance. Extended keys
+can be used to securely generate as many addresses as needed through key
+derivation. This allows for long-term, reusable wallet with a single backup.
 
-You can use an extended private key to:
+Moreover, you can use an extended private key to:
 
 =over
 
 =item * generate extended public keys
 
-=item * derive extended keys using a path
+=item * derive extended keys using standard bip44 or a custom path
 
 =item * restore keys from mnemonic codes, seeds and base58 format
 

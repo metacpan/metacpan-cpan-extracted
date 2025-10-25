@@ -60,7 +60,7 @@ Devel::StatProfiler::Html
 
 =head1 VERSION
 
-version 0.55
+version 0.56
 
 =head1 AUTHORS
 

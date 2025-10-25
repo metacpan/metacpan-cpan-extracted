@@ -699,15 +699,15 @@ subtest "symbols" => sub
     my $expect = [qw(
         array array_object as_hash callback can choice choice2
         clear clear_error clone colour_close colour_closest
-        colour_format colour_open colour_parse colour_to_rgb
-        coloured created datetime debug deserialise dump_hex
-        dump_print dumper dumpto_dumper dumpto_printer errno
-        error error_handler fatal file hash id init io ip isa
-        message_colour messagef_colour metadata name new
-        new_array new_file new_hash new_number new_scalar
-        new_tempfile pass_error printer save serialise setget
-        setget_assign subclasses total trigger_error type uri
-        user_id value version
+        colour_format colour_max_depth colour_open colour_parse
+        colour_to_rgb coloured created datetime debug
+        deserialise dump_hex dump_print dumper dumpto_dumper
+        dumpto_printer errno error error_handler fatal file
+        force_tty hash id init io ip isa message_colour
+        messagef_colour metadata name new new_array new_file
+        new_hash new_number new_scalar new_tempfile pass_error
+        printer save serialise setget setget_assign subclasses
+        total trigger_error type uri user_id value version
     )]
 ;
     is_deeply( \@all => $expect, '_list_symbols' );

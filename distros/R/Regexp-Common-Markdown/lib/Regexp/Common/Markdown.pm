@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Markdown Common Regular Expressions - ~/lib/Regexp/Common/Markdown.pm
-## Version v0.1.7
+## Version v0.1.8
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/08/01
-## Modified 2025/10/21
+## Modified 2025/10/24
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -24,21 +24,23 @@ BEGIN
     ## URI::tel uses the latest rfc3966
     use URI::tel;
     # no warnings qw( experimental::vlb );
-    our $VERSION = 'v0.1.7';
+    our $VERSION = 'v0.1.8';
 
     our $SPACE_RE = qr/[[:blank:]\h]/;
     ## Including vertical space like new lines
     our $SPACE_EXTENDED_RE = qr/[[:blank:]\h\v]/;
     # Guards to keep other patterns from firing inside code
     our $MD_SKIP_FENCED = qr/
-        (?:(?<=\n)|\A)
-        [ ]{0,3}
-        (?<fence>`{3,}|~{3,})[^\n]*\n
         (?:
-            (?![ ]{0,3}\k<fence>[ \t]*\r?(?:\n|\z))
-            .*(?:\n|\z)
+            (?<=\n) | \A                      # start of line or start of string
+        )
+        [ ]{0,3}                              # up to 3 leading spaces
+        (?<fence>`{3,}|~{3,})[^\n]*\n         # opening fence + optional info string
+        (?:
+            (?!^[ ]{0,3}\k<fence>[ \t]*\r?(?:\n|\z))  # not the closing fence line
+            [^\n]*+(?:\n|\z)                  # consume exactly one full line
         )*
-        [ ]{0,3}\k<fence>[ \t]*\r?(?:\n|\z)
+        [ ]{0,3}\k<fence>[ \t]*\r?(?:\n|\z)   # closing fence
         (*SKIP)(*F)
     /xms;
 
@@ -402,6 +404,7 @@ $LIST_TYPE_ORDERED
     # NOTE: html
     # https://regex101.com/r/SH8ki3/4
     # 2025-10-18: Added safeguards to exclude html embedded within code blocks
+    # 2025-10-24: Added the fence guard $MD_SKIP_FENCED
     html => qr/
         #---------------------------------------------------------
         # 0) Indented-code guard
@@ -413,17 +416,7 @@ $LIST_TYPE_ORDERED
         #    We match them first, then (*SKIP)(*F) so the engine
         #    jumps past the whole block and resumes searching after it.
         #---------------------------------------------------------
-        (?:
-            (?<=\n) | \A                  # start of line or start of string
-        )
-        [ ]{0,3}                          # up to 3 leading spaces per CommonMark
-        (?<fence>`{3,}|~{3,})[^\n]*\n     # opening fence with optional info string
-        (?:
-            (?![ ]{0,3}\k<fence>[ \t]*\r?(?:\n|\z))   # not the closing fence line
-            .*(?:\n|\z)                               # consume a whole line
-        )*
-        [ ]{0,3}\k<fence>[ \t]*\r?(?:\n|\z) # closing fence
-        (*SKIP)(*F)                         # skip this whole region and fail this alt
+        $MD_SKIP_FENCED
         |
         #---------------------------------------------------------
         # 2) The actual HTML matcher
@@ -1033,7 +1026,21 @@ $LIST_TYPE_ORDERED
 
     # NOTE: html extended
     # https://regex101.com/r/M6KCjp/3
+    # 2025-10-24: Added indent and fence guard
     ex_html_markdown => qr/
+        #---------------------------------------------------------
+        # 0) Indented-code guard
+        #---------------------------------------------------------
+        $MD_SKIP_INDENTED
+        |
+        #---------------------------------------------------------
+        # 1) Fenced-code guard (```...``` or ~~~...~~~)
+        #---------------------------------------------------------
+        $MD_SKIP_FENCED
+        |
+        #---------------------------------------------------------
+        # 2) The actual extended HTML-with-markdown matcher
+        #---------------------------------------------------------
         (?<html_markdown_all>
             (?<mark_pat1>
                 (?:\n|\A)
@@ -1648,7 +1655,7 @@ Regexp::Common::Markdown - Markdown Common Regular Expressions
 
 =head1 VERSION
 
-    v0.1.7
+    v0.1.8
 
 =head1 DESCRIPTION
 

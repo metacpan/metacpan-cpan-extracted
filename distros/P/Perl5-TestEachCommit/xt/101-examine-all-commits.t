@@ -7,7 +7,7 @@ use File::Temp qw(tempfile tempdir);
 use File::Spec::Functions;
 use String::PerlIdentifier qw(make_varname);
 use Data::Dump qw(dd pp);
-use Capture::Tiny qw(capture_stdout);
+use Capture::Tiny qw(capture capture_stdout);
 
 use Test::More;
 if( (! defined $ENV{SECONDARY_CHECKOUT_DIR}) or
@@ -19,7 +19,7 @@ elsif (! $ENV{PERL_AUTHOR_TESTING}) {
     plan skip_all => 'Lengthy test; set PERL_AUTHOR_TESTING to run';
 }
 else {
-    plan tests => 14;
+    plan tests => 15;
     #plan 'no_plan';
 }
 
@@ -64,6 +64,7 @@ my $opts = {
       "0dfa8ac113680e6acdef0751168ab231b9bf842c",
     ];
     my $commits = $self->get_commits();
+    my $commits_count = scalar(@{$commits});
     is_deeply($commits, $expected_commits,
         "Got expected list of SHAs");
 
@@ -79,7 +80,19 @@ my $opts = {
     is_deeply([@got_lines], $expected_commits,
         "Displayed list of commits as expected");
 
-    $self->examine_all_commits();
+    my ($stderr, @results);
+    ($stdout, $stderr, @results) = capture {
+        $self->examine_all_commits();
+    };
+    @lines = split /\n/, $stderr;
+    my $examining = 0;
+    for my $l (@lines) {
+        $examining++
+            if $l =~ m/Examining commit\s\d+\sof $commits_count commits/;
+    }
+    is($examining, $commits_count,
+        "When requesting verbose output, get position of commit in sequence");
+
     my $expected_results = [
         { commit => "c9cd2e0cf4ad570adf68114c001a827190cb2ee9", score => 2 },
         { commit => "79b32d926ef5961b4946ebe761a7058cb235f797", score => 1 },

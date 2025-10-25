@@ -6,7 +6,7 @@ use v5.34.0; # The Perl version on Slackware 15.0 (sbozyp's min supported versio
 
 package Sbozyp;
 
-our $VERSION = '0.6.1';
+our $VERSION = '0.6.3';
 
 use File::Basename qw(basename dirname);
 use File::Temp qw();
@@ -91,7 +91,7 @@ sub build_command_main {
     for my $pkg (@pkgs) {
         if (my $slackware_pkg = built_slackware_pkg($pkg)) {
             unless ($opt_force) {
-                sbozyp_print("existing package for '$pkg->{PKGNAME}' found at '$slackware_pkg'\n");
+                sbozyp_print("existing package for $pkg->{PKGNAME} found at '$slackware_pkg'\n");
                 next;
             }
         }
@@ -227,7 +227,7 @@ sub remove_command_main {
         my @errors; for my $pkg (@pkgs) {
             my @dependents = pkg_array_minus([pkg_dependents_direct($pkg)], [@pkgs]);
             if (@dependents) {
-                my $error = sbozyp_error_prefix()."package '$pkg->{PKGNAME}' is depended on by:\n";
+                my $error = sbozyp_error_prefix()."package $pkg->{PKGNAME} is depended on by:\n";
                 $error .= "    $_->{PKGNAME}\n" for @dependents;
                 push @errors, $error;
             }
@@ -237,7 +237,7 @@ sub remove_command_main {
     @pkgs = (@pkgs, pkgs_removable_dependencies(@pkgs)) if $opt_removedeps;
     for my $pkg (@pkgs) {
         if (!defined pkg_installed($pkg)) {
-            sbozyp_die("the package '$pkg->{PKGNAME}' is not installed");
+            sbozyp_die("the package $pkg->{PKGNAME} is not installed");
         }
     }
     if (not $opt_noninteractive) {
@@ -278,7 +278,7 @@ sub search_command_main {
 
 sub pkg {
     my ($prgnam) = @_;
-    my $pkgname = prgnam_to_pkgname($prgnam) // sbozyp_die("could not find a package named '$prgnam'");
+    my $pkgname = prgnam_to_pkgname($prgnam) // sbozyp_die("could not find a package named $prgnam");
     state %pkg_cache; if (my $pkg = $pkg_cache{$pkgname}) { return $pkg }
     my $info_file = "$CONFIG{REPO_ROOT}/$CONFIG{REPO_NAME}/$pkgname/@{[basename($pkgname)]}.info";
     my %info = parse_info_file($info_file);
@@ -833,7 +833,7 @@ sub pkg_prepare_for_build {
     my ($pkg) = @_;
     my $arch = arch();
     if (my $arch_problem = $pkg->{ARCH_UNSUPPORTED}) {
-        sbozyp_die("'$pkg->{PKGNAME}' is $arch_problem on $arch")
+        sbozyp_die("$pkg->{PKGNAME} is $arch_problem on $arch")
     }
     my %url_md5;
     if ($arch eq 'x86_64' and my @urls = @{$pkg->{DOWNLOAD_x86_64}}) {
@@ -878,8 +878,8 @@ sub build_slackware_pkg {
         print $line; # magically knows to print to stdout or stderr
     }
     close $cmd;
-    sbozyp_die("failed to build '$pkg->{PKGNAME}'") if $? != 0;
-    sbozyp_die("successfully built '$pkg->{PKGNAME}' but couldn't determine the path of the created Slackware package") if !defined $slackware_pkg;
+    sbozyp_die("failed to build $pkg->{PKGNAME}") if $? != 0;
+    sbozyp_die("successfully built $pkg->{PKGNAME} but couldn't determine the path of the created Slackware package") if !defined $slackware_pkg;
     return $slackware_pkg;
 }
 

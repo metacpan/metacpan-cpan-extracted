@@ -12,7 +12,7 @@ Devel::StatProfiler::ReportStructure - developer documentation for aggregation c
 
 =head1 VERSION
 
-version 0.55
+version 0.56
 
 =head1 DESCRIPTION
 

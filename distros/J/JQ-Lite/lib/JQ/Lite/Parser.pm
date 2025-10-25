@@ -11,11 +11,12 @@ sub parse_query {
     return () unless defined $query;
     return () if $query =~ /^\s*\.\s*$/;
 
-    my @parts = map {
+    my @parts = JQ::Lite::Util::_split_top_level_pipes($query);
+    @parts = map {
         my $part = $_;
         $part =~ s/^\s+|\s+$//g;
         $part;
-    } split /\|/, $query;
+    } @parts;
 
     @parts = map {
         if ($_ eq '.[]') {

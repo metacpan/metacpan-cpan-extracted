@@ -43,7 +43,7 @@ Issues are currently reported using CPAN [bug tracker](https://gitlab.com/jackde
 
 ## More information
 
-Please refer to the [README](https://metacpan.org/source/JDEGUEST/Markdown-Parser-v0.4.1/README.md)
+Please refer to the [README](https://metacpan.org/source/JDEGUEST/Markdown-Parser-v0.5.0/README.md)
 
 ## Author
 

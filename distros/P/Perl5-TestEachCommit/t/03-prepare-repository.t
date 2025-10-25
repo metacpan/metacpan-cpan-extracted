@@ -10,7 +10,7 @@ use Test::More;
 if( defined $ENV{SECONDARY_CHECKOUT_DIR} and
         -d $ENV{SECONDARY_CHECKOUT_DIR} ) {
         #plan 'no_plan';
-    plan tests => 9;
+    plan tests => 13;
 }
 else {
     plan skip_all => 'Could not locate git checkout of Perl core distribution';
@@ -53,11 +53,33 @@ my $opts = {
 
     note("Testing get_commits() and display_commits() ...");
 
+    {
+        # Test bad choice of commits
+        my $opts = {
+            branch  => "blead",
+            start   => "0dfa8ac113680e6acdef0751168ab231b9bf842c",
+            end     => "c9cd2e0cf4ad570adf68114c001a827190cb2ee9",
+            skip_test_harness => 1,
+            verbose => 1,
+        };
+        my $self = Perl5::TestEachCommit->new( $opts );
+        ok($self, "new() returned true value");
+        isa_ok($self, 'Perl5::TestEachCommit',
+            "object is a Perl5::TestEachCommit object");
+        my $rv = $self->prepare_repository();
+        ok($rv, "prepare_repository() returned true value");
+
+        eval { my $commits = $self->get_commits(); };
+        like($@, qr/No commits found in range; check values for --start and --end/,
+            "No commits found when --start and --end were confused");
+    }
+
     my $expected_commits = [
-      "c9cd2e0cf4ad570adf68114c001a827190cb2ee9",
-      "79b32d926ef5961b4946ebe761a7058cb235f797",
-      "0dfa8ac113680e6acdef0751168ab231b9bf842c",
+        "c9cd2e0cf4ad570adf68114c001a827190cb2ee9",
+        "79b32d926ef5961b4946ebe761a7058cb235f797",
+        "0dfa8ac113680e6acdef0751168ab231b9bf842c",
     ];
+
     my $commits = $self->get_commits();
     is_deeply($commits, $expected_commits,
         "Got expected list of SHAs");

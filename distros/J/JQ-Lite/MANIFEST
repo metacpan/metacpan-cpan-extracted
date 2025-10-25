@@ -28,11 +28,13 @@ t/ceil_floor.t
 t/chunks.t
 t/clamp.t
 t/coalesce.t
+t/comma.t
 t/compact.t
 t/compact_output_cli.t
 t/contains.t
 t/contains_function.t
 t/count.t
+t/csv_format.t
 t/default.t
 t/del.t
 t/delpaths.t
@@ -110,6 +112,7 @@ t/tostring.t
 t/transpose.t
 t/trim.t
 t/trimstr.t
+t/tsv_format.t
 t/type.t
 t/unique_by.t
 t/values.t

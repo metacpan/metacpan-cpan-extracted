@@ -7,7 +7,7 @@ use warnings;
 
 use XSLoader;
 
-our $VERSION = '0.55'; # VERSION
+our $VERSION = '0.56'; # VERSION
 
 XSLoader::load(__PACKAGE__);
 
@@ -119,7 +119,7 @@ Devel::StatProfiler - low-overhead sampling code profiler
 
 =head1 VERSION
 
-version 0.55
+version 0.56
 
 =head1 SYNOPSIS
 

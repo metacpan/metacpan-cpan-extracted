@@ -1,5 +1,5 @@
 package Bitcoin::Crypto;
-$Bitcoin::Crypto::VERSION = '3.001';
+$Bitcoin::Crypto::VERSION = '3.002';
 use v5.10;
 use strict;
 use warnings;
@@ -176,6 +176,8 @@ Consider supporting my effort: L<https://bbrtj.eu/support>
 In no particular order:
 
 =over
+
+=item * Reginaldo Costa
 
 =item * chromatic
 

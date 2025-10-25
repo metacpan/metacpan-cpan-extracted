@@ -1,19 +1,30 @@
 Revision history for Perl extension DBD::DuckDB.
 
+0.15 2025-10-24
+	- Added support for TIME, TIME_TZ, UUID and INTERVAL types
+	- Added support for HUGEINT and UHUGEINT
+	- Added support for all types of TIMESTAMP variants (S, MS, NS, and TZ)
+	- Added support for DuckDB config on "DBI->connect"
+	- Added support for statement "TYPE" attribute
+	- Added "$dbh->column_info" helper
+	- Added new DBI trace messages
+	- Added new tests
+	- Updated POD documentations
+
 0.14 2025-10-17
-	- Improved support for LIST, UNION, MAP and DECIMAL
+	- Improved support for LIST, UNION, MAP and DECIMAL types
 	- Added "x_duckdb_read_*" helper functions for read CSV, JSON and Excel
 	- Added new tests
 	- Added examples directory
 
 0.13 2025-10-14
 	- Improved "AutoCommit", "$dbh->commit" and "$dbh->rollback"
-	- Added "foreign_key_info" helper
+	- Added "$dbh->foreign_key_info" helper
 	- Updated documentations
 
 0.12  2025-10-13
 	- Improved DuckDB appender
-	- Added "primary_key_info" helper
+	- Added "$dbh->primary_key_info" helper
 	- Added all "duckdb_append_*" and "duckdb_bind_*" C functions
 	- FIX CI
 

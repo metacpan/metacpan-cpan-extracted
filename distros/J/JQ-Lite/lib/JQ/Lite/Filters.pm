@@ -15,6 +15,41 @@ sub apply {
 
     my $normalized = JQ::Lite::Util::_strip_wrapping_parens($part);
 
+        my @sequence_parts = JQ::Lite::Util::_split_top_level_commas($normalized);
+        if (@sequence_parts > 1) {
+            @next_results = ();
+
+            for my $item (@results) {
+                my $json = JQ::Lite::Util::_encode_json($item);
+
+                for my $segment (@sequence_parts) {
+                    next unless defined $segment;
+                    my $filter = $segment;
+                    $filter =~ s/^\s+|\s+$//g;
+                    $filter = JQ::Lite::Util::_strip_wrapping_parens($filter);
+                    next if $filter eq '';
+
+                    if ($filter !~ /^\s*[\[{(]/) {
+                        my ($values, $ok) = JQ::Lite::Util::_evaluate_value_expression($self, $item, $filter);
+                        if ($ok) {
+                            if (@$values) {
+                                push @next_results, @$values;
+                                next;
+                            }
+                            # fall through to the full evaluator when the shortcut produced no
+                            # values so we don't accidentally drop a legitimate branch
+                        }
+                    }
+
+                    my @outputs = $self->run_query($json, $filter);
+                    push @next_results, @outputs;
+                }
+            }
+
+            @$out_ref = @next_results;
+            return 1;
+        }
+
         # support for variable references like $var or $var.path
         if ($normalized =~ /^\$(\w+)(.*)$/s) {
             my ($var_name, $suffix) = ($1, $2 // '');
@@ -1669,6 +1704,20 @@ sub apply {
             $replacement = defined $replacement ? $replacement : '';
 
             @next_results = map { JQ::Lite::Util::_apply_replace($_, $search, $replacement) } @results;
+            @$out_ref = @next_results;
+            return 1;
+        }
+
+        # support for @csv (format array/scalar as CSV row)
+        if ($part eq '@csv' || $part eq '@csv()') {
+            @next_results = map { JQ::Lite::Util::_apply_csv($_) } @results;
+            @$out_ref = @next_results;
+            return 1;
+        }
+
+        # support for @tsv (format array/scalar as TSV row)
+        if ($part eq '@tsv' || $part eq '@tsv()') {
+            @next_results = map { JQ::Lite::Util::_apply_tsv($_) } @results;
             @$out_ref = @next_results;
             return 1;
         }

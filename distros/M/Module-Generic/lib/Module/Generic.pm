@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v1.1.2
+## Version v1.1.3
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2025/10/19
+## Modified 2025/10/21
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -99,7 +99,7 @@ BEGIN
         (?<ver>(?^:\.[0-9]+) (?^:_[0-9]+)?)
         )
     )/;
-    our $VERSION     = 'v1.1.2';
+    our $VERSION     = 'v1.1.3';
 };
 
 use v5.26.1;
@@ -143,6 +143,7 @@ sub coloured;
 sub colour_close;
 sub colour_closest;
 sub colour_format;
+sub colour_max_depth;
 sub colour_open;
 sub colour_parse;
 sub colour_to_rgb;
@@ -160,6 +161,7 @@ sub error;
 sub error_handler;
 sub false;
 sub fatal;
+sub force_tty;
 sub get;
 sub import;
 sub init;
@@ -7900,29 +7902,29 @@ sub colour_format
     my $cls       = "\e[H\e[2J";
     my $styles =
     {
-    # Bold
-    b       => 1,
-    bold    => 1,
-    strong  => 1,
-    # Italic
-    i       => 3,
-    italic  => 3,
-    # Underline
-    u       => 4,
-    underline => 4,
-    underlined => 4,
-    blink   => 5,
-    # Reverse
-    r       => 7,
-    reverse => 7,
-    reversed => 7,
-    # Concealed
-    c       => 8,
-    conceal => 8,
-    concealed => 8,
-    strike  => 9,
-    striked  => 9,
-    striken  => 9,
+        # Bold
+        b       => 1,
+        bold    => 1,
+        strong  => 1,
+        # Italic
+        i       => 3,
+        italic  => 3,
+        # Underline
+        u       => 4,
+        underline => 4,
+        underlined => 4,
+        blink   => 5,
+        # Reverse
+        r       => 7,
+        reverse => 7,
+        reversed => 7,
+        # Concealed
+        c       => 8,
+        conceal => 8,
+        concealed => 8,
+        strike  => 9,
+        striked  => 9,
+        striken  => 9,
     };
 
     my $convert_24_To_8bits = sub
@@ -8130,17 +8132,24 @@ sub colour_format
     else
     {
         CORE::push( @$data, $opts->{text} );
-        CORE::push( @$data, $normal, $normal ) if( scalar( @$params ) );
+        CORE::push( @$data, $normal ) if( scalar( @$params ) );
     }
     return( CORE::join( '', @$data ) );
 }
 PERL
+    # NOTE: colour_max_depth()
+    colour_max_depth => <<'EOT',
+sub colour_max_depth { return( shift->_set_get( 'colour_max_depth', @_ ) ); }
+EOT
     # NOTE: colour_open()
     colour_open => <<'PERL',
 sub colour_open { return( shift->_set_get( '_colour_open', @_ ) ); }
 PERL
     # NOTE: colour_parse()
     colour_parse => <<'PERL',
+# Term definition:
+# - delimiter is one or more characters used to delimit the start and end of a formatting tag
+# - tag: is a container of colour formatting parameters whose perimeter is marked by 'delimiter'. It is also a closing tag, such as </>, or {/} or custom ones specified.
 sub colour_parse
 {
     my $self = shift( @_ );
@@ -8150,107 +8159,619 @@ sub colour_parse
     my @closes = ( '}', '>' );
     my $cust_open = $self->colour_open;
     my $cust_close = $self->colour_close;
+    # If we have custom open / close delimiters, we must make sure we have even pairs
+    # Custom or explicit open and close delimiters replace our prospective set of delimiters, i.e. instead of guessing, we are given explicit delimiters to use.
     if( defined( $cust_open ) &&
         length( $cust_open ) &&
-        !scalar( grep( /^\Q$cust_open\E$/, @opens ) ) )
+        defined( $cust_close ) &&
+        length( $cust_close ) && 
+        !ref( $cust_open ) &&
+        !ref( $cust_close ) )
     {
-        push( @opens, $cust_open );
-    }
-    if( defined( $cust_close ) &&
-        length( $cust_close ) &&
-        !scalar( grep( /^\Q$cust_close\E$/, @closes ) ) )
-    {
-        push( @closes, $cust_close );
-    }
-    my $open = join( '|', @opens );
-    my $close = join( '|', @closes );
-    my $is_tty = $self->_is_tty;
-    no strict;
-    my $re = qr/
-(?<all>
-(?<open>$open)(?!\/)(?<params>.*?)(?<close>$close)
-    (?<content>
-        (?:
-            (?> [^$open|$close]+ )
-            |
-            (?R)
-        )*+
-    )
-\g{open}\/\g{close}
-)
-    /x;
-    my $colour_re = qr/(?:(?:bright|light)[[:blank:]])?(?:[a-zA-Z]+(?:[[:blank:]]+[\w\-]+)?|rgb[a]?\([[:blank:]]*\d{1,3}[[:blank:]]*\,[[:blank:]]*\d{1,3}[[:blank:]]*\,[[:blank:]]*\d{1,3}[[:blank:]]*(?:\,[[:blank:]]*\d(?:\.\d)?)?[[:blank:]]*\))/;
-    my $style_re = qr/(?:bold|faint|italic|underline|blink|reverse|conceal|strike)/;
-    my $parse;
-    $parse = sub
-    {
-        my $str = shift( @_ );
-        1 while( $str =~ s{$re}
+        if( $cust_open eq $cust_close )
         {
-            my $re = { %- };
-            my $catch = substr( $str, $-[0], $+[0] - $-[0] );
-            my $all = $+{all};
-            my $ct = $+{content};
-            # Are we connected to a tty ?
-            if( !$is_tty )
-            {
-                # Return the content without formatting then
-                $ct;
-            }
-            else
-            {
-                my $params = $+{params};
-                if( index( $ct, $open ) != -1 && index( $ct, $close ) != -1 )
-                {
-                    $ct = $parse->( $ct );
-                }
-                my $def = {};
-                if( $params =~ /^[[:blank:]]*(?:(?<style1>$style_re)[[:blank:]]+)?(?<fg_colour>$colour_re)(?:[[:blank:]]+(?<style2>$style_re))?(?:[[:blank:]]+on[[:blank:]]+(?<bg_colour>$colour_re))?[[:blank:]]*$/i )
-                {
-                    my $style = $+{style1} || $+{style2};
-                    my $fg = $+{fg_colour};
-                    my $bg = $+{bg_colour};
-                    $def = 
-                    {
-                    style => $style,
-                    colour => $fg,
-                    bg_colour => $bg,
-                    };
-                }
-                else
-                {
-                    local $SIG{__WARN__} = sub{};
-                    local $SIG{__DIE__} = sub{};
-                    local $@;
-                    my @res = eval( $params );
-                    $def = { @res } if( scalar( @res ) && !( scalar( @res ) % 2 ) );
-                    if( $@ || ref( $def ) ne 'HASH' )
-                    {
-                        my $err = $@ || "Invalid styling \"${params}\"";
-                        $def = {};
-                    }
-                }
+            warn( "Warning only: you are using the same delimiter ($cust_open) for open and close!" );
+        }
+        else
+        {
+            @opens  = ( $cust_open );
+            @closes = ( $cust_close );
+        }
+    }
+    # This will prevent an opening delimiter such as '{' to be inadvertently caught as a perl string declaration if a dollar sign '$' is prepended, such as '${blue}Hello world{/}'
+    my $open  = join( '|', map( quotemeta( $_ ), @opens ) );
+    my $close = join( '|', map( quotemeta( $_ ), @closes ) );
+    # Create a quick map of open delimiter to its corresponding closing one
+    my $map = {}; @$map{ @opens } = @closes;
+    my $force_tty = $self->force_tty;
+    my $is_tty = defined( $force_tty ) ? $force_tty : $self->_is_tty;
+    my $max_depth = $self->colour_max_depth // 10;
+    my $normal = "\e[m";
 
-                if( scalar( keys( %$def ) ) )
+    my $colour_re = qr{
+        (?:
+            (?:bright|light)
+            [[:blank:]]+
+        )?
+        (?:
+            (?:
+                [a-zA-Z]+
+                (?:[[:blank:]]+[\w\-]+)?
+            )
+            |
+            (?:
+                rgb[a]?\(
+                    [[:blank:]]*\d{1,3}[[:blank:]]*\,
+                    [[:blank:]]*\d{1,3}[[:blank:]]*\,
+                    [[:blank:]]*\d{1,3}[[:blank:]]*
+                    (?:\,[[:blank:]]*\d(?:\.\d)?)?
+                    [[:blank:]]*
+                \)
+            )
+            |
+            (?:
+                rgb[a]?\(
+                    (?<red>\d{3})
+                    (?<green>\d{3})
+                    (?<blue>\d{3})
+                    (?:
+                        [[:blank:]]*\,[[:blank:]]*
+                        (?<opacity>
+                            \d(?:\.\d)?
+                        )
+                    )?
+                \)
+            )
+        )
+    }x;
+    my $style_re = qr/(?:bold|faint|italic|underline|blink|reverse|conceal|strike)/;
+
+    # NOTE: colour_format()
+    my $colour_format = sub
+    {
+        # style, colour or color and text
+        my $opts = shift( @_ );
+        # To make it possible to use either text or message property
+        # $opts->{text} = CORE::delete( $opts->{message} ) if( CORE::length( $opts->{message} ) && !CORE::length( $opts->{text} ) );
+
+        $opts->{colour} //= CORE::delete( $opts->{color} ) || CORE::delete( $opts->{fg_colour} ) || CORE::delete( $opts->{fg_color} ) || CORE::delete( $opts->{fgcolour} ) || CORE::delete( $opts->{fgcolor} );
+        $opts->{bgcolour} //= CORE::delete( $opts->{bgcolor} ) || CORE::delete( $opts->{bg_colour} ) || CORE::delete( $opts->{bg_color} );
+
+        my $bold      = "\e[1m";
+        my $underline = "\e[4m";
+        my $reverse   = "\e[7m";
+        my $normal    = "\e[m";
+        my $cls       = "\e[H\e[2J";
+        my $styles =
+        {
+            # Bold
+            b       => 1,
+            bold    => 1,
+            strong  => 1,
+            # Italic
+            i       => 3,
+            italic  => 3,
+            # Underline
+            u       => 4,
+            underline => 4,
+            underlined => 4,
+            blink   => 5,
+            # Reverse
+            r       => 7,
+            reverse => 7,
+            reversed => 7,
+            # Concealed
+            c       => 8,
+            conceal => 8,
+            concealed => 8,
+            strike  => 9,
+            striked  => 9,
+            striken  => 9,
+        };
+
+        # NOTE: convert_24_To_8bits()
+        my $convert_24_To_8bits = sub
+        {
+            my( $r, $g, $b ) = @_;
+            return( ( POSIX::floor( $r * 7 / 255 ) << 5 ) +
+                    ( POSIX::floor( $g * 7 / 255 ) << 2 ) +
+                    ( POSIX::floor( $b * 3 / 255 ) ) 
+                  );
+        };
+
+        # NOTE: colour_with_alpha()
+        # opacity * original + (1-opacity)*background = resulting pixel
+        # https://stackoverflow.com/a/746934/4814971
+        my $colour_with_alpha = sub
+        {
+            my( $r, $g, $b, $a, $bg ) = @_;
+            ## Assuming a white background (255)
+            my( $bg_r, $bg_g, $bg_b ) = ( 255, 255, 255 );
+            if( ref( $bg ) eq 'HASH' )
+            {
+                ( $bg_r, $bg_g, $bg_b ) = @$bg{qw( red green blue )};
+            }
+            $r = POSIX::round( ( $a * $r ) + ( ( 1 - $a ) * $bg_r ) );
+            $g = POSIX::round( ( $a * $g ) + ( ( 1 - $a ) * $bg_g ) );
+            $b = POSIX::round( ( $a * $b ) + ( ( 1 - $a ) * $bg_b ) );
+            return( [$r, $g, $b] );
+        };
+
+        # NOTE: check_colour()
+        my $check_colour = sub
+        {
+            my $col = shift( @_ );
+            # $colours or $bg_colours
+            my $map = shift( @_ );
+            my $code;
+            my $light;
+            # Example: 'light red' or 'light_red'
+            if( $col =~ m{
+                ^(?:
+                    (?<light>bright|light)
+                    [[:blank:]\_\-]+
+                )?
+                (?<colour>
+                    (?:
+                        (?:[a-zA-Z]+)(?:[[:blank:]]+\w+)?
+                    )
+                    |
+                    (?:
+                        (?<rgb_type>
+                            rgb[a]?
+                        )
+                        \(
+                            [[:blank:]]*(?<red>\d{1,3})[[:blank:]]*\,
+                            [[:blank:]]*(?<green>\d{1,3})[[:blank:]]*\,
+                            [[:blank:]]*(?<blue>\d{1,3})[[:blank:]]*
+                            (?:
+                                \,[[:blank:]]*
+                                (?<opacity>\d(?:\.\d+)?)
+                            )?
+                            [[:blank:]]*
+                        \)
+                    )
+                )$
+            }xi )
+            {
+                my %regexp = %+;
+                ( $light, $col ) = ( $+{light}, $+{colour} );
+                if( CORE::length( $+{rgb_type} ) &&
+                    CORE::length( $+{red} ) &&
+                    CORE::length( $+{green} ) &&
+                    CORE::length( $+{blue} ) )
                 {
-                    if( !defined( $ct ) || !CORE::length( $ct // '' ) )
+                    if( $+{opacity} || $light )
                     {
-                        '';
+                        my $opacity = CORE::length( $+{opacity} )
+                            ? $+{opacity}
+                            : $light
+                                ? 0.5
+                                : 1;
+                        $col = CORE::sprintf( 'rgba(%03d%03d%03d,%.1f)', $+{red}, $+{green}, $+{blue}, $opacity );
                     }
                     else
                     {
-                        $def->{text} = $ct;
-                        my $res = $self->colour_format( $def );
-                        length( $res ) ? $res : $catch;
+                        $col = CORE::sprintf( 'rgb(%03d%03d%03d)', $+{red}, $+{green}, $+{blue} );
+                    }
+                }
+            }
+            elsif( $col =~ m{
+                ^
+                (?<rgb_type>rgb[a]?)
+                \(
+                    [[:blank:]]*(?<red>\d{1,3})[[:blank:]]*\,
+                    [[:blank:]]*(?<green>\d{1,3})[[:blank:]]*\,
+                    [[:blank:]]*(?<blue>\d{1,3})[[:blank:]]*
+                    (?:
+                        \,[[:blank:]]*
+                        (?<opacity>
+                            \d(?:\.\d+)?
+                        )
+                    )?
+                    [[:blank:]]*
+                \)$
+            }xi )
+            {
+                if( $+{opacity} )
+                {
+                    $col = CORE::sprintf( 'rgba(%03d%03d%03d,%.1f)', $+{red}, $+{green}, $+{blue}, $+{opacity} );
+                }
+                else
+                {
+                    $col = CORE::sprintf( '%03d%03d%03d', $+{red}, $+{green}, $+{blue} );
+                }
+            }
+
+            my $col_ref;
+            if( $col =~ /^rgb[a]?\((?<red>\d{3})(?<green>\d{3})(?<blue>\d{3})\)$/i )
+            {
+                $col_ref = {};
+                %$col_ref = %+;
+                return({
+                    _24bits => [@$col_ref{qw( red green blue )}],
+                    _8bits => $convert_24_To_8bits->( @$col_ref{qw( red green blue )} )
+                });
+            }
+            # Treating opacity to make things lighter; not ideal, but standard scheme
+            elsif( $col =~ m{
+                ^rgba
+                \(
+                    (?<red>\d{3})
+                    (?<green>\d{3})
+                    (?<blue>\d{3})
+                    (?:
+                        [[:blank:]]*\,[[:blank:]]*
+                        (?<opacity>
+                            \d(?:\.\d)?
+                        )
+                    )?
+                \)$
+                }xi )
+            {
+                $col_ref = {};
+                %$col_ref = %+;
+                if( $+{opacity} )
+                {
+                    my $opacity = $+{opacity};
+                    my $bg;
+                    if( $opts->{bgcolour} )
+                    {
+                        $bg = $self->colour_to_rgb( $opts->{bgcolour} );
+                    }
+                    my $new_col = $colour_with_alpha->( @$col_ref{qw( red green blue )}, $opacity, $bg );
+                    @$col_ref{qw( red green blue )} = @$new_col;
+                }
+                return({
+                    _24bits => [@$col_ref{qw( red green blue )}],
+                    _8bits => $convert_24_To_8bits->( @$col_ref{qw( red green blue )} )
+                });
+            }
+            elsif( $self->_message( 9, "Checking if rgb value exists for colour '$col'" ) &&
+                   ( $col_ref = $self->colour_to_rgb( $col ) ) )
+            {
+                # $code = $map->{ $col };
+                return({
+                    _24bits => [@$col_ref{qw( red green blue )}],
+                    _8bits => $convert_24_To_8bits->( @$col_ref{qw( red green blue )} )
+                });
+            }
+            else
+            {
+                return({});
+            }
+        };
+
+        my $data    = [];
+        my $data8   = [];
+        my $params  = [];
+        # 8 bits parameters compatible
+        my $params8 = [];
+        if( $opts->{colour} ||
+            $opts->{color} ||
+            $opts->{fgcolour} ||
+            $opts->{fgcolor} ||
+            $opts->{fg_colour} ||
+            $opts->{fg_color} )
+        {
+            $opts->{colour} ||= CORE::delete( $opts->{color} ) || CORE::delete( $opts->{fg_colour} ) || CORE::delete( $opts->{fg_color} ) || CORE::delete( $opts->{fgcolour} ) || CORE::delete( $opts->{fgcolor} );
+            # my $col_ref = $check_colour->( $opts->{colour}, $colours );
+            my $col_ref = $check_colour->( $opts->{colour} );
+            # CORE::push( @$params, $col ) if( CORE::length( $col ) );
+            if( scalar( keys( %$col_ref ) ) )
+            {
+                CORE::push( @$params8, sprintf( '38;5;%d', $col_ref->{_8bits} ) );
+                CORE::push( @$params, sprintf( '38;2;%d;%d;%d', @{$col_ref->{_24bits}} ) );
+            }
+        }
+        if( $opts->{bgcolour} ||
+        $opts->{bgcolor} ||
+        $opts->{bg_colour} ||
+        $opts->{bg_color} )
+        {
+            $opts->{bgcolour} ||= CORE::delete( $opts->{bgcolor} ) || CORE::delete( $opts->{bg_colour} ) || CORE::delete( $opts->{bg_color} );
+            # my $col_ref = $check_colour->( $opts->{bgcolour}, $bg_colours );
+            my $col_ref = $check_colour->( $opts->{bgcolour} );
+            ## CORE::push( @$params, $col ) if( CORE::length( $col ) );
+            if( scalar( keys( %$col_ref ) ) )
+            {
+                CORE::push( @$params8, sprintf( '48;5;%d', $col_ref->{_8bits} ) );
+                CORE::push( @$params, sprintf( '48;2;%d;%d;%d', @{$col_ref->{_24bits}} ) );
+            }
+        }
+        if( $opts->{style} )
+        {
+            my $those_styles = [CORE::split( /\|/, $opts->{style} )];
+            foreach my $s ( @$those_styles )
+            {
+                if( CORE::exists( $styles->{lc($s)} ) )
+                {
+                    CORE::push( @$params, $styles->{lc($s)} );
+                    # We add the 8 bits compliant version only if any colour was provided, i.e.
+                    # This is not just a style definition
+                    CORE::push( @$params8, $styles->{lc($s)} ) if( scalar( @$params8 ) );
+                }
+            }
+        }
+        CORE::push( @$data, "\e[" . CORE::join( ';', @$params8 ) . "m" ) if( scalar( @$params8 ) );
+        CORE::push( @$data, "\e[" . CORE::join( ';', @$params ) . "m" ) if( scalar( @$params ) );
+        return( $data );
+    };
+
+    # NOTE: process_params()
+    my $process_params = sub
+    {
+        my( $params ) = @_;
+        return if( !defined( $params ) || !length( $params // '' ) );
+        my $def = {};
+        # Example: bold green underline on black
+        if( $params =~ m{
+            ^[[:blank:]]*
+            (?:
+                (?<style1>$style_re)
+                [[:blank:]]+
+            )?
+            (?<fg_colour>$colour_re)
+            (?:
+                [[:blank:]]+
+                (?<style2>$style_re)
+            )?
+            (?:
+                [[:blank:]]+on[[:blank:]]+
+                (?<bg_colour>$colour_re)
+            )?
+            [[:blank:]]*$
+            }xi )
+        {
+            my $style = $+{style1} || $+{style2};
+            my $fg = $+{fg_colour};
+            my $bg = $+{bg_colour};
+            $def = 
+            {
+                style     => $style,
+                colour    => $fg,
+                bg_colour => $bg,
+            };
+        }
+        else
+        {
+            # Only allow characters that make sense for hash-like parameters.
+            # This forbids variables, code blocks, Perl ops, backticks, etc.
+            if( $params =~ /[^a-zA-Z0-9_,\=>\s\h[:blank:]'"\|\(\)\.\-]/ )
+            {
+                return;
+            }
+            # illegal functions that have no business being here, and could pass through the previous check
+            elsif( $params =~ /\b(?:
+                    qx|system|open|exec|fork|require|use|eval|do|
+                    package|sub|BEGIN|UNITCHECK|CHECK|INIT|END|
+                    readpipe|sysopen|unlink|rename|chmod|chown|utime|truncate|mkdir|rmdir|opendir|readdir|closedir|glob
+                )\b/i )
+            {
+                return;
+            }
+
+            local $SIG{__WARN__} = sub{};
+            local $SIG{__DIE__} = sub{};
+            local $@;
+            my @res = eval( $params );
+            $def = { @res } if( scalar( @res ) && !( scalar( @res ) % 2 ) );
+            if( $@ || ref( $def ) ne 'HASH' )
+            {
+                my $err = $@ || "Invalid styling \"${params}\"";
+                $def = {};
+            }
+        }
+
+        if( scalar( keys( %$def ) ) )
+        {
+            my $ref = $colour_format->( $def );
+            return if( !$ref || !scalar( @$ref ) );
+            return( $ref );
+        }
+        return;
+    };
+
+    # NOTE: parse()
+    my $parse;
+    $parse = sub
+    {
+        # $chunk is the text from position $pos until the end of the string, as provided by parent
+        my $chunk   = shift( @_ );
+        my $args    = shift( @_ ) || {};
+        my $copy    = $chunk;
+        my $out     = '';
+        my $level   = $args->{level} // 1;
+        my $counter = $args->{counter} // 0;
+        return( $chunk ) if( $level > $max_depth );
+        my( $open_d, $close_d );
+        # If we are given specific open and close delimiter use them, otherwise, use our list of candidates.
+        # This only happens the first time we hist the text to parse and search for those delimiters.
+        # Afterward, as a rule, we always stick to the same delimiters used. The user cannot mix delimiters in the same string.
+        # We create Regexp object on purpose, so we can differentiate from plain string later in our code.
+        # The initial '$open' and '$close' are simple strings, not Regexp object, so we can differentiate them:
+        # Regexp -> confirmed open and close delimiters
+        # Non-Regexp -> prospective open and close delimiters
+        # Once the open and close delimiters are confirmed they never change.
+#         $open_d  = $args->{open}  ? ( ref( $args->{open} )  ? $args->{open}  : qr{(?<open_d>\Q$args->{open}\E)} ) : $open;
+#         $close_d = $args->{close} ? ( ref( $args->{close} ) ? $args->{close} : qr{?<close_d>\Q$args->{close})} )  : $close;
+        $open_d  = $args->{open}  ? $args->{open}  : $open;
+        $close_d = $args->{close} ? $args->{close} : $close;
+        # We found our closing mark
+        if( defined( $args->{open} ) &&
+            defined( $args->{close} ) &&
+            $chunk =~ s/^(?<content>.*?)(${open_d}\/${close_d})// )
+        {
+            my $content = $+{content};
+            # Whether the parameters are in the form of 'bold underline red' or "style => 'bold', colour => 'red'", either way, the parameters must start with an alphabetic character. No space is allowed.
+            # Also, since the opening delimiter may have more than 1 character, we check if the first character is '{' or '['.
+            my $open_re = ( substr( $open_d, 0, 2 ) eq quotemeta('{') || substr( $open_d, 0, 2 ) eq quotemeta('[') )
+                ? "(?<!\\\$)${open_d}"
+                : $open_d;
+            if( $content =~ /${open_re}(?=[a-zA-Z]+)/ )
+            {
+                # Found an opening delimiter before our closing tag, returning the text untouched.
+                $chunk = $copy;
+            }
+            elsif( !$is_tty )
+            {
+                $out = $content;
+            }
+            else
+            {
+                if( my $fmt_ref = $args->{format} )
+                {
+                    # We cannot make the assumption that there are any formatting parameters found, and returned by $process_params
+                    # If there is nothing, then there is nothing to format, and we return the text as is.
+                    if( !scalar( @$fmt_ref ) )
+                    {
+                        # We do not format the $content
+                    }
+                    else
+                    {
+                        my $fmt = CORE::join( '', @$fmt_ref );
+                        # We differentiate text with and without new lines, because if there are multiple lines, we skip the empty ones.
+                        # However, if there are no multiple line, we surround that (possibly empty) line with the formatting and the normaliser.
+                        if( index( $content, "\n" ) != -1 )
+                        {
+                            my $text_parts = [CORE::split( /\n/, $content )];
+                            for( my $i = 0; $i < scalar( @$text_parts ); $i++ )
+                            {
+                                # Empty due to \n repeated
+                                next if( !CORE::length( $text_parts->[$i] ) );
+                                $text_parts->[$i] = $fmt . $text_parts->[$i] . $normal;
+                            }
+                            $content = CORE::join( "\n", @$text_parts );
+                        }
+                        else
+                        {
+                            $content = $fmt . $content . $normal;
+                        }
                     }
                 }
                 else
                 {
-                    $catch;
+                    # Only add a normaliser matching the closing tag we found IF there were valid colouring parameters, otherwise we would be adding normaliser where it is not needed.
+                    $content = $content . ( $counter ? $normal : '' );
+                }
+                # We reduce the closing tag counter since we found one.
+                $counter-- if( $counter > 0 );
+                $out = $content;
+                # We can only use this once, and if we do not remove it now, it would be used again later in our code...
+                delete( $args->{format} );
+                # Continue, since we got a closing tag
+            }
+        }
+        $copy = $chunk;
+        # Capture the opening delimiter, and everything after, then check that what came after contains a closing delimiter.
+        # We have to do this in two steps, because we cannot use an hash reference in the first part of the regular expression, such as:
+        # s{^(?<before>.*?)(?<open>$open)(?<params>[a-zA-Z]+)(?:<more_params>.*?)(?<close>$map->{ \1 })}
+        # So, we need to do this in two steps
+        # Special case for '{' or '['
+        # Since the opening delimiter may have more than 1 character, we check if the first character is '{' or '['.
+        my $open_re = ( substr( $open_d, 0, 2 ) eq quotemeta('{') || substr( $open_d, 0, 2 ) eq quotemeta('[') )
+            ? "(?<!\\\$)${open_d}"
+            : $open_d;
+        $chunk =~ s{^(?<before>.*?)(?<open>$open_re)(?<params>[a-zA-Z]+)(?<remaining>.*?)$}
+        {
+            my $re = { %+ };
+            # Unless the open and close delimiters have already been set and confirmed, i.e. they have been passed as arguments, we set them as Regexp now.
+            unless( $args->{open_d} )
+            {
+                $open_d  = quotemeta( $re->{open} );
+                $close_d = quotemeta( $map->{ $re->{open} } );
+            }
+            my $before    = $re->{before};
+            my $params    = $re->{params};
+            my $remaining = $re->{remaining};
+            # We have been provided with an open and close delimiter, which means we are in a $level > 1, and we have some colour formatting, and we found a closing tag in the leading text chunk, so we need to wrap that leading text in the given colour formatting.
+            if( exists( $args->{open} ) &&
+                exists( $args->{close} ) &&
+                defined( $args->{open} ) &&
+                defined( $args->{close} ) &&
+                $before =~ /${open_d}\/${close_d}/ )
+            {
+                my( $before_close, $after_close ) = split( /${open_d}\/${close_d}/, $before, 2 );
+                if( !$is_tty )
+                {
+                    $out .= $before_close . $after_close;
+                }
+                elsif( $args->{format} )
+                {
+                    my $fmt = CORE::join( '', @{$args->{format}} );
+                    my $text_parts = [CORE::split( /\n/, $before_close )];
+                    for( my $i = 0; $i < scalar( @$text_parts ); $i++ )
+                    {
+                        # Empty due to \n repeated
+                        next if( !CORE::length( $text_parts->[$i] ) );
+                        $text_parts->[$i] = $fmt . $text_parts->[$i] . $normal;
+                    }
+                    $before_close = CORE::join( "\n", @$text_parts );
+                    $out .= $before_close . ( $after_close // '' );
+                }
+                else
+                {
+                    $out .= ( $before_close // '' ) . $normal . ( $after_close // '' );
+                }
+                # We reduce the closing tag counter, since we just found one.
+                $counter-- if( $counter > 0 );
+            }
+            else
+            {
+                $out .= $before;
+            }
+
+            # Closing delimiter for the open tag
+            if( $remaining =~ s/^(?<more_params>.*?)${close_d}// )
+            {
+                my $params2 = $+{more_params};
+                # We search for another opening delimiter, which would be an error, since we are not closed yet, but could happen.
+                if( $params2 =~ /(?:$open_d)(?=[a-zA-Z]+)/ )
+                {
+                    $copy;
+                }
+                else
+                {
+                    # Ok, found parameters + close delimiter
+                    $params .= $params2;
+                    # Get back an array reference of formatting.
+                    my $fmt = $process_params->( $params );
+                    my $rv = $parse->( $remaining => {
+                        open    => $open_d,
+                        close   => $close_d,
+                        # We pass the colour formatting that will be applied on the text our next round of parsing will extract
+                        format  => $fmt,
+                        level   => ( $level + 1 ),
+                        # We keep track of the number of valid open tags we got, so we can decide to remove any usless one (if its corresponding open tag was improper), or to replace them with a normaliser
+                        counter => ( $fmt ? ( $counter + 1 ) : $counter ),
+                    });
+                    $rv;
                 }
             }
-        }gex );
-        return( $str );
+            # We could not find a close delimiter; we call the whole thing off
+            else
+            {
+                $copy;
+            }
+            # Or, we search for a closing delimiter
+            # Once we have the closing delimiter, we get the colour formatting the the parmeters in between.
+        }gexs;
+        $out .= $chunk;
+
+        if( $is_tty && exists( $args->{format} ) && defined( $args->{format} ) )
+        {
+            $out = CORE::join( '', @{$args->{format}} ) . $out;
+        }
+        # Also ensure that any closing tag leftovers are replaced by the special formatter $normal. $normal closes formatting, so using it is safe.
+        # We do this only if we inherited a previously identified opening and closing delimiter; OR
+        # if we have not inherited any, but identified it earlier
+        if( ( $args->{open} && $args->{close} ) ||
+            ( $open_d && $close_d && $open_d ne $open ) )
+        {
+            $out =~ s/(?:${open_d}\/${close_d})/$normal/;
+        }
+
+        return( $out );
     };
     return( $parse->( $txt ) );
 }
@@ -8465,6 +8986,10 @@ sub errno
     }
     return( $this->{errno} );
 }
+PERL
+    # NOTE: force_tty()
+    force_tty => <<'PERL',
+sub force_tty { return( shift->_set_get( 'force_tty', @_ ) ); }
 PERL
     # NOTE: message_colour()
     message_colour => <<'PERL',
@@ -11944,7 +12469,7 @@ Quick way to create a class with feature-rich methods
 
 =head1 VERSION
 
-    v1.1.2
+    v1.1.3
 
 =head1 DESCRIPTION
 
@@ -12063,6 +12588,10 @@ The possible values are: I<bold>, I<italic>, I<underline>, I<blink>, I<reverse>,
 
 =back
 
+=head2 colour_max_depth
+
+Set or get the maximum level of recursion when processing colourised debugging message with L</message_colour>
+
 =head2 colour_open
 
 The marker to be used to set the opening of a command line colour sequence.
@@ -12071,7 +12600,16 @@ Defaults to "<"
 
 =head2 colour_parse
 
-Provided with a string, this will parse the string for colour formatting. Formatting can be encapsulated in another formatting, and can be expressed in 2 different ways. For example:
+    $self->colour_parse( "And {bold light red on white}what about{/} {underline yellow}me too{/} ?" );
+    $self->colour_parse( "And {style => 'i|b', color => green}what about{/} {style => 'blink', color => yellow}me{/} ?" );
+
+Parses a string or list of strings containing colour and style formatting tags and returns the string with appropriate ANSI escape codes applied for terminal display. The method supports nested formatting, custom delimiters, and both named colours (e.g., C<red>, C<light blue>) and RGB/RGBA formats. It is designed to work in both TTY (terminal) and non-TTY environments, with formatting stripped in non-TTY contexts.
+
+If multiple strings are provided, they are concatenated with no separator before processing.
+
+For the purpose of this section, a C<delimiter> is one or more characters that mark the start or end of a C<tag>, such as C<{>, C<}>, C<[>, or C<]>. A C<tag> is container of instruction for colour formatting. There are opening, and closing tag, such as C<{/}>
+
+For example:
 
     $self->colour_parse( "And {style => 'i|b', color => green}what about{/} {style => 'blink', color => yellow}me{/} ?" );
 
@@ -12087,7 +12625,182 @@ would return a string with the words C<what about> in light red bold text on a w
 
 would return a string with the words C<everyone! This is> in bold red characters on white background and the word C<embedded> in underline blue color
 
-The idea for this syntax, not the code, is taken from L<Term::ANSIColor>
+The default prospective delimiters are C<{>, C<}>, C<< < >>, and C<< > >>. Those default delimiters can be overriden by setting alternate ones using the methods L</colour_open>, and L</colour_close>.
+
+Delimiters must be non-empty scalar strings and should not be identical to avoid ambiguity (a warning is issued if they are). Once a delimiter pair is chosen for a string, it is used consistently throughout parsing, and all other delimiter candidates are ignored for that parse run; mixed delimiters, such as C<{> and C<<>, are treated as literal content unless they match the current delimiter pair.
+
+Tags, that are made up of an opening and closing delimiters are used to specify a colouring style, such as C<bold>, C<underline>, and colours, such as C<red>, C<rgb(255,255,255)>. As shown above, C<colour_parse> supports two syntaxes for colour parameters.
+
+=over 4
+
+=item 1. natural
+
+Uses a concise format with styles and colours separated by spaces, optionally including a background colour with C<on>.
+
+    {bold light red on white}
+
+=item 2. hash-like
+
+Uses Perl-like key-value pairs to specify styles and colours.
+
+    {style => 'bold', color => 'red'}
+
+Only a subset of plain scalar values is allowed. Attempting to use Perl expressions is not supported. Invalid or unsafe input is treated as literal.
+
+=back
+
+Tags must start with an alphabetic character (style or colour name) immediately following the opening delimiter, with no leading whitespace. For example, C<{bold red}> is valid, but C<{ bold red}> is treated as literal text.
+
+    { bold red}   # INVALID, literal
+    {bold red}    # VALID
+
+The method supports nested tags up to a maximum default depth of 10, but can be changed using the method L</colour_max_depth>, and handles malformed tags gracefully by either ignoring them or treating them as literal text. In non-TTY environments (influenced by L</force_tty> or terminal detection with L</_is_tty>), formatting tags are stripped, and only the content is returned.
+
+Perl variables like C<${variable}> are preserved as literal text, as the method ensures that C<{> or C<[> preceded by a C<$> is not treated as a formatting tag.
+
+=head3 Supported Styles
+
+The following styles are supported:
+
+=over 4
+
+=item * C<bold> (or C<b>, C<strong>): Bold text (ANSI: C<\e[1m>).
+
+=item * C<italic> (or C<i>): Italic text (ANSI: C<\e[3m>).
+
+=item * C<underline> (or C<u>, C<underlined>): Underlined text (ANSI: C<\e[4m>).
+
+=item * C<blink>: Blinking text (ANSI: C<\e[5m>).
+
+=item * C<reverse> (or C<r>, C<reversed>): Reverse video (ANSI: C<\e[7m>).
+
+=item * C<conceal> (or C<c>, C<concealed>): Concealed text (ANSI: C<\e[8m>).
+
+=item * C<strike> (or C<striked>, C<striken>): Strikethrough text (ANSI: C<\e[9m>).
+
+=back
+
+Multiple styles can be combined in key-value syntax using C<|>, such as C<< style => 'bold|italic' >>.
+
+=head3 Supported colours
+
+Colours can be specified as:
+
+=over 4
+
+=item * Named colours: e.g., C<red>, C<light blue>, C<bright green>.
+
+=item * RGB: e.g., C<rgb(255,255,255)> or C<rgb(255255255)> (comma-less).
+
+=item * RGBA: e.g., C<rgba(255,0,0,0.5)> for 50% opacity, blended with the background (default: white).
+
+=back
+
+Both 8-bit (C<38;5;NNN> or C<48;5;NNN>) and 24-bit (C<38;2;R;G;B> or C<48;2;R;G;B>) ANSI codes are generated for compatibility.
+
+=head3 Delimiter Rules
+
+=over 4
+
+=item * Default delimiters are C<{> and C<}> or C<< < >> and C<< > >> unless overridden by L</colour_open> and L</colour_close>.
+
+=item * Tags must start with a letter, such as C<bold>, C<red> or be a closing tag (C<{/}>).
+
+=item * A C<$> prefix before C<{> or C<[> (e.g., C<${variable}>) prevents interpretation as a tag.
+
+=item * Custom delimiters must be non-empty scalars and are used consistently within a single string.
+
+=item * Mixed delimiters (e.g., C<{bold red}A <underline green>B</>>) are treated as literal content within the chosen delimiter pair.
+
+=back
+
+=head3 Error Handling
+
+=over 4
+
+=item * Invalid tags (e.g., C<{in valid}>) are ignored, and their content is returned without formatting.
+
+=item * Stray closing tags (e.g., C<{/}>) are treated as literal text.
+
+=item * Unclosed tags (e.g., C<{bold red}text>) apply formatting to the remaining text.
+
+=item * Excessive nesting (beyond 10 levels) results in partial formatting up to the limit, with remaining tags treated as literal.
+
+=item * Out-of-range RGB values (e.g., C<rgb(300,-1,260)>) are ignored, and the tag is treated as literal.
+
+=back
+
+=head3 Examples
+
+    my $m = Module::Generic->new;
+
+=over 4
+
+=item * Basic formatting with key-value syntax:
+
+    $m->colour_parse( "Hello {style => 'bold', color => 'red'}world{/}" );
+    # Returns: "Hello \e[38;5;224;1m\e[38;2;255;0;0;1mworld\e[m"
+
+=item * Compact syntax with background colour:
+
+    $m->colour_parse( "Text {bold light red on white}coloured{/} here" );
+    # Returns: "Text \e[38;5;224;48;5;255;1m\e[38;2;255;0;0;48;2;255;255;255;1mcoloured\e[m here"
+
+=item * Nested formatting:
+
+    $m->colour_parse( "Outer {bold red}inner {underline green}green{/} text{/}" );
+    # Returns: "Outer \e[38;5;224;1m\e[38;2;255;0;0;1minner \e[38;5;28;4m\e[38;2;0;255;0;4mgreen\e[m text\e[m"
+
+=item * RGB and RGBA colours:
+
+    $m->colour_parse( "Blue {underline rgb(0,0,255)}text{/}" );
+    # Returns: "Blue \e[38;5;3;4m\e[38;2;0;0;255;4mtext\e[m"
+    $m->colour_parse( "Red {bold rgba(255,0,0,0.5)}text{/}" );
+    # Returns: "Red \e[38;5;237;1m\e[38;2;255;128;128;1mtext\e[m" (blended with white background)
+
+=item * Preserving Perl variables and literal braces:
+
+    $m->colour_parse( 'Code ${variable} here' );
+    # Returns: "Code ${variable} here"
+    $m->colour_parse( "{bold red}code { x: 1 } here{/}" );
+    # Returns: "\e[38;5;224;1m\e[38;2;255;0;0;1mcode { x: 1 } here\e[m"
+
+=item * Malformed tags:
+
+    $m->colour_parse( "{in valid}text{/}" );
+    # Returns: "text"
+    $m->colour_parse( "{bold red}missing close" );
+    # Returns: "\e[38;5;224;1m\e[38;2;255;0;0;1mmissing close"
+
+Be careful that in this last example, if the colour formatting is not closed, the active colour formatting will affect any subsequent output lines.
+
+=item * Deep nesting:
+
+    $m->colour_parse( "{bold red}{underline green}{underline green}deep{/}{/}{/}" );
+    # Returns: "\e[38;5;224;1m\e[38;2;255;0;0;1m\e[38;5;28;4m\e[38;2;0;255;0;4m\e[38;5;28;4m\e[38;2;0;255;0;4mdeep\e[m\e[m\e[m"
+
+=item * Custom delimiters:
+
+    $m->colour_open( '[[');
+    $m->colour_close(']]' );
+    $m->colour_parse( "Text [[bold red]]coloured[[/]]" );
+    # Returns: "Text \e[38;5;224;1m\e[38;2;255;0;0;1mcoloured\e[m"
+
+=item * Non-TTY environment (formatting stripped):
+
+    my $m = Module::Generic->new( force_tty => 0 );
+    $m->colour_parse( "{bold red}text{/}" );
+    # Returns: "text"
+
+=back
+
+Note that this method uses ANSI escape codes for formatting, which may not be supported by all terminals.
+
+And, in non-TTY environments, all formatting is stripped, and only the content within tags is returned. This is particularly necessary if, instead of displaying those messages in a terminal, you redirect the output to a file.
+
+This method returns a string with ANSI escape codes applied for valid formatting tags, or the content with tags stripped in non-TTY environments. Malformed or unrecognised tags are either ignored or treated as literal text.
+
+See also L<Term::ANSIColor> for ANSI escape code details.
 
 =head2 colour_to_rgb
 
@@ -12421,6 +13134,15 @@ You can enable it in your own package by initialising it in your own C<init> met
         $self->{fatal} = 1;
         return( $self->SUPER::init( @_ ) );
     }
+
+=head2 force_tty
+
+Set or get this flag that specify whether the environment is running under TTY or not.
+Normally, this is derived automatically with the method L</_is_tty>, but you can use this method to force your code.
+
+It is by default C<undef>. Set it to false to indicate your code is not running under TTY, and a true value otherwise.
+
+This is used in L</colour_parse>
 
 =head2 get
 

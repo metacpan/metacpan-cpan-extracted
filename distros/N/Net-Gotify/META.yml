@@ -1,0 +1,31 @@
+---
+abstract: unknown
+author:
+  - 'Giuseppe Di Terlizzi <gdt@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Gotify
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  HTTP::Tiny: '0'
+  JSON::PP: '0'
+  Moo: '0'
+  perl: '5.016'
+resources:
+  bugtracker: https://github.com/giterlizzi/perl-Net-Gotify/issues
+  repository: git://github.com/giterlizzi/perl-Net-Gotify
+version: '1.00'
+x_purl: pkg:cpan/GDT/Net-Gotify
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -1,0 +1,61 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "Giuseppe Di Terlizzi <gdt@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-Gotify",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Tiny" : "0",
+            "JSON::PP" : "0",
+            "Moo" : "0",
+            "perl" : "5.016"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/giterlizzi/perl-Net-Gotify/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/giterlizzi/perl-Net-Gotify",
+         "web" : "https://github.com/giterlizzi/perl-Net-Gotify"
+      }
+   },
+   "version" : "1.00",
+   "x_purl" : "pkg:cpan/GDT/Net-Gotify",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

@@ -36,6 +36,7 @@
             "FFI::CheckLib" : "0.30",
             "FFI::Platypus" : "2.00",
             "FFI::Platypus::Record" : "0",
+            "Math::BigInt" : "0",
             "perl" : "5.010"
          }
       },
@@ -57,7 +58,7 @@
          "web" : "https://github.com/giterlizzi/perl-DBD-DuckDB"
       }
    },
-   "version" : "0.14",
-   "x_purl" : "pkg:cpan/GDT/DBI-DuckDB",
+   "version" : "0.15",
+   "x_purl" : "pkg:cpan/GDT/DBD-DuckDB",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

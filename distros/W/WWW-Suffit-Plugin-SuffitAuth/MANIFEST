@@ -20,6 +20,13 @@ t/00-trailingspace.t                     Style test: TrailingSpace
 t/01-use.t                               Test script
 
 # Examples
-eg/server.pl
+eg/myapp.pl
+eg/lib/MyApp.pm
+eg/www/index.html.ep
+eg/www/layouts/default.html.ep
+eg/www/login/login.html.ep
+eg/www/login/private.html.ep
+eg/www/login/private.html.ep
+eg/www/root/index.html.ep
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -7,6 +7,7 @@ use Schedule::Activity;
 print "This is a randomized 7-minute exercise schedule grouped by muscle group.\n";
 
 my $scheduler=Schedule::Activity->new(
+	unsafe=>1,
 	configuration=>{node=>{
 
 		'7min program'=>{

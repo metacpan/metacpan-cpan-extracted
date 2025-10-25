@@ -23,3 +23,8 @@ Revision history for Perl module Perl5::TestEachCommit
 
 0.06 Mon Oct 20 10:03:33 AM EDT 2025
     - Enable user to track at the miniperl/minitest level.
+
+0.07 Fri Oct 24 06:30:34 AM EDT 2025
+    - Throw exception if list of commits is empty.
+    - When requesting verbose output, provide user with guidance as to place
+      of commit being tested within overall list of such commits.

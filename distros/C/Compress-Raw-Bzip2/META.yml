@@ -23,5 +23,5 @@ resources:
   bugtracker: https://github.com/pmqs/Compress-Raw-Bzip2/issues
   homepage: https://github.com/pmqs/Compress-Raw-Bzip2
   repository: git://github.com/pmqs/Compress-Raw-Bzip2.git
-version: '2.213'
+version: '2.214'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

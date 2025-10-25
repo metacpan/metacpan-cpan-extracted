@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::PSBT;
-$Bitcoin::Crypto::PSBT::VERSION = '3.001';
+$Bitcoin::Crypto::PSBT::VERSION = '3.002';
 use v5.10;
 use strict;
 use warnings;

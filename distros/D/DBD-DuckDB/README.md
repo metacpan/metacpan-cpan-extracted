@@ -5,7 +5,7 @@
 # SYNOPSIS
 
     use DBI;
-    my $dbh = DBI->connect("dbi:DuckDB:dbname=$dbfile","","");
+    my $dbh = DBI->connect("dbi:DuckDB:dbname=$dbfile", "", "");
 
 # DESCRIPTION
 
@@ -80,7 +80,7 @@ DBI equivalent of the "new" method.
 
 The connection string is always of the form: "dbi:DuckDB:dbname=&lt;dbfile>"
 
-    my $dbh = DBI->connect("dbi:DucDB:dbname=$dbfile", "", "", $attr);
+    my $dbh = DBI->connect("dbi:DuckDB:dbname=$dbfile", "", "", \%attr);
 
 DuckDB creates a file per a database.
 
@@ -90,13 +90,39 @@ Although the database is stored in a single file, the directory containing the
 database file must be writable by DuckDB because the library will create 
 several temporary files there.
 
-If the filename `$dbfile` is ":memory:", then a private, temporary in-memory 
+If the filename `$dbfile` is `:memory:`, then a private, temporary in-memory 
 database is created for the connection. This in-memory database will vanish 
 when the database connection is closed. It is handy for your library tests.
 
-## Connect Attributes
+## Common connect Attributes
 
-- **duckdb\_checkpoint\_on\_disconnect**
+See ["ATTRIBUTES-COMMON-TO-ALL-HANDLES" in DBI](https://metacpan.org/pod/DBI#ATTRIBUTES-COMMON-TO-ALL-HANDLES).
+
+## DuckDB connect Attributes
+
+### **duckdb\_checkpoint\_on\_disconnect**
+
+Execute `CHECKPOINT` statement on disconnect.
+
+The `CHECKPOINT` statement synchronizes data in the write-ahead log (WAL) to the
+database data file.
+
+### **duckdb\_config**
+
+Configuration options can be provided to change different settings of the database
+system. Note that many of these settings can be changed later on using `PRAGMA`
+statements as well.
+
+    my $dbh = DBI->connect("dbi:DuckDB:dbname=$dbfile", undef, undef, {
+        duckdb_config => {
+            access_mode   => 'READ_WRITE',
+            threads       => 8,
+            max_memory    => '8GB',
+            default_order => 'DESC'
+        }
+    });
+
+See [https://duckdb.org/docs/stable/configuration/overview#global-configuration-options](https://duckdb.org/docs/stable/configuration/overview#global-configuration-options).
 
 ## Methods Common To All Handles
 
@@ -284,11 +310,10 @@ behavior.
 
 ### **table\_info**
 
-    $sth = $dbh->table_info($catalog, $schema, $table, $type, \%attr);
+    $sth = $dbh->table_info( $catalog, $schema, $table, $type );
 
 Returns all tables and schemas (databases) as specified in ["table\_info" in DBI](https://metacpan.org/pod/DBI#table_info).
-The schema and table arguments will do a `LIKE` search. You can specify an
-ESCAPE character by including an 'Escape' attribute in \\%attr. The `$type`
+The schema and table arguments will do a `LIKE` search. The `$type`
 argument accepts a comma separated list of the following types 'TABLE',
 'INDEX', 'VIEW' and 'TRIGGER' (by default all are returned).
 Note that a statement handle is returned, and not a direct list of tables.
@@ -298,11 +323,45 @@ The following fields are returned:
 - **TABLE\_SCHEM**: The name of the schema (database) that the table or view is
 in. The default schema is 'main' and other databases will be in the name given when
 the database was attached.
+- **TABLE\_NAME**: The name of the table or view.
+- **TABLE\_TYPE**: The type of object returned. Will be one of 'TABLE', 'INDEX',
+'VIEW', 'TRIGGER'.
+- **REMARKS**: A description of the table.
 
-    **TABLE\_NAME**: The name of the table or view.
+### **column\_info**
 
-    **TABLE\_TYPE**: The type of object returned. Will be one of 'TABLE', 'INDEX',
-    'VIEW', 'TRIGGER'.
+    $sth = $dbh->column_info( $catalog, $schema, $table, $column );
+
+Fetch information about columns in specificed table (["column\_info" in DBI](https://metacpan.org/pod/DBI#column_info)).
+The catalog, schema and table arguments will do a `LIKE` search.
+Note that a statement handle is returned, and not a direct list of columns.
+The following fields are returned:
+
+- **TABLE\_CAT**: The name of the catalog.
+- **TABLE\_SCHEM**: The name of the schema (database) that the table or 
+view is in. The default schema is 'main' and other databases will be in the 
+name given when the database was attached.
+- **TABLE\_NAME**: The name of the table or view.
+- **COLUMN\_NAME**: The column identifier.
+- **DATA\_TYPE**
+- **TYPE\_NAME**: A data source dependent data type name.
+- **COLUMN\_SIZE**
+- **BUFFER\_LENGTH**
+- **DECIMAL\_DIGITS**: The total number of significant digits to the right
+of the decimal point.
+- **NUM\_PREC\_RADIX**: The radix for numeric precision. The value is 10 or
+2 for numeric data types and NULL (undef) if not applicable.
+- **NULLABLE**: Indicates if a column can accept NULLs (0 = SQL\_NO\_NULLS, 
+1 = SQL\_NULLABLE)
+- **REMARKS**: A description of the column.
+- **COLUMN\_DEF**: The default value of the column, in a format that can be 
+used directly in an SQL statement.
+- **SQL\_DATA\_TYPE**
+- **SQL\_DATETIME\_SUB**
+- **CHAR\_OCTET\_LENGTH**
+- **ORDINAL\_POSITION**: The column sequence number (starting with 1).
+- **IS\_NULLABLE**: Indicates if the column can accept NULLs. Possible 
+values are: 'NO', 'YES' and ''.
 
 ### **tables**
 
@@ -373,6 +432,39 @@ much faster than using prepared statements or individual INSERT INTO statements.
     $appeder->append_row(id => 1, name => 'Mark');
 
 See [DBD::DuckDB::Appender](https://metacpan.org/pod/DBD%3A%3ADuckDB%3A%3AAppender).
+
+### **x\_duckdb\_read\_csv**
+
+    $dbh->x_duckdb_read_csv( $file );
+    $dbh->x_duckdb_read_csv( $file, \%params );
+
+Helper method for `read_csv` function ([https://duckdb.org/docs/stable/data/csv/overview](https://duckdb.org/docs/stable/data/csv/overview)).
+
+    $sth = $dbh->x_duckdb_read_csv('https://duckdb.org/data/flights.csv' => {sep => '|'}) or Carp::croak $dbh->errstr;
+
+    while (my $row = $sth->fetchrow_hashref) {
+        say sprintf '%s --> %s', $row->{OriginCityName}, $row->{DestCityName}; 
+    }
+
+### **x\_duckdb\_read\_json**
+
+    $dbh->x_duckdb_read_json( $file );
+    $dbh->x_duckdb_read_json( $file, \%params );
+
+Helper method for `read_json` function ([https://duckdb.org/docs/stable/data/json/loading\_json](https://duckdb.org/docs/stable/data/json/loading_json)).
+
+    $sth = $dbh->x_duckdb_read_json('https://duckdb.org/data/json/todos.json') or Carp::croak $dbh->errstr;
+
+    while (my $row = $sth->fetchrow_hashref) {
+        say sprintf '[%s] %s', ($row->{completed} ? '✓' : ' '), $row->{title};
+    }
+
+### **x\_duckdb\_read\_xlsx**
+
+    $dbh->x_duckdb_read_xlsx( $file );
+    $dbh->x_duckdb_read_xlsx( $file, \%params );
+
+Helper method for `read_xlsx` function ([https://duckdb.org/docs/stable/core\_extensions/excel](https://duckdb.org/docs/stable/core_extensions/excel)).
 
 # DBI STATEMENT HANDLE OBJECTS
 

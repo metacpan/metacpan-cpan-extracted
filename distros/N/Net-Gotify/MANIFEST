@@ -1,0 +1,19 @@
+Changes
+lib/Net/Gotify.pm
+lib/Net/Gotify/Application.pm
+lib/Net/Gotify/Client.pm
+lib/Net/Gotify/Error.pm
+lib/Net/Gotify/Message.pm
+lib/Net/Gotify/Plugin.pm
+lib/Net/Gotify/User.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/00-load.t
+t/kwalitee.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

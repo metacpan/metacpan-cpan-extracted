@@ -6,7 +6,7 @@ package DBD::DuckDB {
 
     use DBD::DuckDB::FFI qw(duckdb_library_version);
 
-    our $VERSION = '0.14';
+    our $VERSION = '0.15';
     $VERSION =~ tr/_//d;
 
     our $drh;
@@ -76,26 +76,48 @@ package    # hide from PAUSE
         foreach my $var (split /;/, $dsn) {
 
             my ($attr_name, $attr_value) = split '=', $var, 2;
-            return $drh->set_err($DBI::stderr, "Can't parse DSN part '$var'") unless defined $attr_value;
+            return $drh->set_err(1, "Can't parse DSN part '$var'") unless defined $attr_value;
 
             $attr_name = $driver_prefix . $attr_name unless $attr_name =~ /^$driver_prefix/o;
 
             $attr->{$attr_name} = $attr_value;
         }
 
-        $attr->{duckdb_dbname}                   //= ':memory:';
         $attr->{duckdb_checkpoint_on_disconnect} //= 1;
+        $attr->{duckdb_config}                   //= {};
+        $attr->{duckdb_dbname}                   //= ':memory:';
 
         my $dbh = DBI::_new_dbh($drh, {Name => $dsn});
 
-        my ($db, $conn, $rc);
+        my ($db, $conn, $config, $out_error);
 
-        $rc = duckdb_open($attr->{duckdb_dbname}, \$db);
+        duckdb_create_config(\$config);
 
-        return $dbh->set_err(1, "Can't connect to $dsn: duckdb_open failed") if $rc;
+        if (%{$attr->{duckdb_config}}) {
 
-        $rc = duckdb_connect($db, \$conn);
-        return $dbh->set_err(1, "Can't connect to $dsn: duckdb_connect failed") if $rc;
+            foreach my $name (keys %{$attr->{duckdb_config}}) {
+
+                my $option = $attr->{duckdb_config}->{$name};
+
+                $drh->trace_msg("    <- [DuckDB] Config: $name = $option\n");
+
+                if (duckdb_set_config($config, $name, $option)) {
+                    return $drh->set_err(1, "duckdb_set_config ($name => $option) failed");
+                }
+
+            }
+
+        }
+
+        if (duckdb_open_ext($attr->{duckdb_dbname}, \$db, $config, \$out_error)) {
+            return $dbh->set_err(1, $out_error // 'failed to open database');
+        }
+
+        duckdb_destroy_config(\$config);
+
+        if (duckdb_connect($db, \$conn)) {
+            return $dbh->set_err(1, "Can't connect to $dsn: duckdb_connect failed");
+        }
 
         $dbh->{duckdb_conn}    = $conn;
         $dbh->{duckdb_db}      = $db;
@@ -139,6 +161,7 @@ package    # hide from PAUSE
     use warnings;
     use DBI  qw(:sql_types);
     use base qw(DBD::_::db);
+    use Carp ();
 
     use DBD::DuckDB::FFI qw(:all);
     use DBD::DuckDB::Appender;
@@ -146,7 +169,7 @@ package    # hide from PAUSE
 
     our $imp_data_size = 0;
 
-    sub x_duckdb_version { DBD::DuckDB::FFI::duckdb_library_version() }
+    sub x_duckdb_version { duckdb_library_version() }
 
     sub x_duckdb_appender {
 
@@ -314,8 +337,9 @@ package    # hide from PAUSE
         my $db   = delete $dbh->{duckdb_db};
 
         if ($dbh->FETCH('duckdb_checkpoint_on_disconnect') && $dbh->FETCH('AutoCommit')) {
-            my $rc = duckdb_query($conn, 'CHECKPOINT');
-            return $dbh->set_err(1, 'failed to save checkpoint') if $rc;
+            if (duckdb_query($conn, 'CHECKPOINT')) {
+                return $dbh->set_err(1, 'failed to save checkpoint');
+            }
         }
 
         duckdb_disconnect(\$conn);
@@ -334,14 +358,13 @@ package    # hide from PAUSE
         my ($outer, $sth) = DBI::_new_sth($dbh, {Statement => $sql});
         return $sth unless ($sth);
 
-        my $rc = duckdb_prepare($dbh->{duckdb_conn}, $sql, \my $stmt);
+        $sth->{duckdb_stmt} = undef;
 
-        if ($rc) {
-            $dbh->set_err(1, duckdb_prepare_error($stmt) // 'duckdb_prepare failed');
+        if (duckdb_prepare($dbh->{duckdb_conn}, $sql, \$sth->{duckdb_stmt})) {
+            $dbh->set_err(1, duckdb_prepare_error($sth->{duckdb_stmt}) // 'duckdb_prepare failed');
             return;
         }
 
-        $sth->{duckdb_stmt} = $stmt;
         return $outer;
 
     }
@@ -368,6 +391,19 @@ package    # hide from PAUSE
 
     }
 
+    sub _like {
+
+        my ($col, $val, $where, $bind) = @_;
+
+        return if !defined $val || $val eq '' || $val eq '%';
+
+        push @{$where}, ($val =~ /[%_]/) ? "$col LIKE ? ESCAPE '\\'" : "$col = ?";
+        push @{$bind}, $val;
+
+        return 1;
+
+    }
+
     # SQL/CLI (ISO/IEC JTC 1/SC 32 N 0595), 6.63 Tables
     sub table_info {
 
@@ -376,23 +412,12 @@ package    # hide from PAUSE
         my @where = ();
         my @bind  = ();
 
-        my $like = sub {
-
-            my ($col, $val) = @_;
-
-            return if !defined $val || $val eq '' || $val eq '%';
-
-            push @where, ($val =~ /[%_]/) ? "$col LIKE ? ESCAPE '\\'" : "$col = ?";
-            push @bind, $val;
-
-        };
-
         $type = 'BASE TABLE' if (defined $type && uc($type) eq 'TABLE');
 
-        $like->('table_catalog', $catalog) if defined $catalog;
-        $like->('table_schema',  $schema)  if defined $schema;
-        $like->('table_name',    $table)   if defined $table;
-        $like->('table_type',    uc $type) if defined $type;
+        _like('table_catalog', $catalog, \@where, \@bind) if defined $catalog;
+        _like('table_schema',  $schema,  \@where, \@bind) if defined $schema;
+        _like('table_name',    $table,   \@where, \@bind) if defined $table;
+        _like('table_type',    uc $type, \@where, \@bind) if defined $type;
 
         my $sql = q{
             SELECT
@@ -400,12 +425,61 @@ package    # hide from PAUSE
                 table_schema  AS TABLE_SCHEM,
                 table_name    AS TABLE_NAME,
                 CASE table_type WHEN 'BASE TABLE' THEN 'TABLE' ELSE table_type END AS TABLE_TYPE,
-                CAST(NULL AS VARCHAR) AS REMARKS
+                TABLE_COMMENT AS REMARKS
             FROM information_schema.tables
         };
 
         $sql .= ' WHERE ' . join(' AND ', @where) if @where;
         $sql .= ' ORDER BY TABLE_TYPE, TABLE_SCHEM, TABLE_NAME';
+
+        my $sth = $dbh->prepare($sql) or return;
+        $sth->execute(@bind)          or return;
+        return $sth;
+
+    }
+
+    sub column_info {
+
+        my ($dbh, $catalog, $schema, $table, $column, $attr) = @_;
+
+        my @where = ();
+        my @bind  = ();
+
+        _like('table_catalog', $catalog, \@where, \@bind) if defined $catalog;
+        _like('table_schema',  $schema,  \@where, \@bind) if defined $schema;
+        _like('table_name',    $table,   \@where, \@bind) if defined $table;
+        _like('column_name',   $column,  \@where, \@bind) if defined $column;
+
+        # TODO
+        #
+        # * DATA_TYPE: Convert DUCKDB_TYPE_* to DBI SQL_TYPE_*
+        # * COLUMN_SIZE: Guess column size or use duckdb_types()
+
+        my $sql = qq{
+            SELECT
+                table_catalog           AS TABLE_CAT,
+                table_schema            AS TABLE_SCHEM,
+                table_name              AS TABLE_NAME,
+                column_name             AS COLUMN_NAME,
+                NULL                    AS DATA_TYPE,
+                UPPER(data_type)        AS TYPE_NAME,
+                NULL                    AS COLUMN_SIZE,
+                NULL                    AS BUFFER_LENGTH,
+                numeric_scale           AS DECIMAL_DIGITS,
+                numeric_precision_radix AS NUM_PREC_RADIX,
+                CASE UPPER(is_nullable) WHEN 'YES' THEN 1 ELSE 0 END AS NULLABLE,
+                COLUMN_COMMENT          AS REMARKS,
+                column_default          AS COLUMN_DEF,
+                NULL                    AS SQL_DATA_TYPE,
+                NULL                    AS SQL_DATETIME_SUB,
+                NULL                    AS CHAR_OCTET_LENGTH,
+                ordinal_position        AS ORDINAL_POSITION,
+                UPPER(is_nullable)      AS IS_NULLABLE
+            FROM information_schema.columns
+        };
+
+        $sql .= ' WHERE ' . join(' AND ', @where) if @where;
+        $sql .= ' ORDER BY TABLE_CAT, TABLE_SCHEM, TABLE_NAME, ORDINAL_POSITION';
 
         my $sth = $dbh->prepare($sql) or return;
         $sth->execute(@bind)          or return;
@@ -420,20 +494,9 @@ package    # hide from PAUSE
         my @where = ();
         my @bind  = ();
 
-        my $like = sub {
-
-            my ($col, $val) = @_;
-
-            return if !defined $val || $val eq '' || $val eq '%';
-
-            push @where, ($val =~ /[%_]/) ? "$col LIKE ? ESCAPE '\\'" : "$col = ?";
-            push @bind, $val;
-
-        };
-
-        $like->('kc.table_catalog', $catalog) if defined $catalog;
-        $like->('kc.table_schema',  $schema)  if defined $schema;
-        $like->('kc.table_name',    $table)   if defined $table;
+        _like('kc.table_catalog', $catalog, \@where, \@bind) if defined $catalog;
+        _like('kc.table_schema',  $schema,  \@where, \@bind) if defined $schema;
+        _like('kc.table_name',    $table,   \@where, \@bind) if defined $table;
 
         my $sql = q{
             SELECT
@@ -467,23 +530,12 @@ package    # hide from PAUSE
         my @where = ();
         my @bind  = ();
 
-        my $like = sub {
-
-            my ($col, $val) = @_;
-
-            return if !defined $val || $val eq '' || $val eq '%';
-
-            push @where, ($val =~ /[%_]/) ? "$col LIKE ? ESCAPE '\\'" : "$col = ?";
-            push @bind, $val;
-
-        };
-
-        $like->('kc.table_catalog', $pk_catalog) if defined $pk_catalog;
-        $like->('uk.table_schema',  $pk_schema)  if defined $pk_schema;
-        $like->('uk.table_name',    $pk_table)   if defined $pk_table;
-        $like->('fk.table_catalog', $fk_catalog) if defined $fk_catalog;
-        $like->('fk.table_schema',  $fk_schema)  if defined $fk_schema;
-        $like->('fk.table_name',    $fk_table)   if defined $fk_table;
+        _like('kc.table_catalog', $pk_catalog, \@where, \@bind) if defined $pk_catalog;
+        _like('uk.table_schema',  $pk_schema,  \@where, \@bind) if defined $pk_schema;
+        _like('uk.table_name',    $pk_table,   \@where, \@bind) if defined $pk_table;
+        _like('fk.table_catalog', $fk_catalog, \@where, \@bind) if defined $fk_catalog;
+        _like('fk.table_schema',  $fk_schema,  \@where, \@bind) if defined $fk_schema;
+        _like('fk.table_name',    $fk_table,   \@where, \@bind) if defined $fk_table;
 
         my $sql = q{
             SELECT
@@ -564,7 +616,7 @@ package    # hide from PAUSE
                 NUM_PREC_RADIX     => 17,
                 INTERVAL_PRECISION => 18,
             },
-            ['ARRAY',     SQL_ALL_TYPES, $UN, $UN,  $UN, $UN,  1, 0, 0, $UN, 0, $UN, $UN, $UN, $UN, $UN, $UN, $UN, $UN],
+            ['ARRAY',     SQL_ALL_TYPES, 1,   $UN,  $UN, $UN,  1, 0, 0, $UN, 0, $UN, $UN, $UN, $UN, $UN, $UN, $UN, $UN],
             ['BIGINT',    SQL_BIGINT,    19,  $UN,  $UN, $UN,  1, 0, 3, 0,   0, $UN, $UN, $UN, $UN, $UN, $UN, 10,  $UN],
             ['BLOB',      SQL_BLOB,      $UN, "X'", "'", $UN,  1, 0, 0, $UN, 0, $UN, $UN, $UN, $UN, $UN, $UN, $UN, $UN],
             ['BOOLEAN',   SQL_BOOLEAN,   1,   $UN,  $UN, $UN,  1, 0, 3, $UN, 0, $UN, $UN, $UN, $UN, $UN, $UN, $UN, $UN],
@@ -598,7 +650,7 @@ package    # hide from PAUSE
 
         if ($dbh->FETCH('AutoCommit')) {
             if ($dbh->FETCH('Warn')) {
-                warn("Rollback ineffective while AutoCommit is on");
+                warn 'Rollback ineffective while AutoCommit is on';
             }
             return;
         }
@@ -615,7 +667,7 @@ package    # hide from PAUSE
         my $dbh = shift;
 
         if ($dbh->FETCH('AutoCommit')) {
-            warn("Commit ineffective while AutoCommit is on") if ($dbh->FETCH('Warn'));
+            warn 'Commit ineffective while AutoCommit is on' if ($dbh->FETCH('Warn'));
             return;
         }
 
@@ -643,11 +695,11 @@ package    # hide from PAUSE
                 # DuckDB auto commit
             }
             elsif (!$old_value && $value) {
-                $dbh->trace_msg("    -> DuckDB: commit changes\n");
+                $dbh->trace_msg("    <- [DuckDB] Commit changes\n");
                 $dbh->do('COMMIT');
             }
             elsif ($old_value && !$value || !$old_value && !$value && $never_set) {
-                $dbh->trace_msg("    -> DuckDB: start transaction\n");
+                $dbh->trace_msg("    <- [DuckDB] Start transaction\n");
                 $dbh->do('BEGIN TRANSACTION');
             }
 
@@ -686,9 +738,10 @@ package    # hide from PAUSE
     use DBI  qw(:sql_types);
     use base qw(DBD::_::st);
 
-    use Carp;
+    use Carp();
     use Config;
     use Time::Piece;
+    use Math::BigInt;
 
     use FFI::Platypus::Buffer qw( scalar_to_buffer buffer_to_scalar );
 
@@ -702,13 +755,33 @@ package    # hide from PAUSE
 
         my ($attr, $value) = @_;
 
-        return $attr         if defined $attr        && !ref $attr;
-        return $attr->{TYPE} if ref($attr) eq 'HASH' && exists $attr->{TYPE};
+        return $attr if defined $attr && !ref $attr;
+
+        if (ref($attr) eq 'HASH') {
+            return $attr->{TYPE}                                  if defined $attr->{TYPE};
+            return _duckdb_type_to_sql_type($attr->{DUCKDB_TYPE}) if defined $attr->{DUCKDB_TYPE};
+        }
 
         return SQL_INTEGER if defined $value && $value =~ /^-?\d+\z/;
         return SQL_DOUBLE  if defined $value && $value =~ /^-?(?:\d+\.\d*|\.\d+|\d+)(?:[eE][+-]?\d+)?\z/;
         return SQL_BOOLEAN if defined $value && $value =~ /^(?:true|false|0|1)\z/i;
         return SQL_VARCHAR;
+
+    }
+
+    sub _duckdb_type_to_sql_type {
+
+        my ($type_id) = @_;
+
+        return SQL_BIGINT   if $type_id == DUCKDB_TYPE_BIGINT;
+        return SQL_BLOB     if $type_id == DUCKDB_TYPE_BLOB;
+        return SQL_BOOLEAN  if $type_id == DUCKDB_TYPE_BOOLEAN;
+        return SQL_DOUBLE   if $type_id == DUCKDB_TYPE_DOUBLE;
+        return SQL_INTEGER  if $type_id == DUCKDB_TYPE_INTEGER;
+        return SQL_SMALLINT if $type_id == DUCKDB_TYPE_SMALLINT;
+        return SQL_VARCHAR  if $type_id == DUCKDB_TYPE_VARCHAR;
+
+        return SQL_UNKNOWN_TYPE;
 
     }
 
@@ -766,14 +839,15 @@ package    # hide from PAUSE
         my $duckdb_stmt = $sth->{duckdb_stmt};
 
         for my $i (0 .. $#bind) {
-            my $ok = $sth->bind_param($i + 1, $bind[$i]);
-            return $ok if !defined $ok;
+            my $rc = $sth->bind_param($i + 1, $bind[$i]);
+            return $rc if !defined $rc;
         }
 
         my $res = DBD::DuckDB::FFI::Result->new;
-        my $rc  = duckdb_execute_prepared($duckdb_stmt, $res);
 
-        return $sth->set_err(1, duckdb_result_error($res) // 'duckdb_execute_prepared failed') if $rc;
+        if (duckdb_execute_prepared($duckdb_stmt, $res)) {
+            return $sth->set_err(1, duckdb_result_error($res) // 'duckdb_execute_prepared failed');
+        }
 
         my $res_type = duckdb_result_return_type($res);
 
@@ -834,43 +908,58 @@ package    # hide from PAUSE
         my ($vector, $row_idx, $logical_type) = @_;
 
         my $validity = duckdb_vector_get_validity($vector);
-        return undef unless (duckdb_validity_row_is_valid($validity, $row_idx));
+        unless (duckdb_validity_row_is_valid($validity, $row_idx)) {
+            DBI->trace_msg("    -> [DuckDB] duckdb_validity_row_is_valid => 0\n", 2);
+            return undef;
+        }
 
         my $vector_data = duckdb_vector_get_data($vector);
         my $type_id     = duckdb_get_type_id($logical_type);
+        my $type_name   = DBD::DuckDB::Constants->DUCKDB_TYPE($type_id);
+
+        DBI->trace_msg("    -> [DuckDB] Fetch vector value: row_idx=$row_idx, type=$type_name($type_id)\n", 2);
 
         return _vector_array($logical_type, $vector, $row_idx)              if ($type_id == DUCKDB_TYPE_ARRAY);
         return _vector_date($vector_data, $row_idx)                         if ($type_id == DUCKDB_TYPE_DATE);
         return _vector_decimal($logical_type, $vector_data, $row_idx)       if ($type_id == DUCKDB_TYPE_DECIMAL);
         return _vector_f32($vector_data, $row_idx)                          if ($type_id == DUCKDB_TYPE_FLOAT);
         return _vector_f64($vector_data, $row_idx)                          if ($type_id == DUCKDB_TYPE_DOUBLE);
+        return _vector_hugeint($vector_data, $row_idx)                      if ($type_id == DUCKDB_TYPE_HUGEINT);
         return _vector_i16($vector_data, $row_idx)                          if ($type_id == DUCKDB_TYPE_SMALLINT);
         return _vector_i32($vector_data, $row_idx)                          if ($type_id == DUCKDB_TYPE_INTEGER);
         return _vector_i64($vector_data, $row_idx)                          if ($type_id == DUCKDB_TYPE_BIGINT);
         return _vector_i8($vector_data, $row_idx)                           if ($type_id == DUCKDB_TYPE_TINYINT);
+        return _vector_interval($vector_data, $row_idx)                     if ($type_id == DUCKDB_TYPE_INTERVAL);
         return _vector_list($logical_type, $vector, $vector_data, $row_idx) if ($type_id == DUCKDB_TYPE_LIST);
         return _vector_map($logical_type, $vector, $vector_data, $row_idx)  if ($type_id == DUCKDB_TYPE_MAP);
         return _vector_struct($logical_type, $vector, $row_idx)             if ($type_id == DUCKDB_TYPE_STRUCT);
-        return _vector_timestamp($vector_data, $row_idx, 0)                 if ($type_id == DUCKDB_TYPE_TIMESTAMP);
-        return _vector_timestamp($vector_data, $row_idx, 1)                 if ($type_id == DUCKDB_TYPE_TIMESTAMP_TZ);
+        return _vector_time_tz($vector_data, $row_idx)                      if ($type_id == DUCKDB_TYPE_TIME_TZ);
+        return _vector_time($vector_data, $row_idx)                         if ($type_id == DUCKDB_TYPE_TIME);
+        return _vector_timestamp_ms($vector_data, $row_idx)                 if ($type_id == DUCKDB_TYPE_TIMESTAMP_MS);
+        return _vector_timestamp_ns($vector_data, $row_idx)                 if ($type_id == DUCKDB_TYPE_TIMESTAMP_NS);
+        return _vector_timestamp_s($vector_data, $row_idx)                  if ($type_id == DUCKDB_TYPE_TIMESTAMP_S);
+        return _vector_timestamp_tz($vector_data, $row_idx)                 if ($type_id == DUCKDB_TYPE_TIMESTAMP_TZ);
+        return _vector_timestamp($vector_data, $row_idx)                    if ($type_id == DUCKDB_TYPE_TIMESTAMP);
         return _vector_u16($vector_data, $row_idx)                          if ($type_id == DUCKDB_TYPE_USMALLINT);
         return _vector_u32($vector_data, $row_idx)                          if ($type_id == DUCKDB_TYPE_UINTEGER);
         return _vector_u64($vector_data, $row_idx)                          if ($type_id == DUCKDB_TYPE_UBIGINT);
         return _vector_u8($vector_data, $row_idx)                           if ($type_id == DUCKDB_TYPE_UTINYINT);
         return _vector_u8($vector_data, $row_idx) ? !!1 : !!0               if ($type_id == DUCKDB_TYPE_BOOLEAN);
+        return _vector_uhugeint($vector_data, $row_idx)                     if ($type_id == DUCKDB_TYPE_UHUGEINT);
         return _vector_union($logical_type, $vector, $row_idx)              if ($type_id == DUCKDB_TYPE_UNION);
+        return _vector_uuid($vector_data, $row_idx)                         if ($type_id == DUCKDB_TYPE_UUID);
         return _vector_varchar($vector_data, $row_idx)                      if ($type_id == DUCKDB_TYPE_BLOB);
         return _vector_varchar($vector_data, $row_idx)                      if ($type_id == DUCKDB_TYPE_VARCHAR);
 
-        Carp::carp "Unknown type ($type_id)";
+        Carp::carp "Unknown type $type_name($type_id)";
         return undef;
 
     }
 
     sub _mem {
-        my ($vector_data, $row_idx, $size) = @_;
-        my $addr = $vector_data + $row_idx * $size;
-        my $sv   = buffer_to_scalar($addr, $size);
+        my ($ptr, $offset, $length) = @_;
+        my $addr = $ptr + $offset * $length;
+        my $sv   = buffer_to_scalar($addr, $length);
         return $sv;
     }
 
@@ -884,6 +973,41 @@ package    # hide from PAUSE
     sub _vector_i64 { unpack 'q<', _mem(@_, 8) }
     sub _vector_f32 { unpack 'f<', _mem(@_, 4) }
     sub _vector_f64 { unpack 'd<', _mem(@_, 8) }
+
+    sub _vector_uhugeint {
+
+        my ($vector_data, $row_idx) = @_;
+
+        # Decode duckdb_uhugeint struct
+        my ($lower, $upper) = unpack('Q< Q<', buffer_to_scalar($vector_data + $row_idx * 16, 16));
+
+        my $value = Math::BigInt->new($upper);
+        $value->blsft(64);
+        $value->badd($lower);
+
+        return $value->bstr;
+
+    }
+
+    sub _vector_hugeint {
+
+        my ($vector_data, $row_idx) = @_;
+
+        # Decode duckdb_hugeint struct
+        my ($lower, $upper) = unpack('Q< q<', buffer_to_scalar($vector_data + $row_idx * 16, 16));
+
+        my $value = Math::BigInt->new($upper);
+        $value->blsft(64);
+        $value->badd($lower);
+
+        if ($upper & (1 << 63)) {
+            my $two128 = Math::BigInt->bone() << 128;
+            $value->bsub($two128);
+        }
+
+        return $value->bstr;
+
+    }
 
     sub _vector_varchar {
 
@@ -912,18 +1036,109 @@ package    # hide from PAUSE
         my ($vector_data, $row_idx) = @_;
 
         # Decode duckdb_date struct
-        my $days  = _vector_i32($vector_data, $row_idx);
-        my $epoch = 0 + 86400 * $days;
+        my $days = _vector_i32($vector_data, $row_idx);
+        my $date = duckdb_from_date($days);
 
-        my $t = Time::Piece->new($epoch);
-        return $t->date;
+        DBI->trace_msg("    -> [DuckDB] DATE type: days=$days\n", 2);
+
+        return sprintf '%04d-%02d-%02d', $date->year, $date->month, $date->day;
+
+    }
+
+    sub _vector_timestamp_s {
+
+        my ($vector_data, $row_idx) = @_;
+
+        my $seconds = _vector_i64($vector_data, $row_idx);
+        my $t       = Time::Piece->gmtime($seconds);
+
+        DBI->trace_msg("    -> [DuckDB] TIMESTAMP_S type: seconds=$seconds\n", 2);
+
+        return $t->datetime(T => ' ');
+
+    }
+
+    sub _vector_timestamp_tz {
+
+        my ($vector_data, $row_idx) = @_;
+
+        my $micros = _vector_i64($vector_data, $row_idx);
+
+        DBI->trace_msg("    -> [DuckDB] TIMESTAMP_TZ type: micros=$micros\n", 2);
+
+        my $t_micros = int($micros % 1_000_000);
+        my $t        = Time::Piece->localtime(int($micros / 1_000_000));
+
+        my $tz_h    = abs($t->tzoffset) / 3_600;
+        my $tz_m    = abs($t->tzoffset) % 3_600 / 60;
+        my $tz_sign = ($t->tzoffset < 0 ? '-' : '+');
+
+        my $offset = sprintf('%s%02d:%02d', $tz_sign, $tz_h, $tz_m);
+
+        # Remove ":00" from offset
+        while ($offset =~ /\:00$/) {
+            $offset =~ s/\:00$//;
+        }
+
+        my @t = ($t->datetime(T => ' '));
+        push @t, $t_micros if $t_micros > 0;
+
+        return join '', join('.', @t), $offset;
+
+    }
+
+    sub _vector_timestamp_ms {
+
+        my ($vector_data, $row_idx) = @_;
+
+        my $millis = _vector_i64($vector_data, $row_idx);
+
+        DBI->trace_msg("    -> [DuckDB] TIMESTAMP_MS type: millis=$millis\n", 2);
+
+        my $t_millis = int($millis % 1000 * 1000);
+        my $t        = Time::Piece->gmtime($millis / 1000);
+
+        my @t = ($t->datetime(T => ' '));
+        push @t, substr($t_millis, 0, 3) if $millis > 0;
+
+        return join '.', @t;
+
+    }
+
+    sub _vector_timestamp_ns {
+
+        my ($vector_data, $row_idx) = @_;
+
+        my $nanos = _vector_i64($vector_data, $row_idx);
+
+        DBI->trace_msg("    -> [DuckDB] TIMESTAMP_NS type: nanos=$nanos\n", 2);
+
+        my $t_nanos = int($nanos % 1_000_000_000);
+        my $t       = Time::Piece->gmtime(int($nanos / 1_000_000_000));
+
+        my @t = ($t->datetime(T => ' '));
+        push @t, $t_nanos if $t_nanos > 0;
+
+        return join '.', @t;
 
     }
 
     sub _vector_timestamp {
-        my ($vector_data, $row_idx, $tz) = @_;
-        my $epoch = int(_vector_i64($vector_data, $row_idx) / 1_000_000);
-        return ($tz == 1) ? localtime($epoch)->datetime : gmtime($epoch)->datetime;
+
+        my ($vector_data, $row_idx, $type_id) = @_;
+
+        my $micros = _vector_i64($vector_data, $row_idx);
+
+        DBI->trace_msg("    -> [DuckDB] TIMESTAMP type: micros=$micros\n", 2);
+
+        my $t_micros = int($micros % 1_000_000);
+        my $t        = Time::Piece->gmtime(int($micros / 1_000_000));
+
+        my @t = ($t->datetime(T => ' '));
+        push @t, $t_micros if $t_micros > 0;
+
+        return join '.', @t;
+
     }
 
     sub _vector_array {
@@ -1054,23 +1269,146 @@ package    # hide from PAUSE
 
         my ($logical_type, $vector_data, $row_idx) = @_;
 
-        my $width = duckdb_decimal_width($logical_type);
-        my $scale = duckdb_decimal_scale($logical_type);
-        my $type  = duckdb_decimal_internal_type($logical_type);
-        my $value = undef;
+        my $width     = duckdb_decimal_width($logical_type);
+        my $scale     = duckdb_decimal_scale($logical_type);
+        my $type_id   = duckdb_decimal_internal_type($logical_type);
+        my $type_name = DBD::DuckDB::Constants->DUCKDB_TYPE($type_id);
+        my $value     = undef;
 
-        $value = _vector_i32($vector_data, $row_idx) if ($type == DUCKDB_TYPE_INTEGER);
-        $value = _vector_i16($vector_data, $row_idx) if ($type == DUCKDB_TYPE_SMALLINT);
-        $value = _vector_i64($vector_data, $row_idx) if ($type == DUCKDB_TYPE_BIGINT);
+        DBI->trace_msg("    -> [DuckDB] duckdb_decimal_internal_type=$type_name($type_id)\n", 2);
+
+        $value = _vector_i32($vector_data, $row_idx) if ($type_id == DUCKDB_TYPE_INTEGER);
+        $value = _vector_i16($vector_data, $row_idx) if ($type_id == DUCKDB_TYPE_SMALLINT);
+        $value = _vector_i64($vector_data, $row_idx) if ($type_id == DUCKDB_TYPE_BIGINT);
 
         # TODO Add other numeric types
 
-        if ($value) {
+        if (defined $value) {
             return sprintf("%.${scale}f", $value / (10**$scale));
         }
 
-        Carp::carp "Unknown decimal internal type ($type)";
+        Carp::carp "Unknown decimal internal type $type_name($type_id)";
         return undef;
+
+    }
+
+    sub _vector_uuid {
+
+        my ($vector_data, $row_idx) = @_;
+
+        # Decode duckdb_uhugeint struct
+        my ($lower, $upper) = unpack('Q< Q<', buffer_to_scalar($vector_data + $row_idx * 16, 16));
+
+        DBI->trace_msg("    -> [DuckDB] UUID type: lower=$lower, upper=$upper\n", 2);
+
+        $upper ^= 1 << 63;    # flip
+        $upper += 1 << 64 if $upper < 0;
+
+        my $bytes = pack('Q> Q>', $upper, $lower);
+        my $hex   = unpack('H*', $bytes);
+
+        return sprintf '%s-%s-%s-%s-%s', substr($hex, 0, 8), substr($hex, 8, 4), substr($hex, 12, 4),
+            substr($hex, 16, 4), substr($hex, 20, 12);
+
+    }
+
+    sub _vector_interval {
+
+        my ($vector_data, $row_idx) = @_;
+
+        # Decode duckdb_interval struct
+        my ($months, $days, $micros) = unpack('l< l< q<', buffer_to_scalar($vector_data + $row_idx * 16, 16));
+
+        DBI->trace_msg("    -> [DuckDB] INTERVAL type: months=$months, days=$days, micros=$micros\n", 2);
+
+        if ($months > 0 || $days > 0) {
+
+            my $t_months = abs($months) >= 12 ? abs($months) - 12 : abs($months);
+            my $t_years  = int(abs($months) / 12);
+            my $t_days   = abs($days);
+
+            my @t = ();
+
+            push @t, sprintf '%d year%s',  $t_years,  ($t_years > 1  ? 's' : '') if $t_years;
+            push @t, sprintf '%d month%s', $t_months, ($t_months > 1 ? 's' : '') if $t_months;
+            push @t, sprintf '%d day%s',   $t_days,   ($t_days > 1   ? 's' : '') if $t_days;
+
+            return join ' ', @t;
+
+        }
+
+        if ($micros) {
+
+            my $seconds = abs($micros / 1_000_000);
+            my $sign    = ($micros < 0 ? '-' : '');
+
+            my $t_hours   = int($seconds / 3_600);
+            my $t_minutes = int(($seconds % 3_600) / 60);
+            my $t_seconds = int($seconds % 60);
+            my $t_micros  = int($micros % 1_000_000);
+
+            my $time = sprintf '%s%02d:%02d:%02d', $sign, $t_hours, $t_minutes, $t_seconds;
+
+            if ($t_micros) {
+                $time .= ".$t_micros";
+            }
+
+            return $time;
+
+        }
+
+    }
+
+    sub _vector_time {
+
+        my ($vector_data, $row_idx) = @_;
+
+        # Decode duckdb_time struct
+        my $micros = _vector_i64($vector_data, $row_idx);
+        my $time   = duckdb_from_time($micros);
+
+        DBI->trace_msg("    -> [DuckDB] TIME type: micros=$micros\n", 2);
+
+        my $out = sprintf '%02d:%02d:%02d', $time->hour, $time->min, $time->sec;
+
+        if (my $micros = $time->micros) {
+            $out .= ".$micros";
+        }
+
+        return $out;
+
+    }
+
+    sub _vector_time_tz {
+
+        my ($vector_data, $row_idx) = @_;
+
+        # Decode duckdb_time_tz struct
+        my $bits    = _vector_u64($vector_data, $row_idx);
+        my $time_tz = duckdb_from_time_tz($bits);
+
+        DBI->trace_msg("    -> [DuckDB] TIME_TZ type: bits=$bits\n", 2);
+
+        my $time = sprintf '%02d:%02d:%02d', $time_tz->hour, $time_tz->min, $time_tz->sec;
+
+        if (my $micros = $time_tz->micros) {
+            $time .= ".$micros";
+        }
+
+        my $tz_hour = abs($time_tz->offset) / 3_600;
+        my $tz_min  = abs($time_tz->offset) % 3_600 / 60;
+        my $tz_sign = ($time_tz->offset < 0 ? '-' : '+');
+
+        my $offset = sprintf('%s%02d:%02d', $tz_sign, $tz_hour, $tz_min);
+
+        # Remove ":00" from offset
+        while ($offset =~ /\:00$/) {
+            $offset =~ s/\:00$//;
+        }
+
+        $time .= $offset;
+
+        return $time;
 
     }
 
@@ -1142,13 +1480,24 @@ package    # hide from PAUSE
     }
 
     sub FETCH {
+
         my ($sth, $attr) = @_;
 
         if ($attr =~ /^duckdb_/) {
             return $sth->{$attr};
         }
 
+        return [] if $attr eq 'NULLABLE';
+        return [] if $attr eq 'SCALE';
+        return [] if $attr eq 'PRECISION';
+
+        if ($attr eq 'TYPE') {
+            my @types = map { _duckdb_type_to_sql_type($_) } @{$sth->{duckdb_col_types}};
+            return \@types;
+        }
+
         $sth->SUPER::FETCH($attr);
+
     }
 
 }
@@ -1168,7 +1517,8 @@ DBD::DuckDB - DuckDB database driver for the DBI module
 =head1 SYNOPSIS
 
   use DBI;
-  my $dbh = DBI->connect("dbi:DuckDB:dbname=$dbfile","","");
+  my $dbh = DBI->connect("dbi:DuckDB:dbname=$dbfile", "", "");
+
 
 =head1 DESCRIPTION
 
@@ -1252,7 +1602,7 @@ DBI equivalent of the "new" method.
 
 The connection string is always of the form: "dbi:DuckDB:dbname=<dbfile>"
 
-    my $dbh = DBI->connect("dbi:DucDB:dbname=$dbfile", "", "", $attr);
+    my $dbh = DBI->connect("dbi:DuckDB:dbname=$dbfile", "", "", \%attr);
 
 DuckDB creates a file per a database.
 
@@ -1262,18 +1612,39 @@ Although the database is stored in a single file, the directory containing the
 database file must be writable by DuckDB because the library will create 
 several temporary files there.
 
-If the filename C<$dbfile> is ":memory:", then a private, temporary in-memory 
+If the filename C<$dbfile> is C<:memory:>, then a private, temporary in-memory 
 database is created for the connection. This in-memory database will vanish 
 when the database connection is closed. It is handy for your library tests.
 
-=head2 Connect Attributes
+=head2 Common connect Attributes
 
-=over
+See L<DBI/ATTRIBUTES-COMMON-TO-ALL-HANDLES>.
 
-=item * B<duckdb_checkpoint_on_disconnect>
+=head2 DuckDB connect Attributes
 
-=back
+=head3 B<duckdb_checkpoint_on_disconnect>
 
+Execute C<CHECKPOINT> statement on disconnect.
+
+The C<CHECKPOINT> statement synchronizes data in the write-ahead log (WAL) to the
+database data file.
+
+=head3 B<duckdb_config>
+
+Configuration options can be provided to change different settings of the database
+system. Note that many of these settings can be changed later on using C<PRAGMA>
+statements as well.
+
+    my $dbh = DBI->connect("dbi:DuckDB:dbname=$dbfile", undef, undef, {
+        duckdb_config => {
+            access_mode   => 'READ_WRITE',
+            threads       => 8,
+            max_memory    => '8GB',
+            default_order => 'DESC'
+        }
+    });
+
+See L<https://duckdb.org/docs/stable/configuration/overview#global-configuration-options>.
 
 =head2 Methods Common To All Handles
 
@@ -1462,11 +1833,10 @@ behavior.
 
 =head3 B<table_info>
 
-    $sth = $dbh->table_info($catalog, $schema, $table, $type, \%attr);
+    $sth = $dbh->table_info( $catalog, $schema, $table, $type );
 
 Returns all tables and schemas (databases) as specified in L<DBI/table_info>.
-The schema and table arguments will do a C<LIKE> search. You can specify an
-ESCAPE character by including an 'Escape' attribute in \%attr. The C<$type>
+The schema and table arguments will do a C<LIKE> search. The C<$type>
 argument accepts a comma separated list of the following types 'TABLE',
 'INDEX', 'VIEW' and 'TRIGGER' (by default all are returned).
 Note that a statement handle is returned, and not a direct list of tables.
@@ -1480,10 +1850,68 @@ The following fields are returned:
 in. The default schema is 'main' and other databases will be in the name given when
 the database was attached.
 
-B<TABLE_NAME>: The name of the table or view.
+=item * B<TABLE_NAME>: The name of the table or view.
 
-B<TABLE_TYPE>: The type of object returned. Will be one of 'TABLE', 'INDEX',
+=item * B<TABLE_TYPE>: The type of object returned. Will be one of 'TABLE', 'INDEX',
 'VIEW', 'TRIGGER'.
+
+=item * B<REMARKS>: A description of the table.
+
+=back
+
+=head3 B<column_info>
+
+    $sth = $dbh->column_info( $catalog, $schema, $table, $column );
+
+Fetch information about columns in specificed table (L<DBI/column_info>).
+The catalog, schema and table arguments will do a C<LIKE> search.
+Note that a statement handle is returned, and not a direct list of columns.
+The following fields are returned:
+
+=over
+
+=item * B<TABLE_CAT>: The name of the catalog.
+
+=item * B<TABLE_SCHEM>: The name of the schema (database) that the table or 
+view is in. The default schema is 'main' and other databases will be in the 
+name given when the database was attached.
+
+=item * B<TABLE_NAME>: The name of the table or view.
+
+=item * B<COLUMN_NAME>: The column identifier.
+
+=item * B<DATA_TYPE>
+
+=item * B<TYPE_NAME>: A data source dependent data type name.
+
+=item * B<COLUMN_SIZE>
+
+=item * B<BUFFER_LENGTH>
+
+=item * B<DECIMAL_DIGITS>: The total number of significant digits to the right
+of the decimal point.
+
+=item * B<NUM_PREC_RADIX>: The radix for numeric precision. The value is 10 or
+2 for numeric data types and NULL (undef) if not applicable.
+
+=item * B<NULLABLE>: Indicates if a column can accept NULLs (0 = SQL_NO_NULLS, 
+1 = SQL_NULLABLE)
+
+=item * B<REMARKS>: A description of the column.
+
+=item * B<COLUMN_DEF>: The default value of the column, in a format that can be 
+used directly in an SQL statement.
+
+=item * B<SQL_DATA_TYPE>
+
+=item * B<SQL_DATETIME_SUB>
+
+=item * B<CHAR_OCTET_LENGTH>
+
+=item * B<ORDINAL_POSITION>: The column sequence number (starting with 1).
+
+=item * B<IS_NULLABLE>: Indicates if the column can accept NULLs. Possible 
+values are: 'NO', 'YES' and ''.
 
 =back
 

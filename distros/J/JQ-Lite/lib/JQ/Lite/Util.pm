@@ -3,9 +3,10 @@ package JQ::Lite::Util;
 use strict;
 use warnings;
 
-use JSON::PP ();
+use JSON::PP (); 
 use List::Util qw(sum min max);
 use Scalar::Util qw(looks_like_number);
+use B ();
 use JQ::Lite::Expression ();
 
 my $JSON_DECODER     = JSON::PP->new->utf8->allow_nonref;
@@ -162,6 +163,81 @@ sub _split_top_level_semicolons {
     }
 
     push @parts, substr($text, $start) if $start <= length $text;
+
+    return @parts;
+}
+
+sub _split_top_level_pipes {
+    my ($text) = @_;
+
+    return unless defined $text;
+
+    my %pairs = (
+        '(' => ')',
+        '[' => ']',
+        '{' => '}',
+    );
+    my %closing = reverse %pairs;
+
+    my @stack;
+    my $string;
+    my $escape = 0;
+    my @parts;
+    my $start = 0;
+
+    my $length = length $text;
+    for (my $i = 0; $i < $length; $i++) {
+        my $char = substr($text, $i, 1);
+
+        if (defined $string) {
+            if ($escape) {
+                $escape = 0;
+                next;
+            }
+
+            if ($char eq '\\') {
+                $escape = 1;
+                next;
+            }
+
+            if ($char eq $string) {
+                undef $string;
+            }
+
+            next;
+        }
+
+        if ($char eq "'" || $char eq '"') {
+            $string = $char;
+            next;
+        }
+
+        if (exists $pairs{$char}) {
+            push @stack, $char;
+            next;
+        }
+
+        if (exists $closing{$char}) {
+            return unless @stack;
+            my $open = pop @stack;
+            return unless $pairs{$open} eq $char;
+            next;
+        }
+
+        next unless $char eq '|';
+        if (substr($text, $i, 2) eq '||') {
+            $i++;
+            next;
+        }
+
+        if (!@stack) {
+            my $chunk = substr($text, $start, $i - $start);
+            push @parts, $chunk;
+            $start = $i + 1;
+        }
+    }
+
+    push @parts, substr($text, $start) if $start <= $length;
 
     return @parts;
 }
@@ -2487,27 +2563,29 @@ sub _evaluate_condition {
         }
 
         my @values = _traverse($item, $path);
-        my $field_val = $values[0];
+        return 0 unless @values;
 
-        return 0 unless defined $field_val;
+        for my $field_val (@values) {
+            next unless defined $field_val;
 
-        my $is_number = (!ref($field_val) && $field_val =~ /^-?\d+(?:\.\d+)?$/)
-                     && (!ref($value)     && $value     =~ /^-?\d+(?:\.\d+)?$/);
+            my $is_number = (!ref($field_val) && $field_val =~ /^-?\d+(?:\.\d+)?$/)
+                         && (!ref($value)     && $value     =~ /^-?\d+(?:\.\d+)?$/);
 
-        if ($op eq '==') {
-            return $is_number ? ($field_val == $value) : ($field_val eq $value);
-        } elsif ($op eq '!=') {
-            return $is_number ? ($field_val != $value) : ($field_val ne $value);
-        } elsif ($is_number) {
-            # perform numeric comparisons only when applicable
-            if ($op eq '>') {
-                return $field_val > $value;
-            } elsif ($op eq '>=') {
-                return $field_val >= $value;
-            } elsif ($op eq '<') {
-                return $field_val < $value;
-            } elsif ($op eq '<=') {
-                return $field_val <= $value;
+            if ($op eq '==') {
+                return 1 if $is_number ? ($field_val == $value) : ($field_val eq $value);
+            } elsif ($op eq '!=') {
+                return 1 if $is_number ? ($field_val != $value) : ($field_val ne $value);
+            } elsif ($is_number) {
+                # perform numeric comparisons only when applicable
+                if ($op eq '>') {
+                    return 1 if $field_val > $value;
+                } elsif ($op eq '>=') {
+                    return 1 if $field_val >= $value;
+                } elsif ($op eq '<') {
+                    return 1 if $field_val < $value;
+                } elsif ($op eq '<=') {
+                    return 1 if $field_val <= $value;
+                }
             }
         }
     }
@@ -2803,6 +2881,109 @@ sub _parse_string_argument {
     $raw =~ s/^['"]//;
     $raw =~ s/['"]$//;
     return $raw;
+}
+
+sub _apply_csv {
+    my ($value) = @_;
+
+    if (ref $value eq 'ARRAY') {
+        my @fields = map { _format_csv_field($_) } @$value;
+        return join(',', @fields);
+    }
+
+    return _format_csv_field($value);
+}
+
+sub _apply_tsv {
+    my ($value) = @_;
+
+    if (ref $value eq 'ARRAY') {
+        my @fields = map { _format_tsv_field($_) } @$value;
+        return join("\t", @fields);
+    }
+
+    return _format_tsv_field($value);
+}
+
+sub _format_csv_field {
+    my ($value) = @_;
+
+    return '' if !defined $value;
+
+    if (ref($value) eq 'JSON::PP::Boolean') {
+        return $value ? 'true' : 'false';
+    }
+
+    if (ref $value eq 'ARRAY' || ref $value eq 'HASH') {
+        my $encoded = _encode_json($value);
+        return _quote_csv_text($encoded);
+    }
+
+    if (ref $value) {
+        my $stringified = "$value";
+        return _quote_csv_text($stringified);
+    }
+
+    if (_is_unquoted_csv_number($value)) {
+        return "$value";
+    }
+
+    my $text = "$value";
+    return _quote_csv_text($text);
+}
+
+sub _format_tsv_field {
+    my ($value) = @_;
+
+    return '' if !defined $value;
+
+    if (ref($value) eq 'JSON::PP::Boolean') {
+        return $value ? 'true' : 'false';
+    }
+
+    if (ref $value eq 'ARRAY' || ref $value eq 'HASH') {
+        my $encoded = _encode_json($value);
+        return _escape_tsv_text($encoded);
+    }
+
+    if (ref $value) {
+        my $stringified = "$value";
+        return _escape_tsv_text($stringified);
+    }
+
+    my $text = "$value";
+    return _escape_tsv_text($text);
+}
+
+sub _quote_csv_text {
+    my ($text) = @_;
+
+    $text = '' unless defined $text;
+    $text =~ s/"/""/g;
+    return '"' . $text . '"';
+}
+
+sub _escape_tsv_text {
+    my ($text) = @_;
+
+    $text = '' unless defined $text;
+    $text =~ s/\\/\\\\/g;
+    $text =~ s/\t/\\t/g;
+    $text =~ s/\r/\\r/g;
+    $text =~ s/\n/\\n/g;
+    return $text;
+}
+
+sub _is_unquoted_csv_number {
+    my ($value) = @_;
+
+    return 0 if !defined $value;
+    return 0 if ref $value;
+
+    my $sv = B::svref_2object(\$value);
+    my $flags = $sv->FLAGS;
+
+    return ($flags & (B::SVp_IOK() | B::SVp_NOK())) ? 1 : 0;
 }
 
 sub _apply_split {

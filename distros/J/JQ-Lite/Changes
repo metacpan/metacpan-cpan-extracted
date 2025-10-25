@@ -1,3 +1,32 @@
+1.30  2025-10-25
+  [Feature]
+  - Add a jq-compatible @tsv formatter for tab-separated output with
+    proper escaping of arrays and scalar values.
+
+  [Release]
+  - Bump version to 1.30.
+
+1.29  2025-10-25
+  [Feature]
+  - Add jq-compatible comma sequence handling so each branch runs against the
+    same input value and streams its results in order.
+
+  [Tests]
+  - Expand comma regression coverage to exercise chaining, optional access,
+    array/object constructors, and syntax errors.
+
+  [Release]
+  - Bump version to 1.29.
+
+1.28  2025-10-25
+  [Feature]
+  - Add a jq-compatible @csv filter for formatting scalars and arrays as
+    CSV output.
+
+1.27  2025-10-24
+  [Release]
+  - Bump version to 1.27 to publish the select() predicate evaluation fixes.
+
 1.26  2025-10-24
   [Behavior]
   - Run select() predicates as streaming filters so inputs pass once for each
@@ -865,6 +894,8 @@
     - Removed use of eval in _evaluate_condition for better performance and stability.
     - Refactored _traverse for readability and maintainability.
     - Added support for multi-level array traversal (e.g., .users[].friends[].name).
+
+
 
 
 

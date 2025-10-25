@@ -1,0 +1,31 @@
+% layout 'default';
+<h1>
+    Login page
+</h1>
+
+<form action="/login" method="post">
+<fieldset style="width: 15rem; padding: 0 1rem">
+    <legend style="background-color: black; color: white; font-weight: bold; padding: 0.2rem 0.5rem">Login</legend>
+
+    % if (stash 'error') {
+    <p style="color: red">
+        <b><%= stash 'error' %></b>
+    </p>
+    % }
+    <p>
+        <label for="username">UserName:</label><br />
+        <input id="username" name="username" type="text" />
+    </p>
+    <p>
+        <label for="password">Password:</label><br />
+        <input id="password" name="password" type="password" />
+    </p>
+    <p align="right">
+        <input type="submit" value="Login">
+    </p>
+</fieldset>
+</form>
+
+<p>
+    %= link_to '[ Home ]' => 'index'
+</p>

@@ -1,0 +1,43 @@
+% layout 'default';
+<h1>
+    Private page
+</h1>
+% if (my $msg = flash 'message') {
+<p>
+    <b><%= $msg %></b>
+</p>
+% }
+<p>
+    <span style="font-size: 1.3rem; font-weight: bold">Welcome <%= session 'username' %>!</span>
+</p>
+<p>
+    %= link_to '[ Logout ]' => 'logout'
+</p>
+<div>
+
+    <dl>
+      <dt><b>Username</b></dt>
+      <dd><%= stash 'username' %></dd>
+    </dl>
+
+    <dl>
+      <dt><b>Name</b></dt>
+      <dd><%= stash 'name' %></dd>
+    </dl>
+
+    <dl>
+      <dt><b>Role</b></dt>
+      <dd><%= stash 'role' %></dd>
+    </dl>
+
+    <dl>
+      <dt><b>User data</b></dt>
+      <dd>
+        <pre><%= dumper stash 'user' %></pre>
+      </dd>
+    </dl>
+
+</div>
+<p>
+    %= link_to '[ Home ]' => 'index'
+</p>

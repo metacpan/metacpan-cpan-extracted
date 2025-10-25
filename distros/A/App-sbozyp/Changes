@@ -1,4 +1,8 @@
-0.6.1  2025-10-23
+0.6.3  2025-10-24
+
+   - Minor change in printed PKGNAME's not being single quoted
+
+0.6.2  2025-10-24
 
    - Added to remove command a default safety check preventing
      removal of packages with dependents

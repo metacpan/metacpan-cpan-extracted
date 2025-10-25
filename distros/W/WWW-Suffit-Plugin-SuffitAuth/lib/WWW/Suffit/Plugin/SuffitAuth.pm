@@ -354,7 +354,7 @@ B<*> -- this code defines on server side
 
 =head1 SEE ALSO
 
-L<Mojolicious>, L<WWW::Suffit::Client::V1>, L<WWW::Suffit::Server>
+L<Mojolicious>, L<WWW::Suffit::Client::V1>, L<WWW::Suffit::Server>, bundled examples
 
 =head1 AUTHOR
 
@@ -375,7 +375,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 use Mojo::Base 'Mojolicious::Plugin';
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 use File::stat;
 use Mojo::File qw/path/;

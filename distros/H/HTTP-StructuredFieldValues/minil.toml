@@ -1,0 +1,7 @@
+name = "HTTP-StructuredFieldValues"
+# badges = ["travis-ci.com"]
+authority="cpan:ARGRATH"
+
+module_maker="ModuleBuildTiny"
+static_install = "auto"
+

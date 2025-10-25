@@ -9,7 +9,7 @@ use warnings;
 
 use Scalar::Util;
 use Digest::MD5;
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 our @EXPORT = qw[ wrap_hash ];
 
@@ -731,7 +731,7 @@ Hash::Wrap - create on-the-fly objects from hashes
 
 =head1 VERSION
 
-version 1.06
+version 1.07
 
 =head1 SYNOPSIS
 

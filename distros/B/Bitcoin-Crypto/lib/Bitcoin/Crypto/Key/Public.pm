@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Key::Public;
-$Bitcoin::Crypto::Key::Public::VERSION = '3.001';
+$Bitcoin::Crypto::Key::Public::VERSION = '3.002';
 use v5.10;
 use strict;
 use warnings;

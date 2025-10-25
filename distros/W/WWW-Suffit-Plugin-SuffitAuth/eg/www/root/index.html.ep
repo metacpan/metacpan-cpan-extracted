@@ -1,0 +1,7 @@
+% layout 'default';
+<h1>
+    Root index page
+</h1>
+<p>
+    %= link_to '[ Private Page ]' => 'private'
+</p>

@@ -1,8 +1,14 @@
-"Schedule::Activity" Version 0.1.7
+"Schedule::Activity" Version 0.1.8
 
 Abstract:
 ---------
 This package provides a mechanism to construct "random" schedules of events using a graph-based configuration of activities and actions.  Action scheduling allows cycles/recursion to meet activity schedule goals.
+
+What's new in version 0.1.8:
+--------------------------
+* Commandline tool:  schedule-activity.pl
+* Configuration tension for slack/buffer in action scheduling
+* Compile-time safety checks
 
 What's new in version 0.1.7:
 --------------------------
@@ -10,27 +16,6 @@ What's new in version 0.1.7:
 * buildSchedule will be deprecated in 0.2.0.
 * Scheduling to maximum buffer, the single-node case, is now fully passed through filters.
 * Tension settings added for slack/buffer (undocumented, internal only)
-
-What's new in version 0.1.6:
---------------------------
-* Node filtering is now supported in scheduling configurations.
-
-What's new in version 0.1.5:
---------------------------
-* Attributes use rolling averages for efficiency.
-* The 0.1.4 update fixed attribute historic entry, but it never really worked "properly" and has been removed as it is not needed in the scheduler.
-
-What's new in version 0.1.4:
---------------------------
-* Attributes can log historic changes, but they no longer update the 'value', which should always be the most recent logged value.
-
-What's new in version 0.1.3:
---------------------------
-* Attribute precedence when both action nodes and messages contain attribute operators
-
-What's new in version 0.1.2:
---------------------------
-* Named message support
 
 Copyright & License:
 --------------------

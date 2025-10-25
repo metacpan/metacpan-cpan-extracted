@@ -1,7 +1,7 @@
 package Perl5::TestEachCommit;
 use 5.014;
 use warnings;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 $VERSION = eval $VERSION;
 use Carp;
 use Data::Dump ( qw| dd pp| );
@@ -348,6 +348,12 @@ Get a list of SHAs of all commits being tested.
 
 Reference to an array holding list of all commits being tested.
 
+=item * Comment
+
+An exception will be thrown if the array holding the list of all commits being
+tested is empty.  This can occur, for example, if you mistakenly interchange
+the values for the C<--start> and C<--end> commits.
+
 =back
 
 =cut
@@ -358,7 +364,12 @@ sub get_commits {
     my $end_commit = $self->{end};
     my @commits = `git rev-list --reverse ${origin_commit}..${end_commit}`;
     chomp @commits;
-    return \@commits;
+    if (! scalar(@commits)) {
+        croak "No commits found in range; check values for --start and --end";
+    }
+    else {
+        return \@commits;
+    }
 }
 
 =head2 C<display_commits()>
@@ -422,8 +433,11 @@ range.
 sub examine_all_commits {
     my $self = shift;
     $self->{results} = [];
-    for my $c (@{ $self->get_commits }) {
-        $self->examine_one_commit($c);
+    $self->{commits_count} = scalar @{ $self->get_commits };
+    for (my $i = 0; $i < $self->{commits_count}; $i++) {
+        say STDERR "\nExamining commit ", $i+1, " of $self->{commits_count} commits"
+            if $self->{verbose};
+        $self->examine_one_commit($self->get_commits->[$i]);
     }
     return $self;
 }
@@ -540,7 +554,7 @@ Called internally within C<examine_all_commits()>.
 =cut
 
 sub examine_one_commit {
-    my ($self, $c) = @_;
+    my ($self, $c, $i) = @_;
     chdir $self->{workdir} or croak "Unable to change to $self->{workdir}";
     # So that ./Configure, make test_prep and make_test_harness all behave
     # as they typically do in a git checkout.

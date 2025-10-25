@@ -1,5 +1,5 @@
 {
-	"version" : "0.1.7",
+	"version" : "0.1.8",
 	"name"    : "Schedule-Activity",
 	"author"  : ["Brian Blackmore <BBLACKM@cpan.org>"],
 	"abstract": "Generate activity schedules",
@@ -12,7 +12,7 @@
 		},
 		"runtime": {
 			"requires": {
-				"perl": "5.16.3",
+				"perl": "5.10.0",
 				"List::Util": "1.33",
 				"Ref::Util": "0.010",
 				"Scalar::Util": "1.39"

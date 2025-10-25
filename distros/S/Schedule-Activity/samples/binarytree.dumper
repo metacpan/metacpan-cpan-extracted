@@ -1,0 +1,13 @@
+@VAR1=(node=>{
+	'root'=>{message=>'root',next=>[qw/A B/],finish=>'terminal',tmmin=>1,tmavg=>10,tmmax=>99},
+	'A'   =>{message=>'A',   next=>[qw/A-A A-B/],tmmin=>1,tmavg=>10,tmmax=>99},
+	'B'   =>{message=>'B',   next=>[qw/B-A B-B/],tmmin=>1,tmavg=>10,tmmax=>99},
+	'A-A' =>{message=>'A-A', next=>['terminal'],tmmin=>1,tmavg=>10,tmmax=>99},
+	'A-B' =>{message=>'A-B', next=>['terminal'],tmmin=>1,tmavg=>10,tmmax=>99},
+	'B-A' =>{message=>'B-A', next=>['terminal'],tmmin=>1,tmavg=>10,tmmax=>99},
+	'B-B' =>{message=>'B-B', next=>['terminal'],tmmin=>1,tmavg=>10,tmmax=>99},
+	terminal=>{
+		message=>'terminal',
+		tmmin=>0,tmavg=>0,tmmax=>0,
+	},
+})

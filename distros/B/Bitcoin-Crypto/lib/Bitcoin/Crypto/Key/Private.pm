@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Key::Private;
-$Bitcoin::Crypto::Key::Private::VERSION = '3.001';
+$Bitcoin::Crypto::Key::Private::VERSION = '3.002';
 use v5.10;
 use strict;
 use warnings;
@@ -158,7 +158,7 @@ You can use a private key to:
 
 =item * generate public keys
 
-=item * sign and verify messages
+=item * sign and verify messages and transactions
 
 =back
 

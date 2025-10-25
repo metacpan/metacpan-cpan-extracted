@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Markdown Parser Only - ~/lib/Markdown/Parser.pm
-## Version v0.5.0
-## Copyright(c) 2024 DEGUEST Pte. Ltd.
+## Version v0.5.1
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/08/23
-## Modified 2025/10/21
+## Modified 2025/10/25
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -22,7 +22,7 @@ BEGIN
     use CSS::Object;
     use Scalar::Util ();
     our $DEBUG = 0;
-    our $VERSION = 'v0.5.0';
+    our $VERSION = 'v0.5.1';
     # Including vertical space like new lines
     our $ELEMENTS_DICTIONARY =
     {
@@ -1522,7 +1522,7 @@ sub parse
             substr( $url, 0, 0 ) = 'mailto:' if( length( $re->{link_mailto} ) && substr( $re->{link_mailto}, 0, 7 ) ne 'mailto:' );
             my $link = $top->create_link({
                 encrypt => $self->encrypt_email,
-                ## We save the original as URI may alter it by url-encoding characters
+                # We save the original as URI may alter it by url-encoding characters
                 original => $re->{link_url},
                 pos => $pos,
                 raw => $raw,
@@ -2685,7 +2685,7 @@ Markdown::Parser - Markdown Parser Only
 
 =head1 VERSION
 
-    v0.5.0
+    v0.5.1
 
 =head1 DESCRIPTION
 

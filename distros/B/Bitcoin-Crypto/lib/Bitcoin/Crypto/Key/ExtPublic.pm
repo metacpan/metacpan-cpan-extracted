@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Key::ExtPublic;
-$Bitcoin::Crypto::Key::ExtPublic::VERSION = '3.001';
+$Bitcoin::Crypto::Key::ExtPublic::VERSION = '3.002';
 use v5.10;
 use strict;
 use warnings;
@@ -95,13 +95,15 @@ Bitcoin::Crypto::Key::ExtPublic - Bitcoin extended public keys
 
 =head1 DESCRIPTION
 
-This class allows you to create an extended public key instance.
+This class allows you to create an extended public key instance. They are a
+public counterparts to master keys, but sharing them poses some security risks.
+Do not share your extended public keys if you are not aware of these threats.
 
 You can use an extended public key to:
 
 =over
 
-=item * derive extended keys using a path (only public keys)
+=item * derive extended keys using a path (only public keys, no hardened paths)
 
 =item * restore keys from serialized base58 format
 

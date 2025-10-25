@@ -1,5 +1,8 @@
 # Version/Revision history
 
+1.03 Fri 24 Oct 2025 13:35:38 MSK
+    * Added examples
+
 1.02 Thu 23 Oct 2025 20:33:38 MSK
     * Added address param to suffitauth.authenticate helper
     * Added support for human-readable expiration values
