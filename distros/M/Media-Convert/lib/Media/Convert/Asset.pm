@@ -593,6 +593,29 @@ sub _probe_framerate {
 	return $framerate;
 }
 
+=head2 video_frame_length
+
+The length of a single video frame in seconds, as a floating point number.
+
+Calculated as 1 / (video_framerate numerator / video_framerate denumerator)
+
+Probed from the value of video_framerate. Ignored if set.
+
+=cut
+
+has 'video_frame_length' => (
+	is => 'rw',
+	builder => '_probe_frame_length',
+	lazy => 1,
+);
+
+sub _probe_frame_length {
+	my $self = shift;
+
+	my ($numerator, $denumerator) = split /\//, $self->video_framerate;
+	return 1 / ($numerator / $denumerator);
+}
+
 =head2 fragment_start
 
 If set, this instructs Media::Convert on read to only read a particular

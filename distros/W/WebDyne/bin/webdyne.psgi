@@ -39,7 +39,7 @@ use WebDyne::Request::PSGI::Constant;
 
 #  Version information
 #
-$VERSION='2.015';
+$VERSION='2.016';
 
 
 #  Test file to use if no DOCUMENT_ROOT found
@@ -83,6 +83,9 @@ if (!caller || exists $ENV{PAR_TEMP}) {
         #  Get index file path, same dn as test file
         #
         $DOCUMENT_DEFAULT=File::Spec->catfile($test_dn, 'index.psp');
+    }
+    else {
+        $DOCUMENT_DEFAULT=$ENV{'DOCUMENT_DEFAULT'} || $DOCUMENT_DEFAULT;
     }
 
 

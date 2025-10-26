@@ -39,7 +39,7 @@ my $res;
 # check connection
 $api->port(0);
 $res = $api->cmd('/resp');
-ok $! == ECONNREFUSED, 'connection error';
+is int($!), ECONNREFUSED, 'connection error';
 $api->port($port);
 
 # login

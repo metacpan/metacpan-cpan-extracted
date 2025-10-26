@@ -34,7 +34,7 @@ require Opcode;
 
 #  Version information
 #
-$VERSION='2.015';
+$VERSION='2.016';
 
 
 #  Get mod_perl version. Clear $@ after evals
@@ -285,12 +285,15 @@ my %constant_temp;
     #  Max length of source line to show in ouput. 0 for unlimited.
     WEBDYNE_ERROR_SOURCE_CONTEXT_LINE_FRAGMENT_MAX => 80,
 
-    #  Show filename (including full filesystem path)
+    #  Show filename (FULL for full filesystem path)
     WEBDYNE_ERROR_SOURCE_FILENAME_SHOW => 1,
+    WEBDYNE_ERROR_SOURCE_FILENAME_FULL => 0,
 
     #  Show backtrace, show full or brief backtrace
     WEBDYNE_ERROR_BACKTRACE_SHOW  => 1,
     WEBDYNE_ERROR_BACKTRACE_SHORT => 0,
+    #  Skip (eval) and __ANON__ methods unless set to 1
+    WEBDYNE_ERROR_BACKTRACE_FULL  => 0,
 
     #  Show eval trace. Uses SOURCE_CONTEXT_LINES to determine number of lines to show
     WEBDYNE_ERROR_EVAL_CONTEXT_SHOW => 1,
@@ -303,13 +306,13 @@ my %constant_temp;
     #  URI and version
     WEBDYNE_ERROR_URI_SHOW     => 1,
     WEBDYNE_ERROR_VERSION_SHOW => 1,
-
+    WEBDYNE_ERROR_INTERNAL_SHOW => 0,
 
     #  Internal indexes for error eval handler array
     #
-    WEBDYNE_ERROR_EVAL_TEXT_IX     => 0,
-    WEBDYNE_ERROR_EVAL_EMBEDDED_IX => 1,
-    WEBDYNE_ERROR_EVAL_LINE_NO_IX  => 2,
+    #WEBDYNE_ERROR_EVAL_TEXT_IX     => 0,
+    #WEBDYNE_ERROR_EVAL_EMBEDDED_IX => 1,
+    #WEBDYNE_ERROR_EVAL_LINE_NO_IX  => 2,
 
 
     #  Alternate error message if WEBDYNE_ERROR_SHOW disabled

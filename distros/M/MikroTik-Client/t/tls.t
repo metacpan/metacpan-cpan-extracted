@@ -17,7 +17,7 @@ use Errno qw(ECONNRESET);
 use MikroTik::Client;
 use MikroTik::Client::Mockup;
 
-plan skip_all => 'TLS tests. Set TEST_TLS to run.' unless $ENV{TEST_TLS};
+plan skip_all => 'TLS tests. Set TEST_TLS to run.' unless $ENV{TEST_TLS} || $ENV{TEST_ALL};
 
 # It won't work with an old built-in cert and I can't care less to find out why.
 # It's tests only issue

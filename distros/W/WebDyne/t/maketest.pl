@@ -17,6 +17,7 @@ use File::Spec;
 use IO::File;
 use HTML::TreeBuilder;
 use Storable qw(lock_nstore);
+$Storable::canonical=1;
 use FindBin qw($RealBin $Script);
 use Cwd qw(abs_path);
 use Carp qw(confess);

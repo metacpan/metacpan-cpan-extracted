@@ -1,0 +1,77 @@
+#  Error recreate
+#
+<start_html title="File Index" include0="index.css" style="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" meta="%{ viewport=>'width=device-width, initial-scale=1.0' }">
+
+<perl handler="index_list">
+<header>
+  <h1>Index of <span id="current-path">${rel_cwd}</span></h1>
+  <hr>
+</header>
+
+<main>
+  <table role="grid">
+    <thead>
+      <tr>
+        <th><a href="${sort_name_href}">Filename</a></th>
+        <th><a href="${sort_mtime_href}">Last Modified</a></th>
+        <th><a href="${sort_size_href}">Size</a></th>
+      </tr>
+    </thead>
+    <tbody>
+      <block name="index">
+      <tr>
+        <td><a href="${href}">${filename}</a></td>
+        <td>${date}</td>
+        <td>${size}</td>
+      </tr>
+      </block>
+    </tbody>
+  </table>
+</main>
+
+<footer>
+  <hr>
+  <small>Generated on ${timestamp} by WebDyne Indexer in ${sec} sec.</small>
+</footer>
+</perl>
+
+__PERL__
+
+sub index_list {
+
+    #  Index current directory
+    #
+    my $self=shift();
+    
+    my %param=( 
+        
+        relcwd                  => 'abc',
+        sort_name_href          => 'abc',
+        sort_size_href          => 'abc',
+        sort_mtime_href          => 'abc',
+        filename                => 'abc',
+        date                    => 'abc',
+        size                    => 'abc',
+        timestamp               => 'abc',
+        sec                     => 'abc',
+        dn                      => 'abc',
+        href                    => 'abc',
+        rel_cwd                 => 'abc'
+    );
+    
+    
+    #  Previously error handlers failed after render_block because was storing the wrong 
+    #
+    for (1..3) {
+        $self->render_block('index', %param);
+    }
+    die ("bang !");
+    
+    
+    #  Done
+    #
+    return $self->render(%param);
+    
+}
+
+

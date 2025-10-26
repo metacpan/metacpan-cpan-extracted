@@ -52,6 +52,6 @@
          "web" : "https://codeberg.org/anparker/mikrotik-client"
       }
    },
-   "version" : "v0.601",
+   "version" : "v0.610",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

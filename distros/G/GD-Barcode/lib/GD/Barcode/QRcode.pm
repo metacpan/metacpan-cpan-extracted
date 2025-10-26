@@ -8,7 +8,7 @@ package GD::Barcode::QRcode;
 use parent qw(Exporter);
 use vars qw($VERSION @ISA $errStr);
 @ISA     = qw(GD::Barcode Exporter);
-$VERSION = '2.01';
+$VERSION = '2.02';
 
 sub new {
     my ( $sClass, $sTxt, $rhPrm ) = @_;
@@ -37,7 +37,7 @@ sub init {
     my $iWordsPos;
     $aDatBit[$iDatCnt] = 4;
 
-   # Determin Data Type(8Bit, AlphaNumeric, Numeric .. not supported Kanji-Mode)
+   # Determine Data Type(8Bit, AlphaNumeric, Numeric .. not supported Kanji-Mode)
     if ( $oSelf->{text} =~ /\D/ ) {
         if ( $oSelf->{text} =~ /[^0-9A-Z \$\*\%\+\-\.\/\:]/ ) {
 
@@ -97,7 +97,7 @@ sub init {
       do( 'GD/Barcode/QRcode/rsc' . sprintf( '%02d', $iRsEccWords ) . '.dat' );
     my @aRsCalTbl = unpack( "a$iRsEccWords" x 256, pack( 'H*', $sRec ) );
 
-    # ----  set teminator
+    # ----  set terminator
     if ( $iTotalBits <= ( $iMaxDatBits - 4 ) ) {
         $aDatVal[$iDatCnt] = 0;
         $aDatBit[$iDatCnt] = 4;
@@ -298,6 +298,7 @@ sub barcode {
 
 sub plot {
     my ( $oSelf, %hParam ) = @_;
+    require GD;
     my $iUnitSize = $oSelf->{ModuleSize};
     my $oOutImg   = GD::Image->new(
         ( $oSelf->{MaxModules} + 8 ) * $iUnitSize,
@@ -5080,7 +5081,7 @@ This module based on "QRcode image CGI version 0.50 (C)2000-2002,Y.Swetake".
 I<$oGdBar> = GD::Barcode::QRcode->new(I<$sTxt>,
                     { Ecc => I<Ecc Mode>,
                       Version => I<Version>,
-                      ModuleSize => I<Size of 1 modlue>,
+                      ModuleSize => I<Size of 1 module>,
                     });
 
 Constructor. Creates a GD::Barcode::QRcode object for I<$sTxt>.

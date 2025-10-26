@@ -1,3 +1,45 @@
+commit 51bd8cab238ad509ace7e1fc819f6ec2190f487e
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Oct 26 12:41:46 2025 +1030
+
+    VERSION increment: 2.016
+
+commit c99852be4ca6c91468b975e407f855bda0245ada
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Oct 26 12:39:20 2025 +1030
+
+    Streamline error handler, make file paths relative by default, remove (eval) and __ANON__ backtrace by default
+
+commit 7c753de6f465cb4da657185f07bf1a96ee5a11d1
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat Oct 25 17:46:40 2025 +1030
+
+    Fix bug in error handler that showed incorrect line numbers when an error occurred after a render_block call
+
+commit 8187af694cb65103c3fef80a989f00e987172df4
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat Oct 25 15:33:06 2025 +1030
+
+    Remove HTML_Perl_or global, migrate to
+
+commit dcf53777da1b78db88893ffb0ceb7a5645c82555
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat Oct 25 13:33:12 2025 +1030
+
+    First cut at removing global Line_no etc. variables and switching to keeping track in
+
+commit c42244ba37a4f4f5b14486e67333195b56febe2d
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Oct 22 20:52:37 2025 +1030
+
+    Update cwd() method to take into account fn might already be a directory + cache results for future calls
+
+commit 57d6599591609e80c720c184e1397201cb27a1bf
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Oct 22 16:46:17 2025 +1030
+
+    Fix issues in --index code that wouldn't find index.psp once installed
+
 commit e8764bd97863fb999c837dd362409083b00f6330
 Author: Andrew Speer <andrew.speer@isolutions.com.au>
 Date:   Wed Oct 22 00:43:29 2025 +1030

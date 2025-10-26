@@ -364,7 +364,7 @@ sub run {
 	$self->run_complete;
 }
 
-sub DESTROY {
+sub DEMOLISH {
 	if(!(shift->has_run)) {
 		confess "object destructor for Media::Convert::Pipe object entered without having seen a run!";
 	}

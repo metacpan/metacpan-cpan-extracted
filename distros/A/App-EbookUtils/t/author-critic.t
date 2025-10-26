@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/EbookUtils.pm'];
+my $filenames = ['lib/App/EbookUtils.pm','script/cbr2pdf','script/cbz2pdf','script/convert-cbr-to-pdf','script/convert-cbz-to-pdf','script/convert-epub-to-pdf','script/epub2pdf'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

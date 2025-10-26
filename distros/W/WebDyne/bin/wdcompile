@@ -44,11 +44,15 @@ use Getopt::Long;
 use Pod::Usage;
 use Data::Dumper;
 $Data::Dumper::Indent=1;
+$Data::Dumper::Terse=1;
+$Data::Dumper::Sortkeys=1;
+$Data::Dumper::Deepcopy=1;
+$Data::Dumper::Purity=1;
 
 
 #  Version Info, must be all one line for MakeMaker, CPAN.
 #
-$VERSION='2.015';
+$VERSION='2.016';
 
 
 #  Run main

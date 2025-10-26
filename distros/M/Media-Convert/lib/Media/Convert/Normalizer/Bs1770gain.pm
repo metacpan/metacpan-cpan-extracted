@@ -2,7 +2,7 @@ package Media::Convert::Normalizer::Bs1770gain;
 
 use Moose;
 use File::Basename;
-use File::Temp qw/tempdir/;
+use File::Temp;
 use Media::Convert::CodecMap qw/detect_to_write/;
 use Media::Convert::Map;
 use Media::Convert::Asset;
@@ -44,7 +44,7 @@ has 'tempdir' => (
 sub _probe_tempdir {
 	my $self = shift;
 
-	return tempdir("normXXXXXX", CLEANUP => 1);
+	return File::Temp::tempdir("normXXXXXX", CLEANUP => 1);
 }
 
 has '_bs1770gain_version' => (
@@ -90,7 +90,7 @@ sub run {
 	} else {
 		$exten = "mkv";
 	}
-	my @command = ("bs1770gain", "-a", "-o", $self->_tempdir);
+	my @command = ("bs1770gain", "-a", "-o", $self->tempdir);
 	if($self->_bs1770gain_version ne "0.5") {
 		$exten = "mkv";
 		push @command, "--suffix=mkv";
@@ -99,7 +99,7 @@ sub run {
 	print "Running: '" . join("' '", @command) . "'\n";
 	system(@command);
 
-	my $intermediate = $self->_tempdir . "/" . basename($base) . ".$exten";
+	my $intermediate = $self->tempdir . "/" . basename($base) . ".$exten";
 	my $check = Media::Convert::Asset->new(url => $intermediate);
 
 	if($check->audio_codec eq $self->input->audio_codec) {

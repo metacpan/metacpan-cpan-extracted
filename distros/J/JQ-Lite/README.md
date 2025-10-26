@@ -2,6 +2,8 @@
 # 🧩 JQ::Lite — Lightweight jq in Pure Perl
 
 [![GitHub](https://img.shields.io/github/stars/kawamurashingo/JQ-Lite?style=social)](https://github.com/kawamurashingo/JQ-Lite)
+[![MetaCPAN](https://img.shields.io/cpan/v/JQ-Lite.svg)](https://metacpan.org/release/JQ-Lite)
+
 
 **JQ::Lite** is a pure-Perl JSON query engine inspired by [`jq`](https://stedolan.github.io/jq/).
 It allows you to query and transform JSON using jq-like syntax — without external binaries.
@@ -71,18 +73,57 @@ brew tap kawamurashingo/jq-lite
 brew install --HEAD jq-lite
 ```
 
-### 🐧 Portable (Linux/macOS)
+---
 
-```bash
-curl -fsSL https://raw.githubusercontent.com/kawamurashingo/JQ-Lite/main/install.sh | bash
-```
+## 🐧 Portable Installer (Online → Offline)
 
-> Installs to `$HOME/.local/bin`.
-> Add to PATH if needed:
->
-> ```bash
-> export PATH="$HOME/.local/bin:$PATH"
-> ```
+**For air-gapped or offline systems**
+
+1. **Download on a connected machine**
+
+   ```bash
+   ./download.sh [-v <version>] [-o /path/to/usb]
+   ```
+
+   → Produces `JQ-Lite-<version>.tar.gz`.
+
+2. **Transfer** the tarball to the target (offline) machine.
+
+3. **Install (Linux/macOS)**
+
+   ```bash
+   ./install.sh [-p <prefix>] [--skip-tests] /path/to/JQ-Lite-<version>.tar.gz
+   ```
+
+   *Default install path:* `$HOME/.local`
+
+   ```bash
+   export PATH="$HOME/.local/bin:$PATH"
+   export PERL5LIB="$HOME/.local/lib/perl5/site_perl:$PERL5LIB"
+   ```
+
+---
+
+## 🪟 Windows (PowerShell)
+
+1. Open PowerShell and run:
+
+   ```powershell
+   .\install-jq-lite.ps1 [-Prefix <path>] [--SkipTests] C:\path\to\JQ-Lite-<version>.tar.gz
+   ```
+
+2. Add to your PowerShell profile (optional):
+
+   ```powershell
+   $env:PATH = "$env:USERPROFILE\.local\bin;" + $env:PATH
+   $env:PERL5LIB = "$env:USERPROFILE\.local\lib\perl5\site_perl;" + $env:PERL5LIB
+   ```
+
+3. Verify:
+
+   ```powershell
+   jq-lite -v
+   ```
 
 ---
 
@@ -154,6 +195,9 @@ See the complete list in
 ## 📜 License
 
 Same terms as Perl itself.
+
+
+
 
 
 

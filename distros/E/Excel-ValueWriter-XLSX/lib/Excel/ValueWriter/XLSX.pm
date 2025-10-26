@@ -13,7 +13,7 @@ use Encode                qw/encode_utf8/;
 use Data::Domain 1.16     qw/:all/;
 use Try::Tiny;
 
-our $VERSION = '1.09';
+our $VERSION = '1.10';
 
 #======================================================================
 # GLOBALS
@@ -132,10 +132,12 @@ sub add_sheet {
   my ($xml, $last_row, $last_col) = $self->_build_rows($headers, $row_iterator, $table_name);
 
   # add XML preamble and close sheet data
+  my $ref = $last_row >= 1 ? "A1:$last_col$last_row" : "A1"; # range of cells in sheet
   my $preamble = join "", 
     q{<?xml version="1.0" encoding="UTF-8" standalone="yes"?>},
     q{<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"},
-              q{ xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">};
+              q{ xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">},
+    qq{<dimension ref="$ref"/>};
   $preamble .= $self->_xml_for_options($options) if $options;
   $preamble .= q{<sheetData>};
   substr $xml, 0, 0, $preamble;
@@ -272,7 +274,7 @@ sub _xml_for_cols_option {
   my $next_col_num = 1;
   foreach my $col (@$cols) {
     # build attributes for the node
-    my %attrs = ref $col ? %$col : (width => $col); # cols => [6, ...] is just syntactic sugar for => [{witdh => 6}, ...]
+    my %attrs = ref $col ? %$col : (width => $col); # cols => [6, ...] is just syntactic sugar for => [{width => 6}, ...]
     $attrs{$_} //= $next_col_num for qw/min max/;   # colrange to which this <col> specification applies
     $attrs{customWidth} //= 1 if $attrs{width};     # tells Excel that the width is not automatic
 
@@ -980,7 +982,7 @@ Laurent Dami, E<lt>dami at cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2022, 2023 by Laurent Dami.
+Copyright 2022-2025 by Laurent Dami.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -2214,6 +2214,10 @@ Converts all rows to JSON format, using L<JSON::MaybeXS>.
 Converts all rows to YAML format, using L<YAML::XS>.
 
 
+=item L<correlated_updated|DBIx::DataModel::Schema::ResultAs::Correlated_update>
+
+Performs an update operation on the result of a SELECT query.
+
 =back
 
 

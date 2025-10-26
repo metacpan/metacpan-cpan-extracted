@@ -18,11 +18,11 @@ Params::Validate::Strict - Validates a set of parameters against a schema
 
 =head1 VERSION
 
-Version 0.21
+Version 0.22
 
 =cut
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 =head1 SYNOPSIS
 
@@ -160,7 +160,7 @@ Custom types can be extended or overridden in the schema by specifying additiona
     }
   };
 
-Custom types work seamlessly with nested schemas, optional parameters, and all other validation features.
+Custom types work seamlessly with nested schema, optional parameters, and all other validation features.
 
 =back
 
@@ -752,6 +752,7 @@ sub validate_strict
 	}
 
 	my %validated_args;
+	my %invalid_args;
 	foreach my $key (keys %{$schema}) {
 		my $rules = $schema->{$key};
 		my $value = $args->{$key};
@@ -792,7 +793,14 @@ sub validate_strict
 					# Populate missing optional parameters with the specified output values
 					$validated_args{$key} = $rules->{'default'};
 				}
-				next;	# optional and missing
+
+				if($rules->{'schema'}) {
+					$value = _apply_nested_defaults({}, $rules->{'schema'});
+					next unless scalar(%{$value});
+					# The nested schema has a default value
+				} else {
+					next;	# optional and missing
+				}
 			}
 		} elsif(!exists($args->{$key})) {
 			# The parameter is required
@@ -906,6 +914,9 @@ sub validate_strict
 						}
 						$value = int($value);	# Coerce to integer
 					} elsif($type eq 'coderef') {
+						if(!defined($value)) {
+							next;	# Skip if code is undefined
+						}
 						if(ref($value) ne 'CODE') {
 							if($rules->{'error_message'}) {
 								_error($logger, $rules->{'error_message'});
@@ -957,6 +968,7 @@ sub validate_strict
 							} else {
 								_error($logger, "validate_strict: String parameter '$key' too short (" . length($value) . "), must be at least length $rule_value");
 							}
+							$invalid_args{$key} = 1;
 						}
 					} elsif($rules->{'type'} eq 'arrayref') {
 						if(!defined($value)) {
@@ -975,6 +987,7 @@ sub validate_strict
 							} else {
 								_error($logger, "validate_strict: Parameter '$key' must be at least length $rule_value");
 							}
+							$invalid_args{$key} = 1;
 						}
 					} elsif($rules->{'type'} eq 'hashref') {
 						if(!defined($value)) {
@@ -986,6 +999,7 @@ sub validate_strict
 							} else {
 								_error($logger, "validate_strict: Parameter '$key' must contain at least $rule_value keys");
 							}
+							$invalid_args{$key} = 1;
 						}
 					} elsif(($type eq 'integer') || ($type eq 'number') || ($type eq 'float')) {
 						if(!defined($value)) {
@@ -997,6 +1011,7 @@ sub validate_strict
 							} else {
 								_error($logger, "validate_strict: Parameter '$key' ($value) must be at least $rule_value");
 							}
+							$invalid_args{$key} = 1;
 						}
 					} else {
 						_error($logger, "validate_strict: Parameter '$key' of type '$type' has meaningless min value $rule_value");
@@ -1020,6 +1035,7 @@ sub validate_strict
 							} else {
 								_error($logger, "validate_strict: String parameter '$key' too long, (" . length($value) . " characters), must be no longer than $rule_value");
 							}
+							$invalid_args{$key} = 1;
 						}
 					} elsif($rules->{'type'} eq 'arrayref') {
 						if(!defined($value)) {
@@ -1038,6 +1054,7 @@ sub validate_strict
 							} else {
 								_error($logger, "validate_strict: Parameter '$key' must contain no more than $rule_value items");
 							}
+							$invalid_args{$key} = 1;
 						}
 					} elsif($rules->{'type'} eq 'hashref') {
 						if(!defined($value)) {
@@ -1049,6 +1066,7 @@ sub validate_strict
 							} else {
 								_error($logger, "validate_strict: Parameter '$key' must contain no more than $rule_value keys");
 							}
+							$invalid_args{$key} = 1;
 						}
 					} elsif(($type eq 'integer') || ($type eq 'number') || ($type eq 'float')) {
 						if(!defined($value)) {
@@ -1061,6 +1079,8 @@ sub validate_strict
 								} else {
 									_error($logger, "validate_strict: Parameter '$key' ($value) must be no more than $rule_value");
 								}
+								$invalid_args{$key} = 1;
+								next;
 							}
 						} else {
 							if($rules->{'error_message'}) {
@@ -1097,7 +1117,12 @@ sub validate_strict
 						1;
 					};
 					if($@) {
-						_error($logger, "validate_strict: Parameter '$key' regex '$rule_value' error: $@");
+						if($rules->{'error_message'}) {
+							_error($logger, $rules->{'error_message'});
+						} else {
+							_error($logger, "validate_strict: Parameter '$key' regex '$rule_value' error: $@");
+						}
+						$invalid_args{$key} = 1;
 					}
 				} elsif($rule_name eq 'nomatch') {
 					if(!defined($value)) {
@@ -1118,6 +1143,7 @@ sub validate_strict
 						} else {
 							_error($logger, "validate_strict: Parameter '$key' ($value) must not match pattern '$rule_value'");
 						}
+						$invalid_args{$key} = 1;
 					}
 				} elsif($rule_name eq 'memberof') {
 					if(!defined($value)) {
@@ -1142,6 +1168,7 @@ sub validate_strict
 							} else {
 								_error($logger, "validate_strict: Parameter '$key' ($value) must be one of ", join(', ', @{$rule_value}));
 							}
+							$invalid_args{$key} = 1;
 						}
 					} else {
 						if($rules->{'error_message'}) {
@@ -1173,6 +1200,7 @@ sub validate_strict
 							} else {
 								_error($logger, "validate_strict: Parameter '$key' ($value) must not be one of ", join(', ', @{$rule_value}));
 							}
+							$invalid_args{$key} = 1;
 						}
 					} else {
 						if($rules->{'error_message'}) {
@@ -1192,11 +1220,13 @@ sub validate_strict
 						} else {
 							_error($logger, "validate_strict: Parameter '$key' failed custom validation");
 						}
+						$invalid_args{$key} = 1;
 					}
 				} elsif($rule_name eq 'isa') {
 					if($rules->{'type'} eq 'object') {
 						if(!$value->isa($rule_value)) {
 							_error($logger, "validate_strict: Parameter '$key' must be a '$rule_value' object");
+							$invalid_args{$key} = 1;
 						}
 					} else {
 						_error($logger, "validate_strict: Parameter '$key' has meaningless isa value $rule_value");
@@ -1211,11 +1241,13 @@ sub validate_strict
 							foreach my $method(@{$rule_value}) {
 								if(!$value->can($method)) {
 									_error($logger, "validate_strict: Parameter '$key' must be an object that understands the $method method");
+									$invalid_args{$key} = 1;
 								}
 							}
 						} elsif(!ref($rule_value)) {
 							if(!$value->can($rule_value)) {
 								_error($logger, "validate_strict: Parameter '$key' must be an object that understands the $rule_value method");
+								$invalid_args{$key} = 1;
 							}
 						} else {
 							_error($logger, "validate_strict: 'can' rule for Parameter '$key must be either a scalar or an arrayref");
@@ -1225,33 +1257,50 @@ sub validate_strict
 					}
 				} elsif($rule_name eq 'element_type') {
 					if($rules->{'type'} eq 'arrayref') {
+						my $type = $rule_value;
+						my $custom_type = $custom_types->{$rule_value};
+						if($custom_type && $custom_type->{'type'}) {
+							$type = $custom_type->{'type'};
+						}
 						foreach my $member(@{$value}) {
-							if($rule_value eq 'string') {
+							if($custom_type && $custom_type->{'transform'}) {
+								# The custom type has a transform embedded within it
+								if(ref($custom_type->{'transform'}) eq 'CODE') {
+									$member = &{$custom_type->{'transform'}}($member);
+								} else {
+									_error($logger, 'validate_strict: transforms must be a code ref');
+									last;
+								}
+							}
+							if($type eq 'string') {
 								if(ref($member)) {
 									if($rules->{'error_message'}) {
 										_error($logger, $rules->{'error_message'});
 									} else {
 										_error($logger, "$key can only contain strings");
 									}
+									$invalid_args{$key} = 1;
 								}
-							} elsif($rule_value eq 'integer') {
+							} elsif($type eq 'integer') {
 								if(ref($member) || ($member =~ /\D/)) {
 									if($rules->{'error_message'}) {
 										_error($logger, $rules->{'error_message'});
 									} else {
 										_error($logger, "$key can only contain integers (found $member)");
 									}
+									$invalid_args{$key} = 1;
 								}
-							} elsif(($rule_value eq 'number') || ($rule_value eq 'float')) {
+							} elsif(($type eq 'number') || ($rule_value eq 'float')) {
 								if(ref($member) || ($member !~ /^[-+]?(\d*\.\d+|\d+\.?\d*)$/)) {
 									if($rules->{'error_message'}) {
 										_error($logger, $rules->{'error_message'});
 									} else {
 										_error($logger, "$key can only contain numbers (found $member)");
 									}
+									$invalid_args{$key} = 1;
 								}
 							} else {
-								_error($logger, "Bug: Add $rule_value to element_type list");
+								_error($logger, "BUG: Add $type to element_type list");
 							}
 						}
 					} else {
@@ -1272,16 +1321,22 @@ sub validate_strict
 					if($rules->{'type'} eq 'arrayref') {
 						if(ref($value) eq 'ARRAY') {
 							foreach my $member(@{$value}) {
-								validate_strict({ input => { $key => $member }, schema => { $key => $rule_value } });
+								if(!validate_strict({ input => { $key => $member }, schema => { $key => $rule_value }, custom_types => $custom_types })) {
+									$invalid_args{$key} = 1;
+								}
 							}
 						} elsif(defined($value)) {	# Allow undef for optional values
 							_error($logger, "validate_strict: nested schema: Parameter '$value' must be an arrayref");
 						}
 					} elsif($rules->{'type'} eq 'hashref') {
 						if(ref($value) eq 'HASH') {
+							# Apply nested defaults before validation
+							my $nested_with_defaults = _apply_nested_defaults($value, $rule_value);
 							if(scalar keys(%{$value})) {
-								if(my $new_args = validate_strict({ input => $value, schema => $rule_value })) {
+								if(my $new_args = validate_strict({ input => $nested_with_defaults, schema => $rule_value, custom_types => $custom_types })) {
 									$value = $new_args;
+								} else {
+									$invalid_args{$key} = 1;
 								}
 							}
 						} else {
@@ -1294,6 +1349,7 @@ sub validate_strict
 					if(ref($rule_value) eq 'CODE') {
 						if(my $error = &{$rule_value}($args)) {
 							_error($logger, "validate_strict: $key not valid: $error");
+							$invalid_args{$key} = 1;
 						}
 					} else {
 						# _error($logger, "validate_strict: Parameter '$key': 'validate' only supports coderef, not " . ref($value));
@@ -1319,7 +1375,7 @@ sub validate_strict
 					}
 					push @types, $rule->{'type'};
 					eval {
-						validate_strict({ input => { $key => $value }, schema => { $key => $rule }, logger => undef });
+						validate_strict({ input => { $key => $value }, schema => { $key => $rule }, logger => undef, custom_types => $custom_types });
 					};
 					if(!$@) {
 						$rc = 1;
@@ -1328,6 +1384,7 @@ sub validate_strict
 				}
 				if(!$rc) {
 					_error($logger, "validate_strict: Parameter: '$key': must be one of " . join(', ', @types));
+					$invalid_args{$key} = 1;
 				}
 			} else {
 				_error($logger, "validate_strict: Parameter: '$key': schema is empty arrayref");
@@ -1348,8 +1405,14 @@ sub validate_strict
 			}
 			if(my $error = &{$validator}(\%validated_args, $validator)) {
 				_error($logger, $error);
+				# We have no idea which parameters are still valid, so let's invalidate them all
+				return;
 			}
 		}
+	}
+
+	foreach my $key(keys %invalid_args) {
+		delete $validated_args{$key};
 	}
 
 	return \%validated_args;
@@ -1380,6 +1443,26 @@ sub _warn
 	} else {
 		carp(__PACKAGE__, ": $message");
 	}
+}
+
+sub _apply_nested_defaults {
+	my ($input, $schema) = @_;
+	my %result = %$input;
+
+	foreach my $key (keys %$schema) {
+		my $rules = $schema->{$key};
+
+		if (ref $rules eq 'HASH' && exists $rules->{default} && !exists $result{$key}) {
+			$result{$key} = $rules->{default};
+		}
+
+		# Recursively handle nested schema
+		if((ref $rules eq 'HASH') && $rules->{schema} && (ref $result{$key} eq 'HASH')) {
+			$result{$key} = _apply_nested_defaults($result{$key}, $rules->{schema});
+		}
+	}
+
+	return \%result;
 }
 
 =head1 AUTHOR

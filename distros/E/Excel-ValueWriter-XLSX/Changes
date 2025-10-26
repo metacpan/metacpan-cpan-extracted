@@ -1,5 +1,9 @@
 Revision history for Excel-ValueWriter-XLSX
 
+1.10     25.10.2025
+  - insert a <dimension> node in XML (not mandatory according to OOXML schema, but Excel always includes it ...
+    and the companion module Excel-ValueReader needs it)
+
 1.09     20.02.2025
   - fix a bug in date regexes, introduced in 1.08
   - do not die on invalid dates, but treat them as strings (like Excel does)

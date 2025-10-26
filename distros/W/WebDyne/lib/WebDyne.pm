@@ -58,7 +58,7 @@ use Exporter qw(import);
 
 #  Version information
 #
-$VERSION='2.015';
+$VERSION='2.016';
 chomp($VERSION_GIT_REF=do { local (@ARGV, $/) = ($_=__FILE__.'.tmp'); <> if -f $_ });
 
 
@@ -1528,7 +1528,7 @@ sub render {
         #  Save current data block away for reference by error handler if something goes
         #  wrong
         #
-        $self->{'_data_ar'}=$data_ar;
+        push @{$self->{'_data_ar'}},$data_ar;
 
 
         #  Debug
@@ -1611,6 +1611,7 @@ sub render {
         #  Debug
         #
         debug("html_chld $html_chld");
+        my $html;
 
 
         #  Render *our* node now, trying to use most efficient/appropriated method depending on a number
@@ -1619,27 +1620,12 @@ sub render {
         if ($CGI_TAG_WEBDYNE{$html_tag}) {
 
 
-            #  Debug
-            #
-            debug("rendering webdyne tag $html_tag");
-
-
             #  Special WebDyne tag, render using our self ref, not CGI object
             #
-            my $html_sr=(
-                $self->$html_tag($data_ar, $attr_hr, $param_data_hr, $html_chld)
-                    ||
-                    return err());
+            debug("rendering webdyne tag $html_tag");
+            $html=${ $self->$html_tag($data_ar, $attr_hr, $param_data_hr, $html_chld) ||
+                return err() };
 
-
-            #  Debug
-            #
-            debug("CGI tag $html_tag render return $html_sr (%s)", Dumper($html_sr));
-
-
-            #  Return
-            #
-            return $html_sr;
 
 
         }
@@ -1649,13 +1635,9 @@ sub render {
             #  Normal CGI tag, with attributes and perhaps child text
             #
             debug("rendering normal HTML tag: $html_tag with attr: %s", Dumper($attr_hr));
-            return \(
-                $cgi_or->$html_tag(grep {$_} $attr_hr || {}, $html_chld)
-                    ||
-                    return err(
-                    "CGI tag '<$html_tag>' " .
-                        'did not return any text'
-                    ));
+            $html=$cgi_or->$html_tag(grep {$_} $attr_hr || {}, $html_chld) ||
+                return err( "CGI tag '<$html_tag>' did not return any text" );
+            
 
         }
         elsif ($html_chld) {
@@ -1664,13 +1646,9 @@ sub render {
             #  Normal CGI tag, no attributes but with child text
             #
             debug("rendering normal HTML tag: $html_tag, no attributes but with child text");
-            return \(
-                $cgi_or->$html_tag($html_chld)
-                    ||
-                    return err(
-                    "CGI tag '<$html_tag>' " .
-                        'did not return any text'
-                    ));
+            $html=$cgi_or->$html_tag($html_chld) ||
+                return err("CGI tag '<$html_tag>' did not return any text");
+
 
         }
         else {
@@ -1679,15 +1657,20 @@ sub render {
             #  Empty CGI object, eg <hr>
             #
             debug("rendering empty HTML tag: $html_tag");
-            return \(
-                $cgi_or->$html_tag()
-                    ||
-                    return err(
-                    "CGI tag '<$html_tag>' " .
-                        'did not return any text'
-                    ));
+            $html=$cgi_or->$html_tag() ||
+                return err("CGI tag '<$html_tag>' did not return any text");
 
         }
+
+
+        #  No errors, pop error handler stack
+        #
+        pop @{$self->{'_data_ar'}};
+        
+
+        #  Return
+        #
+        return \$html;
 
 
     };
@@ -2805,7 +2788,7 @@ sub perl_init {
 
             #  Save away as current data block for reference by error handler
             #
-            $self->{'_data_ar'}=\@data;
+            push @{$self->{'_data_ar'}}, \@data;
 
         };
 
@@ -3063,6 +3046,7 @@ sub include {
     #my $dn=(File::Spec->splitpath($r->filename()))[1] ||
     my $dn=$self->cwd() ||
         return err('unable to determine cwd for requested file %s', $r->filename());
+    debug("dn: $dn");
 
 
     #  Any param must supply a file name as an attribute
@@ -3653,10 +3637,22 @@ sub cwd {
     #  Return cwd of current psp file
     #
     my $self=shift();
-    debug($self);
-    my $dn=(File::Spec->splitpath($self->{'_r'}->filename()))[1];
-    return File::Spec->rel2abs($dn) || getcwd(); 
-    #return (File::Spec->splitpath(shift()->{'_r'}->filename()))[1] || getcwd();
+    return $self->{'_cwd'} ||= do {
+        debug("$self, fn: %s", $self->{'_r'}->filename());
+        my $fn=$self->{'_r'}->filename();
+        my $dn;
+        unless (-d ($dn=File::Spec->rel2abs($fn))) {
+            #  Not a directory, must be file
+            #
+            $dn=(File::Spec->splitpath($self->{'_r'}->filename()))[1] || getcwd();
+            debug("return calculated dn: $dn");
+            $dn;
+        }
+        else {
+            debug("return existing dn: $dn");
+            $dn;
+        }
+    }
 
 }
 
@@ -3897,7 +3893,8 @@ sub data_ar {
 
     #  Return current data node, assumes we are in a perl block or subst
     #
-    shift()->{'_data_ar'};
+    my $self=shift();
+    return $self->{'_data_ar'}[-1] if $self->{'_data_ar'};
 
 }
 

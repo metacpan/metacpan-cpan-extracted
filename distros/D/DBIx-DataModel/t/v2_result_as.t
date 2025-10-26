@@ -219,6 +219,21 @@ subtest 'yaml'=> sub {
 };
 
 
+subtest 'correlated_update'=> sub {
+  my $count_updates = HR->join(qw/Activity employee department/)->select(
+    -columns   => [qw/d_birth d_begin dpt_name/],
+    -result_as => [correlated_update =>
+       {'T_Activity.remark' => "'started in ' || dpt_name || ' at age ' || d_begin-d_birth"}
+     ]);
+
+  sqlLike("UPDATE (SELECT d_birth, d_begin, dpt_name FROM T_Activity " .
+          "INNER JOIN T_Employee ON ( T_Activity.emp_id = T_Employee.emp_id ) " .
+          "INNER JOIN T_Department ON ( T_Activity.dpt_id = T_Department.dpt_id )) " .
+          "SET T_Activity.remark='started in ' || dpt_name || ' at age ' || d_begin-d_birth", [], 'correlated update');
+};
+
+
+
 subtest 'find_subclass' => sub {
   # test a result kind as subclass of current schema
   my $result = HR->table('Employee')->select(-result_as => 'stupid');

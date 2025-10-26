@@ -135,7 +135,7 @@ Set WEBDYNE_ERROR_SHOW_EXTENDED=1 to display backtrace and other information.
 <b>#&nbsp;&nbsp;&nbsp;Module</b><br>
 <br>
 <block name="backtrace_line">
-${i}&nbsp;&nbsp;${package}, line ${line}<br>
+${backtrace_line}&nbsp;&nbsp;${package}, line ${line}<br>
 </block>
 </span></td></tr>
 </block>
@@ -251,6 +251,25 @@ ${webdyne_constant}
 ${webdyne_version}
 </pre>
 </td></tr>
+
+
+<!-- Error internals -->
+<block name="webdyne_err_internal" dump=1>
+<tr><td>
+<br>
+<br>
+<b>Error internals:</b>
+</td></tr>
+
+<tr><td class="td">
+<br>
+<pre>
+${webdyne_err_internal}
+</pre>
+</td></tr>
+
+
+
 </block>
 
 <!-- End of error table -->
@@ -276,6 +295,7 @@ ${webdyne_version}
 <b>Version Information:</b>&nbsp; WebDyne Version:!{! $WebDyne::VERSION !}
 </block>
 
+
 </body>
 </html>
 
@@ -286,9 +306,9 @@ __PERL__
 #
 use WebDyne::Constant;
 use HTTP::Status qw(status_message);
-use Tie::IxHash;
 use Data::Dumper;
 $Data::Dumper::Indent=1;
+$Data::Dumper::Sortkeys=1;
 
 
 sub err_display {
@@ -300,11 +320,12 @@ sub err_display {
     #
     #my ($self, $r, $cgi_or, $param_hr)=@_;
     my ($self, $param_hr)=@_;
+    my %err_internal;
     
     
-    #  Get CGI ref
+    #  Get CGI ref, request
     #
-    my $cgi_or=$self->CGI();
+    my ($cgi_or, $r)=map { $self->$_ } qw(CGI r);
 
 
     #  Local vars used across all routines
@@ -312,24 +333,43 @@ sub err_display {
     my $errstr=$param_hr->{'errstr'};
     my @errstack=@{$param_hr->{'errstack_ar'}};
     my $errtrace_ar=pop @errstack;
+    @err_internal{qw(errstr errstack_ errtrace_ar)}=(
+        $errstr,
+        \@errstack,
+        $errtrace_ar
+    );
 
 
     #  Get data block from paramaters and load line numbers and other params
     #
-    my $data_ar=$param_hr->{'data_ar'};
+    my $data_ar=pop @{$param_hr->{'data_ar'}};
     my ($html_line_no_tag_start, $html_line_no_tag_end)=$self->data_ar_html_line_no($data_ar) if $data_ar;
     my $inline=$data_ar->[$WEBDYNE_NODE_ATTR_IX] && $data_ar->[$WEBDYNE_NODE_ATTR_IX]->{'inline'};
+    @err_internal{qw(html_line_no_tag_start html_line_no_tag_end data_ar)}=(
+        $html_line_no_tag_start,
+        $html_line_no_tag_end,
+        $data_ar
+    );
 
 
     #  Get any eval text if supplied
     #
     my $eval_text_sr=$param_hr->{'err_eval_perl_sr'};
+    $err_internal{'eval_text_sr'}=$eval_text_sr;
+    
 
 
     #  Source file name and tag start/finish line numbers for this error
     #
     my $srce_fn=$self->data_ar_html_srce_fn($data_ar) if $data_ar;
     my $srce_fn_display=$srce_fn if $WEBDYNE_ERROR_SOURCE_FILENAME_SHOW;
+    my $document_root=$r->document_root();
+    unless ($WEBDYNE_ERROR_SOURCE_FILENAME_FULL) {
+        $srce_fn_display=~s/^${document_root}\/?//;
+        $srce_fn_display ||= '/';
+    }
+    $err_internal{'srce_fn'}=$srce_fn;
+    
 
 
     #  Display error string
@@ -387,10 +427,11 @@ sub err_display {
     if ($WEBDYNE_ERROR_BACKTRACE_SHOW) {
 
 
-            #  Iterate through error backtrace
-            #
-        my $webdyne_module_seen;
+        #  Iterate through error backtrace
+        #
         my $webdyne_backtrace_short=$WEBDYNE_ERROR_BACKTRACE_SHORT;
+        my $backtrace_line=1;
+        my $webdyne_module_seen;
         for (my $i=1; defined($errtrace_ar->[$i]); $i++) {
 
             
@@ -401,14 +442,19 @@ sub err_display {
 
             #  If brief output look to see if we are in internal stack and quit
             #
-            if ($method=~/^WebDyne::\w{32}::/) {
+            if ($method=~/^WebDyne::\w{32}:+/) {
                 $webdyne_module_seen++;
             }
             elsif ($method=~/^WebDyne::/ && !$webdyne_module_seen) {
                 $webdyne_module_seen++;
             }
-            elsif ($webdyne_backtrace_short && $webdyne_module_seen) {
-                last;
+            
+            
+            #  Skip unless we really want full trace
+            #
+            unless ($WEBDYNE_ERROR_BACKTRACE_FULL) {
+                next if ($method=~/^\(eval\)/);
+                next if ($method=~/^WebDyne::__ANON__/);
             }
             
 
@@ -419,10 +465,15 @@ sub err_display {
 
             #  Format nicely and render line
             #
-            my $i_formatted=sprintf('%-2d',$i);
-            $i=~s/ /&nbsp;/;
+            my $backtrace_line_fmt=sprintf("%-2d",$backtrace_line);
             $self->render_block('backtrace_line',
-                i=>$i_formatted, package=>$method, line=>$line_no);
+                backtrace_line=>$backtrace_line_fmt, package=>$method, line=>$line_no);
+            $backtrace_line++;
+
+            if ($webdyne_backtrace_short && $webdyne_module_seen) {
+                last;
+            }
+
 
         }
         
@@ -540,9 +591,7 @@ sub err_display {
 
         #  Get message
         #
-        my $cgi_param_ix=tie(my %cgi_param, 'Tie::IxHash', %_);
-        $cgi_param_ix->SortByKey();
-        my $cgi_param_dump=Data::Dumper->Dump([\%cgi_param], ['WebDyne::CGI']);
+        my $cgi_param_dump=Data::Dumper->Dump([\%_], ['WebDyne::CGI']);
         $cgi_param_dump=$cgi_or->escapeHTML($cgi_param_dump);
         $cgi_param_dump=~s/[\x00]+/,/g;
         $self->render_block('cgi_param', cgi_param_dump=>$cgi_param_dump );
@@ -555,9 +604,7 @@ sub err_display {
 
         #  Get environment
         #
-        my $env_ix=tie(my %env, 'Tie::IxHash', %ENV);
-        $env_ix->SortByKey();
-        my $env_dumper=Data::Dumper->Dump([\%env], ['WebDyne::ENV']);
+        my $env_dumper=Data::Dumper->Dump([\%ENV], ['WebDyne::ENV']);
         $env_dumper=$cgi_or->escapeHTML($env_dumper);
         $self->render_block('env', env=>$env_dumper );
 
@@ -569,20 +616,27 @@ sub err_display {
 
         #  Get environment
         #
-        my $webdyne_constant_ix=tie(my %webdyne_constant, 'Tie::IxHash', map { $_=>${"WebDyne::$_"} } keys %WebDyne::Constant::Constant);
-        $webdyne_constant_ix->SortByKey();
-        my $webdyne_constant_dumper=Data::Dumper->Dump([\%webdyne_constant], ['WebDyne::Constant']);
+        my $webdyne_constant_dumper=Data::Dumper->Dump([\%WebDyne::Constant::Constant], ['WebDyne::Constant']);
         $webdyne_constant_dumper=$cgi_or->escapeHTML($webdyne_constant_dumper);
         $self->render_block('webdyne_constant', webdyne_constant=>$webdyne_constant_dumper );
 
     }
     
-    my $version_ix=tie(my %version, 'Tie::IxHash', (
+    my %version=(
         VERSION         => $WebDyne::VERSION,
         VERSION_GIT_REF => $WebDyne::VERSION_GIT_REF
-    ));
+    );
     my $webdyne_version_dumper=Data::Dumper->Dump([\%version], ['WebDyne::VERSION']);
     $self->render_block('webdyne_version', webdyne_version=>$webdyne_version_dumper);
+
+
+    #  Only for internal debugging when error handler goes wrong
+    #
+    if ($WEBDYNE_ERROR_INTERNAL_SHOW) {
+        my $webdyne_err_internal_dumper=Data::Dumper->Dump([\%err_internal], ['WebDyne::ERROR']);
+        $webdyne_err_internal_dumper=$cgi_or->escapeHTML($webdyne_err_internal_dumper);
+        $self->render_block('webdyne_err_internal', webdyne_err_internal=>$webdyne_err_internal_dumper);
+    }
 
 
     #  Render version and URI blocks

@@ -1,7 +1,9 @@
 bin/jq-lite
 Changes
 CONTRIBUTING.md
+download.sh
 FUNCTIONS.md
+install-jq-lite.ps1
 lib/JQ/Lite.pm
 lib/JQ/Lite/Expression.pm
 lib/JQ/Lite/Filters.pm

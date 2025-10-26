@@ -1,4 +1,5 @@
 lib/Media/Convert.pm
+lib/Media/Convert/AccurateCut.pm
 lib/Media/Convert/Asset.pm
 lib/Media/Convert/Asset/Concat.pm
 lib/Media/Convert/Asset/PNGGen.pm
@@ -24,6 +25,7 @@ MYMETA.json
 MYMETA.yml
 scripts/mc-encode
 t/aac_channels.t
+t/accurate.t
 t/av1.t
 t/avsync.t
 t/codecs.t

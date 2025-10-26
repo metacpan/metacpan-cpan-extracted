@@ -1,3 +1,25 @@
+1.31  2025-10-26
+  [Fix]
+  - Fix YAML::XS and YAML::PP compatibility for older environments
+    (Perl 5.22–5.24) where YAML::XS emitted warnings when loading
+    scalar YAML documents such as single strings or numbers.
+    Added `allow_nonref => 1` to ensure consistent behavior across
+    all supported Perl versions.
+  - Prevent warnings like "hash- or arrayref expected (not a simple scalar)"
+    when reading YAML input from files or STDIN.
+  - Suppress "Name 'CPAN::Meta::YAML::errstr' used only once" warnings
+    that appeared in some test environments during null-input tests.
+
+  [Maintenance]
+  - Verified compatibility across Perl 5.22–5.40.
+    Modern Perl versions (5.30+) were unaffected, but older YAML::XS
+    (0.67–0.69) used with Perl 5.22/5.24 required this adjustment.
+  - Refactor internal YAML loader for consistent behavior across
+    YAML::XS, YAML::PP, and CPAN::Meta::YAML.
+
+  [Release]
+  - Bump version to 1.31.
+
 1.30  2025-10-25
   [Feature]
   - Add a jq-compatible @tsv formatter for tab-separated output with
@@ -894,6 +916,7 @@
     - Removed use of eval in _evaluate_condition for better performance and stability.
     - Refactored _traverse for readability and maintainability.
     - Added support for multi-level array traversal (e.g., .users[].friends[].name).
+
 
 
 

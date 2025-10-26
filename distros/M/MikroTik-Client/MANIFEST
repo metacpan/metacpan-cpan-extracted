@@ -2,6 +2,7 @@ Changes
 lib/MikroTik/Client.pm
 lib/MikroTik/Client/Mo.pm
 lib/MikroTik/Client/Query.pm
+lib/MikroTik/Client/Reactor/AE.pm
 lib/MikroTik/Client/Response.pm
 lib/MikroTik/Client/Sentence.pm
 LICENSE
@@ -18,12 +19,14 @@ t/certs/client.key
 t/certs/server.crt
 t/certs/server.key
 t/lib/MikroTik/Client/Mockup.pm
+t/mikrotik-ae.t
 t/mikrotik-online.t
 t/mikrotik.t
 t/pod.t
 t/pod_coverage.t
 t/promises.t
 t/query.t
+t/reactor-ae.t
 t/response.t
 t/sentence.t
 t/tls.t

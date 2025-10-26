@@ -91,7 +91,7 @@ SQL code to the database
   CREATE TABLE t_employee_skill (
     emp_id         INTEGER NOT NULL REFERENCES t_employee(emp_id),
     skill_code     VARCHAR(2)  NOT NULL REFERENCES t_skill(skill_code),
-    CONSTRAINT PRIMARY KEY (emp_id, skill_code)
+    PRIMARY KEY (emp_id, skill_code)
   );
 
 As can be seen from this SQL, we assume that the primary keys 

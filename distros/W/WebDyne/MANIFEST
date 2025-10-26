@@ -720,6 +720,7 @@ t.error/error_syntax_inline.psp
 t.error/error_syntax_perl_block.psp
 t.error/error_syntax_perl_init.psp
 t.error/error_syntax_subst.psp
+t.error/error_block.psp
 t.error/warn_basic.psp
 t/implicit.psp
 t/include_body.inc                       

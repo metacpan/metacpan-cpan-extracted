@@ -4,7 +4,7 @@
       "Timothy Parnell <parnell.tj@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -21,16 +21,17 @@
       },
       "runtime" : {
          "recommends" : {
-            "Bio::DB::Big" : "1",
-            "Bio::DB::HTS" : "3.01",
-            "Bio::DB::SeqFeature::Store" : "0",
             "Bio::DB::USeq" : "0.25",
-            "BioPerl" : "1.007002",
             "Parallel::ForkManager" : "1.02",
             "Set::IntSpan::Fast" : "1.15",
             "Set::IntervalTree" : "0.1"
          },
          "requires" : {
+            "Bio::DB::Big" : "1",
+            "Bio::DB::BigFile" : "1.07",
+            "Bio::DB::HTS" : "3.01",
+            "Bio::DB::Sam" : "1.36",
+            "Bio::Root::Version" : "1.006924",
             "Config::Simple" : "4.58",
             "File::Which" : "1.17",
             "Getopt::Long" : "2.24",
@@ -45,15 +46,15 @@
       },
       "test" : {
          "requires" : {
-            "Test2::V0" : "1.302",
-            "Test::Script" : "1.29"
+            "Test2::V0" : "0.000138",
+            "Test::Script" : "1.26"
          }
       }
    },
    "provides" : {
       "Bio::ToolBox" : {
          "file" : "lib/Bio/ToolBox.pm",
-         "version" : "2.04"
+         "version" : "2.041"
       },
       "Bio::ToolBox::Data" : {
          "file" : "lib/Bio/ToolBox/Data.pm",
@@ -113,7 +114,7 @@
       },
       "Bio::ToolBox::db_helper" : {
          "file" : "lib/Bio/ToolBox/db_helper.pm",
-         "version" : "2.03"
+         "version" : "2.041"
       },
       "Bio::ToolBox::db_helper::alignment_callbacks" : {
          "file" : "lib/Bio/ToolBox/db_helper/alignment_callbacks.pm",
@@ -179,6 +180,6 @@
          "url" : "https://github.com/tjparnell/biotoolbox"
       }
    },
-   "version" : "2.04",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "2.041",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

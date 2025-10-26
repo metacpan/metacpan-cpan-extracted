@@ -1,5 +1,10 @@
 Revision history for Params-Validate-Strict
 
+0.22	Sat Oct 25 21:51:13 EDT 2025
+	If a cross_validation fails, invalidate all arguments
+	Args were being passed as valid with some settings of logger
+	Improved handling of defaults within nested schemas
+
 0.21	Thu Oct 23 20:12:51 EDT 2025
 	Added cross_validation parameter for validating relationships between fields
 	Added notmemberof to blacklist items

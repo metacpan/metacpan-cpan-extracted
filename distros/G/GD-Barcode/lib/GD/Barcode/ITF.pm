@@ -6,7 +6,7 @@ use GD::Barcode;
 use parent qw(Exporter);
 use vars qw($VERSION @ISA $errStr);
 @ISA     = qw(GD::Barcode Exporter);
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 
 sub new {
     my ( $sClass, $sTxt ) = @_;
@@ -23,7 +23,7 @@ sub init {
     #Check
     return 'Invalid Characters' if ( $sTxt =~ /[^0-9]/ );
 
-    #Not Set Chec
+    #Not Set Check
     if ( length($sTxt) % 2 ) {
         $sTxt .= calcITFCD($sTxt);
     }

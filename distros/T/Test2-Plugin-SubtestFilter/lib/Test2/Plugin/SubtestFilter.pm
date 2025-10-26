@@ -4,10 +4,8 @@ use strict;
 use warnings;
 use Encode qw(decode_utf8);
 use Test2::API qw(context);
-use B::Deparse ();
-use List::Util qw(any);
 
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 
 our $SEPARATOR = ' ';
 
@@ -15,16 +13,19 @@ use constant DEBUG => $ENV{SUBTEST_FILTER_DEBUG} ? 1 : 0;
 
 sub import {
     my $class = shift;
-    my $caller = caller;
+    my ($caller, $file_path) = caller;
 
     # Get original subtest function from caller's namespace
     # If it doesn't exist, do nothing
     my $orig = $caller->can('subtest') or return;
 
+    # Parse subtest structure from file
+    my $all_subtests = _parse_subtest_structure($file_path);
+
     # Override subtest in caller's namespace
     no strict 'refs';
     no warnings 'redefine';
-    *{"${caller}::subtest"} = _create_filtered_subtest($orig, $caller);
+    *{"${caller}::subtest"} = _create_filtered_subtest($orig, $all_subtests);
 }
 
 # Get subtest filter regex from environment variable
@@ -47,11 +48,127 @@ sub _get_subtest_filter_regex {
     return $regexp;
 }
 
+# Parse subtest structure from file
+sub _parse_subtest_structure {
+    my ($file_path) = @_;
+
+    # Read file content
+    open my $fh, '<:encoding(UTF-8)', $file_path
+        or die "Cannot open $file_path: $!";
+    my $content = do { local $/; <$fh> };
+    close $fh;
+
+    # Parse nested subtest structure
+    my $structure = _parse_subtests_recursive($content, []);
+    return $structure;
+}
+
+# Recursively parse subtest structure from content
+sub _parse_subtests_recursive {
+    my ($content, $parent_path, $depth) = @_;
+    $depth //= 0;
+
+    my @results;
+
+    # Match various subtest syntax patterns:
+    # To avoid excessive complexity, we only support common patterns used in tests.
+    # We do NOT support:
+    #   - Coderef variables: subtest name => \&code
+    #   - Variable interpolation: subtest $var => sub { }
+    #     (filters by variable name, not value)
+    #
+    # Supported patterns:
+    # 1. subtest 'name' => sub { }    - quoted with fat comma
+    # 2. subtest "name" => sub { }    - double quoted with fat comma
+    # 3. subtest('name' => sub { })   - parenthesized with quoted name and fat comma
+    # 4. subtest('name', sub { })     - parenthesized with quoted name and comma
+    # 5. subtest name => sub { }      - bareword (ASCII/Unicode) with fat comma
+    # 6. subtest(name => sub { })     - parenthesized with bareword and fat comma
+
+    # Combined regex pattern that matches all these cases
+    # Captures the name in different groups depending on the pattern
+    my $pattern = qr{
+        subtest\s*
+        (?:\()?                          # Optional opening paren
+        \s*
+        (?:
+            ['"]([^'"]+)['"]             # Quoted name (group 1)
+            |
+            ([\p{Word}]+)                # Bareword name including Unicode (group 2)
+        )
+        \s*
+        (?:=>|,)                         # Fat comma or comma
+        \s*
+        (?:\\?&)?                        # Optional coderef syntax \&
+        sub\s*\{                         # sub block start
+    }x;
+
+    while ($content =~ /$pattern/g) {
+        my $name = $1 // $2;  # Get name from either capture group
+        my $start_pos = pos($content);
+
+        # Find the matching closing brace
+        my $block_content = _extract_sub_block($content, $start_pos);
+
+        # Build full path
+        my @current_path = (@$parent_path, $name);
+        my $fullname = join $SEPARATOR, @current_path;
+
+        push @results, $fullname;
+
+        # Recursively parse nested subtests
+        if ($block_content) {
+            my $nested = _parse_subtests_recursive($block_content, \@current_path, $depth + 1);
+            push @results, @$nested;
+        }
+    }
+
+    return \@results;
+}
+
+# Extract the content of a sub block by matching braces
+sub _extract_sub_block {
+    my ($content, $start_pos) = @_;
+
+    my $depth = 1;
+    my $pos = $start_pos;
+    my $len = length($content);
+
+    while ($pos < $len && $depth > 0) {
+        my $char = substr($content, $pos, 1);
+
+        if ($char eq '{') {
+            $depth++;
+        } elsif ($char eq '}') {
+            $depth--;
+        } elsif ($char eq '"' || $char eq "'") {
+            # Skip string content
+            my $quote = $char;
+            $pos++;
+            while ($pos < $len) {
+                my $c = substr($content, $pos, 1);
+                if ($c eq '\\') {
+                    $pos++; # Skip escaped character
+                } elsif ($c eq $quote) {
+                    last;
+                }
+                $pos++;
+            }
+        }
+
+        $pos++;
+    }
+
+    if ($depth == 0) {
+        return substr($content, $start_pos, $pos - $start_pos - 1);
+    }
+
+    return '';
+}
+
 # Create a filtered subtest wrapper
 sub _create_filtered_subtest {
-    my ($original_subtest, $target_caller) = @_;
-
-    my $deparse = B::Deparse->new('-p');
+    my ($original_subtest, $target_all_subtests) = @_;
 
     return sub {
         my $filter = _get_subtest_filter_regex();
@@ -80,23 +197,17 @@ sub _create_filtered_subtest {
             return $pass;
         }
 
-        # Dry-run the subtest to check for matching child subtests
-        my $obj    = B::svref_2object(\$code);
-        my $source = $deparse->coderef2text($code);
-        my @child_subtest_names = $source =~ /subtest\(['"](.+?)['"]/g;
+        # Check if any descendant subtest matches
+        my @matching_descendants = grep {
+            # Check if this subtest is a descendant of current subtest
+            index($_, $current_subtest_fullname . $SEPARATOR) == 0
+                && $_ =~ $filter
+        } @$target_all_subtests;
 
-        if (@child_subtest_names) {
-            my @child_subtest_fullnames = map {
-                my $decoded = $_;
-                # Convert B::Deparse's \x{XXXX} format to actual characters
-                $decoded =~ s/\\x\{([0-9a-fA-F]+)\}/chr(hex($1))/ge;
-                join $SEPARATOR, $current_subtest_fullname, $decoded;
-            } @child_subtest_names;
-            if (any { $_ =~ $filter } @child_subtest_fullnames) {
-                my $pass = $original_subtest->($name, $params, $code, @args);
-                $ctx->release;
-                return $pass;
-            }
+        if (@matching_descendants) {
+            my $pass = $original_subtest->($name, $params, $code, @args);
+            $ctx->release;
+            return $pass;
         }
 
         # No match found, skip the subtest

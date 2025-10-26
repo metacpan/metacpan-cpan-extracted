@@ -17,7 +17,7 @@ use constant DEBUG        => $ENV{MIKROTIK_CLIENT_DEBUG} || 0;
 use constant MOJO_TLS_OPTS => !!
     eval { require Mojolicious; Mojolicious->VERSION('8.72'); 1 };
 
-our $VERSION = 'v0.601';
+our $VERSION = 'v0.610';
 
 has ca        => sub { $ENV{MIKROTIK_CLIENT_CA} };
 has cert      => sub { $ENV{MIKROTIK_CLIENT_CERT} };
@@ -292,9 +292,10 @@ MikroTik::Client - Non-blocking interface to MikroTik API
       {'.proplist' => 'board-name,version,uptime'} => sub {
           my ($api, $err, $list) = @_;
           ...;
+          Mojo::IOLoop->stop;
       }
   );
-  Mojo::IOLoop->start();
+  Mojo::IOLoop->start;
 
   # Subscribe
   $tag = $api->subscribe(
@@ -304,7 +305,7 @@ MikroTik::Client - Non-blocking interface to MikroTik API
       }
   );
   Mojo::IOLoop->timer(3 => sub { $api->cancel($tag) });
-  Mojo::IOLoop->start();
+  Mojo::IOLoop->start;
 
   # Errors handling
   $api->command(
@@ -319,18 +320,40 @@ MikroTik::Client - Non-blocking interface to MikroTik API
           ...;
       }
   );
-  Mojo::IOLoop->start();
+  Mojo::IOLoop->start;
 
   # Promises
   $api->cmd_p('/interface/print')
       ->then(sub { my $res = shift }, sub { my ($err, $attr) = @_ })
-      ->finally(sub { Mojo::IOLoop->stop() });
-  Mojo::IOLoop->start();
+      ->finally(sub { Mojo::IOLoop->stop });
+  Mojo::IOLoop->start;
 
 =head1 DESCRIPTION
 
 Both blocking and non-blocking interface to a MikroTik API service. With queries,
 command subscriptions and Promises/A+.
+
+=head1 CHANGES
+
+Starting from C<v0.600> this module switched back to using L<Mojo::IOLoop> as
+event loop backend. This should not affect blocking calls, but it might break
+non-blocking ones. Since both L<Mojo::IOLoop> and L<AnyEvent> prefer using L<EV>,
+when it's available, it should not really matter which one starts an event loop.
+
+For other event systems you can set C<MOJO_REACTOR> environment variable to
+C<MikroTik::Client::Reactor::AE>. It would force L<Mojo::IOLoop> play a bit more
+nicely with L<AnyEvent>.
+
+    BEGIN {
+        $ENV{MOJO_REACTOR} = "MikroTik::Client::Reactor::AE";
+    }
+
+    use AnyEvent;
+    use AnyEvent::Loop;
+
+    my $done = AE::cv;
+    $api->command('/some/commend' => $done);
+    $done->recv;
 
 =head1 ATTRIBUTES
 

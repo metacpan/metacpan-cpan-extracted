@@ -2,11 +2,130 @@ NAME
     App::EbookUtils - Command-line utilities related to ebooks
 
 VERSION
-    This document describes version 0.001 of App::EbookUtils (from Perl
-    distribution App-EbookUtils), released on 2023-02-10.
+    This document describes version 0.003 of App::EbookUtils (from Perl
+    distribution App-EbookUtils), released on 2025-10-26.
 
 SYNOPSIS
-    Currently empty.
+DESCRIPTION
+    This distribution provides tha following command-line utilities related
+    to ebooks:
+
+    *   cbr2pdf
+
+    *   cbz2pdf
+
+    *   convert-cbr-to-pdf
+
+    *   convert-cbz-to-pdf
+
+    *   convert-epub-to-pdf
+
+    *   epub2pdf
+
+FUNCTIONS
+  convert_cbr_to_pdf
+    Usage:
+
+     convert_cbr_to_pdf(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Convert cbr file to PDF.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   files* => *array[filename]*
+
+        (No description)
+
+    *   overwrite => *bool*
+
+        (No description)
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  convert_cbz_to_pdf
+    Usage:
+
+     convert_cbz_to_pdf(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Convert cbz file to PDF.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   files* => *array[filename]*
+
+        (No description)
+
+    *   overwrite => *bool*
+
+        (No description)
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  convert_epub_to_pdf
+    Usage:
+
+     convert_epub_to_pdf(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Convert epub file to PDF.
+
+    This utility is a simple wrapper to "ebook-convert". It allows setting
+    output filenames ("foo.epub.pdf") so you don't have to specify them
+    manually. It also allows processing multiple files in a single
+    invocation
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   files* => *array[filename]*
+
+        (No description)
+
+    *   overwrite => *bool*
+
+        (No description)
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -17,7 +136,7 @@ SOURCE
     <https://github.com/perlancar/perl-App-EbookUtils>.
 
 SEE ALSO
-    App::PDFUtils distribution includes some utilities like epub2pdf.
+    App::PDFUtils
 
 AUTHOR
     perlancar <perlancar@cpan.org>
@@ -39,7 +158,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

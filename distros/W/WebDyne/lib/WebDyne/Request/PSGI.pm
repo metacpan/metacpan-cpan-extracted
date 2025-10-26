@@ -44,7 +44,7 @@ use WebDyne::Request::Fake;
 
 #  Version information
 #
-$VERSION='2.015';
+$VERSION='2.016';
 
 
 #  Debug load
@@ -303,10 +303,22 @@ sub new {
                 #
                 my $document_default=$r{'document_default'} || $Dir_config_env{'DOCUMENT_DEFAULT'} || $DOCUMENT_DEFAULT;
                 debug("appending document default $document_default to fn:$fn");
-                $fn=File::Spec->catfile($fn, split m{/+}, $document_default); #/
                 
+                #  If absolute path just use it
+                #
+                if (File::Spec->file_name_is_absolute($document_default)) {
+                
+                    #  Yep - absolute path
+                    #
+                    $fn=$document_default
+                }
+                else {
+                
+                    #  Otherwise append to existing path
+                    #
+                    $fn=File::Spec->catfile($fn, split m{/+}, $document_default); #/
+                }
             }
-
         }
 
         #  Final sanity check

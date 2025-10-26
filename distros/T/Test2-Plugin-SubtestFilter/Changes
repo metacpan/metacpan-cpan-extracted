@@ -1,5 +1,8 @@
 Revision history for Perl extension Test2-Plugin-SubtestFilter
 
+0.03 2025-10-25T14:28:52Z
+    - Replace B::Deparse with file-based parsing for deep nested subtest support #1
+
 0.02 2025-10-21T01:54:40Z
     - Add debug mode to control skip message visibilityo
       - https://github.com/kfly8/Test2-Plugin-SubtestFilter/commit/6629e2fa1014784db664ccac4a0f5566191ff1a3

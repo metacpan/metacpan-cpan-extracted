@@ -24,7 +24,7 @@ local $^W=0;
 
 #  Version information. Must be all on one line
 #
-$VERSION='2.015';
+$VERSION='2.016';
 
 
 #  The guts

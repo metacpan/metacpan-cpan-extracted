@@ -423,7 +423,9 @@ sub select {
   # parse -result_as arg
   my $arg_result_as = $self->arg(-result_as) || 'rows';
   my ($result_as, @resultclass_args)
-    = does($arg_result_as, 'ARRAY') ? @$arg_result_as : ($arg_result_as);
+    = does($arg_result_as, 'ARRAY') ? @$arg_result_as 
+    : does($arg_result_as, 'HASH')  ? die("-result_as => {...} is invalid; use -result_as => [...] instead")
+    :                                 ($arg_result_as);
 
   # historically,some kinds of results accepted various aliases
   $result_as =~ s/^flat(?:_array|)$/flat_arrayref/;

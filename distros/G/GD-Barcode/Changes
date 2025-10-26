@@ -1,7 +1,11 @@
 Revision history for Perl extension GD::Barcode.
 
+2.02 2025-10-25
+	- Fix missing import in GD::Barcode::QRCode, reported by
+	  vslavof-lab
+
 2.01 2025-07-24
-	- Fix unitialized value warning in QRcode.pm, contributed
+	- Fix uninitialized value warning in QRcode.pm, contributed
           by Dabe Murphy
 	- Documentation improvements
         - Test improvements, fixed issue where ISBN::Barcode test missed
@@ -37,12 +41,12 @@ Revision history for Perl extension GD::Barcode.
 
 1.13  Sat Dec 30 9:30:00 2000
         - Add Industrail2of5, IATA2of5, Matrix2of5 and COOP(NEC?)2of5 support
-        - Modifty sample(smp_ind.pl, smp_all.pl)
+        - Modify sample(smp_ind.pl, smp_all.pl)
         - Add COPYRIGHT to all modules
 
 1.12  Sat Dec 16 10:00:00 2000
         - Add ITF(Interleaved 2 of 5) support
-        - Modifty EAN8
+        - Modify EAN8
 
 1.10  Sun Oct 29 10:00:00 2000
         - First release (Converted from KbBarcode.pm)
