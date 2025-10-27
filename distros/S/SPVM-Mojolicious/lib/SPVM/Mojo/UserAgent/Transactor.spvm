@@ -21,44 +21,26 @@ class Mojo::UserAgent::Transactor {
   use Mojo::UserAgent::Transactor::Endpoint;
   
   # Fields
-  has compressed : rw byte
-    get {
-      unless (exists $self->{compressed}) {
-        $self->{compressed} = (length (my $_ = Sys->env("SPVM_MOJO_GZIP")) ? (byte)$_ : (byte)1);
-      }
-      
-      return $self->{compressed};
-    }
-  ;
+  has compressed : rw byte;
   
-  has generators : rw Hash of Mojo::UserAgent::Transactor::Callback::Generator
-    get {
-      unless (exists $self->{generators}) {
-        $self->{generators} = Hash->new({
-          form => method : void () { &_form; },
-          json => method : void () { &_json; },
-          multipart => method : void () { &_multipart; },
-        });
-      }
-      
-      return $self->{generators};
-    }
-  ;
+  has generators : rw Hash of Mojo::UserAgent::Transactor::Callback::Generator;
   
-  has name : rw string
-    get {
-      unless (exists $self->{name}) {
-        $self->{name} = "Mojolicious (SPVM)";
-      }
-      
-      return $self->{name};
-    }
-  ;
+  has name : rw string;
   
   # Class Methods
   static method new : Mojo::UserAgent::Transactor () {
     
     my $self = new Mojo::UserAgent::Transactor;
+    
+    $self->{compressed} = (length (my $_ = Sys->env("SPVM_MOJO_GZIP")) ? (byte)$_ : (byte)1);
+    
+    $self->{generators} = Hash->new({
+      form => method : void () { &_form; },
+      json => method : void () { &_json; },
+      multipart => method : void () { &_multipart; },
+    });
+    
+    $self->{name} = "Mojolicious (SPVM)";
     
     return $self;
   }

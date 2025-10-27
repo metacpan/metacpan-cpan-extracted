@@ -67,216 +67,6 @@ YAML
   );
 };
 
-subtest $::TYPE.': path lookup' => sub {
-  my $openapi = OpenAPI::Modern->new(
-    openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
-components:
-  pathItems:
-    my_path_item:
-      description: good luck finding a path_template
-      post:
-        operationId: my_components_pathItem_operation
-        callbacks:
-          my_callback:
-            '{$request.query.queryUrl}': # note this is a path-item
-              post:
-                operationId: my_components_pathItem_callback_operation
-    my_path_item2:
-      description: this should be useable, as it is $ref'd by a /paths/<template> path item
-      post:
-        parameters:
-          - name: Alpha
-            in: header
-            required: true
-            schema: {}
-        operationId: my_reffed_component_operation
-paths:
-  /foo:
-    $ref: '#/components/pathItems/my_path_item2'
-  /foo/bar:
-    post:
-      # note: no operationId here
-      callbacks:
-        my_callback:
-          '{$request.query.queryUrl}': # note this is a path-item
-            post:
-              operationId: my_paths_pathItem_callback_operation
-webhooks:
-  my_hook:  # note this is a path-item
-    description: good luck here too
-    post:
-      operationId: my_webhook_operation
-YAML
-
-  my $request = request('POST', 'http://example.com/foo/bar');
-
-  cmp_result(
-    $openapi->validate_request($request, { operation_id => 'my_components_pathItem_operation' })->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          instanceLocation => '/request',
-          keywordLocation => '/paths',
-          absoluteKeywordLocation => $doc_uri.'#/paths',
-          error => 'no match found for request '.to_str($request),
-        },
-      ],
-    },
-    to_str($request).': operation is not under a path-item with a path template',
-  );
-
-  cmp_result(
-    $openapi->validate_request($request, { path_template => '/foo/bar', operation_id => 'my_components_pathItem_operation' })->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          instanceLocation => '/request',
-          keywordLocation => jsonp(qw(/paths /foo/bar post)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/bar post)))->to_string,
-          error => 'provided path_template and operation_id do not match request '.to_str($request),
-
-        },
-      ],
-    },
-    'operation is not under a path-item with a path template',
-  );
-
-  cmp_result(
-    $openapi->validate_request($request, { operation_id => 'my_webhook_operation' })->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          instanceLocation => '/request',
-          keywordLocation => '/paths',
-          absoluteKeywordLocation => $doc_uri.'#/paths',
-          error => 'no match found for request '.to_str($request),
-        },
-      ],
-    },
-    to_str($request).': operation is not under a path-item with a path template',
-  );
-
-  cmp_result(
-    $openapi->validate_request($request, { operation_id => 'my_paths_pathItem_callback_operation' })->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          instanceLocation => '/request',
-          keywordLocation => '/paths',
-          absoluteKeywordLocation => $doc_uri.'#/paths',
-          error => 'no match found for request '.to_str($request),
-        },
-      ],
-    },
-    to_str($request).': operation is not directly under a path-item with a path template',
-  );
-
-  cmp_result(
-    $openapi->validate_request($request, { operation_id => 'my_components_pathItem_callback_operation' })->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          instanceLocation => '/request',
-          keywordLocation => '/paths',
-          absoluteKeywordLocation => $doc_uri.'#/paths',
-          error => 'no match found for request '.to_str($request),
-        },
-      ],
-    },
-    to_str($request).': operation is not under a path-item with this path template',
-  );
-
-  cmp_result(
-    $openapi->validate_request($request = request('GET', 'http://example.com/bloop/blah'))->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          instanceLocation => '/request',
-          keywordLocation => '/paths',
-          absoluteKeywordLocation => $doc_uri.'#/paths',
-          error => 'no match found for request '.to_str($request),
-        },
-      ],
-    },
-    to_str($request).': no matching entry under /paths for URI',
-  );
-
-  cmp_result(
-    $openapi->validate_request($request, { path_template => '/foo/baz' })->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          instanceLocation => '/request/uri',
-          keywordLocation => '/paths',
-          absoluteKeywordLocation => $doc_uri->clone->fragment('/paths')->to_string,
-          error => 'missing path "/foo/baz"',
-        },
-      ],
-    },
-    to_str($request).': provided path_template does not exist in /paths',
-  );
-
-  cmp_result(
-    $openapi->validate_request(request('POST', 'http://example.com/foo'))->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          instanceLocation => '/request/header',
-          keywordLocation => jsonp(qw(/paths /foo $ref post parameters 0 required)),
-          absoluteKeywordLocation => $doc_uri.'#/components/pathItems/my_path_item2/post/parameters/0/required',
-          error => 'missing header: Alpha',
-        },
-      ],
-    },
-    'path specification was correctly found on the far side of a $ref; error locations are correct',
-  );
-
-
-  $openapi = OpenAPI::Modern->new(
-    openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
-components:
-  pathItems:
-    bar:
-      post: {}
-    foo-bar:
-      get:
-        requestBody:
-          required: true
-          content: {}
-paths:
-  /bar:
-    $ref: '#/components/pathItems/bar'
-  /foo/bar:
-    $ref: '#/components/pathItems/foo-bar'
-YAML
-
-  cmp_result(
-    $openapi->validate_request(request('GET', 'http://example.com/foo/bar'))->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          instanceLocation => '/request',
-          keywordLocation => jsonp(qw(/paths /foo/bar $ref get requestBody required)),
-          absoluteKeywordLocation => $doc_uri.'#/components/pathItems/foo-bar/get/requestBody/required',
-          error => 'request body is required but missing',
-        },
-      ],
-    },
-    'suffix match not deemed sufficient; error locations are correct when $refs involved in both paths',
-  );
-};
-
 subtest $::TYPE.': validation errors, request uri paths' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
@@ -525,6 +315,30 @@ YAML
       ],
     },
     'a specification must exist for every templated path value',
+  );
+};
+
+subtest $::TYPE.': path-item lookup' => sub {
+  my $openapi = OpenAPI::Modern->new(
+    openapi_uri => $doc_uri,
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.'paths: {}'),
+  );
+  my $result = $openapi->validate_request(request('GET', 'https://example.com'));
+  isa_ok($result, ['JSON::Schema::Modern::Result'], 'got a result object back');
+  cmp_result(
+    $result->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/request',
+          keywordLocation => '/paths',
+          absoluteKeywordLocation => $doc_uri.'#/paths',
+          error => 'no match found for request GET https://example.com',
+        },
+      ],
+    },
+    'match failure from find_path_item()',
   );
 };
 

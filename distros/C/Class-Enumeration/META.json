@@ -48,6 +48,7 @@
       "test" : {
          "requires" : {
             "Exporter" : "0",
+            "Exporter::Tiny" : "0",
             "Test::API" : "0",
             "Test::Fatal" : "0",
             "Test::Lib" : "0",
@@ -59,11 +60,11 @@
    "provides" : {
       "Class::Enumeration" : {
          "file" : "lib/Class/Enumeration.pm",
-         "version" : "v1.1.0"
+         "version" : "v1.2.0"
       },
       "Class::Enumeration::Builder" : {
          "file" : "lib/Class/Enumeration/Builder.pm",
-         "version" : "v1.1.0"
+         "version" : "v1.2.0"
       }
    },
    "release_status" : "stable",
@@ -77,5 +78,5 @@
          "web" : "https://github.com/XSven/Class-Enumeration"
       }
    },
-   "version" : "v1.1.0"
+   "version" : "v1.2.0"
 }

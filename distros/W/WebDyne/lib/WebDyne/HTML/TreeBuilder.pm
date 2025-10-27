@@ -46,7 +46,7 @@ use Data::Dumper;
 
 #  Version information
 #
-$VERSION='2.016';
+$VERSION='2.017';
 
 
 #  Debug load
@@ -88,6 +88,7 @@ debug("Loading %s version $VERSION", __PACKAGE__);
         dump
         include
         json
+        api
 
 ));
 
@@ -114,7 +115,7 @@ debug("Loading %s version $VERSION", __PACKAGE__);
 #  associated with each tag below.
 #
 #map {$CGI_TAG_SPECIAL{$_}++} qw(perl script style start_html end_html include);
-map {$CGI_TAG_SPECIAL{$_}++} qw(perl script style start_html end_html include div);
+map {$CGI_TAG_SPECIAL{$_}++} qw(perl script style start_html end_html include div api json);
 
 
 #  Nullify Entities encode & decode
@@ -477,10 +478,23 @@ sub json {
 
     #  No special handling needed, just log for debugging purposes
     #
-    my ($self, $method)=(shift, shift);
+    my ($self, $method, @param)=@_;
     $self->_text_block_tag('json') unless $self->_text_block_tag();
-    debug("json self $self, method $method, @_ text_block_tag %s", $self->_text_block_tag());
-    $self->$method(@_);
+    debug("json self $self, method $method text_block_tag %s", $self->_text_block_tag());
+    return $self->$method(@param);
+
+}
+
+
+sub api {
+
+
+    #  Handle normally but set flag showing we are an <api> page, will optimise differently
+    #
+    my ($self, $method, @param)=@_;
+    debug("api self $self, method $method");
+    $self->{'_api_webdyne'}++;
+    return $self->$method(@param);
 
 }
 
@@ -490,7 +504,7 @@ sub style {
     my ($self, $method)=(shift, shift);
     debug('style');
     $self->_text_block_tag('style') unless $self->_text_block_tag();
-    $self->$method(@_);
+    return $self->$method(@_);
 
 }
 
@@ -564,7 +578,7 @@ sub start {
     my ($self, $tag)=(shift, shift);
     my $text=$_[2];
     ref($tag) || ($tag=lc($tag));
-    debug("$self start tag '$tag' line_no: %s, @_", $self->{'_line_no'});
+    debug("$self start tag '$tag' line_no: %s, %s", $self->{'_line_no'}, Dumper(\@_));
     
     my $html_or;
     if ($self->_text_block_tag()) {

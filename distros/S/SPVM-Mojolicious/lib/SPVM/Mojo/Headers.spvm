@@ -101,33 +101,9 @@ class Mojo::Headers {
   }
   
   # Fields
-  has max_line_size : rw int
-    get {
-      unless ($self->{max_line_size} > -1) {
-        $self->{max_line_size} = length (my $_ = Sys->env("SPVM_MOJO_MAX_LINE_SIZE")) ? (int)$_ : -1;
-        
-        unless ($self->{max_line_size} > -1) {
-          $self->{max_line_size} = 8192;
-        }
-      }
-      
-      return $self->{max_line_size};
-    }
-  ;
+  has max_line_size : rw int;
   
-  has max_lines : rw int
-    get {
-      unless ($self->{max_lines} > -1) {
-        $self->{max_lines} = length (my $_ = Sys->env("SPVM_MOJO_MAX_LINES")) ? (int)$_ : -1;
-        
-        unless ($self->{max_lines} > -1) {
-          $self->{max_lines} = 100;
-        }
-      }
-      
-      return $self->{max_lines};
-    }
-  ;
+  has max_lines : rw int;
   
   # Undocumented Fields
   has headers_h : Hash of string[];
@@ -147,11 +123,11 @@ class Mojo::Headers {
     
     $self->{headers_h} = Hash->new;
     
-    $self->{max_line_size} = -1;
-    
-    $self->{max_lines} = -1;
-    
     $self->{buffer} = StringBuffer->new;
+    
+    $self->{max_line_size} = length (my $_ = Sys->env("SPVM_MOJO_MAX_LINE_SIZE")) ? (int)$_ : 8192;
+    
+    $self->{max_lines} = length (my $_ = Sys->env("SPVM_MOJO_MAX_LINES")) ? (int)$_ : 100;
     
     return $self;
   }

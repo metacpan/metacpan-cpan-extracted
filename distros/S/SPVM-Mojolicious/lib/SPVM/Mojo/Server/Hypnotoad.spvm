@@ -9,10 +9,16 @@ class Mojo::Server::Hypnotoad extends Mojo::Server {
     
     my $self = new Mojo::Server::Hypnotoad;
     
+    $self->init;
+    
     return $self;
   }
   
   # Instance Methods
+  protected method init : void () {
+    
+  }
+  
   method run : void () {
     die "TODO";
   }

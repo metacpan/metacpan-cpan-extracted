@@ -88,7 +88,7 @@ class Mojo::Template {
     # Clean start
     $self->set_unparsed($template);
     my $tree = (List of string[])List->new_ref(new string[][0]);
-    $self->set_tree($tree->get_array->(string[][]));
+    $self->set_tree($tree->get_array);
     $self->set_compiled(0);
     
     my $tag     = $self->tag_start;

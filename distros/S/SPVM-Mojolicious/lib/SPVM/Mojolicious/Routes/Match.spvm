@@ -171,12 +171,12 @@ class Mojolicious::Routes::Match {
     }
     
     # Match children
-    my $snapshot = $r->parent ? $stack_list->clone : List->new(new Hash[0]);
+    my $snapshot = (List of Hash)($r->parent ? $stack_list->clone : List->new(new Hash[0]));
     for my $child (@{$r->children}) {
       if ($self->_match($child, $c, $options)) {
         return 1;
       }
-      $self->set_stack($snapshot->to_array->(Hash[]));
+      $self->set_stack($snapshot->to_array);
     }
   }
 

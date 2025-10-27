@@ -13,43 +13,38 @@ class Mojo::Server extends Mojo::EventEmitter {
   # Fields
   has app : rw Mojolicious;
   
-  has reverse_proxy : rw byte
-    get {
-      unless (exists $self->{reverse_proxy}) {
-        my $reverse_proxy = 0;
-        if (length (my $_ = Sys->env("SPVM_MOJO_REVERSE_PROXY"))) {
-          $reverse_proxy = (int)$_;
-        }
-        else {
-          $reverse_proxy = !!@{$self->trusted_proxies};
-        }
-        
-        $self->{reverse_proxy} = (byte)$reverse_proxy;
-      }
-      return $self->{reverse_proxy};
-    }
-  ;
+  has reverse_proxy : rw byte;
   
-  has trusted_proxies : rw string[]
-    get {
-      unless (exists $self->{trusted_proxies}) {
-        $self->{trusted_proxies} = Re->split("\s*,\s*", length (my $_ = Sys->env("SPVM_MOJO_TRUSTED_PROXIES")) ? $_ : "");
-      }
-      return $self->{trusted_proxies};
-    }
-  ;
+  has trusted_proxies : rw string[];
   
   # Class Methods
   static method new : Mojo::Server () {
     
     my $self = new Mojo::Server;
     
-    $self->on(request => method : void ($server : Mojo::Server, $tx : Mojo::Transaction::HTTP)  { $server->app->handler($tx); });
+    $self->init;
     
     return $self;
   }
   
   # Instance Methods
+  protected method init : void () {
+    
+    $self->{trusted_proxies} = Re->split("\s*,\s*", length (my $_ = Sys->env("SPVM_MOJO_TRUSTED_PROXIES")) ? $_ : "");
+    
+    my $reverse_proxy = 0;
+    if (length (my $_ = Sys->env("SPVM_MOJO_REVERSE_PROXY"))) {
+      $reverse_proxy = (int)$_;
+    }
+    else {
+      $reverse_proxy = !!@{$self->trusted_proxies};
+    }
+    
+    $self->{reverse_proxy} = (byte)$reverse_proxy;
+    
+    $self->on(request => method : void ($server : Mojo::Server, $tx : Mojo::Transaction::HTTP)  { $server->app->handler($tx); });
+  }
+  
   method build_app : Mojolicious ($app : Mojolicious) {
     
     $self->set_app($app);

@@ -23,11 +23,6 @@ jobs:
         run: echo $env:PERL5LIB
       - name: Download cpanm
         run: perl -0777 -Mstrict -Mwarnings -MIO::Socket::INET -e 'my $socket = IO::Socket::INET->new(  Proto => qq(tcp),  PeerAddr => qq(cpanmin.us),  PeerPort => 80,) or die $!;print $socket join qq(\r\n),  qq(GET / HTTP/1.1),  qq(Connection:close),  qq(Host:cpanmin.us),  qq(\r\n);my $res = <$socket>;$res =~ m(^HTTP/1\.1 200 OK\r\n) or die $res;$res =~ s/.*?\r\n\r\n//s;open my $out, qq(>), qq(cpanm) or die $!;print $out $res'
-      # Temporaly setting: There is an ongoing outage on the primary CPAN mirror. It is possible to work around the issue by using MetaCPAN as a mirror.
-      - name: Set PERL_CPANM_OPT
-        run: echo "PERL_CPANM_OPT=-M https://cpan.metacpan.org/ --metacpan" >> $env:GITHUB_ENV
-      - name: Show PERL_CPANM_OPT
-        run: echo $env:PERL_CPANM_OPT
       - name: cpanm installs ExtUtils::MakeMaker
         run: perl cpanm -v -n -L ~/mylib ExtUtils::MakeMaker
       - name: cpanm installs dependent modules

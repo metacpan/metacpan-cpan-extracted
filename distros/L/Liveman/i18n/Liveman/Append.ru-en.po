@@ -1,47 +1,29 @@
-msgid "# NAME"
-msgstr "#NAME"
-
 msgid "Liveman::Append - добавляет секции для методов и функций из `lib/**.pm` в `lib/**.md`"
-msgstr "Liveman::Append - adds sections for methods and functions from `lib/**.pm` to `lib/**.md`"
-
-msgid "# DESCRIPTION"
-msgstr "#DESCRIPTION"
+msgstr "Liveman :: Append - adds sections for methods and functions from `Lib/**. Pm` to` Lib/**. Md`"
 
 msgid "Добавляет руководство по методам и функциям модулей (`lib/**.pm`) к их руководствам (`lib/**.md`)."
-msgstr "Adds a manual about module methods and functions (`lib/**.pm`) to their manuals (`lib/**.md`)."
+msgstr "Adds a guide on the methods and functions of the modules (`Lib/**. PM`) to their guidelines (` Lib/**. MD`)."
 
 msgid "1. Методы — это Perl-подпрограмма, начинающаяся с ключевого слова `sub`.\n"
 "1. Особенности — это свойства экземпляров добавляемые ООП-фреймворками, такими как `Aion`, `Moose`, `Moo`, `Mo`, и начинающиеся с ключевого слова `has`."
-msgstr "1. Methods is a Perl subroutine starting with the `sub` keyword.\n"
-"1. Features are instance properties added by OOP frameworks such as `Aion`, `Moose`, `Moo`, `Mo`, and starting with the `has` keyword."
+msgstr "1. Methods are a Perl subprogram starting with the keyword `sub`.\n"
+"1. Features are the properties of copies added by OOP-frames, such as `Aion`,` Moose`, `Moo`,` Mo`, and starting with the keyword `HAS`."
 
 msgid "Конструктор."
 msgstr "Constructor."
 
 msgid "Создаёт md-файл."
-msgstr "Creates an md file."
+msgstr "Creates an MD file."
 
 msgid "Добавляет в `lib/**.md` из `lib/**.pm` подпрограммы и особенности."
-msgstr "Adds routines and features to `lib/**.md` from `lib/**.pm`."
+msgstr "Adds to `Lib/**. Md` from` Lib/**. Pm` subprograms and features."
 
 msgid "Добавляет подпрограммы и функции из модуля (`$path`) в его мануал."
-msgstr "Adds routines and functions from a module (`$path`) to its manual."
-
-msgid "File lib/Alt/The/Plan.pm:"
-msgstr "File lib/Alt/The/Plan.pm:"
-
-msgid "File lib/Alt/The/Plan.md is:"
-msgstr "File lib/Alt/The/Plan.md is:"
-
-msgid "# AUTHOR"
-msgstr "#AUTHOR"
-
-msgid "Yaroslav O. Kosmina <dart@cpan.org>"
-msgstr "Yaroslav O. Kosmina <dart@cpan.org>"
+msgstr "Adds subprograms and functions from the module (`$ Path`) to its manual."
 
 msgid "⚖ **GPLv3**"
-msgstr "⚖ **GPLv3**"
+msgstr "⚖ ** gplv3 **"
 
 msgid "The Liveman::Append module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All rights reserved."
-msgstr "The Liveman::Append module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All rights reserved."
+msgstr "The Liveman :: Append Module is Copyright © 2023 Yaroslav O. Kosmina. Rusland. All Rights Reserved."
 

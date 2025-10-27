@@ -1,14 +1,8 @@
-msgid "# NAME"
-msgstr "#NAME"
-
 msgid "Liveman::Project - создать новый Perl-репозиторий"
-msgstr "Liveman::Project - create a new Perl repository"
-
-msgid "# DESCRIPTION"
-msgstr "#DESCRIPTION"
+msgstr "Liveman :: Project - Create a new Perl -Ro -Posteria"
 
 msgid "Создает новый Perl-репозиторий."
-msgstr "Creates a new Perl repository."
+msgstr "Creates a new Perl Roads."
 
 msgid "Конструктор."
 msgstr "Constructor."
@@ -23,17 +17,17 @@ msgid "Создаёт `cpanfile`."
 msgstr "Creates `cpanfile`."
 
 msgid "Создает главный модуль."
-msgstr "Creates a main module."
+msgstr "Creates the main module."
 
-msgid "Зоздёт лицензию."
-msgstr "Will issue a license."
+msgid "Создаёт лицензию."
+msgstr "Creates a license."
 
-msgid "Yaroslav O. Kosmina <dart@cpan.org>"
-msgstr "Yaroslav O. Kosmina <dart@cpan.org>"
+msgid "Проверяет проект на ошибки и распечатывает их в STDOUT."
+msgstr "Checks the project for errors and prints them in STDOUT."
 
 msgid "⚖ **GPLv3**"
-msgstr "⚖ **GPLv3**"
+msgstr "⚖ ** gplv3 **"
 
 msgid "The Liveman::Project module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All rights reserved."
-msgstr "The Liveman::Project module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All rights reserved."
+msgstr "The Liveman :: Project Module Is Copyright © 2023 Yaroslav O. Kosmina. Rusland. All Rights Reserved."
 

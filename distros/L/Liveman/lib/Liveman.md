@@ -1,17 +1,17 @@
-!ru:en
+!ru:en,badges
 # NAME
 
 Liveman - компиллятор из markdown в тесты и документацию
 
 # VERSION
 
-3.2
+3.3
 
 # SYNOPSIS
 
 Файл lib/Example.md:
 ```markdown
-Дважды два:
+Twice two:
 \```perl
 2*2  # -> 2+2
 \```
@@ -23,29 +23,21 @@ use Liveman;
 
 my $liveman = Liveman->new(prove => 1);
 
-# Компилировать lib/Example.md файл в t/example.t 
-# и добавить pod-документацию в lib/Example.pm
 $liveman->transform("lib/Example.md");
 
 $liveman->{count}   # => 1
 -f "t/example.t"    # => 1
 -f "lib/Example.pm" # => 1
 
-# Компилировать все lib/**.md файлы со временем модификации, превышающим соответствующие тестовые файлы (t/**.t):
 $liveman->transforms;
 $liveman->{count}   # => 0
 
-# Компилировать без проверки времени модификации
 Liveman->new(compile_force => 1)->transforms->{count} # => 1
 
-# Запустить тесты с yath:
-my $yath_return_code = $liveman->tests->{exit_code};
+my $prove_return_code = $liveman->tests->{exit_code};
 
-$yath_return_code           # => 0
+$prove_return_code           # => 0
 -f "cover_db/coverage.html" # => 1
-
-# Ограничить liveman этими файлами для операций, преобразований и тестов (без покрытия):
-my $liveman2 = Liveman->new(files => [], force_compile => 1);
 ```
 
 # DESCRIPION
@@ -122,7 +114,7 @@ my $exclamation = "!";
 
 ### `like`
 
-Проверяет регулярное выражение, включенное в выражение:
+Скаляр должен быть сопостовим с регулярным выражением:
 
 ```perl
 'abbc' # ~> b+
@@ -131,11 +123,109 @@ my $exclamation = "!";
 
 ### `unlike`
 
-Он проверяет регулярное выражение, исключённое из выражения:
+В скаляре не должно быть совпадения с регулярным выражением:
 
 ```perl
 'ac' # <~ b+
 'ac' # ↫ b+
+```
+
+### `like` begins with extrapolate-string
+
+Скаляр должен начинаться экстраполированой срокой:
+
+```perl
+my $var = 'b';
+
+'abbc' # ^=> a$var
+'abc'  # ⤇ a$var
+```
+
+### `like` ends with extrapolate-string
+
+Скаляр должен заканчиваться экстраполированой срокой:
+
+```perl
+my $var = 'c';
+
+'abbc' # $=> b$var
+'abc'  # ➾ b$var
+```
+
+### `like` inners with extrapolate-string
+
+Скаляр должен содержать экстраполированую сроку:
+
+```perl
+my $var = 'x';
+
+'abxc'  # *=> b$var
+'abxs'  # ⥴ b$var
+```
+
+### `like` begins with nonextrapolate-string
+
+Скаляр должен начинаться неэкстраполированой срокой:
+
+```perl
+'abbc' # ^-> ab
+'abc'  # ↣ ab
+```
+
+### `like` ends with nonextrapolate-string
+
+Скаляр должен заканчиваться неэкстраполированой срокой:
+
+```perl
+'abbc' # $-> bc
+'abc'  # ⇥ bc
+```
+
+### `like` inners with nonextrapolate-string
+
+Скаляр должен содержать неэкстраполированую сроку:
+
+```perl
+'abbc' # *-> bb
+'abc'  # ⥵ b
+```
+
+### `like` throw begins with nonextrapolate-string
+
+Исключение должно начинаться с неэкстраполированой сроки:
+
+```perl
+1/0 # @-> Illegal division by zero
+1/0 # ↯ Illegal division by zero
+```
+
+### `like` throw begins with extrapolate-string
+
+Исключение должно начинаться с экстраполированой сроки:
+
+```perl
+my $by = 'by';
+
+1/0 # @=> Illegal division $by zero
+1/0 # ⤯ Illegal division $by zero
+```
+
+### `like` throw
+
+Исключение должно быть сопостовимо с регулярным выражением:
+
+```perl
+1/0 # @~> division\s*by\s*zero
+1/0 # ⇝ division\s*by\s*zero
+```
+
+### `unlike` throw
+
+Исключение не должно быть сопостовимо с регулярным выражением:
+
+```perl
+1/0 # <~@ auto
+1/0 # ⇜ auto
 ```
 
 ## EMBEDDING FILES
@@ -160,7 +250,7 @@ hi!
 
 **Внимание!** Пустая строка между префиксом и кодом не допускается!
 
-Эти префиксы могут быть как на английском, так и на русском (`File <path>:` и `File <path> is:`).
+Эти префиксы могут быть как на английском, так и на русском (`File [path](https://metacpan.org/pod/path):` и `File [path](https://metacpan.org/pod/path) is:`).
 
 # METHODS
 
@@ -198,7 +288,7 @@ __END__
 
 =encoding utf-8
 
-Дважды два:
+Twice two:
 
 	2*2  # -> 2+2
 
@@ -217,6 +307,22 @@ __END__
 Запустить тесты (`t/**.t`-файлы).
 
 Все, если `$self->{files}` не установлен, или `$self->{files}` только.
+
+## load_po ($md, $from, $to)
+
+Считывает po-файл.
+
+## save_po ()
+
+Сохраняет po-файл.
+
+## trans ($text, $lineno)
+
+Функция переводит текст с одного языка на другой используя утилиту trans.
+
+## trans_paragraph ($paragraph, $lineno)
+
+Так же разбивает по параграфам.
 
 # DEPENDENCIES IN CPANFILE
 

@@ -7,19 +7,24 @@ class Mojolicious::Command::Prefork extends Mojolicious::Command {
   use Mojo::Util;
   use Fn;
   
-  has description : rw string
-    get {
-      unless (exists $self->{description}) {
-        $self->{description} = "Start application with pre-forking HTTP and WebSocket server";
-      }
-      return $self->{description};
-    }
-  ;
+  # Class Methods
+  static method new : Mojolicious::Command::Prefork () {
+    
+    my $self = new Mojolicious::Command::Prefork;
+    
+    $self->init;
+    
+    return $self;
+  }
   
-  has usage : rw string
-    get {
-      unless (exists $self->{usage}) {
-        $self->{usage} = <<'EOS';
+  # Instance Methods
+  protected method init : void () {
+    
+    $self->SUPER::init;
+    
+    $self->{description} = "Start application with pre-forking HTTP and WebSocket server";
+    
+    $self->{usage} = <<'EOS';
 Usage: APPLICATION prefork [OPTIONS]
 
   ./myapp.spvm prefork
@@ -67,11 +72,7 @@ Options:
   -w, --workers <number>               Number of workers, defaults to 4
 
 EOS
-      }
-      
-      return $self->{usage};
-    }
-  ;
+  }
   
   method build_server : Mojo::Server::Prefork ($args : string[] = undef) {
     

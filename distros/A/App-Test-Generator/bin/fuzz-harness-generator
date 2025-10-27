@@ -3,20 +3,43 @@
 use strict;
 use warnings;
 
+use App::Test::Generator;
+use autodie qw(:all);
+use File::Temp;
 use Getopt::Long qw(GetOptions);
 use Pod::Usage;
-use App::Test::Generator;
 
+my $infile;
+my $outfile;
 my $help;
+my $run;
 GetOptions(
 	'help|h' => \$help,
+	'input|i=s' => \$infile,
+	'output|o=s' => \$outfile,
+	'run|r' => \$run,
 ) or pod2usage(2);
 
 pod2usage(1) if $help;
 
-my $conf_file = shift @ARGV or pod2usage('No config file given');
+$infile ||= shift @ARGV or pod2usage('No config file given');
 
-App::Test::Generator::generate($conf_file);
+if($run && !$outfile) {
+	my $fh;
+	($fh, $outfile) = File::Temp::tempfile();
+
+	App::Test::Generator::generate($infile, $outfile);
+
+	system("prove -l $outfile");
+
+	exit $?;
+}
+
+App::Test::Generator::generate($infile, $outfile);
+
+if($run) {
+	system("prove -l $outfile");
+}
 
 exit 0;
 
@@ -28,7 +51,7 @@ fuzz-harness-generator - Generate fuzzing + corpus-based test harnesses
 
 =head1 SYNOPSIS
 
-  fuzz-harness-generator t/conf/add.conf
+  fuzz-harness-generator [-r] [-o outputile] input_file
 
 =head1 DESCRIPTION
 
@@ -43,6 +66,20 @@ cases (Perl or YAML).
 =item B<--help>
 
 Show this help.
+
+=item B<--input>
+
+The input configuration file
+
+=item B<--output>
+
+The (optional) output file.
+
+=item B<--run>
+
+Call C<prove> on the output file.
+
+C<fuzz-harness-generator -r t/conf/data_text_append.conf> will, therefore, dynamically create and run tests on the C<append> method of L<Data::Text>
 
 =back
 

@@ -2,7 +2,7 @@
 # MIT License
 
 class Mojolicious {
-  version "0.030";
+  version "0.031";
   
   use Mojo::Home;
   use Mojo::Loader;
@@ -22,89 +22,23 @@ class Mojolicious {
   use Mojolicious::Commands;
   
   # Fields
-  has home : rw Mojo::Home
-    get {
-      unless (exists $self->{home}) {
-        my $home = Mojo::Home->new;
-        $home->detect;
-        $self->{home} = $home;
-      }
-      return $self->{home};
-    }
-  ;
+  has home : rw Mojo::Home;
   
-  has log  : rw Mojo::Log
-    get {
-      unless (exists $self->{log}) {
-        my $log = Mojo::Log->new;
-        
-        if (length (my $_ = Sys->env("SPVM_MOJO_LOG_LEVEL"))) {
-          $log->set_level($_);
-        }
-        else {
-          unless ($self->mode eq "development") {
-            $log->set_level("info");
-          }
-        }
-        
-        return $self->{log} = $log;
-      }
-    }
-  ;
+  has log  : rw Mojo::Log;
   
-  has mode : rw string
-    get {
-      unless (exists $self->{mode}) {
-        if (length (my $_ = Sys->env("SPVM_MOJO_MODE"))) {
-          $self->{mode} = $_;
-        }
-        else {
-          $self->{mode} = "development";
-        }
-      }
-      return $self->{mode};
-    }
-  ;
+  has mode : rw string;
   
   has moniker : rw string;
   
   has max_request_size : rw int;
   
-  has plugins : rw Mojolicious::Plugins
-    get {
-      unless (exists $self->{plugins}) {
-        $self->{plugins} = Mojolicious::Plugins->new;
-      }
-      return $self->{plugins};
-    }
-  ;
+  has plugins : rw Mojolicious::Plugins;
   
-  has commands : rw Mojolicious::Commands
-    get {
-      unless (exists $self->{commands}) {
-        $self->{commands} = Mojolicious::Commands->new;
-      }
-      return $self->{commands};
-    }
-  ;
+  has commands : rw Mojolicious::Commands;
   
-  has renderer : rw Mojolicious::Renderer
-    get {
-      unless (exists $self->{renderer}) {
-        $self->{renderer} = Mojolicious::Renderer->new;
-      }
-      return $self->{renderer};
-    }
-  ;
+  has renderer : rw Mojolicious::Renderer;
   
-  has routes : rw Mojolicious::Routes
-    get {
-      unless (exists $self->{routes}) {
-        $self->{routes} = Mojolicious::Routes->new;
-      }
-      return $self->{routes};
-    }
-  ;
+  has routes : rw Mojolicious::Routes;
   
   has secrets : rw string[]
     get {
@@ -119,32 +53,11 @@ class Mojolicious {
     }
   ;
   
-  has sessions : rw Mojolicious::Sessions
-    get {
-      unless (exists $self->{sessions}) {
-        $self->{sessions} = Mojolicious::Sessions->new;
-      }
-      return $self->{sessions};
-    }
-  ;
+  has sessions : rw Mojolicious::Sessions;
   
-  has static : rw Mojolicious::Static
-    get {
-      unless (exists $self->{static}) {
-        $self->{static} = Mojolicious::Static->new;
-      }
-      return $self->{static};
-    }
-  ;
+  has static : rw Mojolicious::Static;
   
-  has types : rw Mojolicious::Types
-    get {
-      unless (exists $self->{types}) {
-        $self->{types} = Mojolicious::Types->new;
-      }
-      return $self->{types};
-    }
-  ;
+  has types : rw Mojolicious::Types;
   
   has config : rw Hash;
   
@@ -155,17 +68,45 @@ class Mojolicious {
     
     my $self = new Mojolicious;
     
-    my $home = $self->home;
+    $self->init;
+    
+    return $self;
+  }
+  
+  # Instance Methods
+  protected method init : void ($options : object[] = undef) {
+    
+    my $home = Mojo::Home->new;
+    $home->detect;
+    $self->{home} = $home;
+    
     my $renderer_paths = $self->renderer->paths;
     StringList->new_ref($renderer_paths)->push($home->child("templates")->to_string);
     
     my $static_paths = $self->static->paths;
     StringList->new_ref($static_paths)->push($home->child("public")->to_string);
     
-    return $self;
+    $self->{types} = Mojolicious::Types->new;
+    
+    $self->{static} = Mojolicious::Static->new;
+    
+    $self->{sessions} = Mojolicious::Sessions->new;
+    
+    $self->{routes} = Mojolicious::Routes->new;
+    
+    $self->{renderer} = Mojolicious::Renderer->new;
+    
+    $self->{commands} = Mojolicious::Commands->new;
+    
+    $self->{plugins} = Mojolicious::Plugins->new;
+    
+    $self->{mode} = length (my $_ = Sys->env("SPVM_MOJO_MODE")) ? $_ : "development";
+    
+    my $log = Mojo::Log->new;
+    $log->set_level(length (my $_ = Sys->env("SPVM_MOJO_LOG_LEVEL")) ? $_ : "info");
+    $self->{log} = $log;
   }
   
-  # Instance Methods
   method build_controller : Mojolicious::Controller ($tx : Mojo::Transaction) {
     
     unless ($tx) {

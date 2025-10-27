@@ -34,7 +34,7 @@ require Opcode;
 
 #  Version information
 #
-$VERSION='2.016';
+$VERSION='2.017';
 
 
 #  Get mod_perl version. Clear $@ after evals
@@ -171,7 +171,8 @@ my %constant_temp;
 
     #  Content-type for text/plain. As above
     #
-    WEBDYNE_CONTENT_TYPE_PLAIN => 'text/plain',
+    WEBDYNE_CONTENT_TYPE_TEXT => 'text/plain',
+    WEBDYNE_CONTENT_TYPE_JSON => 'application/json',
 
 
     #  Encoding
@@ -338,6 +339,11 @@ my %constant_temp;
     #  Use JSON canonical mode ?
     #
     WEBDYNE_JSON_CANONICAL => 1,
+    
+    
+    #  Enable the API mode ?
+    #
+    WEBDYNE_API_ENABLE => 1,
 
 
     #  Headers
@@ -456,8 +462,10 @@ sub local_constant_load {
     if (my $charset=$constant_hr->{'WEBDYNE_CHARSET'}) {
         $constant_hr->{'WEBDYNE_CONTENT_TYPE_HTML'}=sprintf("%s; charset=$charset", $constant_hr->{'WEBDYNE_CONTENT_TYPE_HTML'})
             unless $constant_hr->{'WEBDYNE_CONTENT_TYPE_HTML'}=~/charset=/;
-        $constant_hr->{'WEBDYNE_CONTENT_TYPE_PLAIN'}=sprintf("%s; charset=$charset", $constant_hr->{'WEBDYNE_CONTENT_TYPE_PLAIN'})
-            unless $constant_hr->{'WEBDYNE_CONTENT_TYPE_PLAIN'}=~/charset=/;
+        $constant_hr->{'WEBDYNE_CONTENT_TYPE_TEXT'}=sprintf("%s; charset=$charset", $constant_hr->{'WEBDYNE_CONTENT_TYPE_TEXT'})
+            unless $constant_hr->{'WEBDYNE_CONTENT_TYPE_TEXT'}=~/charset=/;
+        $constant_hr->{'WEBDYNE_CONTENT_TYPE_JSON'}=sprintf("%s; charset=$charset", $constant_hr->{'WEBDYNE_CONTENT_TYPE_JSON'})
+            unless $constant_hr->{'WEBDYNE_CONTENT_TYPE_JSON'}=~/charset=/;
     }
 
 

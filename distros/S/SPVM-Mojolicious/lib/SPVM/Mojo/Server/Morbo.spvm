@@ -19,10 +19,16 @@ class Mojo::Server::Morbo extends Mojo::Server {
     
     my $self = new Mojo::Server::Morbo;
     
+    $self->init;
+    
     return $self;
   }
   
   # Instance Methods
+  protected method init : void () {
+  
+  }
+  
   method run : void () {
     die "TODO";
   }

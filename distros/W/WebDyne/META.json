@@ -43,6 +43,7 @@
             "HTTP::Status" : "0",
             "IO::String" : "0",
             "JSON" : "0",
+            "Router::Simple" : "0",
             "Storable" : "0",
             "Test::More" : "0",
             "Test::Simple" : "0.44",
@@ -64,6 +65,6 @@
          "web" : "https://github.com/aspeer/pm-WebDyne"
       }
    },
-   "version" : "2.016",
+   "version" : "2.017",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

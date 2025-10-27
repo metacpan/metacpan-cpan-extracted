@@ -80,6 +80,17 @@ END
     $self
 }
 
+our @modules_for_test = qw/
+Carp
+common::sense
+File::Basename
+File::Path
+File::Slurper
+File::Spec
+Scalar::Util
+Test::More
+/;
+
 sub cpanfile {
     my ($self) = @_;
     write_text "cpanfile", << "END";
@@ -822,7 +833,7 @@ __END__
 
 =head1 NAME
 
-Liveman::Project - create a new Perl repository
+Liveman :: Project - Create a new Perl -Ro -Posteria
 
 =head1 SYNOPSIS
 
@@ -834,7 +845,7 @@ Liveman::Project - create a new Perl repository
 
 =head1 DESCRIPTION
 
-Creates a new Perl repository.
+Creates a new Perl Roads.
 
 =head1 SUBROUTINES/METHODS
 
@@ -856,11 +867,15 @@ Creates C<cpanfile>.
 
 =head2 mkpm ()
 
-Creates a main module.
+Creates the main module.
 
 =head2 license ()
 
-Will issue a license.
+Creates a license.
+
+=head2 warnings ()
+
+Checks the project for errors and prints them in STDOUT.
 
 =head1 AUTHOR
 
@@ -868,8 +883,8 @@ Yaroslav O. Kosmina L<mailto:dart@cpan.org>
 
 =head1 LICENSE
 
-⚖ B<GPLv3>
+⚖ I<* gplv3 *>
 
 =head1 COPYRIGHT
 
-The Liveman::Project module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All rights reserved.
+The Liveman :: Project Module Is Copyright © 2023 Yaroslav O. Kosmina. Rusland. All Rights Reserved.

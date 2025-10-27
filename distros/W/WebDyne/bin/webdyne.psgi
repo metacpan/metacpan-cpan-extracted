@@ -11,7 +11,6 @@
 #
 #  <http://dev.perl.org/licenses/>
 #
-
 package WebDyne::Request::PSGI::Run;
 
 
@@ -39,7 +38,12 @@ use WebDyne::Request::PSGI::Constant;
 
 #  Version information
 #
-$VERSION='2.016';
+$VERSION='2.017';
+
+
+#  API file name cache
+#
+our (%API_fn);
 
 
 #  Test file to use if no DOCUMENT_ROOT found
@@ -227,7 +231,7 @@ sub handler {
     #
     my $html;
     my $html_fh=IO::String->new($html);
-    my $r=WebDyne::Request::PSGI->new(select => $html_fh, document_root => $DOCUMENT_ROOT, document_default => $DOCUMENT_DEFAULT) ||
+    my $r=WebDyne::Request::PSGI->new(select => $html_fh, document_root => $DOCUMENT_ROOT, document_default => $DOCUMENT_DEFAULT, @_) ||
         return err('unable to create new WebDyne::Request::PSGI object: %s', 
 			$@ || errclr() || 'unknown error');
     debug("r: $r");
@@ -281,10 +285,38 @@ sub handler {
             debug('status fall through !')
         }
     }
-    elsif (($status < 0) && !(-f (my $fn=$r->filename()))) {
+    elsif (($status < 0) && !(-f (my $fn=$r->filename())) && !$WEBDYNE_API_ENABLE) {
+        my $document_root=$r->document_root;
+        (my $fn_display=$fn)=~s/^${document_root}//;
+        $fn_display ||= '/';
         debug("status: $status, fn:$fn, setting RC_NOT_FOUND");
         $r->status(RC_NOT_FOUND);
-		my $error=errdump() || "File '$fn' not found, status ($status)"; errclr();
+		my $error=errdump() || "File '$fn_display' not found, status ($status)"; errclr();
+		$html=$r->err_html($status, $error)
+        #warn("file $fn not found") if $WEBDYNE_FASTCGI_WARN_ON_ERROR;
+    }
+    elsif (($status < 0) && !(-f (my $fn=$r->filename())) && $WEBDYNE_API_ENABLE) {
+        my $document_root=$r->document_root;
+        (my $api_dn=$fn)=~s/^${document_root}//;
+        my @api_dn=grep {$_} File::Spec::Unix->splitdir($api_dn);
+        my @api_fn;
+        while (my $dn=shift @api_dn) {
+            push @api_fn, $dn;
+            my $api_fn=File::Spec->catfile($document_root, @api_fn) . '.psp';
+            debug("check $api_fn");
+            #  Check of outside docroot
+            last if (index($api_fn, $document_root) !=0);
+            if ($API_fn{$api_fn} || (-f $api_fn)) {
+                debug("found api file name: $api_fn, %s", Dumper(\%API_fn));
+                $API_fn{$api_fn}++; # Cache so not stat()ing on file system
+                return &handler($env_hr, filename=>$api_fn);
+            }
+        }
+        (my $fn_display=$fn)=~s/^${document_root}//;
+        $fn_display ||= '/';
+        debug("status: $status, fn:$fn, setting RC_NOT_FOUND");
+        $r->status(RC_NOT_FOUND);
+		my $error=errdump() || "File '$fn_display' not found, status ($status)"; errclr();
 		$html=$r->err_html($status, $error)
         #warn("file $fn not found") if $WEBDYNE_FASTCGI_WARN_ON_ERROR;
     }

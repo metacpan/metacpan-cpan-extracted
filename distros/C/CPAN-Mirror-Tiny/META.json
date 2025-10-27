@@ -4,7 +4,7 @@
       "Shoichi Kaji <skaji@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -17,11 +17,6 @@
       "configure" : {
          "requires" : {
             "Module::Build::Tiny" : "0.034"
-         }
-      },
-      "develop" : {
-         "requires" : {
-            "Test::More" : "0.98"
          }
       },
       "runtime" : {
@@ -46,7 +41,7 @@
    "provides" : {
       "CPAN::Mirror::Tiny" : {
          "file" : "lib/CPAN/Mirror/Tiny.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "CPAN::Mirror::Tiny::Archive" : {
          "file" : "lib/CPAN/Mirror/Tiny/Archive.pm"
@@ -73,13 +68,13 @@
          "web" : "https://github.com/skaji/CPAN-Mirror-Tiny"
       }
    },
-   "version" : "0.32",
+   "version" : "0.33",
    "x_contributors" : [
       "Shoichi Kaji <skaji@outlook.com>",
       "Tore Aursand <toreau@gmail.com>"
    ],
-   "x_generated_by_perl" : "v5.34.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "x_generated_by_perl" : "v5.42.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : 1
 }

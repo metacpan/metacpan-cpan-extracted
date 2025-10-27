@@ -29,15 +29,7 @@ class Mojo::Date {
     }
   ;
   
-  has epoch_sec : rw long
-    get {
-      unless (exists $self->{epoch_sec}) {
-        $self->{epoch_sec} = Sys->time;
-      }
-      
-      return $self->{epoch_sec};
-    }
-  ;
+  has epoch_sec : rw long;
   
   has epoch_nsec : rw long;
   
@@ -58,21 +50,27 @@ class Mojo::Date {
   }
   
   # Class Methods
-  static method new : Mojo::Date ($date_value : string|Long = undef) {
+  static method new : Mojo::Date ($date : string|Long|Double = undef) {
     
     my $self = new Mojo::Date;
     
-    if ($date_value isa string) {
-      $self->parse((string)$date_value);
+    if (!$date) {
+      $self->{epoch_sec} = Sys->time;
     }
-    elsif ($date_value isa Long) {
+    elsif ($date isa string) {
+      $self->parse((string)$date);
+    }
+    elsif ($date isa Long) {
       
-      my $epoch_sec = (long)$date_value;
+      my $epoch_sec = (long)$date;
       
       $self->{epoch_sec} = $epoch_sec;
     }
+    elsif ($date isa Double) {
+      $self->parse((string)(double)$date);
+    }
     else {
-      die "The type of the date value \$date_value must be string or Long.";
+      die "The type of the date \$date must be string, Long, or Double.";
     }
     
     return $self;

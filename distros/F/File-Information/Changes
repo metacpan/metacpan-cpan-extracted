@@ -1,3 +1,6 @@
+v0.15  2025-10-26Z
+    - Added experimental support to open a handle for an File::Information::Inode
+
 v0.14  2025-10-19Z
     - Added --wellknown to file-information-dump
     - Added support to peek to file-information-dump

@@ -8,19 +8,24 @@ class Mojolicious::Command::Hypnotoad extends Mojolicious::Command {
   use Mojo::Util;
   use Fn;
   
-  has description : rw string
-    get {
-      unless (exists $self->{description}) {
-        $self->{description} = "Hypnotoad HTTP and WebSocket server";
-      }
-      return $self->{description};
-    }
-  ;
+  # Class Methods
+  static method new : Mojolicious::Command::Hypnotoad () {
+    
+    my $self = new Mojolicious::Command::Hypnotoad;
+    
+    $self->init;
+    
+    return $self;
+  }
   
-  has usage : rw string
-    get {
-      unless (exists $self->{usage}) {
-        $self->{usage} = <<'EOS';
+  # Instance Methods
+  protected method init : void () {
+    
+    $self->SUPER::init;
+    
+    $self->{description} = "Hypnotoad HTTP and WebSocket server";
+    
+    $self->{usage} = <<'EOS';
 Usage: hypnotoad [OPTIONS] [APPLICATION]
 
   ./myapp.spvm hypnotoad
@@ -33,11 +38,7 @@ Options:
   -t, --test         Test application and exit
 
 EOS
-      }
-      
-      return $self->{usage};
-    }
-  ;
+  }
   
   method build_server : Mojo::Server::Hypnotoad ($args : string[] = undef) {
     

@@ -42,10 +42,16 @@ class Mojo::Server::CGI extends Mojo::Server {
     
     my $self = new Mojo::Server::CGI;
     
+    $self->init;
+    
     return $self;
   }
   
   # Instance Methods
+  protected method init : void () {
+  
+  }
+  
   method run : void () {
     
     $self->app->server($self);

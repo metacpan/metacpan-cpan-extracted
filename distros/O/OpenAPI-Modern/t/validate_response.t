@@ -107,249 +107,6 @@ START:
 $::TYPE = $::TYPES[$type_index];
 note 'REQUEST/RESPONSE TYPE: '.$::TYPE;
 
-subtest $::TYPE.': subset of options provided for operation lookup' => sub {
-  my $openapi = OpenAPI::Modern->new(
-    openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
-components:
-  pathItems:
-    my_path_item:
-      description: good luck finding a path_template
-      post:
-        operationId: my_components_pathItem_operation
-        callbacks:
-          my_callback:
-            '{$request.query.queryUrl}': # note this is a path-item
-              post:
-                operationId: my_components_pathItem_callback_operation
-                responses:
-                  200: {}
-        responses:
-          200: {}
-    my_path_item2:
-      description: this should be useable, as it is $ref'd by a /paths/<template> path item
-      post:
-        operationId: my_reffed_component_operation
-        responses:
-          default:
-            headers:
-              Alpha:
-                required: true
-                schema: {}
-paths:
-  /foo:
-    $ref: '#/components/pathItems/my_path_item2'
-  /foo/bar:
-    post:
-      callbacks:
-        my_callback:
-          '{$request.query.queryUrl}': # note this is a path-item
-            post:
-              operationId: my_paths_pathItem_callback_operation
-              responses:
-                200: {}
-webhooks:
-  my_hook:  # note this is a path-item
-    description: good luck here too
-    post:
-      operationId: my_webhook_operation
-      responses:
-        200: {}
-YAML
-
-  my $res = response(400);
-
-  cmp_result(
-    $openapi->validate_response($res, { path_template => '/' })->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          instanceLocation => '/response',
-          keywordLocation => '',
-          absoluteKeywordLocation => $doc_uri->to_string,
-          error => 'at least one of $options->{request}, ($options->{path_template} and $options->{method}), or $options->{operation_id} must be provided',
-        },
-      ],
-    },
-    'no request information was passed: need operation_id or path_template AND method',
-  );
-
-  cmp_result(
-    $openapi->validate_response($res, { method => 'GET' })->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          instanceLocation => '/response',
-          keywordLocation => '',
-          absoluteKeywordLocation => $doc_uri->to_string,
-          error => 'at least one of $options->{request}, ($options->{path_template} and $options->{method}), or $options->{operation_id} must be provided',
-        },
-      ],
-    },
-    'no request information was passed: need operation_id or path_template AND method',
-  );
-
-  cmp_result(
-    $openapi->validate_response($res)->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          instanceLocation => '/response',
-          keywordLocation => '',
-          absoluteKeywordLocation => $doc_uri->to_string,
-          error => 'at least one of $options->{request}, ($options->{path_template} and $options->{method}), or $options->{operation_id} must be provided',
-        },
-      ],
-    },
-    'no request information was passed: need operation_id or path_template AND method',
-  );
-
-  cmp_result(
-    $openapi->validate_response($res, my $options = { operation_id => 'my_components_pathItem_operation' })->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          instanceLocation => '/response/code',
-          keywordLocation => '/components/pathItems/my_path_item/post/responses',
-          absoluteKeywordLocation => $doc_uri.'#/components/pathItems/my_path_item/post/responses',
-          error => 'no response object found for code 400',
-        },
-      ],
-    },
-    'response is processed',
-  );
-  cmp_result(
-    $options,
-    {
-      method => 'POST',
-      operation_id => 'my_components_pathItem_operation',
-      operation_uri => str($doc_uri.'#/components/pathItems/my_path_item/post'),
-    },
-    'operation is not under a path-item with a path template, but still exists',
-  );
-
-  cmp_result(
-    $openapi->validate_response($res, $options = { path_template => '/foo/bar', operation_id => 'my_components_pathItem_operation' })->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          instanceLocation => '/response',
-          keywordLocation => jsonp(qw(/paths /foo/bar post)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/bar post)))->to_string,
-          error => 'templated operation does not match provided operation_id',
-        },
-      ],
-    },
-    'response is processed',
-  );
-
-  cmp_result(
-    $options,
-    {
-      path_template => '/foo/bar',
-      method => 'POST',
-      operation_id => 'my_components_pathItem_operation',
-    },
-    'operation is not under a path-item with a path template',
-  );
-
-  cmp_result(
-    $openapi->validate_response($res, $options = { operation_id => 'my_webhook_operation' })->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          instanceLocation => '/response/code',
-          keywordLocation => '/webhooks/my_hook/post/responses',
-          absoluteKeywordLocation => $doc_uri.'#/webhooks/my_hook/post/responses',
-          error => 'no response object found for code 400',
-        },
-      ],
-    },
-    to_str($res).': response is processed',
-  );
-  cmp_result(
-    $options,
-    {
-      method => 'POST',
-      operation_id => 'my_webhook_operation',
-      operation_uri => str($doc_uri.'#/webhooks/my_hook/post'),
-    },
-    'operation is not under a path-item with a path template, but still exists',
-  );
-
-  cmp_result(
-    $openapi->validate_response($res, $options = { operation_id => 'my_paths_pathItem_callback_operation' })->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          instanceLocation => '/response/code',
-          keywordLocation => jsonp(qw(/paths /foo/bar post callbacks my_callback {$request.query.queryUrl} post responses)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/bar post callbacks my_callback {$request.query.queryUrl} post responses)))->to_string,
-          error => 'no response object found for code 400',
-        },
-      ],
-    },
-    'response is processed',
-  );
-  cmp_result(
-    $options,
-    {
-      method => 'POST',
-      operation_id => 'my_paths_pathItem_callback_operation',
-      operation_uri => str($doc_uri->clone->fragment(jsonp(qw(/paths /foo/bar post callbacks my_callback {$request.query.queryUrl} post)))),
-    },
-    'operation is not directly under a path-item with a path template, but still exists',
-  );
-
-  cmp_result(
-    $openapi->validate_response($res, $options = { operation_id => 'my_components_pathItem_callback_operation' })->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          instanceLocation => '/response/code',
-          keywordLocation => '/components/pathItems/my_path_item/post/callbacks/my_callback/{$request.query.queryUrl}/post/responses',
-          absoluteKeywordLocation => $doc_uri->clone->fragment('/components/pathItems/my_path_item/post/callbacks/my_callback/{$request.query.queryUrl}/post/responses')->to_string,
-          error => 'no response object found for code 400',
-        },
-      ],
-    },
-    to_str($res).': response is processed',
-  );
-  cmp_result(
-    $options,
-    {
-      method => 'POST',
-      operation_id => 'my_components_pathItem_callback_operation',
-      operation_uri => str($doc_uri->clone->fragment('/components/pathItems/my_path_item/post/callbacks/my_callback/{$request.query.queryUrl}/post')),
-    },
-    'operation is not under a path-item with a path template, but still exists',
-  );
-
-  cmp_result(
-    $openapi->validate_response($res, { path_template => '/foo', method => 'POST' })->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          instanceLocation => '/response/header',
-          keywordLocation => jsonp(qw(/paths /foo $ref post responses default headers Alpha required)),
-          absoluteKeywordLocation => $doc_uri.'#/components/pathItems/my_path_item2/post/responses/default/headers/Alpha/required',
-          error => 'missing header: Alpha',
-        },
-      ],
-    },
-    'path specification was correctly found on the far side of a $ref; error locations are correct',
-  );
-};
-
 subtest $::TYPE.': validation errors in responses' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
@@ -359,26 +116,27 @@ paths:
     post: {}
 YAML
 
+  my $result = $openapi->validate_response(response(200), { operation_id => 'foo' });
+  isa_ok($result, ['JSON::Schema::Modern::Result'], 'got a result object back');
   cmp_result(
-    $openapi->validate_response(response(404),
-      { request => request('GET', 'http://example.com/foo/bar') })->TO_JSON,
+    $result->TO_JSON,
     {
       valid => false,
       errors => [
         {
-          instanceLocation => '/request',
-          keywordLocation => '/paths',
-          absoluteKeywordLocation => $doc_uri->clone->fragment('/paths')->to_string,
-          error => 'no match found for request GET http://example.com/foo/bar',
+          instanceLocation => '/response',
+          keywordLocation => '',
+          absoluteKeywordLocation => $doc_uri->to_string,
+          error => 'unknown operation_id "foo"',
         },
       ],
     },
-    'error in find_path when passing request into options',
+    'match failure from find_path_item()',
   );
 
   if ($::TYPE eq 'lwp') {
     my $response = response(404);
-    $response->request(request('POST', 'http://example.com/foo/bar'));
+    $response->request(request('GET', 'http://example.com/foo'));
 
     cmp_result(
       $openapi->validate_response($response)->TO_JSON,
@@ -393,7 +151,7 @@ YAML
           },
         ],
       },
-      'error in find_path when providing request on response',
+      'request can be retrieved from the HTTP::Response object',
     );
 
     $response->request(request('POST', 'http://example.com/foo'));
@@ -403,24 +161,17 @@ YAML
       'operation is successfully found using the request on the response',
     );
   }
+};
 
-  cmp_result(
-    $openapi->validate_response(response(404),
-      { path_template => '/foo', request => request('POST', 'http://example.com/foo') })->TO_JSON,
-    { valid => true },
-    'operation is successfully found using the request in options',
-  );
-
-  cmp_result(
-    $openapi->validate_response(response(404), { path_template => '/foo', method => 'POST' })->TO_JSON,
-    { valid => true },
-    'no responses object - nothing to validate against',
-  );
-
-
-  $openapi = OpenAPI::Modern->new(
+subtest $::TYPE.': validation errors in responses' => sub {
+  my $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+components:
+  pathItems:
+    bar:
+      post:
+        operationId: bar_operation
 paths:
   /foo:
     post:
@@ -428,6 +179,12 @@ paths:
         200: {}
         2XX: {}
 YAML
+
+  cmp_result(
+    $openapi->validate_response(response(404), { operation_id => 'bar_operation' })->TO_JSON,
+    { valid => true },
+    'no responses object - nothing to validate against',
+  );
 
   cmp_result(
     $openapi->validate_response(response(404), { path_template => '/foo', method => 'POST' })->TO_JSON,

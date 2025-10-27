@@ -1,0 +1,20 @@
+v0.03  2025-10-27Z
+    - Improved documentation
+    - Added support for more from types: DateTime, SIRTX::Datecode, Data::Identifier
+    - Allow SIRTX::Datecode to be used in as()
+    - Added is_utc(), is_floating(), and is_null()
+    - Added precision()
+    - Updated generator protections
+    - Added null() to create null datecodes
+    - Added now() to create datecodes for the current time
+    - No longer inherit from Data::Identifier::Interface::Userdata as that was broken.
+      No harm is done to existing applications as this did not work anyway.
+      Later versions will likely add this feature again.
+
+v0.02  2025-10-26Z
+    - Fixed FTBFS with Data::Identifier missing
+    - Added support for as()
+    - Added support for epoch values
+
+v0.01  2025-10-26Z
+    - Initial release

@@ -431,6 +431,15 @@ t/data/02-perl_module_function.dat.5
 t/data/02-perl_module_function.dat.final 
 t/data/02-perl_module_function.html      
 t/data/02-perl_module_function.tree      
+t/data/02-perl_param_cascade.dat.0                  
+t/data/02-perl_param_cascade.dat.1                  
+t/data/02-perl_param_cascade.dat.2                  
+t/data/02-perl_param_cascade.dat.3                  
+t/data/02-perl_param_cascade.dat.4                  
+t/data/02-perl_param_cascade.dat.5                  
+t/data/02-perl_param_cascade.dat.final              
+t/data/02-perl_param_cascade.html                   
+t/data/02-perl_param_cascade.tree                   
 t/data/02-perl_pi.dat.0                  
 t/data/02-perl_pi.dat.1                  
 t/data/02-perl_pi.dat.2                  
@@ -743,6 +752,7 @@ t/perl_head.psp
 t/perl_inline_handler.psp
 t/perl_inline_simple.psp
 t/perl_module_function.psp
+t/perl_param_cascade.psp
 t/perl_pi.psp
 t/perl_require_file_head.psp
 t/perl_require_file.pm

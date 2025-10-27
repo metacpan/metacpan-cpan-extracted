@@ -8,7 +8,7 @@ class Mojolicious::Routes extends Mojolicious::Routes::Route {
   use Mojo::Cache;
   use Mojolicious::Routes::Callback::Condition;
   use Mojo::DynamicMethods;
-  use Mojo::DynamicMethods::Callback;
+  use Mojo::Callback;
   use Regex;
   use Mojolicious::Controller;
   
@@ -16,61 +16,31 @@ class Mojolicious::Routes extends Mojolicious::Routes::Route {
   interface Mojo::DynamicMethods;
   
   # Fields
-  has cache : rw Mojo::Cache
-    get {
-      unless (exists $self->{cache}) {
-        $self->{cache} = Mojo::Cache->new;
-      }
-      
-      return $self->{cache};
-    }
-  ;
+  has cache : rw Mojo::Cache;
   
-  has conditions : rw Hash of Mojolicious::Routes::Callback::Condition
-    get {
-      unless (exists $self->{conditions}) {
-        $self->{conditions} = Hash->new;
-      }
-      
-      return $self->{conditions};
-    }
-  ;
+  has conditions : rw Hash of Mojolicious::Routes::Callback::Condition;
   
-  has shortcuts : rw Hash of Mojo::DynamicMethods::Callback
-    get {
-      unless (exists $self->{shortcuts}) {
-        $self->{shortcuts} = Hash->new;
-      }
-      
-      return $self->{shortcuts};
-    }
-  ;
+  has shortcuts : rw Hash of Mojo::Callback;
   
-  has types : rw Hash of string|Regex|string[]|Regex[]|object[]
-    get {
-      unless (exists $self->{types}) {
-        $self->{types} = Hash->new;
-        $self->{types}->set(num => [Regex->new("[0-9]+")]);
-      }
-      
-      return $self->{types};
-    }
-  ;
+  has types : rw Hash of string|Regex|string[]|Regex[]|object[];
   
-  has namespaces : rw string[]
-    get {
-      unless (exists $self->{namespaces}) {
-        $self->{namespaces} = new string[0];
-      }
-      
-      return $self->{namespaces};
-    }
-  ;
+  has namespaces : rw string[];
   
   # Class Methods
   static method new : Mojolicious::Routes () {
     
     my $self = new Mojolicious::Routes;
+    
+    $self->{cache} = Mojo::Cache->new;
+    
+    $self->{conditions} = Hash->new;
+    
+    $self->{shortcuts} = Hash->new;
+    
+    $self->{types} = Hash->new;
+    $self->{types}->set(num => [Regex->new("[0-9]+")]);
+    
+    $self->{namespaces} = new string[0];
     
     return $self;
   }
@@ -99,7 +69,7 @@ class Mojolicious::Routes extends Mojolicious::Routes::Route {
   }
   
   # Instance Methods
-  method dynamic_methods : Hash of Hash of Mojo::DynamicMethods::Callback () {
+  method dynamic_methods : Hash of Hash of Mojo::Callback () {
     return $self->shortcuts;
   }
   
@@ -108,7 +78,7 @@ class Mojolicious::Routes extends Mojolicious::Routes::Route {
     $self->conditions->set($name, $cb);
   }
   
-  method add_shortcut : void ($name : string, $cb : Mojo::DynamicMethods::Callback) {
+  method add_shortcut : void ($name : string, $cb : Mojo::Callback) {
     $self->conditions->set($name, $cb);
   }
   

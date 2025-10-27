@@ -11,98 +11,71 @@ class Mojo::Message::Request extends Mojo::Message {
   use Hash;
   
   # Class Variables
-  our $seed : string;
+  our $SEED : cache string;
   
-  our $counter : int;
+  our $COUNTER : int;
+  INIT {
+    $COUNTER = (int)Sys->rand(0xffffff);
+  }
   
   # Fields
-  has env : rw Hash of string
-    get {
-      unless (exists $self->{env}) {
-        $self->{env} = Hash->new;
-      }
-      
-      return $self->{env};
-    }
-  ;
+  has env : rw Hash of string;
   
-  has method : rw string
-    get {
-      unless (exists $self->{method}) {
-        $self->{method} = "GET";
-      }
-      
-      return $self->{method};
-    }
-  ;
+  has method : rw string;
   
   has proxy : rw Mojo::URL;
   
   has reverse_proxy : rw byte;
   
-  has url : rw Mojo::URL
-    get {
-      unless (exists $self->{url}) {
-        $self->{url} = Mojo::URL->new;
-      }
-      
-      return $self->{url};
-    }
-  ;
+  has url : rw Mojo::URL;
   
-  has request_id : rw string
-    get {
-      unless (exists $self->{request_id}) {
-        $seed    = Sys->process_id . Sys->time . Sys->rand;
-        $counter = (int)Sys->rand(0xffffff);
-        
-        my $b64 = Fn->substr(Digest::SHA->sha1_base64($seed . ($counter = ($counter + 1) % 0xffffff)), 0, 12);
-        
-        Re->s((mutable string)$b64, "+", "-");
-        
-        Re->s((mutable string)$b64, "/", "_");
-        
-        $self->{request_id} = $b64;
-      }
-      
-      return $self->{request_id};
-    }
-  ;
+  has request_id : rw string;
   
-  has trusted_proxies : rw string[]
-    get {
-      unless (exists $self->{trusted_proxies}) {
-        $self->{trusted_proxies} = new string[0];
-      }
-      
-      return $self->{trusted_proxies};
-    }
-  ;
+  has trusted_proxies : rw string[];
   
-  has via_proxy : rw byte
-    get {
-      unless (exists $self->{via_proxy}) {
-        $self->{via_proxy} = 1;
-      }
-      
-      return $self->{via_proxy};
-    }
-  ;
+  has via_proxy : rw byte;
   
   # Undocumented Fields
   has params : Mojo::Parameters;
   
-  has start_buffer : string;
+  has start_buffer : StringBuffer;
   
   # Class Methods
   static method new : Mojo::Message::Request () {
     
     my $self = new Mojo::Message::Request;
     
+    $self->init;
+    
     return $self;
   }
   
   # Instance Methods
+  protected method init : void () {
+    
+    $self->SUPER::init;
+    
+    $self->{env} = Hash->new;
+    
+    $self->{method} = "GET";
+    
+    $self->{url} = Mojo::URL->new;
+    
+    $SEED = Sys->process_id . Sys->time . Sys->rand;
+    
+    my $b64 = Fn->substr(Digest::SHA->sha1_base64($SEED . ($COUNTER = ($COUNTER + 1) % 0xffffff)), 0, 12);
+    
+    Re->s((mutable string)$b64, "\+", "-");
+    
+    Re->s((mutable string)$b64, "\/", "_");
+    
+    $self->{request_id} = $b64;
+    
+    $self->{trusted_proxies} = new string[0];
+    
+    $self->{via_proxy} = 1;
+  }
+  
   method clone : Mojo::Message::Request () {
     
     # Dynamic requests cannot be cloned
@@ -248,11 +221,11 @@ class Mojo::Message::Request extends Mojo::Message {
     
     $self->emit(progress => "start_line", $offset);
     
-    my $start_buffer_length = length $self->{start_buffer};
+    my $start_buffer_length = $self->{start_buffer}->length;
     
     my $max = ($start_buffer_length <= 131072) ? $start_buffer_length : 131072;
     
-    my $chunk = Fn->substr($self->{start_buffer}, $offset, $max - $offset);
+    my $chunk = $self->{start_buffer}->substr($offset, $max - $offset);
     
     return $chunk;
   }
@@ -455,7 +428,8 @@ class Mojo::Message::Request extends Mojo::Message {
     
     my $version = $self->version;
     
-    $self->{start_buffer} = "$method $path HTTP/$version\x0d\x0a";
+    $self->{start_buffer} = StringBuffer->new;
+    $self->{start_buffer}->push("$method $path HTTP/$version\x0d\x0a");
   }
   
 }

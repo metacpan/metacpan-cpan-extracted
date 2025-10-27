@@ -29,9 +29,7 @@ class Mojo::Content::MultiPart extends Mojo::Content {
     
     my $self = new Mojo::Content::MultiPart;
     
-    $self->on(read => method : void ($that : Mojo::Content::MultiPart, $chunk : string) {
-      $that->_read($chunk);
-    });
+    $self->init;
     
     return $self;
   }
@@ -50,6 +48,15 @@ class Mojo::Content::MultiPart extends Mojo::Content {
   }
   
   # Instance Methods
+  protected method init : void ($options : object[] = undef) {
+    
+    $self->SUPER::init;
+    
+    $self->on(read => method : void ($that : Mojo::Content::MultiPart, $chunk : string) {
+      $that->_read($chunk);
+    });
+  }
+  
   method body_contains : int ($chunk : string) {
     
     my $parts = $self->{parts};

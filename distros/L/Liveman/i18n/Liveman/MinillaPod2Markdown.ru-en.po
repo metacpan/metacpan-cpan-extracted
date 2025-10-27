@@ -1,33 +1,55 @@
-msgid "# NAME"
-msgstr "#NAME"
-
 msgid "Liveman::MinillaPod2Markdown – заглушка для Minilla, которая перебрасывает lib/MainModule.md в README.md"
-msgstr "Liveman::MinillaPod2Markdown – a stub for Minilla that redirects lib/MainModule.md to README.md"
-
-msgid "# DESCRIPION"
-msgstr "#DESCRIPTION"
+msgstr "Liveman::Minillapod2markdown - a plug for minilla, which throws Lib/Mainmodule.md to Readme.md"
 
 msgid "Добавьте строку `markdown_maker = \"Liveman::MinillaPod2Markdown\"` в `minil.toml`, и Minilla не будет создавать `README.md` из pod-документации главного модуля, а возьмёт из одноимённого файла рядом с расширением `*.md`."
-msgstr "Add the line `markdown_maker = \"Liveman::MinillaPod2Markdown\"` to `minil.toml`, and Minilla will not create `README.md` from the pod documentation of the main module, but will take it from the file of the same name next to the `*.md` extension."
+msgstr "Add the `Markdown_maker = \"Liveman::MinillaPod2Markdown\"` to `minil.toml`, and Minilla will not create `README.md` from the POD-documenting of the main module, and will take from the same name next to the extension `*.md`."
 
 msgid "Конструктор."
 msgstr "Constructor."
 
 msgid "Заглушка."
-msgstr "Stub."
+msgstr "Plug."
+
+msgid "Парсит !options на первой строке:"
+msgstr "Parses !options on the first line:"
+
+msgid "1. Удаляет ! и языки за ним.\n"
+"2. Переводит бейджи через запятую в markdown-картинки."
+msgstr "1. Removes ! and languages behind him.\n"
+"2. He translates the badge through a comma into a Markdown picture."
+
+msgid "Список бейджей:"
+msgstr "Badge List:"
+
+msgid ""
+"1. badges - все бейджи.\n"
+"2. github-actions - бейдж на тесты гитхаба.\n"
+"3. metacpan - бейдж на релиз.\n"
+"4. cover - бейдж на покрытие который создаёт `liveman` при прохождении теста в `doc/badges/total.svg`."
+msgstr ""
+"1. badges - all badges.\n"
+"2. github-actions - badge for GitHub tests.\n"
+"3. metacpan - badge for release.\n"
+"4. cover - badge for coverage that creates `liveman` when passing the test in `doc/badges/total.svg`."
+
+msgid "Путь проекта на github: username/repository."
+msgstr "The project path to GitHub: username/repository."
+
+msgid "Считывает файл с markdown-документацией."
+msgstr "Reads a file with MarkDown-documentation."
+
+msgid "Считывает модуль."
+msgstr "Reads the module."
+
+msgid "Версия модуля."
+msgstr "The version of the module."
 
 msgid "Чтобы установить этот модуль в вашу систему, выполните следующие действия [командой](https://metacpan.org/pod/App::cpm):"
-msgstr "To install this module on your system, follow these steps [command](https://metacpan.org/pod/App::cpm):"
-
-msgid "# AUTHOR"
-msgstr "#AUTHOR"
-
-msgid "Yaroslav O. Kosmina <dart@cpan.org>"
-msgstr "Yaroslav O. Kosmina <dart@cpan.org>"
+msgstr "To install this module in your system, follow the following actions [command] (https://metacpan.org/pod/App::cpm):"
 
 msgid "⚖ **GPLv3**"
-msgstr "⚖ **GPLv3**"
+msgstr "⚖ **gplv3**"
 
 msgid "The Liveman::MinillaPod2Markdown module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All rights reserved."
-msgstr "The Liveman::MinillaPod2Markdown module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All rights reserved."
+msgstr "The Liveman::MinillaPod2Markdown module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All Rights Reserved."
 

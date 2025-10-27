@@ -10,20 +10,14 @@ class Mojolicious::Plugins extends Mojo::EventEmitter {
   use Native::MethodCall;
   
   # Fields
-  has namespaces : rw string[]
-    get {
-      if (exists $self->{namespaces}) {
-        $self->{namespaces} = ["Mojolicious::Plugin"];
-      }
-      
-      return $self->{namespaces};
-    }
-  ;
+  has namespaces : rw string[];
   
   # Class Methods
   static method new : Mojolicious::Plugins () {
     
     my $self = new Mojolicious::Plugins;
+    
+    $self->{namespaces} = ["Mojolicious::Plugin"];
     
     return $self;
   }

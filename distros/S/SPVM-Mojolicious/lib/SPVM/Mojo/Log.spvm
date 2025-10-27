@@ -29,45 +29,29 @@ class Mojo::Log extends Mojo::EventEmitter {
   }
   
   # Fields
-  has format : wo Mojo::Log::Callback::Format;
+  has format : rw Mojo::Log::Callback::Format;
   
-  method format : Mojo::Log::Callback::Format () {
-    
-    my $format = $self->{format};
-    
-    unless ($format) {
-      $format = [$this : Mojo::Log = $self] method : string ($time : double, $level : string, $message : string) {
-        return $this->_default($time, $level, $message);
-      };
-      $self->{format} = $format;
-    }
-    
-    return $format;
-    
-    
-  }
-  
-  has handle : wo IO::File;
-  
-  method handle : IO::File () {
-    
-    my $path = $self->path;
-    
-    my $handle = $self->{handle};
-    
-    unless ($handle) {
-      if ($path) {
-        $handle = Mojo::File->new($path)->open(">>");
-      }
-      else {
-        $handle = IO::File->new_from_fd(Sys->fileno(Sys->STDERR), ">>");
+  has handle : rw IO::File
+    get {
+      
+      my $path = $self->path;
+      
+      my $handle = $self->{handle};
+      
+      unless ($handle) {
+        if ($path) {
+          $handle = Mojo::File->new($path)->open(">>");
+        }
+        else {
+          $handle = IO::File->new_from_fd(Sys->fileno(Sys->STDERR), ">>");
+        }
+        
+        $self->{handle} = $handle;
       }
       
-      $self->{handle} = $handle;
+      return $handle;
     }
-    
-    return $handle;
-  }
+  ;
   
   has history : Mojo::Log::Line[];
   
@@ -100,6 +84,10 @@ class Mojo::Log extends Mojo::EventEmitter {
     if (length (my $_ = Sys->env("MOJO_LOG_SHORT"))) {
       $self->{short} = (byte)$_;
     }
+    
+    $self->{format} = [$this : Mojo::Log = $self] method : string ($time : double, $level : string, $message : string) {
+      return $this->_default($time, $level, $message);
+    };
     
     return $self;
   }

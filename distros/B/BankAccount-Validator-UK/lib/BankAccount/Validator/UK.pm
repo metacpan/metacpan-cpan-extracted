@@ -1,6 +1,6 @@
 package BankAccount::Validator::UK;
 
-$BankAccount::Validator::UK::VERSION   = '0.66';
+$BankAccount::Validator::UK::VERSION   = '0.67';
 $BankAccount::Validator::UK::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ BankAccount::Validator::UK - Interface to validate UK bank account.
 
 =head1 VERSION
 
-Version 0.66
+Version 0.67
 
 =cut
 
@@ -36,7 +36,7 @@ has sort_code  => (is => 'ro', default => sub { BankAccount::Validator::UK::Rule
 The module uses the algorithm provided by VOCALINK to validate the bank sort code
 and account number.  It is  done by modulus  checking  method as specified in the
 document which is available on their website L<VOCALINK|https://www.vocalink.com/tools/modulus-checking/>
-It currently supports the document L<v7.90|https://www.vocalink.com/media/a2febq5m/validating-account-numbers-uk-modulus-checking-v7-90.pdf> drafted 27th June 2024.
+It currently supports the document L<v8.50|https://www.vocalink.com/media/vu1advew/validating-account-numbers-uk-modulus-checking-v850.pdf> drafted 26th July 2025.
 
 Institutions covered by this document are below:
 
@@ -601,7 +601,7 @@ sub _prepare {
 
 =head1 AUTHOR
 
-Mohammad S Anwar, C<< <mohammad.anwar at yahoo.com> >>
+Mohammad Sajid Anwar, C<< <mohammad.anwar at yahoo.com> >>
 
 =head1 REPOSITORY
 
@@ -643,7 +643,7 @@ L<https://metacpan.org/dist/BankAccount-Validator-UK>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2012 - 2024 Mohammad Sajid Anwar.
+Copyright (C) 2012 - 2025 Mohammad Sajid Anwar.
 
 This program  is  free software; you can redistribute it and / or modify it under
 the  terms  of the the Artistic License  (2.0). You may obtain a copy of the full

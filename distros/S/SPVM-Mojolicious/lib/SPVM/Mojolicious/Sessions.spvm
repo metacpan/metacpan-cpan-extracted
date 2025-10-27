@@ -17,74 +17,38 @@ class Mojolicious::Sessions {
   
   has secure : rw byte;
   
-  has cookie_name : rw string
-    get {
-      unless (exists $self->{cookie_name}) {
-        $self->{cookie_name} = "mojolicious";
-      }
-      
-      return $self->{cookie_name};
-    }
-  ;
+  has cookie_name : rw string;
   
-  has cookie_path : rw string
-    get {
-      unless (exists $self->{cookie_path}) {
-        $self->{cookie_path} = "/";
-      }
-      
-      return $self->{cookie_path};
-    }
-  ;
+  has cookie_path : rw string;
   
-  has default_expiration : rw int
-    get {
-      unless (exists $self->{default_expiration}) {
-        $self->{default_expiration} = 3600;
-      }
-      
-      return $self->{default_expiration};
-    }
-  ;
+  has default_expiration : rw int;
   
-  has deserialize : rw Mojolicious::Sessions::Callback::Deserialize
-    get {
-      unless (exists $self->{deserialize}) {
-        $self->{deserialize} = method : object ($json : string) {
-          return JSON->new->decode($json);
-        };
-      }
-      
-      return $self->{deserialize};
-    }
-  ;
+  has deserialize : rw Mojolicious::Sessions::Callback::Deserialize;
   
-  has samesite : rw string
-    get {
-      unless (exists $self->{samesite}) {
-        $self->{samesite} = "Lax";
-      }
-      
-      return $self->{samesite};
-    }
-  ;
+  has samesite : rw string;
   
-  has serialize : rw Mojolicious::Sessions::Callback::Serialize
-    get {
-      unless (exists $self->{serialize}) {
-        $self->{serialize} = method : string ($data : object) {
-          return JSON->new->encode($data);
-        };
-      }
-      
-      return $self->{serialize};
-    }
-  ;
+  has serialize : rw Mojolicious::Sessions::Callback::Serialize;
   
   # Class Methods
   static method new : Mojolicious::Sessions () {
     
     my $self = new Mojolicious::Sessions;
+    
+    $self->{cookie_name} = "mojolicious";
+    
+    $self->{cookie_path} = "/";
+    
+    $self->{default_expiration} = 3600;
+    
+    $self->{deserialize} = method : object ($json : string) {
+      return JSON->new->decode($json);
+    };
+    
+    $self->{samesite} = "Lax";
+    
+    $self->{serialize} = method : string ($data : object) {
+      return JSON->new->encode($data);
+    };
     
     return $self;
   }

@@ -21,15 +21,7 @@ class Mojo::UserAgent::CookieJar {
   # Fields
   has ignore : rw Mojo::UserAgent::CookieJar::Callback::Ignore;
   
-  has max_cookie_size : rw int
-    get {
-      unless (exists $self->{max_cookie_size}) {
-        $self->{max_cookie_size} = 4096;
-      }
-      
-      return $self->{max_cookie_size};
-    }
-  ;
+  has max_cookie_size : rw int;
   
   # Undocumented Fields
   has jar : Hash of Mojo::Cookie::Response[];
@@ -40,6 +32,8 @@ class Mojo::UserAgent::CookieJar {
     my $self = new Mojo::UserAgent::CookieJar;
     
     $self->{jar} = Hash->new;
+    
+    $self->{max_cookie_size} = 4096;
     
     return $self;
   }
@@ -74,14 +68,14 @@ class Mojo::UserAgent::CookieJar {
     
     Sort->sort_string_asc($keys);
     
-    my $all_cookies_list = List->new(new Mojo::Cookie::Response[0]);
+    my $all_cookies_list = (List of Mojo::Cookie::Response)List->new(new Mojo::Cookie::Response[0]);
     
     for my $key (@$keys) {
       my $jar = $jar->{$key};
       $all_cookies_list->push_($jar);
     }
     
-    return (Mojo::Cookie::Response[])$all_cookies_list->to_array;
+    return $all_cookies_list->to_array;
   }
   
   method collect : void ($tx : Mojo::Transaction::HTTP) {
@@ -126,7 +120,7 @@ class Mojo::UserAgent::CookieJar {
   
   method find : Mojo::Cookie::Request[] ($url : Mojo::URL) {
     
-    my $found = List->new(new Mojo::Cookie::Request[0]);
+    my $found = (List of Mojo::Cookie::Request)List->new(new Mojo::Cookie::Request[0]);
     my $domain = my $host = Fn->lc($url->ihost);
     my $path   = $url->path->to_abs_string;
     
@@ -172,7 +166,7 @@ class Mojo::UserAgent::CookieJar {
       }
     }
     
-    return $found->to_array->(Mojo::Cookie::Request[]);
+    return $found->to_array;
   }
   
   method prepare : void ($tx : Mojo::Transaction::HTTP) {

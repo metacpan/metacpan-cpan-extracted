@@ -82,18 +82,10 @@ class Mojo::Message::Response extends Mojo::Message {
   
   has message : rw string;
   
-  has max_message_size : rw int
-    get {
-      unless (exists $self->{max_message_size}) {
-        $self->{max_message_size} = length(my $_ = Sys->env("SPVM_MOJO_MAX_MESSAGE_SIZE")) ? (int)$_ : 2147483647;
-      }
-      
-      return $self->{max_message_size};
-    }  
-  ;
+  has max_message_size : rw int;
   
   # Undocumented Fields
-  has start_buffer : string;
+  has start_buffer : StringBuffer;
   
   # Class Methods
   static method new : Mojo::Message::Response () {
@@ -106,6 +98,11 @@ class Mojo::Message::Response extends Mojo::Message {
   }
   
   # Instance Methods
+  protected method init : void () {
+    
+    $self->{max_message_size} = length(my $_ = Sys->env("SPVM_MOJO_MAX_MESSAGE_SIZE")) ? (int)$_ : 2147483647;
+  }
+  
   method cookies : Mojo::Cookie::Response[] () {
     
     # Parse cookies
@@ -219,7 +216,7 @@ class Mojo::Message::Response extends Mojo::Message {
     $self->_start_line;
     $self->emit(progress => "start_line", $offset);
     
-    return Fn->substr($self->{start_buffer}, $offset, 131072);
+    return $self->{start_buffer}->substr($offset, 131072);
   }
   
   method is_client_error : int ($code : int) { return $self->_status_class([400]); }
@@ -242,7 +239,12 @@ class Mojo::Message::Response extends Mojo::Message {
   
   method is_success : int () { return $self->_status_class([200]); }
   
-  method start_line_size : int () { return length ($self->_start_line, $self->{start_buffer}); }
+  method start_line_size : int () {
+    
+    $self->_start_line;
+    
+    return $self->{start_buffer}->length;
+  }
   
   private method _start_line : void () {
     
@@ -255,7 +257,8 @@ class Mojo::Message::Response extends Mojo::Message {
     my $msg = $self->message // $self->default_message;
     
     my $version = $self->version;
-    $self->{start_buffer} = "HTTP/$version $code $msg\x0d\x0a";
+    $self->{start_buffer} = StringBuffer->new;
+    $self->{start_buffer}->push("HTTP/$version $code $msg\x0d\x0a");
   }
   
   private method _status_class : int ($codes : int[]) {

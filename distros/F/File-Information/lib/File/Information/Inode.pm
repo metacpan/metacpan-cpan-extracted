@@ -20,7 +20,7 @@ use Fcntl qw(S_ISREG S_ISDIR S_ISLNK S_ISBLK S_ISCHR S_ISFIFO S_ISSOCK S_IWUSR S
 use Data::Identifier v0.08;
 use Data::Identifier::Generate;
 
-our $VERSION = v0.14;
+our $VERSION = v0.15;
 
 my $HAVE_XATTR              = eval {require File::ExtAttr; 1;};
 my $HAVE_FILE_VALUEFILE     = eval {require File::ValueFile::Simple::Reader; 1;};
@@ -313,6 +313,28 @@ sub peek {
     croak 'Cannot peek required amount of data' if length($buffer) < $required;
 
     return $self->{_peek_buffer} = $buffer;
+}
+
+
+sub open_handle {
+    my ($self, $mode) = @_;
+    my @sa;
+    my @sb;
+
+    open(my $handle, $mode // '<', $self->{path} // croak 'Open not supported on this object') or croak 'Cannot open inode: '.$!;
+
+    # (Re)stat() late so any effects of the open are taken into account:
+    @sa = stat($self->{handle});
+    @sb = stat($handle);
+
+    for (my $i = 0; $i < 13; $i++) {
+        my $va = $sa[$i] // '<undef>';
+        my $vb = $sb[$i] // '<undef>';
+
+        croak 'Race lost' unless $va eq $vb;
+    }
+
+    return $handle;
 }
 
 # ----------------
@@ -991,7 +1013,7 @@ File::Information::Inode - generic module for extracting information from filesy
 
 =head1 VERSION
 
-version v0.14
+version v0.15
 
 =head1 SYNOPSIS
 
@@ -1063,6 +1085,32 @@ The number of bytes wanted. If this number of bytes can't be provided less is re
 The number of bytes that are needed. If this number of bytes can't be provided the method C<die>s.
 
 =back
+
+=head2 open_handle
+
+    my $handle = $inode->open_handle( [ $mode ] );
+
+(experimental since v0.15)
+
+This method opens a new file handle to this inode. This can be used to read or write data from or to this inode.
+
+C<$mode> is the same as C<MODE> in L<perlfunc/open>.
+If no C<$mode> is not given or undefined the file is opened for reading (as per C<E<lt>>).
+
+B<Note:>
+Future versions of this method might change their interface.
+However calling without any parameters is likely to be the most future-proof way.
+
+B<Note:>
+All considerations of L<perlfunc/binmode> apply to the freshly returned handle.
+Also seeking on the returned handle as well as closing it will not have an effect on other handles.
+Each returned handle is a fresh handle.
+
+B<Note:>
+If you want to read some data from the file consider to use L</peek> as it often porvides a better alternative.
+
+B<Note:>
+Availability depends on the operating system, the filesystem, and the current state.
 
 =head1 AUTHOR
 

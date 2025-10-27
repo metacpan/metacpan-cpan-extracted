@@ -230,7 +230,7 @@ class Mojolicious::Routes::Route {
       return;
     }
     
-    my $new_children = List->new(new Mojolicious::Routes::Route[0]);
+    my $new_children = (List of Mojolicious::Routes::Route)List->new(new Mojolicious::Routes::Route[0]);
     for (my $i = 0; $i < @{$parent->children}; $i++) {
       my $child = $parent->children->[$i];
       
@@ -238,7 +238,7 @@ class Mojolicious::Routes::Route {
         $new_children->push($child);
       }
     }
-    $parent->set_children($new_children->get_array->(Mojolicious::Routes::Route[]));
+    $parent->set_children($new_children->get_array);
     
     $self->set_parent(undef);
   }

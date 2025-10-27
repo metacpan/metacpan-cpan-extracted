@@ -67,25 +67,9 @@ class Mojo::Transaction extends Mojo::EventEmitter {
   
   has remote_port : rw int;
   
-  has req : rw Mojo::Message::Request
-    get {
-      unless (exists $self->{req}) {
-        $self->{req} = Mojo::Message::Request->new;
-      }
-      
-      return $self->{req};
-    }
-  ;
+  has req : rw Mojo::Message::Request;
   
-  has res : rw Mojo::Message::Response
-    get {
-      unless (exists $self->{res}) {
-        $self->{res} = Mojo::Message::Response->new;
-      }
-      
-      return $self->{res};
-    }
-  ;
+  has res : rw Mojo::Message::Response;
   
   has connection : rw Mojo::Connection
     set {
@@ -111,6 +95,9 @@ class Mojo::Transaction extends Mojo::EventEmitter {
   
   protected method init : void ($options : object[] = undef) {
     
+    $self->{req} = Mojo::Message::Request->new;
+    
+    $self->{res} = Mojo::Message::Response->new;
   }
   
   # Instance Methods

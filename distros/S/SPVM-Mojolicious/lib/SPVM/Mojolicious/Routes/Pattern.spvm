@@ -12,73 +12,25 @@ class Mojolicious::Routes::Pattern {
   
   has types : rw Hash;
   
-  has placeholder_start : rw string
-    get {
-      unless (exists $self->{placeholder_start}) {
-        $self->{placeholder_start} = ":";
-      }
-      
-      return $self->{placeholder_start};
-    }
-  ;
+  has placeholder_start : rw string;
   
-  has type_start : rw string
-    get {
-      unless (exists $self->{type_start}) {
-        $self->{type_start} = ":";
-      }
-      
-      return $self->{type_start};
-    }
-  ;
+  has type_start : rw string;
   
   has placeholders : rw string[];
   
   has tree : rw object[];
   
-  has quote_end : rw string
-    get {
-      unless (exists $self->{quote_end}) {
-        $self->{quote_end} = ">";
-      }
-      
-      return $self->{quote_end};
-    }
-  ;
+  has quote_end : rw string;
   
-  has quote_start : rw string
-    get {
-      unless (exists $self->{quote_start}) {
-        $self->{quote_start} = "<";
-      }
-      
-      return $self->{quote_start};
-    }
-  ;
+  has quote_start : rw string;
   
   has regex : rw Regex;
   
   has unparsed : rw string;
   
-  has relaxed_start : rw string
-    get {
-      unless (exists $self->{relaxed_start}) {
-        $self->{relaxed_start} = "#";
-      }
-      
-      return $self->{relaxed_start};
-    }
-  ;
+  has relaxed_start : rw string;
   
-  has wildcard_start : rw string
-    get {
-      unless (exists $self->{wildcard_start}) {
-        $self->{wildcard_start} = "#";
-      }
-      
-      return $self->{wildcard_start};
-    }
-  ;
+  has wildcard_start : rw string;
   
   # Class Methods
   static method new : Mojolicious::Routes::Pattern ($args : object...) {
@@ -88,6 +40,18 @@ class Mojolicious::Routes::Pattern {
     if (@$args) {
       $self->parse($args);
     }
+    
+    $self->{placeholder_start} = ":";
+    
+    $self->{type_start} = ":";
+    
+    $self->{quote_end} = ">";
+    
+    $self->{quote_start} = "<";
+    
+    $self->{relaxed_start} = "#";
+    
+    $self->{wildcard_start} = "#";
     
     return $self;
   }

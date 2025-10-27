@@ -1,17 +1,17 @@
-use common::sense; use open qw/:std :utf8/;  use Carp qw//; use File::Basename qw//; use File::Slurper qw//; use File::Spec qw//; use File::Path qw//; use Scalar::Util qw//;  use Test::More 0.98;  BEGIN {     $SIG{__DIE__} = sub {         my ($s) = @_;         if(ref $s) {             $s->{STACKTRACE} = Carp::longmess "?" if "HASH" eq Scalar::Util::reftype $s;             die $s;         } else {             die Carp::longmess defined($s)? $s: "undef"         }     };      my $t = File::Slurper::read_text(__FILE__);     my $s =  '/tmp/.liveman/perl-liveman/liveman'    ;     File::Path::rmtree($s) if -e $s;     File::Path::mkpath($s);     chdir $s or die "chdir $s: $!";      while($t =~ /^#\@> (.*)\n((#>> .*\n)*)#\@< EOF\n/gm) {         my ($file, $code) = ($1, $2);         $code =~ s/^#>> //mg;         File::Path::mkpath(File::Basename::dirname($file));         File::Slurper::write_text($file, $code);     }  } # 
+use common::sense; use open qw/:std :utf8/;  use Carp qw//; use Cwd qw//; use File::Basename qw//; use File::Find qw//; use File::Slurper qw//; use File::Spec qw//; use File::Path qw//; use Scalar::Util qw//;  use Test::More 0.98;  BEGIN { 	$SIG{__DIE__} = sub { 		my ($msg) = @_; 		if(ref $msg) { 			$msg->{STACKTRACE} = Carp::longmess "?" if "HASH" eq Scalar::Util::reftype $msg; 			die $msg; 		} else { 			die Carp::longmess defined($msg)? $msg: "undef" 		} 	}; 	 	my $t = File::Slurper::read_text(__FILE__); 	 	my @dirs = File::Spec->splitdir(File::Basename::dirname(Cwd::abs_path(__FILE__))); 	my $project_dir = File::Spec->catfile(@dirs[0..$#dirs-1]); 	my $project_name = $dirs[$#dirs-1]; 	my @test_dirs = @dirs[$#dirs-1+2 .. $#dirs]; 	my $dir_for_tests = File::Spec->catfile(File::Spec->tmpdir, ".liveman", $project_name, join("!", @test_dirs, File::Basename::basename(__FILE__))); 	 	File::Find::find(sub { chmod 0700, $_ if !/^\.{1,2}\z/ }, $dir_for_tests), File::Path::rmtree($dir_for_tests) if -e $dir_for_tests; 	File::Path::mkpath($dir_for_tests); 	 	chdir $dir_for_tests or die "chdir $dir_for_tests: $!"; 	 	push @INC, "$project_dir/lib", "lib"; 	 	$ENV{PROJECT_DIR} = $project_dir; 	$ENV{DIR_FOR_TESTS} = $dir_for_tests; 	 	while($t =~ /^#\@> (.*)\n((#>> .*\n)*)#\@< EOF\n/gm) { 		my ($file, $code) = ($1, $2); 		$code =~ s/^#>> //mg; 		File::Path::mkpath(File::Basename::dirname($file)); 		File::Slurper::write_text($file, $code); 	} } # !ru:en,badges
 # # NAME
 # 
 # Liveman - компиллятор из markdown в тесты и документацию
 # 
 # # VERSION
 # 
-# 3.0
+# 3.3
 # 
 # # SYNOPSIS
 # 
 # Файл lib/Example.md:
 #@> lib/Example.md
-#>> Дважды два:
+#>> Twice two:
 #>> ```perl
 #>> 2*2  # -> 2+2
 #>> ```
@@ -23,29 +23,21 @@ use Liveman;
 
 my $liveman = Liveman->new(prove => 1);
 
-# Компилировать lib/Example.md файл в t/example.t 
-# и добавить pod-документацию в lib/Example.pm
 $liveman->transform("lib/Example.md");
 
 ::is scalar do {$liveman->{count}}, "1", '$liveman->{count}   # => 1';
 ::is scalar do {-f "t/example.t"}, "1", '-f "t/example.t"    # => 1';
 ::is scalar do {-f "lib/Example.pm"}, "1", '-f "lib/Example.pm" # => 1';
 
-# Компилировать все lib/**.md файлы со временем модификации, превышающим соответствующие тестовые файлы (t/**.t):
 $liveman->transforms;
 ::is scalar do {$liveman->{count}}, "0", '$liveman->{count}   # => 0';
 
-# Компилировать без проверки времени модификации
 ::is scalar do {Liveman->new(compile_force => 1)->transforms->{count}}, "1", 'Liveman->new(compile_force => 1)->transforms->{count} # => 1';
 
-# Запустить тесты с yath:
-my $yath_return_code = $liveman->tests->{exit_code};
+my $prove_return_code = $liveman->tests->{exit_code};
 
-::is scalar do {$yath_return_code}, "0", '$yath_return_code           # => 0';
+::is scalar do {$prove_return_code}, "0", '$prove_return_code           # => 0';
 ::is scalar do {-f "cover_db/coverage.html"}, "1", '-f "cover_db/coverage.html" # => 1';
-
-# Ограничить liveman этими файлами для операций, преобразований и тестов (без покрытия):
-my $liveman2 = Liveman->new(files => [], force_compile => 1);
 
 # 
 # # DESCRIPION
@@ -77,6 +69,8 @@ my $liveman2 = Liveman->new(files => [], force_compile => 1);
 # 
 # **Внимание!** Будьте осторожны и после редактирования `.md` просматривайте `git diff`, чтобы не потерять подкорректированные переводы в `.po`.
 # 
+# **Примечание:** `trans -R` покажет список языков, которые можно указывать в **!from:to** на первой строке документа.
+# 
 # ## TYPES OF TESTS
 # 
 # Коды секций без указанного языка программирования или с `perl` записываются как код в файл `t/**.t`. А комментарий со стрелкой (# -> )превращается в тест `Test::More`.
@@ -85,7 +79,7 @@ my $liveman2 = Liveman->new(files => [], force_compile => 1);
 # 
 # Сравнить два эквивалентных выражения:
 # 
-done_testing; }; subtest '`is`' => sub { 
+::done_testing; }; subtest '`is`' => sub { 
 ::is scalar do {"hi!"}, scalar do{"hi" . "!"}, '"hi!" # -> "hi" . "!"';
 ::is scalar do {"hi!"}, scalar do{"hi" . "!"}, '"hi!" # → "hi" . "!"';
 
@@ -94,7 +88,7 @@ done_testing; }; subtest '`is`' => sub {
 # 
 # Сравнить два выражения для структур:
 # 
-done_testing; }; subtest '`is_deeply`' => sub { 
+::done_testing; }; subtest '`is_deeply`' => sub { 
 ::is_deeply scalar do {["hi!"]}, scalar do {["hi" . "!"]}, '["hi!"] # --> ["hi" . "!"]';
 ::is_deeply scalar do {"hi!"}, scalar do {"hi" . "!"}, '"hi!" # ⟶ "hi" . "!"';
 
@@ -103,7 +97,7 @@ done_testing; }; subtest '`is_deeply`' => sub {
 # 
 # Сравнить выражение с экстраполированной строкой:
 # 
-done_testing; }; subtest '`is` with extrapolate-string' => sub { 
+::done_testing; }; subtest '`is` with extrapolate-string' => sub { 
 my $exclamation = "!";
 ::is scalar do {"hi!2"}, "hi${exclamation}2", '"hi!2" # => hi${exclamation}2';
 ::is scalar do {"hi!2"}, "hi${exclamation}2", '"hi!2" # ⇒ hi${exclamation}2';
@@ -113,27 +107,125 @@ my $exclamation = "!";
 # 
 # Сравнить выражение с неэкстраполированной строкой:
 # 
-done_testing; }; subtest '`is` with nonextrapolate-string' => sub { 
+::done_testing; }; subtest '`is` with nonextrapolate-string' => sub { 
 ::is scalar do {'hi${exclamation}3'}, 'hi${exclamation}3', '\'hi${exclamation}3\' # \> hi${exclamation}3';
 ::is scalar do {'hi${exclamation}3'}, 'hi${exclamation}3', '\'hi${exclamation}3\' # ↦ hi${exclamation}3';
 
 # 
 # ### `like`
 # 
-# Проверяет регулярное выражение, включенное в выражение:
+# Скаляр должен быть сопостовим с регулярным выражением:
 # 
-done_testing; }; subtest '`like`' => sub { 
-::like scalar do {'abbc'}, qr!b+!, '\'abbc\' # ~> b+';
-::like scalar do {'abc'}, qr!b+!, '\'abc\'  # ↬ b+';
+::done_testing; }; subtest '`like`' => sub { 
+::like scalar do {'abbc'}, qr{b+}, '\'abbc\' # ~> b+';
+::like scalar do {'abc'}, qr{b+}, '\'abc\'  # ↬ b+';
 
 # 
 # ### `unlike`
 # 
-# Он проверяет регулярное выражение, исключённое из выражения:
+# В скаляре не должно быть совпадения с регулярным выражением:
 # 
-done_testing; }; subtest '`unlike`' => sub { 
-::unlike scalar do {'ac'}, qr!b+!, '\'ac\' # <~ b+';
-::unlike scalar do {'ac'}, qr!b+!, '\'ac\' # ↫ b+';
+::done_testing; }; subtest '`unlike`' => sub { 
+::unlike scalar do {'ac'}, qr{b+}, '\'ac\' # <~ b+';
+::unlike scalar do {'ac'}, qr{b+}, '\'ac\' # ↫ b+';
+
+# 
+# ### `like` begins with extrapolate-string
+# 
+# Скаляр должен начинаться экстраполированой срокой:
+# 
+::done_testing; }; subtest '`like` begins with extrapolate-string' => sub { 
+my $var = 'b';
+
+::cmp_ok scalar do {'abbc'}, '=~', '^' . quotemeta "a$var", '\'abbc\' # ^=> a$var';
+::cmp_ok scalar do {'abc'}, '=~', '^' . quotemeta "a$var", '\'abc\'  # ⤇ a$var';
+
+# 
+# ### `like` ends with extrapolate-string
+# 
+# Скаляр должен заканчиваться экстраполированой срокой:
+# 
+::done_testing; }; subtest '`like` ends with extrapolate-string' => sub { 
+my $var = 'c';
+
+::cmp_ok scalar do {'abbc'}, '=~', quotemeta("b$var") . '$', '\'abbc\' # $=> b$var';
+::cmp_ok scalar do {'abc'}, '=~', quotemeta("b$var") . '$', '\'abc\'  # ➾ b$var';
+
+# 
+# ### `like` inners with extrapolate-string
+# 
+# Скаляр должен содержать экстраполированую сроку:
+# 
+::done_testing; }; subtest '`like` inners with extrapolate-string' => sub { 
+my $var = 'x';
+
+::cmp_ok scalar do {'abxc'}, '=~', quotemeta "b$var", '\'abxc\'  # *=> b$var';
+::cmp_ok scalar do {'abxs'}, '=~', quotemeta "b$var", '\'abxs\'  # ⥴ b$var';
+
+# 
+# ### `like` begins with nonextrapolate-string
+# 
+# Скаляр должен начинаться неэкстраполированой срокой:
+# 
+::done_testing; }; subtest '`like` begins with nonextrapolate-string' => sub { 
+::cmp_ok scalar do {'abbc'}, '=~', '^' . quotemeta 'ab', '\'abbc\' # ^-> ab';
+::cmp_ok scalar do {'abc'}, '=~', '^' . quotemeta 'ab', '\'abc\'  # ↣ ab';
+
+# 
+# ### `like` ends with nonextrapolate-string
+# 
+# Скаляр должен заканчиваться неэкстраполированой срокой:
+# 
+::done_testing; }; subtest '`like` ends with nonextrapolate-string' => sub { 
+::cmp_ok scalar do {'abbc'}, '=~', quotemeta('bc') . '$', '\'abbc\' # $-> bc';
+::cmp_ok scalar do {'abc'}, '=~', quotemeta('bc') . '$', '\'abc\'  # ⇥ bc';
+
+# 
+# ### `like` inners with nonextrapolate-string
+# 
+# Скаляр должен содержать неэкстраполированую сроку:
+# 
+::done_testing; }; subtest '`like` inners with nonextrapolate-string' => sub { 
+::cmp_ok scalar do {'abbc'}, '=~', quotemeta 'bb', '\'abbc\' # *-> bb';
+::cmp_ok scalar do {'abc'}, '=~', quotemeta 'b', '\'abc\'  # ⥵ b';
+
+# 
+# ### `like` throw begins with nonextrapolate-string
+# 
+# Исключение должно начинаться с неэкстраполированой сроки:
+# 
+::done_testing; }; subtest '`like` throw begins with nonextrapolate-string' => sub { 
+::cmp_ok do { eval {1/0}; $@ }, '=~', '^' . quotemeta 'Illegal division by zero', '1/0 # @-> Illegal division by zero';
+::cmp_ok do { eval {1/0}; $@ }, '=~', '^' . quotemeta 'Illegal division by zero', '1/0 # ↯ Illegal division by zero';
+
+# 
+# ### `like` throw begins with extrapolate-string
+# 
+# Исключение должно начинаться с экстраполированой сроки:
+# 
+::done_testing; }; subtest '`like` throw begins with extrapolate-string' => sub { 
+my $by = 'by';
+
+::cmp_ok do { eval {1/0}; $@ }, '=~', '^' . quotemeta "Illegal division $by zero", '1/0 # @=> Illegal division $by zero';
+::cmp_ok do { eval {1/0}; $@ }, '=~', '^' . quotemeta "Illegal division $by zero", '1/0 # ⤯ Illegal division $by zero';
+
+# 
+# ### `like` throw
+# 
+# Исключение должно быть сопостовимо с регулярным выражением:
+# 
+::done_testing; }; subtest '`like` throw' => sub { 
+::like scalar do { eval { 1/0 }; $@ }, qr{division\s*by\s*zero}, '1/0 # @~> division\s*by\s*zero';
+::like scalar do { eval { 1/0 }; $@ }, qr{division\s*by\s*zero}, '1/0 # ⇝ division\s*by\s*zero';
+
+# 
+# ### `unlike` throw
+# 
+# Исключение не должно быть сопостовимо с регулярным выражением:
+# 
+::done_testing; }; subtest '`unlike` throw' => sub { 
+::unlike scalar do { eval { 1/0 }; $@ }, qr{auto}, '1/0 # <~@ auto';
+::unlike scalar do { eval { 1/0 }; $@ }, qr{auto}, '1/0 # ⇜ auto';
 
 # 
 # ## EMBEDDING FILES
@@ -158,7 +250,7 @@ done_testing; }; subtest '`unlike`' => sub {
 # 
 # **Внимание!** Пустая строка между префиксом и кодом не допускается!
 # 
-# Эти префиксы могут быть как на английском, так и на русском.
+# Эти префиксы могут быть как на английском, так и на русском (`File [path](https://metacpan.org/pod/path):` и `File [path](https://metacpan.org/pod/path) is:`).
 # 
 # # METHODS
 # 
@@ -176,7 +268,7 @@ done_testing; }; subtest '`unlike`' => sub {
 # 
 # Получить путь к `t/**.t`-файлу из пути к `lib/**.md`-файлу:
 # 
-done_testing; }; subtest 'test_path ($md_path)' => sub { 
+::done_testing; }; subtest 'test_path ($md_path)' => sub { 
 ::is scalar do {Liveman->new->test_path("lib/PathFix/RestFix.md")}, "t/path-fix/rest-fix.t", 'Liveman->new->test_path("lib/PathFix/RestFix.md") # => t/path-fix/rest-fix.t';
 
 # 
@@ -196,7 +288,7 @@ __END__
 
 =encoding utf-8
 
-Дважды два:
+Twice two:
 
 	2*2  # -> 2+2
 
@@ -216,6 +308,49 @@ __END__
 # 
 # Все, если `$self->{files}` не установлен, или `$self->{files}` только.
 # 
+# ## load_po ($md, $from, $to)
+# 
+# Считывает po-файл.
+# 
+# ## save_po ()
+# 
+# Сохраняет po-файл.
+# 
+# ## trans ($text, $lineno)
+# 
+# Функция переводит текст с одного языка на другой используя утилиту trans.
+# 
+# ## trans_paragraph ($paragraph, $lineno)
+# 
+# Так же разбивает по параграфам.
+# 
+# # DEPENDENCIES IN CPANFILE
+# 
+# В своей библиотеке, которую вы будете тестировать Liveman-ом, нужно будет указать дополнительные зависимости для тестов в **cpanfile**:
+# 
+
+# on 'test' => sub {
+#     requires 'Test::More', '0.98';
+# 
+#     requires 'Carp';
+#     requires 'File::Basename';
+#     requires 'File::Path';
+#     requires 'File::Slurper';
+#     requires 'File::Spec';
+#     requires 'Scalar::Util';
+# };
+
+# 
+# Так же неплохо будет указать и сам **Liveman** в разделе для разработки:
+# 
+
+# on 'develop' => sub {
+#     requires 'Minilla', 'v3.1.19';
+#     requires 'Data::Printer', '1.000004';
+#     requires 'Liveman', '1.0';
+# };
+
+# 
 # # AUTHOR
 # 
 # Yaroslav O. Kosmina <dart@cpan.org>
@@ -228,7 +363,7 @@ __END__
 # 
 # The Liveman module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All rights reserved.
 
-	done_testing;
+	::done_testing;
 };
 
-done_testing;
+::done_testing;

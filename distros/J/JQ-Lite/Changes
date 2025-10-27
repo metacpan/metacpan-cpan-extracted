@@ -1,3 +1,11 @@
+1.32  2025-10-26
+  [Maintenance]
+  - Update distribution metadata so the MetaCPAN homepage link points to
+    https://kawamurashingo.github.io/JQ-Lite/index-en.html.
+
+  [Release]
+  - Bump version to 1.32.
+
 1.31  2025-10-26
   [Fix]
   - Fix YAML::XS and YAML::PP compatibility for older environments
@@ -916,6 +924,7 @@
     - Removed use of eval in _evaluate_condition for better performance and stability.
     - Refactored _traverse for readability and maintainability.
     - Added support for multi-level array traversal (e.g., .users[].friends[].name).
+
 
 
 

@@ -19,10 +19,11 @@ on runtime => sub {
 };
 
 on test => sub {
-  requires 'Exporter'    => '0';
-  requires 'Test::API'   => '0';
-  requires 'Test::Fatal' => '0';
-  requires 'Test::More'  => '1.001005';    # Subtests accept args
-  requires 'Test::Lib'   => '0';
-  requires 'parent'      => '0'
+  requires 'Exporter'       => '0';
+  requires 'Exporter::Tiny' => '0';
+  requires 'Test::API'      => '0';
+  requires 'Test::Fatal'    => '0';
+  requires 'Test::More'     => '1.001005';    # Subtests accept args
+  requires 'Test::Lib'      => '0';
+  requires 'parent'         => '0'
 }

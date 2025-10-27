@@ -20,7 +20,7 @@ my @files = (
     't/document-parsing.t',
     't/document-toplevel.t',
     't/end-to-end.t',
-    't/find_path.t',
+    't/find_path_item.t',
     't/lib/Helper.pm',
     't/oas-vocabulary.t',
     't/oas-vocabulary/3.1/discriminator.json',

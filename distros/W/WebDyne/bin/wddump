@@ -36,7 +36,7 @@ use FindBin qw($RealBin $Script);
 
 #  Version Info, must be all one line for MakeMaker, CPAN.
 #
-$VERSION='2.016';
+$VERSION='2.017';
 
 
 #  Run main

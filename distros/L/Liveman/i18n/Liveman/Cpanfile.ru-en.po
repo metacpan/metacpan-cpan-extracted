@@ -1,0 +1,66 @@
+msgid "Liveman::Cpanfile - анализатор зависимостей Perl проекта"
+msgstr "Liveman::Cpanfile - Perl project dependency analyzer"
+
+msgid "`Liveman::Cpanfile` анализирует структуру Perl проекта и извлекает информацию о зависимостях из исходного кода, тестов и документации. Модуль автоматически определяет используемые модули и помогает поддерживать актуальный `cpanfile`."
+msgstr "`Liveman::Cpanfile` parses the structure of a Perl project and extracts dependency information from source code, tests, and documentation. The module automatically detects which modules are used and helps keep the `cpanfile` up to date."
+
+msgid "Конструктор."
+msgstr "Constructor."
+
+msgid "Преобразует путь к файлу в имя пакета Perl."
+msgstr "Converts a file path to a Perl package name."
+
+msgid "Возвращает список исполняемых скриптов в директориях `scripts/` и `bin/`."
+msgstr "Returns a list of executable scripts in the `scripts/` and `bin/` directories."
+
+msgid "Файл scripts/test_script:"
+msgstr "Scripts/test_script file:"
+
+msgid "Файл bin/tool:"
+msgstr "bin/tool file:"
+
+msgid "Возвращает список Perl модулей в директории `lib/`."
+msgstr "Returns a list of Perl modules in the `lib/` directory."
+
+msgid "Файл lib/My/Module.pm:"
+msgstr "File lib/My/Module.pm:"
+
+msgid "Файл lib/My/Other.pm:"
+msgstr "File lib/My/Other.pm:"
+
+msgid "Возвращает список имен пакетов проекта соответствующих модулям в директории `lib/`."
+msgstr "Returns a list of project package names corresponding to the modules in the `lib/` directory."
+
+msgid "Возвращает список Markdown файлов документации (`*.md`) в `lib/`."
+msgstr "Returns a list of Markdown documentation files (`*.md`) in `lib/`."
+
+msgid "Файл lib/My/Module.md:"
+msgstr "File lib/My/Module.md:"
+
+msgid "Список внедрённых в `*.md` пакетов."
+msgstr "List of packages embedded in `*.md`."
+
+msgid "Список зависимостей явно указанных в скриптах и модулях без пакетов проекта."
+msgstr "List of dependencies explicitly specified in scripts and modules without project packages."
+
+msgid "Список зависимостей из тестов за исключением:"
+msgstr "List of dependencies from tests except:"
+
+msgid ""
+"1. Зависмостей скриптов и модулей.\n"
+"2. Пакетов проекта.\n"
+"3. Внедрённых в `*.md` пакетов."
+msgstr ""
+"1. Dependencies of scripts and modules.\n"
+"2. Project packages.\n"
+"3. Packages embedded in `*.md`."
+
+msgid "Возвращает текст cpanfile c зависимостями для проекта."
+msgstr "Returns the text cpanfile with dependencies for the project."
+
+msgid "⚖ **GPLv3**"
+msgstr "⚖ **GPLv3**"
+
+msgid "The Liveman::Cpanfile module is copyright © 2025 Yaroslav O. Kosmina. Rusland. All rights reserved."
+msgstr "The Liveman::Cpanfile module is copyright © 2025 Yaroslav O. Kosmina. Rusland. All rights reserved."
+

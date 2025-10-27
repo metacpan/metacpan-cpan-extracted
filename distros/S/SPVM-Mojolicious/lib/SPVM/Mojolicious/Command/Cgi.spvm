@@ -8,19 +8,26 @@ class Mojolicious::Command::Cgi extends Mojolicious::Command {
   use Mojo::Util;
   use Fn;
   
-  has description : rw string
-    get {
-      unless (exists $self->{description}) {
-        $self->{description} = "Start application with CGI";
-      }
-      return $self->{description};
-    }
-  ;
+  has usage : rw string;
   
-  has usage : rw string
-    get {
-      unless (exists $self->{usage}) {
-        $self->{usage} = <<'EOS';
+  # Class Methods
+  static method new : Mojolicious::Command::Cgi () {
+    
+    my $self = new Mojolicious::Command::Cgi;
+    
+    $self->init;
+    
+    return $self;
+  }
+  
+  # Instance Methods
+  protected method init : void () {
+    
+    $self->SUPER::init;
+    
+    $self->{description} = "Start application with CGI";
+    
+    $self->{usage} = <<'EOS';
 Usage: APPLICATION cgi [OPTIONS]
 
   ./myapp.spvm cgi
@@ -34,11 +41,7 @@ Options:
       --nph           Enable non-parsed-header mode
 
 EOS
-      }
-      
-      return $self->{usage};
-    }
-  ;
+  }
   
   method run : void ($args : string[]) {
     

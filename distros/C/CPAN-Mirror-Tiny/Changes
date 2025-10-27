@@ -1,5 +1,8 @@
 Revision history for CPAN-Mirror-Tiny
 
+0.33  2025-10-27 05:44:43 JST
+  - $path =~ s{\\}{/}g in windows (#15)
+
 0.32  2021-11-21 02:36:58 JST
   - Fix typo: resover -> resolver (toreau #14)
 

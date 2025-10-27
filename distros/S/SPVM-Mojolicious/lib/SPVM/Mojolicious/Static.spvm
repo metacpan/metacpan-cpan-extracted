@@ -12,35 +12,11 @@ class Mojolicious::Static {
   use Mojolicious::Controller;
   
   # Fields
-  has asset_dir : rw string
-    get {
-      unless (exists $self->{asset_dir}) {
-        $self->{asset_dir} = "assets";
-      }
-      
-      return $self->{asset_dir};
-    }
-  ;
+  has asset_dir : rw string;
   
-  has classes : rw string[]
-    get {
-      unless (exists $self->{classes}) {
-        $self->{classes} = ["main"];
-      }
-      
-      return $self->{classes};
-    }
-  ;
+  has classes : rw string[];
   
-  has extra : rw Hash of string
-    get {
-      unless (exists $self->{extra}) {
-        $self->{extra} = Hash->new;
-      }
-      
-      return $self->{extra};
-    }
-  ;
+  has extra : rw Hash of string;
   
   has paths : rw string[];
   
@@ -55,6 +31,12 @@ class Mojolicious::Static {
     my $self = new Mojolicious::Static;
     
     $self->{paths} = new string[0];
+    
+    $self->{asset_dir} = "assets";
+    
+    $self->{classes} = ["main"];
+    
+    $self->{extra} = Hash->new;
     
     return $self;
   }

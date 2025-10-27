@@ -45,8 +45,6 @@ lib/SPVM/Mojo/Date.pm
 lib/SPVM/Mojo/Date.spvm
 lib/SPVM/Mojo/DynamicMethods.pm
 lib/SPVM/Mojo/DynamicMethods.spvm
-lib/SPVM/Mojo/DynamicMethods/Callback.pm
-lib/SPVM/Mojo/DynamicMethods/Callback.spvm
 lib/SPVM/Mojo/EventEmitter.pm
 lib/SPVM/Mojo/EventEmitter.spvm
 lib/SPVM/Mojo/File.pm

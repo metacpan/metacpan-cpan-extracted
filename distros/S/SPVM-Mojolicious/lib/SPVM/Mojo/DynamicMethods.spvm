@@ -5,7 +5,7 @@ class Mojo::DynamicMethods : interface_t {
   version_from Mojolicious;
   
   # Interface Methods
-  method dynamic_methods : Hash of Mojo::DynamicMethods::Callback ();
+  method dynamic_methods : Hash of Mojo::Callback ();
   
   method call : object ($name : string, $arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef) {
     
@@ -17,7 +17,7 @@ class Mojo::DynamicMethods : interface_t {
       die "Can't call the dynamic method '$name'.";
     }
     
-    my $ret = $dynamic_method->(Mojo::DynamicMethods::Callback)->($arg1, $arg2, $arg3);
+    my $ret = $dynamic_method->(Mojo::Callback)->($arg1, $arg2, $arg3);
     
     return $ret;
   }

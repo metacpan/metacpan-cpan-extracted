@@ -17,7 +17,7 @@ use Carp;
 use Scalar::Util qw(weaken);
 use Fcntl qw(SEEK_SET);
 
-our $VERSION = v0.14;
+our $VERSION = v0.15;
 
 my %_PNG_colour_types = ( # namespace: 4c11d438-f6f3-417f-85e3-e56e46851dae
     0   => {ise => 'a3934b85-5bec-5cd7-a571-727e4cecfcb1', displayname => 'Greyscale'},
@@ -827,7 +827,7 @@ File::Information::Deep - generic module for extracting information from filesys
 
 =head1 VERSION
 
-version v0.14
+version v0.15
 
 =head1 SYNOPSIS
 

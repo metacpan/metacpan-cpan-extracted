@@ -17,15 +17,7 @@ class Mojo::Transaction::WebSocket extends Mojo::Transaction {
   
   has compressed : rw byte;
   
-  has max_websocket_size : rw int
-    get {
-      unless (exists $self->{max_websocket_size}) {
-        $self->{max_websocket_size} = length(my $_ = Sys->env("SPVM_MOJO_MAX_WEBSOCKET_SIZE")) ? (int)$_ : 262144;
-      }
-      
-      return $self->{max_websocket_size};
-    }
-  ;
+  has max_websocket_size : rw int;
   
   # Undocumented Fields
   has closing : byte;
@@ -43,12 +35,19 @@ class Mojo::Transaction::WebSocket extends Mojo::Transaction {
     
     my $self = new Mojo::Transaction::WebSocket;
     
-    $self->SUPER::init;
+    $self->init;
     
     return $self;
   }
   
   # Instance Methods
+  protected method init : void ($options : object[] = undef) {
+    
+    $self->SUPER::init;
+    
+    $self->{max_websocket_size} = length(my $_ = Sys->env("SPVM_MOJO_MAX_WEBSOCKET_SIZE")) ? (int)$_ : 262144;
+  }
+  
   method build_message : Mojo::WebSocket::Frame ($msg : string|object[]) {
     
     my $options = (object[])undef;

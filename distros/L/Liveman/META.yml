@@ -1,13 +1,22 @@
 ---
-abstract: 'compiler from markdown to tests and documentation'
+abstract: 'компиллятор из markdown в тесты и документацию'
 author:
   - 'Yaroslav O. Kosmina L<mailto:dart@cpan.org>'
 build_requires:
+  Carp: '0'
+  Cwd: '0'
+  File::Basename: '0'
+  File::Find: '0'
+  File::Path: '0'
+  File::Slurper: '0'
+  File::Spec: '0'
+  Scalar::Util: '0'
   Test::More: '0.98'
+  common::sense: '0'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.28, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,41 +35,54 @@ no_index:
 provides:
   Liveman:
     file: lib/Liveman.pm
-    version: '3.2'
+    version: '3.3'
+  Liveman::App::liveman:
+    file: lib/Liveman/App/liveman.pm
   Liveman::Append:
     file: lib/Liveman/Append.pm
+  Liveman::CoverBadge:
+    file: lib/Liveman/CoverBadge.pm
+  Liveman::Cpanfile:
+    file: lib/Liveman/Cpanfile.pm
   Liveman::MinillaPod2Markdown:
     file: lib/Liveman/MinillaPod2Markdown.pm
   Liveman::Project:
     file: lib/Liveman/Project.pm
 requires:
-  App::Yath: '1.000152'
-  Carp::Always::Color: '0.08'
-  Cwd::utf8: '0.011'
+  App::Prove: '0'
+  App::Yath: '0'
+  Carp: '0'
   Data::UUID: '1.226'
   Devel::Cover: '1.40'
   File::Basename: '0'
+  File::Find: '0'
   File::Find::Wanted: '1.00'
-  File::Path: '2.18'
-  File::Slurper: '0.013'
+  File::Path: '0'
+  File::Slurper: '0'
   File::Spec: '0'
+  File::Spec::Unix: '0'
+  Getopt::Long: '2.58'
   Locale::PO: '0.27'
   Markdown::To::POD: '0.06'
   Pod::Markdown: '0'
+  Pod::Text: 5.01_02
+  Pod::Usage: '2.03'
+  Scalar::Util: '1.63'
   Template: '3.101'
   Term::ANSIColor: '5.01'
   Test::More: '0.98'
   Text::Trim: '0'
+  UUID: '0.37'
   common::sense: '3.75'
   perl: v5.22.0
 resources:
   bugtracker: https://github.com/darviarush/perl-liveman/issues
   homepage: https://github.com/darviarush/perl-liveman
   repository: https://github.com/darviarush/perl-liveman.git
-version: '3.2'
+version: '3.3'
 x_authority: cpan:DART
 x_contributors:
   - 'Yaroslav O. Kosmina <dart@cpan.org>'
   - 'Yaroslav O. Kosmina <darviarush@mail.ru>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
-x_static_install: 1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
+x_static_install: 0

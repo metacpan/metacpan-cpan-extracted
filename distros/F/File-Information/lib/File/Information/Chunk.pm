@@ -16,7 +16,7 @@ use parent 'File::Information::Base';
 use Carp;
 use Fcntl qw(SEEK_SET);
 
-our $VERSION = v0.14;
+our $VERSION = v0.15;
 
 my %_properties = (
     chunk_cachehash     => {},
@@ -108,7 +108,7 @@ File::Information::Chunk - generic module for extracting information from filesy
 
 =head1 VERSION
 
-version v0.14
+version v0.15
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,10 @@
 Release history for Class-Enumeration
 
+1.2.0    Mon Oct 27 07:27:26 AM CET 2025
+         - Improve documentation
+         - Introduce new 'prefix' builder option
+         - Introduce new 'predicate' builder option
+
 1.1.0    Tue Oct 21 07:19:58 AM CEST 2025
          - Improve documentation
          - Reduce redundant source code

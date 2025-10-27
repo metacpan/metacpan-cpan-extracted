@@ -27,70 +27,49 @@ class Mojo::URL {
   has userinfo : rw string;
   
   has path : rw Mojo::Path
-    get {
-      unless (exists $self->{path}) {
-        $self->{path} = Mojo::Path->new;
-      }
-      
-      return $self->{path};
-    }
     
     set ($path : string|Mojo::Path) {
-      
-      unless ($path) {
-        die "The path \$path must be defined.";
-      }
       
       if ($path isa Mojo::Path) {
         $self->{path} = (Mojo::Path)$path;
       }
-      else {
+      elsif ($path isa string) {
         unless ($self->{path}) {
           $self->{path} = Mojo::Path->new;
         }
         
         $self->{path}->merge((string)$path);
       }
-      
+      else {
+        die "The path \$path must be defined and its type must be string or Mojo::Path.";
+      }
     }
   ;
   
   has query : rw Mojo::Parameters
-    get {
+    set ($query : object[]|Mojo::Parameters)  {
       
-      unless (exists $self->{query}) {
-        $self->{query} = Mojo::Parameters->new;
-      }
-      
-      return $self->{query};
-    }
-    
-    set ($query_value : object[]|Mojo::Parameters)  {
-      
-      unless ($query_value) {
-        die "The query \$query_value must be defined.";
-      }
-      
-      unless ($self->{query}) {
-        $self->{query} = Mojo::Parameters->new;
-      }
-      
-      # Merge with hash
-      if (is_options $query_value) {
-        $self->{query}->merge($query_value);
-      }
-      
-      # Append array
-      elsif ($query_value isa object[]) {
-        $self->{query}->append($query_value);
+      if ($query isa object[]) {
+        unless ($self->{query}) {
+          $self->{query} = Mojo::Parameters->new;
+        }
+        
+        # Merge with hash
+        if (is_options $query) {
+          $self->{query}->merge($query);
+        }
+        # Append array
+        else {
+          $self->{query}->append($query);
+        }
       }
       
       # New parameters
-      elsif ($query_value isa Mojo::Parameters) {
-        $self->{query} = (Mojo::Parameters)$query_value;
+      elsif ($query isa Mojo::Parameters) {
+        $self->{query} = (Mojo::Parameters)$query;
       }
       else {
-        die "The type query value \$query_value must be object[] or Mojo::Parameters.";
+        die "The query \$query must be defined and its type must be object[] or Mojo::Parameters.";
       }
     }
   ;
@@ -102,6 +81,11 @@ class Mojo::URL {
     
     if ($url) {
       $self->parse($url);
+    }
+    else {
+      $self->{path} = Mojo::Path->new;
+      
+      $self->{query} = Mojo::Parameters->new;
     }
     
     return $self;

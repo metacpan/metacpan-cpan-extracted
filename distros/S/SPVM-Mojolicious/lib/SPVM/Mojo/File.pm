@@ -192,7 +192,7 @@ Examples:
 
 =head2 list
 
-C<method list : Mojo::Collection ($options : object[] = undef);>
+C<method list : L<Mojo::Collection|SPVM::Mojo::Collection> of L<Mojo::File|SPVM::Mojo::File> ($options : object[] = undef);>
 
 List all files in the directory and return a L<Mojo::Collection|SPVM::Mojo::Collection> object containing the results as L<Mojo::File|SPVM::Mojo::File>
 objects. The list does not include C<.> and C<..>.
@@ -203,7 +203,7 @@ Examples:
   my $collection = $path->list({hidden => 1});
   
   # List files
-  for my $_ (@{(Mojo::File[])Mojo::File->new("/home/sri/myapp")->list->to_array}) {
+  for my $_ (@{Mojo::File->new("/home/sri/myapp")->list->to_array}) {
     say $_->to_string;
   }
 
@@ -227,7 +227,7 @@ Include hidden files.
 
 =head2 list_tree
 
-C<method list_tree : Mojo::Collection ($options : object[] = undef);>
+C<method list_tree : L<Mojo::Collection|SPVM::Mojo::Collection> of L<Mojo::File|SPVM::Mojo::File> ($options : object[] = undef);>
 
 List all files recursively in the directory and return a L<Mojo::Collection|SPVM::Mojo::Collection> object containing the results as
 L<Mojo::File|SPVM::Mojo::File> objects. The list does not include C<.> and C<..>.
@@ -238,7 +238,7 @@ Examples:
   my $collection = $path->list_tree({hidden => 1});
   
   # List files
-  for my $_ (@{(Mojo::File[])Mojo::File->new("/home/sri/myapp/templates")->list_tree->to_array}) {
+  for my $_ (@{Mojo::File->new("/home/sri/myapp/templates")->list_tree->to_array}) {
     say $_->to_string;
   }
 

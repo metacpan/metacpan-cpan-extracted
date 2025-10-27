@@ -58,7 +58,7 @@ use Exporter qw(import);
 
 #  Version information
 #
-$VERSION='2.016';
+$VERSION='2.017';
 chomp($VERSION_GIT_REF=do { local (@ARGV, $/) = ($_=__FILE__.'.tmp'); <> if -f $_ });
 
 
@@ -83,6 +83,7 @@ require WebDyne::Err;
     'subst',
     'dump',
     'json',
+    'api',
     'include',
 
 );
@@ -1469,7 +1470,6 @@ sub render {
     #
     my $data_ar=$param_hr->{'data'} || $self->{'_perl'}[0][WEBDYNE_NODE_CHLD_IX] ||
         return err('unable to get HTML data array');
-
     #$self->{'_perl'}[0] ||= $data_ar;
 
 
@@ -1529,6 +1529,7 @@ sub render {
         #  wrong
         #
         push @{$self->{'_data_ar'}},$data_ar;
+        unshift @{$self->{'_perl_data'}}, $param_data_hr;
 
 
         #  Debug
@@ -1666,6 +1667,7 @@ sub render {
         #  No errors, pop error handler stack
         #
         pop @{$self->{'_data_ar'}};
+        shift @{$self->{'_perl_data'}};
         
 
         #  Return
@@ -1723,6 +1725,12 @@ sub redirect {
     my ($self, $param_hr)=@_;
 
 
+    #  If not supplied param as hash ref assume all vars are params to be subs't when
+    #  rendering this data block
+    #
+    ref($param_hr) || ($param_hr={@_[1..$#_]}) if $param_hr;
+
+
     #  Debug
     #
     debug('in redirect, param %s', Dumper($param_hr));
@@ -1775,9 +1783,9 @@ sub redirect {
     else {
 
 
-        #  html/text must be a param
+        #  html/text/json must be a param
         #
-        my $html_sr=$param_hr->{'html'} || $param_hr->{'text'} ||
+        my $html_sr=$param_hr->{'html'} || $param_hr->{'text'} || $param_hr->{'json'} ||
             return err('no data supplied to redirect method');
 
 
@@ -1788,7 +1796,10 @@ sub redirect {
             $r->content_type($WEBDYNE_CONTENT_TYPE_HTML)
         }
         elsif ($param_hr->{'text'}) {
-            $r->content_type($WEBDYNE_CONTENT_TYPE_PLAIN)
+            $r->content_type($WEBDYNE_CONTENT_TYPE_TEXT)
+        }
+        elsif ($param_hr->{'json'}) {
+            $r->content_type($WEBDYNE_CONTENT_TYPE_JSON)
         }
 
 
@@ -2409,6 +2420,72 @@ sub json {
 }
 
 
+sub api {
+
+
+    #  Called when we encounter a <json> tag
+    #
+    my ($self, $data_ar, $attr_hr)=@_;
+    debug("$self rendering api tag in block $data_ar, attr %s", $attr_hr);
+    
+    
+    #  Need Router::Simple
+    #
+    require Router::Simple;
+    my $rest_or=$self->{'_rest_or'} ||= Router::Simple->new();
+    my @route=(grep {$_}
+        @{$attr_hr}{qw(name method handler pattern match data dest destination)}
+    );
+    $route[2] ||= undef;
+    my @option=(grep ${_},
+        @{$attr_hr}{qw(option options constraint constraints)}
+    );
+    debug('route param: %s, %s', Dumper(\@route, \@option));
+    $rest_or->connect(@route, $option[0]);
+    if (my $match_hr=$rest_or->match(\%ENV)) {
+    
+
+        #  We have a match
+        #
+        debug('route match: %s', Dumper(match_hr));
+
+
+        #  Run the code in perl routine specifying it is JSON, get return ref of
+        #  some kind
+        #
+        my $json_xr=$self->perl(undef, {json => 1, %{$attr_hr}, param=>$match_hr }) ||
+            return err();
+        debug("json_xr %s", Dumper($json_xr));
+
+
+        #  Convert to JSON
+        #
+        my $json_or=JSON->new() ||
+            return err('unable to create new JSON object');
+        debug("json_or: $json_or");
+        $json_or->canonical(defined($attr_hr->{'canonical'}) ? $attr_hr->{'canonical'} : $WEBDYNE_JSON_CANONICAL);
+        my $json=eval {$json_or->encode($json_xr)} ||
+            return err('error %s on json_encode of %s', $@, Dumper($json_xr));
+        debug("json %s", Dumper($json));
+        
+        
+        #  Return as JSON data only
+        #
+        return $self->redirect( json => $json );
+        
+    }
+    else {
+    
+        #  No match
+        #
+        debug('no match');
+        return \undef;
+        
+    }
+    
+}
+
+
 sub perl {
 
 
@@ -2454,7 +2531,7 @@ sub perl {
 
         #  May be inline code params to supply to this block
         #
-        my $perl_param_hr=$attr_hr->{'param'};
+        my $perl_param_hr=$attr_hr->{'param'} || $self->{'_perl_data'}[0];
         debug("found inline perl code %s, param %s", Dumper(\$perl_code, $perl_param_hr));
 
 

@@ -5,59 +5,28 @@ class Mojo::Message extends Mojo::EventEmitter {
   
   version_from Mojolicious;
   
-  use Hash;
   use Mojo::Headers;
   use Mojo::Upload;
   use Mojo::Asset::Memory;
   use Mojo::Content::Single;
   use Mojo::Parameters;
   use Mojo::Upload;
-  use JSON;
   use Mojo::Content::MultiPart;
+  use Hash;
+  use JSON;
+  use StringBuffer;
   
   # Interfaces
   interface Stringable;
   
   # Fields
-  has content : rw Mojo::Content
-    get {
-      unless (exists $self->{content}) {
-        $self->{content} = Mojo::Content::Single->new;
-      }
-      
-      return $self->{content};
-    }
-  ;
+  has content : rw Mojo::Content;
   
-  has max_line_size : rw int
-    get {
-      unless (exists $self->{max_line_size}) {
-        $self->{max_line_size} = length(my $_ = Sys->env("SPVM_MOJO_MAX_LINE_SIZE")) ? (int)$_ : 8192;
-      }
-      
-      return $self->{max_line_size};
-    }
-  ;
+  has max_line_size : rw int;
   
-  has max_message_size : rw int
-    get {
-      unless (exists $self->{max_message_size}) {
-        $self->{max_message_size} = length(my $_ = Sys->env("SPVM_MOJO_MAX_MESSAGE_SIZE")) ? (int)$_ : 16777216;
-      }
-      
-      return $self->{max_message_size};
-    }  
-  ;
+  has max_message_size : rw int;
   
-  has version : rw string
-    get {
-      unless (exists $self->{version}) {
-        $self->{version} = "1.1";
-      }
-      
-      return $self->{version};
-    }
-  ;
+  has version : rw string;
   
   # Undocumented Fields
   has state : string;
@@ -74,7 +43,7 @@ class Mojo::Message extends Mojo::EventEmitter {
   
   has raw_size : int;
   
-  has buffer : mutable string;
+  has buffer : StringBuffer;
   
   has _cache : Hash;
   
@@ -86,7 +55,15 @@ class Mojo::Message extends Mojo::EventEmitter {
     
     $self->{_cache} = Hash->new;
     
-    $self->{buffer} = (mutable string)copy "";
+    $self->{buffer} = StringBuffer->new;
+    
+    $self->{content} = Mojo::Content::Single->new;
+    
+    $self->{max_line_size} = length(my $_ = Sys->env("SPVM_MOJO_MAX_LINE_SIZE")) ? (int)$_ : 8192;
+    
+    $self->{max_message_size} = length(my $_ = Sys->env("SPVM_MOJO_MAX_MESSAGE_SIZE")) ? (int)$_ : 16777216;
+    
+    $self->{version} = "1.1";
   }
   
   method body : string () {
@@ -255,22 +232,22 @@ class Mojo::Message extends Mojo::EventEmitter {
     
     $self->{raw_size} += length $chunk;
     
-    $self->{buffer} = (mutable string)($self->{buffer} . $chunk);
+    $self->{buffer}->push($chunk);
     
     # Start-line
     unless ($self->{state}) {
       
       # Check start-line size
-      my $len = Fn->index($self->{buffer}, "\x0a");
+      my $len = $self->{buffer}->index("\x0a");
       if ($len < 0) {
-        $len = length $self->{buffer};
+        $len = $self->{buffer}->length;
       }
       
       if ($len > $self->max_line_size) {
         $self->_limit("Maximum start-line size exceeded");
         return;
       }
-      if ($self->extract_start_line((mutable string)$self->{buffer})) {
+      if ($self->extract_start_line((mutable string)$self->{buffer}->get_string)) {
         $self->{state} = "content";
       }
     }
@@ -279,9 +256,9 @@ class Mojo::Message extends Mojo::EventEmitter {
     my $state = $self->{state} // "";
     if ($state eq "content" || $state eq "finished") {
       my $buffer = $self->{buffer};
-      $self->{buffer} = (mutable string)copy "";
+      $self->{buffer} = StringBuffer->new;
       my $content = $self->content;
-      $content->parse($buffer);
+      $content->parse($buffer->get_string);
       $self->{content} = $content;
     }
     
@@ -344,7 +321,7 @@ class Mojo::Message extends Mojo::EventEmitter {
   
   method uploads : Mojo::Upload[] () {
     
-    my $uploads = List->new(new Mojo::Upload[0]);
+    my $uploads = (List of Mojo::Upload)List->new(new Mojo::Upload[0]);
     for my $data (@{$self->_parse_formdata(1)}) {
       my $upload = Mojo::Upload->new;
       $upload->set_name($data->(object[])->[0]->(string));
@@ -354,7 +331,7 @@ class Mojo::Message extends Mojo::EventEmitter {
       $uploads->push($upload);
     }
     
-    return $uploads->to_array->(Mojo::Upload[]);
+    return $uploads->to_array;
   }
   
   private method _parse_formdata : object[] ($upload : int = 0) {

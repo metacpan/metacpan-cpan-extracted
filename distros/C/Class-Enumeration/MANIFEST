@@ -12,13 +12,17 @@ t/api.t
 t/Builder.t
 t/CoffeeSize.t
 t/lib/CoffeeSize.pm
+t/lib/LockFlag.pm
 t/lib/ToastStatus.pm
 t/lib/TrafficLight.pm
 t/lib/TurnstileState.pm
 t/lib/TurnstileStateMachine.pm
+t/lib/VitalStatus.pm
+t/LockFlag.t
 t/ToastStatus.t
 t/TrafficLight.t
 t/TurnstileState.t
 t/TurnstileStateMachine.t
+t/VitalStatus.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

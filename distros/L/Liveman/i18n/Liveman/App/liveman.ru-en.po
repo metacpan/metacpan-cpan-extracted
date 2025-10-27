@@ -1,0 +1,84 @@
+msgid "liveman - «живое руководство». Утилита для конвертации файлов **lib/\\*\\*.md** в тестовые файлы (**t/\\*\\*.t**) и документацию (**POD**), которая размещается в соответствующем модуле (**lib/\\*\\*.pm**)"
+msgstr "\"Liveman - “Living Guide”. Utility for converting files **lib/\\*\\*.md** in test files (**t/\\*\\*.t**) and documentation (**POD**), which is placed in the corresponding module (**lib/\\*\\*.pm**)"
+
+msgid "Проблема современных проектов в том, что документация отделена от тестирования.\n"
+"Это означает, что примеры в документации могут не работать, а сама документация может отставать от кода."
+msgstr "The problem of modern projects is that the documentation is separated from testing.\n"
+"This means that the examples in the documentation may not work, and the documentation itself can lag behind the code."
+
+msgid "Метод одновременного документирования и тестирования решает эту проблему."
+msgstr "The method of simultaneous documentation and testing solves this problem."
+
+msgid "Для документации был выбран формат **md**, поскольку он наиболее прост для ввода и широко распространён.\n"
+"Описанные в нем участки кода **perl** транслируются в тест. Документация переводится в **POD** и добавляется в раздел **\\__END__** модуля perl."
+msgstr "For the documentation, the **md** format was selected, since it is the most simple for input and widespread.\n"
+"The areas of code **perl** described in it are broadcast into a test. The documentation is translated into **pod** and is added to the **\\__END__** section of the perl module."
+
+msgid "Другими словами, **liveman** конвертирует **lib/\\*\\*.md**-файлы в тестовые файлы (**t/\\*\\*.t**) и документацию, которая помещается в соответствующую **lib/\\*\\*.pm** модуль. И сразу запускает тесты с покрытием."
+msgstr "In other words, **liveman** converts **lib/\\*\\*.md**-files to test files (**t/\\*\\*.t**) and documentation that is placed in the corresponding **lib/\\*\\*.pm** module. And immediately launches the tests with coating."
+
+msgid "Покрытие можно просмотреть в файле *cover_db/coverage.html*."
+msgstr "The coating can be viewed in the **cover_db/coverage.html* file."
+
+msgid "Примечание: лучше сразу поместить *cover_db/* в *.gitignore*."
+msgstr "Note: it is better to immediately place *cover_db/* in *.gitignore*."
+
+msgid "Показать справку и выйти."
+msgstr "Show a certificate and get out."
+
+msgid "Показать версию и выйти."
+msgstr "Show the version and go out."
+
+msgid "Распечатать инструкцию и завершиться."
+msgstr "Print instructions and end."
+
+msgid "Только компилировать (без запуска тестов)."
+msgstr "Only compile (without starting the tests)."
+
+msgid "Преобразовать файлы *lib/\\*\\*.md*, даже если они не изменились."
+msgstr "Convert the *lib/\\*\\*.md* files, even if they have not changed."
+
+msgid "Использовать для тестов утилиту `prove`, а не `yath`."
+msgstr "Use the `prove` utility for tests, not `yath`."
+
+msgid "Открыть покрытие в браузере."
+msgstr "Open the coating in the browser."
+
+msgid "Передать строку с опциями `yath` или `prove`. Эти параметры будут добавлены к параметрам по умолчанию."
+msgstr "Transfer the line with the options `yath` or `prove`. These parameters will be added to the default parameters."
+
+msgid "Параметры по умолчанию для `yath`:"
+msgstr "Default parameters for `yath`:"
+
+msgid "Параметры по умолчанию для `prove`:"
+msgstr "Default parameters for `prove`:"
+
+msgid "**-а**, **--append**"
+msgstr "**-a**, **--append**"
+
+msgid "Добавить разделы функций в `*.md` из `*.pm` и завершиться."
+msgstr "Add functions in `*.md` from`*.pm` and end."
+
+msgid "Создать новый репозиторий."
+msgstr "Create a new repository."
+
+msgid "* *PACKAGE* — это имя нового пакета, например, `Aion::View`.\n"
+"* *LICENSE* — это имя лицензии, например, GPLv3 или perl_5."
+msgstr "* *PACKAGE* - this is the name of the new package, for example, `Aion::View`.\n"
+"* *License* is a license name, for example, GPLv3 or perl_5."
+
+msgid "Распечатать примерный cpanfile."
+msgstr "Print a sample cpanfile."
+
+msgid "Сравнить примерный cpanfile с существующим. Если параметр не указан – используется `meld`. В качестве альтернативы можно использовать `diff`, `colordiff`, `wdiff`, `kompare`, `kdiff3`, `tkdiff`, `diffuse` или любую другую утилиту, которая принимает два файла в качестве аргументов."
+msgstr "Compare the sample cpanfile with the existing one. If the parameter is not specified, `meld` is used. Alternatively, you can use `diff`, `colordiff`, `wdiff`, `kompare`, `kdiff3`, `tkdiff`, `diffuse` or any other utility that takes two files as arguments."
+
+msgid "Чтобы установить этот модуль в вашу систему, выполните следующую [команду](https://metacpan.org/pod/App::cpm):"
+msgstr "To install this module in your system, follow the following [command](https://metacpan.org/pod/App::cpm)"
+
+msgid "⚖ **GPLv3**"
+msgstr "⚖ **GPLv3**"
+
+msgid "The App::liveman module is copyright © 2024 Yaroslav O. Kosmina. Rusland. All rights reserved."
+msgstr "The App :: Liveman Module Is Copyright © 2024 Yaroslav O. Kosmina. Rusland. All Rights Reserved."
+

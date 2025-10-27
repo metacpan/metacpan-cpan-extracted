@@ -23,6 +23,7 @@ WriteMakefile(
     META_MERGE       => {
         'meta-spec' => { version => 2 },
         resources   => {
+            homepage => 'https://kawamurashingo.github.io/JQ-Lite/index-en.html',
             repository => {
                 type => 'git',
                 url  => 'https://github.com/kawamurashingo/JQ-Lite.git',

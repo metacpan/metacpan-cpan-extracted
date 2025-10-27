@@ -11,11 +11,7 @@ class Mojo::Asset::File extends Mojo::Asset {
   use Sys;
   
   # Fields
-  has cleanup : rw byte
-    get {
-      return $self->{cleanup};
-    }
-  ;
+  has cleanup : rw byte;
   
   has path : rw string;
   
@@ -52,25 +48,24 @@ class Mojo::Asset::File extends Mojo::Asset {
     }
   ;
   
-  has tmpdir : rw string
-    get {
-      unless (exists $self->{tmpdir}) {
-        $self->{tmpdir} = length(my $_ = Sys->env("SPVM_MOJO_TMPDIR")) ? (string)$_ : File::Spec->tmpdir;
-      }
-      
-      return $self->{tmpdir};
-    }
-  ;
+  has tmpdir : rw string;
   
   # Class Methods
   static method new : Mojo::Asset::File () {
     
     my $self = new Mojo::Asset::File;
     
+    $self->init;
+    
     return $self;
   }
   
   # Instance Methods
+  protected method init : void () {
+    
+    $self->{tmpdir} = length(my $_ = Sys->env("SPVM_MOJO_TMPDIR")) ? (string)$_ : File::Spec->tmpdir;
+  }
+  
   method add_chunk : Mojo::Asset::File ($chunk : string) {
     
     my $handle = $self->handle;

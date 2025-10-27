@@ -1,5 +1,9 @@
 Revision history for Perl extension Liveman
 
+3.3 2025-10-26T21:38:45Z
+
+    - liveman added cover-badge in <project>/doc/badges/total.svg
+
 3.2 2024-07-06T17:24:55Z
 
     - add -no-auto for trans-utility

@@ -20,41 +20,13 @@ class Mojo::Server::Daemon extends Mojo::Server {
   
   has max_clients : rw int;
   
-  has inactivity_timeout : rw int
-    get {
-      unless (exists $self->{inactivity_timeout}) {
-        $self->{inactivity_timeout} = length(my $_ = Sys->env("SPVM_MOJO_INACTIVITY_TIMEOUT")) ? (int)$_ : 30;
-      }
-      return $self->{inactivity_timeout};
-    }
-  ;
+  has inactivity_timeout : rw int;
   
-  has keep_alive_timeout : rw int
-    get {
-      unless (exists $self->{keep_alive_timeout}) {
-        $self->{keep_alive_timeout} = length(my $_ = Sys->env("SPVM_MOJO_KEEP_ALIVE_TIMEOUT")) ? (int)$_ : 5;
-      }
-      return $self->{keep_alive_timeout};
-    }
-  ;
+  has keep_alive_timeout : rw int;
   
-  has max_requests : rw int
-    get {
-      unless (exists $self->{max_requests}) {
-        $self->{max_requests} = 100;
-      }
-      return $self->{max_requests};
-    }
-  ;
+  has max_requests : rw int;
   
-  has listen : rw string[]
-    get {
-      unless (exists $self->{listen}) {
-        $self->{listen} = length(my $_ = Sys->env("SPVM_MOJO_KEEP_ALIVE_TIMEOUT")) ? Fn->split(",", $_) : ["http://*:3000"];
-      }
-      return $self->{listen};
-    }
-  ;
+  has listen : rw string[];
   
   has reverse_proxy : rw byte;
   
@@ -70,7 +42,7 @@ class Mojo::Server::Daemon extends Mojo::Server {
     
     my $self = new Mojo::Server::Daemon;
     
-    $self->{acceptors} = new Mojo::Connection::Server[0];
+    $self->init;
     
     return $self;
   }
@@ -80,6 +52,19 @@ class Mojo::Server::Daemon extends Mojo::Server {
   }
   
   # Instance Methods
+  protected method init : void () {
+    
+    $self->{acceptors} = new Mojo::Connection::Server[0];
+    
+    $self->{inactivity_timeout} = length(my $_ = Sys->env("SPVM_MOJO_INACTIVITY_TIMEOUT")) ? (int)$_ : 30;
+    
+    $self->{keep_alive_timeout} = length(my $_ = Sys->env("SPVM_MOJO_KEEP_ALIVE_TIMEOUT")) ? (int)$_ : 5;
+    
+    $self->{max_requests} = 100;
+    
+    $self->{listen} = length(my $_ = Sys->env("SPVM_MOJO_KEEP_ALIVE_TIMEOUT")) ? Fn->split(",", $_) : ["http://*:3000"];
+  }
+  
   method ports : int[] () {
     
     my $acceptors = $self->acceptors;

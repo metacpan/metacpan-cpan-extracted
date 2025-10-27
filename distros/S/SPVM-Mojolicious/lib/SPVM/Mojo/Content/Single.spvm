@@ -10,27 +10,9 @@ class Mojo::Content::Single extends Mojo::Content {
   use Mojo::Content::MultiPart;
   
   # Fields
-  has asset : rw Mojo::Asset
-    get {
-      unless (exists $self->{asset}) {
-        my $asset = Mojo::Asset::Memory->new;
-        $asset->set_auto_upgrade(1);
-        $self->{asset} = $asset;
-      }
-      
-      return $self->{asset};
-    }
-  ;
+  has asset : rw Mojo::Asset;
   
-  has auto_upgrade : rw byte
-    get {
-      unless (exists $self->{auto_upgrade}) {
-        $self->{auto_upgrade} = 1;
-      }
-      
-      return $self->{auto_upgrade};
-    }
-  ;
+  has auto_upgrade : rw byte;
   
   # Undocumented Fields
   has read : Mojo::Callback;
@@ -44,18 +26,29 @@ class Mojo::Content::Single extends Mojo::Content {
     
     $self->init;
     
+    return $self;
+  }
+  
+  # Instance Methods
+  protected method init : void ($options : object[] = undef) {
+    
+    $self->SUPER::init;
+    
     $self->{read} = method : void ($that : Mojo::Content::Single, $chunk : string){
       $that->set_asset($that->asset->add_chunk($chunk));
     };
     
     $self->on(read => $self->{read});
     
-    return $self;
+    $self->{auto_upgrade} = 1;
+    
+    my $asset = Mojo::Asset::Memory->new;
+    $asset->set_auto_upgrade(1);
+    $self->{asset} = $asset;
   }
   
-  # Instance Methods
   method body_contains : int ($chunk : string) {
-  
+    
     return $self->asset->contains($chunk) >= 0;
   }
   

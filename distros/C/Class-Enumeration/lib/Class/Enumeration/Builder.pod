@@ -41,7 +41,9 @@ Class::Enumeration::Builder - Builder module for enum classes
 
   # Choose an exporter module and set the 'export' option to true
   use Exporter qw( import );
-  use Class::Enumeration::Builder { export => 1 }, qw( bread toasting toast burnt );
+  use Class::Enumeration::Builder
+    { export => 1 },
+    qw( bread toasting toast burnt );
 
   1
 
@@ -57,31 +59,58 @@ Class::Enumeration::Builder - Builder module for enum classes
 
 C<Class::Enumration::Builder> builds enum classes. Each such class will be a
 child class of the abstract parent class L<Class::Enumeration>.  The builder
-creates getters for custom attributes and as a final mandatory step prepares
-a list of enum objects.
+prepares a list of enum objects. It optionally creates getters for custom
+attributes for each such object.
 
-The C<import()> class method implements the build process. Its first argument
-is an optional HASH reference. The allowed options are C<class> (a non-empty
-string), C<counter> (a CODE reference), and C<export> (a boolean value).
-The C<import()> method returns the name of the enum class.
+The C<import()> class method implements the build process.  The method returns
+the name of the enum class.  The first argument of the C<import()> method is an
+optional options HASH reference. The allowed options are:
 
-If the C<export> option is set to true, the builder will prepare enum constants
-that are stored in the variable C<@EXPORT_OK> and it will create an C<:all>
-that is part of the variable C<%EXPORT_TAGS>. Any exporter module chosen
-and loaded separately enables the feature to export enum constants.
+=over 2
+
+=item * C<class> (a non-empty string)
+
+An enum class can be build at runtime.  In this case The C<class> option
+should be used to set the enum class name.
+
+=item * C<counter> (a CODE reference)
 
 The C<counter> option can be used to overwrite the default ordinal number
 generator. It should return a unique value for each enum object in the list.
 The values should be numeric and comparable in pairs using the C<E<lt>=E<gt>>
 operator.
 
-An enum class build setup can be part of a separate module. In this case
-the build process happens at compile time. The enum class name equals the
-package name.  If you want to override the default stringification you have
-to pre-declare the C<to_string()> before loading the builder.
+=item * C<export> (a boolean value)
 
-An enum class can be build at runtime too.  The C<class> option should be
-used to set the enum class name.
+If the C<export> option is set to true, the builder prepares enum constants
+that are stored in the variable C<@EXPORT_OK> and it creates an C<:all>
+tag that is part of the variable C<%EXPORT_TAGS>. Any separately loaded
+exporter module like for example L<Exporter> enables the feature to export
+enum constants.
+
+=item * C<predicate> (a boolean value)
+
+If the C<predicate> option is set to true, the builder creates C<is_*()>
+predicate methods (object methods) for each enum object in the list.
+
+=item * C<prefix> (a non-empty string)
+
+The C<prefix> option can be used to specify a common prefix for the names of
+the enum objects in the list.
+
+=back
+
+The remaining arguments of the C<import()> method are the names of the
+enum objects in the list. If the enum objects have custom attributes, an
+additional attributes HASH reference is assigned to each name. If present
+all enum objects in the list have to have the same attribute names.
+
+C<Class::Enumration::Builder> is usually C<use>d in a separate module. In
+this case the build process happens at compile time. The enum class name
+equals the package name.
+
+If you want to override the default stringification you have to pre-declare
+the C<to_string()> before loading the builder.
 
 =head1 AUTHOR
 

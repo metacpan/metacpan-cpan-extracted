@@ -26,170 +26,46 @@ class Mojo::UserAgent extends Mojo::EventEmitter {
   }
   
   # Fields
-  has ca : rw string
-    get {
-      unless (exists $self->{ca}) {
-        $self->{ca} = length(my $_ = Sys->env("SPVM_MOJO_CA_FILE")) ? $_ : undef;
-      }
-      
-      return $self->{ca};
-    }
-  ;
+  has ca : rw string;
   
-  has cert : rw string
-    get {
-      unless (exists $self->{cert}) {
-        $self->{cert} = length(my $_ = Sys->env("SPVM_CERT_FILE")) ? $_ : undef;
-      }
-      
-      return $self->{cert};
-    }
-  ;
+  has cert : rw string;
   
   has connect_timeout : rw double;
   
-  has cookie_jar : rw Mojo::UserAgent::CookieJar
-    get {
-      unless (exists $self->{cookie_jar}) {
-        $self->{cookie_jar} = Mojo::UserAgent::CookieJar->new;
-      }
-      
-      return $self->{cookie_jar};
-    }
-  ;
+  has cookie_jar : rw Mojo::UserAgent::CookieJar;
   
-  has inactivity_timeout : rw double
-    get {
-      unless (exists $self->{inactivity_timeout}) {
-        $self->{inactivity_timeout} = length(my $_ = Sys->env("SPVM_MOJO_INACTIVITY_TIMEOUT")) ? (double)$_ : 40.0;
-      }
-      
-      return $self->{inactivity_timeout};
-    }
-  ;
+  has inactivity_timeout : rw double;
   
-  has insecure : rw byte
-    get {
-      unless (exists $self->{insecure}) {
-        $self->{insecure} = length(my $_ = Sys->env("SPVM_MOJO_INSECURE")) ? (byte)$_ : (byte)0;
-      }
-      
-      return $self->{insecure};
-    }
-  ;
+  has insecure : rw byte;
   
   has max_response_size : rw int;
   
-  has key : rw string
-    get {
-      unless (exists $self->{key}) {
-        $self->{key} = length(my $_ = Sys->env("SPVM_MOJO_KEY_FILE")) ? $_ : undef;
-      }
-      
-      return $self->{key};
-    }
-  ;
+  has key : rw string;
   
-  has max_connections : rw int
-    get {
-      unless (exists $self->{max_connections}) {
-        $self->{max_connections} = 5;
-      }
-      
-      return $self->{max_connections};
-    }
-  ;
+  has max_connections : rw int;
   
-  has max_redirects : rw int
-    get {
-      unless (exists $self->{max_redirects}) {
-        $self->{max_redirects} = length(my $_ = Sys->env("SPVM_MOJO_MAX_REDIRECTS")) ? (int)$_ : 0;
-      }
-      
-      return $self->{max_redirects};
-    }
-  ;
+  has max_redirects : rw int;
   
-  has proxy : rw Mojo::UserAgent::Proxy
-    get {
-      unless (exists $self->{proxy}) {
-        $self->{proxy} = Mojo::UserAgent::Proxy->new;
-      }
-      
-      return $self->{proxy};
-    }
-  ;
+  has proxy : rw Mojo::UserAgent::Proxy;
   
-  has request_timeout : rw double
-    get {
-      unless (exists $self->{request_timeout}) {
-        $self->{request_timeout} = length(my $_ = Sys->env("SPVM_MOJO_REQUEST_TIMEOUT")) ? (double)$_ : 0.0;
-      }
-      
-      return $self->{request_timeout};
-    }
-  ;
+  has request_timeout : rw double;
   
   # TODO
   # has server : Mojo::UserAgent::Server;
   
   has socket_options : rw Hash
-    get {
-      unless (exists $self->{socket_options}) {
-        $self->{socket_options} = Hash->new;
-      }
-      
-      return $self->{socket_options};
-    }
     set ($_ : object[]|Hash) {
-      if ($_ isa object[]) {
-        $self->{socket_options} = Hash->new((object[])$_);
-      }
-      elsif ($_ isa Hash) {
-        $self->{socket_options} = (Hash)$_;
-      }
-      elsif (!$_) {
-        $self->{socket_options} = undef;
-      }
-      else {
-        die "The type of socket_options option must be object[] or Hash.";
-      }
+      $self->{socket_options} = Fn->to_hash($_);
     }
   ;
   
   has tls_options : rw Hash
-    get {
-      unless (exists $self->{tls_options}) {
-        $self->{tls_options} = Hash->new;
-      }
-      
-      return $self->{tls_options};
-    }
     set ($_ : object[]|Hash) {
-      if (is_options $_) {
-        $self->{tls_options} = Hash->new((object[])$_);
-      }
-      elsif ($_ isa Hash) {
-        $self->{tls_options} = (Hash)$_;
-      }
-      elsif (!$_) {
-        $self->{tls_options} = undef;
-      }
-      else {
-        die "The type of tls_options option must be object[] or Hash.";
-      }
+      $self->{tls_options} = Fn->to_hash($_);
     }
   ;
   
-  has transactor : rw Mojo::UserAgent::Transactor
-    get {
-      unless (exists $self->{transactor}) {
-        $self->{transactor} = Mojo::UserAgent::Transactor->new;
-      }
-      
-      return $self->{transactor};
-    }
-  ;
+  has transactor : rw Mojo::UserAgent::Transactor;
   
   # Uncodumented Fields
   has keep_alive_sockets : object[]; # endpoint and socket pairs 
@@ -201,9 +77,7 @@ class Mojo::UserAgent extends Mojo::EventEmitter {
     
     my $self = new Mojo::UserAgent;
     
-    $self->{keep_alive_sockets} = new object[0];
-    
-    $self->{connections_h} = (Hash of IO::Socket)Hash->new;
+    $self->init;
     
     return $self;
   }
@@ -318,6 +192,41 @@ EOS
   }
   
   # Instance Methods
+  protected method init : void ($options : object[] = undef) {
+    
+    $self->{keep_alive_sockets} = new object[0];
+    
+    $self->{connections_h} = (Hash of IO::Socket)Hash->new;
+    
+    $self->{ca} = length(my $_ = Sys->env("SPVM_MOJO_CA_FILE")) ? $_ : undef;
+    
+    $self->{cert} = length(my $_ = Sys->env("SPVM_CERT_FILE")) ? $_ : undef;
+    
+    $self->{cookie_jar} = Mojo::UserAgent::CookieJar->new;
+    
+    $self->{inactivity_timeout} = length(my $_ = Sys->env("SPVM_MOJO_INACTIVITY_TIMEOUT")) ? (double)$_ : 40.0;
+    
+    $self->{insecure} = length(my $_ = Sys->env("SPVM_MOJO_INSECURE")) ? (byte)$_ : (byte)0;
+    
+    $self->{key} = length(my $_ = Sys->env("SPVM_MOJO_KEY_FILE")) ? $_ : undef;
+    
+    $self->{max_connections} = 5;
+    
+    $self->{max_redirects} = length(my $_ = Sys->env("SPVM_MOJO_MAX_REDIRECTS")) ? (int)$_ : 0;
+    
+    $self->{proxy} = Mojo::UserAgent::Proxy->new;
+    
+    $self->{request_timeout} = length(my $_ = Sys->env("SPVM_MOJO_REQUEST_TIMEOUT")) ? (double)$_ : 0.0;
+    
+    $self->{socket_options} = Hash->new;
+    
+    $self->{tls_options} = Hash->new;
+    
+    $self->{transactor} = Mojo::UserAgent::Transactor->new;
+    
+    
+  }
+  
   method get : Mojo::Transaction::HTTP ($url : string|Mojo::URL, $args1 : object = undef, $args2 : object = undef) {
     
     my $method = "GET";

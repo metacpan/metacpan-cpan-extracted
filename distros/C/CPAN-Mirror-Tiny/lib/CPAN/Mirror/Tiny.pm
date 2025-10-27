@@ -3,7 +3,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 use CPAN::Meta;
 use CPAN::Mirror::Tiny::Archive;
@@ -23,6 +23,8 @@ use IPC::Run3 ();
 use JSON ();
 use Parse::LocalDistribution;
 use Parse::PMFile;
+
+use constant WIN32 => $^O eq 'MSWin32';
 
 my $JSON = JSON->new->canonical(1)->utf8(1);
 my $CACHE_VERSION = 1;
@@ -299,16 +301,20 @@ sub index_path {
     $option{compress} ? "$file.gz" : $file;
 }
 
+sub _win32_path_fix { my $path = shift; $path =~ s{\\}{/}g; $path }
+
 sub index {
     my ($self, %option) = @_;
     my $base = $self->base("authors", "id");
     return unless -d $base;
 
+    $base = _win32_path_fix($base) if WIN32;
     my @dist;
     my $wanted = sub {
         return unless -f;
         return unless /(?:\.tgz|\.tar\.gz|\.tar\.bz2|\.zip)$/;
         my $path = $_;
+        $path = _win32_path_fix($path) if WIN32;
         push @dist, {
             path => $path,
             mtime => (stat $path)[9],

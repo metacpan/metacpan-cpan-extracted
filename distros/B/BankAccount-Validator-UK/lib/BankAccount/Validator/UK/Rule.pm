@@ -1,6 +1,6 @@
 package BankAccount::Validator::UK::Rule;
 
-$BankAccount::Validator::UK::Rule::VERSION   = '0.66';
+$BankAccount::Validator::UK::Rule::VERSION   = '0.67';
 $BankAccount::Validator::UK::Rule::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ BankAccount::Validator::UK::Rule - Rules for validating UK bank account.
 
 =head1 VERSION
 
-Version 0.66
+Version 0.67
 
 =cut
 
@@ -154,7 +154,7 @@ L<https://metacpan.org/dist/BankAccount-Validator-UK>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2012 - 2024 Mohammad Sajid Anwar.
+Copyright (C) 2012 - 2025 Mohammad Sajid Anwar.
 
 This program  is  free software; you can redistribute it and / or modify it under
 the  terms  of the the Artistic  License (2.0). You may obtain a copy of the full

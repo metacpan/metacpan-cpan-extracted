@@ -1,125 +1,98 @@
-msgid "# NAME"
-msgstr "#NAME"
-
 msgid "Liveman - компиллятор из markdown в тесты и документацию"
-msgstr "Liveman - compiler from markdown to tests and documentation"
-
-msgid "3.0"
-msgstr "3.0"
+msgstr "Liveman - compiler from Markdown to tests and documentation"
 
 msgid "Файл lib/Example.md:"
-msgstr "File lib/Example.md:"
+msgstr "LIB/Example.md file:"
 
 msgid "Тест:"
 msgstr "Test:"
 
-msgid "# DESCRIPION"
-msgstr "#DESCRIPTION"
-
 msgid "Проблема современных проектов в том, что документация оторвана от тестирования.\n"
 "Это значит, что примеры в документации могут не работать, а сама документация может отставать от кода."
-msgstr "The problem with modern projects is that documentation is divorced from testing.\n"
-"This means that the examples in the documentation may not work, and the documentation itself may lag behind the code."
+msgstr "The problem of modern projects is that the documentation is torn from testing.\n"
+"This means that the examples in the documentation may not work, and the documentation itself can lag behind the code."
 
 msgid "Liveman компилирует файлы `lib/**.md` в файлы `t/**.t`\n"
 "и добавляет документацию в раздел `__END__` модуля к файлам `lib/**.pm`."
-msgstr "Liveman compiles `lib/**.md` files into `t/**.t` files\n"
-"and adds documentation in the module's `__END__` section to the `lib/**.pm` files."
+msgstr "LiveMan compiles `Lib/**. MD` to files` t/**. T`\n"
+"And adds the documentation to the `__end__` module to the files` LIB/**. PM`."
 
 msgid "Используйте команду `liveman` для компиляции документации к тестам в каталоге вашего проекта и запускайте тесты:"
-msgstr "Use the `liveman` command to compile test documentation in your project directory and run the tests:"
-
-msgid "    liveman"
-msgstr "liveman"
+msgstr "Use the `Liveman 'command to compilation of documentation for tests in the catalog of your project and start tests:"
 
 msgid "Запустите его с покрытием."
-msgstr "Run it coated."
+msgstr "Run it with a coating."
 
 msgid "Опция `-o` открывает отчёт о покрытии кода тестами в браузере (файл отчёта покрытия: `cover_db/coverage.html`)."
-msgstr "The `-o` option opens a code coverage report by tests in the browser (coverage report file: `cover_db/coverage.html`)."
+msgstr "The `-o` option opens a report on covering code with tests in a browser (coating report file:` COVER_DB/Coverage.html`)."
 
 msgid "Liveman заменяет `our $VERSION = \"...\";` в `lib/**.pm` из `lib/**.md` из секции **VERSION** если она существует."
-msgstr "Liveman replaces `our $VERSION = \"...\";` in `lib/**.pm` from `lib/**.md` from the **VERSION** section if it exists."
+msgstr "Liveman replaces the `OUR $ Version =\" ... \";` in `LIB/**. Pm` from` Lib/**. MD` from the section ** Version ** if it exists."
 
 msgid "Если файл **minil.toml** существует, то Liveman прочитает из него `name` и скопирует файл с этим именем и расширением `.md` в `README.md`."
-msgstr "If the **minil.toml** file exists, then Liveman will read `name` from it and copy the file with that name and `.md` extension into `README.md`."
+msgstr "If the ** minil.toml ** file exists, then Liveman will read `NAME` from it and copy the file with this name and extension` .md` in `readme.md`."
 
 msgid "Если нужно, чтобы документация в `.md` была написана на одном языке, а `pod` – на другом, то в начале `.md` нужно указать `!from:to` (с какого на какой язык перевести, например, для этого файла: `!ru:en`)."
-msgstr "If you need the documentation in `.md` to be written in one language, and `pod` in another, then at the beginning of `.md` you need to indicate `!from:to` (from which language to translate, for example, for this file: `!ru:en`)."
+msgstr "If you need the documentation in `.md` to be written in one language, and` pod` is on the other, then at the beginning of `.md` you need to indicate`! From: to` (from which language to translate, for example, for this file: `! Ru: en`)."
 
 msgid "Заголовки (строки на #) – не переводятся. Так же не переводятя блоки кода.\n"
 "А сам перевод осуществляется по абзацам."
-msgstr "Headings (lines starting with #) are not translated. Also, do not translate blocks of code.\n"
-"And the translation itself is carried out paragraph by paragraph."
+msgstr "Headings (lines on #) - are not translated. Also, without translating the code blocks.\n"
+"And the translation itself is carried out by paragraphs."
 
 msgid "Файлы с переводами складываются в каталог `i18n`, например, `lib/My/Module.md` -> `i18n/My/Module.ru-en.po`. Перевод осуществляется утилитой `trans` (она должна быть установлена в системе). Файлы переводов можно подкорректировать, так как если перевод уже есть в файле, то берётся он."
-msgstr "Files with translations are stored in the `i18n` directory, for example, `lib/My/Module.md` -> `i18n/My/Module.ru-en.po`. Translation is carried out using the `trans` utility (it must be installed on the system). Translation files can be corrected, because if the translation is already in the file, then it is taken."
+msgstr "Files with transfers are added to the `i18n` catalog, for example,` Lib/my/Module.md` -> `i18N/my/Module.ru-en.po`. Translation is carried out by the `Trans` utility (it should be installed in the system). Translation files can be adjusted, because if the transfer is already in the file, then it is taken."
 
 msgid "**Внимание!** Будьте осторожны и после редактирования `.md` просматривайте `git diff`, чтобы не потерять подкорректированные переводы в `.po`."
-msgstr "**Warning!** Be careful and review `git diff` after editing `.md` so as not to lose the corrected translations in `.po`."
+msgstr "** Attention! ** Be careful and after editing `.md` look at` Git Diff` so as not to lose corrected translations in `.Po`."
+
+msgid "**Примечание:** `trans -R` покажет список языков, которые можно указывать в **!from:to** на первой строке документа."
+msgstr "** Note: ** `Trans -r` will show a list of languages that can be indicated in **! From: to ** on the first line of the document."
 
 msgid "Коды секций без указанного языка программирования или с `perl` записываются как код в файл `t/**.t`. А комментарий со стрелкой (# -> )превращается в тест `Test::More`."
-msgstr "Section codes without a specified programming language or with `perl` are written as code in the file `t/**.t`. And a comment with an arrow (# -> ) turns into a `Test::More` test."
+msgstr "Section codes without a specified programming language or with `perl` are written as a code to the file` t/**. T`. And the comment with the arrow (# ->) turns into a test `test :: more`."
 
 msgid "Сравнить два эквивалентных выражения:"
 msgstr "Compare two equivalent expressions:"
 
-msgid "### `is_deeply`"
-msgstr "### `is_deeply`"
-
 msgid "Сравнить два выражения для структур:"
 msgstr "Compare two expressions for structures:"
 
-msgid "### `is` with extrapolate-string"
-msgstr "### `is` with extrapolate-string"
-
 msgid "Сравнить выражение с экстраполированной строкой:"
-msgstr "Compare expression with extrapolated string:"
-
-msgid "### `is` with nonextrapolate-string"
-msgstr "### `is` with nonextrapolate-string"
+msgstr "Compare the expression with an extrapolated line:"
 
 msgid "Сравнить выражение с неэкстраполированной строкой:"
-msgstr "Compare an expression with a non-extrapolated string:"
-
-msgid "### `like`"
-msgstr "### `like`"
+msgstr "Compare the expression with an unexpected line:"
 
 msgid "Проверяет регулярное выражение, включенное в выражение:"
-msgstr "Tests the regular expression included in the expression:"
-
-msgid "### `unlike`"
-msgstr "### `unlike`"
+msgstr "Checks the regular expression included in the expression:"
 
 msgid "Он проверяет регулярное выражение, исключённое из выражения:"
-msgstr "It checks the regular expression excluded from the expression:"
-
-msgid "## EMBEDDING FILES"
-msgstr "## EMBEDDING FILES"
+msgstr "He checks the regular expression excluded from the expression:"
 
 msgid "Каждый тест выполняется во временном каталоге, который удаляется и создается при запуске теста."
-msgstr "Each test runs in a temporary directory, which is deleted and created when the test runs."
+msgstr "Each test is performed in a temporary catalog, which is removed and created when starting the dough."
 
 msgid "Формат этого каталога: /tmp/.liveman/*project*/*path-to-test*/."
-msgstr "The format of this directory is /tmp/.liveman/*project*/*path-to-test*/."
+msgstr "The format of this catalog: /tmp/.liveeman/*Project*/*Path-to-test*/."
 
 msgid "Раздел кода в строке с префиксом md-файла **File `path`:** запишется в файл при тестировании во время выполнения."
-msgstr "The section of code on the line with the md file prefix **File `path`:** will be written to a file when tested at runtime."
+msgstr "The code section in the line with the MD-file prefix ** file `Path`: ** is written to the file when testing during execution."
 
 msgid "Раздел кода в префиксной строке md-файла **File `path` is:** будет сравниваться с файлом методом `Test::More::is`."
-msgstr "The code section in the md file prefix line **File `path` is:** will be compared to the file using the `Test::More::is` method."
+msgstr "The section of the code in the prefix line MD-file ** file `Path` is: ** will be compared with the file` test :: more :: is`."
 
 msgid "Файл experiment/test.txt:"
-msgstr "File experiment/test.txt:"
+msgstr "Experiment/Test.txt file:"
 
 msgid "Файл experiment/test.txt является:"
-msgstr "The experiment/test.txt file is:"
+msgstr "Experiment/Test.txt file is:"
 
 msgid "**Внимание!** Пустая строка между префиксом и кодом не допускается!"
-msgstr "**Attention!** An empty line between the prefix and the code is not allowed!"
+msgstr "** Attention! ** An empty line between the prefix and the code is not allowed!"
 
-msgid "Эти префиксы могут быть как на английском, так и на русском."
-msgstr "These prefixes can be in both English and Russian."
+msgid "Эти префиксы могут быть как на английском, так и на русском (`File [path](https://metacpan.org/pod/path):` и `File [path](https://metacpan.org/pod/path) is:`)."
+msgstr "These prefixes can be both in English and in Russian (`File [Path] (https://metacpan.org/pod/path):` and `File [Path] (https://metacpan.org/pod/path) is:`)."
 
 msgid "Конструктор. Имеет аргументы:"
 msgstr "Constructor. Has arguments:"
@@ -131,48 +104,60 @@ msgid ""
 "1. `options` — добавить параметры в командной строке для проверки или доказательства.\n"
 "1. `prove` — использовать доказательство (команду `prove` для запуска тестов), а не команду `yath`."
 msgstr ""
-"1. `files` (array_ref) - list of md files for the `transforms` and `tests` methods.\n"
-"1. `open` (boolean) — open the coverage in the browser. If the **opera** browser is installed on your computer, the `opera` command will be used to open it. Otherwise - `xdg-open`.\n"
-"1. `force_compile` (boolean) - do not check the modification time of md files.\n"
-"1. `options` - add parameters on the command line for verification or proof.\n"
-"1. `prove` - use proof (the `prove` command to run tests), rather than the `yath` command."
+"1. `Files` (Array_ref)-a list of MD files for the` transforms` and `tests`.\n"
+"1. `Open` (boolean) - open the coating in the browser. If the computer is installed on the computer ** Opera **, the `Opera` command will be used to open. Otherwise-`XDG-OPEN`.\n"
+"1. `Force_compile` (Boolean)-do not check the time of modification of MD files.\n"
+"1. `Options` - Add the parameters on the command line for verification or evidence.\n"
+"1. `Prove` - use the proof (team` Prove` to start tests), and not the `yath` command."
 
 msgid "Получить путь к `t/**.t`-файлу из пути к `lib/**.md`-файлу:"
-msgstr "Get the path to the `t/**.t` file from the path to the `lib/**.md` file:"
-
-msgid "## transform ($md_path, [$test_path])"
-msgstr "## transform ($md_path, [$test_path])"
+msgstr "Get the way to `t/**. T`-file from the way to` LIB/**. Md`-file:"
 
 msgid "Компилирует `lib/**.md`-файл в `t/**.t`-файл."
-msgstr "Compiles a `lib/**.md` file into a `t/**.t` file."
+msgstr "Compiles `Lib/**. Md`-file in` t/**. T`-file."
 
 msgid "А так же заменяет **pod**-документацию в секции `__END__` в `lib/**.pm`-файле и создаёт `lib/**.pm`-файл, если тот не существует."
-msgstr "It also replaces the **pod** documentation in the `__END__` section in the `lib/**.pm` file and creates a `lib/**.pm` file if it does not exist."
+msgstr "And also replaces ** pod **-the documentation in the `__end__` section in` LIB/**. PM`-file and creates `LIB/**. Pm`-file, if it does not exist."
 
 msgid "Файл lib/Example.pm является:"
-msgstr "The lib/Example.pm file is:"
+msgstr "LIB/Example.pm file is:"
 
 msgid "Файл `lib/Example.pm` был создан из файла `lib/Example.md`, что описано в разделе `SINOPSIS` в этом документе."
-msgstr "The file `lib/Example.pm` was created from the file `lib/Example.md`, as described in the `SINOPSIS` section of this document."
+msgstr "The `Lib/Example.pm` file was created from the` Lib/Example.md` file, which is described in the `sinopsis' section in this document."
 
 msgid "Компилировать `lib/**.md`-файлы в `t/**.t`-файлы."
-msgstr "Compile `lib/**.md` files into `t/**.t` files."
+msgstr "Compile `Lib/**. Md`-files in` t/**. T`-files."
 
 msgid "Все, если `$self->{files}` не установлен, или `$self->{files}`."
-msgstr "All if `$self->{files}` is not set, or `$self->{files}`."
+msgstr "That's all, if `$ self-> {files}` is not installed, or `$ self-> {files}`."
 
 msgid "Запустить тесты (`t/**.t`-файлы)."
-msgstr "Run tests (`t/**.t` files)."
+msgstr "Launch tests (`t/**. T`-files)."
 
 msgid "Все, если `$self->{files}` не установлен, или `$self->{files}` только."
-msgstr "All if `$self->{files}` is not set, or `$self->{files}` only."
+msgstr "That's all, if `$ self-> {files}` is not installed, or `$ self-> {files}` only."
 
-msgid "Yaroslav O. Kosmina <dart@cpan.org>"
-msgstr "Yaroslav O. Kosmina <dart@cpan.org>"
+msgid "Считывает po-файл."
+msgstr "Reads the PO-file."
+
+msgid "Сохраняет po-файл."
+msgstr "Saves the PO-file."
+
+msgid "Функция переводит текст с одного языка на другой используя утилиту trans."
+msgstr "The function translates the text from one language to another using the Trans utility."
+
+msgid "Так же разбивает по параграфам."
+msgstr "It also breaks through paragraphs."
+
+msgid "В своей библиотеке, которую вы будете тестировать Liveman-ом, нужно будет указать дополнительные зависимости для тестов в **cpanfile**:"
+msgstr "In your library, which you will test liveeman, you will need to indicate additional dependencies for tests in ** cpanfile **:"
+
+msgid "Так же неплохо будет указать и сам **Liveman** в разделе для разработки:"
+msgstr "It will also be good to indicate and the ** liveman ** in the development section:"
 
 msgid "⚖ **GPLv3**"
-msgstr "⚖ **GPLv3**"
+msgstr "⚖ ** gplv3 **"
 
 msgid "The Liveman module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All rights reserved."
-msgstr "The Liveman module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All rights reserved."
+msgstr "The Liveman Module is Copyright © 2023 Yaroslav O. Kosmina. Rusland. All Rights Reserved."
 

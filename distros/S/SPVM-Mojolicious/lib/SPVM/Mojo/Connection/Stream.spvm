@@ -6,14 +6,7 @@ class Mojo::Connection::Stream extends Mojo::Connection {
   
   use StringBuffer;
   
-  has high_water_mark : rw int
-    get {
-      unless (exists $self->{high_water_mark}) {
-        $self->{high_water_mark} = 1048576;
-      }
-      return $self->{high_water_mark};
-    }
-  ;
+  has high_water_mark : rw int;
   
   has is_writing : ro byte;
   
@@ -34,6 +27,8 @@ class Mojo::Connection::Stream extends Mojo::Connection {
     $self->{timeout} = 15;
     
     $self->{buffer} = StringBuffer->new;
+    
+    $self->{high_water_mark} = 1048576;
     
     return $self;
   }

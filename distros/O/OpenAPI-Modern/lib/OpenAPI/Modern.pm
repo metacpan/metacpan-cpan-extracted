@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.101-6-g2ef635d2
+package OpenAPI::Modern; # git description: v0.102-6-g7b3dfdd4
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.1 or v3.2 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.1 v3.2 Swagger HTTP request response
 
-our $VERSION = '0.102';
+our $VERSION = '0.103';
 
 use 5.020;
 use utf8;
@@ -97,15 +97,15 @@ sub validate_request ($self, $request, $options = {}) {
   croak '$request and $options->{request} are inconsistent'
     if $options->{request} and $request != $options->{request};
 
-  # mostly populated by find_path
+  # mostly populated by find_path_item
   my $state = { data_path => '/request' };
 
   try {
     $options->{request} //= $request;
-    my $path_ok = $self->find_path($options, $state);
+    my $path_ok = $self->find_path_item($options, $state);
     delete $options->{errors};
 
-    # Reporting a failed find_path as an exception will result in a recommended response of
+    # Reporting a failed find_path_item as an exception will result in a recommended response of
     # [ 500, Internal Server Error ], which is warranted if we consider the lack of a specification
     # entry for this incoming request as an unexpected, server-side error.
     # Callers can decide if this should instead be reported as a [ 404, Not Found ], but that sort
@@ -237,13 +237,13 @@ sub validate_response ($self, $response, $options = {}) {
     $options->{request} //= $request;
   }
 
-  # mostly populated by find_path
+  # mostly populated by find_path_item
   my $state = { data_path => '/response' };
 
   try {
     # FIXME: if the operation is shared by multiple paths, path_template may not be inferrable, and
     # we also don't need path_captures
-    my $path_ok = $self->find_path($options, $state);
+    my $path_ok = $self->find_path_item($options, $state);
     delete $options->{errors};
     return $self->_result($state, 1, 1) if not $path_ok;
 
@@ -332,7 +332,10 @@ sub validate_response ($self, $response, $options = {}) {
   return $self->_result($state, 0, 1);
 }
 
-sub find_path ($self, $options, $state = {}) {
+# deprecated, but we'll continue to support it
+*find_path = \&find_path_item;
+
+sub find_path_item ($self, $options, $state = {}) {
   # there are many $state fields used by JSM that we do not set here because we do not use them for
   # OpenAPI validation, such as document, document_path, vocabularies, specification_version
   $state->{data_path} //= '';
@@ -345,8 +348,9 @@ sub find_path ($self, $options, $state = {}) {
   $state->{debug} = $options->{debug} = {} if $DEBUG or $self->debug;
 
   return E({ %$state, exception => 1, recommended_response => [ 500 ] },
-      'at least one of $options->{request}, ($options->{path_template} and $options->{method}), or $options->{operation_id} must be provided')
+      'at least one of $options->{request}, ($options->{uri} and $options->{method}), ($options->{path_template} and $options->{method}), or $options->{operation_id} must be provided')
     if not $options->{request}
+      and not (exists $options->{uri} and exists $options->{method})
       and not ($options->{path_template} and exists $options->{method})
       and not exists $options->{operation_id};
 
@@ -358,14 +362,19 @@ sub find_path ($self, $options, $state = {}) {
     if (my $error = $options->{request}->error) {
       return E({ %$state, data_path => '/request', recommended_response => [ 500 ] }, 'Failed to parse request: %s', $error->{message});
     }
-  }
 
-  # method from request
-  if ($options->{request}) {
+    return E({ %$state, data_path => '/request/uri', recommended_response => [ 500 ] },
+        'mismatched uri "%s"', $options->{request}->url)
+      if exists $options->{uri} and $options->{request}->url ne $options->{uri};
+    $options->{uri} = $options->{request}->url; # a Mojo::URL object
+
     return E({ %$state, data_path => '/request/method', recommended_response => [ 500 ] },
         'wrong HTTP method "%s"', $options->{request}->method)
       if exists $options->{method} and $options->{request}->method ne $options->{method};
     $options->{method} = $options->{request}->method;
+  }
+  elsif (exists $options->{uri}) {
+    $options->{uri} = Mojo::URL->new($options->{uri}.'') if not $options->{uri}->$_isa('Mojo::URL');
   }
 
   # method from operation_id from options
@@ -393,17 +402,17 @@ sub find_path ($self, $options, $state = {}) {
       ? (jsonp(@parts[0..$#parts-1]), uc($parts[-1]))
       : (jsonp(@parts[0..$#parts-2]), $parts[-1]);
 
-    return E({ %$state, ($options->{request} ? (data_path => '/request/method') : ()), keyword_path => $operation_path.'/operationId' },
+    return E({ %$state, ($options->{uri} ? (data_path => '/request/method') : ()), keyword_path => $operation_path.'/operationId' },
         'operation at operation_id does not match %s method "%s"%s',
-          exists $options->{request} ? 'request' : 'provided HTTP', $options->{method},
-          (!exists $options->{request} && $options->{method} eq lc $options->{method}
+          $options->{uri} ? 'request' : 'provided HTTP', $options->{method},
+          (!$options->{uri} && $options->{method} eq lc $options->{method}
               && exists $self->openapi_document->get($path_item_path)->{$options->{method}}
             ? (' (should be '.uc $options->{method}.')') : ''))
       if exists $options->{method} and $options->{method} ne $method;
 
     $options->{method} = $method;
 
-    if (not $options->{path_template} and not $options->{request}) {
+    if (not $options->{path_template} and not $options->{uri}) {
       # some operations don't live under a /paths/$path_template (even via a $ref), e.g. webhooks or
       # callbacks, but they are still usable via operationId for validating responses
       $state->{keyword_path} = $path_item_path;
@@ -421,13 +430,13 @@ sub find_path ($self, $options, $state = {}) {
   my $schema = $self->openapi_document->schema;
 
   # path_template from options
-  return E({ %$state, (exists $options->{request} ? (data_path => '/request/uri') : ()),
+  return E({ %$state, ($options->{uri} ? (data_path => '/request/uri') : ()),
         keyword => 'paths' }, 'missing path "%s"', $options->{path_template})
     if exists $options->{path_template} and not exists $schema->{paths}{$options->{path_template}};
 
   my $captures;  # hashref of template variable names -> concrete values from the uri
 
-  if (not $options->{path_template} and $options->{request}) {
+  if (not $options->{path_template} and $options->{uri}) {
     # derive path_template and capture values from the request URI
 
     # sorting (ascii-wise) gives us the desired results that concrete path components sort ahead of
@@ -437,7 +446,7 @@ sub find_path ($self, $options, $state = {}) {
       my $local_state = +{ %$state };
       $local_state->{path_item} = $schema->{paths}{$pt};
       $local_state->{keyword_path} = jsonp('/paths', $pt);
-      $captures = $self->_match_uri($options->{request}->method, $options->{request}->url, $pt, $local_state);
+      $captures = $self->_match_uri($options->@{qw(method uri)}, $pt, $local_state);
 
       if ($captures) {
         # a URI can match multiple /paths entries, and an operationId can be reachable from multiple
@@ -462,15 +471,15 @@ sub find_path ($self, $options, $state = {}) {
 
     return E({ %$state, data_path => '/request', keyword => 'paths' },
         'no match found for request %s %s',
-        $options->{request}->method, $options->{request}->url->clone->query('')->fragment(undef))
+        $options->{method}, $options->{uri}->clone->query('')->fragment(undef))
       if not exists $options->{path_template};
   }
 
-  elsif ($options->{request}) {
+  elsif ($options->{uri}) {
     # we were passed path_template in options, and now we verify it against the request URI
     $state->{path_item} = $schema->{paths}{$options->{path_template}};
     $state->{keyword_path} = jsonp('/paths', $options->{path_template});
-    $captures = $self->_match_uri($options->{request}->method, $options->{request}->url, $options->{path_template}, $state);
+    $captures = $self->_match_uri($options->@{qw(method uri path_template)}, $state);
 
     if (not $captures) {
       #  no path-item and operation found that matches the request's method and uri
@@ -484,7 +493,7 @@ sub find_path ($self, $options, $state = {}) {
 
       return E({ %$state, data_path => '/request/uri', recommended_response => [ 500 ] },
         'provided path_template does not match request URI "%s"',
-        $options->{request}->url->clone->query('')->fragment(undef));
+        $options->{uri}->clone->query('')->fragment(undef));
     }
 
     if (exists $options->{operation_id}
@@ -495,7 +504,7 @@ sub find_path ($self, $options, $state = {}) {
           .(exists $state->{operation}{operationId} ? '/operationId' : ''),
           recommended_response => [ 500 ] },
         'provided path_template and operation_id do not match request %s %s',
-        $options->{request}->method, $options->{request}->url->clone->query('')->fragment(undef));
+        $options->{method}, $options->{uri}->clone->query('')->fragment(undef));
     }
   }
 
@@ -540,7 +549,7 @@ sub find_path ($self, $options, $state = {}) {
   # note: we aren't doing anything special with escaped slashes. this bit of the spec is hazy.
   # { for the editor
   my @path_capture_names = ($options->{path_template} =~ m!\{([^}]+)\}!g);
-  return E({ %$state, $options->{request} ? (data_path => '/request/uri') : (), recommended_response => [ 500 ] }, 'provided path_captures names do not match path template "%s"', $options->{path_template})
+  return E({ %$state, $options->{uri} ? (data_path => '/request/uri') : (), recommended_response => [ 500 ] }, 'provided path_captures names do not match path template "%s"', $options->{path_template})
     if exists $options->{path_captures}
       and not is_equal([ sort keys $options->{path_captures}->%* ], [ sort @path_capture_names ]);
 
@@ -549,7 +558,7 @@ sub find_path ($self, $options, $state = {}) {
   my @uri_capture_names = keys %$captures;
 
   if (exists $options->{uri_captures}) {
-    return E({ %$state, $options->{request} ? (data_path => '/request/uri') : (), recommended_response => [ 500 ] },
+    return E({ %$state, $options->{uri} ? (data_path => '/request/uri') : (), recommended_response => [ 500 ] },
         'provided uri_captures names do not match extracted values')
       if not is_equal([ sort keys $options->{uri_captures}->%* ], [ sort @uri_capture_names ]);
 
@@ -1208,7 +1217,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.1 o
 
 =head1 VERSION
 
-version 0.102
+version 0.103
 
 =head1 SYNOPSIS
 
@@ -1424,7 +1433,7 @@ the L</openapi_uri> (which is derived from the document's C<$self> keyword as we
 provided to the document constructor).
 
 The second argument is an optional hashref that contains extra information about the request,
-corresponding to the values expected by L</find_path> below. The method populates the hashref
+corresponding to the values expected by L</find_path_item> below. The method populates the hashref
 with some information about the request:
 save it and pass it to a later L</validate_response> call (that corresponds to a response for this request)
 to improve performance.
@@ -1447,15 +1456,17 @@ the L</openapi_uri> (which is derived from the document's C<$self> keyword as we
 provided to the document constructor).
 
 The second argument is an optional hashref that contains extra information about the request
-corresponding to the response, as in L</validate_request> and L</find_path>.
+corresponding to the response, as in L</validate_request> and L</find_path_item>.
 
 C<request> in the hashref represents the original request object that
 corresponds to this response, which can be used to find the appropriate section of the document if
 other values (such as C<operationId>) are not known.
 
-=head2 find_path
+=head2 find_path_item
 
-  $result = $self->find_path($options);
+=for Pod::Coverage find_path
+
+  $result = $self->find_path_item($options);
 
 Finds the appropriate L<path-item|https://spec.openapis.org/oas/latest#path-item-object> entry
 in the OpenAPI document corresponding to a request. Called
@@ -1469,6 +1480,10 @@ of values can be provided; possible values are:
 =item *
 
 C<request>: the object representing the HTTP request. Supported types are: L<HTTP::Request>, L<Plack::Request>, L<Catalyst::Request>, L<Mojo::Message::Request>. Converted to a L<Mojo::Message::Request>.
+
+=item *
+
+C<uri>: the URI of the HTTP request. Converted from any string-compatible type to a L<Mojo::URL>.
 
 =item *
 

@@ -1,0 +1,18 @@
+<start_html>
+<perl handler=param1>
+Param 1:
+Foo is *<? $_[1]->{'foo'} ?>*
+Bar is *<? $_[1]->{'bar'} ?>*
+<perl handler=param2>
+Param 2:
+Foo is *<? $_[0]->{'_perl_data'}[1]{'foo'} ?>*
+Bar is *<? $_[1]->{'bar'} ?>*
+</perl>
+</perl>
+__PERL__
+sub param1 {
+    return shift()->render( foo=> 'foo' )
+}
+sub param2 {
+    return shift()->render( bar=> 'bar' )
+}

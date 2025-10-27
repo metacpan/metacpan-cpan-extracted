@@ -1,3 +1,21 @@
+commit 9f2e6d63c3c50b4089dc1faa4bb4513cd2834e09
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon Oct 27 00:53:29 2025 +1030
+
+    VERSION increment: 2.017
+
+commit 30dc39f492f687f31e9b0790be1136d1eb307162
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon Oct 27 00:20:47 2025 +1030
+
+    First code to introduce <api> tag
+
+commit b94cdf9b79dc98219e7926902c215e67748094da
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Oct 26 13:43:38 2025 +1030
+
+    Allow params to cascade from perl handler section to perl inline section within that handler block, add tests
+
 commit 51bd8cab238ad509ace7e1fc819f6ec2190f487e
 Author: Andrew Speer <andrew.speer@isolutions.com.au>
 Date:   Sun Oct 26 12:41:46 2025 +1030

@@ -10,25 +10,9 @@ class Mojo::Asset::Memory extends Mojo::Asset {
   # Fields
   has auto_upgrade : rw byte;
   
-  has max_memory_size : rw int
-    get {
-      unless (exists $self->{max_memory_size}) {
-        $self->{max_memory_size} = length(my $_ = Sys->env("SPVM_MOJO_MAX_MEMORY_SIZE")) ? (int)$_ : 262144;
-      }
-      
-      return $self->{max_memory_size};
-    }
-  ;
+  has max_memory_size : rw int;
   
-  has mtime : rw long
-    get {
-      unless (exists $self->{mtime}) {
-        $self->{mtime} = CommandInfo->BASETIME;
-      }
-      
-      return $self->{mtime};
-    }
-  ;
+  has mtime : rw long;
   
   # Undocumented Fields
   has content_buffer : StringBuffer;
@@ -49,6 +33,10 @@ class Mojo::Asset::Memory extends Mojo::Asset {
   protected method init : void () {
     
     $self->{content_buffer} = StringBuffer->new;
+    
+    $self->{max_memory_size} = length(my $_ = Sys->env("SPVM_MOJO_MAX_MEMORY_SIZE")) ? (int)$_ : 262144;
+    
+    $self->{mtime} = CommandInfo->BASETIME;
   }
   
   method add_chunk : Mojo::Asset ($chunk : string) {

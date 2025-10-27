@@ -28,12 +28,17 @@ class Mojo::Transaction::HTTP extends Mojo::Transaction {
     
     my $self = new Mojo::Transaction::HTTP;
     
-    $self->SUPER::init;
+    $self->init;
     
     return $self;
   }
   
   # Instance Methods
+  protected method init : void ($options : object[] = undef) {
+    
+    $self->SUPER::init;
+  }
+  
   method client_read : void ($chunk : string) {
     
     my $res = $self->res;

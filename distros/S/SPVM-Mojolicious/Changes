@@ -1,3 +1,11 @@
+0.031 2025-10-27
+  [Requirement Changes]
+    * Require SPVM 0.990105.
+    * Require SPVM::Regex 0.253.
+  [Changes]
+    * Refactor accessors.
+    * Refactor buffers.
+    
 0.030 2025-10-13
   [Internal Changes]
     * Refactor fields.

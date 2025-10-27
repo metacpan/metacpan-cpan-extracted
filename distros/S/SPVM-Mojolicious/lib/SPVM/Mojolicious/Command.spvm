@@ -16,34 +16,13 @@ class Mojolicious::Command {
     }
   ;
   
-  has description : rw string
-    get {
-      unless (exists $self->{description}) {
-        $self->{description} = "No description";
-      }
-      return $self->{description};
-    }
-  ;
+  has description : rw string;
   
   has quiet : rw byte;
   
-  has template : rw object[]
-    get {
-      unless (exists $self->{template}) {
-        $self->{template} = {vars => 1};
-      }
-      return $self->{template};
-    }
-  ;
+  has template : rw Hash;
   
-  has usage : rw string
-    get {
-      unless (exists $self->{usage}) {
-        $self->{usage} = "Usage: APPLICATION\n";
-      }
-      return $self->{usage};
-    }
-  ;
+  has usage : rw string;
   
   # Undocumented Fields
   has app_ref : Mojolicious;
@@ -53,10 +32,21 @@ class Mojolicious::Command {
     
     my $self = new Mojolicious::Command;
     
+    $self->init;
+    
     return $self;
   }
   
   # Instance Methods
+  protected method init : void () {
+    
+    $self->{description} = "No description";
+    
+    $self->{template} = Hash->new({vars => 1});
+    
+    $self->{usage} = "Usage: APPLICATION\n";
+  }
+  
   method chmod_file : void ($path : string, $mode : int) {
     
     Mojo::File->path($path)->chmod($mode);

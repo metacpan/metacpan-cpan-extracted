@@ -1,5 +1,11 @@
 Revision history for OpenAPI-Modern
 
+0.103     2025-10-26 19:14:30Z
+          - find_path() has been renamed to find_path_item() (with a
+            backcompat alias), and now accepts lookup using just an HTTP
+            request URI and method alone, rather than a complete request
+            object
+
 0.102     2025-10-21 21:33:40Z
           - support added for additional HTTP methods, new in OpenAPI 3.2
 

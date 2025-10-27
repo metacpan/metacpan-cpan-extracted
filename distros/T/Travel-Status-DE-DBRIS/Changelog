@@ -1,3 +1,11 @@
+Travel::Status::DE::DBRIS 0.15 - Sun Oct 26 2025
+
+    * DBRIS: Add optional "failure_cache" key to new / new_p. This causes
+      the module to cache failed requests, thus decreasing the risk of
+      running into rate limits when, e.g., requesting carriage formation data
+      that is not available upstream.
+    * Formation::Group: Update carriage name list (patch by Lili Chelsea Urban)
+
 Travel::Status::DE::DBRIS 0.14 - Fri Sep 19 2025
 
     * dbris-m: Do not break --(raw-)json if the requested stop name is not an

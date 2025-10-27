@@ -262,7 +262,7 @@ class Mojo::Util {
   
   private static method _header : string[][] ($str : string, $cookie : int = 0) {
     
-    my $tree = List->new(new string[][0]);
+    my $tree = (List of string[])List->new(new string[][0]);
     my $part = StringList->new;
     
     my $offset = 0;
@@ -298,7 +298,7 @@ class Mojo::Util {
       $tree->push($part);
     }
     
-    return $tree->to_array->(string[][]);
+    return $tree->to_array;
   }
   
   static method unquote : string ($str : string) {

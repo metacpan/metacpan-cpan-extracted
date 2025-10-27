@@ -117,7 +117,7 @@ class Mojo::File {
     return File::Spec->file_name_is_absolute($self->to_string);
   }
   
-  method list : Mojo::Collection ($options : object[] = undef) {
+  method list : Mojo::Collection of Mojo::File ($options : object[] = undef) {
     
     my $options_h = Hash->new($options);
     
@@ -168,7 +168,7 @@ class Mojo::File {
     return Mojo::Collection->new($mojo_files);
   }
   
-  method list_tree : Mojo::Collection ($options : object[] = undef) {
+  method list_tree : Mojo::Collection of Mojo::File ($options : object[] = undef) {
     
     my $options_h = Hash->new($options);
     

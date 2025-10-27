@@ -20,7 +20,7 @@ use Data::Identifier::Generate;
 
 use parent 'Data::Identifier::Interface::Known';
 
-our $VERSION = v0.20;
+our $VERSION = v0.21;
 
 use constant {
     WK_UUID => '8be115d2-dc2f-4a98-91e1-a6e3075cbc31', # uuid
@@ -229,7 +229,7 @@ Data::Identifier::Wellknown - format independent identifier object
 
 =head1 VERSION
 
-version v0.20
+version v0.21
 
 =head1 SYNOPSIS
 
@@ -1162,29 +1162,36 @@ $extra_classes languoid
 $type sid=8
 $namespace 47dd950c-9089-4956-87c1-54c122533219
 
-.   af      Afrikaans
-.   ar      Arabic
-.   bn      Bengali
+.   af      Afrikaans       sid=240
+.   ar      Arabic          sid=243
+.   bn      Bengali         sid=245
 .   de      German          sid=71
 .   en      English         sid=70
 .   eo      Esperanto
 .   es      Spanish         sid=73
 .   fi      Finnish
-.   fr      French
+.   fr      French          sid=244
 .   he      Hebrew
-.   hi      Hindi
+.   hi      Hindi           sid=242
 .   ia      Interlingua
+.   id      Indonesian      sid=248
 .   ie      Interlingue
 .   it      Italian
+.   ja      Japanese        sid=250
+.   mi      Maori           sid=254
+.   mr      Marathi         sid=251
 .   nl      Dutch           sid=72
 .   no      Norwegian
-.   pt      Portuguese
-.   ru      Russian
+.   pt      Portuguese      sid=246
+.   ru      Russian         sid=247
 .   sv      Swedish
-.   sw      Swahili
+.   sw      Swahili         sid=241
+.   te      Telugu
 .   th      Thai
-.   zu      Zulu
+.   ur      Urdu            sid=249
+.   vi      Vietnamese      sid=252
 .   zh      Chinese         sid=74
+.   zu      Zulu            sid=253
 
 
 $class mediatype
@@ -1413,7 +1420,9 @@ $type uuid
 % Reserved: 127 - 131
 % Handled above: 132 - 133
 .   2ec4a6b0-e6bf-40cd-96a2-490cbc8d6c4b    empty-set                   sid=134
-% Unassigned: 135 - 143
+.   99437f71-f1b5-4a50-8ecf-882b61b86b1e    final-file-charset          sid=135
+% Unassigned: 136 - 142
+.   807e485f-8b3a-5483-8bb5-d58648acaa8f    UTF-8                       sid=143
 % Handled above: 144 - 145
 % Unassigned: 146 - 158
 .   7cb67873-33bc-4a93-b53f-072ce96c6f1a    hrair                       sid=159
@@ -1427,7 +1436,10 @@ $type uuid
 % Handled above: 190 - 195
 % Unassigned: 196 - 207
 % Handled above: 208 - 215
-% Unassigned: 216 - 254
+% Unassigned: 216 - 223
+% Handled above: 224 - 229
+% Unassigned: 230 - 239
+% Handled above: 240 - 254
 % Reserved: 255
 
 $end

@@ -41,7 +41,11 @@ ref $liveman_project  # => Liveman::Project
 
 ## license ()
 
-Зоздёт лицензию.
+Создаёт лицензию.
+
+## warnings ()
+
+Проверяет проект на ошибки и распечатывает их в STDOUT.
 
 # AUTHOR
 
