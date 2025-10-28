@@ -31,5 +31,5 @@ resources:
   homepage: https://sourceforge.net/projects/www-suffit-authdb/
   license: https://dev.perl.org/licenses
   repository: https://abalama@git.code.sf.net/p/www-suffit-authdb/code
-version: '1.03'
+version: '1.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

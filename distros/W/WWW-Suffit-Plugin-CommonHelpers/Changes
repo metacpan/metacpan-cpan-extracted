@@ -1,4 +1,7 @@
 # Version/Revision history
 
+1.01 Mon 27 Oct 2025 17:03:25 MSK
+    * Switched to using functions from Acrux::Util and Acrux::RefUtil
+
 1.00 Thu 07 Dec 2023 11:32:08 MSK
     * Initial release

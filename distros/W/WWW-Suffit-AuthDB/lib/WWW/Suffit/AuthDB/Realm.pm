@@ -157,7 +157,7 @@ use Mojo::Base -base;
 
 use Mojo::Util qw/steady_time/;
 
-use WWW::Suffit::RefUtil qw/is_integer/;
+use Acrux::RefUtil qw/is_integer/;
 
 use Net::IP qw//;
 

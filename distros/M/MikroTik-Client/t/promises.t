@@ -31,7 +31,7 @@ my $api    = MikroTik::Client->new(
 my ($err, $p, $res);
 
 # connection errors
-$api->port(0);
+$api->port(Mojo::IOLoop::Server::generate_port());
 $p
     = $api->cmd_p('/resp')
     ->catch(sub { ($err, $res) = @_ })

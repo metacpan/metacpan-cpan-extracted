@@ -424,7 +424,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 use Mojo::Base -base;
 use Mojo::Util qw/md5_sum decode encode steady_time deprecated/;

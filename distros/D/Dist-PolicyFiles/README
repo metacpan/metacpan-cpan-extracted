@@ -2,7 +2,7 @@ NAME
     Dist::PolicyFiles - Generate CONTRIBUTING.md and SECURITY.md
 
 VERSION
-    Version 0.01
+    Version 0.03
 
 SYNOPSIS
         use Dist::PolicyFiles;
@@ -68,7 +68,7 @@ DESCRIPTION
         constructor argument). Optional argument *"CONTRIB_MD_TMPL"* is the
         name of a template file (see Text::Template) for this policy. If
         this argument is not specified, then the internal default template
-        is used.
+        is used (see constant *"INTERNAL_CONTRIB_MD"*).
 
         The template can use the following variables:
 
@@ -104,13 +104,13 @@ DESCRIPTION
         "maintainer:"
             User's full name and email address, e.g.:
 
-               John Doe <jd@cpan.org>
+               'John Doe <jd@cpan.org>'
 
         "program"
             Module name, see constructor argument "module".
 
         "url"
-               https://github.com/LOGIN/REPO/blob/main/SECURITY.md
+               'https://github.com/LOGIN/REPO/blob/main/SECURITY.md'
 
             where:
 
@@ -156,6 +156,11 @@ DESCRIPTION
     "uncapitalize()"
         Returns the value passed via the constructor argument "uncapitalize"
         or the default value (*"false"*).
+
+  CONSTANTS
+    Constant *"INTERNAL_CONTRIB_MD"* containes the internal template used to
+    create CONTRIBUTING.md. The constant is not exported. If necessary,
+    access it as follows: "Dist::PolicyFiles::INTERNAL_CONTRIB_MD".
 
 AUTHOR
     Klaus Rindfrey, "<klausrin at cpan.org.eu>"

@@ -4,7 +4,7 @@
       "Klaus Rindfrey <klausrin@cpan.org.eu>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -63,7 +63,7 @@
    "provides" : {
       "Dist::PolicyFiles" : {
          "file" : "lib/Dist/PolicyFiles.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -74,7 +74,7 @@
          "web" : "https://github.com/klaus-rindfrey/perl-dist-policyfiles.git"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_bugtracker" : {
       "web" : "https://github.com/klaus-rindfrey/perl-dist-policyfiles/issues"
    },

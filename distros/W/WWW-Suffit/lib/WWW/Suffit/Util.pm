@@ -18,87 +18,39 @@ Exported utility functions
 
 =head2 color
 
-    say color(blue => "Format %s %s" => "text", "foo");
-    say color(cyan => "text");
-    say color("red on_bright_yellow" => "text");
-    say STDERR color("red on_bright_yellow" => "text");
-
-Returns colored formatted string if is session was runned from terminal
-
-Supported normal foreground colors:
-
-    black, red, green, yellow, blue, magenta, cyan, white
-
-Bright foreground colors:
-
-    bright_black, bright_red,     bright_green, bright_yellow
-    bright_blue,  bright_magenta, bright_cyan,  bright_white
-
-Normal background colors:
-
-    on_black, on_red,     on_green, on yellow
-    on_blue,  on_magenta, on_cyan,  on_white
-
-Bright background color:
-
-    on_bright_black, on_bright_red,     on_bright_green, on_bright_yellow
-    on_bright_blue,  on_bright_magenta, on_bright_cyan,  on_bright_white
+Deprecated in this module! See L<Acrux::Util/color>
 
 See also L<Term::ANSIColor>
 
 =head2 dformat
 
-    $string = dformat( $mask, \%replacehash );
-    $string = dformat( $mask, %replacehash );
-
-Replace substrings "[...]" in mask and
-returns replaced result. Data for replacing get from \%replacehash
-
-For example:
-
-    # -> 01-foo-bar.baz.tgz
-    $string = dformat( "01-[NAME]-bar.[EXT].tgz", {
-        NAME => 'foo',
-        EXT  => 'baz',
-    });
+Deprecated in this module! See L<Acrux::Util/dformat>
 
 See also L<CTK::Util/dformat>
 
 =head2 fbytes
 
-    print fbytes( 123456 );
-
-Returns formatted size value
+Deprecated in this module! See L<Acrux::Util/fbytes>
 
 =head2 fdate
 
-    print fdate( time );
-
-Returns formatted date value
+Deprecated in this module! See L<Acrux::Util/fdate>
 
 =head2 fdatetime
 
-    print fdatetime( time );
-
-Returns formatted date value
+Deprecated in this module! See L<Acrux::Util/fdatetime>
 
 =head2 fduration
 
-    print fduration( 123 );
-
-Returns formatted duration value
+Deprecated in this module! See L<Acrux::Util/fduration>
 
 =head2 humanize_duration
 
-    print humanize_duration ( 123 );
-
-Turns duration value into a simplified human readable format
+Deprecated in this module! See L<Acrux::Util/humanize_duration>
 
 =head2 human2bytes
 
-    my $bytes = human2bytes("100 kB");
-
-Converts a human readable byte count into the pure  number of bytes without any suffix
+Deprecated in this module! See L<Acrux::Util/human2bytes>
 
 See also L<Mojo::Util/humanize_bytes>
 
@@ -122,46 +74,15 @@ See L<Digest::MD5>
 
 =head2 parse_expire
 
-    print parse_expire("+1d"); # 86400
-    print parse_expire("-1d"); # -86400
-
-Returns offset of expires time (in secs).
-
-Original this function is the part of CGI::Util::expire_calc!
-
-This internal routine creates an expires time exactly some number of hours from the current time.
-It incorporates modifications from  Mark Fisher.
-
-format for time can be in any of the forms:
-
-    now   -- expire immediately
-    +180s -- in 180 seconds
-    +2m   -- in 2 minutes
-    +12h  -- in 12 hours
-    +1d   -- in 1 day
-    +3M   -- in 3 months
-    +2y   -- in 2 years
-    -3m   -- 3 minutes ago(!)
-
-If you don't supply one of these forms, we assume you are specifying the date yourself
+Deprecated in this module! See L<Acrux::Util/parse_expire>
 
 =head2 parse_time_offset
 
-    my $off = parse_time_offset("1h2m24s"); # 4344
-    my $off = parse_time_offset("1h 2m 24s"); # 4344
-
-Returns offset of time (in secs)
+Deprecated in this module! See L<Acrux::Util/parse_time_offset>
 
 =head2 randchars
 
-    $rand = randchars( $n ); # default chars collection: 0..9,'a'..'z','A'..'Z'
-    $rand = randchars( $n, \@collection ); # Defined chars collection
-
-Returns random sequence of casual characters by the amount of n
-
-For example:
-
-    $rand = randchars( 8, [qw/a b c d e f/]); # -> cdeccfdf
+Deprecated in this module! See L<Acrux::Util/randchars>
 
 =head1 HISTORY
 
@@ -173,7 +94,7 @@ See C<TODO> file
 
 =head1 SEE ALSO
 
-L<Digest::MD5>
+L<Acrux::Util>, L<Digest::MD5>
 
 =head1 AUTHOR
 
@@ -181,7 +102,7 @@ Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<g
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2023 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2025 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -192,7 +113,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 use Carp;
 use Term::ANSIColor qw/colored/;

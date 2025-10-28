@@ -22,15 +22,15 @@ sub is_running { !!(shift->{running} || $AnyEvent::CondVar::Base::WAITING) }
 
 sub new { $AE++ ? Mojo::Reactor::Poll->new : shift->SUPER::new }
 
-sub one_tick {
-    my $self = shift;
-    local $self->{running} = 1 unless $self->{running};
-    state $tick
-        = ($AnyEvent::MODEL || '') eq 'AnyEvent::Impl::EV'
-        ? sub { EV::run(EV::RUN_ONCE()); }
-        : \&Mojo::Reactor::Poll::one_tick;
-    $self->$tick();
-}
+# sub one_tick {
+#     my $self = shift;
+#     local $self->{running} = 1 unless $self->{running};
+#     state $tick
+#         = ($AnyEvent::MODEL || '') eq 'AnyEvent::Impl::EV'
+#         ? sub { EV::run(EV::RUN_ONCE()); }
+#         : \&Mojo::Reactor::Poll::one_tick;
+#     $self->$tick();
+# }
 
 sub recurring { shift->_timer(1, @_) }
 

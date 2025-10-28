@@ -1,5 +1,11 @@
 Revision history for Dist-PolicyFiles
 
+0.03    2025/10/27
+
+      - Adapted Makefile.PL
+      - Added constant INTERNAL_CONTRIB_MD to Dist::PolicyFiles.
+      - Corrected POD
+
 0.02    2025/09/07
 
       - Minor code reformatting.

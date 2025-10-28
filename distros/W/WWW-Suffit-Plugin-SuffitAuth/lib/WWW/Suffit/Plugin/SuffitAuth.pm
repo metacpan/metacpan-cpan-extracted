@@ -375,15 +375,18 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 use Mojo::Base 'Mojolicious::Plugin';
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 use File::stat;
 use Mojo::File qw/path/;
 use Mojo::Util qw/encode md5_sum hmac_sha1_sum/;
 use Mojo::JSON::Pointer;
+
+use Acrux::Util qw/parse_time_offset/;
+
 use WWW::Suffit::Client::V1;
 use WWW::Suffit::Const qw/ :session /;
-use WWW::Suffit::Util qw/json_load json_save parse_time_offset/;
+use WWW::Suffit::Util qw/json_load json_save/;
 
 use constant {
     SUFFITAUTH_PREFIX   => 'suffitauth',

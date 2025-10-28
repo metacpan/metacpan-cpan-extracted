@@ -1,5 +1,9 @@
 # Version/Revision history
 
+1.09 Mon 27 Oct 2025 15:31:14 MSK
+    * WWW::Suffit::Util: Deprecated several functions
+    * WWW::Suffit::RefUtil: Deprecated all functions of this module in favor Acrux::RefUtil
+
 1.08 Sun 14 Apr 2024 18:31:22 MSK
     * Added WWW::Suffit::Cache module
 

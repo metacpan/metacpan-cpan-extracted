@@ -6,7 +6,7 @@ use warnings;
 
 use feature ':5.10';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 
 use Carp;
@@ -18,54 +18,7 @@ use Text::Template;
 use GitHub::Config::SSH::UserData qw(get_user_data_from_ssh_cfg);
 
 
-
-sub new {
-  my $class = shift;
-  my %args = (dir => '.', prefix => q{}, @_);
-  state $allowed = {map {$_ => undef} qw(dir
-                                         email
-                                         full_name
-                                         login
-                                         module
-                                         prefix
-                                         uncapitalize)};
-  $args{uncapitalize} = !!$args{uncapitalize};
-  foreach my $arg (keys(%args)) {
-    croak("$arg: unsupported argument") if !exists($allowed->{$arg});
-    croak("$arg: value is not a scalar") if ref($args{$arg});
-  }
-  delete @args{ grep { !defined $args{$_} } keys %args };
-  do {croak("$_: missing mandatory argument") if !exists($args{$_})} for (qw(login module));
-  my $self = bless(\%args, $class);
-  if (!(exists($self->{email}) && exists($self->{full_name}))) {
-    my $udata = get_user_data_from_ssh_cfg($self->{login});
-    $self->{email} //= $udata->{email2} // $udata->{email}
-      // die("Could not determine email address");      # Should never happen.
-    $self->{full_name} //= $udata->{full_name}
-      // die("Could not determine user's full name");   # Should never happen.
-  }
-  return $self;
-}
-
-
-sub dir          {$_[0]->{dir}}
-sub email        {$_[0]->{email}}
-sub full_name    {$_[0]->{full_name}}
-sub login        {$_[0]->{login}}
-sub module       {$_[0]->{module}}
-sub prefix       {$_[0]->{prefix}}
-sub uncapitalize {$_[0]->{uncapitalize}}
-
-
-sub create_contrib_md {
-  my $self = shift;
-  my $contrib_md_tmpl = shift;
-  croak('Unexpected argument(s)') if @_;
-  croak('Missing --module: no module specified') unless exists($self->{module});
-  my $contrib_md_tmpl_str = defined($contrib_md_tmpl) ?
-    do { local ( *ARGV, $/ ); @ARGV = ($contrib_md_tmpl); <> }
-    :
-    <<'EOT';
+use constant INTERNAL_CONTRIB_MD => <<'EOT';
 # Contributing to This Perl Module
 
 Thank you for your interest in contributing!
@@ -112,6 +65,53 @@ Thank you for helping improve this module!
 EOT
 #Don't append a semicolon to the line above!
 
+
+sub new {
+  my $class = shift;
+  my %args = (dir => '.', prefix => q{}, @_);
+  state $allowed = {map {$_ => undef} qw(dir
+                                         email
+                                         full_name
+                                         login
+                                         module
+                                         prefix
+                                         uncapitalize)};
+  $args{uncapitalize} = !!$args{uncapitalize};
+  foreach my $arg (keys(%args)) {
+    croak("$arg: unsupported argument") if !exists($allowed->{$arg});
+    croak("$arg: value is not a scalar") if ref($args{$arg});
+  }
+  delete @args{ grep { !defined $args{$_} } keys %args };
+  do {croak("$_: missing mandatory argument") if !exists($args{$_})} for (qw(login module));
+  my $self = bless(\%args, $class);
+  if (!(exists($self->{email}) && exists($self->{full_name}))) {
+    my $udata = get_user_data_from_ssh_cfg($self->{login});
+    $self->{email} //= $udata->{email2} // $udata->{email}
+      // die("Could not determine email address");      # Should never happen.
+    $self->{full_name} //= $udata->{full_name}
+      // die("Could not determine user's full name");   # Should never happen.
+  }
+  return $self;
+}
+
+
+sub dir          {$_[0]->{dir}}
+sub email        {$_[0]->{email}}
+sub full_name    {$_[0]->{full_name}}
+sub login        {$_[0]->{login}}
+sub module       {$_[0]->{module}}
+sub prefix       {$_[0]->{prefix}}
+sub uncapitalize {$_[0]->{uncapitalize}}
+
+
+
+sub create_contrib_md {
+  my $self = shift;
+  my $contrib_md_tmpl = shift;
+  croak('Unexpected argument(s)') if @_;
+  croak('Missing --module: no module specified') unless exists($self->{module});
+  my $contrib_md_tmpl_str = defined($contrib_md_tmpl) ?
+    do { local ( *ARGV, $/ ); @ARGV = ($contrib_md_tmpl); <> } : INTERNAL_CONTRIB_MD;
   (my $mod_name = (split(/,/, $self->{module}))[0]) =~ s/::/-/g;
   my $cpan_rt  = "https://rt.cpan.org/NoAuth/ReportBug.html?Queue=$mod_name";
   my $repo = $self->{prefix} . ($self->{uncapitalize} ? lc($mod_name) : $mod_name);
@@ -160,7 +160,7 @@ Dist::PolicyFiles - Generate CONTRIBUTING.md and SECURITY.md
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 
@@ -243,7 +243,8 @@ See also the accessor method of the same name.
 Creates F<CONTRIBUTING.md> in directory C<dir> (see corresponding constructor
 argument). Optional argument I<C<CONTRIB_MD_TMPL>> is the name of a template
 file (see L<Text::Template>) for this policy. If this argument is not
-specified, then the internal default template is used.
+specified, then the internal default template is used (see constant
+I<C<INTERNAL_CONTRIB_MD>>).
 
 The template can use the following variables:
 
@@ -289,7 +290,7 @@ However, there are the following defaults:
 
 User's full name and email address, e.g.:
 
-   John Doe <jd@cpan.org>
+   'John Doe <jd@cpan.org>'
 
 =item C<program>
 
@@ -297,7 +298,7 @@ Module name, see constructor argument C<module>.
 
 =item C<url>
 
-   https://github.com/LOGIN/REPO/blob/main/SECURITY.md
+   'https://github.com/LOGIN/REPO/blob/main/SECURITY.md'
 
 where:
 
@@ -373,6 +374,13 @@ Returns the value passed via the constructor argument C<uncapitalize> or the def
 value (I<C<false>>).
 
 =back
+
+=head2 CONSTANTS
+
+Constant I<C<INTERNAL_CONTRIB_MD>> containes the internal template used to
+create F<CONTRIBUTING.md>. The constant is not exported. If necessary, access
+it as follows: C<Dist::PolicyFiles::INTERNAL_CONTRIB_MD>.
+
 
 
 =head1 AUTHOR

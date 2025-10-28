@@ -18,7 +18,7 @@ configure_requires:
   strict: '0'
   warnings: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,7 +31,7 @@ no_index:
 provides:
   Dist::PolicyFiles:
     file: lib/Dist/PolicyFiles.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   Carp: '0'
   File::Basename: '0'
@@ -45,7 +45,7 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/klaus-rindfrey/perl-dist-policyfiles.git
-version: '0.02'
+version: '0.03'
 x_bugtracker:
   web: https://github.com/klaus-rindfrey/perl-dist-policyfiles/issues
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

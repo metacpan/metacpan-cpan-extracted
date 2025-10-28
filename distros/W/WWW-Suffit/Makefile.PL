@@ -8,6 +8,7 @@ my $build_requires = {
     };
 
 my $prereq_pm = {
+        'Acrux'                 => 0.06,    # Ubuntu = libacrux-perl                RHEL = perl-Acrux
         'Crypt::OpenSSL::RSA'   => 0,       # Ubuntu = libcrypt-openssl-rsa-perl    RHEL = perl-Crypt-OpenSSL-RSA
         'Mojolicious'           => 7.94,    # Ubuntu = libmojolicious-perl          RHEL = perl-Mojolicious
     };

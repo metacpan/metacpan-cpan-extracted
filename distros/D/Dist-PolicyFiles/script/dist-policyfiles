@@ -240,6 +240,9 @@ B<Note>: the one-letter abbreviation for this is upper case B<C<-V>>.
 =head1 SEE ALSO
 
 L<Dist::PolicyFiles>,
+L<GitHub::Config::SSH::UserData>,
+L<Software::Security::Policy::Individual>,
+L<Text::Template>
 
 
 =head1 AUTHOR

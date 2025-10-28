@@ -17,13 +17,8 @@ has server => sub {
 
     my $opts = {address => '127.0.0.1', %{$self->srv_opts}};
 
-    if (defined(my $fd = $self->fd)) {
-        $opts->{fd} = $fd;
-    }
-    else {
-        $opts->{port}  = $self->port;
-        $opts->{reuse} = 1;
-    }
+    if   (defined(my $fd = $self->fd)) { $opts->{fd}   = $fd }
+    else                               { $opts->{port} = $self->port }
 
     $self->ioloop->server(
         $opts => sub {

@@ -125,7 +125,7 @@ Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<g
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2023 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2025 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -138,9 +138,9 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 use Mojo::Base 'Mojolicious::Plugin';
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
-use WWW::Suffit::RefUtil qw/ is_array_ref is_hash_ref isnt_void is_int8 /;
+use Acrux::RefUtil qw/ is_array_ref is_hash_ref isnt_void is_int8 /;
 
 sub register {
     my ($self, $app, $opts) = @_; # $self = $plugin

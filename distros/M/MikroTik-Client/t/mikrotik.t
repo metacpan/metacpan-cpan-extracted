@@ -37,7 +37,7 @@ my $api = MikroTik::Client->new(
 my $res;
 
 # check connection
-$api->port(0);
+$api->port(Mojo::IOLoop::Server::generate_port());
 $res = $api->cmd('/resp');
 is int($!), ECONNREFUSED, 'connection error';
 $api->port($port);

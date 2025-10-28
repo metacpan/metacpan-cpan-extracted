@@ -3,12 +3,6 @@
 use warnings;
 use strict;
 
-BEGIN {
-    $ENV{MIKROTIK_CLIENT_CONNTIMEOUT} = 2;
-    $ENV{MOJO_NO_TLS}                 = 1;
-    $ENV{MOJO_REACTOR}                = "MikroTik::Client::Reactor::AE";
-}
-
 use FindBin;
 use lib './';
 use lib "$FindBin::Bin/lib";
@@ -19,6 +13,12 @@ plan skip_all => 'set TEST_AE to enable this test (developer only!)'
     unless $ENV{TEST_AE} || $ENV{TEST_ALL};
 plan skip_all => 'AnyEvent 5.0+ required for this test!'
     unless eval { require AnyEvent; AnyEvent->VERSION('5.0'); 1 };
+
+BEGIN {
+    $ENV{MIKROTIK_CLIENT_CONNTIMEOUT} = 2;
+    $ENV{MOJO_NO_TLS}                 = 1;
+    $ENV{MOJO_REACTOR}                = "MikroTik::Client::Reactor::AE";
+}
 
 use AnyEvent;
 use AnyEvent::Loop;
@@ -50,7 +50,7 @@ my $guard = AnyEvent::post_detect {
 my ($err, $res);
 
 # check connection
-$api->port(0);
+$api->port(Mojo::IOLoop::Server::generate_port());
 $res = $api->cmd('/resp');
 ok $! == ECONNREFUSED, 'connection error';
 $api->port($port);

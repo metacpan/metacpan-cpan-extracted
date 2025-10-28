@@ -9,10 +9,6 @@ use utf8;
 
 WWW::Suffit::UserAgent - Suffit API user agent library
 
-=head1 VERSION
-
-Version 1.00
-
 =head1 SYNOPSIS
 
     use WWW::Suffit::UserAgent;
@@ -322,7 +318,7 @@ Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<g
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2023 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2025 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -333,7 +329,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 use Mojo::UserAgent;
 use Mojo::UserAgent::Proxy;
@@ -342,7 +338,7 @@ use Mojo::URL;
 use Mojo::Util qw/steady_time b64_encode/;
 
 use WWW::Suffit::Const qw/ DEFAULT_URL TOKEN_HEADER_NAME /;
-use WWW::Suffit::Util qw/ fbytes fduration /;
+use Acrux::Util qw/ fbytes fduration /;
 
 use constant {
         MAX_REDIRECTS       => 10,

@@ -71,7 +71,7 @@ EOS
     );
 }
 else {
-    my $write_makefile = 0;
+    my $write_makefile = 1; # FIX THIS XXX
     my ($tcl_incspec, $tcl_libspec, $tk_libspec, $defs, $libs);
 
     if ($^O eq 'cygwin' or $^O eq 'linux' or $^O eq 'darwin') {
@@ -80,7 +80,7 @@ else {
 	chdir "build";
 	print STDERR "doing configure; make";
 	if (1) {
-	    system("../../configure") ||
+	    system("sh ../../configure") ||
 	    system("make") || ($write_makefile=1);
 	} else {
 	    $write_makefile=1;
@@ -126,7 +126,7 @@ else {
 
 
     # read tcl compile options
-    my $DEFS = "$defs -DUSE_TCL_STUBS=1 -DUSE_TK_STUBS=1"=~y/\\//dr;
+    my $DEFS = "$defs -DUSE_TCL_STUBS=1 -DUSE_TK_STUBS=1";
 print STDERR "(tcl_incspec,tcl_libspec,tk_libspec)=($tcl_incspec, $tcl_libspec, $tk_libspec)\n";
     open my $fh_out, ">treectrl.pm";
     print $fh_out <<'EOS';

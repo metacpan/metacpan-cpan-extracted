@@ -1,3 +1,9 @@
+v0.610
+    - Add AnyEvent adaptor for Mojo::IOLoop for backward compatibility
+
+v0.601
+    - Fix contact e-mail
+
 v0.600
     - Switch back to Mojo::IOLoop for event loop backend
     - Update some links and contact info

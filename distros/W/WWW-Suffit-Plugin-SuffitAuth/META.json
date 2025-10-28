@@ -33,6 +33,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Acrux" : "0.06",
             "Mojolicious" : "7.94",
             "WWW::Suffit" : "1.08",
             "WWW::Suffit::Client" : "1.02",
@@ -52,6 +53,6 @@
          "web" : "https://sourceforge.net/p/www-suffit-plugin-suffitauth/code/ci/master/tree/"
       }
    },
-   "version" : "1.03",
+   "version" : "1.04",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

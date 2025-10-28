@@ -17,7 +17,7 @@ use constant DEBUG        => $ENV{MIKROTIK_CLIENT_DEBUG} || 0;
 use constant MOJO_TLS_OPTS => !!
     eval { require Mojolicious; Mojolicious->VERSION('8.72'); 1 };
 
-our $VERSION = 'v0.610';
+our $VERSION = 'v0.611';
 
 has ca        => sub { $ENV{MIKROTIK_CLIENT_CA} };
 has cert      => sub { $ENV{MIKROTIK_CLIENT_CERT} };
@@ -341,7 +341,7 @@ non-blocking ones. Since both L<Mojo::IOLoop> and L<AnyEvent> prefer using L<EV>
 when it's available, it should not really matter which one starts an event loop.
 
 For other event systems you can set C<MOJO_REACTOR> environment variable to
-C<MikroTik::Client::Reactor::AE>. It would force L<Mojo::IOLoop> play a bit more
+C<MikroTik::Client::Reactor::AE>. It would force L<Mojo::IOLoop> to play a bit more
 nicely with L<AnyEvent>.
 
     BEGIN {
@@ -352,7 +352,7 @@ nicely with L<AnyEvent>.
     use AnyEvent::Loop;
 
     my $done = AE::cv;
-    $api->command('/some/commend' => $done);
+    $api->command('/some/command' => $done);
     $done->recv;
 
 =head1 ATTRIBUTES

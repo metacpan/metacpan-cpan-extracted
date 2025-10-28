@@ -1,6 +1,4 @@
 MANIFEST
-META.json
-META.yml
 Makefile.PL
 Makefile.in
 README.md
@@ -11,6 +9,9 @@ license.terms
 pkg.m4
 test-for-tk.tcl
 winrc.m4
+
+demo.pl
+test.pl
 
 demos/biglist.tcl
 demos/bitmaps.tcl
@@ -173,3 +174,5 @@ win/rules.vc
 win/targets.vc
 win/tkWinTree.c
 
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
