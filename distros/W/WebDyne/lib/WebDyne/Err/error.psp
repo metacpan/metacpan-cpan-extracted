@@ -616,7 +616,17 @@ sub err_display {
 
         #  Get environment
         #
-        my $webdyne_constant_dumper=Data::Dumper->Dump([\%WebDyne::Constant::Constant], ['WebDyne::Constant']);
+        #my $webdyne_constant_dumper=Data::Dumper->Dump([\%WebDyne::Constant::Constant], ['WebDyne::Constant']);
+        
+        
+        #  Update - take from WebDyne module vars, don't trust hasn't changed from Constants file
+        #
+        my %constant;
+        while (my ($k, $cv) = each %WebDyne::Constant) {
+            my $wv=${"WebDyne::${k}"};
+            $constant{$k}=($cv eq $wv) ? $wv : "$wv [$cv]";
+        }
+        my $webdyne_constant_dumper=Data::Dumper->Dump([\%constant], ['WebDyne::Constant']);
         $webdyne_constant_dumper=$cgi_or->escapeHTML($webdyne_constant_dumper);
         $self->render_block('webdyne_constant', webdyne_constant=>$webdyne_constant_dumper );
 

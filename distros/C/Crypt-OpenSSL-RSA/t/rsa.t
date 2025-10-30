@@ -6,7 +6,7 @@ use Crypt::OpenSSL::RSA;
 use Crypt::OpenSSL::Guess qw(openssl_version);
 
 BEGIN {
-    plan tests => 37 + ( UNIVERSAL::can( "Crypt::OpenSSL::RSA", "use_sha512_hash" ) ? 4 * 5 : 0 ) + ( UNIVERSAL::can( "Crypt::OpenSSL::RSA", "use_whirlpool_hash" ) ? 1 * 5 : 0 );
+    plan tests => 67 + ( UNIVERSAL::can( "Crypt::OpenSSL::RSA", "use_sha512_hash" ) ? 4 * 5 : 0 ) + ( UNIVERSAL::can( "Crypt::OpenSSL::RSA", "use_whirlpool_hash" ) ? 1 * 5 : 0 );
 }
 
 sub _Test_Encrypt_And_Decrypt {
@@ -37,16 +37,17 @@ sub _Test_Sign_And_Verify {
     my $sig = eval { $rsa->sign($plaintext) };
   SKIP: {
         skip "OpenSSL error: illegal or unsupported padding mode - $hash", 5 if $@ =~ /illegal or unsupported padding mode/i;
-        ok( $rsa_pub->verify( $plaintext, $sig ) );
+        skip "OpenSSL error: invalid digest - $hash", 5 if $@ =~ /invalid digest/i;
+        ok( $rsa_pub->verify( $plaintext, $sig ), "rsa_pub verify $hash");
 
         my $false_sig = unpack "H*", $sig;
         $false_sig =~ tr/[a-f]/[0a-d]/;
-        ok( !$rsa_pub->verify( $plaintext, pack( "H*", $false_sig ) ) );
-        ok( !$rsa->verify( $plaintext, pack( "H*", $false_sig ) ) );
+        ok( !$rsa_pub->verify( $plaintext, pack( "H*", $false_sig ) ), "rsa_pub do not verify invalid $hash" );
+        ok( !$rsa->verify( $plaintext, pack( "H*", $false_sig ) ), "rsa do not verify invalid $hash" );
 
         my $sig_of_other = $rsa->sign("different");
-        ok( !$rsa_pub->verify( $plaintext, $sig_of_other ) );
-        ok( !$rsa->verify( $plaintext, $sig_of_other ) );
+        ok( !$rsa_pub->verify( $plaintext, $sig_of_other ), "rsa_pub do not verify unmatching message" );
+        ok( !$rsa->verify( $plaintext, $sig_of_other ), "rsa do not verify unmatching message");
     }
 }
 
@@ -69,8 +70,8 @@ Crypt::OpenSSL::RSA->import_random_seed();
 
 ok( Crypt::OpenSSL::RSA->generate_key(512)->size() * 8 == 512 );
 
-my $rsa = Crypt::OpenSSL::RSA->generate_key(1024);
-ok( $rsa->size() * 8 == 1024 );
+my $rsa = Crypt::OpenSSL::RSA->generate_key(2048);
+ok( $rsa->size() * 8 == 2048 );
 ok( $rsa->check_key() );
 
 $rsa->use_no_padding();
@@ -121,31 +122,38 @@ _check_for_croak(
 
 $plaintext .= $plaintext x 5;
 
-# check signature algorithms
-$rsa->use_md5_hash();
-$rsa_pub->use_md5_hash();
-_Test_Sign_And_Verify( $plaintext, $rsa, $rsa_pub, "md5" );
+my @paddings = qw/pkcs1_oaep pkcs1_pss/;
+foreach my $padding (@paddings) {
+  my $p = "use_${padding}_padding";
 
-$rsa->use_sha1_hash();
-$rsa_pub->use_sha1_hash();
-_Test_Sign_And_Verify( $plaintext, $rsa, $rsa_pub, "sha1" );
+  $rsa->$p;
+  $rsa_pub->$p;
+  # check signature algorithms
+  $rsa->use_md5_hash();
+  $rsa_pub->use_md5_hash();
+  _Test_Sign_And_Verify( $plaintext, $rsa, $rsa_pub, "md5 with $padding padding" );
 
-if ( UNIVERSAL::can( "Crypt::OpenSSL::RSA", "use_sha512_hash" ) ) {
+  $rsa->use_sha1_hash();
+  $rsa_pub->use_sha1_hash();
+  _Test_Sign_And_Verify( $plaintext, $rsa, $rsa_pub, "sha1 with $padding padding" );
+
+  if ( UNIVERSAL::can( "Crypt::OpenSSL::RSA", "use_sha512_hash" ) ) {
     $rsa->use_sha224_hash();
     $rsa_pub->use_sha224_hash();
-    _Test_Sign_And_Verify( $plaintext, $rsa, $rsa_pub, "sha224" );
+    _Test_Sign_And_Verify( $plaintext, $rsa, $rsa_pub, "sha224 with $padding padding" );
 
     $rsa->use_sha256_hash();
     $rsa_pub->use_sha256_hash();
-    _Test_Sign_And_Verify( $plaintext, $rsa, $rsa_pub, "sha256" );
+    _Test_Sign_And_Verify( $plaintext, $rsa, $rsa_pub, "sha256 with $padding padding" );
 
     $rsa->use_sha384_hash();
     $rsa_pub->use_sha384_hash();
-    _Test_Sign_And_Verify( $plaintext, $rsa, $rsa_pub, "sha384" );
+    _Test_Sign_And_Verify( $plaintext, $rsa, $rsa_pub, "sha384 with $padding padding" );
 
     $rsa->use_sha512_hash();
     $rsa_pub->use_sha512_hash();
-    _Test_Sign_And_Verify( $plaintext, $rsa, $rsa_pub, "sha512" );
+    _Test_Sign_And_Verify( $plaintext, $rsa, $rsa_pub, "sha512 with $padding padding" );
+  }
 }
 
 my ( $major, $minor, $patch ) = openssl_version();

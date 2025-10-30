@@ -4,7 +4,7 @@
 
 <perl handler="index">
 <header>
-  <h1>Index of <span id="current-path">${rel_cwd}</span></h1>
+  <h1>Index of <span id="current-path">${path_dn}</span></h1>
   <hr>
 </header>
 
@@ -47,6 +47,7 @@ use Cwd qw(realpath);
 
 sub index {
 
+
     #  Index current directory
     #
     my $self=shift();
@@ -55,38 +56,60 @@ sub index {
     #  Get request object
     #
     my $r=$self->r() || 
-      return err('unable to get request object');
+        return err('unable to get request object');
+     my $cgi_or=$self->CGI() ||
+         return err('unable to get CGI object');
 
 
     #  Where do we want to be ? Use File::Spec::Unix rather than URI, 
     #  it's not happy when we don't have a base component.
     #
-    my $rel_cwd=File::Spec::Unix->catdir(grep {$_} ('/', $_{'dn'}));
+    my $path_dn=$self->sanitize_path($cgi_or, ($r->path_info() || $ENV{'PATH_INFO'})) ||
+        return err('unable to get path');
         
     
     #  Now get real dn and check not higher than document root
     #    
-    my $dn_root=$r->document_root();
-    my $dn=File::Spec->catdir($dn_root, split(m{/+}, $_{'dn'}));
-    $dn=realpath($dn);
-    if (!defined($dn) || (index($dn,$dn_root) !=0)) {
-        # Bad person, trying to escape
-        $dn=$dn_root;
+    my $root_dn=$r->document_root();
+    my $full_dn;
+    for (1..2) { # Max 2 loops to check and sanitise path
+        $full_dn=File::Spec->catdir($root_dn, split(m{/+}, $path_dn));
+        $full_dn=realpath($full_dn);
+        if (!defined($full_dn) || (index($full_dn,$root_dn) !=0)) {
+            # Bad person, trying to escape
+            $full_dn=$root_dn;
+            next;
+        }
+        elsif(-f $full_dn) {
+            #  Clicked on a file URL which isn't recognised. Go back to index
+            #
+            $path_dn=dirname($path_dn);
+            next;
+        }
+        last;
+    }
+    
+    
+    #  Reset if things go bad
+    #
+    unless ($full_dn && (-d $full_dn)) {
+        $full_dn=$root_dn;
+        $path_dn='/';
     }
     
     
     #  And iterate over it to get file names and stat info
     #
-    opendir(my $dh, $dn) ||
-        return err("unable to open directory $dn, $!");
+    opendir(my $dh, $full_dn) ||
+        return err("unable to open directory $full_dn, $!");
     my @fn;
     my %fn;
     while (my $fn=readdir($dh)) {
         # Skip any special files, [.],[..] etc.
         next if ($fn=~/^\./);
-        $fn.='/' if (-d File::Spec->catfile($dn, $fn));
-        my $fn_or=stat(File::Spec->catfile($dn,$fn)) || next;
-        debug("fn: $fn");
+        $fn.='/' if (-d File::Spec->catfile($full_dn, $fn));
+        my $fn_or=stat(File::Spec->catfile($full_dn,$fn)) || next;
+        #debug("fn: $fn");
         push @fn, $fn;
         map { $fn{$fn}{$_}=$fn_or->$_ } qw(size mtime);
         $fn{$fn}{'name'}=$fn;
@@ -95,13 +118,11 @@ sub index {
     
     #  Create Parent Directory link unless we're at top level
     #
-    unless (!$_{'dn'}) {
-        my $dn_up=dirname($_{'dn'});
-        $dn_up=undef if ($dn_up eq '/');
-        
+    unless ($path_dn eq '/') {
+        my $parent_dn=dirname($path_dn);
         $self->render_block('index',
             filename   => 'Parent Directory',
-            href       => $dn_up ? "?dn=${dn_up}" : '/',
+            href        => $parent_dn,
             date       => '',
             size       => ''
             
@@ -143,12 +164,11 @@ sub index {
         my $href;
         if ($fn=~m{/$}) {
             #  Dir - add as param
-            my $href_dn=File::Spec->catdir($_{'dn'}, split(m{/+}, $fn));
-            $href="?dn=$href_dn";
+            $href=File::Spec->catdir($path_dn, split(m{/+}, $fn));
         }
-        elsif ($_{'dn'}) {
+        else {
             #  Normal file
-            $href=File::Spec->catfile($_{'dn'}, $fn);
+            $href=File::Spec->catfile($path_dn, $fn);
         }
         
         
@@ -182,7 +202,7 @@ sub index {
     #  And fill out page
     #
     my %param=(
-        rel_cwd         => $rel_cwd,
+        path_dn         => $path_dn,
         timestamp       => strftime('%X', localtime()),
         sec             => sprintf('%.3f', $self->render_time()),
         %sort_href
@@ -244,3 +264,20 @@ sub human_size {
     }
     return $units[$i] ? sprintf("%.1f%s", $size, $units[$i]) : $size;
 }
+
+
+sub sanitize_path {
+
+    my ($self, $cgi_or, $dn)=@_;
+    $dn=$cgi_or->url_decode($dn);
+    $dn =~ s/[\x00-\x1F\x7F]//g;
+    $dn =~ s{//+}{/}g;
+    $dn =~ s{^/*}{/};
+    $dn =~ s{/$}{} unless $dn eq '/';
+    $dn = File::Spec->canonpath($dn);
+    $dn =~ s{[^A-Za-z0-9_\-.\s/]}{}g;
+    $dn ='/' unless $dn =~ m{^/};
+    return $dn;
+    
+}
+    

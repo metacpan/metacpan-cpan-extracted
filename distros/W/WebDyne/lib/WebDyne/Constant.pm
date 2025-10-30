@@ -34,7 +34,7 @@ require Opcode;
 
 #  Version information
 #
-$VERSION='2.017';
+$VERSION='2.018';
 
 
 #  Get mod_perl version. Clear $@ after evals
@@ -350,7 +350,7 @@ my %constant_temp;
     #
     WEBDYNE_HTTP_HEADER => {
 
-        'Content-Type'              => sprintf('%s; %s', @constant_temp{qw(webdyne_content_type_html webdyne_html_charset)}),
+        'Content-Type'              => sprintf('%s; charset=%s', @constant_temp{qw(webdyne_content_type_html webdyne_html_charset)}),
         'Cache-Control'             => 'no-cache, no-store, must-revalidate',
         'Pragma'                    => 'no-cache',
         'Expires'                   => '0',
@@ -543,6 +543,7 @@ sub hashref {
 sub import {
     
     my $class=shift();
+    (my $class_parent=$class)=~s/::Constant$//;
     my $hr=\%{"${class}::Constant"};
     if ($_[0] eq 'dump') {
         local $Data::Dumper::Indent=1;
@@ -553,8 +554,31 @@ sub import {
     else {
 
         my $caller = caller(0);
+        no warnings qw(once);
         while (my($k, $v)=each %{$hr}) {
-            *{"${caller}::${k}"}=\$v;
+            #  Used to do just
+            #  
+            # *{"${caller}::${k}"}=\$v;
+            #
+            #  Make a bit more sophisticated so if the
+            #  var is updated anywhere it is used all 
+            #  modules see + put a hash called Constant in
+            #  the parent module so we don't have to do
+            #
+            #  %WebDyne::Constant::Constant 
+            # 
+            #  now just
+            #
+            #  %WebDyne::Constant
+            #
+            if ($caller eq $class_parent) {
+                *{"${caller}::${k}"}=\$v;
+                *{"${caller}::Constant"}=$hr;
+            }
+            else {
+                *{"${caller}::${k}"}=\${"${class_parent}::${k}"};
+                #*{"${caller}::${k}"}=\${"${class_parent}::${k}"}; # Stop "only used once" warning;
+            }
             next if *{"${caller}::${k}"}{'CODE'};
             next if ref($v);
             if ($v=~/^\d+$/) {

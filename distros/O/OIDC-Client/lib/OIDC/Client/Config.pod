@@ -52,6 +52,17 @@ Stored data can only be accessed in the current request.
 This may be useful for an API which must validate the token
 in the C<Authorization> header for each request (Resource Server).
 
+=item cache
+
+The data is stored in a L<CHI|https://metacpan.org/pod/CHI> cache.
+The cache keys correspond to the names of the audiences.
+
+The L</"provider."provider".cache_config"> configuration entry is used
+to instanciate the CHI object.
+
+You can only use the C<cache> store mode with the C<client_credentials>
+or C<password> grant types.
+
 =back
 
 =head2 provider."provider".proxy_detect
@@ -71,7 +82,27 @@ OIDC client ID supplied by your provider. Mandatory
 OIDC client secret supplied by your provider.
 
 If not present, the secret must be defined in the C<OIDC_${provider}_SECRET>
-environment variable.
+environment variable unless the authentication method is C<none> or C<private_key_jwt>.
+
+=head2 provider."provider".private_jwk_file
+
+Path to the private JWK file, used when using the C<private_key_jwt> client
+authentication method.
+
+=head2 provider."provider".private_jwk
+
+Perl HASH ref with JWK key structure, used when using the C<private_key_jwt> client
+authentication method.
+
+=head2 provider."provider".private_key_file
+
+Path to the private RSA key file when using the C<private_key_jwt> client
+authentication method.
+
+=head2 provider."provider".private_key
+
+String of the private RSA key file when using the C<private_key_jwt> client
+authentication method.
 
 =head2 provider."provider".audience
 
@@ -126,6 +157,11 @@ in order to authenticate the user.
 Endpoint on which the backend exchanges an authorization code with a token or refreshes
 a token.
 
+=item introspection_url
+
+Endpoint on which the resource server can query an authorization server to determine
+the active state of a token.
+
 =item userinfo_url
 
 Endpoint used to retrieve user information.
@@ -177,7 +213,12 @@ The value I<0> means that there is no expiration time for the stored identity
 
 Number of seconds of leeway for a token to be considered expired before it actually is.
 
-=head2 provider."provider".decode_jwt
+=head2 provider."provider".max_id_token_age
+
+Maximum number of seconds for an ID token to be considered too old during validation
+by the current client application, after the user has been authenticated with the provider.
+
+=head2 provider."provider".jwt_decoding_options
 
 Options to be transferred to the
 L<Crypt::JWT::decode_jwt()|https://metacpan.org/pod/Crypt::JWT#decode_jwt>
@@ -187,9 +228,51 @@ By default, the transmitted options are :
 
 =over
 
+=item verify_exp: 1
+
+Expiration Time 'exp' claim must be present and valid
+
+=item verify_iat: 1
+
+Issued At 'iat' claim must be present and valid
+
 =item leeway: 60
 
 Clock skew of 1 minute
+
+=back
+
+=head2 provider."provider".client_secret_jwt_encoding_options
+
+Options to be transferred to the
+L<Crypt::JWT::encode_jwt()|https://metacpan.org/pod/Crypt::JWT#encode_jwt>
+function called to encode a JWT token when using the C<client_secret_jwt>
+authentication method.
+
+By default, the transmitted options are :
+
+=over
+
+=item alg: 'HS256'
+
+Encoding algorithm used
+
+=back
+
+=head2 provider."provider".private_key_jwt_encoding_options
+
+Options to be transferred to the
+L<Crypt::JWT::encode_jwt()|https://metacpan.org/pod/Crypt::JWT#encode_jwt>
+function called to encode a JWT token when using the C<private_key_jwt>
+authentication method.
+
+By default, the transmitted options are :
+
+=over
+
+=item alg: 'RS256'
+
+Encoding algorithm used
 
 =back
 
@@ -243,6 +326,26 @@ Tokens are sent in a POST form.
 Defines additional parameters to be sent to the provider when the C<authorize> endpoint
 is called.
 
+=head2 provider."provider".token_validation_method
+
+Defines which method to use for a resource server to validate an access token.
+
+Can take one of these values (C<jwt> by default) :
+
+=over
+
+=item jwt
+
+The L<OIDC::Client::verify_jwt_token()|https://metacpan.org/pod/OIDC::Client#verify_jwt_token(-%25args-)>
+method is used to validate an access token.
+
+=item introspection
+
+The L<OIDC::Client::introspect_token()|https://metacpan.org/pod/OIDC::Client#introspect_token(-%25args-)>
+method is used to validate an access token.
+
+=back
+
 =head2 provider."provider".token_endpoint_grant_type
 
 Defines the C<grant_type> parameter to be sent to the provider when the C<token> endpoint
@@ -260,23 +363,83 @@ Can take one of these values (C<authorization_code> by default) :
 
 =back
 
+=head2 provider."provider".client_auth_method
+
+Defines the authentication method to be used for all the provider endpoints.
+
+Can take one of these values (C<client_secret_basic> by default) :
+
+=over
+
+=item client_secret_basic
+
+The client id and the secret are sent in an C<Authorization> header.
+
+=item client_secret_post
+
+The client id and secret are sent in the POST body.
+
+=item client_secret_jwt
+
+A JWT assertion, signed with the client secret using an HMAC SHA algorithm,
+is generated and sent in the POST body.
+
+=item private_key_jwt
+
+A JWT assertion, signed using a private key in asymmetric cryptography,
+is generated and sent in the POST body.
+
+The private key can be defined with the C<private_key> attribute of the L<OIDC::Client>
+object instance or with one of the following configuration entries :
+
+=item none
+
+The Client does not authenticate itself.
+
+=over
+
+=item private_jwk_file
+
+=item private_jwk
+
+=item private_key_file
+
+=item private_key
+
+=back
+
+=back
+
+You can also redefines the authentication method to be used for each endpoint
+with the C<token_endpoint_auth_method> and C<introspection_endpoint_auth_method>
+configuration entries.
+
 =head2 provider."provider".token_endpoint_auth_method
 
 Defines the authentication method to be used when calling the C<token> endpoint.
 
-Can take one of these values (C<post> by default) :
+Same list of possible values as for the C<client_auth_method> configuration entry.
 
-=over
+=head2 provider."provider".introspection_endpoint_auth_method
 
-=item post
+Defines the authentication method to be used when calling the C<token> endpoint.
 
-The client id and secret are sent in the POST body.
+Same list of possible values as for the C<client_auth_method> configuration entry.
 
-=item basic
+=head2 provider."provider".client_assertion_lifetime
 
-The client id and the secret are sent in an C<Authorization> header.
+Specifies the lifetime, in seconds, of the client assertion JWT generated
+for client authentication methods such as C<client_secret_jwt> and
+C<private_key_jwt>.
 
-=back
+120 seconds by default.
+
+=head2 provider."provider".client_assertion_audience
+
+Defines the audience (C<aud>) claim to include in the client assertion JWT
+used for authentication.
+
+Default: the URL of the endpoint being called.
 
 =head2 provider."provider".username
 
@@ -309,6 +472,28 @@ True by default
 
 Defines additional parameters to be sent to the provider when the C<end_session>
 endpoint is called.
+
+=head2 provider."provider".cache_config
+
+Options to be transferred to the L<CHI|https://metacpan.org/pod/CHI#CONSTRUCTOR>
+constructor when using C<cache> store mode.
+
+By default, the transmitted options are :
+
+=over
+
+=item driver: Memory
+
+In-process memory based cache
+
+This is the least intrusive driver, but you should probably use the one
+that best suits your needs.
+
+=item global: 0
+
+No global datastore in memory.
+
+=back
 
 =head2 provider."provider".mocked_identity
 

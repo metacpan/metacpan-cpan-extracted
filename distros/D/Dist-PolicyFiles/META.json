@@ -22,7 +22,11 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec::Functions" : "0",
+            "autodie" : "0",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "configure" : {
@@ -63,7 +67,7 @@
    "provides" : {
       "Dist::PolicyFiles" : {
          "file" : "lib/Dist/PolicyFiles.pm",
-         "version" : "0.03"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -74,7 +78,7 @@
          "web" : "https://github.com/klaus-rindfrey/perl-dist-policyfiles.git"
       }
    },
-   "version" : "0.03",
+   "version" : "0.05",
    "x_bugtracker" : {
       "web" : "https://github.com/klaus-rindfrey/perl-dist-policyfiles/issues"
    },

@@ -1,0 +1,5 @@
+#  Check inserted under <body> and closed off correctly
+#
+<htmx>
+<p>
+Hello World

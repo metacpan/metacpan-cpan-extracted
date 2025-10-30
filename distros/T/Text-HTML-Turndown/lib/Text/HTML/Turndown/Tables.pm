@@ -1,15 +1,33 @@
-package Text::HTML::Turndown::Tables 0.08;
+package Text::HTML::Turndown::Tables 0.09;
 use 5.020;
 use experimental 'signatures';
 use stable 'postderef';
 use List::MoreUtils 'all';
+
+=head1 NAME
+
+Text::HTML::Turndown::Tables - rules for Markdown Tables
+
+=head1 SYNOPSIS
+
+  use Text::HTML::Turndown;
+  my $turndown = Text::HTML::Turndown->new(%$options);
+  $turndown->use('Text::HTML::Turndown::Tables');
+
+  my $markdown = $convert->turndown(<<'HTML');
+    <table><tr><td>Hello</td><td>world!</td></tr></table>
+  HTML
+  # | Hello | world! |
+  # | ----- | ------ |
+
+=cut
 
 our %RULES = (
 
     tableCell => {
         filter => ['th', 'td'],
         replacement => sub( $content, $node, $options, $context ) {
-          return cell($content, $node);
+          return cell($content, $node, undef);
         },
     },
 
@@ -145,6 +163,7 @@ sub install ($class, $target) {
 }
 
 1;
+
 =head1 REPOSITORY
 
 The public repository of this module is

@@ -1,3 +1,8 @@
+0.015   2025-10-29  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux][cli cut-video-by-duration] Make --start optional (default to 0).
+
+
 0.014   2024-09-22  Released-By: PERLANCAR; Urgency: medium
 
         - Add utility: cut-duration-from-video (vcensor).

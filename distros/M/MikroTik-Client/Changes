@@ -1,3 +1,10 @@
+v0.612
+    - Attempt to fix connection and AnyEvent tests (again)
+
+v0.611
+    - Attempt to fix connection and AnyEvent tests
+    - Use perl implementation for one_tick
+
 v0.610
     - Add AnyEvent adaptor for Mojo::IOLoop for backward compatibility
 

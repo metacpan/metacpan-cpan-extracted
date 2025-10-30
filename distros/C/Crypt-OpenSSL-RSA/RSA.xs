@@ -10,8 +10,10 @@
 #include <openssl/pem.h>
 #include <openssl/rand.h>
 #include <openssl/ripemd.h>
-#if OPENSSL_VERSION_NUMBER < 0x30000000
+#if OPENSSL_VERSION_NUMBER >= 0x10000000 && OPENSSL_VERSION_NUMBER < 0x30000000
+#ifndef LIBRESSL_VERSION_NUMBER
 #include <openssl/whrlpool.h>
+#endif
 #endif
 #include <openssl/rsa.h>
 #include <openssl/sha.h>
@@ -200,10 +202,10 @@ unsigned char* get_message_digest(SV* text_SV, int hash_method)
 {
     STRLEN text_length;
     unsigned char* text;
-#if OPENSSL_VERSION_NUMBER >= 0x30000000L
-    static unsigned char md[EVP_MAX_MD_SIZE];
-#endif
+    unsigned char *md;
+    static unsigned char m[EVP_MAX_MD_SIZE];
     text = (unsigned char*) SvPV(text_SV, text_length);
+    md = m;
 
     switch(hash_method)
     {
@@ -211,36 +213,36 @@ unsigned char* get_message_digest(SV* text_SV, int hash_method)
 #if OPENSSL_VERSION_NUMBER >= 0x30000000L
             return EVP_Q_digest(NULL, "MD5", NULL, text, text_length, md, NULL) ? md : NULL;
 #else
-            return MD5(text, text_length, NULL);
+            return MD5(text, text_length, md);
 #endif
             break;
         case NID_sha1:
-            return SHA1(text, text_length, NULL);
+            return SHA1(text, text_length, md);
             break;
 #ifdef SHA512_DIGEST_LENGTH
         case NID_sha224:
-            return SHA224(text, text_length, NULL);
+            return SHA224(text, text_length, md);
             break;
         case NID_sha256:
-            return SHA256(text, text_length, NULL);
+            return SHA256(text, text_length, md);
             break;
         case NID_sha384:
-            return SHA384(text, text_length, NULL);
+            return SHA384(text, text_length, md);
             break;
         case NID_sha512:
-            return SHA512(text, text_length, NULL);
+            return SHA512(text, text_length, md);
             break;
 #endif
         case NID_ripemd160:
 #if OPENSSL_VERSION_NUMBER >= 0x30000000L
             return EVP_Q_digest(NULL, "RIPEMD160", NULL, text, text_length, md, NULL) ? md : NULL;
 #else
-            return RIPEMD160(text, text_length, NULL);
+            return RIPEMD160(text, text_length, md);
 #endif
             break;
 #ifdef WHIRLPOOL_DIGEST_LENGTH
         case NID_whirlpool:
-            return WHIRLPOOL(text, text_length, NULL);
+            return WHIRLPOOL(text, text_length, md);
             break;
 #endif
         default:
@@ -321,6 +323,10 @@ SV* rsa_crypt(rsaData* p_rsa, SV* p_from,
     size = EVP_PKEY_get_size(p_rsa->rsa);
     CHECK_NEW(to, size, UNSIGNED_CHAR);
 #if OPENSSL_VERSION_NUMBER >= 0x30000000L
+
+    if(p_rsa->padding == RSA_PKCS1_PSS_PADDING)
+        croak("PKCS#1 v2.1 RSA-PSS cannot be used for encryption operations call \"use_pkcs1_oaep_padding\" instead.");
+
     EVP_PKEY_CTX *ctx;
 
     OSSL_LIB_CTX *ossllibctx = OSSL_LIB_CTX_new();
@@ -933,6 +939,12 @@ use_pkcs1_oaep_padding(p_rsa)
   CODE:
     p_rsa->padding = RSA_PKCS1_OAEP_PADDING;
 
+void
+use_pkcs1_pss_padding(p_rsa)
+    rsaData* p_rsa;
+  CODE:
+    p_rsa->padding = RSA_PKCS1_PSS_PADDING;
+
 #if OPENSSL_VERSION_NUMBER < 0x30000000L
 
 void
@@ -968,14 +980,17 @@ sign(p_rsa, text_SV)
     CHECK_OPEN_SSL(ctx);
     CHECK_OPEN_SSL(EVP_PKEY_sign_init(ctx));
     /* FIXME: Issue setting padding in some cases */
-    EVP_PKEY_CTX_set_rsa_padding(ctx, p_rsa->padding);
+    CHECK_OPEN_SSL(EVP_PKEY_CTX_set_rsa_padding(ctx, p_rsa->padding) > 0);
 
     EVP_MD* md = get_md_bynid(p_rsa->hashMode);
     CHECK_OPEN_SSL(md != NULL);
 
     int md_status;
     CHECK_OPEN_SSL((md_status = EVP_PKEY_CTX_set_signature_md(ctx, md)) > 0);
-
+    if (p_rsa->padding == RSA_PKCS1_PSS_PADDING) {
+        CHECK_OPEN_SSL((md_status = EVP_PKEY_CTX_set_rsa_mgf1_md(ctx, md)) > 0);
+        CHECK_OPEN_SSL(EVP_PKEY_CTX_set_rsa_pss_saltlen(ctx, RSA_PSS_SALTLEN_DIGEST) > 0);
+    }
     CHECK_OPEN_SSL(EVP_PKEY_sign(ctx, NULL, &signature_length, digest, get_digest_length(p_rsa->hashMode)) == 1);
 
     //signature = OPENSSL_malloc(signature_length);
@@ -1025,13 +1040,17 @@ PPCODE:
     CHECK_OPEN_SSL(ctx);
     CHECK_OPEN_SSL(EVP_PKEY_verify_init(ctx) == 1);
     /* FIXME: Issue setting padding in some cases */
-    EVP_PKEY_CTX_set_rsa_padding(ctx, p_rsa->padding);
+    CHECK_OPEN_SSL(EVP_PKEY_CTX_set_rsa_padding(ctx, p_rsa->padding) > 0);
 
     EVP_MD* md = get_md_bynid(p_rsa->hashMode);
     CHECK_OPEN_SSL(md != NULL);
 
     int md_status;
     CHECK_OPEN_SSL((md_status = EVP_PKEY_CTX_set_signature_md(ctx, md)) > 0);
+    if (p_rsa->padding == RSA_PKCS1_PSS_PADDING) {
+        CHECK_OPEN_SSL((md_status = EVP_PKEY_CTX_set_rsa_mgf1_md(ctx, md)) > 0);
+        CHECK_OPEN_SSL(EVP_PKEY_CTX_set_rsa_pss_saltlen(ctx, RSA_PSS_SALTLEN_DIGEST) > 0);
+    }
 
     switch (EVP_PKEY_verify(ctx, sig, sig_length, digest, get_digest_length(p_rsa->hashMode)))
 #else

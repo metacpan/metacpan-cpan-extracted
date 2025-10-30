@@ -1,0 +1,3 @@
+#  Check inserted into <body> etc and all closed correctly
+#
+<table><perl>

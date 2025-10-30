@@ -8,7 +8,7 @@ Markup text to ANSI encoder
 
 ## Usage
 
-**ansi-encode** [options] [text file name]
+**ansi-encode** [options] [File or Search]
 
 It is HIGHLY encouraged for your terminal be set as UTF-8 for the advanced features in this module/utility.
 
@@ -62,6 +62,8 @@ Tokens have to be encapsulated inside [% token %] (the token must be surrounded 
 NOTE:  Use "less -r" to view ANSI in "less"
 
 ### GENERAL
+
+Please use the "-t" option to see all of the tokens.  This is only a partial list.
 
 | **Token** | **Description** |
 | --- | --- |
@@ -181,4 +183,3 @@ NOTE:  Use "less -r" to view ANSI in "less"
 | HORIZONTAL RULE BRIGHT MAGENTA | A solid line of bright magenta background |
 | HORIZONTAL RULE BRIGHT CYAN  | A solid line of bright cyan background |
 | HORIZONTAL RULE BRIGHT WHITE | A solid line of bright white background |
-

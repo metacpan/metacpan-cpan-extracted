@@ -12,8 +12,10 @@ t/03_emoji_filter.t
 t/04_debug_mode.t
 t/05_deep_nested.t
 t/06_syntax_variations.t
+t/07_apply_plugin.t
 t/examples/README.md
 t/examples/basic.t
+t/examples/complicated.t
 t/examples/deep_nested.t
 t/examples/edge_cases.t
 t/examples/emoji.t

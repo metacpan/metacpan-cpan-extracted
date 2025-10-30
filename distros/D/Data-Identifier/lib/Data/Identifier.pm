@@ -19,7 +19,7 @@ use Carp;
 use Math::BigInt lib => 'GMP';
 use URI;
 
-our $VERSION = v0.21;
+our $VERSION = v0.22;
 
 use constant {
     RE_UUID => qr/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/,
@@ -314,9 +314,22 @@ sub new {
             } elsif ($id->isa('File::FStore::File') || $id->isa('File::FStore::Adder') || $id->isa('File::FStore::Base')) {
                 $type = 'ise';
                 $id = $id->contentise;
+            } elsif ($id->isa('SIRTX::Datecode')) {
+                $id = $id->as('Data::Identifier');
+                unless (scalar(keys %opts)) {
+                    return $id->as('Data::Identifier');
+                }
+                $type = $id->type;
+                $id   = $id->id;
             } elsif ($id->isa('Business::ISBN')) {
                 $type = $well_known{gtin};
                 $id   = $id->as_isbn13->as_string([]);
+            } elsif ($id->isa('Data::Identifier::Interface::Simple')) {
+                # TODO: We cannot call $id->as('Data::Identifier') here as much as that would be fun,
+                #       as this might in turn call exactly this code again resulting in a deep recursion.
+                #       A future version might come up with some trick here.
+                $type = 'ise';
+                $id   = $id->ise;
             } else {
                 croak 'Unsupported input data';
             }
@@ -652,6 +665,12 @@ sub as {
         return $opts{extractor}->lookup($self->type->uuid => $self->id);
     } elsif ($as eq 'Data::URIID::Service' && defined($opts{extractor})) {
         return $opts{extractor}->service($self->uuid);
+    } elsif ($as eq 'SIRTX::Datecode' && eval {
+            require SIRTX::Datecode;
+            SIRTX::Datecode->VERSION(v0.03);
+            1;
+        }) {
+        return SIRTX::Datecode->new(from => $self);
     } elsif ($as eq 'Data::URIID::Colour' && eval {
             require Data::URIID;
             require Data::URIID::Colour;
@@ -919,7 +938,7 @@ Data::Identifier - format independent identifier object
 
 =head1 VERSION
 
-version v0.21
+version v0.22
 
 =head1 SYNOPSIS
 
@@ -1011,6 +1030,8 @@ L<Data::Identifier>,
 L<Data::URIID::Colour>, L<Data::URIID::Service>, L<Data::URIID::Result>,
 L<Data::TagDB::Tag>,
 L<File::FStore::Base> (see limitations of L<File::FStore::Base/contentise>),
+L<SIRTX::Datecode>,
+L<Data::Identifier::Interface::Simple>,
 and L<Business::ISBN>. If C<$id> is not a reference it is parsed as with C<ise>.
 
 The following type names are currently well known:
@@ -1248,6 +1269,7 @@ L<Data::URIID::Result>,
 L<Data::URIID::Service>,
 L<Data::TagDB::Tag>,
 L<File::FStore::File> (requires version v0.03 or later),
+L<SIRTX::Datecode> (requires version v0.03 or later),
 L<Business::ISBN>.
 Other packages might be supported. Packages need to be installed in order to be supported.
 Also some packages need special options to be passed to be available.

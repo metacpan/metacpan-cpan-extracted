@@ -1,5 +1,8 @@
 Revision history for Perl extension DBIx::DataModel.
 
+v3.14 28.10.2025
+  - fix missing file in MANIFEST
+
 v3.13 25.10.2025
   - fix documentation bug in Quickstart.pod (Graham Knop++)
   - new feature: select(..., -result_as => [correlated_update => \%columns_to_set]);

@@ -1,0 +1,11 @@
+Revision history for Perl extension Text::Fab.
+
+0.01		  Fri Sep  5 07:50:43 2025
+	- original version; created by h2xs 1.23 with options
+		-Xn Text::Fab
+
+	A lot of technical work on the stub implementation, documentation and the test suite was passed to Gemini 2.5 Pro
+		(with 32K thinking budget + very delicate system instructions).
+
+	The implementation supports the most basic parts of processing pipeline only.  Only the pure-config__* subsystem is
+	covered by the test suite.

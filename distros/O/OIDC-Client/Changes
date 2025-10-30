@@ -1,5 +1,19 @@
 Changes for OIDC-Client distribution
 
+1.05 2025-10-28
+  - Possible configuration breaking change : 'post' and 'basic' auth methods are renamed to 'client_secret_basic' and 'client_secret_post'
+  - Possible configuration breaking change : 'client_secret_basic' becomes the default client authentication method
+  - OIDC::Client::verify_token() is deprecated in favor of OIDC::Client::verify_jwt_token()
+  - Added support for 'introspection' token validation method
+  - Added support for 'client_secret_jwt', 'private_key_jwt' and 'none' client authentication methods
+  - Added support for the 'cache' store (only for 'client_credentials' and 'password' grant types)
+  - Added check of the access token's 'at_hash' against the ID token's 'at_hash' claim if present
+  - Renewed ID token : no nonce from provider is accepted
+  - Renewed ID token : 'sub' claim must be the same as in the original ID token
+  - JWT validation : 'exp' and 'iat' claims must be present (and valid)
+  - Fix token exchange without a refresh token in the response
+  - Explicitly accepts 'application/json' for all requests to the provider
+
 1.04 2025-09-12
   - Fix for token refresh : the 'refresh_scope' config should only be used for the current audience
 

@@ -1,3 +1,16 @@
+v0.05  2025-10-29Z
+    - Added eq(), cmp(), assert_16bit()
+    - Improved documentation
+
+v0.04  2025-10-28Z
+    - Converted internal structure to support more complex operations
+    - Inherit from Data::Identifier::Interface::Userdata again
+    - Added more tests
+    - Added year(), month(), and day()
+    - Added support for as('DateTime')
+    - Cache Data::Identifier calculation
+    - Inherit from Data::Identifier::Interface::Simple
+
 v0.03  2025-10-27Z
     - Improved documentation
     - Added support for more from types: DateTime, SIRTX::Datecode, Data::Identifier

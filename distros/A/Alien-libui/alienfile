@@ -16,15 +16,22 @@ share {
 
     # download ['https://github.com/libui-ng/libui-ng/archive/refs/heads/master.zip'];
     plugin Extract => 'tar.gz';
+    my $build_dir = '_build';
     build [
-        [   '%{meson}', 'setup', '-Dtests=false', '-Dexamples=false', '--buildtype=release',
-            '--default-library=shared',
+        sub {
+            my $build = shift;
+            Alien::Build::CommandSequence->new(
+                [   Alien::Meson->exe, 'setup', $build_dir,
 
-            #'--default-library=' . ( $win32 ? 'static' : 'shared' ),
-            #'--backend=ninja',
-            '--prefix=%{.install.prefix}', 'build'
-        ],
-        [ '%{meson}', 'install', '-C', 'build' ],
+                    #'-Dtests=false', '-Dexamples=false',
+                    '--buildtype=release', '--default-library=shared',
+                    '--prefix=%{.install.prefix}',
+                ]
+            )->execute($build);
+        },
+        [ '%{ninja}', qw(-C), $build_dir ],
+        [ '%{ninja}', qw(-C), $build_dir, "test" ],
+        [ '%{ninja}', qw(-C), $build_dir, 'install' ],
     ];
 
     #gather [

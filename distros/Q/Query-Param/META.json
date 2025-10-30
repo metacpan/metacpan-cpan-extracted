@@ -4,7 +4,7 @@
       "Rob Lauer <rlauer6@comcast.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -47,7 +47,7 @@
    "provides" : {
       "Query::Param" : {
          "file" : "lib/Query/Param.pm",
-         "version" : "0.02"
+         "version" : "v1.0.0"
       }
    },
    "release_status" : "stable",
@@ -63,6 +63,6 @@
          "web" : "http://github.com/rlauer6/query-param"
       }
    },
-   "version" : "0.02",
+   "version" : "v1.0.0",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

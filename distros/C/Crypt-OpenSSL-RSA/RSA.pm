@@ -5,7 +5,7 @@ use warnings;
 
 use Carp;    # Removing carp will break the XS code.
 
-our $VERSION = '0.35';
+our $VERSION = '0.37';
 
 use XSLoader;
 XSLoader::load 'Crypt::OpenSSL::RSA', $VERSION;
@@ -245,7 +245,7 @@ Encrypting user data directly with RSA is insecure.
 
 PKCS #1 v1.5 padding has been disabled as it is nearly impossible to use this
 padding method in a secure manner.  It is known to be vulnerable to timing
-based side channel attacks.  use_pkcs1_padding() results in a fatal error. 
+based side channel attacks.  use_pkcs1_padding() results in a fatal error.
 
 L<Marvin Attack|https://github.com/tomato42/marvin-toolkit/blob/master/README.md>
 
@@ -255,6 +255,16 @@ Use C<EME-OAEP> padding as defined in PKCS #1 v2.0 with SHA-1, MGF1 and
 an empty encoding parameter. This mode of padding is recommended for
 all new applications.  It is the default mode used by
 C<Crypt::OpenSSL::RSA>.
+
+=item use_pkcs1_pss_padding
+
+Use C<RSA-PSS> padding as defined in PKCS#1 v2.1.  In general, RSA-PSS
+should be used as a replacement for RSA-PKCS#1 v1.5.  The module specifies
+the message digest being requested and the appropriate mgf1 setting and
+salt length for the digest.
+
+B<Note>: RSA-PSS cannot be used for encryption/decryption and results in a
+fatal error.  Call C<use_pkcs1_oaep_padding> for encryption operations. 
 
 =item use_sslv23_padding
 

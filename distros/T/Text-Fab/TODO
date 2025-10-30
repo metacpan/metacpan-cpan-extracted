@@ -1,0 +1,73 @@
+﻿The error messages are not yet in the described format.
+
+Docs are not cleaned up (mark these by “???”!); and parts are still missing.
+
+The implementation (when it exists) has not been cleaned up yet.
+
+MISS: input__end($n) with $n==0 ending the current input stream, or also $n enclosing streams.
+
+MISS: need to specify what happens with a group on input__end(): survives / should be closed before / close-if-still-open.
+
+MISS: input__end_to($group_type): end input of the files opened up to the the opened-latest-group of the given type.
+
+  Likewise for “closing enclosed groups”???  Join together into 1 API by introducing suitable groups???
+
+    May run forever???  Even the language if group__start, group_end, group__postpone (with the arguments to the last command
+    restricted to these 3 calls) is probably Turing complete???
+
+MISS: _-prefixed versions of config__*() which check the prefix _ __ ___ of the key and make it read/write only.
+
+MISS: pipelining preprocessor with “filters”: filters consists of 3 components: preprocessor, massaging of promises, and the
+      concatenator of the resulting candidates-for-sections.
+
+When undoing, undo data should be guarded, at least up to the exit.
+
+Uplevel w.r.t. the recursion stack should be recalculated into the usual uplevels; a special do-nothing group may be used.
+
+allow not 1 active preprocessor engine, but a stack of them, chained, and have a cfg__pop() primitive method.
+
+Macros are templates marked as OK-to-be-ignored.
+
+Hash to mark macros as “types”, with per-type-warning configurable?  Which way to hash, types to macros, or macros to types, or
+pairs???
+
+An extra parameter $is_replay for the syntax callbacks for the non-first pass.  (Probably, the boundary of the preceding pass cannot
+be part of this???
+
+hash keys.  Setting/getting them employs a serialization method, by default JSON???
+
+==== uplevel should allow execution AFTER the group is closed
+
+There should be an indicator that a method is called “from” before/after uplevel.  If uplevel is called “uplevel”ed, it should
+only register the requests,; at end of the enclosing processing of the uplevevel-ed stuff, these postponed commands should be
+executed (reversing order again???).
+
+  Should reversing of order be customizable, and in which order one should put the inverted group and the non-inverted group????
+  Probably better to have more than 2 types, and for every “type” have the pre/post specified, and whether upleveling from the
+  group reverses the order???
+
+  The type is a Unicode string starting with either PRE-, or post-, and sorting as if it is appended by ".000"… with an infinite
+  number of characters '0' (but before the possible suffix "-inv".  Then sorting lexicographically (with actual closing happening
+  between PRE- and post-, and -inv groups inverted gives the order of execution.  (Still: inversion of postponed postpones???)
+
+  When sorting, one can literally pad by ".0"* up to the maximal length of the name of existening groups + 1!
+
+    Note that "string#" comes before "string" for any value of "string", and different strings “sort differently”!
+
+#unset — but maybe it is going to make undo harder???
+
+Recursive invocation is needed for massaging data between different level:
+  • The hash
+  • Input file names
+  • Input strings
+  • Output sections
+
+#unset — but maybe it is going to make undo harder???
+
+A top→down approach to recognizing the “reconfiguration directives”: but cannot
+we support a bottom→up approach too, when the preprocessor recognizes interlaced
+directives?  How to deal with recursion: return an indicator that the state
+changed?  But it is changing permanently, one needs to filter out changes — but how
+the internal calls know the filters needed for the enclosing calls???
+
+the preprocessor needs a guarantee that it is going to be reentered

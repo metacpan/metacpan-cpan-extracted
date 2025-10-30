@@ -1,5 +1,14 @@
 Revision history for Perl extension re::engine::Lua.
 
+0.22  Wed Oct 29 15:30:00 2025
+	- fix change in regex engine plugin API
+
+0.21  Wed Oct 29 09:30:00 2025
+	- fix change in regex engine plugin API
+
+0.20  Tue Oct 28 12:30:00 2025
+	- follow change in regex engine plugin API
+
 0.19  Mon Apr  1 18:30:00 2019
 	- fix test with perl 5.29.9
 		(avoids warning: Variable length lookbehind is experimental in regex)

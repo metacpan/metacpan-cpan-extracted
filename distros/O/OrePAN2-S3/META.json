@@ -4,7 +4,7 @@
       "Rob Lauer <rlauer6@comcast.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -38,6 +38,7 @@
             "Amazon::S3" : "0",
             "Archive::Tar" : "0",
             "CLI::Simple" : "0",
+            "DarkPAN::Utils" : "0",
             "JSON" : "0",
             "OrePAN2::Index" : "0",
             "Readonly" : "0",
@@ -55,7 +56,7 @@
    "provides" : {
       "OrePAN2::S3" : {
          "file" : "lib/OrePAN2/S3.pm",
-         "version" : "0.03"
+         "version" : "v1.0.4"
       }
    },
    "release_status" : "stable",
@@ -71,6 +72,6 @@
          "web" : "http://github.com/rlauer6/orepan2-s3"
       }
    },
-   "version" : "0.03",
+   "version" : "v1.0.4",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

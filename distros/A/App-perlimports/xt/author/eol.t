@@ -49,6 +49,7 @@ my @files = (
     't/fully-qualified.t',
     't/func-in-use.t',
     't/func-in-var.t',
+    't/function-reference.t',
     't/geo-ip.t',
     't/hash-in-regex.t',
     't/hash-key-expression.t',

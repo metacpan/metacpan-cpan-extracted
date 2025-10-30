@@ -1,0 +1,3 @@
+<api handler pattern='/'>
+__PERL__
+sub handler { {} }

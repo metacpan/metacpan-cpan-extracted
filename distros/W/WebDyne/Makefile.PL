@@ -140,6 +140,14 @@ doc_xml_tidy:
 	find bin -type f -name '*.xml' -exec $(XML_TIDY) _ {} \;
 	find lib -type f -name '*.xml' -exec $(XML_TIDY) _ {} \;
 
+filter_scripts :
+	@for f in $(EXE_FILES); do \
+	echo "Applying PM_FILTER to $$f..."; \
+		cat $$f | $(PM_FILTER) > blib/script/`basename $$f`; \
+	done
+
+pure_all :: filter_scripts
+
 END
     return $postamble;
 }

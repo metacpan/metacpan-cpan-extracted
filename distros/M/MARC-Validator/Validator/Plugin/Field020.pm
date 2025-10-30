@@ -9,7 +9,7 @@ use English;
 use Error::Pure::Utils qw(err_get);
 use MARC::Validator::Utils qw(add_error);
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 sub name {
 	my $self = shift;

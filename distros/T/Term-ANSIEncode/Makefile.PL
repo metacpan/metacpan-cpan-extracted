@@ -21,7 +21,7 @@ if (-e 'Makefile') {
 
 # ANSI Encode
 my $banner = slurp_file('examples/banner.vt');
-print $banner, colored(['green'], 'ok'), "\n";
+print $banner, "\n";
 
 WriteMakefile(
     NAME               => 'Term::ANSIEncode',

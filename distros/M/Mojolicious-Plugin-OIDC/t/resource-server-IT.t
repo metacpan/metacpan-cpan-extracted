@@ -12,8 +12,8 @@ get('/my-resource' => sub {
       my $c = shift;
 
       my $user = try {
-        $c->oidc->verify_token();
-        return $c->oidc->build_user_from_userinfo();
+        my $access_token = $c->oidc->verify_token();
+        return $c->oidc->build_user_from_claims($access_token->claims);
       }
       catch {
         $c->log->warn("Token/User validation : $_");
@@ -31,39 +31,36 @@ get('/my-resource' => sub {
     });
 
 # provider server routes
-get('/userinfo' => sub {
+get('/jwks' => sub {
       my $c = shift;
-
-      my $authorization = $c->req->headers->authorization;
-
-      if ($authorization eq 'Bearer Doe') {
-        $c->render(json => {
-          sub       => 'DOEJ',
-          firstName => 'John',
-          lastName  => 'Doe',
-          roles     => [qw/app.role1 app.role2/],
-        });
-      }
-      elsif ($authorization eq 'Bearer Smith') {
-        $c->render(json => {
-          sub       => 'SMITHL',
-          firstName => 'Liam',
-          lastName  => 'Smith',
-          roles     => [qw/app.role3/],
-        });
-      }
-      else {
-        $c->render(json => {error             => 'SearchError',
-                            error_description => 'User not found'},
-                   status => 404);
-      }
+      $c->render(json => {});
     });
 
-my $mock_oidc_client = Test::MockModule->new('OIDC::Client');
-$mock_oidc_client->redefine('kid_keys'    => sub { {} });
-
-my $mock_access_token = Test::MockModule->new('OIDC::Client::AccessToken');
-$mock_access_token->redefine('has_expired' => sub { 0 });
+my $mock_crypt_jwt = Test::MockModule->new('Crypt::JWT');
+$mock_crypt_jwt->redefine('decode_jwt' => sub {
+  my %params = @_;
+  my %claims = $params{token} eq 'Doe'
+                 ? (iss       => 'my_issuer',
+                    exp       => 12345,
+                    aud       => 'my_id',
+                    sub       => 'DOEJ',
+                    firstName => 'John',
+                    lastName  => 'Doe',
+                    roles     => [qw/app.role1 app.role2/])
+             : $params{token} eq 'Smith'
+                 ? (iss       => 'my_issuer',
+                    exp       => 12345,
+                    aud       => 'my_id',
+                    sub       => 'SMITHL',
+                    firstName => 'Liam',
+                    lastName  => 'Smith',
+                    roles     => [qw/app.role3/])
+             : die 'invalid token';
+  return (
+    $params{decode_header} ? {} : (),
+    \%claims,
+  );
+});
 
 plugin 'OIDC' => {
   provider => {
@@ -73,7 +70,6 @@ plugin 'OIDC' => {
       issuer       => 'my_issuer',
       secret       => 'my_secret',
       role_prefix  => 'app.',
-      userinfo_url => '/userinfo',
       jwks_url     => '/jwks',
       claim_mapping => {
         login     => 'sub',
@@ -85,16 +81,6 @@ plugin 'OIDC' => {
     },
   }
 };
-
-$mock_oidc_client->redefine('decode_jwt' => sub {
-  {
-    'iss'   => 'my_issuer',
-    'exp'   => 12345,
-    'aud'   => 'my_id',
-    'sub'   => 'my_subject',
-    'nonce' => 'fake_uuid',
-  }
-});
 
 my $t = Test::Mojo->new(app);
 

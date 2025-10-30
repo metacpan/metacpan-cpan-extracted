@@ -1,0 +1,299 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Getopt::Long qw(:config no_ignore_case);
+use Pod::Usage;
+use Data::Random::String::Matches;
+
+our $VERSION = '0.02';
+
+# Parse command line options
+my %opts = (
+	count	  => 1,
+	length	 => undef,
+	smart	  => 0,
+	unique	 => 0,
+	separator  => "\n",
+	help	   => 0,
+	man		=> 0,
+	version	=> 0,
+	examples   => 0,
+);
+
+GetOptions(
+	'count|c=i'	 => \$opts{count},
+	'length|l=i'	=> \$opts{length},
+	'smart|s'	   => \$opts{smart},
+	'unique|u'	  => \$opts{unique},
+	'separator|S=s' => \$opts{separator},
+	'help|h|?'	  => \$opts{help},
+	'man|m'		 => \$opts{man},
+	'version|v'	 => \$opts{version},
+	'examples|e'	=> \$opts{examples},
+) or pod2usage(2);
+
+# Handle special options
+if ($opts{version}) {
+	print "random-string version $VERSION\n";
+	exit 0;
+}
+
+pod2usage(1) if $opts{help};
+pod2usage(-exitval => 0, -verbose => 2) if $opts{man};
+
+if ($opts{examples}) {
+	show_examples();
+	exit 0;
+}
+
+# Get the pattern from command line
+my $pattern = shift @ARGV;
+
+unless (defined $pattern) {
+	print STDERR "Error: Pattern required\n\n";
+	pod2usage(1);
+}
+
+# Validate options
+if ($opts{count} < 1) {
+	die 'Error: count must be at least 1';
+}
+
+# Decode escape sequences in separator
+$opts{separator} =~ s/\\n/\n/g;
+$opts{separator} =~ s/\\t/\t/g;
+$opts{separator} =~ s/\\r/\r/g;
+$opts{separator} =~ s/\\0/\0/g;
+
+# Create generator
+my $gen = eval {
+	Data::Random::String::Matches->new($pattern, $opts{length});
+};
+
+if ($@) {
+	die "Error creating generator: $@";
+}
+
+# Generate strings
+my @results;
+for (1 .. $opts{count}) {
+	my $str = eval {
+		$opts{smart} ? $gen->generate_smart() : $gen->generate();
+	};
+
+	if ($@) {
+		die "Error generating string: $@";
+	}
+
+	push @results, $str;
+}
+
+# Output results
+print join($opts{separator}, @results);
+print "\n" unless $opts{separator} =~ /\n$/;
+
+exit 0;
+
+sub show_examples {
+	print <<'EXAMPLES';
+Examples:
+
+  # Generate a single 4-digit number
+  random-string '\d{4}'
+
+  # Generate 10 API keys
+  random-string 'AIza[0-9A-Za-z_-]{35}' --count 10
+
+  # Generate 5 email addresses
+  random-string '[a-z]{5,10}@[a-z]{5,10}\.com' -c 5
+
+  # Generate phone numbers with custom separator
+  random-string '\d{3}-\d{3}-\d{4}' -c 3 -S ', '
+
+  # Generate uppercase letters (3 characters)
+  random-string '[A-Z]{3}'
+
+  # Generate password-like strings
+  random-string '[A-Za-z0-9!@#$%]{16}' -c 5
+
+  # Generate UUID-like strings
+  random-string '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
+
+  # Use alternation
+  random-string '(cat|dog|bird)' -c 10
+
+  # Use backreferences (repeating pattern)
+  random-string '(\w{3})-\1' -c 5
+
+  # Generate credit card test numbers
+  random-string '4\d{15}' -c 3
+
+  # Use smart mode for complex patterns (faster)
+  random-string '[A-Z]{3}\d{4}' -c 100 --smart
+
+Common patterns:
+  \d{4}					- 4-digit PIN
+  [A-Z]{2}\d{3}			- License plate style
+  \d{3}-\d{3}-\d{4}		- Phone number
+  [a-z]+@[a-z]+\.com	   - Simple email
+  [A-Fa-f0-9]{32}		  - MD5 hash
+  [A-Za-z0-9]{20}		  - Random token
+  (foo|bar|baz)			- One of three options
+  (\w{4})-\1			   - Repeated pattern
+
+EXAMPLES
+}
+
+__END__
+
+=head1 NAME
+
+random-string - Generate random strings matching a regular expression
+
+=head1 SYNOPSIS
+
+random-string [options] PATTERN
+
+  Options:
+	-c, --count N		Generate N strings (default: 1)
+	-l, --length N	   Set length for fallback generation (default: 10)
+	-s, --smart		  Use smart generation only (faster)
+	-S, --separator STR  Separator between outputs (default: newline)
+	-e, --examples	   Show usage examples
+	-h, --help		   Show brief help
+	-m, --man			Show full manual
+	-v, --version		Show version
+
+=head1 DESCRIPTION
+
+B<random-string> generates random strings that match a given regular expression
+pattern. It supports most common regex features including character classes,
+quantifiers, groups, alternation, and backreferences.
+
+The pattern should be a valid Perl regular expression. The tool will generate
+random strings that match the pattern.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-c, --count> N
+
+Generate N random strings. Default is 1.
+
+=item B<-l, --length> N
+
+Set the length for fallback random generation. When the smart parser can't
+handle a pattern, it falls back to generating random strings of this length
+until one matches. Default is 10.
+
+=item B<-s, --smart>
+
+Use only the smart generation method. This parses the regex and builds matching
+strings directly, which is much faster for complex patterns. However, it may
+not handle all edge cases.
+
+=item B<-S, --separator> STRING
+
+String to use between multiple outputs. Default is newline. Supports escape
+sequences: \n (newline), \t (tab), \r (carriage return).
+
+=item B<-e, --examples>
+
+Show comprehensive usage examples and exit.
+
+=item B<-h, -?, --help>
+
+Print a brief help message and exit.
+
+=item B<-m, --man>
+
+Print the full manual page and exit.
+
+=item B<-v, --version>
+
+Print version information and exit.
+
+=back
+
+=head1 SUPPORTED REGEX FEATURES
+
+=head2 Character Classes
+
+  [a-z]	  Lowercase letters
+  [A-Z]	  Uppercase letters
+  [0-9]	  Digits
+  [abc]	  Specific characters
+  [^a-z]	 Negated class
+
+=head2 Escape Sequences
+
+  \d		 Digit [0-9]
+  \w		 Word character [a-zA-Z0-9_]
+  \s		 Whitespace
+  \D		 Non-digit
+  \W		 Non-word character
+  \t \n \r   Tab, newline, carriage return
+
+=head2 Quantifiers
+
+  {n}		Exactly n times
+  {n,m}	  Between n and m times
+  {n,}	   At least n times
+  +		  One or more
+  *		  Zero or more
+  ?		  Zero or one
+
+=head2 Groups and Alternation
+
+  (...)	  Capturing group
+  (?:...)	Non-capturing group
+  |		  Alternation (cat|dog)
+  \1 \2	  Backreferences
+
+=head2 Other
+
+  .		  Any character
+  ^		  Start anchor (stripped)
+  $		  End anchor (stripped)
+
+=head1 EXAMPLES
+
+Generate a 4-digit PIN:
+
+  random-string '\d{4}'
+
+Generate 10 license plate style codes:
+
+  random-string '[A-Z]{3}\d{4}' --count 10
+
+Generate email addresses:
+
+  random-string '[a-z]{5,10}@(gmail|yahoo|hotmail)\.com' -c 5
+
+Generate with custom separator (comma-space):
+
+  random-string '[A-Z]{3}' -c 5 -S ', '
+
+Generate API keys using smart mode:
+
+  random-string 'AIza[0-9A-Za-z_-]{35}' -c 100 --smart
+
+Generate patterns with repetition:
+
+  random-string '(\w{4})-\1' -c 3
+
+=head1 EXIT STATUS
+
+Returns 0 on success, non-zero on error.
+
+=head1 AUTHOR
+
+Part of Data::Random::String::Matches distribution.
+
+=head1 SEE ALSO
+
+L<Data::Random::String::Matches>
+
+=cut

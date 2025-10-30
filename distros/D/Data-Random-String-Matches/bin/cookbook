@@ -1,0 +1,713 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Data::Random::String::Matches;
+
+=head1 USAGE
+
+Run this script to see examples of various patterns:
+
+    perl examples/cookbook.pl
+
+Or use individual patterns in your own code:
+
+    use Data::Random::String::Matches;
+
+    # Pick any pattern from above
+    my $gen = Data::Random::String::Matches->new(qr/[A-Z]{3}\d{4}/);
+    my $result = $gen->generate();
+
+=head1 COMMON USE CASES
+
+=head2 Testing
+
+Generate test data for:
+- Email addresses
+- Phone numbers
+- Credit cards (test numbers only!)
+- User IDs
+- API keys
+
+=head2 Development
+
+Create realistic mock data for:
+- Database seeding
+- API responses
+- UI prototypes
+- Performance testing
+
+=head2 Security
+
+Generate:
+- Temporary passwords
+- Session tokens
+- One-time codes
+- Recovery codes
+
+=head1 NAME
+
+cookbook.pl - Examples and recipes for Data::Random::String::Matches
+
+=head1 DESCRIPTION
+
+This file contains practical examples and common patterns for generating
+random strings with Data::Random::String::Matches.
+
+=cut
+
+print "=" x 70, "\n";
+print "Data::Random::String::Matches - Cookbook\n";
+print "=" x 70, "\n\n";
+
+# ============================================================================
+# SECTION 1: Basic Patterns
+# ============================================================================
+
+print "SECTION 1: Basic Patterns\n";
+print "-" x 70, "\n\n";
+
+# Example 1.1: Simple PIN codes
+print "1.1 Four-digit PIN:\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/\d{4}/);
+    print "  ", $gen->generate(), "\n" for (1..3);
+}
+print "\n";
+
+# Example 1.2: Six-digit verification code
+print "1.2 Six-digit verification code:\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/\d{6}/);
+    print "  ", $gen->generate(), "\n" for (1..3);
+}
+print "\n";
+
+# Example 1.3: Alphanumeric codes
+print "1.3 Alphanumeric confirmation codes (8 characters):\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/[A-Z0-9]{8}/);
+    print "  ", $gen->generate(), "\n" for (1..3);
+}
+print "\n";
+
+# ============================================================================
+# SECTION 2: Identifiers and Keys
+# ============================================================================
+
+print "SECTION 2: Identifiers and Keys\n";
+print "-" x 70, "\n\n";
+
+# Example 2.1: Google API keys
+print "2.1 Google-style API keys:\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/AIza[0-9A-Za-z_-]{35}/);
+    print "  ", $gen->generate(), "\n" for (1..2);
+}
+print "\n";
+
+# Example 2.2: UUID v4 format
+print "2.2 UUID v4 format:\n";
+{
+    my $gen = Data::Random::String::Matches->new(
+        qr/[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/
+    );
+    print "  ", $gen->generate(), "\n" for (1..2);
+}
+print "\n";
+
+# Example 2.3: Short hash-like identifiers
+print "2.3 Git-style short hashes:\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/[0-9a-f]{7}/);
+    print "  ", $gen->generate(), "\n" for (1..5);
+}
+print "\n";
+
+# Example 2.4: Database primary keys
+print "2.4 Database-style IDs:\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/[A-Z]{3}\d{10}/);
+    print "  ", $gen->generate(), "\n" for (1..3);
+}
+print "\n";
+
+# Example 2.5: Session tokens
+print "2.5 Session tokens (32 characters):\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/[A-Za-z0-9]{32}/);
+    print "  ", $gen->generate(), "\n" for (1..2);
+}
+print "\n";
+
+# ============================================================================
+# SECTION 3: Contact Information
+# ============================================================================
+
+print "SECTION 3: Contact Information\n";
+print "-" x 70, "\n\n";
+
+# Example 3.1: US Phone numbers
+print "3.1 US Phone numbers:\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/\d{3}-\d{3}-\d{4}/);
+    print "  ", $gen->generate(), "\n" for (1..3);
+}
+print "\n";
+
+# Example 3.2: International format
+print "3.2 International phone format:\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/\+1-\d{3}-\d{3}-\d{4}/);
+    print "  ", $gen->generate(), "\n" for (1..3);
+}
+print "\n";
+
+# Example 3.3: Email addresses
+print "3.3 Simple email addresses:\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/[a-z]{5,10}@[a-z]{5,10}\.com/);
+    print "  ", $gen->generate(), "\n" for (1..3);
+}
+print "\n";
+
+# Example 3.4: Email with common domains
+print "3.4 Email with common domains:\n";
+{
+    my $gen = Data::Random::String::Matches->new(
+        qr/[a-z]{5,10}@(gmail|yahoo|hotmail|outlook)\.com/
+    );
+    print "  ", $gen->generate(), "\n" for (1..5);
+}
+print "\n";
+
+# Example 3.5: US ZIP codes
+print "3.5 US ZIP codes:\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/\d{5}/);
+    print "  ", $gen->generate(), "\n" for (1..3);
+}
+print "\n";
+
+# Example 3.6: ZIP+4 format
+print "3.6 ZIP+4 format:\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/\d{5}-\d{4}/);
+    print "  ", $gen->generate(), "\n" for (1..3);
+}
+print "\n";
+
+# ============================================================================
+# SECTION 4: Financial and Payment
+# ============================================================================
+
+print "SECTION 4: Financial and Payment\n";
+print "-" x 70, "\n\n";
+
+# Example 4.1: Credit card numbers (Visa)
+print "4.1 Test credit card numbers (Visa format):\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/4\d{15}/);
+    print "  ", $gen->generate(), "\n" for (1..3);
+}
+print "\n";
+
+# Example 4.2: Credit card with dashes
+print "4.2 Credit card with formatting:\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/\d{4}-\d{4}-\d{4}-\d{4}/);
+    print "  ", $gen->generate(), "\n" for (1..3);
+}
+print "\n";
+
+# Example 4.3: CVV codes
+print "4.3 CVV codes:\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/\d{3}/);
+    print "  ", $gen->generate(), "\n" for (1..5);
+}
+print "\n";
+
+# Example 4.4: Bank account numbers
+print "4.4 Bank account numbers:\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/\d{10,12}/);
+    print "  ", $gen->generate(), "\n" for (1..3);
+}
+print "\n";
+
+# Example 4.5: Transaction IDs
+print "4.5 Transaction IDs:\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/TXN[A-Z0-9]{12}/);
+    print "  ", $gen->generate(), "\n" for (1..3);
+}
+print "\n";
+
+# ============================================================================
+# SECTION 5: Passwords and Security
+# ============================================================================
+
+print "SECTION 5: Passwords and Security\n";
+print "-" x 70, "\n\n";
+
+# Example 5.1: Simple passwords
+print "5.1 Alphanumeric passwords (12 characters):\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/[A-Za-z0-9]{12}/);
+    print "  ", $gen->generate(), "\n" for (1..3);
+}
+print "\n";
+
+# Example 5.2: Passwords with special characters
+print "5.2 Strong passwords with special characters (16 characters):\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/[A-Za-z0-9!@#$%^&*]{16}/);
+    print "  ", $gen->generate(), "\n" for (1..3);
+}
+print "\n";
+
+# Example 5.3: Passphrases
+print "5.3 Random passphrases (word-like):\n";
+{
+    my $gen = Data::Random::String::Matches->new(
+        qr/[a-z]{4,8}-[a-z]{4,8}-[a-z]{4,8}/
+    );
+    print "  ", $gen->generate(), "\n" for (1..3);
+}
+print "\n";
+
+# Example 5.4: Temporary passwords
+print "5.4 Temporary passwords (mixed case, 8 chars):\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/[A-Z][a-z]{3}\d{4}/);
+    print "  ", $gen->generate(), "\n" for (1..3);
+}
+print "\n";
+
+# Example 5.5: Recovery codes
+print "5.5 Recovery codes:\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}/);
+    print "  ", $gen->generate(), "\n" for (1..3);
+}
+print "\n";
+
+# ============================================================================
+# SECTION 6: Vehicle and Transportation
+# ============================================================================
+
+print "SECTION 6: Vehicle and Transportation\n";
+print "-" x 70, "\n\n";
+
+# Example 6.1: US License plates
+print "6.1 US License plate format:\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/[A-Z]{3}\d{4}/);
+    print "  ", $gen->generate(), "\n" for (1..5);
+}
+print "\n";
+
+# Example 6.2: VIN-like numbers
+print "6.2 VIN-style identifiers (simplified):\n";
+{
+	my $gen = Data::Random::String::Matches->new(qr/[A-HJ-NPR-Z0-9]{17}/);
+	print '  ', $gen->generate(), "\n" for (1..2);
+}
+print "\n";
+
+# Example 6.3: Flight numbers
+print "6.3 Flight numbers:\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/(AA|UA|DL|SW)\d{3,4}/);
+    print "  ", $gen->generate(), "\n" for (1..5);
+}
+print "\n";
+
+# Example 6.4: Tracking numbers
+print "6.4 Package tracking numbers:\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/1Z[A-Z0-9]{16}/);
+    print "  ", $gen->generate(), "\n" for (1..3);
+}
+print "\n";
+
+# ============================================================================
+# SECTION 7: Codes and References
+# ============================================================================
+
+print "SECTION 7: Codes and References\n";
+print "-" x 70, "\n\n";
+
+# Example 7.1: Order numbers
+print "7.1 Order numbers:\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/ORD-\d{8}/);
+    print "  ", $gen->generate(), "\n" for (1..3);
+}
+print "\n";
+
+# Example 7.2: Invoice numbers
+print "7.2 Invoice numbers:\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/INV-\d{4}-[A-Z]{3}/);
+    print "  ", $gen->generate(), "\n" for (1..3);
+}
+print "\n";
+
+# Example 7.3: Coupon codes
+print "7.3 Promotional coupon codes:\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/(SAVE|DEAL|SALE)\d{2}[A-Z]{3}/);
+    print "  ", $gen->generate(), "\n" for (1..5);
+}
+print "\n";
+
+# Example 7.4: Product SKUs
+print "7.4 Product SKUs:\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/[A-Z]{2}-\d{4}-[A-Z]{2}/);
+    print "  ", $gen->generate(), "\n" for (1..5);
+}
+print "\n";
+
+# Example 7.5: Serial numbers
+print "7.5 Serial numbers:\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/SN[A-Z0-9]{10}/);
+    print "  ", $gen->generate(), "\n" for (1..3);
+}
+print "\n";
+
+# ============================================================================
+# SECTION 8: Web and URLs
+# ============================================================================
+
+print "SECTION 8: Web and URLs\n";
+print "-" x 70, "\n\n";
+
+# Example 8.1: Subdomains
+print "8.1 Random subdomains:\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/[a-z]{5,10}\.example\.com/);
+    print "  ", $gen->generate(), "\n" for (1..3);
+}
+print "\n";
+
+# Example 8.2: Short URLs
+print "8.2 Short URL codes:\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/[A-Za-z0-9]{6}/);
+    print "  https://short.url/", $gen->generate(), "\n" for (1..5);
+}
+print "\n";
+
+# Example 8.3: Usernames
+print "8.3 Usernames:\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/[a-z]{3,8}\d{2,4}/);
+    print "  ", $gen->generate(), "\n" for (1..5);
+}
+print "\n";
+
+# Example 8.4: Slugs
+print "8.4 URL slugs:\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/[a-z]{4,8}-[a-z]{4,8}/);
+    print "  ", $gen->generate(), "\n" for (1..3);
+}
+print "\n";
+
+# ============================================================================
+# SECTION 9: Healthcare and Medical
+# ============================================================================
+
+print "SECTION 9: Healthcare and Medical\n";
+print "-" x 70, "\n\n";
+
+# Example 9.1: Patient IDs
+print "9.1 Patient ID numbers:\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/P\d{7}/);
+    print "  ", $gen->generate(), "\n" for (1..3);
+}
+print "\n";
+
+# Example 9.2: Medical Record Numbers
+print "9.2 Medical record numbers:\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/MRN-\d{6}/);
+    print "  ", $gen->generate(), "\n" for (1..3);
+}
+print "\n";
+
+# Example 9.3: Prescription numbers
+print "9.3 Prescription numbers:\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/RX\d{10}/);
+    print "  ", $gen->generate(), "\n" for (1..3);
+}
+print "\n";
+
+# ============================================================================
+# SECTION 10: Advanced Patterns
+# ============================================================================
+
+print "SECTION 10: Advanced Patterns\n";
+print "-" x 70, "\n\n";
+
+# Example 10.1: Backreferences
+print "10.1 Patterns with repetition (backreferences):\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/(\w{4})-\1/);
+    print "  ", $gen->generate(), "\n" for (1..3);
+}
+print "\n";
+
+# Example 10.2: Multiple backreferences
+print "10.2 Multiple repeated sections:\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/(\d{2})-(\w{3})-\1-\2/);
+    print "  ", $gen->generate(), "\n" for (1..3);
+}
+print "\n";
+
+# Example 10.3: Nested groups
+print "10.3 Nested groups with quantifiers:\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/((foo|bar)\d{2}){2}/);
+    print "  ", $gen->generate(), "\n" for (1..3);
+}
+print "\n";
+
+# Example 10.4: Complex alternation
+print "10.4 Complex alternation patterns:\n";
+{
+    my $gen = Data::Random::String::Matches->new(
+        qr/(red|green|blue)-(small|medium|large)/
+    );
+    print "  ", $gen->generate(), "\n" for (1..5);
+}
+print "\n";
+
+# Example 10.5: IPv4 addresses (simplified)
+print "10.5 IPv4-style addresses:\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/);
+    print "  ", $gen->generate(), "\n" for (1..3);
+}
+print "\n";
+
+# Example 10.6: MAC addresses
+print "10.6 MAC addresses:\n";
+{
+    my $gen = Data::Random::String::Matches->new(
+        qr/[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}/
+    );
+    print "  ", $gen->generate(), "\n" for (1..3);
+}
+print "\n";
+
+# Example 10.7: Version numbers
+print "10.7 Semantic version numbers:\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/\d{1,2}\.\d{1,2}\.\d{1,3}/);
+    print "  ", $gen->generate(), "\n" for (1..5);
+}
+print "\n";
+
+# Example 10.8: Dates (YYYY-MM-DD format, simplified)
+print "10.8 Date format (YYYY-MM-DD, simplified):\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/20\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])/);
+    print "  ", $gen->generate(), "\n" for (1..5);
+}
+print "\n";
+
+# Example 10.9: Times (HH:MM format)
+print "10.9 Time format (HH:MM):\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/([01]\d|2[0-3]):[0-5]\d/);
+    print "  ", $gen->generate(), "\n" for (1..5);
+}
+print "\n";
+
+# Example 10.10: Hex color codes
+print "10.10 Hex color codes:\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/#[0-9A-F]{6}/);
+    print "  ", $gen->generate(), "\n" for (1..5);
+}
+print "\n";
+
+# ============================================================================
+# SECTION 11: Unicode and International
+# ============================================================================
+
+print "SECTION 11: Unicode and International Patterns\n";
+print "-" x 70, "\n\n";
+
+# Example 11.1: Unicode letters
+print "11.1 Unicode letters (any script):\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/\p{L}{8}/);
+    print "  ", $gen->generate_smart(), "\n" for (1..3);
+}
+print "\n";
+
+# Example 11.2: Unicode numbers
+print "11.2 Unicode numbers:\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/\p{N}{5}/);
+    print "  ", $gen->generate_smart(), "\n" for (1..3);
+}
+print "\n";
+
+# Example 11.3: Uppercase Unicode letters
+print "11.3 Unicode uppercase letters:\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/\p{Lu}{6}/);
+    print "  ", $gen->generate_smart(), "\n" for (1..3);
+}
+print "\n";
+
+# Example 11.4: Mixed Unicode properties
+print "11.4 Mixed Unicode letters and numbers:\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/[\p{L}\p{N}]{10}/);
+    print "  ", $gen->generate_smart(), "\n" for (1..3);
+}
+print "\n";
+
+# ============================================================================
+# SECTION 12: Named Captures and Advanced Backreferences
+# ============================================================================
+
+print "SECTION 12: Named Captures\n";
+print "-" x 70, "\n\n";
+
+# Example 12.1: Simple named capture
+print "12.1 Date with named captures:\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})/);
+    print "  ", $gen->generate_smart(), "\n" for (1..3);
+}
+print "\n";
+
+# Example 12.2: Named backreferences
+print "12.2 Repeated code with named backreference:\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/(?<code>[A-Z]{3})-\k<code>/);
+    print "  ", $gen->generate_smart(), "\n" for (1..3);
+}
+print "\n";
+
+# Example 12.3: Multiple named captures
+print "12.3 Complex ID with multiple named parts:\n";
+{
+    my $gen = Data::Random::String::Matches->new(
+        qr/(?<prefix>[A-Z]{2})-(?<year>\d{4})-(?<serial>\d{6})/
+    );
+    print "  ", $gen->generate_smart(), "\n" for (1..3);
+}
+print "\n";
+
+# Example 12.4: Named captures with backreferences
+print "12.4 Mirror pattern with named captures:\n";
+{
+    my $gen = Data::Random::String::Matches->new(
+        qr/(?<start>\w{3})-(?<mid>\d{2})-\k<start>/
+    );
+    print "  ", $gen->generate_smart(), "\n" for (1..3);
+}
+print "\n";
+
+# ============================================================================
+# SECTION 13: Possessive Quantifiers
+# ============================================================================
+
+print "SECTION 13: Possessive Quantifiers\n";
+print "-" x 70, "\n\n";
+
+# Example 13.1: Possessive one or more
+print "13.1 Possessive ++ (one or more):\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/\d++[A-Z]/);
+    print "  ", $gen->generate_smart(), "\n" for (1..3);
+}
+print "\n";
+
+# Example 13.2: Possessive zero or more
+print "13.2 Possessive *+ (zero or more):\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/[a-z]*+\d{3}/);
+    print "  ", $gen->generate_smart(), "\n" for (1..3);
+}
+print "\n";
+
+# Example 13.3: Possessive optional
+print "13.3 Possessive ?+ (optional):\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/[A-Z]?+\d{4}/);
+    print "  ", $gen->generate_smart(), "\n" for (1..3);
+}
+print "\n";
+
+# Example 13.4: Possessive range
+print "13.4 Possessive {n,m}+ (range):\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/\w{2,5}+-[A-Z]{2}/);
+    print "  ", $gen->generate_smart(), "\n" for (1..3);
+}
+print "\n";
+
+# ============================================================================
+# SECTION 14: Lookaheads and Lookbehinds
+# ============================================================================
+
+print "SECTION 14: Lookaheads and Lookbehinds\n";
+print "-" x 70, "\n\n";
+
+# Example 14.1: Positive lookahead
+print "14.1 Pattern with positive lookahead:\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/\d{3}(?=[A-Z])/);
+    print "  ", $gen->generate_smart(), " (followed by uppercase)\n" for (1..3);
+}
+print "\n";
+
+# Example 14.2: Negative lookahead
+print "14.2 Pattern with negative lookahead:\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/\w{4}(?!\d)/);
+    print "  ", $gen->generate_smart(), " (not followed by digit)\n" for (1..3);
+}
+print "\n";
+
+# Example 14.3: Positive lookbehind
+print "14.3 Pattern with positive lookbehind:\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/(?<=PREFIX)\d{4}/);
+    print "  ", $gen->generate_smart(), " (preceded by PREFIX)\n" for (1..3);
+}
+print "\n";
+
+# Example 14.4: Negative lookbehind
+print "14.4 Pattern with negative lookbehind:\n";
+{
+    my $gen = Data::Random::String::Matches->new(qr/(?<!XX)\w{5}/);
+    print "  ", $gen->generate_smart(), " (not preceded by XX)\n" for (1..3);
+}
+print "\n";
+
+print "=" x 70, "\n";
+print "End of Cookbook\n";
+print "=" x 70, "\n";
+
+__END__
+
+=head1 SEE ALSO
+
+L<Data::Random::String::Matches>
+
+=cut

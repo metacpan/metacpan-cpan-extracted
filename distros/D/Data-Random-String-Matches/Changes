@@ -1,0 +1,13 @@
+Revision history for Data-Random-String-Matches
+
+0.03	Wed Oct 29 19:12:57 EDT 2025
+	Added some utility methods
+	Added the test dashboard
+
+0.02	Tue Oct 28 20:16:01 EDT 2025
+	Added more obscure regex features
+	Fixed Unicode characters
+	Added generate_many
+
+0.01	Mon Oct 27 21:11:53 EDT 2025
+        First draft

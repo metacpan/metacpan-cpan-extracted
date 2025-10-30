@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-09-22'; # DATE
+our $DATE = '2025-10-29'; # DATE
 our $DIST = 'App-FfmpegUtils'; # DIST
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/FfmpegUtils/cut_duration_from_video",
@@ -41,13 +41,13 @@ cut-duration-from-video - Cut (censor out) a duration out of a video
 
 =head1 VERSION
 
-This document describes version 0.014 of cut-duration-from-video (from Perl distribution App-FfmpegUtils), released on 2024-09-22.
+This document describes version 0.015 of cut-duration-from-video (from Perl distribution App-FfmpegUtils), released on 2025-10-29.
 
 =head1 SYNOPSIS
 
-B<cut-duration-from-video> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+B<cut-duration-from-video> B<L<--help|/"--help">>
 
-B<cut-duration-from-video> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+B<cut-duration-from-video> B<L<--version|/"--version">>
 
 B<cut-duration-from-video> [B<L<--copy|/"--copy">>|B<L<--no-copy|/"--copy">>|B<L<--nocopy|/"--copy">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--dry-run|/"--dry-run, -n">>|B<L<-n|/"--dry-run, -n">>] [B<L<--duration|/"--duration=s">>=I<any>|B<L<--duration-json|/"--duration=s">>=I<json>|B<L<-d|/"--duration=s">>=I<any>] [B<L<--end|/"--end=s">>=I<any>|B<L<--end-json|/"--end=s">>=I<json>|B<L<-e|/"--end=s">>=I<any>] [(B<L<--file|/"--files-json=s">>=I<L<filename|Sah::Schema::filename>>)+|B<L<--files-json|/"--files-json=s">>=I<json>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--start|/"--start=s">>=I<any>|B<L<--start-json|/"--start=s">>=I<json>|B<L<-s|/"--start=s">>=I<any>] -- E<lt>I<L<file|/"--files-json=s">>E<gt> ...
 
@@ -128,8 +128,9 @@ See C<--start>.
 
 =item B<--start>=I<s>
 
-(No description)
+Default value:
 
+ 0
 
 =back
 
@@ -240,7 +241,7 @@ suitable default, e.g. the browser, is chosen.
 
 Run in simulation mode (also via DRY_RUN=1).
 
-=item B<--help>, B<-h>, B<-?>
+=item B<--help>, B<-h>
 
 Display help message and exit.
 
@@ -330,7 +331,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024, 2023, 2022, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

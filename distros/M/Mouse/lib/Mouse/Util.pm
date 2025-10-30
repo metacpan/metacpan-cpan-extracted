@@ -50,7 +50,7 @@ BEGIN{
         },
     );
 
-    use version; our $VERSION = version->declare('v2.5.11');
+    use version; our $VERSION = version->declare('v2.6.0');
 
     my $xs = !(defined(&is_valid_class_name) || $ENV{MOUSE_PUREPERL} || $ENV{PERL_ONLY});
 
@@ -84,54 +84,8 @@ BEGIN{
 
     # definition of mro::get_linear_isa()
     my $get_linear_isa;
-    if ($] >= 5.010_000) {
-        require 'mro.pm';
-        $get_linear_isa = \&mro::get_linear_isa;
-    }
-    else {
-        # this code is based on MRO::Compat::__get_linear_isa
-        my $_get_linear_isa_dfs; # this recurses so it isn't pretty
-        $_get_linear_isa_dfs = sub {
-            my($classname) = @_;
-
-            my @lin = ($classname);
-            my %stored;
-
-            no strict 'refs';
-            foreach my $parent (@{"$classname\::ISA"}) {
-                foreach  my $p(@{ $_get_linear_isa_dfs->($parent) }) {
-                    next if exists $stored{$p};
-                    push(@lin, $p);
-                    $stored{$p} = 1;
-                }
-            }
-            return \@lin;
-        };
-
-        {
-            package # hide from PAUSE
-                Class::C3;
-            our %MRO; # avoid 'once' warnings
-        }
-
-        # MRO::Compat::__get_linear_isa has no prototype, so
-        # we define a prototyped version for compatibility with core's
-        # See also MRO::Compat::__get_linear_isa.
-        $get_linear_isa = sub ($;$){
-            my($classname, $type) = @_;
-
-            if(!defined $type){
-                $type = exists $Class::C3::MRO{$classname} ? 'c3' : 'dfs';
-            }
-            if($type eq 'c3'){
-                require Class::C3;
-                return [Class::C3::calculateMRO($classname)];
-            }
-            else{
-                return $_get_linear_isa_dfs->($classname);
-            }
-        };
-    }
+    require 'mro.pm';
+    $get_linear_isa = \&mro::get_linear_isa;
 
     *get_linear_isa = $get_linear_isa;
 }
@@ -423,7 +377,7 @@ Mouse::Util - Utilities for working with Mouse classes
 
 =head1 VERSION
 
-This document describes Mouse version v2.5.11
+This document describes Mouse version v2.6.0
 
 =head1 SYNOPSIS
 

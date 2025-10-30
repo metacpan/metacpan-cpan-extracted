@@ -2,7 +2,7 @@
 use 5.010;
 use strict;
 use warnings;
-use Test::More tests => 4;
+use Test::More tests => 3;
 
 use Capture::Tiny ':all';
 
@@ -17,8 +17,6 @@ BEGIN {
 
 
 my $Ghmulti_Scr = catdir(dirname(__FILE__), qw(.. script ghmulti));
-
-ok(-x $Ghmulti_Scr, "$Ghmulti_Scr is executable");
 
 # Run it with `perl ...` so tests will work on Windows as well.
 like(`$^X $Ghmulti_Scr --version`,

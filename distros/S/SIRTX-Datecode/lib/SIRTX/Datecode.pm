@@ -15,7 +15,9 @@ use Carp;
 
 use Data::Identifier;
 
-our $VERSION = v0.03;
+use parent qw(Data::Identifier::Interface::Userdata Data::Identifier::Interface::Simple);
+
+our $VERSION = v0.05;
 
 
 sub new {
@@ -73,7 +75,7 @@ sub new {
 
     croak 'Invalid datecode value' if $code == 1;
 
-    return bless(\$code, $pkg);
+    return bless({datecode => $code}, $pkg);
 }
 
 
@@ -98,18 +100,20 @@ sub datecode {
 
     croak 'Stray options passed' if scalar @opts;
 
-    return ${$self};
+    return $self->{datecode};
 }
 
 
 sub iso8601 {
     my ($self, @opts) = @_;
-    my $code = ${$self};
+    my $code = $self->{datecode};
     my ($year, $month, $day);
     my $utc;
     my $iso;
 
     croak 'Stray options passed' if scalar @opts;
+
+    return $self->{iso8601} if defined $self->{iso8601};
 
     $utc = $code & 1;
     $code >>= 1;
@@ -140,11 +144,14 @@ sub iso8601 {
     }
 
     if ($year) {
+        $self->{year} = $year;
         $iso  = sprintf('%04u', $year);
 
         if ($month) {
+            $self->{month} = $month;
             $iso .= sprintf('-%02u', $month);
             if ($day) {
+                $self->{day} = $day;
                 $iso .= sprintf('-%02u', $day);
             }
         }
@@ -152,7 +159,7 @@ sub iso8601 {
         $iso .= 'Z' if $utc;
     }
 
-    return $iso;
+    return $self->{iso8601} = $iso;
 }
 
 
@@ -164,11 +171,61 @@ sub as {
     return $self if $as eq 'SIRTX::Datecode';
 
     croak 'Not supported: This is a null value' if     $self->is_null;
+
+    if ($as eq 'DateTime') {
+        my $year  = $self->year;
+        my $month = $self->month;
+        my $day   = $self->day;
+
+        require DateTime;
+
+        return DateTime->new(year => $year, month => $month, day => $day, ($self->is_utc ? (time_zone => 'UTC') : ()));
+    }
+
     croak 'Not supported: This is not in UTC'   unless $self->is_utc;
 
-    require Data::Identifier::Generate;
+    unless (defined $self->{'Data::Identifier'}) {
+        require Data::Identifier::Generate;
+        $self->{'Data::Identifier'} = Data::Identifier::Generate->date($self->iso8601);
+    }
 
-    return Data::Identifier::Generate->date($self->iso8601)->as($as, %opts);
+    return $self->{'Data::Identifier'} if $as eq 'Data::Identifier' && scalar(keys %opts) == 0;
+
+    return $self->{'Data::Identifier'}->as($as, %opts);
+}
+
+
+sub eq {
+    my ($self, $other, @opts) = @_;
+
+    croak 'Stray options passed' if scalar @opts;
+
+    foreach my $dc ($self, $other) {
+        if (!defined($dc)) {
+            $dc = __PACKAGE__->null;
+        } elsif (!eval {$dc->isa(__PACKAGE__)}) {
+            $dc = __PACKAGE__->new(from => $dc);
+        }
+    }
+
+    return $self->datecode == $other->datecode;
+}
+
+
+sub cmp {
+    my ($self, $other, @opts) = @_;
+
+    croak 'Stray options passed' if scalar @opts;
+
+    foreach my $dc ($self, $other) {
+        if (!defined($dc)) {
+            $dc = __PACKAGE__->null;
+        } elsif (!eval {$dc->isa(__PACKAGE__)}) {
+            $dc = __PACKAGE__->new(from => $dc);
+        }
+    }
+
+    return $self->datecode <=> $other->datecode;
 }
 
 
@@ -177,7 +234,7 @@ sub is_utc {
 
     croak 'Stray options passed' if scalar @opts;
 
-    return ${$self} & 1;
+    return $self->{datecode} & 1;
 }
 
 
@@ -192,7 +249,20 @@ sub is_null {
 
     croak 'Stray options passed' if scalar @opts;
 
-    return ${$self} == 0;
+    return $self->{datecode} == 0;
+}
+
+
+sub assert_16bit {
+    my ($self, @opts) = @_;
+
+    croak 'Stray options passed' if scalar @opts;
+
+    unless ($self->{datecode} >= 0 && $self->{datecode} <= 0xFFFF) {
+        croak 'Datecode is outside of 16 bit range';
+    }
+
+    return $self;
 }
 
 
@@ -213,6 +283,36 @@ sub precision {
     }
 
     croak 'Invalid object state';
+}
+
+
+sub year {
+    my ($self, @args) = @_;
+    return $self->_get_part('year', @args);
+}
+
+sub month {
+    my ($self, @args) = @_;
+    return $self->_get_part('month', @args);
+}
+
+sub day {
+    my ($self, @args) = @_;
+    return $self->_get_part('day', @args);
+}
+
+# ---- Implementation of Data::Identifier::Interface::Simple ----
+
+sub displayname {
+    my ($self, $part, %opts) = @_;
+
+    # compatibility
+    delete $opts{default};
+    delete $opts{no_defaults};
+
+    croak 'Stray options passed' if scalar keys %opts;
+
+    return $self->iso8601;
 }
 
 # ---- Private helpers ----
@@ -250,6 +350,24 @@ sub _build_from_iso {
     return $code;
 }
 
+sub _get_part {
+    my ($self, $part, %opts) = @_;
+    my $has_default = exists $opts{default};
+    my $default     = delete $opts{default};
+
+    delete $opts{no_defaults}; # compatibility
+
+    croak 'Stray options passed' if scalar keys %opts;
+
+    $self->iso8601; # fill cache
+
+    return $self->{$part} if defined $self->{$part};
+
+    return $default if $has_default;
+
+    croak 'Value not available: '.$part;
+}
+
 1;
 
 __END__
@@ -264,15 +382,28 @@ SIRTX::Datecode - module for interacting with SIRTX Datecodes
 
 =head1 VERSION
 
-version v0.03
+version v0.05
 
 =head1 SYNOPSIS
 
     use SIRTX::Datecode;
 
+    my SIRTX::Datecode $dc = SIRTX::Datecode->new($type => $value [, %opts ]);
+
+    my $iso8601 = $dc->iso8601;
+    my $year    = $dc->year;
+
+    if ($dc->eq($other)) {
+        # ...
+    }
+
 This module provides support to convert between different date formats and SIRTX datecodes.
 SIRTX datecodes allow to encode dates in the range of years 1582 to 2440 into just 16 bits
 by using a variable precision. They also allow for numeric ordering over their full range.
+
+This package inherits from
+L<Data::Identifier::Interface::Userdata> (since v0.04),
+and L<Data::Identifier::Interface::Simple> (experimental since v0.04).
 
 =head1 METHODS
 
@@ -355,6 +486,56 @@ Returns the datecode as an ISO-8601 date string.
 
 This is a proxy for L<Data::Identifier/as>.
 
+=head2 eq
+
+    my $bool = $dc->eq($other); # $identifier must be non-undef
+    # or:
+    my $bool = SIRTX::Datecode::eq($dc, $other); # $dc can be undef
+
+(since v0.05)
+
+Compares two datecodes to be equal.
+
+If both datecodes are C<undef> they are considered equal.
+
+If C<$dc> or C<$other> is not an instance of L<SIRTX::Datecode> or C<undef>
+it is converted using L</new> with C<from>.
+
+=head2 cmp
+
+    my $val = $dc->cmp($other); # $dc must be non-undef
+    # or:
+    my $val = SIRTX::Datecode::cmp($dc, $other); # $dc can be undef
+
+(since v0.05)
+
+Compares two datecodes similar to C<E<lt>=E<gt>>. THis method can be used to order datecodes.
+To check for them to be equal see L</eq>.
+
+The parameters are parsed the same way as L</eq>.
+
+If this method is used for sorting the exact resulting order is not defined. However:
+
+=over
+
+=item *
+
+The order is stable (for any given version of this module)
+
+=item *
+
+For any two datecodes with the same precision the order is chronological
+
+=item *
+
+For any two non-overlapping datecodes the order is chronological
+
+=item *
+
+The order is the same for C<$a-E<gt>cmp($b)> as for C<- $b-E<gt>cmp($a)>.
+
+=back
+
 =head2 is_utc
 
     my $bool = $dc->is_utc;
@@ -383,6 +564,15 @@ See also: L</is_utc>.
 
 Returns a true-ish value if the datecode is the null value and false-ish otherwise.
 
+=head2 assert_16bit
+
+    $dc->assert_16bit;
+
+(since v0.05)
+
+Asserts that the datecode fits into 16 bit.
+If it doesn't this method will C<die>.
+
 =head2 precision
 
     my $precision = $dc->precision;
@@ -391,6 +581,33 @@ Returns a true-ish value if the datecode is the null value and false-ish otherwi
 
 Returns the precision of the datecode.
 This is one of: C<null>, C<year>, C<month>, or C<day>.
+
+=head2 year, month, day
+
+    my $year  = $dc->year( [ %opts ] );
+    my $month = $dc->month( [ %opts ] );
+    my $day   = $dc->day( [ %opts ] );
+
+(since v0.04)
+
+Returns the year, month, or day component individually.
+
+If a value is not available those methods C<die>.
+
+The following options are supported:
+
+=over
+
+=item C<default>
+
+A value that is returned if the value is not available.
+This can be set to C<undef> to switch from C<die>ing to returning C<undef>.
+
+=item C<no_defaults>
+
+Ignored. For compatibility with similar methods. May be supported in later releases.
+
+=back
 
 =head1 AUTHOR
 

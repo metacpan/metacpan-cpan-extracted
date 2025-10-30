@@ -6,5 +6,7 @@ TODO
 t/Image-Bitmap2Paths.t
 lib/Image/Bitmap2Paths.pm
 script/hex2font.pl
+script/in-preparation/TODO-convex
+script/in-preparation/convex.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

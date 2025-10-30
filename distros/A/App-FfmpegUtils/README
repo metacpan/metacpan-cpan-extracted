@@ -2,8 +2,8 @@ NAME
     App::FfmpegUtils - Utilities related to ffmpeg
 
 VERSION
-    This document describes version 0.014 of App::FfmpegUtils (from Perl
-    distribution App-FfmpegUtils), released on 2024-09-22.
+    This document describes version 0.015 of App::FfmpegUtils (from Perl
+    distribution App-FfmpegUtils), released on 2025-10-29.
 
 FUNCTIONS
   cut_duration_from_video
@@ -71,7 +71,7 @@ FUNCTIONS
 
         (No description)
 
-    *   start => *duration|percent_str*
+    *   start => *duration|percent_str* (default: 0)
 
         (No description)
 
@@ -169,7 +169,7 @@ FUNCTIONS
 
         (No description)
 
-    *   start => *duration|percent_str*
+    *   start => *duration|percent_str* (default: 0)
 
         (No description)
 
@@ -398,8 +398,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2024, 2023, 2022, 2020 by perlancar
-    <perlancar@cpan.org>.
+    This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

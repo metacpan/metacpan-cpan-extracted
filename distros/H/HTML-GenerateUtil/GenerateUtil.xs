@@ -143,7 +143,7 @@ OUTPUT:
 void
 set_paranoia(paranoia)
   int paranoia
-INIT:
+CODE:
 
   /* Call helper function */
   GF_set_paranoia(paranoia);

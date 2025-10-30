@@ -19,6 +19,7 @@ lib/Power/Outlet/iBootBar.pm
 lib/Power/Outlet/iBootBarGroup.pm
 lib/Power/Outlet/Kauf.pm
 lib/Power/Outlet/MQTT.pm
+lib/Power/Outlet/OpenBeken.pm
 lib/Power/Outlet/Shelly.pm
 lib/Power/Outlet/SonoffDiy.pm
 lib/Power/Outlet/Tasmota.pm

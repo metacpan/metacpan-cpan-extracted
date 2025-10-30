@@ -1,0 +1,3 @@
+#  Checks put inside <html><head><body> and all closed correctly once parsed
+#
+<p>

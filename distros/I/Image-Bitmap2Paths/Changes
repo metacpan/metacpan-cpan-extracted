@@ -20,3 +20,9 @@ Revision history for Perl extension Image::Bitmap2Paths.
   				factoring out into two parts.  (The
   				real testing happens by comparing
   				the generated Unifont Smooth glyphs.)
+
+0.01a
+  Makefile.PL		Has been missing the dependency Data::Flow
+
+  script/in-preparation/TODO-via-convex
+  script/in-preparation/convex.pl	New files (better smoothing)

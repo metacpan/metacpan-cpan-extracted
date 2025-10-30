@@ -1,0 +1,5 @@
+<html> @0 (IMPLICIT)
+  <head> @0.0 (IMPLICIT)
+  <body> @0.1
+    "# Check inserted into etc and all closed correctly#"
+    <table> @0.1.1

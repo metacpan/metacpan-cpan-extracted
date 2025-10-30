@@ -1,3 +1,9 @@
+v0.02  2025-10-30Z
+    - Added reverse lookup support
+    - Added support to add colours easily using add_colours()
+    - Addes next_free(), add_meta_range()
+    - Require perl v5.20 and Data::Identifier v0.22
+
 v0.01  2025-10-19Z
     - Initial release
     - Basic API

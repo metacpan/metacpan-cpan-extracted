@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document::OpenAPI;
 # ABSTRACT: One OpenAPI v3.1 or v3.2 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.103';
+our $VERSION = '0.104';
 
 use 5.020;
 use utf8;
@@ -25,9 +25,9 @@ use Carp qw(croak carp);
 use Digest::MD5 'md5_hex';
 use Storable 'dclone';
 use Ref::Util 'is_plain_hashref';
-use builtin::compat 'blessed';
+use builtin::compat qw(blessed indexed);
 use MooX::TypeTiny 0.002002;
-use Types::Standard qw(HashRef Str);
+use Types::Standard qw(HashRef ArrayRef Str);
 use namespace::clean;
 
 extends 'JSON::Schema::Modern::Document';
@@ -55,6 +55,26 @@ has _operationIds => (
 
 sub operationId_path { $_[0]->_operationIds->{$_[1]} }
 sub _add_operationId { $_[0]->_operationIds->{$_[1]} = json_pointer_type->($_[2]) }
+
+# tag name => document path of tag object
+has _tags => (
+  is => 'bare',
+  isa => HashRef[json_pointer_type],
+  lazy => 1,
+  default => sub { {} },
+);
+
+sub tag_path { $_[0]->{_tags}{$_[1]} }
+
+# tag name => document path of operation
+has _operation_tags => (
+  is => 'bare',
+  isa => HashRef[ArrayRef[json_pointer_type]],
+  lazy => 1,
+  default => sub { {} },
+);
+
+sub operations_with_tag { ($_[0]->{_operation_tags}{$_[1]}//[])->@* }
 
 # the minor.major version of the OpenAPI specification used for this document
 has oas_version => (
@@ -206,7 +226,7 @@ sub traverse ($self, $evaluator, $config_override = {}) {
 
   # evaluate the document against its metaschema to find any errors, to identify all schema
   # resources within to add to the global resource index, and to extract all operationIds
-  my (@json_schema_paths, @operation_paths, %bad_path_item_refs, @servers_paths);
+  my (@json_schema_paths, @operation_paths, %bad_path_item_refs, @servers_paths, %tag_operation_paths);
   my $result = $evaluator->evaluate(
     $schema, $self->metaschema_uri,
     {
@@ -231,8 +251,15 @@ sub traverse ($self, $evaluator, $config_override = {}) {
             ($schema->{'$ref'} =~ m{#/\$defs/(path-item)$}));
           $self->_add_entity_location($state->{data_path}, $entity) if $entity;
 
-          push @operation_paths, [ $data->{operationId} => $state->{data_path} ]
-            if $schema->{'$ref'} eq '#/$defs/operation' and defined $data->{operationId};
+          if ($schema->{'$ref'} eq '#/$defs/operation') {
+            push @operation_paths, [ $data->{operationId} => $state->{data_path} ]
+              if defined $data->{operationId};
+
+            { use autovivification 'store';
+              push $tag_operation_paths{$_}->@*, $state->{data_path}
+                foreach ($data->{tags}//[])->@*;
+            }
+          }
 
           # path-items are weird and allow mixing of fields adjacent to a $ref, which is burdensome
           # to properly support (see https://github.com/OAI/OpenAPI-Specification/issues/3734)
@@ -353,7 +380,36 @@ sub traverse ($self, $evaluator, $config_override = {}) {
     }
   }
 
+  # name -> index; for duplicates, will contain the first index where the tag can be found
+  my %tag_to_index = reverse indexed map $_->{name}, ($schema->{tags}//[])->@*;
+
+  foreach my $tag_idx (0 .. ($schema->{tags}//[])->$#*) {
+    my $tag = $schema->{tags}[$tag_idx];
+    ()= E({ %$state, keyword_path => '/tags/'.$tag_idx.'/name' },
+        'duplicate of tag at /tags/%d: "%s"', $tag_to_index{$tag->{name}}, $tag->{name})
+      if $tag_to_index{$tag->{name}} != $tag_idx;
+
+    ()= E({ %$state, keyword_path => '/tags/'.$tag_idx.'/parent' },
+        'parent of tag "%s" does not exist: "%s"', $tag->{name}, $tag->{parent})
+      if exists $tag->{parent} and not exists $tag_to_index{$tag->{parent}};
+
+    my @seen;
+    while (defined $tag->{parent}) {
+      push @seen, $tag->{name};
+      last if not defined $tag_to_index{$tag->{parent}};
+      $tag = $schema->{tags}[$tag_to_index{$tag->{parent}}];
+
+      ()= E({ %$state, keyword_path => '/tags/'.$tag_idx.'/parent' },
+            'circular reference between tags: '.join(' -> ', map '"'.$_.'"', @seen, $tag->{name})),
+          last
+        if grep $_ eq $tag->{name}, @seen;
+    }
+  }
+
   return $state if $state->{errors}->@*;
+
+  $self->{_tags} = (HashRef[json_pointer_type])->({ map +($_ => '/tags/'.$tag_to_index{$_}), keys %tag_to_index });
+  $self->{_operation_tags} = (HashRef[ArrayRef[json_pointer_type]])->(\%tag_operation_paths);
 
   # disregard paths that are not the root of each embedded subschema.
   # Because the callbacks are executed after the keyword has (recursively) finished evaluating,
@@ -505,7 +561,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.1 or v3.2 document
 
 =head1 VERSION
 
-version 0.103
+version 0.104
 
 =head1 SYNOPSIS
 
@@ -635,6 +691,19 @@ Read-only.
 Returns the json pointer location of the operation containing the provided C<operationId> (suitable
 for passing to C<< $document->get(..) >>), or C<undef> if the operation does not exist in the
 document.
+
+=head2 tag_path
+
+  my $path = $document->tag_path($tag_name);
+
+Returns the json pointer location of the provided tag (suitable for passing to
+C<< $document->get(..) >>), or C<undef> if the tag is not defined.
+
+Note that a tag name can still be used by an operation even if it has no definition.
+
+=head2 operations_with_tag
+
+Returns the list of json pointer location(s) of operations that use the provided tag.
 
 =head1 SEE ALSO
 

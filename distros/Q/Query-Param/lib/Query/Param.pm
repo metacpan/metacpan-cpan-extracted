@@ -1,27 +1,99 @@
 package Query::Param;
 
+# A lightweight form and query string variable parser...
+
 use strict;
 use warnings;
 
 use URI::Escape qw(uri_unescape);
+use JSON;
+use Data::Dumper;
 
-our $VERSION = '0.02';
+our $VERSION = '1.0.0';
 
 ########################################################################
 sub new {
 ########################################################################
-  my ( $class, $query_string ) = @_;
+  my ( $class, $query_string, $content_type ) = @_;
+
+  $content_type //= 'application/x-www-form-urlencoded';
 
   my $self = bless {
-    _raw     => {},  # raw key => [raw_value, ...]
-    _decoded => {},  # decoded key => scalar or arrayref
+    _raw     => {},            # raw key => [raw_value, ...]
+    _decoded => {},            # decoded key => scalar or arrayref
+    _type    => $content_type,
   }, $class;
 
   $query_string //= q{};
 
-  while ( $query_string =~ /([^&=]+)=?([^&]*)/xsmg ) {
-    my ( $key, $val ) = ( $1, $2 );
-    push @{ $self->{_raw}{$key} }, $val;
+  if ( $content_type eq 'application/json' ) {
+    $self->{_raw}     = $query_string;
+    $self->{_decoded} = decode_json($query_string);
+  }
+  elsif ( $content_type =~ /multipart\/form\-data/xsm ) {
+    $self->{_raw}     = $query_string;
+    $self->{_decoded} = $self->parse_multipart_form_data( $content_type, $query_string );
+  }
+  else {
+    while ( $query_string =~ /([^&=]+)=?([^&]*)/xsmg ) {
+      my ( $key, $val ) = ( $1, $2 );
+      push @{ $self->{_raw}{$key} }, $val;
+    }
+  }
+
+  return $self;
+}
+
+########################################################################
+sub new_from_request {
+########################################################################
+  my ($class) = @_;
+
+  my ( $content_type, $content_length, $method ) = @ENV{qw(CONTENT_TYPE CONTENT_LENGTH REQUEST_METHOD)};
+
+  die "ERROR: no request method found\n"
+    if !$ENV{REQUEST_METHOD};
+
+  return $class->new( $ENV{QUERY_STRING} )
+    if $ENV{REQUEST_METHOD} eq 'GET';
+
+  return
+    if $ENV{REQUEST_METHOD} ne 'POST';
+
+  my $fh = *STDIN;
+
+  if ( !$content_length ) {
+    $content_length = 4096;
+  }
+
+  my $content = q{};
+  my $buffer;
+
+  while ( my $bytes_read = read $fh, $buffer, $content_length ) {
+    $content .= $buffer;
+  }
+
+  return $class->new( $content, $content_type )
+    if $content_type !~ /multipart\/form\-data/xsm;
+
+  return $class->_new_from_multipart_form_data( $content_type, $content );
+}
+
+########################################################################
+sub _new_from_multipart_form_data {
+########################################################################
+  my ( $class, $content_type, $content ) = @_;
+
+  my $params = $class->parse_multipart_form_data( $content_type, $content );
+
+  my $self = bless {
+    _raw     => {},
+    _decoded => {},
+    _type    => $content_type,
+  }, $class;
+
+  foreach ( keys %{$params} ) {
+    $self->{_raw}->{$_} = $self->{_decoded}->{$_} = $params->{$_};
   }
 
   return $self;
@@ -39,6 +111,36 @@ sub Vars {
   }
 
   return \%vars;
+}
+
+########################################################################
+sub parse_multipart_form_data {
+########################################################################
+  my ( $self, $content_type, $post_data ) = @_;
+
+  my %params;
+
+  my ($boundary) = $content_type =~ /boundary=([^;]+)/xsm;
+
+  while ( $post_data =~ /Content\-Disposition:\sform\-data;\sname="([^"]+)"\r?\n\r?\n(.*?)\r?\n--$boundary/sg ) {
+
+    my ( $name, $value ) = ( $1, $2 );
+    $value =~ s/\s+$//xsm;
+
+    if ( exists $params{$name} ) {
+      if ( !ref $params{$name} ) {
+        $params{$name} = [ $params{$name}, $value ];
+      }
+      else {
+        push @{ $params{$name} }, $value;
+      }
+    }
+    else {
+      $params{$name} = $value;
+    }
+  }
+
+  return \%params;
 }
 
 ########################################################################
@@ -105,6 +207,9 @@ sub keys {
 ########################################################################
   my ($self) = @_;
 
+  return
+    if $self->{_type} ne 'application/x-www-form-urlencoded';
+
   my %seen;
 
   return grep { !$seen{$_}++ } ( keys %{ $self->{_raw} }, keys %{ $self->{_decoded} } );
@@ -114,6 +219,10 @@ sub keys {
 sub to_string {
 ########################################################################
   my ($self) = @_;
+
+  return $self->{_raw}
+    if $self->{_type} ne 'application/x-www-form-urlencoded';
+
   my @pairs;
 
   for my $key ( $self->keys ) {
@@ -176,7 +285,7 @@ __END__
 =head1 NAME
 
 Query::Param - Lightweight object interface for parsing and creating
-query strings
+query strings and form parameters
 
 =head1 SYNOPSIS
 
@@ -356,6 +465,21 @@ Plack, or inside event loops.
 
 Parses the provided query string and returns a new
 C<Query::Param> object.
+
+=head2 new_from_request
+
+ my $args = Query::Param->new_from_request;
+
+Parses query strings, application/x-www-form-urlencoded, or
+multipart/form-data from HTTP requests.  Assumes environment variables
+CONTENT_TYPE, CONTENT_LENGTH, REQUEST_METHOD have been set.
+
+I<NOTE: Reminder - this is a lightweight parser! It does not support
+file downloads when data is passed as multipart/form-data.>
+
+If the content type is application/json the parser will decode the
+payload. You can retrieve the raw payload using the C<to_string>
+method or individual keys of the payload using C<get()>.
 
 =head1 METHODS AND SUBROUTINES
 

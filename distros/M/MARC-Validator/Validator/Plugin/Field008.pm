@@ -9,7 +9,7 @@ use Error::Pure::Utils qw(err_get);
 use MARC::Leader;
 use MARC::Field008;
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 sub name {
 	my $self = shift;

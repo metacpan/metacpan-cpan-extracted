@@ -5,12 +5,12 @@ use v5.40;
 # NAME
 # ====
 #
-# Daje::Plugin::workflow - It's new $module
+# Daje::Plugin::Workflow - It's new $module
 #
 # SYNOPSIS
 # ========
 #
-#     use Daje::Plugin::workflow;
+#     use Daje::Plugin::Workflow;
 #
 #     Expected config data
 #
@@ -24,7 +24,7 @@ use v5.40;
 # DESCRIPTION
 # ===========
 #
-# Daje::Plugin::workflow is the Mojolicious plugin for Daje::Workflow
+# Daje::Plugin::Workflow is the Mojolicious plugin for Daje::Workflow
 #
 # LICENSE
 # =======
@@ -40,7 +40,7 @@ use v5.40;
 # janeskil1525 E<lt>janeskil1525@gmail.comE<gt>
 #
 
-our $VERSION = "0.07";
+our $VERSION = "0.09";
 
 use Daje::Workflow::Database;
 use Daje::Workflow::Loader;
@@ -73,7 +73,7 @@ sub register ($self, $app, $config) {
     $app->helper(workflow => sub {$workflow});
 
     my $r = $app->routes;
-    $r->put('/tools/api/v1/workflow/execute')->to('Workflow#execute');
+    $r->put('/workflow/api/execute')->to('Workflow#execute');
 
     $app->log->debug("Daje::Plugin::Workflow registered");
 }

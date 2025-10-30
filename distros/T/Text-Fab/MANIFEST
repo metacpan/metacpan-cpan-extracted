@@ -1,0 +1,15 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+TODO
+SYSTEM_INSTRUCTIONS-Gemini_2_5_Pro__32K		# Generally optimized for less licking-up, more critical (and self-critical, preventively) and less cocky on failure
+SYSTEM_INSTRUCTIONS-Gemini_2_5_Pro__32K-latest	# (Not the version used for generation; use 32K thinking budget.)
+t/01-basics.t
+t/02-config-api.t
+t/03-config-adv.t
+t/04-hash-api.t
+t/05-api-robustness.t
+lib/Text/Fab.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

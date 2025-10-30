@@ -1,3 +1,7 @@
+0.05 2025-10-30T08:35:46+01:00
+ - Fix REPOSITORY section in doc.
+ - Fix check of 040 field with RDA rules.
+
 0.04 2025-10-03T01:14:41+02:00
  - Add plugin for field 040e with leader 018 a.
 

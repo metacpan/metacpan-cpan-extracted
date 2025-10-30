@@ -1,5 +1,8 @@
 Revision history for Open-This
 
+0.000035  2025-10-28 17:23:31Z
+    - Add script_fails to Test::Script import list in t/ot.t (GH#60) (Copilot)
+
 0.000034  2024-04-10 14:36:09Z
     - Add experimental --json flag (GH#52) (Olaf Alders)
 

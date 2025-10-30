@@ -1,5 +1,9 @@
 Changes for Catalyst-Plugin-OIDC distribution
 
+1.03 2025-10-29
+  - Bump dependency on OIDC::Client v1.05
+  - Update doc and tests to align with OIDC::Client v1.05
+
 1.02 2025-09-09
   - Bump dependency on OIDC::Client v1.03
 

@@ -1,5 +1,3 @@
-use lib "../lib";
-
 use strict;
 use warnings;
 no warnings 'uninitialized';

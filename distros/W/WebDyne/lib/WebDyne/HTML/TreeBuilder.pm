@@ -46,7 +46,7 @@ use Data::Dumper;
 
 #  Version information
 #
-$VERSION='2.017';
+$VERSION='2.018';
 
 
 #  Debug load
@@ -115,7 +115,19 @@ debug("Loading %s version $VERSION", __PACKAGE__);
 #  associated with each tag below.
 #
 #map {$CGI_TAG_SPECIAL{$_}++} qw(perl script style start_html end_html include);
-map {$CGI_TAG_SPECIAL{$_}++} qw(perl script style start_html end_html include div api json);
+map {$CGI_TAG_SPECIAL{$_}++} qw(
+    perl
+    script
+    style
+    start_html
+    end_html
+    include
+    div
+    api
+    json
+    htmx
+    table
+);
 
 
 #  Nullify Entities encode & decode
@@ -126,17 +138,26 @@ map {$CGI_TAG_SPECIAL{$_}++} qw(perl script style start_html end_html include di
 
 #  Add to islist items in TreeBuilder
 #
-map {$HTML::TreeBuilder::isList{$_}++} keys %CGI_TAG_WEBDYNE;
+map {$HTML::Tagset::isList{$_}++} keys %CGI_TAG_WEBDYNE;
 
 
-#  Need to tell HTML::TagSet about our special elements so
+#  Need to tell HTML::TagSet about our special elements. 
+# 
+#  Update - used to do this but now done in table() method below
 #
-map {$HTML::Tagset::isTableElement{$_}++} keys %CGI_TAG_WEBDYNE;
+#map {$HTML::Tagset::isTableElement{$_}++} keys %CGI_TAG_WEBDYNE;
+
+
+#  Add to valid body elements - means Treebuilder will automatically 
+#  create html,head,body sections and include this - for truly lazy
+#  that just create a .psp file with no leading start_html
+#
+map { $HTML::Tagset::isBodyElement{$_}++ } qw(htmx json dump);
 
 
 #  And that we also block <p> tag closures
 #
-push @HTML::TreeBuilder::p_closure_barriers, keys %CGI_TAG_WEBDYNE;
+push @HTML::Tagset::p_closure_barriers, keys %CGI_TAG_WEBDYNE;
 
 
 #  All done. Positive return
@@ -265,7 +286,7 @@ sub tag_parse {
 
     #  Debug
     #
-    debug("tag_parse $method, *%s*, line_no: %s, line_no_start: %s, attr_hr:%s ", $tag, @{$self}{qw(_line_no _line_no_start)}, Dumper($attr_hr));
+    debug("tag_parse $method, tag: *%s*, line_no: %s, line_no_start: %s, attr_hr:%s ", $tag, @{$self}{qw(_line_no _line_no_start)}, Dumper($attr_hr));
 
 
     #  Get the parent tag
@@ -416,7 +437,7 @@ sub tag_parse {
 
         #  Pass onto our base class for further processing
         #
-        debug("base class method $method");
+        debug("base class method $method, %s", Dumper(\@_));
         $html_or=$self->$method(@_);
 
 
@@ -480,7 +501,7 @@ sub json {
     #
     my ($self, $method, @param)=@_;
     $self->_text_block_tag('json') unless $self->_text_block_tag();
-    debug("json self $self, method $method text_block_tag %s", $self->_text_block_tag());
+    debug("self $self, tag: json, method: $method text_block_tag %s", $self->_text_block_tag());
     return $self->$method(@param);
 
 }
@@ -491,10 +512,42 @@ sub api {
 
     #  Handle normally but set flag showing we are an <api> page, will optimise differently
     #
+    my ($self, $method, $tag, @param)=@_;
+    debug("self $self, tag: api, method: $method");
+    $self->{'_webdyne_compact'}=$tag;
+    return $self->$method($tag, @param);
+
+}
+
+
+sub table {
+
+
+    #  Modify HTML::Tagset to allow perl/block/htmx tags within a table tag, then pull them out
+    #  when the table tag closes.
+    #
     my ($self, $method, @param)=@_;
-    debug("api self $self, method $method");
-    $self->{'_api_webdyne'}++;
+    debug("self $self, tag: api, method: $method");
+    if ($method eq 'SUPER::start') {
+        map { $HTML::Tagset::isTableElement{$_}=1 } qw(perl block htmx)
+    }
+    elsif ($method eq 'SUPER::end') {
+        map { delete $HTML::Tagset::isTableElement{$_} } qw(perl block htmx)
+    }
     return $self->$method(@param);
+    
+}
+
+
+sub htmx {
+
+
+    #  Handle normally but set flag showing we are an <htmx> page, will optimise differently
+    #
+    my ($self, $method, $tag, $attr_hr, @param)=@_;
+    debug("self $self, tag: htmx, method: $method, param: %s", Dumper($attr_hr));
+    $self->{'_webdyne_compact'}=$tag if ($attr_hr->{'compact'});
+    return $self->$method($tag, $attr_hr, @param);
 
 }
 

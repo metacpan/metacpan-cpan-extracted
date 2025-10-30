@@ -6,12 +6,12 @@ author:
 build_requires:
   Test::More: '0.98'
 configure_requires:
-  Alien::Build::MB: '0'
-  Alien::Meson: '0'
-  Alien::Ninja: '0'
+  Alien::Build::MB: '0.09'
+  Alien::Meson: '0.06'
+  Alien::Ninja: '0.03'
   Module::Build: '0.4005'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.19, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.28, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,15 +29,15 @@ no_index:
     - builder
 provides:
   Alien::libui:
-    file: lib/Alien/libui.pm
-    version: '0.01'
+    file: lib/Alien\libui.pm
+    version: '0.02'
 requires:
   perl: '5.008001'
 resources:
   bugtracker: https://github.com/sanko/alien-libui/issues
   homepage: https://github.com/sanko/alien-libui
   repository: https://github.com/sanko/alien-libui.git
-version: '0.01'
+version: '0.02'
 x_authority: cpan:SANKO
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
 x_static_install: 0

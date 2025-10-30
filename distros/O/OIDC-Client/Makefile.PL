@@ -17,11 +17,14 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.020000",
   "NAME" => "OIDC::Client",
   "PREREQ_PM" => {
+    "CHI" => "0.60",
     "Carp" => 0,
     "Crypt::JWT" => "0.035",
     "Data::UUID" => 0,
+    "Digest::SHA" => "6.01",
     "List::MoreUtils" => "0.423",
     "List::Util" => 0,
+    "MIME::Base64" => "3.15",
     "Module::Load" => 0,
     "Mojolicious" => "8.24",
     "Moose" => 0,
@@ -45,7 +48,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Warn" => 0
   },
-  "VERSION" => "1.04",
+  "VERSION" => "1.05",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,9 +56,11 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "CHI" => "0.60",
   "Carp" => 0,
   "Crypt::JWT" => "0.035",
   "Data::UUID" => 0,
+  "Digest::SHA" => "6.01",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
@@ -63,6 +68,7 @@ my %FallbackPrereqs = (
   "List::Util" => 0,
   "Log::Any" => 0,
   "Log::Any::Test" => 0,
+  "MIME::Base64" => "3.15",
   "Module::Load" => 0,
   "Mojolicious" => "8.24",
   "Moose" => 0,

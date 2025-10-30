@@ -10,12 +10,17 @@ my @files = (
     'lib/Catalyst/Plugin/OIDC.pm',
     't/00-compile.t',
     't/auth-code-flow-IT.t',
-    't/lib/MyCatalystApp/lib/MyCatalystApp.pm',
-    't/lib/MyCatalystApp/lib/MyCatalystApp/Controller/Root.pm',
-    't/lib/MyCatalystApp/lib/MyCatalystApp/View/JSON.pm',
-    't/lib/MyCatalystApp/mycatalystapp.conf',
-    't/lib/MyProviderApp/app.pl',
-    't/resource-server-IT.t'
+    't/auth-code-flow-IT/MyCatalystApp/lib/MyCatalystApp.pm',
+    't/auth-code-flow-IT/MyCatalystApp/lib/MyCatalystApp/Controller/Root.pm',
+    't/auth-code-flow-IT/MyCatalystApp/lib/MyCatalystApp/View/JSON.pm',
+    't/auth-code-flow-IT/MyCatalystApp/mycatalystapp.conf',
+    't/auth-code-flow-IT/MyProviderApp/app.pl',
+    't/resource-server-IT.t',
+    't/resource-server-IT/MyCatalystApp/lib/MyCatalystApp.pm',
+    't/resource-server-IT/MyCatalystApp/lib/MyCatalystApp/Controller/Root.pm',
+    't/resource-server-IT/MyCatalystApp/lib/MyCatalystApp/View/JSON.pm',
+    't/resource-server-IT/MyCatalystApp/mycatalystapp.conf',
+    't/resource-server-IT/MyProviderApp/app.pl'
 );
 
 notabs_ok($_) foreach @files;

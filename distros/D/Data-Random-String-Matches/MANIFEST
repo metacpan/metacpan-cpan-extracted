@@ -1,0 +1,30 @@
+bin/cookbook
+bin/random-string
+Changes
+doc/cookbook.md
+examples/bulk-generation
+lib/Data/Random/String/Matches.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+pod.t
+README.md
+scripts/generate_index.pl
+t/30-basics.t
+t/40-advanced.t
+t/advanced-features.t
+t/advanced_regex.t
+t/cli.t
+t/comment-spelling.t
+t/eof.t
+t/eol.t
+t/generate-many.t
+t/generate.t
+t/pod-cm.t
+t/pod-synopsis.t
+t/pod.t
+t/suggest.t
+t/utility_methods.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

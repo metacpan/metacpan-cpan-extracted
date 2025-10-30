@@ -30,6 +30,8 @@ The height of the output image. Default is 350 pixels.
 
 The path to the output image file. If not specified, a filename will be generated.
 
+=back
+
 =cut
 
 use strict;

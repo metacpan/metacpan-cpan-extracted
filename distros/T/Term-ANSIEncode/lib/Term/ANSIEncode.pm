@@ -39,7 +39,7 @@ binmode(STDOUT, ":encoding(UTF-8)");
 binmode(STDIN,  ":encoding(UTF-8)");
 
 BEGIN {
-    our $VERSION = '1.35';
+    our $VERSION = '1.37';
 }
 
 # Returns a description of a token using the meta data.
@@ -270,35 +270,56 @@ sub new {
         'mode'           => 'long',
         'start'          => 0x20,
         'finish'         => 0x1FBFF,
+		'list'           => [(0x20 .. 0x7F, 0xA0 .. 0xFF, 0x2010 .. 0x205F, 0x2070 .. 0x242F, 0x2440 .. 0x244F, 0x2460 .. 0x29FF, 0x1F300 .. 0x1F8BF, 0x1F900 .. 0x1FBBF, 0x1F900 .. 0x1FBCF, 0x1FBF0 .. 0x1FBFF)],
         'ansi_meta' => {
             'special' => {
+				'FONT DOUBLE-HEIGHT TOP' => {
+					'out' => $esc . '#3',
+					'desc' => 'Double-Height Font Top Portion',
+				},
+				'FONT DOUBLE-HEIGHT BOTTOM' => {
+					'out' => $esc . '#4',
+					'desc' => 'Double-Height Font Bottom Portion',
+				},
+				'FONT DOUBLE-WIDTH' => {
+					'out' => $esc . '#6',
+					'desc' => 'Double-Width Font',
+				},
+				'FONT DEFAULT' => {
+					'out' => $esc . '#5',
+					'desc' => 'Default Font Size',
+				},
+				'APC' => {
+					'out' => $esc . '_',
+					'desc' => 'Application Program Command',
+				},
                 'SS2' => {
                     'out'  => $esc . 'N',
-                    'desc' => '',
+                    'desc' => 'Single Shift 2',
                 },
                 'SS3' => {
                     'out'  => $esc . 'O',
-                    'desc' => '',
+                    'desc' => 'Single Shift 3',
                 },
                 'CSI' => {
                     'out'  => $esc . '[',
-                    'desc' => 'Control Sequence Identifier',
+                    'desc' => 'Control Sequence Introducer',
                 },
                 'OSC' => {
                     'out'  => $esc . ']',
-                    'desc' => '',
+                    'desc' => 'Operating System Command',
                 },
                 'SOS' => {
                     'out'  => $esc . 'X',
-                    'desc' => '',
+                    'desc' => 'Start Of String',
                 },
                 'ST' => {
                     'out'  => $esc . "\\",
-                    'desc' => '',
+                    'desc' => 'String Terminator',
                 },
                 'DCS' => {
                     'out'  => $esc . 'P',
-                    'desc' => '',
+                    'desc' => 'Device Control String',
                 },
             },
 
@@ -360,11 +381,11 @@ sub new {
                 },
                 'NEXT LINE' => {
                     'out'  => $csi . 'E',
-                    'desc' => '',
-                },
+                    'desc' => 'Place the cursor at the beginning of the next line',
+                 },
                 'PREVIOUS LINE' => {
                     'out'  => $csi . 'F',
-                    'desc' => '',
+                    'desc' => 'Place the cursor at the beginning of the previous line',
                 },
                 'SAVE' => {
                     'out'  => $csi . 's',
@@ -508,1174 +529,1466 @@ sub new {
             'foreground' => {
                 'DEFAULT' => {
                     'out'  => $csi . '39m',
-                    'desc' => 'Default color',
+                    'desc' => 'Default foreground color',
+					'orig' => TRUE,
                 },
                 'BLACK' => {
                     'out'  => $csi . '30m',
                     'desc' => 'Black',
+					'orig' => TRUE,
                 },
                 'RED' => {
                     'out'  => $csi . '31m',
                     'desc' => 'Red',
+					'orig' => TRUE,
                 },
                 'DARK RED' => {
                     'out'  => $csi . '38:2:139:0:0m',
                     'desc' => 'Dark red',
+					'orig' => FALSE,
                 },
                 'PINK' => {
                     'out'  => $csi . '38;5;198m',
                     'desc' => 'Pink',
+					'orig' => FALSE,
                 },
                 'ORANGE' => {
                     'out'  => $csi . '38;5;202m',
                     'desc' => 'Orange',
+					'orig' => FALSE,
                 },
                 'NAVY' => {
                     'out'  => $csi . '38;5;17m',
                     'desc' => 'Navy',
+					'orig' => FALSE,
                 },
                 'BROWN' => {
                     'out'  => $csi . '38:2:165:42:42m',
                     'desc' => 'Brown',
+					'orig' => FALSE,
                 },
                 'MAROON' => {
                     'out'  => $csi . '38:2:128:0:0m',
                     'desc' => 'Maroon',
+					'orig' => FALSE,
                 },
                 'OLIVE' => {
                     'out'  => $csi . '38:2:128:128:0m',
                     'desc' => 'Olive',
+					'orig' => FALSE,
                 },
                 'PURPLE' => {
                     'out'  => $csi . '38:2:128:0:128m',
                     'desc' => 'Purple',
+					'orig' => FALSE,
                 },
                 'TEAL' => {
                     'out'  => $csi . '38:2:0:128:128m',
                     'desc' => 'Teal',
+					'orig' => FALSE,
                 },
                 'GREEN' => {
                     'out'  => $csi . '32m',
                     'desc' => 'Green',
+					'orig' => TRUE,
                 },
                 'YELLOW' => {
                     'out'  => $csi . '33m',
                     'desc' => 'Yellow',
+					'orig' => TRUE,
                 },
                 'BLUE' => {
                     'out'  => $csi . '34m',
                     'desc' => 'Blue',
+					'orig' => TRUE,
                 },
                 'MAGENTA' => {
                     'out'  => $csi . '35m',
                     'desc' => 'Magenta',
+					'orig' => TRUE,
                 },
                 'CYAN' => {
                     'out'  => $csi . '36m',
                     'desc' => 'Cyan',
+					'orig' => TRUE,
                 },
                 'WHITE' => {
                     'out'  => $csi . '37m',
                     'desc' => 'White',
+					'orig' => TRUE,
                 },
                 'BRIGHT BLACK' => {
                     'out'  => $csi . '90m',
                     'desc' => 'Bright black',
+					'orig' => TRUE,
                 },
                 'BRIGHT RED' => {
                     'out'  => $csi . '91m',
                     'desc' => 'Bright red',
+					'orig' => TRUE,
                 },
                 'BRIGHT GREEN' => {
                     'out'  => $csi . '92m',
                     'desc' => 'Bright green',
+					'orig' => TRUE,
                 },
                 'BRIGHT YELLOW' => {
                     'out'  => $csi . '93m',
                     'desc' => 'Bright yellow',
+					'orig' => TRUE,
                 },
                 'BRIGHT BLUE' => {
                     'out'  => $csi . '94m',
                     'desc' => 'Bright blue',
+					'orig' => TRUE,
                 },
                 'BRIGHT MAGENTA' => {
                     'out'  => $csi . '95m',
                     'desc' => 'Bright magenta',
+					'orig' => TRUE,
                 },
                 'BRIGHT CYAN' => {
                     'out'  => $csi . '96m',
                     'desc' => 'Bright cyan',
+					'orig' => TRUE,
                 },
                 'BRIGHT WHITE' => {
                     'out'  => $csi . '97m',
                     'desc' => 'Bright white',
+					'orig' => TRUE,
                 },
                 'FIREBRICK' => {
                     'out'  => $csi . '38:2:178:34:34m',
                     'desc' => 'Firebrick',
+					'orig' => FALSE,
                 },
                 'CRIMSON' => {
                     'out'  => $csi . '38:2:220:20:60m',
                     'desc' => 'Crimson',
+					'orig' => FALSE,
                 },
                 'TOMATO' => {
                     'out'  => $csi . '38:2:255:99:71m',
                     'desc' => 'Tomato',
+					'orig' => FALSE,
                 },
                 'CORAL' => {
                     'out'  => $csi . '38:2:255:127:80m',
                     'desc' => 'Coral',
+					'orig' => FALSE,
                 },
                 'INDIAN RED' => {
                     'out'  => $csi . '38:2:205:92:92m',
                     'desc' => 'Indian red',
+					'orig' => FALSE,
                 },
                 'LIGHT CORAL' => {
                     'out'  => $csi . '38:2:240:128:128m',
                     'desc' => 'Light coral',
+					'orig' => FALSE,
                 },
                 'DARK SALMON' => {
                     'out'  => $csi . '38:2:233:150:122m',
                     'desc' => 'Dark salmon',
+					'orig' => FALSE,
                 },
                 'SALMON' => {
                     'out'  => $csi . '38:2:250:128:114m',
                     'desc' => 'Salmon',
+					'orig' => FALSE,
                 },
                 'LIGHT SALMON' => {
                     'out'  => $csi . '38:2:255:160:122m',
                     'desc' => 'Light salmon',
+					'orig' => FALSE,
                 },
                 'ORANGE RED' => {
                     'out'  => $csi . '38:2:255:69:0m',
                     'desc' => 'Orange red',
+					'orig' => FALSE,
                 },
                 'DARK ORANGE' => {
                     'out'  => $csi . '38:2:255:140:0m',
                     'desc' => 'Dark orange',
+					'orig' => FALSE,
                 },
                 'GOLD' => {
                     'out'  => $csi . '38:2:255:215:0m',
                     'desc' => 'Gold',
+					'orig' => FALSE,
                 },
                 'DARK GOLDEN ROD' => {
                     'out'  => $csi . '38:2:184:134:11m',
                     'desc' => 'Dark golden rod',
+					'orig' => FALSE,
                 },
                 'GOLDEN ROD' => {
                     'out'  => $csi . '38:2:218:165:32m',
                     'desc' => 'Golden rod',
+					'orig' => FALSE,
                 },
                 'PALE GOLDEN ROD' => {
                     'out'  => $csi . '38:2:238:232:170m',
                     'desc' => 'Pale golden rod',
+					'orig' => FALSE,
                 },
                 'DARK KHAKI' => {
                     'out'  => $csi . '38:2:189:183:107m',
                     'desc' => 'Dark khaki',
+					'orig' => FALSE,
                 },
                 'KHAKI' => {
                     'out'  => $csi . '38:2:240:230:140m',
                     'desc' => 'Khaki',
+					'orig' => FALSE,
                 },
                 'YELLOW GREEN' => {
                     'out'  => $csi . '38:2:154:205:50m',
                     'desc' => 'Yellow green',
+					'orig' => FALSE,
                 },
                 'DARK OLIVE GREEN' => {
                     'out'  => $csi . '38:2:85:107:47m',
                     'desc' => 'Dark olive green',
+					'orig' => FALSE,
                 },
                 'OLIVE DRAB' => {
                     'out'  => $csi . '38:2:107:142:35m',
                     'desc' => 'Olive drab',
+					'orig' => FALSE,
                 },
                 'LAWN GREEN' => {
                     'out'  => $csi . '38:2:124:252:0m',
                     'desc' => 'Lawn green',
+					'orig' => FALSE,
                 },
                 'CHARTREUSE' => {
                     'out'  => $csi . '38:2:127:255:0m',
                     'desc' => 'Chartreuse',
+					'orig' => FALSE,
                 },
                 'GREEN YELLOW' => {
                     'out'  => $csi . '38:2:173:255:47m',
                     'desc' => 'Green yellow',
+					'orig' => FALSE,
                 },
                 'DARK GREEN' => {
                     'out'  => $csi . '38:2:0:100:0m',
                     'desc' => 'Dark green',
+					'orig' => FALSE,
                 },
                 'FOREST GREEN' => {
                     'out'  => $csi . '38:2:34:139:34m',
                     'desc' => 'Forest green',
+					'orig' => FALSE,
                 },
                 'LIME GREEN' => {
                     'out'  => $csi . '38:2:50:205:50m',
                     'desc' => 'Lime Green',
+					'orig' => FALSE,
                 },
                 'LIGHT GREEN' => {
                     'out'  => $csi . '38:2:144:238:144m',
                     'desc' => 'Light green',
+					'orig' => FALSE,
                 },
                 'PALE GREEN' => {
                     'out'  => $csi . '38:2:152:251:152m',
                     'desc' => 'Pale green',
+					'orig' => FALSE,
                 },
                 'DARK SEA GREEN' => {
                     'out'  => $csi . '38:2:143:188:143m',
                     'desc' => 'Dark sea green',
+					'orig' => FALSE,
                 },
                 'MEDIUM SPRING GREEN' => {
                     'out'  => $csi . '38:2:0:250:154m',
                     'desc' => 'Medium spring green',
+					'orig' => FALSE,
                 },
                 'SPRING GREEN' => {
                     'out'  => $csi . '38:2:0:255:127m',
                     'desc' => 'Spring green',
+					'orig' => FALSE,
                 },
                 'SEA GREEN' => {
                     'out'  => $csi . '38:2:46:139:87m',
                     'desc' => 'Sea green',
+					'orig' => FALSE,
                 },
                 'MEDIUM AQUA MARINE' => {
                     'out'  => $csi . '38:2:102:205:170m',
                     'desc' => 'Medium aqua marine',
+					'orig' => FALSE,
                 },
                 'MEDIUM SEA GREEN' => {
                     'out'  => $csi . '38:2:60:179:113m',
                     'desc' => 'Medium sea green',
+					'orig' => FALSE,
                 },
                 'LIGHT SEA GREEN' => {
                     'out'  => $csi . '38:2:32:178:170m',
                     'desc' => 'Light sea green',
+					'orig' => FALSE,
                 },
                 'DARK SLATE GREY' => {
                     'out'  => $csi . '38:2:47:79:79m',
                     'desc' => 'Dark slate gray',
+					'orig' => FALSE,
                 },
                 'DARK CYAN' => {
                     'out'  => $csi . '38:2:0:139:139m',
                     'desc' => 'Dark cyan',
+					'orig' => FALSE,
                 },
                 'AQUA' => {
                     'out'  => $csi . '38:2:0:255:255m',
                     'desc' => 'Aqua',
+					'orig' => FALSE,
                 },
                 'LIGHT CYAN' => {
                     'out'  => $csi . '38:2:224:255:255m',
                     'desc' => 'Light cyan',
+					'orig' => FALSE,
                 },
                 'DARK TURQUOISE' => {
                     'out'  => $csi . '38:2:0:206:209m',
                     'desc' => 'Dark turquoise',
+					'orig' => FALSE,
                 },
                 'TURQUOISE' => {
                     'out'  => $csi . '38:2:64:224:208m',
                     'desc' => 'Turquoise',
+					'orig' => FALSE,
                 },
                 'MEDIUM TURQUOISE' => {
                     'out'  => $csi . '38:2:72:209:204m',
                     'desc' => 'Medium turquoise',
+					'orig' => FALSE,
                 },
                 'PALE TURQUOISE' => {
                     'out'  => $csi . '38:2:175:238:238m',
                     'desc' => 'Pale turquoise',
+					'orig' => FALSE,
                 },
                 'AQUA MARINE' => {
                     'out'  => $csi . '38:2:127:255:212m',
                     'desc' => 'Aqua marine',
+					'orig' => FALSE,
                 },
                 'POWDER BLUE' => {
                     'out'  => $csi . '38:2:176:224:230m',
                     'desc' => 'Powder blue',
+					'orig' => FALSE,
                 },
                 'CADET BLUE' => {
                     'out'  => $csi . '38:2:95:158:160m',
                     'desc' => 'Cadet blue',
+					'orig' => FALSE,
                 },
                 'STEEL BLUE' => {
                     'out'  => $csi . '38:2:70:130:180m',
                     'desc' => 'Steel blue',
+					'orig' => FALSE,
                 },
                 'CORN FLOWER BLUE' => {
                     'out'  => $csi . '38:2:100:149:237m',
                     'desc' => 'Corn flower blue',
+					'orig' => FALSE,
                 },
                 'DEEP SKY BLUE' => {
                     'out'  => $csi . '38:2:0:191:255m',
                     'desc' => 'Deep sky blue',
+					'orig' => FALSE,
                 },
                 'DODGER BLUE' => {
                     'out'  => $csi . '38:2:30:144:255m',
                     'desc' => 'Dodger blue',
+					'orig' => FALSE,
                 },
                 'LIGHT BLUE' => {
                     'out'  => $csi . '38:2:173:216:230m',
                     'desc' => 'Light blue',
+					'orig' => FALSE,
                 },
                 'SKY BLUE' => {
                     'out'  => $csi . '38:2:135:206:235m',
                     'desc' => 'Sky blue',
+					'orig' => FALSE,
                 },
                 'LIGHT SKY BLUE' => {
                     'out'  => $csi . '38:2:135:206:250m',
                     'desc' => 'Light sky blue',
+					'orig' => FALSE,
                 },
                 'MIDNIGHT BLUE' => {
                     'out'  => $csi . '38:2:25:25:112m',
                     'desc' => 'Midnight blue',
+					'orig' => FALSE,
                 },
                 'DARK BLUE' => {
                     'out'  => $csi . '38:2:0:0:139m',
                     'desc' => 'Dark blue',
+					'orig' => FALSE,
                 },
                 'MEDIUM BLUE' => {
                     'out'  => $csi . '38:2:0:0:205m',
                     'desc' => 'Medium blue',
+					'orig' => FALSE,
                 },
                 'ROYAL BLUE' => {
                     'out'  => $csi . '38:2:65:105:225m',
                     'desc' => 'Royal blue',
+					'orig' => FALSE,
                 },
                 'BLUE VIOLET' => {
                     'out'  => $csi . '38:2:138:43:226m',
                     'desc' => 'Blue violet',
+					'orig' => FALSE,
                 },
                 'INDIGO' => {
                     'out'  => $csi . '38:2:75:0:130m',
                     'desc' => 'Indigo',
+					'orig' => FALSE,
                 },
                 'DARK SLATE BLUE' => {
                     'out'  => $csi . '38:2:72:61:139m',
                     'desc' => 'Dark slate blue',
+					'orig' => FALSE,
                 },
                 'SLATE BLUE' => {
                     'out'  => $csi . '38:2:106:90:205m',
                     'desc' => 'Slate blue',
+					'orig' => FALSE,
                 },
                 'MEDIUM SLATE BLUE' => {
                     'out'  => $csi . '38:2:123:104:238m',
                     'desc' => 'Medium slate blue',
+					'orig' => FALSE,
                 },
                 'MEDIUM PURPLE' => {
                     'out'  => $csi . '38:2:147:112:219m',
                     'desc' => 'Medium purple',
+					'orig' => FALSE,
                 },
                 'DARK MAGENTA' => {
                     'out'  => $csi . '38:2:139:0:139m',
                     'desc' => 'Dark magenta',
+					'orig' => FALSE,
                 },
                 'DARK VIOLET' => {
                     'out'  => $csi . '38:2:148:0:211m',
                     'desc' => 'Dark violet',
+					'orig' => FALSE,
                 },
                 'DARK ORCHID' => {
                     'out'  => $csi . '38:2:153:50:204m',
                     'desc' => 'Dark orchid',
+					'orig' => FALSE,
                 },
                 'MEDIUM ORCHID' => {
                     'out'  => $csi . '38:2:186:85:211m',
                     'desc' => 'Medium orchid',
+					'orig' => FALSE,
                 },
                 'THISTLE' => {
                     'out'  => $csi . '38:2:216:191:216m',
                     'desc' => 'Thistle',
+					'orig' => FALSE,
                 },
                 'PLUM' => {
                     'out'  => $csi . '38:2:221:160:221m',
                     'desc' => 'Plum',
+					'orig' => FALSE,
                 },
                 'VIOLET' => {
                     'out'  => $csi . '38:2:238:130:238m',
                     'desc' => 'Violet',
+					'orig' => FALSE,
                 },
                 'ORCHID' => {
                     'out'  => $csi . '38:2:218:112:214m',
                     'desc' => 'Orchid',
+					'orig' => FALSE,
                 },
                 'MEDIUM VIOLET RED' => {
                     'out'  => $csi . '38:2:199:21:133m',
                     'desc' => 'Medium violet red',
+					'orig' => FALSE,
                 },
                 'PALE VIOLET RED' => {
                     'out'  => $csi . '38:2:219:112:147m',
                     'desc' => 'Pale violet red',
+					'orig' => FALSE,
                 },
                 'DEEP PINK' => {
                     'out'  => $csi . '38:2:255:20:147m',
                     'desc' => 'Deep pink',
+					'orig' => FALSE,
                 },
                 'HOT PINK' => {
                     'out'  => $csi . '38:2:255:105:180m',
                     'desc' => 'Hot pink',
+					'orig' => FALSE,
                 },
                 'LIGHT PINK' => {
                     'out'  => $csi . '38:2:255:182:193m',
                     'desc' => 'Light pink',
+					'orig' => FALSE,
                 },
                 'ANTIQUE WHITE' => {
                     'out'  => $csi . '38:2:250:235:215m',
                     'desc' => 'Antique white',
+					'orig' => FALSE,
                 },
                 'BEIGE' => {
                     'out'  => $csi . '38:2:245:245:220m',
                     'desc' => 'Beige',
+					'orig' => FALSE,
                 },
                 'BISQUE' => {
                     'out'  => $csi . '38:2:255:228:196m',
                     'desc' => 'Bisque',
+					'orig' => FALSE,
                 },
                 'BLANCHED ALMOND' => {
                     'out'  => $csi . '38:2:255:235:205m',
                     'desc' => 'Blanched almond',
+					'orig' => FALSE,
                 },
                 'WHEAT' => {
                     'out'  => $csi . '38:2:245:222:179m',
                     'desc' => 'Wheat',
+					'orig' => FALSE,
                 },
                 'CORN SILK' => {
                     'out'  => $csi . '38:2:255:248:220m',
                     'desc' => 'Corn silk',
+					'orig' => FALSE,
                 },
                 'LEMON CHIFFON' => {
                     'out'  => $csi . '38:2:255:250:205m',
                     'desc' => 'Lemon chiffon',
+					'orig' => FALSE,
                 },
                 'LIGHT GOLDEN ROD YELLOW' => {
                     'out'  => $csi . '38:2:250:250:210m',
                     'desc' => 'Light golden rod yellow',
+					'orig' => FALSE,
                 },
                 'LIGHT YELLOW' => {
                     'out'  => $csi . '38:2:255:255:224m',
                     'desc' => 'Light yellow',
+					'orig' => FALSE,
                 },
                 'SADDLE BROWN' => {
                     'out'  => $csi . '38:2:139:69:19m',
                     'desc' => 'Saddle brown',
+					'orig' => FALSE,
                 },
                 'SIENNA' => {
                     'out'  => $csi . '38:2:160:82:45m',
                     'desc' => 'Sienna',
+					'orig' => FALSE,
                 },
                 'CHOCOLATE' => {
                     'out'  => $csi . '38:2:210:105:30m',
                     'desc' => 'Chocolate',
+					'orig' => FALSE,
                 },
                 'PERU' => {
                     'out'  => $csi . '38:2:205:133:63m',
                     'desc' => 'Peru',
+					'orig' => FALSE,
                 },
                 'SANDY BROWN' => {
                     'out'  => $csi . '38:2:244:164:96m',
                     'desc' => 'Sandy brown',
+					'orig' => FALSE,
                 },
                 'BURLY WOOD' => {
                     'out'  => $csi . '38:2:222:184:135m',
                     'desc' => 'Burly wood',
+					'orig' => FALSE,
                 },
                 'TAN' => {
                     'out'  => $csi . '38:2:210:180:140m',
                     'desc' => 'Tan',
+					'orig' => FALSE,
                 },
                 'ROSY BROWN' => {
                     'out'  => $csi . '38:2:188:143:143m',
                     'desc' => 'Rosy brown',
+					'orig' => FALSE,
                 },
                 'MOCCASIN' => {
                     'out'  => $csi . '38:2:255:228:181m',
                     'desc' => 'Moccasin',
+					'orig' => FALSE,
                 },
                 'NAVAJO WHITE' => {
                     'out'  => $csi . '38:2:255:222:173m',
                     'desc' => 'Navajo white',
+					'orig' => FALSE,
                 },
                 'PEACH PUFF' => {
                     'out'  => $csi . '38:2:255:218:185m',
                     'desc' => 'Peach puff',
+					'orig' => FALSE,
                 },
                 'MISTY ROSE' => {
                     'out'  => $csi . '38:2:255:228:225m',
                     'desc' => 'Misty rose',
+					'orig' => FALSE,
                 },
                 'LAVENDER BLUSH' => {
                     'out'  => $csi . '38:2:255:240:245m',
                     'desc' => 'Lavender blush',
+					'orig' => FALSE,
                 },
                 'LINEN' => {
                     'out'  => $csi . '38:2:250:240:230m',
                     'desc' => 'Linen',
+					'orig' => FALSE,
                 },
                 'OLD LACE' => {
                     'out'  => $csi . '38:2:253:245:230m',
                     'desc' => 'Old lace',
+					'orig' => FALSE,
                 },
                 'PAPAYA WHIP' => {
                     'out'  => $csi . '38:2:255:239:213m',
                     'desc' => 'Papaya whip',
+					'orig' => FALSE,
                 },
                 'SEA SHELL' => {
                     'out'  => $csi . '38:2:255:245:238m',
                     'desc' => 'Sea shell',
+					'orig' => FALSE,
                 },
                 'MINT CREAM' => {
                     'out'  => $csi . '38:2:245:255:250m',
                     'desc' => 'Mint green',
+					'orig' => FALSE,
                 },
                 'SLATE GREY' => {
                     'out'  => $csi . '38:2:112:128:144m',
                     'desc' => 'Slate gray',
+					'orig' => FALSE,
                 },
                 'LIGHT SLATE GREY' => {
                     'out'  => $csi . '38:2:119:136:153m',
                     'desc' => 'Lisght slate gray',
+					'orig' => FALSE,
                 },
                 'LIGHT STEEL BLUE' => {
                     'out'  => $csi . '38:2:176:196:222m',
                     'desc' => 'Light steel blue',
+					'orig' => FALSE,
                 },
                 'LAVENDER' => {
                     'out'  => $csi . '38:2:230:230:250m',
                     'desc' => 'Lavender',
+					'orig' => FALSE,
                 },
                 'FLORAL WHITE' => {
                     'out'  => $csi . '38:2:255:250:240m',
                     'desc' => 'Floral white',
+					'orig' => FALSE,
                 },
                 'ALICE BLUE' => {
                     'out'  => $csi . '38:2:240:248:255m',
                     'desc' => 'Alice blue',
+					'orig' => FALSE,
                 },
                 'GHOST WHITE' => {
                     'out'  => $csi . '38:2:248:248:255m',
                     'desc' => 'Ghost white',
+					'orig' => FALSE,
                 },
                 'HONEYDEW' => {
                     'out'  => $csi . '38:2:240:255:240m',
                     'desc' => 'Honeydew',
+					'orig' => FALSE,
                 },
                 'IVORY' => {
                     'out'  => $csi . '38:2:255:255:240m',
                     'desc' => 'Ivory',
+					'orig' => FALSE,
                 },
                 'AZURE' => {
                     'out'  => $csi . '38:2:240:255:255m',
                     'desc' => 'Azure',
+					'orig' => FALSE,
                 },
                 'SNOW' => {
                     'out'  => $csi . '38:2:255:250:250m',
                     'desc' => 'Snow',
+					'orig' => FALSE,
                 },
                 'DIM GREY' => {
                     'out'  => $csi . '38:2:105:105:105m',
                     'desc' => 'Dim gray',
+					'orig' => FALSE,
                 },
                 'DARK GREY' => {
                     'out'  => $csi . '38:2:169:169:169m',
                     'desc' => 'Dark gray',
+					'orig' => FALSE,
                 },
                 'SILVER' => {
                     'out'  => $csi . '38:2:192:192:192m',
                     'desc' => 'Silver',
+					'orig' => FALSE,
                 },
                 'LIGHT GREY' => {
                     'out'  => $csi . '38:2:211:211:211m',
                     'desc' => 'Light gray',
+					'orig' => FALSE,
                 },
                 'GAINSBORO' => {
                     'out'  => $csi . '38:2:220:220:220m',
                     'desc' => 'Gainsboro',
+					'orig' => FALSE,
                 },
                 'WHITE SMOKE' => {
                     'out'  => $csi . '38:2:245:245:245m',
                     'desc' => 'White smoke',
+					'orig' => FALSE,
                 },
             },
 
             'background' => {
                 'B_DEFAULT' => {
                     'out'  => $csi . '49m',
-                    'desc' => 'Default color',
+                    'desc' => 'Default background color',
+					'orig' => TRUE,
                 },
                 'B_BLACK' => {
                     'out'  => $csi . '40m',
                     'desc' => 'Black',
+					'orig' => TRUE,
                 },
                 'B_RED' => {
                     'out'  => $csi . '41m',
                     'desc' => 'Red',
+					'orig' => TRUE,
                 },
                 'B_DARK RED' => {
                     'out'  => $csi . '48:2:139:0:0m',
                     'desc' => 'Dark red',
+					'orig' => FALSE,
                 },
                 'B_PINK' => {
                     'out'  => $csi . '48;5;198m',
                     'desc' => 'Pink',
+					'orig' => FALSE,
                 },
                 'B_ORANGE' => {
                     'out'  => $csi . '48;5;202m',
                     'desc' => 'Orange',
+					'orig' => FALSE,
                 },
                 'B_NAVY' => {
                     'out'  => $csi . '48;5;17m',
                     'desc' => 'Navy',
+					'orig' => FALSE,
                 },
                 'B_BROWN' => {
                     'out'  => $csi . '48:2:165:42:42m',
                     'desc' => 'Brown',
+					'orig' => FALSE,
                 },
                 'B_MAROON' => {
                     'out'  => $csi . '48:2:128:0:0m',
                     'desc' => 'Maroon',
+					'orig' => FALSE,
                 },
                 'B_OLIVE' => {
                     'out'  => $csi . '48:2:128:128:0m',
                     'desc' => 'Olive',
+					'orig' => FALSE,
                 },
                 'B_PURPLE' => {
                     'out'  => $csi . '48:2:128:0:128m',
                     'desc' => 'Purple',
+					'orig' => FALSE,
                 },
                 'B_TEAL' => {
                     'out'  => $csi . '48:2:0:128:128m',
                     'desc' => 'Teal',
+					'orig' => FALSE,
                 },
                 'B_GREEN' => {
                     'out'  => $csi . '42m',
                     'desc' => 'Green',
+					'orig' => TRUE,
                 },
                 'B_YELLOW' => {
                     'out'  => $csi . '43m',
                     'desc' => 'Yellow',
+					'orig' => TRUE,
                 },
                 'B_BLUE' => {
                     'out'  => $csi . '44m',
                     'desc' => 'Blue',
+					'orig' => TRUE,
                 },
                 'B_MAGENTA' => {
                     'out'  => $csi . '45m',
                     'desc' => 'Magenta',
+					'orig' => TRUE,
                 },
                 'B_CYAN' => {
                     'out'  => $csi . '46m',
                     'desc' => 'Cyan',
+					'orig' => TRUE,
                 },
                 'B_WHITE' => {
                     'out'  => $csi . '47m',
                     'desc' => 'White',
+					'orig' => TRUE,
                 },
                 'B_BRIGHT BLACK' => {
                     'out'  => $csi . '100m',
                     'desc' => 'Bright black',
+					'orig' => TRUE,
                 },
                 'B_BRIGHT RED' => {
                     'out'  => $csi . '101m',
                     'desc' => 'Bright red',
+					'orig' => TRUE,
                 },
                 'B_BRIGHT GREEN' => {
                     'out'  => $csi . '102m',
                     'desc' => 'Bright green',
+					'orig' => TRUE,
                 },
                 'B_BRIGHT YELLOW' => {
                     'out'  => $csi . '103m',
                     'desc' => 'Bright yellow',
+					'orig' => TRUE,
                 },
                 'B_BRIGHT BLUE' => {
                     'out'  => $csi . '104m',
                     'desc' => 'Bright blue',
+					'orig' => TRUE,
                 },
                 'B_BRIGHT MAGENTA' => {
                     'out'  => $csi . '105m',
                     'desc' => 'Bright magenta',
+					'orig' => TRUE,
                 },
                 'B_BRIGHT CYAN' => {
                     'out'  => $csi . '106m',
                     'desc' => 'Bright cyan',
+					'orig' => TRUE,
                 },
                 'B_BRIGHT WHITE' => {
                     'out'  => $csi . '107m',
                     'desc' => 'Bright white',
+					'orig' => TRUE,
                 },
                 'B_FIREBRICK' => {
                     'out'  => $csi . '48:2:178:34:34m',
                     'desc' => 'Firebrick',
+					'orig' => FALSE,
                 },
                 'B_CRIMSON' => {
                     'out'  => $csi . '48:2:220:20:60m',
                     'desc' => 'Crimson',
+					'orig' => FALSE,
                 },
                 'B_TOMATO' => {
                     'out'  => $csi . '48:2:255:99:71m',
                     'desc' => 'Tomato',
+					'orig' => FALSE,
                 },
                 'B_CORAL' => {
                     'out'  => $csi . '48:2:255:127:80m',
                     'desc' => 'Coral',
+					'orig' => FALSE,
                 },
                 'B_INDIAN RED' => {
                     'out'  => $csi . '48:2:205:92:92m',
                     'desc' => 'Indian red',
+					'orig' => FALSE,
                 },
                 'B_LIGHT CORAL' => {
                     'out'  => $csi . '48:2:240:128:128m',
                     'desc' => 'Light coral',
+					'orig' => FALSE,
                 },
                 'B_DARK SALMON' => {
                     'out'  => $csi . '48:2:233:150:122m',
                     'desc' => 'Dark salmon',
+					'orig' => FALSE,
                 },
                 'B_SALMON' => {
                     'out'  => $csi . '48:2:250:128:114m',
                     'desc' => 'Salmon',
+					'orig' => FALSE,
                 },
                 'B_LIGHT SALMON' => {
                     'out'  => $csi . '48:2:255:160:122m',
                     'desc' => 'Light salmon',
+					'orig' => FALSE,
                 },
                 'B_ORANGE RED' => {
                     'out'  => $csi . '48:2:255:69:0m',
                     'desc' => 'Orange red',
+					'orig' => FALSE,
                 },
                 'B_DARK ORANGE' => {
                     'out'  => $csi . '48:2:255:140:0m',
                     'desc' => 'Dark orange',
+					'orig' => FALSE,
                 },
                 'B_GOLD' => {
                     'out'  => $csi . '48:2:255:215:0m',
                     'desc' => 'Gold',
+					'orig' => FALSE,
                 },
                 'B_DARK GOLDEN ROD' => {
                     'out'  => $csi . '48:2:184:134:11m',
                     'desc' => 'Dark golden rod',
+					'orig' => FALSE,
                 },
                 'B_GOLDEN ROD' => {
                     'out'  => $csi . '48:2:218:165:32m',
                     'desc' => 'Golden rod',
+					'orig' => FALSE,
                 },
                 'B_PALE GOLDEN ROD' => {
                     'out'  => $csi . '48:2:238:232:170m',
                     'desc' => 'Pale golden rod',
+					'orig' => FALSE,
                 },
                 'B_DARK KHAKI' => {
                     'out'  => $csi . '48:2:189:183:107m',
                     'desc' => 'Dark khaki',
+					'orig' => FALSE,
                 },
                 'B_KHAKI' => {
                     'out'  => $csi . '48:2:240:230:140m',
                     'desc' => 'Khaki',
+					'orig' => FALSE,
                 },
                 'B_YELLOW GREEN' => {
                     'out'  => $csi . '48:2:154:205:50m',
                     'desc' => 'Yellow green',
+					'orig' => FALSE,
                 },
                 'B_DARK OLIVE GREEN' => {
                     'out'  => $csi . '48:2:85:107:47m',
                     'desc' => 'Dark olive green',
+					'orig' => FALSE,
                 },
                 'B_OLIVE DRAB' => {
                     'out'  => $csi . '48:2:107:142:35m',
                     'desc' => 'Olive drab',
+					'orig' => FALSE,
                 },
                 'B_LAWN GREEN' => {
                     'out'  => $csi . '48:2:124:252:0m',
                     'desc' => 'Lawn green',
+					'orig' => FALSE,
                 },
                 'B_CHARTREUSE' => {
                     'out'  => $csi . '48:2:127:255:0m',
                     'desc' => 'Chartreuse',
+					'orig' => FALSE,
                 },
                 'B_GREEN YELLOW' => {
                     'out'  => $csi . '48:2:173:255:47m',
                     'desc' => 'Green yellow',
+					'orig' => FALSE,
                 },
                 'B_DARK GREEN' => {
                     'out'  => $csi . '48:2:0:100:0m',
                     'desc' => 'Dark green',
+					'orig' => FALSE,
                 },
                 'B_FOREST GREEN' => {
                     'out'  => $csi . '48:2:34:139:34m',
                     'desc' => 'Forest green',
+					'orig' => FALSE,
                 },
                 'B_LIME GREEN' => {
                     'out'  => $csi . '48:2:50:205:50m',
                     'desc' => 'Lime Green',
+					'orig' => FALSE,
                 },
                 'B_LIGHT GREEN' => {
                     'out'  => $csi . '48:2:144:238:144m',
                     'desc' => 'Light green',
+					'orig' => FALSE,
                 },
                 'B_PALE GREEN' => {
                     'out'  => $csi . '48:2:152:251:152m',
                     'desc' => 'Pale green',
+					'orig' => FALSE,
                 },
                 'B_DARK SEA GREEN' => {
                     'out'  => $csi . '48:2:143:188:143m',
                     'desc' => 'Dark sea green',
+					'orig' => FALSE,
                 },
                 'B_MEDIUM SPRING GREEN' => {
                     'out'  => $csi . '48:2:0:250:154m',
                     'desc' => 'Medium spring green',
+					'orig' => FALSE,
                 },
                 'B_SPRING GREEN' => {
                     'out'  => $csi . '48:2:0:255:127m',
                     'desc' => 'Spring green',
+					'orig' => FALSE,
                 },
                 'B_SEA GREEN' => {
                     'out'  => $csi . '48:2:46:139:87m',
                     'desc' => 'Sea green',
+					'orig' => FALSE,
                 },
                 'B_MEDIUM AQUA MARINE' => {
                     'out'  => $csi . '48:2:102:205:170m',
                     'desc' => 'Medium aqua marine',
+					'orig' => FALSE,
                 },
                 'B_MEDIUM SEA GREEN' => {
                     'out'  => $csi . '48:2:60:179:113m',
                     'desc' => 'Medium sea green',
+					'orig' => FALSE,
                 },
                 'B_LIGHT SEA GREEN' => {
                     'out'  => $csi . '48:2:32:178:170m',
                     'desc' => 'Light sea green',
+					'orig' => FALSE,
                 },
                 'B_DARK SLATE GREY' => {
                     'out'  => $csi . '48:2:47:79:79m',
                     'desc' => 'Dark slate gray',
+					'orig' => FALSE,
                 },
                 'B_DARK CYAN' => {
                     'out'  => $csi . '48:2:0:139:139m',
                     'desc' => 'Dark cyan',
+					'orig' => FALSE,
                 },
                 'B_AQUA' => {
                     'out'  => $csi . '48:2:0:255:255m',
                     'desc' => 'Aqua',
+					'orig' => FALSE,
                 },
                 'B_LIGHT CYAN' => {
                     'out'  => $csi . '48:2:224:255:255m',
                     'desc' => 'Light cyan',
+					'orig' => FALSE,
                 },
                 'B_DARK TURQUOISE' => {
                     'out'  => $csi . '48:2:0:206:209m',
                     'desc' => 'Dark turquoise',
+					'orig' => FALSE,
                 },
                 'B_TURQUOISE' => {
                     'out'  => $csi . '48:2:64:224:208m',
                     'desc' => 'Turquoise',
+					'orig' => FALSE,
                 },
                 'B_MEDIUM TURQUOISE' => {
                     'out'  => $csi . '48:2:72:209:204m',
                     'desc' => 'Medium turquoise',
+					'orig' => FALSE,
                 },
                 'B_PALE TURQUOISE' => {
                     'out'  => $csi . '48:2:175:238:238m',
                     'desc' => 'Pale turquoise',
+					'orig' => FALSE,
                 },
                 'B_AQUA MARINE' => {
                     'out'  => $csi . '48:2:127:255:212m',
                     'desc' => 'Aqua marine',
+					'orig' => FALSE,
                 },
                 'B_POWDER BLUE' => {
                     'out'  => $csi . '48:2:176:224:230m',
                     'desc' => 'Powder blue',
+					'orig' => FALSE,
                 },
                 'B_CADET BLUE' => {
                     'out'  => $csi . '48:2:95:158:160m',
                     'desc' => 'Cadet blue',
+					'orig' => FALSE,
                 },
                 'B_STEEL BLUE' => {
                     'out'  => $csi . '48:2:70:130:180m',
                     'desc' => 'Steel blue',
+					'orig' => FALSE,
                 },
                 'B_CORN FLOWER BLUE' => {
                     'out'  => $csi . '48:2:100:149:237m',
                     'desc' => 'Corn flower blue',
+					'orig' => FALSE,
                 },
                 'B_DEEP SKY BLUE' => {
                     'out'  => $csi . '48:2:0:191:255m',
                     'desc' => 'Deep sky blue',
+					'orig' => FALSE,
                 },
                 'B_DODGER BLUE' => {
                     'out'  => $csi . '48:2:30:144:255m',
                     'desc' => 'Dodger blue',
+					'orig' => FALSE,
                 },
                 'B_LIGHT BLUE' => {
                     'out'  => $csi . '48:2:173:216:230m',
                     'desc' => 'Light blue',
+					'orig' => FALSE,
                 },
                 'B_SKY BLUE' => {
                     'out'  => $csi . '48:2:135:206:235m',
                     'desc' => 'Sky blue',
+					'orig' => FALSE,
                 },
                 'B_LIGHT SKY BLUE' => {
                     'out'  => $csi . '48:2:135:206:250m',
                     'desc' => 'Light sky blue',
+					'orig' => FALSE,
                 },
                 'B_MIDNIGHT BLUE' => {
                     'out'  => $csi . '48:2:25:25:112m',
                     'desc' => 'Midnight blue',
+					'orig' => FALSE,
                 },
                 'B_DARK BLUE' => {
                     'out'  => $csi . '48:2:0:0:139m',
                     'desc' => 'Dark blue',
+					'orig' => FALSE,
                 },
                 'B_MEDIUM BLUE' => {
                     'out'  => $csi . '48:2:0:0:205m',
                     'desc' => 'Medium blue',
+					'orig' => FALSE,
                 },
                 'B_ROYAL BLUE' => {
                     'out'  => $csi . '48:2:65:105:225m',
                     'desc' => 'Royal blue',
+					'orig' => FALSE,
                 },
                 'B_BLUE VIOLET' => {
                     'out'  => $csi . '48:2:138:43:226m',
                     'desc' => 'Blue violet',
+					'orig' => FALSE,
                 },
                 'B_INDIGO' => {
                     'out'  => $csi . '48:2:75:0:130m',
                     'desc' => 'Indigo',
+					'orig' => FALSE,
                 },
                 'B_DARK SLATE BLUE' => {
                     'out'  => $csi . '48:2:72:61:139m',
                     'desc' => 'Dark slate blue',
+					'orig' => FALSE,
                 },
                 'B_SLATE BLUE' => {
                     'out'  => $csi . '48:2:106:90:205m',
                     'desc' => 'Slate blue',
+					'orig' => FALSE,
                 },
                 'B_MEDIUM SLATE BLUE' => {
                     'out'  => $csi . '48:2:123:104:238m',
                     'desc' => 'Medium slate blue',
+					'orig' => FALSE,
                 },
                 'B_MEDIUM PURPLE' => {
                     'out'  => $csi . '48:2:147:112:219m',
                     'desc' => 'Medium purple',
+					'orig' => FALSE,
                 },
                 'B_DARK MAGENTA' => {
                     'out'  => $csi . '48:2:139:0:139m',
                     'desc' => 'Dark magenta',
+					'orig' => FALSE,
                 },
                 'B_DARK VIOLET' => {
                     'out'  => $csi . '48:2:148:0:211m',
                     'desc' => 'Dark violet',
+					'orig' => FALSE,
                 },
                 'B_DARK ORCHID' => {
                     'out'  => $csi . '48:2:153:50:204m',
                     'desc' => 'Dark orchid',
+					'orig' => FALSE,
                 },
                 'B_MEDIUM ORCHID' => {
                     'out'  => $csi . '48:2:186:85:211m',
                     'desc' => 'Medium orchid',
+					'orig' => FALSE,
                 },
                 'B_THISTLE' => {
                     'out'  => $csi . '48:2:216:191:216m',
                     'desc' => 'Thistle',
+					'orig' => FALSE,
                 },
                 'B_PLUM' => {
                     'out'  => $csi . '48:2:221:160:221m',
                     'desc' => 'Plum',
+					'orig' => FALSE,
                 },
                 'B_VIOLET' => {
                     'out'  => $csi . '48:2:238:130:238m',
                     'desc' => 'Violet',
+					'orig' => FALSE,
                 },
                 'B_ORCHID' => {
                     'out'  => $csi . '48:2:218:112:214m',
                     'desc' => 'Orchid',
+					'orig' => FALSE,
                 },
                 'B_MEDIUM VIOLET RED' => {
                     'out'  => $csi . '48:2:199:21:133m',
                     'desc' => 'Medium violet red',
+					'orig' => FALSE,
                 },
                 'B_PALE VIOLET RED' => {
                     'out'  => $csi . '48:2:219:112:147m',
                     'desc' => 'Pale violet red',
+					'orig' => FALSE,
                 },
                 'B_DEEP PINK' => {
                     'out'  => $csi . '48:2:255:20:147m',
                     'desc' => 'Deep pink',
+					'orig' => FALSE,
                 },
                 'B_HOT PINK' => {
                     'out'  => $csi . '48:2:255:105:180m',
                     'desc' => 'Hot pink',
+					'orig' => FALSE,
                 },
                 'B_LIGHT PINK' => {
                     'out'  => $csi . '48:2:255:182:193m',
                     'desc' => 'Light pink',
+					'orig' => FALSE,
                 },
                 'B_ANTIQUE WHITE' => {
                     'out'  => $csi . '48:2:250:235:215m',
                     'desc' => 'Antique white',
+					'orig' => FALSE,
                 },
                 'B_BEIGE' => {
                     'out'  => $csi . '48:2:245:245:220m',
                     'desc' => 'Beige',
+					'orig' => FALSE,
                 },
                 'B_BISQUE' => {
                     'out'  => $csi . '48:2:255:228:196m',
                     'desc' => 'Bisque',
+					'orig' => FALSE,
                 },
                 'B_BLANCHED ALMOND' => {
                     'out'  => $csi . '48:2:255:235:205m',
                     'desc' => 'Blanched almond',
+					'orig' => FALSE,
                 },
                 'B_WHEAT' => {
                     'out'  => $csi . '48:2:245:222:179m',
                     'desc' => 'Wheat',
+					'orig' => FALSE,
                 },
                 'B_CORN SILK' => {
                     'out'  => $csi . '48:2:255:248:220m',
                     'desc' => 'Corn silk',
+					'orig' => FALSE,
                 },
                 'B_LEMON CHIFFON' => {
                     'out'  => $csi . '48:2:255:250:205m',
                     'desc' => 'Lemon chiffon',
+					'orig' => FALSE,
                 },
                 'B_LIGHT GOLDEN ROD YELLOW' => {
                     'out'  => $csi . '48:2:250:250:210m',
                     'desc' => 'Light golden rod yellow',
+					'orig' => FALSE,
                 },
                 'B_LIGHT YELLOW' => {
                     'out'  => $csi . '48:2:255:255:224m',
                     'desc' => 'Light yellow',
+					'orig' => FALSE,
                 },
                 'B_SADDLE BROWN' => {
                     'out'  => $csi . '48:2:139:69:19m',
                     'desc' => 'Saddle brown',
+					'orig' => FALSE,
                 },
                 'B_SIENNA' => {
                     'out'  => $csi . '48:2:160:82:45m',
                     'desc' => 'Sienna',
+					'orig' => FALSE,
                 },
                 'B_CHOCOLATE' => {
                     'out'  => $csi . '48:2:210:105:30m',
                     'desc' => 'Chocolate',
+					'orig' => FALSE,
                 },
                 'B_PERU' => {
                     'out'  => $csi . '48:2:205:133:63m',
                     'desc' => 'Peru',
+					'orig' => FALSE,
                 },
                 'B_SANDY BROWN' => {
                     'out'  => $csi . '48:2:244:164:96m',
                     'desc' => 'Sandy brown',
+					'orig' => FALSE,
                 },
                 'B_BURLY WOOD' => {
                     'out'  => $csi . '48:2:222:184:135m',
                     'desc' => 'Burly wood',
+					'orig' => FALSE,
                 },
                 'B_TAN' => {
                     'out'  => $csi . '48:2:210:180:140m',
                     'desc' => 'Tan',
+					'orig' => FALSE,
                 },
                 'B_ROSY BROWN' => {
                     'out'  => $csi . '48:2:188:143:143m',
                     'desc' => 'Rosy brown',
+					'orig' => FALSE,
                 },
                 'B_MOCCASIN' => {
                     'out'  => $csi . '48:2:255:228:181m',
                     'desc' => 'Moccasin',
+					'orig' => FALSE,
                 },
                 'B_NAVAJO WHITE' => {
                     'out'  => $csi . '48:2:255:222:173m',
                     'desc' => 'Navajo white',
+					'orig' => FALSE,
                 },
                 'B_PEACH PUFF' => {
                     'out'  => $csi . '48:2:255:218:185m',
                     'desc' => 'Peach puff',
+					'orig' => FALSE,
                 },
                 'B_MISTY ROSE' => {
                     'out'  => $csi . '48:2:255:228:225m',
                     'desc' => 'Misty rose',
+					'orig' => FALSE,
                 },
                 'B_LAVENDER BLUSH' => {
                     'out'  => $csi . '48:2:255:240:245m',
                     'desc' => 'Lavender blush',
+					'orig' => FALSE,
                 },
                 'B_LINEN' => {
                     'out'  => $csi . '48:2:250:240:230m',
                     'desc' => 'Linen',
+					'orig' => FALSE,
                 },
                 'B_OLD LACE' => {
                     'out'  => $csi . '48:2:253:245:230m',
                     'desc' => 'Old lace',
+					'orig' => FALSE,
                 },
                 'B_PAPAYA WHIP' => {
                     'out'  => $csi . '48:2:255:239:213m',
                     'desc' => 'Papaya whip',
+					'orig' => FALSE,
                 },
                 'B_SEA SHELL' => {
                     'out'  => $csi . '48:2:255:245:238m',
                     'desc' => 'Sea shell',
+					'orig' => FALSE,
                 },
                 'B_MINT CREAM' => {
                     'out'  => $csi . '48:2:245:255:250m',
                     'desc' => 'Mint green',
+					'orig' => FALSE,
                 },
                 'B_SLATE GREY' => {
                     'out'  => $csi . '48:2:112:128:144m',
                     'desc' => 'Slate gray',
+					'orig' => FALSE,
                 },
                 'B_LIGHT SLATE GREY' => {
                     'out'  => $csi . '48:2:119:136:153m',
                     'desc' => 'Lisght slate gray',
+					'orig' => FALSE,
                 },
                 'B_LIGHT STEEL BLUE' => {
                     'out'  => $csi . '48:2:176:196:222m',
                     'desc' => 'Light steel blue',
+					'orig' => FALSE,
                 },
                 'B_LAVENDER' => {
                     'out'  => $csi . '48:2:230:230:250m',
                     'desc' => 'Lavender',
+					'orig' => FALSE,
                 },
                 'B_FLORAL WHITE' => {
                     'out'  => $csi . '48:2:255:250:240m',
                     'desc' => 'Floral white',
+					'orig' => FALSE,
                 },
                 'B_ALICE BLUE' => {
                     'out'  => $csi . '48:2:240:248:255m',
                     'desc' => 'Alice blue',
+					'orig' => FALSE,
                 },
                 'B_GHOST WHITE' => {
                     'out'  => $csi . '48:2:248:248:255m',
                     'desc' => 'Ghost white',
+					'orig' => FALSE,
                 },
                 'B_HONEYDEW' => {
                     'out'  => $csi . '48:2:240:255:240m',
                     'desc' => 'Honeydew',
+					'orig' => FALSE,
                 },
                 'B_IVORY' => {
                     'out'  => $csi . '48:2:255:255:240m',
                     'desc' => 'Ivory',
+					'orig' => FALSE,
                 },
                 'B_AZURE' => {
                     'out'  => $csi . '48:2:240:255:255m',
                     'desc' => 'Azure',
+					'orig' => FALSE,
                 },
                 'B_SNOW' => {
                     'out'  => $csi . '48:2:255:250:250m',
                     'desc' => 'Snow',
+					'orig' => FALSE,
                 },
                 'B_DIM GREY' => {
                     'out'  => $csi . '48:2:105:105:105m',
                     'desc' => 'Dim gray',
+					'orig' => FALSE,
                 },
                 'B_DARK GREY' => {
                     'out'  => $csi . '48:2:169:169:169m',
                     'desc' => 'Dark gray',
+					'orig' => FALSE,
                 },
                 'B_SILVER' => {
                     'out'  => $csi . '48:2:192:192:192m',
                     'desc' => 'Silver',
+					'orig' => FALSE,
                 },
                 'B_LIGHT GREY' => {
                     'out'  => $csi . '48:2:211:211:211m',
                     'desc' => 'Light gray',
+					'orig' => FALSE,
                 },
                 'B_GAINSBORO' => {
                     'out'  => $csi . '48:2:220:220:220m',
                     'desc' => 'Gainsboro',
+					'orig' => FALSE,
                 },
                 'B_WHITE SMOKE' => {
                     'out'  => $csi . '48:2:245:245:245m',
                     'desc' => 'White smoke',
+					'orig' => FALSE,
                 },
             },
         },
@@ -1867,15 +2180,12 @@ Sets colors to default
 
 =head2 FOREGROUND
 
-There are many more foreground colors available than the ones below.  However, the ones below should work on any color terminal.  Other colors may requite 256 and 16 million color support.  Most Linux X-Windows and Wayland terminal software should support the extra colors.  Some Windows terminal software should have "Term256" features.  You can used the "-t" option for all of the color tokens available or use the "RGB" token for access to 16 million colors.
+There are many more foreground colors available than the sixteen below.  However, the ones below should work on any color terminal.  Other colors may requite 256 and 16 million color support.  Most Linux X-Windows and Wayland terminal software should support the extra colors.  Some Windows terminal software should have "Term256" features.  You can used the "-t" option for all of the color tokens available or use the "RGB" token for access to 16 million colors.
 
 =over 4
 
 =item BLACK          = Black
 =item RED            = Red
-=item PINK           = Hot pink
-=item ORANGE         = Orange
-=item NAVY           = Deep blue
 =item GREEN          = Green
 =item YELLOW         = Yellow
 =item BLUE           = Blue
@@ -1896,7 +2206,7 @@ There are many more foreground colors available than the ones below.  However, t
 
 =head2 BACKGROUND
 
-There are many more background colors available than the ones below.  However, the ones below should work on any color terminal.  Other colors may requite 256 and 16 million color support.  Most Linux X-Windows and Wayland terminal software should support the extra colors.  Some Windows terminal software should have "Term256" features.  You can used the "-t" option for all of the color tokens available or use the "B_RGB" token for access to 16 million colors.
+There are many more background colors available than the sixteen below.  However, the ones below should work on any color terminal.  Other colors may requite 256 and 16 million color support.  Most Linux X-Windows and Wayland terminal software should support the extra colors.  Some Windows terminal software should have "Term256" features.  You can used the "-t" option for all of the color tokens available or use the "B_RGB" token for access to 16 million colors.
 
 =over 4
 
@@ -1909,9 +2219,6 @@ There are many more background colors available than the ones below.  However, t
 =item B_CYAN           = Cyan
 =item B_WHITE          = White
 =item B_DEFAULT        = Default background color
-=item B_PINK           = Hot pink
-=item B_ORANGE         = Orange
-=item B_NAVY           = Deep blue
 =item BRIGHT B_BLACK   = Bright black (grey)
 =item BRIGHT B_RED     = Bright red
 =item BRIGHT B_GREEN   = Lime

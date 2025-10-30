@@ -9,10 +9,12 @@ use lib "$FindBin::Bin/lib";
 
 use Test::More;
 
-plan skip_all => 'set TEST_AE to enable this test (developer only!)'
-    unless $ENV{TEST_AE} || $ENV{TEST_ALL};
-plan skip_all => 'AnyEvent 5.0+ required for this test!'
-    unless eval { require AnyEvent; AnyEvent->VERSION('5.0'); 1 };
+BEGIN {
+    plan skip_all => 'set TEST_AE to enable this test (developer only!)'
+        unless $ENV{TEST_AE} || $ENV{TEST_ALL};
+    plan skip_all => 'AnyEvent 5.0+ required for this test!'
+        unless eval { require AnyEvent; AnyEvent->VERSION('5.0'); 1 }
+}
 
 BEGIN {
     $ENV{MIKROTIK_CLIENT_CONNTIMEOUT} = 2;
@@ -52,7 +54,8 @@ my ($err, $res);
 # check connection
 $api->port(Mojo::IOLoop::Server::generate_port());
 $res = $api->cmd('/resp');
-ok $! == ECONNREFUSED, 'connection error';
+ok $!, 'connection error';
+diag("Connection error (\$!) is " . int($!));
 $api->port($port);
 
 # blocking

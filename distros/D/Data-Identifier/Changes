@@ -1,3 +1,9 @@
+v0.22  2025-10-29Z
+    - Support Data::TagMap as tagmap in Data::Identifier::Interface::Subobjects
+    - Support SIRTX::Datecode as $as in as()
+    - Support converting from SIRTX::Datecode in new() via from
+    - Support converting from Data::Identifier::Interface::Simple in new() via from
+
 v0.21  2025-10-26Z
     - Updated list of well known languages
     - Updated list of well known tags related to character sets

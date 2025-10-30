@@ -51,7 +51,7 @@ See [https://home-assistant.io/components/switch.command\_line/](https://home-as
 
 ### Node Red
 
-Integration with Node Red [https://nodered.org/](https://nodered.org/) can be accomplished with the included JSON web API power-outlet-json.cgi.  The power-outlet-json.cgi script is a layer on top of [Power::Outlet::Config](https://metacpan.org/pod/Power::Outlet::Config) where the "name" parameter maps to the section in the /etc/power-outlet.ini INI file.
+Integration with Node Red [https://nodered.org/](https://nodered.org/) can be accomplished with the included JSON web API power-outlet-json.cgi.  The power-outlet-json.cgi script is a layer on top of [Power::Outlet::Config](https://metacpan.org/pod/Power%3A%3AOutlet%3A%3AConfig) where the "name" parameter maps to the section in the /etc/power-outlet.ini INI file.
 
 To access all of these devices use an http request node with a URL https://127.0.0.1/cgi-bin/power-outlet-json.cgi?name={{topic}};action={{payload}} then simply set the topic to the INI section and the action to either ON or OFF.
 
@@ -93,7 +93,7 @@ The full text of the license can be found in the LICENSE file included with this
 
 ## SEE ALSO
 
-[Power::Outlet::iBoot](https://metacpan.org/pod/Power::Outlet::iBoot), [Power::Outlet::iBootBar](https://metacpan.org/pod/Power::Outlet::iBootBar), [Power::Outlet::WeMo](https://metacpan.org/pod/Power::Outlet::WeMo), [Power::Outlet::Hue](https://metacpan.org/pod/Power::Outlet::Hue)
+[Power::Outlet::iBoot](https://metacpan.org/pod/Power%3A%3AOutlet%3A%3AiBoot), [Power::Outlet::iBootBar](https://metacpan.org/pod/Power%3A%3AOutlet%3A%3AiBootBar), [Power::Outlet::WeMo](https://metacpan.org/pod/Power%3A%3AOutlet%3A%3AWeMo), [Power::Outlet::Hue](https://metacpan.org/pod/Power%3A%3AOutlet%3A%3AHue)
 
 # File: lib/Power/Outlet/Config.pm
 
@@ -154,7 +154,7 @@ Command Line
 
 ### ini
 
-Returns a [Config::IniFiles](https://metacpan.org/pod/Config::IniFiles) for the power-outlet.ini file.
+Returns a [Config::IniFiles](https://metacpan.org/pod/Config%3A%3AIniFiles) for the power-outlet.ini file.
 
 ### ini\_file
 
@@ -451,6 +451,114 @@ The full text of the license can be found in the LICENSE file included with this
 
 [http://www.developers.meethue.com/philips-hue-api](http://www.developers.meethue.com/philips-hue-api), [http://steveyo.github.io/Hue-Emulator/](http://steveyo.github.io/Hue-Emulator/), [https://home-assistant.io/components/emulated\_hue/](https://home-assistant.io/components/emulated_hue/)
 
+# File: lib/Power/Outlet/Kauf.pm
+
+## NAME
+
+Power::Outlet::Kauf - Control and query a Kauf Plug with HTTP REST API
+
+## SYNOPSIS
+
+    my $outlet = Power::Outlet::Kauf->new(host=>"my_kauf_plug");
+    print $outlet->query, "\n";
+    print $outlet->on, "\n";
+    print $outlet->off, "\n";
+    print $outlet->switch, "\n";
+    print $outlet->cycle, "\n";
+
+## DESCRIPTION
+
+Power::Outlet::Kauf is a package for controlling and querying a Kauf Plug.
+
+From: [https://github.com/KaufHA/common/](https://github.com/KaufHA/common/) and [https://github.com/hightowe/control\_outdoor\_lighting-pl](https://github.com/hightowe/control_outdoor_lighting-pl)
+
+Commands can be executed via web (HTTP) requests, for example:
+
+    POST http://10.10.10.39/switch/kauf_plug/turn_off  => status 200
+    POST http://10.10.10.39/switch/kauf_plug/turn_on   => status 200
+    GET  http://10.10.10.39/switch/kauf_plug           => {"id":"plug name","value":true,"state":"ON"}
+
+## USAGE
+
+    use Power::Outlet::Kauf;
+    my $outlet = Power::Outlet::Kauf->new(host=>"sw-kitchen");
+    print $outlet->on, "\n";
+
+Command Line
+
+    $ power-outlet Kauf ON host sw-kitchen
+
+Command Line (from settings)
+
+    $ cat /etc/power-outlet.ini
+
+    [Kitchen]
+    type=Kauf
+    name=Kitchen
+    host=sw-kitchen
+    groups=Inside Lights
+    groups=Main Floor
+
+    $ power-outlet Config ON section Kitchen
+    $ curl http://127.0.0.1/cgi-bin/power-outlet-json.cgi?name=Kitchen;action=ON
+
+## CONSTRUCTOR
+
+### new
+
+    my $outlet = Power::Outlet->new(type=>"Kauf", host=>"my_kauf_plug");
+    my $outlet = Power::Outlet::Kauf->new(host=>"my_kauf_plug");
+
+## PROPERTIES
+
+### host
+
+Sets and returns the hostname or IP address.
+
+### port
+
+Sets and returns the port number.
+
+Default: 80
+
+## METHODS
+
+### name
+
+### query
+
+Sends an HTTP message to the device to query the current state
+
+### on
+
+Sends a message to the device to Turn Power ON
+
+### off
+
+Sends a message to the device to Turn Power OFF
+
+### switch
+
+Sends a message to the device to toggle the power
+
+### cycle
+
+Sends messages to the device to Cycle Power (ON-OFF-ON or OFF-ON-OFF).
+
+### cycle\_duration
+
+Default; 10 seconds (floating point number)
+
+## COPYRIGHT & LICENSE
+
+Copyright (c) 2025 Michael R. Davis
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+The full text of the license can be found in the LICENSE file included with this module.
+
+## SEE ALSO
+
 # File: lib/Power/Outlet/MQTT.pm
 
 ## NAME
@@ -484,8 +592,8 @@ or explicit definitions with no defaults
                                           publish_switch      => "cmnd/my_device/POWER1+TOGGLE",
                                           publish_query       => "cmnd/my_device/POWER1+",
                                           subscribe_topic     => "stat/my_device/POWER1",
-                                          subscribe_value_on  => 'ON'  #or qr/\A(?:ON|1)\Z/i,
-                                          subscribe_value_off => 'OFF, #or qr/\A(?:OFF|0)\Z/i,
+                                          subscribe_value_on  => 'ON',  #or qr/\A(?:ON|1)\Z/i,
+                                          subscribe_value_off => 'OFF', #or qr/\A(?:OFF|0)\Z/i,
                                          );
     print $outlet->query, "\n";
     print $outlet->on, "\n";
@@ -632,7 +740,7 @@ Sends a message to the device to Turn Power OFF
 
 ### mqtt
 
-Returns a cached connected [Net::MQTT::Simple](https://metacpan.org/pod/Net::MQTT::Simple) or [Net::MQTT::Simple::SSL](https://metacpan.org/pod/Net::MQTT::Simple::SSL) object.
+Returns a cached connected [Net::MQTT::Simple](https://metacpan.org/pod/Net%3A%3AMQTT%3A%3ASimple) or [Net::MQTT::Simple::SSL](https://metacpan.org/pod/Net%3A%3AMQTT%3A%3ASimple%3A%3ASSL) object.
 
 ## BUGS
 
@@ -651,6 +759,153 @@ This program is free software; you can redistribute it and/or modify it under th
 The full text of the license can be found in the LICENSE file included with this module.
 
 ## SEE ALSO
+
+# File: lib/Power/Outlet/OpenBeken.pm
+
+## NAME
+
+Power::Outlet::OpenBeken - Control and query an OpenBeken configured device
+
+## SYNOPSIS
+
+    my $outlet = Power::Outlet::OpenBeken->new(host => "myhost", relay => "POWER1");
+    print $outlet->query, "\n";
+    print $outlet->on, "\n";
+    print $outlet->off, "\n";
+
+## DESCRIPTION
+
+Power::Outlet::OpenBeken is a package for controlling and querying OpenBeken flashed hardware over the exposed HTTP interface. OpenBeken supports multiple chipsets, including ESWIN, Transa Semi, Lightning Semi, Espressif, Beken, WinnerMicro, Xradiotech/Allwinner, Realtek, and Bouffalo Lab.
+
+The OpenBeken project adopted the HTTP command interface from the Tasmota project as defined at [https://tasmota.github.io/docs/#/Commands](https://tasmota.github.io/docs/#/Commands)
+
+Commands can be executed via web (HTTP) requests, for example:
+
+    http://<ip>/cm?cmnd=Power%20TOGGLE
+    http://<ip>/cm?cmnd=Power%20On
+    http://<ip>/cm?cmnd=Power%20off
+    http://<ip>/cm?user=foo&password=bar&cmnd=Power%20Toggle
+
+Examples:
+
+Query default relay
+
+    $ curl http://myhost/cm?cmnd=POWER1
+    {"POWER1":"ON"}
+
+Toggle (Switch) relay 4
+
+    $ curl http://myhost/cm?user=foo;password=bar;cmnd=POWER4+TOGGLE
+    {"POWER4":"OFF"}
+
+Turn ON relay 2
+
+    $ curl http://myhost/cm?user=foo;password=bar;cmnd=POWER2+ON
+    {"POWER2":"ON"}
+
+## USAGE
+
+    use Power::Outlet::OpenBeken;
+    my $relay = Power::Outlet::OpenBeken->new(host=>"myhost", relay=>"POWER1");
+    print $relay->on, "\n";
+
+## CONSTRUCTOR
+
+### new
+
+    my $outlet = Power::Outlet->new(type=>"OpenBeken", host=>"myhost", relay=>"POWER2");
+    my $outlet = Power::Outlet::OpenBeken->new(host=>"myhost", relay=>"POWER2");
+
+## PROPERTIES
+
+### relay
+
+Relays map to the relay tokens "POWER1", "POWER2", ... "POWER8". With "POWER" being the default relay name for the first relay defined in the configuration.
+
+Default: POWER1
+
+### host
+
+Sets and returns the hostname or IP address.
+
+Default: openbeken
+
+### port
+
+Sets and returns the port number.
+
+Default: 80
+
+### http\_path
+
+Sets and returns the http\_path.
+
+Default: /cm
+
+### user
+
+Sets and returns the user used for authentication with the OpenBeken hardware
+
+    my $outlet = Power::Outlet::OpenBeken->new(host=>"myhost", relay=>"POWER1", user=>"mylogin", password=>"mypassword");
+    print $outlet->query, "\n";
+
+Default: undef() #which is only passed on the url when defined
+
+### password
+
+Sets and returns the password used for authentication with the OpenBeken hardware
+
+Default: "" #which is only passed on the url when user property is defined
+
+## METHODS
+
+### name
+
+Returns the FriendlyName from the OpenBeken hardware.
+
+Note: The FriendlyName is cached for the life of the object.
+
+### query
+
+Sends an HTTP message to the device to query the current state
+
+### on
+
+Sends a message to the device to Turn Power ON
+
+### off
+
+Sends a message to the device to Turn Power OFF
+
+### switch
+
+Sends a message to the device to toggle the power
+
+### cycle
+
+Sends messages to the device to Cycle Power (ON-OFF-ON or OFF-ON-OFF).
+
+## BUGS and SUPPORT
+
+Please use GitHub
+
+## AUTHOR
+
+    Michael R. Davis
+    CPAN ID: MRDVT
+
+## COPYRIGHT
+
+Copyright (c) 2025 Michael R. Davis
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+The full text of the license can be found in the LICENSE file included with this module.
+
+## SEE ALSO
+
+[https://github.com/openshwprojects/OpenBK7231T\_App](https://github.com/openshwprojects/OpenBK7231T_App)
+[https://tasmota.github.io/docs/#/Commands](https://tasmota.github.io/docs/#/Commands)
 
 # File: lib/Power/Outlet/Shelly.pm
 
@@ -1114,7 +1369,7 @@ Power::Outlet::TuyaAPI - Control and query an outlet via the TuyaAPI.
 
 Power::Outlet::TuyaAPI is a package for controlling and querying an outlet via the TuyaAPI.
 
-This package is a wrapper around [WebService::Tuya::IoT::API](https://metacpan.org/pod/WebService::Tuya::IoT::API) please see that documentation for device configuration.
+This package is a wrapper around [WebService::Tuya::IoT::API](https://metacpan.org/pod/WebService%3A%3ATuya%3A%3AIoT%3A%3AAPI) please see that documentation for device configuration.
 
 ## USAGE
 
@@ -1310,7 +1565,7 @@ This program is free software; you can redistribute it and/or modify it under th
 
 ## SEE ALSO
 
-[WebService::Belkin::Wemo::Device](https://metacpan.org/pod/WebService::Belkin::Wemo::Device), [https://gist.github.com/jscrane/7257511](https://gist.github.com/jscrane/7257511)
+[WebService::Belkin::Wemo::Device](https://metacpan.org/pod/WebService%3A%3ABelkin%3A%3AWemo%3A%3ADevice), [https://gist.github.com/jscrane/7257511](https://gist.github.com/jscrane/7257511)
 
 # File: scripts/power-outlet
 
@@ -1336,7 +1591,7 @@ This script provide a command line interface for Power::Outlet devices
 
 ## COPYRIGHT
 
-Copyright (c) 2013 Michael R. Davis <mrdvt92>
+Copyright (c) 2013 Michael R. Davis &lt;mrdvt92>
 
 ## LICENSE
 
@@ -1543,7 +1798,7 @@ The included rpm spec file installs a systemd service file so you can run this p
 
 ## COPYRIGHT
 
-Copyright (c) 2020 Michael R. Davis <mrdvt92>
+Copyright (c) 2020 Michael R. Davis &lt;mrdvt92>
 
 ## LICENSE
 

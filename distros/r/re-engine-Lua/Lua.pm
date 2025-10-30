@@ -8,7 +8,7 @@ BEGIN {
     # All engines should subclass the core Regexp package
     our @ISA = qw( Regexp );
 
-    our $VERSION = '0.19';
+    our $VERSION = '0.22';
     XSLoader::load __PACKAGE__, $VERSION;
 }
 
@@ -236,7 +236,7 @@ The development is hosted at L<https://framagit.org/perrad/re-engine-lua>.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2007-2019 FranE<ccedil>ois PERRAD.
+Copyright 2007-2025 FranE<ccedil>ois PERRAD.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Lua.

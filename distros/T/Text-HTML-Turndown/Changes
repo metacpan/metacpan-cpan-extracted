@@ -1,3 +1,6 @@
+0.09 2025-10-28
+    * Allow markup in table cells
+
 0.08 2025-09-25
     * Fix handling of "checked" for checkboxes
 

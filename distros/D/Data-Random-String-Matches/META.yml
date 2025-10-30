@@ -1,0 +1,47 @@
+---
+abstract: 'Generate random strings matching a regex'
+author:
+  - 'Nigel Horne <njh@nigelhorne.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Glob: '0'
+  File::Slurp: '0'
+  File::Temp: '0'
+  File::stat: '0'
+  IPC::Run3: '0'
+  IPC::System::Simple: '0'
+  JSON::MaybeXS: '0'
+  POSIX: '0'
+  Readonly: '0'
+  Test::Compile: '0'
+  Test::DescribeMe: '0'
+  Test::Most: '0'
+  Test::NoWarnings: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Random-String-Matches
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  ExtUtils::MakeMaker: '6.64'
+  Getopt::Long: '0'
+  Params::Get: '0.13'
+  Pod::Usage: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/nigelhorne/Data-Random-String-Matches/issues
+  homepage: https://metacpan.org/pod/Data::Random::String::Matches
+  repository: git://github.com/nigelhorne/Data-Random-String-Matches.git
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

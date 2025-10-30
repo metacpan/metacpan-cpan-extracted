@@ -52,7 +52,7 @@ use Safe::Isa '$_call_if_object';
 use PPI::Statement                 ();
 use PPI::Statement::Include::Perl6 ();
 
-our $VERSION = '1.283';
+our $VERSION = '1.284';
 
 our @ISA = "PPI::Statement";
 

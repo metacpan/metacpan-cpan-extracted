@@ -1,5 +1,13 @@
 Revision history for App::PP::Autolink
 
+2.14 20251028
+  - Early return if process_gdk_pixbuf_loaders cannot
+    find any files to work on.
+
+2.13 20251028
+  - Search @INC for files instead of using a regex,
+    as it did not work for some dir structures.
+
 2.12 20231028
   - Stop adding ./lib to @INC before scanning.
     It was causing substantial slowdowns on Windows.

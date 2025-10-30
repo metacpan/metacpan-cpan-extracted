@@ -4,7 +4,7 @@ Mouse - Moose minus the antlers
 
 # VERSION
 
-This document describes Mouse version v2.5.11
+This document describes Mouse version v2.6.0
 
 # SYNOPSIS
 
@@ -194,7 +194,7 @@ this class. Options:
 
 - `trigger => CodeRef`
 
-    Any time the attribute's value is set (either through the accessor or the constructor), the trigger is called on it. The trigger receives as arguments the instance, and the new value.
+    Any time the attribute's value is set (either through the accessor or the constructor), the trigger is called on it. The trigger receives as arguments the instance, the new value, and optionally the old value if it differs from the new value.
 
 - `builder => Str`
 
@@ -243,7 +243,7 @@ keywords (such as ["extends"](#extends)) it will break loudly instead breaking s
 
 # DEVELOPMENT
 
-Here is the repo: [https://github.com/gfx/p5-Mouse](https://github.com/gfx/p5-Mouse).
+Here is the repo: [https://github.com/xslate/p5-Mouse](https://github.com/xslate/p5-Mouse).
 
 You can build, test, and release it with **Minilla**.
 
@@ -290,7 +290,7 @@ with plenty of code borrowed from [Class::MOP](https://metacpan.org/pod/Class%3A
 # BUGS
 
 All complex software has bugs lurking in it, and this module is no exception.
-Please report any bugs to [https://github.com/gfx/p5-Mouse/issues](https://github.com/gfx/p5-Mouse/issues).
+Please report any bugs to [https://github.com/xslate/p5-Mouse/issues](https://github.com/xslate/p5-Mouse/issues).
 
 # COPYRIGHT AND LICENSE
 

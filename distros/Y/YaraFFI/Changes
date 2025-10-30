@@ -1,0 +1,25 @@
+Revision history for YaraFFI
+
+0.06  2025-10-29
+      - Tidied up pod a bit.
+
+0.05  2025-10-29
+      - Introduced record definition packages:
+        YaraFFI::Record::YR_MATCH
+        YaraFFI::Record::YR_META
+        YaraFFI::Record::YR_RULE
+        YaraFFI::Record::YR_STRING
+
+0.04  2025-10-29
+      - Match offset reporting for string matches (when enabled)
+      - Rule metadata extraction (when enabled)
+
+0.03  2025-10-29
+      - Removed redundant package YaraFFI::Record::YR_RULE.
+
+0.02  2025-10-28
+      - Extracted YaraFFI::Event package.
+      - Updated SYNOPSIS example.
+
+0.01  2025-10-28
+      - module created.

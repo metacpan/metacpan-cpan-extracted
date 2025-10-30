@@ -4,7 +4,7 @@ Dist::PolicyFiles - Generate CONTRIBUTING.md and SECURITY.md
 
 # VERSION
 
-Version 0.01
+Version 0.03
 
 # SYNOPSIS
 
@@ -79,7 +79,8 @@ and `module` are mandatory:
     Creates `CONTRIBUTING.md` in directory `dir` (see corresponding constructor
     argument). Optional argument _`CONTRIB_MD_TMPL`_ is the name of a template
     file (see [Text::Template](https://metacpan.org/pod/Text%3A%3ATemplate)) for this policy. If this argument is not
-    specified, then the internal default template is used.
+    specified, then the internal default template is used (see constant
+    _`INTERNAL_CONTRIB_MD`_).
 
     The template can use the following variables:
 
@@ -118,7 +119,7 @@ and `module` are mandatory:
 
         User's full name and email address, e.g.:
 
-            John Doe <jd@cpan.org>
+            'John Doe <jd@cpan.org>'
 
     - `program`
 
@@ -126,7 +127,7 @@ and `module` are mandatory:
 
     - `url`
 
-            https://github.com/LOGIN/REPO/blob/main/SECURITY.md
+            'https://github.com/LOGIN/REPO/blob/main/SECURITY.md'
 
         where:
 
@@ -177,6 +178,12 @@ and `module` are mandatory:
 
     Returns the value passed via the constructor argument `uncapitalize` or the default
     value (_`false`_).
+
+## CONSTANTS
+
+Constant _`INTERNAL_CONTRIB_MD`_ containes the internal template used to
+create `CONTRIBUTING.md`. The constant is not exported. If necessary, access
+it as follows: `Dist::PolicyFiles::INTERNAL_CONTRIB_MD`.
 
 # AUTHOR
 

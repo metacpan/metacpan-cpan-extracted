@@ -19,8 +19,7 @@ use Mouse ();
     sub my_role_method{ }
 }
 
-# 5.10.0 has a bug on weaken($hash_ref) which leaks an AV.
-my $expected = ( $] == 5.010_000 ? 1 : 0 );
+my $expected = 0;
 
 leaks_cmp_ok {
     Mouse::Meta::Class->create_anon_class();
@@ -45,9 +44,6 @@ leaks_cmp_ok {
     Mouse::Meta::Role->create_anon_role();
 } '<=', $expected, 'create_anon_role()';
 
-if($] < 5.010){
-    $expected = 2; # in MRO::Compat::get_linear_isa, maybe harmless
-}
 leaks_cmp_ok {
     Mouse::Meta::Role->create_anon_role(roles => [qw(MyRole)]);
 } '<=', $expected, 'create_anon_role() with roles';

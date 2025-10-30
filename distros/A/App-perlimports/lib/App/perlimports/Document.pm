@@ -3,7 +3,7 @@ package App::perlimports::Document;
 use Moo;
 use utf8;
 
-our $VERSION = '0.000057';
+our $VERSION = '0.000058';
 
 use App::perlimports::Annotations     ();
 use App::perlimports::ExportInspector ();
@@ -261,10 +261,12 @@ around BUILDARGS => sub {
 
 my %default_ignore = (
     'Carp::Always'                   => 1,
+    'Class::XSAccessor'              => 1,
     'Constant::Generate'             => 1,
     'Data::Printer'                  => 1,
     'DDP'                            => 1,
     'Devel::Confess'                 => 1,
+    'DynaLoader'                     => 1,
     'Encode::Guess'                  => 1,
     'Env'                            => 1,    # see t/env.t
     'Exception::Class'               => 1,
@@ -293,6 +295,7 @@ my %default_ignore = (
     'MooseX::Types'                                       => 1,
     'MooX::StrictConstructor'                             => 1,
     'namespace::autoclean'                                => 1,
+    'namespace::clean'                                    => 1,
     'PerlIO::gzip'                                        => 1,
     'Regexp::Common'                                      => 1,
     'Sort::ByExample'                                     => 1,
@@ -763,7 +766,7 @@ sub _is_used_fully_qualified {
                     )
                 )
                 || ( $_[1]->isa('PPI::Token::Symbol')
-                && $_[1] =~ m{\A[*\$\@\%]+${module_name}::[a-zA-Z0-9_]} );
+                && $_[1] =~ m{\A[&*\$\@\%]+${module_name}::[a-zA-Z0-9_]} );
         }
     );
 
@@ -771,7 +774,7 @@ sub _is_used_fully_qualified {
     for my $key ( keys %{ $self->interpolated_symbols } ) {
 
         # package level variable
-        return 1 if $key =~ m{\A[*\$\@\%]+${module_name}::[a-zA-Z0-9_]+\z};
+        return 1 if $key =~ m{\A[&*\$\@\%]+${module_name}::[a-zA-Z0-9_]+\z};
 
         # function
         return 1 if $key =~ m/\A${module_name}::[a-zA-Z0-9_]+\z/;
@@ -1170,7 +1173,7 @@ App::perlimports::Document - Make implicit imports explicit
 
 =head1 VERSION
 
-version 0.000057
+version 0.000058
 
 =head1 MOTIVATION
 

@@ -27,7 +27,7 @@ This module is hosted at https://framagit.org/perrad/re-engine-lua
 COPYRIGHT AND LICENCE
 ---------------------
 
-Copyright 2007-2019 by Francois PERRAD
+Copyright 2007-2025 by Francois PERRAD
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Lua.

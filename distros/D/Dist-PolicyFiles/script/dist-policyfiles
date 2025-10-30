@@ -64,7 +64,7 @@ dist-policyfiles - Generate CONTRIBUTING.md and SECURITY.md
                   [--dir|-d DIR
                   --email|-e EMAILADDR  --full_name FULL_NAME
                   --prefix|-p PREFIX  --uncapitalize|-u
-                   sec_md_params|s PARAMSTR  --contrib_md_tmpl|-c FILENAME]
+                  --sec_md_params|-s PARAMSTR  --contrib_md_tmpl|-c FILENAME]
 
 =head1 DESCRIPTION
 
@@ -164,16 +164,15 @@ L<Software::Security::Policy::Individual>.
 
 Example:
 
-   -s 'minimum_perl_version=5.14;timeframe=10 days'
+   -s 'minimum_perl_version=5.8;timeframe=7 days;maintainer=John Doe <jd@ml.eu>'
 
 Defaults:
 
+=over
 
 =item C<maintainer:>
 
-User's full name and email address, e.g.:
-
-   John Doe <jd@cpan.org>
+Full name and email address of the user, in the same format as in the example above.
 
 =item C<program>
 
@@ -209,6 +208,8 @@ The rest of the repo name is the module name where the double colons are replace
 
 If option C<uncapitalise> is specified, the latter part of the repo name is
 changed to lower case.
+
+=back
 
 =back
 

@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 16 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 21 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'OIDC/Client.pm',
@@ -21,10 +21,15 @@ my @module_files = (
     'OIDC/Client/Identity.pm',
     'OIDC/Client/Plugin.pm',
     'OIDC/Client/ResponseParser.pm',
+    'OIDC/Client/Role/AttributesManager.pm',
+    'OIDC/Client/Role/ClaimsValidator.pm',
+    'OIDC/Client/Role/ClientAuthenticationHelper.pm',
+    'OIDC/Client/Role/ConfigurationChecker.pm',
     'OIDC/Client/Role/LoggerWrapper.pm',
     'OIDC/Client/TokenResponse.pm',
     'OIDC/Client/TokenResponseParser.pm',
-    'OIDC/Client/User.pm'
+    'OIDC/Client/User.pm',
+    'OIDC/Client/Utils.pm'
 );
 
 

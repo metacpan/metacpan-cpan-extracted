@@ -855,4 +855,137 @@ YAML
   ),
 };
 
+subtest 'extract tags and identify duplicates' => sub {
+  my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
+    canonical_uri => 'http://localhost:1234/api',
+    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+components: {}
+tags:
+  - name: foo
+  - name: bar
+    parent: blech
+  - name: baz
+    parent: foo
+  - name: foo
+  - name: bar
+  - name: alpha
+    parent: beta
+  - name: beta
+    parent: alpha
+  - name: foo
+    parent: foo
+YAML
+
+  cmp_result(
+    [ map $_->TO_JSON, $doc->errors ],
+    [
+      {
+        instanceLocation => '',
+        keywordLocation => '/tags/1/parent',
+        absoluteKeywordLocation => str(Mojo::URL->new('http://localhost:1234/api#/tags/1/parent')),
+        error => 'parent of tag "bar" does not exist: "blech"',
+      },
+      {
+        instanceLocation => '',
+        keywordLocation => '/tags/3/name',
+        absoluteKeywordLocation => str(Mojo::URL->new('http://localhost:1234/api#/tags/3/name')),
+        error => 'duplicate of tag at /tags/0: "foo"',
+      },
+      {
+        instanceLocation => '',
+        keywordLocation => '/tags/4/name',
+        absoluteKeywordLocation => str(Mojo::URL->new('http://localhost:1234/api#/tags/4/name')),
+        error => 'duplicate of tag at /tags/1: "bar"',
+      },
+      {
+        instanceLocation => '',
+        keywordLocation => '/tags/5/parent',
+        absoluteKeywordLocation => str(Mojo::URL->new('http://localhost:1234/api#/tags/5/parent')),
+        error => 'circular reference between tags: "alpha" -> "beta" -> "alpha"',
+      },
+      {
+        instanceLocation => '',
+        keywordLocation => '/tags/6/parent',
+        absoluteKeywordLocation => str(Mojo::URL->new('http://localhost:1234/api#/tags/6/parent')),
+        error => 'circular reference between tags: "beta" -> "alpha" -> "beta"',
+      },
+      {
+        instanceLocation => '',
+        keywordLocation => '/tags/7/name',
+        absoluteKeywordLocation => str(Mojo::URL->new('http://localhost:1234/api#/tags/7/name')),
+        error => 'duplicate of tag at /tags/0: "foo"',
+      },
+      {
+        instanceLocation => '',
+        keywordLocation => '/tags/7/parent',
+        absoluteKeywordLocation => str(Mojo::URL->new('http://localhost:1234/api#/tags/7/parent')),
+        error => 'circular reference between tags: "foo" -> "foo"',
+      },
+    ],
+    'all tag errors identified: duplicates, missing parents, circular heirarchy',
+  );
+
+
+  $doc = JSON::Schema::Modern::Document::OpenAPI->new(
+    canonical_uri => 'http://localhost:1234/api',
+    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+tags:
+  - name: foo
+  - name: bar
+    parent: foo
+  - name: baz
+    parent: bar
+  - name: blech
+    parent: bar
+paths:
+  /foo:
+    get:
+      tags: [foo, blech]
+    post:
+      tags: [bar, zip, baz]
+  /bar:
+    get:
+      tags: [whee, baz]
+YAML
+
+  cmp_result([ $doc->errors ], [], 'no errors when parsing this document');
+
+  cmp_result(
+    $doc->{_tags},
+    {
+      foo => '/tags/0',
+      bar => '/tags/1',
+      baz => '/tags/2',
+      blech => '/tags/3',
+    },
+    'all tag object paths',
+  );
+
+  is($doc->tag_path('foo'), '/tags/0', 'tag_path for foo');
+  is($doc->tag_path('bar'), '/tags/1', 'tag_path for bar');
+  is($doc->tag_path('baz'), '/tags/2', 'tag_path for baz');
+  is($doc->tag_path('blech'), '/tags/3', 'tag_path for blech');
+  is($doc->tag_path('zip'), undef, 'tag_path for zip');
+
+  cmp_result(
+    $doc->{_operation_tags},
+    {
+      foo => ['/paths/~1foo/get'],
+      bar => ['/paths/~1foo/post'],
+      baz => ['/paths/~1bar/get', '/paths/~1foo/post'],
+      blech => ['/paths/~1foo/get'],
+      zip => ['/paths/~1foo/post'],
+      whee => ['/paths/~1bar/get'],
+    },
+    'all tag operation locations, even those not defined by a tag object',
+  );
+
+  cmp_result([$doc->operations_with_tag('foo')], ['/paths/~1foo/get'], 'operations_with_tag("foo")');
+  cmp_result([$doc->operations_with_tag('bar')], ['/paths/~1foo/post'], 'operations_with_tag("bar")');
+  cmp_result([$doc->operations_with_tag('baz')], ['/paths/~1bar/get', '/paths/~1foo/post'], 'operations_with_tag("baz")');
+  cmp_result([$doc->operations_with_tag('blech')], ['/paths/~1foo/get'], 'operations_with_tag("blech")');
+  cmp_result([$doc->operations_with_tag('zip')], ['/paths/~1foo/post'], 'operations_with_tag("zip")');
+  cmp_result([$doc->operations_with_tag('yup')], [], 'operations_with_tag("yup")');
+};
+
 done_testing;

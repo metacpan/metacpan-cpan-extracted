@@ -17,7 +17,7 @@ use constant DEBUG        => $ENV{MIKROTIK_CLIENT_DEBUG} || 0;
 use constant MOJO_TLS_OPTS => !!
     eval { require Mojolicious; Mojolicious->VERSION('8.72'); 1 };
 
-our $VERSION = 'v0.611';
+our $VERSION = 'v0.612';
 
 has ca        => sub { $ENV{MIKROTIK_CLIENT_CA} };
 has cert      => sub { $ENV{MIKROTIK_CLIENT_CERT} };

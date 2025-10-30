@@ -34,7 +34,7 @@ resources:
   homepage: https://github.com/jhthorsen/mojo-mysql
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/jhthorsen/mojo-mysql.git
-version: '1.27'
+version: '1.28'
 x_contributors:
   - 'Adam Hopkins <violapiratejunky@gmail.com>'
   - 'Alexander Karelas <alex.karelas@gmail.com>'

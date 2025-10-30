@@ -1,0 +1,50 @@
+Text-Fab (as of version 0.01)
+=============================
+
+Text::Fab - A powerful, general-purpose document expansion framework
+(currently exists mostly as uncomplete documentation and a beginning
+of a stub of implementation).
+
+Its purpose is to factor out THE COMMON NEEDS of all the
+configurable-on-the-fly document processing engines; more precisely, it
+focuses on the needs orthogonal to the particular syntax of a particular
+problem domain.  (The architecture aims to overcome the experiences with
+designing “simple” configurable systems — which turn out to be not
+scalable, so all the approaches to make them operable crumble under their
+own weight.)
+
+In short: this attempts to abstract out all the complexity of scalable
+configurability.  The resulting “tools” support architecture with a
+top→down approach to recognizing the “reconfiguration directives”.
+
+A README file is required for CPAN modules since CPAN extracts the
+README file from a module distribution so that people browsing the
+archive can use it get an idea of the modules uses. It is usually a
+good idea to provide version information here so that people can
+decide whether fixes for the module are worth downloading.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  FreezeThaw
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2025 by Ilya Zakharevich
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.22.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+

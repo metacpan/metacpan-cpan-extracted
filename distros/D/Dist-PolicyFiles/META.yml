@@ -11,6 +11,9 @@ build_requires:
   Test::Fatal: '0'
   Test::File::Cmp: '0'
   Test::More: '0'
+  autodie: '0'
+  strict: '0'
+  warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec::Functions: '0'
@@ -31,7 +34,7 @@ no_index:
 provides:
   Dist::PolicyFiles:
     file: lib/Dist/PolicyFiles.pm
-    version: '0.03'
+    version: '0.05'
 requires:
   Carp: '0'
   File::Basename: '0'
@@ -45,7 +48,7 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/klaus-rindfrey/perl-dist-policyfiles.git
-version: '0.03'
+version: '0.05'
 x_bugtracker:
   web: https://github.com/klaus-rindfrey/perl-dist-policyfiles/issues
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

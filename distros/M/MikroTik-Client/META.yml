@@ -25,5 +25,5 @@ resources:
   bugtracker: https://codeberg.org/anparker/mikrotik-client/issues
   license: https://www.perlfoundation.org/artistic-license-20.html
   repository: https://codeberg.org/anparker/mikrotik-client.git
-version: v0.611
+version: v0.612
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

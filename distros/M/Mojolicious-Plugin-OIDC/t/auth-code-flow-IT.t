@@ -39,10 +39,9 @@ get('/authorize' => sub {
     });
 post('/token' => sub {
        my $c = shift;
-       my $grant_type    = $c->param('grant_type');
-       my $client_id     = $c->param('client_id');
-       my $client_secret = $c->param('client_secret');
-       my $code          = $c->param('code');
+       my ($client_id, $client_secret) = split(':', $c->req->url->to_abs->userinfo);
+       my $grant_type = $c->param('grant_type');
+       my $code       = $c->param('code');
        if ($grant_type eq 'authorization_code'
            && $client_id eq 'my_id' && $client_secret eq 'my_secret'
            && $code eq 'abc') {
@@ -92,14 +91,21 @@ $t->get_ok('/protected')
   ->status_is(401)
   ->content_is('Authentication Error');
 
-$mock_oidc_client->redefine('decode_jwt' => sub {
-  {
-    'iss'   => 'my_issuer',
-    'exp'   => time + 30,
-    'aud'   => 'my_id',
-    'sub'   => 'my_subject',
-    'nonce' => 'fake_uuid',
-  }
+my $mock_crypt_jwt = Test::MockModule->new('Crypt::JWT');
+$mock_crypt_jwt->redefine('decode_jwt' => sub {
+  my %params = @_;
+  my %claims = (
+    iss   => 'my_issuer',
+    iat   => time - 10,
+    exp   => time + 30,
+    aud   => 'my_id',
+    sub   => 'my_subject',
+    nonce => 'fake_uuid',
+  );
+  return (
+    $params{decode_header} ? { 'alg' => 'whatever' } : (),
+    \%claims,
+  );
 });
 
 $t->get_ok('/protected?a=b&c=d')

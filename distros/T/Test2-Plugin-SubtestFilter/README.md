@@ -98,6 +98,17 @@ with spaces.
 
     When `SUBTEST_FILTER` is not set, all tests run normally.
 
+# METHODS
+
+## apply\_plugin
+
+```
+Test2::Plugin::SubtestFilter->apply_plugin($target_package, $target_file);
+```
+
+Applies the subtest filtering functionality to the specified package.
+Normally called automatically via `import()`. For advanced users only.
+
 # ENVIRONMENT VARIABLES
 
 - `SUBTEST_FILTER`

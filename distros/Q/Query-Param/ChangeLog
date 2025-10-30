@@ -1,4 +1,20 @@
-Thu Jun  5 11:11:00 2025  Rob Lauer  <rlauer6@comcast.net>
+Wed Oct 29 18:30:41 2025  Rob Lauer  <rclauer@gmail.com>
+
+	[1.0.0]:
+	* VERSION: new
+	* version.mk: new
+	* Makefile
+	- build from .in
+	- add version.mk
+	* README.md: generated
+	* lib/Query/Param.pm.in
+	- renamed from Param.pm
+	(new_from_request): new
+	(parse_multipart_form_data): new
+	* t/request.t: tests for above
+	* .gitignore: *.tmp, Param.pm
+
+Thu Jun  5 11:11:002025  Rob Lauer  <rlauer6@comcast.net>
 
 	[CGI compatibility]:
 	* lib/Query/Param.pm

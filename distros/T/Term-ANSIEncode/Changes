@@ -131,3 +131,16 @@
 
         Fixed ALL POD issues.  Ugh.
 
+1.36    Oct 28, 2025
+
+        Changed the tokens and help screen.  Added more descriptions including
+		Indication of original 16 colors for limited terminals.
+
+1.37    Oct 29, 2025
+
+        Tokens output defaults to only the 16 colors and the new "expanded"
+		option will show all color tokens.
+		
+		Unicode output defaults to a squashed output and the new "expanded"
+		option will show dividers between each row to better discern symbol
+		output.

@@ -29,7 +29,7 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
 our @EXPORT = qw();
 
-our $VERSION = '1.20';
+our $VERSION = '1.21';
 
 our $H = 'HTML::GenerateUtil';
 our $E = 'HTML::GenerateUtil::Escape';
@@ -537,7 +537,7 @@ Rob Mueller E<lt>cpan@robm.fastmail.fmE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2004-2014 by FastMail Pty Ltd
+Copyright (C) 2004-2025 by Fastmail Pty Ltd
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

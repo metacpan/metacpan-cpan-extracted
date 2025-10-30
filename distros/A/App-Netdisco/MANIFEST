@@ -456,7 +456,6 @@ share/python/netdisco/netdisco/worklet/stats/early.py
 share/python/netdisco/pyproject.toml
 share/python/netdisco/ruff.toml
 share/python/netdisco/tests/__init__.py
-share/python/netdisco/uv.lock
 share/python/tfsm/index
 share/python/tfsm/juniper_junos_show_bgp_summary.textfsm
 share/python/tfsm/juniper_junos_show_route_forwarding-table.textfsm
@@ -555,6 +554,7 @@ share/schema_versions/App-Netdisco-DB-91-92-PostgreSQL.sql
 share/schema_versions/App-Netdisco-DB-92-93-PostgreSQL.sql
 share/schema_versions/App-Netdisco-DB-93-94-PostgreSQL.sql
 share/schema_versions/App-Netdisco-DB-94-95-PostgreSQL.sql
+share/schema_versions/App-Netdisco-DB-95-96-PostgreSQL.sql
 share/views/admintask.tt
 share/views/ajax/admintask/duplicatedevices.tt
 share/views/ajax/admintask/jobqueue.tt

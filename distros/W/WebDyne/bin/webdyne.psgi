@@ -25,6 +25,7 @@ use vars   qw($VERSION);
 use HTTP::Status qw(RC_INTERNAL_SERVER_ERROR RC_NOT_FOUND HTTP_OK);
 use IO::String;
 use Data::Dumper;
+use Cwd qw(cwd);
 
 
 #  WebDyne Modules
@@ -38,7 +39,7 @@ use WebDyne::Request::PSGI::Constant;
 
 #  Version information
 #
-$VERSION='2.017';
+$VERSION='2.018';
 
 
 #  API file name cache
@@ -72,28 +73,21 @@ if (!caller || exists $ENV{PAR_TEMP}) {
     }
     
     
-    #  Same with static handler
+    #  Used to do --static as option, now default, change to negate option, i.e. always
+    #  serve static files for convenience when started from the command line, same with noindex
     #
-    my $static_fg;
-    if ($static_fg=grep {/^--static$/} @ARGV) {
-        @ARGV=grep {!/^--static$/} @ARGV;
+    my $nostatic_fg;
+    if ($nostatic_fg=grep {/^--nostatic$/} @ARGV) {
+        @ARGV=grep {!/^--nostatic/} @ARGV;
     }
-    
-    
-    #  Indexing ?
-    #
-    if (grep {/^--index$/} @ARGV) {
-        @ARGV=grep {!/^--index$/} @ARGV;
-        #  Get index file path, same dn as test file
-        #
-        $DOCUMENT_DEFAULT=File::Spec->catfile($test_dn, 'index.psp');
-    }
-    else {
-        $DOCUMENT_DEFAULT=$ENV{'DOCUMENT_DEFAULT'} || $DOCUMENT_DEFAULT;
+    my $noindex_fg;
+    if ($noindex_fg=grep {/^--noindex$/} @ARGV) {
+        @ARGV=grep {!/^--noindex/} @ARGV;
     }
 
 
     #  Mac conflicts with Plack default port of 5000 - choose 5001
+    #
     if ($^O eq 'darwin') {
         $plack_or->parse_options('--port', '5001', @ARGV);
     }
@@ -107,15 +101,49 @@ if (!caller || exists $ENV{PAR_TEMP}) {
     #
     $DOCUMENT_ROOT=shift(@{$plack_or->{'argv'}}) ||
         $ENV{'DOCUMENT_ROOT'} || $DOCUMENT_ROOT;
-    if ($test_fg || !$DOCUMENT_ROOT) {
+    #if ($test_fg || !$DOCUMENT_ROOT) {
+    #    $DOCUMENT_ROOT=$test_fn;
+    #}
+    if ($test_fg) {
         $DOCUMENT_ROOT=$test_fn;
+    }
+    elsif(! $DOCUMENT_ROOT) {
+        $DOCUMENT_ROOT=cwd();
     }
     $DOCUMENT_ROOT=&normalize_dn($DOCUMENT_ROOT);
     
+    
+    #  Set DOCUMENT_DEFAULT
+    #
+    $DOCUMENT_DEFAULT=$ENV{'DOCUMENT_DEFAULT'} || $DOCUMENT_DEFAULT;
+
+
+    #  Indexing ? Do by default unless file specified as DOCUMENT_ROOT or --noindex spec'd etc.
+    #
+    unless (-f $DOCUMENT_ROOT || -f File::Spec->catfile($DOCUMENT_ROOT, $DOCUMENT_DEFAULT) || $noindex_fg) {
+
+        #  Final check. Only do if directory
+        #
+        if (-d $DOCUMENT_ROOT) {
+    
+            #  We can do indexing
+            #
+            $DOCUMENT_DEFAULT=File::Spec->rel2abs(File::Spec->catfile($test_dn, 'index.psp'));
+            
+        }
+        
+    }
+    
+    
+    #  Show error information by default
+    #
+    $WebDyne::Constant::WEBDYNE_ERROR_SHOW=1;
+    $WebDyne::WEBDYNE_ERROR_SHOW_EXTENDED=1;
+
 
     #  Done - run it
     #
-    $plack_or->run(&handler_build($static_fg ? &handler_static(\&handler) : \&handler));
+    $plack_or->run(&handler_build($nostatic_fg ? \&handler : &handler_static(\&handler)));
     exit 0;
 
 }
@@ -271,63 +299,66 @@ sub handler {
     debug("html returned: $html");
 
 
-	#  Present error if no status returned
+	#  Present error if non 200 (success) status returned. Yes - there are other status codes but this is most
+	#  common and quickest test, other 200 codes will fall through the if/else statements and still work
 	#
-    if (!defined($status)) {
-        debug('undefined status returned, looking for error handler');
-        if (($status=$r->status) ne RC_INTERNAL_SERVER_ERROR) {
-            my $error=errdump() || $@; errclr();
-            debug("request handler status:$status, detected error: $error, calling err_html");
-            $r->status(RC_INTERNAL_SERVER_ERROR),
-            $html=$r->err_html($status, $error)
-        }
-        else {
-            debug('status fall through !')
-        }
-    }
-    elsif (($status < 0) && !(-f (my $fn=$r->filename())) && !$WEBDYNE_API_ENABLE) {
-        my $document_root=$r->document_root;
-        (my $fn_display=$fn)=~s/^${document_root}//;
-        $fn_display ||= '/';
-        debug("status: $status, fn:$fn, setting RC_NOT_FOUND");
-        $r->status(RC_NOT_FOUND);
-		my $error=errdump() || "File '$fn_display' not found, status ($status)"; errclr();
-		$html=$r->err_html($status, $error)
-        #warn("file $fn not found") if $WEBDYNE_FASTCGI_WARN_ON_ERROR;
-    }
-    elsif (($status < 0) && !(-f (my $fn=$r->filename())) && $WEBDYNE_API_ENABLE) {
-        my $document_root=$r->document_root;
-        (my $api_dn=$fn)=~s/^${document_root}//;
-        my @api_dn=grep {$_} File::Spec::Unix->splitdir($api_dn);
-        my @api_fn;
-        while (my $dn=shift @api_dn) {
-            push @api_fn, $dn;
-            my $api_fn=File::Spec->catfile($document_root, @api_fn) . '.psp';
-            debug("check $api_fn");
-            #  Check of outside docroot
-            last if (index($api_fn, $document_root) !=0);
-            if ($API_fn{$api_fn} || (-f $api_fn)) {
-                debug("found api file name: $api_fn, %s", Dumper(\%API_fn));
-                $API_fn{$api_fn}++; # Cache so not stat()ing on file system
-                return &handler($env_hr, filename=>$api_fn);
+	unless ($status == HTTP_OK) {
+        if (!defined($status)) {
+            debug('undefined status returned, looking for error handler');
+            if (($status=$r->status) ne RC_INTERNAL_SERVER_ERROR) {
+                my $error=errdump() || $@; errclr();
+                debug("request handler status:$status, detected error: $error, calling err_html");
+                $r->status(RC_INTERNAL_SERVER_ERROR),
+                $html=$r->err_html($status, $error)
+            }
+            else {
+                debug('status fall through !')
             }
         }
-        (my $fn_display=$fn)=~s/^${document_root}//;
-        $fn_display ||= '/';
-        debug("status: $status, fn:$fn, setting RC_NOT_FOUND");
-        $r->status(RC_NOT_FOUND);
-		my $error=errdump() || "File '$fn_display' not found, status ($status)"; errclr();
-		$html=$r->err_html($status, $error)
-        #warn("file $fn not found") if $WEBDYNE_FASTCGI_WARN_ON_ERROR;
-    }
-    elsif ($status < 0) {
-        debug("status: $status, setting RC_INTERNAL_SERVER_ERROR");
-        $r->status($status=RC_INTERNAL_SERVER_ERROR),
-        $html=$r->err_html($status, "Unexpected return status ($status) from handler $handler")
-	}
-	elsif (($status eq RC_INTERNAL_SERVER_ERROR) && !$html) {
-	    $html=$r->custom_response($status) ||
-	        "Error $status with no content - try server error logs ?";
+        elsif (($status < 0) && !(-f (my $fn=$r->filename())) && !$WEBDYNE_API_ENABLE) {
+            my $document_root=$r->document_root;
+            (my $fn_display=$fn)=~s/^${document_root}//;
+            $fn_display ||= '/';
+            debug("status: $status, fn:$fn, setting RC_NOT_FOUND");
+            $r->status(RC_NOT_FOUND);
+            my $error=errdump() || "File '$fn_display' not found, status ($status)"; errclr();
+            $html=$r->err_html($status, $error)
+            #warn("file $fn not found") if $WEBDYNE_FASTCGI_WARN_ON_ERROR;
+        }
+        elsif (($status < 0) && !(-f (my $fn=$r->filename())) && $WEBDYNE_API_ENABLE) {
+            my $document_root=$r->document_root;
+            (my $api_dn=$fn)=~s/^${document_root}//;
+            my @api_dn=grep {$_} File::Spec::Unix->splitdir($api_dn);
+            my @api_fn;
+            while (my $dn=shift @api_dn) {
+                push @api_fn, $dn;
+                my $api_fn=File::Spec->catfile($document_root, @api_fn) . '.psp';
+                debug("check $api_fn");
+                #  Check of outside docroot
+                last if (index($api_fn, $document_root) !=0);
+                if ($API_fn{$api_fn} || (-f $api_fn)) {
+                    debug("found api file name: $api_fn, %s", Dumper(\%API_fn));
+                    $API_fn{$api_fn}++; # Cache so not stat()ing on file system
+                    return &handler($env_hr, filename=>$api_fn);
+                }
+            }
+            (my $fn_display=$fn)=~s/^${document_root}//;
+            $fn_display ||= '/';
+            debug("status: $status, fn:$fn, setting RC_NOT_FOUND");
+            $r->status(RC_NOT_FOUND);
+            my $error=errdump() || "File '$fn_display' not found, status ($status)"; errclr();
+            $html=$r->err_html($status, $error)
+            #warn("file $fn not found") if $WEBDYNE_FASTCGI_WARN_ON_ERROR;
+        }
+        elsif ($status < 0) {
+            debug("status: $status, setting RC_INTERNAL_SERVER_ERROR");
+            $r->status($status=RC_INTERNAL_SERVER_ERROR),
+            $html=$r->err_html($status, "Unexpected return status ($status) from handler $handler")
+        }
+        elsif (($status eq RC_INTERNAL_SERVER_ERROR) && !$html) {
+            $html=$r->custom_response($status) ||
+                "Error $status with no content - try server error logs ?";
+        }
     }
     debug("final handler status is $status, html:$html");
 

@@ -1,5 +1,17 @@
 # Change Log
 
+## [0.0.4] - 2025-10-28
+
+### Changed
+
+- Refactored web workflow to show results page instead of direct download
+
+### Added
+
+- GitHub Actions CI/CD workflows for testing, coverage, perlcritic, and complexity
+- Dependabot configuration for GitHub Actions updates
+- POD and POD coverage tests
+
 ## [0.0.3] - 2025-05-11
 
 ### Added

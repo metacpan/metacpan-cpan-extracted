@@ -28,7 +28,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '0.01';
+our $VERSION = '0.01001';
 
 BEGIN { my $debug = $ENV{DEBUG_BITMAP2PATHS} || 0;
 #	$debug++ while @ARGV and $ARGV[0] eq '-d' and shift;

@@ -10,7 +10,7 @@ use version;
 use MRO::Compat;
 use DBIx::DataModel::Meta::Utils qw/does/;
 
-our $VERSION = '3.13';
+our $VERSION = '3.14';
 
 # compatibility setting : see import()
 our $COMPATIBILITY = $VERSION; # from 2.20, no longer automatic compatibility

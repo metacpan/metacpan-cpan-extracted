@@ -39,7 +39,7 @@ use WebDyne::Util;
 
 #  Version information
 #
-$VERSION='2.017';
+$VERSION='2.018';
 
 
 #  Debug load
@@ -269,10 +269,14 @@ sub compile {
     $html_fh->close();
     
     
-    #  Set flag if we have seen <api> tags
+    #  Set flag (tagname) if we have seen <api> or <htmx> tags and want to compact
+    #  our tree to remove unneccessary <html><head><body> etc. since these
+    #  tags will never emit a full html page when used for real. Do here as lost
+    #  after elementify
     #
-    my $api_fg=$tree_or->{'_api_webdyne'};
-
+    my $compact_tag=$tree_or->{'_webdyne_compact'};
+    debug("compact_tag: $compact_tag");
+    
 
     #  Elementify
     #
@@ -342,16 +346,16 @@ sub compile {
     }
     
     
-    #  If <api> tag used in page compress down to just the <api> nodes and throw
+    #  If <api> or <htmx) tag used in page compress down to just the <api>/<htmx> nodes and throw
     #  everything else away.
     #
-    if ($api_fg) {
+    if ($compact_tag) {
     
         #  Find all the api nodes
         #
         my $api_ar=$self->find_node({
             data_ar	=> $data_ar,
-            tag		=> 'api',
+            tag		=> $compact_tag,
             all_fg	=> 1
         });
         

@@ -1,0 +1,7 @@
+<html> @0 (IMPLICIT)
+  <head> @0.0 (IMPLICIT)
+  <body> @0.1
+    "# Check inserted under and closed off correctly#"
+    <htmx> @0.1.1
+      <p> @0.1.1.0
+        "Hello World"

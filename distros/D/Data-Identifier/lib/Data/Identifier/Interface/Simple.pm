@@ -15,7 +15,7 @@ use Carp;
 
 use Data::Identifier;
 
-our $VERSION = v0.21;
+our $VERSION = v0.22;
 
 
 sub as {
@@ -49,7 +49,7 @@ Data::Identifier::Interface::Simple - format independent identifier object
 
 =head1 VERSION
 
-version v0.21
+version v0.22
 
 =head1 SYNOPSIS
 

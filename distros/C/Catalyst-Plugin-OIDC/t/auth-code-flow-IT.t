@@ -8,11 +8,12 @@ use HTTP::Request::Common;
 use HTTP::Cookies;
 
 use FindBin qw($Bin);
-use lib "$Bin/lib/MyCatalystApp/lib";
+use lib "$Bin/auth-code-flow-IT/MyCatalystApp/lib";
 
 local $ENV{MOJO_LOG_LEVEL} = 'error';
 
-my $provider_app = require "$Bin/lib/MyProviderApp/app.pl";
+local @ARGV = ('version');
+my $provider_app = require "$Bin/auth-code-flow-IT/MyProviderApp/app.pl";
 
 my $mock_oidc_client = Test::MockModule->new('OIDC::Client');
 $mock_oidc_client->redefine('kid_keys' => sub { {} });
@@ -39,14 +40,21 @@ subtest 'Get protected page in error because invalid token format' => sub {
   is($res->content, 'Authentication Error', 'Expected error message');
 };
 
-$mock_oidc_client->redefine('decode_jwt' => sub {
-  {
-    'iss'   => 'my_issuer',
-    'exp'   => time + 30,
-    'aud'   => 'my_id',
-    'sub'   => 'my_subject',
-    'nonce' => 'fake_uuid',
-  }
+my $mock_crypt_jwt = Test::MockModule->new('Crypt::JWT');
+$mock_crypt_jwt->redefine('decode_jwt' => sub {
+  my %params = @_;
+  my %claims = (
+    iss   => 'my_issuer',
+    iat   => time - 10,
+    exp   => time + 30,
+    aud   => 'my_id',
+    sub   => 'my_subject',
+    nonce => 'fake_uuid',
+  );
+  return (
+    $params{decode_header} ? { 'alg' => 'whatever' } : (),
+    \%claims,
+  );
 });
 
 subtest 'Get protected page ok' => sub {

@@ -3,26 +3,28 @@
 use warnings;
 use strict;
 
-BEGIN {
-    $ENV{MIKROTIK_CLIENT_CONNTIMEOUT} = 0.5;
-}
-
 use FindBin;
 use lib './';
 use lib "$FindBin::Bin/lib";
 
 use Test::More;
 
-use Errno qw(ECONNRESET);
-use MikroTik::Client;
-use MikroTik::Client::Mockup;
-
 plan skip_all => 'TLS tests. Set TEST_TLS to run.' unless $ENV{TEST_TLS} || $ENV{TEST_ALL};
+plan skip_all => 'IO::Socket::SSL required for TLS support in Mojolicious.'
+    unless eval { require Mojo::IOLoop::TLS; Mojo::IOLoop::TLS->TLS; };
 
 # It won't work with an old built-in cert and I can't care less to find out why.
 # It's tests only issue
-plan skip_all => 'Mojolicious 8.18+ only'
+plan skip_all => 'Mojolicious 8.18+ only.'
     unless eval { require Mojolicious; Mojolicious->VERSION('8.18'); 1 };
+
+BEGIN {
+    $ENV{MIKROTIK_CLIENT_CONNTIMEOUT} = 0.5;
+}
+
+use Errno qw(ECONNRESET);
+use MikroTik::Client;
+use MikroTik::Client::Mockup;
 
 use constant MOJO_TLS_OPTS => eval { MikroTik::Client->MOJO_TLS_OPTS };
 

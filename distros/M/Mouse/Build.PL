@@ -25,7 +25,7 @@ my %args = (
     requires => {
         'Scalar::Util' => '1.14',
         'XSLoader' => '0.02',
-        'perl' => '5.008005',
+        'perl' => '5.010001',
     },
 
     recommends => {

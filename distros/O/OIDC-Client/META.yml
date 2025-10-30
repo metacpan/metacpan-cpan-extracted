@@ -24,11 +24,14 @@ meta-spec:
   version: '1.4'
 name: OIDC-Client
 requires:
+  CHI: '0.60'
   Carp: '0'
   Crypt::JWT: '0.035'
   Data::UUID: '0'
+  Digest::SHA: '6.01'
   List::MoreUtils: '0.423'
   List::Util: '0'
+  MIME::Base64: '3.15'
   Module::Load: '0'
   Mojolicious: '8.24'
   Moose: '0'
@@ -43,7 +46,7 @@ resources:
   bugtracker: https://github.com/sebmourlhou/oidc-client/issues
   homepage: https://github.com/sebmourlhou/oidc-client
   repository: https://github.com/sebmourlhou/oidc-client.git
-version: '1.04'
+version: '1.05'
 x_generated_by_perl: v5.28.3
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: Artistic-2.0

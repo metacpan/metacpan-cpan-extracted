@@ -2,7 +2,7 @@
 
 This is the README file for the `OrePAN2::S3` distribution. The intent
 of this project is to create a so-called DarkPAN mirror that is served
-up from an S3 bucket behind a CloudFront distribution.  However, this
+from an S3 bucket behind a CloudFront distribution.  However, this
 project can also support a website enabled S3 bucket without using
 CloudFront.
 
@@ -27,12 +27,13 @@ artifacts required.
 cpanm -v OrePAN2::S3
 ```
 
-This will install two scripts:
+This will install two `bash` scripts and a Perl script:
 
 | Script Name | Description |
 | ----------- | ----------- |
 | `orepan2-s3` | Used to add new distributions to your DarkPAN | 
 | `orepan2-s3-index` | Called by `orepan2-s3` to create an `index.html` |
+| `orepan2-s3.pl` | Called by `orepan2-s3` to index and create your website |
 
 ## `.orepan2-s3.json`
 
@@ -43,6 +44,7 @@ looks something like this:
 
 ```
 {
+ "default": {
     "AWS": {
         "profile" : "prod",
         "region" : "us-east-1",
@@ -52,6 +54,7 @@ looks something like this:
     "CloudFront" : {
         "DistributionId" : "**************"
     }
+ }
 }
 ```
 
@@ -108,7 +111,8 @@ orepan2-index dump-template
 ```
 
 If you want to create your own template you can provide that using the
-C<--template> option. See C<perldoc OrePAN2::S3> for more details.
+C<--template> option or set the `template` key in your
+configuration. See C<perldoc OrePAN2::S3> for more details.
 
 # Using a Website Enabled S3 Bucket
 

@@ -21,6 +21,58 @@ foreach my $line (<$h>) {
 close($h);
 die("VERSION not found in $PM_File") if !$Version;
 
+my $meta_merge_supported = eval { ExtUtils::MakeMaker->VERSION(6.46) };
+
+my %runtime_requires = (
+                        'autodie'               => '0',
+                        'strict'                => '0',
+                        'warnings'              => '0',
+                        'Carp'                  => '0',
+                        'File::Basename'        => '0',
+                        'File::Spec::Functions' => '0',
+
+                        'GitHub::Config::SSH::UserData'          => '0.05',
+                        'Software::Security::Policy::Individual' => '0.11',
+                        'Text::Template'                         => '1.61',
+                       );
+
+my %test_requires = (
+                     'Cwd'                   => '0',
+                     'File::Basename'        => '0',
+                     'File::Spec::Functions' => '0',
+                     'File::Temp'            => '0',
+                     'Test::Fatal'           => '0',
+                     'Test::File::Cmp'       => '0',
+                     'Test::More'            => '0',
+                    );
+
+
+my %prereq_build = (
+                    'autodie'               => '0',
+                    'strict'                => '0',
+                    'warnings'              => '0',
+                    'ExtUtils::MakeMaker'   => '0',
+                    'File::Spec::Functions' => '0',
+                   );
+
+my %authortest_requires = (
+                           'Capture::Tiny'         => '0.47',
+                           'Cwd'                   => '0',
+                           'File::Basename'        => '0',
+                           'File::Spec::Functions' => '0',
+                           'File::Temp'            => '0',
+                           'File::chdir'           => '0.1011',
+                           'Pod::Wordlist'         => '1.27',
+                           'Test::CheckManifest'   => '1.43',
+                           'Test::More'            => '0',
+                           'Test::Pod'             => '1.51',
+                           'Test::Spelling'        => '0.25',
+                          );
+
+if ($ENV{TEST_AUTHOR}) {
+  print "Author tests enabled (TEST_AUTHOR=1)\n";
+  %test_requires = (%test_requires,  %authortest_requires);
+}
 
 my %WriteMakefileArgs =
   (
@@ -31,69 +83,36 @@ my %WriteMakefileArgs =
    EXE_FILES          => [catfile('script', lc($The_Module =~ s/::/-/rg))],
    LICENSE            => 'perl_5',
    MIN_PERL_VERSION   => '5.010',
-   CONFIGURE_REQUIRES => {
-                          'autodie'               => '0',
-                          'strict'                => '0',
-                          'warnings'              => '0',
-                          'ExtUtils::MakeMaker'   => '0',
-                          'File::Spec::Functions' => '0',
-    },
-   TEST_REQUIRES => {
-                     'Cwd'                   => '0',
-                     'File::Basename'        => '0',
-                     'File::Spec::Functions' => '0',
-                     'File::Temp'            => '0',
-                     'Test::Fatal'           => '0',
-                     'Test::File::Cmp'       => '0',
-                     'Test::More'            => '0',
-                     'Test::More'            => '0',
-                    },
-   PREREQ_PM => {
-                 'autodie'               => '0',
-                 'strict'                => '0',
-                 'warnings'              => '0',
-                 'Carp'                  => '0',
-                 'File::Basename'        => '0',
-                 'File::Spec::Functions' => '0',
-
-                 'GitHub::Config::SSH::UserData'          => '0.05',
-                 'Software::Security::Policy::Individual' => '0.11',
-                 'Text::Template'                         => '1.61',
-                },
-   META_MERGE => {
-                  "meta-spec" => { version => 2 },
-                  dynamic_config => 0,
-                  resources => {
-                                repository => {
-                                               type => 'git',
-                                               url  => "$Git_URL.git",
-                                               web  => "$Git_URL.git",
-                                              },
-                               },
-                  bugtracker => {
-                                 web => "$Git_URL/issues"
-                                },
-                  provides => { $The_Module => { file => $PM_File, version => $Version },
-                              },
-    },
+   TEST_REQUIRES      => \%test_requires,
+   PREREQ_PM          => \%runtime_requires,
+   CONFIGURE_REQUIRES => \%prereq_build,
    dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
    clean => { FILES => join('-', split(/::/, $The_Module)) . '-*' },
   );
 
-if ($ENV{AUTHOR_TESTING}) {
-  $WriteMakefileArgs{BUILD_REQUIRES} =
+if ($meta_merge_supported) {
+  $WriteMakefileArgs{META_MERGE} =
     {
-     'Capture::Tiny'         => '0.47',
-     'Cwd'                   => '0',
-     'File::Basename'        => '0',
-     'File::Spec::Functions' => '0',
-     'File::Temp'            => '0',
-     'File::chdir'           => '0.1011',
-     'Pod::Wordlist'         => '1.27',
-     'Test::CheckManifest'   => '1.43',
-     'Test::More'            => '0',
-     'Test::Pod'             => '1.51',
-     'Test::Spelling;'       => '0.25',
+     "meta-spec" => { version => 2 },
+     dynamic_config => 0,
+     resources => {
+                   repository => {
+                                  type => 'git',
+                                  url  => "$Git_URL.git",
+                                  web  => "$Git_URL.git",
+                                 },
+                  },
+     bugtracker => {
+                    web => "$Git_URL/issues"
+                   },
+     provides => { $The_Module => { file    => $PM_File,
+                                    version => $Version },
+                 },
+     prereqs => {
+                 runtime => { requires => \%runtime_requires },
+                 test    => { requires => \%test_requires },
+                 build   => { requires => \%prereq_build },
+                },
     };
 }
 
@@ -109,32 +128,35 @@ unless (eval { ExtUtils::MakeMaker->VERSION('6.55_03'); 1 }) {
 }
 
 
-delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
-  unless eval { ExtUtils::MakeMaker->VERSION('6.52'); 1 };
-delete $WriteMakefileArgs{MIN_PERL_VERSION}
-  unless eval { ExtUtils::MakeMaker->VERSION('6.48'); 1 };
-delete $WriteMakefileArgs{META_MERGE}
-  unless eval { ExtUtils::MakeMaker->VERSION('6.46'); 1 };
-delete $WriteMakefileArgs{LICENSE}
-  unless eval { ExtUtils::MakeMaker->VERSION('6.31'); 1 };
+# delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
+#   unless eval { ExtUtils::MakeMaker->VERSION('6.52'); 1 };
+# delete $WriteMakefileArgs{MIN_PERL_VERSION}
+#   unless eval { ExtUtils::MakeMaker->VERSION('6.48'); 1 };
+# delete $WriteMakefileArgs{META_MERGE}
+#   unless eval { ExtUtils::MakeMaker->VERSION('6.46'); 1 };
+# delete $WriteMakefileArgs{LICENSE}
+#   unless eval { ExtUtils::MakeMaker->VERSION('6.31'); 1 };
 
 WriteMakefile(%WriteMakefileArgs);
 
 
 sub MY::postamble {
-    return "
+  return "
+clean_all: clean
+\trm -f MANIFEST README
+
 README.md: $PM_File
 \tpod2markdown $PM_File > README.md
 
 README: $PM_File
 \tpod2text $PM_File > README
 
-all :: manifest README
+all :: README
 
 #manifest : README
 
 policy-files:
-\tdist-policyfiles -m Dist::PolicyFiles -l klaus-rindfrey -p perl- -u \\
+\tdist-policyfiles -m $The_Module -l klaus-rindfrey -p perl- -u \\
         -s 'timeframe=10 days;perl_support_years=10'
 ";
 }

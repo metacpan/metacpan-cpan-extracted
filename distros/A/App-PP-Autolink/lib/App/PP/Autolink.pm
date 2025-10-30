@@ -13,7 +13,7 @@ use English qw / -no_match_vars /;
 
 use File::Which      qw( which );
 use Capture::Tiny    qw/ capture /;
-use List::Util       1.45 qw( uniq any );
+use List::Util       1.45 qw( uniq any first );
 use File::Find::Rule qw/ rule find /;
 use Path::Tiny       qw/ path /;
 #use File::Temp       qw/ tempfile /;
@@ -24,7 +24,7 @@ use Config;
 use Getopt::ArgvFile default=>1;
 use Getopt::Long qw / GetOptionsFromArray :config pass_through /;
 
-our $VERSION = '2.12';
+our $VERSION = '2.14';
 
 use constant CASE_INSENSITIVE_OS => ($^O eq 'MSWin32');
 
@@ -521,6 +521,11 @@ sub get_dep_dlls {
         if ($details->{key} =~ m{^Alien/.+\.pm$}) {
             push @aliens, $package;
         }
+        elsif ($details->{key} =~ m{^Gtk}) {
+            #  we need to check the pixbuf loaders
+            my @pixbuf_loaders = $self->process_gdk_pixbuf_loaders;
+            push @uses, @pixbuf_loaders;
+        }
 
         push @uses, $package
           if $details->{file} =~ $RE_DLL_EXT;
@@ -528,27 +533,19 @@ sub get_dep_dlls {
         next if !@uses;
         
         foreach my $dll (grep {$_ =~ $RE_DLL_EXT} @uses) {
-            my $dll_path = path($deps_hash->{$package}{file})->stringify;
-            my $inc_path;
-            if ($dll_path =~ m/$inc_path_re/) {
-                $inc_path = $1;
+            my $dll_path = $dll;
+            if (!path($dll_path)->is_absolute) {
+                if (my $pfx = List::Util::first {path($_, $dll)->exists} @INC) {
+                    $dll_path = path($pfx, $dll);
+                }
             }
-            else {
-                #  fallback, get inc_path as all before /lib/
-                $inc_path = ($dll_path =~ s|(?<=/lib/).+?$||r);
-            }
-            #  if the path is relative then we need to prepend the inc_path
-            $dll_path = path($dll)->is_absolute
-                ? $dll
-                : path ($inc_path, $dll)->stringify;
             #  We were getting double paths under SP 5.36.
             #  It should be fixed now but leave here just in case.
-            if ($dll_path =~ /^\w:.+:/){
+            if ($dll =~ /^\w:.+:/){
                 warn "Fixing double dir path: $dll_path}";
                 $dll_path =~ s/^.+(.):/$1:/;
             }
-            #say $dll_path;
-            croak "either cannot find or cannot read $dll_path "
+            croak "either cannot find or cannot read $dll "
                 . "for package $package"
               if not -r $dll_path;
             $dll_hash{$dll_path}++;
@@ -586,6 +583,33 @@ sub get_dep_dlls {
     return wantarray ? @dll_list : \@dll_list;
 }
 
+sub process_gdk_pixbuf_loaders {
+    my ($self) = @_;
+
+    say 'Scanning gdk-pixbuf-query-loaders result';
+
+    my $ql = which 'gdk-pixbuf-query-loaders';
+
+    return if !$ql;
+
+    my $pixbuf_parent_path = path ($ql)->parent->parent;
+
+    my @res =
+        map {path $_}
+            grep {$_ =~ /$RE_DLL_EXT$/}
+                grep {$_ !~ /#/}
+                    map {s/"//gr}
+                        map {s/\s*//gr}
+                            qx /gdk-pixbuf-query-loaders/;
+
+    foreach my $path (@res) {
+        #  are we relative to pixbuf-loader?
+        if (!$path->is_absolute) {
+            $path = path ($pixbuf_parent_path, $path);
+        }
+    }
+    return @res;
+}
 
 1;
 

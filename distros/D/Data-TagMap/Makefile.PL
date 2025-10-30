@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010000;
+use 5.020000;
 
 use ExtUtils::MakeMaker;
 
@@ -14,18 +14,18 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Data-TagMap",
   "LICENSE" => "artistic_2",
-  "MIN_PERL_VERSION" => "5.010000",
+  "MIN_PERL_VERSION" => "5.020000",
   "NAME" => "Data::TagMap",
   "PREREQ_PM" => {
     "Carp" => "1.35",
-    "Data::Identifier" => "0.19.0"
+    "Data::Identifier" => "0.22.0"
   },
   "TEST_REQUIRES" => {
     "Test::Exception" => "0.30",
     "Test::More" => "1.3",
     "Test::Warn" => "0.30"
   },
-  "VERSION" => "v0.01",
+  "VERSION" => "v0.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -34,7 +34,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => "1.35",
-  "Data::Identifier" => "0.19.0",
+  "Data::Identifier" => "0.22.0",
   "Test::Exception" => "0.30",
   "Test::More" => "1.3",
   "Test::Warn" => "0.30"

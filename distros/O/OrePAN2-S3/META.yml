@@ -10,7 +10,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::ShareDir::Install: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,12 +23,13 @@ no_index:
 provides:
   OrePAN2::S3:
     file: lib/OrePAN2/S3.pm
-    version: '0.03'
+    version: v1.0.4
 requires:
   Amazon::Credentials: '0'
   Amazon::S3: '0'
   Archive::Tar: '0'
   CLI::Simple: '0'
+  DarkPAN::Utils: '0'
   JSON: '0'
   OrePAN2::Index: '0'
   Readonly: '0'
@@ -39,5 +40,5 @@ resources:
   bugtracker: http://github.com/rlauer6/orepan2-s3/issues
   homepage: http://github.com/rlauer6/orepan2-s3.git
   repository: git://github.com/rlauer6/orepan2-s3.git
-version: '0.03'
+version: v1.0.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

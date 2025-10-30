@@ -15,7 +15,9 @@ use Capture::Tiny qw(capture);
 
 my $Ghmulti_Scr = Cwd::abs_path(catfile(dirname(__FILE__), qw(.. script ghmulti)));
 
-{
+ok(-x $Ghmulti_Scr, "$Ghmulti_Scr is executable");
+
+unless ($ENV{NO_LOCAL_TESTS}) {
   my $github_repo = 'https://github.com/klaus-rindfrey/perl-app-ghmulti';
   my $tmp_dir = File::Temp->newdir();
   local $CWD = $tmp_dir;

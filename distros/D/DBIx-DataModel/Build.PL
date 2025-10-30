@@ -50,6 +50,7 @@ my $builder = Module::Build->new(
     meta_merge => {
       resources => {
         repository => 'https://github.com/damil/DBIx-DataModel',
+        bugtracker => 'https://github.com/damil/DBIx-DataModel/issues',
        }
      },
 );

@@ -349,6 +349,34 @@ Column 2 with newline</td>
 ```</pre>
 </div>
 
+<div class="case" data-name="basic table with links">
+  <div class="input">
+    <table>
+      <thead>
+        <tr>
+          <th>Column 1</th>
+          <th>Column 2</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><a href="https://example.com">Row 1, Column 1</a></td>
+          <td>Row 1, Column 2</td>
+        </tr>
+        <tr>
+          <td>Row 2, Column 1</td>
+          <td>Row 2, Column 2</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <pre class="expected">| Column 1 | Column 2 |
+| --- | --- |
+| [Row 1, Column 1](https://example.com) | Row 1, Column 2 |
+| Row 2, Column 1 | Row 2, Column 2 |</pre>
+</div>
+
+
 <!-- /TEST CASES -->
 
 <script src="turndown-plugin-gfm-test.browser.js"></script>

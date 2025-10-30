@@ -1,5 +1,6 @@
 bin/app.psgi
 bin/blurfill
+Changes.md
 lib/App/BlurFill.pm
 lib/App/BlurFill/CLI.pm
 lib/App/BlurFill/Web.pm
@@ -9,7 +10,8 @@ README.md
 t/00-basic.t
 t/01-cli.t
 t/02-web.t
+t/pod.t
+t/pod_coverage.t
 t/test.jpg
-Changes.md
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,4 +1,4 @@
-HTML-GenerateUtil version 1.20
+HTML-GenerateUtil version 1.21
 ==============================
 
 Provides a number of functions that make generating HTML output
@@ -15,7 +15,7 @@ To install this module type the following:
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2004-2014 by FastMail Pty Ltd
+Copyright (C) 2004-2025 by Fastmail Pty Ltd
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

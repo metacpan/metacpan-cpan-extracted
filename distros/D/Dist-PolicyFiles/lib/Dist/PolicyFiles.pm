@@ -6,7 +6,7 @@ use warnings;
 
 use feature ':5.10';
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 
 use Carp;
@@ -160,7 +160,7 @@ Dist::PolicyFiles - Generate CONTRIBUTING.md and SECURITY.md
 
 =head1 VERSION
 
-Version 0.03
+Version 0.05
 
 =head1 SYNOPSIS
 
@@ -177,7 +177,7 @@ F<SECURITY.md>. It comes with the L<dist-policyfiles> command line tool.
 
 =head2 METHODS
 
-=head3 Constructor
+=head3 C<new(I<NAMED_ARGUMENTS>>
 
 The constructor C<new()> accepts the following named arguments, where C<login>
 and C<module> are mandatory:

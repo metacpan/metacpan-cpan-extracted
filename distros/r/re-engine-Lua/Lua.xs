@@ -372,7 +372,7 @@ static const char *match (MatchState *ms, const char *s, const char *p) {
 
 static int luaL_error(lua_State * st, const char * msg)
 {
-    croak(msg);
+    croak("%s", msg);
     return 0;
 }
 
@@ -456,10 +456,17 @@ Lua_comp(pTHX_ SV * const pattern, U32 flags)
     return rx;
 }
 
+#if PERL_VERSION < 20
 I32
 Lua_exec(pTHX_ REGEXP * const rx, char *stringarg, char *strend,
           char *strbeg, I32 minend, SV * sv,
           void *data, U32 flags)
+#else
+I32
+Lua_exec(pTHX_ REGEXP * const rx, char *stringarg, char *strend,
+          char *strbeg, SSize_t minend, SV * sv,
+          void *data, U32 flags)
+#endif
 {
     regexp * re = RegSV(rx);
     STRLEN plen;
@@ -528,6 +535,7 @@ Lua_exec(pTHX_ REGEXP * const rx, char *stringarg, char *strend,
     return 0;
 }
 
+#if PERL_VERSION < 20
 char *
 Lua_intuit(pTHX_ REGEXP * const rx, SV * sv, char *strpos,
              char *strend, U32 flags, re_scream_pos_data *data)
@@ -540,6 +548,21 @@ Lua_intuit(pTHX_ REGEXP * const rx, SV * sv, char *strpos,
     PERL_UNUSED_ARG(data);
     return NULL;
 }
+#else
+char *
+Lua_intuit(pTHX_ REGEXP * const rx, SV * sv, const char * const strbeg, char *strpos,
+             char *strend, const U32 flags, re_scream_pos_data *data)
+{
+    PERL_UNUSED_ARG(rx);
+    PERL_UNUSED_ARG(sv);
+    PERL_UNUSED_ARG(strbeg);
+    PERL_UNUSED_ARG(strpos);
+    PERL_UNUSED_ARG(strend);
+    PERL_UNUSED_ARG(flags);
+    PERL_UNUSED_ARG(data);
+    return NULL;
+}
+#endif
 
 SV *
 Lua_checkstr(pTHX_ REGEXP * const rx)

@@ -70,7 +70,7 @@ sub test_build_access_token_from_token_response {
 }
 
 sub test_build_access_token_from_claims {
-  subtest "build_access_token_from_claims() - a maximun of information" => sub {
+  subtest "build_access_token_from_claims() - a minimum of information" => sub {
 
     # Given
     my $token = 'TOKEN';
@@ -93,8 +93,9 @@ sub test_build_access_token_from_claims {
     # Given
     my $token = 'TOKEN';
     my %claims = (
-      exp => 1234567890,
-      scp => [qw/scope/],
+      exp        => 1234567890,
+      scp        => [qw/scope/],
+      token_type => 'my_token_type',
     );
 
     # When
@@ -103,11 +104,13 @@ sub test_build_access_token_from_claims {
     # Then
     my $expected_access_token = OIDC::Client::AccessToken->new(
       token      => 'TOKEN',
+      token_type => 'my_token_type',
       expires_at => 1234567890,
       scopes     => [qw/scope/],
       claims => {
-        exp => 1234567890,
-        scp => [qw/scope/],
+        exp        => 1234567890,
+        scp        => [qw/scope/],
+        token_type => 'my_token_type',
       },
     );
     cmp_deeply($access_token, $expected_access_token,

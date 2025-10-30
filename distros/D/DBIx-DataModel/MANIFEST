@@ -26,6 +26,7 @@ lib/DBIx/DataModel/Schema.pm
 lib/DBIx/DataModel/Schema/Generator.pm
 lib/DBIx/DataModel/Schema/ResultAs.pm
 lib/DBIx/DataModel/Schema/ResultAs/Categorize.pm
+lib/DBIx/DataModel/Schema/ResultAs/Correlated_update.pm
 lib/DBIx/DataModel/Schema/ResultAs/Count.pm
 lib/DBIx/DataModel/Schema/ResultAs/Fast_statement.pm
 lib/DBIx/DataModel/Schema/ResultAs/File_tabular.pm

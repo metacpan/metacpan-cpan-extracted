@@ -4,8 +4,9 @@ This distribution makes it easy to integrate the OpenID Connect protocol into di
 
 You can use the [OIDC::Client](https://metacpan.org/pod/OIDC::Client) module directly for any batch or script. For use from within an application, you should instead use the framework plugin :
 
-- [Mojolicious](https://metacpan.org/pod/Mojolicious::Plugin::OIDC)
-- [Catalyst](https://metacpan.org/pod/Catalyst::Plugin::OIDC)
+- [Mojolicious::Plugin::OIDC](https://metacpan.org/pod/Mojolicious::Plugin::OIDC)
+- [Catalyst::Plugin::OIDC](https://metacpan.org/pod/Catalyst::Plugin::OIDC)
+- [Dancer2::Plugin::OIDC](https://metacpan.org/pod/Dancer2::Plugin::OIDC)
 
 ## Features
 
@@ -13,8 +14,9 @@ You can use the [OIDC::Client](https://metacpan.org/pod/OIDC::Client) module dir
 - retrieves the provider metadata and JWK keys when the application is launched
 - gets the token(s) from the provider
 - includes a class for session management (token storage)
-- refreshes the access token
+- refreshes the token(s)
 - verifies a JWT token with support for automatic JWK key rotation
+- introspects a token
 - gets the user information from the *userinfo* endpoint
 - exchanges the access token
 
@@ -29,5 +31,5 @@ When using OIDC-Client with an application, it is highly recommended to configur
 
 ## Limitations
 
-- no multi-audience support
+- no support for *tls_client_auth* client authentication method
 - no support for Implicit or Hybrid flows (applicable to front-end applications only and deprecated)

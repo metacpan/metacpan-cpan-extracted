@@ -1,13 +1,15 @@
 #!/usr/bin/env bash
 #-*- mode: sh; -*-
 
+test -n "$EXTRA" && lib="-I $EXTRA"
+
 MODULE=OrePAN2::S3
 
-MODULINO=$(echo $MODULE | perl -M$MODULE -ne 'chomp; s/::/\//g; $m="$_.pm"; print $INC{$m};' 2>/dev/null)
+MODULINO=$(echo $MODULE | perl $lib -M$MODULE -ne 'chomp; s/::/\//g; $m="$_.pm"; print $INC{$m};' 2>/dev/null)
 
 if test -n "$MODULINO"; then
-    POSIXLY_CORRECT=1 perl $MODULINO $command "$@"
+    POSIXLY_CORRECT=1 perl $lib $MODULINO $command "$@"
 else
-    echo "ERROR: unable to find OrePAN::S3"
+    echo "ERROR: unable to find OrePAN2::S3"
     exit 1;
 fi

@@ -1,0 +1,22 @@
+Changes
+lib/YaraFFI.pm
+lib/YaraFFI/Event.pm
+lib/YaraFFI/Record/YR_MATCH.pm
+lib/YaraFFI/Record/YR_META.pm
+lib/YaraFFI/Record/YR_RULE.pm
+lib/YaraFFI/Record/YR_STRING.pm
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/00_load.t
+t/01_basic.t
+t/02_buffer_scan.t
+t/03_detailed.t
+t/04_metadata_offsets.t
+t/05_safety_edge_cases.t
+t/manifest.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

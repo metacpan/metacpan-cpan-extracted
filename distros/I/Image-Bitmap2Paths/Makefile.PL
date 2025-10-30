@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME              => 'Image::Bitmap2Paths',
     VERSION_FROM      => 'lib/Image/Bitmap2Paths.pm', # finds $VERSION, requires EU::MM from perl >= 5.5
-    PREREQ_PM         => {}, # e.g., Module::Name => 1.1
+    PREREQ_PM         => {'Data::Flow' => 0.09}, # e.g., Module::Name => 1.1
     ABSTRACT_FROM     => 'lib/Image/Bitmap2Paths.pm', # retrieve abstract from module
     AUTHOR            => 'Ilya Zakharevich <ilyaz@cpan.com>',
     LICENSE           => 'perl',

@@ -1,4 +1,4 @@
-[![Actions Status](https://github.com/janeskil1525/Daje-Plugin-Workflow/actions/workflows/test.yml/badge.svg)](https://github.com/janeskil1525/Daje-Plugin-Workflow/actions)
+[![Actions Status](https://github.com/janeskil1525/Daje-Plugin-Workflow/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/janeskil1525/Daje-Plugin-Workflow/actions?workflow=test)
 # NAME
 
 Daje::Plugin::workflow - It's new $module

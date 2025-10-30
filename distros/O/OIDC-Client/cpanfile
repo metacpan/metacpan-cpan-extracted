@@ -1,9 +1,12 @@
 requires 'perl', '5.20.0';
 requires 'Carp';
+requires 'CHI', '0.60';
 requires 'Crypt::JWT', '0.035';
 requires 'Data::UUID';
+requires 'Digest::SHA', '6.01';
 requires 'List::Util';
 requires 'List::MoreUtils', '0.423';
+requires 'MIME::Base64', '3.15';
 requires 'Module::Load';
 requires 'Mojolicious', '8.24';
 requires 'Moose';

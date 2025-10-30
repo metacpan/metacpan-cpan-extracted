@@ -1,0 +1,6 @@
+<html> @0 (IMPLICIT)
+  <head> @0.0 (IMPLICIT)
+  <body> @0.1 (IMPLICIT)
+    <htmx compact="compact"> @0.1.0
+      <p> @0.1.0.0
+        "Hello World"

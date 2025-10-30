@@ -4,13 +4,13 @@
       "root <root@hp>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.88, CPAN::Meta::Converter version 2.120351",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "HTML-GenerateUtil",
    "no_index" : {
@@ -35,5 +35,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.20"
+   "version" : "1.21",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

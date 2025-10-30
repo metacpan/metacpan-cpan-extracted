@@ -4,6 +4,12 @@ TODO
   - RE-write Net::UPnP interfaces as Net:UPnP is not good at error trapping or timeouts.
   - Update error handling for Power::Outlet::Hue->name
 
+0.52 2025-10-28
+  - Added Power::Outlet::OpenBeken
+
+0.51 2025-03-28
+  - Added Power::Outlet::Kauf and tests
+
 0.50 2023-03-21
   - Updated lib/Power/Outlet/MQTT.pm
     - Added device property which replaces name property as the topic builder since name is the human friendly name

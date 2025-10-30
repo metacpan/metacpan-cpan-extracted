@@ -5,7 +5,7 @@
       "Sanko Robinson <sanko@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.19",
+   "generated_by" : "Minilla/v3.1.28",
    "license" : [
       "artistic_2"
    ],
@@ -29,9 +29,9 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Alien::Build::MB" : "0",
-            "Alien::Meson" : "0",
-            "Alien::Ninja" : "0",
+            "Alien::Build::MB" : "0.09",
+            "Alien::Meson" : "0.06",
+            "Alien::Ninja" : "0.03",
             "Module::Build" : "0.4005"
          }
       },
@@ -57,8 +57,8 @@
    },
    "provides" : {
       "Alien::libui" : {
-         "file" : "lib/Alien/libui.pm",
-         "version" : "0.01"
+         "file" : "lib/Alien\\libui.pm",
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -73,8 +73,8 @@
          "web" : "https://github.com/sanko/alien-libui"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_authority" : "cpan:SANKO",
-   "x_serialization_backend" : "JSON::PP version 4.11",
+   "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 0
 }

@@ -39,7 +39,8 @@ my $res;
 # check connection
 $api->port(Mojo::IOLoop::Server::generate_port());
 $res = $api->cmd('/resp');
-is int($!), ECONNREFUSED, 'connection error';
+ok $!, 'connection error';
+diag("Connection error (\$!) is " . int($!));
 $api->port($port);
 
 # login

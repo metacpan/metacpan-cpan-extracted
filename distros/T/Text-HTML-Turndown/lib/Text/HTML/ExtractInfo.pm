@@ -1,4 +1,4 @@
-package Text::HTML::ExtractInfo 0.08;
+package Text::HTML::ExtractInfo 0.09;
 use 5.020;
 use stable 'postderef';
 use experimental 'signatures';
@@ -65,7 +65,7 @@ our %elements = (
 sub _get_value( $node ) {
     if( my $c = $node->can( 'value' )) {
         return $c->($node)
-    } elsif( my $c = $node->can( 'textContent' )) {
+    } elsif( $c = $node->can( 'textContent' )) {
         return $c->($node)
     } else {
         croak "Don't know how to handle " . $node->toString

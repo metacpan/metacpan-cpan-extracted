@@ -3,17 +3,22 @@ abstract: 'Helps when using multiple Github accounts with SSH keys'
 author:
   - 'Klaus Rindfrey <klausrin@cpan.org.eu>'
 build_requires:
-  Capture::Tiny: '0.48'
-  ExtUtils::MakeMaker: '0'
+  Capture::Tiny: '0.47'
+  ExtUtils::MakeMaker: '6.42'
   File::Basename: '0'
   File::Spec::Functions: '0'
   Test::More: '0'
+  autodie: '0'
+  strict: '0'
+  warnings: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '6.42'
   File::Spec::Functions: '0'
   autodie: '0'
+  strict: '0'
+  warnings: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,14 +31,19 @@ no_index:
 provides:
   App::ghmulti:
     file: lib/App/ghmulti.pm
-    version: '0.04'
+    version: '0.06'
 requires:
+  Carp: '0'
+  Getopt::Std: '0'
   Git::RemoteURL::Parse: '0.02'
   GitHub::Config::SSH::UserData: '0.01'
+  Pod::Usage: '0'
   perl: '5.010'
+  strict: '0'
+  warnings: '0'
 resources:
   repository: https://github.com/klaus-rindfrey/perl-app-ghmulti.git
-version: '0.04'
+version: '0.06'
 x_bugtracker:
   web: https://github.com/klaus-rindfrey/perl-app-ghmulti/issues
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

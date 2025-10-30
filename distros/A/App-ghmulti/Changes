@@ -1,9 +1,18 @@
 Revision history for App-ghmulti
 
+0.06   2025/10/30
+
+      - Corrected policy files.
+
+0.05   2025/10/29
+
+      - Reworked Makefile.PL.
+      - Improved POD.
+
 0.04   2025/08/08
 
-      - Reformatted Makefile.PL
-      - Fixed problem with 01-version-help.t (https://rt.cpan.org/Ticket/Display.html?id=168832)
+      - Reformatted Makefile.PL.
+      - Fixed problem with 01-version-help.t (https://rt.cpan.org/Ticket/Display.html?id=168832).
 
 0.03   2025/08/07
 

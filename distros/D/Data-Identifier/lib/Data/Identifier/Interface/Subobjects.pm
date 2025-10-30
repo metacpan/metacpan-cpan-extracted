@@ -16,11 +16,12 @@ use parent 'Data::Identifier::Interface::Userdata';
 use Carp;
 use Scalar::Util qw(weaken);
 
-our $VERSION = v0.21;
+our $VERSION = v0.22;
 
 my %_types = (
     db          => 'Data::TagDB',
     extractor   => 'Data::URIID',
+    tagmap      => 'Data::TagMap',
     fii         => 'File::Information',
     store       => 'File::FStore',
     parent      => __PACKAGE__,
@@ -96,7 +97,7 @@ Data::Identifier::Interface::Subobjects - format independent identifier object
 
 =head1 VERSION
 
-version v0.21
+version v0.22
 
 =head1 SYNOPSIS
 

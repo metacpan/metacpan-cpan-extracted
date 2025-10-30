@@ -58,7 +58,7 @@ use Exporter qw(import);
 
 #  Version information
 #
-$VERSION='2.017';
+$VERSION='2.018';
 chomp($VERSION_GIT_REF=do { local (@ARGV, $/) = ($_=__FILE__.'.tmp'); <> if -f $_ });
 
 
@@ -85,6 +85,7 @@ require WebDyne::Err;
     'json',
     'api',
     'include',
+    'htmx'
 
 );
 
@@ -2420,16 +2421,81 @@ sub json {
 }
 
 
+sub htmx {
+
+
+    #  Called when we encounter a <htmx> tag
+    #
+    my ($self, $data_ar, $attr_hr)=@_;
+    debug("$self rendering htmx tag, data_ar: $data_ar, attr_hr: %s", $attr_hr);
+    
+    
+    #  Get the request headers to look for a 'HX-Request' flag
+    #
+    my $r=$self->r() ||
+        return err('unable to get request handler !');
+    my $hx_request=$r->headers_in->{'hx-request'};
+    debug("hx_request header: $hx_request");
+    
+
+    #  Check we have a handler
+    #
+    my $html_sr;
+    if (my $handler=$attr_hr->{'handler'}) {
+    
+    
+        #  Return whatever HTML we get back
+        #
+        debug("htmx rendering with handler $handler");
+        $html_sr=$self->perl($data_ar, $attr_hr) ||
+            return err();
+        debug("html_sr: $html_sr");
+        
+    }
+    else {
+    
+        #  No handler, just render
+        #
+        debug('htmx render without handler');
+        $html_sr=$self->render({ data=> $data_ar->[$WEBDYNE_NODE_CHLD_IX] }) ||
+            return err();
+        debug("html_sr: $html_sr");
+        
+    }
+    
+    
+    #  Done
+    #
+    if ($hx_request) {
+
+        #  Return fragment only
+        #
+        debug('returning htmx tag as html fragment only');
+        return $self->redirect( html=>$html_sr );
+        
+    }
+    else {
+    
+        #  Continue render and return whole page
+        #
+        debug('returning normal render of htmx tag into page');
+        return $html_sr;
+        
+    }
+    
+}
+
+
 sub api {
 
 
-    #  Called when we encounter a <json> tag
+    #  Called when we encounter a <api> tag
     #
     my ($self, $data_ar, $attr_hr)=@_;
     debug("$self rendering api tag in block $data_ar, attr %s", $attr_hr);
     
     
-    #  Need Router::Simple
+    #  Need Router::Simple. Build params needed allowing for synonyms
     #
     require Router::Simple;
     my $rest_or=$self->{'_rest_or'} ||= Router::Simple->new();
@@ -2442,6 +2508,15 @@ sub api {
     );
     debug('route param: %s, %s', Dumper(\@route, \@option));
     $rest_or->connect(@route, $option[0]);
+    
+    
+    #  Now look for match. Set PATH_INFO to '' if not exists to stop warning
+    #
+    $ENV{'PATH_INFO'} ||= '';
+    
+    
+    #  And match
+    #
     if (my $match_hr=$rest_or->match(\%ENV)) {
     
 

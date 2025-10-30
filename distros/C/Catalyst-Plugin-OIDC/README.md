@@ -10,9 +10,10 @@ It essentially uses the [OIDC-Client](https://metacpan.org/dist/OIDC-Client) dis
 - retrieves the provider metadata and JWK keys when the application is launched
 - redirects the browser to the authorize URL to initiate an authorization code flow
 - gets the token(s) from the provider
-- manages the session : the tokens are stored to be used for next requests
+- the tokens are stored for later use or for future requests
 - refreshes access token if needed
 - verifies a JWT token with support for automatic JWK key rotation
+- introspects the access token
 - gets the user information from the *userinfo* endpoint
 - exchanges the access token
 - redirects the browser to the logout URL
@@ -28,5 +29,5 @@ When using Catalyst::Plugin::OIDC, it is highly recommended to configure the fra
 
 ## Limitations
 
-- no multi-audience support
+- no support for *tls_client_auth* client authentication method
 - no support for Implicit or Hybrid flows (applicable to front-end applications only and deprecated)

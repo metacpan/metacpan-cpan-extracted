@@ -5,7 +5,7 @@ use warnings;
 use Encode qw(decode_utf8);
 use Test2::API qw(context);
 
-our $VERSION = "0.03";
+our $VERSION = "0.05";
 
 our $SEPARATOR = ' ';
 
@@ -15,27 +15,35 @@ sub import {
     my $class = shift;
     my ($caller, $file_path) = caller;
 
+    $class->apply_plugin($caller, $file_path);
+}
+
+sub apply_plugin {
+    my ($class, $target_package, $target_file) = @_;
+
+    unless ( $ENV{SUBTEST_FILTER} ) {
+        # No filter set, do nothing
+        return undef;
+    }
+
     # Get original subtest function from caller's namespace
     # If it doesn't exist, do nothing
-    my $orig = $caller->can('subtest') or return;
+    my $orig = $target_package->can('subtest') or return;
 
     # Parse subtest structure from file
-    my $all_subtests = _parse_subtest_structure($file_path);
+    my $all_subtests = _parse_subtest_structure($target_file);
 
     # Override subtest in caller's namespace
     no strict 'refs';
     no warnings 'redefine';
-    *{"${caller}::subtest"} = _create_filtered_subtest($orig, $all_subtests);
+    *{"${target_package}::subtest"} = _create_filtered_subtest($orig, $all_subtests);
+
+    return 1;
 }
 
 # Get subtest filter regex from environment variable
 sub _get_subtest_filter_regex {
-
-    unless ( $ENV{SUBTEST_FILTER} ) {
-        return undef;
-    }
-
-    my $subtest_filter = $ENV{SUBTEST_FILTER};
+    my $subtest_filter = $ENV{SUBTEST_FILTER} or return undef;
 
     # Decode UTF-8 if necessary
     if ($subtest_filter =~ /[\x80-\xFF]/) {
@@ -132,31 +140,40 @@ sub _extract_sub_block {
 
     my $depth = 1;
     my $pos = $start_pos;
-    my $len = length($content);
 
-    while ($pos < $len && $depth > 0) {
+    # Use regex-based approach for faster scanning
+    # This scans for relevant tokens (braces and quotes) instead of checking every character
+    while ($pos < length($content) && $depth > 0) {
+        # Find next relevant character: {, }, ", '
+        if (substr($content, $pos) =~ /\G([^{}"']+)/gc) {
+            $pos += length($1);
+        }
+
+        last if $pos >= length($content);
+
         my $char = substr($content, $pos, 1);
 
         if ($char eq '{') {
             $depth++;
+            $pos++;
         } elsif ($char eq '}') {
             $depth--;
+            $pos++;
+            last if $depth == 0;
         } elsif ($char eq '"' || $char eq "'") {
-            # Skip string content
+            # Skip string content using regex
             my $quote = $char;
             $pos++;
-            while ($pos < $len) {
-                my $c = substr($content, $pos, 1);
-                if ($c eq '\\') {
-                    $pos++; # Skip escaped character
-                } elsif ($c eq $quote) {
-                    last;
-                }
-                $pos++;
+            # Match everything until unescaped quote
+            if (substr($content, $pos) =~ /\G((?:[^\\$quote]|\\.)*)$quote/gc) {
+                $pos += length($1) + 1; # +1 for closing quote
+            } else {
+                # No closing quote found, skip to end
+                $pos = length($content);
             }
+        } else {
+            $pos++;
         }
-
-        $pos++;
     }
 
     if ($depth == 0) {
@@ -314,6 +331,15 @@ Subtests that don't match the filter are skipped.
 When C<SUBTEST_FILTER> is not set, all tests run normally.
 
 =back
+
+=head1 METHODS
+
+=head2 apply_plugin
+
+    Test2::Plugin::SubtestFilter->apply_plugin($target_package, $target_file);
+
+Applies the subtest filtering functionality to the specified package.
+Normally called automatically via C<import()>. For advanced users only.
 
 =head1 ENVIRONMENT VARIABLES
 

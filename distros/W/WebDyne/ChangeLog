@@ -1,3 +1,15 @@
+commit bf31630aa9466cda13cd7bfc05e11a7d6f5b6da0
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Oct 29 22:54:02 2025 +1030
+
+    VERSION increment: 2.018
+
+commit 7195d04c38b255be00b9b5b0f4d266f5732b7c51
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Oct 29 22:52:56 2025 +1030
+
+    Significant update. Add htmx tag, fix numerous bugs, clean-up Treebuilder, fix the way Constants imports, make serving index and static files default for webdyne.psgi, clean up index.psp, minor change to error.psp to show configured vs actual webdyne constant values
+
 commit 9f2e6d63c3c50b4089dc1faa4bb4513cd2834e09
 Author: Andrew Speer <andrew.speer@isolutions.com.au>
 Date:   Mon Oct 27 00:53:29 2025 +1030

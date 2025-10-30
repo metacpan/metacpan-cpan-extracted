@@ -9,7 +9,7 @@ use Error::Pure qw(err);
 use Mo::utils 0.06 qw(check_bool);
 use Mo::utils::Hash qw(check_hash);
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Constructor.
 sub new {
@@ -428,7 +428,7 @@ L<Mo::utils::Hash>.
 
 =head1 REPOSITORY
 
-L<https://github.com/michal-josef-spacek/MARC-Collection-Stats>
+L<https://github.com/michal-josef-spacek/MARC-Validator>
 
 =head1 AUTHOR
 
@@ -444,6 +444,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

@@ -75,13 +75,13 @@ If you are in a git repo, the script sets the remote URL to use the SSH key
 and configures the email address and the username as described above.
 Otherwise the script terminates with an error state.
 
-=item * C<-c GITHUB_URL [DIR]>
+=item * C<B<-c> GITHUB_URL [DIR]>
 
 Checks whether the user name is in F<~/.ssh/config>. If this is not the case,
 the script aborts with an error message. Otherwise it works like C<git clone>,
 but also configures the repo as described above.
 
-=item * C<-u [GITHUB_URL]>
+=item * C<B<-u> [GITHUB_URL]>
 
 Prints the github URL in the format needed to use your SSH keys. If
 I<C<GITHUB_URL>> is not specified, the script attempts to determine a URL via
@@ -91,12 +91,13 @@ With this option, the script does not an configuration.
 
 =back
 
-Note: the options C<-c> and C<-u> are mutually exclusive!
+Note: the options B<C<-c>> and B<C<-u>> are mutually exclusive!
 
 
 =head1 SEE ALSO
 
 L<App::ghmulti>,
+L<App::git_log_ch_usrdata>,
 L<Git::RemoteURL::Parse>,
 L<GitHub::Config::SSH::UserData>
 

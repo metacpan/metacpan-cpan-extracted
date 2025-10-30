@@ -53,6 +53,6 @@
          "web" : "https://github.com/davorg-cpan/app-blurfill"
       }
    },
-   "version" : "v0.0.3",
+   "version" : "v0.0.4",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

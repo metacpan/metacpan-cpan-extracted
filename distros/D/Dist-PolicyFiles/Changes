@@ -1,5 +1,14 @@
 Revision history for Dist-PolicyFiles
 
+0.05    2025/10/29
+
+      - Another fix in POD of dist-policyfiles
+
+0.04    2025/10/28
+
+      - Fixed POD of dist-policyfiles
+      - Improved Makefile.PL and github actions workflow
+
 0.03    2025/10/27
 
       - Adapted Makefile.PL

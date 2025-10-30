@@ -10,6 +10,7 @@ use Pod::Wordlist;
 add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
+198982749
 49699333
 Alders
 Alders'
@@ -23,6 +24,7 @@ ExportInspector
 Include
 Ishigaki
 James
+Johnson
 José
 Kenichi
 Logger
@@ -34,12 +36,14 @@ Olaf
 Oliver
 Onyiah
 PPI
+Paul
 Peter
 Raspass
 Rodríguez
 Role
 Sandbox
 choroba
+copilot
 dependabot
 dump
 git
@@ -50,6 +54,7 @@ lib
 mendoza
 nelo
 olaf
+paul
 perlimports
 sandboxed
 script

@@ -1,3 +1,114 @@
+Mon Oct 27 20:22:21 2025  Rob Lauer  <rclauer@gmail.com>
+
+	[1.0.4]:
+	* README.md: tweaks
+	* VERSION: bump
+	* lib/OrePAN2/S3.pm.in
+	- pod twaks
+	* bin/orepan2-s3
+	- more feedback during processing
+
+Mon Oct 27 09:30:08 2025  Rob Lauer  <rclauer@gmail.com>
+
+	[1.0.3]:
+	* VERSION: bump
+	* lib/OrePAN2/S3.pm.in
+	- update POD
+	(fetch_config): support 'default' as scalar or hash
+	(init): refactored
+	- support 'default' profile name as hash or scalar
+	(create_index)
+	- use custom_sections w/regexp instead of hard coding BLM/BLM-Startup
+	* bin/orepan2-s3
+	- support 'default' profile name as hash or scalar
+	* .gitignore: resources
+
+Sun Oct 26 17:50:18 2025  Rob Lauer  <rclauer@gmail.com>
+
+	[1.0.2]:
+	* VERSION: bump
+	* bin/orepan2-s3
+	- --name, not --profile-name
+	- --profile-name for S3.pm, not --profile
+	* lib/OrePAN2/S3.pm.in
+	(fetch_config)
+	- get config profile from --profile-name
+	(main)
+	- --profile-name, not --profile
+	- default profile_name = default
+	- default profile = $ENV{AWS_PROFILE}
+	* resources: remove from source control
+
+Thu Oct 23 09:16:50 2025  Rob Lauer  <rclauer@gmail.com>
+
+	[1.0.1]:
+	* VERSION: bump
+	* bin/orepan2-s3
+	- -n, not -N for --profile-name
+	- '.AWS.bucket? ' - space after ?
+
+Tue Oct 21 09:16:04 2025  Rob Lauer  <rclauer@gmail.com>
+
+	[1.0.0]:
+	* VERSION: new
+	* version.mk: new
+	* .gitignore: *.pm, *.tmp
+	* Makefile
+	- version.mk
+	- build from .pm.in
+	* bin/orepan2-s3
+	- jq 1.7 needs space before ?
+	* lib/OrePAN2/S3.pm.in: version from @PACKAGE_VERSION@
+	* requires: +DarkPAN::Utils
+
+Fri Jun  6 12:04:15 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[0.06]:
+	* Makefile
+	- cleanup, refactored
+	* bin/orepan2-s3
+	- --log-level option
+	- delete, index commands added
+	* lib/OrePAN2/S3.pm
+	- added logging
+	- pod tweaks
+	(_upload_html)
+	- accept ref or string
+	(create_docs)
+	- get distribution from option or argument
+	- get mirror url from config or options
+	(upload_html):
+	- get url prefix from config
+	- pass ref to html to _upload_html
+	(create_index): add logging
+	(main): --mirror => --url
+
+Sun May 18 08:14:01 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[0.05]:
+	* bin/orepan2-s3
+	- +create-docs
+	- upload and create index in one step
+	- invalidate /docs/*
+	* bin/orepan2-s3-index
+	* lib/OrePAN2/S3.pm
+	- new options: --mirror, --distribution, --upload
+	(_upload_html): new
+	(upload_index): use above
+	(create_docs): new
+	* bin/orepan2-s3-index: add EXTRA to @INC
+	(create_index)
+	- add README.html and module-name.html
+
+Thu May 15 14:49:06 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[0.04]:
+	* bin/orepan2-s3
+	- fix template option assignment
+	- initialize VERBOSE
+	* lib/OrePAN2/S3.pm
+	- pod updates
+
 Tue May 13 07:19:45 2025  Rob Lauer  <rlauer6@comcast.net>
 
 	[0.03]:

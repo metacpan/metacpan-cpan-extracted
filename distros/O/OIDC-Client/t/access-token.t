@@ -5,6 +5,7 @@ use warnings;
 
 use Test::More;
 use Test::Deep;
+use Test::Exception;
 
 use FindBin qw($Bin);
 use lib "$Bin/lib";
@@ -122,6 +123,122 @@ sub test_has_expired {
 
     # Then
     is($has_expired, '', 'has not expired');
+  };
+}
+
+sub test_compute_at_hash {
+  subtest "compute_at_hash() using sha256" => sub {
+
+    # Given
+    my $access_token = $class->new(
+      token => 'M-oxIny1RfaFbmjMX54L8Pl-KQEPeQvF6awzjWFA3iq',
+    );
+    my $alg = 'HS256';
+
+    # When
+    my $at_hash = $access_token->compute_at_hash($alg);
+
+    # Then
+    cmp_deeply($at_hash, 'nDwWvpw0im9HE0QZkgwo7A',
+               'expected at_hash');
+  };
+
+  subtest "compute_at_hash() using sha384" => sub {
+
+    # Given
+    my $access_token = $class->new(
+      token => 'M-oxIny1RfaFbmjMX54L8Pl-KQEPeQvF6awzjWFA3iq',
+    );
+    my $alg = 'RS384';
+
+    # When
+    my $at_hash = $access_token->compute_at_hash($alg);
+
+    # Then
+    cmp_deeply($at_hash, 'LxRf2XaJy8b6FRDyQ1Li2Zt0AoGKRvYY',
+               'expected at_hash');
+  };
+
+  subtest "compute_at_hash() using sha512" => sub {
+
+    # Given
+    my $access_token = $class->new(
+      token => 'M-oxIny1RfaFbmjMX54L8Pl-KQEPeQvF6awzjWFA3iq',
+    );
+    my $alg = 'HS512';
+
+    # When
+    my $at_hash = $access_token->compute_at_hash($alg);
+
+    # Then
+    cmp_deeply($at_hash, 'J86UjPZx1XXXclucMfuDHRypTQyFvbe04LUmKwpgAV8',
+               'expected at_hash');
+  };
+
+  subtest "compute_at_hash() unsupported alg" => sub {
+
+    # Given
+    my $access_token = $class->new(
+      token => 'M-oxIny1RfaFbmjMX54L8Pl-KQEPeQvF6awzjWFA3iq',
+    );
+    my $alg = 'none';
+
+    # When - Then
+    throws_ok { $access_token->compute_at_hash($alg) }
+      qr/OIDC: unsupported signing algorithm: none/,
+      'exception is thrown';
+  };
+}
+
+sub test_verify_at_hash {
+  subtest "verify_at_hash() no expected at_hash" => sub {
+
+    # Given
+    my $access_token = $class->new(
+      token => 'M-oxIny1RfaFbmjMX54L8Pl-KQEPeQvF6awzjWFA3iq',
+    );
+    my $expected_at_hash = undef;
+    my $alg = 'HS256';
+
+    # When
+    my $result = $access_token->verify_at_hash($expected_at_hash, $alg);
+
+    # Then
+    ok($result,
+       'returns a true value');
+  };
+
+  subtest "verify_at_hash() computed at_hash matches the expected one" => sub {
+
+    # Given
+    my $access_token = $class->new(
+      token => 'M-oxIny1RfaFbmjMX54L8Pl-KQEPeQvF6awzjWFA3iq',
+    );
+    my $expected_at_hash = 'nDwWvpw0im9HE0QZkgwo7A';
+    my $alg = 'HS256';
+
+    # When
+    my $result = $access_token->verify_at_hash($expected_at_hash, $alg);
+
+    # Then
+    ok($result,
+       'returns a true value');
+  };
+
+  subtest "verify_at_hash() computed at_hash doesn't match the expected one" => sub {
+
+    # Given
+    my $access_token = $class->new(
+      token => 'M-oxIny1RfaFbmjMX54L8Pl-KQEPeQvF6awzjWFA3iq',
+    );
+    my $expected_at_hash = 'unexpectedAtHash';
+    my $alg = 'HS256';
+
+    # When - Then
+    throws_ok { $access_token->verify_at_hash($expected_at_hash, $alg) }
+      qr/OIDC: unexpected at_hash/,
+      'exception is thrown';
+    isa_ok($@, 'OIDC::Client::Error::TokenValidation');
   };
 }
 

@@ -1,0 +1,78 @@
+{
+   "abstract" : "Minimal Perl FFI bindings for the YARA malware scanning engine",
+   "author" : [
+      "Mohammad Sajid Anwar <mohammad.anwar@yahoo.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "YaraFFI",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "FFI::CheckLib" : "0",
+            "FFI::Platypus" : "1",
+            "File::Slurp" : "0",
+            "perl" : "5.014"
+         }
+      }
+   },
+   "provides" : {
+      "YaraFFI" : {
+         "file" : "lib/YaraFFI.pm",
+         "version" : "0.06"
+      },
+      "YaraFFI::Event" : {
+         "file" : "lib/YaraFFI/Event.pm",
+         "version" : "0.06"
+      },
+      "YaraFFI::Record::YR_MATCH" : {
+         "file" : "lib/YaraFFI/Record/YR_MATCH.pm",
+         "version" : "0.06"
+      },
+      "YaraFFI::Record::YR_META" : {
+         "file" : "lib/YaraFFI/Record/YR_META.pm",
+         "version" : "0.06"
+      },
+      "YaraFFI::Record::YR_RULE" : {
+         "file" : "lib/YaraFFI/Record/YR_RULE.pm",
+         "version" : "0.06"
+      },
+      "YaraFFI::Record::YR_STRING" : {
+         "file" : "lib/YaraFFI/Record/YR_STRING.pm",
+         "version" : "0.06"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/manwar/YaraFFI.git",
+         "web" : "https://github.com/manwar/YaraFFI"
+      }
+   },
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

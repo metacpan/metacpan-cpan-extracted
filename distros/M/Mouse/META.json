@@ -4,7 +4,7 @@
       "Shawn M Moore <sartak at gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.24",
+   "generated_by" : "Minilla/v3.1.28",
    "license" : [
       "perl_5"
    ],
@@ -64,7 +64,7 @@
          "requires" : {
             "Scalar::Util" : "1.14",
             "XSLoader" : "0.02",
-            "perl" : "5.008005"
+            "perl" : "5.010001"
          }
       },
       "test" : {
@@ -82,7 +82,7 @@
    "provides" : {
       "Mouse" : {
          "file" : "lib/Mouse.pm",
-         "version" : "v2.5.11"
+         "version" : "v2.6.0"
       },
       "Mouse::Exporter" : {
          "file" : "lib/Mouse/Exporter.pm"
@@ -118,7 +118,7 @@
          "file" : "lib/Mouse/Meta/Role/Application.pm"
       },
       "Mouse::Meta::Role::Application::RoleSummation" : {
-         "file" : "lib/Mouse/Meta/Role/Composite.pm"
+         "file" : "lib/Mouse/Tiny.pm"
       },
       "Mouse::Meta::Role::Composite" : {
          "file" : "lib/Mouse/Meta/Role/Composite.pm"
@@ -137,18 +137,22 @@
       },
       "Mouse::Role" : {
          "file" : "lib/Mouse/Role.pm",
-         "version" : "v2.5.11"
+         "version" : "v2.6.0"
       },
       "Mouse::Spec" : {
          "file" : "lib/Mouse/Spec.pm",
-         "version" : "v2.5.11"
+         "version" : "v2.6.0"
+      },
+      "Mouse::Tiny" : {
+         "file" : "lib/Mouse/Tiny.pm",
+         "version" : "v2.5.12"
       },
       "Mouse::TypeRegistry" : {
          "file" : "lib/Mouse/TypeRegistry.pm"
       },
       "Mouse::Util" : {
          "file" : "lib/Mouse/Util.pm",
-         "version" : "v2.5.11"
+         "version" : "v2.6.0"
       },
       "Mouse::Util::MetaRole" : {
          "file" : "lib/Mouse/Util/MetaRole.pm"
@@ -181,7 +185,7 @@
          "web" : "https://github.com/xslate/p5-Mouse"
       }
    },
-   "version" : "v2.5.11",
+   "version" : "v2.6.0",
    "x_contributors" : [
       "Aleksandr Matveev <a.matveev@corp.mail.ru>",
       "Alex Solovey <a.solovey@gmail.com>",
@@ -231,6 +235,7 @@
       "Tomas Doran (t0m) <t0m@state51.co.uk>",
       "Vincent Pit <perl@profvince.com>",
       "Yuval Kogman <nothingmuch@woobling.org>",
+      "chocolateboy <chocolate@cpan.org>",
       "markstos <mark@stosberg.com>",
       "mp0liiu <raian@reeshome.org>",
       "sunnavy <sunnavy@bestpractical.com>",

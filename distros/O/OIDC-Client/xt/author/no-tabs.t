@@ -20,10 +20,15 @@ my @files = (
     'lib/OIDC/Client/Identity.pm',
     'lib/OIDC/Client/Plugin.pm',
     'lib/OIDC/Client/ResponseParser.pm',
+    'lib/OIDC/Client/Role/AttributesManager.pm',
+    'lib/OIDC/Client/Role/ClaimsValidator.pm',
+    'lib/OIDC/Client/Role/ClientAuthenticationHelper.pm',
+    'lib/OIDC/Client/Role/ConfigurationChecker.pm',
     'lib/OIDC/Client/Role/LoggerWrapper.pm',
     'lib/OIDC/Client/TokenResponse.pm',
     'lib/OIDC/Client/TokenResponseParser.pm',
     'lib/OIDC/Client/User.pm',
+    'lib/OIDC/Client/Utils.pm',
     't/00-compile.t',
     't/access-token-builder.t',
     't/access-token.t',
@@ -33,9 +38,12 @@ my @files = (
     't/identity.t',
     't/lib/OIDCClientTest.pm',
     't/plugin.t',
+    't/resources/client.jwk',
+    't/resources/client.key',
     't/response-parser.t',
     't/token-response-parser.t',
-    't/user.t'
+    't/user.t',
+    't/utils.t'
 );
 
 notabs_ok($_) foreach @files;

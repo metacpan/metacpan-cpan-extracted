@@ -17,6 +17,7 @@ for (qw(mocked_user_agent
      )) { has $_ => ( is  => 'rw', isa => 'Test::MockObject' ) }
 
 for (qw(mocked_decode_jwt
+        mocked_encode_jwt
         mocked_access_token_builder
      )) { has $_ => ( is  => 'rw', isa => 'Test::MockModule' ) }
 
@@ -82,22 +83,35 @@ sub mock_decode_jwt {
   my ($self, %params) = validated_hash(
     \@_,
     claims   => { isa => 'HashRef', optional => 1 },
+    header   => { isa => 'HashRef', default => {} },
     callback => { isa => 'CodeRef', optional => 1 },
   );
 
-  my $mock_crypt_jwt = Test::MockModule->new('OIDC::Client');
+  my $mock_crypt_jwt = Test::MockModule->new('Crypt::JWT');
 
   if (my $cb = $params{callback}) {
     $mock_crypt_jwt->redefine('decode_jwt' => $cb);
   }
   elsif (my $claims = $params{claims}) {
-    $mock_crypt_jwt->redefine('decode_jwt' => $claims);
+    $mock_crypt_jwt->redefine('decode_jwt' => sub { ($params{header}, $claims) });
   }
   else {
     die 'mock_decode_jwt() : unexpected params';
   }
 
   $self->mocked_decode_jwt($mock_crypt_jwt);
+}
+
+sub mock_encode_jwt {
+  my ($self) = @_;
+
+  my $mock_crypt_jwt = Test::MockModule->new('Crypt::JWT');
+  $mock_crypt_jwt->redefine('encode_jwt' => sub {
+                              my (%params) = @_;
+                              return \%params;
+                            });
+
+  $self->mocked_encode_jwt($mock_crypt_jwt);
 }
 
 sub mock_access_token_builder {

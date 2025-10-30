@@ -1,0 +1,362 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Data::Random::String::Matches;
+
+=head1 NAME
+
+bulk-generation.pl - Examples of bulk string generation with generate_many()
+
+=head1 DESCRIPTION
+
+Demonstrates practical uses of the generate_many() method for efficient
+bulk generation of random strings.
+
+=cut
+
+print "\n";
+print '=' x 70, "\n";
+print "BULK GENERATION EXAMPLES\n";
+print '=' x 70, "\n\n";
+
+# ===========================================================================
+# EXAMPLE 1: Database Seeding
+# ===========================================================================
+
+print "EXAMPLE 1: Database Seeding\n";
+print '-' x 70, "\n\n";
+
+{
+	print "Generating 1000 product codes for database seeding...\n";
+
+	my $gen = Data::Random::String::Matches->new(qr/PRD-[A-Z]{3}-\d{6}/);
+	my @codes = $gen->generate_many(1000, 'unique');
+
+	print "Generated: ", scalar @codes, " unique product codes\n";
+	print "Samples:\n";
+	print "  $_\n" for @codes[0..4];
+	print "  ...\n";
+}
+
+print "\n";
+
+# ===========================================================================
+# EXAMPLE 2: API Key Distribution
+# ===========================================================================
+
+print "EXAMPLE 2: API Key Distribution\n";
+print "-" x 70, "\n\n";
+
+{
+	print "Creating API keys for 100 test accounts...\n";
+
+	my $gen = Data::Random::String::Matches->new(qr/sk_test_[A-Za-z0-9]{32}/);
+	my @api_keys = $gen->generate_many(100, 1);
+
+	print "Generated: ", scalar @api_keys, " API keys\n";
+	print "\nAccount assignments:\n";
+	for my $i (0..4) {
+		printf("  Account %03d: %s\n", $i+1, $api_keys[$i]);
+	}
+	print "  ...\n";
+}
+
+print "\n";
+
+# ===========================================================================
+# EXAMPLE 3: Load Testing User IDs
+# ===========================================================================
+
+print "EXAMPLE 3: Load Testing User IDs\n";
+print "-" x 70, "\n\n";
+
+{
+	print "Generating 5000 unique user IDs for load testing...\n";
+
+	my $gen = Data::Random::String::Matches->new(qr/user_\d{8}/);
+
+	my $start = time();
+	my @user_ids = $gen->generate_many(5000, 'unique');
+	my $elapsed = time() - $start;
+
+	print "Generated: ", scalar @user_ids, " IDs in $elapsed seconds\n";
+	print "Rate: ", sprintf("%.0f", scalar(@user_ids) / $elapsed), " IDs/sec\n" if($elapsed);
+	print "\nSamples:\n";
+	print "  $_\n" for @user_ids[0..4];
+}
+
+print "\n";
+
+# ===========================================================================
+# EXAMPLE 4: Email Campaign
+# ===========================================================================
+
+print "EXAMPLE 4: Email Campaign Test Data\n";
+print "-" x 70, "\n\n";
+
+{
+	print "Creating test email addresses for campaign testing...\n";
+
+	my $gen = Data::Random::String::Matches->new(qr/test\d{4}\@example\.com/);
+	my @emails = $gen->generate_many(200, 1);
+
+	print "Generated: ", scalar @emails, " unique test emails\n";
+	print "\nSample batch:\n";
+	print "  $_\n" for @emails[0..4];
+	print "\nReady for import into email system.\n";
+}
+
+print "\n";
+
+# ===========================================================================
+# EXAMPLE 5: Coupon Code Generation
+# ===========================================================================
+
+print "EXAMPLE 5: Promotional Coupon Codes\n";
+print "-" x 70, "\n\n";
+
+{
+	print "Creating unique coupon codes for sale campaign...\n";
+
+	my $gen = Data::Random::String::Matches->new(qr/(SAVE|DEAL|SALE)\d{2}[A-Z]{3}/);
+	my @coupons = $gen->generate_many(500, 'unique');
+
+	print "Generated: ", scalar @coupons, " unique coupon codes\n";
+	print "\nSample coupons:\n";
+	print "  $_\n" for @coupons[0..9];
+
+	# Group by prefix
+	my %by_prefix;
+	for my $code (@coupons) {
+		my ($prefix) = $code =~ /^(\w+)/;
+		$by_prefix{$prefix}++;
+	}
+
+	print "\nDistribution:\n";
+	for my $prefix (sort keys %by_prefix) {
+		printf("  %-6s: %3d codes\n", $prefix, $by_prefix{$prefix});
+	}
+}
+
+print "\n";
+
+# ===========================================================================
+# EXAMPLE 6: Session Tokens
+# ===========================================================================
+
+print "EXAMPLE 6: Session Token Pool\n";
+print "-" x 70, "\n\n";
+
+{
+	print "Pre-generating session tokens for high-traffic application...\n";
+
+	my $gen = Data::Random::String::Matches->new(qr/[A-Za-z0-9]{40}/);
+	my @tokens = $gen->generate_many(10000, 1);
+
+	print "Generated: ", scalar @tokens, " unique tokens\n";
+	print "Token pool ready for session management.\n";
+	print "\nSample tokens:\n";
+	print "  $_\n" for @tokens[0..2];
+}
+
+print "\n";
+
+# ===========================================================================
+# EXAMPLE 7: Test Credit Cards
+# ===========================================================================
+
+print "EXAMPLE 7: Test Credit Card Numbers\n";
+print "-" x 70, "\n\n";
+
+{
+	print "Generating test credit cards for payment system testing...\n";
+
+	my $gen = Data::Random::String::Matches->new(qr/4\d{3}-\d{4}-\d{4}-\d{4}/);
+	my @cards = $gen->generate_many(100);
+
+	print "Generated: ", scalar @cards, " test Visa cards\n";
+	print "\nSample cards (TEST ONLY - NOT REAL):\n";
+	print "  $_\n" for @cards[0..4];
+}
+
+print "\n";
+
+# ===========================================================================
+# EXAMPLE 8: Tracking Numbers
+# ===========================================================================
+
+print "EXAMPLE 8: Package Tracking Numbers\n";
+print "-" x 70, "\n\n";
+
+{
+	print "Generating tracking numbers for shipment system...\n";
+
+	my $gen = Data::Random::String::Matches->new(qr/TRK[A-Z0-9]{12}/);
+	my @tracking = $gen->generate_many(1000, 'unique');
+
+	print "Generated: ", scalar @tracking, " unique tracking numbers\n";
+	print "\nSample tracking numbers:\n";
+	print "  $_\n" for @tracking[0..4];
+}
+
+print "\n";
+
+# ===========================================================================
+# EXAMPLE 9: One-Time Passwords
+# ===========================================================================
+
+print "EXAMPLE 9: One-Time Password Pool\n";
+print "-" x 70, "\n\n";
+
+{
+	print "Pre-generating OTP codes for authentication system...\n";
+
+	my $gen = Data::Random::String::Matches->new(qr/\d{6}/);
+	my @otps = $gen->generate_many(10000, 1);
+
+	print "Generated: ", scalar @otps, " unique 6-digit OTPs\n";
+	print "Note: Only ", scalar @otps, " unique codes possible with 6 digits\n"
+		if @otps < 10000;
+	print "\nSample OTPs:\n";
+	print "  $_\n" for @otps[0..9];
+}
+
+print "\n";
+
+# ===========================================================================
+# EXAMPLE 10: Batch Comparison - Single vs Bulk
+# ===========================================================================
+
+print "EXAMPLE 10: Performance Comparison\n";
+print "-" x 70, "\n\n";
+
+{
+	print "Comparing single generation vs bulk generation...\n\n";
+
+	my $gen = Data::Random::String::Matches->new(qr/[A-Z0-9]{8}/);
+	my $count = 1000;
+
+	# Method 1: Individual calls
+	print "Method 1: Individual generate() calls\n";
+	my $start1 = time();
+	my @results1;
+	for (1..$count) {
+		push @results1, $gen->generate();
+	}
+	my $time1 = time() - $start1;
+	print "  Time: $time1 seconds\n";
+
+	# Method 2: Bulk generation
+	print "\nMethod 2: Single generate_many() call\n";
+	my $start2 = time();
+	my @results2 = $gen->generate_many($count);
+	my $time2 = time() - $start2;
+	print "  Time: $time2 seconds\n";
+
+	print "\nComparison:\n";
+	printf("  generate_many() is %.1fx faster\n", $time1 / $time2) if $time2 > 0;
+	print "  Both methods generated $count strings\n";
+}
+
+print "\n";
+
+# ===========================================================================
+# EXAMPLE 11: CSV Export
+# ===========================================================================
+
+print "EXAMPLE 11: CSV Export of Test Data\n";
+print "-" x 70, "\n\n";
+
+{
+	print "Generating CSV file with test user data...\n\n";
+
+	my $id_gen = Data::Random::String::Matches->new(qr/USR\d{6}/);
+	my $email_gen = Data::Random::String::Matches->new(qr/[a-z]{5,8}\d{2}\@test\.com/);
+	my $phone_gen = Data::Random::String::Matches->new(qr/\d{3}-\d{3}-\d{4}/);
+
+	my @ids = $id_gen->generate_many(50, 1);
+	my @emails = $email_gen->generate_many(50);
+	my @phones = $phone_gen->generate_many(50);
+
+	print "user_id,email,phone\n";
+	for my $i (0..4) {
+		print "$ids[$i],$emails[$i],$phones[$i]\n";
+	}
+	print "...\n";
+	print "\nGenerated 50 rows ready for CSV export.\n";
+}
+
+print "\n";
+
+# ===========================================================================
+# EXAMPLE 12: Unique Constraint Testing
+# ===========================================================================
+
+print "EXAMPLE 12: Testing Unique Constraint Limits\n";
+print "-" x 70, "\n\n";
+
+{
+	print "Testing uniqueness with limited pattern space...\n\n";
+
+	# Pattern with only 26 possibilities
+	my $gen = Data::Random::String::Matches->new(qr/[A-Z]/);
+
+	print "Pattern: [A-Z] (26 possible values)\n";
+	print "Requesting: 30 unique values\n\n";
+
+	my @results = $gen->generate_many(30, 'unique');
+
+	print "Generated: ", scalar @results, " unique values\n";
+	print "Values: ", join(', ', sort @results), "\n\n";
+	print "Result: Can only generate ", scalar @results, " unique values\n";
+	print "		Pattern space limits uniqueness.\n";
+}
+
+print "\n";
+
+print "=" x 70, "\n";
+print "End of Bulk Generation Examples\n";
+print "=" x 70, "\n\n";
+
+print "TIP: Use generate_many() for efficient bulk generation\n";
+print "TIP: Add 'unique' flag only when you need guaranteed uniqueness\n";
+print "TIP: Consider pattern space when requesting many unique values\n\n";
+
+__END__
+
+=head1 USAGE
+
+Run this script to see bulk generation examples:
+
+	perl examples/bulk-generation.pl
+
+=head1 KEY CONCEPTS
+
+=head2 Bulk Generation
+
+Generate multiple strings efficiently:
+
+	my @strings = $gen->generate_many(1000);
+
+=head2 Unique Generation
+
+Ensure all strings are different:
+
+	my @unique = $gen->generate_many(1000, 1);
+
+=head2 Performance
+
+Bulk generation is faster than individual calls:
+
+  # Fast
+  my @bulk = $gen->generate_many(1000);
+
+  # Slower
+  my @individual = map { $gen->generate() } 1..1000;
+
+=head1 SEE ALSO
+
+L<Data::Random::String::Matches>
+
+=cut

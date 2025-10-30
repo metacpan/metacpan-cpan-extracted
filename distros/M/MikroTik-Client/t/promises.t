@@ -37,8 +37,9 @@ $p
     ->catch(sub { ($err, $res) = @_ })
     ->finally(sub { Mojo::IOLoop->stop() });
 Mojo::IOLoop->start();
-ok $! == ECONNREFUSED, 'connection error';
-ok !$res,              'no error attributes';
+ok $!, 'connection error';
+diag("Connection error (\$!) is " . int($!));
+ok !$res, 'no error attributes';
 $api->port($port);
 
 # result type

@@ -1,5 +1,9 @@
 Revision history for OpenAPI-Modern
 
+0.104     2025-10-29 17:54:47Z
+          - support added for tagged operations (tag heirarchies are new in
+            OpenAPI 3.2)
+
 0.103     2025-10-26 19:14:30Z
           - find_path() has been renamed to find_path_item() (with a
             backcompat alias), and now accepts lookup using just an HTTP

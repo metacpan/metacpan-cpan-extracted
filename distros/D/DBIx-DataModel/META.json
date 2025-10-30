@@ -61,7 +61,7 @@
    "provides" : {
       "DBIx::DataModel" : {
          "file" : "lib/DBIx/DataModel.pm",
-         "version" : "3.13"
+         "version" : "3.14"
       },
       "DBIx::DataModel::Carp" : {
          "file" : "lib/DBIx/DataModel/Carp.pm"
@@ -110,6 +110,9 @@
       },
       "DBIx::DataModel::Schema::ResultAs::Categorize" : {
          "file" : "lib/DBIx/DataModel/Schema/ResultAs/Categorize.pm"
+      },
+      "DBIx::DataModel::Schema::ResultAs::Correlated_update" : {
+         "file" : "lib/DBIx/DataModel/Schema/ResultAs/Correlated_update.pm"
       },
       "DBIx::DataModel::Schema::ResultAs::Count" : {
          "file" : "lib/DBIx/DataModel/Schema/ResultAs/Count.pm"
@@ -186,6 +189,9 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/damil/DBIx-DataModel/issues"
+      },
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
@@ -193,6 +199,6 @@
          "url" : "https://github.com/damil/DBIx-DataModel"
       }
    },
-   "version" : "3.13",
+   "version" : "3.14",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

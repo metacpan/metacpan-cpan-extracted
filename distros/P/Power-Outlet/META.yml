@@ -40,5 +40,5 @@ resources:
   bugtracker: https://github.com/mrdvt92/perl-Power-Outlet/issues
   homepage: https://github.com/mrdvt92/perl-Power-Outlet
   repository: https://github.com/mrdvt92/perl-Power-Outlet.git
-version: '0.51'
+version: '0.52'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -7,7 +7,7 @@ use warnings;
 use MARC::Leader;
 use MARC::Validator::Utils qw(add_error);
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 sub name {
 	my $self = shift;
@@ -30,6 +30,7 @@ sub process {
 	my $desc_conventions = $marc_record->field('040')->subfield('e');
 
 	if ($leader->descriptive_cataloging_form eq 'a'
+		&& defined $desc_conventions
 		&& $desc_conventions eq 'rda') {
 
 		add_error($cnb, $struct_hr, {

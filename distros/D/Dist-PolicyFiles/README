@@ -2,7 +2,7 @@ NAME
     Dist::PolicyFiles - Generate CONTRIBUTING.md and SECURITY.md
 
 VERSION
-    Version 0.03
+    Version 0.05
 
 SYNOPSIS
         use Dist::PolicyFiles;
@@ -16,7 +16,7 @@ DESCRIPTION
     SECURITY.md. It comes with the dist-policyfiles command line tool.
 
   METHODS
-   Constructor
+   "new(*NAMED_ARGUMENTS*"
     The constructor "new()" accepts the following named arguments, where
     "login" and "module" are mandatory:
 
