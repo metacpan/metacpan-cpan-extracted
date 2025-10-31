@@ -31,7 +31,18 @@ WriteMakefile(
 );
 
 if ( $^O !~ /win32/i) {
-	my (undef,undef,$gid) = getgrnam('nobody');
-	warn "\n** Warning: group `nobody` not found. Run `sudo addgroup nobody` if you need to run mitdk2pop\n";
+	my $uid = getpwnam('nobody');
+	warn "\n** Warning: user `nobody` not found. Run `sudo adduser nobody` if you need to run mitdk2pop\n"
+		unless defined $uid;
+	my $found;
+	while (my @m = getgrent) {
+		next unless $m[0] eq 'nobody';
+		warn "\n** Warning: user `nobody` is not a member of group `nobody`. Run `sudo usermod -a -G nobody nobody` if you need to run mitdk2pop\n"
+			unless $m[3] =~ /\bnobody\b/;
+		$found = 1;
+		last;
+	}
+	warn "\n** Warning: group `nobody` not found. Run `sudo addgroup nobody` if you need to run mitdk2pop\n"
+		unless $found;
 }
 

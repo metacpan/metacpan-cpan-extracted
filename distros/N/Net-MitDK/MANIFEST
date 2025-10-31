@@ -11,6 +11,7 @@ bin/mitdk-renew-lease
 bin/mitdk-install-win32
 t/01.t
 example/cron
+example/chrome.bat
 example/fetchmailrc
 example/procmailrc.forward.simple
 example/procmailrc.forward.srs

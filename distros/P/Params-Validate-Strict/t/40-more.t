@@ -592,7 +592,7 @@ subtest 'Input validation and error handling' => sub {
 	# Invalid args type
 	throws_ok {
 		validate_strict(schema => {}, args => 'not_a_hash');
-	} qr/args must be a hash reference/, 'Invalid args type rejected';
+	} qr/args must be a hash or array reference/, 'Invalid args type rejected';
 
 	# Invalid unknown_parameter_handler
 	throws_ok {

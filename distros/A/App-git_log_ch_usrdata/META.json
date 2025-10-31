@@ -4,7 +4,7 @@
       "Klaus Rindfrey <klausrin@cpan.org.eu>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -22,36 +22,55 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec::Functions" : "0",
+            "autodie" : "0",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
             "File::Spec::Functions" : "0",
-            "autodie" : "0"
+            "autodie" : "0",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "runtime" : {
          "requires" : {
+            "Getopt::Long" : "0",
             "Git::RemoteURL::Parse" : "0.02",
             "GitHub::Config::SSH::UserData" : "0.01",
-            "perl" : "5.010"
+            "Pod::Usage" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "test" : {
          "requires" : {
-            "Capture::Tiny" : "0.48",
+            "Capture::Tiny" : "0.47",
+            "Cwd" : "0",
             "File::Basename" : "0",
             "File::Spec::Functions" : "0",
-            "Test::More" : "0"
+            "File::Temp" : "0",
+            "File::chdir" : "0.1011",
+            "Pod::Wordlist" : "1.27",
+            "Test::CheckManifest" : "1.43",
+            "Test::More" : "0",
+            "Test::Pod" : "1.51",
+            "Test::Spelling" : "0.25",
+            "strict" : "0",
+            "warnings" : "0"
          }
       }
    },
    "provides" : {
       "App::git_log_ch_usrdata" : {
          "file" : "lib/App/git_log_ch_usrdata.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -62,7 +81,7 @@
          "web" : "https://github.com/klaus-rindfrey/perl-app-git_log_ch_usrdata.git"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_bugtracker" : {
       "web" : "https://github.com/klaus-rindfrey/perl-app-git_log_ch_usrdata/issues"
    },

@@ -53,7 +53,7 @@ subtest 'Valid Inputs' => sub {
 	is $validated_params->{username}, "test_user", "Username should be correct";
 	is $validated_params->{age}, 30, "Age should be correct and coerced to integer";
 	is $validated_params->{email}, 'test@example.com', "Email should be correct";
-	is $validated_params->{bio}, "A test bio", "Bio should be correct";
+	is $validated_params->{bio}, 'A test bio', "Bio should be correct";
 	is $validated_params->{price}, 19.99, "Price should be correct and coerced to number";
 	is $validated_params->{quantity}, 10, "Quantity should be correct and coerced to number";
 	is $validated_params->{discount}, 1, 'Discount is offered';

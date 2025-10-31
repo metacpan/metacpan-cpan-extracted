@@ -15,7 +15,7 @@ BEGIN {
   use_ok $class or BAIL_OUT "Cannot load class '$class'!";
 }
 
-# Class::Enumeration methods + enum constants
+# Class::Enumeration methods + predicate methods
 class_api_ok $class, qw( name ordinal value_of values names to_string is_dead is_alive );
 
 subtest 'Class method invocations' => sub {

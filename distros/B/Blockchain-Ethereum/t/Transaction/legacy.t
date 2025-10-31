@@ -6,6 +6,9 @@ use warnings;
 use Test::More;
 use Blockchain::Ethereum::Transaction::Legacy;
 use Blockchain::Ethereum::Keystore::Key;
+use Blockchain::Ethereum::Utils;
+
+# These tests are based on the result of running the same transactions over ethers.js
 
 subtest "eip-155 example" => sub {
     my $transaction = Blockchain::Ethereum::Transaction::Legacy->new(
@@ -13,7 +16,7 @@ subtest "eip-155 example" => sub {
         gas_price => '0x4A817C800',
         gas_limit => '0x5208',
         to        => '0x3535353535353535353535353535353535353535',
-        value     => '0xDE0B6B3A7640000',
+        value     => parse_units('1', ETH),
         chain_id  => '0x1'
     );
 

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.019';          # VERSION
+our $VERSION   = '0.020';          # VERSION
 
 use parent "Crypt::Perl::ECDSA::PrivateKey";
 
@@ -76,7 +76,7 @@ Blockchain::Ethereum::Keystore::Key::PKUtil
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 OVERVIEW
 

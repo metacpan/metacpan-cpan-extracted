@@ -1,5 +1,8 @@
+0.07  - 30 Oct 2025
+        fix for newer mitid login
+
 0.06  - 9 May 2024
-	fix for provate-only login
+	fix for private-only login
 
 0.05  - 15 Apr 2024
 	nemid auth method is phased out, use mitid instead.

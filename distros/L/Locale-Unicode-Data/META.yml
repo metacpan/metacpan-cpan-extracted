@@ -31,7 +31,7 @@ requires:
   JSON: '2.00'
   Locale::Unicode: v0.3.11
   Scalar::Util: '0'
-  Want: '0.17'
+  Wanted: v0.1.0
   perl: '5.010001'
   strict: '0'
   vars: '0'
@@ -41,5 +41,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jackdeguest/Locale-Unicode-Data/issues
   repository: https://gitlab.com/jackdeguest/Locale-Unicode-Data
-version: v1.4.0
+version: v1.6.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,6 @@
 Changes to Spreadsheet::Edit, Spreadsheet::Edit::IO, and/or Spreadsheet::Edit::Log
 
+1000.028 : Colorize btw and oops messages (import :nocolor to disable)
 1000.027 : Add OPTION subname_override to log_call and friends.
            Initial support for csv -> txt (fixed-width-fields); not fully working yet.
            Removed undocumented tie_col_variables :safe option.
@@ -42,14 +43,14 @@ Changes to Spreadsheet::Edit, Spreadsheet::Edit::IO, and/or Spreadsheet::Edit::L
         Auto-detect CSV import column formats when possible to avoid
         corruption when converted to a spreadsheet.  Mainly this is to
         specify "text" format for things which would be spoiled if read
-        as a number e.g. zip codes with leading zeroes.  
+        as a number e.g. zip codes with leading zeroes.
         Also detects MM/DD/YY vs DD/MM/YY when the DD happens to be > 12.
 
         Import formats may be provided explicitly with option
-           col_formats => [...] 
-        The value is a list of codes for columns: "text", 
-        "MM/DD/YY", "DD/MM/YY", or undef/empty for Standard 
-        (e.g. generic number), or equivalent OO/LO Format Code numbers 
+           col_formats => [...]
+        The value is a list of codes for columns: "text",
+        "MM/DD/YY", "DD/MM/YY", or undef/empty for Standard
+        (e.g. generic number), or equivalent OO/LO Format Code numbers
         See https://wiki.documentfoundation.org/Documentation/DevGuide/Spreadsheet_Documents#Filter_Options_for_the_CSV_Filter
 
         Now csv->ods->csv round trip is usually completely clean.
@@ -58,13 +59,13 @@ Changes to Spreadsheet::Edit, Spreadsheet::Edit::IO, and/or Spreadsheet::Edit::L
         in csv files.   It first tries the obvious: UTF-8, '"' and ",", but
         should now work automatically with \t separators.
 
-        Override with 
+        Override with
           input_encoding => "UTF-8",  # for example
           quote_char     => '"',
           sep_char       => ','
         ----
         Support CSV transcoding e.g.
-          convert_spreadsheet( inpath => "file_in_utf16.csv", 
+          convert_spreadsheet( inpath => "file_in_utf16.csv",
                                cvt_to => "csv",
                                output_encoding => "UTF-8" )
 

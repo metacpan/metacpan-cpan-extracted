@@ -13,7 +13,7 @@ use Data::Dumper::Interp qw/vis visq dvis dvisq u visnew/;
 
 use Spreadsheet::Edit qw/:all logmsg/;
 
-use Spreadsheet::Edit::Log ':btw=L=${lno} F=${fname} P=${pkg}';
+use Spreadsheet::Edit::Log ':btw=L=${lno} F=${fname} P=${pkg}', ':nocolor';
 
 use File::Basename qw/basename/;
 

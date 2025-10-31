@@ -20,7 +20,9 @@ use open ':std' => ':utf8';
 use utf8;
 use vars qw( $VERSION $DEBUG $VERBOSE $LOG_LEVEL $PROG_NAME $MAINTAINER
              $opt $opts
-             $out $err @argv );
+             $out $err @argv
+             $topdir $basedir $cldr_version
+         );
 use Clone ();
 use Data::Pretty qw( dump );
 use DateTime;
@@ -29,6 +31,7 @@ use DBD::SQLite;
 use DBI qw( :sql_types );
 use Getopt::Class v0.102.6;
 use HTML::Entities qw( decode_entities );
+use IPC::Run;
 use JSON;
 use List::Util qw( uniq );
 use Locale::Unicode;
@@ -50,6 +53,7 @@ my $logfile = file( $0 )->extension( 'log' );
 my $tmpfile = tempfile( suffix => 'sqlite3', cleanup => 0 );
 my $lib_dir = file( $0 )->parent->parent->child( 'lib' );
 my $live_db_file;
+our( $cldr_version, $topdir, $basedir, $patch_dir );
 
 my $credit = <<EOT;
  
@@ -225,7 +229,8 @@ sub process
     {
         die( "$0 /some/where/cldr-common-45.0" );
     }
-    my $topdir = file( shift( @ARGV ) );
+    # Already declared as a global variable
+    $topdir = file( shift( @ARGV ) );
     if( !$topdir->exists )
     {
         die( "CLDR top directory provided ${topdir} does not exist." );
@@ -234,7 +239,8 @@ sub process
     {
         die( "CLDR top directory provided ${topdir} is not a directory." );
     }
-    my $basedir = $topdir->child( 'common' );
+    # Already declared as a global variable
+    $basedir = $topdir->child( 'common' );
     if( !$basedir->exists )
     {
         die( "CLDR JSON base directory ${basedir} does not exist." );
@@ -247,6 +253,8 @@ sub process
     {
         die( "The IANA Olson time zone database file 'zone1970.tab' does not exist. Please download it from ftp://ftp.iana.org/tz/tzdata-latest.tar.gz and place it in the 'scripts' folder." );
     }
+    # $patch_dir is used by the subroutine 'apply_patch'
+    $patch_dir = $script_dir->child( "patches/${cldr_version}" );
     my $anno_dir = $basedir->child( 'annotations' );
     my $bcp47_dir = $basedir->child( 'bcp47' );
     my $casings_dir = $basedir->child( 'casing' );
@@ -376,7 +384,7 @@ sub process
         }
         else
         {
-            warn( "No table '$id' found in our a tables-to-query map check." );
+            warn( "Warning only: No table '$id' found in our a tables-to-query map check." );
         }
     }
     
@@ -392,7 +400,7 @@ sub process
     # NOTE: Add meta information
     &log( "Add meta information." );
     my $today = DateTime->from_epoch( epoch => $opts->{created_time} );
-    my $cldr_version;
+    # $cldr_version is already declared as a global variable
     # cldr-common-45.0
     if( $opts->{cldr_version} )
     {
@@ -580,6 +588,22 @@ sub process
             };
             delete( $bcpCurrIds->{ $bcpCurrDesc2id->{ $test } } );
         }
+        elsif( exists( $bcpCurrIds->{ lc( $code ) } ) )
+        {
+            $currMap->{ $code } = 
+            {
+                id => lc( $code ),
+                description => $bcpCurrIds->{ lc( $code ) },
+                is_obsolete => $is_obsolete,
+            };
+            $currBCPMap->{ lc( $code ) } =
+            {
+                code => $code,
+                description => $bcpCurrIds->{ lc( $code ) },
+                is_obsolete => $is_obsolete,
+            };
+            delete( $bcpCurrIds->{ lc( $code ) } );
+        }
         else
         {
             if( $desc =~ /\((\d{4})\D(\d{4})\)$/ )
@@ -593,12 +617,12 @@ sub process
     # $out->print( dump( $currMap ), "\n" ) if( $DEBUG >= 4 );
     if( scalar( keys( %$currUnknown ) ) )
     {
-        $out->print( "Unknowns: ", join( ', ', sort( keys( %$currUnknown ) ) ), "\n" ) if( $DEBUG );
+        $out->print( "Fatal: unknowns: ", join( ', ', sort( keys( %$currUnknown ) ) ), "\n" ) if( $DEBUG );
         exit(1);
     }
     if( scalar( keys( %$bcpCurrIds ) ) )
     {
-        $out->print( "Unmapped BCP47 IDs: ", scalar( keys( %$bcpCurrIds ) ), ":\n" ) if( $DEBUG );
+        $out->print( "Fatal: unmapped BCP47 IDs: ", scalar( keys( %$bcpCurrIds ) ), ":\n" ) if( $DEBUG );
         foreach my $id ( sort( keys( %$bcpCurrIds ) ) )
         {
             $out->print( "${id}: ", $bcpCurrIds->{ $id }, "\n" ) if( $DEBUG );
@@ -3937,7 +3961,7 @@ sub process
         {
             # NOTE: Loading locales L10N
             &log( "[${locale}] Loading Locales L10N for locale ${locale}." );
-            $localesRes = $mainDoc->findnodes( '//localeDisplayNames/languages/language[@type]' );
+            $localesRes = $mainDoc->findnodes( '//localeDisplayNames/languages/language[@type and not(@menu)]' );
             if( !$localesRes->size )
             {
                 warn( "Warning only: no locales localised names found for locale '${locale}' in file $f" );
@@ -3946,7 +3970,7 @@ sub process
             while( my $el = $localesRes->shift )
             {
                 my $id = $el->getAttribute( 'type' ) ||
-                    die( "Unable to get the attribute 'type' value for this element: ", $el->toString() );
+                    die( "Unable to get the attribute 'type' value for this element in file $f: ", $el->toString() );
                 my $val = $el->textContent;
                 if( index( $val, '&' ) != -1 &&
                     index( $val, ';' ) != -1 )
@@ -3987,14 +4011,14 @@ sub process
                 {
                     $def->{alt} = $el->getAttribute( 'alt' );
                 }
-        
+
                 eval
                 {
                     $sth_locale->execute( @$def{qw( locale locale_id locale_name alt )} );
                 } || die( "Error adding localised information from file ${f} for locale ${locale} and locale ID '${id}': ", ( $@ || $sth_locale->errstr ), "\nwith query: ", $sth_locale->{Statement}, "\n", dump( $def )  );
                 $added->{languages}++;
             }
-        
+
             # NOTE: Loading script L10N
             &log( "\tLoading script L10N." );
             $localesRes = $mainDoc->findnodes( '//localeDisplayNames/scripts/script[@type]' );
@@ -4006,7 +4030,7 @@ sub process
             while( my $el = $localesRes->shift )
             {
                 my $id = $el->getAttribute( 'type' ) ||
-                    die( "Unable to get the attribute 'type' value for this element: ", $el->toString() );
+                    die( "Unable to get the attribute 'type' value for this element in file $f: ", $el->toString() );
                 my $val = $el->textContent;
                 if( index( $val, '&' ) != -1 &&
                     index( $val, ';' ) != -1 )
@@ -4037,7 +4061,7 @@ sub process
             while( my $el = $localesRes->shift )
             {
                 my $id = $el->getAttribute( 'type' ) ||
-                    die( "Unable to get the attribute 'type' value for this element: ", $el->toString() );
+                    die( "Unable to get the attribute 'type' value for this element in file $f: ", $el->toString() );
                 my $val = $el->textContent;
                 if( index( $val, '&' ) != -1 &&
                     index( $val, ';' ) != -1 )
@@ -4072,7 +4096,7 @@ sub process
             while( my $el = $localesRes->shift )
             {
                 my $id = $el->getAttribute( 'type' ) ||
-                    die( "Unable to get the attribute 'type' value for this element: ", $el->toString() );
+                    die( "Unable to get the attribute 'type' value for this element in file $f: ", $el->toString() );
                 my $val = $el->textContent;
                 if( index( $val, '&' ) != -1 &&
                     index( $val, ';' ) != -1 )
@@ -4110,7 +4134,7 @@ sub process
             while( my $el = $localesRes->shift )
             {
                 my $id = $el->getAttribute( 'type' ) ||
-                    die( "Unable to get the attribute 'type' value for this element: ", $el->toString() );
+                    die( "Unable to get the attribute 'type' value for this element in file $f: ", $el->toString() );
                 my $def =
                 {
                     locale      => $locale,
@@ -4132,7 +4156,7 @@ sub process
                     if( $el_name->hasAttribute( 'count' ) )
                     {
                         $def->{count} = $el_name->getAttribute( 'count' ) ||
-                            die( "No value provided for 'count' for this currency '${id}' locale name value: ", $el_name->toString() );
+                            die( "No value provided for 'count' for this currency '${id}' locale name value in file $f: ", $el_name->toString() );
                     }
                     else
                     {
@@ -4175,7 +4199,7 @@ sub process
             while( my $el = $calLocalesCalendarsRes->shift )
             {
                 my $cal_id = $el->getAttribute( 'type' ) ||
-                    die( "Unable to get the calendar ID value from attribute 'type' for this element: ", $el->toString() );
+                    die( "Unable to get the calendar ID value from attribute 'type' for this element in file $f: ", $el->toString() );
                 # NOTE: Check for calendar terms
                 my $cal_term_types =
                 {
@@ -4241,7 +4265,7 @@ sub process
                     while( my $el_context = $calTermContextRes->shift )
                     {
                         my $context = $el_context->getAttribute( 'type' ) ||
-                            die( "This calendar ${cal_id} ${type} context has no attribute 'type' value: ", $el_context->toString() );
+                            die( "This calendar ${cal_id} ${type} context has no attribute 'type' value in file $f: ", $el_context->toString() );
                         my $calTermContextHasAliasRes = $el_context->findnodes( './alias[@path]' );
                         if( $calTermContextHasAliasRes->size )
                         {
@@ -4392,7 +4416,7 @@ sub process
                     if( $calDtContainerHasAliasRes->size )
                     {
                         $el_container = resolve_alias( $calDtContainerHasAliasRes ) ||
-                            die( "The calendar formats container for ${type} is aliased, but could not get the resolved path for calendar ${cal_id} for locale ${locale} for this element: ", $el->toString() );
+                            die( "The calendar formats container for ${type} is aliased, but could not get the resolved path for calendar ${cal_id} for locale ${locale} for this element in file $f: ", $el->toString() );
                     }
                     my $calDateOrTimeLengthRes = $el_container->findnodes( $this->{xpath_len} );
                     if( !$calDateOrTimeLengthRes->size )
@@ -4402,7 +4426,7 @@ sub process
                     while( my $el_len = $calDateOrTimeLengthRes->shift )
                     {
                         my $len = $el_len->getAttribute( 'type' ) ||
-                            die( "Unable to get the ${type} length type for locale ${locale} in file ${f} for this element: ", $el_len->toString() );
+                            die( "Unable to get the ${type} length type for locale ${locale} in file ${f} for this element in file $f: ", $el_len->toString() );
                         my $calDtLengthHasAliasRes = $el_len->findnodes( './alias[@path]' );
                         if( $calDtLengthHasAliasRes->size )
                         {
@@ -4590,13 +4614,13 @@ sub process
                                 locale          => $locale,
                                 calendar        => $cal_id,
                                 format_id       => ( $el_item->getAttribute( 'id' ) ||
-                                    die( "Unable to get the available format ID from the attribute 'id' in this element: ", $el_item->toString() ) ),
+                                    die( "Unable to get the available format ID from the attribute 'id' in this element in file $f: ", $el_item->toString() ) ),
                                 format_pattern  => $el_item->textContent,
                             };
                             if( !defined( $def->{format_pattern} ) ||
                                 !length( $def->{format_pattern} // '' ) )
                             {
-                                die( "No pattern found for this available format with id '$def->{format_id}' for calendar '${cal_id}' and locale '${locale}': ", $el_item->toString() );
+                                die( "No pattern found for this available format with id '$def->{format_id}' for calendar '${cal_id}' and locale '${locale}' in file $f: ", $el_item->toString() );
                             }
                 
                             if( $el_item->hasAttribute( 'count' ) )
@@ -4639,13 +4663,13 @@ sub process
                                 locale          => $locale,
                                 calendar        => $cal_id,
                                 format_id       => ( $el_append->getAttribute( 'request' ) ||
-                                    die( "Unable to get the append format pattern from the attribute 'request' in this element: ", $el_append->toString() ) ),
+                                    die( "Unable to get the append format pattern from the attribute 'request' in this element in file $f: ", $el_append->toString() ) ),
                                 format_pattern  => $el_append->textContent,
                             };
                             if( !defined( $def->{format_pattern} ) ||
                                 !length( $def->{format_pattern} // '' ) )
                             {
-                                die( "No pattern found for this append item format with id '$def->{format_id}' for calendar '${cal_id}' and locale '${locale}': ", $el_append->toString() );
+                                die( "No pattern found for this append item format with id '$def->{format_id}' for calendar '${cal_id}' and locale '${locale}' in file $f: ", $el_append->toString() );
                             }
                             eval
                             {
@@ -4672,7 +4696,7 @@ sub process
                         while( my $el_item = $calIntervalFormatItemsRes->shift )
                         {
                             my $int_id = $el_item->getAttribute( 'id' ) ||
-                                die( "Unable to get the interval ID value from the attribute 'id' in this element: ", $el_item->toString() );
+                                die( "Unable to get the interval ID value from the attribute 'id' in this element in file $f: ", $el_item->toString() );
                             # <greatestDifference id="B">h B – h B</greatestDifference>
                             my $calDiffFormatRes = $el_item->findnodes( './greatestDifference' );
                             while( my $el_diff = $calDiffFormatRes->shift )
@@ -4706,7 +4730,7 @@ sub process
                                     if( !defined( $def->{ $prop } ) ||
                                         !length( $def->{ $prop } // '' ) )
                                     {
-                                        die( "No pattern found for this append item format with id '$def->{format_id}' for calendar '${cal_id}' and locale '${locale}': ", $el_diff->toString() );
+                                        die( "No pattern found for this append item format with id '$def->{format_id}' for calendar '${cal_id}' and locale '${locale}' in file $f: ", $el_diff->toString() );
                                     }
                                 }
         
@@ -4798,7 +4822,7 @@ sub process
                     while( my $el_cyclic = $calCyclicNameSetRes->shift )
                     {
                         my $set = $el_cyclic->getAttribute( 'type' ) ||
-                            die( "Unable to get the calendar cyclic set type value from the attribute 'type' in this element: ", $el_cyclic->toString() );
+                            die( "Unable to get the calendar cyclic set type value from the attribute 'type' in this element in file $f: ", $el_cyclic->toString() );
                         my $calCyclicNameSetHasAliasRes = $el_cyclic->findnodes( './alias[@path]' );
                         if( $calCyclicNameSetHasAliasRes->size )
                         {
@@ -4810,7 +4834,7 @@ sub process
                         while( my $el_ctx = $calCyclicContextRes->shift )
                         {
                             my $context = $el_ctx->getAttribute( 'type' ) ||
-                                die( "Unable to get the calendar cyclic set context value from the attribute 'type' in this element: ", $el_ctx->toString() );
+                                die( "Unable to get the calendar cyclic set context value from the attribute 'type' in this element in file $f: ", $el_ctx->toString() );
                             my $calCyclicContextHasAliasRes = $el_ctx->findnodes( './alias[@path]' );
                             if( $calCyclicContextHasAliasRes->size )
                             {
@@ -4822,7 +4846,7 @@ sub process
                             while( my $el_len = $calCyclicLengthRes->shift )
                             {
                                 my $len = $el_len->getAttribute( 'type' ) ||
-                                    die( "Unable to get the calendar cyclic set length value from the attribute 'type' in this element: ", $el_len->toString() );
+                                    die( "Unable to get the calendar cyclic set length value from the attribute 'type' in this element in file $f: ", $el_len->toString() );
                                 my $calCyclicWidthHasAliasRes = $el_len->findnodes( './alias[@path]' );
                                 if( $calCyclicWidthHasAliasRes->size )
                                 {
@@ -5007,7 +5031,7 @@ sub process
                         $out->print( "\t\tAdding time zone format of type '${tag}': " ) if( $DEBUG );
                         if( !exists( $tz_fmt_map->{ $tag } ) )
                         {
-                            die( "Tag \"${tag}\" is not in our internal type map." );
+                            die( "Tag \"${tag}\" is not in our internal type map in file $f." );
                         }
                         my $def = 
                         {
@@ -5048,7 +5072,8 @@ sub process
                     &log( sprintf( "\t\t%d locale time zone sample cities found for locale ${locale}.", $TimeZonesRes->size ) );
                     while( my $el_tz = $TimeZonesRes->shift )
                     {
-                        my $timezone = $el_tz->getAttribute( 'type' ) || die( "No timezone ID value defined for this element: ", $el->toString() );
+                        my $timezone = $el_tz->getAttribute( 'type' ) ||
+                            die( "No timezone ID value defined for this element in file $f: ", $el->toString() );
                         $out->print( "\t\t\t[${timezone}]\n" ) if( $DEBUG );
                         my @kids = $el_tz->nonBlankChildNodes;
                         $out->printf( "\t\t\t\t%d children nodes found: %s\n", scalar( @kids ), join( ', ', map{ $_->nodeName } @kids ) ) if( $DEBUG );
@@ -5060,7 +5085,7 @@ sub process
                                 die( "Found tag ${tag} as child of this time zones list, but it is unknown to us for time zone '${timezone}' for locale ${locale} in file ${f} for this element: ", $el_kid->toString() );
                             }
                             my $prop = $tz_tags_map->{ $tag } ||
-                                die( "Unable to find an equivalence in our timezone map for the tag ${tag}: ", $el->toString() );
+                                die( "Unable to find an equivalence in our timezone map for the tag ${tag} in file $f: ", $el->toString() );
                             if( $prop eq 'city' )
                             {
                                 my $def =
@@ -5123,7 +5148,7 @@ sub process
                     while( my $el_metatz = $MetazonesRes->shift )
                     {
                         my $metazone = $el_metatz->getAttribute( 'type' ) ||
-                            die( "No value found for metazone attribute 'type' for this element: ", $el->toString() );
+                            die( "No value found for metazone attribute 'type' for this element in file $f: ", $el->toString() );
                         my $MetaTzNamesRes = $el_metatz->findnodes( './*[local-name()="long" or local-name()="short"]' );
                         $out->printf( "\t\tfound %d metazone long/short localised name(s) for metazone '${metazone}'\n", $MetaTzNamesRes->size ) if( $DEBUG );
                         while( my $el_tz_width = $MetaTzNamesRes->shift )
@@ -5183,7 +5208,7 @@ sub process
             eval
             {
                 $sth_locale_info->execute( $locale, 'char_orientation', $ltr );
-            } || die( "Error executing query to add locale information for layout orientation (char_orientation) and value '${ltr}': ", ( $@ || $sth_locale_info->errstr ), "\nwith query: ", $sth_locale_info->{Statement} );
+            } || die( "Error executing query to add locale information for layout orientation (char_orientation) and value '${ltr}' in file $f: ", ( $@ || $sth_locale_info->errstr ), "\nwith query: ", $sth_locale_info->{Statement} );
             $out->printf( "\t%d element added.\n", $sth_locale_info->rows ) if( $DEBUG );
         }
         else
@@ -5214,7 +5239,7 @@ sub process
             my $tag = $el->nodeName;
             if( !exists( $quotation_map->{ $tag } ) )
             {
-                die( "Quotation tag found (${tag}) for locale '${locale}' does not exist in our internal property map in file ${f} for this element: ", $el->toString() );
+                die( "Quotation tag found (${tag}) for locale '${locale}' does not exist in our internal property map in file ${f} for this element in file $f: ", $el->toString() );
             }
             my $val = $el->textContent;
             eval
@@ -5267,7 +5292,7 @@ sub process
             eval
             {
                 $sth_locale_info->execute( $locale, $yes_no_map->{ $tag }, $val );
-            } || die( "Error executing query to add locale information for yes/no string (${tag} -> ", $yes_no_map->{ $tag }, "): ", ( $@ || $sth_locale_info->errstr ), "\nwith query: ", $sth_locale_info->{Statement} );
+            } || die( "Error executing query to add locale information for yes/no string (${tag} -> ", $yes_no_map->{ $tag }, ") in file $f: ", ( $@ || $sth_locale_info->errstr ), "\nwith query: ", $sth_locale_info->{Statement} );
             $j++;
         }
         $out->printf( "\t%d yes/no string information added.\n", $j ) if( $DEBUG );
@@ -5278,7 +5303,7 @@ sub process
         $j = 0;
         if( $localeNumberSymbolRes->size )
         {
-            $sth = $sths->{number_symbols_l10n} || die( "No statement object set for table 'number_symbols_l10n'." );
+            $sth = $sths->{number_symbols_l10n} || die( "No statement object set for table 'number_symbols_l10n' in file $f." );
             # Example:
             # <symbols numberSystem="latn">
             #     <decimal>.</decimal>
@@ -5431,7 +5456,7 @@ sub process
                     regexp          => qr/scientificFormats\[\@numberSystem=["']([a-zA-Z0-9\_\-]+)["']\]/,
                 },
         };
-        $sth = $sths->{number_formats_l10n} || die( "No statement object set for table 'number_formats_l10n'." );
+        $sth = $sths->{number_formats_l10n} || die( "No statement object set for table 'number_formats_l10n' in file $f." );
         my $numbersRes = $mainDoc->findnodes( '/ldml/numbers' );
         if( $numbersRes->size )
         {
@@ -5656,7 +5681,7 @@ sub process
                             if( $numFormatLengthHasAliasRes->size )
                             {
                                 $el_len = resolve_alias( $numFormatLengthHasAliasRes ) ||
-                                    die( "This number format of type ${n_type} (${type}) for length ${len} is aliased, but I could not resolve it for this element: ", $el_container->toString() );
+                                    die( "This number format of type ${n_type} (${type}) for length ${len} is aliased, but I could not resolve it for this element in file $f: ", $el_container->toString() );
                             }
                             my $numFormatRes = $el_len->findnodes( $this->{xpath_fmt} ) ||
                                 die( "Unable to get any number format tag for number format of type ${n_type} (${type}) for this numbering system ID ${sys_id} for locale ${locale} in file ${f} for this element: ", $el_len->toString() );
@@ -5757,7 +5782,7 @@ sub process
             unitPattern             => 'regular',
             perUnitPattern          => 'per-unit',
         };
-        $sth = $sths->{units_l10n} || die( "Unable to get a statement object for table 'units_l10n'." );
+        $sth = $sths->{units_l10n} || die( "Unable to get a statement object for table 'units_l10n' in file $f." );
         my $process_unit = sub
         {
             my( $def, $kids ) = @_;
@@ -5819,19 +5844,19 @@ sub process
                 while( my $el_unit = $unitsRes->shift )
                 {
                     my $id = $el_unit->getAttribute( 'type' ) ||
-                        die( "Unable to get the unit ID from the attribute 'type' for this locale ${locale} in file ${f} for this element: ", $el_unit->toString() );
+                        die( "Unable to get the unit ID from the attribute 'type' with length ${len} for this locale ${locale} in file ${f} for this element: ", $el_unit->toString() );
                     my $unitAliasRes = $el_unit->findnodes( './alias[@path]' );
                     # If this unit is aliased
                     if( $unitAliasRes->size )
                     {
                         $el_unit = resolve_alias( $unitAliasRes ) ||
-                            die( "This unit length with ID ${id} is aliased, but could not resolve it for this locale ${locale} in file ${f} for this element: ", $el->toString() );
+                            die( "This unit length with ID ${id} is aliased, but could not resolve it with length ${len} for this locale ${locale} in file ${f} for this element: ", $el->toString() );
                     }
     
                     my @kids = $el_unit->nonBlankChildNodes;
                     if( !scalar( @kids ) )
                     {
-                        die( "Unable to get any definition elements for this unit ID ${id} for locale ${locale} in file ${f} for this element: ", $el_unit->toString() );
+                        warn( "Warning only: no definition elements for this unit ID ${id} with length ${len} for locale ${locale} in file ${f} for this element: ", $el_unit->toString() );
                     }
     
                     my $patterns = [];
@@ -5909,7 +5934,7 @@ sub process
     
         # NOTE: Checking localised names for calendar IDs
         &log( "Checking localised names for calendar IDs." );
-        my $calendarNamesRes = $mainDoc->findnodes( '/ldml/localeDisplayNames/types/type[@key="calendar"]' );
+        my $calendarNamesRes = $mainDoc->findnodes( '/ldml/localeDisplayNames/types/type[@key="calendar" and @type and not(@scope) and not(@alt)]' );
         $j = 0;
         while( my $el = $calendarNamesRes->shift )
         {
@@ -5929,7 +5954,8 @@ sub process
     
         # NOTE: Checking localised names for number system IDs
         &log( "Checking localised names for number system IDs." );
-        my $numberSystemNamesRes = $mainDoc->findnodes( '/ldml/localeDisplayNames/types/type[@key="numbers"]' );
+        # /ldml/localeDisplayNames/types/type[@key="calendar" and @type and not(@scope)]
+        my $numberSystemNamesRes = $mainDoc->findnodes( '/ldml/localeDisplayNames/types/type[@key="numbers" and @type and not(@scope) and not(@alt)]' );
         $j = 0;
         while( my $el = $numberSystemNamesRes->shift )
         {
@@ -5965,7 +5991,7 @@ sub process
     
         # NOTE: Checking localised names for collation IDs
         &log( "Checking localised names for collation IDs." );
-        my $collationNamesRes = $mainDoc->findnodes( '/ldml/localeDisplayNames/types/type[@key="collation"]' );
+        my $collationNamesRes = $mainDoc->findnodes( '/ldml/localeDisplayNames/types/type[@key="collation" and @type and not(@scope)]' );
         $j = 0;
         while( my $el = $collationNamesRes->shift )
         {
@@ -6034,7 +6060,7 @@ sub process
             if( !defined( $id ) ||
                 !length( $id ) )
             {
-                die( "No ID set for this annotation element: ", $el->toString() );
+                die( "No ID set for this annotation element in file $f: ", $el->toString() );
             }
             # Example: &lt; or &amp;
             if( index( $id, '&' ) != -1 &&
@@ -6061,17 +6087,17 @@ sub process
                 if( !defined( $tts ) ||
                     !length( $tts ) )
                 {
-                    die( "TTS definition exists for this annotation '${id}' at position ${i}, but the TTS value is empty." );
+                    die( "TTS definition exists for this annotation '${id}' at position ${i}, but the TTS value is empty in file $f." );
                 }
                 elsif( index( $tts, '|' ) != -1 )
                 {
-                    die( "It seems this TTS value is designed to contain multiple values. This is unexpected, and would require a change in the database schema to reflect that." );
+                    die( "It seems this TTS value is designed to contain multiple values. This is unexpected, and would require a change in the database schema to reflect that, in file $f." );
                 }
             }
             eval
             {
                 $sth->execute( $locale, $id, to_array( $defaults ), $tts );
-            } || die( "Error adding localised information for annotation No ${i} (${id}): ", ( $@ || $sth->errstr ) );
+            } || die( "Error adding localised information for annotation No ${i} (${id}) in file $f: ", ( $@ || $sth->errstr ) );
             $n += ( defined( $tts ) ? 2 : 1 );
         }
         $out->print( "ok ${i} annotations added.\n" ) if( $DEBUG );
@@ -6103,9 +6129,9 @@ sub process
     {
         # <matchVariable id="$enUS" value="AS+CA+GU+MH+MP+PH+PR+UM+US+VI"/>
         my $var = $el->getAttribute( 'id' ) ||
-            die( "No variable name set in attribute 'id' for this element: ", $el->toString() );
+            die( "No variable name set in attribute 'id' for this element in file $lang_match_file: ", $el->toString() );
         my $data = $el->getAttribute( 'value' ) ||
-            die( "No variable value set in attribute 'value' for this element: ", $el->toString() );
+            die( "No variable value set in attribute 'value' for this element in file $lang_match_file: ", $el->toString() );
         # The algorithm is actually more versatile with '+' adding to the set and '-' removing from set
         # Luckily, the latter is not used, so we can just simply add all to the set
         # Might need to improve on that in the future through, as this might become a liability
@@ -6125,7 +6151,7 @@ sub process
             if( !defined( $val ) ||
                 !length( $val ) )
             {
-                die( "No variable value set in attribute '${prop}' for this element: ", $el->toString() );
+                die( "No variable value set in attribute '${prop}' for this element in file $lang_match_file: ", $el->toString() );
             }
             $val =~ s/_/-/gs if( ( $prop eq 'desired' or $prop eq 'supported' ) && $normalise_sep );
             $def->{ $prop } = $val;
@@ -6133,10 +6159,10 @@ sub process
         if( $el->hasAttribute( 'oneway' ) )
         {
             my $bool = $el->getAttribute( 'oneway' ) ||
-                die( "No boolean value set in attribute 'oneway' for this element: ", $el->toString() );
+                die( "No boolean value set in attribute 'oneway' for this element in file $lang_match_file: ", $el->toString() );
             if( !exists( $lang_match_bool_map->{ $bool } ) )
             {
-                die( "No match found in boolean map for value '${bool}'" );
+                die( "No match found in boolean map for value '${bool}' in file $lang_match_file" );
             }
             # We reverse the value, since the XML specifies whether this entry is asymmetric
             $def->{is_symetric} = ( $lang_match_bool_map->{ $bool } ? 0 : 1 );
@@ -6258,7 +6284,7 @@ sub process
         eval
         {
             $sth->execute( @$def{qw( desired supported distance is_symetric is_regexp sequence )} );
-        } || die( "Error adding rule information for language match $def->{desired} -> $def->{supported}: ", ( $@ || $sth->errstr ), "\n", dump( $def ) );
+        } || die( "Error adding rule information for language match $def->{desired} -> $def->{supported} in file $lang_match_file: ", ( $@ || $sth->errstr ), "\n", dump( $def ) );
         $n++;
         $out->print( "ok\n" ) if( $DEBUG );
     }
@@ -6289,8 +6315,8 @@ sub process
     {
         my $def =
         {
-            unit_id => ( $el->getAttribute( 'type' ) || die( "Unable to get the unit prefix ID in the attribute 'type' for this element: ", $el->toString() ) ),
-            symbol => ( $el->getAttribute( 'symbol' ) || die( "Unable to get the unit symbol in the attribute 'symbol' for this element: ", $el->toString() ) ),
+            unit_id => ( $el->getAttribute( 'type' ) || die( "Unable to get the unit prefix ID in the attribute 'type' for this element in file $units_file: ", $el->toString() ) ),
+            symbol => ( $el->getAttribute( 'symbol' ) || die( "Unable to get the unit symbol in the attribute 'symbol' for this element in file $units_file: ", $el->toString() ) ),
         };
         $out->print( "[$def->{unit_id}] " ) if( $DEBUG );
         if( $el->hasAttribute( 'power10' ) )
@@ -6305,13 +6331,13 @@ sub process
         }
         else
         {
-            die( "This element has no power10 or power2 attribute: ", $el->toString() );
+            die( "This element has no power10 or power2 attribute in file $units_file: ", $el->toString() );
         }
     
         eval
         {
             $sth->execute( @$def{qw( unit_id symbol power factor )} );
-        } || die( "Error adding unit prefix information for unit ID '$def->{unit_id}': ", ( $@ || $sth->errstr ), "\n", dump( $def ) );
+        } || die( "Error adding unit prefix information for unit ID '$def->{unit_id}' in file $units_file: ", ( $@ || $sth->errstr ), "\n", dump( $def ) );
         $n++;
         $j++;
         $out->print( "ok\n" ) if( $DEBUG );
@@ -6327,8 +6353,8 @@ sub process
     {
         my $def =
         {
-            constant => ( $el->getAttribute( 'constant' ) || die( "Unable to get the unit constant in the attribute 'constant' for this element: ", $el->toString() ) ),
-            expression => ( $el->getAttribute( 'value' ) || die( "Unable to get the unit constant value in the attribute 'value' for this element: ", $el->toString() ) ),
+            constant => ( $el->getAttribute( 'constant' ) || die( "Unable to get the unit constant in the attribute 'constant' for this element in file $units_file: ", $el->toString() ) ),
+            expression => ( $el->getAttribute( 'value' ) || die( "Unable to get the unit constant value in the attribute 'value' for this element in file $units_file: ", $el->toString() ) ),
         };
         $out->print( "[$def->{constant}] " ) if( $DEBUG );
         # From the longest to the shortest
@@ -6343,7 +6369,7 @@ sub process
                 $def->{value} = eval( $expr );
                 if( $@ )
                 {
-                    die( "Error evaluating the constant expression '${expr}' (originally '$def->{expression}'): $@" );
+                    die( "Error evaluating the constant expression '${expr}' (originally '$def->{expression}') in file $units_file: $@" );
                 }
             }
             elsif( index( $expr, '*' ) != -1 ||
@@ -6353,7 +6379,7 @@ sub process
                 $def->{value} = eval( $expr );
                 if( $@ )
                 {
-                    die( "Error evaluating the constant expression '${expr}' (originally '$def->{expression}'): $@" );
+                    die( "Error evaluating the constant expression '${expr}' (originally '$def->{expression}') in file $units_file: $@" );
                 }
             }
             else
@@ -6368,7 +6394,7 @@ sub process
             $def->{value} = eval( $def->{expression} );
             if( $@ )
             {
-                die( "Error evaluating the constant expression '$def->{expression}': $@" );
+                die( "Error evaluating the constant expression '$def->{expression}' in file $units_file: $@" );
             }
         }
         else
@@ -6387,7 +6413,7 @@ sub process
         eval
         {
             $sth->execute( @$def{qw( constant expression value description status )} );
-        } || die( "Error adding unit constant information for constant '$def->{constant}': ", ( $@ || $sth->errstr ), "\n", dump( $def ) );
+        } || die( "Error adding unit constant information for constant '$def->{constant}' in file $units_file: ", ( $@ || $sth->errstr ), "\n", dump( $def ) );
         $n++;
         $j++;
         $out->print( "ok\n" ) if( $DEBUG );
@@ -6402,8 +6428,8 @@ sub process
     {
         my $def =
         {
-            base_unit => ( $el->getAttribute( 'baseUnit' ) || die( "Unable to get the unit base unit in the attribute 'baseUnit' for this element: ", $el->toString() ) ),
-            quantity => ( $el->getAttribute( 'quantity' ) || die( "Unable to get the unit quantity value in the attribute 'quantity' for this element: ", $el->toString() ) ),
+            base_unit => ( $el->getAttribute( 'baseUnit' ) || die( "Unable to get the unit base unit in the attribute 'baseUnit' for this element in file $units_file: ", $el->toString() ) ),
+            quantity => ( $el->getAttribute( 'quantity' ) || die( "Unable to get the unit quantity value in the attribute 'quantity' for this element in file $units_file: ", $el->toString() ) ),
         };
         $out->print( "[$def->{base_unit}] " ) if( $DEBUG );
     
@@ -6422,7 +6448,7 @@ sub process
         eval
         {
             $sth->execute( @$def{qw( base_unit quantity status comment )} );
-        } || die( "Error adding unit quantity information for base unit '$def->{base_unit}': ", ( $@ || $sth->errstr ), "\n", dump( $def ) );
+        } || die( "Error adding unit quantity information for base unit '$def->{base_unit}' in file $units_file: ", ( $@ || $sth->errstr ), "\n", dump( $def ) );
         $n++;
         $j++;
         $out->print( "ok\n" ) if( $DEBUG );
@@ -6439,8 +6465,8 @@ sub process
     {
         my $def =
         {
-            source => ( $el->getAttribute( 'source' ) || die( "Unable to get the unit source in the attribute 'source' for this element: ", $el->toString() ) ),
-            base_unit => ( $el->getAttribute( 'baseUnit' ) || die( "Unable to get the base unit value in the attribute 'baseUnit' for this element: ", $el->toString() ) ),
+            source => ( $el->getAttribute( 'source' ) || die( "Unable to get the unit source in the attribute 'source' for this element in file $units_file: ", $el->toString() ) ),
+            base_unit => ( $el->getAttribute( 'baseUnit' ) || die( "Unable to get the base unit value in the attribute 'baseUnit' for this element in file $units_file: ", $el->toString() ) ),
         };
         $out->print( "[$def->{base_unit}] " ) if( $DEBUG );
     
@@ -6467,7 +6493,7 @@ sub process
                 $def->{factor} = eval( $expr );
                 if( $@ )
                 {
-                    die( "Error evaluating the constant expression '${expr}' (originally '$def->{expression}'): $@" );
+                    die( "Error evaluating the constant expression '${expr}' (originally '$def->{expression}') in file $units_file: $@" );
                 }
             }
             elsif( index( $def->{expression}, '*' ) != -1 ||
@@ -6477,7 +6503,7 @@ sub process
                 $def->{factor} = eval( $def->{expression} );
                 if( $@ )
                 {
-                    die( "Error evaluating the constant expression '$def->{expression}': $@" );
+                    die( "Error evaluating the constant expression '$def->{expression}' in file $units_file: $@" );
                 }
             }
         }
@@ -6487,7 +6513,7 @@ sub process
         eval
         {
             $sth->execute( @$def{qw( source base_unit expression factor )}, to_array( $def->{systems} ), $def->{category} );
-        } || die( "Error adding unit conversion information for source '$def->{source}' and base unit '$def->{base_unit}': ", ( $@ || $sth->errstr ), "\n", dump( $def ) );
+        } || die( "Error adding unit conversion information for source '$def->{source}' and base unit '$def->{base_unit}' in file $units_file: ", ( $@ || $sth->errstr ), "\n", dump( $def ) );
         $n++;
         $j++;
         $out->print( "ok\n" ) if( $DEBUG );
@@ -6501,17 +6527,17 @@ sub process
     while( my $el = $unitsPrefsRes->shift )
     {
         my $cat = $el->getAttribute( 'category' ) ||
-            die( "Unable to get the unit preferences category from attribute 'category' for this element: ", $el->toString() );
+            die( "Unable to get the unit preferences category from attribute 'category' for this element in file $units_file: ", $el->toString() );
         my $usage = $el->getAttribute( 'usage' ) ||
-            die( "Unable to get the unit preferences usage from attribute 'usage' for this element: ", $el->toString() );
+            die( "Unable to get the unit preferences usage from attribute 'usage' for this element in file $units_file: ", $el->toString() );
         my $prefsRes = $el->findnodes( './unitPreference' ) ||
-            die( "Unable to get unit preferences for the category '${cat}' and usage '${usage}' for this element: ", $el->toString() );
+            die( "Unable to get unit preferences for the category '${cat}' and usage '${usage}' for this element in file $units_file: ", $el->toString() );
         # Example: <unitPreference regions="001" geq="10" skeleton="precision-increment/10">meter</unitPreference>
         while( my $el_pref = $prefsRes->shift )
         {
             my $def =
             {
-                unit_id => ( $el_pref->textContent || die( "No content found for this preference element: ", $el_pref->toString() ) ),
+                unit_id => ( $el_pref->textContent || die( "No content found for this preference element in file $units_file: ", $el_pref->toString() ) ),
                 category => $cat,
                 usage => $usage,
             };
@@ -6538,7 +6564,7 @@ sub process
                     $sth->bind_param( 5, $def->{geq}, SQL_FLOAT );
                     $sth->bind_param( 6, $def->{skeleton}, SQL_VARCHAR );
                     $sth->execute;
-                } || die( "Error adding unit preference information for category '$def->{category}', usage '$def->{usage}', unit ID '$def->{unit_id}' and territory '$def->{territory}': ", ( $@ || $sth->errstr ), "\n", dump( $def ) );
+                } || die( "Error adding unit preference information for category '$def->{category}', usage '$def->{usage}', unit ID '$def->{unit_id}' and territory '$def->{territory}' in file $units_file: ", ( $@ || $sth->errstr ), "\n", dump( $def ) );
                 $n++;
                 $j++;
             }
@@ -6556,16 +6582,16 @@ sub process
     {
         my $def =
         {
-            alias => ( $el->getAttribute( 'type' ) || die( "Unable to get the unit alias in the attribute 'type' for this element: ", $el->toString() ) ),
-            target => ( $el->getAttribute( 'replacement' ) || die( "Unable to get the alias replacement value in the attribute 'replacement' for this element: ", $el->toString() ) ),
-            reason => ( $el->getAttribute( 'reason' ) || die( "Unable to get the alias replacement reason value in the attribute 'reason' for this element: ", $el->toString() ) ),
+            alias => ( $el->getAttribute( 'type' ) || die( "Unable to get the unit alias in the attribute 'type' for this element in file $units_file: ", $el->toString() ) ),
+            target => ( $el->getAttribute( 'replacement' ) || die( "Unable to get the alias replacement value in the attribute 'replacement' for this element in file $units_file: ", $el->toString() ) ),
+            reason => ( $el->getAttribute( 'reason' ) || die( "Unable to get the alias replacement reason value in the attribute 'reason' for this element in file $units_file: ", $el->toString() ) ),
         };
         $out->print( "[$def->{alias} -> $def->{target}] " ) if( $DEBUG );
     
         eval
         {
             $sth->execute( @$def{qw( alias target reason )} );
-        } || die( "Error adding unit alias information for alias '$def->{alias}' and target '$def->{target}': ", ( $@ || $sth->errstr ), "\n", dump( $def ) );
+        } || die( "Error adding unit alias information for alias '$def->{alias}' and target '$def->{target}' in file $units_file: ", ( $@ || $sth->errstr ), "\n", dump( $def ) );
         $n++;
         $j++;
         $out->print( "ok\n" ) if( $DEBUG );
@@ -6590,7 +6616,7 @@ sub process
     # Example: <pluralRules locales="am as bn doi fa gu hi kn pcm zu">
     while( my $el = $rules->shift )
     {
-        my $locales = $el->getAttribute( 'locales' ) || die( "No attribute 'locales' found for this plural rule: ", $el->toString() );
+        my $locales = $el->getAttribute( 'locales' ) || die( "No attribute 'locales' found for this plural rule in file $plural_rules_file: ", $el->toString() );
         &log( "\tChecking plural rules for locales ${locales}" );
         my $pluralRulesHasAliasRes = $el->findnodes( './alias[@path]' );
         if( $pluralRulesHasAliasRes->size )
@@ -6633,9 +6659,9 @@ sub process
         {
             my $def = {};
             $def->{count} = $el_rule->getAttribute( 'count' ) ||
-                die( "No attribute 'count' for this plural rule: ", $el_rule->toString() );
+                die( "No attribute 'count' for this plural rule in file $plural_rules_file: ", $el_rule->toString() );
             $def->{rule} = $el_rule->textContent ||
-                die( "No value found for this plural rule '$def->{count}' for locales @$locales: ", $el_rule->toString() );
+                die( "No value found for this plural rule '$def->{count}' for locales @$locales in file $plural_rules_file: ", $el_rule->toString() );
             
             foreach my $locale ( @$locales )
             {
@@ -6646,7 +6672,7 @@ sub process
                 eval
                 {
                     $sth->execute( @$def{ qw( locale aliases count rule ) } );
-                } || die( "Error adding plural rule '$def->{count}' with rule '$def->{rule}' for locales @$locales: ", ( $@ || $sth->errstr ), "\nwith SQL query: ", $sth->{Statement}, "\n", dump( $def ) );
+                } || die( "Error adding plural rule '$def->{count}' with rule '$def->{rule}' for locales @$locales in file $plural_rules_file: ", ( $@ || $sth->errstr ), "\nwith SQL query: ", $sth->{Statement}, "\n", dump( $def ) );
                 $n++;
             }
             $total_locales += scalar( @$locales );
@@ -6763,6 +6789,35 @@ sub process
         $tmpfile->move( $live_db_file, overwrite => 1 ) || die( $tmpfile->error );
     }
     return(1);
+}
+
+sub apply_patch
+{
+    # $file is a Module::Generic::File object
+    my( $file ) = @_;
+    # $basedir is a Module::Generic::File object and something like /tmp/cldr-common-48/common
+    # $patch_dir is a global variable
+
+    # Would provide the path relative to the base directory, which is something like '/tmp/cldr-common-48/common', so the relative path would be something like 'supplemental/supplementalData.xml'
+    my $rel_path   = $file->relative( $basedir );
+    # Use the relative path derived to make the local path under the 'patches' directories, and change the resulting file extension to 'patch'. 
+    my $patch_file = $patch_dir->child( $rel_path )->extension( 'patch' );
+    return( $file ) if( !$patch_file->exists );
+    $out->print( "Applying patch ${patch_file} to ${file}\n" );
+    my $backup = $file->copy( "${file}.bak" ) ||
+        die( "Unable to create backup file \"${file}.bak\": ", $file->error );
+    my @cmd = ( 'patch', '--silent', $file, $patch_file );
+    my( $out, $err );
+    # Nothing in STDIN so we use undef
+    my $ok = IPC::Run::run( \@cmd, \undef, \$out, \$err );
+    unless( $ok )
+    {
+        # Rollback the backup
+        $backup->copy( "$file", { overwrite => 1 } );
+        die( "Rolling back. Patch failed for patch $file < $patch_file:\n$err" );
+    }
+    $out->print( "Applied patch ${patch_file}\n" );
+    return( $file );
 }
 
 sub extend
@@ -7094,6 +7149,8 @@ sub load_schema
 sub load_xml
 {
     my $xml_file = shift( @_ );
+    # Apply patch to the underlying file, if any.
+    &apply_patch( $xml_file );
     my $xml = $xml_file->load_utf8 || die( $xml_file->error );
     my $doc = XML::LibXML->load_xml( string => $xml );
     return( $doc );

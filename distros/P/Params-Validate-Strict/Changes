@@ -1,5 +1,9 @@
 Revision history for Params-Validate-Strict
 
+0.23	Thu Oct 30 13:37:31 EDT 2025
+	Flag attempting to compare numbers as strings
+	Added handling for positional arguments
+
 0.22	Sat Oct 25 21:51:13 EDT 2025
 	If a cross_validation fails, invalidate all arguments
 	Args were being passed as valid with some settings of logger

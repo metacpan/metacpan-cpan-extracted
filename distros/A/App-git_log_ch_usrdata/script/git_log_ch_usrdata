@@ -7,7 +7,7 @@ use Getopt::Long qw(:config no_ignore_case auto_help auto_version);
 
 use Pod::Usage;
 
-our $VERSION = '1.01.00';
+our $VERSION = '0.03';
 
 my ($Old_Mail, $New_Mail, $New_User, $No_Credentials);
 
@@ -60,9 +60,6 @@ my @Commands = ('echo "--- Correct local git history ---"',
                );
 
 
-# https://chatgpt.com/c/670d4141-4bf0-8010-97db-0ca53f5f122c
-
-
 foreach my $cmd (@Commands) {
   chomp($cmd);
   if ($cmd =~ /^echo /) {
@@ -82,7 +79,8 @@ __END__
 
 =head1 NAME
 
-  git_log_ch_usrdata - Change username and email address in git log
+git_log_ch_usrdata - Change username and email address in git log
+
 
 =head1 SYNOPSIS
 

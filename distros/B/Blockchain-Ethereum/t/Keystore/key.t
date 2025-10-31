@@ -20,4 +20,11 @@ subtest "0x9d8A62f656a8d1615C1294fd71e9CFb3E4855A4F" => sub {
     is $key->address, '0x9d8A62f656a8d1615C1294fd71e9CFb3E4855A4F';
 };
 
+subtest "Fail to sign non-transaction object" => sub {
+    my $private_key = pack "H*", "4646464646464646464646464646464646464646464646464646464646464646";
+    my $key         = Blockchain::Ethereum::Keystore::Key->new(private_key => $private_key);
+    eval { $key->sign_transaction("Not a transaction object"); };
+    like $@, qr/transaction must be a reference of Blockchain::Ethereum::Transaction/, 'die correctly for non-transaction object';
+};
+
 done_testing();

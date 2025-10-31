@@ -1,6 +1,6 @@
 package YaraFFI::Record::YR_META;
 
-$YaraFFI::Record::YR_META::VERSION   = '0.06';
+$YaraFFI::Record::YR_META::VERSION   = '0.07';
 $YaraFFI::Record::YR_META::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ YaraFFI::Record::YR_META - FFI Record for YARA metadata structure
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =head1 SYNOPSIS
 

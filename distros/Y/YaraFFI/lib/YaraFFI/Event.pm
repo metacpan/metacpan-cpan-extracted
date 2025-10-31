@@ -1,6 +1,6 @@
 package YaraFFI::Event;
 
-$YaraFFI::Event::VERSION   = '0.06';
+$YaraFFI::Event::VERSION   = '0.07';
 $YaraFFI::Event::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ YaraFFI::Event - Event class that stringifies to rule name but also works as a h
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =head1 SYNOPSIS
 
@@ -122,7 +122,7 @@ sub rule {
 
 =head2 metadata
 
-Returns the rule metadata as a hash reference (rule_match events only).
+Returns the rule metadata as a hash reference (C<rule_match> events only).
 
     my $meta = $event->metadata;
     if ($meta) {

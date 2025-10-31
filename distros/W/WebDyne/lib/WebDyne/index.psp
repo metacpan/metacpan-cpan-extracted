@@ -186,8 +186,6 @@ sub index {
     #  Construct the sort hrefs
     #
     use URI;
-    my $cgi_or=$self->CGI() ||
-        return err();
     my %query=$cgi_or->Vars();
     #  Delete any existing sort params when creating href lower/
     map {delete @query{("sort_${_}", "sort_${_}_order")} } qw(name size mtime);

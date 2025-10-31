@@ -12,7 +12,7 @@ use Carp;
 use Data::Dumper::Interp qw/vis visq dvis dvisq u visnew/;
 
 
-use Spreadsheet::Edit::Log qw/btw btwN/;
+use Spreadsheet::Edit::Log qw/btw btwN :nocolor/;
 
 # The default prefix should be just linenum: if imported from only one module
 { my $baseline = __LINE__;

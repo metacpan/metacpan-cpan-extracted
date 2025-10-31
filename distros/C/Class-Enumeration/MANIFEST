@@ -13,12 +13,14 @@ t/Builder.t
 t/CoffeeSize.t
 t/lib/CoffeeSize.pm
 t/lib/LockFlag.pm
+t/lib/PowerState.pm
 t/lib/ToastStatus.pm
 t/lib/TrafficLight.pm
 t/lib/TurnstileState.pm
 t/lib/TurnstileStateMachine.pm
 t/lib/VitalStatus.pm
 t/LockFlag.t
+t/PowerState.t
 t/ToastStatus.t
 t/TrafficLight.t
 t/TurnstileState.t

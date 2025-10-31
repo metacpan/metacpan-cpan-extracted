@@ -4,9 +4,9 @@ use v5.26;
 use strict;
 use warnings;
 
-# ABSTRACT: Ethereum Fee Market transaction abstraction
+# ABSTRACT: Ethereum Fee Market transaction abstraction (EIP-1559)
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.019';          # VERSION
+our $VERSION   = '0.020';          # VERSION
 
 use parent 'Blockchain::Ethereum::Transaction';
 
@@ -50,10 +50,10 @@ sub serialize {
         $self->to,
         $self->value,
         $self->data,
-        $self->access_list,
+        $self->_encode_access_list,
     );
 
-    @params = $self->_equalize_params(\@params)->@*;
+    @params = $self->_normalize_params(\@params)->@*;
 
     push(@params, $self->v, $self->r, $self->s)
         if $self->v && $self->r && $self->s;
@@ -61,17 +61,6 @@ sub serialize {
     # eip-1559 transactions must be prefixed by 2 that is the
     # transaction type
     return TRANSACTION_PREFIX . $self->rlp->encode(\@params);
-}
-
-sub generate_v {
-    my ($self, $y_parity) = @_;
-
-    # eip-1559 uses y directly as the v point
-    # instead of using recovery id as the legacy
-    # transactions
-    my $v = sprintf("0x%x", $y_parity);
-    $self->set_v($v);
-    return $v;
 }
 
 1;
@@ -84,15 +73,15 @@ __END__
 
 =head1 NAME
 
-Blockchain::Ethereum::Transaction::EIP1559 - Ethereum Fee Market transaction abstraction
+Blockchain::Ethereum::Transaction::EIP1559 - Ethereum Fee Market transaction abstraction (EIP-1559)
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 SYNOPSIS
 
-Transaction abstraction for EIP1559 Fee Market transactions
+Transaction abstraction for EIP-1559 Fee Market transactions
 
     my $transaction = Blockchain::Ethereum::Transaction::EIP1559->new(
         nonce                    => '0x0',
@@ -100,12 +89,20 @@ Transaction abstraction for EIP1559 Fee Market transactions
         max_priority_fee_per_gas => '0x0',
         gas_limit                => '0x1DE2B9',
         to                       => '0x3535353535353535353535353535353535353535'
-        value                    => '0xDE0B6B3A7640000',
+        value                    => parse_unit('1', ETH),
         data                     => '0x',
-        chain_id                 => '0x539'
+        chain_id                 => '0x539',
+        access_list => [
+            {
+                address      => '0x1234567890123456789012345678901234567890',
+                storage_keys => [
+                    '0x0000000000000000000000000000000000000000000000000000000000000001',
+                    '0x0000000000000000000000000000000000000000000000000000000000000002'
+                ]
+            }
+        ]
     );
 
-    # github.com/refeco/perl-ethereum-keystore
     my $key = Blockchain::Ethereum::Keystore::Key->new(
         private_key => pack "H*",
         '4646464646464646464646464646464646464646464646464646464646464646'
@@ -126,18 +123,6 @@ Encodes the given transaction parameters to RLP
 =back
 
 Returns the RLP encoded transaction bytes
-
-=head2 generate_v
-
-Generate the transaction v field using the given y-parity
-
-=over 4
-
-=item * C<$y_parity> y-parity
-
-=back
-
-Returns the v hexadecimal value also sets the v fields from transaction
 
 =head1 AUTHOR
 

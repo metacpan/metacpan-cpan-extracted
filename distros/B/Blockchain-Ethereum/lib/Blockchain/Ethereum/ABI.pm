@@ -6,7 +6,7 @@ use warnings;
 
 # ABSTRACT: ABI utility for encoding/decoding ethereum contract arguments
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.019';          # VERSION
+our $VERSION   = '0.020';          # VERSION
 
 1;
 
@@ -22,7 +22,7 @@ Blockchain::Ethereum::ABI - ABI utility for encoding/decoding ethereum contract 
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 SYNOPSIS
 

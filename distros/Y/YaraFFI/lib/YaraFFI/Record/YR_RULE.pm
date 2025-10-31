@@ -1,6 +1,6 @@
 package YaraFFI::Record::YR_RULE;
 
-$YaraFFI::Record::YR_RULE::VERSION   = '0.06';
+$YaraFFI::Record::YR_RULE::VERSION   = '0.07';
 $YaraFFI::Record::YR_RULE::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ YaraFFI::Record::YR_RULE - FFI Record for YARA rule structure
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =head1 SYNOPSIS
 

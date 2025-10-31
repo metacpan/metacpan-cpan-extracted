@@ -6,7 +6,7 @@ use warnings;
 
 # ABSTRACT: Solidity string type interface
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.019';          # VERSION
+our $VERSION   = '0.020';          # VERSION
 
 use parent 'Blockchain::Ethereum::ABI::Type';
 
@@ -51,7 +51,7 @@ Blockchain::Ethereum::ABI::Type::String - Solidity string type interface
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 SYNOPSIS
 

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Unicode Locale Identifier - ~/lib/Locale/Unicode/Data.pm
-## Version v1.4.0
+## Version v1.6.0
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/06/15
-## Modified 2025/03/21
+## Modified 2025/10/30
 ## All rights reserved
 ## 
 ## 
@@ -31,15 +31,15 @@ BEGIN
     use JSON;
     use Locale::Unicode v0.3.5;
     use Scalar::Util ();
-    use Want;
+    use Wanted;
     use constant {
         HAS_CONSTANTS => ( version->parse( $DBD::SQLite::VERSION ) >= 1.48 ? 1 : 0 ),
         MISSING_AUTO_UTF8_DECODING => ( version->parse( $DBD::SQLite::VERSION ) < 1.68 ? 1 : 0 ),
     };
-    our $CLDR_VERSION = '47.0';
+    our $CLDR_VERSION = '48.0';
     our $DBH = {};
     our $STHS = {};
-    our $VERSION = 'v1.4.0';
+    our $VERSION = 'v1.6.0';
 };
 
 use strict;
@@ -595,7 +595,7 @@ sub error
         else
         {
             warn( $msg ) if( warnings::enabled() );
-            rreturn( Locale::Unicode::Data::NullObject->new ) if( Want::want( 'OBJECT' ) );
+            rreturn( Locale::Unicode::Data::NullObject->new ) if( want( 'OBJECT' ) );
             return;
         }
     }
@@ -1432,7 +1432,7 @@ sub pass_error
         return( $self->error( @_ ) );
     }
     
-    if( Want::want( 'OBJECT' ) )
+    if( want( 'OBJECT' ) )
     {
         rreturn( Locale::Unicode::Data::NullObject->new );
     }
@@ -2499,9 +2499,115 @@ sub plural_count
     return( 'other' );
 }
 
+# The hash reference containing the core 40 locales on which all the other 182, out of 222 locales, are aliases.
+my $plural_forms;
+sub plural_forms
+{
+    my $self = shift( @_ );
+    my $locale = shift( @_ ) ||
+        return( $self->error( "No locale has been provided to retrieve its Gettext plural forms." ) );
+    # This is designed to minimise memory consumption.
+    # Also, the list is pre-built in advance. Given it contains only 40 locales, it has a high effort-merit ratio and saves CPU.
+    # So, no need to dynamically convert CLDR plural rules into its Gettext plural forms equivalent.
+    # If our dictionary is not yet defined, we create it now.
+    unless( defined( $plural_forms ) )
+    {
+        my $plural_forms_data = <<'EOT';
+$plural_forms = 
+{
+    af => "nplurals=2; plural=(n != 1);",
+    ak => "nplurals=2; plural=(n > 1);",
+    am => "nplurals=2; plural=(n > 1);",
+    ar => "nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5);",
+    ast => "nplurals=2; plural=(n != 1);",
+    be => "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);",
+    blo => "nplurals=3; plural=(n==0 ? 0 : n==1 ? 1 : 2);",
+    bm => "nplurals=1; plural=0;",
+    br => "nplurals=5; plural=(n%10==1 && !(n%100==11||n%100==71||n%100==91) ? 0 : n%10==2 && !(n%100==12||n%100==72||n%100==92) ? 1 : (n%10==3||n%10==4||n%10==9) && !(n%100>=10&&n%100<=19||n%100>=70&&n%100<=79||n%100>=90&&n%100<=99) ? 2 : n!=0&&n%1000000==0 ? 3 : 4);",
+    bs => "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);",
+    ca => "nplurals=2; plural=(n != 1);",
+    ceb => "nplurals=2; plural=(n > 1);",
+    cs => "nplurals=3; plural=(n==1 ? 0 : n>=2 && n<=4 ? 1 : 2);",
+    cy => "nplurals=4; plural=(n==1 ? 0 : n==2 ? 1 : n!=8 && n!=11 ? 2 : 3);",
+    da => "nplurals=2; plural=(n != 1);",
+    dsb => "nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);",
+    es => "nplurals=2; plural=(n != 1);",
+    ff => "nplurals=2; plural=(n != 1);",
+    fr => "nplurals=2; plural=(n > 1);",
+    ga => "nplurals=5; plural=(n==1 ? 0 : n==2 ? 1 : n>2 && n<7 ? 2 : n>6 && n<11 ? 3 : 4);",
+    gd => "nplurals=4; plural=(n==1 || n==11 ? 0 : n==2 || n==12 ? 1 : n>2 && n<20 ? 2 : 3);",
+    gv => "nplurals=2; plural=(n > 1);",
+    he => "nplurals=2; plural=(n != 1);",
+    is => "nplurals=2; plural=(n%10!=1 || n%100==11);",
+    iu => "nplurals=3; plural=(n==1 ? 0 : n==2 ? 1 : 2);",
+    ksh => "nplurals=3; plural=(n==0 ? 0 : n==1 ? 1 : 2);",
+    kw => "nplurals=4; plural=(n==1 ? 0 : n==2 ? 1 : n==3 ? 2 : 3);",
+    lag => "nplurals=3; plural=(n==0 ? 0 : n==1 ? 1 : 2);",
+    lt => "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n%100<10 || n%100>=20) ? 1 : 2);",
+    lv => "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n!=0 ? 1 : 2);",
+    mk => "nplurals=2; plural=(n==1 || n%10==1 ? 0 : 1);",
+    mo => "nplurals=3; plural=(n==1 ? 0 : n==0 || (n%100>0 && n%100<20) ? 1 : 2);",
+    mt => "nplurals=4; plural=(n==1 ? 0 : n==0 || (n%100>1 && n%100<11) ? 1 : n%100>10 && n%100<20 ? 2 : 3);",
+    pl => "nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);",
+    pt => "nplurals=2; plural=(n != 1);",
+    ru => "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);",
+    shi => "nplurals=3; plural=(n==0 || n==1 ? 0 : n>=2 && n<=10 ? 1 : 2);",
+    si => "nplurals=2; plural=(n != 1);",
+    sl => "nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);",
+    tzm => "nplurals=2; plural=(n != 1);",
+};
+EOT
+        local $@;
+        eval( $plural_forms_data );
+        if( $@ )
+        {
+            return( $self->error( "Error evaluating the list of 40 core Gettext plural rules: $@" ) );
+        }
+    }
+
+    if( exists( $plural_forms->{ $locale } ) )
+    {
+        return( $plural_forms->{ $locale } );
+    }
+    else
+    {
+        $locale = $self->_locale_object( $locale ) ||
+            return( $self->pass_error );
+    
+        my $tree = $self->make_inheritance_tree( $locale->base ) ||
+            return( $self->pass_error );
+        foreach my $loc ( @$tree )
+        {
+            if( exists( $plural_forms->{ $loc } ) )
+            {
+                return( $plural_forms->{ $loc } );
+            }
+            # It is actually the 'aliases' property we are after, so we know which one of the core 40 we should be using.
+            my $all = $self->plural_rules( locale => $loc ) ||
+                return( $self->pass_error );
+            if( $all && scalar( @$all ) )
+            {
+                if( $all->[0]->{aliases} && ref( $all->[0]->{aliases} ) eq 'ARRAY' )
+                {
+                    foreach my $l ( @{$all->[0]->{aliases}} )
+                    {
+                        if( exists( $plural_forms->{ $l } ) )
+                        {
+                            return( $plural_forms->{ $l } );
+                        }
+                    }
+                }
+            }
+        }
+        # Nothing found.
+        return( '' );
+    }
+}
+
 sub plural_range { return( shift->_fetch_one({
     id          => 'get_plural_range',
     field       => 'result',
+    has_array   => [qw( aliases )],
     table       => 'plural_ranges',
     requires    => [qw( locale start stop )],
     default     => { alt => undef },
@@ -2509,6 +2615,7 @@ sub plural_range { return( shift->_fetch_one({
 
 sub plural_ranges { return( shift->_fetch_all({
     id          => 'plural_ranges',
+    has_array   => [qw( aliases )],
     table       => 'plural_ranges',
     by          => [qw( locale aliases start stop result )],
 }, @_ ) ); }
@@ -2516,12 +2623,14 @@ sub plural_ranges { return( shift->_fetch_all({
 sub plural_rule { return( shift->_fetch_one({
     id          => 'get_plural_rule',
     field       => 'rule',
+    has_array   => [qw( aliases )],
     table       => 'plural_rules',
     requires    => [qw( locale count )],
 }, @_ ) ); }
 
 sub plural_rules { return( shift->_fetch_all({
     id          => 'plural_rules',
+    has_array   => [qw( aliases )],
     table       => 'plural_rules',
     by          => [qw( locale aliases count rule )],
 }, @_ ) ); }
@@ -3825,7 +3934,7 @@ sub _set_get_prop
         $self->{ $field } = $val
     }
     # So chaining works
-    rreturn( $self ) if( Want::want( 'OBJECT' ) );
+    rreturn( $self ) if( want( 'OBJECT' ) );
     # Returns undef in scalar context and an empty list in list context
     return if( !defined( $self->{ $field } ) );
     return( $self->{ $field } );
@@ -4232,7 +4341,7 @@ sub TO_JSON { return( shift->as_string ); }
             '""'    => sub{ '' },
             fallback => 1,
         );
-        use Want;
+        use Wanted;
     };
     use strict;
     use warnings;
@@ -4248,7 +4357,7 @@ sub TO_JSON { return( shift->as_string ); }
     {
         my( $method ) = our $AUTOLOAD =~ /([^:]+)$/;
         my $self = shift( @_ );
-        if( Want::want( 'OBJECT' ) )
+        if( want( 'OBJECT' ) )
         {
             rreturn( $self );
         }
@@ -4719,6 +4828,16 @@ Locale::Unicode::Data - Unicode CLDR SQL Data
         ruleset => 'spellout-cardinal',
         rule_id => 7,
     );
+
+    my $rule = $cldr->plural_forms( 'en' );
+    # nplurals=2; plural=(n != 1);
+
+    my $rule = $cldr->plural_forms( 'ja' );
+    # nplurals=1; plural=0;
+
+    my $rule = $cldr->plural_forms( 'ar' );
+    # nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5);
+
     my $all = $cldr->rbnfs;
     my $all = $cldr->rbnfs( locale => 'ko' );
     my $all = $cldr->rbnfs( grouping => 'SpelloutRules' );
@@ -4905,7 +5024,7 @@ Or, you could set the global variable C<$FATAL_EXCEPTIONS> instead:
 
 =head1 VERSION
 
-    v1.4.0
+    v1.6.0
 
 =head1 DESCRIPTION
 
@@ -9223,6 +9342,33 @@ This is used for example by L<DateTime::Format::RelativeTime> to query L<time_re
 If an error has occurred, this will set an L<error object|Locale::Unicode::Data::Exception>, and return C<undef> in scalar context, or an empty list in list context.
 
 See also L<plural_range|/plural_range> and L<plural_rule|/plural_rule>
+
+=head2 plural_forms
+
+    my $rule = $cldr->plural_forms( 'en' );
+    # nplurals=2; plural=(n != 1);
+
+    my $rule = $cldr->plural_forms( 'ja' );
+    # nplurals=1; plural=0;
+
+    my $rule = $cldr->plural_forms( 'ar' );
+    # nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5);
+
+    # Alias to 'ar'
+    my $rule = $cldr->plural_forms( 'ars' );
+    # nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5);
+
+    # No rule found
+    my $rule = $cldr->plural_forms( 'xxx' );
+    # Returns an empty string
+
+This method returns the gettext Plural-Forms string for a given locale, or an empty string if no rule was found.
+
+It returns a gettext C<Plural-Forms> string, or an empty string if no rule was found for the given locale.
+
+If no locale is provided, or if there is an error retrieving the data, an error is set in the object, and C<undef> is returned in scalar context, or an empty list in list context.
+
+See also L<Locale::Unicode::Data/plural_rules>
 
 =head2 plural_range
 

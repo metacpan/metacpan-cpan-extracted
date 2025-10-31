@@ -70,7 +70,7 @@ use v5.40;
 use experimental 'class';
 
 class App::BlurFill {
-  our $VERSION = '0.0.4';
+  our $VERSION = '0.0.5';
 
   use Imager;
   use File::Basename 'fileparse';

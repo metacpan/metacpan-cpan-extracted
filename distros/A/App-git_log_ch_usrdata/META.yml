@@ -3,17 +3,29 @@ abstract: 'Change username and email address in git log'
 author:
   - 'Klaus Rindfrey <klausrin@cpan.org.eu>'
 build_requires:
-  Capture::Tiny: '0.48'
+  Capture::Tiny: '0.47'
+  Cwd: '0'
   ExtUtils::MakeMaker: '0'
   File::Basename: '0'
   File::Spec::Functions: '0'
+  File::Temp: '0'
+  File::chdir: '0.1011'
+  Pod::Wordlist: '1.27'
+  Test::CheckManifest: '1.43'
   Test::More: '0'
+  Test::Pod: '1.51'
+  Test::Spelling: '0.25'
+  autodie: '0'
+  strict: '0'
+  warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec::Functions: '0'
   autodie: '0'
+  strict: '0'
+  warnings: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,14 +38,18 @@ no_index:
 provides:
   App::git_log_ch_usrdata:
     file: lib/App/git_log_ch_usrdata.pm
-    version: '0.02'
+    version: '0.03'
 requires:
+  Getopt::Long: '0'
   Git::RemoteURL::Parse: '0.02'
   GitHub::Config::SSH::UserData: '0.01'
+  Pod::Usage: '0'
   perl: '5.010'
+  strict: '0'
+  warnings: '0'
 resources:
   repository: https://github.com/klaus-rindfrey/perl-app-git_log_ch_usrdata.git
-version: '0.02'
+version: '0.03'
 x_bugtracker:
   web: https://github.com/klaus-rindfrey/perl-app-git_log_ch_usrdata/issues
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

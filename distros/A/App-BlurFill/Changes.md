@@ -1,5 +1,11 @@
 # Change Log
 
+## [0.0.5] - 2025-10-30
+
+### Changed
+
+- Text changes in web app
+
 ## [0.0.4] - 2025-10-28
 
 ### Changed

@@ -446,6 +446,7 @@ IT:
     RM:
       default: Roma Capitale
       alt_en: Rome
+      alt_it: Roma
     RN: Rimini
     RO: Rovigo
     SA: Salerno
@@ -458,7 +459,9 @@ IT:
     TA: Taranto
     TE: Teramo
     TN: Trento
-    TO: Torino
+    TO:
+      default: Torino
+      alt_en: Turin
     TP: Trapani
     TR: Terni
     TV: Treviso

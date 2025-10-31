@@ -1108,7 +1108,8 @@ CREATE TABLE unit_aliases (
     ,reason             VARCHAR(20)
     ,PRIMARY KEY(unit_alias_id)
     ,CHECK( alias REGEXP '^[a-zA-Z][a-zA-Z0-9]+(?:\-[a-zA-Z0-9]+)*$' )
-    ,CHECK( target REGEXP '^[a-zA-Z][a-zA-Z0-9]+(?:\-[a-zA-Z0-9]+)*$' )
+    -- target could be '1e6', so it does not necessarily start with alphabetical characters
+    ,CHECK( target REGEXP '^[a-zA-Z0-9]+(?:\-[a-zA-Z0-9]+)*$' )
     ,CHECK( reason REGEXP '^[a-zA-Z][a-zA-Z0-9]+$' )
 );
 CREATE UNIQUE INDEX idx_unit_aliases_unique ON unit_aliases(alias);

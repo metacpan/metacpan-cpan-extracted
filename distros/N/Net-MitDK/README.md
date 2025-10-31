@@ -37,15 +37,17 @@ Unix/Linux
 
 * Install this module by opening command line and typing `cpan Net::MitDK` (with `sudo` if needed).
 
-* Make sure group `nobody` is present. Run `sudo addgroup nobody` if needed.
+* Make sure group `nobody` and user `nobody` are present. Run `sudo addgroup/adduser nobody` if needed.
+Also make sure that the user nobody is a member of the group nobody. (`perl
+Makefile.PL` will complain if this is not on order).
+
 You may also add yourself to the group `nobody` if you want to let the
-utilities to edit your profile settings, by running `sudo usermod -a -G nobody
-$$USER`.
+utilities to edit your profile settings, by running `sudo usermod -a -G nobody $USER`.
 
 * Run `mitdk-authenticate`, open `http://localhost:9999/` in the browser with
-* lowered security, and login to MitID as described below.
+lowered security, and login to MitID as described below.
 
-* Add `mitdk-renew-lease -a` in a new cron job as yourself (see 'examples/cron'):
+* Add `mitdk-renew-lease -a` in a new cron job as yourself (see `examples/cron`):
   - Run ``perl -le 'print q(*/10 * * * * ).($_=`which mitdk-renew-lease`,chomp,$_).q( -a)'``
   - Run `crontab -e` and add this line
 
@@ -105,8 +107,16 @@ You will need to log in there, in the way you usually do, using the MitID app,
 and then confirm the request from MitDK. If that works, the script will create
 an authorization token and save it in your home catalog under
 `.mitdk/default.profile`. This token will be used for password-less logins to
-the MitDK site. In case it expires, in will need to be renewed using the same
+the MitDK site. In case it expires, it will need to be renewed using the same
 procedure.
+
+NB: if you see the error "you have already logged in" or "you cannot have two sessions",
+use these to sidestep:
+
+1: When you see the invitation to MitID login, "FORTSÆT TIL LOGIN", open the dev console
+first by hitting the F12 key. Then procees
+2: MitID defence check will halt execution on some random javascript debugger statement.
+3: Close the dev console - after that the proper MitID login window should appear.
 
 In case you never logged in to the Digital Post, you'll get a login error.
 You shall need to log in manually to the website, eventually fill your phone
@@ -190,7 +200,7 @@ This is the setup I use on my own remote server, where I connect to using
 email clients to read my mail.
 
 1) Create a startup script, f.ex. for FreeBSD see `example/mitdk2pop.freebsd`,
-and for Debian/Ubuntu see `examples/mitdk2pop.debian`
+and for systemd-based unices see `examples/eboks2pop.service`.
 
 2) Install *procmail* and *fetchmail*. Look into `example/procmailrc.local` and
 and `examples/fetchmail` (the latter needs to have permissions 0600). 
@@ -212,21 +222,18 @@ setup is basically same as in previous section, but see
 The problem you might encounter is that the module generates mails as
 originated from `noreply@mit.dk` and f.ex. Gmail won't accept that due to
 [SPF](https://en.wikipedia.org/wiki/Sender_Policy_Framework). In the
-authenticator web setup you can change the default email to one that matches
+authenticator web setup you can change the default *From* email to one that matches
 your sending domain. If you own that domain, consider adding the SPF TXT
 record to it, something like `v=spf1 a mx ip4:1.2.3.4 ~all`.
 
-The `mitdk-authenticate` script may help you here, you can change the
-default mail *From* address.
-
-Alternatively see if rewriting
-the sender as in `examples/procmail.forward.srs` helps.
+Alternatively see if rewriting the sender as in `examples/procmail.forward.srs`
+helps.
 
 Enjoy!
 
 Thanks to:
 ----------
 
-Morten Helmstedt
+Morten Helmstedt,
 Anders Peter Fugmann
 

@@ -28,27 +28,27 @@ WriteMakefile(
         provides    => {
             'YaraFFI'   => {
                 file    => 'lib/YaraFFI.pm',
-                version => '0.06'
+                version => '0.07'
             },
             'YaraFFI::Event' => {
                 file    => 'lib/YaraFFI/Event.pm',
-                version => '0.06'
+                version => '0.07'
             },
             'YaraFFI::Record::YR_MATCH' => {
                 file    => 'lib/YaraFFI/Record/YR_MATCH.pm',
-                version => '0.06'
+                version => '0.07'
             },
             'YaraFFI::Record::YR_META' => {
                 file    => 'lib/YaraFFI/Record/YR_META.pm',
-                version => '0.06'
+                version => '0.07'
             },
             'YaraFFI::Record::YR_RULE' => {
                 file    => 'lib/YaraFFI/Record/YR_RULE.pm',
-                version => '0.06'
+                version => '0.07'
             },
             'YaraFFI::Record::YR_STRING' => {
                 file    => 'lib/YaraFFI/Record/YR_STRING.pm',
-                version => '0.06'
+                version => '0.07'
             },
         },
         resources => {

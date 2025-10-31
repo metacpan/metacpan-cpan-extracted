@@ -25,5 +25,6 @@ on test => sub {
   requires 'Test::Fatal'    => '0';
   requires 'Test::More'     => '1.001005';    # Subtests accept args
   requires 'Test::Lib'      => '0';
+  requires 'Test::Warn'     => '0';
   requires 'parent'         => '0'
 }

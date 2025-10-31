@@ -1,4 +1,4 @@
-#! env perl
+#!perl
 use strict;
 use warnings;
 # BEGIN { $ENV{IO_LAMBDA_DEBUG} = "select=2,io=2,lambda=2"; }

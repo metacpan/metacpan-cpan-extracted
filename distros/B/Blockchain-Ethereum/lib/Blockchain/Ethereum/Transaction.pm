@@ -6,10 +6,11 @@ use warnings;
 
 # ABSTRACT: Ethereum transaction abstraction
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.019';          # VERSION
+our $VERSION   = '0.020';          # VERSION
 
 use Carp;
 use Crypt::Digest::Keccak256 qw(keccak256);
+use Scalar::Util             qw(blessed looks_like_number);
 
 use Blockchain::Ethereum::RLP;
 
@@ -87,21 +88,55 @@ sub serialize {
     croak "serialize method not implemented";
 }
 
-sub generate_v {
-    croak "generate_v method not implemented";
-}
-
 sub hash {
     my $self = shift;
 
     return keccak256($self->serialize);
 }
 
-# In case of Math::BigInt given for any params, get the hex value
-sub _equalize_params {
+# Hex conversion
+sub _normalize_params {
     my ($self, $params) = @_;
 
-    return [map { ref $_ eq 'Math::BigInt' ? $_->as_hex : $_ } $params->@*];
+    return [
+        map {
+            !defined $_
+                ? $_                                                                        # undefined
+                : blessed $_ && $_->isa('Math::BigInt')  ? $_->as_hex                       # BigInt
+                : /^0x/i                                 ? $_                               # hex string
+                : looks_like_number($_) && $_ == int($_) ? Math::BigInt->new($_)->as_hex    # integer/numeric string
+                : $_                                                                        # anything else
+        } @$params
+    ];
+}
+
+sub _encode_access_list {
+    my $self = shift;
+
+    my $access_list = $self->access_list();
+
+    # If no access list, return empty array
+    return [] unless @$access_list;
+
+    my @encoded_list;
+
+    for my $entry (@$access_list) {
+        my $address      = $entry->{address}      // '';
+        my $storage_keys = $entry->{storage_keys} // [];
+
+        push @encoded_list, [$address, $storage_keys];
+    }
+
+    return \@encoded_list;
+}
+
+sub generate_v {
+    my ($self, $y_parity) = @_;
+
+    # eip-1559 and eip-2930 uses y-parity directly as the v value
+    my $v = sprintf("0x%x", $y_parity);
+    $self->set_v($v);
+    return $v;
 }
 
 1;
@@ -118,12 +153,11 @@ Blockchain::Ethereum::Transaction - Ethereum transaction abstraction
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 SYNOPSIS
 
 Ethereum transaction abstraction for signing and generating raw transactions
-
     # parameters can be hexadecimal strings or Math::BigInt instances
     my $transaction = Blockchain::Ethereum::Transaction::EIP1559->new(
         nonce                    => '0x0',
@@ -131,12 +165,11 @@ Ethereum transaction abstraction for signing and generating raw transactions
         max_priority_fee_per_gas => '0x0',
         gas_limit                => '0x1DE2B9',
         to                       => '0x3535353535353535353535353535353535353535'
-        value                    => Math::BigInt->new('1000000000000000000'),
+        value                    => parse_unit('1', ETH),
         data                     => '0x',
         chain_id                 => '0x539'
     );
 
-    # github.com/refeco/perl-ethereum-keystore
     my $key = Blockchain::Ethereum::Keystore::Key->new(
         private_key => pack "H*",
         '4646464646464646464646464646464646464646464646464646464646464646'
@@ -154,6 +187,8 @@ Supported transaction types:
 
 =item * B<Legacy>
 
+=item * B<EIP2930 Access List>
+
 =item * B<EIP1559 Fee Market>
 
 =back
@@ -170,6 +205,26 @@ To be implemented by the child classes, encodes the given transaction parameters
 
 Returns the RLP encoded transaction bytes
 
+=head2 hash
+
+SHA3 Hash the serialized transaction object
+
+=over 4
+
+=back
+
+Returns the SHA3 transaction hash bytes
+
+=head2 _encode_access_list
+
+Internal method to encode the access list for RLP serialization
+
+=over 4
+
+=back
+
+Returns the properly formatted access list for RLP encoding
+
 =head2 generate_v
 
 Generate the transaction v field using the given y-parity
@@ -181,16 +236,6 @@ Generate the transaction v field using the given y-parity
 =back
 
 Returns the v hexadecimal value also sets the v fields from transaction
-
-=head2 hash
-
-SHA3 Hash the serialized transaction object
-
-=over 4
-
-=back
-
-Returns the SHA3 transaction hash bytes
 
 =head1 AUTHOR
 

@@ -6,7 +6,7 @@ use warnings;
 
 # ABSTRACT: Seed abstraction
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.019';          # VERSION
+our $VERSION   = '0.020';          # VERSION
 
 use Carp;
 use Crypt::PRNG     qw(random_bytes);
@@ -86,7 +86,7 @@ Blockchain::Ethereum::Keystore::Seed - Seed abstraction
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 SYNOPSIS
 

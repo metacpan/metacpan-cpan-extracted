@@ -50,7 +50,7 @@ test_psgi
         is($res->code, 200, 'Got 200 OK from /blur');
         like($res->content, qr/<!DOCTYPE html>/i, 'Response contains HTML doctype');
         like($res->content, qr/<title>BlurFill - Result/i, 'Response contains result page title');
-        like($res->content, qr/Your blurred image is ready!/i, 'Response contains success message');
+        like($res->content, qr/Your resized image is ready!/i, 'Response contains success message');
         like($res->content, qr/<img[^>]+src="\/download\//i, 'Response contains image preview');
         like($res->content, qr/<a[^>]+href="\/download\//i, 'Response contains download link');
         like($res->content, qr/<a[^>]+href="\/"[^>]*>Create Another/i, 'Response contains link back to home');

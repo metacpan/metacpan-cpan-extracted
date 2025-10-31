@@ -6,7 +6,7 @@ use warnings;
 
 # ABSTRACT: Ethereum Legacy transaction abstraction
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.019';          # VERSION
+our $VERSION   = '0.020';          # VERSION
 
 use parent 'Blockchain::Ethereum::Transaction';
 
@@ -39,7 +39,7 @@ sub serialize {
         $self->data,
     );
 
-    @params = $self->_equalize_params(\@params)->@*;
+    @params = $self->_normalize_params(\@params)->@*;
 
     if ($self->v && $self->r && $self->s) {
         push(@params, $self->v, $self->r, $self->s);
@@ -73,7 +73,7 @@ Blockchain::Ethereum::Transaction::Legacy - Ethereum Legacy transaction abstract
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 SYNOPSIS
 
@@ -87,7 +87,6 @@ Transaction abstraction for Legacy transactions
         value     => '0xDE0B6B3A7640000',
         chain_id  => '0x1'
 
-    # github.com/refeco/perl-ethereum-keystore
     my $key = Blockchain::Ethereum::Keystore::Key->new(
         private_key => pack "H*",
         '4646464646464646464646464646464646464646464646464646464646464646'

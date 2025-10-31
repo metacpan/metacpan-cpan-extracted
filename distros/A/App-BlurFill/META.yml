@@ -23,10 +23,11 @@ requires:
   File::Temp: '0'
   Imager: '0'
   Plack: '0'
+  Starman: '0'
   Test::More: '0'
   perl: '5.040'
 resources:
   bugtracker: https://github.com/davorg-cpan/app-blurfill/issues
   repository: https://github.com/davorg-cpan/app-blurfill.git
-version: v0.0.4
+version: v0.0.5
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,14 @@
 Revision history for Perl module Locale::Unicode::Data
 
+v1.6.0 2025-10-30T16:40:34+0900
+    - Release v1.6.0 for CLDR 48
+    - Apply patch to CLDR 48 supplemental/supplementalData.xml at xpath '//references/reference[@type="R1227"]' (fix https:// typo, CLDR-19101)
+
+v1.5.0 2025-10-09T03:11:35+0900
+    - Corrected methods plural_range, plural_ranges, plural_rule, and plural_rules to enable decoding of SQL array in 'aliases'
+    - Added the method plural_forms to return a Gettext Plural-Forms string based on a given locale.
+    - Update dependency from Want to Wanted
+
 v1.4.0 2025-03-21T12:14:09+0900
     - Release for Unicode CLDR version 47
       See CLDR release notes for details: <https://cldr.unicode.org/downloads/cldr-47>

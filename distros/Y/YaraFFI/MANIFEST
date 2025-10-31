@@ -16,6 +16,7 @@ t/02_buffer_scan.t
 t/03_detailed.t
 t/04_metadata_offsets.t
 t/05_safety_edge_cases.t
+t/06_new_events.t
 t/manifest.t
 t/pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

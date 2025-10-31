@@ -1,3 +1,11 @@
+0.020     2025-10-30 23:35:49-03:00 America/Sao_Paulo
+    [Improvements]
+    - Added EIP-2930 transaction support
+    - Added Unit conversion functions parse_units and format_units
+    - Transaction parameters can now also be integers or numeric strings
+    - Remove Test::Fatal from test dependencies
+    [BugFixes]
+    - Fix access list encoding
 0.019     2025-06-28 23:31:03-03:00 America/Sao_Paulo
 - Initial release of Blockchain-Ethereum toolkit as a unified distribution
 - Includes functionality from the following previously separate modules:

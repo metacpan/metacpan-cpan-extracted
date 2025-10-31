@@ -304,7 +304,7 @@ INIT
 		};
 	},
 
-	# case with private only
+	#
 	'/login/mitid' => sub {
 		my $req = shift;
 		$req->uri("https://nemlog-in.mitid.dk/login/mitid");
@@ -317,6 +317,19 @@ INIT
 		return $resp unless $resp->is_success;
 		return $resp if $resp->request->uri->path =~ /loginoption$/;
 		return handle_saml($resp);
+	},
+
+	# case with private only
+	'/mitid/initialize' => sub {
+		my $req = shift;
+		$req->uri("https://nemlog-in.mitid.dk/login/mitid/initialize");
+		$req->header( Referer => 'https://nemlog-in.mitid.dk/login/mitid/initialize');
+		$req->header( Host    => 'nemlog-in.mitid.dk');
+		$req->header( Origin  => 'https://nemlog-in.mitid.dk');
+		$req->header( 'Accept-Encoding' => 'identity');
+		$req->headers->remove_header('Cookie');
+		my $resp = $ua->request($req)->wait;
+		return $resp;
 	},
 
 	# case with sub-select (private and firma(s))

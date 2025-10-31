@@ -68,19 +68,19 @@ optional options HASH reference. The allowed options are:
 
 =over 2
 
-=item * C<class> (a non-empty string)
+=item * C<class> (a non-empty string; available as of version 1.0.0)
 
 An enum class can be build at runtime.  In this case The C<class> option
 should be used to set the enum class name.
 
-=item * C<counter> (a CODE reference)
+=item * C<counter> (a CODE reference; available as of version 1.1.0)
 
 The C<counter> option can be used to overwrite the default ordinal number
 generator. It should return a unique value for each enum object in the list.
 The values should be numeric and comparable in pairs using the C<E<lt>=E<gt>>
 operator.
 
-=item * C<export> (a boolean value)
+=item * C<export> (a boolean value; available as of version 1.0.0)
 
 If the C<export> option is set to true, the builder prepares enum constants
 that are stored in the variable C<@EXPORT_OK> and it creates an C<:all>
@@ -88,15 +88,21 @@ tag that is part of the variable C<%EXPORT_TAGS>. Any separately loaded
 exporter module like for example L<Exporter> enables the feature to export
 enum constants.
 
-=item * C<predicate> (a boolean value)
+=item * C<predicate> (a boolean value; available as of version 1.2.0)
 
 If the C<predicate> option is set to true, the builder creates C<is_*()>
 predicate methods (object methods) for each enum object in the list.
 
-=item * C<prefix> (a non-empty string)
+=item * C<prefix> (a non-empty string; available as of version 1.2.0)
 
 The C<prefix> option can be used to specify a common prefix for the names of
 the enum objects in the list.
+
+=item * C<to_json> (a boolean value; available as of version 1.3.0)
+
+If the C<to_json> option is set to true, the builder creates a C<TO_JSON()>
+method (object method). This default implementation returns the name of the
+calling enum object.
 
 =back
 

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.019';          # VERSION
+our $VERSION   = '0.020';          # VERSION
 
 use Crypt::KeyDerivation qw(pbkdf2);
 use Crypt::ScryptKDF     qw(scrypt_raw);
@@ -97,7 +97,7 @@ Blockchain::Ethereum::Keystore::Keyfile::KDF
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 AUTHOR
 

@@ -6,7 +6,7 @@ use warnings;
 
 # ABSTRACT: Ethereum wallet management utilities
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.019';          # VERSION
+our $VERSION   = '0.020';          # VERSION
 
 1;
 
@@ -22,7 +22,7 @@ Blockchain::Ethereum::Keystore - Ethereum wallet management utilities
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 SYNOPSIS
 

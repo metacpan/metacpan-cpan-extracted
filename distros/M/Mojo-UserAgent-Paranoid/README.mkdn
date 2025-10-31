@@ -1,0 +1,24 @@
+
+[![Windows](https://github.com/Corion/Mojo-UserAgent-Paranoid/workflows/windows/badge.svg)](https://github.com/Corion/Mojo-UserAgent-Paranoid/actions?query=workflow%3Awindows)
+[![MacOS](https://github.com/Corion/Mojo-UserAgent-Paranoid/workflows/macos/badge.svg)](https://github.com/Corion/Mojo-UserAgent-Paranoid/actions?query=workflow%3Amacos)
+[![Linux](https://github.com/Corion/Mojo-UserAgent-Paranoid/workflows/linux/badge.svg)](https://github.com/Corion/Mojo-UserAgent-Paranoid/actions?query=workflow%3Alinux)
+
+# NAME
+
+Mojo::UserAgent::Paranoid - paranoid user agent for fetching unknown URLs
+
+# SYNOPSIS
+
+    my $io = Mojo::IOLoop->singleton;
+    my $ua = Mojo::UserAgent::Paranoid->new(
+        paranoid_dns => Net::DNS::Paranoid->new(
+            blocked_hosts => [qr{\.dev.example\.com$}]
+        ),
+        ioloop       => $io,
+    );
+
+# SEE ALSO
+
+[Mojo::UserAgent](https://metacpan.org/pod/Mojo%3A%3AUserAgent)
+
+[Net::DNS::Paranoid](https://metacpan.org/pod/Net%3A%3ADNS%3A%3AParanoid)

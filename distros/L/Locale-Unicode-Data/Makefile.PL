@@ -45,7 +45,7 @@ my %WriteMakefileArgs = (
         # 2004-11-05
         # 'URI::file'             => '4.19',
         # Version compatible with perl v5.10
-        'Want'                  => '0.17',
+        'Wanted'                => 'v0.1.0',
     },
     TEST_REQUIRES =>
     {

@@ -46,6 +46,32 @@ my $GAF  = $CLASS->new(conf_path => $path);
     }
 }
 
+# Make sure invalid component names are skipped
+{
+    my $af_path   = dirname(__FILE__) . '/../../address-formatting';
+    my $conf_path = $af_path . '/conf/';
+    my $GAF       = $CLASS->new(conf_path => $conf_path);
+
+    my $rh_components = {
+          '' => 'empty',
+          '*' => 'star',
+          '+' => 'plus',
+          '\\' => 'escape',
+          '$' => 'dollar',
+          '(' => 'bracket',
+          '\(' => 'quoted bracket',
+          'country' => 'United Kingdom',
+          'country_code' => 'gb',
+    };
+
+    my $formatted = $GAF->format_address($rh_components, {});
+    chomp $formatted;
+
+    is($formatted, 'United Kingdom');
+}
+
+
+
 {
     # keep in mind this is using the test conf, not the real address-formatting conf
     is($GAF->_add_state_code({}), undef);

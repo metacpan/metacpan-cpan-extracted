@@ -1,6 +1,6 @@
 package YaraFFI;
 
-$YaraFFI::VERSION   = '0.06';
+$YaraFFI::VERSION   = '0.07';
 $YaraFFI::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ YaraFFI - Minimal Perl FFI bindings for the YARA malware scanning engine
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =head1 SYNOPSIS
 
@@ -33,7 +33,7 @@ Version 0.06
     $yara->scan_buffer("hello hacker", sub {
         my ($event) = @_;
         print "Event: $event->{event}\n";
-        print "Rule: $event->{rule}\n";
+        print "Rule: $event->{rule}\n" if $event->{rule};
 
         if ($event->{event} eq 'rule_match') {
             if ($event->{metadata}) {
@@ -48,13 +48,26 @@ Version 0.06
             print "String: $event->{string_id}\n";
             print "Offsets: " . join(", ", @{$event->{offsets}}) . "\n" if $event->{offsets};
         }
+
+        if ($event->{event} eq 'rule_not_match') {
+            print "Rule did not match: $event->{rule}\n";
+        }
+
+        if ($event->{event} eq 'import_module') {
+            print "Module imported: $event->{module_name}\n";
+        }
+
+        if ($event->{event} eq 'scan_finished') {
+            print "Scan completed\n";
+        }
     });
 
 =head1 DESCRIPTION
 
 C<YaraFFI> provides lightweight C<FFI> bindings to C<libyara>, allowing you to compile
-C<YARA> rules from strings and scan memory buffers or files. It supports basic
-C<rule_match> and C<string_match> events via a Perl callback.
+C<YARA> rules from strings and scan memory buffers or files. It supports all major
+callback events including C<rule_match>, C<rule_not_match>, C<string_match>,
+C<import_module>, and C<scan_finished> via a Perl callback.
 
 Currently it focuses on correctness and minimal functionality, not full C<YARA>
 feature coverage.
@@ -71,7 +84,7 @@ For more information, please follow the L<official documentation|https://yara.re
 
 =item * Scan files (C<scan_file>)
 
-=item * Events passed to callback are simple objects (C<rule_match>, C<string_match>)
+=item * Events passed to callback: C<rule_match>, C<rule_not_match>, C<string_match>, C<import_module>, C<scan_finished>
 
 =item * Match offset reporting for string matches (when enabled)
 
@@ -84,8 +97,6 @@ For more information, please follow the L<official documentation|https://yara.re
 =over 4
 
 =item * No support for YARA modules or external variables
-
-=item * No NOT_MATCH, IMPORT, or FINISHED events
 
 =item * Scan flags currently hardcoded to 0
 
@@ -161,11 +172,11 @@ sub compile {
 }
 
 sub scan_file {
-    my ($self, $filename, $callback) = @_;
+    my ($self, $filename, $callback, %opts) = @_;
     die "Compile rules first" unless $self->{rules};
 
     my $content = read_file($filename, binmode => ':raw');
-    return $self->scan_buffer($content, $callback);
+    return $self->scan_buffer($content, $callback, %opts);
 }
 
 # Safe metadata extraction using FFI records
@@ -304,6 +315,35 @@ sub _extract_string_matches_with_records {
     return \@strings;
 }
 
+# Extract rule name from YR_RULE pointer
+sub _extract_rule_name {
+    my ($rule_ptr) = @_;
+    return undef unless $rule_ptr && $rule_ptr > 4096;
+
+    my $rule_name;
+    eval {
+        OFFSET_LOOP: for (my $offset = 8; $offset < 256; $offset += 8) {
+            my $identifier_field_addr = $rule_ptr + $offset;
+            my $ptr_bytes = $ffi->cast('opaque', 'string(8)', $identifier_field_addr);
+            my $name_ptr_value = unpack('Q', $ptr_bytes);
+
+            next if $name_ptr_value < 4096;
+            use bigint;
+            my $max_addr = 140737488355327;  # 0x7fffffffffff
+            no bigint;
+            next if $name_ptr_value > $max_addr;
+
+            my $candidate = $ffi->cast('opaque', 'string', $name_ptr_value);
+            if (defined $candidate && $candidate =~ /^[a-zA-Z_][a-zA-Z0-9_]*$/) {
+                $rule_name = $candidate;
+                last OFFSET_LOOP;
+            }
+        }
+    };
+
+    return $rule_name;
+}
+
 sub scan_buffer {
     my ($self, $buffer, $callback, %opts) = @_;
     die "Compile rules first" unless $self->{rules};
@@ -312,9 +352,12 @@ sub scan_buffer {
     my $ptr = $ffi->cast('string' => 'opaque', $buffer);
     my @events;
 
-    my $emit_strings = $opts{emit_string_events} // 1;
-    my $enable_metadata = $opts{enable_metadata} // 0;  # Disabled by default
-    my $enable_offsets = $opts{enable_offsets} // 0;    # Disabled by default
+    my $emit_strings    = $opts{emit_string_events}    // 1;
+    my $emit_not_match  = $opts{emit_not_match_events} // 0;
+    my $emit_import     = $opts{emit_import_events}    // 0;
+    my $emit_finished   = $opts{emit_finished_events}  // 0;
+    my $enable_metadata = $opts{enable_metadata}       // 0;
+    my $enable_offsets  = $opts{enable_offsets}        // 0;
 
     my $callback_sub = $ffi->closure(sub {
         my ($context, $message, $message_data, $user_data) = @_;
@@ -323,91 +366,124 @@ sub scan_buffer {
             eval {
                 return unless $message_data;
 
-                my $found = 0;
+                my $rule_name = _extract_rule_name($message_data);
+                return unless $rule_name;
 
-                OFFSET_LOOP: for (my $offset = 8; $offset < 256 && !$found; $offset += 8) {
-                    my $rule_name;
-                    eval {
-                        my $identifier_field_addr = $message_data + $offset;
-                        my $ptr_bytes = $ffi->cast('opaque', 'string(8)', $identifier_field_addr);
-                        my $name_ptr_value = unpack('Q', $ptr_bytes);
+                # Extract metadata only if enabled
+                my $metadata;
+                if ($enable_metadata) {
+                    $metadata = eval { _extract_metadata_with_records($message_data, 1) };
+                    $metadata = undef if $@;
+                }
 
-                        return if $name_ptr_value < 4096;
-                        use bigint;
-                        my $max_addr = 140737488355327;  # 0x7fffffffffff
-                        no bigint;
-                        return if $name_ptr_value > $max_addr;
+                # Always emit rule_match event
+                my $rule_event = YaraFFI::Event->new(
+                    event    => 'rule_match',
+                    rule     => $rule_name,
+                    metadata => $metadata,
+                );
+                push @events, $rule_event;
 
-                        $rule_name = $ffi->cast('opaque', 'string', $name_ptr_value);
-                    };
+                # Call callback immediately for rule_match
+                if (defined $callback && ref $callback eq 'CODE') {
+                    eval { $callback->($rule_event) };
+                }
 
-                    if (!$@ && defined $rule_name && $rule_name =~ /^[a-zA-Z_][a-zA-Z0-9_]*$/) {
+                # Emit string_match events if enabled
+                if ($emit_strings) {
+                    my @string_events;
 
-                        # Extract metadata only if enabled (try record-based approach first)
-                        my $metadata;
-                        if ($enable_metadata) {
-                            $metadata = eval { _extract_metadata_with_records($message_data, 1) };
-                            $metadata = undef if $@;
-                        }
+                    # Try to extract detailed string matches if enabled
+                    if ($enable_offsets) {
+                        my $strings = eval { _extract_string_matches_with_records($message_data, 1) };
 
-                        # Always emit rule_match event
-                        my $rule_event = YaraFFI::Event->new(
-                            event    => 'rule_match',
-                            rule     => $rule_name,
-                            metadata => $metadata,
-                        );
-                        push @events, $rule_event;
-
-                        # Call callback immediately for rule_match
-                        if (defined $callback && ref $callback eq 'CODE') {
-                            eval { $callback->($rule_event) };
-                        }
-
-                        # Emit string_match events if enabled
-                        if ($emit_strings) {
-                            my @string_events;
-
-                            # Try to extract detailed string matches if enabled (record-based)
-                            if ($enable_offsets) {
-                                my $strings = eval { _extract_string_matches_with_records($message_data, 1) };
-
-                                if (!$@ && $strings && ref $strings eq 'ARRAY' && @$strings) {
-                                    for my $string (@$strings) {
-                                        push @string_events, YaraFFI::Event->new(
-                                            event     => 'string_match',
-                                            rule      => $rule_name,
-                                            string_id => $string->{id},
-                                            offsets   => $string->{offsets},
-                                        );
-                                    }
-                                }
-                            }
-
-                            # If no strings extracted or feature disabled, emit generic event
-                            if (@string_events == 0) {
+                        if (!$@ && $strings && ref $strings eq 'ARRAY' && @$strings) {
+                            for my $string (@$strings) {
                                 push @string_events, YaraFFI::Event->new(
                                     event     => 'string_match',
                                     rule      => $rule_name,
-                                    string_id => '$',
-                                    offsets   => [],
+                                    string_id => $string->{id},
+                                    offsets   => $string->{offsets},
                                 );
                             }
-
-                            # Emit all string match events
-                            for my $string_event (@string_events) {
-                                push @events, $string_event;
-                                if (defined $callback && ref $callback eq 'CODE') {
-                                    eval { $callback->($string_event) };
-                                }
-                            }
                         }
+                    }
 
-                        $found = 1;
-                        last OFFSET_LOOP;
+                    # If no strings extracted or feature disabled, emit generic event
+                    if (@string_events == 0) {
+                        push @string_events, YaraFFI::Event->new(
+                            event     => 'string_match',
+                            rule      => $rule_name,
+                            string_id => '$',
+                            offsets   => [],
+                        );
+                    }
+
+                    # Emit all string match events
+                    for my $string_event (@string_events) {
+                        push @events, $string_event;
+                        if (defined $callback && ref $callback eq 'CODE') {
+                            eval { $callback->($string_event) };
+                        }
                     }
                 }
             };
-            # Silently ignore callback processing errors to avoid breaking the scan
+        }
+        elsif ($message == CALLBACK_MSG_RULE_NOT_MATCHING && $emit_not_match) {
+            eval {
+                return unless $message_data;
+
+                my $rule_name = _extract_rule_name($message_data);
+                return unless $rule_name;
+
+                my $event = YaraFFI::Event->new(
+                    event => 'rule_not_match',
+                    rule  => $rule_name,
+                );
+                push @events, $event;
+
+                if (defined $callback && ref $callback eq 'CODE') {
+                    eval { $callback->($event) };
+                }
+            };
+        }
+        elsif ($message == CALLBACK_MSG_IMPORT_MODULE && $emit_import) {
+            eval {
+                return unless $message_data;
+
+                # Try to extract module name from message_data
+                my $module_name;
+                eval {
+                    # message_data should point to module name string
+                    if ($message_data > 4096) {
+                        $module_name = $ffi->cast('opaque', 'string', $message_data);
+                    }
+                };
+
+                if ($module_name && $module_name =~ /^[a-zA-Z_][a-zA-Z0-9_]*$/) {
+                    my $event = YaraFFI::Event->new(
+                        event       => 'import_module',
+                        module_name => $module_name,
+                    );
+                    push @events, $event;
+
+                    if (defined $callback && ref $callback eq 'CODE') {
+                        eval { $callback->($event) };
+                    }
+                }
+            };
+        }
+        elsif ($message == CALLBACK_MSG_SCAN_FINISHED && $emit_finished) {
+            eval {
+                my $event = YaraFFI::Event->new(
+                    event => 'scan_finished',
+                );
+                push @events, $event;
+
+                if (defined $callback && ref $callback eq 'CODE') {
+                    eval { $callback->($event) };
+                }
+            };
         }
 
         return CALLBACK_CONTINUE;
@@ -427,13 +503,13 @@ sub DESTROY {
 
 =head2 new
 
-Creates a new YaraFFI instance.
+Creates a new C<YaraFFI> instance.
 
     my $yara = YaraFFI->new();
 
 =head2 compile($rules)
 
-Compiles YARA rules from a string. Returns 1 on success, 0 on failure.
+Compiles C<YARA> rules from a string. Returns C<1> on success, C<0> on failure.
 
     my $rules = '...';
     $yara->compile($rules) or die "Failed to compile";
@@ -444,54 +520,79 @@ Scans a buffer/string for matches.
 
     $yara->scan_buffer($data, sub {
         my ($event) = @_;
-        print "Matched: $event->{rule}\n";
+        print "Event: $event->{event}\n";
+        print "Matched: $event->{rule}\n" if $event->{rule};
     });
 
 Options:
 
 =over 4
 
-=item * emit_string_events - Whether to emit string_match events (default: 1)
+=item * C<emit_string_events>    - Whether to emit C<string_match> events (default: 1)
 
-=item * enable_metadata - Enable metadata extraction (default: 0, experimental)
+=item * C<emit_not_match_events> - Whether to emit C<rule_not_match> events (default: 0)
 
-=item * enable_offsets - Enable offset extraction (default: 0, experimental)
+=item * C<emit_import_events>    - Whether to emit C<import_module> events (default: 0)
+
+=item * C<emit_finished_events>  - Whether to emit C<scan_finished> event (default: 1)
+
+=item * C<enable_metadata>       - Enable metadata extraction (default: 0, experimental)
+
+=item * C<enable_offsets>        - Enable offset extraction (default: 0, experimental)
 
 =back
 
 =head2 scan_file($filename, $callback, %options)
 
-Scans a file for matches. Options are the same as scan_buffer.
+Scans a file for matches. Options are the same as C<scan_buffer>.
 
     $yara->scan_file('/path/to/file', sub {
         my ($event) = @_;
-        print "Matched: $event->{rule}\n";
+        print "Event: $event->{event}\n";
     });
+
+=head1 EVENT TYPES
+
+The callback receives event objects with the following types:
+
+=over 4
+
+=item * C<rule_match>     - A rule matched the scanned data
+
+=item * C<rule_not_match> - A rule did not match (disabled by default)
+
+=item * C<string_match>   - A string pattern matched (emitted after rule_match)
+
+=item * C<import_module>  - A YARA module was imported (disabled by default)
+
+=item * C<scan_finished>  - Scanning completed (enabled by default)
+
+=back
 
 =head1 EXPERIMENTAL FEATURES
 
 Metadata and offset extraction are considered experimental and disabled by default
-due to YARA version compatibility issues. Enable them at your own risk:
+due to C<YARA> version compatibility issues. Enable them at your own risk:
 
     $yara->scan_buffer($data, $callback,
         enable_metadata => 1,
         enable_offsets => 1
     );
 
-These features use FFI::Platypus::Record to safely access YARA internal structures,
-but structure layouts may vary between YARA versions.
+These features use C<FFI::Platypus::Record> to safely access C<YARA> internal structures,
+but structure layouts may vary between C<YARA> versions.
 
 =head1 DEPENDENCIES
 
 =over 4
 
-=item * FFI::Platypus 2.00 or higher
+=item * L<FFI::Platypus> 2.00 or higher
 
-=item * FFI::Platypus::Record (for metadata/offset features)
+=item * L<FFI::Platypus::Record> (for metadata/offset features)
 
-=item * File::Slurp
+=item * L<File::Slurp>
 
-=item * libyara.so (YARA library)
+=item * C<libyara.so> (YARA library)
 
 =back
 

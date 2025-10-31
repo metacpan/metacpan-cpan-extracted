@@ -1,5 +1,5 @@
 package Geo::Address::Formatter;
-$Geo::Address::Formatter::VERSION = '1.9988';
+$Geo::Address::Formatter::VERSION = '1.9989';
 # ABSTRACT: take structured address data and format it according to the various global/country rules
 
 use strict;
@@ -193,6 +193,13 @@ sub format_address {
     }
 
     # 2. deal with the options
+
+    foreach (grep { ! /^[a-z0-9_]+$/ } keys %$rh_components) {
+        if ($debug){
+            say STDERR "Skipping compontent $_";
+        }
+        delete $rh_components->{$_};
+    }
 
     # 2a. which country format will we use?
     #     might have been specified in options
@@ -969,7 +976,7 @@ Geo::Address::Formatter - take structured address data and format it according t
 
 =head1 VERSION
 
-version 1.9988
+version 1.9989
 
 =head1 SYNOPSIS
 

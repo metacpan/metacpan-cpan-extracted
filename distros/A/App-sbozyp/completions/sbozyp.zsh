@@ -22,7 +22,7 @@ _sbozyp_command_prefix() {
 }
 
 _sbozyp_config_file() {
-    local config_file=$([[ -f $HOME/.sbozyp.conf ]] && printf '%s' "$HOME/.sbozyp.conf" || printf '%s' /etc/sbozyp/sbozyp.conf)
+    local config_file=/etc/sbozyp/sbozyp.conf
     if [[ $(_sbozyp_command_prefix) =~ -F[[:space:]](.+) ]]; then
         config_file=$(eval printf '%s' "${match[1]}")
     fi

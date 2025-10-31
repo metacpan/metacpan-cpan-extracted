@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 22 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 24 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Blockchain/Ethereum.pm',
@@ -30,7 +30,9 @@ my @module_files = (
     'Blockchain/Ethereum/RLP.pm',
     'Blockchain/Ethereum/Transaction.pm',
     'Blockchain/Ethereum/Transaction/EIP1559.pm',
-    'Blockchain/Ethereum/Transaction/Legacy.pm'
+    'Blockchain/Ethereum/Transaction/EIP2930.pm',
+    'Blockchain/Ethereum/Transaction/Legacy.pm',
+    'Blockchain/Ethereum/Utils.pm'
 );
 
 

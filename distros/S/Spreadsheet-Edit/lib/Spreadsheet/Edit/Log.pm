@@ -11,8 +11,8 @@ package Spreadsheet::Edit::Log;
 
 # Allow "use <thismodule. VERSION ..." in development sandbox to not bomb
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 1999.999; }
-our $VERSION = '1000.027'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2025-10-13'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1000.028'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2025-10-30'; # DATE from Dist::Zilla::Plugin::OurDate
 
 use Carp;
 use Scalar::Util qw/reftype refaddr blessed weaken openhandle/;
@@ -41,6 +41,38 @@ sub set_logdest(*) {
 
 my $default_pfx = '$lno';
 
+our %opts = (
+  color => 1,
+);
+
+use constant TYPE_ERROR => "error";
+use constant TYPE_WARN  => "warn";
+use constant TYPE_NORM  => "norm";
+sub _colorize($$) {
+  my ($str, $type) = @_;
+  state $initialized;
+  unless ($initialized) {
+    $opts{color} = 0 unless (
+      ($ENV{TERM}//"") =~ /xterm|screen|vt100|ansi/i
+        &&
+      (open(my $fh, ">/dev/tty") || open(my $fh2, "CON"))
+    );
+    $initialized = 1;
+  }
+  return $str unless $opts{color};
+  state $color_end = "\033[0m";
+  my $color_start;
+  if    ($type eq TYPE_NORM)  { }
+  elsif ($type eq TYPE_WARN ) { $color_start = "\033[93m" }   # yellow
+  elsif ($type eq TYPE_ERROR) { $color_start = "\033[1;31m" } # bold red
+  else { confess dvis '$type $str' }
+  if (defined $color_start) {
+    my @chunks = map{ $color_start.$_.$color_end } split /\R/, $str, -1;
+    $str = join "\n", @chunks;
+  }
+  $str;
+}
+
 sub import {
   my $class = shift;
   my $pkg = caller;
@@ -61,6 +93,12 @@ sub import {
     }
     if (/:btw=(.*)\z/s) {
       _genbtw_funcs($pkg,$1);
+    }
+    elsif (/^:(no)?(\w+)\z/ && exists($opts{$2})) {
+      $opts{$2} = $1 ? 0 : 1;
+    }
+    elsif (/^:(\w+)=(.*)\z/ && exists($opts{$1})) {
+      $opts{$1} = $2;
     }
     else {
       push @remaining_args, $_;
@@ -115,6 +153,7 @@ sub _btwTN($$@) {
     foreach (2..$N) { $pfx .= "«" }
   }
   my $fh = _getoptions()->{logdest};
+$_ = _colorize($_, TYPE_WARN);
   print $fh "${pfx}: $_\n";
 }#_btwTN
 
@@ -137,15 +176,17 @@ BEGIN {
 }
 
 sub oops(@) {
+  my @args = @_;
+  foreach (@args) { $_ = _colorize($_, TYPE_ERROR); }
   my $pkg = caller;
   my $pfx = "\nOOPS";
   #$pfx .= " in pkg '$pkg'" unless $pkg eq 'main';
   $pfx .= ": ";
   if (defined(&Spreadsheet::Edit::logmsg)) {
     # Show current apply sheet & row if any.
-    @_=($pfx, &Spreadsheet::Edit::logmsg(@_));
+    @_=($pfx, &Spreadsheet::Edit::logmsg(@args));
   } else {
-    @_=($pfx, @_);
+    @_=($pfx, @args);
   }
   push @_,"\n" unless $_[-1] =~ /\R\z/;
   STDOUT->flush if openhandle(*STDOUT);
@@ -572,13 +613,18 @@ C<btwbt> displays an inline mini traceback before the message, like this:
 By default, only the line numbers of calling locations are shown if the call
 was from package 'main' or Spreadsheet::Edit::Log was imported by only a single module.
 
-If a tag B<:btw=PFX> is imported then customized C<btw()>, C<btwN()> and C<btwbt()>
-functions will be imported which prefix line numbers with an arbitrary prefix B<PFX>,
-which may contain I<$lno> I<$path> I<$fname> I<$package> I<$pkg> or I<$pkg_space>
+The import tag B<:btw=PFX> imports customized
+C<btw()>, C<btwN()> and C<btwbt()> functions which prefix
+messages with an arbitrary prefix B<PFX>
+which may
+contain I<$lno> I<$path> I<$fname> I<$package> I<$pkg> or I<$pkg_space>
 to interpolate respectively
 the calling line number, file path, file basename,
 package name, S<abbreviated package name (*:: removed).>
 or abbrev. package name followed by a space, or nothing if the package is "main".
+
+Import tag B<:nocolor> prevents colorizing.
+By default C<btw> and C<oops> messages are colorized if the terminal allows.
 
 =head2 oops STRING,STRING,...
 

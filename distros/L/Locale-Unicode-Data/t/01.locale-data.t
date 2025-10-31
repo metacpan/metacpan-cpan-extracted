@@ -20,7 +20,7 @@ BEGIN
         plan skip_all => 'Weird memory bug out of my control on OpenBSD for v5.12.0 to 5';
     }
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
-    our $CLDR_VERSION = '47';
+    our $CLDR_VERSION = '48';
 };
 
 BEGIN
@@ -1984,7 +1984,7 @@ my $tests =
                 gdp                 => 3764000000000,
                 literacy_percent    => 99,
                 population          => 68374600,
-                languages           => ["fr","en","es","de","oc","it","pt","pcd","gsw","br","co","hnj","ca","nl","eu","frp","ia"],
+                languages           => ["fr","en","es","de","oc","it","pt","pcd","gsw","br","co","hnj","ca","nl","eu","frp","mww","ia"],
                 contains            => undef,
                 currency            => 'EUR',
                 calendars           => undef,
@@ -2142,7 +2142,7 @@ my $tests =
             {
                 locale      => 'en',
                 timezone    => 'Etc/Unknown',
-                city        => 'Unknown City',
+                city        => 'Unknown Location',
             },
         },
         {

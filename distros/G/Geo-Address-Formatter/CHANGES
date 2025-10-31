@@ -1,5 +1,9 @@
 Revision history for Perl module Geo::Address::Formatter.
 
+1.9989 2025-10-31
+      - drop components with special characters, test
+      - newest address-formatting
+
 1.9988 2025-09-24
       - make apply_replacements regex case insensitive
       - newest address-formatting

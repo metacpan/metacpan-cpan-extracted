@@ -1,5 +1,11 @@
 Revision history for App-git_log_ch_usrdata
 
+0.03    2025/10/30
+
+      - Corrected POD.
+      - Corrected CONTRIBUTING.md and SECURITY.md.
+      - Reworked Makefile.PL.
+
 0.02    2025/08/13
 
       - Added CONTRIBUTING.md and SECURITY.md.

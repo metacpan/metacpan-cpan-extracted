@@ -1,11 +1,14 @@
 package App::FindUtils;
 
-our $DATE = '2019-12-04'; # DATE
-our $VERSION = '0.003'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
+use Log::ger;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2025-10-31'; # DATE
+our $DIST = 'App-FindUtils'; # DIST
+our $VERSION = '0.004'; # VERSION
 
 our %SPEC;
 
@@ -31,6 +34,15 @@ $SPEC{find_duplicate_filenames} = {
             cmdline_aliases => {l=>{}},
         },
     },
+    examples => [
+        {
+            summary => "Find duplicate filenames under the current directory",
+            test => 0,
+            'x.doc.show_result' => 0,
+            src => '[[prog]]',
+            src_plang => 'bash',
+        },
+    ],
 };
 sub find_duplicate_filenames {
     require Cwd;
@@ -46,6 +58,7 @@ sub find_duplicate_filenames {
             no warnings 'once'; # for $File::find::dir
             # XXX inefficient
             my $realpath = Cwd::realpath($_);
+            log_debug "Found path $realpath";
             $files{$_}{$realpath}++;
         },
         @{ $args{dirs} }
@@ -54,6 +67,7 @@ sub find_duplicate_filenames {
     my @res;
     for my $file (sort keys %files) {
         next unless keys(%{$files{$file}}) > 1;
+        log_info "%s is a DUPLICATE name (found in %d paths)", $file, scalar(keys %{$files{$file}});
         if ($args{detail}) {
             for my $path (sort keys %{$files{$file}}) {
                 push @res, {name=>$file, path=>$path};
@@ -80,7 +94,7 @@ App::FindUtils - Utilities related to finding files
 
 =head1 VERSION
 
-This document describes version 0.003 of App::FindUtils (from Perl distribution App-FindUtils), released on 2019-12-04.
+This document describes version 0.004 of App::FindUtils (from Perl distribution App-FindUtils), released on 2025-10-31.
 
 =head1 DESCRIPTION
 
@@ -99,9 +113,9 @@ This distributions provides the following command-line utilities:
 
 Usage:
 
- find_duplicate_filenames(%args) -> [status, msg, payload, meta]
+ find_duplicate_filenames(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-Search directories recursively and find files/dirs with duplicate names.
+Search directories recursively and find filesE<sol>dirs with duplicate names.
 
 This function is not exported.
 
@@ -115,16 +129,19 @@ Instead of just listing duplicate names, return all the location of duplicates.
 
 =item * B<dirs> => I<array[dirname]> (default: ["."])
 
+(No description)
+
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -136,14 +153,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-FindUt
 
 Source repository is at L<https://github.com/perlancar/perl-App-FindUtils>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-FindUtils>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<uniq-files> from L<App::UniqFiles>
@@ -152,11 +161,37 @@ L<uniq-files> from L<App::UniqFiles>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-FindUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

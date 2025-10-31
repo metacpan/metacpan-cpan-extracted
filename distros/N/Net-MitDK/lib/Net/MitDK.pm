@@ -2,7 +2,7 @@ package Net::MitDK;
 
 use strict;
 use warnings;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 use Encode qw(encode decode);
 use DateTime;
 use MIME::Entity;

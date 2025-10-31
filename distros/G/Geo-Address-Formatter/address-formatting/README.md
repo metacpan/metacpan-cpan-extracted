@@ -60,13 +60,19 @@ There are open-source implementations in
   * [Kotlin](https://github.com/bettermile/address-formatter-kotlin)
   * [Perl](https://metacpan.org/release/Geo-Address-Formatter)
   * [PHP](https://github.com/predicthq/address-formatter-php)
+  * [PowerShell](https://github.com/GruberMarkus/AddressFormatter) cross-platform
   * [Python (no longer maintained)](https://github.com/pudo/addressformatting/tree/master)
   * [Ruby](https://github.com/mirubiri/address_composer)
   * [Rust (no longer maintained)](https://github.com/antoine-de/address-formatter-rs)
   * [Scala](https://github.com/ben-willis/address-formatter)
 
 We would love more language implementations. The more people who use the templates, the more likely bugs will be reported. 
-If you write a processor, please submit a pull request adding it to the list. Thanks. 
+
+If you write a processor, please submit a pull request adding your processor to the list.
+
+One key point: please include this repo as a [git submodule](https://git-scm.com/book/en/v2/Git-Tools-Submodules), so we all use the same templates/configuration and don't get out of sync. if you are unfamiliar with git submodules, please have a look at [how we do it in the Perl parser](https://github.com/OpenCageData/perl-Geo-Address-Formatter/blob/master/README.md#installation).
+
+Thanks!
 
 ### International coverage
 

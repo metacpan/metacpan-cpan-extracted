@@ -1,3 +1,15 @@
+commit ffe396d14fcecc26063cdfee57a56024c54e8093
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Thu Oct 30 21:15:53 2025 +1030
+
+    VERSION increment: 2.019
+
+commit 21062fe131dbb57cd08d477cf05840b0a4684ab6
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Thu Oct 30 21:15:30 2025 +1030
+
+    Fix test failure, minor other fixes, introduce displaty attr to <htmx> element
+
 commit bf31630aa9466cda13cd7bfc05e11a7d6f5b6da0
 Author: Andrew Speer <andrew.speer@isolutions.com.au>
 Date:   Wed Oct 29 22:54:02 2025 +1030

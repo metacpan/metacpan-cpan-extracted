@@ -4,7 +4,7 @@ Params::Validate::Strict - Validates a set of parameters against a schema
 
 # VERSION
 
-Version 0.22
+Version 0.23
 
 # SYNOPSIS
 
@@ -132,7 +132,7 @@ It takes three optional arguments:
           }
         };
 
-    Custom types work seamlessly with nested schemas, optional parameters, and all other validation features.
+    Custom types work seamlessly with nested schema, optional parameters, and all other validation features.
 
 The schema can define the following rules for each parameter:
 
@@ -305,6 +305,13 @@ The schema can define the following rules for each parameter:
 
     A regular expression that the parameter value must not match.
     Checks all members of arrayrefs.
+
+- `position`
+
+    For routines and methods that take positional args,
+    this integer value defines which position the argument will be in.
+    If this is set for all arguments,
+    `validate_strict` will return a reference to an array, rather than a reference to a hash.
 
 - `callback`
 
@@ -502,7 +509,7 @@ The schema can define the following rules for each parameter:
     Note that the transformed value is what gets returned in the validated result and is what
     subsequent validation rules will check against. If a transformation might fail, ensure it
     handles edge cases appropriately.
-    It is the responsibilty of the transformer to ensure that the type of the returned value is correct,
+    It is the responsibility of the transformer to ensure that the type of the returned value is correct,
     since that is what will be validated.
 
     Many validators also allow a code ref to be passed so that you can create your own, conditional validation rule, e.g.:

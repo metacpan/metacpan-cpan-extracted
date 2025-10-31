@@ -10,6 +10,7 @@ build_requires:
   Test::Fatal: '0'
   Test::Lib: '0'
   Test::More: '1.001005'
+  Test::Warn: '0'
   parent: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.76'
@@ -31,10 +32,10 @@ no_index:
 provides:
   Class::Enumeration:
     file: lib/Class/Enumeration.pm
-    version: v1.2.0
+    version: v1.3.0
   Class::Enumeration::Builder:
     file: lib/Class/Enumeration/Builder.pm
-    version: v1.2.0
+    version: v1.3.0
 requires:
   Scalar::Util: '0'
   Sub::Util: '1.40'
@@ -46,4 +47,4 @@ requires:
 resources:
   bugtracker: https://github.com/XSven/Class-Enumeration/issues
   repository: https://github.com/XSven/Class-Enumeration.git
-version: v1.2.0
+version: v1.3.0

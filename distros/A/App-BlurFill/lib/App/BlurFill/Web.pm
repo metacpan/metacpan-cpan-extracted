@@ -78,7 +78,7 @@ use v5.40;
 package App::BlurFill::Web;
 use Dancer2;
 
-our $VERSION = '0.0.4';
+our $VERSION = '0.0.5';
 
 use File::Temp qw(tempfile tempdir);
 use File::Spec;
@@ -229,6 +229,20 @@ sub _get_css {
       color: #333;
     }
 
+    .credits {
+      padding-top: 1em;
+      color: #999;
+      text-align: center;
+    }
+
+    .credits a:link {
+      color: #c9c;
+    }
+
+    .credits a:visited {
+      color: #969;
+    }
+
     .result-image {
       margin: 24px 0;
       text-align: center;
@@ -287,7 +301,7 @@ get '/' => sub {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BlurFill - Create Blurred Background Images</title>
+  <title>BlurFill - Perfect crops, zero letterboxing: smart blur-fill from your source image.</title>
   <style>
 $css
   </style>
@@ -295,7 +309,7 @@ $css
 <body>
   <div class="container">
     <h1>BlurFill</h1>
-    <p class="subtitle">Create beautiful blurred background images for your content</p>
+    <p class="subtitle">Perfect crops, zero letterboxing: smart blur-fill from your source image.</p>
     
     <form action="/blur" method="POST" enctype="multipart/form-data">
       <div class="form-group">
@@ -317,15 +331,20 @@ $css
         </div>
       </div>
       
-      <button type="submit">Generate Blurred Image</button>
+      <button type="submit">Generate resized image</button>
     </form>
     
     <div class="info">
       <p><strong>How it works:</strong></p>
       <p>1. Upload your image (JPEG, PNG, or GIF)</p>
       <p>2. Set your desired output dimensions</p>
-      <p>3. Click "Generate" to create a blurred background with your image centered</p>
+      <p>3. Click "Generate" to create a resized image with your source image centered and filled</p>
       <p>4. Your processed image will be displayed with a download link</p>
+    </div>
+    <div class="credits">
+      Version $VERSION /
+      Made by <a href="https://links.davecross.co.uk/">Dave Cross</a> /
+      Code <a href="https://github.com/davorg-cpan/app-blurfill">on GitHub</a>
     </div>
   </div>
 </body>
@@ -396,25 +415,25 @@ $css
 <body>
   <div class="container">
     <h1>BlurFill</h1>
-    <p class="subtitle">Your blurred image is ready!</p>
+    <p class="subtitle">Your resized image is ready!</p>
     
     <div class="success-message">
       <strong>✓ Success!</strong> Your image has been processed successfully.
     </div>
     
     <div class="result-image">
-      <img src="/download/$out_name" alt="Blurred image preview">
+      <img src="/download/$out_name" alt="Resized image preview">
     </div>
     
     <div class="action-buttons">
-      <a href="/download/$out_name" class="button" download>Download Image</a>
-      <a href="/" class="button button-secondary">Create Another</a>
+      <a href="/download/$out_name" class="button" download>Download image</a>
+      <a href="/" class="button button-secondary">Create another</a>
     </div>
     
     <div class="info">
       <p><strong>What's next?</strong></p>
-      <p>• Click "Download Image" to save your blurred background</p>
-      <p>• Click "Create Another" to process a new image</p>
+      <p>• Click "Download image" to save your resized background</p>
+      <p>• Click "Create another" to process a new image</p>
     </div>
   </div>
 </body>

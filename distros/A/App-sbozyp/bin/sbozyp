@@ -6,7 +6,7 @@ use v5.34.0; # The Perl version on Slackware 15.0 (sbozyp's min supported versio
 
 package Sbozyp;
 
-our $VERSION = '0.7.1';
+our $VERSION = '0.8.0';
 
 use Digest::MD5 qw();
 use File::Basename qw(basename dirname);
@@ -37,7 +37,7 @@ sub main {
         'F=s' => \my $opt_configfile,
         'R=s' => \my $opt_reponame,
         'S'   => \my $opt_sync,
-        'T'   => \my $opt_noinit
+        'T'   => \my $opt_noinitrepo
     );
     Getopt::Long::Configure('nopass_through');
     # determine the command main function
@@ -56,7 +56,7 @@ sub main {
     parse_config_file($opt_configfile); # mutates the global %CONFIG
     set_repo_name_or_die($opt_reponame // $CONFIG{REPO_PRIMARY});
     # initialize the environment
-    return if $opt_noinit and !repo_is_cloned();
+    return if $opt_noinitrepo and !repo_is_cloned();
     sbozyp_mkdir(repo_dir(), $CONFIG{TMPDIR});
     if ($opt_clone or !repo_is_cloned()) {
         i_am_root_or_die('need root to clone repo');
@@ -693,10 +693,10 @@ sub clone_repo {
 }
 
 sub sync_repo {
-    my $repo_dir= repo_dir();
+    my $repo_dir = repo_dir();
     if (repo_is_cloned()) {
         my $repo_git_branch = repo_git_branch();
-        sbozyp_system("git -C '$repo_dir' fetch 1>&2");
+        sbozyp_system("git -C '$repo_dir' fetch --verbose 1>&2");
         sbozyp_system("git -C '$repo_dir' reset --hard 'origin/$repo_git_branch' 1>&2");
     } else {
         sbozyp_die("cannot sync non-existent git repository at '$repo_dir'");
@@ -709,9 +709,7 @@ sub sync_repo {
 
 sub parse_config_file {
     my ($config_file) = @_;
-    if (!defined $config_file) {
-        $config_file = -f "$ENV{HOME}/.sbozyp.conf" ? "$ENV{HOME}/.sbozyp.conf" : '/etc/sbozyp/sbozyp.conf';
-    }
+    $config_file = '/etc/sbozyp/sbozyp.conf' unless defined $config_file;
     my $fh = sbozyp_open('<', $config_file);
     while (<$fh>) {
         chomp;
@@ -976,9 +974,8 @@ Examples:
 
 =head1 CONFIGURATION
 
-Sbozyp is configured via the C</etc/sbozyp/sbozyp.conf> file unless
-C<~/.sbozyp.conf> is present. An alternate configuration file can be used with
-the C<-F> option.
+Sbozyp is configured via the C</etc/sbozyp/sbozyp.conf> file. An alternative
+configuration file can be specified with the C<-F> option.
 
 =head2 REPOSITORY DEFINITIONS
 

@@ -6,7 +6,7 @@ use warnings;
 
 # ABSTRACT: A Ethereum toolkit in Perl
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.019';          # VERSION
+our $VERSION   = '0.020';          # VERSION
 
 1;
 
@@ -22,7 +22,7 @@ Blockchain::Ethereum - A Ethereum toolkit in Perl
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 DESCRIPTION
 
@@ -67,30 +67,6 @@ Or install manually:
   git clone https://github.com/refeco/perl-Ethereum-Toolkit.git
   cd perl-Ethereum-Toolkit
   dzil install
-
-=head1 MAINTENANCE STATUS
-
-This toolkit is feature-complete and currently not under active development.
-
-However:
-
-=over 4
-
-=item *
-
-Pull requests are welcome
-
-=item *
-
-Bug reports will be reviewed
-
-=item *
-
-I may occasionally address issues
-
-=back
-
-If you use this project and want to contribute improvements or features, feel free to open a pull request.
 
 =head1 LICENSE
 

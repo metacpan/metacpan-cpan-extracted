@@ -1,5 +1,8 @@
 Revision history for YaraFFI
 
+0.07  2025-10-30
+      - Implemented: NOT_MATCH, IMPORT and FINISHED events.
+
 0.06  2025-10-29
       - Tidied up pod a bit.
 

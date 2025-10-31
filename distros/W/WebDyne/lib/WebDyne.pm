@@ -58,7 +58,7 @@ use Exporter qw(import);
 
 #  Version information
 #
-$VERSION='2.018';
+$VERSION='2.019';
 chomp($VERSION_GIT_REF=do { local (@ARGV, $/) = ($_=__FILE__.'.tmp'); <> if -f $_ });
 
 
@@ -2427,7 +2427,7 @@ sub htmx {
     #  Called when we encounter a <htmx> tag
     #
     my ($self, $data_ar, $attr_hr)=@_;
-    debug("$self rendering htmx tag, data_ar: $data_ar, attr_hr: %s", $attr_hr);
+    debug("$self rendering htmx tag, data_ar: $data_ar, attr_hr: %s", Dumper($attr_hr));
     
     
     #  Get the request headers to look for a 'HX-Request' flag
@@ -2437,6 +2437,17 @@ sub htmx {
     my $hx_request=$r->headers_in->{'hx-request'};
     debug("hx_request header: $hx_request");
     
+    
+    #  Check if we want to fire on match
+    #
+    if (exists ($attr_hr->{'display'})) {
+        unless ($attr_hr->{'display'}) {
+            #  Defined but no match. Bail
+            #
+            return \undef;
+        }
+    }
+
 
     #  Check we have a handler
     #

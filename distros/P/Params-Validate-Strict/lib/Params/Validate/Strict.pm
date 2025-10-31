@@ -18,11 +18,11 @@ Params::Validate::Strict - Validates a set of parameters against a schema
 
 =head1 VERSION
 
-Version 0.22
+Version 0.23
 
 =cut
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 =head1 SYNOPSIS
 
@@ -338,6 +338,13 @@ Checks all members of arrayrefs.
 A regular expression that the parameter value must not match.
 Checks all members of arrayrefs.
 
+=item * C<position>
+
+For routines and methods that take positional args,
+this integer value defines which position the argument will be in.
+If this is set for all arguments,
+C<validate_strict> will return a reference to an array, rather than a reference to a hash.
+
 =item * C<callback>
 
 A code reference to a subroutine that performs custom validation logic.
@@ -534,7 +541,7 @@ Transformations can also be defined in custom types for reusability:
 Note that the transformed value is what gets returned in the validated result and is what
 subsequent validation rules will check against. If a transformation might fail, ensure it
 handles edge cases appropriately.
-It is the responsibilty of the transformer to ensure that the type of the returned value is correct,
+It is the responsibility of the transformer to ensure that the type of the returned value is correct,
 since that is what will be validated.
 
 Many validators also allow a code ref to be passed so that you can create your own, conditional validation rule, e.g.:
@@ -729,25 +736,51 @@ sub validate_strict
 
 	if(exists($params->{'args'}) && (!defined($args))) {
 		$args = {};
-	} elsif(ref($args) ne 'HASH') {
-		_error($logger, 'validate_strict: args must be a hash reference');
+	} elsif((ref($args) ne 'HASH') && (ref($args) ne 'ARRAY')) {
+		_error($logger, 'validate_strict: args must be a hash or array reference');
 	}
 
-	foreach my $key (keys %{$args}) {
-		if(!exists($schema->{$key})) {
-			if($unknown_parameter_handler eq 'die') {
-				_error($logger, "::validate_strict: Unknown parameter '$key'");
-			} elsif($unknown_parameter_handler eq 'warn') {
-				_warn($logger, "::validate_strict: Unknown parameter '$key'");
-				next;
-			} elsif($unknown_parameter_handler eq 'ignore') {
-				if($logger) {
-					$logger->debug(__PACKAGE__ . "::validate_strict: Unknown parameter '$key'");
+	if(ref($args) eq 'HASH') {
+		# Named args
+		foreach my $key (keys %{$args}) {
+			if(!exists($schema->{$key})) {
+				if($unknown_parameter_handler eq 'die') {
+					_error($logger, "::validate_strict: Unknown parameter '$key'");
+				} elsif($unknown_parameter_handler eq 'warn') {
+					_warn($logger, "::validate_strict: Unknown parameter '$key'");
+					next;
+				} elsif($unknown_parameter_handler eq 'ignore') {
+					if($logger) {
+						$logger->debug(__PACKAGE__ . "::validate_strict: Unknown parameter '$key'");
+					}
+					next;
+				} else {
+					_error($logger, "::validate_strict: '$unknown_parameter_handler' unknown_parameter_handler must be one of die, warn, ignore");
 				}
-				next;
-			} else {
-				_error($logger, "::validate_strict: '$unknown_parameter_handler' unknown_parameter_handler must be one of die, warn, ignore");
 			}
+		}
+	}
+
+	# Find out if this routine takes positional arguments
+	my $are_positional_args = -1;
+	foreach my $key (keys %{$schema}) {
+		if(defined(my $rules = $schema->{$key})) {
+			if(ref($rules) eq 'HASH') {
+				if(!defined($rules->{'position'})) {
+					if($are_positional_args == 1) {
+						_error($logger, "::validate_strict: $key is missing position value");
+					}
+					$are_positional_args = 0;
+					last;
+				}
+				$are_positional_args = 1;
+			} else {
+				$are_positional_args = 0;
+				last;
+			}
+		} else {
+			$are_positional_args = 0;
+			last;
 		}
 	}
 
@@ -755,7 +788,7 @@ sub validate_strict
 	my %invalid_args;
 	foreach my $key (keys %{$schema}) {
 		my $rules = $schema->{$key};
-		my $value = $args->{$key};
+		my $value = ($are_positional_args == 1) ? @{$args}[$rules->{'position'}] : $args->{$key};
 
 		if(!defined($rules)) {	# Allow anything
 			$validated_args{$key} = $value;
@@ -788,7 +821,24 @@ sub validate_strict
 
 		# Handle optional parameters
 		if((ref($rules) eq 'HASH') && $is_optional) {
-			if(!exists($args->{$key})) {
+			my $look_for_default = 0;
+			if($are_positional_args == 1) {
+				if(!defined(@{$args}[$rules->{'position'}])) {
+					$look_for_default = 1;
+				}
+			} else {
+				if(!exists($args->{$key})) {
+					$look_for_default = 1;
+				}
+			}
+			if($look_for_default) {
+				if($are_positional_args == 1) {
+					if(scalar(@{$args}) < $rules->{'position'}) {
+						# arg array is too short, so it must be missing
+						_error($logger, "validate_strict: Required parameter '$key' is missing");
+						next;
+					}
+				}
 				if(exists($rules->{'default'})) {
 					# Populate missing optional parameters with the specified output values
 					$validated_args{$key} = $rules->{'default'};
@@ -802,7 +852,7 @@ sub validate_strict
 					next;	# optional and missing
 				}
 			}
-		} elsif(!exists($args->{$key})) {
+		} elsif((ref($args) eq 'HASH') && !exists($args->{$key})) {
 			# The parameter is required
 			_error($logger, "validate_strict: Required parameter '$key' is missing");
 		}
@@ -1005,13 +1055,23 @@ sub validate_strict
 						if(!defined($value)) {
 							next;	# Skip if hash is undefined
 						}
-						if($value < $rule_value) {
+						if(Scalar::Util::looks_like_number($value)) {
+							if($value < $rule_value) {
+								if($rules->{'error_message'}) {
+									_error($logger, $rules->{'error_message'});
+								} else {
+									_error($logger, "validate_strict: Parameter '$key' ($value) must be at least $rule_value");
+								}
+								$invalid_args{$key} = 1;
+								next;
+							}
+						} else {
 							if($rules->{'error_message'}) {
 								_error($logger, $rules->{'error_message'});
 							} else {
-								_error($logger, "validate_strict: Parameter '$key' ($value) must be at least $rule_value");
+								_error($logger, "validate_strict: Parameter '$key' ($value) must be a number");
 							}
-							$invalid_args{$key} = 1;
+							next;
 						}
 					} else {
 						_error($logger, "validate_strict: Parameter '$key' of type '$type' has meaningless min value $rule_value");
@@ -1088,6 +1148,7 @@ sub validate_strict
 							} else {
 								_error($logger, "validate_strict: Parameter '$key' ($value) must be a number");
 							}
+							next;
 						}
 					} else {
 						_error($logger, "validate_strict: Parameter '$key' of type '$type' has meaningless max value $rule_value");
@@ -1352,8 +1413,15 @@ sub validate_strict
 							$invalid_args{$key} = 1;
 						}
 					} else {
-						# _error($logger, "validate_strict: Parameter '$key': 'validate' only supports coderef, not " . ref($value));
-						_error($logger, "validate_strict: Parameter '$key': 'validate' only supports coderef, not $value");
+						# _error($logger, "validate_strict: Parameter '$key': 'validate' only supports coderef, not $value");
+						_error($logger, "validate_strict: Parameter '$key': 'validate' only supports coderef, not " . ref($rule_value) // $rule_value);
+					}
+				} elsif($rule_name eq 'position') {
+					if($rule_value =~ /\D/) {
+						_error($logger, "validate_strict: Parameter '$key': 'position' must be an integer");
+					}
+					if($rule_value < 0) {
+						_error($logger, "validate_strict: Parameter '$key': 'position' must be a positive integer, not $value");
 					}
 				} else {
 					_error($logger, "validate_strict: Unknown rule '$rule_name'");
@@ -1415,6 +1483,19 @@ sub validate_strict
 		delete $validated_args{$key};
 	}
 
+	if($are_positional_args == 1) {
+		my @rc;
+		foreach my $key (keys %{$schema}) {
+			if(my $value = delete $validated_args{$key}) {
+				my $position = $schema->{$key}->{'position'};
+				if(defined($rc[$position])) {
+					_error($logger, "validate_strict: $key: position $position appears twice");
+				}
+				$rc[$position] = $value;
+			}
+		}
+		return \@rc;
+	}
 	return \%validated_args;
 }
 

@@ -10,7 +10,8 @@ our @ISA = ('Outer');
 use Data::Dumper::Interp;
 use Spreadsheet::Edit::Log
   qw/fmt_call log_call nearest_call abbrev_call_fn_ln_subname/,
-  ':btw=$lno/$fname/$pkg/$package' ;
+  ':btw=$lno/$fname/$pkg/$package',
+  ':nocolor';
 
 sub new { my $class=shift; bless {color => $_[0]}, $class }
 sub get { my $self=shift; $self->{color} }
