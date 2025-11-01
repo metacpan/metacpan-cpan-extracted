@@ -424,7 +424,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-our $VERSION = '1.04';
+our $VERSION = '1.06';
 
 use Mojo::Base -base;
 use Mojo::Util qw/md5_sum decode encode steady_time deprecated/;
@@ -824,7 +824,7 @@ sub routes {
             $data{is_cached}= 1;
             $data{cached}   = steady_time();
             $data{cachekey} = $cachekey;
-            $data{expires}  = $now + $self->expiration,
+            $data{expires}  = $now + ($self->expiration // CACHE_EXPIRES),
             $self->cache->set($key, {%data});
         }
     }

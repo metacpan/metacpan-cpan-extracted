@@ -30,7 +30,7 @@ use Time::HiRes ();
 use Encode 'encode';
 use Text::ParseWords 'shellwords';
 
-our $VERSION = '0.74';
+our $VERSION = '0.75';
 our @CARP_NOT;
 
 # We don't yet inherit from Moo 2, so patch up things manually
@@ -2842,11 +2842,17 @@ sub httpMessageFromEvents( $self, $frameId, $events, $url ) {
 
     } else {
         require Data::Dumper;
-        warn Data::Dumper::Dumper( $events );
-        die join " ", "Chrome behaviour problem: Didn't see a",
+        $response = HTTP::Response->new(
+            599, # internal error
+            'Cannot synthesize response',
+            HTTP::Headers->new(),
+            join "\n",
+                Data::Dumper::Dumper( $events ),
+                join " ", "Chrome behaviour problem: Didn't see a",
                       "'Network.responseReceived' event for frameId $frameId,",
                       "requestId $requestId, cannot synthesize response.",
-                      "I saw " . join ",", sort keys %events;
+                      "I saw " . join ",", sort keys %events
+        );
     };
     $response
 }
@@ -6861,7 +6867,7 @@ Joshua Pollack
 
 =head1 COPYRIGHT (c)
 
-Copyright 2010-2024 by Max Maischein C<corion@cpan.org>.
+Copyright 2010-2026 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

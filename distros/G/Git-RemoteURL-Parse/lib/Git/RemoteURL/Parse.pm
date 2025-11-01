@@ -7,7 +7,7 @@ use warnings;
 use Exporter 'import';
 our @EXPORT_OK = qw(parse_git_remote_url);
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub parse_git_remote_url {
     my ($url) = @_;
@@ -78,7 +78,7 @@ Git::RemoteURL::Parse - Parse and classify Git remote URLs (GitHub, GitLab)
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 

@@ -13,6 +13,8 @@ LICENSE
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
+META.json			Module JSON meta-data (added by MakeMaker)
+META.yml			Module YAML meta-data (added by MakeMaker)
 README.md
 SECURITY.md
 t/abs.t
@@ -121,5 +123,3 @@ t/values.t
 t/walk.t
 t/yaml_cli.t
 VISION.md
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

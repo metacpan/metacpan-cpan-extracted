@@ -261,6 +261,15 @@ Marks object as cached
 
 Returns user data as hash in short or full view
 
+=head2 uid
+
+    $uid = $user->uid;
+
+Returns the ID of the user.
+This method is an alias for calling $user->id without arguments
+
+Default: 0
+
 =head2 use_flags
 
     say "yes" if $user->use_flags;
@@ -388,6 +397,7 @@ sub to_hash {
         ) : (),
     );
 }
+sub uid { shift->id }
 sub use_flags {
     my $self = shift;
     my $flags = ($self->flags || 0) * 1;

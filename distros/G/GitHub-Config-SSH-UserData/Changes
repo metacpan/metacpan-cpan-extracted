@@ -1,5 +1,15 @@
 Revision history for GitHub-Config-SSH-UserData
 
+
+0.08    2025/10/31
+
+       - Corrected changlog
+
+0.07    2025/10/31
+
+       - Reworked Makefile.PL
+       - Minor fix in pod-spell.t
+
 0.06    2025/09/08
 
        - Updated policy files.

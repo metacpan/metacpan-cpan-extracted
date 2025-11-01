@@ -10,7 +10,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.13'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,6 +28,6 @@ requires:
 resources:
   bugtracker: https://github.com/giterlizzi/perl-Chart-ECharts/issues
   repository: git://github.com/giterlizzi/perl-Chart-ECharts
-version: '1.02'
+version: '1.03'
 x_purl: pkg:cpan/GDT/Chart-ECharts
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

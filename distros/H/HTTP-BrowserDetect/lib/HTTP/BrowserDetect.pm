@@ -5,7 +5,7 @@ use 5.006;
 
 package HTTP::BrowserDetect;
 
-our $VERSION = '3.42';
+our $VERSION = '3.45';
 
 # Operating Systems
 our @OS_TESTS = qw(
@@ -162,6 +162,7 @@ my @OLD_ROBOT_TESTS = qw(
     nutch
     phplib
     puf
+    pythonurllib
     rubylib
     slurp
     specialarchiver
@@ -278,6 +279,7 @@ my %ROBOT_NAMES = (
     pinterest             => 'Pinterest',
     'pro-sitemaps'        => 'Pro Sitemap Service',
     puf                   => 'puf',
+    'python-urllib'       => 'Python-urllib',
     'quora-link-preview'  => 'Quora Link Preview',
     qwantify              => 'Qwantify',
     researchscan          => 'Researchscan RWTH Aachen',
@@ -341,6 +343,7 @@ my %ROBOT_IDS = (
     nutch           => 'nutch',
     phplib          => 'phplib',
     puf             => 'puf',
+    pythonurllib    => 'python-urllib',
     robot           => 'robot',
     rubylib         => 'ruby-http-library',
     researchscan    => 'researchscan',
@@ -1046,9 +1049,10 @@ sub _init_core {
     }
 
     # Details: https://developer.chrome.com/multidevice/user-agent#webview_user_agent
-    if (   ( $self->android && index( $ua, '; wv)' ) > 0 )
-        || ( $self->chrome && $self->android && $self->browser_major >= 30 ) )
-    {
+    # WebView is identified by the '; wv)' marker in the user agent string.
+    # Prior to this fix, we incorrectly checked for Chrome version >= 30, which
+    # caused false positives for regular Chrome browsers on Android.
+    if ( $self->android && index( $ua, '; wv)' ) != -1 ) {
         $tests->{webview} = 1;
     }
 
@@ -1313,6 +1317,11 @@ sub _init_robots {
         $r                  = 'java';
         $robot_tests->{lib} = 1;
         $robot_fragment     = 'google';
+    }
+    elsif ( index( $ua, 'python-urllib' ) != -1 ) {
+        $r                  = 'pythonurllib';
+        $robot_tests->{lib} = 1;
+        $robot_fragment     = 'python-urllib';
     }
     elsif ( index( $ua, 'researchscan.comsys.rwth-aachen.de' ) != -1 ) {
         $r = 'researchscan';
@@ -1898,10 +1907,12 @@ sub _init_version {
             $minor = $2;
         }
     }
-    elsif ( $ua
+    elsif ( !defined $browser
+        && $ua
         =~ m{\b compatible; \s* [\w\-]* [/\s] ( [0-9]+ ) (?: .([0-9]+) (\S*) )? ;}x
     ) {
         # MSIE and some others use a 'compatible' format
+        # Only match when browser is not yet identified
         ( $major, $minor, $beta ) = ( $1, $2, $3 );
     }
     elsif ( !$browser ) {
@@ -1979,15 +1990,22 @@ sub _init_version {
 
         # MSIE
 
-        if ( $ua =~ m{\b msie \s ( [0-9\.]+ ) (?: [a-z]+ [a-z0-9]* )? ;}x ) {
+        if ( $ua =~ m{\b msie \s ( [0-9\.]+ ) ( [a-z]+ [a-z0-9]* )? ;}x ) {
 
             # Internet Explorer
             ( $major, $minor, $beta ) = split /\./, $1;
+            $beta = $2 if $2;    # Capture version suffix like "2.0d"
         }
         elsif ( $ua =~ m{\b rv: ( [0-9\.]+ ) \b}x ) {
 
             # MSIE masking as Gecko really well ;)
             ( $major, $minor, $beta ) = split /\./, $1;
+        }
+        elsif ( $ua
+            =~ m{\b compatible; \s* [\w\-]* [/\s] ( [0-9]+ ) (?: .([0-9]+) (\S*) )? ;}x
+        ) {
+            # Fallback to compatible format for IE
+            ( $major, $minor, $beta ) = ( $1, $2, $3 );
         }
     }
     elsif ( $browser eq 'n3ds' ) {
@@ -3102,7 +3120,7 @@ HTTP::BrowserDetect - Determine Web browser, version, and platform from an HTTP 
 
 =head1 VERSION
 
-version 3.42
+version 3.45
 
 =head1 SYNOPSIS
 
@@ -3304,7 +3322,7 @@ altavista, apache, askjeeves, baidu, curl, facebook, getright,
 googleadsbot, googleadsense, googlebotimage, googlebotnews,
 googlebotvideo, googlefavicon, googlemobile, google, golib, indy,
 infoseek, ipsagent, linkchecker, linkexchange, lycos, malware,
-mj12bot, nutch, phplib, puf, rubylib, scooter, specialarchiver,
+mj12bot, nutch, phplib, puf, pythonurllib, rubylib, scooter, specialarchiver,
 wget, yandexbot, yandeximages, java, headlesschrome, amazonbot,
 unknown
 
@@ -3645,6 +3663,8 @@ value. This is by no means a complete list of robots that exist on the Web.
 =head3 msoffice
 
 =head3 puf
+
+=head3 pythonurllib
 
 =head3 rubylib
 

@@ -14,7 +14,7 @@
 #######################################################################
 
 use strict;
-use utf8;
+use utf8; # Required
 use charnames();
 use constant {
     TRUE  => 1,
@@ -85,7 +85,18 @@ $text =~ s/XXXX/$VERSION/gs;
 
 my $ansi = Term::ANSIEncode->new('mode' => 'full');
 # warn Dumper($ansi);exit;
-my @list = (0x20 .. 0x7F, 0xA0 .. 0xFF, 0x2010 .. 0x205F, 0x2070 .. 0x242F, 0x2440 .. 0x244F, 0x2460 .. 0x29FF, 0x1F300 .. 0x1F8BF, 0x1F900 .. 0x1FBBF, 0x1F900 .. 0x1FBCF, 0x1FBF0 .. $ansi->{'finish'});
+my @list = (
+	0x20 .. 0x7F,
+	0xA0 .. 0xFF,
+	0x2010 .. 0x205F,
+	0x2070 .. 0x242F,
+	0x2440 .. 0x244F,
+	0x2460 .. 0x29FF,
+	0x1F300 .. 0x1F8BF,
+	0x1F900 .. 0x1FBBF,
+	0x1FBC0 .. 0x1FBCF,
+	0x1FBF0 .. $ansi->{'finish'}
+);
 ###
 my $small = <<'SMALL';
 [% CLS %]╔═════════════════════════════════════════════════════════════════════════╗
@@ -197,7 +208,7 @@ $to =~ s/\[\% GREYDIENT \%\]/$greydient/g;
 	foreach my $code (qw(attributes foreground background)) {
 		if ($code eq 'background') {
 			my $new;
-			foreach my $name (sort(keys %{$ansi->{'ansi_meta'}->{$code}})) {
+			foreach my $name (keys %{$ansi->{'ansi_meta'}->{$code}}) {
 				if ($name =~ /B_BLACK|B_NAVY|B_MIDNIGHT BLUE|B_MEDIUM BLUE|B_INDIGO|B_MAROON|B_DEFAULT|B_DARK BLUE|B_BLUE/) {
 					$new = $ansi->{'ansi_meta'}->{$code}->{$name}->{'out'} . " $name " . $ansi->{'ansi_meta'}->{'attributes'}->{'RESET'}->{'out'};
 				} else {

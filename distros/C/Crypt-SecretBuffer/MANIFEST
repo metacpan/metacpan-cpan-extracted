@@ -33,6 +33,7 @@ t/20-textline.t
 t/21-write-async.t
 t/22-as_pipe.t
 t/90-with-inline.t
+t/91-optional-c-support.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/lib/Test2AndUtils.pm

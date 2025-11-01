@@ -1397,6 +1397,23 @@ stringify(buf, ...)
       }
       XSRETURN(1);
 
+void
+unmask_to(buf, coderef)
+   auto_secret_buffer buf
+   SV *coderef
+   INIT:
+      int count= 0;
+   PPCODE:
+      PUSHMARK(SP);
+      EXTEND(SP, 1);
+      PUSHs(secret_buffer_get_stringify_sv(buf));
+      PUTBACK;
+      count= call_sv(coderef, G_EVAL|GIMME_V);
+      SPAGAIN;
+      if (SvTRUE(ERRSV))
+         croak_sv(ERRSV);
+      XSRETURN(count);
+
 bool
 _can_count_copies_in_process_memory()
    CODE:
@@ -1415,6 +1432,30 @@ _count_matches_in_mem(buf, addr0, addr1)
       RETVAL= scan_mapped_memory_in_range(addr0, addr1, buf->data, buf->len);
    OUTPUT:
       RETVAL
+
+MODULE = Crypt::SecretBuffer                     PACKAGE = Crypt::SecretBuffer::Exports
+
+void
+unmask_secrets_to(coderef, ...)
+   SV *coderef
+   INIT:
+      int count= 0, i;
+      secret_buffer *buf= NULL;
+   PPCODE:
+      PUSHMARK(SP);
+      EXTEND(SP, items);
+      for (i= 1; i < items; i++) {
+         if (SvOK(ST(i)) && SvROK(ST(i)) && (buf= secret_buffer_from_magic(ST(i), 0)))
+            PUSHs(secret_buffer_get_stringify_sv(buf));
+         else
+            PUSHs(ST(i));
+      }
+      PUTBACK;
+      count= call_sv(coderef, G_EVAL|GIMME_V);
+      SPAGAIN;
+      if (SvTRUE(ERRSV))
+         croak_sv(ERRSV);
+      XSRETURN(count);
 
 MODULE = Crypt::SecretBuffer                     PACKAGE = Crypt::SecretBuffer::AsyncResult
 

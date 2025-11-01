@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 on 'runtime' => sub {
-    requires 'perl'    => '5.012000';
+    requires 'perl'    => '5.014000';
     requires 'autodie' => '0';
 
     requires 'Archive::Extract'            => '0.72';
@@ -36,23 +36,29 @@ on 'runtime' => sub {
     requires 'Try::Tiny'                   => '0';
     requires 'Type::Tiny'                  => '2.000000';
     requires 'Types::Path::Tiny'           => '0';
-    requires 'Types::Self'                 => '0';
-    requires 'Types::URI'                  => '0';
+    requires 'Types::Self'                 => '0.002';
+    requires 'Types::URI'                  => '0.007';
+    requires 'URI::FromHash'               => '0';
     requires 'feature'                     => '0';
-    requires 'namespace::clean'            => '0';
+    requires 'namespace::clean'            => '0.27';
     requires 'parent'                      => '0';
     requires 'version'                     => '0.9912';
 };
 
 on 'test' => sub {
-    requires 'File::Touch'            => '0';
-    requires 'File::Which'            => '0';
-    requires 'Path::Tiny'             => '0.119';
-    requires 'Test::More'             => '0.98';
+    requires 'File::Touch' => '0';
+    requires 'File::Which' => '0';
+    requires 'Path::Tiny'  => '0.119';
+    requires 'Test::More'  => '0.98';
+    requires 'Test::Needs' => '0';
+    suggests 'Test::Output' => '0';
     requires 'Test::RequiresInternet' => '0.02';
+    suggests 'Log::Any' => '0';
 };
 
 on 'develop' => sub {
+    requires 'CPAN::Uploader'             => '0';
+    requires 'Perl::MinimumVersion::Fast' => '0';
     requires 'Test::MinimumVersion::Fast' => '0';
     requires 'Test::PAUSE::Permissions'   => '0';
     requires 'Test::Spellunker'           => '0';

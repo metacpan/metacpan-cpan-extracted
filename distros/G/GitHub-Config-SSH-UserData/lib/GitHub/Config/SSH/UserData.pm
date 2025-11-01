@@ -10,7 +10,7 @@ use File::Spec::Functions;
 
 use Exporter 'import';
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
 our @EXPORT_OK = qw(get_user_data_from_ssh_cfg);
 
@@ -62,7 +62,7 @@ GitHub::Config::SSH::UserData - Read user data from comments in ssh config file
 
 =head1 VERSION
 
-Version 0.06
+Version 0.08
 
 =head1 SYNOPSIS
 

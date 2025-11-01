@@ -4,10 +4,12 @@ use base qw(MARC::Validator::Abstract);
 use strict;
 use warnings;
 
+use English;
+use Error::Pure::Utils qw(err_get);
 use MARC::Leader;
 use MARC::Validator::Utils qw(add_error);
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 sub name {
 	my $self = shift;
@@ -20,20 +22,41 @@ sub process {
 
 	my $struct_hr = $self->{'struct'}->{'checks'};
 
-	my $cnb = $marc_record->field('015')->subfield('a');
+	my $error_id = $self->{'cb_error_id'}->($marc_record);
 
 	my $leader_string = $marc_record->leader;
-	my $leader = MARC::Leader->new(
-		'verbose' => $self->{'verbose'},
-	)->parse($leader_string);
+	my $leader = eval {
+		MARC::Leader->new(
+			'verbose' => $self->{'verbose'},
+		)->parse($leader_string);
+	};
+	if ($EVAL_ERROR) {
+		my @errors = err_get(1);
+		$struct_hr->{'not_valid'}->{$error_id} = [];
+		foreach my $error (@errors) {
+			my %err_params = @{$error->{'msg'}}[1 .. $#{$error->{'msg'}}];
+			push @{$struct_hr->{'not_valid'}->{$error_id}}, {
+				'error' => $error->{'msg'}->[0],
+				'params' => \%err_params,
+			};
+		}
+		return;
+	}
 
-	my $desc_conventions = $marc_record->field('040')->subfield('e');
+	my $field_040 = $marc_record->field('040');
+	if (! defined $field_040) {
+		add_error($error_id, $struct_hr, {
+			'error' => "Field 040 isn't present.",
+		});
+		return;
+	}
+	my $desc_conventions = $field_040->subfield('e');
 
 	if ($leader->descriptive_cataloging_form eq 'a'
 		&& defined $desc_conventions
 		&& $desc_conventions eq 'rda') {
 
-		add_error($cnb, $struct_hr, {
+		add_error($error_id, $struct_hr, {
 			'error' => 'Leader descriptive cataloging form (a) is inconsistent with field 040e description conventions (rda).',
 		});
 	}

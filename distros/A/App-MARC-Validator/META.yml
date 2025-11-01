@@ -4,6 +4,7 @@ author:
   - 'Michal Josef Spacek <skim@cpan.org>'
 build_requires:
   English: 0
+  Error::Pure::Utils: 0
   ExtUtils::MakeMaker: 6.59
   File::Object: 0
   File::Spec::Functions: 0
@@ -33,7 +34,7 @@ requires:
   Getopt::Std: 0
   IO::Barf: 0
   MARC::File::XML: 1.0.4
-  MARC::Validator: 0
+  MARC::Validator: 0.06
   Unicode::UTF8: 0
   perl: 5.6.0
 resources:
@@ -41,4 +42,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/App-MARC-Validator
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/App-MARC-Validator
-version: '0.01'
+version: '0.04'

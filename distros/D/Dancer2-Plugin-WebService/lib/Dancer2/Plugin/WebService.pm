@@ -1,12 +1,11 @@
-# ABSTRACT: REST apis with login, persistent data, multiple in/out formats, IP security, role based access
+# ABSTRACT: Rest APIs with login, persistent data, multiple in/out formats, IP security, role based access
 # Multiple input/output formats : json , xml , yaml, perl , human
-# Provide extra routes and functions to your main application.
-# 
+#
 # George Bouras , george.mpouras@yandex.com
 # Joan Ntzougani, ✞
 
 package Dancer2::Plugin::WebService;
-our $VERSION = '4.7.2';
+our $VERSION = '4.8.0';
 if ( $^O =~/(?i)MSWin/ ) { CORE::warn "\nOperating system is not supported\n"; CORE::exit 1 }
 
 use strict;
@@ -14,13 +13,11 @@ use warnings;
 use Encode;
 use Dancer2::Plugin;
 use Storable;
-use Cpanel::JSON::XS;
-use XML::Hash::XS; $XML::Hash::XS::canonical=0;    $XML::Hash::XS::utf8=0; $XML::Hash::XS::doc=0; $XML::Hash::XS::root='root'; $XML::Hash::XS::encoding='utf-8'; $XML::Hash::XS::indent=2; $XML::Hash::XS::xml_decl=0;
-use YAML::Syck;    $YAML::Syck::ImplicitTyping=0;  $YAML::Syck::ImplicitTyping=0;
-use Data::Dumper;  $Data::Dumper::Trailingcomma=0; $Data::Dumper::Indent=2; $Data::Dumper::Terse=1; $Data::Dumper::Deepcopy=1; $Data::Dumper::Purity=1; $Data::Dumper::Sortkeys=0;
+use Data::Dumper;     $Data::Dumper::Sortkeys=0; $Data::Dumper::Indent=1; $Data::Dumper::Terse=1; $Data::Dumper::Deepcopy=1; $Data::Dumper::Purity=1; $Data::Dumper::Useperl=0; $Data::Dumper::Trailingcomma=0;
+use XML::Hash::XS;    my $XML  = XML::Hash::XS->new(           utf8=>1,        indent=>0, canonical=>0, encoding=>'utf-8', root=>'root', xml_decl=>0);
+use Cpanel::JSON::XS; my $JSON = Cpanel::JSON::XS->new; $JSON->utf8(1); $JSON->indent(0); $JSON->canonical(0); $JSON->pretty(0); $JSON->max_size(0); $JSON->space_before(0); $JSON->space_after(1); $JSON->relaxed(0); $JSON->allow_tags(1); $JSON->allow_unknown(0); $JSON->shrink(0); $JSON->allow_nonref(0); $JSON->allow_blessed(0); $JSON->convert_blessed(0); $JSON->max_depth(1024);
+use YAML::XS;         my $YAML = YAML::XS->new(                utf8=>0,        indent=>2, header=>1, footer=>0, width=>2048, anchor_prefix=>'');
 
-my $JSON = Cpanel::JSON::XS->new;
-$JSON->utf8(0); $JSON->pretty(0); $JSON->indent(0); $JSON->max_size(0); $JSON->space_before(0); $JSON->space_after(1); $JSON->relaxed(0); $JSON->canonical(0); $JSON->allow_tags(1); $JSON->allow_unknown(0); $JSON->shrink(0); $JSON->allow_nonref(0); $JSON->allow_blessed(0); $JSON->convert_blessed(0); $JSON->max_depth(1024);
 
 my %Formats = (json=>'application/json', xml=>'application/xml', yaml=>'application/yaml', perl=>'text/plain', human=>'text/plain');
 my $fmt_rgx = eval 'qr/^('. join('|', sort keys %Formats) .')$/';
@@ -168,7 +165,7 @@ print STDOUT "Version application   : ", ( exists $plg->dsl->config->{appversion
 print STDOUT "Version Perl          : $^V\n";
 print STDOUT "Version Dancer2       : $Dancer2::VERSION\n";
 print STDOUT "Version WebService    : $VERSION\n";
-print STDOUT "Operating system      : ", $plg->OS ,"\n\n";
+print STDOUT "Operating system      : ", $plg->OS ,"\n";
 
 # Restore the valid sessions, and delete the expired ones
 opendir DIR, $plg->dir_session or die "Could not list session directory $plg->{dir_session} because $!\n";
@@ -179,7 +176,7 @@ opendir DIR, $plg->dir_session or die "Could not list session directory $plg->{d
     my $lastaccess = ${ Storable::retrieve "$plg->{dir_session}/$token/control/lastaccess" };
 
       if (time - $lastaccess > $plg->Session_timeout) {
-      print "Delete expired session    : $token\n";
+      print STDOUT "Delete expired session: $token\n";
       system $plg->rm, '-rf', "$plg->{dir_session}/$token"
       }
       else {
@@ -196,16 +193,17 @@ opendir DIR, $plg->dir_session or die "Could not list session directory $plg->{d
         }
 
       close __TOKEN;
-      print "Restore session           : $token (". scalar(keys %{$TokenDB{$token}->{data}}) ." records)\n"
+      print STDOUT "Restore session       : $token (". scalar(keys %{$TokenDB{$token}->{data}}) ." records)\n"
       }
     }
-    else {
-    print "Delete corrupt session    : $token\n";
+    else {    
+    print STDOUT "Delete corrupt session: $token\n";
     system $plg->rm,'-rf',"$plg->{dir_session}/$token"
     }
   }
 
 closedir DIR;
+print STDOUT "\n";
 
 
 #print Dumper( $app ) ;exit;
@@ -286,45 +284,48 @@ closedir DIR;
   elsif ( $app->request->{route}->{regexp} =~/^\^[\/\\]+(.*?)\$/ )                  { $plg->route_name($1) }
   else  { $plg->error('Could not recognize the route'); $plg->reply }
 
-  unless (exists $plg->config->{Routes}->{$1}) {
-  $_=$1; s/\\//g;
-  $plg->error("Unknown route $_ you have to add it at your config.yml under the Routes");
-  $plg->reply
-  }
+    unless (exists $plg->config->{Routes}->{$1}) {
+    $_=$1; s/\\//g;
+    $plg->error("Unknown route $_ you have to add it at your config.yml under the Routes");
+    $plg->reply
+    }
 
-  # Convert the posted data text, to hash/array at $plg->data
+    # The following code must pruduce the hash/array   $plg->data    from the posted text at Perl INTERNAL format
+    if ($app->request->body) {
 
-      if ($app->request->body) {
+      eval {
 
-        eval {
+        if    ('json'  eq $plg->Format->{from}) { $JSON->utf8(1); $plg->data( $JSON->decode(  $app->request->body ) ); $JSON->utf8(0) }
+        elsif ('yaml'  eq $plg->Format->{from}) {                 $plg->data( $YAML->load(    $app->request->body ) ) }
+        elsif ('xml'   eq $plg->Format->{from}) {                 $plg->data( $XML->xml2hash( $app->request->body ) ) }
+        elsif ('perl'  eq $plg->Format->{from}) { $plg->data(                            eval $app->request->body   ) }
+        elsif ('human' eq $plg->Format->{from}) { my $ref={};
 
-          if    ('json'  eq $plg->Format->{from}) { $plg->data(           $JSON->decode($app->request->body) ) }
-          elsif ('xml'   eq $plg->Format->{from}) { $plg->data( XML::Hash::XS::xml2hash $app->request->body  ) }
-          elsif ('yaml'  eq $plg->Format->{from}) { $plg->data( YAML::Syck::Load        $app->request->body  ) }
-          elsif ('perl'  eq $plg->Format->{from}) { $plg->data( eval                    $app->request->body  ) }
-          elsif ('human' eq $plg->Format->{from}) { my $ref={};
+          foreach (split /\v+/, $app->request->body) {
+          my @array = split /\s*(?:=|\:|-->|->|\|)+\s*/, $_;
+          next unless @array;
 
-            foreach (split /\v+/, $app->request->body) {
-            my @array = split /\s*(?:=|\:|-->|->|\|)+\s*/, $_;
-            next unless @array;
-
-              if ($#array==0) {
-              $ref->{data}->{default} = $array[0]
-              }
-              else {
-              $ref->{data}->{$array[0]} = join ',', @array[1 .. $#array]
-              }
+            if ($#array==0) {
+            $ref->{data}->{default} = $array[0]
             }
-
-          $plg->data($ref)
+            else {
+            $ref->{data}->{$array[0]} = join ',', @array[1 .. $#array]
+            }
           }
-        };
+
+        $plg->data($ref)
+        }
+      };
 
 			if ($@) {
 			$@ =~s/[\s\v\h]+/ /g;
 			$plg->error('Data parsing as '.$plg->Format->{from}." failed because $@");
       $plg->reply
       }
+
+    # This should croak for wide characters because of the intentional Perl INTERNAL format
+    #print STDERR "----------- in\n";  foreach (keys %{ $plg->data }) { print STDERR "$_ -> @{ $plg->data->{$_} }" }  print STDERR "\n-----------\n";                    # for json, yaml
+    #print STDERR "----------- in\n"; my $h=$plg->data->{root}; foreach (keys %{ $plg->data->{root} }) { print STDERR "$_ , $h->{$_}\n" } print STDERR "-----------\n";  # for the xml
     }
 
 
@@ -628,10 +629,10 @@ $plg->dsl->halt( $plg->reply_text )
 }
 
 
-#	Convert a hash, array, scalar to sting as $plg->reply_text
-#	format of "reply_text" is depended from "to" : json xml yaml perl human
-#
-#	$plg->__STRUCTURE_TO_STRING( Some Data )
+
+#	Convert a hash, array, scalar reference to sting as $plg->reply_text
+# The $_[0] is array/hash encoded to INTERNAL perl format 
+#	$plg->__STRUCTURE_TO_STRING( Hash ref|Array ref|... )
 
 sub __STRUCTURE_TO_STRING
 {
@@ -648,25 +649,52 @@ $plg->reply_text('');
 			$JSON->pretty(0); $JSON->space_after(0)
 			}
 
-    $plg->{reply_text} = Encode::decode 'utf8', $JSON->encode($_[0])
+    #print STDERR "----------- out\n";  foreach (keys %{$_[0]->{reply}}) { print STDERR "$_ -> @{$_[0]->{reply}->{$_}} \n" }  print STDERR "-----------\n";
+
+      if (($plg->Format->{from} eq 'human') || ($plg->Format->{from} eq 'perl')) {
+      $JSON->utf8(0);
+      $plg->{reply_text} = Encode::decode('utf8', $JSON->encode($_[0]) );
+      $JSON->utf8(1)
+      }
+      else {
+      $JSON->utf8(0);
+      $plg->{reply_text} = $JSON->encode($_[0]);
+      $JSON->utf8(1)
+      }
 		}
+
+
 		elsif ($plg->Format->{to} eq 'xml') {
-		$XML::Hash::XS::canonical = $plg->sort;
-    $XML::Hash::XS::indent    = $plg->pretty ? 2 : 0;
-		$plg->{reply_text} = Encode::decode 'utf8', XML::Hash::XS::hash2xml $_[0]
+    #print STDERR "-----------  out\n";  print STDERR $plg->{reply_text} = $XML->hash2xml($_[0], utf8=>0, canonical=> $plg->sort, indent=> ($plg->pretty ? 2:0) );  ;print STDERR "\n-----------\n";
+    $plg->{reply_text} = $XML->hash2xml($_[0], canonical=> $plg->sort, indent=> ($plg->pretty ? 2:0) )  # $XML->hash2xml($_[0], utf8=>1, canonical=> $plg->sort, indent=> ($plg->pretty ? 2:0) )
 		}
+
 		elsif ($plg->Format->{to} eq 'yaml') {
-    $YAML::Syck::SortKey=$plg->sort;
-    $plg->{reply_text} = Encode::decode 'utf8', YAML::Syck::Dump $_[0]
+    #print STDERR "-----------  out\n";  print STDERR $YAML->dump($_[0])  ;print STDERR "\n-----------\n";
+    $plg->{reply_text} = $YAML->dump($_[0]);  # It needs INTERNAL format
 		}
+
+		elsif ($plg->Format->{to} eq 'human') {
+
+      if (($plg->Format->{from} eq 'human') || ($plg->Format->{from} eq 'perl')) {
+      $Handler{WALKER}->($_[0], sub {my $val=shift; $val =~s/^\s*(.*?)\s*$/$1/; $plg->{reply_text} .= Encode::decode('utf8',  join('.', @_) ." = $val\n" ) } )
+      }
+      else {
+      $Handler{WALKER}->($_[0], sub {my $val=shift; $val =~s/^\s*(.*?)\s*$/$1/; $plg->{reply_text} .= join('.', @_) ." = $val\n"})
+      }
+		}
+
 		elsif ($plg->Format->{to} eq 'perl') {
 		$Data::Dumper::Indent=$plg->pretty;
 		$Data::Dumper::Sortkeys=$plg->sort;
-		$plg->{reply_text} = Encode::decode_utf8 Data::Dumper::Dumper $_[0]
-		}
-		elsif ($plg->Format->{to} eq 'human') {
-		$Handler{WALKER}->($_[0], sub {my $val=shift; $val =~s/^\s*(.*?)\s*$/$1/; $plg->{reply_text} .= join('.', @_) ." = $val\n"});
-		$plg->{reply_text} = Encode::decode_utf8 $plg->{reply_text}
+    # print STDERR "-----------\n";  foreach (keys %{$_[0]->{reply}}) { print STDERR "out : $_ -> @{$_[0]->{reply}->{$_}} \n" }  print STDERR "\n-----------\n";
+
+      if (($plg->Format->{from} eq 'human') || ($plg->Format->{from} eq 'perl')) {
+      $plg->{reply_text} = Encode::decode('utf8', Data::Dumper::Dumper $_[0])
+      }
+      else {
+      $plg->{reply_text} = Data::Dumper::Dumper $_[0]
+      }
 		}
 	};
 
@@ -865,19 +893,13 @@ $dir = $plg->dir_session.'/'.$plg->token;
 
 
 #	Set the error
-#
-#   Error('oh no') --> { "error" : "oh no" }
-#   Error()        --> { "error" : "Something went wrong" }
-#
-# any['get','post','put'] => '/error1' => sub {       Error('oh no !'); reply UserData };
-# any['get','post','put'] => '/error2' => sub {       Error('oh no !'); reply          };
-# any['get','post','put'] => '/error3' => sub { reply Error('oh no !')                 };
+# any['get','post','put'] => '/error1' => sub { Error('ok'); reply 'hello' };   #  { "error" : "ok" , ... }
+# any['get','post','put'] => '/error2' => sub { Error('ok'); reply         };   #  { "error" : "ok", reply: {} }
+# any['get','post','put'] => '/error2' => sub {              reply 'hello' };   #  { "error" : "Something went wrong", ...  }
 
-sub Error :PluginKeyword { $_[0]->error( exists $_[1] ? Encode::encode('utf8', $_[1]) : 'Something went wrong' ) }
+sub Error :PluginKeyword { $_[0]->error( exists $_[1] ? $_[1] : 'Something went wrong' ) }
 
-1
-
-__END__
+1;
 
 =pod
 
@@ -885,11 +907,11 @@ __END__
 
 =head1 NAME
 
-Dancer2::Plugin::WebService - REST apis with login, persistent data, multiple in/out formats, IP security, role based access
+Dancer2::Plugin::WebService - Rest APIs with login, persistent data, multiple in/out formats, IP security, role based access
 
 =head1 VERSION
 
-version 4.7.2
+version 4.8.0
 
 =head1 SYNOPSIS
 
@@ -903,9 +925,8 @@ Create REST APIs with login, logout, persistent session data, IP security, role 
 Multiple input/output supported formats : json , xml , yaml, perl , human
 Post your data and keys as url parameters or content body text
 
-  curl -X GET  "$url?k1=v1&k2=v2&k3=v3"
-  curl -X POST  $url -d  '{ "k1":"v1", "k2":"v2", "k3":"v3" }'
-  curl -X POST  $url -d  '[ "k1", "k2", "k3", "k4" ]'
+  curl -X GET  "$url/SomeRoute?k1=v1&k2=v2&k3=v3"
+  curl -X POST  $url/SomeRoute -d '{ "k1":"v1", "k2":"v2", "k3":"v3" }'
 
 =head1 NAME
 
@@ -919,8 +940,10 @@ You can use the  B<from>, B<to>, B<sort>, B<pretty>  parameters to define the in
 
 =item I<from> , I<to>
 
-Define the input/output format. You can mix input/output formats independently.
-I<from> default is the I<config.yml> property plugins.TestService.Default format = json
+Define the input/output format.
+
+You can define input/output formats independently.
+B<from> default is the B<config.yml> property B<plugins.TestService.Default format = json>
 Supported formats are
 
   json or jsn
@@ -928,6 +951,8 @@ Supported formats are
   xml
   perl
   human or text or txt
+
+  curl "$url/mirror?from=perl&to=xml" -d '{ "k1" => ["v1","v2","v3"] }'
 
 =item I<sort>
 
@@ -949,65 +974,50 @@ Get all or some of the posted data
 Retruns a hash referense if the data are posted as hash
 Retruns an array referense if the data are posted as list
 
-  UserData               Everything
-  UserData('k1','k2');   Only some keys of the posted hash, list
+  UserData               Returns everything
+  UserData('k1','k2')    Returns only the specific keys of the posted hash/list
 
-  get '/foo' => sub { reply UserData };
-
-=head2 Error
-
-It sets the error. Normally at success B<error> is 0.
-It does not stop the route execution
-
-  any['get','post'] => '/error1' => sub {       Error('oh no'); reply UserData };
-  any['get','post'] => '/error2' => sub {       Error('oh no'); reply          };
-  any['get','post'] => '/error3' => sub { reply Error('oh no')                 };
+  get '/SomePath' => sub { reply UserData };
 
 =head2 reply
 
-Accepts a Perl data structure, and under the key "reply" returns a string formated as : json, xml, yaml, perl or human
+Your last route's statement. Accepts a Perl data structure, and return it as json, xml, yaml, perl or human under the key I<reply>
 
-It also returns any error defined from the Error(...)  
-
-Aply any necessary format convertions.
-
-This should be the last route's statement
-
-  reply
   reply(   'hello world'        )
+  reply(  \'hello world'        )
   reply(   'a', 'b' , 'c'       )
   reply( [ 'a', 'b' , 'c' ]     )
-  reply( { k1=>'v1', k1=>'v1' } )
+  reply( { k1=>'v1', k2=>'v2' } )
+  reply(   &SomeFunction        )
   reply(  \&SomeFunction        )
 
-A typical response is
+=head2 Error
 
-  {
-  "reply" : { "T" : "42", "wind" : "12" },
-  "error" : "Cartridge out of ink"
-  }
+Set the error. Normally at success B<error> should be 0
+It does not stop the route execution. You must place it before the reply()
+
+  get '/SomePath' => sub { Error('ok'); reply 'hello world' };
+  get '/SomePath' => sub { Error('oups') };
+  get '/SomePath' => sub { reply 'a', 'b' };
 
 =head2 SessionSet
 
-Store session persistent data. It is a protected method, I<login is required>
-
-Session data are not volatile like posted data.
+Store session persistent data, unlike the volatile common posted data. It is a protected method, I<login> is required
 
 They are persistent between requests until they deleted, the user logout or their session get expired.
 
-Returns a list of the stored keys.
-
 You must pass your data as hash or hash reference.
 
-  any['get','post'] => '/session_save'  => sub {
-  @arr = SessionSet(   k1=>'v1' , k2=>'v2'    );
-  @arr = SessionSet( { k3=>'v3' , k3=>'v4' }  );
-  reply { 'saved keys' => \@arr }
+Returns a list of the stored keys.
+
+  any['get','post'] => '/session_save' => sub
+  {
+  @arr = SessionSet(   k1=>'v1' , k2=>'v2'   );
+  @arr = SessionSet( { k3=>'v3' , k4=>'v4' } );
+  reply { 'Your saved keys are' => \@arr }
   };
 
-Store from a POST passing the login token as url parameter
-
-  curl $url/session_save?token=17398-5c8a71b -H "$H" -X POST -d '{"k1":"v1", "k2":"v2", "k3":"v3"}'
+  curl $url/session_save?token=17398-5c8a71b -H "$H" -X POST -d '{"k1":"v1", "k2":"v2", ... }'
 
 =head2 SessionGet
 
@@ -1016,10 +1026,10 @@ Read session persistent data. It is a protected method, I<login is required>
 Returns a hash
 
   any['post','put'] => '/session_read' => sub {
-  my %has1 = SessionGet(   'k1','k2'   );  # some records
-  my %has2 = SessionGet( [ 'k1','k2' ] );  # some records
-  my %hash = SessionGet();                 # all  reocords
-  reply { %hash }
+  my %hash1 = SessionGet(   'k1','k2'   );       # some records
+  my %hash2 = SessionGet( [ 'k1','k2' ] );       # some records
+  my %hash3 = SessionGet();                      # all  records
+  reply { %hash3 }
   };
 
   curl $url/session_read?token=17398-5c8a71b
@@ -1057,8 +1067,10 @@ The routes can be either B<public> or B<protected>
 
 =item B<protected>
 
-  routes that you must provide a token, returned by the login route.
-  Afer login you can save, read persistent session data, which they  auto deleted when you B<logout> or if your session expired.
+  routes that you must provide the I<token>, as returned by the I<login> route.
+  Afer login, you can save, update, read, delete persistent session data
+
+  The B<login> route is using the the first active authentication method of the I<config.yml>
 
 =item B<public>
 
@@ -1066,41 +1078,78 @@ The routes can be either B<public> or B<protected>
 
 =back
 
-Example of route definitions and authentication mechanisms at the I<config.yml>
+=head1 Configuration file "I<Application dir/config.yml>"
 
-    ...
+This file customize the I<application name>, I<version>, I<securrity>, I<routes> and I<Authentication methods>. The following is an example
 
-    Routes:
-      mirror         : { Protected: false }
-      text           : { Protected: true, Groups: [] }
-      dev\/commits   : { Protected: true, Groups: [ git , ansible ] }
+  appname                 : TestService
+  appversion              : 1.0.0
+  environment             : development
+  layout                  : main
+  charset                 : UTF-8
+  template                : template_toolkit
+  engines:
+    template:
+      template_toolkit:
+        EVAL_PERL         : 0
+        start_tag         : '<%'
+        end_tag           : '%>'
+  plugins:
+    WebService:
+      Session enable      : true
+      Session directory   : /var/lib/WebService
+      Session idle timeout: 86400
+      Default format      : json
+      Allowed hosts       :
+      - "127.*"
+      - "172.20.20.*"
+      - "????:????:????:6d00:20c:29ff:*:ffa3"
+      - "10.*.?.*"
+      - "*"
 
-    Authentication methods:
+      Routes:
+        text              : { Protected: false }
+        mirror            : { Protected: false }
+        Protected         : { Protected: true  }
+        Protected_text_ref: { Protected: true  }
+        list              : { Protected: false }
+        list_ref          : { Protected: false }
+        hash              : { Protected: false }
+        code\/text        : { Protected: false }
+        code\/list        : { Protected: false }
+        code\/hash        : { Protected: false }
+        code\/text_ref    : { Protected: false }
+        code\/list_ref    : { Protected: false }
+        keys_selected     : { Protected: false }
+        git\/commit       : { Protected: true, Groups: [ git , ansibleremote ] }
+        session_save      : { Protected: true, Groups: [] }
+        session_read      : { Protected: true, Groups: [] }
+        session_delete    : { Protected: true, Groups: [] }
 
-    - Name      : INTERNAL
-      Active    : true
-      Accounts  :
-        user1   : s3cr3T+PA55sW0rD
-        user2   : <any>
-        <any>   : S3cREt-F0R-aLl
-        #<any>  : <any>
+      Authentication methods:
 
-    - Name      : Linux native users
-      Active    : false
-      Command   : MODULE_INSTALL_DIR/AuthScripts/Linux_native_authentication.sh
-      Arguments : [ ]
-      Use sudo  : true
+      - Name      : INTERNAL
+        Active    : true
+        Accounts  :
+          user1   : s3cr3T+PA55sW0rD
+          user2   : <any>
+          <any>   : S3cREt-4-aLl
+        #<any>   : <any>
 
-    - Name      : Basic Apache auth for simple users
-      Active    : false
-      Command   : MODULE_INSTALL_DIR/AuthScripts/HttpBasic.sh
-      Arguments : [ "/etc/htpasswd" ]
-      Use sudo  : false
+      - Name      : Linux native users
+        Active    : false
+        Command   : MODULE_INSTALL_DIR/AuthScripts/Linux_native_authentication.sh
+        Arguments : [ ]
+        Use sudo  : true
 
-    ...
+      - Name      : Basic Apache auth for simple users
+        Active    : false
+        Command   : MODULE_INSTALL_DIR/AuthScripts/HttpBasic.sh
+        Arguments : [ "/etc/htpasswd" ]
+        Use sudo  : false
 
-For using protected routes, user must provide a valid token received from the B<login> route.
-The B<login> route is using the the first active authentication method of the I<config.yml>
+=head1 Authentication methods
+
 Authentication method can be INTERNAL or external executable Command.
 
 At INTERNAL you define the usernames / passwords directly at the I<config.yml> . The <any> means any username or password,
@@ -1110,24 +1159,25 @@ so if you want to allow all users to login no matter the username or the passwor
 
 This make sense if you just want to give anyone the ability for persistent data
 
-At production enviroments, probably you want to use an external auth script e.g for the native "Linux native" authentication
+The protected routes, at  config.yml  have   Protected:true and their required groups e.g.  Groups:[grp1,grp2 ...]
+
+The user must be member to B<all> defined groups
+
+If the route's Groups list is empty or missing, then the groups membership is ignored
+
+This way you can have user based access, because every user is allowed to access his assigned routes.
+
+=head1 Authentication scripts
+
+At production enviroments, probably you want to use external authenticators, accessed by plugable scripts e.g for the native "Linux native" authentication
 
   MODULE_INSTALL_DIR/AuthScripts/Linux_native_authentication.sh
 
-The protected routes, at  config.yml  have   Protected:true and their required groups e.g.  Groups:[grp1,grp2 ...]
+It is easy to write your own scripts for LDAP, Active Directory, OAuth 2.0, Keycload, etc external authenticators.
 
-The user must be member to all the route Groups
+If the script needs sudo, you must add the user running the application to sudoers e.g
 
-If the route's Groups list is empty or missing, the route will run with any valid token ignoring the group
-
-This way you can have group based access at your routes.
-Every user is be able to access only the routes is assigned to.
-
-It is easy to write your own scripts for LDAP, Active Directory, OAuth 2.0, etc
-
-If the Command needs sudo, you must add the user running the application to sudoers e.g
-
-  dendrodb ALL=(ALL:ALL) NOPASSWD: /usr/share/perl5/site_perl/Dancer2/Plugin/AuthScripts/Linux_native_authentication.sh
+  dendrodb ALL=(ALL:ALL) NOPASSWD: /usr/share/perl5/site_perl/Dancer2/Plugin/AuthScripts/some_auth_script.sh
 
 Please read the file  AUTHENTICATION_SCRIPTS  for the details
 
@@ -1152,7 +1202,7 @@ The rules are checked from up to bottom until there is a match. If no rule match
 
 =head1 Sessions
 
-Upon successful login, the client is in session until logout or its session get expired due to inactivity.
+Upon successful login, the client is in session until logout or its session expired due to inactivity.
 
 While in session you can access protected routes and save, read, delete session persistent data.
 
@@ -1170,17 +1220,18 @@ at the I<config.yml> You can change persistent data storage directory and sessio
       Session directory : /var/lib/WebService
 
   or at your application
+
   setting('plugins')->{'WebService'}->{'Session directory'} = '/var/lib/WebService';
 
 =item B<Session expiration>
 
-  Sessions expired after some seconds of inactivity. You can change the amount of seconds either at the I<config.yml>
+  Sessions are expiring after some seconds of inactivity. You can change the amount of seconds either at the I<config.yml>
 
   plugins:
     WebService:     
       Session idle timeout : 3600
 
-  or at your main script
+  or at your application
 
   setting('plugins')->{'WebService'}->{'Session idle timeout'} = 3600;
 
@@ -1191,62 +1242,39 @@ at the I<config.yml> You can change persistent data storage directory and sessio
 These are plugin built in routes 
 
   WebService            version
-  WebService/routes     list the built-in and application routes
   WebService/client     client propertis
+  WebService/routes     list the built-in and application routes
   login                 login
   logout                logout
 
 Usage examples
 
-  export url=http://127.0.0.1:3000
-  export H='Content-Type: application/json'
+  export url=http://127.0.0.1:3000 H="Content-Type: application/json"
+  alias curl="$(/usr/bin/which curl) --silent --user-agent Perl"
 
-  curl  $url
-  curl  $url/WebService/routes?sort=true
-  curl  $url/WebService/client?sort=true
   curl  $url/WebService
+  curl  $url/WebService/client
+  curl  $url/WebService/routes?sort=true
   curl "$url/WebService?to=json&pretty=true&sort=true"
   curl  $url/WebService?to=yaml
   curl "$url/WebService?to=xml&pretty=false"
   curl "$url/WebService?to=xml&pretty=true"
-  curl  $url/WebService?to=perl
   curl  $url/WebService?to=human
+  curl  $url/WebService?to=perl
+  curl  $url
 
 =head1 Application routes
 
 Based on the code of our TestService ( lib/TestService.pm ) some examples of how to login, logout, and route usage
 
-  curl  $url/mirror -X POST -H "$H"        -d '[ "a", "b", "c" ]'
-  curl  $url/mirror -X GET                 -d '[ "a", { "k1" : "v1" } ]'
-  curl "$url/mirror?from=xml&to=yaml"      -d '<root><k1>v1</k1><k2>v2</k2><k3></k3></root>'
-  curl  $url/mirror?sort=true              -d '{ "k1":"v1", "k2":"v2", "k3":{} }'
-  curl "$url/mirror?k3=v3&k4=v4&sort=true" -d '{ "k1":"v1", "k2":"v2" }'
-  curl  $url/mirror?to=human               -d '{ "k1":"v1", "k2":"v2" }'
-  curl "$url/mirror?to=json&pretty=true"   -d '{ "k1":[ "a","b","c" ] }'
-  curl "$url/mirror?to=xml&pretty=false"   -d '{ "k1":"v1", "k2":"v2" }'
-  curl  $url/mirror?to=yaml                -d '{ "k1":[ "a","b","c" ] }'
-  curl  $url/mirror?to=FOO                 -d '{ "k1":"v1" }'
+  curl "$url/mirror?from=json&to=json&k1=a&k2=b"  -d '{"k1" : ["one","two","three"]}'
+  curl "$url/mirror?to=xml&pretty=true"           -d '{"k1" : ["one","two","three"]}'
+  curl "$url/mirror?from=yaml&to=perl"            -d '"k1"  : ["one","two","three"]'
+  curl "$url/mirror?from=xml&to=yaml"             -d '<root><k1>one</k1><k2>two</k2></root>'
 
-Login. A successful login returns a token e.g. 17393926-5c8-0
+Login
 
   curl -X POST $url/login -H "$H" -d '{"username": "user1", "password": "s3cr3T+PA55sW0rD"}'
-
-Unprotected application routes
-
-  curl  $url/text -H "$H" -d '{"token":"17393926-5c8-0"}' -X POST
-  curl  $url/text_ref
-  curl  $url/list?pretty=false
-  curl  $url/list_ref?to=yaml
-  curl  $url/list_ref
-  curl  $url/hash
-  curl  $url/function/text
-  curl  $url/function/list
-  curl  $url/function/hash
-  curl  $url/function/text_ref
-  curl  $url/function/list_ref
-  curl  $url/keys_selected?to=yaml -d '{ "k1":"v1", "k2":"v2", "k3":"v3" }'
-  curl  $url/keys_selected?to=yaml -d '[ "k1", "k2", "k3", "k4" ]'
-  curl "$url/error?to=json&pretty=true" -H "$H" -d '{"k1":"B",  "k2":"v2"}'
 
 Protected application routes
 
@@ -1275,135 +1303,7 @@ You should your run your APIs as a non privileged user e.g. the "dancer"
 
 =head1 Create a sample application e.g. the "TestService"
 
-As best practise we create our applications inside the dancer's home directory
-
-  /usr/bin/site_perl/dancer2 version
-  dancer2 gen --application TestService --directory TestService --path /home/dancer --overwrite  
-  vi /home/dancer/TestService/bin/app.psgi
-
-    #!/usr/bin/perl
-    use strict;
-    use warnings;
-    use FindBin;
-    use lib "$FindBin::Bin/../lib";
-    use TestService;
-    use Plack::Builder;
-    builder {
-    enable 'Deflater';
-    # you can have multiple applications on different http paths
-    mount '/' => TestService->to_app
-    }
-
-  chown -R dancer:dancer /home/dancer/TestService
-
-=head1 TestService
-
-For better comprehension of the functionality, review the TestService code
-
-  package TestService;
-
-  use strict;
-  use warnings;
-  use Dancer2;
-  use Dancer2::Plugin::WebService;
-  set no_default_middleware => true;
-  our $VERSION = exists config->{appversion} ? config->{appversion} : '0.0.0.0';
-
-  get '/' => sub{send_as html => template 'index' => {'title' => 'TestService'}, {layout=>'main'}};
-
-  any['get','post']=> '/mirror'=> sub { reply UserData };
-  any['get','post']=> '/text'  => sub { reply  'hello world'                  };
-  get '/text_ref'              => sub { reply \'hello world'                  };
-  get '/list'                  => sub { reply   'a', 'b', 'c'                 };
-  get '/list_ref'              => sub { reply [ 'a', 'b', 'c' ]               };
-  get '/hash'                  => sub { reply { 'k1'=>'v1' , 'k2'=>'v2' }     };
-  get '/function/text'         => sub { reply sub {  'hello world'          } };
-  get '/function/list'         => sub { reply sub {   'a', 'b', 'c', 'd'    } };
-  get '/function/hash'         => sub { reply sub { {'k1'=>'v1','k2'=>'v2'} } };
-  get '/function/text_ref'     => sub { reply sub { \'hello world'          } };
-  get '/function/list_ref'     => sub { reply sub { [ 'a', 'b', 'c', 'd' ]  } };
-
-  any['get','post','put'] => '/error'         => sub { Error('oh no'); reply UserData  };
-  any['get','post','put'] => '/keys_selected' => sub { reply UserData('k1','k2')       };
-  any['get','post','put'] => '/session_save'  => sub { reply { 'saved keys' => \@arr } };
-  any['post','put','get'] => '/session_read'  => sub { reply { %hash } };
-  any['delete'] => '/session_delete' => sub { my $arg = UserData(); reply { 'Deleted keys' => \@arr } };
-
-  dance
-
-=head1 Configuration config.yml
-
-At the configuration file define the application name, version, routes, their security, and the authorization methods
-
-vi /home/dancer/TestService/config.yml
-
-  appname                 : TestService
-  appversion              : 1.0.1
-  environment             : development
-  layout                  : main
-  charset                 : UTF-8
-  template                : template_toolkit
-  engines:
-    template:
-      template_toolkit:
-        EVAL_PERL         : 0
-        start_tag         : '<%'
-        end_tag           : '%>'
-
-  plugins:
-    WebService:
-      Session enable      : true
-      Session directory   : /var/lib/WebService
-      Session idle timeout: 86400
-      Default format      : json
-
-      Allowed hosts:
-      - 172.20.20.*
-      - "????:????:????:6d00:20c:29ff:*:ffa3"
-      - 127.*
-      - 10.*.?.*
-      - *
-
-      Routes:
-        mirror            : { Protected: false }
-        text              : { Protected: true, Groups: [] }
-        text_ref          : { Protected: false }
-        list              : { Protected: false }
-        list_ref          : { Protected: false }
-        hash              : { Protected: false }
-        function\/text    : { Protected: false }
-        function\/list    : { Protected: false }
-        function\/hash    : { Protected: false }
-        function\/text_ref: { Protected: false }
-        function\/list_ref: { Protected: false }
-        keys_selected     : { Protected: false }
-        error             : { Protected: false }
-        session_save      : { Protected: true, Groups: [] }
-        session_read      : { Protected: true, Groups: [] }
-        session_delete    : { Protected: true, Groups: [] }
-        dev\/commits      : { Protected: true, Groups: [ git , ansibleremote ] }
-
-      Authentication methods:
-
-      - Name      : INTERNAL
-        Active    : true
-        Accounts  :
-          user1   : s3cr3T+PA55sW0rD
-          user2   : <any>
-          <any>   : S3cREt-4-aLl
-          #<any>  : <any>
-
-      - Name      : Linux native users
-        Active    : false
-        Command   : MODULE_INSTALL_DIR/AuthScripts/Linux_native_authentication.sh
-        Arguments : [ ]
-        Use sudo  : true
-
-      - Name      : Basic Apache auth for simple users
-        Active    : false
-        Command   : MODULE_INSTALL_DIR/AuthScripts/HttpBasic.sh
-        Arguments : [ "/etc/htpasswd" ]
-        Use sudo  : false
+Follow the I<CREATE_SAMPLE_APPLICATION> document to create the sample application I<TestService>
 
 =head1 Start the application
 
@@ -1425,23 +1325,22 @@ view also the INSTALL document for details
 
 =head1 Configure the loggger at the environment file
 
-I</home/dancer/TestService/environments/[development|production].yml>
+I<Application dir/environments/[development|production].yml>
 
-  log              : 'core'   # core, debug, info, warning, error
-  startup_info     : 1        # print the banner
-  show_errors      : 1        # if true shows a detailed debug error page
+  log              : "debug"  # core, debug, info, warning, error
   show_stacktrace  : 0
-  warnings         : 1        # should Dancer2 consider warnings as critical errors?
-  no_server_tokens : 1        # disable server tokens in production environments
-  logger           : 'file'   # console : to STDOUT , file : to file
-  engines:
-    logger:
-      file:
-        log_format : '{"ts":"%{%Y-%m-%d %H:%M:%S}t","host":"%h","pid":"%P","level":"%L","message":"%m"}'
-        log_dir    : '/var/log/WebService'
-        file_name  : 'TestService.log'
-      console:
-        log_format : '%T , %h, %m'
+  no_server_tokens : 1
+  warnings         : 1          # should Dancer2 consider warnings as critical errors?
+  show_errors      : 1          # if true shows a detailed debug error page , otherse the views/404.tt or public/404.html
+  startup_info     : 1          # print the banner
+  no_server_tokens : 1          # disable server tokens in production environments
+  logger           : "file"     # console: to STDOUT , file:to file
+  engines          :
+    logger         :
+      file         :      
+        log_format : '{"ts":"%T","host":"%h","pid":"%P","message":"%m"}'
+        log_dir    : "/tmp"
+        file_name  : "test.log"
 
 =head1 See also
 
@@ -1469,3 +1368,8 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
+
+__END__
+darkhttpd /tmp --addr 0.0.0.0 --port 80 --index index.html
+pod2html --verbose --htmldir=/tmp --title="Look mom" --infile=/opt/Dancer2-Plugin-WebService/lib/Dancer2/Plugin/WebService.pm --outfile=index.html
+

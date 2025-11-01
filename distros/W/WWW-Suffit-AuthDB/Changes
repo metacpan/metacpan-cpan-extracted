@@ -1,5 +1,11 @@
 # Version/Revision history
 
+1.06 Fri 31 Oct 2025 16:39:38 MSK
+    * Bug fixed: undefined value used in initialized attribute call
+
+1.05 Thu 30 Oct 2025 23:17:14 MSK
+    * Added `uid` method as alias for `id`
+
 1.04 Mon 27 Oct 2025 17:43:58 MSK
     * Switched to using functions from Acrux::Util and Acrux::RefUtil
 

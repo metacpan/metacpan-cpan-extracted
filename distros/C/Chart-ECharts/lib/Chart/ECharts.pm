@@ -5,14 +5,14 @@ use strict;
 use utf8;
 use warnings;
 
-use JSON::PP       ();
-use Digest::SHA    qw(sha1_hex);
+use Digest::SHA qw(sha1_hex);
+use File::Basename;
 use File::ShareDir qw(dist_file);
 use File::Spec;
 use IPC::Open3;
-use File::Basename;
+use JSON::PP ();
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 $VERSION =~ tr/_//d;    ## no critic
 
 use constant DEBUG => $ENV{ECHARTS_DEBUG} || 0;
@@ -25,6 +25,7 @@ sub new {
         charts_object    => 'ChartECharts',
         class            => 'chart-container',
         container_prefix => '',
+        dataset          => [],
         events           => {},
         scripts          => [],
         height           => undef,
@@ -40,6 +41,8 @@ sub new {
         width            => undef,
         xAxis            => [],
         yAxis            => [],
+        init_method      => 'event',
+        init_event       => 'load',
         @_
     );
 
@@ -52,6 +55,8 @@ sub new {
 }
 
 sub chart_id { shift->{id} }
+
+sub init_function { join '_', 'init', shift->{id} }
 
 sub set_options {
     my ($self, %options) = @_;
@@ -70,32 +75,32 @@ sub set_option_item {
 
 sub set_title {
     my ($self, %params) = @_;
-    $self->set_option(title => \%params);
+    $self->set_options(title => \%params);
 }
 
 sub set_tooltip {
     my ($self, %params) = @_;
-    $self->set_option(tooltip => \%params);
+    $self->set_options(tooltip => \%params);
 }
 
 sub set_toolbox {
     my ($self, %params) = @_;
-    $self->set_option(toolbox => \%params);
+    $self->set_options(toolbox => \%params);
 }
 
 sub set_legend {
     my ($self, %params) = @_;
-    $self->set_option(legend => \%params);
+    $self->set_options(legend => \%params);
 }
 
 sub set_timeline {
     my ($self, %params) = @_;
-    $self->set_option(timeline => \%params);
+    $self->set_options(timeline => \%params);
 }
 
 sub set_data_zoom {
     my ($self, %params) = @_;
-    $self->set_option(dataZoom => \%params);
+    $self->set_options(dataZoom => \%params);
 }
 
 sub add_data_zoom {
@@ -148,9 +153,15 @@ sub add_series {
     push @{$self->{series}}, \%series;
 }
 
-sub xAxis  { shift->{xAxis} }
-sub yAxis  { shift->{yAxis} }
-sub series { shift->{series} }
+sub add_dataset {
+    my ($self, %dataset) = @_;
+    push @{$self->{dataset}}, \%dataset;
+}
+
+sub xAxis   { shift->{xAxis} }
+sub yAxis   { shift->{yAxis} }
+sub series  { shift->{series} }
+sub dataset { shift->{dataset} }
 
 sub default_options { {} }
 
@@ -169,6 +180,15 @@ sub options {
     for (my $i = 0; $i < @{$options->{series}}; $i++) {
         $options->{series}->[$i] = {%{$options->{series}->[$i]}, %{$default_series_options}};
         $options->{series}->[$i] = {%{$options->{series}->[$i]}, %{$series_options}};
+    }
+
+    if (@{$self->dataset}) {
+        if (scalar @{$self->dataset} == 1) {
+            $options->{dataset} = $self->dataset->[0];
+        }
+        else {
+            $options->{dataset} = \@{$self->dataset};
+        }
     }
 
     $options = {%{$options}, %{$self->axies}, %{$default_options}, %{$global_options}};
@@ -199,16 +219,19 @@ sub render_script {
     my $renderer      = $self->{renderer};
     my $locale        = $self->{locale};
     my $container     = join '', $self->{container_prefix}, $chart_id;
+    my $init_event    = $self->{init_event};
+    my $init_method   = $self->{init_method};
 
     my $wrap = $params{wrap} //= 0;
 
-    if ($chart_id !~ /^[a-zA-Z0-9_-]*$/) {
-        Carp::croak 'Malformed chart "id" name';
-    }
-
-    if ($charts_object !~ /^[a-zA-Z0-9_-]*$/) {
-        Carp::croak 'Malformed "charts_object" name';
-    }
+    Carp::croak 'Malformed chart "id" name'      if ($chart_id      !~ /^[a-zA-Z0-9_-]*$/);
+    Carp::croak 'Malformed "charts_object" name' if ($charts_object !~ /^[a-zA-Z0-9_-]*$/);
+    Carp::croak 'Malformed chart "theme"'        if ($theme         !~ /^[a-zA-Z0-9_-]*$/);
+    Carp::croak 'Malformed chart "container"'    if ($container     !~ /^[a-zA-Z0-9_-]*$/);
+    Carp::croak 'Malformed chart "locale"'       if ($locale        !~ /^[a-zA-Z_-]*$/);
+    Carp::croak 'Malformed chart "renderer"'     if ($renderer      !~ /^(svg|canvas)$/);
+    Carp::croak 'Malformed init event name'      if ($init_event    !~ /^[a-zA-Z\_\-\:]*$/);
+    Carp::croak 'Unknown "init_method"'          if ($init_method   !~ /^(event|iife)$/);
 
     my $json = JSON::PP->new;
 
@@ -229,35 +252,61 @@ sub render_script {
 
     my $init_options = $json->encode({locale => $locale, renderer => $renderer});
 
-    push @script, '(function () {';
-
-    # Add "charts_object"
-    push @script, qq{\tif (!window.$charts_object) { window.$charts_object = {} }};
-    push @script, qq{\tif (!window.$charts_object.charts) { window.$charts_object.charts = {} }};
-
-    push @script, qq{\tlet chart = echarts.init(document.getElementById('$container'), '$theme', $init_options);};
+    my $extra_script = '';
+    my $chart_events = '';
+    my $responsive   = '';
+    my $init_script  = qq[window.addEventListener('$init_event', init_$chart_id);];
 
     foreach my $script (@{$self->{scripts}}) {
-        push @script, "\t$script";
+        $extra_script .= qq[
+            $script
+        ];
     }
-
-    push @script, qq{\tlet option = $option;};
-    push @script, qq{\toption && chart.setOption(option);};
 
     foreach my $event (keys %{$self->{events}}) {
         my $callback = $self->{events}->{$event};
-        push @script, qq{\tchart.on('$event', function (params) { $callback });};
+        $chart_events .= qq[
+            chart.on('$event', function (params) { $callback });
+        ];
     }
-
-    push @script, qq{\twindow.$charts_object.charts["$chart_id"] = chart;};
 
     if ($self->{responsive}) {
-        push @script, qq{\twindow.addEventListener('resize', function () { chart.resize() });};
+        $responsive = qq[
+            window.addEventListener('resize', function () { chart.resize() });
+        ];
     }
 
-    push @script, '})();';
+    if ($self->{init_method} eq 'iife') {
+        $init_script = qq[(function(){ init_$chart_id() })();];
+    }
 
-    my $script = join "\n", @script;
+    my $script = qq[
+        if (!window.$charts_object) { window.$charts_object = {} }
+        if (!window.$charts_object.charts) { window.$charts_object.charts = {} }
+
+        function init_$chart_id() {
+
+            let chartContainer = document.getElementById('$container');
+
+            if (! chartContainer) { return false }
+
+            let chart  = echarts.init(chartContainer, '$theme', $init_options);
+            let option = $option;
+
+            option && chart.setOption(option);
+
+            window.$charts_object.charts["$chart_id"] = chart;
+
+            $chart_events
+            $extra_script
+            $responsive
+
+            return chart;
+
+        }
+
+        $init_script
+    ];
 
     return "<script>\n$script\n</script>" if $wrap;
 
@@ -275,14 +324,20 @@ sub render_html {
     push @styles, sprintf('width:%s',  $self->{width})  if ($self->{width});
     push @styles, sprintf('height:%s', $self->{height}) if ($self->{height});
 
-    my $script = $self->render_script(wrap => 1);
+    my $script = $self->render_script;
 
     my $chart_id        = $self->{id};
     my $container_id    = join '',  $self->{container_prefix}, $chart_id;
     my $styles          = join ';', @styles, $style;
     my $class_container = $self->{class};
 
-    my $html = qq{<div id="$container_id" class="$class_container" style="$styles"></div>\n$script};
+    my $html = qq[
+    <div id="$container_id" class="$class_container" style="$styles">
+        <script>
+            $script
+        </script>
+    </div>
+    ];
 
     return $html;
 
@@ -461,6 +516,8 @@ B<Params>
 
 =item C<series>, Chart series (L<https://echarts.apache.org/en/option.html#series>)
 
+=item C<dataset>, Chart dataset (L<https://echarts.apache.org/en/option.html#dataset>)
+
 =item C<styles>, Default char styles (default C<['min-width:auto', 'min-height:300px']>)
 
 =item C<theme>. Chart theme (default C<white>)
@@ -472,6 +529,10 @@ B<Params>
 =item C<xAxis>, Chart X Axis (L<https://echarts.apache.org/en/option.html#xAxis>)
 
 =item C<yAxis>, Chart Y Axis (L<https://echarts.apache.org/en/option.html#yAxis>)
+
+=item C<init_method>, Change the chart init method (load C<event> - default, C<iife> Immediately Invoked Function Expression)
+
+=item C<init_event>, Change the chart init C<event> name (C<load> - default)
 
 =back
 
@@ -495,6 +556,14 @@ Set Apache EChart options (see Apache ECharts documentations L<https://echarts.a
 =item $chart->get_random_id
 
 Get the random chart ID.
+
+=item $chart->chart_id
+
+Return the chart ID.
+
+=item $chart->init_function
+
+Return the init JS function name.
 
 =item $chart->set_event($event, $callback)
 
@@ -565,6 +634,20 @@ Add single series (see Apache ECharts documentations L<https://echarts.apache.or
         data => [120, 200, 150, 80, 70, 110, 130]
     );
 
+=item $chart->add_dataset(%dataset)
+
+Add dataset (see Apache ECharts documentations L<https://echarts.apache.org/en/option.html#dataset>).
+
+    $chart->add_dataset(
+        source => [
+            ['product', '2015', '2016', '2017'],
+            ['Matcha Latte', 43.3, 85.8, 93.7],
+            ['Milk Tea', 83.1, 73.4, 55.1],
+            ['Cheese Cocoa', 86.4, 65.2, 82.5],
+            ['Walnut Brownie', 72.4, 53.9, 39.1]
+        ]
+    );
+
 =item $chart->js($expression)
 
 Embed arbritaty JS code in chart options.
@@ -611,7 +694,7 @@ Add the chart data zoom
 =back
 
 
-=head3 PROPERIES
+=head3 PROPERTIES
 
 =over
 
@@ -801,6 +884,22 @@ C<render_script>). It is useful to allow customization of the graph via JS.
 
 =back
 
+=head2 Chart init
+
+By default L<Chart::ECharts> use "load" event for init.
+
+Immediately Invoked Function Expression (IIFE):
+
+    my $chart = Chart::ECharts->new(init_method => 'iife', ...);
+
+Custom event:
+
+    my $chart = Chart::ECharts->new(init_method => 'event', init_event => 'app:initChart', ...);
+
+    # in your JS
+    window.dispatchEvent(new CustomEvent('app:initChart'));
+
+
 =head1 SUPPORT
 
 =head2 Bugs / Feature Requests
@@ -830,7 +929,7 @@ L<https://github.com/giterlizzi/perl-Chart-ECharts>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2024 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2024-2025 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

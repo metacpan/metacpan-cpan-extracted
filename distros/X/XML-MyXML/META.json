@@ -4,7 +4,7 @@
       "Alexander Karelas <karjala@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.12",
+   "generated_by" : "Minilla/v3.1.26",
    "license" : [
       "perl_5"
    ],
@@ -60,14 +60,15 @@
    "provides" : {
       "XML::MyXML" : {
          "file" : "lib/XML/MyXML.pm",
-         "version" : "1.08"
+         "version" : "1.09"
       },
       "XML::MyXML::Object" : {
          "file" : "lib/XML/MyXML/Object.pm",
-         "version" : "1.08"
+         "version" : "1.09"
       },
       "XML::MyXML::Util" : {
-         "file" : "lib/XML/MyXML/Util.pm"
+         "file" : "lib/XML/MyXML/Util.pm",
+         "version" : "1.09"
       }
    },
    "release_status" : "stable",
@@ -77,16 +78,18 @@
       },
       "homepage" : "https://github.com/akarelas/xml-myxml",
       "repository" : {
-         "url" : "git://github.com/akarelas/xml-myxml.git",
+         "type" : "git",
+         "url" : "https://github.com/akarelas/xml-myxml.git",
          "web" : "https://github.com/akarelas/xml-myxml"
       }
    },
-   "version" : "1.08",
+   "version" : "1.09",
    "x_authority" : "cpan:KARJALA",
    "x_contributors" : [
       "Alexander Karelas <alex.karelas@gmail.com>",
+      "Alexander Karelas <no-reply@karjala.org>",
       "Gabor Szabo <gabor@szabgab.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.06",
+   "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

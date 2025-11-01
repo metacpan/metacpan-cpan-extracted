@@ -1,67 +1,15 @@
-You should your run your service as a non privileged user e.g. dancer
-Be careful, that non system users can not bind ports up to 1024
-Create the user if not exists.
+You should your run your applications as a non privileged user e.g. dancer
+Be careful, that non system users can only bind ports above the 1024
 It must have a home directory to install there the deployed applications
 
   getent group  dancer >/dev/null || groupadd dancer
-  getent passwd dancer >/dev/null || useradd -g dancer -l -m -c "Dancer2 WebService" -s $(which nologin) dancer
-
-Install prerequisite packages at RedHat like distributions
-
-  yum install perl-devel perl-ExtUtils-ParseXS perl-ExtUtils-Install perl-ExtUtils-MakeMaker perl-ExtUtils-Manifest perl-Test-Harness
-  yum install perl-CPAN perl-CPAN-Meta perl-CPAN-Meta-Requirements perl-CPAN-Meta-YAML perl-CPANPLUS-Dist-Build perl-Parse-CPAN-Meta perl-Test-CPAN-Meta perl-CPAN-Changes perl-CPANPLUS perl-Module-Signature perl-Version-Requirements perl-YAML
-  yum install perl-Data-Dumper
-  yum install perl-App-cpanminus 
-
-Install prerequisite packages Packages at Archlinux
-
-  pacman -S perl-data-dump
-  pacman -S cpanminus
-
-Install the gcc and make packages.
-They required for modules complilation from cpan.
-After modules installation they may removed.
-
-Install C, C++ at Archlinux
-
-  pacman -Q expat  > /dev/null || pacman -S --noconfirm expat
-  pacman -Q libisl > /dev/null || pacman -S --noconfirm libisl
-  pacman -Q gcc    > /dev/null || pacman -S --noconfirm gcc
-  pacman -Q gc     > /dev/null || pacman -S --noconfirm gc
-  pacman -Q make   > /dev/null || pacman -S --noconfirm make
-
-Install C, C++ at RedHat like distributions
-
-  dnf group install "Development Tools"
-  dnf       install llvm-toolse
-
-Install Perl modules from cpan
-
-  cpanm --force XML::Hash::XS
-  cpanm --force Cpanel::JSON::XS
-  cpanm --force YAML::Syck
-  cpanm --force IO::HTML
-  cpanm --force HTTP::Headers
-  cpanm --force HTTP::Entity::Parser
-  cpanm --force HTTP::Request::Common
-  cpanm --force Net::Server
-  cpanm --force Template::Toolkit
-  cpanm --force Moo
-  cpanm --force Starman
-  cpanm --force Plack
-  cpanm --force Plack::Middleware::Deflater
-  cpanm --force HTTP::Server::PSGI
-  cpanm --force Dancer2
-  cpanm --force Dancer2::Plugin::WebService
-
-Make sure that the authorization scripts of the Dancer2::Plugin::WebService module are executable
-
-  /usr/bin/find $(/usr/bin/perl -M File::Basename -E 'use Dancer2::Plugin::WebService; print [ fileparse $INC{"Dancer2/Plugin/WebService.pm"} ]->[1]') -regex ".*\.\(sh\|pl|py\)\$" -type f -exec /usr/bin/chmod 755 {} \;
+  getent passwd dancer >/dev/null || useradd -g dancer -l -m -c "Dancer2 WebService" -s $(/usr/bin/which nologin) dancer
+  lslogins      dancer
 
 Create the Persistent session data and log directories. You can change them later if needed
 
-  i=/var/lib/WebService; [ -d $i ] || { mkdir $i; chown -R dancer:dancer $i; }
-  i=/var/log/WebService; [ -d $i ] || { mkdir $i; chown -R dancer:dancer $i; }
+  i=/var/lib/WebService; [ -d $i ] || { /usr/bin/mkdir $i; /usr/bin/chown -R dancer:dancer $i; }
+  i=/var/log/WebService; [ -d $i ] || { /usr/bin/mkdir $i; /usr/bin/chown -R dancer:dancer $i; }
 
 Use logrotate for housekeeping the log files
 vi /etc/logrotate.d/WebService
@@ -75,317 +23,95 @@ vi /etc/logrotate.d/WebService
   rotate 7
   }
 
-Lets create a sample application, with name "TestService"
-As best practice, we create it at dancer's home directory ( /home/dancer )
-The utility "dancer2" usually is at /usr/bin/site_perl/dancer2
+You need to Install Perl and some 3rd party modules
+For installing the Perl modules you need C (gcc)
 
-  sudo  -u dancer /usr/bin/site_perl/dancer2 version
-  sudo  -u dancer dancer2 gen --application TestService --directory TestService --path /home/dancer --overwrite
-  chown -R dancer:dancer /home/dancer/TestService
+Install at Archlinux
 
-If you use a firewall you should create a rule for the listening port.
-Assuming our sample application is listening at port 3000
+  pacman -Q perl   > /dev/null || pacman -S --noconfirm perl
+  pacman -Q expat  > /dev/null || pacman -S --noconfirm expat
+  pacman -Q libisl > /dev/null || pacman -S --noconfirm libisl
+  pacman -Q gcc    > /dev/null || pacman -S --noconfirm gcc
+  pacman -Q gc     > /dev/null || pacman -S --noconfirm gc
+  pacman -Q make   > /dev/null || pacman -S --noconfirm make
 
-  # Redhat
-  firewall-cmd --zone=public --permanent --add-port=3000/tcp
-  firewall-cmd --reload
-  firewall-cmd --list-all
+Install at RedHat like distributions
 
-If you use an authentication script that needs root privileges
-The "Linux_native_authentication.sh" for using Linux native users is one of them.
-Give to it, the appropriate privileges	using sudoers
-Make sure of the correct actuall path of the script.
-If you do not know where it is, you can find out using the command
+  dnf install perl perl-devel perl-Module-Signature perl-Version-Requirements
+  dnf group install "Development Tools"
+  dnf       install llvm-toolse
 
-  /usr/bin/find $(/usr/bin/perl -M File::Basename -E 'use Dancer2::Plugin::WebService; print [ fileparse $INC{"Dancer2/Plugin/WebService.pm"} ]->[1]') -iname Linux_native_authentication.sh
+Install cpanm
+
+  curl -L http://cpanmin.us | /usr/bin/perl - App::cpanminus
+
+  vi /etc/profile.d/perlbin.sh
+    #!/bin/sh
+    [ -d /usr/bin/site_perl ]   && PATH=${PATH}:/usr/bin/site_perl
+    [ -d /usr/bin/vendor_perl ] && PATH=${PATH}:/usr/bin/vendor_perl
+    [ -d /usr/bin/core_perl ]   && PATH=${PATH}:/usr/bin/core_perl
+    export PATH
+
+  source /etc/profile.d/perlbin.sh
+
+Install Perl modules
+
+  cpanm ExtUtils::MakeMaker
+  cpanm ExtUtils::Config
+  cpanm Test::More
+
+  cpanm Data::Dumper
+  cpanm YAML::XS
+  cpanm XML::Hash::XS
+  cpanm Cpanel::JSON::XS
+  cpanm URI
+  cpanm IO::HTML
+  cpanm HTTP::Headers
+  cpanm HTTP::Entity::Parser
+  cpanm Template::Toolkit
+  cpanm Moo
+  cpanm Net::Server
+  cpanm Starman
+  cpanm HTTP::Server::Simple
+  cpanm HTTP::Server::PSGI
+  cpanm Params::Validate
+  cpanm Params::Util
+  cpanm Plack
+  cpanm Plack::Handler::HTTP::Server::Simple
+  cpanm Plack::Middleware::Deflater
+  cpanm AnyEvent
+  cpanm Dancer2
+  cpanm Dancer2::Plugin::WebService
+
+Check the dancer2 version
+
+  $(/usr/bin/which dancer2) version
+
+Check the installed plackup utility
+
+  plackup=$(/usr/bin/find /usr/bin -name plackup -type f)
+  [ -x "$plackup" ] && echo ok || echo Sorry, could not found the plackup
+  $plackup --version
+
+Make executable any authentication script that needs root privileges, e.g the  Linux_native_authentication.sh
+
+  /usr/bin/find $(/usr/bin/perl -M File::Basename -E 'use Dancer2::Plugin::WebService; print [ fileparse $INC{"Dancer2/Plugin/WebService.pm"} ]->[1]') -regex ".*\.\(sh\|pl|py\)\$"
+  /usr/bin/find $(/usr/bin/perl -M File::Basename -E 'use Dancer2::Plugin::WebService; print [ fileparse $INC{"Dancer2/Plugin/WebService.pm"} ]->[1]') -regex ".*\.\(sh\|pl|py\)\$" -type f -exec /usr/bin/chmod 755 {} \;
+
+Give the authentication scripts   sudo "no password prompt" e.g
 
   vi /etc/sudoers.d/Dancer2-Plugin-WebService
 
     dancer ALL=(ALL:ALL) NOPASSWD: /usr/share/perl5/site_perl/Dancer2/Plugin/AuthScripts/Linux_native_authentication.sh
-                                 
-Optional, have a look at Dancer2::Plugin::WebService documentation
 
-  darkhttpd /home/dancer --addr 0.0.0.0 --port 80 --chroot --daemon --index index.html # Start the web server at the background
-  
+To view the Dancer2::Plugin::WebService documentation using your web browser
+
   [ -f /home/dancer/pod2htmd.tmp ] && unlink /home/dancer/pod2htmd.tmp
-  /usr/bin/core_perl/pod2html --infile=/opt/Dancer2-Plugin-WebService/lib/Dancer2/Plugin/WebService.pm --outfile=/home/dancer/index.html --title="Dancer2 WebService" --verbose
+  pod2html --infile=/opt/Dancer2-Plugin-WebService/lib/Dancer2/Plugin/WebService.pm --outfile=/tmp/index.html --title="Dancer2 WebService" --verbose
+
+  pacman -S darkhttpd
+  darkhttpd /tmp --addr 0.0.0.0 --port 80 --chroot --daemon --index index.html # Start the web server at the background
 
   http://yourserver
 
-
-Use compressed http if you have fast CPU and large replies
-vi /home/dancer/TestService/bin/app.psgi
-
-  #!/usr/bin/perl
-  use strict;
-  use warnings;
-  use FindBin;
-  use lib "$FindBin::Bin/../lib";
-  use TestService;
-  use Plack::Builder;
-  builder {
-  enable 'Deflater';
-  # you can have multiple applications on different http paths
-  mount '/' => TestService->to_app
-  }
-
-Configure the production enviroment
-vi /home/dancer/TestService/environments/production.yml
-
-  log              : "warning"
-  logger           : "file"
-  show_stacktrace  : 0
-  no_server_tokens : 1
-
-For a custom logger
-vi /home/dancer/TestService/environments/production.yml
-
-  # logger    : file, console
-  # log level : core, debug, info, warning, error
-
-  startup_info     : 1
-  show_errors      : 1
-  warnings         : 1
-  no_server_tokens : 0
-  logger           : 'console'
-  log              : 'file'
-  engines:
-    logger:
-      file:
-        log_format : '{"ts":"%{%Y-%m-%d %H:%M:%S}t","host":"%h","level":"%L","message":"%m"}'
-        log_dir    : '/var/log/WebService'
-        file_name  : 'TestService.log'
-      console:
-        log_format : '{"ts":"%{%Y-%m-%d %H:%M:%S}t","host":"%h","level":"%L","message":"%m"}'
-
-
-
-Write your TestService rest api code at
-/home/dancer/TestService/lib/TestService.pm
-At this example We have implement the example routes defined at the sample config.yml 
-vi /home/dancer/TestService/lib/TestService.pm
-
-  ...
-
-Edit the config.yml to define there your routes, their security and the authentication method.
-cp -a /home/dancer/TestService/config.yml /home/dancer/TestService/config.yml.orig
-vi    /home/dancer/TestService/config.yml
-
-
-appname                 : TestService
-environment             : development
-layout                  : main
-charset                 : UTF-8
-template                : template_toolkit
-engines                 :
-  template              :
-    template_toolkit    :
-      EVAL_PERL         : 0
-      start_tag         : '<%'
-      end_tag           : '%>'
-plugins                 :
-  WebService            :
-    Session directory   : /var/lib/WebService
-    Session idle timeout: 86400
-    Default format      : json
-    Allowed hosts       :
-    - 127.*
-    - 10.*.?.*
-    - 172.20.20.105
-    - "????:????:????:6d00:20c:29ff:*:ffa3"
-    - "*"
-    Routes              :
-      mirror            : { Protected: false }
-      somekeys          : { Protected: false, Groups: [ group1 , group2 ] }
-      foo\/test1        : { Protected: false, Groups: [ group1 , group2 ] }
-      foo\/test2        : { Protected: false, Groups: [ group1 , group2 ] }
-      INeedLogin_store  : { Protected: true,  Groups: [ group1 , group2 ] }
-      INeedLogin_delete : { Protected: true,  Groups: group3 }
-      INeedLogin_read   : { Protected: true }
-
-    Authentication methods:
-
-    - Name     : INTERNAL
-      Active   : false
-      Accounts :
-        user1  : pass1
-        user2  : <any>
-        <any>  : Secret4All
-
-    - Name     : Linux native users
-      Active   : true
-      Command  : MODULE_INSTALL_DIR/AuthScripts/Linux_native_authentication.sh
-      Arguments: [ ]
-      Use sudo : true
-
-    - Name     : Basic Apache auth for simple users
-      Active   : false
-      Command  : MODULE_INSTALL_DIR/AuthScripts/HttpBasic.sh
-      Arguments: [ "/etc/htpasswd" ]
-      Use sudo : false
-
-
-
-
--------------------------
-
-
-Start the application
-
-  # Find the plackup
-  plackup=$(/usr/bin/find /usr -name plackup -type f)
-
-  # Start for production using the Starman
-  sudo -u dancer ${plackup} --host 0.0.0.0 --port 3000 --server Starman --workers=5 --env production -a /home/dancer/TestService/bin/app.psgi
-
-  # Start for development using the HTTP::Server::PSGI or HTTP::Server::Simple
-  sudo -u dancer ${plackup} --host 0.0.0.0 --port 3000 --env development --app /home/dancer/TestService/bin/app.psgi --server HTTP::Server::PSGI
-  sudo -u dancer ${plackup} --host 0.0.0.0 --port 3000 --env development --app /home/dancer/TestService/bin/app.psgi --server HTTP::Server::Simple --Reload /home/dancer/TestService/lib/TestService.pm,/home/dancer/TestService/config.yml,/opt/Dancer2-Plugin-WebService/lib/Dancer2/Plugin/WebService.pm
-  sudo -u dancer ${plackup} --host 0.0.0.0 --port 3000 --env development --app /home/dancer/TestService/bin/app.psgi
-
-  # Start as cosnsole application
-  sudo -u dancer /usr/bin/perl -I lib /home/dancer/TestService/bin/app.psgi
-
-Routes
-
-Built-in WebService library routes
-
-  export url=http://127.0.0.1:3000
-  export H='Content-Type: application/json'
-
-  curl  $url
-  curl  $url/WebService
-  curl  $url/WebService/client
-  curl  $url/WebService/routes?sort=true
-  curl "$url/WebService?to=json&pretty=true&sort=true"
-  curl  $url/WebService?to=yaml
-  curl "$url/WebService?to=xml&pretty=false"
-  curl "$url/WebService?to=xml&pretty=true"
-  curl  $url/WebService?to=perl
-  curl  $url/WebService?to=human
-
-TestService custom routes at lib/TestService.pm
-
-  curl "$url/mirror?from=xml&to=yaml"    -d '<root><k1>v1</k1><k2>v2</k2><k3></k3></root>'
-  curl  $url/mirror                      -d '{ "k1":"v1", "k2":"v2", "k3":{} }'
-  curl  $url/mirror                      -d '[ "a", "b", "c", "d"   ]'
-  curl  $url/mirror                      -d '[ "a", { "k2" : "v2" } ]'
-  curl "$url/mirror?k3=v3&k4=v4"         -d '{ "k1":"v1", "k2":"v2" }'
-  curl "$url/mirror?to=human"            -d '{ "k1":"v1", "k2":"v2" }'
-  curl "$url/mirror?to=json&pretty=true" -d '{ "k1":[ "a","b","c" ] }'
-  curl "$url/mirror?to=xml&pretty=false" -d '{ "k1":"v1", "k2":"v2" }'
-  curl "$url/mirror?to=yaml"             -d '{ "k1":[ "a","b","c" ] }'
-  curl "$url/mirror?to=perl"             -d '{ "k1":"v1", "k2":"v2" }'
-  curl "$url/mirror?to=FOO"              -d '{ "k1":"v1" }'
-
-  # A successful login returns a token e.g. 17393926-5c8-0
-  curl -X POST $url/login -H "$H" -d '{"username": "user1", "password": "s3cr3T+PA55sW0rD"}'
-
-  curl  $url/text
-  curl  $url/text?token=17393926-5c8-0                    -X GET
-  curl  $url/text -H "$H" -d '{"token":"17393926-5c8-0"}' -X POST
-  curl  $url/text_ref
-  curl  $url/list?pretty=false
-  curl  $url/list_ref?to=yaml
-  curl  $url/list_ref
-  curl  $url/hash
-  curl  $url/function/text
-  curl  $url/function/list
-  curl  $url/function/hash
-  curl  $url/function/text_ref
-  curl  $url/function/list_ref
-
-  curl    $url/keys_selected?to=yaml -d '{ "k1":"v1", "k2":"v2", "k3":"v3" }'
-  curl    $url/keys_selected?to=yaml -d '[ "k1", "k2", "k3", "k4" ]'
-  curl   "$url/error?to=json&pretty=true" -H "$H" -d '{"k1":"B",  "k2":"v2"}'
-  curl    $url/session_save?token=17393926-5c8-0 -H "$H" -X POST   -d '{"k1":"v1", "k2":"v2", "k3":"v3"}'
-  curl    $url/session_read?token=17393926-5c8-0
-  curl  $url/session_delete?token=17393926-5c8-0 -H "$H" -X DELETE -d '["k3","k8","k9"]'
-  curl    $url/session_read?token=17393926-5c8-0
-  curl          $url/logout?token=17393926-5c8-0
-  curl  $url/logout -d '{"token":"17393926-5c8-0"}' -H "$H" -X POST
-
-
-To start your application as Linux service
-If you plan to use a reverse proxy change the --host 0.0.0.0 to --host 127.0.0.1
-We locate the plackup  executable e.g   /usr/bin/site_perl/plackup
-
-vi /etc/systemd/system/TestService.service
-
-
-[Unit]
-Description=TestService rest API
-Documentation=https://metacpan.org/pod/Dancer2
-After=network.target
-ConditionPathExists=/usr/bin/site_perl/plackup
-
-[Service]
-Type=simple
-User=dancer
-Group=dancer
-Environment=BIND=0.0.0.0
-Environment=PORT=3000
-Environment=WORKERS=10
-Environment=ENVIROMENT=development
-ExecStart=/usr/bin/site_perl/plackup --host $BIND --port $PORT --server Starman --workers=$WORKERS --env $ENVIROMENT -a /home/dancer/TestService/bin/app.psgi
-WorkingDirectory=/home/dancer/TestService
-ExecStop=/bin/kill -s QUIT $MAINPID
-KillMode=mixed
-KillSignal=QUIT
-StandardOutput=journal
-StandardError=journal
-NoNewPrivileges=true
-PrivateTmp=true
-LimitNOFILE=infinity
-Restart=on-failure
-RestartSec=60s
-
-[Install]
-WantedBy=multi-user.target
-
-
-start the service
-
-  systemd-analyze verify /etc/systemd/system/TestService.service
-  systemctl daemon-reload
-  systemctl cat       TestService
-  systemctl enable    TestService.service
-  systemctl start     TestService
-  systemctl is-active TestService
-  systemctl status    TestService
-  journalctl -f -xelu TestService
-  systemctl stop      TestService
-
-delete the service
-
-  systemctl stop      TestService
-  systemctl disable   TestService.service
-  unlink /etc/systemd/system/TestService.service
-
-
-
-
-
-
-If you use an nginx web server to reverse proxy you service your app
-vi nginx.conf 
-
-  ...
-  upstream TestService { server 127.0.0.1:3000 fail_timeout=0; keepalive 1024; }
-  ...
-  server
-  {
-  server_name      www.example.com;
-  listen           30080;
-  listen           30443 ssl;
-  root             /tmp;
-  proxy_redirect   off;
-  proxy_set_header Host $host;
-  proxy_set_header X-Real-IP $remote_addr; # needed for real client IP pass as server enviroment variable HTTP_X_REAL_IP
-  
-      location /
-      {
-      fastcgi_param REMOTE_ADDR X-Real-IP;
-      proxy_pass http://TestService;
-      } 
-  }
+Please follow the CREATE_SAMPLE_APPLICATION document to create the "TestService" application for practice

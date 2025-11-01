@@ -1,0 +1,111 @@
+# NAME
+
+Git::RemoteURL::Parse - Parse and classify Git remote URLs (GitHub, GitLab)
+
+# VERSION
+
+Version 0.04
+
+# SYNOPSIS
+
+    use Git::RemoteURL::Parse;
+
+    my $info = parse_git_remote_url('https://github.com/user/repo.git');
+
+    if ($info) {
+        if ($info->{service} eq 'github') {
+            print "GitHub repo: $info->{user}/$info->{repo}\n";
+        }
+        elsif ($info->{service} eq 'gitlab') {
+            print "GitLab repo: $info->{group_path}/$info->{repo}\n";
+        }
+    } else {
+        warn "Not a recognized GitHub or GitLab URL\n";
+    }
+
+# DESCRIPTION
+
+This module provides a single function, `parse_git_remote_url()`, which
+analyzes a Git remote URL and identifies whether it points to a GitHub or
+GitLab repository. It also extracts the repo and the user name or group path, respectively.
+
+Supported URL formats include both HTTPS and SSH variants.
+
+## SUPPORTED FORMATS
+
+- GitHub HTTPS:
+    - `https://github.com/user/repo.git`
+    - `https://token@github.com/user/repo`
+- GitHub SSH:
+    - `git@github.com:user/repo.git`
+    - `git@gh-alias:user/repo`
+- GitLab HTTPS:
+    - `https://gitlab.com/group/subgroup/repo.git`
+- GitLab SSH:
+    - `git@gitlab.com:group/sub/repo.git`
+    - `git@gl-alias:group1/group2/repo.git`
+
+## FUNCTIONS
+
+- `parse_git_remote_url(_URL_)`
+
+    Takes a Git remote _`URL`_ string and returns a hash reference with the following structure:
+
+    - For GitHub:
+
+            {
+                service => 'github',
+                user    => 'USERNAME',
+                repo    => 'REPO_NAME',
+            }
+
+    - For GitLab:
+
+            {
+                service    => 'gitlab',
+                group_path => 'GROUP/SUBGROUP/...',
+                repo       => 'REPO_NAME',
+            }
+
+    Returns `undef` if the URL is not recognized as a valid GitHub or GitLab URL.
+
+# AUTHOR
+
+Klaus Rindfrey, `<klausrin at cpan.org.eu>`
+
+# SEE ALSO
+
+[App::ghmulti](https://metacpan.org/pod/App%3A%3Aghmulti)
+
+# BUGS
+
+Please report any bugs or feature requests to `bug-git-remoteurl-parse at rt.cpan.org`, or through
+the web interface at [https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Git-RemoteURL-Parse](https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Git-RemoteURL-Parse).  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+# SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Git::RemoteURL::Parse
+
+You can also look for information at:
+
+- RT: CPAN's request tracker (report bugs here)
+
+    [https://rt.cpan.org/NoAuth/Bugs.html?Dist=Git-RemoteURL-Parse](https://rt.cpan.org/NoAuth/Bugs.html?Dist=Git-RemoteURL-Parse)
+
+- Search CPAN
+
+    [https://metacpan.org/release/Git-RemoteURL-Parse](https://metacpan.org/release/Git-RemoteURL-Parse)
+
+- GitHub Repository
+
+    [https://github.com/klaus-rindfrey/git-remoteurl-parse](https://github.com/klaus-rindfrey/git-remoteurl-parse)
+
+# LICENSE AND COPYRIGHT
+
+This software is copyright (c) 2025 by Klaus Rindfrey.
+
+This module is free software. You may redistribute it and/or modify it under
+the same terms as Perl itself.

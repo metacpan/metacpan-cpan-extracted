@@ -32,6 +32,19 @@ docs/AiAcceleratorResponseProductProduct.md
 docs/ApexRedirect.md
 docs/ApexRedirectAllOf.md
 docs/ApexRedirectApi.md
+docs/ApiDiscoveryResponseBodyGetAllServices.md
+docs/ApiDiscoveryResponseCustomer.md
+docs/ApiDiscoveryResponseCustomerCustomer.md
+docs/ApiDiscoveryResponseEnable.md
+docs/ApiDiscoveryResponseEnabledServices.md
+docs/ApiDiscoveryResponseLinks.md
+docs/ApiDiscoveryResponseLinksGetAllServices.md
+docs/ApiDiscoveryResponseLinksGetAllServicesLinks.md
+docs/ApiDiscoveryResponseLinksLinks.md
+docs/ApiDiscoveryResponseProduct.md
+docs/ApiDiscoveryResponseProductProduct.md
+docs/ApiDiscoveryResponseService.md
+docs/ApiDiscoveryResponseServiceService.md
 docs/AsyncResponse.md
 docs/AttackReport.md
 docs/AttackSignal.md
@@ -72,7 +85,6 @@ docs/BotManagementResponseLinksLinks.md
 docs/BotManagementResponseProduct.md
 docs/BotManagementResponseProductProduct.md
 docs/BotManagementResponseService.md
-docs/BotManagementResponseServiceService.md
 docs/BrotliCompressionResponseBodyEnable.md
 docs/BrotliCompressionResponseBodyGetAllServices.md
 docs/BrotliCompressionResponseCustomer.md
@@ -169,6 +181,8 @@ docs/DdosProtectionResponseService.md
 docs/DdosProtectionRule.md
 docs/DdosProtectionRuleAllOf.md
 docs/DdosProtectionRulePatch.md
+docs/DdosProtectionRuleWithStats.md
+docs/DdosProtectionRuleWithStatsAllOf.md
 docs/DdosProtectionTrafficStats.md
 docs/DdosProtectionTrafficStatsAllOf.md
 docs/DefaultSettings.md
@@ -202,6 +216,7 @@ docs/DirectorBackend.md
 docs/DirectorBackendAllOf.md
 docs/DirectorBackendApi.md
 docs/DirectorResponse.md
+docs/DmDomainsApi.md
 docs/Domain.md
 docs/DomainApi.md
 docs/DomainInspector.md
@@ -298,8 +313,6 @@ docs/HttpResponseFormat.md
 docs/HttpStreamFormat.md
 docs/IamPermission.md
 docs/IamPermissionsApi.md
-docs/IamRole.md
-docs/IamRoleAllOf.md
 docs/IamRolesApi.md
 docs/IamServiceGroup.md
 docs/IamServiceGroupAllOf.md
@@ -307,6 +320,8 @@ docs/IamServiceGroupsApi.md
 docs/IamUserGroup.md
 docs/IamUserGroupAllOf.md
 docs/IamUserGroupsApi.md
+docs/IamV1RoleListResponse.md
+docs/IamV1RoleResponse.md
 docs/ImageOptimizerDefaultSettingsApi.md
 docs/ImageOptimizerResponseBodyEnable.md
 docs/ImageOptimizerResponseBodyGetAllServices.md
@@ -325,6 +340,7 @@ docs/InlineObject.md
 docs/InlineObject1.md
 docs/InlineResponse200.md
 docs/InlineResponse2001.md
+docs/InlineResponse20010.md
 docs/InlineResponse2002.md
 docs/InlineResponse2003.md
 docs/InlineResponse2004.md
@@ -583,6 +599,7 @@ docs/Pop.md
 docs/PopApi.md
 docs/PopCoordinates.md
 docs/ProductAiAcceleratorApi.md
+docs/ProductApiDiscoveryApi.md
 docs/ProductBotManagementApi.md
 docs/ProductBrotliCompressionApi.md
 docs/ProductDdosProtectionApi.md
@@ -690,6 +707,8 @@ docs/RelationshipsForTlsConfiguration.md
 docs/RelationshipsForTlsDomain.md
 docs/RelationshipsForTlsPrivateKey.md
 docs/RelationshipsForTlsSubscription.md
+docs/RequestBodyForCreate.md
+docs/RequestBodyForUpdate.md
 docs/RequestSettingsAdditional.md
 docs/RequestSettingsApi.md
 docs/RequestSettingsResponse.md
@@ -774,6 +793,8 @@ docs/StarResponse.md
 docs/StarResponseAllOf.md
 docs/Stats.md
 docs/StatsApi.md
+docs/SuccessfulResponseAsObject.md
+docs/SuccessfulResponseAsObjectAllOf.md
 docs/SudoApi.md
 docs/SudoGenericTokenError.md
 docs/SudoRequest.md
@@ -970,6 +991,7 @@ lib/WebService/Fastly/DictionaryItemApi.pm
 lib/WebService/Fastly/DiffApi.pm
 lib/WebService/Fastly/DirectorApi.pm
 lib/WebService/Fastly/DirectorBackendApi.pm
+lib/WebService/Fastly/DmDomainsApi.pm
 lib/WebService/Fastly/DomainApi.pm
 lib/WebService/Fastly/DomainInspectorHistoricalApi.pm
 lib/WebService/Fastly/DomainInspectorRealtimeApi.pm
@@ -1037,6 +1059,19 @@ lib/WebService/Fastly/Object/AiAcceleratorResponseProduct.pm
 lib/WebService/Fastly/Object/AiAcceleratorResponseProductProduct.pm
 lib/WebService/Fastly/Object/ApexRedirect.pm
 lib/WebService/Fastly/Object/ApexRedirectAllOf.pm
+lib/WebService/Fastly/Object/ApiDiscoveryResponseBodyGetAllServices.pm
+lib/WebService/Fastly/Object/ApiDiscoveryResponseCustomer.pm
+lib/WebService/Fastly/Object/ApiDiscoveryResponseCustomerCustomer.pm
+lib/WebService/Fastly/Object/ApiDiscoveryResponseEnable.pm
+lib/WebService/Fastly/Object/ApiDiscoveryResponseEnabledServices.pm
+lib/WebService/Fastly/Object/ApiDiscoveryResponseLinks.pm
+lib/WebService/Fastly/Object/ApiDiscoveryResponseLinksGetAllServices.pm
+lib/WebService/Fastly/Object/ApiDiscoveryResponseLinksGetAllServicesLinks.pm
+lib/WebService/Fastly/Object/ApiDiscoveryResponseLinksLinks.pm
+lib/WebService/Fastly/Object/ApiDiscoveryResponseProduct.pm
+lib/WebService/Fastly/Object/ApiDiscoveryResponseProductProduct.pm
+lib/WebService/Fastly/Object/ApiDiscoveryResponseService.pm
+lib/WebService/Fastly/Object/ApiDiscoveryResponseServiceService.pm
 lib/WebService/Fastly/Object/AsyncResponse.pm
 lib/WebService/Fastly/Object/AttackReport.pm
 lib/WebService/Fastly/Object/AttackSignal.pm
@@ -1072,7 +1107,6 @@ lib/WebService/Fastly/Object/BotManagementResponseLinksLinks.pm
 lib/WebService/Fastly/Object/BotManagementResponseProduct.pm
 lib/WebService/Fastly/Object/BotManagementResponseProductProduct.pm
 lib/WebService/Fastly/Object/BotManagementResponseService.pm
-lib/WebService/Fastly/Object/BotManagementResponseServiceService.pm
 lib/WebService/Fastly/Object/BrotliCompressionResponseBodyEnable.pm
 lib/WebService/Fastly/Object/BrotliCompressionResponseBodyGetAllServices.pm
 lib/WebService/Fastly/Object/BrotliCompressionResponseCustomer.pm
@@ -1160,6 +1194,8 @@ lib/WebService/Fastly/Object/DdosProtectionResponseService.pm
 lib/WebService/Fastly/Object/DdosProtectionRule.pm
 lib/WebService/Fastly/Object/DdosProtectionRuleAllOf.pm
 lib/WebService/Fastly/Object/DdosProtectionRulePatch.pm
+lib/WebService/Fastly/Object/DdosProtectionRuleWithStats.pm
+lib/WebService/Fastly/Object/DdosProtectionRuleWithStatsAllOf.pm
 lib/WebService/Fastly/Object/DdosProtectionTrafficStats.pm
 lib/WebService/Fastly/Object/DdosProtectionTrafficStatsAllOf.pm
 lib/WebService/Fastly/Object/DefaultSettings.pm
@@ -1272,12 +1308,12 @@ lib/WebService/Fastly/Object/Http3AllOf.pm
 lib/WebService/Fastly/Object/HttpResponseFormat.pm
 lib/WebService/Fastly/Object/HttpStreamFormat.pm
 lib/WebService/Fastly/Object/IamPermission.pm
-lib/WebService/Fastly/Object/IamRole.pm
-lib/WebService/Fastly/Object/IamRoleAllOf.pm
 lib/WebService/Fastly/Object/IamServiceGroup.pm
 lib/WebService/Fastly/Object/IamServiceGroupAllOf.pm
 lib/WebService/Fastly/Object/IamUserGroup.pm
 lib/WebService/Fastly/Object/IamUserGroupAllOf.pm
+lib/WebService/Fastly/Object/IamV1RoleListResponse.pm
+lib/WebService/Fastly/Object/IamV1RoleResponse.pm
 lib/WebService/Fastly/Object/ImageOptimizerResponseBodyEnable.pm
 lib/WebService/Fastly/Object/ImageOptimizerResponseBodyGetAllServices.pm
 lib/WebService/Fastly/Object/ImageOptimizerResponseCustomer.pm
@@ -1295,6 +1331,7 @@ lib/WebService/Fastly/Object/InlineObject.pm
 lib/WebService/Fastly/Object/InlineObject1.pm
 lib/WebService/Fastly/Object/InlineResponse200.pm
 lib/WebService/Fastly/Object/InlineResponse2001.pm
+lib/WebService/Fastly/Object/InlineResponse20010.pm
 lib/WebService/Fastly/Object/InlineResponse2002.pm
 lib/WebService/Fastly/Object/InlineResponse2003.pm
 lib/WebService/Fastly/Object/InlineResponse2004.pm
@@ -1599,6 +1636,8 @@ lib/WebService/Fastly/Object/RelationshipsForTlsConfiguration.pm
 lib/WebService/Fastly/Object/RelationshipsForTlsDomain.pm
 lib/WebService/Fastly/Object/RelationshipsForTlsPrivateKey.pm
 lib/WebService/Fastly/Object/RelationshipsForTlsSubscription.pm
+lib/WebService/Fastly/Object/RequestBodyForCreate.pm
+lib/WebService/Fastly/Object/RequestBodyForUpdate.pm
 lib/WebService/Fastly/Object/RequestSettingsAdditional.pm
 lib/WebService/Fastly/Object/RequestSettingsResponse.pm
 lib/WebService/Fastly/Object/RequestSettingsResponseAllOf.pm
@@ -1671,6 +1710,8 @@ lib/WebService/Fastly/Object/StarData.pm
 lib/WebService/Fastly/Object/StarResponse.pm
 lib/WebService/Fastly/Object/StarResponseAllOf.pm
 lib/WebService/Fastly/Object/Stats.pm
+lib/WebService/Fastly/Object/SuccessfulResponseAsObject.pm
+lib/WebService/Fastly/Object/SuccessfulResponseAsObjectAllOf.pm
 lib/WebService/Fastly/Object/SudoGenericTokenError.pm
 lib/WebService/Fastly/Object/SudoRequest.pm
 lib/WebService/Fastly/Object/SudoResponse.pm
@@ -1834,6 +1875,7 @@ lib/WebService/Fastly/PackageApi.pm
 lib/WebService/Fastly/PoolApi.pm
 lib/WebService/Fastly/PopApi.pm
 lib/WebService/Fastly/ProductAiAcceleratorApi.pm
+lib/WebService/Fastly/ProductApiDiscoveryApi.pm
 lib/WebService/Fastly/ProductBotManagementApi.pm
 lib/WebService/Fastly/ProductBrotliCompressionApi.pm
 lib/WebService/Fastly/ProductDdosProtectionApi.pm

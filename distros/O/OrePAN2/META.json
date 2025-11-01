@@ -4,7 +4,7 @@
       "tokuhirom <tokuhirom@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.23",
+   "generated_by" : "Minilla/v3.1.28",
    "license" : [
       "perl_5"
    ],
@@ -29,6 +29,8 @@
       },
       "develop" : {
          "requires" : {
+            "CPAN::Uploader" : "0",
+            "Perl::MinimumVersion::Fast" : "0",
             "Test::CPAN::Meta" : "0",
             "Test::MinimumVersion::Fast" : "0.04",
             "Test::PAUSE::Permissions" : "0.07",
@@ -69,13 +71,14 @@
             "Try::Tiny" : "0",
             "Type::Tiny" : "2.000000",
             "Types::Path::Tiny" : "0",
-            "Types::Self" : "0",
-            "Types::URI" : "0",
+            "Types::Self" : "0.002",
+            "Types::URI" : "0.007",
+            "URI::FromHash" : "0",
             "autodie" : "0",
             "feature" : "0",
-            "namespace::clean" : "0",
+            "namespace::clean" : "0.27",
             "parent" : "0",
-            "perl" : "5.012000",
+            "perl" : "5.014000",
             "version" : "0.9912"
          }
       },
@@ -85,14 +88,19 @@
             "File::Which" : "0",
             "Path::Tiny" : "0.119",
             "Test::More" : "0.98",
+            "Test::Needs" : "0",
             "Test::RequiresInternet" : "0.02"
+         },
+         "suggests" : {
+            "Log::Any" : "0",
+            "Test::Output" : "0"
          }
       }
    },
    "provides" : {
       "OrePAN2" : {
          "file" : "lib/OrePAN2.pm",
-         "version" : "0.52"
+         "version" : "0.53"
       },
       "OrePAN2::Auditor" : {
          "file" : "lib/OrePAN2/Auditor.pm"
@@ -112,11 +120,17 @@
       "OrePAN2::Injector" : {
          "file" : "lib/OrePAN2/Injector.pm"
       },
+      "OrePAN2::Logger" : {
+         "file" : "lib/OrePAN2/Logger.pm"
+      },
       "OrePAN2::Repository" : {
          "file" : "lib/OrePAN2/Repository.pm"
       },
       "OrePAN2::Repository::Cache" : {
          "file" : "lib/OrePAN2/Repository/Cache.pm"
+      },
+      "OrePAN2::Role::HasLogger" : {
+         "file" : "lib/OrePAN2/Role/HasLogger.pm"
       }
    },
    "release_status" : "stable",
@@ -131,7 +145,7 @@
          "web" : "https://github.com/tokuhirom/OrePAN2"
       }
    },
-   "version" : "0.52",
+   "version" : "0.53",
    "x_authority" : "cpan:TOKUHIROM",
    "x_contributors" : [
       "Chad Granum <exodist7@gmail.com>",
@@ -144,6 +158,7 @@
       "Masahiro Honma <hiratara@cpan.org>",
       "Mickey Nasriachi <mickey@cpan.org>",
       "Olaf Alders <olaf@wundersolutions.com>",
+      "Paulo da Silva <paulo.da.silva@vitroconnect.com>",
       "Seth Daniel <seth.daniel@openx.com>",
       "Shoichi Kaji <skaji@cpan.org>",
       "Shoichi Kaji <skaji@outlook.com>",

@@ -9,7 +9,7 @@ use English;
 use Error::Pure::Utils qw(err_get);
 use MARC::Validator::Utils qw(add_error);
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 sub name {
 	my $self = shift;
@@ -22,7 +22,7 @@ sub process {
 
 	my $struct_hr = $self->{'struct'}->{'checks'};
 
-	my $cnb = $marc_record->field('015')->subfield('a');
+	my $error_id = $self->{'cb_error_id'}->($marc_record);
 
 	my @isbn_fields = $marc_record->field('020');
 	foreach my $isbn_field (@isbn_fields) {
@@ -32,7 +32,7 @@ sub process {
 		}
 		my $isbn_obj = Business::ISBN->new($isbn);
 		if (! defined $isbn_obj) {
-			add_error($cnb, $struct_hr, {
+			add_error($error_id, $struct_hr, {
 				'error' => 'Bad ISBN in 020a field.',
 				'params' => {
 					'Value' => $isbn,
@@ -41,14 +41,14 @@ sub process {
 		} elsif (! $isbn_obj->is_valid) {
 			$isbn_obj->fix_checksum;
 			if (! $isbn_obj->is_valid) {
-				add_error($cnb, $struct_hr, {
+				add_error($error_id, $struct_hr, {
 					'error' => 'Bad ISBN in 020a field after fixing of checksum.',
 					'params' => {
 						'Value' => $isbn,
 					},
 				});
 			} else {
-				add_error($cnb, $struct_hr, {
+				add_error($error_id, $struct_hr, {
 					'error' => 'Bad checksum of ISBN in 020a field.',
 					'params' => {
 						'Value' => $isbn,
@@ -58,14 +58,14 @@ sub process {
 		} else {
 			if ($isbn_obj->as_string ne $isbn) {
 				if ((length $isbn_obj->as_string) != (length $isbn)) {
-					add_error($cnb, $struct_hr, {
+					add_error($error_id, $struct_hr, {
 						'error' => 'Bad ISBN in 020a field, extra characters.',
 						'params' => {
 							'Value' => $isbn,
 						},
 					});
 				} else {
-					add_error($cnb, $struct_hr, {
+					add_error($error_id, $struct_hr, {
 						'error' => 'Bad ISBN in 020a field, bad formatting.',
 						'params' => {
 							'Value' => $isbn,

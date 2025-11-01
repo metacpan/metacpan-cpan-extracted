@@ -255,7 +255,7 @@ sub authz {
     }
 
     # Ok
-    $user->is_authorized(1); # Set flag 'authorized'
+    $user->is_authorized(1); # Set flag 'is_authorized'
     return $user;
 }
 sub access {

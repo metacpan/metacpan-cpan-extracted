@@ -1,36 +1,32 @@
 NAME
 
-    Dancer2::Plugin::WebService
+  Dancer2::Plugin::WebService
 
 DESCRIPTION
 
-    RESTful Web Services. Supports login/logout, sessions, persistent data
+  RESTful Web Services. Supports login/logout, sessions, persistent data
 
 INSTALLATION
 
-    To install this module, run the following commands:
+  Read the INSTALL file for installing your application as Linux service
+  Currently windows is not supported
 
-        perl Makefile.PL
-        make
-        make test
-        make install
+CREATE_SAMPLE_APPLICATION
 
-    Read the INSTALL file for installing your application as Linux service
-    Currently windows is not supported
+  Follow this document to create the "TestService" application for practice
 
 SUPPORT AND DOCUMENTATION
 
-    After installing, you can find documentation for this module with the perldoc command.
-
-    perldoc Dancer2::Plugin::WebService
+  After install, read the documentation
+  perldoc Dancer2::Plugin::WebService
 
 AUTHORS
 
-    Author and maintainer: George Bouras <george.mpouras@yandex.com>
+  Author and maintainer
+  George Bouras <george.mpouras@yandex.com>
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2019 by George Bouras.
-
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as the Perl 5 programming language system itself.
+  copyright (c) 2025 by George Bouras.
+  This is free software; you can redistribute it and/or modify it under
+  the same terms as the Perl 5 programming language system itself.

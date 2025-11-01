@@ -5,7 +5,7 @@ use warnings;
 
 use App::MARC::Validator;
 
-our $VERSION = 0.01;
+our $VERSION = 0.04;
 
 # Run.
 exit App::MARC::Validator->new->run;
@@ -28,7 +28,7 @@ marc-validator - Tool to validate records in MARC file.
 
 =head1 SYNOPSIS
 
- marc-validator [-d] [-h] [-l] [-o output_file] [-p] [-v] [--version] marc_xml_file..
+ marc-validator [-d] [-h] [-i id] [-l] [-o output_file] [-p] [-v] [--version] marc_xml_file..
 
 =head1 DESCRIPTION
 
@@ -47,6 +47,13 @@ Debug mode.
 =item * C<-h>
 
 Print help.
+
+=item * C<-i id>
+
+Record identifier defined by MARC field/subfield.
+Example value is '015a' for national library id.
+
+Default value is '001'.
 
 =item * C<-l>
 
@@ -108,6 +115,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.04
 
 =cut

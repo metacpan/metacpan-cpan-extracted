@@ -4,13 +4,19 @@ author:
   - 'Klaus Rindfrey <klausrin@cpan.org.eu>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  File::Spec::Functions: '0'
   Test::More: '0'
+  autodie: '0'
+  strict: '0'
+  warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec::Functions: '0'
   autodie: '0'
+  strict: '0'
+  warnings: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,7 +29,7 @@ no_index:
 provides:
   Git::RemoteURL::Parse:
     file: lib/Git/RemoteURL/Parse.pm
-    version: '0.03'
+    version: '0.04'
 requires:
   Exporter: '1.6'
   perl: '5.010'
@@ -31,7 +37,7 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/klaus-rindfrey/perl-git-remoteurl-parse.git
-version: '0.03'
+version: '0.04'
 x_bugtracker:
   web: https://github.com/klaus-rindfrey/perl-git-remoteurl-parse/issues
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -36,7 +36,9 @@ is_deeply(
 );
 
 # Test.
-$obj = MARC::Validator::Plugin::Field040->new;
+$obj = MARC::Validator::Plugin::Field040->new(
+	'error_id_def' => '015a',
+);
 $obj->init;
 my $marc_record = MARC::File::XML->in($data_dir->file('cnb002172297-leader_desc_cataloging_form_coolidate_with_rda.xml')->s)->next;
 $obj->process($marc_record);

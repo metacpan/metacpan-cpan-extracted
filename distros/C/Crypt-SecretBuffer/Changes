@@ -1,3 +1,7 @@
+Version 0.007 - 2025-10-31
+  - New API unmask_secrets_to and ->unmask_to
+  - Documented ways to use SecretBuffer without depending on it
+
 Version 0.006 - 2025-09-09
   - Fix bug checking errno for EAGAIN after failed _append_random
   - Fix Makefile.PL feature tests for required lib linker flags

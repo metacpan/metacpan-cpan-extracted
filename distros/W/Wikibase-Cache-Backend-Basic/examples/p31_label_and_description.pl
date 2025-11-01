@@ -12,4 +12,5 @@ print 'P31 label: '.$obj->get('label', 'P31')."\n";
 print 'P31 description: '.$obj->get('description', 'P31')."\n";
 
 # Output:
-# TODO
+# P31 label: instance of
+# P31 description: that class of which this subject is a particular example and member

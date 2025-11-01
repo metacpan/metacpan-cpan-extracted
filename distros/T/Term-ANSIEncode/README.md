@@ -55,6 +55,10 @@ Richard Kelsch
 
 * **GitHub** - https://github.com/richcsst
 
+## Fonts
+
+Some fonts do not support all of the Unicode characters.  The "examples" directory has an install script to install the "Awesome" fonts that look great and have all Unicode symbols.
+
 ## Tokens
 
 Tokens have to be encapsulated inside [% token %] (the token must be surrounded by at least one space on each side.  Colors beyond the standard 8 will require a terminal that supports 256 colors.

@@ -1,5 +1,10 @@
 Change history for Chart-ECharts
 
+1.03 2025-10-31
+    - Added "dataset" and "add_dataset" methods
+    - Use "load" JS event instead of "IIFE"
+    - Add "init_function" method
+
 1.02 2024-12-13
     - Simplified "render_script" JS output
     - Removed "option_prefix" and "chart_prefix" configs

@@ -34,7 +34,7 @@ requires:
 resources:
   bugtracker: https://github.com/nrdvana/perl-Crypt-SecretBuffer/issues
   repository: https://github.com/nrdvana/perl-Crypt-SecretBuffer.git
-version: '0.006'
+version: '0.007'
 x_contributors:
   - 'Michael Conrad <mconrad@intellitree.com>'
 x_generated_by_perl: v5.40.0

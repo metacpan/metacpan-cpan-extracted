@@ -7,11 +7,12 @@ build_requires:
   File::Which: '0'
   Path::Tiny: '0.119'
   Test::More: '0.98'
+  Test::Needs: '0'
   Test::RequiresInternet: '0.02'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.28, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +27,7 @@ no_index:
 provides:
   OrePAN2:
     file: lib/OrePAN2.pm
-    version: '0.52'
+    version: '0.53'
   OrePAN2::Auditor:
     file: lib/OrePAN2/Auditor.pm
   OrePAN2::CLI::Indexer:
@@ -39,10 +40,14 @@ provides:
     file: lib/OrePAN2/Indexer.pm
   OrePAN2::Injector:
     file: lib/OrePAN2/Injector.pm
+  OrePAN2::Logger:
+    file: lib/OrePAN2/Logger.pm
   OrePAN2::Repository:
     file: lib/OrePAN2/Repository.pm
   OrePAN2::Repository::Cache:
     file: lib/OrePAN2/Repository/Cache.pm
+  OrePAN2::Role::HasLogger:
+    file: lib/OrePAN2/Role/HasLogger.pm
 requires:
   Archive::Extract: '0.72'
   Archive::Tar: '1.46'
@@ -75,19 +80,20 @@ requires:
   Try::Tiny: '0'
   Type::Tiny: '2.000000'
   Types::Path::Tiny: '0'
-  Types::Self: '0'
-  Types::URI: '0'
+  Types::Self: '0.002'
+  Types::URI: '0.007'
+  URI::FromHash: '0'
   autodie: '0'
   feature: '0'
-  namespace::clean: '0'
+  namespace::clean: '0.27'
   parent: '0'
-  perl: '5.012000'
+  perl: '5.014000'
   version: '0.9912'
 resources:
   bugtracker: https://github.com/tokuhirom/OrePAN2/issues
   homepage: https://github.com/tokuhirom/OrePAN2
   repository: https://github.com/tokuhirom/OrePAN2.git
-version: '0.52'
+version: '0.53'
 x_authority: cpan:TOKUHIROM
 x_contributors:
   - 'Chad Granum <exodist7@gmail.com>'
@@ -100,6 +106,7 @@ x_contributors:
   - 'Masahiro Honma <hiratara@cpan.org>'
   - 'Mickey Nasriachi <mickey@cpan.org>'
   - 'Olaf Alders <olaf@wundersolutions.com>'
+  - 'Paulo da Silva <paulo.da.silva@vitroconnect.com>'
   - 'Seth Daniel <seth.daniel@openx.com>'
   - 'Shoichi Kaji <skaji@cpan.org>'
   - 'Shoichi Kaji <skaji@outlook.com>'
@@ -108,5 +115,5 @@ x_contributors:
   - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
   - 'dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>'
   - 'moznion <moznion@gmail.com>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
 x_static_install: 1

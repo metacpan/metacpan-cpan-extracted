@@ -5,7 +5,6 @@ use warnings FATAL => 'all';
 
 use Term::ANSIScreen qw( :cursor :screen );
 use Term::ANSIColor;
-use Time::HiRes qw( sleep );
 use List::Util qw(max);
 use utf8;
 

@@ -11,5 +11,6 @@ t/01-add.t
 t/02-dispatch.t
 t/03-cache.t
 t/04-memory.t.dis
+t/05-capture.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,11 +1,11 @@
-# Security Policy for the Software::Security::Policy distribution.
+# Security Policy for the Git::RemoteURL::Parse distribution.
 
-Report security issues by email to Klaus Rindfrey <k-rindfrey@gmx.de> <klausrin@cpan.org>.
+Report security issues by email to Klaus Rindfrey <klausrin@cpan.org>.
 
-This is the Security Policy for Software::Security::Policy.
+This is the Security Policy for Git::RemoteURL::Parse.
 
 The latest version of the Security Policy can be found in the
-[git repository for Software::Security::Policy](https://github.com/CPAN-Security/Software-Security-Policy/blob/main/SECURITY.md).
+[git repository for Git::RemoteURL::Parse](https://github.com/klaus-rindfrey/perl-git-remoteurl-parse/blob/main/SECURITY.md).
 
 This text is based on the CPAN Security Group's Guidelines for Adding
 a Security Policy to Perl Distributions (version 1.3.0)
@@ -13,8 +13,8 @@ https://security.metacpan.org/docs/guides/security-policy-for-authors.html
 
 # How to Report a Security Vulnerability
 
-Security vulnerabilities can be reported to the current Software::Security::Policy
-maintainers by email to Klaus Rindfrey <k-rindfrey@gmx.de> <klausrin@cpan.org>.
+Security vulnerabilities can be reported to the current Git::RemoteURL::Parse
+maintainers by email to Klaus Rindfrey <klausrin@cpan.org>.
 
 Please include as many details as possible, including code samples
 or test cases, so that we can reproduce the issue.  Check that your
@@ -42,7 +42,7 @@ on the CPANSec website.
 The maintainer(s) aim to acknowledge your security report as soon as
 possible.  However, this project is maintained by a single person in
 their spare time, and they cannot guarantee a rapid response.  If you
-have not received a response from them within 7 days, then
+have not received a response from them within 10 days, then
 please send a reminder to them and copy the report to CPANSec at
 <cpan-security@security.metacpan.org>.
 
@@ -59,10 +59,10 @@ They may also forward this issue to CPANSec.
 
 # Which Software This Policy Applies To
 
-Any security vulnerabilities in Software::Security::Policy are covered by this policy.
+Any security vulnerabilities in Git::RemoteURL::Parse are covered by this policy.
 
 Security vulnerabilities in versions of any libraries that are
-included in Software::Security::Policy are also covered by this policy.
+included in Git::RemoteURL::Parse are also covered by this policy.
 
 Security vulnerabilities are considered anything that allows users
 to execute unauthorised code, access unauthorised resources, or to
@@ -70,27 +70,27 @@ have an adverse impact on accessibility or performance of a system.
 
 Security vulnerabilities in upstream software (prerequisite modules
 or system libraries, or in Perl), are not covered by this policy
-unless they affect Software::Security::Policy, or Software::Security::Policy can
+unless they affect Git::RemoteURL::Parse, or Git::RemoteURL::Parse can
 be used to exploit vulnerabilities in them.
 
 Security vulnerabilities in downstream software (any software that
-uses Software::Security::Policy, or plugins to it that are not included with the
-Software::Security::Policy distribution) are not covered by this policy.
+uses Git::RemoteURL::Parse, or plugins to it that are not included with the
+Git::RemoteURL::Parse distribution) are not covered by this policy.
 
-## Supported Versions of Software::Security::Policy
+## Supported Versions of Git::RemoteURL::Parse
 
 The maintainer(s) will only commit to releasing security fixes for
-the latest version of Software::Security::Policy.
+the latest version of Git::RemoteURL::Parse.
 
-Note that the Software::Security::Policy project only supports major versions of Perl
-released in the past 10 years, even though Software::Security::Policy will run on
+Note that the Git::RemoteURL::Parse project only supports major versions of Perl
+released in the past 10 years, even though Git::RemoteURL::Parse will run on
 older versions of Perl.  If a security fix requires us to increase
 the minimum version of Perl that is supported, then we may do so.
 
 # Installation and Usage Issues
 
 The distribution metadata specifies minimum versions of
-prerequisites that are required for Software::Security::Policy to work.  However, some
+prerequisites that are required for Git::RemoteURL::Parse to work.  However, some
 of these prerequisites may have security vulnerabilities, and you
 should ensure that you are using up-to-date versions of these
 prerequisites.
@@ -101,4 +101,3 @@ newer versions as recommended.
 ## Usage
 
 Please see the software documentation for further information.
-

@@ -39,7 +39,7 @@ binmode(STDOUT, ":encoding(UTF-8)");
 binmode(STDIN,  ":encoding(UTF-8)");
 
 BEGIN {
-    our $VERSION = '1.37';
+    our $VERSION = '1.39';
 }
 
 # Returns a description of a token using the meta data.
@@ -157,7 +157,7 @@ sub box {
     my $vl  = '║';
     my $vr  = '║';
 
-    if ($type =~ /THIN/i) {
+    if ($type eq 'THIN') {
         $tl  = '┌';
         $tr  = '┐';
         $bl  = '└';
@@ -166,7 +166,7 @@ sub box {
         $bot = '─';
         $vl  = '│';
         $vr  = '│';
-    } elsif ($type =~ /ROUND/i) {
+    } elsif ($type eq 'ROUND') {
         $tl  = '╭';
         $tr  = '╮';
         $bl  = '╰';
@@ -175,7 +175,7 @@ sub box {
         $bot = '─';
         $vl  = '│';
         $vr  = '│';
-    } elsif ($type =~ /THICK/i) {
+    } elsif ($type eq 'THICK') {
         $tl  = '┏';
         $tr  = '┓';
         $bl  = '┗';
@@ -184,7 +184,7 @@ sub box {
         $bot = '━';
         $vl  = '┃';
         $vl  = '┃';
-    } elsif ($type =~ /BLOCK/i) {
+    } elsif ($type eq 'BLOCK') {
         $tl  = '🬚';
         $tr  = '🬩';
         $bl  = '🬌';
@@ -193,7 +193,7 @@ sub box {
         $bot = '🬋';
         $vl  = '▌';
         $vr  = '▐';
-    } elsif ($type =~ /WEDGE/i) {
+    } elsif ($type eq 'WEDGE') {
         $tl  = '🭊';
         $tr  = '🬿';
         $bl  = '🭥';
@@ -202,25 +202,34 @@ sub box {
         $bot = '🮄';
         $vl  = '█';
         $vr  = '█';
-    } elsif ($type =~ /DOTS/i) {
-        $tl  = '⏺';
-        $tr  = '⏺';
-        $bl  = '⏺';
-        $br  = '⏺';
-        $top = '⏺';
-        $bot = '⏺';
-        $vl  = '⏺';
-        $vr  = '⏺';
-    } elsif ($type =~ /DIAMOND/i) {
-        $tl  = '🞙';
-        $tr  = '🞙';
-        $bl  = '🞙';
-        $br  = '🞙';
-        $top = '🞙';
-        $bot = '🞙';
-        $vl  = '🞙';
-        $vr  = '🞙';
-    } elsif ($type =~ /STAR/i) {
+    } elsif ($type eq 'BIG WEDGE') {
+        $tl  = '◢';
+        $tr  = '◣';
+        $bl  = '◥';
+        $br  = '◤';
+        $top = '█';
+        $bot = '█';
+        $vl  = '█';
+        $vr  = '█';
+    } elsif ($type eq 'DOTS') {
+        $tl  = '🞄';
+        $tr  = '🞄';
+        $bl  = '🞄';
+        $br  = '🞄';
+        $top = '🞄';
+        $bot = '🞄';
+        $vl  = '🞄';
+        $vr  = '🞄';
+    } elsif ($type eq 'DIAMOND') {
+        $tl  = '⧫';
+        $tr  = '⧫';
+        $bl  = '⧫';
+        $br  = '⧫';
+        $top = '⧫';
+        $bot = '⧫';
+        $vl  = '⧫';
+        $vr  = '⧫';
+    } elsif ($type eq 'STAR') {
         $tl  = '⭑';
         $tr  = '⭑';
         $bl  = '⭑';
@@ -229,16 +238,88 @@ sub box {
         $bot = '⭑';
         $vl  = '⭑';
         $vr  = '⭑';
-    } elsif ($type =~ /SQUARE/i) {
-        $tl  = '⏹';
-        $tr  = '⏹';
-        $bl  = '⏹';
-        $br  = '⏹';
-        $top = '⏹';
-        $bot = '⏹';
-        $vl  = '⏹';
-        $vr  = '⏹';
-    } ## end elsif ($type =~ /SQUARE/i)
+    } elsif ($type eq 'CIRCLE') {
+        $tl  = '○';
+        $tr  = '○';
+        $bl  = '○';
+        $br  = '○';
+        $top = '○';
+        $bot = '○';
+        $vl  = '○';
+        $vr  = '○';
+    } elsif ($type eq 'SQUARE') {
+        $tl  = '∎';
+        $tr  = '∎';
+        $bl  = '∎';
+        $br  = '∎';
+        $top = '∎';
+        $bot = '∎';
+        $vl  = '∎';
+        $vr  = '∎';
+    } elsif ($type eq 'DITHERED') {
+        $tl  = '▒';
+        $tr  = '▒';
+        $bl  = '▒';
+        $br  = '▒';
+        $top = '▒';
+        $bot = '▒';
+        $vl  = '▒';
+        $vr  = '▒';
+    } elsif ($type eq 'HEART') {
+        $tl  = '♥';
+        $tr  = '♥';
+        $bl  = '♥';
+        $br  = '♥';
+        $top = '♥';
+        $bot = '♥';
+        $vl  = '♥';
+        $vr  = '♥';
+    } elsif ($type eq 'CHRISTIAN') {
+        $tl  = '🕇';
+        $tr  = '🕇';
+        $bl  = '🕇';
+        $br  = '🕇';
+        $top = '🕇';
+        $bot = '🕇';
+        $vl  = '🕇';
+        $vr  = '🕇';
+    } elsif ($type eq 'NOTES') {
+        $tl  = '♪';
+        $tr  = '♪';
+        $bl  = '♪';
+        $br  = '♪';
+        $top = '♪';
+        $bot = '♪';
+        $vl  = '♪';
+        $vr  = '♪';
+    } elsif ($type eq 'PARALLELOGRAM') {
+        $tl  = '▰';
+        $tr  = '▰';
+        $bl  = '▰';
+        $br  = '▰';
+        $top = '▰';
+        $bot = '▰';
+        $vl  = '▰';
+        $vr  = '▰';
+    } elsif ($type eq 'BIG ARROWS') {
+        $tl  = '▶';
+        $tr  = '▶';
+        $bl  = '◀';
+        $br  = '◀';
+        $top = '▶';
+        $bot = '◀';
+        $vl  = '▲';
+        $vr  = '▼';
+    } elsif ($type eq 'ARROWS') {
+        $tl  = '🡕';
+        $tr  = '🡖';
+        $bl  = '🡔';
+        $br  = '🡗';
+        $top = '🡒';
+        $bot = '🡐';
+        $vl  = '🡑';
+        $vr  = '🡓';
+    }
 
     my $text = '';
     my $xx   = $x;

@@ -16,20 +16,20 @@ $table->add({matcher=>"end", type=>"end", value=>sub { ok $_[0] =~ /end$/, "End 
 
 $table->add({matcher=>1234, type=>"numeric", value=>sub { ok $_[0] == 1234, "Numeric match"}});
 
-$table->add({matcher=>qr/re(g)(e)x/, value=>sub { 
+$table->add({matcher=>qq{re(g)(e)x}, value=>sub { 
 		ok $_[0] eq "regex", "regex match";
 		ok $_[1][0] eq "g", "regex capture ok";
 		ok $_[1][1] eq "e", "regex capture ok";
 	}}
 );
 
-$table->add({matcher=>qr/no(?:c)apture/, value=>sub { 
+$table->add({matcher=>qq{no(?:c)apture}, value=>sub { 
 		ok $_[0] eq "nocapture", "regex match, no capture";
 		ok $_[1]->@*==0, "zero captures"
 	}}
 );
 
-$table->add({matcher=>qr/nomatched(C)*apture/, value=>sub { 
+$table->add({matcher=>qq{nomatched(C)*apture}, value=>sub { 
 		ok $_[0] eq "nomatchedapture", "regex match, unmatched capture";
 		ok $_[1]->@*==0, "zero captures";
 	}}
@@ -45,11 +45,11 @@ $sub=sub {
 		and $_[1] == $value;
 };
 
-$table->add([ $sub , $value, undef]);
+$table->add([ $sub , $value, "code"]);
+
 
 #set default
 $table->set_default(sub {ok $_[0] eq "unmatched", "Defualt as expected"});
-
 
 my $dispatcher=$table->prepare_dispatcher();
 

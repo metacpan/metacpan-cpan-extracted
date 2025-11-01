@@ -11,7 +11,7 @@ WWW::Suffit::API - The Suffit API
 
 =head1 VERSION
 
-API Version 1.04
+API Version 1.05
 
 =head1 DESCRIPTION
 
@@ -218,7 +218,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 use Mojo::Base -base;
 

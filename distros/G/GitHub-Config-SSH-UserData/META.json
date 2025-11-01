@@ -4,7 +4,7 @@
       "Klaus Rindfrey <klausrin@cpan.org.eu>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -22,14 +22,20 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.42",
+            "File::Spec::Functions" : "0",
+            "autodie" : "0",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
+            "ExtUtils::MakeMaker" : "6.42",
             "File::Spec::Functions" : "0",
-            "autodie" : "0"
+            "autodie" : "0",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "runtime" : {
@@ -57,7 +63,7 @@
    "provides" : {
       "GitHub::Config::SSH::UserData" : {
          "file" : "lib/GitHub/Config/SSH/UserData.pm",
-         "version" : "0.06"
+         "version" : "0.08"
       }
    },
    "release_status" : "stable",
@@ -68,7 +74,7 @@
          "web" : "https://github.com/klaus-rindfrey/perl-github-config-ssh-userdata.git"
       }
    },
-   "version" : "0.06",
+   "version" : "0.08",
    "x_bugtracker" : {
       "web" : "https://github.com/klaus-rindfrey/perl-github-config-ssh-userdata/issues"
    },

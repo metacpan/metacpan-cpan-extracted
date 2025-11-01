@@ -1,0 +1,402 @@
+As an example lets create the "TestService" application
+We need a non-privileged user e.g dancer
+
+  sudo -u dancer dancer2 gen --application TestService --directory TestService --path /home/dancer --overwrite
+
+  [ -d /var/lib/WebService/TestService ] || /usr/bin/mkdir -p /var/lib/WebService/TestService
+  [ -d /var/log/WebService ]             || /usr/bin/mkdir    /var/log/WebService
+  cp /home/dancer/TestService/environments/production.yml     /home/dancer/TestService/environments/production.yml.orig
+  cp /home/dancer/TestService/environments/development.yml    /home/dancer/TestService/environments/development.yml.orig
+  cp /home/dancer/TestService/config.yml                      /home/dancer/TestService/config.yml.orig
+  /usr/bin/chown -R dancer:dancer /var/lib/WebService/TestService /home/dancer/TestService /var/log/WebService
+
+The custom routes with your code are stored at the file /home/dancer/TestService/lib/TestService.pm
+
+Configure the firewall to listen e.g at port 3000
+
+  # Redhat
+  firewall-cmd --zone=public --permanent --add-port=3000/tcp
+  firewall-cmd --reload
+  firewall-cmd --list-all
+
+Optional compress the http traffic if you have fast CPU and large replies.
+vi /home/dancer/TestService/bin/app.psgi
+
+  #!/usr/bin/perl
+  use strict;
+  use warnings;
+  use FindBin;
+  use lib "$FindBin::Bin/../lib";
+  use TestService;
+  use Plack::Builder;
+  builder {
+  enable 'Deflater';
+  # you can have multiple applications on different http paths
+  mount '/' => TestService->to_app
+  }
+
+Configure the production enviroment at
+/home/dancer/TestService/environments/production.yml
+
+  logger           : file     # console: to STDOUT , file: to file
+  log              : error    # core, debug, info, warning, error
+  warnings         : 1        # should Dancer2 consider warnings as critical errors?
+  show_errors      : 1        # if true shows a detailed debug error page , otherse the views/404.tt or public/404.html
+  startup_info     : 1        # print the banner
+  no_server_tokens : 1        # disable server tokens in production environments
+  show_stacktrace  : 0
+  engines          :
+    logger         :
+      console      :
+        log_format : '{"ts":"%T","host":"%h","pid":"%P","message":"%m"}'
+      file         :
+        log_format : '{"ts":"%{%Y-%m-%d %H:%M:%S}t","host":"%h","level":"%L","message":"%m"}'
+        log_dir    : "/var/log/WebService"
+        file_name  : "TestService.log"
+
+Configure the development enviroment at
+/home/dancer/TestService/environments/development.yml
+
+  logger           : console
+  log              : debug
+  warnings         : 1
+  show_errors      : 1
+  startup_info     : 1
+  show_stacktrace  : 1
+  no_server_tokens : 0
+  show_stacktrace  : 1
+  engines          :
+    logger         :
+      console      :
+        log_format : '{"ts":"%T","host":"%h","pid":"%P","message":"%m"}'
+      file         :
+        log_format : '{"ts":"%{%Y-%m-%d %H:%M:%S}t","host":"%h","level":"%L","message":"%m"}'
+        log_dir    : "/var/log/WebService"
+        file_name  : "TestService.log"
+
+
+Write your TestService code at the file /home/dancer/TestService/lib/TestService.pm
+
+  package TestService;
+  use strict;
+  use warnings;
+  use Dancer2;
+  use Dancer2::Plugin::WebService;
+  set no_default_middleware => true;
+  our $VERSION = exists config->{appversion} ? config->{appversion} : '0.0.0.0';
+
+  # Wellcome & help screen (classic html)
+  get '/' => sub{send_as html => template 'index' => {'title' => 'TestService'}, {layout=>'main'}};
+
+  any[ 'get', 'post', 'put' ] => '/mirror'    => sub {                reply UserData         };
+  get '/text'                                 => sub {                reply   'hello world'  }; # text
+  get '/list'                                 => sub { Error('ok');   reply   'a', 'b', 'c'  }; # array
+  get '/list_ref'                             => sub { Error('Oups'); reply [ 'a', 'b' ]     }; # array reference
+  get '/hash'                                 => sub { reply {'κλειδί'=>['ένα','δύο','v3'] } }; # hash
+  get '/code/text'                            => sub { reply sub {  'hello world'          } }; # Code text
+  get '/code/list'                            => sub { reply sub {   'a', 'b', 'c', 'd'    } }; # Code array
+  get '/code/hash'                            => sub { reply sub { {'k1'=>'v1','k2'=>'v2'} } }; # Code hash
+  get '/code/text_ref'                        => sub { reply sub { \'hello world'          } }; # Code text reference
+  get '/code/list_ref'                        => sub { reply sub { [ 'a', 'b', 'c', 'd' ]  } }; # Code list reference
+  get '/code/list_ref'                        => sub { reply sub { [ 'a', 'b', 'c', 'd' ]  } }; # Code list reference
+  any['get','post','put'] => '/keys_selected' => sub { reply UserData('k1','k2')             };
+  any['get','post']       => '/Protected'     => sub { Error('ώπα');  reply  UserData        };
+  get '/Protected_text_ref'                   => sub { Error('ok');   reply \'hello world'   }; # text reference
+  get '/project/commit'                       => sub { reply 'commited'                      };
+
+  # Store persistent data
+  # SessionSet( { k1=>'v1' , k2=>'v2' }  );
+  # SessionSet(   k1=>'v1' , k2=>'v2'    );
+  any['get','post','put'] => '/session_save'  => sub {
+  my  $arg = UserData();
+  my  @arr = SessionSet( $arg );
+  reply { 'saved keys' => \@arr }
+  };
+
+  # Retrieve persistent data. returns a normal hash
+  # SessionGet(   'k1','k2'   );      # some records
+  # SessionGet( [ 'k1','k2' ] );      # some records
+  any['post','put','get'] => '/session_read' => sub {
+  my  %hash = SessionGet();           # all  reocords
+  reply { %hash }
+  };
+
+  # Delete persistent data
+  # SessionDel();                   # All  records
+  # SessionDel( 'k1', 'k2', ...);   # Some records
+  any['delete'] => '/session_delete' => sub {
+  my $arg = UserData();
+  my @arr = SessionDel( $arg );    
+  reply { 'Deleted keys' => \@arr }
+  };
+
+  dance;
+
+
+Define the routes, their security and the authentication method at the file /home/dancer/TestService/config.yml
+
+
+appname                 : TestService
+appversion              : 1.0.0
+environment             : development
+layout                  : main
+charset                 : UTF-8
+template                : template_toolkit
+engines:
+  template:
+    template_toolkit:
+      EVAL_PERL         : 0
+      start_tag         : '<%'
+      end_tag           : '%>'
+plugins:
+  WebService:
+    Session enable      : true
+    Session directory   : /var/lib/WebService
+    Session idle timeout: 86400
+    Default format      : json
+    Allowed hosts       :
+    - "127.*"
+    - "172.20.20.*"
+    - "????:????:????:6d00:20c:29ff:*:ffa3"
+    - "10.*.?.*"
+    - "*"
+
+    Routes:
+      text              : { Protected: false }
+      mirror            : { Protected: false }
+      Protected         : { Protected: true  }
+      Protected_text_ref: { Protected: true  }
+      list              : { Protected: false }
+      list_ref          : { Protected: false }
+      hash              : { Protected: false }
+      code\/text        : { Protected: false }
+      code\/list        : { Protected: false }
+      code\/hash        : { Protected: false }
+      code\/text_ref    : { Protected: false }
+      code\/list_ref    : { Protected: false }
+      keys_selected     : { Protected: false }
+      project\/commit   : { Protected: true, Groups: [ git , ansibleremote ] }
+      session_save      : { Protected: true, Groups: [] }
+      session_read      : { Protected: true, Groups: [] }
+      session_delete    : { Protected: true, Groups: [] }
+
+    Authentication methods:
+
+    - Name      : INTERNAL
+      Active    : true
+      Accounts  :
+        user1   : s3cr3T+PA55sW0rD
+        user2   : <any>
+        <any>   : S3cREt-4-aLl
+       #<any>   : <any>
+
+    - Name      : Linux native users
+      Active    : false
+      Command   : MODULE_INSTALL_DIR/AuthScripts/Linux_native_authentication.sh
+      Arguments : [ ]
+      Use sudo  : true
+
+    - Name      : Basic Apache auth for simple users
+      Active    : false
+      Command   : MODULE_INSTALL_DIR/AuthScripts/HttpBasic.sh
+      Arguments : [ "/etc/htpasswd" ]
+      Use sudo  : false
+
+
+
+Test the custom routes.
+Start the TestService manual from the command line.
+As first step we must Define the plackup fullpath
+
+  plackup=$(/usr/bin/find /usr/bin -name plackup -type f)
+  [ -x "$plackup" ] && echo ok || echo Could not found the plackup utility. Check the INSTALL document and try again
+
+  # For development using the HTTP::Server::PSGI or HTTP::Server::Simple
+  sudo -u dancer $plackup --host 0.0.0.0 --port 3000 --env development --app /home/dancer/TestService/bin/app.psgi --server HTTP::Server::PSGI
+  sudo -u dancer $plackup --host 0.0.0.0 --port 3000 --env development --app /home/dancer/TestService/bin/app.psgi --server HTTP::Server::Simple --Reload /home/dancer/TestService/lib/TestService.pm,/home/dancer/TestService/config.yml,/opt/Dancer2-Plugin-WebService/lib/Dancer2/Plugin/WebService.pm
+
+  # For production using the Starman
+  sudo -u dancer $plackup --host 0.0.0.0 --port 3000 --env production  --app /home/dancer/TestService/bin/app.psgi --server Starman --workers=5
+
+  # As console application
+  sudo -u dancer /usr/bin/perl -I lib /home/dancer/TestService/bin/app.psgi
+
+Open an other UTF8 console and export the url and header variables
+
+  export url=http://127.0.0.1:3000 H="Content-Type: application/json"
+  alias curl="$(/usr/bin/which curl) --silent --user-agent Perl"
+  alias curl
+
+Built-in WebService routes
+
+  curl  $url/WebService
+  curl  $url/WebService/client
+  curl  $url/WebService/routes?sort=true
+  curl "$url/WebService?to=json&pretty=true&sort=true"
+  curl  $url/WebService?to=yaml
+  curl "$url/WebService?to=xml&pretty=false"
+  curl "$url/WebService?to=xml&pretty=true"
+  curl  $url/WebService?to=human
+  curl  $url/WebService?to=perl
+  curl  $url
+
+User function "Mirror" using json data
+
+  curl "$url/mirror?from=json&to=json&k1=a&k2=b" -H "$H" -d '{"κλειδί" : ["ένα","δύο","three"]}'
+  curl  $url/mirror                              -H "$H" -d '{"κλειδί" : ["ένα","δύο","three"]}'
+  curl "$url/mirror?to=json&pretty=false"        -H "$H" -d '{"κλειδί" : ["ένα","δύο","three"]}'
+  curl "$url/mirror?to=yaml"                     -H "$H" -d '{"κλειδί" : ["ένα","δύο","three"]}'
+  curl "$url/mirror?to=xml&pretty=true"          -H "$H" -d '{"κλειδί" : ["ένα","δύο","three"]}'
+  curl "$url/mirror?to=perl"                     -H "$H" -d '{"SomeKey": ["one","two","three"]}'
+  curl "$url/mirror?to=human"                    -H "$H" -d '{"κλειδί" : ["ένα","δύο","three"]}'
+
+User function "Mirror" using yaml data
+
+  curl "$url/mirror?from=yaml&to=json&k1=v1&k2=v2" -d '"κλειδί" : ["ένα","δύο","three"]'
+  curl "$url/mirror?from=yaml&to=yaml"             -d '"κλειδί" : ["ένα","δύο","three"]'
+  curl "$url/mirror?from=yaml&to=xml&pretty=false" -d '"κλειδί" : ["ένα","δύο","three"]'
+  curl "$url/mirror?from=yaml&to=perl"             -d '"SomeKey": ["one","two","three"]'
+  curl "$url/mirror?from=yaml&to=human"            -d '"κλειδί" : ["ένα","δύο","three"]'
+  
+User function "Mirror" using xml data
+
+  curl "$url/mirror?from=xml&to=json"              -d '<root><κλειδί1>ένα</κλειδί1><κλειδί2>δύο</κλειδί2></root>'
+  curl "$url/mirror?from=xml&to=yaml"              -d '<root><κλειδί1>ένα</κλειδί1><κλειδί2>δύο</κλειδί2></root>'
+  curl "$url/mirror?from=xml&to=xml&pretty=true"   -d '<root><κλειδί1>ένα</κλειδί1><κλειδί2>δύο</κλειδί2></root>'
+  curl "$url/mirror?from=xml&to=perl&pretty=false" -d '<root><Key1>one</Key1><key2>two</key2></root>'
+  curl "$url/mirror?from=xml&to=human"             -d '<root><κλειδί1>ένα</κλειδί1><κλειδί2>δύο</κλειδί2></root>'
+
+User function "Mirror" using perl data
+
+  curl "$url/mirror?from=perl&to=json"             -d '{ "Κλειδί" => ["ένα","δύο","three"] }'
+  curl "$url/mirror?from=perl&to=yaml"             -d '{ "Κλειδί" => ["ένα","δύο","three"] }'
+  curl "$url/mirror?from=perl&to=xml"              -d '{ "Κλειδί" => ["ένα","δύο","three"] }'
+  curl "$url/mirror?from=perl&to=perl"             -d '{ "Κλειδί" => ["ένα","δύο","three"] }'
+  curl "$url/mirror?from=perl&to=human"            -d '{ "Κλειδί" => ["ένα","δύο","three"] }'
+
+User function "Mirror" using human data
+
+  curl "$url/mirror?from=human&to=json"            -d 'reply.root.Κλειδί = Τιμή'
+  curl "$url/mirror?from=human&to=yaml"            -d 'reply.root.Κλειδί = Τιμή'
+  curl "$url/mirror?from=human&to=xml&pretty=true" -d 'reply.root.Κλειδί = Τιμή'
+  curl "$url/mirror?from=human&to=perl"            -d 'reply.root.Κλειδί = Τιμή'
+  curl "$url/mirror?from=human&to=human"           -d 'reply.root.Κλειδί = Τιμή'
+
+More user functions
+
+  curl $url/text
+  curl $url/list?pretty=false
+  curl $url/list_ref?to=yaml
+  curl $url/list_ref
+  curl $url/hash
+  curl $url/code/text
+  curl $url/code/list
+  curl $url/code/hash
+  curl $url/code/text_ref
+  curl $url/code/list_ref
+
+  curl $url/keys_selected?to=yaml -d '{ "k1":"v1", "k2":"v2", "k3":"v3" }'
+  curl $url/keys_selected?to=yaml -d '[ "k1", "k2", "k3", "k4" ]'
+
+The protected routes needs an authorization token
+Login to obtain a valid token
+
+  curl -X POST $url/login -H "$H" -d '{"username": "user1", "password": "s3cr3T+PA55sW0rD"}'
+
+  export token=1761911379-77fdf06ee8f31bc7f35ebea9-0
+
+  curl $url/git/commit?token=$token
+  curl $url/Protected
+  curl $url/Protected?token=$token -H "$H" -d '{ "k1" : "v1" }'
+  curl $url/Protected -X POST      -H "$H" -d "{ \"token\":\"$token\", \"k1\":\"v1\" }"
+
+  curl $url/Protected_text_ref
+  curl $url/Protected_text_ref?token=$token
+
+Store persistent data
+  
+  
+
+  curl $url/session_save?token=$token   -H "$H" -X POST   -d '{"k1":"v1", "k2":"δύο", "k3":"three"}'
+  curl $url/session_read?token=$token
+  curl $url/session_delete?token=$token -H "$H" -X DELETE -d '["k1", "k2", "k8","k9"]'
+  curl $url/session_read?token=$token
+  curl $url/logout?token=$token
+  curl $url/logout -H "$H" -X POST -d "{\"token\":\"$token\"}"
+
+To start your application as Linux service
+If you plan to use a reverse proxy change the listening IP (BIND) from  0.0.0.0  to  127.0.0.1
+Locate the plackup with "find /usr/bin -name plackup -type f" e.g  /usr/bin/site_perl/plackup
+Edit/create the file  /etc/systemd/system/TestService.service
+
+  [Unit]
+  Description=TestService rest API
+  Documentation=https://metacpan.org/pod/Dancer2
+  After=network.target
+  ConditionPathExists=/usr/bin/site_perl/plackup
+
+  [Service]
+  Type=simple
+  User=dancer
+  Group=dancer
+  Environment=BIND=0.0.0.0
+  Environment=PORT=3000
+  Environment=WORKERS=10
+  Environment=ENVIROMENT=development
+  ExecStart=/usr/bin/site_perl/plackup --host $BIND --port $PORT --env $ENVIROMENT --server Starman --workers=$WORKERS --app /home/dancer/TestService/bin/app.psgi
+  WorkingDirectory=/home/dancer/TestService
+  ExecStop=/bin/kill -s QUIT $MAINPID
+  KillMode=mixed
+  KillSignal=QUIT
+  StandardOutput=journal
+  StandardError=journal
+  NoNewPrivileges=true
+  PrivateTmp=true
+  LimitNOFILE=infinity
+  Restart=on-failure
+  RestartSec=60s
+
+  [Install]
+  WantedBy=multi-user.target
+
+start the service
+
+  systemd-analyze verify /etc/systemd/system/TestService.service
+  systemctl daemon-reload
+  systemctl cat       TestService
+  systemctl enable    TestService.service
+  systemctl start     TestService
+  systemctl is-active TestService
+  systemctl status    TestService
+  journalctl -f -xelu TestService
+  systemctl stop      TestService
+
+delete the service
+
+  systemctl stop      TestService
+  systemctl disable   TestService.service
+  unlink /etc/systemd/system/TestService.service
+
+
+If you use an nginx web server to reverse proxy you service your app
+vi nginx.conf 
+
+  ...
+  upstream TestService { server 127.0.0.1:3000 fail_timeout=0; keepalive 1024; }
+  ...
+  server
+  {
+  server_name      www.example.com;
+  listen           30080;
+  listen           30443 ssl;
+  root             /tmp;
+  proxy_redirect   off;
+  proxy_set_header Host $host;
+  proxy_set_header X-Real-IP $remote_addr; # needed for real client IP pass as server enviroment variable HTTP_X_REAL_IP
+  
+      location /
+      {
+      fastcgi_param REMOTE_ADDR X-Real-IP;
+      proxy_pass http://TestService;
+      } 
+  }

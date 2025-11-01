@@ -22,6 +22,47 @@ close($h);
 die("VERSION not found in $PM_File") if !$Version;
 
 
+
+
+my $meta_merge_supported = eval { ExtUtils::MakeMaker->VERSION(6.46) };
+
+# PREREQ_PM
+my %runtime_requires = (
+                        'strict'   => 0,
+                        'warnings' => 0,
+                        'Exporter' => '1.6',
+                       );
+
+# TEST_REQUIRES
+my %test_requires = (
+                     'strict'     => '0',
+                     'warnings'   => '0',
+                     'Test::More' => '0',
+                    );
+
+# CONFIGURE_REQUIRES
+my %prereq_build = (
+                    'autodie'               => '0',
+                    'strict'                => '0',
+                    'warnings'              => '0',
+                    'ExtUtils::MakeMaker'   => '0',
+                    'File::Spec::Functions' => '0',
+                   );
+
+# Added to %test_requires if needed
+my %authortest_requires = (
+                           'Pod::Coverage'       => '0.23',
+                           'Pod::Wordlist'       => '1.27',
+                           'Test::Pod::Coverage' => '1.10',
+                           'Test::Spelling'      => '0.25',
+                          );
+
+if ($ENV{TEST_AUTHOR}) {
+  print "Author tests enabled (TEST_AUTHOR=1)\n";
+  %test_requires = (%test_requires,  %authortest_requires);
+}
+
+###########
 my %WriteMakefileArgs =
   (
    NAME             => $The_Module,
@@ -30,69 +71,73 @@ my %WriteMakefileArgs =
    ABSTRACT_FROM    => $PM_File,
    LICENSE          => 'perl_5',
    MIN_PERL_VERSION => '5.010',
-   CONFIGURE_REQUIRES => {
-                          'autodie'               => '0',
-                          'ExtUtils::MakeMaker'   => '0',
-                          'File::Spec::Functions' => '0',
-                         },
-   PREREQ_PM => {
-                 'strict'   => 0,
-                 'warnings' => 0,
-                 'Exporter' => '1.6',
-                },
-   META_MERGE => {
-                  "meta-spec" => { version => 2 },
-                  dynamic_config => 0,
-                  resources => {
-                                repository => {
-                                               type => 'git',
-                                               url  => "$Git_URL.git",
-                                               web  => "$Git_URL.git",
-                                              },
-                               },
-                  bugtracker => {
-                                 web => "$Git_URL/issues"
-                                },
-                  provides => { $The_Module => {file => $PM_File,
-                                                version => $Version
-                                               },
-                              },
-                 },
-   TEST_REQUIRES => {
-                     'Test::More' => '0',
-                    },
+   CONFIGURE_REQUIRES => \%prereq_build,
+   PREREQ_PM          => \%runtime_requires,
+   TEST_REQUIRES      => \%test_requires,
    dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
    clean => { FILES => join('-', split(/::/, $The_Module)) . '-*' },
   );
 
-if ($ENV{AUTHOR_TESTING}) {
-  $WriteMakefileArgs{BUILD_REQUIRES} =
+
+if ($meta_merge_supported) {
+  $WriteMakefileArgs{META_MERGE} =
     {
-     'Pod::Coverage'         => '0.23',
-     'Pod::Wordlist'         => '1.27',
-     'Test::Pod::Coverage'   => '1.10',
-     'Test::Spelling;'       => '0.25',
+     "meta-spec" => { version => 2 },
+     dynamic_config => 0,
+     resources => {
+                   repository => {
+                                  type => 'git',
+                                  url  => "$Git_URL.git",
+                                  web  => "$Git_URL.git",
+                                 },
+                  },
+     bugtracker => {
+                    web => "$Git_URL/issues"
+                   },
+     provides => { $The_Module => { file => $PM_File, version => $Version },
+                 },
+     prereqs => {
+                 runtime => { requires => \%runtime_requires },
+                 test    => { requires => \%test_requires },
+                 build   => { requires => \%prereq_build },
+                },
     };
 }
 
 # Compatibility with old versions of ExtUtils::MakeMaker
 unless (eval { ExtUtils::MakeMaker->VERSION('6.64'); 1 }) {
-    my $test_requires = delete $WriteMakefileArgs{TEST_REQUIRES} || {};
-    @{$WriteMakefileArgs{PREREQ_PM}}{keys %$test_requires} = values %$test_requires;
+  my $test_requires = delete $WriteMakefileArgs{TEST_REQUIRES} || {};
+  @{$WriteMakefileArgs{PREREQ_PM}}{keys %$test_requires} = values %$test_requires;
 }
 
 unless (eval { ExtUtils::MakeMaker->VERSION('6.55_03'); 1 }) {
-    my $build_requires = delete $WriteMakefileArgs{BUILD_REQUIRES} || {};
-    @{$WriteMakefileArgs{PREREQ_PM}}{keys %$build_requires} = values %$build_requires;
+  my $build_requires = delete $WriteMakefileArgs{BUILD_REQUIRES} || {};
+  @{$WriteMakefileArgs{PREREQ_PM}}{keys %$build_requires} = values %$build_requires;
 }
 
 delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
-    unless eval { ExtUtils::MakeMaker->VERSION('6.52'); 1 };
+  unless eval { ExtUtils::MakeMaker->VERSION('6.52'); 1 };
 delete $WriteMakefileArgs{MIN_PERL_VERSION}
-    unless eval { ExtUtils::MakeMaker->VERSION('6.48'); 1 };
-delete $WriteMakefileArgs{LICENSE}
-    unless eval { ExtUtils::MakeMaker->VERSION('6.31'); 1 };
+  unless eval { ExtUtils::MakeMaker->VERSION('6.48'); 1 };
 
 WriteMakefile(%WriteMakefileArgs);
 
 
+sub MY::postamble {
+  return "
+clean_all: clean
+\trm -f MANIFEST README
+
+README.md: $PM_File
+\tpod2markdown $PM_File > README.md
+
+README: $PM_File
+\tpod2text $PM_File > README
+
+all :: README
+
+policy-files:
+\tdist-policyfiles -m $The_Module -l klaus-rindfrey -p perl- -u \\
+        -s 'timeframe=10 days;perl_support_years=10'
+";
+}

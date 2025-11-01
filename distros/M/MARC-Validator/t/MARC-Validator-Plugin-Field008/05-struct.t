@@ -36,7 +36,9 @@ is_deeply(
 );
 
 # Test.
-$obj = MARC::Validator::Plugin::Field008->new;
+$obj = MARC::Validator::Plugin::Field008->new(
+	'error_id_def' => '015a',
+);
 $obj->init;
 my $marc_record = MARC::File::XML->in($data_dir->file('cnb001920818-incorrect_field_008_syntax_quote_mark.xml')->s)->next;
 $obj->process($marc_record);
@@ -55,7 +57,9 @@ is_deeply(
 );
 
 # Test.
-$obj = MARC::Validator::Plugin::Field008->new;
+$obj = MARC::Validator::Plugin::Field008->new(
+	'error_id_def' => '015a',
+);
 $obj->init;
 $marc_record = MARC::File::XML->in($data_dir->file('cnb000295209-incorrect_field_008_syntax_space.xml')->s)->next;
 $obj->process($marc_record);
@@ -74,7 +78,9 @@ is_deeply(
 );
 
 # Test.
-$obj = MARC::Validator::Plugin::Field008->new;
+$obj = MARC::Validator::Plugin::Field008->new(
+	'error_id_def' => '015a',
+);
 $obj->init;
 $marc_record = MARC::File::XML->in($data_dir->file('cnb001873805-incorrect_field_008_content-blank.xml')->s)->next;
 $obj->process($marc_record);

@@ -63,8 +63,15 @@ This method returns general statistics of the API server, available only after a
     {
       "algorithms": [ "MD5", "SHA1", "SHA224", "SHA256", "SHA384", "SHA512" ],
       "api_version": "1.02",
+      "authdb": {
+        "ds": "mysql://localhost/authdb?mysql_auto_reconnect=1&mysql_enable_utf8=1",
+        "error": "",
+        "schver": "1.01",
+        "status": true
+      },
       "base_url": "https://localhost:8695",
       "code": "E0000",
+      "csrf": "...",
       "datetime": "2024-08-14T08:05:01Z",
       "elapsed": 0.000289,
       "entities": {
@@ -132,6 +139,7 @@ This method returns general statistics of the API server, available only after a
         "expires": 1723622701,
         "flags": 31,
         "groups": [ "user" ],
+        "id": 2,
         "name": "Test User",
         "public_key": "-----BEGIN RSA PUBLIC KEY-----...",
         "role": "Test user",
@@ -195,8 +203,15 @@ B<NOTE!> The method does not require authorization
     <
     {
       "api_version": "1.02",
+      "authdb": {
+        "ds": "",
+        "error": "",
+        "schver": "1.01",
+        "status": true
+      },
       "base_url": "https://localhost:8695",
       "code": "E0000",
+      "csrf": "...",
       "datetime": "2024-08-14T07:44:31Z",
       "elapsed": 0.00079,
       "generated": 1723621471,
@@ -245,7 +260,7 @@ Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<g
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2024 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2025 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -298,16 +313,35 @@ sub api {
     my $message = "Ok";
     my $username = $self->stash('username'); # from Auth::is_authorized
     my $cachekey = $self->stash('cachekey'); # from Auth::is_authorized
+    my $authdb = $self->authdb;
+
+    # AuthDB (Database info)
+    my %authdb_info = (
+        status  => $authdb->error ? false : $authdb->is_connected ? true : false,
+        error   => $authdb->error // '',
+        ds      => '',
+        schver  => '0.00',
+    );
+    unless ($authdb->error) {
+        my %vd = $authdb->model->meta_get("schema.version");
+        $authdb_info{schver} = $vd{value} || '0.00';
+    }
 
     # Extended data of user
     my $is_authorized = 0;
     my $user = undef;
     if ($username) {
-        $user = $self->authdb->user($username, $cachekey);
-        return $self->reply->json_error($self->authdb->code, $self->authdb->error) if $self->authdb->error;
-        $is_authorized = $user->is_authorized;
+        $user = $authdb->user($username, $cachekey);
+        if ($authdb->error) { # Error
+            $self->log->error(sprintf("[%s] %s", $authdb->code, $authdb->error));
+            $authdb_info{error} = $authdb->error;
+        } else { # Ok
+            $is_authorized = $user->uid && ($user->username eq $username) && $self->stash('is_authorized');
+            if ($is_authorized) {
+                $authdb_info{ds} = $authdb->ds ? Mojo::URL->new($authdb->ds)->to_string : '';
+            }
+        }
     }
-
     return $self->render(json => {
             status          => $status ? true : false,
             code            => $code,
@@ -325,7 +359,9 @@ sub api {
             year            => strftime('%Y', localtime $now),
             route           => $self->current_route // 'root',
             elapsed         => $self->timing->elapsed('suffit_api') // 0,
+            csrf            => $self->csrf_token,
             is_authorized   => $is_authorized ? true : false,
+            authdb          => { %authdb_info },
 
             # Authorized only
             $is_authorized ? (
@@ -339,6 +375,7 @@ sub api {
 
                 # User information
                 user => {
+                    id          => $user->id || 0,
                     username    => $username,
                     cachekey    => $cachekey,
                     name        => $self->stash('name'),
@@ -346,7 +383,7 @@ sub api {
                     email_md5   => $self->stash('email_md5'),
                     role        => $self->stash('role'),
                     groups      => $self->stash('groups'),
-                    expiration  => $self->stash('expiration'), # Session expiration time (no user data!)
+                    expiration  => $self->stash('expiration'), # Session TOKEN expiration time (no user data!)
                     expires     => $self->stash('expires'), # Cache expiration time
                     # Extended fields
                     attributes  => $user->attributes // '',

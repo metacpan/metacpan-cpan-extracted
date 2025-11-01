@@ -292,25 +292,26 @@ sub convert_yaml_to_json {
 
 sub _build_yaml_loader {
     if (eval { require YAML::XS; 1 }) {
-        return (
-            sub { YAML::XS::Load($_[0], { allow_nonref => 1 }) },
-            'YAML::XS'
-        );
+        return (sub { YAML::XS::Load($_[0]) }, 'YAML::XS');
     }
     elsif (eval { require YAML::PP; 1 }) {
         require YAML::PP;
-        my $yp = YAML::PP->new(boolean => 'JSON', allow_nonref => 1);
+        my $yp = YAML::PP->new(boolean => 'JSON');
         return (sub { $yp->load_string($_[0]) }, 'YAML::PP');
     }
     else {
         require CPAN::Meta::YAML;
-        no warnings 'once';
         return (
             sub {
                 my $string = shift // '';
                 my $docs   = CPAN::Meta::YAML->read_string($string);
                 if (!defined $docs) {
-                    my $err = $CPAN::Meta::YAML::errstr || 'Unknown YAML parsing error';
+                    my $err;
+                    {
+                        no warnings 'once';
+                        $err = $CPAN::Meta::YAML::errstr;
+                    }
+                    $err ||= 'Unknown YAML parsing error';
                     die $err;
                 }
                 return @{$docs};

@@ -1,49 +1,116 @@
-Git-RemoteURL-Parse
+NAME
+    Git::RemoteURL::Parse - Parse and classify Git remote URLs (GitHub,
+    GitLab)
 
-The README is used to introduce the module and provide instructions on
-how to install the module, any machine dependencies it may have (for
-example C compilers and installed libraries) and any other information
-that should be provided before the module is installed.
+VERSION
+    Version 0.04
 
-A README file is required for CPAN modules since CPAN extracts the README
-file from a module distribution so that people browsing the archive
-can use it to get an idea of the module's uses. It is usually a good idea
-to provide version information here so that people can decide whether
-fixes for the module are worth downloading.
+SYNOPSIS
+        use Git::RemoteURL::Parse;
 
+        my $info = parse_git_remote_url('https://github.com/user/repo.git');
 
-INSTALLATION
+        if ($info) {
+            if ($info->{service} eq 'github') {
+                print "GitHub repo: $info->{user}/$info->{repo}\n";
+            }
+            elsif ($info->{service} eq 'gitlab') {
+                print "GitLab repo: $info->{group_path}/$info->{repo}\n";
+            }
+        } else {
+            warn "Not a recognized GitHub or GitLab URL\n";
+        }
 
-To install this module, run the following commands:
+DESCRIPTION
+    This module provides a single function, "parse_git_remote_url()", which
+    analyzes a Git remote URL and identifies whether it points to a GitHub
+    or GitLab repository. It also extracts the repo and the user name or
+    group path, respectively.
 
-	perl Makefile.PL
-	make
-	make test
-	make install
+    Supported URL formats include both HTTPS and SSH variants.
 
-SUPPORT AND DOCUMENTATION
+  SUPPORTED FORMATS
+    *   GitHub HTTPS:
 
-After installing, you can find documentation for this module with the
-perldoc command.
+        *   "https://github.com/user/repo.git"
 
-    perldoc Git::RemoteURL::Parse
+        *   "https://token@github.com/user/repo"
 
-You can also look for information at:
+    *   GitHub SSH:
 
-    RT, CPAN's request tracker (report bugs here)
-        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Git-RemoteURL-Parse
+        *   "git@github.com:user/repo.git"
 
-    CPAN Ratings
-        https://cpanratings.perl.org/d/Git-RemoteURL-Parse
+        *   "git@gh-alias:user/repo"
 
-    Search CPAN
-        https://metacpan.org/release/Git-RemoteURL-Parse
+    *   GitLab HTTPS:
 
+        *   "https://gitlab.com/group/subgroup/repo.git"
+
+    *   GitLab SSH:
+
+        *   "git@gitlab.com:group/sub/repo.git"
+
+        *   "git@gl-alias:group1/group2/repo.git"
+
+  FUNCTIONS
+    "parse_git_remote_url(*URL*)"
+        Takes a Git remote *"URL"* string and returns a hash reference with
+        the following structure:
+
+        *   For GitHub:
+
+                {
+                    service => 'github',
+                    user    => 'USERNAME',
+                    repo    => 'REPO_NAME',
+                }
+
+        *   For GitLab:
+
+                {
+                    service    => 'gitlab',
+                    group_path => 'GROUP/SUBGROUP/...',
+                    repo       => 'REPO_NAME',
+                }
+
+        Returns "undef" if the URL is not recognized as a valid GitHub or
+        GitLab URL.
+
+AUTHOR
+    Klaus Rindfrey, "<klausrin at cpan.org.eu>"
+
+SEE ALSO
+    App::ghmulti
+
+BUGS
+    Please report any bugs or feature requests to "bug-git-remoteurl-parse
+    at rt.cpan.org", or through the web interface at
+    <https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Git-RemoteURL-Parse>. I
+    will be notified, and then you'll automatically be notified of progress
+    on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Git::RemoteURL::Parse
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker (report bugs here)
+
+        <https://rt.cpan.org/NoAuth/Bugs.html?Dist=Git-RemoteURL-Parse>
+
+    *   Search CPAN
+
+        <https://metacpan.org/release/Git-RemoteURL-Parse>
+
+    *   GitHub Repository
+
+        <https://github.com/klaus-rindfrey/git-remoteurl-parse>
 
 LICENSE AND COPYRIGHT
+    This software is copyright (c) 2025 by Klaus Rindfrey.
 
-This software is copyright (c) 2025 by Klaus Rindfrey.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+    This module is free software. You may redistribute it and/or modify it
+    under the same terms as Perl itself.
 

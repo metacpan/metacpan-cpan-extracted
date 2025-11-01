@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.87.
+signed via the Module::Signature module, version 0.88.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,14 +14,14 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: RIPEMD160
 
-SHA256 89808e41e794da2202d0419dc4896484f47a8c64b937553cd70727b2f347f03b Basic.pm
-SHA256 9c551040822cab91e32eebb4c31ea6d510c8ba85b23f3fc7a10f79af0902f558 Changes
-SHA256 74ebf9b47f1d6aa16ebf0624b2f21d88e031a484aaf242ff7ffc44f3c9dfd92e LICENSE
+SHA256 f5c2e5dcfbd1845e849158838652b29aa5820beefe2ce3e77b30990f30f8dfc3 Basic.pm
+SHA256 2a7b9e9c9adc833dcbb4a21e8cda7ea7452e421345b85e424f55b2cf4e407ef2 Changes
+SHA256 7c9231c5b94048f3e60c6d0f1b9a3bd5e2d8a95636e0dca49707ae42df2f17fa LICENSE
 SHA256 e12edc7b22efb59f6500e5b1c9b08b19c4c60237baa967d1368baee51f26a381 MANIFEST
-SHA256 74d0be5078619411f1861fb020eb839fe45b5f5ba4533085daa74953d89f8c88 META.yml
-SHA256 75b5db45e0608fdb3ccae1510bca31135b94be9fce7358c31d2a5341fc54123a Makefile.PL
-SHA256 ae61f6681a837baad3878cda3453ca3427fd14237ef43cf667d1f638031ecb76 README
-SHA256 287629b69fef5e8519ea95ac5d8f06bb76e843b0371792e6e3289e92e5174627 examples/p31_label_and_description.pl
+SHA256 0c82ee7fc6753b9b8ae5f15185328292f7657ca1554add9911049fced3c6344a META.yml
+SHA256 dae2a935f5243cdfc3c36c56e8373b7968c22ad4de4f7d8a30203065571f533d Makefile.PL
+SHA256 bd5f909ada688528531c769a3456faa3d9f535da1746b76a6131ed3511f83263 README
+SHA256 bdfb6ff40e6a4bc321741046ea4819627beb2cd0b1be56c8ef238741d949ad0d examples/p31_label_and_description.pl
 SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
 SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
 SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
@@ -34,7 +34,7 @@ SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Modu
 SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
 SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
 SHA256 67630590aefff314f2683cc57c604a42300b3936631c2380c18e6cd8fb8a28ed t/Wikibase-Cache-Backend-Basic/01-use.t
-SHA256 38ab99478816cf25c8ca5f3e95280fa566228a4c49bded73ac03fd03ed5eb432 t/Wikibase-Cache-Backend-Basic/02-version.t
+SHA256 1479733f2dd478a8b4d19558f5a768bc82f1a2d1c131cebcc22ba0849e4d8ced t/Wikibase-Cache-Backend-Basic/02-version.t
 SHA256 b7f551f7b256a8020345af438dc013d58df30e4dcf0fb1a6dbf2f5752e20ba86 t/Wikibase-Cache-Backend-Basic/03-new.t
 SHA256 c5ac38ee8dafb9450240cecb90d1bda51f6c9493c96f28ebab9264b8813ed089 t/Wikibase-Cache-Backend-Basic/04-get.t
 SHA256 8654b9c5bab177cbf3d4833c69d6feded9724915053820aef46ceedf6f9467a0 t/Wikibase-Cache-Backend-Basic/05-save.t
@@ -43,17 +43,15 @@ SHA256 5b8714e795ae0278df52b99f30e42d2a653306cb971df91b1c721fa3b5471a87 xt/Wikib
 SHA256 3b930fa2e0b237af5a0648f28b8003eebb7b7cb8b70073bb3f1d6fa807106c9d xt/Wikibase-Cache-Backend-Basic/02-pod.t
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBAwAdFiEEbEiOwSagsghKcON6ojV9Rpe/B8sFAmR93UoACgkQojV9Rpe/
-B8sMow/+P67p7oAZIXjCjLMsgzzkm0HQHdj0ucoN5X1qBvtNNuhRn52LVToNPxWZ
-B722IIbPwrvvMrr0WFxFTcG0+4rl4B6Zn62NE6TGlAhhYFkz9z64dcwuXqclYFrz
-t49KRaCxhsvlNFVoxv2CBmXxMT2B9A9KskEFhT16iT8gjjpMYFzPlqRcunyjymeb
-RZuz+qTXzfxMEcBwwUs3jIqhYzNsgAzhufm0qEDGNUO8fA6Nf8JQOQ9bm4M0SK6/
-cT2lv58zGoTd8pNBXu8HQK1+jMz5Xjsyll1H+HakxGVhsatRCZB9aRNsj1tR+KOg
-r3oAWy/yHwwFAvDVqzbK1Bor7tKIG34eHz/6fAVE8rIqb1WZ2OiI9NNOz1g56ouG
-N4V+yMThMCWG82EnNgrKYINnKv/rgxyO3d4XNQAQxakbO5vyDMiUG/iI+bunj8Tf
-amtqmpjASb+g1eIwY+XrtpXjou50pfrll2rsLZpK+BuSFR3MV0W7CSxFeK1D52y5
-+mnkXNqAqaGSlf+n/HM/mDa1jK/dALI/bbrAmLMDzOd4ckh/Y5ci4lt9IhHy378n
-4lhDoAkMRkkr6//ukLgU/olMev1UhC8/LjVNpGFazOx7Fu0T45XDf5DeRPqpmydR
-GmrusQCq7TNL67WevGV2rBgsqmt21Z+ZtvxMWqr0HfgM7t0y3vU=
-=hpcl
+iQGzBAEBAwAdFiEE7CqvgROezncwcOKionze/HtIOPAFAmkE97wACgkQonze/HtI
+OPAvwgv/d/hRiyKOXjitXc6+FqKV6TrJU1mpZLW/BqQq2imRvSufBQuVvQ+47e+d
+DQtqDV4vv8jYEBmi+76H40oQDRSDZaWifyl0Sgok7bwZP4bNB2UIX3KURT/XVv1i
+2T5he68KhJ5V34WY0FZWaWBMUBAS3mKaf2HSXLCcB+qcpG52o+1wQu7H9M8X6RcS
+7l5IC0DwDOAh9ZMNq6Trd04m8A+904jNXhUWWXxP1VlhaZLXxfWy7ky5XztHYFot
+ZbvATLfATHqzxwEozaTPS6phT1v00QdkI/EEb9OiaZMHeV6JOSINEsGT4UGw39iJ
+PR1vzYl+24mlXau2j/QiuPnzWq05fx7hZ4CMLDtx9WGsPK/0cLpc3PXrLVESe36N
+ggYmWZCd/Fy+3JPqrP/PgNK09gKmMR9rmDswAymhfEUv0uo/Pk7gfcuRcRiOjgO0
+sBsxPPNVX28vLIzhUTWEzMMA3Q0zOapdaeiNhVWc+didHzrAkaMU2jAHFp9nJ9bt
+a2dveL4v
+=oqzb
 -----END PGP SIGNATURE-----

@@ -2,7 +2,7 @@ NAME
     marc-validator - Tool to validate records in MARC file.
 
 SYNOPSIS
-     marc-validator [-d] [-h] [-l] [-o output_file] [-p] [-v] [--version] marc_xml_file..
+     marc-validator [-d] [-h] [-i id] [-l] [-o output_file] [-p] [-v] [--version] marc_xml_file..
 
 DESCRIPTION
     Tool to validate dataset from MARC record collections.
@@ -17,6 +17,13 @@ ARGUMENTS
     *       "-h"
 
             Print help.
+
+    *       "-i id"
+
+            Record identifier defined by MARC field/subfield. Example value
+            is '015a' for national library id.
+
+            Default value is '001'.
 
     *       "-l"
 
@@ -65,5 +72,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.01
+    0.04
 

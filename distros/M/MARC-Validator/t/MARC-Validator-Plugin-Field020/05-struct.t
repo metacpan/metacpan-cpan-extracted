@@ -36,7 +36,9 @@ is_deeply(
 );
 
 # Test.
-$obj = MARC::Validator::Plugin::Field020->new;
+$obj = MARC::Validator::Plugin::Field020->new(
+	'error_id_def' => '015a',
+);
 $obj->init;
 my $marc_record = MARC::File::XML->in($data_dir->file('cnb003260113-incorrect_field_020a_isbn_bad.xml')->s)->next;
 $obj->process($marc_record);
@@ -55,7 +57,9 @@ is_deeply(
 );
 
 # Test.
-$obj = MARC::Validator::Plugin::Field020->new;
+$obj = MARC::Validator::Plugin::Field020->new(
+	'error_id_def' => '015a',
+);
 $obj->init;
 $marc_record = MARC::File::XML->in($data_dir->file('cnb003698545-incorrect_field_020a_isbn_formatting.xml')->s)->next;
 $obj->process($marc_record);
@@ -74,7 +78,9 @@ is_deeply(
 );
 
 # Test.
-$obj = MARC::Validator::Plugin::Field020->new;
+$obj = MARC::Validator::Plugin::Field020->new(
+	'error_id_def' => '015a',
+);
 $obj->init;
 $marc_record = MARC::File::XML->in($data_dir->file('cnb001410157-incorrect_field_020a_isbn_with_extra_characters.xml')->s)->next;
 $obj->process($marc_record);
@@ -93,7 +99,9 @@ is_deeply(
 );
 
 # Test.
-$obj = MARC::Validator::Plugin::Field020->new;
+$obj = MARC::Validator::Plugin::Field020->new(
+	'error_id_def' => '015a',
+);
 $obj->init;
 $marc_record = MARC::File::XML->in($data_dir->file('fake1-incorrect_field_020a.xml')->s)->next;
 $obj->process($marc_record);

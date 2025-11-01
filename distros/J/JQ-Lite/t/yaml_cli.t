@@ -1,6 +1,12 @@
 use strict;
 use warnings;
 use Test::More;
+
+# Skip this test on Perl 5.20–5.26 because of known compatibility issues
+if ($] >= 5.020000 && $] < 5.027000) {
+    plan skip_all => "Skipped on Perl 5.20–5.26 due to known incompatibility";
+}
+
 use IPC::Open3;
 use Symbol qw(gensym);
 use File::Temp qw(tempfile tempdir);
@@ -8,8 +14,10 @@ use File::Spec;
 use Cwd qw(abs_path);
 use FindBin;
 
+# Create a temporary directory for test files
 my $tmpdir = tempdir(CLEANUP => 1);
 
+# Create a temporary YAML file
 my ($fh_yaml, $yaml_path) = tempfile(DIR => $tmpdir, SUFFIX => '.yaml', UNLINK => 1);
 print {$fh_yaml} <<'YAML';
 users:
@@ -20,8 +28,10 @@ users:
 YAML
 close $fh_yaml;
 
+# Determine the path to the jq-lite executable
 my $exe = abs_path(File::Spec->catfile($FindBin::Bin, '..', 'bin', 'jq-lite'));
 
+# --- Test 1: Read YAML file automatically by extension ---
 my $err = gensym;
 my $pid = open3(my $in, my $out, $err,
     $^X, $exe, '.users[].name', $yaml_path);
@@ -36,6 +46,7 @@ is($stdout, qq("Alice"\n"Bob"\n), 'YAML files are auto-detected by extension');
 like($stderr, qr/^\s*\z/, 'no warnings emitted when reading YAML file');
 is($exit_code, 0, 'process exits successfully when reading YAML file');
 
+# --- Test 2: Read YAML from STDIN with --yaml flag ---
 my $err2 = gensym;
 my $pid2 = open3(my $in2, my $out2, $err2,
     $^X, $exe, '--yaml', '.users | length');

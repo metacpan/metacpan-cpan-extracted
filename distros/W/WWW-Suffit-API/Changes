@@ -1,5 +1,9 @@
 # Version/Revision history
 
+1.05 Thu 30 Oct 2025 23:17:14 MSK
+    * Added `authdb` check block to /api and /api/status handlers
+    * Added `is_authorized` flag to stash while checking authorization status
+
 1.04 Tue 21 Oct 2025 16:58:53 MSK
     * Removed all `cache_` prefixes from `AAA` calls
 

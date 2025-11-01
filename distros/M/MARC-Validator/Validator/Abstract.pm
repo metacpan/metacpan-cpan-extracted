@@ -6,10 +6,10 @@ use warnings;
 use Class::Utils qw(set_params);
 use DateTime;
 use Error::Pure qw(err);
-use Mo::utils 0.06 qw(check_bool);
+use Mo::utils 0.06 qw(check_bool check_required);
 use Mo::utils::Hash qw(check_hash);
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 # Constructor.
 sub new {
@@ -20,6 +20,9 @@ sub new {
 
 	# Debug mode.
 	$self->{'debug'} = 0;
+
+	# Error id definition.
+	$self->{'error_id_def'} = '001';
 
 	# Structure.
 	$self->{'struct'} = {};
@@ -32,6 +35,9 @@ sub new {
 
 	# Check 'debug'.
 	check_bool($self, 'debug');
+
+	# Check 'error_id_def'.
+	check_required($self, 'error_id_def');
 
 	# Check 'struct'.
 	check_hash($self, 'struct');
@@ -49,6 +55,27 @@ sub init {
 	# Common initialization.
 	$self->{'struct'}->{'name'} = $self->name;
 	$self->{'struct'}->{'datetime'} = DateTime->now->iso8601;
+
+	$self->{'cb_error_id'} = sub {
+		my $marc_record = shift;
+
+		my $error_id;
+		my ($field, $subfield) = $self->{'error_id_def'} =~ m/^(\d+)(.*)$/ms;
+		my $field_obj = $marc_record->field($field);
+		if (defined $field_obj) {
+			if ($subfield) {
+				$error_id = $field_obj->subfield($subfield);
+			} else {
+				$error_id = $field_obj->as_string;
+			}
+		} else {
+			err 'Record id is not defined.',
+				'Error ID definition', $self->{'error_id_def'},
+			;
+		}
+
+		return $error_id;
+	};
 
 	# Plugin initialization.
 	$self->_init;
@@ -129,6 +156,13 @@ Constructor.
 Debug mode.
 
 Default value is 0.
+
+=item * C<error_id_def>
+
+Error ID definition in MARC field/subfield hierarchy.
+For control fields is simple number, for field/subfield is something like '015a'.
+
+Default value is '001' = control field 001.
 
 =item * C<struct>
 
@@ -444,6 +478,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

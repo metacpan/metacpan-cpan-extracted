@@ -1,5 +1,10 @@
 Revision history for Git-RemoteURL-Parse
 
+0.04    2025/10/1
+
+     - Reworked Makefile.PL.
+     - Corrected policy files.
+
 0.03    2025/08/08
 
      - Completed POD.

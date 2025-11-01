@@ -1,3 +1,12 @@
+0.06 2025-10-31T14:37:54+01:00
+ - Fix check in case of invalid leader in Field008 plugin.
+ - Fix check in case of invalid leader in Field040 plugin.
+ - Fix field 008 presence.
+ - Fix field 040e presence.
+ - Rewrite identification of record id for reporting. Default value is
+   control field 001. We could change it by definition of 'error_id_def'
+   parameter.
+
 0.05 2025-10-30T08:35:46+01:00
  - Fix REPOSITORY section in doc.
  - Fix check of 040 field with RDA rules.

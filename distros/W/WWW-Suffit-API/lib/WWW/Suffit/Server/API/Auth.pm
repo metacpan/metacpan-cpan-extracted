@@ -45,7 +45,7 @@ This option disables connection to authorization database
 
     token_type => 'access'
 
-This option is required and sets the token type: C<access>, C<session> or C<api>
+This option is required and sets the token type: C<access>, C<session>, C<refresh> or C<api>
 
 =back
 
@@ -194,7 +194,7 @@ Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<g
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2024 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2025 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -276,6 +276,9 @@ sub is_authorized {
 
         # Stash user data
         $self->stash($user->to_hash);
+
+        # Stah is_authorized flag
+        $self->stash(is_authorized => $user->is_authorized ? 1 : 0) ;
     }
 
     # Access (username is optional; b,m,url,p,i,r will be got from controller)
@@ -329,8 +332,8 @@ sub authorize {
     }
 
     # Token type
-    return $self->reply->json_error(400 => "E1020" => "Incorrect token type. Supported types: session, access, api")
-        unless grep {$token_type eq $_} (qw/session access api/);
+    return $self->reply->json_error(400 => "E1020" => "Incorrect token type. Allowed: session, access, refresh, api")
+        unless grep {$token_type eq $_} (qw/session access refresh api/);
 
     # Please provide username and password for authorization
     return $self->reply->json_error(401 => "E1021" => "No username specified") unless length($username);

@@ -36,7 +36,9 @@ is_deeply(
 );
 
 # Test.
-$obj = MARC::Validator::Plugin::Field260->new;
+$obj = MARC::Validator::Plugin::Field260->new(
+	'error_id_def' => '015a',
+);
 $obj->init;
 my $marc_record = MARC::File::XML->in($data_dir->file('cnb001880327-incorrect_260c.xml')->s)->next;
 $obj->process($marc_record);

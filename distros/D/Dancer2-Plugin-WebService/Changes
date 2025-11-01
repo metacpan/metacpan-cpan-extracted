@@ -1,3 +1,32 @@
+4.8.0  2025-10-31
+
+  - Documentation changes
+
+4.7.9  2025-09-18
+
+  - Corrections when onverting from perl format
+
+4.7.8  2025-09-17
+
+  - Corrections when onverting from human format
+
+4.7.7  2025-06-02
+
+  - Error handling
+
+4.7.6  2025-05-04
+
+  - Unicode strings handling
+
+4.7.5  2025-05-03
+
+  - Replace functional code with objects
+
+4.7.4  2025-05-02
+
+  - Replace module YAML::Syck with the YAML::XS
+  - Replace module JSON::XS with the Cpanel::JSON::XS
+
 4.7.2  2025-02-15
 
   - Re-write the documentation
@@ -223,15 +252,15 @@
   - In memory operation for login and session data
   - Less methods and more built in functionality for perfomance
 
-3.101  2018-05-21
+3.10.1 2018-05-21
 
   - Code clean up
 
-3.100  2018-05-20
+3.10.0 2018-05-20
 
   - Re-write many parts of the code for perfomance
 
-3.015  2018-05-10
+3.1.5  2018-05-10
 
   - Remove several not necessary Moo properties
   - Find route name from the $plugin->dsl->request->{route}->{spec_route}
@@ -242,7 +271,7 @@
   - Remove the after hook that clears the posted data
   - Documentation changes
 
-3.014  2017-05-05
+3.1.4  2017-05-05
 
   - New code for retrieving Os info for built-in route info/version
   - Changes at POD documentation
@@ -251,7 +280,7 @@
   - Authentication 'Always allow login for testing' replaced from the INTERNAL simple
   - Add support for <any> user and <any> password at INTERNAL simple
 
-3.012  2017-04-21
+3.1.2  2017-04-21
 
   - Re-package it using Dist::Zilla instead of ExtUtils::MakeMaker
     because Somehow CPAN do not show the pod documentation if the
@@ -260,21 +289,21 @@
     using the two slower map{$_, $plugin->data_user->{$_}} @keys
     only for passing the nosense CPAN auto tests ...
 
-3.000  2016-09-01
+3.0.0  2016-09-01
 
   - login / logout
   - Plugable authorization scripts
   - Sessions
   - Persistent data
 
-2.000  2016-05-01
+2.0.0  2016-05-01
 
-  - Re-write it as a Dancer2 plugin
+  - Re-write as a Dancer2 plugin
 
-1.000  2012-01-17
+1.0.0  2012-01-17
 
-  - User can register his own code to executed from the server
+  - User can upload and register his own code to executed from the server
 
-0.001  2011-01-15 20:00:00+02:00 Europe/Athens
+0.0.1  2011-01-15 20:00:00+02:00 Europe/Athens
 
   - Initial release using the CGI module

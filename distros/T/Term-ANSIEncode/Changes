@@ -144,3 +144,11 @@
 		Unicode output defaults to a squashed output and the new "expanded"
 		option will show dividers between each row to better discern symbol
 		output.
+
+1.38    Oct 30, 2025
+
+        Added more frame styles
+
+1.39    Oct 30, 2025
+
+        Added even more frame styles

@@ -1,5 +1,5 @@
 package Hustle::Table;
-our $VERSION="v0.7.3";
+our $VERSION="v0.8.0";
 
 use strict;
 use warnings;
@@ -63,7 +63,10 @@ sub add {
 
 		}
 
+
 		if(defined $entry->[matcher_]){
+      my $ref=ref $entry->[matcher_];
+      die "Matcher must be a basic scalar string. got $ref" if $ref and $ref ne "CODE";
 			#Append to the end of the normal matching list 
 			splice @$self, @$self-1,0, $entry;
 		}
@@ -95,6 +98,19 @@ sub prepare_dispatcher{
   for(keys %$cache){
     delete $cache->{$_};
   }
+
+  # Recompile source regex
+  for($self->@*){
+    if(!defined($_->[type_]) or ref($_->[type_] eq "RegExp")){
+    $_->[type_]//=qr{$_->[matcher_]} if $_->[matcher_];
+    }
+  }
+
+  # Ensure there is always a default matcher
+  if($self->@* == 0) {
+    push $self->@*, [undef, undef, "exact"];
+  }
+
 	$self->_prepare_online_cached($cache);
 }
 
@@ -115,19 +131,8 @@ sub _prepare_online_cached {
 	@{[do {
 		my $d="";
 
-    my $pack=ref $item->[Hustle::Table::matcher_];
-    my $is_regex;
-
-    if($pack){
-      $is_regex= ($pack eq "Regexp" or grep /^Regexp$/, @{$pack."::ISA"});
-    }
-
-
 		for($item->[Hustle::Table::type_]){
-      if($is_regex){
-        $d.=\'($input=~$table->[\'. $index .\'][Hustle::Table::matcher_] )\';
-      }
-			elsif(ref($item->[Hustle::Table::matcher_]) eq "CODE"){
+			if(ref($item->[Hustle::Table::matcher_]) eq "CODE"){
 
 				$d.=\'($table->[\'.$index.\'][Hustle::Table::matcher_]->($input, ($table->[\'.$index.\'][1])))\';
 			}
@@ -144,11 +149,10 @@ sub _prepare_online_cached {
               $d.=\'(\' . $item->[Hustle::Table::matcher_] . \'== $input)\';
       }
       else{
-        #assume a regex - even if a basic string
-				$item->[Hustle::Table::matcher_]=qr{$item->[Hustle::Table::matcher_]};
-				$item->[Hustle::Table::type_]=undef;
+        # type is any other value (including undef and existing regex);
+        #$item->[Hustle::Table::type_]//=qr{$item->[Hustle::Table::matcher_]};
         $is_regex=1;
-        redo;
+        $d.=\'($input=~$table->[\'. $index .\'][Hustle::Table::type_] )\';
       }
 		}
 

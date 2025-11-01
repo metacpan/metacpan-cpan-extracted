@@ -1,2 +1,13 @@
+0.04 2025-10-31T15:11:53+01:00
+ - Add -i option for definition of record id.
+
+0.03 2025-09-30T17:14:26+02:00
+ - Add test for constructor.
+ - Fix error variable.
+
+0.02 2025-09-30T16:58:53+02:00
+ - Add check for main MARC::File object.
+ - Remove trailing variable.
+
 0.01 2025-07-03T00:22:22+02:00
  - First version.

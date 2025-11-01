@@ -6,7 +6,7 @@ use warnings;
 
 use MARC::Validator::Utils qw(check_260c_year);
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 sub name {
 	my $self = shift;
@@ -19,13 +19,13 @@ sub process {
 
 	my $struct_hr = $self->{'struct'}->{'checks'};
 
-	my $cnb = $marc_record->field('015')->subfield('a');
+	my $error_id = $self->{'cb_error_id'}->($marc_record);
 
 	my @field_264 = $marc_record->field('264');
 	foreach my $field_264 (@field_264) {
 		my @field_264_c = $field_264->subfield('c');
 		foreach my $field_264_c (@field_264_c) {
-			check_260c_year($self, $field_264_c, $struct_hr, $cnb, '264');
+			check_260c_year($self, $field_264_c, $struct_hr, $error_id, '264');
 		}
 	}
 

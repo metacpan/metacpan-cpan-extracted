@@ -1,4 +1,16 @@
 Revision history for Perl extension Hustle::Table
+
+v0.8.0 2025-10-28
+  [changes]
+    - regular expression matchers are now expected as strings, not a RegExp
+    - Internally converted to RegExp as required
+    - Code matchers now need an explicit 'code' type specified
+    - Updated tests to match new restrictions
+    - Adding items to the table now must only be performed with add method
+
+  [fixes]
+    - POD now more accurately documents current usage and API
+
 v0.7.3 2025-09-09
   [fixes]
     - ensure stringification of array contents is joined with an empty string 
@@ -14,11 +26,11 @@ v0.7.1 2025-07-29
     - Fixed memory leak when generating dispatcher
 
 v0.7.0 2025-01-11
-  [improvments]
+  [improvements]
     - Now will return multiple matches not just first match
     - Dispatcher will process a list in a single call
     - Will return the default entry only when nothing else matches
-    - Significant performance improvments with cached regexp matching
+    - Significant performance improvements with cached regexp matching
     - Cache is cleared when reusing with multiple calls to prepare_dispatcher
 
 v0.6.1 2023-08-26

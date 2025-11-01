@@ -17,13 +17,13 @@ my $table=Hustle::Table->new;
 Add entry as hash ref:
 
 ```perl
-$table->add( { matcher => qr/regex (match)/, value=> "a value"});
+$table->add( { matcher => "regex (match)", value=> "a value"});
 ```
 
 Add entry as array ref (3 elements required):
 
 ```
-$table->add( [qr/another/, "another value", undef])
+$table->add( ["another", "another value", undef])
 ```
 
 Add entry as flat key value pairs:
@@ -35,7 +35,7 @@ Add entry as flat key value pairs:
 Add entry as tuple
 
 ```perl
-    $table->add(qr|magic matcher| => "to a value");
+    $table->add("magic matcher" => "to a value");
     
 ```
 
@@ -52,12 +52,19 @@ Prepare a dispatcher external cache:
     my $dispatch = $table->prepare_dispatcher(cache=>\%cache);
 ```
 
-Call dispatcher to return the matching entries and any regex captures. Multiple
+Call dispatcher to return the matching entries and any RegExp captures. Multiple
 items can be tested in a single call
 
 ```perl
-my @results=$dispatch->("thing to match", "another thing", ...);      
-# @results contains pairs of entries and capture arrays
+my @pairs=$dispatch->("thing to match", "another thing", ...);        
+
+# @pairs contains pairs of entries and capture arrays
+
+# perl v5.36 
+for my($e, $c)(@pairs){
+  $e->[1]; # The value 
+  $c;      # Possible captures
+}
 ```
 
 # DESCRIPTION
@@ -65,22 +72,21 @@ my @results=$dispatch->("thing to match", "another thing", ...);
 This module provides a class to construct a routing table and build a high
 performance dispatcher from it. 
 
-A table can have any combination of regex, subroutine, exact string, begin
+A table can have any combination of RegExp, subroutine, exact string, begin
 string, end string or numeric matching of entries. The order in which the
 entries are added defines their precedence. First in, first tested.
 
 In the case of no entries matching the input, a default/fallback entry always
 matches.
 
-Once all the entries have been added to the table, a dispatcher is
+Once all the entries have been added to the table, a dispatcher needs to be
 prepared/created. The dispatcher is an anonymous subroutine, which tests its
 arguments against the matcher in each entry in the table.
 
-**NOTE:**From v0.7.0 results are returned a list containing pairs of matching
-entries and an anonymous array of any captures from regex matching if
-applicable. 
-
-Prior to v0.7.0, testing would stop after the first match.
+**NOTE:** From v0.7.0 The entries that matched the input are returned along with
+an anonymous array of RegExp captures if applicable, as a pair. Multiple pairs
+are returned if more than one match. Prior to v0.7.0, testing would stop after
+the first match.
 
 If more entries are required to be added to the table, the dispatcher must be
 prepared again.
@@ -91,46 +97,55 @@ user to implement on a application basis.
 
 ## API Change
 
+**From v0.8.0:** Matchers **MUST** be input as strings or CODE refs only. Regexp
+matchers are generated internally from the matcher string. This is aid
+searching through the table, for modifications by other packages.  CODE
+matchers **MUST** specify the optional type argument as "code";
+
 **From v0.6.0:** Regexp from non core Regexp engines are now usable as a matcher
 directly. In previous versions, these where not detected and processed as a
 string to be converted into a Perl core Regexp internally.
 
 **In version v0.5.3 and earlier**, the dispatcher would always return a two
 element list. The first being the match entry, and the second array ref of any
-captures from a regexp match. If the matcher type was 'begin', 'end', 'exact',
+captures from a RegExp match. If the matcher type was 'begin', 'end', 'exact',
 or 'numeric', the second element would always be an reference to an empty
 array.
 
-**From v0.5.4 onwards** to optimise performance of non regex matching, this is
-no longer the case. Only regex type matching will generate this second element.
-Other matching types will not. 
+**From v0.5.4 onwards** to optimise performance of non RegExp matching, this is
+no longer the case. Only RegExp type matching will generate this second
+element.  Other matching types will not. 
 
 In other words when calling the dispatcher:
 
 ```perl
-            my ($entry, $captures)=$dispatcher->($input)
+my ($entry, $captures)=$dispatcher->($input)
 ```
 
 The `$captures` variable above now will be `undef` instead of `[]`, for non
-regex matching
+RegExp matching
 
-# CREATING A TABLE
+# CREATING A TABLE 
+
+```
+Hustle::Table->new(...);
+```
 
 Calling the class constructor returns a new table. There are no required
 arguments:
 
 ```perl
-    my $table=Hustle::Table->new;
+my $table=Hustle::Table->new;
 ```
 
-In this case, a default catch all entry (an undef value) is added
+In this case, a default catch all entry (an `undef` value) is added
 automatically.
 
 If an argument is provided, it is the value used in the default/catch all
 entry:
 
 ```perl
-    my $table=Hustle::Table->new($default);
+my $table=Hustle::Table->new($default);
 ```
 
 # ENTRIES
@@ -140,15 +155,16 @@ entry:
 An entry is an anonymous array containing the following elements:
 
 ```
-    [matcher, value, type, default]
+[matcher, value, type]
 ```
 
 - matcher
 
-    `matcher` can be a regex, a subroutine, a string or a numeric value.
+    `matcher` can be a RegExp (as source string), a subroutine, a string or a
+    numeric value.
 
-    When `matcher` is a regex, any captures are returned as the second item when
-    calling the dispatcher
+    When `matcher` treated as a RegExp, any captures are returned as the second
+    item of the pair when calling the dispatcher
 
     When `matcher` is a subroutine,  it is called with input to test and a
     reference to the `value` field in the entry as the two arguments. If it
@@ -158,11 +174,13 @@ An entry is an anonymous array containing the following elements:
     how to perform the match. See `type` below.
 
     If no `type` is specified or is `undef`, the `matcher` is always treated as
-    a regex
+    a RegExp.  **From v0.8.0:** If treated as a RegExp, the `type` field is
+    replaced with the compiled RexExp.
 
 - value
 
-    This is the data you want to retrieve from the table when the matches.
+    This is the data you want to retrieve from the table when entry matches the
+    input.
 
 - type
 
@@ -170,27 +188,24 @@ An entry is an anonymous array containing the following elements:
     are:
 
     ```perl
-        undef   =>      matcher treated as a regex or subroutine if possible
-                        forces basic scalars to become a regexp
+    undef   =>    matcher treated as a RegExp source stirng. 
 
-        "begin" =>      matcher string matches the begining of input string
-        "end"   =>      matcher string matches the end of input string
-        "exact" =>      matcher string matches string equality
-        "numeric" =>    matcher number matches numeric equality
+    "code"  =>  uses code refernce to match argument
+
+    "begin"       =>      matcher string matches the begining of input string 
+
+    "end"   =>  matcher string matches the end of input string 
+
+    "exact"       =>      matcher string matches string equality 
+
+    "numeric" =>  matcher number matches numeric equality
     ```
 
-    If `matcher` is a precompiled regex (i.e. `qr{}`), or a subroutine (i.e. CODE
-    reference), `type` is ignored. 
-
-    If `matcher` is a string or number, it is treated as a regex unless `type` is
-    as above.
-
-- default
-
-    This is a flag indicating if the entry was the default entry. This can not be
-    set
-
 ## Adding
+
+```
+$table->add(...);
+```
 
 Entries are added in anonymous hash, anonymous array or flattened format, using
 the `add` method.
@@ -198,59 +213,69 @@ the `add` method.
 Anonymous array entries must contain 3 elements, in the order of:
 
 ```
-    $table->add([$matcher, $value, $type]);
+$table->add([$matcher, $value, $type]);
 ```
 
-Anonymous hashes format only need to specify the matcher and value pairs
+Anonymous hashes format only need to specify the matcher and value pairs:
 
 ```perl
-    $table->add({matcher=>$matcher, value=>$value, type=>$type});
+$table->add({matcher=>$matcher, value=>$value, type=>$type});
 ```
 
-Single flattened format takes a list directly. It must contain 4 elements
+Single flattened format takes a list directly. It must contain 4 elements, and
+will be treated as a RegExp match:
 
 ```perl
-    $table->add(matcher=>$matcher, value=> $value);
+$table->add(matcher=>$matcher, value=> $value);
 ```
 
-Single simple format takes two elements
+Single simple format takes two elements and will be treated as RegExp match:
 
 ```perl
-    $table->add(qr{some matcher}=>$value);
+$table->add("some matcher"=>$value);
 ```
 
 Or add multiple at once using mixed formats together
 
 ```perl
-    $table->add(
-            [$matcher, $value, $type],
-            {matcher=> $matcher, value=>$value},
-            matcher=>$matcher, value=>$value
-    );
+$table->add( [$matcher, $value, $type], {matcher=> $matcher, value=>$value},
+matcher=>$matcher, value=>$value);
 ```
 
 In any case,`matcher` and `value` are the only items which must be defined
-for subroutine and regex matchers. String matching will need the `type` also
-specified.
+for subroutine and RegExp matchers. String, numeric and code matching will need
+the `type` also specified.
 
 ## Default Matcher
 
-Each list has a default matcher that will unconditionally match the input. This
-entry is specified by using `undef` as the matcher when adding an entry. 
+```
+$table->set_default($value)
+```
 
-To make it more explicit, the it can also be changed via the `set_default`
-method. 
+Each list has a default matcher that will unconditionally match the input. It
+is always in the table and **is only tested when no other matcher matched**
 
-The default `value` of the 'default' entry is undef
+If the default matcher matches it will return `$value` on matching and an
+empty capture array.
+
+## Manipulating Table Entries
+
+There are no explicit manipulation methods. The table is just an array and it
+can be accessed like an any other array e.g. accessing elements, `splice`,
+`shift`, `unshift`, `pop`, `push`.
+
+Just keep in mind the last item in the table is always the default matcher.
+
+After entires have been modified the dispatcher must be prepared again
 
 # PREPARING A DISPATCHER
 
-Once all the entries are added to the table, the dispatcher can be
-constructed by calling `prepare_dispatcher`:
-
 ```perl
-    my $dispatcher=$table->prepare_dispatcher(%args);
+my $dispatcher=$table->prepare_dispatcher(%args);
 ```
+
+Once all the entries are added to the table, the dispatcher can be constructed
+by calling `prepare_dispatcher`:
 
 Arguments to this method include:
 
@@ -259,27 +284,36 @@ Arguments to this method include:
     The hash ref to use as the dispatchers cache. Specifying a hash allows external
     management. If no cache is specified an internal cache is used.
 
+When a dispatcher is prepared, the cache is emptied, any RegExp matchers are
+compiled and the table is forced to always have at least one entry (the default
+matcher).
+
 # USING A DISPATCHER
+
+```perl
+my @pairs=$dispatcher->("input");
+
+# perl v5.36 
+for my($e, $c)(@pairs){
+  $e->[1]; # The value 
+  $c;      # Possible captures
+}
+```
 
 The dispatcher is simply a sub, which you call with the input to match against
 the table entries:
 
-```perl
-    my ($entry, $captures)=$dispatcher->("input");
-    my $value=$entry->[1];
-```
+The returned list are pairs of entries and captures
 
-The return from the dispatcher is a list of up to two elements.
+The first pair item is the array reference to the table entry that matched (or
+the default entry if no match was found). The value associated with the table
+entry is located in position 1
 
-The first is the array reference to the table entry that matched (or the
-default entry if no match was found). The value associated with the table entry
-is located in position 1
-
-The second item, if present, is an anonymous array of any captures due to a
-matching regex.
+The second pair item is an anonymous array of any captures due to a matching
+RegExp, or `undef` otherwise
 
 **NOTE In version 0.5.3 and earlier:** the second element was returned as a ref
-to an empty array even if the matcher was not a regex.
+to an empty array even if the matcher was not a RegExp.
 
 # COMPARISON TO OTHER MODULES
 

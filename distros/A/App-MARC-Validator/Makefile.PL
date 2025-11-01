@@ -24,13 +24,14 @@ requires 'Cpanel::JSON::XS' => 0;
 requires 'English' => 0;
 requires 'Getopt::Std' => 0;
 requires 'IO::Barf' => 0;
-requires 'MARC::Validator' => 0;
 requires 'MARC::File::XML' => '1.0.4';
+requires 'MARC::Validator' => 0.06;
 requires 'Unicode::UTF8' => 0;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/App-MARC-Validator/issues',
 resources 'homepage' => 'https://github.com/michal-josef-spacek/App-MARC-Validator';
 resources 'repository' => 'git://github.com/michal-josef-spacek/App-MARC-Validator';
 test_requires 'English' => 0;
+test_requires 'Error::Pure::Utils' => 0;
 test_requires 'File::Object' => 0;
 test_requires 'File::Spec::Functions' => 0;
 test_requires 'Test::More' => 0;
@@ -38,7 +39,7 @@ test_requires 'Test::NoWarnings' => 0;
 test_requires 'Test::Output' => 0;
 test_requires 'Test::Warn' => 0.31;
 tests_recursive;
-version '0.01';
+version '0.04';
 
 # Run.
 WriteAll();

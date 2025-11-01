@@ -1,0 +1,1 @@
+ο hash με τα Data του Χρήστη δεν είναι utf8 είναι INTERNAL format.

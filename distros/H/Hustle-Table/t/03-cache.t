@@ -14,7 +14,7 @@ my %hit;
 
 $table->add(
 	{matcher=>"B", type=>"begin",	value=>"Entry2"},
-	{matcher=>qr/^(A)/, 		value=>"Entry1"},
+	{matcher=>"^(A)", 		value=>"Entry1"},
 );
 
 my $dispatcher=$table->prepare_dispatcher(cache=>\%cache);

@@ -11,8 +11,10 @@ lib/OrePAN2/CLI/Inject.pm
 lib/OrePAN2/Index.pm
 lib/OrePAN2/Indexer.pm
 lib/OrePAN2/Injector.pm
+lib/OrePAN2/Logger.pm
 lib/OrePAN2/Repository.pm
 lib/OrePAN2/Repository/Cache.pm
+lib/OrePAN2/Role/HasLogger.pm
 minil.toml
 perlimports.toml
 script/orepan2-audit
@@ -28,6 +30,8 @@ t/04_repository.t
 t/05_cache.t
 t/06_inject_live.t
 t/07_auditor.t
+t/08_logging.t
+t/09_log_any.t
 t/cli/gc.t
 t/cli/indexer.t
 t/cli/merge-index.t

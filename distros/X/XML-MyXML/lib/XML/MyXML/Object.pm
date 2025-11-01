@@ -9,7 +9,7 @@ use Encode;
 use Carp;
 use Scalar::Util 'weaken';
 
-our $VERSION = "1.08";
+our $VERSION = "1.09";
 
 sub new {
     my $class = shift;
