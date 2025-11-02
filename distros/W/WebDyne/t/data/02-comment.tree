@@ -2,6 +2,5 @@
   <head> @0.0 (IMPLICIT)
   <body> @0.1 (IMPLICIT)
     <p> @0.1.0
-      "This is a visible paragraph."
     <p> @0.1.1
-      "This is another visible paragraph."
+    <p> @0.1.2

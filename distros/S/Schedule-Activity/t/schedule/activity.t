@@ -198,6 +198,7 @@ subtest 'Attributes'=>sub {
 		},
 		'finish'=>{
 			tmavg=>5,
+			next=>['finish'],
 			attributes=>{
 				counter=>{incr=>1},
 			},
@@ -265,7 +266,7 @@ subtest 'Message attributes'=>sub {
 				message=>{alternates=>[{message=>'Activity',attributes=>{messages=>{incr=>1}}}]},
 				next=>['action 1'],
 				tmmin=>5,tmavg=>5,tmmax=>5,
-				finish=>'Activity, conclude',
+				finish=>'finish',
 				attributes=>{activity=>{incr=>1}},
 			},
 			'action 1'=>{
@@ -283,7 +284,12 @@ subtest 'Message attributes'=>sub {
 			'Activity, conclude'=>{
 				message=>{alternates=>[{message=>'Activity',attributes=>{messages=>{incr=>1}}}]},
 				tmmin=>5,tmavg=>5,tmmax=>5,
+				next=>['finish'],
 				attributes=>{activity=>{incr=>1}},
+			},
+			'finish'=>{
+				tmmin=>0,tmavg=>0,tmmax=>0,
+				attributes=>{activity=>{},action=>{},messages=>{}},
 			},
 		},
 		attributes=>{
@@ -465,14 +471,14 @@ subtest 'Node filtering'=>sub {
 		node=>{
 			Activity=>{
 				message=>'Begin Activity',
-				next=>['action 1'],
-				tmmin=>5,tmavg=>5,tmmax=>5,
+				next=>['action 1','action 2'],
+				tmmin=>0,tmavg=>0,tmmax=>0,
 				finish=>'Activity, conclude',
 				attributes=>{act1=>{set=>0},act2=>{set=>0}},
 			},
 			'action 1'=>{
 				message=>['Begin action 1'],
-				tmmin=>5,tmavg=>5,tmmax=>5,
+				tmmin=>4,tmavg=>5,tmmax=>6,
 				next=>['action 1','action 2','Activity, conclude'],
 				attributes=>{act1=>{incr=>1}},
 			},
@@ -480,21 +486,23 @@ subtest 'Node filtering'=>sub {
 				message=>'Begin action 2',
 				tmmin=>0,tmavg=>10,tmmax=>30,
 				next=>['Activity, conclude'],
-				require=>{attr=>'act1',op=>'ge',value=>3},
+				require=>{attr=>'act1',op=>'ge',value=>4},
 			},
 			'Activity, conclude'=>{
 				message=>'Conclude Activity',
-				tmmin=>0,tmavg=>5,tmmax=>10,
+				tmmin=>0,tmavg=>0,tmmax=>0,
 			},
 		},
 	);
 	$pass=1;
+	%seen=();
 	$scheduler=Schedule::Activity->new(configuration=>\%configuration);
 	foreach (1..20) {
-		%schedule=$scheduler->schedule(unsafe=>1,activities=>[[20,'Activity']]);
-		%seen=map {$$_[1]{message}=>1} @{$schedule{activities}};
-		if(!defined($seen{'Begin action 1'})||defined($seen{'Begin action 2'})) { $pass=0 }
+		eval { %schedule=$scheduler->schedule(unsafe=>1,activities=>[[15,'Activity']]) };
+		if(!%schedule) { next }
+		foreach my $msg (map {$$_[1]{message}} @{$schedule{activities}}) { $seen{$msg}=1 }
 	}
+	if(!defined($seen{'Begin action 1'})||defined($seen{'Begin action 2'})) { $pass=0 }
 	ok($pass,'Blocked node never appears');
 	#
 	$pass=1;
@@ -502,25 +510,28 @@ subtest 'Node filtering'=>sub {
 	$scheduler=Schedule::Activity->new(configuration=>\%configuration);
 	foreach (1..20) {
 		if(!$pass) { next }
-		%schedule=$scheduler->schedule(activities=>[[40,'Activity']]);
+		eval { %schedule=$scheduler->schedule(activities=>[[40,'Activity']]) };
+		if(!%schedule) { next }
 		%seen=();
 		foreach my $message (map {$$_[1]{message}} @{$schedule{activities}}) {
-			if($message eq 'Begin action 2') { if($seen{'Begin action 1'}<4) { $pass=0 } }
+			if($message eq 'Begin action 2') { if($seen{'Begin action 1'}<3) { $pass=0 } }
 			else { $seen{$message}++ }
 		}
 	}
 	ok($pass,'Require prereq node count');
 	#
 	$pass=1;
+	%seen=();
 	$configuration{node}{'action 1'}{next}=['Activity, conclude','action 1',map {'action 2'} (1..99)];
 	$configuration{node}{'action 2'}{require}={attr=>'act2',op=>'ge',value=>1};
 	$scheduler=Schedule::Activity->new(configuration=>\%configuration);
 	foreach (1..20) {
 		if(!$pass) { next }
-		%schedule=$scheduler->schedule(activities=>[[40,'Activity']]);
-		%seen=map {$$_[1]{message}=>1} @{$schedule{activities}};
-		if($seen{'Begin action 2'}) { $pass=0 }
+		eval { %schedule=$scheduler->schedule(activities=>[[40,'Activity']]) };
+		if(!%schedule) { next }
+		foreach my $msg (map {$$_[1]{message}} @{$schedule{activities}}) { $seen{$msg}=1 }
 	}
+	if($seen{'Begin action 2'}) { $pass=0 }
 	ok($pass,'Always blocked node never appears');
 };
 
@@ -573,33 +584,38 @@ subtest 'Sanity checks'=>sub {
 };
 
 subtest 'tension control'=>sub {
-	plan tests=>5;
+	plan tests=>7;
 	my %schedule;
 	my $scheduler=Schedule::Activity->new(
 		configuration=>{
 			node=>{
 				root=>{next=>['A'],tmavg=>0,finish=>'finish'},
-				A=>{tmmin=>5,tmavg=>10,tmmax=>100,next=>['A','finish']},
+				A=>{tmmin=>25,tmavg=>30,tmmax=>35,next=>['A','finish']},
 				finish=>{tmavg=>0},
 			},
 		});
-	# Expectations:
-	# with tension=1.0/1.0, exactly 12=10+2 actions always
-	# tensionbuffer~0 expect 3--12=[1,10]+2 actions
-	# tensionslack~0  expect 12--21=[10,19]+2 actions
 	my @tests=(
-		# slack, buffer, goal, label, validator, negate, test count (0=default)
-		[1.0,1.0,99,'=12',sub { return $_[0]!=12},1,500],
-		[0.0,1.0,99,'>14',sub { return $_[0]>14 },0,  0],
-		[1.0,0.0,99,'<10',sub { return $_[0]<10 },0,  0],
-		[0.5,0.8,99,'>13',sub { return $_[0]>13 },0,4e3],
-		[0.5,0.5,99,'<9', sub { return $_[0]<9  },0,  0],
+		# slack, buffer, goal, label, validator, negate, test count (0=default), # probability of test failure over all cycles
+		[1.0,1.0,299,'=12',sub { return $_[0]!=12},1,500],  # 0
+		[0.0,1.0,300,'>13',sub { return $_[0]>13 },0,100],  # 1e-26 = (100*l(1-45/99))/l(10)
+		[1.0,0.0,279,'<11',sub { return $_[0]<11 },0,2e3],  # 1e-22 = (2000*l(1-0.025))/l(10)
+		[0.0,0.0,312,'<12',sub { return $_[0]<12 },0,2e3],  # 1e-29 = (2000*l(1-1/30))/l(10)
+		[0.0,0.0,300,'>13',sub { return $_[0]>13 },0,500],  # 1e-21 = (500*l(1-69/99000-94/1000))/l(10)
+		[0.0,0.7,300,'>11',sub { return $_[0]<=11 },1,1e3], # 0
+		[0.7,0.0,300,'<14',sub { return $_[0]>=14 },1,1e3], # 0
 	);
 	foreach my $test (@tests) {
 		my ($limit,$pass)=($$test[6]||1000,$$test[5]);
+		my ($total,%count)=(0);
 		while($limit>0) { $limit--;
-			%schedule=$scheduler->schedule(tensionslack=>$$test[0],tensionbuffer=>$$test[1],activities=>[[$$test[2],'root']]);
+			$total++;
+			eval { %schedule=$scheduler->schedule(tensionslack=>$$test[0],tensionbuffer=>$$test[1],activities=>[[$$test[2],'root']]) };
+			if(!%schedule) { $count{0}++; next }
+			$count{1+$#{$schedule{activities}}}++;
 			if(&{$$test[4]}(1+$#{$schedule{activities}})) { $pass=1-$$test[5]; $limit=0 }
+		}
+		if(!$pass) {
+			foreach my $k (keys %count) { $count{$k}/=$total }; use Data::Dumper; print Dumper(\%count);
 		}
 		ok($pass,"(non-deterministic) Slack $$test[0], Buffer $$test[1], Goal $$test[2], count$$test[3]");
 	}

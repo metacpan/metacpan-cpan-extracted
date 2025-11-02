@@ -1,6 +1,9 @@
 <html> @0 (IMPLICIT)
   <head> @0.0 (IMPLICIT)
   <body> @0.1 (IMPLICIT)
-    <div id="output"> @0.1.0
-      <script src="json.js"> @0.1.0.0
-      "__PERL__use JSON;sub json { my $self=shift(); my %json=( array =>..."
+    <json handler="json/" id="json-data"> @0.1.0
+      <json handler="json" id="json-data-implicit"> @0.1.0.0
+        <json handler="json" id="json-data-closed"> @0.1.0.0.0
+        <div id="output"> @0.1.0.0.1
+          <script src="json.js"> @0.1.0.0.1.0
+          "__PERL__use JSON;sub json { my $self=shift(); my %json=( array =>..."

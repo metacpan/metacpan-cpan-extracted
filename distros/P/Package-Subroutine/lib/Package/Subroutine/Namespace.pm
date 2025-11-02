@@ -1,23 +1,51 @@
-  package Package::Subroutine::Namespace
-# **************************************
-; our $VERSION='0.01'
-# *******************
-; use strict ('vars','subs')
-; use warnings
+  package Package::Subroutine::Namespace;
+# ***************************************
+  use strict; use warnings;
+  our $VERSION='0.10';
+# ********************
 
+; use Carp ()
 ; use Perl6::Junction ()
 
-; sub list_childs
+; our $ROOT = \%::
+; our %namespace
+
+; sub list_namespaces
     { my ($self,$package) = @_
-    ; map { s/::$// ; $_ }
-      grep { /::$/ } keys %{"${package}::"}
+    ; local %namespace = %$ROOT
+    ; $package =~ s/::$//
+    ; my @path = split /::/, $package
+    ; while(my $pkg = shift @path)
+        { if(exists $namespace{"${pkg}::"})
+            { %namespace = %{$namespace{$pkg."::"}}
+            }
+          else
+            { Carp::carp("Package \"$package\" not available.")
+            ; return ()
+            }
+        }
+    ; map { s/::$// ; $_ } ## no critic
+      grep { /::$/ } keys %namespace
     }
 
-; sub delete_childs
+; sub delete_namespaces
     { my ($self,$package,@keep) = @_
-    ; for my $chld ($self->list_childs($package))
+    ; $package =~ s/::$//
+    ; my @path = split /::/, $package
+    ; my @children = $self->list_namespaces($package)
+    ; my $namespace = $ROOT
+    ; while(my $pkg = shift @path)
+        { if(exists $namespace->{"${pkg}::"})
+            { $namespace = \%{$namespace->{"${pkg}::"}}
+            }
+          else
+            { Carp::carp("Package \"$package\" not found.")
+            ; return
+            }
+        } 
+    ; for my $chld (@children)
         { next if $chld eq Perl6::Junction::any(@keep)
-        ; delete ${"${package}::"}{"${chld}::"}
+        ; delete $namespace->{"${chld}::"}
         }
     }
 
@@ -36,22 +64,22 @@ Package::Subroutine::Namespace - naive namespace utilities
   # shortcut
   my $ns = bless \my $v, 'Package::Subroutine::Namespace';
 
-  print "$_\n" for $ns->list_childs('Package::Subroutine');
+  print "$_\n" for $ns->list_namespaces('Package::Subroutine');
   # should print at least: Namespace
 
-  $ns->delete_childs('Package::Subroutine','Namespace');
+  $ns->delete_namespaces('Package::Subroutine','Namespace');
   # deletes sub namespaces, but keeps the Namespace module intact
 
 =head1 DESCRIPTION
 
-=head2 list_childs
+=head2 list_namespaces
 
-Class method to list all child namespaces for a given namespace.
+Class method to list all namespaces in a given package.
 
-=head2 delete_childs
+=head2 delete_namespaces
 
 Deletes sub namespaces from a namespace, takes an optional
-list namespace names which are saved from extinction.
+list with namespace child names which are saved from extinction.
 
 Removing is done simply with builtin delete function.
 
@@ -64,4 +92,4 @@ Sebastian Knapp
 Perl has a free license, so this module shares it with this
 programming language.
 
-Copyleft 2006-2009 by Sebastian Knapp E<lt>rock@ccls-online.deE<gt>
+Copyleft 2006-2009,2025 by Sebastian Knapp E<lt>sknpp@cpan.orgE<gt>

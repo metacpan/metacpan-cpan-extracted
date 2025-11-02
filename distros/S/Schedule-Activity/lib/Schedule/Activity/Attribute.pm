@@ -3,7 +3,7 @@ package Schedule::Activity::Attribute;
 use strict;
 use warnings;
 
-our $VERSION='0.1.8';
+our $VERSION='0.1.9';
 
 my %types=(
 	int=>{
@@ -80,6 +80,15 @@ sub average {
 	if(defined($$self{avg})) { return $$self{avg} }
 	($$self{avg},$$self{tmsum})=&{$types{$$self{type}}{average}}($$self{log});
 	return $$self{avg};
+}
+
+sub reset {
+	my ($self)=@_;
+	foreach my $tm (sort {$a<=>$b} keys %{$$self{log}}) { $$self{tmmax}=$tm; $$self{value}=$$self{log}{$tm}; last }
+	%{$$self{log}}=();
+	$$self{avg}=undef;
+	$$self{tmsum}=undef;
+	return $self;
 }
 
 sub dump {

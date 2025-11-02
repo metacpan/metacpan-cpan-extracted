@@ -1,3 +1,15 @@
+commit 0d14fcc822ffe7f4b7b679d9de9193835fe0ec36
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Nov 2 17:27:14 2025 +1030
+
+    VERSION increment: 2.020
+
+commit 726e92a30e9d5f50a219e4f14524e11f8d287a2d
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Nov 2 17:27:04 2025 +1030
+
+    Made error handling more robust, fixed typos for git location in Makefile.PL, added sh file to make test data
+
 commit ffe396d14fcecc26063cdfee57a56024c54e8093
 Author: Andrew Speer <andrew.speer@isolutions.com.au>
 Date:   Thu Oct 30 21:15:53 2025 +1030

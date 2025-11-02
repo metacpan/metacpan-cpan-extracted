@@ -1,4 +1,5 @@
 <html> @0 (IMPLICIT)
   <head> @0.0 (IMPLICIT)
   <body> @0.1 (IMPLICIT)
-    "__PERL__sub json { my $self=shift(); my %chart=( labels =>['Janua..."
+    <json handler="json" id="data"> @0.1.0
+      "__PERL__sub json { my $self=shift(); my %chart=( labels =>['Janua..."

@@ -14,6 +14,9 @@ BEGIN
 {
     use ok( 'Apache2::API' );
     use ok( 'Apache2::API::DateTime' );
+    use ok( 'Apache2::API::Headers::Accept' );
+    use ok( 'Apache2::API::Headers::AcceptCommon' );
+    use ok( 'Apache2::API::Headers::AcceptLanguage' );
     use ok( 'Apache2::API::Query' );
     use ok( 'Apache2::API::Request' );
     use ok( 'Apache2::API::Request::Params' );

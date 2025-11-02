@@ -6,7 +6,7 @@ package Sim::OPT::Takechance;
 # The rationale for the selection of the seach path is explained in detail (with algorithms) in my paper at the following web address: http://arxiv.org/abs/1407.5615 .
 # This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
-use v5.14;
+#use v5.14;
 # use v5.20;
 use Exporter;
 use parent 'Exporter'; # imports and subclasses Exporter
@@ -33,6 +33,9 @@ use feature 'say';
 #use Sub::Signatures;
 #no warnings qw(Sub::Signatures);
 #no strict 'refs';
+use Switch::Back;
+use feature 'smartmatch';
+no warnings 'experimental::smartmatch';
 no strict;
 no warnings;
 
@@ -48,7 +51,7 @@ our @ISA = qw(Exporter); # our @adamkISA = qw(Exporter);
 #@EXPORT_OK   = qw(); # our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
 @EXPORT = qw( takechance ); # our @EXPORT = qw( );
-$VERSION = '0.06';
+$VERSION = '0.09';
 $ABSTRACT = 'The "Sim::OPT::Takechance" module can produce efficient block coordinate search structures given some initialization blocks.';
 
 #########################################################################################

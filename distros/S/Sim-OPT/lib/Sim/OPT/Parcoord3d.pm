@@ -28,6 +28,9 @@ use Data::Dump qw(dump);
 use feature 'say';
 no strict;
 no warnings;
+use Switch::Back;
+use feature 'smartmatch';
+no warnings 'experimental::smartmatch';
 
 use Sim::OPT;
 use Sim::OPT::Morph;
@@ -42,7 +45,7 @@ our @ISA = qw(Exporter); # our @adamkISA = qw(Exporter);
 #@EXPORT_OK   = qw(); # our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
 @EXPORT = qw( parcoord3d ); # our @EXPORT = qw( );
-$VERSION = '0.01.5';
+$VERSION = '0.01.6';
 $ABSTRACT = 'Sim::OPT::Parcoord3d is a program that can process the CSV data for a bi-dimensional parallel coordinate plot and output an Autolisp file for a 3D parallel coordinate plot.';
 
 #########################################################################################

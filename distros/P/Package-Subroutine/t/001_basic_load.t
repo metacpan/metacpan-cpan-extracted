@@ -1,14 +1,14 @@
 # test load of package
 
-; use strict
-; use Test::More tests => 6
+; use Test2::V0
+
 ; use lib 't/lib'
 ; use Tags
 
-# 01
-; BEGIN { use_ok('Package::Subroutine','Tags','minze') }
+; BEGIN { plan(5) }
 
-# 02
+; use Package::Subroutine 'Tags' => 'minze'
+
 ; my $r=eval { minze() }
 ; ok(!$@)
 

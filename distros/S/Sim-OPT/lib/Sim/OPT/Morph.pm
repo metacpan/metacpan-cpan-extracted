@@ -18,6 +18,9 @@ use IO::Tee;
 use Storable qw(dclone);
 use File::Copy qw( move copy );
 use Data::Dumper;
+use Switch::Back;
+use feature 'smartmatch';
+no warnings 'experimental::smartmatch';
 
 
 use Sim::OPT;
@@ -47,7 +50,7 @@ decreasearray deg2rad_ rad2deg_ purifyarray replace_nth rotate2dabs rotate2d rot
 gatherseparators supercleanarray modish $max_processes @weighttransforms rebuildconstr
 ); # our @EXPORT = qw( );
 
-$VERSION = '0.165'; # our $VERSION = '';
+$VERSION = '0.167'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Morph is a morphing program for performing parametric variations on model for simulation programs.';
 
 ################################################# MORPH
@@ -7101,7 +7104,7 @@ Gian Luca Brunetti, E<lt>gianluca.brunetti@polimi.itE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2022 by Gian Luca Brunetti and Politecnico di Milano. This is free software. You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
+Copyright (C) 2008-2025 by Gian Luca Brunetti and Politecnico di Milano. This is free software. You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
 
 =cut

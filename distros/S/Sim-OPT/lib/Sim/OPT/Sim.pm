@@ -24,6 +24,9 @@ use Data::Dumper;
 #$Data::Dumper::Terse  = 1;
 use Data::Dump qw(dump);
 use feature 'say';
+use Switch::Back;
+use feature 'smartmatch';
+no warnings 'experimental::smartmatch';
 
 use Sim::OPT;
 use Sim::OPT::Morph;
@@ -39,7 +42,7 @@ use warnings::unused;
 
 our @EXPORT = qw( sim ); # our @EXPORT = qw( );
 
-$VERSION = '0.097'; # our $VERSION = '';
+$VERSION = '0.099'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Sim is the module used by Sim::OPT to launch simulations once the models have been built.';
 
 #########################################################################################

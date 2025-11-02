@@ -51,13 +51,14 @@ my %WriteMakefile=(
             version => 2
         },
         resources => {
-            homepage   => 'https://github.com/aspeer/pm-WebDyne',
+            homepage   => 'https://github.com/aspeer/WebDyne',
             repository => {
                 type => 'git',
-                url  => 'https://github.com/aspeer/pm-WebDyne.git',
-                web  => 'https://github.com/aspeer/pm-WebDyne'
+                url  => 'https://github.com/aspeer/WebDyne.git',
+                web  => 'https://github.com/aspeer/WebDyne'
             }
-        }
+        },
+        x_authority => 'cpan:ASPEER'
     },
     PM_FILTER => $ENV{'PM_DEBUG'} || $ENV{'WEBDYNE_DEBUG'} || do {
         use IO::File;

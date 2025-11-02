@@ -50,7 +50,7 @@ use Config;
 
 #  Version information
 #
-$VERSION='2.019';
+$VERSION='2.020';
 
 
 #  Debug

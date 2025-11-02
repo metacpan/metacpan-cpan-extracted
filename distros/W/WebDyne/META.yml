@@ -37,8 +37,9 @@ requires:
   Tie::IxHash: '0'
   perl: '5.006'
 resources:
-  homepage: https://github.com/aspeer/pm-WebDyne
+  homepage: https://github.com/aspeer/WebDyne
   license: http://dev.perl.org/licenses/
-  repository: https://github.com/aspeer/pm-WebDyne.git
-version: '2.019'
+  repository: https://github.com/aspeer/WebDyne.git
+version: '2.020'
+x_authority: cpan:ASPEER
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

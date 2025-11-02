@@ -2,7 +2,9 @@
 #NOTE: TO USE THE PROGRAM AS A SCRIPT, THE LINE ABOVE SHOULD BE ERASED OR TURNED INTO A COMMENT.
 #!/usr/bin/perl
 # Modish
-$VERSION = '0.4.3';
+use Switch::Back;
+
+$VERSION = '0.4.4';
 # Author: Gian Luca Brunetti, Politecnico di Milano - gianluca.brunetti@polimi.it.
 # An intermediate version of the subroutine createconstrdbfile has been modified by ESRU (2038),
 # University of Strathclyde, Glasgow.
@@ -22,6 +24,7 @@ $VERSION = '0.4.3';
 # In versions 0.4.2.1 (12.06.2023): updated the subprocedure "createfictgeofile "for creating fictitious obstruction files to the new obstruction file format.
 # In version 0.4.2.3 (25.01.2025): adapted to changes in prj and E2r.
 # In version 0.4.3 (10.06.2025): adapted to changes in Perl (disappearance of the smartmatch operator).
+# In version 0.4.4 (01.11.2025): put back the smartmatch operator thanks to the reappearance  of it in the great Switch::Back module)!
 
 print "I AM DOING\n";
 
@@ -42,6 +45,9 @@ use Storable qw(store retrieve dclone);
 use feature 'say';
 no strict;
 no warnings;
+use Switch::Back;
+use feature 'smartmatch';
+no warnings 'experimental::smartmatch';
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw( modish );

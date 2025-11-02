@@ -7,7 +7,7 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '1.22';
+our $VERSION = '1.23';
 
 use Moose;
 
@@ -56,7 +56,7 @@ Dist::Zilla::Plugin::DROLSKY::Contributors - Creates a .mailmap to populate Cont
 
 =head1 VERSION
 
-version 1.22
+version 1.23
 
 =for Pod::Coverage .*
 
@@ -74,7 +74,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 - 2022 by Dave Rolsky.
+This software is Copyright (c) 2013 - 2025 by Dave Rolsky.
 
 This is free software, licensed under:
 

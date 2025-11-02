@@ -1,6 +1,8 @@
-use Test::More tests => 2;
 
-use strict; use warnings;
+use Test2::V0;
+
+plan(2);
+
 use Package::Subroutine;
 
 package Exp::From;

@@ -2,6 +2,9 @@ CHANGES
 CONTRIBUTING.md
 lib/Apache2/API.pm
 lib/Apache2/API/DateTime.pm
+lib/Apache2/API/Headers/Accept.pm
+lib/Apache2/API/Headers/AcceptCommon.pm
+lib/Apache2/API/Headers/AcceptLanguage.pm
 lib/Apache2/API/Password.pod
 lib/Apache2/API/Query.pm
 lib/Apache2/API/Request.pm
@@ -21,6 +24,8 @@ t/03.query.t
 t/04.status.t
 t/05.other.t
 t/06.apr1.t
+t/07.accept.t
+t/08.accept_language.t
 t/90.coverage.t
 t/91.pod.t
 t/92.signature.t

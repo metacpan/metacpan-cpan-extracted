@@ -1,20 +1,20 @@
 
-; use strict; use warnings
-; use Test::Warnings ()
 
-; package T::Sugar
-; use Test::More tests => 6
+; use Test2::V0
 
 ; use lib './t/lib'
+; use Package::Subroutine::Sugar
+
+; package T::Sugar
+
 ; use Tags
 
 ; BEGIN
-    { use_ok('Package::Subroutine::Sugar')
-    ; eval { import from:: 'Tags' => 'minze' }
-    ; ok(!$@,'import seems to succed in BEGIN block')
+    { eval { import from:: 'Tags' => 'minze' }
+    ; Test2::V0::ok(!$@,'import seems to succeed in BEGIN block')
     }
 
-; ok(T::Sugar->can('minze'),'import succeeds, proved')
+; Test2::V0::can_ok('T::Sugar','minze')
 
 ; package T::good
 
@@ -22,17 +22,19 @@
 
 # interesting: for the import method it is not an error, but on newer perls
 # it emits a warning
-; my $warn = Test::Warnings::warning { import from::('Tags' => 'minze') };
-; if( ref($warn) eq "ARRAY" )
-    { if( @$warn == 0 )
-        { Test::More::pass("No warning on older perls") }
-      else
-        { Test::More::fail("Unknown warning?\n" . join("\n",@$warn)) }
+; my $warn = Test2::V0::warnings { import from::('Tags' => 'minze') };
+if( @$warn == 0 )
+    { Test2::V0::pass("No warning on older perls")
     }
-  else
-    { Test::More::like( $warn, 
+else
+    { Test2::V0::like( $warn->[0], 
          qr/^Attempt to call undefined import method with arguments/,
          "Calling import with unknown module gives a warning.")
+    ; Test2::V0::ok( @$warn == 1, "Only one warning" )
+    ; Test2::V0::diag(join("\n",@$warn[1..(scalar(@$warn)-1)])) if @$warn > 1
     }
-; Test::More::ok(!T::good->can('minze'),'import from does nothing now')
+
+; Test2::V0::ok(!T::good->can('minze'),'import from does nothing now')
+
+; Test2::V0::done_testing;
  

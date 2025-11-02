@@ -1,6 +1,14 @@
 Changelog of Package-Subroutine
 ###############################
 
+v0.23.1 2025-11-01
+     - Package::Subroutine::Namespace is strict refs compatible
+     - wrong named methods list_childs and delete_childs renamed
+       THIS IS A COMPATIBILITY CHANGE!
+     - Tests are using Test2::Suite
+     - add warnings in Package::Subroutine::Namespace when the
+       package to work with is not available
+
 0.22.5 2025-03-31
      - improve test which checks import call on unknown package
 
@@ -20,8 +28,8 @@ Changelog of Package-Subroutine
 
 0.20 Do 4. Aug 23:16:50 CEST 2011
      - released with ShipIt
-     - removed xt/critic.t - because this module is build around bad practice
- 
+     - removed xt/critic.t - because this modul is build around bad practice
+
 0.19 Do 4. Aug 23:01:00 CEST 2011
      - delete t/09*-tests in favor of a xt directory
      - check if it works with aliased
@@ -36,7 +44,7 @@ Changelog of Package-Subroutine
 0.16_1  Thu 14 Apr 2009
      - fixed META.yml requires section
      - switched to development version schema, let CPANTS do its magic
-     
+
 0.15  Thu 14 Apr 2009
      - s/Package-Subroutine/Package::Subroutine/
 
@@ -48,10 +56,10 @@ Changelog of Package-Subroutine
      - documention fixed
      - incomplete sub packages moved away
 
-0.12 
+0.12
      - let's mixin all methods from a package easily
 
-0.11 
+0.11
      - mixin alias
      - ISA submodule
      - unimport for Sugar
@@ -60,10 +68,10 @@ Changelog of Package-Subroutine
      - rename to Package-Subroutine
      - version and install method
      - respawn from as syntactic sugar
-0.05 
+0.05
      - string syntax to import, was removed from the API
 
-0.04 
+0.04
      - shortcut _ for current package
 
 0.03

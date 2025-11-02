@@ -20,6 +20,10 @@ use Data::Dump qw(dump);
 use Data::Dumper;
 use IO::Tee;
 use feature 'say';
+use Switch::Back;
+use feature 'smartmatch';
+no warnings 'experimental::smartmatch';
+
 use Sim::OPT;
 use Sim::OPT::Morph;
 use Sim::OPT::Sim;
@@ -39,7 +43,7 @@ no warnings;
 #@EXPORT   = qw(); # our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw( descend prepareblank tee ); # our @EXPORT = qw( );
 
-$VERSION = '0.167'; # our $VERSION = '';
+$VERSION = '0.169'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Descent is an module collaborating with the Sim::OPT module for performing block coordinate descent.';
 
 #########################################################################################
@@ -952,7 +956,7 @@ sub descend
         my @blockelts = @{ $blockelts_r };
         foreach my $key ( sort ( keys %varns ) )
         {
-          if ( not( grep { $_ eq $key } @blockelts ) )
+          if ( not($key ~~ @blockelts) )
           {
             $varns{$key} = 1;
           }
@@ -990,7 +994,7 @@ sub descend
         {
           foreach my $key ( sort ( keys( %varnums ) ) )
           {
-            if ( not( grep { $_ eq $key } @blockelts ) )
+            if ( not($key ~~ @blockelts) )
             {
               $modhs{$key} = $varnums{$key};
               $torecovers{$key} = $carrier{$key};

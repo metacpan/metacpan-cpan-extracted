@@ -43,6 +43,8 @@ my %opt=(
 	help      =>0,
 	activity  =>[],
 	activities=>undef,
+	notemerge =>1,
+	noteorder =>undef,
 	tslack    =>undef,
 	tbuffer   =>undef,
 );
@@ -54,6 +56,8 @@ GetOptions(
 	'unsafe!'     =>\$opt{unsafe},
 	'activity=s'  =>\@{$opt{activity}},
 	'activities=s'=>\$opt{activities},
+	'notemerge!'  =>\$opt{notemerge},
+	'noteorder=s' =>\$opt{noteorder},
 	'tslack=f'    =>\$opt{tslack},
 	'tbuffer=f'   =>\$opt{tbuffer},
 	'help'        =>\$opt{help},
@@ -78,6 +82,20 @@ for(my $i=0;$i<=$#{$opt{activity}};$i++) { $opt{activity}[$i]=[split(/,/,$opt{ac
 
 my %schedule=$scheduler->schedule(activities=>$opt{activity},tensionslack=>$opt{tslack},tensionbuffer=>$opt{tbuffer});
 if($schedule{error}) { print STDERR join("\n",@{$schedule{error}}),"\n"; exit(1) }
+
+if($opt{notemerge}) {
+	my %seen;
+	my @order;
+	if($opt{noteorder}) { @order=split(/;/,$opt{noteorder}) }
+	else                { @order=sort {$a cmp $b} keys(%{$schedule{annotations}}) }
+	foreach my $group (@order) {
+		if($seen{$group}) { next }
+		if(!defined($schedule{annotations}{$group})) { next }
+		push @{$schedule{activities}},@{$schedule{annotations}{$group}{events}};
+		$seen{$group}=1;
+	}
+	if(%seen) { @{$schedule{activities}}=sort {$$a[0]<=>$$b[0]} @{$schedule{activities}} }
+}
 
 my @materialized;
 foreach my $entry (@{$schedule{activities}}) {
@@ -111,13 +129,14 @@ schedule-activity.pl - Build activity schedules.
     activities:     [--activity=time,name ... | --activities='time,name;time,name;...']
 
   options:
-    --check=0/1:      compile the schedule and report any errors
-    --unsafe=0/1:     skip safety checks (cycles, non-termination, etc.)
-    --tslack=[0,1]:   slack tension from 0.0 to 1.0
-    --tbuffer=[0,1]:  buffer tension from 0.0 to 1.0
+    --check           compile the schedule and report any errors
+    --unsafe          skip safety checks (cycles, non-termination, etc.)
+    --nonotemerge     do not merge annotation messages, default is to merge
+    --noteorder='s'   only merge annotation groups 'name;name;...', default all/alphabetical
+    --tslack=[0,1]    slack tension from 0.0 to 1.0
+    --tbuffer=[0,1]   buffer tension from 0.0 to 1.0
     --help
 
   The format of the schedule configuration is described in Schedule::Activity.
-  Annotations are not part of the output in this version.
 
 =cut

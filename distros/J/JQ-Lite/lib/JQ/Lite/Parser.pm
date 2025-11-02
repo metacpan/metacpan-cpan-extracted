@@ -38,7 +38,28 @@ sub parse_query {
 
     @parts = map { _lower_object_shorthand($_) } @parts;
 
-    return @parts;
+    my @expanded;
+    for my $part (@parts) {
+        next unless defined $part;
+
+        my $trimmed = $part;
+        $trimmed =~ s/^\s+|\s+$//g;
+
+        if ($trimmed =~ /^\(.*\)$/s) {
+            my $inner = JQ::Lite::Util::_strip_wrapping_parens($trimmed);
+            if (defined $inner && length $inner && $inner ne $trimmed) {
+                my @inner_parts = parse_query($inner);
+                if (@inner_parts) {
+                    push @expanded, @inner_parts;
+                    next;
+                }
+            }
+        }
+
+        push @expanded, $trimmed;
+    }
+
+    return @expanded;
 }
 
 sub _lower_object_shorthand {

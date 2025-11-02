@@ -3,9 +3,11 @@ package JQ::Lite::Util;
 use strict;
 use warnings;
 
-use JSON::PP (); 
+use JSON::PP ();
 use List::Util qw(sum min max);
 use Scalar::Util qw(looks_like_number);
+use MIME::Base64 qw(encode_base64);
+use Encode qw(encode is_utf8);
 use B ();
 use JQ::Lite::Expression ();
 
@@ -20,6 +22,11 @@ sub _encode_json {
 
 sub _decode_json {
     my ($text) = @_;
+
+    if (defined $text && is_utf8($text, 1)) {
+        $text = encode('UTF-8', $text);
+    }
+
     return $JSON_DECODER->decode($text);
 }
 
@@ -828,6 +835,15 @@ sub _evaluate_value_expression {
 
         if ($ok) {
             return ([ $value ], 1);
+        }
+    }
+
+    my @pipeline_parts = _split_top_level_pipes($copy);
+    if (@pipeline_parts > 1) {
+        if (defined $self && $self->can('run_query')) {
+            my $json = _encode_json($context);
+            my @outputs = $self->run_query($json, $copy);
+            return ([ @outputs ], 1);
         }
     }
 
@@ -2903,6 +2919,56 @@ sub _apply_tsv {
     }
 
     return _format_tsv_field($value);
+}
+
+sub _apply_base64 {
+    my ($value) = @_;
+
+    my $text;
+
+    if (!defined $value) {
+        $text = 'null';
+    }
+    elsif (ref($value) eq 'JSON::PP::Boolean') {
+        $text = $value ? 'true' : 'false';
+    }
+    elsif (!ref $value) {
+        $text = "$value";
+    }
+    elsif (ref $value eq 'ARRAY' || ref $value eq 'HASH') {
+        $text = _encode_json($value);
+    }
+    else {
+        $text = "$value";
+    }
+
+    return encode_base64($text, '');
+}
+
+sub _apply_uri {
+    my ($value) = @_;
+
+    my $text;
+
+    if (!defined $value) {
+        $text = 'null';
+    }
+    elsif (ref($value) eq 'JSON::PP::Boolean') {
+        $text = $value ? 'true' : 'false';
+    }
+    elsif (!ref $value) {
+        $text = "$value";
+    }
+    elsif (ref $value eq 'ARRAY' || ref $value eq 'HASH') {
+        $text = _encode_json($value);
+    }
+    else {
+        $text = "$value";
+    }
+
+    my $encoded = encode('UTF-8', $text);
+    $encoded =~ s/([^A-Za-z0-9\-._~])/sprintf('%%%02X', ord($1))/ge;
+    return $encoded;
 }
 
 sub _format_csv_field {

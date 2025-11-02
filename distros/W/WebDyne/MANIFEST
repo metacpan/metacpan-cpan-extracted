@@ -834,6 +834,7 @@ t/htmx_bare.psp
 t/htmx_compact.psp                       
 t/p.psp                                  
 t/table_perl_bare.psp                    
+t/maketest.sh                            
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
 ChangeLog                                Module ChangeLog (added by ExtUtils::Git)

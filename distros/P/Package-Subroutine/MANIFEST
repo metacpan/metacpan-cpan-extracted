@@ -17,9 +17,11 @@ t/006_pkg_namespace.t
 t/007_export_to_caller.t
 t/008_from_aliased.t
 t/lib/Tags.pm
-xt/hasversion.t
-xt/manifest.t
+xt/01-hasversion.t
+xt/02-version-update.t
+xt/03-manifest.t
+xt/04-critic.t
+xt/05-minimumversion.t
 xt/meta.t
-xt/minimumversion.t
 xt/pod.t
 xt/podcoverage.t

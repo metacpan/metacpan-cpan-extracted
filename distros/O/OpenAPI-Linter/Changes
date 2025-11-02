@@ -1,0 +1,33 @@
+Revision history for OpenAPI::Linter
+
+0.10  2025-11-02
+      - Renamed script: openapi-linter.
+
+0.09  2025-11-02
+      - Added method format_schema_error().
+      - Updated script openapi-lint to use the above method.
+
+0.08  2025-11-02
+      - Updated find_issues() return ordered keys.
+
+0.07  2025-11-02
+      - Updated validate_schema() to extract message correctly.
+
+0.06  2025-11-02
+      - Updated validate_schema() return consistent format data.
+
+0.05  2025-11-01
+      - Added format check for validator.
+
+0.04  2025-11-01
+      - Added checks for spec file.
+      - Updated pod.
+
+0.03  2025-11-01
+      - Fixed script: openapi-lint.
+
+0.02  2025-11-01
+      - Updated pod documentation.
+
+0.01  2025-11-01
+      - Module Created.

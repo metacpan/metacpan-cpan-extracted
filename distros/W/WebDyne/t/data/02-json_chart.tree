@@ -3,6 +3,7 @@
   <body> @0.1 (IMPLICIT)
     <p> @0.1.0
       "Sales Data:"
-      <script> @0.1.0.1
-        "  // Get JSON data from script tag  const jsonData = JSON.parse(d..."
-      "__PERL__# Tie::IxHash hash in order#use Tie::IxHash;# Method to s..."
+      <json handler="chart_data" id="chart-data"> @0.1.0.1
+        <script> @0.1.0.1.0
+          "  // Get JSON data from script tag  const jsonData = JSON.parse(d..."
+        "__PERL__# Tie::IxHash hash in order#use Tie::IxHash;# Method to s..."

@@ -8,3 +8,4 @@
     <p> @0.1.2
       "Popup Menu 3:"
     <p> @0.1.3
+      <dump force="+{submit}"> @0.1.3.0

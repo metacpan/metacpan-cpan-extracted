@@ -59,4 +59,12 @@ my $error = $@;
 ok(!$ok, 'division by zero throws');
 like($error, qr/Division by zero/, 'division by zero error message');
 
+my $search = '{"q":"東京 タワー","page":5}';
+my @uri_concat = $jq->run_query($search, '"q=" + (.q|@uri)');
+is(
+    $uri_concat[0],
+    'q=%E6%9D%B1%E4%BA%AC%20%E3%82%BF%E3%83%AF%E3%83%BC',
+    '(.q|@uri) inside addition behaves like jq'
+);
+
 done_testing;

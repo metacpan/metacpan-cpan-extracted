@@ -34,7 +34,7 @@ require Opcode;
 
 #  Version information
 #
-$VERSION='2.019';
+$VERSION='2.020';
 
 
 #  Get mod_perl version. Clear $@ after evals
@@ -573,7 +573,7 @@ sub import {
             #
             if ($caller eq $class_parent) {
                 *{"${caller}::${k}"}=\$v;
-                *{"${caller}::Constant"}=$hr;
+                #*{"${caller}::Constant"}=$hr; # Pulled for moment, bit polluting without ability to ref constant scalars in hash values
             }
             else {
                 *{"${caller}::${k}"}=\${"${class_parent}::${k}"};

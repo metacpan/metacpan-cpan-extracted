@@ -45,10 +45,10 @@ subtest 'slack/buffer'=>sub {
 subtest 'next random'=>sub {
 	plan tests=>4;
 	my $node=Schedule::Activity::Node->new(next=>[qw/one two three/]);
-	my %seen=map {$node->nextrandom()=>1} (1..20);
+	my %seen=map {$node->nextrandom()=>1} (1..30); # rewrite me to use a countdown loop variable
 	ok($seen{one},'Random:  one');
 	ok($seen{two},'Random:  two');
-	%seen=map {$node->nextrandom(not=>'one')=>1} (1..20);
+	%seen=map {$node->nextrandom(not=>'one')=>1} (1..30); # rewrite me to use a countdown loop variable
 	ok(!$seen{one},'Not one:  one');
 	ok( $seen{two},'Not one:  two');
 };

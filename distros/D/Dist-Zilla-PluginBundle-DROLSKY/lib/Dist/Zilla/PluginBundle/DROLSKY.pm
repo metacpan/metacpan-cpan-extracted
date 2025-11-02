@@ -7,7 +7,7 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '1.22';
+our $VERSION = '1.23';
 
 use Devel::PPPort 3.42;
 use Dist::Zilla 6.0;
@@ -553,7 +553,8 @@ sub _explicit_prereq_plugins {
 sub _dist_uses_test2 {
     my $rule = Path::Tiny::Rule->new;
     my $iter
-        = $rule->file->name(qr/\.(t|pm)$/)->contents_match(qr/^use Test2/m)
+        = $rule->file->name(qr/\.(t|pm)$/)
+        ->contents_match(qr/^use Test2/m)
         ->iter('t');
 
     while ( my $file = $iter->() ) {
@@ -864,7 +865,7 @@ Dist::Zilla::PluginBundle::DROLSKY - DROLSKY's plugin bundle
 
 =head1 VERSION
 
-version 1.22
+version 1.23
 
 =head1 SYNOPSIS
 
@@ -1192,7 +1193,7 @@ Mark Fowler <mark@twoshortplanks.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 - 2022 by Dave Rolsky.
+This software is Copyright (c) 2013 - 2025 by Dave Rolsky.
 
 This is free software, licensed under:
 

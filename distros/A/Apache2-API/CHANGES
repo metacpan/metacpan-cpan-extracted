@@ -1,5 +1,11 @@
 Revision history for Perl module Apache2::API
 
+v0.5.0 2025-11-01T08:58:01+0900
+    - Expanded and improved localised HTTP errors now covering the following locales: cs_CZ, de_DE, en_GB, es_ES, fr_FR, ga_IE, it_IT, ja_JP, ko_KR, nb_NO, nl_NL, pl_PL, pt_BR, pt_PT, ro_RO, ru_RU, sr_RS, sv_SE, tr_TR, zh_CN, zh_TW
+    - Added the methods allow_methods_list, method_bit, and method_name in Apache2::API::Request
+    - Improved the method data() in Apache2::API to be able to be called in mutator mode, and improved caching by using Apache2::RequestUtil->pnotes rather than an object property
+    - Changed the method length() in Apache2::API::Request from wrongly using bytes_sent() to using the incoming headers field 'Content-Length'
+
 v0.4.1 2025-10-07T08:09:10+0900
     - Corrected the key support method _try so that it honours the list call context
 

@@ -1,6 +1,6 @@
 
-; use strict
-; use Test::More tests => 1;
+use Test2::V0;
+plan(1);
 
 ################################################################################
 ## test the findsubs method
@@ -23,4 +23,4 @@ my %expect  =
 my %methods = map { ($_ => 1) }
     Package::Subroutine->findsubs('Package::Subroutine');
 
-is_deeply(\%methods,\%expect);
+is(\%methods,\%expect);

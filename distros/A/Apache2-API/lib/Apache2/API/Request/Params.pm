@@ -16,6 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'Apache2::API' );
     use version;
     use APR::Request::Param;
     # Which itself inherits from APR::Request

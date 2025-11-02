@@ -1,0 +1,19 @@
+openapi: 3.0.3
+info:
+  title: Schema Test
+  version: 1.0.0
+paths:
+  /user:
+    get:
+      description: Get user
+      responses:
+        '200':
+          description: OK
+components:
+  schemas:
+    User:
+      properties:
+        name:
+          type: string
+        id: {}
+

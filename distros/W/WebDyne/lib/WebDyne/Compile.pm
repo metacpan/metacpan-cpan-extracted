@@ -39,7 +39,7 @@ use WebDyne::Util;
 
 #  Version information
 #
-$VERSION='2.019';
+$VERSION='2.020';
 
 
 #  Debug load
@@ -71,7 +71,7 @@ my %Package;
 #
 BEGIN {
     eval {require Time::HiRes;    Time::HiRes->import('time')};
-    eval {require Devel::Confess; Devel::Confess->import()};
+    eval {require Devel::Confess; Devel::Confess->import(qw(no_warnings))};
     eval {} if $@;
 }
 
@@ -636,11 +636,6 @@ sub optimise_one {
         debug("tag $html_tag, attr %s", Dumper($attr_hr));
 
 
-        #  Store data block as hint to error handler should something go wrong
-        #
-        $self->{'_data_ar'}=$data_ar;
-
-
         #  Check to see if any of the attributes will require a subst to be carried out
         #
         my @subst_oper;
@@ -760,6 +755,7 @@ sub optimise_one {
 
             }
 
+
         }
         else {
             debug('fell through node render, no webdyne, subst tags etc.');
@@ -773,9 +769,19 @@ sub optimise_one {
     };
 
 
+    #  Push data block onto stack as error hint
+    #
+    push @{$self->{'_data_ar_err'}}, $data_ar;
+    
+    
     #  Run it
     #
     $data_ar=$compile_cr->($compile_cr, $data_ar) || return err();
+    
+    
+    #  No error, pop error hint
+    #
+    pop @{$self->{'_data_ar_err'}};
 
 
     #  If scalar ref returned it is all HTML - return as plain scalar
@@ -866,11 +872,6 @@ sub optimise_two {
         my ($html_tag, $attr_hr)=
             @{$data_ar}[WEBDYNE_NODE_NAME_IX, WEBDYNE_NODE_ATTR_IX];
         debug("tag $html_tag");
-
-
-        #  Store data block as hint to error handler should something go wrong
-        #
-        $self->{'_data_ar'}=$data_ar;
 
 
         #  Check if this tag attributes will need substitution (eg ${foo});
@@ -1101,14 +1102,19 @@ sub optimise_two {
             $data_uppr_ar=$data_ar->[WEBDYNE_NODE_CHLD_IX];
             
         }
-
-
+        
+        
         #  Return current node
         #
         return $data_uppr_ar;
 
 
     };
+    
+    
+    #  Push data block onto error hint stack in case of compile error
+    #
+    push @{$self->{'_data_ar_err'}}, $data_ar;
 
 
     #  Run it, return whatever it does, allowing for the special case that first stage
@@ -1116,13 +1122,24 @@ sub optimise_two {
     #  single HTML string. In which case return as array ref to allow for correct storage
     #  and rendering.
     #
+    my $ret;
     if (ref($data_ar)) {
-        return $compile_cr->($compile_cr, $data_ar, undef) ||
+        $ret=$compile_cr->($compile_cr, $data_ar, undef) ||
             err()
     }
     else {
-        return [$data_ar];
+        $ret=[$data_ar];
     }
+    
+    
+    #  No errors, pop error hint stack
+    #
+    pop @{$self->{'_data_ar_err'}};
+    
+    
+    #  And return
+    #
+    return $ret;
 
 }
 

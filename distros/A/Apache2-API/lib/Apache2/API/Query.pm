@@ -15,6 +15,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'Apache2::API' );
     use parent qw( URI::Query );
     use vars qw( $VERSION );
     use utf8 ();

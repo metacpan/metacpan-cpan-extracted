@@ -6,10 +6,6 @@
 
 =over
 
-=item 0.1.9
-
-C<unsafe=0> will be the default.  C<buildSchedule> will warn about deprecation.
-
 =item 0.2.0
 
 C<buildSchedule> will be removed; only the object interface will be supported.
@@ -26,19 +22,15 @@ No additional features planned.  Messages can be strings, arrays, a hash of alte
 
 =head2 Attributes
 
-Planned improvements include helpers to merge annotation attributes into schedules, additional reporting functions, and automatic mapping of attributes for some action node parameters (eg limits).  As of 0.1.2, attributes are fully supported in messages and action nodes.  As of 0.1.3, precedence has been established for node/message attribute overlap.  As of 0.1.5, average values have moved to a rolling algorithm to improve efficiency, which means that no historic/past entry of a value is possible.
+Planned improvements include helpers to merge annotation attributes into schedules, additional reporting functions, and automatic mapping of attributes for some action node parameters (eg limits).  As of 0.1.9, attributes may be "fixed" at activity boundaries but that is no longer done automatically.
 
 =head2 Annotations
 
-Planned improvements include helpers to merge annotation attributes into schedules.  Proposed is annotation configuration per-node (with a keyname, possibly duplicated in the upper-level configuration).  As of 0.1.2, annotation groups are fully supported.
+Planned improvements include helpers to merge annotation attributes into schedules.  This also requires options to control the order/materialization of annotation generation.  Proposed is annotation configuration per-node (with a keyname, possibly duplicated in the upper-level configuration).
 
 =head2 Node filtering
 
 Node filtering is experimental starting in 0.1.6.  Filters support Booleans and attribute numeric comparisons.  Average value filtering should work but is not well tested.  Because per-node limits differ between limit-per-activity and limit-per-schedule, it's not clear that a special mechanism will be created to provide these limits, which can be achieved by setting the attribute to zero at the appropriate point and filtering normally.
-
-=head2 Near-buffer limitation
-
-Fixed in 0.1.7.  See L<Schedule::Activity/BUGS>.  If a conclusion node can be reached, there are more circumstances where it should be chosen to complete scheduling.  The arithmetic for available buffer time should be updated to include the tmmax of the final node, where applicable.
 
 =head2 Tutorial
 
@@ -50,7 +42,7 @@ The case C<limit=1> is not the primary/initial use case of this scheduler, but s
 
 =head2 Tension configuration
 
-Fully available in 0.1.8.  Scheduling tension supports configurable slack/buffer values.  Tension settings affect path selection, but the scheduler will fail for the fullpath if there is insufficient slack/buffer to adjust the path to the goal time.  This may change in the future, namely the tension settings may permit scheduling completion even if the measured slack/buffer wouldn't otherwise permit adjustment.
+Rebuild in 0.1.9 to provide better control over slack and buffer tensions separately.  Behavior is established based on mathematical distribution, which is uniform stepwise leading to a skewed distribution for overall schedules.  Tension settings affect path selection, but the scheduler will fail for the full path if there is insufficient slack/buffer to adjust the path to the goal time.  This may change in the future, namely additional tension settings may permit scheduling completion even if the measured slack/buffer wouldn't otherwise permit adjustment.  See the distribution in C<samples/tension.png> and documentation in L<Schedule::Activity>.
 
 =head2 Slack/buffer defaults
 
@@ -58,13 +50,13 @@ As an improvement, support passing slack/buffer ratios during configuration buil
 
 =head2 Pre-scheduling safety
 
-Built in 0.1.7.  Off by default in 0.1.8 with C<unsafe=1>, and supported from C<schedule-activity.pl --unsafe>.  More complex schedules may be difficult to interpret at a glance.  One particular annoyance is finding that the target time for an activity cannot be reached, or that there are too many actions to fit a smaller goal window.  Convenience functions find the minimum possible activity time (shortest path through the nodes, ultimately), if the activity can be completed at all (sorta easy to forget, and should be checked before attempting scheduling), and the maximum possible activity time (if defined).  Moreover, these checks are needed to avoid hanging nodes (that don't reach finish), or action nodes with zero times (that never make progress), orphans, etc.
+On by default in 0.1.9, but can be turned off with C<unsafe=1> and C<schedule-activity.pl --unsafe>.  More complex schedules may be difficult to interpret at a glance.  One particular annoyance is finding that the target time for an activity cannot be reached, or that there are too many actions to fit a smaller goal window.  Convenience functions find the minimum possible activity time (shortest path through the nodes, ultimately), if the activity can be completed at all (sorta easy to forget, and should be checked before attempting scheduling), and the maximum possible activity time (if defined).  Moreover, these checks are needed to avoid hanging nodes (that don't reach finish), or action nodes with zero times (that never make progress), orphans, etc.
 
 =head2 Script-based tooling
 
 Available in 0.1.8, basic C<schedule-activity.pl> script supports Dumper/JSON schedules and activity lists, compiling with/out safety checks.  Future support may provide for common schedule types:  Music playlists (high count, non-redundant nodes), exercise schedules (chunking, some repeats), chores/errands (small action count per activity/category), games (rounds, countdown reminders).
 
-Annotation handling has not been determined.  Options will likely include materialization into the returned message stream, or separate sections.
+In 0.1.9, some annotation handling is provided.
 
 =head2 Markdown
 

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Apache2 API Framework - ~/lib/Apache2/API.pm
-## Version v0.4.1
-## Copyright(c) 2024 DEGUEST Pte. Ltd.
+## Version v0.5.0
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/05/30
-## Modified 2025/10/03
+## Modified 2025/10/08
 ## All rights reserved
 ## 
 ## 
@@ -16,8 +16,9 @@ BEGIN
 {
     use strict;
     use warnings;
+    use warnings::register;
     use parent qw( Module::Generic );
-    use vars qw( $VERSION $DEBUG @EXPORT );
+    use vars qw( $VERSION $DEBUG @EXPORT $USE_RFC_ERROR );
     use version;
     use Encode ();
     # use Apache2::Const qw( :common :http );
@@ -40,7 +41,7 @@ BEGIN
     use Scalar::Util ();
     our @EXPORT = qw( apr1_md5 );
     $DEBUG   = 0;
-    $VERSION = 'v0.4.1';
+    $VERSION = 'v0.5.0';
 };
 
 use strict;
@@ -76,6 +77,7 @@ sub init
     $self->{apache_request}         = $r unless( $self->{apache_request} );
     # 200Kb
     $self->{compression_threshold}  = 204800 unless( length( $self->{compression_threshold} ) );
+    $self->{use_rfc_error}          = $USE_RFC_ERROR unless( length( $self->{use_rfc_error} ) );
     $self->SUPER::init( @_ ) || return( $self->pass_error );
     unless( $r = $self->apache_request )
     {
@@ -542,10 +544,33 @@ sub print
 # push_handlers($hook_name => [\&handler, \&handler2]);
 sub push_handlers { return( shift->_try( 'server', 'push_handlers', @_ ) ); }
 
+# See also <https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/406>
 sub reply
 {
     my $self = shift( @_ );
     my( $code, $ref );
+    my $use_rfc_error = $self->{use_rfc_error} // $USE_RFC_ERROR;
+    # rfc9457 standard for REST API error response: <https://www.rfc-editor.org/rfc/rfc9457.html>
+    # Legacy JSON payload like Google, Twitter, Facebook
+    # Modern REST APIs now uses rfc9457 with a flattened payload.
+    # When the use_rfc_error object property is true, we use rfc9457 flattened error, this will produce something like:
+    # {
+    #     error  => 'not_found',
+    #     status => 404,
+    #     title  => 'Not found!',
+    #     detail => q{The requested URL was not found on this server. If you entered the URL manually please check your spelling and try again.},
+    #     locale => 'en-US',
+    #     type   => 'https://api.example.com/problems/not-found',
+    # }
+    # otherwise, the legacy approach would be:
+    # {
+    #     error =>
+    #     {
+    #         code => 404,
+    #         message => q{The requested URL was not found on this server. If you entered the URL manually please check your spelling and try again.},
+    #     },
+    #     locale => 'en-US',
+    # }
     # $self->reply( Apache2::Const::HTTP_OK, { message => "All is well" } );
     if( scalar( @_ ) == 2 )
     {
@@ -568,172 +593,477 @@ sub reply
     elsif( ref( $_[0] ) eq 'HASH' )
     {
         $ref = shift( @_ );
-        $code = $ref->{code} if( CORE::length( $ref->{code} ) );
+        $code = $ref->{code} if( length( $ref->{code} ) );
     }
-    my $r = $self->apache_request;
-    if( $code !~ /^[0-9]+$/ )
+    my $r    = $self->apache_request;
+    my $req  = $self->request;
+    my $resp = $self->response;
+
+    # Guardrails on inputs
+    if( !defined( $code ) || $code !~ /^[0-9]{3}$/ )
     {
-        $self->response->code( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
-        $self->response->rflush;
-        $self->response->print( $self->json->utf8->encode({ error => 'An unexpected server error occured', code => 500 }) );
-        $self->error( "http code to be used '$code' is invalid. It should be only integers." );
+        $resp->code( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
+        $resp->rflush;
+        $resp->print( $self->json->utf8->encode({ error => 'An unexpected server error occured', code => 500 }) );
+        $self->error( "http code to be used '", ( $code // 'undef' ), "' is invalid. It should be only integers." );
         return( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
     }
     if( ref( $ref ) ne 'HASH' )
     {
-        $self->response->code( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
-        $self->response->rflush;
+        $resp->code( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
+        $resp->rflush;
         # $r->send_http_header;
-        $self->response->print( $self->json->utf8->encode({ error => 'An unexpected server error occured', code => 500 }) );
-        $self->error( "Data provided to send is not an hash ref." );
+        $resp->print( $self->json->utf8->encode({ error => 'An unexpected server error occured', code => 500 }) );
+        $self->error( "Data provided to send is not a hash ref." );
         return( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
     }
 
+    # Resolve whether this is an error
+    my $is_error = $resp->is_error( $code ) ? 1 : 0;
+
+    # NOTE: guess_preferred_locale() -> this is used to get he most appropriate locale if not defined already so we can, in turn, get the fallback description
+    my $guess_preferred_locale = sub
+    {
+        my $locale = shift( @_ );
+        if( !defined( $locale ) )
+        {
+            $locale = $req->preferred_language( Apache2::API::Status->supported_languages );
+        }
+
+        if( defined( $locale ) )
+        {
+            # Make sure we are dealing with unix style language code
+            $locale =~ tr/-/_/;
+            if( length( $locale ) == 2 )
+            {
+                $locale = Apache2::API::Status->convert_short_lang_to_long( $locale );
+            }
+            # We have something weird, like maybe eng?
+            elsif( $locale !~ /^[a-z]{2}_[A-Z]{2}$/ )
+            {
+                $locale = Apache2::API::Status->convert_short_lang_to_long( substr( $locale, 0, 2 ) );
+            }
+        }
+        return( $locale );
+    };
+
+    # NOTE: build_rfc_error() -> private subroutine to build the modern rfc9457 error payload
+    my $build_rfc_error = sub
+    {
+        my( $ref, $code, $msg ) = @_;
+        # By now, our property 'locale' has been dealt with, so we do not have to worry about it.
+        # It either exists or not
+        my $locale = exists( $ref->{locale} ) ? $ref->{locale} : undef;
+
+        # The property 'status' could exist, but be undefined, or even empty, so we check for that.
+        unless( exists( $ref->{status} ) &&
+                defined( $ref->{status} ) &&
+                length( $ref->{status} ) )
+        {
+            $ref->{status} = $code;
+        }
+
+        # Title from caller or from HTTP status table (localized)
+        unless( exists( $ref->{title} ) &&
+                defined( $ref->{title} ) &&
+                length( $ref->{title} // '' ) )
+        {
+            if( exists( $ref->{error} ) && 
+                defined( $ref->{error} ) &&
+                ref( $ref->{error} ) eq 'HASH' &&
+                exists( $ref->{error}->{title} ) )
+            {
+                $ref->{title} = delete( $ref->{error}->{title} );
+            }
+            elsif( $locale )
+            {
+                $ref->{title} = Apache2::API::Status->status_message( $code => $locale );
+            }
+            else
+            {
+                $ref->{title} = Apache2::API::Status->status_message( $code );
+            }
+        }
+
+        # Detail/message precedence: explicit detail > message field > HTTP message
+        if( !defined( $ref->{detail} ) || $ref->{detail} eq '' )
+        {
+            if( defined( $msg ) && ( !ref( $msg ) || $self->_can_overload( $msg => "''" ) ) )
+            {
+                $ref->{detail} = "$msg";
+            }
+            else
+            {
+                my $fallback = $locale
+                    ? $resp->get_http_message( $code, $locale )
+                    : $resp->get_http_message( $code );
+                $ref->{detail} = $fallback // 'An error occurred';
+            }
+        }
+
+        # Clean up the 'error' property if it is a hash reference.
+        if( exists( $ref->{error} ) &&
+            defined( $ref->{error} ) &&
+            ref( $ref->{error} ) eq 'HASH' )
+        {
+            delete( $ref->{error}->{ $_ } ) for( qw( code status message title ) );
+            delete( $ref->{error} ) if( !scalar( keys( %{$ref->{error}} ) ) );
+        }
+
+        # Set the property 'error' (extension member): string problem code if empty hash/undef
+        if( !exists( $ref->{error} ) ||
+            !defined( $ref->{error} ) ||
+            ( !ref( $ref->{error} ) && !length( $ref->{error} // '' ) ) ||
+            ( ref( $ref->{error} ) eq 'HASH' && !scalar( keys( %{$ref->{error}} ) ) ) )
+        {
+            delete( $ref->{error} );
+            if( my $t = Apache2::API::Status->status_to_type( $code, '-' ) )
+            {
+                # extension member for app code
+                $ref->{error} = $t;
+            }
+        }
+
+        # Build 'type' URL if not provided
+        unless( exists( $ref->{type} ) &&
+            defined( $ref->{type} ) &&
+            length( $ref->{type} // '' ) )
+        {
+            if( my $host = $req->http_host )
+            {
+                if( my $t = Apache2::API::Status->status_to_type( $code, '-' ) )
+                {
+                    my $scheme = $req->is_secure ? 'https' : 'http';
+                    $ref->{type} = "${scheme}://${host}/problems/${t}";
+                }
+            }
+        }
+
+        # Flatten legacy fields that don't belong
+        # The rfc 9457 prefers the property 'detail'
+        delete( $ref->{message} ) if( exists( $ref->{message} ) );
+        # The rfc 9457 prefers the property 'status'
+        delete( $ref->{code} ) if( exists( $ref->{code} ) );
+    };
+
+    # NOTE: build_legacy_error() -> private subroutine to build the legacy error payload
+    my $build_legacy_error = sub
+    {
+        my( $ref, $code, $msg ) = @_;
+        # By now, our property 'locale' has been dealt with, so we do not have to worry about it.
+        # It either exists or not
+        my $locale = exists( $ref->{error}->{locale} ) ? $ref->{error}->{locale} : undef;
+        # We set the property 'error' to be an HASH if not set already.
+        $ref->{error} = {} unless( exists( $ref->{error} ) && ref( $ref->{error} ) eq 'HASH' );
+
+        # The property 'code' could exist, but be undefined, or even empty, so we check for that.
+        unless( exists( $ref->{error}->{code} ) &&
+                defined( $ref->{error}->{code} ) &&
+                length( $ref->{error}->{code} ) )
+        {
+            $ref->{error}->{code} = $code;
+        }
+
+        # We try hard to get the value for the property 'message', but if $locale is undefined, it is impossible to find out the language that was used to formulate the response.
+        # So, ultimately, if we cannot find any value for the property 'message', we revert to guessing the HTTP caller's preferred language, which may, or may not be aligned with the content of other parts of the JSON response. Given that, in that scenario, no 'locale' would have been set, we take the risk of having two different languages used: one for 'title', and other parts of the JSON reply, and the fallback 'message' one.
+        if( !exists( $ref->{error}->{message} ) ||
+            !defined( $ref->{error}->{message} ) ||
+            !length( $ref->{error}->{message} // '' ) )
+        {
+            if( defined( $msg ) &&
+                ( !ref( $msg ) || $self->_can_overload( $msg => "''" ) ) )
+            {
+                $ref->{error}->{message} = "$msg";
+            }
+            else
+            {
+                foreach my $p ( qw( message detail details ) )
+                {
+                    if( exists( $ref->{ $p } ) &&
+                        defined( $ref->{ $p } ) &&
+                        length( $ref->{ $p } ) )
+                    {
+                        $ref->{error}->{message} = delete( $ref->{ $p } );
+                        last;
+                    }
+                }
+            }
+
+            # Still nothing ? Get the fallback value using 'get_http_message' either using the $locale, if defined, or the HTTP caller's preferred language
+            if( !$ref->{error}->{message} )
+            {
+                $locale = $guess_preferred_locale->( $locale ) unless( defined( $locale ) );
+                my $fallback = $locale
+                    ? $resp->get_http_message( $code, $locale )
+                    : $resp->get_http_message( $code );
+                $ref->{error}->{message} = $fallback // 'An error occurred';
+            }
+        }
+
+        # Build 'type' URL if not provided
+        unless( exists( $ref->{error}->{type} ) &&
+            defined( $ref->{error}->{type} ) &&
+            length( $ref->{error}->{type} // '' ) )
+        {
+            # The user has already set the 'type' property, so we use it, and move it to our 'error' hash
+            if( exists( $ref->{type} ) &&
+                defined( $ref->{type} ) &&
+                length( $ref->{type} ) )
+            {
+                $ref->{error}->{type} = delete( $ref->{type} );
+            }
+            elsif( my $host = $req->http_host )
+            {
+                if( my $t = Apache2::API::Status->status_to_type( $code ) )
+                {
+                    (my $slug = $t) =~ tr/_/-/;
+                    my $scheme = $req->is_secure ? 'https' : 'http';
+                    $ref->{error}->{type} = "${scheme}://${host}/problems/${slug}";
+                }
+            }
+            elsif( my $t = Apache2::API::Status->status_to_type( $code ) )
+            {
+                $ref->{error}->{type} = $t;
+            }
+        }
+
+        # Collapse top-level duplicates
+        delete( $ref->{ $_ } ) for( qw( message code type error_description ) );
+    };
+
+    # NOTE: set_payload_locale() -> find out and set the 'locale' property.
+    my $set_payload_locale = sub
+    {
+        my( $ref, $msg ) = @_;
+        my $locale;
+        # From message object
+        # '$msg' might be undef, and the method _is_a knows how to handle it.
+        if( $self->_is_a( $msg => 'Text::PO::String' ) )
+        {
+            $locale = $msg->locale
+        }
+        # Check if the Content-Language has already been set.
+        elsif( my $l = $resp->headers->get( 'Content-Language' ) )
+        {
+            $locale = $l;
+            $locale =~ tr/_/-/;
+        }
+
+        if( !defined( $locale ) &&
+            exists( $ref->{error} ) &&
+            ref( $ref->{error} ) eq 'HASH' )
+        {
+            foreach my $p ( qw( locale lang ) )
+            {
+                if( exists( $ref->{error}->{ $p } ) &&
+                    defined( $ref->{error}->{ $p } ) &&
+                    length( $ref->{error}->{ $p } ) )
+                {
+                    $locale = $ref->{error}->{ $p };
+                    last;
+                }
+            }
+        }
+
+        if( !defined( $locale ) )
+        {
+            foreach my $p ( qw( locale lang ) )
+            {
+                if( exists( $ref->{ $p } ) &&
+                    defined( $ref->{ $p } ) &&
+                    length( $ref->{ $p } ) )
+                {
+                    $locale = $ref->{ $p };
+                    last;
+                }
+            }
+        }
+
+        # If we found a locale, we set it properly whether it is an error or success message.
+        if( defined( $locale ) )
+        {
+            if( $is_error )
+            {
+                if( $use_rfc_error )
+                {
+                    $ref->{locale} = $locale;
+                    if( exists( $ref->{error} ) &&
+                        ref( $ref->{error} ) eq 'HASH' )
+                    {
+                        delete( $ref->{error}->{lang} );
+                        delete( $ref->{error}->{locale} );
+                    }
+                }
+                else
+                {
+                    $ref->{error} //= {};
+                    $ref->{error}->{locale} = $locale;
+                    delete( $ref->{lang} );
+                    delete( $ref->{locale} );
+                }
+            }
+            else
+            {
+                $ref->{locale} = $locale;
+            }
+        }
+        return( defined( $locale ) ? 1 : 0);
+    };
+
+    # '$msg' may possibly be a Text::PO::String, whose benefit is that it has the 'locale' method
     my $msg;
-    if( CORE::exists( $ref->{success} ) )
+    if( exists( $ref->{success} ) )
     {
         $msg = $ref->{success};
     }
     # Maybe error is a string, or maybe it is already an error hash like { error => { message => '', code => '' } }
-    elsif( CORE::exists( $ref->{error} ) && !Apache2::API::Status->is_success( $code ) )
+    elsif( exists( $ref->{error} ) && $is_error )
     {
+        # Caller gave us either a string or a hash under the property  'error'
         if( ref( $ref->{error} ) eq 'HASH' )
         {
             $msg = $ref->{error}->{message};
+            if( !$code && exists( $ref->{error}->{code} ) )
+            {
+                $code = delete( $ref->{error}->{code} );
+            }
+            elsif( !$code && exists( $ref->{error}->{status} ) )
+            {
+                $code = delete( $ref->{error}->{status} );
+            }
+            # Remove those properties now
+            delete( $ref->{error}->{ $_ } ) for( qw( code status ) );
         }
         else
         {
             $msg = $ref->{error};
-            $ref->{error} = {};
+            $ref->{error} = {} unless( $use_rfc_error );
         }
-        $ref->{error}->{code} = $code if( !CORE::length( $ref->{error}->{code} ) );
-        $ref->{error}->{message} = "$msg" if( !CORE::length( $ref->{error}->{message} ) && ( !ref( $msg ) || overload::Method( $msg => "''" ) ) );
-        CORE::delete( $ref->{message} ) if( CORE::length( $ref->{message} ) );
-        CORE::delete( $ref->{code} ) if( CORE::length( $ref->{code} ) );
-    }
-    elsif( CORE::exists( $ref->{message} ) )
-    {
-        $msg = $ref->{message};
-        # We format the message like in bailout, ie { error => { message => '', code => '' } }
-        if( $self->response->is_error( $code ) )
+
+        $set_payload_locale->( $ref, $msg );
+
+        if( $use_rfc_error )
         {
-            $ref->{error} = {} if( ref( $ref->{error} ) ne 'HASH' );
-            $ref->{error}->{code} = $code if( !CORE::length( $ref->{error}->{code} ) );
-            $ref->{error}->{message} = $ref->{message} if( !CORE::length( $ref->{error}->{message} ) );
-            CORE::delete( $ref->{message} ) if( CORE::length( $ref->{message} ) );
-            CORE::delete( $ref->{code} ) if( CORE::length( $ref->{code} ) );
+            $build_rfc_error->( $ref, $code, $msg );
         }
         else
         {
-            # All is good already
+            $build_legacy_error->( $ref, $code, $msg );
         }
     }
-    elsif( $self->response->is_error( $code ) )
+    # Already flattened error or success response
+    elsif( exists( $ref->{message} ) )
     {
-        $ref->{error} = {} if( !CORE::exists( $ref->{error} ) || ref( $ref->{error} ) ne 'HASH' );
-        $ref->{error}->{code} = $code if( !CORE::length( $ref->{error}->{code} ) );
-        CORE::delete( $ref->{code} ) if( CORE::length( $ref->{code} ) );
+        $msg = $ref->{message};
+        # We format the message like in bailout, ie { error => { message => '', code => '' } }
+        if( $is_error )
+        {
+            if( $use_rfc_error )
+            {
+                $build_rfc_error->( $ref, $code, $msg );
+            }
+            else
+            {
+                $build_legacy_error->( $ref, $code, $msg );
+            }
+        }
+        # This is a success response
+        else
+        {
+            $ref->{success} = \1 unless( exists( $ref->{success} ) );
+            $ref->{code} //= $code;
+        }
+    }
+    # Or we just have a code to go on with
+    elsif( $is_error )
+    {
+        # No message, just a code => build minimal error body
+        if( $use_rfc_error )
+        {
+            $build_rfc_error->( $ref, $code, undef );
+        }
+        else
+        {
+            $build_legacy_error->( $ref, $code, undef );
+        }
+    }
+    # Success with no body details
+    else
+    {
+        $ref->{success} = \1 unless( exists( $ref->{success} ) );
+        $ref->{code} //= $code;
     }
 
-    my $frameOffset = 0;
-    my $sub = ( caller( $frameOffset + 1 ) )[3];
-    $frameOffset++ if( substr( $sub, rindex( $sub, '::' ) + 2 ) eq 'reply' );
-    my( $pack, $file, $line ) = caller( $frameOffset );
-    $sub = ( caller( $frameOffset + 1 ) )[3];
-    # Without an Access-Control-Allow-Origin field, this would trigger an erro ron the web browser
+    # Without an Access-Control-Allow-Origin field, this would trigger an error on the web browser
     # So we make sure it is there if not set already
-    unless( $self->response->headers->get( 'Access-Control-Allow-Origin' ) )
+    unless( $resp->headers->get( 'Access-Control-Allow-Origin' ) )
     {
-        $self->response->headers->set( 'Access-Control-Allow-Origin' => '*' );
+        $resp->headers->set( 'Access-Control-Allow-Origin' => '*' );
     }
     # As an api, make sure there is no caching by default unless the field has already been set.
-    unless( $self->response->headers->get( 'Cache-Control' ) )
+    unless( $resp->headers->get( 'Cache-Control' ) )
     {
-        $self->response->headers->set( 'Cache-Control' => 'private, no-cache, no-store, must-revalidate' );
+        $resp->headers->set( 'Cache-Control' => 'private, no-cache, no-store, must-revalidate' );
     }
-    $self->response->content_type( 'application/json; charset=utf-8' );
+
+    # If we have a locale set, we use it
+    my $locale;
+    if( $is_error )
+    {
+        if( $use_rfc_error )
+        {
+            $locale = $ref->{locale} if( exists( $ref->{locale} ) );
+        }
+        else
+        {
+            $locale = $ref->{error}->{locale} if( exists( $ref->{error} ) && ref( $ref->{error} ) eq 'HASH' && exists( $ref->{error}->{locale} ) );
+        }
+    }
+    # Success response
+    else
+    {
+        $locale = $ref->{locale} if( exists( $ref->{locale} ) );
+    }
+
+    if( $locale )
+    {
+        # Set the content language for this payload unless the user has already set it.
+        unless( $resp->headers->get( 'Content-Language' ) )
+        {
+            # en_GB -> en-GB
+            ( my $hdr_locale = $locale ) =~ tr/_/-/;
+            $resp->headers->set( 'Content-Language' => $hdr_locale );
+        }
+        $resp->headers->merge( 'Vary' => 'Accept-Language' );
+    }
+
+    # Choose Content-Type
+    my $ctype = ( $is_error && $use_rfc_error )
+        ? 'application/problem+json; charset=utf-8'
+        : 'application/json; charset=utf-8';
+    $resp->content_type( $ctype );
+
     # $r->status( $code );
-    $self->response->code( $code );
-    if( defined( $msg ) && $self->apache_request->content_type ne 'application/json' )
+    $resp->code( $code );
+    if( defined( $msg ) && $ctype !~ m{^application/(?:json|problem\+json)}i )
     {
         # $r->custom_response( $code, $msg );
-        $self->response->custom_response( $code, $msg );
+        $resp->custom_response( $code, $msg );
     }
     else
     {
         # $r->custom_response( $code, '' );
-        $self->response->custom_response( $code, '' );
+        $resp->custom_response( $code, '' );
         #$r->status( $code );
     }
 
-    # We make sure the code is set
-    if( CORE::exists( $ref->{error} ) && !$self->response->is_success( $code ) )
-    {
-        $ref->{error}->{code} = $code if( ref( $ref->{error} ) eq 'HASH' && !CORE::length( $ref->{error}->{code} ) );
-        my $lang = $self->lang_unix;
-        if( !length( "$lang" ) && $ref->{locale} )
-        {
-            $lang = $ref->{locale};
-        }
-
-        unless( length( "$lang" ) )
-        {
-            $lang = $self->request->preferred_language( Apache2::API::Status->supported_languages );
-            # Make sure we are dealing with unix style language code
-            $lang =~ tr/-/_/;
-            if( CORE::length( $lang ) == 2 )
-            {
-                $lang = Apache2::API::Status->convert_short_lang_to_long( $lang );
-            }
-            # We have something weird, like maybe eng?
-            elsif( $lang !~ /^[a-z]{2}_[A-Z]{2}$/ )
-            {
-                $lang = Apache2::API::Status->convert_short_lang_to_long( substr( $lang, 0, 2 ) );
-            }
-        }
-        my $err_description;
-        if( !$ref->{error}->{error_description} && ( $err_description = $self->response->get_http_message( $code, $lang ) ) )
-        {
-            $ref->{error}->{error_description} = $err_description;
-        }
-        else
-        {
-            $ref->{error}->{error_description} = $self->gettext( $self->response->get_http_message( $code ) );
-        }
-
-        if( !exists( $ref->{error}->{locale} ) &&
-            defined( $msg ) && 
-            $self->_is_a( $msg => 'Text::PO::String' ) && 
-            defined( my $locale = $msg->locale ) )
-        {
-            $ref->{error}->{locale} = $locale if( length( "$locale" ) );
-        }
-        elsif( !exists( $ref->{error}->{locale} ) &&
-               defined( $lang ) &&
-               length( "$lang" ) )
-        {
-            $ref->{error}->{locale} = $lang;
-        }
-    }
-    else
-    {
-        $ref->{code} = $code if( !CORE::length( $ref->{code} ) );
-        if( !exists( $ref->{locale} ) &&
-            defined( $msg ) && 
-            $self->_is_a( $msg => 'Text::PO::String' ) && 
-            defined( my $locale = $msg->locale ) )
-        {
-            $ref->{locale} = $locale if( length( "$locale" ) );
-        }
-    }
-
-    if( CORE::exists( $ref->{cleanup} ) &&
+    if( exists( $ref->{cleanup} ) &&
         defined( $ref->{cleanup} ) &&
         ref( $ref->{cleanup} ) eq 'CODE' )
     {
-        my $cleanup = CORE::delete( $ref->{cleanup} );
+        my $cleanup = delete( $ref->{cleanup} );
         # See <https://perl.apache.org/docs/2.0/user/handlers/http.html#PerlCleanupHandler>
-        $self->request->request->pool->cleanup_register( $cleanup, $self );
+        $r->pool->cleanup_register( $cleanup, $self );
         # $r->push_handlers( PerlCleanupHandler => $cleanup );
     }
 
@@ -802,6 +1132,8 @@ sub server_version
 # $ok = $s->set_handlers($hook_name => undef);
 # https://perl.apache.org/docs/2.0/api/Apache2/ServerUtil.html#C_set_handlers_
 sub set_handlers { return( shift->_try( 'server', 'set_handlers', @_ ) ); }
+
+sub use_rfc_error { return( shift->_set_get_boolean( 'use_rfc_error', @_ ) ); }
 
 sub warn
 {
@@ -1613,7 +1945,7 @@ Apache2::API - Apache2 API Framework
 
 =head1 VERSION
 
-    v0.4.1
+    v0.5.0
 
 =head1 DESCRIPTION
 

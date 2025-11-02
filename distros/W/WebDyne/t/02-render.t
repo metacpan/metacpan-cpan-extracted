@@ -42,6 +42,11 @@ exit(${&main(\@ARGV) || die err ()} || 0);    # || 0 stops warnings
 #==================================================================================================
 
 
+BEGIN {
+    $ENV{'WEBDYNE_CONF'}='.' unless ($ENV{'WEBDYNE_TEST_FILE_PREFIX'} eq '03');
+}
+
+
 sub err_carp {
 
     require Carp;

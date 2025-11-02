@@ -38,7 +38,7 @@ $Data::Dumper::Indent=1;
 
 #  Version information
 #
-$VERSION='2.019';
+$VERSION='2.020';
 
 
 #  Debug
@@ -160,7 +160,7 @@ sub err_html {
             $WEBDYNE_ERROR_TEXT, $WEBDYNE_EVAL_SAFE, $self->{'_error_handler_run'}, $cgi_or
         );
         $r->content_type('text/plain');
-
+        
 
         #  Push error
         #
@@ -168,6 +168,7 @@ sub err_html {
             {
 
                 'URI'  => $r->uri(),
+                #'Line' => scalar $self->data_ar_html_line_no(pop @{$self->{'_data_ar_err'}}),
                 'Line' => scalar $self->data_ar_html_line_no(),
 
             });
@@ -199,7 +200,7 @@ sub err_html {
             errstack_ar      => \@errstack,
             err_eval_perl_sr => $self->{'_err_eval_perl_sr'},
             err_eval_line    => $self->{'_err_eval_line'},
-            data_ar          => $self->{'_data_ar'},
+            data_ar_err      => $self->{'_data_ar_err'},
 
         );
 
@@ -238,6 +239,7 @@ sub err_html {
             #  to use internal
             #
             my $data_ar=$container_ar->[$WEBDYNE_CONTAINER_DATA_IX];
+            debug("err_html data_ar: %s", Dumper($param{'data_ar'}));
 
 
             #  Reset render state and render error page
@@ -248,7 +250,7 @@ sub err_html {
                     data  => $data_ar,
                     param => \%param
 
-                }) || return $self->err_html('fatal problem in error handler during render: %s !', errstr() || 'undefined error');
+            }) || return $self->err_html('fatal problem in error handler during render: %s !', errstr() || 'undefined error');
 
 
             #  Set custom handler

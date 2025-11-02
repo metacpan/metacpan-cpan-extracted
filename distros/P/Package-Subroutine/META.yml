@@ -5,8 +5,8 @@ author:
 build_requires:
   ExtUtils::Manifest: '0'
   IO::File: '0'
-  Test::More: '0'
-  Test::Warnings: '0'
+  Test2::Suite: '0'
+  aliased: '0'
 configure_requires:
   Module::Build: '0.42'
 dynamic_config: 1
@@ -19,12 +19,18 @@ name: Package-Subroutine
 provides:
   Package::Subroutine:
     file: lib/Package/Subroutine.pm
-    version: v0.22.5
+    version: v0.23.1
+  Package::Subroutine::Namespace:
+    file: lib/Package/Subroutine/Namespace.pm
+    version: '0.10'
+  Package::Subroutine::Sugar:
+    file: lib/Package/Subroutine/Sugar.pm
+    version: v0.2.2
 requires:
   Class::ISA: '0'
   Perl6::Junction: '1.30000'
   perl: v5.6.0
 resources:
   license: http://dev.perl.org/licenses/
-version: v0.22.5
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: v0.23.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

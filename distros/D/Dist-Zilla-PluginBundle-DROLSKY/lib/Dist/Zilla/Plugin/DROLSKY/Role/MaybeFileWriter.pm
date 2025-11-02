@@ -7,8 +7,9 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '1.22';
+our $VERSION = '1.23';
 
+use Carp::Always;
 use Path::Tiny qw( path );
 
 use Moose::Role;
@@ -25,7 +26,7 @@ sub _maybe_write_file {
     return if $file->exists;
 
     ## no critic (ValuesAndExpressions::ProhibitLeadingZeros )
-    $file->parent->mkpath( 0, 0755 );
+    $file->parent->mkdir( { chmod => 0755 } );
     $file->spew_utf8($content);
     $file->chmod(0755) if $is_executable;
 
@@ -48,7 +49,7 @@ Dist::Zilla::Plugin::DROLSKY::Role::MaybeFileWriter - Knows how to maybe write f
 
 =head1 VERSION
 
-version 1.22
+version 1.23
 
 =for Pod::Coverage .*
 
@@ -66,7 +67,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 - 2022 by Dave Rolsky.
+This software is Copyright (c) 2013 - 2025 by Dave Rolsky.
 
 This is free software, licensed under:
 

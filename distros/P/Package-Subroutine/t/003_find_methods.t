@@ -1,11 +1,8 @@
 
-use strict;
-use warnings;
-use Test::More tests => 4;
+use Test2::V0;
+plan(3);
 
-BEGIN {
-  use_ok('Package::Subroutine');
-}
+use Package::Subroutine;
 
 package T::Base;
 
@@ -32,11 +29,11 @@ if(UNIVERSAL->can('unimport')) {
 
 my @have = sort Package::Subroutine->findmethods('T::Base');
 
-is_deeply(\@have,\@expect,'methods found');
+is(\@have,\@expect,'methods found');
 
 my @have2 = sort Package::Subroutine->findmethods('T::Plus');
 
-is_deeply(\@have2,\@expect,'methods found');
+is(\@have2,\@expect,'methods found');
 
 {
    no strict 'refs';
@@ -51,5 +48,5 @@ is_deeply(\@have2,\@expect,'methods found');
 
    Package::Subroutine->findmethods('T::Plus');
    my @expect = qw/UNIVERSAL Package::Subroutine T::Plus/;
-   is_deeply(\@classes,\@expect,'classes');
+   is(\@classes,\@expect,'classes');
 }

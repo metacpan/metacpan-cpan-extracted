@@ -1,3 +1,8 @@
+1.23     2025-11-01
+
+- Fixed call to `Path::Tiny->mkdir` .
+
+
 1.22     2022-10-06
 
 - No changes from the last release. The previous release was somehow

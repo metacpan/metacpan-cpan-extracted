@@ -16,7 +16,7 @@ package WebDyne;
 #  Pragma
 #
 use strict qw(vars);
-use vars   qw($VERSION $VERSION_GIT_REF %CGI_TAG_WEBDYNE @ISA $AUTOLOAD @EXPORT_OK);
+use vars   qw($VERSION $AUTHORITY $VERSION_GIT_REF %CGI_TAG_WEBDYNE @ISA $AUTOLOAD @EXPORT_OK);
 use warnings;
 no warnings qw(uninitialized redefine once);
 use overload;
@@ -58,7 +58,8 @@ use Exporter qw(import);
 
 #  Version information
 #
-$VERSION='2.019';
+$AUTHORITY='cpan:ASPEER';
+$VERSION='2.020';
 chomp($VERSION_GIT_REF=do { local (@ARGV, $/) = ($_=__FILE__.'.tmp'); <> if -f $_ });
 
 
@@ -117,7 +118,7 @@ if ($WEBDYNE_EVAL_SAFE) {die "WEBDYNE_EVAL_SAFE disabled in this version\n"}
 #
 BEGIN {
     eval {require Time::HiRes;    Time::HiRes->import('time')};
-    eval {require Devel::Confess; Devel::Confess->import()};
+    eval {require Devel::Confess; Devel::Confess->import(qw(no_warnings))};
 }
 
 
@@ -233,6 +234,33 @@ sub handler : method {    # no subsort
     #
     local $SIG{'__DIE__'}=sub {
         debug('in __DIE__ sig handler, caller %s', join(',', (caller(0))[0..3]));
+        
+        #  Go back through call stack looking for eval errors
+        #
+        my $i=0;
+        my @eval_nest;
+        my $eval_nest;
+        while (my @caller=caller($i++)) {
+            if ($caller[3] eq '(eval)') {
+                push @eval_nest, \@caller;
+                $eval_nest++;
+            }
+        }
+        debug("eval_nest: $eval_nest, eval_nest_ar: %s", Dumper(\@eval_nest)); 
+        
+        
+        #  Don't error out if not a WebDyne error (i.e. if eval{} block was in module called from
+        #  user code
+        #
+        if ($eval_nest[0][0]!~/^WebDyne::/) {
+        
+            #  Not us, clear eval stack
+            #
+            eval {};
+            return;
+            
+        }
+                
 
         #  Updated to *NOT* throw error if in eval block (i.e. if $@ is set). Stops error handler being called
         #  if non WebDyne module has eval code which triggers non WebDyne AUTOLOAD block. Might need to be more
@@ -1529,7 +1557,7 @@ sub render {
         #  Save current data block away for reference by error handler if something goes
         #  wrong
         #
-        push @{$self->{'_data_ar'}},$data_ar;
+        push @{$self->{'_data_ar_err'}},$data_ar;
         unshift @{$self->{'_perl_data'}}, $param_data_hr;
 
 
@@ -1667,7 +1695,7 @@ sub render {
 
         #  No errors, pop error handler stack
         #
-        pop @{$self->{'_data_ar'}};
+        pop @{$self->{'_data_ar_err'}};
         shift @{$self->{'_perl_data'}};
         
 
@@ -1683,18 +1711,19 @@ sub render {
     #  need to take care to only render children if present.
     #
     my @html;
-    foreach my $data_ar (@{$data_ar}) {
+    foreach my $node_data_ar (@{$data_ar}) {
 
 
         #  Is this a sub node, or only text (ref means sub-node)
         #
-        if (ref($data_ar)) {
+        if (ref($node_data_ar)) {
 
 
             #  Sub node, we call call render routine
             #
+            debug('recursive render node_data_ar: %s', Dumper($node_data_ar));
             push @html,
-                ${$render_cr->($render_cr, $self, $cgi_or, $data_ar, $param_data_hr) || return err()};
+                ${$render_cr->($render_cr, $self, $cgi_or, $node_data_ar, $param_data_hr) || return err()};
 
 
         }
@@ -1703,7 +1732,8 @@ sub render {
 
             #  Text only, do not render just push onto return array
             #
-            push @html, $data_ar;
+            debug('add text only node_data_ar: %s', \$node_data_ar);
+            push @html, $node_data_ar;
 
         }
     }
@@ -2951,7 +2981,7 @@ sub perl_init {
 
             #  Save away as current data block for reference by error handler
             #
-            push @{$self->{'_data_ar'}}, \@data;
+            push @{$self->{'_data_ar_err'}}, \@data;
 
         };
 
@@ -3253,6 +3283,7 @@ sub include {
         #
         my $container_ar=$self->compile(\%option) ||
             return err();
+        #$self->data_ar_err_pop();
         my $block_data_ar=$container_ar->[1];
         debug('compiled to data_ar %s', Dumper($block_data_ar));
 
@@ -4051,14 +4082,14 @@ sub inode {
 }
 
 
-sub data_ar {
+sub data_ar_err {
 
-
-    #  Return current data node, assumes we are in a perl block or subst
+    #  Return last data_ar block off error hint stack
     #
     my $self=shift();
-    return $self->{'_data_ar'}[-1] if $self->{'_data_ar'};
-
+    debug("self: $self");
+    return $self->{'_data_ar_err'}[-1];
+    
 }
 
 
@@ -4068,7 +4099,8 @@ sub data_ar_html_srce_fn {
     #  The file name that this data node was sourced from
     #
     my ($self, $data_ar)=@_;
-    if ($data_ar ||= $self->data_ar()) {
+    debug("self: $self, data_ar: $data_ar");
+    if ($data_ar ||= $self->data_ar_err()) {
         return ${$data_ar->[$WEBDYNE_NODE_SRCE_IX]}
     }
 
@@ -4081,7 +4113,8 @@ sub data_ar_html_line_no {
     #  The line number (in the original HTML file) this data node was sourced from. Return tag start line in scalar ref, tag start + tag end in array ref
     #
     my ($self, $data_ar)=@_;
-    if ($data_ar ||= $self->data_ar()) {
+    debug("self: $self, data_ar: $data_ar");
+    if ($data_ar ||= $self->data_ar_err()) {
         return wantarray ? @{$data_ar}[$WEBDYNE_NODE_LINE_IX, $WEBDYNE_NODE_LINE_TAG_END_IX] : $data_ar->[$WEBDYNE_NODE_LINE_IX];
     }
 

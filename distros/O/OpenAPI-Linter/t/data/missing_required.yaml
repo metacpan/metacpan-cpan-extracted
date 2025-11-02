@@ -1,0 +1,6 @@
+# Missing required top-level fields (openapi, info, paths)
+components:
+  schemas:
+    Dummy:
+      type: object
+

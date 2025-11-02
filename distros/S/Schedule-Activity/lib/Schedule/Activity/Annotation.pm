@@ -5,7 +5,7 @@ use warnings;
 use Ref::Util qw/is_hashref is_regexpref/;
 use Scalar::Util qw/looks_like_number/;
 
-our $VERSION='0.1.8';
+our $VERSION='0.1.9';
 
 my %property=map {$_=>undef} qw/message nodes before between p limit attributes note/;
 
@@ -42,7 +42,6 @@ sub annotate {
 		beforemax=>$before{max}//$before{min}//1,
 		between  =>$$self{between}//1,
 	);
-	my $p=$$self{p}//1;
 	my @matchidx=grep {rand()<=$opt{p}} grep {$schedule[$_][1]{keyname}=~$$self{nodes}} (0..$#schedule);
 	if(!@matchidx) { return }
 	my @notes;

@@ -37,7 +37,7 @@ use Data::Dumper;
 #  Version information in a formate suitable for CPAN etc. Must be
 #  all on one line
 #
-$VERSION='2.019';
+$VERSION='2.020';
 
 
 #  Debug using WebDyne debug handler
@@ -73,7 +73,7 @@ errnofatal(1);
 #
 BEGIN {
     eval {require Time::HiRes;    Time::HiRes->import('time')};
-    eval {require Devel::Confess; Devel::Confess->import()};
+    eval {require Devel::Confess; Devel::Confess->import(qw(no_warnings))};
 }
 
 

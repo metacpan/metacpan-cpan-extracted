@@ -15,6 +15,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'Apache2::API' );
     use parent qw( APR::Request::Param );
     use version;
     use APR::Request::Param;

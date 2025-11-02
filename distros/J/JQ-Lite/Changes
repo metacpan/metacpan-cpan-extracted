@@ -1,4 +1,14 @@
-1.34  2025-11-02
+1.37  2025-11-02
+    - Release parenthesized pipeline evaluation improvements in expressions.
+
+1.36  2025-11-02
+    - Release jq-compatible @uri formatter and percent-encoding helper.
+    - Declare Encode dependency and document formatter usage.
+
+1.35  2025-11-01
+    - Release base64 formatter support and dependency metadata updates.
+
+1.34  2025-11-01
     - Publish homepage metadata updates for CPAN distribution listings.
 
 1.33  2025-11-01
@@ -901,6 +911,8 @@
     - Removed use of eval in _evaluate_condition for better performance and stability.
     - Refactored _traverse for readability and maintainability.
     - Added support for multi-level array traversal (e.g., .users[].friends[].name).
+
+
 
 
 

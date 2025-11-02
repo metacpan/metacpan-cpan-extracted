@@ -55,16 +55,17 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "https://github.com/aspeer/pm-WebDyne",
+      "homepage" : "https://github.com/aspeer/WebDyne",
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/aspeer/pm-WebDyne.git",
-         "web" : "https://github.com/aspeer/pm-WebDyne"
+         "url" : "https://github.com/aspeer/WebDyne.git",
+         "web" : "https://github.com/aspeer/WebDyne"
       }
    },
-   "version" : "2.019",
+   "version" : "2.020",
+   "x_authority" : "cpan:ASPEER",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

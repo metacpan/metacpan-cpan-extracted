@@ -35,7 +35,7 @@ use FindBin qw($Script);
 
 #  Version Info, must be all one line for MakeMaker, CPAN.
 #
-$VERSION='2.019';
+$VERSION='2.020';
 
 
 #  Run main
@@ -70,7 +70,8 @@ sub main {
         print $temp_fh $line;
         if ($line=~/^__PERL__/) {
             print $temp_fh '#!perl', $/;
-            $line_no++;
+            print $temp_fh 'use strict;', $/;
+            $line_no+=2;
             print $temp_fh "#line ${line_no}", $/;
         }
     }

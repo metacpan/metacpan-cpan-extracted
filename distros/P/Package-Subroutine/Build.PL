@@ -15,8 +15,8 @@ my $builder = Module::Build->new(
         'Class::ISA' => '0'
     },
     build_requires => {
-        'Test::More' => 0,
-        'Test::Warnings' => 0,
+        'aliased' => 0,
+        'Test2::Suite' => 0,
         'ExtUtils::Manifest' => 0,
         'IO::File' => 0
     },

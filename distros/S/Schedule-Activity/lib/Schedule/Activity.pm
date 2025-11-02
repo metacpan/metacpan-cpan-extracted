@@ -9,7 +9,7 @@ use Schedule::Activity::Message;
 use Schedule::Activity::Node;
 use Schedule::Activity::NodeFilter;
 
-our $VERSION='0.1.8';
+our $VERSION='0.1.9';
 
 sub new {
 	my ($ref,%opt)=@_;
@@ -20,7 +20,7 @@ sub new {
 		valid   =>0,
 		built   =>undef,
 		reach   =>undef,
-		unsafe  =>$opt{unsafe}//1, # default to 1 initially
+		unsafe  =>$opt{unsafe}//0,
 	);
 	return bless(\%self,$class);
 }
@@ -156,13 +156,17 @@ sub schedule {
 	if($check{error})                  { return (error=>$check{error}) }
 	if(!is_arrayref($opt{activities})) { return (error=>'Activities must be an array') }
 	my ($tmoffset,%res)=(0);
+	$res{stat}{slack}=$res{stat}{buffer}=0;
 	foreach my $activity (@{$opt{activities}}) {
 		foreach my $entry (scheduler(goal=>$$activity[0],node=>$$self{built}{node}{$$activity[1]},config=>$$self{built},attr=>$self->_attr(),tmoffset=>$tmoffset,tensionslack=>$opt{tensionslack},tensionbuffer=>$opt{tensionbuffer})) {
 			push @{$res{activities}},[$$entry[0]+$tmoffset,@$entry[1..$#$entry]];
+			$res{stat}{slack}+=$$entry[3]; $res{stat}{buffer}+=$$entry[4];
+			$res{stat}{slackttl}+=$$entry[1]{tmavg}-$$entry[1]{tmmin};
+			$res{stat}{bufferttl}+=$$entry[1]{tmmax}-$$entry[1]{tmavg};
 		}
 		$tmoffset+=$$activity[0];
-		$self->_attr()->log($tmoffset); # potentially overwritten by subsequent nodes
 	}
+	$self->_attr()->log($tmoffset);
 	%{$res{attributes}}=$self->_attr()->report();
 	while(my ($group,$notes)=each %{$$self{config}{annotations}}) {
 		my @schedule;
@@ -267,7 +271,7 @@ sub findpath {
 	my ($tm,$slack,$buffer,@res)=(0,0,0);
 	my %tension=(
 		slack =>1-($opt{tensionslack} //$opt{tension}//0.5),
-		buffer=>1-($opt{tensionbuffer}//$opt{tension}//0.5),
+		buffer=>1-($opt{tensionbuffer}//$opt{tension}//0.85659008),
 	);
 	foreach my $k (qw/slack buffer/) { if($tension{$k}>1){$tension{$k}=1}; if($tension{$k}<0){$tension{$k}=0} }
 	my ($node,$conclusion)=($opt{start},$opt{finish});
@@ -276,8 +280,8 @@ sub findpath {
 		push @res,[$tm,$node];
 		push @{$res[-1]},nodeMessage($opt{attr},$tm+$opt{tmoffset},$node);
 		$node->increment(\$tm,\$slack,\$buffer);
-		if($tm+$tension{buffer}*$buffer<$opt{goal})  { $node=$node->nextrandom(not=>$conclusion,tm=>$tm,attr=>$opt{attr}{attr})//$node->nextrandom(tm=>$tm,attr=>$opt{attr}{attr}) }
-		elsif($tm-$tension{slack}*$slack<$opt{goal}) { $node=$node->nextrandom(tm=>$tm,attr=>$opt{attr}{attr}) } # tm+buffer>=goal
+		if($tm-$tension{slack}*$slack+rand($tension{buffer}*$buffer+$tension{slack}*$slack)<=$opt{goal}) {
+			$node=$node->nextrandom(not=>$conclusion,tm=>$tm,attr=>$opt{attr}{attr})//$node->nextrandom(tm=>$tm,attr=>$opt{attr}{attr}) }
 		elsif($node->hasnext($conclusion)) { $node=$conclusion }
 		else { $node=$node->nextrandom(not=>$conclusion,tm=>$tm,attr=>$opt{attr}{attr})//$node->nextrandom(tm=>$tm,attr=>$opt{attr}{attr}) }
 	}
@@ -345,8 +349,10 @@ sub scheduler {
 		my $dt;
 		if($i<$#res) { $dt=$res[$i+1][0]-$res[$i][0] }
 		else         { $dt=$opt{goal}-$res[$i][0] }
-		$res[$i][3]=$dt-($res[$i][1]{tmmin}//0);
-		$res[$i][4]=($res[$i][1]{tmmax}//0)-$dt;
+		$res[$i][3]=$res[$i][4]=0;
+		$dt-=$res[$i][1]{tmavg}//0;
+		if($dt>0) { $res[$i][4]=$dt }
+		else      { $res[$i][3]=-$dt }
 	}
 	#
 	# Full materialization of messages and attributes occurs after all
@@ -375,6 +381,7 @@ sub scheduler {
 
 sub buildSchedule {
 	my (%opt)=@_;
+	print STDERR "buildSchedule will be deprecated in 0.2.0\n";
 	return __PACKAGE__->new(configuration=>$opt{configuration})->schedule(activities=>$opt{activities});
 }
 
@@ -432,7 +439,7 @@ Schedule::Activity - Generate random activity schedules
 
 =head1 VERSION
 
-Version 0.1.8
+Version 0.1.9
 
 =head1 SYNOPSIS
 
@@ -589,23 +596,37 @@ The difference between the result time and the goal may cause retries when an ex
 
 Caution:  While startup/conclusion of activities may have fixed time specifications, at this time it is recommended that actions always contain some slack/buffer.  There is currently no "relaxing mechanism" during scheduling, so a configured with no slack nor buffer must exactly meet the goal time requested.
 
-=head1 SCHEDULING TENSION
+=head1 SCHEDULING ALGORITHM
+
+The configuration of the C<next> actions is the primary contributor to the schedules that can be built.  As with all algorithms of this type, there are many configurations that simply won't work well:  For example, this is not a maze solver, a best path finder, nor a resourcing optimization system.  Scheduling success toward the stated goals generally requires that actions have different C<tmmin>, C<tmmax>, and C<tmavg>, and that actions permit reasonable repetition and recursion.  Highly imbalanced actions, such as a branch of length 10 and another of length 5000, may always fail depending on the goal.  Neverthless, for the activities and actions so described, how does it work?
+
+The scheduler is a randomized, opportunistic, single-step path growth algorithm.  An activity starts at the indicated node.  At each step, the C<next> entries are filtered and a random action is chosen, then the process repeats.  The selection of the next step is restricted based on the I<current time> (at the end of the action) as follows.
+
+First, a I<random current time> is computed based on the current time, the accumulated slack and buffer, and the tension settings (see below).  If the random current time is less than the goal time, the next action will be a random non-final node, if available, or the final node if all other choices are filtered or unavailable.
+
+If the random current time is greater than the goal time and the final action is listed as a C<next> action, it will be chosen.
+
+In all other cases, a random C<next> action will be chosen.
+
+=head2 Tension
 
 Schedule construction proceeds toward the goal time incrementally, with each action appending its C<tmavg> until the goal is reached.  If the accumulated average times were exactly equal to the goal for the activity, schedules would be unambiguous.  For repeating, recursive scheduling, however, it's necessary to consider scenarios where the actions don't quite reach the goal or where they extend beyond the goal.
 
-=head2 Buffer
+=head3 Buffer and Slack
 
-The primary method to handle differences between the scheduled time and goal time is the C<buffer>.  As defined above, each activity with C<tmmaxE<gt>tmavg> contributes to the total buffer in the schedule.  The amount of buffer used to select the next activity is controlled by including C<schedule(tensionbuffer=>value)>.  In the 'laziest' mode, C<tensionbuffer=0.0>, all available buffer contributes toward achieving the goal, meaning that scheduling will attempt to reach the final activity node sooner, and schedules will effectively contain a smaller number of activities, each stretched toward C<tmmax>.  In the most aggressive mode, C<tensionbuffer=1.0>, the goal time must be met (or exceeded) before aggressively seeking the final activity node, so schedules will contain a larger number of activities, each compressed toward C<tmmin>.  The default is 0.5.
+Each activity node and action has buffer and slack, as defined above, that contributes to the accumulated total buffer and slack.  The amount of buffer/slack that contributes to the random current time is controlled by including C<schedule(tensionbuffer=E<gt>value)> and C<tensionslack=E<gt>value>, each between 0 and 1.  Tension effectively controls how little of each contributes toward randomization around the goal.
 
-=head2 Slack
+In the 'laziest' mode, with C<tension=0.0>, all available buffer/slack is used to establish the random current time, increasing the likelihood that it is greater than the goal.  With a lower buffer tension, for example, scheduling is more likely to reach the final activity node sooner, and thus will contain a smaller number of actions on average, each stretched toward C<tmmax>.  With a higher tension, the goal time must be met (or exceeded) before aggressively seeking the final activity node, so schedules will contain a larger number of actions, each compressed toward C<tmmin>.
 
-The second method to handle differences is the C<slack>, which can be controlled with C<schedule(tensionslack=>value)>.  With C<tensionslack=0.0>, all accumulated slack will be used to schedule activities beyond the goal time, so schedules will effectively contain a larger number of activities compressed toward C<tmmin>.  With C<tensionslack=1.0>, scheduling will seek the final activity node as soon as the schedule time exceeds the goal, resulting in a smaller number of activities.  The default is 0.5.
+The tension for slack is similar, with lower values permitting a larger number of actions beyond the goal, each compressed toward C<tmmin>, whereas with tension near 1, scheduling will seek the final activity node as soon as the schedule time exceeds the goal, resulting in a smaller number of activities.
 
-Note that the slack tension is secondary to the buffer tension.  With the default values, on average, it's more likely that the buffer will be used to reach the goal.  That is, the number of actions is not uniformly distributed around the C<goal/tmavg> count, but biased toward the lower side.
+The random computed time is a uniform distribution around the current time, but because actions are scheduled incrementally, this leads to a skewed distribution that favors a smaller number of actions.  See C<samples/tension.png> for the distributions where exactly 100 repeated actions would be expected.
 
-=head2 Example
+The default values are 0.5 for the slack tension, and ~0.85 for the buffer tension.  This gives an expected number of actions that is very close to C<goal/tmavg>, roughly plus 10% minus 5%.
 
-Suppose a single repeatable action with C<tmavg=10> is used to construct a schedule with C<goal=99>.  The expected action count is 10 when C<tensionbuffer=1.0> and C<tensionslack=1.0>.  If C<tensionbuffer> is closer to 0.0, the expected number of actions is smaller than 10, perhaps even as low as 1 based on C<tmmax>, because the scheduler determines that more of the buffer can be used to stretch the actions toward the goal of 99.  If, on the other hand, C<tensionslack> is closer to 0.0, the expected number of actions is greater than 10, perhaps even as high as 19 based on C<tmmin>, because the scheduler attempts to insert more non-final actions that can be compressed toward the goal.
+=head3 Response
+
+The scheduling response contains C<{stat}> that reports the accumulated slack and buffer used for all actions, as well as C<slackttl> and C<bufferttl> which represent the maximum available.  The amount of slack used during scheduling is C<slack/slackttl>, and the same for buffer.  These values can assist with choosing tension settings based on the specific configuration.
 
 =head1 ATTRIBUTES
 
@@ -654,7 +675,7 @@ The response from C<schedule> includes an C<attributes> section as:
     ...
   }
 
-The C<y> value is the final value at the conclusion of the final activity in the schedule.  The C<xy> contains an array of all values and the times at which they changed; see Logging.  The C<avg> is roughly the time-weighted average of the value, but this depends on the attribute type.
+The C<y> value is the last recorded value in the schedule.  The C<xy> contains an array of all values and the times at which they changed; see Logging.  The C<avg> is roughly the time-weighted average of the value, but this depends on the attribute type.
 
 If an activity containing a unique attribute is not used during construction, the attribute will still be included in the response with its default and initial value.
 
@@ -662,9 +683,9 @@ If an activity containing a unique attribute is not used during construction, th
 
 The C<int> type is the default for attributes.  If initialized in C<%configuration>, it may specify the type, or the value, or both.  The default value is zero, but this may be overwritten if the first activity node specifically calls C<set>.
 
-Integer attributes within activity/actions support all of:  C<set>, C<incr>, C<decr>.  There is no current restriction on values; they may be integers or real numbers, positive or negative.
+Integer attributes within activity/actions support all of:  C<set>, C<incr>, C<decr>.  There is no actual restriction on type so any Perl L<number> is valid, integers or real numbers, positive or negative.
 
-The reported C<avg> is the overall time-weighted average of the values, computed via a trapezoid rule.  That is, if C<tm=0, value=2> and C<tm=10, value=12>, the average is 7 with a weight of 10.  See Logging for more details about averages over activity boundaries.
+The reported C<avg> is the overall time-weighted average of the values, computed via a trapezoid rule.  That is, if C<tm=0, value=2> and C<tm=10, value=12>, the average is 7 with a weight of 10.  See Logging for more details.
 
 =head2 Boolean attributes
 
@@ -688,12 +709,9 @@ When an activity/action node and a selected message both contain attributes, the
 
 The reported C<xy> is an array of values of the form C<(tm, value)>, with each representing an activity/action referencing that attribute built into the schedule.  Each attribute will have its initial value of C<(0, value)>, either the default or the value specified in C<configuration{attributes}>.
 
-For integers, attributes may be fixed in the log at their current value by calling C<incr=0>.  There is currently no similar mechanism for booleans.
+Any attribute may be "fixed" in the log at their current value with the configuration C<name=E<gt>{}>, which is equivalent to C<incr=0> for integers.
 
-(Approaching a decision):  Attribute logging will also occur at the end of every activity, so changes in attributes across activity boundaries do not affect the average value calculation.  In particular, the starting value in any given activity is the most recent value in the previous activity, adjusted by any operator in the activity node itself.  For example, suppose two activities go from C<tm=0> to 10, and from C<tm=10> to 20.  If an attribute is set to C<tm=0, value=5> and not set again until C<tm=15, value=0>, then the average in the first activity is five.
-
-Proposed:  Because C<incr=0> can fix the value of an integer attribute in the final action node of an activity, this permits the user to choose the behavior.  For Boolean attributes, they are already fixed until the next C<set> event, so the average value should be equivalent whether these are pinned at the end of the activity or not.
-
+Attribute logging always occurs at the beginning and end of the completed schedule, so that all scheduled time affects the weighted average value calculation.  Activities may reset or fix attributes in their beginning or final node; the final node is only the "end of the activity" when C<tmavg=0>.
 
 =head1 ANNOTATIONS
 

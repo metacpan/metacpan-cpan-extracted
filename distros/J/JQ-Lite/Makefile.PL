@@ -23,11 +23,13 @@ WriteMakefile(
     MIN_PERL_VERSION => '5.014',
     PREREQ_PM        => {
         'JSON::PP'        => 0,
+        'Encode'          => 0,
         'Test::More'      => 0,
         'FindBin'         => 0,
         'Getopt::Long'    => 0,
         'IO::File'        => 0,
         'List::Util'      => 0,
+        'MIME::Base64'    => 0,
         'Scalar::Util'    => 0,
         'Term::ANSIColor' => 0,
     },
@@ -43,4 +45,3 @@ WriteMakefile(
         resources => $resources,
     },
 );
-

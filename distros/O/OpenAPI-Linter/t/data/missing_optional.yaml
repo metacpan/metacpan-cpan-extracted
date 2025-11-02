@@ -1,0 +1,18 @@
+openapi: 3.0.3
+info:
+  title: Optional Missing Test
+  version: 1.0.0
+paths:
+  /optional:
+    get:
+      responses:
+        '200':
+          description: OK
+components:
+  schemas:
+    Example:
+      type: object
+      properties:
+        name:
+          type: string
+

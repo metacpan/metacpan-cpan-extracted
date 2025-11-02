@@ -69,7 +69,7 @@ subtest 'Random selection'=>sub {
 		],
 	});
 	foreach my $expect (qw/mnop qrst/) {
-		$countdown=30;
+		$countdown=40; # pfail=1e-12
 		while(($countdown>0)&&!$seen{$expect}) { $countdown--; ($string)=$msg->random(); $seen{$string}=1 }
 	}
 	is_deeply(\%seen,{'mnop'=>1,'qrst'=>1},'Message:  hash n=2');
@@ -97,7 +97,7 @@ subtest 'Attributes'=>sub {
 		{alternates=>[{message=>'one',attributes=>{one=>{}}},{message=>'two',attributes=>{two=>{}}}]},
 		attributes=>{hash=>{incr=>1}});
 	foreach my $expect (qw/one two/) {
-		$countdown=30;
+		$countdown=40; # pfail=1e-12
 		while(($countdown>0)&&!$seen{$expect}) {
 			$countdown--;
 			($string,$msg)=$message->random();
@@ -145,7 +145,7 @@ subtest 'Named messages'=>sub {
 	);
 	%results=(string=>{});
 	foreach my $expect ('Message 1','Message 2','Plain message','three one','three two') {
-		$countdown=50;
+		$countdown=300; # pfail=1e-17
 		while(($countdown>0)&&!$results{string}{$expect}) {
 			$countdown--;
 			my ($string,$object)=$msg->random();
@@ -182,7 +182,7 @@ subtest 'Named messages'=>sub {
 	);
 	%results=(string=>{});
 	foreach my $expect ('Message 1','Message 2','Plain message') {
-		$countdown=40;
+		$countdown=100; # pfail=1e-17
 		while(($countdown>0)&&!$results{string}{$expect}) {
 			$countdown--;
 			my ($string,$object)=$msg->random();

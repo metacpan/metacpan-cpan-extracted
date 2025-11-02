@@ -46,7 +46,7 @@ use Data::Dumper;
 
 #  Version information
 #
-$VERSION='2.019';
+$VERSION='2.020';
 
 
 #  Debug load
@@ -181,6 +181,13 @@ sub new {
 }
 
 
+sub line_no_debug {
+
+    my $self=shift();
+    return sprintf("self $self, line_no: %s, line_no_start: %s, line_no_next: %s", @{$self}{qw(_line_no _line_no_start _line_no_next)});
+    
+}
+
 sub parse_fh {
 
 
@@ -224,6 +231,7 @@ sub parse_fh {
         my $html=@{$tree_or->{'_html_wedge_ar'}} ? shift @{$tree_or->{'_html_wedge_ar'}} : ($line=<$html_fh>);
         if ($line) {
             debug("line *$line*");
+            debug($tree_or->line_no_debug());
             my @cr=($line=~/\n/g);
             $tree_or->{'_line_no'}=($tree_or->{'_line_no_next'} || 1);
             $tree_or->{'_line_no_next'}=$tree_or->{'_line_no'}+@cr;
@@ -447,6 +455,7 @@ sub tag_parse {
     #  Insert line number if possible
     #
     debug("insert line_no: %s, line_no_start: %s into object ref $html_or", @{$self}{qw(_line_no _line_no_start)});
+    debug('tag %s', $html_or->tag()) if (ref($html_or));
     ref($html_or) && (@{$html_or}{'_line_no', '_line_no_tag_end'}=(@{$self}{qw(_line_no_start _line_no)}));
 
 
@@ -614,10 +623,13 @@ sub process {
     #
     my ($self, $text)=@_;
     debug("process $text");
+    
+    #  Create perl HTMl::Object
+    #
     my $html_or=HTML::Element->new('perl', inline => 1, perl => $text);
     debug("insert line_no: %s into object ref $html_or", $self->{'_line_no'});
-    @{$html_or}{'_line_no', '_line_no_tag_end'}=@{$self}{qw(_line_no_start _line_no)};
-    $self->tag_parse('SUPER::text', $html_or)
+    @{$html_or}{'_line_no', '_line_no_tag_end'}=@{$self}{qw(_line_no _line_no)};
+    return $self->tag_parse('SUPER::text', $html_or)
 
 }
 
@@ -658,6 +670,8 @@ sub end {
     my ($self, $tag)=(shift, shift);
     ref($tag) || ($tag=lc($tag));
     debug("$self end tag: %s,%s text_block_tag: %s, line_no: %s", Dumper($tag, \@_), $self->_text_block_tag(), $self->{'_line_no'});
+    debug($self->line_no_debug());
+    #debug('self: %s', Dumper($self));
     
     
     #  Var to hold HTML::Element ref if returned, but most methods don't seem to return a HTML ref, just an integer ?
@@ -691,11 +705,13 @@ sub end {
             #
             $self->_text_block_tag($webdyne_tag_or->tag()) if $self->_text_block_tag();
             debug("text_block_tag now %s, ending $webdyne_tag", $self->_text_block_tag());
+            $self->pos()->{'_line_no_tag_end'}=$self->{'_line_no'} if (ref($self->pos()) eq 'HTML::Element');
             $self->SUPER::end($webdyne_tag, @_);
 
             #  Now end the original div tag
             #
             debug("ending $tag now");
+            $self->pos()->{'_line_no_tag_end'}=$self->{'_line_no'} if (ref($self->pos()) eq 'HTML::Element');
             $ret=$self->SUPER::end($tag, @_);
 
 
@@ -737,6 +753,7 @@ sub end {
             #  Vanilla div tag, nothing to do
             #
             debug('undef pop off div stack');
+            $self->pos()->{'_line_no_tag_end'}=$self->{'_line_no'} if (ref($self->pos()) eq 'HTML::Element');
             return $ret=$self->SUPER::end($tag, @_);
         }
     }
@@ -770,6 +787,7 @@ sub end {
             #  End script tag
             #
             debug("end $tag now");
+            $self->pos()->{'_line_no_tag_end'}=$self->{'_line_no'} if (ref($self->pos()) eq 'HTML::Element');
             $self->SUPER::end($tag, @_);
             $self->_text_block_tag(undef);
 
@@ -796,10 +814,12 @@ sub end {
     if ($self->_text_block_tag() && ($tag eq $self->_text_block_tag())) {
         debug("match on tag $tag to text_block_tag %s, clearing text_block_tag", $self->_text_block_tag());
         $self->_text_block_tag(undef);
+        $self->pos()->{'_line_no_tag_end'}=$self->{'_line_no'} if (ref($self->pos()) eq 'HTML::Element');
         $ret=$self->SUPER::end($tag, @_)
     }
     elsif ($self->_text_block_tag()) {
         debug('text segment via text_block_tag %s, passing to text handler', $self->_text_block_tag());
+        $self->pos()->{'_line_no_tag_end'}=$self->{'_line_no'} if (ref($self->pos()) eq 'HTML::Element');
         $ret=$self->text($_[0])
     }
     elsif (!$_[0] && delete($self->{'_end_ignore'})) {
@@ -810,11 +830,12 @@ sub end {
         $ret=undef;
     }
     else {
-        debug("normal tag end");
+        debug("normal tag end: $tag, %s", $self->pos()->tag());
+        $self->pos()->{'_line_no_tag_end'}=$self->{'_line_no'} if (ref($self->pos()) eq 'HTML::Element');
         $ret=$self->SUPER::end($tag, @_)
     }
-
-
+    
+    
     #  Done, return
     #
     debug("end ret $ret");
@@ -865,7 +886,7 @@ sub text {
         #  Yes. We have inline perl code, not text. Just add to perl attribute, which
         #  is treated specially when rendering
         #
-        debug('in __PERL__ tag, appending text to __PERL__ block');
+        debug('in <per> tag, appending text to <perl> block');
         my $html_perl_or=$self->_html_perl_or();
         $html_perl_or->{'perl'}.=$text;
         $html_perl_or->{'_line_no_tag_end'}=$self->{'_line_no'};

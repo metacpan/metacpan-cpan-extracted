@@ -1,0 +1,102 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use JSON;
+use Getopt::Long;
+use OpenAPI::Linter;
+
+my $spec;
+my $version;
+my $json_output     = 0;
+my $validate_schema = 0;
+my $help            = 0;
+
+GetOptions(
+    'json'      => \$json_output,
+    'version=s' => \$version,
+    'spec=s'    => \$spec,
+    'validate'  => \$validate_schema,
+    'help'      => \$help,
+) or print_usage(2);
+
+print_usage(0) if $help;
+
+if (not $spec) {
+    print STDERR "Error: --spec <specfile> is required.\n\n";
+    print_usage(2);
+}
+
+die "ERROR: Spec file not found: $spec\n" unless (-f $spec);
+
+my $linter = OpenAPI::Linter->new(
+    spec    => $spec,
+    version => $version,
+);
+
+my @issues;
+if ($validate_schema) {
+    print "Running schema validation for $spec...\n" unless $json_output;
+    @issues = $linter->validate_schema;
+} else {
+    @issues = $linter->find_issues;
+}
+
+my ($errors, $warns) = (0, 0);
+$errors++ for grep { $_->{level} eq 'ERROR' } @issues;
+$warns++  for grep { $_->{level} eq 'WARN'  } @issues;
+
+if ($json_output) {
+    print JSON->new->pretty->encode({
+        summary => { errors => $errors, warnings => $warns },
+        issues  => \@issues,
+    });
+} else {
+    if (@issues) {
+        for my $i (@issues) {
+            my $message = $i->{message};
+
+            # Apply formatting only to schema validation errors
+            if ($validate_schema) {
+                $message = $linter->format_schema_error($message);
+                print "$message\n";
+            }
+            else {
+                printf "[%s] %s\n", $i->{level}, $message;
+            }
+        }
+        printf "\nSummary: %d ERROR%s, %d WARN%s\n",
+            $errors, $errors == 1 ? '' : 's',
+            $warns,  $warns  == 1 ? '' : 's';
+        exit 1;
+    } else {
+        print "No issues found.\n";
+        exit 0;
+    }
+}
+
+#
+#
+# SUBROUTINE
+
+sub print_usage {
+    my ($exit_code) = @_;
+    print <<'USAGE';
+Usage:
+  openapi-linter --spec <specfile> [options]
+
+Options:
+  --spec <specfile>    Path to OpenAPI specification file (YAML or JSON)
+  --version <version>  Specify OpenAPI version (e.g., 3.0.3, 3.1.0)
+  --json               Output results in JSON format
+  --validate           Run schema validation instead of lint checks
+  --help               Show this help message and exit
+
+Examples:
+  openapi-linter --spec api.yaml
+  openapi-linter --spec api.yaml --validate
+  openapi-linter --spec api.yaml --json
+  openapi-linter --spec api.yaml --version 3.1.0
+USAGE
+    exit($exit_code // 0);
+}

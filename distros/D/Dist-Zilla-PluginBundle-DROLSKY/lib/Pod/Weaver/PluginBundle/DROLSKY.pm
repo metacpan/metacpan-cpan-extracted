@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean -also => ['_exp'];
 
-our $VERSION = '1.22';
+our $VERSION = '1.23';
 
 use Dist::Zilla::Plugin::PodWeaver;
 use List::Util      qw( first );
@@ -293,7 +293,7 @@ Pod::Weaver::PluginBundle::DROLSKY - A plugin bundle for pod woven by DROLSKY
 
 =head1 VERSION
 
-version 1.22
+version 1.23
 
 =head1 SYNOPSIS
 
@@ -483,7 +483,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 - 2022 by Dave Rolsky.
+This software is Copyright (c) 2013 - 2025 by Dave Rolsky.
 
 This is free software, licensed under:
 

@@ -43,6 +43,11 @@ use WebDyne::Util;
 $ENV{'WEBDYNE_TEST_FILE_PREFIX'} ||= '02';
 
 
+#  Override any system webdyne.conf.pl config
+#
+$ENV{'WEBDYNE_CONF'} ||= '.';
+
+
 #  Run
 #
 exit(${&main(\@ARGV) || die err()} || 0);    # || 0 stops warnings

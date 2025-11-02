@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Apache2 API Framework - ~/lib/Apache2/API/Request.pm
-## Version v0.3.1
-## Copyright(c) 2024 DEGUEST Pte. Ltd.
+## Version v0.4.0
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/05/30
-## Modified 2025/10/03
+## Modified 2025/11/02
 ## All rights reserved
 ## 
 ## 
@@ -17,12 +17,13 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'Apache2::API' );
     use parent qw( Module::Generic );
     use vars qw( $ERROR $VERSION $SERVER_VERSION );
     use utf8 ();
     use version;
     use Apache2::Access;
-    use Apache2::Const -compile => qw( :common :http );
+    use Apache2::Const -compile => qw( :common :methods :http );
     use Apache2::Connection ();
     use Apache2::Log ();
     use Apache2::Request;
@@ -54,13 +55,31 @@ BEGIN
     use Scalar::Util;
     use URI;
     use URI::Escape;
-    use Want;
-    our $VERSION = 'v0.3.1';
+    our $VERSION = 'v0.4.0';
     our( $SERVER_VERSION, $ERROR );
 };
 
 use strict;
 use warnings;
+
+my $methods_bit_to_name =
+{
+    Apache2::Const::M_GET()        => 'GET',
+    Apache2::Const::M_POST()       => 'POST',
+    Apache2::Const::M_PUT()        => 'PUT',
+    Apache2::Const::M_DELETE()     => 'DELETE',
+    Apache2::Const::M_OPTIONS()    => 'OPTIONS',
+    Apache2::Const::M_TRACE()      => 'TRACE',
+    Apache2::Const::M_CONNECT()    => 'CONNECT',
+    (Apache2::Const->can('M_PATCH')       ? (Apache2::Const::M_PATCH()       => 'PATCH')       : ()),
+    (Apache2::Const->can('M_PROPFIND')    ? (Apache2::Const::M_PROPFIND()    => 'PROPFIND')    : ()),
+    (Apache2::Const->can('M_PROPPATCH')   ? (Apache2::Const::M_PROPPATCH()   => 'PROPPATCH')   : ()),
+    (Apache2::Const->can('M_MKCOL')       ? (Apache2::Const::M_MKCOL()       => 'MKCOL')       : ()),
+    (Apache2::Const->can('M_COPY')        ? (Apache2::Const::M_COPY()        => 'COPY')        : ()),
+    (Apache2::Const->can('M_MOVE')        ? (Apache2::Const::M_MOVE()        => 'MOVE')        : ()),
+    (Apache2::Const->can('M_LOCK')        ? (Apache2::Const::M_LOCK()        => 'LOCK')        : ()),
+    (Apache2::Const->can('M_UNLOCK')      ? (Apache2::Const::M_UNLOCK()      => 'UNLOCK')      : ()),
+};
 
 sub init
 {
@@ -113,7 +132,7 @@ sub init
             $self->client_api_version( $accept_def->param( 'version' ) );
             $self->accept_charset( $accept_def->param( 'charset' ) );
         }
-    
+
         my $json = $self->json;
         my $payload = $self->data;
         # An error occurred while reading the payload, because even empty, data would return an empty string.
@@ -202,6 +221,22 @@ sub acceptables
 sub allowed { return( shift->_try( 'request', 'allowed', @_ ) ); }
 
 sub allow_methods { return( shift->_try( 'request', 'allow_methods', @_ ) ); }
+
+sub allow_methods_list
+{
+    my $self = shift( @_ );
+    my $r = $self->request;
+    my $mask = $r->allowed;
+    my $names =
+    [
+        map  { $methods_bit_to_name->{ $_ } }
+        grep { $mask & (1 << $_) }
+        keys( %$methods_bit_to_name )
+    ];
+    # Mirror Apache behavior: if GET is allowed, HEAD is implied.
+    push( @$names, 'HEAD' ) if( $mask & ( 1 << Apache2::Const::M_GET ) );
+    return( $names );
+}
 
 sub allow_options { return( shift->_try( 'request', 'allow_options', @_ ) ); }
 
@@ -381,12 +416,37 @@ sub cookies
 sub data
 {
     my $self = shift( @_ );
-    return( $self->{data} ) if( $self->{_data_processed} );
     my $opts = $self->_get_args_as_hash( @_ );
-    my $r = $self->request;
-    my $ctype = $self->type;
-    my $payload = '';
+    my $r    = $self->request;
+    # Mutator mode
+    if( $opts->{data} )
+    {
+        if( !defined( $opts->{data} ) ||
+            !CORE::length( $opts->{data} // '' ) )
+        {
+            warn( "Warning only: you are setting a zero-length payload data." ) if( $self->_is_warnings_enabled( 'Apache2::API' ) );
+        }
+        $self->pnotes( REQUEST_BODY => $opts->{data} );
+        # Optional: allow caller to mark as processed explicitly
+        if( $opts->{processed} )
+        {
+            $self->pnotes( REQUEST_BODY_PROCESSED => 1 );
+        }
+        return( $opts->{data} );
+    }
+
+    # Accessor mode
+    my $payload = $self->pnotes( 'REQUEST_BODY' );
+    return( $payload ) if( $self->pnotes( 'REQUEST_BODY_PROCESSED' ) );
+    my $ctype    = $self->type;
     my $max_size = 0;
+    # The request payload has been set or processed, so we re-use it.
+    if( defined( $payload ) )
+    {
+        # We do not set the 'REQUEST_BODY_PROCESSED' flag, because 1) we do not need to, and 2) it is an indicator if the request payload was processed at all. For example, one could force a different request payload by calling data() in mutator mode. It may be useful to know by checking this flag.
+        return( $payload );
+    }
+
     if( $opts->{max_size} )
     {
         $max_size = $opts->{max_size};
@@ -399,35 +459,72 @@ sub data
     {
         $max_size = $r->dir_config( 'PAYLOAD_MAX_SIZE' );
     }
-    
+
+    $payload   = '';
+    # Header Content-Length value
     my $nbytes = $self->length;
+    # With Content-Length: read exactly $nbytes bytes
     if( int( $nbytes // 0 ) > 0 )
     {
-        if( $max_size && $self->length > $max_size )
+        if( $max_size && $nbytes > $max_size )
         {
             return( $self->error({ code => Apache2::Const::HTTP_REQUEST_ENTITY_TOO_LARGE, message => "Total data submitted (" . $self->length . " bytes) is bigger than the limit you set in Apache configuration ($max_size)." }) );
         }
-        $r->read( $payload, $self->length );
+
+        # $r->read( $payload, $nbytes );
+        my $to_read = int( $nbytes );
+        my $read    = 0;
+        # try-catch
+        local $@;
+
+        while( $read < $to_read )
+        {
+            my $chunk = '';
+            my $want  = $to_read - $read;
+            # Cap chunk size
+            $want     = 65536 if( $want > 65536 );
+            my $n = eval{ $r->read( $chunk, $want ); };
+            # APR::Error
+            if( $@ )
+            {
+                return( $self->error( "Error trying to read $want bytes from the APR::Bucket: $@" ) );
+            }
+            # EOF/abort
+            last unless( $n );
+            $payload .= $chunk;
+            $read    += $n;
+        }
     }
+    # No Content-Length: stream until read() returns 0
     elsif( defined( $ctype ) && 
            lc( $ctype ) eq 'application/json' )
     {
-        if( $max_size )
+        my $total = 0;
+        while(1)
         {
-            while( $r->read( $payload, 1096, CORE::length( $payload ) ) )
+            # try-catch
+            local $@;
+            my $chunk = '';
+            my $n = eval{ $r->read( $chunk, 8192 ); };
+            # APR::Error
+            if( $@ )
             {
-                if( length( $payload ) > $max_size )
-                {
-                    return( $self->error({ code => Apache2::Const::HTTP_REQUEST_ENTITY_TOO_LARGE, message => "Total json payload submitted (" . $self->length . " bytes) is bigger than the limit you set in Apache configuration ($max_size)." }) );
-                }
+                return( $self->error( "Error trying to read 8192 bytes from the APR::Bucket: $@" ) );
+            }
+            last unless( $n );
+            $payload .= $chunk;
+            $total   += $n;
+
+            if( $max_size && $total > $max_size )
+            {
+                return( $self->error({
+                    code    => Apache2::Const::HTTP_REQUEST_ENTITY_TOO_LARGE,
+                    message => "Total payload submitted ($total bytes) exceeds configured limit ($max_size)."
+                }) );
             }
         }
-        else
-        {
-            1 while( $r->read( $payload, 1096, CORE::length( $payload ) ) );
-        }
     }
-    
+
     # try-catch
     local $@;
     eval
@@ -438,17 +535,23 @@ sub data
         {
             $payload = Encode::decode( $charset, $payload, Encode::FB_CROAK );
         }
-        else
+        # We only UTF-8 decode it if it is a pure text file.
+        # If no $ctype is defined, the default should be application/octet-stream
+        elsif( defined( $ctype ) && $ctype =~ m,^text/,i )
         {
             $payload = Encode::decode_utf8( $payload, Encode::FB_CROAK );
         }
     };
     if( $@ )
     {
-        return( $self->error({ code => Apache2::Const::HTTP_BAD_REQUEST, message => "Error while decoding payload received from http client: $@" }) );
+        return( $self->error({
+            code    => Apache2::Const::HTTP_BAD_REQUEST,
+            message => "Error while decoding payload received from http client: $@"
+        }) );
     }
-    $self->{data} = $payload;
-    $self->{_data_processed}++;
+    # Cache the request body so other handlers can access it too.
+    $self->pnotes( REQUEST_BODY => $payload );
+    $self->pnotes( REQUEST_BODY_PROCESSED => 1 );
     return( $payload );
 }
 
@@ -646,7 +749,7 @@ sub json
         sorted => 'canonical',
         sort => 'canonical',
     };
-    
+
     foreach my $opt ( keys( %$opts ) )
     {
         my $ref;
@@ -673,7 +776,7 @@ sub languages
     return( $self->new_array( \@langs ) );
 }
 
-sub length { return( shift->_try( 'request', 'bytes_sent' ) ); }
+sub length { return( shift->headers->{'Content-Length'} ); }
 
 sub local_addr { return( shift->_try( 'connection', 'local_addr' ) ); }
 
@@ -691,6 +794,40 @@ sub log_error { return( shift->_try( 'request', 'log_error', @_ ) ); }
 sub max_size { return( shift->_set_get_number( 'max_size', @_ ) ); }
 
 sub method { return( shift->_try( 'request', 'method', @_ ) ); }
+
+# This takes a method name, notwithstanding its case, and returns the corresponding Apache2::Const value.
+sub method_bit
+{
+    my $self = shift( @_ );
+    my $meth = shift( @_ ) ||
+        return( $self->error( "No HTTP method name was provided." ) );
+    $meth = uc( $meth );
+    my @keys = keys( %$methods_bit_to_name );
+    my $name2bit = {};
+    @$name2bit{ @$methods_bit_to_name{ @keys } } = @keys;
+    unless( exists( $name2bit->{ $meth } ) )
+    {
+        return( $self->error( "The HTTP method provided (${meth}) is not supported." ) );
+    }
+    return( $name2bit->{ $meth } );
+}
+
+# Provided with an Apache constant representing a method bitwise value, and this returns its name
+sub method_name
+{
+    my $self = shift( @_ );
+    my $bit  = shift( @_ );
+    unless( $self->_is_integer( $bit ) )
+    {
+        return( $self->error( "Value provided (", ( $bit // 'undef' ), ") is not a bitwise value." ) );
+    }
+    $bit = 0 + $bit;
+    if( exists( $methods_bit_to_name->{ $bit } ) )
+    {
+        return( $methods_bit_to_name->{ $bit } );
+    }
+    return( $self->error( "No method name is associated with bit value ${bit}" ) );
+}
 
 sub method_number { return( shift->_try( 'request', 'method_number', @_ ) ); }
 
@@ -1093,7 +1230,7 @@ sub server_version
         {
         }
     }
-    
+
     # NOTE: to test our alternative approach
     if( !$vers && ( my $apxs = File::Which::which( 'apxs' ) ) )
     {
@@ -1306,7 +1443,7 @@ sub _headers
             message => "Could not get an APR::Table object from Apache2::RequestRec->${type}",
             want => [qw( hash )],
         }) );
-    
+
     if( !$self->_is_a( $apr => 'APR::Table' ) )
     {
         return( $self->error({
@@ -1314,7 +1451,7 @@ sub _headers
             want => [qw( hash )],
         }) );
     }
-    
+
     if( scalar( @_ ) && !( @_ % 2 ) )
     {
         for( my $i = 0; $i < scalar( @_ ); $i += 2 )
@@ -1425,75 +1562,75 @@ Apache2::API::Request - Apache2 Incoming Request Access and Manipulation
 
     # GET, POST, PUT, OPTIONS, HEAD, etc
     my $methods = $req->allowed;
-    
+
     # get an APR::Request::Apache2 object
     my $apr = $req->apr;
-    
+
     # query string as an hash reference
     my $hash_ref = $req->args; # also an APR::Request::Param::Table object
-    
+
     my $status = $req->args_status;
-    
+
     # HTTP query
     my $string = $req->as_string;
-    
+
     my $auth = $req->auth;
     my $auth = $req->authorization;
     my $auth_type = $req->auth_type;
-    
+
     $req->auto_header(1);
-    
+
     # returns an APR::Request::Param::Table object similar to APR::Table
     my $body = $req->body;
 
     my $status = $req->body_status;
-    
+
     my $limit = $req->brigade_limit;
-    
+
     my $charset = $req->charset;
-    
+
     $req->child_terminate;
-    
+
     my $api_version = $req->client_api_version;
-    
+
     # close client connection
     $req->close;
-    
+
     my $status_code = $req->code;
-    
+
     # Apache2::Connection
     my $conn = $req->connection;
     my $id = $req->connection_id;
-    
+
     # content of the request filename
     my $content = $req->content;
-    
+
     my $encoding = $req->content_encoding;
-    
+
     my $langs_array_ref = $req->content_languages;
-    
+
     my $len = $req->content_length;
-    
+
     # text/plain
     my $ct = $req->content_type;
-    
+
     # Get a Cookie object
     my $cookie = $req->cookie( $name );
     # Cookie::Jar object
     my $jar = $req->cookies;
-    
+
     # get data string sent by client
     my $data = $req->data;
-    
+
     my $formatter = $req->datetime;
     my $decoded = $req->decode( $string );
-    
+
     my $do_not_track = $req->dnt;
-    
+
     my $encoded = $req->encode( $string );
-    
+
     $req->discard_request_body(1);
-    
+
     my $document_root = $req->document_root;
     my $url = $req->document_uri;
     # APR::Table object
@@ -1506,14 +1643,14 @@ Apache2::API::Request - Apache2 Incoming Request Access and Manipulation
     # e.g.: CGI/1.1
     my $gateway = $req->gateway_interface;
     my $code_ref = $req->get_handlers( $name );
-    
+
     # 404 Not Found
     my $str = $req->get_status_line(404);
     my $r = $req->global_request;
     my $is_head = $req->header_only;
     # same
     my $is_head = $req->is_header_only;
-    
+
     my $content_type = $req->headers( 'Content-Type' );
     # or (since it is case insensitive)
     my $content_type = $req->headers( 'content-type' );
@@ -1524,33 +1661,33 @@ Apache2::API::Request - Apache2 Incoming Request Access and Manipulation
     $req->headers->{'Content-Type'} = 'text/plain';
     # APR::Table object
     my $headers = $req->headers;
-    
+
     my $hash_ref = $req->headers_as_hashref;
     my $json = $req->headers_as_json;
     my $headers = $req->headers_in;
     my $out = $req->headers_out;
-    
+
     my $hostname = $req->hostname;
     my $uri_host = $req->http_host;
-    
+
     my $conn_id = $req->id;
-    
+
     my $if_mod = $req->if_modified_since;
     my $if_no_match = $req->if_none_match;
-    
+
     my $filters = $req->input_filters;
-    
+
     my $bool = $req->is_aborted;
 
     my $enabled = $req->is_perl_option_enabled;
     # running under https?
     my $secure = $req->is_secure;
-    
+
     # JSON object
     my $json = $req->json;
     my $keepalive = $req->keepalive;
     my $keepalives = $req->keepalives;
-    
+
     my $ok_languages = $req->languages;
     my $nbytes = $req->length;
     # APR::SockAddr object
@@ -1559,10 +1696,10 @@ Apache2::API::Request - Apache2 Incoming Request Access and Manipulation
     my $str = $req->local_ip;
     my $loc = $req->location;
     $req->log_error( "Oh no!" );
-    
+
     # 200kb
     $req->max_size(204800);
-    
+
     my $http_method = $req->method;
     my $meth_num = $req->method_number;
     # mod_perl/2.0.11
@@ -1571,17 +1708,17 @@ Apache2::API::Request - Apache2 Incoming Request Access and Manipulation
     my $seconds = $req->mtime;
     my $req2 = $req->next;
     $req->no_cache(1);
-    
+
     # APR::Table object
     my $notes = $req->notes;
     my $notes = $req->pnotes;
-    
+
     my $filters = $req->output_filters;
     my $val = $req->param( $name );
     my $hash_ref = $req->params;
-    
+
     my $dt = $req->parse_date( $http_date_string );
-    
+
     my $path = $req->path;
     my $path_info = $req->path_info;
     # for JSON payloads
@@ -1589,19 +1726,19 @@ Apache2::API::Request - Apache2 Incoming Request Access and Manipulation
     my $val = $req->per_dir_config( $my_config_name );
     # APR::Pool object
     my $pool = $req->pool;
-    
+
     my $best_lang = $req->preferred_language( $lang_array_ref );
-    
+
     my $req0 = $req->prev;
     my $proto = $req->protocol;
     $req->proxyreq( Apache2::Const::PROXYREQ_PROXY );
     $req->push_handlers( $name => $code_ref );
-    
+
     # get hash reference from the query string using Apache2::API::Query instead of APR::Body->args
     # To use APR::Body->args, call args() instead
     my $hash_ref = $req->query;
     my $string = $req->query_string;
-    
+
     my $nbytes = $req->read( $buff, 1024 );
     my $notes = $req->redirect_error_notes;
     my $qs = $req->redirect_query_string;
@@ -1614,9 +1751,9 @@ Apache2::API::Request - Apache2 Incoming Request Access and Manipulation
     my $host = $req->remote_host;
     my $string = $req->remote_ip;
     my $port = $req->remote_port;
-    
+
     $req->reply( Apache2::Const::FORBIDDEN => { message => "Get away" } );
-    
+
     # Apache2::RequestRec
     my $r = $req->request;
     my $scheme = $req->request_scheme;
@@ -1644,22 +1781,22 @@ Apache2::API::Request - Apache2 Incoming Request Access and Manipulation
     my $socket = $req->socket;
     my $status = $req->status;
     my $line = $req->status_line;
-    
+
     my $dt = $req->str2datetime( $http_date_string );
     my $rc = $req->subnet_of( $ip, $mask );
     # APR::Table object
     my $env = subprocess_env;
-    
+
     my $dir = $req->temp_dir;
-    
+
     my $r = $req->the_request;
     my $dt = $req->time2datetime( $time );
     say $req->time2str( $seconds );
-    
+
     # text/plain
     my $type = $req->type;
     my $raw = $req->unparsed_uri;
-    
+
     # Apache2::API::Request::Params
     my $uploads = $req->uploads;
     my $uri = $req->uri;
@@ -1670,7 +1807,7 @@ Apache2::API::Request - Apache2 Incoming Request Access and Manipulation
 
 =head1 VERSION
 
-    v0.3.1
+    v0.4.0
 
 =head1 DESCRIPTION
 
@@ -1826,6 +1963,21 @@ For example, to allow only C<GET> and C<POST>, notwithstanding what was set prev
     $req->allow_methods( 1, qw( GET POST ) );
 
 It does not return anything. This is used only to set the allowed method. To retrieve them, see L</allowed>
+
+=head2 allow_methods_list
+
+    my $names = $r->allow_methods_list;
+    $r->print( "Allowed methods: " . join( ', ', @$methods ) . "\n" ); # GET, POST
+
+Returns an array reference containing the list of HTTP method names currently allowed for the request, as reported by L<Apache2::RequestRec/allowed>
+
+The list is made up of uppercase method names such as C<GET>, C<POST>, C<OPTIONS>. Only methods whose corresponding bit is set in the request’s L<allowed mask|Apache2::RequestRec/allowed> are included.
+
+In addition, this method mirrors Apache’s internal behaviour: if C<GET> is allowed, then C<HEAD> is automatically added to the list, even if it was not explicitly marked as allowed.
+
+This can be used, for instance, to build an C<Allow:> response header for an C<OPTIONS> request or to emit clearer diagnostics.
+
+On success, returns an array reference of strings. On error, it sets an L<error|Module::Generic/error> and returns C<undef> in scalar context and an empty list in list context.
 
 =head2 allow_options
 
@@ -2214,9 +2366,17 @@ Returns a L<Cookie::Jar> object acting as a jar with various methods to access, 
 
 =head2 data
 
-This method reads the data sent by the client. It takes an optional hash or hash reference of the following options:
+This method reads the data sent by the client. It can be used as an accessor, and it will return a cached data, if any, or read the data from L<APR::Bucket>, or it can be used as a mutator to artificially set a payload.
+
+Internally it uses L<Apache2::RequestUtil/pnotes> to cache the processed request body and stores it in C<REQUEST_BODY>, and set the shared property C<REQUEST_BODY_PROCESSED> to C<1>. Thus, the processed raw request body is always for other handlers who call C<data>.
+
+It takes an optional hash or hash reference of the following options:
 
 =over 4
+
+=item * C<data>
+
+When provided, this will set the request body to the value provided.
 
 =item * C<max_size>
 
@@ -2777,6 +2937,43 @@ To figure out whether you are inside a main request or a sub-request/internal re
 Get or sets the current request method (e.g. C<GET>, C<HEAD>, C<POST>, etc.), by calling L<Apache2::RequestRec/method>
 
 if a new value was passed the previous value is returned.
+
+=head2 method_bit
+
+    my $bit = $req->method_bit( $name );
+
+    if( $req->allowed & ( 1 << $req->method_bit('POST') ) )
+    {
+        $req->print( "POST is allowed\n") ;
+    }
+
+Given a string C<$name> representing an HTTP method such as C<GET>, C<POST>, C<DELETE>, this method returns the corresponding C<Apache2::Const::M_*> constant value (an integer suitable for bitwise comparison with L</allowed>
+
+The comparison is case-insensitive: the provided name is converted to uppercase internally.
+
+On success, returns an integer as set in L<Apache2::Const/methods>. On error, such as when no name was provided or the given name does not match any known method, this sets an L<Module::Generic/error>, and returns C<undef> in scalar context, and an empty list in list context.
+
+=head2 method_name
+
+    my $name = $req->method_name( $bit );
+
+Given an integer C<$bit> corresponding to one of the C<Apache2::Const::M_*> constants, this method returns the canonical uppercase HTTP method name, such as C<GET>, C<POST>.
+
+This is essentially the reverse mapping of L</method_bit>. It is useful
+when you already have a numeric constant (for example when iterating over
+keys in C<$r->allowed>).
+
+On success, returns a string. If the provided argument is not an integer,
+or if no method name is defined for the given bit value, the method
+returns false and calls L</error>.
+
+Example:
+
+    for my $bit ( keys %$methods_bit_to_name ) {
+        next unless $r->allowed & (1 << $bit);
+        my $name = $r->method_name($bit);
+        $r->print("Allowed: $name\n");
+    }
 
 =head2 method_number
 

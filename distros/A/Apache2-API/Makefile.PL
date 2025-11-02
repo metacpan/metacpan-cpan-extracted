@@ -54,13 +54,12 @@ my %WriteMakefileArgs = (
 		'HTTP::AcceptLanguage'	=> '0.02',
         'JSON'                  => '4.03',
         'JSON::XS'              => '4.03',
-        'Module::Generic'       => 'v0.35.3',
+        'Module::Generic'       => 'v1.1.3',
 		'Regexp::Common'		=> 0,
         'Scalar::Util'          => '1.50',
 		'URI'					=> 0,
 		'URI::Escape'			=> '3.31',
 		'URI::Query'			=> '0.16',
-        'Want'                  => '0.29',
     },
     TEST_REQUIRES =>
     {

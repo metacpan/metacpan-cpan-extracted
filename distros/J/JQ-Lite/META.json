@@ -34,11 +34,13 @@
       },
       "runtime" : {
          "requires" : {
+            "Encode" : "0",
             "FindBin" : "0",
             "Getopt::Long" : "0",
             "IO::File" : "0",
             "JSON::PP" : "0",
             "List::Util" : "0",
+            "MIME::Base64" : "0",
             "Scalar::Util" : "0",
             "Term::ANSIColor" : "0",
             "Test::More" : "0",
@@ -58,6 +60,6 @@
          "web" : "https://github.com/kawamurashingo/JQ-Lite"
       }
    },
-   "version" : "1.34",
+   "version" : "1.37",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

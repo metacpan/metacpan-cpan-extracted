@@ -4,17 +4,17 @@ use ExtUtils::MakeMaker;
 WriteMakefile
 (
   'NAME' => 'Package::Subroutine',
-  'EXE_FILES' => [],
-  'PREREQ_PM' => {
-                   'ExtUtils::Manifest' => 0,
-                   'IO::File' => 0,
-                   'Perl6::Junction' => '1.30000',
-                   'Test::More' => 0,
-                   'Test::Warnings' => 0,
-                   'Class::ISA' => '0'
-                 },
-  'INSTALLDIRS' => 'site',
+  'PL_FILES' => {},
   'VERSION_FROM' => './lib/Package/Subroutine.pm',
-  'PL_FILES' => {}
+  'PREREQ_PM' => {
+                   'Class::ISA' => '0',
+                   'ExtUtils::Manifest' => 0,
+                   'Perl6::Junction' => '1.30000',
+                   'Test2::Suite' => 0,
+                   'aliased' => 0,
+                   'IO::File' => 0
+                 },
+  'EXE_FILES' => [],
+  'INSTALLDIRS' => 'site'
 )
 ;

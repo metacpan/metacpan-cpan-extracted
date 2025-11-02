@@ -25,6 +25,9 @@ use Data::Dumper;
 use POSIX;
 use Data::Dump qw(dump);
 use feature 'say';
+use Switch::Back;
+use feature 'smartmatch';
+no warnings 'experimental::smartmatch';
 
 #use Sub::Signatures;
 #no warnings qw(Sub::Signatures);
@@ -62,7 +65,7 @@ $target %dowhat readsweeps $max_processes $computype $calcprocedure %specularrat
 toil genstar solvestar integratebox filterbox__ clean %dowhat @weighttransforms
 );
 
-$VERSION = '0.741';
+$VERSION = '0.745';
 $ABSTRACT = 'Sim::OPT is an optimization and parametric exploration program oriented toward problem decomposition. It can be used with simulation programs receiving text files as input and emitting text files as output. It allows a free mix of sequential and parallel block coordinate searches, as well of searches more complely structured in graphs.';
 
 #################################################################################
@@ -92,7 +95,7 @@ sub cleanbag
 		my %d = %{ $inst_r };
 		my $is = $d{is};
 
-		unless ( grep { $_ eq $is } @bagnames )
+		unless ($is ~~ @bagnames)
 		{
 			push( @bagnames, $is );
 			push( @baginst, $inst_r );
@@ -123,7 +126,7 @@ sub washhash
 	my ( @bagnames, %newhash );
 	foreach my $key ( keys %hash )
 	{
-		unless ( grep { $_ eq $key } @bagnames )
+		unless ($key ~~ @bagnames)
 		{
 			push( @bagnames, $key );
 			$newhash{$key} = $hash{$key};
@@ -593,7 +596,7 @@ sub fromsweep_toopt
 			foreach (@varns)
 			{
 				my @parlist;
-				unless (grep { $_ eq $_ } @intersection)
+				unless ($_ ~~ @intersection)
 				{
 					push (@nonbelonging, $_);
 				}
@@ -815,7 +818,7 @@ sub extractcase #  UPDATES THE FILE NAME ON THE BASIS OF A %carrier
 
 		if ( ($1) and ($2) )
 		{
-			if ( grep { $_ eq $1 } @blockelts )
+			if ($1 ~~ @blockelts)
 			{
 				$provhash{$1} = $2;
 			}
@@ -829,7 +832,7 @@ sub extractcase #  UPDATES THE FILE NAME ON THE BASIS OF A %carrier
 	{
 		if ( scalar( @blockelts > 0 ) )
 		{
-			if ( grep { $_ eq $key } @blockelts )
+			if ($key ~~ @blockelts)
 			{
 				$tempc{$key} = $provhash{$key};
 			}
@@ -1034,7 +1037,7 @@ sub filterbox
 	foreach my $case ( @arr )
 	{
 		my $elt = $case->[0];
-		if ( not ( grep { $_ eq $elt } @box ) )
+		if ( not ($elt ~~ @box) )
 		{
 			my @bucket;
 			foreach my $caseagain ( @arr )
@@ -2005,7 +2008,7 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 				my @divs = split( "_", $series );
 				foreach my $bit ( @divs )
 				{
-					if ( grep { $_ eq $bit } @sack )
+					if ($bit ~~ @sack)
 					{
 						$count++;
 					}
@@ -2550,7 +2553,7 @@ sub exe
 			Sim::OPT::Descend::descend(	{ instances => \@lastinstance, dowhat => \%dowhat, dirfiles => \%dirfiles, vehicles => \%vehicles, inst => \%inst, precedents => \@precedents, precious => "$precious" } );
 			say $tee "#Moving on " . ($countcase + 1) . ", block " . ($countblock + 1) . ".";
 
-			if ( not ( grep { $_ eq $is } @sack ) )
+			if ( not ($is ~~ @sack) )
 			{
 				push ( @sack, $is );
 				push ( @collect, @lastinstance );
@@ -2738,7 +2741,7 @@ sub genstar
 			my %hs = %{ $el };
 			foreach my $key ( sort( keys( %hs ) ) )
 			{
-				if ( not ( grep { $_ eq $key } @blockelts ) )
+				if ( not ($key ~~ @blockelts) )
 				{
 					$hs{$key} = $carrier{$key};
 				}
@@ -3136,35 +3139,21 @@ Sim::OPT.
 
 =head1 DESCRIPTION
 
-OPT is an optimization and parametric exploration program favouring problem decomposition. It can be used with simulation programs receiving text files as input and emitting text files as output. Sim::OPT's optimization modules (Sim::OPT, Sim::OPT::Descent) pursue optimization through block search, allowing blocks (subspaces) to overlap, and allowing a free intermix of sequential searches (inexact Gauss-Seidel method) and parallell ones (inexact Jacobi method). The Sim::OPT::Takechange module can seek for the least explored search paths when exploring new search spaces sequentially (following rules presented in: L<Gian Luca Brunetti (2016). “Cyclic overlapping block coordinate search for optimizing building design”. Automation in Construction, 71(2), pp. 242-261, DOI: 10.1016/j.autcon.2016.08.014|http://dx.doi.org/10.1016/j.autcon.2016.08.014>. Sim::OPT::Morph, the morphing module, can manipulate parameters of simulation models.
-Other modules under the Sim::OPT namespace are Sim::OPT::Parcoord3d, a module which can convert 2D parallel coordinates plots into Autolisp instructions for obtaining 3D plots as Autocad drawings; and Sim::OPT::Interlinear, which can build metamodels from sparse multidimensional data, and the module Sim::OPT::Modish, capable of altering the shading values calculated with the L<ESP-r buildjng performance simulation platform|http://www.esru.strath.ac.uk/Programs/ESP-r.htm>.
-The Sim::OPT's morphing and reporting modules contain several additional functions specifically targeting the ESP-r building performance simulation platform.
+Sim::OPT is an optimization and parametric exploration environment conceived to work alongside any simulation program that uses text files as input and output. It has been written to support systematic model exploration while preserving the natural decomposition of complex problems into simpler, partially overlapping subspaces. Within this framework, optimization proceeds through block search: the parameter space is partitioned into blocks that may overlap, and each block can be explored sequentially, in parallel, or in any combination of the two. Sequential searches correspond to an inexact Gauss–Seidel method, while parallel ones correspond to an inexact Jacobi scheme, and the user is free to intermix them according to the problem structure and the computational resources available.
 
-To install Sim::OPT, the command <cpanm Sim::OPT> has to be issued as a superuser. Sim::OPT can then be loaded through the command <use Sim::OPT> in a Perl repl. But to ease the launch, the batch file "opt" (which can be found packed in the "optw.tar.gz" file in "examples" folder in this distribution) can be copied in a work directory and the command <opt> may be issued. That command will launch Sim::OPT with the settings specified in the configuration file. When launched, OPT will ask the path to that file, which has to contain a suitable description of the operations to be accomplished and point to an existing simulation model.
+The core modules, Sim::OPT and Sim::OPT::Descent, carry out these block searches, handling the interaction among subspaces and coordinating the communication with external simulation engines. The companion module Sim::OPT::Takechange extends the search capability by detecting the least explored paths in the parameter space and directing the search toward them. Its logic follows the principles illustrated in my 2016 paper “Cyclic overlapping block coordinate search for optimizing building design” (Automation in Construction, 71(2), 242–261).
 
-The "$mypath" variable in the configuration file must be set to the work directory where the base model reside.
+A separate component, Sim::OPT::Morph, is responsible for morphing simulation models, that is, for manipulating text-based model descriptions so that new parameter combinations can be automatically generated. Other modules expand Sim::OPT’s reach in more specialized directions: Sim::OPT::Parcoord3d transforms two-dimensional parallel-coordinate plots into AutoLISP instructions that produce three-dimensional plots inside AutoCAD; Sim::OPT::Interlinear constructs metamodels from sparse multidimensional data; and Sim::OPT::Modish can modify the solar-shading values computed by the ESP-r building-performance simulation platform. Both the morphing and reporting modules include additional functions designed specifically for ESP-r, making Sim::OPT an especially effective companion to that system.
 
-Besides an OPT configuration file, separate configuration files for propagation of constraints may be created. Those files can give the morphing operations greater flexibility. Propagation of constraints can regard the geometry of a model, solar shadings, mass/flow network, controls, and generic text files descripting a simulation model.
+Installation follows the standard Perl practice: issuing cpanm Sim::OPT as a superuser installs the distribution, which can then be loaded with use Sim::OPT;. For convenience, a small batch launcher named opt is provided in the package’s examples directory; copying it into a working folder and executing opt will start the program, which then requests the path to a configuration file describing the optimization task and pointing to the base simulation model. The configuration file specifies, among other variables, the working directory, the structure of the block searches, and the number of iterations per parameter. Separate configuration files may also be created to govern the propagation of constraints, allowing the morphing operations to act coherently on geometry, shading, mass-flow networks, controls, or any other text-based representation of a model.
 
-The simulation model folders and the result files that will be created in a parametric search will assigned a unique name base on a sequence, but within the program each instance will be assigned a name consituted by numbers describing the position of the instance in the multidimensional matrix (tensor). For example, within the program, the instance produced in the first iteration for a root model named "model" in a search constituted by 3 morphing phases and 5 iteration steps each would be named "model_1-1_2-1_3-1"; and the last one, "model_1-5_2-5_3-5"; while the file may be named "model_1__" and "model_128__". After each program's run, the correspondence between the file names and the instance names is recorded in a file ending with "_cryptolinks.pl"; and there is also an option to keep the file names unencrypted (which can be done if they are not too long).
+When a parametric search is executed, Sim::OPT automatically assigns unique names to all generated model folders and result files, keeping an internal correspondence table that links the file names to the logical instance identifiers. These identifiers encode the position of each instance within the multidimensional search matrix, so that the optimization history can be reconstructed or reused later.
 
-The structure of the block searches in the configuration file is described through the variable "@sweeps". Each case is listed inside square brackets; and each search subspace (block) in each case is listed inside square brakets. For example: a sequence constituted by two sequential full-factorial force searches, one regarding parameters 1, 2, 3 and the other regarding parameters 1, 4, 5, 7, would be described with: @sweeps = ( [ [ 1, 2, 3 ] ] , [ [ 1, 4, 5, 7 ] ] ) . And a sequential block search with the first subspace regarding parameters 1, 2, 3 and the second regarding parameters 3, 4, 5, 6 would be described with: @sweeps = ( [ [ 1, 2, 3 ] , [ 3, 4, 5, 6 ] ] ).
+The structure of each block search is defined by the @sweeps variable in the configuration file. Each case in @sweeps corresponds to a sequence of subspaces, and each subspace lists the parameters included in that block. For instance, a two-stage sequential search first acting on parameters 1, 2, 3 and then on 3, 4, 5, 6 would be written as @sweeps = ( [ [1,2,3], [3,4,5,6] ] );. Other variables such as @varnumbers and @miditers specify, respectively, how many values each parameter should take and which iteration represents the base case.
 
-The number of iterations to be taken into account for each parameter for each case is specified in the "@varnumbers" variable. To specifiy that the parameters of the last example are to be tried for three values (iterations) each, @varnumbers has to be set to ( { 1 => 3, 2 => 3, 3 => 3, 4 => 3, 5 => 3, 6 => 3 } ).
+Sim::OPT can operate either by launching new simulations or by analyzing existing result sets. It can randomize the order of the search and the initial parameter levels, and by default it behaves sequentially. However, it can also perform different types of searches within each block: star searches, factorial designs, face-centered composite designs, random or Latin hypercube samplings, and even nested cumulative searches that aggregate results across multiple stages. When operating on metamodels, Sim::OPT can perform variance-based preliminary sensitivity analyses to identify the most influential parameters before committing to a full simulation campaign.
 
-The instance number that has to trated as the basic instance, corresponding to the root case, is specified by the variable "@miditers". "@miditers" for the last example may be for instance set to ( { 1 => 2, 2 => 2, 3 => 2, 4 => 2, 5 => 2, 6 => 2 } ).
-
-OPT can work on a given set of pre-simulated results without launching new simulations, and it can randomize both the sequence of the  search and the initialization level of the parameters (see the included examples).
-
-By default the behaviour of the program is sequential.
-
-OPT can perform star searches (Jacoby method of course, but also Gauss-Seidel) within blocks in place of multilevel full-factorial searches. To ask for that in a configuration file, the first number in a block has to be preceded by a ">" sign, which in its turn has to be preceded by a number specifying how many star points there have to be in the block. A block, in that case, should be declared with something like this: ( "2>1", 2, 3). When operating with pre-simulated dataseries or metamodels, OPT can also perform: factorial searches (to ask for that, the first number in that block has to be preceded by a "<" sign); face-centered composite design searches of the DOE type (in that case, the first number in the block has to be preceded by a "£"); random searches (the first number has to be preceded by a "|" or by a "°"); latin hypercube searches (the first number has to be preceded by a "§"). The simbols "ç" and "é" preceding the first number make possible to cumulate the search results, possibly in a nested manner. "ç" opens the first block and "é" opens the last block. Following that instruction, at the end of the execution of the last block, the results of the previous blocks are cumulated in the evaluation. The number preceding the "é", when present, tells how many top-performing metamodel results have to be refreshed with real samples (simulations).
-
-For specifying in a Sim::OPT configuration file that a certain block has to be searched by the means of a metamodel derived from star searches or other "positions" instead of a multilevel full-factorial search, it is necessary to assign the value "yes" to the variable $dowhat{metamodel}.
-
-OPT can perform variance-based preliminary sensitivity analyses on the basis of metamodels.
-
-OPT works under Linux.
+Although designed with the building-performance domain in mind, Sim::OPT is entirely general. It simply reads and writes text files, orchestrates the generation of new model variants, and coordinates the evaluation of results, thus serving as a flexible driver for any external simulator. The program runs under Linux and can be adapted to a wide range of optimization and design-space-exploration tasks where the model to be optimized is a text-based computational tool.
 
 =head2 EXPORT
 

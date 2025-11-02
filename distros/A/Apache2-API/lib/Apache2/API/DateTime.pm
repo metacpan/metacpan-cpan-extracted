@@ -17,6 +17,7 @@ BEGIN
 {
 	use strict;
     use warnings;
+    warnings::register_categories( 'Apache2::API' );
 	use parent qw( Module::Generic );
 	use vars qw( $VERSION );
 	use APR::Date;

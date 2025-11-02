@@ -26,6 +26,7 @@ t/array_constructor.t
 t/arrays.t
 t/assignment.t
 t/avg_by.t
+t/base64_format.t
 t/basic.t
 t/case_transform.t
 t/ceil_floor.t
@@ -39,6 +40,7 @@ t/contains.t
 t/contains_function.t
 t/count.t
 t/csv_format.t
+t/decode_utf8_input.t
 t/default.t
 t/del.t
 t/delpaths.t
@@ -119,6 +121,7 @@ t/trimstr.t
 t/tsv_format.t
 t/type.t
 t/unique_by.t
+t/uri_format.t
 t/values.t
 t/walk.t
 t/yaml_cli.t

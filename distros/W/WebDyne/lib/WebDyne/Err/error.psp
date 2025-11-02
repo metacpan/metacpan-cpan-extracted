@@ -310,6 +310,9 @@ use Data::Dumper;
 $Data::Dumper::Indent=1;
 $Data::Dumper::Sortkeys=1;
 
+#  Commented out when not actively debugging (as are debug() statements)
+#  
+#use WebDyne::Util qw(debug); # Commented out when not actually insertu
 
 sub err_display {
 
@@ -333,16 +336,19 @@ sub err_display {
     my $errstr=$param_hr->{'errstr'};
     my @errstack=@{$param_hr->{'errstack_ar'}};
     my $errtrace_ar=pop @errstack;
-    @err_internal{qw(errstr errstack_ errtrace_ar)}=(
+    @err_internal{qw(errstr errstack errtrace_ar)}=(
         $errstr,
         \@errstack,
         $errtrace_ar
     );
 
 
-    #  Get data block from paramaters and load line numbers and other params
+    #  Get data block from paramaters and load line numbers and other params. Throw first one away
+    #  because it's us being compiled. If we have an error it wil revert back to text handler
     #
-    my $data_ar=pop @{$param_hr->{'data_ar'}};
+    pop @{$param_hr->{'data_ar_err'}};
+    my $data_ar=pop @{$param_hr->{'data_ar_err'}};
+
     my ($html_line_no_tag_start, $html_line_no_tag_end)=$self->data_ar_html_line_no($data_ar) if $data_ar;
     my $inline=$data_ar->[$WEBDYNE_NODE_ATTR_IX] && $data_ar->[$WEBDYNE_NODE_ATTR_IX]->{'inline'};
     @err_internal{qw(html_line_no_tag_start html_line_no_tag_end data_ar)}=(
@@ -356,7 +362,7 @@ sub err_display {
     #
     my $eval_text_sr=$param_hr->{'err_eval_perl_sr'};
     $err_internal{'eval_text_sr'}=$eval_text_sr;
-    
+    #debug('err_internal: %s', Dumper(\%err_internal));
 
 
     #  Source file name and tag start/finish line numbers for this error
@@ -369,7 +375,6 @@ sub err_display {
         $srce_fn_display ||= '/';
     }
     $err_internal{'srce_fn'}=$srce_fn;
-    
 
 
     #  Display error string
@@ -534,13 +539,13 @@ sub err_display {
 
     #  Now any eval backtrace ?
     #
-    if ($WEBDYNE_ERROR_EVAL_CONTEXT_SHOW && $eval_text_sr) {
+    if ($WEBDYNE_ERROR_EVAL_CONTEXT_SHOW && $eval_text_sr && (my $err_eval_line=$param_hr->{'err_eval_line'})) {
 
 
         #  Get the eval line
         #        
-        my $err_eval_line=$param_hr->{'err_eval_line'};
-
+        #my $err_eval_line=$param_hr->{'err_eval_line'};
+        #debug("err_eval_line: $err_eval_line, srce_fn: $srce_fn");
 
         #  Pretty printing
         #
@@ -622,7 +627,7 @@ sub err_display {
         #  Update - take from WebDyne module vars, don't trust hasn't changed from Constants file
         #
         my %constant;
-        while (my ($k, $cv) = each %WebDyne::Constant) {
+        while (my ($k, $cv) = each %WebDyne::Constant::Constant) {
             my $wv=${"WebDyne::${k}"};
             $constant{$k}=($cv eq $wv) ? $wv : "$wv [$cv]";
         }

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Schedule::Activity::Attribute;
 
-our $VERSION='0.1.8';
+our $VERSION='0.1.9';
 
 sub new {
 	my ($ref,%opt)=@_;
@@ -52,6 +52,12 @@ sub report {
 	my %res;
 	while(my ($k,$v)=each %{$$self{attr}}) { %{$res{$k}}=$v->report() }
 	return %res;
+}
+
+sub reset {
+	my ($self)=@_;
+	foreach my $attr (values %{$$self{attr}}) { $attr->reset() }
+	return $self;
 }
 
 sub push {

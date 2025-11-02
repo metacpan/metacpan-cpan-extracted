@@ -18,8 +18,8 @@
          "requires" : {
             "ExtUtils::Manifest" : "0",
             "IO::File" : "0",
-            "Test::More" : "0",
-            "Test::Warnings" : "0"
+            "Test2::Suite" : "0",
+            "aliased" : "0"
          }
       },
       "configure" : {
@@ -38,7 +38,15 @@
    "provides" : {
       "Package::Subroutine" : {
          "file" : "lib/Package/Subroutine.pm",
-         "version" : "v0.22.5"
+         "version" : "v0.23.1"
+      },
+      "Package::Subroutine::Namespace" : {
+         "file" : "lib/Package/Subroutine/Namespace.pm",
+         "version" : "0.10"
+      },
+      "Package::Subroutine::Sugar" : {
+         "file" : "lib/Package/Subroutine/Sugar.pm",
+         "version" : "v0.2.2"
       }
    },
    "release_status" : "stable",
@@ -47,6 +55,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "v0.22.5",
+   "version" : "v0.23.1",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -32,13 +32,17 @@ use feature 'say';
 no strict;
 no warnings;
 #use warnings::unused;
+use Switch::Back;
+use feature 'smartmatch';
+no warnings 'experimental::smartmatch';
+
 @ISA = qw(Exporter); # our @adamkISA = qw(Exporter);
 #%EXPORT_TAGS = ( DEFAULT => [qw( &opt &prepare )]); # our %EXPORT_TAGS = ( 'all' => [ qw( ) ] );
 #@EXPORT   = qw(); # our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
 our @EXPORT = qw( newretrieve newreport get_files );
 
-$VERSION = '0.121';
+$VERSION = '0.123';
 $ABSTRACT = 'Sim::OPT::Report is the module used by Sim::OPT to retrieve simulation results.';
 
 #########################################################################################

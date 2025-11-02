@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Apache2 API Framework - ~/lib/Apache2/API/Response.pm
-## Version v0.1.3
-## Copyright(c) 2024 DEGUEST Pte. Ltd.
+## Version v0.2.0
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/05/30
-## Modified 2025/10/03
+## Modified 2025/11/02
 ## All rights reserved
 ## 
 ## 
@@ -17,6 +17,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'Apache2::API' );
     use parent qw( Module::Generic );
     use vars qw( $VERSION );
     use Apache2::Request;
@@ -32,7 +33,7 @@ BEGIN
     use Cookie::Jar;
     use Scalar::Util;
     use URI::Escape ();
-    our $VERSION = 'v0.1.3';
+    our $VERSION = 'v0.2.0';
 };
 
 use strict;
@@ -401,6 +402,9 @@ sub last_modified { return( shift->_set_get_one( 'Last-Modified', @_ ) ); }
 
 sub last_modified_date { return( shift->headers( 'Last-Modified-Date', @_ ) ); }
 
+# Number of bytes sent
+sub length { return( shift->_try( 'request', 'bytes_sent' ) ); }
+
 # <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Location>
 sub location { return( shift->_set_get_one( 'Location', @_ ) ); }
 
@@ -631,7 +635,7 @@ sub _set_get_multi
 {
     my $self = shift( @_ );
     my $f    = shift( @_ );
-    return( $self->SUPER::error( "No field was provided to set its value." ) ) if( !defined( $f ) || !length( "$f" ) );
+    return( $self->SUPER::error( "No field was provided to set its value." ) ) if( !defined( $f ) || !CORE::length( "$f" ) );
     my $headers = $self->headers;
     if( @_ )
     {
@@ -663,7 +667,7 @@ sub _set_get_one
 {
     my $self = shift( @_ );
     my $f    = shift( @_ );
-    return( $self->SUPER::error( "No field was provided to set its value." ) ) if( !defined( $f ) || !length( "$f" ) );
+    return( $self->SUPER::error( "No field was provided to set its value." ) ) if( !defined( $f ) || !CORE::length( "$f" ) );
     my $headers = $self->headers;
     if( @_ )
     {
@@ -841,6 +845,8 @@ Apache2::API::Response - Apache2 Outgoing Response Access and Manipulation
     my $http_date = $resp->last_modified;
     # Last-Modified-Date
     my $http_date = $resp->last_modified_date;
+    # The number of bytes sent. Actually calls bytes_sent()
+    my $nbytes = $resp->length;
     # Location
     my $loc = $resp->location;
     my $rv = $resp->lookup_uri( $uri );
@@ -916,7 +922,7 @@ Apache2::API::Response - Apache2 Outgoing Response Access and Manipulation
 
 =head1 VERSION
 
-    v0.1.3
+    v0.2.0
 
 =head1 DESCRIPTION
 
@@ -1466,6 +1472,12 @@ See L<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Last-Modified>
 =head2 last_modified_date
 
 Sets or gets the HTTP header field C<Last-Modified-Date>
+
+=head2 length
+
+Read only.
+
+This returns the number of bytes sent by calling L<Apache2::RequestRec/bytes_sent>
 
 =head2 location
 

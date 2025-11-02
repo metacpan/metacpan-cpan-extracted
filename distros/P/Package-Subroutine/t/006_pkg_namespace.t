@@ -1,14 +1,13 @@
 # test load of package
 
-; use strict
-; use Test::More tests => 5
+; use Test2::V0
+; BEGIN { plan(5) }
 
 ; my $psn
+; use Package::Subroutine::Namespace
 
 # 01
-; BEGIN { $psn = 'Package::Subroutine::Namespace'
-         ; use_ok('Package::Subroutine::Namespace')
-         }
+; BEGIN { $psn = 'Package::Subroutine::Namespace' }
 
 ; package W
 ; sub one { 1 }
@@ -22,23 +21,23 @@
 ; package main
 
 ; BEGIN
-     { is_deeply([sort $psn->list_childs('W')],['Q','R'],'list childs')
-     ; $psn->delete_childs('W')
-     ; is_deeply([$psn->list_childs('W')],[],'childs deleted')
-     }
+    { is([sort $psn->list_namespaces('W')],['Q','R'],'list namespaces')
+    ; $psn->delete_namespaces('W')
+    ; is([$psn->list_namespaces('W')],[],'namespaces deleted')
+    }
 
 ; package W::Q
-; sub two { 2 }
+; sub two { 'two' }
 
 ; package W::R::P
-; sub three { 3 }
+; sub three { 'three' }
 
 ; package main
 
-; BEGIN
-    { $psn->delete_childs('W','R')
-    ; is_deeply([$psn->list_childs('W')],['R'],'delete but keep one')
-    }
+; $psn->delete_namespaces('W','R')
+; is([$psn->list_namespaces('W')],['R'],'delete but keep one')
+
 
 ; is(W::one,1,'test "one" in W')
+; is(W::Q::two,'two',"calling recreated method")
 

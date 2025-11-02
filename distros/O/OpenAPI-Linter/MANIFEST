@@ -1,0 +1,27 @@
+Changes
+lib/OpenAPI/Linter.pm
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+script/openapi-linter
+t/00_load.t
+t/01_basic.t
+t/02_lint_errors.t
+t/03_lint_warnings.t
+t/04_find_issues.t
+t/05_complete_spec.t
+t/06_file_loading.t
+t/07_edge_cases.t
+t/08_validate_schema.t
+t/data/minimal.yaml
+t/data/missing_descriptions.yaml
+t/data/missing_info.yaml
+t/data/missing_optional.yaml
+t/data/missing_required.yaml
+t/data/missing_schema_fields.yaml
+t/manifest.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

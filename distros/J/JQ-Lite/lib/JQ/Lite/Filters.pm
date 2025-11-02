@@ -1722,6 +1722,20 @@ sub apply {
             return 1;
         }
 
+        # support for @base64 (format value as base64 string)
+        if ($part eq '@base64' || $part eq '@base64()') {
+            @next_results = map { JQ::Lite::Util::_apply_base64($_) } @results;
+            @$out_ref = @next_results;
+            return 1;
+        }
+
+        # support for @uri (percent-encode value)
+        if ($part eq '@uri' || $part eq '@uri()') {
+            @next_results = map { JQ::Lite::Util::_apply_uri($_) } @results;
+            @$out_ref = @next_results;
+            return 1;
+        }
+
         # support for split("separator")
         if ($part =~ /^split\((.+)\)$/) {
             my $separator = JQ::Lite::Util::_parse_string_argument($1);
