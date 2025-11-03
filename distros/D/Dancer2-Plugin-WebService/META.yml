@@ -15,7 +15,7 @@ name: Dancer2-Plugin-WebService
 provides:
   Dancer2::Plugin::WebService:
     file: lib/Dancer2/Plugin/WebService.pm
-    version: v4.8.0
+    version: v4.8.1
 requires:
   Cpanel::JSON::XS: '0'
   Dancer2: '0'
@@ -27,8 +27,8 @@ requires:
   Starman: '0'
   Storable: '0'
   XML::Hash::XS: '0'
-  YAML::Syck: '0'
-version: 4.8.0
+  YAML::XS: '0'
+version: 4.8.1
 x_generated_by_perl: v5.42.0
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

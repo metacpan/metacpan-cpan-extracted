@@ -1,3 +1,8 @@
+0.003   2025-11-03  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Coerce alias e.g. 'VB7' to canonical symbol, e.g. 'Biotin'.
+
+
 0.002   2024-05-30  Released-By: PERLANCAR; Urgency: medium
 
         - Use Complete::Nutrient for completion.

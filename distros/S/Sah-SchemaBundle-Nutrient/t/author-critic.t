@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/Perinci/Sub/XCompletion/nutrient_symbol.pm','lib/Sah/Schema/nutrient/symbol.pm','lib/Sah/SchemaBundle/Nutrient.pm','lib/Sah/SchemaR/nutrient/symbol.pm'];
+my $filenames = ['lib/Data/Sah/Filter/perl/Nutrient/canonicalize_nutrient_symbol.pm','lib/Perinci/Sub/XCompletion/nutrient_symbol.pm','lib/Sah/Schema/nutrient/symbol.pm','lib/Sah/SchemaBundle/Nutrient.pm','lib/Sah/SchemaR/nutrient/symbol.pm'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

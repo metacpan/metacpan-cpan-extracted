@@ -60,6 +60,8 @@ sub execute($self) {
         $self->req->headers->header('X-Token-Check')
     );
 
+    say "Daje::Controller::Workflow::execute " . Dumper($self->req->body);
+
     my $data->{context} = decode_json ($self->req->body);
     try {
         $self->app->log->debug('Daje::Controller::Workflow::execute ' . Dumper($data));

@@ -8,9 +8,9 @@ has 'primary_key_name' => "tools_version_pkey";
 has 'table_name' => "tools_version";
 
 
-sub insert_tools_version($self, $data) {
+sub insert($self, $data) {
 
-    my $result = $self->insert(
+    my $result = $self->SUPER::insert(
         $self->table_name, $data, $self->primary_key_name
     );
     return $result;

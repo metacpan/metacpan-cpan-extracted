@@ -15,7 +15,7 @@ is join( q//, jsdump( 'ixi', $NEGATIVE_ONE ) ), 'var ixi = -1;', 'Integer -1';
 
 is join( q//, jsdump( 'pi', $PI ) ), 'var pi = 3.14159;', 'Pi';
 
-is join( q//, jsdump( 'c', '3E8' ) ), 'var c = "3E8";', 'Scientific notation';
+is join( q//, jsdump( 'c', '3E8' ) ), 'var c = 3E8;', 'Scientific notation';
 
 is join( q//, jsdump( 'zipcode', '02139' ) ),
   'var zipcode = "02139";',

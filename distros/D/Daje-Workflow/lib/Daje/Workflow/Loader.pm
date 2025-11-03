@@ -1,4 +1,4 @@
-use v5.40;
+use v5.42;
 use experimental 'class';
 
 # NAME
@@ -17,15 +17,15 @@ use experimental 'class';
 #         type => 'workflow',
 #    )->load();
 #
-#    my $workflow = $workflows->get_workflow('workflow');
+#    my $workflow = $workflows->loader->get_workflow('workflow');
 #
-#    my $state = $workflows->get_state('workflow','state');
+#    my $state = $workflows->loader->get_state('workflow','state');
 #
-#    my $pre_checks = $workflows->get_pre_checks('workflow','state');
+#    my $pre_checks = $workflows->loader->get_pre_checks('workflow','state');
 #
-#    my $post_checks = $workflows->get_post_checks('workflow','state');
+#    my $post_checks = $workflows->loader->get_post_checks('workflow','state');
 #
-#    my $activity = get_activity($workflow, $state_name, $activity_name);
+#    my $activity =  $workflows->loader->get_activity($workflow, $state_name, $activity_name);
 #
 # DESCRIPTION
 # ===========
@@ -72,24 +72,26 @@ class Daje::Workflow::Loader {
     }
 
     method _analyser() {
-        eval {
+        try {
             $analyser = Daje::Workflow::Details::Analyser->new(
                 loader => $loader,
             );
             $analyser->analyze();
+        } catch ($e) {
+            $self->add_error($e);
         };
-        $self->add_error($@) if $@;
     }
 
     method _load() {
-        eval {
+        try {
             $loader = Daje::Workflow::Roadmap::Load->new(
                 type => $type,
                 path => $path,
             );
             $loader->load();
+        } catch($e) {
+            $self->add_error($e);
         };
-        $self->add_error($@) if $@;
     }
 
     method add_error( $new_error =  "") {
@@ -106,6 +108,8 @@ class Daje::Workflow::Loader {
 
 1;
 __END__
+
+
 
 
 
@@ -140,15 +144,15 @@ Daje::Workflow::Loader - Just loads Daje-Workflow JSON based workflows
         type => 'workflow',
    )->load();
 
-   my $workflow = $workflows->get_workflow('workflow');
+   my $workflow = $workflows->loader->get_workflow('workflow');
 
-   my $state = $workflows->get_state('workflow','state');
+   my $state = $workflows->loader->get_state('workflow','state');
 
-   my $pre_checks = $workflows->get_pre_checks('workflow','state');
+   my $pre_checks = $workflows->loader->get_pre_checks('workflow','state');
 
-   my $post_checks = $workflows->get_post_checks('workflow','state');
+   my $post_checks = $workflows->loader->get_post_checks('workflow','state');
 
-   my $activity = get_activity($workflow, $state_name, $activity_name);
+   my $activity =  $workflows->loader->get_activity($workflow, $state_name, $activity_name);
 
 
 
@@ -171,7 +175,7 @@ L<Daje::Workflow::Roadmap::Load>
 
 L<experimental> 
 
-L<v5.40> 
+L<v5.42> 
 
 
 =head1 METHODS

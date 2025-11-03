@@ -4,7 +4,7 @@
       "Michael Stemle, Jr. <mstemle@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -59,10 +59,10 @@
          "web" : "https://github.com/manchicken/data-javascript"
       }
    },
-   "version" : "1.15",
+   "version" : "1.16",
    "x_contributors" : [
       "Jerrad Pierce <jpierce@cpan.org>",
       "Ariel Brosh <schop cpan.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

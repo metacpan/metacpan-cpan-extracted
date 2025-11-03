@@ -31,9 +31,9 @@ use v5.40;
 # janeskil1525 E<lt>janeskil1525@gmail.comE<gt>
 #
 
-has 'fields' => "tools_objects_pkey, editnum, insby, insdatetime, modby, moddatetime, tools_version_fkey, type, name, workflow_fkey";
-has 'primary_keys' => "tools_projects_pkey";
-has 'foreign_keys' => "tools_version_fkey, workflow_fkey";
+has 'fields' => "tools_objects_pkey, editnum, insby, insdatetime, modby, moddatetime, tools_version_fkey, name, tools_object_types_fkey, tools_projects_fkey, workflow_fkey";
+has 'primary_keys' => "tools_objects_pkey";
+has 'foreign_keys' => "tools_version_fkey, workflow_fkey, tools_projects_fkey";
 has 'view_name' => "v_tools_objects_workflow_fkey";
 
 
@@ -45,10 +45,11 @@ async sub load_full_list_p($self) {
     return $result;
 }
 
-sub load_tools_objects_fkey($self, $tools_version_pkey) {
+sub load_tools_objects_fkey($self, $foreign_key_name, $foreign_key) {
 
+    say "$foreign_key_name = $foreign_key";
     return $self->load_fkey(
-        $self->view_name, $self->fields(), "tools_version_fkey", $tools_version_pkey
+        $self->view_name, $self->fields(), $foreign_key_name, $foreign_key
     );
 }
 

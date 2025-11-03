@@ -1,5 +1,32 @@
 Revision history for Data-HexConverter
 
 0.01    2025-07-28 15:00:00
-        First version of Data::HexConverter
+    - First version of Data::HexConverter
 
+0.02    2025-07-29
+    - corrected module location
+
+0.03    2025-07-30
+    - fixed error in POD, added test for 1M string
+
+0.04 2025-07-31
+    - removed Data/HexConverter.pm from MANIFEST.  The correct entry is already in the file.
+
+0.51 2025-11-02
+    - Add XS wrapper over SIMD hex<->bin core (src/hexsimd.c)
+    - Runtime CPU dispatch (scalar/SSE2/AVX2/AVX-512 when built)
+    - Perl API now uses scalar refs:
+        hex_to_binary(\$hex)
+        binary_to_hex(\$bin)
+    - Proper handling of empty strings and odd-length hex (croaks)
+    - Build works on AVX-512 and non-AVX-512 x86_64 (OL8 tested)
+	 - added C demo instructions
+	 - added src/ files
+	 - changed version to 0.51 
+
+0.6 2025-11-02
+    - fixed a typo in HexConverter.pm
+	 - additional instructions for C demo programs.
+
+0.6 2025-11-02
+    - added benchmark.pl and testdata.txt

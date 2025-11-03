@@ -4,9 +4,9 @@ use 5.010001;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-05-30'; # DATE
+our $DATE = '2025-11-03'; # DATE
 our $DIST = 'Sah-SchemaBundle-Nutrient'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our @rows;
 # load and cache the table
@@ -22,6 +22,7 @@ our $schema = [str => {
 
 MARKDOWN
     in => [map {$_->{symbol}} @rows],
+    prefilters => ['Nutrient::canonicalize_nutrient_symbol'],
     'x.completion' => 'nutrient_symbol',
     examples => [
         {value=>'', valid=>0, summary=>"Empty string"},
@@ -46,13 +47,14 @@ Sah::Schema::nutrient::symbol - A known nutrient symbol, from TableData::Health:
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::Schema::nutrient::symbol (from Perl distribution Sah-SchemaBundle-Nutrient), released on 2024-05-30.
+This document describes version 0.003 of Sah::Schema::nutrient::symbol (from Perl distribution Sah-SchemaBundle-Nutrient), released on 2025-11-03.
 
 =head1 SAH SCHEMA DEFINITION
 
  [
    "str",
    {
+     "prefilters" => ["Nutrient::canonicalize_nutrient_symbol"],
      "in" => [
        "VA",
        "VD",
@@ -65,8 +67,8 @@ This document describes version 0.002 of Sah::Schema::nutrient::symbol (from Per
        "VB6",
        "VB9",
        "VB12",
-       "VB7",
-       "VB4",
+       "Biotin",
+       "Choline",
        "VC",
        "Ca",
        "P",
@@ -82,23 +84,31 @@ This document describes version 0.002 of Sah::Schema::nutrient::symbol (from Per
        "Na",
        "Cl",
        "Cu",
+       "B",
+       "Mo",
+       "V",
        "Energy",
        "Protein",
        "Total_Fat",
        "Saturated_Fat",
        "Cholesterol",
        "Linoleic_Acid",
-       "Alpha_Linoleic_Acid",
+       "Omega6",
+       "Alpha_Linolenic_Acid",
+       "Omega3",
        "Carbohydrate",
        "Dietary_Fiber",
        "L_Carnitine",
        "Myo_Inositol",
+       "H2O",
      ],
      "x.completion" => "nutrient_symbol",
    },
  ]
 
 Base type: L<str|Data::Sah::Type::str>
+
+Used prefilters: L<Nutrient::canonicalize_nutrient_symbol|Data::Sah::Filter::perl::Nutrient::canonicalize_nutrient_symbol>
 
 Used completion: L<nutrient_symbol|Perinci::Sub::XCompletion::nutrient_symbol>
 
@@ -135,7 +145,7 @@ valid, a non-empty error message otherwise):
  
  # a sample invalid data
  $data = "energy";
- my $errmsg = $validator->($data); # => "Must be one of [\"VA\",\"VD\",\"VE\",\"VK\",\"VB1\",\"VB2\",\"VB3\",\"VB5\",\"VB6\",\"VB9\",\"VB12\",\"VB7\",\"VB4\",\"VC\",\"Ca\",\"P\",\"Mg\",\"Fe\",\"I\",\"Zn\",\"Se\",\"Mn\",\"F\",\"Cr\",\"K\",\"Na\",\"Cl\",\"Cu\",\"Energy\",\"Protein\",\"Total_Fat\",\"Saturated_Fat\",\"Cholesterol\",\"Linoleic_Acid\",\"Alpha_Linoleic_Acid\",\"Carbohydrate\",\"Dietary_Fiber\",\"L_Carnitine\",\"Myo_Inositol\"]"
+ my $errmsg = $validator->($data); # => "Must be one of [\"VA\",\"VD\",\"VE\",\"VK\",\"VB1\",\"VB2\",\"VB3\",\"VB5\",\"VB6\",\"VB9\",\"VB12\",\"Biotin\",\"Choline\",\"VC\",\"Ca\",\"P\",\"Mg\",\"Fe\",\"I\",\"Zn\",\"Se\",\"Mn\",\"F\",\"Cr\",\"K\",\"Na\",\"Cl\",\"Cu\",\"B\",\"Mo\",\"V\",\"Energy\",\"Protein\",\"Total_Fat\",\"Saturated_Fat\",\"Cholesterol\",\"Linoleic_Acid\",\"Omega6\",\"Alpha_Linolenic_Acid\",\"Omega3\",\"Carbohydrate\",\"Dietary_Fiber\",\"L_Carnitine\",\"Myo_Inositol\",\"H2O\"]"
 
 Often a schema has coercion rule or default value rules, so after validation the
 validated value will be different from the original. To return the validated
@@ -150,7 +160,7 @@ validated value will be different from the original. To return the validated
  
  # a sample invalid data
  $data = "energy";
- my $res = $validator->($data); # => ["Must be one of [\"VA\",\"VD\",\"VE\",\"VK\",\"VB1\",\"VB2\",\"VB3\",\"VB5\",\"VB6\",\"VB9\",\"VB12\",\"VB7\",\"VB4\",\"VC\",\"Ca\",\"P\",\"Mg\",\"Fe\",\"I\",\"Zn\",\"Se\",\"Mn\",\"F\",\"Cr\",\"K\",\"Na\",\"Cl\",\"Cu\",\"Energy\",\"Protein\",\"Total_Fat\",\"Saturated_Fat\",\"Cholesterol\",\"Linoleic_Acid\",\"Alpha_Linoleic_Acid\",\"Carbohydrate\",\"Dietary_Fiber\",\"L_Carnitine\",\"Myo_Inositol\"]","energy"]
+ my $res = $validator->($data); # => ["Must be one of [\"VA\",\"VD\",\"VE\",\"VK\",\"VB1\",\"VB2\",\"VB3\",\"VB5\",\"VB6\",\"VB9\",\"VB12\",\"Biotin\",\"Choline\",\"VC\",\"Ca\",\"P\",\"Mg\",\"Fe\",\"I\",\"Zn\",\"Se\",\"Mn\",\"F\",\"Cr\",\"K\",\"Na\",\"Cl\",\"Cu\",\"B\",\"Mo\",\"V\",\"Energy\",\"Protein\",\"Total_Fat\",\"Saturated_Fat\",\"Cholesterol\",\"Linoleic_Acid\",\"Omega6\",\"Alpha_Linolenic_Acid\",\"Omega3\",\"Carbohydrate\",\"Dietary_Fiber\",\"L_Carnitine\",\"Myo_Inositol\",\"H2O\"]","energy"]
 
 Data::Sah can also create validator that returns a hash of detailed error
 message. Data::Sah can even create validator that targets other language, like
@@ -277,7 +287,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

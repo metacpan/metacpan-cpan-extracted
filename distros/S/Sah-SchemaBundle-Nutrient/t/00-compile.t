@@ -6,9 +6,10 @@ use warnings;
 
 use Test::More;
 
-plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
+    'Data/Sah/Filter/perl/Nutrient/canonicalize_nutrient_symbol.pm',
     'Perinci/Sub/XCompletion/nutrient_symbol.pm',
     'Sah/Schema/nutrient/symbol.pm',
     'Sah/SchemaBundle/Nutrient.pm',

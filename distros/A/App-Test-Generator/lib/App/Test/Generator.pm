@@ -2,6 +2,8 @@ package App::Test::Generator;
 
 # TODO: Support routines that take more than one unnamed parameter
 # TODO: Test validator from Params::Validate::Strict 0.16
+# TODO: $seed should be passed to Data::Random::String::Matches
+# TODO: positional args - when config_undef is set, see what happens when not all args are given
 
 use strict;
 use warnings;
@@ -26,7 +28,7 @@ use Exporter 'import';
 
 our @EXPORT_OK = qw(generate);
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 =head1 NAME
 
@@ -34,7 +36,7 @@ App::Test::Generator - Generate fuzz and corpus-driven test harnesses
 
 =head1 VERSION
 
-Version 0.11
+	Version 0.12
 
 =head1 SYNOPSIS
 
@@ -218,6 +220,8 @@ For routines with one unnamed parameter
 
 Currently, routines with more than one unnamed parameter are not supported.
 
+The keyword C<undef> is used to indicate that the C<function> takes no arguments.
+
 =item * C<%output> - output param types for Return::Set checking:
 
   output:
@@ -238,7 +242,66 @@ The output can be set to the string 'undef' if the routine should return the und
 
   output: undef
 
+The keyword C<undef> is used to indicate that the C<function> returns nothing.
+
+=item * C<%transforms> - list of transformations from input sets to output sets
+
+TO BE IMPLEMENTED.
+
+It takes a list of subsets of the input and output definitions,
+and verifies that data from each input subset is correctly transformed into data from the matching output subset.
+
+This is a draft definition of the schema.
+
+  ---
+  module: builtin
+  function: abs
+  test_undef: no
+  test_empty: no
+  test_nuls: no
+
+  input:
+    number:
+      type: number
+      position: 0
+  output:
+    type: number
+    min: 0
+  transforms:
+    positive:
+      input:
+        number:
+          type: number
+          position: 0
+          min: 0
+      output:
+        type: number
+        min: 0
+    negative:
+      input:
+        number:
+          type: number
+          position: 0
+          max: 0
+      output:
+        type: number
+        min: 0
+    error:
+      input:
+        undef
+      output:
+        _STATUS: DIES
+
+If the output hash contains the key _STATUS, and if that key is set to DIES,
+the routine should die with the given arguments; otherwise, it should live.
+If it's set to WARNS,
+the routine should warn with the given arguments.
+
+The keyword C<undef> is used to indicate that the C<function> returns nothing.
+
 =item * C<$module> - module name (optional).
+
+Using the reserved word C<builtin> means you're testing a Perl builtin function.
 
 If omitted, the generator will guess from the config filename:
 C<My-Widget.conf> -> C<My::Widget>.
@@ -493,14 +556,6 @@ The generated test:
 
 =back
 
-=head1 NOTES
-
-=over 4
-
-=item * The conf file must use C<our> declarations so variables are visible to the generator via C<require>.
-
-=back
-
 =cut
 
 sub generate
@@ -509,7 +564,7 @@ sub generate
 
 	# --- Globals exported by the user's conf (all optional except function maybe) ---
 	# Ensure data don't persist across calls, which would allow
-	local our (%input, %output, %config, $module, $function, $new, %cases, $yaml_cases);
+	local our (%input, %output, %config, $module, $function, $new, %cases, $yaml_cases, %transforms);
 	local our ($seed, $iterations);
 	local our (%edge_cases, @edge_case_array, %type_edge_cases);
 
@@ -533,15 +588,28 @@ sub generate
 		}
 
 		if($config) {
-			%input = %{$config->{input}} if(exists($config->{input}));
+			%config = %{$config->{config}} if(exists($config->{config}));
+			if(exists($config->{input})) {
+				if(ref($config->{input}) eq 'HASH') {
+					%input = %{$config->{input}}
+				} elsif(defined($config->{'input'}) && ($config->{'input'} ne 'undef')) {
+					croak("$conf_file: input should be a hash, not ", ref($config->{'input'}));
+				}
+			}
 			if(exists($config->{output})) {
 				if(ref($config->{output}) eq 'HASH') {
 					%output = %{$config->{output}}
-				} elsif($config->{'output'} ne 'undef') {
+				} elsif(defined($config->{'output'}) && ($config->{'output'} ne 'undef')) {
 					croak("$conf_file: output should be a hash");
 				}
 			}
-			%config = %{$config->{config}} if(exists($config->{config}));
+			if(exists($config->{transforms})) {
+				if(ref($config->{transforms}) eq 'HASH') {
+					%transforms = %{$config->{transforms}}
+				} elsif(defined($config->{'transforms'}) && ($config->{'transforms'} ne 'undef')) {
+					croak("$conf_file: transforms should be a hash");
+				}
+			}
 			%cases = %{$config->{cases}} if(exists($config->{cases}));
 			%edge_cases = %{$config->{edge_cases}} if(exists($config->{edge_cases}));
 			%type_edge_cases = %{$config->{type_edge_cases}} if(exists($config->{type_edge_cases}));
@@ -562,11 +630,6 @@ sub generate
 		croak 'Usage: generate(conf_file [, outfile])';
 	}
 
-	# --- Globals exported by the user's conf (all optional except function maybe) ---
-	# our (%input, %output, %config, $module, $function, $new, %cases, $yaml_cases);
-	# our ($seed, $iterations);
-	# our (%edge_cases, @edge_case_array, %type_edge_cases);
-
 	# sensible defaults
 	$function ||= 'run';
 	$iterations ||= 50;		 # default fuzz runs if not specified
@@ -586,7 +649,9 @@ sub generate
 	}
 
 	# Guess module name from config file if not set
-	if (!$module) {
+	if($module eq 'builtin') {
+		undef $module;
+	} elsif (!$module) {
 		(my $guess = basename($conf_file)) =~ s/\.(conf|pl|pm|yml|yaml)$//;
 		$guess =~ s/-/::/g;
 		$module = $guess || 'Unknown::Module';
@@ -703,7 +768,7 @@ sub generate
 		       ($type eq 'number') ||
 		       ($type eq 'float') ||
 		       ($type eq 'object'));
-      }
+	}
 
 	sub perl_sq {
 		my $s = $_[0];
@@ -718,7 +783,13 @@ sub generate
 			my @quoted_v = map { perl_quote($_) } @{$v};
 			return '[ ' . join(', ', @quoted_v) . ' ]';
 		}
-		return Dumper($v) if(ref($v) && (ref($v) ne 'Regexp'));	# Generic fallback
+		if(ref($v) && (ref($v) ne 'Regexp')) {
+			# Generic fallback
+			$v = Dumper($v);
+			$v =~ s/\$VAR1 =//;
+			$v =~ s/;//;
+			return $v;
+		}
 		$v =~ s/\\/\\\\/g;
 		# return $v =~ /^-?\d+(\.\d+)?$/ ? $v : "'" . ( $v =~ s/'/\\'/gr ) . "'";
 		return $v =~ /^-?\d+(\.\d+)?$/ ? $v : "'" . perl_sq($v) . "'";
@@ -813,8 +884,24 @@ sub generate
 	my $output_code = render_args_hash(\%output);
 	my $new_code = ($new && (ref $new eq 'HASH')) ? render_args_hash($new) : '';
 
+	my $transforms_code;
+	if(keys %transforms) {
+		foreach my $transform(keys %transforms) {
+			if($transforms_code) {
+				$transforms_code .= "},\n";
+			}
+			$transforms_code .= "$transform => {\n" .
+				"\t'input' => { " .
+				render_args_hash($transforms{$transform}->{'input'}) .
+				"\t}, 'output' => { " .
+			render_args_hash($transforms{$transform}->{'output'}) .
+			"\t},\n";
+		}
+		$transforms_code .= "}\n";
+	}
+
 	# Setup / call code (always load module)
-	my $setup_code = "BEGIN { use_ok('$module') }";
+	my $setup_code = ($module) ? "BEGIN { use_ok('$module') }" : '';
 	my $call_code;
 	if(defined($new)) {
 		# keep use_ok regardless (user found earlier issue)
@@ -824,8 +911,10 @@ sub generate
 			$setup_code .= "\nmy \$obj = new_ok('$module' => [ { $new_code } ] );";
 		}
 		$call_code = "\$result = \$obj->$function(\$input);";
-	} else {
+	} elsif(defined($module)) {
 		$call_code = "\$result = $module\->$function(\$input);";
+	} else {
+		$call_code = "\$result = $function(\$input);";
 	}
 
 	# Build static corpus code
@@ -902,6 +991,7 @@ sub generate
 		seed_code => $seed_code,
 		input_code => $input_code,
 		output_code => $output_code,
+		transforms_code => $transforms_code,
 		corpus_code => $corpus_code,
 		call_code => $call_code,
 		function => $function,
@@ -916,7 +1006,11 @@ sub generate
 		open my $fh, '>:encoding(UTF-8)', $outfile or die "Cannot open $outfile: $!";
 		print $fh "$test\n";
 		close $fh;
-		print "Generated $outfile for $module\::$function with fuzzing + corpus support\n";
+		if($module) {
+			print "Generated $outfile for $module\::$function with fuzzing + corpus support\n";
+		} else {
+			print "Generated $outfile for $function with fuzzing + corpus support\n";
+		}
 	} else {
 		print "$test\n";
 	}
@@ -924,13 +1018,27 @@ sub generate
 
 1;
 
+=head1 NOTES
+
+=over 4
+
+=item * The legacy format conf file must use C<our> declarations so variables are visible to the generator via C<require>.
+
+=back
+
 =head1 SEE ALSO
 
 =over 4
 
-=item * Test coverage report: L<https://nigelhorne.github.io/App-Test-Generator/coverage/>
+=item * L<https://nigelhorne.github.io/App-Test-Generator/coverage/>: Test Coverage Report
 
-=item * L<Test::Most>, L<Params::Get>, L<Params::Validate::Strict>, L<Return::Set>, L<YAML::XS>
+=item * L<Params::Validate::Strict>: Schema Definition
+
+=item * L<Params::Get>: Input validation
+
+=item * L<Return::Set>: Output validation
+
+=item * L<Test::Most>, L<YAML::XS>
 
 =back
 
@@ -957,12 +1065,17 @@ use open qw(:std :encoding(UTF-8));	# https://github.com/nigelhorne/App-Test-Gen
 
 use Data::Dumper;
 use Data::Random qw(:all);
+use Data::Random::String::Matches 0.02;
 use Test::Most;
 use Test::Returns 0.02;
 
 [% setup_code %]
 
-diag("[% module %]->[% function %] test case created by https://github.com/nigelhorne/App-Test-Generator");
+[% IF module %]
+	diag('[% module %]->[% function %] test case created by https://github.com/nigelhorne/App-Test-Generator');
+[% ELSE %]
+	diag('[% function %] test case created by https://github.com/nigelhorne/App-Test-Generator');
+[% END %]
 
 # Edge-case maps injected from config (optional)
 my %edge_cases = (
@@ -986,7 +1099,11 @@ my %input = (
 );
 
 my %output = (
-	[% output_code %]
+[% output_code %]
+);
+
+my %transforms = (
+[% transforms_code %]
 );
 
 # Candidates for regex comparisons
@@ -1140,7 +1257,8 @@ sub rand_hashref {
 	return \%h;
 }
 
-sub fuzz_inputs {
+sub fuzz_inputs
+{
 	my @cases;
 
 	# Are any options manadatory?
@@ -1198,6 +1316,13 @@ sub fuzz_inputs {
 		if(((scalar keys %input) == 1) && exists($input{'type'}) && !ref($input{'type'})) {
 			# our %input = ( type => 'string' );
 			my $type = $input{'type'};
+
+			foreach my $field(keys %input) {
+				if(!grep({ $_ eq $field } ('type', 'min', 'max', 'optional', 'matches', 'can'))) {
+					::diag("TODO: handle schema keyword '$field'");
+				}
+			}
+
 			if ($type eq 'string') {
 				# Is hello allowed?
 				if(!defined($input{'memberof'}) || (grep { $_ eq 'hello' } @{$input{'memberof'}})) {
@@ -1227,118 +1352,133 @@ sub fuzz_inputs {
 			}
 		} else {
 			# our %input = ( str => { type => 'string' } );
-			foreach my $field (keys %input) {
-				my $spec = $input{$field} || {};
+			foreach my $arg_name (keys %input) {
+				my $spec = $input{$arg_name} || {};
 				my $type = lc((!ref($spec)) ? $spec : $spec->{type}) || 'string';
+
+				foreach my $field(keys %{$spec}) {
+					if(!grep({ $_ eq $field } ('type', 'min', 'max', 'optional', 'matches', 'can'))) {
+						::diag("TODO: handle schema keyword '$field'");
+					}
+				}
 
 				# --- Type-based seeds ---
 				if ($type eq 'number') {
-					push @cases, { $field => 0 };
-					push @cases, { $field => 1.23 };
-					push @cases, { $field => -42 };
-					push @cases, { $field => 'abc', _STATUS => 'DIES' };
+					push @cases, { $arg_name => 0 };
+					push @cases, { $arg_name => 1.23 };
+					push @cases, { $arg_name => -42 };
+					push @cases, { $arg_name => 'abc', _STATUS => 'DIES' };
 				}
 				elsif ($type eq 'integer') {
-					push @cases, { %mandatory_args, ( $field => 42 ) };
+					push @cases, { %mandatory_args, ( $arg_name => 42 ) };
 					if((!defined $spec->{min}) || ($spec->{min} <= -1)) {
-						push @cases, { %mandatory_args, ( $field => -1, _LINE => __LINE__ ) };
+						push @cases, { %mandatory_args, ( $arg_name => -1, _LINE => __LINE__ ) };
 					}
-					push @cases, { %mandatory_args, ( $field => 3.14, _STATUS => 'DIES' ) };
-					push @cases, { %mandatory_args, ( $field => 'xyz', _STATUS => 'DIES' ) };
+					push @cases, { %mandatory_args, ( $arg_name => 3.14, _STATUS => 'DIES' ) };
+					push @cases, { %mandatory_args, ( $arg_name => 'xyz', _STATUS => 'DIES' ) };
 					# --- min/max numeric boundaries ---
 					# Probably duplicated below, but here as well just in case
 					if (defined $spec->{min}) {
 						my $min = $spec->{min};
-						push @cases, { %mandatory_args, ( $field => $min - 1, _STATUS => 'DIES' ) };
-						push @cases, { %mandatory_args, ( $field => $min, _LINE => __LINE__ ) };
-						push @cases, { %mandatory_args, ( $field => $min + 1 ) };
+						push @cases, { %mandatory_args, ( $arg_name => $min - 1, _STATUS => 'DIES' ) };
+						push @cases, { %mandatory_args, ( $arg_name => $min, _LINE => __LINE__ ) };
+						push @cases, { %mandatory_args, ( $arg_name => $min + 1 ) };
 					}
 					if (defined $spec->{max}) {
 						my $max = $spec->{max};
-						push @cases, { %mandatory_args, ( $field => $max - 1 ) };
-						push @cases, { %mandatory_args, ( $field => $max ) };
-						push @cases, { %mandatory_args, ( $field => $max + 1, _STATUS => 'DIES' ) };
+						push @cases, { %mandatory_args, ( $arg_name => $max - 1 ) };
+						push @cases, { %mandatory_args, ( $arg_name => $max ) };
+						push @cases, { %mandatory_args, ( $arg_name => $max + 1, _STATUS => 'DIES' ) };
 					}
-
 				} elsif ($type eq 'string') {
 					# Is hello allowed?
 					if(my $re = $spec->{matches}) {
 						if(ref($re) ne 'Regexp') {
 							$re = qr/$re/;
 						}
-						if('hello' =~ $re) {
-							if(!defined($spec->{'memberof'}) || (grep { $_ eq 'hello' } @{$spec->{'memberof'}})) {
-								if(defined($spec->{'notmemberof'}) && (grep { $_ eq 'hello' } @{$spec->{'notmemberof'}})) {
-									push @cases, { %mandatory_args, ( $field => 'hello', _STATUS => 'DIES' ) };
-								} else {
-									push @cases, { %mandatory_args, ( $field => 'hello' ) };
-								}
-							} elsif(defined($spec->{'memberof'}) && !defined($spec->{'max'})) {
-								# Data::Random
-								push @cases, { %mandatory_args, ( _input => rand_set(set => $spec->{'memberof'}, size => 1) ) }
-							} else {
-								push @cases, { %mandatory_args, ( $field => 'hello', _STATUS => 'DIES' ) };
-							}
+						my $random_string;
+						if($spec->{'max'}) {
+							$random_string = Data::Random::String::Matches->create_random_string({ length => $spec->{'max'}, regex => $re });
+						} elsif($spec->{'min'}) {
+							$random_string = Data::Random::String::Matches->create_random_string({ length => $spec->{'min'}, regex => $re });
 						} else {
-							push @cases, { %mandatory_args, ( $field => 'hello', _STATUS => 'DIES' ) };
+							$random_string = Data::Random::String::Matches->create_random_string({ regex => $re });
+						}
+    						foreach my $str('hello', $random_string) {
+							if($str =~ $re) {
+								if(!defined($spec->{'memberof'}) || (grep { $_ eq $str } @{$spec->{'memberof'}})) {
+									if(defined($spec->{'notmemberof'}) && (grep { $_ eq $str } @{$spec->{'notmemberof'}})) {
+										push @cases, { %mandatory_args, ( $arg_name => $str, _STATUS => 'DIES' ) };
+									} else {
+										push @cases, { %mandatory_args, ( $arg_name => $str ) };
+									}
+								} elsif(defined($spec->{'memberof'}) && !defined($spec->{'max'})) {
+									# Data::Random
+									push @cases, { %mandatory_args, ( _input => rand_set(set => $spec->{'memberof'}, size => 1) ) }
+								} else {
+									push @cases, { %mandatory_args, ( $arg_name => $str, _STATUS => 'DIES' ) };
+								}
+							} else {
+								push @cases, { %mandatory_args, ( $arg_name => $str, _STATUS => 'DIES' ) };
+							}
 						}
 					} else {
 						if(!defined($spec->{'memberof'}) || (grep { $_ eq 'hello' } @{$spec->{'memberof'}})) {
 							if(defined($spec->{'notmemberof'}) || (grep { $_ eq 'hello' } @{$spec->{'notmemberof'}})) {
-								push @cases, { %mandatory_args, ( $field => 'hello', _LINE => __LINE__, _STATUS => 'DIES' ) };
+								push @cases, { %mandatory_args, ( $arg_name => 'hello', _LINE => __LINE__, _STATUS => 'DIES' ) };
 							} else {
-								push @cases, { %mandatory_args, ( $field => 'hello' ) };
+								push @cases, { %mandatory_args, ( $arg_name => 'hello' ) };
 							}
 						} else {
-							push @cases, { %mandatory_args, ( $field => 'hello', _LINE => __LINE__, _STATUS => 'DIES' ) };
+							push @cases, { %mandatory_args, ( $arg_name => 'hello', _LINE => __LINE__, _STATUS => 'DIES' ) };
 						}
 					}
 					if((!exists($spec->{min})) || ($spec->{min} == 0)) {
 						# '' should die unless it's in the memberof list
 						if(defined($spec->{'memberof'}) && (!grep { $_ eq '' } @{$spec->{'memberof'}})) {
-							push @cases, { %mandatory_args, ( $field => '', _name => $field, _STATUS => 'DIES' ) }
+							push @cases, { %mandatory_args, ( $arg_name => '', _name => $arg_name, _STATUS => 'DIES' ) }
 						} elsif(defined($spec->{'memberof'}) && !defined($spec->{'max'})) {
 							# Data::Random
 							push @cases, { %mandatory_args, _input => rand_set(set => $spec->{'memberof'}, size => 1) }
 						} else {
-							push @cases, { %mandatory_args, ( $field => '', _name => $field ) } if((!exists($spec->{min})) || ($spec->{min} == 0));
+							push @cases, { %mandatory_args, ( $arg_name => '', _name => $arg_name ) } if((!exists($spec->{min})) || ($spec->{min} == 0));
 						}
 					}
-					# push @cases, { $field => "emoji \x{1F600}" };
-					push @cases, { %mandatory_args, ( $field => "\0null" ) } if($config{'test_nuls'} && (!(defined $spec->{memberof})) && !defined($spec->{matches}));
+					# push @cases, { $arg_name => "emoji \x{1F600}" };
+					push @cases, { %mandatory_args, ( $arg_name => "\0null" ) } if($config{'test_nuls'} && (!(defined $spec->{memberof})) && !defined($spec->{matches}));
 
 					unless(defined($spec->{memberof}) || defined($spec->{matches})) {
 						# --- min/max string/array boundaries ---
 						if (defined $spec->{min}) {
 							my $len = $spec->{min};
-							push @cases, { %mandatory_args, ( $field => 'a' x ($len - 1), _STATUS => 'DIES' ) } if($len > 0);
-							push @cases, { %mandatory_args, ( $field => 'a' x $len ) };
-							push @cases, { %mandatory_args, ( $field => 'a' x ($len + 1) ) };
+							push @cases, { %mandatory_args, ( $arg_name => 'a' x ($len - 1), _STATUS => 'DIES' ) } if($len > 0);
+							push @cases, { %mandatory_args, ( $arg_name => 'a' x $len ) };
+							push @cases, { %mandatory_args, ( $arg_name => 'a' x ($len + 1) ) };
 						}
 						if (defined $spec->{max}) {
 							my $len = $spec->{max};
-							push @cases, { %mandatory_args, ( $field => 'a' x ($len - 1) ) };
-							push @cases, { %mandatory_args, ( $field => 'a' x $len ) };
-							push @cases, { %mandatory_args, ( $field => 'a' x ($len + 1), _STATUS => 'DIES' ) };
+							push @cases, { %mandatory_args, ( $arg_name => 'a' x ($len - 1) ) };
+							push @cases, { %mandatory_args, ( $arg_name => 'a' x $len ) };
+							push @cases, { %mandatory_args, ( $arg_name => 'a' x ($len + 1), _STATUS => 'DIES' ) };
 						}
 					}
 				}
 				elsif ($type eq 'boolean') {
-					push @cases, { %mandatory_args, ( $field => 0 ) };
-					push @cases, { %mandatory_args, ( $field => 1 ) };
-					push @cases, { %mandatory_args, ( $field => 'true' ) };
-					push @cases, { %mandatory_args, ( $field => 'false' ) };
-					push @cases, { %mandatory_args, ( $field => 'off' ) };
-					push @cases, { %mandatory_args, ( $field => 'on' ) };
-					push @cases, { %mandatory_args, ( $field => 'bletch', _STATUS => 'DIES' ) };
+					push @cases, { %mandatory_args, ( $arg_name => 0 ) };
+					push @cases, { %mandatory_args, ( $arg_name => 1 ) };
+					push @cases, { %mandatory_args, ( $arg_name => 'true' ) };
+					push @cases, { %mandatory_args, ( $arg_name => 'false' ) };
+					push @cases, { %mandatory_args, ( $arg_name => 'off' ) };
+					push @cases, { %mandatory_args, ( $arg_name => 'on' ) };
+					push @cases, { %mandatory_args, ( $arg_name => 'bletch', _STATUS => 'DIES' ) };
 				}
 				elsif ($type eq 'hashref') {
-					push @cases, { $field => { a => 1 } };
-					push @cases, { $field => [], _STATUS => 'DIES' };
+					push @cases, { $arg_name => { a => 1 } };
+					push @cases, { $arg_name => [], _STATUS => 'DIES' };
 				}
 				elsif ($type eq 'arrayref') {
-					push @cases, { $field => [1,2] };
-					push @cases, { $field => { a => 1 }, _STATUS => 'DIES' };
+					push @cases, { $arg_name => [1,2] };
+					push @cases, { $arg_name => { a => 1 }, _STATUS => 'DIES' };
 				}
 
 				# --- matches (regex) ---
@@ -1346,9 +1486,9 @@ sub fuzz_inputs {
 					my $regex = $spec->{matches};
 					for my $string(@regex_tests) {
 						if($string =~ $regex) {
-							push @cases, { %mandatory_args, ( $field => $string ) };
+							push @cases, { %mandatory_args, ( $arg_name => $string ) };
 						} else {
-							push @cases, { %mandatory_args, ( $field => $string, _STATUS => 'DIES' ) };
+							push @cases, { %mandatory_args, ( $arg_name => $string, _STATUS => 'DIES' ) };
 						}
 					}
 				}
@@ -1358,9 +1498,9 @@ sub fuzz_inputs {
 					my $regex = $spec->{nomatch};
 					for my $string(@regex_tests) {
 						if($string =~ $regex) {
-							push @cases, { %mandatory_args, ( $field => $string, _STATUS => 'DIES' ) };
+							push @cases, { %mandatory_args, ( $arg_name => $string, _STATUS => 'DIES' ) };
 						} else {
-							push @cases, { %mandatory_args, ( $field => $string ) };
+							push @cases, { %mandatory_args, ( $arg_name => $string ) };
 						}
 					}
 				}
@@ -1368,15 +1508,15 @@ sub fuzz_inputs {
 				# --- memberof ---
 				if (defined $spec->{memberof}) {
 					my @set = @{ $spec->{memberof} };
-					push @cases, { %mandatory_args, ( $field => $set[0] ) } if @set;
-					push @cases, { %mandatory_args, ( $field => '_not_in_set_', _STATUS => 'DIES' ) };
+					push @cases, { %mandatory_args, ( $arg_name => $set[0] ) } if @set;
+					push @cases, { %mandatory_args, ( $arg_name => '_not_in_set_', _STATUS => 'DIES' ) };
 				}
 
 				# --- notmemberof ---
 				if (defined $spec->{notmemberof}) {
 					my @set = @{ $spec->{notmemberof} };
-					push @cases, { %mandatory_args, ( $field => $set[0], _STATUS => 'DIES' ) } if @set;
-					push @cases, { %mandatory_args, ( $field => '_not_in_set_' ) };
+					push @cases, { %mandatory_args, ( $arg_name => $set[0], _STATUS => 'DIES' ) } if @set;
+					push @cases, { %mandatory_args, ( $arg_name => '_not_in_set_' ) };
 				}
 			}
 		}
@@ -1400,22 +1540,32 @@ sub fuzz_inputs {
 					# Sometimes pick a type-level edge-case
 					$case_input = _pick_from($type_edge_cases{$type});
 				} elsif($type eq 'string') {
-					unless($input{matches}) {	# TODO: Make a random string to match a regex
+					if($input{matches}) {
+						$case_input = Data::Random::String::Matches->create_random_string({ regex => $input{'matches'} });
+					} else {
 						$case_input = rand_str();
 					}
 				} elsif($type eq 'integer') {
 					$case_input = rand_int() + $input{'min'};
 				} elsif(($type eq 'number') || ($type eq 'float')) {
-					$case_input = rand_num();
+					$case_input = rand_num() + $input{'min'};
 				} elsif($type eq 'boolean') {
 					$case_input = rand_bool();
 				} else {
 					die 'TODO';
 				}
-				push @cases, { _input => $case_input, status => 'OK' } if($case_input);
+				push @cases, { _input => $case_input, status => 'OK', _LINE => __LINE__ } if($case_input);
 			}
 		} else {
 			# our %input = ( str => { type => 'string' } );
+			foreach my $field (keys %input) {
+				my $spec = $input{$field} || {};
+				foreach my $field(keys %{$spec}) {
+					if(!grep({ $_ eq $field } ('type', 'min', 'max', 'optional', 'matches', 'can'))) {
+						::diag("TODO: handle schema keyword '$field'");
+					}
+				}
+			}
 			for (1..[% iterations_code %]) {
 				my %case_input = (%mandatory_args);
 				foreach my $field (keys %input) {
@@ -1437,15 +1587,28 @@ sub fuzz_inputs {
 
 					# 3) Sormal random generation by type
 					if ($type eq 'string') {
-						unless($spec->{matches}) {	# TODO: Make a random string to match a regex
+						if(my $re = $spec->{matches}) {
+							if(ref($re) ne 'Regexp') {
+								$re = qr/$re/;
+							}
+							if($spec->{'max'}) {
+								$case_input{$field} = Data::Random::String::Matches->create_random_string({ length => $spec->{'max'}, regex => $re });
+							} elsif($spec->{'min'}) {
+								$case_input{$field} = Data::Random::String::Matches->create_random_string({ length => $spec->{'min'}, regex => $re });
+							} else {
+								$case_input{$field} = Data::Random::String::Matches->create_random_string({ regex => $re });
+							}
+						} else {
 							if(my $min = $spec->{min}) {
 								$case_input{$field} = rand_str($min);
 								if($config{'test_empty'} && ($min == 0)) {
+									push @cases, { _input => \%case_input, status => 'OK' } if(keys %case_input);
 									$case_input{$field} = '';
 								}
 							} else {
 								$case_input{$field} = rand_str();
 								if($config{'test_empty'}) {
+									push @cases, { _input => \%case_input, status => 'OK' } if(keys %case_input);
 									$case_input{$field} = '';
 								}
 							}
@@ -1498,11 +1661,13 @@ sub fuzz_inputs {
 	}
 
 	# edge-cases
-	if($all_optional) {
-		push @cases, {} if($config{'test_empty'});
-	} else {
-		# Note that this is set on the input rather than output
-		push @cases, { '_STATUS' => 'DIES' } if($config{'test_undef'});	# At least one argument is needed
+	if($config{'test_undef'}) {
+		if($all_optional) {
+			push @cases, {};
+		} else {
+			# Note that this is set on the input rather than output
+			push @cases, { '_STATUS' => 'DIES' };	# At least one argument is needed
+		}
 	}
 
 	if(scalar keys %input) {
@@ -1570,7 +1735,7 @@ sub fuzz_inputs {
 						push @cases, { _input => '0', _STATUS => 'DIES' }
 					}
 				} else {
-					push @cases, { _input => '' } if($config{'test_empty'});	# No min, empty string should be allowable
+					push @cases, { _input => '', _LINE => __LINE__ } if($config{'test_empty'});	# No min, empty string should be allowable
 				}
 				if (defined $input{max}) {
 					my $len = $input{max};
@@ -1670,245 +1835,7 @@ sub fuzz_inputs {
 		}
 	} else {
 		# our %input = ( str => { type => 'string' } );
-		foreach my $field (keys %input) {
-			my $spec = $input{$field} || {};
-			my $type = $spec->{type} || 'string';
-
-			if (exists $spec->{memberof} && ref $spec->{memberof} eq 'ARRAY' && @{$spec->{memberof}}) {
-				# Generate edge cases for memberof
-				# inside values
-				foreach my $val (@{$spec->{memberof}}) {
-					push @cases, { %mandatory_args, ( $field => $val ) };
-				}
-				# outside value
-				my $outside;
-				if ($type eq 'integer' || $type eq 'number') {
-					$outside = (sort { $a <=> $b } @{$spec->{memberof}})[-1] + 1;
-				} else {
-					$outside = 'INVALID_MEMBEROF';
-				}
-				push @cases, { %mandatory_args, ( $field => $outside, _STATUS => 'DIES' ) };
-			} else {
-				# Generate edge cases for min/max
-				if(($type eq 'number') || ($type eq 'integer') || ($type eq 'float')) {
-					if (defined $spec->{min}) {
-						push @cases, { %mandatory_args, ( $field => $spec->{min} + 1 ) };	# just inside
-						push @cases, { %mandatory_args, ( $field => $spec->{min} ) };	# border
-						push @cases, { %mandatory_args, ( $field => $spec->{min} - 1, _STATUS => 'DIES' ) }; # outside
-					} else {
-						push @cases, { $field => 0 };	# No min, so 0 should be allowable
-						push @cases, { $field => -1 };	# No min, so -1 should be allowable
-					}
-					if (defined $spec->{max}) {
-						push @cases, { %mandatory_args, ( $field => $spec->{max} - 1, _LINE => __LINE__ ) };	# just inside
-						push @cases, { %mandatory_args, ( $field => $spec->{max}, _LINE => __LINE__ ) };	# border
-						push @cases, { %mandatory_args, ( $field => $spec->{max} + 1, _STATUS => 'DIES', _LINE => __LINE__ ) }; # outside
-					}
-					# Send wrong data type
-					push @cases, { %mandatory_args, ( $field => 'hello', _STATUS => 'DIES', _LINE => __LINE__ ) };
-					push @cases, { %mandatory_args, ( $field => {}, _STATUS => 'DIES', _LINE => __LINE__ ) };
-					push @cases, { %mandatory_args, ( $field => [], _STATUS => 'DIES', _LINE => __LINE__ ) };
-					if($type eq 'integer') {
-						# Float
-						push @cases, { %mandatory_args, ( $field => 0.5, _STATUS => 'DIES', _LINE => __LINE__ ) };
-					}
-				} elsif($type eq 'string') {
-					if (defined $spec->{min}) {
-						my $len = $spec->{min};
-						if(my $re = $spec->{matches}) {
-							for my $count ($len + 1, $len, $len - 1) {
-								next if ($count < 0);
-								my $str = rand_char() x $count;
-								if($str =~ $re) {
-									push @cases, { %mandatory_args, ( $field => $str ) };
-								} else {
-									push @cases, { %mandatory_args, ( $field => $str, _STATUS => 'DIES' ) };
-								}
-							}
-						} else {
-							push @cases, { %mandatory_args, ( $field => 'a' x ($len + 1) ) };	# just inside
-							push @cases, { %mandatory_args, ( $field => 'a' x $len ) };	# border
-							if($len > 0) {
-								if($len > 0) {
-									if(($len > 1) || $config{'test_empty'}) {
-										# outside
-										push @cases, { %mandatory_args, ( $field => 'a' x ($len - 1), _STATUS => 'DIES' ) };
-									}
-									# Test checking of 'defined'/'exists' rather than if($string)
-									push @cases, { %mandatory_args, ( $field => '0' ) };
-								} else {
-									push @cases, { %mandatory_args, ( $field => '' ) } if($config{'test_empty'});	# min == 0, empty string should be allowable
-									# Don't confuse if() with if(defined())
-									push @cases, { %mandatory_args, ( $field => '0', _STATUS => 'DIES' ) };
-								}
-							} else {
-								push @cases, { %mandatory_args, ( $field => '' ) } if($config{'test_empty'});	# min == 0, empty string should be allowable
-								# Don't confuse if() with if(defined())
-								push @cases, { %mandatory_args, ( $field => '0', _STATUS => 'DIES' ) };
-							}
-						}
-					} else {
-						push @cases, { %mandatory_args, ( $field => '' ) } if($config{'test_empty'});	# No min, empty string should be allowable
-					}
-					if (defined $spec->{max}) {
-						my $len = $spec->{max};
-						if((!defined($spec->{min})) || ($spec->{min} != $len)) {
-							if(my $re = $spec->{matches}) {
-								for my $count ($len - 1, $len, $len + 1) {
-									my $str = rand_char() x $count;
-									if($str =~ $re) {
-										if($count > $len) {
-											push @cases, { %mandatory_args, ( $field => $str, _LINE => __LINE__, _STATUS => 'DIES' ) };
-										} else {
-											push @cases, { %mandatory_args, ( $field => $str, _LINE => __LINE__ ) };
-										}
-									} else {
-										push @cases, { %mandatory_args, ( $field => $str, _STATUS => 'DIES', _LINE => __LINE__ ) };
-									}
-								}
-							} else {
-								push @cases, { %mandatory_args, ( $field => 'a' x ($len - 1), _LINE => __LINE__ ) };	# just inside
-								push @cases, { %mandatory_args, ( $field => 'a' x $len, _LINE => __LINE__ ) };	# border
-								push @cases, { %mandatory_args, ( $field => 'a' x ($len + 1), _LINE => __LINE__, _STATUS => 'DIES' ) }; # outside
-							}
-						}
-					} else {
-						if(exists($spec->{'min'})) {
-							push @cases, { %mandatory_args, ( $field => 'a' x (($spec->{'min'} + 1) * 1_000), _LINE => __LINE__ ) };
-						} else {
-							push @cases, { %mandatory_args, ( $field => 'a' x 10_000, _LINE => __LINE__ ) };
-						}
-					}
-
-					if(defined $spec->{matches}) {
-						my $re = $spec->{matches};
-
-						# --- Positive controls ---
-						foreach my $val (@candidate_good) {
-							if ($val =~ $re) {
-								push @cases, { %mandatory_args, ( $field => $val ) };
-								last; # one good match is enough
-							}
-						}
-
-						# --- Negative controls ---
-						foreach my $val (@candidate_bad) {
-							if(!defined($val)) {
-								push @cases, { _input => undef, _STATUS => 'DIES' };
-							} elsif ($val !~ $re) {
-								push @cases, { _input => $val, _STATUS => 'DIES' };
-							}
-						}
-						push @cases, { $field => undef, _STATUS => 'DIES' } if($config{'test_undef'});
-						push @cases, { $field => "\0", _STATUS => 'DIES' } if($config{'test_nuls'});
-					}
-					if(defined $spec->{nomatch}) {
-						my $re = $spec->{nomatch};
-
-						# --- Positive controls ---
-						foreach my $val (@candidate_good) {
-							if ($val !~ $re) {
-								push @cases, { %mandatory_args, ( $field => $val ) };
-								last; # one good match is enough
-							}
-						}
-
-						# --- Negative controls ---
-						foreach my $val (@candidate_bad) {
-							if ($val =~ $re) {
-								push @cases, { $field => $val, _STATUS => 'DIES' };
-							}
-						}
-					}
-					# Send wrong data type
-					push @cases, { %mandatory_args, ( $field => [], _STATUS => 'DIES', _LINE => __LINE__ ) } if($config{'test_empty'});
-					push @cases, { %mandatory_args, ( $field => {}, _STATUS => 'DIES', _LINE => __LINE__ ) } if($config{'test_empty'});
-				} elsif ($type eq 'arrayref') {
-					if (defined $spec->{min}) {
-						my $len = $spec->{min};
-						push @cases, { $field => [ (1) x ($len + 1) ] };	# just inside
-						push @cases, { $field => [ (1) x $len ] };	# border
-						push @cases, { $field => [ (1) x ($len - 1) ], _STATUS => 'DIES' } if $len > 0; # outside
-					} else {
-						push @cases, { $field => [] } if($config{'test_empty'});	# No min, empty array should be allowable
-					}
-					if (defined $spec->{max}) {
-						my $len = $spec->{max};
-						push @cases, { $field => [ (1) x ($len - 1) ] };	# just inside
-						push @cases, { $field => [ (1) x $len ] };	# border
-						push @cases, { $field => [ (1) x ($len + 1) ], _STATUS => 'DIES' }; # outside
-					}
-				} elsif ($type eq 'hashref') {
-					if (defined $spec->{min}) {
-						my $len = $spec->{min};
-						push @cases, { $field => { map { "k$_" => 1 }, 1 .. ($len + 1) } };
-						push @cases, { $field => { map { "k$_" => 1 }, 1 .. $len } };
-						push @cases, { $field => { map { "k$_" => 1 }, 1 .. ($len - 1) }, _STATUS => 'DIES' } if $len > 0;
-					} else {
-						push @cases, { $field => {} } if($config{'test_empty'});	# No min, empty hash should be allowable
-					}
-					if (defined $spec->{max}) {
-						my $len = $spec->{max};
-						push @cases, { $field => { map { "k$_" => 1 }, 1 .. ($len - 1) } };
-						push @cases, { $field => { map { "k$_" => 1 }, 1 .. $len } };
-						push @cases, { $field => { map { "k$_" => 1 }, 1 .. ($len + 1) }, _STATUS => 'DIES' };
-					}
-				} elsif ($type eq 'boolean') {
-					if (exists $spec->{memberof} && ref $spec->{memberof} eq 'ARRAY') {
-						# memberof already defines allowed booleans
-						foreach my $val (@{$spec->{memberof}}) {
-							push @cases, { %mandatory_args, ( $field => $val ) };
-						}
-					} else {
-						# basic boolean edge cases
-						push @cases, { %mandatory_args, ( $field => 0 ) };
-						push @cases, { %mandatory_args, ( $field => 1 ) };
-						push @cases, { %mandatory_args, ( $field => 'false' ) };
-						push @cases, { %mandatory_args, ( $field => 'true' ) };
-						push @cases, { %mandatory_args, ( $field => 'off' ) };
-						push @cases, { %mandatory_args, ( $field => 'on' ) };
-						push @cases, { %mandatory_args, ( $field => undef, _STATUS => 'DIES' ) } if($config{'test_undef'});
-						push @cases, { %mandatory_args, ( $field => 2, _STATUS => 'DIES' ) };	# invalid boolean
-						push @cases, { %mandatory_args, ( $field => 'xyzzy', _STATUS => 'DIES' ) };	# invalid boolean
-					}
-				}
-			}
-			# transform verification tests
-			if (defined $spec->{transform}) {
-				# Test that transform is applied before validation
-				push @cases, {
-					%mandatory_args, (
-						$field => '  UPPERCASE  ',
-						_expected_after_transform => 'uppercase'
-					)
-				};
-			}
-
-			# case_sensitive tests for memberof
-			if (defined $spec->{memberof} && exists $spec->{case_sensitive}) {
-				if (!$spec->{case_sensitive}) {
-					# Generate mixed-case versions of memberof values
-					foreach my $val (@{$spec->{memberof}}) {
-						push @cases, { %mandatory_args, ( $field => uc($val) ) },
-							{ %mandatory_args, ( $field => lc($val) ) },
-							{ %mandatory_args, ( $field => ucfirst(lc($val)) ) };
-					}
-				}
-			}
-
-			# Add notmemberof tests
-			if (defined $spec->{notmemberof}) {
-				my @blacklist = @{$spec->{notmemberof}};
-				# Each blacklisted value should die
-				foreach my $val (@blacklist) {
-					push @cases, { %mandatory_args, ( $field => $val, _STATUS => 'DIES' ) };
-				}
-				# Non-blacklisted value should pass
-				push @cases, { %mandatory_args, ( $field => '_not_in_blacklist_' ) };
-			}
-
-			# TODO:	How do we generate tests for cross-field validation?
-		}
+		push @cases, @{generate_tests(\%input, \%mandatory_args)};
 	}
 
 	# FIXME: I don't think this catches them all
@@ -1931,27 +1858,293 @@ sub fuzz_inputs {
 	return \@cases;
 }
 
-foreach my $case (@{fuzz_inputs()}) {
-	# my %params;
-	# lives_ok { %params = get_params(\%input, %$case) } 'Params::Get input check';
-	# lives_ok { validate_strict(\%input, %params) } 'Params::Validate::Strict input check';
+sub generate_tests
+{
+	my $input = $_[0];
+	my %mandatory_args = %{$_[1]};
 
-	my $input;
-	my $name = delete $case->{'_name'};
-	if((ref($case) eq 'HASH') && exists($case->{'_input'})) {
-		$input = $case->{'_input'};
-	} else {
-		$input = $case;
+	my @cases;
+
+	foreach my $field (keys %input) {
+		my $spec = $input{$field} || {};
+		my $type = $spec->{type} || 'string';
+
+		if (exists $spec->{memberof} && ref $spec->{memberof} eq 'ARRAY' && @{$spec->{memberof}}) {
+			# Generate edge cases for memberof
+			# inside values
+			foreach my $val (@{$spec->{memberof}}) {
+				push @cases, { %mandatory_args, ( $field => $val ) };
+			}
+			# outside value
+			my $outside;
+			if ($type eq 'integer' || $type eq 'number') {
+				$outside = (sort { $a <=> $b } @{$spec->{memberof}})[-1] + 1;
+			} else {
+				$outside = 'INVALID_MEMBEROF';
+			}
+			push @cases, { %mandatory_args, ( $field => $outside, _STATUS => 'DIES' ) };
+		} else {
+			# Generate edge cases for min/max
+			if(($type eq 'number') || ($type eq 'integer') || ($type eq 'float')) {
+				if(defined $spec->{min}) {
+					push @cases, { %mandatory_args, ( $field => $spec->{min} + 1 ) };	# just inside
+					push @cases, { %mandatory_args, ( $field => $spec->{min} ) };	# border
+					push @cases, { %mandatory_args, ( $field => $spec->{min} - 1, _STATUS => 'DIES' ) }; # outside
+				} else {
+					push @cases, { $field => 0 };	# No min, so 0 should be allowable
+					push @cases, { $field => -1 };	# No min, so -1 should be allowable
+				}
+				if(defined $spec->{max}) {
+					push @cases, { %mandatory_args, ( $field => $spec->{max} - 1, _LINE => __LINE__ ) };	# just inside
+					push @cases, { %mandatory_args, ( $field => $spec->{max}, _LINE => __LINE__ ) };	# border
+					push @cases, { %mandatory_args, ( $field => $spec->{max} + 1, _STATUS => 'DIES', _LINE => __LINE__ ) }; # outside
+				}
+				# Send wrong data type
+				push @cases, { %mandatory_args, ( $field => 'hello', _STATUS => 'DIES', _LINE => __LINE__ ) };
+				push @cases, { %mandatory_args, ( $field => {}, _STATUS => 'DIES', _LINE => __LINE__ ) };
+				push @cases, { %mandatory_args, ( $field => [], _STATUS => 'DIES', _LINE => __LINE__ ) };
+				if($type eq 'integer') {
+					# Float
+					push @cases, { %mandatory_args, ( $field => 0.5, _STATUS => 'DIES', _LINE => __LINE__ ) };
+				}
+			} elsif($type eq 'string') {
+				if (defined $spec->{min}) {
+					my $len = $spec->{min};
+					if(my $re = $spec->{matches}) {
+						for my $count ($len + 1, $len, $len - 1) {
+							next if ($count < 0);
+							my $str = rand_char() x $count;
+							if($str =~ $re) {
+								push @cases, { %mandatory_args, ( $field => $str ) };
+							} else {
+								push @cases, { %mandatory_args, ( $field => $str, _STATUS => 'DIES' ) };
+							}
+						}
+					} else {
+						push @cases, { %mandatory_args, ( $field => 'a' x ($len + 1) ) };	# just inside
+						push @cases, { %mandatory_args, ( $field => 'a' x $len ) };	# border
+						if($len > 0) {
+							if($len > 0) {
+								if(($len > 1) || $config{'test_empty'}) {
+									# outside
+									push @cases, { %mandatory_args, ( $field => 'a' x ($len - 1), _STATUS => 'DIES' ) };
+								}
+								# Test checking of 'defined'/'exists' rather than if($string)
+								push @cases, { %mandatory_args, ( $field => '0' ) };
+							} else {
+								push @cases, { %mandatory_args, ( $field => '' ) } if($config{'test_empty'});	# min == 0, empty string should be allowable
+								# Don't confuse if() with if(defined())
+								push @cases, { %mandatory_args, ( $field => '0', _STATUS => 'DIES' ) };
+							}
+						} else {
+							push @cases, { %mandatory_args, ( $field => '' ) } if($config{'test_empty'});	# min == 0, empty string should be allowable
+							# Don't confuse if() with if(defined())
+							push @cases, { %mandatory_args, ( $field => '0', _STATUS => 'DIES' ) };
+						}
+					}
+				} else {
+					push @cases, { %mandatory_args, ( $field => '' ) } if($config{'test_empty'});	# No min, empty string should be allowable
+				}
+				if (defined $spec->{max}) {
+					my $len = $spec->{max};
+					if((!defined($spec->{min})) || ($spec->{min} != $len)) {
+						if(my $re = $spec->{matches}) {
+							for my $count ($len - 1, $len, $len + 1) {
+								my $str = rand_char() x $count;
+								if($str =~ $re) {
+									if($count > $len) {
+										push @cases, { %mandatory_args, ( $field => $str, _LINE => __LINE__, _STATUS => 'DIES' ) };
+									} else {
+										push @cases, { %mandatory_args, ( $field => $str, _LINE => __LINE__ ) };
+									}
+								} else {
+									push @cases, { %mandatory_args, ( $field => $str, _STATUS => 'DIES', _LINE => __LINE__ ) };
+								}
+							}
+						} else {
+							push @cases, { %mandatory_args, ( $field => 'a' x ($len - 1), _LINE => __LINE__ ) };	# just inside
+							push @cases, { %mandatory_args, ( $field => 'a' x $len, _LINE => __LINE__ ) };	# border
+							push @cases, { %mandatory_args, ( $field => 'a' x ($len + 1), _LINE => __LINE__, _STATUS => 'DIES' ) }; # outside
+						}
+					}
+				} else {
+					if(exists($spec->{'min'})) {
+						push @cases, { %mandatory_args, ( $field => 'a' x (($spec->{'min'} + 1) * 1_000), _LINE => __LINE__ ) };
+					} else {
+						push @cases, { %mandatory_args, ( $field => 'a' x 10_000, _LINE => __LINE__ ) };
+					}
+				}
+
+				if(defined $spec->{matches}) {
+					my $re = $spec->{matches};
+
+					# --- Positive controls ---
+					foreach my $val (@candidate_good) {
+						if ($val =~ $re) {
+							push @cases, { %mandatory_args, ( $field => $val ) };
+							last; # one good match is enough
+						}
+					}
+
+					# --- Negative controls ---
+					foreach my $val (@candidate_bad) {
+						if(!defined($val)) {
+							push @cases, { _input => undef, _STATUS => 'DIES' } if($config{'test_undef'});
+						} elsif ($val !~ $re) {
+							push @cases, { _input => $val, _STATUS => 'DIES' };
+						}
+					}
+					push @cases, { $field => undef, _STATUS => 'DIES' } if($config{'test_undef'});
+					push @cases, { $field => "\0", _STATUS => 'DIES' } if($config{'test_nuls'});
+				}
+				if(defined $spec->{nomatch}) {
+					my $re = $spec->{nomatch};
+
+					# --- Positive controls ---
+					foreach my $val (@candidate_good) {
+						if ($val !~ $re) {
+							push @cases, { %mandatory_args, ( $field => $val ) };
+							last; # one good match is enough
+						}
+					}
+
+					# --- Negative controls ---
+					foreach my $val (@candidate_bad) {
+						if ($val =~ $re) {
+							push @cases, { $field => $val, _STATUS => 'DIES' };
+						}
+					}
+				}
+				# Send wrong data type
+				push @cases, { %mandatory_args, ( $field => [], _STATUS => 'DIES', _LINE => __LINE__ ) } if($config{'test_empty'});
+				push @cases, { %mandatory_args, ( $field => {}, _STATUS => 'DIES', _LINE => __LINE__ ) } if($config{'test_empty'});
+			} elsif ($type eq 'arrayref') {
+				if (defined $spec->{min}) {
+					my $len = $spec->{min};
+					push @cases, { $field => [ (1) x ($len + 1) ] };	# just inside
+					push @cases, { $field => [ (1) x $len ] };	# border
+					push @cases, { $field => [ (1) x ($len - 1) ], _STATUS => 'DIES' } if $len > 0; # outside
+				} else {
+					push @cases, { $field => [] } if($config{'test_empty'});	# No min, empty array should be allowable
+				}
+				if (defined $spec->{max}) {
+					my $len = $spec->{max};
+					push @cases, { $field => [ (1) x ($len - 1) ] };	# just inside
+					push @cases, { $field => [ (1) x $len ] };	# border
+					push @cases, { $field => [ (1) x ($len + 1) ], _STATUS => 'DIES' }; # outside
+				}
+			} elsif ($type eq 'hashref') {
+				if (defined $spec->{min}) {
+					my $len = $spec->{min};
+					push @cases, { $field => { map { "k$_" => 1 }, 1 .. ($len + 1) } };
+					push @cases, { $field => { map { "k$_" => 1 }, 1 .. $len } };
+					push @cases, { $field => { map { "k$_" => 1 }, 1 .. ($len - 1) }, _STATUS => 'DIES' } if $len > 0;
+				} else {
+					push @cases, { $field => {} } if($config{'test_empty'});	# No min, empty hash should be allowable
+				}
+				if (defined $spec->{max}) {
+					my $len = $spec->{max};
+					push @cases, { $field => { map { "k$_" => 1 }, 1 .. ($len - 1) } };
+					push @cases, { $field => { map { "k$_" => 1 }, 1 .. $len } };
+					push @cases, { $field => { map { "k$_" => 1 }, 1 .. ($len + 1) }, _STATUS => 'DIES' };
+				}
+			} elsif ($type eq 'boolean') {
+				if (exists $spec->{memberof} && ref $spec->{memberof} eq 'ARRAY') {
+					# memberof already defines allowed booleans
+					foreach my $val (@{$spec->{memberof}}) {
+						push @cases, { %mandatory_args, ( $field => $val ) };
+					}
+				} else {
+					# basic boolean edge cases
+					push @cases, { %mandatory_args, ( $field => 0 ) };
+					push @cases, { %mandatory_args, ( $field => 1 ) };
+					push @cases, { %mandatory_args, ( $field => 'false' ) };
+					push @cases, { %mandatory_args, ( $field => 'true' ) };
+					push @cases, { %mandatory_args, ( $field => 'off' ) };
+					push @cases, { %mandatory_args, ( $field => 'on' ) };
+					push @cases, { %mandatory_args, ( $field => undef, _STATUS => 'DIES' ) } if($config{'test_undef'});
+					push @cases, { %mandatory_args, ( $field => 2, _STATUS => 'DIES' ) };	# invalid boolean
+					push @cases, { %mandatory_args, ( $field => 'xyzzy', _STATUS => 'DIES' ) };	# invalid boolean
+				}
+			}
+		}
+		# transform verification tests
+		if (defined $spec->{transform}) {
+			# Test that transform is applied before validation
+			push @cases, {
+				%mandatory_args, (
+					$field => '  UPPERCASE  ',
+					_expected_after_transform => 'uppercase'
+				)
+			};
+		}
+
+		# case_sensitive tests for memberof
+		if (defined $spec->{memberof} && exists $spec->{case_sensitive}) {
+			if (!$spec->{case_sensitive}) {
+				# Generate mixed-case versions of memberof values
+				foreach my $val (@{$spec->{memberof}}) {
+					push @cases, { %mandatory_args, ( $field => uc($val) ) },
+						{ %mandatory_args, ( $field => lc($val) ) },
+						{ %mandatory_args, ( $field => ucfirst(lc($val)) ) };
+				}
+			}
+		}
+
+		# Add notmemberof tests
+		if (defined $spec->{notmemberof}) {
+			my @blacklist = @{$spec->{notmemberof}};
+			# Each blacklisted value should die
+			foreach my $val (@blacklist) {
+				push @cases, { %mandatory_args, ( $field => $val, _STATUS => 'DIES' ) };
+			}
+			# Non-blacklisted value should pass
+			push @cases, { %mandatory_args, ( $field => '_not_in_blacklist_' ) };
+		}
+
+		# TODO:	How do we generate tests for cross-field validation?
 	}
 
-	if(my $line = (delete $case->{'_LINE'} || delete $input{'_LINE'})) {
-		diag("Test case from line number $line") if($ENV{'TEST_VERBOSE'});
+	return \@cases;
+}
+
+sub fuzz_transforms {
+	my($transform, $input, $output) = @_;
+	my @cases;
+
+	push @cases, @{generate_tests(\%input, {})};
+	return \@cases;
+}
+
+sub populate_positions
+{
+	my $input = shift;
+
+	my $rc;
+	foreach my $arg (keys %{$input}) {
+		my $spec = $input->{$arg} || {};
+		if(defined($spec->{'position'})) {
+			$rc->{$arg} = $spec->{'position'};
+		} else {
+			if($rc) {
+				::diag("$arg is missing a position parameter in its schema");
+			}
+			return;	# All must be defined
+		}
 	}
 
-	# if($ENV{'TEST_VERBOSE'}) {
-		# diag('input: ', Dumper($input));
-	# }
+	return $rc;
+}
 
+sub run_test
+{
+	my($case, $input, $output, $positions) = @_;
+
+	if($ENV{'TEST_VERBOSE'}) {
+		diag('input: ', Dumper($input));
+	}
+
+	my $name = $case->{'_name'};
 	my $result;
 	my $mess;
 	if(defined($input) && !ref($input)) {
@@ -1961,13 +2154,29 @@ foreach my $case (@{fuzz_inputs()}) {
 			$mess = "[% function %]('$input') %s";
 		}
 	} elsif(defined($input)) {
-		my @alist;
-		foreach my $key (sort keys %{$input}) {
-			if($key ne '_STATUS') {
-				if(defined($input->{$key})) {
-					push @alist, "'$key' => '$input->{$key}'";
-				} else {
-					push @alist, "'$key' => undef";
+		my @alist = ();
+		if($positions) {
+			# Positional args
+			foreach my $key (keys %{$input}) {
+				if($key ne '_STATUS') {
+					if(exists($positions->{$key})) {
+						$alist[$positions->{$key}] = delete $input->{$key};
+					} else {
+						diag("Lost position number for $key");
+					}
+				}
+			}
+			@alist = grep { defined $_ } @alist;	# Undefs will cause not enough args to be sent, which is a nice test
+			$input = join(', ', @alist);
+		} else {
+			# Named args
+			foreach my $key (sort keys %{$input}) {
+				if($key ne '_STATUS') {
+					if(defined($input->{$key})) {
+						push @alist, "'$key' => '$input->{$key}'";
+					} else {
+						push @alist, "'$key' => undef";
+					}
 				}
 			}
 		}
@@ -1977,7 +2186,7 @@ foreach my $case (@{fuzz_inputs()}) {
 		$mess = "[% function %] %s";
 	}
 
-	if(my $status = (delete $case->{'_STATUS'} || delete $output{'_STATUS'})) {
+	if(my $status = (delete $case->{'_STATUS'} || delete $output->{'_STATUS'})) {
 		if($status eq 'DIES') {
 			dies_ok { [% call_code %] } sprintf($mess, 'dies');
 		} elsif($status eq 'WARNS') {
@@ -1989,11 +2198,113 @@ foreach my $case (@{fuzz_inputs()}) {
 		lives_ok { [% call_code %] } sprintf($mess, 'survives');
 	}
 
-	if(scalar keys %output) {
+	if(scalar keys %{$output}) {
 		if($ENV{'TEST_VERBOSE'}) {
 			diag('result: ', Dumper($result));
 		}
-		returns_ok($result, \%output, 'output validates');
+		returns_ok($result, $output, 'output validates');
+	}
+}
+
+my $positions = populate_positions(\%input);
+
+diag('Run Fuzz Tests') if($ENV{'TEST_VERBOSE'});
+
+foreach my $case (@{fuzz_inputs()}) {
+	# my %params;
+	# lives_ok { %params = get_params(\%input, %$case) } 'Params::Get input check';
+	# lives_ok { validate_strict(\%input, %params) } 'Params::Validate::Strict input check';
+
+	my $input;
+	if((ref($case) eq 'HASH') && exists($case->{'_input'})) {
+		$input = $case->{'_input'};
+	} else {
+		$input = $case;
+	}
+
+	if(my $line = (delete $case->{'_LINE'} || delete $input{'_LINE'})) {
+		diag("Test case from line number $line") if($ENV{'TEST_VERBOSE'});
+	}
+
+	run_test($case, $input, \%output, $positions);
+}
+
+diag('Run ', scalar(keys %transforms), ' transform tests') if($ENV{'TEST_VERBOSE'});
+# diag('-' x 60);
+
+# Build the foundation - which is a basic test with sensible defaults in the field
+foreach my $transform (keys %transforms) {
+	my $input = $transforms{$transform}{'input'} || {};
+	my $output = $transforms{$transform}{'output'} || {};
+
+	my $foundation;
+
+	foreach my $field (keys %input) {
+		my $spec = $input->{$field} || {};
+		my $type = $spec->{type} || 'string';
+
+		if(($type eq 'number') || ($type eq 'float')) {
+			if(defined $spec->{min}) {
+				if(defined $spec->{max}) {
+					$foundation->{$field} = $spec->{max};	# border
+				} else {
+					$foundation->{$field} = rand_num() + $spec->{'min'};
+				}
+			} else {
+				if(defined $spec->{max}) {
+					$foundation->{$field} = $spec->{max};	# border
+				} else {
+					$foundation->{$field} = -0.1;	# No min, so -0.1 should be allowable
+				}
+			}
+		} else {
+			die("TODO: transform type $type for foundation");
+		}
+	}
+
+	# The foundation should work
+	my $case = { _name => "basic $transform test", _LINE => __LINE__ };
+	my $positions = populate_positions(\%input);
+	run_test($case, $foundation, \%output, $positions);
+
+	# Generate transform tests
+	# Don't generate invalid data, that's all already done,
+	#	this is about verifying the transorms
+	my @tests;
+	diag("tests for transform $transform") if($ENV{'TEST_VERBOSE'});
+
+	# Now modify the foundation with test code
+
+	# BUILD CODE TO CALL FUNCTION
+	# CALL FUNCTION
+	# CHECK STATUS CORRECT
+	# IF STATUS EQ LIVES
+	#   CHECK OUTPUT USING returns_ok
+	# FI
+
+	foreach my $field (keys %input) {
+		my $spec = $input{$field} || {};
+		my $type = $spec->{type} || 'string';
+
+		if(($type eq 'number') || ($type eq 'integer') || ($type eq 'float')) {
+			if(defined $spec->{min}) {
+				push @tests, { %{$foundation}, ( $field => $spec->{min} + 1 ) };	# just inside
+				push @tests, { %{$foundation}, ( $field => $spec->{min} ) };	# border
+			} else {
+				push @tests, { %{$foundation}, ( $field => 0 ) };	# No min, so 0 should be allowable
+				push @tests, { %{$foundation}, ( $field => -1 ) };	# No min, so -1 should be allowable
+			}
+			if(defined $spec->{max}) {
+				push @tests, { %{$foundation}, ( $field => $spec->{max} - 1 ) };	# just inside
+				push @tests, { %{$foundation}, ( $field => $spec->{max} ) };	# border
+			}
+		} else {
+			die("TODO: transform type $type for test case");
+		}
+	}
+
+	foreach my $test(@tests) {
+		run_test({ _name => $transform }, $test, \%output, $positions);
 	}
 }
 

@@ -152,3 +152,16 @@
 1.39    Oct 30, 2025
 
         Added even more frame styles
+
+1.40    Nov 02, 2025
+
+        The "expanded" option is removed.  It now depends on the COLORTERM
+		environment variable and the "truecolor" value.
+
+1.41    Nov 02, 2025
+
+        Version 1.40 removed from CPAN.  The "--expanded" option re-added.
+		However, the default is to respond to the "COLORTERM" enviroment
+		value.  The "--expanded" option reverses the default.
+
+		Note:  "--expanded" only applies to the "--tokens" option.

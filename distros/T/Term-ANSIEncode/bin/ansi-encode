@@ -46,7 +46,8 @@ my $tokens    = FALSE;
 my $rawtokens = FALSE;
 my $symbols   = FALSE;
 my $unicode   = FALSE;
-my $expanded  = FALSE;
+my $expanded  = (defined($ENV{'COLORTERM'}) && $ENV{'COLORTERM'} eq 'truecolor') ? TRUE : FALSE;
+my $expand    = FALSE;
 my $colors    = FALSE;
 my $Dump      = FALSE;
 
@@ -59,8 +60,10 @@ GetOptions(
     'symbols'   => \$symbols,
     'dump'      => \$Dump,
     'unicode'   => \$unicode,
-	'expanded'  => \$expanded,
+	'expanded'  => \$expand,
 );
+$expanded = ! $expanded if ($expand);
+
 ###
 my $text = <<'VERSION';
 [% CLS %][% YELLOW %]╔═════════════════════════════════════════════════════════════════════════════╗[% RESET %]
@@ -155,8 +158,6 @@ will require a terminal that supports 256 colors, up to 16 million colors.  It
 is also highly recommended that your terminal supports UTF-8 for advanced
 character/symbol support.  Some terminals may not support some features.
 
-Use -[% BRIGHT BLUE %]e[% RESET %] or --[% BRIGHT BLUE %]expanded[% RESET %] to see all color tokens
-
 NOTE:  Use "less -r" to view ANSI in "less"
 
 ╭─────────────────────────────────────────────────────────────────────────────────────────╮
@@ -170,14 +171,15 @@ $to .= '│' . colored(['bright_green'], q{                  88,   "888,_ _,88P"
 $to .= '│' . colored(['bright_yellow'], q{                  MMM     "YMMMMMP"  MMM "MMP" """"YUMMMMMM     YM  "YMmMY"              }) . "│\n";
 
 {
-	foreach my $code ('clear','cursor','attributes','foreground','background','horizontal rules','special') {
-		if ($code eq 'clear') {
+	foreach my $code ('special','clear','cursor','attributes','foreground','background','horizontal rules') {
+		if ($code eq 'special') {
 			$to .= '╞══ ' . colored(['bold','bright_white'],uc($code)) . ' ' . '═' x (29 - (2 + length($code))) . '═╤════════════════════════════════════════════════════════╡' . "\n";
 		} else {
 			$to .= '╞══ ' . colored(['bold','bright_white'],uc($code)) . ' ' . '═' x (29 - (2 + length($code))) . '═╪════════════════════════════════════════════════════════╡' . "\n";
 		}
 		if ($code eq 'horizontal rules') {
-			$to .= '│  ' . sprintf('%-29s', 'HORIZONTAL RULE color') . ' │ ' . sprintf('%-54s','Horizontal rule the width of the screen') . ' │' . "\n";
+			$to .= '│  ' . sprintf('%-29s', 'HORIZONTAL RULE color') . ' │ ' . sprintf('%-54s','Horizontal rule the width of the screen in the') . ' │' . "\n";
+			$to .= '│                                │ ' . sprintf('%-54s','specified color') . ' │' . "\n";
 		} else {
 			my @names = (sort(keys %{$ansi->{'ansi_meta'}->{$code}}));
 			while(scalar(@names)) {
@@ -247,6 +249,8 @@ $to =~ s/\[\% GREYDIENT \%\]/$greydient/g;
 	$to =~ s/╡/$new/gs;
 	$new = colored(['bright_green'],'╪');
 	$to =~ s/╪/$new/gs;
+	$new = 'RULE [% FAINT %][% ITALIC %]color[% RESET %]';
+	$to =~ s/RULE color/$new/s;
 }
 
 if ($version) {

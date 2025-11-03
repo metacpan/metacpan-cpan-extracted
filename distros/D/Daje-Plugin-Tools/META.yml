@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.25, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.28, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,8 +24,20 @@ no_index:
     - author
     - builder
 provides:
+  Daje::Controller::ToolsObjectIndex:
+    file: lib/Daje/Controller/ToolsObjectIndex.pm
+  Daje::Controller::ToolsObjectSQL:
+    file: lib/Daje/Controller/ToolsObjectSQL.pm
+  Daje::Controller::ToolsObjectTypes:
+    file: lib/Daje/Controller/ToolsObjectTypes.pm
+  Daje::Controller::ToolsObjectViews:
+    file: lib/Daje/Controller/ToolsObjectViews.pm
   Daje::Controller::ToolsObjects:
     file: lib/Daje/Controller/ToolsObjects.pm
+  Daje::Controller::ToolsParameterTreelist:
+    file: lib/Daje/Controller/ToolsParameterTreelist.pm
+  Daje::Controller::ToolsParameterValues:
+    file: lib/Daje/Controller/ToolsParameterValues.pm
   Daje::Controller::ToolsProjects:
     file: lib/Daje/Controller/ToolsProjects.pm
   Daje::Controller::ToolsTableObjectDatatypes:
@@ -36,26 +48,56 @@ provides:
     file: lib/Daje/Controller/ToolsTreelist.pm
   Daje::Controller::ToolsVersions:
     file: lib/Daje/Controller/ToolsVersions.pm
+  Daje::Database::Helper::ParameterTreelist:
+    file: lib/Daje/Database/Helper/ParameterTreelist.pm
   Daje::Database::Helper::TreeList:
     file: lib/Daje/Database/Helper/TreeList.pm
+  Daje::Database::Model::Super::ToolsObjectIndex:
+    file: lib/Daje/Database/Model/Super/ToolsObjectIndex.pm
+  Daje::Database::Model::Super::ToolsObjectSQL:
+    file: lib/Daje/Database/Model/Super/ToolsObjectSQL.pm
+  Daje::Database::Model::Super::ToolsObjectTypes:
+    file: lib/Daje/Database/Model/Super/ToolsObjectTypes.pm
+  Daje::Database::Model::Super::ToolsObjectViews:
+    file: lib/Daje/Database/Model/Super/ToolsObjectViews.pm
   Daje::Database::Model::Super::ToolsObjects:
     file: lib/Daje/Database/Model/Super/ToolsObjects.pm
   Daje::Database::Model::Super::ToolsObjectsTables:
     file: lib/Daje/Database/Model/Super/ToolsObjectsTables.pm
   Daje::Database::Model::Super::ToolsObjectsTablesDatatypes:
     file: lib/Daje/Database/Model/Super/ToolsObjectsTablesDatatypes.pm
+  Daje::Database::Model::Super::ToolsParameterGroups:
+    file: lib/Daje/Database/Model/Super/ToolsParameterGroups.pm
+  Daje::Database::Model::Super::ToolsParameterValues:
+    file: lib/Daje/Database/Model/Super/ToolsParameterValues.pm
+  Daje::Database::Model::Super::ToolsParameters:
+    file: lib/Daje/Database/Model/Super/ToolsParameters.pm
   Daje::Database::Model::Super::ToolsProjects:
     file: lib/Daje/Database/Model/Super/ToolsProjects.pm
   Daje::Database::Model::Super::ToolsTreelist:
     file: lib/Daje/Database/Model/Super/ToolsTreelist.pm
   Daje::Database::Model::Super::ToolsVersion:
     file: lib/Daje/Database/Model/Super/ToolsVersion.pm
+  Daje::Database::Model::ToolsObjectIndex:
+    file: lib/Daje/Database/Model/ToolsObjectIndex.pm
+  Daje::Database::Model::ToolsObjectSQL:
+    file: lib/Daje/Database/Model/ToolsObjectSQL.pm
+  Daje::Database::Model::ToolsObjectTypes:
+    file: lib/Daje/Database/Model/ToolsObjectTypes.pm
+  Daje::Database::Model::ToolsObjectViews:
+    file: lib/Daje/Database/Model/ToolsObjectViews.pm
   Daje::Database::Model::ToolsObjects:
     file: lib/Daje/Database/Model/ToolsObjects.pm
   Daje::Database::Model::ToolsObjectsTables:
     file: lib/Daje/Database/Model/ToolsObjectsTables.pm
   Daje::Database::Model::ToolsObjectsTablesDatatypes:
     file: lib/Daje/Database/Model/ToolsObjectsTablesDatatypes.pm
+  Daje::Database::Model::ToolsParameterGroups:
+    file: lib/Daje/Database/Model/ToolsParameterGroups.pm
+  Daje::Database::Model::ToolsParameterValues:
+    file: lib/Daje/Database/Model/ToolsParameterValues.pm
+  Daje::Database::Model::ToolsParameters:
+    file: lib/Daje/Database/Model/ToolsParameters.pm
   Daje::Database::Model::ToolsProjects:
     file: lib/Daje/Database/Model/ToolsProjects.pm
   Daje::Database::Model::ToolsVersion:
@@ -78,23 +120,19 @@ provides:
     file: lib/Daje/Database/View/VTreeList.pm
   Daje::Plugin::Tools:
     file: lib/Daje/Plugin/Tools.pm
-    version: '0.10'
-  Daje::Workflow::Activity::Tools::Objects:
-    file: lib/Daje/Workflow/Activity/Tools/Objects.pm
-  Daje::Workflow::Activity::Tools::ObjectsTable:
-    file: lib/Daje/Workflow/Activity/Tools/ObjectsTable.pm
+    version: '0.13'
   Daje::Workflow::Activity::Tools::Project:
     file: lib/Daje/Workflow/Activity/Tools/Project.pm
 requires:
   Mojo::Base: '0'
   Scalar::Util: '0'
-  perl: v5.40.0
+  perl: '5.042000'
 resources:
   bugtracker: https://github.com/janeskil1525/Daje-Plugin-Tools/issues
   homepage: https://github.com/janeskil1525/Daje-Plugin-Tools
   repository: https://github.com/janeskil1525/Daje-Plugin-Tools.git
-version: '0.10'
+version: '0.13'
 x_contributors:
   - 'janeskil1525 <janeskil1525@gmail.com>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
 x_static_install: 1

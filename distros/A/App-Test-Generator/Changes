@@ -1,5 +1,13 @@
 Revision history for App-Test-Generator
 
+0.12	Sun Nov  2 19:38:10 EST 2025
+	undef can now be used to indicate no input or output
+	Sending with no args if now configured using "test_undef" rather than "test_empty"
+	Use Data::Random::String::Matches to create random string that matches a regex
+	Flag keywords that are yet to be handled
+	$module can now be set to "builtin"
+	Initial basic support for positional arguments and transforms
+
 0.11	Sun Oct 26 14:39:19 EDT 2025
 	Only add to candidate_bad those test cases which are requested
 	Better matches and nomatch tests

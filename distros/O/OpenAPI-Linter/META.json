@@ -42,7 +42,7 @@
    "provides" : {
       "OpenAPI::Linter" : {
          "file" : "lib/OpenAPI/Linter.pm",
-         "version" : "0.10"
+         "version" : "0.12"
       }
    },
    "release_status" : "stable",
@@ -53,6 +53,6 @@
          "web" : "https://github.com/manwar/OpenAPI-Linter"
       }
    },
-   "version" : "0.10",
+   "version" : "0.12",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

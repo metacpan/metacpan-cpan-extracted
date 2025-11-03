@@ -20,7 +20,7 @@ no_index:
 provides:
   OpenAPI::Linter:
     file: lib/OpenAPI/Linter.pm
-    version: '0.10'
+    version: '0.12'
 requires:
   File::Slurp: '0'
   JSON: '0'
@@ -28,5 +28,5 @@ requires:
   YAML::XS: '0'
 resources:
   repository: https://github.com/manwar/OpenAPI-Linter.git
-version: '0.10'
+version: '0.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

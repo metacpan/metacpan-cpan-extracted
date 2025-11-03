@@ -4,7 +4,7 @@ App::Test::Generator - Generate fuzz and corpus-driven test harnesses
 
 # VERSION
 
-Version 0.11
+        Version 0.12
 
 # SYNOPSIS
 
@@ -165,6 +165,8 @@ Recognized items:
 
     Currently, routines with more than one unnamed parameter are not supported.
 
+    The keyword `undef` is used to indicate that the `function` takes no arguments.
+
 - `%output` - output param types for Return::Set checking:
 
         output:
@@ -185,7 +187,66 @@ Recognized items:
 
         output: undef
 
+    The keyword `undef` is used to indicate that the `function` returns nothing.
+
+- `%transforms` - list of transformations from input sets to output sets
+
+    TO BE IMPLEMENTED.
+
+    It takes a list of subsets of the input and output definitions,
+    and verifies that data from each input subset is correctly transformed into data from the matching output subset.
+
+    This is a draft definition of the schema.
+
+        ---
+        module: builtin
+        function: abs
+        test_undef: no
+        test_empty: no
+        test_nuls: no
+
+        input:
+          number:
+            type: number
+            position: 0
+        output:
+          type: number
+          min: 0
+        transforms:
+          positive:
+            input:
+              number:
+                type: number
+                position: 0
+                min: 0
+            output:
+              type: number
+              min: 0
+          negative:
+            input:
+              number:
+                type: number
+                position: 0
+                max: 0
+            output:
+              type: number
+              min: 0
+          error:
+            input:
+              undef
+            output:
+              _STATUS: DIES
+
+    If the output hash contains the key \_STATUS, and if that key is set to DIES,
+    the routine should die with the given arguments; otherwise, it should live.
+    If it's set to WARNS,
+    the routine should warn with the given arguments.
+
+    The keyword `undef` is used to indicate that the `function` returns nothing.
+
 - `$module` - module name (optional).
+
+    Using the reserved word `builtin` means you're testing a Perl builtin function.
 
     If omitted, the generator will guess from the config filename:
     `My-Widget.conf` -> `My::Widget`.
@@ -420,12 +481,15 @@ The generated test:
 
 # NOTES
 
-- The conf file must use `our` declarations so variables are visible to the generator via `require`.
+- The legacy format conf file must use `our` declarations so variables are visible to the generator via `require`.
 
 # SEE ALSO
 
-- Test coverage report: [https://nigelhorne.github.io/App-Test-Generator/coverage/](https://nigelhorne.github.io/App-Test-Generator/coverage/)
-- [Test::Most](https://metacpan.org/pod/Test%3A%3AMost), [Params::Get](https://metacpan.org/pod/Params%3A%3AGet), [Params::Validate::Strict](https://metacpan.org/pod/Params%3A%3AValidate%3A%3AStrict), [Return::Set](https://metacpan.org/pod/Return%3A%3ASet), [YAML::XS](https://metacpan.org/pod/YAML%3A%3AXS)
+- [https://nigelhorne.github.io/App-Test-Generator/coverage/](https://nigelhorne.github.io/App-Test-Generator/coverage/): Test Coverage Report
+- [Params::Validate::Strict](https://metacpan.org/pod/Params%3A%3AValidate%3A%3AStrict): Schema Definition
+- [Params::Get](https://metacpan.org/pod/Params%3A%3AGet): Input validation
+- [Return::Set](https://metacpan.org/pod/Return%3A%3ASet): Output validation
+- [Test::Most](https://metacpan.org/pod/Test%3A%3AMost), [YAML::XS](https://metacpan.org/pod/YAML%3A%3AXS)
 
 # AUTHOR
 

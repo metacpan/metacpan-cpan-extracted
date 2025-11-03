@@ -1,17 +1,23 @@
 package Data::HexConverter;
-
 use strict;
 use warnings;
+use XSLoader;
 use Exporter qw(import);
 
-our $VERSION = '0.04';
+our $VERSION = '0.61';
 
 use XSLoader;
 XSLoader::load(__PACKAGE__, $VERSION);
 
 our @ISA = qw(Exporter);
-our @EXPORT_OK = qw(hex_to_binary binary_to_hex);
-our @EXPORT = ();
+our @EXPORT = qw(
+	hex_to_binary
+	binary_to_hex
+	hex_to_binary_impl
+	binary_to_hex_impl
+);
+
+our @EXPORT_OK = ();
 
 1;
 
@@ -19,79 +25,55 @@ __END__
 
 =head1 NAME
 
-Data::HexConverter - High performance hex string to binary converter
+Data::HexConverter - Fast hex to binary and binary to hex using SIMD aware C code
 
 =head1 SYNOPSIS
 
     use Data::HexConverter;
+
     my $hex_ref = \"41424344";
     my $binary  = Data::HexConverter::hex_to_binary($hex_ref);
-    # $binary now contains "ABCD"
 
-	 my $hex = Data::HexConverter::binary_to_hex(\$binary);
-	 # $hex now contains "41424344"
+    my $hex     = Data::HexConverter::binary_to_hex(\$binary);
+
+    my $himpl   = Data::HexConverter::hex_to_binary_impl();
+    my $bimpl   = Data::HexConverter::binary_to_hex_impl();
 
 =head1 DESCRIPTION
 
-This module provides two functions, C<hex_to_binary> and
-C<binary_to_hex>.
+This module calls a C library that picks the best implementation for the current CPU at runtime.
 
-C<hex_to_binary> accepts a reference to a scalar containing an ASCII
-hexadecimal string and returns a binary string.  It uses SSSE3
-intrinsics to convert blocks of 32 characters at a time for maximum
-throughput.  Remaining characters are handled via a lookup table.  If
-the input contains an odd number of characters or an invalid hex
-digit, an exception is thrown.
+On an AVX512 host it will use AVX512. 
 
-C<binary_to_hex> performs the reverse operation: it accepts a
-reference to a scalar containing arbitrary binary data and returns an
-uppercase hexadecimal representation.  It uses SSSE3 vector
-instructions to expand 16 bytes at a time but will fall back to a
-scalar implementation and emit a warning if SSSE3 is not available.
+On most other hosts AVX2 will be used. 
 
-=head1 VERSION
+If the host is really old (unlikely) will use SSE2 or scalar (even more unlikely).
 
-Version 0.04
-
-=cut
-
+The Perl API takes references to scalars, because the strings can be large.
 
 =head1 FUNCTIONS
 
-=head2 hex_to_binary
+=head2 hex_to_binary(\$hexstr)
 
-    my $binary = Data::HexConverter::hex_to_binary(\$hex_string);
+Takes a reference to a hex string, returns the decoded binary string.
 
-Converts the hexadecimal string pointed at by the reference into its
-binary form and returns it as a Perl scalar.  The input scalar must
-only contain ASCII characters; if the scalar is flagged as UTF-8 it is
-downgraded to bytes using C<sv_utf8_downgrade>[817665102442637-L378-L404].  An exception is thrown if the
-string cannot be downgraded or if it contains invalid characters.
+=head2 binary_to_hex(\$binstr)
 
-=head2 binary_to_hex
+Takes a reference to a binary string, returns the hex encoded string.
 
-    my $hex = Data::HexConverter::binary_to_hex(\$binary_string);
+=head2 hex_to_binary_impl()
 
-Converts a binary string referenced by the argument into its uppercase
-hexadecimal representation and returns it as a Perl scalar.  Each
-input byte becomes two hex characters.  The input scalar is
-downgraded from UTF-8 if necessary.  A warning is issued and a
-scalar implementation is used if the CPU lacks SSSE3 support.  An
-exception is thrown if the argument is not a reference to a scalar.
+Returns a short string with the name of the impl used for hex to bin.
+
+=head2 binary_to_hex_impl()
+
+Returns a short string with the name of the impl used for bin to hex.
 
 =head1 AUTHOR
 
 Jared Still
 
-Assisted by ChatGPT.
+=head1 LICENSE
 
-=head1 LICENSE AND COPYRIGHT
-
-This software is Copyright (c) 2025 by Jared Still.
-
-This is free software, licensed under:
-
-  MIT License
-
-=cut
+MIT License.
 

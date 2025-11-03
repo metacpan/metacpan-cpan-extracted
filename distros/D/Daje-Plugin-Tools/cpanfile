@@ -1,4 +1,4 @@
-requires 'perl', '5.040000';
+requires 'perl', '5.042000';
 requires 'Mojo::Base', '0';
 requires 'Scalar::Util', '0';
 

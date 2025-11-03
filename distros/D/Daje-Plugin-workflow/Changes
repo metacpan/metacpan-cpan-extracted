@@ -1,6 +1,7 @@
 Revision history for Perl extension Daje-Plugin-workflow
 
-0.09 2025-10-30T06:27:27Z
+0.10 2025-11-02T15:11:05Z
+    - 2025-11-02 Beta 1
     - 2025-10-30 url changed to /workflow/api/execute
     - 2025-10-04 Improved logging and documentation
     - original version

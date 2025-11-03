@@ -1,0 +1,38 @@
+---
+module: builtin
+function: abs
+test_undef: no
+test_empty: no
+test_nuls: no
+
+input:
+  number:
+    type: number
+    position: 0
+output:
+  type: number
+  min: 0
+transforms:
+  positive:
+    input:
+      number:
+        type: number
+        position: 0
+        min: 0
+    output:
+      type: number
+      min: 0
+  negative:
+    input:
+      number:
+        type: number
+        position: 0
+        max: 0
+    output:
+      type: number
+      min: 0
+      # error:
+      #   input:
+      #     undef
+      #   output:
+      #     _STATUS: DIES

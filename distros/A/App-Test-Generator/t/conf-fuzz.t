@@ -42,9 +42,9 @@ if($@) {
 	if($? == 0) {
 		unlink $outfile;
 	} else {
-		diag("STDERR:\n$stderr");
 		diag("STDOUT:\n$stdout");
 	}
+	diag($stderr) if(length($stderr));
 
 	like($stderr, qr/Data::Text->append test case created/);
 	like($stdout, qr/^ok \d/sm, 'At least one created test passed');

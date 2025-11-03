@@ -4,7 +4,7 @@ use Modern::Perl;
 use Readonly;
 use Scalar::Util 'reftype';
 
-our $VERSION = q/1.15/;
+our $VERSION = '1.16';
 
 # Exporter
 Readonly our @EXPORT      => qw(jsdump hjsdump);
@@ -22,7 +22,7 @@ Readonly my $JSCOMPAT_UNDEFINED_MISSING    => 1.2;
 # This is a context variable which holds on to configs.
 my %opt = ( JS => $JSCOMPAT_DEFAULT_VERSION );  # TODO: This is super out-dated.
 
-if ( !$] < $MIN_ENCODE_REQUIRE_BREAKPOINT ) { require Encode; }
+if ( $] >= $MIN_ENCODE_REQUIRE_BREAKPOINT ) { require Encode; }
 
 sub import {
   my ( $package, @args ) = @_;
@@ -156,27 +156,25 @@ sub __jsdump {
 
   if ( not $ref ) {
     if ( not defined $elem ) {
-      return qq/$sym = @{[defined($undef) ? $undef : $opt{UNDEF}]};/;
+      return qq($sym = @{[defined($undef) ? $undef : $opt{UNDEF}]};);
     }
 
     #Translated from $Regexp::Common::RE{num}{real}
-    if ( $elem =~ /^[+-]?(?:(?=\d|[.])\d*(?:[.]\d{0,})?)$/xsm ) {
+    if ( $elem ne '.' &&
+	 $elem =~ /^[+-]?(?:(?=\d|[.])\d*(?:[.]\d{0,})?)(?:[eE][+-]?\d+)?$/xsm ) {
 
-      #                                                      (?:[eE][+-]?\d+)?
-      if ( $elem =~ /^0\d+$/xsm ) {
-        return qq/$sym = "$elem";/;
-      }
-      return qq/$sym = $elem;/;
+      if( $elem =~ /^0\d+$/xsm ){
+        return qq($sym = "$elem";) }
+      return qq($sym = $elem;);
     }
 
     #Fall-back to quoted string
-    return qq/$sym = "/ . __quotemeta($elem) . q/";/;
+    return qq($sym = ") . __quotemeta($elem) . '";';
   }
 
   #Circular references
-  if ( $dict->{$elem} ) {
-    return qq/$sym = $dict->{$elem};/;
-  }
+  if( $dict->{$elem} ){
+    return qq($sym = $dict->{$elem};) }
   $dict->{$elem} = $sym;
 
   #isa over ref in case we're given objects

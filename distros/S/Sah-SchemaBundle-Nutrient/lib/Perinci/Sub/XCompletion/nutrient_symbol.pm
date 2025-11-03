@@ -7,9 +7,9 @@ use warnings;
 use Complete::Nutrient qw(complete_nutrient_symbol);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-05-30'; # DATE
+our $DATE = '2025-11-03'; # DATE
 our $DIST = 'Sah-SchemaBundle-Nutrient'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our %SPEC;
 
@@ -39,7 +39,7 @@ Perinci::Sub::XCompletion::nutrient_symbol - Generate completion for nutrient sy
 
 =head1 VERSION
 
-This document describes version 0.002 of Perinci::Sub::XCompletion::nutrient_symbol (from Perl distribution Sah-SchemaBundle-Nutrient), released on 2024-05-30.
+This document describes version 0.003 of Perinci::Sub::XCompletion::nutrient_symbol (from Perl distribution Sah-SchemaBundle-Nutrient), released on 2025-11-03.
 
 =head1 SYNOPSIS
 
@@ -108,7 +108,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

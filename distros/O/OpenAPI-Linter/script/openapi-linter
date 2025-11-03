@@ -58,8 +58,7 @@ if ($json_output) {
 
             # Apply formatting only to schema validation errors
             if ($validate_schema) {
-                $message = $linter->format_schema_error($message);
-                print "$message\n";
+                print $linter->format_schema_error($message) . "\n";
             }
             else {
                 printf "[%s] %s\n", $i->{level}, $message;

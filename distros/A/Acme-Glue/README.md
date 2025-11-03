@@ -4,7 +4,7 @@ Acme::Glue - A placeholder module for code accompanying a Perl photo project
 
 # VERSION
 
-2025.09
+2025.11
 
 # DESCRIPTION
 

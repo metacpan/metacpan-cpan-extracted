@@ -37,6 +37,7 @@ if($run && !$outfile) {
 
 App::Test::Generator::generate($infile, $outfile);
 
+chmod 0755, $outfile;
 if($run) {
 	system("prove -l $outfile");
 }

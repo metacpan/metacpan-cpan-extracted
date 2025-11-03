@@ -28,14 +28,14 @@ async sub update_tools_projects_p($self, $data, $keys) {
     return $result;
 }
 
-sub insert_tools_projects($self, $data) {
-    my $result = $self->insert($self->table_name, $data, $self->primary_key_name);
+sub insert($self, $data) {
+    my $result = $self->SUPER::insert($self->table_name, $data, $self->primary_key_name);
     return $result;
 }
 
 
-sub update_tools_projects($self, $data, $keys) {
-    my $result = $self->update($self->table_name, $data, $keys);
+sub update($self, $data, $keys) {
+    my $result = $self->SUPER::update($self->table_name, $data, $keys);
     return $result;
 }
 

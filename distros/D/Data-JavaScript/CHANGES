@@ -1,5 +1,17 @@
 Revision history for Perl extension Data::JavaScript.
 
+1.16  Sun Nov  2 10:19:35 EST 2025
+  - Debian patch for Perl 5.42 warning
+  - Fix unquoted period reported by jwrightrecs, which matches real num regexp
+  - Unquote numbers in scientific notation for brevity of output
+    (Maybe older JSON did not support them, and that's why they were wrapped?)
+  - Remove 404 issue tracker from YAML.
+    Wayback machine shows title only of three tickets circa 2010,
+    the first two of which are from MSTEMLE / manchicken
+    1. Update documentation
+    2. Add support for modern JavaScript data structures
+    3. single . as value isn't quoted - jwrightrecs
+
 1.15  Sun Oct 11 11:37:15 EDT 2020
   - Adding skip check to the perlcritic test to avoid cpan tester issues.
 

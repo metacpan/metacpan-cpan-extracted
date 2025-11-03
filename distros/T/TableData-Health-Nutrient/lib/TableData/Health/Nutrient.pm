@@ -10,7 +10,7 @@ with 'TableDataRole::Source::AOH';
 our $table_def = {
     fields => {
         symbol   => {pos=>0, schema=>'str*'},
-        aliases  => {pos=>1, schema=>'str*'}, # alternate symbols, comma-separated
+        aliases  => {pos=>1, schema=>'aos'}, # alternate symbols
         summary  => {pos=>2, schema=>'str'},
 
         category => {pos=>3, schema=>['str*', in=>[
@@ -44,11 +44,9 @@ our $data = [
     # TableDataRole::Source::AOH uses the first row to enumerate the columns
     {
         symbol => 'VA',
-        aliases => '',
-        summary => undef,
-
+        aliases => undef,
+        summary => 'Vitamin A',
         category => 'vitamin',
-
         eng_name => 'Vitamin A',
         eng_aliases => undef,
         ind_name => 'Vitamin A',
@@ -64,22 +62,31 @@ our $data = [
     },
     {
         symbol => 'VD',
+        aliases => undef,
+        summary => 'Vitamin D',
+        category => 'vitamin',
         eng_name => 'Vitamin D',
         ind_name => 'Vitamin D',
-        category => 'vitamin',
         default_unit => 'IU-vitd',
         fat_soluble => 1,
     },
     {
         symbol => 'VE',
+        aliases => undef,
+        summary => 'Vitamin E',
+        category => 'vitamin',
+
         eng_name => 'Vitamin E',
         ind_name => 'Vitamin E',
-        category => 'vitamin',
         default_unit => 'IU-vite',
         fat_soluble => 1,
     },
     {
         symbol => 'VK',
+        aliases => undef,
+        summary => 'Vitamin K',
+        category => 'vitamin',
+
         eng_name => 'Vitamin K',
         ind_name => 'Vitamin K',
         category => 'vitamin',
@@ -88,109 +95,129 @@ our $data = [
     },
     {
         symbol => 'VB1',
-        aliases => 'Thiamine',
+        aliases => ['Thiamine'],
+        summary => 'Vitamin B1 (Thiamine)',
+        category => 'vitamin',
+
         eng_name => 'Vitamin B1',
         eng_aliases => ['Thiamine'],
         ind_name => 'Vitamin B1',
         ind_aliases => ['Thiamin'],
-        category => 'vitamin',
         default_unit => 'mg',
         water_soluble => 1,
     },
     {
         symbol => 'VB2',
-        aliases => 'Riboflavin',
+        aliases => ['Riboflavin'],
+        summary => 'Vitamin B2 (Riboflavin)',
+        category => 'vitamin',
+
         eng_name => 'Vitamin B2',
         eng_aliases => ['Riboflavin'],
         ind_name => 'Vitamin B2',
         ind_aliases => ['Riboflavin'],
-        category => 'vitamin',
         default_unit => 'mg',
         water_soluble => 1,
     },
     {
         symbol => 'VB3',
-        aliases => 'Niacin',
-        eng_name => 'Vitamin B3',
-        eng_aliases => ['Niacin'],
-        ind_name => 'Vitamin B3',
-        ind_aliases => ['Niacin'],
+        aliases => ['Niacin'],
+        summary => 'Vitamin B3 (Niacin)',
         category => 'vitamin',
+
+        eng_name => 'Vitamin B3',
+        eng_aliases => ['Niacin', 'Vitamin PP'],
+        ind_name => 'Vitamin B3',
+        ind_aliases => ['Niasin'],
         default_unit => 'mg',
         water_soluble => 1,
     },
     {
         symbol => 'VB5',
-        aliases => 'Pantothenic_Acid',
+        aliases => ['Pantothenic_Acid'],
+        summary => 'Vitamin B5 (Pantothenic Acid)',
+        category => 'vitamin',
+
         eng_name => 'Pantothenic acid',
         eng_aliases => ['Vitamin B5'],
         ind_name => 'Asam pantotenat',
         ind_aliases => ['Vitamin B5'],
-        category => 'vitamin',
         default_unit => 'mg',
         water_soluble => 1,
     },
     {
         symbol => 'VB6',
-        aliases => 'Pyridoxine',
+        aliases => ['Pyridoxine'],
         summary => 'Vitamin B6 refers to a group of six vitamers, one of which is pyridoxine',
+        category => 'vitamin',
+
         eng_name => 'Vitamin B6',
         eng_aliases => ['Pyridoxine'],
         ind_name => 'Vitamin B6',
-        ind_aliases => ['Pyridoxine'],
-        category => 'vitamin',
+        ind_aliases => ['Piridoksin'],
         default_unit => 'mg',
         water_soluble => 1,
     },
     {
         symbol => 'VB9',
-        aliases => 'Folate',
+        aliases => ['Folate'],
+        summary => 'Vitamin B9 (Folate)',
+        category => 'vitamin',
+
         eng_name => 'Folate',
         eng_aliases => ['Vitamin B9', 'Folacin'],
         ind_name => 'Folat',
         ind_aliases => ['Vitamin B9', 'Folasin'],
-        category => 'vitamin',
         default_unit => 'mcg',
         water_soluble => 1,
     },
     {
         symbol => 'VB12',
-        aliases => 'Cobalamin',
+        aliases => ['Cobalamin'],
+        summary => 'Vitamin B12 (Cobalamin)',
+        category => 'vitamin',
+
         eng_name => 'Vitamin B12',
         eng_aliases => ['Cobalamin'],
         ind_name => 'Vitamin B12',
         ind_aliases => ['Kobalamin'],
-        category => 'vitamin',
         default_unit => 'mcg',
         water_soluble => 1,
     },
     {
-        symbol => 'VB7',
-        aliases => 'Biotin',
+        symbol => 'Biotin',
+        aliases => ['VB7'],
+        summary => 'Biotin (Vitamin B7)',
+        category => 'vitamin',
+
         eng_name => 'Biotin',
         eng_aliases => ['Vitamin B7', 'Vitamin H'],
         ind_name => 'Biotin',
         ind_aliases => ['Vitamin B7', 'Vitamin H'],
-        category => 'vitamin',
         default_unit => 'mg',
         water_soluble => 1,
     },
     {
-        symbol => 'VB4',
-        aliases => 'Choline',
+        symbol => 'Choline',
+        aliases => ['VB4'],
+        summary => 'Choline (Vitamin B4)',
+        category => 'essential nutrient',
+
         eng_name => 'Choline',
         eng_aliases => ['Vitamin B4'],
         ind_name => 'Kolin',
         ind_aliases => ['Vitamin B4'],
-        category => 'essential nutrient',
         default_unit => 'mg',
         water_soluble => 1,
     },
     {
         symbol => 'VC',
+        aliases => undef,
+        summary => 'Vitamin C',
+        category => 'vitamin',
+
         eng_name => 'Vitamin C',
         ind_name => 'Vitamin C',
-        category => 'vitamin',
         default_unit => 'mg',
         water_soluble => 1,
     },
@@ -199,222 +226,313 @@ our $data = [
 
     {
         symbol => 'Ca',
+        aliases => undef,
+        summary => 'Calcium',
+        category => 'mineral',
+
         eng_name => 'Calcium',
         ind_name => 'Kalsium',
-        category => 'mineral',
         default_unit => 'mg',
     },
     {
         symbol => 'P',
+        aliases => undef,
+        summary => 'Phosphorus',
+        category => 'mineral',
+
         eng_name => 'Phosphorus',
         ind_name => 'Fosfor',
-        category => 'mineral',
         default_unit => 'mg',
     },
     {
         symbol => 'Mg',
+        aliases => undef,
+        summary => 'Magnesium',
+        category => 'mineral',
+
         eng_name => 'Magnesium',
         ind_name => 'Magnesium',
-        category => 'mineral',
         default_unit => 'mg',
     },
     {
         symbol => 'Fe',
+        aliases => undef,
+        summary => 'Iron',
+        category => 'mineral',
+
         eng_name => 'Iron',
         ind_name => 'Besi',
-        category => 'mineral',
         default_unit => 'mg',
     },
     {
         symbol => 'I',
+        aliases => undef,
+        summary => 'Iodium',
+        category => 'mineral',
+
         eng_name => 'Iodium',
         ind_name => 'Iodium',
-        category => 'mineral',
         default_unit => 'mcg',
     },
     {
         symbol => 'Zn',
+        aliases => undef,
+        summary => 'Zinc',
+        category => 'mineral',
+
         eng_name => 'Zinc',
         ind_name => 'Seng',
-        category => 'mineral',
         default_unit => 'mg',
     },
     {
         symbol => 'Se',
+        aliases => undef,
+        summary => 'Selenium',
+        category => 'mineral',
+
         eng_name => 'Selenium',
         ind_name => 'Selenium',
-        category => 'mineral',
         default_unit => 'mcg',
     },
     {
         symbol => 'Mn',
+        aliases => undef,
+        summary => 'Mangan',
+        category => 'mineral',
+
         eng_name => 'Mangan',
         ind_name => 'Mangan',
-        category => 'mineral',
         default_unit => 'mg',
     },
     {
         symbol => 'F',
+        aliases => undef,
+        summary => 'Fluorine',
+        category => 'mineral',
+
         eng_name => 'Fluorine',
         ind_name => 'Fluor',
-        category => 'mineral',
         default_unit => 'mg',
     },
     {
         symbol => 'Cr',
+        aliases => undef,
+        summary => 'Chromium',
+        category => 'mineral',
+
         eng_name => 'Chromium',
         ind_name => 'Kromium',
-        category => 'mineral',
         default_unit => 'mcg',
     },
     {
         symbol => 'K',
+        aliases => undef,
+        summary => 'Potassium',
+        category => 'mineral',
+
         eng_name => 'Potassium',
         ind_name => 'Kalium',
-        category => 'mineral',
         default_unit => 'mg',
     },
     {
         symbol => 'Na',
+        aliases => undef,
+        summary => 'Sodium',
+        category => 'mineral',
+
         eng_name => 'Sodium',
         ind_name => 'Natrium',
-        category => 'mineral',
         default_unit => 'mg',
     },
     {
         symbol => 'Cl',
+        aliases => undef,
+        summary => 'Chlorine',
+        category => 'mineral',
+
         eng_name => 'Chlorine',
         ind_name => 'Klor',
-        category => 'mineral',
         default_unit => 'mg',
     },
     {
         symbol => 'Cu',
+        aliases => undef,
+        summary => 'Copper',
+        category => 'mineral',
+
         eng_name => 'Copper',
         ind_name => 'Tembaga',
-        category => 'mineral',
         default_unit => 'mcg',
     },
     {
         symbol => 'B',
+        aliases => undef,
+        summary => 'Boron',
+        category => 'mineral',
+
         eng_name => 'Boron',
         ind_name => 'Boron',
-        category => 'mineral',
         default_unit => 'mg',
     },
     {
         symbol => 'Mo',
+        aliases => undef,
+        summary => 'Molybdenum',
+        category => 'mineral',
+
         eng_name => 'Molybdenum',
         ind_name => 'Molibdenum',
-        category => 'mineral',
         default_unit => 'mcg',
     },
     {
         symbol => 'V',
+        aliases => undef,
+        summary => 'Vanadium',
+        category => 'mineral',
         eng_name => 'Vanadium',
         ind_name => 'Vanadium',
-        category => 'mineral',
         default_unit => 'mcg',
     },
 
     # other
     {
         symbol => 'Energy',
+        aliases => undef,
+        summary => 'Energy',
+        category => 'energy',
+
         eng_name => 'Energy',
         ind_name => 'Energi',
-        category => 'energy',
         default_unit => 'kcal',
     },
     {
         symbol => 'Protein',
+        aliases => undef,
+        summary => 'Protein',
+        category => 'macronutrient',
+
         eng_name => 'Protein',
         ind_name => 'Protein',
-        category => 'macronutrient',
         default_unit => 'g',
     },
     {
         symbol => 'Total_Fat',
+        aliases => undef,
+        summary => 'Fat (total)',
+        category => 'macronutrient',
+
         eng_name => 'Total fat',
         ind_name => 'Lemak total',
-        category => 'macronutrient',
         default_unit => 'g',
     },
     {
         symbol => 'Saturated_Fat',
+        aliases => undef,
+        summary => 'Fat (saturated)',
+        category => 'macronutrient',
+
         eng_name => 'Saturated fat',
         ind_name => 'Lemak jenuh',
-        category => 'macronutrient',
         default_unit => 'g',
     },
     {
         symbol => 'Cholesterol',
+        aliases => undef,
+        summary => 'Cholesterol',
+        category => 'other',
+
         eng_name => 'Cholesterol',
         ind_name => 'Kolesterol',
-        category => 'other',
         default_unit => 'mg',
     },
     {
         symbol => 'Linoleic_Acid',
+        aliases => undef,
+        summary => 'Linoleic acid (LA)',
+        category => 'fatty acid',
+
         eng_name => 'Linoleic acid',
         ind_name => 'Asam linoleat',
-        category => 'fatty acid',
         default_unit => 'g',
     },
     {
         symbol => 'Omega6',
+        aliases => undef,
+        summary => 'Omega-6 fatty acids',
+        category => 'fatty acid',
+
         eng_name => 'Omega-6 fatty acids',
         ind_name => 'Asam lemak omega-6',
-        category => 'fatty acid',
         default_unit => 'g',
     },
     {
         symbol => 'Alpha_Linolenic_Acid',
+        aliases => undef,
+        summary => 'ɑ-linolenic acid (ALA)',
+        category => 'fatty acid',
+
         eng_name => 'ɑ-linolenic acid',
         ind_name => 'Asam ɑ-linolenat',
-        category => 'fatty acid',
         default_unit => 'g',
     },
     {
         symbol => 'Omega3',
+        aliases => undef,
+        summary => 'Omega-3 fatty acids',
+        category => 'fatty acid',
+
         eng_name => 'Omega-3 fatty acids',
         ind_name => 'Asam lemak omega-3',
-        category => 'fatty acid',
         default_unit => 'g',
     },
     {
         symbol => 'Carbohydrate',
+        aliases => undef,
+        summary => 'Carbohydrate (total)',
+        category => 'macronutrient',
+
         eng_name => 'Total carbohydrate',
         ind_name => 'Karbohidrat total',
-        category => 'macronutrient',
         default_unit => 'g',
     },
     {
         symbol => 'Dietary_Fiber',
+        aliases => undef,
+        summary => 'Dietary fiber',
+        category => 'other',
+
         eng_name => 'Dietary fiber',
         ind_name => 'Serat pangan',
-        category => 'other',
         default_unit => 'g',
     },
     {
         symbol => 'L_Carnitine',
+        aliases => undef,
+        summary => 'L-Carnitine',
+        category => 'amino acid',
+
         eng_name => 'L-Carnitine',
         ind_name => 'L-Karnitin',
-        category => 'amino acid',
         default_unit => 'mg',
     },
     {
         symbol => 'Myo_Inositol',
+        aliases => undef,
+        summary => 'Myo-Inositol',
+        category => 'sugar',
+
         eng_name => 'Myo-Inositol',
         ind_name => 'Myo-Inositol',
-        category => 'sugar',
         default_unit => 'mg',
     },
     {
         symbol => 'H2O',
-        aliases => 'Water',
+        aliases => ['Water'],
+        summary => 'Water',
+        category => 'other',
+
         eng_name => 'Water',
         ind_name => 'Air',
-        category => 'other',
         default_unit => 'ml',
     },
 ];
@@ -459,7 +577,7 @@ package TableData::Health::Nutrient;
 use strict;
 
 use Role::Tiny::With;
-with 'TableDataRole::Health::Nutrient';
+with 'TableDataRole::Health::Nutrient0';
 with 'TableDataRole::Spec::TableDef';
 
 sub get_table_def {
@@ -467,9 +585,9 @@ sub get_table_def {
 }
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-06-28'; # DATE
+our $DATE = '2025-11-03'; # DATE
 our $DIST = 'TableData-Health-Nutrient'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 our %STATS = ("num_columns",13,"num_rows",45); # STATS
 
@@ -488,7 +606,7 @@ TableDataRole::Health::Nutrient0 - Nutrients
 
 =head1 VERSION
 
-This document describes version 0.005 of TableDataRole::Health::Nutrient0 (from Perl distribution TableData-Health-Nutrient), released on 2024-06-28.
+This document describes version 0.006 of TableDataRole::Health::Nutrient0 (from Perl distribution TableData-Health-Nutrient), released on 2025-11-03.
 
 =head1 SYNOPSIS
 
@@ -567,7 +685,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

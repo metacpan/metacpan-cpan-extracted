@@ -1,6 +1,6 @@
 package OpenAPI::Linter;
 
-$OpenAPI::Linter::VERSION   = '0.10';
+$OpenAPI::Linter::VERSION   = '0.12';
 $OpenAPI::Linter::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ OpenAPI::Linter - Validate and lint OpenAPI specifications
 
 =head1 VERSION
 
-Version 0.10
+Version 0.12
 
 =head1 SYNOPSIS
 
@@ -56,18 +56,18 @@ use File::Slurp qw(read_file);
     my $linter = OpenAPI::Linter->new(spec => $file_path_or_hashref);
     my $linter = OpenAPI::Linter->new(spec => $hashref, version => '3.0.3');
 
-Creates a new OpenAPI::Linter instance. The constructor accepts:
+Creates a new C<OpenAPI::Linter> instance. The constructor accepts:
 
 =over 4
 
 =item * spec
 
-Required. Either a file path to an OpenAPI specification (YAML or JSON) or a hash reference
-containing the parsed OpenAPI specification.
+Required. Either a file path to an C<OpenAPI> specification (C<YAML> or C<JSON>)
+or a hash reference containing the parsed C<OpenAPI> specification.
 
 =item * version
 
-Optional. Explicitly set the OpenAPI version. If not provided, the version will be
+Optional. Explicitly set the C<OpenAPI> version. If not provided, the version will be
 auto-detected from the specification.
 
 =back
@@ -226,8 +226,7 @@ Validates the C<OpenAPI> specification against the official C<JSON> Schema for t
 C<OpenAPI> version. Returns a list of validation errors in list context or an array
 reference in scalar context.
 
-This method uses L<JSON::Validator> to perform schema validation and returns errors
-in the format provided by that module.
+This method uses L<JSON::Validator> to perform schema validation.
 
 =cut
 
@@ -370,11 +369,11 @@ The tool can operate in two modes:
 
 =item 1. Linting mode (default)
 
-Checks for best practices, missing required fields and common issues in OpenAPI specifications.
+Checks for best practices, missing required fields and common issues in C<OpenAPI> specifications.
 
 =item 2. Schema validation mode
 
-Validates the specification against the official OpenAPI JSON Schema for the detected version.
+Validates the specification against the official C<OpenAPI JSON Schema> for the detected version.
 
 =back
 
@@ -384,23 +383,23 @@ Validates the specification against the official OpenAPI JSON Schema for the det
 
 =item B<--spec> I<specfile>
 
-B<Required>. Path to the OpenAPI specification file. The file can be in either
-YAML (.yaml, .yml) or JSON (.json) format.
+B<Required>. Path to the C<OpenAPI> specification file. The file can be in either
+C<YAML> (.yaml, .yml) or C<JSON> (.json) format.
 
 =item B<--version> I<version>
 
-Specify the OpenAPI version explicitly (e.g., C<3.0.3>, C<3.1.0>). If not provided,
+Specify the C<OpenAPI> version explicitly (e.g., C<3.0.3>, C<3.1.0>). If not provided,
 the version will be auto-detected from the C<openapi> field in the specification.
 
 =item B<--json>
 
-Output results in JSON format instead of human-readable text. This is useful for
+Output results in C<JSON> format instead of human-readable text. This is useful for
 programmatic consumption of the results.
 
 =item B<--validate>
 
 Run schema validation instead of lint checks. This mode validates the specification
-against the official OpenAPI JSON Schema rather than performing custom linting rules.
+against the official C<OpenAPI JSON Schema> rather than performing custom linting rules.
 
 =item B<--help>
 
@@ -420,7 +419,7 @@ Run linting checks on C<api.yaml> and display results in human-readable format.
 
     openapi-linter --spec api.json --validate
 
-Validate C<api.json> against the official OpenAPI JSON Schema.
+Validate C<api.json> against the official C<OpenAPI JSON Schema>.
 
 =head3 JSON Output
 
@@ -432,7 +431,7 @@ Run linting checks and output results in JSON format for programmatic processing
 
     openapi-linter --spec api.yaml --version 3.1.0
 
-Run linting checks assuming OpenAPI version 3.1.0, overriding auto-detection.
+Run linting checks assuming C<OpenAPI> version C<3.1.0>, overriding auto-detection.
 
 =head2 OUTPUT FORMATS
 
@@ -504,7 +503,7 @@ When running in linting mode (default), the tool checks for:
 =head2 SCHEMA VALIDATION
 
 When using C<--validate>, the tool validates the specification against the
-official OpenAPI JSON Schema for the detected version. This checks:
+official C<OpenAPI JSON Schema> for the detected version. This checks:
 
 =over 4
 
@@ -512,7 +511,7 @@ official OpenAPI JSON Schema for the detected version. This checks:
 
 =item * Data types and format compliance
 
-=item * Required fields according to the OpenAPI specification
+=item * Required fields according to the C<OpenAPI> specification
 
 =item * Valid references and schema composition
 
@@ -535,11 +534,11 @@ official OpenAPI JSON Schema for the detected version. This checks:
 =item C<"spec => HASHREF required if no file provided">
 
 The C<spec> parameter to C<new> must be either a file path or a hash reference containing
-the OpenAPI specification.
+the C<OpenAPI> specification.
 
 =item C<"Unsupported OpenAPI version: %s">
 
-The OpenAPI version specified in the document or provided to the constructor is not supported.
+The C<OpenAPI> version specified in the document or provided to the constructor is not supported.
 
 =back
 

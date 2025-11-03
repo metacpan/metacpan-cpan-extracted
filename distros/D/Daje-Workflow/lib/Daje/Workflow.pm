@@ -85,7 +85,7 @@ use Daje::Workflow::Errors::Error;
 # janeskil1525 E<lt>janeskil1525@gmail.comE<gt>
 #
 
-our $VERSION = "0.19";
+our $VERSION = "0.20";
 
 has 'workflow_name';    #
 has 'workflow_pkey';    #
@@ -106,15 +106,21 @@ sub process($self, $activity_name) {
     if ($self->_init($db)) {
         if ($self->_state_pre_checks()
             and $self->error->has_error() == 0) {
-            if($self->_activity($db, $activity_name)
+            if ($self->_activity_pre_checks($activity_name)
                 and $self->error->has_error() == 0) {
-                if($self->_state_post_checks()
+                if ($self->_activity($db, $activity_name)
                     and $self->error->has_error() == 0) {
-                    if($self->_state_observers()
+                    if ($self->_activity_post_checks($activity_name)
                         and $self->error->has_error() == 0) {
-                        if($self->save_workflow($db)
+                        if ($self->_state_post_checks()
                             and $self->error->has_error() == 0) {
-                            $tx->commit();
+                            if ($self->_state_observers()
+                                and $self->error->has_error() == 0) {
+                                if ($self->save_workflow($db)
+                                    and $self->error->has_error() == 0) {
+                                    $tx->commit();
+                                }
+                            }
                         }
                     }
                 }
@@ -179,6 +185,38 @@ sub _state_observers($self) {
     return $result;
 }
 
+sub _activity_pre_checks($self, $activity_name) {
+    my $result = 1;
+    my $checks = $self->loader->get_activity_pre_checks(
+        $self->workflow_name, $self->workflow_data->{state}, $activity_name
+    );
+    if(defined $checks) {
+        $result = Daje::Workflow::Checks->new(
+            error => $self->error,
+            model => $self->model,
+        )->check(
+            $self->context, $checks
+        );
+    }
+    return $result;
+}
+
+sub _activity_post_checks($self, $activity_name) {
+    my $result = 1;
+    my $checks = $self->loader->get_activity_post_checks(
+        $self->workflow_name, $self->workflow_data->{state}, $activity_name
+    );
+    if(defined $checks) {
+        $result = Daje::Workflow::Checks->new(
+            error => $self->error,
+            model => $self->model,
+        )->check(
+            $self->context, $checks
+        );
+    }
+    return $result;
+}
+
 sub _state_post_checks($self) {
     my $result = 1;
     my $checks = $self->loader->get_post_checks(
@@ -238,6 +276,8 @@ sub _init($self, $db) {
 
 1;
 __END__
+
+
 
 
 

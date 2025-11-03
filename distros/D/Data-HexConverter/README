@@ -4,19 +4,64 @@ The Data::HexConverter module provides functions to convert between hex strings 
 
 This modules use SIMD instructions to perform high speed conversions.
 
-Any machine this module is built on should have SSE3 SIMD instructions available.
+Any machine this module is built on should have SSE3 and AVX2 SIMD instructions available.
 
 This is most likely the case for any machine built in the last 10 years that has i5 or later (compatible) processors.
 
+Some machines may have the AVX 512 instruction set, this module will those if available.
+
+
+CPU Features
+
+Determine if you CPU supports AVX 512 instructions:
+
+On a local VM:
+
+  $ gcc -O3 -Wall -Wextra -mavx512bw -mavx512vl -o probe_isa probe_isa.c
+ 
+  $  ./probe_isa
+  FEATURES: sse2 avx avx2
+
+On a local server that supports AVX 512:
+
+  $ gcc -O3 -Wall -Wextra -mavx512bw -mavx512vl -o probe_isa probe_isa.c
+
+  $ ./probe_isa
+  FEATURES: sse2 avx avx2 avx512bw avx512vl
 
 INSTALLATION
 
-To install this module, run the following commands:
+To install this module on a standard machine, run the following commands:
 
 	perl Makefile.PL
 	make
 	make test
 	make install
+
+If the machine has avx512 support:
+
+HEXSIMD_ENABLE_AVX512=1 perl Makefile.PL
+	make
+	make test
+	make install
+
+Verify Implementation Used
+
+Local VM without AVX 512:
+
+  $  PERL5LIB=./lib LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./blib/arch/auto/Data/HexConverter perl isa.pl
+  Hex to Binary Implementation:
+  avx2
+  Binary to Hex Implementation:
+  avx2
+
+Local Server with AVX 512:
+
+  $  PERL5LIB=./lib LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./blib/arch/auto/Data/HexConverter perl isa.pl
+  Hex to Binary Implementation:
+  avx512bw
+  Binary to Hex Implementation:
+  avx512bw
 
 SUPPORT AND DOCUMENTATION
 

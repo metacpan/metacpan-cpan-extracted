@@ -34,15 +34,13 @@ sub load_tools_objects_tables_fkey($self, $tools_objects_pkey) {
     );
 }
 
-sub insert_tools_objects_tables($self, $data) {
-    my $result = $self->insert($self->table_name, $data, $self->primary_key_name);
-    say "Daje::Database::Model::Super::ToolsObjectsTables::insert_tools_objects_tables " . Dumper($result);
+sub insert($self, $data) {
+    my $result = $self->SUPER::insert($self->table_name, $data, $self->primary_key_name);
     return $result;
 }
 
-
-sub update_tools_objects_tables($self, $data) {
-    return $self->update($self->table_name, $data, { $self->primary_key_name() => $data->{$self->primary_key_name()}});
+sub update($self, $data) {
+    return $self->SUPER::update($self->table_name, $data, { $self->primary_key_name() => $data->{$self->primary_key_name()}});
 }
 
 

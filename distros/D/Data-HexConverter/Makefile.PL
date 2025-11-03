@@ -1,49 +1,53 @@
-use 5.006;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
+use Config;
 
-my %WriteMakefileArgs = (
-    NAME             => 'Data::HexConverter',
-    AUTHOR           => q{Jared Still <jkstill@gmail.com>},
-    VERSION_FROM     => 'lib/Data/HexConverter.pm',
-    ABSTRACT_FROM    => 'lib/Data/HexConverter.pm',
-    LICENSE          => 'mit',
-    MIN_PERL_VERSION => '5.006',
-	 DEFINE       => '-mssse3',# to compile SIMD code
-    CONFIGURE_REQUIRES => {
-        'ExtUtils::MakeMaker' => '0',
+my $is_x86 = ($Config{archname} =~ /x86_64|i[3456]86/) ? 1 : 0;
+
+# global flags for XS code
+# IMPORTANT: do NOT put -fvisibility=hidden here. it hides boot_Data__HexConverter
+my $ccflags = $Config{ccflags} || '';
+$ccflags .= ' -O3 -Wall -Wextra -fPIC -DHEXSIMD_BUILD';
+
+if ($is_x86) {
+    # generic x86-64, keep generic code safe. AVX is enabled per-function in src/hexsimd.c
+    $ccflags .= ' -march=x86-64 -mno-avx -mno-avx2 -mno-avx512f';
+}
+
+# env-controlled AVX512
+my $env = $ENV{HEXSIMD_ENABLE_AVX512} // '';
+my $want_avx512 =
+    ($env ne '' && $env ne '0' && lc($env) ne 'false') ? 1 : 0;
+
+if ($want_avx512) {
+    $ccflags .= ' -DHEXSIMD_ENABLE_AVX512';
+}
+
+WriteMakefile(
+    NAME         => 'Data::HexConverter',
+    VERSION_FROM => 'lib/Data/HexConverter.pm',
+    ABSTRACT     => 'SIMD accelerated hex <-> binary with runtime dispatch',
+    AUTHOR       => 'Jared Still',
+    LICENSE      => 'perl',
+    CCFLAGS      => $ccflags,
+    INC          => '-Isrc',
+    # force link of both XS and C core
+    OBJECT       => 'HexConverter$(OBJ_EXT) src/hexsimd$(OBJ_EXT)',
+    clean        => {
+        FILES => 'Data-HexConverter-* *.gcov *.gcda *.gcno',
     },
-    TEST_REQUIRES => {
-        'Test::More' => '0',
+    META_MERGE   => {
+        resources => {
+            repository => 'https://metacpan.org/release/Data-HexConverter',
+        },
     },
-    PREREQ_PM => {
-        #'ABC'              => '1.6',
-        #'Foo::Bar::Module' => '5.0401',
-    },
-    PM => {
-        'lib/Data/HexConverter.pm' => '$(INST_LIB)/Data/HexConverter.pm',
-    },
-    dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean => { FILES => 'Data-HexConverter-*' },
 );
 
-# Compatibility with old versions of ExtUtils::MakeMaker
-unless (eval { ExtUtils::MakeMaker->VERSION('6.64'); 1 }) {
-    my $test_requires = delete $WriteMakefileArgs{TEST_REQUIRES} || {};
-    @{$WriteMakefileArgs{PREREQ_PM}}{keys %$test_requires} = values %$test_requires;
+# compile src/hexsimd.c with extra visibility=hidden. but NOT the XS.
+sub MY::postamble {
+    return <<'POST';
+src/hexsimd$(OBJ_EXT): src/hexsimd.c src/hexsimd.h
+	$(CC) $(CCFLAGS) -fvisibility=hidden $(OPTIMIZE) $(INC) -c src/hexsimd.c -o $@
+POST
 }
-
-unless (eval { ExtUtils::MakeMaker->VERSION('6.55_03'); 1 }) {
-    my $build_requires = delete $WriteMakefileArgs{BUILD_REQUIRES} || {};
-    @{$WriteMakefileArgs{PREREQ_PM}}{keys %$build_requires} = values %$build_requires;
-}
-
-delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
-    unless eval { ExtUtils::MakeMaker->VERSION('6.52'); 1 };
-delete $WriteMakefileArgs{MIN_PERL_VERSION}
-    unless eval { ExtUtils::MakeMaker->VERSION('6.48'); 1 };
-delete $WriteMakefileArgs{LICENSE}
-    unless eval { ExtUtils::MakeMaker->VERSION('6.31'); 1 };
-
-WriteMakefile(%WriteMakefileArgs);

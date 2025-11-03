@@ -39,7 +39,7 @@ binmode(STDOUT, ":encoding(UTF-8)");
 binmode(STDIN,  ":encoding(UTF-8)");
 
 BEGIN {
-    our $VERSION = '1.39';
+    our $VERSION = '1.41';
 }
 
 # Returns a description of a token using the meta data.

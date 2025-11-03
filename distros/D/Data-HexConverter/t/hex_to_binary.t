@@ -2,9 +2,12 @@ use strict;
 use warnings;
 use Test::More;
 
-BEGIN {
-    use_ok('Data::HexConverter');
-}
+#BEGIN {
+#use_ok('Data::HexConverter');
+#}
+#}
+
+use Data::HexConverter;
 
 # Test that simple conversions work correctly.
 {
@@ -32,7 +35,8 @@ BEGIN {
     my $error;
     eval { Data::HexConverter::hex_to_binary(\$bad) };
     $error = $@;
-    like($error, qr/Hex string length must be even/, 'odd length croaks with correct message');
+	 #like($error, qr/Hex string length must be even/, 'odd length croaks with correct message');
+	 like($error, qr/not even/, 'odd length croaks with correct message');
 }
 
 # Invalid characters should croak
@@ -41,7 +45,7 @@ BEGIN {
     my $error;
     eval { Data::HexConverter::hex_to_binary(\$bad) };
     $error = $@;
-    like($error, qr/Invalid hex digit/, 'invalid characters croak with correct message');
+    like($error, qr/invalid hex input/, 'invalid characters croak with correct message');
 }
 
 done_testing;

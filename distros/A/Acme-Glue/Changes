@@ -1,5 +1,8 @@
 Revision history for Acme::Glue
 
+2025.11
+    - make the photo a little bigger so it displays nicely on MetaCPAN
+
 2025.09
     - add a photo, this is a photo project after all
 

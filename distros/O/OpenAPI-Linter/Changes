@@ -1,5 +1,11 @@
 Revision history for OpenAPI::Linter
 
+0.12  2025-11-02
+      - Tidied up script: openapi-linter
+
+0.11  2025-11-02
+      - Updated pod.
+
 0.10  2025-11-02
       - Renamed script: openapi-linter.
 

@@ -5,7 +5,7 @@
 # Joan Ntzougani, ✞
 
 package Dancer2::Plugin::WebService;
-our $VERSION = '4.8.0';
+our $VERSION = '4.8.1';
 if ( $^O =~/(?i)MSWin/ ) { CORE::warn "\nOperating system is not supported\n"; CORE::exit 1 }
 
 use strict;
@@ -911,7 +911,7 @@ Dancer2::Plugin::WebService - Rest APIs with login, persistent data, multiple in
 
 =head1 VERSION
 
-version 4.8.0
+version 4.8.1
 
 =head1 SYNOPSIS
 
