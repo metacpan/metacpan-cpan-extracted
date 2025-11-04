@@ -502,6 +502,10 @@ coordinate notation.  Coordinate notation is the format used by most chess
 engines and is the concatenation of the start and destination square and a
 possible promotion piece, for example "e2e4" or "f2f1q".
 
+B<IMPORTANT!> Beginning with version 0.5, B<NOTATION> is case-sensitive! This
+incompatible change was necessary because a move like "B2d4" may otherwise
+be ambiguous.
+
 =item B<SAN(MOVE)>
 
 Renders the integer B<MOVE> into Standard-Algebraic Notation SAN, for example
@@ -1248,7 +1252,7 @@ generator L</RNG>.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2021 Guido Flohr <guido.flohr@cantanea.com>.
+Copyright (C) 2021-2025 Guido Flohr <guido.flohr@cantanea.com>.
 
 =head1 SEE ALSO
 

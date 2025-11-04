@@ -4,179 +4,111 @@
 class Mojolicious::Routes::Match {
   version_from Mojolicious;
   
-  use Mojolicious::Controller;
-  use Mojolicious::Routes;
   use Mojolicious::Routes::Route;
+  use Mojolicious::Routes::Match::StackData;
   
   # Fields
   has root : rw Mojolicious::Routes;
   
-  has endpoint : rw Mojolicious::Routes::Route;
+  has endpoint : ro Mojolicious::Routes::Route;
   
-  has position : int;
+  has stack : rw Mojolicious::Routes::Match::StackData[];
   
-  has stack : rw Hash[];
+  has position : rw int;
   
   # Undocumented Fields
   has captures : Hash;
-  
-  has conditions : Hash of Mojolicious::Routes::Callback::Condition;
   
   # Class Methods
   static method new : Mojolicious::Routes::Match () {
     
     my $self = new Mojolicious::Routes::Match;
     
-    $self->{stack} = new Hash[0];
+    $self->{stack} = new Mojolicious::Routes::Match::StackData[0];
     
     return $self;
   }
   
   # Instance Methods
-  method find : void ($c : Mojolicious::Controller, $options : Hash) {
-    $self->_match($self->root, $c, $options);
+  method find : void ($options : Hash) {
+    
+    $self->_match($self->root, $options);
   }
   
-  method path_for : Hash ($args : object...) {
+  private method _match : int ($r : Mojolicious::Routes::Route, $options : Hash) {
     
-    my $_ = Mojo::Util->_options($args);
-    my $name = (string)$_->[0];
-    my $values = Hash->new((object[])$_->[1]);
-    
-    # Current route
-    my $route = (Mojolicious::Routes::Route)undef;
-    my $current = !$name || $name eq "current";
-    
-    if ($current) {
-      unless ($route = $self->endpoint) {
-        return Hash->new;
-      }
-    }
-    
-    # Find endpoint
-    else {
-      unless ($route = $self->root->lookup($name)) {
-        return Hash->new({path => $name});
-      }
-    }
-    
-    # Merge values (clear format)
-    my $stack_list = (List of Hash)List->new_ref($self->stack);
-    my $captures = (Hash)undef;
-    if ($stack_list->length > 0) {
-      $captures = $stack_list->get($stack_list->length - 1) // Hash->new;
-    }
-    else {
-      $captures = Hash->new;
-    }
-    
-    my $merged = $captures->clone;
-    $merged->merge_options({format => undef});
-    $merged->merge($values);
-    
-    my $pattern     = $route->pattern;
-    my $constraints = $pattern->constraints;
-    
-    if (!$values->exists("format") && $constraints->get("format") && $constraints->get("format")->(string) ne "1") {
-      $merged->set("format", ($current ? $captures->get("format") : undef) // $pattern->defaults->get("format"));
-    }
-    
-    return Hash->new({path => $route->render($merged), websocket => $route->has_websocket});
-  }
-  
-  private method _match : int ($r : Mojolicious::Routes::Route, $c : Mojolicious::Controller, $options : Hash) {
-    
-    my $path_save = $options->get("path")->(string);
-    
-    # Pattern
-    my $path = $path_save;
-    my $partial = $r->partial;
-    my $detect  = (my $endpoint = $r->is_endpoint) && !$partial;
-    my $captures = $r->pattern->match_partial(my $_ = [$path], $detect);
-    $path = $_->[0];
-    unless ($captures) {
-      return 0;
-    }
+    my $path = copy $options->get("path")->(string);
+    my $path_save = copy $path;
     
     $self->{captures} //= Hash->new;
     my $captures_save = $self->{captures}->clone;
     
-    Fn->defer([$options : Hash, $path_save : string, $captures_save : Hash] method : void () {
-      $options->set("path" => $path_save);
-      $options->set("captures" => $captures_save);
+    Fn->defer([$self : Mojolicious::Routes::Match, $options : Hash, $path_save : string, $captures_save : Hash] method : void () {
+      $options->{"path"} = $path_save;
+      $self->{captures} = $captures_save;
     });
+    
+    # Pattern
+    my $is_endpoint = $r->is_endpoint;
+    my $captures = $r->pattern->match_partial((mutable string)$path);
+    unless ($captures) {
+      return 0;
+    }
     
     $options->set(path => $path);
     
     for my $key (@{$captures->keys}) {
-      my $value = $captures->get($key);
-      $self->{captures}->set($key => $value);
+      my $value = $captures->{$key};
+      $self->{captures}->{$key} = $value;
     }
     
     $captures = $self->{captures};
     
     # Method
-    my $methods = $r->methods;
-    
-    if ($methods && !@{Fn->grep([$options : Hash]method : int ($_ : string) { $_ eq $options->get("method")->(string); }, $methods)}) {
-      return 0;
-    }
-    
-    # Conditions
-    if (my $over = $r->requires) {
-      my $conditions = $self->{conditions} //= $self->root->conditions;
-      for my $key (@{$over->keys}) {
-        my $condition = $conditions->get($key);
-        unless ($condition) {
-          return 0;
-        }
-        if (!$condition->($r, $c, $captures, $over->get($key))) {
-          return 0;
+    my $method_match = 0;
+    if ($r->methods) {
+      my $method = $options->get("method")->(string);
+      for my $_ (@{$r->methods}) {
+        if ($method eq $_) {
+          $method_match = 1;
+          last;
         }
       }
+    }
+    else {
+      $method_match = 1;
+    }
+    unless ($method_match) {
+      return 0;
     }
     
     # WebSocket
-    if ($r->is_websocket && !$options->{"websocket"}->(int)) {
+    if ($r->is_websocket && !($options->{"websocket"} ? $options->{"websocket"}->(int) : 0)) {
       return 0;
     }
     
-    # Partial
     my $empty = !length $path || $path eq "/";
-    if ($partial) {
-      $captures->set(path => $path);
-      $self->set_endpoint($r);
-      $empty = 1;
-    }
     
-    my $stack_list = (List of Hash)List->new_ref($self->stack);
+    my $stack = (List of Mojolicious::Routes::Match::StackData)List->new_ref($self->stack);
     # Endpoint (or intermediate destination)
-    if (($endpoint && $empty) || $r->inline) {
-      $stack_list->push($captures->clone);
-      if ($endpoint && $empty) {
-        my $format = $captures->{"format"}->(string);
-        if ($format) {
-          for (my $i = 0; $i = $stack_list->length; $i++) {
-            my $captures = $stack_list->get($i);
-            $captures->set(format => $format);
-          }
-        }
-        
-        $self->set_endpoint($r);
-        
+    if (($is_endpoint && $empty) || $r->inline) {
+      my $stack_data = Mojolicious::Routes::Match::StackData->new;
+      $stack_data->set_captures($captures->clone);
+      $stack_data->set_route($r);
+      $stack->push($stack_data);
+      if ($is_endpoint && $empty) {
+        $self->{endpoint} = $r;
         return 1;
       }
-      $captures->delete("app");
-      $captures->delete("cb");
     }
     
     # Match children
-    my $snapshot = (List of Hash)($r->parent ? $stack_list->clone : List->new(new Hash[0]));
+    my $snapshot = $r->parent ? (Mojolicious::Routes::Match::StackData[])$stack->to_array : new Mojolicious::Routes::Match::StackData[0];
     for my $child (@{$r->children}) {
-      if ($self->_match($child, $c, $options)) {
+      if ($self->_match($child, $options)) {
         return 1;
       }
-      $self->set_stack($snapshot->to_array);
+      $self->set_stack($snapshot);
     }
   }
 

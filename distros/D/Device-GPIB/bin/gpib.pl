@@ -19,6 +19,7 @@ my @options =
      'noclear',             # Do not clear device first: some devices take a long time to do that
      'spoll',               # Spoll the device and print the results
      'trigger',             # Send a GET trigger to this device
+     'local',               # Set the GPIB local
      'file=s@'              # File(s) to read commands from
     );
 
@@ -61,6 +62,11 @@ if (defined $main::opt_spoll)
     }
 }
 
+if (defined $main::opt_local)
+{
+    $d->loc();
+}
+
 sub usage
 {
     print "usage: $0 [-h]
@@ -69,10 +75,10 @@ sub usage
           [-port LinuxGpib:[board_index]]
           [-spoll]                                   Read all queued SRQs from the device with SPOLL
           [-trigger]                                 Send a GET trigger to the device
+	  [-local]                                   Set the device to local mode
           [-file filename [-file filename]]          Send commands from file. Results of queries are printed
           \"commandstring;commandstring;...\"        Sends the commands to the device. 
 	  \"commandstring;querystring?\"             Sends the optional commands and the query, prints the result of the query
-          -debug
-	  -verbose\n";
+          -debug\n";
     exit;
 }

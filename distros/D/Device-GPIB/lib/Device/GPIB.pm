@@ -26,7 +26,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '1.1';
+our $VERSION = '1.3';
 
 
 # Preloaded methods go here.
@@ -57,6 +57,10 @@ Prologix GPIB-USB Controller and compatibles, such as:
 LinuxGpib compatible devices (requires linux-gpib from https://sourceforge.net/projects/linux-gpib)
    (Tested with Keysight 82357B USB-GPIB adapter)
 
+Also supports direct serial connections to devices such as Tek 1240
+with 1200C01 RS232C Comm Pack installed. This device handles many of the same commands
+by serial as it does by the1200C02 GPIB Comm Pack.
+
 This module obsoletes and replaces the earlier Device::GPIB::Prologix
 module from the same author.
 
@@ -80,9 +84,10 @@ Device::GPIB::Controller->new($port);
 A wrapper that will load the appropriate Controller module depending on a port/device specification
 argument passed to it. The following port/device names are supported:
 
-Prologix:[Prologix:[port[:baud:databits:parity:stopbits:handshake]]]
+Prologix:[port[:baud:databits:parity:stopbits:handshake]]
 LinuxGpib:[board_index]]
-port[:baud:databits:parity:stopbits:handshake]]
+port[:baud:databits:parity:stopbits:handshake]] # defaults to Prologix
+SERIAL:[baud:databits:parity:stopbits:handshake]]
 
 Examples:
 
@@ -90,6 +95,7 @@ Examples:
 '/dev/ttyACM0'                    # Prologix:/dev/ttyACM:9600:8:none:1:none
 'Prologix:/dev/ttyUSB1:115200'    # Prologix:/dev/ttyUSB1:15200:8:none:1:none
 'LinuxGpib:0'                     # Linux GPIB board index 0 (see /etc/gpib.conf)
+'SERIAL:/dev/ttyUSB0'             # Direct serial conneciton to devices that support it
 
 You can of course load specific Controllers directly:
 use Device::GPIB::Controllers::Prologix;
@@ -166,6 +172,37 @@ LinuxGpib Controller timeout is set somewhat above that to 30 seconds.
 This make the scan.pl program run fairly slowly when the LinuxGpib
 Controller is used.
 
+=head1 Supported Devices
+
+The gpib.pl and scan.pl are expected to suport any GPIB compliant device.
+
+There are specific interface modules and sample binary programs (implementing many
+control and data operations specific to that device)
+
+=head 2 Tektronix
+AFG310.pm Arbitrary Function Generator plugin
+DM5110.pm Digital Multimeter plugin
+PFG5105.pm Programmable Function Generator plugin
+PS5010.pm Power Supply plugin
+DC5009.pm Digital Counter plugin
+LA1240.pm  Logic Analyser (Serial interface only; GPIB not yet tested)
+AFG5101.pm Arbitrary Function Generator plugin
+DM5010.pm Digital Multimeter plugin
+MI5010.pm Multifunction Interface plugin
+SI5020.pm DC to 18 GHz microwave switcher plugin
+SI5010.pm 50 Ω BNC switch matrix plugin 
+
+=head2 Hewlett-Packard
+HP5342A.pm Microwave Frequency Counter
+HP3456A.pm Digital Voltmeter
+HP8904A.pm Multifunciton Synthesizer
+HP3577A.pm Network Analyzer
+
+=head2 Advantest
+
+TR 4131 Spectrum Analyser
+
+If you need support for other devices, just send me one and I will add support for it.
 
 =head1 SEE ALSO
 

@@ -13,4 +13,11 @@ use strict;
 
 use Chess::Plisco::Engine;
 
-Chess::Plisco::Engine->new->uci(\*STDIN, \*STDOUT) or exit 1;
+# Wrap that into an eval to make sure that the DESTROY function is executed.
+eval {
+	Chess::Plisco::Engine->new->uci(\*STDIN, \*STDOUT)
+		or die "cannot create engine";
+};
+if ($@) {
+	die $@;
+}

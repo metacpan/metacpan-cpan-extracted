@@ -1,0 +1,217 @@
+#! /usr/bin/env perl
+
+# Copyright (C) 2021-2025 Guido Flohr <guido.flohr@cantanea.com>,
+# all rights reserved.
+
+# This program is free software. It comes without any warranty, to
+# the extent permitted by applicable law. You can redistribute it
+# and/or modify it under the terms of the Do What the Fuck You Want
+# to Public License, Version 2, as published by Sam Hocevar. See
+# http://www.wtfpl.net/ for more details.
+
+use strict;
+
+use Locale::TextDomain qw(Chess-Plisco);
+use Getopt::Long;
+
+use Chess::Plisco qw(:all);
+use Chess::Plisco::Tablebase::Syzygy;
+
+sub display_usage;
+sub usage_error;
+sub version_information;
+
+my %options = (
+	path => $ENV{TB_PATH}
+);
+Getopt::Long::Configure('bundling');
+GetOptions(
+	'p|path=s' => \$options{path},
+	'h|help' => \$options{help},
+	'v|version' => \$options{version},
+) or usage_error;
+
+display_usage if $options{help};
+version_information if $options{version};
+
+usage_error __"The option '--path' is mandatory!"
+    if !length $options{path};
+
+my $fen = join ' ', @ARGV;
+usage_error __"No position as FEN given!"
+    if !length $fen;
+
+my $tb = Chess::Plisco::Tablebase::Syzygy->new($options{path});
+my $largest = $tb->largest;
+if (!defined $largest) {
+	usage_error __"Error initializing tablebase.";
+} elsif (!$largest) {
+	usage_error __"No tablebase files found.";
+}
+
+my $position = eval { Chess::Plisco->new($fen) };
+if (!$position) {
+	my $error = $@ || __"Invalid FEN!";
+	usage_error $error;
+}
+
+my $num_pieces = $position->bitboardPopcount($position->[CP_POS_BLACK_PIECES]
+		| $position->[CP_POS_WHITE_PIECES]);
+if ($num_pieces > $largest) {
+	die __x("Position has too many pieces ({pieces}) "
+			. " but the tablebase has a maximum of {largest}.\n",
+		pieces => $num_pieces, largest => $largest);
+}
+
+my @legal_moves = $position->legalMoves;
+my $res = $tb->probeRoot($position, \@legal_moves);
+if ($res == TB_RESULT_FAILED) {
+	die __"Tablebase probe failed; position not found in tablebase or "
+		. "invalid.\n";
+}
+
+sub display_usage {
+	print __x(<<EOF, program => $0);
+Usage: {program} [OPTIONS] FEN
+EOF
+
+	print "\n";
+
+	print __(<<EOF);
+Mandatory arguments to long options, are mandatory to short options, too.
+EOF
+
+	print "\n";
+
+	print __"Database location:\n";
+	print __(<<EOF);
+  -p, --path=PATH              path to the tablebase files
+EOF
+
+	print "\n";
+
+	print __"Informative output:\n";
+
+	print __(<<EOF);
+  -h, --help                   display this help and exit
+EOF
+	print __(<<EOF);
+  -V, --version                display version information and exit
+EOF
+
+	print "\n";
+
+	print __x("Type 'perldoc {program}' for more information.\n");
+
+	exit 0;
+}
+
+sub usage_error {
+	my ($msg) = @_;
+
+	$msg = '' if !defined $msg;
+	$msg =~ s/^[ \t]+//;
+	$msg =~ s/[ \t\r\n]+$//;
+
+	if (length $msg) {
+		$msg = __x("{program}: {error}\n",
+		           program => $0, error => $msg);
+	}
+
+	die $msg . __x("Try '{program} --help' for more information!\n",
+	               program => $0);
+}
+
+sub version_information {
+	my $package = 'Chess::Plisco';
+	my $version = $Chess::Plisco::VERION || __"development version";
+
+	print __x(<<EOF, program => $0, package => $package, version => $version);
+{program} ({package}) {version}
+Copyright (C) 2021 Guido Flohr <guido.flohr\@cantanea.com>.
+License: WTFPL2 <http://www.wtfpl.net/>
+This program is free software. It comes without any warranty, to
+the extent permitted by applicable law.
+EOF
+}
+
+=head1 NAME
+
+pfathom - Syzygy endgame table base probe tool
+
+=head1 SYNOPSIS
+
+    pfathom [OPTIONS] FEN
+    pfathom --path=/path/to/tables 8/8/8/8/8/8/8/QK1k4 w - - 0 1
+
+The FEN argument may be quoted but this is not necessary.  All non-option
+arguments are automatically concatenated to a FEN.
+
+Mandatory arguments to long options, are mandatory to short options, too.
+
+Valid options are:
+
+=over 4
+
+=item B<-p, --path=PATH>
+
+Specify the B<PATH> to the endgame table base.  This is the directory that
+contains the F<.rtbw> and F<.rtbz> files.
+
+If this option is not used, the environment variable C<TB_PATH> is checked.
+
+=item B<-h, --help>
+
+Display a short help page and exit.
+
+=item B<-V, --version>
+
+Display version information and exit.
+
+=back
+
+=head1 DESCRIPTION
+
+This program is a drop-in replacement for the Syzygy probe tool Fathom,
+see L<https://github.com/jdart1/Fathom> and
+L<https://github.com/basil00/Fathom> written in Perl
+
+It creates a PGN representation of the probe result received for the specified
+input position in Forsyth-Edwards Notation (FEN).
+
+PGN tags that may need additional explanation are:
+
+=over 4
+
+=item B<WDL>
+
+The Win-Draw-Loss (WDL) value for the first move, which is one of "Win",
+"Draw", "Loss", or "CursedWin" for a position that can only be one after the
+other side to claim a draw according to the 50-move rule.  Likewise, a
+"BlessedLoss" is a loss that can be prevented by claiming a draw according to
+the 50-move rule.
+
+=item B<DTZ>
+
+The Distance-To-Zero (DTZ) value in plies.
+
+=item B<WinningMoves>
+
+All (next) moves that win, if any.
+
+=item B<LosingMoves>
+
+All (next) moves that lose, if any.
+
+=item B<DrawingMoves>
+
+All (next) moves that draw, if any.
+
+=back
+
+The movetext of the pgn is a sequence of moves that forces the WDL value.  This
+is not necessarily the shortest mate sequence.
+
+=head1 SEE ALSO
+
+fathom(1), L<Chess::Plisco>(3pm), perl(1)

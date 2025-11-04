@@ -9,5 +9,4 @@ dist.ini
 lib/Arthas/Defaults.pm
 lib/Arthas/Defaults/520.pm
 lib/Arthas/Defaults/536.pm
-lib/Arthas/Defaults/536mod.pm
 t/00basic.t

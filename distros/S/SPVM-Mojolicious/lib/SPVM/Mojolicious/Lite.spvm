@@ -3,105 +3,65 @@
 
 class Mojolicious::Lite extends Mojolicious {
   
-  use FindBin;
-  use Re;
-  use Mojo::File;
   use Mojolicious::Routes;
   
   version_from Mojolicious;
   
-  # Fields
-  has routes : rw Mojolicious::Routes;
-  
-  has root : rw Mojolicious::Routes;
-  
   # Class Method
   static method new : Mojolicious::Lite () {
     
-    my $home = FindBin->Bin;
+    my $self = new Mojolicious::Lite;
     
-    my $exe = FindBin->Script;
+    $self->SUPER::init;
     
-    my $moniker = Mojo::File->path($exe)->basename;
-    
-    Re->s((mutable string)$moniker, "\.(pl|pm|t)$", "");
-    
-    my $app = new Mojolicious::Lite;
-    
-    $app->set_moniker($moniker);
-    
-    my $routes = $app->routes;
-    $routes->set_namespaces(new string[0]);
-    
-    $app->{routes} = $routes;
-    
-    $app->{root} = $routes;
-    
-    return $app;
+    return $self;
   }
   
   # Instance Methods
-  method any : Mojolicious::Routes ($args : object...) {
+  method any : Mojolicious::Routes::Route ($args : object...) {
     
-    my $routes = $self->routes;
-    
-    return $routes->any($args);
+    return $self->routes->any($args);
   }
   
-  method del : Mojolicious::Routes ($args : object...) {
+  method delete : Mojolicious::Routes::Route ($args : object...) {
     
-    my $routes = $self->routes;
-    
-    return $routes->delete($args);
+    return $self->routes->delete($args);
   }
   
-  method get : Mojolicious::Routes ($args : object...) {
+  method get : Mojolicious::Routes::Route ($args : object...) {
     
-    my $routes = $self->routes;
-    
-    return $routes->get($args);
+    return $self->routes->get($args);
   }
   
-  method options : Mojolicious::Routes ($args : object...) {
+  method options : Mojolicious::Routes::Route ($args : object...) {
     
-    my $routes = $self->routes;
-    
-    return $routes->options($args);
+    return $self->routes->options($args);
   }
   
-  method patch : Mojolicious::Routes ($args : object...) {
+  method patch : Mojolicious::Routes::Route ($args : object...) {
     
-    my $routes = $self->routes;
-    
-    return $routes->patch($args);
+    return $self->routes->patch($args);
   }
   
-  method post : Mojolicious::Routes ($args : object...) {
+  method post : Mojolicious::Routes::Route ($args : object...) {
     
-    my $routes = $self->routes;
-    
-    return $routes->post($args);
+    return $self->routes->post($args);
   }
   
-  method put : Mojolicious::Routes ($args : object...) {
+  method put : Mojolicious::Routes::Route ($args : object...) {
     
-    my $routes = $self->routes;
-    
-    return $routes->put($args);
+    return $self->routes->put($args);
   }
   
-  method under : Mojolicious::Routes ($args : object...) {
+  method under : Mojolicious::Routes::Route ($args : object...) {
     
-    my $root = $self->root;
-    
-    return $self->{routes} = $root->under($args);
+    return $self->routes->under($args);
   }
   
-  method websocket : Mojolicious::Routes ($args : object...) {
+  method websocket : Mojolicious::Routes::Route ($args : object...) {
     
-    my $routes = $self->routes;
-    
-    return $routes->websocket($args);
+    return $self->routes->websocket($args);
   }
   
 }
+

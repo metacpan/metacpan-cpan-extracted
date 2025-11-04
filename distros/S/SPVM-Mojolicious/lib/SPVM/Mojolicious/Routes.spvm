@@ -5,171 +5,24 @@ class Mojolicious::Routes extends Mojolicious::Routes::Route {
   version_from Mojolicious;
   
   use Hash;
-  use Mojo::Cache;
-  use Mojolicious::Routes::Callback::Condition;
-  use Mojo::DynamicMethods;
-  use Mojo::Callback;
-  use Regex;
+  use Mojolicious::Callback;
   use Mojolicious::Controller;
-  
-  # Interfaces
-  interface Mojo::DynamicMethods;
-  
-  # Fields
-  has cache : rw Mojo::Cache;
-  
-  has conditions : rw Hash of Mojolicious::Routes::Callback::Condition;
-  
-  has shortcuts : rw Hash of Mojo::Callback;
-  
-  has types : rw Hash of string|Regex|string[]|Regex[]|object[];
-  
-  has namespaces : rw string[];
+  use Mojolicious::Routes::Match::StackData;
   
   # Class Methods
   static method new : Mojolicious::Routes () {
     
     my $self = new Mojolicious::Routes;
     
-    $self->{cache} = Mojo::Cache->new;
-    
-    $self->{conditions} = Hash->new;
-    
-    $self->{shortcuts} = Hash->new;
-    
-    $self->{types} = Hash->new;
-    $self->{types}->set(num => [Regex->new("[0-9]+")]);
-    
-    $self->{namespaces} = new string[0];
+    $self->init;
     
     return $self;
   }
   
-  static method _render : string ($c : Mojolicious::Controller) {
-    
-    die "TODO";
-=pod
-
-    my $stash = $c->stash;
-    
-    if ($stash->{"mojo.rendered"}->(int)) {
-      return undef;
-    }
-    
-    my $rendered = $c->render_maybe;
-    
-    unless ($rendered) {
-      unless ($stash->{"mojo.routed"}->(int)) {
-       die "Route without action and nothing to render";
-      }
-    }
-
-=cut
-
-  }
-  
   # Instance Methods
-  method dynamic_methods : Hash of Hash of Mojo::Callback () {
-    return $self->shortcuts;
-  }
-  
-  method add_condition : void ($name : string, $cb : Mojolicious::Routes::Callback::Condition) {
+  protected method init : void ($options : object[] = undef) {
     
-    $self->conditions->set($name, $cb);
-  }
-  
-  method add_shortcut : void ($name : string, $cb : Mojo::Callback) {
-    $self->conditions->set($name, $cb);
-  }
-  
-  method call : object ($name : string, $arg1 : object = undef, $arg2 : object = undef, $arg3 : object = undef) {
-    
-    my $ret = $self->Mojo::DynamicMethods::call($name, $arg1, $arg2, $arg3);
-    
-    return $ret;
-  }
-  
-  method add_type : void ($name : string, $type : string|Regex|string[]|Regex[]|object[]) {
-    
-    $self->types->set($name, $type);
-  }
-  
-  method continue : void ($c : Mojolicious::Controller) {
-
-=pod
-
-    my $match    = $c->match;
-    my $stack    = $match->stack;
-    my $position = $match->position;
-    
-    my $field = $stack->[$position];
-    unless ($field) {
-      return &_render($c);
-    }
-    
-    # Merge captures into stash
-    my $stash = $c->stash;
-    @{$stash->{'mojo.captures'} //= {}}{keys %$field} = values %$field;
-    @$stash{keys %$field} = values %$field;
-    
-    my $continue;
-    my $last = !$stack->[++$position];
-    if (my $cb = $field->{cb}) { $continue = $self->_callback($c, $cb, $last) }
-    else                       { $continue = $self->_controller($c, $field, $last) }
-    $match->position($position);
-    $self->continue($c) if $last || $continue;
-
-=cut
-
-  }
-  
-  method lookup : Mojolicious::Routes ($name : string) {
-    
-  }
-  
-  method any : Mojolicious::Routes ($args : object...) {
-    
-    return (Mojolicious::Routes)$self->SUPER::any($args);
-  }
-  
-  method delete : Mojolicious::Routes ($args : object...) {
-    
-    return (Mojolicious::Routes)$self->SUPER::delete($args);
-  }
-  
-  method get : Mojolicious::Routes ($args : object...) {
-    
-    return (Mojolicious::Routes)$self->SUPER::get($args);
-  }
-  
-  method options : Mojolicious::Routes ($args : object...) {
-    
-    return (Mojolicious::Routes)$self->SUPER::options($args);
-  }
-  
-  method patch : Mojolicious::Routes ($args : object...) {
-    
-    return (Mojolicious::Routes)$self->SUPER::patch($args);
-  }
-  
-  method post : Mojolicious::Routes ($args : object...) {
-    
-    return (Mojolicious::Routes)$self->SUPER::post($args);
-  }
-  
-  method put : Mojolicious::Routes ($args : object...) {
-    
-    return (Mojolicious::Routes)$self->SUPER::put($args);
-  }
-  
-  method under : Mojolicious::Routes ($args : object...) {
-    
-    return (Mojolicious::Routes)$self->SUPER::under($args);
-  }
-  
-  method websocket : Mojolicious::Routes ($args : object...) {
-    
-    return (Mojolicious::Routes)$self->SUPER::websocket($args);
+    $self->SUPER::init;
   }
   
   method dispatch : int ($c : Mojolicious::Controller) {
@@ -185,40 +38,88 @@ class Mojolicious::Routes extends Mojolicious::Routes::Route {
     return 1;
   }
   
-  method match : void ($c : Mojolicious::Controller) {
+  private method match : void ($c : Mojolicious::Controller) {
     
-    die "TODO";
-
-=pod
-
-    # Path (partial path gets priority)
     my $req  = $c->req;
-    my $path = $c->stash->{path};
-    if (defined $path) { $path = "/$path" if $path !~ m!^/! }
-    else               { $path = $req->url->path->to_route }
-
+    my $path = $req->url->path->to_route;
+    
     # Method (HEAD will be treated as GET)
-    my $method   = uc $req->method;
-    my $override = $req->url->query->clone->param('_method');
-    $method = uc $override if $override && $method eq 'POST';
-    $method = 'GET'        if $method eq 'HEAD';
-
-    # Check cache
-    my $ws    = $c->tx->is_websocket ? 1 : 0;
-    my $match = $c->match;
-    $match->root($self);
-    my $cache = $self->cache;
-    if (my $result = $cache->get("$method:$path:$ws")) {
-      return $match->endpoint($result->{endpoint})->stack($result->{stack});
+    my $method = Fn->uc($req->method);
+    if ($method eq "HEAD") {
+      $method = "GET";
     }
-
+    
+    my $ws = $c->tx->is_websocket ? 1 : 0;
+    my $match = $c->match;
+    $match->set_root($self);
+    
+    my $options = Hash->new({method => $method, path => $path, websocket => $ws});
+    
     # Check routes
-    $match->find($c => {method => $method, path => $path, websocket => $ws});
-    return undef unless my $route = $match->endpoint;
-    $cache->set("$method:$path:$ws" => {endpoint => $route, stack => $match->stack});
-
-=cut
-
+    $match->find($options);
+    
+    my $endpoint = $match->endpoint;
+    
+    unless ($endpoint) {
+      return;
+    }
   }
-
+  
+  private method continue : int ($c : Mojolicious::Controller) {
+    
+    my $match = $c->match;
+    my $stack = $match->stack;
+    my $position = $match->position;
+    
+    unless ($position < @$stack) {
+      die "[Unexpected Error]Invalid stack position.";
+    }
+    
+    my $stack_data = $stack->[$position];
+    my $captures = $stack_data->captures;
+    
+    $c->set_captures($captures);
+    
+    my $r = $stack_data->route;
+    
+    my $continue = 1;
+    if (my $cb = $r->cb) {
+      $c->log->trace("Routing to a callback");
+      
+      $continue = $cb->($c);
+    }
+    elsif (my $template = $r->template) {
+      
+      my $format = $r->format;
+      
+      my $handler = $r->handler;
+      
+      $c->log->trace("Routing to the template $template.$format.$handler");
+      
+      my $output = $c->render($template, {format => $format, handler => $handler});
+      
+      if ($output) {
+        $c->set_rendered(1);
+      }
+      
+      $continue = 0;
+    }
+    
+    my $last = ($position == @$stack - 1);
+    if ($last) {
+      $continue = 0;
+    }
+    
+    $match->set_position($position + 1);
+    
+    if ($continue) {
+      return $self->continue($c);
+    }
+    else {
+      unless ($c->rendered) {
+        die "Not rendered.";
+      }
+    }
+  }
+  
 }

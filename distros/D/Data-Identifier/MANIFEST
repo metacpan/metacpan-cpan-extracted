@@ -16,11 +16,13 @@ lib/Data/Identifier/Interface/Known.pm
 lib/Data/Identifier/Interface/Simple.pm
 lib/Data/Identifier/Interface/Subobjects.pm
 lib/Data/Identifier/Interface/Userdata.pm
+lib/Data/Identifier/Util.pm
 lib/Data/Identifier/Wellknown.pm
 t/01_load.t
 t/02_uuid.t
 t/10_mixandmatch.t
 t/20_generate.t
 t/30_cloudlet.t
+t/40_util.t
 t/80_userdata.t
 xt/author/pod-syntax.t

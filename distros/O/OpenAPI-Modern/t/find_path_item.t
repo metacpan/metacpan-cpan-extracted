@@ -1058,7 +1058,7 @@ YAML
   );
   $OpenAPI::Modern::DEBUG = 0;
 
-  my $uri = uri('http://example.com', '', 'foo', 'hello // there ಠ_ಠ!');
+  my $uri = uri('http://example.com', 'foo', 'hello // there ಠ_ಠ!');
   ok($openapi->find_path_item($options = { @request = (method => 'GET', uri => $uri),
       path_template => '/foo/{foo_id}', path_captures => { foo_id => 'hello // there ಠ_ಠ!' } }),
     to_str(@request).': lookup succeeded');
@@ -1729,7 +1729,7 @@ YAML
           '\/bad\/([^/?#]*)$',
           '\/bar\/([^/?#]*)$',
           '\/foo\/([^/?#]*)$',
-          '^http\:\/\/dev\.example\.com\/foo\/([^/?#]*)$',
+          '^http\:\/\/dev\.example\.com',
         ] },
     },
     'with the correct host, the uri matches on a server url from operation + path_template',
@@ -2245,6 +2245,108 @@ YAML
 
 
   $openapi = OpenAPI::Modern->new(
+    debug => 1,
+    openapi_uri => $doc_uri,
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+paths:
+  /foo/{foo_id}:
+    get:
+      servers:
+        - url: http://☃.example.com/🦑/foo                  # a concrete variation of last entry
+        - url: http://xn--n3h.example.com/%F0%9F%A6%91/bar  # another concrete variation of last entry
+        - url: http://{host}.example.com/{subdir}/{subdir2}
+          variables:
+            host:
+              default: prod
+              enum: [dev, stg, prod, ☃, 💩🍓]
+            subdir:
+              default: 🦑
+              enum: [🦑, 🦑🦀]
+            subdir2:
+              default: foo
+YAML
+
+  ok($openapi->find_path_item($options = { @request = (method => 'GET', uri => 'http://☃.example.com/🦑/foo/foo/bar') }),
+    to_str(@request).': lookup succeeded');
+  cmp_result(
+    $options,
+    $expected = {
+      uri => str('http://xn--n3h.example.com/%F0%9F%A6%91/foo/foo/bar'),  # post-normalization
+      method => 'GET',
+      path_template => '/foo/{foo_id}',
+      path_captures => { foo_id => 'bar' },
+      uri_captures => { foo_id => 'bar' },
+      _path_item => { get => ignore },
+      _operation => ignore,
+      _operation_path_suffix => '/get',
+      operation_uri => str($doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id} get)))),
+      errors => [],
+      debug => {
+        uri_patterns => [
+          '\/foo\/([^/?#]*)$',
+          '^http\:\/\/xn\-\-n3h\.example\.com\/\%F0\%9F\%A6\%91\/foo', # <-- we matched servers/0
+        ],
+      },
+    },
+    'server urls are normalized so they use the same punycoding and url-escaping as the uri themselves',
+  );
+
+  ok($openapi->find_path_item($options = { @request = (method => 'GET', uri => 'http://☃.example.com/🦑/bar/foo/bar') }),
+    to_str(@request).': lookup succeeded');
+  cmp_result(
+    $options,
+    $expected = {
+      uri => str('http://xn--n3h.example.com/%F0%9F%A6%91/bar/foo/bar'),  # post-normalization
+      method => 'GET',
+      path_template => '/foo/{foo_id}',
+      path_captures => { foo_id => 'bar' },
+      uri_captures => { foo_id => 'bar' },
+      _path_item => { get => ignore },
+      _operation => ignore,
+      _operation_path_suffix => '/get',
+      operation_uri => str($doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id} get)))),
+      errors => [],
+      debug => {
+        uri_patterns => [
+          '\/foo\/([^/?#]*)$',
+          '^http\:\/\/xn\-\-n3h\.example\.com\/\%F0\%9F\%A6\%91\/foo',
+          '^http\:\/\/xn\-\-n3h\.example\.com\/\%F0\%9F\%A6\%91\/bar', # <-- we matched servers/1
+        ],
+      },
+    },
+    'already-encoded server urls are acceptable as well',
+  );
+
+  # ☃⭐️ doesn't punycode-rountrip: see https://github.com/mojolicious/mojo/issues/2287
+  ok($openapi->find_path_item($options = { @request = (method => 'GET', uri => 'http://💩🍓.example.com/🦑🦀/xn--n3h/foo/ಠ_ಠ') }),
+    to_str(@request).': lookup succeeded');
+  cmp_result(
+    $options,
+    $expected = {
+      uri => str('http://xn--ti8hlv.example.com/%F0%9F%A6%91%F0%9F%A6%80/xn--n3h/foo/%E0%B2%A0_%E0%B2%A0'),  # post-normalization
+      method => 'GET',
+      path_template => '/foo/{foo_id}',
+      path_captures => { foo_id => 'ಠ_ಠ' },
+      uri_captures => { host => '💩🍓', subdir => '🦑🦀', subdir2 => 'xn--n3h', foo_id => 'ಠ_ಠ' },
+      _path_item => { get => ignore },
+      _operation => ignore,
+      _operation_path_suffix => '/get',
+      operation_uri => str($doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id} get)))),
+      errors => [],
+      debug => {
+        uri_patterns => [
+          '\/foo\/([^/?#]*)$',
+          '^http\:\/\/xn\-\-n3h\.example\.com\/\%F0\%9F\%A6\%91\/foo',
+          '^http\:\/\/xn\-\-n3h\.example\.com\/\%F0\%9F\%A6\%91\/bar',
+          '^http\:\/\/([^/?#]*)\.example\.com\/([^/?#]*)\/([^/?#]*)',  # <-- we matched servers/2
+        ],
+      },
+    },
+    'can properly extract unicode characters with a server url template: punydecoding from the host, and url-unescaping from the path',
+  );
+
+
+  $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri_rel,
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 components:
@@ -2372,6 +2474,75 @@ YAML
       errors => [],
     },
     'a relative server url is resolved against the relative retrieval uri to match the request; request has no host or scheme',
+  );
+
+
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => $doc_uri,
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+paths:
+  /foo:
+    get: {}
+servers:
+  - url: .
+  - url: /subdir
+  - url: ./subdir2
+YAML
+
+  foreach my $server_and_path (
+    [ '.', '/foo' ],
+    [ '/subdir', '/subdir/foo' ],
+    [ './subdir2', '/subdir2/foo' ],
+  ) {
+    my ($server, $path) = @$server_and_path;
+    ok($openapi->find_path_item($options = { @request = (method => 'GET', uri => 'http://example.com'.$path) }),
+      to_str(@request).': lookup succeeded');
+    cmp_result(
+      $options,
+      {
+        uri => isa('Mojo::URL'),
+        method => 'GET',
+        path_template => '/foo',
+        path_captures => {},
+        uri_captures => {},
+        _path_item => { get => ignore },
+        _operation => ignore,
+        _operation_path_suffix => '/get',
+        operation_uri => str($doc_uri->clone->fragment(jsonp(qw(/paths /foo get)))),
+        errors => [],
+      },
+      $server.' is a valid server url and is properly normalized',
+    );
+  }
+
+
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => Mojo::URL->new('http://example.com/api{foo}/api.json'),
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+paths:
+  /foo:
+    get: {}
+servers:
+  - url: .
+YAML
+
+  ok($openapi->find_path_item($options = { @request = (method => 'GET', uri => 'http://example.com/api{foo}/foo') }),
+    to_str(@request).': lookup succeeded');
+  cmp_result(
+    $options,
+    {
+      uri => str('http://example.com/api%7Bfoo%7D/foo'),  # post-normalization
+      method => 'GET',
+      path_template => '/foo',
+      path_captures => {},
+      uri_captures => {},
+      _path_item => { get => ignore },
+      _operation => ignore,
+      _operation_path_suffix => '/get',
+      operation_uri => str($openapi->openapi_uri->clone->fragment(jsonp(qw(/paths /foo get)))),
+      errors => [],
+    },
+    'braces in the retrieval uri (and therefore in the normalized server url) aren\'t mistaken for template variables',
   );
 
 
@@ -2621,6 +2792,74 @@ YAML
       ],
     },
     'requesting an empty-string operation_id with path_template does not match an operation with no operationId',
+  );
+
+
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => $doc_uri,
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+paths:
+  /login/{username}:  # { ascii-sorts ahead of ~, so a simple string comparison would match this first
+    get: {}
+  /login/~ether:      # concrete components should always match first ahead of templated ones
+    get: {}
+YAML
+
+  ok($openapi->find_path_item($options = { @request = (method => 'GET', uri => 'http://example.com/login/~ether') }),
+    to_str(@request).': lookup succeeded');
+  cmp_result(
+    $options,
+    {
+      uri => isa('Mojo::URL'),
+      method => 'GET',
+      path_template => '/login/~ether',
+      path_captures => {},
+      uri_captures => {},
+      _path_item => { get => ignore },
+      _operation => ignore,
+      _operation_path_suffix => '/get',
+      operation_uri => str($doc_uri->clone->fragment(jsonp(qw(/paths /login/~ether get)))),
+      errors => [],
+    },
+    'correct sort order is used when finding the first matching path-item',
+  );
+
+  ok($openapi->find_path_item($options = { @request = (method => 'GET', uri => 'http://example.com/login/%7Eether') }),
+    to_str(@request).': lookup succeeded');
+  cmp_result(
+    $options,
+    {
+      uri => isa('Mojo::URL'),
+      method => 'GET',
+      path_template => '/login/~ether',
+      path_captures => {},
+      uri_captures => {},
+      _path_item => { get => ignore },
+      _operation => ignore,
+      _operation_path_suffix => '/get',
+      operation_uri => str($doc_uri->clone->fragment(jsonp(qw(/paths /login/~ether get)))),
+      errors => [],
+    },
+    'url-escaped characters in the URI can still be matched against an unescaped template',
+  );
+
+  ok($openapi->find_path_item($options = { @request = (method => 'GET', uri => 'http://example.com/login/%5Fether') }),
+    to_str(@request).': lookup succeeded');
+  cmp_result(
+    $options,
+    {
+      uri => isa('Mojo::URL'),
+      method => 'GET',
+      path_template => '/login/{username}',
+      path_captures => { username => '_ether' },
+      uri_captures => { username => '_ether' },
+      _path_item => { get => ignore },
+      _operation => ignore,
+      _operation_path_suffix => '/get',
+      operation_uri => str($doc_uri->clone->fragment(jsonp(qw(/paths /login/{username} get)))),
+      errors => [],
+    },
+    'url-escaped characters in the URI can still be matched, and are reported unescaped',
   );
 };
 

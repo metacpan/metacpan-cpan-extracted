@@ -1,0 +1,143 @@
+name: Unified Tester
+
+permissions:
+  contents: read
+
+on:
+  workflow_call:
+    inputs:
+      platform_name:
+        required: true
+        type: string
+      runner_type:
+        required: true
+        type: string
+      os:
+        required: true
+        type: string
+      os_version:
+        required: false
+        type: string
+      arch:
+        required: true
+        type: string
+      prepare:
+        required: false
+        type: string
+      host_os:
+        required: false
+        type: string
+      toolchain:
+        required: true
+        type: string
+
+env:
+  CODECOV_TOKEN: '${{ secrets.CODECOV_TOKEN }}'
+
+jobs:
+  build-and-test:
+    name: ${{ inputs.arch }}-${{ inputs.toolchain }}
+    runs-on: ${{ inputs.host_os || inputs.os }}
+    strategy:
+      fail-fast: false
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v5.0.0
+
+      - name: Setup MSVC
+        if: inputs.toolchain == 'msvc'
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ inputs.arch == 'aarch64' && 'arm64' || 'x64' }}
+
+      - name: Build and Test on Direct Runner
+        if: inputs.runner_type == 'direct'
+        shell: bash
+        run: |
+          ${{ inputs.prepare }}
+          curl -L https://cpanmin.us | perl - -n -v .
+
+      - name: Build and Test in FreeBSD
+        if: inputs.runner_type == 'vm' && inputs.os == 'freebsd'
+        uses: vmactions/freebsd-vm@v1.2.4
+        with:
+          release: ${{ inputs.os_version }}
+          usesh: true
+          arch: ${{ inputs.arch }}
+          prepare: ${{ inputs.prepare }}
+          run: |
+            curl -L https://cpanmin.us | perl - -n -v .
+
+      - name: Build and Test in OpenBSD
+        if: inputs.runner_type == 'vm' && inputs.os == 'openbsd'
+        uses: vmactions/openbsd-vm@v1.2.0
+        with:
+          release: ${{ inputs.os_version }}
+          usesh: true
+          arch: ${{ inputs.arch }}
+          prepare: ${{ inputs.prepare }}
+          run: |
+            curl -L https://cpanmin.us | perl - -n -v .
+
+      - name: Build and Test in NetBSD
+        if: inputs.runner_type == 'vm' && inputs.os == 'netbsd'
+        uses: vmactions/netbsd-vm@v1.2.0
+        with:
+          release: ${{ inputs.os_version }}
+          usesh: true
+          arch: ${{ inputs.arch }}
+          prepare: ${{ inputs.prepare }}
+          run: |
+            curl -L https://cpanmin.us | perl - -n -v .
+
+      - name: Build and Test in DragonflyBSD
+        if: inputs.runner_type == 'vm' && inputs.os == 'dragonflybsd'
+        uses: vmactions/dragonflybsd-vm@v1.1.1
+        with:
+          release: ${{ inputs.os_version }}
+          usesh: true
+          prepare: ${{ inputs.prepare }}
+          run: |
+            curl -L https://cpanmin.us | perl - -n -v .
+
+      - name: Build and Test in Solaris
+        if: inputs.runner_type == 'vm' && inputs.os == 'solaris'
+        uses: vmactions/solaris-vm@v1.1.5
+        with:
+          release: ${{ inputs.os_version }}
+          usesh: true
+          prepare: ${{ inputs.prepare }}
+          run: |
+            curl -L https://cpanmin.us | perl - -n -v .
+
+      - name: Build and Test in OmniOS
+        if: inputs.runner_type == 'vm' && inputs.os == 'omnios'
+        uses: vmactions/omnios-vm@v1.1.1
+        with:
+          release: ${{ inputs.os_version }}
+          usesh: true
+          prepare: ${{ inputs.prepare }}
+          run: |
+            curl -L https://cpanmin.us | perl - -n -v .
+
+      #~ - name: Upload coverage reports to Codecov
+        #~ uses: codecov/codecov-action@v5
+        #~ with:
+          #~ token: ${{ secrets.CODECOV_TOKEN }}
+          #~ root_dir: src
+          #~ flags: ${{inputs.os}}, ${{inputs.arch}}, ${{ inputs.toolchain }}
+          #~ name: ${{ inputs.platform_name }}-${{ inputs.arch }}-${{ inputs.toolchain }}
+          #~ verbose: true
+
+      - name: Record Build Status
+        if: always()
+        shell: bash
+        run: echo ${{ job.status }} > ${{ inputs.platform_name }}-${{ inputs.arch }}-${{ inputs.toolchain }}.result
+
+      - name: Upload Build Status Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: result-artifact-${{ inputs.platform_name }}-${{ inputs.arch }}-${{ inputs.toolchain }}
+          path: ${{ inputs.platform_name }}-${{ inputs.arch }}-${{ inputs.toolchain }}.result
+          retention-days: 1

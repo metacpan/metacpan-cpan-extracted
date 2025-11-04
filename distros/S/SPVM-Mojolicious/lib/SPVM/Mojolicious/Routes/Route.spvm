@@ -4,8 +4,9 @@
 class Mojolicious::Routes::Route {
   version_from Mojolicious;
   
-  use Mojo::Util;
+  use Mojolicious::Routes;
   use Mojolicious::Routes::Pattern;
+  use Mojolicious::Callback;
   
   # Class Variables
   # Reserved stash values
@@ -36,125 +37,55 @@ class Mojolicious::Routes::Route {
   }
   
   # Fields
+  has pattern : rw Mojolicious::Routes::Pattern;
+  
+  has methods : rw string[];
+  
   has inline : rw byte;
   
-  has partial : rw byte;
+  has websocket : byte;
   
   has children : rw Mojolicious::Routes::Route[];
   
   has parent : rw Mojolicious::Routes::Route
-    get {
-      unless (exists $self->{parent}) {
-        $self->{parent} = undef;
-      }
-      
-      return $self->{parent};
-    }
     set {
       $self->{parent} = $_;
       weaken $self->{parent};
     }
   ;
   
-  has pattern : rw Mojolicious::Routes::Pattern
-    get {
-      unless (exists $self->{pattern}) {
-        $self->{pattern} = Mojolicious::Routes::Pattern->new;
-      }
-      
-      return $self->{pattern};
-    }
-  ;
+  has cb : rw Mojolicious::Callback;
   
-  has name : rw string
-    set {
-      $self->{name} = $_;
-      
-      $self->{custom} = 1;
-    }
-  ;
+  has template : rw string;
   
-  has has_websocket : ro int
-    get {
-      unless (exists $self->{has_websocket}) {
-        my $chain = $self->_chain;
-        
-        my $has_websocket = 0;
-        for (my $i = 0; $i < $chain->length; $i++) {
-          my $child = $chain->get($i);
-          
-          if ($child->is_websocket) {
-            $has_websocket = 1;
-          }
-        }
-      }
-      
-      return $self->{has_websocket};
-    }
-  ;
+  has format : rw string;
   
-  has methods : rw string[]
-    set ($_ : string|string[]) {
-      
-      my $methods = (string[])undef;
-      if (!$_) {
-        # undef
-      }
-      elsif ($_ isa string) {
-        $methods = [(string)$_];
-      }
-      elsif ($_ isa string[]) {
-        $methods = (string[])$_;
-      }
-      else {
-        die "The methods field value must be a string, a string array.";
-      }
-      
-      if ($methods) {
-        for (my $i = 0; $i < @$methods; $i++) {
-          $methods->[$i] = Fn->uc($methods->[$i]);
-        }
-      }
-      
-      $self->{methods} = $methods;
-    }
-  ;
-  
-  has requires : rw Hash
-    get {
-      unless (exists $self->{requires}) {
-        $self->{requires} = Hash->new;
-      }
-      
-      return $self->{requires};
-    }
-    set {
-      unless ($_) {
-        die "The requires field value must be defined.";
-      }
-      
-      $self->{requires} = $_;
-      
-      $self->root->cache->set_max_keys(0);
-    }
-  ;
+  has handler : rw string;
   
   # Undocumented Fields
-  has websocket : byte;
-  
-  has custom : string;
   
   # Class Methods
   static method new : Mojolicious::Routes::Route () {
     
     my $self = new Mojolicious::Routes::Route;
     
-    $self->{children} = new Mojolicious::Routes::Route[0];
+    $self->init;
     
     return $self;
   }
   
   # Instance Methods
+  protected method init : void ($options : object[] = undef) {
+    
+    $self->{children} = new Mojolicious::Routes::Route[0];
+    
+    $self->{pattern} = Mojolicious::Routes::Pattern->new;
+    
+    $self->{format} = "html";
+    
+    $self->{handler} = "ep";
+  }
+  
   method any : Mojolicious::Routes::Route ($args : object...) {
     
     my $methods = (string[])undef;
@@ -162,9 +93,6 @@ class Mojolicious::Routes::Route {
     if ($args->[0] isa string[]) {
       $methods = (string[])$args->[0];
       $shift = 1;
-    }
-    else {
-      $methods = new string[0];
     }
     
     $args = $shift ? (object...)Array->copy_object_address($args, 1, @$args - 1) : $args;
@@ -209,20 +137,85 @@ class Mojolicious::Routes::Route {
     return $route;
   }
   
-  method add_child : void ($route : Mojolicious::Routes::Route)  {
+  method root : Mojolicious::Routes () {
+    
+    return (Mojolicious::Routes)$self->_chain->[0];
+  }
+  
+  method is_websocket : int () {
+    
+    return !!$self->{websocket};
+  }
+  
+  method is_reserved : int ($name : string) {
+    return !!$RESERVED->get($name);
+  }
+  
+  method is_endpoint : int () {
+    
+    return $self->inline ? 0 : !@{$self->children};
+  }
+  
+  method parse : void ($pattern_string : string) {
+    
+    my $pattern = $self->pattern;
+    
+    $pattern->parse($pattern_string);
+  }
+  
+  method to : void ($defaults : Hash)  {
+    
+    my $pattern_defaults = $self->pattern->defaults;
+    
+    for my $key (@{$defaults->keys}) {
+      my $value = $defaults->{$key};
+      $pattern_defaults->{$key} = $value;
+    }
+  }
+  
+  method to_string : string () {
+    
+    my $chain = $self->_chain;
+    
+    my $pattern_unparseds = StringList->new;
+    
+    for (my $i = 0; $i < @$chain; $i++) {
+      my $chain = $chain->[$i];
+      
+      my $pattern_unparsed = $chain->pattern->unparsed // "";
+      
+      $pattern_unparseds->push($pattern_unparsed);
+    }
+    
+    return Fn->join("", $pattern_unparseds->to_array);
+  }
+  
+  method has_websocket : int () {
+    my $chain = $self->_chain;
+    
+    my $has_websocket = 0;
+    for (my $i = 0; $i < @$chain; $i++) {
+      my $child = $chain->[$i];
+      
+      if ($child->is_websocket) {
+        $has_websocket = 1;
+      }
+    }
+    return $has_websocket;
+  }
+  
+  private method add_child : void ($route : Mojolicious::Routes::Route)  {
     
     $route->remove;
     
     $route->set_parent($self);
     
-    my $children = List->new_ref($self->{children});
+    my $children = (List of Mojolicious::Routes::Route)List->new_ref($self->{children});
     
     $children->push($route);
-    
-    $route->pattern->set_types($self->root->types);
   }
   
-  method remove : void () {
+  private method remove : void () {
     
     my $parent = $self->parent;
     
@@ -243,14 +236,9 @@ class Mojolicious::Routes::Route {
     $self->set_parent(undef);
   }
   
-  method root : Mojolicious::Routes () {
+  private method _chain : List of Mojolicious::Routes::Route () {
     
-    return (Mojolicious::Routes)$self->_chain->get(0);
-  }
-  
-  method _chain : List of Mojolicious::Routes::Route () {
-    
-    my $chain = List->new([$self]);
+    my $chain = (List of Mojolicious::Routes::Route)List->new([$self]);
     
     while ($self = $self->parent) {
       $chain->unshift($self);
@@ -259,255 +247,102 @@ class Mojolicious::Routes::Route {
     return $chain;
   }
   
-  method find : Mojolicious::Routes::Route ($name : string) {
-    return $self->_index->get($name);
-  }
-  
-  private method _index : Hash of Mojolicious::Routes::Route () {
-    
-    my $auto = Hash->new;
-    
-    my $custom = Hash->new;
-    
-    my $children = (List of Mojolicious::Routes::Route)List->new_ref(Array->copy_object_address($self->children));
-    
-    while (my $child = $children->shift) {
-      if ($child->has_custom_name) {
-        unless ($custom->get($child->name)) {
-          $custom->set($child->name, $child);
-        }
-      }
-      else {
-        unless ($auto->get($child->name)) {
-          $auto->set($child->name, $child);
-        }
-      }
-      
-      $children->push_($child->children);
-    }
-    
-    my $ret = Hash->new;
-    
-    for my $key (@{$auto->keys}) {
-      $ret->set($key, $auto->get($key));
-    }
-    
-    for my $key (@{$custom->keys}) {
-      $ret->set($key, $custom->get($key));
-    }
-    
-    return $ret;
-  }
-  
-  method has_custom_name : int () {
-    return !!$self->{custom};
-  }
-  
-  method is_websocket : int () {
-    
-    return !!$self->{websocket};
-  }
-  
-  method is_reserved : int ($name : string) {
-    return !!$RESERVED->get($name);
-  }
-  
-  method is_endpoint : int () {
-    
-    return $self->inline ? 0 : !@{$self->children};
-  }
-  
-  method parse : void ($args : object...) {
-    
-    my $pattern = $self->pattern;
-    
-    $pattern->parse($args);
-    
-    my $name = (mutable string)copy($pattern->unparsed // "");
-    
-    Re->s($name, ["\W+", "g"], "");
-    
-    $self->{name} = $name;
-  }
-  
-  method render : string ($values : Hash) {
-    
-    my $chain = $self->_chain;
-    
-    my $pattern_strings_list = StringList->new;
-    for (my $i = 0; $i < $chain->length; $i++) {
-      my $_ = $chain->get($i);
-      
-      my $pattern_string = $_->pattern->render($values, !@{$_->children} && !$_->partial);
-      
-      $pattern_strings_list->push($pattern_string);
-    }
-    
-    my $path = Fn->join("", $pattern_strings_list->to_array);
-    
-    return length $path ? $path : "/";
-  }
-  
-  method suggested_method : string () {
-    
-    die "TODO";
-  }
-  
-  method to : void ($args : object...)  {
-    
-    my $pattern = $self->pattern;
-    
-    unless (@$args > 0) {
-      die "Too few arguments.";
-    }
-    
-    my $_ = Mojo::Util->_options($args);
-    my $shortcut = $_->[0];
-    my $default_h = Hash->new((object[])$_->[1]);
-    
-    if ($shortcut) {
-      
-      die "TODO";
-
-=pod
-
-      # Application
-      if (ref $shortcut || $shortcut =~ /^[\w:]+$/) { $defaults{app} = $shortcut }
-      
-      # Controller and action
-      elsif ($shortcut =~ /^([\w\-:]+)?\#(\w+)?$/) {
-        $defaults{controller} = $1 if defined $1;
-        $defaults{action}     = $2 if defined $2;
-      }
-
-=cut
-
-    }
-    
-    for my $key (@{$default_h->keys}) {
-      my $value = $default_h->get($key);
-      $pattern->defaults->set($key, $value);
-    }
-  }
-  
-  method to_string : string () {
-    
-    my $chain = $self->_chain;
-    
-    my $pattern_unparseds_list = StringList->new;
-    
-    for (my $i = 0; $i < $chain->length; $i++) {
-      my $chain = $chain->get($i);
-      
-      my $pattern_unparsed = $chain->pattern->unparsed // "";
-      
-      $pattern_unparseds_list->push($pattern_unparsed);
-    }
-    
-    return Fn->join("", $pattern_unparseds_list->to_array);
-  }
-  
   private method _generate_route : Mojolicious::Routes::Route ($methods : string|string[], $args : object...) {
     
-    my $conditions = Hash->new;
-    
-    my $constraints = Hash->new;
+    my $args = List->new($args);
     
     my $defaults = Hash->new;
     
-    my $name = (string)undef;
+    my $template = (string)undef;
     
     my $pattern = (string)undef;
     
-    my $args_list = List->new($args);
+    my $cb = (Mojolicious::Callback)undef;
     
-    while (my $arg = $args_list->shift) {
+    while (1) {
+      
+      unless (@$args) {
+        last;
+      }
+      
+      my $arg = $args->shift;
       
       # First scalar is the pattern
-      if ($arg isa string && !$pattern) { $pattern = (string)$arg; }
-      
+      if ($arg isa string && !$pattern) {
+        $pattern = (string)$arg;
+      }
       # Scalar
-      elsif ($arg isa string && $args_list->length) { $conditions->set((string)$arg, $args_list->shift); }
-      
-      # Last scalar is the route name
-      elsif ($arg isa string) { $name = (string)$arg; }
-      
+      elsif ($arg isa string && @$args) {
+        die "Condition is not supported.";
+      }
+      # Last scalar is the template
+      elsif ($arg isa string) {
+        $template = (string)$arg;
+      }
       # Callback
-      elsif ($arg isa Mojo::Callback) { $defaults->set("cb", $arg); }
-      
+      elsif ($arg isa Mojolicious::Callback) {
+        $cb = (Mojolicious::Callback)$arg;
+      }
       # Defaults
-      elsif (is_options $arg) {
-        $defaults = Hash->new(Fn->merge_options($defaults->to_array, (object[])$arg));
+      elsif (is_options $arg || $arg isa Hash) {
+        $defaults = Fn->to_hash($arg);
       }
       
       # Constraints
       elsif ($arg isa object[]) {
-        $constraints = Hash->new(Fn->merge_options($constraints->to_array, (object[])$arg));
+        die "Constraint is not supported.";
+      }
+      else {
+        die "Invalid routing argument.";
       }
     }
     
-    my $route = $self->_route($pattern, $constraints);
-    
-    $route->set_requires($conditions);
-    
-    $route->to($defaults);
+    my $route = $self->_route($pattern);
     
     if ($methods isa string && $methods->(string) eq "under") {
       $route->set_inline(1);
     }
     else {
+      if ($methods isa string) {
+        $methods = [(string)$methods];
+      }
       $route->set_methods((string[])$methods);
     }
     
-    if ($name) {
-      $route->set_name($name);
+    $route->set_template($template);
+    
+    if ($cb) {
+      $route->set_cb($cb);
     }
+    
+    $route->to($defaults);
     
     return $route;
   }
   
-  method _route : Mojolicious::Routes::Route ($pattern : string, $constraints_arg : Hash) {
+  private method _route : Mojolicious::Routes::Route ($pattern : string) {
     
     my $r = Mojolicious::Routes::Route->new;
-    $r->parse($pattern, $constraints_arg);
+    
+    $r->parse($pattern);
     
     $self->add_child($r);
     
-    my $children = $self->children;
-    my $route       = $children->[-1];
-    my $new_pattern = $route->pattern;
+    my $pattern = $r->pattern;
     
     my $has_reserved = 0;
-    for (my $i = 0; $i < @{$new_pattern->placeholders}; $i++) {
-      my $placeholder = $new_pattern->placeholders->[$i];
+    for (my $i = 0; $i < @{$pattern->placeholders}; $i++) {
+      my $placeholder = $pattern->placeholders->[$i];
       if ($self->is_reserved($placeholder)) {
         $has_reserved = 1;
         last;
       }
     }
-    
     if ($has_reserved) {
-      die "Route pattern " . $new_pattern->unparsed . " contains a reserved stash value.";
+      die "Route pattern " . $pattern->unparsed . " contains a reserved stash value.";
     }
     
-    my $old_pattern = $self->pattern;
-    my $constraints = $old_pattern->constraints;
-    
-    if ($constraints->exists("format")) {
-      unless ($new_pattern->constraints->get("format")) {
-        $new_pattern->constraints->set("format", $constraints->get("format"));
-      }
-    }
-    
-    my $defaults = $old_pattern->defaults;
-    
-    if ($defaults->exists("format")) {
-      unless ($new_pattern->defaults->get("format")) {
-        $new_pattern->defaults->set("format", $defaults->get("format"));
-      }
-    }
-    
-    return $route;
+    return $r;
   }
 
 }

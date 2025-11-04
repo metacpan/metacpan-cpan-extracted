@@ -19,7 +19,7 @@ use Carp;
 use Math::BigInt lib => 'GMP';
 use URI;
 
-our $VERSION = v0.22;
+our $VERSION = v0.23;
 
 use constant {
     RE_UUID => qr/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/,
@@ -87,6 +87,7 @@ my %well_known = (
     doi  => __PACKAGE__->new($well_known_uuid => WK_DOI,    validate => RE_DOI),
 
     # Unofficial, not part of public API:
+    # Also used by Data::Identifier::Util!
     unicodecp => __PACKAGE__->new($well_known_uuid => WK_UNICODE_CP, validate => RE_UNICODE, namespace => NS_UNICODE_CP, generate => 'id-based'),
 
     hdi => __PACKAGE__->new($well_known_uuid => WK_HDI, validate => RE_UINT),
@@ -938,7 +939,7 @@ Data::Identifier - format independent identifier object
 
 =head1 VERSION
 
-version v0.22
+version v0.23
 
 =head1 SYNOPSIS
 

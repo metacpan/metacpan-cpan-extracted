@@ -1,4 +1,4 @@
-package SPVM::Mojo::Cache;
+package SPVM::Mojolicious::Routes::Match::StackData;
 
 
 
@@ -8,15 +8,15 @@ package SPVM::Mojo::Cache;
 
 =head1 Name
 
-SPVM::Mojo::Cache - Short Description
+SPVM::Mojolicious::Routes::Match::StackData - Short Description
 
 =head1 Description
 
-Mojo::Cache class in L<SPVM> has methods to do someting.
+Mojolicious::Routes::Match::StackData class in L<SPVM> has methods to do someting.
 
 =head1 Usage
 
-  use Mojo::Cache;
+  use Mojolicious::Routes::Match::StackData;
 
 =head1 Details
 

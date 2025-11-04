@@ -1,11 +1,12 @@
-[![Actions Status](https://github.com/sanko/alien-libui/actions/workflows/linux.yaml/badge.svg?branch=main)](https://github.com/sanko/alien-libui/actions?workflow=linux) [![Actions Status](https://github.com/sanko/alien-libui/actions/workflows/windows.yaml/badge.svg?branch=main)](https://github.com/sanko/alien-libui/actions?workflow=windows) [![Actions Status](https://github.com/sanko/alien-libui/actions/workflows/osx.yaml/badge.svg?branch=main)](https://github.com/sanko/alien-libui/actions?workflow=osx) [![Actions Status](https://github.com/sanko/alien-libui/actions/workflows/freebsd.yaml/badge.svg?branch=main)](https://github.com/sanko/alien-libui/actions?workflow=freebsd) [![MetaCPAN Release](https://badge.fury.io/pl/Alien-libui.svg)](https://metacpan.org/release/Alien-libui)
 # NAME
 
 Alien::libui - Build and Install libui: A portable GUI library
 
 # SYNOPSIS
 
-    use Alien::libui;
+```perl
+use Alien::libui;
+```
 
 # DESCRIPTION
 

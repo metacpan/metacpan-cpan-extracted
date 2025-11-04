@@ -11,7 +11,15 @@ class Mojo::Path {
   interface Stringable;
   
   # Fields
-  has parts : rw string[];
+  has parts : rw string[]
+    get {
+      unless ($self->{parts}) {
+        $self->_parse;
+      }
+      
+      return $self->{parts};
+    }
+  ;
   
   has leading_slash : rw byte
     get {
@@ -144,7 +152,7 @@ class Mojo::Path {
     
     my $route = "/";
     
-    $route .= Fn->join("/", $clone->parts);
+    $route .= Fn->join("/", $clone->parts // new string[0]);
     
     if ($clone->trailing_slash) {
       $route .= "/";

@@ -15,61 +15,20 @@
 # $Id: $
 
 package Device::GPIB::Controllers::Prologix;
+our @ISA = qw(Device::GPIB::Controllers::Serial);
 
 use strict;
-use Device::SerialPort;
+use Device::GPIB::Controllers::Serial;
 
 $Device::GPIB::Controllers::Prologix::VERSION = '0.10';
 
 sub new($$)
 {
     my ($class, $port) = @_;
-
-    my $self = {};
-    bless $self, $class;
-
-    # Defaults:
-    $self->{Port} = '/dev/ttyUSB0';
-    $self->{Baudrate} = '9600';
-    $self->{Databits} = '8';
-    $self->{Parity} = 'none';
-    $self->{Stopbits} = '1';
-    $self->{Handshake} = 'none';
-    $self->{ReadCharTimeout} = 2000; # ms
-
-    $self->{Port} = $port if defined $port;
-
-    my ($portname, $baudrate, $databits, $parity, $stopbits, $handshake) 
-	= split(/:/, $self->{Port});
-    $self->{Baudrate}  = $baudrate  if defined $baudrate;
-    $self->{Databits}  = $databits  if defined $databits;
-    $self->{Parity}    = $parity    if defined $parity;
-    $self->{Stopbits}  = $stopbits  if defined $stopbits;
-    $self->{Handshake} = $handshake if defined $handshake;
-
-    debug("$class is connecting to $portname with $self->{Baudrate}:$self->{Databits}:$self->{Parity}:$self->{Stopbits}:$self->{Handshake}");
-
-    $self->{serialport} = Device::SerialPort->new($portname);
-    if (!$self->{serialport})
-    {
-	warning("Could not open serial port $portname: $!");
-	return;
-    }
-    $self->{serialport}->baudrate($self->{Baudrate});
-    $self->{serialport}->databits($self->{Databits});
-    $self->{serialport}->parity($self->{Parity});
-    $self->{serialport}->stopbits($self->{Stopbits});
-    $self->{serialport}->handshake($self->{Handshake});
-    $self->{serialport}->read_char_time($self->{ReadCharTimeout});
-    $self->{serialport}->read_const_time(100);
-    $self->{serialport}->stty_icanon(0);
-
-    $self->{CurrentPad} = -1;
-    $self->{CurrentSad} = -1;
-
-    return unless $self->initialised();
-
+    my $self = $class->SUPER::new($port); # Call parent constructor
+    # Add child-specific initialization here
     return $self;
+
 }
 
 sub initialised($)
@@ -82,7 +41,7 @@ sub initialised($)
     for (my $retries = 0; $retries < 5; $retries++)
     {
 	$self->{DeviceVersion} = $self->version();
-	debug("Controller version: $self->{DeviceVersion}");
+	$self->debug("Controller version: $self->{DeviceVersion}");
 	if (!defined $self->{DeviceVersion})
 	{
 	    sleep(1);
@@ -93,12 +52,17 @@ sub initialised($)
 	# Set the Prologix compatible into a state we like
 	$self->auto(0);
 	return unless $self->auto() == 0;
+	$self->read_tmo_ms(3000); # Some devices need a long timeout
 	return 1; # OK
     }
-    debug("Gave up trying to read versionfrom the controller");
+    $self->debug("Gave up trying to read version from the controller");
     return; # Fail
 }
 
+sub isSerial($)
+{
+    return 0;
+}
 
 # Send an unescaped Prologix command, possibly containing ++
 # and certainly not \n
@@ -106,7 +70,7 @@ sub sendControllerCommand($$)
 {
     my ($self, $s) = @_;
 
-    debug("Sending Controller Command: '$s'");
+    $self->debug("Sending Controller Command: '$s'");
     if ($Device::GPIB::Controller::debug)
     {
 	my $x = unpack('H*', $s);
@@ -120,7 +84,7 @@ sub send($$)
 {
     my ($self, $s) = @_;
 
-    debug("Sending GPIB Command: '$s'");
+    $self->debug("Sending GPIB Command: '$s'");
     # Escape $s, prepend any CR, LF, ESC or '+' with ESC
     $s =~ s/([\x0d\x0a\x1b\x2b])/\x1b$1/g;
     if ($Device::GPIB::Controller::debug)
@@ -140,64 +104,6 @@ sub sendTo($$$$)
     return $self->send($s);
 }
 
-sub read_to_timeout($)
-{
-    my ($self) = @_;
-
-    my $buf;
-    while (1)
-    {
-	my ($count, $ch) = $self->{serialport}->read(1);
-	my $x = unpack('H*', $ch);
-	debug("got $count, $ch: $x");
-	return $buf
-	    unless $count;  # Timeout
-	$buf .= $ch;
-    }
-}
-
-sub read_to_eol($)
-{
-    my ($self) = @_;
-
-    my $buf;
-    while (1)
-    {
-	my ($count, $ch) = $self->{serialport}->read(1);
-	if ($count)
-	{
-	    my $x = unpack('H*', $ch);
-	    debug("got $count, $ch: $x");
-	    if ($ch eq ';' && $self->{EOIMode}) # Experimental
-	    {
-		# Not EOI/LF mode, so this is the last char
-		last;
-	    }
-	    elsif ($ch eq "\r")
-	    {
-		# ignore CR
-	    }
-	    elsif ($ch eq "\n")
-	    {
-		# NL, end of message (unless we are reading binary)
-		last;
-	    }
-	    else
-	    {
-		$buf .= $ch;
-	    }
-	}
-	else
-	{
-	    debug("read_to_eol Timeout");
-	    last;
-	}
-    }
-
-    # Got a buffer full
-    debug("Read: '$buf'");
-    return $buf;
-}
 
 # REad until a char or timeout.
 # $waitfor can be either 'eoi' or the decimal number of the char < 256
@@ -229,21 +135,6 @@ sub read_binary($$$)
     return $self->read_to_timeout();
 }
 
-sub warning($)
-{
-    my ($s) = @_;
-
-    print "WARNING: $s\n";
-}
-
-sub debug($)
-{
-    my ($s) = @_;
-
-    print "DEBUG: $s\n"
-	if $Device::GPIB::Controller::debug;
-}
-
 sub close($)
 {
     my ($self) = @_;
@@ -255,13 +146,6 @@ sub close($)
 	$self->{serialport}->close();
 	undef $self->{serialport};
     }
-}
-
-sub DESTROY($)
-{
-    my ($self) = @_;
-
-    $self->close();
 }
 
 ###
@@ -533,12 +417,12 @@ __END__
 
 =head1 NAME
 
-Device::GPIB::Prologix - Interface to Prologix GPIB-USB Controller
+Device::GPIB::Controllers::Prologix - Interface to Prologix GPIB-USB Controller
 
 =head1 SYNOPSIS
 
-  use Device::GPIB::Prologix;
-  my $d = Device::GPIB::Prologix->new('/dev/ttyUSB0');
+  use Device::GPIB::Controllers::Prologix;
+  my $d = Device::GPIB::Controllers::Prologix->new('/dev/ttyUSB0');
   my $pad = 17;
   $d->sendTo('id?', $pad);
   my $id = $d->read();

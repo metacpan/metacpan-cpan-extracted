@@ -6,195 +6,155 @@ class Mojolicious::Routes::Pattern {
   use Mojolicious::Types;
   
   # Fields
+  has unparsed : rw string;
+  
   has defaults : rw Hash;
-  
-  has constraints : rw Hash;
-  
-  has types : rw Hash;
-  
-  has placeholder_start : rw string;
-  
-  has type_start : rw string;
-  
-  has placeholders : rw string[];
-  
-  has tree : rw object[];
-  
-  has quote_end : rw string;
-  
-  has quote_start : rw string;
   
   has regex : rw Regex;
   
-  has unparsed : rw string;
+  has placeholder_start : rw string;
   
   has relaxed_start : rw string;
   
   has wildcard_start : rw string;
   
+  has quote_start : rw string;
+  
+  has quote_end : rw string;
+  
+  has placeholders : rw string[];
+  
+  # Undocumented Fields
+  has tree : List of string[];
+  
+  has regex_string : string;
+  
   # Class Methods
-  static method new : Mojolicious::Routes::Pattern ($args : object...) {
+  static method new : Mojolicious::Routes::Pattern ($pattern : string = undef) {
     
     my $self = new Mojolicious::Routes::Pattern;
     
-    if (@$args) {
-      $self->parse($args);
-    }
-    
     $self->{placeholder_start} = ":";
     
-    $self->{type_start} = ":";
+    $self->{relaxed_start} = "#";
+    
+    $self->{wildcard_start} = "*";
     
     $self->{quote_end} = ">";
     
     $self->{quote_start} = "<";
     
-    $self->{relaxed_start} = "#";
+    $self->{placeholders} = new string[0];
     
-    $self->{wildcard_start} = "#";
+    $self->{defaults} = Hash->new;
+    
+    $self->{tree} = List->new(new string[][0]);
+    
+    if ($pattern) {
+      $self->parse($pattern);
+    }
     
     return $self;
   }
   
-  private static method _compile_req : string ($req : string|string[]) {
-    
-    if ($req isa string) {
-      return "(" . (string)$req . ")";
-    }
-    
-    my $reqs = Array->copy_string_address((string[])$req);
-    
-    Sort->sort_string_desc($reqs);
-    
-    for (my $i = 0; $i < @$reqs; $i++) {
-      $reqs->[$i] = "\Q" . $reqs->[$i] . "\E";
-    }
-    
-    return "(" . Fn->join("|", $reqs) . ")";
-  }
-  
-  private static method _compile_format : string ($format : string|string[], $has_default : int) {
-    
-    # No regex
-    unless ($format) {
-      return "";
-    }
-    
-    # Default regex
-    if ($format isa string && (string)$format eq "1") {
-      return "/?(?:\.([^/]+))?$" ;
-    }
-    
-    # Compile custom regex
-    my $regex = "\." . &_compile_req($format);
-    
-    return $has_default ? "/?(?:$regex)?\$" : "/?$regex\$";
-  }
-  
   # Instance Methods
-  method match : Hash ($path : string, $detect : int = 0) {
+  method match : Hash ($path : string) {
     
-    my $captures = $self->match_partial(my $_ = [$path], $detect);
-    $path = $_->[0];
+    my $path = copy $path;
     
-    return !$path || $path eq "/" ? $captures : undef;
+    my $captures = $self->match_partial((mutable string)$path);
+    
+    return !length $path || $path eq "/" ? $captures : undef;
   }
   
-  method match_partial : Hash ($pathref : string[], $detect : int = 0) {
+  method match_partial : Hash ($path : mutable string) {
     
     # Compile on demand
     unless ($self->{regex}) {
-      $self->_compile($detect);
+      $self->_compile;
     }
     
     my $captures_length = 0;
     my $match_start = -1;
     my $match_length = -1;
-    my $captures_list = (StringList)undef;
-    if (my $m = $self->regex->match($pathref->[0])) {
+    my $captures = (StringList)undef;
+    if (my $m = $self->regex->match($path)) {
       $captures_length = $m->captures_length;
       $match_start = $m->match_start;
       $match_length = $m->match_length;
       
-      $captures_list = StringList->new;
+      $captures = StringList->new;
       
       for (my $i = 0; $i < $captures_length; $i++) {
-        $captures_list->push($m->captures->[$i]);
+        $captures->push($m->captures->[$i]);
       }
     }
-    
-    unless ($captures_length) {
+    else {
       return undef;
     }
     
-    $pathref->[0] = Fn->substr($pathref->[0], $match_start, $match_length);
+    my $new_path = Fn->substr($path, $match_start + $match_length);
+    set_length($path, length $new_path);
+    Fn->memcpy($path, 0, $new_path, 0, length $new_path);
     
-    my $captures_h = Hash->new($self->defaults->to_array);
-    my $placeholders = StringList->new($self->placeholders);
-    $placeholders->push("format");
-    
-    for my $placeholder (@{$placeholders->get_array}) {
+    my $captures_h = Hash->new($self->defaults->to_options);
+    for my $placeholder (@{$self->placeholders}) {
       
-      unless ($captures_list->length) {
+      unless ($captures->length) {
         last;
       }
       
-      my $capture = $captures_list->shift;
+      my $capture = $captures->shift;
       
-      if ($capture) {
-        $captures_h->set($placeholder, $capture);
+      if (length $capture) {
+        $captures_h->{$placeholder} = $capture;
       }
     }
     
     return $captures_h;
   }
-
-  method parse : void ($args : object...) {
   
-    my $args_list = List->new($args);
+  method parse : void ($pattern : string) {
     
-    my $pattern = (mutable string)copy($args_list->length % 2 ? ($args_list->shift->(string) // "/") : "/");
+    unless (length $pattern) {
+      $pattern = "/";
+    }
     
-    Re->s($pattern, ["^/*|/+", "g"], "/");
+    $pattern = copy $pattern;
+    
+    Re->s((mutable string)$pattern, ["^/*|/+", "g"], "/");
     
     if ($pattern eq "/") {
-      $self->set_constraints(Hash->new((object[])$args_list->get(0))) ;
       return;
     }
     
-    Re->s($pattern, "!/$", "");
-    
-    $self->set_constraints(Hash->new((object[])$args_list->get(0)));
+    Re->s((mutable string)$pattern, "/$", "");
     
     $self->_tokenize($pattern);
   }
   
-  private method _compile : void ($detect : int) {
-
-    my $constraints = $self->constraints;
+  private method _compile : void () {
     
-    my $types       = $self->types;
+    my $defaults = $self->defaults;
     
-    my $defaults    = $self->defaults;
-    
-    my $block    = my $regex = "";
+    my $block = my $regex = "";
     
     my $optional = 1;
     
-    my $tree_list = (List of object[])List->new_ref($self->{tree});
+    my $tree = $self->{tree};
     
-    for (my $i = $tree_list->length - 1; $i >= 0; $i--) {
-      my $token = (object[])$tree_list->get($i);
+    for (my $i = @$tree - 1; $i >= 0; $i--) {
+      my $token = $tree->[$i];
       
-      my $op = (string)$token->[0];
+      my $op = $token->[0];
       my $value = $token->[1];
-      my $type = (string)$token->[2];
+      my $type = $token->[2];
       
       my $part = "";
       
       # Text
       if ($op eq "text") {
-        $part = "\Q" . (string)$value . "\E";
+        $part = "\Q$value\E";
         $optional = 0;
       }
       
@@ -208,19 +168,11 @@ class Mojolicious::Routes::Pattern {
       
       # Placeholder
       else {
-        my $value = (string[])$value;
-        if (@$value > 1) {
-          $part = &_compile_req($types->get($value->[1]) // "?!");
-        }
-        else {
-          $part = $type ? $type eq "relaxed" ? "([^/]+)" : "(.+)" : "([^/.]+)";
-        }
-        
-        # Custom regex
-        if (my $c = $constraints->get($value->[0])) { $part = &_compile_req($c); }
+        my $name = $value;
+        $part = $type ? $type eq "relaxed" ? "([^/]+)" : "(.+)" : "([^/.]+)";
         
         # Optional placeholder
-        if ($defaults->exists($value->[0])) {
+        if ($defaults->exists($name)) {
           $part .= "?";
         }
         else {
@@ -230,32 +182,29 @@ class Mojolicious::Routes::Pattern {
       
       $block = $part . $block;
     }
-
+    
     # Not rooted with a slash
     if ($block) {
       $regex = $block . $regex;
     }
     
-    # Format
-    if ($detect) {
-      $regex .= &_compile_format($constraints->get("format"), $defaults->exists("format")) ;
-    }
+    $regex = "^$regex";
     
-    $self->set_regex(Regex->new($regex));
-
+    $self->{regex_string} = $regex;
+    
+    $self->set_regex(Regex->new($regex, "s"));
   }
-
-  method _tokenize : void ($pattern : string) {
+  
+  private method _tokenize : void ($pattern : string) {
     
     my $placeholders = StringList->new_ref($self->placeholders);
-    my $type_start   = $self->type_start;
     my $quote_end    = $self->quote_end;
     my $quote_start  = $self->quote_start;
     my $start        = $self->placeholder_start;
     my $relaxed      = $self->relaxed_start;
     my $wildcard     = $self->wildcard_start;
     
-    my $tree_list = List->new;
+    my $tree = (List of string[])List->new(new string[][0]);
     my $spec = 0;
     my $more = 0;
     for (my $i = 0; $i < length $pattern; $i++) {
@@ -264,128 +213,67 @@ class Mojolicious::Routes::Pattern {
       # Quoted
       if ($char eq $quote_start) {
         if (++$spec) {
-          $tree_list->push([(object)"placeholder", "", undef]);
+          $tree->push(["placeholder", "", undef]);
         }
       }
-      elsif ($char eq $quote_end)   { $spec = $more = 0; }
+      elsif ($char eq $quote_end)   {
+        $spec = $more = 0;
+      }
       
       # Placeholder
       elsif (!$more && $char eq $start) {
         unless ($spec++) {
-          $tree_list->push([(object)"placeholder", "", undef]);
+          $tree->push(["placeholder", "", undef]);
         }
       }
       
       # Relaxed or wildcard (upgrade when quoted)
       elsif (!$more && ($char eq $relaxed || $char eq $wildcard)) {
         unless ($spec++) {
-          $tree_list->push([(object)"placeholder", "", undef]);
+          $tree->push(["placeholder", "", undef]);
         }
-        $tree_list->get($tree_list->length - 1)->(object[])->[2] = $char eq $relaxed ? "relaxed" : "wildcard";
+        $tree->[-1][2] = $char eq $relaxed ? "relaxed" : "wildcard";
       }
       
       # Slash
       elsif ($char eq "/") {
-        $tree_list->push([(object)"slash", undef, undef]);
+        $tree->push(["slash", undef, undef]);
         $spec = $more = 0;
       }
       
       # Placeholder
       elsif ($spec && ++$more) {
-        my $_ = $tree_list->get($tree_list->length - 1)->(object[])->[1]->(string);
-        $tree_list->get($tree_list->length - 1)->(object[])->[1] =  $_ . $char;
+        $tree->[-1][1] .=  $char;
       }
-
+      
       # Text (optimize slash+text and *+text+slash+text)
-      elsif ($tree_list->get($tree_list->length - 1)->(object[])->[0]->(string) eq "text") {
-        
-        my $token = $tree_list->get($tree_list->length - 1)->(object[]);
-        
-        my $_ = $token->[@$token - 1]->(string);
-        $token->[@$token - 1] = $_ . $char;
+      elsif ($tree->[-1][0] eq "text") {
+        $tree->[-1][1] .= $char;
       }
-      elsif (!$tree_list->get($tree_list->length - 2) && $tree_list->get($tree_list->length - 1)->(object[])->[0]->(string) eq "slash") {
-        $tree_list = List->new(["text", "/$char"]);
+      elsif (@$tree == 1 && $tree->[-1][0] eq "slash") {
+        $tree = (List of string[])List->new([["text", "/$char", undef]]);
       }
-      elsif ($tree_list->get($tree_list->length - 2) && $tree_list->get($tree_list->length - 2)->(object[])->[0]->(string) eq "text" && $tree_list->get($tree_list->length - 1)->(object[])->[0]->(string) eq "slash") {
-        if ($tree_list->length) {
-          $tree_list->pop;
-          my $_ = $tree_list->get($tree_list->length - 1)->(object[])->[$tree_list->length]->(string);
-          my $token = $tree_list->get($tree_list->length - 1)->(object[]);
-          $token->[@$token - 1] = "$_/$char";
-        }
+      elsif (@$tree >= 2 && $tree->[-2][0] eq "text" && $tree->[-1][0] eq "slash") {
+        $tree->pop;
+        $tree->[-1][1] .= "/$char";
       }
       else {
-        $tree_list->push([(object)"text", $char, undef]);
+        $tree->push(["text", $char, undef]);
       }
     }
-
+    
     # Placeholder types
-    for (my $i = $tree_list->length - 1; $i >= 0; $i--) {
-      my $token = (object[])$tree_list->get($i);
-      unless ($token->[0]->(string) eq "placeholder") {
+    for (my $i = @$tree - 1; $i >= 0; $i--) {
+      my $token = $tree->[$i];
+      unless ($token->[0] eq "placeholder") {
         next;
       }
-      
-      if (my $m = Re->m((string)$token->[1], "^(.+)\Q$type_start\E(.+)$")) {
-        $token->[1] = [(object)$m->cap1, $m->cap2, undef];
-      }
-      else {
-        $token->[1] = [(object)$token->[1], undef, undef];
-      }
-      
-      $placeholders->unshift($token->[1]->(object[])->[0]->(string));
+      $placeholders->unshift($token->[1]);
     }
     
     $self->set_unparsed($pattern);
     
-    $self->set_tree($tree_list->get_array);
+    $self->{tree} = $tree;
   }
   
-  method render : string ($values : Hash, $endpoint : int) {
-    
-    # Placeholders can only be optional without a format
-    my $optional = !(my $format = $values->{"format"}->(string));
-    
-    my $str = "";
-    my $tree_list = (List of object[])List->new_ref($self->tree);
-    for (my $i = $tree_list->length - 1; $i >= 0; $i--) {
-      my $token = (object[])$tree_list->get($i);
-      
-      my $op = (string)$token->[0];
-      my $value = $token->[1];
-      
-      my $part = "";
-      
-      # Text
-      if ($op eq "text") {
-        $part = (string)$value;
-        $optional = 0;
-      }
-      
-      # Slash
-      elsif ($op eq "slash") {
-        unless ($optional) {
-          $part = "/";
-        }
-      }
-      
-      # Placeholder
-      else {
-        my $name    = $value->(object[])->[0]->(string);
-        my $default = $self->defaults->{$name}->(string);
-        
-        $part = $values->{$name}->(string) // $default // "";
-        
-        if    (!$default || ($default ne $part)) { $optional = 0; }
-        elsif ($optional)                                { $part     = ""; }
-      }
-      
-      $str = $part . $str;
-    }
-    
-    # Format can be optional
-    return $endpoint && $format ? "$str.$format" : $str;
-  }
-
 }

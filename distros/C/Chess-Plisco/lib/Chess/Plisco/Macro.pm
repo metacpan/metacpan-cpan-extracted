@@ -1,6 +1,6 @@
 #! /bin/false
 
-# Copyright (C) 2021 Guido Flohr <guido.flohr@cantanea.com>,
+# Copyright (C) 2021-2025 Guido Flohr <guido.flohr@cantanea.com>,
 # all rights reserved.
 
 # This program is free software. It comes without any warranty, to
@@ -10,7 +10,7 @@
 # http://www.wtfpl.net/ for more details.
 
 package Chess::Plisco::Macro;
-$Chess::Plisco::Macro::VERSION = '0.4';
+$Chess::Plisco::Macro::VERSION = '0.6';
 use strict;
 
 use Filter::Util::Call;
@@ -188,6 +188,8 @@ sub cp_move_significant {}
 _define cp_move_equivalent => '$m1', '$m2',
 		'(cp_move_significant($m1) == cp_move_significant($m2))';
 sub cp_move_equivalent {}
+_define cp_move_capture_or_promotion => '$m', '($m & 0x1c7000)';
+sub cp_move_capture_or_promotion {}
 
 # Bitboard macros.
 _define cp_bitboard_popcount => '$b', '$c',

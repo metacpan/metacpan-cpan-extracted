@@ -1,6 +1,6 @@
 #! /bin/false
 
-# Copyright (C) 2021 Guido Flohr <guido.flohr@cantanea.com>,
+# Copyright (C) 2021-2025 Guido Flohr <guido.flohr@cantanea.com>,
 # all rights reserved.
 
 # This program is free software. It comes without any warranty, to
@@ -10,9 +10,12 @@
 # http://www.wtfpl.net/ for more details.
 
 package Chess::Plisco::Engine;
-$Chess::Plisco::Engine::VERSION = '0.4';
+$Chess::Plisco::Engine::VERSION = '0.6';
 use strict;
 use integer;
+
+use POSIX qw(:sys_wait_h);
+use Locale::TextDomain qw(Chess-Plisco);
 
 use Chess::Plisco qw(:all);
 
@@ -76,6 +79,10 @@ sub new {
 sub uci {
 	my ($self, $in, $out) = @_;
 
+	if ($^O =~ /win32/i) {
+		$in = $self->__msDosSocket($in);
+	}
+
 	$self->{__out} = $out;
 	$self->{__out}->autoflush(1);
 	$self->{__watcher} = Chess::Plisco::Engine::InputWatcher->new($in);
@@ -98,11 +105,75 @@ Try 'help' for a list of commands!
 EOF
 
 	while (1) {
-		$self->{__watcher}->check(0.01);
-		last if delete $self->{__abort};
+		$self->{__watcher}->check;
+		if (delete $self->{__abort}) {
+			$self->DESTROY; # Make sure to clean-up for MS-DOS.
+			last;
+		}
 	}
 
 	return $self;
+}
+
+sub DESTROY {
+	my ($self) = @_;
+
+	if ($self->{__child_pid}) {
+		# Seems to be useless for MS-DOS but ...
+		kill 'QUIT', $self->{__child_pid};
+	}
+	if ($self->{__socket}) {
+		unlink $self->{__socket};
+	}
+
+	# No point to call waitpid() because the "child process" is actually
+	# a thread in MS-DOS.
+}
+
+sub __msDosSocket {
+	my ($self, $real_in) = @_;
+
+	require IO::Socket::UNIX;
+	require File::Temp;
+
+	my $path = $self->{__socket} = File::Temp::tmpnam();
+
+	my $sock = IO::Socket::UNIX->new(
+		Type => IO::Socket::UNIX::SOCK_STREAM(),
+		Local => $path,
+		Listen => 1,
+	) or die __x("Cannot create socket write-end '{path}': {error}!\n",
+		path => $path, error => $!);
+
+	my $pid = fork;
+	if (!defined $pid) {
+		die __x("Cannot fork: {error}!\n", error => $!);
+	}
+
+	if ($pid) {
+		# Parent.
+		$sock->close;
+		$self->{__child_pid} = $pid;
+		my $new_in = IO::Socket::UNIX->new(
+			Type => IO::Socket::UNIX::SOCK_STREAM(),
+			Peer => $path,
+		) or die __x("Cannot create socket read-end '{path}': {error}!\n",
+				path => $path, error => $!);
+		return $new_in;
+	} else {
+		my $fh = $sock->accept
+			or die __x("Error accepting connection on '{path}': {error}!\n",
+				path => $path, error => $!);
+		while (1) {
+			my $line = $real_in->getline;
+			exit if !defined $line;
+			$fh->print($line);
+			$line = $self->__trim($line);
+			# There seems to be no other way to get rid of the input reading
+			# thread under MS-DOS.
+			exit if 'quit' eq $line;
+		}
+	}
 }
 
 sub __onEof {

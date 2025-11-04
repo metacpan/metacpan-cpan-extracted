@@ -2,7 +2,7 @@
 # MIT License
 
 class Mojolicious {
-  version "0.031";
+  version "0.032";
   
   use Mojo::Home;
   use Mojo::Loader;
@@ -20,6 +20,8 @@ class Mojolicious {
   use Sys;
   use Mojolicious::Helper::Reply;
   use Mojolicious::Commands;
+  use Mojo::File;
+  use FindBin;
   
   # Fields
   has home : rw Mojo::Home;
@@ -63,6 +65,8 @@ class Mojolicious {
   
   has defaults : rw Hash;
   
+  has inline_templates : rw string;
+  
   # Class Methods
   static method new : Mojolicious () {
     
@@ -80,21 +84,21 @@ class Mojolicious {
     $home->detect;
     $self->{home} = $home;
     
+    $self->{types} = Mojolicious::Types->new;
+    
+    $self->{renderer} = Mojolicious::Renderer->new;
+    
+    $self->{renderer} = Mojolicious::Renderer->new;
     my $renderer_paths = $self->renderer->paths;
     StringList->new_ref($renderer_paths)->push($home->child("templates")->to_string);
     
+    $self->{static} = Mojolicious::Static->new;
     my $static_paths = $self->static->paths;
     StringList->new_ref($static_paths)->push($home->child("public")->to_string);
-    
-    $self->{types} = Mojolicious::Types->new;
-    
-    $self->{static} = Mojolicious::Static->new;
     
     $self->{sessions} = Mojolicious::Sessions->new;
     
     $self->{routes} = Mojolicious::Routes->new;
-    
-    $self->{renderer} = Mojolicious::Renderer->new;
     
     $self->{commands} = Mojolicious::Commands->new;
     
@@ -105,6 +109,14 @@ class Mojolicious {
     my $log = Mojo::Log->new;
     $log->set_level(length (my $_ = Sys->env("SPVM_MOJO_LOG_LEVEL")) ? $_ : "info");
     $self->{log} = $log;
+    
+    my $exe = FindBin->Script;
+    
+    my $moniker = Mojo::File->path($exe)->basename;
+    
+    Re->s((mutable string)$moniker, "\.(spvm|t)$", "");
+    
+    $self->set_moniker($moniker);
   }
   
   method build_controller : Mojolicious::Controller ($tx : Mojo::Transaction) {

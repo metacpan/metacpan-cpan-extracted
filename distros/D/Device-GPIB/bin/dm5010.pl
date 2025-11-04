@@ -111,7 +111,7 @@ sub usage
           [-query gpibquerystring]
           [-precommands gpibcommandstring]
           [-postcommands gpibcommandstring]
-          [loop n]
+          [-loop n]
           [-errors]\n";
     exit;
 }

@@ -1,0 +1,1015 @@
+class TestCase::Mojolicious::Routes {
+  use Mojolicious;
+  use Mojo::Home;
+  use Mojo::Log;
+  
+  use Mojolicious::Static;
+  use Mojolicious::Types;
+  use Mojolicious::Lite;
+  use Mojolicious::Plugin;
+  use Mojolicious::Plugins;
+  use Mojolicious::Lite;
+  use Mojolicious::Routes::Pattern;
+  use Mojolicious::Routes::Match;
+  use Mojolicious::Controller;
+  use Mojo::Message::Request;
+  
+  static method routes : int () {
+    
+    {
+      my $path = "/";
+      
+      my $tx = Mojo::Transaction::HTTP->new;
+      $tx->req->url->path->parse($path);
+      $tx->req->set_method("GET");
+      
+      my $app = Mojolicious::Lite->new;
+      my $results = Hash->new;;
+      $app->get("/", [$results : Hash] method : int ($c : Mojolicious::Controller) {
+        
+        $results->{"path"} = $c->req->url->path->to_string;
+        
+        $results->{"success"} = 1;
+        
+        $c->set_rendered(1);
+      });
+      
+      my $c = Mojolicious::Controller->new;
+      $c->set_tx($tx);
+      $c->set_app($app);
+      
+      $app->routes->dispatch($c);
+      
+      unless ($results->{"path"}->(string) eq "/") {
+        return 0;
+      }
+      
+      unless ($results->{"success"}->(int) == 1) {
+        return 0;
+      }
+      
+    }
+    
+    {
+      my $path = "/a/1/b/2";
+      
+      my $tx = Mojo::Transaction::HTTP->new;
+      $tx->req->url->path->parse($path);
+      $tx->req->set_method("GET");
+      
+      my $app = Mojolicious::Lite->new;
+      my $results = Hash->new;
+      
+      my $r = $app->under([$results : Hash] method : int ($c : Mojolicious::Controller) {
+        
+        $results->{"under1"} = 1;
+        
+        return 1;
+      });
+      
+      {
+        my $r = $r->under("/a/:var1", [$results : Hash] method : int ($c : Mojolicious::Controller) {
+          
+          $results->{"under2"} = 1;
+          
+          return 1;
+        });
+        
+        $r->get("/b/:var2", [$results : Hash] method : int ($c : Mojolicious::Controller) {
+          
+          $results->{"path"} = $c->req->url->path->to_string;
+          
+          $results->{"captures"} = $c->captures;
+          
+          $c->set_rendered(1);
+        });
+      }
+      
+      my $c = Mojolicious::Controller->new;
+      $c->set_tx($tx);
+      $c->set_app($app);
+      
+      $app->routes->dispatch($c);
+      
+      unless ($results->{"under1"} && $results->{"under1"}->(int) == 1) {
+        return 0;
+      }
+      
+      unless ($results->{"under2"} && $results->{"under2"}->(int) == 1) {
+        return 0;
+      }
+      
+      unless ($results->{"path"}->(string) eq $path) {
+        return 0;
+      }
+      
+      unless ($results->{"captures"}->(Hash)->{"var1"}->(string) eq "1") {
+        return 0;
+      }
+      
+      unless ($results->{"captures"}->(Hash)->{"var2"}->(string) eq "2") {
+        return 0;
+      }
+      
+    }
+    
+    {
+      my $path = "/a/1/b/2";
+      
+      my $tx = Mojo::Transaction::HTTP->new;
+      $tx->req->url->path->parse($path);
+      $tx->req->set_method("GET");
+      
+      my $app = Mojolicious::Lite->new;
+      my $results = Hash->new;
+      
+      my $r = $app->under([$results : Hash] method : int ($c : Mojolicious::Controller) {
+        
+        $results->{"under1"} = 1;
+        
+        $c->set_rendered(1);
+        
+        return 0;
+      });
+      
+      {
+        my $r = $r->under("/a/:var1", [$results : Hash] method : int ($c : Mojolicious::Controller) {
+          
+          $results->{"under2"} = 1;
+          
+          return 1;
+        });
+        
+        $r->get("/b/:var2", [$results : Hash] method : int ($c : Mojolicious::Controller) {
+          
+          $results->{"path"} = $c->req->url->path->to_string;
+          
+          $results->{"captures"} = $c->captures;
+          
+          $c->set_rendered(1);
+        });
+      }
+      
+      my $c = Mojolicious::Controller->new;
+      $c->set_tx($tx);
+      $c->set_app($app);
+      
+      $app->routes->dispatch($c);
+      
+      unless ($results->{"under1"} && $results->{"under1"}->(int) == 1) {
+        return 0;
+      }
+      
+      if ($results->{"under2"}) {
+        return 0;
+      }
+      
+      if ($results->{"path"}) {
+        return 0;
+      }
+      
+      if ($results->{"captures"}) {
+        return 0;
+      }
+      
+    }
+    
+    return 1;
+  }
+  
+  static method routes_match : int () {
+    
+    # get
+    {
+      {
+        my $match = Mojolicious::Routes::Match->new;
+        my $routes = Mojolicious::Routes->new;
+        my $r = $routes->get("/a");
+        
+        $match->set_root($routes);
+        
+        my $path = "/a";
+        
+        $match->find(Hash->new({method => "GET", path => $path}));
+        
+        unless ($match->endpoint == $r) {
+          return 0;
+        }
+        
+        unless (@{$match->stack} == 1) {
+          return 0;
+        }
+        
+        unless ($match->stack->[0]->route == $r) {
+          return 0;
+        }
+        
+        unless ($match->position == 0) {
+          return 0;
+        }
+      }
+      
+      {
+        my $match = Mojolicious::Routes::Match->new;
+        my $routes = Mojolicious::Routes->new;
+        my $r = $routes->get("/a");
+        
+        $match->set_root($routes);
+        
+        my $path = "/a";
+        
+        $match->find(Hash->new({method => "POST", path => $path}));
+        
+        if ($match->endpoint) {
+          return 0;
+        }
+        
+        if (@{$match->stack}) {
+          return 0;
+        }
+      }
+      
+      {
+        my $match = Mojolicious::Routes::Match->new;
+        my $routes = Mojolicious::Routes->new;
+        my $r = $routes->get("/a");
+        
+        $match->set_root($routes);
+        
+        my $path = "/a";
+        
+        $match->find(Hash->new({method => "POST", path => $path}));
+        
+        if ($match->endpoint) {
+          return 0;
+        }
+        
+        if (@{$match->stack}) {
+          return 0;
+        }
+      }
+      
+      {
+        my $match = Mojolicious::Routes::Match->new;
+        my $routes = Mojolicious::Routes->new;
+        my $r = $routes->put("/");
+        
+        $match->set_root($routes);
+        
+        my $path = "/";
+        
+        $match->find(Hash->new({method => "PUT", path => $path}));
+        
+        unless ($match->endpoint) {
+          return 0;
+        }
+        
+        unless (@{$match->stack} == 1) {
+          return 0;
+        }
+      }
+      
+      {
+        my $match = Mojolicious::Routes::Match->new;
+        my $routes = Mojolicious::Routes->new;
+        my $r = $routes->delete("/");
+        
+        $match->set_root($routes);
+        
+        my $path = "/";
+        
+        $match->find(Hash->new({method => "DELETE", path => $path}));
+        
+        unless ($match->endpoint) {
+          return 0;
+        }
+        
+        unless (@{$match->stack} == 1) {
+          return 0;
+        }
+      }
+      
+      {
+        my $match = Mojolicious::Routes::Match->new;
+        my $routes = Mojolicious::Routes->new;
+        my $r = $routes->options("/");
+        
+        $match->set_root($routes);
+        
+        my $path = "/";
+        
+        $match->find(Hash->new({method => "OPTIONS", path => $path}));
+        
+        unless ($match->endpoint) {
+          return 0;
+        }
+        
+        unless (@{$match->stack} == 1) {
+          return 0;
+        }
+      }
+      
+      {
+        my $match = Mojolicious::Routes::Match->new;
+        my $routes = Mojolicious::Routes->new;
+        my $r = $routes->patch("/");
+        
+        $match->set_root($routes);
+        
+        my $path = "/";
+        
+        $match->find(Hash->new({method => "PATCH", path => $path}));
+        
+        unless ($match->endpoint) {
+          return 0;
+        }
+        
+        unless (@{$match->stack} == 1) {
+          return 0;
+        }
+      }
+      
+      {
+        my $match = Mojolicious::Routes::Match->new;
+        my $routes = Mojolicious::Routes->new;
+        my $r = $routes->websocket("/");
+        
+        unless ($r->is_websocket) {
+          return 0;
+        }
+        
+        $match->set_root($routes);
+        
+        my $path = "/";
+        
+        $match->find(Hash->new({method => "GET", path => $path, websocket => 1}));
+        
+        unless ($match->endpoint) {
+          return 0;
+        }
+        
+        unless (@{$match->stack} == 1) {
+          return 0;
+        }
+      }
+      
+      {
+        my $match = Mojolicious::Routes::Match->new;
+        my $routes = Mojolicious::Routes->new;
+        my $r = $routes->get("/a/:var1");
+        
+        $match->set_root($routes);
+        
+        my $path = "/a/1";
+        
+        $match->find(Hash->new({method => "GET", path => $path}));
+        
+        unless ($match->endpoint) {
+          return 0;
+        }
+        
+        unless (@{$match->stack} == 1) {
+          return 0;
+        }
+        
+        unless ($match->stack->[0]->captures->{"var1"}->(string) eq "1") {
+          return 0;
+        }
+      }
+      
+      {
+        my $match = Mojolicious::Routes::Match->new;
+        my $routes = Mojolicious::Routes->new;
+        $match->set_root($routes);
+        
+        my $r = $routes->any("/a/:var1");
+        
+        {
+          my $r = $r->get("/b/:var2");
+          
+          my $path = "/a/1/b/2";
+          
+          $match->find(Hash->new({method => "GET", path => $path}));
+          
+          unless ($match->endpoint == $r) {
+            return 0;
+          }
+          
+          unless (@{$match->stack} == 1) {
+            return 0;
+          }
+          
+          unless ($match->stack->[-1]->captures->{"var1"}->(string) eq "1") {
+            return 0;
+          }
+          
+          unless ($match->stack->[-1]->captures->{"var2"}->(string) eq "2") {
+            return 0;
+          }
+        }
+        
+      }
+      
+      {
+        my $match = Mojolicious::Routes::Match->new;
+        my $routes = Mojolicious::Routes->new;
+        $match->set_root($routes);
+        
+        my $r = $routes->under("/a/:var1");
+        
+        {
+          my $r = $r->get("/b/:var2");
+          
+          my $path = "/a/1/b/2";
+          
+          $match->find(Hash->new({method => "GET", path => $path}));
+          
+          unless ($match->endpoint == $r) {
+            return 0;
+          }
+          
+          unless (@{$match->stack} == 2) {
+            return 0;
+          }
+          
+          unless ($match->stack->[-2]->captures->{"var1"}->(string) eq "1") {
+            return 0;
+          }
+          
+          if ($match->stack->[-2]->captures->exists("var2")) {
+            return 0;
+          }
+          
+          unless ($match->stack->[-1]->captures->{"var1"}->(string) eq "1") {
+            return 0;
+          }
+          
+          unless ($match->stack->[-1]->captures->{"var2"}->(string) eq "2") {
+            return 0;
+          }
+        }
+        
+      }
+      
+      {
+        my $match = Mojolicious::Routes::Match->new;
+        my $routes = Mojolicious::Routes->new;
+        $match->set_root($routes);
+        
+        my $r = $routes->under;
+        
+        {
+          my $r = $r->under("/a/:var1");
+          
+          {
+            my $r = $r->get("/b/:var2");
+            
+            my $path = "/a/1/b/2";
+            
+            $match->find(Hash->new({method => "GET", path => $path}));
+            
+            unless ($match->endpoint == $r) {
+              return 0;
+            }
+            
+            unless (@{$match->stack} == 3) {
+              return 0;
+            }
+            
+            if ($match->stack->[-3]->captures->exists("var1")) {
+              return 0;
+            }
+            
+            if ($match->stack->[-3]->captures->exists("var2")) {
+              return 0;
+            }
+            
+            unless ($match->stack->[-2]->captures->{"var1"}->(string) eq "1") {
+              return 0;
+            }
+            
+            if ($match->stack->[-2]->captures->exists("var2")) {
+              return 0;
+            }
+            
+            unless ($match->stack->[-1]->captures->{"var1"}->(string) eq "1") {
+              return 0;
+            }
+            
+            unless ($match->stack->[-1]->captures->{"var2"}->(string) eq "2") {
+              return 0;
+            }
+          }
+        }
+        
+        
+      }
+      
+      {
+        my $routes = Mojolicious::Routes->new;
+        
+        my $r = $routes->under;
+        
+        {
+          my $r = $r->under("/a/:var1");
+          
+          {
+            my $r1 = $r->get("/b/:var2");
+            
+            my $r2 = $r->get("/c/:var3");
+            
+            my $path = "/a/1/c/2";
+            
+            my $match = Mojolicious::Routes::Match->new;
+            $match->set_root($routes);
+            $match->find(Hash->new({method => "GET", path => $path}));
+            
+            unless ($match->endpoint == $r2) {
+              return 0;
+            }
+            
+            unless (@{$match->stack} == 3) {
+              return 0;
+            }
+            
+            if ($match->stack->[-3]->captures->exists("var1")) {
+              return 0;
+            }
+            
+            if ($match->stack->[-3]->captures->exists("var2")) {
+              return 0;
+            }
+            
+            if ($match->stack->[-3]->captures->exists("var3")) {
+              return 0;
+            }
+            
+            unless ($match->stack->[-2]->captures->{"var1"}->(string) eq "1") {
+              return 0;
+            }
+            
+            if ($match->stack->[-2]->captures->exists("var2")) {
+              return 0;
+            }
+            
+            if ($match->stack->[-2]->captures->exists("var3")) {
+              return 0;
+            }
+            
+            unless ($match->stack->[-1]->captures->{"var1"}->(string) eq "1") {
+              return 0;
+            }
+            
+            if ($match->stack->[-1]->captures->exists("var2")) {
+              return 0;
+            }
+            
+            unless ($match->stack->[-1]->captures->{"var3"}->(string) eq "2") {
+              return 0;
+            }
+            
+          }
+          
+          {
+            my $r1 = $r->get("/d/:var2");
+            
+            my $path = "/a/1/d/2";
+            
+            my $match = Mojolicious::Routes::Match->new;
+            $match->set_root($routes);
+            $match->find(Hash->new({method => "GET", path => $path}));
+            
+            unless ($match->endpoint == $r1) {
+              return 0;
+            }
+            
+            unless (@{$match->stack} == 3) {
+              return 0;
+            }
+            
+            if ($match->stack->[-3]->captures->exists("var1")) {
+              return 0;
+            }
+            
+            if ($match->stack->[-3]->captures->exists("var2")) {
+              return 0;
+            }
+            
+            unless ($match->stack->[-2]->captures->{"var1"}->(string) eq "1") {
+              return 0;
+            }
+            
+            if ($match->stack->[-2]->captures->exists("var2")) {
+              return 0;
+            }
+            
+            unless ($match->stack->[-1]->captures->{"var1"}->(string) eq "1") {
+              return 0;
+            }
+            
+            unless ($match->stack->[-1]->captures->{"var2"}->(string) eq "2") {
+              return 0;
+            }
+            
+          }
+          
+        }
+        
+        
+      }
+    }
+    
+    # any
+    {
+      {
+        my $match = Mojolicious::Routes::Match->new;
+        my $routes = Mojolicious::Routes->new;
+        my $r = $routes->any("/a");
+        
+        $match->set_root($routes);
+        
+        my $path = "/a";
+        
+        $match->find(Hash->new({method => "GET", path => $path}));
+        
+        unless ($match->endpoint == $r) {
+          return 0;
+        }
+        
+        unless (@{$match->stack} == 1) {
+          return 0;
+        }
+        
+        unless ($match->stack->[0]->route == $r) {
+          return 0;
+        }
+        
+        unless ($match->position == 0) {
+          return 0;
+        }
+      }
+      
+      {
+        my $match = Mojolicious::Routes::Match->new;
+        my $routes = Mojolicious::Routes->new;
+        my $r = $routes->any("/a");
+        
+        $match->set_root($routes);
+        
+        my $path = "/a";
+        
+        $match->find(Hash->new({method => "POST", path => $path}));
+        
+        unless ($match->endpoint == $r) {
+          return 0;
+        }
+        
+        unless (@{$match->stack} == 1) {
+          return 0;
+        }
+        
+        unless ($match->stack->[0]->route == $r) {
+          return 0;
+        }
+        
+        unless ($match->position == 0) {
+          return 0;
+        }
+      }
+      
+      {
+        my $match = Mojolicious::Routes::Match->new;
+        my $routes = Mojolicious::Routes->new;
+        my $r = $routes->any(["GET", "POST"], "/a");
+        
+        $match->set_root($routes);
+        
+        my $path = "/a";
+        
+        $match->find(Hash->new({method => "POST", path => $path}));
+        
+        unless ($match->endpoint == $r) {
+          return 0;
+        }
+        
+        unless (@{$match->stack} == 1) {
+          return 0;
+        }
+        
+        unless ($match->stack->[0]->route == $r) {
+          return 0;
+        }
+        
+        unless ($match->position == 0) {
+          return 0;
+        }
+      }
+      
+      {
+        my $match = Mojolicious::Routes::Match->new;
+        my $routes = Mojolicious::Routes->new;
+        my $r = $routes->any(["GET", "POST"], "/a");
+        
+        $match->set_root($routes);
+        
+        my $path = "/a";
+        
+        $match->find(Hash->new({method => "GET", path => $path}));
+        
+        unless ($match->endpoint == $r) {
+          return 0;
+        }
+        
+        unless (@{$match->stack} == 1) {
+          return 0;
+        }
+        
+        unless ($match->stack->[0]->route == $r) {
+          return 0;
+        }
+        
+        unless ($match->position == 0) {
+          return 0;
+        }
+      }
+      
+      {
+        my $match = Mojolicious::Routes::Match->new;
+        my $routes = Mojolicious::Routes->new;
+        my $r = $routes->any(["GET", "POST"], "/a");
+        
+        $match->set_root($routes);
+        
+        my $path = "/a";
+        
+        $match->find(Hash->new({method => "PUT", path => $path}));
+        
+        if (@{$match->stack}) {
+          return 0;
+        }
+        
+        if ($match->endpoint) {
+          return 0;
+        }
+        
+      }
+      
+    }
+    
+    return 1;
+  }
+  
+  static method routes_pattern : int () {
+    
+    # unparsed
+    {
+      {
+        my $pattern_string = (string)undef;
+        my $pattern = Mojolicious::Routes::Pattern->new($pattern_string);
+        
+        unless ($pattern->unparsed == undef) {
+          return 0;
+        }
+      }
+      
+      {
+        my $pattern_string = "";
+        my $pattern = Mojolicious::Routes::Pattern->new($pattern_string);
+        
+        unless ($pattern->unparsed == undef) {
+          return 0;
+        }
+      }
+      
+      {
+        my $pattern_string = "/";
+        my $pattern = Mojolicious::Routes::Pattern->new($pattern_string);
+        
+        unless ($pattern->unparsed == undef) {
+          return 0;
+        }
+      }
+      
+      {
+        my $pattern_string = "//";
+        my $pattern = Mojolicious::Routes::Pattern->new($pattern_string);
+        
+        unless ($pattern->unparsed == undef) {
+          return 0;
+        }
+      }
+      
+      {
+        my $pattern_string = "/a";
+        my $pattern = Mojolicious::Routes::Pattern->new($pattern_string);
+        
+        unless ($pattern->unparsed eq "/a") {
+          return 0;
+        }
+      }
+      
+      {
+        my $pattern_string = "/a/";
+        my $pattern = Mojolicious::Routes::Pattern->new($pattern_string);
+        
+        unless ($pattern->unparsed eq "/a") {
+          return 0;
+        }
+      }
+    }
+    
+    {
+      # match
+      {
+        my $pattern_string = "/a";
+        my $pattern = Mojolicious::Routes::Pattern->new($pattern_string);
+        
+        {
+          my $captures = $pattern->match("/a");
+          
+          unless ($captures) {
+            return 0;
+          }
+        }
+        
+        {
+          my $captures = $pattern->match("/a/");
+          
+          unless ($captures) {
+            return 0;
+          }
+        }
+        
+        {
+          my $captures = $pattern->match("/a/b");
+          
+          if ($captures) {
+            return 0;
+          }
+        }
+        
+        {
+          my $captures = $pattern->match("/");
+          
+          if ($captures) {
+            return 0;
+          }
+        }
+        
+        # Placeholder
+        {
+          {
+            my $pattern_string = "/a/:var1/b/c<:var2>";
+            my $pattern = Mojolicious::Routes::Pattern->new($pattern_string);
+            
+            {
+              my $captures = $pattern->match("/a/1/b/c2");
+              
+              unless ($captures) {
+                return 0;
+              }
+              
+              unless ($captures->{"var1"}->(string) eq "1") {
+                return 0;
+              }
+              
+              unless ($captures->{"var2"}->(string) eq "2") {
+                return 0;
+              }
+            }
+          }
+          
+          {
+            my $pattern_string = "/:var1";
+            my $pattern = Mojolicious::Routes::Pattern->new($pattern_string);
+            
+            {
+              my $captures = $pattern->match("/foo.json");
+              
+              if ($captures) {
+                return 0;
+              }
+            }
+          }
+          
+          # Relaxed
+          {
+            my $pattern_string = "/#var1";
+            my $pattern = Mojolicious::Routes::Pattern->new($pattern_string);
+            
+            {
+              my $captures = $pattern->match("/a.json");
+              
+              unless ($captures) {
+                return 0;
+              }
+              
+              unless ($captures->{"var1"}->(string) eq "a.json") {
+                return 0;
+              }
+            }
+          }
+          
+          # Wildcard
+          {
+            my $pattern_string = "/a/*var1>";
+            my $pattern = Mojolicious::Routes::Pattern->new($pattern_string);
+            
+            {
+              my $captures = $pattern->match("/a/b/c.json");
+              
+              unless ($captures) {
+                return 0;
+              }
+              
+              unless ($captures->{"var1"}->(string) eq "b/c.json") {
+                return 0;
+              }
+            }
+          }
+          
+          # Defaults
+          {
+            my $pattern_string = "/:var1";
+            my $pattern = Mojolicious::Routes::Pattern->new($pattern_string);
+            $pattern->set_defaults(Hash->new({var1 => "1"}));
+            
+            {
+              my $captures = $pattern->match("/2");
+              
+              unless ($captures) {
+                return 0;
+              }
+              
+              unless ($captures->{"var1"}->(string) eq "2") {
+                return 0;
+              }
+            }
+            
+            { 
+              my $captures = $pattern->match("/");
+              
+              unless ($captures) {
+                return 0;
+              }
+              
+              unless ($captures->{"var1"}->(string) eq "1") {
+                return 0;
+              }
+            }
+          }
+        }
+      }
+      
+      # match_partial
+      {
+        my $pattern_string = "/a";
+        my $pattern = Mojolicious::Routes::Pattern->new($pattern_string);
+        
+        {
+          my $path = copy "/a";
+          my $captures = $pattern->match_partial((mutable string)$path);
+          
+          unless ($captures) {
+            return 0;
+          }
+        }
+        
+        {
+          my $path = copy "/a/";
+          my $captures = $pattern->match_partial((mutable string)$path);
+          
+          unless ($captures) {
+            return 0;
+          }
+        }
+        
+        {
+          my $path = copy "/a/b";
+          my $captures = $pattern->match_partial((mutable string)$path);
+          
+          unless ($captures) {
+            return 0;
+          }
+          
+          unless ($path eq "/b") {
+            return 0;
+          }
+          
+        }
+        
+        {
+          my $path = copy "/";
+          my $captures = $pattern->match((mutable string)$path);
+          
+          if ($captures) {
+            return 0;
+          }
+        }
+      }
+    }
+    
+    return 1;
+  }
+  
+}

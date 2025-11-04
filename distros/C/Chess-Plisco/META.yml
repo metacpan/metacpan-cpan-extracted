@@ -7,13 +7,12 @@ build_requires:
   Cwd: '0'
   Data::Dumper: '0'
   File::Basename: '0'
-  File::Spec: '0'
   Test::More: '0'
   lib: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: unrestricted
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,9 +21,14 @@ name: Chess-Plisco
 requires:
   Carp: '0'
   Exporter: '0'
+  File::Spec: '0'
+  File::Temp: '0'
   Filter::Util::Call: '0'
+  Getopt::Long: '0'
   IO::Select: '0'
+  IO::Socket::UNIX: '0'
   Locale::TextDomain: '0'
+  POSIX: '0'
   PPI::Document: '0'
   Scalar::Util: '0'
   Time::HiRes: '0'
@@ -38,6 +42,6 @@ resources:
   bugtracker: https://github.com/gflohr/Chess-Plisco/issues
   homepage: http://www.guido-flohr.net/en/projects#chess-plisco
   repository: git://github.com/gflohr/Chess-Plisco.git
-version: '0.4'
-x_generated_by_perl: v5.34.0
-x_serialization_backend: 'YAML::Tiny version 1.73'
+version: '0.6'
+x_generated_by_perl: v5.40.0
+x_serialization_backend: 'YAML::Tiny version 1.76'

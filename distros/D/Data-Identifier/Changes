@@ -1,3 +1,6 @@
+v0.23  2025-11-03Z
+    - Added Data::Identifier::Util
+
 v0.22  2025-10-29Z
     - Support Data::TagMap as tagmap in Data::Identifier::Interface::Subobjects
     - Support SIRTX::Datecode as $as in as()

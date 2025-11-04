@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document::OpenAPI;
 # ABSTRACT: One OpenAPI v3.1 or v3.2 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.104';
+our $VERSION = '0.105';
 
 use 5.020;
 use utf8;
@@ -80,6 +80,12 @@ sub operations_with_tag { ($_[0]->{_operation_tags}{$_[1]}//[])->@* }
 has oas_version => (
   is => 'rwp',
   isa => Str->where(q{/^[1-9]\.(?:0|[1-9][0-9]*)$/}),
+);
+
+# list of /paths/* path templates, in canonical search order
+has path_templates => (
+  is => 'rwp',
+  isa => ArrayRef[Str],
 );
 
 # we define the sub directly, rather than using an 'around', since our root base class is not
@@ -298,22 +304,37 @@ sub traverse ($self, $evaluator, $config_override = {}) {
     return $state;
   }
 
-  # v3.2.0 §4.8.1, "Patterned Fields": "Templated paths with the same hierarchy but different
-  # templated names MUST NOT exist as they are identical."
+  # v3.2.0 §4.8.1, "Patterned Fields": "When matching URLs, concrete (non-templated) paths would be
+  # matched before their templated counterparts."
+
+  # caution, Schwartzian transform ahead!
+  $self->_set_path_templates(my $sorted_paths = [
+    map $_->[0],                              # remove transformed entries
+    sort { $a->[1] cmp $b->[1] || $a->[0] cmp $b->[0] }  # sort by the transformed entries
+    map [ $_, s/\{[^{}]+\}/\x{10FFFF}/rg ],   # transform template names into the highest Unicode char
+    grep !/^x-/,                              # remove extension keywords
+    keys(($schema->{paths}//{})->%*)          # all entries in /paths/*
+  ]);
+
   my %seen_path;
-  foreach my $path (sort keys(($schema->{paths}//{})->%*)) {
-    next if $path =~ '^x-';
+  foreach my $path (@$sorted_paths) {
+    # see ABNF at v3.2.0 §4.8.2
+    die "invalid path: $path" if substr($path, 0, 1) ne '/'; # schema validation catches this
+    ()= E({ %$state, keyword_path => jsonp('/paths', $path) }, 'invalid path template "%s"', $path)
+      if grep !/^(?:\{[^{}]+\}|%[0-9A-F]{2}|[:@!\$&'()*+,;=A-Za-z0-9._~-]+)+$/,
+        split('/', substr($path, 1)); # split by segment, omitting leading /
+
     my %seen_names;
-    # { for the editor
-    foreach my $name ($path =~ m!\{([^}]+)\}!g) {
+    foreach my $name ($path =~ /\{([^{}]+)\}/g) {
+      # v3.2.0 §4.8.1, "Patterned Fields": "Templated paths with the same hierarchy but different
+      # templated names MUST NOT exist as they are identical."
       if (++$seen_names{$name} == 2) {
         ()= E({ %$state, keyword_path => jsonp('/paths', $path) },
           'duplicate path template variable "%s"', $name);
       }
     }
 
-    # { for the editor
-    my $normalized = $path =~ s/\{[^}]+\}/\x00/r;
+    my $normalized = $path =~ s/\{[^{}]+\}/\x00/gr;
     if (my $first_path = $seen_path{$normalized}) {
       ()= E({ %$state, keyword_path => jsonp('/paths', $path) },
         'duplicate of templated path "%s"', $first_path);
@@ -335,16 +356,17 @@ sub traverse ($self, $evaluator, $config_override = {}) {
     my %seen_url;
 
     foreach my $server_idx (0 .. $servers->$#*) {
-      if ($servers->[$server_idx]{url} =~ m{(?:/$|\?|#)}) {
-        ()= E({ %$state, keyword_path => jsonp($servers_location, $server_idx, 'url') },
-          'server url cannot end in / or contain query or fragment components');
-        next;
-      }
+      # see ABNF at v3.2.0 §4.6
+      ()= E({ %$state, keyword_path => jsonp($servers_location, $server_idx, 'url') },
+          'invalid server url "%s"', $servers->[$server_idx]{url}), next
+        if $servers->[$server_idx]{url} !~ /^(?:\{[^{}]+\}|%[0-9A-F]{2}|[\x21\x23\x24\x26-\x3B\x3D\x3F-\x5B\x5D\x5F\x61-\x7A\x7E\xA0-\x{D7FF}\x{F900}-\x{FDCF}\x{FDF0}-\x{FFEF}\x{10000}-\x{1FFFD}\x{20000}-\x{2FFFD}\x{30000}-\x{3FFFD}\x{40000}-\x{4FFFD}\x{50000}-\x{5FFFD}\x{60000}-\x{6FFFD}\x{70000}-\x{7FFFD}\x{80000}-\x{8FFFD}\x{90000}-\x{9FFFD}\x{A0000}-\x{AFFFD}\x{B0000}-\x{BFFFD}\x{C0000}-\x{CFFFD}\x{D0000}-\x{DFFFD}\x{E1000}-\x{EFFFD}\x{E000}-\x{F8FF}\x{F0000}-\x{FFFFD}\x{100000}-\x{10FFFD}])+$/;
 
-      # { for the editor
-      my $normalized = $servers->[$server_idx]{url} =~ s/\{[^}]+\}/\x00/r;
-      # { for the editor
-      my @url_variables = $servers->[$server_idx]{url} =~ /\{([^}]+)\}/g;
+      ()= E({ %$state, keyword_path => jsonp($servers_location, $server_idx, 'url') },
+          'server url cannot end in / or contain query or fragment components'), next
+        if $servers->[$server_idx]{url} =~ m{(?:/$|\?|#)};
+
+      my $normalized = $servers->[$server_idx]{url} =~ s/\{[^{}]+\}/\x00/gr;
+      my @url_variables = $servers->[$server_idx]{url} =~ /\{([^{}]+)\}/g;
 
       if (my $first_url = $seen_url{$normalized}) {
         ()= E({ %$state, keyword_path => jsonp($servers_location, $server_idx, 'url') },
@@ -561,7 +583,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.1 or v3.2 document
 
 =head1 VERSION
 
-version 0.104
+version 0.105
 
 =head1 SYNOPSIS
 
@@ -704,6 +726,10 @@ Note that a tag name can still be used by an operation even if it has no definit
 =head2 operations_with_tag
 
 Returns the list of json pointer location(s) of operations that use the provided tag.
+
+=head2 path_templates
+
+All path templates under C</paths/>, sorted in canonical search order.
 
 =head1 SEE ALSO
 

@@ -85,9 +85,10 @@ class Mojo::Log extends Mojo::EventEmitter {
       $self->{short} = (byte)$_;
     }
     
-    $self->{format} = [$this : Mojo::Log = $self] method : string ($time : double, $level : string, $message : string) {
-      return $this->_default($time, $level, $message);
+    $self->{format} = [$self : Mojo::Log] method : string ($time : double, $level : string, $message : string) {
+      return $self->_default($time, $level, $message);
     };
+    weaken $self->{format};
     
     return $self;
   }

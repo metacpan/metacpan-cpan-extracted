@@ -4,7 +4,6 @@
 class Mojolicious::Renderer {
   version_from Mojolicious;
   
-  use Mojo::Cache;
   use Mojo::File;
   use JSON;
   use Mojo::Util;
@@ -12,8 +11,6 @@ class Mojolicious::Renderer {
   use Mojo::Template;
   
   # Fields
-  has cache : rw Mojo::Cache;
-  
   has compress : rw byte;
   
   has default_format : rw string;
@@ -37,8 +34,6 @@ class Mojolicious::Renderer {
   static method new : Mojolicious::Renderer () {
     
     my $self = new Mojolicious::Renderer;
-    
-    $self->{cache} = Mojo::Cache->new;
     
     $self->{compress} = 1;
     

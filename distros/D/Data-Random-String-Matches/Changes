@@ -1,5 +1,8 @@
 Revision history for Data-Random-String-Matches
 
+0.04	Mon Nov  3 21:02:16 EST 2025
+	Fixed 'Argument "#" isn't numeric in range (or flop)' with qr/!#-'*+\\-\\.\\^_`|~0-9A-Za-z/
+
 0.03	Wed Oct 29 19:12:57 EDT 2025
 	Added some utility methods
 	Added the test dashboard

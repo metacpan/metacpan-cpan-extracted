@@ -9,9 +9,9 @@ use File::chdir;
 use Getopt::Long::Complete qw(GetOptionsWithCompletion);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-09-30'; # DATE
+our $DATE = '2025-11-04'; # DATE
 our $DIST = 'App-CdUtils'; # DIST
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 # FRAGMENT id=shcompgen-hint completer=1 for=cdprevsibling
 
@@ -21,6 +21,7 @@ my $cmd = $0 =~ /cdprev/ ? 'cdprevsibling' : 'cdnextsibling';
 my $sort_files_opts = $ENV{CDPREVNEXTSIBLING_SORT_FILES_OPTS} // '--by-field=name';
 my %opts = (
     num => 1,
+    level => 1,
 );
 
 GetOptionsWithCompletion(
@@ -35,6 +36,7 @@ Options:
   --help, -h
   --version, -v
   --num=i, -n
+  --level=i, -l
 USAGE
         exit 0;
     },
@@ -44,18 +46,20 @@ USAGE
         exit 0;
     },
     'num|n=i' => \$opts{num},
+    'level|l=i' => \$opts{level},
 );
 
+die "$cmd: Level must be at least 1\n" if $opts{level} < 1;
 
 # we are at the root, no siblings
-unless (@cwd_elems) {
+unless (@cwd_elems - $opts{level} + 1 > 0) {
     print ".\n";
     exit 0;
 }
 
 my @dirs;
 {
-    local $CWD = "..";
+    local $CWD = join("/", map {".."} 1..$opts{level});
     open my $fh, "sort-files $sort_files_opts |"; ## no critic: InputOutput::ProhibitTwoArgOpen
     while (defined(my $e = <$fh>)) {
         chomp $e;
@@ -66,7 +70,7 @@ my @dirs;
 
 my $curpos;
 for my $i (0 .. $#dirs) {
-    if ($dirs[$i] eq $cwd_elems[-1]) {
+    if ($dirs[$i] eq $cwd_elems[-$opts{level}]) {
         $curpos = $i;
         last;
     }
@@ -76,7 +80,20 @@ $curpos //= 0;
 my $newpos = $curpos + $opts{num} * ($cmd eq 'cdprevsibling' ? -1 : 1);
 $newpos = 0 if $newpos < 0;
 $newpos = @dirs-1 if $newpos >= @dirs;
-print "../$dirs[$newpos]\n";
+
+my @target_elems = (
+    (map { ".." } 1 .. $opts{level}),
+    $dirs[$newpos],
+);
+for my $l (reverse (1 .. $opts{level}-1)) {
+    if (-d join("/", @target_elems, $cwd_elems[-$l])) {
+        push @target_elems, $cwd_elems[-$l];
+    } else {
+        last;
+    }
+}
+
+print join("/", @target_elems), "\n";
 
 # ABSTRACT: Change to the "previous" or "next" sibling directory
 # PODNAME: cdprevsibling-backend
@@ -93,7 +110,7 @@ cdprevsibling-backend - Change to the "previous" or "next" sibling directory
 
 =head1 VERSION
 
-This document describes version 0.011 of cdprevsibling-backend (from Perl distribution App-CdUtils), released on 2025-09-30.
+This document describes version 0.012 of cdprevsibling-backend (from Perl distribution App-CdUtils), released on 2025-11-04.
 
 =head1 SYNOPSIS
 
@@ -122,6 +139,11 @@ To use in shell:
  % pwd
  /some/path/four
 
+ # when there is no previous/next sibling, will stay at the current position
+ % cdprevsibling
+ % pwd
+ /some/path/four
+
 =head1 DESCRIPTION
 
 B<cdprevsibling> and B<cdnextsibling> are commands to change to "previous" and
@@ -134,7 +156,37 @@ to sort the directories.
 
 =head2 --num=i, -n
 
-Integer. Default 1.
+Integer. Default 1. Sibling distance to go to. 1 means the closest, i.e. if
+current position is at number 5, the previous sibling is 4 and next sibling is
+6. If this option is 2, it means the second closest, i.e. if current position is
+at number 5, previous sibling is 3 and next sibling is 7. And so on.
+
+=head2 --level=i, -l
+
+Integer. Default is 1. Number of level to go upwards to find siblings for. For example:
+
+ A/
+   X0/
+   X1/
+     Y/
+   X2/
+ B/
+   X0/
+   X1/
+     Z/
+   X2/
+
+If current position is C</A/X1> and level is 1, previous sibling would be
+C</A/X0> and next sibling would be C</A/X2>.
+
+If current position is C</A/X1> and level is 2, next sibling would be C</B/X1>
+because we are finding sibling for C<A>, not C<X1>.
+
+When level is larger than 1, it is possible that the sibling do not have the
+same structure. In that case, this script will stop at the last depth where the
+same directory can be found. For example, if current position is C</A/X1/Y> and
+level is 3, next sibling should be C</B/X1/Y>. However, since the path does not
+exist, the script will return C</B/X1>.
 
 =head1 COMPLETION
 

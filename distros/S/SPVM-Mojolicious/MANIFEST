@@ -15,8 +15,6 @@ lib/SPVM/Mojo/Asset/Memory.pm
 lib/SPVM/Mojo/Asset/Memory.spvm
 lib/SPVM/Mojo/ByteStream.pm
 lib/SPVM/Mojo/ByteStream.spvm
-lib/SPVM/Mojo/Cache.pm
-lib/SPVM/Mojo/Cache.spvm
 lib/SPVM/Mojo/Callback.pm
 lib/SPVM/Mojo/Callback.spvm
 lib/SPVM/Mojo/Collection.pm
@@ -129,6 +127,8 @@ lib/SPVM/Mojo/WebSocket/Frame.pm
 lib/SPVM/Mojo/WebSocket/Frame.spvm
 lib/SPVM/Mojolicious.pm
 lib/SPVM/Mojolicious.spvm
+lib/SPVM/Mojolicious/Callback.pm
+lib/SPVM/Mojolicious/Callback.spvm
 lib/SPVM/Mojolicious/Command.pm
 lib/SPVM/Mojolicious/Command.spvm
 lib/SPVM/Mojolicious/Command/Cgi.pm
@@ -157,10 +157,10 @@ lib/SPVM/Mojolicious/Renderer.pm
 lib/SPVM/Mojolicious/Renderer.spvm
 lib/SPVM/Mojolicious/Routes.pm
 lib/SPVM/Mojolicious/Routes.spvm
-lib/SPVM/Mojolicious/Routes/Callback/Condition.pm
-lib/SPVM/Mojolicious/Routes/Callback/Condition.spvm
 lib/SPVM/Mojolicious/Routes/Match.pm
 lib/SPVM/Mojolicious/Routes/Match.spvm
+lib/SPVM/Mojolicious/Routes/Match/StackData.pm
+lib/SPVM/Mojolicious/Routes/Match/StackData.spvm
 lib/SPVM/Mojolicious/Routes/Pattern.pm
 lib/SPVM/Mojolicious/Routes/Pattern.spvm
 lib/SPVM/Mojolicious/Routes/Route.pm
@@ -182,7 +182,9 @@ MANIFEST.SKIP
 README.md
 t/basic.t
 t/lib/SPVM/TestCase/Mojolicious.spvm
+t/lib/SPVM/TestCase/Mojolicious/Routes.spvm
 t/lib/SPVM/TestCase/Online.spvm
+t/Mojolicious-Routes.t
 t/online.t
 t/webapp/basic.pl
 TODO.txt

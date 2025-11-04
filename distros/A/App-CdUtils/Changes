@@ -1,3 +1,9 @@
+0.012   2025-11-04  Released-By: PERLANCAR; Urgency: medium
+
+        - [util cdprevsibling-backend, cdnextsibling-backend] Add option --level
+          (-l).
+
+
 0.011   2025-09-30  Released-By: PERLANCAR; Urgency: medium
 
         - Rename commands to avoid ambiguity: cdprev & cdnext ->

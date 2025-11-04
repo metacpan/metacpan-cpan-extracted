@@ -1,0 +1,22 @@
+# Copyright (c) 2025 Yuki Kimoto
+# MIT License
+
+class Mojolicious::Routes::Match::StackData {
+  version_from Mojolicious;
+  
+  use Mojolicious::Routes::Route;
+  
+  # Fields
+  has route : rw Mojolicious::Routes::Route;
+  
+  has captures : rw Hash;
+  
+  # Class Methods
+  static method new : Mojolicious::Routes::Match::StackData () {
+    
+    my $self = new Mojolicious::Routes::Match::StackData;
+    
+    return $self;
+  }
+  
+}

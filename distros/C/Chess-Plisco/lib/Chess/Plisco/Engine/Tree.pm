@@ -1,6 +1,6 @@
 #! /bin/false
 
-# Copyright (C) 2021 Guido Flohr <guido.flohr@cantanea.com>,
+# Copyright (C) 2021-2025 Guido Flohr <guido.flohr@cantanea.com>,
 # all rights reserved.
 
 # This program is free software. It comes without any warranty, to
@@ -10,7 +10,7 @@
 # http://www.wtfpl.net/ for more details.
 
 package Chess::Plisco::Engine::Tree;
-$Chess::Plisco::Engine::Tree::VERSION = '0.4';
+$Chess::Plisco::Engine::Tree::VERSION = '0.6';
 use strict;
 use integer;
 
@@ -35,6 +35,8 @@ use Chess::Plisco::Engine::TranspositionTable;
 # searched first.
 use constant MOVE_ORDERING_PV => 1 << 62;
 use constant MOVE_ORDERING_TT => 1 << 61;
+
+use constant ASPIRATION_WINDOW => 25;
 
 # For all combinations of promotion piece and captured piece, calculate a
 # value suitable for sorting.  We choose the raw material balance minus the
@@ -118,12 +120,11 @@ sub indent {
 	$self->debug("[$ply/$self->{depth}] $indent$msg");
 }
 
-
 sub printPV {
 	my ($self, $pline) = @_;
 
 	no integer;
-	my $position = $self->{position};
+	my $position = $self->{start};
 	my $score = $self->{score};
 	my $mate_in;
 	if ($score >= -(MATE + MAX_PLY)) {
@@ -146,8 +147,10 @@ sub printPV {
 	}
 }
 
+
+
 sub alphabeta {
-	my ($self, $ply, $depth, $alpha, $beta, $pline, $is_pv) = @_;
+	my ($self, $ply, $depth, $alpha, $beta, $pline) = @_;
 
 	my @line;
 
@@ -162,9 +165,6 @@ sub alphabeta {
 		my $line = join ' ', @{$self->{line}};
 		$self->indent($ply, "alphabeta: alpha = $alpha, beta = $beta, line: $line,"
 			. " depth: $depth, sig: $hex_signature $position");
-		if ($is_pv) {
-			$self->indent($ply, "in PV");
-		}
 	}
 
 	if ($position->[CP_POS_HALF_MOVE_CLOCK] >= 100) {
@@ -230,7 +230,7 @@ sub alphabeta {
 	}
 
 	if ($depth <= 0) {
-		return $self->quiesce($ply, $alpha, $beta, $pline, $is_pv);
+		return $self->quiesce($ply, $alpha, $beta, $pline);
 	}
 
 	my @moves = $position->pseudoLegalMoves;
@@ -243,18 +243,13 @@ sub alphabeta {
 	my $ep_shift = (($pos_info & (0x3f << 5)) >> 5);
 	my $pv_move;
 	$pv_move = $pline->[$ply - 1] if @$pline >= $ply;
-	my $found = 0;
 	foreach my $move (@moves) {
 		if ((($move & 0x7fff) == ($pv_move & 0x7fff))) {
 			$move |= MOVE_ORDERING_PV;
-			++$found;
 		} elsif ((($move & 0x7fff) == ($tt_move & 0x7fff))) {
 			$move |= MOVE_ORDERING_TT;
-			++$found;
 		} elsif ($depth > 1) {
 			$move |= $position->SEE($move) << 32;
-		} else {
-			last if $found >= 2;
 		}
 	}
 
@@ -270,7 +265,6 @@ sub alphabeta {
 	foreach my $move (@moves) {
 		my $state = $position->doMove($move) or next;
 		$signatures->[$signature_slot] = $position->[CP_POS_SIGNATURE];
-		++$legal;
 		++$self->{nodes};
 		$self->printCurrentMove($depth, $move, $legal) if $print_current_move;
 		my $val;
@@ -284,21 +278,22 @@ sub alphabeta {
 				$self->indent($ply, "null window search");
 			}
 			$val = -$self->alphabeta($ply + 1, $depth - 1,
-					-$alpha - 1, -$alpha, \@line, $is_pv && !$legal);
+					-$alpha - 1, -$alpha, \@line);
 			if (($val > $alpha) && ($val < $beta)) {
 				if (DEBUG) {
 					$self->indent($ply, "value $val outside null window, re-search");
 				}
 				$val = -$self->alphabeta($ply + 1, $depth - 1,
-						-$beta, -$alpha, \@line, $is_pv && !$legal);
+						-$beta, -$alpha, \@line);
 			}
 		} else {
 			if (DEBUG) {
 				$self->indent($ply, "recurse normal search");
 			}
 			$val = -$self->alphabeta($ply + 1, $depth - 1,
-					-$beta, -$alpha, \@line, $is_pv && !$legal);
+					-$beta, -$alpha, \@line);
 		}
+		++$legal;
 		if (DEBUG) {
 			my $cn = $position->moveCoordinateNotation($move);
 			$self->indent($ply, "move $cn: value $val");
@@ -328,7 +323,7 @@ sub alphabeta {
 			if (DEBUG) {
 				$self->indent($ply, "raise alpha to $alpha");
 			}
-			if ($is_pv) {
+			if ($ply == 1) {
 				$self->{score} = $val;
 				$self->printPV($pline);
 			}
@@ -365,7 +360,7 @@ sub alphabeta {
 }
 
 sub quiesce {
-	my ($self, $ply, $alpha, $beta, $pline, $is_pv) = @_;
+	my ($self, $ply, $alpha, $beta, $pline) = @_;
 
 	if ($self->{nodes} >= $self->{nodes_to_tc}) {
 		$self->checkTime;
@@ -381,9 +376,6 @@ sub quiesce {
 		my $line = join ' ', @{$self->{line}};
 		$self->indent($ply, "quiescence: alpha = $alpha, beta = $beta, line: $line,"
 			. " sig: $hex_signature $position");
-		if ($is_pv) {
-			$self->indent($ply, "in PV");
-		}
 	}
 
 	# Expand the search, when in check.
@@ -477,12 +469,12 @@ sub quiesce {
 			push @{$self->{line}}, $cn;
 			$self->indent($ply, "move $cn: start quiescence search");
 		}
-		$is_pv = $is_pv && !$legal;
 		++$self->{nodes};
+		++$legal;
 		if (DEBUG) {
 			$self->indent($ply, "recurse quiescence search");
 		}
-		$val = -quiesce($self, $ply + 1, -$beta, -$alpha, $pline, $is_pv);
+		$val = -quiesce($self, $ply + 1, -$beta, -$alpha, $pline);
 		if (DEBUG) {
 			my $cn = $position->moveCoordinateNotation($move);
 			$self->indent($ply, "move $cn: value: $val");
@@ -508,10 +500,6 @@ sub quiesce {
 			@$pline = ($move, @line);
 			$tt_type = Chess::Plisco::Engine::TranspositionTable::TT_SCORE_EXACT();
 			$best_move = $move;
-			if ($is_pv) {
-				$self->{score} = $val;
-				$self->printPV($pline);
-			}
 		}
 	}
 
@@ -544,19 +532,33 @@ sub rootSearch {
 	my $score = $self->{score} = 0;
 
 	my @line = @$pline;
+	my $alpha = -INF;
+	my $beta = +INF;
 	eval {
 		while (++$depth <= $max_depth) {
+			my @lower_windows = (-50, -100, -INF);
+			my @upper_windows = (50, 100, +INF);
+
 			$self->{depth} = $depth;
 			if (DEBUG) {
 				$self->debug("Deepening to depth $depth");
 				$self->{line} = [];
 			}
-			$score = -$self->alphabeta(1, $depth, -INF, +INF, \@line, 1);
+			$score = $self->alphabeta(1, $depth, $alpha, $beta, \@line, 1);
 			if (DEBUG) {
 				$self->debug("Score at depth $depth: $score");
 			}
-			if ((do {	my $mask = $score >> CP_INT_SIZE * CP_CHAR_BIT - 1;	($score + $mask) ^ $mask;}) > -(MATE + MAX_PLY)) {
+			if (($score >= -MATE - $depth) || ($score <= MATE + $depth)) {
 				last;
+			}
+
+			if (($score <= $alpha) || ($score >= $beta)) {
+				if (DEBUG) {
+					$self->debug("Must re-search with infinite window.");
+				}
+				$alpha = $score - ASPIRATION_WINDOW;
+				$beta = $score + ASPIRATION_WINDOW;
+				redo;
 			}
 		}
 	};
@@ -586,10 +588,16 @@ sub think {
 	my ($self) = @_;
 
 	my $position = $self->{position};
+	$self->{start} = $position->copy;
 	my @legal = $position->legalMoves;
 	if (!@legal) {
 		$self->{info}->(__"Error: no legal moves");
 		return;
+	} elsif (1 == @legal) {
+		my $move = $legal[0];
+		$self->printCurrentMove(1, $move, 1);
+		$self->printPV([$move]);
+		return $move;
 	}
 
 	my @line;

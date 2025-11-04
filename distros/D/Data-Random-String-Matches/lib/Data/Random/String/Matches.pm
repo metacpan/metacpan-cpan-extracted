@@ -9,7 +9,7 @@ use Carp qw(carp croak);
 use Params::Get;
 use utf8;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 NAME
 
@@ -1032,6 +1032,10 @@ sub _random_from_class {
 
 	my @chars;
 
+	# Debugging this regex: qr/!#-'*+\\-\\.\\^_`|~0-9A-Za-z/
+	# which used to give this error: 'Argument "#" isn't numeric in range (or flop)'
+	warn "DEBUG: class = '$class', length = ", length($class) if ($ENV{DEBUG_REGEX_GEN});
+
 	# Handle negation
 	my $negate = 0;
 	if (substr($class, 0, 1) eq '^') {
@@ -1044,9 +1048,12 @@ sub _random_from_class {
 	while ($i < length($class)) {
 		my $char = substr($class, $i, 1);
 
+		warn "DEBUG: i=$i, char='$char' (ord=", ord($char), ')' if ($ENV{DEBUG_REGEX_GEN});
+
 		if ($char eq '\\') {
 			$i++;
 			my $next = substr($class, $i, 1);
+			warn "DEBUG: Escaped char: $next" if ($ENV{DEBUG_REGEX_GEN});
 			if ($next eq 'd') {
 				push @chars, ('0'..'9');
 			} elsif ($next eq 'w') {
@@ -1060,18 +1067,34 @@ sub _random_from_class {
 				push @chars, $self->_unicode_property_chars($prop);
 				$i = $end;
 			} else {
+				# Escaped literal character (including \-, \., \^, etc.)
 				push @chars, $next;
 			}
 		} elsif ($i + 2 < length($class) && substr($class, $i+1, 1) eq '-') {
-			# Range
-			my $end = substr($class, $i+2, 1);
-			push @chars, ($char .. $end);
-			$i += 2;	# Will be incremented again by loop, total +3
+			# Potential range
+			my $end_char = substr($class, $i+2, 1);
+
+			# Check if end is escaped or if this is valid range
+			if ($end_char eq '\\' || $end_char eq ']') {
+				# Not a range, dash is literal
+				push @chars, $char;
+			} elsif (ord($end_char) >= ord($char)) {
+				# Valid range - use ord/chr to avoid quote interpolation issues
+				my $start_ord = ord($char);
+				my $end_ord = ord($end_char);
+				push @chars, map { chr($_) } ($start_ord .. $end_ord);
+				$i += 2;  # Will be incremented again by loop, total +3
+			} else {
+				# Invalid range order
+				push @chars, $char;
+			}
 		} else {
 			push @chars, $char;
 		}
 		$i++;
 	}
+
+	warn 'DEBUG: Final chars array has ', scalar(@chars), ' elements' if ($ENV{DEBUG_REGEX_GEN});
 
 	if ($negate) {
 		my %excluded = map { $_ => 1 } @chars;

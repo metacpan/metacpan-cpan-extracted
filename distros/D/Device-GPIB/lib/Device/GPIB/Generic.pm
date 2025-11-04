@@ -22,6 +22,15 @@ sub new($$$)
     return $self;
 }
 
+# Sigh: some devices, such as Tek 1240 Logic Analyser, support both direct Serial and GPIB
+# However the behaviours are slightly different so we need to know whether we are connected by GPIB or directly
+# by RS232C
+sub isSerial($)
+{
+    my ($self) = @_;
+    return $self->{Device}->isSerial();
+}
+
 # Serial poll out all current events for this device, and report them in an array
 # Works even if another device is asserting SRQ
 # IF no SRQs returns empty array

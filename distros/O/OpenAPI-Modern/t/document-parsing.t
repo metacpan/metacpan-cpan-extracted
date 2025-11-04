@@ -153,12 +153,18 @@ subtest '/paths correctness' => sub {
       paths => {
         '/a/{a}' => {},
         '/a/{b}' => {},
-        '/b/{a}/hi' => {},
-        '/b/{b}/hi' => {},
+        '/b/{a}/hi/{yes}' => {},
+        '/b/{b}/hi/{yes}' => {},
+        '/b/{x}/hi/{no}' => {},
         '/c/{c}/d/{c}/e/{e}/f/{e}' => {},
+        '/d/{d}.d' => {},         # valid
+        '/e/{e{}' => {},          # invalid
         'x-{alpha}' => {},
         'x-{beta}' => {},
         'x-{foo}-{foo}' => {},
+        '/{foo}{bar}' => {},      # valid, but inadvised
+        '/{foo}-{bar}' => {},     # valid
+        '/{foo}%20{bar}' => {},   # valid
       },
     },
   );
@@ -166,29 +172,41 @@ subtest '/paths correctness' => sub {
   cmp_result(
     [ map $_->TO_JSON, $doc->errors ],
     [
-      +{
+      {
         instanceLocation => '',
         keywordLocation => '/paths/~1a~1{b}',
         absoluteKeywordLocation => str(Mojo::URL->new('http://localhost:1234/api#/paths/~1a~1{b}')),
         error => 'duplicate of templated path "/a/{a}"',
       },
-      +{
+      {
         instanceLocation => '',
-        keywordLocation => '/paths/~1b~1{b}~1hi',
-        absoluteKeywordLocation => str(Mojo::URL->new('http://localhost:1234/api#/paths/~1b~1{b}~1hi')),
-        error => 'duplicate of templated path "/b/{a}/hi"',
+        keywordLocation => '/paths/~1b~1{b}~1hi~1{yes}',
+        absoluteKeywordLocation => str(Mojo::URL->new('http://localhost:1234/api#/paths/~1b~1{b}~1hi~1{yes}')),
+        error => 'duplicate of templated path "/b/{a}/hi/{yes}"',
       },
-      +{
+      {
+        instanceLocation => '',
+        keywordLocation => '/paths/~1b~1{x}~1hi~1{no}',
+        absoluteKeywordLocation => str(Mojo::URL->new('http://localhost:1234/api#/paths/~1b~1{x}~1hi~1{no}')),
+        error => 'duplicate of templated path "/b/{a}/hi/{yes}"',
+      },
+      {
         instanceLocation => '',
         keywordLocation => '/paths/~1c~1{c}~1d~1{c}~1e~1{e}~1f~1{e}',
         absoluteKeywordLocation => str(Mojo::URL->new('http://localhost:1234/api#/paths/~1c~1{c}~1d~1{c}~1e~1{e}~1f~1{e}')),
         error => 'duplicate path template variable "c"',
       },
-      +{
+      {
         instanceLocation => '',
         keywordLocation => '/paths/~1c~1{c}~1d~1{c}~1e~1{e}~1f~1{e}',
         absoluteKeywordLocation => str(Mojo::URL->new('http://localhost:1234/api#/paths/~1c~1{c}~1d~1{c}~1e~1{e}~1f~1{e}')),
         error => 'duplicate path template variable "e"',
+      },
+      {
+        instanceLocation => '',
+        keywordLocation => '/paths/~1e~1{e{}',
+        absoluteKeywordLocation => str(Mojo::URL->new('http://localhost:1234/api#/paths/~1e~1{e{}')),
+        error => 'invalid path template "/e/{e{}"',
       },
     ],
     'duplicate paths or template variables are not permitted',
@@ -196,9 +214,11 @@ subtest '/paths correctness' => sub {
 
   is(document_result($doc), substr(<<'ERRORS', 0, -1), 'stringified errors');
 '/paths/~1a~1{b}': duplicate of templated path "/a/{a}"
-'/paths/~1b~1{b}~1hi': duplicate of templated path "/b/{a}/hi"
+'/paths/~1b~1{b}~1hi~1{yes}': duplicate of templated path "/b/{a}/hi/{yes}"
+'/paths/~1b~1{x}~1hi~1{no}': duplicate of templated path "/b/{a}/hi/{yes}"
 '/paths/~1c~1{c}~1d~1{c}~1e~1{e}~1f~1{e}': duplicate path template variable "c"
 '/paths/~1c~1{c}~1d~1{c}~1e~1{e}~1f~1{e}': duplicate path template variable "e"
+'/paths/~1e~1{e{}': invalid path template "/e/{e{}"
 ERRORS
 };
 
@@ -641,7 +661,7 @@ servers:
         default: hi
       unused:
         default: nope
-  - url: https://example.com/{v}/{greeting}
+  - url: https://example.com/{v}/{g}
   - url: https://example.com/{foo}/{foo}
     variables: {}
   - url: http://example.com/literal
@@ -653,6 +673,26 @@ servers:
   - url: http://example.com/
   - url: http://example.com?foo=1
   - url: http://example.com#bar
+  - url: http://{host}.com/{path1}{path2} # valid, but inadvised
+    variables:
+      host:
+        default: a
+      path1:
+        default: b
+      path2:
+        default: c
+  - url: http://{host}.com/{pa{th}
+  - url: http://example.com/^illegal
+  - url: http://example.com/d/{d}.d       # valid
+    variables:
+      d:
+        default: d
+  - url: http://example.com/{foo}%20{bar}   # valid
+    variables:
+      foo:
+        default: foo
+      bar:
+        default: bar
 YAML
 
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
@@ -695,6 +735,12 @@ YAML
         },
         {
           instanceLocation => '',
+          keywordLocation => $_.'/servers/2/url',
+          absoluteKeywordLocation => 'http://localhost:1234/api#'.$_.'/servers/2/url',
+          error => 'duplicate of templated server url "https://example.com/{v}/{g}"',
+        },
+        {
+          instanceLocation => '',
           keywordLocation => $_.'/servers/2/variables',
           absoluteKeywordLocation => 'http://localhost:1234/api#'.$_.'/servers/2/variables',
           error => 'missing "variables" definition for servers template variable "foo"',
@@ -719,7 +765,19 @@ YAML
             absoluteKeywordLocation => 'http://localhost:1234/api#'.$base.'/servers/'.$_.'/url',
             error => 'server url cannot end in / or contain query or fragment components',
           }, 5,6,7
-        }
+        },
+        {
+          instanceLocation => '',
+          keywordLocation => $_.'/servers/9/url',
+          absoluteKeywordLocation => 'http://localhost:1234/api#'.$_.'/servers/9/url',
+          error => 'invalid server url "http://{host}.com/{pa{th}"',
+        },
+        {
+          instanceLocation => '',
+          keywordLocation => $_.'/servers/10/url',
+          absoluteKeywordLocation => 'http://localhost:1234/api#'.$_.'/servers/10/url',
+          error => 'invalid server url "http://example.com/^illegal"',
+        },
       ), '', '/components/pathItems/path0', '/components/pathItems/path0/get',
     ],
     'all issues with server entries found',
@@ -729,30 +787,39 @@ YAML
 '/servers/0/variables/version/default': servers default is not a member of enum
 '/servers/1/url': duplicate of templated server url "https://example.com/{version}/{greeting}"
 '/servers/1': "variables" property is required for templated server urls
+'/servers/2/url': duplicate of templated server url "https://example.com/{v}/{g}"
 '/servers/2/variables': missing "variables" definition for servers template variable "foo"
 '/servers/2': duplicate servers template variable "foo"
 '/servers/3/variables/version/default': servers default is not a member of enum
 '/servers/5/url': server url cannot end in / or contain query or fragment components
 '/servers/6/url': server url cannot end in / or contain query or fragment components
 '/servers/7/url': server url cannot end in / or contain query or fragment components
+'/servers/9/url': invalid server url "http://{host}.com/{pa{th}"
+'/servers/10/url': invalid server url "http://example.com/^illegal"
 '/components/pathItems/path0/servers/0/variables/version/default': servers default is not a member of enum
 '/components/pathItems/path0/servers/1/url': duplicate of templated server url "https://example.com/{version}/{greeting}"
 '/components/pathItems/path0/servers/1': "variables" property is required for templated server urls
+'/components/pathItems/path0/servers/2/url': duplicate of templated server url "https://example.com/{v}/{g}"
 '/components/pathItems/path0/servers/2/variables': missing "variables" definition for servers template variable "foo"
 '/components/pathItems/path0/servers/2': duplicate servers template variable "foo"
 '/components/pathItems/path0/servers/3/variables/version/default': servers default is not a member of enum
 '/components/pathItems/path0/servers/5/url': server url cannot end in / or contain query or fragment components
 '/components/pathItems/path0/servers/6/url': server url cannot end in / or contain query or fragment components
 '/components/pathItems/path0/servers/7/url': server url cannot end in / or contain query or fragment components
+'/components/pathItems/path0/servers/9/url': invalid server url "http://{host}.com/{pa{th}"
+'/components/pathItems/path0/servers/10/url': invalid server url "http://example.com/^illegal"
 '/components/pathItems/path0/get/servers/0/variables/version/default': servers default is not a member of enum
 '/components/pathItems/path0/get/servers/1/url': duplicate of templated server url "https://example.com/{version}/{greeting}"
 '/components/pathItems/path0/get/servers/1': "variables" property is required for templated server urls
+'/components/pathItems/path0/get/servers/2/url': duplicate of templated server url "https://example.com/{v}/{g}"
 '/components/pathItems/path0/get/servers/2/variables': missing "variables" definition for servers template variable "foo"
 '/components/pathItems/path0/get/servers/2': duplicate servers template variable "foo"
 '/components/pathItems/path0/get/servers/3/variables/version/default': servers default is not a member of enum
 '/components/pathItems/path0/get/servers/5/url': server url cannot end in / or contain query or fragment components
 '/components/pathItems/path0/get/servers/6/url': server url cannot end in / or contain query or fragment components
 '/components/pathItems/path0/get/servers/7/url': server url cannot end in / or contain query or fragment components
+'/components/pathItems/path0/get/servers/9/url': invalid server url "http://{host}.com/{pa{th}"
+'/components/pathItems/path0/get/servers/10/url': invalid server url "http://example.com/^illegal"
 ERRORS
 
   memory_cycle_ok($doc, 'no leaks in the document object');

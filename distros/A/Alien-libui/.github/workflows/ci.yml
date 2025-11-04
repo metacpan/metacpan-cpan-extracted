@@ -1,0 +1,210 @@
+name: CI w/ Coverage Tests
+
+on:
+  pull_request: ~
+  push: ~
+  schedule:
+    - cron: '42 5 * * 0'
+  workflow_dispatch: ~
+
+permissions:
+  contents: read
+  # actions: read is required to list artifacts via the API
+  actions: read
+
+jobs:
+
+  vm:
+    name:  ${{ matrix.platform.os }}
+    uses: ./.github/workflows/unified-tester.yml
+    secrets: inherit
+    with:
+      platform_name: ${{ matrix.platform.os }}
+      runner_type: 'vm'
+      os: ${{ matrix.platform.os }}
+      os_version: ${{ matrix.platform.version }}
+      arch: ${{ matrix.arch }}
+      prepare:  ${{ matrix.toolchain == 'clang' && matrix.platform.prepare_clang || matrix.platform.prepare_gcc }}
+      host_os: 'ubuntu-latest'
+      toolchain: ${{ matrix.compiler_cmd || matrix.toolchain }}
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - os: 'freebsd'
+            version: '14.3'
+            prepare_gcc:   'pkg install -y perl5 lang/gcc'
+            prepare_clang: 'pkg install -y perl5 llvm'
+          - os: 'openbsd'
+            version: '7.7'
+            prepare_gcc:   'pkg_add gcc-11.2.0p15'
+            prepare_clang: ''
+          - os: 'netbsd'
+            version: '10.1'
+            prepare_gcc:   '/usr/sbin/pkg_add perl'
+          - os: 'dragonflybsd'
+            version: '6.4.0'
+            prepare_gcc:   'pkg install -y perl5 gcc'
+          - os: 'solaris'
+            version: '11.4'
+            prepare_gcc:   'pkg install -v --accept perl-538 gcc'
+          - os: 'omnios'
+            version: 'r151052'
+            prepare_gcc:   'pkg install -v --accept perl build-essential'
+        arch: ['x86_64', 'aarch64']
+        toolchain: ['gcc', 'clang']
+        exclude:
+          # Architecture exclusions
+          - platform: { os: 'dragonflybsd' }
+            arch: 'aarch64'
+          - platform: { os: 'solaris' }
+            arch: 'aarch64'
+          - platform: { os: 'omnios' }
+            arch: 'aarch64'
+          # Toolchain exclusions for simplicity
+          - platform: { os: 'netbsd' }
+            toolchain: 'clang'
+          - platform: { os: 'dragonflybsd' }
+            toolchain: 'clang'
+          - platform: { os: 'solaris' }
+            toolchain: 'clang'
+          - platform: { os: 'omnios' }
+            toolchain: 'clang'
+        include:
+          # Use specific 'egcc' command for packaged GCC on OpenBSD
+          - platform: { os: 'openbsd' }
+            toolchain: 'gcc'
+            compiler_cmd: 'egcc'
+
+  direct:
+    name:  ${{ matrix.platform.name }}
+    uses: ./.github/workflows/unified-tester.yml
+    secrets: inherit
+    with:
+      platform_name: ${{ matrix.platform.name }}
+      runner_type: 'direct'
+      os: ${{ matrix.platform.os }}
+      arch: ${{ matrix.platform.arch }}
+      prepare: ${{ (matrix.toolchain == 'clang' && matrix.platform.prepare_clang) || (matrix.toolchain == 'msvc' && matrix.platform.prepare_msvc) || matrix.platform.prepare_gcc }}
+      toolchain: ${{ matrix.toolchain }}
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - name: 'ubuntu'
+            os: 'ubuntu-latest'
+            arch: 'x86_64'
+            prepare_gcc: 'sudo apt-get update && sudo apt-get install -y gcc perl'
+            prepare_clang: 'sudo apt-get update && sudo apt-get install -y clang perl'
+          - name: 'macos'
+            os: 'macos-latest'
+            arch: 'x86_64'
+            prepare_gcc: ''
+            prepare_clang: ''
+          - name: 'windows'
+            os: 'windows-latest'
+            arch: 'x86_64'
+            # Setup Strawberry Perl which includes cpanm
+            prepare_gcc: 'choco install mingw'
+            prepare_clang: 'choco install llvm'
+            prepare_msvc: 'choco install opencppcoverage strawberryperl; bash'
+          - name: 'ubuntu-arm'
+            os: 'ubuntu-24.04-arm'
+            arch: 'aarch64'
+            prepare_gcc: 'sudo apt-get update && sudo apt-get install -y gcc perl'
+            prepare_clang: 'sudo apt-get update && sudo apt-get install -y clang perl'
+          - name: 'windows-arm'
+            os: 'windows-11-arm'
+            arch: 'aarch64'
+            prepare_gcc: ''
+            prepare_clang: 'choco install llvm'
+            prepare_msvc: 'choco install opencppcoverage strawberryperl; bash'
+        toolchain: ['gcc', 'clang', 'msvc']
+        exclude:
+          #~ - platform: { name: 'macos' }
+            #~ toolchain: 'gcc'
+          - platform: { name: 'ubuntu' }
+            toolchain: 'msvc'
+          - platform: { name: 'ubuntu-arm' }
+            toolchain: 'msvc'
+          - platform: { name: 'macos' }
+            toolchain: 'msvc'
+
+  results:
+    name: Summary
+    if: always()
+    needs: [vm, direct]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all result artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: result-artifact-*
+          path: results/
+          merge-multiple: true
+
+      - name: Generate Job Summary from Artifacts
+        run: |
+          mkdir -p status
+          # --- Setup for Markdown and JSON output ---
+          SUMMARY_MD="status/status.md"
+          STATUS_JSON="status/status.json"
+          echo "## Build and Test Summary" > $SUMMARY_MD
+          echo "| OS | Arch | Compiler | Result |" >> $SUMMARY_MD
+          echo "|:---|:---|:---|:---|" >> $SUMMARY_MD
+          echo "{" > $STATUS_JSON
+          is_first_json_entry=true
+          if [ -d "results" ] && [ -n "$(ls -A results)" ]; then
+            find results -type f -name "*.result" | sort | while IFS= read -r file; do
+              result=$(cat "$file")
+              filename=$(basename "$file" .result)
+              ICON=$([[ $result == 'success' ]] && echo '✅' || echo '❌')
+              IFS='-' read -ra parts <<< "$filename"
+              platform="${parts[0]}"
+              arch="${parts[1]}"
+              compiler="${parts[2]}"
+              echo "| **$platform** | \`$arch\` | \`$compiler\` | $ICON $result |" >> $SUMMARY_MD
+              if [ "$is_first_json_entry" = false ]; then
+                echo "," >> $STATUS_JSON
+              fi
+              # The key is the unique job identifier, e.g., "freebsd-x86_64-gcc"
+              # The value is "passing" or "failing" for Shields.io color coding
+              SHIELD_STATUS=$([[ $result == 'success' ]] && echo 'passing' || echo 'failing')
+              echo "\"$filename\": \"$SHIELD_STATUS\"" >> $STATUS_JSON
+              is_first_json_entry=false
+            done
+          else
+            echo "| All build jobs | | | No result data found. ❌ |" >> $SUMMARY_MD
+          fi
+          echo "}" >> $STATUS_JSON
+          cat $SUMMARY_MD >> $GITHUB_STEP_SUMMARY
+      - name: Upload Status Artifact for Publishing
+        uses: actions/upload-artifact@v4
+        with:
+          name: status-files
+          path: status/
+  publish-status:
+    name: Publish Status Page
+    if: github.ref == 'refs/heads/main' # Only run on pushes to the main branch
+    needs: [results]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Important: Permission to write to the repo (for gh-pages branch)
+    steps:
+      - name: Download status files
+        uses: actions/download-artifact@v4
+        with:
+          name: status-files
+          path: ./status
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./status
+          publish_branch: gh-pages
+          keep_files: true
+          destination_dir: status
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
+          commit_message: 'Update build status matrix'

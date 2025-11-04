@@ -203,6 +203,7 @@ sub plot
     # Output the file
     $image->write(file => $output_file)
 	or die "Cannot save file: $output_file", $image->errstr;
+    print "Wrote $output_file\n";
 }
 
 sub usage

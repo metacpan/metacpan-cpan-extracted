@@ -35,10 +35,11 @@ requires:
   SPVM::Math: '1.006'
   SPVM::Mozilla::CA: '0.001'
   SPVM::Regex: '0.253'
+  SPVM::Sys: '0.552'
   SPVM::Time::HiRes: '0.005'
   SPVM::Time::Local: '0.112'
   SPVM::Time::Piece: '0.003'
 resources:
   repository: https://github.com/yuki-kimoto/SPVM-Mojolicious.git
-version: '0.031'
+version: '0.032'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

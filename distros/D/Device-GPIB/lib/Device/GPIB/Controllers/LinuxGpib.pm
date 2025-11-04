@@ -42,11 +42,39 @@ sub new($$)
     # "board_index, pad, sad, timo, eot, eos");
     # PAD defaults to 0
     # Sigh: HP3577A PLA command can take around 9 seconds, so need longer timeout than that
-    debug("LinuxGpib connecting to board_index $board_index");
+    $self->debug("LinuxGpib connecting to board_index $board_index");
     $self->{Device} = LinuxGpib::ibdev($board_index, 0, 0, LinuxGpib::T30s, 1, 0x0a);
     if ($self->{Device} < 0)
     {
-	warning("Could not create LinuxGpib device $board_index");
+	$self->warning("Could not create LinuxGpib device $board_index");
+	return;
+    }
+
+    $self->{CurrentPad} = -1;
+    $self->{CurrentSad} = -1;
+
+    return $self;
+}
+
+sub isSerial($)
+{
+    return 0;
+}
+
+sub send($$)
+{
+    my ($self, $s) = @_;
+
+    $self->debug("Sending: '$s'");
+    return unless $self->{Device};
+    my $ret = LinuxGpib::ibwrt($self->{Device}, $s, length($s));
+    if ($ret ==  0x2100)
+    {
+	return 1;
+    }
+    else
+    {
+	$self->warning("Could not create LinuxGpib device $board_index");
 	return;
     }
 
@@ -60,7 +88,7 @@ sub send($$)
 {
     my ($self, $s) = @_;
 
-    debug("Sending: '$s'");
+    $self->debug("Sending: '$s'");
     return unless $self->{Device};
     my $ret = LinuxGpib::ibwrt($self->{Device}, $s, length($s));
     if ($ret ==  0x2100)
@@ -69,7 +97,7 @@ sub send($$)
     }
     else
     {
-	warning("LinuxGpib::ibwrt failed: $ret");
+	$self->warning("LinuxGpib::ibwrt failed: $ret");
 	return 0;
     }
 }
@@ -80,21 +108,21 @@ sub read($)
 
     my $data;
     my $ret = LinuxGpib::ibrd($self->{Device}, $data, 10000);
-    warning("LinuxGpib::ibrd failed: $ret") unless $ret == 0x2100;
+    $self->warning("LinuxGpib::ibrd failed: $ret") unless $ret == 0x2100;
     
     return $data;
 }
 
 sub warning($)
 {
-    my ($s) = @_;
+    my ($self, $s) = @_;
 
     print "WARNING: $s\n";
 }
 
 sub debug($)
 {
-    my ($s) = @_;
+    my ($self, $s) = @_;
 
     print "DEBUG: $s\n"
 	if $Device::GPIB::Controller::debug;
@@ -116,9 +144,9 @@ sub addr($$$)
     {
 	if ($pad != $self->{CurrentPad})
 	{
-	    debug("Set addresses $pad, $sad\n");
+	    $self->debug("Set addresses $pad, $sad\n");
 	    my $ret = LinuxGpib::ibpad($self->{Device}, $pad);
-	    warning("LinuxGpib::ibpad failed: $ret") unless $ret == 0x100;
+	    $self->warning("LinuxGpib::ibpad failed: $ret") unless $ret == 0x100;
 	    $self->{CurrentPad} = $pad;
 	    $self->{CurrentSad} = $sad;
 	}
@@ -135,7 +163,7 @@ sub clr($$$)
 
     $self->addr($pad, $sad) if defined $pad;
     my $ret = LinuxGpib::ibclr($self->{Device});
-    warning("LinuxGpib::ibclr failed: $ret") unless $ret == 0x100;
+    $self->warning("LinuxGpib::ibclr failed: $ret") unless $ret == 0x100;
 }
 
 sub spoll($$$)
@@ -145,7 +173,7 @@ sub spoll($$$)
     $self->addr($pad, $sad) if defined $pad;
     my $status;
     my $ret = LinuxGpib::ibrsp($self->{Device}, $status);
-    warning("LinuxGpib::ibrsp failed: $ret") unless $ret == 0x2100;
+    $self->warning("LinuxGpib::ibrsp failed: $ret") unless $ret == 0x2100;
     return $status;
 }
 
@@ -157,10 +185,10 @@ sub trg($@)
     while (@addrs)
     {
 	my $addr = shift(@addrs);
-	debug("trigger $addr");
+	$self->debug("trigger $addr");
 	$self->addr($addr);
 	my $ret = LinuxGpib::ibtrg($self->{Device});
-	warning("LinuxGpib::ibrsp failed: $ret") unless $ret == 0x2100;
+	$self->warning("LinuxGpib::ibrsp failed: $ret") unless $ret == 0x2100;
     }
 }
 1;

@@ -301,9 +301,9 @@ resp. inline functions for accessing individual properties:
 
 =over
 
-=item * C<cp_move_to($move)>: the starting square as a shift
+=item * C<cp_move_to($move)>: the destination square as a shift
 
-=item * C<cp_move_from($move)>: the destination square as a shift
+=item * C<cp_move_from($move)>: the starting square as a shift
 
 =item * C<cp_move_promotion($move)>: the promotion piece if any
 
@@ -318,9 +318,9 @@ an assignment)! For this, use other macros:
 
 =over
 
-=item * C<cp_move_set_to($move, $to)>: the starting square as a shift
+=item * C<cp_move_set_to($move, $to)>: the destination square as a shift
 
-=item * C<cp_move_set_from($move, $from)>: the destination square as a shift
+=item * C<cp_move_set_from($move, $from)>: the starting square as a shift
 
 =item * C<cp_move_set_promotion($move, $piece)>: the promotion piece
 

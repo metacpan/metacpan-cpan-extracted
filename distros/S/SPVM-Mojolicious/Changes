@@ -1,3 +1,7 @@
+0.032 2025-11-04
+  [Changes]
+    * Improve Mojolicious::Routes classes.
+    
 0.031 2025-10-27
   [Requirement Changes]
     * Require SPVM 0.990105.

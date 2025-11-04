@@ -1,6 +1,6 @@
 #! /bin/false
 
-# Copyright (C) 2021 Guido Flohr <guido.flohr@cantanea.com>,
+# Copyright (C) 2021-2025 Guido Flohr <guido.flohr@cantanea.com>,
 # all rights reserved.
 
 # This program is free software. It comes without any warranty, to
@@ -63,8 +63,7 @@ sub __solve {
 		die "$location: neither bm no am found";
 	}
 
-	my $position = $record->position;
-	bless $position, 'Chess::Plisco::Engine::Position';
+	my $position = Chess::Plisco::Engine::Position->new($record->position->toFEN);
 
 	foreach my $san (@bm) {
 		my $move = $position->parseMove($san)
@@ -95,21 +94,23 @@ sub __solve {
 	if (@bm) {
 		my $found;
 		foreach my $bm (@bm) {
-			if ($bm == $move) {
+			if ($bm eq $move) {
 				$found = 1;
 				last;
 			}
 		}
-		ok $found, "$location: best move";
+		my $moves = '[' . (join ', ', @bm) . ']';
+		ok $found, "$location: best move, $move in $moves";
 	} elsif (@am) {
 		my $found;
 		foreach my $bm (@bm) {
-			if ($bm == $move) {
+			if ($bm eq $move) {
 				$found = 1;
 				last;
 			}
 		}
-		ok !$found, "$location: avoid move";
+		my $moves = '[' . (join ', ', @am) . ']';
+		ok !$found, "$location: avoid move, $move not in $moves";
 	}
 }
 

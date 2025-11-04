@@ -66,9 +66,10 @@ WriteMakefile(
 				# license    => 'http://dev.perl.org/licenses/',
 			}, bugtracker => {
 				mailto => 'bug-Data-Random-String-Matches@rt.cpan.org',
-				url => 'https://github.com/nigelhorne/Data-Random-String-Matches/issues',
-				# web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Random-String-Matches',
-				web => 'https://github.com/nigelhorne/Data-Random-String-Matches/issues'
+				url => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Random-String-Matches',
+				web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Random-String-Matches',
+				# url => 'https://github.com/nigelhorne/Data-Random-String-Matches/issues',
+				# web => 'https://github.com/nigelhorne/Data-Random-String-Matches/issues'
 			}
 		},
 	},

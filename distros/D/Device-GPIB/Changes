@@ -9,3 +9,11 @@ Revision history for Perl extension Device::GPIB.
 1.1   2023-07-03
       - Added support for HP5342A Microwave Frequency Counter
       - Added support for HP8904 Multifunction Synthesizer, including some example command scripts
+      
+1.2   2025-09-30
+      - Added support for more devices
+      - Factored out serial interface for supporting devices like Tex 1240 Logic Analyzer that
+      suports both RS232C and GPIB interfaces
+
+1.3   2025-11-04
+      - Added support for GPIB interfaces to Tektronix 1240 Logic Analyzer with 1200C02 GPIB comms pack

@@ -70,6 +70,7 @@ WriteMakefile(
     'SPVM::Digest::SHA' => '0.065',
     'SPVM::Compress::Raw::Zlib' => '0.003',
     'SPVM::Getopt::Long' => '0.003',
+    'SPVM::Sys' => '0.552',
   },
   TEST_REQUIRES => {
     

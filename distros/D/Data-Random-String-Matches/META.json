@@ -64,8 +64,8 @@
    "resources" : {
       "bugtracker" : {
          "mailto" : "bug-Data-Random-String-Matches@rt.cpan.org",
-         "web" : "https://github.com/nigelhorne/Data-Random-String-Matches/issues",
-         "x_url" : "https://github.com/nigelhorne/Data-Random-String-Matches/issues"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Random-String-Matches",
+         "x_url" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Random-String-Matches"
       },
       "homepage" : "https://metacpan.org/pod/Data::Random::String::Matches",
       "repository" : {
@@ -75,6 +75,6 @@
          "x_repository" : "https://github.com/nigelhorne/Data-Random-String-Matches"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

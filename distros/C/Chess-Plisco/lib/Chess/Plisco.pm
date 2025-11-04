@@ -1,6 +1,6 @@
 #! /bin/false
 
-# Copyright (C) 2021 Guido Flohr <guido.flohr@cantanea.com>,
+# Copyright (C) 2021-2025 Guido Flohr <guido.flohr@cantanea.com>,
 # all rights reserved.
 
 # This program is free software. It comes without any warranty, to
@@ -39,11 +39,12 @@
 # more extensive use of Chess::Plisco::Macro.
 
 package Chess::Plisco;
-$Chess::Plisco::VERSION = '0.4';
+$Chess::Plisco::VERSION = '0.6';
 use strict;
 use integer;
 no warnings qw(portable);
 use overload '""' => sub { shift->toFEN };
+no warnings qw(uninitialized);
 
 use Locale::TextDomain qw('Chess-Plisco');
 use Scalar::Util qw(reftype);
@@ -1667,7 +1668,8 @@ sub parseMove {
 	my ($self, $notation) = @_;
 
 	my $move;
-	if ($notation =~ /^([a-h][1-8])([a-h][1-8])([qrbn])?$/i) {
+
+	if ($notation =~ /^([a-h][1-8])([a-h][1-8])([qrbn])?$/) {
 		$move = $self->__parseUCIMove(map { lc $_ } ($1, $2, $3))
 			or return;
 	} else {
@@ -2613,8 +2615,9 @@ sub SAN {
 			map { $self->moveSetPromote($_, CP_NO_PIECE) }
 			@cmoves;
 	foreach my $cmove (keys %cmoves) {
-		my ($cfrom, $cto) = ($self->moveFrom($cmove), $self->moveTo($cmove));
+		my ($cfrom, $cto, $cpiece) = ($self->moveFrom($cmove), $self->moveTo($cmove), $self->movePiece($cmove));
 		next if $cto != $to;
+		next if $cpiece != $piece;
 
 		++$candidates;
 		my ($ffile, $frank) = $self->shiftToCoordinates($cfrom);
@@ -3329,6 +3332,14 @@ sub moveNumbers {
 	my ($class);
 
 	return @move_numbers;
+}
+
+sub kingAttackMask {
+	return [@king_attack_masks];
+}
+
+sub knightAttackMask {
+	return [@knight_attack_masks];
 }
 
 ###########################################################################

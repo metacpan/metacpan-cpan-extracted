@@ -1,0 +1,10 @@
+# Copyright (c) 2025 Yuki Kimoto
+# MIT License
+
+class Mojolicious::Callback : interface_t {
+  version_from Mojolicious;
+  
+  use Mojolicious::Controller;
+  
+  required method : int ($c : Mojolicious::Controller);
+}

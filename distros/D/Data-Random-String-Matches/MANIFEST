@@ -24,6 +24,7 @@ t/generate.t
 t/pod-cm.t
 t/pod-synopsis.t
 t/pod.t
+t/release04.t
 t/suggest.t
 t/utility_methods.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
