@@ -48,7 +48,7 @@ Log::Report::Dispatcher::Try - capture all reports as exceptions
 The B<try> works like Perl's build-in C<eval()>, but implements
 real exception handling which Perl core lacks.
 
-The L<Log::Report::try()|Log::Report/"Report Production and Configuration"> function creates this C<::Try> dispatcher
+The L<Log::Report::try()|Log::Report/"Report production and configuration"> function creates this C<::Try> dispatcher
 object with name 'try'.  After the C<try()> is over, you can find
 the object in C<$@>.  The C<$@> as C<::Try> object behaves exactly
 as the C<$@> produced by C<eval>, but has many added features.
@@ -95,17 +95,13 @@ Extends L<"Constructors" in Log::Report::Dispatcher|Log::Report::Dispatcher/"Con
 
 =over 4
 
-=item $obj-E<gt>B<close>()
-
-Inherited, see L<Log::Report::Dispatcher/"Constructors">
-
 =item $class-E<gt>B<new>($type, $name, %options)
 
 Inherited, see L<Log::Report::Dispatcher/"Constructors">
 
  -Option       --Defined in             --Default
   accept         Log::Report::Dispatcher  depend on mode
-  charset        Log::Report::Dispatcher  <C<undef>>
+  charset        Log::Report::Dispatcher  undef
   died                                    undef
   exceptions                              []
   format_reason  Log::Report::Dispatcher  'LOWERCASE'
@@ -116,13 +112,13 @@ Inherited, see L<Log::Report::Dispatcher/"Constructors">
 
 =over 2
 
-=item accept => REASONS
+=item accept => $reasons|\@reasons
 
 =item charset => CHARSET
 
-=item died => STRING
+=item died => $text
 
-The exit string or object ($@) of the eval'ed block, in its unprocessed state.
+The exit string or object (C<$@>) of the eval'ed block, in its unprocessed state.
 
 =item exceptions => \@objects
 
@@ -159,15 +155,15 @@ Extends L<"Accessors" in Log::Report::Dispatcher|Log::Report::Dispatcher/"Access
 
 Returns the value of L<new(on_die)|Log::Report::Dispatcher::Try/"Constructors">.
 
-=item $obj-E<gt>B<died>( [STRING] )
+=item $obj-E<gt>B<died>( [$text] )
 
-The exit string or object ($@) of the eval'ed block, in its unprocessed state.
+The exit C<$text> or object (C<$@>) of the eval'ed block, in its unprocessed state.
 They will always return C<true> when they where deadly, and it always stringifies
 into something useful.
 
 =item $obj-E<gt>B<exceptions>()
 
-Returns all collected C<Log::Report::Exceptions>.  The last of
+Returns all collected L<Log::Report::Exception|Log::Report::Exception> objects.  The last of
 them may be a fatal one.  The other are non-fatal.
 
 =item $obj-E<gt>B<hide>(@reasons)
@@ -184,7 +180,7 @@ you like.
 Be warned: Using this method will reset the whole 'hide' configuration:
 it's a I<set> not an I<add>.
 
-example: change the setting of the running block
+» example: change the setting of the running block
 
   my $parent_try = dispatcher 'active-try';
   $parent_try->hide('ALL');
@@ -225,6 +221,10 @@ Extends L<"Logging" in Log::Report::Dispatcher|Log::Report::Dispatcher/"Logging"
 
 Inherited, see L<Log::Report::Dispatcher/"Logging">
 
+=item $obj-E<gt>B<close>()
+
+Inherited, see L<Log::Report::Dispatcher/"Logging">
+
 =item $any-E<gt>B<collectLocation>()
 
 Inherited, see L<Log::Report::Dispatcher/"Logging">
@@ -247,14 +247,14 @@ Improves base, see L<Log::Report::Dispatcher/"Logging">
 
 Re-cast the messages in all collect exceptions into the defined
 dispatchers, which were disabled during the try block. The C<%options>
-will end-up as HASH of C<%options> to L<Log::Report::report()|Log::Report/"Report Production and Configuration">; see
+will end-up as HASH of C<%options> to L<Log::Report::report()|Log::Report/"Report production and configuration">; see
 L<Log::Report::Exception::throw()|Log::Report::Exception/"Processing"> which does the job.
 
 =item $obj-E<gt>B<reportFatal>(%options)
 
 Re-cast only the fatal message to the defined dispatchers.  If the
 block was left without problems, then nothing will be done.  The C<%options>
-will end-up as HASH of C<%options> to L<Log::Report::report()|Log::Report/"Report Production and Configuration">; see
+will end-up as HASH of C<%options> to L<Log::Report::report()|Log::Report/"Report production and configuration">; see
 L<Log::Report::Exception::throw()|Log::Report::Exception/"Processing"> which does the job.
 
 =item $obj-E<gt>B<skipStack>()
@@ -265,7 +265,7 @@ Inherited, see L<Log::Report::Dispatcher/"Logging">
 
 Inherited, see L<Log::Report::Dispatcher/"Logging">
 
-=item $obj-E<gt>B<translate>(HASH-$of-%options, $reason, $message)
+=item $obj-E<gt>B<translate>(\%options, $reason, $message)
 
 Inherited, see L<Log::Report::Dispatcher/"Logging">
 
@@ -302,10 +302,10 @@ die, otherwise an empty LIST (C<undef>).
 
 =over 2
 
-=item class => CLASS|REGEX
+=item class => $class|REGEX
 
 Only return the exception if it was fatal, and in the same time in
-the specified CLASS (as string) or matches the REGEX.
+the specified C<$class> (as string) or matches the REGEX.
 See L<Log::Report::Message::inClass()|Log::Report::Message/"Processing">
 
 =back
@@ -318,8 +318,8 @@ Extends L<"DETAILS" in Log::Report::Dispatcher|Log::Report::Dispatcher/"DETAILS"
 
 =head1 SEE ALSO
 
-This module is part of Log-Report version 1.41,
-built on September 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report version 1.42,
+built on November 04, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

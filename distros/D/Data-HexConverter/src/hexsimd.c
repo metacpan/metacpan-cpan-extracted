@@ -17,7 +17,7 @@
 #endif
 
 /* decide once. at compile time. whether AVX512 code exists in this file */
-#if (defined(__AVX512BW__) && defined(__AVX512VL__)) || defined(HEXSIMD_ENABLE_AVX512)
+#ifdef HEXSIMD_ENABLE_AVX512
 #  define HEXSIMD_HAVE_AVX512 1
 #else
 #  define HEXSIMD_HAVE_AVX512 0
@@ -242,6 +242,14 @@ static ptrdiff_t hex_to_bytes_avx2_impl(const char* src, size_t len, uint8_t* ds
     const __m256i c0=_mm256_set1_epi8('0'), c9p1=_mm256_set1_epi8('9'+1);
     const __m256i cA=_mm256_set1_epi8('A'), cFp1=_mm256_set1_epi8('F'+1);
     const __m256i casebit=_mm256_set1_epi8(0x20), ten=_mm256_set1_epi8(10);
+    const __m256i mask0F=_mm256_set1_epi8(0x0F);
+    const __m256i pack016=_mm256_setr_epi8(
+        16, 1, 16, 1, 16, 1, 16, 1,
+        16, 1, 16, 1, 16, 1, 16, 1,
+        16, 1, 16, 1, 16, 1, 16, 1,
+        16, 1, 16, 1, 16, 1, 16, 1
+    );
+    const __m256i all_ff=_mm256_set1_epi32(-1);
     for (; i+32<=len; i+=32, o+=16) {
         __m256i x = _mm256_loadu_si256((const __m256i*)(src+i));
         __m256i upper = _mm256_andnot_si256(casebit, x);
@@ -253,25 +261,19 @@ static ptrdiff_t hex_to_bytes_avx2_impl(const char* src, size_t len, uint8_t* ds
             _mm256_cmpeq_epi8(_mm256_min_epu8(upper,cFp1), upper));
         if (strict) {
             __m256i valid = _mm256_or_si256(isd, isa);
-            __m256i all = _mm256_cmpeq_epi8(valid, _mm256_set1_epi8((char)0xFF));
-            if ((unsigned)_mm256_movemask_epi8(all) != 0xFFFFFFFFu) return -1;
+            if (!_mm256_testc_si256(valid, all_ff)) return -1;
         }
         __m256i dval = _mm256_sub_epi8(x,c0);
         __m256i lval = _mm256_add_epi8(_mm256_sub_epi8(upper,cA), ten);
         __m256i nib  = _mm256_or_si256(_mm256_and_si256(isd,dval),
                                        _mm256_andnot_si256(isd,lval));
-        nib = _mm256_and_si256(nib, _mm256_set1_epi8(0x0F));
+        nib = _mm256_and_si256(nib, mask0F);
 
-        __m256i even = _mm256_and_si256(nib, _mm256_set1_epi16(0x00FF));
-        __m256i odd  = _mm256_and_si256(_mm256_srli_epi16(nib,8), _mm256_set1_epi16(0x00FF));
-        __m256i w16  = _mm256_or_si256(_mm256_slli_epi16(even,4), odd);
-
-        __m128i lo16 = _mm256_castsi256_si128(w16);
-        __m128i hi16 = _mm256_extracti128_si256(w16,1);
-        __m128i lo8  = _mm_packus_epi16(lo16, _mm_setzero_si128());
-        __m128i hi8  = _mm_packus_epi16(hi16, _mm_setzero_si128());
-        _mm_storel_epi64((__m128i*)(dst+o+0), lo8);
-        _mm_storel_epi64((__m128i*)(dst+o+8), hi8);
+        __m256i pairs = _mm256_maddubs_epi16(nib, pack016);
+        __m128i lo16 = _mm256_castsi256_si128(pairs);
+        __m128i hi16 = _mm256_extracti128_si256(pairs,1);
+        __m128i out8 = _mm_packus_epi16(lo16, hi16);
+        _mm_storeu_si128((__m128i*)(dst+o), out8);
     }
     if (i<len) {
         ptrdiff_t t = hex_to_bytes_scalar_impl(src+i, len-i, dst+o, strict);
@@ -616,7 +618,8 @@ int main(void){
     char *back = malloc( (BIN_LEN * 2) +1);
     memset(back, 0x5A, BIN_LEN * 2);
 		   
-    ptrdiff_t n = hex_to_bytes(hx, strlen(hx), bin, true);
+    //ptrdiff_t n = hex_to_bytes(hx, strlen(hx), bin, true);
+    ptrdiff_t n = hex_to_bytes(hx, BIN_LEN-1, bin, true);
     if (n < 0) { puts("parse failed"); return 1; }
     ptrdiff_t m = bytes_to_hex(bin, (size_t)n, back);
     back[m] = 0;
@@ -651,4 +654,3 @@ int main(void){
 }
 
 #endif
-

@@ -47,10 +47,6 @@ Extends L<"Constructors" in Log::Report::Dispatcher|Log::Report::Dispatcher/"Con
 
 =over 4
 
-=item $obj-E<gt>B<close>()
-
-Inherited, see L<Log::Report::Dispatcher/"Constructors">
-
 =item $class-E<gt>B<new>($type, $name, %options)
 
 The Log::Dispatch infrastructure has quite a large number of output
@@ -66,7 +62,7 @@ Improves base, see L<Log::Report::Dispatcher/"Constructors">
  -Option       --Defined in             --Default
   accept         Log::Report::Dispatcher  depend on mode
   callbacks                               []
-  charset        Log::Report::Dispatcher  <C<undef>>
+  charset        Log::Report::Dispatcher  undef
   format_reason  Log::Report::Dispatcher  'LOWERCASE'
   locale         Log::Report::Dispatcher  <system locale>
   max_level                               undef
@@ -76,9 +72,9 @@ Improves base, see L<Log::Report::Dispatcher/"Constructors">
 
 =over 2
 
-=item accept => REASONS
+=item accept => $reasons|\@reasons
 
-=item callbacks => CODE|ARRAY-of-CODE
+=item callbacks => CODE|\@CODE
 
 See Log::Dispatch::Output.
 
@@ -100,7 +96,7 @@ LEVEL.  The default will use L<Log::Report|Log::Report> restrictions only.
 
 =item mode => 'NORMAL'|'VERBOSE'|'ASSERT'|'DEBUG'|0..3
 
-=item to_level => ARRAY-of-PAIRS
+=item to_level => \@PAIRS
 
 See L<reasonToLevel()|Log::Report::Dispatcher::LogDispatch/"Logging">.
 
@@ -150,6 +146,10 @@ Extends L<"Logging" in Log::Report::Dispatcher|Log::Report::Dispatcher/"Logging"
 
 Inherited, see L<Log::Report::Dispatcher/"Logging">
 
+=item $obj-E<gt>B<close>()
+
+Inherited, see L<Log::Report::Dispatcher/"Logging">
+
 =item $any-E<gt>B<collectLocation>()
 
 Inherited, see L<Log::Report::Dispatcher/"Logging">
@@ -158,7 +158,7 @@ Inherited, see L<Log::Report::Dispatcher/"Logging">
 
 Inherited, see L<Log::Report::Dispatcher/"Logging">
 
-=item $obj-E<gt>B<log>(HASH-$of-%options, $reason, $message, $domain)
+=item $obj-E<gt>B<log>(\%options, $reason, $message, $domain)
 
 Inherited, see L<Log::Report::Dispatcher/"Logging">
 
@@ -175,7 +175,7 @@ Inherited, see L<Log::Report::Dispatcher/"Logging">
 
 Inherited, see L<Log::Report::Dispatcher/"Logging">
 
-=item $obj-E<gt>B<translate>(HASH-$of-%options, $reason, $message)
+=item $obj-E<gt>B<translate>(\%options, $reason, $message)
 
 Inherited, see L<Log::Report::Dispatcher/"Logging">
 
@@ -191,14 +191,14 @@ Extends L<"DETAILS" in Log::Report::Dispatcher|Log::Report::Dispatcher/"DETAILS"
 
 =item Error: Log::Dispatch level '$level' not understood
 
-Cast by new()
+Cast by C<new()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Log-Report version 1.41,
-built on September 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report version 1.42,
+built on November 04, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

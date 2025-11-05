@@ -1,16 +1,24 @@
+MANIFEST			This list of files
 Changes
 HexConverter.xs
 ignore.txt
 lib/Data/HexConverter.pm
 Makefile.PL
-MANIFEST			This list of files
+make-dist.mk
 probe_isa.c
-isa.pl
 benchmark.pl
+benchmark-multiline.pl
+benchmark.c
+benchmark-multiline.c
+benchmark-build.sh
+create-random-testdata.sh
+isa.pl
 README
 t/00-load.t
+t/01-roundtrip.t
 t/binary_to_hex.t
 t/hex_to_binary.t
+t/hex_to_binary_to_hex.t
 xt/boilerplate.t
 src/hexsimd.h
 src/hexsimd.c

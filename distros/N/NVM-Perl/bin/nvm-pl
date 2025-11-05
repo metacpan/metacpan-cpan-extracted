@@ -1,0 +1,50 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+use NVMPL::Core;
+use Getopt::Long qw(:config no_ignore_case bundling);
+use feature 'say';
+
+#CLI metadata
+my $VERSION = '0.1.1';
+my $HELP = 0;
+
+# Parse global flags
+GetOptions(
+    'h|help' => \$HELP,
+    'v|version' => sub {say "nvm-pl version $VERSION"; exit 0; },
+) or die "Error parsing options. Try 'nvm-pl --help'\n";
+
+# Print help if no args or --help given
+if ($HELP or !@ARGV) {
+    print <<'HELP';
+Usage: nvm-pl <commands> [options]
+
+Commands:
+    install <version>       Install a Node.js version
+    use <version>           Use a specific Node.js version
+    ls                      List installed Node.js versions
+    ls-remote               List all remote Node.js versions
+    current                 Show the currently active Node.js version
+    uninstall <version>     Remove a specific Node.js version
+    cache clean             Clear cached Node.js tarballs
+
+Global Options:
+    -h, --help              Show this help message
+    -v, --version           Show nvm-pl version
+
+Examples:
+    nvm-pl install 22.3.0
+    nvm-pl use 20
+    nvm-pl ls
+    nvm-pl ls-remote
+HELP
+    exit 0;
+}
+
+# Dispatch command
+my $command = shift @ARGV;
+NVMPL::Core::dispatch($command, @ARGV);

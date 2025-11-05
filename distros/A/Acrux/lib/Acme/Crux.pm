@@ -600,7 +600,7 @@ Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<g
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2024 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2025 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -611,7 +611,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use Carp qw/carp croak/;
 use Time::HiRes qw/gettimeofday tv_interval/;
@@ -624,7 +624,7 @@ use Acrux::RefUtil qw/
         as_array_ref is_array_ref
         is_value is_code_ref is_true_flag
     /;
-use Acrux::Const qw/:dir IS_ROOT/;
+use Acrux::Const qw/:dir/;
 use Acrux::Util qw/load_class trim words/;
 
 use constant {
@@ -704,7 +704,7 @@ sub new {
 
     # Root dir
     my $root = $self->{root};
-    $root = $self->{root} = $pwd if defined($root) && $root eq '.';
+    $root = $self->{root} = $pwd if defined($root) && $root eq '.'; # Set root to cwd if specified as '.'
     unless (defined($root) && length($root)) {
         $root = $self->{root} = File::Spec->catdir(SYSCONFDIR, $moniker);
     }
@@ -772,19 +772,28 @@ sub new {
     # Config file
     my $configfile = $self->{configfile};
     unless (defined($configfile) && length($configfile)) {
-        $self->{configfile} = File::Spec->catfile(IS_ROOT ? $root : $pwd, sprintf("%s.conf", $moniker));
+        $self->{configfile} = $configfile = File::Spec->catfile($root, sprintf("%s.conf", $moniker));
+    }
+    unless (File::Spec->file_name_is_absolute($configfile)) {
+        $self->{configfile} = $configfile = File::Spec->rel2abs($configfile);
     }
 
     # Log file
     my $logfile = $self->{logfile};
     unless (defined($logfile) && length($logfile)) {
-        $self->{logfile} = File::Spec->catfile(IS_ROOT ? $logdir : $pwd, sprintf("%s.log", $moniker));
+        $self->{logfile} = $logfile = File::Spec->catfile($logdir, sprintf("%s.log", $moniker));
+    }
+    unless (File::Spec->file_name_is_absolute($logfile)) {
+        $self->{logfile} = $logfile = File::Spec->rel2abs($logfile);
     }
 
     # PID file
     my $pidfile = $self->{pidfile};
     unless (defined($pidfile) && length($pidfile)) {
-        $self->{pidfile} = File::Spec->catfile(IS_ROOT ? $rundir : $pwd, sprintf("%s.pid", $moniker));
+        $self->{pidfile} = $pidfile = File::Spec->catfile($rundir, sprintf("%s.pid", $moniker));
+    }
+    unless (File::Spec->file_name_is_absolute($pidfile)) {
+        $self->{pidfile} = $pidfile = File::Spec->rel2abs($pidfile);
     }
 
     # Define plugins list to plugin map

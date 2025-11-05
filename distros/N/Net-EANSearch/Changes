@@ -1,5 +1,8 @@
 Revision history for Perl extension Net::EANSearch.
 
+1.10  Tue Nov 4 20:00:00 2025
+	- add more unit tests if an API token is available
+
 1.09  Mon Jul 28 19:27:00 2025
 	- fix the documentation
 

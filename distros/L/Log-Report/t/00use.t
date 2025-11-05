@@ -9,7 +9,6 @@ use Test::More tests => 11;
 # full list of all installed modules.
 my @show_versions =
  qw/
-    Dancer2
     Log::Dispatch
     Log::Log4perl
     Mojolicious

@@ -1,3 +1,7 @@
+0.56.6 2025-11-04 15:41:29 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+  - complete fr.po and it.po files
+
 0.56.5 2025-09-30 17:01:56 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - blank out formData when there is only parentform data in the args

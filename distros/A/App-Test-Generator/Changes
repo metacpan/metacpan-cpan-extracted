@@ -1,5 +1,14 @@
 Revision history for App-Test-Generator
 
+0.13	Tue Nov  4 11:52:49 EST 2025
+	Added better documentation for transforms
+	transform: filled in more types for the foundation set of data
+	Added "value" to the transform keywords
+	Refactored and enabled the code to validate that $module exists and is installed
+	Added deprecation notice about loading configs from perl code
+	Allow yes/no as booleans in schema config settings
+	Fix sprintf issue when the text contains a % sign
+
 0.12	Sun Nov  2 19:38:10 EST 2025
 	undef can now be used to indicate no input or output
 	Sending with no args if now configured using "test_undef" rather than "test_empty"

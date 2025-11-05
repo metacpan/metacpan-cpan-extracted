@@ -24,7 +24,7 @@ constructs a L<Log::Report::Exception|Log::Report::Exception> object first.
 Be aware that this extension does catch the messages to be logged,
 but that the dispatching of the error follows a different route now.
 For instance, you cannot use C<$ENV{MOJO_LOG_LEVEL}> to control the output
-level, but you need to use L<Log::Report::dispatcher()|Log::Report/"Report Production and Configuration"> action C<mode>.
+level, but you need to use L<Log::Report::dispatcher()|Log::Report/"Report production and configuration"> action C<mode>.
 
 Mojo defines five "levels" of messages, which map onto L<Log::Report|Log::Report>'s
 reasons this way:
@@ -49,8 +49,8 @@ Inherited C<%options> C<path> and C<level> are ignored.
 
 =head1 SEE ALSO
 
-This module is part of Log-Report version 1.41,
-built on September 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report version 1.42,
+built on November 04, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

@@ -28,6 +28,7 @@ WriteMakefile(
 		'File::Slurp' => 0,
 		'File::Spec' => 0,
 		'Getopt::Long' => 0,
+		'Module::Load::Conditional' => 0,
 		'Params::Get' => 0.13,
 		'Params::Validate::Strict' => 0.23,
 		'Pod::Usage' => 0,

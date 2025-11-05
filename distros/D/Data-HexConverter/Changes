@@ -30,3 +30,20 @@ Revision history for Data-HexConverter
 
 0.6 2025-11-02
     - added benchmark.pl and testdata.txt
+
+0.61 2025-11-02
+    - changed version number
+
+0.62 2025-11-04
+    - added additional avx512 compile flags
+	   - Makefile.PL
+		- make-dist.mk
+
+0.63 2025-11-04
+    - changes to src/hexsimd.c and Makefile.PL to allow correct compilation on machines with/without avx512 capabilities
+
+0.64 2025-11-04
+	 - added benchmark-multiline
+    - Emit the active SIMD implementation once per run to mirror the original benchmark output (benchmark-multiline.c:135).
+	 - hexsimd.c optimizations
+

@@ -27,7 +27,7 @@ convert other kinds of exception frameworks into our message object.
 
 The C<STRING> is the content of C<$@> after an eval() caught a die().
 croak(), or confess().  This routine tries to convert this into
-parameters for L<Log::Report::report()|Log::Report/"Report Production and Configuration">.  This is done in a very
+parameters for L<Log::Report::report()|Log::Report/"Report production and configuration">.  This is done in a very
 smart way, even trying to find the stringifications of C<$!>.
 
 Returned are four elements: the error string or object which triggered
@@ -78,8 +78,8 @@ Currently supported:
 
 =head1 SEE ALSO
 
-This module is part of Log-Report version 1.41,
-built on September 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report version 1.42,
+built on November 04, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

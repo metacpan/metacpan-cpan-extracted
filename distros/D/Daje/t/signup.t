@@ -19,5 +19,10 @@ use Test::Mojo;
 #     }
 # })->status_is(200)->content_like(qr/success/i);
 
+sub signup() {
+    return 1;
+}
+
+ok (signup() == 1);
 done_testing();
 

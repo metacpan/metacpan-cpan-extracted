@@ -1,0 +1,14 @@
+
+==== version history of distribution Dancer2-Plugin-LogReport
+
+Unless noted otherwise, these changes where initiated and applied by
+Mark Overmeer.
+
+version 2.00: Tue  4 Nov 16:45:48 CET 2025
+
+	Fixes:
+	- do not leak internal error messages to end-users [Andy Beverly]
+
+	Extracted the Dancer modules from the Log-Report and
+	Log-Report-Template distributions.
+

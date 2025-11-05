@@ -84,10 +84,6 @@ Extends L<"Constructors" in Log::Report::Dispatcher|Log::Report::Dispatcher/"Con
 
 =over 4
 
-=item $obj-E<gt>B<close>()
-
-Inherited, see L<Log::Report::Dispatcher/"Constructors">
-
 =item $class-E<gt>B<new>($type, $name, %options)
 
 The Log::Log4perl infrastructure has all settings in a configuration
@@ -96,7 +92,7 @@ Improves base, see L<Log::Report::Dispatcher/"Constructors">
 
  -Option       --Defined in             --Default
   accept         Log::Report::Dispatcher  'ALL'
-  charset        Log::Report::Dispatcher  <C<undef>>
+  charset        Log::Report::Dispatcher  undef
   config                                  <C<undef>>
   format_reason  Log::Report::Dispatcher  'LOWERCASE'
   locale         Log::Report::Dispatcher  <system locale>
@@ -105,7 +101,7 @@ Improves base, see L<Log::Report::Dispatcher/"Constructors">
 
 =over 2
 
-=item accept => REASONS
+=item accept => $reasons|\@reasons
 
 =item charset => CHARSET
 
@@ -177,6 +173,10 @@ Extends L<"Logging" in Log::Report::Dispatcher|Log::Report::Dispatcher/"Logging"
 
 Inherited, see L<Log::Report::Dispatcher/"Logging">
 
+=item $obj-E<gt>B<close>()
+
+Inherited, see L<Log::Report::Dispatcher/"Logging">
+
 =item $any-E<gt>B<collectLocation>()
 
 Inherited, see L<Log::Report::Dispatcher/"Logging">
@@ -185,7 +185,7 @@ Inherited, see L<Log::Report::Dispatcher/"Logging">
 
 Inherited, see L<Log::Report::Dispatcher/"Logging">
 
-=item $obj-E<gt>B<log>(HASH-$of-%options, $reason, $message, $domain)
+=item $obj-E<gt>B<log>(\%options, $reason, $message, $domain)
 
 Inherited, see L<Log::Report::Dispatcher/"Logging">
 
@@ -194,7 +194,7 @@ Inherited, see L<Log::Report::Dispatcher/"Logging">
 Returns a level which is understood by Log::Dispatch, based on
 a translation table.  This can be changed with L<new(to_level)|Log::Report::Dispatcher::Log4perl/"Constructors">.
 
-example: 
+» example: 
 
   use Log::Log4perl     qw/:levels/;
 
@@ -211,7 +211,7 @@ Inherited, see L<Log::Report::Dispatcher/"Logging">
 
 Inherited, see L<Log::Report::Dispatcher/"Logging">
 
-=item $obj-E<gt>B<translate>(HASH-$of-%options, $reason, $message)
+=item $obj-E<gt>B<translate>(\%options, $reason, $message)
 
 Inherited, see L<Log::Report::Dispatcher/"Logging">
 
@@ -227,14 +227,14 @@ Extends L<"DETAILS" in Log::Report::Dispatcher|Log::Report::Dispatcher/"DETAILS"
 
 =item Error: Log4perl level '$level' must be in 0-5
 
-Cast by new()
+Cast by C<new()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Log-Report version 1.41,
-built on September 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report version 1.42,
+built on November 04, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

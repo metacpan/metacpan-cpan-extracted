@@ -3,6 +3,18 @@
 All changes are made by Mark Overmeer <markov@cpan.org> unless
 explicitly stated differently.
 
+version 0.22: Mon 15 Sep 14:43:11 CEST 2025
+
+	Changes:
+	- require 5.016 (2012)
+
+	Fixes:
+	- fix metadata [Mohammad S Anwar]
+
+	Improvements:
+	- convert to OODoc 3.04
+	- add .gitignore
+
 version 0.21: Wed 24 Jan 09:54:03 CET 2018
 
 	Something went wrong with the release upload the GitHUB.  Releases of

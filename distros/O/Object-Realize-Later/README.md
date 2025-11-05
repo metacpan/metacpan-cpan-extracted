@@ -3,8 +3,7 @@
   * My extended documentation: <http://perl.overmeer.net/CPAN/>
   * Development via GitHub: <https://github.com/markov2/perl5-Object-Realize-Later>
   * Download from CPAN: <ftp://ftp.cpan.org/pub/CPAN/authors/id/M/MA/MARKOV/>
-  * Indexed from CPAN: <http://search.cpan.org/~markov/Object-Realize-Later/>
-    and <https://metacpan.org/release/Object-Realize-Later>
+  * Indexed from CPAN: <https://metacpan.org/release/Object-Realize-Later>
 
 The "Object::Realize::Later" class helps with implementing transparent
 on demand realization of object data.  This is related to the tricks

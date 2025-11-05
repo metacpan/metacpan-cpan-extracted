@@ -1,10 +1,7 @@
 ChangeLog
 MANIFEST
 Makefile.PL
-README
 README.md
-lib/Dancer2/Template/TTLogReport.pm
-lib/Dancer2/Template/TTLogReport.pod
 lib/Log/Report/Template.pm
 lib/Log/Report/Template.pod
 lib/Log/Report/Template/Extract.pm
@@ -13,7 +10,6 @@ lib/Log/Report/Template/Textdomain.pm
 lib/Log/Report/Template/Textdomain.pod
 t/01use.t
 t/10templater.t
-t/11extract.t
 t/12filters.t
 t/13modifiers.t
 t/14missing.t

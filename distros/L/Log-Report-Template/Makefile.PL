@@ -4,7 +4,7 @@ use 5.016;
 use warnings;
 use strict;
 
-my $version  = '1.03';
+my $version  = '1.04';
 
 # Use command 'oodist' to produce your whole software release.
 my $git      = "https://github.com/markov2/perl5-Log-Report-Template";
@@ -56,9 +56,8 @@ my %oodist   = (
 );
 
 my %prereq  = (
-	'Test::More'              => 0.86,
 	'Scalar::Util'            => 0,
-	'Log::Report'             => 1.40,
+	'Log::Report'             => 1.42,
 	'Log::Report::Lexicon'    => 1.13,
 	'Template'                => 2.26,
 	'String::Print'           => 0.91,

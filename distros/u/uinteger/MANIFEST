@@ -1,0 +1,14 @@
+.github/workflows/testversions.yml
+^uinteger-[0-9]
+Changes
+lib/uinteger.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+ppport.h
+README.md
+t/uinteger.t
+uinteger.xs
+uinteger_ppp.h
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

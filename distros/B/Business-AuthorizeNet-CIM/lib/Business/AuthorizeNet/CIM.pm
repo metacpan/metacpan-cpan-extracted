@@ -1,5 +1,5 @@
 package Business::AuthorizeNet::CIM;
-$Business::AuthorizeNet::CIM::VERSION = '0.18';
+$Business::AuthorizeNet::CIM::VERSION = '0.19';
 
 # ABSTRACT: Authorize.Net Customer Information Manager (CIM) Web Services API
 
@@ -30,6 +30,147 @@ sub new {
     }
 
     bless $args, $class;
+}
+
+sub createTransactionRequest {
+    my $self       = shift;
+    my $trans_type = shift;
+    my $args       = scalar @_ % 2 ? shift : {@_};
+
+    my $xml;
+    my $writer = XML::Writer->new(OUTPUT => \$xml);
+    $writer->startTag('createTransactionRequest', 'xmlns' => 'AnetApi/xml/v1/schema/AnetApiSchema.xsd');
+    $self->_addAuthentication($writer);
+
+    $writer->dataElement('refId', $args->{refId}) if defined $args->{refId};
+    $writer->startTag('transactionRequest');
+    $writer->dataElement('transactionType', $trans_type);
+    $writer->dataElement('amount',          $args->{amount}) if exists $args->{amount};
+
+    if (exists $args->{opaqueData}) {
+        $writer->startTag('payment');
+        $writer->startTag('opaqueData');
+        foreach my $k (qw/dataDescriptor dataValue/) {
+            $writer->dataElement($k, $args->{opaqueData}->{$k});
+        }
+        $writer->endTag('opaqueData');
+        $writer->endTag('payment');
+    }
+
+    if (exists $args->{customerProfileId} && exists $args->{customerPaymentProfileId}) {
+        $writer->startTag('profile');
+        $writer->dataElement('customerProfileId', $args->{customerProfileId});
+        $writer->startTag('paymentProfile');
+        $writer->dataElement('paymentProfileId', $args->{customerPaymentProfileId});
+        $writer->endTag('paymentProfile');
+        $writer->endTag('profile');
+    }
+
+    if (exists $args->{creditCard}) {
+        $writer->startTag('payment');
+        $writer->startTag('creditCard');
+        foreach my $k ('cardNumber', 'expirationDate', 'cardCode') {
+            $writer->dataElement($k, $args->{creditCard}->{$k})
+                if exists $args->{creditCard}->{$k};
+        }
+        $writer->endTag('creditCard');
+        $writer->endTag('payment');
+    }
+    if (exists $args->{bankAccount}) {
+        $writer->startTag('payment');
+        $writer->startTag('bankAccount');
+        foreach my $k ('accountType', 'routingNumber', 'accountNumber', 'nameOnAccount', 'echeckType', 'bankName', 'checkNumber') {
+            $writer->dataElement($k, $args->{bankAccount}->{$k});
+        }
+        $writer->endTag('bankAccount');
+        $writer->endTag('payment');
+    }
+
+    $writer->dataElement('refTransId', $args->{refTransId})
+        if (exists $args->{refTransId}
+        and ($trans_type eq 'priorAuthCaptureTransaction' or $trans_type eq 'refundTransaction' or $trans_type eq 'voidTransaction'));
+
+    if (exists $args->{order}) {
+        $writer->startTag('order');
+        foreach my $k ('invoiceNumber', 'description') {
+            $writer->dataElement($k, $args->{order}->{$k})
+                if exists $args->{order}->{$k};
+        }
+        $writer->endTag('order');
+    }
+
+    if (exists $args->{lineItems}) {
+        $writer->startTag('lineItems');
+        my @lineItems = (ref($args->{lineItems}) eq 'ARRAY') ? @{$args->{lineItems}} : ($args->{lineItems});
+        foreach my $lineItem (@lineItems) {
+            $writer->startTag('lineItem');
+            foreach my $k ('itemId', 'name', 'description', 'quantity', 'unitPrice', 'taxable') {
+                $writer->dataElement($k, $lineItem->{$k})
+                    if exists $lineItem->{$k};
+            }
+            $writer->endTag('lineItem');
+        }
+        $writer->endTag('lineItems');
+    }
+
+    foreach my $type ('tax', 'shipping', 'duty') {
+        next unless exists $args->{$type};
+        $writer->startTag($type);
+        foreach my $k ('amount', 'name', 'description') {
+            $writer->dataElement($k, $args->{$type}->{$k})
+                if exists $args->{$type}->{$k};
+        }
+        $writer->endTag($type);
+    }
+
+    $writer->dataElement('poNumber',  $args->{poNumber})  if exists $args->{poNumber};
+    $writer->dataElement('taxExempt', $args->{taxExempt}) if exists $args->{taxExempt};
+
+    if (exists $args->{customerId}) {
+        $writer->startTag('customer');
+        $writer->dataElement('id', $args->{customerId});
+        $writer->endTag('customer');
+    }
+
+    my @flds      = ('firstName', 'lastName', 'company', 'address', 'city', 'state', 'zip', 'country');
+    my $bill_addr = exists $args->{billTo} ? $args->{billTo} : $args;
+    if (grep { exists $bill_addr->{$_} } @flds) {
+        $writer->startTag('billTo');
+        foreach my $k (@flds) {
+            $writer->dataElement($k, $bill_addr->{$k})
+                if exists $bill_addr->{$k};
+        }
+        $writer->endTag('billTo');
+    }
+
+    my $ship_addr = exists $args->{shipTo} ? $args->{shipTo} : $args;
+    if (grep { exists $ship_addr->{$_} } @flds) {
+        $writer->startTag('shipTo');
+        foreach my $k (@flds) {
+            $writer->dataElement($k, $ship_addr->{$k})
+                if exists $ship_addr->{$k};
+        }
+        $writer->endTag('shipTo');
+    }
+
+    $writer->dataElement('customerIP', $args->{customerIP}) if exists $args->{customerIP};
+
+    if (exists $args->{transactionSettings}) {
+        $writer->startTag('transactionSettings');
+        foreach my $setting (keys %{$args->{transactionSettings}}) {
+            $writer->startTag('setting');
+            $writer->dataElement('settingName',  $setting);
+            $writer->dataElement('settingValue', $args->{transactionSettings}{$setting});
+            $writer->endTag('setting');
+        }
+        $writer->endTag('transactionSettings');
+    }
+
+    $writer->endTag('transactionRequest');
+    $writer->endTag('createTransactionRequest');
+    $writer->end;
+
+    return $self->_send($xml);
 }
 
 sub _need_payment_profiles_section {
@@ -831,7 +972,7 @@ Business::AuthorizeNet::CIM - Authorize.Net Customer Information Manager (CIM) W
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 SYNOPSIS
 
@@ -892,6 +1033,139 @@ passed to LWP::UserAgent
 L<LWP::UserAgent> or L<WWW::Mechanize> instance
 
 =back
+
+=head3 createTransactionRequest
+
+Create a new payment transaction. This method accepts several payment types.
+
+    $cim->createTransactionRequest(
+        'authCaptureTransaction', # or others like priorAuthCaptureTransaction
+
+        refId => $refId, # optional, reference id
+
+        amount => $amount,
+
+        opaqueData => { # optional
+            dataDescriptor => $dataDescriptor,
+            dataValue => $dataValue,
+        },
+
+        # required for payment profile transactions
+        customerProfileId => $customerProfileId,
+        customerPaymentProfileId => $customerPaymentProfileId,
+
+        creditCard => { # required for credit card transactions
+            cardNumber => $cardNumber,
+            expirationDate => $expirationDate, # YYYY-MM. Send as "XXXX" for refund transactions.
+            cardCode => $cardCode,  # optional
+        },
+
+        bankAccount => { # required for bank account transactions
+            accountType => $accountType, # optional, one of checking, savings, businessChecking
+            routingNumber => $routingNumber,
+            accountNumber => $accountNumber,
+            nameOnAccount => $nameOnAccount,
+            echeckType => $echeckType, # optional, one of PPD, WEB, CCD, TEL, ARC, or BOC.
+            bankName   => $bankName, # optional
+            checkNumber => $checkNumber, # do not send checkNumber unless echeckType is either ARC or BOC.
+        },
+
+        ### required for priorAuthCaptureTransaction, refundTransaction, voidTransaction
+        refTransId => $refTransId,
+
+        order => { # optional
+            invoiceNumber => $invoiceNumber,
+            description => $description,
+        },
+
+        lineItems => [ { # optional
+            itemId => $itemId,
+            name => $name,
+            description => $description,
+            quantity => $quantity,
+            unitPrice => $unitPrice,
+            taxable => $taxable,
+        } ],
+
+        tax => { # optional
+            amount => $tax_amount,
+            name   => $tax_name,
+            description => $tax_description
+        },
+        shipping => { # optional
+            amount => $tax_amount,
+            name   => $tax_name,
+            description => $tax_description
+        },
+        duty => { # optional
+            amount => $tax_amount,
+            name   => $tax_name,
+            description => $tax_description
+        },
+
+        poNumber => $poNumber, # optional
+        taxExempt => 'true' OR 'false', # optional
+        customerId => $customerId, # optional
+
+        billTo => { # optional, all sub items are optional
+            firstName => $firstName,
+            lastName  => $lastName,
+            company   => $company,
+            address   => $address,
+            city      => $city,
+            state     => $state,
+            zip       => $zip,
+            country   => $country
+        },
+
+        shipTo => {
+            firstName => $firstName,
+            lastName  => $lastName,
+            company   => $company,
+            address   => $address,
+            city      => $city,
+            state     => $state,
+            zip       => $zip,
+            country   => $country
+        },
+
+        customerIP => $customerIP,
+
+        transactionSettings => { # for these settings: allowPartialAuth, duplicateWindow, emailCustomer, headerEmailReceipt, footerEmailReceipt, recurringBilling
+            setting => {
+                settingName => $settingName,
+                settingValue => $settingValue
+            }
+        },
+    );
+
+The first argument can be one of
+
+=over 4
+
+=item * authOnlyTransaction
+
+For Authorization Only Transactions
+
+=item * authCaptureTransaction
+
+For Authorization and Capture Transactions
+
+=item * captureOnlyTransaction
+
+For Capture Only Transactions
+
+=item * priorAuthCaptureTransaction
+
+For Prior Authorization and Capture Transactions
+
+=item * refundTransaction
+
+For Refund Transactions
+
+=item * voidTransaction
+
+For Void Transactions
 
 =head3 createCustomerProfile
 
@@ -1000,7 +1274,7 @@ Create a new customer payment profile for an existing customer profile. You can 
             routingNumber => $routingNumber,
             accountNumber => $accountNumber,
             nameOnAccount => $nameOnAccount,
-            echeckType => $echeckType, # Optionaal, one of CCD, PPD, TEL, WEB
+            echeckType => $echeckType, # Optional, one of CCD, PPD, TEL, WEB
             bankName   => $bankName, # Optional
         },
 
@@ -1412,7 +1686,7 @@ Olaf Alders
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Fayland Lam.
+This software is copyright (c) 2025 by Fayland Lam.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

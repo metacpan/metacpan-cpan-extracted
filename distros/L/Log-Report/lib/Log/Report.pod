@@ -83,11 +83,11 @@ which are closely related in one:
 
 =over 4
 
-=item . logging (like L<Log::Log4Perl> and syslog), and
+=item 1. logging (like L<Log::Log4Perl> and syslog), and
 
-=item . exceptions (like error and info), with
+=item 2. exceptions (like 'error' and 'info'), with
 
-=item . translations (like C<gettext> and L<Locale::TextDomain>)
+=item 3. translations (like C<gettext> and L<Locale::TextDomain>)
 
 =back
 
@@ -102,7 +102,7 @@ L<https://perl.overmeer.net/log-report/papers/201306-PerlMagazine-article-en.htm
 
 =head1 FUNCTIONS
 
-=head2 Report Production and Configuration
+=head2 Report production and configuration
 
 =over 4
 
@@ -150,7 +150,7 @@ For both the creation as COMMANDs version of this method, all objects
 involved are returned as LIST, non-existing ones skipped.  In SCALAR
 context with only one name, the one object is returned.
 
-example: play with dispatchers
+» example: play with dispatchers
 
   dispatcher Log::Dispatcher::File => mylog =>,
     accept   => 'MISTAKE-',    # for wrapper
@@ -218,7 +218,7 @@ will not trigger an C<die()>.
 
 Some logged exceptions are fatal, other aren't.  The default usually
 is correct. However, you may want an error to be caught (usually with
-L<try()|Log::Report/"Report Production and Configuration">), redispatch it to syslog, but without it killing the main
+L<try()|Log::Report/"Report production and configuration">), redispatch it to syslog, but without it killing the main
 program.
 
 =item locale => $locale
@@ -243,7 +243,7 @@ Still, the dispatcher needs to be enabled and accept the C<$reason>.
 
 =back
 
-example: for use of L<report()|Log::Report/"Report Production and Configuration">
+» example: for use of L<report()|Log::Report/"Report production and configuration">
 
   # long syntax example
   report TRACE => "start processing now";
@@ -290,7 +290,7 @@ B<Be warned> that the {} are interpreted as subroutine, which means that,
 for instance, it has its own C<@_>.  The manual-page of Try::Tiny
 lists a few more side-effects of this.
 
-example: 
+» example: 
 
   my $x = try { 3/$x };  # mind the ';' !!
   if($@) {               # signals something went wrong
@@ -310,7 +310,7 @@ example:
 
 =head2 Abbreviations for report()
 
-The following functions are all wrappers for calls to L<report()|Log::Report/"Report Production and Configuration">,
+The following functions are all wrappers for calls to L<report()|Log::Report/"Report production and configuration">,
 and available when "syntax is SHORT" (by default, see L<import()|Log::Report/"Configuration">).
 You cannot specify additional options to influence the behavior of
 C<report()>, which are usually not needed anyway.
@@ -410,7 +410,7 @@ later.  The function itself does nothing.  See also L<N__w()|Log::Report/"Messag
 This no-op function is used as label to the xgettext program to build the
 translation tables.
 
-example: how to use N__()
+» example: how to use C<N__()>
 
   # add three msgids to the translation table
   my @colors = (N__"red", N__"green", N__"blue");
@@ -429,7 +429,7 @@ Label to indicate that the two MSGIDs are related, the first as
 single, the seconds as its plural.  Only used to find the text
 fragments to be translated.  The function itself does nothing.
 
-example: how to use L<N__n()|Log::Report/"Messages (optionally translatable)">
+» example: how to use L<N__n()|Log::Report/"Messages (optionally translatable)">
 
   my @save = N__n "save file", "save files";
   my @save = (N__n "save file", "save files");
@@ -439,13 +439,13 @@ example: how to use L<N__n()|Log::Report/"Messages (optionally translatable)">
   print __n @save, $nr_files;  # wrong!
   print __n $save[0], $save[1], @files, %vars;
 
-=item B<N__w>(STRING)
+=item B<N__w>($string)
 
 This extension to the Locale::TextDomain syntax, is a combined
 C<qw> (list of quoted words) and L<N__()|Log::Report/"Messages (optionally translatable)"> into a list of translatable
 words.
 
-example: of L<N__w()|Log::Report/"Messages (optionally translatable)">
+» example: of L<N__w()|Log::Report/"Messages (optionally translatable)">
 
   my @colors = (N__"red", N__"green", N__"blue");
   my @colors = N__w"red green blue";  # same
@@ -463,7 +463,7 @@ If you need options for L<Log::Report::Message::new()|Log::Report::Message/"Cons
 the prototype of this function does not permit parameters: it is a
 prefix operator!
 
-example: how to use __()
+» example: how to use C<__()>
 
   print __"Hello World";      # translated into user's language
   print __'Hello World';      # syntax error!
@@ -485,7 +485,7 @@ However, some languages have more complex schemes than English.
 The C<PAIRS> are options for L<Log::Report::Message::new()|Log::Report::Message/"Constructors"> and variables
 to be filled in.
 
-example: how to use __n()
+» example: how to use C<__n()>
 
   print __n "one", "more", $a;
   print __n("one", "more", $a), "\n";
@@ -510,7 +510,7 @@ the VARIABLES will be filled-in.
 The C<PAIRS> are options for L<Log::Report::Message::new()|Log::Report::Message/"Constructors"> and variables
 to be filled in.
 
-example: how to use __nx()
+» example: how to use C<__nx()>
 
   print __nx "one file", "{_count} files", $nr_files;
   print __nx "one file", "{_count} files", @files;
@@ -527,15 +527,23 @@ Both OPTIONS and VARIABLES are key-value pairs.
 The C<PAIRS> are options for L<Log::Report::Message::new()|Log::Report::Message/"Constructors"> and variables
 to be filled in.
 
+» example: how to use C<__x()>
+
+This is by far the most used message constructor.
+
+  print __x"Name {person.name}", person => $person_obj;
+  error __x"Too many options: max 5, got {count}", count => $c;
+  fault __x"Cannot open file {f}", f => $input_filename;
+
 =item B<__xn>($single_msgid, $plural_msgid, $count, $paurs)
 
 Same as L<__nx()|Log::Report/"Messages (optionally translatable)">, because we have no preferred order for 'x' and 'n'.
 
 =back
 
-=head3 Messages with msgctxt
+=head2 Messages with Context
 
-In L<Log::Report|Log::Report>, the message context (mgsctxt in the PO-files --in the
+In L<Log::Report|Log::Report>, the message context (C<mgsctxt> in the PO-files --in the
 translation tables) can be used in a very powerful way.  Read all about
 it in L<Log::Report::Translator::Context|Log::Report::Translator::Context>
 
@@ -549,7 +557,7 @@ Just for compatibility with Locale::TextDomain and completeness, the
 functions in Locale::TextDomain.
 
 B<Warnings:> Functions C<N__p()> and C<N__np()> seem not to be usable in
-reality, hence not implemented.  The script xgettext-perl and
+reality, hence not implemented.  The script F<xgettext-perl> and
 L<Log::Report::Extract::PerlPPI|Log::Report::Extract::PerlPPI> (both in the L<Log::Report::Lexicon|Log::Report::Lexicon>
 distribution) do not yet support these functions.
 
@@ -635,12 +643,12 @@ also selectively change the output mode, like
 
 The SHORT syntax will add the report abbreviations (like function
 L<error()|Log::Report/"Abbreviations for report()">) to your name-space.  Otherwise, each message must be produced
-with L<report()|Log::Report/"Report Production and Configuration">. C<LONG> is an alternative to C<REPORT>: both do not
+with L<report()|Log::Report/"Report production and configuration">. C<LONG> is an alternative to C<REPORT>: both do not
 pollute your namespace with the useful abbrev functions.
 
 =back
 
-example: of import
+» example: of import
 
   use Log::Report mode => 3;     # '3' or 'DEBUG'
 
@@ -681,7 +689,7 @@ the active dispatchers is collecting messages in the specified level.
 This is useful when the processing of data for the message is relatively
 expensive, but for instance only required in debug mode.
 
-example: 
+» example: 
 
   if(Log::Report->needs('TRACE'))
   {  my @args = ...expensive calculation...;
@@ -700,11 +708,11 @@ syntax.  The three tasks:
 
 =over 4
 
-=item produce some text on a certain condition,
+=item *  produce some text on a certain condition,
 
-=item translate it to the proper language, and
+=item * translate it to the proper language, and
 
-=item deliver it in some way to a user.
+=item * deliver it in some way to a user.
 
 =back
 
@@ -937,7 +945,7 @@ L<Log::Report::Dispatcher/Processing the message>.  However, it should
 behave as you expect: the DEBUG mode shows more than the VERBOSE mode,
 and both show more than the NORMAL mode.
 
-B<. Example: extract run mode from Getopt::Long>
+=head4 Â» Example: extract run mode from Getopt::Long
 
 The C<GetOptions()> function will count the number of C<v> options
 on the command-line when a C<+> is after the option name.
@@ -957,28 +965,29 @@ Now, C<-vv> will set C<$mode> to C<2>, as will C<--verbose 2> and
 C<--verbose=2> and C<--mode=ASSERT>.  Of course, you do not need to
 provide all these options to the user: make a choice.
 
-B<. Example: the mode of a dispatcher>
+=head4 Â» Example: the mode of a dispatcher
 
   my $mode = dispatcher(find => 'myname')->mode;
 
-B<. Example: run-time change mode of a dispatcher>
+=head4 Â» Example: run-time change mode of a dispatcher
 
 To change the running mode of the dispatcher, you can do
+
   dispatcher mode => DEBUG => 'myname';
 
 However, be warned that this does not change the types of messages
 accepted by the dispatcher!  So: probably you will not receive
 the trace, assert, and info messages after all.  So, probably you
 need to replace the dispatcher with a new one with the same name:
+
   dispatcher FILE => 'myname', to => ..., mode => 'DEBUG';
 
 This may reopen connections (depends on the actual dispatcher), which
 might be not what you wish to happened.  In that case, you must take
 the following approach:
 
-  # at the start of your program
-  dispatcher FILE => 'myname', to => ...,
-        accept => 'ALL';    # overrule the default 'NOTICE-' !!
+  # at the start of your program, overrule the default 'NOTICE-' !!
+  dispatcher FILE => 'myname', to => ..., accept => 'ALL';
 
   # now it works
   dispatcher mode => DEBUG => 'myname';    # debugging on
@@ -1015,7 +1024,7 @@ untranslated, with all unprocessed parameters still at hand.
 
 See L<Log::Report::Dispatcher::Try|Log::Report::Dispatcher::Try> and L<Log::Report::Exception|Log::Report::Exception>.
 
-=head2 Comparison
+=head2 Compared to other solutions in Perl
 
 Some notes on differences between the L<Log::Report|Log::Report> approach and other
 Perl concepts.
@@ -1158,66 +1167,66 @@ into the translated text.
 
 =item Error: a message object is reported with more parameters
 
-Cast by report()
+Cast by C<report()>
 
 =item Error: even length parameter list for __x at $where
 
-Cast by __x()
+Cast by C<__x()>
 
 =item Error: message_class $class does not extend $base
 
-Cast by import()
+Cast by C<import()>
 
 =item Error: no domain for configuration options in $fn line $line
 
-Cast by import()
+Cast by C<import()>
 
 =item Error: odd length parameter list with '$msg'
 
-Cast by report()
+Cast by C<report()>
 
 =item Error: odd length parameter list with object '$msg'
 
-Cast by report()
+Cast by C<report()>
 
 =item Error: only one dispatcher name accepted in SCALAR context
 
 In SCALAR context, only one dispatcher name accepted
-The L<dispatcher()|Log::Report/"Report Production and Configuration"> method returns the L<Log::Report::Dispatcher|Log::Report::Dispatcher>
+The L<dispatcher()|Log::Report/"Report production and configuration"> method returns the L<Log::Report::Dispatcher|Log::Report::Dispatcher>
 objects which it has accessed.  When multiple names where given, it
 wishes to return a LIST of objects, not the count of them.
-Cast by dispatcher()
+Cast by C<dispatcher()>
 
 =item Error: syntax flag must be either SHORT or REPORT, not `$flag' in $fn line $line
 
-Cast by import()
+Cast by C<import()>
 
 =item Error: textdomain `$domain' for translator not defined
 
-Cast by import()
+Cast by C<import()>
 
 =item Error: the 'filter' sub-command needs a CODE reference
 
-Cast by dispatcher()
+Cast by C<dispatcher()>
 
 =item Error: the 'needs' sub-command parameter '$need' is not a reason
 
-Cast by dispatcher()
+Cast by C<dispatcher()>
 
 =item Error: token '$token' not recognized as reason
 
-Cast by report()
+Cast by C<report()>
 
 =item Error: translator must be a $pkg object for $domain
 
-Cast by import()
+Cast by C<import()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Log-Report version 1.41,
-built on September 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report version 1.42,
+built on November 04, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

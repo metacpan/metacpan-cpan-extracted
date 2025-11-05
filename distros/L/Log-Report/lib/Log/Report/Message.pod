@@ -80,7 +80,7 @@ Returns a new object which copies info from original, and updates it
 with the specified C<%options> and C<$variables>.  The advantage is that the
 cached translations are shared between the objects.
 
-example: use of clone()
+» example: use of clone()
 
   my $s = __x "found {nr} files", nr => 5;
   my $t = $s->clone(nr => 3);
@@ -276,7 +276,7 @@ return C<undef>, because usually all dispatchers get all messages.
 Lookup the named C<$parameter> for the message.  All pre-defined names
 have their own method which should be used with preference.
 
-example: 
+» example: 
 
 When the message was produced with
 
@@ -320,7 +320,7 @@ to delay translations even longer.  When C<$prepend> is C<true>, the C<STRING>
 or C<$object> (other C<Log::Report::Message>) needs to prepended, otherwise
 it is appended.
 
-example: of concatenation
+» example: of concatenation
 
   print __"Hello" . ' ' . __"World!\n";
   print __("Hello")->concat(' ')->concat(__"World!")->concat("\n");
@@ -337,7 +337,7 @@ matches the Regexp.  The trueth value is the (first matching) class.
 [1.20] When used in combination with a templating system, you may want to
 use C<<content_for => 'HTML'>> in L<Log::Report::Domain::configure(formatter)|Log::Report::Domain/"Attributes">.
 
-example: 
+» example: 
 
   print $msg->toHTML('NL');
 
@@ -473,7 +473,7 @@ L<Log::Report::Dispatcher::Try::wasFatal()|Log::Report::Dispatcher::Try/"Status"
 
 =back
 
-B<. Example: using the _count>
+=head4 Â» Example: using the _count
 
 With Locale::TextDomain, you have to do
 
@@ -564,8 +564,8 @@ In either case, the translation will be looked-up only once.
 
 =head1 SEE ALSO
 
-This module is part of Log-Report version 1.41,
-built on September 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report version 1.42,
+built on November 04, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

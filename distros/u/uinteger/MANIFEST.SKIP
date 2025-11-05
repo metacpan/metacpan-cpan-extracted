@@ -1,0 +1,13 @@
+^.gitignore$
+^\.git/
+^blib/
+~$
+\.o$
+^uinteger\.(c|bs)$
+^MYMETA\.
+^Makefile$
+^pm_to_blib$
+^MANIFEST\.bak$
+\.#
+\#$
+^uinteger-[0-9]

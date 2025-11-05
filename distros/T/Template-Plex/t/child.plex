@@ -1,8 +1,8 @@
 @{[init {
 	inherit "parent.plex";
+  @{[fill_slot header=>"===HEADER==="]};
+  @{[fill_slot footer=>"===FOOTER==="]};
+  @{[fill_slot sub=>cache(undef, \"sub1.plex")]};
 }]}
 ###START OF CHILD 
 ###END OF CHILD
-@{[fill_slot header=>"===HEADER==="]}
-@{[fill_slot footer=>"===FOOTER==="]}
-@{[fill_slot sub=>cache(undef, \"sub1.plex")]}

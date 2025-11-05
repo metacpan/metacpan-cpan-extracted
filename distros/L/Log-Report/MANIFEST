@@ -1,17 +1,7 @@
 ChangeLog
 MANIFEST
 Makefile.PL
-README
 README.md
-examples/dancer/dancer1.pl
-lib/Dancer/Logger/LogReport.pm
-lib/Dancer/Logger/LogReport.pod
-lib/Dancer2/Logger/LogReport.pm
-lib/Dancer2/Logger/LogReport.pod
-lib/Dancer2/Plugin/LogReport.pm
-lib/Dancer2/Plugin/LogReport.pod
-lib/Dancer2/Plugin/LogReport/Message.pm
-lib/Dancer2/Plugin/LogReport/Message.pod
 lib/Log/Report.pm
 lib/Log/Report.pod
 lib/Log/Report/DBIC/Profiler.pm
@@ -63,7 +53,6 @@ t/53log4perl.t
 t/54try.t
 t/55throw.t
 t/60mojo.t
-t/70dancer2.t
 t/DieTests.pm
 xt/99pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

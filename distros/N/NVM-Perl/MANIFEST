@@ -1,0 +1,30 @@
+bin/nvm-pl
+install/node_index_cache.json
+lib/NVMPL/Config.pm
+lib/NVMPL/Core.pm
+lib/NVMPL/Installer.pm
+lib/NVMPL/Platform/Unix.pm
+lib/NVMPL/Platform/Windows.pm
+lib/NVMPL/Remote.pm
+lib/NVMPL/Shell/Bash.pm
+lib/NVMPL/Shell/Cmd.pm
+lib/NVMPL/Shell/PowerShell.pm
+lib/NVMPL/Shell/Zsh.pm
+lib/NVMPL/Switcher.pm
+lib/NVMPL/Uninstaller.pm
+lib/NVMPL/Utils.pm
+LICENSE
+Makefile.PL
+MANIFEST
+nvm-pl.conf
+README.md
+t/00-load.t
+t/01-core.t
+t/02-switch.t
+t/03-shell.t
+t/04-platform.t
+t/05-installer.t
+t/06-remote.t
+t/07-uninstaller.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

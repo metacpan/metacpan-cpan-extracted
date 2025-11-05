@@ -29,7 +29,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '1.09';
+our $VERSION = '1.10';
 
 our $ALL_LANGUAGES = 99;
 our $ENGLISH = 1;
@@ -291,7 +291,7 @@ Relaxed Communications GmbH, E<lt>info@relaxedcommunications.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2024 by Relaxed Communications GmbH, E<lt>info@relaxedcommunications.comE<gt>
+Copyright 2025 by Relaxed Communications GmbH, E<lt>info@relaxedcommunications.comE<gt>
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.30.0 or,

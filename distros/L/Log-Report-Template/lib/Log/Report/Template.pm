@@ -1,5 +1,5 @@
-# This code is part of Perl distribution Log-Report-Template version 1.03.
-# The POD got stripped from this file by OODoc version 3.04.
+# This code is part of Perl distribution Log-Report-Template version 1.04.
+# The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
 # This software is copyright (c) 2017-2025 by Mark Overmeer.
@@ -14,7 +14,7 @@
 #oodist: testing, however the code of this development version may be broken!
 
 package Log::Report::Template;{
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 }
 
 use base 'Template';
@@ -30,7 +30,6 @@ use File::Find        qw/find/;
 use Scalar::Util      qw/blessed/;
 use Template::Filters ();
 use String::Print     ();
-
 
 
 sub new

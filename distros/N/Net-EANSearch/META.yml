@@ -23,5 +23,8 @@ requires:
   MIME::Base64: '0'
   Test::NoWarnings: '0'
   URL::Encode: '0'
-version: '1.09'
+resources:
+  bugtracker: https://github.com/eansearch/perl-ean-search/issues
+  repository: https://github.com/eansearch/perl-ean-search.git
+version: '1.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

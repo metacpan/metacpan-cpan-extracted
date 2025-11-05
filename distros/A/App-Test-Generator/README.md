@@ -4,7 +4,7 @@ App::Test::Generator - Generate fuzz and corpus-driven test harnesses
 
 # VERSION
 
-        Version 0.12
+Version 0.12
 
 # SYNOPSIS
 
@@ -56,83 +56,6 @@ and generates a [Test::Most](https://metacpan.org/pod/Test%3A%3AMost)-based fuzz
 - Functional or OO mode (via `$new`)
 - Reproducible runs via `$seed` and configurable iterations via `$iterations`
 
-## EDGE CASE GENERATION
-
-In addition to purely random fuzz cases, the harness generates
-deterministic edge cases for parameters that declare `min`, `max` or `len` in their schema definitions.
-
-For each constraint, three edge cases are added:
-
-- Just inside the allowable range
-
-    This case should succeed, since it lies strictly within the bounds.
-
-- Exactly on the boundary
-
-    This case should succeed, since it meets the constraint exactly.
-
-- Just outside the boundary
-
-    This case is annotated with `_STATUS = 'DIES'` in the corpus and
-    should cause the harness to fail validation or croak.
-
-Supported constraint types:
-
-- `number`, `integer`
-
-    Uses numeric values one below, equal to, and one above the boundary.
-
-- `string`
-
-    Uses strings of lengths one below, equal to, and one above the boundary.
-
-- `arrayref`
-
-    Uses references to arrays of with the number of elements one below, equal to, and one above the boundary.
-
-- `hashref`
-
-    Uses hashes with key counts one below, equal to, and one above the
-    boundary (`min` = minimum number of keys, `max` = maximum number
-    of keys).
-
-- `memberof` - arrayref of allowed values for a parameter
-
-    This example is for a routine called `input()` that takes two arguments: `status` and `level`.
-    `status` is a string that must have the value `ok`, `error` or `pending`.
-    The `level` argument is an integer that must be one of `1`, `5` or `111`.
-
-        ---
-        input:
-          status:
-            type: string
-            memberof:
-              - ok
-              - error
-              - pending
-          level:
-            type: integer
-            memberof:
-              - 1
-              - 5
-              - 111
-
-    The generator will automatically create test cases for each allowed value (inside the member list),
-    and at least one value outside the list (which should die or `croak`, `_STATUS = 'DIES'`).
-    This works for strings, integers, and numbers.
-
-- `boolean` - automatic boundary tests for boolean fields
-
-        input:
-          flag:
-            type: boolean
-
-    The generator will automatically create test cases for 0 and 1; true and false; off and on, and values that should trigger `_STATUS = 'DIES'`.
-
-These edge cases are inserted automatically, in addition to the random
-fuzzing inputs, so each run will reliably probe boundary conditions
-without relying solely on randomness.
-
 # CONFIGURATION
 
 The configuration file is either a file that can be read by [Config::Abstraction](https://metacpan.org/pod/Config%3A%3AAbstraction) or a **trusted input** Perl file that should set variables with `our`.
@@ -140,6 +63,8 @@ The configuration file is either a file that can be read by [Config::Abstraction
 The documentation here covers the old trusted input style input, but that will go away so you are recommended to use
 [Config::Abstraction](https://metacpan.org/pod/Config%3A%3AAbstraction) files.
 Example: the generator expects your config to use `our %input`, `our $function`, etc.
+
+## SCHEMA
 
 Recognized items:
 
@@ -191,8 +116,6 @@ Recognized items:
 
 - `%transforms` - list of transformations from input sets to output sets
 
-    TO BE IMPLEMENTED.
-
     It takes a list of subsets of the input and output definitions,
     and verifies that data from each input subset is correctly transformed into data from the matching output subset.
 
@@ -201,9 +124,11 @@ Recognized items:
         ---
         module: builtin
         function: abs
-        test_undef: no
-        test_empty: no
-        test_nuls: no
+
+        config:
+          test_undef: no
+          test_empty: no
+          test_nuls: no
 
         input:
           number:
@@ -316,6 +241,157 @@ Recognized items:
     - `test_undef`, test with undefined value (default: 1)
     - `test_empty`, test with empty strings (default: 1)
     - `dedup`, fuzzing can create duplicate tests, go some way to remove duplicates (default: 1)
+
+## OUTPUT
+
+The generated test:
+
+- Seeds RND (if configured) for reproducible fuzz runs
+- Uses edge cases (per-field and per-type) with configurable probability
+- Runs `$iterations` fuzz cases plus appended edge-case runs
+- Validates inputs with Params::Get / Params::Validate::Strict
+- Validates outputs with [Return::Set](https://metacpan.org/pod/Return%3A%3ASet)
+- Runs static `is(... )` corpus tests from Perl and/or YAML corpus
+
+## TRANSFORMS
+
+### Overview
+
+Transforms allow you to define how input data should be transformed into output data.
+This is useful for testing functions that convert between formats, normalize data,
+or apply business logic transformations on a set of data to different set of data.
+
+Transform schemas also have the keyword `value`, when a specific value is required
+
+### Configuration Example
+
+    ---
+    module: Math::Utils
+    function: normalize_number
+
+    input:
+      value:
+        type: number
+        position: 0
+
+    output:
+      type: number
+
+    transforms:
+      positive_stays_positive:
+        input:
+          value:
+            type: number
+            min: 0
+            max: 1000
+        output:
+          type: number
+          min: 0
+          max: 1
+
+      negative_becomes_zero:
+        input:
+          value:
+            type: number
+            max: 0
+        output:
+          type: number
+          value: 0
+
+      preserves_zero:
+        input:
+          value:
+            type: number
+            value: 0
+        output:
+          type: number
+          value: 0
+
+### Transform Validation Rules
+
+For each transform:
+1\. Generate test cases using the transform's input schema
+2\. Call the function with those inputs
+3\. Validate the output matches the transform's output schema
+4\. If output has a specific 'value', check exact match
+5\. If output has constraints (min/max), validate within bounds
+
+## EDGE CASE GENERATION
+
+In addition to purely random fuzz cases, the harness generates
+deterministic edge cases for parameters that declare `min`, `max` or `len` in their schema definitions.
+
+For each constraint, three edge cases are added:
+
+- Just inside the allowable range
+
+    This case should succeed, since it lies strictly within the bounds.
+
+- Exactly on the boundary
+
+    This case should succeed, since it meets the constraint exactly.
+
+- Just outside the boundary
+
+    This case is annotated with `_STATUS = 'DIES'` in the corpus and
+    should cause the harness to fail validation or croak.
+
+Supported constraint types:
+
+- `number`, `integer`
+
+    Uses numeric values one below, equal to, and one above the boundary.
+
+- `string`
+
+    Uses strings of lengths one below, equal to, and one above the boundary.
+
+- `arrayref`
+
+    Uses references to arrays of with the number of elements one below, equal to, and one above the boundary.
+
+- `hashref`
+
+    Uses hashes with key counts one below, equal to, and one above the
+    boundary (`min` = minimum number of keys, `max` = maximum number
+    of keys).
+
+- `memberof` - arrayref of allowed values for a parameter
+
+    This example is for a routine called `input()` that takes two arguments: `status` and `level`.
+    `status` is a string that must have the value `ok`, `error` or `pending`.
+    The `level` argument is an integer that must be one of `1`, `5` or `111`.
+
+        ---
+        input:
+          status:
+            type: string
+            memberof:
+              - ok
+              - error
+              - pending
+          level:
+            type: integer
+            memberof:
+              - 1
+              - 5
+              - 111
+
+    The generator will automatically create test cases for each allowed value (inside the member list),
+    and at least one value outside the list (which should die or `croak`, `_STATUS = 'DIES'`).
+    This works for strings, integers, and numbers.
+
+- `boolean` - automatic boundary tests for boolean fields
+
+        input:
+          flag:
+            type: boolean
+
+    The generator will automatically create test cases for 0 and 1; true and false; off and on, and values that should trigger `_STATUS = 'DIES'`.
+
+These edge cases are inserted automatically, in addition to the random
+fuzzing inputs, so each run will reliably probe boundary conditions
+without relying solely on randomness.
 
 # EXAMPLES
 
@@ -467,17 +543,11 @@ This example takes you through testing the online\_render method of [HTML::Genea
             env:
               AUTOMATED_TESTING: 1
 
-# OUTPUT
+# METHODS
 
-By default, writes `t/fuzz.t`.
-The generated test:
+    generate($schema_file, $test_file)
 
-- Seeds RND (if configured) for reproducible fuzz runs
-- Uses edge cases (per-field and per-type) with configurable probability
-- Runs `$iterations` fuzz cases plus appended edge-case runs
-- Validates inputs with Params::Get / Params::Validate::Strict
-- Validates outputs with [Return::Set](https://metacpan.org/pod/Return%3A%3ASet)
-- Runs static `is(... )` corpus tests from Perl and/or YAML corpus
+Takes a schema file and produces a test file (or STDOUT).
 
 # NOTES
 
@@ -495,6 +565,6 @@ The generated test:
 
 Nigel Horne, `<njh at nigelhorne.com>`
 
-Portions of this module's design and documentation were created with the
+Portions of this module's initial design and documentation were created with the
 assistance of [ChatGPT](https://openai.com/) (GPT-5), with final curation
 and authorship by Nigel Horne.

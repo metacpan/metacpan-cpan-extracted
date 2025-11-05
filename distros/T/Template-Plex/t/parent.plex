@@ -6,6 +6,7 @@
 @{[slot "header"]}
 
 @{[slot]}
+
 @{[slot "footer"]}
 
 @{[slot "sub"]}

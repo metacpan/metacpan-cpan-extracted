@@ -1,5 +1,5 @@
-# This code is part of Perl distribution Log-Report version 1.41.
-# The POD got stripped from this file by OODoc version 3.04.
+# This code is part of Perl distribution Log-Report version 1.42.
+# The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
 # This software is copyright (c) 2007-2025 by Mark Overmeer.
@@ -13,14 +13,8 @@
 #oodist: during its release in the distribution.  You can use this file for
 #oodist: testing, however the code of this development version may be broken!
 
-#oorestyle: not found P for method type($type)
-
-# This code is part of distribution Log-Report. Meta-POD processed with
-# OODoc into POD and HTML manual-pages.  See README.md
-# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
-
 package Log::Report::Dispatcher;{
-our $VERSION = '1.41';
+our $VERSION = '1.42';
 }
 
 
@@ -101,14 +95,6 @@ sub init($)
 	$self;
 }
 
-
-sub close()
-{	my $self = shift;
-	$self->{closed}++ and return undef;
-	$self->{disabled}++;
-	$self;
-}
-
 sub DESTROY { in_global_destruction or shift->close }
 
 #--------------------
@@ -163,6 +149,14 @@ sub needs(;$)
 }
 
 #--------------------
+
+sub close()
+{	my $self = shift;
+	$self->{closed}++ and return undef;
+	$self->{disabled}++;
+	$self;
+}
+
 
 sub log($$$$)
 {	panic "method log() must be extended per back-end";

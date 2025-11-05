@@ -7,6 +7,15 @@ Mark Overmeer.
 TODO:
 	. connect to Message::Passing framework
 
+version 1.42: Tue  4 Nov 10:24:16 CET 2025
+
+	Changes:
+	- the Dancer* modules moved to separate distribution Dancer2-Plugin-LogReport
+
+	Fixes:
+	- report to multiple dispatchers
+	  [Sam Kington] github issue #17
+
 version 1.41: Thu 11 Sep 13:01:50 CEST 2025
 
 	Changes:

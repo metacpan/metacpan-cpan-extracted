@@ -1,0 +1,50 @@
+---
+abstract: 'logging, exceptions and translations in Dancer2 via Log::Report'
+author:
+  - 'Mark Overmeer <markov@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '1'
+  Test::Pod: '1'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Plugin-LogReport
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Dancer2: '0.207'
+  Log::Report: '1.42'
+  Scalar::Util: '0'
+resources:
+  homepage: http://perl.overmeer.net/CPAN/
+  repository: https://github.com/markov2/perl5-Dancer2-Plugin-LogReport.git
+version: '2.00'
+x_oodist:
+  email: markov@cpan.org
+  first_year: 2015
+  generate:
+    -
+      format: pod3
+      podtail: ~
+  include:
+    - ../Log-Report
+  oodoc_version: 3.04
+  parser:
+    pmhead: ~
+    skip_links: []
+    syntax: markov
+  raw:
+    publish: ../public_html/dancer2-plugin-logreport/raw
+  release:
+    publish: ../public_html/dancer2-plugin-logreport/source
+  tests: {}
+  use: []
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

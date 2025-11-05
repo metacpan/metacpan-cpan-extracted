@@ -20,7 +20,7 @@ Log::Report::Template - Template Toolkit with translations
 
 This module extends Template, which is the core of Template Toolkit.
 The main addition is support for translations via the translation
-framework offered by Log::Report.
+framework offered by L<Log::Report|Log::Report>.
 
 You add translations to a template system, by adding calls to some
 translation function (by default called C<loc()>) to your template text.
@@ -28,8 +28,8 @@ That function will perform dark magic to collect the translation from
 translation tables, and fill in values.  For instance:
 
   [% price = 3.14 %]
-  <div>Price: [% price %]</div>          # no translation
-  <div>[% loc("Price: {price}") %]</div> # translation optional
+  E<lt>divE<gt>Price: [% price %]E<lt>/divE<gt>          # no translation
+  E<lt>divE<gt>[% loc("Price: {price}") %]E<lt>/divE<gt> # translation optional
 
 It's quite a lot of work to make your templates translatable.
 Please read the L</DETAILS> section before you start using this module.
@@ -59,9 +59,9 @@ forking.
 
 =over 2
 
-=item modifiers => ARRAY
+=item modifiers => \@modifiers
 
-Add a list of modifiers to the default set.  Modifiers are part of the
+Add C<@modifiers> to the default set.  Modifiers are part of the
 formatting process, when values get inserted in the translated string.
 Read L</"Formatter value modifiers">.
 
@@ -120,7 +120,7 @@ The (domain) C<name> must be unique, and the C<function> not yet in use.
 When the code also uses this textdomain, then that configuration will
 get extended with this configuration.
 
-example: 
+» example: 
 
   my $domain = $templater->addTextdomain(
     name     => 'my-project',
@@ -140,7 +140,7 @@ Returns a LIST with all defined textdomains, unsorted.
 Extract message ids from the templates, and register them to the lexicon.
 Read section L</"Extracting PO-files"> how to use this method.
 
-Show statistics will be show when the Log::Report more is VERBOSE or
+Show statistics will be show when the L<Log::Report|Log::Report> more is VERBOSE or
 DEBUG.
 
  -Option        --Default
@@ -158,7 +158,7 @@ DEBUG.
 Process all files from the INCLUDE_PATH directories which match this
 regular expression.
 
-=item filenames => FILENAME|ARRAY
+=item filenames => $file|\@files
 
 By default, all filenames from the INCLUDE_PATH directories which match
 the C<filename_match> are processed, but you may explicitly create a
@@ -183,10 +183,10 @@ needed.  A few TT filters are provided to easy the process.
 
 A typical example of an HTML component which needs translation is
 
-  <tr><td>Price:</td><td>20 £</td></tr>
+  E<lt>trE<gt>E<lt>tdE<gt>Price:E<lt>/tdE<gt>E<lt>tdE<gt>20 £E<lt>/tdE<gt>E<lt>/trE<gt>
 
 Both the price text as value need to be translated.  In plain perl
-(with Log::Report) you would write
+(with L<Log::Report|Log::Report>) you would write
 
   __x"Price: {price £}", price => $product->price   # or
   __x"Price: {p.price £}", p => $product;
@@ -200,7 +200,7 @@ is a modifier.  The translation for Dutch (via a PO table) could be
 
 SO: we want to get both table fields in one translation.  Try this:
 
-  <tr>[% loc("Price:\t{p.price £}" | cols %]</tr>
+  E<lt>trE<gt>[% loc("Price:\t{p.price £}" | cols %]E<lt>/trE<gt>
 
 In the translation table, you have to place the tabs (backslash-t) as
 well.
@@ -211,13 +211,13 @@ pass 'cols' a list of container names.  The fields in the input string
 container name will be reused for all remaining columns.  By default,
 everything is wrapped in 'td' containers.
 
-  "a\tb\tc" | cols             <td>a</td><td>b</td><td>c</td>
+  "a\tb\tc" | cols             E<lt>tdE<gt>aE<lt>/tdE<gt>E<lt>tdE<gt>bE<lt>/tdE<gt>E<lt>tdE<gt>cE<lt>/tdE<gt>
   "a\tb\tc" | cols('td')       same
-  "a\tb\tc" | cols('th', 'td') <th>a</th><td>b</td><td>c</td>
-  "a"       | cols('div')      <div>a</div>
-  loc("a")  | cols('div')      <div>xxxx</div>
+  "a\tb\tc" | cols('th', 'td') E<lt>thE<gt>aE<lt>/thE<gt>E<lt>tdE<gt>bE<lt>/tdE<gt>E<lt>tdE<gt>cE<lt>/tdE<gt>
+  "a"       | cols('div')      E<lt>divE<gt>aE<lt>/divE<gt>
+  loc("a")  | cols('div')      E<lt>divE<gt>xxxxE<lt>/divE<gt>
 
-The second form has one pattern, which contains (at least one) '$1'
+The second form has one pattern, which contains (at least one) C<$1>
 replacement positions.  Missing columns for positional parameters
 will be left blank.
 
@@ -228,7 +228,7 @@ will be left blank.
 =item Filter: br
 
 Some translations will produce more than one line of text.  Add
-'<br>' after each of them.
+'E<lt>brE<gt>' after each of them.
 
   [% loc('intro-text') | br %]
   [% | br %][% intro_text %][% END %]
@@ -319,7 +319,7 @@ collect the error like this:
      or die $tt->error;
 
 When the 'procesing_errors' option is set to 'EXCEPTION', the error is
-translated into a Log::Report::Exception:
+translated into a L<Log::Report::Exception|Log::Report::Exception>:
 
   use Log::Report;
   try { $tt->process($template_fn, $vars, ...) };
@@ -343,7 +343,7 @@ This module uses standard gettext PO-translation tables via the
 L<Log::Report::Lexicon|Log::Report::Lexicon> distribution.  An important role here is
 for the 'textdomain': the name of the set of translation tables.
 
-For code, you say "use Log::Report '<textdomain>;" in each related
+For code, you say "use L<Log::Report|Log::Report> '<textdomain>;" in each related
 module (pm file).  We cannot do achieve comparible syntax with
 Template Toolkit: you must specify the textdomain before the
 templates get processed.
@@ -351,7 +351,7 @@ templates get processed.
 Your website may contain multiple separate sets of templates.  For
 instance, a standard website implementation with some local extensions.
 The only way to get that to work, is by using different translation
-functions: one textdomain may use 'loc()', where an other uses 'L()'.
+functions: one textdomain may use 'loc()', where an other uses 'trans()'.
 
 =head3 Integration with Template::Toolkit
 
@@ -439,7 +439,7 @@ As examples
   [% | loc(size) %]one person|{_count} people[% END %]
   [% 'one person|{_count} people' | loc(size) %]
 
-These syntaxes work exacly like translations with Log::Report for your
+These syntaxes work exacly like translations with L<Log::Report|Log::Report> for your
 Perl programs.  Compare this with:
 
   __x"hi {n}", n => name;    # equivalent to
@@ -460,13 +460,13 @@ may try to avoid repeated computation.  In the follow example, "soldOn"
 is collected/computed twice:
 
   [% IF product.soldOn %]
-  <td>[% loc("Sold on {product.soldOn DATE}")</td>
+  E<lt>tdE<gt>[% loc("Sold on {product.soldOn DATE}")E<lt>/tdE<gt>
   [% END %]
 
 The performance is predictable optimal with:
 
   [% sold_on = product.soldOn; IF sold_on %]
-  <td>[% loc("Sold on {sold_on DATE}")</td>
+  E<lt>tdE<gt>[% loc("Sold on {sold_on DATE}")E<lt>/tdE<gt>
   [% END %]
 
 =head3 Translation into HTML
@@ -475,26 +475,26 @@ Usually, when data is passed from the program's internal to the template,
 it should get encoded into HTML to escape some characters.  Typical TT
 code:
 
-  Title&gt; [% title | html %]
+  Title: [% title | html %]
 
 When your insert is produced by the localizer, you can do this as well
 (set C<template_syntax> to 'UNKNOWN' first)
 
-  [% loc("Title> {t}", t => title) | html %]
+  [% loc("Title: {t}", t => title) | html %]
 
 The default TT syntax is 'HTML', which will circumvent the need to
 use the html filter.  In that default case, you only say:
 
-  [% loc("Title> {t}", t => title) %]
-  [% loc("Title> {title}") %]  # short form, see previous section
+  [% loc("Title: {t}", t => title) %]
+  [% loc("Title: {title}") %]  # short form, see previous section
 
 When the title is already escaped for HTML, you can circumvent that
 by using tags which end on 'html':
 
-  [% loc("Title> {t_html}", t_html => title) %]
+  [% loc("Title: {t_html}", t_html => title) %]
 
   [% SET title_html = html(title) %]
-  [% loc("Title> {title_html}") %]
+  [% loc("Title: {title_html}") %]
 
 =head2 Extracting PO-files
 
@@ -595,7 +595,7 @@ shipped with the L<Log::Report::Lexicon|Log::Report::Lexicon> distribution.
 PO-files are quite large.  You can reduce the translation table size by
 creating a binary "MO"-file for each of them. L<Log::Report::Lexicon|Log::Report::Lexicon>
 will prefer mo files, if it encounters them, but generation is not (yet)
-organized via Log::Report components.  Search for "msgfmt" as separate
+organized via L<Log::Report|Log::Report> components.  Search for "msgfmt" as separate
 tool or CPAN module.
 
 =head1 DIAGNOSTICS
@@ -604,22 +604,22 @@ tool or CPAN module.
 
 =item Error: directory $dir not in INCLUDE_PATH, used by $option
 
-Cast by addTextdomain()
+Cast by C<addTextdomain()>
 
 =item Error: illegal value '$value' for 'processing_errors' option
 
-Cast by new()
+Cast by C<new()>
 
 =item Error: translation function '$func' already in use by textdomain '$name'
 
-Cast by addTextdomain()
+Cast by C<addTextdomain()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Log-Report-Template version 1.03,
-built on September 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report-Template version 1.04,
+built on November 04, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

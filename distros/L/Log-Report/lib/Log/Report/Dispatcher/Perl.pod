@@ -43,22 +43,22 @@ Extends L<"DETAILS" in Log::Report::Dispatcher|Log::Report::Dispatcher/"DETAILS"
 
 =item Error: Perl does not support charset $cs
 
-Cast by new()
+Cast by C<new()>
 
 =item Alert: cannot use class $backend:\n$@: $!
 
-Cast by new()
+Cast by C<new()>
 
 =item Error: illegal format_reason '$format' for dispatcher
 
-Cast by new()
+Cast by C<new()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Log-Report version 1.41,
-built on September 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report version 1.42,
+built on November 04, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

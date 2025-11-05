@@ -1,0 +1,20 @@
+ChangeLog
+MANIFEST
+Makefile.PL
+README.md
+examples/dancer/dancer1.pl
+lib/Dancer/Logger/LogReport.pm
+lib/Dancer/Logger/LogReport.pod
+lib/Dancer2/Logger/LogReport.pm
+lib/Dancer2/Logger/LogReport.pod
+lib/Dancer2/Plugin/LogReport.pm
+lib/Dancer2/Plugin/LogReport.pod
+lib/Dancer2/Plugin/LogReport/Message.pm
+lib/Dancer2/Plugin/LogReport/Message.pod
+lib/Dancer2/Template/TTLogReport.pm
+lib/Dancer2/Template/TTLogReport.pod
+t/00use.t
+t/70dancer2.t
+xt/99pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

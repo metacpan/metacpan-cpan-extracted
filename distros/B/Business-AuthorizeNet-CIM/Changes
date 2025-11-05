@@ -1,5 +1,8 @@
 Revision history for Perl extension Business-AuthorizeNet-CIM
 
+0.19    2025-11-04
+        Add createTransactionRequest method (aklajda)
+
 0.18    2024-08-23
         Allow for opaqueData to be sent through certain customer & payment profile requests (cblake777)
 

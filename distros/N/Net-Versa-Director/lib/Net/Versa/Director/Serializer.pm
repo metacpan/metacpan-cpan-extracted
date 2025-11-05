@@ -1,5 +1,5 @@
 package Net::Versa::Director::Serializer;
-$Net::Versa::Director::Serializer::VERSION = '0.003000';
+$Net::Versa::Director::Serializer::VERSION = '0.004000';
 # ABSTRACT: Versa Director REST API serializer
 
 use v5.36;
@@ -50,7 +50,7 @@ Net::Versa::Director::Serializer - Versa Director REST API serializer
 
 =head1 VERSION
 
-version 0.003000
+version 0.004000
 
 =head1 AUTHOR
 

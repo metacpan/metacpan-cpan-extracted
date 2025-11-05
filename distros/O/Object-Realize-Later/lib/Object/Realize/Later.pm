@@ -1,14 +1,21 @@
-# Copyrights 2001-2018 by [Mark Overmeer].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.02.
-# This code is part of distribution Object-Realize-Later.  Meta-POD processed
-# with OODoc into POD and HTML manual-pages.  See README.md
-# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
+# This code is part of Perl distribution Object-Realize-Later version 0.22.
+# The POD got stripped from this file by OODoc version 3.05.
+# For contributors see file ChangeLog.
 
-package Object::Realize::Later;
-use vars '$VERSION';
-$VERSION = '0.21';
+# This software is copyright (c) 2001-2025 by Mark Overmeer.
+
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
+#oodist: *** DO NOT USE THIS VERSION FOR PRODUCTION ***
+#oodist: This file contains OODoc-style documentation which will get stripped
+#oodist: during its release in the distribution.  You can use this file for
+#oodist: testing, however the code of this development version may be broken!
+
+package Object::Realize::Later;{
+our $VERSION = '0.22';
+}
 
 
 use Carp;
@@ -18,15 +25,16 @@ use warnings;
 use strict;
 no strict 'refs';
 
+#--------------------
 
 my $named  = 'ORL_realization_method';
 my $helper = 'ORL_fake_realized';
 
 
 sub init_code($)
-{   my $args    = shift;
+{	my $args    = shift;
 
-    <<INIT_CODE;
+	<<INIT_CODE;
   package $args->{class};
   require $args->{source_module};
 
@@ -35,9 +43,9 @@ INIT_CODE
 }
 
 sub isa_code($)
-{   my $args    = shift;
+{	my $args    = shift;
 
-    <<ISA_CODE;
+	<<ISA_CODE;
   sub isa(\$)
   {   my (\$thing, \$what) = \@_;
       return 1 if \$thing->SUPER::isa(\$what);  # real dependency?
@@ -48,10 +56,10 @@ ISA_CODE
 
 
 sub can_code($)
-{   my $args = shift;
-    my $becomes = $args->{becomes};
+{	my $args = shift;
+	my $becomes = $args->{becomes};
 
-    <<CAN_CODE;
+	<<CAN_CODE;
   sub can(\$)
   {   my (\$thing, \$method) = \@_;
       my \$func;
@@ -72,9 +80,9 @@ CAN_CODE
 
 
 sub AUTOLOAD_code($)
-{   my $args   = shift;
+{	my $args   = shift;
 
-    <<'CODE1' . ($args->{believe_caller} ? '' : <<NOT_BELIEVE) . <<CODE2;
+	<<'CODE1' . ($args->{believe_caller} ? '' : <<NOT_BELIEVE) . <<CODE2;
   our $AUTOLOAD;
   sub AUTOLOAD(@)
   {  my $call = substr $AUTOLOAD, rindex($AUTOLOAD, ':')+1;
@@ -98,116 +106,117 @@ CODE2
 
 
 sub realize_code($)
-{   my $args   = shift;
-    my $pkg    = __PACKAGE__;
-    my $argspck= join "'\n         , '", %$args;
+{	my $args    = shift;
+	my $pkg     = __PACKAGE__;
+	my $argspck = join "'\n         , '", %$args;
 
-    <<REALIZE_CODE .($args->{warn_realization} ? <<'WARN' : '') .<<REALIZE_CODE;
+	<<REALIZE_CODE .($args->{warn_realization} ? <<'WARN' : '') . <<REALIZE_CODE;
   sub forceRealize(\$)
   {
 REALIZE_CODE
-      require Carp;
-      Carp::carp("Realization of $_[0]");
+	require Carp;
+	Carp::carp("Realization of $_[0]");
 WARN
-      ${pkg}->realize
-        ( ref_object => \\\${_[0]}
-        , caller     => [ caller 1 ]
-        , '$argspck'
-        );
+	${pkg}->realize(
+		ref_object => \\\${_[0]},
+		caller     => [ caller 1 ],
+		'$argspck'
+	);
   }
 REALIZE_CODE
 }
 
 
 sub will_realize_code($)
-{   my $args = shift;
-    my $becomes = $args->{becomes};
-    <<WILL_CODE;
+{	my $args = shift;
+	my $becomes = $args->{becomes};
+	<<WILL_CODE;
 sub willRealize() {'$becomes'}
 WILL_CODE
 }
 
+#--------------------
 
 sub realize(@)
-{   my ($class, %args) = @_;
-    my $object  = ${$args{ref_object}};
-    my $realize = $args{realize};
+{	my ($class, %args) = @_;
+	my $object  = ${$args{ref_object}};
+	my $realize = $args{realize};
 
-    my $already = $class->realizationOf($object);
-    if(defined $already && ref $already ne ref $object)
-    {   if($args{warn_realize_again})
-        {   my (undef, $filename, $line) = @{$args{caller}};
-            warn "Attempt to realize object again: old reference caught at $filename line $line.\n"
-        }
+	my $already = $class->realizationOf($object);
+	if(defined $already && ref $already ne ref $object)
+	{	if($args{warn_realize_again})
+		{	my (undef, $filename, $line) = @{$args{caller}};
+			warn "Attempt to realize object again: old reference caught at $filename line $line.\n"
+		}
 
-        return ${$args{ref_object}} = $already;
-    }
+		return ${$args{ref_object}} = $already;
+	}
 
-    my $loaded  = ref $realize ? $realize->($object) : $object->$realize;
+	my $loaded  = ref $realize ? $realize->($object) : $object->$realize;
 
-    warn "Load produces a ".ref($loaded)
-       . " where a $args{becomes} is expected.\n"
-           unless $loaded->isa($args{becomes});
+	$loaded->isa($args{becomes})
+		or warn "Load produces a ".ref($loaded) . " where a $args{becomes} is expected.\n";
 
-    ${$args{ref_object}} = $loaded;
-    $class->realizationOf($object, $loaded);
-} 
+	${$args{ref_object}} = $loaded;
+	$class->realizationOf($object, $loaded);
+}
 
 
 my %realization;
 
 sub realizationOf($;$)
-{   my ($class, $object) = (shift, shift);
-    my $unique = "$object";
+{	my ($class, $object) = (shift, shift);
+	my $unique = "$object";
 
-    if(@_)
-    {   $realization{$unique} = shift;
-        weaken $realization{$unique};
-    }
+	if(@_)
+	{	$realization{$unique} = shift;
+		weaken $realization{$unique};
+	}
 
-    $realization{$unique};
+	$realization{$unique};
 }
 
 
 sub import(@)
-{   my ($class, %args) = @_;
+{	my ($class, %args) = @_;
 
-    confess "Require 'becomes'" unless $args{becomes};
-    confess "Require 'realize'" unless $args{realize};
+	confess "Require 'becomes'" unless $args{becomes};
+	confess "Require 'realize'" unless $args{realize};
 
-    $args{class}                = caller;
-    $args{warn_realization}   ||= 0;
-    $args{warn_realize_again} ||= 0;
-    $args{source_module}      ||= $args{becomes};
+	$args{class}                = caller;
+	$args{warn_realization}   ||= 0;
+	$args{warn_realize_again} ||= 0;
+	$args{source_module}      ||= $args{becomes};
 
-    # A reference to code will stringify at the eval below.  To solve
-    # this, it is tranformed into a call to a named subroutine.
-    if(ref $args{realize} eq 'CODE')
-    {   my $named_method = "$args{class}::$named";
-        *{$named_method} = $args{realize};
-        $args{realize}   = $named_method;
-    }
+	# A reference to code will stringify at the eval below.  To solve
+	# this, it is tranformed into a call to a named subroutine.
+	if(ref $args{realize} eq 'CODE')
+	{	my $named_method = "$args{class}::$named";
+		*{$named_method} = $args{realize};
+		$args{realize}   = $named_method;
+	}
 
-    # Produce the code
+	# Produce the code
 
-    my $args = \%args;
-    my $eval
-       = init_code($args)
-       . isa_code($args)
-       . can_code($args)
-       . AUTOLOAD_code($args)
-       . realize_code($args)
-       . will_realize_code($args)
-       ;
+	my $args = \%args;
+	my $eval
+		= init_code($args)
+		. isa_code($args)
+		. can_code($args)
+		. AUTOLOAD_code($args)
+		. realize_code($args)
+		. will_realize_code($args)
+		;
 #warn $eval;
 
-    # Install the code
+	# Install the code
 
-    eval $eval;
-    die $@ if $@;
+	eval $eval;
+	die $@ if $@;
 
-    1;
+	1;
 }
 
+#--------------------
 
 1;

@@ -3,7 +3,7 @@ package Template::Plex;
 use strict;
 use warnings;
 
-our $VERSION = 'v0.9.3';
+our $VERSION = 'v0.9.4';
 use feature qw<say refaliasing>;
 no warnings "experimental";
 
@@ -36,6 +36,7 @@ sub new {
   $self->[slots_]={};
 	bless $self, $package;
 }
+
 sub get_cache {
 	$_[0][cache_];
 }
@@ -255,8 +256,9 @@ sub slot {
 	my ($self, $slot_name, $default_value)=@_;
 	$slot_name//="default";	#If no name assume default
 
+  my $root=$self->find_root; 
 	DEBUG and Log::OK::TRACE and log_trace __PACKAGE__.": Template called slot: $slot_name";
-	my $data=$self->[slots_]{$slot_name};
+	my $data=$root->[slots_]{$slot_name};
 	my $output="";
 	
 	$data//=$default_value;
@@ -281,7 +283,8 @@ sub slot {
 
 sub fill_slot {
 	my ($self)=shift;
-	my $parent=$self->[parent_]//$self;
+  #my $parent=$self->[parent_]//$self;
+	my $parent=$self->find_root;
 	unless($parent){
 		DEBUG and Log::OK::WARN and log_warn __PACKAGE__.": No parent setup for: ". $self->meta->{file};
 		return;
@@ -299,43 +302,42 @@ sub fill_slot {
 		#	$parent->[slots_]{$k}=$v;
 		#}
 
-		my %fillers=@_;
-		for (keys %fillers){
-      # Only fill the slot if it doesn't have a value
-      $parent->[slots_]{$_}=$fillers{$_};
-		}
+    for(my $i=0; $i<@_; $i+=2){
+      $parent->[slots_]{$_[$i]}=$_[$i+1];
+    }
+
 	}
 	"";
 }
 
 sub append_slot {
   my($self)=shift;
-	my $parent=$self->[parent_]//$self;
+  #my $parent=$self->[parent_]//$self;
+	my $parent=$self->find_root;
   unless($parent){
 
     DEBUG and Log::OK::WARN and log_warn __PACKAGE__.": No parent setup for ". $self->meta->{file};
     return
   }
   else{
-    my %fillers=@_;
-    for(keys %fillers){
-      $parent->[slots_]{$_}.=$fillers{$_};
+    for(my $i=0; $i<@_; $i+=2){
+      $parent->[slots_]{$_[$i]}.=$_[$i+1];
     }
   }
 }
 
 sub prepend_slot {
   my($self)=shift;
-  my $parent=$self->[parent_]//$self;
+  #my $parent=$self->[parent_]//$self;
+	my $parent=$self->find_root;
   unless($parent){
 
     DEBUG and Log::OK::WARN and log_warn __PACKAGE__.": No parent setup for ". $self->meta->{file};
     return
   }
   else{
-    my %fillers=@_;
-    for(keys %fillers){
-      $parent->[slots_]{$_}=$fillers{$_}.$parent->[slots_]{$_};
+    for(my $i=0; $i<@_; $i+=2){
+      $parent->[slots_]{$_[$i]}= $_[$i+1].  $parent->[slots_]{$_[$i]}
     }
   }
 }
@@ -347,6 +349,12 @@ sub inherit {
 	my ($self, $path, $root)=@_;
 	DEBUG and Log::OK::DEBUG and log_debug __PACKAGE__.": Inherit: $path";
 	#If any parent variables have be setup load the parent template
+
+  if($path=~/::/){
+    # Package name... 
+    eval "require $path";
+    ($path, $root)=$path->template_path;
+  }
 
 	#Setup the parent. Cached  with path
   my %options=$self->meta->%*;
@@ -410,7 +418,14 @@ sub render {
 
 sub parent {$_[0][parent_];}
 
-
+sub find_root {
+  my $self=shift;
+  my $p=$self;
+		while($p->[parent_]){
+			$p=$p->[parent_];
+		}
+  return $p;
+}
 
 # the callee is reomved from refernece cache if an ID is present.
 # internal variables are released

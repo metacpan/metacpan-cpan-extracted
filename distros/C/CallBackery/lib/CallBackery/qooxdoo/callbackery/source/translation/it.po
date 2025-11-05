@@ -13,15 +13,15 @@ msgstr ""
 
 #: callbackery/ui/Footer.js:23
 msgid "Support"
-msgstr ""
+msgstr "Supporto"
 
 #: callbackery/ui/Footer.js:34
 msgid "Implemented by %1"
-msgstr ""
+msgstr "Implementato da"
 
 #: callbackery/ui/Footer.js:39
 msgid "Version %1, %2%3"
-msgstr ""
+msgstr "Versione %1, %2%3"
 
 #: callbackery/ui/Login.js:23 callbackery/ui/Login.js:111
 msgid "Login"
@@ -29,7 +29,7 @@ msgstr ""
 
 #: callbackery/ui/Login.js:82
 msgid "User"
-msgstr ""
+msgstr "Utente"
 
 #: callbackery/ui/Login.js:98
 msgid "Password"
@@ -41,15 +41,15 @@ msgstr ""
 
 #: callbackery/ui/Login.js:143
 msgid "Reset Password"
-msgstr ""
+msgstr "Reimposta password"
 
 #: callbackery/ui/Login.js:149
 msgid "Register New Account"
-msgstr ""
+msgstr "Registra un nuovo account"
 
 #: callbackery/ui/Login.js:163
 msgid "release %1, %2 by %3"
-msgstr ""
+msgstr "pubblicazione %1, %2 da %3"
 
 #: callbackery/ui/Login.js:284
 msgid "<span style=\"text-decoration: underline;\">%1</span>"
@@ -57,31 +57,31 @@ msgstr ""
 
 #: callbackery/ui/Popup.js:39 callbackery/ui/MsgBox.js:66
 msgid "Cancel"
-msgstr ""
+msgstr "Cancellare"
 
 #: callbackery/ui/MsgBox.js:67
 msgid "Apply"
-msgstr ""
+msgstr "Fare domanda a"
 
 #: callbackery/ui/MsgBox.js:69
 msgid "Yes"
-msgstr ""
+msgstr "SÌ"
 
 #: callbackery/ui/MsgBox.js:70
 msgid "No"
-msgstr ""
+msgstr "NO"
 
 #: callbackery/ui/MsgBox.js:177
 msgid "RPC Error %1"
-msgstr ""
+msgstr "Errore RPC %1"
 
 #: callbackery/ui/TabView.js:46
 msgid "Unsaved Data"
-msgstr ""
+msgstr "Dati non salvati"
 
 #: callbackery/ui/TabView.js:47
 msgid "This form contains unsaved data. Do you still want to switch?"
-msgstr ""
+msgstr "Questo modulo contiene dati non salvati. Vuoi comunque cambiare?"
 
 #: callbackery/ui/form/Auto.js:78 callbackery/ui/form/Auto.js:86
 msgid "dd.MM.yyyy"
@@ -90,16 +90,16 @@ msgstr ""
 #: callbackery/ui/form/renderer/NoteForm.js:82
 #: callbackery/ui/form/renderer/NoteForm.js:84
 msgid "Select %1 and press [ctrl]+[c]"
-msgstr ""
+msgstr "Seleziona %1 e premi [ctrl]+[c]"
 
 #: callbackery/ui/form/renderer/NoteForm.js:90
 msgid "Success"
-msgstr ""
+msgstr "Successo"
 
 #: callbackery/ui/form/renderer/NoteForm.js:93
 #: callbackery/ui/form/renderer/NoteForm.js:96
 msgid "Copy failed"
-msgstr ""
+msgstr "Copia non riuscita"
 
 #: callbackery/ui/plugin/Action.js:133 callbackery/ui/plugin/Action.js:164
 #: callbackery/ui/plugin/Action.js:272
@@ -110,30 +110,24 @@ msgstr ""
 #: callbackery/ui/plugin/Action.js:273
 msgid ""
 "The form can only be submitted when all data fields have valid content."
-msgstr ""
+msgstr "Il modulo può essere inviato solo se tutti i campi dati hanno un contenuto valido."
 
 #: callbackery/ui/plugin/Action.js:179
 msgid "No Data"
-msgstr ""
+msgstr "Nessun dato"
 
 #: callbackery/ui/plugin/Action.js:188
 msgid "Download Exception"
-msgstr ""
+msgstr "Scarica eccezione"
 
 #: callbackery/ui/plugin/Action.js:305
 msgid "Upload Exception"
-msgstr ""
+msgstr "Eccezione di caricamento"
 
 #: callbackery/ui/plugin/Form.js:252
 msgid "Loading Form Data"
-msgstr ""
+msgstr "Caricamento dei dati del modulo"
 
 #: callbackery/ui/plugin/Html.js:54
 msgid "Loading HTML Data"
-msgstr ""
-
-#~ msgid "%1 copied to clipboard."
-#~ msgstr ""
-
-#~ msgid "Select %1 and press [ctr]+[c]"
-#~ msgstr ""
+msgstr "Caricamento dati HTML"

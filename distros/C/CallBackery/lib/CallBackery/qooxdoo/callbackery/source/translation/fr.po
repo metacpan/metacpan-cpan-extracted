@@ -13,11 +13,11 @@ msgstr ""
 
 #: callbackery/ui/Footer.js:23
 msgid "Support"
-msgstr ""
+msgstr "Soutien"
 
 #: callbackery/ui/Footer.js:34
 msgid "Implemented by %1"
-msgstr ""
+msgstr "Mis en œuvre par"
 
 #: callbackery/ui/Footer.js:39
 msgid "Version %1, %2%3"
@@ -25,31 +25,31 @@ msgstr ""
 
 #: callbackery/ui/Login.js:23 callbackery/ui/Login.js:111
 msgid "Login"
-msgstr ""
+msgstr "Se connecter"
 
 #: callbackery/ui/Login.js:82
 msgid "User"
-msgstr ""
+msgstr "Utilisateur"
 
 #: callbackery/ui/Login.js:98
 msgid "Password"
-msgstr ""
+msgstr "Mot de passe"
 
 #: callbackery/ui/MsgBox.js:68 callbackery/ui/Login.js:114
 msgid "OK"
-msgstr ""
+msgstr "D'ACCORD"
 
 #: callbackery/ui/Login.js:143
 msgid "Reset Password"
-msgstr ""
+msgstr "Réinitialiser le mot de passe"
 
 #: callbackery/ui/Login.js:149
 msgid "Register New Account"
-msgstr ""
+msgstr "Créer un nouveau compte"
 
 #: callbackery/ui/Login.js:163
 msgid "release %1, %2 by %3"
-msgstr ""
+msgstr "publié %1, $2 par %3"
 
 #: callbackery/ui/Login.js:284
 msgid "<span style=\"text-decoration: underline;\">%1</span>"
@@ -61,7 +61,7 @@ msgstr "Annuler"
 
 #: callbackery/ui/MsgBox.js:67
 msgid "Apply"
-msgstr ""
+msgstr "Appliquer"
 
 #: callbackery/ui/MsgBox.js:69
 msgid "Yes"
@@ -73,11 +73,11 @@ msgstr "No"
 
 #: callbackery/ui/MsgBox.js:177
 msgid "RPC Error %1"
-msgstr ""
+msgstr "Erreur RPC %1"
 
 #: callbackery/ui/TabView.js:46
 msgid "Unsaved Data"
-msgstr ""
+msgstr "Données non enregistrées"
 
 #: callbackery/ui/TabView.js:47
 msgid "This form contains unsaved data. Do you still want to switch?"
@@ -92,21 +92,21 @@ msgstr ""
 #: callbackery/ui/form/renderer/NoteForm.js:82
 #: callbackery/ui/form/renderer/NoteForm.js:84
 msgid "Select %1 and press [ctrl]+[c]"
-msgstr ""
+msgstr "Sélectionnez %1 et appuyez sur [ctrl]+[c]"
 
 #: callbackery/ui/form/renderer/NoteForm.js:90
 msgid "Success"
-msgstr ""
+msgstr "Succès"
 
 #: callbackery/ui/form/renderer/NoteForm.js:93
 #: callbackery/ui/form/renderer/NoteForm.js:96
 msgid "Copy failed"
-msgstr ""
+msgstr "Échec de la copie"
 
 #: callbackery/ui/plugin/Action.js:133 callbackery/ui/plugin/Action.js:164
 #: callbackery/ui/plugin/Action.js:272
 msgid "Validation Error"
-msgstr ""
+msgstr "Erreur de validation"
 
 #: callbackery/ui/plugin/Action.js:134 callbackery/ui/plugin/Action.js:165
 #: callbackery/ui/plugin/Action.js:273
@@ -116,26 +116,20 @@ msgstr ""
 
 #: callbackery/ui/plugin/Action.js:179
 msgid "No Data"
-msgstr ""
+msgstr "Aucune donnée"
 
 #: callbackery/ui/plugin/Action.js:188
 msgid "Download Exception"
-msgstr ""
+msgstr "Exception de téléchargement"
 
 #: callbackery/ui/plugin/Action.js:305
 msgid "Upload Exception"
-msgstr ""
+msgstr "Exception de téléchargement"
 
 #: callbackery/ui/plugin/Form.js:252
 msgid "Loading Form Data"
-msgstr ""
+msgstr "Chargement des données du formulaire"
 
 #: callbackery/ui/plugin/Html.js:54
 msgid "Loading HTML Data"
-msgstr ""
-
-#~ msgid "%1 copied to clipboard."
-#~ msgstr ""
-
-#~ msgid "Select %1 and press [ctr]+[c]"
-#~ msgstr ""
+msgstr "Chargement des données HTML"

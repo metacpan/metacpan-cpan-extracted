@@ -12,6 +12,7 @@ if (@$errors_ref) {
     $r->headers_out->{'HX-Trigger'} = JSON(
         {
             actionsChanged => { messages => $Actions, isWarning => 1 },
+            validationFailed => [],
         },
         ascii => 1,
     );

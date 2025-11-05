@@ -1,0 +1,53 @@
+name: test-versions
+
+on:
+  push:
+    branches:
+      - '**'
+    tags-ignore:
+      - '*'
+  pull_request:
+
+jobs:
+  test-versions:
+    name: perl ${{matrix.os.label }} ${{ matrix.perl-version }} ${{ matrix.threads.label }}
+    runs-on: ${{ matrix.os.id }}
+    env:
+        PERL_USE_UNSAFE_INC: 0
+        AUTHOR_TESTING: 1
+        AUTOMATED_TESTING: 1
+        RELEASE_TESTING: 1
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - id: ubuntu-latest
+            label: Linux
+            make: make
+          - id: windows-latest
+            label: Windows
+            make: gmake
+        perl-version:
+          - '5.38'
+          - '5.24'
+          - '5.16'
+        threads:
+          - enable: true
+            label: -Dusethreads
+          - enable: false
+            label: -Uusethreads
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up perl
+        uses: shogo82148/actions-setup-perl@v1.30.0
+        with:
+          perl-version: ${{ matrix.perl-version }}
+          multi-thread: ${{ matrix.threads.enable }}
+          install-modules:
+            ExtUtils::MakeMaker
+      - name: perl -V
+        run: perl -V
+      - name: build
+        run: perl Makefile.PL && ${{matrix.os.make }}
+      - name: test
+        run: ${{matrix.os.make }} test

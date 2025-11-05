@@ -1,5 +1,8 @@
 Revision history for RT-Extension-MandatoryOnTransition
 
+1.01 2025-11-04
+ - Trigger validationFailed event to indicate that the submission did not succeed
+
 1.00 2025-05-29
  - Update for RT 6
 

@@ -67,7 +67,7 @@ my @fmt = qw/%a %A %b %B %d %e %H %I %j %m %M %p %S %U %w %W %y %Y/;
 my @adt = split /#+/, strftime(join('#', @fmt), localtime($now));
 #diag explain \@adt;
 for (@fmt) { s/%//; $t{$_} = shift @adt };
-diag explain \%t;
+#diag explain \%t;
 
 # RFC 3339/ISO 8601
 my $rfc = '%Y-%m-%dT%H:%M:%S';

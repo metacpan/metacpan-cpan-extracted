@@ -44,7 +44,6 @@ inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
 inc/YAML/Tiny.pm
 lib/RT/Extension/MandatoryOnTransition.pm
-lib/RT/Extension/MandatoryOnTransition/Test.pm
 lib/RT/Extension/MandatoryOnTransition/Test.pm.in
 Makefile.PL
 MANIFEST			This list of files

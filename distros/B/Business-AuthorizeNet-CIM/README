@@ -58,6 +58,138 @@ DESCRIPTION
 
       LWP::UserAgent or WWW::Mechanize instance
 
+  createTransactionRequest
+
+    Create a new payment transaction. This method accepts several payment
+    types.
+
+        $cim->createTransactionRequest(
+            'authCaptureTransaction', # or others like priorAuthCaptureTransaction
+    
+            refId => $refId, # optional, reference id
+    
+            amount => $amount,
+    
+            opaqueData => { # optional
+                dataDescriptor => $dataDescriptor,
+                dataValue => $dataValue,
+            },
+    
+            # required for payment profile transactions
+            customerProfileId => $customerProfileId,
+            customerPaymentProfileId => $customerPaymentProfileId,
+    
+            creditCard => { # required for credit card transactions
+                cardNumber => $cardNumber,
+                expirationDate => $expirationDate, # YYYY-MM. Send as "XXXX" for refund transactions.
+                cardCode => $cardCode,  # optional
+            },
+    
+            bankAccount => { # required for bank account transactions
+                accountType => $accountType, # optional, one of checking, savings, businessChecking
+                routingNumber => $routingNumber,
+                accountNumber => $accountNumber,
+                nameOnAccount => $nameOnAccount,
+                echeckType => $echeckType, # optional, one of PPD, WEB, CCD, TEL, ARC, or BOC.
+                bankName   => $bankName, # optional
+                checkNumber => $checkNumber, # do not send checkNumber unless echeckType is either ARC or BOC.
+            },
+    
+            ### required for priorAuthCaptureTransaction, refundTransaction, voidTransaction
+            refTransId => $refTransId,
+    
+            order => { # optional
+                invoiceNumber => $invoiceNumber,
+                description => $description,
+            },
+    
+            lineItems => [ { # optional
+                itemId => $itemId,
+                name => $name,
+                description => $description,
+                quantity => $quantity,
+                unitPrice => $unitPrice,
+                taxable => $taxable,
+            } ],
+    
+            tax => { # optional
+                amount => $tax_amount,
+                name   => $tax_name,
+                description => $tax_description
+            },
+            shipping => { # optional
+                amount => $tax_amount,
+                name   => $tax_name,
+                description => $tax_description
+            },
+            duty => { # optional
+                amount => $tax_amount,
+                name   => $tax_name,
+                description => $tax_description
+            },
+    
+            poNumber => $poNumber, # optional
+            taxExempt => 'true' OR 'false', # optional
+            customerId => $customerId, # optional
+    
+            billTo => { # optional, all sub items are optional
+                firstName => $firstName,
+                lastName  => $lastName,
+                company   => $company,
+                address   => $address,
+                city      => $city,
+                state     => $state,
+                zip       => $zip,
+                country   => $country
+            },
+    
+            shipTo => {
+                firstName => $firstName,
+                lastName  => $lastName,
+                company   => $company,
+                address   => $address,
+                city      => $city,
+                state     => $state,
+                zip       => $zip,
+                country   => $country
+            },
+    
+            customerIP => $customerIP,
+    
+            transactionSettings => { # for these settings: allowPartialAuth, duplicateWindow, emailCustomer, headerEmailReceipt, footerEmailReceipt, recurringBilling
+                setting => {
+                    settingName => $settingName,
+                    settingValue => $settingValue
+                }
+            },
+        );
+
+    The first argument can be one of
+
+      * authOnlyTransaction
+
+      For Authorization Only Transactions
+
+      * authCaptureTransaction
+
+      For Authorization and Capture Transactions
+
+      * captureOnlyTransaction
+
+      For Capture Only Transactions
+
+      * priorAuthCaptureTransaction
+
+      For Prior Authorization and Capture Transactions
+
+      * refundTransaction
+
+      For Refund Transactions
+
+      * voidTransaction
+
+      For Void Transactions
+
   createCustomerProfile
 
     Create a new customer profile along with any customer payment profiles
@@ -166,7 +298,7 @@ DESCRIPTION
                 routingNumber => $routingNumber,
                 accountNumber => $accountNumber,
                 nameOnAccount => $nameOnAccount,
-                echeckType => $echeckType, # Optionaal, one of CCD, PPD, TEL, WEB
+                echeckType => $echeckType, # Optional, one of CCD, PPD, TEL, WEB
                 bankName   => $bankName, # Optional
             },
     
@@ -564,4 +696,13 @@ DESCRIPTION
             batchId => $batchId,
             refId   => $refId,    # Optional
         );
+
+POD ERRORS
+
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 198:
+
+      You forgot a '=back' before '=head3'
 

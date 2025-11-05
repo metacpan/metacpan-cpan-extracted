@@ -1,14 +1,16 @@
 ---
 abstract: 'Delayed realization of objects'
 author:
-  - 'Mark Overmeer'
+  - 'Mark Overmeer <markov@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::More: '1'
+  Test::Pod: '1'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
-license: unknown
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -20,7 +22,26 @@ no_index:
 requires:
   Scalar::Util: '0'
 resources:
+  homepage: http://perl.overmeer.net/CPAN/
   repository: https://github.com/markov2/perl5-Object-Realize-Later.git
-version: '0.21'
-x_homepage: http://perl.overmeer.net/CPAN/
-x_serialization_backend: 'CPAN::Meta::YAML version 0.011'
+version: 0.22
+x_oodist:
+  email: markov@cpan.org
+  first_year: 2001
+  generate:
+    -
+      format: pod3
+      podtail: ~
+  include: []
+  oodoc_version: 3.05
+  parser:
+    pmhead: ~
+    skip_links: []
+    syntax: markov
+  raw:
+    publish: ../public_html/object-realize-later/raw
+  release:
+    publish: ../public_html/object-realize-later/source
+  tests: {}
+  use: []
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,10 @@
 # Version/Revision history
 
+0.07 Tue 04 Nov 2025 16:21:16 MSK
+    * Acme::Crux: root, configfile, logfile, pidfile attributes are redesigned
+      Now each of the listed attributes does not depend on the application
+      execution context.
+
 0.06 Wed 05 Mar 2025 14:12:11 MSK
     * Disabled strf test
 

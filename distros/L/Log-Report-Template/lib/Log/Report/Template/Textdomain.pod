@@ -8,6 +8,7 @@ Log::Report::Template::Textdomain - template translation with one domain
 
  Log::Report::Template::Textdomain
    is a Log::Report::Domain
+   is a Log::Report::Minimal::Domain
 
 =head1 SYNOPSIS
 
@@ -18,22 +19,29 @@ Log::Report::Template::Textdomain - template translation with one domain
 
 Manage one translation domain for L<Log::Report::Template|Log::Report::Template>.
 
+Extends L<"DESCRIPTION" in Log::Report::Domain|Log::Report::Domain/"DESCRIPTION">.
+
 =head1 METHODS
 
+Extends L<"METHODS" in Log::Report::Domain|Log::Report::Domain/"METHODS">.
+
 =head2 Constructors
+
+Extends L<"Constructors" in Log::Report::Domain|Log::Report::Domain/"Constructors">.
 
 =over 4
 
 =item $class-E<gt>B<new>(%options)
 
-Z<>
+Inherited, see L<Log::Report::Domain/"Constructors">
 
- -Option              --Default
-  lang                  undef
-  lexicon               undef
-  only_in_directory     undef
-  templater             <required>
-  translation_function  'loc'
+ -Option              --Defined in                  --Default
+  lang                                                undef
+  lexicon                                             undef
+  name                  Log::Report::Minimal::Domain  <required>
+  only_in_directory                                   undef
+  templater                                           <required>
+  translation_function                                'loc'
 
 =over 2
 
@@ -43,6 +51,8 @@ Z<>
 for each user connection via L<translateTo()|Log::Report::Template::Textdomain/"Translating">.
 
 =item lexicon => DIRECTORY
+
+=item name => STRING
 
 =item only_in_directory => DIRECTORY|ARRAY
 
@@ -61,7 +71,7 @@ See L<function()|Log::Report::Template::Textdomain/"Attributes">.  It must be un
 
 =item $class-E<gt>B<upgrade>($domain, %options)
 
-Upgrade a base class Log::Report::Domain-object into an Template
+Upgrade a base class L<Log::Report::Domain|Log::Report::Domain>-object into an Template
 domain.
 
 This is a bit akward process, needed when one of the code packages
@@ -72,7 +82,17 @@ configuration stays intact.
 
 =head2 Attributes
 
+Extends L<"Attributes" in Log::Report::Domain|Log::Report::Domain/"Attributes">.
+
 =over 4
+
+=item $obj-E<gt>B<configure>(%options)
+
+Inherited, see L<Log::Report::Domain/"Attributes">
+
+=item $obj-E<gt>B<contextRules>()
+
+Inherited, see L<Log::Report::Domain/"Attributes">
 
 =item $obj-E<gt>B<expectedIn>($filename)
 
@@ -84,6 +104,10 @@ when there is no match.
 
 Returns the name of the function which is used for translations.
 
+=item $obj-E<gt>B<isConfigured>()
+
+Inherited, see L<Log::Report::Minimal::Domain/"Attributes">
+
 =item $obj-E<gt>B<lang>()
 
 The language we are going to translate to.  Change this with L<translateTo()|Log::Report::Template::Textdomain/"Translating">
@@ -93,15 +117,49 @@ for this domain, or better L<Log::Report::Template::translateTo()|Log::Report::T
 
 Directory where the translation tables are kept.
 
+=item $obj-E<gt>B<name>()
+
+Inherited, see L<Log::Report::Minimal::Domain/"Attributes">
+
+=item $obj-E<gt>B<nativeLanguage>()
+
+Inherited, see L<Log::Report::Domain/"Attributes">
+
+=item $any-E<gt>B<readConfig>($filename)
+
+Inherited, see L<Log::Report::Domain/"Attributes">
+
 =item $obj-E<gt>B<templater>()
 
 The L<Log::Report::Template|Log::Report::Template> object which is using this textdomain.
+
+=item $obj-E<gt>B<translator>()
+
+Inherited, see L<Log::Report::Domain/"Attributes">
 
 =back
 
 =head2 Translating
 
+Extends L<"Translating" in Log::Report::Domain|Log::Report::Domain/"Translating">.
+
 =over 4
+
+=item $obj-E<gt>B<defaultContext>()
+
+Inherited, see L<Log::Report::Domain/"Translating">
+
+=item $obj-E<gt>B<interpolate>( $msgid, [$args] )
+
+Inherited, see L<Log::Report::Minimal::Domain/"Translating">
+
+=item $obj-E<gt>B<setContext>(STRING|HASH|ARRAY|PAIRS)
+
+Inherited, see L<Log::Report::Domain/"Translating">
+
+=item $obj-E<gt>B<translate>($message, $language)
+
+Inherited, see L<Log::Report::Domain/"Translating">
 
 =item $obj-E<gt>B<translateTo>($lang)
 
@@ -114,47 +172,74 @@ But in general, you can best use L<Log::Report::Template::translateTo()|Log::Rep
 This method returns a CODE which is able to handle a call for
 translation by Template Toolkit.
 
+=item $obj-E<gt>B<updateContext>(STRING|HASH|ARRAY|PAIRS)
+
+Inherited, see L<Log::Report::Domain/"Translating">
+
 =back
+
+=head1 DETAILS
+
+Extends L<"DETAILS" in Log::Report::Domain|Log::Report::Domain/"DETAILS">.
 
 =head1 DIAGNOSTICS
 
 =over 4
 
+=item Warning: Missing key '$key' in format '$format', file $use
+
+Cast by C<configure()>
+
 =item Warning: Missing key '$key' in format '$format', in $use //template
 
-=encoding utf-8
-Cast by translationFunction()
+Cast by C<translationFunction()>
+
+=item Fault: cannot open JSON file for context at $fn: $!
+
+Cast by C<readConfig()>
 
 =item Error: extension to domain '$name' already exists
 
-Cast by upgrade()
+Cast by C<upgrade()>
 
 =item Error: message does not contain counting alternatives in '$msgid'
 
-Cast by translationFunction()
+Cast by C<translationFunction()>
 
 =item Error: no counting positional for '$msgid'
 
-Cast by translationFunction()
+Cast by C<translationFunction()>
 
 =item Error: no counting positional for '$msgid'
 
-Cast by translationFunction()
+Cast by C<translationFunction()>
 
 =item Error: superfluous positional parameters for '$msgid'
 
-Cast by translationFunction()
+Cast by C<translationFunction()>
 
 =item Error: superfluous positional parameters for '$msgid'
 
-Cast by translationFunction()
+Cast by C<translationFunction()>
+
+=item Error: the native_language '$locale' is not a valid locale
+
+Cast by C<configure()>
+
+=item Error: unsupported context file type for $fn
+
+Cast by C<readConfig()>
+
+=item Error: you need to configure context_rules before setContext
+
+Cast by C<setContext()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Log-Report-Template version 1.03,
-built on September 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report-Template version 1.04,
+built on November 04, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

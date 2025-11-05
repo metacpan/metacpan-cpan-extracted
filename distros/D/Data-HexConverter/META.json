@@ -37,6 +37,6 @@
          "url" : "https://metacpan.org/release/Data-HexConverter"
       }
    },
-   "version" : "0.61",
+   "version" : "0.64",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

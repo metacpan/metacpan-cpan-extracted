@@ -40,7 +40,7 @@ To install this module on a standard machine, run the following commands:
 
 If the machine has avx512 support:
 
-HEXSIMD_ENABLE_AVX512=1 perl Makefile.PL
+perl Makefile.PL
 	make
 	make test
 	make install

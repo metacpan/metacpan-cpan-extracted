@@ -29,4 +29,5 @@ use this in stead
 ###END OF PARENT
 ###END OF GRANDPARENT'
 ;
+say STDERR $result;
 ok $result eq $expected, "Inheritance ok";

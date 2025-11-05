@@ -5,7 +5,7 @@ use warnings;
 use strict;
 
 # Use command 'oodist' to produce your whole software release.
-my $version  = '1.41';
+my $version  = '1.42';
 my $webpages = "../public_html";
 my $git      = "https://github.com/markov2/perl5-Log-Report";
 my $publish  = "../public_html/log-report";
@@ -17,6 +17,7 @@ my %oodist   = (
 	email         => "markov\@cpan.org",
 
 	include  => [
+		'../Dancer2-Plugin-LogReport',
 		'../Log-Report-Lexicon',
 		'../Log-Report-Optional',
 		'../Log-Report-Template',
@@ -29,8 +30,6 @@ my %oodist   = (
 	parser   => {
 		syntax         => 'markov',
 		skip_links     => [
-			'Dancer2::Config',
-			'Dancer2::Logger::Syslog',
 			'Locale::TextDomain',
 			'Log::Dispatch',
 			'Log::Dispatch::Output',
@@ -73,7 +72,6 @@ my %oodist   = (
 );
 
 my %prereq  = (
-	'Test::More'              => '0.86',
 	'Sys::Syslog'             => '0.27',
 	'Encode'                  => '2.00',
 	'Scalar::Util'            => 0,
@@ -82,29 +80,11 @@ my %prereq  = (
 	'String::Print'           => '0.91',
 );
 
-eval "require Log::Report::Template";
-$@ or $prereq{'Log::Report::Template'} = 1.02;
-
-# Upgrade L::R::Lexicon if installed
-eval "require Log::Report::Extract";
-#warn $@;
-unless($@)
-{   my $v = $Log::Report::Extract::VERSION || '1.00';
-    if($v < 1.00) { warn <<'__CHANGES_100'; sleep 10 }
-***************************************************************
-WARNING: with Log::Report 1.00, the distribution got spit into
-   four separate components.  If you use *translations*, then
-   you have to upgrade Log::Report::Lexicon as well.  You may 
-   need to add dependencies to that module as well.
-***************************************************************
-__CHANGES_100
-}
-
 #use Data::Dumper;
 #warn Dumper \%prereq;
 
 WriteMakefile
-	NAME      => 'Log::Report',
+	NAME      => 'Log-Report',
 	VERSION   => $version,
 	PREREQ_PM => \%prereq,
 

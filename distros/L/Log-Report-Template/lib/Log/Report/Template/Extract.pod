@@ -277,52 +277,54 @@ Maybe 'user_gender' is more maintainable)
   $domain->setContext( +{gender => 'male'} );  # or ('gender=male')
   $domain->setContext( "gender=male" );        # same
 
+=encoding utf-8
+
 =head1 DIAGNOSTICS
 
 =over 4
 
 =item Fault: cannot read template from $file: $!
 
-Cast by process()
+Cast by C<process()>
 
 =item Warning: msgid '$msgid' contains html escapes, don't do that.  File $file line $linenr
 
-Cast by process()
+Cast by C<process()>
 
 =item Error: need pattern to scan for, either via new() or process()
 
-Cast by process()
+Cast by C<process()>
 
 =item Error: no context tags allowed in plural `$msgid'
 
-Cast by store()
+Cast by C<store()>
 
 =item Info: processing file $file in $charset
 
-Cast by process()
+Cast by C<process()>
 
 =item Info: starting new textdomain $domain, template in $filename
 
-Cast by write()
+Cast by C<write()>
 
 =item Error: template extract requires explicit domain
 
-Cast by new()
+Cast by C<new()>
 
 =item Error: template syntax error, no END in $fn line $line
 
-Cast by process()
+Cast by C<process()>
 
 =item Error: unknown pattern $pattern
 
-Cast by process()
+Cast by C<process()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Log-Report-Template version 1.03,
-built on September 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report-Template version 1.04,
+built on November 04, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

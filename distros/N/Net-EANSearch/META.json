@@ -41,6 +41,16 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.09",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/eansearch/perl-ean-search/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/eansearch/perl-ean-search.git",
+         "web" : "https://github.com/eansearch/perl-ean-search"
+      }
+   },
+   "version" : "1.10",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

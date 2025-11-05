@@ -38,12 +38,11 @@
       "runtime" : {
          "requires" : {
             "File::Find" : "0",
-            "Log::Report" : "1.4",
+            "Log::Report" : "1.42",
             "Log::Report::Lexicon" : "1.13",
             "Scalar::Util" : "0",
             "String::Print" : "0.91",
-            "Template" : "2.26",
-            "Test::More" : "0.86"
+            "Template" : "2.26"
          }
       },
       "test" : {
@@ -62,7 +61,7 @@
          "web" : "https://github.com/markov2/perl5-Log-Report-Template"
       }
    },
-   "version" : "1.03",
+   "version" : "1.04",
    "x_oodist" : {
       "email" : "markov@cpan.org",
       "first_year" : 2017,

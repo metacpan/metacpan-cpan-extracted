@@ -171,12 +171,24 @@ SKIP: {
     my $appliance = $appliances->[0];
     diag "using appliance '" . $appliance->{name} . "' for following tests";
 
-    is($director->list_device_interfaces($appliance->{name}), array  {
+    is($director->list_device_interfaces($appliance->{name}), hash {
+            field 'operations'  => hash { etc(); };
+            field 'wwan'        => hash { etc(); };
+            field 'vni'         => array  {
+                all_items hash {
+                    etc();
+                };
+                etc();
+            };
+            etc();
+        }, 'list_device_interfaces returns hashref of arrayref of hashrefs');
+
+    is($director->list_device_interfaces($appliance->{name})->{vni}, array {
             all_items hash {
                 etc();
             };
             etc();
-        }, 'list_device_interfaces returns arrayref of hashrefs');
+        }, 'list_device_interfaces->{vni} returns arrayref of hashrefs');
 
     is($director->list_device_networks($appliance->{name}), array  {
             all_items hash {

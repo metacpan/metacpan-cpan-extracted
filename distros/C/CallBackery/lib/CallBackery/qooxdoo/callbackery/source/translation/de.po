@@ -41,11 +41,11 @@ msgstr ""
 
 #: callbackery/ui/Login.js:143
 msgid "Reset Password"
-msgstr ""
+msgstr "Passwort zurück setzen"
 
 #: callbackery/ui/Login.js:149
 msgid "Register New Account"
-msgstr ""
+msgstr "Neues Konto registrieren"
 
 #: callbackery/ui/Login.js:163
 msgid "release %1, %2 by %3"
@@ -139,6 +139,3 @@ msgstr "Daten werden geladen"
 #: callbackery/ui/plugin/Html.js:54
 msgid "Loading HTML Data"
 msgstr "HTML Daten werde geladen"
-
-#~ msgid "%1 copied to clipboard."
-#~ msgstr "%1 in die Zwischenablage kopiert."

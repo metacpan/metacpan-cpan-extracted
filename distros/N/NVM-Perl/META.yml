@@ -1,0 +1,44 @@
+---
+abstract: 'A Perl-based Node Version Manager'
+author:
+  - 'Jason Hall <jason.kei.hall@gmail.com>'
+build_requires:
+  Capture::Tiny: '0'
+  File::Temp: '0'
+  FindBin: '0'
+  Test::Exception: '0'
+  Test::MockModule: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: NVM-Perl
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  NVM::Perl:
+    file: lib/NVM/Perl.pm
+    version: v0.1.1
+requires:
+  Archive::Zip: '0'
+  Exporter: '0'
+  File::HomeDir: '0'
+  File::Path: '0'
+  File::Spec: '0'
+  Getopt::Long: '0'
+  HTTP::Tiny: '0'
+  JSON::PP: '0'
+  Term::ANSIColor: '0'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/jkhall81/nvm-pl/issues
+  repository: https://github.com/jkhall81/nvm-pl.git
+version: v0.1.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

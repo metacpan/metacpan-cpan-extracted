@@ -1,5 +1,11 @@
 Revision history for Net-Versa-Director
 
+0.004000  2025-11-04 13:26:19+01:00 Europe/Vienna
+    - change list_device_interfaces to return all interface types not just vni
+      This is a breaking change which changes the return value from arrayref
+      to hashref of interface types!
+      To get the old behaviour you can call list_device_interfaces->{vni}.
+
 0.003000  2025-04-22 17:03:27+02:00 Europe/Vienna
     - add support for OAuth authentication
       automatically detected when server is on port 9183

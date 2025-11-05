@@ -3,8 +3,10 @@
 Unless noted otherwise, these changes where initiated and applied by
 Mark Overmeer.
 
-Simplify when this becomes available in the leading Dancer2 version:
-	https://github.com/PerlDancer/Dancer2/pull/1723
+version 1.04: Tue  4 Nov 13:00:02 CET 2025
+
+	Changes:
+	- move Dancer2 code to new Dancer2-Plugin-LogReport module.
 
 version 1.03: Mon  8 Sep 15:54:42 CEST 2025
 

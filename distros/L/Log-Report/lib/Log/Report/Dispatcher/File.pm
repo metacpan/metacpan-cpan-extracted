@@ -1,5 +1,5 @@
-# This code is part of Perl distribution Log-Report version 1.41.
-# The POD got stripped from this file by OODoc version 3.04.
+# This code is part of Perl distribution Log-Report version 1.42.
+# The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
 # This software is copyright (c) 2007-2025 by Mark Overmeer.
@@ -14,7 +14,7 @@
 #oodist: testing, however the code of this development version may be broken!
 
 package Log::Report::Dispatcher::File;{
-our $VERSION = '1.41';
+our $VERSION = '1.42';
 }
 
 use base 'Log::Report::Dispatcher';
@@ -42,38 +42,20 @@ sub init($)
 	$self->SUPER::init($args);
 
 	my $name = $self->name;
-	$self->{to}      = $args->{to}
-		or error __x"dispatcher {name} needs parameter 'to'", name => $name;
+	$self->{to}      = $args->{to} or error __x"dispatcher {name} needs parameter 'to'", name => $name;
 	$self->{replace} = $args->{replace} || 0;
 
 	my $format = $args->{format} || sub { '['.localtime()."] $_[0]" };
 	$self->{LRDF_format}
-	= ref $format eq 'CODE' ? $format
-	: $format eq 'LONG'
-	? sub {	my $msg    = shift;
+	  = ref $format eq 'CODE' ? $format
+	  : $format eq 'LONG'     ? sub {
+			my $msg    = shift;
 			my $domain = shift || '-';
 			my $stamp  = strftime "%Y-%m-%dT%H:%M:%S", gmtime;
-			"[$stamp $$] $domain $msg";
-	  }
-	: error __x"unknown format parameter `{what}'", what => ref $format || $format;
+	 		"[$stamp $$] $domain $msg";
+	    }
+	  : error __x"unknown format parameter `{what}'", what => ref $format || $format;
 
-	$self;
-}
-
-
-
-sub close()
-{	my $self = shift;
-	$self->SUPER::close
-		or return;
-
-	my $to = $self->{to};
-	my @fh_to_close
-	  = ref $to eq 'CODE'      ? values %{$self->{LRDF_out}}
-	  : $self->{LRDF_filename} ? $self->{LRDF_output}
-	  : ();
-
-	$_ && $_->close for @fh_to_close;
 	$self;
 }
 
@@ -91,7 +73,7 @@ sub output($)
 	my $name = $self->name;
 
 	my $to   = $self->{to};
-	if(!ref $to)
+	unless(ref $to)
 	{	# constant file name
 		$self->{LRDF_filename} = $to;
 		my $binmode = $self->{replace} ? '>' : '>>';
@@ -133,7 +115,7 @@ sub rotate($)
 	my $logs = ref $to eq 'CODE' ? $self->{LRDF_out} : +{ $self->{to} => $self->{LRDF_output} };
 
 	while(my ($log, $fh) = each %$logs)
-	{	!ref $log
+	{	! ref $log
 			or error __x"cannot rotate log file which was opened as file-handle";
 
 		my $oldfn = ref $old eq 'CODE' ? $old->($log) : $old;
@@ -165,6 +147,22 @@ sub log($$$$)
 	flock $out, LOCK_EX;
 	$out->print($text);
 	flock $out, LOCK_UN;
+}
+
+
+sub close()
+{	my $self = shift;
+	$self->SUPER::close
+		or return;
+
+	my $to = $self->{to};
+	my @fh_to_close
+	  = ref $to eq 'CODE' ? values %{$self->{LRDF_out}}
+	  : $self->filename   ? $self->{LRDF_output}
+	  : ();
+
+	$_ && $_->close for @fh_to_close;
+	$self;
 }
 
 1;

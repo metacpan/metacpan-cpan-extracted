@@ -135,18 +135,3 @@ msgstr ""
 #: callbackery/ui/plugin/Html.js:54
 msgid "Loading HTML Data"
 msgstr ""
-
-#~ msgid "%1 copied to clipboard."
-#~ msgstr ""
-
-#~ msgid "Implemented by %1."
-#~ msgstr ""
-
-#~ msgid "Passwort"
-#~ msgstr ""
-
-#~ msgid "Username"
-#~ msgstr ""
-
-#~ msgid "Version %1, %2%3%4"
-#~ msgstr ""

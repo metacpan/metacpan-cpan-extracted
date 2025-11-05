@@ -1,5 +1,5 @@
-# This code is part of Perl distribution Log-Report version 1.41.
-# The POD got stripped from this file by OODoc version 3.04.
+# This code is part of Perl distribution Log-Report version 1.42.
+# The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
 # This software is copyright (c) 2007-2025 by Mark Overmeer.
@@ -14,7 +14,7 @@
 #oodist: testing, however the code of this development version may be broken!
 
 package Log::Report::Message;{
-our $VERSION = '1.41';
+our $VERSION = '1.42';
 }
 
 

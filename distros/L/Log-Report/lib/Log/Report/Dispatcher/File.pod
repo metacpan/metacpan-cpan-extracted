@@ -18,8 +18,7 @@ Log::Report::Dispatcher::File - send messages to a file or file-handle
   dispatcher close => 'stderr';
 
   # let dispatcher open and close the file
-  dispatcher FILE => 'mylog', to => '/var/log/mylog',
-    charset => 'utf-8';
+  dispatcher FILE => 'mylog', to => '/var/log/mylog', charset => 'utf-8';
   ...
   dispatcher close => 'mylog';  # will close file
 
@@ -58,12 +57,6 @@ Extends L<"Constructors" in Log::Report::Dispatcher|Log::Report::Dispatcher/"Con
 
 =over 4
 
-=item $obj-E<gt>B<close>()
-
-Only when initiated with a FILENAME, the file will be closed.  In any
-other case, nothing will be done.
-Improves base, see L<Log::Report::Dispatcher/"Constructors">
-
 =item $class-E<gt>B<new>($type, $name, %options)
 
 Inherited, see L<Log::Report::Dispatcher/"Constructors">
@@ -80,7 +73,7 @@ Inherited, see L<Log::Report::Dispatcher/"Constructors">
 
 =over 2
 
-=item accept => REASONS
+=item accept => $reasons|\@reasons
 
 =item charset => CHARSET
 
@@ -225,6 +218,12 @@ Extends L<"Logging" in Log::Report::Dispatcher|Log::Report::Dispatcher/"Logging"
 
 Inherited, see L<Log::Report::Dispatcher/"Logging">
 
+=item $obj-E<gt>B<close>()
+
+Only when initiated with a FILENAME, the file will be closed.  In any
+other case, nothing will be done.
+Improves base, see L<Log::Report::Dispatcher/"Logging">
+
 =item $any-E<gt>B<collectLocation>()
 
 Inherited, see L<Log::Report::Dispatcher/"Logging">
@@ -233,7 +232,7 @@ Inherited, see L<Log::Report::Dispatcher/"Logging">
 
 Inherited, see L<Log::Report::Dispatcher/"Logging">
 
-=item $obj-E<gt>B<log>(HASH-$of-%options, $reason, $message, $domain)
+=item $obj-E<gt>B<log>(\%options, $reason, $message, $domain)
 
 Inherited, see L<Log::Report::Dispatcher/"Logging">
 
@@ -245,7 +244,7 @@ Inherited, see L<Log::Report::Dispatcher/"Logging">
 
 Inherited, see L<Log::Report::Dispatcher/"Logging">
 
-=item $obj-E<gt>B<translate>(HASH-$of-%options, $reason, $message)
+=item $obj-E<gt>B<translate>(\%options, $reason, $message)
 
 Inherited, see L<Log::Report::Dispatcher/"Logging">
 
@@ -261,30 +260,30 @@ Extends L<"DETAILS" in Log::Report::Dispatcher|Log::Report::Dispatcher/"DETAILS"
 
 =item Error: cannot rotate log file which was opened as file-handle
 
-Cast by rotate()
+Cast by C<rotate()>
 
 =item Fault: cannot write log into $file: $!
 
-Cast by rotate()
+Cast by C<rotate()>
 
 =item Error: dispatcher $name needs parameter 'to'
 
-Cast by new()
+Cast by C<new()>
 
 =item Fault: unable to rotate logfile $fn to $oldfn: $!
 
-Cast by rotate()
+Cast by C<rotate()>
 
 =item Error: unknown format parameter `$what'
 
-Cast by new()
+Cast by C<new()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Log-Report version 1.41,
-built on September 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report version 1.42,
+built on November 04, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

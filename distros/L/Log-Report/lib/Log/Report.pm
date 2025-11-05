@@ -1,5 +1,5 @@
-# This code is part of Perl distribution Log-Report version 1.41.
-# The POD got stripped from this file by OODoc version 3.04.
+# This code is part of Perl distribution Log-Report version 1.42.
+# The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
 # This software is copyright (c) 2007-2025 by Mark Overmeer.
@@ -14,7 +14,7 @@
 #oodist: testing, however the code of this development version may be broken!
 
 package Log::Report;{
-our $VERSION = '1.41';
+our $VERSION = '1.42';
 }
 
 use base 'Exporter';
@@ -137,9 +137,10 @@ sub report($@)
 	}
 
 	$message->to($to) if $to;  # overrule destination of message
-	if(my $disp_name = $message->to)
-	{	@disp = grep $_->name eq $disp_name, @disp;
-		push @disp, $try if defined $try && $disp_name ne 'try';
+	if(my $disp_names = $message->to)
+	{	my %select = map +($_ => 1), ref $disp_names eq 'ARRAY' ? @$disp_names : $disp_names;
+		@disp = grep $select{$_->name}, @disp;
+		push @disp, $try if defined $try && $select{try};
 		@disp or return;
 	}
 
@@ -354,7 +355,6 @@ sub __($)
 }
 
 
-
 # label "msgid" added before first argument
 sub __x($@)
 {	my ($cpkg, $fn, $linenr) = caller;
@@ -401,6 +401,7 @@ sub N__w(@) {split " ", $_[0]}
 #--------------------
 
 sub __p($$) { __($_[0])->_msgctxt($_[1]) }
+
 sub __px($$@)
 {	my ($ctxt, $msgid) = (shift, shift);
 	__x($msgid, @_)->_msgctxt($ctxt);

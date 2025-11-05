@@ -6,7 +6,7 @@
       "Olaf Alders"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -53,8 +53,9 @@
          "web" : "https://github.com/fayland/perl-Business-AuthorizeNet-CIM"
       }
    },
-   "version" : "0.18",
+   "version" : "0.19",
    "x_contributors" : [
+      "aklajda <aklajda@liquidweb.com>",
       "Carl Blakemore <cblakemore@liquidweb.com>",
       "Michael Hamlin <mhamlin@liquidweb.com>",
       "Olaf Alders <olaf@wundersolutions.com>",

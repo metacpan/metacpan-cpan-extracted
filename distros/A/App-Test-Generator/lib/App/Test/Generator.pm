@@ -1,6 +1,5 @@
 package App::Test::Generator;
 
-# TODO: Support routines that take more than one unnamed parameter
 # TODO: Test validator from Params::Validate::Strict 0.16
 # TODO: $seed should be passed to Data::Random::String::Matches
 # TODO: positional args - when config_undef is set, see what happens when not all args are given
@@ -21,6 +20,7 @@ use Data::Dumper;
 use Data::Section::Simple;
 use File::Basename qw(basename);
 use File::Spec;
+use Module::Load::Conditional qw(check_install can_load);
 use Template;
 use YAML::XS qw(LoadFile);
 
@@ -28,7 +28,7 @@ use Exporter 'import';
 
 our @EXPORT_OK = qw(generate);
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 =head1 NAME
 
@@ -36,7 +36,7 @@ App::Test::Generator - Generate fuzz and corpus-driven test harnesses
 
 =head1 VERSION
 
-	Version 0.12
+Version 0.13
 
 =head1 SYNOPSIS
 
@@ -101,91 +101,6 @@ and generates a L<Test::Most>-based fuzzing harness combining:
 
 =back
 
-=head2 EDGE CASE GENERATION
-
-In addition to purely random fuzz cases, the harness generates
-deterministic edge cases for parameters that declare C<min>, C<max> or C<len> in their schema definitions.
-
-For each constraint, three edge cases are added:
-
-=over 4
-
-=item * Just inside the allowable range
-
-This case should succeed, since it lies strictly within the bounds.
-
-=item * Exactly on the boundary
-
-This case should succeed, since it meets the constraint exactly.
-
-=item * Just outside the boundary
-
-This case is annotated with C<_STATUS = 'DIES'> in the corpus and
-should cause the harness to fail validation or croak.
-
-=back
-
-Supported constraint types:
-
-=over 4
-
-=item * C<number>, C<integer>
-
-Uses numeric values one below, equal to, and one above the boundary.
-
-=item * C<string>
-
-Uses strings of lengths one below, equal to, and one above the boundary.
-
-=item * C<arrayref>
-
-Uses references to arrays of with the number of elements one below, equal to, and one above the boundary.
-
-=item * C<hashref>
-
-Uses hashes with key counts one below, equal to, and one above the
-boundary (C<min> = minimum number of keys, C<max> = maximum number
-of keys).
-
-=item * C<memberof> - arrayref of allowed values for a parameter
-
-This example is for a routine called C<input()> that takes two arguments: C<status> and C<level>.
-C<status> is a string that must have the value C<ok>, C<error> or C<pending>.
-The C<level> argument is an integer that must be one of C<1>, C<5> or C<111>.
-
-  ---
-  input:
-    status:
-      type: string
-      memberof:
-        - ok
-        - error
-        - pending
-    level:
-      type: integer
-      memberof:
-        - 1
-        - 5
-        - 111
-
-The generator will automatically create test cases for each allowed value (inside the member list),
-and at least one value outside the list (which should die or C<croak>, C<_STATUS = 'DIES'>).
-This works for strings, integers, and numbers.
-
-=item * C<boolean> - automatic boundary tests for boolean fields
-
-  input:
-    flag:
-      type: boolean
-
-The generator will automatically create test cases for 0 and 1; true and false; off and on, and values that should trigger C<_STATUS = 'DIES'>.
-
-=back
-
-These edge cases are inserted automatically, in addition to the random
-fuzzing inputs, so each run will reliably probe boundary conditions
-without relying solely on randomness.
-
 =head1 CONFIGURATION
 
 The configuration file is either a file that can be read by L<Config::Abstraction> or a B<trusted input> Perl file that should set variables with C<our>.
@@ -193,6 +108,8 @@ The configuration file is either a file that can be read by L<Config::Abstractio
 The documentation here covers the old trusted input style input, but that will go away so you are recommended to use
 L<Config::Abstraction> files.
 Example: the generator expects your config to use C<our %input>, C<our $function>, etc.
+
+=head2 SCHEMA
 
 Recognized items:
 
@@ -246,8 +163,6 @@ The keyword C<undef> is used to indicate that the C<function> returns nothing.
 
 =item * C<%transforms> - list of transformations from input sets to output sets
 
-TO BE IMPLEMENTED.
-
 It takes a list of subsets of the input and output definitions,
 and verifies that data from each input subset is correctly transformed into data from the matching output subset.
 
@@ -256,9 +171,11 @@ This is a draft definition of the schema.
   ---
   module: builtin
   function: abs
-  test_undef: no
-  test_empty: no
-  test_nuls: no
+
+  config:
+    test_undef: no
+    test_empty: no
+    test_nuls: no
 
   input:
     number:
@@ -384,6 +301,174 @@ The current supported variables are
 =back
 
 =back
+
+=head2 OUTPUT
+
+The generated test:
+
+=over 4
+
+=item * Seeds RND (if configured) for reproducible fuzz runs
+
+=item * Uses edge cases (per-field and per-type) with configurable probability
+
+=item * Runs C<$iterations> fuzz cases plus appended edge-case runs
+
+=item * Validates inputs with Params::Get / Params::Validate::Strict
+
+=item * Validates outputs with L<Return::Set>
+
+=item * Runs static C<is(... )> corpus tests from Perl and/or YAML corpus
+
+=back
+
+=head2 TRANSFORMS
+
+=head3 Overview
+
+Transforms allow you to define how input data should be transformed into output data.
+This is useful for testing functions that convert between formats, normalize data,
+or apply business logic transformations on a set of data to different set of data.
+
+Transform schemas also have the keyword C<value>, when a specific value is required
+
+=head3 Configuration Example
+
+  ---
+  module: Math::Utils
+  function: normalize_number
+
+  input:
+    value:
+      type: number
+      position: 0
+
+  output:
+    type: number
+
+  transforms:
+    positive_stays_positive:
+      input:
+        value:
+          type: number
+          min: 0
+          max: 1000
+      output:
+        type: number
+        min: 0
+        max: 1
+
+    negative_becomes_zero:
+      input:
+        value:
+          type: number
+          max: 0
+      output:
+        type: number
+        value: 0
+
+    preserves_zero:
+      input:
+        value:
+          type: number
+          value: 0
+      output:
+        type: number
+        value: 0
+
+=head3 Transform Validation Rules
+
+For each transform:
+1. Generate test cases using the transform's input schema
+2. Call the function with those inputs
+3. Validate the output matches the transform's output schema
+4. If output has a specific 'value', check exact match
+5. If output has constraints (min/max), validate within bounds
+
+=head2 EDGE CASE GENERATION
+
+In addition to purely random fuzz cases, the harness generates
+deterministic edge cases for parameters that declare C<min>, C<max> or C<len> in their schema definitions.
+
+For each constraint, three edge cases are added:
+
+=over 4
+
+=item * Just inside the allowable range
+
+This case should succeed, since it lies strictly within the bounds.
+
+=item * Exactly on the boundary
+
+This case should succeed, since it meets the constraint exactly.
+
+=item * Just outside the boundary
+
+This case is annotated with C<_STATUS = 'DIES'> in the corpus and
+should cause the harness to fail validation or croak.
+
+=back
+
+Supported constraint types:
+
+=over 4
+
+=item * C<number>, C<integer>
+
+Uses numeric values one below, equal to, and one above the boundary.
+
+=item * C<string>
+
+Uses strings of lengths one below, equal to, and one above the boundary.
+
+=item * C<arrayref>
+
+Uses references to arrays of with the number of elements one below, equal to, and one above the boundary.
+
+=item * C<hashref>
+
+Uses hashes with key counts one below, equal to, and one above the
+boundary (C<min> = minimum number of keys, C<max> = maximum number
+of keys).
+
+=item * C<memberof> - arrayref of allowed values for a parameter
+
+This example is for a routine called C<input()> that takes two arguments: C<status> and C<level>.
+C<status> is a string that must have the value C<ok>, C<error> or C<pending>.
+The C<level> argument is an integer that must be one of C<1>, C<5> or C<111>.
+
+  ---
+  input:
+    status:
+      type: string
+      memberof:
+        - ok
+        - error
+        - pending
+    level:
+      type: integer
+      memberof:
+        - 1
+        - 5
+        - 111
+
+The generator will automatically create test cases for each allowed value (inside the member list),
+and at least one value outside the list (which should die or C<croak>, C<_STATUS = 'DIES'>).
+This works for strings, integers, and numbers.
+
+=item * C<boolean> - automatic boundary tests for boolean fields
+
+  input:
+    flag:
+      type: boolean
+
+The generator will automatically create test cases for 0 and 1; true and false; off and on, and values that should trigger C<_STATUS = 'DIES'>.
+
+=back
+
+These edge cases are inserted automatically, in addition to the random
+fuzzing inputs, so each run will reliably probe boundary conditions
+without relying solely on randomness.
 
 =head1 EXAMPLES
 
@@ -535,32 +620,17 @@ This example takes you through testing the online_render method of L<HTML::Genea
           env:
             AUTOMATED_TESTING: 1
 
-=head1 OUTPUT
+=head1 METHODS
 
-By default, writes C<t/fuzz.t>.
-The generated test:
+  generate($schema_file, $test_file)
 
-=over 4
-
-=item * Seeds RND (if configured) for reproducible fuzz runs
-
-=item * Uses edge cases (per-field and per-type) with configurable probability
-
-=item * Runs C<$iterations> fuzz cases plus appended edge-case runs
-
-=item * Validates inputs with Params::Get / Params::Validate::Strict
-
-=item * Validates outputs with L<Return::Set>
-
-=item * Runs static C<is(... )> corpus tests from Perl and/or YAML corpus
-
-=back
+Takes a schema file and produces a test file (or STDOUT).
 
 =cut
 
 sub generate
 {
-	my ($conf_file, $outfile) = @_;
+	my ($schema_file, $test_file) = @_;
 
 	# --- Globals exported by the user's conf (all optional except function maybe) ---
 	# Ensure data don't persist across calls, which would allow
@@ -570,20 +640,23 @@ sub generate
 
 	@edge_case_array = ();
 
-	if(defined($conf_file)) {
+	if(defined($schema_file)) {
 		# --- Load configuration safely (require so config can use 'our' variables) ---
 		# FIXME:  would be better to use Config::Abstraction, since requiring the user's config could execute arbitrary code
-		# my $abs = $conf_file;
+		# my $abs = $schema_file;
 		# $abs = "./$abs" unless $abs =~ m{^/};
 		# require $abs;
 
 		my $config;
-		if($config = Config::Abstraction->new(config_dirs => ['.', ''], config_file => $conf_file)) {
+		if($config = Config::Abstraction->new(config_dirs => ['.', ''], config_file => $schema_file)) {
 			$config = $config->all();
 			if(defined($config->{'$module'}) || defined($config->{'our $module'}) || !defined($config->{'module'})) {
 				# Legacy file format. This will go away.
 				# TODO: remove this code
-				$config = _load_conf(File::Spec->rel2abs($conf_file));
+				$config = _load_conf(File::Spec->rel2abs($schema_file));
+				if($config) {
+					carp("$schema_file: Loading perl files as configs is deprecated and will be removed soon.");
+				}
 			}
 		}
 
@@ -593,21 +666,21 @@ sub generate
 				if(ref($config->{input}) eq 'HASH') {
 					%input = %{$config->{input}}
 				} elsif(defined($config->{'input'}) && ($config->{'input'} ne 'undef')) {
-					croak("$conf_file: input should be a hash, not ", ref($config->{'input'}));
+					croak("$schema_file: input should be a hash, not ", ref($config->{'input'}));
 				}
 			}
 			if(exists($config->{output})) {
 				if(ref($config->{output}) eq 'HASH') {
 					%output = %{$config->{output}}
 				} elsif(defined($config->{'output'}) && ($config->{'output'} ne 'undef')) {
-					croak("$conf_file: output should be a hash");
+					croak("$schema_file: output should be a hash");
 				}
 			}
 			if(exists($config->{transforms})) {
 				if(ref($config->{transforms}) eq 'HASH') {
 					%transforms = %{$config->{transforms}}
 				} elsif(defined($config->{'transforms'}) && ($config->{'transforms'} ne 'undef')) {
-					croak("$conf_file: transforms should be a hash");
+					croak("$schema_file: transforms should be a hash");
 				}
 			}
 			%cases = %{$config->{cases}} if(exists($config->{cases}));
@@ -627,7 +700,7 @@ sub generate
 		}
 		_validate_config($config);
 	} else {
-		croak 'Usage: generate(conf_file [, outfile])';
+		croak 'Usage: generate(schema_file [, outfile])';
 	}
 
 	# sensible defaults
@@ -638,9 +711,9 @@ sub generate
 	# dedup: fuzzing can easily generate repeats, default is to remove duplicates
 	foreach my $field ('test_nuls', 'test_undef', 'test_empty', 'dedup') {
 		if(exists($config{$field})) {
-			if(($config{$field} eq 'false') || ($config{$field} eq 'off')) {
+			if(($config{$field} eq 'false') || ($config{$field} eq 'off') || ($config{$field} eq 'no')) {
 				$config{$field} = 0;
-			} elsif(($config{$field} eq 'true') || ($config{$field} eq 'on')) {
+			} elsif(($config{$field} eq 'true') || ($config{$field} eq 'on') || ($config{$field} eq 'yes')) {
 				$config{$field} = 1;
 			}
 		} else {
@@ -652,17 +725,14 @@ sub generate
 	if($module eq 'builtin') {
 		undef $module;
 	} elsif (!$module) {
-		(my $guess = basename($conf_file)) =~ s/\.(conf|pl|pm|yml|yaml)$//;
+		(my $guess = basename($schema_file)) =~ s/\.(conf|pl|pm|yml|yaml)$//;
 		$guess =~ s/-/::/g;
 		$module = $guess || 'Unknown::Module';
 	}
 
-	# FIXME:  Always fails with "Can't locate" - either method
-	# eval "require \"$module\"; \"$module\"->import()";
-	# eval { require $module };
-	# if($@) {
-		# carp(__PACKAGE__, ' (', __LINE__, "): $@");
-	# }
+	if($module && ($module ne 'Unknown::Module')) {
+		_validate_module($module, $schema_file)
+	}
 
 	# --- YAML corpus support (yaml_cases is filename string) ---
 	my %yaml_corpus_data;
@@ -770,6 +840,49 @@ sub generate
 		       ($type eq 'object'));
 	}
 
+	sub _validate_module {
+		my ($module, $schema_file) = @_;
+		
+		return 1 unless $module;  # No module to validate (builtin functions)
+		
+		# Check if the module can be found
+		my $mod_info = check_install(module => $module);
+		
+		if (!$mod_info) {
+			# Module not found - this is just a warning, not an error
+			# The module might not be installed on the generation machine
+			# but could be on the test machine
+			carp("Warning: Module '$module' not found in \@INC during generation.");
+			carp("  Config file: $schema_file");
+			carp("  This is OK if the module will be available when tests run.");
+			carp("  If this is unexpected, check your module name and installation.");
+			return 0;  # Not found, but not fatal
+		}
+		
+		# Module was found
+		if ($ENV{TEST_VERBOSE} || $ENV{GENERATOR_VERBOSE}) {
+			print STDERR "Found module '$module' at: $mod_info->{file}\n",
+				'  Version: ', ($mod_info->{version} || 'unknown'), "\n";
+		}
+		
+		# Optionally try to load it (disabled by default since it can have side effects)
+		if ($ENV{GENERATOR_VALIDATE_LOAD}) {
+			my $loaded = can_load(modules => { $module => undef }, verbose => 0);
+			
+			if (!$loaded) {
+				carp("Warning: Module '$module' found but failed to load: $Module::Load::Conditional::ERROR");
+				carp("  This might indicate a broken installation or missing dependencies.");
+				return 0;
+			}
+			
+			if ($ENV{TEST_VERBOSE} || $ENV{GENERATOR_VERBOSE}) {
+				print STDERR "Successfully loaded module '$module'\n";
+			}
+		}
+		
+		return 1;
+	}
+
 	sub perl_sq {
 		my $s = $_[0];
 		$s =~ s/\\/\\\\/g; $s =~ s/'/\\'/g; $s =~ s/\n/\\n/g; $s =~ s/\r/\\r/g; $s =~ s/\t/\\t/g;
@@ -807,7 +920,7 @@ sub generate
 				next unless defined $def->{$subk};
 				if(ref($def->{$subk})) {
 					unless((ref($def->{$subk}) eq 'ARRAY') || (ref($def->{$subk}) eq 'Regexp')) {
-						croak(__PACKAGE__, ": conf_file, $subk is a nested element, not yet supported (", ref($def->{$subk}), ')');
+						croak(__PACKAGE__, ": schema_file, $subk is a nested element, not yet supported (", ref($def->{$subk}), ')');
 					}
 				}
 				if(($subk eq 'matches') || ($subk eq 'nomatch')) {
@@ -1002,14 +1115,14 @@ sub generate
 	my $test;
 	$tt->process(\$template, $vars, \$test) or die $tt->error();
 
-	if ($outfile) {
-		open my $fh, '>:encoding(UTF-8)', $outfile or die "Cannot open $outfile: $!";
+	if ($test_file) {
+		open my $fh, '>:encoding(UTF-8)', $test_file or die "Cannot open $test_file: $!";
 		print $fh "$test\n";
 		close $fh;
 		if($module) {
-			print "Generated $outfile for $module\::$function with fuzzing + corpus support\n";
+			print "Generated $test_file for $module\::$function with fuzzing + corpus support\n";
 		} else {
-			print "Generated $outfile for $function with fuzzing + corpus support\n";
+			print "Generated $test_file for $function with fuzzing + corpus support\n";
 		}
 	} else {
 		print "$test\n";
@@ -1046,7 +1159,7 @@ sub generate
 
 Nigel Horne, C<< <njh at nigelhorne.com> >>
 
-Portions of this module's design and documentation were created with the
+Portions of this module's initial design and documentation were created with the
 assistance of L<ChatGPT|https://openai.com/> (GPT-5), with final curation
 and authorship by Nigel Horne.
 
@@ -1166,7 +1279,8 @@ sub rand_unicode_char {
 }
 
 # Generate a string: mostly ASCII, sometimes unicode, sometimes nul bytes or combining marks
-sub rand_str {
+sub rand_str
+{
 	my $len = shift || int(rand(10)) + 1;
 
 	my @chars;
@@ -1245,7 +1359,8 @@ sub rand_num {
 
 sub rand_arrayref {
 	my $len = shift || int(rand(3)) + 1; # small arrays
-	[ map { rand_str() } 1..$len ];
+
+	return [ map { rand_str() } 1..$len ];
 }
 
 sub rand_hashref {
@@ -1319,7 +1434,7 @@ sub fuzz_inputs
 
 			foreach my $field(keys %input) {
 				if(!grep({ $_ eq $field } ('type', 'min', 'max', 'optional', 'matches', 'can'))) {
-					::diag("TODO: handle schema keyword '$field'");
+					diag("TODO: handle schema keyword '$field'");
 				}
 			}
 
@@ -1358,7 +1473,7 @@ sub fuzz_inputs
 
 				foreach my $field(keys %{$spec}) {
 					if(!grep({ $_ eq $field } ('type', 'min', 'max', 'optional', 'matches', 'can'))) {
-						::diag("TODO: handle schema keyword '$field'");
+						diag("TODO: handle schema keyword '$field'");
 					}
 				}
 
@@ -1436,12 +1551,12 @@ sub fuzz_inputs
 					if((!exists($spec->{min})) || ($spec->{min} == 0)) {
 						# '' should die unless it's in the memberof list
 						if(defined($spec->{'memberof'}) && (!grep { $_ eq '' } @{$spec->{'memberof'}})) {
-							push @cases, { %mandatory_args, ( $arg_name => '', _name => $arg_name, _STATUS => 'DIES' ) }
+							push @cases, { %mandatory_args, ( $arg_name => '', _NAME => $arg_name, _STATUS => 'DIES' ) }
 						} elsif(defined($spec->{'memberof'}) && !defined($spec->{'max'})) {
 							# Data::Random
 							push @cases, { %mandatory_args, _input => rand_set(set => $spec->{'memberof'}, size => 1) }
 						} else {
-							push @cases, { %mandatory_args, ( $arg_name => '', _name => $arg_name ) } if((!exists($spec->{min})) || ($spec->{min} == 0));
+							push @cases, { %mandatory_args, ( $arg_name => '', _NAME => $arg_name ) } if((!exists($spec->{min})) || ($spec->{min} == 0));
 						}
 					}
 					# push @cases, { $arg_name => "emoji \x{1F600}" };
@@ -1561,8 +1676,8 @@ sub fuzz_inputs
 			foreach my $field (keys %input) {
 				my $spec = $input{$field} || {};
 				foreach my $field(keys %{$spec}) {
-					if(!grep({ $_ eq $field } ('type', 'min', 'max', 'optional', 'matches', 'can'))) {
-						::diag("TODO: handle schema keyword '$field'");
+					if(!grep({ $_ eq $field } ('type', 'min', 'max', 'optional', 'matches', 'can', 'position'))) {
+						diag("TODO: handle schema keyword '$field'");
 					}
 				}
 			}
@@ -1891,8 +2006,8 @@ sub generate_tests
 					push @cases, { %mandatory_args, ( $field => $spec->{min} ) };	# border
 					push @cases, { %mandatory_args, ( $field => $spec->{min} - 1, _STATUS => 'DIES' ) }; # outside
 				} else {
-					push @cases, { $field => 0 };	# No min, so 0 should be allowable
-					push @cases, { $field => -1 };	# No min, so -1 should be allowable
+					push @cases, { $field => 0, _LINE => __LINE__ };	# No min, so 0 should be allowable
+					push @cases, { $field => -1, _LINE => __LINE__ };	# No min, so -1 should be allowable
 				}
 				if(defined $spec->{max}) {
 					push @cases, { %mandatory_args, ( $field => $spec->{max} - 1, _LINE => __LINE__ ) };	# just inside
@@ -2068,16 +2183,6 @@ sub generate_tests
 				}
 			}
 		}
-		# transform verification tests
-		if (defined $spec->{transform}) {
-			# Test that transform is applied before validation
-			push @cases, {
-				%mandatory_args, (
-					$field => '  UPPERCASE  ',
-					_expected_after_transform => 'uppercase'
-				)
-			};
-		}
 
 		# case_sensitive tests for memberof
 		if (defined $spec->{memberof} && exists $spec->{case_sensitive}) {
@@ -2105,14 +2210,6 @@ sub generate_tests
 		# TODO:	How do we generate tests for cross-field validation?
 	}
 
-	return \@cases;
-}
-
-sub fuzz_transforms {
-	my($transform, $input, $output) = @_;
-	my @cases;
-
-	push @cases, @{generate_tests(\%input, {})};
 	return \@cases;
 }
 
@@ -2144,7 +2241,7 @@ sub run_test
 		diag('input: ', Dumper($input));
 	}
 
-	my $name = $case->{'_name'};
+	my $name = $case->{'_NAME'};
 	my $result;
 	my $mess;
 	if(defined($input) && !ref($input)) {
@@ -2181,6 +2278,7 @@ sub run_test
 			}
 		}
 		my $args = join(', ', @alist);
+		$args =~ s/%/%%/g;
 		$mess = "[% function %]($args) %s";
 	} else {
 		$mess = "[% function %] %s";
@@ -2237,7 +2335,7 @@ foreach my $transform (keys %transforms) {
 	my $input = $transforms{$transform}{'input'} || {};
 	my $output = $transforms{$transform}{'output'} || {};
 
-	my $foundation;
+	my $foundation;	# basic set of data with every field filled in with a sensible default value
 
 	foreach my $field (keys %input) {
 		my $spec = $input->{$field} || {};
@@ -2257,13 +2355,35 @@ foreach my $transform (keys %transforms) {
 					$foundation->{$field} = -0.1;	# No min, so -0.1 should be allowable
 				}
 			}
+		} elsif($type eq 'string') {
+			if(defined $spec->{min} && $spec->{min} > 0) {
+				$foundation->{$field} = 'a' x $spec->{min};
+			} elsif(defined $spec->{max} && $spec->{max} > 0) {
+				$foundation->{$field} = 'b' x $spec->{max};
+			} else {
+				$foundation->{$field} = 'test_value';
+			}
+		} elsif ($type eq 'integer') {
+			if (defined $spec->{min}) {
+				$foundation->{$field} = $spec->{min};
+			} elsif (defined $spec->{max}) {
+				$foundation->{$field} = rand_int() + $spec->{max};
+			} else {
+				$foundation->{$field} = rand_int();
+			}
+		} elsif ($type eq 'boolean') {
+			$foundation->{$field} = 1;
+		} elsif ($type eq 'arrayref') {
+			$foundation->{$field} = ['test'];
+		} elsif ($type eq 'hashref') {
+			$foundation->{$field} = { key => 'value' };
 		} else {
 			die("TODO: transform type $type for foundation");
 		}
 	}
 
 	# The foundation should work
-	my $case = { _name => "basic $transform test", _LINE => __LINE__ };
+	my $case = { _NAME => "basic $transform test", _LINE => __LINE__ };
 	my $positions = populate_positions(\%input);
 	run_test($case, $foundation, \%output, $positions);
 
@@ -2286,25 +2406,65 @@ foreach my $transform (keys %transforms) {
 		my $spec = $input{$field} || {};
 		my $type = $spec->{type} || 'string';
 
+		# If there's a specific value, test that exact value
+		if (exists $spec->{value}) {
+			push @tests, {
+				%{$foundation},
+				$field => $spec->{value},
+				_LINE => __LINE__
+				# _DESCRIPTION => "$transform_name: $field=$spec->{value}"
+			};
+			next;
+		}
+
+		# Generate edge cases based on type and contraints
 		if(($type eq 'number') || ($type eq 'integer') || ($type eq 'float')) {
 			if(defined $spec->{min}) {
 				push @tests, { %{$foundation}, ( $field => $spec->{min} + 1 ) };	# just inside
 				push @tests, { %{$foundation}, ( $field => $spec->{min} ) };	# border
+				# Test 0 if it's in range
+				push @tests, { %{$foundation}, ( $field => 0 ) } if($spec->{'min'} < -1);
 			} else {
 				push @tests, { %{$foundation}, ( $field => 0 ) };	# No min, so 0 should be allowable
-				push @tests, { %{$foundation}, ( $field => -1 ) };	# No min, so -1 should be allowable
+				push @tests, { %{$foundation}, ( $field => (($type eq 'integer') ? -1 : -0.1) ) };	# No min, so -1 should be allowable
 			}
 			if(defined $spec->{max}) {
-				push @tests, { %{$foundation}, ( $field => $spec->{max} - 1 ) };	# just inside
-				push @tests, { %{$foundation}, ( $field => $spec->{max} ) };	# border
+				push @tests, { %{$foundation}, ( $field => $spec->{max} - (($type eq 'integer') ? 1 : 0.1 ) ) };	# just inside
+				if((defined $spec->{min}) && ($spec->{'min'} != $spec->{'max'})) {
+					push @tests, { %{$foundation}, ( $field => $spec->{max} ) };	# border
+				}
 			}
+		} elsif($type eq 'string') {
+			if(defined $spec->{min}) {
+				push @tests, { %{$foundation}, ( $field => rand_str($spec->{min} + 1) ) };	# just inside
+				push @tests, { %{$foundation}, ( $field => rand_str($spec->{min}) ) };	# border
+			} else {
+				push @tests, { %{$foundation}, ( $field => rand_str() ) };
+			}
+			if(defined $spec->{max}) {
+				push @tests, { %{$foundation}, ( $field => rand_str($spec->{max} - 1) ) };	# just inside
+				if((defined $spec->{min}) && ($spec->{'min'} != $spec->{'max'})) {
+					push @tests, { %{$foundation}, ( $field => rand_str($spec->{max}) ) };	# border
+				}
+			}
+		} elsif($type eq 'boolean') {
+			push @tests, { %{$foundation}, ( $field => 1 ) }, { %{$foundation}, ( $field => 0 ) };
 		} else {
 			die("TODO: transform type $type for test case");
 		}
 	}
 
+	if($config{'dedup'}) {
+		# dedup, fuzzing can easily generate repeats
+		my %seen;
+		@tests = grep {
+			my $dump = encode_json($_);
+			!$seen{$dump}++
+		} @tests;
+	}
+
 	foreach my $test(@tests) {
-		run_test({ _name => $transform }, $test, \%output, $positions);
+		run_test({ _NAME => $transform }, $test, \%output, $positions);
 	}
 }
 

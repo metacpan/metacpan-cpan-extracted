@@ -117,17 +117,17 @@ used as default for the parameters above.  This parameter is especially
 useful for the C<context_rules>, which need to be shared between the
 running application and F<xgettext-perl>.  See L<readConfig()|Log::Report::Domain/"Attributes">
 
-=item context_rules => HASH|OBJECT
+=item context_rules => \%rules|OBJECT
 
-When rules are provided, the translator will use the C<msgctxt> fields
+When C<%rules> are provided, the translator will use the C<msgctxt> fields
 as provided by PO-files (gettext).  This parameter is used to initialize
 a L<Log::Report::Translator::Context|Log::Report::Translator::Context> helper object.
 
-=item formatter => CODE|HASH|'PRINTI'
+=item formatter => CODE|\%config|'PRINTI'
 
-Selects the formatter used for the errors messages.  The default is C<PRINTI>,
-which will use L<String::Print::printi()|String::Print/"FUNCTIONS">: interpolation with curly
-braces around the variable names.
+Selects the formatter used for the errors messages.  The default is the
+string C<PRINTI>, which will use L<String::Print::printi()|String::Print/"FUNCTIONS">: interpolation
+with curly braces around the variable names.
 
 =item native_language => CODESET
 
@@ -136,7 +136,7 @@ the non-translatable messages in.  In case no translation is needed,
 you still wish the system error messages to be in the same language
 as the report.  Of course, each textdomain can define its own.
 
-=item translator => Log::Report::Translator|HASH
+=item translator => Log::Report::Translator|\%config
 
 Set the object which will do the translations for this domain.
 
@@ -201,9 +201,9 @@ when the message is created without a C<_context> parameter. The context
 can be retrieved with L<defaultContext()|Log::Report::Domain/"Translating">.
 
 Contexts are totally ignored then there are no C<context_rules>.  When
-you do not wish to change settings, you may simply provide a C<HASH>.
+you do not wish to change settings, you may simply provide an empty C<HASH>.
 
-example: 
+» example: 
 
   use Log::Report 'my-domain', context_rules => {};
 
@@ -250,7 +250,7 @@ version of L<Log::Report|Log::Report>.
 [0.91] The C<PRINTI> is a special constants for L<configure(formatter)|Log::Report::Domain/"Attributes">, and
 will use L<String::Print|String::Print> function C<printi()>, with the standard tricks.
 
-  textdomain 'some-domain'
+  textdomain 'some-domain',
     formatter =>
       { class     => 'String::Print',    # default
         method    => 'sprinti',          # default
@@ -261,8 +261,7 @@ When you want your own formatter, or configuration of C<String::Print>,
 you need to pass a CODE.  Be aware that you may loose magic added by
 L<Log::Report|Log::Report> and other layers, like L<Log::Report::Template|Log::Report::Template>:
 
-  textdomain 'some-domain',
-    formatter => \&my_formatter;
+  textdomain 'some-domain', formatter => \&my_formatter;
 
 =head3 configuring global values
 
@@ -271,12 +270,13 @@ name in some of the log lines.  For this, (ab)use the translation context:
 
   ### first, enable translation contexts
   use Log::Report 'my-domain', context_rules => { ... };
+
   # or
   use Log::Report 'my-domain';
   textdomain->configure(context_rules => { ... });
+
   # or
-  textdomain 'my-domain',
-    content_rules => { ... };
+  textdomain 'my-domain', content_rules => { ... };
 
   ### every time you start working for a different virtual host
   (textdomain 'my-domain')->setContext(host => $host);
@@ -292,30 +292,30 @@ name in some of the log lines.  For this, (ab)use the translation context:
 
 =item Warning: Missing key '$key' in format '$format', file $use
 
-Cast by configure()
+Cast by C<configure()>
 
 =item Fault: cannot open JSON file for context at $fn: $!
 
-Cast by readConfig()
+Cast by C<readConfig()>
 
 =item Error: the native_language '$locale' is not a valid locale
 
-Cast by configure()
+Cast by C<configure()>
 
 =item Error: unsupported context file type for $fn
 
-Cast by readConfig()
+Cast by C<readConfig()>
 
 =item Error: you need to configure context_rules before setContext
 
-Cast by setContext()
+Cast by C<setContext()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Log-Report version 1.41,
-built on September 11, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report version 1.42,
+built on November 04, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
