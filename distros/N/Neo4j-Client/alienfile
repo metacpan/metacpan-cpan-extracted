@@ -78,12 +78,23 @@ share sub {
    ];
   gather sub {
     my ($bld) = @_;
-    my ($dev_cflags, $pt_cflags, $pt_libs) = scan_config_log($bld);
+    my ($dev_cflags, $pt_cflags, $pt_libs, $version) = scan_config_log($bld);
     my $pfx = $bld->runtime_prop->{prefix};
-    $bld->runtime_prop->{libs} = join(' ', "-L${pfx}/dynamic", $pt_libs, Alien::OpenSSL->libs, "-lneo4j-client");
-    $bld->runtime_prop->{libs_static} = join(' ', "-L${pfx}/lib", $pt_libs, Alien::OpenSSL->libs, "-lneo4j-client");
-    $bld->runtime_prop->{cflags} = join(' ', "-I${pfx}/include", "-iquote${pfx}/include", $pt_cflags, Alien::OpenSSL->cflags);
+
+    # We're using static libs for this 'share' install because that's more
+    # reliable; see Alien::Build::Manual::AlienAuthor. The *_static flags
+    # are probably automatically populated in Alien::Build, but it doesn't
+    # hurt to explicitly set them here.
+
+    $bld->runtime_prop->{libs_static} =
+    $bld->runtime_prop->{libs} = join(' ', "-L${pfx}/lib", $pt_libs, "-lneo4j-client", Alien::OpenSSL->libs_static);
+
+    $bld->runtime_prop->{cflags_static} =
+    $bld->runtime_prop->{cflags} = join(' ', "-I${pfx}/include", $pt_cflags, Alien::OpenSSL->cflags_static);
+
     $bld->runtime_prop->{dev_cflags} = $dev_cflags;
+    $bld->runtime_prop->{version} = $version;
+    $bld->runtime_prop->{legacy}->{inline_auto_include} = ['neo4j-client.h'];
   };
 };
 plugin "Gather::IsolateDynamic";
@@ -121,6 +132,8 @@ sub scan_config_log {
   my ($cflags) = grep /^CFLAGS=/,@log;
   $cflags =~ s/^CFLAGS='//; $cflags =~ s/'\s*$//;
   $cflags =~ s/\s+-W[a-zA-Z-_=]*//g;
-  return $cflags, $pthread{PTHREAD_CFLAGS}, $pthread{PTHREAD_LIBS};
+  my ($version) = grep /^PACKAGE_VERSION=/,@log;
+  $version =~ s/.*?'(.*)'.*/$1/s if $version;
+  return $cflags, $pthread{PTHREAD_CFLAGS}, $pthread{PTHREAD_LIBS}, $version;
 }
   

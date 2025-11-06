@@ -1,5 +1,5 @@
 msgid "Liveman::MinillaPod2Markdown – заглушка для Minilla, которая перебрасывает lib/MainModule.md в README.md"
-msgstr "Liveman::Minillapod2markdown - a plug for minilla, which throws Lib/Mainmodule.md to Readme.md"
+msgstr "Liveman::Minillapod2markdown - a plug for minilla, which throws lib/MainModule.md to README.md"
 
 msgid "Добавьте строку `markdown_maker = \"Liveman::MinillaPod2Markdown\"` в `minil.toml`, и Minilla не будет создавать `README.md` из pod-документации главного модуля, а возьмёт из одноимённого файла рядом с расширением `*.md`."
 msgstr "Add the `Markdown_maker = \"Liveman::MinillaPod2Markdown\"` to `minil.toml`, and Minilla will not create `README.md` from the POD-documenting of the main module, and will take from the same name next to the extension `*.md`."
@@ -48,7 +48,7 @@ msgid "Чтобы установить этот модуль в вашу сис�
 msgstr "To install this module in your system, follow the following actions [command] (https://metacpan.org/pod/App::cpm):"
 
 msgid "⚖ **GPLv3**"
-msgstr "⚖ **gplv3**"
+msgstr "⚖ **GPLv3**"
 
 msgid "The Liveman::MinillaPod2Markdown module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All rights reserved."
 msgstr "The Liveman::MinillaPod2Markdown module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All Rights Reserved."

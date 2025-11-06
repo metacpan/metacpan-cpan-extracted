@@ -3,14 +3,9 @@
 use strict;
 use warnings;
 
+use Test::DescribeMe qw(author);
 use Test::Most;
+use Test::Needs 'Test::Vars';
 
-if(not $ENV{RELEASE_TESTING}) {
-	plan(skip_all => 'Author tests not required for installation');
-}
-
-eval "use Test::Vars";
-
-plan skip_all => "Test::Vars required for detecting unused variables" if $@;
-
+Test::Vars->import();
 all_vars_ok(ignore_vars => { '$self' => 0 });

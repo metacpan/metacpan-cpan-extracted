@@ -12,7 +12,7 @@ PDF::Collage - PDF manipulation with scissors and glue
 
 =head1 VERSION
 
-This document describes PDF::Collage version 0.002.
+This document describes PDF::Collage version 0.003.
 
 =begin html
 

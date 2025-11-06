@@ -1,7 +1,7 @@
 package PDF::Collage::TemplatesCollection;
 use v5.24;
 use warnings;
-{ our $VERSION = '0.002' }
+{ our $VERSION = '0.003' }
 
 use Carp;
 use JSON::PP qw< decode_json >;

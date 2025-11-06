@@ -1,10 +1,10 @@
 use strict;
 use warnings;
-package Test::JSON::Schema::Acceptance; # git description: v1.028-3-gac2636b
+package Test::JSON::Schema::Acceptance; # git description: v1.029-4-gec574f1
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Acceptance testing for JSON-Schema based validators
 
-our $VERSION = '1.029';
+our $VERSION = '1.030';
 
 use 5.020;
 use Moo;
@@ -31,7 +31,7 @@ use namespace::clean;
 
 # specification version => metaschema URI
 use constant METASCHEMA => {
-  'draft-next'    => 'https://json-schema.org/draft/next/schema',
+  'v1'            => 'https://json-schema.org/v1',
   'draft2020-12'  => 'https://json-schema.org/draft/2020-12/schema',
   'draft2019-09'  => 'https://json-schema.org/draft/2019-09/schema',
   'draft7'        => 'http://json-schema.org/draft-07/schema#',
@@ -40,9 +40,10 @@ use constant METASCHEMA => {
   'draft3'        => 'http://json-schema.org/draft-03/schema#',
 };
 
+my $spec_type = Enum[sort keys METASCHEMA->%*];
 has specification => (
   is => 'ro',
-  isa => Enum[keys METASCHEMA->%*],
+  isa => $spec_type,
   lazy => 1,
   default => 'draft2020-12',
   predicate => '_has_specification',
@@ -50,7 +51,7 @@ has specification => (
 
 has supported_specifications => (
   is => 'ro',
-  isa => ArrayRef[Enum[keys METASCHEMA->%*]],
+  isa => ArrayRef[$spec_type],
   lazy => 1,
   default => sub { [ shift->specification ] },
 );
@@ -371,7 +372,7 @@ sub _mutation_check ($self, $data) {
       push @error_paths, $node->[0] if tied($node->[1]->@*);
     }
     elsif (is_plain_hashref($node->[1])) {
-      push @nodes, map [ $node->[0].'/'.(s/~/~0/gr =~ s!/!~1!gr), $node->[1]{$_} ], keys $node->[1]->%*;
+      push @nodes, map [ $node->[0].'/'.(s!~!~0!gr =~ s!/!~1!gr), $node->[1]{$_} ], keys $node->[1]->%*;
       push @error_paths, $node->[0] if tied($node->[1]->%*);
     }
     elsif (is_ref($node->[1])) {
@@ -550,7 +551,7 @@ Test::JSON::Schema::Acceptance - Acceptance testing for JSON-Schema based valida
 
 =head1 VERSION
 
-version 1.029
+version 1.030
 
 =head1 SYNOPSIS
 
@@ -655,7 +656,7 @@ C<latest> (alias for C<draft2020-12>)
 
 =item *
 
-C<draft-next>
+C<v1>
 
 =back
 
@@ -890,6 +891,14 @@ Ricardo Signes <rjbs@cpan.org> for direction to and creation of Test::Fatal.
 Various others in #perl-help.
 
 =for stopwords OpenAPI
+
+=head1 GIVING THANKS
+
+=for stopwords MetaCPAN GitHub
+
+If you found this module to be useful, please show your appreciation by
+adding a +1 in L<MetaCPAN|https://metacpan.org/dist/Test-JSON-Schema-Acceptance>
+and a star in L<GitHub|https://github.com/karenetheridge/Test-JSON-Schema-Acceptance>.
 
 =head1 SUPPORT
 

@@ -14,11 +14,14 @@ use warnings;
 use Carp;
 use Scalar::Util qw(looks_like_number);
 
+use SIRTX::VM::RegisterFile;
+use SIRTX::VM::Assembler;
+
 use parent 'Data::Identifier::Interface::Userdata';
 
-our $VERSION = v0.08;
+our $VERSION = v0.10;
 
-my %_die_raen = (code => 0, P => 7, codeX => 0, S => 2, T => 4+1, is_return => 1);
+my %_die_raen = (code => 0, P => 7, codeX => 0, S => 2, T => 4+1);
 
 my %_raes_to_raen = (
     NONE    =>  0,
@@ -52,6 +55,7 @@ our %_logicals_to_sni = (
     false   => 189,
     true    => 190,
 );
+my %_sni_to_logicals = reverse %_logicals_to_sni;
 
 my %_logicals_to_sid = (
     asi         => 1,
@@ -95,7 +99,7 @@ my @_simple_3 = (reg => 'P', reg => 'S', reg => 'T');
 my %_simple_opcodes = (
     noop            => [\@_simple_0 => {first => 0, second => 0, T => 0}],
     magic           => [\@_simple_0 => {first => 0, codeX => 0, S => 0, T => 4+3, extra => "VM\r\n\xc0\n"}],
-    autodie         => [\@_simple_0 => {code => 0, P => 7, codeX => 0, S => 2, T => 4+0, is_autodie => 1}],
+    autodie         => [\@_simple_0 => {code => 0, P => 7, codeX => 0, S => 2, T => 4+0}],
     data_start_marker   => [\@_simple_0 => {code => 0, P => 6, codeX => 0, S => 0, T => 0}],
 
     filesize        => [[int_half => 'extra[]'] => {code => 0, P => 1, codeX => 0, S => 0, T => 0+1}],
@@ -109,8 +113,8 @@ my %_simple_opcodes = (
 
     unref           => [\@_simple_1 => {code => 0, codeX => 1, S => 0, T => 0+0}],
     rewind          => [\@_simple_1 => {code => 0, codeX => 1, S => 1, T => 0+0}],
-    die             => [\@_simple_1 => {code => 0, codeX => 1, S => 2, T => 4+0, is_return => 1}],
-    exit            => [\@_simple_1 => {code => 0, codeX => 1, S => 3, T => 0+0, is_return => 1}],
+    die             => [\@_simple_1 => {code => 0, codeX => 1, S => 2, T => 4+0}],
+    exit            => [\@_simple_1 => {code => 0, codeX => 1, S => 3, T => 0+0}],
     #jump            => {code => 0, codeX => 1, S => 4, T => 0+0},
     rcall           => [[int => 'extra[]'] => {code => 0, codeX => 1, S => 5, T => 0+1}],
     trcall          => [[int => 'extra[]'] => {code => 0, codeX => 1, S => 5, T => 4+1}],
@@ -122,8 +126,8 @@ my %_simple_opcodes = (
     tell            => [\@_simple_2 => {code => 0, codeX => 2, S => 3}],
     transfer        => [\@_simple_2 => {code => 0, codeX => 2, S => 4}],
 
-    return          => [\@_simple_0 => {code => 0, P => 7, codeX => 0, S => 2, T => 0+0, is_return => 1},
-                        \@_simple_1 => {code => 0,         codeX => 1, S => 2, T => 0+0, is_return => 1}],
+    return          => [\@_simple_0 => {code => 0, P => 7, codeX => 0, S => 2, T => 0+0},
+                        \@_simple_1 => {code => 0,         codeX => 1, S => 2, T => 0+0}],
 
     contents        => [\@_simple_2 => {code => 1, codeX => 2, S => 1}],
     die             => [['raen:' => 'extra[]'] => \%_die_raen],
@@ -153,6 +157,8 @@ my %_simple_opcodes = (
 );
 $_simple_opcodes{nop} = $_simple_opcodes{noop}; # alias
 
+my @_opcode_to_text;
+
 my %_synthetic = (
     open            => [
         [reg => 1, undef     => 'undef'] => ['unref', \1],
@@ -180,7 +186,7 @@ sub new {
     my ($pkg, %opts) = @_;
     my $self = bless({}, $pkg);
 
-    foreach my $key (qw(first second code codeX ST P S T size is_return is_autodie)) {
+    foreach my $key (qw(first second code codeX ST P S T size pos)) {
         my $val = delete $opts{$key} // next;
         unless (looks_like_number($val)) {
             croak 'Invalid argument: '.$key.' is not a number';
@@ -459,9 +465,95 @@ sub from_template {
         }
 
         return $pkg->new(first => 0, codeX => 0, S => 0, T => ($l/2), extra => $string);
+    } elsif ($cmd eq 'execution_info_flags') {
+        my $flags = 0;
+
+        foreach my $flag (@args) {
+            if ($flag eq 'resources_only') {
+                $flags |= 1<<15;
+            } elsif ($flag eq 'single_load') {
+                $flags |= 1<<14;
+            } elsif ($flag eq 'multi_session') {
+                $flags |= (1<<13) | (1<<14);
+            } else {
+                croak sprintf('Unsupported/unknown execution_info_flags flag: line %s: flag %s', $line, $flag);
+            }
+        }
+
+        return $pkg->new(code => 0, P => 3, codeX => 0, S => 0, T => 0+1, extra => [$flags]);
     }
 
     croak 'Unsupported template';
+}
+
+
+sub read {
+    my ($pkg, $fh, @opts) = @_;
+    my $data;
+    my $pos;
+
+    croak 'Stray options passed' if scalar @opts;
+
+    $pos = $fh->tell;
+
+    if (defined($pos) && ($pos & 1)) {
+        croak 'Invalid aligned opcode read';
+    }
+
+    croak 'Cannot read opcode' unless $fh->read($data, 2) == 2;
+
+    {
+        my ($first, $second) = unpack('CC', $data);
+        my $code  = ($first  & 0370) >> 3;
+        my $P     = ($first  & 0007) >> 0;
+        my $codeX = ($second & 0300) >> 6;
+        my $S     = ($second & 0070) >> 3;
+        my $T     = ($second & 0007) >> 0;
+
+        my $registers;
+        my $extra_len;
+        my $extra;
+
+        if ($code <= 3) {
+            $registers = $codeX;
+        } elsif ($code == 4) {
+            $registers = 3;
+        } else {
+            croak sprintf('Unsupported/invalid opcode: 0x%02x%02x: Number of registers is undefined/unknown', $first, $second);
+        }
+
+        if ($code <= 1 && $codeX <= 1) {
+            $extra_len = $T & 3;
+        } elsif ($code <= 1 && $codeX == 3) {
+            $extra_len = 0;
+        } elsif ($code == 1 && $codeX == 2 && ($S & 4) == 4) {
+            $extra_len = 1;
+        } elsif ($code == 1 && $codeX == 2 && $S == (0 + 3)) {
+            $extra_len = 2;
+        } elsif ($code == 1 && $codeX == 2 && $S == (0 + 1)) {
+            $extra_len = 0;
+        } elsif ($code == 0 && $codeX == 2) {
+            $extra_len = 0;
+        } elsif ($code == 3) {
+            $extra_len = 1;
+        } elsif ($code == 4) {
+            $extra_len = 0;
+        } else {
+            croak sprintf('Unsupported/invalid opcode: 0x%02x%02x: Size of extra is undefined/unknown', $first, $second);
+        }
+
+        #warn sprintf('registers: %u, extra: %u', $registers, $extra_len);
+
+        if ($extra_len) {
+            $extra_len *= 2;
+
+            croak 'Cannot read extra' unless $fh->read($extra, $extra_len) == $extra_len;
+        }
+
+        return $pkg->new(first => $first, second => $second, code => $code, codeX => $codeX, P => $P, S => $S, T => $T, extra => $extra, pos => $pos);
+    }
+
+    croak 'Cannot parse opcode';
 }
 
 
@@ -545,7 +637,17 @@ sub is_return {
 
     croak 'Stray options passed' if scalar @opts;
 
-    return $self->{is_return};
+    $self->required_size;
+
+    if ($self->{first} == 0x07 && $self->{codeX} == 0 && $self->{S} == 2) {
+        my $T = $self->{T};
+        return $T == 0 || $T == (4+1);
+    } elsif ($self->{code} == 0 && $self->{codeX} == 1) {
+        my $S = $self->{S};
+        return $S == 2 || $S == 3;
+    }
+
+    return undef;
 }
 
 
@@ -554,10 +656,249 @@ sub is_autodie {
 
     croak 'Stray options passed' if scalar @opts;
 
-    return $self->{is_autodie};
+    $self->required_size;
+
+    return $self->{first} == 0x07 && $self->{second} == 0x14;
+}
+
+
+sub is_end_of_text {
+    my ($self, @opts) = @_;
+
+    croak 'Stray options passed' if scalar @opts;
+
+    $self->required_size;
+
+    if ($self->{first} == 0x06 && $self->{codeX} == 0) {
+        my $S = $self->{S};
+        return $S == 0 || $S == 7;
+    } elsif ($self->{first} == 0x00 && $self->{codeX} == 0 && $self->{S} == 3 && ($self->{T} & 4)) {
+        return 1;
+    }
+
+    return undef;
+}
+
+
+sub as_text {
+    my ($self, @opts) = @_;
+    my $name = eval {$self->_name};
+    my $opcode_to_text = $self->{opcode_to_text};
+    my $extra = $self->{extra} // '';
+    my $command;
+
+    croak 'Stray options passed' if scalar @opts;
+
+    if (defined $opcode_to_text) {
+        if (scalar(@{$opcode_to_text->{argmap}}) == 0) {
+            $command = $name;
+        } else {
+            my @argmap = @{$opcode_to_text->{argmap}};
+            my @extra = unpack('n*', $extra);
+
+            $command = $name;
+
+            for (my $j = 0; ($j*2) < scalar(@argmap); $j++) {
+                my $type = $argmap[$j*2 + 0];
+                my $dst  = $argmap[$j*2 + 1];
+
+                if ($type eq 'reg') {
+                    $command .= sprintf(' r%u', $self->{$dst});
+                } elsif ($type =~ /^(?:sni|raen):$/ && $dst eq 'extra[]') {
+                    $command .= sprintf(' %s%u', $type, shift(@extra));
+                } elsif ($type eq 'int_half' && $dst eq 'extra[]') {
+                    $command .= sprintf(' %u', shift(@extra)*2);
+                } elsif ($type eq 'int_rel4' && $dst eq 'extra[]') {
+                    $command .= sprintf(' %u', shift(@extra)*2 + $self->{pos} + 4);
+                } elsif ($type eq 'int' && $dst eq 'extra[]') {
+                    $command .= sprintf(' %u', shift(@extra));
+                } elsif ($type eq 'undef' && $dst eq 'undef') {
+                    $command .= ' undef';
+                } elsif ($type eq 'autodie' && $dst eq 'true') {
+                    $command =~ s/^(\S+)(\s?)/$1!$2/;
+                } elsif ($type eq 'autodie' && $dst eq 'false') {
+                    $command =~ s/^(\S+)(\s?)/$1?$2/;
+                } else {
+                    $command = undef;
+                    last;
+                }
+            }
+        }
+    } else {
+        my $first  = $self->{first};
+        my $second = $self->{second};
+        my $code   = ($first  & 0370) >> 3;
+        my $P      = ($first  & 0007) >> 0;
+        my $codeX  = ($second & 0300) >> 6;
+        my $S      = ($second & 0070) >> 3;
+        my $T      = ($second & 0007) >> 0;
+
+        if ($code == 0 && $codeX == 3 && defined(my $regname = SIRTX::VM::RegisterFile->_physical_name_by_number($second & 0077))) {
+            $command = sprintf('map r%u %s', $P, $regname);
+        } elsif ($first == 0 && $codeX == 0 && $S > 0 && $T == 0) {
+            $command = sprintf('.endsection ; %s', $SIRTX::VM::Assembler::_header_ids_rev{$S} // '???');
+        } elsif ($first == 0 && $codeX == 0 && $S > 0 && $T == 4) {
+            $command = sprintf('.section %s', $SIRTX::VM::Assembler::_header_ids_rev{$S} // '???');
+        } elsif ($first == 0 && $codeX == 0 && $S > 0 && ($T & 4)) {
+            $command = sprintf('.section %s %s', $SIRTX::VM::Assembler::_header_ids_rev{$S} // '???', _escape_text($extra));
+        } elsif ($first == 0 && $codeX == 0 && $S == 0 && $T > 0 && $T < 4) {
+            $command = sprintf('noop %s', _escape_text($extra));
+        } elsif ($code == 0 && $codeX == 2 && $S == 7) {
+            $command = sprintf('open r%u %u', $P, $T);
+        } elsif ($code == 0 && $codeX == 1 && $S == 6 && $T == (0+2)) {
+            my ($sni, $id) = unpack('nn', $extra);
+            $sni = $_sni_to_logicals{$sni} // $sni;
+            $command = sprintf('open r%u %s:%u', $P, $sni, $id);
+        } elsif ($code == 0 && $codeX == 1 && $S == 7 && $T == (0+1)) {
+            $command = sprintf('open r%u %u', $P, unpack('n', $extra));
+        }
+    }
+
+    unless (defined $command) {
+        $command  = sprintf('.byte 0x%02x 0x%02x', $self->{first}, $self->{second});
+        $command .= ', '.join(' ', map {sprintf('0x%02x', ord)} split(//, $self->{extra})) if defined $self->{extra};
+    }
+
+    {
+        my $pos = defined($self->{pos}) ? sprintf('%04x', $self->{pos}) : '????';
+        $command = sprintf('%-48s ; at 0x%s: code=%2u, P=%u, codeX=%u, S=%u, T=%u, extra=[%s]',
+            $command, $pos,
+            $self->{code}, $self->{P},
+            $self->{codeX}, $self->{S}, $self->{T},
+            join(', ', map {sprintf('0x%04x', $_)} unpack('n*', $extra)),
+        );
+    }
+
+    return $command;
 }
 
 # ---- Private helpers ----
+sub _name { # TODO: Private for now, might be exposed later on
+    my ($self, @opts) = @_;
+
+    croak 'Stray options passed' if scalar @opts;
+
+    return $self->{opcode_to_text}{name} if defined $self->{opcode_to_text};
+
+    {
+        my $code;
+
+        $self->required_size;
+
+        $code = ($self->{first} << 8) | $self->{second};
+
+        foreach my $entry (@_opcode_to_text) {
+            if ($entry->{masked_code} == ($code & $entry->{mask})) {
+                $self->{opcode_to_text} = $entry;
+                return $entry->{name};
+            }
+        }
+    }
+
+    croak 'Unknown/no name for opcode';
+}
+
+sub _extra {
+    my ($self, @opts) = @_;
+    my %res = (type => 'opcode');
+
+    croak 'Stray options passed' if scalar @opts;
+
+    $self->required_size;
+
+    if ($self->{first} == 0x01 && $self->{codeX} == 0 && $self->{S} == 1) {
+        my $T = $self->{T};
+
+        if ($T == 1) {
+            $res{start_offsets} = [unpack('n', $self->{extra})*2];
+        }
+    } elsif ($self->{first} == 0x06 && $self->{codeX} == 0 && $self->{S} == 7 && defined($self->{pos})) {
+        my $T = $self->{T};
+        my $length;
+
+        if ($T == 1) {
+            $length = unpack('n', $self->{extra})*2;
+        } elsif ($T == 2) {
+            $length = unpack('N', $self->{extra})*2;
+        }
+
+        $res{start_offsets} = [$length + $self->{pos} + 4];
+        $res{length}        = $length;
+        $res{type}          = 'chunk';
+    }
+
+    return %res;
+}
+
+foreach my $key (keys %_simple_opcodes) {
+    my $entry = $_simple_opcodes{$key};
+
+    next if $key eq 'nop'; # skip alias.
+
+    for (my $i = 0; $i < scalar(@{$entry}); $i += 2) {
+        my @argmap = @{$entry->[$i]};
+        my $opcode = $entry->[$i + 1];
+        my $first  = $opcode->{first};
+        my $second = $opcode->{second};
+        my $code   = $opcode->{code};
+        my $codeX  = $opcode->{codeX};
+        my $ST     = $opcode->{ST};
+        my $P      = $opcode->{P};
+        my $S      = $opcode->{S};
+        my $T      = $opcode->{T};
+        my $mask = 0;
+
+        for (my $j = 0; ($j*2) < scalar(@argmap); $j++) {
+            my $type = $argmap[$j*2 + 0];
+            my $dst  = $argmap[$j*2 + 1];
+
+            if ($dst eq 'P') {
+                $P = 0;
+                $mask |= 0x0700;
+            } elsif ($dst eq 'S') {
+                $S = 0;
+                $mask |= 0070;
+            } elsif ($dst eq 'T') {
+                $T = 0;
+                $mask |= 0007;
+            }
+        }
+
+        $first  //= ($code  << 3) | $P  if defined($code)  && defined($P);
+        $ST     //= ($S     << 3) | $T  if defined($S)     && defined($T);
+        $second //= ($codeX << 6) | $ST if defined($codeX) && defined($ST);
+
+        $mask ^= 0xFFFF;
+
+        if (defined($first) && defined($second)) {
+            my $code = ($first << 8) | $second;
+
+            push(@_opcode_to_text, {
+                    masked_code => $code,
+                    masked_first => $first,
+                    masked_second => $second,
+                    mask => $mask,
+                    name => $key,
+                    argmap => $entry->[$i+0],
+                    opcode => $entry->[$i+1],
+                });
+        }
+    }
+}
+
+sub _escape_text {
+    my ($text) = @_;
+    return '"'.join('',
+        map {
+        my $x = ord;
+        $x >= 0x20 && $x <= 0x7E && $x != 0x5C ? $_ : sprintf('\\x%02x', $x)
+        } split //, $text
+    ).'"';
+}
+
+#warn sprintf('# %04x / %04x => %s', $_->{masked_code}, $_->{mask}, $_->{name}) foreach @_opcode_to_text;
+
+1;
 
 __END__
 
@@ -571,7 +912,7 @@ SIRTX::VM::Opcode - module for single SIRTX VM opcodes
 
 =head1 VERSION
 
-version v0.08
+version v0.10
 
 =head1 SYNOPSIS
 
@@ -645,6 +986,18 @@ The space (in bytes) for the opcode to fill. This may be used in multi-pass tran
 
 Try to create an opcode from a template
 
+=head2 read
+
+    my SIRTX::VM::Opcode $opcode = SIRTX::VM::Opcode->read($fh);
+
+(experimental since v0.09)
+
+Reads a opcode from a handle.
+
+B<Note:>
+This is a highly experimental method.
+It should not be called directly.
+
 =head2 write
 
     $opcode->write($fh);
@@ -683,6 +1036,24 @@ Returns a true value for opcodes that are some kind of return (e.g. return, die,
     my $is_autodie = $opcode->is_autodie;
 
 Returns a true value for opcodes that are some kind of autodie (autodie, those that implement it).
+
+=head2 is_end_of_text
+
+    my $is_autodie = $opcode->is_end_of_text;
+
+Returns a true value for opcodes that are some kind of end of text (code) mark.
+
+=head2 as_text
+
+    my $text = $opcode->as_text;
+
+(experimental since v0.09)
+
+Renders the opcode as text.
+
+B<Note:>
+This is a highly experimental method.
+It should not be called directly.
 
 =head1 AUTHOR
 

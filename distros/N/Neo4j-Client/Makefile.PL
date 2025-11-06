@@ -37,6 +37,19 @@ WriteMakefile($mm->mm_args(
   },
   META_MERGE => {
     'meta-spec' => { version => 2 },
+    prereqs => {
+      develop => {
+        recommends => {
+          'FFI::Platypus' => 0,
+          'Inline::C' => 0,
+          'Test::CPAN::Changes' => 0,
+          'Test::Pod' => 0,
+        },
+        requires => {
+          'IPC::Run' => 0,  # nc-update
+        },
+      },
+    },
     resources => {
       bugtracker => {
 	web => 'https://github.com/majensen/neoclient/issues',
@@ -52,6 +65,9 @@ WriteMakefile($mm->mm_args(
   },
   dist => {
     TAR => 'ptar',  # avoid extended headers in tarball
+  },
+  realclean => {
+    FILES => 'MANIFEST.bak build/configure~',
   },
  ));
 

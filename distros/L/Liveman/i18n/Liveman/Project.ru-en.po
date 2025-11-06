@@ -1,8 +1,8 @@
 msgid "Liveman::Project - создать новый Perl-репозиторий"
-msgstr "Liveman :: Project - Create a new Perl -Ro -Posteria"
+msgstr "Liveman::Project - Created a new Perl-repository"
 
 msgid "Создает новый Perl-репозиторий."
-msgstr "Creates a new Perl Roads."
+msgstr "Creates a new Perl-repository."
 
 msgid "Конструктор."
 msgstr "Constructor."
@@ -26,8 +26,8 @@ msgid "Проверяет проект на ошибки и распечатыв
 msgstr "Checks the project for errors and prints them in STDOUT."
 
 msgid "⚖ **GPLv3**"
-msgstr "⚖ ** gplv3 **"
+msgstr "⚖ **GPLv3**"
 
 msgid "The Liveman::Project module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All rights reserved."
-msgstr "The Liveman :: Project Module Is Copyright © 2023 Yaroslav O. Kosmina. Rusland. All Rights Reserved."
+msgstr "The Liveman::Project Module Is Copyright © 2023 Yaroslav O. Kosmina. Rusland. All Rights Reserved."
 

@@ -12,7 +12,7 @@ Log::Report::Translator::Context - handle translation contexts
 
 =head1 DESCRIPTION
 
-[Added in Log::Report v1.00]
+[Added in L<Log::Report|Log::Report> v1.00]
 The "contexts" concept in (GNU's version of) gettext, has a
 very restricted purpose: to separate two (accidental) uses of the
 same message-id, under different circumstances.  The same msgid may
@@ -29,7 +29,7 @@ Some translation setups use the library name consequently as msgctxt.
 But, the name "context" is pretending much more power than the gettext
 libraries are capable of: it usually only behaves like a namespace.
 
-For Log::Report, the power of "context" is extended with selecting
+For L<Log::Report|Log::Report>, the power of "context" is extended with selecting
 between alternatives for the use of a msgid B<on the same spot>.
 
 For instance, the gender of the user of the website determines whether
@@ -79,7 +79,7 @@ Returns a HASH to the simplified context maps.
 
 Returns a pair of the MSGID stripped from context markup, and the
 context evaluated into the msgctxt string.  The C<$message> is a
-Log::Report::Message object.  The C<$context> is the default context
+L<Log::Report::Message|Log::Report::Message> object.  The C<$context> is the default context
 for a certain textdomain.
 
   my ($msgid, $msgctxt) = $context->ctxtFor($msg, $lang, $context);
@@ -117,7 +117,7 @@ libraries are capable of: it usually only behaves like a namespace.
 
 =head2 Contexts in Log::Report
 
-For Log::Report, the power of "context" is extended with selecting
+For L<Log::Report|Log::Report>, the power of "context" is extended with selecting
 between alternatives for the use of a msgid B<on the same spot>.
 
 For instance, the gender of the user of the website determines whether
@@ -142,7 +142,7 @@ Probably this would beed needed:
 
 =head2 Using context_rules
 
-In Log::Report's extended concept of "contexts", you can select between
+In L<Log::Report|Log::Report>'s extended concept of "contexts", you can select between
 multiple translations for the same msgid, when they
 
 =over 4
@@ -184,7 +184,7 @@ This does not translate!  For one, you would need to translate C<his> and
 C<her> to the language as well.  But in some languages, the differences
 between addressed genders have more impact on the whole sentence.
 
-So, Log::Report translations add extra syntax:
+So, L<Log::Report|Log::Report> translations add extra syntax:
 
   my ($name, $gender) = ('Jack', 'male');
   print __x"{name<gender} found her key", name => $name,
@@ -322,7 +322,7 @@ Therefore, we need a map-file.
 
 The context maps are included in a configuration file which is passed to
 xgettext-perl and to the program which uses contexts.
-See Log::Report::Domain subroutine readConfig.
+See L<Log::Report::Domain::readConfig()|Log::Report::Domain/"Attributes">.
 
 Example of such configuration file: (JSON syntax and Perl syntax)
 
@@ -398,30 +398,30 @@ as default or for your language.
 
 =item Error: no context definition for `$tag' in `$msgid'
 
-Cast by ctxtFor()
+Cast by C<ctxtFor()>
 
 =item Warning: no value for tag `$tag' in the context
 
-Cast by ctxtFor()
+Cast by C<ctxtFor()>
 
 =item Error: tags value must have form `a=b', found `$this' in `$source'
 
-Cast by needDecode()
+Cast by C<needDecode()>
 
 =item Warning: unknown alternative `$alt' for tag `$tag' in context of `$msgid'
 
-Cast by ctxtFor()
+Cast by C<ctxtFor()>
 
 =item Error: unknown context tag '$tag' used in '$msgid'
 
-Cast by expand()
+Cast by C<expand()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Log-Report-Lexicon version 1.14,
-built on September 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report-Lexicon version 1.15,
+built on November 06, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

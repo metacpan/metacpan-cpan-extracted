@@ -154,86 +154,86 @@ Inherited, see L<Log::Report::Lexicon::Table/"Administration">
 
 =item Error: cannot detect charset in $fn
 
-Cast by read()
+Cast by C<read()>
 
 =item Fault: cannot read magic from $fn: $!
 
-Cast by read()
+Cast by C<read()>
 
 =item Fault: cannot read mo from file $fn: $!
 
-Cast by read()
+Cast by C<read()>
 
 =item Fault: cannot read msgids from $fn, need $size at $loc: $!
 
-Cast by read()
+Cast by C<read()>
 
 =item Fault: cannot read originals from $fn, need $size at $loc: $!
 
-Cast by read()
+Cast by C<read()>
 
 =item Fault: cannot read superblock from $fn: $!
 
-Cast by read()
+Cast by C<read()>
 
 =item Fault: cannot read translations from $fn, need $size at $loc: $!
 
-Cast by read()
+Cast by C<read()>
 
 =item Fault: cannot read translations from $fn, need $size at $loc: $!
 
-Cast by read()
+Cast by C<read()>
 
 =item Fault: cannot seek to $loc in $fn for msgid strings: $!
 
-Cast by read()
+Cast by C<read()>
 
 =item Fault: cannot seek to $loc in $fn for originals: $!
 
-Cast by read()
+Cast by C<read()>
 
 =item Fault: cannot seek to $loc in $fn for transl strings: $!
 
-Cast by read()
+Cast by C<read()>
 
 =item Fault: cannot seek to $loc in $fn for translations: $!
 
-Cast by read()
+Cast by C<read()>
 
 =item Error: invalid plural-form algorithm '$alg'
 
-Cast by setupPluralAlgorithm()
+Cast by C<setupPluralAlgorithm()>
 
 =item Error: only acceptable parameter is 'ACTIVE'
 
-Cast by translations()
+Cast by C<translations()>
 
 =item Error: the header is not the first entry, needed for charset in $fn
 
-Cast by read()
+Cast by C<read()>
 
 =item Error: there is no Plural-Forms field in the header, but needed
 
-Cast by pluralIndex()
+Cast by C<pluralIndex()>
 
 =item Error: unsupported charset $charset in $fn
 
-Cast by read()
+Cast by C<read()>
 
 =item Error: unsupported explicit charset $charset for $fn
 
-Cast by read()
+Cast by C<read()>
 
 =item Error: unsupported file type (magic number is $magic)
 
-Cast by read()
+Cast by C<read()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Log-Report-Lexicon version 1.14,
-built on September 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report-Lexicon version 1.15,
+built on November 06, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

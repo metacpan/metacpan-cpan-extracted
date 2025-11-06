@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.008;
+use 5.010;
 
 use ExtUtils::MakeMaker;
 
@@ -14,16 +14,17 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Matplotlib-Simple",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.008",
+  "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Matplotlib::Simple",
   "PREREQ_PM" => {
     "Capture::Tiny" => 0,
     "Data::Printer" => 0,
     "Devel::Confess" => 0,
     "Devel::Size" => 0,
+    "Term::ANSIColor" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.03",
+  "VERSION" => "0.04",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -35,6 +36,7 @@ my %FallbackPrereqs = (
   "Data::Printer" => 0,
   "Devel::Confess" => 0,
   "Devel::Size" => 0,
+  "Term::ANSIColor" => 0,
   "Test::More" => 0
 );
 

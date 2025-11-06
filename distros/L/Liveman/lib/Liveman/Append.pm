@@ -224,7 +224,7 @@ __END__
 
 =head1 NAME
 
-Liveman :: Append - adds sections for methods and functions from C<Lib/**. Pm> toC<Lib/**. Md>
+Liveman::Append - adds sections for methods and functions from C<lib/**.pm> to C<lib/**.md>
 
 =head1 SYNOPSIS
 
@@ -236,13 +236,13 @@ Liveman :: Append - adds sections for methods and functions from C<Lib/**. Pm> t
 
 =head1 DESCRIPTION
 
-Adds a guide on the methods and functions of the modules (C<Lib/**. PM>) to their guidelines (C<Lib/**. MD>).
+Adds a guide on the methods and functions of the modules (C<lib/**.pm>) to their guidelines (C<lib/**.md>).
 
 =over
 
 =item 1. Methods are a Perl subprogram starting with the keyword C<sub>.
 
-=item 2. Features are the properties of copies added by OOP-frames, such as C<Aion>,C<Moose>, C<Moo>,C<Mo>, and starting with the keyword C<HAS>.
+=item 2. Features are the properties of copies added by OOP-frameworks, such as C<Aion>, C<Moose>, C<Moo>, C<Mo>, and starting with the keyword C<has>.
 
 =back
 
@@ -254,15 +254,15 @@ Constructor.
 
 =head2 mkmd ($md)
 
-Creates an MD file.
+Creates an md-file.
 
 =head2 appends ()
 
-Adds to C<Lib/**. Md> fromC<Lib/**. Pm> subprograms and features.
+Adds to C<lib/**.md> from C<lib/**.pm> subprograms and features.
 
 =head2 append ($path)
 
-Adds subprograms and functions from the module (C<$ Path>) to its manual.
+Adds subprograms and functions from the module (C<$path>) to its manual.
 
 File lib/Alt/The/Plan.pm:
 
@@ -369,8 +369,8 @@ Yaroslav O. Kosmina L<mailto:dart@cpan.org>
 
 =head1 LICENSE
 
-⚖ I<* gplv3 *>
+⚖ B<GPLv3>
 
 =head1 COPYRIGHT
 
-The Liveman :: Append Module is Copyright © 2023 Yaroslav O. Kosmina. Rusland. All Rights Reserved.
+The Liveman::Append module is Copyright © 2023 Yaroslav O. Kosmina. Rusland. All Rights Reserved.

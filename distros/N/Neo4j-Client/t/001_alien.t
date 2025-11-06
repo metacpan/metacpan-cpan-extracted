@@ -8,12 +8,14 @@ my $xs = do { local $/; <DATA> };
 xs_ok $xs, with_subtest {
   my($mod) = @_;
   ok $mod->version;
-  diag $mod->version;
+  is $mod->version, Neo4j::Client->version;
+  diag 'libneo4j-omni ' . $mod->version;
+
+  is $mod->neo4j_log_level_str(2), 'INFO';
 };
 
 diag(Neo4j::Client->cflags);
 diag(Neo4j::Client->libs);
-diag(Neo4j::Client->libs_static);
   
 done_testing;
 
@@ -35,3 +37,7 @@ MODULE = TA_MODULE PACKAGE = TA_MODULE
  
 const char *version(class);
     const char *class;
+
+char *
+neo4j_log_level_str(class, U8 level)
+  C_ARGS: level

@@ -1,3 +1,19 @@
+v0.10  2025-11-05Z
+    - Fixed invalid integer rendering in SIRTX::VM::Opcode
+    - Added basic chunk support in disassembler
+    - Added a way to skip large blocks of data in disassembler
+    - Added support for more opcodes in disassembler
+
+v0.09  2025-11-05Z
+    - Added basic support for execution_info_flags
+    - Added basic profile support
+    - Optimised register allocation in synthetic directive handling
+    - Added experimental method to read an opcode from a handle
+    - Added experimental method to render an opcode as text
+    - Fixed $opcode->is_autodie, and $opcode->is_return for non-template created opcodes
+    - Added $opcode->is_end_of_text
+    - Added disassembler: vmv0-disasm and SIRTX::VM::Disassembler
+
 v0.08  2025-09-26Z
     - Added experimental support for logical:XXX
     - Added support for resources sections

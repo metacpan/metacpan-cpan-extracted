@@ -14,6 +14,8 @@ output.images/boxplot.png
 output.images/hexbin.png
 output.images/hist2d.png
 output.images/histogram.png
+output.images/imshow.multiple.png
+output.images/imshow.single.png
 output.images/pie.png
 output.images/plot.png
 output.images/plot.single.png

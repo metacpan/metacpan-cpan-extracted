@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: log-report 0.01\n"
 "Report-Msgid-Bugs-To:\n"
 "POT-Creation-Date: 2007-05-14 17:14+0200\n"
-"PO-Revision-Date: 2025-04-14 17:31+0200\n"
+"PO-Revision-Date: 2025-11-06 10:53+0100\n"
 "Last-Translator: Mark Overmeer <mark@overmeer.net>\n"
 "Language-Team:\n"
 "MIME-Version: 1.0\n"
@@ -12,114 +12,125 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n!=1);\n"
 
-#: lib/Log/Report/Translator/POT.pm:99
+#: lib/Log/Report/Translator/POT.pm:110
 #, fuzzy
 msgid "You have to upgrade Log::Report::Lexicon to at least 1.00"
 msgstr ""
 
-#: lib/Log/Report/Extract.pm:54
+#: lib/Log/Report/Extract.pm:58
 msgid "cannot create lexicon directory {dir}"
 msgstr "kan lexicon map {dir} niet aanmaken"
 
-#: lib/Log/Report/Lexicon/MOTcompact.pm:168 lib/Log/Report/Lexicon/POT.pm:180
-#: lib/Log/Report/Lexicon/POTcompact.pm:90
+#: bin/xgettext-perl:63
+#, fuzzy
+msgid "cannot create output directory {dir}"
+msgstr ""
+
+#: lib/Log/Report/Lexicon/MOTcompact.pm:177 lib/Log/Report/Lexicon/POT.pm:192
+#: lib/Log/Report/Lexicon/POTcompact.pm:96
 #, fuzzy
 msgid "cannot detect charset in {fn}"
 msgstr ""
 
-#: lib/Log/Report/Lexicon/POT.pm:163 lib/Log/Report/Lexicon/POTcompact.pm:77
+#: bin/xgettext-perl:75
+#, fuzzy
+msgid "cannot read filename list from {fn}"
+msgstr ""
+
+#: lib/Log/Report/Lexicon/POT.pm:175 lib/Log/Report/Lexicon/POTcompact.pm:82
 #, fuzzy
 msgid "cannot read from file {fn} (unknown charset)"
 msgstr ""
 
-#: lib/Log/Report/Lexicon/POTcompact.pm:72
+#: lib/Log/Report/Lexicon/POTcompact.pm:78
 #, fuzzy
 msgid "cannot read in {charset} from file {fn}"
 msgstr ""
 
-#: lib/Log/Report/Lexicon/POT.pm:158
+#: lib/Log/Report/Lexicon/POT.pm:171
 msgid "cannot read in {cs} from file {fn}"
 msgstr "kan bestand {fn} niet lezen in {cs}"
 
-#: lib/Log/Report/Lexicon/MOTcompact.pm:89
+#: lib/Log/Report/Lexicon/MOTcompact.pm:107
 #, fuzzy
 msgid "cannot read magic from {fn}"
 msgstr ""
 
-#: lib/Log/Report/Lexicon/MOTcompact.pm:81
+#: lib/Log/Report/Lexicon/MOTcompact.pm:99
 #, fuzzy
 msgid "cannot read mo from file {fn}"
 msgstr ""
 
-#: lib/Log/Report/Lexicon/MOTcompact.pm:142
+#: lib/Log/Report/Lexicon/MOTcompact.pm:154
 #, fuzzy
 msgid "cannot read msgids from {fn}, need {size} at {loc}"
 msgstr ""
 
-#: lib/Log/Report/Lexicon/MOTcompact.pm:113
+#: lib/Log/Report/Lexicon/MOTcompact.pm:129
 #, fuzzy
 msgid "cannot read originals from {fn}, need {size} at {loc}"
 msgstr ""
 
-#: lib/Log/Report/Extract/PerlPPI.pm:134
+#: lib/Log/Report/Extract/PerlPPI.pm:142
 #, fuzzy
 msgid "cannot read perl from file {filename}"
 msgstr ""
 
-#: lib/Log/Report/Lexicon/MOTcompact.pm:99
+#: lib/Log/Report/Lexicon/MOTcompact.pm:116
 #, fuzzy
 msgid "cannot read superblock from {fn}"
 msgstr ""
 
-#: lib/Log/Report/Extract/Template.pm:114
-msgid "cannot read template from {fn}"
-msgstr "template {fn} kan niet worden gelezen"
-
-#: lib/Log/Report/Lexicon/MOTcompact.pm:124
-#: lib/Log/Report/Lexicon/MOTcompact.pm:152
+#: lib/Log/Report/Lexicon/MOTcompact.pm:138
+#: lib/Log/Report/Lexicon/MOTcompact.pm:162
 #, fuzzy
 msgid "cannot read translations from {fn}, need {size} at {loc}"
 msgstr ""
 
-#: lib/Log/Report/Lexicon/MOTcompact.pm:136
+#: lib/Log/Report/Lexicon/MOTcompact.pm:149
 #, fuzzy
 msgid "cannot seek to {loc} in {fn} for msgid strings"
 msgstr ""
 
-#: lib/Log/Report/Lexicon/MOTcompact.pm:109
+#: lib/Log/Report/Lexicon/MOTcompact.pm:126
 #, fuzzy
 msgid "cannot seek to {loc} in {fn} for originals"
 msgstr ""
 
-#: lib/Log/Report/Lexicon/MOTcompact.pm:147
+#: lib/Log/Report/Lexicon/MOTcompact.pm:158
 #, fuzzy
 msgid "cannot seek to {loc} in {fn} for transl strings"
 msgstr ""
 
-#: lib/Log/Report/Lexicon/MOTcompact.pm:120
+#: lib/Log/Report/Lexicon/MOTcompact.pm:135
 #, fuzzy
 msgid "cannot seek to {loc} in {fn} for translations"
 msgstr ""
 
-#: lib/Log/Report/Lexicon/POT.pm:237
+#: lib/Log/Report/Lexicon/POT.pm:253
 #, fuzzy
 msgid "cannot write to file {fn} with {layers}"
 msgstr "kan bestand {fn} niet schrijven in {layers}"
 
-#: lib/Log/Report/Extract/PerlPPI.pm:277
+#: lib/Log/Report/Extract/PerlPPI.pm:290
 #, fuzzy
 msgid "count missing in {function} in line {line}"
 msgstr ""
 
-#: lib/Log/Report/Extract/PerlPPI.pm:248
+#: bin/xgettext-perl:68
+#, fuzzy
+msgid "do not combine command-line filenames with --files-from"
+msgstr ""
+
+#: lib/Log/Report/Extract/PerlPPI.pm:265
 msgid "do not interpolate in msgid (found '{var}' in line {line})"
 msgstr "gebruik geen variabelen in een msgid (vond '{var}' op regel {line'})"
 
-#: lib/Log/Report/Lexicon/PO.pm:398
+#: lib/Log/Report/Lexicon/PO.pm:414
 msgid "do not understand command '{cmd}' at {where}"
 msgstr "commando '{cmd}' op plaats {where} niet begrepen"
 
-#: lib/Log/Report/Lexicon/PO.pm:415
+#: lib/Log/Report/Lexicon/PO.pm:429
 msgid ""
 "do not understand line at {where}:\n"
 "  {line}"
@@ -127,128 +138,149 @@ msgstr ""
 "de regel op {where} wordt niet begrepen:\n"
 "  {line}"
 
-#: lib/Log/Report/Extract.pm:51
+#: bin/xgettext-perl:60
+#, fuzzy
+msgid "explicit output directory (-p) required"
+msgstr ""
+
+#: lib/Log/Report/Extract.pm:55
 msgid "extractions require an explicit lexicon directory"
 msgstr "een expliciete lexicon directory is nodig voor de uittreksels"
 
-#: lib/Log/Report/Lexicon/MOTcompact.pm:183 lib/Log/Report/Lexicon/POT.pm:194
-#: lib/Log/Report/Lexicon/POTcompact.pm:136
+#: lib/Log/Report/Lexicon/MOTcompact.pm:192 lib/Log/Report/Lexicon/POT.pm:206
+#: lib/Log/Report/Lexicon/POTcompact.pm:142
 msgid "failed reading from file {fn}"
 msgstr "lezen uit bestand {fn} mislukt"
 
-#: lib/Log/Report/Extract.pm:236
+#: lib/Log/Report/Extract.pm:235
 msgid "found one pot file for domain {domain}"
 msgid_plural "found {_count} pot files for domain {domain}"
 msgstr[0] "één pot bestand voor domein {domain} gevonden"
 msgstr[1] "{_count} pot bestanden voor domain {domain} gevonden"
 
-#: lib/Log/Report/Lexicon/POTcompact.pm:88
+#: lib/Log/Report/Lexicon/POTcompact.pm:93
 #, fuzzy
 msgid "header not found for charset in {fn}"
 msgstr ""
 
-#: lib/Log/Report/Lexicon/Table.pm:125
+#: lib/Log/Report/Lexicon/Table.pm:127
 msgid "invalid plural-form algorithm '{alg}'"
 msgstr "incorrect meervoudsvorm algoritme '{alg}'"
 
-#: lib/Log/Report/Extract/Template.pm:141
-#, fuzzy
-msgid "msgid '{msgid}' contains html escapes, don't do that.  File {fn} line {linenr}"
-msgstr ""
-
-#: lib/Log/Report/Extract/Template.pm:109
-msgid "need pattern to scan for, either via new() or process()"
-msgstr "een scan pattern is nodig, via new() of process()"
-
-#: lib/Log/Report/Extract/PerlPPI.pm:266
+#: lib/Log/Report/Extract/PerlPPI.pm:279
 msgid "new-line is added automatically (found in line {line})"
 msgstr "een regel-overgang wordt automatisch toegevoegd (gevonden op regel {line})"
 
-#: lib/Log/Report/Extract/PerlPPI.pm:138
+#: lib/Log/Report/Extract/PerlPPI.pm:146
 #, fuzzy
 msgid "no Perl in file {filename}"
 msgstr ""
 
-#: lib/Log/Report/Translator/Context.pm:117
+#: lib/Log/Report/Translator/Context.pm:123
 #, fuzzy
 msgid "no context definition for `{tag}' in `{msgid}'"
 msgstr ""
 
-#: lib/Log/Report/Extract.pm:276
+#: lib/Log/Report/Extract.pm:274
 #, fuzzy
 msgid "no context tags allowed in plural `{msgid}'"
 msgstr ""
 
-#: lib/Log/Report/Lexicon/POT.pm:227
+#: lib/Log/Report/Lexicon/POT.pm:243
 msgid "no filename or file-handle specified for PO"
 msgstr "geen bestandsnaam of -handle meegegeven voor PO"
 
-#: lib/Log/Report/Lexicon/POT.pm:382
+#: lib/Log/Report/Lexicon/POT.pm:398
 msgid "no header defined in POT for file {fn}"
 msgstr "geen kop opgegeven in POT in bestand {fn}"
 
-#: lib/Log/Report/Lexicon/PO.pm:421
+#: lib/Log/Report/Lexicon/PO.pm:88
+#, fuzzy
+msgid "no msgid defined for PO"
+msgstr ""
+
+#: lib/Log/Report/Lexicon/PO.pm:434
 msgid "no msgid in block {where}"
 msgstr "geen msgid in blok {where}"
 
-#: lib/Log/Report/Lexicon/PO.pm:500
+#: lib/Log/Report/Lexicon/PO.pm:513
 msgid "no plurals for '{msgid}'"
 msgstr "geen meervoudsvormen voor '{msgid}'"
 
-#: lib/Log/Report/Extract/PerlPPI.pm:202
+#: lib/Log/Report/Extract/PerlPPI.pm:219
 msgid "no text-domain for translatable at {fn} line {line}"
 msgstr "geen text-domain voor vertaalbare string in {fn} regel {line}"
 
-#: lib/Log/Report/Translator/Context.pm:125
+#: lib/Log/Report/Translator/Context.pm:130
 #, fuzzy
 msgid "no value for tag `{tag}' in the context"
 msgstr ""
 
-#: lib/Log/Report/Extract/PerlPPI.pm:142 lib/Log/Report/Extract/Template.pm:106
+#: lib/Log/Report/Extract/PerlPPI.pm:150
 msgid "processing file {fn} in {charset}"
 msgstr "verwerk bestand {fn} in {charset}"
 
-#: lib/Log/Report/Lexicon/PO.pm:410
+#: bin/xgettext-perl:57
+#, fuzzy
+msgid "programming language {lang} not supported"
+msgstr ""
+
+#: lib/Log/Report/Lexicon/PO.pm:425
 msgid "quoted line is not a continuation at {where}"
 msgstr "regel met quotes is geen voortzetting in {where}"
 
-#: lib/Log/Report/Translator/POT.pm:176
+#: lib/Log/Report/Translator/POT.pm:190
 #, fuzzy
 msgid "read table {filename} as {class} for {dname} in {locale}"
 msgstr ""
 
-#: lib/Log/Report/Extract.pm:245
+#: bin/xgettext-perl:111
+#, fuzzy
+msgid "skipping (not a template) {fn}"
+msgstr ""
+
+#: bin/xgettext-perl:132
+#, fuzzy
+msgid "skipping (not perl) {fn}"
+msgstr ""
+
+#: bin/xgettext-perl:129
+#, fuzzy
+msgid "skipping missing file {fn}"
+msgstr ""
+
+#: bin/xgettext-perl:98
+#, fuzzy
+msgid "specify a text-domain (-d) for the templates"
+msgstr ""
+
+#: lib/Log/Report/Extract.pm:242
 msgid "starting new textdomain {domain}, template in {filename}"
 msgstr "begin van nieuw textdomain {domain}, sjabloon in {filename}"
 
-#: lib/Log/Report/Lexicon/POTcompact.pm:199
+#: lib/Log/Report/Lexicon/POTcompact.pm:208
 msgid "string '{text}' not between quotes at {location}"
 msgstr "tekst '{text}' niet tussen quotes in {location}"
 
-#: lib/Log/Report/Extract/PerlPPI.pm:256
+#: lib/Log/Report/Extract/PerlPPI.pm:269
 msgid "string is incorrect at line {line}: {error}"
 msgstr "foutieve string in regel {regel}: {error}"
 
-#: lib/Log/Report/Translator/Context.pm:156
+#: lib/Log/Report/Translator/Context.pm:163
 #, fuzzy
 msgid "tags value must have form `a=b', found `{this}' in `{source}'"
 msgstr ""
 
-#: lib/Log/Report/Extract/Template.pm:170
-#, fuzzy
-msgid "template syntax error, no END in {fn} line {line}"
-msgstr ""
-
-#: lib/Log/Report/Lexicon/POT.pm:119
+#: lib/Log/Report/Lexicon/POT.pm:126
 msgid "textdomain parameter is required"
 msgstr "tekstdomain argument is verplicht"
 
-#: lib/Log/Report/Lexicon/MOTcompact.pm:165
+#: lib/Log/Report/Lexicon/MOTcompact.pm:174
 #, fuzzy
 msgid "the header is not the first entry, needed for charset in {fn}"
 msgstr ""
 
-#: lib/Log/Report/Lexicon/POT.pm:361
+#: lib/Log/Report/Lexicon/POT.pm:376
 msgid "the only acceptable parameter is 'ACTIVE', not '{p}'"
 msgstr "het enige geaccepteerde argument is 'ACTIVE', niet '{p}'"
 
@@ -257,65 +289,60 @@ msgstr "het enige geaccepteerde argument is 'ACTIVE', niet '{p}'"
 msgid "there is no Plural-Forms field in the header, but needed"
 msgstr ""
 
-#: lib/Log/Report/Lexicon/PO.pm:489
+#: lib/Log/Report/Lexicon/PO.pm:503
 msgid "too many plurals for '{msgid}'"
 msgstr "te veel meervouden voor '{msgid}'"
 
-#: lib/Log/Report/Lexicon/POT.pm:341
+#: lib/Log/Report/Lexicon/POT.pm:358
 #, fuzzy
 msgid "translation already exists for '{msgid}' with '{ctxt}"
 msgstr ""
 
-#: lib/Log/Report/Translator/Context.pm:129
+#: lib/Log/Report/Translator/Context.pm:134
 #, fuzzy
 msgid "unknown alternative `{alt}' for tag `{tag}' in context of `{msgid}'"
 msgstr ""
 
-#: lib/Log/Report/Lexicon/PO.pm:372
+#: lib/Log/Report/Lexicon/PO.pm:389
 msgid "unknown comment type '{cmd}' at {where}"
 msgstr "onbekend commentaar type '{cmd}' in {where}"
 
-#: lib/Log/Report/Translator/Context.pm:180
+#: lib/Log/Report/Translator/Context.pm:188
 #, fuzzy
 msgid "unknown context tag '{tag}' used in '{msgid}'"
 msgstr ""
 
-#: lib/Log/Report/Lexicon/PO.pm:340
+#: lib/Log/Report/Lexicon/PO.pm:349
 msgid "unknown flag {flag} ignored"
 msgstr "onbekende vlag {flag} wordt genegeerd"
 
-#: lib/Log/Report/Extract/Template.pm:130
-#, fuzzy
-msgid "unknown pattern {pattern}"
-msgstr ""
-
-#: lib/Log/Report/Translator/POT.pm:174
+#: lib/Log/Report/Translator/POT.pm:188
 #, fuzzy
 msgid "unknown translation table extension '{ext}' in {filename}"
 msgstr ""
 
-#: lib/Log/Report/Lexicon/MOTcompact.pm:172 lib/Log/Report/Lexicon/POT.pm:185
-#: lib/Log/Report/Lexicon/POTcompact.pm:92
+#: lib/Log/Report/Lexicon/MOTcompact.pm:182 lib/Log/Report/Lexicon/POT.pm:198
+#: lib/Log/Report/Lexicon/POTcompact.pm:99
 #, fuzzy
 msgid "unsupported charset {charset} in {fn}"
 msgstr ""
 
-#: lib/Log/Report/Lexicon/MOTcompact.pm:67
+#: lib/Log/Report/Lexicon/MOTcompact.pm:86
 #, fuzzy
 msgid "unsupported explicit charset {charset} for {fn}"
 msgstr ""
 
-#: lib/Log/Report/Lexicon/MOTcompact.pm:94
+#: lib/Log/Report/Lexicon/MOTcompact.pm:112
 #, fuzzy
 msgid "unsupported file type (magic number is {magic%x})"
 msgstr ""
 
-#: lib/Log/Report/Extract/PerlPPI.pm:186
+#: lib/Log/Report/Extract/PerlPPI.pm:197
 #, fuzzy
 msgid "use double quotes not single, in {string} on {file} line {line}"
 msgstr ""
 
-#: lib/Log/Report/Lexicon/POT.pm:258
+#: lib/Log/Report/Lexicon/POT.pm:273
 msgid "write errors for file {fn}"
 msgstr "schrijfproblemen bij bestand {fn}"
 
@@ -325,12 +352,12 @@ msgid_plural "{domain}: {_count} files with each {ids} msgids"
 msgstr[0] "{domain}: één bestand met {ids} mgsids"
 msgstr[1] "{domain}: {_count} bestanden met elk {ids} msgids"
 
-#: lib/Log/Report/Extract.pm:176
+#: lib/Log/Report/Extract.pm:178
 msgid "{domain}: one file with {ids} msgids, {f} fuzzy and {i} inactive translations"
 msgid_plural "{domain}: {_count} files each {ids} msgids, {f} fuzzy and {i} inactive translations in total"
 msgstr[0] "{domain}: één bestand met {ids} mgsids, {f} fuzzy en {i} op non-actief"
 msgstr[1] "{domain}: {_count} bestanden met elk {ids} msgids, {f} fuzzy en {i} op non-actief in het totaal"
 
-#: lib/Log/Report/Extract.pm:166
+#: lib/Log/Report/Extract.pm:170
 msgid "{domain}: {fuzzy%3d} fuzzy, {inact%3d} inactive in {filename}"
 msgstr "{domain}: {fuzzy%3d} fuzzy, {inact%3d} op non-actief in {filename}"

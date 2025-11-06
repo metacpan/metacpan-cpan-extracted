@@ -109,6 +109,9 @@ MANIFEST			This list of files
 README
 README.md
 t/001_alien.t
+t/020_inline.t
+t/021_ffi.t
+t/030_sslversion.t
 t/098_pod.t
 t/099_cpan_changes.t
 tools/ac/alienfile

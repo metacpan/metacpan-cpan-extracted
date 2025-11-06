@@ -1,5 +1,10 @@
 Revision history for Perl extension Liveman
 
+3.4 2025-11-06T10:10:27Z
+
+    - if not *.pm, then writes *.pod
+    - fix bug with translation
+
 3.3 2025-10-26T21:38:45Z
 
     - liveman added cover-badge in <project>/doc/badges/total.svg

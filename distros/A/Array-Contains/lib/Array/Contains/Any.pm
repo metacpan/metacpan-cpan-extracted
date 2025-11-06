@@ -7,7 +7,7 @@ use feature 'keyword_any';
 no warnings 'experimental::keyword_any';
 use mro 'c3';
 use English;
-our $VERSION = 3.0;
+our $VERSION = 3.1;
 use Carp;
 
 require Exporter;

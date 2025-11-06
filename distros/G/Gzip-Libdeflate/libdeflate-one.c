@@ -23,7 +23,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.24/lib/adler32.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.25/lib/adler32.c */
 
 
 /* #include "lib_common.h" */
@@ -74,8 +74,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	24
-#define LIBDEFLATE_VERSION_STRING	"1.24"
+#define LIBDEFLATE_VERSION_MINOR	25
+#define LIBDEFLATE_VERSION_STRING	"1.25"
 
 
 #ifndef LIBDEFLATEAPI
@@ -1075,8 +1075,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	24
-#define LIBDEFLATE_VERSION_STRING	"1.24"
+#define LIBDEFLATE_VERSION_MINOR	25
+#define LIBDEFLATE_VERSION_STRING	"1.25"
 
 
 #ifndef LIBDEFLATEAPI
@@ -2477,8 +2477,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	24
-#define LIBDEFLATE_VERSION_STRING	"1.24"
+#define LIBDEFLATE_VERSION_MINOR	25
+#define LIBDEFLATE_VERSION_STRING	"1.25"
 
 
 #ifndef LIBDEFLATEAPI
@@ -3484,15 +3484,6 @@ static inline u32 get_x86_cpu_features(void) { return 0; }
 #  define HAVE_AVXVNNI(features)	1
 #else
 #  define HAVE_AVXVNNI(features)	((features) & X86_CPU_FEATURE_AVXVNNI)
-#endif
-
-#if (GCC_PREREQ(14, 0) || CLANG_PREREQ(18, 0, 18000000)) \
-	&& !defined(__EVEX512__) 
-#  define EVEX512	",evex512"	
-#  define NO_EVEX512	",no-evex512"
-#else
-#  define EVEX512	""
-#  define NO_EVEX512	""
 #endif
 
 #endif 
@@ -4712,7 +4703,7 @@ ADD_SUFFIX(adler32_x86)(u32 adler, const u8 *p, size_t len)
 
 #  define adler32_x86_avx512_vl256_vnni	adler32_x86_avx512_vl256_vnni
 #  define SUFFIX				   _avx512_vl256_vnni
-#  define ATTRIBUTES		_target_attribute("avx512bw,avx512vl,avx512vnni" NO_EVEX512)
+#  define ATTRIBUTES		_target_attribute("avx512bw,avx512vl,avx512vnni")
 #  define VL			32
 #  define USE_VNNI		1
 #  define USE_AVX512		1
@@ -5113,7 +5104,7 @@ ADD_SUFFIX(adler32_x86)(u32 adler, const u8 *p, size_t len)
 
 #  define adler32_x86_avx512_vl512_vnni	adler32_x86_avx512_vl512_vnni
 #  define SUFFIX				   _avx512_vl512_vnni
-#  define ATTRIBUTES		_target_attribute("avx512bw,avx512vnni" EVEX512)
+#  define ATTRIBUTES		_target_attribute("avx512bw,avx512vnni")
 #  define VL			64
 #  define USE_VNNI		1
 #  define USE_AVX512		1
@@ -5579,7 +5570,7 @@ libdeflate_adler32(u32 adler, const void *buffer, size_t len)
 		return 1;
 	return adler32_impl(adler, buffer, len);
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.24/lib/crc32.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.25/lib/crc32.c */
 
 
 
@@ -5632,8 +5623,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	24
-#define LIBDEFLATE_VERSION_STRING	"1.24"
+#define LIBDEFLATE_VERSION_MINOR	25
+#define LIBDEFLATE_VERSION_STRING	"1.25"
 
 
 #ifndef LIBDEFLATEAPI
@@ -7580,8 +7571,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	24
-#define LIBDEFLATE_VERSION_STRING	"1.24"
+#define LIBDEFLATE_VERSION_MINOR	25
+#define LIBDEFLATE_VERSION_STRING	"1.25"
 
 
 #ifndef LIBDEFLATEAPI
@@ -9835,8 +9826,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	24
-#define LIBDEFLATE_VERSION_STRING	"1.24"
+#define LIBDEFLATE_VERSION_MINOR	25
+#define LIBDEFLATE_VERSION_STRING	"1.25"
 
 
 #ifndef LIBDEFLATEAPI
@@ -10844,15 +10835,6 @@ static inline u32 get_x86_cpu_features(void) { return 0; }
 #  define HAVE_AVXVNNI(features)	((features) & X86_CPU_FEATURE_AVXVNNI)
 #endif
 
-#if (GCC_PREREQ(14, 0) || CLANG_PREREQ(18, 0, 18000000)) \
-	&& !defined(__EVEX512__) 
-#  define EVEX512	",evex512"	
-#  define NO_EVEX512	",no-evex512"
-#else
-#  define EVEX512	""
-#  define NO_EVEX512	""
-#endif
-
 #endif 
 
 #endif 
@@ -11841,7 +11823,7 @@ reduce_x0:
 
 #  define crc32_x86_vpclmulqdq_avx512_vl256  crc32_x86_vpclmulqdq_avx512_vl256
 #  define SUFFIX				      _vpclmulqdq_avx512_vl256
-#  define ATTRIBUTES		_target_attribute("vpclmulqdq,pclmul,avx512bw,avx512vl" NO_EVEX512)
+#  define ATTRIBUTES		_target_attribute("vpclmulqdq,pclmul,avx512bw,avx512vl")
 #  define VL			32
 #  define USE_AVX512		1
 /* #include "x86-crc32_pclmul_template.h" */
@@ -12162,7 +12144,7 @@ reduce_x0:
 
 #  define crc32_x86_vpclmulqdq_avx512_vl512  crc32_x86_vpclmulqdq_avx512_vl512
 #  define SUFFIX				      _vpclmulqdq_avx512_vl512
-#  define ATTRIBUTES		_target_attribute("vpclmulqdq,pclmul,avx512bw,avx512vl" EVEX512)
+#  define ATTRIBUTES		_target_attribute("vpclmulqdq,pclmul,avx512bw,avx512vl")
 #  define VL			64
 #  define USE_AVX512		1
 /* #include "x86-crc32_pclmul_template.h" */
@@ -12550,7 +12532,7 @@ libdeflate_crc32(u32 crc, const void *p, size_t len)
 		return 0;
 	return ~crc32_impl(~crc, p, len);
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.24/lib/deflate_compress.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.25/lib/deflate_compress.c */
 
 
 /* #include "deflate_compress.h" */
@@ -12605,8 +12587,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	24
-#define LIBDEFLATE_VERSION_STRING	"1.24"
+#define LIBDEFLATE_VERSION_MINOR	25
+#define LIBDEFLATE_VERSION_STRING	"1.25"
 
 
 #ifndef LIBDEFLATEAPI
@@ -13656,8 +13638,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	24
-#define LIBDEFLATE_VERSION_STRING	"1.24"
+#define LIBDEFLATE_VERSION_MINOR	25
+#define LIBDEFLATE_VERSION_STRING	"1.25"
 
 
 #ifndef LIBDEFLATEAPI
@@ -14644,8 +14626,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	24
-#define LIBDEFLATE_VERSION_STRING	"1.24"
+#define LIBDEFLATE_VERSION_MINOR	25
+#define LIBDEFLATE_VERSION_STRING	"1.25"
 
 
 #ifndef LIBDEFLATEAPI
@@ -15804,8 +15786,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	24
-#define LIBDEFLATE_VERSION_STRING	"1.24"
+#define LIBDEFLATE_VERSION_MINOR	25
+#define LIBDEFLATE_VERSION_STRING	"1.25"
 
 
 #ifndef LIBDEFLATEAPI
@@ -16811,15 +16793,6 @@ static inline u32 get_x86_cpu_features(void) { return 0; }
 #  define HAVE_AVXVNNI(features)	1
 #else
 #  define HAVE_AVXVNNI(features)	((features) & X86_CPU_FEATURE_AVXVNNI)
-#endif
-
-#if (GCC_PREREQ(14, 0) || CLANG_PREREQ(18, 0, 18000000)) \
-	&& !defined(__EVEX512__) 
-#  define EVEX512	",evex512"	
-#  define NO_EVEX512	",no-evex512"
-#else
-#  define EVEX512	""
-#  define NO_EVEX512	""
 #endif
 
 #endif 
@@ -17310,8 +17283,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	24
-#define LIBDEFLATE_VERSION_STRING	"1.24"
+#define LIBDEFLATE_VERSION_MINOR	25
+#define LIBDEFLATE_VERSION_STRING	"1.25"
 
 
 #ifndef LIBDEFLATEAPI
@@ -18298,8 +18271,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	24
-#define LIBDEFLATE_VERSION_STRING	"1.24"
+#define LIBDEFLATE_VERSION_MINOR	25
+#define LIBDEFLATE_VERSION_STRING	"1.25"
 
 
 #ifndef LIBDEFLATEAPI
@@ -19458,8 +19431,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	24
-#define LIBDEFLATE_VERSION_STRING	"1.24"
+#define LIBDEFLATE_VERSION_MINOR	25
+#define LIBDEFLATE_VERSION_STRING	"1.25"
 
 
 #ifndef LIBDEFLATEAPI
@@ -20465,15 +20438,6 @@ static inline u32 get_x86_cpu_features(void) { return 0; }
 #  define HAVE_AVXVNNI(features)	1
 #else
 #  define HAVE_AVXVNNI(features)	((features) & X86_CPU_FEATURE_AVXVNNI)
-#endif
-
-#if (GCC_PREREQ(14, 0) || CLANG_PREREQ(18, 0, 18000000)) \
-	&& !defined(__EVEX512__) 
-#  define EVEX512	",evex512"	
-#  define NO_EVEX512	",no-evex512"
-#else
-#  define EVEX512	""
-#  define NO_EVEX512	""
 #endif
 
 #endif 
@@ -20913,8 +20877,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	24
-#define LIBDEFLATE_VERSION_STRING	"1.24"
+#define LIBDEFLATE_VERSION_MINOR	25
+#define LIBDEFLATE_VERSION_STRING	"1.25"
 
 
 #ifndef LIBDEFLATEAPI
@@ -21901,8 +21865,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	24
-#define LIBDEFLATE_VERSION_STRING	"1.24"
+#define LIBDEFLATE_VERSION_MINOR	25
+#define LIBDEFLATE_VERSION_STRING	"1.25"
 
 
 #ifndef LIBDEFLATEAPI
@@ -23061,8 +23025,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	24
-#define LIBDEFLATE_VERSION_STRING	"1.24"
+#define LIBDEFLATE_VERSION_MINOR	25
+#define LIBDEFLATE_VERSION_STRING	"1.25"
 
 
 #ifndef LIBDEFLATEAPI
@@ -24068,15 +24032,6 @@ static inline u32 get_x86_cpu_features(void) { return 0; }
 #  define HAVE_AVXVNNI(features)	1
 #else
 #  define HAVE_AVXVNNI(features)	((features) & X86_CPU_FEATURE_AVXVNNI)
-#endif
-
-#if (GCC_PREREQ(14, 0) || CLANG_PREREQ(18, 0, 18000000)) \
-	&& !defined(__EVEX512__) 
-#  define EVEX512	",evex512"	
-#  define NO_EVEX512	",no-evex512"
-#else
-#  define EVEX512	""
-#  define NO_EVEX512	""
 #endif
 
 #endif 
@@ -27460,7 +27415,7 @@ libdeflate_deflate_compress_bound(struct libdeflate_compressor *c,
 	
 	return (5 * max_blocks) + in_nbytes;
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.24/lib/deflate_decompress.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.25/lib/deflate_decompress.c */
 
 
 /* #include "lib_common.h" */
@@ -27511,8 +27466,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	24
-#define LIBDEFLATE_VERSION_STRING	"1.24"
+#define LIBDEFLATE_VERSION_MINOR	25
+#define LIBDEFLATE_VERSION_STRING	"1.25"
 
 
 #ifndef LIBDEFLATEAPI
@@ -29654,8 +29609,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	24
-#define LIBDEFLATE_VERSION_STRING	"1.24"
+#define LIBDEFLATE_VERSION_MINOR	25
+#define LIBDEFLATE_VERSION_STRING	"1.25"
 
 
 #ifndef LIBDEFLATEAPI
@@ -30663,15 +30618,6 @@ static inline u32 get_x86_cpu_features(void) { return 0; }
 #  define HAVE_AVXVNNI(features)	((features) & X86_CPU_FEATURE_AVXVNNI)
 #endif
 
-#if (GCC_PREREQ(14, 0) || CLANG_PREREQ(18, 0, 18000000)) \
-	&& !defined(__EVEX512__) 
-#  define EVEX512	",evex512"	
-#  define NO_EVEX512	",no-evex512"
-#else
-#  define EVEX512	""
-#  define NO_EVEX512	""
-#endif
-
 #endif 
 
 #endif 
@@ -31406,7 +31352,7 @@ libdeflate_free_decompressor(struct libdeflate_decompressor *d)
 	if (d)
 		d->free_func(d);
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.24/lib/gzip_compress.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.25/lib/gzip_compress.c */
 
 
 /* #include "deflate_compress.h" */
@@ -31461,8 +31407,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	24
-#define LIBDEFLATE_VERSION_STRING	"1.24"
+#define LIBDEFLATE_VERSION_MINOR	25
+#define LIBDEFLATE_VERSION_STRING	"1.25"
 
 
 #ifndef LIBDEFLATEAPI
@@ -32458,7 +32404,7 @@ libdeflate_gzip_compress_bound(struct libdeflate_compressor *c,
 	return GZIP_MIN_OVERHEAD +
 	       libdeflate_deflate_compress_bound(c, in_nbytes);
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.24/lib/gzip_decompress.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.25/lib/gzip_decompress.c */
 
 
 /* #include "lib_common.h" */
@@ -32509,8 +32455,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	24
-#define LIBDEFLATE_VERSION_STRING	"1.24"
+#define LIBDEFLATE_VERSION_MINOR	25
+#define LIBDEFLATE_VERSION_STRING	"1.25"
 
 
 #ifndef LIBDEFLATEAPI
@@ -33551,7 +33497,7 @@ libdeflate_gzip_decompress(struct libdeflate_decompressor *d,
 					     out, out_nbytes_avail,
 					     NULL, actual_out_nbytes_ret);
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.24/lib/utils.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.25/lib/utils.c */
 
 
 /* #include "lib_common.h" */
@@ -33602,8 +33548,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	24
-#define LIBDEFLATE_VERSION_STRING	"1.24"
+#define LIBDEFLATE_VERSION_MINOR	25
+#define LIBDEFLATE_VERSION_STRING	"1.25"
 
 
 #ifndef LIBDEFLATEAPI
@@ -34593,7 +34539,7 @@ libdeflate_assertion_failed(const char *expr, const char *file, int line)
 	abort();
 }
 #endif 
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.24/lib/zlib_compress.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.25/lib/zlib_compress.c */
 
 
 /* #include "deflate_compress.h" */
@@ -34648,8 +34594,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	24
-#define LIBDEFLATE_VERSION_STRING	"1.24"
+#define LIBDEFLATE_VERSION_MINOR	25
+#define LIBDEFLATE_VERSION_STRING	"1.25"
 
 
 #ifndef LIBDEFLATEAPI
@@ -35613,7 +35559,7 @@ libdeflate_zlib_compress_bound(struct libdeflate_compressor *c,
 	return ZLIB_MIN_OVERHEAD +
 	       libdeflate_deflate_compress_bound(c, in_nbytes);
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.24/lib/zlib_decompress.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.25/lib/zlib_decompress.c */
 
 
 /* #include "lib_common.h" */
@@ -35664,8 +35610,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	24
-#define LIBDEFLATE_VERSION_STRING	"1.24"
+#define LIBDEFLATE_VERSION_MINOR	25
+#define LIBDEFLATE_VERSION_STRING	"1.25"
 
 
 #ifndef LIBDEFLATEAPI
@@ -36642,7 +36588,7 @@ libdeflate_zlib_decompress(struct libdeflate_decompressor *d,
 					     out, out_nbytes_avail,
 					     NULL, actual_out_nbytes_ret);
 }
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.24/lib/arm/cpu_features.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.25/lib/arm/cpu_features.c */
 
 
 
@@ -36719,8 +36665,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	24
-#define LIBDEFLATE_VERSION_STRING	"1.24"
+#define LIBDEFLATE_VERSION_MINOR	25
+#define LIBDEFLATE_VERSION_STRING	"1.25"
 
 
 #ifndef LIBDEFLATEAPI
@@ -37706,8 +37652,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	24
-#define LIBDEFLATE_VERSION_STRING	"1.24"
+#define LIBDEFLATE_VERSION_MINOR	25
+#define LIBDEFLATE_VERSION_STRING	"1.25"
 
 
 #ifndef LIBDEFLATEAPI
@@ -38930,7 +38876,7 @@ void libdeflate_init_arm_cpu_features(void)
 }
 
 #endif 
-/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.24/lib/x86/cpu_features.c */
+/* /usr/home/ben/projects/gzip-libdeflate/../../software/libdeflate/libdeflate-1.25/lib/x86/cpu_features.c */
 
 
 /* #include "cpu_features_common.h" - no include guard */ 
@@ -38988,8 +38934,8 @@ extern "C" {
 #endif
 
 #define LIBDEFLATE_VERSION_MAJOR	1
-#define LIBDEFLATE_VERSION_MINOR	24
-#define LIBDEFLATE_VERSION_STRING	"1.24"
+#define LIBDEFLATE_VERSION_MINOR	25
+#define LIBDEFLATE_VERSION_STRING	"1.25"
 
 
 #ifndef LIBDEFLATEAPI
@@ -39995,15 +39941,6 @@ static inline u32 get_x86_cpu_features(void) { return 0; }
 #  define HAVE_AVXVNNI(features)	1
 #else
 #  define HAVE_AVXVNNI(features)	((features) & X86_CPU_FEATURE_AVXVNNI)
-#endif
-
-#if (GCC_PREREQ(14, 0) || CLANG_PREREQ(18, 0, 18000000)) \
-	&& !defined(__EVEX512__) 
-#  define EVEX512	",evex512"	
-#  define NO_EVEX512	",no-evex512"
-#else
-#  define EVEX512	""
-#  define NO_EVEX512	""
 #endif
 
 #endif 

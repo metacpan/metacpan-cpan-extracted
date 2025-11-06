@@ -8,9 +8,17 @@ This document is formatted according to the principles of [Keep A CHANGELOG](htt
 
 ## [Unreleased]
 
+## [36.1.0] - 2025-11-05
+### Added
+- [Java] Add OSGi metadata ([#485](https://github.com/cucumber/gherkin/pull/485))
+
+## [30.1.0] - 2025-11-05
+### Added
+- [Java] Add OSGi metadata ([#485](https://github.com/cucumber/gherkin/pull/485))
+
 ## [36.0.0] - 2025-10-09
 ### Changed
-- [.NET, Elixir, Go, JavaScript, Java, Perl, Php, Ruby] Update dependency messages to v31
+- [.NET, Elixir, Go, JavaScript, Java, Perl, Php, Ruby] Update dependency messages to v30
 
 ### Fixed
 - [Java] Only use `org.assertj:assertj-core` in `test` scope.
@@ -838,7 +846,9 @@ This document is formatted according to the principles of [Keep A CHANGELOG](htt
 ### Changed
 - First release
 
-[Unreleased]: https://github.com/cucumber/gherkin/compare/v36.0.0...HEAD
+[Unreleased]: https://github.com/cucumber/gherkin/compare/v36.1.0...HEAD
+[36.1.0]: https://github.com/cucumber/gherkin/compare/v30.1.0...v36.1.0
+[30.1.0]: https://github.com/cucumber/gherkin/compare/v36.0.0...v30.1.0
 [36.0.0]: https://github.com/cucumber/gherkin/compare/v35.1.0...v36.0.0
 [35.1.0]: https://github.com/cucumber/gherkin/compare/v35.0.0...v35.1.0
 [35.0.0]: https://github.com/cucumber/gherkin/compare/v34.0.0...v35.0.0

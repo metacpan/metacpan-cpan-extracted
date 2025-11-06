@@ -68,7 +68,22 @@ Add an empty page as page number 1.
 Get page 3 from file C</some/file.pdf> and add it as page 2 in the PDF
 that is built.
 
+   {
+      ope => 'add-page',
+      'from-path' => '/some/file.pdf',
+      'from-page' => '2-10 13 17 19-25',
+   }
+
+
+(Since 0.003) Get multiple pages from file C</some/file.pdf> and add all
+of them at the end of the PDF that is built, in the same order as they
+are specified in C<from-page>.
+
 Key C<from-path> can also be abbreviated as C<from>.
+
+As of version 0.003, input PDFs are opened only once and the associated
+object is cached for later reuse, giving a performance boost on big
+files.
 
 =head2 B<< add-text >>
 

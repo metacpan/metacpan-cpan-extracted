@@ -10,6 +10,7 @@ WriteMakefile(
     MIN_PERL_VERSION  => '5.36.0',
     PREREQ_PM         => {
         "Array::Contains" => 2.7,
+        "DBI" => 0,
         "XML::Simple" => 0,
         "IO::Select" => 0,
         "IO::Socket::IP" => 0,

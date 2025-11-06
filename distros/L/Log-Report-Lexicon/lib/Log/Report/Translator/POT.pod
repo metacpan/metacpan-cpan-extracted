@@ -33,9 +33,15 @@ lazily (unless forced).  This module accesses the PO's in a compact way,
 using L<Log::Report::Lexicon::POTcompact|Log::Report::Lexicon::POTcompact>, which is much more efficient
 than L<Log::Report::Lexicon::PO|Log::Report::Lexicon::PO>.
 
+Extends L<"DESCRIPTION" in Log::Report::Translator|Log::Report::Translator/"DESCRIPTION">.
+
 =head1 METHODS
 
+Extends L<"METHODS" in Log::Report::Translator|Log::Report::Translator/"METHODS">.
+
 =head2 Constructors
+
+Extends L<"Constructors" in Log::Report::Translator|Log::Report::Translator/"Constructors">.
 
 =over 4
 
@@ -68,7 +74,7 @@ of a L<Log::Report::Lexicon::Index|Log::Report::Lexicon::Index>.
 
 =back
 
-example: default lexicon directory
+» example: default lexicon directory
 
   # file xxx/perl5.8.8/My/Module.pm
   use Log::Report 'my-domain',
@@ -79,6 +85,8 @@ example: default lexicon directory
 =back
 
 =head2 Accessors
+
+Extends L<"Accessors" in Log::Report::Translator|Log::Report::Translator/"Accessors">.
 
 =over 4
 
@@ -95,11 +103,17 @@ translation files may be located.
 
 =head2 Translating
 
+Extends L<"Translating" in Log::Report::Translator|Log::Report::Translator/"Translating">.
+
 =over 4
+
+=item $obj-E<gt>B<load>($domain, $locale)
+
+Inherited, see L<Log::Report::Translator/"Translating">
 
 =item $obj-E<gt>B<translate>($msg, $lang, $context)
 
-Z<>
+Inherited, see L<Log::Report::Translator/"Translating">
 
 =back
 
@@ -109,22 +123,22 @@ Z<>
 
 =item Error: You have to upgrade Log::Report::Lexicon to at least 1.00
 
-Cast by new()
+Cast by C<new()>
 
 =item Info: read table $filename as $class for $dname in $locale
 
-Cast by translate()
+Cast by C<translate()>
 
 =item Error: unknown translation table extension '$ext' in $filename
 
-Cast by translate()
+Cast by C<translate()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Log-Report-Lexicon version 1.14,
-built on September 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report-Lexicon version 1.15,
+built on November 06, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

@@ -5,41 +5,35 @@
 use warnings;
 use strict;
 
-use Log::Report 'log-report';
+use Log::Report 'log-report-lexicon';
 
 use Getopt::Long qw/:config no_ignore_case bundling/;
 use File::Find   qw/find/;
 use Pod::Usage   qw/pod2usage/;
 
-my $lang    = 'perl';
-my $version = 0;
-my $help    = 0;
-my $cleanup = 1;
-my ($from, $output, $fn_match, %configs);
-my ($char_in, $char_out) = ('utf-8', 'utf-8');
-my ($default_domain, $mode, $template);
+my $mode = 0;
 
 GetOptions
-   'cleanup!'          => \$cleanup  # kill transl from removed files, def true
- , 'config|c=s'        => \%configs  # domain configurations
- , 'domain|d=s'        => \$default_domain    # for templates
- , 'files-from|f=s'    => \$from     # file with filenames (MANIFEST?) or '-'
- , 'files-match|m=s'   => \$fn_match # select filename is dir
- , 'from-code=s'       => \$char_in
- , 'help|h'            => \$help
- , 'language|L=s'      => \$lang
- , 'mode=s'            => \$mode
- , 'output-dir|p=s'    => \$output
- , 'template|t=s'      => \$template # pattern in ::Template
- , 'to-code=s'         => \$char_out # missing in xgettext?
- , 'verbose=i'         => \$mode
- , 'version|V'         => \$version
- , 'v+'                => \$mode
+	'cleanup!'          => \(my $cleanup  = 1),       # kill transl from removed files, def true
+	'config|c=s'        => \(my %configs),            # domain configurations
+	'domain|d=s'        => \(my $default_domain),     # for templates
+	'files-from|f=s'    => \(my $from),               # file with filenames (MANIFEST?) or '-'
+	'files-match|m=s'   => \(my $fn_match),           # select filename is dir
+	'from-code=s'       => \(my $char_in),
+	'help|h'            => \(my $help     = 0),
+	'language|L=s'      => \(my $lang     = 'perl'),
+	'mode=s'            => \$mode,
+	'output-dir|p=s'    => \(my $output),
+	'template|t=s'      => \(my $template),           # pattern in ::Template
+	'to-code=s'         => \(my $char_out = 'utf-8'), # missing in xgettext?
+	'verbose=i'         => \$mode,
+	'version|V'         => \(my $version  = 0),
+	'v+'                => \$mode,
    or exit 1;
 
 if($version)
-{   print "Log::Report $Log::Report::VERSION\n";
-    exit 0;
+{	print "Log::Report $Log::Report::VERSION\n";
+	exit 0;
 }
 
 $help && pod2usage(0);
@@ -51,103 +45,100 @@ $help && pod2usage(0);
 #    --config domain1=filename --config domain2=filename
 
 while(my ($domain, $fn) = each %configs)
-{   trace "configuring domain $domain from $fn";
-    textdomain $domain, config => $fn;
+{	trace "configuring domain $domain from $fn";
+	textdomain $domain, config => $fn;
 }
 
 # all output to stderr
-dispatcher FILE => stderr => to => \*STDERR
-  , mode => $mode, format => sub {shift};
-
+dispatcher FILE => stderr => to => \*STDERR , mode => $mode, format => sub {shift};
 dispatcher close => 'default';
 
 $template || $lang eq 'perl'
-    or error __x"programming language {lang} not supported", lang => $lang;
+	or error __x"programming language {lang} not supported", lang => $lang;
 
 defined $output
-    or error __"explicit output directory (-p) required";
+	or error __"explicit output directory (-p) required";
 
 -d $output or mkdir $output
-    or fault __x"cannot create output directory {dir}", dir => $output;
+	or fault __x"cannot create output directory {dir}", dir => $output;
 
 my @filenames;
 if(defined $from)
-{   !@ARGV
-        or error __x"do not combine command-line filenames with --files-from";
+{	!@ARGV
+		or error __x"do not combine command-line filenames with --files-from";
 
-    if($from eq '-')
-    {   @filenames = <STDIN>;
-    }
-    else
-    {   open FILENAMES, '<:raw', $from
-            or fault __x"cannot read filename list from {fn}", fn => $from;
+	if($from eq '-')
+	{   @filenames = <STDIN>;
+	}
+	else
+	{   open FILENAMES, '<:raw', $from
+			or fault __x"cannot read filename list from {fn}", fn => $from;
 
-        @filenames = <FILENAMES>;
-        close FILENAMES;
-    }
-    chomp(@filenames);
+		@filenames = <FILENAMES>;
+		close FILENAMES;
+	}
+	chomp(@filenames);
 }
 elsif(@ARGV)
-{   find sub { push @filenames, $File::Find::name if -f }, @ARGV;
+{	find sub { push @filenames, $File::Find::name if -f }, @ARGV;
 }
 else
-{   error "give --files-from or directories to be processed";
+{	error "give --files-from or directories to be processed";
 }
 
 my $extr;
 my %processed;
 
 if($template)
-{   # process from template toolkit
-    eval "require Log::Report::Template::Extract";
-    panic $@ if $@;
+{	# process from template toolkit
+	eval "require Log::Report::Template::Extract";
+	panic $@ if $@;
 
-    $default_domain
-        or error __x"specify a text-domain (-d) for the templates";
+	$default_domain
+		or error __x"specify a text-domain (-d) for the templates";
 
-    $extr = Log::Report::Template::Extract->new
-      ( lexicon => $output
-      , charset => $char_out
-      , domain  => $default_domain
-      , pattern => $template
-      );
+	$extr = Log::Report::Template::Extract->new(
+		lexicon => $output,
+		charset => $char_out,
+		domain  => $default_domain,
+		pattern => $template,
+	);
 
-    $fn_match ||= qr/\.tt2?$/i;
+	$fn_match ||= qr/\.tt2?$/i;
 
-    foreach my $filename (@filenames)
-    {   unless($filename =~ $fn_match)
-        {   info __x"skipping (not a template) {fn}", fn => $filename;
-            next;
-        }
-        $extr->process($filename, charset => $char_in);
-        $processed{$filename}++;
-    }
+	foreach my $filename (@filenames)
+	{   unless($filename =~ $fn_match)
+		{   info __x"skipping (not a template) {fn}", fn => $filename;
+			next;
+		}
+		$extr->process($filename, charset => $char_in);
+		$processed{$filename}++;
+	}
 }
 else
-{   # process the pm files
-    eval "require Log::Report::Extract::PerlPPI";
-    error $@ if $@;
+{	# process the pm files
+	eval "require Log::Report::Extract::PerlPPI";
+	error $@ if $@;
 
-    $extr = Log::Report::Extract::PerlPPI->new
-      ( lexicon => $output
-      , charset => $char_out
-      );
+	$extr = Log::Report::Extract::PerlPPI->new(lexicon => $output, charset => $char_out);
 
-    $fn_match ||= qr/\.p[lm]$/i;
-    foreach my $filename (@filenames)
-    {   unless($filename =~ $fn_match)
-        {   info __x"skipping (not perl) {fn}", fn => $filename;
-            next;
-        }
-        $extr->process($filename, charset => $char_in);
-        $processed{$filename}++;
-    }
+	$fn_match ||= qr/\.p[lm]$/i;
+	foreach my $filename (@filenames)
+	{   if($filename !~ $fn_match)
+		{	open my ($fh), '<', $filename
+				or warning(__x"skipping missing file {fn}", fn => $filename), next;
+
+			$fh->getline =~ m!\bperl\b|\bperl[0-9]!
+				or info(__x"skipping (not perl) {fn}", fn => $filename), next;
+
+			$fh->close;
+		}
+		$extr->process($filename, charset => $char_in);
+		$processed{$filename}++;
+	}
 }
 
-warn "CLEANUP KEEP=$cleanup";
-$extr->cleanup(keep => \%processed)
-    if $cleanup;
-
+$extr->cleanup(keep => \%processed) if $cleanup;
 $extr->showStats;
 $extr->write;
 
@@ -165,7 +156,7 @@ xgettext-perl - extract translatable strings
   GENERIC OPTIONS
   --config      -c %config    domain configuration
   --files-from  -f $filename  source of filenames to be processed
-  --from-code      $charset   used by input files (default utf-8)
+  --from-code      $charset   used by input files (auto-detects)
   --no-cleanup                keep unprocessed files in po table
   --output-dir  -p $directory location of lexicons (required)
   --to-code        $charset   charset of po files (default utf-8)
@@ -222,6 +213,6 @@ notation (with leading '__' to mean gettext)
 
 =head2 Extracting from Template::Toolkit
 
-		See L<Log::Report::Template::Extract>
+See Log::Report::Template::Extract
 
 =cut

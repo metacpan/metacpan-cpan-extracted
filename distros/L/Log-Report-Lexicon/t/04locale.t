@@ -3,6 +3,7 @@
 
 use Test::More;
 use POSIX;
+use locale;
 
 my $alt_locale;
 BEGIN  {

@@ -80,5 +80,5 @@ msgid "⚖ **GPLv3**"
 msgstr "⚖ **GPLv3**"
 
 msgid "The App::liveman module is copyright © 2024 Yaroslav O. Kosmina. Rusland. All rights reserved."
-msgstr "The App :: Liveman Module Is Copyright © 2024 Yaroslav O. Kosmina. Rusland. All Rights Reserved."
+msgstr "The App::Liveman module is Copyright © 2024 Yaroslav O. Kosmina. Rusland. All Rights Reserved."
 

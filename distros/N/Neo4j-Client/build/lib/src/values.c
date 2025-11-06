@@ -123,7 +123,7 @@ static const struct neo4j_types neo4j_types =
 };
 
 #define TYPE_OFFSET(name) \
-        (offsetof(struct neo4j_types, name) / sizeof(struct neo4j_types *))
+        (offsetof(struct neo4j_types, name) / sizeof(struct neo4j_type *))
 #define TYPE_PTR(offset) (*((struct neo4j_type * const *)(const void *)( \
         (const char *)&neo4j_types + offset * sizeof(struct neo4j_type *))))
 

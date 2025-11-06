@@ -3,7 +3,7 @@ use ExtUtils::MakeMaker;
 use 5.016;
 
 # Use command 'oodist' to produce your whole software release.
-my $version  = '1.14';
+my $version  = '1.15';
 my $git      = "https://github.com/markov2/perl5-Log-Report-Lexicon";
 my $publish  = "../public_html/log-report-lexicon";
 my $homepage = "http://perl.overmeer.net/CPAN/";
@@ -25,7 +25,11 @@ my %oodist   = (
 
 	parser   => {
 		syntax         => 'markov',
-		skip_links     => [ ],
+		skip_links     => [
+			'Locale::PO',
+			'Win32::Locale',
+			'Win32::Codepage',
+		],
 		pmhead         => undef,
 	},
 
@@ -51,14 +55,12 @@ my %oodist   = (
 );
 
 my %prereq  = (
-	'Test::More'              => '0.86',
 	'Data::Dumper'            => 0,
 	'Fcntl'                   => 0,
 	'File::Basename'          => 0,
 	'File::Find'              => 0,
 	'File::Spec'              => 0,
 	'File::Temp'              => 0,
-	'IO::File'                => 0,
 	'List::Util'              => 0,
 	'Scalar::Util'            => 0,
 	'Log::Report'             => 1.40,
@@ -113,6 +115,11 @@ WriteMakefile
 		x_oodist => \%oodist,
 	};
 
+
+sub MY::postamble { <<'__POSTAMBLE' }
 # for translation tables
-#linkext::
-#	bin/xgettext-perl --mode=VERBOSE -p lib/Log/Report/messages lib bin
+
+messages::
+	bin/xgettext-perl --mode=VERBOSE -p lib/Log/Report/messages lib bin
+
+__POSTAMBLE

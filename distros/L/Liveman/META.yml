@@ -1,5 +1,5 @@
 ---
-abstract: 'компиллятор из markdown в тесты и документацию'
+abstract: 'compiler from Markdown to tests and documentation'
 author:
   - 'Yaroslav O. Kosmina L<mailto:dart@cpan.org>'
 build_requires:
@@ -35,7 +35,7 @@ no_index:
 provides:
   Liveman:
     file: lib/Liveman.pm
-    version: '3.3'
+    version: '3.4'
   Liveman::App::liveman:
     file: lib/Liveman/App/liveman.pm
   Liveman::Append:
@@ -79,7 +79,7 @@ resources:
   bugtracker: https://github.com/darviarush/perl-liveman/issues
   homepage: https://github.com/darviarush/perl-liveman
   repository: https://github.com/darviarush/perl-liveman.git
-version: '3.3'
+version: '3.4'
 x_authority: cpan:DART
 x_contributors:
   - 'Yaroslav O. Kosmina <dart@cpan.org>'

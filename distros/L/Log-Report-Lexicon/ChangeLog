@@ -16,6 +16,20 @@ bugs:
 wishlist:
 	- let xgettext-perl produce mo files as well.
 
+version 1.15: Thu  6 Nov 11:05:27 CET 2025
+
+	Changes:
+	- auto-detects (and applies) "use utf8", still not supported by PPI.
+
+	Improvements:
+	- remove double dependency on Test::More
+	  rt.cpan.org#171438 [Petr Pisar]
+	- remove dependency on IO::File, not used
+	  rt.cpan.org#171438 [Petr Pisar]
+	- better set locale in test script
+	  rt.cpan.org#171439 [Petr Pisar]
+	- also accept perl scripts which do not end on .pl
+
 version 1.14: Mon  8 Sep 15:31:33 CEST 2025
 
 	Changes:

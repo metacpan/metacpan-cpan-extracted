@@ -17,7 +17,7 @@ use SIRTX::VM::Register;
 
 use parent 'Data::Identifier::Interface::Userdata';
 
-our $VERSION = v0.08;
+our $VERSION = v0.10;
 
 my @_register_templates = (
     # user:
@@ -237,6 +237,14 @@ sub clone {
     return $clone;
 }
 
+# ---- Private helpers ----
+
+sub _physical_name_by_number {
+    my ($pkg, $number) = @_;
+    my $template = $_register_templates[$number];
+    return defined($template) ? $template->{name} : undef;
+}
+
 1;
 
 __END__
@@ -251,7 +259,7 @@ SIRTX::VM::RegisterFile - module for interacting with SIRTX VM code
 
 =head1 VERSION
 
-version v0.08
+version v0.10
 
 =head1 SYNOPSIS
 

@@ -1,10 +1,10 @@
 {
    "abstract" : "Access XML data via the DBI interface",
    "author" : [
-      "Nigel Horne <njh@bandsman.co.uk>"
+      "Nigel Horne <njh@nigelhorne.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -32,8 +32,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Carp" : "0",
-            "DBI" : "1.637",
+            "DBI" : "1.643",
             "DBI::DBD::SqlEngine" : "0.06",
             "SQL::Statement" : "1.41",
             "XML::Twig" : "0",
@@ -42,10 +41,17 @@
       },
       "test" : {
          "requires" : {
+            "Carp" : "0",
+            "File::Slurp" : "0",
+            "File::Temp" : "0",
             "IPC::System::Simple" : "0",
+            "POSIX" : "0",
+            "Readonly" : "0",
             "Test::DatabaseRow" : "0",
+            "Test::DescribeMe" : "0",
             "Test::Differences" : "0",
             "Test::Most" : "0",
+            "Test::Needs" : "0",
             "Test::NoWarnings" : "0",
             "Test::Script" : "1.12",
             "autodie" : "0"
@@ -56,8 +62,8 @@
    "resources" : {
       "bugtracker" : {
          "mailto" : "bug-DBD-XMLSimple@rt.cpan.org",
-         "web" : "https://github.com/nigelhorne/DBD-XMLSimple/issues",
-         "x_url" : "https://github.com/nigelhorne/DBD-XMLSimple/issues"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=DBD-XMLSimple",
+         "x_url" : "https://rt.cpan.org/Public/Dist/Display.html?Name=DBD-XMLSimple"
       },
       "repository" : {
          "type" : "git",
@@ -66,6 +72,6 @@
          "x_repository" : "https://github.com/nigelhorne/DBD-XMLSimple"
       }
    },
-   "version" : "0.07",
+   "version" : "0.08",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

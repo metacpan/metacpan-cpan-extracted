@@ -26,7 +26,7 @@ requires:
 resources:
   homepage: http://perl.overmeer.net/CPAN/
   repository: https://github.com/markov2/perl5-Dancer2-Plugin-LogReport.git
-version: '2.00'
+version: '2.01'
 x_oodist:
   email: markov@cpan.org
   first_year: 2015

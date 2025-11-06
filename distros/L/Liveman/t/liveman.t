@@ -1,4 +1,4 @@
-use common::sense; use open qw/:std :utf8/;  use Carp qw//; use Cwd qw//; use File::Basename qw//; use File::Find qw//; use File::Slurper qw//; use File::Spec qw//; use File::Path qw//; use Scalar::Util qw//;  use Test::More 0.98;  BEGIN { 	$SIG{__DIE__} = sub { 		my ($msg) = @_; 		if(ref $msg) { 			$msg->{STACKTRACE} = Carp::longmess "?" if "HASH" eq Scalar::Util::reftype $msg; 			die $msg; 		} else { 			die Carp::longmess defined($msg)? $msg: "undef" 		} 	}; 	 	my $t = File::Slurper::read_text(__FILE__); 	 	my @dirs = File::Spec->splitdir(File::Basename::dirname(Cwd::abs_path(__FILE__))); 	my $project_dir = File::Spec->catfile(@dirs[0..$#dirs-1]); 	my $project_name = $dirs[$#dirs-1]; 	my @test_dirs = @dirs[$#dirs-1+2 .. $#dirs]; 	my $dir_for_tests = File::Spec->catfile(File::Spec->tmpdir, ".liveman", $project_name, join("!", @test_dirs, File::Basename::basename(__FILE__))); 	 	File::Find::find(sub { chmod 0700, $_ if !/^\.{1,2}\z/ }, $dir_for_tests), File::Path::rmtree($dir_for_tests) if -e $dir_for_tests; 	File::Path::mkpath($dir_for_tests); 	 	chdir $dir_for_tests or die "chdir $dir_for_tests: $!"; 	 	push @INC, "$project_dir/lib", "lib"; 	 	$ENV{PROJECT_DIR} = $project_dir; 	$ENV{DIR_FOR_TESTS} = $dir_for_tests; 	 	while($t =~ /^#\@> (.*)\n((#>> .*\n)*)#\@< EOF\n/gm) { 		my ($file, $code) = ($1, $2); 		$code =~ s/^#>> //mg; 		File::Path::mkpath(File::Basename::dirname($file)); 		File::Slurper::write_text($file, $code); 	} } # !ru:en,badges
+use common::sense; use open qw/:std :utf8/;  use Carp qw//; use Cwd qw//; use File::Basename qw//; use File::Find qw//; use File::Slurper qw//; use File::Spec qw//; use File::Path qw//; use Scalar::Util qw//;  use Test::More 0.98;  BEGIN { 	$SIG{__DIE__} = sub { 		my ($msg) = @_; 		if(ref $msg) { 			$msg->{STACKTRACE} = Carp::longmess "?" if "HASH" eq Scalar::Util::reftype $msg; 			die $msg; 		} else { 			die Carp::longmess defined($msg)? $msg: "undef" 		} 	}; 	 	my $t = File::Slurper::read_text(__FILE__); 	 	my @dirs = File::Spec->splitdir(File::Basename::dirname(Cwd::abs_path(__FILE__))); 	my $project_dir = File::Spec->catfile(@dirs[0..$#dirs-1]); 	my $project_name = $dirs[$#dirs-1]; 	my @test_dirs = @dirs[$#dirs-1+2 .. $#dirs]; 	my $dir_for_tests = File::Spec->catfile(File::Spec->tmpdir, ".liveman", $project_name, join("!", @test_dirs, File::Basename::basename(__FILE__))); 	 	File::Find::find(sub { chmod 0700, $_ if !/^\.{1,2}\z/ }, $dir_for_tests), File::Path::rmtree($dir_for_tests) if -e $dir_for_tests; 	File::Path::mkpath($dir_for_tests); 	 	chdir $dir_for_tests or die "chdir $dir_for_tests: $!"; 	 	push @INC, "$project_dir/lib", "lib"; 	 	$ENV{PROJECT_DIR} = $project_dir; 	$ENV{DIR_FOR_TESTS} = $dir_for_tests; 	 	while($t =~ /^#\@> (.*)\n((#>> .*\n)*)#\@< EOF\n/gm) { 		my ($file, $code) = ($1, $2); 		$code =~ s/^#>> //mg; 		File::Path::mkpath(File::Basename::dirname($file)); 		File::Slurper::write_text($file, $code); 	} } # 
 # # NAME
 # 
 # Liveman - компиллятор из markdown в тесты и документацию
@@ -25,19 +25,19 @@ my $liveman = Liveman->new(prove => 1);
 
 $liveman->transform("lib/Example.md");
 
-::is scalar do {$liveman->{count}}, "1", '$liveman->{count}   # => 1';
-::is scalar do {-f "t/example.t"}, "1", '-f "t/example.t"    # => 1';
-::is scalar do {-f "lib/Example.pm"}, "1", '-f "lib/Example.pm" # => 1';
+::is scalar do {$liveman->{count}}, scalar do{1}, '$liveman->{count}    # -> 1';
+::is scalar do {-f "t/example.t"}, scalar do{1}, '-f "t/example.t"     # -> 1';
+::is scalar do {-f "lib/Example.pod"}, scalar do{1}, '-f "lib/Example.pod" # -> 1';
 
 $liveman->transforms;
-::is scalar do {$liveman->{count}}, "0", '$liveman->{count}   # => 0';
+::is scalar do {$liveman->{count}}, scalar do{0}, '$liveman->{count}   # -> 0';
 
-::is scalar do {Liveman->new(compile_force => 1)->transforms->{count}}, "1", 'Liveman->new(compile_force => 1)->transforms->{count} # => 1';
+::is scalar do {Liveman->new(compile_force => 1)->transforms->{count}}, scalar do{1}, 'Liveman->new(compile_force => 1)->transforms->{count} # -> 1';
 
 my $prove_return_code = $liveman->tests->{exit_code};
 
-::is scalar do {$prove_return_code}, "0", '$prove_return_code           # => 0';
-::is scalar do {-f "cover_db/coverage.html"}, "1", '-f "cover_db/coverage.html" # => 1';
+::is scalar do {$prove_return_code}, scalar do{0}, '$prove_return_code          # -> 0';
+::is scalar do {-f "cover_db/coverage.html"}, scalar do{1}, '-f "cover_db/coverage.html" # -> 1';
 
 # 
 # # DESCRIPION
@@ -70,6 +70,8 @@ my $prove_return_code = $liveman->tests->{exit_code};
 # **Внимание!** Будьте осторожны и после редактирования `.md` просматривайте `git diff`, чтобы не потерять подкорректированные переводы в `.po`.
 # 
 # **Примечание:** `trans -R` покажет список языков, которые можно указывать в **!from:to** на первой строке документа.
+# 
+# Предшественником `liveman` является [miu](https://github.com/darviarush/miu).
 # 
 # ## TYPES OF TESTS
 # 
@@ -221,7 +223,7 @@ my $by = 'by';
 # 
 # ### `unlike` throw
 # 
-# Исключение не должно быть сопостовимо с регулярным выражением:
+# Исключение не должно быть сопостовимо с регулярным выражением (но оно должно иметь место):
 # 
 ::done_testing; }; subtest '`unlike` throw' => sub { 
 ::unlike scalar do { eval { 1/0 }; $@ }, qr{auto}, '1/0 # <~@ auto';
@@ -276,7 +278,31 @@ my $by = 'by';
 # 
 # Компилирует `lib/**.md`-файл в `t/**.t`-файл.
 # 
-# А так же заменяет **pod**-документацию в секции `__END__` в `lib/**.pm`-файле и создаёт `lib/**.pm`-файл, если тот не существует.
+# А так же заменяет **pod**-документацию в секции `__END__` в `lib/**.pm`-файле и создаёт `lib/**.pm`-файл, если тот существует, а иначе – создаёт файл`lib/**.pod`.
+# 
+# При вызове `transform` в `SYNOPSYS` был создан файл `lib/Example.pod`.
+# 
+# Файл lib/Example.pod является:
+
+{ my $s = 'lib/Example.pod'; open my $__f__, '<:utf8', $s or die "Read $s: $!"; my $n = join '', <$__f__>; close $__f__; ::is $n, 'Twice two:
+
+	2*2  # -> 2+2
+
+', "File $s"; }
+# 
+# Создадим `lib/Example.pm` и вызовем `transform`:
+# 
+::done_testing; }; subtest 'transform ($md_path, [$test_path])' => sub { 
+open my $fh, ">", "lib/Example.pm" or die $!;
+print $fh q{package Example;
+
+1;};
+close $fh;
+
+my $liveman = Liveman->new(prove => 1);
+
+$liveman->transform("lib/Example.md");
+
 # 
 # Файл lib/Example.pm является:
 
@@ -293,8 +319,6 @@ Twice two:
 	2*2  # -> 2+2
 
 ', "File $s"; }
-# 
-# Файл `lib/Example.pm` был создан из файла `lib/Example.md`, что описано в разделе `SINOPSIS` в этом документе.
 # 
 # ## transforms ()
 # 

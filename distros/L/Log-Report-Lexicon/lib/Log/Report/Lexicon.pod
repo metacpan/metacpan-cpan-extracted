@@ -10,10 +10,10 @@ Log::Report::Lexicon - translation component of Log::Report
 
 This module is the main extry point for the distribution, but has
 currently no further use.  This distribution contains all components
-of Log::Report which handle translations.
+of L<Log::Report|Log::Report> which handle translations.
 
 If you do not need translations, you do not need to install this module.
-When you use Log::Report and need to add translations, it may be
+When you use L<Log::Report|Log::Report> and need to add translations, it may be
 very little work: when you nicely wrote texts in the advised message
 format like
 
@@ -41,7 +41,7 @@ Translation table administration, in PO or MO format.
 Translation table file file administration, understanding locales,
 domains, and attributes in the filenames.
 
-=item * Log::Report::Translator
+=item * L<Log::Report::Translator|Log::Report::Translator>
 
 The run-time component of translations.
 
@@ -63,8 +63,8 @@ Z<>
 
 =head1 SEE ALSO
 
-This module is part of Log-Report-Lexicon version 1.14,
-built on September 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report-Lexicon version 1.15,
+built on November 06, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

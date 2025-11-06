@@ -40,9 +40,9 @@ sub before_release {
 
   die $error if $error;
 
-  # skip old share/tests/draft-future -- not officially supported by any implementation
-  # (now known as draft-next)
-  $diff =~ s{^-share/tests/draft-future/.+\n}{}gm;
+  # skip old share/tests/draft-future and draft-next, now replaced by "v1"
+  # and to be entirely ignored
+  $diff =~ s{^-share/(?:output-tests|remotes|tests)/draft-(?:future|next)/.+\n}{}gm;
 
   # note: if a removed file was re-added in the submodule, we will get a "aborting; duplicate files
   # would be produced" fatal error from Gather plugins, so we don't need to explicitly check for

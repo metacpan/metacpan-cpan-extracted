@@ -1,5 +1,13 @@
 Revision history for DBD-XMLSimple
 
+0.08	Wed Nov  5 14:23:38 EST 2025
+	Use Test::DescribeMe to simplify tests
+	Use Test::Needs
+	Use gtar to create a distribution on Macs
+	Fixed row indexing issue and strengthened column inference
+	Added support for more than one table at the same time
+	Added test dashboard
+
 0.07	Fri Feb  2 09:05:41 EST 2024
 	Fix uninit variable in DBI.pm
 

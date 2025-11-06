@@ -8,10 +8,12 @@ META.yml
 Makefile.PL
 README
 bin/vmv0-asm
+bin/vmv0-disasm
 cpanfile
 dist.ini
 lib/SIRTX/VM.pm
 lib/SIRTX/VM/Assembler.pm
+lib/SIRTX/VM/Disassembler.pm
 lib/SIRTX/VM/Opcode.pm
 lib/SIRTX/VM/Register.pm
 lib/SIRTX/VM/RegisterFile.pm

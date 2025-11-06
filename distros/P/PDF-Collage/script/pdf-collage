@@ -112,11 +112,17 @@ sub get_collage ($config) {
            if $n_sources > 1;
          return collage(definition => $source);
       }
-      die "cannot use source '$source'\n" unless -r $source;
-      if (-d $source) {
+      if ($source eq '-') {
+         die "only one single plain template allowed\n"
+            if $n_sources > 1;
+         my $stuff = slurp_raw('-');
+         die "only JSON from standard input\n" if $stuff !~ $is_json;
+         return collage(definition => $stuff);
+      }
+      elsif (-d $source) {
          push @res, resolver_from_dir(root => $source, throw => 1);
       }
-      else {
+      elsif (-r $source) {
          my $first_byte = slurp_raw($source, 10);
          if ($first_byte =~ $is_json) {
             die "only one single plain template allowed\n"
@@ -125,6 +131,9 @@ sub get_collage ($config) {
          }
          push @res, resolver_from_tar(archive => $source, throw => 1);
       } ## end else [ if (-d $source) ]
+      else {
+         die "cannot use source '$source'\n";
+      }
    } ## end for my $source ($sources...)
 
    my $resolver =
@@ -199,8 +208,9 @@ sub output_pdf ($pdf, $output) {
 } ## end sub output_pdf
 
 sub slurp_raw ($path, $n = undef) {
+   my $is_stdin = $path eq '-';
    my $fh =
-     $path eq '-'
+     $is_stdin
      ? \*STDIN
      : do {
       open my $fh, '<:raw', $path or die "open('$path'): $OS_ERROR\n";
@@ -218,7 +228,7 @@ sub slurp_raw ($path, $n = undef) {
    local $/;
    defined(my $retval = <$fh>)
      or die "read() from '$path': $OS_ERROR\n";
-   close $fh;    # don't care if has errors
+   close $fh unless $is_stdin;    # don't care if has errors
    return $retval;
 } ## end sub slurp_raw
 

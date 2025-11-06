@@ -5,7 +5,7 @@ Liveman - компиллятор из markdown в тесты и документ
 
 # VERSION
 
-3.3
+3.4
 
 # SYNOPSIS
 
@@ -25,19 +25,19 @@ my $liveman = Liveman->new(prove => 1);
 
 $liveman->transform("lib/Example.md");
 
-$liveman->{count}   # => 1
--f "t/example.t"    # => 1
--f "lib/Example.pm" # => 1
+$liveman->{count}    # -> 1
+-f "t/example.t"     # -> 1
+-f "lib/Example.pod" # -> 1
 
 $liveman->transforms;
-$liveman->{count}   # => 0
+$liveman->{count}   # -> 0
 
-Liveman->new(compile_force => 1)->transforms->{count} # => 1
+Liveman->new(compile_force => 1)->transforms->{count} # -> 1
 
 my $prove_return_code = $liveman->tests->{exit_code};
 
-$prove_return_code           # => 0
--f "cover_db/coverage.html" # => 1
+$prove_return_code          # -> 0
+-f "cover_db/coverage.html" # -> 1
 ```
 
 # DESCRIPION
@@ -70,6 +70,8 @@ Liveman заменяет `our $VERSION = "...";` в `lib/**.pm` из `lib/**.md`
 **Внимание!** Будьте осторожны и после редактирования `.md` просматривайте `git diff`, чтобы не потерять подкорректированные переводы в `.po`.
 
 **Примечание:** `trans -R` покажет список языков, которые можно указывать в **!from:to** на первой строке документа.
+
+Предшественником `liveman` является [miu](https://github.com/darviarush/miu).
 
 ## TYPES OF TESTS
 
@@ -221,7 +223,7 @@ my $by = 'by';
 
 ### `unlike` throw
 
-Исключение не должно быть сопостовимо с регулярным выражением:
+Исключение не должно быть сопостовимо с регулярным выражением (но оно должно иметь место):
 
 ```perl
 1/0 # <~@ auto
@@ -276,7 +278,31 @@ Liveman->new->test_path("lib/PathFix/RestFix.md") # => t/path-fix/rest-fix.t
 
 Компилирует `lib/**.md`-файл в `t/**.t`-файл.
 
-А так же заменяет **pod**-документацию в секции `__END__` в `lib/**.pm`-файле и создаёт `lib/**.pm`-файл, если тот не существует.
+А так же заменяет **pod**-документацию в секции `__END__` в `lib/**.pm`-файле и создаёт `lib/**.pm`-файл, если тот существует, а иначе – создаёт файл`lib/**.pod`.
+
+При вызове `transform` в `SYNOPSYS` был создан файл `lib/Example.pod`.
+
+Файл lib/Example.pod является:
+```pod
+Twice two:
+
+	2*2  # -> 2+2
+
+```
+
+Создадим `lib/Example.pm` и вызовем `transform`:
+
+```perl
+open my $fh, ">", "lib/Example.pm" or die $!;
+print $fh q{package Example;
+
+1;};
+close $fh;
+
+my $liveman = Liveman->new(prove => 1);
+
+$liveman->transform("lib/Example.md");
+```
 
 Файл lib/Example.pm является:
 ```perl
@@ -293,8 +319,6 @@ Twice two:
 	2*2  # -> 2+2
 
 ```
-
-Файл `lib/Example.pm` был создан из файла `lib/Example.md`, что описано в разделе `SINOPSIS` в этом документе.
 
 ## transforms ()
 

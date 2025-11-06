@@ -9,6 +9,7 @@ MANIFEST
 MANIFEST.SKIP
 README
 README.md
+scripts/generate_index.pl
 t/00-load.t
 t/10-filedata.t
 t/20-stringdata.t
@@ -21,9 +22,12 @@ t/coverage.t
 t/critic.t
 t/cv.t
 t/dist.t
+t/eof.t
+t/eol.t
 t/gv.t
 t/kwalitee.t
 t/metrics.t
+t/modules-used.t
 t/namespaces.t
 t/noplan.t
 t/pod-cm.t
@@ -35,7 +39,7 @@ t/prereq.t
 t/snippets.t
 t/strict.t
 t/unused.t
-t/used.t
 t/vars.t
+t/xml.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

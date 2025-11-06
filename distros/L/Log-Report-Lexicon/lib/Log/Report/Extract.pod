@@ -8,6 +8,7 @@ Log::Report::Extract - Collect translatable strings
 
  Log::Report::Extract is extended by
    Log::Report::Extract::PerlPPI
+   Log::Report::Template::Extract
 
 =head1 SYNOPSIS
 
@@ -111,7 +112,7 @@ Returned is the number of messages found in this particular file.
 Show a status about the DOMAIN (by default all domains).  At least mode
 verbose is required to see this.
 
-The statistics are sent to (Log::Report) dispatchers which accept
+The statistics are sent to (L<Log::Report|Log::Report>) dispatchers which accept
 notice and info.  This could be syslog.  When you have no explicit
 dispatchers in your program, the level of detail get controlled by
 the 'mode':
@@ -140,26 +141,26 @@ manager.
 
 =item Fault: cannot create lexicon directory $dir: $!
 
-Cast by new()
+Cast by C<new()>
 
 =item Error: extractions require an explicit lexicon directory
 
-Cast by new()
+Cast by C<new()>
 
 =item Error: no context tags allowed in plural `$msgid'
 
-Cast by store()
+Cast by C<store()>
 
 =item Info: starting new textdomain $domain, template in $filename
 
-Cast by write()
+Cast by C<write()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Log-Report-Lexicon version 1.14,
-built on September 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report-Lexicon version 1.15,
+built on November 06, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

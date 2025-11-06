@@ -1,0 +1,52 @@
+#!/usr/bin/perl
+
+# Copyright (c) 2024-2025 Löwenfelsen UG (haftungsbeschränkt)
+
+# licensed under Artistic License 2.0 (see LICENSE file)
+
+# ABSTRACT: module for interacting with SIRTX VM code
+
+use strict;
+use warnings;
+use v5.16;
+
+use Getopt::Long;
+use SIRTX::VM::Disassembler;
+
+my %config = (
+    output      => undef,
+    max_data    => undef,
+);
+my $disasm;
+
+{
+    my %opts;
+
+    $opts{'output|o=s'} = \$config{output};
+    $opts{'max-data=i'} = \$config{max_data};
+
+    $opts{'help|h'} = sub {
+        printf("Usage: %s [OPTIONS] -o output.vmv0 input.vmv0-asm\n", $0);
+        say '';
+        printf("OPTIONS:\n");
+        printf(" %s\n", $_) foreach sort keys %opts;
+        exit(0);
+    };
+
+    Getopt::Long::Configure('bundling');
+    GetOptions(%opts);
+}
+
+if (scalar(@ARGV) != 1) {
+    die "Error: Invalid number of input files. Need exactly one.\n";
+}
+
+if (!defined($config{output}) || !length($config{output})) {
+    die "Error: No output file given, use -o\n";
+}
+
+$disasm = SIRTX::VM::Disassembler->new(in => $ARGV[0], out => $config{output}, max_data => $config{max_data});
+
+$disasm->run;
+
+#ll

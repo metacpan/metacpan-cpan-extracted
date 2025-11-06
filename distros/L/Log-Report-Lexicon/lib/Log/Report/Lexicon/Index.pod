@@ -89,7 +89,7 @@ instance to select only C<po>, C<mo> or C<gmo> files, and ignore readme's.
 Use an string, without dot and interpreted case-insensitive, or a
 regular expression.
 
-example: 
+» example: 
 
   my @l = $index->list('my-domain');
   my @l = $index->list('my-domain', 'po');
@@ -116,7 +116,7 @@ the C<textdomain> followed by C<.po> are added.  This is exactly as
 C<gettext(1)> does, but then using the PO text file instead of the MO
 binary file.
 
-B<. Example: lexicon in module tree>
+=head4 » Example: lexicon in module tree
 
 My module is named C<Some::Module> and installed in
 some of perl's directories, say C<~perl5.8.8>.  The module is defining
@@ -205,8 +205,8 @@ from you [please help improve this]), and are treated case-INsensitive!
 
 =head1 SEE ALSO
 
-This module is part of Log-Report-Lexicon version 1.14,
-built on September 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report-Lexicon version 1.15,
+built on November 06, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

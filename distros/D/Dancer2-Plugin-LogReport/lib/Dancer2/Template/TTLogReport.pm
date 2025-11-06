@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Dancer2-Plugin-LogReport version 2.00.
+# This code is part of Perl distribution Dancer2-Plugin-LogReport version 2.01.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -16,7 +16,7 @@
 #XXX rework of Dancer2::Template::TemplateToolkit 1.1.2
 
 package Dancer2::Template::TTLogReport;{
-our $VERSION = '2.00';
+our $VERSION = '2.01';
 }
 
 

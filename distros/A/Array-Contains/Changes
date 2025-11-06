@@ -1,5 +1,8 @@
 Revision history for Perl extension Array::Contains.
 
+3.1  Tue Nov 05 14:45:00 2025
+    - Call the import on the module, not the filename
+
 3.0  Tue Jul 15 11:30:00 2025
     - On Perl 5.42 and up, use the new "any" keyword instead of a for loop for better performance, with a soft fallback for older perls.
 

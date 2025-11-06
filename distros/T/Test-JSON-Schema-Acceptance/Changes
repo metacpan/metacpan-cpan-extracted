@@ -1,5 +1,10 @@
 Revision history for Test-JSON-Schema-Acceptance
 
+1.030     2025-11-06 01:05:56Z
+        - "draft-next" is now known as "v1"
+        - updated test suite:
+          https://github.com/json-schema-org/JSON-Schema-Test-Suite/compare/9ad349be933f1e74810cb4fd3ad19780694dc77e...be58fa98d5f79bb8d20f45a15e540332669ad947
+
 1.029     2025-06-03 21:01:17Z
         - the acceptance sub provided by the application can now return an
           additional value, containing the error result of the validation, for

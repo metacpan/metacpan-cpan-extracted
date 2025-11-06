@@ -3,7 +3,7 @@ use v5.24;
 use warnings;
 use experimental qw< signatures >;
 no warnings qw< experimental::signatures >;
-{ our $VERSION = '0.002' }
+{ our $VERSION = '0.003' }
 
 use Carp;
 use English                           qw< -no_match_vars >;

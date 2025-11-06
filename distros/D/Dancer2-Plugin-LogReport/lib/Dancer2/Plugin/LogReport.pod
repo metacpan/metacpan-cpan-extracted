@@ -552,8 +552,8 @@ Cast by C<fatal_handler()>
 
 =head1 SEE ALSO
 
-This module is part of Dancer2-Plugin-LogReport version 2.00,
-built on November 04, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Dancer2-Plugin-LogReport version 2.01,
+built on November 05, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

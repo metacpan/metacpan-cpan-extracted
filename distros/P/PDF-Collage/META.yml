@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.21, Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Milla version v1.0.22, Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,13 +24,13 @@ no_index:
 provides:
   PDF::Collage:
     file: lib/PDF/Collage.pm
-    version: '0.002'
+    version: '0.003'
   PDF::Collage::Template:
     file: lib/PDF/Collage/Template.pm
-    version: '0.002'
+    version: '0.003'
   PDF::Collage::TemplatesCollection:
     file: lib/PDF/Collage/TemplatesCollection.pm
-    version: '0.002'
+    version: '0.003'
 requires:
   Data::Resolver: '0.006'
   Image::PNG::Libpng: '0.57'
@@ -43,10 +43,10 @@ resources:
   bugtracker: https://codeberg.org/polettix/PDF-Collage/issues
   homepage: https://codeberg.org/polettix/PDF-Collage
   repository: https://codeberg.org/polettix/PDF-Collage.git
-version: '0.002'
+version: '0.003'
 x_contributors:
   - 'Flavio Poletti <flavio@polettix.it>'
 x_generated_by_perl: v5.36.0
-x_serialization_backend: 'YAML::Tiny version 1.73'
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: Apache-2.0
 x_static_install: 1

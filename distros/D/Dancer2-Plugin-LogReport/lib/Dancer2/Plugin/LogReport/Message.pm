@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Dancer2-Plugin-LogReport version 2.00.
+# This code is part of Perl distribution Dancer2-Plugin-LogReport version 2.01.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -14,7 +14,7 @@
 #oodist: testing, however the code of this development version may be broken!
 
 package Dancer2::Plugin::LogReport::Message;{
-our $VERSION = '2.00';
+our $VERSION = '2.01';
 }
 
 use base 'Log::Report::Message';

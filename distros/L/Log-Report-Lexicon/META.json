@@ -44,13 +44,11 @@
             "File::Find" : "0",
             "File::Spec" : "0",
             "File::Temp" : "0",
-            "IO::File" : "0",
             "List::Util" : "0",
             "Log::Report" : "1.4",
             "POSIX" : "0",
             "Pod::Usage" : "0",
-            "Scalar::Util" : "0",
-            "Test::More" : "0.86"
+            "Scalar::Util" : "0"
          }
       },
       "test" : {
@@ -69,7 +67,7 @@
          "web" : "https://github.com/markov2/perl5-Log-Report-Lexicon"
       }
    },
-   "version" : "1.14",
+   "version" : "1.15",
    "x_oodist" : {
       "email" : "markov@cpan.org",
       "first_year" : 2007,
@@ -86,7 +84,11 @@
       "oodoc_version" : 3.03,
       "parser" : {
          "pmhead" : null,
-         "skip_links" : [],
+         "skip_links" : [
+            "Locale::PO",
+            "Win32::Locale",
+            "Win32::Codepage"
+         ],
          "syntax" : "markov"
       },
       "raw" : {

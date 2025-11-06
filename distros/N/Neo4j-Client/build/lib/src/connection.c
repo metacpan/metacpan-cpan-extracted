@@ -34,6 +34,10 @@
 #include <assert.h>
 #include <unistd.h>
 
+#ifndef __has_attribute
+#  define __has_attribute(x) 0  /* for GCC 4.8 and earlier */
+#endif
+
 static int add_userinfo_to_config(const char *userinfo, neo4j_config_t *config,
         uint_fast32_t flags);
 static neo4j_connection_t *establish_connection(const char *hostname,

@@ -4,6 +4,12 @@
 Unless noted otherwise, these changes where initiated and applied by
 Mark Overmeer.
 
+version 2.01: Wed  5 Nov 17:35:44 CET 2025
+
+	Fixes:
+	- test module use for Dancer/Dancer2 only when they are installed.
+	  reported by [Andy Beverley]
+
 version 2.00: Tue  4 Nov 16:45:48 CET 2025
 
 	Fixes:

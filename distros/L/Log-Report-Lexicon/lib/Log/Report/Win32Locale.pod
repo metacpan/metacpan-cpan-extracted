@@ -27,7 +27,7 @@ Log::Report::Win32Locale - unix/windows locales
 =head1 DESCRIPTION
 
 Windows uses different locales to represent languages: codepages. Programs
-which are written with Log::Report however, will contain ISO encoded
+which are written with L<Log::Report|Log::Report> however, will contain ISO encoded
 language names; this module translates between them.
 
 The algorithms in this module are based on Win32::Locale and Win32::Codepage.
@@ -78,8 +78,8 @@ Returns the locale setting from the control panel.
 
 =head1 SEE ALSO
 
-This module is part of Log-Report-Lexicon version 1.14,
-built on September 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report-Lexicon version 1.15,
+built on November 06, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

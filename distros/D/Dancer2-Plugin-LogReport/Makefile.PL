@@ -5,7 +5,7 @@ use warnings;
 use strict;
 
 # Use command 'oodist' to produce your whole software release.
-my $version  = '2.00';
+my $version  = '2.01';
 my $webpages = "../public_html";
 my $git      = "https://github.com/markov2/perl5-Dancer2-Plugin-LogReport";
 my $publish  = "../public_html/dancer2-plugin-logreport";

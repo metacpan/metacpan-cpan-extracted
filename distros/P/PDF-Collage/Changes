@@ -1,3 +1,9 @@
+0.003  2025-11-06 00:35:16 CET
+   - Provide a performance boost when adding multiple pages from the same
+     big input file.
+   - Support providing multiple pages and ranges of pages to add-page.
+   - Support input definitions as JSON from standard input.
+
 0.002  2023-06-11 15:19:37 CEST
    - Release after 138 PASSes on CPAN Testers (thanks!)
 

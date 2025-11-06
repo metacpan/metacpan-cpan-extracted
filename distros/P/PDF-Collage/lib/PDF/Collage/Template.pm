@@ -1,7 +1,7 @@
 package PDF::Collage::Template;
 use v5.24;
 use warnings;
-{ our $VERSION = '0.002' }
+{ our $VERSION = '0.003' }
 
 use Carp;
 use English;
@@ -20,20 +20,22 @@ has functions => (is => 'lazy');
 has logger    => (is => 'lazy');
 has metadata  => (is => 'lazy');
 
-has _data     => (is => 'lazy');
-has _defaults => (is => 'lazy');
-has _fonts    => (is => 'lazy');
-has _pdf      => (is => 'lazy');
+has _src_cache => (is => 'lazy');
+has _data      => (is => 'lazy');
+has _defaults  => (is => 'lazy');
+has _fonts     => (is => 'lazy');
+has _pdf       => (is => 'lazy');
 
 sub _build_functions ($self) { return {} }
 sub _build_logger    ($self) {
    eval { require Log::Any; Log::Any->get_logger }
 }
-sub _build_metadata  ($self) { return {} }
-sub _build__data     ($self) { return {} }
-sub _build__defaults ($self) { return {} }
-sub _build__fonts    ($self) { return {} }
-sub _build__pdf      ($self) { return PDF::Builder->new }
+sub _build_metadata   ($self) { return {} }
+sub _build__src_cache ($self) { return {} }
+sub _build__data      ($self) { return {} }
+sub _build__defaults  ($self) { return {} }
+sub _build__fonts     ($self) { return {} }
+sub _build__pdf       ($self) { return PDF::Builder->new }
 
 sub render ($self, $data) {
    $self->new(    # hand over to a disposable clone
@@ -114,15 +116,32 @@ sub _op_add_image ($self, $command) {
    return;
 } ## end sub _op_add_image
 
+sub __parse_pages ($input) {
+   return $input if ref($input); # already represented as an array
+   my @pages = map {
+      my ($from, $to) = split m{-}mxs, $_, 2;
+      defined($to) ? ($from .. $to) : $from;
+   } split m{[\s,]+}mxs, $input;
+   return \@pages;
+}
+
 sub _op_add_page ($self, $command) {
    my $opts =
      $self->_expand($command, qw< page from from_path from_page >);
    my $target_n = __pageno($opts->{page} // 'last');
    defined(my $source_path = $opts->{from} // $opts->{from_path})
      or return $self->_pdf->page($target_n);
-   my $source   = PDF::Builder->open($source_path);
-   my $source_n = __pageno($opts->{from_page} // 'last');
-   return $self->_pdf->import_page($source, $source_n, $target_n);
+   my $source = $self->_src_cache->{$source_path}
+      //= PDF::Builder->open($source_path);
+
+   my $retval;
+   my $source_ns = __parse_pages($opts->{from_page} // 'last');
+   for my $sn ($source_ns->@*) {
+      my $source_n = __pageno($sn);
+      $retval = $self->_pdf->import_page($source, $source_n, $target_n);
+      $target_n++ if $target_n; # only advance if not 0 = last
+   }
+   return $retval;
 } ## end sub _op_add_page
 
 sub _op_add_text ($self, $command) {

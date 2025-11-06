@@ -115,7 +115,7 @@ __END__
 
 =head1 NAME
 
-Liveman::Minillapod2markdown - a plug for minilla, which throws Lib/Mainmodule.md to Readme.md
+Liveman::Minillapod2markdown - a plug for minilla, which throws lib/MainModule.md to README.md
 
 =head1 SYNOPSIS
 
@@ -207,7 +207,7 @@ Yaroslav O. Kosmina L<mailto:dart@cpan.org>
 
 =head1 LICENSE
 
-⚖ B<gplv3>
+⚖ B<GPLv3>
 
 =head1 COPYRIGHT
 

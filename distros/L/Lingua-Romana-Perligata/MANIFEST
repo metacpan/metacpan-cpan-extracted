@@ -22,5 +22,6 @@ demo/demo_monkey.pl
 demo/demo_number.pl
 demo/demo_reference.pl
 demo/demo_simple.pl
+demo/Perligata.era
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

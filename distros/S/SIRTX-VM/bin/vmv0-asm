@@ -16,6 +16,7 @@ use SIRTX::VM::Assembler;
 my %config = (
     output      => undef,
     dumpfile    => undef,
+    profile     => [],
 );
 my $asm;
 
@@ -24,6 +25,7 @@ my $asm;
 
     $opts{'output|o=s'} = \$config{output};
     $opts{'dumpfile=s'} = \$config{dumpfile};
+    $opts{'profile=s@'} = \$config{profile};
 
     $opts{'help|h'} = sub {
         printf("Usage: %s [OPTIONS] -o output.vmv0 input.vmv0-asm\n", $0);
@@ -45,7 +47,7 @@ if (!defined($config{output}) || !length($config{output})) {
     die "Error: No output file given, use -o\n";
 }
 
-$asm = SIRTX::VM::Assembler->new(in => $ARGV[0], out => $config{output});
+$asm = SIRTX::VM::Assembler->new(in => $ARGV[0], out => $config{output}, profile => $config{profile});
 
 $asm->run;
 

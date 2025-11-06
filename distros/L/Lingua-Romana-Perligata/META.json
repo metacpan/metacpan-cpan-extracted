@@ -4,7 +4,7 @@
       "Damian Conway <DCONWAY@CPAN.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -37,6 +37,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.604",
-   "x_serialization_backend" : "JSON::PP version 4.10"
+   "version" : "0.605",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

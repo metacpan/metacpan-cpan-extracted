@@ -1,5 +1,5 @@
-# This code is part of Perl distribution Log-Report-Lexicon version 1.14.
-# The POD got stripped from this file by OODoc version 3.04.
+# This code is part of Perl distribution Log-Report-Lexicon version 1.15.
+# The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
 # This software is copyright (c) 2007-2025 by Mark Overmeer.
@@ -20,7 +20,7 @@
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package Log::Report::Lexicon::POT;{
-our $VERSION = '1.14';
+our $VERSION = '1.15';
 }
 
 use base 'Log::Report::Lexicon::Table';

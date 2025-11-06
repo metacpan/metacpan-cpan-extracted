@@ -30,6 +30,7 @@
 #include <openssl/x509v3.h>
 #include <openssl/err.h>
 #include <openssl/crypto.h>
+#include <openssl/opensslv.h>
 #pragma GCC diagnostic pop
 
 #define NEO4J_CYPHER_LIST "HIGH:!EXPORT:!aNULL@STRENGTH"
@@ -612,4 +613,13 @@ int openssl_error(neo4j_logger_t *logger, uint_fast8_t level,
             ERR_reason_error_string(code));
 
     return NEO4J_UNEXPECTED_ERROR;
+}
+
+const char *neo4j_openssl_version(int t)
+{
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L /* 1.1.0 or later */
+    return OpenSSL_version(t > 0 ? t : OPENSSL_VERSION);
+#else
+    return SSLeay_version(t > 0 ? t : SSLEAY_VERSION);
+#endif
 }

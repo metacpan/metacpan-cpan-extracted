@@ -1,6 +1,6 @@
 package Lingua::Romana::Perligata;
 
-our $VERSION = '0.604';
+our $VERSION = '0.605';
 
 use Filter::Util::Call;
 use IO::Handle;
@@ -1647,14 +1647,14 @@ Lingua::Romana::Perligata -- Perl in Latin
 
 =head1 EDITIO
 
-This document describes version 0.604 of Lingua::Romana::Perligata
+This document describes version 0.605 of Lingua::Romana::Perligata
 released May  3, 2001.
 
 =head1 SUMMARIUM
 
     use Lingua::Romana::Perligata;
 
-    adnota Illud Cribrum Eratothenis
+    adnota Illud Cribrum Eratosthenis
 
     maximum tum val inquementum tum biguttam tum stadium egresso scribe.
     da meo maximo vestibulo perlegementum.
@@ -1671,7 +1671,7 @@ released May  3, 2001.
 
 =head1 DESCRIPTIO
 
-The Lingua::Romana::Perligata makes it makes it possible to write Perl
+The Lingua::Romana::Perligata makes it possible to write Perl
 programs in Latin. (If you have to ask "Why?", then the answer probably
 won't make any sense to you either.)
 
@@ -1777,7 +1777,7 @@ Since they cannot be used as an lvalue, they have no dative forms.
 
 The one exception is C<$0> (the variable storing the name of the current program),
 which is I<programma> in the accusative and I<programmati> in the dative.
-It also have a genitive form (I<programmatis>), though it's hard to imagine
+It also has a genitive form (I<programmatis>), though it's hard to imagine
 ever needing that.
 
 The parameter variable (C<@ARGV>) is rendered as I<parametra> in the

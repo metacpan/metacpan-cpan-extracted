@@ -3107,6 +3107,8 @@ int neo4j_u8cpwidth(int cp);
 int neo4j_u8cswidth(const char *s, size_t n);
 
 
+const char *neo4j_openssl_version(int t); /* Internal - DO NOT USE */
+
 #pragma GCC visibility pop
 
 #ifdef __cplusplus

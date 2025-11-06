@@ -13,7 +13,9 @@ use Test::JSON::Schema::Acceptance;
 my $test_dir = path(File::ShareDir::dist_dir('Test-JSON-Schema-Acceptance'), 'tests');
 
 foreach my $draft (sort $test_dir->children) {
-  my $accepter = Test::JSON::Schema::Acceptance->new(specification => $draft->basename);
+  $draft = $draft->basename;
+  next if $draft eq 'draft-next';
+  my $accepter = Test::JSON::Schema::Acceptance->new(specification => $draft);
   my $exception;
   try {
     $accepter->_test_data;
@@ -22,7 +24,7 @@ foreach my $draft (sort $test_dir->children) {
     $exception = $e;
   };
 
-  is($exception, undef, 'no errors loading data for '.$draft->basename);
+  is($exception, undef, 'no errors loading data for '.$draft);
 }
 
 done_testing;

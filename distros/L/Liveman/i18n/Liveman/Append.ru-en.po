@@ -1,29 +1,29 @@
 msgid "Liveman::Append - добавляет секции для методов и функций из `lib/**.pm` в `lib/**.md`"
-msgstr "Liveman :: Append - adds sections for methods and functions from `Lib/**. Pm` to` Lib/**. Md`"
+msgstr "Liveman::Append - adds sections for methods and functions from `lib/**.pm` to `lib/**.md`"
 
 msgid "Добавляет руководство по методам и функциям модулей (`lib/**.pm`) к их руководствам (`lib/**.md`)."
-msgstr "Adds a guide on the methods and functions of the modules (`Lib/**. PM`) to their guidelines (` Lib/**. MD`)."
+msgstr "Adds a guide on the methods and functions of the modules (`lib/**.pm`) to their guidelines (`lib/**.md`)."
 
 msgid "1. Методы — это Perl-подпрограмма, начинающаяся с ключевого слова `sub`.\n"
 "1. Особенности — это свойства экземпляров добавляемые ООП-фреймворками, такими как `Aion`, `Moose`, `Moo`, `Mo`, и начинающиеся с ключевого слова `has`."
 msgstr "1. Methods are a Perl subprogram starting with the keyword `sub`.\n"
-"1. Features are the properties of copies added by OOP-frames, such as `Aion`,` Moose`, `Moo`,` Mo`, and starting with the keyword `HAS`."
+"1. Features are the properties of copies added by OOP-frameworks, such as `Aion`, `Moose`, `Moo`, `Mo`, and starting with the keyword `has`."
 
 msgid "Конструктор."
 msgstr "Constructor."
 
 msgid "Создаёт md-файл."
-msgstr "Creates an MD file."
+msgstr "Creates an md-file."
 
 msgid "Добавляет в `lib/**.md` из `lib/**.pm` подпрограммы и особенности."
-msgstr "Adds to `Lib/**. Md` from` Lib/**. Pm` subprograms and features."
+msgstr "Adds to `lib/**.md` from `lib/**.pm` subprograms and features."
 
 msgid "Добавляет подпрограммы и функции из модуля (`$path`) в его мануал."
-msgstr "Adds subprograms and functions from the module (`$ Path`) to its manual."
+msgstr "Adds subprograms and functions from the module (`$path`) to its manual."
 
 msgid "⚖ **GPLv3**"
-msgstr "⚖ ** gplv3 **"
+msgstr "⚖ **GPLv3**"
 
 msgid "The Liveman::Append module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All rights reserved."
-msgstr "The Liveman :: Append Module is Copyright © 2023 Yaroslav O. Kosmina. Rusland. All Rights Reserved."
+msgstr "The Liveman::Append module is Copyright © 2023 Yaroslav O. Kosmina. Rusland. All Rights Reserved."
 

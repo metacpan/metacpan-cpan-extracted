@@ -363,6 +363,11 @@ Support "socketcommands" in XML config. This can be used for example for changin
 
 This version is fully backwards compatible to Version 29
 
+=head2 VERSION 31
+
+Fix missing requirements for the "DBI" module in Makefile.PL
+
+This version is fully backwards compatible to Version 30
 
 =head1 AUTHOR
 

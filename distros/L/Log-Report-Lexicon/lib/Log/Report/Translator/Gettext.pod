@@ -42,22 +42,48 @@ handling functions ngettext(), dngettext() and dcngettext().  Sooner or
 later you will probably also need bind_textdomain_codeset() which is
 also only available on certain systems.
 
+Extends L<"DESCRIPTION" in Log::Report::Translator|Log::Report::Translator/"DESCRIPTION">.
+
 =head1 METHODS
 
-=head2 Translating
+Extends L<"METHODS" in Log::Report::Translator|Log::Report::Translator/"METHODS">.
+
+=head2 Constructors
+
+Extends L<"Constructors" in Log::Report::Translator|Log::Report::Translator/"Constructors">.
 
 =over 4
 
+=item $class-E<gt>B<new>(%options)
+
+Inherited, see L<Log::Report::Translator/"Constructors">
+
+=back
+
+=head2 Accessors
+
+Extends L<"Accessors" in Log::Report::Translator|Log::Report::Translator/"Accessors">.
+
+=head2 Translating
+
+Extends L<"Translating" in Log::Report::Translator|Log::Report::Translator/"Translating">.
+
+=over 4
+
+=item $obj-E<gt>B<load>($domain, $locale)
+
+Inherited, see L<Log::Report::Translator/"Translating">
+
 =item $obj-E<gt>B<translate>($msg, $lang, $ctxt)
 
-Z<>
+Inherited, see L<Log::Report::Translator/"Translating">
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Log-Report-Lexicon version 1.14,
-built on September 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report-Lexicon version 1.15,
+built on November 06, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

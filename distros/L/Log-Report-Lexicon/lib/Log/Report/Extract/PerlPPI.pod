@@ -59,7 +59,7 @@ will get disabled, not removed.  New msgids will be added and flagged
 =head3 What is extracted?
 
 This script will extract the msgids used in C<__()>, C<__x()>, C<__xn()>,
-and C<__n()> (implemented by Log::Report) For instance
+and C<__n()> (implemented by L<Log::Report|Log::Report>) For instance
 
   __x"msgid", @more
   __x'msgid', @more  <--- no!  syntax error!
@@ -149,7 +149,10 @@ Improves base, see L<Log::Report::Extract/"Processors">
 
 =over 2
 
-=item charset => STRING
+=item charset => $charset
+
+PPI v1.284 still does not support unicode by itself, so you need to help
+it by specifying the character-set which is used in the file.
 
 =back
 
@@ -171,56 +174,52 @@ Inherited, see L<Log::Report::Extract/"Processors">
 
 =over 4
 
-=item Error: PPI only supports iso-8859-1 (latin-1) on the moment
-
-Cast by process()
-
 =item Fault: cannot create lexicon directory $dir: $!
 
-Cast by new()
+Cast by C<new()>
 
 =item Fault: cannot read perl from file $filename: $!
 
-Cast by process()
+Cast by C<process()>
 
 =item Error: count missing in $function in line $line
 
-Cast by process()
+Cast by C<process()>
 
 =item Error: extractions require an explicit lexicon directory
 
-Cast by new()
+Cast by C<new()>
 
 =item Info: no Perl in file $filename
 
-Cast by process()
+Cast by C<process()>
 
 =item Error: no context tags allowed in plural `$msgid'
 
-Cast by store()
+Cast by C<store()>
 
 =item Info: processing file $fn in $charset
 
-Cast by process()
+Cast by C<process()>
 
 =item Info: starting new textdomain $domain, template in $filename
 
-Cast by write()
+Cast by C<write()>
 
 =item Error: string is incorrect at line $line: $error
 
-Cast by process()
+Cast by C<process()>
 
 =item Warning: use double quotes not single, in $string on $file line $line
 
-Cast by process()
+Cast by C<process()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Log-Report-Lexicon version 1.14,
-built on September 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report-Lexicon version 1.15,
+built on November 06, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

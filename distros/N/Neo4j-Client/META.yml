@@ -43,7 +43,7 @@ requires:
 resources:
   bugtracker: https://github.com/majensen/neoclient/issues
   repository: https://github.com/majensen/neoclient.git
-version: '0.55'
+version: '0.56'
 x_alienfile:
   generated_by: 'Alien::Build::MM version 2.84'
   requires:

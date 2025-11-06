@@ -1,4 +1,4 @@
-       use Lingua::Romana::Perligata;
+       use Lingua::Romana::Perligata 'converte';
 
            EGRESSO SCRIBE DICTUM
    SIC PLEASE ENTER THE STRING TO BE CIS

@@ -2,7 +2,7 @@ package Liveman;
 use 5.22.0;
 use common::sense;
 
-our $VERSION = "3.3";
+our $VERSION = "3.4";
 
 use File::Basename qw/dirname/;
 use File::Find::Wanted qw/find_wanted/;
@@ -318,8 +318,9 @@ sub transform {
 
 	my $markdown = read_text($md);
 
-	my $from; my $to;
-	$markdown =~ s/^!(\w+):(\w+)[\t ]*\n/$from = $1; $to = $2; "\n"/e;
+	my $options;
+	$markdown =~ s/^!(.*)\n/$options = $1; "\n"/e;
+	my ($from, $to) = $options =~ /(\w+):(\w+)/;
 	$self->load_po($md, $from, $to);
 
 	my @pod; my @test; my $title = 'Start'; my $close_subtest; my $use_title = 1;
@@ -404,30 +405,29 @@ sub transform {
 
 	write_text $test, join "", $test_head, @test;
 
-	# Создаём модуль, если его нет
-	my $pm = $md =~ s/\.md$/.pm/r;
-	if(!-e $pm) {
-		my $pkg = Liveman::Cpanfile::pkg_from_path $pm;
-		write_text $pm, "package $pkg;\n\n1;";
-	}
-
-	# Трансформируем модуль (pod и версия):
-	my $pod = join "", @pod;
-	my $module = read_text $pm;
-	$module =~ s!(\s*\n__END__[\t ]*\n.*)?$!\n\n__END__\n\n=encoding utf-8\n\n$pod!sn;
-
 	# Меняем версию:
 	my $v = uc "version";
 	my ($version) = $markdown =~ /^#[ \t]+$v\s+([\w\.-]{1,32})\s/m;
-	$module =~ s!^(our\s*\$$v\s*=\s*)["']?[\w.-]{1,32}["']?!$1"$version"!m if defined $version;
-	write_text $pm, $module;
+	
+	# Трансформируем модуль (pod и версия):
+	my $pod_doc = join "", @pod;
+	my $pm = $md =~ s/\.md$/.pm/r;
+	if (-e $pm) {
+		my $module = read_text $pm;
+		$module =~ s!^(our\s*\$$v\s*=\s*)["']?[\w.-]{1,32}["']?!$1"$version"!m if defined $version;
+		$module =~ s!(\s*\n__END__[\t ]*\n.*)?$!\n\n__END__\n\n=encoding utf-8\n\n$pod_doc!sn;
+		write_text $pm, $module;
+	} else {
+		my $pod = $md =~ s/\.md$/.pod/r;
+		write_text $pod, $pod_doc;
+	}
 
 	$self->{count}++;
 
 	$self->save_po;
 
 	my $mark = join "", @text;
-	$mark =~ s/^/!$from:$to/ if $from;
+	$mark =~ s/^/!$options/ if $options;
 	write_text($md, $mark) if $mark ne $markdown;
 
 	print colored("ok", "bright_green"), "\n";
@@ -494,25 +494,24 @@ __END__
 
 =encoding utf-8
 
-!ru:en,badges
 =head1 NAME
 
-Liveman - компиллятор из markdown в тесты и документацию
+Liveman - compiler from Markdown to tests and documentation
 
 =head1 VERSION
 
-3.3
+3.4
 
 =head1 SYNOPSIS
 
-Файл lib/Example.md:
+File lib/Example.md:
 
 	Twice two:
 	\```perl
 	2*2  # -> 2+2
 	\```
 
-Тест:
+Test:
 
 	use Liveman;
 	
@@ -520,72 +519,74 @@ Liveman - компиллятор из markdown в тесты и документ
 	
 	$liveman->transform("lib/Example.md");
 	
-	$liveman->{count}   # => 1
-	-f "t/example.t"    # => 1
-	-f "lib/Example.pm" # => 1
+	$liveman->{count}    # -> 1
+	-f "t/example.t"     # -> 1
+	-f "lib/Example.pod" # -> 1
 	
 	$liveman->transforms;
-	$liveman->{count}   # => 0
+	$liveman->{count}   # -> 0
 	
-	Liveman->new(compile_force => 1)->transforms->{count} # => 1
+	Liveman->new(compile_force => 1)->transforms->{count} # -> 1
 	
 	my $prove_return_code = $liveman->tests->{exit_code};
 	
-	$prove_return_code           # => 0
-	-f "cover_db/coverage.html" # => 1
+	$prove_return_code          # -> 0
+	-f "cover_db/coverage.html" # -> 1
 
 =head1 DESCRIPION
 
-Проблема современных проектов в том, что документация оторвана от тестирования.
-Это значит, что примеры в документации могут не работать, а сама документация может отставать от кода.
+The problem of modern projects is that the documentation is torn from testing.
+This means that the examples in the documentation may not work, and the documentation itself can lag behind the code.
 
-Liveman компилирует файлы C<lib/**.md> в файлы C<t/**.t>
-и добавляет документацию в раздел C<__END__> модуля к файлам C<lib/**.pm>.
+LiveMan compiles C<Lib/**.md> to files C<t/**.t>
+And adds the documentation to the C<__END__> module to the files C<lib/**.pm>.
 
-Используйте команду C<liveman> для компиляции документации к тестам в каталоге вашего проекта и запускайте тесты:
+Use the `Liveman 'command to compilation of documentation for tests in the catalog of your project and start tests:
 
  liveman
 
-Запустите его с покрытием.
+Run it with a coating.
 
-Опция C<-o> открывает отчёт о покрытии кода тестами в браузере (файл отчёта покрытия: C<cover_db/coverage.html>).
+The C<-o> option opens a report on covering code with tests in a browser (coating report file:C<cover_db/coverage.html>).
 
-Liveman заменяет C<our $VERSION = "...";> в C<lib/**.pm> из C<lib/**.md> из секции B<VERSION> если она существует.
+Liveman replaces the C<our $VERSION = "...";> in C<lib/**.pm> from C<lib/**.md> from the section B<VERSION> if it exists.
 
-Если файл B<minil.toml> существует, то Liveman прочитает из него C<name> и скопирует файл с этим именем и расширением C<.md> в C<README.md>.
+If the I<* minil.toml *> file exists, then Liveman will read C<NAME> from it and copy the file with this name and extensionC<.md> in C<readme.md>.
 
-Если нужно, чтобы документация в C<.md> была написана на одном языке, а C<pod> – на другом, то в начале C<.md> нужно указать C<!from:to> (с какого на какой язык перевести, например, для этого файла: C<!ru:en>).
+If you need the documentation in C<.md> to be written in one language, andC<pod> is on the other, then at the beginning of C<.md> you need to indicateC<!from:to> (from which language to translate, for example, for this file: C<!ru:en>).
 
-Заголовки (строки на #) – не переводятся. Так же не переводятя блоки кода.
-А сам перевод осуществляется по абзацам.
+Headings (lines on #) - are not translated. Also, without translating the code blocks.
+And the translation itself is carried out by paragraphs.
 
-Файлы с переводами складываются в каталог C<i18n>, например, C<lib/My/Module.md> -> C<i18n/My/Module.ru-en.po>. Перевод осуществляется утилитой C<trans> (она должна быть установлена в системе). Файлы переводов можно подкорректировать, так как если перевод уже есть в файле, то берётся он.
+Files with transfers are added to the C<i18n> catalog, for example, C<lib/My/Module.md> -> C<i18n/My/Module.ru-en.po>. Translation is carried out by the C<Trans> utility (it should be installed in the system). Translation files can be adjusted, because if the transfer is already in the file, then it is taken.
 
-B<Внимание!> Будьте осторожны и после редактирования C<.md> просматривайте C<git diff>, чтобы не потерять подкорректированные переводы в C<.po>.
+B<Attention!> Be careful and after editing C<.md> look at C<git diff> so as not to lose corrected translations in C<.po>.
 
-B<Примечание:> C<trans -R> покажет список языков, которые можно указывать в B<!from:to> на первой строке документа.
+B<Note:> C<trans -R> will show a list of languages that can be indicated in B<!from:to> on the first line of the document.
+
+The predecessor of C<liveman> is LL<https://github.com/darviarush/miu>.
 
 =head2 TYPES OF TESTS
 
-Коды секций без указанного языка программирования или с C<perl> записываются как код в файл C<t/**.t>. А комментарий со стрелкой (# -> )превращается в тест C<Test::More>.
+Section codes without a specified programming language or with C<perl> are written as code in the file C<t/**.t>. And a comment with an arrow (# -> ) turns into a C<Test::More> test.
 
 =head3 C<is>
 
-Сравнить два эквивалентных выражения:
+Compare two equivalent expressions:
 
 	"hi!" # -> "hi" . "!"
 	"hi!" # → "hi" . "!"
 
 =head3 C<is_deeply>
 
-Сравнить два выражения для структур:
+Compare two expressions for structures:
 
 	["hi!"] # --> ["hi" . "!"]
 	"hi!" # ⟶ "hi" . "!"
 
 =head3 C<is> with extrapolate-string
 
-Сравнить выражение с экстраполированной строкой:
+Compare the expression with an extrapolated line:
 
 	my $exclamation = "!";
 	"hi!2" # => hi${exclamation}2
@@ -593,28 +594,28 @@ B<Примечание:> C<trans -R> покажет список языков, �
 
 =head3 C<is> with nonextrapolate-string
 
-Сравнить выражение с неэкстраполированной строкой:
+Compare the expression with an unexpected line:
 
 	'hi${exclamation}3' # \> hi${exclamation}3
 	'hi${exclamation}3' # ↦ hi${exclamation}3
 
 =head3 C<like>
 
-Скаляр должен быть сопостовим с регулярным выражением:
+The scalar must be comparable to a regular expression:
 
 	'abbc' # ~> b+
 	'abc'  # ↬ b+
 
 =head3 C<unlike>
 
-В скаляре не должно быть совпадения с регулярным выражением:
+The scalar must not match the regular expression:
 
 	'ac' # <~ b+
 	'ac' # ↫ b+
 
 =head3 C<like> begins with extrapolate-string
 
-Скаляр должен начинаться экстраполированой срокой:
+The scalar must begin with an extrapolated term:
 
 	my $var = 'b';
 	
@@ -623,7 +624,7 @@ B<Примечание:> C<trans -R> покажет список языков, �
 
 =head3 C<like> ends with extrapolate-string
 
-Скаляр должен заканчиваться экстраполированой срокой:
+The scalar must end with an extrapolated term:
 
 	my $var = 'c';
 	
@@ -632,7 +633,7 @@ B<Примечание:> C<trans -R> покажет список языков, �
 
 =head3 C<like> inners with extrapolate-string
 
-Скаляр должен содержать экстраполированую сроку:
+The scalar must contain the extrapolated term:
 
 	my $var = 'x';
 	
@@ -641,35 +642,35 @@ B<Примечание:> C<trans -R> покажет список языков, �
 
 =head3 C<like> begins with nonextrapolate-string
 
-Скаляр должен начинаться неэкстраполированой срокой:
+The scalar must begin with a non-extrapolated term:
 
 	'abbc' # ^-> ab
 	'abc'  # ↣ ab
 
 =head3 C<like> ends with nonextrapolate-string
 
-Скаляр должен заканчиваться неэкстраполированой срокой:
+The scalar must end with a non-extrapolated term:
 
 	'abbc' # $-> bc
 	'abc'  # ⇥ bc
 
 =head3 C<like> inners with nonextrapolate-string
 
-Скаляр должен содержать неэкстраполированую сроку:
+The scalar must contain a non-extrapolated term:
 
 	'abbc' # *-> bb
 	'abc'  # ⥵ b
 
 =head3 C<like> throw begins with nonextrapolate-string
 
-Исключение должно начинаться с неэкстраполированой сроки:
+The exception must start with the non-extrapolated term:
 
 	1/0 # @-> Illegal division by zero
 	1/0 # ↯ Illegal division by zero
 
 =head3 C<like> throw begins with extrapolate-string
 
-Исключение должно начинаться с экстраполированой сроки:
+The exception must start with the extrapolated timing:
 
 	my $by = 'by';
 	
@@ -678,73 +679,94 @@ B<Примечание:> C<trans -R> покажет список языков, �
 
 =head3 C<like> throw
 
-Исключение должно быть сопостовимо с регулярным выражением:
+The exception must be matched to the regular expression:
 
 	1/0 # @~> division\s*by\s*zero
 	1/0 # ⇝ division\s*by\s*zero
 
 =head3 C<unlike> throw
 
-Исключение не должно быть сопостовимо с регулярным выражением:
+The exception doesn't have to be matched by the regular expression (but it should be):
 
 	1/0 # <~@ auto
 	1/0 # ⇜ auto
 
 =head2 EMBEDDING FILES
 
-Каждый тест выполняется во временном каталоге, который удаляется и создается при запуске теста.
+Each test is performed in a temporary catalog, which is removed and created when starting the dough.
 
-Формат этого каталога: /tmp/.liveman/I<project>/I<path-to-test>/.
+The format of this catalog: /tmp/.liveman/I<project>/I<path-to-test>/.
 
-Раздел кода в строке с префиксом md-файла B<< File C<path>: >> запишется в файл при тестировании во время выполнения.
+The code section in the line with the MD-file prefix B<< File C<path>: >> is written to the file when testing during execution.
 
-Раздел кода в префиксной строке md-файла B<< File C<path> is: >> будет сравниваться с файлом методом C<Test::More::is>.
+The code section in the md file prefix line B<< File C<path> is: >> will be compared to the file using the C<Test::More::is> method.
 
-Файл experiment/test.txt:
-
-	hi!
-
-Файл experiment/test.txt является:
+experiment/test.txt file:
 
 	hi!
 
-B<Внимание!> Пустая строка между префиксом и кодом не допускается!
+experiment/test.txt file is:
 
-Эти префиксы могут быть как на английском, так и на русском (C<File [path](https://metacpan.org/pod/path):> и C<File [path](https://metacpan.org/pod/path) is:>).
+	hi!
+
+B<Attention!> An empty line between the prefix and the code is not allowed!
+
+These prefixes can be both in English and in Russian (C<File [path] (https://metacpan.org/pod/path):> and C<File [path] (https://metacpan.org/pod/path) is:>).
 
 =head1 METHODS
 
 =head2 new (%param)
 
-Конструктор. Имеет аргументы:
+Constructor. Has arguments:
 
 =over
 
-=item 1. C<files> (array_ref) — список md-файлов для методов C<transforms> и C<tests>.
+=item 1. C<Files> (array_ref)-a list of MD files for theC<transforms> and C<tests>.
 
-=item 2. C<open> (boolean) — открыть покрытие в браузере. Если на компьютере установлен браузер B<opera>, то будет использоватся команда C<opera> для открытия. Иначе — C<xdg-open>.
+=item 2. C<open> (boolean) - open the coating in the browser. If the computer is installed on the computer B<Opera>, the C<Opera> command will be used to open. Otherwise-C<xdg-open>.
 
-=item 3. C<force_compile> (boolean) — не проверять время модификации md-файлов.
+=item 3. C<force_compile> (boolean)-do not check the time of modification of MD files.
 
-=item 4. C<options> — добавить параметры в командной строке для проверки или доказательства.
+=item 4. C<options> - Add the parameters on the command line for verification or evidence.
 
-=item 5. C<prove> — использовать доказательство (команду C<prove> для запуска тестов), а не команду C<yath>.
+=item 5. C<prove> - use the proof (team C<prove> to start tests), and not the C<yath> command.
 
 =back
 
 =head2 test_path ($md_path)
 
-Получить путь к C<t/**.t>-файлу из пути к C<lib/**.md>-файлу:
+Get the way to C<t/**.t>-file from the way toC<lib/**.md>-file:
 
 	Liveman->new->test_path("lib/PathFix/RestFix.md") # => t/path-fix/rest-fix.t
 
 =head2 transform ($md_path, [$test_path])
 
-Компилирует C<lib/**.md>-файл в C<t/**.t>-файл.
+Compiles C<lib/**.md>-file inC<t/**.t>-file.
 
-А так же заменяет B<pod>-документацию в секции C<__END__> в C<lib/**.pm>-файле и создаёт C<lib/**.pm>-файл, если тот не существует.
+It also replaces the B<pod> documentation in the C<__END__> section in the C<lib/**.pm> file and creates a C<lib/**.pm> file if it exists, otherwise it creates a C<lib/**.pod> file.
 
-Файл lib/Example.pm является:
+When C<transform> was called in C<SYNOPSYS>, a file C<lib/Example.pod> was created.
+
+The lib/Example.pod file is:
+
+	Twice two:
+	
+		2*2  # -> 2+2
+	
+
+Let's create C<lib/Example.pm> and call C<transform>:
+
+	open my $fh, ">", "lib/Example.pm" or die $!;
+	print $fh q{package Example;
+	
+	1;};
+	close $fh;
+	
+	my $liveman = Liveman->new(prove => 1);
+	
+	$liveman->transform("lib/Example.md");
+
+The lib/Example.pm file is:
 
 	package Example;
 	
@@ -759,39 +781,37 @@ B<Внимание!> Пустая строка между префиксом и 
 		2*2  # -> 2+2
 	
 
-Файл C<lib/Example.pm> был создан из файла C<lib/Example.md>, что описано в разделе C<SINOPSIS> в этом документе.
-
 =head2 transforms ()
 
-Компилировать C<lib/**.md>-файлы в C<t/**.t>-файлы.
+Compile C<lib/**.md> files into C<t/**.t> files.
 
-Все, если C<< $self-E<gt>{files} >> не установлен, или C<< $self-E<gt>{files} >>.
+That's all, if C<< $self-E<gt>{files} >> is not installed, or C<< $self-E<gt>{files} >>.
 
 =head2 tests ()
 
-Запустить тесты (C<t/**.t>-файлы).
+Launch tests (C<t/**.t>-files).
 
-Все, если C<< $self-E<gt>{files} >> не установлен, или C<< $self-E<gt>{files} >> только.
+That's all, if C<< $self-E<gt>{files} >> is not installed, or C<< $self-E<gt>{files} >> only.
 
 =head2 load_po ($md, $from, $to)
 
-Считывает po-файл.
+Reads the PO-file.
 
 =head2 save_po ()
 
-Сохраняет po-файл.
+Saves the PO-file.
 
 =head2 trans ($text, $lineno)
 
-Функция переводит текст с одного языка на другой используя утилиту trans.
+The function translates the text from one language to another using the Trans utility.
 
 =head2 trans_paragraph ($paragraph, $lineno)
 
-Так же разбивает по параграфам.
+It also breaks through paragraphs.
 
 =head1 DEPENDENCIES IN CPANFILE
 
-В своей библиотеке, которую вы будете тестировать Liveman-ом, нужно будет указать дополнительные зависимости для тестов в B<cpanfile>:
+In your library, which you will test Liveman, you will need to indicate additional dependencies for tests in B<cpanfile>:
 
 	on 'test' => sub {
 	    requires 'Test::More', '0.98';
@@ -804,7 +824,7 @@ B<Внимание!> Пустая строка между префиксом и 
 	    requires 'Scalar::Util';
 	};
 
-Так же неплохо будет указать и сам B<Liveman> в разделе для разработки:
+It will also be good to indicate and the B<Liveman> in the development section:
 
 	on 'develop' => sub {
 	    requires 'Minilla', 'v3.1.19';
@@ -822,4 +842,4 @@ Yaroslav O. Kosmina L<mailto:dart@cpan.org>
 
 =head1 COPYRIGHT
 
-The Liveman module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All rights reserved.
+The Liveman Module is Copyright © 2023 Yaroslav O. Kosmina. Rusland. All Rights Reserved.

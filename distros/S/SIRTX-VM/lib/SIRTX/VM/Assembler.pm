@@ -14,6 +14,7 @@ use warnings;
 use Carp;
 use Encode ();
 use Fcntl qw(SEEK_SET SEEK_CUR SEEK_END);
+use List::Util qw(uniq);
 
 use String::Super;
 
@@ -22,7 +23,7 @@ use SIRTX::VM::Opcode;
 
 use parent 'Data::Identifier::Interface::Userdata';
 
-our $VERSION = v0.08;
+our $VERSION = v0.10;
 
 my %_escapes = (
     '\\' => '\\',
@@ -44,9 +45,15 @@ my %_header_ids = (
     resources   => 6,
 );
 
+our %_header_ids_rev = reverse %_header_ids;
+
 my @_section_order = qw(header init text rodata resources trailer);
 my @_section_text  = qw(header init text);
 my @_section_load  = (@_section_text, qw(rodata resources));
+
+my %_disabled_sections = (
+    'resources_only' => {map {$_ => 1} qw(init text)},
+);
 
 my %_info          = map {$_ => 1} (
     qw(.author .license .copyright_years .copyright_holder),
@@ -55,172 +62,189 @@ my %_info          = map {$_ => 1} (
     qw(.repo_uri),
 );
 
+my %_profiles      = (
+    default         => 0,
+    resources_only  => 1,
+    minimal         => 2,
+);
+
 my %_synthetic = (
-    mul             => [['"out"' => 'undef', reg => 1, '"arg"' => 'undef'] => ['user*' => 2] => [
-                            ['open', \2, 0],
-                            ['control', \2, 'sni:81', \1],
-                        ],
-                        ['"out"' => 'undef', reg => 1, reg => 2] => ['arg' => 3] => [
-                            ['replace', \3, \2],
-                            ['mul', 'out', \1, \3],
-                        ],
-                        ['"out"' => 'undef', reg => 1, int => 2] => ['arg' => 3] => [
-                            ['open', \3, \2],
-                            ['mul', 'out', \1, \3],
-                        ]],
-    contents        => [[reg => 1, int => 2] => ['user*' => 3] => [
-                            ['open_function*', \3, \2],
-                            ['contents*', \1, \3],
-                        ],
-                        [reg => 1, id => 2] => ['user*' => 3] => [
-                            ['open*', \3, \2],
-                            ['contents*', \1, \3],
-                        ]],
-    call            => [[reg => 1, int => 2] => ['user*' => 3] => [
-                            ['open_function*', \3, \2],
-                            ['call*', \1, \3]
-                        ],
-                        [reg => 1, id => 2] => ['user*' => 3] => [
-                            ['open*', \3, \2],
-                            ['call*', \1, \3],
-                        ],
-                        [[qw(reg int id)] => 1] => ['user*' => 2] => [
-                            ['open_context*', \2],
-                            ['call*', \2, \1],
-                        ]],
-    transfer        => [[reg => 1, string => 2] => ['user*' => 3] => [
-                            ['open', \3, \2],
-                            ['transfer', \1, \3],
-                        ]],
-    control         => [[reg => 1, [qw(reg sni:)] => 2, [qw(string bool)] => 3] => ['user*' => 4] => [
-                            ['open', \4, \3],
-                            ['control', \1, \2, \4],
-                        ],
-                        [reg => 1, [qw(reg sni:)] => 2, [qw(string bool)] => 3, reg => 4] => ['user*' => 5, 'arg' => 6] => [
-                            ['open', \5, \3],
-                            ['replace', \6, \4],
-                            ['control', \1, \2, \5],
-                        ],
-                        [reg => 1, [qw(reg sni:)] => 2, [qw(string bool)] => 3, any => 4] => ['user*' => 5, 'arg' => 6] => [
-                            ['open', \5, \3],
-                            ['open', \6, \4],
-                            ['control', \1, \2, \5],
-                        ],
-                        [any => 1, any => 2, any => 3, reg => 4] => ['arg' => 5] => [
-                            ['replace', \5, \4],
-                            ['control', \1, \2, \3, \5],
-                        ],
-                        [any => 1, any => 2, any => 3, any => 4] => ['arg' => 5] => [
-                            ['open', \5, \4],
-                            ['control', \1, \2, \3, \5],
-                        ]],
-    push            => [[any => 1, string => 2] => ['user*' => 3] => [
-                            ['open', \3, \2],
-                            ['push', \1, \3],
-                        ],
-                        [any => 1, any => 2] => ['user*' => 3] => [
-                            ['open', \3, \2],
-                            ['push', \1, \3],
-                        ],
-                        [any => 1, [qw(int id string bool)] => 2, '"arg"' => 3] => ['user*' => 4] => [
-                            ['open', \4, \2],
-                            ['control', \1, 'sni:180', \4, \3],
-                        ],
-                        [any => 1, reg => 2, '"arg"' => 3] => [] => [
-                            ['control', \1, 'sni:180', \2, \3],
-                        ],
-                        [any => 1, [qw(int id string bool)] => 2, reg => 3] => ['user*' => 4, 'arg' => 5] => [
-                            ['open', \4, \2],
-                            ['replace', \5, \3],
-                            ['control', \1, 'sni:180', \4, \3],
-                        ],
-                        [any => 1, reg => 2, reg => 3] => ['arg' => 4] => [
-                            ['replace', \4, \3],
-                            ['control', \1, 'sni:180', \2, \4],
-                        ],
-                        [any => 1, [qw(int id string bool)] => 2, any => 3] => ['user*' => 4, 'arg' => 5] => [
-                            ['open', \4, \2],
-                            ['open', \5, \3],
-                            ['control', \1, 'sni:180', \4, \3],
-                        ],
-                        [any => 1, reg => 2, any => 3] => ['arg' => 4] => [
-                            ['open', \4, \3],
-                            ['control', \1, 'sni:180', \2, \4],
-                        ]],
-    pop             => [[reg => 1, reg => 2] => [] => [
-                            ['control', \2, 'sni:181'],
-                            ['replace', \1, 'out'],
-                        ]],
-    setvalue        => [
-                        [reg => 1, reg => 2, '"arg"' => 3] => [] => [
-                            ['control', \1, 'sni:102', \2, \3],
-                        ],
-                        [reg => 1, any => 2, '"arg"' => 3] => ['user*' => 4] => [
-                            ['open', \4, \2],
-                            ['control', \1, 'sni:102', \4, \3],
-                        ],
-                        [reg => 1, reg => 2, reg => 3] => ['arg' => 4] => [
-                            ['replace', \4, \3],
-                            ['control', \1, 'sni:102', \2, \4],
-                        ],
-                        [reg => 1, any => 2, reg => 3] => ['arg' => 4, 'user*' => 5] => [
-                            ['replace', \4, \3],
-                            ['open', \5, \2],
-                            ['control', \1, 'sni:102', \5, \4],
-                        ],
-                        [reg => 1, reg => 2, any => 3] => ['arg' => 4] => [
-                            ['open', \4, \3],
-                            ['control', \1, 'sni:102', \2, \4],
-                        ],
-                        [reg => 1, any => 2, any => 3] => ['arg' => 4, 'user*' => 5] => [
-                            ['open', \4, \3],
-                            ['open', \5, \2],
-                            ['control', \1, 'sni:102', \5, \4],
-                        ]],
-    getvalue        => [
-                        ['"out"' => 1, reg => 2, any => 3] => ['user*' => 4] => [
-                            ['open', \4, \3],
-                            ['getvalue', \1, \2, \4],
-                        ],
-                        [reg => 1, reg => 2, reg => 3] => [] => [
-                            ['getvalue', 'out', \2, \3],
-                            ['replace', \1, 'out'],
-                        ],
-                        [reg => 1, reg => 2, any => 3] => ['user*' => 4] => [
-                            ['open', \4, \3],
-                            ['getvalue', 'out', \2, \4],
-                            ['replace', \1, 'out'],
-                        ]],
-    relations       => [[alias => 1, reg => 2, id => 3, any => 4] => ['user*' => 5, 'user*' => 6] => [
-                            ['.force_mapped', \5],
-                            ['open_function', \5, \1],
-                            ['open', \6, \3],
-                            ['relations', \5, \2, \6, \4],
-                        ]],
-    '.autosectionstart' => [['"header"' => 1] => [] => [
-                            ['.section', \1, '"VM\\r\\n\\xc0\\n"'],
-                            ['filesize', 'size$out$'],
-                            ['text_boundary', 'end$boundary$text'],
-                            ['load_boundary', 'end$boundary$load'],
-                            (map {['section_pointer', 'section$'.$_.'//section$header']} @_section_order),
-                        ],
-                        ['"rodata"' => 1] => [] => [
-                            ['.section', \1],
-                            ['.rodata'], # INTERNAL COMMAND, NOT FOR DOCS!
-                            ['.align', 2],
-                        ],
-                        [any => 1] => [] => [
-                            ['.section', \1]
-                        ]],
-    '.autosection'  => [[any => 1] => [] => [
-                            ['.autosectionstart', \1],
-                            ['.endsection']
-                        ]],
-    '.filechunk'    => [[string => 1, 'any...' => 2] => [] => [
-                            ['.chunk', \2],
-                            ['.cat', \1],
-                            ['.endchunk'],
-                        ]],
+    default => {
+        mul             => [['"out"' => 'undef', reg => 1, '"arg"' => 'undef'] => ['user*' => 2] => [
+                ['open', \2, 0],
+                ['control', \2, 'sni:81', \1],
+            ],
+            ['"out"' => 'undef', reg => 1, reg => 2] => ['arg' => 3] => [
+                ['replace', \3, \2],
+                ['mul', 'out', \1, \3],
+            ],
+            ['"out"' => 'undef', reg => 1, int => 2] => ['arg' => 3] => [
+                ['open', \3, \2],
+                ['mul', 'out', \1, \3],
+            ]],
+        contents        => [[reg => 1, int => 2] => ['user*' => 3] => [
+                ['open_function*', \3, \2],
+                ['contents*', \1, \3],
+            ],
+            [reg => 1, id => 2] => ['user*' => 3] => [
+                ['open*', \3, \2],
+                ['contents*', \1, \3],
+            ]],
+        call            => [[reg => 1, int => 2] => ['user*' => 3] => [
+                ['open_function*', \3, \2],
+                ['call*', \1, \3]
+            ],
+            [reg => 1, id => 2] => ['user*' => 3] => [
+                ['open*', \3, \2],
+                ['call*', \1, \3],
+            ],
+            [[qw(reg int id)] => 1] => ['user*' => 2] => [
+                ['open_context*', \2],
+                ['call*', \2, \1],
+            ]],
+        transfer        => [[reg => 1, string => 2] => ['user*' => 3] => [
+                ['open', \3, \2],
+                ['transfer', \1, \3],
+            ]],
+        control         => [[reg => 1, [qw(reg sni:)] => 2, [qw(string bool)] => 3] => ['user*' => 4] => [
+                ['open', \4, \3],
+                ['control', \1, \2, \4],
+            ],
+            [reg => 1, [qw(reg sni:)] => 2, [qw(string bool)] => 3, reg => 4] => ['user*' => 5, 'arg' => 6] => [
+                ['open', \5, \3],
+                ['replace', \6, \4],
+                ['control', \1, \2, \5],
+            ],
+            [reg => 1, [qw(reg sni:)] => 2, [qw(string bool)] => 3, any => 4] => ['user*' => 5, 'arg' => 6] => [
+                ['open', \5, \3],
+                ['open', \6, \4],
+                ['control', \1, \2, \5],
+            ],
+            [any => 1, any => 2, any => 3, reg => 4] => ['arg' => 5] => [
+                ['replace', \5, \4],
+                ['control', \1, \2, \3, \5],
+            ],
+            [any => 1, any => 2, any => 3, any => 4] => ['arg' => 5] => [
+                ['open', \5, \4],
+                ['control', \1, \2, \3, \5],
+            ]],
+        push            => [[any => 1, string => 2] => ['user*' => 3] => [
+                ['open', \3, \2],
+                ['push', \1, \3],
+            ],
+            [any => 1, any => 2] => ['user*' => 3] => [
+                ['open', \3, \2],
+                ['push', \1, \3],
+            ],
+            [any => 1, [qw(int id string bool)] => 2, '"arg"' => 3] => ['user*' => 4] => [
+                ['open', \4, \2],
+                ['control', \1, 'sni:180', \4, \3],
+            ],
+            [any => 1, reg => 2, '"arg"' => 3] => [] => [
+                ['control', \1, 'sni:180', \2, \3],
+            ],
+            [any => 1, [qw(int id string bool)] => 2, reg => 3] => ['user*' => 4, 'arg' => 5] => [
+                ['open', \4, \2],
+                ['replace', \5, \3],
+                ['control', \1, 'sni:180', \4, \3],
+            ],
+            [any => 1, reg => 2, reg => 3] => ['arg' => 4] => [
+                ['replace', \4, \3],
+                ['control', \1, 'sni:180', \2, \4],
+            ],
+            [any => 1, [qw(int id string bool)] => 2, any => 3] => ['user*' => 4, 'arg' => 5] => [
+                ['open', \4, \2],
+                ['open', \5, \3],
+                ['control', \1, 'sni:180', \4, \3],
+            ],
+            [any => 1, reg => 2, any => 3] => ['arg' => 4] => [
+                ['open', \4, \3],
+                ['control', \1, 'sni:180', \2, \4],
+            ]],
+        pop             => [[reg => 1, reg => 2] => [] => [
+                ['control', \2, 'sni:181'],
+                ['replace', \1, 'out'],
+            ]],
+        setvalue        => [
+            [reg => 1, reg => 2, '"arg"' => 3] => [] => [
+                ['control', \1, 'sni:102', \2, \3],
+            ],
+            [reg => 1, any => 2, '"arg"' => 3] => ['user*' => 4] => [
+                ['open', \4, \2],
+                ['control', \1, 'sni:102', \4, \3],
+            ],
+            [reg => 1, reg => 2, reg => 3] => ['arg' => 4] => [
+                ['replace', \4, \3],
+                ['control', \1, 'sni:102', \2, \4],
+            ],
+            [reg => 1, any => 2, reg => 3] => ['arg' => 4, 'user*' => 5] => [
+                ['replace', \4, \3],
+                ['open', \5, \2],
+                ['control', \1, 'sni:102', \5, \4],
+            ],
+            [reg => 1, reg => 2, any => 3] => ['arg' => 4] => [
+                ['open', \4, \3],
+                ['control', \1, 'sni:102', \2, \4],
+            ],
+            [reg => 1, any => 2, any => 3] => ['arg' => 4, 'user*' => 5] => [
+                ['open', \4, \3],
+                ['open', \5, \2],
+                ['control', \1, 'sni:102', \5, \4],
+            ]],
+        getvalue        => [
+            ['"out"' => 1, reg => 2, any => 3] => ['user*' => 4] => [
+                ['open', \4, \3],
+                ['getvalue', \1, \2, \4],
+            ],
+            [reg => 1, reg => 2, reg => 3] => [] => [
+                ['getvalue', 'out', \2, \3],
+                ['replace', \1, 'out'],
+            ],
+            [reg => 1, reg => 2, any => 3] => ['user*' => 4] => [
+                ['open', \4, \3],
+                ['getvalue', 'out', \2, \4],
+                ['replace', \1, 'out'],
+            ]],
+        relations       => [[alias => 1, reg => 2, id => 3, any => 4] => ['user*' => 5, 'user*' => 6] => [
+                ['.force_mapped', \5],
+                ['open_function', \5, \1],
+                ['open', \6, \3],
+                ['relations', \5, \2, \6, \4],
+            ]],
+        '.autosectionstart' => [['"header"' => 1] => [] => [
+                ['.section', \1, '"VM\\r\\n\\xc0\\n"'],
+                ['filesize', 'size$out$'],
+                ['text_boundary', 'end$boundary$text'],
+                ['load_boundary', 'end$boundary$load'],
+                (map {['section_pointer', 'section$'.$_.'//section$header']} @_section_order),
+            ],
+            ['"rodata"' => 1] => [] => [
+                ['.section', \1],
+                ['.rodata'], # INTERNAL COMMAND, NOT FOR DOCS!
+                ['.align', 2],
+            ],
+            [any => 1] => [] => [
+                ['.section', \1]
+            ]],
+        '.autosection'  => [[any => 1] => [] => [
+                ['.autosectionstart', \1],
+                ['.endsection']
+            ]],
+        '.filechunk'    => [[string => 1, 'any...' => 2] => [] => [
+                ['.chunk', \2],
+                ['.cat', \1],
+                ['.endchunk'],
+            ]],
+    },
+    minimal => {
+        '.autosection' => [
+            ['"rodata"' => 1] => [] => [
+                ['data_start_marker'],
+                ['.rodata'], # INTERNAL COMMAND, NOT FOR DOCS!
+            ],
+            [any => 1] => [] => [
+            ]],
+    },
 );
 
 my %_section_order_bad;
@@ -254,6 +278,8 @@ sub new {
             rodata              => String::Super->new,
             alias_rodata_idx    => {},
             auto_host_defined   => undef,
+            profiles            => [],
+            profiles_hash       => undef,
         }, $pkg);
 
     {
@@ -281,6 +307,16 @@ sub new {
 
         $fh->binmode;
         $self->{out} = $fh;
+    }
+
+    $self->_join_profile('default');
+
+    if (defined(my $profile = delete $opts{profile})) {
+        $profile = [$profile] unless ref $profile;
+
+        foreach my $p (@{$profile}) {
+            $self->_join_profile(split(/(?:\s*,\s*|\s+)/, $p));
+        }
     }
 
     croak 'Stray options passed' if scalar keys %opts;
@@ -391,6 +427,12 @@ sub dump {
     $dumpfh->binmode;
     $dumpfh->binmode(':utf8');
 
+    say $dumpfh '; Profiles:';
+    foreach my $key (@{$self->{profiles}}) {
+        printf $dumpfh ";   %s\n", $key;
+    }
+
+    say $dumpfh '';
     say $dumpfh '; Settings:';
     foreach my $key (sort keys %{$self->{settings}}) {
         printf $dumpfh ";   %-32s -> %s\n", $key, $self->{settings}{$key} // '<undef>';
@@ -433,6 +475,37 @@ sub _alive {
 sub _quit {
     my ($self) = @_;
     delete $self->{alive};
+}
+
+sub _join_profile {
+    my ($self, @profiles) = @_;
+    push(@profiles, @{$self->{profiles}});
+
+    $self->{profiles} = [uniq sort {($_profiles{$b} // croak 'Bad profile: '.$b) <=> ($_profiles{$a} // croak 'Bad profile: '.$a)} @profiles];
+    $self->{profiles_hash} = {map {$_ => 1} @{$self->{profiles}}};
+}
+
+sub _using_profile {
+    my ($self, @profile) = @_;
+    my $hash = $self->{profiles_hash};
+
+    foreach my $profile (@profile) {
+        return 1 if $hash->{$profile};
+    }
+
+    return undef;
+}
+
+sub _get_synthetic {
+    my ($self, $cmd) = @_;
+
+    foreach my $profile (@{$self->{profiles}}) {
+        if (defined(my $entry = $_synthetic{$profile}{$cmd})) {
+            return $entry;
+        }
+    }
+
+    return undef;
 }
 
 sub _align {
@@ -524,7 +597,10 @@ sub _reg_alloc_phy {
     my ($self, @names) = @_;
     my $regmap_mapped = $self->{regmap_mapped};
     my $rf = $self->{rf};
-    my ($reg) = grep {$rf->register_owner($_) eq SIRTX::VM::Register::OWNER_YOURS()} grep {!$regmap_mapped->{$_}} $rf->expand(@names);
+    my ($reg) = sort {(eval {$rf->get_logical_by_name($a)} // 999) <=> (eval {$rf->get_logical_by_name($b)} // 999)}
+                grep {$rf->register_owner($_) eq SIRTX::VM::Register::OWNER_YOURS()}
+                grep {!$regmap_mapped->{$_}}
+                $rf->expand(@names);
 
     croak 'No suitable physical register found for auto mapping, did you set enough registers with .yours?' unless defined $reg;
 
@@ -653,6 +729,8 @@ sub _proc_parts {
 
     if ($cmd eq '.quit' && scalar(@args) == 0) {
         $self->_quit;
+    } elsif ($cmd eq '.profile' && scalar(@args) > 0) {
+        $self->_join_profile(@args);
     } elsif ($cmd eq '.pushname' && !(scalar(@args) & 1)) {
         for (my $i = 0; $i < scalar(@args); $i += 2) {
             my $key   = $args[$i + 0];
@@ -816,6 +894,14 @@ sub _proc_parts {
             croak sprintf('Invalid section: line %s: section %s', $opts->{line}, $args[0]);
         }
 
+        foreach my $profile (@{$self->{profiles}}) {
+            if (defined(my $disabled = $_disabled_sections{$profile})) {
+                if ($disabled->{$args[0]}) {
+                    croak sprintf('Invalid section for profile: line %s: section %s not allowed in profile %s', $opts->{line}, $args[0], $profile);
+                }
+            }
+        }
+
         if (defined(my $bad = $_section_order_bad{$args[0]})) {
             foreach my $key (@_section_order) {
                 next unless defined $self->{sections}{$key};
@@ -840,14 +926,18 @@ sub _proc_parts {
             name => $args[0],
         };
 
-        $self->_write_opcode(SIRTX::VM::Opcode->new(%tpl, T => $T, extra => $extra));
+        unless ($self->_using_profile('minimal')) {
+            $self->_write_opcode(SIRTX::VM::Opcode->new(%tpl, T => $T, extra => $extra));
+        }
         $self->_save_position('inner$section$'.$args[0]);
 
         $self->{sections}{$args[0]} = {};
     } elsif ($cmd eq '.endsection' && scalar(@args) == 0 && defined(my $section = $self->{current}{section})) {
         my $section_suffix = 'section$'.$section->{name};
         $self->_save_endposition('inner$'.$section_suffix);
-        $self->_write_opcode($section->{close_opcode}) if defined $section->{close_opcode};
+        unless ($self->_using_profile('minimal')) {
+            $self->_write_opcode($section->{close_opcode}) if defined $section->{close_opcode};
+        }
         $self->_save_endposition($section_suffix);
         $self->{current}{section} = undef;
     } elsif ($cmd eq '.chunk' && scalar(@args) >= 2) {
@@ -1004,7 +1094,7 @@ sub _proc_parts {
     } else {
         my $done;
 
-        if (defined(my $entry = $_synthetic{$cmd})) {
+        if (defined(my $entry = $self->_get_synthetic($cmd))) {
             outer:
             for (my $i = 0; $i < scalar(@{$entry}); $i += 3) {
                 my @argmap = @{$entry->[$i]};
@@ -1225,7 +1315,7 @@ SIRTX::VM::Assembler - module for assembling SIRTX VM code
 
 =head1 VERSION
 
-version v0.08
+version v0.10
 
 =head1 SYNOPSIS
 
@@ -1267,6 +1357,12 @@ It is best to avoid reusing the handle with other code.
 (required)
 
 The output to write the result to. The same aspects as for C<in> apply.
+
+=item C<profile>
+
+(optional)
+
+Profile (or list of profiles) to be used by the assembler.
 
 =back
 

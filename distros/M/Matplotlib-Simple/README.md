@@ -103,6 +103,9 @@ sub rand_between {
 }
 ```
 ## Barplot/bar/barh
+
+Plot a hash or a hash of arrays as a boxplot
+
 ### Options
 
 | Option | Description | Example |
@@ -310,12 +313,187 @@ plot({
 which produces the plot:
 
 <img width="2678" height="849" alt="barplots" src="https://github.com/user-attachments/assets/6d87d13b-dabd-485d-92f7-1418f4acc65b" />
+
 ## boxplot
+
+Plot a hash of arrays as a series of boxplots
+
 ### options
+
+| Option | Description | Example |
+| -------- | ------- | ------- |
+|`color` | a single color for all plots | `color => 'pink'`|
+|`colors`| a hash, where each data point and color is a hash pair |`colors => { A => 'orange', E => 'yellow', B => 'purple' },`|
+| `key.order`| order that the keys in the entry hash will be plotted | `key.order = ['A', 'E', 'B']` |
+| `orientation`| orientation of the plot, by default `vertical`| `orientation = 'horizontal'` |
+|`showcaps`| Show the caps on the ends of whiskers; default `True` | `showcaps => 'False',` |
+| `showfliers` |Show the outliers beyond the caps; default `True` | `showfliers  => 'False'` |
+|`showmeans` | show means; default = `True` | `showmeans   => 'False'` |
+|`whiskers`| show whiskers, default = 1| ` whiskers    => 0,`|
+				
 ### single, simple plot
+```
+my $x = generate_normal_dist( 100, 15, 3 * 10 );
+my $y = generate_normal_dist( 85,  15, 3 * 10 );
+my $z = generate_normal_dist( 106, 15, 3 * 10 );
+
+# single plots are simple
+plot(
+    {
+        'output.filename' => 'output.images/single.boxplot.png',
+        data              => {                                     # simple hash
+            E => [ 55,    @{$x}, 160 ],
+            B => [ @{$y}, 140 ],
+
+            #		A => @a
+        },
+        'plot.type'  => 'boxplot',
+        title        => 'Single Box Plot: Specified Colors',
+        colors       => { E => 'yellow', B => 'purple' },
+        'input.file' => $tmp_filename,
+        execute      => 0,
+    }
+);
+```
+which makes the following image:
+
+<img width="651" height="491" alt="single boxplot" src="https://github.com/user-attachments/assets/19870fa2-fe36-4513-8cbb-23da3a0cf686" />
+
 ### multiple plots
+```
+plot(
+    {
+        'output.filename' => 'output.images/boxplot.png',
+        execute           => 0,
+        'input.file'      => $tmp_filename,
+        plots             => [
+            {
+                data => {
+                    A => [ 55, @{$z} ],
+                    E => [ @{$y} ],
+                    B => [ 122, @{$z} ],
+                },
+                title       => 'Simple Boxplot',
+                ylabel      => 'ylabel',
+                xlabel      => 'label',
+                'plot.type' => 'boxplot',
+                suptitle    => 'Boxplot examples'
+            },
+            {
+                color => 'pink',
+                data  => {
+                    A => [ 55, @{$z} ],
+                    E => [ @{$y} ],
+                    B => [ 122, @{$z} ],
+                },
+                title       => 'Specify single color',
+                ylabel      => 'ylabel',
+                xlabel      => 'label',
+                'plot.type' => 'boxplot'
+            },
+            {
+                colors => {
+                    A => 'orange',
+                    E => 'yellow',
+                    B => 'purple'
+                },
+                data => {
+                    A => [ 55, @{$z} ],
+                    E => [ @{$y} ],
+                    B => [ 122, @{$z} ],
+                },
+                title       => 'Specify set-specific color; showfliers = False',
+                ylabel      => 'ylabel',
+                xlabel      => 'label',
+                'plot.type' => 'boxplot',
+                showmeans   => 'True',
+                showfliers  => 'False',
+                set_figwidth => 12
+            },
+            {
+                colors => {
+                    A => 'orange',
+                    E => 'yellow',
+                    B => 'purple'
+                },
+                data => {
+                    A => [ 55, @{$z} ],
+                    E => [ @{$y} ],
+                    B => [ 122, @{$z} ],
+                },
+                title       => 'Specify set-specific color; showmeans = False',
+                ylabel      => 'ylabel',
+                xlabel      => 'label',
+                'plot.type' => 'boxplot',
+                showmeans   => 'False',
+            },
+            {
+                colors => {
+                    A => 'orange',
+                    E => 'yellow',
+                    B => 'purple'
+                },
+                data => {
+                    A => [ 55, @{$z} ],
+                    E => [ @{$y} ],
+                    B => [ 122, @{$z} ],
+                },
+                title       => 'Set-specific color; orientation = horizontal',
+                ylabel      => 'ylabel',
+                xlabel      => 'label',
+                orientation => 'horizontal',
+                'plot.type' => 'boxplot',
+            },
+            {
+                colors => {
+                    A => 'orange',
+                    E => 'yellow',
+                    B => 'purple'
+                },
+                data => {
+                    A => [ 55, @{$z} ],
+                    E => [ @{$y} ],
+                    B => [ 122, @{$z} ],
+                },
+                title       => 'Notch = True',
+                ylabel      => 'ylabel',
+                xlabel      => 'label',
+                notch       => 'True',
+                'plot.type' => 'boxplot',
+            },
+            {
+                colors => {
+                    A => 'orange',
+                    E => 'yellow',
+                    B => 'purple'
+                },
+                data => {
+                    A => [ 55, @{$z} ],
+                    E => [ @{$y} ],
+                    B => [ 122, @{$z} ],
+                },
+                title         => 'showcaps = False',
+                ylabel        => 'ylabel',
+                xlabel        => 'label',
+                showcaps      => 'False',
+                'plot.type'   => 'boxplot',
+                set_figheight => 12,
+            },
+        ],
+        ncols => 3,
+        nrows => 3,
+    }
+);
+```
+which makes the following plot:
+
+<img width="1230" height="1211" alt="boxplot" src="https://github.com/user-attachments/assets/7e32e394-86fc-49e7-ad97-f48fd82fc8b0" />
+
 ## hexbin
+
+Plot a hash of arrays as a hexbin
 see https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.hexbin.html
+
 ### options
 
 | Option | Description | Example |
@@ -462,14 +640,53 @@ which produces the following image:
 ### single, simple plot
 ### multiple plots
 ## imshow
+
+Plot 2D array of numbers as an image
+
 ### options
+| Option | Description | Example |
+| -------- | ------- | ------- 
+|`cblabel`| colorbar label | `cblabel => 'sin(x) * cos(x)',`
+|`cbdrawedges` |draw edges for colorbar | |
+|`cblocation` | 'left', 'right', 'top', 'bottom'| `cblocation => 'left',`|
+|`cborientation`|  None, or 'vertical', 'horizontal' | 
+|`cmap`| # The Colormap instance or registered colormap name used to map scalar data to colors.|
+|`vmax`| float |
+|`vmin`| float | 
+
 ### single, simple plot
+
+```
+my @imshow_data;
+foreach my $i (0..360) {
+	foreach my $j (0..360) {
+		push @{ $imshow_data[$i] }, sin($i * $pi/180)*cos($j * $pi/180);
+	}
+}
+plot({
+	data              => \@imshow_data,
+	execute           => 0,
+   'input.file'      => $tmp_filename,
+	'output.filename' => 'output.images/imshow.single.png',
+	'plot.type'       => 'imshow',
+	set_xlim          => '0, ' . scalar @imshow_data,
+	set_ylim          => '0, ' . scalar @imshow_data,
+});
+```
+<img width="599" height="491" alt="imshow single" src="https://github.com/user-attachments/assets/3fa4ffe6-4817-4133-9c91-b68099400377" />
+
 ### multiple plots
+
 ## pie
+
 ### options
+
 ### single, simple plot
+
 ### multiple plots
+
 ## plot
+
 ### single, simple
 
 ```

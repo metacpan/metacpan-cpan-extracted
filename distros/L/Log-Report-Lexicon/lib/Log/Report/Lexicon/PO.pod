@@ -124,7 +124,7 @@ return C<undef> (also C<false>) in case that both are not present.
 You can also specify C<PAIRS>: the key is a language name, and the
 value is either C<0>, C<1>, or C<undef>.
 
-example: use of format()
+» example: use of format()
 
   # getters
   if($po->format('c')) ...
@@ -218,46 +218,46 @@ behavior is attempted.
 
 =item Warning: do not understand command '$cmd' at $where
 
-Cast by fromText()
+Cast by C<fromText()>
 
 =item Warning: do not understand line at $where:\n  $line
 
-Cast by fromText()
+Cast by C<fromText()>
 
 =item Error: no msgid defined for PO
 
-Cast by new()
+Cast by C<new()>
 
 =item Warning: no msgid in block $where
 
-Cast by fromText()
+Cast by C<fromText()>
 
 =item Warning: no plurals for '$msgid'
 
-Cast by toString()
+Cast by C<toString()>
 
 =item Warning: quoted line is not a continuation at $where
 
-Cast by fromText()
+Cast by C<fromText()>
 
 =item Warning: too many plurals for '$msgid'
 
-Cast by toString()
+Cast by C<toString()>
 
 =item Warning: unknown comment type '$cmd' at $where
 
-Cast by fromText()
+Cast by C<fromText()>
 
 =item Warning: unknown flag $flag ignored
 
-Cast by addFlags()
+Cast by C<addFlags()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Log-Report-Lexicon version 1.14,
-built on September 08, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report-Lexicon version 1.15,
+built on November 06, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

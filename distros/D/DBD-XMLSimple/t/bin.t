@@ -5,6 +5,9 @@ use strict;
 use Test::Most tests => 10;
 use Test::Script 1.12;
 
+delete local $ENV{'LANG'};
+delete local $ENV{'LC_ALL'};
+
 script_compiles('bin/xml');
 script_runs(['bin/xml']);
 

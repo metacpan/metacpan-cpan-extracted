@@ -3,7 +3,16 @@ use strict;
 use warnings;
 use base qw( Alien::Base );
 
-our $VERSION = '0.55';
+our $VERSION = '0.56';
+
+sub Inline {
+  # Work around https://github.com/PerlAlien/Alien-Build/issues/430
+  {
+    AUTO_INCLUDE => '#include "neo4j-client.h"',
+    CCFLAGSEX    => __PACKAGE__->cflags_static,
+    LIBS         => __PACKAGE__->libs_static,
+  }
+}
 
 =head1 NAME
 
@@ -11,14 +20,50 @@ Neo4j::Client - Build and use the libneo4j-omni library
 
 =head1 SYNOPSIS
 
- use ExtUtils::MakeMaker;
- use Neo4j::Client;
- 
- WriteMakefile(
-   LIBS => Neo4j::Client->libs,
-   CCFLAGS => Neo4j::Client->cflags,
-   ...
- );
+With L<Alien::Base::Wrapper> for L<perlxs>:
+
+  use Alien::Base::Wrapper 1.98 qw( WriteMakefile );
+
+  WriteMakefile(
+    alien_requires => [ 'Neo4j::Client' ],
+    ...
+  );
+
+  # The wrapper will supply all compiler flags needed for
+  # your Perl module to use libneo4j-omni automatically.
+
+With L<Inline::C>:
+
+  use Neo4j::Client 0.56;
+  use Inline 0.56 with => 'Neo4j::Client';
+
+With L<FFI::Platypus>:
+
+  use FFI::CheckLib 0.25;
+  use FFI::Platypus;
+
+  my $ffi = FFI::Platypus->new;
+  $ffi->lib( find_lib_or_die(
+    alien => 'Neo4j::Client',
+    lib   => 'neo4j-client',
+  ));
+
+Supplying compiler flags manually (not recommended):
+
+  # for ExtUtils::MakeMaker
+  use Config;
+  WriteMakefile(
+    CCFLAGS   => "$Config{ccflags} " . Neo4j::Client->cflags,
+    LIBS      => Neo4j::Client->libs,
+    ...
+
+  # for Inline::C
+  use Inline 0.51 C => Config =>
+    CCFLAGSEX => Neo4j::Client->cflags,
+    LIBS      => Neo4j::Client->libs;
+
+  # for FFI::Platypus
+  $ffi->lib( Neo4j::Client->dynamic_libs );
 
 =head1 DESCRIPTION
 
@@ -36,8 +81,17 @@ which are bundled with this distro and are known to work on this library.
 (These are required to build from ./configure for C<libneo4j-omni>.)
 
 Thanks to the miracle of L<Alien::Build>, the library should always
-contain OpenSSL support.
+contain OpenSSL support. This is already taken into account by the
+methods in L<Alien::Base>, which are inherited by this module.
+You shouldn't need to add any extra compiler flags for OpenSSL.
 
+=head1 BUGS
+
+The minimum supported version of OpenSSL is currently 1.1.0.
+(L<GH #7|https://github.com/majensen/neoclient/issues/7>)
+
+The C compiler must support the C<-Wpedantic> and C<-Wvla> options.
+(L<GH #8|https://github.com/majensen/neoclient/issues/8>)
 
 =head1 SEE ALSO
 

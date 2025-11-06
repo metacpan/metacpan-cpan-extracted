@@ -833,7 +833,7 @@ __END__
 
 =head1 NAME
 
-Liveman :: Project - Create a new Perl -Ro -Posteria
+Liveman::Project - Created a new Perl-repository
 
 =head1 SYNOPSIS
 
@@ -845,7 +845,7 @@ Liveman :: Project - Create a new Perl -Ro -Posteria
 
 =head1 DESCRIPTION
 
-Creates a new Perl Roads.
+Creates a new Perl-repository.
 
 =head1 SUBROUTINES/METHODS
 
@@ -883,8 +883,8 @@ Yaroslav O. Kosmina L<mailto:dart@cpan.org>
 
 =head1 LICENSE
 
-⚖ I<* gplv3 *>
+⚖ B<GPLv3>
 
 =head1 COPYRIGHT
 
-The Liveman :: Project Module Is Copyright © 2023 Yaroslav O. Kosmina. Rusland. All Rights Reserved.
+The Liveman::Project Module Is Copyright © 2023 Yaroslav O. Kosmina. Rusland. All Rights Reserved.

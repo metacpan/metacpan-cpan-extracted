@@ -15,6 +15,7 @@ use Test::JSON::Schema::Acceptance;
 
 foreach my $draft (path(dist_dir('Test-JSON-Schema-Acceptance'), 'tests')->children) {
   $draft = $draft->basename;
+  next if $draft eq 'draft-next';
   my $accepter = Test::JSON::Schema::Acceptance->new(specification => $draft, include_optional => 1);
   is(
     exception { $accepter->_test_data },

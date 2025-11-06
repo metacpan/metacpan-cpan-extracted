@@ -43,7 +43,7 @@ no_index:
 provides:
   Test::JSON::Schema::Acceptance:
     file: lib/Test/JSON/Schema/Acceptance.pm
-    version: '1.029'
+    version: '1.030'
 requires:
   Feature::Compat::Try: '0'
   File::ShareDir: '0'
@@ -73,10 +73,10 @@ resources:
   bugtracker: https://github.com/karenetheridge/Test-JSON-Schema-Acceptance/issues
   homepage: https://github.com/karenetheridge/Test-JSON-Schema-Acceptance
   repository: https://github.com/karenetheridge/Test-JSON-Schema-Acceptance.git
-version: '1.029'
+version: '1.030'
 x_Dist_Zilla:
   perl:
-    version: '5.041013'
+    version: '5.043004'
   plugins:
     -
       class: Dist::Zilla::Plugin::Run::BeforeBuild
@@ -135,7 +135,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: 'Gather sharedir'
-      version: '2.051'
+      version: '2.052'
     -
       class: inc::OldShareDirFiles
       name: =inc::OldShareDirFiles
@@ -184,7 +184,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: '@Author::ETHER/Git::GatherDir'
-      version: '2.051'
+      version: '2.052'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Author::ETHER/MetaYAML'
@@ -443,6 +443,10 @@ x_Dist_Zilla:
               version: '4.020'
             -
               class: Pod::Weaver::Section::GenerateSection
+              name: '@Author::ETHER/generate GIVING THANKS'
+              version: '4.020'
+            -
+              class: Pod::Weaver::Section::GenerateSection
               name: '@Author::ETHER/generate SUPPORT'
               version: '4.020'
             -
@@ -554,7 +558,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.47.1
+          git_version: 2.50.1
           include_authors: 0
           include_releaser: 1
           order_by: commits
@@ -621,7 +625,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20250528'
+          Module::CoreList: '5.20251022'
       name: '@Author::ETHER/EnsureLatestPerl'
       version: '0.010'
     -
@@ -646,15 +650,15 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.47.1
+          git_version: 2.50.1
           repo_root: .
       name: '@Author::ETHER/initial check'
-      version: '2.051'
+      version: '2.052'
     -
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.47.1
+          git_version: 2.50.1
           repo_root: .
       name: '@Author::ETHER/Git::CheckFor::MergeConflicts'
       version: '0.014'
@@ -662,7 +666,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.47.1
+          git_version: 2.50.1
           repo_root: .
       name: '@Author::ETHER/Git::CheckFor::CorrectBranch'
       version: '0.014'
@@ -688,10 +692,10 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.47.1
+          git_version: 2.50.1
           repo_root: .
       name: '@Author::ETHER/after tests'
-      version: '2.051'
+      version: '2.052'
     -
       class: Dist::Zilla::Plugin::CheckIssues
       name: '@Author::ETHER/CheckIssues'
@@ -772,12 +776,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.47.1
+          git_version: 2.50.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::ETHER/@Git::VersionManager/release snapshot'
-      version: '2.051'
+      version: '2.052'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -785,16 +789,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.029
+          tag: v1.030
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.47.1
+          git_version: 2.50.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::ETHER/@Git::VersionManager/Git::Tag'
-      version: '2.051'
+      version: '2.052'
     -
       class: Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional
       config:
@@ -826,12 +830,12 @@ x_Dist_Zilla:
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.47.1
+          git_version: 2.50.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::ETHER/@Git::VersionManager/post-release commit'
-      version: '2.051'
+      version: '2.052'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -848,10 +852,10 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.47.1
+          git_version: 2.50.1
           repo_root: .
       name: '@Author::ETHER/Git::Push'
-      version: '2.051'
+      version: '2.052'
     -
       class: Dist::Zilla::Plugin::GitHub::Update
       config:
@@ -986,7 +990,7 @@ x_authority: cpan:RELEQUEST
 x_contributors:
   - 'Karen Etheridge <ether@cpan.org>'
   - 'Daniel Perrett <dp13@sanger.ac.uk>'
-x_generated_by_perl: v5.41.13
+x_generated_by_perl: v5.43.4
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: MIT
 x_static_install: 0

@@ -200,4 +200,4 @@ Yaroslav O. Kosmina L<mailto:dart@cpan.org>
 
 =head1 COPYRIGHT
 
-The App :: Liveman Module Is Copyright © 2024 Yaroslav O. Kosmina. Rusland. All Rights Reserved.
+The App::Liveman module is Copyright © 2024 Yaroslav O. Kosmina. Rusland. All Rights Reserved.

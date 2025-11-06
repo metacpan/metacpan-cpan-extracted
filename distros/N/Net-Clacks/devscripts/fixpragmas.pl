@@ -6,7 +6,7 @@ use diagnostics;
 use mro 'c3';
 use English qw(-no_match_vars);
 use Carp qw[carp croak confess cluck longmess shortmess];
-our $VERSION = 30;
+our $VERSION = 31;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
@@ -84,7 +84,7 @@ foreach my $file (@files) {
             print $ofh "use mro 'c3';\n";
             print $ofh "use English qw(-no_match_vars);\n";
             print $ofh "use Carp qw[carp croak confess cluck longmess shortmess];\n";
-            print $ofh "our \$VERSION = 30;\n";
+            print $ofh "our \$VERSION = 31;\n";
             print $ofh "use autodie qw( close );\n";
             print $ofh "use Array::Contains;\n";
             print $ofh "use utf8;\n";

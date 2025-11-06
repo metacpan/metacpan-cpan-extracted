@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use mro 'c3';
 use English;
-our $VERSION = 3.0;
+our $VERSION = 3.1;
 use Carp;
 
 require Exporter;
@@ -27,7 +27,7 @@ BEGIN {
     my $fname = $basemodule . '.pm';
     $fname =~ s/\:\:/\//g;
     require $fname;
-    $fname->import();
+    $basemodule->import();
 
     {
         # make the contains() function in our package point to the _contains function of the sub-package
