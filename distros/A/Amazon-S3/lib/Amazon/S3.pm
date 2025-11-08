@@ -4,7 +4,18 @@ use strict;
 use warnings;
 
 use Amazon::S3::Bucket;
+use Amazon::S3::BucketV2;
 use Amazon::S3::Constants qw(:all);
+
+use Amazon::S3::Util qw(
+  set_md5_header
+  urlencode
+  get_parameters
+  create_xml_request
+  create_api_uri
+  create_query_string
+);
+
 use Amazon::S3::Logger;
 use Amazon::S3::Signature::V4;
 
@@ -14,15 +25,14 @@ use Digest::HMAC_SHA1;
 use Digest::MD5 qw(md5_hex);
 use English     qw(-no_match_vars);
 use HTTP::Date;
-use URI;
 use LWP::UserAgent::Determined;
+use List::Util   qw( any pairs none );
 use MIME::Base64 qw(encode_base64 decode_base64);
 use Scalar::Util qw( reftype blessed );
-use List::Util   qw( any pairs );
-use URI::Escape  qw(uri_escape_utf8);
-use XML::Simple  qw(XMLin);                      ## no critic (Community::DiscouragedModules)
+use URI;
+use XML::Simple;
 
-use parent qw(Class::Accessor::Fast);
+use parent qw(Class::Accessor::Fast Exporter);
 
 __PACKAGE__->mk_accessors(
   qw(
@@ -37,6 +47,7 @@ __PACKAGE__->mk_accessors(
     err
     errstr
     error
+    express
     host
     last_request
     last_response
@@ -51,7 +62,9 @@ __PACKAGE__->mk_accessors(
   ),
 );
 
-our $VERSION = '0.65'; ## no critic (RequireInterpolation)
+our $VERSION = '2.0.2'; ## no critic (RequireInterpolation)
+
+our @EXPORT_OK = qw(is_domain_bucket);
 
 ########################################################################
 sub new {
@@ -66,6 +79,7 @@ sub new {
   $options{dns_bucket_names} //= $TRUE;
   $options{cache_signer}     //= $FALSE;
   $options{retry}            //= $FALSE;
+  $options{express}          //= $FALSE;
 
   $options{_region} = delete $options{region};
   $options{_signer} = delete $options{signer};
@@ -145,9 +159,28 @@ sub new {
     $self->_signer( $self->signer );
   }
 
+  if ( $self->express ) {
+    $self->use_express_one_zone();
+  }
+
   $self->turn_on_special_retry();
 
   return $self;
+}
+
+########################################################################
+sub use_express_one_zone {
+########################################################################
+  my ($self) = @_;
+
+  my $express = $self->express;
+
+  $self->express($TRUE);
+
+  $self->host( sprintf 's3express-control.%s.amazonaws.com', $self->region );
+  $self->dns_bucket_names($FALSE);
+
+  return $express;
 }
 
 ########################################################################
@@ -170,11 +203,11 @@ sub new {
           return md5_hex( rand $PID );
         }
       };
+
+      return $text if $EVAL_ERROR;
     }
 
-    if ( !$encryption_key || $EVAL_ERROR ) {
-      return $text;
-    }
+    return $text if !$encryption_key;
 
     my $cipher = Crypt::CBC->new(
       -pass        => $encryption_key,
@@ -229,8 +262,7 @@ sub get_default_region {
   return $region
     if $region;
 
-  my $url
-    = 'http://169.254.169.254/latest/meta-data/placement/availability-zone';
+  my $url = $AWS_METADATA_BASE_URL . 'placement/availability-zone';
 
   my $request = HTTP::Request->new( 'GET', $url );
 
@@ -278,16 +310,16 @@ sub turn_on_special_retry {
 ########################################################################
   my ($self) = @_;
 
-  if ( $self->retry ) {
+  return
+    if !$self->retry;
 
-    # In the field we are seeing issue of Amazon returning with a 400
-    # code in the case of timeout.  From AWS S3 logs: REST.PUT.PART
-    # Backups/2017-05-04/<account>.tar.gz "PUT
-    # /Backups<path>?partNumber=27&uploadId=<id> - HTTP/1.1" 400
-    # RequestTimeout 360 20971520 20478 - "-" "libwww-perl/6.15"
-    my $http_codes_hr = $self->ua->codes_to_determinate();
-    $http_codes_hr->{$HTTP_BAD_REQUEST} = $TRUE;
-  }
+  # In the field we are seeing issue of Amazon returning with a 400
+  # code in the case of timeout.  From AWS S3 logs: REST.PUT.PART
+  # Backups/2017-05-04/<account>.tar.gz "PUT
+  # /Backups<path>?partNumber=27&uploadId=<id> - HTTP/1.1" 400
+  # RequestTimeout 360 20971520 20478 - "-" "libwww-perl/6.15"
+  my $http_codes_hr = $self->ua->codes_to_determinate();
+  $http_codes_hr->{$HTTP_BAD_REQUEST} = $TRUE;
 
   return;
 }
@@ -297,16 +329,16 @@ sub turn_off_special_retry {
 ########################################################################
   my ($self) = @_;
 
-  if ( $self->retry ) {
+  return
+    if !$self->retry;
 
-    # In the field we are seeing issue with Amazon returning a 400
-    # code in the case of timeout.  From AWS S3 logs: REST.PUT.PART
-    # Backups/2017-05-04/<account>.tar.gz "PUT
-    # /Backups<path>?partNumber=27&uploadId=<id> - HTTP/1.1" 400
-    # RequestTimeout 360 20971520 20478 - "-" "libwww-perl/6.15"
-    my $http_codes_hr = $self->ua->codes_to_determinate();
-    delete $http_codes_hr->{$HTTP_BAD_REQUEST};
-  }
+  # In the field we are seeing issue with Amazon returning a 400
+  # code in the case of timeout.  From AWS S3 logs: REST.PUT.PART
+  # Backups/2017-05-04/<account>.tar.gz "PUT
+  # /Backups<path>?partNumber=27&uploadId=<id> - HTTP/1.1" 400
+  # RequestTimeout 360 20971520 20478 - "-" "libwww-perl/6.15"
+  my $http_codes_hr = $self->ua->codes_to_determinate();
+  delete $http_codes_hr->{$HTTP_BAD_REQUEST};
 
   return;
 }
@@ -425,38 +457,80 @@ sub add_bucket {
 ########################################################################
   my ( $self, $conf ) = @_;
 
-  my $region = $conf->{location_constraint} // $conf->{region}
-    // $self->region;
-
-  if ( $region && $region eq $DEFAULT_REGION ) {
-    undef $region;
-  }
-
   my $bucket = $conf->{bucket};
 
   croak 'must specify bucket'
     if !$bucket;
 
-  my %header_ref;
+  my $headers = $conf->{headers} // {};
 
   if ( $conf->{acl_short} ) {
     $self->_validate_acl_short( $conf->{acl_short} );
 
-    $header_ref{'x-amz-acl'} = $conf->{acl_short};
+    $headers->{'x-amz-acl'}              //= $conf->{acl_short};
+    $headers->{'x-amz-object-ownership'} //= 'ObjectWriter';
   }
 
-  my $xml = <<'XML';
-<CreateBucketConfiguration>
-  <LocationConstraint>%s</LocationConstraint>
-</CreateBucketConfiguration>
-XML
+  my $region = $conf->{location_constraint} // $conf->{region};
 
-  my $data = defined $region ? sprintf $xml, $region : $EMPTY;
+  $region //= $self->region;
+
+  if ( $region && $region eq $DEFAULT_REGION ) {
+    undef $region;
+  }
+
+  return $self->_add_bucket(
+    { headers           => $headers,
+      bucket            => $conf->{bucket},
+      region            => $region,
+      availability_zone => $conf->{availability_zone},
+    }
+  );
+}
+
+########################################################################
+sub _add_bucket {
+########################################################################
+  my ( $self, @args ) = @_;
+
+  my $parameters = get_parameters(@args);
+
+  my ( $bucket, $headers, $region, $availability_zone )
+    = @{$parameters}{qw(bucket headers region availability_zone)};
+
+  $region  //= $EMPTY;
+  $headers //= {};
+
+  my $request
+    = { CreateBucketConfiguration => { LocationConstraint => $region, } };
+
+  if ($availability_zone) {
+    $request->{CreateBucketConfiguration}->{Location} = {
+      Name => $availability_zone,
+      Type => 'AvailabilityZone',
+    };
+
+    $request->{CreateBucketConfiguration}->{Bucket} = {
+      DataRedundancy => 'SingleAvailabilityZone',
+      Type           => 'Directory',
+    };
+
+    delete $request->{CreateBucketConfiguration}->{LocationConstraint};
+  }
+
+  $self->dns_bucket_names(0);
+
+  my $data
+    = ( $region || $availability_zone )
+    ? create_xml_request($request)
+    : $EMPTY;
+
+  $headers->{'Content-Length'} = length $data;
 
   my $retval = $self->_send_request_expect_nothing(
     { method  => 'PUT',
       path    => "$bucket/",
-      headers => { %header_ref, 'Content-Length' => length $data },
+      headers => $headers,
       data    => $data,
       region  => $region,
     },
@@ -504,14 +578,16 @@ sub delete_bucket {
 
   my $bucket;
   my $region;
+  my $headers;
 
   if ( eval { return $conf->isa('Amazon::S3::Bucket'); } ) {
     $bucket = $conf->bucket;
     $region = $conf->region;
   }
   else {
-    $bucket = $conf->{bucket};
-    $region = $conf->{region} || $self->get_bucket_location($bucket);
+    $bucket  = $conf->{bucket};
+    $region  = $conf->{region} || $self->get_bucket_location($bucket);
+    $headers = $conf->{headers};
   }
 
   croak 'must specify bucket'
@@ -520,10 +596,33 @@ sub delete_bucket {
   return $self->_send_request_expect_nothing(
     { method  => 'DELETE',
       path    => $bucket . $SLASH,
-      headers => {},
+      headers => $headers // {},
       region  => $region,
     },
   );
+}
+
+########################################################################
+sub list_directory_buckets {
+########################################################################
+  my ( $self, @args ) = @_;
+
+  my $parameters = get_parameters(@args);
+
+  my $express = $self->use_express_one_zone;
+
+  my $result = $self->_send_request(
+    { method     => 'GET',
+      headers    => {},
+      path       => $SLASH,
+      uri_params => $parameters->{uri_params} // {},
+      region     => $self->region,
+    }
+  );
+
+  $self->express($express);
+
+  return $result;
 }
 
 ########################################################################
@@ -543,12 +642,15 @@ sub list_bucket {
 
   my $bucket = delete $conf->{bucket};
 
-  croak 'must specify bucket' if !$bucket;
+  croak 'must specify bucket'
+    if !$bucket;
 
-  $conf ||= {};
+  $conf //= {};
 
   my $bucket_list; # return this
   my $path = $bucket . $SLASH;
+
+  my $headers = delete $conf->{headers};
 
   my $list_type = $conf->{'list-type'} // '1';
 
@@ -571,11 +673,10 @@ sub list_bucket {
     }
 
     my $query_string = $QUESTION_MARK . join $AMPERSAND,
-      map { $_ . $EQUAL_SIGN . $self->_urlencode( $conf->{$_} ) }
+      map { $_ . $EQUAL_SIGN . urlencode( $conf->{$_} ) }
       keys %{$conf};
 
     $path .= $query_string;
-
   }
 
   $self->get_logger->debug( sprintf 'PATH: %s', $path );
@@ -583,7 +684,7 @@ sub list_bucket {
   my $r = $self->_send_request(
     { method  => 'GET',
       path    => $path,
-      headers => {},           # { 'Content-Length' => 0 },
+      headers => $headers // {}, # { 'Content-Length' => 0 },
       region  => $self->region,
     },
   );
@@ -675,7 +776,6 @@ sub list_bucket {
 
   return $bucket_list;
 }
-
 ########################################################################
 sub list_bucket_all_v2 {
 ########################################################################
@@ -732,6 +832,91 @@ sub list_bucket_all {
 }
 
 ########################################################################
+# API: ListObjectVersions
+#########################################################################
+# Documentation:
+#  https://docs.aws.amazon.com/AmazonS3/latest/API/API_ListObjectVersions.html
+#
+# Request:
+#  GET /?versions
+#  HOST: Bucket.s3.amazonaws.com
+#  x-amz-expected-bucket-owner: ExpectedBucketOwner
+#  x-amz-request-payer: RequestPayer
+#  x-amz-optional-object-attributes: OptionalObjectAtttributes
+#
+# Parameters:
+#   delimiter         => Delimiter
+#   encoding-type     => EncodingType
+#   key-marker        => KeyMarker
+#   max-keys          => MaxKeys
+#   prefix            => Prefix
+#   version-id-marker => VersionIdMarker
+#
+# Response
+
+########################################################################
+sub list_object_versions {
+########################################################################
+  my ( $self, $conf ) = @_;
+
+  my $bucket = delete $conf->{bucket};
+
+  die 'no bucket'
+    if !$bucket;
+
+  my $headers = delete $conf->{headers};
+
+  croak 'must specify bucket'
+    if !$bucket;
+
+  $conf ||= {};
+
+  my ( $marker, $next_marker, $query_next )
+    = @{ $LIST_OBJECT_MARKERS{'3'} };
+
+  if ( $conf->{'key-marker'} ) {
+    $conf->{$query_next} = delete $conf->{'key-marker'};
+  }
+
+  if ( %{$conf} ) {
+
+    # remove undefined elements
+    foreach ( keys %{$conf} ) {
+      next if defined $conf->{$_};
+
+      delete $conf->{$_};
+    }
+  }
+
+  my $path
+    = create_api_uri( path => "$bucket/", api => 'versions', %{$conf} );
+
+  my $r = $self->_send_request(
+    { method  => 'GET',
+      path    => $path,
+      headers => $headers // {},
+      region  => $self->region,
+    },
+  );
+
+  return
+    if !$r || $self->errstr;
+
+  $self->get_logger->debug(
+    sub {
+      return Dumper(
+        [ marker      => $marker,
+          next_marker => $next_marker,
+          response    => $r,
+        ],
+      );
+    },
+  );
+
+  return $r;
+}
+
+########################################################################
 sub get_credentials {
 ########################################################################
   my ($self) = @_;
@@ -785,13 +970,14 @@ sub signer {
   return $self->_signer
     if $self->_signer;
 
-  my $creds = $self->credentials ? $self->credentials : $self;
+  my $creds   = $self->credentials ? $self->credentials : $self;
+  my $express = $self->express;
 
   my $signer = Amazon::S3::Signature::V4->new(
     { access_key_id  => $creds->get_aws_access_key_id,
       secret         => $creds->get_aws_secret_access_key,
       region         => $self->region || $self->get_default_region,
-      service        => 's3',
+      service        => $express ? 's3express' : 's3',
       security_token => $creds->get_token,
     },
   );
@@ -808,53 +994,56 @@ sub _validate_acl_short {
 ########################################################################
   my ( $self, $policy_name ) = @_;
 
-  if ( !any { $policy_name eq $_ }
-    qw(private public-read public-read-write authenticated-read) ) {
-    croak "$policy_name is not a supported canned access policy";
-  }
+  croak sprintf '%s is not a supported canned access policy', $policy_name
+    if none { $policy_name eq $_ }
+    qw(private public-read public-read-write authenticated-read);
 
   return;
 }
 
+########################################################################
 # Determine if a bucket can used as subdomain for the host
 # Specifying the bucket in the URL path is being deprecated
-# So, if the bucket name is suitable, we need to put it
-# as a subdomain to the host, instead. Currently buckets with
-# periods in their names cannot be handled in that manner
-# due to SSL certificate issues, they will have to remain in
-# the url path instead
+# So, if the bucket name is suitable, we need to use it
+# as a subdomain in the host name instead.
+#
+# Currently buckets with periods in their names cannot be handled in
+# that manner due to SSL certificate issues, they will have to remain
+# in the url path instead.
+#
+########################################################################
+sub is_domain_bucket { goto &_can_bucket_be_subdomain; }
+########################################################################
+
+########################################################################
 sub _can_bucket_be_subdomain {
+########################################################################
   my ($bucketname) = @_;
 
-  if ( length $bucketname > $MAX_BUCKET_NAME_LENGTH - 1 ) {
-    return $FALSE;
-  }
+  return $FALSE
+    if length $bucketname > $MAX_BUCKET_NAME_LENGTH - 1;
 
-  if ( length $bucketname < $MIN_BUCKET_NAME_LENGTH ) {
-    return $FALSE;
-  }
+  return $FALSE
+    if length $bucketname < $MIN_BUCKET_NAME_LENGTH;
 
-  return $FALSE if $bucketname !~ m{\A[[:lower:]][[:lower:]\d-]*\z}xsm;
-  return $FALSE if $bucketname !~ m{[[:lower:]\d]\z}xsm;
+  return $FALSE
+    if $bucketname !~ m{\A[[:lower:]][[:lower:]\d-]*\z}xsm;
+
+  return $FALSE
+    if $bucketname !~ m{[[:lower:]\d]\z}xsm;
 
   return $TRUE;
 }
-
-# make the HTTP::Request object
 
 ########################################################################
 sub _make_request {
 ########################################################################
   my ( $self, @args ) = @_;
-  my ( $method, $path, $headers, $data, $metadata, $region );
 
-  if ( ref $args[0] && reftype( $args[0] ) eq 'HASH' ) {
-    ( $method, $path, $headers, $data, $metadata, $region )
-      = @{ $args[0] }{qw(method path headers data metadata region)};
-  }
-  else {
-    ( $method, $path, $headers, $data, $metadata, $region ) = @args;
-  }
+  my $parameters = get_parameters(@args);
+
+  my ( $method, $path, $headers, $data, $metadata, $region )
+    = @{$parameters}{qw(method path headers data metadata region)};
 
   # reset region on every call...every bucket can have it's own region
   $self->region( $region // $self->_region );
@@ -865,11 +1054,12 @@ sub _make_request {
   croak 'must specify path'
     if !defined $path;
 
-  $headers ||= {};
+  $headers //= {};
 
-  $metadata ||= {};
+  $metadata //= {};
 
   $data //= $EMPTY;
+  $headers->{'Content-Length'} //= length $data;
 
   my $http_headers = $self->_merge_meta( $headers, $metadata );
 
@@ -878,20 +1068,35 @@ sub _make_request {
   my $host = $self->host;
 
   $path =~ s/\A\///xsm;
-  my $url = "$protocol://$host/$path";
+  my $url = sprintf '%s://%s/%s', $protocol, $host, $path;
 
-  if ( $path =~ m{\A([^/?]+)([^?]+)(.*)}xsm
+  #  if ( $path =~ m{\A([^/?]+)([^?]+)(.*)}xsm
+  if ( $path =~ /\A([^\/?]+)([^?]+)(.*)/xsm
     && $self->dns_bucket_names
-    && _can_bucket_be_subdomain($1) ) {
+    && is_domain_bucket($1) ) {
 
     my $bucket = $1;
     $path = $2;
+
     my $query_string = $3;
+
+    $self->logger->debug(
+      sub {
+        return Dumper(
+          [ bucket       => $bucket,
+            path         => $path,
+            query_string => $query_string,
+          ]
+        );
+      }
+    );
 
     if ( $host =~ /([^:]+):([^:]\d+)$/xsm ) {
 
+      my $port;
+
       $url = eval {
-        my $port = $2;
+        $port = $2;
         $host = $1;
 
         my $uri = URI->new;
@@ -904,75 +1109,116 @@ sub _make_request {
         return $uri . $query_string;
       };
 
-      die "could not a uri for bucket: $bucket, host: $host, path: $path\n"
+      die sprintf
+        "error creating uri for bucket: [%s], host: [%s], path: [%s], port: [%s]\n%s",
+        $bucket, $host, $path, $port, $EVAL_ERROR
+
         if !$url || $EVAL_ERROR;
     }
     else {
-      $url = "$protocol://$bucket.$host$path$query_string";
+      $url = sprintf '%s://%s.%s%s%s', $protocol, $bucket, $host, $path,
+        $query_string;
     }
   }
-
-  $self->get_logger->debug( sprintf 'URL (uri): %s', $url );
 
   my $request = HTTP::Request->new( $method, $url, $http_headers );
 
   $self->last_request($request);
 
-  $request->content($data);
+  if ($data) {
+    $request->content($data);
+  }
 
   $self->signer->region($region); # always set regional endpoint for signing
 
   $self->signer->sign($request);
-
-  $self->get_logger->trace( sub { return Dumper( [$request] ); } );
 
   return $request;
 }
 
 # $self->_send_request($HTTP::Request)
 # $self->_send_request(@params_to_make_request)
+# $self->_send_request($params_to_make_request)
 ########################################################################
 sub _send_request {
 ########################################################################
   my ( $self, @args ) = @_;
 
-  $self->get_logger->trace(
+  my $logger = $self->get_logger;
+
+  $logger->trace(
     sub {
-      return Dumper( [ 'REQUEST' => \@args ] );
+      return Dumper( [ args => \@args ] );
     },
   );
 
-  my $request;
   my $keep_root = $FALSE;
 
-  if ( @args == 1 && ref( $args[0] ) =~ /HTTP::Request/xsm ) {
-    $request = $args[0];
-  }
-  else {
-    if ( ref $args[0] ) {
-      $keep_root = delete $args[0]->{keep_root};
-    }
+  my $request = eval {
+    return $args[0]
+      if ref( $args[0] ) =~ /HTTP::Request/xsm;
 
-    $request = $self->_make_request(@args);
+    return {@args}
+      if @args > 1 && !@args % 2;
+
+    return $args[0]
+      if ref $args[0];
+
+    croak 'invalid argument to _send_request';
+  };
+
+  if ( ref($request) !~ /HTTP::Request/xsm ) {
+    $keep_root = delete $request->{keep_root};
+
+    $request = $self->_make_request($request);
   }
 
   my $response = $self->_do_http($request);
 
-  $self->get_logger->debug( Dumper( [$response] ) );
-
   $self->last_response($response);
 
-  my $content = $response->content;
+  $logger->debug(
+    sub {
+      return Dumper( [ response => $response ] );
+    }
+  );
 
-  if ( $response->code !~ /\A2\d\d\z/xsm ) {
+  return $self->_decode_response( $response, $keep_root );
+}
+
+########################################################################
+sub _decode_response {
+########################################################################
+  my ( $self, $response, $keep_root ) = @_;
+
+  my $content;
+
+  if ( $response->code !~ /\A2\d{2}\z/xsm ) {
     $self->_remember_errors( $response->content, 1 );
     $content = undef;
   }
-  elsif ( $content && $response->content_type eq 'application/xml' ) {
-    $content = $self->_xpc_of_content( $content, $keep_root );
+  elsif ( is_xml_response($response) ) {
+    $content = $self->_xpc_of_content( $response->content, $keep_root );
   }
 
   return $content;
+}
+
+########################################################################
+sub is_xml_response {
+########################################################################
+  my ($rsp) = @_;
+
+  return $FALSE
+    if !$rsp->content;
+
+  return $TRUE
+    if $rsp->content_type eq 'application/xml';
+
+  return $TRUE
+    if $rsp->content =~ /\A\s*<[?]xml/xsm;
+
+  return $FALSE;
 }
 
 #
@@ -983,11 +1229,14 @@ sub adjust_region {
 ########################################################################
   my ( $self, $bucket, $called_from_redirect ) = @_;
 
-  my $request
-    = HTTP::Request->new( 'GET', 'https://' . $bucket . $DOT . $self->host );
+  my $url = sprintf 'https://%s.%s', $bucket, $self->host;
+
+  my $request = HTTP::Request->new( GET => $url );
+
   $self->{'signer'}->sign($request);
 
-  # We have to turn off our special retry since this will deliberately trigger that code
+  # We have to turn off our special retry since this will deliberately
+  # trigger that code
   $self->turn_off_special_retry();
 
   # If the bucket name has a period in it, the certificate validation
@@ -1011,20 +1260,36 @@ sub adjust_region {
 
   # If the error is due to the wrong region, then we will get
   # back a block of XML with the details
-  if ( $response->content_type eq 'application/xml' and $response->content ) {
+  return $FALSE
+    if !is_xml_response($response);
 
-    my $error_hash = $self->_xpc_of_content( $response->content );
+  my $error_hash = $self->_xpc_of_content( $response->content );
 
-    if (  $error_hash->{'Code'} eq 'PermanentRedirect'
-      and $error_hash->{'Endpoint'} ) {
+  my ( $endpoint, $code, $region, $message )
+    = @{$error_hash}{qw(Endpoint Code Region Message)};
 
+  my $condition = eval {
+    return 'PermanentRedirect'
+      if $code eq 'PermanentRedirect' && $endpoint;
+
+    return 'AuthorizationHeaderMalformed'
+      if $code eq 'AuthorizationHeaderMalformed' && $region;
+
+    return 'IllegalLocationConstraintException'
+      if $code eq 'IllegalLocationConstraintException';
+
+    return 'Other';
+  };
+
+  my %error_handlers = (
+    PermanentRedirect => sub {
       # Don't recurse through multiple redirects
       return $FALSE
         if $called_from_redirect;
 
       # With a permanent redirect error, they are telling us the explicit
       # host to use.  The endpoint will be in the form of bucket.host
-      my $host = $error_hash->{'Endpoint'};
+      my $host = $endpoint;
 
       # Remove the bucket name from the front of the host name
       # All the requests will need to be of the form https://host/bucket
@@ -1033,45 +1298,42 @@ sub adjust_region {
 
       # We will need to call ourselves again in order to trigger the
       # AuthorizationHeaderMalformed error in order to get the region
-      return $self->adjust_region( $bucket, 1 );
-    }
-
-    if (  $error_hash->{'Code'} eq 'AuthorizationHeaderMalformed'
-      and $error_hash->{'Region'} ) {
-
+      return $self->adjust_region( $bucket, $TRUE );
+    },
+    AuthorizationHeaderMalformed => sub {
       # Set the signer to use the correct reader evermore
-      $self->{'signer'}{'endpoint'} = $error_hash->{'Region'};
+      $self->{signer}->{endpoint} = $region;
 
       # Only change the host if we haven't been called as a redirect
       # where an exact host has been given
       if ( !$called_from_redirect ) {
-        $self->host( 's3-' . $error_hash->{'Region'} . '.amazonaws.com' );
+        $self->host( sprintf 's3-%s-amazonaws.com', $region );
       }
 
       return $TRUE;
-    }
-
-    if ( $error_hash->{'Code'} eq 'IllegalLocationConstraintException' ) {
-
+    },
+    IllegalLocationConstraintException => sub {
       # This is hackish; but in this case the region name only appears in the message
-      if ( $error_hash->{'Message'} =~ /The (\S+) location/xsm ) {
-        my $region = $1;
+      if ( $message =~ /The (\S+) location/xsm ) {
+        my $new_region = $1;
 
         # Correct the region for the signer
-        $self->{'signer'}{'endpoint'} = $region;
+        $self->{signer}->{endpoint} = $new_region;
 
         # Set the proper host for the region
-        $self->host( 's3.' . $region . '.amazonaws.com' );
+        $self->host( sprintf 's3.%s.amazonaws.com', $new_region );
 
         return $TRUE;
       }
-    }
+    },
+    'Other' => sub {
+      # Some other error
+      $self->_remember_errors( $response->content, 1 );
+      return $FALSE;
+    },
+  );
 
-  }
-
-  # Some other error
-  $self->_remember_errors( $response->content, 1 );
-  return $FALSE;
+  return $error_handlers{$condition}->();
 }
 
 ########################################################################
@@ -1099,17 +1361,21 @@ sub _do_http {
   # For new buckets at non-standard locations, amazon will sometimes
   # respond with a temporary redirect.  In this case it is necessary
   # to try again with the new URL
-  if ( $response->code =~ /\A3/xsm and defined $response->header('Location') )
-  {
+  my $location = $response->header('Location');
+
+  if ( $response->code =~ /\A3/xsm and defined $location ) {
 
     $self->get_logger->debug(
-      'Redirecting to:  ' . $response->header('Location') );
+      sub {
+        return { sprintf 'Redirecting to:  %s', $location };
+      }
+    );
 
-    $request->uri( $response->header('Location') );
+    $request->uri($location);
     $response = $self->ua->request( $request, $filename );
   }
 
-  $self->get_logger->debug( Dumper( [$response] ) );
+  $self->get_logger->debug( sub { return Dumper( [$response] ) } );
 
   $self->last_response($response);
 
@@ -1128,7 +1394,8 @@ sub _do_http_no_redirect {
   $self->reset_errors;
 
   my $response = $self->ua->request( $request, $filename );
-  $self->get_logger->debug( Dumper( [$response] ) );
+
+  $self->get_logger->debug( sub { return Dumper( [$response] ) } );
 
   $self->last_response($response);
 
@@ -1143,8 +1410,6 @@ sub _send_request_expect_nothing {
   my $request = $self->_make_request(@args);
 
   my $response = $self->_do_http($request);
-
-  $self->get_logger->debug( Dumper( [$response] ) );
 
   my $content = $response->content;
 
@@ -1165,20 +1430,14 @@ sub _send_request_expect_nothing {
 # first time we used it. Thus, we need to probe first to find out what's going on,
 # before we start sending any actual data.
 ########################################################################
-sub _send_request_expect_nothing_probed { ## no critic (ProhibitUnusedPrivateSubroutines)
+sub _send_request_expect_nothing_probed {
 ########################################################################
   my ( $self, @args ) = @_;
 
-  my ( $method, $path, $conf, $value, $region );
+  my $parameters = get_parameters(@args);
 
-  if ( @args == 1 && ref $args[0] ) {
-    ( $method, $path, $conf, $value, $region )
-      = @{ $args[0] }{qw(method path headers data region)};
-  }
-  else {
-    ( $method, $path, $conf, $value, $region )
-      = @{ $args[0] }{qw(method path headers data region)};
-  }
+  my ( $method, $path, $conf, $value, $region )
+    = @{$parameters}{qw(method path headers data region)};
 
   $region = $region // $self->region;
 
@@ -1189,7 +1448,7 @@ sub _send_request_expect_nothing_probed { ## no critic (ProhibitUnusedPrivateSub
     },
   );
 
-  my $override_uri = undef;
+  my $override_uri;
 
   my $old_redirectable = $self->ua->requests_redirectable;
   $self->ua->requests_redirectable( [] );
@@ -1204,7 +1463,11 @@ sub _send_request_expect_nothing_probed { ## no critic (ProhibitUnusedPrivateSub
       $self->_croak_if_response_error($response);
     }
 
-    $self->get_logger->debug( 'setting override URI to ', $override_uri );
+    $self->get_logger->debug(
+      sub {
+        return sprintf 'setting override URI: [%s]', $override_uri;
+      }
+    );
   }
 
   $request = $self->_make_request(
@@ -1240,13 +1503,12 @@ sub _croak_if_response_error {
 ########################################################################
   my ( $self, $response ) = @_;
 
-  if ( $response->code !~ /^2\d\d$/xsm ) {
+  if ( $response->code !~ /^2\d{2}$/xsm ) {
     $self->err('network_error');
 
     $self->errstr( $response->status_line );
 
-    croak sprintf 'Amazon::S3: Amazon responded with %s ',
-      $response->status_line;
+    croak $response->status_line;
   }
 
   return;
@@ -1280,7 +1542,7 @@ sub _remember_errors {
 ########################################################################
   my ( $self, $src, $keep_root ) = @_;
 
-  return $src
+  return
     if !$src;
 
   if ( !ref $src && $src !~ /^[[:space:]]*</xsm ) { # if not xml
@@ -1301,19 +1563,18 @@ sub _remember_errors {
     $r = $r->{Error};
   }
 
-  if ( $r->{Code} ) {
-    $self->err( $r->{Code} );
-    $self->errstr( $r->{Message} );
+  my ( $code, $message ) = @{$r}{qw(Code Message)};
 
-    return $TRUE;
-  }
+  return $FALSE
+    if !$code;
 
-  return $FALSE;
+  $self->err($code);
+  $self->errstr($message);
+
+  return $TRUE;
 }
 
-#
 # Deprecated - this adds a header for the old V2 auth signatures
-#
 ########################################################################
 sub _add_auth_header { ## no critic (ProhibitUnusedPrivateSubroutines)
 ########################################################################
@@ -1327,18 +1588,28 @@ sub _add_auth_header { ## no critic (ProhibitUnusedPrivateSubroutines)
   }
 
   if ($token) {
-    $headers->header( $AMAZON_HEADER_PREFIX . 'security-token', $token );
+    $headers->header( $AMAZON_HEADER_PREFIX . 'security-token' => $token );
   }
 
   my $canonical_string = $self->_canonical_string( $method, $path, $headers );
-  $self->get_logger->trace( Dumper( [$headers] ) );
-  $self->get_logger->trace("canonical string: $canonical_string\n");
+
+  $self->get_logger->trace(
+    sub {
+      return Dumper(
+        [ headers          => $headers,
+          canonincal_sring => $canonical_string,
+        ]
+      );
+    }
+  );
 
   my $encoded_canonical
     = $self->_encode( $aws_secret_access_key, $canonical_string );
 
   $headers->header(
-    Authorization => "AWS $aws_access_key_id:$encoded_canonical" );
+    Authorization => sprintf 'AWS %s:%s',
+    $aws_access_key_id, $encoded_canonical
+  );
 
   return;
 }
@@ -1350,8 +1621,8 @@ sub _merge_meta {
 ########################################################################
   my ( $self, $headers, $metadata ) = @_;
 
-  $headers  ||= {};
-  $metadata ||= {};
+  $headers  //= {};
+  $metadata //= {};
 
   my $http_header = HTTP::Headers->new;
 
@@ -1472,15 +1743,42 @@ sub _encode {
 
   my $b64 = encode_base64( $hmac->digest, $EMPTY );
 
-  return $urlencode ? $self->_urlencode($b64) : return $b64;
+  return $urlencode ? urlencode($b64) : return $b64;
 }
 
 ########################################################################
-sub _urlencode {
+sub bucketv2 {
 ########################################################################
-  my ( $self, $unencoded ) = @_;
+  my ( $self, @args ) = @_;
 
-  return uri_escape_utf8( $unencoded, '^A-Za-z0-9\-\._~\x2f' ); ## no critic (RequireInterpolation)
+  my $parameters = get_parameters(@args);
+
+  my ( $bucketname, $region, $verify_region )
+    = @{$parameters}{qw(bucket region verify_region)};
+
+  # only set to default region if a region wasn't passed or region
+  # verification not requested
+  if ( !$region && !$verify_region ) {
+    $region = $self->region;
+  }
+
+  return Amazon::S3::BucketV2->new(
+    { bucket        => $bucketname,
+      account       => $self,
+      region        => $region,
+      verify_region => $verify_region,
+    },
+  );
+}
+
+########################################################################
+sub delete_public_access_block {
+########################################################################
+  my ( $self, $bucket ) = @_;
+
+  my $bucketv2 = bless $bucket, 'Amazon::S3::BucketV2';
+
+  return $bucketv2->DeletePublicAccessBlock;
 }
 
 1;
@@ -1561,7 +1859,7 @@ managing Amazon S3 buckets and keys.
 
 =head1 DESCRIPTION
 
-This documentation refers to version 0.65.
+This documentation refers to version 2.0.2.
 
 C<Amazon::S3> provides a portable client interface to Amazon Simple
 Storage System (S3).
@@ -1578,11 +1876,109 @@ implementations of:
 
 =item DeleteObjects
 
+=item ListObjectVersions
+
 =back
 
 Additionally, this module now implements Signature Version 4 signing,
 unit tests have been updated and more documentation has been added or
 corrected. Credentials are encrypted if you have encryption modules installed.
+
+I<NEW!>
+
+The C<Amazon::S3> modules have been heavily refactored over the last
+few releases to increase maintainability and to add new features. New
+features include:
+
+=over 5
+
+=item L<Amazon::S3::BucketV2>
+
+This new module implements a mechanism to invoke I<almost> all of the
+S3 APIs using a standard calling method.
+
+The module will format your Perl objects as XML payloads and enable
+you to provide all of the parameters required to make an API
+call. Headers and URI parameters can also be passed to the
+methods. L<Amazon::S3::BucketV2> is a subclass of
+L<Amazon::S3::Bucket>, meaning you can still invoke all of the same
+methods found there.
+
+See L<Amazon::S3::BucketV2> for more details.
+
+=item Limited Support for Directory Buckets
+
+This version include limited support for directory buckets.
+
+You can create and list directory buckets.
+
+I<Directory buckets use the S3 Express One Zone storage class, which
+is recommended if your application is performance sensitive and
+benefits from single-digit millisecond PUT and GET latencies.> -
+L<https://docs.aws.amazon.com/AmazonS3/latest/userguide/directory-buckets-overview.html>
+
+=over 10
+
+=item list_directory_buckets
+
+List the directory buckets. Note this only returns a list of you
+directory buckets, not their contents. In order to list the contents
+of a directory bucket you must first create a session that establishes
+temporary credentials used to acces the Zonal endpoints. You then use
+those credentials for signing requests using the ListObjectV2 API.
+
+This process is currently B<not supported> by this class.
+
+L<https://docs.aws.amazon.com/AmazonS3/latest/API/API_CreateSession.html>
+
+<Lhttps://docs.aws.amazon.com/AmazonS3/latest/API/API_ListObjectsV2.html>
+
+=item add_bucket
+
+You can add a regin and availability zone to this call in order to
+create a directory bucket.
+
+ $bucket->add_bucket({ bucket => $bucket_name, availability_zone => 'use1-az5' });
+
+Note that your bucket name must conform to the naming conventions for
+directory buckets. -
+L<https://docs.aws.amazon.com/AmazonS3/latest/userguide/directory-buckets-overview.html#directory-buckets-name>
+ 
+=back
+
+=item Addition of version parameter for C<delete_key>
+
+You can now delete a version of a key by including its verion ID.
+
+ $bucket->delete_key($key, $version_id);
+
+=item Methods that accept a hash reference can now accept a
+C<headers> object that may contain any additional headers you might want
+to send with a request. Some of the methods that now allow you to pass
+a header object include:
+
+=over 10
+
+=item add_bucket
+
+=item add_key
+
+=item get_key
+
+Can now be called with a hashref which may include both a C<headers>
+and C<uri_params> object.
+
+=item delete_bucket
+
+=item list_bucket
+
+=item list_object_versions
+
+=item upload_multipart_object
+
+=back
+
+=back
 
 =head2 Comparison to Other Perl S3 Modules
 
@@ -1602,10 +1998,13 @@ Perl modules in lieu of raw Perl code to increase maintainability and
 stability as well as some refactoring. C<Amazon::S3> also strives now
 to adhere to best practices as much as possible.
 
-C<Paws::S3> may be a much more robust implementation of
-a Perl S3 interface, however this module may still appeal to
-those that favor simplicity of the interface and a lower number of
-dependencies. Below is the original description of the module.
+C<Paws::S3> may be a much more robust implementation of a Perl S3
+interface, however this module may still appeal to those that favor
+simplicity of the interface and a lower number of dependencies. The
+new L<Amazon::S3::BucketV2> module now provides access to nearly all
+of the main S3 API metods.
+
+ Below is the original description of the module.
 
 =over 10
 
@@ -1651,7 +2050,8 @@ number of dependencies and make it I<easy to install>. Recent changes
 to this module have introduced new dependencies in order to improve
 the maintainability and provide additional features. Installing CPAN
 modules is never easy, especially when the dependencies of the
-dependencies are impossible to control and include XS modules.
+dependencies are impossible to control and include may include XS
+modules.
 
 =over 5
 
@@ -1680,7 +2080,9 @@ In this order install:
  LWP 6.13
  Amazon::S3
 
-...other versions I<may> work...YMMV.
+...other versions I<may> work...YMMV. If you do decide to run on an
+earlier version of C<perl>, you are encouraged to run the test
+suite. See the L</TESTING> section for more details.
 
 =item API Signing
 
@@ -1723,11 +2125,6 @@ L<https://docs.aws.amazon.com/AmazonS3/latest/userguide/RESTAuthentication.html>
 
 =back
 
-=item New APIs
-
-This module does not support some of the newer API method calls
-for S3 added after the initial creation of this interface.
-
 =item Multipart Upload Support
 
 There are some recently added unit tests for multipart uploads that
@@ -1741,6 +2138,10 @@ L<https://docs.aws.amazon.com/AmazonS3/latest/API/API_CreateMultipartUpload.html
 =back
 
 =head1 METHODS AND SUBROUTINES
+
+Unless otherwise noted methods will return an C<undef> if an error
+occurs.  You can get more information about the error by calling
+C<err()> and C<errstr()>.
 
 =head2 new 
 
@@ -1826,7 +2227,9 @@ default: s3.amazonaws.com
 
 Note that requests are made to domain buckets when possible.  You can
 prevent that behavior if either the bucket name does not conform to
-DNS bucket naming conventions or you preface the bucket name with '/'.
+DNS bucket naming conventions or you preface the bucket name with '/'
+or explicitly turn off domain buckets by setting C<dns_bucket_names>
+to false.
 
 If you set a region then the host name will be modified accordingly if
 it is an Amazon endpoint.
@@ -1909,7 +2312,7 @@ storing your credentials and preventing exfiltration.
 
 =head2 region
 
-Sets the region for the  API calls. This will also be the
+Sets the region for the API calls. This will also be the
 default when instantiating the bucket object unless you pass the
 region parameter in the C<bucket> method or use the C<verify_region>
 flag that will I<always> verify the region of the bucket using the
@@ -1968,8 +2371,16 @@ C<undef> if there are not buckets or an error occurs.
 
  add_bucket(bucket-configuration)
 
-C<bucket-configuration> is a reference to a hash with bucket configuration
-parameters.
+C<bucket-configuration> is a reference to a hash with bucket
+configuration parameters.
+
+I<Note that since April of 2023, new buckets are created that block
+public access by default. If you attempt to set an ACL with public
+permissions the create operation will fail. To create a public bucket
+you must first create the bucket with private permissions, remove the
+public block and subsequently apply public permissions.>
+
+See L</delete_public_access_block>.
 
 =over
 
@@ -1981,13 +2392,23 @@ for more details on bucket naming rules.
 
 =item acl_short (optional)
 
-See the set_acl subroutine for documenation on the acl_short options
+See the set_acl subroutine for documenation on the acl_short
+options. Note that starting in April of 2023 new buckets are
+configured to automatically block public access. Trying to create a
+bucket with public permissions will fail. In order to create a public
+bucket you must first create a private bucket, then call the
+DeletePublicAccessBlock API. You can then set public permissions for
+your bucket using ACLs or a bucket policy.
 
 =item location_constraint
 
 =item region
 
 The region the bucket is to be created in.
+
+=item headers
+
+Additional headers to send with request.
 
 =back
 
@@ -2048,6 +2469,12 @@ recommend that you don't delete the bucket.
 
 =back
 
+=head2 delete_public_access_block
+
+ delete_public_access_block(bucket-obj)
+
+Removes the public access block flag for the bucket.
+
 =head2 dns_bucket_names
 
 Set or get a boolean that indicates whether to use DNS bucket
@@ -2055,9 +2482,24 @@ names.
 
 default: true
 
+=head2 err
+
+Returns the last error. Usually this is the error code returned from
+an API call or a short message that the describes the error. Use
+C<errstr> for a more descriptive explanation of the error condition.
+
+=head2 errstr
+
+Detailed error description.
+
 =head2 list_bucket, list_bucket_v2
 
-List all keys in this bucket.
+List keys in a bucket. Note that this method will only return
+C<max-keys>. If you want all of the keys you should use
+C<list_bucket_all> or C<list_bucket_all_v2>.
+
+I<See the note in the C<delimiter> and C<max-keys> descriptions below
+regarding how keys are counted against the C<max-keys> value.>
 
 Takes a reference to a hash of arguments:
 
@@ -2088,13 +2530,53 @@ collection. If an otherwise matching key does not contain the
 delimiter after the prefix, it appears in the Contents collection.
 
 Each element in the CommonPrefixes collection counts as one against
-the MaxKeys limit. The rolled-up keys represented by each CommonPrefixes
-element do not.  If the Delimiter parameter is not present in your
+the C<MaxKeys> limit. The rolled-up keys represented by each CommonPrefixes
+element do not.  
+
+In other words, key below the delimiter are not considered in the
+count.
+
+Remember that S3 keys do not represent a file system hierarchy
+although it might look like that depending on how you choose to store
+objects. Using the C<prefix> and C<delimiter> parameters essentially
+allows you to restrict the return set to parts of your key
+"hierarchy". So in the example above If all I wanted was the very top
+level of the hierarchy I would set my C<delimiter to> '/' and omit the
+C<prefix> parameter.
+
+
+If the C<Delimiter> parameter is not present in your
 request, keys in the result set will not be rolled-up and neither
 the CommonPrefixes collection nor the NextMarker element will be
 present in the response.
 
 NOTE: CommonPrefixes isn't currently supported by Amazon::S3. 
+
+Example:
+
+Suppose I have the keys:
+
+ bar/baz
+ bar/buz
+ bar/buz/biz
+ bar/buz/zip
+
+And I'm only interest in object directly below 'bar'
+
+ prefix=bar/
+ delimiter=/
+
+Would yield:
+
+ bar/baz
+ bar/buz
+
+Omitting the delimiter would yield:
+
+ bar/baz
+ bar/buz
+ bar/buz/biz
+ bar/buz/zip
 
 =item max-keys 
 
@@ -2103,8 +2585,8 @@ response to your query. Amazon S3 will return no more than this
 number of results, but possibly less. Even if max-keys is not
 specified, Amazon S3 will limit the number of results in the response.
 Check the IsTruncated flag to see if your results are incomplete.
-If so, use the Marker parameter to request the next page of results.
-For the purpose of counting max-keys, a 'result' is either a key
+If so, use the C<Marker> parameter to request the next page of results.
+For the purpose of counting C<max-key>s, a 'result' is either a key
 in the 'Contents' collection, or a delimited prefix in the
 'CommonPrefixes' collection. So for delimiter requests, max-keys
 limits the total number of list results, not just the number of
@@ -2212,6 +2694,79 @@ Takes the same arguments as C<list_bucket>.
 
 I<You are encouraged to use the newer C<list_bucket_all_v2> method.>
 
+=head2 list_object_versions
+
+ list_object_versions( args ) 
+
+Returns metadata about all versions of the objects in a bucket. You
+can also use request parameters as selection criteria to return
+metadata about a subset of all the object versions.
+
+This method will only return the raw result set and does not perform
+pagination or unravel common prefixes as do other methods like
+C<list_bucket>. This may change in the future.
+
+See L<https://docs.aws.amazon.com/AmazonS3/latest/API/API_ListObjectVersions.html>
+for more information about the request parameters and the result body.
+
+C<args> is hash reference containing the following parameters:
+
+=over 5
+
+=item bucket
+
+Name of the bucket. This method is not vailable for directory buckets.
+
+=item headers
+
+Optional headers. See
+L<https://docs.aws.amazon.com/AmazonS3/latest/API/API_ListObjectVersions.html>
+for more details regarding optional headers.
+
+=item delimiter
+
+A delimiter is a character that you specify to group keys. All keys
+that contain the same string between the prefix and the first
+occurrence of the delimiter are grouped under a single result element
+in CommonPrefixes. These groups are counted as one result against the
+max-keys limitation. These keys are not returned elsewhere in the
+response.
+
+=item encoding-type     
+
+Requests Amazon S3 to encode the object keys in the response and
+specifies the encoding method to use.
+
+=item key-marker        
+
+Specifies the key to start with when listing objects in a bucket.
+
+=item max-keys          
+
+Sets the maximum number of keys returned in the response. By default,
+the action returns up to 1,000 key names. The response might contain
+fewer keys but will never contain more. If additional keys satisfy the
+search criteria, but were not returned because max-keys was exceeded,
+the response contains <isTruncated>true</isTruncated>. To return the
+additional keys, see key-marker and version-id-marker.
+
+default: 1000
+
+=item prefix            
+
+Use this parameter to select only those keys that begin with the
+specified prefix. You can use prefixes to separate a bucket into
+different groupings of keys. (You can think of using prefix to make
+groups in the same way that you'd use a folder in a file system.) You
+can use prefix with delimiter to roll up numerous objects into a
+single result under CommonPrefixes.
+
+=item version-id-marker 
+
+Specifies the object version you want to start listing from.
+
+=back
+
 =head2 err
 
 The S3 error code for the last error encountered.
@@ -2244,7 +2799,8 @@ Called to add extra retry codes if retry has been set
 
 =head2 turn_off_special_retry
 
-Called to turn off special retry codes when we are deliberately triggering them
+Called to turn off special retry codes when we are deliberately
+triggering them
 
 =head1 ABOUT
 
@@ -2262,12 +2818,13 @@ following notice:
 
 =head1 TESTING
 
-Testing S3 is a tricky thing. Amazon wants to charge you a bit of 
-money each time you use their service. And yes, testing counts as using.
-Because of this, the application's test suite skips anything approaching 
-a real test unless you set these environment variables:
+Testing S3 is a tricky thing. Amazon wants to charge you a bit of
+money each time you use their service. And yes, testing counts as
+using.  Because of this, the application's test suite skips anything
+approaching a real test unless you set certain environment variables.
 
-For more on testing this module see L<README-TESTING.md|https://github.com/rlauer6/perl-amazon-s3/blob/master/README-TESTING.md>
+For more on testing this module see
+L<README-TESTING.md|https://github.com/rlauer6/perl-amazon-s3/blob/master/README-TESTING.md>
 
 =over 
 
@@ -2287,7 +2844,7 @@ mocking service and your bucket names are probably not resolvable. You
 can override this behavior by setting C<AWS_S3_DNS_BUCKET_NAMES> to any
 value.
 
-=item AWS_S3_DSN_BUCKET_NAMES
+=item AWS_S3_DNS_BUCKET_NAMES
 
 Set this to any value to override the default behavior of disabling
 DNS bucket names during testing.

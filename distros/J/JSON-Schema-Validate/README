@@ -1,0 +1,248 @@
+NAME
+    JSON::Schema::Validate - Lean, recursion-safe JSON Schema validator
+    (Draft 2020-12)
+
+SYNOPSIS
+        use JSON::Schema::Validate;
+        use JSON ();
+
+        my $schema = {
+            '$schema' => 'https://json-schema.org/draft/2020-12/schema',
+            '$id'     => 'https://example.org/s/root.json',
+            type      => 'object',
+            required  => [ 'name' ],
+            properties => {
+                name => { type => 'string', minLength => 1 },
+                next => { '$dynamicRef' => '#Node' },
+            },
+            '$dynamicAnchor' => 'Node',
+            additionalProperties => JSON::false,
+        };
+
+        my $js = JSON::Schema::Validate->new( $schema )
+            ->register_builtin_formats;
+
+        my $ok = $js->validate({ name => 'head', next=>{ name => 'tail' } })
+            or die $js->error;
+
+        print "ok\n";
+
+VERSION
+    v0.1.0_5
+
+DESCRIPTION
+    "JSON::Schema::Validate" is a compact, dependency-light validator for
+    JSON Schema <https://json-schema.org/> draft 2020-12. It focuses on:
+
+    *   Correctness and recursion safety (supports $ref, $dynamicRef,
+        $anchor, $dynamicAnchor).
+
+    *   Draft 2020-12 evaluation semantics, including "unevaluatedItems" and
+        "unevaluatedProperties" with annotation tracking.
+
+    *   A practical Perl API (constructor takes the schema; call "validate"
+        with your data; inspect "error" / "errors" on failure).
+
+    *   Builtin validators for common "format"s (date, time, email,
+        hostname, ip, uri, uuid, JSON Pointer, etc.), with the option to
+        register or override custom format handlers.
+
+    This module is intentionally minimal compared to large reference
+    implementations, but it implements the parts most people rely on in
+    production.
+
+  Supported Keywords (2020-12)
+    *   Types
+
+        "type" (string or array of strings), including union types. Unions
+        may also include inline schemas (e.g. "type => [ 'integer', {
+        minimum => 0 } ]").
+
+    *   Constant / Enumerations
+
+        "const", "enum".
+
+    *   Numbers
+
+        "multipleOf", "minimum", "maximum", "exclusiveMinimum",
+        "exclusiveMaximum".
+
+    *   Strings
+
+        "minLength", "maxLength", "pattern", "format".
+
+    *   Arrays
+
+        "prefixItems", "items", "contains", "minContains", "maxContains",
+        "uniqueItems", "unevaluatedItems".
+
+    *   Objects
+
+        "properties", "patternProperties", "additionalProperties",
+        "propertyNames", "required", "dependentRequired",
+        "dependentSchemas", "unevaluatedProperties".
+
+    *   Combinators
+
+        "allOf", "anyOf", "oneOf", "not".
+
+    *   Conditionals
+
+        "if", "then", "else".
+
+    *   Referencing
+
+        $id, $anchor, $ref, $dynamicAnchor, $dynamicRef.
+
+  Formats
+    Call "register_builtin_formats" to install default validators for the
+    following "format" names:
+
+    *   "date-time", "date", "time", "duration"
+
+        Leverages DateTime and DateTime::Format::ISO8601 when available
+        (falls back to strict regex checks). Duration uses
+        DateTime::Duration.
+
+    *   "email", "idn-email"
+
+        Uses Regexp::Common with "Email::Address" if available.
+
+    *   "hostname", "idn-hostname"
+
+        "idn-hostname" uses Net::IDN::Encode if available; otherwise,
+        applies a permissive Unicode label check and then "hostname" rules.
+
+    *   "ipv4", "ipv6"
+
+        Strict regex-based validation.
+
+    *   "uri", "uri-reference", "iri"
+
+        Reasonable regex checks for scheme and reference forms (not a full
+        RFC parser).
+
+    *   "uuid"
+
+        Hyphenated 8-4-4-4-12 hex.
+
+    *   "json-pointer", "relative-json-pointer"
+
+        Conformant to RFC 6901 and the relative variant used by JSON Schema.
+
+    *   "regex"
+
+        Checks that the pattern compiles in Perl.
+
+    Custom formats can be registered or override builtins via
+    "register_format" or the "format => { ... }" constructor option (see
+    "METHODS").
+
+METHODS
+  new
+        my $js = JSON::Schema::Validate->new( $schema, %opts );
+
+    Build a validator from a decoded JSON Schema (Perl hash/array
+    structure).
+
+    Options (all optional):
+
+    "format => \%callbacks"
+        Hash of "format_name => sub { ... }" validators. Each sub receives
+        the string to validate and must return true/false. Entries here take
+        precedence when you later call "register_builtin_formats" (i.e. your
+        callbacks remain in place).
+
+  register_builtin_formats
+        $js->register_builtin_formats;
+
+    Registers the built-in validators listed in "Formats". Existing
+    user-supplied format callbacks are preserved if they already exist under
+    the same name.
+
+  register_format
+        $js->register_format( $name, sub { ... } );
+
+    Register or override a "format" validator at runtime. The sub receives a
+    single scalar (the candidate string) and must return true/false.
+
+  set_resolver
+        $js->set_resolver( sub { my( $absolute_uri ) = @_; ...; return $schema_hashref } );
+
+    Install a resolver for external documents. It is called with an absolute
+    URI (formed from the current base $id and the $ref) and must return a
+    Perl hash reference representation of a JSON Schema. If the returned
+    hash contains '$id', it will become the new base for that document;
+    otherwise, the absolute URI is used as its base.
+
+  validate
+        my $ok = $js->validate( $data );
+
+    Validate a decoded JSON instance against the compiled schema. Returns a
+    boolean. On failure, inspect "$js->error" for a concise message (first
+    error), or "$js->errors" for an arrayref of hashes like:
+
+        { path => '#/properties~1name', msg => 'string shorter than minLength 1' }
+
+  error
+        my $msg = $js->error;
+
+    Short, human-oriented message for the first failure.
+
+  errors
+        my $arrayref = $js->errors;
+
+    All collected errors (up to the internal "max_errors" cap).
+
+BEHAVIOUR NOTES
+    *   Recursion & Cycles
+
+        The validator guards on the pair "(schema_pointer,
+        instance_address)", so self-referential schemas and cyclic instance
+        graphs won’t infinite-loop.
+
+    *   Union Types with Inline Schemas
+
+        "type" may be an array mixing string type names and inline schemas.
+        Any inline schema that validates the instance makes the "type" check
+        succeed.
+
+    *   Booleans
+
+        For practicality in Perl, "type => 'boolean'" accepts JSON-like
+        booleans (e.g. true/false, 1/0 as strings) as well as Perl boolean
+        objects (if you use a boolean class). If you need stricter
+        behaviour, you can adapt "_match_type" or introduce a constructor
+        flag and branch there.
+
+    *   Unevaluated*
+
+        Both "unevaluatedItems" and "unevaluatedProperties" are enforced
+        using annotation produced by earlier keyword evaluations within the
+        same schema object, matching draft 2020-12 semantics.
+
+    *   Unsupported/Not Implemented
+
+        This module intentionally omits some rarely used 2020-12 control
+        keywords such as $vocabulary and $comment processing, and
+        media-related keywords like "contentEncoding"/"contentMediaType".
+        These can be added later if required.
+
+CREDITS
+    Albert from OpenAI for his invaluable help.
+
+AUTHOR
+    Jacques Deguest <jack@deguest.jp>
+
+SEE ALSO
+    perl, DateTime, DateTime::Format::ISO8601, DateTime::Duration,
+    Regexp::Common, Net::IDN::Encode, JSON::PP
+
+COPYRIGHT & LICENSE
+    Copyright(c) 2025 DEGUEST Pte. Ltd.
+
+    All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -9,12 +9,12 @@ requires 'IO::Async::Notifier';
 requires 'IO::Async::Stream';
 requires 'Log::Any';
 requires 'Object::Pad' => '0.821';
-requires 'Protocol::Sys::Virt' => '11.8.0';
-requires 'Protocol::Sys::Virt::KeepAlive' => '11.8.0';
-requires 'Protocol::Sys::Virt::Remote' => '11.8.0';
-requires 'Protocol::Sys::Virt::Remote::XDR' => '11.8.0';
-requires 'Protocol::Sys::Virt::UNIXSocket' => '11.8.0';
-requires 'Protocol::Sys::Virt::URI' => '11.8.0';
+requires 'Protocol::Sys::Virt' => '11.9.0';
+requires 'Protocol::Sys::Virt::KeepAlive' => '11.9.0';
+requires 'Protocol::Sys::Virt::Remote' => '11.9.0';
+requires 'Protocol::Sys::Virt::Remote::XDR' => '11.9.0';
+requires 'Protocol::Sys::Virt::UNIXSocket' => '11.9.0';
+requires 'Protocol::Sys::Virt::URI' => '11.9.0';
 requires 'Sublike::Extended' => '0.29';  # treat 'method' and 'sub' as extended keywords
 
 on test => sub {

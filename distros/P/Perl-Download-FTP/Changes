@@ -1,5 +1,8 @@
 Revision history for Perl module Perl::Download::FTP
 
+0.06 Thu Nov  6 06:27:33 PM EST 2025
+    - Update lists of Perl releases used in testing.
+
 0.05 Sat Jul  7 17:06:36 EDT 2018
     - Implement handling of RC releases.  list_releases() can now take
       'dev_or_rc' as value for 'type'

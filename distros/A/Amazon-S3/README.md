@@ -66,7 +66,7 @@ managing Amazon S3 buckets and keys.
 
 # DESCRIPTION
 
-This documentation refers to version 0.65.
+This documentation refers to version 2.0.2.
 
 `Amazon::S3` provides a portable client interface to Amazon Simple
 Storage System (S3).
@@ -78,10 +78,89 @@ implementations of:
 - ListObjectsV2
 - CopyObject
 - DeleteObjects
+- ListObjectVersions
 
 Additionally, this module now implements Signature Version 4 signing,
 unit tests have been updated and more documentation has been added or
 corrected. Credentials are encrypted if you have encryption modules installed.
+
+_NEW!_
+
+The `Amazon::S3` modules have been heavily refactored over the last
+few releases to increase maintainability and to add new features. New
+features include:
+
+- [Amazon::S3::BucketV2](https://metacpan.org/pod/Amazon%3A%3AS3%3A%3ABucketV2)
+
+    This new module implements a mechanism to invoke _almost_ all of the
+    S3 APIs using a standard calling method.
+
+    The module will format your Perl objects as XML payloads and enable
+    you to provide all of the parameters required to make an API
+    call. Headers and URI parameters can also be passed to the
+    methods. [Amazon::S3::BucketV2](https://metacpan.org/pod/Amazon%3A%3AS3%3A%3ABucketV2) is a subclass of
+    [Amazon::S3::Bucket](https://metacpan.org/pod/Amazon%3A%3AS3%3A%3ABucket), meaning you can still invoke all of the same
+    methods found there.
+
+    See [Amazon::S3::BucketV2](https://metacpan.org/pod/Amazon%3A%3AS3%3A%3ABucketV2) for more details.
+
+- Limited Support for Directory Buckets
+
+    This version include limited support for directory buckets.
+
+    You can create and list directory buckets.
+
+    _Directory buckets use the S3 Express One Zone storage class, which
+    is recommended if your application is performance sensitive and
+    benefits from single-digit millisecond PUT and GET latencies._ -
+    [https://docs.aws.amazon.com/AmazonS3/latest/userguide/directory-buckets-overview.html](https://docs.aws.amazon.com/AmazonS3/latest/userguide/directory-buckets-overview.html)
+
+    - list\_directory\_buckets
+
+        List the directory buckets. Note this only returns a list of you
+        directory buckets, not their contents. In order to list the contents
+        of a directory bucket you must first create a session that establishes
+        temporary credentials used to acces the Zonal endpoints. You then use
+        those credentials for signing requests using the ListObjectV2 API.
+
+        This process is currently **not supported** by this class.
+
+        [https://docs.aws.amazon.com/AmazonS3/latest/API/API\_CreateSession.html](https://docs.aws.amazon.com/AmazonS3/latest/API/API_CreateSession.html)
+
+        <Lhttps://docs.aws.amazon.com/AmazonS3/latest/API/API\_ListObjectsV2.html>
+
+    - add\_bucket
+
+        You can add a regin and availability zone to this call in order to
+        create a directory bucket.
+
+            $bucket->add_bucket({ bucket => $bucket_name, availability_zone => 'use1-az5' });
+
+        Note that your bucket name must conform to the naming conventions for
+        directory buckets. -
+        [https://docs.aws.amazon.com/AmazonS3/latest/userguide/directory-buckets-overview.html#directory-buckets-name](https://docs.aws.amazon.com/AmazonS3/latest/userguide/directory-buckets-overview.html#directory-buckets-name)
+
+- Addition of version parameter for `delete_key`
+
+    You can now delete a version of a key by including its verion ID.
+
+        $bucket->delete_key($key, $version_id);
+
+- Methods that accept a hash reference can now accept a
+`headers` object that may contain any additional headers you might want
+to send with a request. Some of the methods that now allow you to pass
+a header object include:
+    - add\_bucket
+    - add\_key
+    - get\_key
+
+        Can now be called with a hashref which may include both a `headers`
+        and `uri_params` object.
+
+    - delete\_bucket
+    - list\_bucket
+    - list\_object\_versions
+    - upload\_multipart\_object
 
 ## Comparison to Other Perl S3 Modules
 
@@ -101,10 +180,13 @@ Perl modules in lieu of raw Perl code to increase maintainability and
 stability as well as some refactoring. `Amazon::S3` also strives now
 to adhere to best practices as much as possible.
 
-`Paws::S3` may be a much more robust implementation of
-a Perl S3 interface, however this module may still appeal to
-those that favor simplicity of the interface and a lower number of
-dependencies. Below is the original description of the module.
+`Paws::S3` may be a much more robust implementation of a Perl S3
+interface, however this module may still appeal to those that favor
+simplicity of the interface and a lower number of dependencies. The
+new [Amazon::S3::BucketV2](https://metacpan.org/pod/Amazon%3A%3AS3%3A%3ABucketV2) module now provides access to nearly all
+of the main S3 API metods.
+
+    Below is the original description of the module.
 
 > Amazon S3 is storage for the Internet. It is designed to
 > make web-scale computing easier for developers. Amazon S3
@@ -146,7 +228,8 @@ number of dependencies and make it _easy to install_. Recent changes
 to this module have introduced new dependencies in order to improve
 the maintainability and provide additional features. Installing CPAN
 modules is never easy, especially when the dependencies of the
-dependencies are impossible to control and include XS modules.
+dependencies are impossible to control and include may include XS
+modules.
 
 - MINIMUM PERL
 
@@ -173,7 +256,9 @@ dependencies are impossible to control and include XS modules.
         LWP 6.13
         Amazon::S3
 
-    ...other versions _may_ work...YMMV.
+    ...other versions _may_ work...YMMV. If you do decide to run on an
+    earlier version of `perl`, you are encouraged to run the test
+    suite. See the ["TESTING"](#testing) section for more details.
 
 - API Signing
 
@@ -212,11 +297,6 @@ dependencies are impossible to control and include XS modules.
 
         [https://docs.aws.amazon.com/AmazonS3/latest/userguide/RESTAuthentication.html](https://docs.aws.amazon.com/AmazonS3/latest/userguide/RESTAuthentication.html)
 
-- New APIs
-
-    This module does not support some of the newer API method calls
-    for S3 added after the initial creation of this interface.
-
 - Multipart Upload Support
 
     There are some recently added unit tests for multipart uploads that
@@ -228,6 +308,10 @@ dependencies are impossible to control and include XS modules.
     [https://docs.aws.amazon.com/AmazonS3/latest/API/API\_CreateMultipartUpload.html](https://docs.aws.amazon.com/AmazonS3/latest/API/API_CreateMultipartUpload.html)
 
 # METHODS AND SUBROUTINES
+
+Unless otherwise noted methods will return an `undef` if an error
+occurs.  You can get more information about the error by calling
+`err()` and `errstr()`.
 
 ## new 
 
@@ -311,7 +395,9 @@ Create a new S3 client object. Takes some arguments:
 
     Note that requests are made to domain buckets when possible.  You can
     prevent that behavior if either the bucket name does not conform to
-    DNS bucket naming conventions or you preface the bucket name with '/'.
+    DNS bucket naming conventions or you preface the bucket name with '/'
+    or explicitly turn off domain buckets by setting `dns_bucket_names`
+    to false.
 
     If you set a region then the host name will be modified accordingly if
     it is an Amazon endpoint.
@@ -388,7 +474,7 @@ false value.
 
 ## region
 
-Sets the region for the  API calls. This will also be the
+Sets the region for the API calls. This will also be the
 default when instantiating the bucket object unless you pass the
 region parameter in the `bucket` method or use the `verify_region`
 flag that will _always_ verify the region of the bucket using the
@@ -439,8 +525,16 @@ buckets owned by the accout or (see below) or `undef` on error.
 
     add_bucket(bucket-configuration)
 
-`bucket-configuration` is a reference to a hash with bucket configuration
-parameters.
+`bucket-configuration` is a reference to a hash with bucket
+configuration parameters.
+
+_Note that since April of 2023, new buckets are created that block
+public access by default. If you attempt to set an ACL with public
+permissions the create operation will fail. To create a public bucket
+you must first create the bucket with private permissions, remove the
+public block and subsequently apply public permissions._
+
+See ["delete\_public\_access\_block"](#delete_public_access_block).
 
 - bucket
 
@@ -450,12 +544,22 @@ parameters.
 
 - acl\_short (optional)
 
-    See the set\_acl subroutine for documenation on the acl\_short options
+    See the set\_acl subroutine for documenation on the acl\_short
+    options. Note that starting in April of 2023 new buckets are
+    configured to automatically block public access. Trying to create a
+    bucket with public permissions will fail. In order to create a public
+    bucket you must first create a private bucket, then call the
+    DeletePublicAccessBlock API. You can then set public permissions for
+    your bucket using ACLs or a bucket policy.
 
 - location\_constraint
 - region
 
     The region the bucket is to be created in.
+
+- headers
+
+    Additional headers to send with request.
 
 Returns a [Amazon::S3::Bucket](https://metacpan.org/pod/Amazon%3A%3AS3%3A%3ABucket) object on success or `undef` on failure.
 
@@ -506,6 +610,12 @@ Note from the [Amazon's documentation](https://docs.aws.amazon.com/AmazonS3/late
 > of a deleted bucket**. If you want to use the same bucket name, we
 > recommend that you don't delete the bucket.
 
+## delete\_public\_access\_block
+
+    delete_public_access_block(bucket-obj)
+
+Removes the public access block flag for the bucket.
+
 ## dns\_bucket\_names
 
 Set or get a boolean that indicates whether to use DNS bucket
@@ -513,9 +623,24 @@ names.
 
 default: true
 
+## err
+
+Returns the last error. Usually this is the error code returned from
+an API call or a short message that the describes the error. Use
+`errstr` for a more descriptive explanation of the error condition.
+
+## errstr
+
+Detailed error description.
+
 ## list\_bucket, list\_bucket\_v2
 
-List all keys in this bucket.
+List keys in a bucket. Note that this method will only return
+`max-keys`. If you want all of the keys you should use
+`list_bucket_all` or `list_bucket_all_v2`.
+
+_See the note in the `delimiter` and `max-keys` descriptions below
+regarding how keys are counted against the `max-keys` value._
 
 Takes a reference to a hash of arguments:
 
@@ -544,13 +669,52 @@ Takes a reference to a hash of arguments:
     delimiter after the prefix, it appears in the Contents collection.
 
     Each element in the CommonPrefixes collection counts as one against
-    the MaxKeys limit. The rolled-up keys represented by each CommonPrefixes
-    element do not.  If the Delimiter parameter is not present in your
+    the `MaxKeys` limit. The rolled-up keys represented by each CommonPrefixes
+    element do not.  
+
+    In other words, key below the delimiter are not considered in the
+    count.
+
+    Remember that S3 keys do not represent a file system hierarchy
+    although it might look like that depending on how you choose to store
+    objects. Using the `prefix` and `delimiter` parameters essentially
+    allows you to restrict the return set to parts of your key
+    "hierarchy". So in the example above If all I wanted was the very top
+    level of the hierarchy I would set my `delimiter to` '/' and omit the
+    `prefix` parameter.
+
+    If the `Delimiter` parameter is not present in your
     request, keys in the result set will not be rolled-up and neither
     the CommonPrefixes collection nor the NextMarker element will be
     present in the response.
 
     NOTE: CommonPrefixes isn't currently supported by Amazon::S3. 
+
+    Example:
+
+    Suppose I have the keys:
+
+        bar/baz
+        bar/buz
+        bar/buz/biz
+        bar/buz/zip
+
+    And I'm only interest in object directly below 'bar'
+
+        prefix=bar/
+        delimiter=/
+
+    Would yield:
+
+        bar/baz
+        bar/buz
+
+    Omitting the delimiter would yield:
+
+        bar/baz
+        bar/buz
+        bar/buz/biz
+        bar/buz/zip
 
 - max-keys 
 
@@ -559,8 +723,8 @@ Takes a reference to a hash of arguments:
     number of results, but possibly less. Even if max-keys is not
     specified, Amazon S3 will limit the number of results in the response.
     Check the IsTruncated flag to see if your results are incomplete.
-    If so, use the Marker parameter to request the next page of results.
-    For the purpose of counting max-keys, a 'result' is either a key
+    If so, use the `Marker` parameter to request the next page of results.
+    For the purpose of counting `max-key`s, a 'result' is either a key
     in the 'Contents' collection, or a delimited prefix in the
     'CommonPrefixes' collection. So for delimiter requests, max-keys
     limits the total number of list results, not just the number of
@@ -662,6 +826,75 @@ Takes the same arguments as `list_bucket`.
 
 _You are encouraged to use the newer `list_bucket_all_v2` method._
 
+## list\_object\_versions
+
+    list_object_versions( args ) 
+
+Returns metadata about all versions of the objects in a bucket. You
+can also use request parameters as selection criteria to return
+metadata about a subset of all the object versions.
+
+This method will only return the raw result set and does not perform
+pagination or unravel common prefixes as do other methods like
+`list_bucket`. This may change in the future.
+
+See [https://docs.aws.amazon.com/AmazonS3/latest/API/API\_ListObjectVersions.html](https://docs.aws.amazon.com/AmazonS3/latest/API/API_ListObjectVersions.html)
+for more information about the request parameters and the result body.
+
+`args` is hash reference containing the following parameters:
+
+- bucket
+
+    Name of the bucket. This method is not vailable for directory buckets.
+
+- headers
+
+    Optional headers. See
+    [https://docs.aws.amazon.com/AmazonS3/latest/API/API\_ListObjectVersions.html](https://docs.aws.amazon.com/AmazonS3/latest/API/API_ListObjectVersions.html)
+    for more details regarding optional headers.
+
+- delimiter
+
+    A delimiter is a character that you specify to group keys. All keys
+    that contain the same string between the prefix and the first
+    occurrence of the delimiter are grouped under a single result element
+    in CommonPrefixes. These groups are counted as one result against the
+    max-keys limitation. These keys are not returned elsewhere in the
+    response.
+
+- encoding-type     
+
+    Requests Amazon S3 to encode the object keys in the response and
+    specifies the encoding method to use.
+
+- key-marker        
+
+    Specifies the key to start with when listing objects in a bucket.
+
+- max-keys          
+
+    Sets the maximum number of keys returned in the response. By default,
+    the action returns up to 1,000 key names. The response might contain
+    fewer keys but will never contain more. If additional keys satisfy the
+    search criteria, but were not returned because max-keys was exceeded,
+    the response contains &lt;isTruncated>true&lt;/isTruncated>. To return the
+    additional keys, see key-marker and version-id-marker.
+
+    default: 1000
+
+- prefix            
+
+    Use this parameter to select only those keys that begin with the
+    specified prefix. You can use prefixes to separate a bucket into
+    different groupings of keys. (You can think of using prefix to make
+    groups in the same way that you'd use a folder in a file system.) You
+    can use prefix with delimiter to roll up numerous objects into a
+    single result under CommonPrefixes.
+
+- version-id-marker 
+
+    Specifies the object version you want to start listing from.
+
 ## err
 
 The S3 error code for the last error encountered.
@@ -694,7 +927,8 @@ Called to add extra retry codes if retry has been set
 
 ## turn\_off\_special\_retry
 
-Called to turn off special retry codes when we are deliberately triggering them
+Called to turn off special retry codes when we are deliberately
+triggering them
 
 # ABOUT
 
@@ -712,12 +946,13 @@ following notice:
 
 # TESTING
 
-Testing S3 is a tricky thing. Amazon wants to charge you a bit of 
-money each time you use their service. And yes, testing counts as using.
-Because of this, the application's test suite skips anything approaching 
-a real test unless you set these environment variables:
+Testing S3 is a tricky thing. Amazon wants to charge you a bit of
+money each time you use their service. And yes, testing counts as
+using.  Because of this, the application's test suite skips anything
+approaching a real test unless you set certain environment variables.
 
-For more on testing this module see [README-TESTING.md](https://github.com/rlauer6/perl-amazon-s3/blob/master/README-TESTING.md)
+For more on testing this module see
+[README-TESTING.md](https://github.com/rlauer6/perl-amazon-s3/blob/master/README-TESTING.md)
 
 - AMAZON\_S3\_EXPENSIVE\_TESTS
 
@@ -735,7 +970,7 @@ For more on testing this module see [README-TESTING.md](https://github.com/rlaue
     can override this behavior by setting `AWS_S3_DNS_BUCKET_NAMES` to any
     value.
 
-- AWS\_S3\_DSN\_BUCKET\_NAMES
+- AWS\_S3\_DNS\_BUCKET\_NAMES
 
     Set this to any value to override the default behavior of disabling
     DNS bucket names during testing.

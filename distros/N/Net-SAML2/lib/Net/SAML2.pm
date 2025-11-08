@@ -40,7 +40,7 @@ Net::SAML2 - SAML2 bindings and protocol implementation
 
 =head1 VERSION
 
-version 0.82
+version 0.83
 
 =head1 SYNOPSIS
 

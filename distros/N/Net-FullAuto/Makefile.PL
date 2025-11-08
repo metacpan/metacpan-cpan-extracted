@@ -25,7 +25,7 @@
 #
 ################################################################
 
-our $VERSION='1.0000827';
+our $VERSION='1.0000828';
 
 #print `env`,"\n\n\n";
 
@@ -893,6 +893,10 @@ END
 if (-e "dependencies/CPAN/authors" &&
       !(grep {
       /(?:use[-_]?)?internet|online|connect_to_internet_ok/i } @ARGV)) {
+   if (grep { /-*(?:add|all)[-_]?dependencies/i } @ARGV) { 
+      &fa_install_module('Sub::Exporter::Progressive','install','Makefile');
+      &fa_install_module('Compress::Raw::Zlib','install','Makefile');
+   }
    opendir(DH,"dependencies/CPAN/authors/id/F/FR/FREW") ||
       fa_die("Cannot open dir dependencies/CPAN/authors/id/F/FR/FREW: $1\n");
    my $filenames_not_trunced=0;my $got_sub=0;
@@ -954,10 +958,16 @@ END
       }
    }
    my $loc="$cwd/dependencies/CPAN";
-   $CPAN::Config->{urllist}="file:$loc";
+   $CPAN::Config->{urllist}=["file://$loc"];
+   $CPAN::Config->{pushy_https}=0;
    $CPAN::Config->{keep_source_where}=$loc;
-   $CPAN::Config->{connect_to_internet_ok}=1;
    $CPAN::Config->{index_expire}=1000;
+   unless (grep { /SKIP|CPAN|figlet|/ } @ARGV) {
+      unless (grep { /-*(?:add|all)[-_]?dependencies/i } @ARGV) {
+         CPAN::Shell->reload('index');
+      }
+   }
+
 }
 
 use File::Path;
@@ -1642,7 +1652,7 @@ if (grep { /-*(?:add|all)[-_]?dependencies/i } @ARGV) {
    my $f=$fs;
    $f=~s/^.*\/(.*)$/$1/;
    unless (-e "dependencies/FIGlet_fonts/$f") {
-      fa_system("(cd dependencies/FIGlet_fonts;wget $fs)");
+      fa_system("(mkdir -vp dependencies/FIGlet_fonts;cd dependencies/FIGlet_fonts;wget $fs)");
    }
 }
 
@@ -1788,6 +1798,7 @@ sub fa_install_mod {
             require CPAN::Mini;
             import CPAN::Mini;
          };
+         die $@ if $@;
          my $distribution = CPAN::Shell->expand(
                "Module",$p 
             )->distribution()->pretty_id();
@@ -1803,6 +1814,18 @@ sub fa_install_mod {
          );
          $minicpan->mirror_file(
             "authors/id/$let/$lett/$distribution");
+         #$minicpan->clean_file(
+         #   "dependencies/CPAN/authors/01mailrc.txt.gz");
+         #$minicpan->mirror_file(
+         #   "authors/01mailrc.txt.gz");
+         #$minicpan->clean_file(
+         #   "dependencies/CPAN/modules/02packages.details.txt.gz");
+         #$minicpan->mirror_file(
+         #   "modules/02packages.details.txt.gz");
+         #$minicpan->clean_file(
+         #   "dependencies/CPAN/modules/03modlist.data.gz");
+         #$minicpan->mirror_file(
+         #   "modules/03modlist.data.gz");
       }
    }
    my $mod_info='';my $instfile='';my $cpanfil='';
@@ -7182,5 +7205,36 @@ sub DLLname {}
 package ExtUtils::MM_Any;
 
 sub xs_dlsyms_ext {}
+
+package CPAN::Index;
+
+sub reload_x {
+   use File::Spec;
+   use Cwd;
+   use CPAN::Mini;
+   my($cl,$wanted,$localname,$force) = @_;
+   my $minicpan=CPAN::Mini->new(
+
+      remote => "http://www.cpan.org",
+      local  => cwd()."/dependencies/CPAN",
+      log_level => 'debug',
+      exact_mirror => 1,
+
+   );
+   $minicpan->clean_file(
+      "dependencies/CPAN/authors/01mailrc.txt.gz");
+   $minicpan->mirror_file(
+      "authors/01mailrc.txt.gz");
+   $minicpan->clean_file(
+      "dependencies/CPAN/modules/02packages.details.txt.gz");
+   $minicpan->mirror_file(
+      "modules/02packages.details.txt.gz");
+   $minicpan->clean_file(
+      "dependencies/CPAN/modules/03modlist.data.gz");
+   $minicpan->mirror_file(
+      "modules/03modlist.data.gz");
+   return File::Spec->catfile(&cwd."/dependencies/CPAN",
+                                        $localname);
+}
 
 1;

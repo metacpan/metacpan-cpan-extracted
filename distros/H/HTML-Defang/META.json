@@ -4,13 +4,13 @@
       "Rob Mueller <cpan@robm.fastmail.fm>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "HTML-Defang",
    "no_index" : {
@@ -35,5 +35,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : 1.07
+   "version" : 1.08,
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

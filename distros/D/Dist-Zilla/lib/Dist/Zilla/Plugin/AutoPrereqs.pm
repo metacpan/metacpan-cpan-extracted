@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::AutoPrereqs 6.033;
+package Dist::Zilla::Plugin::AutoPrereqs 6.034;
 # ABSTRACT: automatically extract prereqs from your modules
 
 use Moose;
@@ -168,7 +168,7 @@ Dist::Zilla::Plugin::AutoPrereqs - automatically extract prereqs from your modul
 
 =head1 VERSION
 
-version 6.033
+version 6.034
 
 =head1 SYNOPSIS
 

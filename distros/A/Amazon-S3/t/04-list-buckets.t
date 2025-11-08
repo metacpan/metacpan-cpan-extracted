@@ -5,9 +5,9 @@
 use warnings;
 use strict;
 
-use lib qw(. lib);
+use lib qw(. .. lib);
 
-use English qw{-no_match_vars};
+use English qw(-no_match_vars);
 
 use S3TestUtils qw(:constants :subs);
 
@@ -116,7 +116,7 @@ subtest 'list' => sub {
 ########################################################################
 
   my $marker = '';
-  my $iter   = 0; # so we don't loop forever if this is busted
+  my $iter   = 0;  # so we don't loop forever if this is busted
 
   my @key_list;
   my $page_size = int $max_keys / 2;
@@ -161,7 +161,7 @@ subtest 'list_v2' => sub {
 ########################################################################
 
   my $marker = '';
-  my $iter   = 0; # so we don't loop forever if this is busted
+  my $iter   = 0;  # so we don't loop forever if this is busted
 
   my @key_list;
   my $page_size = int $max_keys / 2;

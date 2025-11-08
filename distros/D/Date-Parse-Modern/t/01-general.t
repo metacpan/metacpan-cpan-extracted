@@ -20,8 +20,13 @@ is(strtotime('1970-01-01 00:00:01 UTC') , 1    , 'Epoch + 1');
 
 # General tests
 is(strtotime('1979-02-24')                 , 288691200        , 'YYYY-MM-DD');
+is(strtotime('1979-2-24')                  , 288691200        , 'YYYY-M-DD');
+is(strtotime('1979-2-4')                   , 286963200        , 'YYYY-M-D');
 is(strtotime('1979/04/16')                 , 293097600        , 'YYYY/MM/DD');
+is(strtotime('1979/4/6')                   , 292233600        , 'YYYY/M/D');
 is(strtotime('12-24-1999')                 , 946022400        , 'MM-DD-YYYY');
+is(strtotime('2-4-1999')                   , 923040000        , 'M-D-YYYY');
+is(strtotime('10-4-1999')                  , 923731200        , 'MM-D-YYYY');
 is(strtotime('Sat May  8 21:24:31 2021')   , 1620537871       , 'Human text string');
 is(strtotime('2000-02-29T12:34:56')        , 951856496        , 'ISO 8601');
 is(strtotime('1995-01-24T09:08:17.1823213'), 790967297.1823213, 'ISO 8601 with milliseconds');
@@ -35,6 +40,8 @@ is(strtotime('dec 21 1994 17:05')          , 788058300        , 'MMM DD YYYY');
 is(strtotime('dec 21 94 17:05')            , 788058300        , 'MMM DD YY');
 is(strtotime('dec 21 94 17:05 GMT')        , 788029500        , 'MMM DD YY text timezone');
 is(strtotime('dec 21 94 17:05 -1700')      , 788090700        , 'MMM DD YY numeric timezone');
+is(strtotime('June 1st 2020')              , 1590998400       , 'One digit day with a st/th/rd after it');
+is(strtotime('June 27th 2020')             , 1593244800       , 'Two digit day with a st/th/rd after it');
 
 cmp_ok(strtotime('May  4 01:04:16')         , '>=', 1683187456 , 'Text date WITHOUT year');
 cmp_ok(strtotime('10:00:00')                , '>=', 1673632800 , 'Time only');

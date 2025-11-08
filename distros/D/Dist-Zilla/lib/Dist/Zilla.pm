@@ -1,4 +1,4 @@
-package Dist::Zilla 6.033;
+package Dist::Zilla 6.034;
 # ABSTRACT: distribution builder; installer not included!
 
 use Moose 0.92; # role composition fixes
@@ -896,7 +896,7 @@ Dist::Zilla - distribution builder; installer not included!
 
 =head1 VERSION
 
-version 6.033
+version 6.034
 
 =head1 DESCRIPTION
 

@@ -1708,6 +1708,13 @@ sub apply {
             return 1;
         }
 
+        # support for @json (format value as JSON string)
+        if ($part eq '@json' || $part eq '@json()') {
+            @next_results = map { JQ::Lite::Util::_apply_tojson($_) } @results;
+            @$out_ref = @next_results;
+            return 1;
+        }
+
         # support for @csv (format array/scalar as CSV row)
         if ($part eq '@csv' || $part eq '@csv()') {
             @next_results = map { JQ::Lite::Util::_apply_csv($_) } @results;

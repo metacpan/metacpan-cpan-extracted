@@ -4,7 +4,7 @@
       "Rob Lauer <rlauer6@comcat.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -65,22 +65,30 @@
    "provides" : {
       "Amazon::S3" : {
          "file" : "lib/Amazon/S3.pm",
-         "version" : "0.65"
+         "version" : "v2.0.2"
       },
       "Amazon::S3::Bucket" : {
          "file" : "lib/Amazon/S3/Bucket.pm",
-         "version" : "0.65"
+         "version" : "v2.0.2"
+      },
+      "Amazon::S3::BucketV2" : {
+         "file" : "lib/Amazon/S3/BucketV2.pm",
+         "version" : "v2.0.2"
       },
       "Amazon::S3::Constants" : {
          "file" : "lib/Amazon/S3/Constants.pm",
-         "version" : "0.65"
+         "version" : "v2.0.2"
       },
       "Amazon::S3::Logger" : {
          "file" : "lib/Amazon/S3/Logger.pm",
-         "version" : "0.65"
+         "version" : "v2.0.2"
       },
       "Amazon::S3::Signature::V4" : {
          "file" : "lib/Amazon/S3/Signature/V4.pm",
+         "version" : "0"
+      },
+      "Amazon::S3::Util" : {
+         "file" : "lib/Amazon/S3/Util.pm",
          "version" : "0"
       }
    },
@@ -97,6 +105,6 @@
          "web" : "http://github.com/rlauer6/perl-amazon-s3"
       }
    },
-   "version" : "0.65",
-   "x_serialization_backend" : "JSON::PP version 4.10"
+   "version" : "v2.0.2",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,4 +1,4 @@
-package Dist::Zilla::Pragmas 6.033;
+package Dist::Zilla::Pragmas 6.034;
 # ABSTRACT: the pragmas (boilerplate!) to enable in each Dist::Zilla module
 
 use v5.20.0;
@@ -39,7 +39,7 @@ Dist::Zilla::Pragmas - the pragmas (boilerplate!) to enable in each Dist::Zilla 
 
 =head1 VERSION
 
-version 6.033
+version 6.034
 
 =head1 PERL VERSION
 

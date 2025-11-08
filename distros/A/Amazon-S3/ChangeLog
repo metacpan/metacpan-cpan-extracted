@@ -1,3 +1,137 @@
+Mon Jun 10 08:33:31 2024  Rob Lauer  <rlauer6@comcast.net>
+
+	[2.0.2]:
+	* src/main/perl/lib/Amazon/S3/Bucket.pm.in
+	- issue #16 - Small fix for error when retrieving keys
+	  with charset spec in content-type
+	* src/main/perl/lib/Amazon/S3.pm.in
+	- issue #17 - Fixed a bug where encryption was impossible in special cases
+	* VERSION: bump
+	* README.md: version
+
+Mon Jun 10 07:30:59 2024  Rob Lauer  <rlauer6@comcast.net>
+
+	[0.66]:
+	* NEWS.md: updated
+	* .gitignore: *.log
+	* src/main/perl/run-test: new from test.localstack
+	* src/main/perl/S3TestUtils.pm
+	(set_s3_host): AMAZON_S3_SKIP_ACLS, not SKIP_PERMISSIONS
+	* src/main/perl/t/01-api.t
+	- likewise
+	(like_acl_allrusers_read):
+	- dump flag
+	* src/main/perl/t/04-list-buckets.t: whitespace
+	* src/main/perl/t/06-list-multipart-uploads.t
+	- ignore case on status header (LocalStack <> AWS)
+
+Mon Apr 22 15:14:36 2024  Rob Lauer  <rlauer6@comcast.net>
+
+	[2.0.1]:
+	* VERSION: 2.0.1
+	* NEWS.md: notes on version 2
+	* README.md: generated
+	* src/main/perl/lib/Amazon/S3/BucketV2.pm.in
+	- pod tweaks and additions
+	- whitespace
+
+Tue Dec 26 07:58:33 2023  Rob Lauer  <rlauer6@comcast.net>
+
+	[0.66]:
+	* README.md: generated
+	* src/main/perl/lib/Amazon/S3/Constants.pm.in
+	- + $HTTP_NO_CONTENT, $HTTP_PARTIAL_CONTENT
+	* src/main/perl/lib/Amazon/S3/Bucket.pm.in
+	(upload_part_of_multipart_upload): refactored, use create_api_uri()
+	(get_key_v2): new
+	(get_key): support list or hashref as args include uri_params
+	(_get_key): refactored
+	(get_key_filename): refactored, accept hash of args
+	* src/main/perl/lib/Amazon/S3.pm.in
+	- pod tweaks
+	- refactoring, use methods from Amazon::S3::Util
+	- some support for express one-zone
+	(use_express_one_zone): new
+	(add_bucket): refactored to use _add_bucket()
+	(_add_bucket): new
+	(list_directory_buckets): new
+	(list_object_versions): refactored using create_api_uri()
+	(signer): support for express one-zone
+	(_make_request)
+	- set Content-Length header
+	- only set content if we have data
+	* src/main/perl/lib/Amazon/S3/Util.pm.in
+	(create_query_string): refactored
+	(create_api_uri): new
+	* s3-perl.pl
+	- new options, availability-zone, modified-since
+	(list_directory_buckets): new
+	(create_bucket): support expresss one-zone
+	(list_object_versions): new
+>>>>>>> master
+
+Thu Nov 30 13:56:08 2023  Rob Lauer  <rlauer6@comcast.net>
+
+	[0.66]:
+	* VERSION: bump
+	* NEWS.md: updated
+	* README.md: generated
+	* src/main/perl/lib/Amazon/S3.pm.in: pod updates
+	* README.md: generated
+	* src/main/perl/lib/Amazon/S3/BucketV2.pm.in: new
+	* src/main/perl/lib/Amazon/S3/Util.pm.in: new
+	* src/main/perl/lib/Makefile.am: add above to build
+	* src/main/perl/lib/Amazon/S3.pm.in
+	- refactoring
+	- updated pod
+	(add_bucket): allow additional headers
+	(delete_bucket): likewise
+	(list_bucket)
+	- likewise
+	- allow query parameters
+	(_validate_acl_short): refactored
+	(_make_request): refactored
+	(adjust_region): refactored
+	(_do_http): refactored
+	(_send_request_expect_nothing): refactored
+	(_send_request_expect_nothing_probed): refactored
+	(_remember_errors): refactored
+	(_add_auth_header): refactored
+	(_merge_meta): refactored
+	(_encode): refactored
+	* src/main/perl/lib/Amazon/S3/Bucket.pm.in
+	- refactored
+	(new): refactored
+	(_uri): refactored
+	(add_key): allow for additional headers
+	(upload_mulipart_object)
+	- refactored
+	- allow additional headers
+	(initiate_multipart_upload): likewise
+	(upload_part_of_multipart_upload): likewise
+	(make_xml_document_simple): replaced with _create_multipart_upload_request()
+	(get_key): call _get_key() now
+	(_get_key)
+	- renamed from get_key()
+	- allow additional headers
+	(copy_object): refactored
+	(delete_keys)
+	- refactored
+	- allow additional headers
+	* src/main/perl/lib/Amazon/S3/Constants.pm.in
+	- + $AWS_METADATA_BASE_URL
+	- + markers for ListObjectVersions
+	* src/main/perl/t/01-api.t
+	- create private bucket first, then delete public access block
+	(list_all)
+	- refactored
+	- allow additional headers
+	(get_acl)
+	- refactored
+	- allow additional headers
+	(get_location_constraint): refactored
+	(_create_multipart_upload_request): new
+
 Tue Nov 28 17:42:44 2023  Rob Lauer  <rlauer6@comcast.net>
 
 	[0.65]:

@@ -1,4 +1,4 @@
-package Dist::Zilla::Role::BuildRunner 6.033;
+package Dist::Zilla::Role::BuildRunner 6.034;
 # ABSTRACT: something used as a delegating agent during 'dzil run'
 
 use Moose::Role;
@@ -37,7 +37,7 @@ Dist::Zilla::Role::BuildRunner - something used as a delegating agent during 'dz
 
 =head1 VERSION
 
-version 6.033
+version 6.034
 
 =head1 DESCRIPTION
 

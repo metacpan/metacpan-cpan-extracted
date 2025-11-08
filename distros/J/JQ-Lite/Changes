@@ -1,3 +1,11 @@
+1.39  2025-11-09
+    - Add jq-compatible --arg option to the CLI and wire variables into the engine.
+    - Allow passing initial variables when constructing JQ::Lite instances.
+    - Document the new option and add regression tests for variable access.
+
+1.38  2025-11-08
+    - Release jq-compatible @json formatter support with documentation and tests.
+
 1.37  2025-11-02
     - Release parenthesized pipeline evaluation improvements in expressions.
 
@@ -911,6 +919,7 @@
     - Removed use of eval in _evaluate_condition for better performance and stability.
     - Refactored _traverse for readability and maintainability.
     - Added support for multi-level array traversal (e.g., .users[].friends[].name).
+
 
 
 

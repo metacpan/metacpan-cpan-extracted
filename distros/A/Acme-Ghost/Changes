@@ -1,5 +1,8 @@
 # Version/Revision history
 
+1.02 Fri 07 Nov 2025 19:22:49 MSK
+    * The module was accidentally deleted
+
 1.01 Sat 20 Jan 2024 21:50:45 MSK
     * Added Prefork module
     * Added OS requirements in Makefile.PL

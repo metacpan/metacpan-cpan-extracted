@@ -4,7 +4,6 @@ use warnings;
 use IPC::Run3;
 use IPC::System::Simple qw(system);
 use Test::Most;
-use Test::DescribeMe qw(author);	# Not implemented yet
 
 use App::Test::Generator qw(generate);
 

@@ -1,7 +1,7 @@
 package Net::SAML2::IdP;
 use Moose;
 
-our $VERSION = '0.82'; # VERSION
+our $VERSION = '0.83'; # VERSION
 
 # ABSTRACT: SAML Identity Provider object
 
@@ -272,7 +272,7 @@ Net::SAML2::IdP - SAML Identity Provider object
 
 =head1 VERSION
 
-version 0.82
+version 0.83
 
 =head1 SYNOPSIS
 

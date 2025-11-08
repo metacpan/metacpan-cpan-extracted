@@ -9,14 +9,17 @@ use JQ::Lite::Filters;
 use JQ::Lite::Parser;
 use JQ::Lite::Util ();
 
-our $VERSION = '1.37';
+our $VERSION = '1.39';
 
 sub new {
     my ($class, %opts) = @_;
     my $self = {
-        raw => $opts{raw} || 0,
+        raw   => $opts{raw} || 0,
         _vars => {},
     };
+    if (exists $opts{vars} && ref $opts{vars} eq 'HASH') {
+        $self->{_vars} = { %{ $opts{vars} } };
+    }
     return bless $self, $class;
 }
 
@@ -57,7 +60,7 @@ JQ::Lite - A lightweight jq-like JSON query engine in Perl
 
 =head1 VERSION
 
-Version 1.37
+Version 1.39
 
 =head1 SYNOPSIS
 
@@ -142,7 +145,9 @@ C<select>, C<empty>, C<not>, C<test>, C<reduce>, C<foreach>, C<if> / C<then> / C
 
   my $jq = JQ::Lite->new;
 
-Creates a new instance. Options may be added in future versions.
+Creates a new instance. Pass C<raw =E<gt> 1> to enable raw output and
+C<vars =E<gt> \%hash> to predeclare jq-style variables (for example,
+C<JQ::Lite-E<gt>new(vars =E<gt> { name =E<gt> 'Alice' })>).
 
 =head1 METHODS
 

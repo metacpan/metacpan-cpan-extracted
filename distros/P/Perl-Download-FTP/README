@@ -2,8 +2,8 @@ README for Perl extension Perl-Download-FTP
 
 Perl::Download::FTP - Identify Perl releases and download the most recent via FTP
 
-This document refers to version 0.05 of Perl-Download-FTP.
-This version was released July 07 2018.
+This document refers to version 0.06 of Perl-Download-FTP.
+This version was released November 6 2025.
 
 SYNOPSIS
 
@@ -41,9 +41,9 @@ INSTALLATION
 To install this module on your system, place the tarball archive file in a
 temporary directory and call the following:
 
-    gunzip Perl-Download-FTP-0.05.tar.gz
-    tar xf Perl-Download-FTP-0.05.tar
-    cd Perl-Download-FTP-0.05
+    gunzip Perl-Download-FTP-0.06.tar.gz
+    tar xf Perl-Download-FTP-0.06.tar
+    cd Perl-Download-FTP-0.06
     perl Makefile.PL
     make
     make test

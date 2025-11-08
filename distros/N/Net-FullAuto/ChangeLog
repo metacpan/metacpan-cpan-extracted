@@ -20,6 +20,15 @@
 #######################################################################
 
 
+2025-11-06  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000828 released
+
+        * Updated Makefile.PL for COMPLETE builds
+
+	* Updated &send_email in FA_Core.pm to
+	  accept sasl credentials
+
 2025-08-21  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000827 released

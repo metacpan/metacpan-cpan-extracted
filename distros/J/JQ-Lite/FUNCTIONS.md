@@ -44,7 +44,7 @@ Functions are grouped by purpose for easier lookup.
 | `split(sep)`, `join(sep)`            | Split and join                       |
 | `substr(start, len)`                 | Substring extraction                 |
 | `replace(old, new)`                  | Replace substring (literal)          |
-| `@csv`, `@tsv`, `@base64`, `@uri`    | Format value as CSV/TSV row, Base64 string, or percent-encoded URI |
+| `@json`, `@csv`, `@tsv`, `@base64`, `@uri` | Format value as JSON, CSV/TSV row, Base64 string, or percent-encoded URI |
 | `explode()`, `implode()`             | String ↔ Unicode code points         |
 | `tostring`, `tojson`, `fromjson`     | Serialization utilities              |
 

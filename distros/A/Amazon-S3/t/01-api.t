@@ -3,13 +3,13 @@
 use warnings;
 use strict;
 
-use lib qw( . lib);
+use lib qw( . .. lib);
 
 use Data::Dumper;
 use Digest::MD5::File qw(file_md5_hex);
-use English           qw{-no_match_vars};
-use File::Temp        qw{ tempfile };
-use List::Util        qw(any);
+use English qw(-no_match_vars);
+use File::Temp qw( tempfile );
+use List::Util qw(any);
 use Test::More;
 
 use S3TestUtils qw(:constants :subs);
@@ -75,7 +75,7 @@ for my $location (@REGIONS) {
     $bucket_obj = eval {
       $s3->add_bucket(
         { bucket              => $bucket_name,
-          acl_short           => 'public-read',
+          acl_short           => 'private',
           location_constraint => $location
         }
       );
@@ -115,13 +115,19 @@ for my $location (@REGIONS) {
       skip 'ACLs only for Amazon S3', 3;
     }
 
+    eval { $s3->delete_public_access_block($bucket_obj); };
+
+    BAIL_OUT($EVAL_ERROR)
+      if $EVAL_ERROR;
+
+    my $rsp = $bucket_obj->set_acl( { acl_short => 'public-read' } );
+
     like_acl_allusers_read($bucket_obj);
 
-    my $rsp = $bucket_obj->set_acl( { acl_short => 'private' } );
+    $rsp = $bucket_obj->set_acl( { acl_short => 'private' } );
 
     ok( $rsp, 'set_acl - private' )
-      or diag(
-      Dumper( [ response => $rsp, $s3->err, $s3->errstr, $s3->error ] ) );
+      or diag( Dumper( [ response => $rsp, $s3->err, $s3->errstr, $s3->error ] ) );
 
     unlike_acl_allusers_read($bucket_obj);
   }
@@ -188,8 +194,7 @@ for my $location (@REGIONS) {
         skip 'ACLs only for Amazon S3', 3;
       }
 
-      is_request_response_code( $url, $HTTP_OK,
-        'can access the publicly readable key' );
+      is_request_response_code( $url, $HTTP_OK, 'can access the publicly readable key' );
 
       like_acl_allusers_read( $bucket_obj, $keyname );
 
@@ -203,12 +208,11 @@ for my $location (@REGIONS) {
     }
 
     SKIP: {
-      if ( $ENV{AMAZON_S3_SKIP_PERMISSIONS} ) {
+      if ( $ENV{AMAZON_S3_SKIP_ACLS} ) {
         skip 'Mocking service does not enforce ACLs', 1;
       }
 
-      is_request_response_code( $url, $HTTP_FORBIDDEN,
-        'cannot access the private key' );
+      is_request_response_code( $url, $HTTP_FORBIDDEN, 'cannot access the private key' );
     }
 
     SKIP: {
@@ -226,8 +230,7 @@ for my $location (@REGIONS) {
         )
       );
 
-      is_request_response_code( $url,
-        $HTTP_OK, 'can access the publicly readable key after acl_xml set' );
+      is_request_response_code( $url, $HTTP_OK, 'can access the publicly readable key after acl_xml set' );
 
       like_acl_allusers_read( $bucket_obj, $keyname );
 
@@ -241,12 +244,11 @@ for my $location (@REGIONS) {
     }
 
     SKIP: {
-      if ( $ENV{AMAZON_S3_SKIP_PERMISSIONS} ) {
+      if ( $ENV{AMAZON_S3_SKIP_ACLS} ) {
         skip 'Mocking service does not enforce ACLs', 2;
       }
 
-      is_request_response_code( $url,
-        $HTTP_FORBIDDEN, 'cannot access the private key after acl_xml set' );
+      is_request_response_code( $url, $HTTP_FORBIDDEN, 'cannot access the private key after acl_xml set' );
 
       unlike_acl_allusers_read( $bucket_obj, $keyname );
     }
@@ -275,12 +277,11 @@ for my $location (@REGIONS) {
       : "http://$host/$bucket_name/$keyname2";
 
     SKIP: {
-      if ( $ENV{AMAZON_S3_SKIP_PERMISSIONS} ) {
+      if ( $ENV{AMAZON_S3_SKIP_ACLS} ) {
         skip 'Mocking service does not enforce ACLs', 1;
       }
 
-      is_request_response_code( $url, $HTTP_FORBIDDEN,
-        'cannot access the private key' );
+      is_request_response_code( $url, $HTTP_FORBIDDEN, 'cannot access the private key' );
     }
 
     SKIP: {
@@ -298,8 +299,7 @@ for my $location (@REGIONS) {
         )
       );
 
-      is_request_response_code( $url,
-        $HTTP_OK, 'can access the publicly readable key' );
+      is_request_response_code( $url, $HTTP_OK, 'can access the publicly readable key' );
 
       like_acl_allusers_read( $bucket_obj, $keyname2 );
 
@@ -322,8 +322,7 @@ for my $location (@REGIONS) {
       BAIL_OUT( $s3->err . ': ' . $s3->errstr );
     }
 
-    is( $response->{bucket}, $bucket_name_raw, sprintf 'list(%s) - %s',
-      $v, $bucket_name );
+    is( $response->{bucket}, $bucket_name_raw, sprintf 'list(%s) - %s', $v, $bucket_name );
 
     ok( !$response->{prefix}, "list($v) - prefix empty" )
       or diag( Dumper [$response] );
@@ -344,7 +343,7 @@ for my $location (@REGIONS) {
 
     # the etag is the MD5 of the value
     is( $key->{etag}, 'b9ece18c950afbfa6b0fdbfa4ff731d3', "list($v) - etag" );
-    is( $key->{size}, 1, "list($v) - size == 1" );
+    is( $key->{size}, 1,                                  "list($v) - size == 1" );
 
     SKIP: {
       if ( $ENV{AMAZON_S3_SKIP_OWNER_ID_TEST} ) {
@@ -355,8 +354,7 @@ for my $location (@REGIONS) {
         or diag( Dumper [$key] );
     }
 
-    is( $key->{owner_displayname},
-      $OWNER_DISPLAYNAME, "list($v) - owner display name" );
+    is( $key->{owner_displayname}, $OWNER_DISPLAYNAME, "list($v) - owner display name" );
   }
 
   # You can't delete a bucket with things in it
@@ -395,34 +393,31 @@ EOT
   $response = $bucket_obj->get_key($keyname);
 
   is( $response->{content_type}, 'text/plain', 'get_key - content_type' );
+
   like( $response->{value}, qr/Lorem\sipsum/xsm, 'get_key - Lorem ipsum' );
 
   is( $response->{etag}, $lorem_ipsum_md5, 'get_key - etag' )
     or diag( Dumper [$response] );
 
   is( $response->{'x-amz-meta-colour'}, 'orangy', 'get_key - metadata' );
-  is( $response->{content_length},
-    $lorem_ipsum_size, 'get_key - content_type' );
+
+  is( $response->{content_length}, $lorem_ipsum_size, 'get_key - content_type' );
 
   eval { unlink $lorem_ipsum };
 
   $response = $bucket_obj->get_key_filename( $keyname, undef, $lorem_ipsum );
 
-  is( $response->{content_type},
-    'text/plain', 'get_key_filename - content_type' );
+  is( $response->{content_type}, 'text/plain', 'get_key_filename - content_type' );
 
   is( $response->{value}, $EMPTY, 'get_key_filename - value empty' );
 
   is( $response->{etag}, $lorem_ipsum_md5, 'get_key_filename - etag == md5' );
 
-  is( file_md5_hex($lorem_ipsum),
-    $lorem_ipsum_md5, 'get_key_filename - file md5' );
+  is( file_md5_hex($lorem_ipsum), $lorem_ipsum_md5, 'get_key_filename - file md5' );
 
-  is( $response->{'x-amz-meta-colour'},
-    'orangy', 'get_key_filename - metadata' );
+  is( $response->{'x-amz-meta-colour'}, 'orangy', 'get_key_filename - metadata' );
 
-  is( $response->{content_length},
-    $lorem_ipsum_size, 'get_key_filename - content_length' );
+  is( $response->{content_length}, $lorem_ipsum_size, 'get_key_filename - content_length' );
 
   # before we delete this key...
 
@@ -449,14 +444,9 @@ EOT
 
   is( $response->{value}, $EMPTY, 'empty object - value empty' );
 
-  is(
-    $response->{etag},
-    'd41d8cd98f00b204e9800998ecf8427e',
-    'empty object - etag'
-  );
+  is( $response->{etag}, 'd41d8cd98f00b204e9800998ecf8427e', 'empty object - etag' );
 
-  is( $response->{content_type},
-    'binary/octet-stream', 'empty object - content_type' );
+  is( $response->{content_type}, 'binary/octet-stream', 'empty object - content_type' );
 
   is( $response->{content_length}, 0, 'empty object - content_length == 0' );
 
@@ -469,21 +459,17 @@ EOT
 
   $bucket_name =~ s/^\///xsm;
 
-  is( $response->{bucket}, $bucket_name,
-    'delete key from bucket - ' . $bucket_name );
+  is( $response->{bucket}, $bucket_name, 'delete key from bucket - ' . $bucket_name );
 
   ok( !$response->{prefix}, 'delete key from bucket - prefix empty' );
 
   ok( !$response->{marker}, 'delete key from bucket - marker empty' );
 
-  is( $response->{max_keys}, 1_000,
-    'delete key from bucket - max keys 1000' );
+  is( $response->{max_keys}, 1_000, 'delete key from bucket - max keys 1000' );
 
-  is( $response->{is_truncated},
-    0, 'delete key from bucket - is_truncated 0' );
+  is( $response->{is_truncated}, 0, 'delete key from bucket - is_truncated 0' );
 
-  is_deeply( $response->{keys}, [],
-    'delete key from bucket - empty list of keys' );
+  is_deeply( $response->{keys}, [], 'delete key from bucket - empty list of keys' );
 
   ######################################################################
   # delete multiple keys from bucket
@@ -522,8 +508,8 @@ EOT
       'could not delete quietly '
         . Dumper(
         [ response      => $delete_rsp,
-          last_request  => $s3->get_last_request,
-          last_response => $s3->get_last_response,
+          last_request  => $s3->last_request,
+          last_response => $s3->last_response,
         ]
         )
       );
@@ -531,11 +517,7 @@ EOT
     $response = $bucket_obj->list
       or die $s3->err . ': ' . $s3->errstr;
 
-    is(
-      scalar @{ $response->{keys} },
-      -2 + scalar(@key_list),
-      'delete versioned keys'
-    );
+    is( scalar @{ $response->{keys} }, -2 + scalar(@key_list), 'delete versioned keys' );
 
     shift @key_list;
     shift @key_list;
@@ -551,11 +533,7 @@ EOT
     $response = $bucket_obj->list
       or die $s3->err . ': ' . $s3->errstr;
 
-    is(
-      scalar @{ $response->{keys} },
-      -2 + scalar(@key_list),
-      'delete list of keys'
-    );
+    is( scalar @{ $response->{keys} }, -2 + scalar(@key_list), 'delete list of keys' );
 
     shift @key_list;
     shift @key_list;
@@ -571,11 +549,7 @@ EOT
     $response = $bucket_obj->list
       or die $s3->err . ': ' . $s3->errstr;
 
-    is(
-      scalar @{ $response->{keys} },
-      -2 + scalar(@key_list),
-      'delete array of keys'
-    );
+    is( scalar @{ $response->{keys} }, -2 + scalar(@key_list), 'delete array of keys' );
 
     shift @key_list;
     shift @key_list;
@@ -633,11 +607,14 @@ sub is_request_response_code {
 ########################################################################
 sub like_acl_allusers_read {
 ########################################################################
-  my ( $bucket_obj, $keyname ) = @_;
+  my ( $bucket_obj, $keyname, $dump ) = @_;
 
   my $message = acl_allusers_read_message( 'like', $bucket_obj, $keyname );
 
   my $acl = $bucket_obj->get_acl($keyname);
+
+  diag( Dumper( [ acl => $acl ] ) )
+    if $dump;
 
   like( $acl, qr/AllUsers.+READ/xsm, $message )
     or diag( Dumper( [ acl => $acl ] ) );
@@ -665,8 +642,7 @@ sub acl_allusers_read_message {
 ########################################################################
   my ( $like_or_unlike, $bucket_obj, $keyname ) = @_;
 
-  my $message = sprintf '%s_acl_allusers_read: %s', $like_or_unlike,
-    $bucket_obj->bucket;
+  my $message = sprintf '%s_acl_allusers_read: %s', $like_or_unlike, $bucket_obj->bucket;
 
   if ($keyname) {
     $message .= " - $keyname";
@@ -682,8 +658,7 @@ sub acl_xml_from_acl_short {
 
   $acl_short //= 'private';
 
-  my $public_read
-    = $acl_short eq 'public-read' ? $PUBLIC_READ_POLICY : $EMPTY;
+  my $public_read = $acl_short eq 'public-read' ? $PUBLIC_READ_POLICY : $EMPTY;
 
   my $policy = <<"END_OF_POLICY";
 <?xml version="1.0" encoding="UTF-8"?>

@@ -1,10 +1,8 @@
 ChangeLog
 MANIFEST
 Makefile.PL
-README
 README.md
 bin/camt
-bin/make-abbrvs
 bin/make-templates
 examples/danskeci.com/README.md
 examples/danskeci.com/camt053_dk_example.xml
@@ -41,6 +39,7 @@ lib/Business/CAMT/xsd/camt.021.001.06.xsd
 lib/Business/CAMT/xsd/camt.023.001.07.xsd
 lib/Business/CAMT/xsd/camt.024.001.08.xsd
 lib/Business/CAMT/xsd/camt.025.001.08.xsd
+lib/Business/CAMT/xsd/camt.025.001.09.xsd
 lib/Business/CAMT/xsd/camt.026.001.10.xsd
 lib/Business/CAMT/xsd/camt.027.001.10.xsd
 lib/Business/CAMT/xsd/camt.028.001.12.xsd
@@ -68,9 +67,12 @@ lib/Business/CAMT/xsd/camt.049.001.07.xsd
 lib/Business/CAMT/xsd/camt.050.001.07.xsd
 lib/Business/CAMT/xsd/camt.051.001.07.xsd
 lib/Business/CAMT/xsd/camt.052.001.12.xsd
+lib/Business/CAMT/xsd/camt.052.001.13.xsd
 lib/Business/CAMT/xsd/camt.053.001.02.xsd
 lib/Business/CAMT/xsd/camt.053.001.12.xsd
+lib/Business/CAMT/xsd/camt.053.001.13.xsd
 lib/Business/CAMT/xsd/camt.054.001.12.xsd
+lib/Business/CAMT/xsd/camt.054.001.13.xsd
 lib/Business/CAMT/xsd/camt.055.001.12.xsd
 lib/Business/CAMT/xsd/camt.056.001.11.xsd
 lib/Business/CAMT/xsd/camt.057.001.08.xsd
@@ -80,6 +82,8 @@ lib/Business/CAMT/xsd/camt.060.001.07.xsd
 lib/Business/CAMT/xsd/camt.061.001.02.xsd
 lib/Business/CAMT/xsd/camt.062.001.03.xsd
 lib/Business/CAMT/xsd/camt.063.001.02.xsd
+lib/Business/CAMT/xsd/camt.064.001.01.xsd
+lib/Business/CAMT/xsd/camt.065.001.01.xsd
 lib/Business/CAMT/xsd/camt.066.001.02.xsd
 lib/Business/CAMT/xsd/camt.067.001.02.xsd
 lib/Business/CAMT/xsd/camt.068.001.02.xsd
@@ -101,16 +105,22 @@ lib/Business/CAMT/xsd/camt.085.001.02.xsd
 lib/Business/CAMT/xsd/camt.086.001.05.xsd
 lib/Business/CAMT/xsd/camt.087.001.09.xsd
 lib/Business/CAMT/xsd/camt.088.001.02.xsd
+lib/Business/CAMT/xsd/camt.088.001.03.xsd
 lib/Business/CAMT/xsd/camt.101.001.02.xsd
 lib/Business/CAMT/xsd/camt.102.001.03.xsd
 lib/Business/CAMT/xsd/camt.103.001.03.xsd
 lib/Business/CAMT/xsd/camt.104.001.01.xsd
 lib/Business/CAMT/xsd/camt.105.001.02.xsd
+lib/Business/CAMT/xsd/camt.105.001.03.xsd
 lib/Business/CAMT/xsd/camt.106.001.02.xsd
+lib/Business/CAMT/xsd/camt.106.001.03.xsd
 lib/Business/CAMT/xsd/camt.107.001.02.xsd
 lib/Business/CAMT/xsd/camt.108.001.02.xsd
 lib/Business/CAMT/xsd/camt.109.001.02.xsd
 lib/Business/CAMT/xsd/camt.110.001.01.xsd
 lib/Business/CAMT/xsd/camt.111.001.01.xsd
+lib/Business/CAMT/xsd/camt.111.001.02.xsd
+t/00use.t
+xt/99pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -10,9 +10,9 @@ use File::chdir;
 use Getopt::Long::Complete qw(GetOptionsWithCompletion);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-11-04'; # DATE
+our $DATE = '2025-11-07'; # DATE
 our $DIST = 'App-CdUtils'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 # FRAGMENT id=shcompgen-hint completer=1 for=cdpart
 
@@ -113,7 +113,7 @@ cdpart-backend - Change directory part
 
 =head1 VERSION
 
-This document describes version 0.012 of cdpart-backend (from Perl distribution App-CdUtils), released on 2025-11-04.
+This document describes version 0.013 of cdpart-backend (from Perl distribution App-CdUtils), released on 2025-11-07.
 
 =head1 SYNOPSIS
 

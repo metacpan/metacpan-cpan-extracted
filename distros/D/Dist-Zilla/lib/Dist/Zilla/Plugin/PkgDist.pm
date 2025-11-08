@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::PkgDist 6.033;
+package Dist::Zilla::Plugin::PkgDist 6.034;
 # ABSTRACT: add a $DIST to your packages
 
 use Moose;
@@ -121,7 +121,7 @@ Dist::Zilla::Plugin::PkgDist - add a $DIST to your packages
 
 =head1 VERSION
 
-version 6.033
+version 6.034
 
 =head1 DESCRIPTION
 

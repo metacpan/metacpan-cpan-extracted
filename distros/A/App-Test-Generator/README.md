@@ -4,7 +4,7 @@ App::Test::Generator - Generate fuzz and corpus-driven test harnesses
 
 # VERSION
 
-Version 0.12
+Version 0.14
 
 # SYNOPSIS
 
@@ -233,6 +233,32 @@ Recognized items:
                     integer => [ 0, 1, -1, 2**31-1, -(2**31), 2**63-1, -(2**63) ],
             );
 
+- `%edge_case_array` - specify edge case values for routines that accept a single unnamed parameter
+
+    This is specifically designed for simple functions that take one argument without a parameter name.
+    These edge cases supplement the normal random string generation, ensuring specific problematic values are always tested.
+    During fuzzing iterations, there's a 40% probability that a test case will use a value from edge\_case\_array instead of randomly generated data.
+
+        ---
+        module: Text::Processor
+        function: sanitize
+
+        input:
+          type: string
+          min: 1
+          max: 1000
+
+        edge_case_array:
+          - "<script>alert('xss')</script>"
+          - "'; DROP TABLE users; --"
+          - "\0null\0byte"
+          - "emoji😊test"
+          - ""
+          - " "
+
+        seed: 42
+        iterations: 50
+
 - `%config` - optional hash of configuration.
 
     The current supported variables are
@@ -261,7 +287,7 @@ Transforms allow you to define how input data should be transformed into output 
 This is useful for testing functions that convert between formats, normalize data,
 or apply business logic transformations on a set of data to different set of data.
 
-Transform schemas also have the keyword `value`, when a specific value is required
+Transform schema also have the keyword `value`, when a specific value is required
 
 ### Configuration Example
 
@@ -507,7 +533,17 @@ This example takes you through testing the online\_render method of [HTML::Genea
 
     jobs:
       generate-fuzz-tests:
-        runs-on: ubuntu-latest
+        strategy:
+          fail-fast: false
+          matrix:
+            os:
+              - macos-latest
+              - ubuntu-latest
+              - windows-latest
+            perl: ['5.42', '5.40', '5.38', '5.36', '5.34', '5.32', '5.30', '5.28', '5.22']
+
+        runs-on: ${{ matrix.os }}
+        name: Fuzz testing with perl ${{ matrix.perl }} on ${{ matrix.os }}
 
         steps:
           - uses: actions/checkout@v5
@@ -515,7 +551,7 @@ This example takes you through testing the online\_render method of [HTML::Genea
           - name: Set up Perl
             uses: shogo82148/actions-setup-perl@v1
             with:
-              perl-version: '5.42'
+              perl-version: ${{ matrix.perl }}
 
           - name: Install App::Test::Generator this module's dependencies
             run: |
@@ -528,6 +564,7 @@ This example takes you through testing the online\_render method of [HTML::Genea
               make
             env:
               AUTOMATED_TESTING: 1
+              NONINTERACTIVE_TESTING: 1
 
           - name: Generate fuzz tests
             run: |
@@ -542,6 +579,7 @@ This example takes you through testing the online\_render method of [HTML::Genea
               prove -lr t/fuzz/
             env:
               AUTOMATED_TESTING: 1
+              NONINTERACTIVE_TESTING: 1
 
 # METHODS
 
@@ -559,7 +597,8 @@ Takes a schema file and produces a test file (or STDOUT).
 - [Params::Validate::Strict](https://metacpan.org/pod/Params%3A%3AValidate%3A%3AStrict): Schema Definition
 - [Params::Get](https://metacpan.org/pod/Params%3A%3AGet): Input validation
 - [Return::Set](https://metacpan.org/pod/Return%3A%3ASet): Output validation
-- [Test::Most](https://metacpan.org/pod/Test%3A%3AMost), [YAML::XS](https://metacpan.org/pod/YAML%3A%3AXS)
+- [Test::Most](https://metacpan.org/pod/Test%3A%3AMost)
+- [YAML::XS](https://metacpan.org/pod/YAML%3A%3AXS)
 
 # AUTHOR
 

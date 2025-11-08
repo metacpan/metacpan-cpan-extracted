@@ -1,14 +1,16 @@
 ---
-abstract: unknown
+abstract: 'ISO20022 Cash Management (CAMT) messages'
 author:
   - 'Mark Overmeer <markov@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::More: '1'
+  Test::Pod: '1'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 0
+dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
-license: unknown
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -17,8 +19,6 @@ no_index:
   directory:
     - t
     - inc
-    - t
-    - xt
 requires:
   Data::Dumper: '0'
   Getopt::Long: '0'
@@ -27,15 +27,30 @@ requires:
   Log::Report: '1.32'
   Path::Class: '0'
   Scalar::Util: '0'
-  Test::More: '0'
   XML::Compile: '1.64'
   XML::Compile::Cache: '1.06'
   XML::LibXML: '2.0207'
-  perl: '5.020000'
 resources:
-  bugtracker: https://github.com/markov2/perl5-Business-CAMT/issues
-  homepage: http://perl.overmeer.net
-  license: http://dev.perl.org/licenses/
+  homepage: http://perl.overmeer.net/CPAN/
   repository: https://github.com/markov2/perl5-Business-CAMT.git
-version: '0.13'
+version: '0.14'
+x_oodist:
+  email: markov@cpan.org
+  first_year: 2024
+  generate:
+    -
+      format: pod3
+      podtail: ~
+  include: []
+  oodoc_version: 3.05
+  parser:
+    pmhead: ~
+    skip_links: []
+    syntax: markov
+  raw:
+    publish: ../public_html/business-camt/raw
+  release:
+    publish: ../public_html/business-camt/source
+  tests: {}
+  use: []
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

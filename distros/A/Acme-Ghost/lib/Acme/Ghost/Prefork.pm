@@ -356,7 +356,7 @@ Serż Minus (Sergey Lepenkov) L<https://www.serzik.com> E<lt>abalama@cpan.orgE<g
 
 =head1 COPYRIGHT
 
-Copyright (C) 1998-2024 D&D Corporation. All Rights Reserved
+Copyright (C) 1998-2025 D&D Corporation. All Rights Reserved
 
 =head1 LICENSE
 
@@ -366,8 +366,6 @@ modify it under the same terms as Perl itself.
 See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
-
-our $VERSION = '1.01';
 
 use parent qw/Acme::Ghost/;
 

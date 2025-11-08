@@ -1,10 +1,10 @@
 package Net::SAML2::Binding::Redirect;
 use Moose;
 
-our $VERSION = '0.82'; # VERSION
+our $VERSION = '0.83'; # VERSION
 
 use Carp qw(croak);
-use Crypt::OpenSSL::RSA;
+use Crypt::PK::RSA;
 use Crypt::OpenSSL::X509;
 use File::Slurper qw/ read_text /;
 use IO::Compress::RawDeflate qw/ rawdeflate /;
@@ -110,10 +110,8 @@ sub _sign_redirect_uri {
     my $uri  = shift;
 
     my $key_string = read_text($self->key);
-    my $rsa_priv = Crypt::OpenSSL::RSA->new_private_key($key_string);
-
-    my $method = "use_" . $self->sig_hash . "_hash";
-    $rsa_priv->$method;
+    my $pk = Crypt::PK::RSA->new();
+    my $rsa_priv = $pk->import_key(\$key_string);
 
     $uri->query_param('SigAlg',
         $self->sig_hash eq 'sha1'
@@ -121,7 +119,7 @@ sub _sign_redirect_uri {
         : 'http://www.w3.org/2001/04/xmldsig-more#rsa-' . $self->sig_hash);
 
     my $to_sign = $uri->query;
-    my $sig = encode_base64($rsa_priv->sign($to_sign), '');
+    my $sig = encode_base64($rsa_priv->sign_message($to_sign, uc($self->sig_hash), 'v1.5'), '');
     $uri->query_param('Signature', $sig);
     return $uri->as_string;
 }
@@ -173,24 +171,26 @@ sub _verify {
 
     foreach my $crt (@{$self->cert}) {
         my $cert = Crypt::OpenSSL::X509->new_from_string($crt);
-        my $rsa_pub = Crypt::OpenSSL::RSA->new_public_key($cert->pubkey);
+        my $pk = Crypt::PK::RSA->new();
+        my $rsa_pub = $pk->import_key(\$cert->pubkey);
 
+        my $hash_name;
         if ($sigalg eq 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha256') {
-            $rsa_pub->use_sha256_hash;
+            $hash_name = 'SHA256';
         } elsif ($sigalg eq 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha224') {
-            $rsa_pub->use_sha224_hash;
+            $hash_name = 'SHA224';
         } elsif ($sigalg eq 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha384') {
-            $rsa_pub->use_sha384_hash;
+            $hash_name = 'SHA384';
         } elsif ($sigalg eq 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha512') {
-            $rsa_pub->use_sha512_hash;
+            $hash_name = 'SHA512';
         } elsif ($sigalg eq 'http://www.w3.org/2000/09/xmldsig#rsa-sha1') {
-            $rsa_pub->use_sha1_hash;
+            $hash_name = 'SHA1';
         }
         else {
             warn "Unsupported Signature Algorithim: $sigalg, defaulting to sha256" if $self->debug;
         }
 
-        return 1 if $rsa_pub->verify($signed, $sig);
+        return 1 if $rsa_pub->verify_message($sig, $signed, $hash_name, 'v1.5');
 
         warn "Unable to verify with " . $cert->subject if $self->debug;
     }
@@ -212,7 +212,7 @@ Net::SAML2::Binding::Redirect - HTTP Redirect binding for SAML
 
 =head1 VERSION
 
-version 0.82
+version 0.83
 
 =head1 SYNOPSIS
 

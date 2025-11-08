@@ -114,11 +114,11 @@ services.  The messages are standardized within ISO20022, see their
 website at F<https://www.iso20022.org>.
 
 Which conversion is requested is detected from the file-name extensions,
-where C<.xml> means C<CAMT message in xml format>. 
+where C<.xml> means C<CAMT message in xml format>.   Format C<.dd> is
+Perl M<Data::Dumper> format (can be loaded via C<eval>).  And C<.json>
+is (surprise!) JSON standard format.
 
-At the moment, only JSON and Perl's Data::Dumper serializers are
-implemented.  A useful CSV and MT940 are planned.  (Please support me
-to implement them)
+A useful CSV and MT940 are planned.  (Please support me to implement them)
 
 =head2 Quality
 
@@ -170,7 +170,7 @@ The CAMT uses huge values as maximum.  This can be handled for some output, but
 not for (for instance) JSON.  Such values are also usually not needed, so the
 default is not to expect them.
 
-=item -l --log-tagnames --no-long-tagnames (default false)
+=item -l --long-tagnames --no-long-tagnames (default false)
 
 The CAMT specification contains clear names for the data fields, but decided to
 trim characters from XML fields.  This is really silly and needless.  When you
@@ -201,7 +201,7 @@ Github: F<https://github.com/markov2/perl5-Business-CAMT/>
 
 =head1 LICENSE
 
-Copyrights 2024 by [Mark Overmeer <markov@cpan.org>]. For other
+Copyrights 2024-2025 by [Mark Overmeer <markov@cpan.org>]. For other
 contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it

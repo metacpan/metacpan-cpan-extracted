@@ -1,4 +1,4 @@
-package Dist::Zilla::Util::AuthorDeps 6.033;
+package Dist::Zilla::Util::AuthorDeps 6.034;
 # ABSTRACT: Utils for listing your distribution's author dependencies
 
 use Dist::Zilla::Pragmas;
@@ -9,19 +9,23 @@ use List::Util 1.45 ();
 
 use namespace::autoclean;
 
-sub format_author_deps {
-  my ($reqs, $versions) = @_;
+sub _format_author_deps {
+  my ($reqs, $versions, $cpanm_versions) = @_;
 
   my $formatted = '';
-  foreach my $rec (@{ $reqs }) {
-    my ($mod, $ver) = each(%{ $rec });
-    $formatted .= $versions ? "$mod = $ver\n" : "$mod\n";
+  for my $rec (@{ $reqs }) {
+    my ($mod, $ver) = %$rec;
+    $formatted .= $cpanm_versions ? "$mod~$ver\n"
+                : $versions       ? "$mod = $ver\n"
+                :                   "$mod\n";
   }
-  chomp($formatted);
+
+  chomp $formatted;
+
   return $formatted;
 }
 
-sub extract_author_deps {
+sub _extract_author_deps {
   my ($root, $missing) = @_;
 
   my $ini = path($root, 'dist.ini');
@@ -160,7 +164,7 @@ Dist::Zilla::Util::AuthorDeps - Utils for listing your distribution's author dep
 
 =head1 VERSION
 
-version 6.033
+version 6.034
 
 =head1 PERL VERSION
 

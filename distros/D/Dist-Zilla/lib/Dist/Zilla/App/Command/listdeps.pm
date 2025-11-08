@@ -1,4 +1,4 @@
-package Dist::Zilla::App::Command::listdeps 6.033;
+package Dist::Zilla::App::Command::listdeps 6.034;
 # ABSTRACT: print your distribution's prerequisites
 
 use Dist::Zilla::Pragmas;
@@ -172,11 +172,11 @@ sub execute {
 
   my @names = sort { lc $a cmp lc $b } keys %modules;
   if ($opt->versions) {
-      print "$_ = $modules{$_}\n" for @names;
+    print "$_ = $modules{$_}\n" for @names;
   } elsif ($opt->cpanm_versions) {
-      print qq{$_~"$modules{$_}"\n} for @names;
+    print "$_~$modules{$_}\n" for @names;
   } else {
-      print "$_\n" for @names;
+    print "$_\n" for @names;
   }
 }
 
@@ -194,7 +194,7 @@ Dist::Zilla::App::Command::listdeps - print your distribution's prerequisites
 
 =head1 VERSION
 
-version 6.033
+version 6.034
 
 =head1 SYNOPSIS
 

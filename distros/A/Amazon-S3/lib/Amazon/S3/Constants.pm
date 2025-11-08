@@ -7,7 +7,7 @@ use parent qw(Exporter);
 
 use Readonly;
 
-our $VERSION = '0.65'; ## no critic (RequireInterpolation)
+our $VERSION = '2.0.2'; ## no critic (RequireInterpolation)
 
 # defaults
 Readonly our $AMAZON_HEADER_PREFIX            => 'x-amz-';
@@ -23,6 +23,8 @@ Readonly our $DEFAULT_LOG_LEVEL               => 'error';
 Readonly our $MAX_DELETE_KEYS                 => 1000;
 Readonly our $MAX_RETRIES                     => 5;
 Readonly our $DEFAULT_REGION                  => 'us-east-1';
+Readonly our $AWS_METADATA_BASE_URL =>
+  'http://169.254.169.254/latest/meta-data/';
 
 Readonly our $XMLDECL  => '<?xml version="1.0" encoding="UTF-8"?>';
 Readonly our $S3_XMLNS => 'http://s3.amazonaws.com/doc/2006-03-01/';
@@ -37,6 +39,7 @@ Readonly::Hash our %LOG_LEVELS => (
 );
 
 Readonly::Hash our %LIST_OBJECT_MARKERS => (
+  '3' => [qw(KeyMarker NextKeyMarker key-marker)],
   '2' => [qw(ContinuationToken NextContinuationToken continuation-token)],
   '1' => [qw(Marker NextMarker marker)],
 );
@@ -58,6 +61,8 @@ Readonly our $EQUAL_SIGN    => q{=};
 
 # HTTP codes
 
+Readonly our $HTTP_PARTIAL_CONTENT   => 206;
+Readonly our $HTTP_NO_CONTENT        => 204;
 Readonly our $HTTP_BAD_REQUEST       => 400;
 Readonly our $HTTP_UNAUTHORIZED      => 401;
 Readonly our $HTTP_PAYMENT_RQUIRED   => 402;
@@ -108,6 +113,7 @@ our %EXPORT_TAGS = (
   ],
   misc => [
     qw(
+      $AWS_METADATA_BASE_URL
       $S3_XMLNS
       $XMLDECL
       %LIST_OBJECT_MARKERS
@@ -123,7 +129,9 @@ our %EXPORT_TAGS = (
       $HTTP_PAYMENT_RQUIRED
       $HTTP_FORBIDDEN
       $HTTP_NOT_FOUND
+      $HTTP_NO_CONTENT
       $HTTP_MOVED_PERMANENTLY
+      $HTTP_PARTIAL_CONTENT
       $HTTP_FOUND
       $HTTP_SEE_OTHER
       $HTTP_NOT_MODIFIED

@@ -1,5 +1,5 @@
 ---
-abstract: 'is a Mojolicious server serveing Daje stuff'
+abstract: 'is a Mojolicious server serving Daje stuff'
 author:
   - 'janeskil1525 <janeskil1525@gmail.com>'
 build_requires:
@@ -26,8 +26,9 @@ no_index:
 provides:
   Daje:
     file: lib/Daje.pm
-    version: '0.06'
+    version: '0.07'
 requires:
+  Daje::Plugin::Apploader: '0.03'
   Daje::Tools::JWT: '0'
   Mojo::JSON: '0'
   Mojo::Loader: '0'
@@ -37,6 +38,6 @@ resources:
   bugtracker: https://github.com/janeskil1525/Daje/issues
   homepage: https://github.com/janeskil1525/Daje
   repository: https://github.com/janeskil1525/Daje.git
-version: '0.06'
+version: '0.07'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
 x_static_install: 1

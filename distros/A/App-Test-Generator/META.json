@@ -86,6 +86,6 @@
          "x_repository" : "https://github.com/nigelhorne/App-Test-Generator"
       }
    },
-   "version" : "0.13",
+   "version" : "0.14",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

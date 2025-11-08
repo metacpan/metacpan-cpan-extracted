@@ -92,7 +92,7 @@ subtest 'abort-on-error' => sub {
 
   eval { $bucket_obj->complete_multipart_upload( $key, $id, $part_list ); };
 
-  ok( $EVAL_ERROR =~ /Bad Request/, 'abort-on-error successful' )
+  ok( $EVAL_ERROR =~ /Bad Request/i, 'abort-on-error successful' )
     or diag( Dumper( [ $EVAL_ERROR, $id ] ) );
 
   $bucket_obj->abort_multipart_upload( $key, $id );

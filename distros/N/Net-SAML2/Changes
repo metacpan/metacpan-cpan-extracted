@@ -1,5 +1,26 @@
 Revision history for Perl extension Net::SAML2.
 
+0.83 -- Fri Nov 07 22:39:52 AST 2025
+
+    [Significant Changes]
+    - Fixes #239 Signing redirect URLs fails with Crypt::OpenSSL::RSA 0.37
+    - Crypt::OpenSSL::RSA removed use_pkcs1_padding so we have moved to Crypt::PK::RSA
+    - Tested against a number of IdPs but you will want to perform testing
+    - Requires XML::Sig 0.67
+    
+    [Detailed Change Log]
+    - 1debfe3 Migrate from Crypt::OpenSSL::RSA to Crypt::PK::RSA
+    - adeaaf8 v0.82
+
+     [Compatibility Deprecation Warning]
+     As of Release 0.79 the following have been changed and the old version may be
+     removed in an upcoming release.
+
+     - Net::SAML2::Protocol::Artifact
+         - response_to changed to in_response_to
+     - Net::SAML2::Protocol::LogoutResponse
+         - response_to changed to in_response_to
+
 0.82 -- Tue May 27 20:37:54 ADT 2025
 
      [Compatibility Deprecation Warning]

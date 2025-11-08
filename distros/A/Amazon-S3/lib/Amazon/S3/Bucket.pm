@@ -4,6 +4,8 @@ use strict;
 use warnings;
 
 use Amazon::S3::Constants qw(:all);
+use Amazon::S3::Util      qw(:all);
+
 use Carp;
 use Data::Dumper;
 use Digest::MD5       qw(md5 md5_hex);
@@ -13,13 +15,14 @@ use File::stat;
 use IO::File;
 use IO::Scalar;
 use MIME::Base64;
+use List::Util   qw(none pairs);
 use Scalar::Util qw(reftype);
 use URI;
 use XML::Simple; ## no critic (DiscouragedModules)
 
-use parent qw(Class::Accessor::Fast);
+use parent qw(Exporter Class::Accessor::Fast);
 
-our $VERSION = '0.65'; ## no critic (RequireInterpolation)
+our $VERSION = '2.0.2'; ## no critic (RequireInterpolation)
 
 __PACKAGE__->mk_accessors(
   qw(
@@ -38,10 +41,11 @@ sub new {
 ########################################################################
   my ( $class, @args ) = @_;
 
-  my %options = ref $args[0] ? %{ $args[0] } : @args;
-  $options{buffer_size} ||= $DEFAULT_BUFFER_SIZE;
+  my $options = get_parameters(@args);
 
-  my $self = $class->SUPER::new( \%options );
+  $options->{buffer_size} ||= $DEFAULT_BUFFER_SIZE;
+
+  my $self = $class->SUPER::new($options);
 
   croak 'no bucket'
     if !$self->bucket;
@@ -84,10 +88,11 @@ sub _uri {
 
   my $account = $self->account;
 
-  my $uri
-    = ($key)
-    ? $self->bucket . $SLASH . $account->_urlencode($key)
-    : $self->bucket . $SLASH;
+  my $uri = $self->bucket . $SLASH;
+
+  if ($key) {
+    $uri .= urlencode($key);
+  }
 
   if ( $account->dns_bucket_names ) {
     $uri =~ s/^\///xsm;
@@ -104,7 +109,12 @@ sub add_key {
   croak 'must specify key'
     if !$key || !length $key;
 
+  $conf //= {};
+
   my $account = $self->account;
+
+  my $headers = delete $conf->{headers};
+  $headers //= {};
 
   if ( $conf->{acl_short} ) {
     $account->_validate_acl_short( $conf->{acl_short} );
@@ -114,28 +124,14 @@ sub add_key {
     delete $conf->{acl_short};
   }
 
-  if ( ref($value) && reftype($value) eq 'SCALAR' ) {
-    my $md5_hex = file_md5_hex( ${$value} );
-    my $md5     = pack 'H*', $md5_hex;
+  $headers = { %{$conf}, %{$headers} };
 
-    my $md5_base64 = encode_base64($md5);
-    chomp $md5_base64;
+  set_md5_header( data => $value, headers => $headers );
 
-    $conf->{'Content-MD5'} = $md5_base64;
-
-    $conf->{'Content-Length'} ||= -s ${$value};
+  if ( ref $value ) {
     $value = _content_sub( ${$value}, $self->buffer_size );
 
-    $conf->{'x-amz-content-sha256'} = 'UNSIGNED-PAYLOAD';
-  }
-  else {
-    $conf->{'Content-Length'} ||= length $value;
-
-    my $md5        = md5($value);
-    my $md5_hex    = unpack 'H*', $md5;
-    my $md5_base64 = encode_base64($md5);
-
-    $conf->{'Content-MD5'} = $md5_base64;
+    $headers->{'x-amz-content-sha256'} = 'UNSIGNED-PAYLOAD';
   }
 
   # If we're pushing to a bucket that's under
@@ -144,7 +140,7 @@ sub add_key {
   # to see what's going on
   my $retval = eval {
     return $self->_add_key(
-      { headers => $conf,
+      { headers => $headers,
         data    => $value,
         key     => $key,
       },
@@ -162,7 +158,7 @@ sub add_key {
     }
 
     $retval = $self->_add_key(
-      { headers => $conf,
+      { headers => $headers,
         data    => $value,
         key     => $key,
       },
@@ -178,6 +174,7 @@ sub _add_key {
   my ( $self, @args ) = @_;
 
   my ( $data, $headers, $key ) = @{ $args[0] }{qw{data headers key}};
+
   my $account = $self->account;
 
   if ( ref $data ) {
@@ -217,37 +214,32 @@ sub upload_multipart_object {
 
   my $logger = $self->logger;
 
-  my %parameters;
-
-  if ( @args == 1 && reftype( $args[0] ) eq 'HASH' ) {
-    %parameters = %{ $args[0] };
-  }
-  else {
-    %parameters = @args;
-  }
+  my $parameters = get_parameters(@args);
 
   croak 'no key!'
-    if !$parameters{key};
+    if !$parameters->{key};
 
   croak 'either data, callback or fh must be set!'
-    if !$parameters{data} && !$parameters{callback} && !$parameters{fh};
+    if !$parameters->{data} && !$parameters->{callback} && !$parameters->{fh};
 
   croak 'callback must be a reference to a subroutine!'
-    if $parameters{callback} && reftype( $parameters{callback} ) ne 'CODE';
+    if $parameters->{callback}
+    && reftype( $parameters->{callback} ) ne 'CODE';
 
-  $parameters{abort_on_error} //= $TRUE;
-  $parameters{chunk_size}     //= $MIN_MULTIPART_UPLOAD_CHUNK_SIZE;
+  $parameters->{abort_on_error} //= $TRUE;
+  $parameters->{chunk_size}     //= $MIN_MULTIPART_UPLOAD_CHUNK_SIZE;
 
-  if ( !$parameters{callback} && !$parameters{fh} ) {
+  if ( !$parameters->{callback} && !$parameters->{fh} ) {
     #...but really nobody should be passing a >5MB scalar
-    my $data = ref $parameters{data} ? $parameters{data} : \$parameters{data};
+    my $data
+      = ref $parameters->{data} ? $parameters->{data} : \$parameters->{data};
 
-    $parameters{fh} = IO::Scalar->new($data);
+    $parameters->{fh} = IO::Scalar->new($data);
   }
 
   # ...having a file handle implies, we use this callback
-  if ( $parameters{fh} ) {
-    my $fh = $parameters{fh};
+  if ( $parameters->{fh} ) {
+    my $fh = $parameters->{fh};
 
     $fh->seek( 0, 2 );
 
@@ -261,12 +253,12 @@ sub upload_multipart_object {
       if $length < $MIN_MULTIPART_UPLOAD_CHUNK_SIZE;
 
     my $chunk_size
-      = ( $parameters{chunk_size} && $parameters{chunk_size} )
+      = ( $parameters->{chunk_size} && $parameters->{chunk_size} )
       > $MIN_MULTIPART_UPLOAD_CHUNK_SIZE
-      ? $parameters{chunk_size}
+      ? $parameters->{chunk_size}
       : $MIN_MULTIPART_UPLOAD_CHUNK_SIZE;
 
-    $parameters{callback} = sub {
+    $parameters->{callback} = sub {
       return
         if !$length;
 
@@ -291,9 +283,9 @@ sub upload_multipart_object {
     };
   }
 
-  my $headers = $parameters{headers} || {};
+  my $headers = $parameters->{headers} || {};
 
-  my $id = $self->initiate_multipart_upload( $parameters{key}, $headers );
+  my $id = $self->initiate_multipart_upload( $parameters->{key}, $headers );
 
   $logger->trace( sprintf 'multipart id: %s', $id );
 
@@ -301,11 +293,11 @@ sub upload_multipart_object {
 
   my %parts;
 
-  my $key = $parameters{key};
+  my $key = $parameters->{key};
 
   my $retval = eval {
     while (1) {
-      my ( $buffer, $length ) = $parameters{callback}->();
+      my ( $buffer, $length ) = $parameters->{callback}->();
       last if !$buffer;
 
       my $etag = $self->upload_part_of_multipart_upload(
@@ -319,10 +311,10 @@ sub upload_multipart_object {
       $parts{ $part++ } = $etag;
     }
 
-    $self->complete_multipart_upload( $parameters{key}, $id, \%parts );
+    $self->complete_multipart_upload( $parameters->{key}, $id, \%parts );
   };
 
-  if ( $EVAL_ERROR && $parameters{abort_on_error} ) {
+  if ( $EVAL_ERROR && $parameters->{abort_on_error} ) {
     $self->abort_multipart_upload( $key, $id );
     %parts = ();
   }
@@ -338,7 +330,7 @@ sub upload_multipart_object {
 ########################################################################
 sub initiate_multipart_upload {
 ########################################################################
-  my ( $self, $key, $conf ) = @_;
+  my ( $self, $key, $headers ) = @_;
 
   croak 'Object key is required'
     if !$key;
@@ -349,7 +341,7 @@ sub initiate_multipart_upload {
     { region  => $self->region,
       method  => 'POST',
       path    => $self->_uri($key) . '?uploads=',
-      headers => $conf,
+      headers => $headers,
     },
   );
 
@@ -406,27 +398,40 @@ sub upload_part_of_multipart_upload {
   croak 'Part Number is required'
     if !$part_number;
 
-  my $conf = {};
-  my $acct = $self->account;
+  my $headers = {};
+  my $acct    = $self->account;
 
-  # Make sure length and md5 are set
-  my $md5        = md5($data);
-  my $md5_hex    = unpack 'H*', $md5;
-  my $md5_base64 = encode_base64($md5);
+  set_md5_header( data => $data, headers => $headers );
 
-  $conf->{'Content-MD5'}    = $md5_base64;
-  $conf->{'Content-Length'} = $length;
+  my $path = create_api_uri(
+    path       => $self->_uri($key),
+    partNumber => ${part_number},
+    uploadId   => ${upload_id}
+  );
 
-  my $params = "?partNumber=${part_number}&uploadId=${upload_id}";
+  my $params = $QUESTION_MARK
+    . create_query_string(
+    partNumber => ${part_number},
+    uploadId   => ${upload_id}
+    );
 
-  $self->logger->debug( 'uploading ' . sprintf 'part: %s length: %s',
-    $part_number, length $data );
+  $self->logger->debug(
+    sub {
+      return Dumper(
+        [ part   => $part_number,
+          length => length $data,
+          path   => $path,
+        ]
+      );
+    }
+  );
 
   my $request = $acct->_make_request(
-    { region  => $self->region,
-      method  => 'PUT',
-      path    => $self->_uri($key) . $params,
-      headers => $conf,
+    { region => $self->region,
+      method => 'PUT',
+      path   => $self->_uri($key) . $params,
+      #path    => $path,
+      headers => $headers,
       data    => $data,
     },
   );
@@ -444,27 +449,6 @@ sub upload_part_of_multipart_upload {
   }
 
   return $etag;
-}
-
-########################################################################
-sub make_xml_document_simple {
-########################################################################
-  my ($parts_hr) = @_;
-
-  my $xml = q{<?xml version="1.0" encoding="UTF-8"?>};
-  my $xml_template
-    = '<Part><PartNumber>%s</PartNumber><ETag>%s</ETag></Part>';
-
-  my @parts;
-
-  foreach my $part_num ( sort { $a <=> $b } keys %{$parts_hr} ) {
-    push @parts, sprintf $xml_template, $part_num, $parts_hr->{$part_num};
-  }
-
-  $xml .= sprintf "\n<CompleteMultipartUpload>%s</CompleteMultipartUpload>\n",
-    join q{}, @parts;
-
-  return $xml;
 }
 
 #
@@ -490,10 +474,7 @@ sub complete_multipart_upload {
 
   # The complete command requires sending a block of xml containing all
   # the part numbers and their associated etags (returned from the upload)
-
-  # build XML doc
-
-  my $content = make_xml_document_simple($parts_hr);
+  my $content = _create_multipart_upload_request($parts_hr);
 
   $self->logger->debug("content: \n$content");
 
@@ -501,7 +482,7 @@ sub complete_multipart_upload {
   my $md5_base64 = encode_base64($md5);
   chomp $md5_base64;
 
-  my $conf = {
+  my $headers = {
     'Content-MD5'    => $md5_base64,
     'Content-Length' => length $content,
     'Content-Type'   => 'application/xml',
@@ -514,7 +495,7 @@ sub complete_multipart_upload {
     { region  => $self->region,
       method  => 'POST',
       path    => $self->_uri($key) . $params,
-      headers => $conf,
+      headers => $headers,
       data    => $content,
     },
   );
@@ -529,9 +510,6 @@ sub complete_multipart_upload {
   return $TRUE;
 }
 
-#
-# Stop a multipart upload
-#
 ########################################################################
 sub abort_multipart_upload {
 ########################################################################
@@ -567,7 +545,7 @@ sub abort_multipart_upload {
 ########################################################################
 sub list_multipart_upload_parts {
 ########################################################################
-  my ( $self, $key, $upload_id, $conf ) = @_;
+  my ( $self, $key, $upload_id, $headers ) = @_;
 
   croak 'Object key is required'
     if !$key;
@@ -582,7 +560,7 @@ sub list_multipart_upload_parts {
     { region  => $self->region,
       method  => 'GET',
       path    => $self->_uri($key) . $params,
-      headers => $conf,
+      headers => $headers,
     },
   );
 
@@ -594,14 +572,12 @@ sub list_multipart_upload_parts {
   return $response->content;
 }
 
-#
 # List all the currently active multipart upload operations
 # Returns the block of XML returned from Amazon
-#
 ########################################################################
 sub list_multipart_uploads {
 ########################################################################
-  my ( $self, $conf ) = @_;
+  my ( $self, $headers ) = @_;
 
   my $acct = $self->account;
 
@@ -609,7 +585,7 @@ sub list_multipart_uploads {
     { region  => $self->region,
       method  => 'GET',
       path    => $self->_uri() . '?uploads',
-      headers => $conf,
+      headers => $headers,
     },
   );
 
@@ -630,11 +606,54 @@ sub head_key {
 }
 
 ########################################################################
+sub get_key_v2 {
+########################################################################
+  my ( $self, $key, $method, $headers ) = @_;
+
+  return $self->_get_key( $key, $method, undef, $headers );
+}
+
+########################################################################
 sub get_key {
 ########################################################################
-  my ( $self, $key, $method, $filename ) = @_;
+  my ( $self, @args ) = @_;
 
-  $method ||= 'GET';
+  my ( $key, $method, $headers, $uri_params );
+
+  if ( ref $args[0] ) {
+    ( $key, $method, $headers, $uri_params )
+      = @{ $args[0] }{qw(key method headers uri_params)};
+  }
+  else {
+    ( $key, $method, $headers, $uri_params ) = @args;
+  }
+
+  return $self->_get_key(
+    key        => $key,
+    method     => $method,
+    filename   => undef,
+    headers    => $headers,
+    uri_params => $uri_params,
+  );
+}
+
+########################################################################
+sub _get_key {
+########################################################################
+  my ( $self, @args ) = @_;
+
+  my $parameters = get_parameters(@args);
+
+  my ( $key, $method, $filename, $headers, $uri_params )
+    = @{$parameters}{qw(key method filename headers uri_params)};
+
+  $method //= 'GET';
+
+  my $uri = $self->_uri($key);
+
+  if ( $uri_params && keys %{$uri_params} ) {
+    $uri = $QUESTION_MARK . create_query_string($uri_params);
+  }
 
   if ( ref $filename ) {
     $filename = ${$filename};
@@ -642,21 +661,17 @@ sub get_key {
 
   my $acct = $self->account;
 
-  my $uri = $self->_uri($key);
-
   my $request = $acct->_make_request(
     { region  => $self->region,
       method  => $method,
       path    => $uri,
-      headers => {},
+      headers => $headers,
     },
   );
 
-  my $retval;
-
   my $response = $acct->_do_http( $request, $filename );
 
-  return $retval
+  return
     if $response->code eq $HTTP_NOT_FOUND;
 
   $acct->_croak_if_response_error($response);
@@ -668,15 +683,17 @@ sub get_key {
     $etag =~ s/"$//xsm;
   }
 
-  $retval = {
-    content_length => $response->content_length || 0,
-    content_type   => $response->content_type,
+  my $retval = {
+    content_length => ( $response->content_length || 0 ),
+    content_type   => scalar $response->content_type,
     etag           => $etag,
-    value          => $response->content,
+    value          => ( $response->content // $EMPTY ),
+    content_range  => ( $response->header('Content-Range') || $EMPTY ),
+    last_modified  => ( $response->header('Last-Modified') || $EMPTY ),
   };
 
-  # Validate against data corruption by verifying the MD5
-  if ( $method eq 'GET' ) {
+  # Validate against data corruption by verifying the MD5 (only if not partial)
+  if ( $method eq 'GET' && $response->code ne $HTTP_PARTIAL_CONTENT ) {
     my $md5
       = ( $filename and -f $filename )
       ? file_md5_hex($filename)
@@ -699,13 +716,29 @@ sub get_key {
 ########################################################################
 sub get_key_filename {
 ########################################################################
-  my ( $self, $key, $method, $filename ) = @_;
+  my ( $self, @args ) = @_;
+
+  my ( $key, $method, $filename, $headers, $uri_params );
+
+  if ( ref $args[0] ) {
+    ( $key, $method, $filename, $headers, $uri_params )
+      = @{ $args[0] }{qw(key method filename headers uri_params)};
+  }
+  else {
+    ( $key, $method, $filename, $headers, $uri_params ) = @args;
+  }
 
   if ( !defined $filename ) {
     $filename = $key;
   }
 
-  return $self->get_key( $key, $method, \$filename );
+  return $self->_get_key(
+    key        => $key,
+    method     => $method,
+    filename   => \$filename,
+    headers    => $headers,
+    uri_params => $uri_params,
+  );
 }
 
 ########################################################################
@@ -717,10 +750,12 @@ sub get_key_filename {
 ########################################################################
 sub copy_object {
 ########################################################################
-  my ( $self, %parameters ) = @_;
+  my ( $self, @args ) = @_;
+
+  my $parameters = get_parameters(@args);
 
   my ( $source, $key, $bucket, $headers_in )
-    = @parameters{qw(source key bucket headers)};
+    = @{$parameters}{qw(source key bucket headers)};
 
   $headers_in //= {};
 
@@ -744,23 +779,27 @@ sub copy_object {
     if !$key;
 
   my $acct = $self->account;
+  $bucket //= $self->bucket();
 
   if ( !$request_headers{'x-amz-copy-source'} ) {
 
-    $request_headers{'x-amz-copy-source'} = sprintf '%s/%s',
-      $bucket // $self->{bucket},
-      $acct->_urlencode($source);
+    $request_headers{'x-amz-copy-source'} = sprintf '%s/%s', $bucket,
+      urlencode($source);
   }
 
   $request_headers{'x-amz-tagging-directive'} //= 'COPY';
 
   $key = $self->_uri($key);
 
-  my $request = $acct->_make_request( 'PUT', $key, \%request_headers, );
+  my $request = $acct->_make_request(
+    method  => 'PUT',
+    path    => $key,
+    headers => \%request_headers,
+  );
 
   my $response = $acct->_do_http($request);
 
-  if ( $response->code !~ /\A2\d\d\z/xsm ) {
+  if ( $response->code !~ /\A2\d{2}\z/xsm ) {
     $acct->_remember_errors( $response->content, 1 );
     croak $response->status_line;
   }
@@ -771,17 +810,23 @@ sub copy_object {
 ########################################################################
 sub delete_key {
 ########################################################################
-  my ( $self, $key ) = @_;
+  my ( $self, $key, $version ) = @_;
 
   croak 'must specify key'
     if !$key && length $key;
 
   my $account = $self->account;
 
+  my $path = $self->_uri($key);
+
+  if ($version) {
+    $path = '?versionId=' . $version;
+  }
+
   return $account->_send_request_expect_nothing(
     { method  => 'DELETE',
       region  => $self->region,
-      path    => $self->_uri($key),
+      path    => $path,
       headers => {},
     },
   );
@@ -852,10 +897,10 @@ sub delete_keys {
 ########################################################################
   my ( $self, @args ) = @_;
 
-  my ( $keys, $quiet_mode );
+  my ( $keys, $quiet_mode, $headers );
 
   if ( ref $args[0] && reftype( $args[0] ) eq 'HASH' ) {
-    ( $keys, $quiet_mode ) = @{ $args[0] }{qw(keys quiet)};
+    ( $keys, $quiet_mode, $headers ) = @{ $args[0] }{qw(keys quiet headers)};
     $keys = _format_delete_keys($keys);
   }
   else {
@@ -881,7 +926,6 @@ sub delete_keys {
     XMLDecl  => $XMLDECL,
   );
 
-  my $conf    = {};
   my $account = $self->account;
 
   my $md5        = md5($xml_content);
@@ -889,13 +933,15 @@ sub delete_keys {
 
   chomp $md5_base64;
 
-  $conf->{'Content-MD5'} = $md5_base64;
+  $headers //= {};
+
+  $headers->{'Content-MD5'} = $md5_base64;
 
   return $account->_send_request(
     { method  => 'POST',
       region  => $self->region,
       path    => $self->_uri() . '?delete',
-      headers => $conf,
+      headers => $headers,
       data    => $xml_content,
     },
   );
@@ -946,7 +992,7 @@ sub list_all_v2 {
 ########################################################################
   my ( $self, $conf ) = @_;
 
-  $conf ||= {};
+  $conf //= {};
 
   $conf->{bucket} = $self->bucket;
 
@@ -958,7 +1004,7 @@ sub list_all {
 ########################################################################
   my ( $self, $conf ) = @_;
 
-  $conf ||= {};
+  $conf //= {};
 
   $conf->{bucket} = $self->bucket;
 
@@ -968,7 +1014,7 @@ sub list_all {
 ########################################################################
 sub get_acl {
 ########################################################################
-  my ( $self, $key ) = @_;
+  my ( $self, $key, $headers ) = @_;
 
   my $account = $self->account;
 
@@ -976,7 +1022,7 @@ sub get_acl {
     { region  => $self->region,
       method  => 'GET',
       path    => $self->_uri($key) . '?acl=',
-      headers => {},
+      headers => $headers // {},
     },
   );
 
@@ -1022,7 +1068,9 @@ sub set_acl {
 ########################################################################
   my ( $self, $conf ) = @_;
 
-  $conf ||= {};
+  my $account = $self->account;
+
+  $conf //= {};
 
   croak 'need either acl_xml or acl_short'
     if !$conf->{acl_xml} && !$conf->{acl_short};
@@ -1030,17 +1078,15 @@ sub set_acl {
   croak 'cannot provide both acl_xml and acl_short'
     if $conf->{acl_xml} && $conf->{acl_short};
 
-  my $path = $self->_uri( $conf->{key} ) . '?acl=';
+  my $path = $self->_uri( $conf->{key} ) . '?acl';
 
-  my $headers = {};
+  my $headers = $conf->{headers};
 
   if ( $conf->{acl_short} ) {
-    $headers->{'x-amz-acl'} = $conf->{acl_short};
+    $headers->{'x-amz-acl'} //= $conf->{acl_short};
   }
 
-  my $xml = $conf->{acl_xml} || $EMPTY;
-
-  my $account = $self->account;
+  my $xml = $conf->{acl_xml} // $EMPTY;
 
   $headers->{'Content-Length'} = length $xml;
 
@@ -1057,36 +1103,32 @@ sub set_acl {
 ########################################################################
 sub get_location_constraint {
 ########################################################################
-  my ($self) = @_;
+  my ( $self, @args ) = @_;
+
+  my $parameters = get_parameters(@args);
+
+  my ( $bucket, $headers, $region )
+    = @{$parameters}{qw(bucket headers region)};
 
   my $account = $self->account;
+  $bucket //= $self->bucket;
 
-  my $xpc = $account->_send_request(
-    { region => $self->region,
-      method => 'GET',
-      path   => $self->bucket . '/?location=',
+  my $location = $account->_send_request(
+    { region  => $region // $self->region,
+      method  => 'GET',
+      path    => $bucket . '/?location=',
+      headers => $headers,
     },
   );
 
-  my $lc;
+  return $location
+    if $location;
 
-  if ( !$xpc ) {
-    croak $account->errstr
-      if $account->_remember_errors($xpc);
+  croak $account->errstr
+    if $account->_remember_errors($location);
 
-    return $lc;
-  }
-
-  $lc = $xpc;
-
-  if ( defined $lc && $lc eq $EMPTY ) {
-    $lc = undef;
-  }
-
-  return $lc;
+  return;
 }
-
-# proxy up the err requests
 
 ########################################################################
 sub last_response {
@@ -1170,6 +1212,25 @@ sub _content_sub {
   };
 }
 
+########################################################################
+sub _create_multipart_upload_request {
+########################################################################
+  my ($parts_hr) = @_;
+
+  my @parts;
+
+  foreach my $part_num ( sort { $a <=> $b } keys %{$parts_hr} ) {
+    push @parts,
+      {
+      PartNumber => $part_num,
+      ETag       => $parts_hr->{$part_num},
+      };
+  }
+
+  return create_xml_request(
+    { CompleteMultipartUpload => { Part => \@parts } } );
+}
+
 1;
 
 __END__
@@ -1212,6 +1273,8 @@ Amazon::S3::Bucket - A container class for a S3 bucket and its contents.
   $bucket->delete_key($keyname);
 
 =head1 DESCRIPTION
+
+Class for interacting with AWS S3 buckets.
 
 =head1 METHODS AND SUBROUTINES
 
@@ -1406,10 +1469,12 @@ HASH will contain the following members:
 
 =back
 
-=head2 delete_key $key_name
+=head2 delete_key
+
+ delete_key(key, [version])
 
 Permanently removes C<$key_name> from the bucket. Returns a
-boolean value indicating the operations success.
+boolean value indicating the operation's success.
 
 =head2 delete_keys @keys
 
@@ -1418,7 +1483,7 @@ boolean value indicating the operations success.
 Permanently removes keys from the bucket. Returns the response body
 from the API call. Returns C<undef> on non '2xx' return codes.
 
-See <Deleting Amazon S3 object | https://docs.aws.amazon.com/AmazonS3/latest/userguide/DeletingObjects.html>
+See <Deleting Amazon S3 objects | https://docs.aws.amazon.com/AmazonS3/latest/userguide/DeletingObjects.html>
 
 The argument to C<delete_keys> can be:
 
@@ -1482,10 +1547,65 @@ cannot be removed if it contains any keys (contents).
 
 This is an alias for C<$s3-E<gt>delete_bucket($bucket)>.
 
-=head2 get_key $key_name, [$method]
+=head2 get_key key, [method, headers, uri_params]
 
-Takes a key and an optional HTTP method and fetches it from
-S3. The default HTTP method is GET.
+=head2 get_key hashref
+
+Takes a key and optional arguments and returns the hash of metatdata
+which includes the contents of the S3 object.
+
+Example:
+
+ $bucket->get_key(
+   key        => 'foo',
+   uri_params => { versionId => $version },
+   headers    => { Range     => 'bytes=0-9' }
+ );
+
+=over 5
+
+=item key
+
+Key name
+
+=item method
+
+HTTP method (GET or HEAD)
+
+default: GET
+
+=item headers
+
+A hashref of additional headers to send with the request
+
+=item uri-params
+
+A hashref containing key/value pairs representing the URI parameters
+you want to include in the request. Possible parameters are shown below.
+
+See L<https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetObject.html#API_GetObject_RequestSyntax>
+
+=over 10
+
+=item partNumber
+
+=item response-cache-control
+
+=item response-content-disposition
+
+=item response-content-encoding
+
+=item response-content-language
+
+=item response-content-type
+
+=item response-expires
+
+=item versionId
+
+=back
+
+=back
 
 The method returns C<undef> if the key does not exist in the
 bucket and throws an exception (dies) on server errors.
@@ -1502,13 +1622,50 @@ On success, the method returns a HASHREF containing:
 
 =item @meta
 
+=item content_range
+
+=item last_modified
+
 =back
 
-=head2 get_key_filename $key_name, $method, $filename
+I<Note that the C<etag> for ranged gets is the MD5 value for the entire file.>
+
+=head2 get_key_filename $key_name, [$method, $filename, $headers, $uri_params]
+
+=head2 get_key_filename $args
+
+Pass a list of arguments or a hash of key value/pairs.
 
 This method works like C<get_key>, but takes an added
 filename that the S3 resource will be written to.
 
+If C<filename> is undefined or an empty string, the a file with the
+key name will be created.
+
+=over 5
+
+=item key (required)
+
+=item method
+
+default: GET
+
+=item filename
+
+default: name of the key
+
+=item headers
+
+A hashref of additional headers to send with the request
+
+=item uri-params
+
+A hashref containing key/value pairs representing the URI parameters
+you want to include in the request. See L</get_key> for possible parameters.
+
+See L<https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetObject.html#API_GetObject_RequestSyntax>
+
+=back
 
 =head2 list
 
@@ -1557,7 +1714,7 @@ bucket itself.
 
  set_acl(acl)
 
-Retrieves the Access Control List (ACL) for the bucket or
+Sets the Access Control List (ACL) for the bucket or
 resource. Requires a HASHREF argument with one of the following keys:
 
 =over
@@ -1614,7 +1771,7 @@ Returns a boolean indicating the operations success.
 =head2 get_location_constraint
 
 Returns the location constraint (region the bucket resides in) for a
-bucket. Returns undef if no location constraint.
+bucket. Returns undef if there is no location constraint.
 
 Valid values that may be returned:
 

@@ -20,7 +20,7 @@ Business::CAMT - ISO20022 Cash Management (CAMT) messages
 Use this module to manage CAMT messages, which are ISO20022 standard
 "Cash Management" messages as produced in banking.  For instance,
 CAMT.053 is produced by banks and consumed by accountancies, showing
-transactions in bank-accounts.  See F<https://www.iso20022.org>.
+transactions in bank-accounts.  See L<https://www.iso20022.org>.
 
 At the moment, this module can be used to read and write the XML
 message files, perfectly validated and predictable.  It is intended to
@@ -36,7 +36,7 @@ and MT-940 converter, v.v.  Please hire me.
 
 =over 4
 
-=item Business::CAMT-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
 
 Create a new CAMT processing object.
 
@@ -52,7 +52,7 @@ is pretty expensive.
 
 =item big_numbers => BOOLEAN
 
-Set to a true value when your accounts run into the billions.  This will
+Set to a C<true> value when your accounts run into the billions.  This will
 enable Math::BigFloat to be used, which is slower and memory hungry.
 
 =item long_tagnames => BOOLEAN
@@ -65,10 +65,10 @@ will give you the nice long names in Perl.
 
 =item match_schema => $rule
 
-Sets the default $rule how to handle messages which have namespaces
+Sets the default C<$rule> how to handle messages which have namespaces
 which do not match the schemas contained in the module release.
 
-See L<matchSchema()|Business::CAMT/"Helper methods"> for the available $rule values.  See the L<DETAILS>
+See L<matchSchema()|Business::CAMT/"Helper methods"> for the available C<$rule> values.  See the L<DETAILS>
 section about the namespace versioning horrors.
 
 =back
@@ -98,7 +98,7 @@ the message, in a structure as can be found in the example templates.
 
 The C<$type> is either in the form C<camt.053.001.02> or C<053.001.02>.
 
-example: of create
+» example: of create
 
   my $camt = Business::CAMT->new(...);
   my $msg  = $camt->create('053.001.02', \%data);
@@ -123,7 +123,7 @@ Something like C<camt.053.001.02> or C<053.001.02>.
 
 =item $obj-E<gt>B<read>($file|$xml, %options)
 
-Pass a $file name, an $xml document or an $xml element.  Returned is
+Pass a C<$file> name, an C<$xml> document or an C<$xml> element.  Returned is
 a HASH blessed in class 'Business::CAMT::CAMT<nr>', for instance
 C<Business::CAMT::CAMT053>.
 
@@ -142,7 +142,7 @@ Write a constructed C<$message> (an extension of L<Business::CAMT::Message|Busin
 to a file in XML format.  The message can also be written as JSON or Perl
 data-structure, via the message itself.
 
-example: writing a message
+» example: writing a message
 
   my $message = $camt->create('053.001.02', $data);
   $camt->write('out.xml', $message);
@@ -164,13 +164,13 @@ Translates long and understandable names into (silly) abbreviated tags.
 =item $obj-E<gt>B<knownVersions>( [$set] )
 
 Returns a sorted LIST with all schema versions which are included in this
-distribution.  When the $set is specified (like C<053.001>), then only
+distribution.  When the C<$set> is specified (like C<053.001>), then only
 those are reported.
 
 =item $obj-E<gt>B<matchSchema>($set, $version, %options)
 
-Find the available schema version for the $set (like '053.001') to interpret
-a message with $version (like '02').
+Find the available schema version for the C<$set> (like '053.001') to interpret
+a message with C<$version> (like '02').
 
  -Option--Default
   rule    new(match_schema)
@@ -185,7 +185,7 @@ returns the highest available version, but must be newer.  Most generous
 is C<ANY>, which falls back to the newest available version even when
 it is older than the message version.
 
-You may also pass a CODE reference, which is called with the $set, the requested
+You may also pass a CODE reference, which is called with the C<$set>, the requested
 schema, and a sorted ARRAY of available versions.  It must return one of the
 available versions or C<undef> (no compatible version).
 
@@ -194,10 +194,12 @@ available versions or C<undef> (no compatible version).
 =item $obj-E<gt>B<schemaReader>($set, $version, $ns)
 
 Produces a CODE which can be called with an XML message, to get it transformed
-into a Perl data-structure.  In this case, the $set and $version have to be
+into a Perl data-structure.  In this case, the C<$set> and C<$version> have to be
 known already; method L<read()|Business::CAMT/"Read and Write messages"> figures that out by itself.
 
 =item $obj-E<gt>B<schemaWriter>($set, $version, $ns)
+
+Z<>
 
 =item $obj-E<gt>B<tag2fullnameTable>()
 
@@ -351,16 +353,59 @@ But more importantly: this hinders backward compatibility in the message
 evaluation a lot!  Using XML features better would result in better
 maintainable applications.  Much better.
 
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Error: Message set '$set' is unsupported.
+
+Cast by C<write()>
+
+=item Error: No compatible schema version available.
+
+Cast by C<read()>
+
+=item Error: Not a CAMT file.
+
+Cast by C<read()>
+
+=item Error: Not a supported CAMT message type.
+
+Cast by C<read()>
+
+=item Error: Schema version $version is not available, pick from $versions.
+
+Cast by C<write()>
+
+=item Error: Unknown message type '$type'
+
+Cast by C<fromHASH()>
+
+=item Error: Unknown message type '$type'
+
+Cast by C<create()>
+
+=item Error: Unknown schema match rule '$rule'.
+
+Cast by C<matchSchema()>
+
+=item Error: Unrecognized input
+
+Cast by C<read()>
+
+=back
+
 =head1 SEE ALSO
 
-This module is part of Business-CAMT distribution version 0.13,
-built on December 02, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Business-CAMT version 0.14,
+built on November 06, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2024 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2024-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

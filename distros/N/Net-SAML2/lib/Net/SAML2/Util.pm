@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Net::SAML2::Util;
-our $VERSION = '0.82'; # VERSION
+our $VERSION = '0.83'; # VERSION
 
 use Crypt::OpenSSL::Random qw(random_pseudo_bytes);
 
@@ -37,7 +37,7 @@ Net::SAML2::Util - Utility functions for Net::SAML2
 
 =head1 VERSION
 
-version 0.82
+version 0.83
 
 =head1 SYNOPSIS
 

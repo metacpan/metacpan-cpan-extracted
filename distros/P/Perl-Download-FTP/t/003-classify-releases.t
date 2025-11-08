@@ -10,7 +10,7 @@ unless ($ENV{PERL_ALLOW_NETWORK_TESTING}) {
     plan 'skip_all' => "Set PERL_ALLOW_NETWORK_TESTING to conduct live tests";
 }
 else {
-    plan tests =>  78;
+    plan tests =>  39;
 }
 use Test::RequiresInternet ('ftp.cpan.org' => 21);
 use List::Compare::Functional qw(
@@ -98,14 +98,6 @@ note("development releases");
     compression     => 'gz',
 } );
 cmp_ok(scalar(@dev), '>=', 1, "Non-zero number of .gz tarballs listed");
-@three_oldest = (
-    "perl5.004_02.tar.gz",
-    "perl5.004_01.tar.gz",
-    "perl5.003_07.tar.gz",
-);
-for (my $i = 0; $i <= $#three_oldest; $i++) {
-    is($dev[$i-3], $three_oldest[$i], "Got $three_oldest[$i] where expected");
-}
 @devgz = map {$_} @dev;
 
 note("list_releases() default case: type: dev compression: gz");
@@ -113,38 +105,18 @@ note("list_releases() default case: type: dev compression: gz");
 @dev = $self->list_releases();
 cmp_ok(scalar(@dev), '>=', 1,
     "list_releases() default case: Non-zero number of .gz tarballs listed");
-for (my $i = 0; $i <= $#three_oldest; $i++) {
-    is($dev[$i-3], $three_oldest[$i],
-        "list_releases() default case: Got $three_oldest[$i] where expected");
-}
 
 @dev = $self->list_releases( {
     type            => 'development',
     compression     => 'bz2',
 } );
 cmp_ok(scalar(@dev), '>=', 1, "Non-zero number of .bz2 tarballs listed");
-@three_oldest = (
-    "perl-5.11.1.tar.bz2",
-    "perl-5.11.0.tar.bz2",
-    "perl-5.9.0.tar.bz2",
-);
-for (my $i = 0; $i <= $#three_oldest; $i++) {
-    is($dev[$i-3], $three_oldest[$i], "Got $three_oldest[$i] where expected");
-}
 
 @dev = $self->list_releases( {
     type            => 'development',
     compression     => 'xz',
 } );
 cmp_ok(scalar(@dev), '>=', 1, "Non-zero number of .xz tarballs listed");
-@three_oldest = (
-    "perl-5.21.8.tar.xz",
-    "perl-5.21.7.tar.xz",
-    "perl-5.21.6.tar.xz",
-);
-for (my $i = 0; $i <= $#three_oldest; $i++) {
-    is($dev[$i-3], $three_oldest[$i], "Got $three_oldest[$i] where expected");
-}
 
 note("rc releases");
 
@@ -152,15 +124,8 @@ note("rc releases");
     type            => 'rc',
     compression     => 'gz',
 } );
+
 cmp_ok(scalar(@rc), '>=', 1, "Non-zero number of .gz tarballs listed");
-@three_oldest = (
-  "perl-5.6.1-TRIAL3.tar.gz",
-  "perl-5.6.1-TRIAL2.tar.gz",
-  "perl-5.6.1-TRIAL1.tar.gz",
-);
-for (my $i = 0; $i <= $#three_oldest; $i++) {
-    is($rc[$i-3], $three_oldest[$i], "Got $three_oldest[$i] where expected");
-}
 @rcgz = map {$_} @rc;
 
 @rc = $self->list_releases( {
@@ -168,29 +133,12 @@ for (my $i = 0; $i <= $#three_oldest; $i++) {
     compression     => 'bz2',
 } );
 cmp_ok(scalar(@rc), '>=', 1, "Non-zero number of .bz2 tarballs listed");
-@three_oldest = (
-    "perl-5.12.2-RC1.tar.bz2",
-    "perl-5.12.1-RC2.tar.bz2",
-    "perl-5.12.1-RC1.tar.bz2",
-);
-for (my $i = 0; $i <= $#three_oldest; $i++) {
-    is($rc[$i-3], $three_oldest[$i], "Got $three_oldest[$i] where expected");
-}
 
 @rc = $self->list_releases( {
     type            => 'rc',
     compression     => 'xz',
 } );
 cmp_ok(scalar(@rc), '>=', 1, "Non-zero number of .xz tarballs listed");
-@three_oldest = (
-    "perl-5.22.1-RC1.tar.xz",
-    "perl-5.22.0-RC2.tar.xz",
-    "perl-5.22.0-RC1.tar.xz",
-
-);
-for (my $i = 0; $i <= $#three_oldest; $i++) {
-    is($rc[$i-3], $three_oldest[$i], "Got $three_oldest[$i] where expected");
-}
 
 note("dev_or_rc releases");
 
@@ -198,16 +146,8 @@ note("dev_or_rc releases");
     type            => 'dev_or_rc',
     compression     => 'gz',
 } );
-cmp_ok(scalar(@dev_or_rc), '>=', 1, "Non-zero number of .gz tarballs listed");
 
-@three_oldest = (
-    "perl5.004_02.tar.gz",
-    "perl5.004_01.tar.gz",
-    "perl5.003_07.tar.gz",
-);
-for (my $i = 0; $i <= $#three_oldest; $i++) {
-    is($dev_or_rc[$i-3], $three_oldest[$i], "Got $three_oldest[$i] where expected");
-}
+cmp_ok(scalar(@dev_or_rc), '>=', 1, "Non-zero number of .gz tarballs listed");
 
 ok(is_LsubsetR( [ \@devgz, \@dev_or_rc ] ),
     "List of gz dev releases is subset of list of gz dev_or_rc releases");
@@ -238,14 +178,6 @@ note("production releases");
     type                => 'prod',
 } );
 cmp_ok(scalar(@prod), '>=', 1, "Non-zero number of .gz tarballs listed");
-@three_oldest = (
-  "perl-5.6.0.tar.gz",
-  "perl5.005.tar.gz",
-  "perl5.004.tar.gz",
-);
-for (my $i = 0; $i <= $#three_oldest; $i++) {
-    is($prod[$i-3], $three_oldest[$i], "Got $three_oldest[$i] where expected");
-}
 
 note("development releases");
 
@@ -254,14 +186,6 @@ note("development releases");
     type                => 'dev',
 } );
 cmp_ok(scalar(@dev), '>=', 1, "Non-zero number of .gz tarballs listed");
-@three_oldest = (
-    "perl5.004_02.tar.gz",
-    "perl5.004_01.tar.gz",
-    "perl5.003_07.tar.gz",
-);
-for (my $i = 0; $i <= $#three_oldest; $i++) {
-    is($dev[$i-3], $three_oldest[$i], "Got $three_oldest[$i] where expected");
-}
 
 note("rc releases");
 
@@ -270,14 +194,6 @@ note("rc releases");
     type                => 'rc',
 } );
 cmp_ok(scalar(@rc), '>=', 1, "Non-zero number of .gz tarballs listed");
-@three_oldest = (
-  "perl-5.6.1-TRIAL3.tar.gz",
-  "perl-5.6.1-TRIAL2.tar.gz",
-  "perl-5.6.1-TRIAL1.tar.gz",
-);
-for (my $i = 0; $i <= $#three_oldest; $i++) {
-    is($rc[$i-3], $three_oldest[$i], "Got $three_oldest[$i] where expected");
-}
 
 note("dev_or_rc releases");
 
@@ -287,14 +203,6 @@ note("dev_or_rc releases");
 } );
 cmp_ok(scalar(@dev_or_rc), '>=', 1, "Non-zero number of .gz tarballs listed");
 
-@three_oldest = (
-    "perl5.004_02.tar.gz",
-    "perl5.004_01.tar.gz",
-    "perl5.003_07.tar.gz",
-);
-for (my $i = 0; $i <= $#three_oldest; $i++) {
-    is($dev_or_rc[$i-3], $three_oldest[$i], "Got $three_oldest[$i] where expected");
-}
 
 ###########################################################
 
@@ -334,12 +242,4 @@ like(
     "list_releases(): Got expected verbose output"
 );
 cmp_ok(scalar(@prod), '>=', 1, "Non-zero number of .gz tarballs listed");
-@three_oldest = (
-  "perl-5.6.0.tar.gz",
-  "perl5.005.tar.gz",
-  "perl5.004.tar.gz",
-);
-for (my $i = 0; $i <= $#three_oldest; $i++) {
-    is($prod[$i-3], $three_oldest[$i], "Got $three_oldest[$i] where expected");
-}
 

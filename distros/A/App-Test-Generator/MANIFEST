@@ -9,6 +9,7 @@ README.md
 scripts/generate_index.pl
 t/10-compile.t
 t/30-basics.t
+t/40-more.t
 t/abs.t
 t/conf-corpus.t
 t/conf-fuzz.t
@@ -21,6 +22,7 @@ t/conf/html_genealogy_map.conf
 t/conf/html_genealogy_map.yml
 t/eof.t
 t/eol.t
+t/errors.t
 t/generate.t
 t/html_genealogy_map.t
 t/pod-cm.t
@@ -28,6 +30,7 @@ t/pod-coverage.t
 t/pod-spelling.t
 t/pod-synopsis.t
 t/pod.t
+t/unused.t
 t/vars.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

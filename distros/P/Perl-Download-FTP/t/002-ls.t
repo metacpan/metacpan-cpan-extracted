@@ -31,38 +31,27 @@ ok(defined $self, "Constructor returned defined object when using default values
 isa_ok ($self, 'Perl::Download::FTP');
 
 my @exp_gzips = (
-  "perl-5.10.0-RC2.tar.gz",
-  "perl-5.10.0.tar.gz",
-  "perl-5.26.0.tar.gz",
-  "perl-5.26.1-RC1.tar.gz",
-  "perl-5.27.0.tar.gz",
-  "perl-5.6.0.tar.gz",
-  "perl-5.6.1-TRIAL1.tar.gz",
-  "perl-5.6.1-TRIAL2.tar.gz",
-  "perl-5.6.1-TRIAL3.tar.gz",
-  "perl5.003_07.tar.gz",
-  "perl5.004.tar.gz",
-  "perl5.004_01.tar.gz",
-  "perl5.005.tar.gz",
-  "perl5.005_01.tar.gz",
+    "perl-5.40.0-RC1.tar.gz",
+    "perl-5.40.0-RC2.tar.gz",
+    "perl-5.40.0.tar.gz",
+    "perl-5.40.1-RC1.tar.gz",
+    "perl-5.40.1.tar.gz",
+    "perl-5.42.0-RC1.tar.gz",
+    "perl-5.42.0-RC2.tar.gz",
+    "perl-5.42.0-RC3.tar.gz",
+    "perl-5.42.0.tar.gz",
 );
 
 my @exp_bzips = (
   "perl-5.10.1.tar.bz2",
-  "perl-5.12.2-RC1.tar.bz2",
-  "perl-5.26.1-RC1.tar.bz2",
-  "perl-5.27.0.tar.bz2",
-  "perl-5.8.9.tar.bz2",
 );
 
 my @exp_xzs = (
-  "perl-5.21.10.tar.xz",
-  "perl-5.21.6.tar.xz",
-  "perl-5.22.0-RC1.tar.xz",
-  "perl-5.22.0.tar.xz",
-  "perl-5.22.1-RC4.tar.xz",
-  "perl-5.26.1.tar.xz",
-  "perl-5.27.2.tar.xz",
+    "perl-5.40.0.tar.xz",
+    "perl-5.40.1.tar.xz",
+    "perl-5.40.2.tar.xz",
+    "perl-5.40.3.tar.xz",
+    "perl-5.42.0.tar.xz",
 );
 
 @allarchives = $self->ls();

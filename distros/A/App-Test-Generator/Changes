@@ -1,5 +1,15 @@
 Revision history for App-Test-Generator
 
+0.14 Fri Nov  7 20:26:32 EST 2025
+	Fixed logic when neither memberof nor notmemberof were defined,
+		which could cause an empty notmemberof array to be created
+	Transform: better number of items for arrayrefs
+	At least one of module and function must be defined
+	Don't send wrong data types in transform testing built ins
+	Document the edge_cases_array and ensure all tests in that array are run
+	Better handing of "input: undef" in the config file
+	Fix handling of matches in output schemas
+
 0.13	Tue Nov  4 11:52:49 EST 2025
 	Added better documentation for transforms
 	transform: filled in more types for the foundation set of data

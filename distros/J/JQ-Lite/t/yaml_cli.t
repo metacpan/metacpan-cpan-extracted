@@ -2,9 +2,9 @@ use strict;
 use warnings;
 use Test::More;
 
-# Skip this test on Perl 5.20–5.26 because of known compatibility issues
-if ($] >= 5.020000 && $] < 5.027000) {
-    plan skip_all => "Skipped on Perl 5.20–5.26 due to known incompatibility";
+# YAML support relies on functionality available only in Perl 5.40 and newer
+if ($] < 5.040000) {
+    plan skip_all => "YAML tests require Perl 5.40 or newer";
 }
 
 use IPC::Open3;

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Data::Dumper;
-use English    qw(-no_match_vars);
+use English qw(-no_match_vars);
 use List::Util qw(any);
 use Readonly;
 use Test::More;
@@ -112,9 +112,7 @@ sub check_test_bucket {
   my $response = eval { return $s3->buckets; };
 
   if ( $EVAL_ERROR || !$response ) {
-    diag(
-      Dumper( [ error => [ $response, $s3->err, $s3->errstr, $s3->error ] ] )
-    );
+    diag( Dumper( [ error => [ $response, $s3->err, $s3->errstr, $s3->error ] ] ) );
 
     BAIL_OUT($EVAL_ERROR);
   }
@@ -142,7 +140,7 @@ sub set_s3_host {
 
   ## no critic (RequireLocalizedPunctuationVars)
 
-  if ( exists $ENV{AMAZON_S3_LOCALSTACK} ) {
+  if ( $ENV{AMAZON_S3_LOCALSTACK} ) {
 
     $host //= $DEFAULT_LOCAL_STACK_HOST;
 
@@ -150,9 +148,9 @@ sub set_s3_host {
 
     $ENV{AWS_SECRET_ACCESS_KEY} = 'test';
 
-    $ENV{AMAZON_S3_EXPENSIVE_TESTS} = $TRUE;
+    $ENV{AMAZON_S3_SKIP_ACLS} = $TRUE;
 
-    $ENV{AMAZON_S3_SKIP_PERMISSIONS} = $TRUE;
+    $ENV{AMAZON_S3_EXPENSIVE_TESTS} = $TRUE;
   }
   elsif ( exists $ENV{AMAZON_S3_MINIO} ) {
 

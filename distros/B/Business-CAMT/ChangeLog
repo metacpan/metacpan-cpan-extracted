@@ -4,6 +4,13 @@
 Unless noted otherwise, these changes where initiated and applied by
 Mark Overmeer.
 
+version 0.14: Thu  6 Nov 12:18:30 CET 2025
+
+	Improvements:
+	- added some new or updated schemas.
+	- convert to OODoc 3.05
+	- added minimal tests
+
 version 0.13: Mon  2 Dec 09:23:52 CET 2024
 
 	Changes:

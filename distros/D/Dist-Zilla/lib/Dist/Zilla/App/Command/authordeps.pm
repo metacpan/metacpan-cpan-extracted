@@ -1,4 +1,4 @@
-package Dist::Zilla::App::Command::authordeps 6.033;
+package Dist::Zilla::App::Command::authordeps 6.034;
 # ABSTRACT: List your distribution's author dependencies
 
 use Dist::Zilla::Pragmas;
@@ -29,6 +29,7 @@ sub opt_spec {
     [ 'root=s' => 'the root of the dist; defaults to .' ],
     [ 'missing' => 'list only the missing dependencies' ],
     [ 'versions' => 'include required version numbers in listing' ],
+    [ 'cpanm-versions' => 'format versions for consumption by cpanm' ],
   );
 }
 
@@ -38,11 +39,13 @@ sub execute {
   require Dist::Zilla::Path;
   require Dist::Zilla::Util::AuthorDeps;
 
-  my $deps = Dist::Zilla::Util::AuthorDeps::format_author_deps(
-    Dist::Zilla::Util::AuthorDeps::extract_author_deps(
+  my $deps = Dist::Zilla::Util::AuthorDeps::_format_author_deps(
+    Dist::Zilla::Util::AuthorDeps::_extract_author_deps(
       Dist::Zilla::Path::path($opt->root // '.'),
       $opt->missing,
-    ), $opt->versions
+    ),
+    $opt->versions,
+    $opt->cpanm_versions
   );
 
   $self->log($deps) if $deps;
@@ -64,7 +67,7 @@ Dist::Zilla::App::Command::authordeps - List your distribution's author dependen
 
 =head1 VERSION
 
-version 6.033
+version 6.034
 
 =head1 SYNOPSIS
 

@@ -1,4 +1,4 @@
-package Dist::Zilla::App::Command::version 6.033;
+package Dist::Zilla::App::Command::version 6.034;
 # ABSTRACT: display dzil's version
 
 use Dist::Zilla::Pragmas;
@@ -40,7 +40,7 @@ Dist::Zilla::App::Command::version - display dzil's version
 
 =head1 VERSION
 
-version 6.033
+version 6.034
 
 =head1 SYNOPSIS
 

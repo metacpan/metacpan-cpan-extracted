@@ -1,12 +1,20 @@
-# Copyrights 2024 by [Mark Overmeer <markov@cpan.org>].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.03.
-# This code is part of distribution Business::CAMT.  It is licensed under the
-# same terms as Perl itself: https://spdx.org/licenses/Artistic-2.0.html
+# This code is part of Perl distribution Business-CAMT version 0.14.
+# The POD got stripped from this file by OODoc version 3.05.
+# For contributors see file ChangeLog.
+
+# This software is copyright (c) 2024-2025 by Mark Overmeer.
+
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
+#oodist: *** DO NOT USE THIS VERSION FOR PRODUCTION ***
+#oodist: This file contains OODoc-style documentation which will get stripped
+#oodist: during its release in the distribution.  You can use this file for
+#oodist: testing, however the code of this development version may be broken!
 
 package Business::CAMT::Message;{
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 }
 
 
@@ -21,7 +29,7 @@ use JSON          ();
 sub new
 {	my ($class, %args) = @_;
 	my $data = delete $args{data} or return undef;
-    (bless $data, $class)->init(\%args);
+	(bless $data, $class)->init(\%args);
 }
 
 sub init($) {
@@ -56,13 +64,13 @@ sub fromData(%)
 	$class->_loadSubclass($set)->new(%args);
 }
 
-#-------------------------
+#--------------------
 
 sub set     { $_[0]->{_attrs}{set} }
 sub version { $_[0]->{_attrs}{version} }
 sub camt    { $_[0]->{_attrs}{camt} }
 
-#-------------------------
+#--------------------
 
 sub write(%)
 {	my ($self, $file) = (shift, shift);

@@ -14,7 +14,7 @@ our @EXPORT = ('strtotime');
 ###############################################################################
 
 # https://pause.perl.org/pause/query?ACTION=pause_operating_model#3_5_factors_considering_in_the_indexing_phase
-our $VERSION = '0.6';
+our $VERSION = '0.8';
 
 # https://timezonedb.com/download
 my $TZ_OFFSET = {
@@ -75,7 +75,7 @@ our $MONTH_REGEXP = qr/
 
 =head1 NAME
 
-C<Date::Parse::Modern> - Provide string to unixtime conversions
+Date::Parse::Modern - Provide string to unixtime conversions
 
 =head1 DESCRIPTION
 
@@ -101,7 +101,8 @@ integer unixtime. If the string is unparseable, or a weird error occurs, it will
 All the "magic" in C<strtotime()> is done using regular expressions that look for common datetime
 formats. Common formats like YYYY-MM-DD and HH:II:SS are easily detected and converted to the
 appropriate formats. This allows the date or time to be found anywhere in the string, in (almost) any
-order. In all cases, the day of the week is ignored in the input string.
+order. If you limit your string to only the date/time portion the parsing will
+be much quicker. Shorter input equals faster parsing.
 
 B<Note:> Strings without a year are assumed to be in the current year. Example: C<May 15th, 10:15am>
 
@@ -111,6 +112,8 @@ B<Note:> Strings with only time are assumed to be the current day. Example: C<10
 
 B<Note:> In strings with numeric B<and> textual time zone offsets, the numeric is used. Example:
 C<14 Nov 1994 11:34:32 -0500 (EST)>
+
+B<Note:> In all cases, the day of the week is ignored in the input string. Example: C<Mon Mar 25 2024>
 
 =head1 Will you support XYZ format?
 
@@ -154,9 +157,9 @@ sub strtotime {
 
 	state $rule_1 = qr/
 		\b
-		((\d{4})$sep(\d{2})$sep(\d{2}) # YYYY-MM-DD
+		((\d{4})$sep(\d{1,2})$sep(\d{1,2}) # YYYY-MM-DD
 		|
-		(\d{2})$sep(\d{2})$sep(\d{4})) # DD-MM-YYYY
+		(\d{1,2})$sep(\d{1,2})$sep(\d{4})) # DD-MM-YYYY
 	/x;
 
 	# First we look to see if we have anything that mathches YYYY-MM-DD (numerically)
@@ -250,6 +253,11 @@ sub strtotime {
 	# The year may be on the end of the string: Sat May  8 21:24:31 2021
 	if (!$year) {
 		($year) = $str =~ m/\b(\d{4})\b/;
+	}
+
+	# Match 1st, 2nd, 3rd, 29th
+	if (!$day && $str =~ m/\b(\d{1,2})(st|nd|rd|th)/) {
+		$day = $1;
 	}
 
 	###########################################################################
@@ -410,7 +418,7 @@ sub strtotime {
 		my $color  = "\e[38;5;45m";
 		my $reset  = "\e[0m";
 		my $header = sprintf("%*s = YYYY-MM-DD HH:II:SS (timezone offset)", length($str) + 2, "Input string");
-		my $output = sprintf("'%s' = %02d-%02d-%02d %02d:%02d:%02d (%s = %d seconds)", $str, $year || -1, $month || -1, $day || -1, $hour, $min, $sec, $tz_str, $tz_offset_seconds);
+		my $output = sprintf("%12s = %02d-%02d-%02d %02d:%02d:%02d (%s = %d seconds)", "'$str'", $year || -1, $month || -1, $day || -1, $hour, $min, $sec, $tz_str, $tz_offset_seconds);
 
 		print STDERR $color . $header . $reset . "\n";
 		print STDERR $output . "\n";

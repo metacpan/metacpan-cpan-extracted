@@ -9380,6 +9380,7 @@ sub send_email
       -1<index $Net::FullAuto::FA_Core::LOG,'*';
    my $usage='notify_on_error';my $mail_module='Mail::Sender';
    my $mail_method='';my $mail_server='';my $mail_port='';
+   my $mail_sasl_username='';my $mail_sasl_password='';
    my $bcc='';my $cc='';my $content_type='';my $priority='';
    my $content_transfer_encoding='';my $content_disposition='';
    my $date='';my $from='';my $keywords='';my $message_id='';
@@ -9423,6 +9424,12 @@ sub send_email
            (exists $email_defaults{Mail_Port})) {
          $mail_port=$email_defaults{Mail_Port};
       }
+      if (exists $mail_info->{Mail_SASL_Username}) {
+         $mail_sasl_username=$mail_info->{Mail_SASL_Username};
+      } elsif ($email_defaults &&
+           (exists $email_defaults{Mail_SASL_Password})) {
+         $mail_sasl_password=$email_defaults{Mail_SASL_Password};
+      }
       if ($mail_method=~/smtp/i) {
          if ($mail_server) {
             if ($mail_port) {
@@ -9433,6 +9440,31 @@ sub send_email
             } else {
                $transport=Email::Sender::Transport::SMTP->new({
                    host => $mail_server
+               });
+            }
+         }
+      } elsif ($mail_method=~/ssl/i) {
+         if ($mail_server) {
+            if ($mail_port) {
+               if ($mail_sasl_username) {
+                  $transport=Email::Sender::Transport::SMTP->new({
+                      host => $mail_server,
+                      port => $mail_port,
+                      ssl => 'STARTTLS',
+                      sasl_username => $mail_sasl_username,
+                      sasl_password => $mail_sasl_password
+                  });
+               } else {
+                  $transport=Email::Sender::Transport::SMTP->new({
+                      host => $mail_server,
+                      port => $mail_port,
+                      ssl => 'STARTTLS'
+                  });
+               }
+            } else {
+               $transport=Email::Sender::Transport::SMTP->new({
+                   host => $mail_server,
+                   ssl => 'STARTTLS',
                });
             }
          }
@@ -9620,6 +9652,10 @@ sub send_email
          if exists $email_defaults{Mail_Port};
       $mail_method=$email_defaults{Mail_Method}
          if exists $email_defaults{Mail_Method};
+      $mail_sasl_username=$email_defaults{Mail_SASL_Username}
+         if exists $email_defaults{Mail_SASL_Username};
+      $mail_sasl_password=$email_defaults{Mail_SASL_Password}
+         if exists $email_defaults{Mail_SASL_Password};
       if ($mail_method=~/smtp/i) {
          if ($mail_server) {
             if ($mail_port) {
@@ -9632,6 +9668,29 @@ sub send_email
                    host => $mail_server
                });
             }
+         }
+      } elsif ($mail_method=~/ssl/i) {
+         if ($mail_port) {
+            if ($mail_sasl_username) {
+               $transport=Email::Sender::Transport::SMTP->new({
+                   host => $mail_server,
+                   port => $mail_port,
+                   ssl => 'STARTTLS',
+                   sasl_username => $mail_sasl_username,
+                   sasl_password => $mail_sasl_password
+               });
+            } else {
+               $transport=Email::Sender::Transport::SMTP->new({
+                   host => $mail_server,
+                   port => $mail_port,
+                   ssl => 'STARTTLS'
+               });
+            }
+         } else {
+            $transport=Email::Sender::Transport::SMTP->new({
+                host => $mail_server,
+                ssl => 'STARTTLS',
+            });
          }
       }
       $ent = MIME::Entity->build(Type       => "multipart/mixed",

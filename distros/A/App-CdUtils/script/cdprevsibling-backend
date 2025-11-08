@@ -9,9 +9,9 @@ use File::chdir;
 use Getopt::Long::Complete qw(GetOptionsWithCompletion);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-11-04'; # DATE
+our $DATE = '2025-11-07'; # DATE
 our $DIST = 'App-CdUtils'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 # FRAGMENT id=shcompgen-hint completer=1 for=cdprevsibling
 
@@ -110,7 +110,7 @@ cdprevsibling-backend - Change to the "previous" or "next" sibling directory
 
 =head1 VERSION
 
-This document describes version 0.012 of cdprevsibling-backend (from Perl distribution App-CdUtils), released on 2025-11-04.
+This document describes version 0.013 of cdprevsibling-backend (from Perl distribution App-CdUtils), released on 2025-11-07.
 
 =head1 SYNOPSIS
 
@@ -143,6 +143,31 @@ To use in shell:
  % cdprevsibling
  % pwd
  /some/path/four
+
+Changing sibling of grandparent (and upper) directory:
+
+ % tree
+ .
+ ├── A
+ │   ├── X0
+ │   ├── X1
+ │   │   └── Y
+ │   └── X2
+ └── B
+     ├── X0
+     ├── X1
+     │   └── Z
+     └── X2
+ 11 directories, 0 files
+
+ % cd A/X1
+ % cdnextsibling -l2
+ % pwd
+ /some/path/B/X1
+ % cd Z
+ % cdprevsibling -l3
+ % pwd
+ /some/path/A/X1        # (because A/X1/Z is not available)
 
 =head1 DESCRIPTION
 

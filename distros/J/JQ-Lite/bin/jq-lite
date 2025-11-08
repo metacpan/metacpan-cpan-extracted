@@ -24,6 +24,7 @@ my $query_file;
 my $force_yaml      = 0;
 my $yaml_module;
 my $yaml_loader;
+my %arg_vars;
 
 # ---------- Help text ----------
 my $USAGE = <<'USAGE';
@@ -39,6 +40,7 @@ Options:
   --color              Colorize JSON output (keys, strings, numbers, booleans)
   --use <Module>       Force JSON decoder module (e.g. JSON::PP, JSON::XS, Cpanel::JSON::XS)
   --debug              Show which JSON module is being used
+  --arg NAME VALUE     Set jq-style variable $NAME to the string VALUE
   -f, --from-file FILE Read jq filter from FILE instead of the command line
   -n, --null-input     Use null as input instead of reading JSON data
   -s, --slurp          Read entire input stream as an array of JSON values
@@ -74,6 +76,17 @@ GetOptions(
     'help-functions'  => \$help_functions,
     'version|v'       => \$want_version,
     'from-file|f=s'   => \$query_file,
+    'arg=s'           => sub {
+        my ($opt_name, $var_name) = @_;
+        die "[ERROR] --arg requires a variable name\n" if !defined $var_name || $var_name eq '';
+        if ($var_name !~ /^[A-Za-z_]\w*$/) {
+            die "[ERROR] Invalid variable name '$var_name' for --arg\n";
+        }
+        die "[ERROR] --arg requires a value\n" if !@ARGV;
+        my $value = shift @ARGV;
+        $value = '' unless defined $value;
+        $arg_vars{$var_name} = "$value";
+    },
 ) or die "[ERROR] Unknown option(s)\n";
 
 if ($help_functions) {
@@ -262,7 +275,7 @@ if ($slurp_input && !$null_input) {
 }
 
 # ---------- JQ::Lite core ----------
-my $jq = JQ::Lite->new(raw => $raw_output);
+my $jq = JQ::Lite->new(raw => $raw_output, vars => \%arg_vars);
 
 sub convert_yaml_to_json {
     my ($text) = @_;

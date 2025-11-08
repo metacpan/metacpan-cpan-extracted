@@ -1,14 +1,22 @@
-# Copyrights 2024 by [Mark Overmeer <markov@cpan.org>].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.03.
-# This code is part of distribution Business::CAMT.  It is licensed under the
-# same terms as Perl itself: https://spdx.org/licenses/Artistic-2.0.html
+# This code is part of Perl distribution Business-CAMT version 0.14.
+# The POD got stripped from this file by OODoc version 3.05.
+# For contributors see file ChangeLog.
+
+# This software is copyright (c) 2024-2025 by Mark Overmeer.
+
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
+#oodist: *** DO NOT USE THIS VERSION FOR PRODUCTION ***
+#oodist: This file contains OODoc-style documentation which will get stripped
+#oodist: during its release in the distribution.  You can use this file for
+#oodist: testing, however the code of this development version may be broken!
 
 # https://www.betaalvereniging.nl/wp-content/uploads/IG-Bank-to-Customer-Statement-CAMT-053-v1-1.pdf
 
 package Business::CAMT;{
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 }
 
 
@@ -21,9 +29,9 @@ use Log::Report 'business-camt';
 use Path::Class         ();
 use XML::LibXML         ();
 use XML::Compile::Cache ();
-use Scalar::Util        qw(blessed);
-use List::Util          qw(first);
-use XML::Compile::Util  qw(pack_type);
+use Scalar::Util        qw/blessed/;
+use List::Util          qw/first/;
+use XML::Compile::Util  qw/pack_type/;
 
 use Business::CAMT::Message ();
 
@@ -45,7 +53,7 @@ my $tagtable;
 
 sub new(%)
 {	my ($class, %args) = @_;
-    (bless {}, $class)->init(\%args);
+	(bless {}, $class)->init(\%args);
 }
 
 sub init($)
@@ -62,23 +70,23 @@ sub init($)
 	$self->{BC_long} = delete $args->{long_tagnames} || 0;
 	$self->{RC_schemas} = XML::Compile::Cache->new;
 
-    $self;
+	$self;
 }
 
-#-------------------------
+#--------------------
 
 sub schemas() { $_[0]->{RC_schemas} }
 
-#-------------------------
+#--------------------
 
 sub read($%)
 {	my ($self, $src, %args) = @_;
 
 	my $dom
-	  = ! ref $src ? XML::LibXML->load_xml($src =~ /\<.*\>/ ? (string => $src) : (location => $src))
-	  : $src->isa('IO::Handle') || $src->isa('GLOB') ? XML::LibXML->load_xml(IO => $src)
-	  : $src->isa('XML::LibXML::Node') ? $src
-	  : error "Unrecognized input";
+	= ! ref $src ? XML::LibXML->load_xml($src =~ /\<.*\>/ ? (string => $src) : (location => $src))
+	: $src->isa('IO::Handle') || $src->isa('GLOB') ? XML::LibXML->load_xml(IO => $src)
+	: $src->isa('XML::LibXML::Node') ? $src
+	: error "Unrecognized input";
 
 	my $xml = $dom->isa('XML::LibXML::Document') ? $dom->documentElement : $dom;
 
@@ -148,8 +156,7 @@ sub write($$%)
 	my @versions = sort { $a <=> $b } keys %$versions;
 	my $version  = $msg->version;
 	grep $version eq $_, @versions
-		or error __x"Schema version {version} is not available, pick from {versions}.",
-			version => $version, versions => \@versions;
+		or error __x"Schema version {version} is not available, pick from {versions}.", version => $version, versions => \@versions;
 
 	my $ns     = "$urnbase:camt.$set.$version";
 	my $writer = $self->schemaWriter($set, $version, $ns);
@@ -158,14 +165,12 @@ sub write($$%)
 	my $xml    = $writer->($doc, $msg);
 	$doc->setDocumentElement($xml);
 
-	if(ref $fn eq 'GLOB')
-         { $doc->toFH($fn, 1) }
-	else { $doc->toFile($fn, 1) }
+	if(ref $fn eq 'GLOB') { $doc->toFH($fn, 1) } else { $doc->toFile($fn, 1) }
 
 	$xml;
 }
 
-#-------------------------
+#--------------------
 
 sub _loadXsd($$)
 {	my ($self, $set, $version) = @_;
@@ -208,6 +213,7 @@ sub schemaWriter($$$)
 
 # called with ($set, $version, \@available_versions)
 sub _exact { first { $_[1] eq $_ } @{$_[2]} }
+
 my %rules = (
 	EXACT  => \&_exact,
 	NEWER  => sub { (grep $_ >= $_[1], @{$_[2]})[0] },
@@ -222,7 +228,7 @@ sub matchSchema($$%)
 	my $ruler = $args{rule} ||= $self->{BC_rule};
 	my $rule  = ref $ruler eq 'CODE' ? $ruler : $rules{$ruler}
 		or error __x"Unknown schema match rule '{rule}'.", rule => $ruler;
-	
+
 	$rule->($set, $version, [ sort { $a <=> $b } keys %$versions ]);
 }
 
@@ -250,6 +256,6 @@ sub tag2fullnameTable()
 	};
 }
 
-#---------------
+#--------------------
 
 1;

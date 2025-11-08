@@ -19,7 +19,7 @@ name: App-CdUtils
 provides:
   App::CdUtils:
     file: lib/App/CdUtils.pm
-    version: '0.012'
+    version: '0.013'
 requires:
   Complete::Util: '0.620'
   Cwd: '0'
@@ -34,7 +34,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-CdUtils
   homepage: https://metacpan.org/release/App-CdUtils
   repository: git://github.com/perlancar/perl-App-CdUtils.git
-version: '0.012'
+version: '0.013'
 x_Dist_Zilla:
   perl:
     version: '5.040002'

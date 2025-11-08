@@ -1,5 +1,8 @@
 Revision history for Perl extension HTML::Defang.
 
+1.08  Thu Nov 6 22:00:00 2025
+  - Fix defang bug with <script> tag and mangled comment data
+
 1.07  Tue Jul 3 15:30:00 2018
   - More fixes for 5.26 (\{ in regexp)
   - Fixes for perl 5.8 (thanks Michael McClimon)

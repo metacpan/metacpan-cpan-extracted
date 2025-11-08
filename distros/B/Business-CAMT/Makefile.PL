@@ -8,13 +8,55 @@ use 5.020;
 
 use ExtUtils::MakeMaker;
 
-my $git_url = 'https://github.com/markov2/perl5-Business-CAMT';
+# Use command 'oodist' to produce your whole software release.
+my $git      = "https://github.com/markov2/perl5-Business-CAMT";
+my $publish  = "../public_html/business-camt";
+my $homepage = "http://perl.overmeer.net/CPAN/";
+
+my %oodist   = (
+	oodoc_version => 3.05,
+	first_year    => 2024,
+	email    => "markov\@cpan.org",
+
+	include  => [
+	],
+
+	use      => [
+	],
+
+	parser   => {
+		syntax         => 'markov',
+		skip_links     => [
+		],
+		pmhead         => undef,
+	},
+
+	tests    => {
+	},
+
+	release  => {
+		publish        => "$publish/source",
+	},
+
+	raw      => {
+		publish        => "$publish/raw",
+	},
+
+	generate => [
+	  {
+		format         => 'pod3',
+		podtail        => undef,
+	  },
+	],
+);
 
 WriteMakefile
-  (
-    NAME             => 'Business-CAMT',
-    VERSION          => '0.13',
+    NAME             => 'Business::CAMT',
+    VERSION          => '0.14',
     AUTHOR           => 'Mark Overmeer <markov@cpan.org>',
+	ABSTRACT         => 'ISO20022 Cash Management (CAMT) messages',
+	LICENSE          => 'perl_5',
+
     PREREQ_PM        => {
 		'Data::Dumper'   => 0,
 		'Getopt::Long'   => 0,
@@ -23,42 +65,37 @@ WriteMakefile
         'Log::Report'    => 1.32,
 		'Path::Class'    => 0,
         'Scalar::Util'   => 0,
-        'Test::More'     => 0,
         'XML::Compile'   => 1.64,
         'XML::Compile::Cache' => 1.06,
         'XML::LibXML'    => 2.0207,
     },
 	EXE_FILES        => [ qw(bin/camt) ],
-    test             => {TESTS         => 't/*.t'},
-    clean            => {FILES         => '*.bak'},
-    MIN_PERL_VERSION => '5.014000',
-    META_MERGE       => {
-        dynamic_config => 0,
-        'meta-spec'    => {version   => 2},
-        no_index       => {directory => [ 't', 'xt', ]},
-        prereqs        => {runtime   => {requires => {perl => '5.020000'}}},
-        resources      => {
-            bugtracker => {web => "$git_url/issues"},
-            homepage   => 'http://perl.overmeer.net',
-            license    => [ 'http://dev.perl.org/licenses/'],
-            repository => {
-                type => 'git',
-                url => "$git_url.git",
-                web => $git_url,
-            },
-        },
-    },
-);
 
-sub MY::postamble { <<'__DIST' }
-# for DIST
-RAWDIR          = ../public_html/business-camt/raw
-DISTDIR         = ../public_html/business-camt/source
-LICENSE         = perl
+	META_MERGE => {
+		'meta-spec' => { version => 2 },
+		resources   => {
+			repository => {
+				type => 'git',
+				url  => "$git.git",
+				web  => $git,
+			},
+			homepage => $homepage,
+			license  => [ 'http//dev.perl.org/licenses/' ],
+		},
+		prereqs => {
+			develop => {
+				requires => {
+					'OODoc' => '3.00',
+				}
+			},
+			test => {
+				requires => {
+					'Test::More' => 1.00,
+					'Test::Pod'  => 1.00,
+				}
+			},
+		},
 
-# for POD
-FIRST_YEAR      = 2024
-EMAIL           = markov@cpan.org
-WEBSITE         = http://perl.overmeer.net/CPAN/
-
-__DIST
+		# You may use multiple set-ups, see "oodist --make"
+		x_oodist => \%oodist,
+	};

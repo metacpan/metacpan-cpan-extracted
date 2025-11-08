@@ -1,5 +1,12 @@
 Revision history for Dist-Zilla
 
+6.034     2025-11-07 09:20:18-05:00 America/Toronto
+        - add "dzil authordeps --cpanm-versions"
+        - the --cpanm-versions output no longer includes double quotes;
+          that is: it emits Foo~2 rather than Foo~"2"
+        - drop Archive::Tar::Wrapper, which failed when the path contained
+          non-ASCII; the speed improvement was quite small
+
 6.033     2025-05-01 11:45:18-04:00 America/New_York
         - when creating a tarball with GNU tar, use --format=ustar to avoid
           xattrs and other problems sometimes related to macOS (thanks, Graham

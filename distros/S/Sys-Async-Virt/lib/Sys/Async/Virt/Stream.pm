@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v0.3.1
-#                   and LibVirt version v11.8.0
+#                   and LibVirt version v11.9.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -16,7 +16,7 @@ use experimental 'signatures';
 use Future::AsyncAwait;
 use Object::Pad 0.821;
 
-class Sys::Async::Virt::Stream v0.1.7;
+class Sys::Async::Virt::Stream v0.1.8;
 
 # inheriting from IO::Async::Notifier (a non-Object::Pad base class) implies ':repr(HASH)'
 inherit IO::Async::Notifier;
@@ -25,7 +25,7 @@ use Carp qw(croak);
 use Future::Queue;
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v0.1.7;
+use Protocol::Sys::Virt::Remote::XDR v0.1.8;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 field $_id :param :reader;
@@ -162,7 +162,7 @@ Sys::Async::Virt::Stream - Client side of a data transfer channel
 
 =head1 VERSION
 
-v0.1.7
+v0.1.8
 
 =head1 SYNOPSIS
 

@@ -21,6 +21,7 @@ t/abs.t
 t/aggregate.t
 t/all.t
 t/any.t
+t/arg_option.t
 t/arithmetic.t
 t/array_constructor.t
 t/arrays.t
@@ -67,6 +68,7 @@ t/index.t
 t/indices.t
 t/is_empty.t
 t/join.t
+t/json_formatter.t
 t/keys_unsorted.t
 t/leaf_paths.t
 t/length.t

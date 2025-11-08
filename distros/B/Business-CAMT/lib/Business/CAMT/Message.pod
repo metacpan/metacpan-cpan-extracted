@@ -27,15 +27,15 @@ the CAMT messages.
 
 =over 4
 
-=item Business::CAMT::Message-E<gt>B<fromData>(%options)
+=item $class-E<gt>B<fromData>(%options)
 
-This method accepts the same %options as N<new()>.  All options
+This method accepts the same C<%options> as N<new()>.  All options
 passed in are passed to that constructor.
 
-=item Business::CAMT::Message-E<gt>B<new>(%options)
+=item $class-E<gt>B<new>(%options)
 
 The data (probably read from a file) is wrapped into this class.  When
-C<data> is undef, then C<undef> will be returned.
+C<data> is C<undef>, then C<undef> will be returned.
 
  -Option --Default
   camt     <required>
@@ -45,7 +45,7 @@ C<data> is undef, then C<undef> will be returned.
 
 =over 2
 
-=item camt => L<Business::CAMT|Business::CAMT> object
+=item camt => Business::CAMT object
 
 =item data => HASH
 
@@ -63,9 +63,15 @@ C<data> is undef, then C<undef> will be returned.
 
 =item $obj-E<gt>B<camt>()
 
+Z<>
+
 =item $obj-E<gt>B<set>()
 
+Z<>
+
 =item $obj-E<gt>B<version>()
+
+Z<>
 
 =back
 
@@ -102,25 +108,26 @@ attributes in your output: this method hides that administration.
 
 =item $obj-E<gt>B<write>($file, %options)
 
-All %options are passed to L<Business::CAMT::write()|Business::CAMT/"Read and Write messages">.
+All C<%options> are passed to L<Business::CAMT::write()|Business::CAMT/"Read and Write messages">.
 
-example: for write
+» example: for write
 
-   $msg->write($file);
-   $camt->write($file, $msg);   # same
+  $msg->write($file);
+  $camt->write($file, $msg);   # same
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Business-CAMT distribution version 0.13,
-built on December 02, 2024. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Business-CAMT version 0.14,
+built on November 06, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2024 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2024-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::ModuleBuild 6.033;
+package Dist::Zilla::Plugin::ModuleBuild 6.034;
 # ABSTRACT: build a Build.PL that uses Module::Build
 
 use Moose;
@@ -270,7 +270,7 @@ Dist::Zilla::Plugin::ModuleBuild - build a Build.PL that uses Module::Build
 
 =head1 VERSION
 
-version 6.033
+version 6.034
 
 =head1 DESCRIPTION
 

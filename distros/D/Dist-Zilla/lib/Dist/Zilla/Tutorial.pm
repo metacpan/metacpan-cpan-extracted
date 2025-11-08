@@ -1,4 +1,4 @@
-package Dist::Zilla::Tutorial 6.033;
+package Dist::Zilla::Tutorial 6.034;
 # ABSTRACT: how to use this "Dist::Zilla" thing
 
 use Dist::Zilla::Pragmas;
@@ -25,11 +25,15 @@ Carp::confess "you're not meant to use the tutorial, just read it!";
 #pod   copyright_holder = Alan Smithee
 #pod
 #pod   [@Basic]
+#pod   ; options to @Basic could go here
 #pod
 #pod   [Prereqs]
 #pod   App::Cmd          = 0.013
 #pod   Number::Nary      = 0
 #pod   Sub::Exporter     = 0.981
+#pod
+#pod It's a plain old L<INI file|https://en.wikipedia.org/wiki/INI_file>, following
+#pod the L<grammar in Config::INI|https://metacpan.org/pod/Config::INI#GRAMMAR>.
 #pod
 #pod The topmost section configures Dist::Zilla itself.  Here are some of the
 #pod entries it expects:
@@ -148,7 +152,7 @@ Dist::Zilla::Tutorial - how to use this "Dist::Zilla" thing
 
 =head1 VERSION
 
-version 6.033
+version 6.034
 
 =head1 SYNOPSIS
 
@@ -168,11 +172,15 @@ F<dist.ini>:
   copyright_holder = Alan Smithee
 
   [@Basic]
+  ; options to @Basic could go here
 
   [Prereqs]
   App::Cmd          = 0.013
   Number::Nary      = 0
   Sub::Exporter     = 0.981
+
+It's a plain old L<INI file|https://en.wikipedia.org/wiki/INI_file>, following
+the L<grammar in Config::INI|https://metacpan.org/pod/Config::INI#GRAMMAR>.
 
 The topmost section configures Dist::Zilla itself.  Here are some of the
 entries it expects:

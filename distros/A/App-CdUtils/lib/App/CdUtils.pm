@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-11-04'; # DATE
+our $DATE = '2025-11-07'; # DATE
 our $DIST = 'App-CdUtils'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 1;
 
@@ -25,7 +25,7 @@ App::CdUtils - CLI utilities related to changing directories
 
 =head1 VERSION
 
-This document describes version 0.012 of App::CdUtils (from Perl distribution App-CdUtils), released on 2025-11-04.
+This document describes version 0.013 of App::CdUtils (from Perl distribution App-CdUtils), released on 2025-11-07.
 
 =head1 DESCRIPTION
 

@@ -1,7 +1,8 @@
-[![Actions Status](https://github.com/janeskil1525/Daje-Plugin-Apploader/actions/workflows/test.yml/badge.svg)](https://github.com/janeskil1525/Daje-Plugin-Apploader/actions)
+[![Actions Status](https://github.com/janeskil1525/Daje-Plugin-Apploader/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/janeskil1525/Daje-Plugin-Apploader/actions?workflow=test)
 # NAME
 
-Daje::Plugin::Apploader - It's new $module
+Daje::Plugin::Apploader - Loads stuff from a config file
+during starup of the Daje server
 
 # SYNOPSIS
 
@@ -50,13 +51,17 @@ Daje::Plugin::Apploader - It's new $module
 
 # DESCRIPTION
 
-Daje::Plugin::Apploader is ...
+Daje::Plugin::Apploader is a simple apploader for the Daje server.
+It automatically installs missing / installs newer versions of
+modules from cpan if told to
 
 # REQUIRES
 
+[Daje::Database::Migrator](https://metacpan.org/pod/Daje%3A%3ADatabase%3A%3AMigrator) 
+
 [Mojo::Loader](https://metacpan.org/pod/Mojo%3A%3ALoader) 
 
-[v5.40](https://metacpan.org/pod/v5.40) 
+[v5.42](https://metacpan.org/pod/v5.42) 
 
 [Mojo::Base](https://metacpan.org/pod/Mojo%3A%3ABase) 
 

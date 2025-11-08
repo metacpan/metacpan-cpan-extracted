@@ -3,12 +3,12 @@
 use strict;
 use warnings;
 
+use Cwd qw(abs_path);
 use Encode qw(encode);
 use File::Temp qw(tempdir tempfile);
 use File::Spec;
-use Cwd qw(abs_path);
-use YAML::XS qw(DumpFile);
 use Test::Most;
+use YAML::XS qw(DumpFile);
 
 BEGIN { use_ok('App::Test::Generator') }
 
@@ -19,27 +19,60 @@ BEGIN { use_ok('App::Test::Generator') }
 #------------------------------------------------------------------------------
 
 my $dir = tempdir(CLEANUP => 1);
-my $conf_file = File::Spec->catfile($dir, 'example.conf');
+# my $conf_file = File::Spec->catfile($dir, 'example.conf');
+my $conf_file = File::Spec->catfile($dir, 'example.yml');
 my $yaml_file = File::Spec->catfile($dir, 'cases.yaml');
 my $output_file = File::Spec->catfile($dir, 'generated.t');
 
 #------------------------------------------------------------------------------
-# Write a simple configuration file (Safe-compatible)
+# Write a simple configuration file
 #------------------------------------------------------------------------------
+
+# Don't test the legacy format any more
+# open my $fh, '>', $conf_file or die $!;
+# print $fh <<"CONF";
+# our \$module	= 'Test::Simple';
+# our \$function	= 'ok';
+# our \%input	= ( arg1 => { 'type' => 'string' } );
+# our \%output = ( type => 'string' );
+# our \%cases	= (
+	# basic => [ 'foo', 'bar' ],
+# );
+# our \$iterations = 3;
+# our \@edge_case_array = ( 'undef', '', ' ' );
+# our \$yaml_cases = '$yaml_file';
+
+# CONF
 
 open my $fh, '>', $conf_file or die $!;
 print $fh <<"CONF";
-our \$module	= 'Test::Simple';
-our \$function	= 'ok';
-our \%input	= ( arg1 => { 'type' => 'string' } );
-our \%output = ( type => 'string' );
-our \%cases	= (
-	basic => [ 'foo', 'bar' ],
-);
-our \$iterations = 3;
-our \@edge_case_array = ( 'undef', '', ' ' );
-our \$yaml_cases = '$yaml_file';
+---
+module: Test::Simple
+function: ok
+
+input:
+  arg1:
+    type: string
+
+output:
+  type: string
+
+cases:
+  basic:
+    - "foo"
+    - "bar"
+
+iterations: 3
+
+edge_case_array:
+  - "undef"
+  - ""
+  - " "
+
+yaml_cases: "$yaml_file"
+
 CONF
+
 close $fh;
 
 #------------------------------------------------------------------------------

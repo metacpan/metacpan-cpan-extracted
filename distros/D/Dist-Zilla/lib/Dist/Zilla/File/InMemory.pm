@@ -1,4 +1,4 @@
-package Dist::Zilla::File::InMemory 6.033;
+package Dist::Zilla::File::InMemory 6.034;
 # ABSTRACT: a file that you build entirely in memory
 
 use Moose;
@@ -53,7 +53,7 @@ Dist::Zilla::File::InMemory - a file that you build entirely in memory
 
 =head1 VERSION
 
-version 6.033
+version 6.034
 
 =head1 DESCRIPTION
 
