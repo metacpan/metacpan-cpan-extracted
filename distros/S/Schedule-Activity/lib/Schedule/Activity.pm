@@ -9,7 +9,7 @@ use Schedule::Activity::Message;
 use Schedule::Activity::Node;
 use Schedule::Activity::NodeFilter;
 
-our $VERSION='0.1.9';
+our $VERSION='0.2.0';
 
 sub new {
 	my ($ref,%opt)=@_;
@@ -39,12 +39,60 @@ sub validate {
 	my ($self,$force)=@_;
 	if($$self{valid}&&!$force) { return }
 	$$self{config}//={}; if(!is_hashref($$self{config})) { return ('Configuration must be a hash') }
-	my @errors=validateConfig($self->_attr(),%{$$self{config}});
+	my @errors=$self->_validateConfig();
 	if(!@errors) { $$self{valid}=1 }
 	return @errors;
 }
 
-sub _reachability { # UNTESTED (directly)
+sub _validateConfig {
+	my ($self)=@_;
+	my $attr=$self->_attr();
+	my %config=%{$$self{config}};
+	my (@errors,@invalids);
+	if(!is_hashref($config{node})) { push @errors,'Config is missing:  node'; $config{node}={} }
+	if($config{attributes}) {
+		if(!is_hashref($config{attributes})) { push @errors,'Attributes invalid structure' }
+		else { while(my ($k,$v)=each %{$config{attributes}}) { push @errors,$attr->register($k,%$v) } }
+	}
+	if($config{messages}) {
+		if(!is_hashref($config{messages})) { push @errors,'Messages invalid structure' }
+		else {
+		while(my ($namea,$msga)=each %{$config{messages}}) {
+			if(!is_hashref($msga)) { push @errors,"Messages $namea invalid structure" }
+			elsif(defined($$msga{attributes})&&!is_hashref($$msga{attributes})) { push @errors,"Messages $namea invalid attributes" }
+			else { foreach my $kv (Schedule::Activity::Message::attributesFromConf($msga)) { push @errors,$attr->register($$kv[0],%{$$kv[1]}) } }
+			if(is_hashref($$msga{message})) {
+				if(defined($$msga{message}{alternates})&&!is_arrayref($$msga{message}{alternates})) { push @errors,"Messages $namea invalid alternates" }
+				else { foreach my $kv (Schedule::Activity::Message::attributesFromConf($$msga{message})) { push @errors,$attr->register($$kv[0],%{$$kv[1]}) } }
+			}
+		}
+	} } # messages
+	while(my ($k,$node)=each %{$config{node}}) {
+		if(!is_hashref($node)) { push @errors,"Node $k, Invalid structure"; next }
+		Schedule::Activity::Node::defaulting($node);
+		my @nerrors=Schedule::Activity::Node::validate(%$node);
+		if($$node{attributes}) {
+			if(!is_hashref($$node{attributes})) { push @nerrors,"attributes, Invalid structure" }
+			else { while(my ($k,$v)=each %{$$node{attributes}}) { push @nerrors,$attr->register($k,%$v) } }
+		}
+		push @nerrors,Schedule::Activity::Message::validate($$node{message},names=>$config{messages});
+		foreach my $kv (Schedule::Activity::Message::attributesFromConf($$node{message})) { push @nerrors,$attr->register($$kv[0],%{$$kv[1]}) }
+		if(@nerrors) { push @errors,map {"Node $k, $_"} @nerrors; next }
+		@invalids=grep {!defined($config{node}{$_})} @{$$node{next}//[]};
+		if(@invalids) { push @errors,"Node $k, Undefined name in array:  next" }
+		if(defined($$node{finish})&&!defined($config{node}{$$node{finish}})) { push @errors,"Node $k, Undefined name:  finish" }
+	}
+	$config{annotations}//={};
+	if(!is_hashref($config{annotations})) { push @errors,'Annotations must be a hash' }
+	else { while(my ($k,$notes)=each %{$config{annotations}}) {
+		push @errors,map {"Annotation $k:  $_"} map {
+			Schedule::Activity::Annotation::validate(%$_),
+			Schedule::Activity::Message::validate($$_{message},names=>$config{messages})
+			} @$notes } }
+	return @errors;
+}
+
+sub _reachability {
 	my ($self)=@_;
 	my $changed;
 	my %reach=(min=>{},max=>{});
@@ -139,60 +187,9 @@ sub safetyChecks {
 	return @errors;
 }
 
-sub compile {
-	my ($self,%opt)=@_;
-	if($$self{built}) { return }
-	my @errors=$self->validate();
-	if(@errors) { return (error=>\@errors) }
-	%{$$self{built}}=buildConfig(%{$$self{config}});
-	if(!$opt{unsafe}) { @errors=$self->safetyChecks(); if(@errors) { return (error=>\@errors) } }
-	return;
-}
-
-sub schedule {
-	my ($self,%opt)=@_;
-	delete($$self{attr});
-	my %check=$self->compile(unsafe=>$opt{unsafe}//$$self{unsafe});
-	if($check{error})                  { return (error=>$check{error}) }
-	if(!is_arrayref($opt{activities})) { return (error=>'Activities must be an array') }
-	my ($tmoffset,%res)=(0);
-	$res{stat}{slack}=$res{stat}{buffer}=0;
-	foreach my $activity (@{$opt{activities}}) {
-		foreach my $entry (scheduler(goal=>$$activity[0],node=>$$self{built}{node}{$$activity[1]},config=>$$self{built},attr=>$self->_attr(),tmoffset=>$tmoffset,tensionslack=>$opt{tensionslack},tensionbuffer=>$opt{tensionbuffer})) {
-			push @{$res{activities}},[$$entry[0]+$tmoffset,@$entry[1..$#$entry]];
-			$res{stat}{slack}+=$$entry[3]; $res{stat}{buffer}+=$$entry[4];
-			$res{stat}{slackttl}+=$$entry[1]{tmavg}-$$entry[1]{tmmin};
-			$res{stat}{bufferttl}+=$$entry[1]{tmmax}-$$entry[1]{tmavg};
-		}
-		$tmoffset+=$$activity[0];
-	}
-	$self->_attr()->log($tmoffset);
-	%{$res{attributes}}=$self->_attr()->report();
-	while(my ($group,$notes)=each %{$$self{config}{annotations}}) {
-		my @schedule;
-		foreach my $note (@$notes) {
-			my $annotation=Schedule::Activity::Annotation->new(%$note);
-			foreach my $note ($annotation->annotate(@{$res{activities}})) {
-				my ($message,$mobj)=Schedule::Activity::Message->new(message=>$$note[1]{message},names=>$$self{config}{messages}//{})->random();
-				my %node=(message=>$message);
-				if($$note[1]{annotations}) { $node{annotations}=$$note[1]{annotations} }
-				push @schedule,[$$note[0],\%node,@$note[2..$#$note]];
-			}
-		}
-		@schedule=sort {$$a[0]<=>$$b[0]} @schedule;
-		for(my $i=0;$i<$#schedule;$i++) {
-			if($schedule[$i+1][0]==$schedule[$i][0]) {
-				splice(@schedule,$i+1,1); $i-- } }
-		$res{annotations}{$group}{events}=\@schedule;
-	}
-	return %res;
-}
-
-
-# --------------- older, static functions past here ---------------
-
-sub buildConfig {
-	my (%base)=@_;
+sub _buildConfig {
+	my ($self)=@_;
+	my %base=%{$$self{config}};
 	my %res;
 	while(my ($k,$node)=each %{$base{node}}) {
 		if(is_plain_hashref($node)) { $res{node}{$k}=Schedule::Activity::Node->new(%$node) }
@@ -208,52 +205,21 @@ sub buildConfig {
 		$$node{msg}=Schedule::Activity::Message->new(message=>$$node{message},names=>$msgNames);
 		if(is_plain_hashref($$node{require})) { $$node{require}=Schedule::Activity::NodeFilter->new(%{$$node{require}}) }
 	}
-	return %res;
+	$$self{built}=\%res;
+	return $self;
 }
 
-sub validateConfig {
-	my ($attr,%config)=@_;
-	my (@errors,@invalids);
-	if(!is_hashref($config{node})) { push @errors,'Config is missing:  node'; $config{node}={} }
-	if($config{attributes}) {
-		if(!is_hashref($config{attributes})) { push @errors,'Attributes invalid structure' }
-		else { while(my ($k,$v)=each %{$config{attributes}}) { push @errors,$attr->register($k,%$v) } }
-	}
-	if($config{messages}) {
-		if(!is_hashref($config{messages})) { push @errors,'Messages invalid structure' }
-		else {
-		while(my ($namea,$msga)=each %{$config{messages}}) {
-			if(!is_hashref($msga)) { push @errors,"Messages $namea invalid structure" }
-			elsif(defined($$msga{attributes})&&!is_hashref($$msga{attributes})) { push @errors,"Messages $namea invalid attributes" }
-			else { foreach my $kv (Schedule::Activity::Message::attributesFromConf($msga)) { push @errors,$attr->register($$kv[0],%{$$kv[1]}) } }
-			if(is_hashref($$msga{message})) {
-				if(defined($$msga{message}{alternates})&&!is_arrayref($$msga{message}{alternates})) { push @errors,"Messages $namea invalid alternates" }
-				else { foreach my $kv (Schedule::Activity::Message::attributesFromConf($$msga{message})) { push @errors,$attr->register($$kv[0],%{$$kv[1]}) } }
-			}
-		}
-	} } # messages
-	while(my ($k,$node)=each %{$config{node}}) {
-		if(!is_hashref($node)) { push @errors,"Node $k, Invalid structure"; next }
-		Schedule::Activity::Node::defaulting($node);
-		my @nerrors=Schedule::Activity::Node::validate(%$node);
-		if($$node{attributes}) {
-			if(!is_hashref($$node{attributes})) { push @nerrors,"attributes, Invalid structure" }
-			else { while(my ($k,$v)=each %{$$node{attributes}}) { push @nerrors,$attr->register($k,%$v) } }
-		}
-		foreach my $kv (Schedule::Activity::Message::attributesFromConf($$node{message})) { push @nerrors,$attr->register($$kv[0],%{$$kv[1]}) }
-		if(@nerrors) { push @errors,map {"Node $k, $_"} @nerrors; next }
-		@invalids=grep {!defined($config{node}{$_})} @{$$node{next}//[]};
-		if(@invalids) { push @errors,"Node $k, Undefined name in array:  next" }
-		if(defined($$node{finish})&&!defined($config{node}{$$node{finish}})) { push @errors,"Node $k, Undefined name:  finish" }
-	}
-	$config{annotations}//={};
-	if(!is_hashref($config{annotations})) { push @errors,'Annotations must be a hash' }
-	else { while(my ($k,$notes)=each %{$config{annotations}}) {
-		push @errors,map {"Annotation $k:  $_"} map {Schedule::Activity::Annotation::validate(%$_)} @$notes } }
-	return @errors;
+sub compile {
+	my ($self,%opt)=@_;
+	if($$self{built}) { return }
+	my @errors=$self->validate();
+	if(@errors) { return (error=>\@errors) }
+	$self->_buildConfig();
+	if(!$opt{unsafe}) { @errors=$self->safetyChecks(); if(@errors) { return (error=>\@errors) } }
+	return;
 }
 
-sub nodeMessage {
+sub _nodeMessage {
 	my ($optattr,$tm,$node)=@_;
 	my ($message,$msg)=$$node{msg}->random();
 	if($$node{attributes}) {
@@ -278,7 +244,7 @@ sub findpath {
 	$opt{attr}->push();
 	while($node&&($node ne $conclusion)) {
 		push @res,[$tm,$node];
-		push @{$res[-1]},nodeMessage($opt{attr},$tm+$opt{tmoffset},$node);
+		push @{$res[-1]},_nodeMessage($opt{attr},$tm+$opt{tmoffset},$node);
 		$node->increment(\$tm,\$slack,\$buffer);
 		if($tm-$tension{slack}*$slack+rand($tension{buffer}*$buffer+$tension{slack}*$slack)<=$opt{goal}) {
 			$node=$node->nextrandom(not=>$conclusion,tm=>$tm,attr=>$opt{attr}{attr})//$node->nextrandom(tm=>$tm,attr=>$opt{attr}{attr}) }
@@ -287,7 +253,7 @@ sub findpath {
 	}
 	if($node&&($node eq $conclusion)) {
 		push @res,[$tm,$conclusion];
-		push @{$res[-1]},nodeMessage($opt{attr},$tm+$opt{tmoffset},$conclusion);
+		push @{$res[-1]},_nodeMessage($opt{attr},$tm+$opt{tmoffset},$conclusion);
 		$conclusion->increment(\$tm,\$slack,\$buffer);
 		$node=undef;
 	}
@@ -299,14 +265,6 @@ sub findpath {
 		buffer=>$buffer,
 	);
 }
-
-# opt{tension} is currently _only_ the percentage of total buffer that can be used
-# in achieiving the goal time.  If tension=1, scheduling requires that the action times
-# exceed the goal time, and then all adjustments are made using slack time.
-# If tension=0, the scheduled action time may be less than the goal time up to the total
-# buffer time, in which case the adjustments are made using the buffer time.
-#
-# Ideally, there should be tension-buffer and tension-slack.
 
 sub scheduler {
 	my (%opt)=@_; # goal,node,config
@@ -379,10 +337,43 @@ sub scheduler {
 	return @res;
 }
 
-sub buildSchedule {
-	my (%opt)=@_;
-	print STDERR "buildSchedule will be deprecated in 0.2.0\n";
-	return __PACKAGE__->new(configuration=>$opt{configuration})->schedule(activities=>$opt{activities});
+sub schedule {
+	my ($self,%opt)=@_;
+	delete($$self{attr});
+	my %check=$self->compile(unsafe=>$opt{unsafe}//$$self{unsafe});
+	if($check{error})                  { return (error=>$check{error}) }
+	if(!is_arrayref($opt{activities})) { return (error=>'Activities must be an array') }
+	my ($tmoffset,%res)=(0);
+	$res{stat}{slack}=$res{stat}{buffer}=0;
+	foreach my $activity (@{$opt{activities}}) {
+		foreach my $entry (scheduler(goal=>$$activity[0],node=>$$self{built}{node}{$$activity[1]},config=>$$self{built},attr=>$self->_attr(),tmoffset=>$tmoffset,tensionslack=>$opt{tensionslack},tensionbuffer=>$opt{tensionbuffer})) {
+			push @{$res{activities}},[$$entry[0]+$tmoffset,@$entry[1..$#$entry]];
+			$res{stat}{slack}+=$$entry[3]; $res{stat}{buffer}+=$$entry[4];
+			$res{stat}{slackttl}+=$$entry[1]{tmavg}-$$entry[1]{tmmin};
+			$res{stat}{bufferttl}+=$$entry[1]{tmmax}-$$entry[1]{tmavg};
+		}
+		$tmoffset+=$$activity[0];
+	}
+	$self->_attr()->log($tmoffset);
+	%{$res{attributes}}=$self->_attr()->report();
+	while(my ($group,$notes)=each %{$$self{config}{annotations}}) {
+		my @schedule;
+		foreach my $note (@$notes) {
+			my $annotation=Schedule::Activity::Annotation->new(%$note);
+			foreach my $note ($annotation->annotate(@{$res{activities}})) {
+				my ($message,$mobj)=Schedule::Activity::Message->new(message=>$$note[1]{message},names=>$$self{config}{messages}//{})->random();
+				my %node=(message=>$message);
+				if($$note[1]{annotations}) { $node{annotations}=$$note[1]{annotations} }
+				push @schedule,[$$note[0],\%node,@$note[2..$#$note]];
+			}
+		}
+		@schedule=sort {$$a[0]<=>$$b[0]} @schedule;
+		for(my $i=0;$i<$#schedule;$i++) {
+			if($schedule[$i+1][0]==$schedule[$i][0]) {
+				splice(@schedule,$i+1,1); $i-- } }
+		$res{annotations}{$group}{events}=\@schedule;
+	}
+	return %res;
 }
 
 sub loadMarkdown {
@@ -439,7 +430,7 @@ Schedule::Activity - Generate random activity schedules
 
 =head1 VERSION
 
-Version 0.1.9
+Version 0.2.0
 
 =head1 SYNOPSIS
 
@@ -487,8 +478,6 @@ This module permits building schedules of I<activities> each containing randomly
 For additional examples, see the C<samples/> directory.
 
 Areas subject to change are documented below.  Configurations and goals may lead to cases that currently C<die()>, so callers should plan to trap and handle these exceptions accordingly.
-
-Note:  The static method C<Schedule::Activity::buildSchedule> will be removed in version 0.2.0.
 
 =head1 CONFIGURATION
 
@@ -558,7 +547,7 @@ Each activity/action node may contain an optional message.  Messages are provide
     ]
   }
 
-Message selection is randomized for arrays and a hash of alternates.  Any attributes are emitted with the attribute response values, described below.
+Message selection is randomized for arrays and a hash of alternates.  Named messages must exist (see L</"NAMED MESSAGES"> below).  Any attributes are emitted with the attribute response values, described below.
 
 =head1 RESPONSE
 

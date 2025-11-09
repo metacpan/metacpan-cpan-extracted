@@ -20,7 +20,7 @@ my $compact_output  = 0;
 my $color_output    = 0;
 my $null_input      = 0;
 my $slurp_input     = 0;
-my $query_file;
+my @query_files;
 my $force_yaml      = 0;
 my $yaml_module;
 my $yaml_loader;
@@ -42,6 +42,7 @@ Options:
   --debug              Show which JSON module is being used
   --arg NAME VALUE     Set jq-style variable $NAME to the string VALUE
   -f, --from-file FILE Read jq filter from FILE instead of the command line
+                          (use '-' to read the filter from STDIN)
   -n, --null-input     Use null as input instead of reading JSON data
   -s, --slurp          Read entire input stream as an array of JSON values
   --yaml               Parse input as YAML (auto-detected for .yml/.yaml files)
@@ -75,7 +76,7 @@ GetOptions(
     'help|h'          => \$want_help,
     'help-functions'  => \$help_functions,
     'version|v'       => \$want_version,
-    'from-file|f=s'   => \$query_file,
+    'from-file|f=s'   => \@query_files,
     'arg=s'           => sub {
         my ($opt_name, $var_name) = @_;
         die "[ERROR] --arg requires a variable name\n" if !defined $var_name || $var_name eq '';
@@ -108,12 +109,28 @@ if ($want_version) {
 # Unknown options are already rejected above; only query and file remain.
 my ($query, $filename);
 
-if ($query_file) {
-    my $fh = IO::File->new($query_file, 'r')
-      or die "Cannot open query file '$query_file': $!\n";
-    local $/;
-    $query = <$fh> // '';
-    $fh->close;
+if (@query_files) {
+    die "[ERROR] --from-file may only be specified once\n" if @query_files > 1;
+
+    my $file = $query_files[0];
+    if (defined $file && $file eq '-') {
+        if (!$null_input && !@ARGV) {
+            die "[ERROR] Cannot use --from-file - when reading JSON from STDIN. Provide input file or use --null-input.\n";
+        }
+    }
+
+    if (defined $file && $file eq '-') {
+        local $/;
+        $query = <STDIN>;
+        $query = '' unless defined $query;
+    }
+    else {
+        my $fh = IO::File->new($file, 'r')
+          or die "Cannot open query file '$file': $!\n";
+        local $/;
+        $query = <$fh> // '';
+        $fh->close;
+    }
 }
 
 if (@ARGV == 0) {

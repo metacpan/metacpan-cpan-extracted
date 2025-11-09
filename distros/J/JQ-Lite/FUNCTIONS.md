@@ -38,13 +38,14 @@ Functions are grouped by purpose for easier lookup.
 | Function                             | Description                          |
 | ------------------------------------ | ------------------------------------ |
 | `upper()`, `lower()`, `titlecase()`  | Case conversion                      |
+| `ascii_upcase()`, `ascii_downcase()` | ASCII-only case conversion           |
 | `trim()`, `ltrimstr()`, `rtrimstr()` | Trim whitespace or prefixes/suffixes |
 | `startswith()`, `endswith()`         | Prefix/suffix test                   |
 | `contains(value)`                    | Substring or array inclusion         |
 | `split(sep)`, `join(sep)`            | Split and join                       |
 | `substr(start, len)`                 | Substring extraction                 |
 | `replace(old, new)`                  | Replace substring (literal)          |
-| `@json`, `@csv`, `@tsv`, `@base64`, `@uri` | Format value as JSON, CSV/TSV row, Base64 string, or percent-encoded URI |
+| `@json`, `@csv`, `@tsv`, `@base64`, `@base64d`, `@uri` | Format value as JSON, CSV/TSV row, Base64 string, decode Base64 text, or percent-encoded URI |
 | `explode()`, `implode()`             | String ↔ Unicode code points         |
 | `tostring`, `tojson`, `fromjson`     | Serialization utilities              |
 

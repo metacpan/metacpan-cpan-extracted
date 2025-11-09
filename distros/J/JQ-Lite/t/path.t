@@ -1,8 +1,17 @@
+use 5.029;
 use strict;
 use warnings;
-use Test::More tests => 4;
+use Test::More;
 use JSON::PP;
 use JQ::Lite;
+
+BEGIN {
+    if ($] < 5.029) {
+        plan skip_all => "Perl 5.29 or higher required for this test";
+    } else {
+        plan tests => 4;
+    }
+}
 
 my $jq = JQ::Lite->new;
 
@@ -25,5 +34,3 @@ is($result3[0], '', 'path() returns empty string for scalar');
 my $json4 = 'null';
 my @result4 = $jq->run_query($json4, 'path');
 is($result4[0], '', 'path() returns empty string for null');
-
-

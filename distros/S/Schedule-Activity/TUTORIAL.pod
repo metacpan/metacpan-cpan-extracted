@@ -1,0 +1,285 @@
+=pod
+
+=head1 An Evening Schedule
+
+Many have a fairly consistent eight hour workday, plus some commuting time.  With approximately eight hours of sleep, that gives most of us five small hours each weekday for our private lives.  In a single week night, we may find ourselves doing many or all of these:
+
+  Chores:     Routine cleaning, recycling, garbage, preparing work-related items.
+  Exercise:   Setup, exercises, cleanup.
+  Food:       Cooking, eating, (coincident movie/tv watching).
+  Projects:   Crafts, intellectual pursuits, creating.
+  Paperwork:  Bills, filtering mail, etc.
+  Weekend:    Preparing for weekend activities.
+  Reading:    Relaxing/entertaining reading.
+  Sleep:      Preparation, going to sleep.
+
+Each of these has a natural set of steps that affect our focus, attention, energy, and productivity.  Some many benefit from music, others from optimistic messages, and others from routine/helpful reminders.  In a given evening, we may want to be somewhat random with our activities, or have specific goals in mind.  For many of our tasks, they won't all fit in a given evening and we must choose wisely.  For the sake of demonstration, some of these will be configured and scheduled.
+
+=head2 Initial Example
+
+Let's look at a more complete, hypothetical example of the above:
+
+  0:00:00 Begin chores
+  0:00:10 Change music, album1
+  0:00:30 Start chores large task1
+  0:09:00 "Only 3 minutes to go!"
+  0:12:00 Start chores small task2
+  0:15:00 "Stay on task, 60 seconds"
+  0:16:00 Start chores small task3
+  0:19:00 "Last minute, wind down"
+  0:20:00 (Finish chores)
+          #
+  0:20:00 Begin exercise
+  0:20:10 Exercise gear/clothing
+  0:22:00 Fetch exercise equipment
+  0:23:30 Change music, album2
+  0:24:00 Exercise thing1
+  0:27:00 Exercise thing2
+  0:30:00 Exercise thing3
+  0:32:00 "You can do it!"
+  0:33:00 Exercise thing2
+  0:35:00 "No rush"
+  0:36:00 1min break
+  0:37:00 Exercise thing3
+  0:40:00 Exercise thing4
+  0:42:00 "Remember to breathe"
+  0:43:00 1min break
+  0:44:00 Exercise thing1
+  0:44:30 "Focus on your form"
+  0:47:00 Cleanup
+  0:49:30 Change music, off
+  0:50:00 (Finish exercise)
+
+Before continuing, note that items on the schedule have different I<types>.  Some items are indicators, others are things you need to do, some are reminders, some are related to music, and so forth.  When scheduling with C<Schedule::Activity>, it's best to think of separating items into I<activities>, and I<actions>, and I<annotation> groups.
+
+=head2 Type Separation
+
+In this case, the activities are clear:  Each of Chores, Exercise, Food, will be a separate activity, permitting them to be scheduled separately, with adjustable times.  The items within each that are things you I<need> to do are the actions.  Other items can be handled by annotations.  The items can be separated out in the example:
+
+  h:mm:ss Activity/action           Music-related         General annotations
+  0:00:00 Begin chores
+  0:00:10                           Change music, album1
+  0:00:30 Start chores large task1
+  0:09:00                                                 "Only 3 minutes to go!"
+  0:12:00 Start chores small task2
+  0:15:00                                                 "Stay on task, 60 seconds"
+  0:16:00 Start chores small task3
+  0:19:00                                                 "Last minute, wind down"
+  0:20:00 (Finish chores)
+          #
+  0:20:00 Begin exercise
+  0:20:10 Exercise gear/clothing
+  0:22:00 Fetch exercise equipment
+  0:23:30                            Change music, album2
+  0:24:00 Exercise thing1
+  0:27:00 Exercise thing2
+  0:30:00 Exercise thing3
+  0:32:00                                                 "You can do it!"
+  0:33:00 Exercise thing2
+  0:35:00                                                 "No rush"
+  0:36:00 1min break
+  0:37:00 Exercise thing3
+  0:40:00 Exercise thing4
+  0:42:00                                                 "Remember to breathe"
+  0:43:00 1min break
+  0:44:00 Exercise thing1
+  0:44:30                                                 "Focus on your form"
+  0:47:00 Cleanup
+  0:49:30                           Change music, off
+  0:50:00 (Finish exercise)
+
+=head2 Repeating Tasks
+
+As seen in the sample, some tasks (actions) repeat.  As an example, there is always "paperwork/mail to reorganize" as a small chore, or "clean one room" as a large chore.  Likewise exercise might be broken down into actual repeat sets, eg "curls", or just be a broad category, eg "arms".  Your schedule will vary based on your needs!  As seen below, however, the scehduler expects to revisit some of the tasks, though some are unique and occur only once.
+
+=head2 Chores
+
+Chores are organized like this (some labels are abbreviated):
+
+           Chores
+          /     \
+         /       \
+        v         v
+      large1    large2
+          \      /
+           v    v
+       Chores, small <-
+     /  ^    |  ^   \  \
+    /  /     |  |    \  \
+   v  /      v  |     v  \
+  small1    small2    small3
+       \      |      /
+        v     v     v
+       Chores, finish
+
+In your personal evening schedule, some of the small may not repeat, and there are ways to configure that with node filters, not demonstrated below.
+
+=head2 Exercise
+
+Exercise is organized like this (some labels are abbreviated):
+
+              Exercise
+                 |
+                 v
+          Exercise, setup
+                 |
+                 v
+     -----Exercise, sets<---------
+    /    ^ |  ^     ^  |\    \    \
+    |   /  |  |     |  | \    \    \
+    v  /   v  |     |  v  \    \    |
+thing1-   thing2   thing3  ->thing4 |
+       \  |          |   \  /     | |
+        \ |          |    v       | |
+         \|          |    break >-+-/
+          v          v           /
+          Exercise, finish<------
+
+=head2 Activities and Actions
+
+For the Chores activity, you expect to have time for a large task and some small tasks.  That can be configured as
+
+  Chores=>{
+    message=>'Time to start chores!',
+    tmmin  =>30, tmavg=>30, tmmax=>30,
+    next   =>['Chores, large 1','Chores, large 2'],
+    finish =>'Chores, finish',
+  },
+  'Chores, large 1'=>{
+    message=>'Start large chore 1',
+    tmmin  =>8*60, tmavg=>12*60, tmmax=>15*60,
+    next   =>['Chores, small'],
+  },
+  'Chores, large 2'=>{
+    message=>'Start large chore 2',
+    tmmin  =>7*60, tmavg=>10*60, tmmax=>13*60,
+    next   =>['Chores, small'],
+  },
+  'Chores, small'=>{
+    tmavg  =>0,
+    next   =>['Chores, small 1','Chores, small 2','Chores, small 3'],
+  },
+  'Chores, small 1'=>{
+    message=>'Start small chore 1',
+    tmmin  =>3*60, tmavg=>4*60, tmmax=>5*60,
+    next   =>['Chores, small','Chores, finish'],
+  },
+  'Chores, small 2'=>{
+    message=>'Start small chore 2',
+    tmmin  =>4*60, tmavg=>5*60, tmmax=>6*60,
+    next   =>['Chores, small','Chores, finish'],
+  },
+  'Chores, small 3'=>{
+    message=>'Start small chore 3',
+    tmmin  =>5*60, tmavg=>6*60, tmmax=>7*60,
+    next   =>['Chores, small','Chores, finish'],
+  },
+  'Chores, finish'=>{
+    message=>'Chores are done!',
+    tmavg  =>0,
+  },
+
+Notice that there will be a single large chore and at least one small chore per this configuration, so the shortest time for which the activity could be scheduled is 10m30s.  Because small chores can repeat, the time can be expanded indefinitely.  (There is currently no automatic option to restrict action repetition, but each could set an effective limit of running once using attributes.)
+
+The activity can be checked independently.
+
+  ./script/schedule-activity.pl --schedule=samples/tutorial.dumper --activities='720,Chores'
+  00:00:00 Time to start chores!
+  00:00:30 Start large chore 2
+  00:08:38 Start small chore 1
+  00:12:00 Chores are done!
+
+  ./script/schedule-activity.pl --schedule=samples/tutorial.dumper --activities='1200,Chores'
+  00:00:00 Time to start chores!
+  00:00:30 Start large chore 2
+  00:09:36 Start small chore 2
+  00:14:18 Start small chore 3
+  00:20:00 Chores are done!
+
+As similar configuration for Exercise can be found in C<samples/>, along with 7-min exercise examples.
+
+  ./script/schedule-activity.pl --schedule=samples/tutorial.dumper --activities='1200,Chores;1800,Exercise'
+  00:00:00 Time to start chores!
+  00:00:30 Start large chore 2
+  00:10:48 Start small chore 2
+  00:15:54 Start small chore 1
+  00:20:00 Chores are done!
+  00:20:00 Begin exercise
+  00:20:10 Exercise gear, clothing, equipment
+  00:23:41 Exercise thing 1
+  00:26:58 Exercise thing 4
+  00:30:32 Exercise thing 3
+  00:34:06 Short break
+  00:35:15 Exercise thing 2
+  00:38:32 Exercise thing 3
+  00:42:06 Short break
+  00:43:15 Exercise thing 3
+  00:46:49 Cleanup gear and equipment
+  00:50:00 Finish exercise
+
+Node filtering can be used to ensure better spacing of the Short breaks, for example.
+
+=head2 Annotations
+
+There are two groups of annotations, related to music and general reminders.
+
+=head2 Music group
+
+In the sample, music is associated with the beginning and ending of activities.  For example, certain music occurs when chores begin:
+
+  {
+    nodes  =>qr/^Chores$/,
+    message=>'Change music, album1',
+    before =>{min=>-10,max=>-15},
+    p      =>1.0,
+  },
+
+The note always appears (probability 1), ten to fifteen seconds after the start of the C<Chores> activity.
+
+Exercise is similar.  Here for example, is how the music ends at the end of exercise:
+
+  {
+    nodes  =>qr/^Exercise, finish$/,
+    message=>'Change music, off',
+    before =>{min=>20,max=>30},
+    p      =>1.0,
+  },
+
+=head2 General group
+
+The remaining messages in the sample are reminders to stay on track or give countdown information.  Each category of reminder can select a random message, and is configured either before or after an associated action.
+
+For example, the final reminder for chores is a countdown:
+
+  {
+    nodes  =>qr/^Chores, finish$/,
+    message=>'Last minute, wind down',
+    before =>{min=>60,max=>90},
+    p      =>1.0,
+  },
+
+Additional examples, such as the Exercise related messages, can be found in C<samples/>.
+
+=head2 Open for Improvement
+
+As of version 0.1.9, some of the attributes can not be ideally configured.  For example:
+
+  {
+    nodes  =>qr/^Chores, small$/,
+    message=>'Only 3 minutes to go!',
+    before =>{min=>170,max=>190},
+    p      =>0.3,
+    limit  =>2,
+  },
+
+This does provide the indicated message but it can occur in an undesirable location and needs manual review/edit:
+
+  00:07:45 Start small chore 2
+  00:08:40 Only 3 minutes to go!
+  00:11:50 Start small chore 2
+
+While this is accurate, the preferred behavior is to place this note after the start of a large chore.  This requires adding an attribute to small chores (which is supported) to be used to prevent the annotation.  As of 0.1.9, however, annotations do not support I<filtering> by attributes, so the above is the best configuration assuming manual review of generated schedules.
+
+A note can be placed after the start of large chore, for example "Ten minutes down, almost there!", and it will appear if the action is at least ten minutes long.
+
+=cut

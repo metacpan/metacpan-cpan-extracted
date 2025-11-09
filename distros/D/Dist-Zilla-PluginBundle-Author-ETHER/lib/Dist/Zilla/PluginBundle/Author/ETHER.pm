@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.168-4-g6b91920
+package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.169-2-geff4520
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: A plugin bundle for distributions built by ETHER
 # KEYWORDS: author bundle distribution tool
 
-our $VERSION = '0.169';
+our $VERSION = '0.170';
 
 use Moose;
 with
@@ -656,6 +656,18 @@ around add_bundle => sub {
     return $self->$orig($bundle, $payload);
 };
 
+# patch around broken Dist::Zilla 6.034+
+# known affected modules:
+# Dist::Zilla::App::Command::alldeps
+# Dist::Zilla::App::Command::stale
+# Dist::Zilla::Plugin::EnsurePrereqsInstalled
+# Dist::Zilla::Plugin::Prereqs::AuthorDeps
+# Dist::Zilla::Plugin::PromptIfStale
+require Dist::Zilla::Util::AuthorDeps;
+*Dist::Zilla::Util::AuthorDeps::extract_author_deps = \&Dist::Zilla::Util::AuthorDeps::_extract_author_deps
+  if eval { Dist::Zilla::Util::AuthorDeps->VERSION(6.034); 1 }
+    and not Dist::Zilla::Util::AuthorDeps->can('extract_author_deps');
+
 __PACKAGE__->meta->make_immutable;
 
 __END__
@@ -670,7 +682,7 @@ Dist::Zilla::PluginBundle::Author::ETHER - A plugin bundle for distributions bui
 
 =head1 VERSION
 
-version 0.169
+version 0.170
 
 =head1 SYNOPSIS
 

@@ -1,10 +1,8 @@
-LaTeX-Replicase version 0.057
+LaTeX-Replicase version 0.300
 =============================
 
-The module provides the necessary subroutines to generate 
-Russian wording of numerals from numerical values (unsigned integer and 0).
-The methods implemented in this module, are all 
-focused on knowledge of Russian grammar.
+The module provides a minimalistic engine
+for filling real TeX-LaTeX files that act as templates.
 
 INSTALLATION
 
@@ -36,7 +34,7 @@ Carp
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2025 by Alessandro Gorohovski
+Copyright (C) 2010-2025 by Alessandro Gorohovski
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.0 or,

@@ -20,7 +20,7 @@ with
    make test
    make install
 
-This will install the module in the standard location for which you
+This will install the module in the standard location, for which you
 normally will need root privileges. To install in a non-standard
 directory like /home/cpan, specify the directory during the 'perl
 Makefile.PL' stage:
@@ -31,14 +31,15 @@ after which you are adviced to modify the environment variable
 $PERL5LIB in order for Perl to find the module when executing
 programs, e.g.
 
-   export PERL5LIB=/home/cpan/lib/perl/5.8.4:$PERL5LIB
+   export PERL5LIB=/home/cpan/lib/perl5:$PERL5LIB
 
-(or the corresponding command for your operating system and Perl version).
+(or wherever you found that Geo::BUFR was installed from output of
+the 'make install' command above).
 
-You will need a C compiler which supports variable length arrays. This
-is standard on Unix-like systems. On Windows I recommend using
-Strawberry Perl, in which case you should type 'gmake' instead of
-'make' when installing.
+You will need a C compiler which supports variable length arrays, and
+a platform and Perl that supports 64-bit integers. This is standard on
+Unix-like systems. On Windows I recommend using Strawberry Perl, in
+which case you should type 'gmake' instead of 'make' when installing.
 
 DEPENDENCIES
 

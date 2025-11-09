@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Ref::Util qw/is_arrayref is_hashref is_ref/;
 
-our $VERSION='0.1.9';
+our $VERSION='0.2.0';
 
 my %property=map {$_=>undef} qw/message attributes names note/;
 
@@ -60,6 +60,21 @@ sub attributesFromConf {
 		foreach my $message (grep {is_hashref($_)} @{$$conf{alternates}}) {
 			if(is_hashref($$message{attributes})) {
 				while(my ($k,$v)=each %{$$message{attributes}}) { push @res,[$k,$v] } } } }
+	return @res;
+}
+
+sub validate {
+	my ($msg,%opt)=@_;
+	if(!is_ref($msg)) { return }
+	if(is_arrayref($msg)) { return map {validate($_,%opt)} grep {is_hashref($_)} @$msg }
+	my @res;
+	if(is_hashref($msg)) {
+		if(exists($$msg{name})) {
+			if(!defined($$msg{name}))                 { push @res,'Message undefined name' }
+			elsif(!defined($opt{names}{$$msg{name}})) { push @res,"Message undefined name:  $$msg{name}" }
+		}
+		if(is_arrayref($$msg{alternates})) { push @res,map {validate($_,%opt)} @{$$msg{alternates}} }
+	}
 	return @res;
 }
 

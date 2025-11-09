@@ -2,19 +2,9 @@
 
 =head1 Features
 
-=head2 Tentative Version Changes
-
-=over
-
-=item 0.2.0
-
-C<buildSchedule> will be removed; only the object interface will be supported.
-
-=back
-
 =head2 Scheduling
 
-Multiple proposals are being considered for rescheduling, scheduling adjustment to target different attributes, as well as attribute-level goals.  Other feature improvements below are related to scheduling.
+Multiple proposals are being considered for rescheduling, scheduling incrementally (C<begin>, C<push>, C<pop>), scheduling adjustment to target different attributes, as well as attribute-level goals.  Other feature improvements below are related to scheduling.
 
 =head2 Message support
 
@@ -26,7 +16,9 @@ Planned improvements include helpers to merge annotation attributes into schedul
 
 =head2 Annotations
 
-Planned improvements include helpers to merge annotation attributes into schedules.  This also requires options to control the order/materialization of annotation generation.  Proposed is annotation configuration per-node (with a keyname, possibly duplicated in the upper-level configuration).
+Some annotations may occur before an action but not when after certain other actions.  Annotations should support node filtering for this situation.
+
+Other improvements include helpers to merge annotation attributes into schedules.  This also requires options to control the order/materialization of annotation generation.  Proposed is annotation configuration per-node (with a keyname, possibly duplicated in the upper-level configuration).
 
 =head2 Node filtering
 
@@ -34,7 +26,7 @@ Node filtering is experimental starting in 0.1.6.  Filters support Booleans and 
 
 =head2 Tutorial
 
-In addition to the samples listed below, a tutorial is planned to take an existing, linear schedule, and deconstruct it into activities/actions, messages, and annotation groups.  As of 0.1.6, work has begun on a tutorial!
+A basic tutorial and sample configuration is provided starting with 0.2.0.  It may be extended.
 
 =head2 Action limits
 
@@ -42,7 +34,7 @@ The case C<limit=1> is not the primary/initial use case of this scheduler, but s
 
 =head2 Tension configuration
 
-Rebuild in 0.1.9 to provide better control over slack and buffer tensions separately.  Behavior is established based on mathematical distribution, which is uniform stepwise leading to a skewed distribution for overall schedules.  Tension settings affect path selection, but the scheduler will fail for the full path if there is insufficient slack/buffer to adjust the path to the goal time.  This may change in the future, namely additional tension settings may permit scheduling completion even if the measured slack/buffer wouldn't otherwise permit adjustment.  See the distribution in C<samples/tension.png> and documentation in L<Schedule::Activity>.
+Rebuilt in 0.1.9 to provide better control over slack and buffer tensions separately.  Behavior is established based on mathematical distribution, which is uniform stepwise leading to a skewed distribution for overall schedules.  Tension settings affect path selection, but the scheduler will fail for the full path if there is insufficient slack/buffer to adjust the path to the goal time.  This may change in the future, namely additional tension settings may permit scheduling completion even if the measured slack/buffer wouldn't otherwise permit adjustment.  See the distribution in C<samples/tension.png> and documentation in L<Schedule::Activity>.
 
 =head2 Slack/buffer defaults
 

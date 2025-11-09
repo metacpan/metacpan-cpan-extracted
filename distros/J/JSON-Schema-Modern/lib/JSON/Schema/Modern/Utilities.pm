@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Modern
 
-our $VERSION = '0.621';
+our $VERSION = '0.622';
 
 use 5.020;
 use strictures 2;
@@ -34,6 +34,7 @@ use Exporter 'import';
 our @EXPORT_OK = qw(
   is_type
   get_type
+  is_bool
   is_schema
   is_bignum
   is_equal
@@ -509,7 +510,7 @@ JSON::Schema::Modern::Utilities - Internal utilities for JSON::Schema::Modern
 
 =head1 VERSION
 
-version 0.621
+version 0.622
 
 =head1 SYNOPSIS
 

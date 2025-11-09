@@ -119,6 +119,7 @@ my %WriteMakefileArgs = (
     "Dist::Zilla::Role::PluginBundle::Easy" => 0,
     "Dist::Zilla::Role::PluginBundle::PluginRemover" => "0.103",
     "Dist::Zilla::Util" => 0,
+    "Dist::Zilla::Util::AuthorDeps" => 0,
     "File::ShareDir" => 0,
     "List::Util" => "1.45",
     "Module::Runtime" => 0,
@@ -177,7 +178,7 @@ my %WriteMakefileArgs = (
     "namespace::clean" => 0,
     "parent" => 0
   },
-  "VERSION" => "0.169",
+  "VERSION" => "0.170",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -278,6 +279,7 @@ my %FallbackPrereqs = (
   "Dist::Zilla::Role::PluginBundle::PluginRemover" => "0.103",
   "Dist::Zilla::Tester" => 0,
   "Dist::Zilla::Util" => 0,
+  "Dist::Zilla::Util::AuthorDeps" => 0,
   "Exporter" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::ShareDir" => 0,

@@ -28,6 +28,7 @@ t/arrays.t
 t/assignment.t
 t/avg_by.t
 t/base64_format.t
+t/base64d.t
 t/basic.t
 t/case_transform.t
 t/ceil_floor.t
@@ -57,6 +58,7 @@ t/flatten_depth.t
 t/foreach.t
 t/friends.t
 t/from_file_cli.t
+t/from_file_stdin.t
 t/fromjson.t
 t/getpath.t
 t/group_by.t

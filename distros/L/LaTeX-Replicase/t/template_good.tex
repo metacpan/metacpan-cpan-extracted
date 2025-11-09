@@ -1,3 +1,4 @@
+%%%TDZ:
 \documentclass[10pt,a4paper]{article}
 \usepackage[papersize={210mm,297mm}, nohead, nofoot, top=10mm, bottom=10mm, outer=10mm, inner=10mm]{geometry}
 
@@ -7,6 +8,7 @@
 \usepackage{amsmath}
 \usepackage{color}
 \usepackage{url}
+%%%ENDZ:
 
 \title{
 SPECIFY Title ! %%%V: myTitle
@@ -40,42 +42,30 @@ c0 & c1 & c2 & c3 & c4 \\
 %%%VAR: myTable_array
 %%%ADDX: \\
 %%%ADDX: \hline
-%%%ADD1: \hline
-%%%ADD1: \color{green}
-%%%ADD2: \scriptsize
-%%%ADD3: \footnotesize\color{blue}
-%%%ADD4: \large\color{red}
 \rule{0mm}{1.5em} %%%ADD:
   SPECIFY VALUE 0! %%%V:0
 
  & %%%ADD:
-%%%ADD1: \large
-~ %%%ADD5:
   SPECIFY VALUE 1! %%%V:1
 
  & %%%ADD:
-%%%ADD1: \multicolumn{2}{c}{
   SPECIFY VALUE 2! %%%V:2
 
  & %%%ADD:
-%%%ADD1: \color{green}
-%%%ADD2: \scriptsize
   SPECIFY VALUE 3! %%%V:3
 
-%%%ADD1: }
  & %%%ADD:
   SPECIFY VALUE 4! %%%V:4
-%%%ADD5:\\ \cline{3-4}
 %%%ADDX: ~
 
-%%%END:
+%%%TDZ:
 \\
 \hline
   \end{tabular}
 \end{table}
 
 \begin{center}
-
+%%%ENDZ:
 \begin{tabbing}
 %%%VAR: myTable_hash
 %%%ADDX: \\
@@ -98,7 +88,7 @@ SPECIFY NoNameI ! %%%V: NoNameI
 \mbox{
 %%%VAR: NoNameII
 SPECIFY VALUE NoNameII !
-%%%END:
+%%%ENDT:
 }
 
 \end{document}

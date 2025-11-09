@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use Schedule::Activity::Message;
-use Test::More tests=>5;
+use Test::More tests=>6;
 
 subtest 'init'=>sub {
 	plan tests=>3;
@@ -193,6 +193,18 @@ subtest 'Named messages'=>sub {
 	is_deeply([sort keys(%{$results{string}})],['Message 1','Message 2','Plain message'],'Hash alternates:  All messages');
 	is_deeply([sort keys(%{$results{attr}})],  [qw/named unnamed/],                      'Hash alternates:  All attributes');
 	#
+};
+
+subtest 'Validation'=>sub {
+	plan tests=>6;
+	my $f=\&Schedule::Activity::Message::validate;
+	my %names=(key=>'value');
+	is_deeply([&$f()],        [],'Undefined message');
+	is_deeply([&$f('string')],[],'String message');
+	is_deeply([&$f({})],      [],'Empty hash (not currently "invalid")');
+	is_deeply([&$f({name=>'key'},names=>\%names)],[],'Valid named message');
+	is_deeply([&$f({name=>'yek'},names=>\%names)],['Message undefined name:  yek'],'Invalid named message');
+	is_deeply([&$f({alternates=>['one',{name=>'yek'},{name=>'key'}]},names=>\%names)],['Message undefined name:  yek'],'Invalid alternates named message');
 };
 
 # attributesFromConf is effectively tested through activity.t at this point,

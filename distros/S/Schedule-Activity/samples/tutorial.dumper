@@ -1,0 +1,133 @@
+@VAR1=(node=>{
+
+	Chores=>{
+		message=>'Time to start chores!',
+		tmmin  =>30, tmavg=>30, tmmax=>30,
+		next   =>['Chores, large 1','Chores, large 2'],
+		finish =>'Chores, finish',
+	},
+	'Chores, large 1'=>{
+		message=>'Start large chore 1',
+		tmmin  =>8*60, tmavg=>12*60, tmmax=>15*60,
+		next   =>['Chores, small'],
+	},
+	'Chores, large 2'=>{
+		message=>'Start large chore 2',
+		tmmin  =>7*60, tmavg=>10*60, tmmax=>13*60,
+		next   =>['Chores, small'],
+	},
+	'Chores, small'=>{
+		tmavg  =>0,
+		next   =>['Chores, small 1','Chores, small 2','Chores, small 3'],
+	},
+	'Chores, small 1'=>{
+		message=>'Start small chore 1',
+		tmmin  =>3*60, tmavg=>4*60, tmmax=>5*60,
+		next   =>['Chores, small','Chores, finish'],
+	},
+	'Chores, small 2'=>{
+		message=>'Start small chore 2',
+		tmmin  =>4*60, tmavg=>5*60, tmmax=>6*60,
+		next   =>['Chores, small','Chores, finish'],
+	},
+	'Chores, small 3'=>{
+		message=>'Start small chore 3',
+		tmmin  =>5*60, tmavg=>6*60, tmmax=>7*60,
+		next   =>['Chores, small','Chores, finish'],
+	},
+	'Chores, finish'=>{
+		message=>'Chores are done!',
+		tmavg  =>0,
+	},
+
+	Exercise=>{
+		message=>'Begin exercise',
+		tmmin  =>10, tmavg=>10, tmmax=>10,
+		next   =>['Exercise, setup'],
+		finish =>'Exercise, finish',
+	},
+	'Exercise, setup'=>{
+		message=>'Exercise gear, clothing, equipment',
+		tmmin  =>180, tmavg=>200, tmmax=>220,
+		next   =>['Exercise, sets'],
+	},
+	'Exercise, sets'=>{
+		tmavg  =>0,
+		next   =>['Exercise, thing 1','Exercise, thing 2','Exercise, thing 3','Exercise, thing 4'],
+	},
+	'Exercise, break'=>{
+		message=>'Short break',
+		tmavg  =>60,
+		next   =>['Exercise, sets'],
+	},
+	'Exercise, thing 1'=>{
+		message=>'Exercise thing 1',
+		tmmin  =>160, tmavg=>180, tmmax=>210,
+		next   =>['Exercise, sets','Exercise, finish'],
+	},
+	'Exercise, thing 2'=>{
+		message=>'Exercise thing 2',
+		tmmin  =>160, tmavg=>180, tmmax=>210,
+		next   =>['Exercise, sets','Exercise, finish'],
+	},
+	'Exercise, thing 3'=>{
+		message=>'Exercise thing 3',
+		tmmin  =>160, tmavg=>180, tmmax=>240,
+		next   =>['Exercise, sets','Exercise, break','Exercise, finish'],
+	},
+	'Exercise, thing 4'=>{
+		message=>'Exercise thing 4',
+		tmmin  =>160, tmavg=>180, tmmax=>240,
+		next   =>['Exercise, sets','Exercise, break','Exercise, finish'],
+	},
+	'Exercise, finish'=>{
+		message=>'Finish exercise, cleanup gear and equipment',
+		tmmin  =>180, tmavg=>180, tmmax=>200,
+	},
+
+},
+annotations=>{
+	music=>[
+		{
+			nodes  =>qr/^Chores$/,
+			message=>'Change music, album1',
+			before =>{min=>-10,max=>-15},
+			p      =>1.0,
+		},
+		{
+			nodes  =>qr/^Exercise, setup$/,
+			message=>'Change music, album2',
+			before =>{min=>-140,max=>-150},
+			p      =>1.0,
+			limit  =>1,
+		},
+		{
+			nodes  =>qr/^Exercise, finish$/,
+			message=>'Change music, off',
+			before =>{min=>20,max=>30},
+			p      =>1.0,
+		},
+	],
+	general=>[
+		{
+			nodes  =>qr/^Chores, finish$/,
+			message=>'Last minute, wind down',
+			before =>{min=>60,max=>90},
+			p      =>1.0,
+		},
+		{
+			nodes  =>qr/^Chores, small$/,
+			message=>'Only 3 minutes to go!',
+			before =>{min=>170,max=>190},
+			p      =>0.3,
+			limit  =>2,
+		},
+		{
+			nodes  =>qr/^Exercise, thing/,
+			message=>['You can do it!','No rush','Remember to breathe','Focus on your form'],
+			before =>{min=>-120,max=>-140},
+			p      =>1.0,
+			limit  =>4,
+		},
+	],
+})

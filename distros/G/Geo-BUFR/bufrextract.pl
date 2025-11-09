@@ -121,11 +121,11 @@ sub extract {
             next READLOOP;
         }
 
-        next if $option{ahl} && $bufr->is_filtered();
+        next READLOOP if $option{ahl} && $bufr->is_filtered();
         # Skip messages where stated length of BUFR message is sure to
         # be erroneous, unless we want ahls only (or should we skip
         # message in this case also? Hard choice...)
-        next if !$option{only_ahl} && $bufr->bad_bufrlength();
+        next READLOOP if !$option{only_ahl} && $bufr->bad_bufrlength();
 
         my $current_subset_number = $bufr->get_current_subset_number();
         # If next_observation() did find a BUFR message, subset number
@@ -234,7 +234,7 @@ line just before calling C<is_filtered()> in code:
 
 Or to extract BUFR messages with TM315009 only:
 
-  next if bufr->get_descriptors_unexpanded() ne '315009';
+  next if $bufr->get_descriptors_unexpanded() ne '315009';
 
 =head1 CAVEAT
 

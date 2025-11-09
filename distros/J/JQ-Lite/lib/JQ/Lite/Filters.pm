@@ -1608,6 +1608,20 @@ sub apply {
             return 1;
         }
 
+        # support for ascii_upcase
+        if ($part eq 'ascii_upcase()' || $part eq 'ascii_upcase') {
+            @next_results = map { JQ::Lite::Util::_apply_ascii_case_transform($_, 'upper') } @results;
+            @$out_ref = @next_results;
+            return 1;
+        }
+
+        # support for ascii_downcase
+        if ($part eq 'ascii_downcase()' || $part eq 'ascii_downcase') {
+            @next_results = map { JQ::Lite::Util::_apply_ascii_case_transform($_, 'lower') } @results;
+            @$out_ref = @next_results;
+            return 1;
+        }
+
         # support for lower()
         if ($part eq 'lower()' || $part eq 'lower') {
             @next_results = map { JQ::Lite::Util::_apply_case_transform($_, 'lower') } @results;
@@ -1732,6 +1746,13 @@ sub apply {
         # support for @base64 (format value as base64 string)
         if ($part eq '@base64' || $part eq '@base64()') {
             @next_results = map { JQ::Lite::Util::_apply_base64($_) } @results;
+            @$out_ref = @next_results;
+            return 1;
+        }
+
+        # support for @base64d (decode base64-encoded string)
+        if ($part eq '@base64d' || $part eq '@base64d()') {
+            @next_results = map { JQ::Lite::Util::_apply_base64d($_) } @results;
             @$out_ref = @next_results;
             return 1;
         }

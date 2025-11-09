@@ -9412,11 +9412,11 @@ sub send_email
       }
       if (exists $mail_info->{Mail_Server}) {
          $mail_server=$mail_info->{Mail_Server};
-         $mail_method='smtp';
+         $mail_method='smtp' unless $mail_method;
       } elsif ($email_defaults &&
            (exists $email_defaults{Mail_Server})) {
          $mail_server=$email_defaults{Mail_Server};
-         $mail_method='smtp';
+         $mail_method='smtp' unless $mail_method;
       }
       if (exists $mail_info->{Mail_Port}) {
          $mail_port=$mail_info->{Mail_Port};
@@ -9426,6 +9426,12 @@ sub send_email
       }
       if (exists $mail_info->{Mail_SASL_Username}) {
          $mail_sasl_username=$mail_info->{Mail_SASL_Username};
+      } elsif ($email_defaults &&
+           (exists $email_defaults{Mail_SASL_Username})) {
+         $mail_sasl_username=$email_defaults{Mail_SASL_Username};
+      }
+      if (exists $mail_info->{Mail_SASL_Password}) {
+         $mail_sasl_password=$mail_info->{Mail_SASL_Password};
       } elsif ($email_defaults &&
            (exists $email_defaults{Mail_SASL_Password})) {
          $mail_sasl_password=$email_defaults{Mail_SASL_Password};
@@ -9652,6 +9658,7 @@ sub send_email
          if exists $email_defaults{Mail_Port};
       $mail_method=$email_defaults{Mail_Method}
          if exists $email_defaults{Mail_Method};
+      $mail_method||='smtp';
       $mail_sasl_username=$email_defaults{Mail_SASL_Username}
          if exists $email_defaults{Mail_SASL_Username};
       $mail_sasl_password=$email_defaults{Mail_SASL_Password}

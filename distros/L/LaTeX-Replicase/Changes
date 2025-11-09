@@ -17,3 +17,18 @@ Revision history for Perl extension LaTeX::Replicase.
 	- Expanded control of input values for filling out TeX-template.
 	- Significantly improved error messages when debugging.
 	- Fixed tests.
+
+0.300 Fri Nov 07 07:07:07 2025
+	- Added (expanded) new structures to fill the template: REF, REF.SCALAR, and its derivatives.
+	- Index list and ranges (e.g. -1,5,2,6,1,3-9 or -5-,7-,0- etc.) added for '%%%V:' tag of ...ARRAY data.
+	- '%%%V:' tag can now override the global environment for variable lookup or the absolute or relative path of its location in the incoming $info structure.
+	- '%%%VAR:' tag can now specify the local environment for variable lookup or path of its location in the incoming $info structure.
+	- Added a new tags: '%%%ADDE:', '%%%TDZ:', '%%%ENDZ:', and '%%%ENDT:'
+	- The behavior of the nested tags '%%%TDZ:', '%%%ENDZ:', and '%%%ENDT:'  have been extended to be similar to '%%%END:' of '%%%VAR:'.
+	- Added '%' semaphore at end of '%%%ADDx:' tags to eliminate line breaks.
+	- Removed '%%%ADDn:' tags.
+	- Expanded control of input values for filling out TeX-template.
+	- The incoming $info structure has been simplified and the mandatory 'data' and 'cases' substructures have been removed.
+	- Now the incoming $info structure can be either a HASH or an ARRAY.
+	- The manual has been corrected and expanded.
+	- Fixed tests.

@@ -45,10 +45,7 @@ subtest 'should sign and verify a message' => sub {
 	is $secp->sign_message($t{privkey}, $t{preimage}), $t{sig}, 'message signed ok';
 	ok $secp->verify_message($t{pubkey}, $t{sig}, $t{preimage}), 'message verified ok';
 	ok !$secp->verify_message($t{pubkey}, $t{bad_sig}, $t{preimage}), 'bad signature ok';
-
-	is warns {
-		ok $secp->verify_message($t{pubkey}, $t{sig_unn}, $t{preimage}), 'unnormalized signature verified ok';
-	}, 1, 'unnormalized signature warning ok';
+	ok $secp->verify_message($t{pubkey}, $t{sig_unn}, $t{preimage}), 'unnormalized signature verified ok';
 };
 
 subtest 'should sign and verify a message (schnorr)' => sub {
@@ -62,11 +59,8 @@ subtest 'should sign and verify a digest' => sub {
 	is $secp->sign_digest($t{privkey}, sha256(sha256($t{preimage}))), $t{sig}, 'digest signed ok';
 	ok $secp->verify_digest($t{pubkey}, $t{sig}, sha256(sha256($t{preimage}))), 'digest verified ok';
 	ok !$secp->verify_digest($t{pubkey}, $t{bad_sig}, sha256(sha256($t{preimage}))), 'digest verified ok';
-
-	is warns {
-		ok $secp->verify_digest($t{pubkey}, $t{sig_unn}, sha256(sha256($t{preimage}))),
-			'unnormalized signature verified ok';
-	}, 1, 'unnormalized signature warning ok';
+	ok $secp->verify_digest($t{pubkey}, $t{sig_unn}, sha256(sha256($t{preimage}))),
+		'unnormalized signature verified ok';
 };
 
 subtest 'should sign and verify a digest (schnorr)' => sub {

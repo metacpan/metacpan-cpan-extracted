@@ -1,5 +1,10 @@
 Revision history for Schedule::Activity
 
+0.2.0 - 2025-11-08
+	- Schedule::Activity only provides the object interface
+	- Tutorial added
+	- References to named messages are checked
+
 0.1.9 - 2025-11-01
 	- Attributes are no longer "fixed" at activity boundaries, only at the start/end of schedule.
 	- Tension algorithm uses mathematically-proven distribution.

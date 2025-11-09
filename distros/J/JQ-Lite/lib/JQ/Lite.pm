@@ -9,7 +9,7 @@ use JQ::Lite::Filters;
 use JQ::Lite::Parser;
 use JQ::Lite::Util ();
 
-our $VERSION = '1.39';
+our $VERSION = '1.43';
 
 sub new {
     my ($class, %opts) = @_;
@@ -60,7 +60,7 @@ JQ::Lite - A lightweight jq-like JSON query engine in Perl
 
 =head1 VERSION
 
-Version 1.39
+Version 1.43
 
 =head1 SYNOPSIS
 
@@ -127,7 +127,7 @@ C<select>, C<has>, C<contains>, C<any>, C<all>, C<unique>, C<unique_by>, C<group
 
 =item * Transformation helpers
 
-C<map>, C<map_values>, C<walk>, C<enumerate>, C<transpose>, C<flatten_all>, C<flatten_depth>, C<chunks>, C<range>, C<implode>, C<explode>, C<join>, C<split>, C<slice>, C<substr>, C<trim>, C<ltrimstr>, C<rtrimstr>, C<startswith>, C<endswith>, C<upper>, C<lower>, C<titlecase>, C<tostring>, C<tojson>, C<fromjson>, C<to_number>, C<compact>.
+C<map>, C<map_values>, C<walk>, C<enumerate>, C<transpose>, C<flatten_all>, C<flatten_depth>, C<chunks>, C<range>, C<implode>, C<explode>, C<join>, C<split>, C<slice>, C<substr>, C<trim>, C<ltrimstr>, C<rtrimstr>, C<startswith>, C<endswith>, C<upper>, C<lower>, C<ascii_upcase>, C<ascii_downcase>, C<titlecase>, C<tostring>, C<tojson>, C<fromjson>, C<to_number>, C<compact>.
 
 =item * Aggregation and math
 

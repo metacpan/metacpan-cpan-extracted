@@ -14,6 +14,7 @@ use utf8;
 # use Test::More 'no_plan';
 use Test::More tests => 13;
 use Test::More::UTF8;
+# use Test::NoWarnings;
 
 BEGIN { use_ok('LaTeX::Replicase') }; ### Test 1
 use LaTeX::Replicase qw(:all);

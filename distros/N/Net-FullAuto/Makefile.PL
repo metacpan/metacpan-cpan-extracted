@@ -25,7 +25,7 @@
 #
 ################################################################
 
-our $VERSION='1.0000828';
+our $VERSION='1.0000830';
 
 #print `env`,"\n\n\n";
 
@@ -850,7 +850,7 @@ END
       ($version,$cpanfil,$instfile,$mod_info)=cpan_modules($module_fail);
       fa_system("sudo echo y | /bin/rm -rf \"$instfile\"");
    } elsif (2<$exec_cnt) {
-print "EXEC_CNT=$exec_cnt\n";
+#print "EXEC_CNT=$exec_cnt\n";
       my $timeout=300;
       ($version,$cpanfil,$instfile,$mod_info)=cpan_modules($module_fail);
       eval {
@@ -961,6 +961,7 @@ END
    $CPAN::Config->{urllist}=["file://$loc"];
    $CPAN::Config->{pushy_https}=0;
    $CPAN::Config->{keep_source_where}=$loc;
+   $CPAN::Config->{connect_to_internet_ok}=1;
    $CPAN::Config->{index_expire}=1000;
    unless (grep { /SKIP|CPAN|figlet|/ } @ARGV) {
       unless (grep { /-*(?:add|all)[-_]?dependencies/i } @ARGV) {
@@ -1669,9 +1670,12 @@ sub fa_err_exit {
 sub fa_find_latest {
 
    my $temp=0;
-   my $look=shift||'';
+   my $look=$_[0]||'';
+   my $cpanfil=$_[1]||'';
+   my @caller=caller;
+   my $caller=join " ",@caller;
    unless ($look) {
-      fa_die("ERROR - No argument provided to &fa_find_latest().\n");
+      fa_die("ERROR - No argument provided to &fa_find_latest(). Caller: $caller<==\n");
    }
    $look=~s/::/-/g;
    print "***** Looking for Most Recent \"$look Dir\" \n";
@@ -1694,6 +1698,11 @@ sub fa_find_latest {
          }
       }
       $ENV{CPAN_BUILD_DIR}=$d;
+   }
+   if ($cpanfil) {
+      my $cwd=&cwd;
+      fa_system("cd $ENV{CPAN_BUILD_DIR};tar xvf ".
+                "$cwd/dependencies/CPAN/authors/id/$cpanfil;cd $cwd");
    }
    my $new='';my $file='';
    opendir(DH,$d) or
@@ -1814,18 +1823,6 @@ sub fa_install_mod {
          );
          $minicpan->mirror_file(
             "authors/id/$let/$lett/$distribution");
-         #$minicpan->clean_file(
-         #   "dependencies/CPAN/authors/01mailrc.txt.gz");
-         #$minicpan->mirror_file(
-         #   "authors/01mailrc.txt.gz");
-         #$minicpan->clean_file(
-         #   "dependencies/CPAN/modules/02packages.details.txt.gz");
-         #$minicpan->mirror_file(
-         #   "modules/02packages.details.txt.gz");
-         #$minicpan->clean_file(
-         #   "dependencies/CPAN/modules/03modlist.data.gz");
-         #$minicpan->mirror_file(
-         #   "modules/03modlist.data.gz");
       }
    }
    my $mod_info='';my $instfile='';my $cpanfil='';
@@ -1909,7 +1906,11 @@ sub fa_install_mod {
       eval {
          local $SIG{__DIE__}; # No sigdie handler;
          require CPAN;
-         CPAN::Shell->notest('get',$p);
+         unless (-e "dependencies/CPAN/authors" &&
+               !(grep {
+               /(?:use[-_]?)?internet|online|connect_to_internet_ok/i } @ARGV)) {
+            CPAN::Shell->notest('get',$p);
+         }
       };
       if ($@) {
          fa_die("CPAN Error: $@ $!\n");
@@ -1921,10 +1922,11 @@ sub fa_install_mod {
       }
       if (lc($task) eq 'install') {
 	 my $sudo='';
+         my $cpanfile=$cpanfil;
          $cpanfil=~s/^.*\/(.*)$/$1/;
          $cpanfil=~s/^(.*)-.*$/$1/;
          $cpanfil=~s/-/::/;  
-         $dir||=&fa_find_latest($cpanfil);
+         $dir||=&fa_find_latest($cpanfil,$cpanfile);
          print "*** Running $sudo$^X $butil.PL\n";
          print "*** cd to $dir\n";
          if ($p eq 'Archive::Tar') {
@@ -2452,10 +2454,10 @@ if (($^O ne 'MSWin32') && ($^O ne 'MSWin64') && !grep { /^GETBERK$/ } @ARGV) {
    &fa_install_module('Algorithm::Diff','install','Makefile');
    &fa_install_module('Text::Diff','install','Makefile');
    &fa_install_module('PAR::Dist','install','Makefile');
-   &fa_install_module('IO::Compress::Base::Common','install','Makefile');
    &fa_install_module('Compress::Raw::Bzip2','install','Makefile');
    &fa_install_module('Compress::Raw::Zlib','install','Makefile');
    &fa_install_module('Compress::Zlib','install','Makefile');
+   &fa_install_module('IO::Compress::Base::Common','install','Makefile');
    &fa_install_module('CPAN::Mini','install','Makefile');
    &fa_install_module('CPAN::Meta::YAML','install','Makefile');
    &fa_install_module('Parse::CPAN::Meta','install','Makefile');
@@ -2535,6 +2537,7 @@ if (($^O ne 'MSWin32') && ($^O ne 'MSWin64') && !grep { /^GETBERK$/ } @ARGV) {
    #&fa_install_module('Convert::BinHex','install','Makefile');
    &fa_install_module('MIME::Base64','install','Makefile');
    &fa_install_module('MIME::Entity','install','Makefile');
+   &fa_install_module('Authen::SASL','install','Makefile');
    &fa_install_module('HTTP::Negotiate','install','Makefile');
    &fa_install_module('Net::HTTP','install','Makefile');
    &fa_install_module('Data::Dump','install','Makefile');
@@ -7211,30 +7214,9 @@ package CPAN::Index;
 sub reload_x {
    use File::Spec;
    use Cwd;
-   use CPAN::Mini;
    my($cl,$wanted,$localname,$force) = @_;
-   my $minicpan=CPAN::Mini->new(
-
-      remote => "http://www.cpan.org",
-      local  => cwd()."/dependencies/CPAN",
-      log_level => 'debug',
-      exact_mirror => 1,
-
-   );
-   $minicpan->clean_file(
-      "dependencies/CPAN/authors/01mailrc.txt.gz");
-   $minicpan->mirror_file(
-      "authors/01mailrc.txt.gz");
-   $minicpan->clean_file(
-      "dependencies/CPAN/modules/02packages.details.txt.gz");
-   $minicpan->mirror_file(
-      "modules/02packages.details.txt.gz");
-   $minicpan->clean_file(
-      "dependencies/CPAN/modules/03modlist.data.gz");
-   $minicpan->mirror_file(
-      "modules/03modlist.data.gz");
    return File::Spec->catfile(&cwd."/dependencies/CPAN",
-                                        $localname);
+                                         $localname);
 }
 
 1;

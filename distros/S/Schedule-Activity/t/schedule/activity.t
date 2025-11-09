@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use Schedule::Activity;
-use Test::More tests=>15;
+use Test::More tests=>16;
 
 subtest 'validation'=>sub {
 	plan tests=>2;
@@ -158,10 +158,9 @@ subtest 'cycles'=>sub {
 };
 
 subtest 'edge cases'=>sub {
-	plan skip_all=>'Pending min/max reachability reporting';
+	plan tests=>2;
 	#
-	# If this falls into the spin branch, it will hang.
-	# Compiling/reachability should determine that the spin node can never exit, for example.
+	# Improvement:  A timeout flag that permits bailout instead of hanging.
 	#
 	my $scheduler=Schedule::Activity->new(configuration=>{node=>{
 		'root'=>{finish=>'terminate',next=>['cycle','spin'],tmmin=>0,tmavg=>0,tmmax=>0},
@@ -169,8 +168,9 @@ subtest 'edge cases'=>sub {
 		'cycle'=>{tmmin=>100,tmavg=>200,tmmax=>400,next=>['cycle','terminate']},
 		'terminate'=>{tmmin=>0,tmavg=>0,tmmax=>0},
 	}});
-	my %schedule=$scheduler->schedule(activities=>[[3000,'root']]);
-	ok($#{$schedule{activities}}>10,'Spin node');
+	my %schedule=$scheduler->schedule(unsafe=>0,activities=>[[3000,'root']]);
+	like($schedule{error}[0],qr/Dangling/,   'Dangling action');
+	like($schedule{error}[1],qr/No progress/,'No progress message');
 };
 
 subtest 'Attributes'=>sub {
@@ -533,6 +533,57 @@ subtest 'Node filtering'=>sub {
 	}
 	if($seen{'Begin action 2'}) { $pass=0 }
 	ok($pass,'Always blocked node never appears');
+};
+
+subtest 'Reachability'=>sub {
+	plan tests=>8;
+	my $reach=sub {
+		my ($A)=@_;
+		Schedule::Activity::_reachability($A);
+		foreach my $va (values %{$$A{reach}}) {
+			foreach my $ka (keys %$va) {
+				foreach my $kb (keys %{$$va{$ka}}) { $$va{$ka}{$$A{pam}{$kb}}=delete($$va{$ka}{$kb}) }
+				$$va{$$A{pam}{$ka}}=delete($$va{$ka});
+			}
+		}
+	};
+	my $builder=sub {
+		my (%nodes)=@_;
+		my %pam=map {$nodes{$_}=>$_} keys(%nodes);
+		foreach my $k (keys %nodes) { @{$nodes{$k}{next}}=map {$nodes{$_}} @{$nodes{$k}{next}} }
+		return (pam=>\%pam,built=>{node=>\%nodes});
+	};
+	my %activity;
+	#
+	%activity=&$builder(
+		A=>{next=>[qw/B/],tmmin=>1,tmmax=>2},
+		B=>{next=>[],tmmin=>1,tmmax=>2});
+	&$reach(\%activity);
+	is_deeply($activity{reach}{min}{A},{B=>1},'Single step:  min A->B');
+	is_deeply($activity{reach}{max}{A},{B=>2},'Single step:  max A->B');
+	is_deeply($activity{reach}{min}{B},{},    'Single step:  min B->nothing');
+	is_deeply($activity{reach}{max}{B},{},    'Single step:  max B->nothing');
+	#
+	%activity=&$builder(
+		A=>{next=>[qw/B C/],tmmin=>1,tmmax=>2},
+		B=>{next=>[qw/D/],tmmin=>3,tmmax=>4},
+		C=>{next=>[qw/D/],tmmin=>5,tmmax=>6},
+		D=>{next=>[],tmmin=>7,tmmax=>8},
+	);
+	&$reach(\%activity);
+	is_deeply($activity{reach}{min}{A},{B=>1,C=>1,D=>4},'Branch:  min A');
+	is_deeply($activity{reach}{max}{A},{B=>2,C=>2,D=>8},'Branch:  max A');
+	#
+	%activity=&$builder(
+		A=>{next=>[qw/B/],  tmmin=>1,tmmax=>2},
+		B=>{next=>[qw/A C/],tmmin=>3,tmmax=>4},
+		C=>{next=>[qw/B D/],tmmin=>5,tmmax=>6},
+		D=>{next=>[],       tmmin=>7,tmmax=>8},
+	);
+	&$reach(\%activity);
+	is_deeply($activity{reach}{min}{A},{A=>4,B=>1,C=>4,D=>9},        'lfsr:  min A');
+	is_deeply($activity{reach}{max}{A},{A=>'+',B=>'+',C=>'+',D=>'+'},'lfsr:  max A');
+	#
 };
 
 subtest 'Sanity checks'=>sub {

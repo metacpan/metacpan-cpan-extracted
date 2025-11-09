@@ -151,6 +151,7 @@ do { my $x = {
                                       'Dist::Zilla::Role::PluginBundle::Easy' => '0',
                                       'Dist::Zilla::Role::PluginBundle::PluginRemover' => '0.103',
                                       'Dist::Zilla::Util' => '0',
+                                      'Dist::Zilla::Util::AuthorDeps' => '0',
                                       'File::ShareDir' => '0',
                                       'List::Util' => '1.45',
                                       'Module::Runtime' => '0',

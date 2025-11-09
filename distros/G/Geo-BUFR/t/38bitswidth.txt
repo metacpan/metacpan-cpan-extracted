@@ -1,0 +1,51 @@
+
+Message 1  
+
+Section 0:
+    Length of BUFR message:            117
+    BUFR edition:                      4
+
+Section 1:
+    Length of section:                 22
+    BUFR master table:                 0
+    Originating centre:                85
+    Originating subcentre:             0
+    Update sequence number:            0
+    Optional section present:          0
+    Data category (table A):           1
+    International data subcategory:    25
+    Local data subcategory:            25
+    Master table version number:       11
+    Local table version number:        0
+    Year:                              2025
+    Month:                             10
+    Day:                               29
+    Hour:                              23
+    Minute:                            0
+    Second:                            0
+
+Section 3:
+    Length of section:                 25
+    Number of data subsets:            1
+    Observed data:                     1
+    Compressed data:                   0
+    Data descriptors unexpanded:       107000 031001 201144 202133 022080 022096 022069 202000 201000
+
+Subset 1
+
+     1  031001                5  DELAYED DESCRIPTOR REPLICATION FACTOR [NUMERIC]
+     2  022080       0.03515625  WAVEBAND CENTRAL FREQUENCY [Hz]
+     3  022096       0.00390625  SPECTRAL BAND WIDTH [1/S]
+     4  022069       0.00000000  SPECTRAL WAVE DENSITY [M2HZ-1]
+     5  022080       0.03906250  WAVEBAND CENTRAL FREQUENCY [Hz]
+     6  022096       0.00390625  SPECTRAL BAND WIDTH [1/S]
+     7  022069       0.10000000  SPECTRAL WAVE DENSITY [M2HZ-1]
+     8  022080       0.04296875  WAVEBAND CENTRAL FREQUENCY [Hz]
+     9  022096       0.00390625  SPECTRAL BAND WIDTH [1/S]
+    10  022069       1.23456789  SPECTRAL WAVE DENSITY [M2HZ-1]
+    11  022080       0.04687500  WAVEBAND CENTRAL FREQUENCY [Hz]
+    12  022096       0.00390625  SPECTRAL BAND WIDTH [1/S]
+    13  022069          missing  SPECTRAL WAVE DENSITY [M2HZ-1]
+    14  022080       0.05078125  WAVEBAND CENTRAL FREQUENCY [Hz]
+    15  022096       0.00390625  SPECTRAL BAND WIDTH [1/S]
+    16  022069       0.00000000  SPECTRAL WAVE DENSITY [M2HZ-1]

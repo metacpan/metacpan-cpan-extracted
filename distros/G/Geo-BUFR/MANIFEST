@@ -35,6 +35,8 @@ t/307080.partial
 t/307080.simple
 t/307080.table
 t/307080.txt
+t/38bitswidth.bufr
+t/38bitswidth.txt
 t/3xBUFRSYNOP-com.bufr
 t/3xBUFRSYNOP-com.bufr_altered
 t/3xBUFRSYNOP-com.txt

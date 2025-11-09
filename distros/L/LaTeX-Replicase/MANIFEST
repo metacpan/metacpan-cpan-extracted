@@ -2,6 +2,7 @@ Changes
 Makefile.PL
 MANIFEST
 README
+SECURITY.md
 lib/LaTeX/Replicase.pm
 t/00-pod.t
 t/01-replication.t

@@ -20,6 +20,20 @@
 #######################################################################
 
 
+2025-11-08  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000830 released
+
+        * Updated Makefile.PL to add Authen::SASL
+
+	* Added Support for Authenticated Email
+
+2025-11-08  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000829 released
+
+        * Updated Makefile.PL for COMPLETE builds
+
 2025-11-06  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000828 released

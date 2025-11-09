@@ -12,10 +12,13 @@ use warnings;
 use utf8;
 
 # use Test::More 'no_plan';
-use Test::More tests => 22;
+use Test::More tests => 25;
 use Test::More::UTF8;
+# use Test::NoWarnings;
 use Digest::MD5;
 use File::Path;
+
+use Data::Dumper;
 
 BEGIN { use_ok('LaTeX::Replicase') }; ### Test 1
 use LaTeX::Replicase qw(:all);
@@ -23,56 +26,25 @@ use LaTeX::Replicase qw(:all);
 ##### Test replication() #####
 
 my $info = {
-		data => { # mandatory data section
-			myTitle => 'ChiTaRS-${}_{3.1}$-the enhanced chimeric transcripts and RNA-seq database matched with protein-protein interactions',
-			Authors => 'Alessandro Gorohovski, Somnath Tagore, etc...',
-			myAbstract => 'Discovery of chimeric RNAs, which are produced by chromosomal translocations as well as 
+		myTitle => 'ChiTaRS-${}_{3.1}$-the enhanced chimeric transcripts and RNA-seq database matched with protein-protein interactions',
+		Authors => 'Alessandro Gorohovski, Somnath Tagore, etc...',
+		myAbstract => 'Discovery of chimeric RNAs, which are produced by chromosomal translocations as well as 
 the joining of exons from different genes by trans-splicing, has added a new level of complexity to our study and 
 understanding of the transcriptome. The enhanced ChiTaRS-${}_{3.1}$ database (\url{http://chitars.md.biu.ac.il}) is designed 
 to make widely accessible a wealth of mined data on chimeric RNAs, with easy-to-use analytical tools built-in.',
-			myCaption => 'The major improvements and data additions in ChiTaRS-${}_{3.1}$ in comparison to ChiTaRS-${}_{2.1}$.',
-			myTable_array => [ # custom user variable ARRAY-ARRAY
-				['00', '01', '02', '03', '04',], # row 0
-				[10, 11, 12, 13, 14,], # row 1
-				[20, 21, 22, undef, 24,], # row 2
-				[30, 31, 32, 33, 34,], # row 3
-			],
-			myTable_hash => [ # custom user variable ARRAY-HASH
-				{A=>'00', B=>'01', C=>'02', D=>'03', E=>'04',}, # row 0
-				{A=>10, B=>11, C=>12, D=>13, E=>14,}, # row 1
-				{A=>20, B=>21, C=>22, D=>23, E=>24,}, # row 2
-				{A=>30, B=>31, C=>32, D=>33, E=>34,}, # row 3
-			],
-		},
-		cases => { # optional auxiliary data section
-			myTable_array => {
-				0 => { # table row 0
-					3 => [1, 2], # extract from document %%%ADD1: and %%%ADD2: for 3-rd column of table
-					1 => [5, 10],
-				},
-				2 => { # table row 2
-					0 => [1, 3], # extract %%%ADD1: and %%%ADD3: for 0-th column
-					1 => 2, # extract only %%%ADD2: for 1-st column
-					2 => 1,
-					4 => 1,
-					'' => 5, # extract only %%%ADD5: located at the very "tail" of row
-				},
-				3 => { # table row 2
-					0 => 4, # extract %%%ADD4: for 0-th column
-				},
-			},
-			myTable_hash => {
-				1 => { # table row 1
-					B => 1, # extract %%%ADD1: for 'B' key (1-st column)
-					A => [1, 3], # extract %%%ADD1: and %%%ADD3: for 'A' key (0-th column)
-				},
-				0 => { # table row 0
-					B => 2, # extract %%%ADD2:
-					C => [1, 2], # extract %%%ADD1: and %%%ADD2:
-				},
-			},
-
-		},
+		myCaption => 'The major improvements and data additions in ChiTaRS-${}_{3.1}$ in comparison to ChiTaRS-${}_{2.1}$.',
+		myTable_array => [ # custom user variable ARRAY-ARRAY
+			['00', '01', '02', '03', '04',], # row 0
+			[10, 11, 12, 13, 14,], # row 1
+			[20, 21, 22, undef, 24,], # row 2
+			[30, 31, 32, 33, 34,], # row 3
+		],
+		myTable_hash => [ # custom user variable ARRAY-HASH
+			{A=>'00', B=>'01', C=>'02', D=>'03', E=>'04',}, # row 0
+			{A=>10, B=>11, C=>12, D=>13, E=>14,}, # row 1
+			{A=>20, B=>21, C=>22, D=>23, E=>24,}, # row 2
+			{A=>30, B=>31, C=>32, D=>33, E=>34,}, # row 3
+		],
 	};
 
 
@@ -83,8 +55,7 @@ my $ofile = 't/ready_good.tex';
 unlink $ofile;
 my $msg = replication( $file, $info, ofile => $ofile, def => 1, ignore => 1 ) // [];
 
-is( @$msg, 0, "Test #2: '$file'");
-
+is( @$msg, 0, "Test #2: '$file' without errors");
 
 ###Test 3
 open OFILE, $ofile or die "Can't open '$ofile': $!";
@@ -103,7 +74,7 @@ while(<TFILE>) {
 }
 close TFILE;
 
-is_deeply( $msg, $msg_ref3, "Test #3: Check '$ofile' body");
+is_deeply( $msg, $msg_ref3, "Test #3: Check body of '$ofile' vs 't/template_test.tex'");
 
 unlink $ofile;
 
@@ -136,7 +107,7 @@ my $md5 = Digest::MD5->new;
 for( @$msg ) {
 	$md5->add($_);
 }
-is( $md5->hexdigest, 'a51299dd3ff00321337d4728b9e5bbf9', "Test #8: DEBUG");
+is( $md5->hexdigest, 'f7298abe6cf73f063eb680728b7d78cc', "Test #8: DEBUG");
 
 
 ###Test 4
@@ -156,31 +127,29 @@ $file = 't/template_good.tex';
 $ofile = 't/ready_good.tex';
 
 $info = {
-		data => { # mandatory data section
-			Authors => 'Alessandro Gorohovski, Somnath Tagore, etc...',
-		},
+		Authors => 'Alessandro Gorohovski, Somnath Tagore, etc...',
 	};
 
 $msg = replication( $file, $info, ofile => $ofile, def => 1, silent =>1 ) // [];
 
 my $msg_ref = [
-	'~~> l.12 WARNING#3: unknown tag = myTitle',
-	'~~> l.24 WARNING#2: unknown SCALAR or ARRAY %%%VAR:myAbstract',
-	'~~> l.32 WARNING#2: unknown SCALAR or ARRAY %%%VAR:myCaption',
-	'~~> l.40 WARNING#2: unknown SCALAR or ARRAY %%%VAR:myTable_array',
-	'~~> l.49 WARNING#3: unknown tag = 0',
-	'~~> l.54 WARNING#3: unknown tag = 1',
-	'~~> l.58 WARNING#3: unknown tag = 2',
-	'~~> l.63 WARNING#3: unknown tag = 3',
-	'~~> l.67 WARNING#3: unknown tag = 4',
-	'~~> l.80 WARNING#2: unknown SCALAR or ARRAY %%%VAR:myTable_hash',
-	'~~> l.82 WARNING#3: unknown tag = A',
-	'~~> l.84 WARNING#3: unknown tag = B',
-	'~~> l.86 WARNING#3: unknown tag = C',
-	'~~> l.88 WARNING#3: unknown tag = D',
-	'~~> l.90 WARNING#3: unknown tag = E',
-	'~~> l.96 WARNING#3: unknown tag = NoNameI',
-	'~~> l.99 WARNING#2: unknown SCALAR or ARRAY %%%VAR:NoNameII',
+	"~~> l.14 WARNING#3: unknown sub-key 'myTitle' in %%%V:myTitle",
+	"~~> l.26 WARNING#2: unknown or undef ARRAY|HASH|SCALAR|REF.SCALAR of sub-key 'myAbstract' in %%%VAR:myAbstract",
+	"~~> l.34 WARNING#2: unknown or undef ARRAY|HASH|SCALAR|REF.SCALAR of sub-key 'myCaption' in %%%VAR:myCaption",
+	"~~> l.42 WARNING#2: unknown or undef ARRAY|HASH|SCALAR|REF.SCALAR of sub-key 'myTable_array' in %%%VAR:myTable_array",
+	"~~> l.46 WARNING#3: unknown sub-key '0' in %%%V:0",
+	"~~> l.49 WARNING#3: unknown sub-key '1' in %%%V:1",
+	"~~> l.52 WARNING#3: unknown sub-key '2' in %%%V:2",
+	"~~> l.55 WARNING#3: unknown sub-key '3' in %%%V:3",
+	"~~> l.58 WARNING#3: unknown sub-key '4' in %%%V:4",
+	"~~> l.70 WARNING#2: unknown or undef ARRAY|HASH|SCALAR|REF.SCALAR of sub-key 'myTable_hash' in %%%VAR:myTable_hash",
+	"~~> l.72 WARNING#3: unknown sub-key 'A' in %%%V:A",
+	"~~> l.74 WARNING#3: unknown sub-key 'B' in %%%V:B",
+	"~~> l.76 WARNING#3: unknown sub-key 'C' in %%%V:C",
+	"~~> l.78 WARNING#3: unknown sub-key 'D' in %%%V:D",
+	"~~> l.80 WARNING#3: unknown sub-key 'E' in %%%V:E",
+	"~~> l.86 WARNING#3: unknown sub-key 'NoNameI' in %%%V:NoNameI",
+	"~~> l.89 WARNING#2: unknown or undef ARRAY|HASH|SCALAR|REF.SCALAR of sub-key 'NoNameII' in %%%VAR:NoNameII",
 ];
 
 is_deeply( $msg, $msg_ref, "Test #5: unknown %%%VARs");
@@ -197,25 +166,25 @@ my $msg_ref2 = [
 	"--> Using 't/ready_good.tex' file as output",
 	"--> Open 't/template_good.tex'",
 	"--> Open 't/ready_good.tex'",
-	"~~> l.12 WARNING#3: unknown tag = myTitle",
-	"--> l.15 Found %%%VAR:Authors",
-	"--> l.17>16 Insert SCALAR %%%VAR = Alessandro Gorohovski, Somnath Tagore, etc...",
-	"~~> l.24 WARNING#2: unknown SCALAR or ARRAY %%%VAR:myAbstract",
-	"~~> l.32 WARNING#2: unknown SCALAR or ARRAY %%%VAR:myCaption",
-	"~~> l.40 WARNING#2: unknown SCALAR or ARRAY %%%VAR:myTable_array",
-	"~~> l.49 WARNING#3: unknown tag = 0",
-	"~~> l.54 WARNING#3: unknown tag = 1",
-	"~~> l.58 WARNING#3: unknown tag = 2",
-	"~~> l.63 WARNING#3: unknown tag = 3",
-	"~~> l.67 WARNING#3: unknown tag = 4",
-	"~~> l.80 WARNING#2: unknown SCALAR or ARRAY %%%VAR:myTable_hash",
-	"~~> l.82 WARNING#3: unknown tag = A",
-	"~~> l.84 WARNING#3: unknown tag = B",
-	"~~> l.86 WARNING#3: unknown tag = C",
-	"~~> l.88 WARNING#3: unknown tag = D",
-	"~~> l.90 WARNING#3: unknown tag = E",
-	"~~> l.96 WARNING#3: unknown tag = NoNameI",
-	"~~> l.99 WARNING#2: unknown SCALAR or ARRAY %%%VAR:NoNameII",
+	"~~> l.14 WARNING#3: unknown sub-key 'myTitle' in %%%V:myTitle",
+	"--> l.17 Found %%%VAR:Authors",
+	"--> l.19>15 Insert %%%V[AR]:Authors= Alessandro Gorohovski, Somnath Tagore, etc...",
+	"~~> l.26 WARNING#2: unknown or undef ARRAY|HASH|SCALAR|REF.SCALAR of sub-key 'myAbstract' in %%%VAR:myAbstract",
+	"~~> l.34 WARNING#2: unknown or undef ARRAY|HASH|SCALAR|REF.SCALAR of sub-key 'myCaption' in %%%VAR:myCaption",
+	"~~> l.42 WARNING#2: unknown or undef ARRAY|HASH|SCALAR|REF.SCALAR of sub-key 'myTable_array' in %%%VAR:myTable_array",
+	"~~> l.46 WARNING#3: unknown sub-key '0' in %%%V:0",
+	"~~> l.49 WARNING#3: unknown sub-key '1' in %%%V:1",
+	"~~> l.52 WARNING#3: unknown sub-key '2' in %%%V:2",
+	"~~> l.55 WARNING#3: unknown sub-key '3' in %%%V:3",
+	"~~> l.58 WARNING#3: unknown sub-key '4' in %%%V:4",
+	"~~> l.70 WARNING#2: unknown or undef ARRAY|HASH|SCALAR|REF.SCALAR of sub-key 'myTable_hash' in %%%VAR:myTable_hash",
+	"~~> l.72 WARNING#3: unknown sub-key 'A' in %%%V:A",
+	"~~> l.74 WARNING#3: unknown sub-key 'B' in %%%V:B",
+	"~~> l.76 WARNING#3: unknown sub-key 'C' in %%%V:C",
+	"~~> l.78 WARNING#3: unknown sub-key 'D' in %%%V:D",
+	"~~> l.80 WARNING#3: unknown sub-key 'E' in %%%V:E",
+	"~~> l.86 WARNING#3: unknown sub-key 'NoNameI' in %%%V:NoNameI",
+	"~~> l.89 WARNING#2: unknown or undef ARRAY|HASH|SCALAR|REF.SCALAR of sub-key 'NoNameII' in %%%VAR:NoNameII",
 ];
 
 is_deeply( $msg, $msg_ref2, "Test #11: unknown %%%VARs with DEBUG");
@@ -241,40 +210,42 @@ is_deeply( $msg, $msg_ref9, "Test #9: INFILE == OUTFILE");
 
 
 ###Test 10
-$msg = replication( $file, {}, ofile => $file, silent =>1, debug => 0 ) // [];
+$msg = replication( $file, {}, ofile => $newfile, silent =>1, debug => 0 ) // [];
 
 is( $msg->[0], "!!! ERROR#2: EMPTY data!", "Test #10: EMPTY data");
+
+unlink $newfile;
 
 
 ###Test 12
 $file = 't/template_good.tex';
 $ofile = 't/ready_good.tex';
 
+my $rs = 'My Title';
 $info = {
-		data => {
-			myTitle => 'My Title',
-			Authors => 'Alessandro Gorohovski, etc...',
-			myAbstract => 'My Abstract',
-			myCaption => 'My Caption',
-			myTable_array => {
-				0 => ['00', '01', '02', '03', '04',], # row 0
-			},
-			myTable_hash => [ # custom user variable ARRAY-HASH
-				{A=>'00', B=>'01', C=>'02', D=>'03', E=>'04',}, # row 0
-			],
+		myTitle => \$rs,
+		Authors => 'Alessandro Gorohovski, etc...',
+		myAbstract => 'My Abstract',
+		myCaption => 'My Caption',
+		myTable_array => {
+			0 => ['00', '01', '02', '03', '04',], # row 0
 		},
+		myTable_hash => [ # custom user variable ARRAY-HASH
+			{A=>'00', B=>'01', C=>'02', D=>'03', E=>'04',}, # row 0
+		],
 	};
 
 $msg = replication( $file, $info, ofile => $ofile, silent =>1, debug => 0 ) // [];
 
 my $msg_ref12 = [
-	'~~> l.96 WARNING#3: unknown tag = NoNameI',
-	'~~> l.99 WARNING#2: unknown SCALAR or ARRAY %%%VAR:NoNameII',
+	"~~> l.86 WARNING#3: unknown sub-key 'NoNameI' in %%%V:NoNameI",
+	"~~> l.89 WARNING#2: unknown or undef ARRAY|HASH|SCALAR|REF.SCALAR of sub-key 'NoNameII' in %%%VAR:NoNameII",
 ];
 
 is_deeply( $msg, $msg_ref12, "Test #12: wrong ARRAY");
 
 unlink $ofile;
+
 
 ###Test 13-14
 my $file_s = 't/tmp/template_simple.tex';
@@ -283,8 +254,42 @@ my $ofile_s = 't/tmp/ready_simple.tex';
 my $tex = q|
 \begin{tabbing}
 %%%VAR: myArray
+%%%ADDX: \=
    'A' %%%V: @
- \= %%%ADDX:
+ \=
+   'B'
+ \=
+   'C'
+%%%END:
+\end{tabbing}
+
+\begin{tabbing}
+%%%VAR: myArray
+%%%ADDX: \=
+   'A' %%%V: -1-
+ \=
+   'B'
+ \=
+   'C'
+%%%END:
+\end{tabbing}
+
+\begin{tabbing}
+%%%VAR: myArray
+%%%ADDX: \=
+   'A' %%%V: 2,1,3-4,0
+ \=
+   'B'
+ \=
+   'C'
+%%%END:
+\end{tabbing}
+
+\begin{tabbing}
+%%%VAR: myArrayRef
+%%%ADDX: \=
+   'A' %%%V: 2,1,0-
+ \=
    'B'
  \=
    'C'
@@ -296,15 +301,15 @@ open F, ">$file_s" or die "Can't open '$file_s': $!";
 print F $tex;
 close F;
 
+my @ell = (11, 22, 33);
 $info = {
-		data => {
-			myArray => [1..5],
-		},
+		myArray => [1..5],
+		myArrayRef => \@ell,
 	};
 
 $msg = replication( $file_s, $info, ofile => $ofile_s, silent =>1, debug => 0 ) // [];
 
-is( @$msg, 0, "Test #13: '$file_s'");
+is( @$msg, 0, "Test #13: '$file_s' without errors");
 
 open OFILE, $ofile_s or die "Can't open '$ofile_s': $!";
 $msg = [];
@@ -318,14 +323,50 @@ my $msg_ref_s = [
 '',
 '\begin{tabbing}',
 1,
-' \=',
+'\=',
 2,
-' \=',
+'\=',
 3,
-' \=',
+'\=',
 4,
-' \=',
+'\=',
 5,
+'\end{tabbing}',
+'',
+'\begin{tabbing}',
+5,
+'\=',
+4,
+'\=',
+3,
+'\=',
+2,
+'\=',
+1,
+'\end{tabbing}',
+'',
+'\begin{tabbing}',
+3,
+'\=',
+2,
+'\=',
+4,
+'\=',
+5,
+'\=',
+1,
+'\end{tabbing}',
+'',
+'\begin{tabbing}',
+33,
+'\=',
+22,
+'\=',
+11,
+'\=',
+22,
+'\=',
+33,
 '\end{tabbing}',
 ];
 
@@ -345,9 +386,11 @@ $tex = q|
    'C' %%%V:1
 %%%END:
 \end{tabbing}
- SPECIFY VALUE 'myArray'! %%%V: myArray
+ SPECIFY VALUE 'myArray'! %%%V: myArray/0
 ~
- SPECIFY VALUE 'myArrayArray'! %%%V: myArrayArray
+ SPECIFY VALUE 'myArrayArray'! %%%V: myArrayArray/0/0
+~
+ SPECIFY VALUE 'myArrayHashArray'! %%%V: myArrayHashArray/0/A/5
 ~
 %%%VAR: myArrayHashArray
    array A   %%%V:A%
@@ -365,17 +408,16 @@ print F $tex;
 close F;
 
 $info = {
-		data => {
-			myArray => [0,1,2],
-			myArrayArray => [[0,3..5], 1, 2],
-			myArrayHashArray => [ { A=>[0..9],},],
-			myArrayArrayArray => [[undef,[1..9],],[undef,[2..9],],],
-		},
+		myArray => [0,1,2],
+		myArrayArray => [[0,3..5], 1, 2],
+		myArrayHashArray => [ { A=>[0..9],},],
+		myArrayArrayArray => [[undef,[1..9],],[undef,[2..9],],],
 	};
 
 $msg = replication( $file_s, $info, ofile => $ofile_s, silent =>1, debug => 0 ) // [];
 
-is( @$msg, 0, "Test #21: '$file_s'");
+is( @$msg, 0, "Test #21: '$file_s' without errors");
+
 
 open OFILE, $ofile_s or die "Can't open '$ofile_s': $!";
 $msg = [];
@@ -397,6 +439,8 @@ $msg_ref_s = [
 '~',
 0,
 '~',
+5,
+'~',
 '0123456789,',
 '~',
 '123456789,',
@@ -410,34 +454,55 @@ unlink $file_s, $ofile_s;
 
 ###Test 15-16
 $tex = q|
+%%%V: /// 	   
+%%%V: /		
+%%%V: /myHash
 \begin{tabbing}
-%%%VAR: myHash
-   SPECIFY VALUE 'A'! %%%V: A%
+%%%VAR: /myHash
+   SPECIFY VALUE 'A'! %%%V:A%
  \= %%%ADD:
    SPECIFY VALUE 'B'! %%%V: B%
  \= %%%ADD:
    SPECIFY VALUE 'C'! %%%V: C%
  \= %%%ADD:
-   SPECIFY VALUE 'D'! %%%V: D%
+   SPECIFY VALUE 'D'! %%%V:D%
  \= %%%ADD:
    SPECIFY VALUE 'E'! %%%V: E
-%%%END:
+%%%ENDZ:
 \end{tabbing}
+
+\begin{tabular}{ccccc}
+ \hline
+%%%VAR: /myHash
+ & %%%ADDX:
+ \multicolumn{1}{l}{ %%%ADD:%
+   SPECIFY VALUE 'A'! %%%V:@%
+} %%%ADDE:
+ B 
+ & %%%ADDX:
+ C & D & E
+%%%ENDT:
+ \\\\ \hline
+\end{tabular}
 |;
 
 open F, ">$file_s" or die "Can't open '$file_s': $!";
 print F $tex;
 close F;
 
+my $r = 1;
 $info = {
-		data => {
-			myHash => {A=>1, B=>2, C=>3, D=>4, E=>5},
+		myHash => {
+			A=>\$r, B=>2, C=>3, D=>4, E=>5,
+			'@' => ['C','B','D','A','E'],
 		},
 	};
 
 $msg = replication( $file_s, $info, ofile => $ofile_s, silent =>1, debug => 0 ) // [];
+# $msg = replication( $file_s, $info, ofile => $ofile_s, def=>1, debug => 1 ) // [];
 
-is( @$msg, 0, "Test #15: '$file_s'");
+is( @$msg, 0, "Test #15: '$file_s' without errors");
+
 
 open OFILE, $ofile_s or die "Can't open '$ofile_s': $!";
 $msg = [];
@@ -456,6 +521,20 @@ $msg_ref_s = [
 '4 \=',
 5,
 '\end{tabbing}',
+'',
+'\begin{tabular}{ccccc}',
+' \hline',
+' \multicolumn{1}{l}{3}',
+' &',
+' \multicolumn{1}{l}{2}',
+' &',
+' \multicolumn{1}{l}{4}',
+' &',
+' \multicolumn{1}{l}{1}',
+' &',
+' \multicolumn{1}{l}{5}',
+' \\\\ \hline',
+'\end{tabular}',
 ];
 
 is_deeply( $msg, $msg_ref_s, "Test #16: ordinary HASH");
@@ -465,8 +544,9 @@ unlink $ofile_s;
 
 ###Test 17-18
 $info = {
-		data => {
-			myHash => {A=>1, B=>[2,6..8], C=>3, D=>4, E=>5},
+		myHash => {
+			A=>1, B=>[2,6..8], C=>3, D=>4, E=>5,
+			'@' => [undef,'E','C','A','D','B'],
 		},
 	};
 
@@ -491,6 +571,20 @@ $msg_ref_s = [
 '4 \=',
 5,
 '\end{tabbing}',
+'',
+'\begin{tabular}{ccccc}',
+' \hline',
+' \multicolumn{1}{l}{5}',
+' &',
+' \multicolumn{1}{l}{3}',
+' &',
+' \multicolumn{1}{l}{1}',
+' &',
+' \multicolumn{1}{l}{4}',
+' &',
+' \multicolumn{1}{l}{}',
+' \\\\ \hline',
+'\end{tabular}',
 ];
 
 is_deeply( $msg, $msg_ref_s, "Test #18: mixed HASH");
@@ -509,8 +603,30 @@ SPECIFY VALUE ParamI !
 %%%VAR: ParamII
 SPECIFY VALUE ParamII !
 ~
-~
+~ %%%ADDD:% is wrong tag!
 %%%END:
+~
+%%%V: RefSub
+~
+%%%VAR: myArray
+~ %%%ADD:%
+SPECIFY VALUE %%%V:-25-15
+%%%END:
+~
+%%%VAR: myArray
+~ %%%ADD:%
+SPECIFY VALUE %%%V:-5-1,-3
+%%%END:
+~
+%%%VAR: ArrRefs
+~ %%%ADD:%
+SPECIFY VALUE %%%V:@
+%%%END:
+~
+%%%VAR: Mixed
+~ %%%ADD:%
+SPECIFY VALUE %%%V:@
+%%%ENDZ:
 }
 |;
 
@@ -519,15 +635,26 @@ print F $tex;
 close F;
 
 $info = {
-		data => {
-			ParamI => 12345,
-			ParamII => 67890,
-		},
+		ParamI => 12345,
+		ParamII => 67890,
+		RefSub => sub{ print"Ok\n"},
+		ArrRefs => [
+				\$ell[2],
+				\$ell[0],
+				\$ell[1],
+			],
+		Mixed => [
+				0,
+				{A=>1},
+				\$ell[2],
+				[5..9],
+			],
+		myArray => [0..9],
 	};
 
 $msg = replication( $file_s, $info, ofile => $ofile_s, silent =>1, debug => 0 ) // [];
 
-is( @$msg, 0, "Test #19: '$file_s'");
+is( $msg->[0], "~~> l.14 WARNING#4: wrong type (not SCALAR|ARRAY|HASH) of 'RefSub' in %%%V:RefSub", "Test #19: '$file_s'");
 
 open OFILE, $ofile_s or die "Can't open '$ofile_s': $!";
 $msg = [];
@@ -541,6 +668,22 @@ $msg_ref_s = [
 '',
 '\mbox{',
 1234567890,
+'~',
+'%%%V: RefSub',
+'~',
+'~0',
+'~',
+'~9',
+'~8',
+'~7',
+'~6',
+'~5',
+'~7',
+'~',
+'~~~~',
+'%%%VAR: Mixed',
+'~ %%%ADD:%',
+'SPECIFY VALUE %%%V:@',
 '}',
 ];
 
@@ -548,5 +691,58 @@ is_deeply( $msg, $msg_ref_s, "Test #20: '%%%VAR:' nested within another '%%%VAR:
 
 unlink $file_s, $ofile_s;
 
+
+###Test 23-24
+$tex = q|
+\mbox{
+%%%VAR: /0/7
+SPECIFY ELEMENT of ARRAY !
+~
+%%%ENDT:
+}
+|;
+
+open F, ">$file_s" or die "Can't open '$file_s': $!";
+print F $tex;
+close F;
+
+$info = [ [0..9], ];
+
+$msg = replication( $file_s, $info, ofile => $ofile_s, silent =>1, debug => 0 ) // [];
+
+is( @$msg, 0, "Test #23: '$file_s'");
+
+open OFILE, $ofile_s or die "Can't open '$ofile_s': $!";
+$msg = [];
+while(<OFILE>) {
+	s/\s+$//;
+	push @$msg, $_;
+}
+close OFILE;
+
+$msg_ref_s = [
+'',
+'\mbox{',
+7,
+'}',
+];
+
+is_deeply( $msg, $msg_ref_s, "Test #24: ARAAY.ARRAY %%%VAR:");
+
+unlink $file_s, $ofile_s;
+
+
+###Test 25
+$msg = replication( undef, $info, ofile => $ofile_s, silent =>1, debug => 0 ) // [];
+
+is( $msg->[0], "!!! ERROR#0: undefined input file!", "Test #25: undefined input name of TeX file");
+
+unlink $ofile_s;
+
 rmtree('t/tmp');
 
+###DEL###
+# open F, ">test.log";
+# print F Dumper($msg);
+# close F;
+# exit;

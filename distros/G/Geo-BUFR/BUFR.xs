@@ -29,26 +29,34 @@ bitstream2dec(unsigned char *bitstream,   \
         /* The extracted bits is interpreted as a non negative integer. */
         /* Returns undef if all bits extracted are 1 bits. */
 
-        static unsigned int bitmask[] = {
+        static UV bitmask[] = {
             0,
-            0x00000001, 0x00000003, 0x00000007, 0x0000000f,
-            0x0000001f, 0x0000003f, 0x0000007f, 0x000000ff,
-            0x000001ff, 0x000003ff, 0x000007ff, 0x00000fff,
-            0x00001fff, 0x00003fff, 0x00007fff, 0x0000ffff,
-            0x0001ffff, 0x0003ffff, 0x0007ffff, 0x000fffff,
-            0x001fffff, 0x003fffff, 0x007fffff, 0x00ffffff,
-            0x01ffffff, 0x03ffffff, 0x07ffffff, 0x0fffffff,
-            0x1fffffff, 0x3fffffff, 0x7fffffff, 0xffffffff
+            0x0000000000000001, 0x0000000000000003, 0x0000000000000007, 0x000000000000000f,
+            0x000000000000001f, 0x000000000000003f, 0x000000000000007f, 0x00000000000000ff,
+            0x00000000000001ff, 0x00000000000003ff, 0x00000000000007ff, 0x0000000000000fff,
+            0x0000000000001fff, 0x0000000000003fff, 0x0000000000007fff, 0x000000000000ffff,
+            0x000000000001ffff, 0x000000000003ffff, 0x000000000007ffff, 0x00000000000fffff,
+            0x00000000001fffff, 0x00000000003fffff, 0x00000000007fffff, 0x0000000000ffffff,
+            0x0000000001ffffff, 0x0000000003ffffff, 0x0000000007ffffff, 0x000000000fffffff,
+            0x000000001fffffff, 0x000000003fffffff, 0x000000007fffffff, 0x00000000ffffffff,
+            0x00000001ffffffff, 0x00000003ffffffff, 0x00000007ffffffff, 0x0000000fffffffff,
+            0x0000001fffffffff, 0x0000003fffffffff, 0x0000007fffffffff, 0x000000ffffffffff,
+            0x000001ffffffffff, 0x000003ffffffffff, 0x000007ffffffffff, 0x00000fffffffffff,
+            0x00001fffffffffff, 0x00003fffffffffff, 0x00007fffffffffff, 0x0000ffffffffffff,
+            0x0001ffffffffffff, 0x0003ffffffffffff, 0x0007ffffffffffff, 0x000fffffffffffff,
+            0x001fffffffffffff, 0x003fffffffffffff, 0x007fffffffffffff, 0x00ffffffffffffff,
+            0x01ffffffffffffff, 0x03ffffffffffffff, 0x07ffffffffffffff, 0x0fffffffffffffff,
+            0x1fffffffffffffff, 0x3fffffffffffffff, 0x7fffffffffffffff, 0xffffffffffffffff
         };
-        int octet = bitpos/8;    /* Which octet the word starts in              */
+        int octet = bitpos/8; /* Which octet the word starts in */
         int startbit = bitpos & 0x07; /* Offset from start of octet to start of word */
         int bits, lastbits;
-        unsigned long word;
+        UV word;
 
         if (wordlength == 0) {
             word = 0;
-        } else if (wordlength > 32) {
-            /* For now, we restrict ourselves to 32-bit words */
+        } else if (wordlength > 64) {
+            /* For now, we restrict ourselves to 64-bit words */
             XSRETURN_UNDEF;
         } else {
             if (wordlength+startbit <= 8) {
@@ -129,7 +137,7 @@ bitstream2ascii(unsigned char *bitstream, int bitpos, int len)
 
 
 void
-dec2bitstream(unsigned long word, \
+dec2bitstream(UV word, \
               unsigned char *bitstream, \
               int bitpos, int wordlength)
 
@@ -143,27 +151,27 @@ dec2bitstream(unsigned long word, \
   int num_encodedbits, num_onebits, num_lastbits, i;
   unsigned char lastbyte;
 
-  if (wordlength > 32) {
-    /* Data width in table B for numerical data will hopefully never
-       exceed 32. Since 'long' in C is assured to be 4 bytes, we are
-       not able to encode that big values with present method. */
+  if (wordlength > 64) {
+    /* Data width in table B for numerical data (or after applying
+       CHANGE DATA WIDTH operator) will hopefully never exceed 64. We
+       are not able to encode that big values with present method. */
     exit(1);
   }
   if (wordlength > 0) {
     /* First set the bits after startbit to 0 in first byte of bitstream */
     bitstream[octet] &= SetFirstBits[startbit];
-    if (wordlength+startbit <= 32) {
+    if (wordlength+startbit <= 64) {
     /* Shift the part of word we want to encode (the last wordlength bits)
        so that it starts at startbit in first byte (will be preceded by 0 bits) */
-      word <<= (32-wordlength-startbit);
+      word <<= (64-wordlength-startbit);
       /* Then extract first byte, which must be shifted to last byte
          before being assigned to an unsigned char */
-      bitstream[octet] |= word >> 24;
+      bitstream[octet] |= word >> 56;
       /* Then encode remaining bytes in word, if any */
       num_encodedbits = 8-startbit;
       while (num_encodedbits < wordlength) {
         word <<= 8;
-        bitstream[++octet] = word >> 24;
+        bitstream[++octet] = word >> 56;
         num_encodedbits += 8;
       }
       /* Finally pad last encoded byte in bitstream with one bits */
@@ -173,17 +181,17 @@ dec2bitstream(unsigned long word, \
       /* When aligning word with bitstream[octet], we will in this
          case lose some of the rightmost bits, which we therefore need
          to save first */
-      num_lastbits = startbit+wordlength-32;
+      num_lastbits = startbit+wordlength-64;
       lastbyte = word << (8-num_lastbits);
       /* Align word with bitstream[octet] */
       word >>= num_lastbits;
       /* Then extract and encode the bytes in word, which must be
          shifted to last byte before being assigned to an unsigned
          char */
-      bitstream[octet++] |= word >> 24;
+      bitstream[octet++] |= word >> 56;
       word <<= 8;
       for (i=0; i<3; i++) {
-        bitstream[octet++] = word >> 24;
+        bitstream[octet++] = word >> 56;
         word <<= 8;
       }
       /* Finally encode last bits (which we shifted off from word above),

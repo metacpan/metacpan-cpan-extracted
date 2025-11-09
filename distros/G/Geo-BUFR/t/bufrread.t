@@ -1,7 +1,7 @@
 use warnings;
 use strict;
 
-use Test::More tests => 35;
+use Test::More tests => 36;
 use Config;
 
 my $perl = $Config{perlpath};
@@ -30,7 +30,7 @@ is($output, $expected, 'testing bufrread.pl -d -n -w -o on temp message with qc'
 
 $output = `$perl ./bufrread.pl --all_operators t/associated.bufr --tablepath t/bt`;
 $expected = read_file('t/associated.txt');
-is($output, $expected, 'testing bufrread.pl -all on message with associated values and 201-2 operators');
+is($output, $expected, 'testing bufrread.pl --all on message with associated values and 201-2 operators');
 
 `$perl ./bufrread.pl --strict_checking 1 t/iozx.bufr --tablepath t/bt > t/outrea2 2> t/warnrea2`;
 
@@ -82,15 +82,15 @@ is($output, $expected, 'testing bufrread.pl -s 1 on dubious left out descriptors
 
 $output = `$perl ./bufrread.pl t/change_refval.bufr --tablepath t/bt`;
 $expected = read_file('t/change_refval.txt');
-is($output, $expected, 'testing bufrread.pl on message containing 203Y');
+is($output, $expected, 'testing bufrread.pl on message containing 203 change reference values operator');
 
 $output = `$perl ./bufrread.pl t/change_refval_compressed.bufr --tablepath t/bt`;
 $expected = read_file('t/change_refval_compressed.txt');
-is($output, $expected, 'testing bufrread.pl on compressed message containing 203Y');
+is($output, $expected, 'testing bufrread.pl on compressed message containing 203 operator');
 
 $output = `$perl ./bufrread.pl t/208035.bufr -w 35 --tablepath t/bt`;
 $expected = read_file('t/208035.txt');
-is($output, $expected, 'testing bufrread.pl on message containing 208Y');
+is($output, $expected, 'testing bufrread.pl on message containing 208 change width of ccitt ia5 field operator');
 
 $output = `$perl ./bufrread.pl t/multiple_qc.bufr --tablepath t/bt`;
 $expected = read_file('t/multiple_qc.txt');
@@ -126,7 +126,11 @@ is($output, $expected, 'testing bufrread.pl on message with 232000 and 204YYY op
 
 $output = `$perl ./bufrread.pl t/signify_datawidth.bufr --tablepath t/bt`;
 $expected = read_file('t/signify_datawidth.txt');
-is($output, $expected, 'testing bufrread.pl on message with 206YYY signify data width operator with known local descriptor');
+is($output, $expected, 'testing bufrread.pl on message with 206 signify data width operator with known local descriptor');
+
+$output = `$perl ./bufrread.pl t/38bitswidth.bufr --tablepath t/bt`;
+$expected = read_file('t/38bitswidth.txt');
+is($output, $expected, 'testing bufrread.pl on message with data width 38 bits caused by 201 change data width operator');
 
 $output = `$perl ./bufrread.pl t/signify_datawidth.bufr2 --tablepath t/bt -all -v 1`;
 $expected = read_file('t/signify_datawidth.txt2');
