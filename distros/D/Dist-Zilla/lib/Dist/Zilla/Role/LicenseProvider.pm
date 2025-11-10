@@ -1,4 +1,4 @@
-package Dist::Zilla::Role::LicenseProvider 6.034;
+package Dist::Zilla::Role::LicenseProvider 6.036;
 # ABSTRACT: something that provides a license for the dist
 
 use Moose::Role;
@@ -44,7 +44,7 @@ Dist::Zilla::Role::LicenseProvider - something that provides a license for the d
 
 =head1 VERSION
 
-version 6.034
+version 6.036
 
 =head1 DESCRIPTION
 

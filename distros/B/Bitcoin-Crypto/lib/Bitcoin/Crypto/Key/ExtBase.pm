@@ -1,8 +1,9 @@
-package Bitcoin::Crypto::Role::ExtendedKey;
-$Bitcoin::Crypto::Role::ExtendedKey::VERSION = '3.002';
+package Bitcoin::Crypto::Key::ExtBase;
+$Bitcoin::Crypto::Key::ExtBase::VERSION = '4.000';
 use v5.10;
 use strict;
 use warnings;
+use Moo;
 use Scalar::Util qw(blessed);
 use Mooish::AttributeBuilder -standard;
 use Types::Common -sigs, -types;
@@ -17,7 +18,8 @@ use Bitcoin::Crypto::Util qw(hash160 to_format);
 use Bitcoin::Crypto::Helpers qw(ensure_length);
 use Bitcoin::Crypto::Network;
 use Bitcoin::Crypto::Exception;
-use Moo::Role;
+
+use namespace::clean;
 
 has param 'depth' => (
 	isa => IntMaxBits [8],
@@ -25,7 +27,7 @@ has param 'depth' => (
 );
 
 has param 'parent_fingerprint' => (
-	isa => StrLength [4, 4],
+	coerce => ByteStrLen [4],
 	default => (pack 'x4'),
 );
 
@@ -35,18 +37,26 @@ has param 'child_number' => (
 );
 
 has param 'chain_code' => (
-	isa => StrLength [32, 32],
+	coerce => ByteStrLen [32],
 );
 
 with qw(Bitcoin::Crypto::Role::Key);
 
-requires '_derive_key_partial';
+sub _is_private
+{
+	die __PACKAGE__ . '::_is_private is unimplemented';
+}
+
+sub _derive_key_partial
+{
+	die __PACKAGE__ . '::_derive_key_partial is unimplemented';
+}
 
 sub _get_network_extkey_version
 {
 	my ($self, $network, $purpose) = @_;
-	$network //= $self->network;
-	$purpose //= $self->purpose;
+	$network = $self->network if @_ < 2;
+	$purpose = $self->purpose if @_ < 3;
 
 	my $name = 'ext';
 	$name .= $self->_is_private ? 'prv' : 'pub';
@@ -74,21 +84,21 @@ sub to_serialized
 	) unless defined $version;
 
 	# version number (4B)
-	my $serialized = ensure_length pack('N', $version), 4;
+	my $serialized = pack('N', $version);
 
 	# depth (1B)
-	$serialized .= ensure_length pack('C', $self->depth), 1;
+	$serialized .= pack('C', $self->depth);
 
 	# parent's fingerprint (4B) - ensured
 	$serialized .= $self->parent_fingerprint;
 
 	# child number (4B)
-	$serialized .= ensure_length pack('N', $self->child_number), 4;
+	$serialized .= pack('N', $self->child_number);
 
-	# chain code (32B) - ensured
+	# chain code (32B)
 	$serialized .= $self->chain_code;
 
-	# key entropy (1 + 32B or 33B)
+	# key entropy (1 + 32B)
 	$serialized .= ensure_length $self->raw_key, Bitcoin::Crypto::Constants::key_max_length + 1;
 
 	return $serialized;
@@ -124,24 +134,26 @@ sub from_serialized
 		my @found_networks;
 
 		for my $check_purpose (
-			Bitcoin::Crypto::Constants::bip44_purpose,
+			undef,
 			Bitcoin::Crypto::Constants::bip44_compat_purpose,
 			Bitcoin::Crypto::Constants::bip44_segwit_purpose
 			)
 		{
-			$purpose = $check_purpose;
-
 			@found_networks = Bitcoin::Crypto::Network->find(
 				sub {
 					my ($inst) = @_;
-					my $this_version = $class->_get_network_extkey_version($inst, $purpose);
+					my $this_version = $class->_get_network_extkey_version($inst, $check_purpose);
 					return $this_version && $this_version eq $version;
 				}
 			);
+
 			@found_networks = grep { $_ eq $network } @found_networks
 				if defined $network;
 
-			last if @found_networks > 0;
+			if (@found_networks > 0) {
+				$purpose = $check_purpose;
+				last;
+			}
 		}
 
 		if (@found_networks > 1) {
@@ -169,7 +181,7 @@ sub from_serialized
 			parent_fingerprint => $fingerprint,
 			depth => unpack('C', $depth),
 			network => $found_networks[0],
-			purpose => $purpose,
+			(defined $purpose ? (purpose => $purpose) : ()),
 		);
 
 		return $key;
@@ -263,27 +275,7 @@ sub derive_key
 	return $key;
 }
 
-### DEPRECATED
-
-sub to_serialized_base58
-{
-	my ($self) = @_;
-
-	my $class = ref $self;
-	carp "$class->to_serialized_base58 is now deprecated. Use to_format [base58 => $class->to_serialized] instead";
-
-	return to_format [base58 => $self->to_serialized];
-}
-
-sub from_serialized_base58
-{
-	my ($class, $base58, $network) = @_;
-
-	carp
-		"$class->from_serialized_base58(\$base58) is now deprecated. Use $class->from_serialized([base58 => \$base58]) instead";
-
-	return $class->from_serialized([base58 => $base58], $network);
-}
-
 1;
+
+# Internal use only
 

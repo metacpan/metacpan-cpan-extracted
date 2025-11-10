@@ -1,18 +1,21 @@
 package Bitcoin::Crypto::Script::Common;
-$Bitcoin::Crypto::Script::Common::VERSION = '3.002';
+$Bitcoin::Crypto::Script::Common::VERSION = '4.000';
 use v5.10;
 use strict;
 use warnings;
 
 use Types::Common -sigs, -types;
 
-use Bitcoin::Crypto qw(btc_script);
+use Bitcoin::Crypto qw(btc_script btc_tapscript);
 use Bitcoin::Crypto::Types -types;
 use Bitcoin::Crypto::Exception;
+
+use namespace::clean;
 
 sub _make_PKH
 {
 	my ($class, $script, $hash) = @_;
+	$script //= btc_script->new;
 
 	return $script
 		->add('OP_DUP')
@@ -25,6 +28,7 @@ sub _make_PKH
 sub _make_SH
 {
 	my ($class, $script, $hash) = @_;
+	$script //= btc_script->new;
 
 	return $script
 		->add('OP_HASH160')
@@ -35,11 +39,22 @@ sub _make_SH
 sub _make_WSH
 {
 	my ($class, $script, $hash) = @_;
+	$script //= btc_script->new;
 
 	return $script
 		->add('OP_SHA256')
 		->push($hash)
 		->add('OP_EQUAL');
+}
+
+sub _make_TR
+{
+	my ($class, $script, $pubkey) = @_;
+	$script //= btc_tapscript->new;
+
+	return $script
+		->push($pubkey)
+		->add('OP_CHECKSIG');
 }
 
 sub _get_method
@@ -63,12 +78,12 @@ sub new
 {
 	my ($class, $type, $data) = @_;
 
-	return $class->fill($type, btc_script->new, $data);
+	return $class->fill($type, undef, $data);
 }
 
 signature_for fill => (
 	method => Str,
-	positional => [Str, InstanceOf ['Bitcoin::Crypto::Script'], ByteStr],
+	positional => [Str, Maybe [BitcoinScript], ByteStr],
 );
 
 sub fill

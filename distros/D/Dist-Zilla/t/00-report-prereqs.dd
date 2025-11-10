@@ -9,8 +9,7 @@ do { my $x = {
                       'requires' => {
                                       'Test::CleanNamespaces' => '0.15',
                                       'Test::More' => '0.94',
-                                      'Test::Pod' => '1.41',
-                                      'strict' => '0'
+                                      'Test::Pod' => '1.41'
                                     }
                     },
        'runtime' => {
@@ -98,6 +97,7 @@ do { my $x = {
                                       'namespace::autoclean' => '0',
                                       'parent' => '0',
                                       'perl' => 'v5.20.0',
+                                      'strict' => '0',
                                       'utf8' => '0',
                                       'version' => '0',
                                       'warnings' => '0'
@@ -121,8 +121,7 @@ do { my $x = {
                                    'Test::Fatal' => '0',
                                    'Test::File::ShareDir' => '0',
                                    'Test::More' => '0.96',
-                                   'lib' => '0',
-                                   'strict' => '0'
+                                   'lib' => '0'
                                  }
                  }
      };

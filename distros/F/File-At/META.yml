@@ -1,0 +1,28 @@
+---
+abstract: 'Thin FFI wrapper around the POSIX *at() filesystem syscalls'
+author:
+  - 'Nobody <nobody@example.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-At
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Digest::MD5: '0'
+  FFI::Platypus: '2.00'
+  Fcntl: '0'
+  Test::More: '0'
+resources:
+  repository: https://example.com/your/git/repo
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

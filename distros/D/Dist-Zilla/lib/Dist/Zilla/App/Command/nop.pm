@@ -1,4 +1,4 @@
-package Dist::Zilla::App::Command::nop 6.034;
+package Dist::Zilla::App::Command::nop 6.036;
 # ABSTRACT: initialize dzil, then exit
 
 use Dist::Zilla::Pragmas;
@@ -44,7 +44,7 @@ Dist::Zilla::App::Command::nop - initialize dzil, then exit
 
 =head1 VERSION
 
-version 6.034
+version 6.036
 
 =head1 SYNOPSIS
 

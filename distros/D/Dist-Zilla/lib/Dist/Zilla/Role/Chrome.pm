@@ -1,4 +1,4 @@
-package Dist::Zilla::Role::Chrome 6.034;
+package Dist::Zilla::Role::Chrome 6.036;
 # ABSTRACT: something that provides a user interface for Dist::Zilla
 
 use Moose::Role;
@@ -27,7 +27,7 @@ Dist::Zilla::Role::Chrome - something that provides a user interface for Dist::Z
 
 =head1 VERSION
 
-version 6.034
+version 6.036
 
 =head1 PERL VERSION
 

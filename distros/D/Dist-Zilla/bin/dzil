@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-package dzil 6.034;
+package dzil 6.036;
 use Dist::Zilla::App;
 
 use Dist::Zilla::Pragmas;
@@ -30,7 +30,7 @@ dzil - do stuff with your dist
 
 =head1 VERSION
 
-version 6.034
+version 6.036
 
 =head1 OVERVIEW
 

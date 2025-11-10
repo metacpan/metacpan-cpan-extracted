@@ -1,5 +1,9 @@
 Revision history for Perl extension App::Bitcoin::PaperWallet.
 
+1.14  Mon Nov 10 2025
+	- paper-wallet now generates taproot addresses in place of segwit addresses by default
+	- new option in paper-wallet: -t, --taproot_addrs - the number of taproot addresses to generate
+
 1.13  Sun Aug 25 2024
 	- new option in paper-wallet: -n, --network - choose the network for which to generate the wallet (thanks @chromatic)
 	- switch test framework to Test2

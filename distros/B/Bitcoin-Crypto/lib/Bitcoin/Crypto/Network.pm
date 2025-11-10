@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Network;
-$Bitcoin::Crypto::Network::VERSION = '3.002';
+$Bitcoin::Crypto::Network::VERSION = '4.000';
 use v5.10;
 use strict;
 use warnings;
@@ -9,6 +9,7 @@ use Mooish::AttributeBuilder -standard;
 use Types::Common -sigs, -types;
 
 use Bitcoin::Crypto::Exception;
+use Bitcoin::Crypto::Types -types;
 
 use namespace::clean;
 
@@ -25,15 +26,15 @@ has param 'name' => (
 );
 
 has param 'p2pkh_byte' => (
-	isa => StrLength [1, 1],
+	coerce => ByteStrLen [1],
 );
 
 has param 'wif_byte' => (
-	isa => StrLength [1, 1],
+	coerce => ByteStrLen [1],
 );
 
 has param 'p2sh_byte' => (
-	isa => StrLength [1, 1],
+	coerce => ByteStrLen [1],
 	required => 0,
 );
 
@@ -525,13 +526,13 @@ Throws an exception if network doesn't exist.
 
 =head2 find
 
-	@network_objects = $class->find($sub = undef)
+	@network_ids = $class->find($sub = undef)
 
-Without arguments, returns a list of all registered network identifiers.
+Without arguments, returns a list of all registered network ids (strings).
 
 With the C<$sub> argument (coderef), searches for all networks that pass the
 criteria and returns their ids. The C<$sub> will be passed all the instances of
-registered networks, one at a time. If must perform required checks and return
+registered networks, one at a time. It must perform required checks and return
 a boolean value. All the networks that pass this test will be returned.
 Example:
 

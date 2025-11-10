@@ -1,0 +1,8 @@
+Revision history for File-At
+
+0.01  2025-11-09
+    - Initial release.
+    - Thin FFI bindings for the POSIX *at() filesystem syscalls.
+    - File::At::Dir helper object and open_fd_at/open_fh_at helpers.
+    - Example script eg/at_hardlink.pl demonstrating a quasi-recursive
+      tree walker that replaces duplicate files with hard links.

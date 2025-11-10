@@ -1,4 +1,4 @@
-package Dist::Zilla::Util::AuthorDeps 6.034;
+package Dist::Zilla::Util::AuthorDeps 6.036;
 # ABSTRACT: Utils for listing your distribution's author dependencies
 
 use Dist::Zilla::Pragmas;
@@ -9,23 +9,31 @@ use List::Util 1.45 ();
 
 use namespace::autoclean;
 
-sub _format_author_deps {
-  my ($reqs, $versions, $cpanm_versions) = @_;
+#pod =func extract_author_deps
+#pod
+#pod   my $prereqs = extract_author_deps($dist_root, $missing_only);
+#pod
+#pod This returns a reference to an array in the form:
+#pod
+#pod   [
+#pod     { $module1 => $ver1 },
+#pod     { $module2 => $ver2 },
+#pod     ...
+#pod   ]
+#pod
+#pod Each entry is one of the likely author dependencies for the distribution at the
+#pod root path C<$dist_root>.  If C<$missing_only> is true, then prereqs that appear
+#pod to be available under the running perl will not be included.
+#pod
+#pod I<This function is not really meant to be reliable.>  It was undocumented and
+#pod subject to change at any time, but some downstream libraries chose to use it
+#pod anyway.  I may provide a replacement, at some point, at which point this method
+#pod will be deprecated and begin issuing a warning.  I have documented this method
+#pod only to provide this warning!
+#pod
+#pod =cut
 
-  my $formatted = '';
-  for my $rec (@{ $reqs }) {
-    my ($mod, $ver) = %$rec;
-    $formatted .= $cpanm_versions ? "$mod~$ver\n"
-                : $versions       ? "$mod = $ver\n"
-                :                   "$mod\n";
-  }
-
-  chomp $formatted;
-
-  return $formatted;
-}
-
-sub _extract_author_deps {
+sub extract_author_deps {
   my ($root, $missing) = @_;
 
   my $ini = path($root, 'dist.ini');
@@ -96,7 +104,7 @@ sub _extract_author_deps {
 
   my $vermap = $reqs->as_string_hash;
   # Add the other requirements
-  push(@packages, sort keys %{ $vermap });
+  push @packages, sort keys %$vermap;
 
   # Move inc:: first in list as they may impact the loading of other
   # plugins (in particular local ones).
@@ -150,6 +158,53 @@ sub _extract_author_deps {
   [ map { { $_ => $vermap->{$_} } } @packages ]
 }
 
+#pod =func format_author_deps
+#pod
+#pod   my $string = format_author_deps($prereqs, $include_versions);
+#pod
+#pod Given a reference to an array in the format returned by C<extract_author_deps>,
+#pod this returns a string in the form:
+#pod
+#pod   Module::One
+#pod   Module::Two
+#pod   Module::Three
+#pod
+#pod or, if C<$include_versions> is true:
+#pod
+#pod   Module::One = 1.00
+#pod   Module::Two = 1.23
+#pod   Module::Three = 8.910213
+#pod
+#pod I<This function is not really meant to be reliable.>  It was undocumented and
+#pod subject to change at any time, but some downstream libraries chose to use it
+#pod anyway.  I may provide a replacement, at some point, at which point this method
+#pod will be deprecated and begin issuing a warning.  I have documented this method
+#pod only to provide this warning!
+#pod
+#pod =cut
+
+sub format_author_deps {
+  my ($prereqs, $versions) = @_;
+  return _format_author_deps($prereqs, $versions);
+}
+
+sub _format_author_deps {
+  my ($prereqs, $versions, $cpanm_versions) = @_;
+
+  my $formatted = '';
+  for my $rec (@$prereqs) {
+    my ($mod, $ver) = %$rec;
+    $formatted .= $cpanm_versions ? "$mod~$ver\n"
+                : $versions       ? "$mod = $ver\n"
+                :                   "$mod\n";
+  }
+
+  chomp $formatted;
+
+  return $formatted;
+}
+
+
 1;
 
 __END__
@@ -164,7 +219,7 @@ Dist::Zilla::Util::AuthorDeps - Utils for listing your distribution's author dep
 
 =head1 VERSION
 
-version 6.034
+version 6.036
 
 =head1 PERL VERSION
 
@@ -178,6 +233,53 @@ Although it may work on older versions of perl, no guarantee is made that the
 minimum required version will not be increased.  The version may be increased
 for any reason, and there is no promise that patches will be accepted to
 lower the minimum required perl.
+
+=head1 FUNCTIONS
+
+=head2 extract_author_deps
+
+  my $prereqs = extract_author_deps($dist_root, $missing_only);
+
+This returns a reference to an array in the form:
+
+  [
+    { $module1 => $ver1 },
+    { $module2 => $ver2 },
+    ...
+  ]
+
+Each entry is one of the likely author dependencies for the distribution at the
+root path C<$dist_root>.  If C<$missing_only> is true, then prereqs that appear
+to be available under the running perl will not be included.
+
+I<This function is not really meant to be reliable.>  It was undocumented and
+subject to change at any time, but some downstream libraries chose to use it
+anyway.  I may provide a replacement, at some point, at which point this method
+will be deprecated and begin issuing a warning.  I have documented this method
+only to provide this warning!
+
+=head2 format_author_deps
+
+  my $string = format_author_deps($prereqs, $include_versions);
+
+Given a reference to an array in the format returned by C<extract_author_deps>,
+this returns a string in the form:
+
+  Module::One
+  Module::Two
+  Module::Three
+
+or, if C<$include_versions> is true:
+
+  Module::One = 1.00
+  Module::Two = 1.23
+  Module::Three = 8.910213
+
+I<This function is not really meant to be reliable.>  It was undocumented and
+subject to change at any time, but some downstream libraries chose to use it
+anyway.  I may provide a replacement, at some point, at which point this method
+will be deprecated and begin issuing a warning.  I have documented this method
+only to provide this warning!
 
 =head1 AUTHOR
 

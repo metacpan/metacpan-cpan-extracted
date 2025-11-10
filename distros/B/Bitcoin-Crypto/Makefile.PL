@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010;
+use 5.010001;
 
 use ExtUtils::MakeMaker;
 
@@ -14,11 +14,11 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Bitcoin-Crypto",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.010",
+  "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Bitcoin::Crypto",
   "PREREQ_PM" => {
     "Bitcoin::BIP39" => "0.002",
-    "Bitcoin::Secp256k1" => 0,
+    "Bitcoin::Secp256k1" => "0.008",
     "CryptX" => "0.074",
     "List::Util" => "1.33",
     "Math::BigInt" => "1.999831",
@@ -31,16 +31,16 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test2::V0" => 0
   },
-  "VERSION" => "3.002",
+  "VERSION" => "4.000",
   "test" => {
-    "TESTS" => "t/*.t t/Key/*.t t/PSBT/*.t t/Script/*.t t/Transaction/*.t"
+    "TESTS" => "t/*.t t/Key/*.t t/PSBT/*.t t/Script/*.t t/Taproot/*.t t/Transaction/*.t"
   }
 );
 
 
 my %FallbackPrereqs = (
   "Bitcoin::BIP39" => "0.002",
-  "Bitcoin::Secp256k1" => 0,
+  "Bitcoin::Secp256k1" => "0.008",
   "CryptX" => "0.074",
   "List::Util" => "1.33",
   "Math::BigInt" => "1.999831",

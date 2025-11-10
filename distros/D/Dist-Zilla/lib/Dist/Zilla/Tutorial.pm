@@ -1,4 +1,4 @@
-package Dist::Zilla::Tutorial 6.034;
+package Dist::Zilla::Tutorial 6.036;
 # ABSTRACT: how to use this "Dist::Zilla" thing
 
 use Dist::Zilla::Pragmas;
@@ -152,7 +152,7 @@ Dist::Zilla::Tutorial - how to use this "Dist::Zilla" thing
 
 =head1 VERSION
 
-version 6.034
+version 6.036
 
 =head1 SYNOPSIS
 

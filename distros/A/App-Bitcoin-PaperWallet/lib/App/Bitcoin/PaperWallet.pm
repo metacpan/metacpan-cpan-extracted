@@ -1,5 +1,5 @@
 package App::Bitcoin::PaperWallet;
-$App::Bitcoin::PaperWallet::VERSION = '1.13';
+$App::Bitcoin::PaperWallet::VERSION = '1.14';
 use v5.12;
 use warnings;
 
@@ -27,7 +27,8 @@ sub generate
 {
 	my ($class, $entropy, $pass, $opts) = @_;
 	my $compat_addresses = $opts->{compat_addresses} // 1;
-	my $segwit_addresses = $opts->{segwit_addresses} // 3;
+	my $segwit_addresses = $opts->{segwit_addresses} // 0;
+	my $taproot_addresses = $opts->{taproot_addresses} // 3;
 	my $entropy_length = $opts->{entropy_length} // 256;
 	my $network = $opts->{network} ? Bitcoin::Crypto::Network->get($opts->{network}) : Bitcoin::Crypto::Network->get;
 	$network->set_single;
@@ -43,8 +44,8 @@ sub generate
 
 	my $key = btc_extprv->from_mnemonic($mnemonic, $pass);
 	my @address_purposes = $network->supports_segwit()
-						 ? ([49 => $compat_addresses], [84 => $segwit_addresses])
-						 : ([44 => $compat_addresses + $segwit_addresses]);
+						 ? ([49 => $compat_addresses], [84 => $segwit_addresses], [86 => $taproot_addresses])
+						 : ([44 => $compat_addresses + $segwit_addresses + $taproot_addresses]);
 
 	return {
 		mnemonic => $mnemonic,
@@ -111,7 +112,11 @@ A number of segwit compat (purpose 49) addresses to generate, 1 by default.
 
 =item * C<segwit_addresses>
 
-A number of segwit native (purpose 84) addresses to generate, 3 by default.
+A number of segwit native (purpose 84) addresses to generate, 0 by default.
+
+=item * C<taproot_addresses>
+
+A number of taproot (purpose 86) addresses to generate, 3 by default.
 
 =item * C<entropy_length>
 
@@ -144,6 +149,11 @@ funds to the wallet.
 =head2 Compatibility
 
 =over
+
+=item
+
+Version 1.14 started generating taproot addresses in place of segwit
+addresses by default.
 
 =item
 
@@ -187,7 +197,7 @@ In no particular order:
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2021 by Bartosz Jarzyna
+Copyright (C) 2021-2025 by Bartosz Jarzyna
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.12.0 or,

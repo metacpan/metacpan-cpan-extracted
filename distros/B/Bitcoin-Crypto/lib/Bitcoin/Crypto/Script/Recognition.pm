@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Script::Recognition;
-$Bitcoin::Crypto::Script::Recognition::VERSION = '3.002';
+$Bitcoin::Crypto::Script::Recognition::VERSION = '4.000';
 use v5.10;
 use strict;
 use warnings;
@@ -11,6 +11,8 @@ use List::Util qw(any);
 use Try::Tiny;
 
 use Bitcoin::Crypto::Script::Opcode;
+
+use namespace::clean;
 
 has param 'script' => (
 	isa => InstanceOf ['Bitcoin::Crypto::Script'],

@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::PruneFiles 6.034;
+package Dist::Zilla::Plugin::PruneFiles 6.036;
 # ABSTRACT: prune arbitrary files from the dist
 
 use Moose;
@@ -104,7 +104,7 @@ Dist::Zilla::Plugin::PruneFiles - prune arbitrary files from the dist
 
 =head1 VERSION
 
-version 6.034
+version 6.036
 
 =head1 SYNOPSIS
 

@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::GatherFile 6.034;
+package Dist::Zilla::Plugin::GatherFile 6.036;
 # ABSTRACT: gather individual file(s)
 
 use Moose;
@@ -147,7 +147,7 @@ Dist::Zilla::Plugin::GatherFile - gather individual file(s)
 
 =head1 VERSION
 
-version 6.034
+version 6.036
 
 =head1 SYNOPSIS
 

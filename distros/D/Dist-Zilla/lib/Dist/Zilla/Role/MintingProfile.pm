@@ -1,4 +1,4 @@
-package Dist::Zilla::Role::MintingProfile 6.034;
+package Dist::Zilla::Role::MintingProfile 6.036;
 # ABSTRACT: something that can find a minting profile dir
 
 use Moose::Role;
@@ -50,7 +50,7 @@ Dist::Zilla::Role::MintingProfile - something that can find a minting profile di
 
 =head1 VERSION
 
-version 6.034
+version 6.036
 
 =head1 DESCRIPTION
 

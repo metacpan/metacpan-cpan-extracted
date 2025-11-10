@@ -20,7 +20,7 @@ use Data::Identifier::Generate;
 
 use parent 'Data::Identifier::Interface::Known';
 
-our $VERSION = v0.23;
+our $VERSION = v0.24;
 
 use constant {
     WK_UUID => '8be115d2-dc2f-4a98-91e1-a6e3075cbc31', # uuid
@@ -229,7 +229,7 @@ Data::Identifier::Wellknown - format independent identifier object
 
 =head1 VERSION
 
-version v0.23
+version v0.24
 
 =head1 SYNOPSIS
 
@@ -330,7 +330,7 @@ $type uuid
 
 $class rgb-colour
 $extra_classes colour
-$generator style=colour,namespace=88d3944f-a13b-4e35-89eb-e3c1fbe53e76
+$generator style=colour,namespace=88d3944f-a13b-4e35-89eb-e3c1fbe53e76,generator=55febcc4-6655-4397-ae3d-2353b5856b34
 
 .   #000000     black
 .   #ffffff     white
@@ -854,9 +854,11 @@ $type uuid
 
 
 $class integer
-$generator style=integer-based,namespace=5dd8ddbb-13a8-4d6c-9264-36e6dd6f9c99
 
+$generator style=integer-based,namespace=5dd8ddbb-13a8-4d6c-9264-36e6dd6f9c99,generator=e8aa9e01-8d37-4b4b-8899-42ca0a2a906f
 .   -1  .       sid=47
+
+$generator style=integer-based,namespace=5dd8ddbb-13a8-4d6c-9264-36e6dd6f9c99,generator=53863a15-68d4-448d-bd69-a9b19289a191
 .   0   zero    sid=48
 .   1   one     sid=49
 .   2   two     sid=50
@@ -1163,6 +1165,7 @@ $type sid=8
 $namespace 47dd950c-9089-4956-87c1-54c122533219
 
 .   af      Afrikaans       sid=240
+.   am      Amharic         sid=332
 .   ar      Arabic          sid=243
 .   bn      Bengali         sid=245
 .   de      German          sid=71
@@ -1171,13 +1174,18 @@ $namespace 47dd950c-9089-4956-87c1-54c122533219
 .   es      Spanish         sid=73
 .   fi      Finnish
 .   fr      French          sid=244
+.   gu      Gujarati        sid=331
+.   ha      Hausa           sid=321
 .   he      Hebrew
 .   hi      Hindi           sid=242
 .   ia      Interlingua
 .   id      Indonesian      sid=248
 .   ie      Interlingue
-.   it      Italian
+.   it      Italian         sid=330
 .   ja      Japanese        sid=250
+.   jv      Javanese        sid=329
+.   kn      Kannada         sid=333
+.   ko      Korean          sid=327
 .   mi      Maori           sid=254
 .   mr      Marathi         sid=251
 .   nl      Dutch           sid=72
@@ -1186,8 +1194,11 @@ $namespace 47dd950c-9089-4956-87c1-54c122533219
 .   ru      Russian         sid=247
 .   sv      Swedish
 .   sw      Swahili         sid=241
-.   te      Telugu
-.   th      Thai
+.   ta      Tamil           sid=325
+.   te      Telugu          sid=320
+.   th      Thai            sid=328
+.   tl      Tagalog         sid=324
+.   tr      Turkish         sid=322
 .   ur      Urdu            sid=249
 .   vi      Vietnamese      sid=252
 .   zh      Chinese         sid=74
@@ -1195,7 +1206,7 @@ $namespace 47dd950c-9089-4956-87c1-54c122533219
 
 
 $class mediatype
-$generator style=name-based,namespace=38ef9f1b-1cea-4173-953e-4fdee539010d
+$generator style=name-based,namespace=38ef9f1b-1cea-4173-953e-4fdee539010d,generator=5c8c072e-f1a2-4824-9721-d57e811b6b4f
 
 .   application
 .   audio
@@ -1211,12 +1222,12 @@ $generator style=name-based,namespace=38ef9f1b-1cea-4173-953e-4fdee539010d
 
 
 $class mediasubtype
-$generator style=name-based,namespace=50d7c533-2d9b-4208-b560-bcbbf75ce3f9
+$generator style=name-based,namespace=50d7c533-2d9b-4208-b560-bcbbf75ce3f9,generator=a649d48d-35b0-4454-81af-c5fd2eb40373
 
-.   application/gzip
+.   application/gzip                                            .   sid=233
 .   application/http
-.   application/json
-.   application/ld+json
+.   application/json                                            .   sid=239
+.   application/ld+json                                         .   sid=238
 .   application/octet-stream                                    .   sid=224,sni=197
 .   application/ogg
 .   application/pdf                                             .   sid=229
@@ -1241,7 +1252,7 @@ $generator style=name-based,namespace=50d7c533-2d9b-4208-b560-bcbbf75ce3f9
 .   application/vnd.oasis.opendocument.text-web
 .   application/vnd.sirtx.vmv0                                  .   sni=198
 .   application/xhtml+xml
-.   application/xml
+.   application/xml                                             .   sid=230
 .   audio/flac
 .   audio/matroska
 .   audio/ogg

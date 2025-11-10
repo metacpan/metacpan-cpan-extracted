@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::InlineFiles 6.034;
+package Dist::Zilla::Plugin::InlineFiles 6.036;
 # ABSTRACT: files in a data section
 
 use Moose;
@@ -64,7 +64,7 @@ Dist::Zilla::Plugin::InlineFiles - files in a data section
 
 =head1 VERSION
 
-version 6.034
+version 6.036
 
 =head1 DESCRIPTION
 

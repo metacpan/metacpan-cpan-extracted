@@ -17,7 +17,7 @@ use Carp;
 
 use Data::Identifier;
 
-our $VERSION = v0.23;
+our $VERSION = v0.24;
 
 my $_DEFAULT_INSTANCE = __PACKAGE__->new;
 
@@ -236,23 +236,23 @@ sub parse_sirtx {
 
     $data =~ s/^\[(.+)\]$/$1/;
 
-    if ($data =~ /^'([0-9]*)/) {
+    if ($data =~ /^'([0-9]*)$/) {
         my $num = int($1 || '0');
         require Data::Identifier::Generate;
         return Data::Identifier::Generate->integer($num);
-    } elsif ($data =~ /^\/([0-9]+)/) {
+    } elsif ($data =~ /^\/([0-9]+)$/) {
         return Data::Identifier->new('d73b6550-5309-46ad-acc9-865c9261065b' => int($1));
     } elsif ($data =~ /^(sid|sni):([0-9]+)$/) {
         return Data::Identifier->new($1 => int($2));
     } elsif ($data =~ /^uuid:([0-9a-fA-F-]+)$/) {
         return Data::Identifier->new(uuid => $1);
-    } elsif ($data =~ /^~([0-9]+)/) {
+    } elsif ($data =~ /^~([0-9]+)$/) {
         return Data::Identifier->new(hdi => int($1));
-    } elsif ($data =~ /^raen:([0-9]+)/) {
+    } elsif ($data =~ /^raen:([0-9]+)$/) {
         return Data::Identifier->new('2bffc55d-7380-454e-bd53-c5acd525d692' => int($1));
-    } elsif ($data =~ /^chat0w:([0-9]+)/) {
+    } elsif ($data =~ /^chat0w:([0-9]+)$/) {
         return Data::Identifier->new('2c7e15ed-aa2f-4e2f-9a1d-64df0c85875a' => int($1));
-    } elsif ($data =~ /^asciicp:([0-9]+)/) {
+    } elsif ($data =~ /^asciicp:([0-9]+)$/) {
         require Data::Identifier::Generate;
         return Data::Identifier::Generate->unicode_character(ascii => int($1));
     } elsif ($data =~ /^raes:(.+)/) {
@@ -273,6 +273,44 @@ sub parse_sirtx {
     }
 
     croak 'Unsupported/invalid SIRTX identifier';
+}
+
+
+sub render_sirtx {
+    my ($self, $identifier, @opts) = _normalise_args(@_);
+    state $map = [
+        [sid        => Data::Identifier->new(wellknown => 'sid')->register],
+        [sni        => Data::Identifier->new(wellknown => 'sni')->register],
+        ['/'        => Data::Identifier->new(uuid => 'd73b6550-5309-46ad-acc9-865c9261065b')->register],
+        [raen       => Data::Identifier->new(uuid => '2bffc55d-7380-454e-bd53-c5acd525d692')->register],
+        [chat0w     => Data::Identifier->new(uuid => '2c7e15ed-aa2f-4e2f-9a1d-64df0c85875a')->register],
+        ['~'        => Data::Identifier->new(wellknown => 'hdi')->register],
+    ];
+
+    croak 'Stray options passed' if scalar @opts;
+
+    $identifier = Data::Identifier->new(from => $identifier);
+
+    if (defined(my Data::Identifier $generator = $identifier->generator(default => undef)) && defined(my $req = $identifier->request(default => undef))) {
+        if ($generator->eq('53863a15-68d4-448d-bd69-a9b19289a191')) {
+            return sprintf('\'%u', $req);
+        } elsif ($generator->eq('d74f8c35-bcb8-465c-9a77-01010e8ed25c') && $req =~ /^[Uu]\+([0-9a-fA-F]{4,6})$/) {
+            my $cp = hex $1;
+            if ($cp < 0x80) {
+                return sprintf('asciicp:%u', $cp);
+            }
+        }
+    }
+
+    foreach my $ent (@{$map}) {
+        my $v = $identifier->as($ent->[1], no_defaults => 1, default => undef) // next;
+        $v = sprintf($ent->[0] =~ /^[a-z]/ ? '%s:%s' : '%s%s', $ent->[0], $v);
+        $v = '['.$v.']' if $v =~ /-/;
+        return $v;
+    }
+
+    # Fallback:
+    return sprintf('[uuid:%s]', $identifier->uuid);
 }
 
 # ---- Private helpers ----
@@ -333,7 +371,7 @@ Data::Identifier::Util - format independent identifier object
 
 =head1 VERSION
 
-version v0.23
+version v0.24
 
 =head1 SYNOPSIS
 
@@ -431,6 +469,24 @@ See also L<Data::TagDB/tag_by_specification> with C<style =E<gt> 'sirtx'>.
 
 This might might support more values if L<Data::Identifier::Wellknown> is loaded with the corresponding classes,
 and/or if a L<Data::TagMap> is given via L<Data::Identifier::Interface::Subobjects/so_attach>.
+
+See also L</render_sirtx>.
+
+=head2 render_sirtx
+
+    my $value = $util->render_sirtx($identifier);
+
+(experimental since v0.24)
+
+This methods tries to render an identifier in the standard SIRTX syntax.
+It will add escapes as needed.
+
+Future versions of this method might support more identifiers or more compact syntax.
+
+This might might support more values if L<Data::Identifier::Wellknown> is loaded with the corresponding classes,
+and/or if a L<Data::TagMap> is given via L<Data::Identifier::Interface::Subobjects/so_attach>.
+
+See also L</parse_sirtx>.
 
 =head1 AUTHOR
 

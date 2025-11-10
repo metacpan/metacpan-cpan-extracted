@@ -1,0 +1,25 @@
+File::At
+========
+
+File::At is a thin FFI::Platypus wrapper around the POSIX "at" family of
+filesystem syscalls (openat, fstatat, unlinkat, mkdirat, linkat, etc.).
+
+It exposes:
+
+- constants like AT_FDCWD, AT_SYMLINK_NOFOLLOW, AT_REMOVEDIR, ...
+- direct bindings to the underlying libc functions
+- a small helper object, File::At::Dir, which owns a directory fd
+- convenience helpers open_fd_at() and open_fh_at() for opening files
+  relative to a directory fd
+
+Typical usage:
+
+  use File::At qw(dir open_fh_at AT_FDCWD);
+  use Fcntl qw(O_RDONLY);
+
+  my $root = dir("/some/base");
+  my $fh   = open_fh_at($root, "subdir/file.txt", O_RDONLY, 0);
+
+See eg/at_hardlink.pl for a more complete example: it walks two directory
+trees and, when files match by MD5, replaces the destination file with a
+hard link to the source using linkat().

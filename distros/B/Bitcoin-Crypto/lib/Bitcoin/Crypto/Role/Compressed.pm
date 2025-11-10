@@ -1,10 +1,12 @@
 package Bitcoin::Crypto::Role::Compressed;
-$Bitcoin::Crypto::Role::Compressed::VERSION = '3.002';
+$Bitcoin::Crypto::Role::Compressed::VERSION = '4.000';
 use v5.10;
 use strict;
 use warnings;
 use Mooish::AttributeBuilder -standard;
 use Types::Common -sigs, -types;
+
+use Carp qw(carp);
 
 use Moo::Role;
 
@@ -16,14 +18,19 @@ has param 'compressed' => (
 
 signature_for set_compressed => (
 	method => Object,
-	positional => [Bool, {default => !!1}],
+	positional => [Maybe [Bool], {default => undef}],
 );
 
 sub set_compressed
 {
 	my ($self, $state) = @_;
 
-	$self->_set_compressed($state);
+	carp 'set_compressed without argument is deprecated: use set_compressed(1) instead'
+		unless defined $state;
+
+	$self->_set_compressed($state // !!1);
+
+	# chainable - undocumented behavior, but kept for backcompat
 	return $self;
 }
 

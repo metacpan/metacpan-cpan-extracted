@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::BIP44;
-$Bitcoin::Crypto::BIP44::VERSION = '3.002';
+$Bitcoin::Crypto::BIP44::VERSION = '4.000';
 use v5.10;
 use strict;
 use warnings;
@@ -182,7 +182,7 @@ All of these attributes can be fetched using a method with the same name.
 =head3 purpose
 
 Purpose contains the BIP document number that you wish to use. Can be either
-C<44>, C<49> or C<84>.
+C<44>, C<49>, C<84> or C<86>.
 
 By default, number C<44> will be used.
 
@@ -210,7 +210,7 @@ By default, the value C<0> is used.
 =head3 change
 
 Needs to be a number C<1> (for addresses to be used as change outputs) or C<0>
-(for addresses that are to be used only internally).
+(for addresses that are to be used for receiving from external sources).
 
 By default, the value C<0> is used.
 

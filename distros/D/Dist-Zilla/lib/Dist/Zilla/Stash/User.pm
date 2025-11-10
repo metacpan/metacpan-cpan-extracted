@@ -1,4 +1,4 @@
-package Dist::Zilla::Stash::User 6.034;
+package Dist::Zilla::Stash::User 6.036;
 # ABSTRACT: a stash of user name and email
 
 use Moose;
@@ -40,7 +40,7 @@ Dist::Zilla::Stash::User - a stash of user name and email
 
 =head1 VERSION
 
-version 6.034
+version 6.036
 
 =head1 PERL VERSION
 

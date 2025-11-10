@@ -1,4 +1,4 @@
-package Dist::Zilla::App::Command::authordeps 6.034;
+package Dist::Zilla::App::Command::authordeps 6.036;
 # ABSTRACT: List your distribution's author dependencies
 
 use Dist::Zilla::Pragmas;
@@ -40,7 +40,7 @@ sub execute {
   require Dist::Zilla::Util::AuthorDeps;
 
   my $deps = Dist::Zilla::Util::AuthorDeps::_format_author_deps(
-    Dist::Zilla::Util::AuthorDeps::_extract_author_deps(
+    Dist::Zilla::Util::AuthorDeps::extract_author_deps(
       Dist::Zilla::Path::path($opt->root // '.'),
       $opt->missing,
     ),
@@ -67,7 +67,7 @@ Dist::Zilla::App::Command::authordeps - List your distribution's author dependen
 
 =head1 VERSION
 
-version 6.034
+version 6.036
 
 =head1 SYNOPSIS
 

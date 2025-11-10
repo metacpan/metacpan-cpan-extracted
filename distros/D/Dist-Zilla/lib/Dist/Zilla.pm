@@ -1,4 +1,4 @@
-package Dist::Zilla 6.034;
+package Dist::Zilla 6.036;
 # ABSTRACT: distribution builder; installer not included!
 
 use Moose 0.92; # role composition fixes
@@ -896,7 +896,7 @@ Dist::Zilla - distribution builder; installer not included!
 
 =head1 VERSION
 
-version 6.034
+version 6.036
 
 =head1 DESCRIPTION
 
@@ -1339,10 +1339,6 @@ Doug Bell <doug@preaction.me>
 
 =item *
 
-Doug Bell <madcityzen@gmail.com>
-
-=item *
-
 Elvin Aslanov <rwp.primary@gmail.com>
 
 =item *
@@ -1384,10 +1380,6 @@ Graham Barr <gbarr@pobox.com>
 =item *
 
 Graham Knop <haarg@haarg.org>
-
-=item *
-
-Graham Ollis <perl@wdlabs.com>
 
 =item *
 
@@ -1468,10 +1460,6 @@ Karen Etheridge <ether@cpan.org>
 =item *
 
 Kent Fredric <kentfredric@gmail.com>
-
-=item *
-
-Kent Fredric <kentnl@gentoo.org>
 
 =item *
 

@@ -1,4 +1,4 @@
-package Dist::Zilla::App::Command::test 6.034;
+package Dist::Zilla::App::Command::test 6.036;
 # ABSTRACT: test your dist
 
 use Dist::Zilla::Pragmas;
@@ -100,7 +100,7 @@ Dist::Zilla::App::Command::test - test your dist
 
 =head1 VERSION
 
-version 6.034
+version 6.036
 
 =head1 SYNOPSIS
 

@@ -1,3 +1,9 @@
+v0.24  2025-11-10Z
+    - Added support for Data::Identifier::Util->render_sirtx()
+    - Fixed parsing of SIRTX identifiers
+    - Include generator for generated well known tags
+    - Added new SID values
+
 v0.23  2025-11-03Z
     - Added Data::Identifier::Util
 

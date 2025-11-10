@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::PSBT::Field;
-$Bitcoin::Crypto::PSBT::Field::VERSION = '3.002';
+$Bitcoin::Crypto::PSBT::Field::VERSION = '4.000';
 use v5.10;
 use strict;
 use warnings;
@@ -49,11 +49,11 @@ sub BUILD
 		$self->_set_raw_key(undef);
 	}
 
-	if (exists $args->{value}) {
+	if (defined $args->{value}) {
 		$self->set_value($args->{value});
 	}
 
-	if (exists $args->{key}) {
+	if (defined $args->{key}) {
 		$self->set_key($args->{key});
 	}
 
@@ -305,7 +305,7 @@ serialization). Reading the source of L<Bitcoin::Crypto::PSBT::FieldType> may
 be required if it isn't clear how they are implemented for a specific field.
 
 Reading the value through L</raw_value> will return a bytestring, but reading
-thourgh C<value> will use the deserializer. Calling C<set_value> will use the
+through C<value> will use the deserializer. Calling C<set_value> will use the
 serializer to update L</raw_value>. The field only holds raw data and uses
 serializers to update it as a convenience.
 

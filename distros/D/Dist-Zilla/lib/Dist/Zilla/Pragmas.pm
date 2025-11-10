@@ -1,13 +1,15 @@
-package Dist::Zilla::Pragmas 6.034;
+package Dist::Zilla::Pragmas 6.036;
 # ABSTRACT: the pragmas (boilerplate!) to enable in each Dist::Zilla module
 
 use v5.20.0;
+use strict ();
 use warnings;
 use utf8;
 
 use experimental qw(signatures);
 
 sub import {
+  strict->import;
   warnings->import;
   utf8->import;
 
@@ -39,7 +41,7 @@ Dist::Zilla::Pragmas - the pragmas (boilerplate!) to enable in each Dist::Zilla 
 
 =head1 VERSION
 
-version 6.034
+version 6.036
 
 =head1 PERL VERSION
 

@@ -1,4 +1,4 @@
-package Dist::Zilla::Role::PrereqScanner 6.034;
+package Dist::Zilla::Role::PrereqScanner 6.036;
 # ABSTRACT: automatically extract prereqs from your modules
 
 use Moose::Role;
@@ -190,7 +190,7 @@ Dist::Zilla::Role::PrereqScanner - automatically extract prereqs from your modul
 
 =head1 VERSION
 
-version 6.034
+version 6.036
 
 =head1 PERL VERSION
 

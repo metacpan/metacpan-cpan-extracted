@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Block;
-$Bitcoin::Crypto::Block::VERSION = '3.002';
+$Bitcoin::Crypto::Block::VERSION = '4.000';
 use v5.10;
 use strict;
 use warnings;
@@ -31,9 +31,8 @@ has option 'prev_block_hash' => (
 has field 'merkle_root' => (
 	isa => ByteStr,
 	lazy => 1,
-	builder => '_build_merkle_root',
-	predicate => '_has_merkle_root',
-	clearer => '_clear_merkle_root',
+	predicate => -hidden,
+	clearer => -hidden,
 );
 
 has param 'timestamp' => (
@@ -321,28 +320,13 @@ sub _build_merkle_root
 {
 	my ($self) = @_;
 
-	my @tx_hashes = map { scalar reverse $_->get_hash } @{$self->transactions};
+	my @txs = map { $_->to_serialized(witness => 0) } @{$self->transactions};
 
 	Bitcoin::Crypto::Exception::Block->raise(
 		'cannot calculate merkle root for empty block'
-	) unless @tx_hashes;
+	) unless @txs > 0;
 
-	# Build merkle tree
-	while (@tx_hashes > 1) {
-		my @next_level;
-
-		for (my $i = 0 ; $i < @tx_hashes ; $i += 2) {
-			my $left = $tx_hashes[$i];
-			my $right = $i + 1 < @tx_hashes ? $tx_hashes[$i + 1] : $left;
-
-			# Concatenate and double hash
-			push @next_level, hash256($left . $right);
-		}
-
-		@tx_hashes = @next_level;
-	}
-
-	return scalar reverse $tx_hashes[0];
+	return scalar reverse Bitcoin::Crypto::Util::merkle_root(\@txs);
 }
 
 signature_for median_time_past => (
@@ -500,7 +484,7 @@ required - other block header fields can be omitted.
 
 Block version number. Default: 1.
 
-I<writer:> B<set_version>
+I<writer:> C<set_version>
 
 I<Available in the constructor>.
 
@@ -510,14 +494,14 @@ Optional previous block hash as binary string (32 bytes)
 
 I<Available in the constructor>.
 
-I<writer:> B<set_prev_block_hash>
+I<writer:> C<set_prev_block_hash>
 
-I<predicate:> B<has_prev_block_hash>
+I<predicate:> C<has_prev_block_hash>
 
 =head3 merkle_root
 
 Merkle root hash as binary string (32 bytes). This field serves as a cache that
-be calculated automatically and cleared on change of transactions. Calling
+is calculated automatically and cleared on change of transactions. Calling
 reader of this field repeatedly without adding new transactions via
 L</add_transaction> will not cause the recalculation of the merkle_root.
 
@@ -527,7 +511,7 @@ Block timestamp as Unix timestamp. Default: current time.
 
 I<Available in the constructor>.
 
-I<writer:> B<set_timestamp>
+I<writer:> C<set_timestamp>
 
 =head3 bits
 
@@ -535,7 +519,7 @@ Block difficulty target in compact notation. Default: 0x207fffff.
 
 I<Available in the constructor>.
 
-I<writer:> B<set_bits>
+I<writer:> C<set_bits>
 
 =head3 nonce
 
@@ -543,7 +527,7 @@ Block nonce used in proof-of-work. Default: 0.
 
 I<Available in the constructor>.
 
-I<writer:> B<set_nonce>
+I<writer:> C<set_nonce>
 
 =head3 height
 
@@ -551,9 +535,9 @@ Optional block height.
 
 I<Available in the constructor>.
 
-I<writer:> B<set_height>
+I<writer:> C<set_height>
 
-I<predicate:> B<has_height>
+I<predicate:> C<has_height>
 
 =head3 previous
 
@@ -563,9 +547,9 @@ transactions. It may silently replace the existing C<prev_block_hash>.
 
 I<Available in the constructor>.
 
-I<writer:> B<set_previous>
+I<writer:> C<set_previous>
 
-I<predicate:> B<has_previous>
+I<predicate:> C<has_previous>
 
 =head3 transactions
 
@@ -668,7 +652,7 @@ block header fields, metrics, and transaction summaries.
 This method returns the median time past described in BIP113 (median timestamp
 of previous 11 blocks).
 
-Since this block implementation is as basic as it gets, it will happily
+Since this block implementation can be used without full chain, it will happily
 calculate median time past from less than 11 blocks, if there aren't enough
 blocks chained via L</previous>.
 

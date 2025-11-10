@@ -1,4 +1,4 @@
-package Dist::Zilla::App::Tester 6.034;
+package Dist::Zilla::App::Tester 6.036;
 # ABSTRACT: testing library for Dist::Zilla::App
 
 use Dist::Zilla::Pragmas;
@@ -45,7 +45,7 @@ sub test_dzil {
 }
 
 {
-  package Dist::Zilla::App::Tester::Result 6.034;
+  package Dist::Zilla::App::Tester::Result 6.036;
 
   BEGIN { our @ISA = qw(App::Cmd::Tester::Result); }
 
@@ -128,7 +128,7 @@ Dist::Zilla::App::Tester - testing library for Dist::Zilla::App
 
 =head1 VERSION
 
-version 6.034
+version 6.036
 
 =head1 DESCRIPTION
 

@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::MetaNoIndex 6.034;
+package Dist::Zilla::Plugin::MetaNoIndex 6.036;
 # ABSTRACT: Stop CPAN from indexing stuff
 
 use Moose;
@@ -133,7 +133,7 @@ Dist::Zilla::Plugin::MetaNoIndex - Stop CPAN from indexing stuff
 
 =head1 VERSION
 
-version 6.034
+version 6.036
 
 =head1 SYNOPSIS
 
