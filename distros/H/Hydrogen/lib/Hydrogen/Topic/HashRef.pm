@@ -8,7 +8,7 @@ use Hydrogen ();
 package Hydrogen::Topic::HashRef;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.021000';
+our $VERSION   = '0.021001';
 
 =head1 NAME
 
@@ -16,8 +16,8 @@ Hydrogen::Topic::HashRef - functions from Hydrogen::HashRef applied to C<$_>
 
 =head1 VERSION
 
-This documentation is for Hydrogen::Topic::HashRef 0.021000,
-which is based on Sub::HandlesVia::HandlerLibrary::Hash 0.050003.
+This documentation is for Hydrogen::Topic::HashRef 0.021001,
+which is based on Sub::HandlesVia::HandlerLibrary::Hash 0.050005.
 
 =cut
 
@@ -348,7 +348,7 @@ Operates on C<< $_ >>, which must be a reference to a hash.
 
 Arguments: B<< CodeRef >>.
 
-Function which calls the coderef for each key in the hash, passing just the key to the coderef.
+Function which calls the coderef for each key in the hash, passing just the key to the coderef. The key will also be available as C<< $_ >>.
 
 =cut
 
@@ -372,7 +372,7 @@ sub for_each_key {
 
         (@_);
     };
-    for my $shv_key ( keys %{$_} ) { &{ $_[0] }($shv_key) };
+    for ( keys %{$_} ) { &{ $_[0] }($_) };
     $_;
 }
 
@@ -418,7 +418,7 @@ Operates on C<< $_ >>, which must be a reference to a hash.
 
 Arguments: B<< CodeRef >>.
 
-Function which calls the coderef for each value in the hash, passing just the value to the coderef.
+Function which calls the coderef for each value in the hash, passing just the value to the coderef. The value will also be available as C<< $_ >>.
 
 =cut
 
@@ -442,7 +442,7 @@ sub for_each_value {
 
         (@_);
     };
-    for my $shv_value ( values %{$_} ) { &{ $_[0] }($shv_value) };
+    for ( values %{$_} ) { &{ $_[0] }($_) };
     $_;
 }
 

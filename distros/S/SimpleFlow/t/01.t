@@ -11,7 +11,7 @@ my $r = task({
 });
 my $simple_task = 0;
 if (
-		($r->{'die'} == 1) &&
+		($r->{'die'} eq 'true') &&
 		($r->{'done'} eq 'now') &&
 		($r->{'exit'} == 0) &&
 		($r->{'overwrite'} eq 'false') &&

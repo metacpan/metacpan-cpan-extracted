@@ -1,0 +1,6 @@
+<start_html 
+    style="@{qw(
+        https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css 
+        https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.classless.min.css
+    )}" 
+>

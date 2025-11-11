@@ -67,14 +67,14 @@ See L<Dancer2::Plugin::LogReport/"DETAILS"> for examples.
 
 =item $obj-E<gt>B<log>($level, $params)
 
-=encoding UTF-8
+Z<>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of Dancer2-Plugin-LogReport version 2.01,
-built on November 05, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Dancer2-Plugin-LogReport version 2.02,
+built on November 10, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

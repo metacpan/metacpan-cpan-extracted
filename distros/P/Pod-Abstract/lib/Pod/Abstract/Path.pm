@@ -8,29 +8,30 @@ use Pod::Abstract::BuildNode qw(node);
 
 $Data::Dumper::Indent = 1;
 
-our $VERSION = '0.20';
+our $VERSION = '0.26';
 
-use constant CHILDREN  => 1;  # /
-use constant ALL       => 2;  # //
-use constant NAME      => 3;  # head1
-use constant INDEX     => 4;  # (3)
-use constant L_SELECT  => 5;  # [
-use constant ATTR      => 6;  # @label
-use constant N_CMP     => 7;  # == != < <= > >=
-use constant STRING    => 8;  # 'foobar'
-use constant R_SELECT  => 9;  # ]
-use constant NUM_OF    => 10; # #
-use constant NOT       => 15; # !
-use constant PARENT    => 16; # ..
-use constant MATCHES   => 17; # =~
-use constant REGEXP    => 18; # {<pattern>}
-use constant NOP       => 19; # .
-use constant PREV      => 20; # <<
-use constant NEXT      => 21; # >>
-use constant ROOT      => 22; # ^
-use constant UNION     => 23; # |
-use constant INTERSECT => 24; # &
-use constant S_CMP     => 25; # eq lt gt le ge ne
+use constant CHILDREN   => 1;  # /
+use constant ALL        => 2;  # //
+use constant NAME       => 3;  # head1
+use constant INDEX      => 4;  # (3)
+use constant L_SELECT   => 5;  # [
+use constant ATTR       => 6;  # @label
+use constant N_CMP      => 7;  # == != < <= > >=
+use constant STRING     => 8;  # 'foobar'
+use constant R_SELECT   => 9;  # ]
+use constant NUM_OF     => 10; # #
+use constant NOT        => 15; # !
+use constant PARENT     => 16; # ..
+use constant MATCHES    => 17; # =~
+use constant REGEXP     => 18; # {<pattern>}
+use constant NOP        => 19; # .
+use constant PREV       => 20; # <<
+use constant NEXT       => 21; # >>
+use constant ROOT       => 22; # ^
+use constant UNION      => 23; # |
+use constant INTERSECT  => 24; # &
+use constant S_CMP      => 25; # eq lt gt le ge ne
+use constant ALL_PARENT => 26; # ...
 
 =pod
 
@@ -41,7 +42,7 @@ document tree.
 
 =head1 SYNOPSIS
 
- /head1(1)/head2          # All head2 elements under 
+ /head1(1)/head2          # All head2 elements under
                           # the 2nd head1 element
  //item                   # All items anywhere
  //item[@label =~ {^\*$}] # All items with '*' labels.
@@ -52,10 +53,10 @@ document tree.
  # "NAME", and also have at least one list somewhere in their
  # contents.
  /head1[/head2[@heading =~ {NAME}]][//over]
- 
+
  # Top level headings having the same title as the following heading.
  /head1[@heading = >>@heading]
- 
+
  # Top level headings containing at least one subheading with the same
  # name.
  /head1[@heading = ./head2@heading]
@@ -83,6 +84,10 @@ Selects children of the left hand side.
 
 Selects all descendants of the left hand side.
 
+=item (I<index>)
+
+Selects only the element at I<index>.
+
 =item .
 
 Selects the current node - this is a NOP that can be used in
@@ -90,8 +95,18 @@ expressions.
 
 =item ..
 
-Selects the parrent node. If there are multiple nodes selected, all of
+Selects the parent node. If there are multiple nodes selected, all of
 their parents will be included.
+
+=item ...
+
+Selects ALL parent nodes, up to the document root. e.g, C<"..."> on a
+paragraph in a head3 will yield the head3, head2, head1 and root nodes (in
+that order).
+
+Practical application: Find the first enclosing heading node:
+
+ ...[@heaading](0)
 
 =item ^
 
@@ -193,7 +208,7 @@ nodes of your Pod document. Use with caution in interactive systems.
 
 =head1 INTERFACE
 
-It is recommended you use the C<<Pod::Abstract::Node->select>> method
+It is recommended you use the C<< Pod::Abstract::Node->select >> method
 to evaluate Path expressions.
 
 If you wish to generate paths for use in other modules, use
@@ -208,20 +223,20 @@ sub new {
     my $class = shift;
     my $expression = shift;
     my $parse_tree = shift;
-    
+
     if($parse_tree) {
-        my $self = bless { 
+        my $self = bless {
             expression => $expression,
             parse_tree => $parse_tree
         }, $class;
         return $self;
     } else {
         my $self = bless { expression => $expression }, $class;
-        
+
         my @lexemes = $self->lex($expression);
         my $parse_tree = $self->parse_path(\@lexemes);
         $self->{parse_tree} = $parse_tree;
-        
+
         return $self;
     }
 }
@@ -260,7 +275,7 @@ sub lex {
         } elsif($expression =~ m/^\@([a-zA-Z0-9]+)/) {
             push @l, [ ATTR, $1 ];
             substr($expression, 0, length( $1 ) + 1) = '';
-        } elsif($expression =~ m/^\(([0-9]+)\)/) {
+        } elsif($expression =~ m/^\((\-?[0-9]+)\)/) {
             push @l, [ INDEX, $1 ];
             substr($expression, 0, length( $1 ) + 2) = '';
         } elsif($expression =~ m/^\{(([^\}]|\\\})+)\}([i]?)/) {
@@ -331,13 +346,13 @@ sub filter_unique {
     my $self = shift;
     my $ilist = shift;
     my $nlist = [ ];
-    
+
     my %seen = ( );
     foreach my $node (@$ilist) {
         push @$nlist, $node unless $seen{$node->serial};
         $seen{$node->serial} = 1;
     }
-    
+
     return $nlist;
 }
 
@@ -345,10 +360,10 @@ sub filter_unique {
 sub process {
     my $self = shift;
     my @nodes = @_;
-    
+
     my $pt = $self->{parse_tree};
     my $ilist = [ @nodes ];
-    
+
     while($pt && $pt->{action} ne 'end_select') {
         my $action = $pt->{action};
         my @args = ( );
@@ -371,9 +386,9 @@ sub select_name {
     my $ilist = shift;
     my @names = @_;
     my $nlist = [ ];
-    
+
     my %names = map { $_ => 1 } @names;
-    
+
     for(my $i = 0; $i < @$ilist; $i ++) {
         if($names{$ilist->[$i]->type}) {
             push @$nlist, $ilist->[$i];
@@ -389,30 +404,30 @@ sub select_union {
     my $ilist = shift;
     my $left = shift;
     my $right = shift;
-    
+
     my $l_path = $class->new('union left', $left);
     my $r_path = $class->new('union right', $right);
-    
+
     my @l_result = $l_path->process(@$ilist);
     my @r_result = $r_path->process(@$ilist);
-    
+
     return [ @l_result, @r_result ];
 }
 
 sub select_intersect {
     my $self = shift;
     my $class = ref $self;
-    
+
     my $ilist = shift;
     my $left = shift;
     my $right = shift;
-    
+
     my $l_path = $class->new("intersect left", $left);
     my $r_path = $class->new("intersect right", $right);
-    
+
     my @l_result = $l_path->process(@$ilist);
     my @r_result = $r_path->process(@$ilist);
-    
+
     my %seen = ( );
     my $nlist = [ ];
     foreach my $a (@l_result) {
@@ -421,7 +436,7 @@ sub select_intersect {
     foreach my $b (@r_result) {
         push @$nlist, $b if $seen{$b->serial};
     }
-    
+
     return $nlist;
 }
 
@@ -430,7 +445,7 @@ sub select_attr {
     my $ilist = shift;
     my $name = shift;
     my $nlist = [ ];
-    
+
     foreach my $i (@$ilist) {
         my $pv = $i->param($name);
         if($pv) {
@@ -444,11 +459,20 @@ sub select_index {
     my $self = shift;
     my $ilist = shift;
     my $index = shift;
-    
+
     if($index < scalar @$ilist) {
-        return [ $ilist->[$index] ];
+        if($index >= 0) {
+            return [ $ilist->[$index] ];
+        } else { # Index < 0
+            my $neg = abs $index;
+            if($neg <= scalar @$ilist) {
+                return [ $ilist->[-$neg] ];
+            } else {
+                return [ ]; # Out of bounds
+            }
+        }
     } else {
-        return [ ];
+        return [ ]; # Out of bounds
     }
 }
 
@@ -459,9 +483,9 @@ sub match_expression {
     my $invert = shift;
     my $exp = shift;
     my $r_exp = shift;
-    
+
     my $op = shift; # Only for some operators
-    
+
     my $nlist = [ ];
     foreach my $n(@$ilist) {
         my @t_list = $exp->process($n);
@@ -487,7 +511,7 @@ sub test_cmp_op {
     my $l_list = shift;
     my $r_exp = shift;
     my $op = shift;
-    
+
     if(scalar(@$r_exp) == 0 || eval { $r_exp->[0]->isa('Pod::Abstract::Node') }) {
         # combination test
         my $match = 0;
@@ -544,7 +568,7 @@ sub test_regexp {
 sub test_simple {
     my $self = shift;
     my $t_list = shift;
-    
+
     return (scalar @$t_list) > 0;
 }
 
@@ -552,12 +576,12 @@ sub select_children {
     my $self = shift;
     my $ilist = shift;
     my $nlist = [ ];
-    
+
     foreach my $n (@$ilist) {
         my @children = $n->children;
         push @$nlist, @children;
     }
-    
+
     return $nlist;
 }
 
@@ -565,14 +589,14 @@ sub select_next {
     my $self = shift;
     my $ilist = shift;
     my $nlist = [ ];
-    
+
     foreach my $n (@$ilist) {
         my $next = $n->next;
         if($next) {
             push @$nlist, $next;
         }
     }
-    
+
     return $nlist;
 }
 
@@ -580,14 +604,14 @@ sub select_prev {
     my $self = shift;
     my $ilist = shift;
     my $nlist = [ ];
-    
+
     foreach my $n (@$ilist) {
         my $prev = $n->previous;
         if($prev) {
             push @$nlist, $prev;
         }
     }
-    
+
     return $nlist;
 }
 
@@ -600,7 +624,7 @@ sub select_parents {
             push @$nlist, $n->parent;
         }
     }
-    
+
     return $nlist;
 }
 
@@ -612,7 +636,7 @@ sub select_root {
         push @$nlist, $n->root; # almost certainly all the same - not
                                 # efficient but consistent.
     }
-    
+
     return $nlist;
 }
 
@@ -626,25 +650,25 @@ sub select_all {
     my $self = shift;
     my $ilist = shift;
     my $nlist = [ ];
-    
+
     foreach my $n (@$ilist) {
         push @$nlist, $self->expand_all($n);
     }
-    
+
     return $nlist;
 }
 
 sub expand_all {
     my $self = shift;
     my $n = shift;
-    
+
     my @children = $n->children;
     my @r = ( );
     foreach my $c (@children) {
         push @r, $c;
         push @r, $self->expand_all($c);
     };
-    
+
     return @r;
 }
 
@@ -659,9 +683,9 @@ lookahead.
 sub parse_path {
     my $self = shift;
     my $l = shift;
-    
+
     my $left = $self->parse_l_path($l);
-    
+
     # Handle UNION or INTERSECT operators
     my $next = shift @$l;
     if($next) {
@@ -689,24 +713,24 @@ sub parse_path {
 sub parse_l_path {
     my $self = shift;
     my $l = shift;
-    
+
     my $next = shift @$l;
     my $tok = $next->[0] if $next;
     my $val = $next->[1] if $next;
-    
+
     # Accept: / (children), // (all), name, <select>, @attr, .index
     if(not defined $next) {
         return {
             'action' => 'end_select',
         };
-    } elsif(grep { $tok == $_ } 
+    } elsif(grep { $tok == $_ }
             (MATCHES, R_SELECT, S_CMP, N_CMP, UNION, INTERSECT)) {
         unshift @$l, $next;
         return {
             'action' => 'end_select',
         };
     } elsif($tok == CHILDREN) {
-        return { 
+        return {
             'action' => 'select_children',
             'next' => $self->parse_l_path($l),
         };
@@ -741,6 +765,7 @@ sub parse_l_path {
             'next' => $self->parse_l_path($l),
         };
     } elsif($tok == NAME) {
+        $self->check_name($val); # Dies on fail.
         my @extra_names = $self->parse_names($l);
         return {
             'action' => 'select_name',
@@ -764,12 +789,6 @@ sub parse_l_path {
         my $exp = $self->parse_expression($l);
         $exp->{'next'} = $self->parse_l_path($l);
         return $exp;
-    } elsif($tok == ATTR) {
-        return {
-            'action' => 'select_attribute',
-            'arguments' => [ $val ],
-            'next' => $self->parse_l_path($l),
-        }
     } else {
         die "Unexpected token, ", Dumper([$next]);
     }
@@ -779,54 +798,107 @@ sub parse_names {
     my $self = shift;
     my $l = shift;
     my @r = ( );
-    
+
     # Collect a list of names until there are no more.
     while(@$l && $l->[0][0] == NAME) {
         my $next = shift @$l;
         my $val = $next->[1];
+
+        return unless $self->check_name($val); # This is going to produce a die, unless told not to.
+
         push @r, $val;
     }
-    
+
     return @r;
+}
+
+my %allow = (
+    head1 => 1,
+    head2 => 1,
+    head3 => 1,
+    head4 => 1, 
+    head5 => 1,
+    head6 => 1,
+    pod => 1,
+    over => 1,
+    item => 1,
+    back => 1,
+    begin => 1,
+    for => 1,
+    end => 1,
+    '#cut' => 1,
+    ':verbatim' => 1,
+    ':text' => 1,
+    ':paragraph' => 1,
+
+    # Formatting commands
+    ':L' => 1, # Link
+    ':X' => 1, # Index
+    ':B' => 1, # Bold
+    ':C' => 1, # Code
+    ':E' => 1, # Escape
+    ':I' => 1, # Italic
+    ':F' => 1, # Filename
+    ':Z' => 1, # Zero
+    ':S' => 1, # Non-breaking spaces
+);
+
+sub check_name {
+    my $self = shift;
+    my $val = shift;
+
+    if( $allow{$val} ) {
+        return 1;
+    }
+
+    if( $val =~ m/^[A-Z]$/ ) {
+        die "Expression name $val looks like a formatting code, did you mean :$val?\n";
+    }
+
+    if( $allow{":$val"} ) {
+        die "Expression $val invalid, did you mean :$val?\n";
+    }
+
+    die "Invalid node expression $val\n";
 }
 
 sub parse_expression {
     my $self = shift;
     my $class = ref $self;
     my $l = shift;
-    
+
     my $l_select = shift @$l;
     die "Expected L_SELECT, got ", Dumper([$l_select])
         unless $l_select->[0] == L_SELECT;
-    
+
     # See if we lead with a NOT
     if($l->[0][0] == NOT) {
         shift @$l;
         unshift @$l, $l_select;
-        
+
         my $exp = $self->parse_expression($l);
         $exp->{arguments}[1] = !$exp->{arguments}[1];
         return $exp;
     }
-    
+
     my $l_exp = $self->parse_path($l);
     $l_exp = $class->new("select expression",$l_exp);
     my $op = shift @$l;
     my $op_tok = $op->[0];
     my $op_val = $op->[1];
     my $exp = undef;
-    
+
     if($op_tok == MATCHES) {
         my $re = shift @$l;
         my $re_tok = $re->[0];
         my $re_str = $re->[1];
         my $case_sensitive = $re->[2];
-        
+
         if($re_tok == REGEXP) {
             $exp = {
                 'action' => 'match_expression',
-                'arguments' => [ 'test_regexp', 0, 
-                                 $l_exp, 
+                'arguments' => [ 'test_regexp', 0,
+                                 $l_exp,
                                  [ $re_str, $case_sensitive ] ],
             }
         } else {
@@ -836,7 +908,7 @@ sub parse_expression {
         my $rh = shift @$l;
         my $rh_tok = $rh->[0];
         my $r_exp = undef;
-        
+
         if($rh_tok == STRING) { # simple string equality
             $r_exp = $rh;
         } else {
@@ -859,25 +931,25 @@ sub parse_expression {
     } else {
         die "Expected MATCHES, got ", Dumper([$op_tok]);
     }
-    
+
     # Must match close of select;
     my $r_select = shift @$l;
     die "Expected R_SELECT, got, ", Dumper([$r_select])
         unless $r_select->[0] == R_SELECT;
     die "Failed to generate expression"
         unless $exp;
-    
+
     # All OK!
     return $exp;
 }
 
 =head1 AUTHOR
 
-Ben Lilburne <bnej@mac.com>
+Ben Lilburne <bnej80@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009 Ben Lilburne
+Copyright (C) 2009-2025 Ben Lilburne
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -885,4 +957,4 @@ it under the same terms as Perl itself.
 =cut
 
 1;
- 
+

@@ -25,7 +25,6 @@ no_index:
 provides:
   NVM::Perl:
     file: lib/NVM/Perl.pm
-    version: v0.1.1
 requires:
   Archive::Zip: '0'
   Exporter: '0'
@@ -40,5 +39,5 @@ requires:
 resources:
   bugtracker: https://github.com/jkhall81/nvm-pl/issues
   repository: https://github.com/jkhall81/nvm-pl.git
-version: v0.1.1
+version: '1.2'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

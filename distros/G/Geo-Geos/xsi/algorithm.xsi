@@ -134,7 +134,7 @@ double signedArea (Array ring) {
 
 double length(Array pts) {
     auto seq = Helper::convert_coords(pts);
-    RETVAL = CGAlgorithms::signedArea(&seq);
+    RETVAL = CGAlgorithms::length(&seq);
 }
 
 int orientationIndex(Coordinate& p1, Coordinate& p2, Coordinate& q) {

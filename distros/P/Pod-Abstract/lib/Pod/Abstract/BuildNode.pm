@@ -7,7 +7,7 @@ use Pod::Abstract::Parser;
 use Pod::Abstract::Node;
 use base qw(Exporter);
 
-our $VERSION = '0.20';
+our $VERSION = '0.26';
 
 our @EXPORT_OK = qw(node nodes);
 
@@ -21,7 +21,7 @@ Pod::Abstract::BuildNode - Build new nodes for use in Pod::Abstract.
 =head1 SYNOPSIS
 
  use Pod::Abstract::BuildNode qw(node nodes); # shorthand
- 
+
  my $root_doc = node->root;
  for(my $i = 1; $i < 10; $i ++) {
     $root_doc->push(node->head1("Heading number $i"));
@@ -73,10 +73,10 @@ will be populated under the returned nodes.
 sub from_pod {
     my $class = shift;
     my $str = shift;
-    
+
     my $root = Pod::Abstract->load_string($str);
     return undef unless $root;
-    
+
     my @r = map { $_->detach; $_ } $root->children;
     return @r;
 }
@@ -112,7 +112,7 @@ belongs to it's corresponding begin.
 sub begin {
     my $class = shift;
     my $cmd = shift;
-    
+
     my $begin = Pod::Abstract::Node->new(
         type => 'begin',
         body => $cmd,
@@ -156,13 +156,13 @@ nodes inside the paragraph.
 sub paragraph {
     my $class = shift;
     my $str = shift;
-    
+
     my $para = Pod::Abstract::Node->new(
         type => ':paragraph',
         );
     my $parser = Pod::Abstract::Parser->new;
     my $pt = $parser->parse_text($str);
-    
+
     if($pt) {
         $parser->load_pt($para,$pt);
     } else {
@@ -183,7 +183,7 @@ treated as verbatim.
 sub verbatim {
     my $class = shift;
     my $str = shift;
-    
+
     my @strs = split "\n",$str;
     for(my $i = 0; $i < @strs; $i ++) {
         my $str_line = $strs[$i];
@@ -217,7 +217,7 @@ sub heading {
     my $parser = Pod::Abstract::Parser->new;
     my $pt = $parser->parse_text($heading);
     $parser->load_pt($attr_node, $pt);
-        
+
     my $element_node = Pod::Abstract::Node->new(
         type => "head$level",
         heading => $attr_node,
@@ -235,7 +235,7 @@ sub heading {
 sub head1 {
     my $class = shift;
     my $heading = shift;
-    
+
     return $class->heading(1,$heading);
 }
 
@@ -248,7 +248,7 @@ sub head1 {
 sub head2 {
     my $class = shift;
     my $heading = shift;
-    
+
     return $class->heading(2,$heading);
 }
 
@@ -261,7 +261,7 @@ sub head2 {
 sub head3 {
     my $class = shift;
     my $heading = shift;
-    
+
     return $class->heading(3,$heading);
 }
 
@@ -274,7 +274,7 @@ sub head3 {
 sub head4 {
     my $class = shift;
     my $heading = shift;
-    
+
     return $class->heading(4,$heading);
 }
 
@@ -293,7 +293,7 @@ sub over {
     my $class = shift;
     my $number = shift;
     $number = '' unless defined $number;
-    
+
     return Pod::Abstract::Node->new(
         type => 'over',
         body => ($number ? $number : undef),
@@ -301,6 +301,30 @@ sub over {
             type => 'back',
         ),
         );
+}
+
+=head2 link
+
+ my $link = node->link('Pod::Abstract');
+
+Generates an inline link. This will nest the passed link text only.
+
+There's special inline parsing for Perl POD links, which is not handled
+by this method.
+
+=cut
+
+sub link {
+    my $class = shift;
+    my $link = shift;
+
+    my $l = Pod::Abstract::Node->new(
+        type => ':L',
+        body => undef,
+    );
+    my $body = $class->text($link);
+    $l->nest($body);
+    return $l;
 }
 
 =head2 item
@@ -316,14 +340,14 @@ nodes.
 sub item {
     my $class = shift;
     my $label = shift;
-    
+
     my $attr_node = Pod::Abstract::Node->new(
         type => '@attribute',
         );
     my $parser = Pod::Abstract::Parser->new;
     my $pt = $parser->parse_text($label);
     $parser->load_pt($attr_node, $pt);
-        
+
     my $element_node = Pod::Abstract::Node->new(
         type => "item",
         label => $attr_node,
@@ -345,7 +369,7 @@ append a word at the end of a paragraph.
 sub text {
     my $class = shift;
     my $text = shift;
-    
+
     my $attr_node = Pod::Abstract::Node->new(
         type => ':text',
         body => $text,
@@ -372,7 +396,7 @@ sub pod {
         );
 }
 
-=head1
+=head2 cut
 
  my $cut = node->cut;
 
@@ -390,11 +414,11 @@ sub cut {
 
 =head1 AUTHOR
 
-Ben Lilburne <bnej@mac.com>
+Ben Lilburne <bnej80@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009 Ben Lilburne
+Copyright (C) 2009-2025 Ben Lilburne
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

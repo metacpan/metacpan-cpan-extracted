@@ -2,22 +2,26 @@
 use strict;
 use warnings;
 use 5.020;
+use strictures 2;
 use stable 0.031 'postderef';
 use experimental 'signatures';
+no autovivification warn => qw(fetch store exists delete);
+use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
+no if "$]" >= 5.041009, feature => 'smartmatch';
 
 use Test2::API 'intercept';
-use Test::More 0.88;
-use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
-use Test::Deep;
+use Test2::V0 qw(!bag !bool), -no_pragmas => 1;
+use if $ENV{AUTHOR_TESTING}, 'Test2::Warnings';
 use Test::JSON::Schema::Acceptance;
 use List::Util 'sum';
 use Test::File::ShareDir -share => { -dist => { 'Test-JSON-Schema-Acceptance' => 'share' } };
 
 use lib 't/lib';
 use SchemaParser;
+use Helper;
 
 my $accepter = Test::JSON::Schema::Acceptance->new(test_dir => 't/tests/subset');
 my $parser = SchemaParser->new;
@@ -26,6 +30,7 @@ my $parser = SchemaParser->new;
 # baz contains only passing tests (3)
 # foo contains only passing tests (3x3)
 
+# count indicates the number of tests run from each of: bar.json, baz.json, foo.json
 foreach my $test (
   # run tests in this file
   { count => [0,0,9], tests => { file => 'foo.json' } },
@@ -75,7 +80,8 @@ foreach my $test (
   },
 ) {
   my ($count, $test_options) = @{$test}{qw(count tests)};
-  my $events = intercept(
+
+  my $events = intercept( # Test2::API::InterceptResult
     sub {
       $accepter->acceptance(
         validate_data => sub ($schema, $data) {
@@ -89,7 +95,7 @@ foreach my $test (
   my @tests = grep $_->isa('Test2::Event::Ok'), @$events;
   is(scalar(@tests), sum(@$count), 'ran ('.join('+',@$count).') tests');
 
-  cmp_deeply(
+  cmp_result(
     $accepter->results,
     [
       map +(
@@ -102,7 +108,8 @@ foreach my $test (
       ), (0..2)
     ],
     'result data was populated',
-  );
+  )
+  or diag "all failing tests:\n", join("\n", failing_test_names($events));
 }
 
 done_testing;

@@ -4,12 +4,12 @@ use strict;
 use base qw(Pod::Abstract::Filter);
 use Pod::Abstract::BuildNode qw(node);
 
-our $VERSION = '0.20';
+our $VERSION = '0.26';
 
 =head1 NAME
 
-Pod::Abstract::Filter::summary - paf command to show document outline,
-with short examples.
+Pod::Abstract::Filter::summary - Show document outline, with short
+examples.
 
 =cut
 
@@ -71,11 +71,11 @@ sub summarise_headings {
 
 =head1 AUTHOR
 
-Ben Lilburne <bnej@mac.com>
+Ben Lilburne <bnej80@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009 Ben Lilburne
+Copyright (C) 2009-2025 Ben Lilburne
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

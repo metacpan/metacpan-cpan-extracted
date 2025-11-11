@@ -1,13 +1,16 @@
 #!/usr/bin/env perl
-use v5.36.1;
 use strict;
 use warnings;
 use utf8;
-use Test::More;
 use lib './lib';
 use open ':std' => 'utf8';
+use Test::More;
 use JSON;
-use JSON::Schema::Validate;
+
+BEGIN
+{
+    use_ok( 'JSON::Schema::Validate' ) || BAIL_OUT( "Unable to load JSON::Schema::Validate" );
+}
 
 my $schema = {
     '$schema' => 'https://json-schema.org/draft/2020-12/schema',

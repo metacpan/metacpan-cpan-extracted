@@ -1,19 +1,23 @@
 use strict;
 use warnings;
-package Test::JSON::Schema::Acceptance; # git description: v1.029-4-gec574f1
+package Test::JSON::Schema::Acceptance; # git description: v1.032-3-g4da109d
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Acceptance testing for JSON-Schema based validators
 
-our $VERSION = '1.030';
+our $VERSION = '1.033';
 
 use 5.020;
 use Moo;
 use strictures 2;
 use stable 0.031 'postderef';
 use experimental 'signatures';
+no autovivification warn => qw(fetch store exists delete);
+use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
+no if "$]" >= 5.041009, feature => 'smartmatch';
+no feature 'switch';
 use Test2::API ();
 use Test2::Todo;
 use Test2::Tools::Compare ();
@@ -551,7 +555,7 @@ Test::JSON::Schema::Acceptance - Acceptance testing for JSON-Schema based valida
 
 =head1 VERSION
 
-version 1.030
+version 1.033
 
 =head1 SYNOPSIS
 
@@ -564,7 +568,7 @@ modules that run the same tests in different languages.
 
 In the JSON::Schema::Modern module, a test could look like the following:
 
-  use Test::More;
+  use Test2::V0;
   use JSON::Schema::Modern;
   use Test::JSON::Schema::Acceptance;
 

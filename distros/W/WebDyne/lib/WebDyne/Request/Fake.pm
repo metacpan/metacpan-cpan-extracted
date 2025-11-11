@@ -38,7 +38,7 @@ my %Package;
 
 #  Version information
 #
-$VERSION='2.020';
+$VERSION='2.026';
 
 
 #  Debug load
@@ -290,7 +290,7 @@ sub uri {
 sub document_root {
 
     my $r=shift();
-    @_ ? $r->{'document_root'}=shift() : $r->{'document_root'} || $ENV{'DOCUMENT_ROOT'}
+    @_ ? $r->{'document_root'}=shift() : $r->{'document_root'} || ($ENV{'DOCUMENT_ROOT'} || cwd());
     
 }
 

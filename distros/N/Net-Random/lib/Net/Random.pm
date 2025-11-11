@@ -4,7 +4,7 @@ use strict;
 local $^W = 1;
 use vars qw($VERSION %randomness);
 
-$VERSION = '2.32';
+$VERSION = '2.33';
 
 require LWP::UserAgent;
 use Sys::Hostname;
@@ -98,6 +98,12 @@ sub _recharge {
 =head1 NAME
 
 Net::Random - get random data from online sources
+
+=head1 SUPPORT
+
+This module is unsupported, unloved, unmaintained, obsolete, and DEPRECATED. The most egregious of bugs might be fixed but I do not promise to do so. There is no support. Using this module is a Bad Idea. Under no circumstances will maintenance be handed over to anyone else. The PAUSE admins should note that anyone wanting to take over maintenance is not qualified to do so.
+
+I recommend that users switch to using L<Crypt::URandom> instead, and also read L<https://security.metacpan.org/docs/guides/random-data-for-security.html>.
 
 =head1 SYNOPSIS
 
@@ -305,7 +311,7 @@ I welcome feedback about my code, especially constructive criticism.
 
 =head1 AUTHOR, COPYRIGHT and LICENCE
 
-Copyright 2003 - 2012 David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
+Copyright 2003 - 2025 David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
 
 This software is free-as-in-speech software, and may be used,
 distributed, and modified under the terms of either the GNU

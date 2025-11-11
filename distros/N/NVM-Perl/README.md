@@ -21,7 +21,7 @@ A fast, lightweight Perl-based Node.js version manager. Install, switch, and man
 
 ```bash
 # Install from CPAN
-cpanm NVMPL
+sudo cpanm JHALL/NVM-Perl-0.1.1.tar.gz
 
 # Or clone and install manually
 git clone https://github.com/jkhall81/nvm-pl.git

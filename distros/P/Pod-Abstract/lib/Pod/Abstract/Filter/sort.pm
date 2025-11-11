@@ -8,12 +8,37 @@ use base qw(Pod::Abstract::Filter);
 
 =head1 NAME
 
-Pod::Abstract::Filter::sort - paf command to alphabetically sort
-sub-sections within a Pod section
+Pod::Abstract::Filter::sort - alphabetically sort sub-sections within a
+POD section.
+
+=head1 USAGE
+
+=over
+
+=item *
+
+Sort the METHODS section in the target document:
+
+ paf sort -heading=METHODS Your::Module::Name
+
+=item *
+
+Sort as specified, where your document has:
+
+ =head1 METHODS
+
+ =for sorting
+
+ {etc}
+
+In this case the "=for sorting" label will cause all subheadings to be
+sorted alphabetically, you don't need to specify a section.
+
+ paf sort Your::Module::Name
 
 =cut
 
-our $VERSION = '0.20';
+our $VERSION = '0.26';
 
 sub filter {
     my $self = shift;
@@ -49,11 +74,11 @@ sub filter {
 
 =head1 AUTHOR
 
-Ben Lilburne <bnej@mac.com>
+Ben Lilburne <bnej80@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009 Ben Lilburne
+Copyright (C) 2009-2025 Ben Lilburne
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

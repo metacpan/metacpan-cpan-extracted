@@ -1,0 +1,7 @@
+Release history for Tie-Hash-MultiValueOpts
+
+1.0.1    Sat Nov  8 06:52:02 PM CET 2025
+         - Remove wrong META_MERGE/provides entry
+
+1.0.0    Sat Nov  8 06:44:28 PM CET 2025
+         - Initial release

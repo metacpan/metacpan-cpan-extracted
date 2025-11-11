@@ -49,7 +49,11 @@ foreach my $module (@shell_modules) {
     };
     
     ok(defined $snippet, "init_snippet returns defined value - $module");
-    like($snippet, qr/current[\\\/]bin/, "init_snippet contains current/bin path - $module");
+    if ($module eq 'NVMPL::Shell::PowerShell') {
+    like($snippet, qr/current([\\\/]bin)?/, "init_snippet contains current or current/bin path - $module");
+    } else {
+        like($snippet, qr/current[\\\/]bin/, "init_snippet contains current/bin path - $module");
+    }
 }
 
 done_testing();

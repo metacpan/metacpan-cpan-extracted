@@ -199,7 +199,7 @@ Flattens the arrayref into a list, including any nested arrayrefs. (Has the pote
 
 Arguments: B<< CodeRef >>.
 
-Chainable method which executes the coderef on each element of the array. The coderef will be passed two values: the element and its index.
+Chainable method which executes the coderef on each element of the array. The coderef will be passed two values: the element and its index. The element will also be available as C<< $_ >>.
 
   my $object = My::Class->new( attr => [ 'foo', 'bar', 'baz' ] );
   $object->my_for_each( sub { say "Item $_[1] is $_[0]." } );

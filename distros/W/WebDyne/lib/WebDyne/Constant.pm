@@ -34,7 +34,7 @@ require Opcode;
 
 #  Version information
 #
-$VERSION='2.020';
+$VERSION='2.026';
 
 
 #  Get mod_perl version. Clear $@ after evals
@@ -173,7 +173,15 @@ my %constant_temp;
     #
     WEBDYNE_CONTENT_TYPE_TEXT => 'text/plain',
     WEBDYNE_CONTENT_TYPE_JSON => 'application/json',
-
+    
+    
+    #  Script types which are executable so we won't subst strings in them
+    #
+    WEBDYNE_SCRIPT_TYPE_EXECUTABLE_HR => { map { $_=>1 } qw(
+        text/javascript
+        application/javascript
+        module
+    )},
 
     #  Encoding
     #
@@ -188,7 +196,10 @@ my %constant_temp;
     WEBDYNE_META => {
     
         # Set to 'chareset=UTF-8' => undef to get result we want
-        'charset='.$constant_temp{'webdyne_html_charset'} => undef
+        'charset='.$constant_temp{'webdyne_html_charset'} => undef,
+        
+        # Set viewport by default
+        viewport => 'width=device-width, initial-scale=1.0'
     },
 
 
@@ -199,7 +210,21 @@ my %constant_temp;
 
     #  Default <html> tag paramaters, eg { lang	=>'en-US' }
     #
-    WEBDYNE_HTML_PARAM => {lang => 'en'},
+    WEBDYNE_HTML_PARAM => {lang => 'en' },
+    
+
+    #  Default params for <start_html> tag
+    #
+    #  E.g. WEBDYNE_START_HTML_PARAM => {  include_style=>['foo.css', 'bar.css'] },
+
+    #
+    WEBDYNE_START_HTML_PARAM => {},
+    
+    
+    #  Make include/other sections in start_html tag static, i.e. load them at compile
+    #  time and they never change. Make undef to force re-include every page load
+    #
+    WEBDYNE_START_HTML_PARAM_STATIC => 1,
     
     
     #  Anything that should be added in <head> section. Will be inserted verbatim before
@@ -211,8 +236,8 @@ my %constant_temp;
     #  Will be added to all <head> sections universally.
     #
     WEBDYNE_HEAD_INSERT => '',
-
-
+    
+    
     #  Ignore ignorable whitespace in compile. Play around with these settings if
     #  you don't like the formatting of the compiled HTML. See HTML::TreeBuilder
     #  man page for details here
@@ -344,6 +369,20 @@ my %constant_temp;
     #  Enable the API mode ?
     #
     WEBDYNE_API_ENABLE => 1,
+    
+    
+    #  Enable Alpine/Vue hack
+    #
+    WEBDYNE_ALPINE_VUE_ATTRIBUTE_HACK_ENABLE => 'x-on',
+    
+    
+    #  Request headers for HTMX and Alpine Ajax
+    #
+    WEBDYNE_HTTP_HEADER_AJAX_HR => { map { $_=> 1} @{$_=[qw(
+        hx-request
+        x-alpine-request
+    )]}},
+    WEBDYNE_HTTP_HEADER_AJAX_AR => $_,
 
 
     #  Headers
@@ -378,25 +417,31 @@ my %constant_temp;
 
 sub local_constant_load {
 
+
+    #  Load constants from override files first
+    #
     my ($class, $constant_hr)=@_;
     debug("class $class, constant_hr %s", Dumper($constant_hr));
-    my $local_constant_cn=local_constant_cn();
-    debug("local_constant_cn $local_constant_cn");
-    my $local_hr=(-f $local_constant_cn) && (
-        do($local_constant_cn)
-        ||
-        warn "unable to read local constant file, $!"
-    );
-    debug("local_hr $local_hr");
-    if (my $hr=$local_hr->{$class}) {
-        debug("found class $class hr %s", Dumper($hr));
-        while (my ($key, $val)=each %{$hr}) {
-            $constant_hr->{$key}=$val;
+    my $local_constant_pn_ar=&local_constant_pn();
+    debug("local_constant_pn_ar: %s", Dumper($local_constant_pn_ar));
+    foreach my $local_constant_pn (@{$local_constant_pn_ar}) {
+        debug("load local_constant_pn: $local_constant_pn");
+        my $local_hr=(-f $local_constant_pn) && (
+            do($local_constant_pn)
+            ||
+            warn "unable to read local constant file, $!"
+        );
+        debug("local_hr $local_hr");
+        if (my $hr=$local_hr->{$class}) {
+            debug("found class $class hr %s", Dumper($hr));
+            while (my ($key, $val)=each %{$hr}) {
+                $constant_hr->{$key}=$val;
+            }
         }
     }
 
 
-    #  Set via environment vars first
+    #  Now from environment vars - override anything in config file
     #
     foreach my $key (keys %{$constant_hr}) {
         if (my $val=$ENV{$key}) {
@@ -476,25 +521,28 @@ sub local_constant_load {
 }
 
 
-sub local_constant_cn {
+sub local_constant_pn {
 
 
     #  Where local constants reside
     #
+    my @local_constant_pn;
     my $local_constant_fn='webdyne.conf.pl';
-    my $local_constant_cn;
     if ($^O=~/MSWin[32|64]/) {
         my $dn=$ENV{'WEBDYNE_HOME'} || $ENV{'WEBDYNE'} || $ENV{'WINDIR'};
-        $local_constant_cn=$ENV{'WEBDYNE_CONF'} || 
-            File::Spec->catfile($dn, $local_constant_fn)
+        push @local_constant_pn, ($ENV{'WEBDYNE_CONF'} || 
+            File::Spec->catfile($dn, $local_constant_fn))
     }
     else {
-        $local_constant_cn=$ENV{'WEBDYNE_CONF'} || 
+        push @local_constant_pn, ($ENV{'WEBDYNE_CONF'} || 
             File::Spec->catfile(
                 File::Spec->rootdir(), 'etc', $local_constant_fn
-        )
+        ))
     }
-    return $local_constant_cn;
+    unless ($ENV{'WEBDYNE_CONF'}) {
+        push @local_constant_pn, glob(sprintf('~/.%s', $local_constant_fn));
+    }
+    return \@local_constant_pn;
 
 }
 

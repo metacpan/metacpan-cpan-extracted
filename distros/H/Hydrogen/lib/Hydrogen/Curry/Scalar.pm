@@ -9,7 +9,7 @@ use Hydrogen::Scalar ();
 package Hydrogen::Curry::Scalar;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.021000';
+our $VERSION   = '0.021001';
 
 =head1 NAME
 
@@ -17,8 +17,8 @@ Hydrogen::Curry::Scalar - easily curry functions from Hydrogen::Scalar
 
 =head1 VERSION
 
-This documentation is for Hydrogen::Curry::Scalar 0.021000,
-which is based on Sub::HandlesVia::HandlerLibrary::Scalar 0.050003.
+This documentation is for Hydrogen::Curry::Scalar 0.021001,
+which is based on Sub::HandlesVia::HandlerLibrary::Scalar 0.050005.
 
 =cut
 

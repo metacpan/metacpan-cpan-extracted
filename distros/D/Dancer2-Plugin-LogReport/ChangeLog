@@ -4,6 +4,17 @@
 Unless noted otherwise, these changes where initiated and applied by
 Mark Overmeer.
 
+version 2.02: Mon 10 Nov 17:38:21 CET 2025
+
+	Fixes:
+	- dependency to Log::Report::Template
+	  rt.cpan.org#171523 [Andreas Koenig], cpantesters
+	  rt.cpan.org#171596 [Kurt D. Starsini]
+
+	Improvements:
+	- add bugtracker to meta.
+	- add funding
+
 version 2.01: Wed  5 Nov 17:35:44 CET 2025
 
 	Fixes:

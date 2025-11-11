@@ -19,3 +19,6 @@ Revision history for Mojo::Util::Collection
 
 0.0.11   2024-01-22
         Fix pod for the Mojo::Util::Model::User
+
+0.0.13   2025-11-10
+        Add pager to the collection

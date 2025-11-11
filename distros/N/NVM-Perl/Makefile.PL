@@ -36,7 +36,6 @@ WriteMakefile(
         provides    => {
             'NVM::Perl' => {
                 file    => 'lib/NVM/Perl.pm',
-                version => '0.1.1',
             },
         },
         resources   => {

@@ -1,11 +1,12 @@
 use strict;
+require 5.010;
 use feature 'say';
 use DDP {output => 'STDOUT', array_max => 10, show_memsize => 0};
 use Devel::Confess 'color';
 use Cwd 'getcwd';
 use warnings FATAL => 'all';
 package SimpleFlow;
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 use Term::ANSIColor;
 use Scalar::Util 'openhandle';
 use DDP {output => 'STDOUT', array_max => 10, show_memsize => 0};
@@ -47,10 +48,14 @@ sub task {
 	if (
 			(defined $args->{'log.fh'})
 			&&
-			(not defined ($args->{'log.fh'}))
+			(not openhandle($args->{'log.fh'}))
 		) {
 		p $args;
 		die "the filehandle given to $current_sub isn't actually a filehandle";
+	}
+	if (not defined $args->{'log.fh'}) {
+		p $args;
+		warn "$current_sub didn't receive a filehandle: no logging for the above task will be done.";
 	}
 	my (%input_file_size, @existing_files, @output_files);
 	if (defined $args->{'input.files'}) {
@@ -67,6 +72,10 @@ sub task {
 			die 'ref type "' . $ref . '" is not allowed for "input.files"';
 		}
 		if (scalar @missing_files > 0) {
+			say STDERR 'this list of arguments:';
+			p $args;
+			my $dir = getcwd();
+			say STDERR 'Cannot run because these files are either missing or unreadable in: ' . getcwd();
 			p @missing_files;
 			die 'the above files are missing or are not readable';
 		}
@@ -86,7 +95,7 @@ sub task {
 	if (scalar @output_files > 0) {
 		@existing_files = grep {-f $_} @output_files;
 	}
-	$args->{'die'}			= $args->{'die'}		// 1;
+	$args->{'die'}			= $args->{'die'}		// 'true';
 	$args->{overwrite}	= $args->{overwrite} // 'false';
 	my %r = (
 		cmd             => $args->{cmd},
@@ -114,9 +123,23 @@ sub task {
 		$r{$std} =~ s/\s+$//; # remove trailing whitespace/newline
 	}
 	$r{done} = 'now';
+	my @missing_output_files = grep {not -f -r $_} @output_files;
+	if (scalar @missing_output_files > 0) {
+		say STDERR "this input to $current_sub:";
+		p $args;
+		say STDERR 'has these files missing:';
+		p @missing_output_files;
+		die 'those above files should be made but are missing';
+	}
 	%output_file_size = map {$_ => -s $_} @output_files;
+#	p %output_file_size;
+	my @files_with_zero_size = grep { $output_file_size{$_} == 0} @output_files;
+	if (scalar @files_with_zero_size > 0) {
+		p @files_with_zero_size;
+		warn 'the above output files have 0 size.';
+	}
 	p(%r, output => $args->{'log.fh'}, show_memsize => 0) if defined $args->{'log.fh'};
-	if (($args->{'die'} == 1) && ($r{'exit'} != 0)) {
+	if (($args->{'die'} eq 'true') && ($r{'exit'} != 0)) {
 		p %r;
 		die "$args->{cmd} failed"
 	}
@@ -153,8 +176,6 @@ the only required key/argument is `cmd`, but other arguments are possible:
 You may wish to output results to a logfile using a previously opened filehandle thus:
 
     my ($fh, $fname) = tempfile( UNLINK => 0, DIR => '/tmp');
-    close $fh;
-    open $fh, '>', $fname;
     my $t = task({
     	cmd            => 'which ln',
     	'log.fh'       => $fh,

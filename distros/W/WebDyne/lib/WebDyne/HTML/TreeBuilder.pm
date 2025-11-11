@@ -46,7 +46,7 @@ use Data::Dumper;
 
 #  Version information
 #
-$VERSION='2.020';
+$VERSION='2.026';
 
 
 #  Debug load
@@ -88,7 +88,6 @@ debug("Loading %s version $VERSION", __PACKAGE__);
         dump
         include
         json
-        api
 
 ));
 
@@ -245,7 +244,27 @@ sub parse_fh {
             debug("add CR at EOF");
             $html.=$/ unless $html=~/(?:\r?\n|\r)$/;
         }
-
+        
+        
+        #  Ugly hack to fix @ type attribute names in Alpine and Vue. Need to be done in the Parser properly at
+        #  some stage
+        #
+        if (my $attr_convert=$WEBDYNE_ALPINE_VUE_ATTRIBUTE_HACK_ENABLE) {
+            if ($html =~ s{
+                (<\s*[\w:-]+             # match the start of an HTML tag
+                (?:\s+[^>]*?)?)          # non-greedy match of attributes
+                \s@([\w\.-]+)            # match attribute like @click or @keydown.enter
+                (\s*=\s*["'][^"']*["'])  # match = "value" or = 'value'
+            }{
+                "$1 ${attr_convert}:$2$3"
+            }egx) { #" # Fake quote to re-enable syntax highlighting
+                debug("match on AlpineJS attribute syntax hack, line now: $line");
+            }
+            else {
+                debug('no match on AlpineJS attribute syntax hack')
+            }
+        }
+        
 
         #  Done, return HTML
         #
@@ -290,6 +309,20 @@ sub tag_parse {
     #  Get the tag, tag attr
     #
     my ($tag, $attr_hr)=@_;
+    
+    
+    #  Get rid of attribute multi-line value if the start with subst cars
+    #
+    foreach my $attr (keys %{$attr_hr}) {
+        my $attr_value=$attr_hr->{$attr};
+        if ($attr_value=~/([\$@%!+*^])\{(\1?)/) {
+            #  Get rid of cr/lf
+            if ($attr_value=~s/\s*[\r\n]+\s*/ /g) {
+                $attr_hr->{$attr}=$attr_value;
+            }
+        }
+    }
+    #map { $attr_hr->{$_}=($attr_hr->{$_}=~s/\s*[\r\n]+\s*/ /gr) } keys %{$attr_hr};
 
 
     #  Debug
@@ -450,13 +483,33 @@ sub tag_parse {
 
 
     }
-
-
-    #  Insert line number if possible
+    
+    
+    #  Do we have a HTML::Element object ?
     #
-    debug("insert line_no: %s, line_no_start: %s into object ref $html_or", @{$self}{qw(_line_no _line_no_start)});
-    debug('tag %s', $html_or->tag()) if (ref($html_or));
-    ref($html_or) && (@{$html_or}{'_line_no', '_line_no_tag_end'}=(@{$self}{qw(_line_no_start _line_no)}));
+    if ((my $ref=ref($html_or)) eq 'HTML::Element') {
+        
+        #  Yes
+        #
+        debug("parse returned $ref object, tag: %s, inserting line no", $html_or->tag());
+        @{$html_or}{'_line_no', '_line_no_tag_end'}=@{$self}{qw(_line_no_start _line_no)};
+        
+        
+    }
+    elsif ($ref && ($ref ne 'WebDyne::HTML::TreeBuilder')) {
+    
+        #  That's weird ..
+        #
+        return err("parse returned $ref object, expected 'WebDyne::HTML::Element'");
+        
+    }
+    else {    
+        
+        #  Text
+        #
+        debug('parse returned text (scalar) object');
+        
+    }
 
 
     #  Returm object ref
@@ -482,6 +535,7 @@ sub block {
 sub script {
 
     my ($self, $method, $tag, $attr_hr, @param)=@_;
+    no warnings 'qw';
     debug("$self script, attr: %s", Dumper($attr_hr));
     my $script_or=$self->$method($tag, $attr_hr, @param);
     if ($attr_hr->{'type'} eq 'application/perl') {
@@ -516,19 +570,6 @@ sub json {
 }
 
 
-sub api {
-
-
-    #  Handle normally but set flag showing we are an <api> page, will optimise differently
-    #
-    my ($self, $method, $tag, @param)=@_;
-    debug("self $self, tag: api, method: $method");
-    $self->{'_webdyne_compact'}=$tag;
-    return $self->$method($tag, @param);
-
-}
-
-
 sub table {
 
 
@@ -555,8 +596,57 @@ sub htmx {
     #
     my ($self, $method, $tag, $attr_hr, @param)=@_;
     debug("self $self, tag: htmx, method: $method, param: %s", Dumper($attr_hr));
-    $self->{'_webdyne_compact'}=$tag if ($attr_hr->{'compact'});
-    return $self->$method($tag, $attr_hr, @param);
+    $self->{'_webdyne_compact'}=$tag if ($attr_hr->{'compact'} || $attr_hr->{'bare'});
+    if (delete $attr_hr->{'perl'}) {
+        my $html_perl_or=$self->$method($tag, $attr_hr);
+        $self->_html_perl_or($html_perl_or);
+        $self->_text_block_tag($tag) unless $self->_text_block_tag();
+        return $html_perl_or;
+    }
+    else {
+        return $self->$method($tag, $attr_hr, @param);
+    }
+
+}
+
+
+sub api {
+
+
+    #  Handle normally but set flag showing we are an <api> page, will optimise differently
+    #
+    my ($self, $method, $tag, $attr_hr, @param)=@_;
+    debug("self $self, tag: api, method: $method");
+    $self->{'_webdyne_compact'}=$tag;
+    if (delete $attr_hr->{'perl'}) {
+        my $html_perl_or=$self->$method($tag, $attr_hr);
+        $self->_html_perl_or($html_perl_or);
+        $self->_text_block_tag($tag) unless $self->_text_block_tag();
+        return $html_perl_or;
+    }
+    else {
+        return $self->$method($tag, $attr_hr, @param);
+    }
+
+}
+
+
+sub json {
+
+
+    #  No special handling needed, just log for debugging purposes
+    #
+    my ($self, $method, $tag, $attr_hr, @param)=@_;
+    debug("self $self, tag: api, method: $method");
+    if (delete $attr_hr->{'perl'}) {
+        my $html_perl_or=$self->$method($tag, $attr_hr);
+        $self->_html_perl_or($html_perl_or);
+        $self->_text_block_tag($tag) unless $self->_text_block_tag();
+        return $html_perl_or;
+    }
+    else {
+        return $self->$method($tag, $attr_hr, @param);
+    }
 
 }
 
@@ -577,7 +667,7 @@ sub perl {
     #  Special handling of perl tag
     #
     my ($self, $method, $tag, $attr_hr)=@_;
-    debug("$tag $method");
+    debug("tag: *$tag* method: $method");
 
 
     #  Call SUPER method, check if inline
@@ -587,6 +677,7 @@ sub perl {
     if ($tag eq 'perl') {
         unless (grep {exists $attr_hr->{$_}} qw(package method handler)) {
             $html_perl_or->attr(inline => ++$inline);
+            debug("inline: $inline");
         }
     }
     if ($inline) {
@@ -595,7 +686,7 @@ sub perl {
         #  added here
         #
         $self->_html_perl_or($html_perl_or);
-        $self->_text_block_tag('perl') unless $self->_text_block_tag();
+        $self->_text_block_tag($tag) unless $self->_text_block_tag();
 
 
         #  And return it
@@ -880,13 +971,14 @@ sub text {
 
     #  Are we in an inline perl block ?
     #
-    if ($self->_text_block_tag() eq 'perl') {
+    #if ($self->_text_block_tag() eq 'perl') {
+    if (grep { $self->_text_block_tag() eq $_ } qw(perl htmx api json)) {
 
 
         #  Yes. We have inline perl code, not text. Just add to perl attribute, which
         #  is treated specially when rendering
         #
-        debug('in <per> tag, appending text to <perl> block');
+        debug('in <perl> tag, appending text to <perl> block');
         my $html_perl_or=$self->_html_perl_or();
         $html_perl_or->{'perl'}.=$text;
         $html_perl_or->{'_line_no_tag_end'}=$self->{'_line_no'};
@@ -936,25 +1028,50 @@ sub text {
 
             #  Meeds subst. Get rid of cr's at start and end of text after a <perl> tag, stuffs up formatting in <pre> sections
             #
-            debug("found subst tag line_no_start: %s, line_no: %s, text '$text'", @{$self}{qw(_line_no_start _line_no)});
-            my @cr=($text=~/\n/g);
-            if (my $html_or=$self->{'_pos'}) {
-                debug("parent %s", $html_or->tag());
-                if (($html_or->tag() eq 'perl') && !$html_or->attr('inline')) {
-                    debug('hit !');
+            debug("found subst tag line_no_start: %s, line_no: %s, text '$text', script_stack: %s, %s", @{$self}{qw(_line_no_start _line_no _script_stack)}, Dumper($self->{'_script_stack'}));
 
-                    #  Why did I comment this out ?
-                    #
-                    #$text=~s/^\n//;
-                    #$text=~s/\n$//;
-                }
+            #my @cr=($text=~/\n/g);
+            #if (my $html_or=$self->{'_pos'}) {
+            #    debug("parent %s", $html_or->tag());
+            #    if (($html_or->tag() eq 'perl') && !$html_or->attr('inline')) {
+            #        debug('hit !');
+            #
+            #        #  Why did I comment this out ?
+            #        #
+            #        #$text=~s/^\n//;
+            #        #$text=~s/\n$//;
+            #    }
+            #}
+            
+            #  If in <script> block we probably don't want to be running subst over strings we find because ${varname} is valid Javascript 
+            #  syntax and we shouldn't reallt ever need to subs in a script block (user can pass params to script). Nevertheless we'll give
+            #  them a subst option if they want
+            #
+            my $html_or=$self->{'_pos'};
+            my %attr=$html_or->all_external_attr();
+            
+            
+            #  Gets a bit ugly for <script> tags. If <script> is Javascript *dont* run subst over it unless the user insists.
+            #
+            #  First - are we inside a script tag. Easiest way is to see if in script_stack
+            #
+            if (@{$self->{'_script_stack'}} && (!$attr{'type'} || $WEBDYNE_SCRIPT_TYPE_EXECUTABLE_HR->{$attr{'type'}}) && !$attr{'subst'}) {
+            #if (@{$self->{'_script_stack'}} && !$attr{'subst'}) {
+                debug("script_stack present, bypass susbt: parent %s, attr: %s", $html_or->tag(), Dumper(\%attr));
+                $self->tag_parse('SUPER::text', $text)
+            
             }
-
-            my $html_or=HTML::Element->new('subst');
-            debug("insert line_no: %s, line_no_tag_end: %s into object ref $html_or for text $text, cr %s", @{$self}{qw(_line_no_start _line_no)}, scalar @cr);
-            @{$html_or}{'_line_no', '_line_no_tag_end'}=@{$self}{qw(_line_no _line_no)};
-            $html_or->push_content($text);
-            $self->tag_parse('SUPER::text', $html_or)
+            elsif ($attr{'nosubst'}) {
+                debug('nosubst attr found in attr: %s', Dumper(\%attr));
+                $self->tag_parse('SUPER::text', $text)
+            }
+            else {
+                my $html_subst_or=HTML::Element->new('subst');
+                debug("insert line_no: %s, line_no_tag_end: %s into object ref $html_subst_or for text $text", @{$self}{qw(_line_no_start _line_no)});
+                @{$html_subst_or}{'_line_no', '_line_no_tag_end'}=@{$self}{qw(_line_no _line_no)};
+                $html_subst_or->push_content($text);
+                $self->tag_parse('SUPER::text', $html_subst_or)
+            }
         }
         else {
 
@@ -997,6 +1114,7 @@ sub comment {
 sub start_html {
 
     my ($self, $method, $tag, $attr_hr)=@_;
+    debug("self: $self, method: $method, tag: $tag, attr_hr: %s", Dumper($attr_hr));
     push @{$self->{'_html_wedge_ar'}}, (my $html=$self->{'_html_tiny_or'}->$tag($attr_hr));
     return $self;
 
@@ -1100,6 +1218,7 @@ sub div {
 sub _get_set {
 
     my ($key, $self, $value)=@_;
+    debug("$self, key: $key, value: $value, store: %s", ($self->{$key} || '<none>'));
     return (@_==3) ? $self->{$key}=$value : $self->{$key}
     
 }

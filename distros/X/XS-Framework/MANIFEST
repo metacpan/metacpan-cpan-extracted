@@ -50,7 +50,6 @@ lib/XS/STL/ErrorCategory.pod
 lib/XS/STL/ErrorCode.pm
 lib/XS/STL/ErrorCode.pod
 Makefile.PL
-Makefile.test
 MANIFEST			This list of files
 misc/leak1.plx
 misc/mytest.plx
@@ -212,8 +211,5 @@ t/upgrade.t
 typemap
 typemap32
 typemap64
-XS-Framework-1.6.1/META.json
-XS-Framework-1.6.1/META.yml
-XS-Framework.pro
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

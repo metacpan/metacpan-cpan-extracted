@@ -32,11 +32,13 @@ use Pod::Usage;
 use Data::Dumper;
 use Storable;
 use FindBin qw($RealBin $Script);
+$Data::Dumper::Indent=1;
+$Data::Dumper::Sortkeys=1;
 
 
 #  Version Info, must be all one line for MakeMaker, CPAN.
 #
-$VERSION='2.020';
+$VERSION='2.026';
 
 
 #  Run main
@@ -77,7 +79,6 @@ sub main {
 
     #  Dump
     #
-    $Data::Dumper::Indent=1;
     print Data::Dumper::Dumper($data_ar);
 
 

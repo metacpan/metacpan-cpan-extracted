@@ -39,7 +39,7 @@ use WebDyne::Request::PSGI::Constant;
 
 #  Version information
 #
-$VERSION='2.020';
+$VERSION='2.026';
 
 
 #  API file name cache
@@ -285,7 +285,7 @@ sub handler {
         }
     }
     debug("calling handler: $handler");
-    
+
 
     #  Call handler and evaluate results
     #

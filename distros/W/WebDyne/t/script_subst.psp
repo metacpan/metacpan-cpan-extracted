@@ -1,0 +1,19 @@
+<start_html>
+<script>
+    const foo=`?source=${encodeURIComponent(filename)}`
+</script>
+<script type="module">
+    const foo=`?source=${encodeURIComponent(filename)}`
+</script>
+<script type="application/javascript">
+    const foo=`?source=${encodeURIComponent(filename)}`
+</script>
+<script type="text/javascript">
+    const foo=`?source=${encodeURIComponent(filename)}`
+</script>
+<script type="text/plain">
+subst +{subst}
+</script>
+<script type="text/plain" nosubst>
+nosubst +{nosubst}
+</script>

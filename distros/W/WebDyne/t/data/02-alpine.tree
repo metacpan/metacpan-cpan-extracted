@@ -1,0 +1,9 @@
+<html> @0 (IMPLICIT)
+  <head> @0.0 (IMPLICIT)
+    <script defer="defer" src="//unpkg.com/alpinejs"> @0.0.0
+  <body> @0.1 (IMPLICIT)
+    <div x-data="{ open: false }"> @0.1.0
+      <button @click="open = true"> @0.1.0.0
+        "Expand"
+      <span x-show="open"> @0.1.0.1
+        " Content... "

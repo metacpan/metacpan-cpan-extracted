@@ -28,6 +28,7 @@ my @files = (
     't/15-mutation.t',
     't/16-skip_dir.t',
     't/99-sanity.t',
+    't/lib/Helper.pm',
     't/lib/SchemaParser.pm',
     't/tests/add_resource/foo.json',
     't/tests/add_resource/remotes/draft2019-09/remote4.json',

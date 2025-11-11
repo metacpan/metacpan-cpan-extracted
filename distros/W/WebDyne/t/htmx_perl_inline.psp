@@ -1,0 +1,6 @@
+<htmx bare=1 perl>
+return <<'END';
+Hello world
+END
+;
+</htmx>

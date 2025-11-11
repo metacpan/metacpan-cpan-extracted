@@ -1,7 +1,7 @@
 package Mojo::Util::Collection::Comparator;
 use Mojo::Base -base;
 
-our $VERSION = '0.0.11';
+our $VERSION = '0.0.13';
 
 use List::Util qw(all any none);
 

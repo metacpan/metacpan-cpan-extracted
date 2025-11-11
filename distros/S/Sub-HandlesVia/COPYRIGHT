@@ -57,6 +57,7 @@ Files: Changes
  t/40mite/scalar.t
  t/40mite/string.t
  t/50objectpad.t
+ t/96foreach.t
  t/99headtail.t
 Copyright: Copyright 2025 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
@@ -109,7 +110,6 @@ Files: dist.ini
  t/61moosemetagubbins.t
  t/62mousemetagubbins.t
  t/94cmp.t
- t/96foreach.t
 Copyright: Copyright 2022 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 

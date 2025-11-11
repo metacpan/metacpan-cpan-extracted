@@ -5,7 +5,7 @@ use warnings;
 package Sub::HandlesVia::HandlerLibrary::Hash;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.050003';
+our $VERSION   = '0.050005';
 
 use Sub::HandlesVia::HandlerLibrary;
 our @ISA = 'Sub::HandlesVia::HandlerLibrary';
@@ -412,8 +412,8 @@ sub for_each_key {
 		args      => 1,
 		signature => [CodeRef],
 		usage     => '$coderef',
-		template  => 'for my $shv_key (keys %{$GET}) { &{$ARG}($shv_key) }; $SELF',
-		documentation => 'Chainable method which calls the coderef for each key in the hash, passing just the key to the coderef.',
+		template  => 'for (keys %{$GET}) { &{$ARG}($_) }; $SELF',
+		documentation => 'Chainable method which calls the coderef for each key in the hash, passing just the key to the coderef. The key will also be available as C<< $_ >>.',
 }
 
 sub for_each_value {
@@ -422,8 +422,8 @@ sub for_each_value {
 		args      => 1,
 		signature => [CodeRef],
 		usage     => '$coderef',
-		template  => 'for my $shv_value (values %{$GET}) { &{$ARG}($shv_value) }; $SELF',
-		documentation => 'Chainable method which calls the coderef for each value in the hash, passing just the value to the coderef.',
+		template  => 'for (values %{$GET}) { &{$ARG}($_) }; $SELF',
+		documentation => 'Chainable method which calls the coderef for each value in the hash, passing just the value to the coderef. The value will also be available as C<< $_ >>.',
 }
 
 sub reset {

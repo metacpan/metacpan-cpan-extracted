@@ -4,12 +4,12 @@ use strict;
 use base qw(Pod::Abstract::Filter);
 use Pod::Abstract::BuildNode qw(node);
 
-our $VERSION = '0.20';
+our $VERSION = '0.26';
 
 =head1 NAME
 
-Pod::Abstract::Filter::add_podcmds - paf command to insert explict =pod
-commands before each Pod block in a document.
+Pod::Abstract::Filter::add_podcmds - Insert explict =pod commands
+before each Pod block in a document.
 
 =head1 METHODS
 
@@ -48,11 +48,11 @@ sub filter {
 
 =head1 AUTHOR
 
-Ben Lilburne <bnej@mac.com>
+Ben Lilburne <bnej80@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009 Ben Lilburne
+Copyright (C) 2009-2025 Ben Lilburne
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

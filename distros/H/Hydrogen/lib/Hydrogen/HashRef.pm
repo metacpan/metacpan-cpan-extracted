@@ -8,7 +8,7 @@ use Hydrogen ();
 package Hydrogen::HashRef;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.021000';
+our $VERSION   = '0.021001';
 
 =head1 NAME
 
@@ -16,8 +16,8 @@ Hydrogen::HashRef - a standard library for hashrefs
 
 =head1 VERSION
 
-This documentation is for Hydrogen::HashRef 0.021000,
-which is based on Sub::HandlesVia::HandlerLibrary::Hash 0.050003.
+This documentation is for Hydrogen::HashRef 0.021001,
+which is based on Sub::HandlesVia::HandlerLibrary::Hash 0.050005.
 
 =cut
 
@@ -365,7 +365,7 @@ sub exists {
 
 Additional arguments: B<< CodeRef >>.
 
-Function which calls the coderef for each key in the hash, passing just the key to the coderef.
+Function which calls the coderef for each key in the hash, passing just the key to the coderef. The key will also be available as C<< $_ >>.
 
 =cut
 
@@ -397,7 +397,7 @@ sub for_each_key {
 
         (@_);
     };
-    for my $shv_key ( keys %{$$__REF__} ) { &{ $_[1] }($shv_key) };
+    for ( keys %{$$__REF__} ) { &{ $_[1] }($_) };
     $__REF__;
 }
 
@@ -447,7 +447,7 @@ sub for_each_pair {
 
 Additional arguments: B<< CodeRef >>.
 
-Function which calls the coderef for each value in the hash, passing just the value to the coderef.
+Function which calls the coderef for each value in the hash, passing just the value to the coderef. The value will also be available as C<< $_ >>.
 
 =cut
 
@@ -479,7 +479,7 @@ sub for_each_value {
 
         (@_);
     };
-    for my $shv_value ( values %{$$__REF__} ) { &{ $_[1] }($shv_value) };
+    for ( values %{$$__REF__} ) { &{ $_[1] }($_) };
     $__REF__;
 }
 

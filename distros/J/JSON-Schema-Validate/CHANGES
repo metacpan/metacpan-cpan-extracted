@@ -1,4 +1,106 @@
 Revision history for Perl module JSON::Schema::Validate
 
+v0.3.0 2025-11-11T09:20:18+0900
+    [Error Object Improvements]
+    - Error reporting overhaul:
+        * Error objects (JSON::Schema::Validate::Error) now consistently carry: message,
+          path (instance JSON Pointer), keyword (if known), and schema_pointer
+          (JSON Pointer to the keyword that failed).
+        * Stringification shows "schema_pointer → path: message" when a schema pointer 
+          is available; otherwise "path: message".
+        * More precise messages across keywords (type, const, enum, string 
+          length/pattern, numeric bounds, contains/minContains/ maxContains, 
+          additionalProperties, unevaluated*, dependent*, oneOf/anyOf/allOf/not, content*).
+        * Resolver failures, unresolved $ref/$dynamicRef, and invalid JSON Pointer 
+          fragments now produce explicit, actionable messages (with keyword set to 
+          '$ref' where applicable).
+
+    [CLI]
+    - Introduced jsonvalidate command-line tool (distribution: App::jsonvalidate)
+      supporting:
+        --schema / --instance / --json / --jsonl / --compile / --trace / --register-formats /
+        --content-checks / --ignore-unknown-required-vocab / --max-errors / --normalize /
+        --schema-base
+    - JSON output mode now includes structured errors:
+        { path, message, keyword, schema_pointer }
+
+    [Documentation]
+    - Expanded POD for JSON::Schema::Validate::Error, including constructor,
+      getters/setters, as_string(), as_hash(), and behaviour of overloads.
+
+v0.2.0 2025-11-10T15:30:12+0900
+    [Core Implementation]
+    - Full support for JSON Schema Draft 2020-12, including:
+        * $id / $anchor / $ref with external & fragment resolution,
+        * $dynamicAnchor / $dynamicRef with correct dynamic scope lookup.
+    - Recursion safety implemented via (schema_pointer, instance_address) pairs.
+    - Comprehensive keyword coverage: type (including unions with inline schemas),
+      const, enum, multipleOf (float-tolerant), numeric bounds, length and pattern,
+      prefixItems/items, contains(min/max), uniqueItems, unevaluatedItems,
+      properties / patternProperties / additionalProperties, propertyNames,
+      required / dependentRequired / dependentSchemas, unevaluatedProperties,
+      allOf / anyOf / oneOf / not, and if/then/else.
+    - Unevaluated* keyword handling uses annotation tracking on evaluated nodes
+      (props/items maps), matching spec semantics.
+
+    [New Features]
+    - Optional ahead-of-time compilation:
+        * Enables fast-path validation via closures per schema node.
+        * Use ->compile() or constructor 'compile => 1'.
+        * Indexes anchors / dynamic anchors for constant-time lookup.
+    - Content assertions (RFC 8927):
+        * Enable via ->content_checks() or constructor 'content_assert => 1'.
+        * Supports contentEncoding (built-in base64), contentMediaType,
+          pluggable media decoders, and contentSchema validation.
+        * Ships with 'application/json' decoder/validator.
+    - Built-in format validators:
+        * Activate via ->register_builtin_formats().
+        * Provides validators for date/time/duration (ISO8601), email/idn-email,
+          hostname/idn-hostname, IPv4/IPv6, URI/IRI/URI-reference, UUID,
+          JSON Pointer / Relative JSON Pointer, and regex.
+        * Custom format handlers via ->register_format() or constructor 'format => {}'.
+    - Tracing and introspection:
+        * Enable via ->trace().
+        * Limit / sample with ->trace_limit() and ->trace_sample().
+        * Retrieve via ->get_trace() (returns a copy).
+    - Vocabulary enforcement:
+        * Honors $vocabulary and required entries.
+        * Unknown vocabularies may be ignored via ->ignore_unknown_required_vocab().
+
+    [API Additions]
+    - Constructor options:
+        compile, content_assert, format (hash reference of callbacks),
+        ignore_unknown_required_vocab, max_errors, normalize_instance,
+        trace, trace_limit, trace_sample, vocab_support (hash reference).
+    - Methods:
+        compile(), content_checks(), enable_content_checks(),
+        ignore_unknown_required_vocab(),
+        register_content_decoder(), register_format(),
+        register_media_validator(), set_resolver(), set_vocabulary_support(),
+        trace(), trace_limit(), trace_sample().
+      Accessors: is_* variants and get_trace_limit().
+    - Error handling:
+        ->error() returns the first JSON::Schema::Validate::Error object
+        (stringifies to '"path: message"').
+        ->errors() returns an array reference (up to max_errors).
+
+    [Behavioral Improvements]
+    - Instance normalisation (enabled by default): round-trips values to enforce
+      strict JSON typing distinct from Perl dual values. Can be disabled via
+      'normalize_instance => 0'.
+
+    [Bug Fixes & Polish]
+    - Added missing dependency declarations (thanks Slaven Rezić, GitLab #1).
+    - Numeric strictness now based on B::FLAGS (IOK/NOK) for correct JSON semantics.
+    - UTF-8-aware string lengths via codepoint iteration (not bytes).
+    - All mutator methods return $self for chained configuration.
+
+    [Documentation & Tests]
+    - Expanded POD: constructor options, method semantics, formats, normalisation,
+      vocabulary behaviour, recursion notes, unevaluated* examples.
+    - Test suite now covers: dynamic anchors, external refs, combinators,
+      unevaluated*, content/media assertions, compile vs interpretive modes,
+      trace output, vocabulary validation, and structured errors.
+
 v0.1.0 2025-11-07T11:59:21+0900
 	- Initial version

@@ -59,7 +59,7 @@ use Exporter qw(import);
 #  Version information
 #
 $AUTHORITY='cpan:ASPEER';
-$VERSION='2.020';
+$VERSION='2.026';
 chomp($VERSION_GIT_REF=do { local (@ARGV, $/) = ($_=__FILE__.'.tmp'); <> if -f $_ });
 
 
@@ -1010,7 +1010,8 @@ sub init_class {
 
         #  Debug
         #
-        my $inode=$self->{'_inode'} || 'ANON';    # Anon used when no inode present, eg wdcompile
+        #my $inode=$self->{'_inode'} || 'ANON';    # Was ANON but caused nasty test errors because of memory collisions after many iterations Anon used when no inode present, eg wdcompile
+        my $inode=$self->{'_inode'} || $self->inode();
         my $html_line_no=$data_ar->[WEBDYNE_NODE_LINE_IX];
 
 
@@ -1156,8 +1157,8 @@ sub init_class {
 
         #  Inode
         #
-        my $inode=$self->{'_inode'} || 'ANON';    # Anon used when no inode present, eg wdcompile
-
+        #my $inode=$self->{'_inode'} || 'ANON' # Was ANON - see above Anon used when no inode present, eg wdcompile
+        my $inode=$self->{'_inode'} ||  $self->inode();
 
         #  Get CGI vars
         #
@@ -1378,7 +1379,7 @@ sub init_class {
     #  Store in class name space
     #
     $Package{'_eval_cr'}=\%eval_cr;
-
+    
 }
 
 
@@ -2408,7 +2409,7 @@ sub json {
 
     #  Check we have a handler
     #
-    $attr_hr->{'handler'} ||
+    $attr_hr->{'handler'} || $attr_hr->{'perl'} ||
         return err('no json tag perl handler supplied');
 
 
@@ -2439,7 +2440,7 @@ sub json {
         type => 'application/json',
         %{$attr_hr}
     );
-    delete @attr{qw(package method handler)};
+    delete @attr{qw(perl package method handler)};
 
 
     #  Render and return
@@ -2456,7 +2457,7 @@ sub htmx {
 
     #  Called when we encounter a <htmx> tag
     #
-    my ($self, $data_ar, $attr_hr)=@_;
+    my ($self, $data_ar, $attr_hr, @param)=@_;
     debug("$self rendering htmx tag, data_ar: $data_ar, attr_hr: %s", Dumper($attr_hr));
     
     
@@ -2464,7 +2465,10 @@ sub htmx {
     #
     my $r=$self->r() ||
         return err('unable to get request handler !');
-    my $hx_request=$r->headers_in->{'hx-request'};
+    my $hx_request;
+    foreach my $header (@{$WEBDYNE_HTTP_HEADER_AJAX_AR}) {
+        last if ($hx_request=$r->headers_in->{$header});
+    }
     debug("hx_request header: $hx_request");
     
     
@@ -2482,11 +2486,12 @@ sub htmx {
     #  Check we have a handler
     #
     my $html_sr;
-    if (my $handler=$attr_hr->{'handler'}) {
+    if ((my $handler=$attr_hr->{'handler'}) || $attr_hr->{'perl'}) {
     
     
         #  Return whatever HTML we get back
         #
+        $handler ||= '*perl*';
         debug("htmx rendering with handler $handler");
         $html_sr=$self->perl($data_ar, $attr_hr) ||
             return err();
@@ -2533,19 +2538,28 @@ sub api {
     #  Called when we encounter a <api> tag
     #
     my ($self, $data_ar, $attr_hr)=@_;
-    debug("$self rendering api tag in block $data_ar, attr %s", $attr_hr);
+    debug("$self rendering api tag in block $data_ar, attr %s", Dumper($attr_hr));
     
+    
+    #  Perl ?
+    #
+    my %attr=%{$attr_hr};
+    if (my $perl=$attr{'perl'}) {
+        $attr{'name'}='perl'
+    }
     
     #  Need Router::Simple. Build params needed allowing for synonyms
     #
     require Router::Simple;
     my $rest_or=$self->{'_rest_or'} ||= Router::Simple->new();
     my @route=(grep {$_}
-        @{$attr_hr}{qw(name method handler pattern match data dest destination)}
+        #@{$attr_hr}{qw(name method handler pattern match data dest destination)}
+        @attr{qw(name method handler pattern match data dest destination)}
     );
     $route[2] ||= undef;
     my @option=(grep ${_},
-        @{$attr_hr}{qw(option options constraint constraints)}
+        #@{$attr_hr}{qw(option options constraint constraints)}
+        @attr{qw(option options constraint constraints)}
     );
     debug('route param: %s, %s', Dumper(\@route, \@option));
     $rest_or->connect(@route, $option[0]);
@@ -2569,7 +2583,8 @@ sub api {
         #  Run the code in perl routine specifying it is JSON, get return ref of
         #  some kind
         #
-        my $json_xr=$self->perl(undef, {json => 1, %{$attr_hr}, param=>$match_hr }) ||
+        #my $json_xr=$self->perl(undef, {json => 1, %{$attr_hr}, param=>$match_hr }) ||
+        my $json_xr=$self->perl(undef, {json => 1, %attr, param=>$match_hr }) ||
             return err();
         debug("json_xr %s", Dumper($json_xr));
 
@@ -2624,7 +2639,8 @@ sub perl {
 
     #  Get current inode
     #
-    my $inode=$self->{'_inode'} || 'ANON';
+    #my $inode=$self->{'_inode'} || 'ANON';
+    my $inode=$self->{'_inode'} ||  $self->inode();
 
 
     #  Load any modules spec'd by require attribute
@@ -2785,7 +2801,8 @@ sub eval_require {
 
     #  Inode ?
     #
-    my $inode=$self->{'_inode'} || 'ANON';
+    #my $inode=$self->{'_inode'} || 'ANON';
+    my $inode=$self->{'_inode'} ||  $self->inode();
 
 
     #  Eval cr
@@ -2925,7 +2942,8 @@ sub perl_init {
     #  Init the perl package space for this inode
     #
     my ($self, $perl_ar, $perl_debug_ar)=@_;
-    my $inode=$self->{'_inode'} || 'ANON';    #ANON used when run from command line
+    #my $inode=$self->{'_inode'} || 'ANON';    #ANON used when run from command line
+    my $inode=$self->{'_inode'} ||  $self->inode();
 
 
     #  Prep package space
@@ -3244,199 +3262,241 @@ sub include {
 
     #  Any param must supply a file name as an attribute
     #
-    my $fn=$param_hr->{'file'} ||
+    my $fn_ar=$param_hr->{'file'} ||
         return err('no file name supplied with include tag');
-    my $pn=File::Spec->rel2abs($fn, $dn);
-
-
-    #  Check what user wants to do
+    unless (ref($fn_ar) eq 'ARRAY') {
+        $fn_ar=[$fn_ar]
+    }
+    debug('fn_ar: %s', Dumper($fn_ar));
+    
+    
+    #  Array for HTML results
     #
-    if (my $node=(grep {exists $param_hr->{$_}} qw(head body))[0]) {
-
-
-        #  They want to include the head or body section of an existing pure HTML
-        #  file.
+    my @html;
+    my $count=0;
+    
+    
+    #  Iterate
+    #
+    foreach my $fn (@{$fn_ar}) {
+    
+    
+        #  Get full path name
         #
-        debug('head or body render');
-        my %option=(
+        my $pn=File::Spec->rel2abs($fn, $dn);
+        $count++;
+        debug("processing fn: $fn, pn: $pn");
 
-            nofilter => 1,
-            noperl   => 1,
-            stage0   => 1,
-            srce     => $pn,
-            
-            #  Note this - don't want implicit <p> tags for included files at body start,
-            #  i.e. <body><p>Some Text in included file may end up as <body><p><p> in initiator file 
-            implicit_body_p_tag => 0,
 
-        );
-        
-        
-        #  Bring in WebDyne::Compile - going to need it
+        #  Check what user wants to do
         #
-        eval {require WebDyne::Compile}
-            || return $self->err_html(
-            errsubst('unable to load WebDyne:Compile, %s', $@ || 'undefined error'));
-        
-
-        #  compile spec'd file
-        #
-        my $container_ar=$self->compile(\%option) ||
-            return err();
-        #$self->data_ar_err_pop();
-        my $block_data_ar=$container_ar->[1];
-        debug('compiled to data_ar %s', Dumper($block_data_ar));
-
-        #  Find the head or body tag
-        #
-        my $block_ar=$self->find_node(
-            {
-
-                data_ar => $block_data_ar,
-                tag     => $node,
-
-            }) || return err();
-        @{$block_ar} ||
-            return err("unable to find block '$node' in include file '$fn'");
-        debug('found block_ar %s', Dumper($block_ar));
+        if (my $node=(grep {exists $param_hr->{$_}} qw(head body))[0]) {
 
 
-        #  Find_node returns array of blocks that match - we only want first
-        #
-        $block_ar=$block_ar->[0];
-
-
-        #  Need to finish compiling now found
-        #
-        $self->optimise_one($block_ar) || return err();
-        $self->optimise_two($block_ar) || return err();
-        debug('optimised data now %s', Dumper($block_ar));
-
-
-        #  Need to encapsulate into <block display=1> tag, so alter tag name, attr
-        #
-        $block_ar->[WEBDYNE_NODE_NAME_IX]='block';
-        $block_ar->[WEBDYNE_NODE_ATTR_IX]={name => $node, display => 1};
-
-
-        #  Incorporate into top level data so we don't have to do this again if
-        #  called from tag
-        #
-        @{$data_ar}=@{$block_ar} if ($data_ar && !$param_hr->{'nocache'});
-
-
-        #  Render included block and return after stripping <p></p>
-        #
-        my $html_sr=$self->render({data => $block_ar->[$WEBDYNE_NODE_CHLD_IX], param => $param_hr->{'param'}}) || 
-            return err();
-        return $html_sr;
-        
-
-    }
-    elsif (my $block=$param_hr->{'block'}) {
-
-        #  Wants to include a paticular block from a psp library file
-        #
-        debug('block render');
-        my %option=(
-
-            nofilter 	=> 1,
-            #noperl     => 1,
-            stage1 	=> 1,
-            srce   	=> $pn,
-            implicit_body_p_tag => 0,
-
-        );
-
-
-        #  Bring in WebDyne::Compile - going to need it
-        #
-        eval {require WebDyne::Compile}
-            || return $self->err_html(
-            errsubst('unable to load WebDyne:Compile, %s', $@ || 'undefined error'));
-
-
-        #  compile spec'd file
-        #
-        my $container_ar=$self->compile(\%option) ||
-            return err();
-        my $block_data_ar=$container_ar->[1];
-        debug('block data %s', Dumper($block_data_ar));
-
-
-        #  Find the block node with name we want
-        #
-        debug("looking for block name $block");
-        my $block_ar=$self->find_node(
-            {
-
-                data_ar => $block_data_ar,
-                tag     => 'block',
-                attr_hr => {name => $block},
-
-            }) || return err();
-        @{$block_ar} ||
-            return err("unable to find block '$block' in include file '$fn'");
-        debug('found block_ar %s', Dumper($block_ar));
-
-
-        #  Find_node returns array of blocks that match - we only want first
-        #
-        $block_ar=$block_ar->[0];
-
-
-        #  Set to attr always display
-        #
-        $block_ar->[$WEBDYNE_NODE_ATTR_IX]{'display'}=1;
-
-
-        #  Incorporate into top level data so we don't have to do this again if
-        #  called from tag
-        #
-        #  COMMENTED OUT FOR NOW: Doesn't work in terms of stripping <p></p> tags
-        #
-        @{$data_ar}=@{$block_ar} if ($data_ar && !$param_hr->{'nocache'});
-        #@{$data_ar}=@{$block_ar} if $data_ar;
-
-
-        #  We don't want to render <block> tags, so start at
-        #  child of results [WEBDYNE_NODE_CHLD_IX].
-        #
-        debug('calling render');
-        my $html_sr=$self->render({data => $block_ar->[$WEBDYNE_NODE_CHLD_IX], param => ($param_hr->{'param'} || $param_data_hr)}) || 
-            return err();
-        return $html_sr;
-
-
-    }
-    else {
-
-
-        #  Plain vanilla file include, no mods
-        #
-        debug('vanilla file include');
-        my $fh=IO::File->new($pn, O_RDONLY) || return err("unable to open file '$fn' for read, $!");
-        local $/;
-        my $html = <$fh>;
-        $fh->close();
-        
-        
-        #  Need to create fake <block> tag to hold this if want to cache
-        #
-        if ($data_ar && !$param_hr->{'nocache'}) {
-        
-            #  Yes, want to cache this file, create fake block tag and force display
+            #  They want to include the head or body section of an existing pure HTML
+            #  file.
             #
-            my @block=('block', { name=>'file', display=>1 }, [$html], undef, 1, 1, \$pn);
-            @{$data_ar}=@block;
-            
-        }
-        
-        #  And return HTML
-        #
-        return \$html;
+            debug('head or body render');
+            my %option=(
 
+                nofilter => 1,
+                noperl   => 1,
+                stage0   => 1,
+                srce     => $pn,
+                
+                #  Note this - don't want implicit <p> tags for included files at body start,
+                #  i.e. <body><p>Some Text in included file may end up as <body><p><p> in initiator file 
+                implicit_body_p_tag => 0,
+
+            );
+            
+            
+            #  Bring in WebDyne::Compile - going to need it
+            #
+            eval {require WebDyne::Compile}
+                || return $self->err_html(
+                errsubst('unable to load WebDyne:Compile, %s', $@ || 'undefined error'));
+            
+
+            #  compile spec'd file
+            #
+            my $container_ar=$self->compile(\%option) ||
+                return err();
+            #$self->data_ar_err_pop();
+            my $block_data_ar=$container_ar->[1];
+            debug('compiled to data_ar %s', Dumper($block_data_ar));
+
+            #  Find the head or body tag
+            #
+            my $block_ar=$self->find_node(
+                {
+
+                    data_ar => $block_data_ar,
+                    tag     => $node,
+
+                }) || return err();
+            @{$block_ar} ||
+                return err("unable to find block '$node' in include file '$fn'");
+            debug('found block_ar %s', Dumper($block_ar));
+
+
+            #  Find_node returns array of blocks that match - we only want first
+            #
+            $block_ar=$block_ar->[0];
+
+
+            #  Need to finish compiling now found
+            #
+            $self->optimise_one($block_ar) || return err();
+            $self->optimise_two($block_ar) || return err();
+            debug('optimised data now %s', Dumper($block_ar));
+
+
+            #  Need to encapsulate into <block display=1> tag, so alter tag name, attr
+            #
+            $block_ar->[WEBDYNE_NODE_NAME_IX]='block';
+            $block_ar->[WEBDYNE_NODE_ATTR_IX]={name => $node, display => 1};
+
+
+            #  Incorporate into top level data so we don't have to do this again if
+            #  called from tag
+            #
+            @{$data_ar}=@{$block_ar} if ($data_ar && !$param_hr->{'nocache'});
+
+
+            #  Render included block and return after stripping <p></p>
+            #
+            my $html_sr=$self->render({data => $block_ar->[$WEBDYNE_NODE_CHLD_IX], param => $param_hr->{'param'}}) || 
+                return err();
+            #return $html_sr;
+            push @html, ${$html_sr}
+            
+
+        }
+        elsif (my $block=$param_hr->{'block'}) {
+
+            #  Wants to include a paticular block from a psp library file
+            #
+            debug('block render');
+            my %option=(
+
+                nofilter 	=> 1,
+                #noperl     => 1,
+                stage1 	=> 1,
+                srce   	=> $pn,
+                implicit_body_p_tag => 0,
+
+            );
+
+
+            #  Bring in WebDyne::Compile - going to need it
+            #
+            eval {require WebDyne::Compile}
+                || return $self->err_html(
+                errsubst('unable to load WebDyne:Compile, %s', $@ || 'undefined error'));
+
+
+            #  compile spec'd file
+            #
+            my $container_ar=$self->compile(\%option) ||
+                return err();
+            my $block_data_ar=$container_ar->[1];
+            debug('block data %s', Dumper($block_data_ar));
+
+
+            #  Find the block node with name we want
+            #
+            debug("looking for block name $block");
+            my $block_ar=$self->find_node(
+                {
+
+                    data_ar => $block_data_ar,
+                    tag     => 'block',
+                    attr_hr => {name => $block},
+
+                }) || return err();
+            @{$block_ar} ||
+                return err("unable to find block '$block' in include file '$fn'");
+            debug('found block_ar %s', Dumper($block_ar));
+
+
+            #  Find_node returns array of blocks that match - we only want first
+            #
+            $block_ar=$block_ar->[0];
+
+
+            #  Set to attr always display
+            #
+            $block_ar->[$WEBDYNE_NODE_ATTR_IX]{'display'}=1;
+
+
+            #  Incorporate into top level data so we don't have to do this again if
+            #  called from tag
+            #
+            #  COMMENTED OUT FOR NOW: Doesn't work in terms of stripping <p></p> tags
+            #
+            @{$data_ar}=@{$block_ar} if ($data_ar && !$param_hr->{'nocache'});
+            #@{$data_ar}=@{$block_ar} if $data_ar;
+
+
+            #  We don't want to render <block> tags, so start at
+            #  child of results [WEBDYNE_NODE_CHLD_IX].
+            #
+            debug('calling render');
+            my $html_sr=$self->render({data => $block_ar->[$WEBDYNE_NODE_CHLD_IX], param => ($param_hr->{'param'} || $param_data_hr)}) || 
+                return err();
+            #return $html_sr;
+            push @html, ${$html_sr};
+
+
+        }
+        else {
+
+
+            #  Plain vanilla file include, no mods
+            #
+            debug('vanilla file include');
+            my $fh=IO::File->new($pn, O_RDONLY) || return err("unable to open file '$fn' for read, $!");
+            local $/;
+            my $html = <$fh>;
+            $fh->close();
+            
+
+            #  Wrap ?
+            #
+            if (my $tag=$param_hr->{'wrap'}) {
+                debug("wrapping in tag: $tag");
+                my $html_or=HTML::Element->new($tag);
+                $html_or->push_content($html);
+                $html=$html_or->as_HTML();
+            }
+            
+            
+            #  Need to create fake <block> tag to hold this if want to cache
+            #
+            if ($data_ar && !$param_hr->{'nocache'}) {
+            
+                #  Yes, want to cache this file, create fake block tag and force display
+                #
+                my @block=('block', { name=>"file_${count}", display=>1 }, [$html], undef, 1, 1, \$pn);
+                push @{$data_ar}, \@block;
+                
+            }
+            
+            
+            #  And return HTML
+            #
+            #return \$html;
+            push @html, $html;
+
+        }
     }
+
+    #  Done
+    #
+    my $html=join(undef, grep {$_} @html);
+    debug("returning html: $html");
+    return \$html;
 
 }
 
@@ -3851,15 +3911,6 @@ sub cwd {
 }
 
 
-sub cwd0 {
-
-    #  Return cwd of current psp file
-    #
-    return (File::Spec->splitpath(shift()->{'_r'}->filename()))[1] || getcwd();
-
-}
-
-
 sub filename {
 
     #  Return the full filename from the request handler
@@ -4077,7 +4128,9 @@ sub inode {
     #  Return inode name
     #
     my $self=shift();
-    @_ ? $self->{'_inode'}=shift() : $self->{'_inode'};
+    @_ ? $self->{'_inode'}=shift() : ($self->{'_inode'} ||= do {
+         md5_hex( $self->{'_r'} ? $self->{'_r'}->{'filename'} : $self.rand() ) 
+    });
 
 }
 

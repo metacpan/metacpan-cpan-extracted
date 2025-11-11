@@ -39,6 +39,7 @@
          "requires" : {
             "Dancer2" : "0.207",
             "Log::Report" : "1.42",
+            "Log::Report::Template" : "0",
             "Scalar::Util" : "0"
          }
       },
@@ -51,6 +52,9 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/markov2/perl5-Dancer2-Plugin-LogReport/issues"
+      },
       "homepage" : "http://perl.overmeer.net/CPAN/",
       "repository" : {
          "type" : "git",
@@ -58,7 +62,7 @@
          "web" : "https://github.com/markov2/perl5-Dancer2-Plugin-LogReport"
       }
    },
-   "version" : "2.01",
+   "version" : "2.02",
    "x_oodist" : {
       "email" : "markov@cpan.org",
       "first_year" : 2015,

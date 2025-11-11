@@ -6,7 +6,7 @@ use Pod::Abstract::Node;
 use Data::Dumper;
 use base qw(Pod::Parser);
 
-our $VERSION = '0.20';
+our $VERSION = '0.26';
 
 =head1 NAME
 
@@ -15,9 +15,10 @@ Pod::Abstract::Parser - Internal Parser class of Pod::Abstract.
 =head1 DESCRIPTION
 
 This is a C<Pod::Parser> subclass, used by C<Pod::Abstract> to convert Pod
-text into a Node tree. You do not need to use this class yourself, the
-C<Pod::Abstract> class will do the work of creating the parser and running
-it for you.
+text into a Node tree.
+
+Use this class via the L<Pod::Abstract> class which has "load" methods
+provided.
 
 =head1 METHODS
 
@@ -26,7 +27,11 @@ it for you.
  Pod::Abstract::Parser->new( $pod_abstract );
 
 Requires a Pod::Abstract object to load Pod data into. Should only be
-called internally by Pod::Abstract.
+called internally by L<Pod::Abstract>.
+
+This is a subclass of L<Pod::Parser> and uses that class to handle all basic Pod
+parsing, but implements the additional rules from L<perlpodspec> that require
+more context.
 
 =cut
 
@@ -72,12 +77,15 @@ my %section_commands = (
     'head2' => [ 'head2', 'head1' ],
     'head3' => [ 'head3', 'head2', 'head1' ],
     'head4' => [ 'head4', 'head3', 'head2', 'head1' ],
+    'head5' => [ 'head5', 'head4', 'head3', 'head2', 'head1' ],
+    'head6' => [ 'head6', 'head5', 'head4', 'head3', 'head2', 'head1' ],
     'over'  => [ '<back' ],
     'item'  => [ 'item', 'back' ],
     'begin' => [ '<end' ],
     );
 
-# Don't parse anything inside these.
+# Don't parse anything inside these. But there are some special cases where you
+# might need to - see "parse_me"
 my %no_parse = (
     'begin' => 1,
     'for' => 1,
@@ -104,7 +112,7 @@ sub command {
         # Treat as non-pod - i.e, verbatim program text block.
         my $element_node = Pod::Abstract::Node->new(
             type => "#cut",
-            body => "=$command $paragraph$p_break",
+            body => ($paragraph ? "=$command $paragraph$p_break" : "=$command$p_break"),
             );
         my $top = $cmd_stack->[$#$cmd_stack];
         $top->push($element_node);
@@ -152,13 +160,28 @@ sub command {
             $attr_node = Pod::Abstract::Node->new(
                 type => '@attribute',
                 );
+            $paragraph =~ s/[\s\n\r]+/ /g;
             my $pt = $self->parse_text($paragraph);
             $self->load_pt($attr_node, $pt);
             $attr{$attr_name} = $attr_node;
             $attr{body_attr} = $attr_name;
-        } elsif($paragraph =~ m/^\:/) {
+        } elsif($command =~ m/^(begin|for)$/ && $paragraph =~ m/^\:/) {
+            # In the case of begin/for, the format name is the first word and if
+            # it begins with : then the internal POD should be parsed.
             $attr{parse_me} = 1;
         }
+
+        my $for_para = undef;
+        if($command eq 'for') {
+            # Special case for =for - POD rules are nonsense, so the first
+            # *word* is the formatter (we will treat as body), and the
+            # following words are either a child text, or possibly interior
+            # sequences that need to be parsed.
+            my ($formatter, $rest) = split /\s/,$paragraph,2;
+            $paragraph = $formatter;
+            $for_para = $rest;
+        }
+
         
         my $element_node = Pod::Abstract::Node->new(
             type => $command,
@@ -166,6 +189,22 @@ sub command {
             p_break => $p_break,
             %attr,
             );
+
+        if( $command eq 'for' && $for_para ) {
+            # Special handling for =for - the "paragraph" has been split from
+            # the formatter, and may or may not need parsing.
+            if( $attr{parse_me} ) {
+                my $pt = $self->parse_text($for_para);
+                $self->load_pt($element_node, $pt);
+            } else {
+                my $t_node = Pod::Abstract::Node->new(
+                    type => ':text',
+                    body => $for_para,
+                    );
+                $element_node->push($t_node);
+            }
+        }
+
         if($pull) {
             $pull->param('close_element', $element_node);
         } else {
@@ -180,6 +219,40 @@ sub command {
     
     $self->{cmd_stack} = $cmd_stack;
 }
+
+=head2 verbatim
+
+In general, a verbatim node is created as any indented text in a POD block.
+However, there's a special case which is that -
+
+=over
+
+=item *
+
+If we are in a "begin/end" block, that's by default not parsed, and this should
+be text, not verbatim.
+
+=item *
+
+B<But> if we are in a parsed begin/end block (C<parse_me>) it should still be a
+verbatim node.
+
+=back
+
+The behaviour here is very much a DWIM - if you're in a non-parsed block this
+will interpret it correctly even though C<Pod::Parser> will tell you it's a
+verbatim. If you're in a parsed block it will be a C<:text>.
+
+ This would be verbatim.
+
+ =begin example
+
+ But if this command was at the start of the line, this would be non-parsed
+ and would instead be a text node.
+
+ =end
+
+=cut
 
 sub verbatim {
     my ($self, $paragraph, $line_num) = @_;
@@ -212,6 +285,19 @@ sub preprocess_paragraph {
     my $top = $cmd_stack->[$#$cmd_stack];
     $top->push($element_node);
 }
+
+=head2 textblock
+
+Textblock handling as C<Pod::Parser> class - we are keeping a command stack
+which lets us know if we should parse the interior sequences of the text block -
+the C<< B<interior sequences> >> style commands. In some cases L<perlpodspec>
+requires them to be ignored, and in some cases they should be parsed.
+
+The C<%no_parse> hash defines commands that generally shouldn't be parsed, but
+the command parser may add a parameter C<parse_me> to the command which will
+cause their text to be parsed as normal POD text.
+
+=cut
 
 sub textblock {
     my ($self, $paragraph, $line_num) = @_;
@@ -290,11 +376,11 @@ sub end_pod {
 
 =head1 AUTHOR
 
-Ben Lilburne <bnej@mac.com>
+Ben Lilburne <bnej80@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009 Ben Lilburne
+Copyright (C) 2009-2025 Ben Lilburne
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

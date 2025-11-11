@@ -7,7 +7,7 @@ use Pod::Abstract::Serial;
 
 use Scalar::Util qw(weaken);
 
-our $VERSION = '0.20';
+our $VERSION = '0.26';
 
 =head1 NAME
 
@@ -98,7 +98,7 @@ sub new {
     my $body = $args{body};
     delete $args{type};
     delete $args{body};
-    
+
     my $self = bless {
         tree => Pod::Abstract::Tree->new(),
         serial => Pod::Abstract::Serial->next,
@@ -107,7 +107,7 @@ sub new {
         body => $body,
         params => { %args },
     }, $class;
-    
+
     return $self;
 }
 
@@ -125,14 +125,14 @@ sub ptree {
     my $self = shift;
     my $indent = shift || 0;
     my $width = 72 - $indent;
-    
+
     my $type = $self->type;
     my $body = $self->body;
     if(my $body_attr = $self->param('body_attr')) {
         $body = $self->param($body_attr)->pod;
     }
     $body =~ s/[\n\t]//g if $body;
-    
+
     my $r = ' ' x $indent;
     if($body) {
         $r .= substr("[$type] $body",0,$width);
@@ -166,11 +166,11 @@ my %escapes = (
 
 sub text {
     my $self = shift;
-    
+
     my $r = '';
     my $type = $self->type;
     my $body = $self->body;
-    
+
     my @children = $self->children;
     if($type eq ':text') {
 	    $r .= $body;
@@ -184,11 +184,15 @@ sub text {
         }
         return $r;
     }
-    
+
     foreach my $c (@children) {
-        $r .= $c->text;
+        # Recurse into child elements, but special case :X as these are
+        # invisible. This dodges past a bit of naff pod use which is in
+        # perlpod.pod - comes down to how poorly defined bullet lists
+        # are.
+        $r .= $c->text unless $c->type eq ':X';
     }
-    
+
     return $r;
 }
 
@@ -203,14 +207,14 @@ node should produce the original POD text when pod is requested.
 
 sub pod {
     my $self = shift;
-    
+
     my $r = '';
     my $body = $self->body;
     my $type = $self->type;
     my $should_para_break = 0;
     my $p_break = $self->param('p_break');
     $p_break = "\n\n" unless defined $p_break;
-    
+
     my $r_delim = undef; # Used if a interior sequence needs closing.
 
     if($type eq ':paragraph') {
@@ -224,33 +228,41 @@ sub pod {
         $r .= "$cmd$l_delim";
     } elsif( $type eq '[ROOT]' or $type =~ m/^@/) {
         # ignore
+    } elsif( $type eq 'for' ) {
+        # Special case for "for" command, because we pulled the formatter/text
+        # into body/children
+        my $text = "";
+        $text .= $_->pod foreach $self->children;
+        $r .= "=$type $body $text$p_break";
+        return $r;
     } else { # command
         my $body_attr = $self->param('body_attr');
         if($body_attr) {
             $body = $self->param($body_attr)->pod;
         }
+
         if(defined $body && $body ne '') {
             $r .= "=$type $body$p_break";
         } else {
             $r .= "=$type$p_break";
         }
     }
-    
+
     my @children = $self->children;
     foreach my $c (@children) {
         $r .= $c->pod;
     }
-    
+
     if($should_para_break) {
         $r .= $p_break;
     } elsif($r_delim) {
         $r .= $r_delim;
     }
-    
+
     if($self->param('close_element')) {
         $r .= $self->param('close_element')->pod;
     }
-    
+
     return $r;
 }
 
@@ -270,7 +282,7 @@ manipulating them will transform the document.
 sub select {
     my $self = shift;
     my $path = shift;
-    
+
     my $p_path = Pod::Abstract::Path->new($path);
     return $p_path->process($self);
 }
@@ -289,10 +301,10 @@ sub select_into {
     my $self = shift;
     my $target = shift;
     my $path = shift;
-    
+
     my @nodes = $self->select($path);
     my @dup_nodes = map { $_->duplicate } @nodes;
-    
+
     return $target->nest(@dup_nodes);
 }
 
@@ -319,6 +331,9 @@ sub type {
 
 Get or set the node body text. This is NOT the child tree of the node,
 it is the literal text as used by text/verbatim nodes.
+
+For a "begin" or "for" block, it is the text following the begin or for
+label. The children of the node are the contained text/nodes.
 
 =cut
 
@@ -350,6 +365,38 @@ sub param {
     return $self->{params}{$param_name};
 }
 
+=head2 link_info
+
+ my $link_info = $node->link_info;
+
+For C<:L> nodes (Links), break up the link according to the Perl Pod rules
+and return a hashref containing C<text>, C<document> and C<section>.
+
+=cut
+
+sub link_info {
+    my $self = shift;
+    my $t = $self->text;
+    $t =~ m/^(?:([^\|]*)\|)?([^\/]*)\/?(.*)$/;
+
+    my ($text,$doc,$section) = ($1,$2,$3);
+    if($doc && $doc =~ m/^.+\:$/) {
+        my $url = "$doc/$section";
+        return {
+            url => $url,
+            link_text => $text,
+            text => $text || $url,
+        };
+    } else {
+        return {
+            text => $text || $doc || $section,
+            link_text => $text,
+            document => $doc || $text,
+            section => $section,
+        };
+    }
+}
+
 =head2 duplicate
 
  my $new_node = $node->duplicate;
@@ -362,7 +409,7 @@ identical document tree, but different node identifiers.
 sub duplicate {
     my $self = shift;
     my $class = ref $self;
- 
+
     # Implement the new() call with all the data needed.
     my $params = $self->{params};
     my %new_params = ( );
@@ -381,11 +428,11 @@ sub duplicate {
         body => $self->body,
         %new_params,
         );
-    
+
     my @children = $self->children;
     my @dup_children = map { $_->duplicate } @children;
     $dup->nest(@dup_children);
-    
+
     return $dup;
 }
 
@@ -402,7 +449,7 @@ position.
 sub insert_before {
     my $self = shift;
     my $target = shift;
-    
+
     my $target_tree = $target->parent->tree;
     die "Can't insert before a root node" unless $target_tree;
     if($target_tree->insert_before($target, $self)) {
@@ -425,7 +472,7 @@ position.
 sub insert_after {
     my $self = shift;
     my $target = shift;
-    
+
     my $target_tree = $target->parent->tree;
     die "Can't insert after a root node" unless $target_tree;
     if($target_tree->insert_after($target, $self)) {
@@ -461,7 +508,7 @@ $node. After this operation, $node will have no children. In pictures:
 sub hoist {
     my $self = shift;
     my @children = $self->children;
-    
+
     my $parent = $self->parent;
 
     my $target = $self;
@@ -470,7 +517,7 @@ sub hoist {
         $n->insert_after($target);
         $target = $n;
     }
-    
+
     return scalar @children;
 }
 
@@ -486,11 +533,11 @@ can be safely reused, but they will no longer be in the document tree.
 sub clear {
     my $self = shift;
     my @children = $self->children;
-    
+
     foreach my $n (@children) {
         $n->detach;
     }
-    
+
     return @children;
 }
 
@@ -505,7 +552,7 @@ Pushes $target at the end of $node's children.
 sub push {
     my $self = shift;
     my $target = shift;
-    
+
     my $target_tree = $self->tree;
     if($target_tree->push($target)) {
         $target->parent($self);
@@ -526,11 +573,11 @@ of hoist.
 
 sub nest {
     my $self = shift;
-    
+
     foreach my $target (@_) {
         $self->push($target);
     }
-    
+
     return @_;
 }
 
@@ -550,7 +597,7 @@ The reverse of push, add a node to the start of $node's children.
 sub unshift {
     my $self = shift;
     my $target = shift;
-    
+
     my $target_tree = $self->tree;
     if($target_tree->unshift($target)) {
         $target->parent($self);
@@ -599,7 +646,7 @@ Detached nodes can be reused safely.
 
 sub detach {
     my $self = shift;
-    
+
     if($self->parent) {
         $self->parent->tree->detach($self);
         return 1;
@@ -610,30 +657,82 @@ sub detach {
 
 =head2 parent
 
- $node->parent;
+ my $parent = $node->parent;
 
-Returns the parent of $node if available. Returns undef if no parent.
+Returns the parent of C<$node> if available. Returns undef if no parent.
 
 =cut
 
 sub parent {
     my $self = shift;
-    
+
     if(@_) {
         my $new_parent = shift;
-        if( defined $self->{parent} && 
+        if( defined $self->{parent} &&
             $self->parent->tree->detach($self) ) {
             warn "Implicit detach when reparenting";
         }
         $self->{parent} = $new_parent;
-        
+
         # Parent nodes have to be weak - otherwise we leak.
-        weaken $self->{parent} 
+        weaken $self->{parent}
            if defined $self->{parent};
     }
-    
+
     return $self->{parent};
 }
+
+=head2 parents
+
+ my @parents = $node->parents;
+
+Returns a list of the parents of C<$node>, including C<$node>.
+
+=cut
+
+sub parents {
+    my $self = shift;
+
+    my $current = $self;
+    my @r = ( );
+    while($current) {
+        CORE::push @r, $current;
+        $current = $current->parent;
+    }
+
+    return @r;
+}
+
+=head2 path_to
+
+ my $path_to = $node->path_to;
+
+Returns a L<ppath|Pod::Abstract::Path> expression that will lead to the
+heading/item containing C<$node>, as best as is possible by named nodes.
+
+=cut
+
+sub path_to {
+    my $self = shift;
+    my @parents = reverse $self->parents;
+
+    my $result = '';
+    foreach my $p (@parents) {
+        if($p->type =~ m/^head[123456]$/) {
+            my $heading = $p->param('heading')->text;
+            $result .= "/" . $p->{type} . "[ \@heading eq '$heading' ]"
+        } elsif($p->type eq 'over') {
+            $result .= "/over"
+        } elsif($p->type eq 'item') {
+            my $label = $p->param('label')->text;
+            $result .= "/item[ \@label eq '$label' ]";
+        }
+    }
+
+    return $result;
+}
+
+=cut
 
 =head2 root
 
@@ -646,11 +745,11 @@ original node if it has no parent.
 
 sub root {
     my $n = shift;
-    
+
     while(defined $n->parent) {
         $n = $n->parent;
     }
-    
+
     return $n;
 }
 
@@ -719,7 +818,7 @@ really sure you know what you want.
 sub coalesce_body {
     my $self = shift;
     my $node_type = shift;
-    
+
     # Select all elements containing :verbatim nodes.
     my @candidates = $self->select("//[/$node_type]");
     foreach my $c (@candidates) {
@@ -749,11 +848,11 @@ sub coalesce_body {
 
 =head1 AUTHOR
 
-Ben Lilburne <bnej@mac.com>
+Ben Lilburne <bnej80@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009 Ben Lilburne
+Copyright (C) 2009-2025 Ben Lilburne
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

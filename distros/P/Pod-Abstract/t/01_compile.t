@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 17;
+use Test::More tests => 18;
 
 my @modules = qw(
 Pod::Abstract
@@ -23,6 +23,7 @@ Pod::Abstract::Filter::clear_podcmds
 Pod::Abstract::Filter::summary
 Pod::Abstract::Filter::find
 Pod::Abstract::Filter::number_sections
+Pod::Abstract::Filter::ptree
 );
 
 foreach my $module (@modules) {

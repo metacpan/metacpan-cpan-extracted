@@ -1,0 +1,22 @@
+---
+abstract: 'Perl library to facilitate running a solution to https://theweeklychallenge.org using one or more sets of inputs provided as JSON command line arguments'
+author:
+  - 'Yitzchak Scott-Thoennes <ysth@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Run-WeeklyChallenge
+requires:
+  Cpanel::JSON::XS: '0'
+  JSON::Schema::Modern: '0'
+  perl: '5.040'
+version: '0.001'
+x_generated_by_perl: v5.42.0
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: MIT

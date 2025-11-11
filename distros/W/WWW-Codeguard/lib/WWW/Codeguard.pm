@@ -13,11 +13,11 @@ WWW::Codeguard - Perl interface to interact with the Codeguard API
 
 =head1 VERSION
 
-Version 0.09
+Version 0.11
 
 =cut
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 =head1 SYNOPSIS
 

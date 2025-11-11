@@ -165,3 +165,21 @@
 		value.  The "--expanded" option reverses the default.
 
 		Note:  "--expanded" only applies to the "--tokens" option.
+
+1.42    Nov 06, 2025
+
+        Ok, I know it's frustrating, but I completely removed the "expanded"
+		option.  Full detection of 256 color and truecolor capability has been
+		implemented.
+
+1.43    Nov 06, 2025
+
+        The "tokens" option has a more informative output for all of the
+		various color types.  This had the side effect of more available
+		tokens.
+
+1.44    Nov 06, 2025
+
+        Internal token handling improved.
+
+        "tokens" option output also improved

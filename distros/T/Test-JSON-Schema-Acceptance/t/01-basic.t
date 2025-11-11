@@ -2,21 +2,26 @@
 use strict;
 use warnings;
 use 5.020;
+use strictures 2;
 use stable 0.031 'postderef';
 use experimental 'signatures';
+no autovivification warn => qw(fetch store exists delete);
+use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
+no if "$]" >= 5.041009, feature => 'smartmatch';
 
 use Test2::API 'intercept';
-use Test::More 0.88;
-use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
-use Test::Deep;
+use Test2::V0 qw(!bag !bool), -no_pragmas => 1;
+use if $ENV{AUTHOR_TESTING}, 'Test2::Warnings';
+use Test::Deep qw(!array !hash);;
 
 use Test::File::ShareDir -share => { -dist => { 'Test-JSON-Schema-Acceptance' => 'share' } };
 use Test::JSON::Schema::Acceptance;
 use lib 't/lib';
 use SchemaParser;
+use Helper;
 
 my $accepter = Test::JSON::Schema::Acceptance->new(7);
 
@@ -54,6 +59,7 @@ cmp_deeply(
     ),
   )),
   'tests pass for checking schemas that test for boolean type',
-);
+)
+or diag "all failing tests:\n", join("\n", failing_test_names($events));
 
 done_testing;

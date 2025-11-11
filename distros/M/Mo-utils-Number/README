@@ -61,10 +61,11 @@ SUBROUTINES
   "check_positive_decimal"
      check_positive_decimal($self, $key)
 
-    *Since version 0.05.*
+    *Since version 0.05. Described functionality since version 0.08.*
 
     Check if the parameter defined by $key is a positive decimal number.
-    Value could be undefined or doesn't exist.
+    Value could be undefined or doesn't exist. Check accepts numbers in
+    scientific notation.
 
     Put error if check isn't ok.
 
@@ -349,5 +350,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.07
+    0.08
 

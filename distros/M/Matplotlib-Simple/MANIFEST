@@ -9,6 +9,7 @@ README.pod
 dist.ini
 lib/Matplotlib/Simple.pm
 mpl.examples.pl
+output.images/add.single.png
 output.images/barplots.png
 output.images/boxplot.png
 output.images/hexbin.png

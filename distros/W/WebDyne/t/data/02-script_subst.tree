@@ -1,0 +1,15 @@
+<html> @0 (IMPLICIT)
+  <head> @0.0 (IMPLICIT)
+    <script> @0.0.0
+      "    const foo=`?source=${encodeURIComponent(filename)}`"
+    <script type="module"> @0.0.1
+      "    const foo=`?source=${encodeURIComponent(filename)}`"
+    <script type="application/javascript"> @0.0.2
+      "    const foo=`?source=${encodeURIComponent(filename)}`"
+    <script type="text/javascript"> @0.0.3
+      "    const foo=`?source=${encodeURIComponent(filename)}`"
+    <script type="text/plain"> @0.0.4
+      "subst +{subst}"
+    <script nosubst="nosubst" type="text/plain"> @0.0.5
+      "nosubst +{nosubst}"
+  <body> @0.1 (IMPLICIT)

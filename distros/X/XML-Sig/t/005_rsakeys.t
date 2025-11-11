@@ -16,7 +16,7 @@ my $exponent = 'AQAB';
 my $sig = XML::Sig->new( { key => 't/rsa.private.key' } );
 isa_ok( $sig, 'XML::Sig' );
 
-isa_ok( $sig->{ key_obj }, 'Crypt::OpenSSL::RSA', 'Key object is valid' );
+isa_ok( $sig->{ key_obj }, 'Crypt::PK::RSA', 'Key object is valid' );
 is( index( $sig->{KeyInfo}, $modulus ), 166, 'Modulus is correct' );
 is( index( $sig->{KeyInfo}, $exponent), 576, 'Exponent is correct' );
 

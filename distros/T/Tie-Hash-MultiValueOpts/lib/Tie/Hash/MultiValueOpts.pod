@@ -1,0 +1,65 @@
+=pod
+
+=head1 NAME
+
+Tie::Hash::MultiValueOpts - Store multiple values per option
+
+=head1 SYNOPSIS
+
+  use Getopt::Std               qw( getopts );
+  use Tie::Hash::MultiValueOpts ();
+
+  tie my %opts, 'Tie::Hash::MultiValueOpts';
+  $opts{ l } = [];
+  getopts( 'a:bl:', \%opts );
+
+=head1 DESCRIPTION
+
+The L<Getopt::Std> core module exports the C<getopts()> function that processes
+single-character options. If we use the two-argument form of C<getopts()>,
+the second argument is a HASH reference C<\%opts> that stores the processing
+result. Each hash key refers to a provided option and the corresponding hash
+value refers to the option-argument (or C<1> if it is a flag).
+
+If an option that requires an option-argument is provided multiple times,
+the last argument wins (implicit overwrite). Sometimes we want to treat an
+option (C<l> for example) as a multi-value option. In this case we have to
+bind the C<%opts> variable to the C<Tie::Hash::MultiValueOpts> class and we
+have to set its initial value to an empty ARRAY reference. If the multi-value
+option is now provided multiple times, their values are stored in order in
+C<@{ $opts{ l } }>.
+
+=head1 SEE ALSO
+
+=over 2
+
+=item *
+
+L<Tie::Hash>
+
+=item *
+
+L<Tie::Hash::MultiValue>
+
+=item *
+
+L<Tie::Hash::MultiValueOrdered>
+
+=item *
+
+L<Hash::MultiValue>
+
+=back
+
+=head1 AUTHOR
+
+Sven Willenbuecher <sven.willenbuecher@gmx.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2025 by Sven Willenbuecher.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

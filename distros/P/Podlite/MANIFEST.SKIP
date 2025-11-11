@@ -1,0 +1,6 @@
+^_build/
+^blib/
+~$
+^MYMETA\.
+^Podlite-\d
+^\.

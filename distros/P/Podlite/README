@@ -1,0 +1,156 @@
+Podlite version 1.00
+====================
+
+Podlite is a lightweight block-based markup language designed for flexibility
+and ease of use. This module is a source filter that allows you to use Podlite
+markup language in your Perl programs.
+
+
+WHAT IS PODLITE?
+
+Podlite is a lightweight markup language with a simple, consistent underlying
+document object model. It is designed to be a pure descriptive markup language
+with no presentational components.
+
+This module preprocesses your Perl code, stripping out any Podlite
+documentation while preserving line numbering for accurate error reporting.
+This means you can document your programs using Podlite markup and they will
+still run correctly under the Perl interpreter.
+
+
+KEY FEATURES
+
+  * Source filtering - Strips Podlite markup during compilation
+  * Line number preservation - Ensures accurate error reporting
+  * Data blocks - Access embedded data via *DATA filehandle
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+SYNOPSIS
+
+    use Podlite;
+
+    my $x = 1;
+
+    =head1 DESCRIPTION
+    =para This documentation block will be filtered out during compilation,
+    but you can still use it for generating documentation.
+
+    my $y = 2;
+    print "Sum: ", $x + $y, "\n";
+
+Task lists with checkboxes:
+
+    =item [x] Implement basic functionality
+    =item [x] Write documentation
+    =item [ ] Add test suite
+
+Tables with captions:
+
+    =begin table :caption<Performance Benchmarks>
+    Operation      Time (ms)   Memory (MB)
+    Parse          45          12
+    Render         23          8
+    =end table
+
+Notification blocks (callouts):
+
+    =begin nested :notify<warning> :caption<Important Note>
+    This feature is experimental and may change in future releases.
+    =end nested
+
+Code blocks with syntax highlighting:
+
+    =begin code :lang<perl>
+    sub calculate {
+        my ($x, $y) = @_;
+        return $x + $y;
+    }
+    =end code
+
+Markdown blocks:
+
+    =begin markdown
+    # Heading
+
+    You can mix **markdown** and *Podlite* markup!
+
+    - Bullet lists
+    - Work as expected
+    - In markdown blocks
+    =end markdown
+
+
+DEPENDENCIES
+
+This module requires:
+
+  * Filter::Simple
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command:
+
+    perldoc Podlite
+
+You can also look for information at:
+
+    GitHub Repository (report bugs here)
+        https://github.com/zag/p5-Podlite
+
+    GitHub Issues
+        https://github.com/zag/p5-Podlite/issues
+
+    Search CPAN
+        https://metacpan.org/release/Podlite
+
+
+PODLITE ECOSYSTEM
+
+  Official Specification:
+    https://podlite.org/specification
+    https://github.com/podlite/podlite-specs
+
+  Main implementation:
+    https://github.com/podlite/podlite
+
+  Desktop viewer/editor:
+    https://github.com/podlite/podlite-desktop
+    Available in Linux (Snapcraft), Windows Store, and Mac App Store
+
+  Publishing system:
+    https://github.com/podlite/podlite-web
+
+  Online resources:
+    https://podlite.org - Official website
+    https://pod6.in - Online Podlite/Rakudoc converter
+    https://podlite.org/#Roadmap - Roadmap
+
+
+AUTHOR
+
+Aliaksandr Zahatski <zag@cpan.org>
+
+
+CREDITS
+
+Damian Conway - for inspiration and source filter techniques
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2025 by Aliaksandr Zahatski
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl programming language system itself.

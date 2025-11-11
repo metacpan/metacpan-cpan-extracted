@@ -35,6 +35,20 @@ is_deeply(
 @r = ();
 
 is_deeply(
+	$collection->for_each(sub {
+		push @r, [$_=>@_];
+	}),
+	$collection,
+);
+
+is_deeply(
+	\@r,
+	[[1,1,0], [2,2,1], [3,3,2], [4,4,3], [5,5,4], [6,6,5]],
+);
+
+@r = ();
+
+is_deeply(
 	$collection->for_each_pair(sub {
 		push @r, [@_];
 	}),
@@ -90,8 +104,36 @@ is_deeply(
 @r = ();
 
 is_deeply(
+	$collection->for_each_key(sub {
+		push @r, join "|", $_;
+	}),
+	$collection,
+);
+
+is_deeply(
+	[sort @r],
+	["bar", "foo"],
+);
+
+@r = ();
+
+is_deeply(
 	$collection->for_each_value(sub {
 		push @r, join "|", @_;
+	}),
+	$collection,
+);
+
+is_deeply(
+	[sort @r],
+	[1, 2],
+);
+
+@r = ();
+
+is_deeply(
+	$collection->for_each_value(sub {
+		push @r, join "|", $_;
 	}),
 	$collection,
 );

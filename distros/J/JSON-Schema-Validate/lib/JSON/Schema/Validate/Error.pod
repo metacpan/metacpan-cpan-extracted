@@ -1,0 +1,203 @@
+=encoding utf-8
+
+=head1 NAME
+
+JSON::Schema::Validate::Error - JSON Schema Exception
+
+=head1 SYNOPSIS
+
+    use JSON::Schema::Validate::Error;
+
+    # Legacy 2-arg form:
+    my $err = JSON::Schema::Validate::Error->new( '/user/name', 'minLength violated' );
+
+    # Named-arg form (recommended):
+    my $err = JSON::Schema::Validate::Error->new(
+        path            => '/user/name',
+        message         => 'string shorter than minLength 1',
+        keyword         => 'minLength',
+        schema_pointer  => '#/properties/name/minLength',
+    );
+
+    # String context:
+    say "$err"; # "#/properties/name/minLength → /user/name: string shorter than minLength 1"
+
+    # Comparisons (compare by message+path):
+    say 'same' if( $err eq JSON::Schema::Validate::Error->new( '/user/name', 'string shorter than minLength 1' ) );
+
+    # Hash view for serialization
+    my $h = $err->as_hash;
+
+would return the following hash reference:
+
+    {
+        keyword         => 'minLength',
+        message         => 'string shorter than minLength 1',
+        path            => '/user/name',
+        schema_pointer  => '#/properties/name/minLength',
+    }
+
+=head1 VERSION
+
+    v0.1.0
+
+=head1 DESCRIPTION
+
+This class (C<JSON::Schema::Validate::Error>) represents L<JSON::Schema::Validate> errors that are found upon validating the schema provided.
+
+The objects of this class are overloadable, which means they stringify if called in a string context. They can also be serialised as plain hashes.
+
+They can also be compared, such as:
+
+    say $err1 eq $err2;
+
+This will not check the two objects are the same, but rather tha their C<path> and their C<message> are identical.
+
+=head1 CONSTRUCTOR
+
+    my $err = JSON::Schema::Validate::Error->new( $json_pointer, $error_message );
+
+    my $err = JSON::Schema::Validate::Error->new(
+        path            => $json_pointer,
+        message         => $error_message,
+        keyword         => $keyword,         # optional (e.g., 'minLength', 'type', '$ref', ...)
+        schema_pointer  => $schema_pointer,  # optional JSON Pointer into the schema
+    );
+
+Instantiate a new L<JSON::Schema::Validate::Error> object, and returns it.
+
+The constructor supports two instantiation patterns:
+
+=head2 Legacy
+
+It then takes the following parameters:
+
+=over 4
+
+=item * C<$json_pointer>
+
+A JSON pointer representing the path in the JSON data where the error occurred.
+
+=item * C<$error_message>
+
+An error text message that describes the error.
+
+=back
+
+=head2 Modern
+
+It accepts an hash of the following parameters:
+
+=over 4
+
+=item * C<keyword>
+
+The schema C<keyword>
+
+=item * C<message>
+
+The error message.
+
+=item * C<path>
+
+The field path in the data.
+
+=item * C<schema_pointer>
+
+The path in the schema.
+
+=back
+
+=head1 METHODS
+
+=head2 as_string
+
+    say $err; # some/path/field: some error message
+
+Returns the human-friendly string representation of the error.
+
+If C<schema_pointer> is set, the format is:
+
+    schema_pointer → path: message
+
+otherwise:
+
+    path: message
+
+=head2 as_hash
+
+    my $href = $err->as_hash;
+
+Returns a plain hash reference with keys C<keyword>, C<message>, C<path>, and C<schema_pointer>. Useful for logging or JSON serialisation.
+
+=head2 keyword
+
+    $err->keyword( 'minLength' );
+    my $k = $err->keyword; # minLength
+
+Sets or gets the JSON Schema keyword that failed, when known.
+
+=head2 message
+
+    $err->message( "Some error" );
+    $err->message; # Some error
+
+Sets or gets the object error message.
+
+=head2 path
+
+    $err->path( $json_pointer );
+    $err->path; # /some/where/field
+
+Sets or gets the object error path (JSON pointer).
+
+=head2 schema_pointer
+
+    $err->schema_pointer( '#/properties/name/minLength' );
+    my $sp = $err->schema_pointer; # #/properties/name/minLength
+
+Sets or gets the JSON Pointer to the schema location associated with this error.
+
+=head1 OPERATOR OVERLOADING
+
+Error objects are overloadable:
+
+=over 4
+
+=item * Stringification
+
+C<"$err"> calls L</as_string>.
+
+=item * Boolean
+
+Always true.
+
+=item * Equality / Inequality
+
+C<eq>, C<ne>, C<==>, and C<!=> compare the pair C<(message, path)>. This is intentional so tests can assert equivalence of observable failures without caring about object identity.
+
+=back
+
+=head1 THREAD SAFETY
+
+This module is thread-safe.
+
+It does not use nor manipulate global variables, and each instance of L<JSON::Schema::Validate::Error> is self-contained and does not share any mutable state across threads.
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 SEE ALSO
+
+L<JSON::Schema::Validate>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright(c) 2025 DEGUEST Pte. Ltd.
+
+All rights reserved.
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+=cut

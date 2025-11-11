@@ -5,7 +5,7 @@ use English;
 use Error::Pure::Utils qw(clean err_msg_hr);
 use Mo::utils::Number qw(check_positive_decimal);
 use Readonly;
-use Test::More 'tests' => 15;
+use Test::More 'tests' => 23;
 use Test::NoWarnings;
 
 Readonly::Array our @BAD_NUMBERS => qw(
@@ -13,12 +13,17 @@ Readonly::Array our @BAD_NUMBERS => qw(
 	-10.2
 	foo
 	0
+	.5
+	1.
+	e10
 );
 Readonly::Array our @RIGHT_NUMBERS => qw(
 	0.1
 	10.2345
 	2
 	100
+	1e4
+	7.4096e-06
 );
 
 # Test.

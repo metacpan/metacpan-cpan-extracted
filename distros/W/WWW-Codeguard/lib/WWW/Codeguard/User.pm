@@ -181,6 +181,7 @@ Optional:
 	dir_path
 	hostname
 	disabled
+	provider
 
 =cut
 
@@ -877,7 +878,7 @@ sub _fetch_optional_params {
 	my $optional_keys_map = {
         create_website        => { map { ($_ => 1) } qw(port dir_path) },
         create_database       => { map { ($_ => 1) } qw(website_id authentication_mode) },
-        edit_website          => { map { ($_ => 1) } qw(url monitor_frequency account password key dir_path hostname disabled) },
+        edit_website          => { map { ($_ => 1) } qw(url monitor_frequency account password key dir_path hostname disabled provider) },
         show_database         => { map { ($_ => 1) } qw(website_id) }, # Added in v0.03.
         edit_database         => { map { ($_ => 1) } qw(server_address account password port database_name authentication_mode server_account server_password website_id disabled) },
         browse_website_backup => { map { ($_ => 1) } qw (path) },

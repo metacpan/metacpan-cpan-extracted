@@ -1,3 +1,5 @@
+2.33  2025-11-10   This module is dead.
+
 2.32  2020-05-10   Add dependency on LWP::Protocol::https which has
                      been split out into a separate dist on the CPAN
 

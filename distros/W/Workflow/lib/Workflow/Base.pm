@@ -6,7 +6,7 @@ use v5.14.0;
 use parent qw( Class::Accessor );
 use Log::Any;
 
-$Workflow::Base::VERSION = '2.06';
+$Workflow::Base::VERSION = '2.07';
 
 sub new {
     my ( $class, @params ) = @_;
@@ -49,10 +49,7 @@ sub param {
     }
 
     unless ( defined $value ) {
-        if ( exists $self->{PARAMS}{$name} ) {
-            return $self->{PARAMS}{$name};
-        }
-        return;
+        return $self->{PARAMS}{$name};
     }
     return $self->{PARAMS}{$name} = $value;
 }
@@ -60,7 +57,7 @@ sub param {
 sub delete_param {
     my ( $self, $name ) = @_;
     unless ( defined $name ) {
-        return;
+        return undef;
     }
 
     # Allow multiple parameters to be deleted at once...
@@ -75,12 +72,7 @@ sub delete_param {
         return {%list};
     }
 
-    if ( exists $self->{PARAMS}{$name} ) {
-        my $value = $self->{PARAMS}{$name};
-        delete $self->{PARAMS}{$name};
-        return $value;
-    }
-    return;
+    return delete $self->{PARAMS}{$name};
 }
 
 sub clear_params {
@@ -106,7 +98,7 @@ Workflow::Base - Base class with constructor
 
 =head1 VERSION
 
-This documentation describes version 2.06 of this package
+This documentation describes version 2.07 of this package
 
 =head1 SYNOPSIS
 

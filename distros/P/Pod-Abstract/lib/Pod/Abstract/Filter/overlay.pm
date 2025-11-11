@@ -6,12 +6,31 @@ use base qw(Pod::Abstract::Filter);
 use Pod::Abstract;
 use Pod::Abstract::BuildNode qw(node);
 
-our $VERSION = '0.20';
+our $VERSION = '0.26';
 
 =head1 NAME
 
-Pod::Abstract::Filter::overlay - paf command to perform a method
-documentation overlay on a Pod document.
+Pod::Abstract::Filter::overlay - Perform a method documentation overlay
+on a Pod document.
+
+=head1 USAGE
+
+Use the C<paf> command to run this filter inline - for example:
+
+ $ paf -p overlay sort summary Pod::Abstract::Filter::overlay
+
+Produces
+
+  NAME
+  METHODS
+   \ =begin :overlay =overlay METHODS Some::Class::Or::File =end :overlay
+    filter
+    new
+    param
+    require_params
+    run
+  AUTHOR
+  COPYRIGHT AND LICENSE
 
 =begin :overlay
 
@@ -36,8 +55,6 @@ commands, which should be structured like:
 Each overlay is processed in order. It will add any headings for the
 matched sections in the current document from the named source, for
 any heading that is not already present in the given section.
-
-If that doesn't make sense just try it and it will!
 
 The main utility of this is to specify a superclass, so that all the
 methods that are not documented in your subclass become documented by
@@ -134,11 +151,11 @@ sub filter {
 
 =head1 AUTHOR
 
-Ben Lilburne <bnej@mac.com>
+Ben Lilburne <bnej80@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009 Ben Lilburne
+Copyright (C) 2009-2025 Ben Lilburne
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

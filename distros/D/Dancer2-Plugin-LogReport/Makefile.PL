@@ -5,7 +5,7 @@ use warnings;
 use strict;
 
 # Use command 'oodist' to produce your whole software release.
-my $version  = '2.01';
+my $version  = '2.02';
 my $webpages = "../public_html";
 my $git      = "https://github.com/markov2/perl5-Dancer2-Plugin-LogReport";
 my $publish  = "../public_html/dancer2-plugin-logreport";
@@ -50,20 +50,16 @@ my %oodist   = (
 	],
 );
 
-my %prereq  = (
-	'Dancer2'          => '0.207',
-	'Log::Report'      => '1.42',
-	'Scalar::Util'     => 0,
+my %requires  = (
+	'Dancer2'               => '0.207',
+	'Log::Report'           => '1.42',
+	'Scalar::Util'          => 0,
+	'Log::Report::Template' => 0,
 );
-
-#use Data::Dumper;
-#warn Dumper \%prereq;
 
 WriteMakefile
 	NAME      => 'Dancer2::Plugin::LogReport',
 	VERSION   => $version,
-	PREREQ_PM => \%prereq,
-
 	AUTHOR    => 'Mark Overmeer <markov@cpan.org>',
 	ABSTRACT  => 'logging, exceptions and translations in Dancer2 via Log::Report',
 	LICENSE   => 'perl_5',
@@ -76,20 +72,26 @@ WriteMakefile
 				url  => "$git.git",
 				web  => $git,
 			},
+			bugtracker => {
+				web  => "$git/issues",
+			},
 			homepage => $homepage,
 			license  => [ 'http//dev.perl.org/licenses/' ],
 		},
 		prereqs => {
+			runtime => {
+				requires => \%requires,
+			},
 			develop => {
 				requires => {
 					'OODoc' => '3.04',
-				}
+				},
 			},
 			test => {
 				requires => {
 					'Test::More' => 1.00,
 					'Test::Pod'  => 1.00,
-				}
+				},
 			},
 		},
 

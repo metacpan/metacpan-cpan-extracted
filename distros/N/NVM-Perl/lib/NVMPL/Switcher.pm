@@ -6,23 +6,31 @@ use File::Spec;
 use NVMPL::Config;
 use NVMPL::Utils qw(detect_platform);
 
-
 # ---------------------------------------------------------
 # Public entry point
 # ---------------------------------------------------------
 
 sub _detect_shell {
-    my $shell = $ENV{SHELL} || '/bin/bash';
-    if ($shell =~ /zsh/) {
+    # --- Windows shell detection first ---
+    if ($^O eq 'MSWin32') {
+        # PowerShell defines PSModulePath, CMD defines ComSpec
+        if ($ENV{PSModulePath}) {
+            return 'PowerShell';
+        } elsif ($ENV{ComSpec} && $ENV{ComSpec} =~ /cmd\.exe/i) {
+            return 'Cmd';
+        } else {
+            return 'PowerShell';  # safe default on Windows
+        }
+    }
+
+    # --- Unix-like environments ---
+    my $shell = $ENV{SHELL} || '';
+    if ($shell =~ /zsh/i) {
         return 'Zsh';
-    } elsif ($shell =~ /bash/) {
+    } elsif ($shell =~ /bash/i) {
         return 'Bash';
-    } elsif ($shell =~ /cmd\.exe/i || $^O eq 'MSWin32') {
-        return 'Cmd';
-    } elsif ($shell =~ /powershell|pwsh/i) {
-        return 'PowerShell';
     } else {
-        return 'Bash';
+        return 'Bash';  # fallback for unknown shells
     }
 }
 
@@ -37,12 +45,21 @@ sub use_version {
     my $vtag = "v$version";
 
     my $cfg = NVMPL::Config->load();
-    my $install_dir = $cfg->{install_dir};
+    my $install_dir  = $cfg->{install_dir};
     my $versions_dir = File::Spec->catdir($install_dir, 'versions');
-    my $target_dir = File::Spec->catdir($versions_dir, $vtag);
+    my $target_dir   = File::Spec->catdir($versions_dir, $vtag);
+
+    # --- Windows nested node folder fix ---
+    if ($^O eq 'MSWin32') {
+        my @matches = glob("$target_dir\\node-v*-win-x64");
+        if (@matches && -d $matches[0]) {
+            $target_dir = $matches[0];
+        }
+    }
+
     my $current_link = File::Spec->catfile($versions_dir, 'current');
 
-    unless(-d $target_dir) {
+    unless (-d $target_dir) {
         say "[nvm-pl] Version $vtag is not installed.";
         return 1;
     }
@@ -61,33 +78,60 @@ sub use_version {
     _update_shell_config($current_link);
 
     say "[nvm-pl] Active version is now $vtag";
-    say "Restart your shell or run the appropriate source command for your shell.";
 
+    # --- PowerShell live PATH update ---
+    if ($^O eq 'MSWin32' && $ENV{PSModulePath}) {
+        my $ps_path = $target_dir;
+        $ps_path =~ s#/#\\#g;
+
+        # only update if node.exe isn't already on PATH
+        my $node_check = `where node 2> NUL`;
+        if ($node_check !~ /\Q$ps_path\E/i) {
+            # Detect which PowerShell to use
+            my $ps_exe = `where pwsh 2> NUL`;
+            chomp($ps_exe);
+            if (!$ps_exe) {
+                $ps_exe = `where powershell 2> NUL`;
+                chomp($ps_exe);
+            }
+
+            if ($ps_exe) {
+                say "[nvm-pl] (PowerShell) Updating PATH for current session...";
+                system($ps_exe, "-NoLogo", "-NoProfile", "-Command",
+                    "\$env:PATH = '$ps_path;' + \$env:PATH; Write-Host 'PATH updated for this session.'");
+            } else {
+                say "[nvm-pl] (PowerShell) Could not find PowerShell executable — skipping live PATH update.";
+            }
+        } else {
+            say "[nvm-pl] (PowerShell) Node path already active.";
+        }
+    }
+
+    say "Restart your shell or run the appropriate source command for your shell.";
     return 0;
 }
+
 
 sub _update_shell_config {
     my ($current_link) = @_;
     my $shell_type = _detect_shell();
-    
-    # Load the appropriate shell module
+
+    # Load the appropriate shell module dynamically
     my $shell_module = "NVMPL::Shell::$shell_type";
     eval "require $shell_module" or do {
         warn "[nvm-pl] Could not load $shell_module: $@";
         return;
     };
-    
+
     my $init_snippet = $shell_module->init_snippet();
-    
-    # Update the appropriate config file
-    my $config_file = _get_shell_config($shell_type);
+    my $config_file  = _get_shell_config($shell_type);
     _write_shell_config($config_file, $init_snippet, $shell_type);
 }
 
 sub _get_shell_config {
     my ($shell_type) = @_;
-    my $home = $ENV{HOME};
-    
+    my $home = $ENV{HOME} // $ENV{USERPROFILE};
+
     return {
         Bash       => "$home/.bashrc",
         Zsh        => "$home/.zshrc",
@@ -98,9 +142,8 @@ sub _get_shell_config {
 
 sub _write_shell_config {
     my ($config_file, $init_snippet, $shell_type) = @_;
-    
     return unless $config_file;
-    
+
     # Read existing config
     my @lines;
     if (-f $config_file) {
@@ -108,42 +151,39 @@ sub _write_shell_config {
         @lines = <$in>;
         close $in;
     }
-    
+
     # Remove ONLY the nvm-pl managed section (more precise)
     my @clean_lines;
     my $in_nvm_section = 0;
-    
+
     foreach my $line (@lines) {
         # Detect start of nvm-pl section
         if ($line =~ /^# nvm-pl managed Node\.js path$/) {
             $in_nvm_section = 1;
             next;
         }
-        
+
         # Skip lines until we're out of the nvm-pl section
         if ($in_nvm_section) {
-            # Detect end of nvm-pl section (empty line or new section)
             if ($line =~ /^\s*$/ || $line =~ /^#/) {
                 $in_nvm_section = 0;
             } else {
                 next;
             }
         }
-        
-        # Keep the line if we're not in nvm-pl section
+
         push @clean_lines, $line unless $in_nvm_section;
     }
-    
+
     # Write new config with nvm-pl snippet at the end
     open my $out, '>', $config_file or return;
     print $out @clean_lines;
     print $out "\n# nvm-pl managed Node.js path\n";
     print $out "$init_snippet\n";
     close $out;
-    
+
     say "[nvm-pl] Updated $config_file for $shell_type";
 }
-
 
 # ---------------------------------------------------------
 # Helpers
@@ -151,7 +191,7 @@ sub _write_shell_config {
 
 sub _win_junction {
     my ($link, $target) = @_;
-    $link =~ s#/#\\#g;
+    $link   =~ s#/#\\#g;
     $target =~ s#/#\\#g;
     my $cmd = "cmd /C mklink /J \"$link\" \"$target\"";
     system($cmd) == 0

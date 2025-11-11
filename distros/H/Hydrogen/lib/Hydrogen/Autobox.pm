@@ -24,7 +24,7 @@ use Import::Into ();
 package Hydrogen::Autobox;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.021000';
+our $VERSION   = '0.021002';
 
 sub import {
 	my ( $class, $also ) = ( shift, @_ );

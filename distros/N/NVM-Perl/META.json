@@ -52,8 +52,7 @@
    },
    "provides" : {
       "NVM::Perl" : {
-         "file" : "lib/NVM/Perl.pm",
-         "version" : "v0.1.1"
+         "file" : "lib/NVM/Perl.pm"
       }
    },
    "release_status" : "stable",
@@ -67,6 +66,6 @@
          "web" : "https://github.com/jkhall81/nvm-pl"
       }
    },
-   "version" : "v0.1.1",
+   "version" : "1.2",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

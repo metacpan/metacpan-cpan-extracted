@@ -4,7 +4,9 @@ use warnings;
 
 use Pod::Abstract;
 
-our $VERSION = '0.20';
+use Module::Pluggable require => 1, search_path => ['Pod::Abstract::Filter'];
+
+our $VERSION = '0.26';
 
 =head1 NAME
 
@@ -56,6 +58,84 @@ sub new {
     my %args = @_;
     
     return bless { %args }, $class;
+}
+
+=head2 plugins_info
+
+ my $info = Pod::Abstract::Filter->plugins_info;
+
+Gets information for each paf command/plugin.
+
+=cut
+
+sub plugins_info {
+    my $class = shift;
+
+    my @plugins = $class->plugins;
+    my $info = {};
+    foreach my $p (@plugins) {
+        $p =~ m/^Pod::Abstract::Filter::(.*)$/;
+        my $cmd = $1;
+
+        $info->{$cmd} = {
+            class => $p,
+            command => $cmd,
+            summary => $class->summarise( $p ),
+        };
+    }
+
+    return $info;
+}
+
+sub summarise {
+    my $class = shift;
+    my $mod = shift;
+    
+    $mod =~ s/::/\//g;
+    $mod .= '.pm';
+    my $filepath = '';
+    foreach my $path (@INC) {
+        if(-r "$path/$mod") {
+            $filepath = "$path/$mod";
+            last;
+        }
+    }
+
+    my $pa = Pod::Abstract->load_file($filepath);
+    my @texts = $pa->select('/head1[@heading eq \'NAME\']/:paragraph');
+    return [] unless @texts;
+    
+    my $pt = join '', map { $_->pod } @texts;
+    $pt =~ s/^Pod::Abstract::Filter:://;
+    my ($command, $rest) = split / - /, $pt, 2;
+    return [ ] unless $command && $rest; # Never mind if the module doesn't follow standard
+
+    $rest =~ s/[\r\n]//g;
+
+
+    # Reflow to max 72 chars.
+    my $out = '';
+    while( $rest ) {
+        if( length $rest <= 72 ) {
+            $out .= '    '.$rest;
+            $rest = '';
+        } else {
+            my $i = 72;
+            while( substr($rest, $i, 1) !~ /^\s$/ && $i > 0 ) {
+                $i --;
+            }
+            if( $i == 0 ) {
+                # Give up and finish the string.
+                $out .= '    '.$rest;
+            } else {
+                $out .= '    '.substr( $rest, 0, $i, '')."\n";
+                $rest =~ s/^\s*//;
+            }
+        }
+
+    }
+
+    return [ $command, $out ];
 }
 
 =head2 require_params
@@ -117,11 +197,11 @@ sub run {
 
 =head1 AUTHOR
 
-Ben Lilburne <bnej@mac.com>
+Ben Lilburne <bnej80@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009 Ben Lilburne
+Copyright (C) 2009-2025 Ben Lilburne
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

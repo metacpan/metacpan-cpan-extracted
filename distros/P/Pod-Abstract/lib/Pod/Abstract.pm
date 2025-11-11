@@ -7,7 +7,7 @@ use Pod::Abstract::Path;
 use Pod::Abstract::Parser;
 use IO::String;
 
-our $VERSION = '0.20';
+our $VERSION = '0.26';
 
 =head1 NAME
 
@@ -33,55 +33,44 @@ Pod::Abstract - Abstract document tree for Perl POD documents
 
 =head1 DESCRIPTION
 
-POD::Abstract provides a means to load a POD (or POD compatible)
-document without direct reference to it's syntax, and perform
-manipulations on the abstract syntax tree.
+C<Pod::Abstract> provides a means to load a POD document without direct
+reference to it's syntax, and perform manipulations on the abstract
+syntax tree.
 
 This can be used to support additional features for POD, to format
 output, to compile into alternative formats, etc.
 
-=head2 WHY?
+POD documents are not a natural tree, but do have a logical nesting
+structure. C<Pod::Abstract> makes this explicit - C<=head*> commands
+create nested sections, =over and =back create nested lists, etc.
 
-If you've ever asked yourself "What does Pod do for me?", this module
-is intended to answer that question.
+The "paf summary" command provides easy visualisation of the created
+tree.
 
-While Pod looks like a simple format, the specification calls for a
-number of special cases to be handled, and that makes any software
-that works on Pod as text more complex than it needs to be.
+=head2 USAGE
 
-In addition to this, Pod does not lend itself to a natural structured
-model. This makes it difficult to manipulate without damaging the
-validity of the document.
+C<Pod::Abstract> allows easy manupulation and traversal of POD or Perl
+files containing POD, without having to manually do any string
+manipulation.
 
-Pod::Abstract solves these problems by loading the document into a
-structured tree, and providing consistent traversal, searching,
-manpulation and re-serialisation. Pod related utilities are easy to
-write using Pod::Abstract.
+It allows you to easily write formatters, filters, test scripts, etc
+for POD.
 
-The design goal of Pod::Abstract is to do the hard work for the
-programmer - the library should work for you, and as such it should be
-significantly easier than string mashing what you want out of a Pod
-document.
+C<Pod::Abstract> is based on the standard L<Pod::Parser> module.
 
 =head2 PROCESSING MODEL
 
-The intent with POD::Abstract is to provide a means to decorate a
-parse tree, rather than manipulate text, to allow other software to
-add features and functionality to POD based documenation systems.
+C<Pod::Abstract> allows documents to be loaded, decorated, and
+manupulated in multiple steps. It can also make generating a POD
+formatter very simple. You can easily add features to an existing POD
+formatter, since any POD abstract object can be written out as a POD
+document.
 
-If you wish to write modules that interact nicely with other
-POD::Abstract modules, then you should provide a POD::Abstract -E<gt>
-POD::Abstract translation. Leave any document element that your
-program is not interested in directly untouched in the parse tree, and
-if you have data that could be useful to other packages, decorate the
-parse tree with that data even if you don't see any direct way to use
-it in the output.
-
-In this way, when you want one more feature for POD, rather than write
-or fork a whole translator, a single inline "decorator" can be added.
+Rather than write or fork a whole translator, a single inline
+"decorator" can be added.
 
 The C<paf> utility provides a good starting point, which also allows
-you to hook in to an existing filter/transform library. Simply add a
+you to hook in to an existing filter/transform library. Add a
 C<Pod::Abstract::Filter> class to the namespace and it should start
 working as a C<paf> command.
 
@@ -115,21 +104,19 @@ into:
 
  =back
 
-This transformation can be simply performed on the document tree. If
-your formatter does not use Pod::Abstract, you can simply pipe out POD
-and use a regular formatter. If your formatter supports Pod::Abstract
-though, then you can feed in the syntax tree directly without having
-to re-serialise and parse the document.
+This transformation can be performed on the document tree. If your
+formatter does not use Pod::Abstract, you can pipe out POD and use a
+regular formatter. If your formatter supports Pod::Abstract, you can
+feed in the syntax tree without having to re-serialise and parse the
+document.
 
-In addition to this, because the source document is still valid Pod,
-you aren't breaking compatibility with regular perldoc just by making
-Pod::Abstract transformations.
+The source document is still valid Pod, you aren't breaking
+compatibility with regular perldoc just by making Pod::Abstract
+transformations.
 
 =head2 POD SUPPORT
 
-Pod::Abstract aims to support all POD rules defined in perlpodspec
-(even the ones I don't like), except for those directly related to
-formatting output, or which cannot be implemented generically.
+C<Pod::Abstract> supports all POD rules defined in perlpodspec.
 
 =head1 COMPONENTS
 
@@ -139,41 +126,97 @@ Pod::Abstract is comprised of:
 
 =item *
 
-The parser, which loads a document tree for you.
+The parser, which loads a document tree.
 
-You should access this through C<Pod::Abstract>, not directly
+e.g:
+
+ my $pa = Pod::Abstract->load_filehandle(\*STDIN);
 
 =item *
 
-The document tree, which is the root node you are given by the
-parser. Calling B<pod> on the root node should always give you back
-your original document.
+The document tree, returned from the parser. The root node (C<$pa>
+above) represents the whole document. Calling B<< ->pod >> on the root node
+will give you back your original document.
+
+Note the document includes C<#cut> nodes, which are generally the Perl
+code - the parts that aren't POD. These will be included in the output
+of B<< ->pod >> unless you remove them, so you can modify a Perl module
+as a POD document in POD abstract, and it will work the same
+afterwards.
+
+e.g
+
+ my $pod_text = $pa->pod; # $pod_text is reserialized from the tree.
 
 See L<Pod::Abstract::Node>
 
 =item *
 
-L<Pod::Abstract::Path>, the node selection expression language. This
-is generally called by doing
-C<< $node->select(PATH_EXP) >>. Pod::Abstract::Path is the most complex
-and powerful component of this module, and if you're not using it you
-should be. ;)
+L<Pod::Abstract::Path>, a node selection language. Called via C<<
+$node->select(PATH_EXP) >>. Pod paths are a powerful feature allowing
+declarative traversal of a document.
 
-This allows you to ask questions like:
+For example -
 
-"In the first head1 that starts with "A", find me the head2 matching
-'foo' with bold text somewhere in the preceding paragraph or heading"
+"Find all head2s under METHODS"
 
- /head1[@heading=~{^A}](0)/head2[@heading=~{foo}i]<<head2 :paragraph[//:B]
+ /head1[@heading=~{^METHODS$}]/head2
 
-You probably don't need anything that complex, but it's there if you
-do.
+"Find all bold text anywhere"
+
+ //B
 
 =item *
 
-The node builder, L<Pod::Abstract::BuildNode>
+The node builder, L<Pod::Abstract::BuildNode>. This exports methods to
+allow adding content to POD documents.
+
+You can also combine documents - 
+
+ use Pod::Abstract::BuildNode qw(node nodes);
+ # ...
+ my @nodes = nodes->from_pod($pod);
+
+Where C<$pod> is a text with POD formatting.
 
 =back
+
+=head2 Using paths
+
+The easiest way to traverse a C<$pa> tree is to use the C<select> method on the
+nodes, and paths.
+
+C<select> will accept and expression and return an array of
+L<Pod::Abstract::Node>. These nodes also support the select method - for example:
+
+ my @headings = $pa->select('/head1'); # Get all heading 1
+ my @X = $headings[0]->select('//:X'); # Get all X (index) sequences inside that heading
+ my @indices = map { $_->text } @X; # Map out the contents of those as plain text.
+
+You can combine path expressions with other methods, for example - C<children>
+will give all the child nodes of a POD node, C<next>, C<previous>, C<parent> and
+C<root> allow traversal from a given node.
+
+From any node you can then call C<select> to make a declarative traversal from
+there. The above methods also have comparable expressions in
+L<Pod::Abstract::Path>.
+
+=head2 Traversing for document generation
+
+To traverse the tree for document generation, you can follow C<children> from
+the first node, then examine each node type to determine what you should
+generate.
+
+The nodes will generate in a tree, so headings have nested children with
+subheadings and texts. In most cases the C<body> method will give the text (or
+POD nodes) next to the command, while the C<children> method will give the
+contained POD.
+
+Special types are C<:paragraph>, C<:text>, <#cut>. Interior sequences are also
+started with a : for their type, like C<:L>, C<:B>, C<:I> for Link, Bold,
+Italic.
+
+Use the C<< $node->ptree >> method to see a visualised tree of a parsed document.
 
 =head1 METHODS
 
@@ -197,6 +240,9 @@ sub load_file {
     $p->parse_from_file($filename);
     $p->root->coalesce_body(":verbatim");
     $p->root->coalesce_body(":text");
+
+    # Remove any blank verbatim nodes.
+    $_->detach foreach $p->root->select('//:verbatim[ . =~ {^[\s]*$}]');
     return $p->root;
 }
 
@@ -217,6 +263,9 @@ sub load_filehandle {
     $p->parse_from_filehandle($fh);
     $p->root->coalesce_body(":verbatim");
     $p->root->coalesce_body(":text");
+
+    # Remove blank verbatim nodes.
+    $_->detach foreach $p->root->select('//:verbatim[ . =~ {^[\s]*$}]');
     return $p->root;
 }
 
@@ -239,11 +288,11 @@ sub load_string {
 
 =head1 AUTHOR
 
-Ben Lilburne <bnej@mac.com>
+Ben Lilburne <bnej80@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009 Ben Lilburne
+Copyright (C) 2009-2025 Ben Lilburne
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

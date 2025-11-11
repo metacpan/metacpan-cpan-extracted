@@ -1,3 +1,99 @@
+commit 2ac844e833bd420fdc1af3851ccbcd19be11aa09
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon Nov 10 22:48:38 2025 +1030
+
+    VERSION increment: 2.026
+
+commit 7492d80ede053b21874f1ca26bebbca54afcbaec
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon Nov 10 22:48:13 2025 +1030
+
+    Attempt to fix bug in wdcompile and WebDyne::Compile  which was causing test failures because Webdyne inode() wasn't unique across files
+
+commit 9e215b1b0bb14db3e6c3cc45d7a43d63b46ef0c9
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat Nov 8 10:01:11 2025 +1030
+
+    VERSION increment: 2.025
+
+commit feb633c43e342663278669d15263bfbf01491afc
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat Nov 8 10:00:56 2025 +1030
+
+    Fix way we treat fragment sources to not alter data_ar by deleting src attrribute, map AJAX/HTMX headers an array ref in WebDyne::Constant
+
+commit 60dbbd1afb486a95c54ded2f7f0bfef80e47c74e
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Nov 7 23:02:03 2025 +1030
+
+    VERSION increment: 2.024
+
+commit 1e3e7a28dd60044343cfe848e1469d36944ffc0b
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Nov 7 23:01:46 2025 +1030
+
+    Update tests to not use Storable::freeze for actual vs expected data, not reliable across different Perl versions. Revert to Data::Dumper string comparison
+
+commit 93b2caf0cba0fdae8edb390c4182b029d6a2b92c
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Nov 7 21:41:26 2025 +1030
+
+    VERSION increment: 2.023
+
+commit 54549ed6ba314df2ffdc282e93e0abcc1d490f7b
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Nov 7 21:41:14 2025 +1030
+
+    Allow perl code within <htmx>, <api> and <json> blocks, fixed change which broke /api path when document_default set
+
+commit cf5a84e304611dd607ad6b4f6109c97c720afd1a
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Nov 7 01:04:22 2025 +1030
+
+    Fix type on AlpineJS translation hack
+
+commit 88b83bed606fd3b12ba5c1a43ed3d640afe2be8e
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Nov 7 00:36:54 2025 +1030
+
+    VERSION increment: 2.022
+
+commit bd1e4c545e8b09f96df018bd83dd58bbb5284266
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Nov 7 00:36:45 2025 +1030
+
+    Add missing css files for test to MANIFEST
+
+commit 87d314b1f42b4017e5fba593ed434ba0f71a9c74
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Nov 7 00:33:10 2025 +1030
+
+    VERSION increment: 2.021
+
+commit 4220ed3d6e56463188e4d4826faa623f5c113f67
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Nov 7 00:15:39 2025 +1030
+
+    Add new test files to MANIFEST
+
+commit ee413c0b46a9728dddf80521e6ada66ede65f179
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Fri Nov 7 00:14:43 2025 +1030
+
+    Add viewport as default meta tag, allow includes in head to be array refs, update index to show source using htmx files
+
+commit 365d98678110c0ea4dfa9e8b5402a862c4dd1e02
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Thu Nov 6 00:06:22 2025 +1030
+
+    Interim commit of new index.psp with include_style and include_script keywords for <start_html> + hack to fix Alpine.js @click syntax in attributes
+
+commit 5056002e07f8c3111d350986bda6f633a8dac9bb
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Mon Nov 3 23:50:35 2025 +1030
+
+    Add support for multi-line start_html attributes like script, style etc. Change logic to not do subst on Javascript <script> blocks. Add some tests
+
 commit 0d14fcc822ffe7f4b7b679d9de9193835fe0ec36
 Author: Andrew Speer <andrew.speer@isolutions.com.au>
 Date:   Sun Nov 2 17:27:14 2025 +1030

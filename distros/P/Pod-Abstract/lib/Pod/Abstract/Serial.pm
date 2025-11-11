@@ -1,6 +1,6 @@
 package Pod::Abstract::Serial;
 use strict;
-our $VERSION = '0.20';
+our $VERSION = '0.26';
 
 my $serial_number = 0;
 
@@ -36,11 +36,11 @@ sub set {
 
 =head1 AUTHOR
 
-Ben Lilburne <bnej@mac.com>
+Ben Lilburne <bnej80@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009 Ben Lilburne
+Copyright (C) 2009-2025 Ben Lilburne
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -1,0 +1,5 @@
+<popup_menu values="@{qw(foo)}"/>
+<popup_menu values="@{'foo'}"/>
+<popup_menu values="@{
+    'foo'
+}"/>

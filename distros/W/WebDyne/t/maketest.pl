@@ -6,6 +6,9 @@ use strict qw(vars);
 use warnings;
 use vars   qw($VERSION);
 
+BEGIN {
+    $ENV{'WEBDYNE_CONF'}='.' unless ($ENV{'WEBDYNE_TEST_FILE_PREFIX'} eq '03');
+}
 
 #  External Modules
 #
@@ -17,12 +20,12 @@ use File::Spec;
 use IO::File;
 use HTML::TreeBuilder;
 use Storable qw(lock_nstore);
-$Storable::canonical=1;
 use FindBin qw($RealBin $Script);
 use Cwd qw(abs_path);
 use Carp qw(confess);
 $Storable::canonical=1;
 use Data::Dumper;
+$Data::Dumper::Sortkeys=1;
 
 
 #  WebDyne Modules
@@ -43,16 +46,12 @@ use WebDyne::Util;
 $ENV{'WEBDYNE_TEST_FILE_PREFIX'} ||= '02';
 
 
-#  Override any system webdyne.conf.pl config
-#
-$ENV{'WEBDYNE_CONF'} ||= '.';
-
-
 #  Run
 #
 exit(${&main(\@ARGV) || die err()} || 0);    # || 0 stops warnings
 
 #==================================================================================================
+
 
 sub main {
 

@@ -1,3 +1,6 @@
+0.08 2025-11-11T10:39:44+01:00
+ - Add scientific notation to check_positive_decimal() subroutine.
+
 0.07 2025-09-09T23:07:40+02:00
  - Add check_positive_decimal_range().
 

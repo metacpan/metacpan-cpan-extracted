@@ -1,7 +1,7 @@
 package Mojo::Util::Collection::Formatter;
 use Mojo::Base -base;
 
-our $VERSION = '0.0.11';
+our $VERSION = '0.0.13';
 
 use Mojo::JSON qw(encode_json);
 

@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## REST API Framework - ~/lib/Net/API/REST.pm
-## Version v1.2.3
+## Version v1.2.4
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/09/01
-## Modified 2024/09/05
+## Modified 2025/11/06
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -39,7 +39,7 @@ BEGIN
     use Net::API::REST::Request;
     use Net::API::REST::Response;
     use Apache2::API::Status;
-    $VERSION = 'v1.2.3';
+    $VERSION = 'v1.2.4';
 };
 
 use strict;
@@ -275,9 +275,19 @@ sub handler : method
     my $ep = $self->route( $uri );
     if( !defined( $ep ) )
     {
-        my $code = $self->error->code || Apache2::Const::HTTP_INTERNAL_SERVER_ERROR;
+        my $json = {};
+        my $code = $self->error->code;
+        if( $code )
+        {
+            $json->{code} = $code;
+            $json->{message} = $self->error->message;
+        }
+        else
+        {
+            $json->{code} = Apache2::Const::HTTP_INTERNAL_SERVER_ERROR;
+        }
         # Net::API::REST::reply will automatically set a json with an error message based on the user language
-        return( $self->reply({ code => $code }) );
+        return( $self->reply( $json ) );
     }
     # No resource found matching the user request, returning a 400
     elsif( !length( $ep ) )
@@ -863,8 +873,14 @@ sub route
     }
     $client_api_version ||= $self->request->client_api_version || $self->api_version;
     my $routes = $self->routes;
-    return( $self->error({ code => 500, message => "No routes set up to find the appropriate resource." }) ) if( !scalar( keys( %$routes ) ) );
-    return( $self->reply( Apache2::Const::HTTP_NOT_ACCEPTABLE, { error => "API version requested ($client_api_version) is not supported." } ) ) if( !CORE::exists( $routes->{ $client_api_version } ) );
+    if( !scalar( keys( %$routes ) ) )
+    {
+        return( $self->error({ code => 500, message => "No routes set up to find the appropriate resource." }) );
+    }
+    elsif( !CORE::exists( $routes->{ $client_api_version } ) )
+    {
+        return( $self->error({ code => Apache2::Const::HTTP_NOT_ACCEPTABLE, message => "API version requested ($client_api_version) is not supported." }) );
+    }
     my $req = $self->request;
     my $resp = $self->response;
     # Path variables like "/some/path/1234/more/thing/jack" where 1234 and jack are variables
@@ -1304,7 +1320,7 @@ sub routes
                     #    api => $self,
                     #    checkonly => 1
                     #) || return( $self->pass_error( $cl->error ) );
-                    if( defined( $meth ) )
+                    if( !defined( $meth ) )
                     {
                         return( "Class \"$cl\" does not have a method \"$meth\"." ) if( !$cl->can( $meth ) );
                     }
@@ -1610,7 +1626,7 @@ Net::API::REST - Framework for RESTful APIs
 
 =head1 VERSION
 
-    v1.2.3
+    v1.2.4
 
 =head1 DESCRIPTION
 

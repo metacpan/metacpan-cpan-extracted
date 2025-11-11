@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -25,13 +25,13 @@
       },
       "configure" : {
          "requires" : {
-            "XS::Install" : "v1.2.17"
+            "XS::Install" : "v1.4.0"
          }
       },
       "runtime" : {
          "requires" : {
             "DBIx::Class" : "0.07003",
-            "XS::Install" : "v1.2.17"
+            "XS::Install" : "v1.4.0"
          }
       },
       "test" : {
@@ -45,6 +45,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : 0.04,
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "v1.0.0",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

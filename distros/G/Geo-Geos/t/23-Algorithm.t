@@ -40,7 +40,7 @@ subtest "CGA" => sub {
     is distanceLineLine($c1, $c2, $c3, $c4), 2;
 
     is signedArea($coords_ring), 8;
-    is Geo::Geos::Algorithm::length([$c1, $c2, $c3, $c4]), 8;
+    is Geo::Geos::Algorithm::length($coords_ring), 12;
 };
 
 subtest "CentralEndpointIntersector" => sub {

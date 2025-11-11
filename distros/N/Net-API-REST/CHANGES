@@ -1,5 +1,8 @@
 Revision history for Perl module Net::API::REST
 
+v1.2.4 2025-11-06T21:02:53+0900
+    - Corrected an error in the method route() returning an HTTP cod einstead of an error.
+
 v1.2.3 2024-09-05T21:23:31+0900
     - Updated dependencies
 

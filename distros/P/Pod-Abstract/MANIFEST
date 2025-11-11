@@ -13,6 +13,7 @@ lib/Pod/Abstract/Filter/sort.pm
 lib/Pod/Abstract/Filter/summary.pm
 lib/Pod/Abstract/Filter/find.pm
 lib/Pod/Abstract/Filter/number_sections.pm
+lib/Pod/Abstract/Filter/ptree.pm
 lib/Pod/Abstract/Node.pm
 lib/Pod/Abstract/Parser.pm
 lib/Pod/Abstract/Path.pm
@@ -24,4 +25,8 @@ README
 t/01_compile.t
 t/02_roundtrip.t
 t/03_buildnode.t
-META.yml                                 Module meta-data (added by MakeMaker)
+t/04_matchnodes.t
+t/05_pod_detailed.t
+t/06_pa_example.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

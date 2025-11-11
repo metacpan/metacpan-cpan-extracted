@@ -1,2 +1,2 @@
-<start_html script="@{qw(https://cdn.jsdelivr.net/npm/chart.js https://cdn.jsdelivr.net/npm/chart.js)}"/>
-Array ref Script
+<start_html script="@{qw(https://cdn.jsdelivr.net/npm/chart.js https://cdn.jsdelivr.net/npm/chart.js)}">
+start_html_script_array

@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 7 + ($] < 5.013001 ? 1 : 0);
+use Test::More tests => 8;
 use Test::Fatal qw(exception success);
 use Try::Tiny 0.07;
 
@@ -51,17 +51,18 @@ try {
 
 {
   package BreakException;
-  sub DESTROY { eval { my $x = 'o no'; } }
+  sub DESTROY { eval { my $x = 'o no'; } }  # resets $@ to '' on older perls
 }
 
-if ($] < 5.013001) {
+SKIP: {
+  skip 'perl < 5.013001 required to test $@ being altered in DESTROY', 1 if $] >= 5.013001;
   like(
     exception { exception {
       my $blackguard = bless {}, 'BreakException';
       die "real exception";
     } },
     qr{false exception},
-    "we throw a new exception if the exception is false",
+    'DESTROY resets $@ to false; we throw a new exception if the exception is false',
   );
 }
 
@@ -70,9 +71,9 @@ if ($] < 5.013001) {
   use overload 'bool' => sub { 0 };
 }
 
-like(
+is(
   exception { exception { die(bless {} => 'FalseObject'); } },
-  qr{false exception},
-  "we throw a new exception if the exception is false",
+  undef,
+  "we do not throw a new exception if the exception is false but blessed",
 );
 

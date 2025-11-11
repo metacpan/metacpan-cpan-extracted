@@ -1,0 +1,6 @@
+<start_html 
+    script="@{
+        'https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js#defer'
+    }" 
+>
+start_html_script_fragment

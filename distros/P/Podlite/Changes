@@ -1,0 +1,8 @@
+Revision history for Podlite
+
+1.00  2025-11-09
+    - initial release
+    - source filter for Podlite markup language in Perl programs
+    - strips Podlite markup during compilation
+    - preserves line numbers for accurate error reporting
+    - support for embedded data via *DATA filehandle

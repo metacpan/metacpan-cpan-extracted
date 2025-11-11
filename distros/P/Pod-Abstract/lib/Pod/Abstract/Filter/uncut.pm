@@ -5,12 +5,11 @@ use warnings;
 use base qw(Pod::Abstract::Filter);
 use Pod::Abstract::BuildNode qw(node);
 
-our $VERSION = '0.20';
+our $VERSION = '0.26';
 
 =head1 NAME
 
-Pod::Abstract::Filter::uncut - paf command to turn source code into
-verbatim nodes.
+Pod::Abstract::Filter::uncut - Turn source code into verbatim nodes.
 
 =head1 DESCRIPTION
 
@@ -31,25 +30,33 @@ sub filter {
         next unless $cut->body =~ m/^=cut/;
         my $n = $cut->next;
         while( $n && $n->type eq '#cut' ) {
-            $cut->push(node->verbatim($n->body));
+            my $body = $n->body;
+            $body =~ s/\n\s*$//m;
+            $cut->push(node->verbatim($body));
             $n->detach;
             $n = $cut->next;
         }
-        $cut->coalesce_body(':verbatim');
         $cut->hoist;
         $cut->detach;
     }
+    $pa->coalesce_body(":verbatim");
+    $pa->coalesce_body(":text");
+
+    # Detach/remove any blank verbatim nodes, so we don't have extra
+    # empty verbatim blocks to deal with.
+
+    $_->detach foreach $pa->select('//:verbatim[ . =~ {^[\s]*$}]');
     
     return $pa;
 }
 
 =head1 AUTHOR
 
-Ben Lilburne <bnej@mac.com>
+Ben Lilburne <bnej80@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009 Ben Lilburne
+Copyright (C) 2009-2025 Ben Lilburne
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

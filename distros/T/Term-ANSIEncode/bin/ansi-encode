@@ -46,25 +46,84 @@ my $tokens    = FALSE;
 my $rawtokens = FALSE;
 my $symbols   = FALSE;
 my $unicode   = FALSE;
-my $expanded  = (defined($ENV{'COLORTERM'}) && $ENV{'COLORTERM'} eq 'truecolor') ? TRUE : FALSE;
-my $expand    = FALSE;
 my $colors    = FALSE;
 my $Dump      = FALSE;
+my $c16       = TRUE;
+my $c256      = FALSE;
+my $crgb      = FALSE;
+my $frames    = FALSE;
+my $rules     = FALSE;
 
 GetOptions(
-    'version'   => \$version,
-    'help'      => \$help,
-    'tokens'    => \$tokens,
-    'rawtokens' => \$rawtokens,
-    'colors'    => \$colors,
-    'symbols'   => \$symbols,
-    'dump'      => \$Dump,
-    'unicode'   => \$unicode,
-	'expanded'  => \$expand,
+    'version'            => \$version,
+    'help'               => \$help,
+    'tokens'             => \$tokens,
+    'rawtokens'          => \$rawtokens,
+    'colors'             => \$colors,
+    'symbols'            => \$symbols,
+    'dump'               => \$Dump,
+    'unicode'            => \$unicode,
+	'frames'             => \$frames,
+	'h|horizontal-rules' => \$rules,
 );
-$expanded = ! $expanded if ($expand);
+
+if (exists($ENV{'COLORTERM'}) && $ENV{'COLORTERM'} eq 'truecolor') {
+    $crgb = TRUE;
+}
+if (exists($ENV{'TERM'}) && $ENV{'TERM'} =~ /256/) {
+    $c256 = TRUE;
+}
+
+my $header = '[% CLS %]For Best results, make sure your terminal type supports 256 (or more)
+colors like "xterm-256color".  You should be using the "Awesome" fonts for
+access to all Unicode characters and symbols:
+
+    http://github.com/gabrielelana/awesome-terminal-fonts
+';
 
 ###
+
+my $sample_horizontal_rules = <<'RULES';
+
+Horizontal rules
+
+[% HORIZONTAL RULE PINK %][% BLACK %][% B_PINK %] PINK[% RESET %]
+[% HORIZONTAL RULE GREEN %][% BLACK %][% B_GREEN %] GREEN[% RESET %]
+[% HORIZONTAL RULE ORANGE %][% BLACK %][% B_ORANGE %] ORANGE[% RESET %]
+[% HORIZONTAL RULE MAGENTA %][% BLACK %][% B_MAGENTA %] MAGENTA[% RESET %]
+[% HORIZONTAL RULE CYAN %][% BLACK %][% B_CYAN %] CYAN[% RESET %]
+[% HORIZONTAL RULE BLUE %][% WHITE %][% B_BLUE %] BLUE[% RESET %]
+[% HORIZONTAL RULE RED %][% WHITE %][% B_RED %] RED[% RESET %]
+[% HORIZONTAL RULE YELLOW %][% BLACK %][% B_YELLOW %] YELLOW[% RESET %]
+[% HORIZONTAL RULE NAVY %][% WHITE %][% B_NAVY %] NAVY[% RESET %]
+[% HORIZONTAL RULE ROYAL BLUE %][% WHITE %][% B_ROYAL BLUE %] ROYAL BLUE[% RESET %]
+
+RULES
+
+my $sample_frames = <<'FRAMES';
+
+[% BOX BRIGHT YELLOW,1,7,17,5,DOUBLE        %]This is a text box with a DOUBLE frame[% ENDBOX %]
+[% BOX BRIGHT GREEN,18,7,21,4,THIN          %]This is a text box with a THIN frame[% ENDBOX %]
+[% BOX BRIGHT RED,39,7,16,5,THICK           %]This is a text box with a THICK frame[% ENDBOX %]
+[% BOX BRIGHT BLUE,56,7,16,5,CIRCLE         %]This is a text box with a CIRCLE frame[% ENDBOX %]
+[% BOX PINK,1,12,20,5,ROUNDED               %]This is a text box with a ROUNDED frame[% ENDBOX %]
+[% BOX ORANGE,18,17,16,5,BLOCK              %]This is a text box with a BLOCK frame[% ENDBOX %]
+[% BOX BRIGHT BLUE,1,17,16,5,WEDGE          %]This is a text box with a WEDGE frame[% ENDBOX %]
+[% BOX MAGENTA,53,16,14,6,DOTS              %]This is a text box with a DOTS frame[% ENDBOX %]
+[% BOX CYAN,22,12,17,5,DIAMOND              %]This is a text box with a DIAMOND frame[% ENDBOX %]
+[% BOX WHITE,41,12,22,4,STAR                %]This is a text box with a STAR frame[% ENDBOX %]
+[% BOX RED,35,17,17,5,SQUARE                %]This is a text box with a SQUARE frame[% ENDBOX %]
+[% BOX BRIGHT WHITE,1,22,17,5,DITHERED      %]This is a text box with a DITHERED frame[% ENDBOX %]
+[% BOX BRIGHT MAGENTA,19,22,17,5,HEARTS     %]This is a text box with a HEARTS frame[% ENDBOX %]
+[% BOX SADDLE BROWN,37,22,17,5,CHRISTIAN    %]This is a text box with a CHRISTIAN frame[% ENDBOX %]
+[% BOX ROYAL BLUE,55,22,17,5,ARROWS         %]This is a text box with an ARROWS frame[% ENDBOX %]
+[% BOX FOREST GREEN,1,27,22,5,PARALLELOGRAM %]This is a text box with a PARALLELOGRAM frame[% ENDBOX %]
+[% BOX CRIMSON,24,27,17,5,BIG WEDGE         %]This is a text box with a BIG WEDGE frame[% ENDBOX %]
+[% BOX SALMON,42,27,17,5,BIG ARROWS         %]This is a text box with a BIG ARROWS frame[% ENDBOX %]
+[% BOX YELLOW,60,27,16,5,NOTES              %]This is a text box with a NOTES frame[% ENDBOX %]
+
+FRAMES
+
 my $text = <<'VERSION';
 [% CLS %][% YELLOW %]╔═════════════════════════════════════════════════════════════════════════════╗[% RESET %]
 [% YELLOW %]║[% B_BLACK %][% RED %]               [% BRIGHT YELLOW %] _   _ [% GREEN %] _____ [% BRIGHT BLUE %]_____  [% BRIGHT WHITE %] ______                     _            [% RESET %][% YELLOW %]║[% RESET %]
@@ -86,22 +145,24 @@ VERSION
 ###
 $text =~ s/XXXX/$VERSION/gs;
 
-my $ansi = Term::ANSIEncode->new('mode' => 'full');
-# warn Dumper($ansi);exit;
+my $ansi = Term::ANSIEncode->new();
+
 my @list = (
-	0x20 .. 0x7F,
-	0xA0 .. 0xFF,
-	0x2010 .. 0x205F,
-	0x2070 .. 0x242F,
-	0x2440 .. 0x244F,
-	0x2460 .. 0x29FF,
-	0x1F300 .. 0x1F8BF,
-	0x1F900 .. 0x1FBBF,
-	0x1FBC0 .. 0x1FBCF,
-	0x1FBF0 .. $ansi->{'finish'}
+    0x20 .. 0x7F,
+    0xA0 .. 0xFF,
+    0x2010 .. 0x205F,
+    0x2070 .. 0x242F,
+    0x2440 .. 0x244F,
+    0x2460 .. 0x29FF,
+    0x1F300 .. 0x1F8BF,
+    0x1F900 .. 0x1FBBF,
+    0x1FBC0 .. 0x1FBCF,
+    0x1FBF0 .. $ansi->{'finish'}
 );
+
 ###
 my $small = <<'SMALL';
+
 [% CLS %]╔═════════════════════════════════════════════════════════════════════════╗
 ║[% B_BLACK %]                     [% RED %]┏━┓[% BRIGHT YELLOW %]┏┓╻[% GREEN %]┏━┓[% BRIGHT BLUE %]╻   [% BRIGHT WHITE %]┏━╸┏┓╻┏━╸┏━┓╺┳┓┏━╸                     [% RESET %]║
 ║[% B_BLACK %]                     [% RED %]┣━┫[% BRIGHT YELLOW %]┃┗┫[% GREEN %]┗━┓[% BRIGHT BLUE %]┃   [% BRIGHT WHITE %]┣╸ ┃┗┫┃  ┃ ┃ ┃┃┣╸                      [% RESET %]║
@@ -114,14 +175,23 @@ my $small = <<'SMALL';
 ║     [% CYAN %]ansi-encode[% RESET %] [options] [text file]                                   ║
 ╟─────────────────────────────────────────────────────────────────────────╢
 ║[% B_COLOR 52 %][% BRIGHT YELLOW %] OPTIONS                                                                 [% RESET %]║
-║     -[% BRIGHT BLUE %]v[% RESET %] or --[% BRIGHT BLUE %]version[% RESET %]                                                     ║
-║         Shows version and licensing info                                ║
-║                                                                         ║
-║     -[% BRIGHT BLUE %]h[% RESET %] or --[% BRIGHT BLUE %]help[% RESET %]                                                        ║
-║         Usage information                                               ║
-║                                                                         ║
 ║     -[% BRIGHT BLUE %]c[% RESET %] or --[% BRIGHT BLUE %]colors[% RESET %]                                                      ║
 ║         Show available colors                                           ║
+║                                                                         ║
+║     -[% BRIGHT BLUE %]d[% RESET %] or --[% BRIGHT BLUE %]dump[% RESET %] [search]                                               ║
+║         Dump available sysmbols                                         ║
+║                                                                         ║
+║     -[% BRIGHT BLUE %]f[% RESET %] or --[% BRIGHT BLUE %]frames[% RESET %]                                                      ║
+║         Show sample frame types                                         ║
+║                                                                         ║
+║     --[% BRIGHT BLUE %]help[% RESET %]                                                              ║
+║         Usage information                                               ║
+║                                                                         ║
+║     -[% BRIGHT BLUE %]h[% RESET %] or --[% BRIGHT BLUE %]horizontal-rules[% RESET %]                                            ║
+║         Show sample horizontal rules                                    ║
+║                                                                         ║
+║     -[% BRIGHT BLUE %]r[% RESET %] or --[% BRIGHT BLUE %]rawtokens[% RESET %]                                                   ║
+║         Raw dump of available tokens.                                   ║
 ║                                                                         ║
 ║     -[% BRIGHT BLUE %]s[% RESET %] or --[% BRIGHT BLUE %]symbols[% RESET %] [search]                                            ║
 ║         Show available symbols and character tokens by name             ║
@@ -132,26 +202,13 @@ my $small = <<'SMALL';
 ║     -[% BRIGHT BLUE %]u[% RESET %] or --[% BRIGHT BLUE %]unicode[% RESET %] [-[% BRIGHT BLUE %]e[% RESET %]] [search]                                       ║
 ║         Show available symbols and character tokens by unicode          ║
 ║                                                                         ║
-║     -[% BRIGHT BLUE %]e[% RESET %] or --[% BRIGHT BLUE %]expanded[% RESET %]                                                    ║
-║         Shows all color tokens in token mode.  Shows horizontal         ║
-║         dividers for unicode mode.  Ignored in other modes              ║
-║                                                                         ║
-║     -[% BRIGHT BLUE %]r[% RESET %] or --[% BRIGHT BLUE %]rawtokens[% RESET %]                                                   ║
-║         Raw dump of available tokens.                                   ║
-║                                                                         ║
-║     -[% BRIGHT BLUE %]d[% RESET %] or --[% BRIGHT BLUE %]dump[% RESET %] [search]                                               ║
-║         Dump available sysmbols                                         ║
+║     -[% BRIGHT BLUE %]v[% RESET %] or --[% BRIGHT BLUE %]version[% RESET %]                                                     ║
+║         Shows version and licensing info                                ║
 ╚═════════════════════════════════════════════════════════════════════════╝
 SMALL
-###
-my $greydient = '';    # Yes, the spelling is intentional
-foreach my $c (0 .. 23) {
-    $greydient .= "[% B_GREY $c %] ";
-}
-$greydient .= '[% RESET %]';
-# [% BRIGHT WHITE %]╞══[% B_BLACK %] [% BOLD %][% MAGENTA %]GENERAL [% RESET %][% BRIGHT WHITE %]════════════════════════════╤══════════════════════════════════════════════╡[% RESET %]
-###
+
 my $to = <<'TOKENS';
+
 [% CLS %]Tokens have to be encapsulated inside [ % TOKEN % ] (the TOKEN must be
 surrounded by at least one space on each side).  Colors beyond the standard 16
 will require a terminal that supports 256 colors, up to 16 million colors.  It
@@ -160,107 +217,163 @@ character/symbol support.  Some terminals may not support some features.
 
 NOTE:  Use "less -r" to view ANSI in "less"
 
-╭─────────────────────────────────────────────────────────────────────────────────────────╮
+╭────────────────────────────────────────────────────────────────────────────────────────────────╮
 TOKENS
-
-$to .= '│' . colored(['bright_red'],'             ::::::::::::   ...      :::  .   .,:::::::::.    :::. .::::::.              ') . "│\n";
-$to .= '│' . colored(['bright_magenta'], q{             ;;;;;;;;''''.;;;;;;;.   ;;; .;;,.;;;;''''`;;;;,  `;;;;;;`    `              }) . "│\n";
-$to .= '│' . colored(['bright_cyan'], q{                  [[    ,[[     \[[, [[[[[/'   [[cccc   [[[[[. '[['[==/[[[[,             }) . "│\n";
-$to .= '│' . colored(['bright_blue'], q{                  $$    $$$,     $$$_$$$$,     $$""""   $$$ "Y$c$$  '''    $             }) . "│\n";
-$to .= '│' . colored(['bright_green'], q{                  88,   "888,_ _,88P"888"88o,  888oo,__ 888    Y88 88b    dP             }) . "│\n";
-$to .= '│' . colored(['bright_yellow'], q{                  MMM     "YMMMMMP"  MMM "MMP" """"YUMMMMMM     YM  "YMmMY"              }) . "│\n";
-
-{
-	foreach my $code ('special','clear','cursor','attributes','foreground','background','horizontal rules') {
-		if ($code eq 'special') {
-			$to .= '╞══ ' . colored(['bold','bright_white'],uc($code)) . ' ' . '═' x (29 - (2 + length($code))) . '═╤════════════════════════════════════════════════════════╡' . "\n";
-		} else {
-			$to .= '╞══ ' . colored(['bold','bright_white'],uc($code)) . ' ' . '═' x (29 - (2 + length($code))) . '═╪════════════════════════════════════════════════════════╡' . "\n";
-		}
-		if ($code eq 'horizontal rules') {
-			$to .= '│  ' . sprintf('%-29s', 'HORIZONTAL RULE color') . ' │ ' . sprintf('%-54s','Horizontal rule the width of the screen in the') . ' │' . "\n";
-			$to .= '│                                │ ' . sprintf('%-54s','specified color') . ' │' . "\n";
-		} else {
-			my @names = (sort(keys %{$ansi->{'ansi_meta'}->{$code}}));
-			while(scalar(@names)) {
-				my $name = shift(@names);
-				if ($code =~ /foreground|background/) {
-					unless ($expanded) {
-						if ($ansi->{'ansi_meta'}->{$code}->{$name}->{'orig'}) {
-							$to .= '│  ' . sprintf('%-29s',$name) . ' │ ' . sprintf('%-54s',$ansi->ansi_description($code,$name)) . ' │' . "\n";
-						}
-					} else {
-						$to .= '│  ' . sprintf('%-29s',$name) . ' │ ' . sprintf('%-54s',$ansi->ansi_description($code,$name)) . ' │' . "\n";
-					}
-				} else {
-					$to .= '│  ' . sprintf('%-29s',$name) . ' │ ' . sprintf('%-54s',$ansi->ansi_description($code,$name)) . ' │' . "\n";
-				}
-			}
-		}
-	}
-}
-  
-$to .= '╰────────────────────────────────┴────────────────────────────────────────────────────────╯' . "\n";
 ###
 
-$to =~ s/\[\% GREYDIENT \%\]/$greydient/g;
+$to .= '│' . colored(['bright_red'],      '                ::::::::::::   ...      :::  .   .,:::::::::.    :::. .::::::.                  ') . "│\n";
+$to .= '│' . colored(['bright_magenta'], q{                ;;;;;;;;''''.;;;;;;;.   ;;; .;;,.;;;;''''`;;;;,  `;;;;;;`    `                  }) . "│\n";
+$to .= '│' . colored(['bright_cyan'],    q{                     [[    ,[[     \[[, [[[[[/'   [[cccc   [[[[[. '[['[==/[[[[,                 }) . "│\n";
+$to .= '│' . colored(['bright_blue'],    q{                     $$    $$$,     $$$_$$$$,     $$""""   $$$ "Y$c$$  '''    $                 }) . "│\n";
+$to .= '│' . colored(['bright_green'],   q{                     88,   "888,_ _,88P"888"88o,  888oo,__ 888    Y88 88b    dP                 }) . "│\n";
+$to .= '│' . colored(['bright_yellow'],  q{                     MMM     "YMMMMMP"  MMM "MMP" """"YUMMMMMM     YM  "YMmMY"                  }) . "│\n";
 
 {
-	my $new;
-	foreach my $code (qw(attributes foreground background)) {
-		if ($code eq 'background') {
-			my $new;
-			foreach my $name (keys %{$ansi->{'ansi_meta'}->{$code}}) {
-				if ($name =~ /B_BLACK|B_NAVY|B_MIDNIGHT BLUE|B_MEDIUM BLUE|B_INDIGO|B_MAROON|B_DEFAULT|B_DARK BLUE|B_BLUE/) {
-					$new = $ansi->{'ansi_meta'}->{$code}->{$name}->{'out'} . " $name " . $ansi->{'ansi_meta'}->{'attributes'}->{'RESET'}->{'out'};
-				} else {
-					$new = $ansi->{'ansi_meta'}->{'foreground'}->{'BLACK'}->{'out'} . $ansi->{'ansi_meta'}->{$code}->{$name}->{'out'} . " $name " . $ansi->{'ansi_meta'}->{'attributes'}->{'RESET'}->{'out'};
+    foreach my $code ('special','clear','cursor','attributes','foreground ANSI 16', 'foreground ANSI 256', 'foreground ANSI TrueColor','background ANSI 16', 'background ANSI 256', 'background ANSI TrueColor','horizontal rules') {
+		next if (($code =~ /256/ && ! $c256) || ($code =~ /TrueColor/ && ! $crgb));
+        if ($code eq 'special') {
+            $to .= '╞══ ' . colored(['bold','bright_white'],uc($code)) . ' ' . '═' x (36 - (2 + length($code))) . '═╤════════════════════════════════════════════════════════╡' . "\n";
+        } else {
+            $to .= '╞══ ' . colored(['bold','bright_white'],uc($code)) . ' ' . '═' x (36 - (2 + length($code))) . '═╪════════════════════════════════════════════════════════╡' . "\n";
+        }
+        if ($code eq 'horizontal rules') {
+            $to .= '│' . sprintf('%-38s', 'HORIZONTAL RULE color') . ' │ ' . sprintf('%-54s','Horizontal rule the width of the screen in the') . ' │' . "\n";
+            $to .= '│                                       │ ' . sprintf('%-54s','specified color') . ' │' . "\n";
+		} elsif ($code =~ /^(foreground|background)/) {
+			my $ncode = substr($code, 0, 10);
+            my @names = grep(!/^(DEFAULT|B_DEFAULT|COLOR|GRAY|B_COLOR|B_GRAY)/,(sort(keys %{$ansi->{'ansi_meta'}->{$ncode}})));
+			if ($code eq 'foreground ANSI 16') {
+				unshift(@names,'DEFAULT');
+			} elsif ($code eq 'background ANSI 16') {
+				unshift(@names, 'B_DEFAULT');
+			}
+			foreach my $count (16 .. 231) {
+				if ($code eq 'foreground ANSI 256') {
+					push(@names,"COLOR $count");
+				} elsif ($code eq 'background ANSI 256') {
+					push(@names,"B_COLOR $count");
 				}
-				$to =~ s/  $name  / $new /gs;
 			}
-		} else {
-			foreach my $name (grep(!/^(HIDE|BLACK)$/, sort(keys %{$ansi->{'ansi_meta'}->{$code}}))) {
-				my $new = $ansi->{'ansi_meta'}->{$code}->{$name}->{'out'} . $name . $ansi->{'ansi_meta'}->{'attributes'}->{'RESET'}->{'out'};
-				$to =~ s/  $name  /  $new  /gs;
+			foreach my $count (0 .. 23) {
+				if ($code eq 'foreground ANSI 256') {
+					push(@names,"GRAY $count");
+				} elsif ($code eq 'background ANSI 256') {
+					push(@names,"B_GRAY $count");
+				}
 			}
-		}
-	}
-	$new = colored(['bright_green'],'│');
-	$to =~ s/│/$new/gs;
-	$new = colored(['bright_green'],'─');
-	$to =~ s/─/$new/gs;
-	$new = colored(['bright_green'],'┴');
-	$to =~ s/┴/$new/gs;
-	$new = colored(['bright_green'],'╭');
-	$to =~ s/╭/$new/gs;
-	$new = colored(['bright_green'],'╮');
-	$to =~ s/╮/$new/gs;
-	$new = colored(['bright_green'],'╰');
-	$to =~ s/╰/$new/gs;
-	$new = colored(['bright_green'],'╯');
-	$to =~ s/╯/$new/gs;
-	$new = colored(['bright_green'],'╞');
-	$to =~ s/╞/$new/gs;
-	$new = colored(['bright_green'],'═');
-	$to =~ s/═/$new/gs;
-	$new = colored(['bright_green'],'╤');
-	$to =~ s/╤/$new/gs;
-	$new = colored(['bright_green'],'╡');
-	$to =~ s/╡/$new/gs;
-	$new = colored(['bright_green'],'╪');
-	$to =~ s/╪/$new/gs;
-	$new = 'RULE [% FAINT %][% ITALIC %]color[% RESET %]';
-	$to =~ s/RULE color/$new/s;
+            while(scalar(@names)) {
+                my $name = shift(@names);
+				my $prefix = substr($ansi->{'ansi_meta'}->{$ncode}->{$name}->{'out'},2);
+				my $type = type($prefix);
+				if (($c16 && $type eq 'ANSI16' && $code =~ /ANSI 16/) || ($c256 && $type eq 'ANSI256' && $code =~ /ANSI 256/) || ($crgb && $type eq 'ANSITRUECOLOR' && $code =~ /TrueColor/)) {
+					$to .= '│' . sprintf('%-39s',$name) . '[% RESET %]│ ' . sprintf('%-54s',$ansi->ansi_description($ncode,$name)) . ' │' . "\n";
+				}
+            }
+			if ($code eq 'foreground ANSI TrueColor') {
+				$to .= '│' . sprintf('%-38s', ' RGB red,green,blue') . ' │ ' . sprintf('%-54s','Set foreground color with Red, Green and Blue values') . ' │' . "\n";
+			} elsif ($code eq 'background ANSI TrueColor') {
+				$to .= '│' . sprintf('%-38s', ' B_RGB red,green,blue') . ' │ ' . sprintf('%-54s','Set background color with Red, Green and Blue values') . ' │' . "\n";
+			}
+		} elsif ($code eq 'special') {
+            my @names = (sort(keys %{$ansi->{'ansi_meta'}->{$code}}));
+            while(scalar(@names)) {
+                my $name = shift(@names);
+				$to .= '│' . sprintf('%-38s',$name) . ' │ ' . sprintf('%-54s',$ansi->ansi_description($code,$name)) . ' │' . "\n";
+			}
+			$to .= '│' . sprintf('%-38s','BOX color,column,row,width,height,type') . ' │ ' . sprintf('%-54s', 'Shows framed text box in the selected frame type and') . ' │' . "\n";
+			$to .= '│' . sprintf('%-38s',' ') . ' │ ' . sprintf('%-54s', 'color.  Text goes between the BOX and ENDBOX token') . ' │' . "\n";
+			$to .= '│' . sprintf('%-38s','    types:') . ' │ ' . sprintf('%-54s', 'See the "frames" option') . ' │' . "\n";
+			foreach my $types (sort('DOUBLE', 'THIN', 'THICK', 'CIRCLE', 'ROUNDED', 'BLOCK', 'WEDGE', 'DOTS', 'DIAMOND', 'STAR', 'SQUARE', 'DITHERED', 'HEARTS', 'CHRISTIAN', 'ARROWS', 'PARALLELOGRAM', 'BIG WEDGE', 'BIG ARROWS', 'NOTES')) {
+				$to .= '│' . sprintf('%38s',$types) . ' │ ' . sprintf('%-54s', ' ') . ' │' . "\n";
+			}
+			$to .= '│' . sprintf('%-38s','ENDBOX') . ' │ ' . sprintf('%-54s', 'Ends the BOX token function') . ' │' . "\n";
+		} elsif ($code eq 'cursor') {
+            my @names = (sort(keys %{$ansi->{'ansi_meta'}->{$code}}));
+            while(scalar(@names)) {
+                my $name = shift(@names);
+				$to .= '│' . sprintf('%-38s',$name) . ' │ ' . sprintf('%-54s',$ansi->ansi_description($code,$name)) . ' │' . "\n";
+			}
+			$to .= '│' . sprintf('%-38s','LOCATE column,row') . ' │ ' . sprintf('%-54s','Sets the cursor location') . ' │' . "\n";
+			$to .= '│' . sprintf('%-38s','SCROLL UP count') . ' │ ' . sprintf('%-54s','Scrolls the screen up by "count" lines') . ' │' . "\n";
+			$to .= '│' . sprintf('%-38s','SCROLL DOWN count') . ' │ ' . sprintf('%-54s','Scrolls the screen down by "count" lines') . ' │' . "\n";
+        } else {
+            my @names = (sort(keys %{$ansi->{'ansi_meta'}->{$code}}));
+            while(scalar(@names)) {
+                my $name = shift(@names);
+				$to .= '│' . sprintf('%-38s',$name) . ' │ ' . sprintf('%-54s',$ansi->ansi_description($code,$name)) . ' │' . "\n";
+			}
+        }
+    }
+}
+  
+$to .= '╰───────────────────────────────────────┴────────────────────────────────────────────────────────╯' . "\n";
+###
+
+{
+    my $new;
+    foreach my $code (qw(attributes foreground background)) {
+        if ($code eq 'background') {
+            my $new;
+            foreach my $name (keys %{$ansi->{'ansi_meta'}->{$code}}) {
+                if ($name =~ /^(B_GRAY 0|B_GRAY 1|B_GRAY 2|B_GRAY 3|B_GRAY 4|B_COLOR 16|B_COLOR 17|B_COLOR 18|B_COLOR 19|B_COLOR 20|B_COLOR 21|B_COLOR 22|B_COLOR 23|B_HALAYA UBE|B_INTERNATIONAL KLEIN|B_UA BLUE|B_NAVY BLUE|B_BISTRE|B_BRITISH RACING GREEN|B_BULGARIAN ROSE|B_DUKE BLUE|B_ZAFFRE|B_CALIFORNIA GOLD|B_CHARCOAL|B_COOL BLACK|B_DARK GREEN|B_DARK JUNGLE GREEN|B_DARK MIDNIGHT BLUE|B_DARK SIENNA|B_DARK SCARLET|B_MAJESTY|B_MEDIUM JUNGLE GREEN|B_MYRTLE|B_ONYX|B_OXFORD BLUE|B_PERSIAN INDIGO|B_PHTHALO BLUE|B_PHTHALO GREEN|B_PRUSSIAN BLUE|B_SAINT PATRICK BLUE|B_SEAL BROWN|B_SMOKY BLACK|B_ULTRAMARINE|B_UP FOREST GREEN|B_TAUPE|B_WARM BLACK|B_ZINNWALDITE BROWN|B_BLACK|B_NAVY|B_MIDNIGHT BLUE|B_MEDIUM BLUE|B_INDIGO|B_MAROON|B_DEFAULT|B_DARK BLUE|B_BLUE)$/) {
+                    $new = '[% ' . $name . ' %] ' . $name;
+                } else {
+                    $new = '[% BLACK %][% ' . $name . ' %] ' . $name;
+                }
+                $to =~ s/│$name  /│$new /gs;
+            }
+        } else {
+            foreach my $name (grep(!/^(HIDE|BLACK)$/, sort(keys %{$ansi->{'ansi_meta'}->{$code}}))) {
+                my $new = $ansi->{'ansi_meta'}->{$code}->{$name}->{'out'} . $name . $ansi->{'ansi_meta'}->{'attributes'}->{'RESET'}->{'out'};
+                $to =~ s/│$name  /│$new  /gs;
+            }
+        }
+    }
+    $new = '[% RESET %]' . colored(['bright_green'],'│');
+    $to =~ s/│/$new/gs;
+    $new = colored(['bright_green'],'─');
+    $to =~ s/─/$new/gs;
+    $new = colored(['bright_green'],'┴');
+    $to =~ s/┴/$new/gs;
+    $new = colored(['bright_green'],'╭');
+    $to =~ s/╭/$new/gs;
+    $new = colored(['bright_green'],'╮');
+    $to =~ s/╮/$new/gs;
+    $new = colored(['bright_green'],'╰');
+    $to =~ s/╰/$new/gs;
+    $new = colored(['bright_green'],'╯');
+    $to =~ s/╯/$new/gs;
+    $new = colored(['bright_green'],'╞');
+    $to =~ s/╞/$new/gs;
+    $new = colored(['bright_green'],'═');
+    $to =~ s/═/$new/gs;
+    $new = colored(['bright_green'],'╤');
+    $to =~ s/╤/$new/gs;
+    $new = colored(['bright_green'],'╡');
+    $to =~ s/╡/$new/gs;
+    $new = colored(['bright_green'],'╪');
+    $to =~ s/╪/$new/gs;
+    $new = 'RULE [% FAINT %][% ITALIC %]color[% RESET %]';
+    $to =~ s/RULE color/$new/s;
+    $new = '[% FAINT %][% ITALIC %]red[% RESET %]';
+    $to =~ s/red/$new/gs;
+    $new = '[% FAINT %][% ITALIC %]green[% RESET %]';
+    $to =~ s/green/$new/gs;
+    $new = '[% FAINT %][% ITALIC %]blue[% RESET %]';
+    $to =~ s/blue/$new/gs;
 }
 
+$| = 1;
 if ($version) {
-    $| = 1;
     $ansi->ansi_output($text);
 } elsif ($help) {
-    $| = 1;
     $ansi->ansi_output($small);
 } elsif ($tokens) {
     $ansi->ansi_output($to);
+} elsif ($frames) {
+	$ansi->ansi_output("$header\n$sample_frames");
+} elsif ($rules) {
+	$ansi->ansi_output("$header\n$sample_horizontal_rules");
 } elsif ($rawtokens) {
     print "\n╔", '═' x 131, "╗\n";
     $ansi->ansi_output('║[% B_BLACK %][% BRIGHT YELLOW %]' . ' ' x 46 . 'THE FOLLOWING ARE THE AVAILABLE TOKENS' . ' ' x 47 . "[% RESET %]║\n");
@@ -269,34 +382,34 @@ if ($version) {
     print "\n║";
     my $width = 4;
     my $count = 1;
-	foreach my $codes ('clear','cursor','attributes','foreground','background') {
-		foreach my $token (sort(keys %{ $ansi->{'ansi_meta'}->{$codes} })) {
-			next if ($token =~ /COLOR |GREY /);
-			printf(' %-31s', $token);
-			$count++;
-			if ($count > $width) {
-				$count = 1;
-				print "║\n║";
-			} else {
-				print '║';
-			}
-		} ## end foreach my $token (sort(keys...))
-	}
+    foreach my $codes ('clear','cursor','attributes','foreground','background') {
+        foreach my $token (sort(keys %{ $ansi->{'ansi_meta'}->{$codes} })) {
+            next if ($token =~ /COLOR |GREY /);
+            printf(' %-31s', $token);
+            $count++;
+            if ($count > $width) {
+                $count = 1;
+                print "║\n║";
+            } else {
+                print '║';
+            }
+        } ## end foreach my $token (sort(keys...))
+    }
     print "\r╚", '═' x 32, '╩', '═' x 32, '╩', '═' x 32, '╩', '═' x 32, '╝', "\n\n";
 } elsif ($Dump) {
     my $temp = "\n\n";
     my @names;
     my $search = (scalar(@ARGV)) ? pop(@ARGV) : undef;
     if (defined($search) && $search ne '') {
-		$ansi->ansi_output(charnames::string_vianame($search));
+        $ansi->ansi_output(charnames::string_vianame($search));
     } else {
         my $start = $ansi->{'start'};
         foreach my $code (@list) {
             my $name = charnames::viacode($code);
-			$ansi->ansi_output(charnames::string_vianame($name) . ' ');
+            $ansi->ansi_output(charnames::string_vianame($name) . ' ');
         }
     }
-	print "\n";
+    print "\n";
 } elsif ($unicode) {
     my $search = (scalar(@ARGV)) ? pop(@ARGV) : undef;
     $ansi->ansi_output("\nNOTE:  Not all terminals will support all characters\n" . '[% COLOR 52 %]╭─────────╮[% RESET %]' . "\n");
@@ -315,47 +428,45 @@ if ($version) {
             my $char = charnames::string_vianame($name);
             my $hcode = sprintf('U+%-5s',substr(sprintf('0x%05X',$code),2));
             if ($hcode ne '') {
-				unless ($count) {
-					$ansi->ansi_output('[% COLOR 52 %]│[% BRIGHT WHITE %] ' . $hcode . ' [% COLOR 52 %]│[% RESET %] ' . $char);
-				} else {
-					$ansi->ansi_output('  ' . $char);
-				}
+                unless ($count) {
+                    $ansi->ansi_output('[% COLOR 52 %]│[% BRIGHT WHITE %] ' . $hcode . ' [% COLOR 52 %]│[% RESET %] ' . $char);
+                } else {
+                    $ansi->ansi_output('  ' . $char);
+                }
                 $count++;
                 if ($count > 15) {
                     $count = 0;
                     print "\n";
-					$ansi->ansi_output('[% COLOR 52 %]├─────────┼─────────────────────────────────────────────────────────────────[% RESET %]' . "\n") if ($code < 0x1FBFF && $expanded);
+                    $ansi->ansi_output('[% COLOR 52 %]├─────────┼─────────────────────────────────────────────────────────────────[% RESET %]' . "\n") if ($code < 0x1FBFF);
                 }
             } ## end if ($name ne '')
         }
         $ansi->ansi_output('[% COLOR 52 %]╰─────────┴─────────────────────────────────────────────────────────────────[% RESET %]' . "\n\n");
     }
-#    $ansi->ansi_output($temp);
 } elsif ($symbols) {
     my @names;
     my $search = (scalar(@ARGV)) ? pop(@ARGV) : undef;
     my $size = 0;
     if (defined($search) && $search ne '') {
-		if ($search =~ /^U\+/) {
-			$search = substr($search,2);
-			foreach my $code (@list) {
-				my $ucode = sprintf('%X',$code);
-				warn $ucode . ' ' . $search;
-				if ($ucode =~ /^$search/i) {
-					my $name = charnames::viacode($code);
-					push(@names, $name);
-					$size = max($size, length($name));
-				}
-			}
-		} else {
-			foreach my $code (@list) {
-				my $name = charnames::viacode($code);
-				if ($name =~ /$search/i) {
-					push(@names, $name);
-					$size = max($size, length($name));
-				}
-			}
-		}
+        if ($search =~ /^U\+/) {
+            $search = substr($search,2);
+            foreach my $code (@list) {
+                my $ucode = sprintf('%X',$code);
+                if ($ucode =~ /^$search/i) {
+                    my $name = charnames::viacode($code);
+                    push(@names, $name);
+                    $size = max($size, length($name));
+                }
+            }
+        } else {
+            foreach my $code (@list) {
+                my $name = charnames::viacode($code);
+                if ($name =~ /$search/i) {
+                    push(@names, $name);
+                    $size = max($size, length($name));
+                }
+            }
+        }
     } else {
         foreach my $code (@list) {
             my $name = charnames::viacode($code);
@@ -429,6 +540,19 @@ if ($version) {
         $| = 1;
     }
 } ## end else [ if ($version) ]
+
+sub type {
+    my $text = shift;
+
+    my $type = 0;
+    if ($text =~ /^\d+m/) {
+        return('ANSI16');
+    } elsif ($text =~ /^\d+\;\d\;\d+m/) {
+        return('ANSI256');
+    } elsif ($text =~ /^\d+\:\d\:\d+\:\d+\:\d+m/) {
+        return('ANSITRUECOLOR');
+    }
+}
 
 exit(0);
 

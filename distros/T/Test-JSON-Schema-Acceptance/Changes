@@ -1,5 +1,19 @@
 Revision history for Test-JSON-Schema-Acceptance
 
+1.033     2025-11-09 16:24:46Z
+        - fix test warnings on older perls
+        - updated test suite:
+          https://github.com/json-schema-org/JSON-Schema-Test-Suite/compare/8fd4fcec8ffc2294958818e05326a37fcf2b6c5c...8da0a7bcb23f3516590e70bc5c3e396400c27741
+
+1.032     2025-11-09 01:52:07Z
+        - make tests "todo" when they fail when Cpanel::JSON::XS is not
+          installed (GH#24)
+        - updated test suite:
+          https://github.com/json-schema-org/JSON-Schema-Test-Suite/compare/be58fa98d5f79bb8d20f45a15e540332669ad947...8fd4fcec8ffc2294958818e05326a37fcf2b6c5c
+
+1.031     2025-11-07 17:27:21Z
+        - remove Test::More as a dependency
+
 1.030     2025-11-06 01:05:56Z
         - "draft-next" is now known as "v1"
         - updated test suite:

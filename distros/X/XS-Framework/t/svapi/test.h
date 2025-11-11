@@ -48,9 +48,8 @@ struct perlvars {
         ohv   = newHV();
         ohvr  = sv_bless(newRV_noinc((SV*)ohv), stash);
 
-        SV** gvref = hv_fetchs(stash, "class_method", 0);
-        if (!gvref) throw std::logic_error("should not happen");
-        gv = (GV*)(*gvref);
+        gv = gv_fetchpvs("M1::class_method", 0, SVt_PVGV);
+        if (!gv) throw std::logic_error("should not happen");
         gvr = newRV((SV*)gv);
 
         ior  = SvREFCNT_inc(eval_pv("*STDOUT{IO}", 1));

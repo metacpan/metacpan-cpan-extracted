@@ -6,6 +6,15 @@ Home page:    <https://metacpan.org/release/Sub-HandlesVia>
 Bug tracker:  <https://github.com/tobyink/p5-sub-handlesvia/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.050005	2025-11-10
+
+ - Bug fix for pathological case exposed by Hydrogen.
+
+0.050004	2025-11-10
+
+ - Array:for_each, Hash:for_each_key, and Hash:for_each_value now support
+   $_.
+
 0.050002	2025-03-23
 
  [ SECURITY ]

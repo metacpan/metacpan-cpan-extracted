@@ -1,5 +1,6 @@
 bin/nvm-pl
 install/node_index_cache.json
+lib/NVM/Perl.pm
 lib/NVMPL/Config.pm
 lib/NVMPL/Core.pm
 lib/NVMPL/Installer.pm

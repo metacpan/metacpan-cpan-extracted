@@ -1,8 +1,8 @@
 Revision history for Perl extension Perl6::Pod.
-TODO:
-    - Declarator blocks
-    - Formatting code: P<>, S<>, M<>, 
-    - Config: :margin, :formatted
+
+0.75 2020-11-09
+    * update documentation to reference Podlite project
+    * update README with Podlite resources and links
 
 0.74 2020-03-15
     * fix detect numbering =items

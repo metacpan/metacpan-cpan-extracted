@@ -7,7 +7,7 @@ our @EXPORT_OK = qw(
     collect
 );
 
-our $VERSION = '0.0.11';
+our $VERSION = '0.0.13';
 
 use List::Util;
 use Scalar::Util qw(blessed);
@@ -43,13 +43,15 @@ has 'objects' => sub {
     return \@objects;
 };
 
+has 'pager' => sub { {} };
+
 
 =head2 add
 
-Add an object
+    Add an object
 
-Returns:
-C<Collection> of C<Model> objects
+    Returns:
+    C<Collection> of C<Model> objects
 
 =cut
 
@@ -85,7 +87,7 @@ sub add {
 
 =head2 as
 
-Set model for collection
+    Set model for collection
 
 =cut
 
@@ -99,7 +101,7 @@ sub as {
 
 =head2 asOptions
 
-Return an array ref containing [{ value => $value, label => $label }, ...]
+    Return an array ref containing [{ value => $value, label => $label }, ...]
 
 =cut
 
@@ -111,7 +113,7 @@ sub asOptions {
 
 =head2 avg
 
-Return the average value for given $field
+    Return the average value for given $field
 
 =cut
 
@@ -124,7 +126,7 @@ sub avg {
 
 =head2 collect
 
-Instantiate a new collection
+    Instantiate a new collection
 
 =cut
 
@@ -136,7 +138,7 @@ sub collect {
 
 =head2 count
 
-Return the size of objects
+    Return the size of objects
 
 =cut
 
@@ -146,7 +148,7 @@ sub count {
 
 =head2 each
 
-Map through each object and call the callback
+    Map through each object and call the callback
 
 =cut
 
@@ -158,10 +160,10 @@ sub each {
 
 =head2 exclude
 
-Exclude objects that doesn't match criteria
+    Exclude objects that doesn't match criteria
 
-Returns:
-C<Collection> of C<Model> objects
+    Returns:
+    C<Collection> of C<Model> objects
 
 =cut
 
@@ -179,10 +181,10 @@ sub exclude {
 
 =head2 filter
 
-Filter objects by callback
+    Filter objects by callback
 
-Returns:
-C<Collection> of C<Model> objects
+    Returns:
+    C<Collection> of C<Model> objects
 
 =cut
 
@@ -196,10 +198,10 @@ sub filter {
 
 =head2 find
 
-Find object by primary key, of if args is a hash ref then find first object matching given args
+    Find object by primary key, of if args is a hash ref then find first object matching given args
 
-Returns:
-C<Model> object
+    Returns:
+    C<Model> object
 
 =cut
 
@@ -225,10 +227,10 @@ sub find {
 
 =head2 findOrNew
 
-Find object or create a new instance
+    Find object or create a new instance
 
-Returns:
-C<Model> object
+    Returns:
+    C<Model> object
 
 =cut
 
@@ -242,10 +244,10 @@ sub findOrNew {
 
 =head2 first
 
-Get first object
+    Get first object
 
-Returns:
-C<Model> object
+    Returns:
+    C<Model> object
 
 =cut
 
@@ -255,10 +257,10 @@ sub first {
 
 =head2 firstOrNew
 
-Get first object if exists, otherwise create one
+    Get first object if exists, otherwise create one
 
-Returns:
-C<Model> object
+    Returns:
+    C<Model> object
 
 =cut
 
@@ -270,10 +272,10 @@ sub firstOrNew {
 
 =head2 get
 
-Get object by index
+    Get object by index
 
-Returns:
-C<Collection> of C<Model> objects
+    Returns:
+    C<Collection> of C<Model> objects
 
 =cut
 
@@ -285,7 +287,10 @@ sub get {
 
 =head2 indexOf
 
-Get the index of an object
+    Get the index of an object
+
+    Returns:
+    Integer index
 
 =cut
 
@@ -311,10 +316,10 @@ sub indexOf {
 
 =head2 last
 
-Get last object
+    Get last object
 
-Returns:
-C<Model> object
+    Returns:
+    C<Model> object
 
 =cut
 
@@ -326,8 +331,8 @@ sub last {
 
 =head2 lists
 
-Return an array ref containing all the fields from all objects for the given $field.
-Return a hash ref containing $key_field => $value_field if both are given.
+    Return an array ref containing all the fields from all objects for the given $field.
+    Return a hash ref containing $key_field => $value_field if both are given.
 
 =cut
 
@@ -347,7 +352,7 @@ sub lists {
 
 =head2 max
 
-Return the maximum value for given $field
+    Return the maximum value for given $field
 
 =cut
 
@@ -360,7 +365,7 @@ sub max {
 
 =head2 min
 
-Return the minimum value for given $field
+    Return the minimum value for given $field
 
 =cut
 
@@ -373,10 +378,10 @@ sub min {
 
 =head2 newObject
 
-Instantiate new object
+    Instantiate new object
 
-Returns:
-C<Model> object
+    Returns:
+    C<Model> object
 
 =cut
 
@@ -392,10 +397,10 @@ sub newObject {
 
 =head2 next
 
-Get next object
+    Get next object
 
-Returns:
-C<Model> object
+    Returns:
+    C<Model> object
 
 =cut
 
@@ -417,7 +422,7 @@ sub next {
 
 =head2 only
 
-Return an array ref containing only given @keys
+    Return an array ref containing only given @keys
 
 =cut
 
@@ -435,7 +440,7 @@ sub only {
 
 =head2 orderBy
 
-Order collection
+    Order collection
 
 =cut
 
@@ -471,10 +476,10 @@ sub orderBy {
 
 =head2 page
 
-Take a collection containing only the results from a given page
+    Take a collection containing only the results from a given page
 
-Returns:
-C<Collection> of C<Model> objects
+    Returns:
+    C<Collection> of C<Model> objects
 
 =cut
 
@@ -486,12 +491,30 @@ sub page {
     my $start = ($page - 1) * $self->limit;
     my $end = List::Util::min(($page * $self->limit), scalar(@objects)) - 1;
 
-    return $self->slice($start, $end);
+    my $last_page = int((scalar(@objects) + $self->limit - 1) / $self->limit);
+
+    my $pager = {
+        count       => $self->count,
+        limit       => $self->limit,
+        prev_page   => ($page > 1) ? $page - 1 : 1,
+        first_page  => 1,
+        page        => $page,
+        next_page   => ($page < $last_page) ? $page + 1 : $last_page,
+        last_page   => $last_page,
+        start       => $start + 1,
+        end         => $end + 1,
+    };
+
+    my $next = $self->slice($start, $end);
+
+    $next->pager($pager);
+
+    return $next;
 }
 
 =head2 remove
 
-Remove an object
+    Remove an object
 
 =cut
 
@@ -516,7 +539,7 @@ sub remove {
 
 =head2 reset
 
-Reset index
+    Reset index
 
 =cut
 
@@ -530,10 +553,10 @@ sub reset {
 
 =head2 search
 
-Search objects by given args
+    Search objects by given args
 
-Returns:
-C<Collection> of C<Model> objects
+    Returns:
+    C<Collection> of C<Model> objects
 
 =cut
 
@@ -551,10 +574,10 @@ sub search {
 
 =head2 slice
 
-Take a slice from the collection
+    Take a slice from the collection
 
-Returns:
-C<Collection> of C<Model> objects
+    Returns:
+    C<Collection> of C<Model> objects
 
 =cut
 
@@ -572,7 +595,7 @@ sub slice {
 
 =head2 splice
 
-Splice objects
+    Splice objects
 
 =cut
 
@@ -595,7 +618,7 @@ sub splice {
 
 =head2 sum
 
-Sum by $field
+    Sum by $field
 
 =cut
 
@@ -608,7 +631,7 @@ sub sum {
 
 =head2 toArray
 
-Convert collection to array ref
+    Convert collection to array ref
 
 =cut
 
@@ -620,7 +643,7 @@ sub toArray {
 
 =head2 toCsv
 
-Convert collection to CSV string
+    Convert collection to CSV string
 
 =cut
 
@@ -632,7 +655,7 @@ sub toCsv {
 
 =head2 toJson
 
-Convert collection to JSON string
+    Convert collection to JSON string
 
 =cut
 
@@ -644,7 +667,7 @@ sub toJson {
 
 =head2 touch
 
-Touch collections model
+    Touch collections model
 
 =cut
 
@@ -664,7 +687,7 @@ sub touch {
 
 =head2 unique
 
-Return an array ref containing only unique values for given $field
+    Return an array ref containing only unique values for given $field
 
 =cut
 
@@ -680,10 +703,10 @@ sub unique {
 
 =head2 where
 
-Search objects where field is equal to value
+    Search objects where field is equal to value
 
-Returns:
-C<Collection> of C<Model> objects
+    Returns:
+    C<Collection> of C<Model> objects
 
 =cut
 
@@ -695,10 +718,10 @@ sub where {
 
 =head2 whereIn
 
-Search objects where field is in $array
+    Search objects where field is in $array
 
-Returns:
-C<Collection> of C<Model> objects
+    Returns:
+    C<Collection> of C<Model> objects
 
 =cut
 
@@ -716,10 +739,10 @@ sub whereIn {
 
 =head2 whereNotIn
 
-Search objects where field is not in $array
+    Search objects where field is not in $array
 
-Returns:
-C<Collection> of C<Model> objects
+    Returns:
+    C<Collection> of C<Model> objects
 
 =cut
 
@@ -731,10 +754,10 @@ sub whereNotIn {
 
 =head2 __first
 
-Find first object that match $callback
+    Find first object that match $callback
 
-Returns:
-C<Model> object
+    Returns:
+    C<Model> object
 
 =cut
 
@@ -746,7 +769,7 @@ sub __first {
 
 =head2 __list
 
-Return a scalar, or an array if the value is a collection
+    Return a scalar, or an array if the value is a collection
 
 =cut
 

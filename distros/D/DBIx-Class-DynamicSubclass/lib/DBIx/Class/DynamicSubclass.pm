@@ -3,7 +3,7 @@ use base qw/DBIx::Class/;
 use strict;
 use warnings;
 
-our $VERSION = 0.04;
+our $VERSION = '1.0.0';
 
 __PACKAGE__->mk_group_accessors(inherited => qw/_typecast_map typecast_column/);
 
@@ -78,7 +78,7 @@ DBIx::Class::DynamicSubclass - Convenient way to use dynamic subclassing.
 =head1 DESCRIPTION
 
 This plugin implements methodics described here
-L<DBIx::Class::Manual::Cookbook/Dynamic_Sub-classing_DBIx::Class_proxy_classes_(AKA_multi-class_object_inflation_from_one_table)>.
+L<DBIx::Class::Manual::Cookbook/Dynamic-Sub-classing-DBIx::Class-proxy-classes>.
 
 DynamicSubclass has 2 ways to work: static defining and dynamic defining.
 

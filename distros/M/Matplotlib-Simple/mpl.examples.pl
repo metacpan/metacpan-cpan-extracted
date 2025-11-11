@@ -56,9 +56,52 @@ sub rand_between {
 # generate random numbers for ROC-like distributions
 my @xw = linspace( 0.1, 1, 100 );
 my @y  = map { 2 - 1 / $_ } @xw;
-my ( $fh, $tmp_filename ) =
-  tempfile( DIR => '/tmp', SUFFIX => '.py', UNLINK => 0 );
+my $pi = atan2( 0, -1 );
+my @x  = linspace( -2 * $pi, 2 * $pi, 100, 1 );
+my ( $fh, $tmp_filename ) = tempfile( DIR => '/tmp', SUFFIX => '.py', UNLINK => 0 );
 close $fh;
+plot({
+	'output.filename' => 'output.images/add.single.png',
+	'plot.type'       => 'plot',
+	data              => {
+		'sin(2x)'       => [
+			[@x],
+			[map {sin(2*$_)} @x]
+		]
+	},
+	title             => 'Multiple plots',
+	'set.options'     => {
+		'sin(2x)' => 'color = "green"'
+	},
+	add               => [
+		{
+			data              => {
+				'sin(x)'       => [
+					[@x],
+					[map {sin($_)} @x]
+				]
+			},
+			'plot.type' => 'plot',
+			'set.options' => {
+				'sin(x)'	=>  'color = "red", linestyle = "dashed"'
+			}
+		},
+		{
+			data              => {
+				'cos(x)'       => [
+					[@x],
+					[map {cos($_)} @x]
+				]
+			},
+			'plot.type' => 'plot',
+			'set.options' => {
+				'cos(x)'	=>  'color = "blue", linestyle = "dashed"'
+			}
+		},
+	],
+	'input.file' => $tmp_filename,
+	execute      => 0,
+});
 plot({
 	data => {
 		Clinical => [
@@ -106,18 +149,18 @@ plot({
 });
 plot({
 	plots => [
-		{
-		    data => [
-		        [
-		            [@xw],    # x
-		            [@y]      # y
-		        ],
-		        [ [@xw], [ map { $_ + rand_between( -0.5, 0.5 ) } @y ] ],
-		        [ [@xw], [ map { $_ + rand_between( -0.5, 0.5 ) } @y ] ]
-		    ],
-		    'plot.type' => 'wide',
-		    color       => 'red',
-		    title       => 'Visualization of similar lines plotted together'
+		{ # start first plot
+			data => [
+			  [
+					[@xw],    # x
+					[@y]      # y
+			  ],
+			  [ [@xw], [ map { $_ + rand_between( -0.5, 0.5 ) } @y ] ],
+			  [ [@xw], [ map { $_ + rand_between( -0.5, 0.5 ) } @y ] ]
+			],
+			'plot.type' => 'wide',
+			color       => 'red',
+			title       => 'Visualization of similar lines plotted together'
 		}
 	],
 	'output.filename' => 'output.images/wide.subplots.png',
@@ -585,8 +628,6 @@ plot({
 	set_figwidth => 4*5,
 	suptitle     => 'Various Changes to Standard Hexbin: All data is the same'
 });
-my $pi = atan2( 0, -1 );
-my @x  = linspace( -2 * $pi, 2 * $pi, 100, 1 );
 plot({
 	'input.file'      => $tmp_filename,
 	execute           => 0,
@@ -1057,9 +1098,20 @@ plot({
 		{
 			cblabel           => 'sin(x) * cos(x)',
 			data              => \@imshow_data,
-			aux               => { # add secondary plots
-				
-			},
+			add               => [ # add secondary plots
+			{ # 1st additional plot
+				data              => {
+					'sin(x)'       => [
+						[0..360],
+						[map {180 + 180*sin($_ * $pi/180)} 0..360]
+					]
+				},
+				'plot.type' => 'plot',
+				'set.options' => {
+					'sin(x)'	=>  'color = "red", linestyle = "dashed"'
+				}
+			}
+			],
 			'plot.type'       => 'imshow',
 			set_xlim          => '0, ' . scalar @imshow_data,
 			set_ylim          => '0, ' . scalar @imshow_data,

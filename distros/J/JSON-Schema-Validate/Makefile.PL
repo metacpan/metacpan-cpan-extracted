@@ -24,9 +24,12 @@ my %WriteMakefileArgs = (
         'strict'            => 0,
         'warnings'          => 0,
         'vars'              => 0,
+        'DateTime'          => 0,
+        'DateTime::Duration'=> 0,
         'Encode'            => 0,
         'JSON'              => 0,
         'List::Util'        => 0,
+        'Regexp::Common'    => 0,
         'Scalar::Util'      => 0,
     },
     TEST_REQUIRES =>

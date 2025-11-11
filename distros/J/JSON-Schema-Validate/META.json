@@ -32,9 +32,12 @@
       },
       "runtime" : {
          "requires" : {
+            "DateTime" : "0",
+            "DateTime::Duration" : "0",
             "Encode" : "0",
             "JSON" : "0",
             "List::Util" : "0",
+            "Regexp::Common" : "0",
             "Scalar::Util" : "0",
             "perl" : "5.016000",
             "strict" : "0",
@@ -60,6 +63,6 @@
          "web" : "https://gitlab.com/jackdeguest/JSON-Schema-Validate"
       }
    },
-   "version" : "v0.1.0",
+   "version" : "v0.3.0",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

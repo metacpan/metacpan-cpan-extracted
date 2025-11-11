@@ -1,7 +1,20 @@
 #  Quick and dirty facsimile of Apache mod_index
 #
-<start_html title="File Index" include="index.css" style="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" meta="%{ viewport=>'width=device-width, initial-scale=1.0' }">
-
+<start_html 
+    title="File Index" 
+    include_style="@{qw(index.css index_highlight.css)}"
+    style="@{qw(
+        https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css
+        https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.classless.min.css
+    )}" 
+    meta="%{viewport=>'width=device-width, initial-scale=1.0'}"
+    script="@{qw(
+        https://cdn.jsdelivr.net/npm/htmx.org@1.9.5
+        https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js#defer
+        https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js
+    )}"
+    include_script="index_highlight.js" 
+>
 <perl handler="index">
 <header>
   <h1>Index of <span id="current-path">${path_dn}</span></h1>
@@ -15,6 +28,7 @@
         <th><a href="${sort_name_href}">Filename</a></th>
         <th><a href="${sort_mtime_href}">Last Modified</a></th>
         <th><a href="${sort_size_href}">Size</a></th>
+        <th style="text-align: right">View</th>
       </tr>
     </thead>
     <tbody>
@@ -23,17 +37,50 @@
         <td><a href="${href}">${filename}</a></td>
         <td>${date}</td>
         <td>${size}</td>
+        <td style="text-align: right"  x-data="{ isOpen: false }">
+            <a href="#" 
+              @click.prevent="toggleSourceRow($el, $data)"
+              data-filename="${filename}"
+              x-text="isOpen ? 'Hide Source' : 'View Source'"
+            >
+            View Source
+            <!-- <img src="https://unpkg.com/lucide-static/icons/code.svg" alt="View Source icon" width="18" height="18"> -->
+            </a>
+
+        </td>
       </tr>
       </block>
     </tbody>
   </table>
 </main>
 
+<! -- HTMX section start -->
+
+<htmx display="+{source}" handler="source">
+<tr class="source-row"><td colspan="4">
+
+<script id="srce_html" data-language="html" type="text/plain">
+${srce_html}
+</script>
+<script id="srce_lang" data-language="${language}" type="text/plain">
+${srce_lang}
+</script>
+
+<pre>
+<code class="hljs" data-mode="${mode}" id="srce_highlight"></code>
+</pre>
+
+</td></tr>
+</htmx>
+
+<! -- HTMX section end -->
+
 <footer>
   <hr>
   <small>Generated on ${timestamp} by WebDyne Indexer in ${sec} sec.</small>
 </footer>
 </perl>
+
 
 __PERL__
 
@@ -44,21 +91,107 @@ use File::Basename qw(dirname);
 use POSIX qw(strftime);
 use WebDyne::Util;
 use Cwd qw(realpath);
+use IO::File;
 
-sub index {
+sub source {
 
 
-    #  Index current directory
+    #  Get source file and display
     #
     my $self=shift();
+    my $cgi_or=$self->CGI() ||
+        return err('unable to get CGI object');
     
     
-    #  Get request object
+    #  Massage to get full file name path
     #
+    my $srce_fn=$_{'source'} ||
+        return err('no filename to display');
+    my $full_dn=$self->full_dn() ||
+        return err('no full_dn');
+    my $path_fn=File::Spec->catfile($full_dn, $srce_fn);
+    $path_fn=$self->sanitize_path($cgi_or, $path_fn) ||
+        return err('unable to get path');
+    
+
+    #  Vars we need
+    #
+    my $srce;
+    my @srce_html;
+    my @srce_lang;
+    my $perl;
+    
+    
+    #  Open and run through file line by line, splitting out perl and HTML bits
+    #
+    my $path_fh=IO::File->new($path_fn, O_RDONLY) ||
+        return err("unable to open file: $srce_fn, $!");
+    
+    
+    #  If not .psp file then flick perl flag so goes into the lang bucket
+    #
+    unless ($srce_fn=~/\.psp$/) { $perl++ }
+    
+    
+    #  Now iterate over file
+    #
+    my ($binary, $language);  
+    while (my $line=<$path_fh>) {
+        
+        if ($line =~ /[\x00-\x08\x0B\x0C\x0E-\x1F\x80-\xFF]/) {
+            push @srce_lang, 'Binary file - not displaying';
+            $language='text';
+            $binary++;
+            last;
+        }
+
+        if ($line=~/^__PERL__/) {
+            $perl++;
+        }
+        if ($perl) {
+            push @srce_lang, $line
+        }
+        else {
+            push @srce_html, $line
+        }
+    }
+    
+    
+    #  Get mapping hash
+    #
+    my $ext_to_lang_hr=&ext_to_lang();
+    my ($ext)=($srce_fn=~/\.(.*?)$/);
+    $language ||= $ext_to_lang_hr->{$ext};
+    $language ||= $ext ? 'automatic' : 'text';
+    #$language= $ext_to_lang_hr->{$ext};
+    
+    
+    #  Concatenate together and escape </script> tag in HTML
+    #
+    my $srce_html=join(undef, @srce_html);
+    my $srce_lang=join(undef, @srce_lang);
+    $srce_html=~s/<\/script>/<\\\/script>/gm;
+    $srce_lang=~s/<\/script>/<\\\/script>/gm;
+    return $self->render(
+        srce_html   => $srce_html, 
+        srce_lang   => $srce_lang, 
+        language    => $language, 
+        mode        => $srce_html ? 'combined' : 'single'
+    );
+    
+}
+
+
+sub full_dn {
+
+
+    #  Get the full dn of the URI location we are currently at
+    #
+    my $self=shift();
+    my $cgi_or=$self->CGI() ||
+         return err('unable to get CGI object');
     my $r=$self->r() || 
         return err('unable to get request object');
-     my $cgi_or=$self->CGI() ||
-         return err('unable to get CGI object');
 
 
     #  Where do we want to be ? Use File::Spec::Unix rather than URI, 
@@ -89,6 +222,50 @@ sub index {
         last;
     }
     
+    
+    #  Reset if things go bad
+    #
+    unless ($full_dn && (-d $full_dn)) {
+        $full_dn=$root_dn;
+    }
+    
+    
+    #  Done;
+    #
+    return $full_dn;
+    
+}
+    
+
+sub index {
+
+
+    #  Index current directory
+    #
+    my $self=shift();
+    
+    
+    #  Get request object
+    #
+    my $r=$self->r() || 
+        return err('unable to get request object');
+    my $cgi_or=$self->CGI() ||
+         return err('unable to get CGI object');
+
+
+    #  Where do we want to be ? Use File::Spec::Unix rather than URI, 
+    #  it's not happy when we don't have a base component.
+    #
+    my $path_dn=$self->sanitize_path($cgi_or, ($r->path_info() || $ENV{'PATH_INFO'})) ||
+        return err('unable to get path');
+        
+    
+    #  Now get real dn and check not higher than document root
+    #    
+    my $root_dn=$r->document_root();
+    my $full_dn=$self->full_dn() ||
+        return err('no full_dn');
+
     
     #  Reset if things go bad
     #
@@ -148,7 +325,7 @@ sub index {
         
     
     #  Now go over every file in sort order and format info, build output
-    #        
+    # 
     foreach my $fn (@{$fn_ar}) {
     
         
@@ -163,7 +340,7 @@ sub index {
         #
         my $href;
         if ($fn=~m{/$}) {
-            #  Dir - add as param
+            #  Dir
             $href=File::Spec->catdir($path_dn, split(m{/+}, $fn));
         }
         else {
@@ -180,6 +357,7 @@ sub index {
             date        => $mtime,
             size        => $size
         );
+        
     }
     
     
@@ -278,4 +456,120 @@ sub sanitize_path {
     return $dn;
     
 }
+
+
+sub ext_to_lang {
+
+    my %ext_to_lang = (
     
+        # Perl
+        'pl'      => 'perl',
+        'pm'      => 'perl',
+        't'       => 'perl',
+        'psp'     => 'perl',
+        'PL'      => 'perl',
+
+        # Python
+        'py'      => 'python',
+
+        # Ruby
+        'rb'      => 'ruby',
+
+        # JavaScript & TypeScript
+        'js'      => 'javascript',
+        'jsx'     => 'javascript',
+        'ts'      => 'typescript',
+        'tsx'     => 'typescript',
+
+        # Web
+        'html'    => 'xml',  # HTML is treated as XML in highlight.js
+        'htm'     => 'xml',
+        'xml'     => 'xml',
+        'css'     => 'css',
+        'scss'    => 'scss',
+
+        # JSON / YAML / Config
+        'json'    => 'json',
+        'yaml'    => 'yaml',
+        'yml'     => 'yaml',
+        'ini'     => 'ini',
+        'toml'    => 'toml',
+
+        # Bash / Shell
+        'sh'      => 'bash',
+        'bash'    => 'bash',
+        'zsh'     => 'bash',
+
+        # C / C++
+        'c'       => 'c',
+        'h'       => 'cpp',  # highlight.js prefers 'cpp'
+        'cpp'     => 'cpp',
+        'cc'      => 'cpp',
+        'cxx'     => 'cpp',
+        'hpp'     => 'cpp',
+        'hxx'     => 'cpp',
+
+        # Java / JVM
+        'java'    => 'java',
+        'kt'      => 'kotlin',
+        'kts'     => 'kotlin',
+        'scala'   => 'scala',
+        'groovy'  => 'groovy',
+
+        # C#
+        'cs'      => 'csharp',
+
+        # PHP
+        'php'     => 'php',
+
+        # Go
+        'go'      => 'go',
+
+        # Rust
+        'rs'      => 'rust',
+
+        # Swift / Apple
+        'swift'   => 'swift',
+        'm'       => 'objectivec',
+        'mm'      => 'objectivec',
+
+        # SQL
+        'sql'     => 'sql',
+
+        # R
+        'r'       => 'r',
+
+        # Lua
+        'lua'     => 'lua',
+
+        # Markdown / Text
+        'md'      => 'markdown',
+        'markdown'=> 'markdown',
+        'txt'     => 'plaintext',
+
+        # Makefiles & build
+        'makefile'=> 'makefile',
+        'mk'      => 'makefile',
+        'cmake'   => 'cmake',
+
+        # Docker / CI
+        'dockerfile' => 'dockerfile',
+        'env'        => 'bash',
+
+        # LaTeX
+        'tex'     => 'latex',
+
+        # Assembly
+        'asm'     => 'x86asm',
+        's'       => 'x86asm',
+
+        # Powershell
+        'ps1'     => 'powershell'
+        
+    );
+    
+    return \%ext_to_lang
+    
+}
+
+     

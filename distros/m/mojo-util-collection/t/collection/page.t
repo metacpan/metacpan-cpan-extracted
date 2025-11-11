@@ -39,8 +39,49 @@ my $collection = Mojo::Util::Collection->new(
 
 $collection->limit(2);
 
-is_deeply($collection->page(1)->only('id'), [ { id => 1 }, { id => 2 } ], 'page 1');
-is_deeply($collection->page(2)->only('id'), [ { id => 3 }, { id => 4 } ], 'page 2');
-is_deeply($collection->page(3)->only('id'), [], 'page 3');
+my $page = $collection->page(1);
+
+is_deeply($page->only('id'), [ { id => 1 }, { id => 2 } ], 'page 1');
+is_deeply($page->pager, {
+    'next_page' => 2,
+    'end' => 2,
+    'count' => 4,
+    'first_page' => 1,
+    'start' => 1,
+    'page' => 1,
+    'prev_page' => 1,
+    'limit' => 2,
+    'last_page' => 2
+}, 'page 1 pager');
+
+$page = $collection->page(2);
+
+is_deeply($page->only('id'), [ { id => 3 }, { id => 4 } ], 'page 2');
+is_deeply($page->pager, {
+    'next_page' => 2,
+    'end' => 4,
+    'count' => 4,
+    'first_page' => 1,
+    'start' => 3,
+    'page' => 2,
+    'prev_page' => 1,
+    'limit' => 2,
+    'last_page' => 2
+}, 'page 2 pager');
+
+$page = $collection->page(3);
+
+is_deeply($page->only('id'), [], 'page 3');
+is_deeply($page->pager, {
+    'next_page' => 2,
+    'end' => 4,
+    'count' => 4,
+    'first_page' => 1,
+    'start' => 5,
+    'page' => 3,
+    'prev_page' => 2,
+    'limit' => 2,
+    'last_page' => 2
+}, 'page 3 pager');
 
 done_testing();

@@ -22,11 +22,13 @@ no_index:
 requires:
   Dancer2: '0.207'
   Log::Report: '1.42'
+  Log::Report::Template: '0'
   Scalar::Util: '0'
 resources:
+  bugtracker: https://github.com/markov2/perl5-Dancer2-Plugin-LogReport/issues
   homepage: http://perl.overmeer.net/CPAN/
   repository: https://github.com/markov2/perl5-Dancer2-Plugin-LogReport.git
-version: '2.01'
+version: '2.02'
 x_oodist:
   email: markov@cpan.org
   first_year: 2015

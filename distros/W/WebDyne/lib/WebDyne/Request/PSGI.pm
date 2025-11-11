@@ -44,7 +44,7 @@ use WebDyne::Request::Fake;
 
 #  Version information
 #
-$VERSION='2.020';
+$VERSION='2.026';
 
 
 #  Debug load
@@ -298,25 +298,32 @@ sub new {
             #
             #if ($fn=~/\/$/) {
             unless ($fn=~/\.psp$/) {
+
+                #  Is it a directory that exists ? Only append default document if that is the case, else let the api code
+                #  handle it
+                #
+                if  (-d $fn) {
+                    
             
-                #  Append default doc to path, which appears at moment to be a directory ?
-                #
-                my $document_default=$r{'document_default'} || $Dir_config_env{'DOCUMENT_DEFAULT'} || $DOCUMENT_DEFAULT;
-                debug("appending document default $document_default to fn:$fn");
-                
-                #  If absolute path just use it
-                #
-                if (File::Spec->file_name_is_absolute($document_default)) {
-                
-                    #  Yep - absolute path
+                    #  Append default doc to path, which appears at moment to be a directory ?
                     #
-                    $fn=$document_default
-                }
-                else {
-                
-                    #  Otherwise append to existing path
+                    my $document_default=$r{'document_default'} || $Dir_config_env{'DOCUMENT_DEFAULT'} || $DOCUMENT_DEFAULT;
+                    debug("appending document default $document_default to fn:$fn");
+                    
+                    #  If absolute path just use it
                     #
-                    $fn=File::Spec->catfile($fn, split m{/+}, $document_default); #/
+                    if (File::Spec->file_name_is_absolute($document_default)) {
+                    
+                        #  Yep - absolute path
+                        #
+                        $fn=$document_default
+                    }
+                    else {
+                    
+                        #  Otherwise append to existing path
+                        #
+                        $fn=File::Spec->catfile($fn, split m{/+}, $document_default); #/
+                    }
                 }
             }
         }

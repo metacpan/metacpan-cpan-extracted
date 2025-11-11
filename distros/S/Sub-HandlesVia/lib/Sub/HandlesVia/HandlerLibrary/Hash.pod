@@ -125,7 +125,7 @@ Indicates whether a value exists in the hashref by its key.
 
 Arguments: B<< CodeRef >>.
 
-Chainable method which calls the coderef for each key in the hash, passing just the key to the coderef.
+Chainable method which calls the coderef for each key in the hash, passing just the key to the coderef. The key will also be available as C<< $_ >>.
 
 =head2 C<< for_each_pair( $coderef ) >>
 
@@ -137,7 +137,7 @@ Chainable method which calls the coderef for each key in the hash, passing the k
 
 Arguments: B<< CodeRef >>.
 
-Chainable method which calls the coderef for each value in the hash, passing just the value to the coderef.
+Chainable method which calls the coderef for each value in the hash, passing just the value to the coderef. The value will also be available as C<< $_ >>.
 
 =head2 C<< get( $key ) >>
 

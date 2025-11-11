@@ -56,7 +56,7 @@ my %Package;
 
 #  Version information
 #
-$VERSION='2.020';
+$VERSION='2.026';
 
 
 #  Debug load
@@ -67,6 +67,7 @@ debug("Loading %s version $VERSION", __PACKAGE__);
 #  Trick to allow use of illegal subroutine name to suppport treebuilder comment format
 #
 *{'WebDyne::HTML::Tiny::~comment'}=\&_comment;
+*{'WebDyne::HTML::Tiny::entity_encode'}=sub { return $_[1] };
 
 
 #  All done. Positive return
@@ -300,12 +301,14 @@ sub _start_html {
 
     #  Attributes we are going to use
     #
-    debug('WEBDYNE_HTML_PARAM: %s', Dumper($WEBDYNE_HTML_PARAM));
+    debug('WEBDYNE_START_HTML_PARAM: %s', Dumper($WEBDYNE_START_HTML_PARAM));
     my %attr=(
         %{$WEBDYNE_HTML_PARAM},
+        %{$WEBDYNE_START_HTML_PARAM},
         %{$attr_hr}
     );
     debug('attr: %s', Dumper(\%attr));
+    #die Dumper(\%attr);
 
 
     #  If no attributes passed used defaults from constants file
@@ -325,6 +328,8 @@ sub _start_html {
         author
         script
         include
+        include_script
+        include_style
     );
     debug('start_html %s', Dumper(\%attr_page));
 
@@ -344,6 +349,7 @@ sub _start_html {
     else {
         debug('no meta run');
     }
+
 
     #  Logic error below, replaced by above
     #
@@ -365,36 +371,78 @@ sub _start_html {
     #  Add any stylesheets
     #
     my @link;
-    if ($attr_page{'style'}) {
-        push @link, $self->link({rel => 'stylesheet', href => $attr_page{'style'}})
+    if (my $style=$attr_page{'style'}) {
+    
+        #  Generate HTML for link tag stylheet
+        #
+        push @link, $self->_start_html_tag('link', 'href', $style, 
+            { rel=>'stylesheet'});
+
     }
+    if (my $include_style=$attr_page{'include_style'}) {
+
+        #  Generate HTML to make an include section for any styles user wants, wrap in <style> tag
+        #
+        push @link, $self->_start_html_tag('include', 'file', $include_style, 
+            { wrap =>'style'});
+            
+            
+        #  Used to do this way but only could do single file
+        #
+        #my $html_or=HTML::Element->new('include', wrap=>'style', file => $include_style);
+        #push @link, $html_or->as_HTML();
+    }
+
     if (my $author=$attr_page{'author'}) {
         $author=$self->url_encode($author);
-        push @link, $self->link({rel => 'author', href => sprintf('mailto:%s', $author)});
+        my $html_or=HTML::Element->new('link', rel=> 'author', href => sprintf('mailto:%s', $author));
+        push @link, $html_or->as_HTML();
     }
     
 
-    #  Script
+    #  Scripts
     #
     my @script;
-    if ($attr_page{'script'}) {
-        push @script, $self->script({ src => $attr_page{'script'} });
+    if (my $script=$attr_page{'script'}) {
+    
+        #  Script same as style above
+        #
+        push @script, $self->_start_html_tag('script', 'src', $script);
+    }
+    if (my $include_script=$attr_page{'include_script'}) {
+    
+        #  Include script same as style above
+        #
+        push @script, $self->_start_html_tag('include', 'file', $include_script, 
+            { wrap =>'script'});
+
     }
     
     
-    #  Include. Not working - commented out at moment
+    #  Include any other files
     #
-    my $include;
-    if ((my $fn=$attr_page{'include'}) && (my $webdyne_or=$self->{'_webdyne'})) {
+    my @include;
+    if (my $fn=$attr_page{'include'}) {
+    
+        
+        #  Same as other tags above, generate <include> HTML
+        #
+        push @include, $self->_start_html_tag('include', 'file', $fn);
+        
+        
+        #  Used to do this way
+        #
+        #my $html_or=HTML::Element->new('include', file => $fn);
+        #push @include, $html_or->as_HTML();
         
 
-        #  Experimental
+        #  Older way was experimental
         #
-        $include=${
-            $webdyne_or->include({ file=>$fn, head=>1 }) ||
-                return err();
-        };
-        debug("include: $include");
+        #$include=${
+        #    $webdyne_or->include({ file=>$fn, head=>1 }) ||
+        #        return err();
+        #};
+        #debug("include: $include");
 
     }
     else {
@@ -411,7 +459,7 @@ sub _start_html {
     #  Build title
     #
     my $title;
-    unless ($include && $include=~/<title>.*?<\/title>/i) {
+    unless (@include && (grep {/<title>.*?<\/title>/i} @include)) {
         $title=$attr_page{'title'} || $WEBDYNE_HTML_DEFAULT_TITLE;
     }
     debug('title: %s', $title || '*undef*');
@@ -429,7 +477,7 @@ sub _start_html {
             @meta,
             @link,
             @script,
-            $include
+            @include
         ));
 
 
@@ -442,6 +490,25 @@ sub _start_html {
 
 }
 
+
+sub _start_html_tag {
+
+    my ($self, $tag, $attr, $param_ar, $attr_hr)=@_;
+    my @html;
+    unless (ref($param_ar) eq 'ARRAY') {
+        $param_ar=[$param_ar];
+    }
+    if ($WEBDYNE_START_HTML_PARAM_STATIC) {
+        $attr_hr->{'static'}=1;
+    }
+    foreach my $param (@{$param_ar}) {
+        my $html_or=HTML::Element->new($tag, $attr=>$param, %{$attr_hr} );
+        push @html, $html_or->as_HTML();
+    }
+    return join('', @html);
+    
+}
+        
 
 sub _end_html {
 
@@ -615,15 +682,54 @@ sub script {
 
     my ($self, $attr_hr, @param)=@_;
     debug("$self script, attr %s", Dumper($attr_hr));
+    
+    
+    #  Take copy of attribute hash ref so we don't alter original
+    #
     my @html;
-    if (ref($attr_hr->{'src'}) eq 'ARRAY') {
-        my %attr=%{$attr_hr};
-        my $src_ar=delete $attr{'src'};
-        map {push @html, $self->SUPER::script({%attr, src => $_}, @param)} @{$src_ar}
+    my %attr=%{$attr_hr};
+    if ($attr{'src'}) {
+    
+    
+	#  Convert to array
+	#
+        my $script_ar;
+        unless (ref($script_ar=$attr{'src'}) eq 'ARRAY') {
+            $script_ar=[$script_ar]
+        }
+        debug('attr_hr: %s, script_ar: %s', Dumper($attr_hr, $script_ar));
+        
+        #  Iterate over each one
+        #
+        foreach my $src (@{$script_ar}) {
+            debug("src: $src");
+            my %src_attr=%attr;
+            
+            #  Split off any fragments and use them as attributes, e.g. #defer becomes defer, ?foo=bar becomes foo=bar in attr
+            my @src=split(/#/, $src);
+            $src=$src[0];
+            debug("src post split: $src");
+            if ($src[1]) {
+                debug('split src: %s', Dumper(\@src));
+                foreach my $kv (split /&/, $src[1]) {
+                    next unless length($kv);
+                    if ( $kv =~ /^([^=]+)=(.*)$/ ) {
+                        $src_attr{$1}=$2;
+                    }
+                    else {
+                        # no “=” means flag parameter
+                        $src_attr{$kv} = [];
+                    }
+                }
+                debug("fragment attr: $src[1] decoded as %s from query_param: %s", Dumper(\%attr, \@src));
+            }
+            push @html, $self->SUPER::script({%src_attr, src => $src}, @param)
+        }
     }
     else {
         push @html, $self->SUPER::script($attr_hr, @param)
     }
+    debug('html: %s', Dumper(\@html));
     return join($/, @html);
 
 }

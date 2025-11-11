@@ -217,7 +217,7 @@ The suite contain the following classes:
 
 =cut
 
-$Perl6::Pod::VERSION = '0.74';
+$Perl6::Pod::VERSION = '0.75';
 
 use warnings;
 use strict;
@@ -354,11 +354,22 @@ __END__
 
 =back 
 
-=head2 JavaScript implementation of pod6
+=head2 🌟 Podlite is a lightweight block-based markup language designed for flexibility and ease of use 🌟
 
-I highly recommend see L<pod6 implementation|https://github.com/zag/js-pod6>. That is modern
-implementation of pod6. Also check project site L<https://pod6.in> for latest information 
-about pod6.
+Podlite represents the evolution of Synopsis26 ideas.
+Follow Podlite news and developments:
+
+=over
+
+=item <Podlite Perl module|https://metacpan.org/release/Podlite> - Podlite support for Perl
+
+=item L<Podlite Specification|https://podlite.org/specification> - Official specification in HTML
+
+=item L<Podlite Specification Source|https://github.com/podlite/podlite-specs> - Specification source code
+
+=item L<podlite.org|https://podlite.org> - Official website
+
+=back
 
 
 =head1 AUTHOR

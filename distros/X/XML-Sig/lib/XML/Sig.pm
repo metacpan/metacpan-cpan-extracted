@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package XML::Sig;
-our $VERSION = '0.66';
+our $VERSION = '0.67';
 
 use Encode;
 # ABSTRACT: XML::Sig - A toolkit to help sign and verify XML Digital Signatures
@@ -630,20 +630,25 @@ sub _verify_rsa {
     my $self = shift;
     my ($context,$canonical,$sig) = @_;
 
+    eval {
+        require Crypt::PK::RSA;
+    };
+    confess "Crypt::PK::RSA needs to be installed so
+                that we can handle X509 certificates" if $@;
     # Generate Public Key from XML
     my $mod = _trim($self->{parser}->findvalue('dsig:Modulus', $context));
     my $modBin = decode_base64( $mod );
     my $exp = _trim($self->{parser}->findvalue('dsig:Exponent', $context));
     my $expBin = decode_base64( $exp );
-    my $n = Crypt::OpenSSL::Bignum->new_from_bin($modBin);
-    my $e = Crypt::OpenSSL::Bignum->new_from_bin($expBin);
-    my $rsa_pub = Crypt::OpenSSL::RSA->new_key_from_parameters( $n, $e );
+    my $n = unpack("H*", $modBin);
+    my $e = unpack("H*", $expBin);
 
+    my $pk = Crypt::PK::RSA->new();
+    my $rsa_pub = $pk->import_key({N => $n, e => $e});
     # Decode signature and verify
-    my $sig_hash = 'use_' . $self->{ sig_hash } . '_hash';
-    $rsa_pub->$sig_hash;
     my $bin_signature = decode_base64($sig);
-    return 1 if ($rsa_pub->verify( $canonical,  $bin_signature ));
+
+    return 1 if ($rsa_pub->verify_message( $bin_signature, $canonical, $self->{ sig_hash }, "v1.5"));
     return 0;
 }
 
@@ -772,17 +777,16 @@ sub _verify_x509_cert {
     }
     else {
         eval {
-            require Crypt::OpenSSL::RSA;
+            require Crypt::PK::RSA;
         };
-        confess "Crypt::OpenSSL::RSA needs to be installed so
+        confess "Crypt::PK::RSA needs to be installed so
                     that we can handle X509 certificates" if $@;
 
-        my $rsa_pub = Crypt::OpenSSL::RSA->new_public_key($cert->pubkey);
+        my $pk = Crypt::PK::RSA->new();
+        my $rsa_pub = $pk->import_key(\$cert->pubkey);
 
-        my $sig_hash = 'use_' . $self->{sig_hash} . '_hash';
-        $rsa_pub->$sig_hash();
         # If successful verify, store the signer's cert for validation
-        if ($rsa_pub->verify( $canonical,  $bin_signature )) {
+        if ($rsa_pub->verify_message( $bin_signature, $canonical, $self->{sig_hash}, 'v1.5' )) {
             $self->{signer_cert} = $cert;
             return 1;
         }
@@ -1145,7 +1149,7 @@ sub _load_dsa_key {
         $self->{key_type} = 'dsa';
     }
     else {
-        confess "did not get a new Crypt::OpenSSL::RSA object";
+        confess "did not get a new Crypt::PK::RSA object";
     }
 }
 
@@ -1167,25 +1171,21 @@ sub _load_rsa_key {
     my ($key_text) = @_;
 
     eval {
-        require Crypt::OpenSSL::RSA;
+        require Crypt::PK::RSA;
     };
-    confess "Crypt::OpenSSL::RSA needs to be installed so that we can handle RSA keys." if $@;
+    confess "Crypt::PK::RSA needs to be installed so that we can handle RSA keys." if $@;
 
-    my $rsaKey = Crypt::OpenSSL::RSA->new_private_key( $key_text );
+    my $pk = Crypt::PK::RSA->new();
+    my $rsaKey = $pk->import_key(\$key_text);
 
     if ( $rsaKey ) {
-        $rsaKey->use_pkcs1_oaep_padding();
         $self->{ key_obj }  = $rsaKey;
         $self->{ key_type } = 'rsa';
 
         if (!$self->{ x509 }) {
-            my $bigNum = ( $rsaKey->get_key_parameters() )[1];
-            my $bin = $bigNum->to_bin();
-            my $exp = encode_base64( $bin, '' );
-
-            $bigNum = ( $rsaKey->get_key_parameters() )[0];
-            $bin = $bigNum->to_bin();
-            my $mod = encode_base64( $bin, '' );
+            my $key_params = $rsaKey->key2hash;
+            my $exp = encode_base64(pack("H*", $key_params->{e}), '');
+            my $mod = encode_base64(pack("H*", $key_params->{N}), '');
             $self->{KeyInfo} = "<dsig:KeyInfo>
                                  <dsig:KeyValue>
                                   <dsig:RSAKeyValue>
@@ -1197,7 +1197,7 @@ sub _load_rsa_key {
         }
     }
     else {
-        confess "did not get a new Crypt::OpenSSL::RSA object";
+        confess "did not get a new Crypt::PK::RSA object";
     }
 }
 
@@ -1632,9 +1632,7 @@ sub _calc_rsa_signature {
     my $signed_info_canon   = shift;
 
     print ("    Signing SignedInfo using RSA key type\n") if $DEBUG;
-    my $sig_hash = 'use_' . $self->{ sig_hash } . '_hash';
-    $self->{key_obj}->$sig_hash;
-    my $bin_signature = $self->{key_obj}->sign( $signed_info_canon );
+    my $bin_signature = $self->{key_obj}->sign_message( $signed_info_canon, $self->{sig_hash}, 'v1.5' );
 
     return $bin_signature;
 }
@@ -1685,7 +1683,7 @@ XML::Sig - XML::Sig - A toolkit to help sign and verify XML Digital Signatures
 
 =head1 VERSION
 
-version 0.66
+version 0.67
 
 =head1 SYNOPSIS
 

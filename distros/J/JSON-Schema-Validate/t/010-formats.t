@@ -1,5 +1,4 @@
 #!/usr/bin/env perl
-use v5.36.1;
 use strict;
 use warnings;
 use lib './lib';
@@ -7,7 +6,11 @@ use utf8;
 use open ':std' => 'utf8';
 use Test::More;
 use JSON;
-use JSON::Schema::Validate;
+
+BEGIN
+{
+    use_ok( 'JSON::Schema::Validate' ) || BAIL_OUT( "Unable to load JSON::Schema::Validate" );
+}
 
 my $fmt = sub { +{
     type => 'object',

@@ -1,0 +1,5 @@
+<html> @0 (IMPLICIT)
+  <head> @0.0 (IMPLICIT)
+  <body> @0.1 (IMPLICIT)
+    <htmx bare="1" perl="perl"> @0.1.0
+      "return <<'END';Hello worldEND;"

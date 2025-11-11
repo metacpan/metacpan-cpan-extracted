@@ -9,66 +9,7 @@ use Devel::Confess 'color';
 
 package Matplotlib::Simple;
 require 5.010;
-our $VERSION = 0.04; # discard Perl versions < 5.10; cleaner CPAN page
-
-=head1 NAME
-
-Matplotlib::Simple
-
-=head1 AUTHOR
-
-David E. Condon
-
-=head1 LICENSE
-
-Perl5
-
-=head1 SYNOPSIS
-
-Simplest possible use case:
-
-	use Matplotlib::Simple 'plot';
-	plot({
-		'output.filename' => '/tmp/gospel.word.counts.png',
-		'plot.type'       => 'bar',
-		data              => {
-			Matthew => 18345,
-			Mark    => 11304,
-			Luke    => 19482,
-			John    => 15635,
-		}
-	});
-	
-Having a `plots` argument as an array lets the module know to create subplots:
-
-	use Matplotlib::Simple 'plot';
-	plot({
-		'output.filename'	=> 'svg/pies.png',
-		plots             => [
-			{
-				data	=> {
-				 Russian => 106_000_000,  # Primarily European Russia
-				 German => 95_000_000,    # Germany, Austria, Switzerland, etc.
-				},
-				'plot.type'	=> 'pie',
-				title       => 'Top Languages in Europe',
-				suptitle    => 'Pie in subplots',
-			},
-			{
-				data	=> {
-				 Russian => 106_000_000,  # Primarily European Russia
-				 German => 95_000_000,    # Germany, Austria, Switzerland, etc.
-				},
-				'plot.type'	=> 'pie',
-				title       => 'Top Languages in Europe',
-			},
-		],
-		ncols    => 2,
-	});
-
-See https://github.com/hhg7/MatPlotLib-Simple for more detailed use cases (with images)
-
-=cut
+our $VERSION = 0.05; # discard Perl versions < 5.10; cleaner CPAN page
 use List::Util qw(max sum min);
 use Term::ANSIColor;
 use Cwd 'getcwd';
@@ -322,211 +263,238 @@ sub plot_args {    # this is a helper function to other matplotlib subroutines
 	say { $args->{fh} } "\t$args->{ax}.legend($legend)";
 }
 
-sub barplot_helper { # this is a helper function to other matplotlib subroutines
-    my ($args) = @_;
-    my $current_sub = ( split( /::/, ( caller(0) )[3] ) )[-1]
-      ; # https://stackoverflow.com/questions/2559792/how-can-i-get-the-name-of-the-current-subroutine-in-perl
-    unless ( ref $args eq 'HASH' ) {
-        die
-"args must be given as a hash ref, e.g. \"$current_sub({ data => \@blah })\"";
-    }
-    my @reqd_args = (
-        'fh',      # e.g. $py, $fh, which will be passed by the subroutine
-        'plot',    # args to original function
-    );
-    my @undef_args = grep { !defined $args->{$_} } @reqd_args;
-    if ( scalar @undef_args > 0 ) {
-        p @undef_args;
-        die 'the above args are necessary, but were not defined.';
-    }
-    my @opt = (
-		@reqd_args, @ax_methods, @plt_methods, @fig_methods, @arg,
+my @plot_keys = ('pplot');
+sub graphics {
+	my ($args) = @_;
+	my $current_sub = ( split( /::/, ( caller(0) )[3] ) )[-1]
+	; # https://stackoverflow.com/questions/2559792/how-can-i-get-the-name-of-the-current-subroutine-in-perl
+	unless ( ref $args eq 'HASH' ) {
+	  die
+	"args must be given as a hash ref, e.g. \"$current_sub({ data => \@blah })\"";
+	}
+	my @reqd_args = (
 		'ax',
-		'color'
-		, # :mpltype:`color` or list of :mpltype:`color`, optional; The colors of the bar faces. This is an alias for *facecolor*. If both are given, *facecolor* takes precedence # if entering multiple colors, quoting isn't needed
-		'edgecolor'
-		, #:mpltype:`color` or list of :mpltype:`color`, optional; The colors of the bar edges.
-		'key.order',    # define the keys in an order (an array reference)
-		'label',        # an array of labels for grouped bar plots
-		'linewidth'
-		, # float or array, optional; Width of the bar edge(s). If 0, don't draw edges
-		'log'
-		,    # bool, default: False; If *True*, set the y-axis to be log scale.
-		'stacked',    # stack the groups on top of one another; default 0 = off
-		'width',      # float or array, default: 0.8; The width(s) of the bars.
-		'xerr'
-		, # float or array-like of shape(N,) or shape(2, N), optional. If not *None*, add horizontal / vertical errorbars to the bar tips. The values are +/- sizes relative to the data:        - scalar: symmetric +/- values for all bars #        - shape(N,): symmetric +/- values for each bar #        - shape(2, N): Separate - and + values for each bar. First row #          contains the lower errors, the second row contains the upper #          errors. #        - *None*: No errorbar. (Default)
-		'yerr',    # same as xerr, but better with bar
-    );
-    @opt = grep {$_ !~ m/^(?:$cb_regex)$/} @opt; # args that shouldn't apply
-    my $plot      = $args->{plot};
-    my @undef_opt = grep {
-        my $key = $_;
-        not grep { $_ eq $key } @opt
-    } keys %{$plot};
-    my $ax = $args->{ax} // '';
-    if ( scalar @undef_opt > 0 ) {
-        p @undef_opt;
-        die
-"The above arguments aren't defined for $plot->{'plot.type'} at plot position $ax";
-    }
-    my ( %ref_counts, $plot_type );
-    foreach my $set ( keys %{ $plot->{data} } ) {
-        $ref_counts{ ref $plot->{data}{$set} }++;
-    }
-    if ( scalar %ref_counts > 1 ) {
-        p $plot->{data};
-        p %ref_counts;
-        die
-"different kinds of data were entered to plot $ax which should be simple hash or hash of arrays.";
-    }
-    if ( defined $ref_counts{''} ) {
-        $plot_type = 'simple';
-    } elsif ( defined $ref_counts{'ARRAY'} ) {
-        $plot_type = 'grouped';
-    } elsif ( defined $ref_counts{'HASH'} ) {
-        $plot_type =
-          'grouped';    # now make the hash of hash into a ARRAY structure
-        my %key2;
-        foreach my $key1 ( keys %{ $plot->{data} } ) {
-            foreach my $key2 ( keys %{ $plot->{data}{$key1} } ) {
-                $key2{$key2}++;
-            }
-        }
-        my @key2 = sort { lc $a cmp lc $b } keys %key2;
-        my %new_structure;
-        foreach my $k1 ( keys %{ $plot->{data} } ) {
-            @{ $new_structure{$k1} } = @{ $plot->{data}{$k1} }{@key2};
-        }
-        @{ $plot->{label} } = @key2;
-        $plot->{data} = \%new_structure;
-    } else {
-        p %ref_counts;
-        p $plot->{data};
-        die 'the above plot type is not yet programmed in to bar/barh';
-    }
-    $plot->{stacked} = $plot->{stacked} // 0;
-    if (   ( $plot_type eq 'grouped' )
-        && ( defined $plot->{width} )
-        && ( $plot->{stacked} == 0 ) )
-    {
-        say STDERR 'grouped, non-stacked barplots ignore width settings';
-        delete $plot->{width};
-    }
-    my @key_order;
-    if ( defined $plot->{'key.order'} ) {
-        @key_order = @{ $plot->{'key.order'} };
-    } else {
-        @key_order = sort keys %{ $plot->{data} };
-    }
-    my $options = '';    # these args go to the plt.bar call
-    if ( defined $plot->{'log'} ) {
-        $options .= ", log = $plot->{log}";
-    }    # args that can be either arrays or strings below; STRINGS:
-    foreach my $c ( grep { defined $plot->{$_} } ( 'color', 'edgecolor' ) ) {
-        next if ( ( $c eq 'color' ) && ( $plot_type eq 'grouped' ) );
-        my $ref = ref $plot->{$c};
-        if ( $ref eq '' ) {    # single color
-            $options .= ", $c = '$plot->{$c}'";
-        }
-        elsif ( $ref eq 'ARRAY' ) {
-            $options .= ", $c = [\"" . join( '","', @{ $plot->{$c} } ) . '"]';
-        }
-    }    # args that can be either arrays or strings below; NUMERIC:
-    foreach my $c ( grep { defined $plot->{$_} } ('linewidth') ) {
-        my $ref = ref $plot->{$c};
-        if ( $ref eq '' ) {    # single color
-            $options .= ", $c = $plot->{$c}";
-        } elsif ( $ref eq 'ARRAY' ) {
-            $options .= ", $c = [" . join( ',', @{ $plot->{$c} } ) . ']';
-        } else {
-            p $args;
-            die "$ref for $c isn't acceptable";
-        }
-    }
-    foreach my $err ( grep { defined $plot->{$_} } ( 'xerr', 'yerr' ) ) {
-        my $ref = ref $plot->{$err};
-        if ( $ref eq '' ) {
-            $options .= ", $err = $plot->{$err}";
-        } elsif ( $ref eq 'HASH' ) {    # I assume that it's all defined
-            my ( @low, @high );
-            foreach my $i (@key_order) {
-                if ( scalar @{ $plot->{$err}{$i} } != 2 ) {
-                    p $plot->{$err}{$i};
-                    die
-"$err/$i should have exactly 2 items: low and high error bars";
-                }
-                push @low,  $plot->{$err}{$i}[0];
-                push @high, $plot->{$err}{$i}[1];
-            }
-            $options .=
-                ", $err = [["
-              . join( ',', @low ) . '],['
-              . join( ',', @high ) . ']]';
-        } else {
-            p $args;
-            die "$ref for $err isn't acceptable";
-        }
-    }
-    if ( $plot_type eq 'simple' ) {    # a simple hash -> simple bar plot
-        say { $args->{fh} } 'labels = ["' . join( '","', @key_order ) . '"]';
-        say { $args->{fh} } 'vals = ['
-          . join( ',', @{ $plot->{data} }{@key_order} ) . ']';
-        say { $args->{fh} } "ax$ax.$plot->{'plot.type'}(labels, vals $options)";
-    }
-    elsif ( $plot_type eq 'grouped' ) {    # grouped bar plot; hash of array
-        my @val;
-        foreach my $k (@key_order) {
-            foreach my $i ( 0 .. scalar @{ $plot->{data}{$k} } - 1 ) {
-                push @{ $val[$i] }, $plot->{data}{$k}[$i];
-            }
-        }
-        my $barwidth = $plot->{width} // 0.8;
-        $plot->{stacked} = $plot->{stacked} // 0;
-        if ( $plot->{stacked} == 0 ) {
-            $barwidth /= ( scalar %ref_counts + 3 );
-        }
-        my @xticks   = 0 .. scalar @{ $val[0] } - 1;
-        my @mean_pos = map { 0 } 0 .. scalar @{ $val[0] } - 1;    # initialize
-        my $hw       = 'height';
-        $hw = 'width' if $plot->{'plot.type'} eq 'bar';
-        my @bottom = map { 0 } 0 .. scalar @{ $val[0] } - 1;      # initialize
-        my $i = 0;
-        foreach my $arr (@val) {
-            my $x = '[' . join( ',', @xticks ) . ']';
-            foreach my $p ( 0 .. $#mean_pos ) {
-                $mean_pos[$p] += $xticks[$p];
-            }
-            my $set_options = '';
-            foreach
-              my $f ( grep { defined $plot->{$_}[$i] } ( 'color', 'label' ) )
-            {
-                $set_options .= ", $f = '$plot->{$f}[$i]'";
-            }
-            if ( $plot->{stacked} > 0 ) {
-                $set_options .= ', bottom = [' . join( ',', @bottom ) . ']';
-            }
-            say { $args->{fh} } "ax$ax.$plot->{'plot.type'}($x, ["
-              . join( ',', @{$arr} )
-              . "], $hw = $barwidth $options $set_options)";
-            @bottom =
-              map { $bottom[$_] + $arr->[$_] } 0 .. scalar @{ $val[0] } - 1
-              if $plot->{stacked} > 0;
-            @xticks = map { $_ + $barwidth } @xticks
-              if $plot->{stacked} <= 0;    # for next iteration
-              $i++;
-        }
-        my $xticks = '["' . join( '","', @key_order ) . '"]';
-        my $ticks  = 'yticks';
-        $ticks = 'xticks' if $plot->{'plot.type'} eq 'bar';
-        $_ /= scalar @val for @mean_pos;
-        say { $args->{fh} } "ax$ax.set_$ticks(["
-          . join( ',', @mean_pos )
-          . "], $xticks)";
-    } else {
-        die
-"\$plot_type = $plot_type & stacked = $plot->{stacked}and isn't defined.";
-    }
+		'fh',      # e.g. $py, $fh, which will be passed by the subroutine
+		'method',
+		'plot',    # args to original function
+	);
+	my @undef_args = grep { !defined $args->{$_} } @reqd_args;
+	if ( scalar @undef_args > 0 ) {
+	  p @undef_args;
+	  die 'the above args are necessary, but were not defined.';
+	}
+	my $cmd = "$args->{ax}.plot(";
+	my %reqd_args = map {$_ => 1} @reqd_args;
+	foreach my $arg (grep {not defined $reqd_args{$_}} keys %{ $args }) {
+		$cmd .= "$arg = $args->{$arg}";
+	}
+	say {$args->{fh}} "$cmd)";
+}
+
+sub barplot_helper { # this is a helper function to other matplotlib subroutines
+	my ($args) = @_;
+	my $current_sub = ( split( /::/, ( caller(0) )[3] ) )[-1]
+	; # https://stackoverflow.com/questions/2559792/how-can-i-get-the-name-of-the-current-subroutine-in-perl
+	unless ( ref $args eq 'HASH' ) {
+	  die
+	"args must be given as a hash ref, e.g. \"$current_sub({ data => \@blah })\"";
+	}
+	my @reqd_args = (
+	  'fh',      # e.g. $py, $fh, which will be passed by the subroutine
+	  'plot',    # args to original function
+	);
+	my @undef_args = grep { !defined $args->{$_} } @reqd_args;
+	if ( scalar @undef_args > 0 ) {
+	  p @undef_args;
+	  die 'the above args are necessary, but were not defined.';
+	}
+	my @opt = (
+	@reqd_args, @ax_methods, @plt_methods, @fig_methods, @arg,
+	'ax',
+	'color'
+	, # :mpltype:`color` or list of :mpltype:`color`, optional; The colors of the bar faces. This is an alias for *facecolor*. If both are given, *facecolor* takes precedence # if entering multiple colors, quoting isn't needed
+	'edgecolor'
+	, #:mpltype:`color` or list of :mpltype:`color`, optional; The colors of the bar edges.
+	'key.order',    # define the keys in an order (an array reference)
+	'label',        # an array of labels for grouped bar plots
+	'linewidth'
+	, # float or array, optional; Width of the bar edge(s). If 0, don't draw edges
+	'log'
+	,    # bool, default: False; If *True*, set the y-axis to be log scale.
+	'stacked',    # stack the groups on top of one another; default 0 = off
+	'width',      # float or array, default: 0.8; The width(s) of the bars.
+	'xerr'
+	, # float or array-like of shape(N,) or shape(2, N), optional. If not *None*, add horizontal / vertical errorbars to the bar tips. The values are +/- sizes relative to the data:        - scalar: symmetric +/- values for all bars #        - shape(N,): symmetric +/- values for each bar #        - shape(2, N): Separate - and + values for each bar. First row #          contains the lower errors, the second row contains the upper #          errors. #        - *None*: No errorbar. (Default)
+	'yerr',    # same as xerr, but better with bar
+	);
+	@opt = grep {$_ !~ m/^(?:$cb_regex)$/} @opt; # args that shouldn't apply
+	my $plot      = $args->{plot};
+	my @undef_opt = grep {
+	  my $key = $_;
+	  not grep { $_ eq $key } @opt
+	} keys %{$plot};
+	my $ax = $args->{ax} // '';
+	if ( scalar @undef_opt > 0 ) {
+	  p @undef_opt;
+	  die
+	"The above arguments aren't defined for $plot->{'plot.type'} at plot position $ax";
+	}
+	my ( %ref_counts, $plot_type );
+	foreach my $set ( keys %{ $plot->{data} } ) {
+	  $ref_counts{ ref $plot->{data}{$set} }++;
+	}
+	if ( scalar %ref_counts > 1 ) {
+	  p $plot->{data};
+	  p %ref_counts;
+	  die
+	"different kinds of data were entered to plot $ax which should be simple hash or hash of arrays.";
+	}
+	if ( defined $ref_counts{''} ) {
+		$plot_type = 'simple';
+	} elsif ( defined $ref_counts{'ARRAY'} ) {
+		$plot_type = 'grouped';
+	} elsif ( defined $ref_counts{'HASH'} ) {
+		$plot_type = 'grouped';    # now make the hash of hash into a ARRAY structure
+		my %key2;
+		foreach my $key1 ( keys %{ $plot->{data} } ) {
+			foreach my $key2 ( keys %{ $plot->{data}{$key1} } ) {
+				$key2{$key2}++;
+			}
+		}
+		my @key2 = sort { lc $a cmp lc $b } keys %key2;
+		my %new_structure;
+		foreach my $k1 ( keys %{ $plot->{data} } ) {
+			@{ $new_structure{$k1} } = @{ $plot->{data}{$k1} }{@key2};
+		}
+		@{ $plot->{label} } = @key2;
+		$plot->{data} = \%new_structure;
+	} else {
+	  p %ref_counts;
+	  p $plot->{data};
+	  die 'the above plot type is not yet programmed in to bar/barh';
+	}
+	$plot->{stacked} = $plot->{stacked} // 0;
+	if (   ( $plot_type eq 'grouped' )
+	  && ( defined $plot->{width} )
+	  && ( $plot->{stacked} == 0 ) )
+	{
+	  say STDERR 'grouped, non-stacked barplots ignore width settings';
+	  delete $plot->{width};
+	}
+	my @key_order;
+	if ( defined $plot->{'key.order'} ) {
+	  @key_order = @{ $plot->{'key.order'} };
+	} else {
+	  @key_order = sort keys %{ $plot->{data} };
+	}
+	my $options = '';    # these args go to the plt.bar call
+	if ( defined $plot->{'log'} ) {
+	  $options .= ", log = $plot->{log}";
+	}    # args that can be either arrays or strings below; STRINGS:
+	foreach my $c ( grep { defined $plot->{$_} } ( 'color', 'edgecolor' ) ) {
+	  next if ( ( $c eq 'color' ) && ( $plot_type eq 'grouped' ) );
+	  my $ref = ref $plot->{$c};
+	  if ( $ref eq '' ) {    # single color
+		   $options .= ", $c = '$plot->{$c}'";
+	  }
+	  elsif ( $ref eq 'ARRAY' ) {
+		   $options .= ", $c = [\"" . join( '","', @{ $plot->{$c} } ) . '"]';
+	  }
+	}    # args that can be either arrays or strings below; NUMERIC:
+	foreach my $c ( grep { defined $plot->{$_} } ('linewidth') ) {
+	  my $ref = ref $plot->{$c};
+	  if ( $ref eq '' ) {    # single color
+		   $options .= ", $c = $plot->{$c}";
+	  } elsif ( $ref eq 'ARRAY' ) {
+		   $options .= ", $c = [" . join( ',', @{ $plot->{$c} } ) . ']';
+	  } else {
+		   p $args;
+		   die "$ref for $c isn't acceptable";
+	  }
+	}
+	foreach my $err ( grep { defined $plot->{$_} } ( 'xerr', 'yerr' ) ) {
+	  my $ref = ref $plot->{$err};
+	  if ( $ref eq '' ) {
+		   $options .= ", $err = $plot->{$err}";
+	  } elsif ( $ref eq 'HASH' ) {    # I assume that it's all defined
+		   my ( @low, @high );
+		   foreach my $i (@key_order) {
+		       if ( scalar @{ $plot->{$err}{$i} } != 2 ) {
+		           p $plot->{$err}{$i};
+		           die
+	"$err/$i should have exactly 2 items: low and high error bars";
+		       }
+		       push @low,  $plot->{$err}{$i}[0];
+		       push @high, $plot->{$err}{$i}[1];
+		   }
+		   $options .=
+		       ", $err = [["
+		     . join( ',', @low ) . '],['
+		     . join( ',', @high ) . ']]';
+	  } else {
+		   p $args;
+		   die "$ref for $err isn't acceptable";
+	  }
+	}
+	if ( $plot_type eq 'simple' ) {    # a simple hash -> simple bar plot
+	  say { $args->{fh} } 'labels = ["' . join( '","', @key_order ) . '"]';
+	  say { $args->{fh} } 'vals = ['
+		 . join( ',', @{ $plot->{data} }{@key_order} ) . ']';
+	  say { $args->{fh} } "ax$ax.$plot->{'plot.type'}(labels, vals $options)";
+	}
+	elsif ( $plot_type eq 'grouped' ) {    # grouped bar plot; hash of array
+	  my @val;
+	  foreach my $k (@key_order) {
+		   foreach my $i ( 0 .. scalar @{ $plot->{data}{$k} } - 1 ) {
+		       push @{ $val[$i] }, $plot->{data}{$k}[$i];
+		   }
+	  }
+	  my $barwidth = $plot->{width} // 0.8;
+	  $plot->{stacked} = $plot->{stacked} // 0;
+	  if ( $plot->{stacked} == 0 ) {
+		   $barwidth /= ( scalar %ref_counts + 3 );
+	  }
+	  my @xticks   = 0 .. scalar @{ $val[0] } - 1;
+	  my @mean_pos = map { 0 } 0 .. scalar @{ $val[0] } - 1;    # initialize
+	  my $hw       = 'height';
+	  $hw = 'width' if $plot->{'plot.type'} eq 'bar';
+	  my @bottom = map { 0 } 0 .. scalar @{ $val[0] } - 1;      # initialize
+	  my $i = 0;
+	  foreach my $arr (@val) {
+		   my $x = '[' . join( ',', @xticks ) . ']';
+		   foreach my $p ( 0 .. $#mean_pos ) {
+		       $mean_pos[$p] += $xticks[$p];
+		   }
+		   my $set_options = '';
+		   foreach
+		     my $f ( grep { defined $plot->{$_}[$i] } ( 'color', 'label' ) )
+		   {
+		       $set_options .= ", $f = '$plot->{$f}[$i]'";
+		   }
+		   if ( $plot->{stacked} > 0 ) {
+		       $set_options .= ', bottom = [' . join( ',', @bottom ) . ']';
+		   }
+		   say { $args->{fh} } "ax$ax.$plot->{'plot.type'}($x, ["
+		     . join( ',', @{$arr} )
+		     . "], $hw = $barwidth $options $set_options)";
+		   @bottom =
+		     map { $bottom[$_] + $arr->[$_] } 0 .. scalar @{ $val[0] } - 1
+		     if $plot->{stacked} > 0;
+		   @xticks = map { $_ + $barwidth } @xticks
+		     if $plot->{stacked} <= 0;    # for next iteration
+		     $i++;
+	  }
+	  my $xticks = '["' . join( '","', @key_order ) . '"]';
+	  my $ticks  = 'yticks';
+	  $ticks = 'xticks' if $plot->{'plot.type'} eq 'bar';
+	  $_ /= scalar @val for @mean_pos;
+	  say { $args->{fh} } "ax$ax.set_$ticks(["
+		 . join( ',', @mean_pos )
+		 . "], $xticks)";
+	} else {
+	  die
+	"\$plot_type = $plot_type & stacked = $plot->{stacked}and isn't defined.";
+	}
 }
 
 sub boxplot_helper {
@@ -1251,8 +1219,7 @@ sub scatter_helper {
     }
     if ( defined $ref_counts{ARRAY} ) {
         $plot_type = 'single';
-    }
-    elsif ( defined $ref_counts{HASH} ) {
+    } elsif ( defined $ref_counts{HASH} ) {
         $plot_type = 'multiple';
     }
     $plot->{cmap} = $plot->{cmap} // 'gist_rainbow';
@@ -1260,9 +1227,8 @@ sub scatter_helper {
     if ( $plot_type eq 'single' ) {    # only a single set of data
         my ( $color_key, @keys );
         if ( defined $plot->{'keys'} ) {
-            @keys = @{ $plot->{'keys'} };
-        }
-        else {
+        	@keys = @{ $plot->{'keys'} };
+        } else {
             @keys = sort { lc $a cmp lc $b } keys %{ $plot->{data} };
         }
         my $n_keys = scalar keys %{ $plot->{data} };
@@ -1280,8 +1246,7 @@ sub scatter_helper {
                 splice @keys, $i, 1;    # remove the color key from @keys
                 $i++;
             }
-        }
-        elsif ( scalar @keys == 3 ) {
+        } elsif ( scalar @keys == 3 ) {
             $color_key = pop @keys;
         }    #			my $options = '';# these args go to the plt.hist call
         say { $args->{fh} } 'x = ['
@@ -1304,8 +1269,7 @@ sub scatter_helper {
         }
         $plot->{xlabel} = $plot->{xlabel} // $keys[0];
         $plot->{ylabel} = $plot->{ylabel} // $keys[1];
-    }
-    elsif ( $plot_type eq 'multiple' ) {    # multiple sets
+    } elsif ( $plot_type eq 'multiple' ) {    # multiple sets
         my @undefined_opts;
         foreach my $set ( sort keys %{ $plot->{'set.options'} } ) {
             next if grep { $set eq $_ } keys %{ $plot->{data} };
@@ -1684,7 +1648,6 @@ sub plot {
 	ncols    => 3,
 	});';
 	my @undef_args = grep { !defined $args->{$_} } @reqd_args;
-
 	if ( scalar @undef_args > 0 ) {
 	  p @undef_args;
 	  die 'the above args are necessary, but were not defined.';
@@ -1697,7 +1660,7 @@ sub plot {
 	}
 	my @defined_args = (
 	@reqd_args, @ax_methods, @fig_methods,  @plt_methods, @cb_arg,
-	@arg,       'key.order', 'set.options', 'color',
+	@arg,       'add', 'key.order', 'set.options', 'color',
 	'colors',   'show.legend'
 	);
 	my @bad_args = grep {
@@ -1710,9 +1673,9 @@ sub plot {
 	  p @defined_args, array_max => scalar @defined_args;
 	  die "The above args are accepted by \"$current_sub\"";
 	}
-	my $single_plot = 0;    # false
+	my $single_plot = 0; # false
 	if ( ( defined $args->{'plot.type'} ) && ( defined $args->{data} ) ) {
-	  $single_plot = 1;    # true
+	  $single_plot = 1; # true
 	}
 	if ( ( $single_plot == 1 ) && ( not defined $args->{'plot.type'} ) ) {
 	  p $args;
@@ -1787,7 +1750,6 @@ sub plot {
 	  my @undef_plot_types;
 	  my $i = 0;
 	  foreach my $plot (@{ $args->{plots} }) {
-	#        while ( my ( $i, $plot ) = each @{ $args->{plots} } ) {
 		   next if defined $plot->{'plot.type'};
 		   push @undef_plot_types, $i;
 		   $i++;
@@ -1798,231 +1760,349 @@ sub plot {
 		   die 'The above subplot indices are missing "plot.type"';
 	  }
 	}
-	my $find_global_min_max =
-	scalar grep { $_->{'plot.type'} eq 'hist2d' } @{ $args->{plots} };
+	my $find_global_min_max = scalar grep { $_->{'plot.type'} eq 'hist2d' } @{ $args->{plots} };
 	if ( $find_global_min_max > 0 ) {
-	  say $fh 'global_max = float("-inf")';
-	  say $fh 'global_min = float("inf")';
+		say $fh 'global_max = float("-inf")';
+		say $fh 'global_min = float("inf")';
 	}
-	if ( $single_plot == 1 ) {
-	  if ( not defined $args->{'plot.type'} ) {
-		   die "\"plot.type\" is not defined for \"$current_sub\"";
-	  }
-	  if ( $args->{'plot.type'} =~ m/^barh?$/ ) {  # barplot: "bar" and "barh"
-		   barplot_helper({
-		     fh   => $fh,
-		     ax   => 0,
-		     plot => $args
-		   });
-	  } elsif ( $args->{'plot.type'} eq 'boxplot' ) {
-		   boxplot_helper({
-		     fh   => $fh,
-		     ax   => 0,
-		     plot => $args
-		   });
-	  } elsif ( $args->{'plot.type'} eq 'hexbin' ) {
-		   hexbin_helper({
-		     fh   => $fh,
-		     ax   => 0,
-		     plot => $args
-		   });
-	  } elsif ( $args->{'plot.type'} eq 'hist' ) {    # histogram
-		   hist_helper({
-		     fh   => $fh,
-		     ax   => 0,
-		     plot => $args
+	if ($single_plot == 1) {
+		foreach my $graph (@{ $args->{add} }) {
+			if ( $args->{'plot.type'} =~ m/^barh?$/ ) {  # barplot: "bar" and "barh"
+				barplot_helper({
+					fh   => $fh,
+					ax   => 0,
+					plot => $graph
+				});
+			} elsif ( $args->{'plot.type'} eq 'boxplot' ) {
+				boxplot_helper({
+					fh   => $fh,
+					ax   => 0,
+					plot => $graph
+				});
+			} elsif ( $args->{'plot.type'} eq 'hexbin' ) {
+				hexbin_helper({
+				  fh   => $fh,
+				  ax   => 0,
+				  plot => $graph
+				});
+			} elsif ( $args->{'plot.type'} eq 'hist' ) {    # histogram
+				hist_helper({
+				  fh   => $fh,
+				  ax   => 0,
+				  plot => $graph
+			  });
+			} elsif ( $args->{'plot.type'} eq 'hist2d' ) {
+				hist2d_helper({
+				  fh   => $fh,
+				  ax   => 0,
+				  plot => $graph
+				});
+			} elsif ( $args->{'plot.type'} eq 'imshow' ) {
+				imshow_helper({
+				  fh   => $fh,
+				  ax   => 0,
+				  plot => $graph
+				});
+			} elsif ( $args->{'plot.type'} eq 'pie' ) {
+				pie_helper({
+				  fh   => $fh,
+				  ax   => 0,
+				  plot => $args
+				});
+			} elsif ( $args->{'plot.type'} eq 'plot' ) {
+				plot_helper({
+					fh   => $fh,
+					ax   => 0,
+					plot => $graph
+				});
+			} elsif ( $args->{'plot.type'} eq 'scatter' ) {    # scatterplot
+				scatter_helper({
+				  fh   => $fh,
+				  ax   => 0,
+				  plot => $graph
+				 });
+			} elsif ( $args->{'plot.type'} eq 'violinplot' ) {
+				violin_helper({
+				  fh   => $fh,
+				  ax   => 0,
+				  plot => $graph
+			  });
+			} elsif ( $args->{'plot.type'} eq 'wide' ) {
+				wide_helper({
+				  fh   => $fh,
+				  ax   => 0,
+				  plot => $graph
+				});
+			} else {
+				die "$args->{'plot.type'} doesn't fit pigeonholes with \$single_plot = $single_plot";
+			} # sometimes, I need "ax" methods instead of plt, while keeping calling simpler
+		}
+		delete $args->{add};
+	}
+	if ($single_plot == 1) {
+		if ( not defined $args->{'plot.type'} ) {
+			die "\"plot.type\" is not defined for \"$current_sub\"";
+		}
+		if ( $args->{'plot.type'} =~ m/^barh?$/ ) {  # barplot: "bar" and "barh"
+			barplot_helper({
+				fh   => $fh,
+				ax   => 0,
+				plot => $args
+			});
+		} elsif ( $args->{'plot.type'} eq 'boxplot' ) {
+			boxplot_helper({
+			  fh   => $fh,
+			  ax   => 0,
+			  plot => $args
+			});
+		} elsif ($args->{'plot.type'} eq 'hexbin') {
+			hexbin_helper({
+			  fh   => $fh,
+			  ax   => 0,
+			  plot => $args
+			});
+		} elsif ($args->{'plot.type'} eq 'hist') {    # histogram
+			hist_helper({
+			  fh   => $fh,
+			  ax   => 0,
+			  plot => $args
 		  });
-	  } elsif ( $args->{'plot.type'} eq 'hist2d' ) {
-		   hist2d_helper({
-		     fh   => $fh,
-		     ax   => 0,
-		     plot => $args
-		   });
-	  } elsif ( $args->{'plot.type'} eq 'imshow' ) {
-		   imshow_helper({
-		     fh   => $fh,
-		     ax   => 0,
-		     plot => $args
-		   });
-	  } elsif ( $args->{'plot.type'} eq 'pie' ) {
-		   pie_helper(
-		       {
-		           fh   => $fh,
-		           ax   => 0,
-		           plot => $args
-		       }
-		   );
-	  } elsif ( $args->{'plot.type'} eq 'plot' ) {
-		   plot_helper(
-		       {
-		           fh   => $fh,
-		           ax   => 0,
-		           plot => $args
-		       }
-		   );
-	  } elsif ( $args->{'plot.type'} eq 'scatter' ) {    # scatterplot
-		   scatter_helper(
-		       {
-		           fh   => $fh,
-		           ax   => 0,
-		           plot => $args
-		       }
-		   );
-	  } elsif ( $args->{'plot.type'} eq 'violinplot' ) {
-		   violin_helper(
-		       {
-		           fh   => $fh,
-		           ax   => 0,
-		           plot => $args
-		       }
-		   );
-	  } elsif ( $args->{'plot.type'} eq 'wide' ) {
-		   wide_helper(
-		       {
-		           fh   => $fh,
-		           ax   => 0,
-		           plot => $args
-		       }
-		   );
-	  } else {
-		   die
-	"$args->{'plot.type'} doesn't fit pigeonholes with \$single_plot = $single_plot";
-	  } # sometimes, I need "ax" methods instead of plt, while keeping calling simpler
-	  my %rename = (
-		   xlabel => 'set_xlabel',
-		   title  => 'set_title',
-		   ylabel => 'set_ylabel',
-		   legend => 'legend',
-		   xlim   => 'set_xlim',
-	  );
-	  foreach my $opt ( grep { defined $rename{$_} } keys %{$args} ) {
-		   $args->{ $rename{$opt} } = delete $args->{$opt};
-	  }
-	  plot_args({
-		 fh   => $fh,
-		 args => $args,
-		 ax   => 'ax0'
-	  });
+		} elsif ($args->{'plot.type'} eq 'hist2d') {
+			hist2d_helper({
+			  fh   => $fh,
+			  ax   => 0,
+			  plot => $args
+			});
+		} elsif ( $args->{'plot.type'} eq 'imshow' ) {
+			imshow_helper({
+			  fh   => $fh,
+			  ax   => 0,
+			  plot => $args
+			});
+		} elsif ( $args->{'plot.type'} eq 'pie' ) {
+			pie_helper({
+			  fh   => $fh,
+			  ax   => 0,
+			  plot => $args
+			});
+		} elsif ( $args->{'plot.type'} eq 'plot' ) {
+			plot_helper({
+				fh   => $fh,
+				ax   => 0,
+				plot => $args
+			});
+		} elsif ( $args->{'plot.type'} eq 'scatter' ) {    # scatterplot
+			scatter_helper({
+			  fh   => $fh,
+			  ax   => 0,
+			  plot => $args
+			 });
+		} elsif ( $args->{'plot.type'} eq 'violinplot' ) {
+			violin_helper({
+			  fh   => $fh,
+			  ax   => 0,
+			  plot => $args
+		  });
+		} elsif ( $args->{'plot.type'} eq 'wide' ) {
+			wide_helper({
+			  fh   => $fh,
+			  ax   => 0,
+			  plot => $args
+			});
+		} else {
+			die
+		"$args->{'plot.type'} doesn't fit pigeonholes with \$single_plot = $single_plot";
+		} # sometimes, I need "ax" methods instead of plt, while keeping calling simpler
+		my %rename = (
+			xlabel => 'set_xlabel',
+			title  => 'set_title',
+			ylabel => 'set_ylabel',
+			legend => 'legend',
+			xlim   => 'set_xlim',
+		);
+		foreach my $opt ( grep { defined $rename{$_} } keys %{$args} ) {
+			$args->{ $rename{$opt} } = delete $args->{$opt};
+		}
+		plot_args({
+			fh   => $fh,
+			args => $args,
+			ax   => 'ax0'
+		});
 	}
 	my $ax = 0;
 	foreach my $plot (@{ $args->{plots} } ) {
-	#    while ( my ( $ax, $plot ) = each @{ $args->{plots} } ) { # for each plot $ax (hash is $plot)
-	  my @reqd_keys = (
-		   'data',         # data type, of which several are available
-		   'plot.type',    # "bar", "barh", "hist", etc.
-	  );
-	  my @undef_keys = grep { !defined $plot->{$_} } @reqd_keys;
-	  if ( scalar @undef_keys > 0 ) {
-		   p @undef_keys;
-		   die
-	"the above args are necessary, but were not defined for plot $ax.";
-	  }
-	  if ( $plot->{'plot.type'} =~ m/^barh?$/ ) {  # barplot: "bar" and "barh"
-		   barplot_helper(
-		       {
-		           fh   => $fh,
-		           ax   => $ax,
-		           plot => $plot
-		       }
-		   );
-	  } elsif ( $plot->{'plot.type'} eq 'boxplot' ) {
-		   boxplot_helper(
-		       {
-		           fh   => $fh,
-		           ax   => $ax,
-		           plot => $plot
-		       }
-		   );
-	  }
-	  elsif ( $plot->{'plot.type'} eq 'hexbin' ) {
-		   hexbin_helper(
-		       {
-		           fh   => $fh,
-		           ax   => $ax,
-		           plot => $plot
-		       }
-		   );
-	  }  elsif ( $plot->{'plot.type'} eq 'hist' ) {    # histogram
-		   hist_helper({
-		     fh   => $fh,
-		     ax   => $ax,
-		     plot => $plot
-		   });
-	  } elsif ( $plot->{'plot.type'} eq 'hist2d' ) {
-		   hist2d_helper({
-		     fh   => $fh,
-		     ax   => $ax,
-		     plot => $plot
-		   });
-	  } elsif ( $plot->{'plot.type'} eq 'imshow' ) {
-		   imshow_helper({
-		        fh   => $fh,
-		        ax   => $ax,
-		        plot => $plot
-		   });
-	  } elsif ( $plot->{'plot.type'} eq 'pie' ) {
-		   pie_helper(
-		       {
-		           fh   => $fh,
-		           ax   => $ax,
-		           plot => $plot
-		       }
-		   );
-	  } elsif ( $plot->{'plot.type'} eq 'plot' ) {
-		   plot_helper(
-		       {
-		           fh   => $fh,
-		           ax   => $ax,
-		           plot => $plot
-		       }
-		   );
-	  } elsif ( $plot->{'plot.type'} eq 'scatter' ) {    # scatterplot
-		   scatter_helper(
-		       {
-		           fh   => $fh,
-		           ax   => $ax,
-		           plot => $plot
-		       }
-		   );
-	  } elsif ( $plot->{'plot.type'} eq 'violinplot' ) {
-		   violin_helper(
-		       {
-		           fh   => $fh,
-		           ax   => $ax,
-		           plot => $plot
-		       }
-		   );
-	  } elsif ( $plot->{'plot.type'} eq 'wide' ) {
-		   wide_helper({
-		     fh   => $fh,
-		     ax   => $ax,
-		     plot => $plot
-		   });
-	  }
-	  else {
-		   die
-	"\"$plot->{'plot.type'}\" doesn't fit pigeonholes with \$single_plot = $single_plot";
-	  }
-	  my %rename = (
-		   xlabel => 'set_xlabel',
-		   title  => 'set_title',
-		   ylabel => 'set_ylabel',
-		   legend => 'legend',
-		   #			xlim => 'set_xlim',
-	  );
-	  foreach my $opt ( grep { defined $rename{$_} } keys %{$plot} ) {
-		   $plot->{ $rename{$opt} } = delete $plot->{$opt};
-	  }
-	  plot_args({
+		foreach my $graph (@{ $plot->{add} }) {
+			if ( $graph->{'plot.type'} =~ m/^barh?$/ ) {  # barplot: "bar" and "barh"
+				barplot_helper({
+					fh   => $fh,
+					ax   => $ax,
+					plot => $graph
+				});
+			} elsif ( $graph->{'plot.type'} eq 'boxplot' ) {
+				boxplot_helper({
+				  fh   => $fh,
+				  ax   => $ax,
+				  plot => $graph
+				});
+			}
+			elsif ( $graph->{'plot.type'} eq 'hexbin' ) {
+				hexbin_helper({
+				  fh   => $fh,
+				  ax   => $ax,
+				  plot => $graph
+				});
+			}  elsif ( $graph->{'plot.type'} eq 'hist' ) {    # histogram
+				hist_helper({
+				  fh   => $fh,
+				  ax   => $ax,
+				  plot => $graph
+				});
+			} elsif ( $graph->{'plot.type'} eq 'hist2d' ) {
+				hist2d_helper({
+				  fh   => $fh,
+				  ax   => $ax,
+				  plot => $graph
+				});
+			} elsif ( $graph->{'plot.type'} eq 'imshow' ) {
+				imshow_helper({
+				  fh   => $fh,
+				  ax   => $ax,
+				  plot => $graph
+				});
+			} elsif ( $graph->{'plot.type'} eq 'pie' ) {
+				pie_helper({
+				  fh   => $fh,
+				  ax   => $ax,
+				  plot => $graph
+			  });
+			} elsif ( $graph->{'plot.type'} eq 'plot' ) {
+				plot_helper({
+				  fh   => $fh,
+				  ax   => $ax,
+				  plot => $graph
+				});
+			} elsif ( $graph->{'plot.type'} eq 'scatter' ) {    # scatterplot
+				scatter_helper({
+				  fh   => $fh,
+				  ax   => $ax,
+				  plot => $graph
+				});
+			} elsif ( $graph->{'plot.type'} eq 'violinplot' ) {
+				violin_helper({
+				  fh   => $fh,
+				  ax   => $ax,
+				  plot => $graph
+				});
+			} elsif ( $graph->{'plot.type'} eq 'wide' ) {
+				wide_helper({
+				  fh   => $fh,
+				  ax   => $ax,
+				  plot => $graph
+				});
+			} else {
+				die "\"$plot->{'plot.type'}\" doesn't fit pigeonholes with \$single_plot = $single_plot";
+			}
+		}
+		delete $plot->{add};
+		my @reqd_keys = (
+			'data',         # data type, of which several are available
+			'plot.type',    # "bar", "barh", "hist", etc.
+		);
+		my @undef_keys = grep { !defined $plot->{$_} } @reqd_keys;
+		if ( scalar @undef_keys > 0 ) {
+			p @undef_keys;
+			die "Above args are necessary, but were not defined for plot $ax.";
+		}
+		if ( $plot->{'plot.type'} =~ m/^barh?$/) {  # barplot: "bar" and "barh"
+			barplot_helper({
+			  fh   => $fh,
+			  ax   => $ax,
+			  plot => $plot
+			});
+		} elsif ( $plot->{'plot.type'} eq 'boxplot') {
+			boxplot_helper({
+			  fh   => $fh,
+			  ax   => $ax,
+			  plot => $plot
+			});
+		}
+		elsif ( $plot->{'plot.type'} eq 'hexbin' ) {
+			hexbin_helper({
+			  fh   => $fh,
+			  ax   => $ax,
+			  plot => $plot
+			});
+		}  elsif ( $plot->{'plot.type'} eq 'hist' ) {    # histogram
+			hist_helper({
+			  fh   => $fh,
+			  ax   => $ax,
+			  plot => $plot
+			});
+		} elsif ( $plot->{'plot.type'} eq 'hist2d' ) {
+			hist2d_helper({
+			  fh   => $fh,
+			  ax   => $ax,
+			  plot => $plot
+			});
+		} elsif ( $plot->{'plot.type'} eq 'imshow' ) {
+			imshow_helper({
+			  fh   => $fh,
+			  ax   => $ax,
+			  plot => $plot
+			});
+		} elsif ( $plot->{'plot.type'} eq 'pie' ) {
+			pie_helper({
+			  fh   => $fh,
+			  ax   => $ax,
+			  plot => $plot
+		  });
+		} elsif ( $plot->{'plot.type'} eq 'plot' ) {
+			plot_helper({
+			  fh   => $fh,
+			  ax   => $ax,
+			  plot => $plot
+			});
+		} elsif ( $plot->{'plot.type'} eq 'scatter' ) {    # scatterplot
+			scatter_helper({
+			  fh   => $fh,
+			  ax   => $ax,
+			  plot => $plot
+			});
+		} elsif ( $plot->{'plot.type'} eq 'violinplot' ) {
+			violin_helper({
+			  fh   => $fh,
+			  ax   => $ax,
+			  plot => $plot
+			});
+		} elsif ( $plot->{'plot.type'} eq 'wide' ) {
+			wide_helper({
+			  fh   => $fh,
+			  ax   => $ax,
+			  plot => $plot
+			});
+		} else {
+			die "\"$plot->{'plot.type'}\" doesn't fit pigeonholes with \$single_plot = $single_plot";
+		}
+		my %rename = (
+			xlabel => 'set_xlabel',
+			title  => 'set_title',
+			ylabel => 'set_ylabel',
+			legend => 'legend',
+			#			xlim => 'set_xlim',
+		);
+		foreach my $opt ( grep { defined $rename{$_} } keys %{$plot} ) {
+			$plot->{ $rename{$opt} } = delete $plot->{$opt};
+		}
+		plot_args({
 		 fh   => $fh,
 		 args => $plot,
 		 ax   => "ax$ax"
-	  });
-	  $ax++;
+		});
+		$ax++;
 	}
 	foreach my $ax (@ax) {
-	  say $fh "if $ax.has_data() == False:";    # remove empty plots
-	  say $fh "\t$ax.remove()";                 # remove empty plots
+		say $fh "if $ax.has_data() == False:";    # remove empty plots
+		say $fh "\t$ax.remove()";                 # remove empty plots
 	}
 	my %methods = map { $_ => 1 } @plt_methods;
 	foreach my $plt_method ( grep { defined $methods{$_} } keys %{$args} ) {
@@ -2034,8 +2114,7 @@ sub plot {
 		   $args->{$plt_method} =~ s/^\'+//;
 		   $args->{$plt_method} =~ s/\'+$//;
 		   say $fh "plt.$plt_method('$args->{$plt_method}')#" . __LINE__;
-	  }
-	  elsif ( $ref eq 'ARRAY' ) {
+	  } elsif ( $ref eq 'ARRAY' ) {
 		   foreach my $j ( @{ $args->{$plt_method} } ) {    # say $fh "plt.$method($plt)";
 		       say $fh "plt.$plt_method($j)#" . __LINE__;
 		   }
@@ -2077,3 +2156,70 @@ sub plot {
 	}
 }
 1;
+
+=pod
+
+=head1 NAME
+
+Matplotlib::Simple
+
+=head1 AUTHOR
+
+David E. Condon
+
+=head1 LICENSE
+
+Perl5
+
+=head1 SYNOPSIS
+
+Simplest possible use case:
+
+	use Matplotlib::Simple 'plot';
+	plot({
+		'output.filename' => '/tmp/gospel.word.counts.png',
+		'plot.type'       => 'bar',
+		data              => {
+			Matthew => 18345,
+			Mark    => 11304,
+			Luke    => 19482,
+			John    => 15635,
+		}
+	});
+	
+Having a `plots` argument as an array lets the module know to create subplots:
+
+	use Matplotlib::Simple 'plot';
+	plot({
+		'output.filename'	=> 'svg/pies.png',
+		plots             => [
+			{
+				data	=> {
+				 Russian => 106_000_000,  # Primarily European Russia
+				 German => 95_000_000,    # Germany, Austria, Switzerland, etc.
+				},
+				'plot.type'	=> 'pie',
+				title       => 'Top Languages in Europe',
+				suptitle    => 'Pie in subplots',
+			},
+			{
+				data	=> {
+				 Russian => 106_000_000,  # Primarily European Russia
+				 German => 95_000_000,    # Germany, Austria, Switzerland, etc.
+				},
+				'plot.type'	=> 'pie',
+				title       => 'Top Languages in Europe',
+			},
+		],
+		ncols    => 2,
+	});
+
+=begin html
+see <a href="https://github.com/hhg7/MatPlotLib-Simple">GitHub</a> for more details
+
+the simplest plot:
+
+<p><center><img src="https://private-user-images.githubusercontent.com/17788973/486139108-a008dece-2e34-47bf-af0f-8603709f7d52.png?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NjIzNzg1MzQsIm5iZiI6MTc2MjM3ODIzNCwicGF0aCI6Ii8xNzc4ODk3My80ODYxMzkxMDgtYTAwOGRlY2UtMmUzNC00N2JmLWFmMGYtODYwMzcwOWY3ZDUyLnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNTExMDUlMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjUxMTA1VDIxMzAzNFomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTNkNWYwM2ZlMDhjOTIzZDQ4NDg2MmIxYzY3Y2IxYzMwYjlmNTk3MjY5MzI0Yzk2YzljMDMxOTA3ZmYwOWIzYzImWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.zpgP04I8RyA4iSXSoUbBPEQV4bUeti8w11KQyZgXkFk" width="640" height="420" alt="Basic Plot" /></center></p>
+
+=end html
+

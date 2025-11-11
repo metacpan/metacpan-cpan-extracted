@@ -21,11 +21,22 @@ This module requires these other modules and libraries:
 
 SEE ALSO
 
-JavaScript implementation of pod6
-  
-I highly recommend see pod6 implementation https://github.com/zag/js-pod6.
-That is modern implementation of pod6. 
-Also check project site https://pod6.in for latest information about pod6.
+Podlite is a lightweight block-based markup language designed for flexibility and ease of use.
+
+Podlite represents the evolution of Synopsis26 ideas.
+Follow Podlite news and developments:
+
+  * Podlite Perl module (https://metacpan.org/release/Podlite)
+    Podlite support for Perl on CPAN
+
+  * Podlite Specification (https://podlite.org/specification)
+    Official specification in HTML
+
+  * Podlite Specification Source (https://github.com/podlite/podlite-specs)
+    Specification source code
+
+  * podlite.org (https://podlite.org)
+    Official website
 
 AUTHOR 
 

@@ -9,7 +9,7 @@ use Hydrogen::ArrayRef ();
 package Hydrogen::Curry::ArrayRef;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.021000';
+our $VERSION   = '0.021001';
 
 =head1 NAME
 
@@ -17,8 +17,8 @@ Hydrogen::Curry::ArrayRef - easily curry functions from Hydrogen::ArrayRef
 
 =head1 VERSION
 
-This documentation is for Hydrogen::Curry::ArrayRef 0.021000,
-which is based on Sub::HandlesVia::HandlerLibrary::Array 0.050003.
+This documentation is for Hydrogen::Curry::ArrayRef 0.021001,
+which is based on Sub::HandlesVia::HandlerLibrary::Array 0.050005.
 
 =cut
 

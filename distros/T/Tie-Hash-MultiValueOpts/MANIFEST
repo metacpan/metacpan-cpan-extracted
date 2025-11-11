@@ -1,0 +1,12 @@
+Changes
+cpanfile
+lib/Tie/Hash/MultiValueOpts.pm
+lib/Tie/Hash/MultiValueOpts.pod
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/basic.t
+t/getopts.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

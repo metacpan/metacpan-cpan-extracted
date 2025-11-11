@@ -12,7 +12,7 @@ use Scalar::Util qw(looks_like_number);
 Readonly::Array our @EXPORT_OK => qw(check_int check_natural check_number
 	check_percent check_positive_decimal check_positive_natural);
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 # ... -2, -1, 0, 1, 2, ...
 sub check_int {
@@ -74,7 +74,7 @@ sub check_positive_decimal {
 
 	_check_key($self, $key) && return;
 
-	if ($self->{$key} !~ m/^\d+(?:\.\d+)?$/ms || $self->{$key} == 0) {
+	if ($self->{$key} !~ m/^\d+(?:\.\d+)?(?:[eE][+-]?\d+)?$/ms || $self->{$key} == 0) {
 		err "Parameter '$key' must be a positive decimal number.",
 			'Value', $self->{$key},
 		;
@@ -188,10 +188,11 @@ Returns undef.
 
  check_positive_decimal($self, $key)
 
-I<Since version 0.05.>
+I<Since version 0.05. Described functionality since version 0.08.>
 
 Check if the parameter defined by C<$key> is a positive decimal number.
 Value could be undefined or doesn't exist.
+Check accepts numbers in scientific notation.
 
 Put error if check isn't ok.
 
@@ -532,6 +533,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut

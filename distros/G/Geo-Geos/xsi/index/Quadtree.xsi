@@ -1,7 +1,7 @@
 MODULE = Geo::Geos                PACKAGE = Geo::Geos::Index::Quadtree
 PROTOTYPES: DISABLE
 
-Sv new(SV) {
+Sv new(Sv) {
     Object wrapped = xs::out<quadtree::Quadtree*>(new quadtree::Quadtree());
     auto payload = new SVs_map_payload();
     wrapped.payload_attach(payload, &payload_marker_SVs_map);
