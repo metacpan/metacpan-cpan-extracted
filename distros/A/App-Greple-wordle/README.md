@@ -1,4 +1,4 @@
-[![Actions Status](https://github.com/kaz-utashiro/greple-wordle/workflows/test/badge.svg)](https://github.com/kaz-utashiro/greple-wordle/actions) [![MetaCPAN Release](https://badge.fury.io/pl/App-Greple-wordle.svg)](https://metacpan.org/release/App-Greple-wordle)
+[![Actions Status](https://github.com/kaz-utashiro/greple-wordle/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/kaz-utashiro/greple-wordle/actions?workflow=test) [![MetaCPAN Release](https://badge.fury.io/pl/App-Greple-wordle.svg)](https://metacpan.org/release/App-Greple-wordle)
 # NAME
 
 App::Greple::wordle - wordle module for greple
@@ -9,11 +9,15 @@ greple -Mwordle
 
 # DESCRIPTION
 
-App::Greple::wordle is a greple module which implements wordle game.
-Correctness is checked by regular expression.
+App::Greple::wordle is a greple module that implements the Wordle game.
+Answer correctness is checked by regular expression.
 
-Rule is almost same as the original game but answer is different.  Use
-**--compat** option to get compatible answer.
+This module supports multiple word datasets. Use the **--data** option to
+choose different word datasets such as the original Wordle word list
+or the New York Times Wordle word list.
+
+Rules are almost the same as the original game, but answers are different.
+Use the **--compat** option to get answers compatible with the original game.
 
 <div>
     <p><img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/greple-wordle/main/images/screen-5.png">
@@ -21,38 +25,60 @@ Rule is almost same as the original game but answer is different.  Use
 
 # OPTIONS
 
+- **--data**=_dataset_
+
+    Choose the word dataset.  Default is `ORIGINAL`.
+
+    Available datasets:
+
+    - `ORIGINAL`
+
+        The original word list from the initial Wordle game. This is the
+        default dataset and contains the classic Wordle word list.
+
+    - `NYT`
+
+        The New York Times Wordle word list, which includes words used by NYT
+        Wordle. This dataset is updated and may contain different words than
+        the original.
+
+    Dataset modules are dynamically loaded from `App::Greple::wordle::`
+    namespace with uppercase dataset name.
+
 - **--series**=#,  **-s**#
 - **--compat**
 
-    Choose different series of answer.  Default 1.  Series zero is same as
-    the original game and option **--compat** is a short cut for
-    **--series=0**.  If it is not zero, original answer word set is
-    shuffled by pseudo random numbers using series number as an initial
-    seed.
+    Choose a different answer series.  Default is 1.  Series zero is the same as
+    the original game and option **--compat** is a shortcut for
+    **--series=0**.  If it is not zero, the answer set is shuffled by
+    pseudo-random numbers using the series number as an initial seed.
 
 - **--index**=#, **-n**#
 
-    Specify index. Default index is calculated from days from 2021/06/19.
-    If the value is negative and you can get yesterday's question by
-    giving -1.
+    Specify the answer index. The default index is calculated from days since
+    2021/06/19.  If the value is negative, you can get yesterday's
+    question by specifying -1.
 
-    Answer for option **-s0n0** is `cigar`.
+    If the specified index exceeds the available answer list, a random
+    answer will be selected from the dataset with a warning message.
+
+    Answer for option **-s0n0** with `ORIGINAL` dataset is `cigar`.
 
 - **--**\[**no-**\]**result**
 
-    Show result when succeeded.  Default true.
+    Show result when successful.  Default is true.
 
 - **--random**
 
-    Generate random index every time.
+    Generate a random index every time.
 
 - **--trial**=#, **-x**=#
 
-    Set trial count.  Default 6.
+    Set the trial count.  Default is 6.
 
 # COMMANDS
 
-Five letter word is processed as an answer.  Some other input is taken
+A five-letter word is processed as an answer.  Other input is taken
 as a command.
 
 - **h**, **hint**
@@ -65,33 +91,35 @@ as a command.
 
 - **=**_chars_
 
-    If start with equal (`=`), list words which include all of _chars_.
+    If starting with equal (`=`), list words that include all _chars_.
 
 - **!**_chars_
 
-    If start with exclamation mark (`!`), list words which does not
+    If starting with exclamation mark (`!`), list words that do not
     include any of _chars_.
 
 - _regex_
 
-    Any other string include non-alphabetical character is taken as a
+    Any other string including a non-alphabetical character will be taken as a
     regular expression to filter words.
 
 - **!!**
 
-    Get word list produced by the last command execution.
+    Recall the word list produced by the last command execution.
 
-These commands can be connected in series.  For example, next command
-show possible words start with letter `z`.
+These commands can be connected in series.  For example, the following command
+shows possible words starting with letter `z`.
 
     hint ^z
 
-Next shows all words which does not incude any letter of `audio` and
-`rents`, and made of unique characters.
+The next example shows all words that do not include any letter of `audio` and
+`rents`, and are made of unique characters.
 
     !audio !rents u
 
 # EXAMPLE
+
+## Basic gameplay
 
     1: solid                    # try word "solid"
     2: panic                    # try word "panic"
@@ -102,22 +130,26 @@ Next shows all words which does not incude any letter of `audio` and
     4: datum                    # try word "datum"
     5: tardy                    # try word "tardy"
 
+## Using different datasets
+
+    greple -Mwordle --data=NYT            # Use NYT Wordle word list
+    greple -Mwordle --data=ORIGINAL       # Use original word list (default)
+    greple -Mwordle --data=NYT -n0        # First word in NYT dataset (cigar)
+
 <div>
     <p><img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/greple-wordle/main/images/hint-1.png">
 </div>
 
 # BUGS
 
-Wrong position character is colored yellow always, even if it is
-colored green in other position.
+A character in the wrong position is always colored yellow, even if it
+appears in green elsewhere.
 
 # INSTALL
 
 ## CPANMINUS
 
     $ cpanm App::Greple::wordle
-    or
-    $ curl -sL http://cpanmin.us | perl - App::Greple::wordle
 
 # SEE ALSO
 
@@ -129,13 +161,15 @@ colored green in other position.
 
 [https://github.com/alex1770/wordle](https://github.com/alex1770/wordle)
 
+[https://wordfinder.yourdictionary.com/wordle/answers/](https://wordfinder.yourdictionary.com/wordle/answers/)
+
 # AUTHOR
 
 Kazumasa Utashiro
 
 # LICENSE
 
-Copyright 2022 Kazumasa Utashiro.
+Copyright 2022-2025 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

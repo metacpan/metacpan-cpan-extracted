@@ -1,5 +1,12 @@
 Revision history for Perl extension App-Greple-wordle
 
+0.13 2025-11-11T09:15:57Z
+
+    - Add --data option to support multiple word datasets
+    - Add ORIGINAL and NYT dataset modules
+    - Improve POD documentation
+    - Add Data::Section::Simple dependency
+
 0.12 2022-08-26T08:19:39Z
 
     - change --try option to --trial

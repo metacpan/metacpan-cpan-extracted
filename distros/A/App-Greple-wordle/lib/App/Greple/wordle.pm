@@ -3,20 +3,19 @@ use v5.14;
 use warnings;
 use utf8;
 
-our $VERSION = "0.12";
+our $VERSION = "0.13";
 
 use Data::Dumper;
 use List::Util qw(shuffle max);
 use Try::Tiny;
 use Getopt::EX::Colormap qw(colorize ansi_code);
 use Text::VisualWidth::PP 0.05 'vwidth';
-use App::Greple::wordle::word_all    qw(@word_all %word_all);
-use App::Greple::wordle::word_hidden qw(@word_hidden);
 use App::Greple::wordle::game;
 use App::Greple::wordle::util qw();
 
 use Getopt::EX::Hashed; {
     Getopt::EX::Hashed->configure( DEFAULT => [ is => 'rw' ] );
+    has data    => '   =s ' , default => 'ORIGINAL' ;
     has answer  => '   =s ' , default => $ENV{WORDLE_ANSWER} ;
     has index   => ' n =i ' , default => $ENV{WORDLE_INDEX} ;
     has trial   => ' x =i ' , default => 6 ;
@@ -47,8 +46,21 @@ sub _days {
     Delta_Days(2021, 6, 19, $year + 1900, $mon + 1, $mday);
 }
 
+my(@word_all, %word_all, @word_hidden);
+
 sub setup {
     my $app = shift;
+    my $pkg = __PACKAGE__ . '::' . uc($app->data);
+    eval "use $pkg";
+    if ($@) {
+	die "$app->{data}: no such data set\n" if $@ =~ /Can't locate/;
+	die $@;
+    } else {
+	no strict 'refs';
+	@word_all = @{"$pkg\::WORDS"};
+	@word_hidden = @{"$pkg\::HIDDEN"};
+    }
+    $word_all{$_} = 1 for @word_all;
     for ($app->index) {
 	$_   = int rand @word_hidden if $app->random;
 	$_ //= _days;
@@ -61,6 +73,11 @@ sub setup {
 	if ($app->series > 0) {
 	    srand($app->series);
 	    @word_hidden = shuffle @word_hidden;
+	}
+	if ($app->index > $#word_hidden) {
+	    warn sprintf "no data for %d, so pick a random answer from past data\n", $app->index;
+	    srand($app->series);
+	    $app->index = int rand @word_hidden;
 	}
 	$app->answer = $word_hidden[ $app->index ];
     }

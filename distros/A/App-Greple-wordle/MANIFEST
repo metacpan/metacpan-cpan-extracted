@@ -1,4 +1,6 @@
+AGENTS.md
 Build.PL
+CLAUDE.md
 Changes
 LICENSE
 MANIFEST.SKIP
@@ -7,6 +9,8 @@ README.md
 cpanfile
 lib/App/Greple/wordle.pm
 lib/App/Greple/wordle.pod
+lib/App/Greple/wordle/NYT.pm
+lib/App/Greple/wordle/ORIGINAL.pm
 lib/App/Greple/wordle/game.pm
 lib/App/Greple/wordle/util.pm
 lib/App/Greple/wordle/word_all.pm

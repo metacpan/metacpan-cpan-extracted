@@ -10,5 +10,12 @@ authority     = "cpan:UTASHIRO"
 module_maker   = "ModuleBuildTiny"
 static_install = "auto"
 
+[FileGatherer.Excludes]
+excludes = [
+    "^.claude/",
+    "^CLAUDE.md$",
+    "^AGENTS.md$"
+]
+
 [release]
 branch = "main"

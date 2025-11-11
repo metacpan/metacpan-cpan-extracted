@@ -10,11 +10,15 @@ greple -Mwordle
 
 =head1 DESCRIPTION
 
-App::Greple::wordle is a greple module which implements wordle game.
-Correctness is checked by regular expression.
+App::Greple::wordle is a greple module that implements the Wordle game.
+Answer correctness is checked by regular expression.
 
-Rule is almost same as the original game but answer is different.  Use
-B<--compat> option to get compatible answer.
+This module supports multiple word datasets. Use the B<--data> option to
+choose different word datasets such as the original Wordle word list
+or the New York Times Wordle word list.
+
+Rules are almost the same as the original game, but answers are different.
+Use the B<--compat> option to get answers compatible with the original game.
 
 =begin html
 
@@ -26,35 +30,61 @@ B<--compat> option to get compatible answer.
 
 =over 7
 
+=item B<--data>=I<dataset>
+
+Choose the word dataset.  Default is C<ORIGINAL>.
+
+Available datasets:
+
+=over 4
+
+=item C<ORIGINAL>
+
+The original word list from the initial Wordle game. This is the
+default dataset and contains the classic Wordle word list.
+
+=item C<NYT>
+
+The New York Times Wordle word list, which includes words used by NYT
+Wordle. This dataset is updated and may contain different words than
+the original.
+
+=back
+
+Dataset modules are dynamically loaded from C<App::Greple::wordle::>
+namespace with uppercase dataset name.
+
 =item B<--series>=#,  B<-s>#
 
 =item B<--compat>
 
-Choose different series of answer.  Default 1.  Series zero is same as
-the original game and option B<--compat> is a short cut for
-B<--series=0>.  If it is not zero, original answer word set is
-shuffled by pseudo random numbers using series number as an initial
-seed.
+Choose a different answer series.  Default is 1.  Series zero is the same as
+the original game and option B<--compat> is a shortcut for
+B<--series=0>.  If it is not zero, the answer set is shuffled by
+pseudo-random numbers using the series number as an initial seed.
 
 =item B<--index>=#, B<-n>#
 
-Specify index. Default index is calculated from days from 2021/06/19.
-If the value is negative and you can get yesterday's question by
-giving -1.
+Specify the answer index. The default index is calculated from days since
+2021/06/19.  If the value is negative, you can get yesterday's
+question by specifying -1.
 
-Answer for option B<-s0n0> is C<cigar>.
+If the specified index exceeds the available answer list, a random
+answer will be selected from the dataset with a warning message.
+
+Answer for option B<-s0n0> with C<ORIGINAL> dataset is C<cigar>.
 
 =item B<-->[B<no->]B<result>
 
-Show result when succeeded.  Default true.
+Show result when successful.  Default is true.
 
 =item B<--random>
 
-Generate random index every time.
+Generate a random index every time.
 
 =item B<--trial>=#, B<-x>=#
 
-Set trial count.  Default 6.
+Set the trial count.  Default is 6.
 
 =begin comment
 
@@ -68,7 +98,7 @@ Set answer word.  For debug purpose.
 
 =head1 COMMANDS
 
-Five letter word is processed as an answer.  Some other input is taken
+A five-letter word is processed as an answer.  Other input is taken
 as a command.
 
 =over 7
@@ -83,35 +113,37 @@ List possible words made of unique characters.
 
 =item B<=>I<chars>
 
-If start with equal (C<=>), list words which include all of I<chars>.
+If starting with equal (C<=>), list words that include all I<chars>.
 
 =item B<!>I<chars>
 
-If start with exclamation mark (C<!>), list words which does not
+If starting with exclamation mark (C<!>), list words that do not
 include any of I<chars>.
 
 =item I<regex>
 
-Any other string include non-alphabetical character is taken as a
+Any other string including a non-alphabetical character will be taken as a
 regular expression to filter words.
 
 =item B<!!>
 
-Get word list produced by the last command execution.
+Recall the word list produced by the last command execution.
 
 =back
 
-These commands can be connected in series.  For example, next command
-show possible words start with letter C<z>.
+These commands can be connected in series.  For example, the following command
+shows possible words starting with letter C<z>.
 
     hint ^z
 
-Next shows all words which does not incude any letter of C<audio> and
-C<rents>, and made of unique characters.
+The next example shows all words that do not include any letter of C<audio> and
+C<rents>, and are made of unique characters.
 
     !audio !rents u
 
 =head1 EXAMPLE
+
+=head2 Basic gameplay
 
     1: solid                    # try word "solid"
     2: panic                    # try word "panic"
@@ -122,6 +154,12 @@ C<rents>, and made of unique characters.
     4: datum                    # try word "datum"
     5: tardy                    # try word "tardy"
 
+=head2 Using different datasets
+
+    greple -Mwordle --data=NYT            # Use NYT Wordle word list
+    greple -Mwordle --data=ORIGINAL       # Use original word list (default)
+    greple -Mwordle --data=NYT -n0        # First word in NYT dataset (cigar)
+
 =begin html
 
 <p><img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/greple-wordle/main/images/hint-1.png">
@@ -130,16 +168,14 @@ C<rents>, and made of unique characters.
 
 =head1 BUGS
 
-Wrong position character is colored yellow always, even if it is
-colored green in other position.
+A character in the wrong position is always colored yellow, even if it
+appears in green elsewhere.
 
 =head1 INSTALL
 
 =head2 CPANMINUS
 
     $ cpanm App::Greple::wordle
-    or
-    $ curl -sL http://cpanmin.us | perl - App::Greple::wordle
 
 =head1 SEE ALSO
 
@@ -151,13 +187,15 @@ L<https://qiita.com/kaz-utashiro/items/ba6696187f2ce902aa39>
 
 L<https://github.com/alex1770/wordle>
 
+L<https://wordfinder.yourdictionary.com/wordle/answers/>
+
 =head1 AUTHOR
 
 Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 2022 Kazumasa Utashiro.
+Copyright 2022-2025 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -16,19 +16,19 @@ no Mo;
 
 sub try {
     my $obj = shift;
-    push @{$obj->{attempts}}, @_;
+    push @{$obj->attempts}, @_;
     $obj->update(@_);
     $obj->solved;
 }
 
 sub attempt {
     my $obj = shift;
-    int @{$obj->{attempts}};
+    int @{$obj->attempts};
 }
 
 sub solved {
     my $obj = shift;
-    any { lc eq lc $obj->{answer} } @{$obj->{attempts}};
+    any { lc eq lc $obj->answer } @{$obj->attempts};
 }
 
 sub update {
@@ -79,7 +79,7 @@ my %square = (
 
 sub result {
     my $obj = shift;
-    my @result = _result(map lc, $obj->{answer}, @{$obj->{attempts}});
+    my @result = _result(map lc, $obj->answer, @{$obj->attempts});
     my $result = join "\n", map s/([GYK])/$square{$1}/ger, @result;
     $result;
 }
@@ -113,7 +113,7 @@ sub hint_color {
 
 sub hint {
     my $obj = shift;
-    my $pattern = _hint(map lc, $obj->{answer}, @{$obj->{attempts}});
+    my $pattern = _hint(map lc, $obj->answer, @{$obj->attempts});
 }
 
 sub _hint {

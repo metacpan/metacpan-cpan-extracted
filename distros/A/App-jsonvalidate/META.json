@@ -1,0 +1,69 @@
+{
+   "abstract" : "App harness for the jsonvalidate CLI",
+   "author" : [
+      "Jacques Deguest (jack@deguest.jp)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-jsonvalidate",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Getopt::Class" : "v1.1.4",
+            "JSON" : "4.10",
+            "JSON::Schema::Validate" : "v0.3.0",
+            "Module::Generic" : "v1.1.3",
+            "Pod::Usage" : "2.01",
+            "Term::ANSIColor::Simple" : "0.10",
+            "open" : "0",
+            "perl" : "5.016000",
+            "strict" : "0",
+            "utf8" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1.302162",
+            "Test::Pod" : "1.52",
+            "lib" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://gitlab.com/jackdeguest/App-jsonvalidate/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "web" : "https://gitlab.com/jackdeguest/App-jsonvalidate"
+      }
+   },
+   "version" : "v0.1.0",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

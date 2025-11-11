@@ -1,0 +1,734 @@
+#!/usr/bin/env perl
+##----------------------------------------------------------------------------
+## JSON Schema Validator - ~/lib/App/jsonvalidate.pm
+## Version v0.1.0
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
+## Author: Jacques Deguest <jack@deguest.jp>
+## Created 2025/11/10
+## Modified 2025/11/10
+## All rights reserved
+## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
+##----------------------------------------------------------------------------
+use v5.16.0;
+use strict;
+use warnings;
+use utf8;
+use open ':std' => ':utf8';
+use vars qw(
+    $VERSION $DEBUG $VERBOSE $LOG_LEVEL $PROG_NAME
+    $opt $opts $out $err
+);
+use Module::Generic::File qw( file cwd stdout stderr );
+use Getopt::Class;
+use JSON ();
+use JSON::Schema::Validate;
+use Module::Generic::File qw( file );
+use Pod::Usage;
+use Term::ANSIColor::Simple;
+our $VERSION = 'v0.1.0';
+
+our $LOG_LEVEL = 0;
+our $DEBUG = 0;
+our $VERBOSE = 0;
+our $PROG_NAME = file(__FILE__)->basename( '.pl' );
+
+$SIG{INT} = $SIG{TERM} = \&_signal_handler;
+
+our $out = stdout( binmode => 'utf-8', autoflush => 1 );
+our $err = stderr( binmode => 'utf-8', autoflush => 1 );
+@ARGV = map( Encode::decode_utf8( $_ ), @ARGV );
+
+# NOTE: options dictionary
+# In this dictionary, the tokens are written in underscore, and are automatically converted to dash to serve as option
+# Example: content_checks -> content-checks
+# Any option aliases follow the same logic.
+# The values are available under the token name, notwithstanding any alias.
+# Example:
+#    jsonvalidate --content-checks
+# leads to
+# $opts->{content_checks} having a true value
+my $dict =
+{
+    compile                 => { type => 'boolean', default => 0 },
+    content_checks          => { type => 'boolean', default => 0 },
+    errors_only             => { type => 'boolean', default => 0 },
+    ignore_vocab            => { type => 'boolean', alias => [qw( ignore_unknown_required_vocab )], default => 0 },
+    # Array object (Module::Generic::Array) of file objects (Module::Generic::File)
+    instance                => { type => 'file-array', alias => [qw(i)] },
+    # Should we print out the result as JSON data?
+    json                    => { type => 'boolean', default => 0 },
+    jsonl                   => { type => 'boolean', default => 0 },
+    max_errors              => { type => 'integer', default => 200 },
+    normalize               => { type => 'boolean', alias => [qw( normalise )], default => 1 },
+    register_formats        => { type => 'boolean', default => 0 },
+    # Array object (Module::Generic::Array) of file objects (Module::Generic::File)
+    schema                  => { type => 'file-array', alias => [qw(s)], required => 1 },
+    # base directory for file refs; this make this option value a Module::Generic::File object
+    schema_base             => { type => 'file' },
+    trace                   => { type => 'boolean', default => 0 },
+    trace_limit             => { type => 'integer', default => 0 },
+    trace_sample            => { type => 'integer', default => 0 },
+
+    # Generic options
+    debug                   => { type => 'integer', alias => [qw(d)], default => \$DEBUG },
+    help                    => { type => 'code', alias => [qw(?)], code => sub{ pod2usage( -exitstatus => 1, -verbose => 99, -sections => [qw( NAME SYNOPSIS DESCRIPTION OPTIONS AUTHOR COPYRIGHT )] ); }, action => 1 },
+    log_level               => { type => 'integer', default => \$LOG_LEVEL },
+    man                     => { type => 'code', code => sub{ pod2usage( -exitstatus => 0, -verbose => 2 ); }, action => 1 },
+    quiet                   => { type => 'boolean', default => 0 },
+    verbose                 => { type => 'integer', default => \$VERBOSE },
+    v                       => { type => 'code', code => sub{ $out->print( $VERSION, "\n" ); exit(0) }, action => 1 },
+};
+
+our $opt = Getopt::Class->new({ dictionary => $dict }) ||
+    die( "Error instantiating Getopt::Class object: ", Getopt::Class->error, "\n" );
+$opt->usage( sub{ pod2usage(2) } );
+our $opts = $opt->exec || die( "An error occurred executing Getopt::Class: ", $opt->error, "\n" );
+my @errors = ();
+my $opt_errors = $opt->configure_errors;
+push( @errors, @$opt_errors ) if( $opt_errors->length );
+if( $opts->{quiet} )
+{
+    $DEBUG = $VERBOSE = 0;
+}
+
+# NOTE: SIGDIE
+local $SIG{__DIE__} = sub
+{
+    my $trace = $opt->_get_stack_trace;
+    my $stack_trace = join( "\n    ", split( /\n/, $trace->as_string ) );
+    $err->print( "Error: ", @_, "\n", $stack_trace );
+    &_cleanup_and_exit(1);
+};
+# NOTE: SIGWARN
+local $SIG{__WARN__} = sub
+{
+    $out->print( "Perl warning only: ", @_, "\n" ) if( $LOG_LEVEL >= 5 );
+};
+
+# Unless the log level has been set directly with a command line option
+unless( $LOG_LEVEL )
+{
+    $LOG_LEVEL = 1 if( $VERBOSE );
+    $LOG_LEVEL = ( 1 + $DEBUG ) if( $DEBUG );
+}
+
+# NOTE: Find out what action to take
+# Right now, there is only 'validate' by default, but this design allows us to have other commands supported in the future.
+my $action_found = '';
+my @actions = grep{ exists( $dict->{ $_ }->{action} ) } keys( %$opts );
+foreach my $action ( @actions )
+{
+    $action =~ tr/-/_/;
+    next if( ref( $opts->{ $action } ) eq 'CODE' );
+    if( $opts->{ $action } && $action_found && $action_found ne $action )
+    {
+        push( @errors, "You have opted for \"$action\", but \"$action_found\" is already selected." );
+    }
+    elsif( $opts->{ $action } && !length( $action_found ) )
+    {
+        $action_found = $action;
+        die( "Unable to find a subroutne for '$action'" ) if( !main->can( $action ) );
+    }
+}
+
+if( !$action_found )
+{
+    # pod2usage( -exitval => 2, -message => "No action was selected" );
+    $action_found = 'validate';
+}
+
+if( @errors )
+{
+    my $error = join( "\n", map{ "\t* $_" } @errors );
+    substr( $error, 0, 0, "\n\tThe following arguments are mandatory and missing.\n" );
+    if( !$opts->{quiet} )
+    {
+        $err->print( <<EOT );
+$error
+Please, use option '-h' or '--help' to find out and properly call
+this program in interactive mode:
+
+$PROG_NAME -h
+EOT
+    }
+    exit(1);
+}
+
+my $coderef = ( exists( $dict->{ $action_found }->{code} ) && ref( $dict->{ $action_found }->{code} ) eq 'CODE' )
+    ? $dict->{ $action_found }->{code}
+    : main->can( $action_found );
+if( !defined( $coderef ) )
+{
+    die( "There is no sub for action \"$action_found\"\n" );
+}
+# exit( $coderef->() ? 0 : 1 );
+&_cleanup_and_exit( $coderef->() ? 0 : 1 );
+
+sub bailout
+{
+    my $err = join( '', @_ );
+    _message( '<red>', $err, '</>' );
+    die( $err );
+}
+
+sub validate
+{
+    my $schema = $opts->{schema};
+    my $instance = $opts->{instance};
+    my $json = JSON->new->utf8->canonical;
+    # Load schemas (one or many)
+    my @schemas;
+    foreach my $sf ( @$schema )
+    {
+        if( !$sf->exists )
+        {
+            bailout( "The schema file $sf does not exist." );
+        }
+        elsif( $sf->is_empty )
+        {
+            _message( 1, "Warning: the schema file <orange>$sf</> is empty." );
+            next;
+        }
+        _message( 2, "Loading schema data from file <green>$sf</>" );
+        my $data = $sf->load_json;
+        if( !$data )
+        {
+            _message( 1, "Failed to load JSON data from schema file \"<green>$sf</>\": ", $sf->error );
+            next;
+        }
+        _message( 4, "<green>", length( $data ), "</> bytes of JSON data loaded from <green>$sf</>" );
+        push( @schemas, $data );
+    }
+
+    # Determine base dir for file resolution
+    # Since all the schema files are Module::Generic::File objects, it returns an object
+    my $root_schema_path = _first_existing_path( @$schema );
+    # If 'schema_base' is provided, it would be a Module::Generic::File object
+    if( !defined( $opts->{schema_base} ) && defined( $root_schema_path ) )
+    {
+        _message( 5, "No <green>schema_base</> value provided, deriving it from <green>$root_schema_path</>" );
+        # Set 'schema_base' to the parent directory of the first schema file found.
+        $opts->{schema_base} = $root_schema_path->parent;
+        _message( 5, "<green>schema_base</> is now set to <green>$opts->{schema_base}</>" );
+    }
+
+    # Build the validator from the FIRST schema (root)
+    my %ctor =
+    (
+        compile                         => $opts->{compile} ? 1 : 0,
+        content_assert                  => $opts->{content_checks} ? 1 : 0,
+        ignore_unknown_required_vocab   => $opts->{ignore_vocab} ? 1 : 0,
+        max_errors                      => $opts->{max_errors},
+        normalize_instance              => $opts->{normalize} ? 1 : 0,
+        trace                           => $opts->{trace} ? 1 : 0,
+        trace_limit                     => $opts->{trace_limit},
+        trace_sample                    => $opts->{trace_sample},
+    );
+    my $js = JSON::Schema::Validate->new( $schemas[0], %ctor );
+    # Register built-in formats if desired
+    if( $opts->{register_formats} )
+    {
+        _message( 5, "Registering builtin formats." );
+        $js->register_builtin_formats;
+    }
+
+    # Content checks on?
+    if( $opts->{content_checks} )
+    {
+        _message( 5, "Asserting content." );
+        $js->content_checks(1);
+    }
+
+    # Simple resolver:
+    # - file:/… or relative paths from --schema-base
+    # - http(s):// if LWP::UserAgent is available (optional)
+    # - otherwise: if the requested absolute matches any secondary schema $id, return it
+    my %by_id;
+    for my $s ( @schemas )
+    {
+        if( ref( $s ) eq 'HASH' && defined( $s->{'$id'} ) )
+        {
+            $by_id{ $s->{'$id'} } = $s;
+        }
+    }
+
+    $js->set_resolver(sub
+    {
+        my( $abs_uri ) = @_;
+
+        # exact $id match among provided schemas
+        if( exists( $by_id{ $abs_uri } ) )
+        {
+            return( $by_id{ $abs_uri } );
+        }
+
+        # file: URIs
+        if( $abs_uri =~ m{\Afile:(//)?(.+)\z} )
+        {
+            # Transform this into a Module::Generic::File
+            my $path = file( $2 );
+            return( $path->load_json );
+        }
+
+        # Bare relative paths occasionally appear if upstream forms wrong absolute;
+        # resolve against schema_base if set
+        if( defined( $opts->{schema_base} ) && $abs_uri !~ m{^[a-z][a-z0-9+.-]*:}i )
+        {
+            my $try = file( $abs_uri, base_dir => $opts->{schema_base} );
+            if( $try->exists )
+            {
+                return( $try->load_json );
+            }
+        }
+
+        # Optional HTTP(S)
+        if( $abs_uri =~ m{\Ahttps?://}i )
+        {
+            my $doc = _fetch_http_json( $abs_uri, $json );
+            return( $doc ) if( defined( $doc ) );
+        }
+
+        $abs_uri = file( $abs_uri );
+        # Last resort: try as local path
+        if( $abs_uri->exists )
+        {
+            return( $abs_uri->load_json );
+        }
+
+        bailout( "Unable to resolve \$ref: $abs_uri" );
+    });
+
+    # Optional: capture $comment into trace (no-op handler by default)
+    $js->set_comment_handler(sub{});
+
+    # Validate instances
+    my $total_ok   = 0;
+    my $total_fail = 0;
+    my $run_idx    = 0;
+
+    if( $opts->{instance}->is_empty )
+    {
+        if( $opts->{jsonl} )
+        {
+            _message( 5, "No JSON data file was provided, reading from STDIN line by line." );
+            while( defined( my $line = <STDIN> ) )
+            {
+                next if $line =~ /\A\s*\z/;
+                my $data = _decode_json_or_die( $line, $json, "STDIN: line $.: " );
+                _run_one( $js, $data, \$total_ok, \$total_fail, ++$run_idx, $json );
+            }
+        }
+        else
+        {
+            _message( 5, "No JSON data file was provided, reading from STDIN all in one go." );
+            my $data = &_get_stdin();
+            _run_one( $js, $data, \$total_ok, \$total_fail, ++$run_idx, $json );
+        }
+    }
+    else
+    {
+        for my $inst_file ( @{$opts->{instance}} )
+        {
+            _message( 5, "Processing JSON data file <green>$inst_file</>" );
+            if( !$inst_file->exists )
+            {
+                bailout( "The instance file \"$inst_file\" does not exist." );
+            }
+            elsif( $inst_file->is_empty )
+            {
+                _message( 1, "The instance file \"$inst_file\" is empty." );
+                next;
+            }
+            my $raw = $inst_file->load( binmode => 'raw' );
+            if( !defined( $raw ) )
+            {
+                _message( 1, "The instance file \"$inst_file\" content could not be retrieved: ", $inst_file->error );
+                next;
+            }
+    
+            if( $opts->{jsonl} )
+            {
+                _message( 5, "Processing the file <green>$inst_file</> data line-by-line." );
+                my $ln = 0;
+                for my $line ( split( /\n/, $raw, -1 ) )
+                {
+                    ++$ln;
+                    next if( $line =~ /\A\s*\z/ );
+                    my $data = _decode_json_or_die( $line, $json, "$inst_file:$ln: " );
+                    _run_one( $js, $data, \$total_ok, \$total_fail, ++$run_idx, $json );
+                }
+            }
+            else
+            {
+                _message( 5, "Processing the file <green>$inst_file</> data all in one go." );
+                my $data = _decode_json_or_die( $raw, $json, "$inst_file: " );
+                _run_data_maybe_array( $js, $data, \$total_ok, \$total_fail, \$run_idx, $json );
+            }
+        }
+    }
+
+    # Summary & exit code
+    if( !$opts->{quiet} && !$opts->{json} )
+    {
+        $out->print( "Summary: OK=$total_ok  FAIL=$total_fail\n" );
+    }
+    # Return 0 on failure, and 1 on success
+    _message( 5, "<red>$total_fail</> total fail. Returning ", ( $total_fail ? 0 : 1 ) );
+    return( $total_fail ? 0 : 1 );
+}
+
+sub _cleanup_and_exit
+{
+    my $exit = shift( @_ );
+    $exit = 0 if( !length( $exit // '' ) || $exit !~ /^\d+$/ );
+    exit( $exit );
+}
+
+sub _decode_json_or_die
+{
+    my( $raw, $json, $label ) = @_;
+    my $data;
+    local $@;
+    eval
+    {
+        $data = $json->decode( $raw );
+        1;
+    }
+    or do
+    {
+        bailout( "Failed to decode JSON ($label): $@" );
+    };
+    return( $data );
+}
+
+sub _fetch_http_json
+{
+    my( $url, $json ) = @_;
+
+    local $@;
+    eval
+    {
+        require LWP::UserAgent;
+        require HTTP::Request;
+        my $ua = LWP::UserAgent->new( timeout => 10 );
+        my $res = $ua->get( $url );
+        if( $res->is_success )
+        {
+            return( _decode_json_or_die( $res->decoded_content, $json, "$url: " ) );
+        }
+        bailout( "HTTP $url failed: " . $res->status_line );
+    }
+    or do
+    {
+        # No LWP or fetch failed; return undef so caller can try alternatives or die.
+        return;
+    };
+}
+
+sub _first_existing_path
+{
+    for my $p ( @_ )
+    {
+        return( $p ) if( defined( $p ) && $p->exists );
+    }
+    return;
+}
+
+# Get the JSON data from STDIN
+sub _get_stdin
+{
+    $out->print( "Enter the JSON data below and type ctrl-D when finished:\n" ) if( &_is_tty );
+    my $json = '';
+    $json .= $_ while( <STDIN> );
+    $json =~ s/(\r?\n)+$//gs;
+    _message( 4, "JSON received is '$json'" );
+    return( $json );
+}
+
+# Taken from ExtUtils::MakeMaker
+sub _is_tty
+{
+    return( -t( STDIN ) && ( -t( STDOUT ) || !( -f STDOUT || -c STDOUT ) ) );
+}
+
+sub _message
+{
+    my $required_level;
+    if( $_[0] =~ /^\d{1,2}$/ )
+    {
+        $required_level = shift( @_ );
+    }
+    else
+    {
+        $required_level = 0;
+    }
+    return if( !$LOG_LEVEL || $LOG_LEVEL < $required_level );
+    my $msg = join( '', map( ref( $_ ) eq 'CODE' ? $_->() : $_, @_ ) );
+    if( index( $msg, '</>' ) != -1 )
+    {
+        $msg =~ s
+        {
+            <([^\>]+)>(.*?)<\/>
+        }
+        {
+            my $colour = $1;
+            my $txt = $2;
+            my $obj = color( $txt );
+            my $code = $obj->can( $colour ) ||
+                die( "Colour '$colour' is unsupported by Term::ANSIColor::Simple" );
+            $code->( $obj );
+        }gexs;
+    }
+    my $frame = 0;
+    my $sub_pack = (caller(1))[3] || '';
+    my( $pkg, $file, $line ) = caller( $frame );
+    my $sub = ( caller( $frame + 1 ) )[3] // '';
+    my $sub2;
+    if( length( $sub ) )
+    {
+        $sub2 = substr( $sub, rindex( $sub, '::' ) + 2 );
+    }
+    else
+    {
+        $sub2 = 'main';
+    }
+    return( $err->print( "${pkg}::${sub2}() [$line]: $msg\n" ) );
+}
+
+sub _run_data_maybe_array
+{
+    my( $js, $data, $ok_ref, $fail_ref, $idx_ref, $json ) = @_;
+
+    if( ref( $data ) eq 'ARRAY' )
+    {
+        for my $elem ( @$data )
+        {
+            _run_one( $js, $elem, $ok_ref, $fail_ref, ++$$idx_ref, $json );
+        }
+    }
+    else
+    {
+        _run_one( $js, $data, $ok_ref, $fail_ref, ++$$idx_ref, $json );
+    }
+}
+
+sub _run_one
+{
+    my( $js, $data, $ok_ref, $fail_ref, $idx, $json ) = @_;
+
+    my $ok = $js->validate( $data );
+
+    if( $opts->{json} )
+    {
+        if( $ok )
+        {
+            $out->print( $json->encode({ index => $idx, ok => JSON::true }), "\n" );
+        }
+        else
+        {
+            my @errs = map
+            {
+                {
+                    path       => $_->path,
+                    message    => $_->message,
+                    keyword    => $_->keyword,
+                    schema_ptr => $_->schema_pointer,
+                }
+            } @{$js->errors || []};
+
+            $out->print( $json->encode({
+                index => $idx,
+                ok    => JSON::false,
+                errors => \@errs,
+            }), "\n" );
+        }
+    }
+    else
+    {
+        if( $ok )
+        {
+            if( !$opts->{quiet} && !$opts->{errors_only} )
+            {
+                $out->print( "Record #$idx OK\n" );
+            }
+        }
+        else
+        {
+            $$fail_ref++;
+            my $err = $js->error;
+            if( !$opts->{quiet} )
+            {
+                $out->print( "Record #$idx FAILED\n" );
+                $out->printf( "  %s: %s\n", $err->path, $err->message );
+                # Maybe, we should display the full list?
+                # for my $e ( @{$js->errors || []} )
+                # {
+                #     $out->printf( "  - %s: %s\n", $e->path, $e->message );
+                # }
+            }
+        }
+    }
+
+    $$ok_ref++ if( $ok );
+}
+
+# Signal handler for SIG TERM or INT; we exit 1
+sub _signal_handler
+{
+    my( $sig ) = @_;
+    &_message( "Caught a $sig signal, terminating process $$" );
+    if( uc( $sig ) eq 'TERM' )
+    {
+        &_cleanup_and_exit(0);
+    }
+    else
+    {
+        &_cleanup_and_exit(1);
+    }
+}
+
+# NOTE: POD
+__END__
+
+=encoding utf-8
+
+=pod
+
+=head1 NAME
+
+jsonvalidate - Validate JSON instances against a JSON Schema (Draft 2020-12)
+
+=head1 SYNOPSIS
+
+    jsonvalidate --schema schema.json --instance data.json
+    jsonvalidate -s schema.json -i instances.array.json
+    jsonvalidate -s schema.json -i - < data.jsonl --jsonl --json
+    jsonvalidate -s root.json -s subdefs.json -i items.ndjson --jsonl --compile --register-formats
+
+=head1 DESCRIPTION
+
+A lean CLI powered by L<JSON::Schema::Validate>. It supports arrays of instances, JSON Lines, local file C<$ref>, optional HTTP(S) fetch for C<$ref> (when L<LWP::UserAgent> is available), and useful output modes.
+
+=head1 OPTIONS
+
+=head2 Selection
+
+=over 4
+
+=item B<--schema>, B<-s> FILE1, FILE2, FILE3, etc...
+
+Root schema; additional C<--schema> files are made available to the resolver, such as when their C<C<'$id'>> is referenced.
+
+=item B<--instance>, B<-i> FILE1, FILE2, FILE3, etc...
+
+Instances to validate. Use C<-> for STDIN. An instance may be a single object, a single array (each element validated), or JSON Lines with C<--jsonl>.
+
+Not that you can either use C<-> (STDIN), or one or more files, but you cannot mix both.
+
+=item B<--jsonl>
+
+Treat each line as an instance (NDJSON).
+
+=back
+
+=head2 Output
+
+=over 4
+
+=item B<--quiet>, B<-q>
+
+Suppress per-record output; still returns non-zero exit on failures.
+
+=item B<--errors-only>
+
+Only print failed records (ignored when C<--json> is used).
+
+=item B<--json>
+
+Emit JSON objects (one per instance) with C<{ index, ok, errors[] }>.
+
+=back
+
+=head2 Behavior
+
+=over 4
+
+=item B<--compile> / B<--no-compile>
+
+Enable compiled fast-path for repeated validation.
+
+=item B<--content-checks>
+
+Enable C<contentEncoding>, C<contentMediaType>, C<contentSchema>. Registers a basic C<application/json> validator/decoder.
+
+=item B<--register-formats>
+
+Register built-in C<format> validators (date, email, hostname, ip, uri, uuid, JSON Pointer, regex, etc.).
+
+=item B<--trace>
+
+Record lightweight trace; cap with C<--trace-limit>; sample with C<--trace-sample>.
+
+=item B<--trace-limit N>
+
+Max number of trace entries per validation (0 = unlimited).
+
+=item B<--trace-sample P>
+
+Sampling percentage for trace events.
+
+=item B<--max-errors N>
+
+Maximum recorded errors per validation (default 200).
+
+=item B<--normalize> / B<--no-normalize>
+
+Round-trip instances through L<JSON> to enforce strict JSON typing (default on).
+
+=item B<--ignore-unknown-required-vocab>
+
+Ignore unknown vocabularies listed in schema C<C<'$vocabulary'>> I<required>.
+
+=item B<--schema-base DIR>
+
+A base directory to resolve relative file C<$ref> (defaults to the directory of the first C<--schema>).
+
+=back
+
+=head1 EXIT CODES
+
+=over 4
+
+=item * C<0>
+
+All instances validated.
+
+=item * C<1>
+
+At least one instance failed.
+
+=item * C<2>
+
+Usage error.
+
+=back
+
+=head1 SEE ALSO
+
+L<JSON::Schema::Validate>, L<JSON>
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 COPYRIGHT
+
+Copyright(c) 2025 DEGUEST Pte. Ltd.
+
+All rights reserved
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+=cut
