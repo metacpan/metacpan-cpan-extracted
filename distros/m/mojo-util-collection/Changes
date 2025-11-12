@@ -22,3 +22,9 @@ Revision history for Mojo::Util::Collection
 
 0.0.13   2025-11-10
         Add pager to the collection
+
+0.0.14   2025-11-11
+        Fix page sub
+
+0.0.17   2025-11-11
+        Add missing and intersect methods

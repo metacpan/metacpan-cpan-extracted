@@ -36,7 +36,6 @@
             "Config::Abstraction" : "0.36",
             "Data::Dumper" : "0",
             "Data::Section::Simple" : "0",
-            "File::Slurp" : "0",
             "File::Spec" : "0",
             "Getopt::Long" : "0",
             "Module::Load::Conditional" : "0",
@@ -56,14 +55,10 @@
             "Data::Random" : "0",
             "Data::Random::String::Matches" : "0.02",
             "Encode" : "0",
-            "File::Glob" : "0",
             "File::Temp" : "0",
-            "File::stat" : "0",
             "IPC::Run3" : "0",
             "IPC::System::Simple" : "0",
             "JSON::MaybeXS" : "0",
-            "POSIX" : "0",
-            "Readonly" : "0",
             "Test::DescribeMe" : "0",
             "Test::Most" : "0",
             "Test::Needs" : "0",
@@ -86,6 +81,6 @@
          "x_repository" : "https://github.com/nigelhorne/App-Test-Generator"
       }
    },
-   "version" : "0.14",
+   "version" : "0.15",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

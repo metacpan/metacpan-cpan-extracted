@@ -6,6 +6,14 @@ Home page:    <https://metacpan.org/release/Sub-HandlesVia>
 Bug tracker:  <https://github.com/tobyink/p5-sub-handlesvia/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.050006	2025-11-10
+
+ [ Documentation ]
+ - Document usage with the Perl 5.38+ `class` keyword (Corinna).
+
+ [ Test Suite ]
+ - Test with Perl 5.38+ `class` keyword (Corinna).
+
 0.050005	2025-11-10
 
  - Bug fix for pathological case exposed by Hydrogen.

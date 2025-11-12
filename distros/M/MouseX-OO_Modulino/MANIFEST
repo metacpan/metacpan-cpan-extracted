@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/MouseX/OO_Modulino.pm
+lib/MouseX/OO_Modulino.pod
+lib/MouseX/OO_Modulino/MOP4Import.pm
+minil.toml
+t/00_compile.t
+t/10_run.t
+t/lib/MyModule.pm
+META.yml
+MANIFEST

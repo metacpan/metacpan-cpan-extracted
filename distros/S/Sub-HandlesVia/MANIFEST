@@ -39,6 +39,7 @@ lib/Sub/HandlesVia/HandlerLibrary/String.pod
 lib/Sub/HandlesVia/Manual/Advanced.pod
 lib/Sub/HandlesVia/Manual/Comparison.pod
 lib/Sub/HandlesVia/Manual/WithClassTiny.pod
+lib/Sub/HandlesVia/Manual/WithCorinna.pod
 lib/Sub/HandlesVia/Manual/WithGeneric.pod
 lib/Sub/HandlesVia/Manual/WithMite.pod
 lib/Sub/HandlesVia/Manual/WithMoo.pod
@@ -177,6 +178,15 @@ t/40mite/number.t
 t/40mite/scalar.t
 t/40mite/string.t
 t/50objectpad.t
+t/55corinna.t
+t/55corinna/array.t
+t/55corinna/bool.t
+t/55corinna/code.t
+t/55corinna/counter.t
+t/55corinna/hash.t
+t/55corinna/number.t
+t/55corinna/scalar.t
+t/55corinna/string.t
 t/60detect.t
 t/61moosemetagubbins.t
 t/62mousemetagubbins.t

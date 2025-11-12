@@ -1,0 +1,24 @@
+SYNOPSIS
+
+      use v5.38;
+      use WebService::Akeneo;
+      use WebService::Akeneo::Config;
+    
+      my $cfg = WebService::Akeneo::Config->new(
+        base_url      => 'https://my-site.com',
+        client_id     => $ENV{AKENEO_CLIENT_ID},
+        client_secret => $ENV{AKENEO_CLIENT_SECRET},
+        username      => $ENV{AKENEO_USER},
+        password      => $ENV{AKENEO_PASS},
+      );
+    
+      my $ak = WebService::Akeneo->new(config => $cfg);
+    
+      $ak->on_request(sub ($i){ say "--> $i->{method} $i->{url}" });
+      $ak->on_response(sub ($i){ say "<-- $i->{code}" });
+    
+      my $res = $ak->categories->upsert_ndjson([
+        { code => 'smagic', parent=>'master', labels=>{ es_ES => 'Espada Magica' } },
+        { code => 'mixers', parent=>'master', labels=>{ es_ES => 'Batidora' } },
+      ]);
+

@@ -2,8 +2,8 @@ NAME
     App::MineralUtils - Utilities related to mineral supplements
 
 VERSION
-    This document describes version 0.023 of App::MineralUtils (from Perl
-    distribution App-MineralUtils), released on 2025-09-26.
+    This document describes version 0.024 of App::MineralUtils (from Perl
+    distribution App-MineralUtils), released on 2025-11-12.
 
 DESCRIPTION
     This distributions provides the following command-line utilities:
@@ -97,13 +97,13 @@ FUNCTIONS
            ],
            {
              "table.fields"        => ["amount", "pct_ca", "unit", "summary"],
-             "table.field_aligns"  => ["number", "number", "left", "left"],
              "table.field_formats" => [
                                         ["number", { precision => 3, thousands_sep => "" }],
                                         ["number", { thousands_sep => "", precision => 3 }],
                                         undef,
                                         undef,
                                       ],
+             "table.field_aligns"  => ["number", "number", "left", "left"],
            },
          ]
 
@@ -204,13 +204,13 @@ FUNCTIONS
              },
            ],
            {
+             "table.field_aligns"  => ["number", "number", "left", "left"],
              "table.field_formats" => [
-                                        ["number", { precision => 3, thousands_sep => "" }],
+                                        ["number", { thousands_sep => "", precision => 3 }],
                                         ["number", { thousands_sep => "", precision => 3 }],
                                         undef,
                                         undef,
                                       ],
-             "table.field_aligns"  => ["number", "number", "left", "left"],
              "table.fields"        => ["amount", "pct_fe", "unit", "summary"],
            },
          ]
@@ -514,17 +514,24 @@ FUNCTIONS
                unit    => "mg-mg-taurate",
                summary => "Magnesium taurate (C4H12MgN2O6S2), in milligrams",
              },
+             {
+               amount  => 24.390243902439,
+               pct_mg  => 4.11064319177364,
+               purity  => 1,
+               unit    => "mg-mg-stearate-anhydrous",
+               summary => "Magnesium stearate anhydrous (Mg(C18H35O2)2), in milligrams",
+             },
            ],
            {
              "table.field_formats" => [
-                                        ["number", { thousands_sep => "", precision => 3 }],
-                                        ["number", { thousands_sep => "", precision => 3 }],
-                                        ["number", { thousands_sep => "", precision => 3 }],
+                                        ["number", { precision => 3, thousands_sep => "" }],
+                                        ["number", { precision => 3, thousands_sep => "" }],
+                                        ["number", { precision => 3, thousands_sep => "" }],
                                         undef,
                                         undef,
                                       ],
-             "table.field_aligns"  => ["number", "number", "left", "left"],
              "table.fields"        => ["amount", "pct_mg", "purity", "unit", "summary"],
+             "table.field_aligns"  => ["number", "number", "left", "left"],
            },
          ]
 
@@ -652,13 +659,13 @@ FUNCTIONS
            ],
            {
              "table.field_formats" => [
-                                        ["number", { thousands_sep => "", precision => 3 }],
                                         ["number", { precision => 3, thousands_sep => "" }],
+                                        ["number", { thousands_sep => "", precision => 3 }],
                                         undef,
                                         undef,
                                       ],
-             "table.field_aligns"  => ["number", "number", "left", "left"],
              "table.fields"        => ["amount", "pct_k", "unit", "summary"],
+             "table.field_aligns"  => ["number", "number", "left", "left"],
            },
          ]
 
@@ -775,13 +782,13 @@ FUNCTIONS
            ],
            {
              "table.field_aligns"  => ["number", "number", "left", "left"],
+             "table.fields"        => ["amount", "pct_na", "unit", "summary"],
              "table.field_formats" => [
-                                        ["number", { precision => 3, thousands_sep => "" }],
+                                        ["number", { thousands_sep => "", precision => 3 }],
                                         ["number", { precision => 3, thousands_sep => "" }],
                                         undef,
                                         undef,
                                       ],
-             "table.fields"        => ["amount", "pct_na", "unit", "summary"],
            },
          ]
 
@@ -963,13 +970,13 @@ FUNCTIONS
            ],
            {
              "table.fields"        => ["amount", "pct_zn", "unit", "summary"],
-             "table.field_aligns"  => ["number", "number", "left", "left"],
              "table.field_formats" => [
-                                        ["number", { precision => 3, thousands_sep => "" }],
+                                        ["number", { thousands_sep => "", precision => 3 }],
                                         ["number", { thousands_sep => "", precision => 3 }],
                                         undef,
                                         undef,
                                       ],
+             "table.field_aligns"  => ["number", "number", "left", "left"],
            },
          ]
 

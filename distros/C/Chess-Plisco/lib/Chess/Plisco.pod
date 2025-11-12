@@ -2,6 +2,8 @@
 
 Chess::Plisco - A comprehensive chess library for Perl
 
+=encoding utf-8
+
 =head1 SYNOPSIS
 
     use Chess::Plisco(:all);
@@ -41,6 +43,8 @@ coordinate notation
 =item Static Exchange Evaluation (SEE)
 
 =item Zobrist Keys
+
+=item Syzygy endgame table probing
 
 =back
 
@@ -338,7 +342,7 @@ the fact that they are necessarily the first king move.
 =back
 
 The half-move-clock is important because both players can claim a draw, when
-the half-move clock has reached 50.
+the half-move clock has reached 100.
 
 =item B<halfMoveClock>
 
@@ -774,18 +778,248 @@ These methods can be used to analyze features of the current position.
 
 =over 4
 
-=item B<insufficientMaterial>
+=item B<insufficientMaterial [FORCIBLE]>
 
-Returns true if none of the two sides has sufficient material to win, false
-otherwise.
+Returns true if none of the two sides has sufficient material to deliver
+checkmate, false otherwise.
 
-This is B<not> a general-purpose draw detection but only checks the material
-of both sides.  If one side has at least a pawn, rook, or queen, the material
-is sufficient to mate.  A mate is also possible when both sides have at least
-one minor piece with the exception of king and bishop vs king and bishop.  This
-can only be won if the two bishops move on differently colored squares.
+The exact behaviour is controlled by the optional flag B<FORCIBLE> which was
+introduced in version 0.7. By default, the method only reports a draw if
+a checkmate is logically impossible. This is in line with the rules of chess.
+So if you write a chess GUI, you will call the method without the B<FORCIBLE>
+flag for signalling "game over".
 
-One minor piece against a lone king is always a draw.
+But there are also positions, wherea checkmate can be delivered but only, with
+the help of the opponent.  The following table illustrates different cases:
+
+    +-----+-------+---------+----------+-----------------------+
+    |     | Pcs.  | Default | FORCIBLE | Bishop pair           |
+    +-----+-------+---------+----------+-----------------------+
+    | 1.  | KNvKN | no draw | draw     |                       |
+    | 2.  | KNvKB | no draw | draw     |                       |
+    | 3.  | KBvKN | no draw | draw     |                       |
+    | 4.  | KNNvK | no draw | draw     |                       |
+    | 5a. | KBvKB | no draw | no draw  | different-coloured    |
+    | 5b. | KBvKB | draw    | draw     | same-coloured         |
+    | 6a. | KBBvK | no draw | no draw  | different-coloured    |
+    | 6b. | KBBvK | draw    | draw.    | same-coloured         |
+    | 7.  | KPvP  | no draw | no draw  |                       |
+    +-----+-------+---------+----------+-----------------------+
+
+Let's go over all cases. Black is always on move.
+
+=over 4
+
+=item B<1. King and Knight versus King and Knight>
+
+A mate is possible but only with the help of the opponent:
+
+      a b c d e f g h
+     +-+-+-+-+-+-+-+-+
+    8|. . . . . . n k|8
+    7|. . . . . . . .|7
+    6|. . . . . . N K|6
+    5|. . . . . . . .|5
+    4|. . . . . . . .|4
+    3|. . . . . . . .|3
+    2|. . . . . . . .|2
+    1|. . . . . . . .|1
+     +-+-+-+-+-+-+-+-+
+
+The black knight prevents the king from escaping.
+
+=item B<2. King and Knight versus King and Bishop>
+
+      a b c d e f g h
+     +-+-+-+-+-+-+-+-+
+    8|. . . . . . b k|8
+    7|. . . . . . . .|7
+    6|. . . . . . N K|6
+    5|. . . . . . . .|5
+    4|. . . . . . . .|4
+    3|. . . . . . . .|3
+    2|. . . . . . . .|2
+    1|. . . . . . . .|1
+     +-+-+-+-+-+-+-+-+
+
+Almost the same as before but now the black bishop helps by blocking the
+black king.
+
+=item B<3. King and Bishop versus King and Knight>
+
+      a b c d e f g h
+     +-+-+-+-+-+-+-+-+
+    8|. . . . . . n k|8
+    7|. . . . . . . .|7
+    6|. . . . . B . K|6
+    5|. . . . . . . .|5
+    4|. . . . . . . .|4
+    3|. . . . . . . .|3
+    2|. . . . . . . .|2
+    1|. . . . . . . .|1
+     +-+-+-+-+-+-+-+-+
+
+Now the white bishop delivers check, and the black knight helps by being in
+the way of the black king.
+
+=item B<4. King and Two Knights versus Lone King>
+
+      a b c d e f g h
+     +-+-+-+-+-+-+-+-+
+    8|. . . . . . . k|8
+    7|. . . . . K . .|7
+    6|. . . . . N N .|6
+    5|. . . . . . . .|5
+    4|. . . . . . . .|4
+    3|. . . . . . . .|3
+    2|. . . . . . . .|2
+    1|. . . . . . . .|1
+     +-+-+-+-+-+-+-+-+
+
+This mate can also not be forced. The black king has to help by moving into
+a corner.
+
+=item B<5a. King and Bishop versus King and Different-coloured Bishop>
+
+      a b c d e f g h
+     +-+-+-+-+-+-+-+-+
+    8|. . . . . . b k|8
+    7|. . . . . . . .|7
+    6|. . . . . B . K|6
+    5|. . . . . . . .|5
+    4|. . . . . . . .|4
+    3|. . . . . . . .|3
+    2|. . . . . . . .|2
+    1|. . . . . . . .|1
+     +-+-+-+-+-+-+-+-+
+
+The mate cannot be forced. The black bishop has to help.
+
+=item B<5b. King and Bishop versus King and Same-coloured Bishop>
+
+      a b c d e f g h
+     +-+-+-+-+-+-+-+-+
+    8|. . . . . b . k|8
+    7|. . . . . . . .|7
+    6|. . . . . B . K|6
+    5|. . . . . . . .|5
+    4|. . . . . . . .|4
+    3|. . . . . . . .|3
+    2|. . . . . . . .|2
+    1|. . . . . . . .|1
+     +-+-+-+-+-+-+-+-+
+
+A mate is not possible.  The position is always a draw.
+
+=item B<6a. King and Different-coloured Bishop Pair versus Lone King>
+
+      a b c d e f g h
+     +-+-+-+-+-+-+-+-+
+    8|. . . . . . . k|8
+    7|. . . . . B . .|7
+    6|. . . . . B . K|6
+    5|. . . . . . . .|5
+    4|. . . . . . . .|4
+    3|. . . . . . . .|3
+    2|. . . . . . . .|2
+    1|. . . . . . . .|1
+     +-+-+-+-+-+-+-+-+
+
+This mate can be forced and the constellation is therefore never a draw.
+
+=item B<6a. King and Same-coloured Bishop Pair versus Lone King>
+
+This constellation can only be achieved by an underpromotion of a pawn to a
+bishop. The closest you can get to a checkmate is something like this:
+
+      a b c d e f g h
+     +-+-+-+-+-+-+-+-+
+    8|. . . . . K . k|8
+    7|. . . . . . . .|7
+    6|. . . . . B . B|6
+    5|. . . . . . . .|5
+    4|. . . . . . . .|4
+    3|. . . . . . . .|3
+    2|. . . . . . . .|2
+    1|. . . . . . . .|1
+     +-+-+-+-+-+-+-+-+
+
+The black king can still escape to h7. No matter how you move the pieces around,
+you will never find a mate.  This constellation is therefore always a draw.
+And, by the way, it would still be a draw if white has three or even more
+bishops as long as they move on same-coloured squares.
+
+=item B<King and Pawn versus Lone King>
+
+      a b c d e f g h
+     +-+-+-+-+-+-+-+-+
+    8|. . . . . . . k|8
+    7|. . . . . . . .|7
+    6|. . . . . . . P|6
+    5|. . . . . . . .|5
+    4|. . . . . . K .|4
+    3|. . . . . . . .|3
+    2|. . . . . . . .|2
+    1|. . . . . . . .|1
+     +-+-+-+-+-+-+-+-+
+
+In this particular case, a checkmate can still be delivered because the pawn
+can be promoted to a queen or rook. But if black does not make a mistake, this
+cannot be forced.
+
+According to the rules of chess, this is not a draw. But a chess engine
+or an experienced human player will probably still consider the position a
+draw, because checkmate cannot be forced.
+
+However, even with the B<FORCIBLE> flag, the method B<insufficientMaterial()>
+will not report this as a draw because that evaluation would require an
+analysis of the game. Rationale: It is common belief that neither side can
+force a win from the starting position of chess. This is is the same situation
+as in the pawn endgame from the example. Given that both sides play perfectly,
+the outcome will be a draw. But if one side blunders, a win is possible.
+
+=back
+
+In brief: The B<FORCIBLE> flag additionally evaluates positions as a draw
+where a checkmate can only be delivered with active help by the opponent.
+
+=item B<gameOver [FORCIBLE]>
+
+This method has been added in version 0.7.
+
+Returns a truthy value if the game is over. Returns a falsy value, if the
+game is ongoing.
+
+The return value can be further analysed to get the details.
+
+    $state = $pos->gameOver();
+    if ($state & CP_GAME_OVER) {
+        say "The game is over.";
+    }
+    if ($state & CP_GAME_WHITE_WINS) {
+        say "White has won.";
+    } elsif ($state & CP_GAME_BLACK_WINS) {
+        say "Black has won.";
+    } else {
+        if ($state & CP_GAME_STALEMATE) {
+            say "The position is a stalemate";
+        } elsif ($state & CP_GAME_FIFTY_MOVES) {
+            say "The position is a draw because of the 50-moves-rule.";
+        } elsif ($state & CP_GAME_INSUFFICIENT_MATERIAL) {
+            say "The position is a draw because insufficient material.";
+        } else {
+            say "You have found a bug in Chess::Plisco.";
+        }
+    }
+
+Important! A draw because of 3-fold repetition is *not* handled. The reason
+is that this would require access to the game history. You have to implement
+this check yourself in your application.
+
+The B<FORCIBLE> flag has the same semantics as for B<insufficientMaterial()>
+above. If you want to find out whether one side can claim a draw according to
+the rules of chess, do not pass the flag. But a chess engine that evaluates
+a position should pass a truthy value so that dead positions can be detected.
 
 =item B<attacked(SHIFT)>
 
@@ -1191,6 +1425,14 @@ Bitboard of all white squares (b1, d1, ... g8)
 
 Bitboard of all black squares (a1, c1, ... h8)
 
+=head3 CP_LIGHT_MASK
+
+An alias for CP_WHITE_MASK. Added in version 0.7.
+
+=head3 CP_DARK_MASK
+
+An alias for CP_BLACK_MASK. Added in version 0.7.
+
 =head3 CP_FILE_A .. CP_FILE_H
 
 0-based numbers of all files ("a" to "h").
@@ -1235,6 +1477,38 @@ Internal.
 
 Internal.
 
+=head2 Game State Constants (:game)
+
+This tag has been added in version 0.7.
+
+=head3 CP_GAME_OVER
+
+Bit mask for game state "game over".
+
+=head3 CP_GAME_WHITE_WINS
+
+Bit mask for game state where white has won.
+
+=head3 CP_GAME_BLACK_WINS
+
+Bit mask for game state where black has won.
+
+=head3 CP_GAME_STALEMATE
+
+Bit mask for game state stalemate.
+
+=head3 CP_GAME_FIFTY_MOVES
+
+Bit mask for draw because of the 50-move-rule.
+
+=head3 CP_GAME_THREEFOLD_REPETITION
+
+Bit mask for draw because of threefold repetition.
+
+=head3 CP_GAME_INSUFFICIENT_MATERIAL
+
+Bit mask for draw because of threefold repetition.
+
 =head2 Auxiliary Constants (:aux)
 
 =head3 CP_INT_SIZE
@@ -1249,6 +1523,50 @@ The number of bits in a char.  Should be 8.
 
 A pretty arbitrary value used to initialize the pseudo-random number
 generator L</RNG>.
+
+=head1 FAQ
+
+=head2 What Does Plisco Mean?
+
+I originally wrote a chess engine in C and named it "tate", just because I
+liked the name. But then I found out about Emory Andrew Tate Jr., an
+international master of chess. As it turned out, Tate hated chess computers
+and never used them. I therefore decided that the name "tate" was inappropriate.
+
+The chess engine was then renamed to "lisco" (in Bulgarian: лиско) which means
+fox in Bulgarian. The name of the engine had changed but its countless bugs
+remained. I decided that it would be easier to debug the engine in Perl
+but all available chess libraries were either too buggy or too slow or both
+for using them. So I decided to write a library that was well tested and
+fast enough, and that library is now B<Chess::Plisco>. The first letter
+P stands for Perl.
+
+=head2 Operation ">>" no method found
+
+The B<Chess::Plisco> overloads the stringification so that you can print
+objects into their FEN representation. That has the disadvantage in Perl that
+you get funny error messages, when you accidentally use any other operator
+on a B<Chess::Plisco> object. Examples:
+
+    $position = Chess::Plisco->new;
+
+    say $position; # Works fine, and prints the FEN representation;
+    $position >> 1; # Errors:
+    # Operation ">>" no method found,
+    #         left argument in overloaded package Chess::Plisco
+    #         right argument has no overloaded magic at SOURCE LOCATION
+
+Unfortunately, B<SOURCE LOCATION> is not neccessarily in your own code. If
+you call a method with a B<Chess::Plisco> object that expects something else,]
+for example an integer, the location will be somewhere in the code of the
+module. Example:
+
+    $position = Chess::Plisco->new;
+    # ...
+    $position->doMove($position); # Ouch!
+
+The location of the error message will now be inside the source code of
+B<Chess::Plisco>.
 
 =head1 COPYRIGHT
 

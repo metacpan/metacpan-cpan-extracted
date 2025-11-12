@@ -43,6 +43,8 @@ Global options:
   -f|--feeds=<file>        Specify path to feeds file
   -z|--time-format=<fmt>   Specify default strftime format for time strings
   -a|--autoclean[=1|0]     Toggle autoclean
+  -C|--color[=1|0]         Toggle colored output
+     --no-color
 
   -h|--help      Print usage message
   -v|--version   Print version and copyright information
@@ -401,7 +403,7 @@ B<reload> has the following options:
 
 Forces B<noss> to do a hard reload on the updated feeds. A hard reload means
 that B<noss> will delete a feed's data prior to performing the reload, resulting
-in data like posts' read/unread statuses are lost.
+in data like posts' read/unread statuses being lost.
 
 =back
 
@@ -438,101 +440,8 @@ F<stdout>.
 =item B<--read-format>=I<fmt>
 
 Specify the format for the post's HTML contents that B<noss> will format when
-reading. I<fmt> is a string that consists of formatting codes which will be
-substituted by B<noss> for whatever information the code represents. A
-formatting code starts with a percentage sign, followed by an optional integar
-specifying the pad width, and a character signifying what the code is actually
-formatting. If the pad width is negative, the text will be left-justified. See
-also the C<read_format> configuration option.
-
-The format string can use the following formatting codes:
-
-=over 2
-
-=item %%
-
-A percentage sign.
-
-=item %f
-
-The name of the feed the post is in.
-
-=item %i
-
-The ID of the post.
-
-=item %t
-
-The title of the post.
-
-=item %u
-
-The URL of the post.
-
-=item %a
-
-The name of the author of the post.
-
-=item %c
-
-The list of categories the post is tagged under.
-
-=item %s
-
-A single character signifying the post's read status (C<r> for read, C<U> for
-unread).
-
-=item %S
-
-The post's read status, C<read> or C<unread>.
-
-=item %P
-
-The HTML contents of the post.
-
-=item %C
-
-The date of the post in the preferred date/time representation of the
-current locale.
-
-=item %d
-
-The post's day of the month as a decimal number (range 01 to 31).
-
-=item %w
-
-The post's abbreviated day of the week according to the current locale.
-
-=item %W
-
-The post's full day of the week according to the current locale.
-
-=item %m
-
-The post's abbreviated month name according to the current locale.
-
-=item %M
-
-The post's full month name according to the current locale.
-
-=item %n
-
-THe post's month as a decimal number (range 01 to 12).
-
-=item %y
-
-The post's year in two-digit form (range 00 to 99).
-
-=item %Y
-
-The post's full year.
-
-=item %z
-
-The post's time formatted according to the C<--time-format> option or
-C<time_format> configuration field.
-
-=back
+reading. See the L</FORMATTING> section of this manual for information on how
+formatting works in B<noss>. Also see the C<read_format> configuration option.
 
 =item B<--width>=I<width>
 
@@ -659,9 +568,9 @@ Show hidden feeds when using C<list> with no arguments.
 
 =item B<--list-format>=I<fmt>
 
-Print post information using the specified format. This option works just like
-the C<--read-format> option in the C<read> command. Consult its documentation
-for how formatting works and list of valid formatting codes.
+Print post information using the specified format. See the L</FORMATTING>
+section of this manual for information on how formatting in B<noss> works.
+Also see the C<list_format> and C<list_unread_format> configuration fields.
 
 =back
 
@@ -707,9 +616,9 @@ This command has the following options:
 
 =item B<--post-format>=I<fmt>
 
-Specify the format to use for printing post information. Consult the
-documentation for the read command's C<--read-format> option for information
-on how formatting works and a list of valid formatting codes.
+Specify the format to use for printing post information. See the
+L</FORMATTING> section of this manual for information on how formatting works
+in B<noss>. Also see the C<post_format> configuration field.
 
 =back
 
@@ -730,81 +639,9 @@ Only print feed names, not additional feed info.
 
 =item B<--feeds-format>=I<fmt>
 
-Specify the format to use for printing feed information. Consult the
-documentation for the read command's C<--read-format> option for information
-on how format strings are processed.
-
-The following format codes are available:
-
-=over 2
-
-=item %%
-
-A percentage sign.
-
-=item %f
-
-The feed's name.
-
-=item %l
-
-The feed's link.
-
-=item %t
-
-The feed's title
-
-=item %u
-
-The feed's homepage.
-
-=item %e
-
-The feed's description.
-
-=item %a
-
-The feed's author.
-
-=item %c
-
-The feed's tags.
-
-=item %p
-
-The number of posts in the feed.
-
-=item %r
-
-The number of read posts in the feed.
-
-=item %U
-
-The number of unread posts in the feed.
-
-=item %C
-
-=item %d
-
-=item %w
-
-=item %W
-
-=item %m
-
-=item %M
-
-=item %n
-
-=item %y
-
-=item %Y
-
-=item %z
-
-The same as their post formatting counterparts.
-
-=back
+Specify the format to use for printing feed information. See the
+L</FORMATTING> section of this manual for information how formatting works in
+B<noss>. See also the C<feeds_format> configuration field.
 
 =back
 
@@ -922,6 +759,13 @@ so this option will also affect their output.
 
 If this option is not set, C<%z> will default to the C<%c> L<strftime(3)>
 formatting code.
+
+=item B<-C>|B<--color>[=I<0>|I<1>]
+
+=item B<--no-color>
+
+Toggle colored output. C<0> and B<--no-color> disables color, C<1> enables it.
+By default, color is enabled unless the standard output is not a terminal.
 
 =item B<-h>|B<--help>
 
@@ -1041,6 +885,12 @@ formatting works.
 The format to use for posts in the C<list> command. See also the C<list>
 command's C<--list-format> option.
 
+=item "B<list_unread_format>": "I<fmt>"
+
+The format to use for unread posts in the C<list> command. If this is not set,
+the format specified by the C<list_format> setting or C<--list-format> option
+will be used instead.
+
 =item "B<post_format>": "I<fmt>"
 
 The format to use for the post information printed in the C<post> command. See
@@ -1061,7 +911,228 @@ command after performing any operation. See also the C<--autoclean> option.
 The L<strftime(3)> format string to use for formatting C<%z> times. See also
 the C<--time-format> option.
 
+=item "B<colors>": { "I<code>": "I<color>", ... }
+
+Key-value of map of color codes (range C<0>-C<16>) and their color names. A
+list of default color codes values are documented under
+L</FORMATTING/Default Color Codes>.
+
+Consult the documentation for L<Term::ANSIColor(3pm)> for more details on how
+colors are handled in B<noss>.
+
+=item "B<colored_output>": I<bool>
+
+Toggle whether B<noss> should use colored output or not. See also the
+C<--color> option.
+
 =back
+
+=head1 FORMATTING
+
+Some B<noss> commands support customizing the formatting of their output.
+Format strings are similar to C-style L<printf(3)> strings, using
+percentage-sign prefixed formatting codes which are substituted for the pieces
+of data represented by said code. The percentage can also optionally be
+followed by an integar (positive or negative) which specifies the pad-width to
+use for that field. A positive pad-width will justify the field to the right,
+a negative pad-width justifies to the left.
+
+B<noss> can also have its formatted output colored through color codes. A
+color code is a number range C<0>-C<16> enclosed in angle brackets
+(C<E<lt>...E<gt>>). Each code corresponds to a different
+L<Term::ANSIColor(3pm)> color which can be configured via the C<colors>
+setting in B<noss>'s configuration file. If B<noss> has its colored output
+explicitly disabled either via the C<--no-color> option or the
+C<"colored_output": false> setting, any color codes present in a format string
+are ignored.
+
+=head2 Post Formatting Codes
+
+These formatting codes can be used in the C<read_format>, C<list_format>,
+C<list_unread_format>, and C<post_format> settings for the C<read>, C<list>, and
+C<post> commands.
+
+=over 4
+
+=item %%
+
+A percentage sign.
+
+=item %f
+
+The name of the feed the post is in.
+
+=item %i
+
+The ID of the post.
+
+=item %t
+
+The title of the post.
+
+=item %u
+
+The URL of the post.
+
+=item %a
+
+The name of the author of the post.
+
+=item %c
+
+The list of categories the post is tagged under.
+
+=item %s
+
+A single character signifying the post's read status (C<r> for read, C<U> for
+unread).
+
+=item %S
+
+The post's read status, C<read> or C<unread>.
+
+=item %P
+
+The HTML contents of the post.
+
+=item %C
+
+The date of the post in the preferred date/time representation of the
+current locale.
+
+=item %d
+
+The post's day of the month as a decimal number (range 01 to 31).
+
+=item %w
+
+The post's abbreviated day of the week according to the current locale.
+
+=item %W
+
+The post's full day of the week according to the current locale.
+
+=item %m
+
+The post's abbreviated month name according to the current locale.
+
+=item %M
+
+The post's full month name according to the current locale.
+
+=item %n
+
+THe post's month as a decimal number (range 01 to 12).
+
+=item %y
+
+The post's year in two-digit form (range 00 to 99).
+
+=item %Y
+
+The post's full year.
+
+=item %z
+
+The post's time formatted according to the C<--time-format> option or
+C<time_format> configuration field.
+
+=back
+
+=head2 Feed Formatting Codes
+
+These formatting codes can be used in the C<feed_format> setting for the
+C<feeds> command.
+
+=over 4
+
+=item %%
+
+A percentage sign.
+
+=item %f
+
+The feed's name.
+
+=item %l
+
+The feed's link.
+
+=item %t
+
+The feed's title
+
+=item %u
+
+The feed's homepage.
+
+=item %e
+
+The feed's description.
+
+=item %a
+
+The feed's author.
+
+=item %c
+
+The feed's tags.
+
+=item %p
+
+The number of posts in the feed.
+
+=item %r
+
+The number of read posts in the feed.
+
+=item %U
+
+The number of unread posts in the feed.
+
+=item %C
+
+=item %d
+
+=item %w
+
+=item %W
+
+=item %m
+
+=item %M
+
+=item %n
+
+=item %y
+
+=item %Y
+
+=item %z
+
+The same as their post formatting counterparts.
+
+=back
+
+=head2 Default Color Codes
+
+    0     clear
+    1     black
+    2     red
+    3     green
+    4     yellow
+    5     blue
+    6     magenta
+    7     cyan
+    8     white
+    9     bold black
+    10    bold red
+    11    bold green
+    12    bold yellow
+    13    bold blue
+    14    bold magenta
+    15    bold cyan
+    16    bold white
 
 =head1 NOSSUI
 
@@ -1070,6 +1141,92 @@ which is a L<dialog(1)>-based frontend that provides a terminal user
 interface for B<noss>. Not all of the functionality of B<noss> is available
 through L<nossui(1)>, so it shouldn't be used as a complete replacement for
 B<noss>, but it should be suitable for most of B<noss>'s routine usage.
+
+=head1 EXAMPLES
+
+=head2 Feeds File
+
+  # Comments and trailing commas are allowed.
+  {
+      "feeds": {
+          "11sam": "https://1-1sam.codeberg.page/feed/atom.xml",
+          "devault": "https://drewdevault.com/blog/index.xml",
+          "AndrewKelley": "https://andrewkelley.me/rss.xml",
+          "rachel": {
+              "feed": "https://rachelbythebay.com/w/atom.xml",
+              "default_update": false,
+          },
+          "lwn": {
+              "feed": "https://lwn.net/headlines/Features",
+              "exclude_title": "[$]",
+          },
+      },
+      "groups": {
+          "programming": [
+              "11sam",
+              "devault",
+              "AndrewKelley",
+              "rachel",
+              "lwn",
+          ],
+          "news": {
+              "feeds": [ "lwn" ],
+              "limit": 10,
+          },
+      },
+      "default": {
+          "limit": 100,
+      },
+  }
+
+=head2 Configuration File
+
+  # Like with the feeds file, comments and trailing commas are allowed.
+  {
+      "feeds": "~/feeds.json",
+      "downloads": 10,
+      "list_format": "%s %-16f %4i %t",
+      "autoclean": true,
+      "colors": {
+          "3": "cyan",
+          "7", "green",
+          "11": "bold cyan",
+          "15": "bold green",
+      },
+  }
+
+=head2 Basic Usage
+
+  # Add feeds to your feeds file
+  $ mkdir -p ~/.config/noss
+  $ vim ~/.config/noss/noss.feeds
+  $ cat ~/.config/noss/noss.feeds
+  {
+    "feeds": {
+      "11sam": "https://1-1sam.codeberg.page/feed/atom.xml",
+    },
+  }
+
+  # Pull feed updates
+  $ noss update
+  Fetched https://1-1sam.codeberg.page/feed/atom.xml
+  11sam: 7 new posts
+
+  # Browse posts
+  $ noss list
+  U 11sam 1 My (Inexperienced) Experience with CompTIA Certs
+  U 11sam 2 1st
+  U 11sam 3 Manuals for Raku Programs
+  U 11sam 4 New(ish) Site
+  U 11sam 5 quixftp
+  U 11sam 6 My site now has an Atom feed
+  U 11sam 7 LLM Poison
+
+  # Read posts...
+  # ...via pager
+  $ noss read 11sam 7
+  # ...or via browser
+  $ noss open 11sam 7
 
 =head1 ENVIRONMENT
 
@@ -1134,7 +1291,7 @@ the Free Software Foundation, either version 3 of the License, or
 =head1 SEE ALSO
 
 L<nossui(1)>, L<curl(1)>, L<less(1)>, L<lynx(1)>, L<more(1)>, L<sqlite3(1)>,
-L<strftime(3)>
+L<strftime(3)>, L<printf(3)>, L<Term::ANSIColor(3pm)>
 
 =cut
 

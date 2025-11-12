@@ -8,7 +8,6 @@ lib/WWW/Noss.pm
 lib/WWW/Noss/BaseConfig.pm
 lib/WWW/Noss/Curl.pm
 lib/WWW/Noss/DB.pm
-lib/WWW/Noss/Dir.pm
 lib/WWW/Noss/FeedConfig.pm
 lib/WWW/Noss/FeedReader.pm
 lib/WWW/Noss/FeedReader/Atom.pm
@@ -20,6 +19,7 @@ lib/WWW/Noss/Lynx.pm
 lib/WWW/Noss/OPML.pm
 lib/WWW/Noss/TextToHtml.pm
 lib/WWW/Noss/Timestamp.pm
+lib/WWW/Noss/Util.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
@@ -28,7 +28,7 @@ t/01_init.t
 t/05_text2html.t
 t/10_home.t
 t/15_feed_config.t
-t/20_dir.t
+t/20_util.t
 t/25_lynx.t
 t/27_times.t
 t/30_atom.t

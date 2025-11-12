@@ -1,5 +1,8 @@
 Revision history for Perl extension App-oo_modulino_zsh_completion_helper
 
+0.07 2025-11-12
+    - Fix `comparguments: invalid option definition` when docstring contains `[]`, like `isa ArrayRef[]`
+
 0.06 2025-02-15
     - GH-4 Add support for modules which uses [`class`](https://perldoc.perl.org/perlclass) keyword
 

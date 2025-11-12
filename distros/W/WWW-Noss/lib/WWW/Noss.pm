@@ -2,7 +2,7 @@ package WWW::Noss;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '1.10';
+our $VERSION = '2.00';
 
 use Cwd;
 use Getopt::Long qw(GetOptionsFromArray);
@@ -13,11 +13,11 @@ use File::Temp qw(tempfile);
 use List::Util qw(max);
 use POSIX qw(strftime);
 use Pod::Usage;
+use Term::ANSIColor;
 
 use JSON;
 
-use WWW::Noss::Curl qw(curl curl_error);
-use WWW::Noss::Dir qw(dir);
+use WWW::Noss::Curl qw(curl curl_error http_status_string);
 use WWW::Noss::DB;
 use WWW::Noss::FeedConfig;
 use WWW::Noss::GroupConfig;
@@ -25,12 +25,22 @@ use WWW::Noss::Home qw(home);
 use WWW::Noss::Lynx qw(lynx_dump);
 use WWW::Noss::OPML;
 use WWW::Noss::TextToHtml qw(escape_html);
+use WWW::Noss::Util qw(dir);
 
 my $PRGNAM = 'noss';
 my $PRGVER = $VERSION;
 
 # TODO: Command to view unread post information? (what feeds are unread, how many unread, etc.)
-# TODO: It would be cool if we could somehow add ANSI colors...
+# TODO: Command to determine RSS feed from HTML page?
+
+# TODO: Look into adding colored output to the following commands:
+# - update
+# - reload
+
+# TODO: Handle 301 Moved Permanently pages gracefully
+# TODO: Handle 429 Too Many Request pages gracefully
+
+# TODO: Add screenshot to README
 
 my %COMMANDS = (
     'update'   => \&update,
@@ -184,28 +194,51 @@ Updated: %z
 HERE
 
 my $DEFAULT_POST_FMT = <<'HERE';
-%f:%i
-  Title:   %t
-  Link:    %u
-  Author:  %a
-  Tags:    %c
-  Updated: %z
-  Status:  %S
+<14>%f<0>:<15>%i<0>
+  <16>Title<0>:   %t
+  <16>Link<0>:    %u
+  <16>Author<0>:  %a
+  <16>Tags<0>:    %c
+  <16>Updated<0>: %z
+  <16>Status<0>:  %S
 HERE
 
 my $DEFAULT_FEED_FMT = <<'HERE';
-%f
-  Title:   %t
-  Link:    %u
-  Author:  %a
-  Updated: %z
-  Posts:   %p
-  Unread:  %U/%p
+<14>%f<0>
+  <16>Title<0>:   %t
+  <16>Source<0>:  %l
+  <16>Link<0>:    %u
+  <16>Author<0>:  %a
+  <16>Updated<0>: %z
+  <16>Posts<0>:   %p
+  <16>Unread<0>:  %U/%p
 
 HERE
 
 my %DOESNT_NEED_FEED = map { $_ => 1 } qw(
     import help
+);
+
+my $COLOR_CODE_RX = qr/(?:1[0-6]|[0-9])/;
+
+my %COLOR_CODES = (
+    0  => 'clear',
+    1  => 'black',
+    2  => 'red',
+    3  => 'green',
+    4  => 'yellow',
+    5  => 'blue',
+    6  => 'magenta',
+    7  => 'cyan',
+    8  => 'white',
+    9  => 'bold black',
+    10 => 'bold red',
+    11 => 'bold green',
+    12 => 'bold yellow',
+    13 => 'bold blue',
+    14 => 'bold magenta',
+    15 => 'bold cyan',
+    16 => 'bold white',
 );
 
 sub _HELP  {
@@ -546,6 +579,34 @@ sub _read_config {
         }
     }
 
+    if (defined $json->{ colors }) {
+        if (ref $json->{ colors } ne 'HASH') {
+            warn "'colors' is not a key-value map, ignoring\n";
+        } else {
+            for my $k (keys %{ $json->{ colors } }) {
+                if (not exists $self->{ ColorMap }{ $k }) {
+                    warn "'$k' is not a valid color code, ignoring\n";
+                    next;
+                }
+                $self->{ ColorMap }{ $k } = $json->{ colors }{ $k };
+            }
+        }
+    }
+
+    if (defined $json->{ list_unread_format }) {
+        if (ref $json->{ list_unread_format }) {
+            warn "'list_unread_format' is not a format string, ignoring\n";
+        } else {
+            $self->{ ListUnreadFmt } //= $json->{ list_unread_format };
+        }
+    }
+
+    if (defined $json->{ colored_output }) {
+        # If true, set to undef so that noss can automatically disable the use
+        # of color when not writing to a terminal.
+        $self->{ UseColor } //= $json->{ colored_output } ? undef : 0;
+    }
+
     return 1;
 
 }
@@ -796,25 +857,50 @@ sub _arg2rx {
 
 }
 
+# TODO: Accept '+'?
 sub _fmt {
 
-    my ($fmt, $codes) = @_;
+    my ($fmt, $codes, $colors) = @_;
+    $colors //= {};
 
     $fmt .= "\n" unless $fmt =~ /\n$/;
 
     my @subs;
+    my $colored = 0;
 
-    $fmt =~ s{%((?:-?\d+)?.)}{
-        my $code = $1;
-        my $c = chop $code;
-        unless (exists $codes->{ $c }) {
-            die "'%$code$c' is not a valid formatting code\n";
+    $fmt =~ s{(?<Fmt>%(?:-?\d+)?.)|(?<Color><$COLOR_CODE_RX>)}{
+        if (defined $+{ Fmt }) {
+            my $code = substr $+{ Fmt }, 1;
+            my $c = chop $code;
+            unless (exists $codes->{ $c }) {
+                die "'%$code$c' is not a valid formatting code\n";
+            }
+            push @subs, $codes->{ $c };
+            '%' . $code . 's';
+        } else {
+            my $code = substr $+{ Color }, 1, -1;
+            if (not exists $colors->{ $code }) {
+                $+{ Color };
+            } else {
+                $colored = 1;
+                color($colors->{ $code });
+            }
         }
-        push @subs, $codes->{ $c };
-        '%' . $code . 's';
     }ge;
 
+    if ($colored) {
+        $fmt .= color('reset');
+    }
+
     return sub { sprintf $fmt, map { $_->($_[0]) } @subs };
+
+}
+
+sub _rm_color_codes {
+
+    my ($str) = @_;
+
+    return $str =~ s/<$COLOR_CODE_RX>//gr;
 
 }
 
@@ -874,7 +960,7 @@ sub _get_feed {
     # Otherwise, just try to curl the URL
     } else {
 
-        my $rt = curl(
+        my ($rt, $resp, $head) = curl(
             $feed->feed,
             $feed->path,
             verbose => 0,
@@ -896,8 +982,14 @@ sub _get_feed {
             ),
         );
 
-        unless ($rt == 0) {
-            die sprintf "Failed to curl %s: %s\n", $feed->feed, curl_error($rt);
+        if ($rt != 0) {
+            my $e;
+            if (defined $resp and $resp->[1] =~ /^[45]/) {
+                $e = "$resp->[1] " . ($resp->[2] || http_status_string($resp->[1]));
+            } else {
+                $e = curl_error($rt);
+            }
+            die "$e\n";
         }
 
         return $feed->path;
@@ -1146,6 +1238,8 @@ sub read_post {
         }
     }
 
+    $self->{ ReadFmt } = _rm_color_codes($self->{ ReadFmt });
+
     my $fmt = do {
         my %fmt_codes = %POST_FMT_CODES;
         for my $f (keys %fmt_codes) {
@@ -1313,9 +1407,36 @@ sub look {
     my $idlen   = length($self->{ DB }->largest_id(@feeds) // 0);
     my $feedlen = max(map { length } @feeds) // 1;
 
-    my $fmt = $self->{ ListFmt } // ("%s %-$feedlen" . "f %$idlen" ."i  %t");
-    my $fmtsub = _fmt($fmt, \%POST_FMT_CODES);
-    my $callback = sub { print $fmtsub->($_[0]) };
+    my $readfmt = do {
+        my $fmt = $self->{ ListFmt };
+        if (not defined $fmt) {
+            $fmt = sprintf "<7>%%s <6>%%-%df <3>%%%di <8>%%t", $feedlen, $idlen;
+        }
+        if (!$self->{ UseColor }) {
+            $fmt = _rm_color_codes($fmt);
+        }
+        _fmt($fmt, \%POST_FMT_CODES, $self->{ ColorMap });
+    };
+    my $unreadfmt = do {
+        my $fmt = $self->{ ListUnreadFmt };
+        if (not defined $fmt) {
+            if (defined $self->{ ListFmt }) {
+                $fmt = $self->{ ListFmt };
+            } else {
+                $fmt = sprintf "<15>%%s <14>%%-%df <11>%%%di <16>%%t", $feedlen, $idlen;
+            }
+        }
+        if (!$self->{ UseColor }) {
+            $fmt = _rm_color_codes($fmt);
+        }
+        _fmt($fmt, \%POST_FMT_CODES, $self->{ ColorMap });
+    };
+
+    my $callback = sub {
+        print $_[0]->{ status } eq 'read'
+              ? $readfmt->($_[0])
+              : $unreadfmt->($_[0]);
+    };
 
     $self->{ DB }->look(
         title => $titlerx,
@@ -1428,7 +1549,17 @@ sub post {
         die "'$feed:$id' does not exist\n";
     }
 
-    print _fmt($self->{ PostFmt }, \%POST_FMT_CODES)->($post);
+    if (!$self->{ UseColor }) {
+        $self->{ PostFmt } = _rm_color_codes($self->{ PostFmt });
+    }
+
+    my $fmt = _fmt(
+        $self->{ PostFmt },
+        \%POST_FMT_CODES,
+        $self->{ ColorMap }
+    );
+
+    print $fmt->($post);
 
     return 1;
 
@@ -1462,7 +1593,11 @@ sub feeds {
         die "No feeds can be printed\n";
     }
 
-    my $cb = _fmt($self->{ FeedsFmt }, \%FEED_FMT_CODES);
+    if (!$self->{ UseColor }) {
+        $self->{ FeedsFmt } = _rm_color_codes($self->{ FeedsFmt });
+    }
+
+    my $cb = _fmt($self->{ FeedsFmt }, \%FEED_FMT_CODES, $self->{ ColorMap });
 
     for my $n (@feeds) {
 
@@ -1730,6 +1865,8 @@ sub init {
         DB            => undef,
         AutoClean     => undef,
         TimeFmt       => undef,
+        UseColor      => undef,
+        ColorMap      => { %COLOR_CODES },
         # update
         NewOnly       => 0,
         NonDefaults   => 0,
@@ -1760,6 +1897,7 @@ sub init {
         ListLimit     => undef,
         ShowHidden    => 0,
         ListFmt       => undef,
+        ListUnreadFmt => undef,
         # mark
         MarkAll       => 0,
         # post
@@ -1789,6 +1927,17 @@ sub init {
             }
         },
         'time-format|z=s' => \$self->{ TimeFmt },
+        'color|C:s'       => sub {
+            if ($_[1] eq '' or $_[1] eq '1') {
+                $self->{ UseColor } = 1;
+            } elsif ($_[1] eq '0') {
+                $self->{ UseColor } = 0;
+            } else {
+                $self->{ UseColor } = 1;
+                unshift @argv, $_[1];
+            }
+        },
+        'no-color'        => sub { $self->{ UseColor } = 0 },
         # update
         'new-only'        => \$self->{ NewOnly },
         'non-defaults'    => \$self->{ NonDefaults },
@@ -1818,7 +1967,10 @@ sub init {
         'reverse'         => \$self->{ Reverse },
         'list-limit=i'    => \$self->{ ListLimit },
         'hidden'          => \$self->{ ShowHidden },
-        'list-format=s'   => \$self->{ ListFmt },
+        'list-format=s'   => sub {
+            $self->{ ListFmt } = $_[1];
+            $self->{ ListUnreadFmt } = $_[1];
+        },
         # mark
         'all'             => \$self->{ MarkAll },
         # post
@@ -1955,6 +2107,19 @@ sub init {
 
     if (defined $self->{ TimeFmt }) {
         _set_z_fmt($self->{ TimeFmt });
+    }
+
+    if (not defined $self->{ UseColor }) {
+        if (-t STDOUT) {
+            $self->{ UseColor } = 1;
+        } else {
+            $self->{ UseColor } = 0;
+        }
+    }
+
+    # Windows terminals do not support ANSI color codes.
+    if ($^O eq 'MSWin32') {
+        $self->{ UseColor } = 0;
     }
 
     return $self;

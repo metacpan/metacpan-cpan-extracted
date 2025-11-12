@@ -6,9 +6,9 @@ use utf8;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-09-26'; # DATE
+our $DATE = '2025-11-12'; # DATE
 our $DIST = 'App-MineralUtils'; # DIST
-our $VERSION = '0.023'; # VERSION
+our $VERSION = '0.024'; # VERSION
 
 our %SPEC;
 
@@ -247,6 +247,13 @@ my @magnesium_forms = (
         magnesium_ratio => 24.305/272.6, # 8.92%
         summary => 'Magnesium taurate (C4H12MgN2O6S2), in milligrams',
     },
+
+    {
+        name=>'mg-mg-stearate-anhydrous',
+        magnesium_ratio => 24.305 / 591.27, # 4.11%
+        summary => 'Magnesium stearate anhydrous (Mg(C18H35O2)2), in milligrams',
+    },
+
 );
 
 our %argspecs_magnesium = (
@@ -1140,7 +1147,7 @@ App::MineralUtils - Utilities related to mineral supplements
 
 =head1 VERSION
 
-This document describes version 0.023 of App::MineralUtils (from Perl distribution App-MineralUtils), released on 2025-09-26.
+This document describes version 0.024 of App::MineralUtils (from Perl distribution App-MineralUtils), released on 2025-11-12.
 
 =head1 DESCRIPTION
 
@@ -1244,13 +1251,13 @@ Result:
    ],
    {
      "table.fields"        => ["amount", "pct_ca", "unit", "summary"],
-     "table.field_aligns"  => ["number", "number", "left", "left"],
      "table.field_formats" => [
                                 ["number", { precision => 3, thousands_sep => "" }],
                                 ["number", { thousands_sep => "", precision => 3 }],
                                 undef,
                                 undef,
                               ],
+     "table.field_aligns"  => ["number", "number", "left", "left"],
    },
  ]
 
@@ -1360,13 +1367,13 @@ Result:
      },
    ],
    {
+     "table.field_aligns"  => ["number", "number", "left", "left"],
      "table.field_formats" => [
-                                ["number", { precision => 3, thousands_sep => "" }],
+                                ["number", { thousands_sep => "", precision => 3 }],
                                 ["number", { thousands_sep => "", precision => 3 }],
                                 undef,
                                 undef,
                               ],
-     "table.field_aligns"  => ["number", "number", "left", "left"],
      "table.fields"        => ["amount", "pct_fe", "unit", "summary"],
    },
  ]
@@ -1679,17 +1686,24 @@ Result:
        unit    => "mg-mg-taurate",
        summary => "Magnesium taurate (C4H12MgN2O6S2), in milligrams",
      },
+     {
+       amount  => 24.390243902439,
+       pct_mg  => 4.11064319177364,
+       purity  => 1,
+       unit    => "mg-mg-stearate-anhydrous",
+       summary => "Magnesium stearate anhydrous (Mg(C18H35O2)2), in milligrams",
+     },
    ],
    {
      "table.field_formats" => [
-                                ["number", { thousands_sep => "", precision => 3 }],
-                                ["number", { thousands_sep => "", precision => 3 }],
-                                ["number", { thousands_sep => "", precision => 3 }],
+                                ["number", { precision => 3, thousands_sep => "" }],
+                                ["number", { precision => 3, thousands_sep => "" }],
+                                ["number", { precision => 3, thousands_sep => "" }],
                                 undef,
                                 undef,
                               ],
-     "table.field_aligns"  => ["number", "number", "left", "left"],
      "table.fields"        => ["amount", "pct_mg", "purity", "unit", "summary"],
+     "table.field_aligns"  => ["number", "number", "left", "left"],
    },
  ]
 
@@ -1826,13 +1840,13 @@ Result:
    ],
    {
      "table.field_formats" => [
-                                ["number", { thousands_sep => "", precision => 3 }],
                                 ["number", { precision => 3, thousands_sep => "" }],
+                                ["number", { thousands_sep => "", precision => 3 }],
                                 undef,
                                 undef,
                               ],
-     "table.field_aligns"  => ["number", "number", "left", "left"],
      "table.fields"        => ["amount", "pct_k", "unit", "summary"],
+     "table.field_aligns"  => ["number", "number", "left", "left"],
    },
  ]
 
@@ -1951,13 +1965,13 @@ Result:
    ],
    {
      "table.field_aligns"  => ["number", "number", "left", "left"],
+     "table.fields"        => ["amount", "pct_na", "unit", "summary"],
      "table.field_formats" => [
-                                ["number", { precision => 3, thousands_sep => "" }],
+                                ["number", { thousands_sep => "", precision => 3 }],
                                 ["number", { precision => 3, thousands_sep => "" }],
                                 undef,
                                 undef,
                               ],
-     "table.fields"        => ["amount", "pct_na", "unit", "summary"],
    },
  ]
 
@@ -2148,13 +2162,13 @@ Result:
    ],
    {
      "table.fields"        => ["amount", "pct_zn", "unit", "summary"],
-     "table.field_aligns"  => ["number", "number", "left", "left"],
      "table.field_formats" => [
-                                ["number", { precision => 3, thousands_sep => "" }],
+                                ["number", { thousands_sep => "", precision => 3 }],
                                 ["number", { thousands_sep => "", precision => 3 }],
                                 undef,
                                 undef,
                               ],
+     "table.field_aligns"  => ["number", "number", "left", "left"],
    },
  ]
 

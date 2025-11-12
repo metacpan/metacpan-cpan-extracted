@@ -1,0 +1,116 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Sub::HandlesVia::Manual::WithCorinna - using Sub::HandlesVia with the C<class> keyword
+
+=head1 SYNOPSIS
+
+ use v5.038;
+ use experimental 'class';
+ 
+ class Kitchen {
+   field $foods :param = [];
+   method foods () { return $foods }
+   method _set_foods ($new) { $foods = $new }
+   use Sub::HandlesVia::Declare [ 'foods', '_set_foods', sub { [] } ],
+     Array => (
+       all_foods => 'all',
+       add_food  => 'push',
+       eat_all   => 'reset',
+     );
+ }
+ 
+ my $kitchen = Kitchen->new;
+ $kitchen->add_food( 'apples' );
+ $kitchen->add_food( 'carrots' );
+ 
+ say "I have:";
+ say "- $_" for $kitchen->all_foods;
+ 
+ say "Now I will eat them all!";
+ $kitchen->eat_all;
+
+=head1 MANUAL
+
+Sub::HandlesVia allows you to delegate methods from your class to the
+values of your objects' attributes.
+
+Conceptually, it allows you to define C<< $object->push_number($n) >>
+to be a shortcut for C<< $object->numbers->push($n) >> except that
+C<< $object->numbers >> is an arrayref, so doesn't have methods you
+can call on it like C<push>.
+
+Sub::HandlesVia provides support for the Perl 5.38+ C<class> keyword via
+L<Sub::HandlesVia::Declare>.
+
+As of the current version, you need to provide a "getter" and "setter"
+method to allow Sub::HandlesVia to access the attribute's value. It's
+also recommended to provide a coderef that Sub::HandlesVia can use to
+"reset" the value.
+
+=head2 Which Methods Can Be Delegated To?
+
+The second parameter ("Array" in the synopsis) indicates which library
+of methods should be available. Valid values include
+L<Array|Sub::HandlesVia::HandlerLibrary::Array>,
+L<Blessed|Sub::HandlesVia::HandlerLibrary::Blessed>,
+L<Bool|Sub::HandlesVia::HandlerLibrary::Bool>,
+L<Code|Sub::HandlesVia::HandlerLibrary::Code>,
+L<Counter|Sub::HandlesVia::HandlerLibrary::Counter>,
+L<Enum|Sub::HandlesVia::HandlerLibrary::Enum>,
+L<Hash|Sub::HandlesVia::HandlerLibrary::Hash>,
+L<Number|Sub::HandlesVia::HandlerLibrary::Number>,
+L<Scalar|Sub::HandlesVia::HandlerLibrary::Scalar>, and
+L<String|Sub::HandlesVia::HandlerLibrary::String>.
+
+An arrayref can be provided, though many of the options are conceptually
+contradictory.
+
+ use Sub::HandlesVia::Declare 'num', [ 'Number', 'Scalar' ] => (
+   ...,
+ );
+
+=head1 BUGS
+
+Please report any bugs to
+L<https://github.com/tobyink/p5-sub-handlesvia/issues>.
+
+=head1 SEE ALSO
+
+Misc advanced documentation:
+L<Sub::HandlesVia::Manual::Advanced>.
+
+L<Sub::HandlesVia>, L<Sub::HandlesVia::Declare>.
+
+Documentation for delegatable methods:
+L<Sub::HandlesVia::HandlerLibrary::Array>,
+L<Sub::HandlesVia::HandlerLibrary::Blessed>,
+L<Sub::HandlesVia::HandlerLibrary::Bool>,
+L<Sub::HandlesVia::HandlerLibrary::Code>,
+L<Sub::HandlesVia::HandlerLibrary::Counter>,
+L<Sub::HandlesVia::HandlerLibrary::Enum>,
+L<Sub::HandlesVia::HandlerLibrary::Hash>,
+L<Sub::HandlesVia::HandlerLibrary::Number>,
+L<Sub::HandlesVia::HandlerLibrary::Scalar>, and
+L<Sub::HandlesVia::HandlerLibrary::String>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2022 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

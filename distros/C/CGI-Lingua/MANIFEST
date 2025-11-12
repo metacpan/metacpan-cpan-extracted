@@ -18,6 +18,7 @@ t/carp.t
 t/changes.t
 t/cloudflare.t
 t/comment-spelling.t
+t/country.t
 t/coverage.t
 t/cr.t
 t/critic.t
@@ -28,6 +29,7 @@ t/eof.t
 t/eol.t
 t/es_419.t
 t/eu.t
+t/fuzz.t
 t/gv.t
 t/hk.t
 t/hp-tablet.t

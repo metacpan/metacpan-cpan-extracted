@@ -33,7 +33,7 @@ if($@) {
 
 	# Run the generated test
 	my ($stdout, $stderr);
-	run3 [ $^X, $outfile ], undef, \$stdout, \$stderr;
+	run3 [$^X, $outfile], undef, \$stdout, \$stderr;
 
 	ok($? == 0, 'Generated test script exits successfully');
 

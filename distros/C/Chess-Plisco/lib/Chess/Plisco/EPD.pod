@@ -1,0 +1,53 @@
+=head1 NAME 
+
+Chess::Plisco::EPD - EPD parser for Chess::Plisco
+
+=head1 SYNOPSIS
+
+    use Chess::Plisco::EPD(:all);
+
+    $epd = Chess::Plisco::EPD->new(
+        "1b1B4/8/8/4N2k/1p4n1/5KR1/8/3N4 w - - bm Rh3#;\n",
+        . "3R3K/8/5Q2/8/5N2/1B6/2PB4/1qbk4 w - - bm Qa1;\n"
+    );
+    $epd = Chess::Plisco::EPD->new([
+        "1b1B4/8/8/4N2k/1p4n1/5KR1/8/3N4 w - - bm Rh3#;\n",
+        "3R3K/8/5Q2/8/5N2/1B6/2PB4/1qbk4 w - - bm Qa1;\n",
+    ]);
+    $epd = Chess::Plisco::EPD->new('bratko-kopec.epd');
+    open $fh, '<', 'bratko-kopec.epd';
+    $epd = Chess::Plisco::EPD->new($fh);
+
+=head1 DESCRIPTION
+
+B<Chess::Plisco::EPD> can parse EPDs from strings or files.
+
+=head1 CONSTRUCTOR
+
+=over 4
+
+=item B<new(STRING|ARRAYREF|FILENAME|FILEHANDLE>)
+
+You can instantiate the parser either with EPD data from a string, from
+an array reference holding individual lines, from a named file or from a file
+handle that is open for reading.
+
+=back
+
+=head1 METHODS
+
+=over 4
+
+=item B<records>
+
+Returns all found records as L<Chess::Plisco::EPD::Record> objects.
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright (C) 2021-2025 Guido Flohr <guido.flohr@cantanea.com>.
+
+=head1 SEE ALSO
+
+L<Chess::Plisco::EPD::Record>, perl(1)

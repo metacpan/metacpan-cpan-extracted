@@ -28,7 +28,7 @@ use Exporter 'import';
 
 our @EXPORT_OK = qw(generate);
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 =head1 NAME
 
@@ -36,7 +36,7 @@ App::Test::Generator - Generate fuzz and corpus-driven test harnesses
 
 =head1 VERSION
 
-Version 0.14
+Version 0.15
 
 =head1 SYNOPSIS
 
@@ -251,10 +251,10 @@ Maps the expected output string to the input and _STATUS
   cases:
     ok:
       input: ping
-      status: OK
+      _STATUS: OK
     error:
       input: ""
-      status: DIES
+      _STATUS: DIES
 
 =item * C<$yaml_cases> - optional path to a YAML file with the same shape as C<%cases>.
 
@@ -660,6 +660,56 @@ This example takes you through testing the online_render method of L<HTML::Genea
             AUTOMATED_TESTING: 1
             NONINTERACTIVE_TESTING: 1
 
+=head2 Fuzz Testing your CPAN Module
+
+Running fuzz tests when you run C<make test> in your CPAN module.
+
+Create a directory <t/conf> which contains the schemas.
+
+Then create this file as <t/fuzz.t>:
+
+  #!/usr/bin/env perl
+
+  use strict;
+  use warnings;
+
+  use FindBin qw($Bin);
+  use IPC::Run3;
+  use IPC::System::Simple qw(system);
+  use Test::Most;
+  use Test::Needs 'App::Test::Generator';
+
+  my $dirname = "$Bin/conf";
+
+  if((-d $dirname) && opendir(my $dh, $dirname)) {
+	while (my $filename = readdir($dh)) {
+		# Skip '.' and '..' entries and vi temporary files
+		next if ($filename eq '.' || $filename eq '..') || ($filename =~ /\.swp$/);
+
+		my $filepath = "$dirname/$filename";
+
+		if(-f $filepath) {	# Check if it's a regular file
+			my ($stdout, $stderr);
+			run3 ['fuzz-harness-generator', '-r', $filepath], undef, \$stdout, \$stderr;
+
+			ok($? == 0, 'Generated test script exits successfully');
+
+			if($? == 0) {
+				ok($stdout =~ /^Result: PASS/ms);
+				if($stdout =~ /Files=1, Tests=(\d+)/ms) {
+					diag("$1 tests run");
+				}
+			} else {
+				diag("STDOUT:\n$stdout");
+			}
+			diag($stderr) if(length($stderr));
+		}
+	}
+	closedir($dh);
+  }
+
+  done_testing();
+
 =head1 METHODS
 
   generate($schema_file, $test_file)
@@ -670,6 +720,10 @@ Takes a schema file and produces a test file (or STDOUT).
 
 sub generate
 {
+	if($_[0] && ($_[0] eq __PACKAGE__)) {
+		shift;
+	}
+
 	my ($schema_file, $test_file) = @_;
 
 	# --- Globals exported by the user's conf (all optional except function maybe) ---
@@ -681,6 +735,10 @@ sub generate
 	@edge_case_array = ();
 
 	if(defined($schema_file)) {
+		if(!-r $schema_file) {
+			croak(__PACKAGE__, ": generate($schema_file): $!");
+		}
+
 		# --- Load configuration safely (require so config can use 'our' variables) ---
 		# FIXME:  would be better to use Config::Abstraction, since requiring the user's config could execute arbitrary code
 		# my $abs = $schema_file;
@@ -867,9 +925,48 @@ sub generate
 		for my $param (keys %{$config->{input}}) {
 			my $spec = $config->{input}{$param};
 			if(ref($spec)) {
-				croak "Invalid type for parameter '$param'" unless _valid_type($spec->{type});
+				croak "Invalid type '$spec->{type}' for parameter '$param'" unless _valid_type($spec->{type});
 			} else {
-				croak "Invalid type $spec for parameter '$param'" unless _valid_type($spec);
+				croak "Invalid type '$spec' for parameter '$param'" unless _valid_type($spec);
+			}
+		}
+
+		# Check if using positional arguments
+		my $has_positions = 0;
+		my %positions;
+
+		for my $param (keys %{$config->{input}}) {
+			my $spec = $config->{input}{$param};
+			if (ref($spec) eq 'HASH' && defined($spec->{position})) {
+				$has_positions = 1;
+				my $pos = $spec->{position};
+
+				# Validate position is non-negative integer
+				croak "Position for '$param' must be a non-negative integer" unless $pos =~ /^\d+$/;
+
+				# Check for duplicate positions
+				croak "Duplicate position $pos for parameters '$positions{$pos}' and '$param'" if exists $positions{$pos};
+
+				$positions{$pos} = $param;
+			}
+		}
+
+		# If using positions, all params must have positions
+		if ($has_positions) {
+			for my $param (keys %{$config->{input}}) {
+				my $spec = $config->{input}{$param};
+				unless (ref($spec) eq 'HASH' && defined($spec->{position})) {
+					croak "Parameter '$param' missing position (all params must have positions if any do)";
+				}
+			}
+
+			# Check for gaps in positions (0, 1, 3 - missing 2)
+			my @sorted = sort { $a <=> $b } keys %positions;
+			for my $i (0..$#sorted) {
+				if ($sorted[$i] != $i) {
+					carp "Warning: Position sequence has gaps (positions: @sorted)";
+					last;
+				}
 			}
 		}
 	}
@@ -883,6 +980,8 @@ sub generate
 			($type eq 'integer') ||
 			($type eq 'number') ||
 			($type eq 'float') ||
+			($type eq 'hashref') ||
+			($type eq 'arrayref') ||
 			($type eq 'object'));
 	}
 
@@ -971,7 +1070,7 @@ sub generate
 		return '' unless $href && ref($href) eq 'HASH';
 		my @lines;
 		for my $k (sort keys %$href) {
-			my $def = $href->{$k} || {};
+			my $def = $href->{$k} // {};
 			next unless ref $def eq 'HASH';
 			my @pairs;
 			for my $subk (sort keys %$def) {
@@ -1100,7 +1199,7 @@ sub generate
 		$corpus_code = "\n# --- Static Corpus Tests ---\n";
 		for my $expected (sort keys %all_cases) {
 			my $inputs = $all_cases{$expected};
-			next unless($inputs && (ref $inputs eq 'ARRAY'));
+			next unless($inputs);
 
 			my $expected_str = perl_quote($expected);
 			my $status = ((ref($inputs) eq 'HASH') && $inputs->{'_STATUS'}) // 'OK';
@@ -1113,14 +1212,27 @@ sub generate
 			if(ref($inputs) eq 'HASH') {
 				$inputs = $inputs->{'input'};
 			}
-			my $input_str = join(', ', map { perl_quote($_) } @$inputs);
+			my $input_str;
+			if(ref($inputs) eq 'ARRAY') {
+				$input_str = join(', ', map { perl_quote($_) } @{$inputs});
+			} elsif(ref($inputs) eq 'HASH') {
+				$input_str = Dumper($inputs);
+				$input_str =~ s/\$VAR1 =//;
+				$input_str =~ s/;//;
+				$input_str =~ s/=> 'undef'/=> undef/gms;
+			} else {
+				$input_str = $inputs;
+			}
+			if(($input_str eq 'undef') && (!$config{'test_undefs'})) {
+				carp('corpus case set to undef, yet test_undefs is not set in config');
+			}
 			if ($new) {
 				if($status eq 'DIES') {
 					$corpus_code .= "dies_ok { \$obj->$function($input_str) } " .
-							"'$function(" . join(", ", map { $_ // '' } @$inputs ) . ") dies';\n";
+							"'$function(" . join(', ', map { $_ // '' } @$inputs ) . ") dies';\n";
 				} elsif($status eq 'WARNS') {
 					$corpus_code .= "warnings_exist { \$obj->$function($input_str) } qr/./, " .
-							"'$function(" . join(", ", map { $_ // '' } @$inputs ) . ") warns';\n";
+							"'$function(" . join(', ', map { $_ // '' } @$inputs ) . ") warns';\n";
 				} else {
 					my $desc = sprintf("$function(%s) returns %s",
 						perl_quote(join(', ', map { $_ // '' } @$inputs )),
@@ -1131,13 +1243,13 @@ sub generate
 			} else {
 				if($status eq 'DIES') {
 					$corpus_code .= "dies_ok { $module\::$function($input_str) } " .
-						"'$function(" . join(", ", map { $_ // '' } @$inputs ) . ") dies';\n";
+						"'$function(" . ref(($inputs eq 'ARRAY') ? join(', ', map { $_ // '' } @{$inputs}) : $inputs) . ") dies';\n";
 				} elsif($status eq 'WARNS') {
 					$corpus_code .= "warnings_exist { $module\::$function($input_str) } qr/./, " .
-						"'$function(" . join(", ", map { $_ // '' } @$inputs ) . ") warns';\n";
+						"'$function(" . ((ref $inputs eq 'ARRAY') ? join(', ', map { $_ // '' } @{$inputs}) : $inputs) . ") warns';\n";
 				} else {
 					my $desc = sprintf("$function(%s) returns %s",
-						perl_quote(join(', ', map { $_ // '' } @$inputs )),
+						perl_quote((ref $inputs eq 'ARRAY') ? (join(', ', map { $_ // '' } @{$inputs})) : $inputs),
 						$expected_str
 					);
 					$corpus_code .= "is($module\::$function($input_str), $expected_str, " . q_wrap($desc) . ");\n";
@@ -1248,6 +1360,11 @@ use Data::Random::String::Matches 0.02;
 use Test::Most;
 use Test::Returns 0.02;
 
+if($^O ne 'MSWin32') {
+	close(STDIN);
+	open(STDIN, '<', '/dev/null');
+}
+
 [% setup_code %]
 
 [% IF module %]
@@ -1315,7 +1432,7 @@ sub rand_ascii_str {
 }
 
 my @unicode_codepoints = (
-    0x00A9,        # ©
+    0x00A9,	# ©
     0x00AE,        # ®
     0x03A9,        # Ω
     0x20AC,        # €
@@ -1324,7 +1441,7 @@ my @unicode_codepoints = (
     0x0308,        # combining diaeresis
     0x1F600,       # 😀 (emoji)
     0x1F62E,       # 😮
-    0x1F4A9,       # 💩 (yes)
+    0x1F4A9,	# 💩 (yes)
 );
 
 # Tests for matches or nomatch
@@ -1353,17 +1470,17 @@ sub rand_str
 	for (1..$len) {
 		my $r = rand();
 		if ($r < 0.72) {
-			push @chars, chr(97 + int(rand(26)));          # a-z
+			push @chars, chr(97 + int(rand(26)));	# a-z
 		} elsif ($r < 0.88) {
-			push @chars, chr(65 + int(rand(26)));          # A-Z
+			push @chars, chr(65 + int(rand(26)));	# A-Z
 		} elsif ($r < 0.95) {
-			push @chars, chr(48 + int(rand(10)));          # 0-9
+			push @chars, chr(48 + int(rand(10)));	# 0-9
 		} elsif ($r < 0.975) {
-			push @chars, rand_unicode_char();              # occasional emoji/marks
+			push @chars, rand_unicode_char();	# occasional emoji/marks
 		} elsif($config{'test_nuls'}) {
-			push @chars, chr(0);                           # nul byte injection
+			push @chars, chr(0);	# nul byte injection
 		} else {
-			push @chars, chr(97 + int(rand(26)));          # a-z
+			push @chars, chr(97 + int(rand(26)));	# a-z
 		}
 	}
 	# Occasionally prepend/append a combining mark to produce combining sequences
@@ -1415,7 +1532,7 @@ sub rand_num {
 	if ($r < 0.7) {
 		return (rand() * 200 - 100);	# -100 .. 100
 	} elsif ($r < 0.9) {
-		return (rand() * 1e12) - 5e11;          # large-ish
+		return (rand() * 1e12) - 5e11;	# large-ish
 	} elsif ($r < 0.98) {
 		return (rand() * 1e308) - 5e307;	# very large floats
 	} else {
@@ -1538,7 +1655,7 @@ sub fuzz_inputs
 				my $type = lc((!ref($spec)) ? $spec : $spec->{type}) || 'string';
 
 				foreach my $field(keys %{$spec}) {
-					if(!grep({ $_ eq $field } ('type', 'min', 'max', 'optional', 'matches', 'can'))) {
+					if(!grep({ $_ eq $field } ('type', 'min', 'max', 'optional', 'matches', 'can', 'memberof'))) {
 						diag(__LINE__, ": TODO: handle schema keyword '$field'");
 					}
 				}
@@ -2002,15 +2119,20 @@ sub fuzz_inputs
 					}
 				} else {
 					# basic boolean edge cases
-					push @cases, { _input => 0 };
-					push @cases, { _input => 1 };
-					push @cases, { _input => 'off' };
-					push @cases, { _input => 'on' };
-					push @cases, { _input => 'false' };
-					push @cases, { _input => 'true' };
+					push @cases,
+						{ _input => 0 },
+						{ _input => 1 },
+						{ _input => 'off' },
+						{ _input => 'on' },
+						{ _input => 'false' },
+						{ _input => 'true' },
+						{ _input => 'yes' },
+						{ _input => 'no' },
+						{ _input => 2, _STATUS => 'DIES' },	# invalid boolean
+						{ _input => [ 3 ], _STATUS => 'DIES' },	# invalid boolean
+						{ _input => { 'abc' => 'xyz' }, _STATUS => 'DIES' },	# invalid boolean
+						{ _input => 'plugh', _STATUS => 'DIES' };	# invalid boolean
 					push @cases, { _input => undef, _STATUS => 'DIES' } if($config{'test_undef'});
-					push @cases, { _input => 2, _STATUS => 'DIES' };	# invalid boolean
-					push @cases, { _input => 'plugh', _STATUS => 'DIES' };	# invalid boolean
 				}
 			}
 
@@ -2113,17 +2235,13 @@ sub generate_tests
 						push @cases, { %mandatory_args, ( $field => 'a' x ($len + 1) ) };	# just inside
 						push @cases, { %mandatory_args, ( $field => 'a' x $len ) };	# border
 						if($len > 0) {
-							if($len > 0) {
-								if(($len > 1) || $config{'test_empty'}) {
-									# outside
-									push @cases, { %mandatory_args, ( $field => 'a' x ($len - 1), _STATUS => 'DIES' ) };
-								}
-								# Test checking of 'defined'/'exists' rather than if($string)
-								push @cases, { %mandatory_args, ( $field => '0' ) };
-							} else {
-								push @cases, { %mandatory_args, ( $field => '' ) } if($config{'test_empty'});	# min == 0, empty string should be allowable
-								# Don't confuse if() with if(defined())
-								push @cases, { %mandatory_args, ( $field => '0', _STATUS => 'DIES' ) };
+							if(($len > 1) || $config{'test_empty'}) {
+								# outside
+								push @cases, { %mandatory_args, ( $field => 'a' x ($len - 1), _STATUS => 'DIES' ) };
+							}
+							if($len <= 1) {
+								push @cases, { %mandatory_args, ( $field => '9' ) };
+								push @cases, { %mandatory_args, ( $field => '' ) } if($len == 0);
 							}
 						} else {
 							push @cases, { %mandatory_args, ( $field => '' ) } if($config{'test_empty'});	# min == 0, empty string should be allowable
@@ -2294,7 +2412,7 @@ sub populate_positions
 	my $rc;
 	foreach my $arg (keys %{$input}) {
 		my $spec = $input->{$arg} || {};
-		if(defined($spec->{'position'})) {
+		if(((ref($spec)) eq 'HASH') && defined($spec->{'position'})) {
 			$rc->{$arg} = $spec->{'position'};
 		} else {
 			if($rc) {

@@ -16,6 +16,7 @@ do { my $x = {
                       'requires' => {
                                       'HealthCheck' => 'v1.8.1',
                                       'Parallel::ForkManager' => '0',
+                                      'Scalar::Util' => '0',
                                       'perl' => 'v5.10.0'
                                     }
                     },

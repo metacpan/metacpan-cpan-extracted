@@ -8,7 +8,7 @@ use Params::Get 0.13;
 use Storable; # RT117983
 use Class::Autouse qw{Carp Locale::Language Locale::Object::Country Locale::Object::DB I18N::AcceptLanguage I18N::LangTags::Detect};
 
-our $VERSION = '0.77';
+our $VERSION = '0.78';
 
 =head1 NAME
 
@@ -16,7 +16,7 @@ CGI::Lingua - Create a multilingual web page
 
 =head1 VERSION
 
-Version 0.77
+Version 0.78
 
 =cut
 
@@ -999,7 +999,10 @@ sub country {
 		if($self->{_have_geoip} == 1) {
 			$self->{_country} = $self->{_geoip}->country_code_by_addr($ip);
 		}
-		unless(defined($self->{_country})) {
+
+		# FIXME:  45.128.139.41 is broken in Geo::IPFree,
+		#	see https://github.com/bricas/geo-ipfree/issues/10
+		if(!defined($self->{_country}) && ($ip ne '45.128.139.41')) {
 			if($self->{_have_geoipfree} == -1) {
 				# Don't use 'eval { use ... ' as recommended by Perlcritic
 				# See https://www.cpantesters.org/cpan/report/6db47260-389e-11ec-bc66-57723b537541
@@ -1392,9 +1395,9 @@ sub _log
 {
 	my ($self, $level, @messages) = @_;
 
-	if(scalar(@messages)) {
+	if(ref($self) && scalar(@messages)) {
 		# FIXME: add caller's function
-		# if(($level eq 'warn') || ($level eq 'notice')) {
+		# if(($level eq 'warn') || ($level eq 'info')) {
 			push @{$self->{'messages'}}, { level => $level, message => join('', grep defined, @messages) };
 		# }
 

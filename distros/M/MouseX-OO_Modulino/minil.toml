@@ -1,0 +1,8 @@
+name = "MouseX-OO_Modulino"
+badges = ["github-actions/test.yml"]
+module_maker="ModuleBuildTiny"
+static_install = "auto"
+
+readme_from="lib/MouseX/OO_Modulino.pod"
+abstract_from="lib/MouseX/OO_Modulino.pod"
+authors_from="lib/MouseX/OO_Modulino.pod"

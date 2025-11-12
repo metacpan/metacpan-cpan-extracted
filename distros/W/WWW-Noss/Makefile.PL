@@ -5,6 +5,35 @@ use ExtUtils::MakeMaker;
 
 use DBD::SQLite;
 
+sub extract_argv_var {
+
+    my $var = shift;
+
+    my $idx;
+    my $val;
+
+    for my $i (0 .. $#ARGV) {
+        if ($ARGV[$i] =~ /^\Q$var\E=(.*)$/) {
+            $idx = $i;
+            $val = $1;
+            last;
+        }
+    }
+
+    if (not defined $idx) {
+        return undef;
+    }
+
+    # So that MakeMaker doesn't complain about the custom parameter.
+    splice @ARGV, $idx, 1;
+
+    return $val;
+
+}
+
+my $NO_NOSSUI = extract_argv_var('NO_NOSSUI');
+$NO_NOSSUI //= $^O eq 'MSWin32' ? 1 : 0;
+
 my %WriteMakefileArgs = (
     NAME             => 'WWW::Noss',
     AUTHOR           => q{Samuel Young <samyoung12788@gmail.com>},
@@ -40,17 +69,18 @@ my %WriteMakefileArgs = (
         'Parallel::ForkManager' => '0.7.6',
         'Pod::Usage' => '0',
         'POSIX' => '0',
+        'Term::ANSIColor' => '0',
         'Time::Piece' => '0',
         # for load_xml()
         'XML::LibXML' => '1.70',
     },
     EXE_FILES => [
         'bin/noss',
-        'bin/nossui',
+        (!$NO_NOSSUI ? 'bin/nossui' : ()),
     ],
     MAN1PODS => {
         'bin/noss'       => 'blib/man1/noss.1',
-        'doc/nossui.pod' => 'blib/man1/nossui.1',
+        (!$NO_NOSSUI ? ('doc/nossui.pod' => 'blib/man1/nossui.1') : ()),
     },
     META_MERGE => {
         'meta-spec' => { version => 2 },

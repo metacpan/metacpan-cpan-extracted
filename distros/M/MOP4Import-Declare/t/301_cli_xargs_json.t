@@ -5,14 +5,15 @@ use strict;
 use warnings qw(FATAL all NONFATAL misc);
 use Carp;
 use FindBin; BEGIN { do "$FindBin::Bin/t_lib.pl" }
+use File::Basename qw(dirname);
 
 use Test::More;
 use Test2::Tools::Command;
 
-ok chdir("$FindBin::Bin/../Base"), "chdir to MOP4Import/Base";
+my $dist_root = dirname($FindBin::Bin);
 
 command {
-  args => [qw(./CLI_JSON.pm)]
+  args => ["$dist_root/Base/CLI_JSON.pm"]
     , status => 255
     , stderr => qr/^Usage: /
 };
@@ -22,7 +23,7 @@ SKIP: {
     if $] <= 5.018;
 
   command {
-    args => [qw(./CLI_JSON.pm cli_xargs_json cli_array)]
+    args => ["$dist_root/Base/CLI_JSON.pm", qw(cli_xargs_json cli_array)]
       , stdin => qq{{}},
       , stdout => qq{[{}]\n}
     };

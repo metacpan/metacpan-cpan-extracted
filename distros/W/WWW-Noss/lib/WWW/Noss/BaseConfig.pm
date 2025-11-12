@@ -2,7 +2,7 @@ package WWW::Noss::BaseConfig;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '1.10';
+our $VERSION = '2.00';
 
 use List::Util qw(any all);
 

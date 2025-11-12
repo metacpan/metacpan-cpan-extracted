@@ -3,6 +3,8 @@ use warnings;
 require Carp;
 sub MY () {__PACKAGE__}
 
+use Cwd ();
+
 my $DIST_NAMESPACE = 'MOP4Import';
 
 # $_[0] should be $dist_root/t, which is normally $FindBin::Bin.
@@ -10,14 +12,12 @@ my $DIST_NAMESPACE = 'MOP4Import';
 my $dir = do {
   my $d = $_[0] || $FindBin::Bin or die "bindir is empty!";
   $d //= $FindBin::Bin; # To suppress warning.
-  MY->rel2abs(untaint_any($d));
+  Cwd::realpath(MY->rel2abs(untaint_any($d)));
 };
 
 use File::Basename;
 sub untaint_any {$_[0] =~ m{(.*)} and $1}
 use base qw/File::Spec/;
-
-my (@libdir);
 
 my $hook = sub {
   my ($this, $orig_modfn) = @_;
@@ -30,20 +30,11 @@ my $hook = sub {
   $fh;
 };
 
-unshift @INC, $hook;
+unshift @INC, dirname(dirname($dir)), $hook;
 
 my $ins = $INC[$#INC] eq "." ? $#INC : @INC;
 splice @INC, $ins, 0, $hook, $hook;
 # XXX: Why I need to put this into @INC-hook 3times?!
 
-require lib;
+# print STDERR join("\n", @INC), "\n" if $ENV{DEBUG_INC};
 
-if (@libdir) {
-  import lib @libdir;
-
-  print STDERR join("\n", @libdir), "\n" if $ENV{DEBUG_INC};
-}
-
-# Should returns $dist_root
-
-return "$dir/..";

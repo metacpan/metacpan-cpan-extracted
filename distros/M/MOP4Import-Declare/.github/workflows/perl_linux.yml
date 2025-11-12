@@ -32,14 +32,20 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+      with:
+         path: 'lib/MOP4Import'
     - name: Set up Perl ${{ matrix.perl-version }}
       uses: shogo82148/actions-setup-perl@v1
       with:
         perl-version: ${{ matrix.perl-version }}
         multi-thread: ${{ matrix.threaded }}
+        working-directory: 'lib/MOP4Import'
     - name: Install Dependencies
       run: cpm install -g
+      working-directory: 'lib/MOP4Import'
     - name: build
+      working-directory: 'lib/MOP4Import'
       run: perl Build.PL && ./Build build
     - name: Run Tests
+      working-directory: 'lib/MOP4Import'
       run: ./Build test

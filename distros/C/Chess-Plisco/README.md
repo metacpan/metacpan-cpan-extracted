@@ -51,11 +51,13 @@ See the [tutorial](lib/Chess/Plisco/Tutorial.pod) for a gentle introduction
 to the library.  When installed, you can also try the command
 `perldoc Chess::Plisco::Tutorial`.
 
-Reference documentation is available for
-[Chess::Plisco](lib/Chess/Plisco.pod) (`perldoc Chess::Plisco`)
-and
-[Chess::Pllisco::Macro](lib/Chess/Plisco/Macro.pod)
-(`perldoc Chess::Plisco::Macro`).
+Reference documentation is available for:
+
+* [Chess::Plisco](lib/Chess/Plisco.pod) (`perldoc Chess::Plisco`)
+* [Chess::Pllisco::Macro](lib/Chess/Plisco/Macro.pod) (`perldoc Chess::Plisco::Macro`).
+* [Chess::Plisco::EPD](lib/Chess/Plisco/EPD.pod) (`perldoc Chess::Plisco::EPD`)
+* [Chess::Plisco::EPD::Record](lib/Chess/Plisco/EPD/Record.pod) (`perldoc Chess::Plisco::EPD::Record`)
+* [Chess::Plisco::Tablebase::Syzygy](lib/Chess/Plisco/Tablebase/Syzygy.pod) (`perldoc Chess::Plisco::Tablebase::Syzygy`).
 
 ## Engine
 

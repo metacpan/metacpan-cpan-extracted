@@ -57,6 +57,15 @@ Files: Changes
  t/40mite/scalar.t
  t/40mite/string.t
  t/50objectpad.t
+ t/55corinna.t
+ t/55corinna/array.t
+ t/55corinna/bool.t
+ t/55corinna/code.t
+ t/55corinna/counter.t
+ t/55corinna/hash.t
+ t/55corinna/number.t
+ t/55corinna/scalar.t
+ t/55corinna/string.t
  t/96foreach.t
  t/99headtail.t
 Copyright: Copyright 2025 Toby Inkster.
@@ -168,6 +177,7 @@ Files: lib/Sub/HandlesVia/Declare.pm
  lib/Sub/HandlesVia/Manual/Advanced.pod
  lib/Sub/HandlesVia/Manual/Comparison.pod
  lib/Sub/HandlesVia/Manual/WithClassTiny.pod
+ lib/Sub/HandlesVia/Manual/WithCorinna.pod
  lib/Sub/HandlesVia/Manual/WithGeneric.pod
  lib/Sub/HandlesVia/Manual/WithMite.pod
  lib/Sub/HandlesVia/Manual/WithMoo.pod

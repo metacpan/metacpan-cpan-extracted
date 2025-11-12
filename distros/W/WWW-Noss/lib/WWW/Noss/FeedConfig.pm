@@ -2,7 +2,7 @@ package WWW::Noss::FeedConfig;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '1.10';
+our $VERSION = '2.00';
 
 use parent 'WWW::Noss::BaseConfig';
 
@@ -194,7 +194,7 @@ sub set_groups {
     }
 
     for my $i (0 .. $#$new) {
-        unless ($new->[$i]->isa('WWW::Noss::GroupConfig')) {
+        unless (eval { $new->[$i]->isa('WWW::Noss::GroupConfig') }) {
             die "group[$i] is not a WWW::Noss::GroupConfig object";
         }
     }

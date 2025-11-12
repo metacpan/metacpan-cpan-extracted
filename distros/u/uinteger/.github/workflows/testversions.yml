@@ -28,9 +28,10 @@ jobs:
             label: Windows
             make: gmake
         perl-version:
-          - '5.38'
-          - '5.24'
-          - '5.16'
+          - '5.42'
+          - '5.34'
+          - '5.28'
+          - '5.22'
         threads:
           - enable: true
             label: -Dusethreads
@@ -39,7 +40,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Set up perl
-        uses: shogo82148/actions-setup-perl@v1.30.0
+        uses: shogo82148/actions-setup-perl@v1.36.0
         with:
           perl-version: ${{ matrix.perl-version }}
           multi-thread: ${{ matrix.threads.enable }}

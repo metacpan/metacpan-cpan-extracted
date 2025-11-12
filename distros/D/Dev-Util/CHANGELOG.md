@@ -1,0 +1,333 @@
+# Changelog for Dev::Util
+
+All notable changes to this project will be documented in this file.
+
+## [version/v2.17.17] - 2025-11-11
+
+### ⚙️ Miscellaneous Tasks
+
+- *(version)* Update version to v2.17.17
+
+### 🚜 Refactor
+
+- *(use)* Clean up use statements
+- *(use)* Clean up use statements
+- *(use)* Remove un-needed modules
+- *(makefile)* Add METE_MERGE info. Update PREREQ_PM & TEST_REQUIRES
+
+### 🧪 Testing
+
+- *(spell)* Add to spelling whitelist
+- *(boilerplate)* Fix typo for README.md
+
+### 📚 Documentation
+
+- *(pod)* Add function descriptions
+- *(readme)* Convert README to Markdown
+- *(readme)* Customize README.md for this module and sub-modules
+- *(pod)* Updated and corrected pod documentation for modules
+
+### 🎨 Styling
+
+- *(typo)* Fix spelling mistake
+
+### 🚧 Build
+
+- *(makefile)* Update Prereq_pm with needed modules
+
+## [version/v2.17.4] - 2025-11-10
+
+### 🚀 Features
+
+- *(mk_temp_file)* Autoflush temp file, don't unlink it
+
+### ⚙️ Miscellaneous Tasks
+
+- *(version)* Update version to v2.17.4
+
+### 🚜 Refactor
+
+- *(ipc_run)* [**breaking**] Rename functions ipc_run_{l,s} to ipc_run_{c,e}
+- *(query)* Code clean up
+
+### 🧪 Testing
+
+- *(const)* Fix test diagnostic messages
+- *(spelling)* Add spell check for pod documentation
+- *(boilerplate)* Update list of submodules
+- *(coverage)* Add tests for better conditional coverage
+- *(read_list)* Add tests for read_list
+- *(query)* Add tests for query module
+
+### 🎨 Styling
+
+- *(test)* Fix typo in test message
+- *(spelling)* Fix mis-spelling of ACKNOWLEDGMENTS
+
+### 🚧 Build
+
+- *(docs)* Add make manifest and make signature
+
+## [version/v2.15.4] - 2025-11-07
+
+### ⚙️ Miscellaneous Tasks
+
+- *(version)* Update version minor level
+
+### 🚜 Refactor
+
+- *(file)* [**breaking**] Move functions to File from Utils
+- *(os)* [**breaking**] Move functions to OS from Utils
+- *(utils)* [**breaking**] Move Utils to Query
+
+### 🧪 Testing
+
+- Test functions in new module
+- *(query)* Convert to Query from Utils
+
+### 📚 Documentation
+
+- *(pod)* Update Pod docs
+- *(pod)* Update Pod docs
+
+### Other
+
+- *(other)* Merge branch 'query'
+
+* query:
+  docs(pod): Update Pod docs
+  test(query): Convert to Query from Utils
+  refactor(utils)!: Move Utils to Query
+
+## [version/v2.12.4] - 2025-11-06
+
+### 🚀 Features
+
+- *(docs)* Add script to make docs for modules
+- *(read_list)* Add read_list function
+- *(mk_tmp_dir)* Add ability to specify temp dir
+
+### 🐛 Bug Fixes
+
+- *(pod)* Fix typo in pod
+- *(display_menu)* Use prompt from IO::Prompt, not the local one
+
+### ⚙️ Miscellaneous Tasks
+
+- Merge branch 'utils'
+
+* utils: (26 commits)
+  fix(display_menu): Use prompt from IO::Prompt, not the local one
+  docs(pod): Update Pod docs
+  test(valid): Remove tests for deleted function
+  refactor(prompt): Modernize code with IO::Prompt, keeping API
+  refactor(display_menu): Modernize code, use IO::Prompt
+  feat(mk_tmp_dir): Add ability to specify temp dir
+  feat(read_list): Add read_list function
+  refactor(yes_no_prompt): Rewrite function using IO::Prompt
+  refactor: Remove get_keypress and valid functions, and tests
+  docs(markdown): Create markdown docs for modules via make_docs.sh
+  feat(docs): Add script to make docs for modules
+  build(manifest): Exclude scratch dir from manifest
+  fix(pod): Fix typo in pod
+  test(load): Include Dev::Util::File in load test
+  build(git): Update git ignore file
+  test(perlcritic): Update perl critic test
+  test(xt): Include xt tests when running yath
+  docs(install): Add installation documentation
+  refactor(test): Modernize Author tests
+  refactor(use): Remove un-needed modules
+  ...
+- *(version)* Update version to v2.12.4
+
+### 🚜 Refactor
+
+- *(utils)* [**breaking**] Move file and dir functions to new module: Dev::Util::File
+- *(use)* Remove un-needed modules
+- *(test)* Modernize Author tests
+- Remove get_keypress and valid functions, and tests
+- *(yes_no_prompt)* Rewrite function using IO::Prompt
+- *(display_menu)* Modernize code, use IO::Prompt
+- *(prompt)* Modernize code with IO::Prompt, keeping API
+
+### 🧪 Testing
+
+- *(xt)* Include xt tests when running yath
+- *(perlcritic)* Update perl critic test
+- *(load)* Include Dev::Util::File in load test
+- *(valid)* Remove tests for deleted function
+
+### 📚 Documentation
+
+- *(constants)* Define the constants
+- *(install)* Add installation documentation
+- *(markdown)* Create markdown docs for modules via make_docs.sh
+- *(pod)* Update Pod docs
+
+### 🚧 Build
+
+- *(git)* Update git ignore file
+- *(manifest)* Exclude scratch dir from manifest
+
+## [version/v2.1.6] - 2025-10-29
+
+### ⚙️ Miscellaneous Tasks
+
+- *(merge)* Merge branch 'devutil'
+- *(version)* Bump version minor level
+
+### 🚜 Refactor
+
+- *(utils)* [**breaking**] Move names constants to separate module, Dev::Util::Const
+
+### 🧪 Testing
+
+- *(const)* New tests for Const module
+- *(module)* Include new Const module in loading tests
+
+### 📚 Documentation
+
+- *(module)* Update manifest
+
+## [version/v2.0.7] - 2025-10-26
+
+### ⚙️ Miscellaneous Tasks
+
+- *(version)* Bump version major level
+
+### 🚜 Refactor
+
+- *(module)* [**breaking**] Begin conversion to Dev::Util from MERM::Base
+- *(module)* [**breaking**] Convert Makefile.PL
+- *(module)* [**breaking**] Convert cliff toml
+- *(module)* [**breaking**] Convert example programs
+- *(module)* [**breaking**] Convert lib dir name
+- *(module)* [**breaking**] Convert pm modules
+- *(module)* [**breaking**] Convert tests
+
+### 🧪 Testing
+
+- *(prereqs)* Update list of required modules
+
+### 📚 Documentation
+
+- *(changelog)* Update changelog
+
+## [version/v1.1.6] - 2025-10-25
+
+### ⚙️ Miscellaneous Tasks
+
+- *(version)* Bump version patch level
+- *(merge)* Merge branch 'backup'
+
+### 🚜 Refactor
+
+- Modernize code, use MERM::Base::Backup
+- Modernize code, add pod docs
+
+### 🧪 Testing
+
+- *(load)* Include MERM::Base::Backup in load test
+- *(backup)* Add tests for directory backup
+
+### 🎨 Styling
+
+- *(tidy)* Clean up code
+
+## [version/v1.1.3] - 2025-10-23
+
+### 🚀 Features
+
+- *(modules)* Add depentant modules for MERM::Base::Backup
+- Add MERM::Base::Backup module
+- Add bu script
+
+### ⚙️ Miscellaneous Tasks
+
+- *(manifest)* Add SIGNATURE and VERSION
+- *(version)* Bump version patch level
+- *(version)* Bump version minor level
+
+### 🧪 Testing
+
+- Add tests for MERM::Base::Backup
+- *(kwalitee)* Update kwalitee test
+
+### 📚 Documentation
+
+- *(pod)* Add reference to MERM::Base::Backup
+- *(manifest)* Add Backup module and test files
+- *(pod)* Fix format errors via podchecker
+- *(changelog)* Add changelog generated by git cliff
+- *(pod)* Update pod documentation for modules
+
+### 🎨 Styling
+
+- *(tidy)* Clean up code. Use /usr/bin/env perl
+- *(tidy)* Clean up code
+
+### 🚧 Build
+
+- *(changelog)* Use git cliff
+- *(cliff)* Fix error in default cliff.toml
+
+## [version/v1.0.11] - 2024-09-17
+
+### 🚀 Features
+
+- *(syntax)* Add 'use version', bump version to 1.0.10
+
+### 🐛 Bug Fixes
+
+- *(yes_no_prompt)* Initialize value
+
+### 🎨 Styling
+
+- *(Utils)* Perl Tidy
+
+### Other
+
+- *(other)* Add test report-prereqs. Bump version
+
+## [version/v1.0.8] - 2024-06-26
+
+### Other
+
+- *(other)* Update Makefile.PL to include requirements
+- *(other)* Update manifest
+- *(other)* Remove duplication
+
+## [version/v1.0.6] - 2024-06-21
+
+### Other
+
+- *(other)* Base modules for perl development. Initial Commit.
+- *(other)* Sync dev infrastructure with established codebase
+
+MERM::SmartTools
+- *(other)* Use base dev infrastructure for testing
+
+Update to MERM::Base
+- *(other)* Merge branch 'testing'
+
+* testing:
+  Use base dev infrastructure for testing
+
+module-starter
+  --module=MERM::Base
+  --module=MERM::Base::Syntax
+  --module=MERM::Base::Utils
+  --builder=ExtUtils::MakeMaker
+  --author='Matt Martini'
+  --email=matt@imaginarywave.com
+  --ignore=git
+  --license=gpl3
+  --genlicense
+  --minperl=5.018
+  --verbose
+- *(other)* Tidy tests
+- *(other)* Sync code with MERM::SmartTools
+- *(other)* Add OS module and tests
+- *(other)* Update version
+
+<!-- generated by git-cliff -->

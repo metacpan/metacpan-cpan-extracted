@@ -30,16 +30,22 @@
          "requires" : {
             "Carp" : "0",
             "Exporter" : "0",
-            "File::Spec" : "0",
+            "Fcntl" : "0",
+            "File::Basename" : "0",
+            "File::Globstar" : "0",
             "File::Temp" : "0",
             "Filter::Util::Call" : "0",
             "Getopt::Long" : "0",
             "IO::Select" : "0",
             "IO::Socket::UNIX" : "0",
+            "List::Util" : "0",
             "Locale::TextDomain" : "0",
+            "Math::Int64" : "0",
             "POSIX" : "0",
             "PPI::Document" : "0",
             "Scalar::Util" : "0",
+            "Sys::Mmap" : "0",
+            "Tie::Cache::LRU" : "0",
             "Time::HiRes" : "0",
             "base" : "0",
             "constant" : "0",
@@ -54,7 +60,7 @@
             "Chess::PGN::Parse" : "0",
             "Cwd" : "0",
             "Data::Dumper" : "0",
-            "File::Basename" : "0",
+            "File::Spec" : "0",
             "Test::More" : "0",
             "lib" : "0"
          }
@@ -72,7 +78,7 @@
          "web" : "http://github.com/gflohr/Chess-Plisco.git"
       }
    },
-   "version" : "0.6",
+   "version" : "v0.7.0",
    "x_generated_by_perl" : "v5.40.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.38"
 }

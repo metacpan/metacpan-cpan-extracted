@@ -1,5 +1,29 @@
 Revision history for noss (WWW::Noss)
 
+2.00  Nov 11 2025
+  - list, feeds, and post commands now have colored output. Output can be
+    customized by using color codes in the commands' respective format
+    configurations.
+    - Color codes can be customized via the "colors" setting in noss's
+      configuration file.
+    - Colored output can be enabled/disabled via the --color/--no-color options
+      or the "use_color" setting.
+  - Add "list_unread_fmt" setting: Specify the format to use for unread posts
+    in the list command.
+  - noss now informs the user of an HTTP error status if one was present during
+    failed update.
+  - Add example configuration and feeds files to manual.
+  - Add "Source" field to default feeds command output.
+  - Add "Edit Feeds" and "Edit Config" commands in nossui.
+  - The "Reload" and "Clean" menu items in nossui have been moved to a new
+    "Extra" menu.
+  - Fix nossui not respecting NOSS_FEEDS, NOSS_CONFIG, and NOSS_DATA.
+  - Fix "Can't call method without package or object reference" error.
+  - Add NO_NOSSUI option to Makefile.PL: do not install the nossui shell
+    script.
+    - nossui is no longer installed by default on Windows systems.
+  - Improved formatting of noss(1) manual.
+
 1.10  Oct 16 2025
   - noss now attempts to resolve relative URLs ('/foo' and '//foo').
   - Trim whitespace for %e feed descriptions.

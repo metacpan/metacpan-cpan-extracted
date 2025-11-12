@@ -2,11 +2,14 @@ package WWW::Noss::Curl;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '1.10';
+our $VERSION = '2.00';
 
 use Exporter qw(import);
-our @EXPORT_OK = qw(curl curl_error);
+our @EXPORT_OK = qw(curl curl_error http_status_string parse_http_header);
 
+use File::Temp qw(tempfile);
+
+# https://curl.se/docs/manpage.html
 our %CODES = (
     -1 => 'Failed to execute curl',
     0  => 'Success',
@@ -99,6 +102,79 @@ our %CODES = (
     # and maybe some more in the future...
 );
 
+# https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status
+our %HTTP_CODES = (
+
+    100 => 'Continue',
+    101 => 'Switching Protocols',
+    102 => 'Processing',
+    103 => 'Early Hints',
+
+    200 => 'OK',
+    201 => 'Created',
+    202 => 'Accepted',
+    203 => 'Non-Authoritative Information',
+    204 => 'No Content',
+    205 => 'Reset Content',
+    206 => 'Partial Content',
+    207 => 'Multi-Status',
+    208 => 'Already Reported',
+    209 => 'IM Used',
+
+    300 => 'Multiple Choices',
+    301 => 'Moved Permanently',
+    302 => 'Found',
+    303 => 'See Other',
+    304 => 'Not Modified',
+    305 => 'Use Proxy',
+    306 => 'unused',
+    307 => 'Temporary Redirect',
+    308 => 'Permanent Redirect',
+
+    400 => 'Bad Request',
+    401 => 'Unauthorized',
+    402 => 'Payment Required',
+    403 => 'Forbidden',
+    404 => 'Not Found',
+    405 => 'Method Not Allowed',
+    406 => 'Not Acceptable',
+    407 => 'Proxy Authentication Required',
+    408 => 'Request Timeout',
+    409 => 'Conflict',
+    410 => 'Gone',
+    411 => 'Length Required',
+    412 => 'Precondition Failed',
+    413 => 'Content Too Large',
+    414 => 'URI Too Long',
+    415 => 'Unsupported Media Type',
+    416 => 'Range Not Satisfiable',
+    417 => 'Exception Failed',
+    418 => q{I'm a teapot},
+    421 => 'Misdirected Request',
+    422 => 'Unprocessable Content',
+    423 => 'Locked',
+    424 => 'Failed Dependency',
+    425 => 'Too Early',
+    426 => 'Upgrade Required',
+    428 => 'Precondition Required',
+    429 => 'Too Many Requests',
+    431 => 'Request Header Fields Too Large',
+    451 => 'Unavailable For Legal Reasons',
+
+    500 => 'Internal Server Error',
+    501 => 'Not Implemented',
+    502 => 'Bad Gateway',
+    503 => 'Service Unavailable',
+    504 => 'Gateway Timeout',
+    505 => 'HTTP Version Not Supported',
+    506 => 'Variant Also Negotiates',
+    507 => 'Insufficient Storage',
+    508 => 'Loop Detected',
+    510 => 'Not Extended',
+    511 => 'Network Authentication Required',
+
+);
+
 sub curl_error {
 
     my ($code) = @_;
@@ -123,7 +199,13 @@ sub curl {
     my $proxy        = $param{ proxy        } // undef;
     my $proxy_user   = $param{ proxy_user   } // undef;
 
-    my @cmd = ('curl', '-o', $output);
+    my $tmp = do {
+        my ($h, $p) = tempfile(UNLINK => 1);
+        close $h;
+        $p;
+    };
+
+    my @cmd = ('curl', '-D', $tmp, '-o', $output);
 
     if (!$verbose) {
         push @cmd, '-s';
@@ -177,7 +259,58 @@ sub curl {
 
     system @cmd;
 
-    return $? == -1 ? $? : $? >> 8;
+    my $exit = $? == -1 ? $? : $? >> 8;
+    my ($resp, $head) = -s $tmp ? parse_http_header($tmp) : (undef, {});
+
+    return ($exit, $resp, $head);
+
+}
+
+sub parse_http_header {
+
+    my ($file) = @_;
+
+    open my $fh, '<', $file
+        or die "Failed to open $file for reading: $!\n";
+    binmode $fh;
+    my ($resp, @lines) = do { local $/ = "\r\n"; <$fh> };
+    close $fh;
+
+    $resp =~ s/\r\n$//;
+    my @resp_parts = split /\s+/, $resp, 3;
+    if (@resp_parts == 2) {
+        $resp_parts[2] = '';
+    } elsif (@resp_parts != 3) {
+        die "invalid HTTP response header";
+    }
+
+    my %head;
+    for my $l (@lines) {
+        $l =~ s/\r\n$//;
+        if ($l eq '') {
+            last;
+        }
+        my ($k, $v) = split /:/, $l, 2;
+        if (not defined $v) {
+            die "invalid HTTP response header";
+        }
+        $v =~ s/^\s+|\s+$//g;
+        $head{ lc $k } = $v;
+    }
+
+    return (\@resp_parts, \%head);
+
+}
+
+sub http_status_string {
+
+    my ($status) = @_;
+
+    if (not exists $HTTP_CODES{ $status }) {
+        die "'$status' is not a valid HTTP status code";
+    }
+
+    return $HTTP_CODES{ $status };
 
 }
 
@@ -205,14 +338,15 @@ Subroutines are not automatically exported.
 
 =over 4
 
-=item $rt = curl($link, $output, [ %param ])
+=item ($rt, \@resp, \%head) = curl($link, $output, [ %param ])
 
 L<curl(1)> C<$link> and download it to C<$output>. C<%param> is an optional
 hash argument of additional parameters to pass.
 
 Returns the exit code of L<curl(1)>. A return value of C<0> means
 success, non-zero means failure. C<curl_error()> can be used to describe
-the return value.
+the return value. Also returns the return values of C<parse_http_header()> on
+the reponse's header.
 
 The following are valid fields for the C<%param> hash:
 
@@ -277,7 +411,7 @@ to none.
 
 =item proxy_user
 
-Username and password to use for proxy, seperated by a colon (C<user:pwd>).
+Username and password to use for proxy, separated by a colon (C<user:pwd>).
 Corresponds to L<curl(1)>'s C<--proxy-user> option. Defaults to none.
 
 =back
@@ -285,6 +419,19 @@ Corresponds to L<curl(1)>'s C<--proxy-user> option. Defaults to none.
 =item $desc = curl_error($rt)
 
 Returns the string description of the C<curl()> exit code C<$rt>.
+
+=item (\@response, \%head) = parse_http_header($file)
+
+Parses the HTTP header in C<$file>. C<\@response> is an array ref containing
+the reponses's information. The first element is the protocol information, the
+second is the HTTP status code, and the third is a string providing extra
+information about the reponse. C<\%head> is a hash of data provided by the
+response's header fields.
+
+=item $desc = http_status_string($code)
+
+Returns the string description of the HTTP status code C<$code>. Dies if
+C<$code> is not a valid status code.
 
 =back
 

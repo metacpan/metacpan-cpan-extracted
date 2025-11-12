@@ -1,6 +1,23 @@
 Changelog for HealthCheck-Parallel
 
-v0.0.2 2023-03-28T15:40:10
+v0.1.0 2025-11-11T20:05:17
+ - Regenerate LICENSE and README (Andrew Hewus Fresh)
+ - Pull in Makefile changes from upstream (Andrew Hewus Fresh)
+ - Pull request #2: Add top-level / global timeout support (Mitch
+   McCracken)
+ - Support coderefs for timeout & max_procs args (Mitch McCracken)
+ - Return results for each check killed/not started (Mitch McCracken)
+ - Handle circular reference in run_on_wait() (Mitch McCracken)
+ - Remove unnecessary helper (Mitch McCracken)
+ - Simplify _validate_max_procs() (Mitch McCracken)
+ - Exit child immediately on timeout & simplify code (Mitch McCracken)
+ - Sleep for same amount as P:FM in reap loop (Mitch McCracken)
+ - Remove unreachable code (Mitch McCracken)
+ - Use non-blocking / non-signal based timeout (Mitch McCracken)
+ - Don't set $SIG{ALRM} when parallization isn't used (Mitch McCracken)
+ - Add top-level / global timeout support (Mitch McCracken)
+
+v0.0.2 2023-03-27T18:38:10
  - No changes found
 
 v0.0.1 2023-03-27T18:38:10

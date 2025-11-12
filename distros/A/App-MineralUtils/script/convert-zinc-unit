@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-09-26'; # DATE
+our $DATE = '2025-11-12'; # DATE
 our $DIST = 'App-MineralUtils'; # DIST
-our $VERSION = '0.023'; # VERSION
+our $VERSION = '0.024'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/MineralUtils/convert_zinc_unit",
@@ -39,13 +39,13 @@ convert-zinc-unit - Convert a zinc quantity from one unit to another
 
 =head1 VERSION
 
-This document describes version 0.023 of convert-zinc-unit (from Perl distribution App-MineralUtils), released on 2025-09-26.
+This document describes version 0.024 of convert-zinc-unit (from Perl distribution App-MineralUtils), released on 2025-11-12.
 
 =head1 SYNOPSIS
 
-B<convert-zinc-unit> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+B<convert-zinc-unit> B<L<--help|/"--help">>
 
-B<convert-zinc-unit> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+B<convert-zinc-unit> B<L<--version|/"--version">>
 
 B<convert-zinc-unit> [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- [I<L<quantity|/"--quantity=s">>] [I<L<to_unit|/"--to-unit=s">>]
 
@@ -149,7 +149,7 @@ suitable default, e.g. the browser, is chosen.
 
 =over
 
-=item B<--help>, B<-h>, B<-?>
+=item B<--help>, B<-h>
 
 Display help message and exit.
 

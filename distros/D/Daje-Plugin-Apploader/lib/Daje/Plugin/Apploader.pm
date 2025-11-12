@@ -64,8 +64,8 @@ use CPAN;
 # ===========
 #
 # Daje::Plugin::Apploader is a simple apploader for the Daje server.
-# It automatically installs missing / installs newer versions of
-# modules from cpan if told to
+# It automatically installs missing / updates to newer versions of
+# modules from cpan if told to.
 #
 # LICENSE
 # =======
@@ -81,7 +81,7 @@ use CPAN;
 # janeskil1525 E<lt>janeskil1525@gmail.comE<gt>
 #
 
-our $VERSION = "0.10";
+our $VERSION = "0.20";
 
 sub register ($self, $app, $config) {
 
@@ -172,7 +172,7 @@ sub _find_missing_modules($self, $plugin, $modules, $install) {
 
     for(my $i = 0; $i < $length; $i++) {
         my $class = @{$modules}[$i]->{namespace} . "::" . $plugin;
-        if (!grep(/^$class$/, @{$modules->{modules}})) {
+        if (!grep(/^$class$/, @{$modules})) {
             if (!grep(/^$class$/, @{$install})) {
                 push @{$install}, $class;
             } elsif (grep(/^$class$/, @{$install})) {
@@ -226,6 +226,7 @@ sub _plugin_options($self, $app, $name, $options) {
 }
 1;
 __END__
+
 
 
 
@@ -295,16 +296,22 @@ during starup of the Daje server
 
 
 Daje::Plugin::Apploader is a simple apploader for the Daje server.
-It automatically installs missing / installs newer versions of
-modules from cpan if told to
+It automatically installs missing / updates to newer versions of
+modules from cpan if told to.
 
 
 
 =head1 REQUIRES
 
+L<CPAN> 
+
 L<Daje::Database::Migrator> 
 
 L<Mojo::Loader> 
+
+L<List::Util> 
+
+L<Data::Dumper> 
 
 L<v5.42> 
 

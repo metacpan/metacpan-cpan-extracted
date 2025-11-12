@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-09-26'; # DATE
+our $DATE = '2025-11-12'; # DATE
 our $DIST = 'App-MineralUtils'; # DIST
-our $VERSION = '0.023'; # VERSION
+our $VERSION = '0.024'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/MineralUtils/convert_magnesium_unit",
@@ -39,13 +39,13 @@ convert-magnesium-unit - Convert a magnesium quantity from one unit to another
 
 =head1 VERSION
 
-This document describes version 0.023 of convert-magnesium-unit (from Perl distribution App-MineralUtils), released on 2025-09-26.
+This document describes version 0.024 of convert-magnesium-unit (from Perl distribution App-MineralUtils), released on 2025-11-12.
 
 =head1 SYNOPSIS
 
-B<convert-magnesium-unit> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+B<convert-magnesium-unit> B<L<--help|/"--help">>
 
-B<convert-magnesium-unit> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+B<convert-magnesium-unit> B<L<--version|/"--version">>
 
 B<convert-magnesium-unit> [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- [I<L<quantity|/"--quantity=s">>] [I<L<to_unit|/"--to-unit=s">>]
 
@@ -77,7 +77,7 @@ Can also be specified as the 1st command-line argument.
 
 Valid values:
 
- ["mg","mg-mg-elem","mg-trimagnesium-dicitrate","mg-mg-citrate-dibasic","mg-mg-citrate-anhydrous","mg-mg-citrate-anhydrous-nowfoods","mg-mg-citrate-nonahydrate","mg-mg-glycinate-anhydrous","mg-mg-bisglycinate-anhydrous","mg-mg-bisglycinate-nowfoods","mg-mg-ascorbate-dihydrate","mg-mg-pidolate","mg-mg-l-threonate","mg-mg-oxide-anhydrous","mg-magshape","mg-mg-lactate-anhydrous","mg-mg-lactate-dihydrate","mg-mg-chloride-ah","mg-mg-chloride-hexahydrate","mg-mg-malate","mg-mg-malate-trihydrate","mg-mg-sulfate-anhydrous","mg-mg-sulfate-monohydrate","mg-mg-sulfate-heptahydrate","mg-mg-carbonate-anhydrous","mg-mg-carbonate-trihydrate","mg-mg-hydroxide-anhydrous","mg-mg-hydroxide-pentahydrate","mg-mg-acetate-anhydrous","mg-mg-acetate-tetrahydrate","mg-mg-gluconate-dihydrate","mg-mg-gluconate-hydrate","mg-mg-glycerophosphate-anhydrous","mg-mg-glycerophosphate-hydrate","mg-trimagnesium-orthophosphate-anhydrous","mg-sunactive-mg","mg-mg-taurate"]
+ ["mg","mg-mg-elem","mg-trimagnesium-dicitrate","mg-mg-citrate-dibasic","mg-mg-citrate-anhydrous","mg-mg-citrate-anhydrous-nowfoods","mg-mg-citrate-nonahydrate","mg-mg-glycinate-anhydrous","mg-mg-bisglycinate-anhydrous","mg-mg-bisglycinate-nowfoods","mg-mg-ascorbate-dihydrate","mg-mg-pidolate","mg-mg-l-threonate","mg-mg-oxide-anhydrous","mg-magshape","mg-mg-lactate-anhydrous","mg-mg-lactate-dihydrate","mg-mg-chloride-ah","mg-mg-chloride-hexahydrate","mg-mg-malate","mg-mg-malate-trihydrate","mg-mg-sulfate-anhydrous","mg-mg-sulfate-monohydrate","mg-mg-sulfate-heptahydrate","mg-mg-carbonate-anhydrous","mg-mg-carbonate-trihydrate","mg-mg-hydroxide-anhydrous","mg-mg-hydroxide-pentahydrate","mg-mg-acetate-anhydrous","mg-mg-acetate-tetrahydrate","mg-mg-gluconate-dihydrate","mg-mg-gluconate-hydrate","mg-mg-glycerophosphate-anhydrous","mg-mg-glycerophosphate-hydrate","mg-trimagnesium-orthophosphate-anhydrous","mg-sunactive-mg","mg-mg-taurate","mg-mg-stearate-anhydrous"]
 
 Can also be specified as the 2nd command-line argument.
 
@@ -149,7 +149,7 @@ suitable default, e.g. the browser, is chosen.
 
 =over
 
-=item B<--help>, B<-h>, B<-?>
+=item B<--help>, B<-h>
 
 Display help message and exit.
 
@@ -237,6 +237,7 @@ For fish and zsh, install L<shcompgen> as described above.
  |  3.610 |  27.739 | 1.000  | mg-trimagnesium-orthophosphate-anhydrous | Trimagnesium orthophosphate (Mg3O8P2), in milligrams                                                                                              |
  |  8.333 |  12.000 | 1.000  | mg-sunactive-mg                          | SunActive Magnesium (a micronized, microencapsulated form of trimagnesium orthophosphate), in milligrams                                          |
  | 11.236 |   8.916 | 1.000  | mg-mg-taurate                            | Magnesium taurate (C4H12MgN2O6S2), in milligrams                                                                                                  |
+ | 24.390 |   4.111 | 1.000  | mg-mg-stearate-anhydrous                 | Magnesium stearate anhydrous (Mg(C18H35O2)2), in milligrams                                                                                       |
  +--------+---------+--------+------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------+
 
 =head2 How much of magnesium oxide provides 350 mg of elemental magnesium?
@@ -282,6 +283,7 @@ For fish and zsh, install L<shcompgen> as described above.
  15.385	6.489	1.000	mg-mg-ascorbate-dihydrate	Magnesium ascorbate hydrate (C12H14MgO12) [anhydrous and dihydrate are the most common hydrate forms of Mg-ascorbate at room temp], in milligrams
  17.857	5.618	1.000	mg-mg-gluconate-hydrate	Magnesium gluconate dihydrate (C12H26MgO16), in milligrams
  18.519	5.394	1.000	mg-mg-gluconate-dihydrate	Magnesium gluconate dihydrate (C12H26MgO16), in milligrams
+ 24.390	4.111	1.000	mg-mg-stearate-anhydrous	Magnesium stearate anhydrous (Mg(C18H35O2)2), in milligrams
  25.000	3.963	1.000	mg-mg-citrate-nonahydrate	Magnesium citrate nonahydrate ((C6H5O7)2Mg3 \xC2\xB7 9H2O, C12H28Mg3O23) [most common hydrate form of Mg-citrate at room temp], in milligrams
 
 =head1 HOMEPAGE

@@ -1,0 +1,130 @@
+=encoding utf-8
+
+=head1 NAME
+
+MouseX::OO_Modulino - Turn your Mouse class into JSON-aware Object-Oriented Modulino.
+
+=head1 SYNOPSIS
+
+    #!/usr/bin/env perl
+    package MyModule;
+    use MouseX::OO_Modulino -as_base; # ← use Mouse;
+
+    has foo => (is => 'ro', default => 'FOO');
+    sub funcA { [shift->foo , "A", @_] }
+
+    __PACKAGE__->cli_run(\@ARGV) unless caller; # ← Modulino!
+    1;
+
+Then you can do below from command-line:
+
+    % ./MyModule.pm foo
+    FOO
+    % ./MyModule.pm --foo=BAR foo
+    BAR
+    %  ./MyModule.pm --foo='{"foo":3,"bar":8}' funcA '[3,4,5]'
+    [{"foo":3,"bar":8},"A",[3,4,5]]
+
+=head1 DESCRIPTION
+
+MouseX::OO_Modulino is a base class to extend your Mouse class to be
+an B<OO Modulino(Object-Oriented Modulino)>. OO Modulino is an extension of L<Modulino|https://perlmaven.com/modulino-both-script-and-module> that adds an initialization and
+method dispatch mechanism, allowing any method to be invoked as a CLI
+subcommand.
+
+OO Modulino introduces a consistent set of conventions to the Modulino's CLI, inspired by CLI tools with subcommands like git:
+
+    program [GLOBAL_OPTIONS] COMMAND [COMMAND_ARGS]
+
+=over 4
+
+=item C<GLOBAL_OPTIONS>: Passed to constructor (C<--key=value> format)
+
+=item C<COMMAND>: Method name to invoke
+
+=item C<COMMAND_ARGS>: Arguments to the method
+
+=back
+
+By introducing this calling convention to the Modulino's CLI, it becomes possible to easily test any method of a module from the command line. This is an extremely valuable characteristic for both module developers and those who test the module later.
+
+
+=head1 METHODS
+
+=head2 C<cli_run(\@ARGV, \%shortcuts)>
+
+  __PACKAGE__->cli_run(\@ARGV) unless caller;
+
+  # With option shortcuts
+  __PACKAGE__->cli_run(\@ARGV, {h => 'help', v => 'verbose'}) unless caller;
+
+Main entry point for CLI execution. Parses arguments, creates an instance,
+and invokes the appropriate method. Options before the command become
+constructor arguments, remaining arguments are passed to the method.
+
+Option format: C<--name> or C<--name=value> (no space between name and value).
+
+JSON values in options and arguments are automatically decoded:
+
+=for code sh
+
+  $ ./MyScript.pm --config='{"port":8080}' process '[1,2,3]'
+
+=head1 OPTIONS
+
+These options control CLI behavior and are processed by C<cli_run>:
+
+=over 4
+
+=item C<--help>
+
+Show help message and exit
+
+=item C<--quiet>
+
+Suppress normal output
+
+=item C<--scalar>
+
+Evaluate methods in scalar context (default is list context)
+
+=item C<--output=FORMAT>
+
+Output format: C<jsonl> (default), C<json>(alias of jsonl), C<dump>
+
+=item C<--undef_as=STRING>
+
+How to represent undef in TSV output (default: "null")
+
+=item C<--no_exit_code>
+
+Don't set exit code based on results
+
+=item C<--binary>
+
+Keep STDIN/STDOUT/STDERR in binary mode (no UTF-8 encoding)
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<MOP4Import::Base::CLI_JSON>
+
+=item * L<OO Modulino Pattern|https://github.com/hkoba/perl-mop4import-declare/blob/master/docs/OO_Modulino.md>
+
+
+=back
+
+=head1 LICENSE
+
+Copyright (C) Kobayasi, Hiroaki.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Kobayasi, Hiroaki E<lt>buribullet@gmail.comE<gt>
+

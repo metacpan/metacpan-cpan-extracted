@@ -1,0 +1,205 @@
+=head1 NAME
+
+Chess::Plisco::Tablebase::Syzygy - Perl interface to Syzygy endgame table bases
+
+=head1 SYNOPSIS
+
+    $tb = Chess::Plisco::Tablebase::Syzygy->new("./3-4-5");
+
+=head1 DESCRIPTION
+
+The module B<Chess::Plisco::Tablebase::Syzygy> allows access to end-game
+table bases in Syzygy format.
+
+This module has been added in version 7.0.0.
+
+Syzygy endgame tables have been developed by Ronald de Man. They store the
+outcome of every possible game of chess with up to 7 pieces.  They allow
+probing for a win/draw/loss (WDL) or for the "distance to zero" (DTZ) for
+a particular position.
+
+=head2 WDL (win/draw/loss)
+
+These probes should be done during search. They simply give the information
+whether a mate can be forced in a particular position or not.
+
+A probe only makes sense if the half move counter is 0, in other words after
+a pawn move or a capture. Rationale: If the WDL probe reports a win but that
+win happens to take exactly fifty moves, the position is really a draw, when
+the fifty move counter is not 0.
+
+For an engine, this should normally not matter if it probes all positions
+wherer possible. But it can be a problem if because of missing tables
+one or more non-optimal quiet moves have been made.
+
+=head2 Cursed Wins and Blessed Losses
+
+While generating the tables, it turned out that there are quite a few positions
+with 7 pieces or less where a mate can be forced but not within 50 moves.
+A position where the side to move can force a mate but in more than 50 moves,
+is called a cursed win. A position where checkmate can be delivered to the side
+to move but even with optimal play from both sides but not within 50 moves is
+called a blessed loss.
+
+Under normal circumstances such positions should be considered a draw because
+the side that is on loss can claim a draw.
+
+For cursed wins and blessed losses, the results of DTZ probes may be off by
+one. In order to save space the least significant bit of the DTZ value is
+discarded. This should normally not matter because the positions are a draw
+under the 50-move-rule.
+
+=head2 DTZ (distance to zero)
+
+This gives the number of half moves that the side to move needs to force a
+reset of the half move clock to 0. This is B<not> the distance to mate (DTM)!
+
+The half move clock is reset to 0 when a pawn moves, a piece is captured, or
+one side loses castling rights by moving a king or rook from its initial
+position. Keep in mind, however, that positions with castling rights are not
+contained in the database!
+
+Minimizing a positive DTZ will sooner or later force a mate but not necessarily
+in the most elegant manner. Minimizing a negative DTZ will result in optimal
+play.
+
+To understand the difference, imagine end endgame king, queen, and rook against
+a lone king. Minimizing DTZ will ultimately lead to a move of one of these
+types:
+
+=over 8
+
+=item - a checkmate
+
+=item - a rook sacrifice
+
+=item - a queen sacrifice
+
+=back
+
+The last two options may not look too smart but once one of the not strictly
+necessary pieces has left the board, the next zero point will be checkmate.
+
+If two engines play against each other, this is perfectly alright because there
+are no extra points for a mate with fewer moves. Trying to find it is a waste
+of CPU circles.
+
+If, however, an engine is used for game analysis, it should only follow the
+DTZ strategy if the mate cannot be found in the time given.
+
+=head2 Castling
+
+The tablebase files do not contain positions where castling is possible. With
+a maximum of 7 pieces on the board such positions are relatively rare anyhow.
+
+=head2 En Passant
+
+The tablebase files so also not contain positions where en passant is possible.
+However, the library works around this limitation. If a position is probed
+where en passant is possible, the probed value is not returned immediately.
+Instead, all en passant captures are tried out and the resulting positions
+are probed as well. Depending on the outcome of these additional probes,
+the result is corrected accordingly.
+
+Example 1: The initial probe reports a draw. But if a pawn can be captured
+en passant, the position may turn into a win.
+
+Example 2: The initial probe reports a draw because of a stalemate. But it
+could happen that an en passant capture is possible. That means that the
+position is actually not a stalemate. Since the capture is the only legal
+move, it has to be done and the resulting game may be a loss.
+
+=head1 CONSTRUCTOR
+
+=over 4
+
+=item B<new PATH[, OPTIONS]>
+
+Initialize the database located at B<PATH>.
+
+Throws an exception in case of an error.
+
+You may pass additional options as a hash reference B<OPTIONS>:
+
+=over 8
+
+=item B<load_wdl>
+
+Whether to load WDL files, default true.
+
+=item B<load_dtz>
+
+Whether to load DTZ files, default true.
+
+=item B<max_fds>
+
+Maximum number of open file descriptors, default 128.
+
+=item B<recursive>
+
+Whether search recursively for files.
+
+=back
+
+=back
+
+=head1 METHODS
+
+=over 4
+
+=item B<probeWdl POSITION>
+
+Does a WDL probe for the L<Chess::Plisco> object B<POSITION>. Returns +2 for
+a forced win, -2 for a forced loss, 0 for a draw. All results take the 50
+move rule into account. A return value of +1 means a cursed win, a return value
+of -1 is a blessed loss. These should also be considered a draw.
+
+The method may throw an exception. One common cause is a missing table.
+
+=item B<safeProbeWdl POSITION, DEFAULT>
+
+Like B<probeWdl()> but returns B<DEFAULT> if an exception occurs.  If you
+omit B<DEFAULT>, C<undefined> is returned.
+
+=item B<probeDtz POSITION>
+
+Does a DTZ probe for the L<Chess::Plisco> object B<POSITION>. It returns a
+positive value for positions where a mate can beforced, and a negative value
+for positions where a loss is unavoidable. A return value of 0 means a draw.
+
+The absolute value of the return value gives the number of half moves until
+the winning side can force a reset of the half move counter to 0 either by
+a pawn move, a capture, or a checkmate.
+
+=item B<safeProbeDtz POSITION, DEFAULT>
+
+Like B<probeDtz()> but returns B<DEFAULT> if an exception occurs.  If you
+omit B<DEFAULT>, C<undefined> is returned.
+
+=item B<addDirectory DIRECTORY>
+
+Adds files from B<DIRECTORY> to the database.
+
+=item B<largestWdl>
+
+Returns the maximum number of pieces for which WDL probes can be done. A value
+of 0 means that no WDL tables have been found.
+
+=item B<largestDtz>
+
+Returns the maximum number of pieces for which WDL probes can be done. A value
+of 0 means that no DTZ tables have been found.
+
+=item B<largest>
+
+Returns the maximum of B<largestWdl> and B<largestDtz>.
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright (C) 2021-2025 Guido Flohr <guido.flohr@cantanea.com>.
+
+=head1 SEE ALSO
+
+L<Chess::Plisco>(3pm), fathom(1), perl(1)

@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = "0.06";
+our $VERSION = "0.07";
 
 use MOP4Import::Base::CLI_JSON -as_base
   , [fields =>
@@ -78,7 +78,9 @@ sub zsh_options {
     my $optSpec;
     if (ref (my FieldSpec $spec = $_)) {
       $optSpec = "--$spec->{name}=-";
-      $optSpec .= "[$spec->{doc}]" if $spec->{doc};
+      if ($spec->{doc}) {
+        $optSpec .= "[".$self->zsh_escape_doc($spec->{doc})."]"
+      }
       if ($spec->{zsh_completer}) {
         $optSpec .= $spec->{zsh_completer};
       }
@@ -87,6 +89,12 @@ sub zsh_options {
     }
     $optSpec;
   } @grouped;
+}
+
+sub zsh_escape_doc {
+  (my MY $self, my $doc) = @_;
+  $doc =~ s/[\\\[\]]/\\$&/g;
+  $doc;
 }
 
 sub zsh_methods {

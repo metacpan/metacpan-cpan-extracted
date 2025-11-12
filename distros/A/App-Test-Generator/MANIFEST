@@ -1,5 +1,6 @@
 bin/fuzz-harness-generator
 Changes
+doc/getting-started-blog.md
 lib/App/Test/Generator.pm
 LICENSE
 Makefile.PL
@@ -23,6 +24,7 @@ t/conf/html_genealogy_map.yml
 t/eof.t
 t/eol.t
 t/errors.t
+t/fuzz.t
 t/generate.t
 t/html_genealogy_map.t
 t/pod-cm.t

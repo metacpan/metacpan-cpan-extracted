@@ -1,0 +1,37 @@
+=head1 NAME 
+
+Chess::Plisco::EPD::Record - A single EPD Record
+
+=head1 SYNOPSIS
+
+    die "do not instantiate objects of this type";
+
+=head1 DESCRIPTION
+
+B<Chess::Plisco::EPD::Record> represents one line from an EPD file.
+
+=head1 METHODS
+
+=over 4
+
+=item B<position>
+
+Returns the position as a L<Chess::Plisco> object.
+
+=item B<operations>
+
+Returns all operations (like "bm", "ce", ...) as a hash reference.
+
+=item B<operation ID>
+
+Returns the operation B<ID> or a falsy value if not found.
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright (C) 2021-2025 Guido Flohr <guido.flohr@cantanea.com>.
+
+=head1 SEE ALSO
+
+L<Chess::Plisco>, perl(1)

@@ -16,10 +16,12 @@ use Getopt::Long;
 
 use Chess::Plisco qw(:all);
 use Chess::Plisco::Tablebase::Syzygy;
+use Chess::Plisco::Tablebase::SearchTree;
 
 sub display_usage;
 sub usage_error;
 sub version_information;
+sub print_pv;
 
 my %options = (
 	path => $ENV{TB_PATH}
@@ -45,8 +47,6 @@ my $tb = Chess::Plisco::Tablebase::Syzygy->new($options{path});
 my $largest = $tb->largest;
 if (!defined $largest) {
 	usage_error __"Error initializing tablebase.";
-} elsif (!$largest) {
-	usage_error __"No tablebase files found.";
 }
 
 my $position = eval { Chess::Plisco->new($fen) };
@@ -55,19 +55,112 @@ if (!$position) {
 	usage_error $error;
 }
 
-my $num_pieces = $position->bitboardPopcount($position->[CP_POS_BLACK_PIECES]
-		| $position->[CP_POS_WHITE_PIECES]);
-if ($num_pieces > $largest) {
-	die __x("Position has too many pieces ({pieces}) "
-			. " but the tablebase has a maximum of {largest}.\n",
-		pieces => $num_pieces, largest => $largest);
+my $wdl = $tb->probeWdl($position);
+
+my @wdl_to_name_str = (
+	"Loss",
+	"BlessedLoss",
+	"Draw",
+	"CursedWin",
+	"Win",
+);
+
+my $wdl_result = $wdl_to_name_str[$wdl + 2];
+my $result;
+if ($wdl < 0) {
+	$result = "0-1";
+} elsif ($wdl > 0) {
+	$result = "1-0";
+} else {
+	$result = "1/2-1/2";
 }
 
-my @legal_moves = $position->legalMoves;
-my $res = $tb->probeRoot($position, \@legal_moves);
-if ($res == TB_RESULT_FAILED) {
-	die __"Tablebase probe failed; position not found in tablebase or "
-		. "invalid.\n";
+my $pgn = <<EOF;
+[Event ""]
+[Site ""]
+[Date "??"]
+[Round] "-"]
+[White "Syzygy"]
+[Black "Syzygy"]
+[Result "$result"]
+[FEN "$fen"]
+[WDL "$wdl_result"]
+EOF
+
+my $wdl_moves = print_wdl_moves($tb, $position);
+$pgn .= $wdl_moves;
+
+# Test position: 8/7k/8/5K2/8/8/1Q4p1/8 w - - 0 1
+my $tree = Chess::Plisco::Tablebase::SearchTree->new($tb);
+my @pv = $tree->search($position, $wdl);
+$pgn .= print_pv $position, @pv;
+
+print $pgn;
+
+sub print_pv {
+	my ($_pos, @pv) = @_;
+
+$DB::single = 1;
+	my $pos = $_pos->copy;
+
+	my $output = "\n1.";
+	my $ply = 0;
+	if ($pos->toMove == CP_BLACK) {
+		$output .= '..';
+		++$ply;
+	}
+
+	while (@pv) {
+		if ($ply && !($ply & 1)) {
+			my $movenum = ($ply >> 1) + 1;
+			$output .= " $movenum.";
+		}
+		++$ply;
+
+		my $move = shift @pv;
+		#$pos->doMove($move);
+		#my $san = $pos->SAN($move);
+
+		$output .= " $move";
+	}
+
+	return $output . "\n";
+}
+
+sub print_wdl_moves {
+	my ($tb, $pos) = @_;
+
+	my (@wins, @draws, @losses, @unknown);
+	foreach my $move ($pos->legalMoves) {
+		my $san = $pos->SAN($move);
+		my $undo = $pos->doMove($move);
+		my $wdl = $tb->getWdl($pos);
+		$pos->undoMove($undo);
+
+		# The WDL value is now from the other side's perspective!
+		if (!defined $wdl) {
+			push @unknown, $wdl;
+		} elsif ($wdl == 2) {
+			push @losses, $san;
+		} elsif ($wdl == -1 || $wdl == 0 || $wdl == 1) {
+			push @draws, $san;
+		} elsif ($wdl == -2) {
+			push @wins, $san;
+		} else {
+			push @unknown, $san;
+		}
+	}
+
+	my @report = (
+		qq([WinningMoves "@{[join ', ', @wins]}"]),
+		qq([DrawingMoves "@{[join ', ', @draws]}"]),
+		qq([LosingMoves "@{[join ', ', @losses]}"]),
+	);
+	if (@unknown) {
+		push @report, qq([UnknownOutcomeMoves "@{[join ', ', @unknown]}"]);
+	}
+
+	return join "\n", @report, '';
 }
 
 sub display_usage {
@@ -128,12 +221,14 @@ sub version_information {
 
 	print __x(<<EOF, program => $0, package => $package, version => $version);
 {program} ({package}) {version}
-Copyright (C) 2021 Guido Flohr <guido.flohr\@cantanea.com>.
+Copyright (C) 2021-2025 Guido Flohr <guido.flohr\@cantanea.com>.
 License: WTFPL2 <http://www.wtfpl.net/>
 This program is free software. It comes without any warranty, to
 the extent permitted by applicable law.
 EOF
 }
+
+1;
 
 =head1 NAME
 

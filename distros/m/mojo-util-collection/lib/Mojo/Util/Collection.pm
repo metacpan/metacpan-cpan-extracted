@@ -2,12 +2,13 @@ package Mojo::Util::Collection;
 use Mojo::Base -base;
 
 use Exporter 'import';
+use Mojo::Util::Model;
 
 our @EXPORT_OK = qw(
     collect
 );
 
-our $VERSION = '0.0.13';
+our $VERSION = '0.0.17';
 
 use List::Util;
 use Scalar::Util qw(blessed);
@@ -314,6 +315,23 @@ sub indexOf {
     return $index;
 }
 
+=head2 intersect
+
+    Return a new collection containing only items that exist in both collections
+
+    Returns:
+    C<Collection> of C<Model> objects
+
+=cut
+
+sub intersect {
+    my ($self, $other_collection) = @_;
+
+    return $self->search({
+        $self->model->primary_key => $other_collection->lists($other_collection->model->primary_key),
+    });
+}
+
 =head2 last
 
     Get last object
@@ -374,6 +392,24 @@ sub min {
     my $values = $self->lists($field);
 
     return List::Util::min(@$values);
+}
+
+=head2 missing
+
+    Return a new collection containing only items that exist in this collection
+    but not in the other collection
+
+    Returns:
+    C<Collection> of C<Model> objects
+
+=cut
+
+sub missing {
+    my ($self, $other_collection) = @_;
+
+    return $self->exclude({
+        $self->model->primary_key => $other_collection->lists($other_collection->model->primary_key),
+    });
 }
 
 =head2 newObject
@@ -485,6 +521,7 @@ sub orderBy {
 
 sub page {
     my ($self, $page) = @_;
+    $page ||= 1;
 
     my @objects = @{ $self->objects };
 

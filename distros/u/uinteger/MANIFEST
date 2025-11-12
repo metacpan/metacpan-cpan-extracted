@@ -1,5 +1,4 @@
 .github/workflows/testversions.yml
-^uinteger-[0-9]
 Changes
 lib/uinteger.pm
 Makefile.PL

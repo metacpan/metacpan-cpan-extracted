@@ -1,11 +1,11 @@
-package WWW::Noss::Dir;
+package WWW::Noss::Util;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '1.10';
+our $VERSION = '2.00';
 
 use Exporter qw(import);
-our @EXPORT_OK = qw(dir);
+our @EXPORT_OK = qw(dir resolve_url);
 
 use File::Spec;
 
@@ -27,23 +27,53 @@ sub dir {
 
 }
 
+sub resolve_url {
+
+    my ($url, $from) = @_;
+
+    my ($proto, $root, $path) = $from =~ /^(\w+:\/\/)?([^\/]+)(.*)$/;
+    $proto //= '';
+
+    if ($url =~ /^\w+:\/\//) {
+        return $url;
+    }
+
+    if ($proto eq 'shell://' or $proto eq 'file://') {
+        return undef;
+    }
+
+    if ($url =~ /^\/\//) {
+        $url =~ s/^\/\///;
+        return $proto . $url;
+    } elsif ($url =~ /^\//) {
+        return $proto . $root . $url;
+    } else {
+        $url =~ s/^\.\/+//;
+        $root =~ s/\/+[^\/]*$//;
+        return $proto . $root . '/' . $url;
+    }
+
+}
+
 1;
 
 =head1 NAME
 
-WWW::Noss::Dir - dir subroutine
+WWW::Noss::Util - Misc. utility functions for noss
 
 =head1 USAGE
 
-  use WWW::Noss::Dir qw(dir);
+  use WWW::Noss::Util qw(dir resolve_url);
 
   my @files = dir('/');
 
+  my $full_url = resolve_url('/pages', 'https://example.com/home');
+
 =head1 DESCRIPTION
 
-B<WWW::Noss::Dir> is a module that provides the C<dir()>, subroutine, which
-returns a list of files present in the given directory. This is a private
-module, please consult the L<noss> manual for user documentation.
+B<WWW::Noss::Util> is a module that provides various utility functions for
+L<noss>. This is a private module, please consult the L<noss> manual for user
+documentation.
 
 =head1 SUBROUTINES
 
@@ -51,20 +81,25 @@ Subroutines are not exported automatically.
 
 =over 4
 
-=item @files = dir($dir, [ %param ])
+=item @children = dir($dir, [ %param ])
 
-Returns a list of files present in the directory C<$dir>. C<%param> is an
-optional argument of additional parameters.
+Returns list of children files under directory C<$dir>. C<%param> is an
+optional hash of additional parameters.
 
 The following are valid fields in C<%param>:
 
-=over 4
+=over 2
 
 =item hidden
 
 Boolean determining whether to include hidden files or not. Defaults to false.
 
 =back
+
+=item $full_url = resolve_url($url, $from)
+
+Resolves URL C<$url> found on the page linked by C<$from>. Retuns C<undef> if
+the URL could not be resolved.
 
 =back
 

@@ -90,22 +90,28 @@ sub m4i_CODE_ATTR_add {
 }
 
 sub m4i_CODE_ATTR_dict {
-  my ($_pack, $code) = @_;
+  my ($pack, $code) = @_;
 
   $named_code_attributes{$code} //= do {
-    my $atts = +{};
 
     # To make sure infinite recursion of FETCH_CODE_ATTRIBUTES,
     # I want to avoid calling attributes::get($code) here.
-    foreach my $attDesc (_fetch_builtin_attrs($code)) {
-      my ($name, $value) = $attDesc =~ m{^([^\(]+)([\(].*)?\z}
-        or Carp::croak "Can't parse attribute $attDesc";
-      $value =~ s/^\(|\)\z//g if defined $value;
-      $atts->{$name} = $value // 1;
-    }
+    my @atts = _fetch_builtin_attrs($code);
 
-    $atts;
+    m4i_parse_attributes($pack, @atts);
   };
+}
+
+sub m4i_parse_attributes {
+  my ($_pack, @atts) = @_;
+  my $atts = +{};
+  foreach my $attDesc (@atts) {
+    my ($name, $value) = $attDesc =~ m{^([^\(]+)([\(].*)?\z}
+      or Carp::croak "Can't parse attribute $attDesc";
+    $value =~ s/^\(|\)\z//g if defined $value;
+    $atts->{$name} = $value // 1;
+  }
+  $atts;
 }
 
 sub m4i_CODE_ATTR_get {

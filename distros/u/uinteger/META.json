@@ -23,7 +23,8 @@
       "build" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "Test::More" : "0.47"
+            "Test::More" : "0.47",
+            "perl" : "5.016"
          }
       },
       "configure" : {
@@ -54,6 +55,6 @@
          "web" : "https://github.com/tonycoz/perl5-uinteger/"
       }
    },
-   "version" : "1.000",
+   "version" : "1.001",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

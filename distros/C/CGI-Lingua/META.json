@@ -90,6 +90,6 @@
          "x_repository" : "https://github.com/nigelhorne/CGI-Lingua"
       }
    },
-   "version" : "0.77",
+   "version" : "0.78",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

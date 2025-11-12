@@ -10,7 +10,7 @@
 # http://www.wtfpl.net/ for more details.
 
 package Chess::Plisco::Engine;
-$Chess::Plisco::Engine::VERSION = '0.6';
+$Chess::Plisco::Engine::VERSION = 'v0.7.0';
 use strict;
 use integer;
 

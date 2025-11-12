@@ -1,16 +1,16 @@
 package Getopt::EX::Hashed;
 
-our $VERSION = '1.0601';
+our $VERSION = '1.0602';
 
 =encoding utf-8
 
 =head1 NAME
 
-Getopt::EX::Hashed - Hash store object automation for Getopt::Long
+Getopt::EX::Hashed - Hash object automation for Getopt::Long
 
 =head1 VERSION
 
-Version 1.0601
+Version 1.0602
 
 =head1 SYNOPSIS
 
@@ -77,6 +77,7 @@ lock_keys %DefaultConfig;
 our @EXPORT = qw(has);
 
 sub import {
+    my $pkg = shift;
     my $caller = caller;
     no strict 'refs';
     push @{"$caller\::ISA"}, __PACKAGE__;
@@ -84,7 +85,7 @@ sub import {
     my $config = __Config__($caller);
     unless (%$config) {
 	unlock_keys %$config;
-	%$config = %DefaultConfig or die "something wrong!";
+	%$config = %DefaultConfig or die "Failed to initialize config";
 	lock_keys %$config;
     }
 }
@@ -108,7 +109,7 @@ sub configure {
     while (my($key, $value) = splice @_, 0, 2) {
 	if ($key eq 'DEFAULT') {
 	    ref($value) eq 'ARRAY' or die "DEFAULT must be arrayref";
-	    @$value % 2 == 0       or die "DEFAULT have wrong member";
+	    @$value % 2 == 0       or die "DEFAULT has wrong members";
 	}
 	$config->{$key} = $value;
     }
@@ -270,7 +271,7 @@ sub _compile {
     my $spec = do {
 	if    (@spec == 0) { '' }
 	elsif (@spec == 1) { $spec[0] }
-	else               { die }
+	else               { die "Multiple option specs found: @spec" }
     };
     my @names = ($name, @alias);
     for ($name, @alias) {
@@ -375,15 +376,15 @@ __END__
 
 =head1 DESCRIPTION
 
-B<Getopt::EX::Hashed> is a module to automate a hash object to store
-command line option values for B<Getopt::Long> and compatible modules
-including B<Getopt::EX::Long>.  Module name shares B<Getopt::EX>
-prefix, but it works independently from other modules in
-B<Getopt::EX>, so far.
+B<Getopt::EX::Hashed> is a module to automate the creation of a hash
+object to store command line option values for B<Getopt::Long> and
+compatible modules including B<Getopt::EX::Long>.  The module name
+shares the B<Getopt::EX> prefix, but it works independently from other
+modules in B<Getopt::EX>, so far.
 
-Major objective of this module is integrating initialization and
-specification into single place.  It also provides simple validation
-interface.
+The major objective of this module is integrating initialization and
+specification into a single place.  It also provides a simple
+validation interface.
 
 Accessor methods are automatically generated when C<is> parameter is
 given.  If the same function is already defined, the program causes
@@ -394,7 +395,7 @@ Problems may occur when multiple objects are present at the same time.
 
 =head2 B<has>
 
-Declare option parameters in a following form.  The parentheses are
+Declare option parameters in the following form.  The parentheses are
 for clarity only and may be omitted.
 
     has option_name => ( param => value, ... );
@@ -407,22 +408,22 @@ value as a parameter, and also can be used as C<-n>, do the following
 The accessor is created with the first name. In this
 example, the accessor will be defined as C<< $app->number >>.
 
-If array reference is given, multiple names can be declared at once.
+If an array reference is given, multiple names can be declared at once.
 
     has [ 'left', 'right' ] => ( spec => "=i" );
 
-If the name start with plus (C<+>), given parameter updates existing
-setting.
+If the name starts with plus (C<+>), the given parameter updates the
+existing setting.
 
     has '+left' => ( default => 1 );
 
-As for C<spec> parameter, label can be omitted if it is the first
-parameter.
+As for the C<spec> parameter, the label can be omitted if it is the
+first parameter.
 
     has left => "=i", default => 1;
 
-If the number of parameter is not even, default label is assumed to be
-exist at the head: C<action> if the first parameter is code reference,
+If the number of parameters is odd, the first parameter is treated as
+having an implicit label: C<action> if it is a code reference,
 C<spec> otherwise.
 
 Following parameters are available.
@@ -443,12 +444,12 @@ follows.
 
     has start => "=i s begin";
 
-Above declaration will be compiled into the next string.
+The above declaration will be compiled into the following string.
 
     start|s|begin=i
 
-which conform to C<Getopt::Long> definition.  Of course, you can write
-as this:
+which conforms to the C<Getopt::Long> definition.  Of course, you can
+write it as:
 
     has start => "s|begin=i";
 
@@ -457,24 +458,25 @@ is defined with dash (C<->) in place of underscores.
 
     has a_to_z => "=s";
 
-Above declaration will be compiled into the next string.
+The above declaration will be compiled into the following string.
 
     a_to_z|a-to-z=s
 
-If nothing special is necessary, give empty (or white space only)
-string as a value.  Otherwise, it is not considered as an option.
+If no option spec is needed, give an empty (or white space only)
+string as a value.  Without a spec string, the member will not be
+treated as an option.
 
 =item B<alias> => I<string>
 
-Additional alias names can be specified by B<alias> parameter too.
-There is no difference with ones in C<spec> parameter.
+Additional alias names can be specified by the B<alias> parameter too.
+There is no difference from the ones in the C<spec> parameter.
 
     has start => "=i", alias => "s begin";
 
 =item B<is> => C<ro> | C<rw>
 
-To produce accessor method, C<is> parameter is necessary.  Set the
-value C<ro> for read-only, C<rw> for read-write.
+To produce an accessor method, the C<is> parameter is necessary.  Set
+the value C<ro> for read-only, C<rw> for read-write.
 
 Read-write accessor has lvalue attribute, so it can be assigned to.
 You can use like this:
@@ -485,13 +487,13 @@ This is much simpler than writing as in the following.
 
     $app->foo(1) unless defined $app->foo;
 
-If you want to make accessor for all following members, use
-C<configure> to set C<DEFAULT> parameter.
+If you want to make accessors for all following members, use
+C<configure> to set the C<DEFAULT> parameter.
 
     Getopt::EX::Hashed->configure( DEFAULT => [ is => 'rw' ] );
 
-If you don't like assignable accessor, configure C<ACCESSOR_LVALUE>
-parameter to 0.  Because accessor is generated at the time of C<new>,
+If you don't like assignable accessors, configure the C<ACCESSOR_LVALUE>
+parameter to 0.  Because accessors are generated at the time of C<new>,
 this value is effective for all members.
 
 =item B<default> => I<value> | I<coderef>
@@ -499,15 +501,17 @@ this value is effective for all members.
 Set default value.  If no default is given, the member is initialized
 as C<undef>.
 
-If the value is a reference for ARRAY or HASH, new reference with same
-member is assigned.  This means that member data is shared across
-multiple C<new> calls.  Please be careful if you call C<new> multiple
-times and alter the member data.
+If the value is a reference to an ARRAY or HASH, a shallow copy is
+created for each C<new> call.  This means the reference itself is
+copied, but the contents are shared.  Modifying the array or hash
+contents will affect all instances.
 
 If a code reference is given, it is called at the time of B<new> to
 get default value.  This is effective when you want to evaluate the
 value at the time of execution, rather than declaration.  If you want
-to define a default action, use the B<action> parameter.
+to define a default action, use the B<action> parameter.  If you want
+to set code reference as the initial value, you must specify a code
+reference that returns a code reference.
 
 If a reference to SCALAR is given, the option value is stored in the
 data indicated by the reference, not in the hash object member.  In
@@ -527,8 +531,8 @@ When called, hash object is passed as C<$_>.
         $_->{left} = $_->{right} = $_[1];
     };
 
-You can use this for C<< "<>" >> to catch everything.  In that case,
-spec parameter does not matter and not required.
+You can use this for C<< "<>" >> to handle non-option arguments.  In
+that case, the spec parameter does not matter and is not required.
 
     has ARGV => default => [];
     has "<>" => sub {
@@ -537,8 +541,8 @@ spec parameter does not matter and not required.
 
 =back
 
-Following parameters are all for data validation.  First C<must> is a
-generic validator and can implement anything.  Others are shortcut
+Following parameters are all for data validation.  First, C<must> is a
+generic validator and can implement anything.  Others are shortcuts
 for common rules.
 
 =over 7
@@ -546,13 +550,14 @@ for common rules.
 =item B<must> => I<coderef> | [ I<coderef> ... ]
 
 Parameter C<must> takes a code reference to validate option values.
-It takes same arguments as C<action> and returns boolean.  With next
-example, option B<--answer> takes only 42 as a valid value.
+It takes the same arguments as C<action> and returns a boolean.  With
+the following example, option B<--answer> takes only 42 as a valid
+value.
 
     has answer => '=i',
         must => sub { $_[1] == 42 };
 
-If multiple code reference is given, all code have to return true.
+If multiple code references are given, all code must return true.
 
     has answer => '=i',
         must => [ sub { $_[1] >= 42 }, sub { $_[1] <= 42 } ];
@@ -563,12 +568,13 @@ If multiple code reference is given, all code have to return true.
 
 Set the minimum and maximum limit for the argument.
 
-=item B<any> => I<arrayref> | qr/I<regex>/
+=item B<any> => I<arrayref> | qr/I<regex>/ | I<coderef>
 
-Set the valid string parameter list.  Each item is a string or a regex
-reference.  The argument is valid when it is same as, or match to any
-item of the given list.  If the value is not an arrayref, it is taken
-as a single item list (regexpref usually).
+Set the valid string parameter list.  Each item can be a string, a
+regex reference, or a code reference.  The argument is valid when it
+is the same as, or matches any item of the given list.  If the value
+is not an arrayref, it is taken as a single item list (regexpref or
+coderef usually).
 
 Following declarations are almost equivalent, except second one is
 case insensitive.
@@ -591,28 +597,32 @@ value in the list.  Otherwise it causes validation error.
 
 =head2 B<new>
 
-Class method to get initialized hash object.
+A class method that creates a new hash object.  Initializes all
+members with their default values and creates accessor methods as
+configured.  Returns a blessed hash reference.  The hash keys are
+locked if LOCK_KEYS is enabled.
 
 =head2 B<optspec>
 
-Return option specification list which can be given to C<GetOptions>
-function.
+Returns the option specification list which can be passed to the
+C<GetOptions> function.
 
     GetOptions($obj->optspec)
 
-C<GetOptions> has a capability of storing values in a hash, by giving
-the hash reference as a first argument, but it is not necessary.
+C<GetOptions> has the capability of storing values in a hash by
+giving the hash reference as the first argument, but it is not
+necessary.
 
 =head2 B<getopt> [ I<arrayref> ]
 
-Call appropriate function defined in caller's context to process
-options.
+Calls the appropriate function defined in the caller's context to
+process options.
 
     $obj->getopt
 
     $obj->getopt(\@argv);
 
-Above examples are shortcut for following code.
+The above examples are shortcuts for the following code.
 
     GetOptions($obj->optspec)
 
@@ -620,9 +630,9 @@ Above examples are shortcut for following code.
 
 =head2 B<use_keys> I<keys>
 
-Because hash keys are protected by C<Hash::Util::lock_keys>, accessing
-non-existent member causes an error.  Use this function to declare new
-member key before use.
+When LOCK_KEYS is enabled, accessing a non-existent member causes an
+error.  Use this method to declare new member keys before accessing
+them.
 
     $obj->use_keys( qw(foo bar) );
 
@@ -637,56 +647,76 @@ parameter.
 =head2 B<configure> B<label> => I<value>, ...
 
 Use class method C<< Getopt::EX::Hashed->configure() >> before
-creating an object; this information is stored in the area unique for
-calling package.  After calling C<new()>, package unique configuration
-is copied in the object, and it is used for further operation.  Use
-C<< $obj->configure() >> to update object unique configuration.
+creating an object; this information is stored separately for each
+calling package.  After calling C<new()>, the package-level
+configuration is copied into the object for its use.  Use
+C<< $obj->configure() >> to update object-level configuration.
 
-There are following configuration parameters.
+The following configuration parameters are available.
 
 =over 7
 
 =item B<LOCK_KEYS> (default: 1)
 
-Lock hash keys.  This avoids accidental access to non-existent hash
-entry.
+Lock hash keys.  This prevents typos or other mistakes from creating
+unintended hash entries.
 
 =item B<REPLACE_UNDERSCORE> (default: 1)
 
-Produce alias with underscores replaced by dash.
+Automatically create option aliases with underscores replaced by
+dashes.
 
 =item B<REMOVE_UNDERSCORE> (default: 0)
 
-Produce alias with underscores removed.
+Automatically create option aliases with underscores removed.
 
 =item B<GETOPT> (default: 'GetOptions')
 
 =item B<GETOPT_FROM_ARRAY> (default: 'GetOptionsFromArray')
 
-Set function name called from C<getopt> method.
+Set the function name called from the C<getopt> method.
 
 =item B<ACCESSOR_PREFIX> (default: '')
 
-When specified, it is prepended to the member name to make accessor
-method.  If C<ACCESSOR_PREFIX> is defined as C<opt_>, accessor for
-member C<file> will be C<opt_file>.
+When specified, it will be prepended to the member name to make the
+accessor method.  If C<ACCESSOR_PREFIX> is defined as C<opt_>, the
+accessor for member C<file> will be C<opt_file>.
 
 =item B<ACCESSOR_LVALUE> (default: 1)
 
-If true, read-write accessors have lvalue attribute.  Set zero if you
-don't like that behavior.
+If true, read-write accessors have the lvalue attribute.  Set to zero
+if you don't like that behavior.
 
 =item B<DEFAULT>
 
-Set default parameters.  At the call for C<has>, DEFAULT parameters
-are inserted before argument parameters.  So if both include same
-parameter, later one in argument list has precedence.  Incremental
-call with C<+> is not affected.
+Set default parameters.  When C<has> is called, DEFAULT parameters are
+inserted before the explicit parameters.  If a parameter appears in
+both, the explicit one takes precedence.  Incremental calls with C<+>
+are not affected.
 
-Typical use of DEFAULT is C<is> to prepare accessor method for all
+A typical use of DEFAULT is C<is> to prepare accessor methods for all
 following hash entries.  Declare C<< DEFAULT => [] >> to reset.
 
     Getopt::EX::Hashed->configure(DEFAULT => [ is => 'ro' ]);
+
+=begin comment
+
+=item B<INVALID_MSG> (default: built-in error message generator)
+
+Set a code reference to generate error messages for validation
+failures.  The code reference receives the same arguments as the option
+handler ($_[0] is option name, $_[1] is the value for simple options,
+or $_[1] and $_[2] for hash options).  The default function generates
+messages like "--option=value: option validation error".
+
+    Getopt::EX::Hashed->configure(
+        INVALID_MSG => sub {
+            my $opt = shift;
+            "Invalid value for --$opt: @_\n";
+        }
+    );
+
+=end comment
 
 =back
 
@@ -710,7 +740,7 @@ The following copyright notice applies to all the files provided in
 this distribution, including binary files, unless explicitly noted
 otherwise.
 
-Copyright 2021-2024 Kazumasa Utashiro
+Copyright 2021-2025 Kazumasa Utashiro
 
 =head1 LICENSE
 

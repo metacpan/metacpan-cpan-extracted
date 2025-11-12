@@ -1,5 +1,11 @@
 Revision history for Net-IMAP-Client
 
+0.9508  Nov 9, 2025
+
+         - update atom regex to include full set of 7-bit
+           characters allowed by RFC3501 (fixes RT#169466)
+         - and removing two prohibited characters, \ and *
+
 0.9507  Apr 22, 2016
 
         - avoid uninitialized warning (fixes RT#98616)

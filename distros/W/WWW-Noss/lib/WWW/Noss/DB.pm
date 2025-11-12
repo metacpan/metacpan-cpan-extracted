@@ -2,7 +2,7 @@ package WWW::Noss::DB;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '1.10';
+our $VERSION = '2.00';
 
 use List::Util qw(all any max none);
 
@@ -11,6 +11,7 @@ use DBI;
 use JSON;
 
 use WWW::Noss::FeedReader qw(read_feed);
+use WWW::Noss::Util qw(resolve_url);
 
 my %DAY_MAP = (
     0 => 'Sunday',
@@ -21,32 +22,6 @@ my %DAY_MAP = (
     5 => 'Friday',
     6 => 'Saturday',
 );
-
-sub _resolve_url {
-
-    my ($url, $from) = @_;
-
-    my ($proto, $root, $path) = $from =~ /^(\w+:\/\/)?([^\/]+)(.*)$/;
-    $proto //= '';
-
-    if ($url =~ /^\w+:\/\//) {
-        return $url;
-    }
-
-    if ($proto eq 'shell://' or $proto eq 'file://') {
-        return undef;
-    }
-
-    if ($url =~ /^\/\//) {
-        $url =~ s/^\/\///;
-        return $proto . $url;
-    } elsif ($url =~ /^\//) {
-        return $proto . $root . $url;
-    } else {
-        return $url;
-    }
-
-}
 
 sub _initialize {
 
@@ -225,7 +200,7 @@ sub has_feed {
     my ($self, $feed) = @_;
 
     my $name =
-        $feed->isa('WWW::Noss::FeedConfig')
+        eval { $feed->isa('WWW::Noss::FeedConfig') }
         ? $feed->name
         : $feed;
 
@@ -412,7 +387,7 @@ sub feed {
     my ($self, $feed, %param) = @_;
 
     my $name =
-        $feed->isa('WWW::Noss::FeedConfig')
+        eval { $feed->isa('WWW::Noss::FeedConfig') }
         ? $feed->name
         : $feed;
 
@@ -456,7 +431,7 @@ WHERE
         ? decode_json($row->{ skipdays })
         : [];
     if (defined $row->{ link }) {
-        $row->{ link } = _resolve_url($row->{ link }, $row->{ nosslink });
+        $row->{ link } = resolve_url($row->{ link }, $row->{ nosslink });
     }
 
     if ($param{ post_info }) {
@@ -529,7 +504,7 @@ FROM
             ? decode_json($f->{ skipdays })
             : [];
         if (defined $f->{ link }) {
-            $f->{ link } = _resolve_url($f->{ link }, $f->{ nosslink });
+            $f->{ link } = resolve_url($f->{ link }, $f->{ nosslink });
         }
     }
 
@@ -574,7 +549,7 @@ sub post {
     my ($self, $feed, $post) = @_;
 
     my $name =
-        $feed->isa('WWW::Noss::FeedConfig')
+        eval { $feed->isa('WWW::Noss::FeedConfig') }
         ? $feed->name
         : $feed;
 
@@ -647,7 +622,7 @@ WHERE
     # Convert '/foo' and '//foo' relative links
     if (defined $postref->{ link } and $postref->{ link } =~ /^\//) {
         my $feed_info = $self->feed($feed);
-        my $conf = _resolve_url(
+        my $conf = resolve_url(
             $postref->{ link },
             $feed_info->{ link } // $feed_info->{ nosslink }
         );
@@ -663,7 +638,7 @@ sub first_unread {
     my ($self, $feed) = @_;
 
     my $name =
-        $feed->isa('WWW::Noss::FeedConfig')
+        eval { $feed->isa('WWW::Noss::FeedConfig') }
         ? $feed->name
         : $feed;
 
@@ -704,7 +679,7 @@ ORDER BY
     # Convert '/foo' and '//foo' relative links
     if (defined $postref->{ link } and $postref->{ link } =~ /^\//) {
         my $feed_info = $self->feed($feed);
-        my $conf = _resolve_url(
+        my $conf = resolve_url(
             $postref->{ link },
             $feed_info->{ link } // $feed_info->{ nosslink }
         );
@@ -882,7 +857,7 @@ $limit_clause;
                 $feed_info = $self->feed($p->{ feed });
                 $cache{ $p->{ feed } } = $feed_info;
             }
-            my $conv = _resolve_url(
+            my $conv = resolve_url(
                 $p->{ link },
                 $feed_info->{ link } // $feed_info->{ nosslink }
             );
@@ -904,7 +879,7 @@ sub mark {
     my ($self, $mark, $feed, @post) = @_;
 
     my $name =
-        $feed->isa('WWW::Noss::FeedConfig')
+        eval { $feed->isa('WWW::Noss::FeedConfig') }
         ? $feed->name
         : $feed;
 
@@ -944,7 +919,7 @@ sub skip {
     my ($self, $feed) = @_;
 
     my $name =
-        $feed->isa('WWW::Noss::FeedConfig')
+        eval { $feed->isa('WWW::Noss::FeedConfig') }
         ? $feed->name
         : $feed;
 

@@ -1,13 +1,23 @@
+# stuff we don't ship
 ^.gitignore$
 ^\.git/
+
+# build detritus
 ^blib/
-~$
 \.o$
 ^uinteger\.(c|bs)$
 ^MYMETA\.
 ^Makefile$
 ^pm_to_blib$
 ^MANIFEST\.bak$
+
+# editor droppings
+~$
 \.#
 \#$
+
+# dists and distdirs
 ^uinteger-[0-9]
+
+# perf record
+^perf\.data

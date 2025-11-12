@@ -1,7 +1,7 @@
 package Mojo::Util::Model::User;
 use Mojo::Util::Model -base;
 
-our $VERSION = '0.0.13';
+our $VERSION = '0.0.17';
 
 has [qw(id email first_name last_name age)];
 

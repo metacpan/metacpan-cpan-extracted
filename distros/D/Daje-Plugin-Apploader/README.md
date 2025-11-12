@@ -52,14 +52,20 @@ during starup of the Daje server
 # DESCRIPTION
 
 Daje::Plugin::Apploader is a simple apploader for the Daje server.
-It automatically installs missing / installs newer versions of
-modules from cpan if told to
+It automatically installs missing / updates to newer versions of
+modules from cpan if told to.
 
 # REQUIRES
+
+[CPAN](https://metacpan.org/pod/CPAN) 
 
 [Daje::Database::Migrator](https://metacpan.org/pod/Daje%3A%3ADatabase%3A%3AMigrator) 
 
 [Mojo::Loader](https://metacpan.org/pod/Mojo%3A%3ALoader) 
+
+[List::Util](https://metacpan.org/pod/List%3A%3AUtil) 
+
+[Data::Dumper](https://metacpan.org/pod/Data%3A%3ADumper) 
 
 [v5.42](https://metacpan.org/pod/v5.42) 
 

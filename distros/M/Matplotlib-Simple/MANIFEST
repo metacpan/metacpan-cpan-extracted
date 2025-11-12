@@ -8,6 +8,7 @@ README.md
 README.pod
 dist.ini
 lib/Matplotlib/Simple.pm
+md2pod.pl
 mpl.examples.pl
 output.images/add.single.png
 output.images/barplots.png
@@ -25,6 +26,7 @@ output.images/single.array.png
 output.images/single.barplot.png
 output.images/single.boxplot.png
 output.images/single.hexbin.png
+output.images/single.hist.png
 output.images/single.hist2d.png
 output.images/single.pie.png
 output.images/single.violinplot.png

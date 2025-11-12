@@ -5,6 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   Test::More: '0.47'
+  perl: '5.016'
 configure_requires:
   ExtUtils::MakeMaker: '6.46'
 dynamic_config: 1
@@ -24,5 +25,5 @@ resources:
   bugtracker: https://github.com/tonycoz/perl5-uint/
   homepage: http://github.com/tonycoz/perl5-uinteger/
   repository: https://github.com/tonycoz/perl5-uinteger.git
-version: '1.000'
+version: '1.001'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -10,7 +10,7 @@
 # http://www.wtfpl.net/ for more details.
 
 package Chess::Plisco::Macro;
-$Chess::Plisco::Macro::VERSION = '0.6';
+$Chess::Plisco::Macro::VERSION = 'v0.7.0';
 use strict;
 
 use Filter::Util::Call;

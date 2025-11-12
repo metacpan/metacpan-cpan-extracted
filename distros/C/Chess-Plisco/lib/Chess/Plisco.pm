@@ -39,7 +39,7 @@
 # more extensive use of Chess::Plisco::Macro.
 
 package Chess::Plisco;
-$Chess::Plisco::VERSION = '0.6';
+$Chess::Plisco::VERSION = 'v0.7.0';
 use strict;
 use integer;
 no warnings qw(portable);
@@ -85,7 +85,7 @@ use constant CP_POS_ROOKS => CP_ROOK;
 use constant CP_POS_QUEENS => CP_QUEEN;
 use constant CP_POS_KINGS => CP_KING;
 use constant CP_POS_WHITE_PIECES => 7;
-use constant CP_POS_BLACK_PIECES => CP_POS_WHITE_PIECES + CP_BLACK;
+use constant CP_POS_BLACK_PIECES => 8;
 use constant CP_POS_HALF_MOVE_CLOCK => 9;
 use constant CP_POS_INFO => 10;
 use constant CP_POS_EVASION_SQUARES => 11;
@@ -204,8 +204,10 @@ use constant CP_RANK_6 => (5);
 use constant CP_RANK_7 => (6);
 use constant CP_RANK_8 => (7);
 
-use constant CP_WHITE_MASK => 0x5555555555555555;
-use constant CP_BLACK_MASK => 0xaaaaaaaaaaaaaaaa;
+use constant CP_WHITE_MASK => 0x55aa55aa55aa55aa;
+use constant CP_BLACK_MASK => 0xaa55aa55aa55aa55;
+use constant CP_LIGHT_MASK => 0x55aa55aa55aa55aa;
+use constant CP_DARK_MASK => 0xaa55aa55aa55aa55;
 
 use constant CP_PIECE_CHARS => [
 	['', 'P', 'N', 'B', 'R', 'Q', 'K'],
@@ -214,6 +216,14 @@ use constant CP_PIECE_CHARS => [
 
 use constant CP_RANDOM_SEED => 0x415C0415C0415C0;
 my $cp_random = CP_RANDOM_SEED;
+
+# Game states.
+use constant CP_GAME_OVER => 1 << 0;
+use constant CP_GAME_WHITE_WINS => 1 << 1;
+use constant CP_GAME_BLACK_WINS => 1 << 2;
+use constant CP_GAME_STALEMATE => 1 << 3;
+use constant CP_GAME_FIFTY_MOVES => 1 << 4;
+use constant CP_GAME_INSUFFICIENT_MATERIAL => 1 << 5;
 
 my @pawn_aux_data = (
 	# White.
@@ -567,13 +577,21 @@ sub newFromFEN {
 	my $to_move = (($pos_info & (1 << 4)) >> 4);
 	if ('-' eq $ep_square) {
 		($pos_info = ($pos_info & ~(0x3f << 5)) | (0 << 5));
-	} elsif ($to_move == CP_WHITE && $ep_square =~ /^[a-h]6$/) {
+	} elsif ($to_move == CP_WHITE) {
+		if ($ep_square !~ /^[a-h]6$/) {
+			die __x("Illegal FEN: White to move and en-passant square '{square}' is not on 6th rank.\n",
+				square => $ep_square);
+		}
 		my $ep_shift = $self->squareToShift($ep_square);
 		if ((1 << ($ep_shift - 8)) & $self->[CP_POS_BLACK_PIECES]
 		    & $self->[CP_POS_PAWNS]) {
 			($pos_info = ($pos_info & ~(0x3f << 5)) | ($self->squareToShift($ep_square) << 5));
 		}
-	} elsif ($to_move == CP_BLACK && $ep_square =~ /^[a-h]3$/) {
+	} elsif ($to_move == CP_BLACK) {
+		if ($ep_square !~ /^[a-h]3$/) {
+			die __x("Illegal FEN: Black to move and en-passant square '{square}' is not on 3rd rank.\n",
+				square => $ep_square);
+		}
 		my $ep_shift = $self->squareToShift($ep_square);
 		if ((1 << ($ep_shift + 8)) & $self->[CP_POS_WHITE_PIECES]
 		    & $self->[CP_POS_PAWNS]) {
@@ -600,6 +618,55 @@ sub newFromFEN {
 
 	$self->__updateZobristKey;
 	(do {	my $c = (($pos_info & (1 << 4)) >> 4);	my $kings = $self->[CP_POS_KINGS]		& ($c ? $self->[CP_POS_BLACK_PIECES] : $self->[CP_POS_WHITE_PIECES]);	my $king_shift = (do {	my $A = $kings - 1 - ((($kings - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});	($pos_info = ($pos_info & ~(0x3f << 11)) | ($king_shift << 11));	my $checkers = $self->[CP_POS_IN_CHECK] = (do {	my $her_color = !$c;	my $her_pieces = $self->[CP_POS_WHITE_PIECES + $her_color];	my $occupancy = $self->[CP_POS_WHITE_PIECES + $c] | $her_pieces;	my $queens = $self->[CP_POS_QUEENS];	$her_pieces		& (($pawn_masks[$c]->[2]->[$king_shift] & $self->[CP_POS_PAWNS])			| ($knight_attack_masks[$king_shift] & $self->[CP_POS_KNIGHTS])			| ($king_attack_masks[$king_shift] & $self->[CP_POS_KINGS])			| (CP_MAGICMOVESBDB->[$king_shift][(((($occupancy) & CP_MAGICMOVES_B_MASK->[$king_shift]) * CP_MAGICMOVES_B_MAGICS->[$king_shift]) >> 55) & ((1 << (64 - 55)) - 1)] & ($queens | $self->[CP_POS_BISHOPS]))			| (CP_MAGICMOVESRDB->[$king_shift][(((($occupancy) & CP_MAGICMOVES_R_MASK->[$king_shift]) * CP_MAGICMOVES_R_MAGICS->[$king_shift]) >> 52) & ((1 << (64 - 52)) - 1)] & ($queens | $self->[CP_POS_ROOKS])));});	if ($checkers) {		if ($checkers & ($checkers - 1)) {			($pos_info = ($pos_info & ~(0x3 << 17)) | (CP_EVASION_KING_MOVE << 17));		} elsif ($checkers & ($self->[CP_POS_KNIGHTS] | ($self->[CP_POS_PAWNS]))) {			($pos_info = ($pos_info & ~(0x3 << 17)) | (CP_EVASION_CAPTURE << 17));			$self->[CP_POS_EVASION_SQUARES] = $checkers;		} else {			($pos_info = ($pos_info & ~(0x3 << 17)) | (CP_EVASION_ALL << 17));			my $piece_shift = (do {	my $A = $checkers - 1 - ((($checkers - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});			my ($attack_type, undef, $attack_ray) =				@{$common_lines[$king_shift]->[$piece_shift]};			if ($attack_ray) {				$self->[CP_POS_EVASION_SQUARES] = $attack_ray;			} else {				$self->[CP_POS_EVASION_SQUARES] = $checkers;			}		}	}	$self->[CP_POS_INFO] = $pos_info;});
+
+	return $self;
+}
+
+
+sub __legalityCheck {
+	my ($self) = @_;
+
+	# Pawn on 1st or 8th rank?
+	return if $self->[CP_POS_PAWNS] & (CP_1_MASK | CP_8_MASK);
+
+	my $to_move = $self->toMove;
+
+	my $ep_shift = ((($self->[CP_POS_INFO] & (0x3f << 5)) >> 5));
+	if ($ep_shift) {
+		my $ep_mask = 1 << $ep_shift;
+		my $occupancy = $self->[CP_POS_WHITE_PIECES] | $self->[CP_POS_BLACK_PIECES];
+		my ($ep_rank_mask, $ep_cross_mask);
+		if ($to_move == CP_WHITE) {
+			$ep_rank_mask = CP_6_MASK;
+			$ep_cross_mask = 1 << ($ep_shift + 8);
+		} else {
+			$ep_rank_mask = CP_3_MASK;
+			$ep_cross_mask = 1 << ($ep_shift - 8);
+		}
+
+		return if !$ep_mask & $ep_rank_mask; # Wrong rank.
+		return if $ep_cross_mask & $occupancy; # En-passant square is occupied.
+	}
+
+	# Check whether the other side's king is in chess.
+	my $king_index = $to_move == CP_WHITE ? CP_POS_BLACK_PIECES : CP_POS_WHITE_PIECES;
+	my $king_bb = $self->[CP_POS_KINGS] & $self->[$king_index];
+	my $king_shift = (do {	my $B = $king_bb & -$king_bb;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});
+
+	my $cp_black = CP_BLACK;
+	if ($to_move == CP_WHITE) {
+		if ((do {	my $her_color = !CP_BLACK;	my $her_pieces = $self->[CP_POS_WHITE_PIECES + $her_color];	my $occupancy = $self->[CP_POS_WHITE_PIECES + CP_BLACK] | $her_pieces;	my $queens = $self->[CP_POS_QUEENS];	$her_pieces		& (($pawn_masks[CP_BLACK]->[2]->[$king_shift] & $self->[CP_POS_PAWNS])			| ($knight_attack_masks[$king_shift] & $self->[CP_POS_KNIGHTS])			| ($king_attack_masks[$king_shift] & $self->[CP_POS_KINGS])			| (CP_MAGICMOVESBDB->[$king_shift][(((($occupancy) & CP_MAGICMOVES_B_MASK->[$king_shift]) * CP_MAGICMOVES_B_MAGICS->[$king_shift]) >> 55) & ((1 << (64 - 55)) - 1)] & ($queens | $self->[CP_POS_BISHOPS]))			| (CP_MAGICMOVESRDB->[$king_shift][(((($occupancy) & CP_MAGICMOVES_R_MASK->[$king_shift]) * CP_MAGICMOVES_R_MAGICS->[$king_shift]) >> 52) & ((1 << (64 - 52)) - 1)] & ($queens | $self->[CP_POS_ROOKS])));})) {
+			return;
+		}
+	} else {
+		if ((do {	my $her_color = !CP_WHITE;	my $her_pieces = $self->[CP_POS_WHITE_PIECES + $her_color];	my $occupancy = $self->[CP_POS_WHITE_PIECES + CP_WHITE] | $her_pieces;	my $queens = $self->[CP_POS_QUEENS];	$her_pieces		& (($pawn_masks[CP_WHITE]->[2]->[$king_shift] & $self->[CP_POS_PAWNS])			| ($knight_attack_masks[$king_shift] & $self->[CP_POS_KNIGHTS])			| ($king_attack_masks[$king_shift] & $self->[CP_POS_KINGS])			| (CP_MAGICMOVESBDB->[$king_shift][(((($occupancy) & CP_MAGICMOVES_B_MASK->[$king_shift]) * CP_MAGICMOVES_B_MAGICS->[$king_shift]) >> 55) & ((1 << (64 - 55)) - 1)] & ($queens | $self->[CP_POS_BISHOPS]))			| (CP_MAGICMOVESRDB->[$king_shift][(((($occupancy) & CP_MAGICMOVES_R_MASK->[$king_shift]) * CP_MAGICMOVES_R_MAGICS->[$king_shift]) >> 52) & ((1 << (64 - 52)) - 1)] & ($queens | $self->[CP_POS_ROOKS])));})) {
+			return;
+		}
+	}
+
+	# Check castling rights consistency.
+
+	# Check number of pieces.
 
 	return $self;
 }
@@ -1790,55 +1857,30 @@ sub bitboardMoreThanOneSet {
 	return ($bitboard && ($bitboard & ($bitboard - 1)));
 }
 
-sub insufficientMaterial {
-	my ($self) = @_;
+sub gameOver {
+	my ($self, $forcible) = @_;
 
-	# FIXME! Once we distinguish black and white material (should we?),
-	# we can try to take an early exit here if any of the two sides has
-	# more material than a bishop.
+	my $state = 0;
 
-	# All of these are sufficient to mate.
-	if ($self->[CP_POS_PAWNS] | $self->[CP_POS_ROOKS] | $self->[CP_POS_QUEENS]) {
-		return;
+	my @legal = $self->legalMoves;
+	if (!@legal) {
+		$state |= CP_GAME_OVER;
+		if ($self->[CP_POS_IN_CHECK]) {
+			if (CP_WHITE == ((($self->[CP_POS_INFO] & (1 << 4)) >> 4))) {
+				$state |= CP_GAME_BLACK_WINS;
+			} else {
+				$state |= CP_GAME_WHITE_WINS;
+			}
+		} else {
+			$state |= CP_GAME_STALEMATE;
+		}
+	} elsif (100 <= $self->[CP_POS_HALF_MOVE_CLOCK]) {
+		$state |= CP_GAME_OVER | CP_GAME_FIFTY_MOVES;
+	} elsif ($self->insufficientMaterial($forcible)) {
+		$state |= CP_GAME_OVER | CP_GAME_INSUFFICIENT_MATERIAL;
 	}
 
-	# There is neither a queen nor a rook nor a pawn.  Two or more minor
-	# pieces on one side can always mate.
-	my $not_kings = ~$self->[CP_POS_KINGS];
-
-	my $white = $self->[CP_POS_WHITE_PIECES];
-	my $white_minor_pieces = $white & $not_kings;
-	if (($white_minor_pieces && ($white_minor_pieces & ($white_minor_pieces - 1)))) {
-		return;
-	}
-
-	my $black = $self->[CP_POS_BLACK_PIECES];
-	my $black_minor_pieces = $black & $not_kings;
-	if (($black_minor_pieces && ($black_minor_pieces & ($black_minor_pieces - 1)))) {
-		return;
-	}
-
-	# One minor piece against a lone king cannot mate.
-	if(!($white_minor_pieces && $black_minor_pieces)) {
-		return 1;
-	}
-
-	# Both sides have exactly one minor piece.  The only combination that
-	# is a draw is KBKB with bishops of different color.  That means, that
-	# both sides can mate if a knight is on the board.
-	if ($self->[CP_POS_KNIGHTS]) {
-		return;
-	}
-
-	# Every side has one bishop.  It is not necessarily a draw, if they are
-	# on different colored squares.
-	my $bishops = $self->[CP_POS_BISHOPS];
-	if (!!($white & $bishops & CP_WHITE_MASK)
-	    != !!($black & $bishops & CP_BLACK_MASK)) {
-		return;
-	}
-
-	return 1;
+	return $state;
 }
 
 sub __updateZobristKey {
@@ -2013,54 +2055,102 @@ sub __zobristKeyDump {
 }
 
 sub insufficientMaterial {
-	my ($self) = @_;
-
-	# FIXME! Once we distinguish black and white material (should we?),
-	# we can try to take an early exit here if any of the two sides has
-	# more material than a bishop.
+	my ($self, $forcible) = @_;
 
 	# All of these are sufficient to mate.
 	if ($self->[CP_POS_PAWNS] | $self->[CP_POS_ROOKS] | $self->[CP_POS_QUEENS]) {
 		return;
 	}
 
-	# There is neither a queen nor a rook nor a pawn.  Two or more minor
-	# pieces on one side can always mate.
-	my $not_kings = ~$self->[CP_POS_KINGS];
-
-	my $white = $self->[CP_POS_WHITE_PIECES];
-	my $white_minor_pieces = $white & $not_kings;
-	if (($white_minor_pieces && ($white_minor_pieces & ($white_minor_pieces - 1)))) {
-		return;
-	}
-
-	my $black = $self->[CP_POS_BLACK_PIECES];
-	my $black_minor_pieces = $black & $not_kings;
-	if (($black_minor_pieces && ($black_minor_pieces & ($black_minor_pieces - 1)))) {
-		return;
-	}
-
-	# One minor piece against a lone king cannot mate.
-	if(!($white_minor_pieces && $black_minor_pieces)) {
+	# There is neither a queen nor a rook nor a pawn.
+	my $bishop_bb = $self->[CP_POS_BISHOPS];
+	my $knight_bb = $self->[CP_POS_KNIGHTS];
+	my $not_kings = $bishop_bb | $knight_bb;
+	if (!($not_kings && ($not_kings & ($not_kings - 1)))) {
+		# Lone king versus lone king or a single minor piece.  Always a draw.
 		return 1;
 	}
-
-	# Both sides have exactly one minor piece.  The only combination that
-	# is a draw is KBKB with bishops of different color.  That means, that
-	# both sides can mate if a knight is on the board.
-	if ($self->[CP_POS_KNIGHTS]) {
-		return;
+	
+	# We have at least two minor pieces.  The only situation, where a mate
+	# is technically impossible is, when we have only same-coloured bishops,
+	# no matter on which side.
+	if (!$forcible && $bishop_bb && $knight_bb) {
+		return; # Mate theoretically possible.
 	}
 
-	# Every side has one bishop.  It is not necessarily a draw, if they are
-	# on different colored squares.
-	my $bishops = $self->[CP_POS_BISHOPS];
-	if (!!($white & $bishops & CP_WHITE_MASK)
-	    != !!($black & $bishops & CP_BLACK_MASK)) {
-		return;
+	my $light_squared_bishop_bb = $bishop_bb & CP_LIGHT_MASK;
+	my $dark_squared_bishop_bb = $bishop_bb & CP_DARK_MASK;
+
+	if (!($light_squared_bishop_bb && $dark_squared_bishop_bb)) {
+		# We either have no bishops or all bishops move on same-coloured
+		# fields. If we have knights, a mate can be delivered.
+		#
+		# If there are no knights, all bishops move on the same squares. No
+		# matter how many we have, this is always a draw. If there are knights,
+		# a mate is maybe possible if one side has more than one knight.
+		if (!$knight_bb) {
+			return 1; # Only same-coloured bishops on the board.
+		}
+
+		# We have knights. If there are knights and bishops or more than one
+		# knight, a mate is theoretically possible.
+		if (!$forcible) {
+			return if $bishop_bb || ($knight_bb && ($knight_bb & ($knight_bb - 1)));
+		}
+
+		# There is at least one knight. We only considered KNNvK a forcible draw.
+		# Probing Syzygy endgame tables shows more constellations but this is
+		# out of scope of this function.
+		my $white_pieces = $self->[CP_POS_WHITE_PIECES];
+		my $black_pieces = $self->[CP_POS_BLACK_PIECES];
+		my $white_knight_bb = $white_pieces & $knight_bb;
+		my $black_knight_bb = $black_pieces & $knight_bb;
+		my $white_knight_pair = ($white_knight_bb && ($white_knight_bb & ($white_knight_bb - 1)));
+		my $black_knight_pair = ($black_knight_bb && ($black_knight_bb & ($black_knight_bb - 1)));
+
+		# If both sides have a knight pair, we do not report a draw,
+		# although endgame tablebases will probably consider most of them
+		# a draw.
+		return 1 if $white_knight_pair && $black_knight_pair;
+
+		if (!$bishop_bb) {
+			# Only KNNvK and KNvKN are considered a draw. We can detect that
+			# with a popcount of the knight bitboard.
+			my $num_knights;
+			{ my $_b = $knight_bb; for ($num_knights = 0; $_b; ++$num_knights) { $_b &= $_b - 1; } };
+
+			return $num_knights <= 2;
+		}
+	} else {
+		return if !$forcible; # Mate theoratically possible.
+
+		# The bishops are different-coloured, and we have at least two.
+		# If one side has at least two bishops, a mate can be forced.
+		my $white_pieces = $self->[CP_POS_WHITE_PIECES];
+		my $black_pieces = $self->[CP_POS_BLACK_PIECES];
+
+		if (!($bishop_bb & $white_pieces) && ($bishop_bb && $black_pieces)) {
+			# All bishops are on one side. A mate can probably be forced.
+			return;
+		}
+
+		# Both sides have at least one bishop. We consider KBvKB a draw,
+		# all other cases can be won.
+		return if $knight_bb;
+
+		# We only have bishops. If either side has more than one bishop,
+		# the position is considered winnable.
+		my $white_bishop_pair = ($white_pieces & $bishop_bb && ($white_pieces & $bishop_bb & ($white_pieces & $bishop_bb - 1)));
+		my $black_bishop_pair = ($white_pieces & $bishop_bb && ($white_pieces & $bishop_bb & ($white_pieces & $bishop_bb - 1)));
+
+		if ((!$white_bishop_pair) && !($black_bishop_pair)) {
+			# Either side has exactly one bishop.
+			return 1;
+		}
 	}
 
-	return 1;
+	# In all other cases, we cannot determine the outcome.
+	return;
 }
 
 # Do not remove this line!
@@ -2092,7 +2182,7 @@ my @export_board = qw(
 	CP_E_MASK CP_F_MASK CP_G_MASK CP_H_MASK
 	CP_1_MASK CP_2_MASK CP_3_MASK CP_4_MASK
 	CP_5_MASK CP_6_MASK CP_7_MASK CP_8_MASK
-	CP_WHITE_MASK CP_BLACK_MASK
+	CP_WHITE_MASK CP_BLACK_MASK CP_LIGHT_MASK CP_DARK_MASK
 );
 
 my @export_pieces = qw(
@@ -2111,10 +2201,19 @@ my @export_magicmoves = qw(
 	CP_MAGICMOVESRDB
 );
 
+my @export_game = qw(
+	CP_GAME_OVER
+	CP_GAME_WHITE_WINS
+	CP_GAME_BLACK_WINS
+	CP_GAME_STALEMATE
+	CP_GAME_FIFTY_MOVES
+	CP_GAME_INSUFFICIENT_MATERIAL
+);
+
 my @export_aux = qw(CP_INT_SIZE CP_CHAR_BIT CP_RANDOM_SEED);
 
 our @EXPORT_OK = (@export_pieces, @export_board, @export_accessors,
-		@export_magicmoves, @export_aux);
+		@export_magicmoves, @export_game, @export_aux);
 
 our %EXPORT_TAGS = (
 	accessors => [@export_accessors],
@@ -2122,6 +2221,7 @@ our %EXPORT_TAGS = (
 	board => [@export_board],
 	magicmoves => [@export_magicmoves],
 	aux => [@export_aux],
+	# game => [@export_game],
 	all => [@EXPORT_OK],
 );
 

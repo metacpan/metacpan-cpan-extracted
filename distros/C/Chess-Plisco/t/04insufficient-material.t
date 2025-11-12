@@ -68,9 +68,21 @@ my @tests = (
 		draw => 0,
 	},
 	{
+		fen => '7k/8/8/8/8/8/8/KNN5 w - - 10 20',
+		name => 'KNN vs. k',
+		forcible => 1,
+		draw => 1,
+	},
+	{
 		fen => '5nnk/8/8/8/8/8/8/K7 w - - 10 20',
 		name => 'K vs. knn',
 		draw => 0,
+	},
+	{
+		fen => '5nnk/8/8/8/8/8/8/K7 w - - 10 20',
+		name => 'K vs. knn',
+		forcible => 1,
+		draw => 1,
 	},
 	{
 		fen => '5bnk/8/8/8/8/8/8/KBN5 w - - 10 20',
@@ -124,12 +136,12 @@ my @tests = (
 	},
 	{
 		fen => '5b1k/8/8/8/8/8/8/KB6 w - - 10 20',
-		name => 'KB vs. kb (white bishop vs. white bishop)',
+		name => 'KB vs. kb (different-coloured bishop pair)',
 		draw => 0,
 	},
 	{
 		fen => '6bk/8/8/8/8/8/8/KB6 w - - 10 20',
-		name => 'KB vs. kb',
+		name => 'KB vs. kb (same-coloured bishop pair)',
 		draw => 1,
 	},
 	{
@@ -167,16 +179,67 @@ my @tests = (
 		name => 'K vs. k',
 		draw => 1,
 	},
+
+	# Edge cases.
+	{
+		fen => '7k/8/8/3N4/3N4/4K3/8/8 w - - 0 1',
+		name => 'KN vs. Kn (forcible)',
+		forcible => 1, # Non-forcible already tested.
+		draw => 1,
+	},
+	{
+		fen => '3bk3/8/8/8/8/8/8/3BK3 w - - 0 1',
+		name => 'KB vs. Kb (different-coloured, forcible)',
+		forcible => 1, # Non-forcible already tested.
+		draw => 1,
+	},
+	{
+		fen => '7k/8/8/3B4/8/3BK3/8/8 w - - 0 1',
+		name => 'KBB vs. K (same-coloured bishopss)',
+		draw => 1,
+	},
+	{
+		fen => '7k/8/8/3B4/8/3BK3/8/8 w - - 0 1',
+		name => 'KBB vs. K (same-coloured bishopss)',
+		forcible => 1,
+		draw => 1,
+	},
+	{
+		fen => '2b4k/1b1b4/8/3B4/8/3BK3/2B5/8 w - - 0 1',
+		name => 'KBBB vs. Kbbb (same-coloured bishops)',
+		draw => 1,
+	},
+	{
+		fen => '2b4k/1b1b4/8/3B4/8/3BK3/2B5/8 w - - 0 1',
+		name => 'KBBB vs. Kbbb (same-coloured bishops)',
+		draw => 1,
+		forcible => 1,
+	},
+	{
+		fen => '8/1K6/1b6/8/8/4n3/2k5/8 b - - 0 1',
+		name => 'KBN vs. K',
+		draw => 0,
+	},
+	{
+		fen => '8/1K6/1b6/8/8/4n3/2k5/8 b - - 0 1',
+		name => 'KBN vs. K (forcible)',
+		draw => 0,
+		forcible => 1,
+	}
 );
 
 plan tests => scalar @tests;
 
 foreach my $test (@tests) {
 	my $pos = Chess::Plisco->new($test->{fen});
+if ($test->{fen} eq '8/1K6/1b6/8/8/4n3/2k5/8 b - - 0 1') {
+	$DB::single = 1;
+}
+	my $forcible = $test->{forcible} ? ' (forcible)' : '';
 	if ($test->{draw}) {
-		ok $pos->insufficientMaterial, "$test->{name} should be draw";
+		ok $pos->insufficientMaterial($test->{forcible}), "$test->{name} should be draw$forcible";
 	} else {
-		ok !$pos->insufficientMaterial, "$test->{name} should not be draw";
+		ok !$pos->insufficientMaterial($test->{forcible}), "$test->{name} should not be draw$forcible";
 	}
 }
 

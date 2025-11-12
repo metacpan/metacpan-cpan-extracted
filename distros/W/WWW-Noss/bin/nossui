@@ -2,9 +2,9 @@
 
 PRGNAM=nossui
 
-NOSS_CONFIG=
-NOSS_FEEDS=
-NOSS_DATA=
+NOSSUI_CONFIG=
+NOSSUI_FEEDS=
+NOSSUI_DATA=
 
 export DIALOG_CANCEL=1
 export DIALOG_ERROR=-1
@@ -49,24 +49,161 @@ die() {
     exit 1
 }
 
+verify_json() {
+
+    if [ -s "$1" ]; then
+        perl -MJSON -0777 -e 'JSON->new->relaxed->decode(<>)' < "$1"
+        return "$?"
+    else
+        return 0
+    fi
+
+}
+
+default_feeds_file() {
+
+    if [ -n "$NOSSUI_FEEDS" ]; then
+        printf "%s" "$NOSSUI_FEEDS"
+        return
+    fi
+
+    if [ -n "$NOSS_FEEDS" ]; then
+        printf "%s" "$NOSS_FEEDS"
+        return
+    fi
+
+    if [ -n "$XDG_CONFIG_HOME" ]; then
+        if [ -e "$XDG_CONFIG_HOME/noss/noss.feeds" ]; then
+            printf "%s" "$XDG_CONFIG_HOME/noss/noss.feeds"
+            return
+        elif [ -e "$XDG_CONFIG_HOME/noss.feeds" ]; then
+            printf "%s" "$XDG_CONFIG_HOME/noss.feeds"
+            return
+        fi
+    fi
+
+    if [ -e "$HOME/.config/noss/noss.feeds" ]; then
+        printf "%s" "$HOME/.config/noss/noss.feeds"
+        return
+    fi
+
+    if [ -e "$HOME/.config/noss.feeds" ]; then
+        printf "%s" "$HOME/.config/noss.feeds"
+        return
+    fi
+
+    if [ -e "$HOME/.noss.feeds" ]; then
+        printf "%s" "$HOME/.noss.feeds"
+        return
+    fi
+
+    if [ -n "$XDG_CONFIG_HOME" ]; then
+        mkdir -p "$XDG_CONFIG_HOME/noss"
+        printf "%s" "$XDG_CONFIG_HOME/noss/noss.feeds"
+        return
+    fi
+
+    if [ -d "$HOME/.config" ]; then
+        mkdir -p "$HOME/.config/noss"
+        printf "%s" "$HOME/.config/noss/noss.feeds"
+        return
+    fi
+
+    printf "%s" "$HOME/.noss.feeds"
+
+}
+
+default_config_file() {
+
+    if [ -n "$NOSSUI_CONFIG" ]; then
+        printf "%s" "$NOSSUI_CONFIG"
+        return
+    fi
+
+    if [ -n "$NOSS_CONFIG" ]; then
+        printf "%s" "$NOSS_CONFIG"
+        return
+    fi
+
+    if [ -n "$XDG_CONFIG_HOME" ]; then
+        if [ -e "$XDG_CONFIG_HOME/noss/noss.conf" ]; then
+            printf "%s" "$XDG_CONFIG_HOME/noss/noss.conf"
+            return
+        elif [ -e "$XDG_CONFIG_HOME/noss.conf" ]; then
+            printf "%s" "$XDG_CONFIG_HOME/noss.conf"
+            return
+        fi
+    fi
+
+    if [ -e "$HOME/.config/noss/noss.conf" ]; then
+        printf "%s" "$HOME/.config/noss/noss.conf"
+        return
+    fi
+
+    if [ -e "$HOME/.config/noss.conf" ]; then
+        printf "%s" "$HOME/.config/noss.conf"
+        return
+    fi
+
+    if [ -e "$HOME/.noss.conf" ]; then
+        printf "%s" "$HOME/.noss.conf"
+        return
+    fi
+
+    if [ -n "$XDG_CONFIG_HOME" ]; then
+        mkdir -p "$XDG_CONFIG_HOME/noss"
+        printf "%s" "$XDG_CONFIG_HOME/noss/noss.conf"
+        return
+    fi
+
+    if [ -d "$HOME/.config" ]; then
+        mkdir -p "$HOME/.config/noss"
+        printf "%s" "$HOME/.config/noss/noss.conf"
+        return
+    fi
+
+    printf "%s" "$HOME/.noss.conf"
+
+}
+
+get_default_editor() {
+
+    if [ -n "$EDITOR" ]; then
+        printf "%s" "$EDITOR"
+        return
+    elif [ -n "$VISUAL" ]; then
+        printf "%s" "$VISUAL"
+        return
+    elif command -v "sensible-editor"; then
+        printf "sensible-editor"
+        return
+    elif command -v "vi"; then
+        printf "vi"
+        return
+    else
+        return 1
+    fi
+
+}
+
 wnoss() {
 
-    if [ -n "$NOSS_CONFIG" ]
+    if [ -n "$NOSSUI_CONFIG" ]
     then
-        set -- '--config' "$NOSS_CONFIG" "$@"
+        set -- '--config' "$NOSSUI_CONFIG" "$@"
     fi
 
-    if [ -n "$NOSS_FEEDS" ]
+    if [ -n "$NOSSUI_FEEDS" ]
     then
-        set -- '--feeds' "$NOSS_FEEDS" "$@"
+        set -- '--feeds' "$NOSSUI_FEEDS" "$@"
     fi
 
-    if [ -n "$NOSS_DATA" ]
+    if [ -n "$NOSSUI_DATA" ]
     then
-        set -- '--data' "$NOSS_DATA" "$@"
+        set -- '--data' "$NOSSUI_DATA" "$@"
     fi
 
-    noss --autoclean 0 "$@"
+    noss --autoclean 0 --no-color "$@"
 
 
 }
@@ -600,6 +737,52 @@ dialog_groups() {
 
 }
 
+dialog_edit_feeds() {
+
+    dialog_edit_feeds_err="$(mktemp)"
+    dialog_edit_feeds_file="$(default_feeds_file)"
+    dialog_edit_feeds_editor="$(get_default_editor)"
+    if [ "$?" != "0" ]; then
+        dialog --msgbox 'Could not determine default text editor' 0 0
+        return 1
+    fi
+
+    while true; do
+        "$dialog_edit_feeds_editor" "$dialog_edit_feeds_file"
+        verify_json "$dialog_edit_feeds_file" 2>"$dialog_edit_feeds_err"
+        if [ "$?" = "0" ]; then
+            break
+        fi
+        dialog --msgbox "Error in JSON file: $(cat "$dialog_edit_feeds_err")" 0 0
+    done
+
+    rm -f "$dialog_edit_feeds_err"
+
+}
+
+dialog_edit_config() {
+
+    dialog_edit_config_err="$(mktemp)"
+    dialog_edit_config_file="$(default_config_file)"
+    dialog_edit_config_editor="$(get_default_editor)"
+    if [ "$?" != "0" ]; then
+        dialog --msgbox 'Could not determine default text editor' 0 0
+        return 1
+    fi
+
+    while true; do
+        "$dialog_edit_config_editor" "$dialog_edit_config_file"
+        verify_json "$dialog_edit_config_file" 2>"$dialog_edit_config_err"
+        if [ "$?" = "0" ]; then
+            break
+        fi
+        dialog --msgbox "Error in JSON file: $(cat "$dialog_edit_config_err")" 0 0
+    done
+
+    rm -f "$dialog_edit_config_err"
+
+}
+
 dialog_clean() {
 
     dialog --infobox 'Cleaning up...' 0 0
@@ -607,6 +790,48 @@ dialog_clean() {
     wnoss clean
 
     dialog --msgbox 'Finished cleanup.' 0 0
+
+}
+
+dialog_extra() {
+
+    dialog_extra_tmpsel="$(mktemp)"
+
+    while true; do
+
+        dialog \
+            --erase-on-exit \
+            --menu 'Please select a menu item.' 0 0 0 \
+            'Edit Config' 'Edit configuration flie' \
+            'Reload' 'Reload feed cache' \
+            'Clean' 'Clean up feed cache and database' \
+            2> "$dialog_extra_tmpsel"
+
+        if [ "$?" != "$DIALOG_OK" ]
+        then
+            rm -f "$dialog_extra_tmpsel"
+            return 0
+        fi
+
+        case "$(cat "$dialog_extra_tmpsel")" in
+            'Edit Config')
+                dialog_edit_config
+            ;;
+            'Reload')
+                dialog --yesno "Would you like to reload all of your feeds?" 0 0
+                if [ "$?" != '0' ]
+                then
+                    continue
+                fi
+                dialog_reload
+            ;;
+            'Clean')
+                dialog_clean
+            ;;
+        esac
+    done
+
+    rm -f "$dialog_extra_tmpsel"
 
 }
 
@@ -625,8 +850,8 @@ dialog_main() {
             'Feeds' 'Browse your feeds' \
             'Groups' 'Browse your feed groups' \
             'Update' 'Fetch and load feed updates' \
-            'Reload' 'Reload feed cache' \
-            'Clean' 'Clean up feed cache and database' \
+            'Edit Feeds' 'Edit feeds file' \
+            'Extra' 'Extra commands' \
             2> "$dialog_main_tmpsel"
 
         if [ "$?" != "$DIALOG_OK" ]
@@ -659,16 +884,11 @@ dialog_main() {
                 fi
                 dialog_update
             ;;
-            'Reload')
-                dialog --yesno "Would you like to reload all of your feeds?" 0 0
-                if [ "$?" != '0' ]
-                then
-                    continue
-                fi
-                dialog_reload
+            'Edit Feeds')
+                dialog_edit_feeds
             ;;
-            'Clean')
-                dialog_clean
+            'Extra')
+                dialog_extra
             ;;
         esac
 
@@ -694,13 +914,13 @@ main() {
     do
         case "$opt" in
             'c')
-                NOSS_CONFIG="$OPTARG"
+                NOSSUI_CONFIG="$OPTARG"
             ;;
             'D')
-                NOSS_DATA="$OPTARG"
+                NOSSUI_DATA="$OPTARG"
             ;;
             'f')
-                NOSS_FEEDS="$OPTARG"
+                NOSSUI_FEEDS="$OPTARG"
             ;;
             'h')
                 print_help
@@ -717,14 +937,14 @@ main() {
         esac
     done
 
-    if [ -n "$NOSS_CONFIG" ] && [ ! -f "$NOSS_CONFIG" ]
+    if [ -n "$NOSSUI_CONFIG" ] && [ ! -f "$NOSSUI_CONFIG" ]
     then
-        die "$NOSS_CONFIG does not exist"
+        die "$NOSSUI_CONFIG does not exist"
     fi
 
-    if [ -n "$NOSS_FEEDS" ] && [ ! -f "$NOSS_FEEDS" ]
+    if [ -n "$NOSSUI_FEEDS" ] && [ ! -f "$NOSSUI_FEEDS" ]
     then
-        die "$NOSS_FEEDS does not exist"
+        die "$NOSSUI_FEEDS does not exist"
     fi
 
     dialog_main

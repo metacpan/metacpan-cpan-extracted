@@ -26,7 +26,7 @@ no_index:
 provides:
   Daje::Plugin::Apploader:
     file: lib/Daje/Plugin/Apploader.pm
-    version: '0.10'
+    version: '0.20'
 requires:
   CPAN: '0'
   Daje::Database::Migrator: '0.01'
@@ -37,6 +37,6 @@ resources:
   bugtracker: https://github.com/janeskil1525/Daje-Plugin-Apploader/issues
   homepage: https://github.com/janeskil1525/Daje-Plugin-Apploader
   repository: https://github.com/janeskil1525/Daje-Plugin-Apploader.git
-version: '0.10'
+version: '0.20'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
 x_static_install: 1
