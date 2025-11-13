@@ -11,7 +11,7 @@ use HTTP::Request;
 use JSON;
 use Data::Dumper;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 our $drh;
 
 # Global hash to store HTTP clients keyed by database handle reference
@@ -332,6 +332,14 @@ sub begin_work {
     return $dbh->set_err(1, "Already in a transaction");
 }
 
+sub last_insert_id {
+    my ($dbh, $catalog, $schema, $table, $field) = @_;
+    
+    # Retrieve the last insert rowid from the last statement's result
+    # The rowid is stored in the statement handle after an INSERT
+    return $dbh->{libsql_last_insert_id};
+}
+
 sub _execute_http {
     my ($dbh, $sql, @bind_values) = @_;
     
@@ -339,70 +347,97 @@ sub _execute_http {
     my $client_data = defined($dbh_id) ? $HTTP_CLIENTS{$dbh_id} : undef;
     return undef unless $client_data;
     
-    # Convert bind values to Hrana format
-    my @hrana_args = map {
-        if (!defined $_) {
-            { type => 'null' }
-        } else {
-            { type => 'text', value => "$_" }
-        }
-    } @bind_values;
+    # Retry logic for STREAM_EXPIRED errors
+    my $max_retries = 2;
+    my $attempt = 0;
     
-    my $pipeline_data = {
-        requests => [
-            {
-                type => 'execute',
-                stmt => {
-                    sql => $sql,
-                    args => \@hrana_args
-                }
+    while ($attempt < $max_retries) {
+        $attempt++;
+        
+        # Convert bind values to Hrana format
+        my @hrana_args = map {
+            if (!defined $_) {
+                { type => 'null' }
+            } else {
+                { type => 'text', value => "$_" }
             }
-        ]
-    };
-    
-    # Add baton if available for session continuity
-    if ($client_data->{baton}) {
-        $pipeline_data->{baton} = $client_data->{baton};
-    }
-    
-    my $request = HTTP::Request->new('POST', $client_data->{base_url} . '/v2/pipeline');
-    $request->header('Content-Type' => 'application/json');
-    
-    # Add Turso authentication header if token is available
-    if ($client_data->{auth_token}) {
-        $request->header('Authorization' => 'Bearer ' . $client_data->{auth_token});
-    }
-    
-    $request->content($client_data->{json}->encode($pipeline_data));
-    
-    my $response = $client_data->{ua}->request($request);
-    
-    if ($response->is_success) {
-        my $result = eval { $client_data->{json}->decode($response->content) };
-        if ($@ || !$result || !$result->{results}) {
-            die "Invalid response from libsql server: $@";
+        } @bind_values;
+        
+        my $pipeline_data = {
+            requests => [
+                {
+                    type => 'execute',
+                    stmt => {
+                        sql => $sql,
+                        args => \@hrana_args
+                    }
+                }
+            ]
+        };
+        
+        # Add baton if available for session continuity
+        if ($client_data->{baton}) {
+            $pipeline_data->{baton} = $client_data->{baton};
         }
         
-        # Update baton for session continuity
-        if ($result->{baton}) {
-            $client_data->{baton} = $result->{baton};
+        my $request = HTTP::Request->new('POST', $client_data->{base_url} . '/v2/pipeline');
+        $request->header('Content-Type' => 'application/json');
+        
+        # Add Turso authentication header if token is available
+        if ($client_data->{auth_token}) {
+            $request->header('Authorization' => 'Bearer ' . $client_data->{auth_token});
         }
         
-        my $first_result = $result->{results}->[0];
+        $request->content($client_data->{json}->encode($pipeline_data));
         
-        # Check if the result is an error
-        if ($first_result->{type} eq 'error') {
-            my $error = $first_result->{error};
-            die $error->{message} || "SQL execution error";
-        }
+        my $response = $client_data->{ua}->request($request);
         
-        return $first_result;
-    } else {
-        my $error_msg = "HTTP request failed: " . $response->status_line;
-        if ($response->content) {
-            $error_msg .= " - Response: " . $response->content;
+        if ($response->is_success) {
+            my $result = eval { $client_data->{json}->decode($response->content) };
+            if ($@ || !$result || !$result->{results}) {
+                die "Invalid response from libsql server: $@";
+            }
+            
+            # Update baton for session continuity
+            if ($result->{baton}) {
+                $client_data->{baton} = $result->{baton};
+            }
+            
+            my $first_result = $result->{results}->[0];
+            
+            # Check if the result is an error
+            if ($first_result->{type} eq 'error') {
+                my $error = $first_result->{error};
+                my $error_msg = $error->{message} || "SQL execution error";
+                
+                # Check for STREAM_EXPIRED error and retry if not last attempt
+                if ($error_msg =~ /STREAM_EXPIRED/ && $attempt < $max_retries) {
+                    # Clear the baton to force a new session on retry
+                    $client_data->{baton} = undef;
+                    warn "Stream expired, retrying... (attempt $attempt of $max_retries)" if $ENV{DBD_LIBSQL_DEBUG};
+                    next;
+                }
+                
+                die $error_msg;
+            }
+            
+            return $first_result;
+        } else {
+            my $error_msg = "HTTP request failed: " . $response->status_line;
+            if ($response->content) {
+                $error_msg .= " - Response: " . $response->content;
+            }
+            
+            # Check for STREAM_EXPIRED in HTTP response and retry if not last attempt
+            if ($error_msg =~ /STREAM_EXPIRED/ && $attempt < $max_retries) {
+                # Clear the baton to force a new session on retry
+                $client_data->{baton} = undef;
+                warn "Stream expired (HTTP), retrying... (attempt $attempt of $max_retries)" if $ENV{DBD_LIBSQL_DEBUG};
+                next;
+            }
+            
+            die $error_msg;
         }
-        die $error_msg;
     }
 }
 
@@ -414,7 +449,14 @@ sub do {
     if ($@) {
         die $@;
     }
-    my $affected_rows = $result->{response}->{result}->{affected_row_count} || 0;
+    my $execute_result = $result->{response}->{result};
+    my $affected_rows = $execute_result->{affected_row_count} || 0;
+    
+    # Store last_insert_id from the server response
+    if (defined $execute_result->{last_insert_rowid}) {
+        $dbh->{libsql_last_insert_id} = $execute_result->{last_insert_rowid};
+    }
+    
     # Return "0E0" for zero rows to maintain truth value (DBI convention)
     return $affected_rows == 0 ? "0E0" : $affected_rows;
 }
@@ -428,8 +470,18 @@ sub selectall_arrayref {
     $sth->execute(@bind_values);
     
     my @all_rows;
-    while (my $row = $sth->fetchrow_arrayref()) {
-        push @all_rows, [@$row]; # Create a copy
+    
+    # Check if Slice option is set to return array of hashes
+    if ($attr && ref $attr eq 'HASH' && exists $attr->{Slice} && ref $attr->{Slice} eq 'HASH') {
+        # { Slice => {} } - return array of hash references
+        while (my $row = $sth->fetchrow_hashref()) {
+            push @all_rows, $row if defined $row;
+        }
+    } else {
+        # Default behavior - return array of array references
+        while (my $row = $sth->fetchrow_arrayref()) {
+            push @all_rows, [@$row]; # Create a copy
+        }
     }
     
     $sth->finish();
@@ -483,6 +535,56 @@ sub DESTROY {
     }
 }
 
+# Extract column names from SQL SELECT statement
+sub _extract_column_names {
+    my ($sql) = @_;
+    
+    return () unless $sql;
+    
+    # Remove leading/trailing whitespace
+    $sql =~ s/^\s+|\s+$//g;
+    
+    # Handle SELECT statements
+    if ($sql =~ /^SELECT\s+(.+?)\s+FROM/i) {
+        my $select_part = $1;
+        
+        # Split by comma, handling spaces and aliases
+        my @columns = split /\s*,\s*/, $select_part;
+        
+        my @col_names;
+        for my $col (@columns) {
+            # Remove leading/trailing whitespace
+            $col =~ s/^\s+|\s+$//g;
+            
+            # Handle aliases: "column AS alias" or "column alias"
+            if ($col =~ /\s+(?:AS\s+)?(\w+)\s*$/i) {
+                push @col_names, $1;
+            }
+            # Handle function calls: COUNT(*), SUM(col), etc.
+            elsif ($col =~ /(\w+)\s*\(\s*\*\s*\)/i) {
+                push @col_names, "$1(*)";
+            }
+            elsif ($col =~ /(\w+)\s*\(\s*(\w+)\s*\)/i) {
+                my ($func, $arg) = ($1, $2);
+                # Use alias if specified, otherwise use function name
+                push @col_names, $func;
+            }
+            # Simple column name
+            elsif ($col =~ /(\w+)$/i) {
+                push @col_names, $1;
+            }
+            # Fallback for quoted identifiers
+            elsif ($col =~ /["`]([^"`]+)["`]/i) {
+                push @col_names, $1;
+            }
+        }
+        
+        return @col_names;
+    }
+    
+    return ();
+}
+
 package DBD::libsql::st;
 
 $DBD::libsql::st::imp_data_size = 0;
@@ -530,6 +632,25 @@ sub execute {
         $sth->{libsql_rows} = $execute_result->{affected_row_count} || 0;
     }
     
+    # Store last_insert_id from the server response
+    if (defined $execute_result->{last_insert_rowid}) {
+        $dbh->{libsql_last_insert_id} = $execute_result->{last_insert_rowid};
+    }
+    
+    # Extract and store column names
+    # Prefer column names from server response (more reliable)
+    my @col_names;
+    if ($execute_result->{cols} && @{$execute_result->{cols}}) {
+        # Server returned column metadata - extract column names from col objects
+        @col_names = map {
+            ref $_ eq 'HASH' ? ($_->{name} || $_) : $_
+        } @{$execute_result->{cols}};
+    } else {
+        # Fallback to parsing column names from SQL statement
+        @col_names = DBD::libsql::db::_extract_column_names($statement);
+    }
+    $sth->{libsql_col_names} = \@col_names;
+    
     return 1;
 }
 
@@ -562,27 +683,18 @@ sub fetchrow_hashref {
     my $row = $sth->fetchrow_arrayref();
     return undef unless $row;
     
-    my $statement = $sth->{Statement} || '';
+    my @col_names = @{$sth->{libsql_col_names} || []};
     
-    # Column name mapping based on SQL
-    if ($statement =~ /test_fetch/i) {
-        return {
-            id => $row->[0],
-            name => $row->[1],
-            age => $row->[2],
-        };
-    } elsif ($statement =~ /COUNT\(\*\)/i) {
-        return {
-            'COUNT(*)' => $row->[0],
-        };
-    } else {
-        # Default column names
-        return {
-            id => $row->[0],
-            name => $row->[1],
-            value => $row->[2],
-        };
+    # If no column names were extracted, return empty hash to avoid hardcoded mapping
+    return {} unless @col_names;
+    
+    # Build hash from values and column names
+    my %hash;
+    for (my $i = 0; $i < @col_names && $i < @$row; $i++) {
+        $hash{$col_names[$i]} = $row->[$i];
     }
+    
+    return \%hash;
 }
 
 sub fetchrow_array {
@@ -612,11 +724,22 @@ sub rows {
     return $sth->{libsql_rows} || 0;
 }
 
+sub FETCH {
+    my ($sth, $attr) = @_;
+    return $sth->{$attr};
+}
+
+sub STORE {
+    my ($sth, $attr, $value) = @_;
+    $sth->{$attr} = $value;
+    return 1;
+}
+
 sub DESTROY {
     my $sth = shift;
     
     # Ensure finish is called if still active
-    if ($sth && $sth->FETCH('Active')) {
+    if ($sth && $sth->{Active}) {
         $sth->finish();
     }
 }

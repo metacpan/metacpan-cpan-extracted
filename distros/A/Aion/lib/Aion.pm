@@ -3,10 +3,13 @@ use 5.22.0;
 no strict; no warnings; no diagnostics;
 use common::sense;
 
-our $VERSION = "0.4";
+our $VERSION = "1.1";
 
-use Scalar::Util qw/blessed weaken/;
 use Aion::Types qw//;
+use Aion::Meta::RequiresAnyFunction;
+use Aion::Meta::Feature;
+use Aion::Meta::RequiresFeature;
+use Aion::Meta::Subroutine;
 
 # Когда осуществлять проверки:
 #   ro - только при выдаче
@@ -22,35 +25,55 @@ our %META;
 
 # Вызывается из другого пакета, для импорта данного
 sub import {
-	my ($cls, $attr) = @_;
+	my (undef, $attr) = @_;
 	my $pkg = caller;
 
-	*{"${pkg}::isa"} = \&isa if \&isa != $pkg->can('isa');
+	*{"$pkg\::isa"} = \&isa if \&isa != $pkg->can('isa');
+	*{"$pkg\::DOES"} = \&does if \&does != $pkg->can('DOES');
 
-    if($attr ne '-role') {  # Класс
-		export $pkg, qw/new extends/;
-    } else {    # Роль
-		export $pkg, qw/requires/;
-    }
+	if($attr ne '-role') {  # Класс
+		export $pkg, qw/extends/;
+		*{"${pkg}::new"} = \&initialize;
+	} else {	# Роль
+		export $pkg, qw/requires req/;
+	}
 
-	export $pkg, qw/with upgrade has aspect does clear/;
+	export $pkg, qw/with has aspect does/;
 
-    # Метаинформация
+	# Метаинформация
 	$META{$pkg} = {
 		order => scalar keys %META,
+		require => {},
 		feature => {},
+		subroutine => {},
 		aspect => {
-			is => \&is_aspect,
-			isa => \&isa_aspect,
-			coerce => \&coerce_aspect,
-			default => \&default_aspect,
-			trigger => \&trigger_aspect,
-			release => \&release_aspect,
-			clearer => \&clearer_aspect,
+			is        => \&is_aspect,
+			isa       => \&isa_aspect,
+			coerce    => \&coerce_aspect,
+			lazy      => \&lazy_aspect,
+			default   => \&default_aspect,
+			trigger   => \&trigger_aspect,
+			release   => \&release_aspect,
+			init_arg  => \&init_arg_aspect,
+			accessor  => \&accessor_aspect,
+			writer    => \&writer_aspect,
+			reader    => \&reader_aspect,
+			predicate => \&predicate_aspect,
+			clearer   => \&clearer_aspect,
+			cleaner   => \&cleaner_aspect,
 		}
 	};
 
-    eval "package $pkg; use Aion::Types; 1" or die;
+	eval "package $pkg; use Aion::Types; 1" or die;
+}
+
+# Удаляет добавленные символы
+sub unimport {
+	my $pkg = caller;
+	
+	undef &{"${pkg}::$_"} for qw/extends with aspect requires req/;
+	
+	eval "package $pkg; no Aion::Types; 1" or die;
 }
 
 # Экспортирует функции в пакет, если их там ещё нет
@@ -63,7 +86,7 @@ sub export($@) {
 	}
 }
 
-# Экспортирует функции в пакет, если их там ещё нет
+# Проверяет, что этот пакет инициализирован Aion
 sub is_aion($) {
 	my $pkg = shift;
 	die "$pkg is'nt class of Aion!" if !exists $META{$pkg};
@@ -71,157 +94,208 @@ sub is_aion($) {
 
 #@category Aspects
 
-sub _weaken_init {
-	my ($self, $feature) = @_;
-	weaken $self->{$feature->{name}};
-}
-
 # ro, rw, + и -, *
 sub is_aspect {
-    my ($cls, $name, $is, $construct, $feature) = @_;
-    die "Use is => '(ro|rw|wo|no)[+-]?[*]?'" if $is !~ /^(ro|rw|wo|no)[+-]?[*]?\z/;
+	my ($is, $feature) = @_;
+	die "Use is => '{ro|rw|wo|no} {+|-} {*} {?} {!}'" if $is !~ /^(?<access>ro|rw|wo|no)?(?<require>[+-])?(?<weak>\*)?(?<has>\??)(?<clear>!?)\z/;
 
-    $construct->{get} = "die 'has: $name is $is (not get)'" if $is =~ /^(wo|no)/;
+	my ($construct, $name) = @$feature{qw/construct name/};
 
-	if($is =~ /^(ro|no)/) {
-    	$construct->{set} = "die 'has: $name is $is (not set)'";
-	}
-	elsif($is =~ /\*\z/) {
-		$construct->{ret} = "; Scalar::Util::weaken(\$self->{$name})$construct->{ret}";
-	}
+	$construct->getter("die 'Feature $name cannot be get!';") if $+{access} ~~ [qw/wo no/];
 
-    $feature->{required} = 1 if $is =~ /\+/;
-    $feature->{excessive} = 1 if $is =~ /-/;
-    push @{$feature->{init}}, \&_weaken_init if $is =~ /\*\z/;
+	$construct->setter("die 'Feature $name cannot be set!';") if $+{access} ~~ [qw/ro no/];
+
+	$construct->add_trigger("%(weaken)s") if $+{weak};
+
+	$feature->{required} = 1, $construct->not_specified(' else { die "%(init_arg)s required!" }') if $+{require} eq '+';
+	
+	$feature->{excessive} = 1, $construct->initer('die "%(init_arg)s excessive!"') if $+{require} eq '-';
+
+	$feature->{make_predicate} = 1 if $+{has};
+	$feature->{make_clearer} = 1 if $+{clear};
 }
 
 # isa => Type
 sub isa_aspect {
-    my ($cls, $name, $isa, $construct, $feature) = @_;
-    die "has: $name - isa maybe Aion::Type"
-        if !UNIVERSAL::isa($isa, 'Aion::Type');
+	my ($isa, $feature) = @_;
+	my ($construct, $name) = @$feature{qw/construct name/};
+	die "has: $name - isa maybe Aion::Type" unless UNIVERSAL::isa($isa, 'Aion::Type');
 
-    $feature->{isa} = $isa;
+	$feature->{isa} = $isa;
 
-    $construct->{get} = "\$Aion::META{'$cls'}{feature}{$name}{isa}->validate(do{$construct->{get}}, 'Get feature `$name`')" if ISA =~ /ro|rw/;
+	$construct->add_release("${\$feature->meta}\{isa}->validate(\$val, 'Get feature $name');") if ISA =~ /ro|rw/;
 
-    $construct->{set} = "\$Aion::META{'$cls'}{feature}{$name}{isa}->validate(\$val, 'Set feature `$name`'); $construct->{set}" if ISA =~ /wo|rw/;
+	$construct->add_preset("${\$feature->meta}\{isa}->validate(\$val, 'Set feature $name');") if ISA =~ /wo|rw/;
 }
 
 # coerce => 1
 sub coerce_aspect {
-    my ($cls, $name, $coerce, $construct, $feature) = @_;
+	my ($coerce, $feature) = @_;
 
 	return unless $coerce;
 
 	die "coerce: isa not present!" unless $feature->{isa};
 
-    $construct->{coerce} = "\$val = \$Aion::META{'$cls'}{feature}{$name}{isa}->coerce(\$val); ";
-    $construct->{set} = "%(coerce)s$construct->{set}"
+	$feature->{construct}->add_preset("\$val = ${\$feature->meta}\{isa}->coerce(\$val);", 1) if ISA =~ /wo|rw/;
+}
+
+# lazy => 1|0
+sub lazy_aspect {
+	my ($lazy, $feature) = @_;
+
+	$feature->{lazy} = $lazy;
 }
 
 # default => value
 sub default_aspect {
-    my ($cls, $name, $default, $construct, $feature) = @_;
+	my ($default, $feature) = @_;
 
-    if(ref $default eq "CODE") {
-        $feature->{lazy} = 1;
-        *{"${cls}::${name}__DEFAULT"} = $default;
+	my $name = $feature->name;
+	my $default_is_code = ref $default eq "CODE";
 
-		$construct->{lazy_trigger} //= "";
-		$construct->{lazy} = "\$self->{$name} = \$self->${name}__DEFAULT%(lazy_trigger)s if !exists \$self->{$name}; ";
-        $construct->{get} = "%(lazy)s$construct->{get}";
-    } else {
-        $feature->{opt}{isa}->validate($default, $name) if $feature->{opt}{isa};
-        $feature->{default} = $default;
-    }
-}
+	if($default_is_code) {
+		$feature->{builder} = $default;
+	} else {
+		$feature->{default} = $default;
+		$feature->{opt}{isa}->validate($default, $name) if $feature->{opt}{isa};
+	}
 
-sub _trigger_init {
-	my ($self, $feature) = @_;
-	my $name = "$feature->{name}__TRIGGER";
-	$self->$name;
+	if($feature->{opt}{lazy} // $default_is_code) {
+		$feature->{lazy} = 1;
+
+		if ($default_is_code) {
+			$feature->construct->add_access("unless(%(has)s) {
+				my \$val = ${\$feature->meta}\{builder}->(\$self);
+				%(write)s
+			}");
+		} else {
+			$feature->construct->add_access("unless(%(has)s) {
+				my \$val = ${\$feature->meta}\{default};
+				%(write)s
+			}");
+		}
+	} else {
+		if($default_is_code) {
+			$feature->{construct}->not_specified(" else {
+				my \$val = ${\$feature->meta}\{builder}->(\$self);
+				%(write)s
+			}");
+		} else {
+			$feature->{construct}->not_specified(" else {
+				my \$val = ${\$feature->meta}\{default};
+				%(write)s
+			}");
+		}
+		
+	}
 }
 
 # trigger => $sub
 sub trigger_aspect {
-	my ($cls, $name, $trigger, $construct, $feature) = @_;
+	my ($trigger, $feature) = @_;
 
-	*{"${cls}::${name}__TRIGGER"} = $trigger;
+	$feature->{trigger} = $trigger;
 
-	$construct->{set} = "my \$e = exists \$self->{$name}; my \$old = \$self->{$name}; $construct->{set}; \$self->${name}__TRIGGER(\$e? \$old: ())";
-	$construct->{lazy_trigger} = ", \$self->${name}__TRIGGER";
+	my $construct = $feature->{construct};
 
-	push @{$feature->{init}}, \&_trigger_init;
+	$construct->add_preset("my \@old = %(has)s? %(get)s: ();");
+	$construct->add_trigger("${\$feature->meta}\{trigger}->(\$self, \@old);");
 }
 
 # release => $sub
 sub release_aspect {
-	my ($cls, $name, $release, $construct, $feature) = @_;
+	my ($release, $feature) = @_;
 
-	*{"${cls}::${name}__RELEASE"} = $release;
+	$feature->{release} = $release;
 
-	$construct->{get} = "my \$release = $construct->{get}; \$self->${name}__RELEASE(\$release); \$release";
+	$feature->{construct}->add_release("${\$feature->meta}\{release}->(\$self, \$val);");
 }
 
-# Если на фичах объекта есть clearer, то на него устанавливается этот деструктор
-sub destroy {
-	my ($self) = @_;
+# init_arg => $name
+sub init_arg_aspect {
+	my ($init_arg, $feature) = @_;
 
-	my $feature_href = $Aion::META{ref $self}{feature};
-	
-	for my $feature (sort { $b->{order} <=> $a->{order} } values %$feature_href) {
-		eval {
-			my ($name, $clearer) = @$feature{qw/name clearer/};
-			$clearer->($self) if defined $clearer and exists $self->{$name};
-		};
-		warn $@ if $@;
-	}
+	$feature->construct->init_arg($init_arg);
 }
 
-# clearer => $sub
+# accessor => $name
+sub accessor_aspect {
+	my ($accessor, $feature) = @_;
+
+	$feature->construct->accessor_name($accessor);
+}
+
+# writer => $name
+sub writer_aspect {
+	my ($writer, $feature) = @_;
+
+	$feature->{make_writer} = 1;
+	$feature->construct->writer_name($writer);
+}
+
+# reader => $name
+sub reader_aspect {
+	my ($reader, $feature) = @_;
+
+	$feature->{make_reader} = 1;
+	$feature->construct->reader_name($reader);
+}
+
+# predicate => $name
+sub predicate_aspect {
+	my ($predicate, $feature) = @_;
+
+	$feature->{make_predicate} = 1;
+	$feature->construct->predicate_name($predicate);
+}
+
+# clearer => $name
 sub clearer_aspect {
-	my ($cls, $name, $clearer, $construct, $feature) = @_;
+	my ($clearer, $feature) = @_;
 
-	$feature->{clearer} = $clearer;
-	*{"${cls}::DESTROY"} = \&destroy unless $cls->can('DESTROY');
-	*{"${cls}::${name}__CLEARER"} = $clearer;
+	$feature->{make_clearer} = 1;
+	$feature->construct->clearer_name($clearer);
+}
+
+# cleaner => $sub
+sub cleaner_aspect {
+	my ($cleaner, $feature) = @_;
+
+	my ($cls, $construct) = @$feature{qw/pkg construct/};
 	
-	die "Is DESTROY in Aion class ($cls): not set aion destroy!" if $cls->can('DESTROY') != \&destroy;
+	$feature->{cleaner} = $cleaner;
+
+	$construct->add_cleaner("${\$feature->meta}\{cleaner}->(\$self);");
 }
 
 # Расширяет класс или роль
 sub inherits($$@) {
-    my $pkg = shift; my $with = shift;
+	my $pkg = shift; my $is_with = shift;
 
 	is_aion $pkg;
 
-    my $FEATURE = $Aion::META{$pkg}{feature};
-    my $ASPECT = $Aion::META{$pkg}{aspect};
+	my $FEATURE = $Aion::META{$pkg}{feature};
+	my $ASPECT = $Aion::META{$pkg}{aspect};
+	my $REQUIRE = $Aion::META{$pkg}{require} //= {};
 
-    # Добавляем наследуемые свойства и атрибуты
+	# Добавляем наследуемые свойства и атрибуты
 	for my $module (@_) {
-        eval "require $module" or die unless $module->can('with') || $module->can('new');
+		eval "require $module" or die unless $module->can('with') || $module->can('new');
 
 		if(my $meta = $Aion::META{$module}) {
 			%$FEATURE = (%$FEATURE, %{$meta->{feature}}) ;
 			%$ASPECT = (%$ASPECT, %{$meta->{aspect}});
+			%$REQUIRE = (%$REQUIRE, %{$meta->{require}});
 		}
 	}
 
-    my $import_name = $with? 'import_with': 'import_extends';
-    for my $module (@_) {
-        my $import = $module->can($import_name);
-        $import->($module, $pkg) if $import;
+	my $import_name = $is_with? 'import_with': 'import_extends';
+	for my $module (@_) {
+		my $import = $module->can($import_name);
+		$import->($module, $pkg) if $import;
+	}
 
-		if($with && exists $Aion::META{$module} && (my $requires = $Aion::META{$module}{requires})) {
-			my @not_requires = grep { !$pkg->can($_) } @$requires;
-
-			do { local $, = ", "; die "@not_requires requires!" } if @not_requires;
-		}
-    }
-
-    return;
+	return;
 }
 
 # Наследование классов
@@ -233,8 +307,8 @@ sub extends(@) {
 	push @{"${pkg}::ISA"}, @_;
 	push @{$Aion::META{$pkg}{extends}}, @_;
 
-    unshift @_, $pkg, 0;
-    goto &inherits;
+	unshift @_, $pkg, 0;
+	goto &inherits;
 }
 
 # Расширение ролями
@@ -246,216 +320,182 @@ sub with(@) {
 	push @{"${pkg}::ISA"}, @_;
 	push @{$Aion::META{$pkg}{with}}, @_;
 
-    unshift @_, $pkg, 1;
-    goto &inherits;
+	unshift @_, $pkg, 1;
+	goto &inherits;
 }
 
-# Требуются подпрограммы
 sub requires(@) {
-    my $pkg = caller;
+	my $pkg = caller;
 
 	is_aion $pkg;
 
-    push @{$Aion::META{$pkg}{requires}}, @_;
-    return;
+	#TODO: добавить проверку на существование
+	$Aion::META{$pkg}{require}{$_} = Aion::Meta::RequiresAnyFunction->new(pkg => $pkg, name => $_) for @_;
+}
+
+# Требуется свойство
+sub req(@) {
+	my ($name) = @_;
+	my $pkg = caller;
+
+	is_aion $pkg;
+
+	my $meta = $Aion::META{$pkg};
+
+	#TODO: добавить проверку на существование по модулю и сравнить, что не одинаковы, если модули не совпадают
+	# die "Feature `$name` already required!" if exists $meta->{require}{$name};
+
+	$meta->{require}{$name} = Aion::Meta::RequiresFeature->new($pkg, @_);
+	return;
 }
 
 # Добавляется аспект
 sub aspect($$) {
 	my ($name, $sub) = @_;
-    my $pkg = caller;
+	my $pkg = caller;
 
 	is_aion $pkg;
 
 	my $ASPECT = $Aion::META{$pkg}{aspect};
 	die "Aspect `$name` exists!" if exists $ASPECT->{$name};
-    $ASPECT->{$name} = $sub;
-    return;
+	$ASPECT->{$name} = $sub;
+	return;
 }
 
-# Определяет - расширен ли класс
+# Переопределяет стандартную isa для того, чтобы не искать роли
 sub isa {
     my ($self, $class) = @_;
-
-    my $pkg = ref $self || $self;
-
-	return 1 if $class eq $pkg;
-
-	my $meta = $Aion::META{$pkg};
-    my $extends = $meta->{extends} // return "";
-
-    return 1 if $class ~~ $extends;
-    for my $extender (@$extends) {
-        return 1 if $extender->isa($class);
-    }
-
-    return "";
+    return '' if Aion::Types::ClassName->exclude($class);
+	goto &UNIVERSAL::isa;
 }
+
 
 # Определяет - подключена ли роль
 sub does {
-    my ($self, $role) = @_;
-
-    my $pkg = ref $self || $self;
-	my $meta = $Aion::META{$pkg};
-	my $does = $meta->{with} // return "";
-
-    return 1 if $role ~~ $does;
-    for my $doeser (@$does) {
-        return 1 if $doeser->can("does") && $doeser->does($role);
-    }
-
-    return "";
-}
-
-# Очищает переменные в объекте, возвращает себя
-sub clear {
-    my $self = shift;
-	my $meta = $Aion::META{ref $self};
-	for my $name (@_) {
-		my $feature = $meta->{feature}{$name};
-		$feature->{clearer}->($self) if $feature and $feature->{clearer} and exists $self->{$name};
-	}
-    delete @$self{@_};
-    $self
+	my ($self, $role) = @_;
+	return '' if Aion::Types::ClassName->include($role);
+	goto &UNIVERSAL::isa;
 }
 
 # Создаёт свойство
 sub has(@) {
 	my $property = shift;
 
-    return exists $property->{$_[0]} if blessed $property;
-
 	my $pkg = caller;
 	is_aion $pkg;
 
-    my %opt = @_;
+	my %opt = @_;
 	my $meta = $Aion::META{$pkg};
 
-	# атрибуты
+	# создаём фичи
 	for my $name (ref $property? @$property: $property) {
 
 		die "has: the method $name is already in the package $pkg"
-            if $pkg->can($name) && !exists $meta->{feature}{$name};
+			if $pkg->can($name) && !exists $meta->{feature}{$name};
 
-        my %construct = (
-            pkg => $pkg,
-            name => $name,
-			attr => '',
-			eval => 'package %(pkg)s {
-	%(sub)s
-}',
-            sub => 'sub %(name)s%(attr)s {
-		if(@_>1) {
-			my ($self, $val) = @_;
-			%(set)s%(ret)s
-		} else {
-			my ($self) = @_;
-			%(get)s
-		}
-	}',
-            get => '$self->{%(name)s}',
-            set => '$self->{%(name)s} = $val',
-			ret => '; $self',
-        );
+		my $feature = Aion::Meta::Feature->new($pkg, $name, @_);
 
-        my $feature = {
-            has => [@_],
-            opt => \%opt,
-            name => $name,
-            construct => \%construct,
-			order => scalar keys %{$meta->{feature}},
-        };
+		my $require = delete $meta->{require}{$name};
+		$require->compare($feature) if $require;
 
-        my $ASPECT = $meta->{aspect};
-        for(my $i=0; $i<@_; $i+=2) {
-            my ($aspect, $value) = @_[$i, $i+1];
-            my $aspect_sub = $ASPECT->{$aspect};
-            die "has: not exists aspect `$aspect`!" if !$aspect_sub;
-            $aspect_sub->($pkg, $name, $value, \%construct, $feature);
-        }
-
-        my $sub = _resolv($construct{eval}, \%construct);
-		eval $sub;
-		die if $@;
-
-        $feature->{sub} = $sub;
+		my $overload = $meta->{feature}{$name};
+		$overload->compare($feature) if $overload;
+		
+		$feature->mk_property;
 		$meta->{feature}{$name} = $feature;
 	}
 	return;
 }
 
-sub _resolv {
-    my ($s, $construct) = @_;
-    $s =~ s{%\((\w*)\)s}{
-        die "has: not construct `$1`\!" unless exists $construct->{$1};
-        _resolv($construct->{$1}, $construct);
-    }ge;
-    $s
-}
-
-# конструктор
-sub new {
-	my ($self, @errors) = create_from_params(@_);
-
-	die join "", "has:\n\n", map "* $_\n", @errors if @errors;
-
-	$self
-}
-
-# Устанавливает свойства и выдаёт объект и ошибки
-sub create_from_params {
-	my ($cls, %value) = @_;
+# Инициализатор: закрывает класс и заменяется на конструктор
+sub initialize {
+	my ($cls) = @_;
 
 	$cls = ref $cls || $cls;
 	is_aion $cls;
 
-	my $self = bless {}, $cls;
-
-	my @init;
-	my @required;
-	my @errors;
-    my $FEATURE = $Aion::META{$cls}{feature};
-
-	while(my ($name, $feature) = each %$FEATURE) {
-
-		if(exists $value{$name}) {
-			my $val = delete $value{$name};
-
-			if(!$feature->{excessive}) {
-				$val = $feature->{coerce}->coerce($val) if $feature->{coerce};
-
-				push @errors, $feature->{isa}->detail($val, "Feature $name")
-                    if ISA =~ /w/ && $feature->{isa} && !$feature->{isa}->include($val);
-				$self->{$name} = $val;
-				push @init, $feature if $feature->{init};
-			}
-			else {
-				push @errors, "Feature $name cannot set in new!";
-			}
-		} elsif($feature->{required}) {
-            push @required, $name;
-        } elsif(exists $feature->{default}) {
-			$self->{$name} = $feature->{default};
-			push @init, $feature if $feature->{init};
-		}
-
-	}
-
-	for my $feature (@init) {
-		for my $init (@{$feature->{init}}) {
-			$init->($self, $feature);
+	my $REQUIRE = $Aion::META{$cls}{require};
+	my $FEATURE = $Aion::META{$cls}{feature};
+	my $SUBROUTINE = $Aion::META{$cls}{subroutine};
+	for my $key (keys %$REQUIRE) {
+		my $require = $REQUIRE->{$key};
+		
+		if ($require->isa('Aion::Meta::RequiresAnyFunction')) {
+			$require->compare($cls->can($key));
+		} elsif ($require->isa('Aion::Meta::RequiresFeature')) {
+			$require->compare($FEATURE->{$require->name});
+		} else {
+			$require->compare($SUBROUTINE->{$require->subname});
 		}
 	}
 
-	do {local $" = ", "; unshift @errors, "Features @required is required!"} if @required > 1;
-	unshift @errors, "Feature @required is required!" if @required == 1;
+	%$REQUIRE = ();
 
-	my @fakekeys = sort keys %value;
-	unshift @errors, "@fakekeys is not feature!" if @fakekeys == 1;
-	do {local $" = ", "; unshift @errors, "@fakekeys is not features!"} if @fakekeys > 1;
+	# TODO: очищать класс от вспомогательных функций
+	#eval "package $cls; Aion->unimport; 1" or die;
 
-	return $self, @errors;
+	my $new = << 'END';
+package %(cls)s {
+	sub new {
+		my ($cls, %value) = @_;
+		$cls = ref $cls || $cls;
+		my $self = bless {}, $cls;
+		
+%(initializers)s
+		
+		if(scalar keys %value) {
+			my @fakekeys = sort keys %value;
+			die "@fakekeys is'nt feature!" if @fakekeys == 1;
+			local $" = ", ";
+			die "@fakekeys is'nt features!"
+		}
+
+		return $self;
+	}
+}
+END
+
+    my @destroyers;
+	my $initializers = join "", map {
+		push @destroyers, $_->{construct}->destroyer if $_->{cleaner};
+		$_->{construct}->initializer
+	} sort { $a->{order} <=> $b->{order} } values %$FEATURE;
+	
+	my %var = (
+		cls => $cls,
+		initializers => $initializers,
+	);
+	
+	$new =~ s/%\((\w+)\)s/$var{$1}/ge;
+
+	eval $new;
+	die if $@;
+
+	if (@destroyers) {
+		my $destroyer = << 'END';
+package %(cls)s {
+	sub DESTROY {
+		my ($self) = @_;
+
+		warn "${\ref $self}#${\Scalar::Util::id $self} destroy in global phase!" if ${^GLOBAL_PHASE} eq 'DESTRUCT';
+
+%(destroyers)s
+	}
+}
+END
+
+		my %var = (
+			cls => $cls,
+			destroyers => join "", @destroyers,
+		);
+	
+		$destroyer =~ s/%\((\w+)\)s/$var{$1}/ge;
+
+		eval $destroyer;
+		die $@ if $@;
+	}
+	
+	goto &{"${cls}::new"};
 }
 
 1;
@@ -470,22 +510,22 @@ Aion - a postmodern object system for Perl 5, such as “Mouse”, “Moose”, 
 
 =head1 VERSION
 
-0.4
+1.1
 
 =head1 SYNOPSIS
 
 	package Calc {
 	
-	    use Aion;
+		use Aion;
 	
-	    has a => (is => 'ro+', isa => Num);
-	    has b => (is => 'ro+', isa => Num);
-	    has op => (is => 'ro', isa => Enum[qw/+ - * \/ **/], default => '+');
+		has a => (is => 'ro+', isa => Num);
+		has b => (is => 'ro+', isa => Num);
+		has op => (is => 'ro', isa => Enum[qw/+ - * \/ **/], default => '+');
 	
-	    sub result : Isa(Object => Num) {
-	        my ($self) = @_;
-	        eval "${\ $self->a} ${\ $self->op} ${\ $self->b}"
-	    }
+		sub result : Isa(Me => Num) {
+			my ($self) = @_;
+			eval "${\ $self->a} ${\ $self->op} ${\ $self->b}";
+		}
 	
 	}
 	
@@ -545,8 +585,8 @@ File lib/Role/Keys/Stringify.pm:
 	use Aion -role;
 	
 	sub keysify {
-	    my ($self) = @_;
-	    join ", ", sort keys %$self;
+		my ($self) = @_;
+		join ", ", sort keys %$self;
 	}
 	
 	1;
@@ -558,8 +598,8 @@ File lib/Role/Values/Stringify.pm:
 	use Aion -role;
 	
 	sub valsify {
-	    my ($self) = @_;
-	    join ", ", map $self->{$_}, sort keys %$self;
+		my ($self) = @_;
+		join ", ", map $self->{$_}, sort keys %$self;
 	}
 	
 	1;
@@ -584,8 +624,8 @@ File lib/Class/All/Stringify.pm:
 	
 	my $s = Class::All::Stringify->new(key1=>"a", key2=>"b");
 	
-	$s->keysify     # => key1, key2
-	$s->valsify     # => a, b
+	$s->keysify	 # => key1, key2
+	$s->valsify	 # => a, b
 
 =head2 isa ($package)
 
@@ -609,9 +649,9 @@ Checks that C<$package> is a super class for a given or this class itself.
 Checks that C<$package> is a role that is used in a class or another role.
 
 	package Role::X { use Aion -role; }
-	package Role::A { use Aion; with qw/Role::X/; }
-	package Role::B { use Aion; }
-	package Ex::Z { use Aion; with qw/Role::A Role::B/ }
+	package Role::A { use Aion -role; with qw/Role::X/; }
+	package Role::B { use Aion -role; }
+	package Ex::Z { use Aion; with qw/Role::A Role::B/; }
 	
 	Ex::Z->does("Role::A") # -> 1
 	Ex::Z->does("Role::B") # -> 1
@@ -625,15 +665,17 @@ Checks that C<$package> is a role that is used in a class or another role.
 Adds the aspect to C<has> in the current class and its classroom classes or the current role and applies its classes.
 
 	package Example::Earth {
-	    use Aion;
+		use Aion;
 	
-	    aspect lvalue => sub {
-	        my ($cls, $name, $value, $construct, $feature) = @_;
+		aspect lvalue => sub {
+			my ($lvalue, $feature) = @_;
 	
-	        $construct->{attr} .= ":lvalue";
-	    };
+			return unless $lvalue;
 	
-	    has moon => (is => "rw", lvalue => 1);
+			$feature->construct->add_attr(":lvalue");
+		};
+	
+		has moon => (is => "rw", lvalue => 1);
 	}
 	
 	my $earth = Example::Earth->new;
@@ -648,70 +690,27 @@ The creator of the aspect has the parameters:
 
 =over
 
-=item * C<$cls> - a bag with C<has>.
+=item * C<$value> — aspect value.
 
-=item * C<$name> is the name of feature.
+=item * C<$feature> - meta-object describing the feature (C<Aion::Meta::Feature>).
 
-=item * C<$value> is the meaning of the aspect.
-
-=item * C<$construct> - a hash with fragments of the code for joining the object method.
-
-=item * C<$feature> - a hash describing a feature.
+=item * C<$aspect_name> — aspect name.
 
 =back
 
 	package Example::Mars {
-	    use Aion;
+		use Aion;
 	
-	    aspect lvalue => sub {
-	        my ($cls, $name, $value, $construct, $feature) = @_;
+		aspect lvalue => sub {
+			my ($value, $feature, $aspect_name) = @_;
 	
-	        $construct->{attr} .= ":lvalue";
+			$value # -> 1
+			$aspect_name # => lvalue
 	
-	        $cls # => Example::Mars
-	        $name # => moon
-	        $value # -> 1
-	        [sort keys %$construct] # --> [qw/attr eval get name pkg ret set sub/]
-	        [sort keys %$feature] # --> [qw/construct has name opt order/]
+			$feature->construct->add_attr(":lvalue");
+		};
 	
-	        my $_construct = {
-	            pkg => $cls,
-	            name => $name,
-				attr => ':lvalue',
-				eval => 'package %(pkg)s {
-		%(sub)s
-	}',
-	            sub => 'sub %(name)s%(attr)s {
-			if(@_>1) {
-				my ($self, $val) = @_;
-				%(set)s%(ret)s
-			} else {
-				my ($self) = @_;
-				%(get)s
-			}
-		}',
-	            get => '$self->{%(name)s}',
-	            set => '$self->{%(name)s} = $val',
-	            ret => '; $self',
-	        };
-	
-	        $construct # --> $_construct
-	
-	        my $_feature = {
-	            has => [is => "rw", lvalue => 1],
-	            opt => {
-	                is => "rw",
-	                lvalue => 1,
-	            },
-	            name => $name,
-	            construct => $_construct,
-	            order => 0,
-	        };
-	
-	        $feature # --> $_feature
-	    };
-	
-	    has moon => (is => "rw", lvalue => 1);
+		has moon => (is => "rw", lvalue => 1);
 	}
 
 =head1 SUBROUTINES IN CLASSES
@@ -722,24 +721,24 @@ Expands the class with another class/classes. It causes from each inherited clas
 
 	package World { use Aion;
 	
-	    our $extended_by_this = 0;
+		our $extended_by_this = 0;
 	
-	    sub import_extends {
-	        my ($class, $extends) = @_;
-	        $extended_by_this ++;
+		sub import_extends {
+			my ($class, $extends) = @_;
+			$extended_by_this ++;
 	
-	        $class      # => World
-	        $extends    # => Hello
-	    }
+			$class   # => World
+			$extends # => Hello
+		}
 	}
 	
 	package Hello { use Aion;
-	    extends q/World/;
+		extends q/World/;
 	
-	    $World::extended_by_this # -> 1
+		$World::extended_by_this # -> 1
 	}
 	
-	Hello->isa("World")     # -> 1
+	Hello->isa("World")	 # -> 1
 
 =head2 new (%param)
 
@@ -756,19 +755,19 @@ The constructor.
 =back
 
 	package NewExample { use Aion;
-	    has x => (is => 'ro', isa => Num);
-	    has y => (is => 'ro+', isa => Num);
-	    has z => (is => 'ro-', isa => Num);
+		has x => (is => 'ro', isa => Num);
+		has y => (is => 'ro+', isa => Num);
+		has z => (is => 'ro-', isa => Num);
 	}
 	
-	eval { NewExample->new(f => 5) }; $@            # ~> f is not feature!
-	eval { NewExample->new(n => 5, r => 6) }; $@    # ~> n, r is not features!
-	eval { NewExample->new }; $@                    # ~> Feature y is required!
-	eval { NewExample->new(z => 10) }; $@           # ~> Feature z cannot set in new!
+	NewExample->new(f => 5) # @-> y required!
+	NewExample->new(f => 5, y => 10) # @-> f is'nt feature!
+	NewExample->new(f => 5, p => 6, y => 10) # @-> f, p is'nt features!
+	NewExample->new(z => 10, y => 10) # @-> z excessive!
 	
 	my $ex = NewExample->new(y => 8);
 	
-	eval { $ex->x }; $@  # ~> Get feature `x` must have the type Num. The it is undef
+	$ex->x # @-> Get feature x must have the type Num. The it is undef!
 	
 	$ex = NewExample->new(x => 10.1, y => 8);
 	
@@ -778,76 +777,45 @@ The constructor.
 
 =head2 requires (@subroutine_names)
 
-Checks that in classes using this role there are these subprograms or features.
+Checks that classes using this role have the specified routines or features.
 
 	package Role::Alpha { use Aion -role;
 	
-	    sub in {
-	        my ($self, $s) = @_;
-	        $s =~ /[${\ $self->abc }]/
-	    }
-	
-	    requires qw/abc/;
+		requires qw/abc/;
 	}
 	
-	eval { package Omega1 { use Aion; with Role::Alpha; } }; $@ # ~> abc requires!
+	package Omega1 { use Aion; with Role::Alpha; }
+	
+	eval { Omega1->new }; $@ # ~> Requires abc of Role::Alpha
 	
 	package Omega { use Aion;
-	    with Role::Alpha;
+		with Role::Alpha;
 	
-	    sub abc { "abc" }
+		sub abc { "abc" }
 	}
 	
-	Omega->new->in("a")  # -> 1
+	Omega->new->abc  # => abc
 
-=head1 METHODS
+=head2 req ($name => @aspects)
 
-=head2 has ($feature)
+Checks that classes using this role have the specified features with the specified aspects.
 
-Checks that the property is established.
-
-Features having C<< default =E<gt> sub {...} >> perform C<sub> during the first call of the Getter, that is: are delayed.
-
-C<< $object-E<gt>has('feature') >> allows you to check that C<default> has not yet been called.
-
-	package ExHas { use Aion;
-	    has x => (is => 'rw');
+	package Role::Beta { use Aion -role;
+	
+		req x => (is => 'rw', isa => Num);
 	}
 	
-	my $ex = ExHas->new;
+	package Omega2 { use Aion; with Role::Beta; }
 	
-	$ex->has("x")   # -> ""
+	eval { Omega2->new }; $@ # ~> Requires req x => \(is => 'rw', isa => Num\) of Role::Beta
 	
-	$ex->x(10);
+	package Omega3 { use Aion;
+		with Role::Beta;
 	
-	$ex->has("x")   # -> 1
-
-=head2 clear (@features)
-
-He removes the keys of the feature from the object by previously calling them C<clearer> (if exists).
-
-	package ExClearer { use Aion;
-	    has x => (is => 'rw');
-	    has y => (is => 'rw');
+		has x => (is => 'rw', isa => Num, default => 12);
 	}
 	
-	my $c = ExClearer->new(x => 10, y => 12);
-	
-	$c->has("x")   # -> 1
-	$c->has("y")   # -> 1
-	
-	$c->clear(qw/x y/);
-	
-	$c->has("x")   # -> ""
-	$c->has("y")   # -> ""
-
-=head1 METHODS IN CLASSES
-
-C<Use Aion> includes the following methods in the module:
-
-=head2 new (%parameters)
-
-The constructor.
+	Omega3->new->x  # -> 12
 
 =head1 ASPECTS
 
@@ -871,35 +839,41 @@ Additional permits:
 
 =over
 
-=item * C<+> - feature is required in the parameters of the designer. C<+> is not used with C<->.
+=item * C<+> - the feature is required in the constructor parameters. C<+> is not used with C<->.
 
-=item * C<-> - a feature cannot be installed through the constructor. '-' is not used with C<+>.
+=item * C<-> - the feature cannot be installed via the constructor. '-' is not used with C<+>.
 
-=item * C<*> - do not increase the counter of links to the value (apply C<weaken> to the value after installing it in a feature).
+=item * C<*> - do not increment the value's reference counter (apply C<weaken> to the value after installing it in the feature).
+
+=item * C<?> – create a predicate.
+
+=item * C<!> – create clearer.
 
 =back
 
 	package ExIs { use Aion;
-	    has rw => (is => 'rw');
-	    has ro => (is => 'ro+');
-	    has wo => (is => 'wo-');
+		has rw => (is => 'rw?!');
+		has ro => (is => 'ro+');
+		has wo => (is => 'wo-?');
 	}
 	
-	eval { ExIs->new }; $@ # ~> \* Feature ro is required!
-	eval { ExIs->new(ro => 10, wo => -10) }; $@ # ~> \* Feature wo cannot set in new!
-	ExIs->new(ro => 10);
-	ExIs->new(ro => 10, rw => 20);
+	ExIs->new # @-> ro required!
+	ExIs->new(ro => 10, wo => -10) # @-> wo excessive!
+	
+	ExIs->new(ro => 10)->has_rw # -> ""
+	ExIs->new(ro => 10, rw => 20)->has_rw # -> 1
+	ExIs->new(ro => 10, rw => 20)->clear_rw->has_rw # -> ""
 	
 	ExIs->new(ro => 10)->ro  # -> 10
 	
-	ExIs->new(ro => 10)->wo(30)->has("wo")  # -> 1
-	eval { ExIs->new(ro => 10)->wo }; $@ # ~> has: wo is wo- \(not get\)
+	ExIs->new(ro => 10)->wo(30)->has_wo # -> 1
+	ExIs->new(ro => 10)->wo # @-> Feature wo cannot be get!
 	ExIs->new(ro => 10)->rw(30)->rw  # -> 30
 
 The function with C<*> does not hold the meaning:
 
 	package Node { use Aion;
-	    has parent => (is => "rw*", isa => Maybe[Object["Node"]]);
+		has parent => (is => "rw*", isa => Maybe[Object["Node"]]);
 	}
 	
 	my $root = Node->new;
@@ -921,35 +895,46 @@ The function with C<*> does not hold the meaning:
 Indicates the type, or rather - a validator, feature.
 
 	package ExIsa { use Aion;
-	    has x => (is => 'ro', isa => Int);
+		has x => (is => 'ro', isa => Int);
 	}
 	
-	eval { ExIsa->new(x => 'str') }; $@ # ~> \* Feature x must have the type Int. The it is 'str'
-	eval { ExIsa->new->x          }; $@ # ~> Get feature `x` must have the type Int. The it is undef
-	ExIsa->new(x => 10)->x              # -> 10
+	ExIsa->new(x => 'str') # @-> Set feature x must have the type Int. The it is 'str'!
+	ExIsa->new->x # @-> Get feature x must have the type Int. The it is undef!
+	ExIsa->new(x => 10)->x			  # -> 10
 
-For a list of validators, see L<Aion:::Type>.
+For a list of validators, see L<Aion::Types>.
+
+=head2 coerce => (1|0)
+
+Includes type conversions.
+
+	package ExCoerce { use Aion;
+		has x => (is => 'ro', isa => Int, coerce => 1);
+	}
+	
+	ExCoerce->new(x => 10.4)->x  # -> 10
+	ExCoerce->new(x => 10.5)->x  # -> 11
 
 =head2 default => $value
 
 The default value is set in the designer if there is no parameter with the name of the feature.
 
 	package ExDefault { use Aion;
-	    has x => (is => 'ro', default => 10);
+		has x => (is => 'ro', default => 10);
 	}
 	
 	ExDefault->new->x  # -> 10
 	ExDefault->new(x => 20)->x  # -> 20
 
-If C<$ Value> is a subprogram, then the subprogram is considered a designer of the meaning of the feature. Lazy calculation is used.
+If C<$value> is a subroutine, then the subroutine is considered the feature's value constructor. Lazy evaluation is used if there is no C<lazy> attribute.
 
 	my $count = 10;
 	
 	package ExLazy { use Aion;
-	    has x => (default => sub {
-	        my ($self) = @_;
-	        ++$count
-	    });
+		has x => (default => sub {
+			my ($self) = @_;
+			++$count
+		});
 	}
 	
 	my $ex = ExLazy->new;
@@ -959,24 +944,46 @@ If C<$ Value> is a subprogram, then the subprogram is considered a designer of t
 	$ex->x   # -> 11
 	$count   # -> 11
 
+=head2 lazy => (1|0)
+
+The C<lazy> attribute enables or disables lazy evaluation of the default value (C<default>).
+
+By default it is only enabled if the default is a subroutine.
+
+	package ExLazy0 { use Aion;
+		has x => (is => 'ro?', lazy => 0, default => sub { 5 });
+	}
+	
+	my $ex0 = ExLazy0->new;
+	$ex0->has_x # -> 1
+	$ex0->x     # -> 5
+	
+	package ExLazy1 { use Aion;
+		has x => (is => 'ro?', lazy => 1, default => 6);
+	}
+	
+	my $ex1 = ExLazy1->new;
+	$ex1->has_x # -> ""
+	$ex1->x     # -> 6
+
 =head2 trigger => $sub
 
 C<$sub> is called after installing the property in the constructor (C<new>) or through the setter.
 Etymology - let in.
 
 	package ExTrigger { use Aion;
-	    has x => (trigger => sub {
-	        my ($self, $old_value) = @_;
-	        $self->y($old_value + $self->x);
-	    });
+		has x => (trigger => sub {
+			my ($self, $old_value) = @_;
+			$self->y($old_value + $self->x);
+		});
 	
-	    has y => ();
+		has y => ();
 	}
 	
 	my $ex = ExTrigger->new(x => 10);
-	$ex->y      # -> 10
+	$ex->y	  # -> 10
 	$ex->x(20);
-	$ex->y      # -> 30
+	$ex->y	  # -> 30
 
 =head2 release => $sub
 
@@ -984,71 +991,162 @@ C<$sub> is called before returning the property from the object through the gutt
 Etymology - release.
 
 	package ExRelease { use Aion;
-	    has x => (release => sub {
-	        my ($self, $value) = @_;
-	        $_[1] = $value + 1;
-	    });
+		has x => (release => sub {
+			my ($self, $value) = @_;
+			$_[1] = $value + 1;
+		});
 	}
 	
 	my $ex = ExRelease->new(x => 10);
-	$ex->x      # -> 11
+	$ex->x	  # -> 11
 
-=head2 clearer => $sub
+=head2 init_arg => $name
 
-C<$sub> is called when the deructor is called orC<< $object-E<gt>clear("feature") ``, but only if there is a property (see >>$object->has(" feature ")`).
+Changes the property name in the constructor.
+
+	package ExInitArg { use Aion;
+		has x => (is => 'ro+', init_arg => 'init_x');
+	
+		ExInitArg->new(init_x => 10)->x # -> 10
+	}
+
+=head2 accessor => $name
+
+Changes the accessor name.
+
+	package ExAccessor { use Aion;
+		has x => (is => 'rw', accessor => '_x');
+	
+		ExAccessor->new->_x(10)->_x # -> 10
+	}
+
+=head2 writer => $name
+
+Creates a setter named C<$name> for a property.
+
+	package ExWriter { use Aion;
+		has x => (is => 'ro', writer => '_set_x');
+	
+		ExWriter->new->_set_x(10)->x # -> 10
+	}
+
+=head2 reader => $name
+
+Creates a getter named C<$name> for a property.
+
+	package ExReader { use Aion;
+		has x => (is => 'wo', reader => '_get_x');
+	
+		ExReader->new(x => 10)->_get_x # -> 10
+	}
+
+=head2 predicate => $name
+
+Creates a predicate named C<$name> for a property. You can also create a predicate with a standard name using C<< is =E<gt> '?' >>.
+
+	package ExPredicate { use Aion;
+		has x => (predicate => '_has_x');
+		
+		my $ex = ExPredicate->new;
+		$ex->_has_x        # -> ""
+		$ex->x(10)->_has_x # -> 1
+	}
+
+=head2 clearer => $name
+
+Creates a cleaner named C<$name> for a property. You can also create a cleaner with a standard name using C<< is =E<gt> '!' >>.
 
 	package ExClearer { use Aion;
-		
-		our $x;
-	
-	    has x => (clearer => sub {
-	        my ($self) = @_;
-	        $x = $self->x
-	    });
+		has x => (is => '?', clearer => 'clear_x_');
 	}
 	
-	$ExClearer::x      	# -> undef
-	ExClearer->new(x => 10);
-	$ExClearer::x      	# -> 10
+	my $ex = ExClearer->new;
+	$ex->has_x	  # -> ""
+	$ex->clear_x_;
+	$ex->has_x	  # -> ""
+	$ex->x(10);
+	$ex->has_x	  # -> 1
+	$ex->clear_x_;
+	$ex->has_x	  # -> ""
+
+=head2 cleaner => $sub
+
+C<$sub> is called when the destructor or C<< $object-E<gt>clear_feature >> is called, but only if the feature is present (see C<< $object-E<gt>has_feature >>).
+
+This aspect forces the creation of a predicate and a clearer.
+
+	package ExCleaner { use Aion;
 	
-	my $ex = ExClearer->new(x => 12);
+		our $x;
 	
-	$ExClearer::x      # -> 10
-	$ex->clear('x');
-	$ExClearer::x      # -> 12
+		has x => (is => '!', cleaner => sub {
+			my ($self) = @_;
+			$x = $self->x
+		});
+	}
+	
+	$ExCleaner::x		  # -> undef
+	ExCleaner->new(x => 10);
+	$ExCleaner::x		  # -> 10
+	
+	my $ex = ExCleaner->new(x => 12);
+	
+	$ExCleaner::x	  # -> 10
+	$ex->clear_x;
+	$ExCleaner::x	  # -> 12
 	
 	undef $ex;
 	
-	$ExClearer::x      # -> 12
+	$ExCleaner::x	  # -> 12
 
 =head1 ATTRIBUTES
 
 C<Aion> adds universal attributes to the package.
 
-=head2 Isa (@signature)
+=head2 :Isa (@signature)
 
 The attribute C<Isa> checks the signature of the function.
 
-B<Attention>: Using the C<Isa> attribute slows down the program.
-
-B<COUNCIL>: The use of the C<Isa> aspect for objects is more than enough to check the correctness of the object data.
-
-	package Anim { use Aion;
+	package MaybeCat { use Aion;
 	
-	    sub is_cat : Isa(Object => Str => Bool) {
-	        my ($self, $anim) = @_;
-	        $anim =~ /(cat)/
-	    }
+		sub is_cat : Isa(Me => Str => Bool) {
+			my ($self, $anim) = @_;
+			$anim =~ /(cat)/
+		}
 	}
 	
-	my $anim = Anim->new;
+	my $anim = MaybeCat->new;
+	$anim->is_cat('cat')	# -> 1
+	$anim->is_cat('dog')	# -> ""
 	
-	$anim->is_cat('cat')    # -> 1
-	$anim->is_cat('dog')    # -> ""
+	MaybeCat->is_cat("cat") # @-> Arguments of method `is_cat` must have the type Tuple[Me, Str].
+	my @items = $anim->is_cat("cat") # @-> Returns of method `is_cat` must have the type Tuple[Bool].
+
+The Isa attribute allows you to declare the required functions:
+
+	package Anim { use Aion -role;
 	
+		sub is_cat : Isa(Me => Bool);
+	}
 	
-	eval { Anim->is_cat("cat") }; $@ # ~> Arguments of method `is_cat` must have the type Tuple\[Object, Str\].
-	eval { my @items = $anim->is_cat("cat") }; $@ # ~> Returns of method `is_cat` must have the type Tuple\[Bool\].
+	package Cat { use Aion; with qw/Anim/;
+	
+		sub is_cat : Isa(Me => Bool) { 1 }
+	}
+	
+	package Dog { use Aion; with qw/Anim/;
+	
+		sub is_cat : Isa(Me => Bool) { 0 }
+	}
+	
+	package Mouse { use Aion; with qw/Anim/;
+		
+		sub is_cat : Isa(Me => Int) { 0 }
+	}
+	
+	Cat->new->is_cat # -> 1
+	Dog->new->is_cat # -> 0
+	Mouse->new # @-> Signature mismatch: is_cat(Me => Bool) of Anim <=> is_cat(Me => Int) of Mouse
 
 =head1 AUTHOR
 
@@ -1060,4 +1158,4 @@ Yaroslav O. Kosmina L<mailto:dart@cpan.org>
 
 =head1 COPYRIGHT
 
-The Aion Module Is Copyright © 2023 Yaroslav O. Kosmina. Rusland. All Rights Reserved.
+The Aion module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All Rights Reserved.

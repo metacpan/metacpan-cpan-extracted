@@ -1,27 +1,27 @@
-!ru:en
+!ru:en,badges
 # NAME
 
 Aion - постмодернистская объектная система для Perl 5, такая как «Mouse», «Moose», «Moo», «Mo» и «M», но с улучшениями
 
 # VERSION
 
-0.4
+1.1
 
 # SYNOPSIS
 
 ```perl
 package Calc {
 
-    use Aion;
+	use Aion;
 
-    has a => (is => 'ro+', isa => Num);
-    has b => (is => 'ro+', isa => Num);
-    has op => (is => 'ro', isa => Enum[qw/+ - * \/ **/], default => '+');
+	has a => (is => 'ro+', isa => Num);
+	has b => (is => 'ro+', isa => Num);
+	has op => (is => 'ro', isa => Enum[qw/+ - * \/ **/], default => '+');
 
-    sub result : Isa(Object => Num) {
-        my ($self) = @_;
-        eval "${\ $self->a} ${\ $self->op} ${\ $self->b}"
-    }
+	sub result : Isa(Me => Num) {
+		my ($self) = @_;
+		eval "${\ $self->a} ${\ $self->op} ${\ $self->b}";
+	}
 
 }
 
@@ -83,8 +83,8 @@ package Role::Keys::Stringify;
 use Aion -role;
 
 sub keysify {
-    my ($self) = @_;
-    join ", ", sort keys %$self;
+	my ($self) = @_;
+	join ", ", sort keys %$self;
 }
 
 1;
@@ -97,8 +97,8 @@ package Role::Values::Stringify;
 use Aion -role;
 
 sub valsify {
-    my ($self) = @_;
-    join ", ", map $self->{$_}, sort keys %$self;
+	my ($self) = @_;
+	join ", ", map $self->{$_}, sort keys %$self;
 }
 
 1;
@@ -124,8 +124,8 @@ use Class::All::Stringify;
 
 my $s = Class::All::Stringify->new(key1=>"a", key2=>"b");
 
-$s->keysify     # => key1, key2
-$s->valsify     # => a, b
+$s->keysify	 # => key1, key2
+$s->valsify	 # => a, b
 ```
 
 ## isa ($package)
@@ -153,9 +153,9 @@ Ex::X->isa("Ex::X") # -> 1
 
 ```perl
 package Role::X { use Aion -role; }
-package Role::A { use Aion; with qw/Role::X/; }
-package Role::B { use Aion; }
-package Ex::Z { use Aion; with qw/Role::A Role::B/ }
+package Role::A { use Aion -role; with qw/Role::X/; }
+package Role::B { use Aion -role; }
+package Ex::Z { use Aion; with qw/Role::A Role::B/; }
 
 Ex::Z->does("Role::A") # -> 1
 Ex::Z->does("Role::B") # -> 1
@@ -171,15 +171,17 @@ Ex::Z->does("Ex::Z") # -> ""
 
 ```perl
 package Example::Earth {
-    use Aion;
+	use Aion;
 
-    aspect lvalue => sub {
-        my ($cls, $name, $value, $construct, $feature) = @_;
+	aspect lvalue => sub {
+		my ($lvalue, $feature) = @_;
 
-        $construct->{attr} .= ":lvalue";
-    };
+		return unless $lvalue;
 
-    has moon => (is => "rw", lvalue => 1);
+		$feature->construct->add_attr(":lvalue");
+	};
+
+	has moon => (is => "rw", lvalue => 1);
 }
 
 my $earth = Example::Earth->new;
@@ -193,65 +195,24 @@ $earth->moon # => Mars
 
 Создатель аспекта имеет параметры:
 
-* `$cls` — пакет с `has`.
-* `$name` — имя фичи.
 * `$value` — значение аспекта.
-* `$construct` — хэш с фрагментами кода для присоединения к методу объекта.
-* `$feature` — хеш описывающий фичу.
+* `$feature` — метаобъект описывающий фичу (`Aion::Meta::Feature`).
+* `$aspect_name` — наименование аспекта.
 
 ```perl
 package Example::Mars {
-    use Aion;
+	use Aion;
 
-    aspect lvalue => sub {
-        my ($cls, $name, $value, $construct, $feature) = @_;
+	aspect lvalue => sub {
+		my ($value, $feature, $aspect_name) = @_;
 
-        $construct->{attr} .= ":lvalue";
+		$value # -> 1
+		$aspect_name # => lvalue
 
-        $cls # => Example::Mars
-        $name # => moon
-        $value # -> 1
-        [sort keys %$construct] # --> [qw/attr eval get name pkg ret set sub/]
-        [sort keys %$feature] # --> [qw/construct has name opt order/]
+		$feature->construct->add_attr(":lvalue");
+	};
 
-        my $_construct = {
-            pkg => $cls,
-            name => $name,
-			attr => ':lvalue',
-			eval => 'package %(pkg)s {
-	%(sub)s
-}',
-            sub => 'sub %(name)s%(attr)s {
-		if(@_>1) {
-			my ($self, $val) = @_;
-			%(set)s%(ret)s
-		} else {
-			my ($self) = @_;
-			%(get)s
-		}
-	}',
-            get => '$self->{%(name)s}',
-            set => '$self->{%(name)s} = $val',
-            ret => '; $self',
-        };
-
-        $construct # --> $_construct
-
-        my $_feature = {
-            has => [is => "rw", lvalue => 1],
-            opt => {
-                is => "rw",
-                lvalue => 1,
-            },
-            name => $name,
-            construct => $_construct,
-            order => 0,
-        };
-
-        $feature # --> $_feature
-    };
-
-    has moon => (is => "rw", lvalue => 1);
+	has moon => (is => "rw", lvalue => 1);
 }
 ```
 
@@ -264,24 +225,24 @@ package Example::Mars {
 ```perl
 package World { use Aion;
 
-    our $extended_by_this = 0;
+	our $extended_by_this = 0;
 
-    sub import_extends {
-        my ($class, $extends) = @_;
-        $extended_by_this ++;
+	sub import_extends {
+		my ($class, $extends) = @_;
+		$extended_by_this ++;
 
-        $class      # => World
-        $extends    # => Hello
-    }
+		$class   # => World
+		$extends # => Hello
+	}
 }
 
 package Hello { use Aion;
-    extends q/World/;
+	extends q/World/;
 
-    $World::extended_by_this # -> 1
+	$World::extended_by_this # -> 1
 }
 
-Hello->isa("World")     # -> 1
+Hello->isa("World")	 # -> 1
 ```
 
 ## new (%param)
@@ -294,19 +255,19 @@ Hello->isa("World")     # -> 1
 
 ```perl
 package NewExample { use Aion;
-    has x => (is => 'ro', isa => Num);
-    has y => (is => 'ro+', isa => Num);
-    has z => (is => 'ro-', isa => Num);
+	has x => (is => 'ro', isa => Num);
+	has y => (is => 'ro+', isa => Num);
+	has z => (is => 'ro-', isa => Num);
 }
 
-eval { NewExample->new(f => 5) }; $@            # ~> f is not feature!
-eval { NewExample->new(n => 5, r => 6) }; $@    # ~> n, r is not features!
-eval { NewExample->new }; $@                    # ~> Feature y is required!
-eval { NewExample->new(z => 10) }; $@           # ~> Feature z cannot set in new!
+NewExample->new(f => 5) # @-> y required!
+NewExample->new(f => 5, y => 10) # @-> f is'nt feature!
+NewExample->new(f => 5, p => 6, y => 10) # @-> f, p is'nt features!
+NewExample->new(z => 10, y => 10) # @-> z excessive!
 
 my $ex = NewExample->new(y => 8);
 
-eval { $ex->x }; $@  # ~> Get feature `x` must have the type Num. The it is undef
+$ex->x # @-> Get feature x must have the type Num. The it is undef!
 
 $ex = NewExample->new(x => 10.1, y => 8);
 
@@ -317,83 +278,49 @@ $ex->x # -> 10.1
 
 ## requires (@subroutine_names)
 
-Проверяет, что в классах использующих эту роль есть указанные подпрограммы или фичи.
+Проверяет, что в классах, использующих эту роль, есть указанные подпрограммы или фичи.
 
 ```perl
 package Role::Alpha { use Aion -role;
 
-    sub in {
-        my ($self, $s) = @_;
-        $s =~ /[${\ $self->abc }]/
-    }
-
-    requires qw/abc/;
+	requires qw/abc/;
 }
 
-eval { package Omega1 { use Aion; with Role::Alpha; } }; $@ # ~> abc requires!
+package Omega1 { use Aion; with Role::Alpha; }
+
+eval { Omega1->new }; $@ # ~> Requires abc of Role::Alpha
 
 package Omega { use Aion;
-    with Role::Alpha;
+	with Role::Alpha;
 
-    sub abc { "abc" }
+	sub abc { "abc" }
 }
 
-Omega->new->in("a")  # -> 1
+Omega->new->abc  # => abc
 ```
 
-# METHODS
+## req ($name => @aspects)
 
-## has ($feature)
-
-Проверяет, что свойство установлено.
-
-Фичи имеющие `default => sub { ... }` выполняют `sub` при первом вызове геттера, то есть: являются отложенными.
-
-`$object->has('фича')` позволяет проверить, что `default` ещё не вызывался.
+Проверяет, что в классах, использующих эту роль, есть указанные фичи с указанными аспектами.
 
 ```perl
-package ExHas { use Aion;
-    has x => (is => 'rw');
+package Role::Beta { use Aion -role;
+
+	req x => (is => 'rw', isa => Num);
 }
 
-my $ex = ExHas->new;
+package Omega2 { use Aion; with Role::Beta; }
 
-$ex->has("x")   # -> ""
+eval { Omega2->new }; $@ # ~> Requires req x => \(is => 'rw', isa => Num\) of Role::Beta
 
-$ex->x(10);
+package Omega3 { use Aion;
+	with Role::Beta;
 
-$ex->has("x")   # -> 1
-```
-
-## clear (@features)
-
-Удаляет ключи фич из объекта предварительно вызвав на них `clearer` (если есть).
-
-```perl
-package ExClearer { use Aion;
-    has x => (is => 'rw');
-    has y => (is => 'rw');
+	has x => (is => 'rw', isa => Num, default => 12);
 }
 
-my $c = ExClearer->new(x => 10, y => 12);
-
-$c->has("x")   # -> 1
-$c->has("y")   # -> 1
-
-$c->clear(qw/x y/);
-
-$c->has("x")   # -> ""
-$c->has("y")   # -> ""
+Omega3->new->x  # -> 12
 ```
-
-
-# METHODS IN CLASSES
-
-`use Aion` включает в модуль следующие методы:
-
-## new (%parameters)
-
-Конструктор.
 
 # ASPECTS
 
@@ -412,23 +339,27 @@ $c->has("y")   # -> ""
 * `+` — фича обязательна в параметрах конструктора. `+` не используется с `-`.
 * `-` — фича не может быть установлена через конструктор. '-' не используется с `+`.
 * `*` — не инкрементировать счётчик ссылок на значение (применить `weaken` к значению после установки его в фичу).
+* `?` – создать предикат.
+* `!` – создать clearer.
 
 ```perl
 package ExIs { use Aion;
-    has rw => (is => 'rw');
-    has ro => (is => 'ro+');
-    has wo => (is => 'wo-');
+	has rw => (is => 'rw?!');
+	has ro => (is => 'ro+');
+	has wo => (is => 'wo-?');
 }
 
-eval { ExIs->new }; $@ # ~> \* Feature ro is required!
-eval { ExIs->new(ro => 10, wo => -10) }; $@ # ~> \* Feature wo cannot set in new!
-ExIs->new(ro => 10);
-ExIs->new(ro => 10, rw => 20);
+ExIs->new # @-> ro required!
+ExIs->new(ro => 10, wo => -10) # @-> wo excessive!
+
+ExIs->new(ro => 10)->has_rw # -> ""
+ExIs->new(ro => 10, rw => 20)->has_rw # -> 1
+ExIs->new(ro => 10, rw => 20)->clear_rw->has_rw # -> ""
 
 ExIs->new(ro => 10)->ro  # -> 10
 
-ExIs->new(ro => 10)->wo(30)->has("wo")  # -> 1
-eval { ExIs->new(ro => 10)->wo }; $@ # ~> has: wo is wo- \(not get\)
+ExIs->new(ro => 10)->wo(30)->has_wo # -> 1
+ExIs->new(ro => 10)->wo # @-> Feature wo cannot be get!
 ExIs->new(ro => 10)->rw(30)->rw  # -> 30
 ```
 
@@ -436,7 +367,7 @@ ExIs->new(ro => 10)->rw(30)->rw  # -> 30
 
 ```perl
 package Node { use Aion;
-    has parent => (is => "rw*", isa => Maybe[Object["Node"]]);
+	has parent => (is => "rw*", isa => Maybe[Object["Node"]]);
 }
 
 my $root = Node->new;
@@ -460,15 +391,28 @@ $node->parent   # -> undef
 
 ```perl
 package ExIsa { use Aion;
-    has x => (is => 'ro', isa => Int);
+	has x => (is => 'ro', isa => Int);
 }
 
-eval { ExIsa->new(x => 'str') }; $@ # ~> \* Feature x must have the type Int. The it is 'str'
-eval { ExIsa->new->x          }; $@ # ~> Get feature `x` must have the type Int. The it is undef
-ExIsa->new(x => 10)->x              # -> 10
+ExIsa->new(x => 'str') # @-> Set feature x must have the type Int. The it is 'str'!
+ExIsa->new->x # @-> Get feature x must have the type Int. The it is undef!
+ExIsa->new(x => 10)->x			  # -> 10
 ```
 
-Список валидаторов см. в [Aion::Type](https://metacpan.org/pod/Aion::Type).
+Список валидаторов см. в [Aion::Types](https://metacpan.org/pod/Aion::Types).
+
+## coerce => (1|0)
+
+Включает преобразования типов.
+
+```perl
+package ExCoerce { use Aion;
+	has x => (is => 'ro', isa => Int, coerce => 1);
+}
+
+ExCoerce->new(x => 10.4)->x  # -> 10
+ExCoerce->new(x => 10.5)->x  # -> 11
+```
 
 ## default => $value
 
@@ -476,23 +420,23 @@ ExIsa->new(x => 10)->x              # -> 10
 
 ```perl
 package ExDefault { use Aion;
-    has x => (is => 'ro', default => 10);
+	has x => (is => 'ro', default => 10);
 }
 
 ExDefault->new->x  # -> 10
 ExDefault->new(x => 20)->x  # -> 20
 ```
 
-Если `$value` является подпрограммой, то подпрограмма считается конструктором значения фичи. Используется ленивое вычисление.
+Если `$value` является подпрограммой, то подпрограмма считается конструктором значения фичи. Используется ленивое вычисление, если нет атрибута `lazy`.
 
 ```perl
 my $count = 10;
 
 package ExLazy { use Aion;
-    has x => (default => sub {
-        my ($self) = @_;
-        ++$count
-    });
+	has x => (default => sub {
+		my ($self) = @_;
+		++$count
+	});
 }
 
 my $ex = ExLazy->new;
@@ -503,6 +447,30 @@ $ex->x   # -> 11
 $count   # -> 11
 ```
 
+## lazy => (1|0)
+
+Атрибут `lazy` включает или отключает ленивое вычисление значения по умолчанию (`default`).
+
+По умолчанию он включен только если значение по умолчанию является подпрограммой.
+
+```perl
+package ExLazy0 { use Aion;
+	has x => (is => 'ro?', lazy => 0, default => sub { 5 });
+}
+
+my $ex0 = ExLazy0->new;
+$ex0->has_x # -> 1
+$ex0->x     # -> 5
+
+package ExLazy1 { use Aion;
+	has x => (is => 'ro?', lazy => 1, default => 6);
+}
+
+my $ex1 = ExLazy1->new;
+$ex1->has_x # -> ""
+$ex1->x     # -> 6
+```
+
 ## trigger => $sub
 
 `$sub` вызывается после установки свойства в конструкторе (`new`) или через сеттер.
@@ -510,18 +478,18 @@ $count   # -> 11
 
 ```perl
 package ExTrigger { use Aion;
-    has x => (trigger => sub {
-        my ($self, $old_value) = @_;
-        $self->y($old_value + $self->x);
-    });
+	has x => (trigger => sub {
+		my ($self, $old_value) = @_;
+		$self->y($old_value + $self->x);
+	});
 
-    has y => ();
+	has y => ();
 }
 
 my $ex = ExTrigger->new(x => 10);
-$ex->y      # -> 10
+$ex->y	  # -> 10
 $ex->x(20);
-$ex->y      # -> 30
+$ex->y	  # -> 30
 ```
 
 ## release => $sub
@@ -531,75 +499,180 @@ $ex->y      # -> 30
 
 ```perl
 package ExRelease { use Aion;
-    has x => (release => sub {
-        my ($self, $value) = @_;
-        $_[1] = $value + 1;
-    });
+	has x => (release => sub {
+		my ($self, $value) = @_;
+		$_[1] = $value + 1;
+	});
 }
 
 my $ex = ExRelease->new(x => 10);
-$ex->x      # -> 11
+$ex->x	  # -> 11
 ```
 
-## clearer => $sub
+## init_arg => $name
 
-`$sub` вызывается при вызове декструктора или `$object->clear("feature")`, но только если свойство имеется (см. `$object->has("feature")`).
+Меняет имя свойства в конструкторе.
+
+```perl
+package ExInitArg { use Aion;
+	has x => (is => 'ro+', init_arg => 'init_x');
+
+	ExInitArg->new(init_x => 10)->x # -> 10
+}
+```
+
+## accessor => $name
+
+Меняет имя акцессора.
+
+```perl
+package ExAccessor { use Aion;
+	has x => (is => 'rw', accessor => '_x');
+
+	ExAccessor->new->_x(10)->_x # -> 10
+}
+```
+
+## writer => $name
+
+Создаёт сеттер с именем `$name` для свойства.
+
+```perl
+package ExWriter { use Aion;
+	has x => (is => 'ro', writer => '_set_x');
+
+	ExWriter->new->_set_x(10)->x # -> 10
+}
+```
+
+## reader => $name
+
+Создаёт геттер с именем `$name` для свойства.
+
+```perl
+package ExReader { use Aion;
+	has x => (is => 'wo', reader => '_get_x');
+
+	ExReader->new(x => 10)->_get_x # -> 10
+}
+```
+
+## predicate => $name
+
+Создаёт предикат с именем `$name` для свойства. Создать предикат со стандартным именем можно так же через  `is => '?'`.
+
+```perl
+package ExPredicate { use Aion;
+	has x => (predicate => '_has_x');
+	
+	my $ex = ExPredicate->new;
+	$ex->_has_x        # -> ""
+	$ex->x(10)->_has_x # -> 1
+}
+```
+
+## clearer => $name
+
+Создаёт очиститель с именем `$name` для свойства. Создать очиститель со стандартным именем можно так же через  `is => '!'`.
 
 ```perl
 package ExClearer { use Aion;
-	
-	our $x;
-
-    has x => (clearer => sub {
-        my ($self) = @_;
-        $x = $self->x
-    });
+	has x => (is => '?', clearer => 'clear_x_');
 }
 
-$ExClearer::x      	# -> undef
-ExClearer->new(x => 10);
-$ExClearer::x      	# -> 10
+my $ex = ExClearer->new;
+$ex->has_x	  # -> ""
+$ex->clear_x_;
+$ex->has_x	  # -> ""
+$ex->x(10);
+$ex->has_x	  # -> 1
+$ex->clear_x_;
+$ex->has_x	  # -> ""
+```
 
-my $ex = ExClearer->new(x => 12);
+## cleaner => $sub
 
-$ExClearer::x      # -> 10
-$ex->clear('x');
-$ExClearer::x      # -> 12
+`$sub` вызывается при вызове декструктора или `$object->clear_feature`, но только если свойство имеется (см. `$object->has_feature`).
+
+Данный аспект принудительно создаёт предикат и clearer.
+
+```perl
+package ExCleaner { use Aion;
+
+	our $x;
+
+	has x => (is => '!', cleaner => sub {
+		my ($self) = @_;
+		$x = $self->x
+	});
+}
+
+$ExCleaner::x		  # -> undef
+ExCleaner->new(x => 10);
+$ExCleaner::x		  # -> 10
+
+my $ex = ExCleaner->new(x => 12);
+
+$ExCleaner::x	  # -> 10
+$ex->clear_x;
+$ExCleaner::x	  # -> 12
 
 undef $ex;
 
-$ExClearer::x      # -> 12
+$ExCleaner::x	  # -> 12
 ```
 
 # ATTRIBUTES
 
 `Aion` добавляет в пакет универсальные атрибуты.
 
-## Isa (@signature)
+## :Isa (@signature)
 
 Атрибут `Isa` проверяет сигнатуру функции.
 
-**ВНИМАНИЕ**: использование атрибута «Isa» замедляет работу программы.
-
-**СОВЕТ**: использования аспекта `isa` для объектов более чем достаточно, чтобы проверить правильность данных объекта.
-
 ```perl
-package Anim { use Aion;
+package MaybeCat { use Aion;
 
-    sub is_cat : Isa(Object => Str => Bool) {
-        my ($self, $anim) = @_;
-        $anim =~ /(cat)/
-    }
+	sub is_cat : Isa(Me => Str => Bool) {
+		my ($self, $anim) = @_;
+		$anim =~ /(cat)/
+	}
 }
 
-my $anim = Anim->new;
+my $anim = MaybeCat->new;
+$anim->is_cat('cat')	# -> 1
+$anim->is_cat('dog')	# -> ""
 
-$anim->is_cat('cat')    # -> 1
-$anim->is_cat('dog')    # -> ""
+MaybeCat->is_cat("cat") # @-> Arguments of method `is_cat` must have the type Tuple[Me, Str].
+my @items = $anim->is_cat("cat") # @-> Returns of method `is_cat` must have the type Tuple[Bool].
+```
 
+Атрибут Isa позволяет объявить требуемые функции:
 
-eval { Anim->is_cat("cat") }; $@ # ~> Arguments of method `is_cat` must have the type Tuple\[Object, Str\].
-eval { my @items = $anim->is_cat("cat") }; $@ # ~> Returns of method `is_cat` must have the type Tuple\[Bool\].
+```perl
+package Anim { use Aion -role;
+
+	sub is_cat : Isa(Me => Bool);
+}
+
+package Cat { use Aion; with qw/Anim/;
+
+	sub is_cat : Isa(Me => Bool) { 1 }
+}
+
+package Dog { use Aion; with qw/Anim/;
+
+	sub is_cat : Isa(Me => Bool) { 0 }
+}
+
+package Mouse { use Aion; with qw/Anim/;
+	
+	sub is_cat : Isa(Me => Int) { 0 }
+}
+
+Cat->new->is_cat # -> 1
+Dog->new->is_cat # -> 0
+Mouse->new # @-> Signature mismatch: is_cat(Me => Bool) of Anim <=> is_cat(Me => Int) of Mouse
 ```
 
 # AUTHOR

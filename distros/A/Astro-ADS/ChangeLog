@@ -1,3 +1,10 @@
+1.92      2025 Nov 12
+===
+* bug in condition check on number of rows fixed by @esabol (Ed Sabol)
+* added query_tree method to get AST of query
+* added bigquery method to take a long list of bibcodes to filter query on
+* post_response method now takes both string content and json payload
+
 1.91      2025 Oct 16
 ===
 * Citation Metrics Report - added all 3 endpoints

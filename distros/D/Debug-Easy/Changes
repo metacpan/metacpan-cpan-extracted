@@ -366,3 +366,7 @@ Revision history for Debug-Easy
 2.17    Aug 29, 2025
 
         Modifications to the build process.
+
+2.18    Nov 11, 2025
+
+        Changed how versioning is handled

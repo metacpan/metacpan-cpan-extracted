@@ -8,7 +8,7 @@ use Params::Get 0.13;
 use Storable; # RT117983
 use Class::Autouse qw{Carp Locale::Language Locale::Object::Country Locale::Object::DB I18N::AcceptLanguage I18N::LangTags::Detect};
 
-our $VERSION = '0.78';
+our $VERSION = '0.79';
 
 =head1 NAME
 
@@ -16,7 +16,7 @@ CGI::Lingua - Create a multilingual web page
 
 =head1 VERSION
 
-Version 0.78
+Version 0.79
 
 =cut
 
@@ -68,6 +68,10 @@ Creates a CGI::Lingua object.
 Takes one mandatory parameter, C<supported>,
 a list of languages, in RFC-1766 format,
 that the website supports.
+It can either be a simple string,
+if only one language is supported,
+or a reference to a list of languages.
+
 Language codes are of the form primary-code [ - country-code ] e.g.
 'en', 'en-gb' for English and British English respectively.
 
@@ -210,7 +214,11 @@ sub new
 		} elsif($l = $class->_what_language()) {
 			$key .= "$l/";
 		}
-		$key .= join('/', @{$params->{supported}});
+		if(ref($params->{'supported'} eq 'ARRAY')) {
+			$key .= join('/', @{$params->{supported}});
+		} else {
+			$key .= $params->{'supported'};
+		}
 		# if($logger) {
 			# $self->debug("Looking in cache for $key");
 		# }
@@ -228,6 +236,7 @@ sub new
 			$rc->{_have_geoip} = -1;
 			$rc->{_have_geoipfree} = -1;
 
+
 			if(($rc->{_what_language} || $rc->{_rlanguage}) && $info && $info->lang()) {
 				delete $rc->{_what_language};
 				delete $rc->{_rlanguage};
@@ -239,7 +248,7 @@ sub new
 
 	return bless {
 		%{$params},
-		_supported => $params->{supported}, # List of languages (two letters) that the application
+		_supported => ref($params->{supported}) ? $params->{supported} : [ $params->{'supported'} ], # List of languages (two letters) that the application
 		_cache => $cache,	# CHI
 		_info => $info,
 		# _rlanguage => undef,	# Requested language

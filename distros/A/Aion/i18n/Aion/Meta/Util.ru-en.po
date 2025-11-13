@@ -1,0 +1,24 @@
+msgid "Aion::Meta::Util - вспомогательные функции для создания мета-данных"
+msgstr "Aion::Meta::Util - helper functions for creating meta data"
+
+msgid "В мета-классах поддерживающих создание фич и сигнатур функций (т.е. внутреннюю кухню Aion) требуется своя небольшая реализация, которую и предоставляет данный модуль."
+msgstr "Meta-classes that support the creation of features and function signatures (i.e., the internal kitchen of Aion) require their own small implementation, which this module provides."
+
+msgid "Создаёт геттеры."
+msgstr "Creates getters."
+
+msgid "Создаёт геттер-сеттеры."
+msgstr "Creates getter-setters."
+
+msgid "Проверяет, имеет ли подпрограмма тело."
+msgstr "Checks whether the subroutine has a body."
+
+msgid "Переводит `$val` в строку."
+msgstr "Converts `$val` to a string."
+
+msgid "⚖ **GPLv3**"
+msgstr "⚖ **GPLv3**"
+
+msgid "The Aion::Meta::Util module is copyright © 2025 Yaroslav O. Kosmina. Rusland. All rights reserved."
+msgstr "The Aion::Meta::Util module is copyright © 2025 Yaroslav O. Kosmina. Rusland. All rights reserved."
+

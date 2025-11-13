@@ -14,7 +14,7 @@ no if "$]" >= 5.041009, feature => 'smartmatch';
 
 use Test2::V0 -no_pragmas => 1;
 use if $ENV{AUTHOR_TESTING}, 'Test2::Warnings';
-use Test::Fatal;
+use Test2::Tools::Exception;
 use Test::File::ShareDir -share => { -dist => { 'Test-JSON-Schema-Acceptance' => 'share' } };
 use Test::JSON::Schema::Acceptance;
 
@@ -46,14 +46,14 @@ foreach my $version (3,4,6,7) {
 
 foreach my $version ('a', 2, 'foo') {
   like(
-    exception { Test::JSON::Schema::Acceptance->new($version) },
+    dies { Test::JSON::Schema::Acceptance->new($version) },
     qr/Value "draft$version" did not pass type constraint/,
     'does not accept version = '.$version,
   );
 }
 
 like(
-  exception { Test::JSON::Schema::Acceptance->new(test_dir => 'foo') },
+  dies { Test::JSON::Schema::Acceptance->new(test_dir => 'foo') },
   qr/test_dir does not exist: .*foo/,
   'explicit test_dir argument is checked',
 );

@@ -1,5 +1,5 @@
 package Astro::ADS::Metrics;
-$Astro::ADS::Metrics::VERSION = '1.91';
+$Astro::ADS::Metrics::VERSION = '1.92';
 use Moo;
 extends 'Astro::ADS';
 #with 'Astro::ADS::Role::ResultMapper';
@@ -101,7 +101,7 @@ Astro::ADS::Metrics - Queries the ADS Metrics endpoint and collects the results
 
 =head1 VERSION
 
-version 1.91
+version 1.92
 
 =head1 SYNOPSIS
 

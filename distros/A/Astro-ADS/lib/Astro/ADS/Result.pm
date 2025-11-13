@@ -1,5 +1,5 @@
 package Astro::ADS::Result;
-$Astro::ADS::Result::VERSION = '1.91';
+$Astro::ADS::Result::VERSION = '1.92';
 use Moo;
 
 use Carp;
@@ -56,8 +56,8 @@ sub next {
         carp "No more results for ", $self->q, "\n";
         return;
     }
-    elsif ( $num && ! $num > 0 ) {
-        carp sprintf('Bad value for number of rows: %d. Defaulting to %d', $num, $self->rows);
+    elsif ( $num && !($num > 0) ) {
+        carp sprintf('Bad value for number of rows: %s. Defaulting to %d', $num, $self->rows);
         $num = 0;
     }
 
@@ -108,7 +108,7 @@ Astro::ADS::Result - A class for the results of a Search
 
 =head1 VERSION
 
-version 1.91
+version 1.92
 
 =head1 SYNOPSIS
 

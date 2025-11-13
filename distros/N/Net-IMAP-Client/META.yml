@@ -25,5 +25,5 @@ requires:
   List::MoreUtils: '0'
   List::Util: '0'
   Test::More: '0'
-version: '0.9508'
+version: '0.9509'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

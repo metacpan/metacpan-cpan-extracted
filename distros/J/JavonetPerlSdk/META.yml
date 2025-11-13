@@ -35,5 +35,5 @@ requires:
   aliased: '0'
   autobox::universal: '0'
   threads: '0'
-version: v2.6.4
+version: v2.6.5
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

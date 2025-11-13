@@ -1,0 +1,22 @@
+Revision history for Perl extension Aion::Enum
+
+0.0.3 2025-11-13T10:20:32Z
+
+    - issa validate name and alias
+
+0.0.2 2025-11-13T07:17:55Z
+
+    - corrected cpanfile dependencies
+
+0.0.1 2025-11-13T07:01:16Z
+
+    - change version
+
+0.0.0 2025-11-13T06:58:55Z
+
+    - use liveman badges
+
+0.01 2018-04-19T11:17:54Z
+
+    - original version
+

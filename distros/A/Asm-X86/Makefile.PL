@@ -1,7 +1,7 @@
 #!perl
 # Asm::X86 - Makefile builder.
 #
-#	Copyright (C) 2008-2024 Bogdan 'bogdro' Drozdowski,
+#	Copyright (C) 2008-2025 Bogdan 'bogdro' Drozdowski,
 #	  bogdro (at) users . sourceforge . net
 #	  bogdro /at\ cpan . org
 #
@@ -21,6 +21,7 @@ use ExtUtils::MakeMaker;
 
 my $mod_file = 'lib/Asm/X86.pm';
 my $mod_name = 'Asm::X86';
+my $mod_ver = '0.72';
 
 # Dynamic configuration is a workaround for systems where BSD tar
 # is installed instead of GNU tar
@@ -61,7 +62,7 @@ WriteMakefile(
 	MIN_PERL_VERSION	=> '5.006',	# just because of 'Exporter'
 	META_ADD		=> { provides => { $mod_name => {
 					file => $mod_file,
-					version => '0.70'
+					version => $mod_ver
 					}
 				} },
 

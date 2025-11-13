@@ -183,3 +183,9 @@
         Internal token handling improved.
 
         "tokens" option output also improved
+
+1.45    Nov 11, 2025
+
+        Added "ansi-modes" option to show supported ANSI color support.
+
+		Changed version handling

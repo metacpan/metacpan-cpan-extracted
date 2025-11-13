@@ -63,27 +63,31 @@
    "provides" : {
       "Astro::ADS" : {
          "file" : "lib/Astro/ADS.pm",
-         "version" : "1.91"
+         "version" : "1.92"
       },
       "Astro::ADS::Metrics" : {
          "file" : "lib/Astro/ADS/Metrics.pm",
-         "version" : "1.91"
+         "version" : "1.92"
       },
       "Astro::ADS::Paper" : {
          "file" : "lib/Astro/ADS/Paper.pm",
-         "version" : "1.91"
+         "version" : "1.92"
+      },
+      "Astro::ADS::QTree" : {
+         "file" : "lib/Astro/ADS/QTree.pm",
+         "version" : "1.92"
       },
       "Astro::ADS::Result" : {
          "file" : "lib/Astro/ADS/Result.pm",
-         "version" : "1.91"
+         "version" : "1.92"
       },
       "Astro::ADS::Role::ResultMapper" : {
          "file" : "lib/Astro/ADS/Role/ResultMapper.pm",
-         "version" : "1.91"
+         "version" : "1.92"
       },
       "Astro::ADS::Search" : {
          "file" : "lib/Astro/ADS/Search.pm",
-         "version" : "1.91"
+         "version" : "1.92"
       }
    },
    "release_status" : "stable",
@@ -98,7 +102,7 @@
          "web" : "https://github.com/duffee/astro-ads"
       }
    },
-   "version" : "1.91",
+   "version" : "1.92",
    "x_generated_by_perl" : "v5.38.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "MIT"

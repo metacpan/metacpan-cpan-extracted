@@ -1,4 +1,6 @@
 Revision history for Net-IMAP-Client
+0.9509  Nov 13, 2025
+         - revert previous, overambitious patch
 
 0.9508  Nov 9, 2025
 

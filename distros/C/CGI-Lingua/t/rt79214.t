@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 8;
+use Test::More tests => 9;
 
 use lib 't/lib';
 use MyLogger;
@@ -28,7 +28,7 @@ RT79214: {
 	delete $ENV{'HTTP_ACCEPT_LANGUAGE'};
 	my $l = new_ok('CGI::Lingua' => [
 		supported => [ 'en-gb', 'nl', 'da', 'fr', 'de', 'pl' ],
-		logger => MyLogger->new()
+		logger => new_ok('MyLogger')
 	]);
 	ok(defined($l));
 	ok($l->isa('CGI::Lingua'));
@@ -38,9 +38,7 @@ RT79214: {
 		ok(defined($l->requested_language()));
 		is($l->language(), 'Unknown');
 
-		TODO: {
-			local $TODO = 'https://rt.cpan.org/Public/Bug/Display.html?id=79214';
-			ok(!defined($l->code_alpha2()));
-		}
+		# https://rt.cpan.org/Public/Bug/Display.html?id=79214';
+		ok(!defined($l->code_alpha2()));
 	}
 }

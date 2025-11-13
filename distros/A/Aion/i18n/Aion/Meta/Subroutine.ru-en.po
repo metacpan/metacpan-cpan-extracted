@@ -1,0 +1,44 @@
+msgid "Aion::Meta::Subroutine - описывает функцию с сигнатурой"
+msgstr "Aion::Meta::Subroutine - describes a function with a signature"
+
+msgid "Служит для объявления требуемой функции в интерфейсах и обстрактных классах.\n"
+"При этом `referent ~~ Undef`."
+msgstr "Used to declare the required function in interfaces and abstract classes.\n"
+"In this case, `referent ~~ Undef`."
+
+msgid "А так же создаёт функцию-обёртку проверяющую сигнатуру."
+msgstr "It also creates a wrapper function that checks the signature."
+
+msgid "Конструктор."
+msgstr "Constructor."
+
+msgid "Создаёт функцию-обёртку проверяющую сигнатуру."
+msgstr "Creates a wrapper function that checks the signature."
+
+msgid "Сверяет свою (ожидаемую) сигнатуру с объявленной у функции в модуле и выбрасывает исключение, если сигнатуры не совпадают."
+msgstr "Checks its (expected) signature against the one declared by the function in the module and throws an exception if the signatures do not match."
+
+msgid "Строковое описание функции."
+msgstr "String description of the function."
+
+msgid "Возвращает имя пакета, в котором объявлена функция."
+msgstr "Returns the name of the package in which the function is declared."
+
+msgid "Возвращает имя функции."
+msgstr "Returns the name of the function."
+
+msgid "Возвращает сигнатуру функции."
+msgstr "Returns the function signature."
+
+msgid "Возвращает ссылку на оригинальную функцию."
+msgstr "Returns a reference to the original function."
+
+msgid "Возвращает функцию-обёртку проверяющую сигнатуру."
+msgstr "Returns a wrapper function that checks the signature."
+
+msgid "⚖ **GPLv3**"
+msgstr "⚖ **GPLv3**"
+
+msgid "The Aion::Meta::Subroutine module is copyright © 2025 Yaroslav O. Kosmina. Rusland. All rights reserved."
+msgstr "The Aion::Meta::Subroutine module is copyright © 2025 Yaroslav O. Kosmina. Rusland. All rights reserved."
+

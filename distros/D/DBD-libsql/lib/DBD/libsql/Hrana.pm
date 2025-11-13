@@ -8,7 +8,7 @@ use Protocol::WebSocket;
 use IO::Socket::SSL;
 use Carp;
 
-our $VERSION = "0.03";
+our $VERSION = "0.05";
 
 # Hrana Protocol Client for libSQL
 # Based on the Hrana protocol specification used by libsql-client-ts

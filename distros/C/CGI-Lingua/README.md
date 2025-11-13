@@ -16,7 +16,7 @@ CGI::Lingua - Create a multilingual web page
 
 # VERSION
 
-Version 0.78
+Version 0.79
 
 # SYNOPSIS
 
@@ -66,6 +66,10 @@ Creates a CGI::Lingua object.
 Takes one mandatory parameter, `supported`,
 a list of languages, in RFC-1766 format,
 that the website supports.
+It can either be a simple string,
+if only one language is supported,
+or a reference to a list of languages.
+
 Language codes are of the form primary-code \[ - country-code \] e.g.
 'en', 'en-gb' for English and British English respectively.
 

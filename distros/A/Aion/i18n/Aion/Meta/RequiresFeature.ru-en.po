@@ -1,0 +1,36 @@
+msgid "Aion::Meta::RequiresFeature - требование фичи для интерфейсов"
+msgstr "Aion::Meta::RequiresFeature - feature requirement for interfaces"
+
+msgid "С помощью `req` создаёт требование к фиче которая будет описана в модуле к которому будет подключена роль или который унаследует абстрактный класс."
+msgstr "Using `req` creates a requirement for a feature that will be described in the module to which the role will be connected or which will inherit the abstract class."
+
+msgid "Проверяться будут только указанные аспекты в фиче."
+msgstr "Only the specified aspects in the feature will be checked."
+
+msgid "Конструктор."
+msgstr "Constructor."
+
+msgid "Возвращает имя пакета в котором описано требование к фиче."
+msgstr "Returns the name of the package that describes the feature requirement."
+
+msgid "Возвращает имя фичи."
+msgstr "Returns the name of the feature."
+
+msgid "Возвращает массив с аспектами фичи."
+msgstr "Returns an array with aspects of the feature."
+
+msgid "Возвращает хеш аспектов фичи."
+msgstr "Returns a hash of the feature's aspects."
+
+msgid "Строковое представление фичи."
+msgstr "String representation of a feature."
+
+msgid "Сравнивает с фичей, но только указанные аспекты."
+msgstr "Compares with a feature, but only the specified aspects."
+
+msgid "⚖ **GPLv3**"
+msgstr "⚖ **GPLv3**"
+
+msgid "The Aion::Meta::RequiresFeature module is copyright © 2025 Yaroslav O. Kosmina. Rusland. All rights reserved."
+msgstr "The Aion::Meta::RequiresFeature module is copyright © 2025 Yaroslav O. Kosmina. Rusland. All rights reserved."
+

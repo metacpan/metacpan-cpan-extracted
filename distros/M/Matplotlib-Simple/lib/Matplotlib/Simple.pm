@@ -9,7 +9,7 @@ use Devel::Confess 'color';
 
 package Matplotlib::Simple;
 require 5.010;
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 use List::Util qw(max sum min);
 use Term::ANSIColor;
 use Cwd 'getcwd';
@@ -2155,6 +2155,7 @@ sub plot {
 	}
 }
 1;
+#  markdown2pod README.md > README.pod
 =encoding utf8
 
 
@@ -2182,8 +2183,10 @@ Simplest use case:
 
 where C<xlabel>, C<ylabel>, C<title>, etc. are axis methods in matplotlib itself. C<plot.type>, C<data>, C<input.file> are all specific to C<MatPlotLib::Simple>.
 
+=for html
+<p>
 <img alt="gospel word counts" height="491" src="https://github.com/user-attachments/assets/a008dece-2e34-47bf-af0f-8603709f7d52" width="651" />
-
+</p>
 
 =head2 Multiple Plots
 
@@ -2246,7 +2249,6 @@ sub linspace { # mostly written by Grok
       }
     }
     return @result;
-
 }
 
 sub generateI<normal>dist {

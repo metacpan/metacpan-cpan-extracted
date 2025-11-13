@@ -13,6 +13,8 @@ use Astro::ADS::Metrics;
 use Data::Dumper::Concise;
 use Mojo::UserAgent::Mockable;
 
+skip_all('No API key found in test suite') unless $ENV{ADS_DEV_KEY};
+
 my $ua = Mojo::UserAgent::Mockable->new( mode => 'lwp-ua-mockable', ignore_headers => 'all' );
 
 my $bibcode = '2019MNRAS.487.3523C';

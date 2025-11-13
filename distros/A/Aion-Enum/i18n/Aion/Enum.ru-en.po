@@ -1,0 +1,84 @@
+msgid "Aion::Enum - перечисления в стиле ООП, когда каждое перечсление является объектом"
+msgstr "Aion :: Enum - Listing in the style of OOP, when each renewal is an object"
+
+msgid "Файл lib/StatusEnum.pm:"
+msgstr "File lib/StatusEnum.pm:"
+
+msgid "`Aion::Enum` позволяет создавать перечисления-объекты. Данные перечисления могут содержать дополнительные методы и свойства. В них можно добавлять роли (с помощью `with`) или использовать их самих как роли."
+msgstr "`Aion :: Enum` allows you to create transfers-objects. These transfers may contain additional methods and properties. You can add roles to them (using `with`) or use them as a role."
+
+msgid "Важной особенностью является сохранение порядка перечисления."
+msgstr "An important feature is the preservation of the procedure for listing."
+
+msgid "`Aion::Enum` подобен перечислениям из php8, но имеет дополнительные свойства `alias` и `stash`."
+msgstr "`Aion::Enum` is similar to php8 enums, but has the additional properties `alias` and `stash`."
+
+msgid "Создаёт перечисление: его константу."
+msgstr "Creates a listing: his constant."
+
+msgid "Указывает тип (isa) значений и дополнений."
+msgstr "Indicates the type (ISA) of meanings and additions."
+
+msgid "Её название – отсылка к богине Иссе из повести «Под лунами Марса» Берроуза."
+msgstr "Its name is a reference to the goddess Isse from the story “Under the Moles of Mars” Burrose."
+
+msgid "Файл lib/StringEnum.pm:"
+msgstr "File lib/StringEnum.pm:"
+
+msgid "Список перечислений."
+msgstr "List of transfers."
+
+msgid "Имена перечислений."
+msgstr "Names of transfers."
+
+msgid "Значения перечислений."
+msgstr "The values of the transfers."
+
+msgid "Дополнения перечислений."
+msgstr "Additions of transfers."
+
+msgid "Псевдонимы перечислений."
+msgstr "Pseudonyms of transfers."
+
+msgid "Файл lib/AuthorEnum.pm:"
+msgstr "LIB/authorenum.pm file:"
+
+msgid "Получить case по имени c исключением."
+msgstr "Get Case by name with exceptions."
+
+msgid "Получить case по имени."
+msgstr "Get Case by name."
+
+msgid "Получить case по значению c исключением."
+msgstr "Get Case by value with exceptions."
+
+msgid "Получить case по значению."
+msgstr "Get Case by value."
+
+msgid "Получить case по дополнению c исключением."
+msgstr "Get CASE on addition with exceptions."
+
+msgid "Получить case по дополнению."
+msgstr "Get Case for addition."
+
+msgid "Получить case по псевдониму c исключением."
+msgstr "Get Case by pseudonym with exceptions."
+
+msgid "Получить case по псевдониму."
+msgstr "Get case by alias."
+
+msgid "Свойство только для чтения."
+msgstr "Property only for reading."
+
+msgid "Алиасы работают только если пакет находится в модуле, так как считывают комментарий перед кейсом за счёт рефлексии."
+msgstr "Aliases work only if the package is in the module, as they read the comment before the case due to reflection."
+
+msgid "Файл lib/AliasEnum.pm:"
+msgstr "LIB/aliasenum.pm file:"
+
+msgid "⚖ **GPLv3**"
+msgstr "⚖ ** gplv3 **"
+
+msgid "The Aion::Enum module is copyright © 2025 Yaroslav O. Kosmina. Rusland. All rights reserved."
+msgstr "The Aion :: Enum Module is Copyright © 2025 Yaroslav O. Kosmina. Rusland. All Rights Reserved."
+

@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Script::Runner;
-$Bitcoin::Crypto::Script::Runner::VERSION = '4.000';
+$Bitcoin::Crypto::Script::Runner::VERSION = '4.001';
 use v5.10;
 use strict;
 use warnings;
@@ -270,6 +270,10 @@ signature_for step => (
 sub step
 {
 	my ($self) = @_;
+
+	# optimization: a lot of operations may want to check bytestrings here, but
+	# all bytestrings were already checked and accepted
+	local $Bitcoin::Crypto::Types::CHECK_BYTESTRINGS = !!0;
 
 	my $pos = $self->pos;
 

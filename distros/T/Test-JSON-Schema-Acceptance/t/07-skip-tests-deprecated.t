@@ -14,7 +14,7 @@ no if "$]" >= 5.041009, feature => 'smartmatch';
 
 use Test2::API 'intercept';
 use Test2::V0 qw(!bag !bool !warnings), -no_pragmas => 1;
-use Test2::Warnings 'warnings';
+use Test2::Warnings qw(warnings had_no_warnings :no_end_test);
 use Test::JSON::Schema::Acceptance;
 use Test::File::ShareDir -share => { -dist => { 'Test-JSON-Schema-Acceptance' => 'share' } };
 
@@ -71,4 +71,5 @@ foreach my $test (
   );
 }
 
+had_no_warnings() if $ENV{AUTHOR_TESTING};
 done_testing;

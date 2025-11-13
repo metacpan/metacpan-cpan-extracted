@@ -2,7 +2,7 @@
 # Asm::X86 - List of instructions and registers of x86-compatible processors,
 #   validating and converting instructions and memory references.
 #
-#	Copyright (C) 2008-2024 Bogdan 'bogdro' Drozdowski,
+#	Copyright (C) 2008-2025 Bogdan 'bogdro' Drozdowski,
 #	  bogdro (at) users . sourceforge . net
 #	  bogdro /at\ cpan . org
 #
@@ -60,11 +60,11 @@ Asm::X86 - List of instructions and registers of x86-compatible processors, vali
 
 =head1 VERSION
 
-Version 0.70
+Version 0.72
 
 =cut
 
-our $VERSION = '0.70';
+our $VERSION = '0.72';
 
 =head1 DESCRIPTION
 
@@ -257,8 +257,7 @@ sub _nopluses($) {
 #
 sub _is_in_array($@) {
 
-	my $elem = shift;
-	my $arr = shift;
+	my ($elem, $arr) = @_;
 	return 0 unless $elem =~ /^\w+$/o;
 	foreach (@$arr) {
 		return 1 if /^$elem$/i;
@@ -278,8 +277,7 @@ sub _is_in_array($@) {
 #
 sub _is_in_array_att($@) {
 
-	my $elem = shift;
-	my $arr = shift;
+	my ($elem, $arr) = @_;
 	return 0 unless $elem =~ /^\%\w+$/o;
 	foreach (@$arr) {
 		return 1 if /^$elem$/i;
@@ -299,7 +297,9 @@ sub add_att_suffix_instr(@);
 our @regs8_intel = (
 		'al', 'bl', 'cl', 'dl', 'r8b', 'r9b', 'r10b', 'r11b',
 		'r12b', 'r13b', 'r14b', 'r15b', 'sil', 'dil', 'spl', 'bpl',
-		'ah', 'bh', 'ch', 'dh'
+		'ah', 'bh', 'ch', 'dh',
+		'r16b', 'r17b', 'r18b', 'r19b', 'r20b', 'r21b', 'r22b', 'r23b',
+		'r24b', 'r25b', 'r26b', 'r27b', 'r28b', 'r29b', 'r30b', 'r31b'
 		);
 
 =head2 @regs8_att
@@ -335,6 +335,8 @@ our @segregs_att = _add_percent @segregs_intel;
 our @regs16_intel = (
 		'ax', 'bx', 'cx', 'dx', 'r8w', 'r9w', 'r10w', 'r11w',
 		'r12w', 'r13w', 'r14w', 'r15w', 'si', 'di', 'sp', 'bp',
+		'r16w', 'r17w', 'r18w', 'r19w', 'r20w', 'r21w', 'r22w', 'r23w',
+		'r24w', 'r25w', 'r26w', 'r27w', 'r28w', 'r29w', 'r30w', 'r31w',
 		@segregs_intel
 		);
 
@@ -353,6 +355,10 @@ my @addressable32_att = _add_percent @addressable32;
 my @r32_in64 = (
 		'r8d', 'r8l', 'r9d', 'r9l', 'r10d', 'r10l', 'r11d', 'r11l',
 		'r12d', 'r12l', 'r13d', 'r13l', 'r14d', 'r14l', 'r15d', 'r15l',
+		'r16d', 'r17d', 'r18d', 'r19d', 'r20d', 'r21d', 'r22d', 'r23d',
+		'r24d', 'r25d', 'r26d', 'r27d', 'r28d', 'r29d', 'r30d', 'r31d',
+		'r16l', 'r17l', 'r18l', 'r19l', 'r20l', 'r21l', 'r22l', 'r23l',
+		'r24l', 'r25l', 'r26l', 'r27l', 'r28l', 'r29l', 'r30l', 'r31l',
 		);
 
 my @r32_in64_att = _add_percent @r32_in64;
@@ -402,7 +408,9 @@ our @regs_fpu_att = _add_percent @regs_fpu_intel;
 
 our @regs64_intel = (
 		'rax', 'rbx', 'rcx', 'rdx', 'r8', 'r9', 'r10', 'r11',
-		'r12', 'r13', 'r14', 'r15', 'rsi', 'rdi', 'rsp', 'rbp', 'rip'
+		'r12', 'r13', 'r14', 'r15', 'rsi', 'rdi', 'rsp', 'rbp', 'rip',
+		'r16', 'r17', 'r18', 'r19', 'r20', 'r21', 'r22', 'r23',
+		'r24', 'r25', 'r26', 'r27', 'r28', 'r29', 'r30', 'r31'
 		);
 
 =head2 @regs64_att
@@ -506,14 +514,25 @@ our @regs_att = ( @regs8_att, @regs16_att, @regs32_att,
 =cut
 
 our @instr_intel = (
-	'aaa', 'aad', 'aadd', 'aam', 'aand', 'aas', 'adc', 'adcx', 'add', 'addpd', 'addps', 'addsd', 'addss', 'addsubpd',
-	'addsubps', 'adox', 'aesdec', 'aesdeclast', 'aesenc', 'aesenclast', 'aesimc', 'aeskeygenassist',
-	'and', 'andn', 'andnpd', 'andnps', 'andpd', 'andps', 'arpl', 'axor', 'bb0_reset',
+	'aaa', 'aad', 'aadd', 'aam', 'aand', 'aas', 'adc', 'adcx', 'add', 'addb', 'addd',
+	'addpd', 'addps', 'addq','addsd', 'addss', 'addsubpd', 'addsubps', 'addw', 'adox',
+	'aesdec', 'aesdec128kl', 'aesdec256kl', 'aesdeclast', 'aesdecwide128kl', 'aesdecwide256kl',
+	'aesenc', 'aesenc128kl', 'aesenc256kl', 'aesenclast', 'aesencwide128kl', 'aesencwide256kl',
+	'aesimc', 'aeskeygenassist', 'and', 'andb', 'andd', 'andn', 'andnb', 'andnd', 'andnpd',
+	'andnps', 'andnq', 'andnw', 'andpd', 'andps', 'andq', 'andw','arpl', 'axor', 'bb0_reset',
 	'bb1_reset', 'bextr', 'blcfill', 'blci', 'blcic', 'blcmsk', 'blcs',
 	'blendpd', 'blendps', 'blendvpd', 'blendvps', 'blsfill', 'blsi', 'blsic', 'blsmsk', 'blsr',
 	'bnd', 'bndcl', 'bndcn', 'bndcu', 'bndldx', 'bndmk', 'bndmov', 'bndstx',
-	'bound', 'bsf', 'bsr', 'bswap', 'bt', 'btc', 'btr', 'bts', 'bzhi', 'call', 'cbw',
-	'cdq', 'cdqe', 'clac', 'clc', 'cld', 'cldemote', 'clflush', 'clflushopt',
+	'bound', 'brkpt', 'bsf', 'bsr', 'bswap', 'bt', 'btc', 'btr', 'bts', 'bzhi', 'call', 'cbw',
+	'ccmp', 'ccmpa', 'ccmpae', 'ccmpb', 'ccmpbe', 'ccmpc', 'ccmpe', 'ccmpf', 'ccmpg',
+	'ccmpge', 'ccmpl', 'ccmple', 'ccmpna', 'ccmpnae', 'ccmpnb', 'ccmpnbe', 'ccmpnc',
+	'ccmpne', 'ccmpng', 'ccmpnge', 'ccmpnl', 'ccmpnle', 'ccmpno', 'ccmpns',
+	'ccmpnz', 'ccmpo', 'ccmps', 'ccmpt', 'ccmpz', 'cdq', 'cdqe', 'cfcmova', 'cfcmovae',
+	'cfcmovb', 'cfcmovbe', 'cfcmovc', 'cfcmove', 'cfcmovg', 'cfcmovge', 'cfcmovl',
+	'cfcmovle', 'cfcmovna', 'cfcmovnae', 'cfcmovnb', 'cfcmovnbe', 'cfcmovnc',
+	'cfcmovne', 'cfcmovng', 'cfcmovnge', 'cfcmovnl', 'cfcmovnle', 'cfcmovno', 'cfcmovnp',
+	'cfcmovns', 'cfcmovnz', 'cfcmovo', 'cfcmovp', 'cfcmovpe', 'cfcmovpo', 'cfcmovs', 'cfcmovz',
+	'clac', 'clc', 'cld', 'cldemote', 'clflush', 'clflushopt',
 	'clgi', 'cli', 'clrssbsy','clts', 'clui', 'clwb', 'clzero',
 	'cmc', 'cmova', 'cmovae', 'cmovb', 'cmovbe', 'cmovc', 'cmove', 'cmovg', 'cmovge',
 	'cmovl', 'cmovle', 'cmovna', 'cmovnae', 'cmovnb', 'cmovnbe', 'cmovnc',
@@ -540,12 +559,17 @@ our @instr_intel = (
 	'comuless', 'comultpd', 'comultps', 'comultsd', 'comultss', 'comuneqpd', 'comuneqps', 'comuneqsd',
 	'comuneqss', 'comunlepd', 'comunleps', 'comunlesd', 'comunless', 'comunltpd', 'comunltps',
 	'comunltsd', 'comunltss', 'comunordpd', 'comunordps', 'comunordsd', 'comunordss', 'cpuid',
-	'cpu_read', 'cpu_write', 'cqo', 'crc32', 'cvtdq2pd', 'cvtdq2ps', 'cvtpd2dq', 'cvtpd2pi',
+	'cpu_read', 'cpu_write', 'cqo', 'crc32', 'ctest', 'ctesta', 'ctestae', 'ctestb', 'ctestbe',
+	'ctestc', 'cteste', 'ctestf', 'ctestg', 'ctestge', 'ctestl', 'ctestle', 'ctestna', 'ctestnae',
+	'ctestnb', 'ctestnbe', 'ctestnc', 'ctestne', 'ctestng', 'ctestnge', 'ctestnl', 'ctestnle',
+	'ctestno', 'ctestns', 'ctestnz', 'ctesto', 'ctests', 'ctestt', 'ctestz',
+	'cvtdq2pd', 'cvtdq2ps', 'cvtpd2dq', 'cvtpd2pi',
 	'cvtpd2ps', 'cvtph2ps', 'cvtpi2pd', 'cvtpi2ps', 'cvtps2dq', 'cvtps2pd', 'cvtps2ph',
 	'cvtps2pi', 'cvtsd2si', 'cvtsd2ss', 'cvtsi2sd', 'cvtsi2ss', 'cvtss2sd', 'cvtss2si', 'cvttpd2dq',
 	'cvttpd2pi', 'cvttps2dq', 'cvttps2pi', 'cvttsd2si', 'cvttss2si', 'cwd', 'cwde', 'daa', 'das',
 	'dec', 'div', 'divpd', 'divps', 'divsd', 'divss', 'dmint', 'dppd',
-	'dpps', 'emms', 'endbr32', 'endbr64', 'encls', 'enclu', 'enclv', 'enqcmd', 'enqcmds', 'enter',
+	'dpps', 'emms', 'encls', 'enclu', 'enclv', 'encodekey128', 'encodekey256',
+	'endbr32', 'endbr64', 'enqcmd', 'enqcmds', 'enter', 'enterd', 'enterq', 'enterw',
 	'erets', 'eretu', 'extractps', 'extrq', 'f2xm1', 'fabs', 'fadd', 'faddp', 'fbld', 'fbstp', 'fchs', 'fclex',
 	'fcmovb', 'fcmovbe', 'fcmove', 'fcmovnb', 'fcmovnbe', 'fcmovne', 'fcmovnu', 'fcmovu', 'fcom',
 	'fcomi', 'fcomip', 'fcomp', 'fcompp', 'fcos', 'fdecstp', 'fdisi', 'fdiv', 'fdivp', 'fdivr',
@@ -562,7 +586,7 @@ our @instr_intel = (
 	'fsub', 'fsubp', 'fsubr', 'fsubrp', 'ftst', 'fucom', 'fucomi', 'fucomip', 'fucomp', 'fucompp',
 	'fwait', 'fxam', 'fxch', 'fxrstor', 'fxrstor64', 'fxsave', 'fxsave64',
 	'fxtract', 'fyl2x', 'fyl2xp1', 'getsec', 'gf2p8affineinvqb', 'gf2p8affineqb', 'gf2p8mulb', 'haddpd',
-	'haddps', 'hint_nop0', 'hint_nop1', 'hint_nop10', 'hint_nop11', 'hint_nop12', 'hint_nop13',
+	'haddps', 'hint_nop', 'hint_nop0', 'hint_nop1', 'hint_nop10', 'hint_nop11', 'hint_nop12', 'hint_nop13',
 	'hint_nop14','hint_nop15', 'hint_nop16', 'hint_nop17', 'hint_nop18', 'hint_nop19', 'hint_nop2',
 	'hint_nop20', 'hint_nop21', 'hint_nop22', 'hint_nop23', 'hint_nop24', 'hint_nop25', 'hint_nop26',
 	'hint_nop27', 'hint_nop28', 'hint_nop29', 'hint_nop3', 'hint_nop30', 'hint_nop31', 'hint_nop32',
@@ -575,32 +599,37 @@ our @instr_intel = (
 	'inc', 'incsspd', 'incsspq', 'incbin', 'insb', 'insd', 'insertps', 'insertq', 'insw', 'int', 'int01', 'int03',
 	'int1', 'int3', 'into', 'invd', 'invept', 'invlpg', 'invlpga', 'invlpgb', 'invpcid', 'invvpid', 'iret', 'iretd',
 	'iretq', 'iretw', 'ja', 'jae', 'jb', 'jbe', 'jc', 'jcxz', 'je', 'jecxz', 'jg', 'jge', 'jl',
-	'jle', 'jmp', 'jmpe', 'jna', 'jnae', 'jnb', 'jnbe', 'jnc', 'jne', 'jng', 'jnge', 'jnl',
+	'jle', 'jmp', 'jmpabs', 'jmpe', 'jna', 'jnae', 'jnb', 'jnbe', 'jnc', 'jne', 'jng', 'jnge', 'jnl',
 	'jnle', 'jno', 'jnp', 'jns', 'jnz', 'jo', 'jp', 'jpe', 'jpo', 'jrcxz', 'js', 'jz',
 	'kadd', 'kaddb', 'kaddd', 'kaddq', 'kaddw', 'kand', 'kandb', 'kandd', 'kandn', 'kandnb', 'kandnd', 'kandnq',
 	'kandnw', 'kandq', 'kandw', 'kmov', 'kmovb', 'kmovd', 'kmovq','kmovw', 'knot', 'knotb', 'knotd',
 	'knotq', 'knotw', 'kor', 'korb', 'kord', 'korq', 'kortest', 'kortestb', 'kortestd', 'kortestq','kortestw',
 	'korw', 'kshiftl', 'kshiftlb', 'kshiftld', 'kshiftlq','kshiftlw', 'kshiftr', 'kshiftrb', 'kshiftrd',
-	'kshiftrq', 'kshiftrw', 'ktest', 'ktestb', 'ktestd', 'ktestq', 'ktestw',
-	'kunpck', 'kunpckbw', 'kunpckdq', 'kunpckwd', 'kxnor', 'kxnorb', 'kxnord', 'kxnorq', 'kxnorw',
-	'kxor', 'kxorb', 'kxord', 'kxorq', 'kxorw',
-	'lahf', 'lar', 'lddqu', 'ldmxcsr', 'lds', 'ldtilecfg', 'lea', 'leave', 'les', 'lfence', 'lfs', 'lgdt',
-	'lgs', 'lidt', 'lkgs', 'lldt', 'llwpcb', 'lmsw', 'loadall', 'loadall286', 'loadall386', 'lock', 'lodsb', 'lodsd',
+	'kshiftrq', 'kshiftrw', 'kshl', 'kshlb', 'kshld', 'kshlq', 'kshlw', 'kshr', 'kshrb', 'kshrd',
+	'kshrq', 'kshrw', 'ktest', 'ktestb', 'ktestd', 'ktestq', 'ktestw',
+	'kunpck', 'kunpckbw', 'kunpckd', 'kunpckdq', 'kunpckq', 'kunpckw', 'kunpckwd', 'kxnor',
+	'kxnorb', 'kxnord', 'kxnorq', 'kxnorw', 'kxor', 'kxorb', 'kxord', 'kxorq', 'kxorw',
+	'lahf', 'lar', 'lddqu', 'ldmxcsr', 'lds', 'ldtilecfg', 'lea', 'leave', 'leaved',
+	'leaveq', 'leavew','les', 'lfence', 'lfs', 'lgdt',
+	'lgs', 'lidt', 'lkgs', 'lldt', 'llwpcb', 'lmsw', 'loadall', 'loadall286',
+	'loadiwkey', 'loadall386', 'lock', 'lodsb', 'lodsd',
 	'lodsq', 'lodsw', 'loop', 'loopd', 'loope', 'looped', 'loopeq', 'loopew', 'loopne', 'loopned',
 	'loopneq', 'loopnew', 'loopnz', 'loopnzd', 'loopnzq', 'loopnzw', 'loopq', 'loopw', 'loopz',
 	'loopzd', 'loopzq', 'loopzw', 'lsl', 'lss', 'ltr', 'lwpins', 'lwpval', 'lzcnt', 'maskmovdqu',
 	'maskmovq', 'maxpd', 'maxps', 'maxsd', 'maxss', 'mcommit', 'mfence', 'minpd', 'minps', 'minsd',
-	'minss', 'monitor', 'monitorx', 'montmul', 'mov', 'movapd',
-	'movaps', 'movbe', 'movd', 'movddup', 'movdir64b', 'movdiri', 'movdq2q',
+	'minss', 'monitor', 'monitord', 'monitorq', 'monitorw','monitorx', 'montmul', 'mov', 'movabs', 'movapd',
+	'movaps', 'movb', 'movbe', 'movd', 'movddup', 'movdir64b', 'movdiri', 'movdq2q',
 	'movdqa', 'movdqu', 'movhlps', 'movhpd', 'movhps', 'movlhps', 'movlpd', 'movlps', 'movmskpd',
 	'movmskps', 'movntdq', 'movntdqa', 'movnti', 'movntpd', 'movntps', 'movntq', 'movntsd',
-	'movntss', 'movq', 'movq2dq', 'movsb', 'movsd', 'movshdup', 'movsldup', 'movsq', 'movss',
-	'movsw', 'movsx', 'movsxd', 'movupd', 'movups', 'movzx', 'mpsadbw', 'mul', 'mulpd', 'mulps',
-	'mulsd', 'mulss', 'mulx', 'mwait', 'mwaitx', 'neg',
-	'nop', 'not', 'or', 'orpd', 'orps', 'out', 'outsb', 'outsd',
+	'movntss', 'movq', 'movq2dq', 'movrs', 'movsb', 'movsd', 'movshdup', 'movsldup', 'movsq', 'movss',
+	'movsw', 'movsx', 'movsxb', 'movsxd', 'movsxw', 'movupd', 'movups', 'movw',
+	'movzx', 'movzxb', 'movzxd', 'movzxw', 'mpsadbw', 'mul', 'mulpd', 'mulps',
+	'mulsd', 'mulss', 'mulx', 'mwait', 'mwaitx', 'neg', 'nop', 'nop2', 'not', 'notb',
+	'notd', 'notq', 'notw', 'or', 'orb', 'ord', 'orpd', 'orps', 'orq', 'ortest', 'ortestb',
+	'ortestd', 'ortestq', 'ortestw', 'orw', 'out', 'outsb', 'outsd',
 	'outsw', 'pabsb', 'pabsd', 'pabsw', 'packssdw', 'packsswb', 'packusdw', 'packuswb', 'paddb',
 	'paddd', 'paddq', 'paddsb', 'paddsiw', 'paddsw', 'paddusb', 'paddusw', 'paddw', 'palignr',
-	'pand', 'pandn', 'pause', 'paveb', 'pavgb', 'pavgusb', 'pavgw', 'pblendvb', 'pblendw',
+	'pand', 'pandn', 'pause', 'paveb', 'pavgb', 'pavgusb', 'pavgw', 'pblendvb', 'pblendw', 'pbndkb',
 	'pclmulhqhqdq', 'pclmulhqhdq', 'pclmulhqlqdq', 'pclmullqhqdq', 'pclmullqhdq', 'pclmullqlqdq', 'pclmulqdq', 'pcmov',
 	'pcmpeqb', 'pcmpeqd', 'pcmpeqq', 'pcmpeqw', 'pcmpestri', 'pcmpestrm', 'pcmpgtb', 'pcmpgtd',
 	'pcmpgtq', 'pcmpgtw', 'pcmpistri', 'pcmpistrm', 'pcomb', 'pcomd', 'pcomeqb', 'pcomeqd',
@@ -627,48 +656,58 @@ our @instr_intel = (
 	'pminuw', 'pmovmskb', 'pmovsxbd', 'pmovsxbq', 'pmovsxbw', 'pmovsxdq', 'pmovsxwd', 'pmovsxwq',
 	'pmovzxbd', 'pmovzxbq', 'pmovzxbw', 'pmovzxdq', 'pmovzxwd', 'pmovzxwq', 'pmuldq', 'pmulhriw',
 	'pmulhrsw', 'pmulhrwa', 'pmulhrw', 'pmulhrwc', 'pmulhuw', 'pmulhw', 'pmulld', 'pmullw', 'pmuludq',
-	'pmvgezb', 'pmvlzb', 'pmvnzb', 'pmvzb', 'pop', 'popd', 'popa', 'popad', 'popaw', 'popcnt', 'popf',
-	'popfd', 'popfq', 'popfw', 'popq', 'popw', 'por', 'pperm',
-	'prefetch', 'prefetchit0', 'prefetchit1', 'prefetchnta', 'prefetcht0', 'prefetcht1',
+	'pmvgezb', 'pmvlzb', 'pmvnzb', 'pmvzb', 'pop', 'pop2', 'pop2p', 'popd', 'popa', 'popad',
+	'popaw', 'popcnt', 'popf', 'popfd', 'popfq', 'popfw', 'popq', 'popw', 'popp', 'por', 'pperm',
+	'prefetch', 'prefetchit0', 'prefetchit1', 'prefetchnta', 'prefetchrst2', 'prefetcht0', 'prefetcht1',
 	'prefetcht2', 'prefetchw', 'prefetchwt1', 'protb', 'protd', 'protq', 'protw', 'psadbw',
 	'pshab', 'pshad', 'pshaq', 'pshaw', 'pshlb', 'pshld', 'pshlq', 'pshlw', 'pshufb', 'pshufd',
 	'pshufhw', 'pshuflw', 'pshufw', 'psignb', 'psignd', 'psignw', 'pslld', 'pslldq', 'psllq',
 	'psllw', 'psmash', 'psrad', 'psraw', 'psrld', 'psrldq', 'psrlq', 'psrlw', 'psubb', 'psubd', 'psubq',
 	'psubsb', 'psubsiw', 'psubsw', 'psubusb', 'psubusw', 'psubw', 'pswapd', 'ptest', 'ptwrite', 'punpckhbw',
 	'punpckhdq', 'punpckhqdq', 'punpckhwd', 'punpcklbw', 'punpckldq', 'punpcklqdq', 'punpcklwd',
-	'push', 'pusha', 'pushad', 'pushaw', 'pushd', 'pushf', 'pushfd', 'pushfq', 'pushfw', 'pushq',
-	'pushw', 'pvalidate', 'pxor', 'rcl', 'rcpps', 'rcpss', 'rcr', 'rdfsbase', 'rdgsbase', 'rdm', 'rdmsr',
+	'push', 'push2', 'push2p', 'pusha', 'pushad', 'pushaw', 'pushd', 'pushf', 'pushfd', 'pushfq', 'pushfw', 'pushq',
+	'pushw', 'pushp', 'pvalidate', 'pxor', 'rcl', 'rcpps', 'rcpss', 'rcr', 'rdfsbase', 'rdgsbase', 'rdm', 'rdmsr',
 	'rdmsrlist', 'rdmsrq', 'rdpid', 'rdpkru', 'rdpmc', 'rdpru', 'rdrand',
 	'rdseed', 'rdsspd', 'rdsspq', 'rdshr', 'rdtsc', 'rdtscp', 'rep', 'repe', 'repne', 'repnz',
 	'repz', 'ret', 'retd', 'retf', 'retfd', 'retfq', 'retfw', 'retn', 'retnd', 'retnq', 'retnw', 'retq', 'retw',
-	'rmpadjust', 'rmpupdate', 'rol', 'ror', 'rorx', 'roundpd', 'roundps', 'roundsd', 'roundss', 'rsdc', 'rsldt', 'rsm',
-	'rsqrtps', 'rsqrtss', 'rstorssp', 'rsts', 'sahf', 'sal', 'salc', 'sar',
+	'rmpadjust', 'rmpupdate', 'rol', 'rolx', 'ror', 'rorx', 'roundpd', 'roundps', 'roundsd', 'roundss', 'rsdc', 'rsldt', 'rsm',
+	'rsqrtps', 'rsqrtss', 'rstorssp', 'rsts', 'sahf', 'sal', 'salc', 'salx', 'sar',
 	'sarx', 'saveprevssp', 'sbb', 'scasb', 'scasd', 'scasq',
-	'scasw', 'senduipi', 'serialize', 'seta', 'setae', 'setalc', 'setb',
-	'setbe', 'setc', 'sete', 'setg', 'setge', 'setl',
-	'setle', 'setna', 'setnae', 'setnb', 'setnbe', 'setnc', 'setne', 'setng', 'setnge',
-	'setnl', 'setnle', 'setno', 'setnp', 'setns', 'setnz', 'seto', 'setp', 'setpe', 'setpo',
-	'sets', 'setssbsy', 'setz', 'sfence', 'sgdt', 'sha1msg1',
+	'scasw', 'senduipi', 'serialize', 'seta', 'setae', 'setaezu', 'setazu', 'setalc', 'setb',
+	'setbe', 'setbezu', 'setbzu', 'setc', 'setczu', 'sete', 'setezu', 'setg',
+	'setge', 'setgezu', 'setgzu', 'setl', 'setle', 'setlezu', 'setlzu',
+	'setna', 'setnae', 'setnaezu', 'setnazu', 'setnb', 'setnbe', 'setnbezu',
+	'setnbzu', 'setnc', 'setnczu', 'setne', 'setnezu', 'setng', 'setnge', 'setngezu', 'setngzu',
+	'setnl', 'setnle', 'setnlezu', 'setnlzu', 'setno', 'setnozu', 'setnp', 'setnpzu',
+	'setns', 'setnszu', 'setnz', 'setnzzu', 'seto', 'setozu', 'setp', 'setpe', 'setpezu', 'setpo',
+	'setpozu', 'setpzu', 'sets', 'setssbsy', 'setszu', 'setz', 'setzzu', 'sfence', 'sgdt', 'sha1msg1',
 	'sha1msg2', 'sha1nexte', 'sha1rnds4', 'sha256msg1', 'sha256msg2', 'sha256rnds2',
-	'shl', 'shld', 'shlx', 'shr', 'shrd', 'shrx', 'shufpd', 'shufps', 'sidt',
+	'shiftl', 'shiftlb', 'shiftld', 'shiftlq', 'shiftlw', 'shiftr', 'shiftrb', 'shiftrd', 'shiftrq', 'shiftrw',
+	'shl', 'shlb', 'shld', 'shlq', 'shlw', 'shlx', 'shr', 'shrb', 'shrd', 'shrq', 'shrw', 'shrx', 'shufpd', 'shufps', 'sidt',
 	'skinit', 'sldt', 'slwpcb', 'smi', 'smint', 'smintold', 'smsw', 'sqrtpd', 'sqrtps', 'sqrtsd',
 	'sqrtss', 'stac', 'stc', 'std', 'stgi', 'sti', 'stmxcsr', 'stosb', 'stosd', 'stosq', 'stosw',
 	'str', 'sttilecfg', 'stui', 'sub',
 	'subpd', 'subps', 'subsd', 'subss', 'svdc', 'svldt', 'svts', 'swapgs', 'syscall', 'sysenter',
-	'sysexit', 'sysexitq', 'sysret', 'sysretq', 't1mskc', 'tdpbf16ps', 'tdpbssd', 'tdpbsud', 'tdpbusd', 'tdpbuud',
-	'test', 'testui', 'tileloadd', 'tileloaddt1', 'tilerelease', 'tilestored',
-	'tilezero', 'tlbsync', 'tpause', 'tzcnt', 'tzmsk',
-	'ucomisd', 'ucomiss', 'ud0', 'ud1', 'ud2', 'ud2a', 'ud2b', 'uiret', 'umonitor', 'umov',
-	'umwait', 'unpckhpd', 'unpckhps', 'unpcklpd', 'unpcklps', 'useavx256', 'useavx512',
-	'v4dpwssd', 'v4dpwssds', 'v4fmaddps', 'v4fmaddss', 'v4fnmaddps', 'v4fnmaddss',
+	'sysexit', 'sysexitq', 'sysret', 'sysretq', 't1mskc', 't2rpntlvwz0', 't2rpntlvwz0rs',
+	't2rpntlvwz0rst1', 't2rpntlvwz0t1', 't2rpntlvwz1', 't2rpntlvwz1rs', 't2rpntlvwz1rst1',
+	't2rpntlvwz1t1', 'tcmmimfp16ps', 'tcmmrlfp16ps', 'tconjtcmmimfp16ps', 'tconjtfp16',
+	'tcvtrowd2ps', 'tcvtrowps2bf16h', 'tcvtrowps2bf16l', 'tcvtrowps2phh', 'tcvtrowps2phl',
+	'tdpbf16ps', 'tdpbf8ps', 'tdpbhf8ps', 'tdpbssd', 'tdpbsud', 'tdpbusd', 'tdpbuud',
+	'tdpfp16ps', 'tdphbf8ps', 'tdphf8ps','test', 'testb', 'testd', 'testq', 'testui', 'testw',
+	'tileloadd', 'tileloaddrs', 'tileloaddrst1', 'tileloaddt1', 'tilemovrow', 'tilerelease', 'tilestored',
+	'tilezero', 'tmmultf32ps', 'tlbsync', 'tpause', 'ttcmmimfp16ps', 'ttcmmrlfp16ps',
+	'ttdpbf16ps', 'ttdpfp16ps', 'ttmmultf32ps', 'ttransposed','tzcnt', 'tzmsk',
+	'ucomisd', 'ucomiss', 'ud0', 'ud1', 'ud2', 'ud2a', 'ud2b', 'udb', 'uiret', 'umonitor', 'umov',
+	'umwait', 'unpck', 'unpckbw', 'unpckd', 'unpckdq','unpckhpd', 'unpckhps', 'unpcklpd', 'unpcklps',
+	'v4dpwssd', 'v4dpwssds', 'v4fmaddps', 'v4fmaddss', 'v4fnmaddps', 'v4fnmaddss', 'vaddbf16',
 	'vaddpd', 'vaddph', 'vaddps', 'vaddsd', 'vaddsh', 'vaddss', 'vaddsubpd', 'vaddsubps', 'vaesdec',
 	'vaesdeclast', 'vaesenc', 'vaesenclast', 'vaesimc', 'vaeskeygenassist', 'valignd',
-	'valignq', 'vandnpd', 'vandnps', 'vandpd', 'vandps', 'vbcstnebf16ps',
+	'valignq', 'vandnpd', 'vandnps', 'vandpd', 'vandps', 'vbcstnebf162ps', 'vbcstnebf16ps',
 	'vbcstnesh2ps', 'vblendmpd', 'vblendmps', 'vblendpd', 'vblendps',
 	'vblendvpd', 'vblendvps', 'vbroadcastf128', 'vbroadcastf32x2', 'vbroadcastf32x4',
 	'vbroadcastf32x8', 'vbroadcastf64x2', 'vbroadcastf64x4', 'vbroadcasti128', 'vbroadcasti32x2',
 	'vbroadcasti32x4', 'vbroadcasti32x8', 'vbroadcasti64x2',
-	'vbroadcasti64x4', 'vbroadcastsd', 'vbroadcastss', 'vcmpeqpd',
+	'vbroadcasti64x4', 'vbroadcastsd', 'vbroadcastss', 'vcmpbf16', 'vcmpeqpd',
 	'vcmpeqps', 'vcmpeqsd', 'vcmpeqss', 'vcmpeq_oqpd', 'vcmpeq_oqps', 'vcmpeq_oqsd', 'vcmpeq_oqss',
 	'vcmpeq_ospd', 'vcmpeq_osps', 'vcmpeq_ossd',
 	'vcmpeq_osss', 'vcmpeq_uqpd', 'vcmpeq_uqps',
@@ -711,77 +750,93 @@ our @instr_intel = (
 	'vcmptrue_uspd', 'vcmptrue_usps', 'vcmptrue_ussd', 'vcmptrue_usss',
 	'vcmpunordpd', 'vcmpunordps', 'vcmpunordsd', 'vcmpunordss', 'vcmpunord_qpd', 'vcmpunord_qps',
 	'vcmpunord_qsd', 'vcmpunord_qss', 'vcmpunord_spd', 'vcmpunord_sps', 'vcmpunord_ssd',
-	'vcmpunord_sss', 'vcomisd', 'vcomish', 'vcomiss', 'vcompresspd',
-	'vcompressps', 'vcvtdq2pd', 'vcvtdq2ph', 'vcvtdq2ps', 'vcvtne2ps2bf16',
+	'vcmpunord_sss', 'vcomisbf16', 'vcomisd', 'vcomish', 'vcomiss', 'vcompresspd',
+	'vcompressps', 'vcomxsd', 'vcomxsh', 'vcomxss', 'vcvt2ph2bf8', 'vcvt2ph2bf8s',
+	'vcvt2ph2hf8', 'vcvt2ph2hf8s', 'vcvt2ps2phx', 'vcvtbf162ibs', 'vcvtbf162iubs',
+	'vcvtbiasph2bf8', 'vcvtbiasph2bf8s', 'vcvtbiasph2hf8', 'vcvtbiasph2hf8s',
+	'vcvtdq2pd', 'vcvtdq2ph', 'vcvtdq2ps', 'vcvthf82ph','vcvtne2ps2bf16',
 	'vcvtneebf162ps', 'vcvtneeph2ps', 'vcvtneobf162ps', 'vcvtneoph2ps', 'vcvtneps2bf16',
 	'vcvtpd2dq', 'vcvtpd2ph', 'vcvtpd2ps', 'vcvtpd2qq', 'vcvtpd2udq', 'vcvtpd2uqq',
-	'vcvtph2dq', 'vcvtph2pd', 'vcvtph2ps', 'vcvtph2psx', 'vcvtph2qq',
-	'vcvtph2udq', 'vcvtph2uqq', 'vcvtph2uw', 'vcvtph2w', 'vcvtps2dq', 'vcvtps2pd', 'vcvtps2ph',
+	'vcvtph2bf8', 'vcvtph2bf8s', 'vcvtph2dq', 'vcvtph2hf8', 'vcvtph2hf8s', 'vcvtph2ibs',
+	'vcvtph2iubs', 'vcvtph2pd', 'vcvtph2ps', 'vcvtph2psx', 'vcvtph2qq',
+	'vcvtph2udq', 'vcvtph2uqq', 'vcvtph2uw', 'vcvtph2w', 'vcvtps2dq',
+	'vcvtps2ibs', 'vcvtps2iubs', 'vcvtps2pd', 'vcvtps2ph', 'vcvtps2phx',
 	'vcvtps2qq', 'vcvtps2udq', 'vcvtps2uqq', 'vcvtqq2pd', 'vcvtqq2ph', 'vcvtqq2ps',
 	'vcvtsd2sh', 'vcvtsd2si', 'vcvtsd2ss', 'vcvtsd2usi', 'vcvtsh2sd', 'vcvtsh2si',
 	'vcvtsh2ss', 'vcvtsh2usi', 'vcvtsi2sd', 'vcvtsi2sh', 'vcvtsi2ss', 'vcvtss2sd',
-	'vcvtss2sh', 'vcvtss2si', 'vcvtss2usi', 'vcvttpd2dq',
-	'vcvttpd2qq', 'vcvttpd2udq', 'vcvttpd2uqq', 'vcvttph2dq',
-	'vcvttph2qq', 'vcvttph2udq', 'vcvttph2uqq', 'vcvttph2uw', 'vcvttph2w', 'vcvttps2dq', 'vcvttps2qq',
-	'vcvttps2uqq', 'vcvttps2udq', 'vcvttsd2si', 'vcvttsd2usi',
-	'vcvttsh2si', 'vcvttsh2usi', 'vcvttss2si', 'vcvttss2usi',
-	'vcvtudq2pd', 'vcvtudq2ph', 'vcvtudq2ps', 'vcvtuqq2pd', 'vcvtuqq2ph',
+	'vcvtss2sh', 'vcvtss2si', 'vcvtss2usi', 'vcvttbf162ibs', 'vcvttbf162iubs', 'vcvttpd2dq',
+	'vcvttpd2dqs', 'vcvttpd2qq', 'vcvttpd2qqs', 'vcvttpd2udq', 'vcvttpd2udqs',
+	'vcvttpd2uqq', 'vcvttpd2uqqs', 'vcvttph2dq', 'vcvttph2ibs', 'vcvttph2iubs', 'vcvttph2qq',
+	'vcvttph2udq', 'vcvttph2uqq', 'vcvttph2uw', 'vcvttph2w', 'vcvttps2dq',
+	'vcvttps2dqs', 'vcvttps2ibs', 'vcvttps2iubs', 'vcvttps2qq', 'vcvttps2qqs',
+	'vcvttps2udq', 'vcvttps2udqs', 'vcvttps2uqq', 'vcvttps2uqqs', 'vcvttsd2si', 'vcvttsd2sis', 'vcvttsd2usi',
+	'vcvttsd2usis', 'vcvttsh2si', 'vcvttsh2usi', 'vcvttss2si', 'vcvttss2sis', 'vcvttss2usi',
+	'vcvttss2usis', 'vcvtudq2pd', 'vcvtudq2ph', 'vcvtudq2ps', 'vcvtuqq2pd', 'vcvtuqq2ph',
 	'vcvtuqq2ps', 'vcvtusi2sd', 'vcvtusi2sh', 'vcvtusi2ss', 'vcvtuw2ph', 'vcvtw2ph', 'vdbpsadbw',
-	'vdivpd', 'vdivph', 'vdivps', 'vdivsd', 'vdivsh','vdivss', 'vdpbf16ps',
-	'vdppd', 'vdpps', 'vendscaleph', 'vendscalesh', 'verr', 'verw',
+	'vdivbf16', 'vdivpd', 'vdivph', 'vdivps', 'vdivsd', 'vdivsh', 'vdivss', 'vdpbf16ps',
+	'vdppd', 'vdpphps', 'vdpps', 'vendscaleph', 'vendscalesh', 'verr', 'verw',
 	'vexp2pd', 'vexp2ps', 'vexpandpd', 'vexpandps',
 	'vextractf128', 'vextractf32x4', 'vextractf32x8', 'vextractf64x2',
 	'vextractf64x4', 'vextracti128', 'vextracti32x4', 'vextracti32x8', 'vextracti64x2',
-	'vextracti64x4', 'vextractps', 'vfcmaddcph', 'vfcmaddcsh', 'vfcmulcpch', 'vfcmulcsh',
+	'vextracti64x4', 'vextractps', 'vfcmaddcph', 'vfcmaddcsh', 'vfcmulcpch', 'vfcmulcph', 'vfcmulcsh',
 	'vfixupimmpd', 'vfixupimmps', 'vfixupimmsd', 'vfixupimmss',
 	'vfmadd123pd', 'vfmadd123ps', 'vfmadd123sd', 'vfmadd123ss',
-	'vfmadd132pd', 'vfmadd132ph', 'vfmadd132ps', 'vfmadd132sd', 'vfmadd132ss', 'vfmadd213pd', 'vfmadd213ph', 'vfmadd213ps',
-	'vfmadd213sd', 'vfmadd213ss', 'vfmadd231pd', 'vfmadd231ph', 'vfmadd231ps', 'vfmadd231sd', 'vfmadd231ss',
+	'vfmadd132bf16', 'vfmadd132pd', 'vfmadd132ph', 'vfmadd132ps', 'vfmadd132sd', 'vfmadd132sh', 'vfmadd132ss',
+	'vfmadd213bf16', 'vfmadd213pd', 'vfmadd213ph', 'vfmadd213ps', 'vfmadd213sd', 'vfmadd213sh','vfmadd213ss',
+	'vfmadd231bf16', 'vfmadd231pd', 'vfmadd231ph', 'vfmadd231ps', 'vfmadd231sd', 'vfmadd231sh', 'vfmadd231ss',
 	'vfmadd312pd', 'vfmadd312ps', 'vfmadd312sd', 'vfmadd312ss', 'vfmadd321pd', 'vfmadd321ps',
 	'vfmadd321sd', 'vfmadd321ss', 'vfmaddcph', 'vfmaddcsh', 'vfmaddpd', 'vfmaddps', 'vfmaddsd', 'vfmaddss', 'vfmaddsub123pd',
 	'vfmaddsub123ps', 'vfmaddsub132pd', 'vfmaddsub132ph', 'vfmaddsub132ps',
 	'vfmaddsub213pd', 'vfmaddsub213ph', 'vfmaddsub213ps',
 	'vfmaddsub231pd', 'vfmaddsub231ph','vfmaddsub231ps', 'vfmaddsub312pd', 'vfmaddsub312ps', 'vfmaddsub321pd',
-	'vfmaddsub321ps', 'vfmaddsubpd', 'vfmaddsubps', 'vfmsub123pd', 'vfmsub123ps',
-	'vfmsub123sd', 'vfmsub123ss', 'vfmsub132pd', 'vfmsub132ph', 'vfmsub132ps', 'vfmsub132sd',
-	'vfmsub132ss', 'vfmsub213pd', 'vfmsub213ph', 'vfmsub213ps', 'vfmsub213sd', 'vfmsub213ss',
-	'vfmsub231pd', 'vfmsub231ph', 'vfmsub231ps', 'vfmsub231sd', 'vfmsub231ss', 'vfmsub312pd',
-	'vfmsub312ps', 'vfmsub312sd', 'vfmsub312ss', 'vfmsub321pd', 'vfmsub321ps',
+	'vfmaddsub321ps', 'vfmaddsubpd', 'vfmaddsubps', 'vfmsub123pd', 'vfmsub123ps', 'vfmsub123sd', 'vfmsub123ss',
+	'vfmsub132bf16', 'vfmsub132pd', 'vfmsub132ph', 'vfmsub132ps', 'vfmsub132sd', 'vfmsub132sh', 'vfmsub132ss',
+	'vfmsub213bf16', 'vfmsub213pd', 'vfmsub213ph', 'vfmsub213ps', 'vfmsub213sd', 'vfmsub213sh', 'vfmsub213ss',
+	'vfmsub231bf16', 'vfmsub231pd', 'vfmsub231ph', 'vfmsub231ps', 'vfmsub231sd', 'vfmsub231sh', 'vfmsub231ss',
+	'vfmsub312pd', 'vfmsub312ps', 'vfmsub312sd', 'vfmsub312ss', 'vfmsub321pd', 'vfmsub321ps',
 	'vfmsub321sd', 'vfmsub321ss', 'vfmsubadd123pd', 'vfmsubadd123ps', 'vfmsubadd132pd', 'vfmsubadd132ph',
 	'vfmsubadd132ps', 'vfmsubadd213pd', 'vfmsubadd213ph', 'vfmsubadd213ps', 'vfmsubadd231pd', 'vfmsubadd231ph', 'vfmsubadd231ps',
 	'vfmsubadd312pd', 'vfmsubadd312ps', 'vfmsubadd321pd', 'vfmsubadd321ps', 'vfmsubaddpd',
-	'vfmsubaddps', 'vfmsubpd', 'vfmsubps', 'vfmsubsd', 'vfmsubss', 'vfmulcpch', 'vfmulcsh', 'vfnmadd123pd', 'vfnmadd123ps',
-	'vfnmadd123sd', 'vfnmadd123ss', 'vfnmadd132pd', 'vfnmadd132ps', 'vfnmadd132sd', 'vfnmadd132ss',
-	'vfnmadd213pd', 'vfnmadd213ps', 'vfnmadd213sd', 'vfnmadd213ss', 'vfnmadd231pd',
-	'vfnmadd231ps', 'vfnmadd231sd', 'vfnmadd231ss', 'vfnmadd312pd', 'vfnmadd312ps',
+	'vfmsubaddps', 'vfmsubpd', 'vfmsubps', 'vfmsubsd', 'vfmsubss', 'vfmulcpch', 'vfmulcph', 'vfmulcsh', 'vfnmadd123pd', 'vfnmadd123ps',
+	'vfnmadd123sd', 'vfnmadd123ss', 'vfnmadd132bf16', 'vfnmadd132pd', 'vfnmadd132ph',
+	'vfnmadd132ps', 'vfnmadd132sd', 'vfnmadd132sh', 'vfnmadd132ss', 'vfnmadd213bf16',
+	'vfnmadd213pd', 'vfnmadd213ph', 'vfnmadd213ps', 'vfnmadd213sd', 'vfnmadd213sh', 'vfnmadd213ss', 'vfnmadd231bf16', 'vfnmadd231pd',
+	'vfnmadd231ph', 'vfnmadd231ps', 'vfnmadd231sd', 'vfnmadd231sh', 'vfnmadd231ss', 'vfnmadd312pd', 'vfnmadd312ps',
 	'vfnmadd312sd', 'vfnmadd312ss', 'vfnmadd321pd', 'vfnmadd321ps', 'vfnmadd321sd',
 	'vfnmadd321ss', 'vfnmaddpd', 'vfnmaddps', 'vfnmaddsd', 'vfnmaddss', 'vfnmsub123pd',
-	'vfnmsub123ps', 'vfnmsub123sd', 'vfnmsub123ss', 'vfnmsub132pd', 'vfnmsub132ps',
+	'vfnmsub123ps', 'vfnmsub123sd', 'vfnmsub132sh', 'vfnmsub123ss', 'vfnmsub213bf16',
+	'vfnmsub132bf16', 'vfnmsub132pd', 'vfnmsub213ph', 'vfnmsub132ph', 'vfnmsub132ps',
 	'vfnmsub132sd', 'vfnmsub132ss', 'vfnmsub213pd', 'vfnmsub213ps', 'vfnmsub213sd',
-	'vfnmsub213ss', 'vfnmsub231pd', 'vfnmsub231ps', 'vfnmsub231sd', 'vfnmsub231ss',
+	'vfnmsub213sh', 'vfnmsub213ss', 'vfnmsub231bf16', 'vfnmsub231pd', 'vfnmsub231ph',
+	'vfnmsub231ps', 'vfnmsub231sd', 'vfnmsub231sh', 'vfnmsub231ss',
 	'vfnmsub312pd', 'vfnmsub312ps', 'vfnmsub312sd', 'vfnmsub312ss', 'vfnmsub321pd',
 	'vfnmsub321ps', 'vfnmsub321sd', 'vfnmsub321ss', 'vfnmsubpd', 'vfnmsubps', 'vfnmsubsd',
-	'vfnmsubss', 'vfpclasspd', 'vfpclassph', 'vfpclassps', 'vfpclasssd', 'vfpclasssh', 'vfpclassss', 'vfrczpd',
+	'vfnmsubss', 'vfpclassbf16', 'vfpclasspd', 'vfpclassph', 'vfpclassps',
+	'vfpclasssd', 'vfpclasssh', 'vfpclassss', 'vfrczpd',
 	'vfrczps', 'vfrczsd', 'vfrczss', 'vgatherdpd', 'vgatherdps',
 	'vgatherpf0dpd', 'vgatherpf0dps', 'vgatherpf0qpd', 'vgatherpf0qps',
 	'vgatherpf1dpd', 'vgatherpf1dps', 'vgatherpf1qpd', 'vgatherpf1qps',
-	'vgatherqpd', 'vgatherqps', 'vgetexppd', 'vgetexpph', 'vgetexpps', 'vgetexpsd', 'vgetexpsh', 'vgetexpss',
+	'vgatherqpd', 'vgatherqps', 'vgetexpbf16', 'vgetexppd', 'vgetexpph', 'vgetexpps',
+	'vgetexpsd', 'vgetexpsh', 'vgetexpss', 'vgetmantbf16',
 	'vgetmantpd', 'vgetmantph', 'vgetmantps', 'vgetmantsd', 'vgetmantsh', 'vgetmantss',
 	'vgetmaxph', 'vgetmaxsh', 'vgetminph', 'vgetminsh', 'vgf2p8affineinvqb',
 	'vgf2p8affineqb', 'vgf2p8mulb', 'vhaddpd', 'vhaddps', 'vhsubpd',
 	'vhsubps', 'vinsertf128', 'vinsertf32x4', 'vinsertf32x8',
 	'vinsertf64x2', 'vinsertf64x4', 'vinserti128', 'vinserti32x4', 'vinserti32x8', 'vinserti64x2',
 	'vinserti64x4', 'vinsertps', 'vlddqu', 'vldmxcsr', 'vldqqu', 'vmaskmovdqu',
-	'vmaskmovpd', 'vmaskmovps', 'vmaxpd', 'vmaxps', 'vmaxsd', 'vmaxss', 'vmcall', 'vmclear', 'vmfunc',
-	'vmgexit', 'vminpd', 'vminps', 'vminsd', 'vminss', 'vmlaunch', 'vmload', 'vmmcall', 'vmovapd', 'vmovaps',
+	'vmaskmovpd', 'vmaskmovps', 'vmaxbf16', 'vmaxpd', 'vmaxph', 'vmaxps',
+	'vmaxsd', 'vmaxsh', 'vmaxss', 'vmcall', 'vmclear', 'vmfunc',
+	'vmgexit', 'vminbf16', 'vminmaxbf16', 'vminmaxpd', 'vminmaxph', 'vminmaxps', 'vminmaxsd', 'vminmaxsh',
+	'vminmaxss', 'vminpd', 'vminph', 'vminps', 'vminsd', 'vminsh',
+	'vminss', 'vmlaunch', 'vmload', 'vmmcall', 'vmovapd', 'vmovaps',
 	'vmovd', 'vmovddup', 'vmovdqa', 'vmovdqa32',
 	'vmovdqa64', 'vmovdqu', 'vmovdqu16', 'vmovdqu32',
 	'vmovdqu64', 'vmovdqu8', 'vmovhlps', 'vmovhpd', 'vmovhps', 'vmovlhps',
 	'vmovlpd', 'vmovlps', 'vmovmskpd', 'vmovmskps', 'vmovntdq', 'vmovntdqa', 'vmovntpd',
 	'vmovntps', 'vmovntqq', 'vmovq', 'vmovqqa', 'vmovqqu', 'vmovsd', 'vmovsh', 'vmovshdup', 'vmovsldup',
 	'vmovss', 'vmovupd', 'vmovups', 'vmovw', 'vmpsadbw', 'vmptrld', 'vmptrst', 'vmread', 'vmresume',
-	'vmrun', 'vmsave', 'vmulpd', 'vmulph', 'vmulps', 'vmulsd', 'vmulsh', 'vmulss', 'vmwrite', 'vmxoff', 'vmxon',
-	'vorpd', 'vorps', 'vp2intersectd', 'vp4dpwssd', 'vp4dpwssds', 'vpabsb', 'vpabsd',
+	'vmrun', 'vmsave', 'vmulbf16', 'vmulpd', 'vmulph', 'vmulps', 'vmulsd', 'vmulsh', 'vmulss', 'vmwrite', 'vmxoff', 'vmxon',
+	'vorpd', 'vorps', 'vp2intersectd', 'vp2intersectq', 'vp4dpwssd', 'vp4dpwssds', 'vpabsb', 'vpabsd',
 	'vpabsq', 'vpabsw', 'vpackssdw', 'vpacksswb', 'vpackusdw',
 	'vpackuswb', 'vpaddb', 'vpaddd', 'vpaddq', 'vpaddsb', 'vpaddsw', 'vpaddusb',
 	'vpaddusw', 'vpaddw', 'vpalignr', 'vpand', 'vpandd', 'vpandn', 'vpandnd',
@@ -814,7 +869,8 @@ our @instr_intel = (
 	'vpcomtrueub', 'vpcomtrueud', 'vpcomtrueuq', 'vpcomtrueuw', 'vpcomtruew',
 	'vpcomub', 'vpcomud', 'vpcomuq', 'vpcomuw', 'vpcomw', 'vpconflictd', 'vpconflictq',
 	'vpdpbssd', 'vpdpbssds', 'vpdpbsud', 'vpdpbsuds', 'vpdpbusd', 'vpdpbusds',
-	'vpdpbuud', 'vpdpbuuds', 'vpdpwssd', 'vpdpwssds', 'vperm2f128', 'vperm2i128',
+	'vpdpbuud', 'vpdpbuuds', 'vpdpwssd', 'vpdpwssds', 'vpdpwsud',
+	'vpdpwsuds', 'vpdpwusd', 'vpdpwusds', 'vpdpwuud', 'vpdpwuuds', 'vperm2f128', 'vperm2i128',
 	'vpermb', 'vpermd', 'vpermi2b', 'vpermi2d', 'vpermi2pd', 'vpermi2w', 'vpermi2ps',
 	'vpermi2q', 'vpermil2pd', 'vpermil2ps', 'vpermilmo2pd',
 	'vpermilmo2ps', 'vpermilmz2pd', 'vpermilmz2ps', 'vpermilpd', 'vpermilps', 'vpermpd',
@@ -861,28 +917,32 @@ our @instr_intel = (
 	'vpunpcklbw', 'vpunpckldq', 'vpunpcklqdq', 'vpunpcklwd', 'vpxor', 'vpxord',
 	'vpxorq', 'vrangepd', 'vrangeps', 'vrangesd', 'vrangess',
 	'vrcp14pd', 'vrcp14ps', 'vrcp14sd', 'vrcp14ss', 'vrcp28pd',
-	'vrcp28ps', 'vrcp28sd', 'vrcp28ss', 'vrcpph', 'vrcpps', 'vrcpsh', 'vrcpss', 'vreducepd',
+	'vrcp28ps', 'vrcp28sd', 'vrcp28ss', 'vrcpbf16', 'vrcpph', 'vrcpps',
+	'vrcpsh', 'vrcpss', 'vreducebf16', 'vreducepd',
 	'vreduceph', 'vreduceps', 'vreducesd', 'vreducesh', 'vreducess',
-	'vrndscalepd', 'vrndscaleps', 'vrndscalesd', 'vrndscaless',
+	'vrndscalebf16', 'vrndscalepd', 'vrndscaleph', 'vrndscaleps', 'vrndscalesd', 'vrndscalesh', 'vrndscaless',
 	'vroundpd', 'vroundps', 'vroundsd', 'vroundss', 'vrsqrt14pd',
 	'vrsqrt14ps', 'vrsqrt14sd', 'vrsqrt14ss', 'vrsqrt28pd', 'vrsqrt28ps',
-	'vrsqrt28sd', 'vrsqrt28ss', 'vrsqrtph', 'vrsqrtps', 'vrsqrtsh', 'vrsqrtss',
-	'vscalefpd', 'vscalefph', 'vscalefps', 'vscalefsd', 'vscalefsh', 'vscalefss',
+	'vrsqrt28sd', 'vrsqrt28ss', 'vrsqrtbf16', 'vrsqrtph', 'vrsqrtps', 'vrsqrtsh', 'vrsqrtss',
+	'vscalefbf16', 'vscalefpd', 'vscalefph', 'vscalefps', 'vscalefsd', 'vscalefsh', 'vscalefss',
 	'vscatterdpd', 'vscatterdps', 'vscatterpf0dpd',
 	'vscatterpf0dps', 'vscatterpf0qpd', 'vscatterpf0qps', 'vscatterpf1dpd',
 	'vscatterpf1dps', 'vscatterpf1qpd', 'vscatterpf1qps', 'vscatterqpd',
 	'vscatterqps', 'vsha512msg1', 'vsha512msg2', 'vsha512rnds2',
 	'vshuff32x4', 'vshuff64x2', 'vshufi32x4', 'vshufi64x2','vshufpd',
 	'vshufps', 'vsm3msg1', 'vsm3msg2', 'vsm3rnds2', 'vsm4key4', 'vsm4rnds4',
-	'vsqrtpd', 'vsqrtph', 'vsqrtps', 'vsqrtsd', 'vsqrtsh', 'vsqrtss', 'vstmxcsr', 'vsubpd',
-	'vsubph', 'vsubps', 'vsubsd', 'vsubsh', 'vsubss',
-	'vtestpd', 'vtestps', 'vucomisd', 'vucomish', 'vucomiss', 'vunpckhpd',
+	'vsqrtbf16', 'vsqrtpd', 'vsqrtph', 'vsqrtps', 'vsqrtsd', 'vsqrtsh', 'vsqrtss', 'vstmxcsr',
+	'vsubbf16', 'vsubpd', 'vsubph', 'vsubps', 'vsubsd', 'vsubsh', 'vsubss',
+	'vtestpd', 'vtestps', 'vucomisd', 'vucomish', 'vucomiss', 'vucomxsd',
+	'vucomxsh', 'vucomxss','vunpckhpd',
 	'vunpckhps', 'vunpcklpd', 'vunpcklps', 'vxorpd', 'vxorps', 'vzeroall', 'vzeroupper',
 	'wait', 'wbinvd', 'wbnoinvd', 'wrfsbase', 'wrgsbase', 'wrmsr', 'wrmsrlist', 'wrmsrns', 'wrmsrq', 'wrpkru',
 	'wrssd', 'wrssq', 'wrussd', 'wrussq', 'wrshr', 'xabort',
 	'xacquire', 'xadd', 'xbegin', 'xbts', 'xchg', 'xcryptcbc', 'xcryptcfb',
-	'xcryptctr', 'xcryptecb', 'xcryptofb', 'xend', 'xgetbv', 'xlat', 'xlatb', 'xor', 'xorpd',
-	'xorps', 'xrelease', 'xresldtrk', 'xrstor', 'xrstor64', 'xrstors', 'xrstors64', 'xsave', 'xsave64',
+	'xcryptctr', 'xcryptecb', 'xcryptofb', 'xend', 'xgetbv', 'xlat', 'xlatb', 'xnor',
+	'xnorb', 'xnord', 'xnorq', 'xnorw', 'xor', 'xorb', 'xord', 'xorpd',
+	'xorps', 'xorq', 'xorw', 'xrelease', 'xresldtrk', 'xrstor',
+	'xrstor64', 'xrstors', 'xrstors64', 'xsave', 'xsave64',
 	'xsavec', 'xsavec64', 'xsaveopt', 'xsaveopt64', 'xsaves', 'xsaves64',
 	'xsetbv', 'xsha1', 'xsha256', 'xstore', 'xsusldtrk', 'xtest'
  		);
@@ -1406,8 +1466,7 @@ sub _is_valid_16bit_addr_reg_intel($) {
 #
 sub _is_same_type_16bit_addr_reg_intel($$) {
 
-	my $reg1 = shift;
-	my $reg2 = shift;
+	my ($reg1, $reg2) = @_;
 	return 1 if ($reg1 =~ /^b.$/io && $reg2 =~ /^b.$/io)
 		||  ($reg1 =~ /^.i$/io && $reg2 =~ /^.i$/io);
 	return 0;
@@ -1424,13 +1483,7 @@ sub _is_same_type_16bit_addr_reg_intel($$) {
 #
 sub _validate_16bit_addr_parts_intel($$$$$$$) {
 
-	my $seg_reg = shift;
-	my $reg1_sign = shift;
-	my $reg1 = shift;
-	my $reg2_sign = shift;
-	my $reg2 = shift;
-	my $disp_sign = shift;
-	my $disp = shift;
+	my ($seg_reg, $reg1_sign, $reg1, $reg2_sign, $reg2, $disp_sign, $disp) = @_;
 
 	return 0 if defined $seg_reg && ! is_segreg_intel($seg_reg);
 	return 0 if #defined $reg1 && # always defined
@@ -1607,8 +1660,7 @@ sub _is_valid_16bit_addr_reg_att($) {
 #
 sub _is_same_type_16bit_addr_reg_att($$) {
 
-	my $reg1 = shift;
-	my $reg2 = shift;
+	my ($reg1, $reg2) = @_;
 	return 1 if ($reg1 =~ /^%b.$/io && $reg2 =~ /^%b.$/io)
 		||  ($reg1 =~ /^%.i$/io && $reg2 =~ /^%.i$/io);
 	return 0;
@@ -1786,14 +1838,8 @@ sub is_valid_16bit_addr($) {
 # =cut
 sub _validate_32bit_addr_parts_intel($$$$$$$$) {
 
-	my $seg_reg = shift;
-	my $base_reg_sign = shift;
-	my $base_reg = shift;
-	my $index_reg_sign = shift;
-	my $index_reg = shift;
-	my $scale = shift;
-	my $disp_sign = shift;
-	my $disp = shift;
+	my ($seg_reg, $base_reg_sign, $base_reg, $index_reg_sign, $index_reg,
+		$scale, $disp_sign, $disp) = @_;
 
 	return 0 if defined $seg_reg && ! is_segreg_intel($seg_reg);
 	return 0 if defined $base_reg && is_reg_intel($base_reg) && ! is_addressable32_intel($base_reg);
@@ -2110,14 +2156,8 @@ sub _is_valid_64bit_addr_reg_intel($) {
 # =cut
 sub _validate_64bit_addr_parts_intel($$$$$$$$) {
 
-	my $seg_reg = shift;
-	my $base_reg_sign = shift;
-	my $base_reg = shift;
-	my $index_reg_sign = shift;
-	my $index_reg = shift;
-	my $scale = shift;
-	my $disp_sign = shift;
-	my $disp = shift;
+	my ($seg_reg, $base_reg_sign, $base_reg, $index_reg_sign,
+	    $index_reg, $scale, $disp_sign, $disp) = @_;
 	my $was64 = 0;
 	my $nregs = 0;
 
@@ -3256,6 +3296,28 @@ sub _remove_size_qualifiers_add_dollar($) {
 	return $par;
 }
 
+# =head2 _add_suffix_if_reg
+#
+#  PRIVATE SUBROUTINE.
+#  Returns the parameter (the first one) after adding a size suffix (byte,
+#  word, dword, etc.) to the instruction parameter (the third one), if the
+#  register parameter (the second one) is a register.
+#  If the register parameter is not a register, returns input unmodified.
+#
+# =cut
+#
+sub _add_suffix_if_reg($$$) {
+
+	my ($par, $reg, $instr) = @_;
+
+	if ( is_reg8($reg) )     { $par =~ s/^\s*$instr\b/\t${instr}b/i; }
+	elsif ( is_reg16($reg) ) { $par =~ s/^\s*$instr\b/\t${instr}w/i; }
+	elsif ( is_reg32($reg) ) { $par =~ s/^\s*$instr\b/\t${instr}l/i; }
+	elsif ( is_reg64($reg) ) { $par =~ s/^\s*$instr\b/\t${instr}q/i; }
+
+	return $par;
+}
+
 =head2 conv_intel_instr_to_att
 
  Converts the given string representing a valid Intel instruction to AT&T syntax.
@@ -3308,34 +3370,22 @@ sub conv_intel_instr_to_att($) {
 					elsif ( is_reg32($a3) ) { $par =~ s/^\s*$i\b/\t${i}l/i; }
 					elsif ( is_reg64($a3) ) { $par =~ s/^\s*$i\b/\t${i}q/i; }
 					elsif ( $par =~ /^\s*$i\s+([^\[\],]+)\s*,\s*([^,]+)\s*,\s*([^,]+)/i ) {
-						$a1 = $1;
-						$a1 =~ s/\s+$//o;
-						if ( is_reg8 ($a1) )    { $par =~ s/^\s*$i\b/\t${i}b/i; }
-						elsif ( is_reg16($a1) ) { $par =~ s/^\s*$i\b/\t${i}w/i; }
-						elsif ( is_reg32($a1) ) { $par =~ s/^\s*$i\b/\t${i}l/i; }
-						elsif ( is_reg64($a1) ) { $par =~ s/^\s*$i\b/\t${i}q/i; }
+						($a1 = $1) =~ s/\s+$//o;
+						$par = _add_suffix_if_reg($par, $a1, $i);
 						# (default: let the programmer decide)
 						#else { $par =~ s/^\s*$i\b/\t${i}l/i; }
 					}
 					elsif ( $par =~ /^\s*$i\s+([^,]+)\s*,\s*([^\[\],]+)\s*,\s*([^,]+)/i ) {
-						$a2 = $2;
-						$a2 =~ s/\s+$//o;
-						if ( is_reg8 ($a2) )    { $par =~ s/^\s*$i\b/\t${i}b/i; }
-						elsif ( is_reg16($a2) ) { $par =~ s/^\s*$i\b/\t${i}w/i; }
-						elsif ( is_reg32($a2) ) { $par =~ s/^\s*$i\b/\t${i}l/i; }
-						elsif ( is_reg64($a2) ) { $par =~ s/^\s*$i\b/\t${i}q/i; }
+						($a2 = $2) =~ s/\s+$//o;
+						$par = _add_suffix_if_reg($par, $a2, $i);
 						# (default: let the programmer decide)
 						#else { $par =~ s/^\s*$i\b/\t${i}l/i; }
 					}
 					# taken care of by the first conditions
 					#else {#if ( $par =~ /^\s*$i\s+([^,]+)\s*,\s*([^,]+),\s*([^\[\],]+)\s*/i ) {
 						#$par =~ /^\s*$i\s+([^,]+)\s*,\s*([^,]+),\s*([^\[\],]+)\s*/i;
-						#$a3 = $3;
-						#$a3 =~ s/\s+$//o;
-						#if ( is_reg8 ($a3) )    { $par =~ s/^\s*$i\b/\t${i}b/i; }
-						#elsif ( is_reg16($a3) ) { $par =~ s/^\s*$i\b/\t${i}w/i; }
-						#elsif ( is_reg32($a3) ) { $par =~ s/^\s*$i\b/\t${i}l/i; }
-						#elsif ( is_reg64($a3) ) { $par =~ s/^\s*$i\b/\t${i}q/i; }
+						#($a3 = $3) =~ s/\s+$//o;
+						#$par = _add_suffix_if_reg($par, $a3, $i);
 						# (default: let the programmer decide)
 						#else { $par =~ s/^\s*$i\b/\t${i}l/i; }
 					#} else {
@@ -3350,24 +3400,16 @@ sub conv_intel_instr_to_att($) {
 					elsif ( is_reg32($a2) ) { $par =~ s/^\s*$i\b/\t${i}l/i; }
 					elsif ( is_reg64($a2) ) { $par =~ s/^\s*$i\b/\t${i}q/i; }
 					elsif ( $par =~ /^\s*$i\s+([^\[\],]+)\s*,\s*([^,]+)\s*,\s*([^,]+)/i ) {
-						$a1 = $1;
-						$a1 =~ s/\s+$//o;
-						if ( is_reg8 ($a1) )    { $par =~ s/^\s*$i\b/\t${i}b/i; }
-						elsif ( is_reg16($a1) ) { $par =~ s/^\s*$i\b/\t${i}w/i; }
-						elsif ( is_reg32($a1) ) { $par =~ s/^\s*$i\b/\t${i}l/i; }
-						elsif ( is_reg64($a1) ) { $par =~ s/^\s*$i\b/\t${i}q/i; }
+						($a1 = $1) =~ s/\s+$//o;
+						$par = _add_suffix_if_reg($par, $a1, $i);
 						# (default: let the programmer decide)
 						#else { $par =~ s/^\s*$i\b/\t${i}l/i; }
 					}
 					# taken care of by the first conditions
 					#else {#if ( $par =~ /^\s*$i\s+([^,]+)\s*,\s*([^\[\],]+)\s*,\s*([^,]+)/i ) {
 						#$par =~ /^\s*$i\s+([^,]+)\s*,\s*([^\[\],]+)\s*,\s*([^,]+)/i;
-						#$a1 = $2;
-						#$a1 =~ s/\s+$//o;
-						#if ( is_reg8 ($a1) )    { $par =~ s/^\s*$i\b/\t${i}b/i; }
-						#elsif ( is_reg16($a1) ) { $par =~ s/^\s*$i\b/\t${i}w/i; }
-						#elsif ( is_reg32($a1) ) { $par =~ s/^\s*$i\b/\t${i}l/i; }
-						#elsif ( is_reg64($a1) ) { $par =~ s/^\s*$i\b/\t${i}q/i; }
+						#($a2 = $2) =~ s/\s+$//o;
+						#$par = _add_suffix_if_reg($par, $a2, $i);
 						# (default: let the programmer decide)
 						#else { $par =~ s/^\s*$i\b/\t${i}l/i; }
 					#} else {
@@ -3377,12 +3419,8 @@ sub conv_intel_instr_to_att($) {
 
 				} elsif ( $par =~ /^\s*$i\s+([^\[\],]+)\s*,\s*([^,]+)\s*,\s*([^,]+)/i ) {
 
-					$a1 = $1;
-					$a1 =~ s/\s+$//o;
-					if ( is_reg8 ($a1) )    { $par =~ s/^\s*$i\b/\t${i}b/i; }
-					elsif ( is_reg16($a1) ) { $par =~ s/^\s*$i\b/\t${i}w/i; }
-					elsif ( is_reg32($a1) ) { $par =~ s/^\s*$i\b/\t${i}l/i; }
-					elsif ( is_reg64($a1) ) { $par =~ s/^\s*$i\b/\t${i}q/i; }
+					($a1 = $1) =~ s/\s+$//o;
+					$par = _add_suffix_if_reg($par, $a1, $i);
 					# (default: let the programmer decide)
 					#else { $par =~ s/^\s*$i\b/\t${i}l/i; }
 
@@ -3400,23 +3438,15 @@ sub conv_intel_instr_to_att($) {
 					elsif ( is_reg32($a2) ) { $par =~ s/^\s*$i\b/\t${i}l/i; }
 					elsif ( is_reg64($a2) ) { $par =~ s/^\s*$i\b/\t${i}q/i; }
 					elsif ( $par =~ /^\s*$i\s+([^\[\],]+)\s*,\s*([^,]+)/i ) {
-						$a1 = $1;
-						$a1 =~ s/\s+$//o;
-						if ( is_reg8 ($a1) )    { $par =~ s/^\s*$i\b/\t${i}b/i; }
-						elsif ( is_reg16($a1) ) { $par =~ s/^\s*$i\b/\t${i}w/i; }
-						elsif ( is_reg32($a1) ) { $par =~ s/^\s*$i\b/\t${i}l/i; }
-						elsif ( is_reg64($a1) ) { $par =~ s/^\s*$i\b/\t${i}q/i; }
+						($a1 = $1) =~ s/\s+$//o;
+						$par = _add_suffix_if_reg($par, $a1, $i);
 						# (default: let the programmer decide)
 						#else { $par =~ s/^\s*$i\b/\t${i}l/i; }
 					}
 					# taken care of by the first conditions
 					#else {#if ( $par =~ /^\s*$i\s+([^,]+)\s*,\s*([^\[\],]+)/i ) {
-						#$a1 = $2;
-						#$a1 =~ s/\s+$//o;
-						#if ( is_reg8 ($a1) )    { $par =~ s/^\s*$i\b/\t${i}b/i; }
-						#elsif ( is_reg16($a1) ) { $par =~ s/^\s*$i\b/\t${i}w/i; }
-						#elsif ( is_reg32($a1) ) { $par =~ s/^\s*$i\b/\t${i}l/i; }
-						#elsif ( is_reg64($a1) ) { $par =~ s/^\s*$i\b/\t${i}q/i; }
+						#($a2 = $2) =~ s/\s+$//o;
+						#$par = _add_suffix_if_reg($par, $a2, $i);
 						# (default: let the programmer decide)
 						#else { $par =~ s/^\s*$i\b/\t${i}l/i; }
 					#} else {
@@ -3426,12 +3456,8 @@ sub conv_intel_instr_to_att($) {
 
 				} elsif ( $par =~ /^\s*$i\s+([^\[\],]+)\s*,\s*([^,]+)/i ) {
 
-					$a1 = $1;
-					$a1 =~ s/\s+$//o;
-					if ( is_reg8 ($a1) )    { $par =~ s/^\s*$i\b/\t${i}b/i; }
-					elsif ( is_reg16($a1) ) { $par =~ s/^\s*$i\b/\t${i}w/i; }
-					elsif ( is_reg32($a1) ) { $par =~ s/^\s*$i\b/\t${i}l/i; }
-					elsif ( is_reg64($a1) ) { $par =~ s/^\s*$i\b/\t${i}q/i; }
+					($a1 = $1) =~ s/\s+$//o;
+					$par = _add_suffix_if_reg($par, $a1, $i);
 					# (default: let the programmer decide)
 					#else { $par =~ s/^\s*$i\b/\t${i}l/i; }
 
@@ -3443,10 +3469,7 @@ sub conv_intel_instr_to_att($) {
 
 				$par =~ /^\s*$i\s+([^,]+)\s*/i;
 				($a1 = $1) =~ s/\s+$//o;
-				if ( is_reg8 ($a1) )    { $par =~ s/^\s*$i\b/\t${i}b/i; }
-				elsif ( is_reg16($a1) ) { $par =~ s/^\s*$i\b/\t${i}w/i; }
-				elsif ( is_reg32($a1) ) { $par =~ s/^\s*$i\b/\t${i}l/i; }
-				elsif ( is_reg64($a1) ) { $par =~ s/^\s*$i\b/\t${i}q/i; }
+				$par = _add_suffix_if_reg($par, $a1, $i);
 				#else {
 					# (default: let the programmer decide)
 					#$par =~ s/^\s*$i\b/\t${i}l/i;
@@ -3507,13 +3530,15 @@ sub conv_intel_instr_to_att($) {
 	}
 
 	# (FPU instructions)
-	$par =~ s/^\s*fi(\w+)\s+word\s*(.*)/\tfi${1}s\t$2/io;
-	$par =~ s/^\s*fi(\w+)\s+dword\s*(.*)/\tfi${1}l\t$2/io;
-	$par =~ s/^\s*fi(\w+)\s+qword\s*(.*)/\tfi${1}q\t$2/io;
+	if ( $par =~ /^\s*f(\w+)\s+/io ) {
+		$par =~ s/^\s*fi(\w+)\s+word\s*(.*)/\tfi${1}s\t$2/io;
+		$par =~ s/^\s*fi(\w+)\s+dword\s*(.*)/\tfi${1}l\t$2/io;
+		$par =~ s/^\s*fi(\w+)\s+qword\s*(.*)/\tfi${1}q\t$2/io;
 
-	$par =~ s/^\s*f([^iI]\w+)\s+dword\s*(.*)/\tf${1}s\t$2/io;
-	$par =~ s/^\s*f([^iI]\w+)\s+qword\s*(.*)/\tf${1}l\t$2/io;
-	$par =~ s/^\s*f([^iI]\w+)\s+t(word|byte)\s*(.*)/\tf${1}t\t$3/io;
+		$par =~ s/^\s*f([^i]\w+)\s+dword\s*(.*)/\tf${1}s\t$2/io;
+		$par =~ s/^\s*f([^i]\w+)\s+qword\s*(.*)/\tf${1}l\t$2/io;
+		$par =~ s/^\s*f([^i]\w+)\s+t(word|byte)\s*(.*)/\tf${1}t\t$3/io;
+	}
 
 	# (change "xxx" to "$xxx", if there are no "[]")
 	# (don't touch "call/jmp xxx")
@@ -3553,11 +3578,13 @@ sub conv_intel_instr_to_att($) {
 	$par =~ s/^\s*cwd\b/\tcwtd/io;
 	$par =~ s/^\s*cdq\b/\tcltd/io;
 
-	# (adding asterisk chars)
-	$par =~ s/^\s*(jmp|call)\s+([dp]word|word|near|far|short)?\s*(\[[\w\*\+\-\s]+\])/\t$1\t*$3/io;
-	$par =~ s/^\s*(jmp|call)\s+([dp]word|word|near|far|short)?\s*((0x)?\d+h?)/\t$1\t*$3/io;
-	$par =~ s/^\s*(jmp|call)\s+([dp]word|word|near|far|short)?\s*([\w\*\+\-\s]+)/\t$1\t$3/io;
-	$par =~ s/^\s*(jmp|call)\s+([^:]+)\s*:\s*([^:]+)/\tl$1\t$2, $3/io;
+	if ( $par =~ /^\s*(jmp|call)\s+/io ) {
+		# (adding asterisk chars)
+		$par =~ s/^\s*(jmp|call)\s+([dp]word|word|near|far|short)?\s*(\[[\w\*\+\-\s]+\])/\t$1\t*$3/io;
+		$par =~ s/^\s*(jmp|call)\s+([dp]word|word|near|far|short)?\s*((0x)?\d+h?)/\t$1\t*$3/io;
+		$par =~ s/^\s*(jmp|call)\s+([dp]word|word|near|far|short)?\s*([\w\*\+\-\s]+)/\t$1\t$3/io;
+		$par =~ s/^\s*(jmp|call)\s+([^:]+)\s*:\s*([^:]+)/\tl$1\t$2, $3/io;
+	}
 	$par =~ s/^\s*retf\s+(.*)$/\tlret\t$1/io;
 
 	# (changing memory references):
@@ -3602,7 +3629,7 @@ Bogdan Drozdowski, C<< <bogdro at cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright 2008-2024 Bogdan Drozdowski, all rights reserved.
+Copyright 2008-2025 Bogdan Drozdowski, all rights reserved.
 
 =head1 LICENSE
 

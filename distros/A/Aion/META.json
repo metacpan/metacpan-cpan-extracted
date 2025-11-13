@@ -4,7 +4,7 @@
       "Yaroslav O. Kosmina L<mailto:dart@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.26",
+   "generated_by" : "Minilla/v3.1.28",
    "license" : [
       "gpl_3"
    ],
@@ -33,17 +33,25 @@
       },
       "develop" : {
          "requires" : {
+            "App::cpm" : "0",
+            "CPAN::Uploader" : "0",
+            "Data::Printer" : "1.000004",
+            "Liveman" : "1.0",
+            "Minilla" : "v3.1.19",
+            "Software::License::GPL_3" : "0",
             "Test::CPAN::Meta" : "0",
             "Test::MinimumVersion::Fast" : "0.04",
             "Test::PAUSE::Permissions" : "0.07",
             "Test::Pod" : "1.41",
-            "Test::Spellunker" : "v0.2.7"
+            "Test::Spellunker" : "v0.2.7",
+            "V" : "0",
+            "Version::Next" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "Attribute::Handlers" : "0.99",
-            "DDP" : "1.002001",
+            "B" : "0",
+            "Exporter" : "0",
             "List::Util" : "1.68",
             "Math::BigFloat" : "0",
             "Math::BigInt" : "1.999837",
@@ -51,26 +59,48 @@
             "Sub::Util" : "1.63",
             "common::sense" : "3.75",
             "config" : "1.3",
+            "constant" : "0",
+            "overload" : "0",
             "perl" : "v5.22.0"
          }
       },
       "test" : {
          "requires" : {
             "Carp" : "0",
+            "Cwd" : "0",
             "File::Basename" : "0",
+            "File::Find" : "0",
             "File::Path" : "0",
             "File::Slurper" : "0",
             "File::Spec" : "0",
-            "Scalar::Util" : "0",
             "Test::More" : "0.98",
-            "common::sense" : "0"
+            "lib" : "0",
+            "open" : "0"
          }
       }
    },
    "provides" : {
       "Aion" : {
          "file" : "lib/Aion.pm",
-         "version" : "0.4"
+         "version" : "1.1"
+      },
+      "Aion::Meta::Feature" : {
+         "file" : "lib/Aion/Meta/Feature.pm"
+      },
+      "Aion::Meta::FeatureConstruct" : {
+         "file" : "lib/Aion/Meta/FeatureConstruct.pm"
+      },
+      "Aion::Meta::RequiresAnyFunction" : {
+         "file" : "lib/Aion/Meta/RequiresAnyFunction.pm"
+      },
+      "Aion::Meta::RequiresFeature" : {
+         "file" : "lib/Aion/Meta/RequiresFeature.pm"
+      },
+      "Aion::Meta::Subroutine" : {
+         "file" : "lib/Aion/Meta/Subroutine.pm"
+      },
+      "Aion::Meta::Util" : {
+         "file" : "lib/Aion/Meta/Util.pm"
       },
       "Aion::Type" : {
          "file" : "lib/Aion/Type.pm"
@@ -91,7 +121,7 @@
          "web" : "https://github.com/darviarush/perl-aion"
       }
    },
-   "version" : "0.4",
+   "version" : "1.1",
    "x_authority" : "cpan:DART",
    "x_contributors" : [
       "Iaroslav O. Kosmina <darviarush@ya.ru>",
@@ -99,5 +129,5 @@
       "Yaroslav O. Kosmina <darviarush@mail.ru>"
    ],
    "x_serialization_backend" : "JSON::PP version 4.16",
-   "x_static_install" : 1
+   "x_static_install" : 0
 }

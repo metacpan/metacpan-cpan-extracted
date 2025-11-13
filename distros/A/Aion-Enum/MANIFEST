@@ -1,0 +1,14 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+doc/badges/total.svg
+i18n/Aion/Enum.ru-en.po
+lib/Aion/Enum.md
+lib/Aion/Enum.pm
+minil.toml
+t/aion/enum.t
+META.yml
+MANIFEST

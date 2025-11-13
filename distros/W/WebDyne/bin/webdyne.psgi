@@ -39,7 +39,7 @@ use WebDyne::Request::PSGI::Constant;
 
 #  Version information
 #
-$VERSION='2.026';
+$VERSION='2.028';
 
 
 #  API file name cache
@@ -51,6 +51,11 @@ our (%API_fn);
 #
 (my $test_dn=$INC{'WebDyne.pm'})=~s/\.pm$//;
 my $test_fn=File::Spec->catfile($test_dn, 'time.psp');
+
+
+#  Set DOCUMENT_DEFAULT
+#
+$DOCUMENT_DEFAULT=$ENV{'DOCUMENT_DEFAULT'} || $DOCUMENT_DEFAULT;
 
 
 #  All done. Start endless loop if called from command line or return
@@ -113,11 +118,6 @@ if (!caller || exists $ENV{PAR_TEMP}) {
     $DOCUMENT_ROOT=&normalize_dn($DOCUMENT_ROOT);
     
     
-    #  Set DOCUMENT_DEFAULT
-    #
-    $DOCUMENT_DEFAULT=$ENV{'DOCUMENT_DEFAULT'} || $DOCUMENT_DEFAULT;
-
-
     #  Indexing ? Do by default unless file specified as DOCUMENT_ROOT or --noindex spec'd etc.
     #
     unless (-f $DOCUMENT_ROOT || -f File::Spec->catfile($DOCUMENT_ROOT, $DOCUMENT_DEFAULT) || $noindex_fg) {
@@ -137,7 +137,7 @@ if (!caller || exists $ENV{PAR_TEMP}) {
     
     #  Show error information by default
     #
-    $WebDyne::Constant::WEBDYNE_ERROR_SHOW=1;
+    $WebDyne::WEBDYNE_ERROR_SHOW=1;
     $WebDyne::WEBDYNE_ERROR_SHOW_EXTENDED=1;
 
 
@@ -161,7 +161,7 @@ else {
 
 #  Return handler code ref
 #
-&handler_build(\&handler);
+&handler_build($WEBDYNE_PSGI_STATIC ? &handler_static(\&handler) : \&handler);
 
 
 #==================================================================================================

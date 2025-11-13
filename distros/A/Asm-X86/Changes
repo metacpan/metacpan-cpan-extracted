@@ -1,5 +1,20 @@
 Revision history for Asm-X86
 
+2025-11-05	Bogdan Drozdowski <bogdro \at\ cpan . org>
+
+	* Version 0.72
+	  Updated the instruction list.
+	* lib/Asm/X86.pm (@instr_intel): Updated the instruction and register
+	  lists from NASM version 3.01.
+	* lib/Asm/X86.pm: Simplified parameter assigning in subroutines.
+	* lib/Asm/X86.pm (conv_intel_instr_to_att, _add_suffix_if_reg): Moved
+	  common code to a subroutine.
+	* lib/Asm/X86.pm (conv_intel_instr_to_att): Convert only when a match
+	  is found. Simplified regexes.
+	* Makefile.PL: Put the version in a variable.
+	* lib/Asm/X86.pm, t/zz*.t, Makefile.PL, README: Updated the copyright
+	  and version.
+
 2024-06-26	Bogdan Drozdowski <bogdro \at\ cpan . org>
 
 	* Version 0.70

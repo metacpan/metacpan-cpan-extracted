@@ -1,5 +1,9 @@
 Revision history for CGI-Lingua
 
+0.79	Wed Nov 12 21:33:38 EST 2025
+	new: "supported" can now be a simple string if only one language is supported
+	Moved the Test::Needs higher up the use list (RT#171642)
+
 0.78	Tue Nov 11 15:27:14 EST 2025
 	Added workaround for https://github.com/bricas/geo-ipfree/issues/10
 	Started fuzz testing

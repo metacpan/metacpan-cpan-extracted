@@ -10,8 +10,14 @@ minil.toml
 t/00_compile.t
 t/01_basic.t
 t/02_dsn.t
+t/03_issue4_selectrow_hashref.t
+t/05_last_insert_id.t
+t/06_stream_expired_handling.t
 xt/01_integration.t
 xt/02_smoke.t
 xt/03_turso_live.t
+xt/04_dbix_sunny_select_row.t
+xt/05_dbix_sunny_select_all.t
+xt/06_dbix_sunny_integration.t
 META.yml
 MANIFEST

@@ -1,5 +1,18 @@
 Revision history for Perl extension DBD-libsql
 
+0.05 2025-11-13T03:52:51Z
+    - feat: Implement last_insert_id method (issue #8)
+    - fix: Implement { Slice => {} } option for selectall_arrayref (issue #10)
+    - fix: Use server-provided column metadata in fetchrow_hashref (issue #9)
+    - fix: Add automatic retry logic for STREAM_EXPIRED connection errors
+    - test: Add comprehensive test for last_insert_id method
+    - test: Add DBIx::Sunny integration tests
+
+0.04 2025-11-12T12:32:15Z
+    - fix: Make fetchrow_hashref return dynamic column names from SQL (issue #4)
+    - fix: Add FETCH and STORE methods to st package
+    - test: Add integration tests for DBIx::Sunny select_row and select_all
+
 0.03 2025-09-29T08:40:30Z
     - fix: call $sth->finish() when DESTROY and $sth is active
 

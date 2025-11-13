@@ -1,3 +1,27 @@
+commit dffda081257d3274131ff2e4504a04eef33effaa
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Nov 12 23:37:33 2025 +1030
+
+    VERSION increment: 2.028
+
+commit 37db6ab83982f681bec869d818d6bff4d109facf
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Nov 12 23:37:22 2025 +1030
+
+    Still fixing handling of DEFAULT_DOCUMENT and making sure we refuse to serve non .psp files if not in static mode
+
+commit 1db4b20ecec942a319adef308793439b1bd8b7fe
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Nov 12 23:24:40 2025 +1030
+
+    VERSION increment: 2.027
+
+commit f7549eac7f8b4ff1bd8fd84112a2e04b6f449b2c
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Wed Nov 12 23:24:14 2025 +1030
+
+    Allow starman to serve static files by default, fix handling of DOCUMENT_DEFAULT in starman, other minor fixes
+
 commit 2ac844e833bd420fdc1af3851ccbcd19be11aa09
 Author: Andrew Speer <andrew.speer@isolutions.com.au>
 Date:   Mon Nov 10 22:48:38 2025 +1030

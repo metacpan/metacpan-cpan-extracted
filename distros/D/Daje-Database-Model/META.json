@@ -54,7 +54,7 @@
    "provides" : {
       "Daje::Database::Model" : {
          "file" : "lib/Daje/Database/Model.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       },
       "Daje::Database::Model::Super::Common::Base" : {
          "file" : "lib/Daje/Database/Model/Super/Common/Base.pm"
@@ -75,7 +75,7 @@
          "web" : "https://github.com/janeskil1525/Daje-Database-Model"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

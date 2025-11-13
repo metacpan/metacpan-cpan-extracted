@@ -8,9 +8,8 @@ lib/Debug/Easy.pm
 Makefile.PL
 MANIFEST
 README.md
+AUTHOR.md
 t/01-all-levels.t
-t/02-verbose.t
-t/03-Backward-Compatible.t
-t/pod.t
+LICENSE
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

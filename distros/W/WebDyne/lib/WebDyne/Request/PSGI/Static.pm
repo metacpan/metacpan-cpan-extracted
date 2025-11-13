@@ -24,6 +24,7 @@ use vars   qw($VERSION $AUTOLOAD @ISA);
 use HTTP::Status (qw(RC_INTERNAL_SERVER_ERROR RC_NOT_FOUND));
 use IO::File;
 use WebDyne::Util;
+use WebDyne::Constant;
 
 
 #  Inheritance
@@ -34,7 +35,7 @@ use WebDyne::Request::PSGI;
 
 #  Version information
 #
-$VERSION='2.026';
+$VERSION='2.028';
 
 
 #  Debug load
@@ -64,6 +65,8 @@ sub run {
         my $hr=$r->headers_out();
         my $size=(stat($fn))[7];
         $hr->{'Content-Length'}=$size;
+        my $ext=($fn=~/\.(\w+)$/) && $1;
+        $hr->{'Content-Type'}=$WEBDYNE_MIME_TYPE_HR->{$ext} || 'text/plain';
         $r->send_http_header();
         while (<$fh>) {$r->print($_)}
         $fh->close();

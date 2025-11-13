@@ -1,5 +1,5 @@
 package Astro::ADS::Search;
-$Astro::ADS::Search::VERSION = '1.91';
+$Astro::ADS::Search::VERSION = '1.92';
 use Moo;
 extends 'Astro::ADS';
 with 'Astro::ADS::Role::ResultMapper';
@@ -78,20 +78,27 @@ sub query {
 
 sub query_tree {
     my ($self, $terms) = @_;
-    carp "Not implemented yet"; return;
 
-    my $url = $self->base_url->path('search/qtree');
+    my $url = $self->base_url->clone->path('search/qtree');
     $url->query( { q => $self->q, fl => $self->fl } );
-    return $self->get_result( $url );
+    my $response = $self->get_response( $url );
+
+    my $qtree = $self->parse_qtree_response( $response );
+    return $qtree;
 }
 
 sub bigquery {
-    my ($self, $terms) = @_;
-    carp "Not implemented yet"; return;
+    my ($self, @bibcodes) = @_;
 
-    my $url = $self->base_url->path('search/bigquery');
+    my $bibcode_list = join "\n", 'bibcode', @bibcodes;
+
+    my $url = $self->base_url->clone->path('search/bigquery');
+    #TODO why the parameters in the query?
     $url->query( { q => $self->q, fl => $self->fl } );
-    #return $self->post_result( $url );
+    my $response = $self->post_response( $url, $bibcode_list );
+
+    my $json = $response->json;
+    return $self->parse_response( $json );
 }
 
 sub gather_search_terms {
@@ -172,7 +179,7 @@ Astro::ADS::Search - Queries the ADS Search endpoint and collects the results
 
 =head1 VERSION
 
-version 1.91
+version 1.92
 
 =head1 SYNOPSIS
 
@@ -225,13 +232,9 @@ deleted if the query attribute is updated.
 
 =head2 query_tree
 
-B<Not implemented yet>
-
 Will return the L<Abstract Syntax Tree|https://ui.adsabs.harvard.edu/help/api/api-docs.html#get-/search/qtree> for the query.
 
 =head2 bigquery
-
-B<Not implemented yet>
 
 Accepts a L<list of many IDs|https://ui.adsabs.harvard.edu/help/api/api-docs.html#post-/search/bigquery> and supports paging.
 

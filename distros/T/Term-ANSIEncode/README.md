@@ -46,7 +46,7 @@ It is HIGHLY encouraged for your terminal be set as UTF-8 for the advanced featu
 
 ### -**d** or --**dump** [search]
 ~~~
-    Shows the syumbols only
+    Shows the symbols only
 ~~~
 
 ## Author
@@ -187,3 +187,4 @@ Please use the "-t" option to see all of the tokens.  This is only a partial lis
 | HORIZONTAL RULE BRIGHT MAGENTA | A solid line of bright magenta background |
 | HORIZONTAL RULE BRIGHT CYAN  | A solid line of bright cyan background |
 | HORIZONTAL RULE BRIGHT WHITE | A solid line of bright white background |
+

@@ -34,7 +34,7 @@ require Opcode;
 
 #  Version information
 #
-$VERSION='2.026';
+$VERSION='2.028';
 
 
 #  Get mod_perl version. Clear $@ after evals
@@ -403,6 +403,35 @@ my %constant_temp;
         #'Referrer-Policy'           => 'strict-origin-when-cross-origin',
 
     },
+    
+    
+    #  Webdyne PSGI serves static files ?
+    #
+    WEBDYNE_PSGI_STATIC => 1,
+    
+    
+    #  WebDyne default extension and length, used in susbtr as faster than regex
+    #
+    WEBDYNE_PSP_EXT 	=> '.psp',
+    WEBDYNE_PSP_EXT_LEN	=> 4,
+    
+    
+    #  Very minimal MIME type hash used by lookup_file function
+    #
+    WEBDYNE_MIME_TYPE_HR => {
+        'html' => 'text/html',
+        'htm'  => 'text/html',
+        'txt'  => 'text/plain',
+        'jpg'  => 'image/jpeg',
+        'jpeg' => 'image/jpeg',
+        'png'  => 'image/png',
+        'gif'  => 'image/gif',
+        'css'  => 'text/css',
+        'js'   => 'application/javascript',
+        'json' => 'application/json',
+        'pdf'  => 'application/pdf',
+        'svg'  => 'image/svg+xml'
+    },
 
 
     #  Mod_perl level. Do not change unless you know what you are
@@ -444,7 +473,8 @@ sub local_constant_load {
     #  Now from environment vars - override anything in config file
     #
     foreach my $key (keys %{$constant_hr}) {
-        if (my $val=$ENV{$key}) {
+        if (defined $ENV{$key}) {
+            my $val=$ENV{$key};
             debug("using environment value $val for key: $key");
             $constant_hr->{$key}=$val;
         }

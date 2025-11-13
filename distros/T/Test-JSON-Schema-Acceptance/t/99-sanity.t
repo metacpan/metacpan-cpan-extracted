@@ -16,16 +16,15 @@ use if $ENV{AUTHOR_TESTING}, 'Test2::Warnings';
 use Test::File::ShareDir -share => { -dist => { 'Test-JSON-Schema-Acceptance' => 'share' } };
 use File::ShareDir 'dist_dir';
 use Path::Tiny;
-use Test::Fatal;
+use Test2::Tools::Exception;
 use Test::JSON::Schema::Acceptance;
 
 foreach my $draft (path(dist_dir('Test-JSON-Schema-Acceptance'), 'tests')->children) {
   $draft = $draft->basename;
   next if $draft eq 'draft-next';
   my $accepter = Test::JSON::Schema::Acceptance->new(specification => $draft, include_optional => 1);
-  is(
-    exception { $accepter->_test_data },
-    undef,
+  ok(
+    lives { $accepter->_test_data },
     'test data for '.$draft.' does not violate any type constraints',
   );
 }

@@ -1,9 +1,10 @@
 package Astro::ADS::Role::ResultMapper;
-$Astro::ADS::Role::ResultMapper::VERSION = '1.91';
+$Astro::ADS::Role::ResultMapper::VERSION = '1.92';
 use Moo::Role;
 use strictures 2;
 
 use Astro::ADS::Paper;
+use Astro::ADS::QTree;
 use Astro::ADS::Result;
 
 sub parse_response {
@@ -29,6 +30,24 @@ sub parse_response {
     return Astro::ADS::Result->new( $result_params );
 }
 
+sub parse_qtree_response {
+    my ($self, $response) = @_;
+
+    my $json = $response->json;
+    unless ($json && exists $json->{responseHeader}) {
+        warn 'No response to parse';
+        return;
+    }
+    # re-map wanted hash keys
+    my $result_params;
+    @{$result_params}{ qw<qtime status> } = @{$json->{responseHeader}}{ qw<QTime status> };
+    $result_params->{qtree} = $json->{qtree};
+
+    $result_params->{asset} = $response->content->asset;
+
+    return Astro::ADS::QTree->new( $result_params );
+}
+
 1;
 
 =pod
@@ -42,7 +61,7 @@ to an Astro::ADS::Result object
 
 =head1 VERSION
 
-version 1.91
+version 1.92
 
 =head1 SYNOPSIS 
 
@@ -55,8 +74,19 @@ version 1.91
 
 =head1 DESCRIPTION
 
+=head2 parse_response
+
 Takes the Mojo Response JSON and maps it to the Result object parameters,
 returning a Result object with Papers in the B<docs> attribute.
+
+=head2 parse_qtree_response
+
+Takes the Mojo Response and maps it to the QTree object parameters,
+allocating the JSON fields to attributes and the C<content> to the C<asset>
+attribute to allow use of the Mojo::Asset::move_to function.
+
+This interface is subject to change up to v2.0 to discover the best way
+to use the returned value.
 
 =head1 COPYRIGHT AND LICENSE
 

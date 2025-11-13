@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Types;
-$Bitcoin::Crypto::Types::VERSION = '4.000';
+$Bitcoin::Crypto::Types::VERSION = '4.001';
 use v5.10;
 use strict;
 use warnings;
@@ -11,6 +11,8 @@ use Types::Common -types;
 # make sure Math::BigInt is properly loaded - this module loads it
 use Bitcoin::Crypto::Helpers;
 use Bitcoin::Crypto::Constants;
+
+our $CHECK_BYTESTRINGS = !!1;
 
 __PACKAGE__->add_type(
 	name => 'BIP44Purpose',
@@ -46,12 +48,15 @@ my $bytestr = __PACKAGE__->add_type(
 	name => 'ByteStr',
 	parent => Str,
 
-	constraint => qq{ (grep { ord > 255 } split //) == 0 },
+	constraint => q{ $Bitcoin::Crypto::Types::CHECK_BYTESTRINGS ? /\\A[\\x00-\\xff]*\\z/ : !!1 },
 
 	inline => sub {
 		my $varname = pop;
 
-		return (undef, qq{ (grep { ord > 255 } split //, $varname) == 0 });
+		return (
+			undef,
+			qq{ \$Bitcoin::Crypto::Types::CHECK_BYTESTRINGS ? $varname =~ /\\A[\\x00-\\xff]*\\z/ : !!1 }
+		);
 	},
 
 	message => sub {

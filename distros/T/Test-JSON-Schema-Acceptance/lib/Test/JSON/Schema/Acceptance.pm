@@ -1,10 +1,10 @@
 use strict;
 use warnings;
-package Test::JSON::Schema::Acceptance; # git description: v1.032-3-g4da109d
+package Test::JSON::Schema::Acceptance; # git description: v1.033-8-g1a305c6
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Acceptance testing for JSON-Schema based validators
 
-our $VERSION = '1.033';
+our $VERSION = '1.034';
 
 use 5.020;
 use Moo;
@@ -555,7 +555,7 @@ Test::JSON::Schema::Acceptance - Acceptance testing for JSON-Schema based valida
 
 =head1 VERSION
 
-version 1.033
+version 1.034
 
 =head1 SYNOPSIS
 
@@ -883,16 +883,6 @@ JSON-encodes a data structure in a format suitable for human view, used for prin
 =head2 json_encoder
 
 Provides access to the object that provides the L</json_prettyprint> method.
-
-=head1 ACKNOWLEDGEMENTS
-
-=for stopwords Perrett Signes
-
-Daniel Perrett <perrettdl@cpan.org> for the concept and help in design.
-
-Ricardo Signes <rjbs@cpan.org> for direction to and creation of Test::Fatal.
-
-Various others in #perl-help.
 
 =for stopwords OpenAPI
 

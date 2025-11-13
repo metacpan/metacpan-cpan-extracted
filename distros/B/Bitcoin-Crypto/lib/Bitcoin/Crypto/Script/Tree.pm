@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Script::Tree;
-$Bitcoin::Crypto::Script::Tree::VERSION = '4.000';
+$Bitcoin::Crypto::Script::Tree::VERSION = '4.001';
 use v5.10;
 use strict;
 use warnings;

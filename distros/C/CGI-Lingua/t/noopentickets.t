@@ -5,12 +5,12 @@ use warnings;
 
 use Test::DescribeMe qw(author);
 use Test::Most tests => 4;
+use Test::RequiresInternet;
 
 use constant URL => 'https://api.github.com/repos/nigelhorne/CGI-Lingua/issues';
 use constant SITE =>'api.github.com';
 
 RT: {
-	# RT system, deprecated
 	SKIP: {
 		eval 'use WWW::RT::CPAN';	# FIXME: use a REST client
 		if($@) {

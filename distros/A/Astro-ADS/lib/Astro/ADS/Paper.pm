@@ -1,5 +1,5 @@
 package Astro::ADS::Paper;
-$Astro::ADS::Paper::VERSION = '1.91';
+$Astro::ADS::Paper::VERSION = '1.92';
 use Moo;
 
 use Carp;
@@ -82,7 +82,7 @@ Astro::ADS::Paper - A class for holding the document attributes for the results 
 
 =head1 VERSION
 
-version 1.91
+version 1.92
 
 =head1 SYNOPSIS
 

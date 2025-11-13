@@ -142,5 +142,4 @@ t/lib/ScriptTest.pm
 t/lib/TransactionStore.pm
 t/predefined-networks.t
 t/purpose-tracking.t
-t/release-taproot-long.t
-t/release-taproot-short.t
+t/release-taproot.t

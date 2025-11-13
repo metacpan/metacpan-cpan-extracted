@@ -1,4 +1,4 @@
-package Term::ANSIEncode;
+package Term::ANSIEncode 1.45;
 
 #######################################################################
 #            _   _  _____ _____   ______                     _        #
@@ -37,10 +37,6 @@ use Text::Wrap::Smart ':all';
 binmode(STDERR, ":encoding(UTF-8)");
 binmode(STDOUT, ":encoding(UTF-8)");
 binmode(STDIN,  ":encoding(UTF-8)");
-
-BEGIN {
-    our $VERSION = '1.44';
-}
 
 # Returns a description of a token using the meta data.
 sub ansi_description {

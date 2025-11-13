@@ -48,13 +48,15 @@ my $symbols   = FALSE;
 my $unicode   = FALSE;
 my $colors    = FALSE;
 my $Dump      = FALSE;
-my $c16       = TRUE;
+my $c16       = ($ENV{'TERM'} =~ /xterm/) ? TRUE : FALSE;
 my $c256      = FALSE;
 my $crgb      = FALSE;
 my $frames    = FALSE;
 my $rules     = FALSE;
+my $ansi_modes = FALSE;
 
 GetOptions(
+	'a|ansi-modes'       => \$ansi_modes,
     'version'            => \$version,
     'help'               => \$help,
     'tokens'             => \$tokens,
@@ -175,6 +177,9 @@ my $small = <<'SMALL';
 ║     [% CYAN %]ansi-encode[% RESET %] [options] [text file]                                   ║
 ╟─────────────────────────────────────────────────────────────────────────╢
 ║[% B_COLOR 52 %][% BRIGHT YELLOW %] OPTIONS                                                                 [% RESET %]║
+║     -[% BRIGHT BLUE %]a[% RESET %] or --[% BRIGHT BLUE %]ansi-modes[% RESET %]                                                  ║
+║         Show supported ANSI modes                                       ║
+║                                                                         ║
 ║     -[% BRIGHT BLUE %]c[% RESET %] or --[% BRIGHT BLUE %]colors[% RESET %]                                                      ║
 ║         Show available colors                                           ║
 ║                                                                         ║
@@ -366,6 +371,25 @@ $to .= '╰───────────────────────
 $| = 1;
 if ($version) {
     $ansi->ansi_output($text);
+} elsif ($ansi_modes) {
+	my $out = "[% BRIGHT WHITE %]-------- [% BRIGHT YELLOW %]Modes supported [% BRIGHT WHITE %]----------[% RESET %]\n";
+	if ($c16) {
+		$out .= "        ANSI16:  [% GREEN %]Supported[% RESET %]\n";
+	} else {
+		$out .= "        ANSI16:  [% RED %]Not Supported[% RESET %]\n";
+	}
+    if ($c256) {
+		$out .= "       ANSI256:  [% GREEN %]Supported[% RESET %]\n";
+	} else {
+		$out .= "       ANSI256:  [% RED %]Not Supported[% RESET %]\n";
+	}
+	if ($crgb) {
+		$out .= "ANSI TrueColor:  [% GREEN %]Supported[% RESET %]\n";
+	} else {
+		$out .= "ANSI TrueColor:  [% RED %]Not Supported[% RESET %]\n";
+	}
+	$out .= "[% BRIGHT WHITE %]-----------------------------------[% RESET %]\n";
+	$ansi->ansi_output($out);
 } elsif ($help) {
     $ansi->ansi_output($small);
 } elsif ($tokens) {
@@ -557,6 +581,10 @@ sub type {
 exit(0);
 
 __END__
+
+=pod
+
+=encoding utf8
 
 =head1 NAME
 
@@ -846,6 +874,6 @@ Richard Kelsch
 
 This program is free software; you can redistribute it and/or modify it under the terms of the the Artistic License (2.0). You may obtain a copy of the full license at:
 
-L<http://www.perlfoundation.org/artistic_license_2_0>
+L<https://perlfoundation.org/artistic-license-20.html>
 
 =cut

@@ -1,0 +1,127 @@
+msgid "Aion::Meta::Feature - метаописатель фичи"
+msgstr "Aion::Meta::Feature - feature metadescriptor"
+
+msgid "Описывает фичу, которая добавляется в класс функцией `has`."
+msgstr "Describes a feature that is added to the class by the `has` function."
+
+msgid "## name\n"
+"Имя фичи."
+msgstr "## name\n"
+"Feature name."
+
+msgid "## opt\n"
+"Хеш опций фичи."
+msgstr "## opt\n"
+"Feature options hash."
+
+msgid "## has\n"
+"Массив опций фичи в виде пар ключ-значение."
+msgstr "##has\n"
+"An array of feature options in the form of key-value pairs."
+
+msgid "## construct\n"
+"Объект конструктора фичи."
+msgstr "## construct\n"
+"Feature constructor object."
+
+msgid "## order ()\n"
+"Порядковый номер фичи в классе."
+msgstr "##order()\n"
+"The serial number of the feature in the class."
+
+msgid "## required (;$bool)\n"
+"Флаг обязательности фичи в конструкторе (`new`)."
+msgstr "## required (;$bool)\n"
+"Flag for requiring a feature in the constructor (`new`)."
+
+msgid "## excessive (;$bool)\n"
+"Флаг избыточности фичи в конструкторе (`new`). Если она там есть должно выбрасываться исключение."
+msgstr "## excessive (;$bool)\n"
+"Feature redundancy flag in the constructor (`new`). If it is there, an exception should be thrown."
+
+msgid "## isa (;Object[Aion::Type])\n"
+"Ограничение типа для значения фичи."
+msgstr "## isa (;Object[Aion::Type])\n"
+"Type constraint on feature value."
+
+msgid "## lazy (;$bool)\n"
+"Флаг ленивой инициализации."
+msgstr "## lazy (;$bool)\n"
+"Lazy initialization flag."
+
+msgid "## builder (;$sub)\n"
+"Билдер значения фичи или `undef`."
+msgstr "## builder (;$sub)\n"
+"Feature value builder or `undef`."
+
+msgid "## default (;$value)\n"
+"Значение по умолчанию для фичи."
+msgstr "## default (;$value)\n"
+"Default value for the feature."
+
+msgid "## trigger (;$sub)\n"
+"Обработчик события изменения значения фичи или `undef`."
+msgstr "## trigger (;$sub)\n"
+"Event handler for feature value change or `undef`."
+
+msgid "## release (;$sub)\n"
+"Обработчик события чтения значения из фичи или `undef`."
+msgstr "## release (;$sub)\n"
+"Event handler for reading a value from a feature or `undef`."
+
+msgid "## cleaner (;$sub)\n"
+"Обработчик события удаления фичи из объекта или `undef`."
+msgstr "## cleaner (;$sub)\n"
+"Event handler for removing a feature from an object or `undef`."
+
+msgid "## make_reader (;$bool)\n"
+"Флаг создания метода-ридера."
+msgstr "## make_reader (;$bool)\n"
+"Flag for creating a reader method."
+
+msgid "## make_writer (;$bool)\n"
+"Флаг создания метода-райтера."
+msgstr "## make_writer (;$bool)\n"
+"Flag for creating a writer method."
+
+msgid "## make_predicate (;$bool)\n"
+"Флаг создания метода-предиката."
+msgstr "## make_predicate (;$bool)\n"
+"Flag for creating a predicate method."
+
+msgid "## make_clearer (;$bool)\n"
+"Флаг создания метода-очистителя."
+msgstr "## make_clearer (;$bool)\n"
+"Flag for creating a cleanup method."
+
+msgid "## new ($pkg, $name, @has)\n"
+"Конструктор фичи."
+msgstr "## new ($pkg, $name, @has)\n"
+"Feature designer."
+
+msgid "## stringify ()\n"
+"Строковое представление фичи."
+msgstr "## stringify()\n"
+"String representation of a feature."
+
+msgid "## mk_property ()\n"
+"Создаёт акцессор, геттер, сеттер, предикат и очиститель свойства."
+msgstr "## mk_property()\n"
+"Creates a property accessor, getter, setter, predicate, and purifier."
+
+msgid "## meta ()\n"
+"Возвращает код в виде текста для доступа к метаинформации фичи."
+msgstr "## meta()\n"
+"Returns code as text to access the feature's meta information."
+
+msgid "## stash ($key; $val)\n"
+"Доступ к хранилищу свойств для вызывающего пакета."
+msgstr "## stash ($key; $val)\n"
+"Access the property store for the calling package."
+
+msgid "⚖ **GPLv3**"
+msgstr "⚖ **GPLv3**"
+
+msgid "The Aion::Meta::Feature module is copyright © 2025 Yaroslav O. Kosmina. Rusland. All rights reserved."
+msgstr "The Aion::Meta::Feature module is copyright © 2025 Yaroslav O. Kosmina. Rusland. All rights reserved."
+

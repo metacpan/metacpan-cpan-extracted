@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Script;
-$Bitcoin::Crypto::Script::VERSION = '4.000';
+$Bitcoin::Crypto::Script::VERSION = '4.001';
 use v5.10;
 use strict;
 use warnings;
@@ -26,7 +26,7 @@ use Bitcoin::Crypto::Script::Recognition;
 use namespace::clean;
 
 has field '_serialized' => (
-	isa => Str,
+	isa => ByteStr,
 	writer => 1,
 	default => '',
 );
@@ -355,9 +355,7 @@ sub to_serialized
 
 signature_for from_serialized => (
 	method => Str,
-	positional => [Any],
-
-	# no need to validate ByteStr, as it will be passed to add_raw
+	positional => [ByteStr],
 );
 
 sub from_serialized
@@ -488,24 +486,19 @@ sub get_address
 	return undef
 		unless $self->has_type && defined $address;
 
-	my $segwit = sub {
-		my ($version, $address) = @_;
+	if ($self->is_native_segwit) {
 
 		# network field is not required, lazy check for completeness
 		Bitcoin::Crypto::Exception::NetworkConfig->raise(
 			'this network does not support segregated witness'
 		) unless $self->network->supports_segwit;
 
-		return encode_segwit($self->network->segwit_hrp, $version . $address);
-	};
+		my $version = pack 'C',
+			$self->is_taproot
+			? Bitcoin::Crypto::Constants::taproot_witness_version
+			: Bitcoin::Crypto::Constants::segwit_witness_version;
 
-	if ($self->type eq 'P2TR') {
-		my $version = pack 'C', Bitcoin::Crypto::Constants::taproot_witness_version;
-		return $segwit->($version, $address);
-	}
-	elsif ($self->is_native_segwit) {
-		my $version = pack 'C', Bitcoin::Crypto::Constants::segwit_witness_version;
-		return $segwit->($version, $address);
+		return encode_segwit($self->network->segwit_hrp, $version . $address);
 	}
 	elsif ($self->type eq 'P2PKH') {
 		return encode_base58check($self->network->p2pkh_byte . $address);

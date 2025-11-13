@@ -1,7 +1,7 @@
 package Net::IMAP::Client;
 
 use vars qw[$VERSION];
-$VERSION = '0.9508';
+$VERSION = '0.9509';
 
 use strict;
 use warnings;
@@ -1051,7 +1051,7 @@ sub _parse_tokens {
                 push @{$stack[-1]}, $str; # found string
             } elsif ($text =~ m/\G(\d+)/gc) {
                 push @{$stack[-1]}, $1 + 0; # found numeric
-            } elsif ($text =~ m/\G ([ a-z A-Z 0-9 _ $ . + \/ & ! # ' , : ; < = > ? @ ^ ` ~ | } - ]+ )/gcxx){
+            } elsif ($text =~ m/\G([a-zA-Z0-9_\$\\.+\/*&-]+)/gc) {
                 my $atom = $1;
                 if (lc $atom eq 'nil') {
                     $atom = undef;

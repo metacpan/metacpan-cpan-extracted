@@ -44,7 +44,7 @@ subtest 'Country Resolution' => sub {
 	local %ENV = %{$mock_env};
 
 	my $lingua = CGI::Lingua->new(
-		supported => ['en'],
+		supported => 'en',
 		cache => $cache,
 	);
 

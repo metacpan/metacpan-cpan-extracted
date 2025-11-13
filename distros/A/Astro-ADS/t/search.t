@@ -9,6 +9,8 @@ BEGIN {
     $ENV{ LWP_UA_MOCK_FILE } ||= __FILE__.'-lwp-mock.out';
 }
 
+skip_all('No API key found in test suite') unless $ENV{ADS_DEV_KEY};
+
 use Astro::ADS::Search;
 use Data::Dumper::Concise;
 use Mojo::UserAgent::Mockable;
@@ -95,6 +97,66 @@ subtest 'Search terms' => sub {
             end();
         },
         'Building Search terms from accessors';
+};
+
+subtest 'Query tree object' => sub {
+    ok my $result = $ads->query_tree(), 'Call to query_tree ok';
+
+    is $result, object {
+        prop isa => 'Astro::ADS::QTree';
+
+        field qtime  => match qr/^\d$/;
+        field qtree  => T();
+        field status => 0;
+
+        field asset => check_isa('Mojo::Asset::Memory');
+
+        end();
+    },
+    'query_tree returns QTree object';
+
+
+    my $ast = <<"AST";
+\n{\"name\":\"OPERATOR\", \"label\":\"DEFOP\", \"children\": [\n    {\"name\":\"MODIFIER\", \"label\":\"MODIFIER\", \"children\": [\n        {\"name\":\"TMODIFIER\", \"label\":\"TMODIFIER\", \"children\": [\n            {\"name\":\"FIELD\", \"label\":\"FIELD\", \"children\": [\n                {\"name\":\"QNORMAL\", \"label\":\"QNORMAL\", \"children\": [\n                    {\"name\":\"TERM_NORMAL\", \"input\":\"star\", \"start\":0, \"end\":3}]\n                }]\n            }]\n        }]\n    }]
+}
+AST
+    chomp $ast;
+    is $result->qtree, $ast, 'Got the AST';
+
+    todo 'Can write to a file' => sub {
+        my $tmpfile = 't/qtree_tmpfile.json';
+        ok $result->move_to( $tmpfile ), 'Can move_to';
+        is -s $tmpfile, 577, 'Temp file written';
+        unlink $tmpfile;
+    };
+};
+
+subtest 'BigQuery method' => sub {
+    my @bibcodes = qw(2003NanoL...3..459S 2011Natur.477..207S
+        2006PNAS..103..921S 2011NIMPA.659..106A 2004NanoL...4.1587S
+        2003MaMol..36..553S 2004AdM....16.2049S 2003NanoL...3.1421S
+        2006nucl.ex...1042S 2014ApJ...784...44L);
+
+    $ads->q('*:*');
+    ok my $result = $ads->bigquery( @bibcodes ), 'Makes bigquery call';
+    is $result, object {
+        prop isa => 'Astro::ADS::Result';
+
+        field q  => '*:*';
+        field fl => 'bibcode';
+
+        field rows => 10;
+        field start => 0;
+        field numFound => 10;
+        field numFoundExact => T();
+        field docs => array {
+            item 9 => check_isa('Astro::ADS::Paper');
+            end();
+        };
+
+        end();
+    };
+
 };
 
 done_testing();

@@ -1,18 +1,21 @@
 use Test2::V0;
 
 use lib qw|t/lib|;
+use Test::Astro::ADS;
 
 BEGIN {
     $ENV{ LWP_UA_MOCK } ||= 'playback';
     $ENV{ LWP_UA_MOCK_FILE } ||= __FILE__.'-lwp-mock.out';
 }
 
-use Mojo::UserAgent::Mockable;
-my $ua = Mojo::UserAgent::Mockable->new( mode => 'lwp-ua-mockable', ignore_headers => 'all' );
+skip_all('No API key found in test suite') unless $ENV{ADS_DEV_KEY};
 
 use Astro::ADS::Paper;
 use Astro::ADS::Search;
 use Data::Dumper::Concise;
+use Mojo::UserAgent::Mockable;
+
+my $ua = Mojo::UserAgent::Mockable->new( mode => 'lwp-ua-mockable', ignore_headers => 'all' );
 
 subtest 'Test all kinds of bibcodes' => sub {
     my @bibcodes = get_bibcodes();

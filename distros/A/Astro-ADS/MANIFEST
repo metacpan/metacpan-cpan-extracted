@@ -8,11 +8,13 @@ META.yml
 Makefile.PL
 README
 README.md
+ROADMAP.md
 cpanfile
 dist.ini
 lib/Astro/ADS.pm
 lib/Astro/ADS/Metrics.pm
 lib/Astro/ADS/Paper.pm
+lib/Astro/ADS/QTree.pm
 lib/Astro/ADS/Result.pm
 lib/Astro/ADS/Role/ResultMapper.pm
 lib/Astro/ADS/Search.pm
@@ -27,3 +29,4 @@ t/search.t
 t/search.t-lwp-mock.out
 t/useragent.t
 t/useragent.t-lwp-mock.out
+xt/environment.t

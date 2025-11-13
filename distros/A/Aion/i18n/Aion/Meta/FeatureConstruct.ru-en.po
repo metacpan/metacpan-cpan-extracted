@@ -1,0 +1,184 @@
+msgid "Aion::Meta::FeatureConstruct - конструктор акцессора, предиката, инициализатора и очистителя"
+msgstr "Aion::Meta::FeatureConstruct - accessor, predicate, initializer and clearer"
+
+msgid "Предназначен для конструирования геттеров/сеттеров из кусочков кода."
+msgstr "Designed for constructing getters/setters from pieces of code."
+
+msgid "Конструктор."
+msgstr "Constructor."
+
+msgid "Пакет, к которому относится атрибут. Геттер."
+msgstr "The package to which the attribute belongs. Getter."
+
+msgid "Имя атрибута. Геттер."
+msgstr "Attribute name. Getter."
+
+msgid "Код для записи значения. Геттер."
+msgstr "Code for writing the value. Getter."
+
+msgid "## read\n"
+"Код для чтения значения. Геттер."
+msgstr "## read\n"
+"Code to read the value. Getter."
+
+msgid "## getvar\n"
+"Переменная для получения значения. Геттер."
+msgstr "## getvar\n"
+"Variable to receive the value. Getter."
+
+msgid "## ret\n"
+"Код возврата значения. Геттер."
+msgstr "##ret\n"
+"Value return code. Getter."
+
+msgid "## init_arg\n"
+"Ключ в хеше инициализации. Акцессор."
+msgstr "## init_arg\n"
+"The key is in the initialization hash. Accessor."
+
+msgid "## set\n"
+"Код установки значения в хеш объекта. Акцессор."
+msgstr "## set\n"
+"Code for setting the value to the object hash. Accessor."
+
+msgid "## get\n"
+"Код получения значения из хеша объекта. Акцессор."
+msgstr "## get\n"
+"Code for getting a value from an object hash. Accessor."
+
+msgid "## has\n"
+"Код проверки существования значения. Акцессор."
+msgstr "##has\n"
+"Code for checking the existence of a value. Accessor."
+
+msgid "## clear\n"
+"Код удаления значения. Акцессор."
+msgstr "## clear\n"
+"Code for deleting a value. Accessor."
+
+msgid "## weaken\n"
+"Код ослабления ссылки. Акцессор."
+msgstr "## weaken\n"
+"Link weakening code. Accessor."
+
+msgid "## accessor_name\n"
+"Имя метода-акцессора. Акцессор."
+msgstr "## accessor_name\n"
+"The name of the accessor method. Accessor."
+
+msgid "## reader_name\n"
+"Имя метода-ридера. Акцессор."
+msgstr "## reader_name\n"
+"Reader method name. Accessor."
+
+msgid "## writer_name\n"
+"Имя метода-райтера. Акцессор."
+msgstr "## writer_name\n"
+"Writer method name. Accessor."
+
+msgid "## predicate_name\n"
+"Имя метода-предиката. Акцессор."
+msgstr "## predicate_name\n"
+"Predicate method name. Accessor."
+
+msgid "## clearer_name\n"
+"Имя метода-очистителя. Акцессор."
+msgstr "## clearer_name\n"
+"The name of the cleanser method. Accessor."
+
+msgid "## initer\n"
+"Код инициализации атрибута. Акцессор."
+msgstr "##initer\n"
+"Attribute initialization code. Accessor."
+
+msgid "## not_specified\n"
+"Код инициализации, если значение не указано. Акцессор."
+msgstr "## not_specified\n"
+"Initialization code if no value is specified. Accessor."
+
+msgid "## getter\n"
+"Код геттера в акцессоре. Акцессор."
+msgstr "## getter\n"
+"Getter code in the accessor. Accessor."
+
+msgid "## setter\n"
+"Код сеттера в акцессоре. По умолчанию: '%(write)s'."
+msgstr "## setter\n"
+"Setter code in the accessor. Default: '%(write)s'."
+
+msgid "## selfret\n"
+"Код возврата из сеттера. Акцессор."
+msgstr "##selfret\n"
+"Return code from setter. Accessor."
+
+msgid "## add_attr($code, $unshift)\n"
+"Добавляет атрибут к акцессору."
+msgstr "## add_attr($code, $unshift)\n"
+"Adds an attribute to the accessor."
+
+msgid "## add_preset($code, $unshift)\n"
+"Добавляет код предустановки перед записью."
+msgstr "## add_preset($code, $unshift)\n"
+"Adds a preset code before recording."
+
+msgid "## add_trigger($code, $unshift)\n"
+"Добавляет триггер после записи."
+msgstr "## add_trigger($code, $unshift)\n"
+"Adds a trigger after recording."
+
+msgid "## add_cleaner($code, $unshift)\n"
+"Добавляет код очистки перед удалением."
+msgstr "## add_cleaner($code, $unshift)\n"
+"Adds cleanup code before deletion."
+
+msgid "## add_access($code, $unshift)\n"
+"Добавляет код в геттер перед чтением атрибута."
+msgstr "## add_access($code, $unshift)\n"
+"Adds code to the getter before reading the attribute."
+
+msgid "## add_release($code, $unshift)\n"
+"Добавляет код в геттер после чтения."
+msgstr "## add_release($code, $unshift)\n"
+"Adds code to the getter after reading."
+
+msgid "## initializer\n"
+"Генерирует код для инициализации фичи в конструкторе (`new`)."
+msgstr "## initializer\n"
+"Generates code to initialize a feature in the constructor (`new`)."
+
+msgid "## destroyer\n"
+"Генерирует код для деструктора."
+msgstr "## destroyer\n"
+"Generates code for the destructor."
+
+msgid "## accessor\n"
+"Генерирует код акцессора."
+msgstr "## accessor\n"
+"Generates an accessor code."
+
+msgid "## reader\n"
+"Генерирует код геттера."
+msgstr "## reader\n"
+"Generates getter code."
+
+msgid "## writer\n"
+"Генерирует код сеттера."
+msgstr "## writer\n"
+"Generates setter code."
+
+msgid "## predicate\n"
+"Генерирует код предиката."
+msgstr "## predicate\n"
+"Generates a predicate code."
+
+msgid "## clearer\n"
+"Генерирует код очистителя."
+msgstr "## clearer\n"
+"Generates a purifier code."
+
+msgid "⚖ **GPLv3**"
+msgstr "⚖ **GPLv3**"
+
+msgid "The Aion::Meta::FeatureConstruct module is copyright © 2025 Yaroslav O. Kosmina. Rusland. All rights reserved."
+msgstr "The Aion::Meta::FeatureConstruct module is copyright © 2025 Yaroslav O. Kosmina. Rusland. All rights reserved."
+

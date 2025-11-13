@@ -5,48 +5,53 @@ use 5.22.0;
 no strict; no warnings; no diagnostics;
 use common::sense;
 
+use Aion::Meta::Util qw//;
 use Aion::Type;
-use Attribute::Handlers;
-use List::Util qw/all any/;
+use List::Util qw/all any first/;
 use Exporter qw/import/;
 use Scalar::Util qw/looks_like_number reftype blessed/;
-use Sub::Util qw/prototype set_prototype subname set_subname/;
+use Sub::Util qw//;
 
 our @EXPORT = our @EXPORT_OK = grep {
-	*{$Aion::Types::{$_}}{CODE}	&& !/^(_|(NaN|import|all|any|looks_like_number|reftype|blessed|prototype|set_prototype|subname|set_subname)\z)/n
+	*{$Aion::Types::{$_}}{CODE}	&& !/^(_|(NaN|import|all|any|first|looks_like_number|reftype|blessed)\z)/n
 } keys %Aion::Types::;
 
-sub UNIVERSAL::Isa : ATTR(CODE) {
-    my ($pkg, $symbol, $referent, $attr, $data, $phase, $file, $line) = @_;
-    my $args_of_meth = "Arguments of method `" . *{$symbol}{NAME} . "`";
-    my $returns_of_meth = "Returns of method `" . *{$symbol}{NAME} . "`";
-    my $return_of_meth = "Return of method `" . *{$symbol}{NAME} . "`";
+# Обрабатываем атрибут :Isa
+sub MODIFY_CODE_ATTRIBUTES {
+    my ($pkg, $referent, @attributes) = @_;
 
-	my @signature = map { ref($_)? $_: $pkg->can($_)->() } @$data;
+    grep { /^Isa\((.*)\)\z/s? do { _Isa($pkg, $referent, $1); 0 }: 1 } @attributes
+}
 
-	my $ret = pop @signature;
+sub _Isa {
+	my ($pkg, $referent, $data) = @_;
+	my $subname = Sub::Util::subname $referent;
+	$subname =~ s/^.*:://;
 
-    my ($ret_array, $ret_scalar) = exists $ret->{is_wantarray}? @{$ret->{args}}: (Tuple([$ret]), $ret);
+	my @signature = eval "package $pkg; map { ref(\$_)? \$_: __PACKAGE__->can(\$_)->() } ($data)";
+	die if $@;
 
-    my $args = Tuple(\@signature);
+	die "$pkg\::$subname has no return type!" if @signature < 1;
 
-    my $sub = sub {
-        $args->validate(\@_, $args_of_meth);
-        wantarray? do {
-            my @returns = $referent->(@_);
-            $ret_array->validate(\@returns, $returns_of_meth);
-            @returns
-        }: do {
-            my $return = $referent->(@_);
-            $ret_scalar->validate($return, $return_of_meth);
-            $return
-        }
-    };
+	require Aion::Meta::Subroutine;
+	my $subroutine = Aion::Meta::Subroutine->new(
+		pkg => $pkg,
+		subname => $subname,
+		signature => \@signature,
+		referent => $referent,
+	);
 
-	set_prototype prototype($referent), $sub;
-	set_subname subname($referent) . "__Isa", $sub;
+	if (!Aion::Meta::Util::subref_is_reachable($referent)) {
+		$Aion::META{$pkg}{require}{$subname} = $subroutine;
+	} else {
+		my $require = delete $Aion::META{$pkg}{require}{$subname};
+		$require->compare($subroutine) if $require;
 
-	*$symbol = $sub
+		my $overload = $Aion::META{$pkg}{subroutine}{$subname};
+		$overload->compare($subroutine) if $overload;
+		
+		$subroutine->wrap_sub;
+	}
 }
 
 BEGIN {
@@ -56,13 +61,13 @@ my $TRUE = sub {1};
 sub subtype(@) {
 	my $save = my $name = shift;
 	my %o = @_;
-	
+
 	my ($as, $init_where, $where, $awhere, $message) = delete @o{qw/as init_where where awhere message/};
 
 	die "subtype $save unused keys left: " . join ", ", keys %o if keys %o;
 
 	my $is_maybe_arg; my $is_arg;
-	$name =~ s/(`?)(\[.*)/ $is_maybe_arg = $1; $is_arg = $2; ''/e;
+	$name =~ s/(`?)(\[).*/ $is_maybe_arg = $1; $is_arg = $2; ''/e;
 
 	my $pkg = scalar caller;
 	die "subtype $save: ${pkg}::$name exists!" if *{"${pkg}::$name"}{CODE};
@@ -72,7 +77,7 @@ sub subtype(@) {
 	} else {
 		die "subtype $save: awhere is excess" if $awhere;
 	}
-	
+
 	die "subtype $save: needs a where" if $is_arg && !($where || $awhere);
 
 	if($as && $as->{test} != $TRUE) {
@@ -85,8 +90,8 @@ sub subtype(@) {
 	}
 
 	my $type = Aion::Type->new(name => $name);
-	
-	$type->{detail} = $message if $message;
+
+	$type->{message} = $message if $message;
 	$type->{init} = $init_where if $init_where;
 	$type->{as} = $as if $as;
 
@@ -94,9 +99,9 @@ sub subtype(@) {
 		$type->{test} = $where;
 		$type->{a_test} = $awhere;
 		$type->make_maybe_arg($pkg)
-	} elsif($is_arg) {
+	} elsif($is_arg || $init_where) {
 		$type->{test} = $where;
-		$type->make_arg($pkg)
+		$type->make_arg($pkg, $is_arg? '$': '')
 	} else {
 		$type->{test} = $where // $TRUE;
 		$type->make($pkg)
@@ -164,6 +169,9 @@ subtype "Any";
 
 	subtype "Item", as &Any;
 		subtype "Bool", as &Item, where { ref $_ eq "" and /^(1|0|)\z/ };
+		subtype "BoolLike", as &Item, where {
+			my $m = overload::Method($_, '0+');
+			Bool()->include($m ? $m->($_) : $_) };
 		subtype "Enum[A...]", as &Item, where { $_ ~~ ARGS };
 		subtype "Maybe[A]", as &Item, where { !defined($_) || A->test };
 		subtype "Undef", as &Item, where { !defined $_ };
@@ -185,12 +193,12 @@ subtype "Any";
 					subtype "Tel", as &Str, where { /^\+\d{7,}\z/ };
 					subtype "Url", as &Str, where { /^https?:\/\// };
 					subtype "Path", as &Str, where { /^\// };
-					subtype "Html", as &Str, where { /^\s*<(!doctype|html)\b/i };
+					subtype "Html", as &Str, where { /^\s*<(!doctype\s+html|html)\b/i };
 					subtype "StrDate", as &Str, where { /^\d{4}-\d{2}-\d{2}\z/ };
 					subtype "StrDateTime", as &Str, where { /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\z/ };
 					subtype "StrMatch[qr/.../]", as &Str, where { $_ =~ A };
 					subtype "ClassName", as &Str, where { !!$_->can('new') };
-					subtype "RoleName", as &Str, where { !!$_->can('requires') };
+					subtype "RoleName", as &Str, where { !$_->can('new') && !!(@{"$_\::ISA"} || first { *{$_}{CODE} } values %{"$_\::"}) };
 
 					subtype "Num", as &Str, where { looks_like_number($_) && /[\dfn]\z/i };
 						subtype "PositiveNum", as &Num, where { $_ >= 0 };
@@ -234,7 +242,10 @@ subtype "Any";
 					awhere { my $A = A; ref $_ eq "HASH" && all { $A->test } values %$_ };
 				subtype "Object`[O]", as &Ref,
 					where { blessed($_) ne "" }
-					awhere { UNIVERSAL::isa($_, A) };
+					awhere { blessed($_) && $_->isa(A) };
+					subtype "Me", as &Object,
+						init_where { SELF->{me} = caller(2) }
+						where { UNIVERSAL::isa($_, SELF->{me}) };
 				subtype "Map[K, V]", as &HashRef,
 					where {
 						my ($K, $V) = ARGS;
@@ -299,52 +310,52 @@ subtype "Any";
 					subtype "LimKeys[A, B?]", as &HashLike,
 						init_where => $init_limit,
 						where { SELF->{min} <= scalar keys %$_ && scalar keys %$_ <= SELF->{max} };
+						
+		subtype "Like", as (&Str | &Object);
+			subtype "HasMethods[m...]", as &Like,
+				where { my $x = $_; all { $x->can($_) } ARGS };
+			subtype "Overload`[m...]", as &Like,
+				where { !!overload::Overloaded($_) }
+				awhere { my $x = $_; all { overload::Method($x, $_) } ARGS };
+			subtype "InstanceOf[A...]", as &Like, where { my $x = $_; all { $x->isa($_) } ARGS };
+			subtype "ConsumerOf[A...]", as &Like, where { my $x = $_; all { $x->DOES($_) } ARGS };
+			subtype "StrLike", as &Like, where { !blessed($_) or !!overload::Method($_, '""') };
+				subtype "Len[A, B?]", as &StrLike,
+					init_where => $init_limit,
+					where { SELF->{min} <= length($_) && length($_) <= SELF->{max} };
 
-			subtype "Like", as (&Str | &Object);
-				subtype "HasMethods[m...]", as &Like,
-					where { my $x = $_; all { $x->can($_) } ARGS };
-				subtype "Overload`[m...]", as &Like,
-					where { !!overload::Overloaded($_) }
-					awhere { my $x = $_; all { overload::Method($x, $_) } ARGS };
-				subtype "InstanceOf[A...]", as &Like, where { my $x = $_; all { $x->isa($_) } ARGS };
-				subtype "ConsumerOf[A...]", as &Like, where { my $x = $_; all { $x->can("does") && $x->does($_) } ARGS };
-				subtype "StrLike", as (&Str | Overload(['""']));
-					subtype "Len[A, B?]", as &StrLike,
-						init_where => $init_limit,
-						where { SELF->{min} <= length($_) && length($_) <= SELF->{max} };
+			subtype "NumLike", as &Like, where { looks_like_number($_) };
+				subtype "Float", as &NumLike, where { -3.402823466E+38 <= $_ && $_ <= 3.402823466E+38 };
 
-				subtype "NumLike", where { looks_like_number($_) };
-					subtype "Float", as &NumLike, where { -3.402823466E+38 <= $_ && $_ <= 3.402823466E+38 };
-					
-					my $_from; my $_to;
-					subtype "Double", as &NumLike, where {
-                        $_from //= do { require Math::BigFloat; Math::BigFloat->new('-1.7976931348623157e+308') };
-                        $_to   //= do { require Math::BigFloat; Math::BigFloat->new( '1.7976931348623157e+308') };
-                        $_from <= $_ && $_ <= $_to;
-                    };
-					subtype "Range[from, to]", as &NumLike, where { A <= $_ && $_ <= B };
+				my $_from; my $_to;
+				subtype "Double", as &NumLike, where {
+					$_from //= do { require Math::BigFloat; Math::BigFloat->new('-1.7976931348623157e+308') };
+					$_to   //= do { require Math::BigFloat; Math::BigFloat->new( '1.7976931348623157e+308') };
+					$_from <= $_ && $_ <= $_to;
+				};
+				subtype "Range[from, to]", as &NumLike, where { A <= $_ && $_ <= B };
 
-					my $_8bits;
-					subtype "Bytes[N]", as &NumLike,
-						init_where {
-							my $bits = A < 8? 8: ($_8bits //= do {
-								require Math::BigInt;
-								Math::BigInt->new(8)
-							});
-							my $N = 1 << ($bits * A - 1);
-							N = -$N;
-							M = $N-1;
-						}
-						where { N <= $_ && $_ <= M };
-					subtype "PositiveBytes[N]", as &NumLike,
-						init_where {
-							my $bits = A < 8? 8: ($_8bits //= do {
-								require Math::BigInt;
-								Math::BigInt->new(8)
-							});
-							M = (1 << ($bits*A)) - 1;
-						}
-						where { 0 <= $_ && $_ <= M };
+				my $_8bits;
+				subtype "Bytes[N]", as &NumLike,
+					init_where {
+						my $bits = A < 8? 8: ($_8bits //= do {
+							require Math::BigInt;
+							Math::BigInt->new(8)
+						});
+						my $N = 1 << ($bits * A - 1);
+						N = -$N;
+						M = $N-1;
+					}
+					where { N <= $_ && $_ <= M };
+				subtype "PositiveBytes[N]", as &NumLike,
+					init_where {
+						my $bits = A < 8? 8: ($_8bits //= do {
+							require Math::BigInt;
+							Math::BigInt->new(8)
+						});
+						M = (1 << ($bits*A)) - 1;
+					}
+					where { 0 <= $_ && $_ <= M };
 
 	coerce &Str => from &Undef => via { "" };
 	coerce &Int => from &Num => via { int($_+($_ < 0? -.5: .5)) };
@@ -366,14 +377,14 @@ Aion::Types is a library of validators. And it makes new validators
 	use Aion::Types;
 	
 	BEGIN {
-	    subtype SpeakOfKitty => as StrMatch[qr/\bkitty\b/i],
-	        message { "Speak is'nt included kitty!" };
+		subtype SpeakOfKitty => as StrMatch[qr/\bkitty\b/i],
+			message { "Speak is'nt included kitty!" };
 	}
 	
 	"Kitty!" ~~ SpeakOfKitty # -> 1
-	"abc" ~~ SpeakOfKitty 	 # -> ""
+	"abc"    ~~ SpeakOfKitty # -> ""
 	
-	eval { SpeakOfKitty->validate("abc", "This") }; "$@" # ~> Speak is'nt included kitty!
+	SpeakOfKitty->validate("abc", "This") # @-> Speak is'nt included kitty!
 	
 	
 	BEGIN {
@@ -414,6 +425,7 @@ Hierarhy of validators:
 			Wantarray[A, S]
 		Item
 			Bool
+			BoolLike
 			Enum[A...]
 			Maybe[A]
 			Undef
@@ -454,6 +466,7 @@ Hierarhy of validators:
 					ArrayRef`[A]
 					HashRef`[H]
 					Object`[O]
+						Me
 					Map[K, V]
 					Tuple[A...]
 					CycleTuple[A...]
@@ -490,8 +503,8 @@ Make new type.
 		subtype One => where { $_ == 1 } message { "Actual 1 only!" };
 	}
 	
-	1 ~~ One 	# -> 1
-	0 ~~ One 	# -> ""
+	1 ~~ One	 # -> 1
+	0 ~~ One	 # -> ""
 	eval { One->validate(0) }; $@ # ~> Actual 1 only!
 
 C<where> and C<message> is syntax sugar, and C<subtype> can be used without them.
@@ -542,7 +555,7 @@ Use with C<subtype>. Need if is the required arguments.
 
 =head2 awhere ($code)
 
-Use with C<subtype>. 
+Use with C<subtype>.
 
 If type maybe with and without arguments, then use for set test with arguments, and C<where> - without.
 
@@ -553,8 +566,8 @@ If type maybe with and without arguments, then use for set test with arguments, 
 		;
 	}
 	
-	0 ~~ GreatThen    # -> ""
-	1 ~~ GreatThen    # -> 1
+	0 ~~ GreatThen	# -> ""
+	1 ~~ GreatThen	# -> 1
 	
 	3 ~~ GreatThen[3] # -> ""
 	4 ~~ GreatThen[3] # -> 1
@@ -606,10 +619,10 @@ C<M> and C<N> is the reduction for C<< SELF-E<gt>{M} >> and C<< SELF-E<gt>{N} >>
 			where { $_ =~ N && $_ =~ M };
 	}
 	
-	"Hi, my dear!" ~~ BeginAndEnd["Hi,", "!"]   # -> 1
-	"Hi my dear!" ~~ BeginAndEnd["Hi,", "!"]   # -> ""
+	"Hi, my dear!" ~~ BeginAndEnd["Hi,", "!"];   # -> 1
+	"Hi my dear!" ~~ BeginAndEnd["Hi,", "!"];   # -> ""
 	
-	BeginAndEnd["Hi,", "!"]   # => BeginAndEnd['Hi,', '!']
+	"" . BeginAndEnd["Hi,", "!"]   # => BeginAndEnd['Hi,', '!']
 
 =head2 message ($code)
 
@@ -631,9 +644,9 @@ It add new coerce ($via) to C<$type> from C<$from>-type.
 	
 	coerce Four, from ArrayRef, via { scalar @$_ };
 	
-	Four->coerce([1,2,3])	# -> 3
-	Four->coerce([1,2,3]) ~~ Four	# -> ""
-	Four->coerce([1,2,3,4]) ~~ Four	# -> 1
+	Four->coerce([1,2,3])           # -> 3
+	Four->coerce([1,2,3]) ~~ Four   # -> ""
+	Four->coerce([1,2,3,4]) ~~ Four # -> 1
 
 C<coerce> throws exeptions:
 
@@ -667,7 +680,7 @@ Syntax sugar for C<coerce>.
 
 =head1 ATTRIBUTES
 
-=head2 Isa (@signature)
+=head2 :Isa (@signature)
 
 Check the subroutine signature: arguments and returns.
 
@@ -678,21 +691,11 @@ Check the subroutine signature: arguments and returns.
 	
 	minint 6, 5; # -> 5
 	eval {minint 5.5, 2}; $@ # ~> Arguments of method `minint` must have the type Tuple\[Int, Int\]\.
-
-Attribute C<Isa> is subroutine C<UNIVERSAL::Isa>.
-
-	sub half($) {
+	
+	sub half($) : Isa(Int => Int) {
 		my ($x) = @_;
 		$x / 2
 	}
-	
-	UNIVERSAL::Isa(
-		__PACKAGE__,
-		*half,
-		\&half,
-		undef,
-		[Int => Int],
-	);
 	
 	half 4; # -> 2
 	eval {half 5}; $@ # ~> Return of method `half` must have the type Int. The it is 2.5
@@ -711,30 +714,30 @@ Top-level type in the hierarchy constructors new types from any types.
 
 Union many types. It analog operator C<$type1 | $type2>.
 
-	33  ~~ Union[Int, Ref]    # -> 1
-	[]  ~~ Union[Int, Ref]    # -> 1
-	"a" ~~ Union[Int, Ref]    # -> ""
+	33  ~~ Union[Int, Ref]	# -> 1
+	[]  ~~ Union[Int, Ref]	# -> 1
+	"a" ~~ Union[Int, Ref]	# -> ""
 
 =head2 Intersection[A, B...]
 
 Intersection many types. It analog operator C<$type1 & $type2>.
 
-	15 ~~ Intersection[Int, StrMatch[/5/]]    # -> 1
+	15 ~~ Intersection[Int, StrMatch[/5/]]	# -> 1
 
 =head2 Exclude[A, B...]
 
 Exclude many types. It analog operator C<~ $type>.
 
-	-5  ~~ Exclude[PositiveInt]    # -> 1
-	"a" ~~ Exclude[PositiveInt]    # -> 1
-	5   ~~ Exclude[PositiveInt]    # -> ""
-	5.5 ~~ Exclude[PositiveInt]    # -> 1
+	-5  ~~ Exclude[PositiveInt]	# -> 1
+	"a" ~~ Exclude[PositiveInt]	# -> 1
+	5   ~~ Exclude[PositiveInt]	# -> ""
+	5.5 ~~ Exclude[PositiveInt]	# -> 1
 
 If C<Exclude> has many arguments, then this analog C<~ ($type1 | $type2 ...)>.
 
-	-5  ~~ Exclude[PositiveInt, Enum[-2]]    # -> 1
-	-2  ~~ Exclude[PositiveInt, Enum[-2]]    # -> ""
-	0   ~~ Exclude[PositiveInt, Enum[-2]]    # -> ""
+	-5  ~~ Exclude[PositiveInt, Enum[-2]]	# -> 1
+	-2  ~~ Exclude[PositiveInt, Enum[-2]]	# -> ""
+	0   ~~ Exclude[PositiveInt, Enum[-2]]	# -> ""
 
 =head2 Option[A]
 
@@ -767,60 +770,60 @@ Top-level type in the hierarchy scalar types.
 
 C<1> is true. C<0>, C<""> or C<undef> is false.
 
-	1 ~~ Bool     # -> 1
-	0 ~~ Bool     # -> 1
+	1 ~~ Bool	 # -> 1
+	0 ~~ Bool	 # -> 1
 	undef ~~ Bool # -> 1
-	"" ~~ Bool    # -> 1
+	"" ~~ Bool	# -> 1
 	
-	2 ~~ Bool     # -> ""
-	[] ~~ Bool    # -> ""
+	2 ~~ Bool	 # -> ""
+	[] ~~ Bool	# -> ""
 
 =head2 Enum[A...]
 
 Enumerate values.
 
-	3 ~~ Enum[1,2,3]        	# -> 1
+	3 ~~ Enum[1,2,3]			# -> 1
 	"cat" ~~ Enum["cat", "dog"] # -> 1
-	4 ~~ Enum[1,2,3]        	# -> ""
+	4 ~~ Enum[1,2,3]			# -> ""
 
 =head2 Maybe[A]
 
 C<undef> or type in C<[]>.
 
-	undef ~~ Maybe[Int]    # -> 1
-	4 ~~ Maybe[Int]        # -> 1
-	"" ~~ Maybe[Int]       # -> ""
+	undef ~~ Maybe[Int]	# -> 1
+	4 ~~ Maybe[Int]		# -> 1
+	"" ~~ Maybe[Int]	   # -> ""
 
 =head2 Undef
 
 C<undef> only.
 
-	undef ~~ Undef    # -> 1
-	0 ~~ Undef        # -> ""
+	undef ~~ Undef	# -> 1
+	0 ~~ Undef		# -> ""
 
 =head2 Defined
 
 All exclude C<undef>.
 
-	\0 ~~ Defined       # -> 1
-	undef ~~ Defined    # -> ""
+	\0 ~~ Defined	   # -> 1
+	undef ~~ Defined	# -> ""
 
 =head2 Value
 
 Defined unreference values.
 
-	3 ~~ Value        # -> 1
-	\3 ~~ Value       # -> ""
-	undef ~~ Value    # -> ""
+	3 ~~ Value		# -> 1
+	\3 ~~ Value	   # -> ""
+	undef ~~ Value	# -> ""
 
 =head2 Len[A, B?]
 
 Defines the length value from C<A> to C<B>, or from 0 to C<A> if C<B> is'nt present.
 
 	"1234" ~~ Len[3]   # -> ""
-	"123" ~~ Len[3]    # -> 1
-	"12" ~~ Len[3]     # -> 1
-	"" ~~ Len[1, 2]    # -> ""
+	"123" ~~ Len[3]	# -> 1
+	"12" ~~ Len[3]	 # -> 1
+	"" ~~ Len[1, 2]	# -> ""
 	"1" ~~ Len[1, 2]   # -> 1
 	"12" ~~ Len[1, 2]  # -> 1
 	"123" ~~ Len[1, 2] # -> ""
@@ -829,36 +832,36 @@ Defines the length value from C<A> to C<B>, or from 0 to C<A> if C<B> is'nt pres
 
 Perl versions.
 
-	1.1.0 ~~ Version    # -> 1
+	1.1.0 ~~ Version	# -> 1
 	v1.1.0 ~~ Version   # -> 1
-	v1.1 ~~ Version     # -> 1
-	v1 ~~ Version       # -> 1
-	1.1 ~~ Version      # -> ""
+	v1.1 ~~ Version	 # -> 1
+	v1 ~~ Version	   # -> 1
+	1.1 ~~ Version	  # -> ""
 	"1.1.0" ~~ Version  # -> ""
 
 =head2 Str
 
 Strings, include numbers.
 
-	1.1 ~~ Str         # -> 1
-	"" ~~ Str          # -> 1
-	1.1.0 ~~ Str       # -> ""
+	1.1 ~~ Str		 # -> 1
+	"" ~~ Str		  # -> 1
+	1.1.0 ~~ Str	   # -> ""
 
 =head2 Uni
 
 Unicode strings: with utf8-flag or decode to utf8 without error.
 
-	"↭" ~~ Uni    # -> 1
-	123 ~~ Uni    # -> ""
-	do {no utf8; "↭" ~~ Uni}    # -> 1
+	"↭" ~~ Uni	# -> 1
+	123 ~~ Uni	# -> ""
+	do {no utf8; "↭" ~~ Uni}	# -> 1
 
 =head2 Bin
 
 Binary strings: without utf8-flag and octets with numbers less then 128.
 
-	123 ~~ Bin    # -> 1
-	"z" ~~ Bin    # -> 1
-	"↭" ~~ Bin    # -> ""
+	123 ~~ Bin	# -> 1
+	"z" ~~ Bin	# -> 1
+	"↭" ~~ Bin	# -> ""
 	do {no utf8; "↭" ~~ Bin }   # -> ""
 
 =head2 StartsWith[S]
@@ -879,39 +882,39 @@ The string ends with C<S>.
 
 String with one or many non-space characters.
 
-	" " ~~ NonEmptyStr        # -> ""
-	" S " ~~ NonEmptyStr      # -> 1
+	" " ~~ NonEmptyStr		# -> ""
+	" S " ~~ NonEmptyStr	  # -> 1
 	" S " ~~ (NonEmptyStr & Len[2])   # -> ""
 
 =head2 Email
 
 Strings with C<@>.
 
-	'@' ~~ Email      # -> 1
+	'@' ~~ Email	  # -> 1
 	'a@a.a' ~~ Email  # -> 1
-	'a.a' ~~ Email    # -> ""
+	'a.a' ~~ Email	# -> ""
 
 =head2 Tel
 
 Format phones is plus sign and seven or great digits.
 
-	"+1234567" ~~ Tel    # -> 1
-	"+1234568" ~~ Tel    # -> 1
-	"+ 1234567" ~~ Tel    # -> ""
-	"+1234567 " ~~ Tel    # -> ""
+	"+1234567" ~~ Tel	# -> 1
+	"+1234568" ~~ Tel	# -> 1
+	"+ 1234567" ~~ Tel	# -> ""
+	"+1234567 " ~~ Tel	# -> ""
 
 =head2 Url
 
 Web urls is string with prefix http:// or https://.
 
-	"http://" ~~ Url    # -> 1
-	"http:/" ~~ Url    # -> ""
+	"http://" ~~ Url	# -> 1
+	"http:/" ~~ Url	# -> ""
 
 =head2 Path
 
 The paths starts with a slash.
 
-	"/" ~~ Path     # -> 1
+	"/" ~~ Path	 # -> 1
 	"/a/b" ~~ Path  # -> 1
 	"a/b" ~~ Path   # -> ""
 
@@ -919,89 +922,96 @@ The paths starts with a slash.
 
 The html starts with a C<< E<lt>!doctype >> or C<< E<lt>html >>.
 
-	"<HTML" ~~ Html            # -> 1
-	" <html" ~~ Html           # -> 1
+	"<HTML" ~~ Html			# -> 1
+	" <html" ~~ Html		   # -> 1
 	" <!doctype html>" ~~ Html # -> 1
-	" <html1>" ~~ Html         # -> ""
+	" <html1>" ~~ Html		 # -> ""
 
 =head2 StrDate
 
 The date is format C<yyyy-mm-dd>.
 
-	"2001-01-12" ~~ StrDate    # -> 1
-	"01-01-01" ~~ StrDate    # -> ""
+	"2001-01-12" ~~ StrDate	# -> 1
+	"01-01-01" ~~ StrDate	# -> ""
 
 =head2 StrDateTime
 
 The dateTime is format C<yyyy-mm-dd HH:MM:SS>.
 
-	"2012-12-01 00:00:00" ~~ StrDateTime     # -> 1
-	"2012-12-01 00:00:00 " ~~ StrDateTime    # -> ""
+	"2012-12-01 00:00:00" ~~ StrDateTime	 # -> 1
+	"2012-12-01 00:00:00 " ~~ StrDateTime	# -> ""
 
 =head2 StrMatch[qr/.../]
 
 Match value with regular expression.
 
-	' abc ' ~~ StrMatch[qr/abc/]    # -> 1
+	' abc ' ~~ StrMatch[qr/abc/]	# -> 1
 	' abbc ' ~~ StrMatch[qr/abc/]   # -> ""
 
 =head2 ClassName
 
 Classname is the package with method C<new>.
 
-	'Aion::Type' ~~ ClassName     # -> 1
-	'Aion::Types' ~~ ClassName    # -> ""
+	'Aion::Type' ~~ ClassName  # -> 1
+	'Aion::Types' ~~ ClassName # -> ""
 
 =head2 RoleName
 
-Rolename is the package with subroutine C<requires>.
+Rolename is the package without method C<new>, and with C<@ISA> or with one any method.
 
-	package ExRole {
-		sub requires {}
+	package ExRole1 {
+		sub any_method {}
 	}
 	
-	'ExRole' ~~ RoleName    	# -> 1
-	'Aion::Type' ~~ RoleName    # -> ""
+	package ExRole2 {
+		our @ISA = qw/ExRole1/;
+	}
+	
+	
+	'ExRole1' ~~ RoleName    # -> 1
+	'ExRole2' ~~ RoleName    # -> 1
+	'Aion::Type' ~~ RoleName # -> ""
+	'Nouname::Empty::Package' ~~ RoleName # -> ""
 
 =head2 Rat
 
 Rational numbers.
 
-	"6/7" ~~ Rat     # -> 1
-	"-6/7" ~~ Rat    # -> 1
-	6 ~~ Rat         # -> 1
-	"inf" ~~ Rat     # -> 1
-	"+Inf" ~~ Rat    # -> 1
-	"NaN" ~~ Rat     # -> 1
-	"-nan" ~~ Rat    # -> 1
-	6.5 ~~ Rat       # -> 1
-	"6.5 " ~~ Rat    # -> ''
+	"6/7" ~~ Rat  # -> 1
+	"-6/7" ~~ Rat # -> 1
+	6 ~~ Rat      # -> 1
+	"inf" ~~ Rat  # -> 1
+	"+Inf" ~~ Rat # -> 1
+	"NaN" ~~ Rat  # -> 1
+	"-nan" ~~ Rat # -> 1
+	6.5 ~~ Rat    # -> 1
+	"6.5 " ~~ Rat # -> ''
 
 =head2 Num
 
 The numbers.
 
-	-6.5 ~~ Num      # -> 1
-	6.5e-7 ~~ Num    # -> 1
-	"6.5 " ~~ Num    # -> ""
+	-6.5 ~~ Num   # -> 1
+	6.5e-7 ~~ Num # -> 1
+	"6.5 " ~~ Num # -> ""
 
 =head2 PositiveNum
 
 The positive numbers.
 
-	0 ~~ PositiveNum     # -> 1
-	0.1 ~~ PositiveNum   # -> 1
-	-0.1 ~~ PositiveNum  # -> ""
-	-0 ~~ PositiveNum    # -> 1
+	0 ~~ PositiveNum    # -> 1
+	0.1 ~~ PositiveNum  # -> 1
+	-0.1 ~~ PositiveNum # -> ""
+	-0 ~~ PositiveNum   # -> 1
 
 =head2 Float
 
 The machine float number is 4 bytes.
 
-	-4.8 ~~ Float    				# -> 1
-	-3.402823466E+38 ~~ Float    	# -> 1
-	+3.402823466E+38 ~~ Float    	# -> 1
-	-3.402823467E+38 ~~ Float       # -> ""
+	-4.8 ~~ Float             # -> 1
+	-3.402823466E+38 ~~ Float # -> 1
+	+3.402823466E+38 ~~ Float # -> 1
+	-3.402823467E+38 ~~ Float # -> ""
 
 =head2 Double
 
@@ -1009,7 +1019,7 @@ The machine float number is 8 bytes.
 
 	use Scalar::Util qw//;
 	
-	-4.8 ~~ Double                     # -> 1
+	                      -4.8 ~~ Double # -> 1
 	'-1.7976931348623157e+308' ~~ Double # -> 1
 	'+1.7976931348623157e+308' ~~ Double # -> 1
 	'-1.7976931348623159e+308' ~~ Double # -> ""
@@ -1018,35 +1028,35 @@ The machine float number is 8 bytes.
 
 Numbers between C<from> and C<to>.
 
-	1 ~~ Range[1, 3]    # -> 1
-	2.5 ~~ Range[1, 3]  # -> 1
-	3 ~~ Range[1, 3]    # -> 1
-	3.1 ~~ Range[1, 3]  # -> ""
-	0.9 ~~ Range[1, 3]  # -> ""
+	1 ~~ Range[1, 3]   # -> 1
+	2.5 ~~ Range[1, 3] # -> 1
+	3 ~~ Range[1, 3]   # -> 1
+	3.1 ~~ Range[1, 3] # -> ""
+	0.9 ~~ Range[1, 3] # -> ""
 
 =head2 Int
 
 Integers.
 
-	123 ~~ Int    # -> 1
-	-12 ~~ Int    # -> 1
-	5.5 ~~ Int    # -> ""
+	123 ~~ Int	# -> 1
+	-12 ~~ Int	# -> 1
+	5.5 ~~ Int	# -> ""
 
 =head2 Bytes[N]
 
 C<N> - the number of bytes for limit.
 
-	-129 ~~ Bytes[1]    # -> ""
-	-128 ~~ Bytes[1]    # -> 1
-	127 ~~ Bytes[1]     # -> 1
-	128 ~~ Bytes[1]     # -> ""
+	-129 ~~ Bytes[1]	# -> ""
+	-128 ~~ Bytes[1]	# -> 1
+	127 ~~ Bytes[1]	 # -> 1
+	128 ~~ Bytes[1]	 # -> ""
 	
 	# 2 bits power of (8 bits * 8 bytes - 1)
 	my $N = 1 << (8*8-1);
 	(-$N-1) ~~ Bytes[8]   # -> ""
-	(-$N) ~~ Bytes[8]     # -> 1
-	($N-1) ~~ Bytes[8]  	# -> 1
-	$N ~~ Bytes[8]      	# -> ""
+	(-$N) ~~ Bytes[8]	 # -> 1
+	($N-1) ~~ Bytes[8]	  # -> 1
+	$N ~~ Bytes[8]		  # -> ""
 	
 	require Math::BigInt;
 	
@@ -1061,19 +1071,19 @@ C<N> - the number of bytes for limit.
 
 Positive integers.
 
-	+0 ~~ PositiveInt    # -> 1
-	-0 ~~ PositiveInt    # -> 1
-	55 ~~ PositiveInt    # -> 1
-	-1 ~~ PositiveInt    # -> ""
+	+0 ~~ PositiveInt	# -> 1
+	-0 ~~ PositiveInt	# -> 1
+	55 ~~ PositiveInt	# -> 1
+	-1 ~~ PositiveInt	# -> ""
 
 =head2 PositiveBytes[N]
 
 C<N> - the number of bytes for limit.
 
-	-1 ~~ PositiveBytes[1]    # -> ""
-	0 ~~ PositiveBytes[1]    # -> 1
-	255 ~~ PositiveBytes[1]    # -> 1
-	256 ~~ PositiveBytes[1]    # -> ""
+	-1 ~~ PositiveBytes[1]	# -> ""
+	0 ~~ PositiveBytes[1]	# -> 1
+	255 ~~ PositiveBytes[1]	# -> 1
+	256 ~~ PositiveBytes[1]	# -> ""
 	
 	-1 ~~ PositiveBytes[8] # -> ""
 	1.01 ~~ PositiveBytes[8] # -> ""
@@ -1091,15 +1101,15 @@ C<N> - the number of bytes for limit.
 
 Integers 1+.
 
-	0 ~~ Nat    # -> ""
-	1 ~~ Nat    # -> 1
+	0 ~~ Nat	# -> ""
+	1 ~~ Nat	# -> 1
 
 =head2 Ref
 
 The value is reference.
 
-	\1 ~~ Ref    # -> 1
-	1 ~~ Ref     # -> ""
+	\1 ~~ Ref	# -> 1
+	1 ~~ Ref	 # -> ""
 
 =head2 Tied`[A]
 
@@ -1114,26 +1124,26 @@ The reference on the tied variable.
 	tie my $a, "TiedScalar";
 	my %b; my @b; my $b;
 	
-	\%a ~~ Tied    # -> 1
-	\@a ~~ Tied    # -> 1
-	\$a ~~ Tied    # -> 1
+	\%a ~~ Tied	# -> 1
+	\@a ~~ Tied	# -> 1
+	\$a ~~ Tied	# -> 1
 	
-	\%b ~~ Tied    # -> ""
-	\@b ~~ Tied    # -> ""
-	\$b ~~ Tied    # -> ""
-	\\$b ~~ Tied    # -> ""
+	\%b ~~ Tied	# -> ""
+	\@b ~~ Tied	# -> ""
+	\$b ~~ Tied	# -> ""
+	\\$b ~~ Tied	# -> ""
 	
 	ref tied %a  # => TiedHash
 	ref tied %{\%a}  # => TiedHash
 	
-	\%a ~~ Tied["TiedHash"]     # -> 1
-	\@a ~~ Tied["TiedArray"]    # -> 1
+	\%a ~~ Tied["TiedHash"]	 # -> 1
+	\@a ~~ Tied["TiedArray"]	# -> 1
 	\$a ~~ Tied["TiedScalar"]   # -> 1
 	
-	\%a ~~ Tied["TiedArray"]    # -> ""
+	\%a ~~ Tied["TiedArray"]	# -> ""
 	\@a ~~ Tied["TiedScalar"]   # -> ""
-	\$a ~~ Tied["TiedHash"]     # -> ""
-	\\$a ~~ Tied["TiedScalar"]     # -> ""
+	\$a ~~ Tied["TiedHash"]	 # -> ""
+	\\$a ~~ Tied["TiedScalar"]	 # -> ""
 	
 	
 
@@ -1167,9 +1177,9 @@ But it with C<: lvalue> do'nt working.
 	$x->x = 10;
 	
 	$x->x # => 10
-	$x    # --> bless {x=>10}, "As"
+	$x	# --> bless {x=>10}, "As"
 	
-	ref \$x->x 			# => SCALAR
+	ref \$x->x			 # => SCALAR
 	\$x->x ~~ LValueRef # -> ""
 
 And on the end:
@@ -1193,57 +1203,57 @@ The format.
 	.
 	
 	*EXAMPLE_FMT{FORMAT} ~~ FormatRef   # -> 1
-	\1 ~~ FormatRef    			# -> ""
+	\1 ~~ FormatRef				# -> ""
 
 =head2 CodeRef
 
 Subroutine.
 
-	sub {} ~~ CodeRef    # -> 1
-	\1 ~~ CodeRef        # -> ""
+	sub {} ~~ CodeRef	# -> 1
+	\1 ~~ CodeRef		# -> ""
 
 =head2 RegexpRef
 
 The regular expression.
 
-	qr// ~~ RegexpRef    # -> 1
-	\1 ~~ RegexpRef    	 # -> ""
+	qr// ~~ RegexpRef	# -> 1
+	\1 ~~ RegexpRef		 # -> ""
 
 =head2 ScalarRef`[A]
 
 The scalar.
 
-	\12 ~~ ScalarRef     		# -> 1
-	\\12 ~~ ScalarRef    		# -> ""
-	\-1.2 ~~ ScalarRef[Num]     # -> 1
-	\\-1.2 ~~ ScalarRef[Num]     # -> ""
+	\12 ~~ ScalarRef			 # -> 1
+	\\12 ~~ ScalarRef			# -> ""
+	\-1.2 ~~ ScalarRef[Num]	 # -> 1
+	\\-1.2 ~~ ScalarRef[Num]	 # -> ""
 
 =head2 RefRef`[A]
 
 The ref as ref.
 
-	\\1 ~~ RefRef    # -> 1
-	\1 ~~ RefRef     # -> ""
-	\\1.3 ~~ RefRef[ScalarRef[Num]]    # -> 1
-	\1.3 ~~ RefRef[ScalarRef[Num]]    # -> ""
+	\\1 ~~ RefRef	# -> 1
+	\1 ~~ RefRef	 # -> ""
+	\\1.3 ~~ RefRef[ScalarRef[Num]]	# -> 1
+	\1.3 ~~ RefRef[ScalarRef[Num]]	# -> ""
 
 =head2 GlobRef
 
 The global.
 
-	\*A::a ~~ GlobRef    # -> 1
-	*A::a ~~ GlobRef     # -> ""
+	\*A::a ~~ GlobRef	# -> 1
+	*A::a ~~ GlobRef	 # -> ""
 
 =head2 ArrayRef`[A]
 
 The arrays.
 
-	[] ~~ ArrayRef    # -> 1
-	{} ~~ ArrayRef    # -> ""
-	[] ~~ ArrayRef[Num]    # -> 1
-	{} ~~ ArrayRef[Num]    # -> ''
-	[1, 1.1] ~~ ArrayRef[Num]    # -> 1
-	[1, undef] ~~ ArrayRef[Num]    # -> ""
+	[] ~~ ArrayRef	# -> 1
+	{} ~~ ArrayRef	# -> ""
+	[] ~~ ArrayRef[Num]	# -> 1
+	{} ~~ ArrayRef[Num]	# -> ''
+	[1, 1.1] ~~ ArrayRef[Num]	# -> 1
+	[1, undef] ~~ ArrayRef[Num]	# -> ""
 
 =head2 Lim[A, B?]
 
@@ -1263,29 +1273,39 @@ Limit arrays from C<A> to C<B>, or from 0 to C<A>, if C<B> is'nt present.
 
 The hashes.
 
-	{} ~~ HashRef    # -> 1
-	\1 ~~ HashRef    # -> ""
+	{} ~~ HashRef	# -> 1
+	\1 ~~ HashRef	# -> ""
 	
-	[]  ~~ HashRef[Int]    # -> ""
-	{x=>1, y=>2}  ~~ HashRef[Int]    # -> 1
-	{x=>1, y=>""} ~~ HashRef[Int]    # -> ""
+	[]  ~~ HashRef[Int]	# -> ""
+	{x=>1, y=>2}  ~~ HashRef[Int]	# -> 1
+	{x=>1, y=>""} ~~ HashRef[Int]	# -> ""
 
 =head2 Object`[O]
 
 The blessed values.
 
-	bless(\(my $val=10), "A1") ~~ Object    # -> 1
-	\(my $val=10) ~~ Object			    	# -> ""
+	bless(\(my $val=10), "A1") ~~ Object	# -> 1
+	\(my $val=10) ~~ Object					# -> ""
 	
 	bless(\(my $val=10), "A1") ~~ Object["A1"]   # -> 1
 	bless(\(my $val=10), "A1") ~~ Object["B1"]   # -> ""
+
+=head2 Me
+
+The blessed values self package.
+
+	package A1 {
+		use Aion;
+		bless({}, __PACKAGE__) ~~ Me  # -> 1
+		bless({}, "A2") ~~ Me  # -> ""
+	}
 
 =head2 Map[K, V]
 
 As C<HashRef>, but has type for keys also.
 
-	{} ~~ Map[Int, Int]    		 # -> 1
-	{5 => 3} ~~ Map[Int, Int]    # -> 1
+	{} ~~ Map[Int, Int]			 # -> 1
+	{5 => 3} ~~ Map[Int, Int]	# -> 1
 	+{5.5 => 3} ~~ Map[Int, Int] # -> ""
 	{5 => 3.3} ~~ Map[Int, Int]  # -> ""
 	{5 => 3, 6 => 7} ~~ Map[Int, Int]  # -> 1
@@ -1294,29 +1314,29 @@ As C<HashRef>, but has type for keys also.
 
 The tuple.
 
-	["a", 12] ~~ Tuple[Str, Int]    # -> 1
-	["a", 12, 1] ~~ Tuple[Str, Int]    # -> ""
-	["a", 12.1] ~~ Tuple[Str, Int]    # -> ""
+	["a", 12] ~~ Tuple[Str, Int]	# -> 1
+	["a", 12, 1] ~~ Tuple[Str, Int]	# -> ""
+	["a", 12.1] ~~ Tuple[Str, Int]	# -> ""
 
 =head2 CycleTuple[A...]
 
 The tuple one or more times.
 
-	["a", -5] ~~ CycleTuple[Str, Int]    # -> 1
-	["a", -5, "x"] ~~ CycleTuple[Str, Int]    # -> ""
-	["a", -5, "x", -6] ~~ CycleTuple[Str, Int]    # -> 1
-	["a", -5, "x", -6.2] ~~ CycleTuple[Str, Int]    # -> ""
+	["a", -5] ~~ CycleTuple[Str, Int]	# -> 1
+	["a", -5, "x"] ~~ CycleTuple[Str, Int]	# -> ""
+	["a", -5, "x", -6] ~~ CycleTuple[Str, Int]	# -> 1
+	["a", -5, "x", -6.2] ~~ CycleTuple[Str, Int]	# -> ""
 
 =head2 Dict[k => A, ...]
 
 The dictionary.
 
-	{a => -1.6, b => "abc"} ~~ Dict[a => Num, b => Str]    # -> 1
+	{a => -1.6, b => "abc"} ~~ Dict[a => Num, b => Str]	# -> 1
 	
-	{a => -1.6, b => "abc", c => 3} ~~ Dict[a => Num, b => Str]    # -> ""
-	{a => -1.6} ~~ Dict[a => Num, b => Str]    # -> ""
+	{a => -1.6, b => "abc", c => 3} ~~ Dict[a => Num, b => Str]	# -> ""
+	{a => -1.6} ~~ Dict[a => Num, b => Str]	# -> ""
 	
-	{a => -1.6} ~~ Dict[a => Num, b => Option[Str]]    # -> 1
+	{a => -1.6} ~~ Dict[a => Num, b => Option[Str]]	# -> 1
 
 =head2 HasProp[p...]
 
@@ -1324,22 +1344,22 @@ The hash has the properties.
 
 	[0, 1] ~~ HasProp[qw/0 1/]	# -> ""
 	
-	{a => 1, b => 2, c => 3} ~~ HasProp[qw/a b/]    # -> 1
-	{a => 1, b => 2} ~~ HasProp[qw/a b/]    # -> 1
-	{a => 1, c => 3} ~~ HasProp[qw/a b/]    # -> ""
+	{a => 1, b => 2, c => 3} ~~ HasProp[qw/a b/]	# -> 1
+	{a => 1, b => 2} ~~ HasProp[qw/a b/]	# -> 1
+	{a => 1, c => 3} ~~ HasProp[qw/a b/]	# -> ""
 	
-	bless({a => 1, b => 3}, "A") ~~ HasProp[qw/a b/]    # -> 1
+	bless({a => 1, b => 3}, "A") ~~ HasProp[qw/a b/]	# -> 1
 
 =head2 Like
 
 The object or string.
 
-	"" ~~ Like    	# -> 1
-	1 ~~ Like    	# -> 1
-	bless({}, "A") ~~ Like    # -> 1
-	bless([], "A") ~~ Like    # -> 1
-	bless(\(my $str = ""), "A") ~~ Like    # -> 1
-	\1 ~~ Like    	# -> ""
+	"" ~~ Like		# -> 1
+	1 ~~ Like		# -> 1
+	bless({}, "A") ~~ Like	# -> 1
+	bless([], "A") ~~ Like	# -> 1
+	bless(\(my $str = ""), "A") ~~ Like	# -> 1
+	\1 ~~ Like		# -> ""
 
 =head2 HasMethods[m...]
 
@@ -1350,12 +1370,12 @@ The object or the class has the methods.
 		sub x2 {}
 	}
 	
-	"HasMethodsExample" ~~ HasMethods[qw/x1 x2/]    		# -> 1
+	"HasMethodsExample" ~~ HasMethods[qw/x1 x2/]			# -> 1
 	bless({}, "HasMethodsExample") ~~ HasMethods[qw/x1 x2/] # -> 1
-	bless({}, "HasMethodsExample") ~~ HasMethods[qw/x1/]    # -> 1
-	"HasMethodsExample" ~~ HasMethods[qw/x3/]    			# -> ""
-	"HasMethodsExample" ~~ HasMethods[qw/x1 x2 x3/]    		# -> ""
-	"HasMethodsExample" ~~ HasMethods[qw/x1 x3/]    		# -> ""
+	bless({}, "HasMethodsExample") ~~ HasMethods[qw/x1/]	# -> 1
+	"HasMethodsExample" ~~ HasMethods[qw/x3/]				# -> ""
+	"HasMethodsExample" ~~ HasMethods[qw/x1 x2 x3/]			# -> ""
+	"HasMethodsExample" ~~ HasMethods[qw/x1 x3/]			# -> ""
 
 =head2 Overload`[op...]
 
@@ -1365,15 +1385,15 @@ The object or the class is overloaded.
 		use overload '""' => sub { "abc" };
 	}
 	
-	"OverloadExample" ~~ Overload    # -> 1
-	bless({}, "OverloadExample") ~~ Overload    # -> 1
-	"A" ~~ Overload    				# -> ""
-	bless({}, "A") ~~ Overload    	# -> ""
+	"OverloadExample" ~~ Overload	# -> 1
+	bless({}, "OverloadExample") ~~ Overload	# -> 1
+	"A" ~~ Overload					# -> ""
+	bless({}, "A") ~~ Overload		# -> ""
 
 And it has the operators if arguments are specified.
 
 	"OverloadExample" ~~ Overload['""']   # -> 1
-	"OverloadExample" ~~ Overload['|']    # -> ""
+	"OverloadExample" ~~ Overload['|']	# -> ""
 
 =head2 InstanceOf[A...]
 
@@ -1385,17 +1405,17 @@ The class or the object inherits the list of classes.
 	
 	
 	"Tiger" ~~ InstanceOf['Animal', 'Cat']  # -> 1
-	"Tiger" ~~ InstanceOf['Tiger']    		# -> 1
-	"Tiger" ~~ InstanceOf['Cat', 'Dog']    	# -> ""
+	"Tiger" ~~ InstanceOf['Tiger']			# -> 1
+	"Tiger" ~~ InstanceOf['Cat', 'Dog']		# -> ""
 
 =head2 ConsumerOf[A...]
 
 The class or the object has the roles.
 
-The presence of the role is checked by the C<does> method.
+The presence of the role is checked by the C<DOES> method.
 
 	package NoneExample {}
-	package RoleExample { sub does { $_[1] ~~ [qw/Role1 Role2/] } }
+	package RoleExample { sub DOES { $_[1] ~~ [qw/Role1 Role2/] } }
 	
 	'RoleExample' ~~ ConsumerOf[qw/Role1/] # -> 1
 	'RoleExample' ~~ ConsumerOf[qw/Role2 Role1/] # -> 1
@@ -1403,19 +1423,37 @@ The presence of the role is checked by the C<does> method.
 	
 	'NoneExample' ~~ ConsumerOf[qw/Role1/]	# -> ""
 
+=head2 BoolLike
+
+Check the 1, 0, "", undef or object with overloaded operator C<0+> as C<JSON::PP::Boolean>.
+
+The operator C<0+> evaluates, and result is checking.
+
+	package BoolLikeExample {
+		use overload '0+' => sub { ${$_[0]} };
+	}
+	
+	bless(\(my $x = 1 ), 'BoolLikeExample') ~~ BoolLike # -> 1
+	bless(\(my $x = 11), 'BoolLikeExample') ~~ BoolLike # -> ""
+	
+	1 ~~ BoolLike	  # -> 1
+	0 ~~ BoolLike	  # -> 1
+	"" ~~ BoolLike	  # -> 1
+	undef ~~ BoolLike # -> 1
+
 =head2 StrLike
 
 String or object with overloaded operator C<"">.
 
-	"" ~~ StrLike    							# -> 1
+	"" ~~ StrLike								# -> 1
 	
 	package StrLikeExample {
 		use overload '""' => sub { "abc" };
 	}
 	
-	bless({}, "StrLikeExample") ~~ StrLike    	# -> 1
+	bless({}, "StrLikeExample") ~~ StrLike		# -> 1
 	
-	{} ~~ StrLike    							# -> ""
+	{} ~~ StrLike								# -> ""
 
 =head2 RegexpLike
 
@@ -1427,33 +1465,33 @@ The regular expression or the object with overloaded operator C<qr>.
 	my $regex = bless qr//, "A";
 	Scalar::Util::reftype($regex) # => REGEXP
 	
-	$regex ~~ RegexpLike    # -> 1
-	qr// ~~ RegexpLike    	# -> 1
-	"" ~~ RegexpLike    	# -> ""
+	$regex ~~ RegexpLike	# -> 1
+	qr// ~~ RegexpLike		# -> 1
+	"" ~~ RegexpLike		# -> ""
 	
 	package RegexpLikeExample {
 		use overload 'qr' => sub { qr/abc/ };
 	}
 	
-	"RegexpLikeExample" ~~ RegexpLike    # -> ""
-	bless({}, "RegexpLikeExample") ~~ RegexpLike    # -> 1
+	"RegexpLikeExample" ~~ RegexpLike	# -> ""
+	bless({}, "RegexpLikeExample") ~~ RegexpLike	# -> 1
 
 =head2 CodeLike
 
 The subroutines.
 
-	sub {} ~~ CodeLike    	# -> 1
+	sub {} ~~ CodeLike		# -> 1
 	\&CodeLike ~~ CodeLike  # -> 1
-	{} ~~ CodeLike  		# -> ""
+	{} ~~ CodeLike		  # -> ""
 
 =head2 ArrayLike`[A]
 
 The arrays or objects with  or overloaded operator C<@{}>.
 
-	{} ~~ ArrayLike    		# -> ""
-	{} ~~ ArrayLike[Int]    # -> ""
+	{} ~~ ArrayLike			# -> ""
+	{} ~~ ArrayLike[Int]	# -> ""
 	
-	[] ~~ ArrayLike    	# -> 1
+	[] ~~ ArrayLike		# -> 1
 	
 	package ArrayLikeExample {
 		use overload '@{}' => sub {
@@ -1465,19 +1503,19 @@ The arrays or objects with  or overloaded operator C<@{}>.
 	$x->[1] = 12;
 	$x->{array}  # --> [undef, 12]
 	
-	$x ~~ ArrayLike    # -> 1
+	$x ~~ ArrayLike	# -> 1
 	
-	$x ~~ ArrayLike[Int]    # -> ""
+	$x ~~ ArrayLike[Int]	# -> ""
 	
 	$x->[0] = 13;
-	$x ~~ ArrayLike[Int]    # -> 1
+	$x ~~ ArrayLike[Int]	# -> 1
 
 =head2 HashLike`[A]
 
 The hashes or objects with overloaded operator C<%{}>.
 
-	{} ~~ HashLike    	# -> 1
-	[] ~~ HashLike    	# -> ""
+	{} ~~ HashLike		# -> 1
+	[] ~~ HashLike		# -> ""
 	[] ~~ HashLike[Int] # -> ""
 	
 	package HashLikeExample {
@@ -1490,9 +1528,9 @@ The hashes or objects with overloaded operator C<%{}>.
 	$x->{key} = 12.3;
 	$x->[0]  # --> {key => 12.3}
 	
-	$x ~~ HashLike    	   # -> 1
-	$x ~~ HashLike[Int]    # -> ""
-	$x ~~ HashLike[Num]    # -> 1
+	$x ~~ HashLike		   # -> 1
+	$x ~~ HashLike[Int]	# -> ""
+	$x ~~ HashLike[Num]	# -> 1
 
 =head1 AUTHOR
 

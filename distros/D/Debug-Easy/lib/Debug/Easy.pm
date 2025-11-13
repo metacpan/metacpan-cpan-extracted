@@ -1,10 +1,4 @@
-#################         Easy Debugging Module        ######################
-################# Copyright 2013 - 2025 Richard Kelsch ######################
-#################          All Rights Reserved         ######################
-######## Licensing information available near the end of this file. #########
-
-
-package Debug::Easy;
+package Debug::Easy 2.18;
 
 use strict;
 use constant {
@@ -16,7 +10,7 @@ use Config;
 use DateTime;
 use Term::ANSIColor;
 use Time::HiRes qw(time);
-use File::Basename;
+use File::Basename qw(fileparse);
 
 use Data::Dumper;    # Included in Perl
 eval {               # Data::Dumper::Simple is preferred.  Try to load it without dying.
@@ -25,7 +19,7 @@ eval {               # Data::Dumper::Simple is preferred.  Try to load it withou
     1;
 };
 
-use threads;
+use if ($Config{'useithreads'}), 'threads';
 
 # Set up dumper variables for friendly output
 
@@ -39,18 +33,14 @@ $Data::Dumper::Sortkeys      = TRUE;
 $Data::Dumper::Purity        = TRUE;
 $Data::Dumper::Deparse       = TRUE;
 
-
 BEGIN {
     require Exporter;
-
-    # set the version for version checking
-    our $VERSION = '2.17';
 
     # Inherit from Exporter to export functions and variables
     our @ISA = qw(Exporter);
 
     # Functions and variables which are exported by default
-    our @EXPORT = qw();
+    our @EXPORT = qw(fileparse);
 
     # Functions and variables which can be optionally exported
     our @EXPORT_OK = qw(@Levels);
@@ -67,6 +57,8 @@ for (my $count = 0; $count < scalar(@Levels); $count++) {
 
 our $PARENT = $$;    # This needs to be defined at the very beginning before new
 my ($SCRIPTNAME, $SCRIPTPATH, $suffix) = fileparse($0);
+
+=encoding utf8
 
 =head1 NAME
 
@@ -315,12 +307,12 @@ B<%D>
 =over 8
 
   'ANSILevel' => {
-     'ERR'      => colored(['white on_red'],        '[ ERROR ]'),
-     'WARN'     => colored(['black on_yellow'],     '[WARNING]'),
-     'NOTICE'   => colored(['yellow'],              '[NOTICE ]'),
-     'INFO'     => colored(['black on_white'],      '[ INFO  ]'),
-     'DEBUG'    => colored(['bold green'],          '[ DEBUG ]'),
-     'DEBUGMAX' => colored(['bold black on_green'], '[DEBUGMX]'),
+     'ERR'      => colored(['white on_red'],        '[ ERROR  ]'),
+     'WARN'     => colored(['black on_yellow'],     '[WARNING ]'),
+     'NOTICE'   => colored(['yellow'],              '[ NOTICE ]'),
+     'INFO'     => colored(['black on_white'],      '[ INFO   ]'),
+     'DEBUG'    => colored(['bold green'],          '[ DEBUG  ]'),
+     'DEBUGMAX' => colored(['bold black on_green'], '[DEBUGMAX]'),
   }
 
 =back
@@ -330,33 +322,34 @@ B<%D>
 sub new {
     my $class = shift;
     my ($filename, $dir, $suffix) = fileparse($0);
-	my $tm = time;
+    my $tm   = time;
     my $self = {
-        'LogLevel'           => 'ERR',                                                               # Default is errors only
-        'Type'               => 'fh',                                                                # Default is a filehandle
-        'Path'               => '/var/log',                                                          # Default path should type be unix
-        'FileHandle'         => \*STDERR,                                                            # Default filehandle is STDERR
+        'LogLevel'           => 'ERR',                                                                    # Default is errors only
+        'Type'               => 'fh',                                                                     # Default is a filehandle
+        'Path'               => '/var/log',                                                               # Default path should type be unix
+        'FileHandle'         => \*STDERR,                                                                 # Default filehandle is STDERR
         'MasterStart'        => $tm,
-        'ANY_LastStamp'      => $tm,                                                                 # Initialize main benchmark
-        'ERR_LastStamp'      => $tm,                                                                 # Initialize the ERR benchmark
-        'WARN_LastStamp'     => $tm,                                                                 # Initialize the WARN benchmark
-        'INFO_LastStamp'     => $tm,                                                                 # Initialize the INFO benchmark
-        'NOTICE_LastStamp'   => $tm,                                                                 # Initialize the NOTICE benchmark
-        'DEBUG_LastStamp'    => $tm,                                                                 # Initialize the DEBUG benchmark
-        'DEBUGMAX_LastStamp' => $tm,                                                                 # Initialize the DEBUGMAX benchmark
-        'Color'              => TRUE,                                                                # Default to colorized output
+        'ANY_LastStamp'      => $tm,                                                                      # Initialize main benchmark
+        'ERR_LastStamp'      => $tm,                                                                      # Initialize the ERR benchmark
+        'WARN_LastStamp'     => $tm,                                                                      # Initialize the WARN benchmark
+        'INFO_LastStamp'     => $tm,                                                                      # Initialize the INFO benchmark
+        'NOTICE_LastStamp'   => $tm,                                                                      # Initialize the NOTICE benchmark
+        'DEBUG_LastStamp'    => $tm,                                                                      # Initialize the DEBUG benchmark
+        'DEBUGMAX_LastStamp' => $tm,                                                                      # Initialize the DEBUGMAX benchmark
+        'Color'              => TRUE,                                                                     # Default to colorized output
         'DateStamp'          => colored(['yellow'], '%date%'),
         'TimeStamp'          => colored(['yellow'], '%time%'),
-        'Epoch'              => colored(['cyan'], '%epoch%'),
-        'Padding'            => -20,                                                                 # Default padding is 20 spaces
+        'Epoch'              => colored(['cyan'],   '%epoch%'),
+        'Padding'            => -20,                                                                      # Default padding is 20 spaces
         'Lines-Padding'      => -2,
-        'Subroutine-Padding' => 0,
-        'Line-Padding'       => 0,
+        'Subroutine-Padding' =>  0,
+        'Line-Padding'       =>  0,
         'PARENT'             => $$,
         'Prefix'             => '%Date% %Time% %Benchmark% %Loglevel%[%Subroutine%][%Lastline%] ',
         'DEBUGMAX-Prefix'    => '%Date% %Time% %Benchmark% %Loglevel%[%Module%][%Lines%] ',
         'Filename'           => '[' . colored(['magenta'], $filename) . ']',
         'TIMEZONE'           => DateTime::TimeZone->new(name => 'local'),
+        'DATETIME'           => DateTime->now('time_zone' => DateTime::TimeZone->new(name => 'local')),
         'ANSILevel'          => {
             'ERR'      => colored(['white on_red'],        '[ ERROR  ]'),
             'WARN'     => colored(['black on_yellow'],     '[WARNING ]'),
@@ -377,9 +370,9 @@ sub new {
             # This fixes a documentation error for past versions
             if ($upper eq 'LOGLEVEL') {
                 $self->{$upper} = 'ERR' if ($self->{$upper} =~ /^ERROR$/i);
-                $self->{$upper} = uc($self->{$upper});    # Make loglevels case insensitive
+                $self->{$upper} = uc($self->{$upper});                        # Make loglevels case insensitive
             }
-            delete($self->{$Key});        # Get rid of the bad key
+            delete($self->{$Key});                                            # Get rid of the bad key
         } elsif ($Key eq 'LOGLEVEL') {    # Make loglevels case insensitive
             $self->{$upper} = uc($self->{$upper});
         }
@@ -458,6 +451,7 @@ sub debug {
     $level =~ s/(OR|ING|RMATION)$//;                        # Strip off the excess
 
     # A much quicker bypass when the log level is below what is needed
+    # This minimizes the execution overhead for log levels not active.
     return if ($LevelLogic{ $self->{'LOGLEVEL'} } < $LevelLogic{$level});
 
     my @messages;
@@ -481,7 +475,7 @@ sub debug {
                 $package = $array[0];
                 my $subroutine = $array[3];
                 $subroutine =~ s/^$package\:\://;
-                $sname =~ s/$subroutine//;
+                $sname      =~ s/$subroutine//;
                 if ($sname eq '') {
                     $sname = ($subroutine ne '') ? $subroutine : $package;
                     $cline = $array[2];
@@ -498,7 +492,7 @@ sub debug {
             $count++;
         } ## end while (my @array = caller...)
         if ($package ne '') {
-            $sname = $package . '::' . $sname;
+            $sname  = $package . '::' . $sname;
             $nested = ' ' x $nest if ($nest);
         } else {
             my @array = caller(1);
@@ -511,24 +505,25 @@ sub debug {
             $sline = $cline;
             $short = $sname;
         } ## end else [ if ($package ne '') ]
-        $subroutine = ($sname ne '') ? $sname : 'main';
+        $subroutine                   = ($sname ne '') ? $sname : 'main';
         $self->{'PADDING'}            = 0 - length($subroutine) if (length($subroutine) > abs($self->{'PADDING'}));
         $self->{'LINES-PADDING'}      = 0 - length($cline)      if (length($cline) > abs($self->{'LINES-PADDING'}));
         $self->{'SUBROUTINE-PADDING'} = 0 - length($short)      if (length($short) > abs($self->{'SUBROUTINE-PADDING'}));
         $self->{'LINE-PADDING'}       = 0 - length($sline)      if (length($sline) > abs($self->{'LINE-PADDING'}));
-        $cline = sprintf('%' . $self->{'LINES-PADDING'} . 's', $cline);
-        $subroutine = colored(['bold cyan'], sprintf('%' . $self->{'PADDING'} . 's', $subroutine));
-        $sline = sprintf('%' . $self->{'LINE-PADDING'} . 's', $sline);
-        $short = colored(['bold cyan'], sprintf('%' . $self->{'SUBROUTINE-PADDING'} . 's', $short));
+        $cline                        = sprintf('%' . $self->{'LINES-PADDING'} . 's', $cline);
+        $subroutine                   = colored(['bold cyan'], sprintf('%' . $self->{'PADDING'} . 's', $subroutine));
+        $sline                        = sprintf('%' . $self->{'LINE-PADDING'} . 's', $sline);
+        $short                        = colored(['bold cyan'], sprintf('%' . $self->{'SUBROUTINE-PADDING'} . 's', $short));
     } ## end if ($self->{'PREFIX'} ...)
 
     # Figure out the benchmarks, but only if it is in the prefix
     if ($self->{'PREFIX'} =~ /\%Benchmark\%/i) {
+
         # For multiline output, only output the bench data on the first line.  Use padded spaces for the rest.
-        $thisBench = sprintf('%7s', sprintf(' %.02f', time - $self->{'ANY_LASTSTAMP'}));
+        $thisBench  = sprintf('%7s', sprintf(' %.02f', time - $self->{'ANY_LASTSTAMP'}));
         $thisBench2 = ' ' x length($thisBench);
     } ## end if ($self->{'PREFIX'} ...)
-    my $first = TRUE;    # Set the first line flag.
+    my $first = TRUE;                # Set the first line flag.
     foreach my $msg (@messages) {    # Loop through each line of output and format accordingly.
         if (ref($msg) ne '') {
             $msg = Dumper($msg);
@@ -548,7 +543,7 @@ sub debug {
     $self->{ $level . '_LASTSTAMP' } = time;
 } ## end sub debug
 
-sub _send_to_logger {      # This actually simplifies the previous method ... seriously
+sub _send_to_logger {    # This actually simplifies the previous method ... seriously
     my $self       = shift;
     my $level      = shift;
     my $padding    = shift;
@@ -562,18 +557,18 @@ sub _send_to_logger {      # This actually simplifies the previous method ... se
     my $shortsub   = shift;
 
     my $timezone = $self->{'TIMEZONE'} || DateTime::TimeZone->new(name => 'local');
-    my $dt       = DateTime->now('time_zone' => $timezone);
+    my $dt       = $self->{'DATETIME'};
     my $Date     = $dt->ymd();
     my $Time     = $dt->hms();
-    my $prefix   = $self->{ $level . '-PREFIX' } . '';        # A copy not a pointer
+    my $prefix   = $self->{ $level . '-PREFIX' } . '';                                # A copy not a pointer
     my $forked   = ($PARENT ne $$) ? 'C' : 'P';
     my $threaded = 'PT-';
     my $epoch    = time;
 
-    if (exists($Config{'useithreads'}) && $Config{'useithreads'}) { # Gotta trust the Config vars... right?
-		my $tid   = threads->tid();
-		$threaded = ($tid > 0) ? sprintf('T%02d',$tid) : 'PT-';
-    } ## end if (exists($Config{'useithreads'...}))
+    if (exists($Config{'useithreads'}) && $Config{'useithreads'}) {                   # Gotta trust the Config vars... right?
+        my $tid = threads->tid();
+        $threaded = ($tid > 0) ? sprintf('T%02d', $tid) : 'PT-';
+    }
 
     $prefix =~ s/\%PID\%/$$/gi;
     $prefix =~ s/\%Loglevel\%/$self->{'ANSILEVEL'}->{$level}/gi;
@@ -763,7 +758,7 @@ This program is free software; you can redistribute it and/or modify it under th
 
 =head1 B<VERSION>
 
-Version 2.16
+Version 2.17
 
 =head1 B<SUPPORT>
 
@@ -789,7 +784,7 @@ Copyright 2013-2025 Richard Kelsch.
 
 This program is free software; you can redistribute it and/or modify it under the terms of the the Artistic License (2.0). You may obtain a copy of the full license at:
 
-L<http://www.perlfoundation.org/artistic_license_2_0>
+L<https://perlfoundation.org/artistic-license-20.html>
 
 Any use, modification, and distribution of the Standard or Modified Versions is governed by this Artistic License. By using, modifying or distributing the Package, you accept this license. Do not use, modify, or distribute the Package, if you do not accept this license.
 
@@ -805,10 +800,12 @@ Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER AND CONT
 
 Perl modules available on github - L<https://github.com/richcsst>
 
-And available on CPAN
+And available on CPAN:
 
+ *  BBS::Universal
  *  Debug::Easy
  *  Graphics::Framebuffer
  *  Term::ANSIEncode
+ *  BBS::Universal - A Perl based Internet BBS server
 
 =cut

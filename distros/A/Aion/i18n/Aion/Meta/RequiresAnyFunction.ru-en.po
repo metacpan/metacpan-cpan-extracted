@@ -1,0 +1,24 @@
+msgid "Aion::Meta::RequiresAnyFunction - определяет любую функцию, которая должна быть в модуле"
+msgstr "Aion::Meta::RequiresAnyFunction - defines any function that must be in the module"
+
+msgid "Создаётся в `requires fn1, fn2...` и при инициализации класса проверяется, что такая функция в нём была объявлена через `sub` или `has`."
+msgstr "It is created in `requires fn1, fn2...` and when initializing the class it is checked that such a function was declared in it using `sub` or `has`."
+
+msgid "Конструктор."
+msgstr "Constructor."
+
+msgid "Проверяет, что `$other` является функцией."
+msgstr "Checks that `$other` is a function."
+
+msgid "Возвращает имя пакета, в котором объявлена функция."
+msgstr "Returns the name of the package in which the function is declared."
+
+msgid "Возвращает имя функции."
+msgstr "Returns the name of the function."
+
+msgid "⚖ **GPLv3**"
+msgstr "⚖ **GPLv3**"
+
+msgid "The Aion::Meta::RequiresAnyFunction module is copyright © 2025 Yaroslav O. Kosmina. Rusland. All rights reserved."
+msgstr "The Aion::Meta::RequiresAnyFunction module is copyright © 2025 Yaroslav O. Kosmina. Rusland. All rights reserved."
+

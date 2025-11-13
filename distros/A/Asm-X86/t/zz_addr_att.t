@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 # Asm::X86 - a test for AT&T-syntax addressing modes.
 #
-#	Copyright (C) 2008-2024 Bogdan 'bogdro' Drozdowski,
+#	Copyright (C) 2008-2025 Bogdan 'bogdro' Drozdowski,
 #	  bogdro (at) users . sourceforge . net
 #	  bogdro /at\ cpan . org
 #
