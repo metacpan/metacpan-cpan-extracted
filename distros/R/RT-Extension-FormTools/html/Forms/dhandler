@@ -187,12 +187,20 @@ jQuery(function () {
             if ( matched ) {
                 if ( target.closest('.formtools-item').hasClass('hidden') ) {
                     target.closest('.formtools-item').removeClass('hidden');
+
+                    // Set required attribute on newly visible required fields
+                    target.closest('.formtools-item').find('[data-name]:has(.required) :input, :input.required').attr('required', true);
+
                     changed = 1;
                 }
             }
             else {
                 if ( !target.closest('.formtools-item').hasClass('hidden') ) {
                     target.closest('.formtools-item').addClass('hidden');
+
+                    // Remove required attribute from hidden elements
+                    target.closest('.formtools-item').find(':input').attr('required', false);
+
                     changed = 1;
                 }
             }

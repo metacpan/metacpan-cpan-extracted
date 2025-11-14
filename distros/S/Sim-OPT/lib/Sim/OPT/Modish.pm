@@ -46,8 +46,6 @@ use feature 'say';
 no strict;
 no warnings;
 use Switch::Back;
-use feature 'smartmatch';
-no warnings 'experimental::smartmatch';
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw( modish );

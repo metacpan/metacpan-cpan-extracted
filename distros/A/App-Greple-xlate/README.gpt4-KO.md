@@ -14,7 +14,7 @@ App::Greple::xlate - greple을 위한 번역 지원 모듈입니다.
 
 # VERSION
 
-Version 0.9914
+Version 0.9915
 
 # DESCRIPTION
 

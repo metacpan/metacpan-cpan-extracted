@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: MooX::Options + MooX::Cmd + Sanity
-our $VERSION = '0.08'; # VERSION
+our $VERSION = '0.09'; # VERSION
 our $AUTHORITY = 'cpan:ARODLAND'; # AUTHORITY
 
 use Carp 'croak';
@@ -163,7 +163,7 @@ CLI::Osprey - MooX::Options + MooX::Cmd + Sanity
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -468,9 +468,9 @@ Default: None.
 Allows controlling the order that options are listed in the help text. Options
 without an order attribute are sorted by the order their C<option> statements
 are executed, if L</added_order> is true, and by alphabetical order otherwise.
-They are placed as though they had order 9999, so use small values to sort
-before automaticall-sorted options, and values of 10000 and up to sort at the
-end.
+Options without an explicit order are placed as though they had order 9999, so
+use small values to sort before automatically-sorted options, and values of
+10000 or greater to sort at the end.
 
 =head2 repeatable
 
@@ -478,7 +478,7 @@ Default: B<false>.
 
 Allows an option to be specified more than once. When used on a "boolean"
 option with no L</format>, each appearace of the option will increment the value
-by 1 (equivalent to C<+> in L<Getopt::Long>. When used on an option with
+by 1 (equivalent to C<+> in L<Getopt::Long>). When used on an option with
 arguments, produces an arrayref, one value per appearance of the option.
 
 =head2 required
@@ -588,7 +588,7 @@ Andrew Rodland <arodland@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Andrew Rodland.
+This software is copyright (c) 2025 by Andrew Rodland.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

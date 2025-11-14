@@ -1,5 +1,5 @@
 package Dist::Build::XS::Alien;
-$Dist::Build::XS::Alien::VERSION = '0.020';
+$Dist::Build::XS::Alien::VERSION = '0.021';
 use strict;
 use warnings;
 
@@ -71,7 +71,7 @@ Dist::Build::XS::Alien - Dist::Build extension to use Alien modules.
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 

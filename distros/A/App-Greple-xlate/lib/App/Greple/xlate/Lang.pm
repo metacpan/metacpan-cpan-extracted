@@ -39,6 +39,7 @@ our %LANGNAME = (
     'TR'    => 'Turkish',
     'UK'    => 'Ukrainian',
     'ZH'    => 'Chinese',
+    'AR'    => 'Arabic',
     );
 
 1;

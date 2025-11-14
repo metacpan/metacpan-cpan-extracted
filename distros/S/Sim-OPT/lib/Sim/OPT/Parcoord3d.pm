@@ -3,7 +3,7 @@ package Sim::OPT::Parcoord3d;
 # This is Sim::OPT::Parcoord3d, a program that can receive as input the data for a bi-dimensional parallel coordinate plot in cvs format to produce as output an Autolisp file that can be used from Autocad or Intellicad-based 3D CAD programs to obtain 3D parallel coordinate plots.
 # This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
-# use v5.14;
+use v5.14;
 # use v5.20;
 use Exporter;
 use parent 'Exporter'; # imports and subclasses Exporter
@@ -29,8 +29,6 @@ use feature 'say';
 no strict;
 no warnings;
 use Switch::Back;
-use feature 'smartmatch';
-no warnings 'experimental::smartmatch';
 
 use Sim::OPT;
 use Sim::OPT::Morph;
@@ -45,7 +43,7 @@ our @ISA = qw(Exporter); # our @adamkISA = qw(Exporter);
 #@EXPORT_OK   = qw(); # our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
 @EXPORT = qw( parcoord3d ); # our @EXPORT = qw( );
-$VERSION = '0.01.6';
+$VERSION = '0.01.5';
 $ABSTRACT = 'Sim::OPT::Parcoord3d is a program that can process the CSV data for a bi-dimensional parallel coordinate plot and output an Autolisp file for a 3D parallel coordinate plot.';
 
 #########################################################################################
@@ -341,7 +339,7 @@ sub parcoord3d
 					{
 						my @elems = @{$elem};
 						my @cutelems = @elems[0..2]; # PUT ..2 IF ALSO THE THIRD AXIS HAS TO BE CHECKED FOR NON-REPETITIONS, PUT 1 OTHERWISE.
-						if (scalar(@cutelms) == scalar(@cutelems) && !grep { $cutelms[$_] ne $cutelems[$_] } 0..$#cutelms)
+						if (@cutelms ~~ @cutelems)
 						{
 
 							$counthit++;

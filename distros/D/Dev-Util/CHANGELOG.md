@@ -2,6 +2,51 @@
 
 All notable changes to this project will be documented in this file.
 
+## [version/v2.18.19] - 2025-11-14
+
+### 🚀 Features
+
+- *(semaphor)* Create Sem file locking module and tests
+
+### 🐛 Bug Fixes
+
+- *(links)* Remove links to defunct websites: AnnoCPAN and CPAN Ratings
+- *(diagnostics)* Remove diagnostics code used in development
+
+### ⚙️ Miscellaneous Tasks
+
+- *(security)* Add security policy tool. Create security policy.
+- *(example)* Create simple example of semaphore locking
+- *(version)* Update version minor level
+
+### 🧪 Testing
+
+- *(author)* Convert to Author test perl{tidy,critic}
+- *(pod)* Rename pod.t to pod-syntax.t
+- Add xt tests for utf-8 and file name portability
+- *(remove)* Delete block testing second semaphore wait
+
+### 📚 Documentation
+
+- *(readme)* Add pod description for Dev::Util::Sem
+- *(contributing)* Create a policy for contibutions to this project
+- *(contibuting)* Document coding style for contributions
+- *(links)* Remove links to defunct websites: AnnoCPAN and CPAN Ratings
+- *(pod)* Expand the pod documentation
+
+### 🚧 Build
+
+- *(makefile)* Add new tests in XT_TEST_REQUIRES
+- *(makefile)* Add IO::Prompt, App::Yath to PREREQ_PM and TEST_REQUIRES respectively
+- *(support)* Create support dir for development tools
+- *(critic)* Add _get_locks_dir to ProtectPrivateSubs
+
+## [release/20251111] - 2025-11-11
+
+### 📚 Documentation
+
+- *(changelog)* Update changelog
+
 ## [version/v2.17.17] - 2025-11-11
 
 ### ⚙️ Miscellaneous Tasks

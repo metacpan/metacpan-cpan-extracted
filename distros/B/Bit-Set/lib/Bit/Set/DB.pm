@@ -1,6 +1,6 @@
 #!/home/chrisarg/perl5/perlbrew/perls/current/bin/perl
 package Bit::Set::DB;
-$Bit::Set::DB::VERSION = '0.04';
+$Bit::Set::DB::VERSION = '0.05';
 use strict;
 use warnings;
 use FFI::Platypus::Record;
@@ -9,7 +9,7 @@ use FFI::Platypus::Record;
 {
 
     package Bit::Set::DB::SETOP_COUNT_OPTS;
-$Bit::Set::DB::SETOP_COUNT_OPTS::VERSION = '0.04';
+$Bit::Set::DB::SETOP_COUNT_OPTS::VERSION = '0.05';
 use FFI::Platypus::Record;
     record_layout_1(
         'int'  => 'num_cpu_threads',
@@ -67,6 +67,17 @@ my %functions = (
     BitDB_free => {
         args => ['Bit_DB_T_Ptr'],
         ret  => 'opaque',
+    },
+    BitDB_load => {
+        args => ['int','int','opaque'],
+        ret  => 'Bit_DB_T',
+     	check => sub {
+            my ( $length, $num_of_bitsets ) = @_;
+            die "BitDB_new: length must be >= 0 and <= INT_MAX"
+              if $length < 0 || $length > 2147483647;
+            die "BitDB_new: num_of_bitsets must be >= 0 and <= INT_MAX"
+              if $num_of_bitsets < 0 || $num_of_bitsets > 2147483647;
+        }
     },
 
     # Properties
@@ -362,7 +373,7 @@ for my $name ( sort keys %functions ) {
 # Verification that all C functions are mapped (excluding macros)
 my @c_functions = qw(
   BitDB_new BitDB_free BitDB_length BitDB_nelem BitDB_count_at BitDB_count
-  BitDB_get_from BitDB_put_at BitDB_extract_from BitDB_replace_at BitDB_clear BitDB_clear_at
+  BitDB_get_from BitDB_put_at BitDB_extract_from BitDB_replace_at BitDB_clear BitDB_clear_at BitDB_load
   BitDB_inter_count_store_cpu BitDB_union_count_store_cpu BitDB_diff_count_store_cpu BitDB_minus_count_store_cpu
   BitDB_inter_count_store_gpu BitDB_union_count_store_gpu BitDB_diff_count_store_gpu BitDB_minus_count_store_gpu
   BitDB_inter_count_cpu BitDB_union_count_cpu BitDB_diff_count_cpu BitDB_minus_count_cpu
@@ -391,7 +402,7 @@ Bit::Set::DB - Perl interface for bitset containers from the C<Bit> C library
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -443,6 +454,10 @@ Creates a new bitset container for C<num_of_bitsets> bitsets, each of C<length>.
 =item B<BitDB_free(db_ref)>
 
 Frees the memory associated with the bitset container. Expects a reference to the scalar holding the DB object.
+
+=item B<BitDB_load(length, num_of_bitsets, buffer address - numeric)>
+
+Creates a new bitset container for C<num_of_bitsets> bitsets, each of C<length>, from an external buffer. The buffer address should point to a memory region large enough to hold all bitsets.
 
 =back
 

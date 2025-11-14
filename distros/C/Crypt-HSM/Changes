@@ -1,5 +1,10 @@
 Revision history for Crypt-HSM
 
+0.022     2025-11-14 01:48:35+01:00 Europe/Brussels
+          - Return correct types in open_* methods
+          - Null-initialize attribute before using it to fetch
+          - Fix various leaks on errors
+
 0.021     2025-07-22 22:30:38+02:00 Europe/Brussels
           - Split Mechanism::Info object out of Mechanism
           - Fix off-by-one in PSS argument handling

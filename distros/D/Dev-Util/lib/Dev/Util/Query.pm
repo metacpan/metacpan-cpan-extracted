@@ -7,7 +7,7 @@ use Exporter qw(import);
 use IO::Interactive qw(is_interactive);
 use IO::Prompt      qw();                 # don't import prompt
 
-our $VERSION = version->declare("v2.17.17");
+our $VERSION = version->declare("v2.18.19");
 
 our %EXPORT_TAGS = (
                      misc => [ qw(
@@ -145,7 +145,7 @@ Dev::Util::Query - Functions to prompt user for input, y/n, or menus.
 
 =head1 VERSION
 
-Version v2.17.17
+Version v2.18.19
 
 =head1 SYNOPSIS
 
@@ -305,14 +305,6 @@ You can also look for information at:
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Dev-Util>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Dev-Util>
-
-=item * CPAN Ratings
-
-L<https://cpanratings.perl.org/d/Dev-Util>
 
 =item * Search CPAN
 

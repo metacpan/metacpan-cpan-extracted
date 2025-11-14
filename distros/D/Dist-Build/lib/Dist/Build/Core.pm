@@ -1,5 +1,5 @@
 package Dist::Build::Core;
-$Dist::Build::Core::VERSION = '0.020';
+$Dist::Build::Core::VERSION = '0.021';
 use strict;
 use warnings;
 
@@ -198,18 +198,21 @@ sub add_methods {
 			},
 		);
 
-		my $script_doc_files = $planner->create_filter(on => $script_script_files, condition => \&contains_pod);
+		my $install_paths = $planner->install_paths;
+		if ($install_paths->is_default_installable('bindoc') && $install_paths->install_destination('bindoc')) {
+			my $script_doc_files = $planner->create_filter(on => $script_script_files, condition => \&contains_pod);
 
-		my $section1 = $planner->config->get('man1ext');
-		my $blib_doc_files = $planner->create_subst(
-			on     => [ $script_pod_files, $script_doc_files ],
-			add_to => 'manify',
-			subst  => sub {
-				my ($source) = @_;
-				my $destination = catfile('blib', 'bindoc', man1_pagename($source, $section1));
-				return $planner->manify($source, $destination, $section1);
-			},
-		);
+			my $section1 = $planner->config->get('man1ext');
+			my $blib_doc_files = $planner->create_subst(
+				on     => [ $script_pod_files, $script_doc_files ],
+				add_to => 'manify',
+				subst  => sub {
+					my ($source) = @_;
+					my $destination = catfile('blib', 'bindoc', man1_pagename($source, $section1));
+					return $planner->manify($source, $destination, $section1);
+				},
+			);
+		}
 	});
 
 	$planner->add_delegate('lib_dir', sub {
@@ -240,20 +243,23 @@ sub add_methods {
 			},
 		);
 
-		my $pm_doc_files = $planner->create_filter(
-			on        => $pm_files,
-			condition => \&contains_pod,
-		);
-		my $section3 = $planner->config->get('man3ext');
-		my $blib_doc_files = $planner->create_subst(
-			on     => [ $pm_doc_files, $pod_files ],
-			add_to => 'manify',
-			subst  => sub {
-				my ($source) = @_;
-				my $destination = catfile('blib', 'libdoc', man3_pagename($source, $base, $section3));
-				return $planner->manify($source, $destination, $section3);
-			}
-		);
+		my $install_paths = $planner->install_paths;
+		if ($install_paths->is_default_installable('libdoc') && $install_paths->install_destination('libdoc')) {
+			my $pm_doc_files = $planner->create_filter(
+				on        => $pm_files,
+				condition => \&contains_pod,
+			);
+			my $section3 = $planner->config->get('man3ext');
+			my $blib_doc_files = $planner->create_subst(
+				on     => [ $pm_doc_files, $pod_files ],
+				add_to => 'manify',
+				subst  => sub {
+					my ($source) = @_;
+					my $destination = catfile('blib', 'libdoc', man3_pagename($source, $base, $section3));
+					return $planner->manify($source, $destination, $section3);
+				}
+			);
+		}
 	});
 
 	$planner->add_delegate('autoclean', sub {
@@ -378,7 +384,7 @@ Dist::Build::Core - core functions for Dist::Build
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 DESCRIPTION
 

@@ -2,7 +2,7 @@ NAME
     Bit::Set - Perl interface for bitset functions from the 'bit' C library
 
 VERSION
-    version 0.04
+    version 0.05
 
 SYNOPSIS
       use Bit::Set;

@@ -2,6 +2,7 @@
 
 use Dev::Util::Syntax;
 use Test2::V0;
+use Test2::Require::AuthorTesting;
 use FindBin qw($RealBin);
 
 # perlcritic config set in this file

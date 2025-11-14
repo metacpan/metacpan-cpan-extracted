@@ -1,5 +1,5 @@
 package Dist::Build::XS;
-$Dist::Build::XS::VERSION = '0.020';
+$Dist::Build::XS::VERSION = '0.021';
 use strict;
 use warnings;
 
@@ -147,7 +147,7 @@ Dist::Build::XS - An XS implementation for Dist::Build
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 

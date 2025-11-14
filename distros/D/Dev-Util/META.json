@@ -44,6 +44,7 @@
             "IO::File" : "0",
             "IO::Handle" : "0",
             "IO::Interactive" : "0",
+            "IO::Prompt" : "0",
             "IPC::Cmd" : "0",
             "Import::Into" : "0",
             "List::Util" : "0",
@@ -61,6 +62,7 @@
       },
       "test" : {
          "requires" : {
+            "App::Yath" : "0",
             "English" : "0",
             "ExtUtils::Manifest" : "0",
             "File::Compare" : "0",
@@ -81,6 +83,6 @@
          "web" : "https://github.com/mattmartini/Dev-Util"
       }
    },
-   "version" : "v2.17.17",
+   "version" : "v2.18.19",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

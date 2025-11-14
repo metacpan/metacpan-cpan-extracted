@@ -3,8 +3,9 @@
 # NOTE: this test expects a $HOME/.perltidyrc file containing:
 #   -pbp -nst -nse
 
-use Test2::V0;
 use lib 'lib';
+use Test2::V0;
+use Test2::Require::AuthorTesting;
 
 use Dev::Util::Syntax;
 

@@ -4,7 +4,7 @@ Dev::Util::Syntax - Provide consistent feature setup.
 
 # VERSION
 
-Version v2.17.17
+Version v2.18.19
 
 # SYNOPSIS
 
@@ -67,14 +67,6 @@ You can also look for information at:
 - RT: CPAN's request tracker (report bugs here)
 
     [https://rt.cpan.org/NoAuth/Bugs.html?Dist=Dev-Util](https://rt.cpan.org/NoAuth/Bugs.html?Dist=Dev-Util)
-
-- AnnoCPAN: Annotated CPAN documentation
-
-    [http://annocpan.org/dist/Dev-Util](http://annocpan.org/dist/Dev-Util)
-
-- CPAN Ratings
-
-    [https://cpanratings.perl.org/d/Dev-Util](https://cpanratings.perl.org/d/Dev-Util)
 
 - Search CPAN
 

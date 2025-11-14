@@ -1,0 +1,10 @@
+v0.1.0  2025-11-30
+        Initial release.
+
+        [Features]
+        - pod_ok() for single-file POD syntax validation.
+        - all_pod_ok() for recursive POD checking.
+        - Exposed ignore list (@Test2::Tools::Pod::Ignore) for directory
+          customization.
+        - Duplicate filtering when scanning multiple locations.
+        - Full Test2::API integration with proper context handling.

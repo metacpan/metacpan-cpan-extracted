@@ -25,7 +25,7 @@ no_index:
 provides:
   Tie::Hash::MultiValueOpts:
     file: lib/Tie/Hash/MultiValueOpts.pm
-    version: v1.0.1
+    version: v1.0.2
 requires:
   Getopt::Std: '0'
   Tie::Hash: '0'
@@ -35,4 +35,4 @@ requires:
 resources:
   bugtracker: https://github.com/XSven/Tie-Hash-MultiValueOpts/issues
   repository: https://github.com/XSven/Tie-Hash-MultiValueOpts.git
-version: v1.0.1
+version: v1.0.2

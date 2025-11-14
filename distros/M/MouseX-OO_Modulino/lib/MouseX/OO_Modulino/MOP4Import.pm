@@ -6,7 +6,7 @@ use Mouse ();
 use Data::Dumper ();
 use Carp ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use constant DEBUG => $ENV{DEBUG_MOP4IMPORT};
 BEGIN {

@@ -1,16 +1,19 @@
 package Archive::Tar::Stream;
 
-use 5.006;
 use strict;
 use warnings;
 
 # this is pretty fixed by the format!
 use constant BLOCKSIZE => 512;
 
+use constant BLOCKCOUNT => 2048;
+use constant BUFSIZE => (512*2048);
+
 # dependencies
 use IO::File;
 use IO::Handle;
 use File::Temp;
+use List::Util qw(min);
 
 # XXX - make this an OO attribute
 our $VERBOSE = 0;
@@ -21,11 +24,11 @@ Archive::Tar::Stream - pure perl IO-friendly tar file management
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 
 =head1 SYNOPSIS
@@ -102,10 +105,6 @@ file will not corrupt the output file.
 sub new {
   my $class = shift;
   my %args = @_;
-
-  die "Useless to stream without a filehandle"
-    unless ($args{infh} or $args{outfh});
-
   my $Self = bless {
     # defaults
     safe_copy => 1,
@@ -113,7 +112,6 @@ sub new {
     outpos => 0,
     %args
   }, ref($class) || $class;
-
   return $Self;
 }
 
@@ -180,10 +178,7 @@ sub AddFile {
   $header->{name} = $name;
   $header->{size} = $size;
 
-  my $fullheader = $Self->WriteHeader($header);
-  $Self->CopyFromFh($fh, $size);
-
-  return $fullheader;
+  return $header->{size} ? $Self->WriteFromFh($fh, $header) : $Self->WriteHeader($header);
 }
 
 =head2 AddLink
@@ -206,7 +201,6 @@ sub AddLink {
   my $header = $Self->BlankHeader(@_);
   $header->{name} = $name;
   $header->{linkname} = $linkname;
-  $header->{typeflag} = 2;
 
   return $Self->WriteHeader($header);
 }
@@ -265,7 +259,6 @@ sub StreamCopy {
 
   while (my $header = $Self->ReadHeader()) {
     my $pos = $header->{_pos};
-    my $oldsize = $header->{size};
     if ($Chooser) {
       my ($rc, $newheader) = $Chooser->($header, $Self->{outpos}, undef);
 
@@ -290,19 +283,15 @@ sub StreamCopy {
       if ($rc eq 'KEEP') {
         print "KEEP $header->{name} $pos/$Self->{outpos}\n" if $VERBOSE;
         if ($TempFile) {
-          $Self->WriteHeader($header);
-          $Self->CopyFromFh($TempFile, $header->{size});
+          $Self->WriteFromFh($TempFile, $header);
         }
-        # if the sizes don't match we just do a tempfile too
-        elsif ($Self->{safe_copy} or ($oldsize != $header->{size})) {
-          # guarantee safety by getting everything into a temporary file first
-          $TempFile = $Self->CopyToTempFile($oldsize);
-          $Self->WriteHeader($header);
-          $Self->CopyFromFh($TempFile, $header->{size});
+        # guarantee safety by getting everything into a temporary file first
+        elsif ($Self->{safe_copy}) {
+          $TempFile = $Self->CopyToTempFile($header->{size});
+          $Self->WriteFromFh($TempFile, $header);
         }
         else {
-          $Self->WriteHeader($header);
-          $Self->CopyBytes($header->{size});
+          $Self->WriteCopy($header);
         }
       }
 
@@ -324,16 +313,12 @@ sub StreamCopy {
     }
     else {
       print "PASSTHROUGH $header->{name} $Self->{outpos}\n" if $VERBOSE;
+      # XXX - faster but less safe
+      #$Self->WriteCopy($header);
 
-      if ($Self->{safe_copy}) {
-        my $TempFile = $Self->CopyToTempFile($header->{size});
-        $Self->WriteHeader($header);
-        $Self->CopyFromFh($TempFile, $header->{size});
-      }
-      else {
-        $Self->WriteHeader($header);
-        $Self->CopyBytes($header->{size});
-      }
+      # slow safe option :)
+      my $TempFile = $Self->CopyToTempFile($header->{size});
+      $Self->WriteFromFh($TempFile, $header);
     }
   }
 }
@@ -359,23 +344,23 @@ sub ReadBlocks {
   my $Self = shift;
   my $nblocks = shift || 1;
   unless ($Self->{infh}) {
-    die "Attempt to read without input filehandle";
+    die "Attempt to read without input filehandle\n";
   }
   my $bytes = BLOCKSIZE * $nblocks;
-  my $buf;
-  my @result;
-  while ($bytes > 0) {
-    my $n = sysread($Self->{infh}, $buf, $bytes);
+  my $buf = '';
+  my $pos = 0;
+  while ($pos < $bytes) {
+    my $chunk = min($bytes - $pos, BUFSIZE);
+    my $n = sysread($Self->{infh}, $buf, $chunk, $pos);
     unless ($n) {
       delete $Self->{infh};
-      return if ($bytes == BLOCKSIZE * $nblocks); # nothing at EOF
-      die "Failed to read full block at $Self->{inpos}";
+      return unless $pos; # nothing at EOF is fine
+      die "Failed to read full block at $Self->{inpos}\n";
     }
-    $bytes -= $n;
+    $pos += $n;
     $Self->{inpos} += $n;
-    push @result, $buf;
   }
-  return join('', @result);
+  return $buf;
 }
 
 =head2 WriteBlocks
@@ -396,31 +381,29 @@ Returns the position of the header in the output stream.
 
 sub WriteBlocks {
   my $Self = shift;
-  my $string = shift;
+  my $buf = shift;
   my $nblocks = shift || 1;
 
   my $bytes = BLOCKSIZE * $nblocks;
 
   unless ($Self->{outfh}) {
-    die "Attempt to write without output filehandle";
+    die "Attempt to write without output filehandle\n";
   }
   my $pos = $Self->{outpos};
 
   # make sure we've got $nblocks times BLOCKSIZE bytes to write
-  if (length($string) > $bytes) {
-    $string = substr($string, 0, $bytes);
-  }
-  elsif (length($string) < $bytes) {
-    $string .= "\0" x ($bytes - length($string));
+  if (length($buf) < $bytes) {
+    $buf .= "\0" x ($bytes - length($buf));
   }
 
-  while ($bytes > 0) {
-    my $n = syswrite($Self->{outfh}, $string, $bytes, (BLOCKSIZE * $nblocks) - $bytes);
+  my $bufpos = 0;
+  while ($bufpos < $bytes) {
+    my $n = syswrite($Self->{outfh}, $buf, $bytes - $bufpos, $bufpos);
     unless ($n) {
       delete $Self->{outfh};
-      die "Failed to write full block at $Self->{outpos}";
+      die "Failed to write full block at $Self->{outpos}\n";
     }
-    $bytes -= $n;
+    $bufpos += $n;
     $Self->{outpos} += $n;
   }
 
@@ -568,7 +551,6 @@ in %extra to make sure they're all known keys.
 
 sub BlankHeader {
   my $Self = shift;
-
   my %hash = (
     name => '',
     mode => 0777,
@@ -584,7 +566,6 @@ sub BlankHeader {
     devminor => 0,
     prefix => '',
   );
-
   my %overrides = @_;
   foreach my $key (keys %overrides) {
     if (exists $hash{$key}) {
@@ -678,8 +659,7 @@ sub DumpBytes {
   my $Self = shift;
   my $bytes = shift;
   while ($bytes > 0) {
-    my $n = int($bytes / BLOCKSIZE);
-    $n = 16  if $n > 16;
+    my $n = min(1 + int(($bytes-1) / BLOCKSIZE), BLOCKCOUNT);
     my $dump = $Self->ReadBlocks($n);
     $bytes -= length($dump);
   }
@@ -699,11 +679,9 @@ files together.
 
 sub FinishTar {
   my $Self = shift;
-  $Self->WriteBlocks("\0" x 512);
-  $Self->WriteBlocks("\0" x 512);
-  $Self->WriteBlocks("\0" x 512);
-  $Self->WriteBlocks("\0" x 512);
-  $Self->WriteBlocks("\0" x 512);
+  # add 5 blocks of all zero - this seems to be expected by gnutar and it will complain
+  # if they're not there
+  $Self->WriteBlocks("", 5);
 }
 
 =head2 CopyToTempFile
@@ -722,9 +700,9 @@ sub CopyToTempFile {
 
   my $TempFile = File::Temp->new();
   while ($bytes > 0) {
-    my $n = 1 + int(($bytes - 1) / BLOCKSIZE);
-    $n = 16  if $n > 16;
+    my $n = min(1 + int(($bytes - 1) / BLOCKSIZE), BLOCKCOUNT);
     my $dump = $Self->ReadBlocks($n);
+    die "Failed to read $n blocks for $bytes at $Self->{inpos}\n" unless defined $dump;
     $dump = substr($dump, 0, $bytes) if length($dump) > $bytes;
     $TempFile->print($dump);
     $bytes -= length($dump);
@@ -747,25 +725,94 @@ sub CopyFromFh {
   my $Self = shift;
   my $Fh = shift;
   my $bytes = shift;
+  my $buf = shift // '';
+  my $pos = shift // 0;
 
-  my $buf;
-  while ($bytes > 0) {
-    my $thistime = $bytes > BLOCKSIZE ? BLOCKSIZE : $bytes;
-    my $block = '';
-    while ($thistime) {
-      my $n = sysread($Fh, $buf, $thistime);
-      unless ($n) {
-        die "Failed to read entire file, doh ($bytes remaining)!\n";
-      }
-      $thistime -= $n;
-      $block .= $buf;
+  my $tocopy = $bytes + $pos;
+
+  while ($pos < $tocopy) {
+    my $chunk = min($tocopy - $pos, BUFSIZE);
+    my $n = sysread($Fh, $buf, $chunk, $pos);
+    unless ($n) {
+      die "Failed to read $chunk bytes from input fh at at $pos\n";
     }
-    if (length($block) < BLOCKSIZE) {
-      $block .= "\0" x (BLOCKSIZE - length($block));
+    $pos += $n;
+
+    # if we're done, write including padding
+    if ($pos == $tocopy) {
+      my $nblocks = 1 + int(($pos-1) / BLOCKSIZE);
+      $Self->WriteBlocks($buf, $nblocks);
+      return;
     }
-    $Self->WriteBlocks($block);
-    $bytes -= BLOCKSIZE;
+
+    # if we have any full blocks, write them out
+    my $nblocks = int($pos / BLOCKSIZE);
+    if ($nblocks) {
+      $Self->WriteBlocks($buf, $nblocks);
+      # keep any partial blocks
+      my $written = $nblocks * BLOCKSIZE;
+      $buf = substr($buf, $written);
+      $pos -= $written;
+      $tocopy -= $written;
+    }
   }
+
+  die "Finished copying without writing everything\n";
+}
+
+=head2 WriteFromFh
+
+   $ts->WriteFromFh($fh, $header);
+
+Adds the header and then calls CopyFromFh with the data from the
+filehandle
+
+=cut
+
+sub WriteFromFh {
+  my $Self = shift;
+  my $Fh = shift;
+  my $header = shift;
+
+  my $pos = $Self->{outpos};
+
+  my $block = $Self->CreateHeader($header);
+  $Self->CopyFromFh($Fh, $header->{size}, $block, BLOCKSIZE);
+
+  return( {%$header, _pos => $pos} );
+}
+
+=head2 WriteCopy
+
+   $ts->WriteCopy($header);
+
+Streams the record which matches the given header directly from the input
+stream to the output stream.
+
+=cut
+
+sub WriteCopy {
+  my $Self = shift;
+  my $header = shift;
+
+  my $pos = $Self->{outpos};
+
+  my $block = $Self->CreateHeader($header);
+  my $hn = 1;
+
+  my $bytes = $header->{size};
+  while ($bytes > 0) {
+    my $n = min(1 + int(($bytes-1) / BLOCKSIZE), BLOCKCOUNT);
+    my $dump = $Self->ReadBlocks($n);
+    die "Failed to read $n blocks for $bytes at $Self->{inpos}\n" unless defined $dump;
+    $Self->WriteBlocks($block . $dump, $hn + $n);
+    $bytes -= length($dump);
+    # only write header on the first time;
+    $block = '';
+    $hn = 0;
+  }
+
+  return( {%$header, _pos => $pos} );
 }
 
 =head1 TARHEADER format

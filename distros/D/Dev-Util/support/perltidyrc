@@ -1,0 +1,78 @@
+# I/O control
+--add-terminal-newline
+--character-encoding=utf8
+--iterations=2
+--output-line-ending=unix
+
+--perl-best-practices -nst -nse
+
+# Basic formatting options
+--indent-columns=4
+--maximum-line-length=78
+--no-tabs
+--variable-maximum-line-length
+
+# Code indentation control
+--closing-brace-indentation=1
+--closing-paren-indentation=1
+--closing-square-bracket-indentation=1
+--continuation-indentation=4
+--extended-continuation-indentation
+--line-up-parentheses
+--extended-line-up-parentheses
+--nooutdent-long-quotes
+--nooutdent-labels
+
+# Whitespace control
+--add-semicolons
+--block-brace-tightness=0
+--brace-tightness=0
+--delete-semicolons
+--extended-block-tightness
+--logical-padding
+--paren-tightness=1
+--no-space-for-semicolon
+--square-bracket-tightness=1
+--square-bracket-vertical-tightness=2
+--square-bracket-vertical-tightness-closing=0
+--trim-qw
+--valign-signed-numbers
+
+# Comment controls
+--static-block-comments
+
+# Linebreak controls
+--add-newlines
+--vertical-tightness=2
+--vertical-tightness-closing=0
+--brace-vertical-tightness=2
+--brace-vertical-tightness-closing=0
+--no-cuddled-else
+--delete-old-newlines
+--paren-vertical-tightness=0
+--paren-vertical-tightness-closing=0
+
+# Controlling list formatting
+--comma-arrow-breakpoints=1
+--closing-token-indentation=1
+
+# Retaining or ignoring existing line breaks
+--nobreak-at-old-ternary-breakpoints
+
+# Blank line control
+--blanks-before-subs
+--blanks-before-comments
+--blanks-before-blocks
+
+# Other controls
+--add-missing-else
+--add-missing-else-comment='##FIXME - added with perltidy -ame'
+--warn-missing-else
+
+--nobreak-at-old-comma-breakpoints
+# --maximum-fields-per-table=4
+
+
+
+
+

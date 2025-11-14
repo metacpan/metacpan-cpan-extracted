@@ -1,4 +1,4 @@
-[![Actions Status](https://github.com/kaz-utashiro/App-Greple-xlate/actions/workflows/test.yml/badge.svg)](https://github.com/kaz-utashiro/App-Greple-xlate/actions)
+[![Actions Status](https://github.com/kaz-utashiro/App-Greple-xlate/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/kaz-utashiro/App-Greple-xlate/actions?workflow=test)
 # NAME
 
 App::Greple::xlate - translation support module for greple
@@ -15,7 +15,7 @@ App::Greple::xlate - translation support module for greple
 
 # VERSION
 
-Version 0.9914
+Version 0.9915
 
 # DESCRIPTION
 

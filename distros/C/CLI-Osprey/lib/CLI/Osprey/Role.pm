@@ -9,16 +9,21 @@ use Module::Runtime 'use_module';
 use CLI::Osprey::Descriptive;
 
 # ABSTRACT: Role for CLI::Osprey applications
-our $VERSION = '0.08'; # VERSION
+our $VERSION = '0.09'; # VERSION
 our $AUTHORITY = 'cpan:ARODLAND'; # AUTHORITY
 
 sub _osprey_option_to_getopt {
   my ($name, %attributes) = @_;
-  my $getopt = join('|', grep defined, ($name, $attributes{short}));
+
+  # Use custom option name if provided, otherwise use attribute name
+  my $option_name = $attributes{option} || $name;
+
+  my $getopt = join('|', grep defined, ($option_name, $attributes{short}));
   $getopt .= '+' if $attributes{repeatable} && !defined $attributes{format};
   $getopt .= '!' if $attributes{negatable};
   $getopt .= '=' . $attributes{format} if defined $attributes{format};
   $getopt .= '@' if $attributes{repeatable} && defined $attributes{format};
+
   return $getopt;
 }
 
@@ -29,6 +34,10 @@ sub _osprey_prepare_options {
   my %abbreviations;
   my %fullnames;
 
+  # If options have an 'order' attr, use it; those without sort as though they were 9,999.
+  # If the order is equal (or not present on both) and the 'added_order' config flag is set,
+  # then sort according to added_order.
+  # Otherwise, sort according to option name.
   my @order = sort {
     ($options->{$a}{order} || 9999) <=> ($options->{$b}{order} || 9999)
     || ($config->{added_order} ? ($options->{$a}{added_order} <=> $options->{$b}{added_order}) : 0)
@@ -66,7 +75,7 @@ sub _osprey_prepare_options {
     if ($config->{abbreviate}) {
       for my $len (1 .. length($name) - 1) {
         my $abbreviated = substr $name, 0, $len;
-        push @{ $abbreviations{$abbreviated} }, $name unless exists $fullnames{$abbreviated};
+        push @{ $abbreviations{$abbreviated} }, $option unless exists $fullnames{$abbreviated};
       }
     }
   }
@@ -74,6 +83,15 @@ sub _osprey_prepare_options {
   return \@getopt, \%abbreviations;
 }
 
+# Process ARGV, rewriting options to be what GLD expects them to be.
+# We only want to rewrite things that GLD will be happy about, because it would be
+# bad to have GLD generate an error about something being invalid, if it isn't
+# actually something that the user typed!
+# Stuff that's done here:
+# * Rewrite abbreviations to their equivalent full names.
+# * Rewrite options that were aliased with 'option' or the default underscore-to-dash
+#   rewriting, to their canonical name (the same as the attribute name).
+# * Recognize '--foo=bar' options and replace them with '--foo bar'.
 sub _osprey_fix_argv {
   my ($options, $abbreviations) = @_;
 
@@ -95,6 +113,13 @@ sub _osprey_fix_argv {
 
     my $option_name;
     
+    # If this is a long option and abbreviations are enabled, search the abbreviation table
+    # for options that match the prefix. If the result is unique, use it. If the result is
+    # ambiguous, set $option_name undef so that eventually we will generate an "unknown option"
+    # error for it. Prefixes that exactly match an option name are excluded from the table, so
+    # that assuming that 'foo' and 'foobar' are both options, '--fo' will be ambiguous,
+    # '--foo' will be unambiguously 'foo' (*not* an error even though there are in fact two
+    # optiions that start with 'foo'), and '--foob' will be 'foobar'.
     if ($dash eq '--') {
       my $option_names = $abbreviations->{$arg_name_without_dash};
       if (defined $option_names) {
@@ -107,9 +132,12 @@ sub _osprey_fix_argv {
       }
     }
 
+    # $option_name is the attribute name (underscored) from abbreviations table
+    # We need to get the actual CLI option name for the rewritten ARGV
     my $arg_name = ($dash || '') . ($negative || '');
     if (defined $option_name) {
-      $arg_name .= $option_name;
+      # Use the custom option name from the options hash if possible
+      $arg_name .= $options->{$option_name}{option} || $option_name;
     } else {
       $arg_name .= $arg_name_without_dash;
     }
@@ -254,7 +282,15 @@ sub parse_options {
   my %parsed_params;
 
   for my $name (keys %options, qw(h help man)) {
-    my $val = $opt->$name();
+    # Getopt::Long converts hyphens to underscores; Getopt::Long::Descriptive uses these as method names
+    # For custom option names, we need to retrieve using the option name, not attribute name
+    my $method_name = $name;
+    if (exists $options{$name} && exists $options{$name}{option}) {
+      $method_name = $options{$name}{option};
+      $method_name =~ tr/-/_/;  # Convert hyphens to underscores to match Getopt::Long's conversion
+    }
+
+    my $val = $opt->$method_name();
     $parsed_params{$name} = $val if defined $val;
   }
 
@@ -349,7 +385,7 @@ CLI::Osprey::Role - Role for CLI::Osprey applications
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 AUTHOR
 
@@ -357,7 +393,7 @@ Andrew Rodland <arodland@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Andrew Rodland.
+This software is copyright (c) 2025 by Andrew Rodland.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

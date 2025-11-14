@@ -1,5 +1,9 @@
 Revision history for RT-Extension-FormTools
 
+2.03 2025-11-13
+ - Fix issue where conditionally shown fields would not be required when shown but configured as required
+ - Add callback for additional validation (Thanks Grant Emsley)
+
 2.02 2025-08-21
  - Update html attributes and classes for RT 6
 

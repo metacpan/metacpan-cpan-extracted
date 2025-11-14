@@ -1,12 +1,12 @@
 package Sim::OPT::Interlinear;
 # NOTE: TO USE THE PROGRAM AS A SCRIPT, THE LINE ABOVE SHOULD BE DELETED.
 # Author: Gian Luca Brunetti, Politecnico di Milano. (gianluca.brunetti@polimi.it)
-# Copyright reserved.  2018-2025.
+# Copyright reserved.  2018-2024.
 # GPL License 3.0 or newer.
 # This is a program for filling a design space multivariate discrete dataseries
 # through a strategy entailing distance-weighting the nearest-neihbouring gradients.
 
-# use v5.14;
+use v5.14;
 use Math::Round;
 use List::Util qw( min max reduce shuffle any );
 use Statistics::Basic qw(:all);
@@ -17,11 +17,9 @@ use List::AllUtils qw(sum);
 use Data::Dump qw(dump);
 use IO::Tee;
 use feature 'say';
-use Switch::Back;
-use feature 'smartmatch';
-no warnings 'experimental::smartmatch';
 no strict;
 no warnings;
+use Switch::Back;
 
 use Sim::OPT;
 use Sim::OPT::Morph;
@@ -34,7 +32,7 @@ use Sim::OPT::Parcoord3d;
 
 our @ISA = qw( Exporter );
 our @EXPORT = qw( interlinear, interstart prepfactlev tellstepsize );
-$VERSION = '0.195';
+$VERSION = '0.191';
 $ABSTRACT = 'Interlinear is a program for building metamodels from incomplete multivariate discrete dataseries on the basis of nearest-neighbouring gradients weighted by distance.';
 
 #######################################################################
@@ -112,7 +110,7 @@ sub diff_OLD
   my @int = get_intersection( \@aa, \@bb );
   foreach my $el ( @aa )
   {
-    if ( not ($_ ~~ @int) )
+    if ( not ( $_ ~~ @int ) )
     #if ( not ( any { $_ eq $el } @int ) )
     {
       push ( @difference, $_ );
@@ -751,7 +749,7 @@ sub wei
     my %bank;
 
     my @newneighbours;
-    if ("flat" ~~ @modality)
+    if ( "flat" ~~ @modality )
     {
       foreach my $e ( @arra )
       {
@@ -763,7 +761,7 @@ sub wei
     {
       if ( ( $el->[2] ne "" ) and ( $el->[3] >= $minimumcertain ) )
       {
-        unless ("bankflat" ~~ @modality)
+        unless ( "bankflat" ~~ @modality )
         {
           if ( scalar( @{ $nears{$el->[0]}{neighbours} } ) == 0 )
           {
@@ -969,7 +967,7 @@ sub wei
     {
       my @els = split( "-", $trio );
       my $first = $els[0];
-      unless ( ( $message eq "principal" ) and ($first ~~ @recedes) )
+      unless ( ( $message eq "principal" ) and ( $first ~~ @recedes ) )
       {
         my ( @grads, @ordists, @dists, @strengths );
         unless( ( $bank{$trio}{grad} eq "" ) or ( $bank{$trio}{ordists} eq "" )
@@ -1027,7 +1025,7 @@ sub wei
       {
         my @splits = split( "-", $trio );
         my $num = $splits[0];
-        if ($num ~~ @parsws)
+        if ( $num ~~ @parsws )
         {
           push ( @{ $bank{$trio}{orderedtrio} }, @{ $weldbank{$trio}{orderedtrio} } );
           push ( @{ $bank{$trio}{grad} }, @{ $weldbank{$trio}{grad} } );
@@ -1123,7 +1121,7 @@ sub wei
     my $coun = 0;
 
     my @newneighbours;
-    if ("flat" ~~ @modality)
+    if ( "flat" ~~ @modality )
     {
       foreach my $e ( @arrb )
       {
@@ -1139,7 +1137,7 @@ sub wei
       {
         my @neighbours;
 
-        unless ("flat" ~~ @modality)
+        unless ( "flat" ~~ @modality )
         {
           if ( scalar( @{ $nears{$el->[0]}{neighbours} } ) == 0 )
           {
@@ -1229,7 +1227,7 @@ sub wei
                             if ( $da1[$c] == $da2[$i] )
                             {
                               my $diffpar = abs( $e - $ei );
-                             ###################if ( ( ${ $bank{$newtrio}{orstring} }[grep { $_ eq $cn] } @neighbours ) ) and ( $diffpar <= $minreq_forgrad->[1] ) and ( $diffpar > 0 ) ) ############################HERE
+                             ###################if ( ( ${ $bank{$newtrio}{orstring} }[$cn] ~~ @neighbours ) ) and ( $diffpar <= $minreq_forgrad->[1] ) and ( $diffpar > 0 ) ) ############################HERE
                               if ( ( $diffpar <= $minreq_forgrad->[1] ) and ( $diffpar > 0 ) ) ###DDD!!! TAKE CARE, IT WAS: if ( ( $diffpar <= $minreq_forgrad->[1] ) and ( $diffpar > 0 ) )
                               {
                                 push ( @factbag, $fact );
@@ -1421,7 +1419,7 @@ sub wei
 
   my ( $wand_ref, $nears_ref );
 
-  if ( not ("simple" ~~ @modality) )
+  if ( not ( "simple" ~~ @modality ) )
   {
     ( $wand_ref, $nears_ref ) = cyclearr( \@arr__, $minreq_forinclusion, $minreq_forgrad, \%bank, \%factlevels, $nfiltergrads,
       \@arrb, $first0, $last0, \%nears, $limitgrads, $limitpoints, \@modality );
@@ -1895,7 +1893,7 @@ sub prepfactlev_delete
       }
       else
       {
-        #if ($head ~~ @blockelts)
+        #if ( $head ~~ @blockelts )
         if ( any { $_ eq $head } @blockelts )
         {
           $hsh{pairs}{$head} = $tail;
@@ -2317,63 +2315,120 @@ Sim::OPT::Interlinear
 =head1 DESCRIPTION
 
 
-Sim::OPT::Interlinear is a program devoted to metamodelling — the reconstruction of missing data in multivariate series. It operates by estimating the values of unsimulated instances through distance-weighted interpolation of local rates of change. In simple terms, it examines how known data points differ from one another and uses those differences to infer the shape of the design space where information is missing.
+Interlinear is a program for metamodelling the missing instance values in multivariate datasieries by distance-weighting the nearest-neihbouring gradients between points.
+The strategy weights the known gradients in a manner inversely proportional to the distance between the points they are taken from to the missing nearest-neighbouring points they are going to be used for. It is a zero-order instance-based method. In it, the space curvatures are reconstructed by utilizing a local sample of the near-neighbouring gradients. The method has been presented in the following publication: L<Gian Luca Brunetti (2020). “Increasing the efficiency of simulation-based design explorations via metamodelling”. Journal of Building Performance Simulation, 13:1, pp. 79-99. DOI: 10.1080/19401493.2019.1707875|http://doi.org/10.1080/19401493.2019.1707875>, where is has been named Distance-Weighted Gradient Network (DWGN), and has been shown capable of outperforming the Kriging method, the MARS method, and polynomial methods.
+The DWGN is active by default when calling Intelinear. Another version of the procedure, in which the derived points are calculated on a global rather than a local basis, allowing faster computations, but entailing less accurate results, can be activated by setting @modality = ( "simple" ) in the configuration file.
+Besides strategies the DWGN and the DWGN-simple, two alternative metamodelling strategies can be utilized in Interlinear: pure linear interpolation (one may want to use this just in some occasions: for example, on factorials), and pure nearest neighbour (a strategy of last resort: one may want to use a pass of it to unlock a computation which is based on data which are too sparse to proceed, or when nothing else works).
 
-The method at its core is the Distance-Weighted Rate-of-Change Network (DWGN), first described in Gian Luca Brunetti’s paper “Increasing the efficiency of simulation-based design explorations via metamodelling” (Journal of Building Performance Simulation, 13:1, pp. 79–99, 2020; DOI: 10.1080/19401493.2019.1707875
-). DWGN belongs to the family of zero-order, instance-based methods: it makes no global assumption about the mathematical form of the underlying function. Instead, it reconstructs local curvatures by weighting the known rates of change inversely to their distance from the points being estimated. In comparative tests it has outperformed classical techniques such as Kriging, MARS, and polynomial regression, particularly when handling irregularly distributed samples.
+The DWGN and the DWGN-simple work preferentially on the basis of group of samples that are adjacent in the design space. For example, it does not like to work with only the gradients between a certain iteration 1 and the corresponding iteration 3. It likes to work with the gradient between iterations 1 and 2, or 2 and 3. For that reason, it does not work well with data evenly distributed in the design space, like those deriving from latin hypercube sampling, or a random sampling; and works well with data clustered in small patches, like those deriving from star sampling strategies, or from coordinate descent, or block coordinate descent, or overlapping block coordinate descent.
+To work well with a latin hypercube sampling, it may be necessary to include a pass of pure linear interpolation or pure nearest neighbour before calling the DWGN. Then the DWGN will charge itself of reducing the errors created by that initial pass. As an alternative, in the DWGN, the third element of the variable $minreq_forgrad in the configuration file (which is, by default, "confinterlinear.pl") may be set to more than 1: for example $minreq_forgrad = [1, 1, 2]. This makes not only the nearest-neighbouring samples be taken into account in the calculations, but also the 2nd-nearest, or the nth-nearest.
 
-By default, Interlinear activates DWGN automatically. A simplified global version, DWGN-simple, is also available. It sacrifices some local accuracy for greater speed and can be selected by setting @modality = ("simple") in the configuration file. Two additional strategies can be invoked: a pure linear interpolation—useful on factorial grids—and a pure nearest-neighbour method, intended as a fallback when the dataset is too sparse for more refined approaches.
+A configuration file should be prepared following the example in the "examples" folder in this distribution.
+If the configuration file is incomplete or missing, the program will adopt its own defaults, exploiting the distance-weighted gradient-based strategy a1.
+The only variable that must mandatorily be specified in a configuration file is $sourcefile: the Unix path to the source file containining the dataseries. The source file has to be prepared by listing in each column the values (levels) of the parameters (factors, variables), putting the objective function valuesin the last column in the last column, at the rows in which they are present.
 
-DWGN and DWGN-simple work best when the available samples are locally clustered, as happens in star, coordinate-descent, or overlapping-block explorations. They are less effective with uniformly scattered points, such as those produced by Latin hypercube or random sampling. For such cases, a preliminary pass of linear or nearest-neighbour interpolation can be used to seed the data before DWGN refinement. Alternatively, in DWGN the third element of the variable $minreq_forgrad in the configuration file (by default confinterlinear.pl) can be set above 1—e.g. $minreq_forgrad = [1,1,2]—to make the algorithm also consider the second-nearest, third-nearest, and so on, neighbouring samples.
+The parameter number is given by the position of the column (i.e. column 4 host parameter 4).
 
-A configuration file should follow the examples provided in the package’s examples directory. When incomplete or absent, Interlinear automatically uses default settings and applies the DWGN strategy. The only mandatory variable is $sourcefile, which gives the Unix path to the input data file. Each column in this file represents a parameter, and the last column contains the objective-function values.
+Here below is an example of multivatiate dataseries of 3 parameters assuming 3 levels each. The numbers preceding the objective function (which is in the last colum) are the indices of the multidimensional matrix (tensor).
 
-For example, a dataset with three parameters and up to three levels per parameter may appear as:
 
 1,1,1,1,1.234
+
 1,2,3,2,1.500
+
+1,3,3,3
+
 2,1,3,1,1.534
+
 2,2,3,2,0.000
+
 2,3,3,1,0.550
+
+3,1,3,1
+
 3,2,3,2,0.670
 
-
-Interlinear converts this conventional tabular form into Sim::OPT’s tensor-based notation:
-
-1-1_2-1_3-1,1.234
-1-2_2-3_3-2,1.500
-2-1_2-3_3-1,1.534
-2-2_2-3_3-2,0.000
-2-3_2-3_3-1,0.550
-3-2_2-3_3-2,0.670
+3,3,3,3
 
 
-Only the objective-function entries may be missing; the parameter listings must be complete if Interlinear is used without Sim::OPT. After computation, Interlinear outputs a new dataset with all missing values filled in. The completed series can then be passed to OPT for block optimization, greatly reducing the number of expensive simulations required—especially useful when each run demands substantial computational time, such as in CFD-based building analyses.
-
-Because the computational load of metamodelling grows exponentially with the number of samples, Interlinear provides limiters to keep the process tractable. The parameters $nfiltergrads, $limit_checkdistgrads, and $limit_checkdistpoints control, respectively, the number of original rate-of-change samples, derived rate-of-change relations, and derived points considered in each pass. When left blank, no limits are imposed; typical values might be twice the square root of the total number of samples for $nfiltergrads, and one-fifth or one-tenth of that total for the two distance limits.
-
-Interlinear can also weld two related problem-space models together, provided they share the same parametric structure. This operation, described in Brunetti’s article “Grafting of design-space models onto models of different scope or resolution” (Journal of Building Performance Simulation, 13:3, pp. 227–246, 2020; DOI: 10.1080/19401493.2020.1712477
-), merges datasets on a neighbour-by-neighbour basis rather than by simple averaging, producing a continuous, reconciled design space. Its behaviour is set in the configuration file through the arrays @weldsprepared, @parswelds, and @recedes, which define, respectively, the path to the secondary dataset, the parameters involved, and the directions along which the first dataset yields precedence to the second.
-
-Interlinear can be called directly from Perl with:
-
-use Sim::OPT::Interlinear;
-Sim::OPT::Interlinear::interlinear("./sourcefile.csv", "./confinterlinear.pl", "./obtainedmetamodel.csv");
+The program converts this format into the one preferred by Sim::OPT, which is the following:
 
 
-When run as a script, one may also execute:
+1-1_2-1_3-1,9.234
 
-perl ./Interlinear.pm . "./sourcefile.csv" "./confinterlinear.pl"
+1-1_2-2_3-2,4.500
+
+1-1_2-3_3-3
+
+1-2_2-1_3-1,7.534
+
+1-2_2-2_3-2,0.000
+
+1-2_2-3_3-3,0.550
+
+1-3_2-1_3-1
+
+1-3_2-2_3-2,0.670
+
+1-3_2-3_3-3
 
 
-or simply start an interactive session with
+(((Note that the parameter listings cannot be incomplete if Interlinear is to be involved without involving Sim::OPT. Just the objective function entries can be incomplete. The following series, for example, is a version of the series above, incomplete as regards the parameter listings:
 
-./Interlinear.pm interstart
+1-1_2-1_3-1,9.234
+
+1-1_2-2_3-2,4.500
+
+1-2_2-1_3-1,7.534
+
+1-2_2-2_3-2,0.000
+
+1-2_2-3_3-3,0.550
+
+1-3_2-2_3-2,0.670
+
+How to involve Sim::OPT is dealt with at the end of this document.)))
 
 
-Once executed, Interlinear produces a completed data series that Sim::OPT can immediately use for further optimization. A minimal workflow therefore consists of preparing a configuration file (for instance, by adapting caravantrial.pl in the examples folder), copying the .csv dataset and the launcher opt into the working directory, and starting the search with ./opt.
+After some computations, Interlinear will output a new dataseries with the missing values filled in.
+This dataseries can be used by OPT for the optimization of one or more blocks. This can be useful, for example, to save computations in searches involving simulations, especially when the time required by each simulations is long, like it may happen with CFD simulations in building design.
 
-Sim::OPT::Interlinear thus acts as the intelligent bridge between sparse simulation data and full optimization, reconstructing the hidden surfaces of the design space through the careful weighting of local rates of change—a process that turns scattered results into a continuous, intelligible landscape ready for exploration.
+The number of computations required for the creation of a metamodel in OPT increases exponentially with the number of instances in the metamodel. To reduce the exponential, a limit has to be set for the size of the net of instances taken into account in the computations for gradients and for points. The variables in the configuration files controlling those limits are "$nfiltergrads", a limit with adaptive effects (putting a ceiling to the number of originary gradients utilized to derive the points), as well as "$limit_checkdistgrads" and "$limit_checkdistpoints" (putting a limit to the number of derived gradients and points from which the calculations are further propagated at each computation pass). By default they are unspecified. If they are unspecified (i.e. a null value ("") is specified for them), no limit is assumed. "$nfiltergrads" may be set to the double of the square root of the number of instances of a problem space. "$limit_checkdistgrads" and "$limit_checkdistpoints" may be set to a part of the total number of instances, for example that number divided by 1/5, or 1/10. "$limit_checkdistgrads" and "$limit_checkdistpoints" may be given the same value. An example of configuration file with more information in the comments is embedded in this source code, where it sets the defaults.
+
+By utilizing the metamodelling procedure at point (a), Interlinear can also weld two related problem space models together, provided that they share the same parametric structure. This welding is not a mere merge. It is a neighbour-by-neighbour action, much wholler and, yes, cooler. The procedure has been presented in the following publication: L<Gian Luca Brunetti (2020). “Grafting of design-space models onto models of different scope or resolution”. Journal of Building Performance Simulation, 13:3, pp. 227-246. DOI: 10.1080/19401493.2019.1707875
+|http://doi.org/10.1080/19401493.2020.1712477>. The action of procedure is controlled by the following settings in the configuration file:
+1) @weldsprepared = ( "/home/luca/ffexpexps_full/minmissionsprep.csv" ); #The path to the second dataseries.
+2) @parswelds = ( [ 1, 4 ] ); #The parameter numbers of which the welding action has to take place.
+3) @recedes = ( 1, 4 ); #This signals with respect to which parameters the first dataseries gives way to the second. (Otherwise, the obtained points would be averaged one-to-one with those of first dataseries. Usually you do not want that.)
+
+To call Interlinear as a Perl function (best strategy):
+re.pl # open Perl shell
+use Sim::OPT::Interlinear; # load Interlinear
+Sim::OPT::Interlinear::interlinear( "./sourcefile.csv", "./confinterlinear.pl", "./obtainedmetamodel.csv" );
+"confinterlinear.pl" is the configuration file. If that file is an empty file, Interlinear will assume the default file names above.
+"./sourcefile.csv" is the only information which is truly mandatory: the path to the csv dataseries to be completed.
+If is not specified,
+
+To use Interlinear as a script from the command line:
+perl ./Interlinear.pm . "./sourcefile.csv" "./confinterlinear.pl ";
+(Note the dot within the line.) Again, if "./sourcefile.csv" is not specified, the default file "./sourcefile.csv" will be sought.
+
+Or to begin with a dialogue question:
+./Interlinear.pm interstart;
+.
+
+The minimal operations for utilizing a data series which is incomplete as regards the parameter listings are the following:
+
+1) copy the executable "opt" in the work folder;
+
+2) create a configuration file for Sim::OPT by modifying the "caravantrial.pl" file in the "examples" folder of this distribution (it is sufficient to modify the few values signalled by capital letters in the comments) and place it in the work folder;
+
+4) copy the .csv file in the work folder;
+
+5) launch Sim::OPT in the shell: << ./opt >>;
+
+6) when asked, specify the name (with relative path) of the Sim::OPT configuration file. For example:
+./filename.pl .
 
 
 =head2 EXPORT

@@ -1,9 +1,9 @@
 package Sim::OPT::Descend;
-# Copyright (C) 2008-2025 by Gian Luca Brunetti and Politecnico di Milano.
+# Copyright (C) 2008-2022 by Gian Luca Brunetti and Politecnico di Milano.
 # This is the module Sim::OPT::Descend of Sim::OPT, a program for detailed metadesign managing parametric explorations through the ESP-r building performance simulation platform and performing optimization by block coordinate descent.
 # This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
-# use v5.14;
+use v5.14;
 # use v5.20;
 
 use Exporter;
@@ -20,16 +20,13 @@ use Data::Dump qw(dump);
 use Data::Dumper;
 use IO::Tee;
 use feature 'say';
-use Switch::Back;
-use feature 'smartmatch';
-no warnings 'experimental::smartmatch';
-
 use Sim::OPT;
 use Sim::OPT::Morph;
 use Sim::OPT::Sim;
 use Sim::OPT::Report;
 use Sim::OPT::Takechance;
 use Sim::OPT::Interlinear;
+use Switch::Back;
 
 $Data::Dumper::Indent = 0;
 $Data::Dumper::Useqq  = 1;
@@ -43,7 +40,7 @@ no warnings;
 #@EXPORT   = qw(); # our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw( descend prepareblank tee ); # our @EXPORT = qw( );
 
-$VERSION = '0.169'; # our $VERSION = '';
+$VERSION = '0.165'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Descent is an module collaborating with the Sim::OPT module for performing block coordinate descent.';
 
 #########################################################################################
@@ -956,7 +953,7 @@ sub descend
         my @blockelts = @{ $blockelts_r };
         foreach my $key ( sort ( keys %varns ) )
         {
-          if ( not($key ~~ @blockelts) )
+          if ( not( $key ~~ @blockelts ) )
           {
             $varns{$key} = 1;
           }
@@ -994,7 +991,7 @@ sub descend
         {
           foreach my $key ( sort ( keys( %varnums ) ) )
           {
-            if ( not($key ~~ @blockelts) )
+            if ( not( $key ~~ @blockelts ) )
             {
               $modhs{$key} = $varnums{$key};
               $torecovers{$key} = $carrier{$key};
@@ -1508,7 +1505,7 @@ sub descend
           my $c = 0;
           foreach my $instance ( @{ $vehicles{cumulateall} } )
           {
-            if ( grep { $_ eq $instance->{is} } @reds )
+            if ( $instance->{is} ~~ @reds )
             {
               my @instancees;
               push( @instancees, $instance );
@@ -1664,7 +1661,7 @@ sub descend
           my $c = 0;
           foreach my $instance ( @{ $vehicles{cumulateall} } )
           {
-            if ( grep { $_ eq $instance->{is} } @reds )
+            if ( $instance->{is} ~~ @reds )
             {
               my @instancees;
               push( @instancees, $instance );

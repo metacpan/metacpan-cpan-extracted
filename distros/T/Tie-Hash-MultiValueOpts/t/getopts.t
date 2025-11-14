@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Test::More import => [ qw( BAIL_OUT is is_deeply ok use_ok ) ], tests => 15;
+use Test::More import => [ qw( BAIL_OUT is is_deeply ok use_ok ) ], tests => 18;
 
 use Getopt::Std qw( getopts );
 
@@ -48,7 +48,7 @@ my $expected;
   local @ARGV = qw( -a -b foo -c );
   # https://github.com/Perl/perl5/issues/23906
   # Getopt::Std questionable undefined value bahaviour
-  getopts( 'ab:c:', \%opts );
+  ok !getopts( 'ab:c:', \%opts ), 'getopts fails: switch expected argument, none provided';
   $expected = { 'a' => 1, 'b' => 'foo', 'c' => undef };
   is_deeply( \%opts, $expected, 'getopts: multiple switches; switch expected argument, none provided; value undef' );
   undef %opts;
@@ -56,7 +56,7 @@ my $expected;
 
 {
   local @ARGV = qw( -c );
-  getopts( 'c:', \%opts );
+  ok !getopts( 'c:', \%opts ), 'getopts fails: switch expected argument, none provided';
   $expected = { 'c' => undef };
   is_deeply( \%opts, $expected, 'getopts: single switch; switch expected argument, none provided; value undef' );
   undef %opts;
@@ -64,7 +64,7 @@ my $expected;
 
 {
   local @ARGV = qw( -a -b foo -c );
-  getopts( 'ab:c:', \my %opts );
+  ok !getopts( 'ab:c:', \my %opts ), 'getopts fails: switch expected argument, none provided';
   $expected = { 'a' => 1, 'b' => 'foo', 'c' => undef };
   is_deeply( \%opts, $expected,
     'getopts (scoped): multiple switches; switch expected argument, none provided; value undef' );

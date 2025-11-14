@@ -68,6 +68,8 @@ if ($real_next) {
         push @results, @msg;
     }
 
+    $m->callback( CallbackName => 'AfterValidateCustomFields', ARGSRef => \%request_args, results => \@results );
+
     unless ( @results || ( $request_args{AddMoreAttach} && $request_args{AddMoreAttach} eq 'Add More Files' ) ) {
         # Flag to show validation passed
         $ARGS{'validation_ok'} = 1;

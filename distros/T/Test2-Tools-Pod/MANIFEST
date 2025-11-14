@@ -1,0 +1,14 @@
+Changes
+cpanfile
+lib/Test2/Tools/Pod.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+README.md
+t/00-load.t
+t/01-internals.t
+t/10-single.t
+t/11-all.t
+t/self.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

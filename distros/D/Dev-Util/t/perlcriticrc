@@ -223,7 +223,8 @@ add_packages = Exporter Exporter::Verbose Getopt::Long Getopt::Long::error
 [Variables::RequireLocalizedPunctuationVars]
 allow = $|
 
-
+[Subroutines::ProtectPrivateSubs]
+allow = _get_locks_dir
 
 
 # @ARGV $ARGV

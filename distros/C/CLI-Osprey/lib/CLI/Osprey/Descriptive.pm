@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: Getopt::Long::Descriptive subclass for CLI::Osprey use
-our $VERSION = '0.08'; # VERSION
+our $VERSION = '0.09'; # VERSION
 our $AUTHORITY = 'cpan:ARODLAND'; # AUTHORITY
 
 use Getopt::Long::Descriptive 0.100;
@@ -28,7 +28,7 @@ CLI::Osprey::Descriptive - Getopt::Long::Descriptive subclass for CLI::Osprey us
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 DESCRIPTION
 
@@ -42,7 +42,7 @@ Andrew Rodland <arodland@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Andrew Rodland.
+This software is copyright (c) 2025 by Andrew Rodland.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

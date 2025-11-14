@@ -1,5 +1,8 @@
 Revision history for Dist-Build
 
+0.021     2025-11-14 04:02:43+01:00 Europe/Brussels
+          - Don't generate manpages on systems not supporting man paths
+
 0.020     2025-05-01 14:52:59+02:00 Europe/Brussels
           - No longer install script/ by default
 

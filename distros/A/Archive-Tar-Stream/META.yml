@@ -1,22 +1,29 @@
---- #YAML:1.0
-name:               Archive-Tar-Stream
-version:            0.02
-abstract:           pure perl IO-friendly tar file management
+---
+abstract: 'pure perl IO-friendly tar file management'
 author:
-    - Bron Gondwana <perlcode@brong.net>
-license:            perl
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'Bron Gondwana <perlcode@brong.net>'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    Test::More:  0
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.57_05
+  Digest::SHA: '0'
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Archive-Tar-Stream
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::Temp: '0'
+  List::Util: '0'
+  perl: '5.006'
+resources:
+  repository: https://github.com/brong/Archive-Tar-Stream
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

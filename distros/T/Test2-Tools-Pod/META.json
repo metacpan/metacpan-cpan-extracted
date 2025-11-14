@@ -1,0 +1,52 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Test2-Tools-Pod",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Path::Iterator::Rule" : "1.015",
+            "Path::Tiny" : "0.150",
+            "perl" : "5.042000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tessarin/Test2-Tools-Pod/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/tessarin/Test2-Tools-Pod"
+      }
+   },
+   "version" : "v0.1.0",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

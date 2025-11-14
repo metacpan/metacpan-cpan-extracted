@@ -3,7 +3,7 @@ use strict;
 
 package RT::Extension::FormTools;
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 RT->AddStyleSheets('rt-extension-formtools.css');
 RT->AddJavaScript('rt-extension-formtools.js');

@@ -1,6 +1,10 @@
+Version 0.09: 2025-11-13
+
 Version 0.08: 2020-07-12
   * Fix the mapping of underscores in attribute names to dashes in option
-    names (sivoais again).
+    names (sivoais again). Although this makes things work as documented, and
+    as they were always intended to work, it may be a breaking change if you
+    were relying on old incorrect behavior.
 
 Version 0.07: 2020-07-02
   * Fix inline subcommands, broken by 0.06 (sivoais).
@@ -14,7 +18,7 @@ Version 0.06: 2020-06-30
   * Fix a documentation error regarding preserve_argv (vague666).
 
 Version 0.05: 2020-02-27
-  * Fix "prefer_commandline" import option to work properly (thanks ufoboat).
+  * Fix "prefer_commandline" import option to work properly (thanks ufobat).
   * Use Moo::Role->is_role to check whether we're being used in a role
     (thanks djerius).
   * Add missing methods to CLI::Osprey::Descriptive::Usage

@@ -95,6 +95,9 @@ my $attributes = $public_key->get_attributes([ 'modulus', 'public-exponent' ]);
 note 'modulus: ', unpack('H*', $attributes->{modulus});
 note 'exponent: ', unpack('H*', $attributes->{'public-exponent'});
 
+my $modulus = $public_key->get_attribute('modulus');
+is($modulus, $attributes->{modulus});
+
 $public_key->destroy_object;
 $private_key->destroy_object;
 

@@ -1,0 +1,66 @@
+NAME
+    Test2::Tools::Pod -- check that POD syntax is valid
+
+SYNOPSIS
+        use Test2::V0;
+        use Test2::Tools::Pod;
+
+        # Check a single file
+        pod_ok 'lib/Module.pm';
+
+        # Check all modules in distribution
+        all_pod_ok;
+
+        done_testing;
+
+DESCRIPTION
+    "Test2::Tools::Pod" performs simple POD syntax checks on one or more
+    Perl source files, reporting any parsing errors as test failures. It is
+    built directly on top of Test2::API, making it suitable for projects
+    that use modern Test2-based tooling.
+
+    Parsing and validation are performed using Pod::Simple. Each file is
+    read, parsed, and reported as a separate test.
+
+    The tool is suitable for author tests, continuous integration, or any
+    situation where POD syntax correctness is required without additional
+    diagnostics or formatting checks.
+
+SUBROUTINES
+  pod_ok
+        sub pod_ok ( $file, $name = undef )
+
+    Parses the given file and runs a single test asserting that its POD
+    syntax is valid. The optional $name argument specifies the test name. If
+    omitted, the default name is "POD syntax ok for $file".
+
+    If no POD content is found in the file, the test is skipped.
+
+    Returns "true" if the syntax is OK, "false" otherwise. If no POD was
+    found and the test was skipped, returns undef;
+
+  all_pod_ok
+        sub all_pod_ok ( @locations )
+
+    Recursively searches for Perl files containing POD under @locations,
+    which may include both directories and files. If no locations are
+    provided, it searches the blib directory if it exists, or otherwise lib.
+
+    Files tested include those with extensions .pl, .pm, .pod, .psgi, and
+    .t, as well as any file that begins with a Perl shebang line.
+
+    When scanning directories, "all_pod_ok" automatically skips
+    version-control directories for Git and Mercurial. This list is stored
+    in %Test2::Tools::Pod::Ignore, which you may modify before calling
+    "all_pod_ok" to adjust which directories are ignored.
+
+    Returns the number of files tested.
+
+SEE ALSO
+    Test2, Test2::V0.
+
+AUTHOR
+    Cesar Tessarin, <cesar@tessarin.com.br>.
+
+    Written in November 2025.
+

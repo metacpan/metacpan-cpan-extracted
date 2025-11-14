@@ -2,7 +2,7 @@
 Dev::Util - Utilities useful in the development of perl programs
 
 # VERSION
-Version v2.17.17
+Version v2.18.19
 
 # SYNOPSIS
 
@@ -102,6 +102,15 @@ appended. Directories are backed up by tar and gz.
     my $backup_file = backup('myfile');
     my $backup_dir  = backup('mydir/');
 
+## Dev::Util::Sem
+Module to do Semaphore locking
+
+    use Dev::Util::Sem;
+
+    my $sem = Sem->new('mylock.sem');
+    ...
+    $sem->unlock;
+
 # EXAMPLES
 Example programs demonstrate how the `Dev::Util` modules can be used are in the F<examples> dir.
 
@@ -125,10 +134,6 @@ perldoc command.
 You can also look for information at:
 
 - [RT, CPAN's request tracker (report bugs here)](https://rt.cpan.org/NoAuth/Bugs.html?Dist=Dev-Util)
-
-- [AnnoCPAN: Annotated CPAN documentation](http://annocpan.org/dist/Dev-Util)
-
-- [CPAN Ratings](https://cpanratings.perl.org/d/Dev-Util)
 
 - [Search CPAN](https://metacpan.org/release/Dev-Util)
 

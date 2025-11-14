@@ -1,5 +1,10 @@
 Revision history for Perl extension App-Greple-xlate
 
+0.9915 2025-11-14T01:11:02Z
+
+    - add Arabic document
+    - add llm-openrouter in docker image
+
 0.9914 2025-10-08T11:10:18Z
 
     - add GPT-5 engine support to documentation
