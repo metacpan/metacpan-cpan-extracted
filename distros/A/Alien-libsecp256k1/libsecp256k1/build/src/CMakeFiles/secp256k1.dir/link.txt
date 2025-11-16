@@ -1,0 +1,1 @@
+/usr/bin/cc -fPIC -O2 -g  -shared -Wl,-soname,libsecp256k1.so.5 -o ../lib/libsecp256k1.so.5.0.0 CMakeFiles/secp256k1.dir/secp256k1.c.o CMakeFiles/secp256k1_precomputed.dir/precomputed_ecmult.c.o CMakeFiles/secp256k1_precomputed.dir/precomputed_ecmult_gen.c.o 

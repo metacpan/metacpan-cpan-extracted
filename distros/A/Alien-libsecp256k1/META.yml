@@ -14,7 +14,7 @@ configure_requires:
   Alien::Build::Plugin::Fetch::LocalDir: '0.72'
   ExtUtils::MakeMaker: '6.52'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,15 +29,15 @@ requires:
 resources:
   bugtracker: https://github.com/Perl-Bitcoin/Alien-libsecp256k1/issues
   repository: git://github.com/Perl-Bitcoin/Alien-libsecp256k1.git
-version: '0.060000'
+version: '0.060001'
 x_alienfile:
-  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
+  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.33'
   requires:
     share:
       Alien::Build::Plugin::Gather::IsolateDynamic: '0.48'
       Alien::cmake3: '0.02'
       Config: '0'
     system: {}
-x_generated_by_perl: v5.40.0
-x_serialization_backend: 'YAML::Tiny version 1.74'
+x_generated_by_perl: v5.42.0
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

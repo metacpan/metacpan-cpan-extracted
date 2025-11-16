@@ -1,0 +1,1 @@
+/usr/bin/cc -O2 -g  CMakeFiles/exhaustive_tests.dir/tests_exhaustive.c.o -o ../bin/exhaustive_tests 

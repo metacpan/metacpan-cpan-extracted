@@ -1,5 +1,8 @@
 Revision history for Alien-libsecp256k1
 
+0.060001 - 2025-11-15
+	- libsecp256k1 is now compiled with recoverable signatures module
+
 0.060000 - 2025-03-20
 	- libsecp256k1 is now bundled together with the module (instead of being downloaded from github)
 	- libsecp256k1 version is now v0.6.0

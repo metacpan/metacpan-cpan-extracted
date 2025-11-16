@@ -17,6 +17,7 @@ share {
 			'%{cmake}',
 			@{meta->prop->{plugin_build_cmake}->{args}},
 			'-DBUILD_SHARED_LIBS=OFF',
+			'-DSECP256K1_ENABLE_MODULE_RECOVERY=ON',
 			'-DSECP256K1_VALGRIND=' . ($run_tests ? 'ON' : 'OFF'),
 			'-DSECP256K1_BUILD_TESTS=' . ($run_tests ? 'ON' : 'OFF'),
 			'-DSECP256K1_BUILD_EXHAUSTIVE_TESTS=' . ($run_tests ? 'ON' : 'OFF'),

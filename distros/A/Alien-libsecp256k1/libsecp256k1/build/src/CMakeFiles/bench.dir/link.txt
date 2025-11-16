@@ -1,0 +1,1 @@
+/usr/bin/cc -O2 -g  CMakeFiles/bench.dir/bench.c.o -o ../bin/bench  -Wl,-rpath,/home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/lib ../lib/libsecp256k1.so.5.0.0 

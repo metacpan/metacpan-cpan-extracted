@@ -1,0 +1,423 @@
+The system is: Linux - 5.15.161 - x86_64
+Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
+Compiler: /usr/bin/cc 
+Build flags: 
+Id flags:  
+
+The output was:
+0
+
+
+Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "a.out"
+
+The C compiler identification is GNU, found in "/home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/3.21.4/CompilerIdC/a.out"
+
+Detecting C compiler ABI info compiled with the following output:
+Change Dir: /home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_f6fbd/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_f6fbd.dir/build.make CMakeFiles/cmTC_f6fbd.dir/build
+gmake[1]: Entering directory '/home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_f6fbd.dir/CMakeCCompilerABI.c.o
+/usr/bin/cc   -v -o CMakeFiles/cmTC_f6fbd.dir/CMakeCCompilerABI.c.o -c /usr/share/cmake-3.21/Modules/CMakeCCompilerABI.c
+Reading specs from /usr/lib64/gcc/x86_64-slackware-linux/11.2.0/specs
+COLLECT_GCC=/usr/bin/cc
+Target: x86_64-slackware-linux
+Configured with: ../configure --prefix=/usr --libdir=/usr/lib64 --mandir=/usr/man --infodir=/usr/info --enable-shared --enable-bootstrap --enable-languages=ada,brig,c,c++,d,fortran,go,lto,objc,obj-c++ --enable-threads=posix --enable-checking=release --enable-objc-gc --with-system-zlib --enable-libstdcxx-dual-abi --with-default-libstdcxx-abi=new --disable-libstdcxx-pch --disable-libunwind-exceptions --enable-__cxa_atexit --disable-libssp --enable-gnu-unique-object --enable-plugin --enable-lto --disable-install-libiberty --disable-werror --with-gnu-ld --with-isl --verbose --with-arch-directory=amd64 --disable-gtktest --enable-clocale=gnu --disable-multilib --target=x86_64-slackware-linux --build=x86_64-slackware-linux --host=x86_64-slackware-linux
+Thread model: posix
+Supported LTO compression algorithms: zlib zstd
+gcc version 11.2.0 (GCC) 
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_f6fbd.dir/CMakeCCompilerABI.c.o' '-c' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_f6fbd.dir/'
+ /usr/libexec/gcc/x86_64-slackware-linux/11.2.0/cc1 -quiet -v /usr/share/cmake-3.21/Modules/CMakeCCompilerABI.c -quiet -dumpdir CMakeFiles/cmTC_f6fbd.dir/ -dumpbase CMakeCCompilerABI.c.c -dumpbase-ext .c -mtune=generic -march=x86-64 -version -o /tmp/ccZLbOg3.s
+GNU C17 (GCC) version 11.2.0 (x86_64-slackware-linux)
+	compiled by GNU C version 11.2.0, GMP version 6.2.1, MPFR version 4.1.0, MPC version 1.2.1, isl version isl-0.24-GMP
+
+GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+ignoring nonexistent directory "/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/../../../../x86_64-slackware-linux/include"
+#include "..." search starts here:
+#include <...> search starts here:
+ /usr/lib64/gcc/x86_64-slackware-linux/11.2.0/include
+ /usr/local/include
+ /usr/lib64/gcc/x86_64-slackware-linux/11.2.0/include-fixed
+ /usr/include
+End of search list.
+GNU C17 (GCC) version 11.2.0 (x86_64-slackware-linux)
+	compiled by GNU C version 11.2.0, GMP version 6.2.1, MPFR version 4.1.0, MPC version 1.2.1, isl version isl-0.24-GMP
+
+GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+Compiler executable checksum: ea079ab2d42d4201c0dfe2a35a43a2b8
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_f6fbd.dir/CMakeCCompilerABI.c.o' '-c' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_f6fbd.dir/'
+ as -v --64 -o CMakeFiles/cmTC_f6fbd.dir/CMakeCCompilerABI.c.o /tmp/ccZLbOg3.s
+GNU assembler version 2.37 (x86_64-slackware-linux) using BFD version version 2.37-slack15
+COMPILER_PATH=/usr/libexec/gcc/x86_64-slackware-linux/11.2.0/:/usr/libexec/gcc/x86_64-slackware-linux/11.2.0/:/usr/libexec/gcc/x86_64-slackware-linux/:/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/:/usr/lib64/gcc/x86_64-slackware-linux/:/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/../../../../x86_64-slackware-linux/bin/
+LIBRARY_PATH=/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/:/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/../../../:/lib/:/usr/lib/
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_f6fbd.dir/CMakeCCompilerABI.c.o' '-c' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_f6fbd.dir/CMakeCCompilerABI.c.'
+Linking C executable cmTC_f6fbd
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_f6fbd.dir/link.txt --verbose=1
+/usr/bin/cc  -v CMakeFiles/cmTC_f6fbd.dir/CMakeCCompilerABI.c.o -o cmTC_f6fbd 
+Reading specs from /usr/lib64/gcc/x86_64-slackware-linux/11.2.0/specs
+COLLECT_GCC=/usr/bin/cc
+COLLECT_LTO_WRAPPER=/usr/libexec/gcc/x86_64-slackware-linux/11.2.0/lto-wrapper
+Target: x86_64-slackware-linux
+Configured with: ../configure --prefix=/usr --libdir=/usr/lib64 --mandir=/usr/man --infodir=/usr/info --enable-shared --enable-bootstrap --enable-languages=ada,brig,c,c++,d,fortran,go,lto,objc,obj-c++ --enable-threads=posix --enable-checking=release --enable-objc-gc --with-system-zlib --enable-libstdcxx-dual-abi --with-default-libstdcxx-abi=new --disable-libstdcxx-pch --disable-libunwind-exceptions --enable-__cxa_atexit --disable-libssp --enable-gnu-unique-object --enable-plugin --enable-lto --disable-install-libiberty --disable-werror --with-gnu-ld --with-isl --verbose --with-arch-directory=amd64 --disable-gtktest --enable-clocale=gnu --disable-multilib --target=x86_64-slackware-linux --build=x86_64-slackware-linux --host=x86_64-slackware-linux
+Thread model: posix
+Supported LTO compression algorithms: zlib zstd
+gcc version 11.2.0 (GCC) 
+COMPILER_PATH=/usr/libexec/gcc/x86_64-slackware-linux/11.2.0/:/usr/libexec/gcc/x86_64-slackware-linux/11.2.0/:/usr/libexec/gcc/x86_64-slackware-linux/:/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/:/usr/lib64/gcc/x86_64-slackware-linux/:/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/../../../../x86_64-slackware-linux/bin/
+LIBRARY_PATH=/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/:/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/../../../:/lib/:/usr/lib/
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_f6fbd' '-mtune=generic' '-march=x86-64' '-dumpdir' 'cmTC_f6fbd.'
+ /usr/libexec/gcc/x86_64-slackware-linux/11.2.0/collect2 -plugin /usr/libexec/gcc/x86_64-slackware-linux/11.2.0/liblto_plugin.so -plugin-opt=/usr/libexec/gcc/x86_64-slackware-linux/11.2.0/lto-wrapper -plugin-opt=-fresolution=/tmp/ccxDPfZI.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --eh-frame-hdr -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_f6fbd /usr/lib64/gcc/x86_64-slackware-linux/11.2.0/../../../../lib64/crt1.o /usr/lib64/gcc/x86_64-slackware-linux/11.2.0/../../../../lib64/crti.o /usr/lib64/gcc/x86_64-slackware-linux/11.2.0/crtbegin.o -L/usr/lib64/gcc/x86_64-slackware-linux/11.2.0 -L/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/../../.. CMakeFiles/cmTC_f6fbd.dir/CMakeCCompilerABI.c.o -lgcc --push-state --as-needed -lgcc_s --pop-state -lc -lgcc --push-state --as-needed -lgcc_s --pop-state /usr/lib64/gcc/x86_64-slackware-linux/11.2.0/crtend.o /usr/lib64/gcc/x86_64-slackware-linux/11.2.0/../../../../lib64/crtn.o
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_f6fbd' '-mtune=generic' '-march=x86-64' '-dumpdir' 'cmTC_f6fbd.'
+gmake[1]: Leaving directory '/home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp'
+
+
+
+Parsed C implicit include dir info from above output: rv=done
+  found start of include info
+  found start of implicit include info
+    add: [/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/include]
+    add: [/usr/local/include]
+    add: [/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/include-fixed]
+    add: [/usr/include]
+  end of search list found
+  collapse include dir [/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/include] ==> [/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/include]
+  collapse include dir [/usr/local/include] ==> [/usr/local/include]
+  collapse include dir [/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/include-fixed] ==> [/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/include-fixed]
+  collapse include dir [/usr/include] ==> [/usr/include]
+  implicit include dirs: [/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/include;/usr/local/include;/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/include-fixed;/usr/include]
+
+
+Parsed C implicit link information from above output:
+  link line regex: [^( *|.*[/\])(ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\]+-)?ld|collect2)[^/\]*( |$)]
+  ignore line: [Change Dir: /home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp]
+  ignore line: []
+  ignore line: [Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_f6fbd/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_f6fbd.dir/build.make CMakeFiles/cmTC_f6fbd.dir/build]
+  ignore line: [gmake[1]: Entering directory '/home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp']
+  ignore line: [Building C object CMakeFiles/cmTC_f6fbd.dir/CMakeCCompilerABI.c.o]
+  ignore line: [/usr/bin/cc   -v -o CMakeFiles/cmTC_f6fbd.dir/CMakeCCompilerABI.c.o -c /usr/share/cmake-3.21/Modules/CMakeCCompilerABI.c]
+  ignore line: [Reading specs from /usr/lib64/gcc/x86_64-slackware-linux/11.2.0/specs]
+  ignore line: [COLLECT_GCC=/usr/bin/cc]
+  ignore line: [Target: x86_64-slackware-linux]
+  ignore line: [Configured with: ../configure --prefix=/usr --libdir=/usr/lib64 --mandir=/usr/man --infodir=/usr/info --enable-shared --enable-bootstrap --enable-languages=ada,brig,c,c++,d,fortran,go,lto,objc,obj-c++ --enable-threads=posix --enable-checking=release --enable-objc-gc --with-system-zlib --enable-libstdcxx-dual-abi --with-default-libstdcxx-abi=new --disable-libstdcxx-pch --disable-libunwind-exceptions --enable-__cxa_atexit --disable-libssp --enable-gnu-unique-object --enable-plugin --enable-lto --disable-install-libiberty --disable-werror --with-gnu-ld --with-isl --verbose --with-arch-directory=amd64 --disable-gtktest --enable-clocale=gnu --disable-multilib --target=x86_64-slackware-linux --build=x86_64-slackware-linux --host=x86_64-slackware-linux]
+  ignore line: [Thread model: posix]
+  ignore line: [Supported LTO compression algorithms: zlib zstd]
+  ignore line: [gcc version 11.2.0 (GCC) ]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_f6fbd.dir/CMakeCCompilerABI.c.o' '-c' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_f6fbd.dir/']
+  ignore line: [ /usr/libexec/gcc/x86_64-slackware-linux/11.2.0/cc1 -quiet -v /usr/share/cmake-3.21/Modules/CMakeCCompilerABI.c -quiet -dumpdir CMakeFiles/cmTC_f6fbd.dir/ -dumpbase CMakeCCompilerABI.c.c -dumpbase-ext .c -mtune=generic -march=x86-64 -version -o /tmp/ccZLbOg3.s]
+  ignore line: [GNU C17 (GCC) version 11.2.0 (x86_64-slackware-linux)]
+  ignore line: [	compiled by GNU C version 11.2.0  GMP version 6.2.1  MPFR version 4.1.0  MPC version 1.2.1  isl version isl-0.24-GMP]
+  ignore line: []
+  ignore line: [GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072]
+  ignore line: [ignoring nonexistent directory "/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/../../../../x86_64-slackware-linux/include"]
+  ignore line: [#include "..." search starts here:]
+  ignore line: [#include <...> search starts here:]
+  ignore line: [ /usr/lib64/gcc/x86_64-slackware-linux/11.2.0/include]
+  ignore line: [ /usr/local/include]
+  ignore line: [ /usr/lib64/gcc/x86_64-slackware-linux/11.2.0/include-fixed]
+  ignore line: [ /usr/include]
+  ignore line: [End of search list.]
+  ignore line: [GNU C17 (GCC) version 11.2.0 (x86_64-slackware-linux)]
+  ignore line: [	compiled by GNU C version 11.2.0  GMP version 6.2.1  MPFR version 4.1.0  MPC version 1.2.1  isl version isl-0.24-GMP]
+  ignore line: []
+  ignore line: [GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072]
+  ignore line: [Compiler executable checksum: ea079ab2d42d4201c0dfe2a35a43a2b8]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_f6fbd.dir/CMakeCCompilerABI.c.o' '-c' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_f6fbd.dir/']
+  ignore line: [ as -v --64 -o CMakeFiles/cmTC_f6fbd.dir/CMakeCCompilerABI.c.o /tmp/ccZLbOg3.s]
+  ignore line: [GNU assembler version 2.37 (x86_64-slackware-linux) using BFD version version 2.37-slack15]
+  ignore line: [COMPILER_PATH=/usr/libexec/gcc/x86_64-slackware-linux/11.2.0/:/usr/libexec/gcc/x86_64-slackware-linux/11.2.0/:/usr/libexec/gcc/x86_64-slackware-linux/:/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/:/usr/lib64/gcc/x86_64-slackware-linux/:/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/../../../../x86_64-slackware-linux/bin/]
+  ignore line: [LIBRARY_PATH=/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/:/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/../../../:/lib/:/usr/lib/]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_f6fbd.dir/CMakeCCompilerABI.c.o' '-c' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_f6fbd.dir/CMakeCCompilerABI.c.']
+  ignore line: [Linking C executable cmTC_f6fbd]
+  ignore line: [/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_f6fbd.dir/link.txt --verbose=1]
+  ignore line: [/usr/bin/cc  -v CMakeFiles/cmTC_f6fbd.dir/CMakeCCompilerABI.c.o -o cmTC_f6fbd ]
+  ignore line: [Reading specs from /usr/lib64/gcc/x86_64-slackware-linux/11.2.0/specs]
+  ignore line: [COLLECT_GCC=/usr/bin/cc]
+  ignore line: [COLLECT_LTO_WRAPPER=/usr/libexec/gcc/x86_64-slackware-linux/11.2.0/lto-wrapper]
+  ignore line: [Target: x86_64-slackware-linux]
+  ignore line: [Configured with: ../configure --prefix=/usr --libdir=/usr/lib64 --mandir=/usr/man --infodir=/usr/info --enable-shared --enable-bootstrap --enable-languages=ada,brig,c,c++,d,fortran,go,lto,objc,obj-c++ --enable-threads=posix --enable-checking=release --enable-objc-gc --with-system-zlib --enable-libstdcxx-dual-abi --with-default-libstdcxx-abi=new --disable-libstdcxx-pch --disable-libunwind-exceptions --enable-__cxa_atexit --disable-libssp --enable-gnu-unique-object --enable-plugin --enable-lto --disable-install-libiberty --disable-werror --with-gnu-ld --with-isl --verbose --with-arch-directory=amd64 --disable-gtktest --enable-clocale=gnu --disable-multilib --target=x86_64-slackware-linux --build=x86_64-slackware-linux --host=x86_64-slackware-linux]
+  ignore line: [Thread model: posix]
+  ignore line: [Supported LTO compression algorithms: zlib zstd]
+  ignore line: [gcc version 11.2.0 (GCC) ]
+  ignore line: [COMPILER_PATH=/usr/libexec/gcc/x86_64-slackware-linux/11.2.0/:/usr/libexec/gcc/x86_64-slackware-linux/11.2.0/:/usr/libexec/gcc/x86_64-slackware-linux/:/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/:/usr/lib64/gcc/x86_64-slackware-linux/:/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/../../../../x86_64-slackware-linux/bin/]
+  ignore line: [LIBRARY_PATH=/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/:/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/../../../:/lib/:/usr/lib/]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_f6fbd' '-mtune=generic' '-march=x86-64' '-dumpdir' 'cmTC_f6fbd.']
+  link line: [ /usr/libexec/gcc/x86_64-slackware-linux/11.2.0/collect2 -plugin /usr/libexec/gcc/x86_64-slackware-linux/11.2.0/liblto_plugin.so -plugin-opt=/usr/libexec/gcc/x86_64-slackware-linux/11.2.0/lto-wrapper -plugin-opt=-fresolution=/tmp/ccxDPfZI.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --eh-frame-hdr -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_f6fbd /usr/lib64/gcc/x86_64-slackware-linux/11.2.0/../../../../lib64/crt1.o /usr/lib64/gcc/x86_64-slackware-linux/11.2.0/../../../../lib64/crti.o /usr/lib64/gcc/x86_64-slackware-linux/11.2.0/crtbegin.o -L/usr/lib64/gcc/x86_64-slackware-linux/11.2.0 -L/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/../../.. CMakeFiles/cmTC_f6fbd.dir/CMakeCCompilerABI.c.o -lgcc --push-state --as-needed -lgcc_s --pop-state -lc -lgcc --push-state --as-needed -lgcc_s --pop-state /usr/lib64/gcc/x86_64-slackware-linux/11.2.0/crtend.o /usr/lib64/gcc/x86_64-slackware-linux/11.2.0/../../../../lib64/crtn.o]
+    arg [/usr/libexec/gcc/x86_64-slackware-linux/11.2.0/collect2] ==> ignore
+    arg [-plugin] ==> ignore
+    arg [/usr/libexec/gcc/x86_64-slackware-linux/11.2.0/liblto_plugin.so] ==> ignore
+    arg [-plugin-opt=/usr/libexec/gcc/x86_64-slackware-linux/11.2.0/lto-wrapper] ==> ignore
+    arg [-plugin-opt=-fresolution=/tmp/ccxDPfZI.res] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+    arg [-plugin-opt=-pass-through=-lc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+    arg [--eh-frame-hdr] ==> ignore
+    arg [-m] ==> ignore
+    arg [elf_x86_64] ==> ignore
+    arg [-dynamic-linker] ==> ignore
+    arg [/lib64/ld-linux-x86-64.so.2] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTC_f6fbd] ==> ignore
+    arg [/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/../../../../lib64/crt1.o] ==> obj [/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/../../../../lib64/crt1.o]
+    arg [/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/../../../../lib64/crti.o] ==> obj [/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/../../../../lib64/crti.o]
+    arg [/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/crtbegin.o] ==> obj [/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/crtbegin.o]
+    arg [-L/usr/lib64/gcc/x86_64-slackware-linux/11.2.0] ==> dir [/usr/lib64/gcc/x86_64-slackware-linux/11.2.0]
+    arg [-L/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/../../../../lib64] ==> dir [/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/../../../../lib64]
+    arg [-L/lib/../lib64] ==> dir [/lib/../lib64]
+    arg [-L/usr/lib/../lib64] ==> dir [/usr/lib/../lib64]
+    arg [-L/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/../../..] ==> dir [/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/../../..]
+    arg [CMakeFiles/cmTC_f6fbd.dir/CMakeCCompilerABI.c.o] ==> ignore
+    arg [-lgcc] ==> lib [gcc]
+    arg [--push-state] ==> ignore
+    arg [--as-needed] ==> ignore
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [--pop-state] ==> ignore
+    arg [-lc] ==> lib [c]
+    arg [-lgcc] ==> lib [gcc]
+    arg [--push-state] ==> ignore
+    arg [--as-needed] ==> ignore
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [--pop-state] ==> ignore
+    arg [/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/crtend.o] ==> obj [/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/crtend.o]
+    arg [/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/../../../../lib64/crtn.o] ==> obj [/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/../../../../lib64/crtn.o]
+  collapse obj [/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/../../../../lib64/crt1.o] ==> [/usr/lib64/crt1.o]
+  collapse obj [/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/../../../../lib64/crti.o] ==> [/usr/lib64/crti.o]
+  collapse obj [/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/../../../../lib64/crtn.o] ==> [/usr/lib64/crtn.o]
+  collapse library dir [/usr/lib64/gcc/x86_64-slackware-linux/11.2.0] ==> [/usr/lib64/gcc/x86_64-slackware-linux/11.2.0]
+  collapse library dir [/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/../../../../lib64] ==> [/usr/lib64]
+  collapse library dir [/lib/../lib64] ==> [/lib64]
+  collapse library dir [/usr/lib/../lib64] ==> [/usr/lib64]
+  collapse library dir [/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/../../..] ==> [/usr/lib64]
+  implicit libs: [gcc;gcc_s;c;gcc;gcc_s]
+  implicit objs: [/usr/lib64/crt1.o;/usr/lib64/crti.o;/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/crtbegin.o;/usr/lib64/gcc/x86_64-slackware-linux/11.2.0/crtend.o;/usr/lib64/crtn.o]
+  implicit dirs: [/usr/lib64/gcc/x86_64-slackware-linux/11.2.0;/usr/lib64;/lib64]
+  implicit fwks: []
+
+
+Performing C SOURCE FILE Test HAVE_X86_64_ASM succeeded with the following output:
+Change Dir: /home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_cc264/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_cc264.dir/build.make CMakeFiles/cmTC_cc264.dir/build
+gmake[1]: Entering directory '/home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_cc264.dir/src.c.o
+/usr/bin/cc -DHAVE_X86_64_ASM  -std=c90 -o CMakeFiles/cmTC_cc264.dir/src.c.o -c /home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTC_cc264
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_cc264.dir/link.txt --verbose=1
+/usr/bin/cc CMakeFiles/cmTC_cc264.dir/src.c.o -o cmTC_cc264 
+gmake[1]: Leaving directory '/home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+
+    #include <stdint.h>
+
+    int main()
+    {
+      uint64_t a = 11, tmp;
+      __asm__ __volatile__("movq $0x100000000,%1; mulq %%rsi" : "+a"(a) : "S"(tmp) : "cc", "%rdx");
+    }
+  
+Performing C SOURCE FILE Test C_SUPPORTS__PEDANTIC succeeded with the following output:
+Change Dir: /home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_670a7/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_670a7.dir/build.make CMakeFiles/cmTC_670a7.dir/build
+gmake[1]: Entering directory '/home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_670a7.dir/src.c.o
+/usr/bin/cc -DC_SUPPORTS__PEDANTIC  -Werror   -pedantic -std=c90 -o CMakeFiles/cmTC_670a7.dir/src.c.o -c /home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp/src.c
+Linking C static library libcmTC_670a7.a
+/usr/bin/cmake -P CMakeFiles/cmTC_670a7.dir/cmake_clean_target.cmake
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_670a7.dir/link.txt --verbose=1
+/usr/bin/ar qc libcmTC_670a7.a CMakeFiles/cmTC_670a7.dir/src.c.o
+/usr/bin/ranlib libcmTC_670a7.a
+gmake[1]: Leaving directory '/home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+int main(void) { return 0; }
+Performing C SOURCE FILE Test C_SUPPORTS__WALL succeeded with the following output:
+Change Dir: /home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_6663d/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_6663d.dir/build.make CMakeFiles/cmTC_6663d.dir/build
+gmake[1]: Entering directory '/home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_6663d.dir/src.c.o
+/usr/bin/cc -DC_SUPPORTS__WALL  -Werror   -Wall -std=c90 -o CMakeFiles/cmTC_6663d.dir/src.c.o -c /home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp/src.c
+Linking C static library libcmTC_6663d.a
+/usr/bin/cmake -P CMakeFiles/cmTC_6663d.dir/cmake_clean_target.cmake
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_6663d.dir/link.txt --verbose=1
+/usr/bin/ar qc libcmTC_6663d.a CMakeFiles/cmTC_6663d.dir/src.c.o
+/usr/bin/ranlib libcmTC_6663d.a
+gmake[1]: Leaving directory '/home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+int main(void) { return 0; }
+Performing C SOURCE FILE Test C_SUPPORTS__WCAST_ALIGN succeeded with the following output:
+Change Dir: /home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_53206/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_53206.dir/build.make CMakeFiles/cmTC_53206.dir/build
+gmake[1]: Entering directory '/home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_53206.dir/src.c.o
+/usr/bin/cc -DC_SUPPORTS__WCAST_ALIGN  -Werror   -Wcast-align -std=c90 -o CMakeFiles/cmTC_53206.dir/src.c.o -c /home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp/src.c
+Linking C static library libcmTC_53206.a
+/usr/bin/cmake -P CMakeFiles/cmTC_53206.dir/cmake_clean_target.cmake
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_53206.dir/link.txt --verbose=1
+/usr/bin/ar qc libcmTC_53206.a CMakeFiles/cmTC_53206.dir/src.c.o
+/usr/bin/ranlib libcmTC_53206.a
+gmake[1]: Leaving directory '/home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+int main(void) { return 0; }
+Performing C SOURCE FILE Test C_SUPPORTS__WCAST_ALIGN_STRICT succeeded with the following output:
+Change Dir: /home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_cc6f2/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_cc6f2.dir/build.make CMakeFiles/cmTC_cc6f2.dir/build
+gmake[1]: Entering directory '/home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_cc6f2.dir/src.c.o
+/usr/bin/cc -DC_SUPPORTS__WCAST_ALIGN_STRICT  -Werror   -Wcast-align=strict -std=c90 -o CMakeFiles/cmTC_cc6f2.dir/src.c.o -c /home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp/src.c
+Linking C static library libcmTC_cc6f2.a
+/usr/bin/cmake -P CMakeFiles/cmTC_cc6f2.dir/cmake_clean_target.cmake
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_cc6f2.dir/link.txt --verbose=1
+/usr/bin/ar qc libcmTC_cc6f2.a CMakeFiles/cmTC_cc6f2.dir/src.c.o
+/usr/bin/ranlib libcmTC_cc6f2.a
+gmake[1]: Leaving directory '/home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+int main(void) { return 0; }
+Performing C SOURCE FILE Test C_SUPPORTS__WEXTRA succeeded with the following output:
+Change Dir: /home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_c794c/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_c794c.dir/build.make CMakeFiles/cmTC_c794c.dir/build
+gmake[1]: Entering directory '/home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_c794c.dir/src.c.o
+/usr/bin/cc -DC_SUPPORTS__WEXTRA  -Werror   -Wextra -std=c90 -o CMakeFiles/cmTC_c794c.dir/src.c.o -c /home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp/src.c
+Linking C static library libcmTC_c794c.a
+/usr/bin/cmake -P CMakeFiles/cmTC_c794c.dir/cmake_clean_target.cmake
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_c794c.dir/link.txt --verbose=1
+/usr/bin/ar qc libcmTC_c794c.a CMakeFiles/cmTC_c794c.dir/src.c.o
+/usr/bin/ranlib libcmTC_c794c.a
+gmake[1]: Leaving directory '/home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+int main(void) { return 0; }
+Performing C SOURCE FILE Test C_SUPPORTS__WNESTED_EXTERNS succeeded with the following output:
+Change Dir: /home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_ceb43/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_ceb43.dir/build.make CMakeFiles/cmTC_ceb43.dir/build
+gmake[1]: Entering directory '/home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_ceb43.dir/src.c.o
+/usr/bin/cc -DC_SUPPORTS__WNESTED_EXTERNS  -Werror   -Wnested-externs -std=c90 -o CMakeFiles/cmTC_ceb43.dir/src.c.o -c /home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp/src.c
+Linking C static library libcmTC_ceb43.a
+/usr/bin/cmake -P CMakeFiles/cmTC_ceb43.dir/cmake_clean_target.cmake
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_ceb43.dir/link.txt --verbose=1
+/usr/bin/ar qc libcmTC_ceb43.a CMakeFiles/cmTC_ceb43.dir/src.c.o
+/usr/bin/ranlib libcmTC_ceb43.a
+gmake[1]: Leaving directory '/home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+int main(void) { return 0; }
+Performing C SOURCE FILE Test C_SUPPORTS__WNO_LONG_LONG succeeded with the following output:
+Change Dir: /home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_da7bc/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_da7bc.dir/build.make CMakeFiles/cmTC_da7bc.dir/build
+gmake[1]: Entering directory '/home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_da7bc.dir/src.c.o
+/usr/bin/cc -DC_SUPPORTS__WNO_LONG_LONG  -Werror   -Wno-long-long -std=c90 -o CMakeFiles/cmTC_da7bc.dir/src.c.o -c /home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp/src.c
+Linking C static library libcmTC_da7bc.a
+/usr/bin/cmake -P CMakeFiles/cmTC_da7bc.dir/cmake_clean_target.cmake
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_da7bc.dir/link.txt --verbose=1
+/usr/bin/ar qc libcmTC_da7bc.a CMakeFiles/cmTC_da7bc.dir/src.c.o
+/usr/bin/ranlib libcmTC_da7bc.a
+gmake[1]: Leaving directory '/home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+int main(void) { return 0; }
+Performing C SOURCE FILE Test C_SUPPORTS__WNO_OVERLENGTH_STRINGS succeeded with the following output:
+Change Dir: /home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_ffe06/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_ffe06.dir/build.make CMakeFiles/cmTC_ffe06.dir/build
+gmake[1]: Entering directory '/home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_ffe06.dir/src.c.o
+/usr/bin/cc -DC_SUPPORTS__WNO_OVERLENGTH_STRINGS  -Werror   -Wno-overlength-strings -std=c90 -o CMakeFiles/cmTC_ffe06.dir/src.c.o -c /home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp/src.c
+Linking C static library libcmTC_ffe06.a
+/usr/bin/cmake -P CMakeFiles/cmTC_ffe06.dir/cmake_clean_target.cmake
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_ffe06.dir/link.txt --verbose=1
+/usr/bin/ar qc libcmTC_ffe06.a CMakeFiles/cmTC_ffe06.dir/src.c.o
+/usr/bin/ranlib libcmTC_ffe06.a
+gmake[1]: Leaving directory '/home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+int main(void) { return 0; }
+Performing C SOURCE FILE Test C_SUPPORTS__WNO_UNUSED_FUNCTION succeeded with the following output:
+Change Dir: /home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_bd430/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_bd430.dir/build.make CMakeFiles/cmTC_bd430.dir/build
+gmake[1]: Entering directory '/home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_bd430.dir/src.c.o
+/usr/bin/cc -DC_SUPPORTS__WNO_UNUSED_FUNCTION  -Werror   -Wno-unused-function -std=c90 -o CMakeFiles/cmTC_bd430.dir/src.c.o -c /home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp/src.c
+Linking C static library libcmTC_bd430.a
+/usr/bin/cmake -P CMakeFiles/cmTC_bd430.dir/cmake_clean_target.cmake
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_bd430.dir/link.txt --verbose=1
+/usr/bin/ar qc libcmTC_bd430.a CMakeFiles/cmTC_bd430.dir/src.c.o
+/usr/bin/ranlib libcmTC_bd430.a
+gmake[1]: Leaving directory '/home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+int main(void) { return 0; }
+Performing C SOURCE FILE Test C_SUPPORTS__WSHADOW succeeded with the following output:
+Change Dir: /home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_4cbd6/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_4cbd6.dir/build.make CMakeFiles/cmTC_4cbd6.dir/build
+gmake[1]: Entering directory '/home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_4cbd6.dir/src.c.o
+/usr/bin/cc -DC_SUPPORTS__WSHADOW  -Werror   -Wshadow -std=c90 -o CMakeFiles/cmTC_4cbd6.dir/src.c.o -c /home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp/src.c
+Linking C static library libcmTC_4cbd6.a
+/usr/bin/cmake -P CMakeFiles/cmTC_4cbd6.dir/cmake_clean_target.cmake
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_4cbd6.dir/link.txt --verbose=1
+/usr/bin/ar qc libcmTC_4cbd6.a CMakeFiles/cmTC_4cbd6.dir/src.c.o
+/usr/bin/ranlib libcmTC_4cbd6.a
+gmake[1]: Leaving directory '/home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+int main(void) { return 0; }
+Performing C SOURCE FILE Test C_SUPPORTS__WSTRICT_PROTOTYPES succeeded with the following output:
+Change Dir: /home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_0cab3/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_0cab3.dir/build.make CMakeFiles/cmTC_0cab3.dir/build
+gmake[1]: Entering directory '/home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_0cab3.dir/src.c.o
+/usr/bin/cc -DC_SUPPORTS__WSTRICT_PROTOTYPES  -Werror   -Wstrict-prototypes -std=c90 -o CMakeFiles/cmTC_0cab3.dir/src.c.o -c /home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp/src.c
+Linking C static library libcmTC_0cab3.a
+/usr/bin/cmake -P CMakeFiles/cmTC_0cab3.dir/cmake_clean_target.cmake
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_0cab3.dir/link.txt --verbose=1
+/usr/bin/ar qc libcmTC_0cab3.a CMakeFiles/cmTC_0cab3.dir/src.c.o
+/usr/bin/ranlib libcmTC_0cab3.a
+gmake[1]: Leaving directory '/home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+int main(void) { return 0; }
+Performing C SOURCE FILE Test C_SUPPORTS__WUNDEF succeeded with the following output:
+Change Dir: /home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_20037/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_20037.dir/build.make CMakeFiles/cmTC_20037.dir/build
+gmake[1]: Entering directory '/home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_20037.dir/src.c.o
+/usr/bin/cc -DC_SUPPORTS__WUNDEF  -Werror   -Wundef -std=c90 -o CMakeFiles/cmTC_20037.dir/src.c.o -c /home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp/src.c
+Linking C static library libcmTC_20037.a
+/usr/bin/cmake -P CMakeFiles/cmTC_20037.dir/cmake_clean_target.cmake
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_20037.dir/link.txt --verbose=1
+/usr/bin/ar qc libcmTC_20037.a CMakeFiles/cmTC_20037.dir/src.c.o
+/usr/bin/ranlib libcmTC_20037.a
+gmake[1]: Leaving directory '/home/bartosz/dox/Perl-Bitcoin/Alien-libsecp256k1/libsecp256k1/build/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+int main(void) { return 0; }
