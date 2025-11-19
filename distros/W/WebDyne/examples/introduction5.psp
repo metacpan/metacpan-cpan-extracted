@@ -1,0 +1,6 @@
+<start_html title="Server Time">
+The local server epoch time (hires) is: <? time() ?>
+<end_html>
+__PERL__
+use Time::HiRes qw(time);
+1;

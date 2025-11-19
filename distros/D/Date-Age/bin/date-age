@@ -1,0 +1,127 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use Date::Age qw(describe details);
+
+# Parse command line options
+my $help = 0;
+my $verbose = 0;
+my $json = 0;
+
+GetOptions(
+	'help|h'	 => \$help,
+	'verbose|v' => \$verbose,
+	'json|j'	 => \$json,
+) or pod2usage(2);
+
+pod2usage(1) if $help;
+
+# Check arguments
+if (@ARGV < 1 || @ARGV > 2) {
+	pod2usage("Error: Please provide 1 or 2 date arguments\n");
+}
+
+my ($dob, $ref_date) = @ARGV;
+
+# Use current date if reference date not provided
+$ref_date //= '';
+
+eval {
+	if ($json) {
+		# JSON output
+		require JSON;
+		my $details = details($dob, $ref_date || undef);
+		print JSON->new->pretty->encode($details), "\n";
+	} elsif ($verbose) {
+		# Verbose output
+		my $details = details($dob, $ref_date || undef);
+		print "Date of Birth: $dob\n";
+		print 'Reference Date: ', ($ref_date || "today"), "\n";
+		print 'Age Range: ', $details->{range}, "\n";
+		print 'Minimum Age: ', $details->{min_age}, "\n";
+		print 'Maximum Age: ', $details->{max_age}, "\n";
+		if (defined $details->{precise}) {
+			print 'Precise Age: ', $details->{precise}, "\n";
+		} else {
+			print "Precise Age: Cannot be determined (partial date)\n";
+		}
+	} else {
+		# Simple output - just the age range
+		print describe($dob, $ref_date || undef), "\n";
+	}
+};
+
+if ($@) {
+	die "Error: $@";
+}
+
+__END__
+
+=head1 NAME
+
+date-age - Calculate age from dates using Date::Age module
+
+=head1 SYNOPSIS
+
+date-age [options] <date_of_birth> [reference_date]
+
+ Options:
+   -h, --help	  Show this help message
+   -v, --verbose   Show detailed age information
+   -j, --json	  Output results in JSON format
+
+ Examples:
+   date-age 1990-05-15					# Age from birth to today
+   date-age 1990-05-15 2020-01-01		# Age from birth to specific date
+   date-age 1990 2020-01-01			  # Age range for partial birth year
+   date-age --verbose 1990-05 2020-01-01 # Detailed output
+   date-age --json 1990 2020-01-01	   # JSON output
+
+=head1 DESCRIPTION
+
+This program calculates age or age ranges between two dates using the Date::Age
+module. It supports partial dates (year only, or year-month) and will calculate
+possible age ranges when exact dates aren't available.
+
+The first argument is the date of birth, and the optional second argument is
+the reference date. If no reference date is provided, the current date is used.
+
+Date formats supported:
+  YYYY-MM-DD  (full date)
+  YYYY-MM (year and month)
+  YYYY	(year only)
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-h, --help>
+
+Show help message and exit.
+
+=item B<-v, --verbose>
+
+Show detailed age information including minimum age, maximum age, and whether
+the age can be precisely determined.
+
+=item B<-j, --json>
+
+Output the results in JSON format. Requires the JSON module to be installed.
+
+=back
+
+=head1 EXIT STATUS
+
+Returns 0 on success, non-zero on error.
+
+=head1 AUTHOR
+
+Generated CLI for Date::Age module
+
+=head1 SEE ALSO
+
+Date::Age
+
+=cut

@@ -1,0 +1,240 @@
+NAME
+    Types::Capabilities - don't care what type of data you are given, just
+    what you can do with it
+
+SYNOPSIS
+      package LineFilter {
+        use Moo;
+        use Type::Params 'signature_for';
+        use Types::Capabilities 'Greppable';
+        use Types::Standard 'RegexpRef';
+    
+        has regexp => ( is => 'ro', isa => RegexpRef, required => 1 );
+    
+        signature_for print_matching_lines => (
+          method     => 1,
+          positional => [ Greppable ],
+        );
+    
+        sub print_matching_lines ( $self, $source ) {
+          my $re = $self->regexp;
+          for my $line ( $source->grep( sub { /$re/ } ) ) {
+            print $line, "\n";
+          }
+        }
+      }
+  
+      my $greetings = LineFilter->new( regexp => qr/Hello/ );
+      $greetings->print_matching_lines( [ 'Hello world', 'Goodbye' ] );
+
+DESCRIPTION
+    This module allows you to indicate when you are designing your API that
+    you don't care exactly what type of object is passed to you, as long as
+    it's "greppable" or "sortable" or some other capability you want from the
+    object.
+
+    In particular, in the "SYNOPSIS" example, the signature is checking that
+    whatever value is provided for $source, it must offer a `grep` method.
+    Exactly what the `grep` method does isn't checked by the type constraint,
+    but the expected behaviour is that it must accept a coderef and, in list
+    context, return the values matching the grep as a list.
+
+    The key feature that this module provides is that if $source is *not* an
+    object with a `grep` method, but is an array ref or an object which
+    overloads `@{}`, then it will be coerced into an object with a `grep`
+    method.
+
+CONSTRAINTS
+    This module is a Type::Library-based type constraint library and provides
+    the following constraints.
+
+  Constraints for Collection-Like Objects
+    Mappable
+        An object which provides a `map` method.
+
+        The expectation is that the method should accept a coderef which
+        transforms a single item in a collection. Called in list context, it
+        should return the result of applying that to all items in that
+        collection. The results of calling `map` in scalar context are not
+        specified, but it may return another collection-like object which
+        further operations can be carried out on.
+
+        Can be coerced from ArrayRef, Greppable, Eachable, or ArrayLike.
+
+    Greppable
+        An object which provides a `grep` method.
+
+        The expectation is that the method should accept a coderef which
+        returns a boolean for each item in a collection. Called in list
+        context, it should return items in that collection where the coderef
+        returned true. The results of calling `grep` in scalar context are not
+        specified, but it may return another collection-like object which
+        further operations can be carried out on.
+
+        Can be coerced from ArrayRef, Mappable, Eachable, or ArrayLike.
+
+    Sortable
+        An object which provides a `sort` method.
+
+        The expectation is that the method should accept a coderef which
+        compares two items, returning 1 if they are in the correct order, -1
+        if they are in the wrong order, and 0 if the two items are of
+        equivalent order. Called in list context, it should return all the
+        items in the collection sorted according to the coderef. The results
+        of calling `sort` in scalar context are not specified, but it may
+        return another collection-like object which further operations can be
+        carried out on.
+
+        Can be coerced from ArrayRef, Mappable, Greppable, Eachable, or
+        ArrayLike.
+
+    Reversible
+        An object which provides a `reverse` method.
+
+        The expectation is that when the method is called in list context, it
+        should return all the items in the collection in reverse order. The
+        results of calling `reverse` in scalar context are not specified, but
+        it may return another collection-like object which further operations
+        can be carried out on.
+
+        Can be coerced from ArrayRef, Mappable, Greppable, Eachable, or
+        ArrayLike.
+
+    Countable
+        An object which provides a `count` method.
+
+        The expectation is that when the method is called in scalar context,
+        it should return the number of items in the collection.
+
+        Can be coerced from ArrayRef, Mappable, Greppable, Eachable, or
+        ArrayLike.
+
+    Joinable
+        An object which provides a `join` method.
+
+        The expectation is that when the method is called in scalar context,
+        it should return a single item that is caused by joining all the items
+        in the collection together, typically via string concatenation. The
+        method may be passed a value to use as a separator; if no separator is
+        given, the method may use a default separator, typically something
+        like "," or the empty string.
+
+        Can be coerced from ArrayRef, Mappable, Greppable, Eachable, or
+        ArrayLike.
+
+    Eachable
+        An object which provides an `each` method.
+
+        The expectation is that when the method is called in void context and
+        passed a coderef, it should call the coderef for each item in the
+        collection.
+
+        Can be coerced from ArrayRef, Mappable, Greppable, or ArrayLike.
+
+   Constraints for Queue-Like Objects
+    Enqueueable
+        An object which provides an `enqueue` method.
+
+        The expectation is that the method can be called with a single item to
+        add that item to the end of the collection.
+
+        Can be coerced from ArrayRef, Mappable, Greppable, Eachable, or
+        ArrayLike.
+
+    Dequeueable
+        An object which provides a `dequeue` method.
+
+        The expectation is that when the method is called in a scalar context,
+        it will remove an item from the front of the collection and return it.
+
+        Can be coerced from ArrayRef, Mappable, Greppable, Eachable, or
+        ArrayLike.
+
+    Peekable
+        An object which provides a `peek` method.
+
+        The expectation is that when the method is called in a scalar context,
+        it will return an item from the collection without altering the
+        collection.
+
+        When used with a queue-like collection, it is expected to return the
+        item at the front/start of the collection; the item which would be
+        returned by `dequeue`. When used with a stack-like collection, it is
+        expected to return the item at the back/end of the collection; the
+        item which would be returned by `pop`. Otherwise, which item it
+        returns is unspecified.
+
+        Can be coerced from ArrayRef, Mappable, Greppable, Eachable, or
+        ArrayLike.
+
+   Constraints for Stack-Like Objects
+    Pushable
+        An object which provides a `push` method.
+
+        The expectation is that the method can be called with a single item to
+        add that item to the end of the collection. (This behaviour is
+        essentially the same as `enqueue`.)
+
+        Can be coerced from ArrayRef, Mappable, Greppable, Eachable, or
+        ArrayLike.
+
+    Poppable
+        An object which provides a `pop` method.
+
+        The expectation is that when the method is called in a scalar context,
+        it will remove an item from the end of the collection and return it.
+
+        Can be coerced from ArrayRef, Mappable, Greppable, Eachable, or
+        ArrayLike.
+
+    Peekable
+        See description above.
+
+  Combined Capabilities
+    It is possible to specify that you need an object to provide multiple
+    capabilities:
+
+      has task_queue => (
+        is      => 'ro',
+        isa     => Enqueueable & Dequeueable & Countable & Peekable,
+        coerce  => 1,
+      );
+
+    General collection-like capabilities (like `Eachable` and `Countable`) may
+    be combined with queue-like and stack-like capabilities.
+
+   Combining Conflicting Capabilities
+    Combining queue-like and stack-like capabilities with each other will
+    work, but the coercion feature will stop working and you will need to
+    design your own class to implement those capabilities.
+
+      has task_queue => (
+        is      => 'ro',
+        isa     => ( Enqueueable & Poppable )
+                     ->plus_coercions( ArrayRef, sub { MyClass->new($_) } ),
+        coerce  => 1,
+      );
+
+BUGS
+    Please report any bugs to
+    <https://github.com/tobyink/p5-types-capabilities/issues>.
+
+SEE ALSO
+    Largely inspired by: Data::Collection.
+
+    Sub::HandlesVia, Hydrogen::Autobox.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2025 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

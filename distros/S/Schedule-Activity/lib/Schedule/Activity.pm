@@ -9,7 +9,7 @@ use Schedule::Activity::Message;
 use Schedule::Activity::Node;
 use Schedule::Activity::NodeFilter;
 
-our $VERSION='0.2.0';
+our $VERSION='0.2.1';
 
 sub new {
 	my ($ref,%opt)=@_;
@@ -339,12 +339,20 @@ sub scheduler {
 
 sub schedule {
 	my ($self,%opt)=@_;
-	delete($$self{attr});
 	my %check=$self->compile(unsafe=>$opt{unsafe}//$$self{unsafe});
 	if($check{error})                  { return (error=>$check{error}) }
 	if(!is_arrayref($opt{activities})) { return (error=>'Activities must be an array') }
-	my ($tmoffset,%res)=(0);
-	$res{stat}{slack}=$res{stat}{buffer}=0;
+	my $tmoffset=$opt{tmoffset}//0;
+	my %res=(stat=>{slack=>0,buffer=>0});
+	if($opt{after}) {
+		delete($$self{attr});
+		my $attr=$self->_attr();
+		push @{$$attr{stack}},$opt{after}{_attr};
+		$attr->pop();
+		$tmoffset=$opt{after}{_tmmax};
+		%{$res{stat}}=(%{$res{stat}},%{$opt{after}{stat}});
+	}
+	$self->_attr()->push();
 	foreach my $activity (@{$opt{activities}}) {
 		foreach my $entry (scheduler(goal=>$$activity[0],node=>$$self{built}{node}{$$activity[1]},config=>$$self{built},attr=>$self->_attr(),tmoffset=>$tmoffset,tensionslack=>$opt{tensionslack},tensionbuffer=>$opt{tensionbuffer})) {
 			push @{$res{activities}},[$$entry[0]+$tmoffset,@$entry[1..$#$entry]];
@@ -355,8 +363,9 @@ sub schedule {
 		$tmoffset+=$$activity[0];
 	}
 	$self->_attr()->log($tmoffset);
+	if($opt{after}) { unshift @{$res{activities}},@{$opt{after}{activities}} }
 	%{$res{attributes}}=$self->_attr()->report();
-	while(my ($group,$notes)=each %{$$self{config}{annotations}}) {
+	if(!$opt{nonote}) { while(my ($group,$notes)=each %{$$self{config}{annotations}}) {
 		my @schedule;
 		foreach my $note (@$notes) {
 			my $annotation=Schedule::Activity::Annotation->new(%$note);
@@ -372,7 +381,10 @@ sub schedule {
 			if($schedule[$i+1][0]==$schedule[$i][0]) {
 				splice(@schedule,$i+1,1); $i-- } }
 		$res{annotations}{$group}{events}=\@schedule;
-	}
+	} }
+	$self->_attr()->push(); $res{_attr}=pop(@{$$self{attr}{stack}}); # store a copy in {_attr}
+	$self->_attr()->pop();
+	$res{_tmmax}=$tmoffset;
 	return %res;
 }
 
@@ -430,7 +442,7 @@ Schedule::Activity - Generate random activity schedules
 
 =head1 VERSION
 
-Version 0.2.0
+Version 0.2.1
 
 =head1 SYNOPSIS
 
@@ -747,11 +759,7 @@ Any message configuration within activity/action nodes may then reference the me
 
 The configuration of a named message may only create string, array, or hash alternative messages; it cannot reference another name.
 
-This feature is experimental starting with version 0.1.2.
-
 =head1 FILTERING
-
-Experimental starting with version 0.1.6.
 
 Action nodes may include prerequisites before they will be selected during scheduling:
 
@@ -795,11 +803,32 @@ The imported configuration permits an activity to be followed by any of its acti
 
 The full settings needed to build a schedule can be loaded with C<%settings=loadMarkdown(text)>, and both C<$settings{configuration}> and C<$settings{activities}> will be defined so an immediate call to C<schedule(%settings)> can be made.
 
+=head1 INCREMENTAL CONSTRUCTION
+
+For longer schedules with multiple activities, regenerating a full schedule because of issues with a single activity can be time consuming.  A more interactive approach would be to build and verify the first activity, then review choices for the second activity schedule, append it, and continue.  After full scheduling construction, annotations can be built.
+
+Incremental schedules can be built using the C<after> and C<nonote> options:
+
+  # Use nonote to avoid annotation build at this time
+  my $choiceA=$scheduler->schedule(nonote=>1, activities=>[[600,'activity1']);
+  my $choiceB=$scheduler->schedule(nonote=>1, activities=>[[600,'activity1']);
+  #
+  # two or more choices are reviewed and one is selected
+  my %res=$scheduler->schedule(after=>$choiceB, activities=>[[600,'activity2']);
+
+The schedule indicated via C<after> signals that the scheduler should build the activities and extend the schedule.  Attributes are automatically loaded from the earlier part of the schedule and affect node filtering normally.
+
+Annotations, which may apply to any node by name, are dropped when the schedule is extended.  This is because a single annotation may have a limit and match nodes across activities, so full regeneration is necessary.  To make generation more efficient, C<nonote> may be set to skip annotation generation in earlier steps.
+
+The final result above does generate annotations, but it's also possible to pass C<nonote> at each step and then generate annotations without adding activities by calling:
+
+  my %res=$scheduler->schedule(after=>$earlierSchedule, activities=>[]);
+
+This functionality is experimental starting with Version 0.2.1.
+
 =head1 BUGS
 
 It is possible for some settings to get stuck in an infinite loop:  Be cautious setting C<tmavg=0> for actions.
-
-(This should be fixed in 0.1.7).  There is currently a limitation with scheduling to the maximum buffer that is dependent on the behavior that a list of next actions with only a single entry will return that entry (even if it would have been otherwise filtered).  The exceptions need to be updated so that the maximum buffer includes the tmmax of the conclusion node itself, otherwise the conclusion node will get filtered out and scheduling will fail.
 
 =head1 SEE ALSO
 

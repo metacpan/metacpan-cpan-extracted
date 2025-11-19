@@ -8,7 +8,7 @@ use Carp;
 
 use subs qw();
 
-our $VERSION = '1.017';
+our $VERSION = '1.018';
 
 =encoding utf8
 
@@ -158,6 +158,7 @@ With major versions after 10, all point releases have the same identifier:
 	13 Ventura
 	14 Sonoma
 	15 Sequoia
+	16 Tahoe
 
 =item minor_version_numbers( [ MAJOR ] )
 
@@ -183,6 +184,7 @@ my %names = (
 	'13' => [ 'Ventura' ],
 	'14' => [ 'Sonoma' ],
 	'15' => [ 'Sequoia' ],
+	'26' => [ 'Tahoe' ],   # starts aligning with calendar year
 	 );
 
 my %release_dates = (
@@ -192,6 +194,7 @@ my %release_dates = (
 	13 => [ ],
 	14 => [ ],
 	15 => [ ],
+	26 => [ ],
 	);
 
 sub default_major_version { '10' }

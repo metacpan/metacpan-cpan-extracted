@@ -1,0 +1,19 @@
+TODO
+====
+* NaN and INFINITY
+
+Done
+====
+* Regexp objects
+* Glob objects
+* Bool values
+* Add option for KRUMO_NOSORT
+* Add option for KRUMO_RETURN
+* Add option for KRUMO_NO_COLOR
+* Short circuit array_str_length after 999 chars so we don't waste CPU time
+* Add kxd()
+* Handle the width and include indentation
+* Consistent quoting for hash keys
+* Unit tests
+* Better handle string quoting ' vs "
+* Handle VSTRINGS (version strings)

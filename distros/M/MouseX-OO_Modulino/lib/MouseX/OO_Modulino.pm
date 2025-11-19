@@ -2,7 +2,7 @@
 package MouseX::OO_Modulino;
 use MouseX::OO_Modulino::MOP4Import -as_base;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Carp ();
 use Module::Runtime ();

@@ -24,9 +24,9 @@ METHODS
 
     *       "leader"
 
-            MARC leader string.
+            MARC leader in Data::MARC::Leader instance.
 
-            It's required.
+            It's required for parse() method only.
 
             Default is undef.
 
@@ -65,13 +65,15 @@ ERRORS
                              Reference: %s
              From Mo::utils::check_required():
                      Parameter 'ignore_data_errors' is required.
-                     Parameter 'leader' is required.
              From Class::Utils::set_params():
                      Unknown parameter '%s'.
 
      parse():
              Bad length of MARC 008 field.
                      Length: %s
+
+             From Mo::utils::check_required():
+                     Parameter 'leader' is required.
 
              Errors from L<Data::MARC::Field008>, see documentation.
 
@@ -201,6 +203,13 @@ LICENSE AND COPYRIGHT
 
     BSD 2-Clause License
 
+ACKNOWLEDGEMENTS
+    Development of this software has been made possible by institutional
+    support for the long-term strategic development of the National Library
+    of the Czech Republic as a research organization provided by the
+    Ministry of Culture of the Czech Republic (DKRVO 2024–2028), Area 11:
+    Linked Open Data.
+
 VERSION
-    0.03
+    0.04
 

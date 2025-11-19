@@ -1,3 +1,7 @@
+0.07 2025-11-14T17:02:02+01:00
+ - Add ACKNOWLEDGEMENTS section to doc.
+ - Add tests for verbose mode parsing.
+
 0.06 2025-04-13T10:14:54+02:00
  - Add 'verbose' parameter for verbose mode.
  - Add length of leader to error.

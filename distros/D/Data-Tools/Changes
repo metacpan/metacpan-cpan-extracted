@@ -1,4 +1,13 @@
+
 Revision history for Perl extension Data::Tools
+
+1.50 2025-10-26
+
+   - Data::Tools::Socket::Protocols fixed empty message or empty payload logic
+   - Data::Tools::Socket::Protocols added 'H' for simple, url-like escaped msgs
+   - Data::Tools fixed str_escape()
+   - Data::Tools fixed str2hash() and hash2str() for the simple slash escaping
+   - Data::Tools added str_initials() 
 
 1.47 2025-07-23
 

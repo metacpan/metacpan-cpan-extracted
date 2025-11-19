@@ -3,7 +3,7 @@ abstract: 'Perl Based Secure Distributed Computing Network Process'
 author:
   - 'Brian M. Kelly <Brian.Kelly@FullAuto.com>'
 configure_requires:
-license: AGPLv3.0 # https://www.gnu.org/licenses/license-list.html#GNUGPL
+license: AGPL # https://www.gnu.org/licenses/license-list.html#GNUGPL
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v2.0.html
   version: 2.0
@@ -15,7 +15,7 @@ provides:
     file: lib/Net/FullAuto/FA_Core.pm
   Net::FullAuto:
     file: lib/Net/FullAuto.pm
-    version: 1.0000830
+    version: 1.0000831
   Net::FullAuto::FA_Core:
     file: lib/Net/FullAuto/FA_Core.pm
   Net::FullAuto::FA_DB:
@@ -36,4 +36,4 @@ provides:
     file: lib/Net/FullAuto/Distro/fa_menu.pm
 resources:
   license: http://www.gnu.org/licenses/agpl.html
-version: 1.0000830
+version: 1.0000831

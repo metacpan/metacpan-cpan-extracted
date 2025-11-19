@@ -1,0 +1,18 @@
+<start_html script="https://unpkg.com/htmx.org@1.9.10">
+<h2>Current time</h2>
+<p>Click the button below to load time data from the server</p>
+
+<!-- HTMX Trigger Button -->
+<button 
+  hx-get="htmx_time2.psp"
+  hx-target="#time-container"
+  hx-swap="innerHTML"
+>
+Get Time
+</button>
+
+<!-- Where the fetched HTML fragment will go -->
+<p>
+<div id="time-container">
+  <em>Time data not loaded yet.</em>
+</div>

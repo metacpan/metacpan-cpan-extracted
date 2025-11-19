@@ -133,7 +133,7 @@ L<python-chess|https://python-chess.readthedocs.io/en/latest/> by about 50 %.
 
 =over 4
 
-=item B<new([FEN])>
+=item B<new([FEN][, RELAXED])>
 
 Creates a new B<Chess::Plisco> instance that represents the starting position
 of standard chess.
@@ -142,7 +142,10 @@ If an argument is passed to the constructor, it is interpreted as a position in
 Forsyth-Edwards Notation (FEN).  This has the same effect as using the
 constructor C<newFromFEN>.
 
-=item B<newFromFEN(FEN)>
+Beginning with version v0.8.0, you can now pass a second parameter B<RELAXED>
+that disables a lot of legality checks on the position.
+
+=item B<newFromFEN(FEN[, RELAXED])>
 
 Creates a new B<Chess::Plisco> instance from a string containing the
 Forsyth-Edwards Notation (FEN) of a chess position.  The only difference to
@@ -153,6 +156,9 @@ the requirements of the library.
 
 All legal chess positions meet the requirements of the library.  But positions
 that are not legal and may cause the library to malfunction, are rejected.
+
+Beginning with version v0.8.0, you can now pass a second parameter B<RELAXED>
+that disables a lot of legality checks on the position.
 
 =item B<copy(POSITION)>
 
@@ -496,10 +502,12 @@ properties.
 
 =over 4
 
-=item B<parseMove(NOTATION)>
+=item B<parseMove(NOTATION[, PSEUDO_LEGAL])>
 
 Parses the string B<NOTATION> into an integer representing the move or returns
-false, if the B<NOTATION> cannot be parsed or is an illegal move.
+false, if the B<NOTATION> cannot be parsed or is an illegal move.  Note that
+the parser does not do a complete legality check. Use "applyMove()" to test
+whether the move is really legal.
 
 B<NOTATION> can either be a move in Standard Algebraic Notation (SAN) or in
 coordinate notation.  Coordinate notation is the format used by most chess
@@ -509,6 +517,9 @@ possible promotion piece, for example "e2e4" or "f2f1q".
 B<IMPORTANT!> Beginning with version 0.5, B<NOTATION> is case-sensitive! This
 incompatible change was necessary because a move like "B2d4" may otherwise
 be ambiguous.
+
+Beginning with version v0.8.0, you can pass an optional flag B<PSEUDO_LEGAL>.
+If it has a truthy value, the move is not checked for legality.
 
 =item B<SAN(MOVE)>
 
@@ -1026,14 +1037,17 @@ a position should pass a truthy value so that dead positions can be detected.
 Returns true if the square indicated by B<SHIFT> is attacked by a piece of
 the opponent.
 
-=item B<moveAttacked(MOVE|NOTATION)>
+=item B<moveAttacked(MOVE|NOTATION[, PSEUDO_LEGAL])>
 
 Returns true if when executing B<MOVE>, the moving piece would be attacked
-by a piece of the opponent.  A typical usage example would be to check if
-the king moving from B<FROM> to B<TO> would move into check.
+by a piece of the opponent.
 
 You can give the move either as an integer or in one of the supported move
 notations.
+
+Beginning with version v0.8.0, you can pass an optional flag B<PSEUDO_LEGAL>.
+If it has a truthy value, the move is not checked for legality. You want to
+use this for checking whether the king would move into chess.
 
 =item B<movePinned(MOVE|NOTATION)>
 
@@ -1043,6 +1057,10 @@ opponent attack is not considered a pin by this method.
 
 You can give the move either as an integer or in one of the supported move
 notations.
+
+Beginning with version v0.8.0, you can pass an optional flag B<PSEUDO_LEGAL>.
+If it has a truthy value, the move is not checked for legality. You want to
+use this for checking whether the move would put the king into check.
 
 =item B<rMagic(SHIFT, OCCUPANCY)>
 

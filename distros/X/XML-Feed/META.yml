@@ -17,7 +17,7 @@ name: XML-Feed
 provides:
   XML::Feed:
     file: lib/XML/Feed.pm
-    version: '0.65'
+    version: v1.0.0
   XML::Feed::Content:
     file: lib/XML/Feed/Content.pm
     version: '0.65'
@@ -67,7 +67,7 @@ resources:
   bugtracker: https://github.com/davorg-cpan/xml-feed/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/davorg-cpan/xml-feed.git
-version: '0.65'
+version: v1.0.0
 x_contributors:
   - 'Dave Cross <davecross@cpan.org>'
   - 'Jakob Voss <voss@gbv.de>'

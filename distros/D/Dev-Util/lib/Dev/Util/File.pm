@@ -1,12 +1,12 @@
 package Dev::Util::File;
 
-use lib 'lib';
 use Dev::Util::Syntax;
 use Exporter qw(import);
+
 use File::Temp;
 use IO::Handle;
 
-our $VERSION = version->declare("v2.18.19");
+our $VERSION = version->declare("v2.19.6");
 
 our %EXPORT_TAGS = (
                      fattr => [ qw(
@@ -450,7 +450,7 @@ Dev::Util::File - General utility functions for files and directories.
 
 =head1 VERSION
 
-Version v2.18.19
+Version v2.19.6
 
 =head1 SYNOPSIS
 

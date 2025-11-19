@@ -1,0 +1,55 @@
+<html>
+<head>
+
+<!-- Special meta tag -->
+<meta name="WebDyne" content="static=1">
+
+<title>Hello World</title>
+</head>
+<body>
+<p>
+Hello World
+<hr>
+
+
+<!-- A normal dynamic section, but because of the meta tag it will be frozen 
+	at compile time -->
+
+<perl method="localtime">
+Current time: ${time} 
+</perl>
+
+<!-- Note the static attribute. It is redundant now the whole page is flagged
+	as static - it could be removed safely. -->
+
+<p>
+<perl method="mtime" static="1">
+<em>Last Modified: </em>${mtime}
+</perl>
+
+
+</body>
+</html>
+
+__PERL__
+
+
+sub localtime {
+
+	shift()->render(time=>scalar localtime);
+
+}
+
+
+sub mtime {
+
+	my $self=shift();
+	my $r=$self->request();
+	
+	my $srce_pn=$r->filename();
+    	my $srce_mtime=(stat($srce_pn))[9];
+	my $srce_localmtime=localtime $srce_mtime;
+
+        return $self->render( mtime=>$srce_localmtime )
+
+}

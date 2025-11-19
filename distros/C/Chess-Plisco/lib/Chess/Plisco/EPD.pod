@@ -26,11 +26,27 @@ B<Chess::Plisco::EPD> can parse EPDs from strings or files.
 
 =over 4
 
-=item B<new(STRING|ARRAYREF|FILENAME|FILEHANDLE>)
+=item B<new(STRING|ARRAYREF|FILENAME|FILEHANDLE[, OPTIONS])>
 
 You can instantiate the parser either with EPD data from a string, from
 an array reference holding individual lines, from a named file or from a file
 handle that is open for reading.
+
+The optional hash parameter B<OPTIONS> has been introduced in version 0.8.0.
+The following options are defined:
+
+=over 8
+
+=item filename
+
+Overrides the filename. This makes sense when you do B<not> pass a filename as
+the input source.
+
+=item pseudo_legal
+
+If it has a truthy value, a lot of legality checks are disabled.
+
+=back
 
 =back
 

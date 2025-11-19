@@ -1,0 +1,7 @@
+<html>
+<head>
+<include head file="./include2.psp">
+</head>
+<body>
+<include body file="./include2.psp">
+

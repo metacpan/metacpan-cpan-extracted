@@ -1,0 +1,2 @@
+<start_html title="Server Time">
+The local server time is: <? localtime() ?>

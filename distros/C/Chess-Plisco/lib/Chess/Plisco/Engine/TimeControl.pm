@@ -13,10 +13,12 @@
 # ABSTRACT: Analyze chess games in PGN format
 
 package Chess::Plisco::Engine::TimeControl;
-$Chess::Plisco::Engine::TimeControl::VERSION = 'v0.7.0';
+$Chess::Plisco::Engine::TimeControl::VERSION = 'v0.8.0';
 use strict;
 
-use Time::HiRes qw(gettimeofday);
+use Time::HiRes qw(gettimeofday tv_interval);
+
+use Chess::Plisco::Engine::TimeControl::MovesToGo;
 
 sub new {
 	my ($class, $tree, %params) = @_;
@@ -53,8 +55,13 @@ sub new {
 	}
 
 	# Initial value for calibration.
-	$tree->{nodes_to_tc} = 1000;
+	$tree->{nodes_to_tc} = 5000;
 
+	# The parameter "ponder" is ignored and we compute the time allocation
+	# as usual but the search tree will ignore it while pondering. If the
+	# opponent plays the expected move (ponder hit), the start time of the
+	# tree will be reset to the current time and it goes from ponder mode into
+	# normal mode and can then check the time as usual.
 	if ($params{movetime}) {
 		$tree->{allocated_time} = $params{movetime};
 		$tree->{fixed_time} = 1;
@@ -78,16 +85,15 @@ sub new {
 sub allocateTime {
 	my ($self, $tree, $params) = @_;
 
-	# First get a rough estimate of the moves to go.
-	my $mtg = $self->movesToGo;
-
+	my $mtg;
 	if ($params->{movestogo} && $params->{movestogo} < $mtg) {
 		$mtg = $params->{movestogo};
+	} else {
+		$mtg = $self->movesToGo;
 	}
 
 	my $time_left = $params->{mytime} + $params->{movestogo} * $params->{myinc};
 
-	# FIXME! This should not be fixed_time but have a better name.
 	# FIXME! Depending on the volatility of the position, there should be
 	# a time cushion that can be used if the evaluation changes a lot between      
 	# iterations.
@@ -97,47 +103,36 @@ sub allocateTime {
 sub movesToGo {
 	my ($self) = @_;
 
-	# FIXME! These parameters should be configurable and their defaults
-	# should be tuned!
-	my $min_moves_remaining = 20;
-	my $max_moves_remaining = 60;
-	my $moves_range = $max_moves_remaining - $min_moves_remaining;
+	my $position = $self->{__tree}->{position};
+	my $score = abs($position->evaluate);
 
-	# We make two very simple assumptions.  The popcount of the weaker
-	# party decreases in the course of the game from 16 to 1.  That
-	# allows us a linear interpolation for the number of moves to go.
-	# On the other hand, the material imbalance may change from 0
-	# to 9 queens (81 for our purposes).  But an imbalance of 10
-	# (one queen plus a pawn) should guaranty a trivial win for the side
-	# to move and we can limit the material imbalance to that.
-	#
-	# And then we simply give each a result a weight with the two results
-	# summing up to 1.0.
-	my $popcount_weight = 0.75;
-	my $material_weight = (1 - $popcount_weight);
-
-	my $pos = $self->{__tree}->{position};
-	my $wpopcount = $pos->bitboardPopcount($pos->whitePieces);
-	my $bpopcount = $pos->bitboardPopcount($pos->blackPieces);
-	my $material = $pos->material;
-
-	my $popcount = $wpopcount < $bpopcount ? $wpopcount : $bpopcount;
-
-	# Popcount slope and constant offset.
-	my $mpc = my $moves_range / (16 - 1);
-	my $cpc = $min_moves_remaining - $mpc;
-
-	# Material imbalance slope and constant offset.
-	my $mmc = -$moves_range / 10 - 0;
-	my $cmc = $max_moves_remaining;
-
-	# FIXME! Since this is only done once per ply, a full evaluation of
-	# the position should be done instead of just looking at the material
-	# balance.
-    my $mtg = $popcount_weight * ($mpc * $popcount + $cpc)
-			 + $material_weight * ($mmc * $material + $cmc);
+	my $mtg = Chess::Plisco::Engine::TimeControl::MovesToGo::MOVES_TO_GO->[$score]
+		// 10;
 
 	return $mtg;
+}
+
+sub onPonderhit {
+	my ($self) = @_;
+
+	my $tree = $self->{__tree};
+	return if !delete $tree->{ponder};
+
+	my $won_time = 1000 * tv_interval($tree->{start_time});
+
+	# At the moment we don't know how to efficiently use the time won. Once,
+	# we do a new assessment after earch search iteration, we can simply
+	# redo that now. But for the time being, we can only guess and use
+	# one fourth of the won time for the current position.
+	if ($tree->{allocated_time}) {
+		# Apply a little bit of the extra time to this search because it was
+		# a little bit slower, because while pondering, we do more the time
+		# controls more frequently. On the other hand, a ponderhit rather
+		# indicates that the current position is not worth searching very
+		# deeply.
+		$tree->{allocated_time} += $won_time >> 3;
+		$tree->{ponderhit} = 1; # Avoid warnings about using too much time.
+	}
 }
 
 1;

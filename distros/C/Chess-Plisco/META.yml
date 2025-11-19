@@ -20,13 +20,13 @@ meta-spec:
 name: Chess-Plisco
 requires:
   Carp: '0'
+  Chess::Opening::Book::Polyglot: '0'
   Exporter: '0'
   Fcntl: '0'
   File::Basename: '0'
   File::Globstar: '0'
   File::Temp: '0'
   Filter::Util::Call: '0'
-  Getopt::Long: '0'
   IO::Select: '0'
   IO::Socket::UNIX: '0'
   List::Util: '0'
@@ -48,6 +48,6 @@ resources:
   bugtracker: https://github.com/gflohr/Chess-Plisco/issues
   homepage: http://www.guido-flohr.net/en/projects#chess-plisco
   repository: git://github.com/gflohr/Chess-Plisco.git
-version: v0.7.0
+version: v0.8.0
 x_generated_by_perl: v5.40.0
 x_serialization_backend: 'YAML::Tiny version 1.76'

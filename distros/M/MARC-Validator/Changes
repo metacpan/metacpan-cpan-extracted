@@ -1,3 +1,9 @@
+0.07 2025-11-14T15:39:34+01:00
+ - Add ACKNOWLEDGEMENTS section to doc.
+ - Add plugin for 035 field to check unique 035a.
+ - Fix ERRORS section in Abstract class doc.
+ - Regen example in doc.
+
 0.06 2025-10-31T14:37:54+01:00
  - Fix check in case of invalid leader in Field008 plugin.
  - Fix check in case of invalid leader in Field040 plugin.

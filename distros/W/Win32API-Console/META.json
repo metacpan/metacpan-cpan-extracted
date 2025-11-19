@@ -1,0 +1,70 @@
+{
+   "abstract" : "Win32 native Console API",
+   "author" : [
+      "J. Schneider"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Win32API-Console",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.56"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Types::Standard" : "0",
+            "Win32::GuiTest" : "0"
+         },
+         "requires" : {
+            "Encode" : "0",
+            "Exporter" : "0",
+            "Hash::Util" : "0",
+            "Win32" : "0.44",
+            "Win32::API" : "0.77",
+            "Win32::Console" : "0.10",
+            "Win32API::File" : "0.08",
+            "Win32API::Registry" : "0.21",
+            "perl" : "5.014",
+            "version" : "0.77"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/brickpool/Win32API-Console/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/brickpool/Win32API-Console.git",
+         "web" : "https://github.com/brickpool/Win32API-Console"
+      }
+   },
+   "version" : "v0.1.1",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

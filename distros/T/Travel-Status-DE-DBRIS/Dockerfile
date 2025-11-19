@@ -2,6 +2,7 @@ FROM perl:5.40-slim
 
 COPY bin/ /app/bin/
 COPY lib/ /app/lib/
+COPY share/ /app/share/
 COPY Build.PL cpanfile* /app/
 
 WORKDIR /app

@@ -4,230 +4,354 @@ WebDyne is a Perl based dynamic HTML engine. It works with web servers
 (or from the command line) to render HTML documents with embedded Perl
 code.
 
-Once WebDyne is installed and initialised to work with a web server any
-file with a `.psp` extension is treated as a WebDyne source file. It is
-parsed for WebDyne or HTML shortcut pseudo-tags (such as `<perl>` and
-`<block>` for WebDyne, or `<start_html>`,`<popup_menu>` shortcuts) which
-are interpreted and executed on the server. The resulting output is then
-sent to the browser.
+Once WebDyne is installed and initialised any file with a `.psp`
+extension is treated as a WebDyne source file. It is parsed for WebDyne
+pseudo-tags (such as `<perl>` and `<block>`) which are interpreted and
+executed on the server. The resulting output is then sent to the
+browser.
 
-Pages are parsed once, then optionally stored in a partially compiled
-format - speeding up subsequent processing by avoiding the need to
-re-parse a page each time it is loaded. WebDyne works with common web
-server persistant/resident Perl modules such as mod_perl and PSGI to
-provide fast dynamic content.
+WebDyne works with common web server persistent Perl interpreters - such
+as Apache `mod_perl` and `PSGI` - to provide fast dynamic content. It
+works with PSGI servers such as Plack and Starman, and can be
+implemented as a Docker container to run HTML with embedded Perl code.
+
+Pages are parsed once, then stored in a partially compiled format -
+speeding up subsequent processing by avoiding the need to re-parse a
+page each time it is loaded.
 
 Alternate syntaxes are available to enable WebDyne code to be used with
-editors that do no recognise custom HTML tags, and the syntax supports
-the use of PHP type processing instruction tags (`<? perl ?>`) or
-`<div>` tags (via data attributes such as `<div data-webdyne-perl>`) to
-define WebDyne blocks
+editors that do not recognise custom HTML tags, and the syntax supports
+the use of PHP type processing instruction tags (`<?..?>`) or `<div>`
+tags (via data attributes such as `<div data-webdyne-perl>`) to define
+WebDyne blocks.
 
-# Legal Information - Licensing and Copyright
+Perl code can be co-mingled in the HTML code for "quick and dirty" pages
+or completed isolated into separate files or modules for separation of
+presentation and logic layers. You can see examples in a dedicated
+section - but here are a few very simple examples as an overview.
 
-WebDyne is Copyright © Andrew Speer 2006-2010. Webdyne is dual licensed.
-It is released as free software released under the [Gnu Public License
-(GPL)](#gpl), but is also available for commercial use under a
-proprietary license - please contact the author for further information.
+Simple HTML file with Perl code embedded using WebDyne :
 
-WebDyne is written in Perl and uses modules from
-[CPAN](http://www.cpan.org) (the Comprehensive Perl Archive Network).
-CPAN modules are Copyright © the owner/author, and are available in
-source form by downloading from CPAN directly. All CPAN modules used are
-covered by the [Perl Artistic
-License](http://www.perl.com/pub/a/language/misc/Artistic.html)
+``` html
+<html>
+<head><title>Server Time</title></head>
+<body>
+The local server time is:
+<perl> localtime() </perl>
+</body>
+</html>
+```
 
-# Credits
+[Run](https://demo.webdyne.org/introduction1.psp)
 
-WebDyne relies heavily on modules and code developed and open-sourced by
-other authors. Without Perl, and Perl modules such as mod_perl/PSGI,
-HTML::Tiny, HTML::TreeBuilder, Storable and many other, WebDyne would
-not be possible. To the authors of those modules - and all the other
-modules used to a lesser extent by WebDyne - I convey my thanks.
+This can be abbreviated with some WebDyne shortcut tags such as
+`<start_html>`. This does exactly the same thing and still renders
+compliant HTML to the browser:
 
-# Installation
+``` html
+<start_html title="Server Time">
+The local server time is: <? localtime() ?>
+```
 
-WebDyne can be installed via the following methods:
+[Run](https://demo.webdyne.org/introduction2.psp)
 
-Perl CPAN
+Don't like the co-mingling code and HTML but still want things in one
+file ?
 
-:   Install from the Perl CPAN library. Installs dependencies if
-    required (also via CPAN). Use this method if you are familiar with
-    CPAN. Destination of the installated files is dependent on the local
-    CPAN configuration, however in most cases it wil be to the Perl site
-    library location. WebDyne supports installation to an alternate
-    location using the PREFIX option in CPAN. Binaries are usually
-    installed to `/usr/bin` or `/usr/local/bin` by CPAN, but may vary by
-    distribution/local configuration.
+``` html
+<start_html title="Server Time">
+The local server time is <? print_time() ?>
+</html>
+__PERL__
+sub print_time {
+    print(scalar localtime);
+}
+    
+```
 
-    Assuming your CPAN environment is setup correctly you can run the
-    command:
+[Run](https://demo.webdyne.org/introduction3.psp)
 
-    `perl -MCPAN -e "install WebDyne"`
+Want further code and HTML separation ? You can import methods from any
+external Perl module. Example from a core module below, but could be any
+installed CPAN module or your own code:
 
-    To install the base WebDyne module, which includes the Apache
-    installer.
+``` html
+<start_html title="Server Time">
+Server Time::HiRes time:
+<perl require="Time::HiRes" import="time">time()</perl>
+```
 
-    To get the installer for Lighttpd (after the base package above is
-    installed) run
+[Run](https://demo.webdyne.org/introduction4.psp)
 
-    `perl -MCPAN -e "install WebDyne::Install::Lighttpd"`
+Same concepts implemented in slightly different ways:
 
-    To get the complete suite of WebDyne modules, including all
-    installers and externsion modules (Session manager etc.) run:
+``` html
+<start_html title="Server Time">
+The local server epoch time (hires) is: <? time() ?>
+<end_html>
+__PERL__
+use Time::HiRes qw(time);
+1;
+```
 
-    `perl -MCPAN -e "install Bundle::WebDyne"`
+[Run](https://demo.webdyne.org/introduction5.psp)
 
-::: important
-WebDyne must be initialised after installation. To get started quickly
-run `wdapacheinit` after CPAN installation to setup WebDyne for an
-Apache/mod_perl environment, or `wdlighttpdinit` for a Lighttpd/FastCGI
-environment (make sure the Lighttpd FastCGI module is installed - it is
-often packaged as a separate component in many Linux distributions). See
-the [initialisation](#sect1-initialisation) section for more information
-:::
+``` html
+<start_html title="Server Time">
+<perl require="Time::HiRes" import="time"/>
+The local server time (hires) is: <? time() ?>
+```
+
+[Run](https://demo.webdyne.org/introduction6.psp)
+
+Using an editor that doesn't like custom tags ? Use of the <div\> tag
+with a `data-*` attribute is legal HTML syntax and can be used to embed
+Perl:
+
+``` html
+<start_html title="Server Time">
+The local server time is: <div data-webdyne-perl> localtime() </div>
+```
+
+[Run](https://demo.webdyne.org/introduction7.psp)
+
+Don't like <div\> style syntax ? Put the code in a <script\> block -
+it will be interpreted on the server, not the client:
+
+``` html
+<start_html title="Server Time">
+Server local time is: 
+<script type="application/perl">
+    print scalar localtime()
+</script>
+```
+
+[Run](https://demo.webdyne.org/introduction7.psp)
+
+Template blocks and variable replacement is supported also:
+
+``` html
+<start_html>
+
+<!-- Call perl code to render server time -->
+<perl handler="server_time">
+
+<!-- Template Block it will be rendered into -->
+<block name="server_time">
+<p>
+Loop ${i}: The local server time is: ${time}
+</block>
+
+</perl>
+
+__PERL__
+
+sub server_time {
+
+    #  Get self ref
+    #
+    my $self=shift();
+    
+    #  Get local time
+    #
+    my $time=scalar localtime();
+
+    #  Loop 4 times
+    #
+    foreach my $i (1..4) {
+    
+        #  Render template block
+        #
+        $self->render_block('server_time', i=>$i, time=>$time)
+        
+    }
+
+    #  Return section
+    #
+    return $self->render()
+
+}
+```
+
+[Run](https://demo.webdyne.org/introduction9.psp)
+
+# Installation and Quickstart
 
 ## Prerequisites
 
-WebDyne requires mod_perl available when running with Apache, or FastCGI
-support if running with Lighttpd. Installation on Windows requires
-ActiveState Perl be installed, and Apache/mod_perl be available.
+WebDyne will install and run on any modern Linux system that has a
+recent version of Perl installed and is capable of installing Perl
+module via CPAN. Installation via Docker is also supported.
 
-In pathological cases WebDyne can run in CGI mode (does not need
-mod_perl or FastCGI) however such a configuration is not supported by
-the installation scripts, and would be extremely inefficient and CPU
-intensive under any non-trivial load.
+When installing WebDyne there are two components which are required
+before you can begin serving .psp files:
 
-## Compatibility
+-   The core WebDyne Perl modules
 
-WebDyne should install on any modern Linux distribution. It will run
-with mod_perl 1.x, 1.99_x, 2.0.x and 2.2, and has been tested on a
-variety of distributions.
+-   A web server configured to use WebDyne
 
-Installation from CPAN or the source code should be possible with little
-or no effort on most \*nix/compatible systems such a \*BSD, Solaris etc.
-so long as the correct development tools and libraries are available.
+WebDyne will work with Apache mod_perl or PSGI compatible web servers
+(such as Plack, Starman etc.).
 
-WebDyne has been installed onto a Windows 2003 SP1 server running Apache
-2.0/mod_perl, Apache 2.2/mod_perl and IIS. The `wdapacheinit` installer
-may work in other Windows environments but has not been tested.
+Docker containers with pre-built versions of WebDyne are also available.
 
-# Initialisation {#sect1-initialisation}
+## Installing via CPAN or CPANMinus
 
-After installation Web Server configuration files must be updated so
-that the WebDyne software will be used to generate output when a .psp
-file is invoked. WebDyne comes bundled with an installer for Apache
-(`wdapacheinit`), and installers for selected other web servers (e.g.
-`WebDyne::Install::Lighttpd`) are available separately from CPAN.
+Install from the Perl CPAN library using `cpan` or `cpanm` utilities.
+Installs dependencies if required (also from CPAN).
 
-Initialisation can be done via one of two methods:
+Destination of the installed files is dependent on the local CPAN
+configuration, however in most cases it will be to the Perl site library
+location. WebDyne supports installation to an alternate location using
+the PREFIX option in CPAN. Binaries are usually installed to `/usr/bin`
+or `/usr/local/bin` by CPAN, but may vary by distribution/local
+configuration.
 
-Manual Initialisation
+Assuming your CPAN environment is setup correctly you can run the
+command:
 
-:   Web server configuration files can be hand-edited, and cache
-    directories manualy created.
+`perl -MCPAN -e "install WebDyne"`
 
-Script Initialisation
+Or (with `cpanminus` if installed)
 
-:   Scripts to automate the initialisation process for Apache and
-    Lighttpd have been written - they will attempt to locate and update
-    the Web Server config files (and create neccessary directories, set
-    permissions etc.) as required. The scripts will work in common
-    cases, but may have trouble on unusual distributions, or if a custom
-    version of Apache (or other Web Server) is being used
+`cpanm WebDyne`
 
-Scripted installation is easiest if it works for your distribution - it
-will take care of all configuration file changes, directory permissions
-and ownership etc.
+This will install the base WebDyne modules, which includes the Apache
+config utility and PSGI version. Note that Apache or PSGI servers and
+dependencies such as Plack or Starman are **not** installed by default
+and need to be installed separately - see the relevant section.
 
-## Running `wdapacheinit` to initialise the software for use with Apache/mod_perl
+Once installed you will need to configure your web server to use WebDyne
+to serve files with the `.psp` extension if using Apache - see section
+below.
 
-Once the WebDyne software in installed it must be initialized. The
-`wdapacheinit` command must be run to update the Apache configuration
-files so that WebDyne pages will be correctly interpreted:
+## Quickstart
 
-    [root@localhost ~]# /opt/webdyne/bin/wdapacheinit
+If using PSGI you can start a quick web server with:
 
-    [install] - Installation source directory '/opt/webdyne'.
-    [install] - Using existing cache directory '/opt/webdyne/cache'.
-    [install] - Updating perl5lib config.
-    [install] - Writing Apache config file '/etc/httpd/conf.d/webdyne.conf'.
-    [install] - Granting Apache write access to cache directory.
-    [install] - Install completed.
+``` bash
+#  Render a file to STDOUT to see the HTML
+#
+$ wdrender app.psp
+
+#  Install Plack
+#
+$ cpanm Plack
+
+#  Check all working
+#
+$ webdyne.psgi --test
+
+#  Start serving only a single PSP file
+#
+$ webdyne.psgi app.psp
+
+# Start serving any file in the current directory, using app.psp as the default
+#
+$ webdyne.psgi .
+
+# Start but listen on non-default port, only on localhost
+#
+$ webdyne.psgi --port=5001 --host=127.0.0.1
+```
+
+Connect your browser to the host and you should see the WebDyne output
+
+## Apache mod_perl
+
+If using Apache with mod_perl you can initialise WebDyne using the
+`wdapacheinit` command. This will attempt to auto-discover where the
+Apache binary and configuration files are, then add a suitable
+`webdyne.conf` file to the apache configuration. Apache will need to be
+restarted for the new configuration file to take effect. This will need
+to be done as a the root user.
+
+``` bash
+[root@localhost ~]# wdapacheinit 
+
+[install] - Installation source directory '/usr'.
+[install] - Creating cache directory '/var/cache/webdyne'.
+
+[install] - Writing Apache config file '/etc/httpd/conf.d/webdyne.conf'.
+[install] - Writing Webdyne config file '/etc/httpd/conf.d/webdyne_conf.pl'.
+[install] - Apache uses conf.d directory - not changing httpd.conf file.
+[install] - Granting Apache (apache.apache) ownership of cache directory '/var/cache/webdyne'.
+[install] - Install completed.
+
+[root@localhost ~]# systemctl restart httpd
+```
 
 By default WebDyne will create a cache directory in `/var/cache/webdyne`
 on Linux systems when a default CPAN install is done (no PREFIX
 specified). If a PREFIX is specified the cache directory will be created
-as `PREFIX/cache`. Use the `--cache` command-line option to specify an
-alternate location.
+as `$PREFIX/cache`. Use the `wdapacheinit` `--cache` command-line option
+to specify an alternate location.
 
 Once `wdapacheinit` has been run the Apache server should be reloaded or
 restarted. Use a method appropriate for your Linux distribution.
 
-    [root@localhost ~]# service httpd restart
+    [root@localhost ~]# systemctl httpd restart
     Stopping httpd:                                            [  OK  ]
     Starting httpd:                                            [  OK  ]
 
-WebDyne should be now ready for use.
-
-If the Apache service does not restart, examine the error log (usually
-`/var/log/httpd/error.log`) for details.
-
-The script will look for Apache components (binary, configuration
-directories etc.) using common defaults. In the event that the script
-gives an error indicating that it cannot find a binary, directory or
-library you may need to specify the location manually. Run the script
-with the `--help` option to determine the appropriate syntax.
-
-## Manual configuration of Apache
+### Manual configuration of Apache
 
 If the `wdapacheinit` command does not work as expected on your system
-the Apache config files can be modified manually.
+then the Apache config files can be modified manually.
 
 Include the following section in the Apache httpd.conf file (or create a
 webdyne.conf file if you distribution supports conf.d style
-configuration files):
+configuration files). These following config files are written with
+Apache 2.4 syntax - adjust path and syntax as required:
 
-    #  Put this in if WebDyne was installed using the PREFIX option to its own directory - replace
-    #  /opt/webdyne with the correct path to the perl5lib.pl library.
+    #  Need mod_perl, load up if not already done
     #
-    #  This will adjust the @INC path so all WebDyne modules (and modules WebDyne relies on) can be
-    #  located and loaded.
-    #  
-    #  Not needed if installed to default Perl library location, but does not hurt to leave in.
-    #
-    PerlRequire   "/opt/webdyne/bin/perl5lib.pl"
+    <IfModule !mod_perl.c>
+    LoadModule perl_module "/etc/httpd/modules/mod_perl.so"
+    </IfModule>
 
+    #  Uncomment and update if using a local::lib location for Perl modules
+    #
+    #PerlSwitches -I/opt/perl -I/opt/otherperl
 
     #  Preload the WebDyne and WebDyne::Compile module
     #
     PerlModule    WebDyne WebDyne::Compile
 
-
     #  Associate psp files with WebDyne
     #
-    AddHandler    perl-script    .psp
+    AddHandler    modperl    .psp
     PerlHandler   WebDyne
-
 
     #  Set a directory for storage of cache files. Make sure this exists already is writable by the 
     #  Apache daemon process.
     #
     PerlSetVar    WEBDYNE_CACHE_DN    '/opt/webdyne/cache'
 
-
     #  Allow Apache to access the cache directory if it needs to serve pre-compiled pages from there.
     #
     <Directory "/opt/webdyne/cache">
-    Order allow,deny
-    Allow from all
-    Deny from none
+    Require all granted
     </Directory>
 
-::: important
-Substitute directory paths in the above example for the
-relevant/correct/appropriate ones on your system.
-:::
+    # Put variables in a separate file - best
+    #
+    PerlRequire conf.d/webdyne_constant.pl
+
+    #  Or use <Perl> sections - but warning, certbot doesn't like this syntax in http conf files
+    #
+    <Perl>
+
+    #  Error display/extended display on/off. Set to 1 to enable, 0 to disable
+    #
+    $WebDyne::WEBDYNE_ERROR_SHOW=1;
+    $WebDyne::WEBDYNE_ERROR_SHOW_EXTENDED=1;
+    </Perl>
+
+!!! important
+
+    Substitute directory paths in the above example for the
+    relevant/correct/appropriate ones on your system.
 
 Create the cache directory and assign ownership and permission
 appropriate for your distribution (group name will vary by
@@ -239,176 +363,262 @@ distribution - locate the correct one for your distribution)
 
 Restart Apache and check for any errors.
 
-## Running `wdlighttpdinit` to initialise the software for use with Lighttpd/FastCGI
+## PSGI
 
-If using WebDyne with Lighttpd download and install the
-`WebDyne::Install::Lighttpd` module. Then run the `wdlighttpdinit`
-command to update the Lighttpd configuration files so that WebDyne pages
-will be correctly interpreted:
+Ensure that Plack is installed on your system via CPAN:
 
-::: important
-WebDyne depends on the Lighttpd mod_fastcgi module (on RPM systems the
-package is sometimes called lighttpd-fastcgi). Please ensure the it is
-installed before running the initialisation script.
-:::
+    # Via CPAN
+    perl -MCPAN -e 'install Plack'
 
-    [root@localhost ~]# /opt/webdyne/bin/wdlighttpdinit
-
-    [install] - Installation source directory '/opt/webdyne'.
-    [install] - Using existing cache directory '/opt/webdyne/cache'.
-    [install] - Updating perl5lib config.
-    [install] - Writing Lighttpd config file '/etc/lighttpd/webdyne.conf'.
-    [install] - Lighttpd config file 'lighttpd_conf_fn'
-    [install] - Lighttpd config file '/etc/lighttpd/lighttpd.conf' updated.
-    [install] - Granting Lighttpd write access to cache directory.
-    [install] - Install completed.
-
-Once `wdlighttpinit` has been run the Lighttpd server should be reloaded
-or restarted. Use a method appropriate for your Linux distribution.
-
-    [root@localhost ~]# service lighttpd restart
-    Stopping lighttpd:                                            [  OK  ]
-    Starting lighttpd:                                            [  OK  ]
-
-WebDyne should be now ready for use.
-
-If the Lighttpd service does not restart, examine the error log (usually
-`/var/log/lighttpd/error.log`) for details.
-
-## Manual configuration of lighttpd
-
-If the `wdlighttpdinit` command does not work on your system the
-Lighttpd config files can be modified manually..
-
-Include the following section into the lighttpd configuration file:
-
-    #  Include the Lighttpd FastCGI module - make sure it is present on the system, install if not
+    # Modern systems
     #
+    cpan Plack
+
+    # Or better via CPANM
+    cpanm Plack
+
+You can start a basic WebDyne server by running the webdyne.psgi command
+with the --test parameter
+
+    webdyne.psgi --test
+
+This will start a PSGI web server on your machine listening to port 5000
+(or port 5001 on a Mac). Open a connection to http://127.0.0.1:5000/ or
+the IP address of your server in your web browser to view the test page
+and validate the WebDyne is working correctly:
+
+Once verified as working correctly you can serve WebDyne content from a
+particular directory - or from a single file - using the syntax:
+
+    #  To serve up all files in a directory:
     #
-    server.modules += (
-        "mod_fastcgi",
-    ),
+    $ webdyne.psgi <directory>
 
-
-    #  Register the psp extension with the FastCGI module
+    #  E.g serve files in /var/www/html. By default WebDyne will serve app.psp if no filename
+    #  is specified
     #
-    fastcgi.server = ( 
+    $ webdyne.psgi /var/www/html
 
-        ".psp" => ( 
-            "localhost" => (
+    #  Allow static files such as css, jpg files etc. to be served also
+    #
+    $ webdyne.psgi --static /var/www/html/app.psp
 
-                #  Change paths as appropriate for your system, socket dir must be writable by
-                #  Lighttpd daemon process owner.
-                #
-                "socket"           => "/opt/webdyne/cache/wdfastcgi-webdyne.sock",
-                "bin-path"         => "/opt/webdyne/bin/wdfastcgi",
+    #  Or just a single app.psp file. Only this file will be served regardless of URL
+    #
+    $ webdyne.psgi /var/www/html/time.psp
 
-                #  Optional, must be writable by Lighttpd daemon process owner
-                #
-                "bin-environment"  => (
-                    "WEBDYNE_CACHE_DN"=> "/opt/webdyne/cache"
-                )
-            )
-        )
-    )
+The above starts a single-threaded web server using Plack. To start the
+more performant Starman server (assuming installed):
 
-# Getting Started/Basic Usage {#examples}
+    #  Start Starman instance. Substitute port + document root and location of webdyne.psgi
+    #  as appropriate for your system.
+    #
+    $ DOCUMENT_ROOT=/var/www/html starman --port 5001 /usr/local/bin/webdyne.psgi
+
+!!! note
+
+    Starman does not support options such as --test and --static. If you
+    want to server static files from starman you should do so using best
+    practice via a traditional web server front end.
+
+Numerous options can be set from the command line via environment
+variables, including Webdyne configuration. See relevant section for all
+WebDyne configuration options but assuming in a local file
+webdyne.conf.pl:
+
+    #  Start instance webdyne.psgi using local config file
+    #
+    $ WEBDYNE_CONF=./webdyne.conf.pl webdyne.psgi --port=5012 .
+
+## Docker
+
+Docker containers are available from the Github Container Registry.
+Install the default Docker container (based on Debian) via:
+
+    #  Default debian version
+    #
+    $ docker pull ghcr.io/aspeer/webdyne:latest
+
+    #  Or Alpine/Fedora/Perl versions
+    #
+    # docker pull ghcr.io/aspeer/webdyne-alpine:latest
+    # docker pull ghcr.io/aspeer/webdyne-fedora:latest
+    # docker pull ghcr.io/aspeer/webdyne-perl:latest
+
+Start the docker container with the command:
+
+    $ docker run -e PORT=5002 -p 5002:5002 --name=webdyne webdyne
+
+This will start WebDyne running on port 5002 on the host. Connecting to
+that location should show the server *localtime* test page
+
+To mount a local page and serve it through the docker container use the
+command:
+
+    docker run --mount <local_dir>:/app:ro -e PORT=5011 -e DOCUMENT_ROOT=/app -p 5011:5011 --name=webdyne webdyne
+
+This will tell docker to mount the local directory into the docker
+container. If there is a default file named app.psp in the location it
+will be displayed. if there is a `cpanfile` in the mount directory any
+modules will be installed into the docker container automatically.
+
+### Deploying WebDyne apps with Docker
+
+The WebDyne container can be used as the basis for new docker images
+containing your application files. Consider the following directory
+structure (available from Github as
+[aspeer/psp-WebDyne-Fortune](https://github.com/aspeer/psp-WebDyne-Fortune):
+
+    psp-WebDyne-Fortune/
+    ├── app.pm
+    ├── app.psp
+    ├── cpanfile
+    ├── Dockerfile
+    └── webdyne.conf.pl
+
+Where:
+
+app.psp
+
+:   The main and default psp file
+
+app.pm
+
+:   Perl code used in the psp file
+
+cpanfile
+
+:   A list of Perl modules to be installed in the docker container by
+    cpanm
+
+Dockerfile
+
+:   The docker build file
+
+webdyne.conf.pl
+
+:   Any variables to be set for the WebDyne environment
+
+Constitute all the files needed to stand up a WebDyne based application
+in a Docker container. The contents of the Dockerfile are minimal:
+
+    FROM webdyne:latest
+    WORKDIR /app
+    # Debian packages needed for this app
+    RUN apt-get update && apt-get -y install fortunes
+    COPY app.* .
+    COPY cpanfile .
+    COPY webdyne.conf.pl /etc
+
+Build the Docker container:
+
+    docker build  -t webdyne-app-fortune -f ./Dockerfile .
+
+And run it:
+
+    docker run -e PORT=5010 -p 5010:5010 --name=webdyne-app-fortune webdyne-app-fortune
+
+Your application should now be available:
+
+![](images/webdyne-app-fortune1.png)
+
+# Basic Usage {#examples}
 
 Assuming the installation has completed with no errors you are now ready
 to start creating WebDyne pages and applications.
 
-## Basics - integrating Perl into HTML
+## Integrating Perl into HTML
 
 Some code fragments to give a very high-level overview of how WebDyne
 can be implemented. First the most basic usage example:
 
-<pre>
-<span class="h-ab">&lt;</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">head</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">title</span><span class="h-ab">&gt;</span>Hello World<span class="h-ab">&lt;/</span><span class="h-tag">title</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;/</span><span class="h-tag">head</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
+``` html
+<html>
+<head><title>Hello World</title></head>
+<body>
+<p>
 
-<span class="h-com">&lt;!-- Note the perl tags --&gt;</span>
+<!-- Note the perl tags -->
 
-Hello World <span class="h-ab">&lt;</span><span class="h-webdyne_tag">perl</span><span class="h-ab">&gt;</span> localtime() <span class="h-ab">&lt;/</span><span class="h-webdyne_tag">perl</span><span class="h-ab">&gt;</span>
+Hello World <perl> localtime() </perl>
 
-<span class="h-ab">&lt;/</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
-</pre>
+</body>
+</html>
+```
 
+[Run](https://demo.webdyne.org/hello1.psp)
 
-[Run](example/hello1.psp)
+So far not too exciting - after all we are mixing code and content. Lets
+try again:
 
-So far not too exciting - after all we are still mixing code and
-content. Lets try again:
+``` html
+<html>
+<head><title>Hello World</title></head>
+<body>
+<p>
 
-<pre>
-<span class="h-ab">&lt;</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">head</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">title</span><span class="h-ab">&gt;</span>Hello World<span class="h-ab">&lt;/</span><span class="h-tag">title</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;/</span><span class="h-tag">head</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
+<!-- Empty perl tag this time, but with method name as attribute -->
 
-<span class="h-com">&lt;!-- Empty perl tag this time, but with method name as attribute --&gt;</span>
+Hello World <perl method="hello"/>
 
-Hello World <span class="h-ab">&lt;</span><span class="h-webdyne_tag">perl</span> <span class="h-attr">method</span>=<span class="h-attv">"hello</span>"<span class="h-ab">/&gt;</span>
+</body>
+</html>
 
-<span class="h-ab">&lt;/</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
+__PERL__
 
-&#095&#095PERL&#095&#095
+sub hello { return localtime }
+```
 
-sub hello &#123; return localtime &#125;
-</pre>
-
-
-[Run](example/hello2.psp)
+[Run](https://demo.webdyne.org/hello2.psp)
 
 Better - at least code and content are distinctly separated. Note that
 whatever the Perl code returns at the end of the routine is what is
 displayed. Although WebDyne will happily display returned strings or
 scalars, it is more efficient to return a scalar reference, e.g.:
 
-    #  Works
-    #
-    sub greeting { print "Hello World" }
+``` perl
+#  Works
+#
+sub greeting { print "Hello World" }
 
 
-    #  Is the same as
-    #
-    sub greeting { return "Hello World }
-    sub greeting { my $var="Hello World"; return $var }
+#  Is the same as
+#
+sub greeting { return "Hello World" }
+sub greeting { my $var="Hello World"; return $var }
 
 
-    # But best is
-    #
-    sub greeting { my $var="Hello World"; return \$var }
+# But best is
+#
+sub greeting { my $var="Hello World"; return \$var }
 
 
-    # This will cause an error
-    #
-    sub greeting { return undef }
+# This will cause an error
+#
+sub greeting { return undef }
 
 
-    # If you don't want to display anything return \undef,
-    #
-    sub greeting { return \undef }
+# If you don't want to display anything return \undef,
+#
+sub greeting { return \undef }
 
 
-    # This will fail also
-    #
-    sub greeting { return 0 }
+# This will fail also
+#
+sub greeting { return 0 }
 
 
-    #  If you want "0" to be displayed ..
-    #
-    sub greeting { return \0 }
+#  If you want "0" to be displayed ..
+#
+sub greeting { return \0 }
+```
 
 Perl code in WebDyne pages must always return a
 non-undef/non-0/non-empty string value (i.e. it must return something
-that evals as \"true\"). If the code returns a non-true value (e.g. 0,
-undef, \'\') then WebDyne assumes an error has occurred in the routine.
-If you actually want to run some Perl code, but not display anything,
-you should return a reference to undef, (`\undef)`, e.g.:
+that evals as "true"). If the code returns a non-true value (e.g. 0,
+undef, '') then WebDyne assumes an error has occurred in the routine. If
+you actually want to run some Perl code, but not display anything, you
+should return a reference to undef, (`\undef)`, e.g.:
 
     sub log { &dosomething; return \undef }
 
@@ -417,62 +627,60 @@ file. The following example shows an instance where the code is
 contained in a separate Perl module, which should be available somewhere
 in the `@INC` path.
 
-<pre>
-<span class="h-ab">&lt;</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">head</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">title</span><span class="h-ab">&gt;</span>Hello World<span class="h-ab">&lt;/</span><span class="h-tag">title</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;/</span><span class="h-tag">head</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
+``` html
+<html>
+<head><title>Hello World</title></head>
+<body>
+<p>
 
-<span class="h-com">&lt;!-- Perl tag with call to external module method --&gt;</span>
+<!-- Perl tag with call to external module method -->
 
-Hello World <span class="h-ab">&lt;</span><span class="h-webdyne_tag">perl</span> <span class="h-attr">method</span>=<span class="h-attv">"MyModule::hello</span>"<span class="h-ab">/&gt;</span>
+Hello World <perl handler="Digest::MD5::md5_hex"/>
 
-<span class="h-ab">&lt;/</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
-</pre>
+</body>
+</html>
+```
 
+[Run](https://demo.webdyne.org/hello3.psp)
 
-If not already resident the module (in this case \"MyModule\") will be
+If not already resident the module (in this case "Digest::MD5") will be
 loaded by WebDyne, so it must be available somewhere in the `@INC` path.
-The example above cannot be run because there is no \"MyModule\" package
-on this system.
 
-## Use of the \<perl\> tag for in-line code.
+### Use of the <perl\> tag for in-line code.
 
-The above examples show several variations of the `<perl>` tag in use.
-Perl code that is enclosed by `<perl>..</perl>` tags is called *in-line*
-code:
+The above examples show several variations of the <perl\> tag in use.
+Perl code that is enclosed by <perl\>..</perl\> tags is called
+*in-line* code:
 
+``` html
+<html>
+<head><title>Hello World</title></head>
+<body>
+<p>
 <pre>
-<span class="h-ab">&lt;</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">head</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">title</span><span class="h-ab">&gt;</span>Hello World<span class="h-ab">&lt;/</span><span class="h-tag">title</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;/</span><span class="h-tag">head</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">pre</span><span class="h-ab">&gt;</span>
 
-<span class="h-com">&lt;!-- Perl tag containing perl code which generates output --&gt;</span>
+<!-- Perl tag containing perl code which generates output -->
 
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">perl</span><span class="h-ab">&gt;</span>
+<perl>
 
-for (0..3) &#123;
-	print "Hello World\n"
-&#125;
+for (0..3) {
+    print "Hello World\n"
+}
 
 #  Must return a positive value, but don't want anything
 #  else displayed, so use \undef
 #
-\undef;
+return \undef;
 
-<span class="h-ab">&lt;/</span><span class="h-webdyne_tag">perl</span><span class="h-ab">&gt;</span>
+</perl>
 
 
-<span class="h-ab">&lt;/</span><span class="h-tag">pre</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
 </pre>
+</body>
+</html>
+```
 
-
-[Run](example/inline1.psp)
+[Run](https://demo.webdyne.org/inline1.psp)
 
 This is the most straight-forward use of Perl within a HTML document,
 but does not really make for easy reading - the Perl code and HTML are
@@ -480,77 +688,74 @@ intermingled. It may be OK for quick scripts etc, but a page will
 quickly become hard to read if there is a lot of in-line Perl code
 interspersed between the HTML.
 
-in-line Perl can be useful if you want a \"quick\" computation, e.g.
+in-line Perl can be useful if you want a "quick" computation, e.g.
 insertion of the current year:
 
-<pre>
-<span class="h-ab">&lt;</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">head</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">title</span><span class="h-ab">&gt;</span>Hello World<span class="h-ab">&lt;/</span><span class="h-tag">title</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;/</span><span class="h-tag">head</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
+``` html
+<html>
+<head><title>Hello World</title></head>
+<body>
+<p>
 
-<span class="h-com">&lt;!-- Very quick and dirty block of perl code --&gt;</span>
+<!-- Very quick and dirty block of perl code -->
 
-Copyright (C) <span class="h-ab">&lt;</span><span class="h-webdyne_tag">perl</span><span class="h-ab">&gt;</span>(localtime())[5]+1900<span class="h-ab">&lt;/</span><span class="h-webdyne_tag">perl</span><span class="h-ab">&gt;</span> Foobar Gherkin corp.
+Copyright (C) <perl>(localtime())[5]+1900</perl> Foobar Gherkin corp.
 
-<span class="h-ab">&lt;/</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
-</pre>
+</body>
+</html>
+```
 
-
-[Run](example/inline2.psp)
+[Run](https://demo.webdyne.org/inline2.psp)
 
 Which can be pretty handy, but looks a bit cumbersome - the tags
 interfere with the flow of the text, making it harder to read. For this
 reason in-line perl can also be flagged in a WebDyne page using the
-shortcuts `&#033{&#033&#033}`, or by the use of processing instructions
-(**`<? .. ?>`**) e.g.:
+shortcuts !{! .. !}, or by the use of processing instructions (**<? ..
+?\>**) e.g.:
 
-<pre>
-<span class="h-ab">&lt;</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">head</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">title</span><span class="h-ab">&gt;</span>Hello World<span class="h-ab">&lt;/</span><span class="h-tag">title</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;/</span><span class="h-tag">head</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
+``` html
+<html>
+<head><title>Hello World</title></head>
+<body>
 
-<span class="h-com">&lt;!-- Same code with alternative denotation --&gt;</span>
+<!-- Same code with alternative denotation -->
 
-The time is: !&#123;! localtime() !&#125;
+The time is: !{! localtime() !}
 
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
+<p>
 
-The time is:  <span class="h-pi">&lt;? localtime() ?&gt;</span>
-
-
-<span class="h-ab">&lt;/</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
-</pre>
+The time is:  <? localtime() ?>
 
 
-[Run](example/inline3.psp)
+</body>
+</html>
+```
 
-The `&#033{&#033&#033}` denotation can also be used in tag attributes
-(processing instructions, and `<perl>` tags cannot):
+[Run](https://demo.webdyne.org/inline3.psp)
 
-<pre>
-<span class="h-ab">&lt;</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">head</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">title</span><span class="h-ab">&gt;</span>Hello World<span class="h-ab">&lt;/</span><span class="h-tag">title</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;/</span><span class="h-tag">head</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
+The !{! .. !} denotation can also be used in tag attributes (processing
+instructions, and <perl\> tags cannot):
 
-<span class="h-com">&lt;!-- Perl code can be used in tag attributes also --&gt;</span>
+``` html
+<html>
+<head><title>Hello World</title></head>
+<body>
+<p>
 
-<span class="h-ab">&lt;</span><span class="h-tag">font</span> <span class="h-attr">color</span>=<span class="h-attv">"!&#123;! (qw(red blue green))[rand 3] !&#125;</span>"<span class="h-ab">&gt;</span>
+<!-- Perl code can be used in tag attributes also -->
+
+<font color="!{! (qw(red blue green))[rand 3] !}">
 
 Hello World
 
-<span class="h-ab">&lt;/</span><span class="h-tag">font</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
-</pre>
+</font>
+</body>
+</html>
+```
 
+[Run](https://demo.webdyne.org/inline4.psp)
 
-[Run](example/inline4.psp)
-
-## Use of the \<perl\> tag for non-inline code.
+### Use of the <perl\> tag for non-inline code.
 
 Any code that is not co-mingled with the HTML of a document is
 *non-inline* code. It can be segmented from the content HTML using the
@@ -558,169 +763,405 @@ Any code that is not co-mingled with the HTML of a document is
 package and referenced as an external Perl subroutine call. An example
 of non-inline code:
 
-<pre>
-<span class="h-ab">&lt;</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">head</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">title</span><span class="h-ab">&gt;</span>Hello World<span class="h-ab">&lt;/</span><span class="h-tag">title</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;/</span><span class="h-tag">head</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
+``` html
+<html>
+<head><title>Hello World</title></head>
+<body>
+<p>
 
-<span class="h-com">&lt;!-- Empty perl tag this time, but with method name as attribute --&gt;</span>
+<!-- Empty perl tag this time, but with method name as attribute -->
 
-Hello World <span class="h-ab">&lt;</span><span class="h-webdyne_tag">perl</span> <span class="h-attr">method</span>=<span class="h-attv">"hello</span>"<span class="h-ab">/&gt;</span>
+Hello World <perl method="hello"/>
 
-<span class="h-ab">&lt;/</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
+</body>
+</html>
 
-&#095&#095PERL&#095&#095
+__PERL__
 
-sub hello &#123; return localtime &#125;
-</pre>
+sub hello { return localtime }
+```
 
+[Run](https://demo.webdyne.org/hello2.psp)
 
-[Run](example/hello2.psp)
+Note that the <perl\> tag in the above example is explicitly closed and
+does not contain any content. However non-inline code can enclose HTML
+or text within the tags:
 
-Note that the `<perl>` tag in this example is explicitly closed and does
-not contain any content. However non-inline code can enclose HTML or
-text within the tags:
+``` html
+<html>
+<head><title>Hello World</title></head>
+<body>
+<p>
 
-<pre>
-<span class="h-ab">&lt;</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">head</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">title</span><span class="h-ab">&gt;</span>Hello World<span class="h-ab">&lt;/</span><span class="h-tag">title</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;/</span><span class="h-tag">head</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
+<!-- The perl method will be called, but "Hello World" will not be displayed ! -->
 
-<span class="h-com">&lt;!-- The perl method will be called, but "Hello World" will not be displayed ! --&gt;</span>
-
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">perl</span> <span class="h-attr">method</span>=<span class="h-attv">"hello</span>"<span class="h-ab">&gt;</span>
+<perl method="hello">
 Hello World 
-<span class="h-ab">&lt;/</span><span class="h-webdyne_tag">perl</span><span class="h-ab">&gt;</span>
+</perl>
 
-<span class="h-ab">&lt;/</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
+</body>
+</html>
 
-&#095&#095PERL&#095&#095
+__PERL__
 
-sub hello &#123; return localtime() &#125;
-</pre>
+sub hello { return localtime() }
+```
 
+[Run](https://demo.webdyne.org/noninline1.psp)
 
-[Run](example/noninline1.psp)
-
-But this is not very interesting so far - the \"Hello World\" text is
-not displayed when the example is run !
+But this is not very interesting so far - the "Hello World" text is not
+displayed when the example is run !
 
 In order for text or HTML within a non-inline perl block to be
-displayed, it must be \"rendered\" into the output stream by the WebDyne
-engine. This is done by calling the render() method. Let\'s try that
+displayed, it must be "rendered" into the output stream by the WebDyne
+engine. This is done by calling the render() method. Let's try that
 again:
 
-<pre>
-<span class="h-ab">&lt;</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">head</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">title</span><span class="h-ab">&gt;</span>Hello World<span class="h-ab">&lt;/</span><span class="h-tag">title</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;/</span><span class="h-tag">head</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
+``` html
+<html>
+<head><title>Hello World</title></head>
+<body>
+<p>
 
-<span class="h-com">&lt;!-- The perl method will be called, and this time the "Hello World" will be displayed--&gt;</span>
+<!-- The perl method will be called, and this time the "Hello World" will be displayed-->
 
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">perl</span> <span class="h-attr">method</span>=<span class="h-attv">"hello</span>"<span class="h-ab">&gt;</span>
+<perl method="hello">
 Hello World 
-<span class="h-ab">&lt;/</span><span class="h-webdyne_tag">perl</span><span class="h-ab">&gt;</span>
+</perl>
 
-<span class="h-ab">&lt;/</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
+</body>
+</html>
 
-&#095&#095PERL&#095&#095
+__PERL__
 
-sub hello &#123;
-	
-	my $self=shift();
-	$self->render();
+sub hello {
+    
+    my $self=shift();
+    $self->render();
 
-&#125;
-</pre>
+}
+```
 
-
-[Run](example/noninline2.psp)
+[Run](https://demo.webdyne.org/noninline2.psp)
 
 And again, this time showing how to render the text block multiple
 times. Note that an array reference is returned by the Perl routine -
 this is fine, and is interpreted as an array of HTML text, which is
 concatenated and send to the browser.
 
-<pre>
-<span class="h-ab">&lt;</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">head</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">title</span><span class="h-ab">&gt;</span>Hello World<span class="h-ab">&lt;/</span><span class="h-tag">title</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;/</span><span class="h-tag">head</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
+``` html
+<html>
+<head><title>Hello World</title></head>
+<body>
 
-<span class="h-com">&lt;!-- The "Hello World" text will be rendered multiple times --&gt;</span>
+<!-- The "Hello World" text will be rendered multiple times -->
 
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">perl</span> <span class="h-attr">method</span>=<span class="h-attv">"hello</span>"<span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
+<perl method="hello">
+<p>
 Hello World 
-<span class="h-ab">&lt;/</span><span class="h-webdyne_tag">perl</span><span class="h-ab">&gt;</span>
+</perl>
 
-<span class="h-ab">&lt;/</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
+</body>
+</html>
 
-&#095&#095PERL&#095&#095
+__PERL__
 
-sub hello &#123;
-	
-	my $self=shift();
-	my @html;
-	for (0..3) &#123; push @html, $self->render() &#125;;
-	return \@html;
-&#125;
-</pre>
+sub hello {
+    
+    my $self=shift();
+    my @html;
+    for (0..3) { push @html, $self->render() };
+    return \@html;
+}
+```
+
+[Run](https://demo.webdyne.org/noninline3.psp)
+
+Same output using the \$self-\>print() method:
+
+``` html
+<html>
+<head><title>Hello World</title></head>
+<body>
+
+<!-- The "Hello World" text will be rendered multiple times -->
+
+<perl method="hello">
+<p>
+Hello World 
+</perl>
+
+</body>
+</html>
+
+__PERL__
+
+sub hello {
+    
+    #  Note use of $self->print()
+    #
+    my $self=shift();
+    for (0..3) { $self->print($self->render()) };
+    return \undef;
+}
+```
+
+[Run](https://demo.webdyne.org/noninline3.psp)
+
+### Alternate output methods from Perl handlers
+
+When calling a perl handler from a .psp file at some stage you will want
+your code to deliver output to the browser. Various examples have been
+given throughout this document, here is a summary of various output
+options:
+
+``` html
+<start_html>
+<pre>
+<perl handler="handler1" />
+<perl handler="handler2" />
+<perl handler="handler3" />
+<perl handler="handler4" />
+<perl handler="handler5" />
+<perl handler="handler6" chomp />
+<perl handler="handler7" />
+<perl handler="handler8" />
+__PERL__
+
+#  Different ways of sending output to the browser
+#
+sub handler1 {
+
+    #  Simplest - just return a scalar variable
+    #
+    my $text='Hello World 1';
+    return $text;
+    
+}
+
+sub handler2 {
+
+    #  Scalar ref better because if var is empty (undef) won't trigger and error
+    #
+    my $text='Hello World 2';
+    return \$text;
+    
+}
+
+sub handler3 {
+
+    #  Returning an array ref is OK
+    #
+    my @text=('Hello', 'World', 3);
+    
+    
+    #  This won't work
+    #
+    #return @text
+
+    
+    #  Returning an array ref is OK - note it won't auto insert spaces though !
+    #
+    return \@text
+    
+}
+
+sub handler4 {
+
+    #  Print something also using the print statement
+    #
+    my $text='Hello World 4';
+    print $text;
+    print "\n";
+    
+    #  Printing a scalar ref is OK
+    #
+    print \$text;
+    
+}
 
 
-[Run](example/noninline3.psp)
+sub handler5 {
 
-## Passing parameters to subroutines
+    #  Print arrays
+    #
+    my @text=('Hello ', 'World ', 5);
+    print @text;
+    
+    
+    #  Print new line manually, or turn on autonewline -
+    #  see next example;
+    #
+    print "\n";
+    
+    #  Array refs are OK
+    #
+    print \@text;
+    
+    
+    #  Printing hash ref's won't work ! This will fail
+    #
+    # print { a=>1, b=>2 }
+    return \undef;
+    
+}
+
+sub handler6 {
+
+    #  You can print using a webdyne method handler
+    #
+    my $self=shift();
+    
+    
+    #  Text we want to print
+    #
+    my $text="Hello World 6\n";
+    my @text=('Hello ', 'World ', 6, "\n");
+    
+    
+    #  These all work
+    #
+    $self->print($text);
+    $self->print(\$text);
+    $self->print(@text);
+    $self->print(\@text);
+    return \undef;
+    
+}
+
+sub handler7 {
+
+    #  You can print using a webdyne method handler
+    #
+    my $self=shift();
+    
+    
+    #  Text we want to print
+    #
+    my $text="Hello World 7";
+    my @text=('Hello ', 'World ', 7);
+    
+    
+    #  Turn on autonew line to print "\n" at end of every call
+    #
+    $self->autonewline(1);
+    
+    
+    #  These work
+    #
+    $self->print($text);
+    $self->print(\$text);
+    
+    
+    #  These put a CR between every element in the array
+    $self->print(@text);
+    $self->print(\@text);
+    
+    
+    #  Turn off autonewline and return
+    #
+    $self->autonewline(0);
+    return \undef;
+    
+}
+
+sub handler8 {
+
+    #  The say() method is supported also
+    #
+    use feature 'say';
+    my $self=shift();
+    my $text='Hello World 8';
+    
+    
+    #  These will print, but won't send newline - say() won't send \n to TIEHANDLE
+    #
+    say($text);
+    say($text);
+    $self->print("\n");
+    
+    
+    #  Use this instead
+    #
+    $self->say($text, $text);
+}
+```
+
+[Run](https://demo.webdyne.org/output1.psp)
+
+### Passing parameters to subroutines
 
 The behaviour of a called \_\_PERL\_\_ subroutine can be modified by
 passing parameters which it can act on:
 
+``` html
+<html>
+<head><title>Hello World</title></head>
+<body>
+
+<!-- The "Hello World" text will be rendered with the param name -->
+
+<perl method="hello" param="Alice"/>
+<p>
+<perl method="hello" param="Bob"/>
+<p>
+
+<!-- We can pass an array or hashref also - see variables section for more info on this syntax -->
+
+<perl method="hello_again" param="%{ firstname=>'Alice', lastname=>'Smith' }"/>
+
+</body>
+</html>
+
+__PERL__
+
+sub hello {
+    
+    my ($self, $param)=@_;
+    return \"Hello world $param"
+}
+
+sub hello_again {
+
+    my ($self, $param_hr)=@_;
+    my $firstname=$param_hr->{'firstname'};
+    my $lastname =$param_hr->{'lastname'};
+    return \"Hello world $firstname $lastname";
+
+}
+```
+
+[Run](https://demo.webdyne.org/noninline7.psp)
+
+### Parameter inheritance
+
+In-line code can inherit parameters passed from a perl handler/method.
+In-line code gets two parameters supplied - the first (`$_[0)`) is the
+self reference (e.g. `$self`), the second (`$_[1]`) is any inherited
+parameters as a hash reference. This can be useful for quick "in-line"
+formatting, e.g:
+
+``` html
+<start_html>
+<perl method="inherit">
 <pre>
-<span class="h-ab">&lt;</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">head</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">title</span><span class="h-ab">&gt;</span>Hello World<span class="h-ab">&lt;/</span><span class="h-tag">title</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;/</span><span class="h-tag">head</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
+Time - Unix epoch format: ${time}
+Time - local time format: <? strftime('%X', localtime($_[1]->{'time'})) ?>
+Date - ISO format: <? strftime('%Y-%m-%d', localtime($_[1]->{'time'})) ?>
+Date - US format: <? strftime('%m/%d/%Y', localtime($_[1]->{'time'})) ?>
+Date - UK format: <? strftime('%d/%m/%Y', localtime($_[1]->{'time'})) ?>
+</pre>
+</perl>
+__PERL__
+use POSIX qw(strftime);
+sub inherit {
+    shift()->render( time=>time() )
+}
+```
 
-<span class="h-com">&lt;!-- The "Hello World" text will be rendered with the param name --&gt;</span>
+[Run](https://demo.webdyne.org/inherit1.psp)
 
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">perl</span> <span class="h-attr">method</span>=<span class="h-attv">"hello</span>" <span class="h-attr">param</span>=<span class="h-attv">"Alice</span>"<span class="h-ab">/&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">perl</span> <span class="h-attr">method</span>=<span class="h-attv">"hello</span>" <span class="h-attr">param</span>=<span class="h-attv">"Bob</span>"<span class="h-ab">/&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
-
-<span class="h-com">&lt;!-- We can pass an array or hashref also - see variables section for more info on this syntax --&gt;</span>
-
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">perl</span> <span class="h-attr">method</span>=<span class="h-attv">"hello_again</span>" <span class="h-attr">param</span>=<span class="h-attv">"%&#123; firstname=>'Alice', lastname=>'Smith' &#125;</span>"<span class="h-ab">/&gt;</span>
-
-<span class="h-ab">&lt;/</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
-
-&#095&#095PERL&#095&#095
-
-sub hello &#123;
-	
-	my ($self, $param)=@_;
-	return \"Hello world $param"
-&#125;
-
-sub hello_again &#123;
-
-	my ($self, $param_hr)=@_;
-	my $firstname=$param_hr->&#123;'firstname'&#125;;
-	my $lastname =$param_hr->&#123;'lastname'&#125;;
-	return \"Hello world $firstname $lastname";
-
-&#125;</pre>
-
-
-[Run](example/noninline7.psp)
-
-## Notes about \_\_PERL\_\_ sections
+### Notes about \_\_PERL\_\_ sections
 
 Code in \_\_PERL\_\_ sections has some particular properties.
 \_\_PERL\_\_ code is only executed once. Subroutines defined in a
@@ -729,131 +1170,129 @@ code outside of subroutines is only executed the first time a page is
 loaded. No matter how many times it is run, in the following code `$i`
 will always be 1:
 
-<pre>
-<span class="h-ab">&lt;</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">head</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">title</span><span class="h-ab">&gt;</span>Hello World<span class="h-ab">&lt;/</span><span class="h-tag">title</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;/</span><span class="h-tag">head</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
+``` html
+<html>
+<head><title>Hello World</title></head>
+<body>
 
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">perl</span> <span class="h-attr">method</span>=<span class="h-attv">"hello</span>"<span class="h-ab">/&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">perl</span> <span class="h-attr">method</span>=<span class="h-attv">"hello</span>"<span class="h-ab">/&gt;</span>
+<perl method="hello"/>
+<p>
+<perl method="hello"/>
 
-<span class="h-ab">&lt;/</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
+</body>
+</html>
 
-&#095&#095PERL&#095&#095
+__PERL__
 
 my $i=0;
 $i++;
 
 my $x=0;
 
-sub hello &#123;
-	
-	#  Note x may not increment as you expect because you will probably
-	#  get a different Apache process each time you load this page
-	#
-	return sprintf("value of i: $i, value of x in PID $$: %s", $x++)
-&#125;
-</pre>
+sub hello {
+    
+    #  Note x may not increment as you expect because you will probably
+    #  get a different Apache process each time you load this page
+    #
+    return sprintf("value of i: $i, value of x in PID $$: %s", $x++)
+}
+```
 
-
-[Run](example/noninline4.psp)
+[Run](https://demo.webdyne.org/noninline4.psp)
 
 Lexical variables are not accessible outside of the \_\_PERL\_\_ section
-due to the way perl\'s eval() function works. The following example will
+due to the way perl's eval() function works. The following example will
 fail:
 
-<pre>
-<span class="h-ab">&lt;</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">head</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">title</span><span class="h-ab">&gt;</span>Hello World<span class="h-ab">&lt;/</span><span class="h-tag">title</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;/</span><span class="h-tag">head</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
+``` html
+<html>
+<head><title>Hello World</title></head>
+<body>
 
-The value of $i is !&#123;! \$i !&#125;
+The value of $i is !{! \$i !}
 
-<span class="h-ab">&lt;/</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
+</body>
+</html>
 
-&#095&#095PERL&#095&#095
+__PERL__
 
-my $i=5;</pre>
+my $i=5;
+```
 
-
-[Run](example/noninline5.psp)
+[Run](https://demo.webdyne.org/noninline5.psp)
 
 Package defined vars declared in a \_\_PERL\_\_ section do work, with
 caveats:
 
-<pre>
-<span class="h-ab">&lt;</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">head</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">title</span><span class="h-ab">&gt;</span>Hello World<span class="h-ab">&lt;/</span><span class="h-tag">title</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;/</span><span class="h-tag">head</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
+``` html
+<html>
+<head><title>Hello World</title></head>
+<body>
 
-<span class="h-com">&lt;!-- Does not work --&gt;</span>
-The value of $i is !&#123;! \$::i !&#125;
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
+<!-- Does not work -->
+The value of $i is !{! $::i !}
+<p>
 
-<span class="h-com">&lt;!-- Ugly hack, does work though --&gt;</span>
-The value of $i is !&#123;! \$&#123;__PACKAGE__.::i&#125; !&#125;
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
+<!-- Ugly hack, does work though -->
+The value of $i is !{! ${__PACKAGE__.::i} !}
+<p>
 
-<span class="h-com">&lt;!-- Probably best to just do this though --&gt;</span>
-The value of $i is !&#123;! &get_i() !&#125;
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
+<!-- Probably best to just do this though -->
+The value of $i is !{! &get_i() !}
+<p>
 
-<span class="h-com">&lt;!-- Or this - see variable substitution section  --&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">perl</span> <span class="h-attr">method</span>=<span class="h-attv">"render_i</span>"<span class="h-ab">&gt;</span>
-The value of $i is $&#123;i&#125;
-<span class="h-ab">&lt;/</span><span class="h-webdyne_tag">perl</span><span class="h-ab">&gt;</span>
+<!-- Or this - see variable substitution section  -->
+<perl method="render_i">
+The value of $i is ${i}
+</perl>
 
-<span class="h-ab">&lt;/</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
+</body>
+</html>
 
-&#095&#095PERL&#095&#095
+__PERL__
 
 our $i=5;
 
-sub get_i &#123; \$i &#125;
+sub get_i { \$i }
 
-sub render_i &#123; shift()->render(i=>$i) &#125;</pre>
+sub render_i { shift()->render(i=>$i) }
+```
 
-
-[Run](example/noninline6.psp)
+[Run](https://demo.webdyne.org/noninline6.psp)
 
 See the Variables/Substitution section for clean ways to insert variable
 contents into the page.
 
-## Variables / Substitution
+## Variables
 
 WebDyne starts to get more useful when variables are used to modify the
 content of a rendered text block. A simple example:
 
-<pre>
-<span class="h-ab">&lt;</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">head</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">title</span><span class="h-ab">&gt;</span>Hello World<span class="h-ab">&lt;/</span><span class="h-tag">title</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;/</span><span class="h-tag">head</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
+``` html
+<html>
+<head><title>Hello World</title></head>
+<body>
+<p>
 
-<span class="h-com">&lt;!-- The var $&#123;time&#125; will be substituted for the correspondingly named render parameter --&gt;</span>
+<!-- The var ${time} will be substituted for the correspondingly named render parameter -->
 
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">perl</span> <span class="h-attr">method</span>=<span class="h-attv">"hello</span>"<span class="h-ab">&gt;</span>
-Hello World $&#123;time&#125;
-<span class="h-ab">&lt;/</span><span class="h-webdyne_tag">perl</span><span class="h-ab">&gt;</span>
+<perl method="hello">
+Hello World ${time}
+</perl>
 
-<span class="h-ab">&lt;/</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
+</body>
+</html>
 
-&#095&#095PERL&#095&#095
+__PERL__
 
-sub hello &#123; 
-	my $self=shift();
-	my $time=localtime();
-	$self->render( time=>$time );
-&#125;
-</pre>
+sub hello { 
+    my $self=shift();
+    my $time=localtime();
+    $self->render( time=>$time );
+}
+```
 
-
-[Run](example/var1.psp)
+[Run](https://demo.webdyne.org/var1.psp)
 
 Note the passing of the `time` value as a parameter to be substituted
 when the text is rendered.
@@ -861,191 +1300,309 @@ when the text is rendered.
 Combine this with multiple call to the render() routine to display
 dynamic data:
 
-<pre>
-<span class="h-ab">&lt;</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">head</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">title</span><span class="h-ab">&gt;</span>Hello World<span class="h-ab">&lt;/</span><span class="h-tag">title</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;/</span><span class="h-tag">head</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
+``` html
+<html>
+<head><title>Hello World</title></head>
+<body>
 
-<span class="h-com">&lt;!-- Multiple variables can be supplied at once as render parameters --&gt;</span>
+<!-- Multiple variables can be supplied at once as render parameters -->
 
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">perl</span> <span class="h-attr">method</span>=<span class="h-attv">"hello0</span>"<span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
-Hello World $&#123;time&#125;, loop iteration $&#123;i&#125;.
-<span class="h-ab">&lt;/</span><span class="h-webdyne_tag">perl</span><span class="h-ab">&gt;</span>
+<perl method="hello0">
+<p>
+Hello World ${time}, loop iteration ${i}.
+</perl>
 
-<span class="h-ab">&lt;</span><span class="h-tag">br</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">br</span><span class="h-ab">&gt;</span>
+<br>
+<br>
 
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">perl</span> <span class="h-attr">method</span>=<span class="h-attv">"hello1</span>"<span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
-Hello World $&#123;time&#125;, loop iteration $&#123;i&#125;.
-<span class="h-ab">&lt;/</span><span class="h-webdyne_tag">perl</span><span class="h-ab">&gt;</span>
+<perl method="hello1">
+<p>
+Hello World ${time}, loop iteration ${i}.
+</perl>
 
-<span class="h-ab">&lt;/</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
+</body>
+</html>
 
-&#095&#095PERL&#095&#095
+__PERL__
 
-sub hello0 &#123;
-	
-	my $self=shift();
-	my @html;
-	my $time=localtime();
-	for (my $i=0; $i<3; $i++) &#123; 
-		push @html, $self->render( time=>$time, i=>$i) 
-	&#125;;
-	return \@html;
-&#125;
+sub hello0 {
+    
+    my $self=shift();
+    my @html;
+    my $time=localtime();
+    for (my $i=0; $i<3; $i++) { 
+        push @html, $self->render( time=>$time, i=>$i) 
+    };
+    return \@html;
+}
 
-sub hello1 &#123;
-	
-	#  Alternate syntax using print
-	#
-	my $self=shift();
-	my $time=localtime();
-	for (my $i=0; $i<3; $i++) &#123; 
-		print $self->render( time=>$time, i=>$i)
-	&#125;;
-	return \undef
-&#125;
-</pre>
+sub hello1 {
+    
+    #  Alternate syntax using print
+    #
+    my $self=shift();
+    my $time=localtime();
+    for (my $i=0; $i<3; $i++) { 
+        print $self->render( time=>$time, i=>$i)
+    };
+    return \undef
+}
+```
 
-
-[Run](example/var2.psp)
+[Run](https://demo.webdyne.org/var2.psp)
 
 Variables can also be used to modify tag attributes:
 
-<pre>
-<span class="h-ab">&lt;</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">head</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">title</span><span class="h-ab">&gt;</span>Hello World<span class="h-ab">&lt;/</span><span class="h-tag">title</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;/</span><span class="h-tag">head</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
+``` html
+<html>
+<head><title>Hello World</title></head>
+<body>
 
-<span class="h-com">&lt;!-- Render paramaters also work in tag attributes --&gt;</span>
+<!-- Render paramaters also work in tag attributes -->
 
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">perl</span> <span class="h-attr">method</span>=<span class="h-attv">"hello</span>"<span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">font</span> <span class="h-attr">color</span>=<span class="h-attv">"$&#123;color&#125;</span>"<span class="h-ab">&gt;</span>
+<perl method="hello">
+<p>
+<font color="${color}">
 Hello World
-<span class="h-ab">&lt;/</span><span class="h-tag">font</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-webdyne_tag">perl</span><span class="h-ab">&gt;</span>
+</font>
+</perl>
 
-<span class="h-ab">&lt;/</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
+</body>
+</html>
 
-&#095&#095PERL&#095&#095
+__PERL__
 
-sub hello &#123;
+sub hello {
 
-	my $self=shift();
-	my @html;
-	for (0..3) &#123;
-		my $color=(qw(red green yellow blue orange))[rand 5];
-		push @html, $self->render( color=>$color );
-	&#125;
-	\@html;
+    my $self=shift();
+    my @html;
+    for (0..3) {
+        my $color=(qw(red green yellow blue orange))[rand 5];
+        push @html, $self->render( color=>$color );
+    }
+    \@html;
 
-&#125;
-</pre>
+}
+```
 
-
-[Run](example/var3.psp)
+[Run](https://demo.webdyne.org/var3.psp)
 
 Other variable types are available also, including:
 
--   `&#064{var,var,..}` for arrays, e.g. `&#064{'foo', 'bar'}`
+-   `@{var,var,..}` for arrays, e.g. `@{'foo', 'bar'}`
 
--   `&#037{key=>value, key=>value, ..}` for hashes e.g.`&#037{ a=>1, b=>2 }`
+-   `%{key=>value, key=>value, ..}` for hashes e.g.`%{ a=>1, b=>2 }`
 
--   `&#043{varname}` for CGI form parameters, e.g. `&#043{firstname}`
+-   `+{varname}` for CGI form parameters, e.g. `+{firstname}`
 
--   `&#042{varname}`for environment variables, e.g. `&#042{HTTP_USER_AGENT}`
+-   `*{varname}`for environment variables, e.g. `*{HTTP_USER_AGENT}`
 
--   `&#094{requestmethod}` for Apache request (`$r=Apache->request`) object
-    methods, e.g. `&#094{protocol}`. Only available for in Apache/mod_perl,
+-   `^{requestmethod}` for Apache request (`$r=Apache->request`) object
+    methods, e.g. `^{protocol}`. Only available for in Apache/mod_perl,
     and only useful for request methods that return a scalar value.
 
 The following template uses techniques and tags discussed later, but
 should provide an example of potential variable usage:
 
-<pre>
-<span class="h-ab">&lt;</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">head</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">title</span><span class="h-ab">&gt;</span>Variables<span class="h-ab">&lt;/</span><span class="h-tag">title</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">head</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
+``` html
+<html>
+<head>
+<title>Variables</title>
+</head>
+<body>
 
-<span class="h-com">&lt;!-- Environment variables --&gt;</span>
+<!-- Environment variables -->
 
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
-<span class="h-com">&lt;!-- Short Way --&gt;</span>
-Mod Perl Version: *&#123;MOD_PERL&#125;
-<span class="h-ab">&lt;</span><span class="h-tag">br</span><span class="h-ab">&gt;</span>
-<span class="h-com">&lt;!-- Same as Perl code --&gt;</span>
+<p>
+<!-- Short Way -->
+Mod Perl Version: *{MOD_PERL}
+<br>
+<!-- Same as Perl code -->
 Mod Perl Version: 
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">perl</span><span class="h-ab">&gt;</span> \$ENV&#123;'MOD_PERL'&#125; <span class="h-ab">&lt;/</span><span class="h-webdyne_tag">perl</span><span class="h-ab">&gt;</span>
+<perl> \$ENV{'MOD_PERL'} </perl>
 
 
-<span class="h-com">&lt;!-- Apache request record methods. Only methods that return a scalar result are usable --&gt;</span>
+<!-- Apache request record methods. Only methods that return a scalar result are usable -->
 
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
-<span class="h-com">&lt;!-- Short Way --&gt;</span>
-Request Protocol: ^&#123;protocol&#125;
-<span class="h-ab">&lt;</span><span class="h-tag">br</span><span class="h-ab">&gt;</span>
-<span class="h-com">&lt;!-- Same as Perl code --&gt;</span>
+<p>
+<!-- Short Way -->
+Request Protocol: ^{protocol}
+<br>
+<!-- Same as Perl code -->
 Request Protocol: 
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">perl</span><span class="h-ab">&gt;</span> my $self=shift(); my $r=$self->r(); \$r->protocol() <span class="h-ab">&lt;/</span><span class="h-webdyne_tag">perl</span><span class="h-ab">&gt;</span>
+<perl> my $self=shift(); my $r=$self->r(); \$r->protocol() </perl>
 
 
-<span class="h-com">&lt;!-- CGI params --&gt;</span>
+<!-- CGI params -->
 
-<span class="h-ab">&lt;</span><span class="h-tag">form</span><span class="h-ab">&gt;</span>
-Your Name: <span class="h-ab">&lt;</span><span class="h-cgi_tag">textfield</span> <span class="h-attr">name</span>=<span class="h-attv">"name</span>" <span class="h-attr">default</span>=<span class="h-attv">"Test</span>" <span class="h-attr">size</span>=<span class="h-attv">"12</span>"<span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-cgi_tag">submit</span> <span class="h-attr">name</span>=<span class="h-attv">"Submit</span>"<span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">form</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
-<span class="h-com">&lt;!-- Short Way --&gt;</span>
-You Entered: +&#123;name&#125;
-<span class="h-ab">&lt;</span><span class="h-tag">br</span><span class="h-ab">&gt;</span>
-<span class="h-com">&lt;!-- Same as Perl code --&gt;</span>
+<form>
+Your Name:
+<p><textfield name="name" default="Test" size="12">
+<p><submit name="Submit">
+</form>
+<p>
+<!-- Short Way -->
+You Entered: +{name}
+<br>
+<!-- Same as Perl code -->
 You Entered: 
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">perl</span><span class="h-ab">&gt;</span> my $self=shift(); my $cgi_or=$self->CGI(); \$cgi_or->param('name') <span class="h-ab">&lt;/</span><span class="h-webdyne_tag">perl</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">br</span><span class="h-ab">&gt;</span>
-<span class="h-com">&lt;!-- CGI vars are also loaded into the %_ global var, so the above is the same as --&gt;</span>
+<perl> my $self=shift(); my $cgi_or=$self->CGI(); \$cgi_or->param('name') </perl>
+<br>
+<!-- CGI vars are also loaded into the %_ global var, so the above is the same as -->
 You Entered: 
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">perl</span><span class="h-ab">&gt;</span> \$_&#123;'name'&#125; <span class="h-ab">&lt;/</span><span class="h-webdyne_tag">perl</span><span class="h-ab">&gt;</span>
+<perl> $_{'name'} </perl>
 
 
-<span class="h-com">&lt;!-- Arrays --&gt;</span>
+<!-- Arrays -->
 
-<span class="h-ab">&lt;</span><span class="h-tag">form</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
+<form>
+<p>
 Favourite colour 1:
-<span class="h-ab">&lt;</span><span class="h-cgi_tag">popup_menu</span> <span class="h-attr">name</span>=<span class="h-attv">"popup_menu</span>" <span class="h-attr">values</span>=<span class="h-attv">"@&#123;qw(red green blue)&#125;</span>"<span class="h-ab">&gt;</span>
+<p><popup_menu name="popup_menu" values="@{qw(red green blue)}">
 
 
-<span class="h-com">&lt;!-- Hashes --&gt;</span>
+<!-- Hashes -->
 
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
+<p>
 Favourite colour 2:
-<span class="h-ab">&lt;</span><span class="h-cgi_tag">popup_menu</span> <span class="h-attr">name</span>=<span class="h-attv">"popup_menu</span>" 
-	<span class="h-attr">values</span>=<span class="h-attv">"%&#123;red=>Red, green=>Green, blue=>Blue&#125;</span>"<span class="h-ab">&gt;</span>
+<p><popup_menu name="popup_menu" 
+    values="%{red=>Red, green=>Green, blue=>Blue}">
 
-<span class="h-ab">&lt;/</span><span class="h-tag">form</span><span class="h-ab">&gt;</span>
+</form>
 
-<span class="h-ab">&lt;/</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
+</body>
+</html>
+```
 
-</pre>
+[Run](https://demo.webdyne.org/var4.psp)
 
+## Shortcut Tags
 
-[Run](example/var4.psp)
+Previous versions of WebDyne used Lincoln Stein's CGI.pm module to
+render tags, and supported CGI.pm shortcut tags such as <start_html\>,
+<popup_menu\> etc. Modern versions of WebDyne do not use CGI.pm in any
+modules, having ported tag generation to HTML::Tiny. Support for
+shortcut tags is preserved though - they provide a quick and easy way to
+generate simple web pages.
 
-## Integration with Lincoln Stein\'s CGI.pm module
+### Quick pages using shortcut <start_html\>, <end_html\> tags
 
-WebDyne makes extensive use of Lincoln Stein\'s CGI.pm module. Almost
-any CGI.pm function that renders HTML tags can be called from within a
-WebDyne template. The manual page for CGI.pm contains the following
-synopsis example:
+For rapid development you can take advantage of the <start_html\> and
+<end_html\> tags. The following page generates compliant HTML (view the
+page source after loading it to see for yourself):
+
+``` html
+<start_html title="Quick Page">
+The time is: !{! localtime() !}
+<end_html>
+```
+
+[Run](https://demo.webdyne.org/cgi6.psp)
+
+The <start_html\> tag generates all the <html\>, <head\>, <title\>
+tags etc needed for a valid HTML page plus an opening body tag. Just
+enter the body content, then optionally finish with <end_html\> to
+generate the closing <body\> and <html\> tags (optional because the
+page is automatically closed if these are omitted). See the tag
+reference section but here is an example using several of the properties
+available in the <start_html\> tag including loading multiple scripts
+and stylesheets:
+
+``` html
+<start_html title="Hello World" 
+    style="@{qw(https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Playfair+Display:wght@700&display=swap)}"
+    script="@{qw(https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js https://cdn.jsdelivr.net/npm/typed.js@2.1.0/dist/typed.umd.js)}"
+>
+<p>
+<h2 id="typed"></h2>
+<div data-aos="fade-up">I animate on load and scroll !</div>
+
+<script>
+  AOS.init({
+    duration: 1000,  // 1s animations
+    once: true       // animate only once
+  });
+</script>
+
+<script>
+  new Typed('#typed', {
+    strings: ["Lorem", "Ipsum", "!{! localtime !}"],
+    typeSpeed: 50,
+    backSpeed: 25,
+    loop: true
+  });
+</script>
+```
+
+[Run](https://demo.webdyne.org/start_html1.psp)
+
+!!! caution
+
+    If make sure any attributes using the `@{..}` or `%{..}` convention are
+    on one line - the parser will not interpret them correctly if spanning
+    multiple lines.
+
+If using the <start_html\> shortcut tag you can optionally insert
+default stylesheets and/or <head\> sections from the Webdyne
+configuration file. E.g if in your `webdyne.conf.pl` file you have the
+following:
+
+    $_={
+        'WebDyne::Constant' => {
+
+            #  Inserted as <meta> into <head> section
+            #
+            WEBDYNE_META => {
+                #  These all rendered as <meta name="$key" content="$value">
+                viewport => 'width=device-width, initial-scale=1.0',
+                author => 'Bob Foobar',
+                #  This one rendered as <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                'http-equiv=X-UA-Compatible' => 'IE=edge',
+                'http-equiv=refresh' => '5; url=https://www.example.com'
+            }
+
+            #  This is inserted inside the <html> starting tag, works for <start_html> or straight <html>
+            #
+            WEBDYNE_HTML_PARAM => {
+                lang => 'de'
+            }
+
+            #  This is inserted before the </head> closing tag, works for <start_html> or straight <html>
+            #
+            WEBDYNE_HEAD_INSERT => << 'END'
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.classless.min.css">
+    <style>
+    :root { --pico-font-size: 85% } 
+    body { padding-top: 10px; padding-left: 10px;
+    </style>
+    END
+        
+        }
+    }
+
+Then any `.psp` file with a <start_html\> tag will have the following
+content:
+
+    <!DOCTYPE html><html lang="de">
+    <head>
+    <title>Untitled Document</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Bob Foobar">
+    <meta http-equiv="refresh" content="5; url=https://www.example.com">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.classless.min.css">
+    <style>
+        :root { --pico-font-size: 85% } 
+    </style>
+    </head>
+
+### HTML Forms using <popup_menu\>,<checkbox_group\> and other tags
+
+The CGI.pm module presented several shortcut tags for generating HTML
+forms. These tags have been recreated in WebDyne and act in a similar
+way.
+
+The manual page for CGI.pm contains the following synopsis example:
 
     use CGI qw/:standard/;
        print header,
@@ -1071,64 +1628,73 @@ synopsis example:
 If the example was ported to a WebDyne compatible page it might look
 something like this:
 
-<pre>
-<span class="h-com">&lt;!-- The same form from the CGI example --&gt;</span>
+``` html
+<!-- The same form from the CGI example -->
 
-<span class="h-ab">&lt;</span><span class="h-cgi_tag">start_html</span> <span class="h-attr">title</span>=<span class="h-attv">"A simple example</span>"<span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">h1</span><span class="h-ab">&gt;</span>A Simple Example<span class="h-ab">&lt;/</span><span class="h-tag">h1</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-cgi_tag">start_form</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
-What's your name ? <span class="h-ab">&lt;</span><span class="h-cgi_tag">textfield</span> <span class="h-attr">name</span>=<span class="h-attv">"name</span>"<span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
-What's the combination ? <span class="h-ab">&lt;</span><span class="h-cgi_tag">checkbox_group</span> 
-	<span class="h-attr">name</span>=<span class="h-attv">"words</span>" <span class="h-attr">values</span>=<span class="h-attv">"@&#123;qw(eenie meenie minie moe)&#125;</span>" <span class="h-attr">defaults</span>=<span class="h-attv">"@&#123;qw(eenie minie)&#125;</span>"<span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
-What's your favourite color ? <span class="h-ab">&lt;</span><span class="h-cgi_tag">popup_menu</span> 
-	<span class="h-attr">name</span>=<span class="h-attv">"color</span>" <span class="h-attr">values</span>=<span class="h-attv">"@&#123;qw(red green blue chartreuse)&#125;</span>"<span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-cgi_tag">submit</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-cgi_tag">end_form</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">hr</span><span class="h-ab">&gt;</span>
-
-
-<span class="h-com">&lt;!-- This section only rendered when form submitted --&gt;</span>
-
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">perl</span> <span class="h-attr">method</span>=<span class="h-attv">"answers</span>"<span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
-Your name is: <span class="h-ab">&lt;</span><span class="h-tag">em</span><span class="h-ab">&gt;</span>+&#123;name&#125;<span class="h-ab">&lt;/</span><span class="h-tag">em</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
-The keywords are: <span class="h-ab">&lt;</span><span class="h-tag">em</span><span class="h-ab">&gt;</span>$&#123;words&#125;<span class="h-ab">&lt;/</span><span class="h-tag">em</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
-Your favorite color is: <span class="h-ab">&lt;</span><span class="h-tag">em</span><span class="h-ab">&gt;</span>+&#123;color&#125;<span class="h-ab">&lt;/</span><span class="h-tag">em</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-webdyne_tag">perl</span><span class="h-ab">&gt;</span>
-
-&#095&#095PERL&#095&#095
-
-sub answers &#123;
-
-	my $self=shift();
-	my $cgi_or=$self->CGI();
-	if ($cgi_or->param()) &#123;
-		my $words=join(",", $cgi_or->param('words'));
-		return $self->render( words=>$words )
-	&#125;
-	else &#123;
-		return \undef;
-	&#125;
-
-&#125;
-</pre>
+<start_html title="A simple example">
+<h1>A Simple Example</h1>
+<start_form>
+<p>
+What's your name ?
+<p><textfield name="name">
+<p>
+What's the combination ? 
+<p><checkbox_group 
+    name="words" values="@{qw(eenie meenie minie moe)}" defaults="@{qw(eenie minie)}">
+<p>
+What's your favourite color ? 
+<p><popup_menu name="color" values="@{qw(red green blue chartreuse)}">
+<p><submit>
+<end_form>
+<hr>
 
 
-[Run](example/cgi1.psp)
+<!-- This section only rendered when form submitted -->
 
-## More on CGI.pm generated tags
+<perl method="answers">
+<p>
+Your name is: <em>+{name}</em>
+<p>
+The keywords are: <em>${words}</em>
+<p>
+Your favorite color is: <em>+{color}</em>
+</perl>
 
-We can use CGI.pm tags such as \<popup_menu\>, instead of
-\<select\>\<option\>\...\</select\>. The following example:
+__PERL__
 
-    <popup_menu value="&#037{red=>Red, green=>Green, blue=>Blue}"/>
+sub answers {
 
-is arguably easier to read than:
+    my $self=shift();
+    my $cgi_or=$self->CGI();
+    if ($cgi_or->param()) {
+        my $words=join(",", $cgi_or->param('words'));
+        return $self->render( words=>$words )
+    }
+    else {
+        return \undef;
+    }
+
+}
+```
+
+[Run](https://demo.webdyne.org/cgi1.psp)
+
+!!! note
+
+    When using the WebDyne form tags, state (previous form values) are
+    preserved after the Submit button is presented. This makes building
+    single page application simple as there is no need to implement logic to
+    adjust options in a traditional HTML form to reflect the user's choice.
+
+### More on HTML shortcut tags in forms
+
+Tags such as <popup_menu\> output traditional HTML form tags such as
+<select\><option\>...</select\>, but they have the advantage of
+allowing Perl data types as attributes. Take the following example:
+
+    <popup_menu value="%{red=>Red, green=>Green, blue=>Blue}"/>
+
+it is arguably easier to read than:
 
     <select name="values" tabindex="1">
     <option value="green">Green</option>
@@ -1139,185 +1705,171 @@ is arguably easier to read than:
 So there is some readability benefit, however the real advantage shows
 when we consider the next example:
 
-<pre>
-<span class="h-ab">&lt;</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">head</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">title</span><span class="h-ab">&gt;</span>Hello World<span class="h-ab">&lt;/</span><span class="h-tag">title</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;/</span><span class="h-tag">head</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
+``` html
+<html>
+<head><title>Hello World</title></head>
+<body>
+<p>
 
-<span class="h-com">&lt;!-- Generate all country names for picklist --&gt;</span>
+<!-- Generate all country names for picklist -->
 
-<span class="h-ab">&lt;</span><span class="h-tag">form</span><span class="h-ab">&gt;</span>
+<form>
 
 Your Country ?
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">perl</span> <span class="h-attr">method</span>=<span class="h-attv">"countries</span>"<span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-cgi_tag">popup_menu</span> <span class="h-attr">values</span>=<span class="h-attv">"$&#123;countries_ar&#125;</span>"<span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-webdyne_tag">perl</span><span class="h-ab">&gt;</span>
+<perl method="countries">
+<popup_menu values="${countries_ar}" default="Australia">
+</perl>
 
-<span class="h-ab">&lt;/</span><span class="h-tag">form</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
+</form>
+</body>
+</html>
 
-&#095&#095PERL&#095&#095
+__PERL__
 
 use Locale::Country;
 
-sub countries &#123;
-	
-	my $self=shift();
-	my @countries = sort &#123; $a cmp $b &#125; all_country_names();
-	$self->render( countries_ar=>\@countries );
+sub countries {
+    
+    my $self=shift();
+    my @countries = sort { $a cmp $b } all_country_names();
+    $self->render( countries_ar=>\@countries );
 
-&#125;
-</pre>
+}
+```
 
+[Run](https://demo.webdyne.org/cgi5.psp)
 
-[Run](example/cgi5.psp)
+All values for the menu item were pre-populated from one WebDyne
+variable - which saves a significant amount of time populating a
+"countries" style drop-down box.
 
-That saved a lot of typing !
+### Access to HTML form responses and query strings
 
-## Access to CGI query, form and keyword parameters
+Once a form is submitted you will want to act on responses. There are
+several ways to do this - you can access a CGI::Simple object instance
+in any WebDyne template by calling the CGI() method to obtain form
+responses:
 
-As mentioned above WebDyne makes extensive use of the CGI.pm Perl
-module. You can access a CGI object instance in any WebDyne template by
-calling the CGI() method:
+``` html
+<html>
+<head><title>Hello World</title></head>
+<body>
+<p>
 
-<pre>
-<span class="h-ab">&lt;</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">head</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">title</span><span class="h-ab">&gt;</span>Hello World<span class="h-ab">&lt;/</span><span class="h-tag">title</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;/</span><span class="h-tag">head</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
+<!-- Note use of CGI.pm derived textfield tag -->
 
-<span class="h-com">&lt;!-- Note use of CGI.pm derived textfield tag --&gt;</span>
-
-<span class="h-ab">&lt;</span><span class="h-tag">form</span><span class="h-ab">&gt;</span>
-Enter your name: <span class="h-ab">&lt;</span><span class="h-cgi_tag">textfield</span> <span class="h-attr">name</span>=<span class="h-attv">"name</span>"<span class="h-ab">&gt;</span>
-<span class="h-ent">&amp;nbsp;</span>
-<span class="h-ab">&lt;</span><span class="h-cgi_tag">submit</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">form</span><span class="h-ab">&gt;</span>
-
-
-<span class="h-com">&lt;!-- And print out name if we have it --&gt;</span>
-
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">perl</span> <span class="h-attr">method</span>=<span class="h-attv">"hello</span>"<span class="h-ab">&gt;</span>
-Hello $&#123;name&#125;, pleased to meet you.
-<span class="h-ab">&lt;/</span><span class="h-webdyne_tag">perl</span><span class="h-ab">&gt;</span>
-
-<span class="h-ab">&lt;/</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
-
-&#095&#095PERL&#095&#095
-
-sub hello &#123; 
-	my $self=shift();
-
-	#  Get CGI instance
-	#
-	my $cgi_or=$self->CGI();
-
-	#  Use CGI.pm param() method. Could also use other
-	#  methods like keywords(), Vars() etc.
-	#
-	my $name=$cgi_or->param('name');
-
-	$self->render( name=>$name);
-&#125;
-</pre>
+<form>
+Enter your name: 
+<p><textfield name="name">
+<p><submit>
+</form>
 
 
-[Run](example/cgi3.psp)
+<!-- And print out name if we have it -->
 
-From there you can all any method supported by the CGI.pm module - see
-the CGI.pm manual page (`man CGI`)
+<perl method="hello">
+Hello ${name}, pleased to meet you.
+</perl>
+
+</body>
+</html>
+
+__PERL__
+
+sub hello { 
+    my $self=shift();
+
+    #  Get CGI instance
+    #
+    my $cgi_or=$self->CGI();
+
+    #  Use CGI.pm param() method. Could also use other
+    #  methods like keywords(), Vars() etc.
+    #
+    my $name=$cgi_or->param('name');
+
+    $self->render( name=>$name);
+}
+```
+
+[Run](https://demo.webdyne.org/cgi3.psp)
+
+From there you can all any method supported by the CGI::Simple module -
+see the CGI::Simple manual page (`man CGI::Simple`) or review on CPAN:
+[CGI::Simple](https://metacpan.org/pod/CGI::Simple)
 
 Since one of the most common code tasks is to access query parameters,
-WebDyne stores them in the `%_` global variable before any user defined
-Perl methods are called. For example:
+WebDyne stores them in the special `%_` global variable before any user
+defined Perl methods are called. For example:
 
-<pre>
-<span class="h-ab">&lt;</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">head</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">title</span><span class="h-ab">&gt;</span>Hello World<span class="h-ab">&lt;/</span><span class="h-tag">title</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;/</span><span class="h-tag">head</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">form</span><span class="h-ab">&gt;</span>
-Enter your name: <span class="h-ab">&lt;</span><span class="h-cgi_tag">textfield</span> <span class="h-attr">name</span>=<span class="h-attv">"name</span>"<span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-cgi_tag">submit</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">form</span><span class="h-ab">&gt;</span>
+``` html
+<html>
+<head><title>Hello World</title></head>
+<body>
+<p>
+<form>
+Enter your name:
+<p><textfield name="name">
+<p><submit>
+</form>
 
-<span class="h-com">&lt;!-- Quick and dirty, no perl code at all --&gt;</span>
-
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
-Hello +&#123;name&#125;, pleased to meet you.
-
-
-<span class="h-com">&lt;!-- Traditional, using the CGI.pm param() call --&gt;</span>
-
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">perl</span> <span class="h-attr">method</span>=<span class="h-attv">"hello1</span>"<span class="h-ab">&gt;</span>
-Hello $&#123;name&#125;, pleased to meet you.
-<span class="h-ab">&lt;/</span><span class="h-webdyne_tag">perl</span><span class="h-ab">&gt;</span>
+<!-- Use the %_ global var, other options below -->
+<p>
+Hello <? uc($_{'name'} || 'Anonymous') ?>, pleased to meet you.
 
 
-<span class="h-com">&lt;!-- Quicker method using %_ global var --&gt;</span>
+<!-- Quick and dirty, no perl code at all -->
 
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">perl</span> <span class="h-attr">method</span>=<span class="h-attv">"hello2</span>"<span class="h-ab">&gt;</span>
-Hello $&#123;name&#125;, pleased to meet you.
-<span class="h-ab">&lt;/</span><span class="h-webdyne_tag">perl</span><span class="h-ab">&gt;</span>
+<p>
+Hello +{name}, pleased to meet you.
 
 
-<span class="h-com">&lt;!-- Quick and dirty using inline Perl --&gt;</span>
+<!-- Traditional, using the CGI::Simple param() call in the hello1 sub -->
 
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
-Hello !&#123;! \$_&#123;name&#125; !&#125;, pleased to meet you.
-
-<span class="h-ab">&lt;/</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
-
-
-&#095&#095PERL&#095&#095
-
-sub hello1 &#123; 
-	my $self=shift();
-	my $cgi_or=$self->CGI();
-	my $name=$cgi_or->param('name');
-	$self->render( name=>$name);
-&#125;
-
-sub hello2 &#123; 
-
-	my $self=shift();
-	
-	#  Quicker method of getting name param
-	#
-	my $name=$_&#123;'name'&#125;;
-	$self->render( name=>$name);
-&#125;
-
-</pre>
+<p>
+<perl method="hello1">
+Hello ${name}, pleased to meet you.
+</perl>
 
 
-[Run](example/cgi4.psp)
+<!-- Quicker method using %_ global var in the hello2 sub -->
 
-## Quick Pages using CGI.pm\'s \<start_html\>\<end_html\> tags
-
-For rapid development you can take advantage of CGI.pm\'s \<start_html\>
-and \<end_html\> tags. The following page generates compliant HTML (view
-the page source after loading it to see for yourself):
-
-<pre>
-<span class="h-ab">&lt;</span><span class="h-cgi_tag">start_html</span> <span class="h-attr">title</span>=<span class="h-attv">"Quick Page</span>"<span class="h-ab">&gt;</span>
-The time is: !&#123;! localtime() !&#125;
-<span class="h-ab">&lt;</span><span class="h-cgi_tag">end_html</span><span class="h-ab">&gt;</span></pre>
+<p>
+<perl method="hello2">
+Hello ${name}, pleased to meet you.
+</perl>
 
 
-[Run](example/cgi6.psp)
+<!-- Quick and dirty using inline Perl. Note use of \ to prevent error if param empty -->
 
-The \<start_html\> tag generates all the \<html\>, \<head\>, \<title\>
-tags etc needed for a valid HTML page plus an opening body tag. Just
-enter the body content, then finish with \<end_html\> to generate the
-closing \<body\> and \<html\> tags. See the CGI.pm manual page for more
-information.
+<p>
+Hello !{! \$_{name} !}, pleased to meet you.
+
+</body>
+</html>
+
+
+__PERL__
+
+sub hello1 { 
+    my $self=shift();
+    my $cgi_or=$self->CGI();
+    my $name=$cgi_or->param('name');
+    $self->render( name=>$name);
+}
+
+sub hello2 { 
+
+    my $self=shift();
+    
+    #  Quicker method of getting name param
+    #
+    my $name=$_{'name'};
+    $self->render( name=>$name);
+}
+```
+
+[Run](https://demo.webdyne.org/cgi4.psp)
 
 # Advanced Usage
 
@@ -1332,520 +1884,610 @@ render arbitrary blocks of text or HTML within a page, which makes
 generation of dynamic content generally more readable than similar
 output generated within Perl code. An example:
 
-<pre>
-<span class="h-ab">&lt;</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">head</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">title</span><span class="h-ab">&gt;</span>Blocks<span class="h-ab">&lt;/</span><span class="h-tag">title</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">head</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
+``` html
+<html>
+<head>
+<title>Blocks</title>
+</head>
+<body>
+<p>
 
-<span class="h-ab">&lt;</span><span class="h-tag">form</span><span class="h-ab">&gt;</span>
-2 + 2 = <span class="h-ab">&lt;</span><span class="h-cgi_tag">textfield</span> <span class="h-attr">name</span>=<span class="h-attv">"sum</span>"<span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-cgi_tag">submit</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">form</span><span class="h-ab">&gt;</span>
+<form>
+2 + 2 = <textfield name="sum">
+<p><submit>
+</form>
 
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">perl</span> <span class="h-attr">method</span>=<span class="h-attv">"check</span>"<span class="h-ab">&gt;</span>
+<p>
+<perl method="check">
 
 
-<span class="h-com">&lt;!-- Each block below is only rendered if specifically requested by the Perl code --&gt;</span>
+<!-- Each block below is only rendered if specifically requested by the Perl code -->
 
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">block</span> <span class="h-attr">name</span>=<span class="h-attv">"pass</span>"<span class="h-ab">&gt;</span>
-Yes, +&#123;sum&#125; is the correct answer ! Brilliant ..
-<span class="h-ab">&lt;/</span><span class="h-webdyne_tag">block</span><span class="h-ab">&gt;</span>
+<block name="pass">
+Yes, +{sum} is the correct answer ! Brilliant ..
+</block>
 
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">block</span> <span class="h-attr">name</span>=<span class="h-attv">"fail</span>"<span class="h-ab">&gt;</span>
-I am sorry .. +&#123;sum&#125; is not correct .. Please try again !
-<span class="h-ab">&lt;/</span><span class="h-webdyne_tag">block</span><span class="h-ab">&gt;</span>
+<block name="fail">
+I am sorry .. +{sum} is not correct .. Please try again !
+</block>
 
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">block</span> <span class="h-attr">name</span>=<span class="h-attv">"silly</span>"<span class="h-ab">&gt;</span>
-Danger, does not compute ! .. "+&#123;sum&#125;" is not a number !
-<span class="h-ab">&lt;/</span><span class="h-webdyne_tag">block</span><span class="h-ab">&gt;</span>
+<block name="silly">
+Danger, does not compute ! .. "+{sum}" is not a number !
+</block>
 
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
+<p>
 Thanks for playing !
 
-<span class="h-ab">&lt;/</span><span class="h-webdyne_tag">perl</span><span class="h-ab">&gt;</span>
+</perl>
 
-<span class="h-ab">&lt;/</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
+</body>
+</html>
 
-&#095&#095PERL&#095&#095
+__PERL__
 
-sub check &#123;
+sub check {
 
-	my $self=shift();
+    my $self=shift();
 
-	if ((my $ans=$_&#123;'sum'&#125;) == 4) &#123;
-		$self->render_block('pass')
-	&#125;
-	elsif ($ans=~/^[0-9.]+$/) &#123;
-		$self->render_block('fail')
-	&#125;
-	elsif ($ans) &#123;
-		$self->render_block('silly')
-	&#125;
+    if ((my $ans=$_{'sum'}) == 4) {
+        $self->render_block('pass')
+    }
+    elsif ($ans=~/^[0-9.]+$/) {
+        $self->render_block('fail')
+    }
+    elsif ($ans) {
+        $self->render_block('silly')
+    }
 
-	#  Blocks aren't displayed until whole section rendered
-	#
-	return $self->render();
+    #  Blocks aren't displayed until whole section rendered
+    #
+    return $self->render();
 
-&#125;
-		
-</pre>
+}
+        
+```
 
-
-[Run](example/block1.psp)
+[Run](https://demo.webdyne.org/block1.psp)
 
 There can be more than one block with the same name - any block with the
 target name will be rendered:
 
-<pre>
-<span class="h-ab">&lt;</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">head</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">title</span><span class="h-ab">&gt;</span>Hello World<span class="h-ab">&lt;/</span><span class="h-tag">title</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;/</span><span class="h-tag">head</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">form</span><span class="h-ab">&gt;</span>
-Enter your name: <span class="h-ab">&lt;</span><span class="h-cgi_tag">textfield</span> <span class="h-attr">name</span>=<span class="h-attv">"name</span>"<span class="h-ab">&gt;</span>
-<span class="h-ent">&amp;nbsp;</span>
-<span class="h-ab">&lt;</span><span class="h-cgi_tag">submit</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">form</span><span class="h-ab">&gt;</span>
+``` html
+<html>
+<head><title>Hello World</title></head>
+<body>
+<p>
+<form>
+Enter your name:
+<p><textfield name="name">
+<p><submit>
+</form>
 
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">perl</span> <span class="h-attr">method</span>=<span class="h-attv">"hello</span>"<span class="h-ab">&gt;</span>
-
-
-<span class="h-com">&lt;!-- The following block is only rendered if we get a name - see the perl 
-	code --&gt;</span>
-
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">block</span> <span class="h-attr">name</span>=<span class="h-attv">"greeting</span>"<span class="h-ab">&gt;</span>
-Hello +&#123;name&#125;, pleased to meet you !
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-webdyne_tag">block</span><span class="h-ab">&gt;</span>
+<perl method="hello">
 
 
-<span class="h-com">&lt;!-- This text is always rendered - it is not part of a block --&gt;</span>
+<!-- The following block is only rendered if we get a name - see the perl 
+    code -->
 
-The time here is !&#123;! localtime() !&#125;
-
-
-<span class="h-com">&lt;!-- This block has the same name as the first one, so will be rendered
-	whenever that one is --&gt;</span>
-
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">block</span> <span class="h-attr">name</span>=<span class="h-attv">"greeting</span>"<span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
-It has been a pleasure to serve you, +&#123;name&#125; !
-<span class="h-ab">&lt;/</span><span class="h-webdyne_tag">block</span><span class="h-ab">&gt;</span>
+<block name="greeting">
+Hello +{name}, pleased to meet you !
+<p>
+</block>
 
 
-<span class="h-ab">&lt;/</span><span class="h-webdyne_tag">perl</span><span class="h-ab">&gt;</span>
+<!-- This text is always rendered - it is not part of a block -->
 
-<span class="h-ab">&lt;/</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
-
-&#095&#095PERL&#095&#095
-
-sub hello &#123; 
-
-	my $self=shift();
-
-	#  Only render greeting blocks if name given. Both blocks
-	#  will be rendered, as the both have the name "greeting"
-	#
-	if ($_&#123;'name'&#125;) &#123;
-		$self->render_block('greeting');
-	&#125;
-
-	$self->render();
-&#125;
-</pre>
+The time here is !{! localtime() !}
 
 
-[Run](example/block2.psp)
+<!-- This block has the same name as the first one, so will be rendered
+    whenever that one is -->
 
-Like any other text or HTML between \<perl\> tags, blocks can take
+<block name="greeting">
+<p>
+It has been a pleasure to serve you, +{name} !
+</block>
+
+
+</perl>
+
+</body>
+</html>
+
+__PERL__
+
+sub hello { 
+
+    my $self=shift();
+
+    #  Only render greeting blocks if name given. Both blocks
+    #  will be rendered, as the both have the name "greeting"
+    #
+    if ($_{'name'}) {
+        $self->render_block('greeting');
+    }
+
+    $self->render();
+}
+```
+
+[Run](https://demo.webdyne.org/block2.psp)
+
+Like any other text or HTML between <perl\> tags, blocks can take
 parameters to substitute into the text:
 
-<pre>
-<span class="h-ab">&lt;</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">head</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">title</span><span class="h-ab">&gt;</span>Hello World<span class="h-ab">&lt;/</span><span class="h-tag">title</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;/</span><span class="h-tag">head</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">form</span><span class="h-ab">&gt;</span>
-Enter your name: <span class="h-ab">&lt;</span><span class="h-cgi_tag">textfield</span> <span class="h-attr">name</span>=<span class="h-attv">"name</span>"<span class="h-ab">&gt;</span>
-<span class="h-ent">&amp;nbsp;</span>
-<span class="h-ab">&lt;</span><span class="h-cgi_tag">submit</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">form</span><span class="h-ab">&gt;</span>
+``` html
+<html>
+<head><title>Hello World</title></head>
+<body>
+<p>
+<form>
+Enter your name: <textfield name="name">
+&nbsp;
+<submit>
+</form>
 
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">perl</span> <span class="h-attr">method</span>=<span class="h-attv">"hello</span>"<span class="h-ab">&gt;</span>
-
-
-<span class="h-com">&lt;!-- This block will be rendered multiple times, the output changing depending
-	on the variables values supplied as parameters --&gt;</span>
-
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">block</span> <span class="h-attr">name</span>=<span class="h-attv">"greeting</span>"<span class="h-ab">&gt;</span>
-$&#123;i&#125; .. Hello +&#123;name&#125;, pleased to meet you !
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-webdyne_tag">block</span><span class="h-ab">&gt;</span>
-
-The time here is <span class="h-pi">&lt;? localtime() ?&gt;</span>
-
-<span class="h-ab">&lt;/</span><span class="h-webdyne_tag">perl</span><span class="h-ab">&gt;</span>
-
-<span class="h-ab">&lt;/</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
-
-&#095&#095PERL&#095&#095
-
-sub hello &#123; 
-
-	my $self=shift();
-
-	#  Only render greeting blocks if name given. Both blocks
-	#  will be rendered, as the both have the name "greeting"
-	#
-	if ($_&#123;'name'&#125;) &#123;
-		for(my $i=0; $i<3; $i++) &#123;
-			$self->render_block('greeting', i=>$i );
-		&#125;
-	&#125;
-
-	$self->render();
-&#125;
-</pre>
+<perl method="hello">
 
 
-[Run](example/block3.psp)
+<!-- This block will be rendered multiple times, the output changing depending
+    on the variables values supplied as parameters -->
+
+<block name="greeting">
+${i} .. Hello +{name}, pleased to meet you !
+<p>
+</block>
+
+The time here is <? localtime() ?>
+
+</perl>
+
+</body>
+</html>
+
+__PERL__
+
+sub hello { 
+
+    my $self=shift();
+
+    #  Only render greeting blocks if name given. Both blocks
+    #  will be rendered, as the both have the name "greeting"
+    #
+    if ($_{'name'}) {
+        for(my $i=0; $i<3; $i++) {
+            $self->render_block('greeting', i=>$i );
+        }
+    }
+
+    $self->render();
+}
+```
+
+[Run](https://demo.webdyne.org/block3.psp)
 
 Blocks have a non-intuitive feature - they still display even if they
-are outside of the \<perl\> tags that made the call to render them. e.g.
+are outside of the <perl\> tags that made the call to render them. e.g.
 the following is OK:
 
-<pre>
-<span class="h-ab">&lt;</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">head</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">title</span><span class="h-ab">&gt;</span>Hello World<span class="h-ab">&lt;/</span><span class="h-tag">title</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;/</span><span class="h-tag">head</span><span class="h-ab">&gt;</span>
+``` html
+<html>
+<head><title>Hello World</title></head>
 
-<span class="h-ab">&lt;</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
+<body>
 
-<span class="h-com">&lt;!-- Perl block with no content --&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">perl</span> <span class="h-attr">method</span>=<span class="h-attv">"hello</span>"<span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-webdyne_tag">perl</span><span class="h-ab">&gt;</span>
+<!-- Perl block with no content -->
+<perl method="hello">
+</perl>
 
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
+<p>
 
-<span class="h-com">&lt;!-- This block is not enclosed within the &lt;perl&gt; tags, but will still render --&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">block</span> <span class="h-attr">name</span>=<span class="h-attv">"hello</span>"<span class="h-ab">&gt;</span>
+<!-- This block is not enclosed within the <perl> tags, but will still render -->
+<block name="hello">
 Hello World
-<span class="h-ab">&lt;/</span><span class="h-webdyne_tag">block</span><span class="h-ab">&gt;</span>
+</block>
 
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
+<p>
 
-<span class="h-com">&lt;!-- So will this one --&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">block</span> <span class="h-attr">name</span>=<span class="h-attv">"hello</span>"<span class="h-ab">&gt;</span>
+<!-- So will this one -->
+<block name="hello">
 Again
-<span class="h-ab">&lt;/</span><span class="h-webdyne_tag">block</span><span class="h-ab">&gt;</span>
+</block>
 
-<span class="h-ab">&lt;/</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
+</body>
+</html>
 
-&#095&#095PERL&#095&#095
+__PERL__
 
-sub hello &#123;
+sub hello {
 
-	my $self=shift();
-	$self->render_block('hello');
+    my $self=shift();
+    $self->render_block('hello');
 
-&#125;
-</pre>
+}
+```
 
-
-[Run](example/block4.psp)
+[Run](https://demo.webdyne.org/block4.psp)
 
 You can mix the two styles:
 
-<pre>
-<span class="h-ab">&lt;</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">head</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">title</span><span class="h-ab">&gt;</span>Hello World<span class="h-ab">&lt;/</span><span class="h-tag">title</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;/</span><span class="h-tag">head</span><span class="h-ab">&gt;</span>
+``` html
+<html>
+<head><title>Hello World</title></head>
 
-<span class="h-ab">&lt;</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">perl</span> <span class="h-attr">method</span>=<span class="h-attv">"hello</span>"<span class="h-ab">&gt;</span>
+<body>
+<perl method="hello">
 
-<span class="h-com">&lt;!-- This block is rendered --&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">block</span> <span class="h-attr">name</span>=<span class="h-attv">"hello</span>"<span class="h-ab">&gt;</span>
+<!-- This block is rendered -->
+<block name="hello">
 Hello World
-<span class="h-ab">&lt;/</span><span class="h-webdyne_tag">block</span><span class="h-ab">&gt;</span>
+</block>
 
-<span class="h-ab">&lt;/</span><span class="h-webdyne_tag">perl</span><span class="h-ab">&gt;</span>
+</perl>
 
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
-<span class="h-com">&lt;!-- So is this one, even though it is outside the &lt;perl&gt;..&lt;/perl&gt; block --&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">block</span> <span class="h-attr">name</span>=<span class="h-attv">"hello</span>"<span class="h-ab">&gt;</span>
+<p>
+<!-- So is this one, even though it is outside the <perl>..</perl> block -->
+<block name="hello">
 Again
-<span class="h-ab">&lt;/</span><span class="h-webdyne_tag">block</span><span class="h-ab">&gt;</span>
+</block>
 
-<span class="h-ab">&lt;/</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
+</body>
+</html>
 
-&#095&#095PERL&#095&#095
+__PERL__
 
-sub hello &#123;
+sub hello {
 
-	my $self=shift();
-	$self->render_block('hello');
-	$self->render();
+    my $self=shift();
+    $self->render_block('hello');
+    $self->render();
 
-&#125;
-</pre>
+}
+```
 
+[Run](https://demo.webdyne.org/block5.psp)
 
-[Run](example/block5.psp)
+You can use the <block\> tag display attribute to hide or show a block,
+or use a CGI parameter to determine visibility (e.g for a status update
+or warning):
+
+``` html
+<start_html>
+
+<!-- Form to get block toggle status. Update hidden param based on toggle button -->
+<form>
+<submit name="button" value="Toggle">
+<hidden name="toggle" value="!{! $_{'toggle'} ? 0 : 1 !}">
+</form>
+
+<!-- This block will only be displayed if the toggle value is true -->
+<block name="toggle1" display="!{! $_{'toggle'} !}">
+Toggle On (+{toggle})
+</block>
+<p>
+
+<!-- This block will always display -->
+<block name="hello" display=1>
+Hello World
+</block>
+
+<!-- This block will never display unless called from a perl handler -->
+<block name="hello" display=0>
+Goodbye world
+</block>
+```
+
+[Run](https://demo.webdyne.org/block_toggle1.psp)
 
 ## File inclusion
 
 You can include other file fragments at compile time using the include
 tag:
 
-<pre>
-<span class="h-ab">&lt;</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">head</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">title</span><span class="h-ab">&gt;</span>Hello World<span class="h-ab">&lt;/</span><span class="h-tag">title</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;/</span><span class="h-tag">head</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
+``` html
+<html>
+<head><title>Hello World</title></head>
+<body>
+<p>
 The protocols file on this machine:
-<span class="h-ab">&lt;</span><span class="h-tag">pre</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">include</span> <span class="h-attr">file</span>=<span class="h-attv">"/etc/protocols</span>"<span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">pre</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
+<pre>
+<include file="/etc/protocols">
 </pre>
+</body>
+</html>
+```
 
-
-[Run](example/include1.psp)
+[Run](https://demo.webdyne.org/include1.psp)
 
 If the file name is not an absolute path name is will be loaded relative
-to the directory of the parent file. For example if file \"bar.psp\"
-incorporates the tag\<include file=\"foo.psp\"/\> it will be expected
-that \"foo.psp\" is in the same directory as \"bar.psp\".
+to the directory of the parent file. For example if file "bar.psp"
+incorporates the tag <include file="foo.psp"\> it will be expected that
+"`foo.psp`" is in the same directory as "`bar.psp`".
 
-::: important
-The include tag pulls in the target file at compile time. Changes to the
-included file after the WebDyne page is run the first time (resulting in
-compilation) are not reflected in subsequent output. Thus the include
-tag should not be seen as a shortcut to a pseudo Content Management
-System. For example \<include file=\"latest_news.txt\"/\> will probably
-not behave in the way you expect. The first time you run it the latest
-news is displayed. However updating the \"latest_news.txt\" file will
-not result in changes to the output (it will be stale).
+!!! important
 
-There are betters ways to build a CMS with WebDyne - use the include tag
-sparingly !
-:::
+    The include tag pulls in the target file at compile time. Changes to the
+    included file after the WebDyne page is run the first time (resulting in
+    compilation) are not reflected in subsequent output unless the `nocache`
+    attribute is set. Thus the include tag should not be seen as a shortcut
+    to a pseudo Content Management System. For example <include
+    file="latest_news.txt"\> will probably not behave in the way you expect.
+    The first time you run it the latest news is displayed. However updating
+    the "latest_news.txt" file will not result in changes to the output (it
+    will be stale).
 
-## Static Sections
+    If you do use the `nocache` attribute the included page will be loaded
+    and parsed every time, significantly slowing down page display. There
+    are betters ways to build a CMS with WebDyne - use the include tag
+    sparingly !
+
+You can include just the head or body section of a HTML or PSP file by
+using the head or body attributes. Here is the reference file (file to
+be included). It does not have to be a .psp file - a standard HTML file
+can be supplied :
+
+``` html
+<start_html title="Include Head Title">
+Include Body
+```
+
+[Run](https://demo.webdyne.org/include2.psp)
+
+And here is the generating file (the file that includes sections from
+the reference file).
+
+``` html
+<html>
+<head>
+<include head file="./include2.psp">
+</head>
+<body>
+<include body file="./include2.psp">
+```
+
+[Run](https://demo.webdyne.org/include3.psp)
+
+You can also include block sections from `.psp` files. If this is the
+reference file (the file to be included) containing two blocks. This is
+a renderable `.psp` file in it's own right. The blocks use the `display`
+attribute to demonstrate that they will produce output, but it's not
+required:
+
+``` html
+<start_html>
+<p>
+<block name="block1" display>
+This is block 1
+</block>
+
+<p>
+<block name="block2" display>
+This is block 2
+</block>
+```
+
+[Run](https://demo.webdyne.org/include4.psp)
+
+And here is the file that brings in the blocks from the reference file
+and incorporates them into the output:
+
+``` html
+<start_html>
+This is my master file
+<p>
+Here is some text pulled from the "include4.psp" file:
+<p>
+<include file="include4.psp" block="block1">
+<p>
+And another different block from the same file with caching disabled:
+<p>
+<include file="include4.psp" block="block2" nocache>
+```
+
+[Run](https://demo.webdyne.org/include5.psp)
+
+## Static Sections {#static_sections}
 
 Sometimes you want to generate dynamic output in a page once only (e.g.
 a last modified date, a sidebar menu etc.) Using WebDyne this can be
-done with Perl or CGI code flagged with the \"static\" attribute. Any
+done with Perl or CGI code flagged with the "static" attribute. Any
 dynamic tag so flagged will be rendered at compile time, and the
 resulting output will become part of the compiled page - it will not
 change on subsequent page views, or have to be re-run each time the page
 is loaded. An example:
 
-<pre>
-<span class="h-ab">&lt;</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">head</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">title</span><span class="h-ab">&gt;</span>Hello World<span class="h-ab">&lt;/</span><span class="h-tag">title</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;/</span><span class="h-tag">head</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
+``` html
+<html>
+<head><title>Hello World</title></head>
+<body>
+<p>
 Hello World
-<span class="h-ab">&lt;</span><span class="h-tag">hr</span><span class="h-ab">&gt;</span>
+<hr>
 
 
-<span class="h-com">&lt;!-- Note the static attribute --&gt;</span>
+<!-- Note the static attribute -->
 
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">perl</span> <span class="h-attr">method</span>=<span class="h-attv">"mtime</span>" <span class="h-attr">static</span>=<span class="h-attv">"1</span>"<span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">em</span><span class="h-ab">&gt;</span>Last Modified: <span class="h-ab">&lt;/</span><span class="h-tag">em</span><span class="h-ab">&gt;</span>$&#123;mtime&#125;
-<span class="h-ab">&lt;/</span><span class="h-webdyne_tag">perl</span><span class="h-ab">&gt;</span>
+<perl method="mtime" static="1">
+<em>Last Modified: </em>${mtime}
+</perl>
 
-<span class="h-ab">&lt;/</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
+</body>
+</html>
 
-&#095&#095PERL&#095&#095
+__PERL__
 
-sub mtime &#123;
+sub mtime {
 
-	my $self=shift();
-	my $r=$self->request();
-	
-	my $srce_pn=$r->filename();
-    	my $srce_mtime=(stat($srce_pn))[9];
-	my $srce_localmtime=localtime $srce_mtime;
+    my $self=shift();
+    my $r=$self->request();
+    
+    my $srce_pn=$r->filename();
+        my $srce_mtime=(stat($srce_pn))[9];
+    my $srce_localmtime=localtime $srce_mtime;
 
         return $self->render( mtime=>$srce_localmtime )
 
-&#125;
-</pre>
+}
+```
 
-
-[Run](example/static1.psp)
+[Run](https://demo.webdyne.org/static1.psp)
 
 In fact the above page will render very quickly because it has no
-dynamic content at all once the \<perl\> content is flagged as static.
+dynamic content at all once the <perl\> content is flagged as static.
 The WebDyne engine will recognise this and store the page as a static
 HTML file in its cache. Whenever it is called WebDyne will use the
 Apache lookup_file() function to return the page as if it was just
 serving up static content.
 
 You can check this by looking at the content of the WebDyne cache
-directory (usually /var/webdyne/cache). Any file with a \".html\"
+directory (usually /var/webdyne/cache). Any file with a ".html"
 extension represents the static version of a page.
 
 Of course you can still mix static and dynamic Perl sections:
 
-<pre>
-<span class="h-ab">&lt;</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">head</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">title</span><span class="h-ab">&gt;</span>Hello World<span class="h-ab">&lt;/</span><span class="h-tag">title</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;/</span><span class="h-tag">head</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
+``` html
+<html>
+<head><title>Hello World</title></head>
+<body>
+<p>
 Hello World
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
+<p>
 
-<span class="h-com">&lt;!-- A normal dynamic section - code is run each time page is loaded --&gt;</span>
+<!-- A normal dynamic section - code is run each time page is loaded -->
 
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">perl</span> <span class="h-attr">method</span>=<span class="h-attv">"localtime</span>"<span class="h-ab">&gt;</span>
-Current time: $&#123;time&#125; 
-<span class="h-ab">&lt;/</span><span class="h-webdyne_tag">perl</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">hr</span><span class="h-ab">&gt;</span>
+<perl method="localtime">
+Current time: ${time} 
+</perl>
+<hr>
 
-<span class="h-com">&lt;!-- Note the static attribute - code is run only once at compile time --&gt;</span>
+<!-- Note the static attribute - code is run only once at compile time -->
 
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">perl</span> <span class="h-attr">method</span>=<span class="h-attv">"mtime</span>" <span class="h-attr">static</span>=<span class="h-attv">"1</span>"<span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">em</span><span class="h-ab">&gt;</span>Last Modified: <span class="h-ab">&lt;/</span><span class="h-tag">em</span><span class="h-ab">&gt;</span>$&#123;mtime&#125;
-<span class="h-ab">&lt;/</span><span class="h-webdyne_tag">perl</span><span class="h-ab">&gt;</span>
-
-
-<span class="h-ab">&lt;/</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
-
-&#095&#095PERL&#095&#095
+<perl method="mtime" static="1">
+<em>Last Modified: </em>${mtime}
+</perl>
 
 
-sub localtime &#123;
+</body>
+</html>
 
-	shift()->render(time=>scalar localtime);
-
-&#125;
+__PERL__
 
 
-sub mtime &#123;
+sub localtime {
 
-	my $self=shift();
-	my $r=$self->request();
-	
-	my $srce_pn=$r->filename();
-    	my $srce_mtime=(stat($srce_pn))[9];
-	my $srce_localmtime=localtime $srce_mtime;
+    shift()->render(time=>scalar localtime);
+
+}
+
+
+sub mtime {
+
+    my $self=shift();
+    my $r=$self->request();
+    
+    my $srce_pn=$r->filename();
+        my $srce_mtime=(stat($srce_pn))[9];
+    my $srce_localmtime=localtime $srce_mtime;
 
         return $self->render( mtime=>$srce_localmtime )
 
-&#125;
-</pre>
+}
+```
 
-
-[Run](example/static2.psp)
+[Run](https://demo.webdyne.org/static2.psp)
 
 If you want the whole pages to be static, then flagging everything with
-the \"static\" attribute can be cumbersome. There is a special meta tag
+the "static" attribute can be cumbersome. There is a special meta tag
 which flags the entire page as static:
 
-<pre>
-<span class="h-ab">&lt;</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">head</span><span class="h-ab">&gt;</span>
+``` html
+<html>
+<head>
 
-<span class="h-com">&lt;!-- Special meta tag --&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">meta</span> <span class="h-attr">name</span>=<span class="h-attv">"WebDyne</span>" <span class="h-attr">content</span>=<span class="h-attv">"static=1</span>"<span class="h-ab">&gt;</span>
+<!-- Special meta tag -->
+<meta name="WebDyne" content="static=1">
 
-<span class="h-ab">&lt;</span><span class="h-tag">title</span><span class="h-ab">&gt;</span>Hello World<span class="h-ab">&lt;/</span><span class="h-tag">title</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">head</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
+<title>Hello World</title>
+</head>
+<body>
+<p>
 Hello World
-<span class="h-ab">&lt;</span><span class="h-tag">hr</span><span class="h-ab">&gt;</span>
+<hr>
 
 
-<span class="h-com">&lt;!-- A normal dynamic section, but because of the meta tag it will be frozen 
-	at compile time --&gt;</span>
+<!-- A normal dynamic section, but because of the meta tag it will be frozen 
+    at compile time -->
 
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">perl</span> <span class="h-attr">method</span>=<span class="h-attv">"localtime</span>"<span class="h-ab">&gt;</span>
-Current time: $&#123;time&#125; 
-<span class="h-ab">&lt;/</span><span class="h-webdyne_tag">perl</span><span class="h-ab">&gt;</span>
+<perl method="localtime">
+Current time: ${time} 
+</perl>
 
-<span class="h-ent">&amp;nbsp;</span>
+<!-- Note the static attribute. It is redundant now the whole page is flagged
+    as static - it could be removed safely. -->
 
-<span class="h-com">&lt;!-- Note the static attribute. It is redundant now the whole page is flagged
-	as static - it could be removed safely. --&gt;</span>
-
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">perl</span> <span class="h-attr">method</span>=<span class="h-attv">"mtime</span>" <span class="h-attr">static</span>=<span class="h-attv">"1</span>"<span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">em</span><span class="h-ab">&gt;</span>Last Modified: <span class="h-ab">&lt;/</span><span class="h-tag">em</span><span class="h-ab">&gt;</span>$&#123;mtime&#125;
-<span class="h-ab">&lt;/</span><span class="h-webdyne_tag">perl</span><span class="h-ab">&gt;</span>
-
-
-<span class="h-ab">&lt;/</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
-
-&#095&#095PERL&#095&#095
+<p>
+<perl method="mtime" static="1">
+<em>Last Modified: </em>${mtime}
+</perl>
 
 
-sub localtime &#123;
+</body>
+</html>
 
-	shift()->render(time=>scalar localtime);
-
-&#125;
+__PERL__
 
 
-sub mtime &#123;
+sub localtime {
 
-	my $self=shift();
-	my $r=$self->request();
-	
-	my $srce_pn=$r->filename();
-    	my $srce_mtime=(stat($srce_pn))[9];
-	my $srce_localmtime=localtime $srce_mtime;
+    shift()->render(time=>scalar localtime);
+
+}
+
+
+sub mtime {
+
+    my $self=shift();
+    my $r=$self->request();
+    
+    my $srce_pn=$r->filename();
+        my $srce_mtime=(stat($srce_pn))[9];
+    my $srce_localmtime=localtime $srce_mtime;
 
         return $self->render( mtime=>$srce_localmtime )
 
-&#125;
-</pre>
+}
+```
 
+[Run](https://demo.webdyne.org/static3.psp)
 
-[Run](example/static3.psp)
+If you don't like the idea of setting the static flag in meta data, then
+"using" the special package "WebDyne::Static" will have exactly the same
+effect:
 
-If you don\'t like the idea of setting the static flag in meta data,
-then \"using\" the special package \"WebDyne::Static\" will have exactly
-the same effect:
-
-<pre>
-<span class="h-ab">&lt;</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">head</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">title</span><span class="h-ab">&gt;</span>Hello World<span class="h-ab">&lt;/</span><span class="h-tag">title</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">head</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
+``` html
+<html>
+<head>
+<title>Hello World</title>
+</head>
+<body>
+<p>
 Hello World
-<span class="h-ab">&lt;</span><span class="h-tag">hr</span><span class="h-ab">&gt;</span>
+<hr>
 
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">perl</span> <span class="h-attr">method</span>=<span class="h-attv">"localtime</span>"<span class="h-ab">&gt;</span>
-Current time: $&#123;time&#125; 
-<span class="h-ab">&lt;/</span><span class="h-webdyne_tag">perl</span><span class="h-ab">&gt;</span>
+<perl method="localtime">
+Current time: ${time} 
+</perl>
 
-<span class="h-ent">&amp;nbsp;</span>
+<p>
 
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">perl</span> <span class="h-attr">method</span>=<span class="h-attv">"mtime</span>"<span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">em</span><span class="h-ab">&gt;</span>Last Modified: <span class="h-ab">&lt;/</span><span class="h-tag">em</span><span class="h-ab">&gt;</span>$&#123;mtime&#125;
-<span class="h-ab">&lt;/</span><span class="h-webdyne_tag">perl</span><span class="h-ab">&gt;</span>
+<perl method="mtime">
+<em>Last Modified: </em>${mtime}
+</perl>
 
-<span class="h-ab">&lt;/</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
+</body>
+</html>
 
-&#095&#095PERL&#095&#095
+__PERL__
 
 
 #  Makes the whole page static
@@ -1853,136 +2495,131 @@ Current time: $&#123;time&#125;
 use WebDyne::Static;
 
 
-sub localtime &#123;
+sub localtime {
 
-	shift()->render(time=>scalar localtime);
+    shift()->render(time=>scalar localtime);
 
-&#125;
+}
 
 
-sub mtime &#123;
+sub mtime {
 
-	my $self=shift();
-	my $r=$self->request();
-	
-	my $srce_pn=$r->filename();
-    	my $srce_mtime=(stat($srce_pn))[9];
-	my $srce_localmtime=localtime $srce_mtime;
+    my $self=shift();
+    my $r=$self->request();
+    
+    my $srce_pn=$r->filename();
+        my $srce_mtime=(stat($srce_pn))[9];
+    my $srce_localmtime=localtime $srce_mtime;
 
         return $self->render( mtime=>$srce_localmtime )
 
-&#125;
-</pre>
+}
+```
 
-
-[Run](example/static3a.psp)
+[Run](https://demo.webdyne.org/static3a.psp)
 
 If the static tag seems trivial consider the example that displayed
 country codes:
 
-<pre>
-<span class="h-ab">&lt;</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">head</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">title</span><span class="h-ab">&gt;</span>Hello World<span class="h-ab">&lt;/</span><span class="h-tag">title</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;/</span><span class="h-tag">head</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
+``` html
+<html>
+<head><title>Hello World</title></head>
+<body>
+<p>
 
-<span class="h-com">&lt;!-- Generate all country names for picklist --&gt;</span>
+<!-- Generate all country names for picklist -->
 
-<span class="h-ab">&lt;</span><span class="h-tag">form</span><span class="h-ab">&gt;</span>
+<form>
 
 Your Country ?
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">perl</span> <span class="h-attr">method</span>=<span class="h-attv">"countries</span>"<span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-cgi_tag">popup_menu</span> <span class="h-attr">values</span>=<span class="h-attv">"$&#123;countries_ar&#125;</span>"<span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-webdyne_tag">perl</span><span class="h-ab">&gt;</span>
+<perl method="countries">
+<popup_menu values="${countries_ar}" default="Australia">
+</perl>
 
-<span class="h-ab">&lt;/</span><span class="h-tag">form</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
+</form>
+</body>
+</html>
 
-&#095&#095PERL&#095&#095
+__PERL__
 
 use Locale::Country;
 
-sub countries &#123;
-	
-	my $self=shift();
-	my @countries = sort &#123; $a cmp $b &#125; all_country_names();
-	$self->render( countries_ar=>\@countries );
+sub countries {
+    
+    my $self=shift();
+    my @countries = sort { $a cmp $b } all_country_names();
+    $self->render( countries_ar=>\@countries );
 
-&#125;
-</pre>
+}
+```
 
-
-[Run](example/cgi5.psp)
+[Run](https://demo.webdyne.org/cgi5.psp)
 
 Every time the above example is viewed the Country Name list is
-generated dynamically via CGI.pm and the Locale::Country module (on a
-sample machine Apache Bench measured the output at around 55 pages/sec).
-This is a waste of resources because the list changes very infrequently.
-We can keep the code neat but gain a lot of speed by adding the static
-tag attribute:
+generated dynamically via the Locale::Country module. This is a waste of
+resources because the list changes very infrequently. We can keep the
+code neat but gain a lot of speed by adding the `static` tag attribute:
 
-<pre>
-<span class="h-ab">&lt;</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">head</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">title</span><span class="h-ab">&gt;</span>Hello World<span class="h-ab">&lt;/</span><span class="h-tag">title</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;/</span><span class="h-tag">head</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
+``` html
+<html>
+<head><title>Hello World</title></head>
+<body>
+<p>
 
-<span class="h-com">&lt;!-- Generate all country names for picklist --&gt;</span>
+<!-- Generate all country names for picklist -->
 
-<span class="h-ab">&lt;</span><span class="h-tag">form</span><span class="h-ab">&gt;</span>
+<form>
 
 Your Country ?
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">perl</span> <span class="h-attr">method</span>=<span class="h-attv">"countries</span>" <span class="h-attr">static</span>=<span class="h-attv">"1</span>"<span class="h-ab">&gt;</span>
+<perl method="countries" static="1">
 
-<span class="h-com">&lt;!-- Note the addition of the static attribute --&gt;</span>
+<!-- Note the addition of the static attribute -->
 
-<span class="h-ab">&lt;</span><span class="h-cgi_tag">popup_menu</span> <span class="h-attr">values</span>=<span class="h-attv">"$&#123;countries_ar&#125;</span>"<span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-webdyne_tag">perl</span><span class="h-ab">&gt;</span>
+<popup_menu values="${countries_ar}">
+</perl>
 
-<span class="h-ab">&lt;/</span><span class="h-tag">form</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
+</form>
+</body>
+</html>
 
-&#095&#095PERL&#095&#095
+__PERL__
 
 use Locale::Country;
 
-sub countries &#123;
-	
-	my $self=shift();
-	my @countries = sort &#123;$a cmp $b&#125; all_country_names();
-	$self->render( countries_ar=>\@countries );
+sub countries {
+    
+    my $self=shift();
+    my @countries = sort {$a cmp $b} all_country_names();
+    $self->render( countries_ar=>\@countries );
 
-&#125;
-</pre>
+}
+```
 
+[Run](https://demo.webdyne.org/static4.psp)
 
-[Run](example/static4.psp)
+By simply adding the "static" attribute output on a sample machine
+resulted in a 4x speedup in page loads. Judicious use of the static tag
+in places with slow changing data can markedly increase efficiency of
+the WebDyne engine.
 
-By simply adding the \"static\" attribute output on a sample machine
-increased from 55 Pages/sec to 280 Pages/sec ! Judicious use of the
-static tag in places with slow changing data can markedly increase
-efficiency of the WebDyne engine.
-
-## Caching
+## Caching {#caching_section}
 
 WebDyne has the ability to cache the compiled version of a dynamic page
 according to specs you set via the API. When coupled with pages/blocks
 that are flagged as static this presents some powerful possibilities.
 
-::: important
-Caching will only work if `$WEBDYNE_CACHE_DN` is defined and set to a
-directory that the web server has write access to. If caching does not
-work check that \$`WEBDYNE_CACHE_DN` is defined and permissions set
-correctly for your web server.
-:::
+!!! important
+
+    Caching will only work if `$WEBDYNE_CACHE_DN` is defined and set to a
+    directory that the web server has write access to. If caching does not
+    work check that \$`WEBDYNE_CACHE_DN` is defined and permissions set
+    correctly for your web server.
 
 There are many potential examples, but consider this one: you have a
 page that generates output by making a complex query to a database,
 which takes a lot of CPU and disk IO resources to generate. You need to
 update the page reasonably frequently (e.g. a weather forecast, near
-real time sales stats), but can\'t afford to have the query run every
+real time sales stats), but can't afford to have the query run every
 time someone view the page.
 
 WebDyne allows you to configure the page to cache the output for a
@@ -2002,58 +2639,58 @@ r\$-\>lookup_file() or the FCGI equivalent, which is very fast.
 Try it by running the following example and clicking refresh a few times
 over a 20 second interval
 
-<pre>
-<span class="h-ab">&lt;</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">head</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">title</span><span class="h-ab">&gt;</span>Caching<span class="h-ab">&lt;/</span><span class="h-tag">title</span><span class="h-ab">&gt;</span>
-<span class="h-com">&lt;!-- Set static and cache meta parameters --&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">meta</span> <span class="h-attr">name</span>=<span class="h-attv">"WebDyne</span>" content="cache=<span class="h-ent">&amp;cache;</span>static=1"<span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">head</span><span class="h-ab">&gt;</span>
+``` html
+<html>
+<head>
+<title>Caching</title>
+<!-- Set static and cache meta parameters -->
+<meta name="WebDyne" content="cache=&cache;static=1">
+</head>
 
-<span class="h-ab">&lt;</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
+<body>
+<p>
 
 This page will update once every 10 seconds.
 
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
+<p>
 
-Hello World !&#123;! localtime() !&#125;
+Hello World !{! localtime() !}
 
-<span class="h-ab">&lt;/</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
+</body>
+</html>
 
-&#095&#095PERL&#095&#095
+__PERL__
 
 
 #  The following would work in place of the meta tags
 #
 #use WebDyne::Static;
-#use WebDyne::Cache (\<span class="h-ent">&amp;cache);</span>
+#use WebDyne::Cache (\&cache);
 
 
-sub cache &#123;
+sub cache {
 
-	my $self=shift();
+    my $self=shift();
 
-	#  Get cache file mtime (modified time)
+    #  Get cache file mtime (modified time)
         #
-        my $mtime=$&#123; $self->cache_mtime() &#125;;
+        my $mtime=${ $self->cache_mtime() };
 
 
         #  If older than 10 seconds force recompile
         #
-        if ((time()-$mtime) > 10) &#123; 
+        if ((time()-$mtime) > 10) { 
                 $self->cache_compile(1) 
-        &#125;;
+        };
 
-	#  Done
-	#
-	return \undef;
+    #  Done
+    #
+    return \undef;
 
-&#125;</pre>
+}
+```
 
-
-[Run](example/cache1.psp)
+[Run](https://demo.webdyne.org/cache1.psp)
 
 WebDyne uses the return value of the nominated cache routine to
 determine what UID (unique ID) to assign to the page. In the above
@@ -2071,84 +2708,430 @@ based on the month selected, then cache the resulting output.
 
 The following example simulates such a scenario:
 
-<pre>
-<span class="h-com">&lt;!-- Start to cheat by using start/end_html tags to save space --&gt;</span>
+``` html
+<!-- Start to cheat by using start/end_html tags to save space -->
 
-<span class="h-ab">&lt;</span><span class="h-cgi_tag">start_html</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">form</span> <span class="h-attr">method</span>=<span class="h-attv">"GET</span>"<span class="h-ab">&gt;</span>
-Get sales results for:<span class="h-ent">&amp;nbsp;</span><span class="h-ab">&lt;</span><span class="h-cgi_tag">popup_menu</span> <span class="h-attr">name</span>=<span class="h-attv">"month</span>" <span class="h-attr">values</span>=<span class="h-attv">"@&#123;qw(January February March)&#125;</span>"<span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-cgi_tag">submit</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">form</span><span class="h-ab">&gt;</span>
+<start_html>
+<form method="GET">
+Get sales results for:&nbsp;<popup_menu name="month" values="@{qw(January February March)}">
+<submit>
+</form>
 
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">perl</span> <span class="h-attr">method</span>=<span class="h-attv">"results</span>"<span class="h-ab">&gt;</span>
-Sales results for +&#123;month&#125;: $$&#123;results&#125;
-<span class="h-ab">&lt;/</span><span class="h-webdyne_tag">perl</span><span class="h-ab">&gt;</span>
+<perl method="results">
+Sales results for +{month}: $${results}
+</perl>
 
-<span class="h-ab">&lt;</span><span class="h-tag">hr</span><span class="h-ab">&gt;</span>
-This page generated: !&#123;! localtime() !&#125;
-<span class="h-ab">&lt;</span><span class="h-cgi_tag">end_html</span><span class="h-ab">&gt;</span>
+<hr>
+This page generated: !{! localtime() !}
+<end_html>
 
-&#095&#095PERL&#095&#095
+__PERL__
 
 use WebDyne::Static;
-use WebDyne::Cache (\<span class="h-ent">&amp;cache);</span>
+use WebDyne::Cache (\&cache);
 
 my %results=(
 
-	January		=> 20,
-	February	=> 30,
-	March		=> 40
+    January     => 20,
+    February    => 30,
+    March       => 40
 );
 
-sub cache &#123;
+sub cache {
 
-	#  Return UID based on month
-	#
-	my $uid=undef;
-	if (my $month=$_&#123;'month'&#125;) &#123;
+    #  Return UID based on month
+    #
+    my $uid=undef;
+    if (my $month=$_{'month'}) {
 
-		#  Make sure month is valid
-		#
-		$uid=$month if defined $results&#123;$month&#125;
+        #  Make sure month is valid
+        #
+        $uid=$month if defined $results{$month}
 
-	&#125;
-	return \$uid;
+    }
+    return \$uid;
 
-&#125;
-
-
-sub results &#123;
-
-	my $self=shift();
-	if (my $month=$_&#123;'month'&#125;) &#123;
-		
-		#  Could be a really long complex SQL query ...
-		#
-		my $results=$results&#123;$month&#125;;
+}
 
 
-		#  And display
-		#
-		return $self->render(results => $results);
-	&#125;
-	else &#123;
-		return \undef;
-	&#125;
+sub results {
 
-&#125;</pre>
+    my $self=shift();
+    if (my $month=$_{'month'}) {
+        
+        #  Could be a really long complex SQL query ...
+        #
+        my $results=$results{$month};
 
 
-[Run](example/cache2.psp)
+        #  And display
+        #
+        return $self->render(results => $results);
+    }
+    else {
+        return \undef;
+    }
 
-::: important
-Take care when using user-supplied input to generate the page UID. There
-is no inbuilt code in WebDyne to limit the number of UID\'s associated
-with a page. Unless we check it, a malicious user could potentially DOS
-the server by supplying endless random \"months\" to the above page with
-a script, causing WebDyne to create a new file for each UID - perhaps
-eventually filling the disk partition that holds the cache directory.
-That is why we check the month is valid in the code above.
-:::
+}
+```
+
+[Run](https://demo.webdyne.org/cache2.psp)
+
+!!! important
+
+    Take care when using user-supplied input to generate the page UID. There
+    is no inbuilt code in WebDyne to limit the number of UID's associated
+    with a page. Unless we check it, a malicious user could potentially DOS
+    the server by supplying endless random "months" to the above page with a
+    script, causing WebDyne to create a new file for each UID - perhaps
+    eventually filling the disk partition that holds the cache directory.
+    That is why we check the month is valid in the code above.
+
+## JSON
+
+WebDyne has a <json\> tag that can be used to present JSON data objects
+to Javascript libraries in an output page. Here is a very simple
+example:
+
+``` html
+<start_html title="Sample JSON Chart" script="https://cdn.jsdelivr.net/npm/chart.js">
+
+<h2>Monthly Sales Chart</h2>
+
+<canvas id="myChart"></canvas>
+
+<json handler="chart_data" id="chartData">
+
+<script>
+  // Parse JSON from the script tag
+  const data = JSON.parse(document.getElementById("chartData").textContent);
+
+  const ctx = document.getElementById('myChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar', // You can also use 'line', 'pie', etc.
+    data: {
+      labels: data.labels,
+      datasets: [{
+        label: 'Sales',
+        data: data.values,
+      }]
+    }
+  });
+</script>
+
+__PERL__
+
+sub chart_data {
+
+    my %data=(
+        labels  => [qw(Jan Feb Mar Apr)],
+        values  => [(120, 150, 180, 100)]
+    );
+    return \%data
+    
+}
+        
+```
+
+[Run](https://demo.webdyne.org/chart1.psp)
+
+If you run it and review the source HTML you will see the JSON data
+rendered into the page as <script\></script\> block of type
+application/json with an id of "chartData". Any data returned by the
+perl routine nominated by the json tag is presented as JSON within that
+tag block, and available to Javascript libraries within the page. JSON
+data is kept in canononical order by default, which can be adjusted with
+the WEBDYNE_JSON_CANONICAL variable if not desired/needed for a very
+small speed-up.
+
+## API Tags
+
+WebDyne has the ability to make available a basic REST API facility
+using the <api\> tag in conjunction with the Router::Simple CPAN
+module. Documents that utilise the <api\> tag are somewhat unique in
+that:
+
+-   There is no need for any other tags in the document besides the
+    <api\> tag. All other tags are ignored - in fact they are
+    discarded.
+
+-   Any .psp file file an <api\> tag will only emit JSON data with a
+    content type of "`application/json`"
+
+-   The REST api path must correspond .psp file at some path level, e.g.
+    if your path is `/api/user/42` you must have a file called either
+    "`api.psp`" or "`api/user.psp`" in your path.
+
+-   A .psp file can contain multiple <api\> tags corresponding to
+    different `Router::Simple` routes
+
+Here is a very simple example. Note the format of the URL in the Run
+hyperlink:
+
+``` html
+<api handler=uppercase pattern="/api/uppercase/{user}/:id">
+<api handler=doublecase pattern="/api/doublecase/{user}/:id">
+__PERL__
+sub uppercase {
+
+    my ($self, $match_hr)=@_;
+    my ($user, $id)=@{$match_hr}{qw(user id)};
+    my %data=(
+        user => uc($user),
+        id   => $id
+    );
+    return \%data
+    
+}
+
+sub doublecase {
+
+    my ($self, $match_hr)=@_;
+    my ($user, $id)=@{$match_hr}{qw(user id)};
+    my %data=(
+        user => join('_', uc($user), lc($user)),
+        id   => $id
+    );
+    return \%data
+    
+}
+```
+
+[Run uppercase API
+example](https://demo.webdyne.org/api/uppercase/bob/42)
+
+[Run doublecase API
+example](https://demo.webdyne.org/api/doublecase/bob/42)
+
+!!! caution
+
+    The <api\> tag is still somewhat experimental. Use with caution
+
+## HTMX
+
+WebDyne has support for <htmx\> tags to supply fragmented HTML to pages
+using the [HTMX Javascript Library](https://htmx.org). WebDyne can
+support just supplying HTML snippet to pages in response to htmx calls.
+HTMX and WebDyne are complementary libraries which can be combined
+together to support dynamic pages with in-place updates from WebDybe
+Perl backends. Here is a simple HTML file (`htmx_demo1.psp`)
+incorporating HTMX calls to a backend file called `htmx_time1.psp`. Here
+is the display file, `htmx_demo1.psp`
+
+``` html
+<start_html script="https://unpkg.com/htmx.org@1.9.10">
+<h2>Current time</h2>
+<p>Click the button below to load time data from the server</p>
+
+<!-- HTMX Trigger Button -->
+<button 
+  hx-get="htmx_time1.psp"
+  hx-target="#time-container"
+  hx-swap="innerHTML"
+>
+Get Time
+</button>
+
+<!-- Where the fetched HTML fragment will go -->
+<p>
+<div id="time-container">
+  <em>Time data not loaded yet.</em>
+</div>
+```
+
+[Run](https://demo.webdyne.org/htmx_demo1.psp)
+
+And the backend file which generates the HTMX data for the above page
+(`htmx_time1.psp`):
+
+``` html
+<start_html>
+<htmx>Server local time: <? localtime() ?> </htmx>
+```
+
+[Run](https://demo.webdyne.org/htmx_time1.psp)
+
+Note the <htmx\> tags. You can run the above htmx resource file and it
+will render correctly as a full HTML page - however if WebDyne detects a
+'hx-request' HTTP header it will only send the fragment back.
+
+!!! important
+
+    Only one <htmx\> section from a file will ever be rendered. You can
+    have multiple <htmx\> sections in a .psp file however only one can be
+    rendered at any time. You can use the display attribute with dynamic
+    matching (see later) do render different <htmx\> sections in a .psp
+    file, or you can keep them all in different files (e.g. one <htmx\>
+    section per .psp file
+
+### Using Perl within <htmx\> tags
+
+<htmx\> tags can be called with the same attributes as <perl\> tags,
+including nominating a handler to generate data. See the following
+example:
+
+``` html
+<start_html script="https://unpkg.com/htmx.org@1.9.10">
+<h2>Current time</h2>
+<p>Click the button below to load time data from the server</p>
+
+<!-- HTMX Trigger Button -->
+<button 
+  hx-get="htmx_time2.psp"
+  hx-target="#time-container"
+  hx-swap="innerHTML"
+>
+Get Time
+</button>
+
+<!-- Where the fetched HTML fragment will go -->
+<p>
+<div id="time-container">
+  <em>Time data not loaded yet.</em>
+</div>
+```
+
+[Run](https://demo.webdyne.org/htmx_demo2.psp)
+
+And the backend file which generates the HTMX data for the above page:
+
+``` html
+<start_html>
+<htmx handler="server_time">
+<p>
+Server local time: ${server_time}
+</htmx>
+
+__PERL__
+
+sub server_time {
+    my $self=shift();
+    my $time=scalar localtime;
+    for (1..3) {
+        $self->print( $self->render( server_time=> $time ));
+    }
+    return \undef;
+}
+```
+
+[Run](https://demo.webdyne.org/htmx_time2.psp)
+
+### Using multiple <htmx\> tags in one .psp file
+
+As is mentioned above only one <htmx\> fragment can be returned by a
+.psp page at a time - but you can use techniques to select which tag
+should be rendered. The <htmx\> tag supports the display attribute. If
+this attribute exists and is a "true" value then the <htmx\> fragment
+will be returned. At first this doesn't seem very useful - but when
+combined with dynamic evaluation via either page query parameters or
+`!{! .. !}` evaluation it becomes more compelling. Take the following
+two button example:
+
+``` html
+<start_html script="https://unpkg.com/htmx.org@1.9.10">
+<h2>HTMX Demo</h2>
+<p>
+Click the button below to load time data from the server.</p>
+
+<!-- HTMX Trigger Button for Local Time -->
+<button 
+  style="width:180px"
+  hx-get="/htmx_time3.psp"
+  hx-target="#time-container"
+  hx-swap="innerHTML"
+  hx-vals="js:{ time_local: 1 }"
+>
+Get Local Time
+</button>
+
+<p>
+
+<!-- HTMX Trigger Button for UTC Time -->
+<button 
+  style="width:180px"
+  hx-get="/htmx_time3.psp"
+  hx-target="#time-container"
+  hx-swap="innerHTML"
+  hx-vals="js:{ time_utc: 1 }"
+>
+Get UTC Time
+</button>
+
+<!-- Where the fetched HTML fragment will go -->
+<p>
+<div id="time-container">
+  <em>Time data not loaded yet.</em>
+</div>
+```
+
+[Run](https://demo.webdyne.org/htmx_demo3.psp)
+
+``` html
+<htmx display="+{time_local}"> Time Local: <? localtime() ?></htmx>
+<htmx display="+{time_utc}"> Time UTC: <? gmtime() ?></htmx>
+```
+
+[Run](https://demo.webdyne.org/htmx_time3.psp)
+
+Normally you would expect to have the hx-get attribute for each button
+go to a different .psp page. But in this instance they refer to the same
+page. So how do we discriminate ? The key is in the supply of the
+hx-vals attribute, which allows us to send query strings to the htmx
+resource page. We can then use them to select which <htmx\> block is
+returned.
+
+!!! note
+
+    Note the use of `js:{ <json> }` notation in the <htmx\> `hx-vals`
+    attribute. It allows for easier supply of JSON data without needed to
+    manipulate/escape double-quotes in raw JSON data. You'll also note there
+    is no <start_html\> tag. It's not necessary for <htmx\> pages.
+
+## Dump
+
+The <dump\> tag is a informational element which can be included in a
+page for diagnostic or debugging purposes. It will show various variable
+and state values for the page. By default if a <dump\> flag is embedded
+in a page diagnostic information is not shown unless the `force`
+attribute is specified or the `$WEBDYNE_DUMP_FLAG` is set, the latter
+allowing the <dump\> tag to be embedded into all pages on a site but
+not activated unless debugging enabled.
+
+Various diagnostic elements can be displayed - see the <dump\> tag
+section for information on what they are. In this example all components
+are enabled and display is forced:
+
+``` html
+<start_html>
+<p>
+<form>
+Your Name: <textfield name="name">
+<p>
+<submit>
+</form>
+<dump all force>
+```
+
+[Run](https://demo.webdyne.org/dump1.psp)
+
+Dump display/hide can be controlled by form parameters or run URI query
+strings. In the example below ticking the checkbox or simply appending
+"?dump_enable=1" to the URL will display the dump information:
+
+``` html
+<start_html>
+<p>
+<form>
+Your Name: <textfield name="name">
+<p>
+Show Dump: <checkbox name="dump_enable">
+<p>
+<submit>
+</form>
+<dump all force="!{! $_{'dump_enable'} !}">
+```
+
+[Run](https://demo.webdyne.org/dump2.psp)
 
 # Error Handling
 
@@ -2159,65 +3142,51 @@ happens WebDyne will generate an error showing what the error was and
 attempting to give information on where it came from: Take the following
 example:
 
-<pre>
-<span class="h-ab">&lt;</span><span class="h-cgi_tag">start_html</span> <span class="h-attr">title</span>=<span class="h-attv">"Error</span>"<span class="h-ab">&gt;</span>
-Let's divide by zero: !&#123;! my $z=0; return 5/$z !&#125;
-<span class="h-ab">&lt;</span><span class="h-cgi_tag">end_html</span><span class="h-ab">&gt;</span>
-</pre>
+``` html
+<start_html title="Error">
+Let's divide by zero: !{! my $z=0; return 5/$z !}
+<end_html>
+```
 
+[Run](https://demo.webdyne.org/err1.psp)
 
-[Run](example/err1.psp)
-
-If you run the above example an error message will be displayed:.
-
-Error Message 1
+If you run the above example an error message will be displayed
 
 ![](images/err1.png)
 
-In this example the backtrace is not particularly useful because the
-error occurred within in-line code, so all references in the backtrace
-are to internal WebDyne modules. However the code fragment clearly shows
-the line with the error, and the page line number where the error
-occurred (line 3) is given at the start of the message. The reference to
-\"(eval 268) line 1\" is a red herring - it is the 268th eval performed
-by this perl process, and the error occurred in line 1 of the text that
-the eval was passed - standard perl error text, but not really helpful
-here.
+In this example the backtrace is within in-line code, so all references
+in the backtrace are to internal WebDyne modules. The code fragment will
+show the line with the error.
 
 If we have a look at another example:
 
-<pre>
-<span class="h-ab">&lt;</span><span class="h-cgi_tag">start_html</span> <span class="h-attr">title</span>=<span class="h-attv">"Error</span>"<span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">perl</span> <span class="h-attr">method</span>=<span class="h-attv">"hello</span>"<span class="h-ab">/&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-cgi_tag">end_html</span><span class="h-ab">&gt;</span>
+``` html
+<start_html title="Error">
+<perl method="hello"/>
+<end_html>
 
-&#095&#095PERL&#095&#095
+__PERL__
 
-sub hello &#123;
+sub hello {
 
-	die('bang !');
+    die('bang !');
 
-&#125;
-</pre>
+}
+```
 
-
-[Run](example/err2.psp)
+[Run](https://demo.webdyne.org/err2.psp)
 
 And the corresponding screen shot:
 
-Error Message 2
-
 ![](images/err2.png)
 
-The backtrace is somewhat more helpful. Looking through the backtrace we
-can see that the error occurred in the \"hello\" subroutine (invoked at
-line 3 of the page) on line 5 - In this case \"line 5\" means the 5th
-line down from the \_\_PERL\_\_ delimiter. The 32 digit hexadecimal
-number is the page unique ID - it is different for each page. WebDyne
-runs the code for each page in a package name space that includes the
-page\'s UID - in this way pages with identical subroutine names (e.g.
-two pages with a \"hello\" subroutine) can be accommodated with no
-collision.
+We can see that the error occurred in the "hello" subroutine (invoked at
+line 2 of the page) within the perl block on line 9. The 32 digit
+hexadecimal number is the page unique ID - it is different for each
+page. WebDyne runs the code for each page in a package name space that
+includes the page's UID - in this way pages with identical subroutine
+names (e.g. two pages with a "hello" subroutine) can be accommodated
+with no collision.
 
 ## Exceptions
 
@@ -2230,7 +3199,7 @@ Errors (exceptions) can be generated within a WebDyne page in two ways:
 
 Examples
 
-    &#095&#095PERL&#095&#095
+    __PERL__
 
 
     #  Good
@@ -2253,59 +3222,58 @@ Examples
 
 So far all the code examples have just assumed that any call to a
 WebDyne API method has been successful - no error checking is done.
-WebDyne always returns \"undef\" if an API method call fails - which
+WebDyne always returns "undef" if an API method call fails - which
 should be checked for after every call in a best practice scenario.
 
-<pre>
-<span class="h-ab">&lt;</span><span class="h-cgi_tag">start_html</span> <span class="h-attr">title</span>=<span class="h-attv">"Error</span>"<span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">perl</span> <span class="h-attr">method</span>=<span class="h-attv">"hello</span>"<span class="h-ab">&gt;</span>
+``` html
+<start_html title="Error">
+<perl method="hello">
 
-Hello World $&#123;foo&#125;
+Hello World ${foo}
 
-<span class="h-ab">&lt;/</span><span class="h-webdyne_tag">perl</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-cgi_tag">end_html</span><span class="h-ab">&gt;</span>
+</perl>
+<end_html>
 
-&#095&#095PERL&#095&#095
+__PERL__
 
-sub hello &#123;
+sub hello {
 
-	#  Check for error after calling render function
-	#
-	shift()->render( bar=> 'Again') || return err();
+    #  Check for error after calling render function
+    #
+    shift()->render( bar=> 'Again') || return err();
 
-&#125;
-</pre>
+}
+```
 
-
-[Run](example/err3.psp)
+[Run](https://demo.webdyne.org/err3.psp)
 
 You can use the err() function to check for errors in WebDyne Perl code
 associated with a page, e.g.:
 
-<pre>
-<span class="h-ab">&lt;</span><span class="h-cgi_tag">start_html</span> <span class="h-attr">title</span>=<span class="h-attv">"Error</span>"<span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">form</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-cgi_tag">submit</span> <span class="h-attr">name</span>=<span class="h-attv">"Error</span>" <span class="h-attr">value</span>=<span class="h-attv">"Click here for error !</span>"<span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">form</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">perl</span> <span class="h-attr">method</span>=<span class="h-attv">"foo</span>"<span class="h-ab">/&gt;</span><span class="h-ab">&lt;</span><span class="h-cgi_tag">end_html</span><span class="h-ab">&gt;</span>
+``` html
+<start_html title="Error">
+<form>
+<submit name="Error" value="Click here for error !">
+</form>
+<perl method="foo"/><end_html>
 
-&#095&#095PERL&#095&#095
+__PERL__
 
-sub foo &#123;
+sub foo {
 
-	<span class="h-ent">&amp;bar() || return err();</span>
-	\undef;
+    &bar() || return err();
+    \undef;
 
-&#125;
+}
 
-sub bar &#123;
+sub bar {
 
-	return err('bang !') if $_&#123;'Error'&#125;;
-	\undef;
-&#125;</pre>
+    return err('bang !') if $_{'Error'};
+    \undef;
+}
+```
 
-
-[Run](example/err4.psp)
+[Run](https://demo.webdyne.org/err4.psp)
 
 Note that the backtrace in this example shows clearly where the error
 was triggered from.
@@ -2316,50 +3284,98 @@ was triggered from.
 
 Reference of WebDyne tags and supported attributes
 
-\<perl\>
+<perl\>
 
-:   Run Perl code either in-line (between the \<perl\>..\</perl\>) tags,
+:   Run Perl code either in-line (between the <perl\>..</perl\>) tags,
     or non-inline via the method attribute
 
-    method=\[Module::Name\]::method
+    method\|handler=method
 
-    :   *Optional*. Call an external perl subroutine in a pre-loaded
-        module, or a subroutine in a \_\_PERL\_\_ block at then of the
-        HTML: file
+    :   Call an external Perl subroutine in from a module, or a
+        subroutine in a \_\_PERL\_\_ block at the of the .psp file. If
+        the handler is specified a module call (e.g.
+        Digest::MD5::md5_hex()) then a require call will be load the
+        module (Digest::MD5 in this example.
+
+    package\|require=\[Module::Name\] \| \[Path/Filename.pm\]
+
+    :   Load a Perl module or file needed to support a method call. E.g.
+        <perl require=Digest::MD5/\> to load the Digest::MD5 module.
+        Anything with a \[./\\\] character is treated as file patch to a
+        Perl file (e.g. "/home/user/module.pm"), otherwise it is treated
+        as module name ("Digest::MD5")
+
+    import=\[function\], <function\>, <function\> ..
+
+    :   Import a single or multiple functions into the file namespace.
+        Use "import=name" for a single function, or pass an array ref
+        (import="@{name1, name2}" for multiple functions. E.g. <perl
+        require="Digest::SHA" import="@{qw(sha1 sha1_hex)}"/\>.
+        Functions are then available anywhere in the file namespace.
 
     param=scalar\|array\|hash
 
-    :   *Optional*. Parameters to be supplied to perl routine. Supply
-        array and hash using \&#064{1,2} and &#037{a=\>1, b=\>2} conventions
-        respectively.
+    :   Parameters to be supplied to perl routine. Supply array and hash
+        using "@{1,2}" and "%{a=\>1, b=\>2}" conventions respectively,
+        e.g. <perl method="sum2num" param="@{2,2}"/\>
 
     static=1
 
-    :   *Optional*. This Perl code to be run once only and the output
-        cached for all subsequent requests.
+    :   This Perl code to be run once only and the output cached for all
+        subsequent requests.
 
-\<block\>
+    file=1
+
+    :   Force package\|require attribute to be treated as a file, even
+        if it appears to "look like" a module name to the loader. Rarely
+        needed, use case would be a Perl module in the current directory
+        without an extension.
+
+    hidden=1
+
+    :   The output from the Perl module will be hidden.
+
+<json\>
+
+:   Run Perl code similar to <perl\> tag but expect code to return a
+    HASH or ARRAY ref and encode into JSON, outputting in a <script\>
+    tag with type="application/json". When supplied with an id attribute
+    this data can be used by any Javascript function in the page. All
+    attributes are the same as the <perl\> tag with the following extra
+    attribute
+
+    id=\[name\]
+
+    :   ID this <script\> tag will be given, e.g. <script id="mydata"
+        type="application/json"\>\[{"foo":1}\]</script\>
+
+<block\>
 
 :   Block of HTML code to be optionally rendered if desired by call to
     render_block Webdyne method:
 
     name=identifier
 
-    :   *Mandatory*. The name for this block of HTML.
+    :   *Mandatory.* The name for this block of HTML. Referenced when
+        rendering a particular block in perl code, e.g. return
+        \$self-\>render_block("foo");
 
     display=1
 
-    :   *Optional.* Force display of this block even if not invoked by
-        render_block WebDyne method. Useful for prototyping.
+    :   Force display of this block even if not invoked by render_block
+        WebDyne method. Useful for prototyping.
 
     static=1
 
-    :   *Optional*. This block rendered once only and the output cached
-        for all subsequent requests
+    :   This block rendered once only and the output cached for all
+        subsequent requests
 
-\<include\>
+<include\>
 
-:   Include HTML or text from an external file
+:   Include HTML or text from an external file. This includes pulling in
+    the <head\> or <body\> section from another HTML or .psp file. If
+    pulled in from a .psp file it will compiled and interpreted in the
+    context of the current page.
 
     file=filename
 
@@ -2368,29 +3384,86 @@ Reference of WebDyne tags and supported attributes
 
     head=1
 
-    :   *Optional*. File is an HTML file and we want to include just the
-        \<head\> section
+    :   File is an HTML or `.psp` file and we want to include just the
+        <head\> section
 
     body=1
 
-    :   *Optional*. File is an HTML file and we want to include just the
-        \<body\> section.
+    :   File is an HTML or `.psp` file and we want to include just the
+        <body\> section.
 
     block=blockname
 
-    :   *Optional*. File is a .psp file and we want to include a
-        \<block\> section from that file.
+    :   File is a `.psp` file and we want to include a <block\> section
+        from that file.
 
-\<dump\>
+    nocache
 
-:   Display CGI paramters in dump format via CGI-\>Dump call. Useful for
-    debugging. Only rendered if `$WEBDYNE_DUMP_FLAG` global set to 1 in
-    WebDyne constants (see below)
+    :   Don't cache the results of the include, bring them in off disk
+        each time. Will incur performance penalty
 
-    display=1
+<api\>
+
+:   Respond to a JSON request made from a client.
+
+    pattern=string
+
+    :   *Mandatory*. Name of `Route::Simple` pattern we want to serve,
+        e.g. /api/{user}/:id
+
+    destination \| dest \| data=hash ref
+
+    :   Hash we want to supply to perl routine if match made. See
+        `Route::Simple`
+
+    option=hash ref
+
+    :   Match options, GET, PUT etc. `Route::Simple`
+
+<htmx\>
+
+:   Serve HTML snippets. Takes exactly the same parameters as the
+    <perl\> tag with one addition
+
+    display=boolean
+
+    :   *Optional*. If evaluates to true then this <htmx\> snippet
+        fires. Only tag can respond per page. Use this attribute in
+        conjunction with dynamic evaluation (e.g. display="!{!
+        \$\_{name} eq 'Bob' !}")
+
+<dump\>
+
+:   Display CGI parameters in dump format via CGI::Simple-\>Dump call.
+    Useful for debugging. Only rendered if `$WEBDYNE_DUMP_FLAG` global
+    set to 1 in WebDyne constants of the display\|force attribute
+    specified (see below). Useful while troubleshooting or debugging
+    pages.
+
+    display\|force=1
 
     :   *Optional.* Force display even if `$WEBDYNE_DUMP_FLAG` global
         not set
+
+    all
+
+    :   Display all diagnostic blocks
+
+    cgi
+
+    :   Display CGI parameters and query strings
+
+    env
+
+    :   Display environment variables
+
+    constant
+
+    :   Display Webdyne constants
+
+    version
+
+    :   Display version strings
 
 ## WebDyne methods
 
@@ -2403,54 +3476,87 @@ instance of the WebDyne object:
 
 CGI()
 
-:   Returns an instance of the CGI.pm object for the current request.
+:   Returns an instance of the CGI::Simple object for the current
+    request.
 
 r(), request()
 
-:   Returns an instance of the Apache request object.
+:   Returns an instance of the Apache request object, or a mock object
+    with similar functionality when running under PSGI or FCGI
 
-render( \<key=\>value, key=\>value\>, .. )
+html_tiny()
 
-:   Called to render the text or HTML between \<perl\>..\</perl\> tags.
+:   Returns an instance of the HTML::Tiny object, can be used for
+    creating programmatic HTML output
+
+include()
+
+:   Returns HTML derived from a file, using the same parameters as the
+    <include\> tag
+
+render( <key=\>value, key=\>value\>, .. )
+
+:   Called to render the text or HTML between <perl\>..</perl\> tags.
     Optional key and value pairs will be substituted into the output as
     per the variable section. Returns a scalar ref of the resulting
     HTML.
 
-render_block( blockname, \<key=\>value, key=\>value, ..\>).
+render_block( blockname, <key=\>value, key=\>value, ..\>).
 
 :   Called to render a block of text or HTML between
-    \<block\>..\</block\> tags. Optional key and value pairs will be
+    <block\>..</block\> tags. Optional key and value pairs will be
     substituted into the output as per the variable section. Returns
-    scalar ref of resulting HTML if called with from \<perl\>..\</perl\>
+    scalar ref of resulting HTML if called with from <perl\>..</perl\>
     section containing the block to be rendered, or true (\\undef) if
-    the block is not within the \<perl\>..\</perl\> section (e.g.
+    the block is not within the <perl\>..</perl\> section (e.g.
     further into the document, see the block section for an example).
 
-redirect({ uri=\>uri \| file=\>filename \| html=\>\\html_text })
+render_reset()
+
+:   Erase anything previously set to render - it will not be sent to the
+    browser.
+
+redirect( uri=\>uri \| file=\>filename \| html=\>\\html_text \| json=\>\\json_text \| text=\>\\plain_text)
 
 :   Will redirect to URI or file nominated, or display only nominated
-    text. Any rendering done to prior to this method is abandoned.
+    text. Any rendering done to prior to this method is abandoned. If
+    supplying HTML text to be rendered supply as a SCALAR reference.
 
-cache_inode( \<seed\> )
+cache_inode( <seed\> )
 
 :   Returns the page unique ID (UID). Called inode for legacy reasons,
     as that is what the UID used to be based on. If a seed value is
     supplied a new UID will be generated based on an MD5 of the seed.
     Seed only needs to be supplied if using advanced cache handlers.
 
-cache_mtime( \<uid\> )
+cache_mtime( <uid\> )
 
 :   Returns the mtime (modification time) of the cache file associated
     with the optionally supplied UID. If no UID supplied the current one
     will be used. Can be used to make cache compile decisions by
     WebDyne::Cache code (e.g if page \> x minutes old, recompile).
 
-cache_compile( )
+source_mtime()
+
+:   Returns the mtime (modification time) of the source .psp file
+    currently being rendered.
+
+cache_compile()
 
 :   Force recompilation of cache file. Can be used in cache code to
     force recompilation of a page, even if it is flagged static. Returns
     current value if no parameters supplied, or sets if parameter
     supplied.
+
+filename()
+
+:   Return the full filename (including path) of the file being
+    rendered. Will only return the core (main) filename - any included
+    files, templates etc. are not reported.
+
+cwd()
+
+:   Return the current working directory WebDyne is operating in.
 
 no_cache()
 
@@ -2467,21 +3573,35 @@ meta()
     across Apache requests (although not across different Apache
     processes)
 
-## WebDyne Constants
+print(), printf(), say()
+
+:   Render the output of the print(), printf() or say() routines into
+    the current HTML stream. The print() and printf() methods emulate
+    their Perl functions in not appending a new line into the output,
+    where as say() does.
+
+render_time()
+
+:   Return the elapsed time since the WebDyne hander started rendering
+    this page. Obviously only meaningful if called at the end of a page,
+    just before final output to browser.
+
+## WebDyne Constants {#webdyne_constants}
 
 Constants defined in the WebDyne::Constant package control various
 aspects of how WebDyne behaves. Constants can be modified globally by
-altering a system file (`/etc/webdyne.pm` under Linux distros), or by
-altering configuration parameters within the Apache or lighttpd/FastCGI
-web servers.
+altering a global configuration file (`/etc/webdyne.conf.pl` under Linux
+distros), setting environment variable or by altering configuration
+parameters within the Apache web server config.
 
 ### Global constants file
 
-WebDyne will look for a system constants file under `/etc/webdyne.pm`
-and set package variables according to values found in that file. The
-file is in Perl Data::Dumper format, and takes the format:
+WebDyne will look for a system constants file under
+`/etc/webdyne.conf.pl` and set package variables according to values
+found in that file. The file is in Perl Data::Dumper format, and takes
+the format:
 
-    # sample /etc/webdyne.pm file
+    # sample /etc/webdyne.conf.pl file
     #
     $VAR1={
             WebDyne::Constant => {
@@ -2504,11 +3624,12 @@ file is in Perl Data::Dumper format, and takes the format:
 The file is not present by default and should be created if you wish to
 change any of the WebDyne constants from their default values.
 
-::: important
-Always check the syntax of the `/etc/webdyne.pm` file after editing by
-running `perl -c -w /etc/webdyne.pm` to check that the file is readable
-by Perl.
-:::
+!!! important
+
+    Always check the syntax of the `/etc/webdyne.conf.pl` file after editing
+    by running `perl -c -w /etc/webdyne.conf.pl` to check that the file is
+    readable by Perl. Files with syntax errors will fail silently and the
+    variables will revert to module defaults.
 
 ### Setting WebDyne constants in Apache
 
@@ -2523,16 +3644,29 @@ PerlSetVar directive:
     #
     PerlSetVar      WEBDYNE_SESSION_ID_COOKIE_NAME  'session_cookie'
 
-::: important
-WebDyne constants cannot be set on a per-location or per-directory
-basis - they are read from the top level of the config file and set
-globally.
+!!! important
 
-Some 1.x versions of mod_perl do not read PerlSetVar variables
-correctly. If you encounter this problem use a \<Perl\>..\</Perl\>
-section in the httpd.conf file, e.g.:
+    WebDyne constants cannot be set on a per-location or per-directory
+    basis - they are read from the top level of the config file and set
+    globally.
 
-    # Mod_perl 1.x
+    Some 1.x versions of mod_perl do not read PerlSetVar variables
+    correctly. If you encounter this problem use a <Perl\>..</Perl\>
+    section in the `httpd.conf` file, e.g.:
+
+        # Mod_perl 1.x
+
+        PerlHandler     WebDyne
+        <Perl>
+        $WebDyne::Constant::WEBDYNE_CACHE_DN='/data1/webdyne/cache';
+        $WebDyne::Constant::WEBDYNE_STORE_COMMENTS=1;
+        $WebDyne::Session::Constant::WEBDYNE_SESSION_ID_COOKIE_NAME='session_cookie';
+        </Perl>
+
+Where you need to set variables without simple string content you can
+use a <Perl\>..</Perl\> section in the `httpd.conf` file, e.g.:
+
+    # Setting more complex variables
 
     PerlHandler     WebDyne
     <Perl>
@@ -2540,25 +3674,35 @@ section in the httpd.conf file, e.g.:
     $WebDyne::Constant::WEBDYNE_STORE_COMMENTS=1;
     $WebDyne::Session::Constant::WEBDYNE_SESSION_ID_COOKIE_NAME='session_cookie';
     </Perl>
-:::
 
-### Setting WebDyne constants in lighttpd/FastCGI
+!!! warning
 
-WebDyne constants can be set in lighttpd/FastCGI using the
-bin-environment directive. Here is a sample lighttpd.conf file showing
-WebDyne constants:
+    The letsencrypt `certbot` utility will error out when trying to update
+    any Apache config file with `<Perl>` sections. To avoid this you put the
+    variables in a separate file and include them, e.g. in the `apache.conf`
+    file:
 
-    fastcgi.server = ( ".psp" =>
-                       ( "localhost" =>
-                          (
-                            "socket" => "/tmp/psp-fastcgi.socket",
-                            "bin-path" => "/opt/webdyne/bin/wdfastcgi",
-                            "bin-environment"     => (
-                              "WEBDYNE_CACHE_DN   => "/data1/webdyne/cache"
-                            )
-                         )
-                       )
-                     )
+        # Some config setting defaults. See documentation for full range. 
+        # Commented out # options represent defaults 
+        #
+        PerlRequire conf.d/webdyne_constant.pl
+
+    And then in the webdyne_constant.pl file:
+
+        use WebDyne;
+        use WebDyne::Constant;
+
+        #  Error display/extended display on/off. More granular options below. 
+        #  Set to 1 to enable, 0 to disable
+        #
+        $WebDyne::WEBDYNE_ERROR_SHOW=1;
+        $WebDyne::WEBDYNE_ERROR_SHOW_EXTENDED=1;
+
+        #  Extended error control.
+        #
+        #  $WebDyne::WEBDYNE_ERROR_SOURCE_CONTEXT_SHOW=1;
+        #  $WebDyne::WEBDYNE_ERROR_SOURCE_CONTEXT_LINES_PRE=4;
+        #  $WebDyne::WEBDYNE_ERROR_SOURCE_CONTEXT_LINES_POST=4;
 
 ### Constants Reference
 
@@ -2605,22 +3749,23 @@ package namespace.
 `$WEBDYNE_EVAL_SAFE`
 
 :   default=0 (no), If set to 1 means eval in a Safe.pm container.
+    Evaluating code in a Safe container is experimental and not
+    supported or recommended for general WebDyne use.
 
 `$WEBDYNE_EVAL_SAFE_OPCODE_AR`
 
 :   The opcode set to use in Safe.pm evals (see the Safe man page).
-    Defaults to \"\[\':default\'\]\". Use \[&Opcode::full_opset()\] for
-    the full opset. CAUTION Use of WebDyne with Safe.pm not
-    comprehensively tested.
+    Defaults to "\[':default'\]". Use \[&Opcode::full_opset()\] for the
+    full opset. CAUTION Use of WebDyne with Safe.pm not comprehensively
+    tested and considered experimental.
 
 `$WEBDYNE_EVAL_USE_STRICT`
 
-:   The string to use before each eval. Defaults to \"use strict
-    qw(vars);\". Set to undef if you do not want strict.pm. In Safe mode
-    this becomes a flag only - set undef for \"no strict\", and
-    non-undef for \"use strict\" equivalence in a Safe mode (checked
-    under Perl 5.8.6 only, results in earlier versions of Perl may
-    vary).
+:   The string to use before each eval. Defaults to "use strict
+    qw(vars);". Set to undef if you do not want strict.pm. In Safe mode
+    this becomes a flag only - set undef for "no strict", and non-undef
+    for "use strict" equivalence in a Safe mode (checked under Perl
+    5.8.6 only, results in earlier versions of Perl may vary).
 
 `$WEBDYNE_STRICT_VARS`
 
@@ -2630,19 +3775,24 @@ package namespace.
 
 `$WEBDYNE_DUMP_FLAG`
 
-:   If 1, any instance of the special \<dump\> tag will print out
+:   If 1, any instance of the special <dump\> tag will print out
     results from CGI-\>dump(). Use when debugging forms. default=0
 
 `$WEBDYNE_DTD`
 
 :   The DTD to place at the top of a rendered page. Defaults to:
-    \<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"
-    \"http://www.w3.org/TR/html4/loose.dtd\"\>
+    <!DOCTYPE html\>
 
 `$WEBDYNE_HTML_PARAM`
 
-:   attributes for the \<html\> tag, e.g. { lang =\>\'en-US\' }. undef
-    by default
+:   attributes for the <html\> tag, default is { lang =\>'en' }
+
+`$WEBDYNE_HEAD_INSERT`
+
+:   Any HTML you want inserted before the closing </head\> tag, e.g.
+    stylesheet or script includes to be added to every `.psp` page. Must
+    be valid HTML <head\> directives, not interpreted or compiled by
+    WebDyne, incorporated as-is
 
 `$WEBDYNE_COMPILE_IGNORE_WHITESPACE`
 
@@ -2659,7 +3809,7 @@ package namespace.
 :   By default comments are not rendered. Set to 1 to store and display
     comments from source files. Defaults to 0
 
-`$WEBDYNE_NO_CACHE`.
+`$WEBDYNE_NO_CACHE`
 
 :   WebDyne should send no-cache HTTP headers. Set to 0 to not send such
     headers. Defaults to 1
@@ -2668,7 +3818,7 @@ package namespace.
 
 :   By default WebDyne will render blocks targeted by a render_block()
     call, even those that are outside the originating
-    \<perl\>..\</perl\> section that made the call. Set to 0 to not
+    <perl\>..</perl\> section that made the call. Set to 0 to not
     render such blocks. Defaults to 1
 
 `$WEBDYNE_WARNINGS_FATAL`
@@ -2680,18 +3830,24 @@ package namespace.
 
 `$WEBDYNE_CGI_DISABLE_UPLOADS`
 
-:   Disable CGI.pm file uploads. Defaults to 1 (true - do not allow
+:   Disable CGI::Simple file uploads. Defaults to 1 (true - do not allow
     uploads).
 
 `$WEBDYNE_CGI_POST_MAX`
 
 :   Maximum size of a POST request. Defaults to 512Kb
 
+`$WEBDYNE_JSON_CANONICAL`
+
+:   Set is JSON encoding should be canonical, i.e. respect the order of
+    supplied data (slightly slows down encoding). Defaults to 1 (true -
+    preserve variable order)
+
 `$WEBDYNE_ERROR_TEXT`
 
 :   Display simplified errors in plain text rather than using HTML.
-    Useful in interal WebDyne development only. By default this is 0 =\>
-    the HTML error handler will be used.
+    Useful in internal WebDyne development only. By default this is 0
+    =\> the HTML error handler will be used.
 
 `$WEBDYNE_ERROR_SHOW`
 
@@ -2699,7 +3855,7 @@ package namespace.
 
 `$WEBDYNE_ERROR_SOURCE_CONTEXT_SHOW`
 
-:   Display a fragment of the .psp source file around where the error
+:   Display a fragment of the `.psp` source file around where the error
     occurred to give some context of where the error happened. Set to 0
     to not display context.
 
@@ -2729,14 +3885,14 @@ package namespace.
 
 `$WEBDYNE_AUTOLOAD_POLLUTE`
 
-:   When a method is called from a \<perl\> routine the WebDyne AUTOLOAD
+:   When a method is called from a <perl\> routine the WebDyne AUTOLOAD
     method must search multiple modules for the method owner. Setting
     this flag to 1 will pollute the WebDyne name space with the method
     name so that AUTOLOAD is not called if that method is used again
     (for the duration of the Perl process, not just that call to the
     page). This is dangerous and can cause confusion if different
     modules use the same name. In very strictly controlled
-    environments - and ebev then only in some cases - it can result is
+    environments - and even then only in some cases - it can result is
     faster throughput. Off by default, set to 1 to enable.
 
 Extension modules (e.g., WebDyne::Session) have their own constants -
@@ -2745,9 +3901,9 @@ see each package for details.
 ## WebDyne Directives
 
 A limited number of directives are are available which change the way
-WebDyne processes pages. Directives are set in either the Apache or
-lighttpd .conf files and can be set differently per location. At this
-stage only one directive applies to the core WebDyne module:
+WebDyne processes pages. Directives are set in either the Apache .conf
+files and can be set differently per location. At this stage only one
+directive applies to the core WebDyne module:
 
 `WebDyneHandler`
 
@@ -2755,28 +3911,9 @@ stage only one directive applies to the core WebDyne module:
     handling the page internally. The only other handler available today
     is WebDyne::Chain.
 
-This directive exists primarily to allow lighttpd/FastCGI to invoke
-WebDyne::Chain as the primary handler. An example from the lighttpd.conf
-file (see the WebDyne::Chain documentation for information on the
-`WebDyneChain` directive):
-
-    fastcgi.server = ( ".psp" =>
-                       ( "localhost" =>
-                          (
-                            "socket" => "/tmp/psp-fastcgi.socket",
-                            "bin-path" => "/opt/webdyne/bin/wdfastcgi",
-                            "bin-environment"     => (
-                              #  Handle WebDyne requests via WebDyne::Chain, which in turn will
-                              #  pass all requests through WebDyne::Session so that a unique session 
-                              #  cookie is assigned to each user.
-                              "WebDyneHandler"    => "WebDyne::Chain",
-                              "WebDyneChain"      => "WebDyne::Session",
-                            )
-                         )
-                       )
-                     )
-
-It can be used in Apache httpd.conf files, but is not very efficient:
+This directive exists primarily to allow PSGI to invoke WebDyne::Chain
+as the primary handler. It can be used in Apache httpd.conf files, but
+is not very efficient:
 
     #  This will work, but is not very efficient
     #
@@ -2793,60 +3930,6 @@ It can be used in Apache httpd.conf files, but is not very efficient:
     PerlHandler     WebDyne::Chain
     PerlSetVar      WebDyneChain                 'WebDyne::Session'
     </location>
-
-As with Apache you can do per-location/directory configuration of
-WebDyne, however the configuration is a little more complex. The example
-below shows how to set different directives on a per location basis,
-using WebDyne and WebDyne::Chain directives as examples:
-
-    $HTTP["url"] =~"^/proxcube/" {
-
-            server.document-root = "/opt/proxcube/lib/perl5/site_perl/5.8.6/ProxCube/HTML/html/",
-
-            fastcgi.server = (
-
-                    ".psp" => (
-                            "localhost" => (
-                                    "socket"      => "/tmp/psp-fastcgi-proxube.socket",
-                                    "bin-path"    => "/opt/webdyne/bin/wdfastcgi",
-                                    "bin-environment" => (
-                                            "WebDyneHandler"  => "WebDyne::Chain",
-                                            "WebDyneChain"    => "ProxCube::HTML ProxCube::License"
-                                            "WebDyneTemplate" => "/opt/proxcube/lib/perl5/site_perl/5...
-                                            "WebDyneFilter"   => "WebDyne::Template WebDyne::CGI",
-                                            "MenuData"        => "/opt/proxcube/lib/perl5/site_perl/5...
-                                            "WebDyneLocation" => "/proxcube/"
-                                    )
-                            )
-                    )
-            )
-
-    },
-
-
-    $HTTP["url"] =~"^/example/" {
-
-            server.document-root = "/var/www/html/",
-
-            fastcgi.server = (
-
-                    ".psp" => (
-                            "localhost" => (
-                                    "socket"      => "/tmp/psp-fastcgi-example.socket",
-                                    "bin-path"    => "/opt/webdyne/bin/wdfastcgi",
-                                    "bin-environment" => (
-                                            "WebDyneLocation" => "/example/"
-                                    )
-                            )
-                    )
-            )
-    }   
-
-::: important
-As noted in the configuration file the socket file names must be unique
-for each location that you want different WebDyne directives/constants
-for.
-:::
 
 # Miscellaneous
 
@@ -2882,25 +3965,28 @@ especially if you have nominated a `PREFIX` option when using CPAN.
     source file (usually in /var/webdyne/cache). Will dump out the saved
     data structure of the compiled file.
 
-`wdfastcgi`
+`wddebug`
 
-:   Used to run WebDyne under FastCGI - not usually invoked
-    interactively
+:   Usage: `wddebug --status|--enable|--disable`. Enable/disable
+    debugging in the WebDyne code.
+
+`webdyne.psgi`
+
+:   Used to run WebDyne as a PSGI process- usually invoked by Plack via
+    plackup or starman, but can be run directly for development
+    purposes.
+
+wdlint
+
+:   Run perl -c -w over code in \_\_PERL\_\_ sections on any .psp file
+    to check for syntax errors.
 
 ## Other files referenced by WebDyne
 
-`/etc/webdyne.pm`
+`/etc/webdyne.conf.pl`
 
 :   Used for storage of local constants that override WebDyne defaults.
     See the [WebDyne::Constant](#webdyne_constants) section for details
-
-`/etc/perl5lib.pm`
-
-:   Contains a list of directories that WebDyne will look in for
-    libraries. Effectively extends Perl\'s `@INC` variable. If you
-    install CPAN or other Perl modules to a particular directory using
-    `perl Makefile.PL PREFIX=/opt/mylibs`, then add \'`/opt/mylibs`\' to
-    the `perl5lib.pm` file, WebDyne will find them.
 
 # Extending WebDyne
 
@@ -2912,7 +3998,7 @@ standard packages as a template.
 The following gives an overview of the standard packages included in the
 distribution, or downloadable as extensions from CPAN.
 
-## WebDyne::Chain
+## WebDyne::Chain {#webdyne_chain}
 
 WebDyne::Chain is a module that will cascade a WebDyne request through
 one or more modules before delivery to the WebDyne engine. Most modules
@@ -2922,7 +4008,7 @@ into the request lifecycle.
 Whilst WebDyne::Chain does not modify content itself, it allows any of
 the modules below to intercept the request as if they had been loaded by
 the target page directly (i.e., loaded in the \_\_PERL\_\_ section of a
-page via the \"use\" or \"require\" functions).
+page via the "use" or "require" functions).
 
 Using WebDyne::Chain you can modify the behaviour of WebDyne pages based
 on their location. The WebDyne::Template module can be used in such
@@ -2988,8 +4074,8 @@ run. The called routine can generate a new UID (Unique ID) for the page,
 or force it to be recompiled. There are no API methods associated with
 this module.
 
-See the [Caching](#caching) section above for more information on how to
-use this module with an individual page.
+See the [Caching](#caching_section) section above for more information
+on how to use this module with an individual page.
 
 WebDyne::Cache can also be used in conjunction with the
 [WebDyne::Chain](#webdyne_chain) module to flag all files in a
@@ -3008,12 +4094,13 @@ httpd.conf snippet:
     </Location>
 
 Note that any package used as the WebDyneCacheHandler target should be
-already loaded via \"PerlRequire\" or similar mechanism.
+already loaded via "PerlRequire" or similar mechanism.
 
 As an example of why this could be useful consider the [caching
-examples](#caching) above. Instead of flagging that an individual file
-should only be re-compiled every x seconds, that policy could be applied
-to a whole directory with no alteration to the individual pages.
+examples](#caching_section) above. Instead of flagging that an
+individual file should only be re-compiled every x seconds, that policy
+could be applied to a whole directory with no alteration to the
+individual pages.
 
 ## WebDyne::Session
 
@@ -3028,26 +4115,24 @@ session_id()
 `$WEBDYNE_SESSION_ID_COOKIE_NAME`
 
 :   Constant. Holds the name of the cookie that will be used to assign
-    the session id in the users browser. Defaults to \"session\". Set as
+    the session id in the users browser. Defaults to "session". Set as
     per [WebDyne::Constants](#webdyne_constants) section. Resides in the
     `WebDyne::Session::Constant` package namespace.
 
 Example:
 
-<pre>
-<span class="h-ab">&lt;</span><span class="h-cgi_tag">start_html</span><span class="h-ab">&gt;</span>
+    <start_html>
 
-Session ID: !&#123;! shift()->session_id() !&#125;
+    Session ID: !{! shift()->session_id() !}
 
-<span class="h-ab">&lt;</span><span class="h-cgi_tag">end_html</span><span class="h-ab">&gt;</span>
+    <end_html>
 
-&#095&#095PERL&#095&#095
+    __PERL__
 
-use WebDyne::Session;
-1;</pre>
+    use WebDyne::Session;
+    1;
 
-
-[Run](example/session1.psp)
+[Run](https://demo.webdyne.org/session1.psp)
 
 WebDyne::Session can also be used in conjunction with the
 [WebDyne::Chain](#webdyne_chain) module to make session information
@@ -3066,164 +4151,11 @@ available to all pages within a location. An example httpd.conf snippet:
 
     </Location>
 
-## WebDyne::State::BerkeleyDB
-
-WebDyne::State::BerkeleyDB works in conjunction with WebDyne::Session to
-maintain simple state information for a session. It inherits from
-WebDyne::State, and it could be used to build other state storage
-modules (e.g. WebDyne::State::MySQL)
-
-login()
-
-:   Function. Logs a user in, creating a state entry for them. Returns
-    true if successful, undef if fails.
-
-user()
-
-:   Function. Returns scalar ref containing the name of the logged user
-    for this session, undef if fails
-
-logout()
-
-:   Function. Logout the current user, deleting all state info.
-
-state_store( \<key=\>value, key=\>value \| hashref\> )
-
-:   Function. Store a key and associated value into the state database.
-    Returns true for success, undef for failure. You can optionally pass
-    a hash ref to state_store, in which case it will replace the
-    existing state hash.
-
-state_fetch( \<key\> )
-
-:   Function.Fetch a previously stored key, Returns scalar ref to key
-    value if successful, undef for failure. If no key name is supplied a
-    hash ref of the current state hash will be returned.
-
-state_delete()
-
-:   Function.Delete the state database for this session. Returns true
-    for success, undef for failure. Actual deletion does not take place
-    until cleanup() phase of Apache lifecycle.
-
-filename( \<filename\> )
-
-:   Function.Fetch or set the name of the file where the state
-    information will be held (defaults to
-    `$WEBDYNE_CACHE_DIR``/state.db`). Must be set before any state
-    operations take place.
-
-`$WEBDYNE_BERKELEYDB_STATE_FN`
-
-:   Constant. Name of the file that will hold the state database. Can be
-    just a file name or an absolute path name. Set as per
-    [WebDyne::Constants](#webdyne_constants) section. Defined in the
-    `WebDyne::State::BerkeleyDB::Constant` namespace. Defaults to
-    `state.db`
-
-`$WEBDYNE_BERKELEYDB_STATE_DN`
-
-:   Constant.Name of the directory where the state file will be located.
-    If an absolute filename (i.e. one that includes a directory name) is
-    given above then this variable is ignored. Set as per
-    [WebDyne::Constants](#webdyne_constants) section. Defined in the
-    `WebDyne::State::BerkeleyDB::Constant` namespace. Defaults to
-    `$WEBDYNE_CACHE_DN`
-
-Example:
-
-<pre>
-<span class="h-ab">&lt;</span><span class="h-cgi_tag">start_html</span> <span class="h-attr">title</span>=<span class="h-attv">"State</span>"<span class="h-ab">&gt;</span>
-
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">perl</span> <span class="h-attr">method</span>=<span class="h-attv">"state</span>"<span class="h-ab">&gt;</span>
-
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">block</span> <span class="h-attr">name</span>=<span class="h-attv">"login</span>"<span class="h-ab">&gt;</span>
-You are logged in as user "$&#123;user&#125;"
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
-The following data is associated with user $&#123;user&#125;:
-<span class="h-ab">&lt;</span><span class="h-tag">pre</span><span class="h-ab">&gt;</span>
-$&#123;data&#125;
-<span class="h-ab">&lt;/</span><span class="h-tag">pre</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-webdyne_tag">block</span><span class="h-ab">&gt;</span>
-
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">block</span> <span class="h-attr">name</span>=<span class="h-attv">"logout</span>"<span class="h-ab">&gt;</span>
-You are not logged in.
-<span class="h-ab">&lt;/</span><span class="h-webdyne_tag">block</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">hr</span><span class="h-ab">&gt;</span>
-
-<span class="h-ab">&lt;</span><span class="h-tag">form</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-cgi_tag">submit</span> <span class="h-attr">name</span>=<span class="h-attv">"login</span>" <span class="h-attr">value</span>=<span class="h-attv">"Login</span>"<span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-cgi_tag">submit</span> <span class="h-attr">name</span>=<span class="h-attv">"logout</span>" <span class="h-attr">value</span>=<span class="h-attv">"Logout</span>"<span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-cgi_tag">submit</span> <span class="h-attr">name</span>=<span class="h-attv">"refresh</span>" <span class="h-attr">value</span>=<span class="h-attv">"Refresh</span>"<span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">form</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-webdyne_tag">perl</span><span class="h-ab">&gt;</span>
-
-<span class="h-ab">&lt;</span><span class="h-cgi_tag">end_html</span><span class="h-ab">&gt;</span>
-
-&#095&#095PERL&#095&#095
-
-use WebDyne::Session;
-use WebDyne::State::BerkeleyDB;
-use Data::Dumper;
-
-sub state &#123;
-
-	my $self=shift();
-
-	if ($_&#123;'login'&#125;) &#123;
-		$self->login('alice') || return err();
-		my %data=( fullname=>'Alice Smith', favourite_colour=>'Blue');
-		$self->state_store(&#123; data=>\%data &#125;) || return err();
-	&#125;
-	elsif ($_&#123;'logout'&#125;) &#123;
-		$self->logout
-	&#125;
-
-	if (my $user=$&#123; $self->user() || return err() &#125;) &#123;
-		my $data_hr=$self->state_fetch();
-		$self->render_block('login', user=>$user, data=>Dumper($data_hr));
-	&#125;
-	else &#123;
-		$self->render_block('logout');
-	&#125;
-
-	$self->render();
-
-&#125;
-</pre>
-
-
-[Run](example/state1.psp)
-
-::: important
-State information is stored against the browser session ID, not against
-a user ID. The same user on two different machines will have two
-different state entries.
-
-WebDyne::State is meant for simplistic storage of state information - it
-is not meant for long term storage of user preferences or other data,
-and should not be used as a persistent database.
-:::
-
-WebDyne::State::BerkelyDB can also be used in conjunction with the
-[WebDyne::Chain](#webdyne_chain) module to make state information
-available to all pages within a location. An example httpd.conf snippet:
-
-    <Location />
-
-    #  We want state information accessible across the whole site. WebDyne::State only works
-    #  in conjunction with WebDyne::Session, so it must be in the chain also.
-    #
-    PerlHandler     WebDyne::Chain
-    PerlSetVar      WebDyneChain    'WebDyne::Session WebDyne::State::BerkeleyDB'
-
-    </Location>
-
 ## WebDyne::Template
 
 One of the more powerful WebDyne extensions. WebDyne::Template can be
 used to build CMS (Content Management Systems). It will extract the
-\<head\> and \<body\> sections from an existing HTML or WebDyne page and
+<head\> and <body\> sections from an existing HTML or WebDyne page and
 insert them into the corresponding head and body blocks of a template
 file.
 
@@ -3232,8 +4164,8 @@ and replace operations each time the file is loaded, or server side
 includes, so the resulting pages are quite fast.
 
 Both the template and content files should be complete - there is no
-need to write the content without a \<head\> section, or leave out
-\<html\> tags. As a result both the content and template files can be
+need to write the content without a <head\> section, or leave out
+<html\> tags. As a result both the content and template files can be
 viewed as standalone documents.
 
 The API:
@@ -3253,99 +4185,96 @@ Example:
 
 The template:
 
-<pre>
-<span class="h-ab">&lt;</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
+``` html
+<html>
 
-<span class="h-ab">&lt;</span><span class="h-tag">head</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">block</span> <span class="h-attr">name</span>=<span class="h-attv">"head</span>" <span class="h-attr">display</span>=<span class="h-attv">"1</span>"<span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">title</span><span class="h-ab">&gt;</span>Template<span class="h-ab">&lt;/</span><span class="h-tag">title</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-webdyne_tag">block</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">head</span><span class="h-ab">&gt;</span>
+<head>
+<block name="head" display="1">
+<title>Template</title>
+</block>
+</head>
 
-<span class="h-ab">&lt;</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
+<body>
 
-<span class="h-ab">&lt;</span><span class="h-tag">table</span> <span class="h-attr">width</span>=<span class="h-attv">"100%</span>"<span class="h-ab">&gt;</span>
+<table width="100%">
 
-<span class="h-ab">&lt;</span><span class="h-tag">tr</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">td</span> colspan=2 <span class="h-attr">bgcolor</span>=<span class="h-attv">"green</span>"<span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">style</span>=<span class="h-attv">"color:white;font-size:20px</span>"<span class="h-ab">&gt;</span>Site Name<span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">td</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">tr</span><span class="h-ab">&gt;</span>
+<tr>
+<td colspan=2 bgcolor="green">
+<span style="color:white;font-size:20px">Site Name</span>
+</td>
+</tr>
 
-<span class="h-ab">&lt;</span><span class="h-tag">tr</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">td</span> <span class="h-attr">bgcolor</span>=<span class="h-attv">"green</span>" <span class="h-attr">width</span>=<span class="h-attv">"100px</span>"<span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
+<tr>
+<td bgcolor="green" width="100px">
+<p>
 Left
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
+<p>
 Menu
-<span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
+<p>
 Here
-<span class="h-ab">&lt;/</span><span class="h-tag">td</span><span class="h-ab">&gt;</span>
+</td>
 
-<span class="h-ab">&lt;</span><span class="h-tag">td</span> <span class="h-attr">bgcolor</span>=<span class="h-attv">"white</span>"<span class="h-ab">&gt;</span>
+<td bgcolor="white">
 
-<span class="h-com">&lt;!-- Content goes here --&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">block</span> <span class="h-attr">name</span>=<span class="h-attv">"body</span>" <span class="h-attr">display</span>=<span class="h-attv">"1</span>"<span class="h-ab">&gt;</span>
+<!-- Content goes here -->
+<block name="body" display="1">
 This is where the content will go
-<span class="h-ab">&lt;/</span><span class="h-webdyne_tag">block</span><span class="h-ab">&gt;</span>
+</block>
 
-<span class="h-ab">&lt;/</span><span class="h-tag">td</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">tr</span><span class="h-ab">&gt;</span>
+</td>
+</tr>
 
-<span class="h-ab">&lt;</span><span class="h-tag">tr</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">td</span> colspan=2 <span class="h-attr">bgcolor</span>=<span class="h-attv">"green</span>"<span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">style</span>=<span class="h-attv">"color:white</span>"<span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-webdyne_tag">perl</span> <span class="h-attr">method</span>=<span class="h-attv">"copyright</span>"<span class="h-ab">&gt;</span>
-Copyright (C) $&#123;year&#125; Foobar corp.
-<span class="h-ab">&lt;/</span><span class="h-webdyne_tag">perl</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">td</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">tr</span><span class="h-ab">&gt;</span>
-
-
-<span class="h-ab">&lt;/</span><span class="h-tag">table</span><span class="h-ab">&gt;</span>
-
-<span class="h-ab">&lt;/</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;/</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
-
-&#095&#095PERL&#095&#095
-	
-sub copyright &#123;
-
-	shift()->render(year=>((localtime)[5]+1900));
-
-&#125;</pre>
+<tr>
+<td colspan=2 bgcolor="green">
+<span style="color:white">
+<perl method="copyright">
+Copyright (C) ${year} Foobar corp.
+</perl>
+</span>
+</td>
+</tr>
 
 
-[Run](example/template1.psp)
+</table>
+
+</body>
+</html>
+
+__PERL__
+    
+sub copyright {
+
+    shift()->render(year=>((localtime)[5]+1900));
+
+}
+```
+
+[Run](https://demo.webdyne.org/template1.psp)
 
 The content, run to view resulting merge:
 
-<pre>
-<span class="h-ab">&lt;</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
-<span class="h-ab">&lt;</span><span class="h-tag">head</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">title</span><span class="h-ab">&gt;</span>Content 1<span class="h-ab">&lt;/</span><span class="h-tag">title</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;/</span><span class="h-tag">head</span><span class="h-ab">&gt;</span>
+    <html>
+    <head><title>Content 1</title></head>
 
-<span class="h-ab">&lt;</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
-This is my super content !
-<span class="h-ab">&lt;/</span><span class="h-tag">body</span><span class="h-ab">&gt;</span>
+    <body>
+    This is my super content !
+    </body>
 
-<span class="h-ab">&lt;/</span><span class="h-tag">html</span><span class="h-ab">&gt;</span>
+    </html>
 
-&#095&#095PERL&#095&#095
+    __PERL__
 
-use WebDyne::Template qw(template1.psp);
-</pre>
+    use WebDyne::Template qw(template1.psp);
 
-
-[Run](example/content1.psp)
+[Run](https://demo.webdyne.org/content1.psp)
 
 In real life it is not desirable to put the template name into every
 content file (as was done in the above example), nor would we want to
-have to \"use WebDyne::Template\" in every content file.
+have to "use WebDyne::Template" in every content file.
 
 To overcome this WebDyne::Template can read the template file name using
 the Apache dir_config function, and assign a template on a per location
-basis using the WebDyneTemplate directive. Here is a sample httpd.conf
+basis using the WebDyneTemplate directive. Here is a sample `httpd.conf`
 file:
 
     <Location />
@@ -3356,307 +4285,102 @@ file:
 
     </Location>
 
-# GNU General Public License {#gpl}
+# Credits
 
-# Preamble {#gpl-1}
+WebDyne relies heavily on modules and code developed and open-sourced by
+other authors. Without Perl, and Perl modules such as mod_perl/PSGI,
+HTML::Tiny, HTML::TreeBuilder, Storable and many other, WebDyne would
+not be possible. To the authors of those modules - and all the other
+modules used to a lesser extent by WebDyne - I convey my thanks.
 
-The licenses for most software are designed to take away your freedom to
-share and change it. By contrast, the GNU General Public License is
-intended to guarantee your freedom to share and change free software -
-to make sure the software is free for all its users. This General Public
-License applies to most of the Free Software Foundation\'s software and
-to any other program whose authors commit to using it. (Some other Free
-Software Foundation software is covered by the GNU Library General
-Public License instead.) You can apply it to your programs, too.
+# Miscellaneous
 
-When we speak of free software, we are referring to freedom, not price.
-Our General Public Licenses are designed to make sure that you have the
-freedom to distribute copies of free software (and charge for this
-service if you wish), that you receive source code or can get it if you
-want it, that you can change the software or use pieces of it in new
-free programs; and that you know you can do these things.
+Things to note or information not otherwise contained elsewhere
 
-To protect your rights, we need to make restrictions that forbid anyone
-to deny you these rights or to ask you to surrender the rights. These
-restrictions translate to certain responsibilities for you if you
-distribute copies of the software, or if you modify it.
+How to check syntax on a PSP file
 
-For example, if you distribute copies of such a program, whether gratis
-or for a fee, you must give the recipients all the rights that you have.
-You must make sure that they, too, receive or can get the source code.
-And you must show them these terms so they know their rights.
+:   To check the syntax of a PSP file, specifically any Perl code in the
+    \_\_PERL\_\_ section make sure you have a #!perl shebang after the
+    \_\_PERL\_\_ delimiter as here:
 
-We protect your rights with two steps:
+    ``` html
+    <start_html>
+    Hello World <? server_time() ?>
+    __PERL__
+    #!perl
 
-1.  copyright the software, and
+    sub server_time {
+        my 2==1; #Error here
+    }
+    ```
 
-2.  offer you this license which gives you legal permission to copy,
-    distribute and/or modify the software.
+    Then run the command `perl -x -c -w <filename.psp>`. This will check
+    the file for syntax error and report back:
 
-Also, for each author\'s protection and ours, we want to make certain
-that everyone understands that there is no warranty for this free
-software. If the software is modified by someone else and passed on, we
-want its recipients to know that what they have is not the original, so
-that any problems introduced by others will not reflect on the original
-authors\' reputations.
+        $ perl -c -w -x check.psp 
+        syntax error at check.psp line 4, near "my 2"
+        check.psp had compilation errors.
 
-Finally, any free program is threatened constantly by software patents.
-We wish to avoid the danger that redistributors of a free program will
-individually obtain patent licenses, in effect making the program
-proprietary. To prevent this, we have made it clear that any patent must
-be licensed for everyone\'s free use or not licensed at all.
+How to pass \$self ref if using processing instructions
 
-The precise terms and conditions for copying, distribution and
-modification follow.
+:   If you use the processing instruction form of calling a perl method
+    it will not pass the WebDyne object ref through to your perl code.
+    You can pass it by supplying \@\_ as a param, or just shift() and
+    your parameters:
 
-# TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION {#gpl-2}
+    ``` html
+    <start_html>
+    Hello World <? server_time(@_) ?>
+    Hello World <? server_time(shift(), 'UTC' ?>
+    Hello World <perl handler="server_time" param="UTC"/>
+    __PERL__
 
-## Section 0 {#gpl-2-0}
+    sub server_time {
+        #  Now we can get self ref
+        my ($self, $timezone)=@_;
+        #  Do something and return
+    }
+    ```
 
-This License applies to any program or other work which contains a
-notice placed by the copyright holder saying it may be distributed under
-the terms of this General Public License. The \"Program\", below, refers
-to any such program or work, and a "work based on the Program " means
-either the Program or any derivative work under copyright law: that is
-to say, a work containing the Program or a portion of it, either
-verbatim or with modifications and/or translated into another language.
-(Hereinafter, translation is included without limitation in the term
-"modification ".) Each licensee is addressed as "you".
+Use of hash characters for comments in .psp files
 
-Activities other than copying, distribution and modification are not
-covered by this License; they are outside its scope. The act of running
-the Program is not restricted, and the output from the Program is
-covered only if its contents constitute a work based on the Program
-(independent of having been made by running the Program). Whether that
-is true depends on what the Program does.
+:   Any \# characters at the very start of a PSP file before a <html\>
+    or <start_html\> tag are treated as comments and discarded - they
+    will not be stored or displayed (they are **not** translated into
+    HTML comments). This allows easy to read comments at the start of
+    .psp files. Any \# characters after the first valid tag are not
+    treated specially - they will be rendered as normal HTML:
 
-## Section 1 {#gpl-2-1}
+    ``` html
+    #  This is my server time display file
+    #  
+    #  VERSION=1.23
+    #
+    <start_html>
+    Server local time is: <? localtime ?>
+    ```
 
-You may copy and distribute verbatim copies of the Program\'s source
-code as you receive it, in any medium, provided that you conspicuously
-and appropriately publish on each copy an appropriate copyright notice
-and disclaimer of warranty; keep intact all the notices that refer to
-this License and to the absence of any warranty; and give any other
-recipients of the Program a copy of this License along with the Program.
+The <checkbox\> tag will always set a hidden form field
 
-You may charge a fee for the physical act of transferring a copy, and
-you may at your option offer warranty protection in exchange for a fee.
+:   The <checkbox\> tag is unusual in that it adds a hidden field (with
+    the same name as the checkbox) to the HTML page to retain state.
+    Thus if you are examining the checkbox parameter from CGI via
+    `$_{'checkbox_name'}` or `$self->CGI->param('checkbox_name')` you
+    may get an array rather than a single value. The value of the
+    checkbox (boolean, checked or unchecked, i.e. 1 or 0) will always be
+    the first value returned. So the code
+    `if ($_{'checkbox_name'}) { .. do_something }` will work as
+    expected - but just be careful if using in an array context.
 
-## Section 2 {#gpl-2-2}
+# Legal Information - Licensing and Copyright
 
-You may modify your copy or copies of the Program or any portion of it,
-thus forming a work based on the Program, and copy and distribute such
-modifications or work under the terms of [Section 1 ](#gpl-2-1) above,
-provided that you also meet all of these conditions:
+WebDyne is Copyright © Andrew Speer 2006-2025. WebDyne is free software;
+you can redistribute it and/or modify it under the same terms as Perl
+itself.
 
-1.  You must cause the modified files to carry prominent notices stating
-    that you changed the files and the date of any change.
-
-2.  You must cause any work that you distribute or publish, that in
-    whole or in part contains or is derived from the Program or any part
-    thereof, to be licensed as a whole at no charge to all third parties
-    under the terms of this License.
-
-3.  If the modified program normally reads commands interactively when
-    run, you must cause it, when started running for such interactive
-    use in the most ordinary way, to print or display an announcement
-    including an appropriate copyright notice and a notice that there is
-    no warranty (or else, saying that you provide a warranty) and that
-    users may redistribute the program under these conditions, and
-    telling the user how to view a copy of this License.
-
-    ::: note
-    ::: title
-    Exception:
-    :::
-
-    If the Program itself is interactive but does not normally print
-    such an announcement, your work based on the Program is not required
-    to print an announcement.)
-    :::
-
-These requirements apply to the modified work as a whole. If
-identifiable sections of that work are not derived from the Program, and
-can be reasonably considered independent and separate works in
-themselves, then this License, and its terms, do not apply to those
-sections when you distribute them as separate works. But when you
-distribute the same sections as part of a whole which is a work based on
-the Program, the distribution of the whole must be on the terms of this
-License, whose permissions for other licensees extend to the entire
-whole, and thus to each and every part regardless of who wrote it.
-
-Thus, it is not the intent of this section to claim rights or contest
-your rights to work written entirely by you; rather, the intent is to
-exercise the right to control the distribution of derivative or
-collective works based on the Program.
-
-In addition, mere aggregation of another work not based on the Program
-with the Program (or with a work based on the Program) on a volume of a
-storage or distribution medium does not bring the other work under the
-scope of this License.
-
-## Section 3 {#gpl-2-3}
-
-You may copy and distribute the Program (or a work based on it, under
-[Section 2 ](#gpl-2-2) in object code or executable form under the terms
-of [Sections 1 ](#gpl-2-1) and [2 ](#gpl-2-2) above provided that you
-also do one of the following:
-
-1.  Accompany it with the complete corresponding machine-readable source
-    code, which must be distributed under the terms of Sections 1 and 2
-    above on a medium customarily used for software interchange; or,
-
-2.  Accompany it with a written offer, valid for at least three years,
-    to give any third party, for a charge no more than your cost of
-    physically performing source distribution, a complete
-    machine-readable copy of the corresponding source code, to be
-    distributed under the terms of Sections 1 and 2 above on a medium
-    customarily used for software interchange; or,
-
-3.  Accompany it with the information you received as to the offer to
-    distribute corresponding source code. (This alternative is allowed
-    only for noncommercial distribution and only if you received the
-    program in object code or executable form with such an offer, in
-    accord with Subsection b above.)
-
-The source code for a work means the preferred form of the work for
-making modifications to it. For an executable work, complete source code
-means all the source code for all modules it contains, plus any
-associated interface definition files, plus the scripts used to control
-compilation and installation of the executable. However, as a special
-exception, the source code distributed need not include anything that is
-normally distributed (in either source or binary form) with the major
-components (compiler, kernel, and so on) of the operating system on
-which the executable runs, unless that component itself accompanies the
-executable.
-
-If distribution of executable or object code is made by offering access
-to copy from a designated place, then offering equivalent access to copy
-the source code from the same place counts as distribution of the source
-code, even though third parties are not compelled to copy the source
-along with the object code.
-
-## Section 4 {#gpl-2-4}
-
-You may not copy, modify, sublicense, or distribute the Program except
-as expressly provided under this License. Any attempt otherwise to copy,
-modify, sublicense or distribute the Program is void, and will
-automatically terminate your rights under this License. However, parties
-who have received copies, or rights, from you under this License will
-not have their licenses terminated so long as such parties remain in
-full compliance.
-
-## Section 5 {#gpl-2-5}
-
-You are not required to accept this License, since you have not signed
-it. However, nothing else grants you permission to modify or distribute
-the Program or its derivative works. These actions are prohibited by law
-if you do not accept this License. Therefore, by modifying or
-distributing the Program (or any work based on the Program), you
-indicate your acceptance of this License to do so, and all its terms and
-conditions for copying, distributing or modifying the Program or works
-based on it.
-
-## Section 6 {#gpl-2-6}
-
-Each time you redistribute the Program (or any work based on the
-Program), the recipient automatically receives a license from the
-original licensor to copy, distribute or modify the Program subject to
-these terms and conditions. You may not impose any further restrictions
-on the recipients\' exercise of the rights granted herein. You are not
-responsible for enforcing compliance by third parties to this License.
-
-## Section 7 {#gpl-2-7}
-
-If, as a consequence of a court judgment or allegation of patent
-infringement or for any other reason (not limited to patent issues),
-conditions are imposed on you (whether by court order, agreement or
-otherwise) that contradict the conditions of this License, they do not
-excuse you from the conditions of this License. If you cannot distribute
-so as to satisfy simultaneously your obligations under this License and
-any other pertinent obligations, then as a consequence you may not
-distribute the Program at all. For example, if a patent license would
-not permit royalty-free redistribution of the Program by all those who
-receive copies directly or indirectly through you, then the only way you
-could satisfy both it and this License would be to refrain entirely from
-distribution of the Program.
-
-If any portion of this section is held invalid or unenforceable under
-any particular circumstance, the balance of the section is intended to
-apply and the section as a whole is intended to apply in other
-circumstances.
-
-It is not the purpose of this section to induce you to infringe any
-patents or other property right claims or to contest validity of any
-such claims; this section has the sole purpose of protecting the
-integrity of the free software distribution system, which is implemented
-by public license practices. Many people have made generous
-contributions to the wide range of software distributed through that
-system in reliance on consistent application of that system; it is up to
-the author/donor to decide if he or she is willing to distribute
-software through any other system and a licensee cannot impose that
-choice.
-
-This section is intended to make thoroughly clear what is believed to be
-a consequence of the rest of this License.
-
-## Section 8 {#gpl-2-8}
-
-If the distribution and/or use of the Program is restricted in certain
-countries either by patents or by copyrighted interfaces, the original
-copyright holder who places the Program under this License may add an
-explicit geographical distribution limitation excluding those countries,
-so that distribution is permitted only in or among countries not thus
-excluded. In such case, this License incorporates the limitation as if
-written in the body of this License.
-
-## Section 9 {#gpl-2-9}
-
-The Free Software Foundation may publish revised and/or new versions of
-the General Public License from time to time. Such new versions will be
-similar in spirit to the present version, but may differ in detail to
-address new problems or concerns.
-
-Each version is given a distinguishing version number. If the Program
-specifies a version number of this License which applies to it and \"any
-later version\", you have the option of following the terms and
-conditions either of that version or of any later version published by
-the Free Software Foundation. If the Program does not specify a version
-number of this License, you may choose any version ever published by the
-Free Software Foundation.
-
-## Section 10 {#gpl-2-10}
-
-If you wish to incorporate parts of the Program into other free programs
-whose distribution conditions are different, write to the author to ask
-for permission. For software which is copyrighted by the Free Software
-Foundation, write to the Free Software Foundation; we sometimes make
-exceptions for this. Our decision will be guided by the two goals of
-preserving the free status of all derivatives of our free software and
-of promoting the sharing and reuse of software generally.
-
-## NO WARRANTY Section 11 {#gpl-2-11}
-
-BECAUSE THE PROGRAM IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY FOR
-THE PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
-OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
-PROVIDE THE PROGRAM \"AS IS\" WITHOUT WARRANTY OF ANY KIND, EITHER
-EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
-ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE PROGRAM IS WITH
-YOU. SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
-NECESSARY SERVICING, REPAIR OR CORRECTION.
-
-## Section 12 {#gpl-2-12}
-
-IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
-WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
-REDISTRIBUTE THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR
-DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL
-DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE PROGRAM
-(INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
-INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE OF
-THE PROGRAM TO OPERATE WITH ANY OTHER PROGRAMS), EVEN IF SUCH HOLDER OR
-OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
-
-END OF TERMS AND CONDITIONS
+WebDyne is written in Perl and uses modules from
+[CPAN](http://www.cpan.org) (the Comprehensive Perl Archive Network).
+CPAN modules are Copyright © the owner/author, and are available in
+source form by downloading from CPAN directly. All CPAN modules used are
+covered by the [Perl Artistic
+License](http://www.perl.com/pub/a/language/misc/Artistic.html)

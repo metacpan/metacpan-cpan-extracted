@@ -24,9 +24,9 @@ use Chess::Plisco::Engine::TimeControl;
 sub new {
 	my ($class, $epdfile, $limit, %params) = @_;
 
-	%params = (depth => 3) unless %params;
+	$params{depth} //= 3;
 
-	my $epd = Chess::Plisco::EPD->new($epdfile);
+	my $epd = Chess::Plisco::EPD->new($epdfile, pseudo_legal => $params{pseudo_legal});
 
 	my $num_tests;
 	if ($limit > 0) {
@@ -83,11 +83,10 @@ sub __solve {
 	}
 
 	my $tree = Chess::Plisco::Engine::Tree->new(
-		$position,
-		Chess::Plisco::Engine::TranspositionTable->new(16),
-		$self->{__watcher},
-		sub {},
-		[$position->signature],
+		position => $position,
+		tt => Chess::Plisco::Engine::TranspositionTable->new(16),
+		watcher => $self->{__watcher},
+		signatures => [$position->signature],
 	);
 	my $tc = Chess::Plisco::Engine::TimeControl->new($tree, %params);
 	my $move = $position->moveCoordinateNotation($tree->think);

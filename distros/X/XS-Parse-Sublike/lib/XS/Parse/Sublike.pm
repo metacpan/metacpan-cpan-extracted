@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020-2024 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Sublike 0.39;
+package XS::Parse::Sublike 0.40;
 
 use v5.14;
 use warnings;
@@ -278,6 +278,12 @@ documented in L<Sublike::Extended>.
 If set, use the extended signature parser of this module when parsing a
 signature and additionally permit the use of attribute declarations on
 parameter variables, as documented in L<Sublike::Extended>.
+
+=item XS_PARSE_SUBLIKE_FLAG_SIGNATURE_REFALIAS
+
+If set, use the extended signature parser of this module when parsing a
+signature and additionally permit the use of refalias parameter syntax, as
+documented in L<Sublike::Extended>.
 
 =back
 

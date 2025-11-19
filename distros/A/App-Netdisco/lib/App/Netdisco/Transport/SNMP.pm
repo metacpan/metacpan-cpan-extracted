@@ -202,7 +202,7 @@ sub _snmp_connect_generic {
 
   # try last known-good by tag if it's stored
   # this gets in the way of SNMP version upgrade (2 to 3)
-  # but can use only/no to get around that
+  # but can use only/no or snmpforce_v* to get around that
 
   my $tag_name = 'snmp_auth_tag_'. $mode;
   my $stored_tag = eval { $device->community->$tag_name };
@@ -356,9 +356,11 @@ sub _try_read {
     : $device->set_column(snmp_ver => $info->snmp_ver);
 
   if ($comm->{community}) {
+      my $new_comm = (($info->snmp_ver and ($info->snmp_ver == 3))
+        ? undef : $comm->{community});
       $device->in_storage
-        ? $device->update({snmp_comm => $comm->{community}})
-        : $device->set_column(snmp_comm => $comm->{community});
+        ? $device->update({snmp_comm => $new_comm})
+        : $device->set_column(snmp_comm => $new_comm);
   }
 
   # regardless of device in storage, save the hint

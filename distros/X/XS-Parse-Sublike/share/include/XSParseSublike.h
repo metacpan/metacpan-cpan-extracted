@@ -30,6 +30,8 @@ enum {
 
   XS_PARSE_SUBLIKE_FLAG_ALLOW_PKGNAME = 1<<5,
 
+  XS_PARSE_SUBLIKE_FLAG_SIGNATURE_REFALIAS = 1<<6,
+
   /* Back-compat flags we hope to remove in the next ABI version */
   XS_PARSE_SUBLIKE_COMPAT_FLAG_DYNAMIC_ACTIONS = 1<<15,
 };
@@ -158,6 +160,8 @@ struct XPSSignatureParamContext {
   char sigil;
   const char *namepv;
   STRLEN namelen;
+
+  bool is_refalias;
 };
 
 struct XPSSignatureAttributeFuncs {

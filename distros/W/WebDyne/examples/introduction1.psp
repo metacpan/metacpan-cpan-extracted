@@ -1,0 +1,7 @@
+<html>
+<head><title>Server Time</title></head>
+<body>
+The local server time is:
+<perl> localtime() </perl>
+</body>
+</html>

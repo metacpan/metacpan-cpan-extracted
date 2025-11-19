@@ -10,7 +10,7 @@
 # http://www.wtfpl.net/ for more details.
 
 package Chess::Plisco::EPD::Record;
-$Chess::Plisco::EPD::Record::VERSION = 'v0.7.0';
+$Chess::Plisco::EPD::Record::VERSION = 'v0.8.0';
 use strict;
 use integer;
 
@@ -19,7 +19,7 @@ use Locale::TextDomain qw('Chess-Plisco');
 use Chess::Plisco qw(:all);
 
 sub new {
-	my ($class, $line) = @_;
+	my ($class, $line, $pseudo_legal) = @_;
 
 	my $ws = "[ \011-\015]";
 	$line =~ s/^$ws+//;
@@ -55,11 +55,11 @@ sub new {
 		$operations{$operation} = [@operands];
 	}
 
-	my $position = Chess::Plisco->new("$pieces $to_move $castling $ep_shift");
+	my $position = Chess::Plisco->new("$pieces $to_move $castling $ep_shift", $pseudo_legal);
 	my $hmc = $operations{hmvc} || 0;
 	my $fmc = $operations{fmvc} || 1;
 	my $fen = "$pieces $to_move $castling $ep_shift $hmc $fmc";
-	my $position = Chess::Plisco->new($fen);
+	my $position = Chess::Plisco->new($fen, $pseudo_legal);
 
 	bless {
 		__position => $position,

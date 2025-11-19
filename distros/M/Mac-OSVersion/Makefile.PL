@@ -61,7 +61,6 @@ my %WriteMakefile = (
 
 	'TEST_REQUIRES' => {
 		'Test::More'   => '1',
-		'version'      => '0.86',
 		},
 
 	'RECOMMENDS' => {

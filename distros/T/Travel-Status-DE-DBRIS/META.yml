@@ -3,6 +3,8 @@ abstract: 'Interface to bahn.de / bahnhof.de departure monitors'
 author:
   - 'Copyright (C) 2024-2025 Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>'
 build_requires:
+  File::Slurp: '9999.19'
+  JSON: '0'
   Test::Compile: '0'
   Test::More: '0'
   Test::Pod: '0'
@@ -18,28 +20,31 @@ name: Travel-Status-DE-DBRIS
 provides:
   Travel::Status::DE::DBRIS:
     file: lib/Travel/Status/DE/DBRIS.pm
-    version: '0.15'
+    version: '0.18'
   Travel::Status::DE::DBRIS::Formation:
     file: lib/Travel/Status/DE/DBRIS/Formation.pm
-    version: '0.15'
+    version: '0.18'
   Travel::Status::DE::DBRIS::Formation::Carriage:
     file: lib/Travel/Status/DE/DBRIS/Formation/Carriage.pm
-    version: '0.15'
+    version: '0.18'
   Travel::Status::DE::DBRIS::Formation::Group:
     file: lib/Travel/Status/DE/DBRIS/Formation/Group.pm
-    version: '0.15'
+    version: '0.18'
   Travel::Status::DE::DBRIS::Formation::Sector:
     file: lib/Travel/Status/DE/DBRIS/Formation/Sector.pm
-    version: '0.15'
+    version: '0.18'
   Travel::Status::DE::DBRIS::Journey:
     file: lib/Travel/Status/DE/DBRIS/Journey.pm
-    version: '0.15'
+    version: '0.18'
   Travel::Status::DE::DBRIS::JourneyAtStop:
     file: lib/Travel/Status/DE/DBRIS/JourneyAtStop.pm
-    version: '0.15'
+    version: '0.18'
   Travel::Status::DE::DBRIS::Location:
     file: lib/Travel/Status/DE/DBRIS/Location.pm
-    version: '0.15'
+    version: '0.18'
+  Travel::Status::DE::DBRIS::Operators:
+    file: lib/Travel/Status/DE/DBRIS/Operators.pm
+    version: '0.18'
 recommends:
   Cache::File: '0'
   GIS::Distance: '0'
@@ -57,5 +62,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/derf/Travel-Status-DE-DBRIS
-version: '0.15'
+version: '0.18'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

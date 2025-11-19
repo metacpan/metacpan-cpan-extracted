@@ -249,6 +249,8 @@ static int parse(pTHX_
         flags |= PARSE_SUBSIGNATURE_NAMED_PARAMS;
       if(hooks->flags & XS_PARSE_SUBLIKE_FLAG_SIGNATURE_PARAM_ATTRIBUTES)
         flags |= PARSE_SUBSIGNATURE_PARAM_ATTRIBUTES;
+      if(hooks->flags & XS_PARSE_SUBLIKE_FLAG_SIGNATURE_REFALIAS)
+        flags |= PARSE_SUBSIGNATURE_REFALIAS;
       if(hooks->ver >= 7 && (hooks->start_signature || hooks->finish_signature))
         have_sighooks = true;
     }
@@ -660,7 +662,8 @@ static struct XSParseSublikeHooks hooks_extended = {
   .flags = XS_PARSE_SUBLIKE_FLAG_PREFIX|
     XS_PARSE_SUBLIKE_FLAG_BODY_OPTIONAL|
     XS_PARSE_SUBLIKE_FLAG_SIGNATURE_NAMED_PARAMS|
-    XS_PARSE_SUBLIKE_FLAG_SIGNATURE_PARAM_ATTRIBUTES,
+    XS_PARSE_SUBLIKE_FLAG_SIGNATURE_PARAM_ATTRIBUTES|
+    XS_PARSE_SUBLIKE_FLAG_SIGNATURE_REFALIAS,
 
   /* No hooks */
 };
@@ -670,7 +673,8 @@ static struct XSParseSublikeHooks hooks_extended_sub = {
   .permit_hintkey = "Sublike::Extended/extended-sub",
   .flags = XS_PARSE_SUBLIKE_FLAG_BODY_OPTIONAL|
     XS_PARSE_SUBLIKE_FLAG_SIGNATURE_NAMED_PARAMS|
-    XS_PARSE_SUBLIKE_FLAG_SIGNATURE_PARAM_ATTRIBUTES,
+    XS_PARSE_SUBLIKE_FLAG_SIGNATURE_PARAM_ATTRIBUTES|
+    XS_PARSE_SUBLIKE_FLAG_SIGNATURE_REFALIAS,
 
   /* No hooks */
 };

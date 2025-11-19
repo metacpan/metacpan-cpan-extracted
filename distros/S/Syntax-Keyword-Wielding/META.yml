@@ -1,0 +1,45 @@
+---
+abstract: 'adds a `wielding` keyword to make it easier to call the same function or method multiple times'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Test2::Plugin::BailOnFail: '0'
+  Test2::Require::AuthorTesting: '0'
+  Test2::Require::Module: '0'
+  Test2::Tools::Spec: '0'
+  Test2::V0: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Syntax-Keyword-Wielding
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  Syntax::Keyword::Wielding:
+    file: lib/Syntax/Keyword/Wielding.pm
+    version: '0.001001'
+requires:
+  Import::Into: '0'
+  Keyword::Declare: '0'
+  perl: '5.014'
+resources:
+  Identifier: http://purl.org/NET/cpan-uri/dist/Syntax-Keyword-Wielding/project
+  bugtracker: https://github.com/tobyink/p5-syntax-keyword-wielding/issues
+  homepage: https://metacpan.org/release/Syntax-Keyword-Wielding
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-syntax-keyword-wielding.git
+version: '0.001001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

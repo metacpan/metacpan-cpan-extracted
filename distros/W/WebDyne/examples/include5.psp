@@ -1,0 +1,11 @@
+<start_html>
+This is my master file
+<p>
+Here is some text pulled from the "include4.psp" file:
+<p>
+<include file="include4.psp" block="block1">
+<p>
+And another different block from the same file with caching disabled:
+<p>
+<include file="include4.psp" block="block2" nocache>
+

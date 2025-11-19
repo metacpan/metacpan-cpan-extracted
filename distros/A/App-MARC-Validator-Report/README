@@ -43,6 +43,10 @@ ARGUMENTS
 EXAMPLE
      marc-validator-report __report.json__
 
+SEE ALSO
+    marc-validator
+        Tool to validate records in MARC file.
+
 REPOSITORY
     <https://github.com/michal-josef-spacek/App-MARC-Validator-Report>
 
@@ -56,6 +60,13 @@ LICENSE AND COPYRIGHT
 
     BSD 2-Clause License
 
+ACKNOWLEDGEMENTS
+    Development of this software has been made possible by institutional
+    support for the long-term strategic development of the National Library
+    of the Czech Republic as a research organization provided by the
+    Ministry of Culture of the Czech Republic (DKRVO 2024–2028), Area 11:
+    Linked Open Data.
+
 VERSION
-    0.01
+    0.03
 

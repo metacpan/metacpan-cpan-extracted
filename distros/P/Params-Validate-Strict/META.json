@@ -38,6 +38,7 @@
             "List::Util" : "1.33",
             "Params::Get" : "0.13",
             "Scalar::Util" : "0",
+            "perl" : "5.008",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -74,6 +75,6 @@
          "x_repository" : "https://github.com/nigelhorne/Params-Validate-Strict"
       }
    },
-   "version" : "0.23",
+   "version" : "0.24",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

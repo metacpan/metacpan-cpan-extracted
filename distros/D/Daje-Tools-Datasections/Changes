@@ -1,7 +1,9 @@
 Revision history for Perl extension Daje-Tools-DataSections
 
-0.11 2025-02-04T16:40:11Z
+1.00 2025-11-16T04:56:10Z
 
+    - 2025-11-16 Bumped version to 1, ready for production
+    - 2025-11-16 added use 5.42 and try catch
     - added error
     - changed to use Mojo::Loader::load_class instead of require
 

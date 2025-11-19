@@ -1,0 +1,5 @@
+<start_html title="Server Time">
+Server local time is: 
+<script type="application/perl">
+    print scalar localtime()
+</script>

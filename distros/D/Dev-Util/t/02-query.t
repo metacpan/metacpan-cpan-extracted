@@ -1,11 +1,11 @@
 #!/usr/bin/env perl
 
 use Test2::V0;
-use lib 'lib';
 
 use Dev::Util::Syntax;
 use Dev::Util::Query qw(:all);
-use IO::Interactive  qw(is_interactive);
+
+use IO::Interactive qw(is_interactive);
 
 plan tests => 4;
 

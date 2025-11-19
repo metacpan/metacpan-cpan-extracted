@@ -5,7 +5,7 @@ use App::MARC::Validator::Report;
 use English;
 use File::Object;
 use File::Spec::Functions qw(abs2rel catfile);
-use Test::More 'tests' => 6;
+use Test::More 'tests' => 13;
 use Test::NoWarnings;
 use Test::Output;
 use Test::Warn 0.31;
@@ -22,14 +22,68 @@ my $right_ret = <<'END';
 Plugin 'field_260':
 - Bad year in parenthesis in MARC field 260 $c.
 END
+my $exit_code = 1;
 stdout_is(
 	sub {
-		App::MARC::Validator::Report->new->run;
+		$exit_code = App::MARC::Validator::Report->new->run;
 		return;
 	},
 	$right_ret,
 	'List unique error messages (-l).',
 );
+is($exit_code, 0, 'Exit code (0).');
+
+# Test.
+@ARGV = (
+	$data_dir->file('report1.json')->s,
+);
+$right_ret = <<'END';
+Plugin 'field_260':
+- Bad year in parenthesis in MARC field 260 $c.
+-- cnb001926336: Value: '(1933)'
+END
+$exit_code = 1;
+stdout_is(
+	sub {
+		$exit_code = App::MARC::Validator::Report->new->run;
+		return;
+	},
+	$right_ret,
+	'Create report.',
+);
+is($exit_code, 0, 'Exit code (0).');
+
+# Test.
+@ARGV = (
+	$data_dir->file('bad_report1.json')->s,
+);
+$right_ret = "Doesn't exist key 'checks' in plugin field_008.";
+$exit_code = 0;
+stderr_is(
+	sub {
+		$exit_code = App::MARC::Validator::Report->new->run;
+		return;
+	},
+	$right_ret,
+	"Process bad report file (not 'checks' structure).",
+);
+is($exit_code, 1, 'Exit code (1).');
+
+# Test.
+@ARGV = (
+	$data_dir->file('bad_report2.json')->s,
+);
+$right_ret = "Doesn't exist key 'checks'->'not_valid' in plugin field_008.";
+$exit_code = 0;
+stderr_is(
+	sub {
+		$exit_code = App::MARC::Validator::Report->new->run;
+		return;
+	},
+	$right_ret,
+	"Process bad report file (not 'checks'->'not_valid' structure).",
+);
+is($exit_code, 1, 'Exit code (1).');
 
 # Test.
 @ARGV = (

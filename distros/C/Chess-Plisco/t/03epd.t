@@ -28,20 +28,20 @@ open my $fh, '<', $filename or die "$filename: $!";
 my @lines = <$fh>;
 my $contents = join '', @lines;
 
-my $epd = Chess::Plisco::EPD->new($filename);
+my $epd = Chess::Plisco::EPD->new($filename, pseudo_legal => 1);
 ok $epd, 'load epd from file';
 is ((scalar $epd->records), (scalar @lines), "records in file");
 
 open my $fh, '<', $filename or die "$filename: $!";
-$epd = Chess::Plisco::EPD->new($fh);
+$epd = Chess::Plisco::EPD->new($fh, pseudo_legal => 1);
 ok $epd, 'load epd from file handle';
 is ((scalar $epd->records), (scalar @lines), "records in file handle");
 
-$epd = Chess::Plisco::EPD->new(\@lines);
+$epd = Chess::Plisco::EPD->new(\@lines, pseudo_legal => 1);
 ok $epd, 'load epd from array';
 is ((scalar $epd->records), (scalar @lines), "records from array");
 
-$epd = Chess::Plisco::EPD->new(\$contents);
+$epd = Chess::Plisco::EPD->new(\$contents, pseudo_legal => 11);
 ok $epd, 'load epd from string';
 is ((scalar $epd->records), (scalar @lines), "records from string");
 

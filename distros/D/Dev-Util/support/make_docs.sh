@@ -21,18 +21,24 @@ done
 echo "done"
 
 echo -n "Updating Manifest..."
-rm MANIFEST
+if [[ -e 'MANIFEST' ]]; then
+  rm MANIFEST
+fi
 make manifest
 echo "done"
 
 # Update Changelog
 echo -n "Updating Changelog..."
-rm CHANGELOG.md
+if [[ -e 'CHANGELOG.md' ]]; then
+  rm CHANGELOG.md
+fi
 git cliff > CHANGELOG.md
 echo "done"
 
 echo -n "Updating Signatures..."
-rm SIGNATURE
+if [[ -e 'SIGNATURE' ]]; then
+  rm SIGNATURE
+fi
 make signature
 echo "done"
 

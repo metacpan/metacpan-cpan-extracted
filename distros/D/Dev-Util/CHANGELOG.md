@@ -2,6 +2,138 @@
 
 All notable changes to this project will be documented in this file.
 
+## [version/v2.19.6] - 2025-11-18
+
+### 🚀 Features
+
+- *(os)* Add fn is_freebsd, and associated tests
+- *(os)* Add distro version hashes, is_openbsd sub
+- *(os)* Add functions is_freebsd and is_openbsd, with tests, docs
+
+### 🐛 Bug Fixes
+
+- Check for existence of files before deleting
+- *(file)* Skip tests if setting setuid/setgid/sticky on test file fails
+- *(file)* Skip test (not skip_all) if block/char files is not avail
+
+### ⚙️ Miscellaneous Tasks
+
+- *(version)* Bump version minor level
+
+### 🚜 Refactor
+
+- *(test)* Remove the dependence on yath
+- *(tests)* Utilize Test2::Require::Module to ensure test modules are available
+
+### 🧪 Testing
+
+- *(boilerplate)* Add Dev::Util::Sem
+
+## [release/2025/11/15/1336] - 2025-11-15
+
+### 📚 Documentation
+
+- *(changelog)* Update changelog
+
+## [version/v2.18.35] - 2025-11-15
+
+### 🐛 Bug Fixes
+
+- *(test)* Remove the plan because number of tests is variable.
+- *(mode)* Change file permissions to allow access to test file
+- *(timezone)* Set timezone so all testers use the same one
+
+### ⚙️ Miscellaneous Tasks
+
+- *(version)* Bump version patch level
+
+### 🚜 Refactor
+
+- *(use)* Standarize module loading, remove use lib 'lib'
+
+## [release/2025/11/15/0912] - 2025-11-15
+
+### 📚 Documentation
+
+- *(changelog)* Update changelog
+
+## [version/v2.18.31] - 2025-11-15
+
+### ⚙️ Miscellaneous Tasks
+
+- *(version)* Bump version patch level
+
+### 🚜 Refactor
+
+- *(use)* Standarize module loading, remove use lib 'lib'
+- *(yath)* Add option to not use concurrency (--single)
+
+### 🧪 Testing
+
+- *(yath)* Update test configuration and options
+
+### 🚧 Build
+
+- *(git)* Ignore yath temp file lastlog.jsonl
+
+## [release/2025/11/14/0931] - 2025-11-14
+
+### 📚 Documentation
+
+- *(changelog)* Update changelog
+
+## [version/v2.18.26] - 2025-11-14
+
+### ⚙️ Miscellaneous Tasks
+
+- *(version)* Bump version patch level
+
+### 🧪 Testing
+
+- Remove Data::{Dumper,Printer}. Set plan
+
+### 📚 Documentation
+
+- *(pod)* Clarify documentation
+- Documentation improvements
+- *(readme)* Use Dev::Util::Syntax automatically adds use strict and use warnings
+
+## [release/20251114] - 2025-11-14
+
+### 📚 Documentation
+
+- *(changelog)* Update changelog
+
+### 🚧 Build
+
+- *(manifest)* Update manifest and signature file
+
+### Other
+
+- *(other)* Merge branch 'sem' - Create Sem module
+
+* sem:
+  build(manifest): Update manifest and signature file
+  docs(changelog): Update changelog
+  chore(version): Update version minor level
+  docs(pod): Expand the pod documentation
+  chore(example): Create simple example of semaphore locking
+  fix(diagnostics): Remove diagnostics code used in development
+  test(remove): Delete block testing second semaphore wait
+  feat(semaphor): Create Sem file locking module and tests
+  build(critic): Add _get_locks_dir to ProtectPrivateSubs
+  docs(links): Remove links to defunct websites: AnnoCPAN and CPAN Ratings
+  docs(contibuting): Document coding style for contributions
+  docs(contributing): Create a policy for contibutions to this project
+  fix(links): Remove links to defunct websites: AnnoCPAN and CPAN Ratings
+  chore(security): Add security policy tool. Create security policy.
+  build(support): Create support dir for development tools
+  build(makefile): Add IO::Prompt, App::Yath to PREREQ_PM and TEST_REQUIRES respectively
+  build(makefile): Add new tests in XT_TEST_REQUIRES
+  docs(readme): Add pod description for Dev::Util::Sem
+  test: Add xt tests for utf-8 and file name portability
+  test(pod): Rename pod.t to pod-syntax.t
+
 ## [version/v2.18.19] - 2025-11-14
 
 ### 🚀 Features
@@ -144,7 +276,7 @@ All notable changes to this project will be documented in this file.
   test(query): Convert to Query from Utils
   refactor(utils)!: Move Utils to Query
 
-## [version/v2.12.4] - 2025-11-06
+## [version/v2.16.4] - 2025-11-06
 
 ### 🚀 Features
 

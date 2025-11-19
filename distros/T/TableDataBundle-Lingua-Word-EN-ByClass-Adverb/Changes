@@ -1,0 +1,15 @@
+0.003   2025-01-13  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename module/dist
+          TableDataBundle-Lingua-Word-EN-{,ByClass-}Adverb.
+
+
+0.002   2021-06-01  Released-By: PERLANCAR; Urgency: medium
+
+        - Rename from TablesCollection-Words-EN-Adverbs to
+          TableDataBundle::Lingua::Word::EN::Adverb. Follow TableData 0.2.0.
+
+
+0.001   2021-03-05  Released-By: PERLANCAR
+
+        - First release.

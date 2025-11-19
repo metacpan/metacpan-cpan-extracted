@@ -1,0 +1,45 @@
+<html>
+<head><title>Hello World</title></head>
+<body>
+<p>
+<form>
+Enter your name: <textfield name="name">
+&nbsp;
+<submit>
+</form>
+
+<perl method="hello">
+
+
+<!-- This block will be rendered multiple times, the output changing depending
+	on the variables values supplied as parameters -->
+
+<block name="greeting">
+${i} .. Hello +{name}, pleased to meet you !
+<p>
+</block>
+
+The time here is <? localtime() ?>
+
+</perl>
+
+</body>
+</html>
+
+__PERL__
+
+sub hello { 
+
+	my $self=shift();
+
+	#  Only render greeting blocks if name given. Both blocks
+	#  will be rendered, as the both have the name "greeting"
+	#
+	if ($_{'name'}) {
+		for(my $i=0; $i<3; $i++) {
+			$self->render_block('greeting', i=>$i );
+		}
+	}
+
+	$self->render();
+}

@@ -2,27 +2,25 @@
 
 =head1 Features
 
-=head2 Scheduling
+=head2 Documentation
 
-Multiple proposals are being considered for rescheduling, scheduling incrementally (C<begin>, C<push>, C<pop>), scheduling adjustment to target different attributes, as well as attribute-level goals.  Other feature improvements below are related to scheduling.
-
-=head2 Message support
-
-No additional features planned.  Messages can be strings, arrays, a hash of alternates, a named message key, or a hash named message.  Named messages are supported for action nodes and annotations.  Attributes are supported in hash-alternate configurations and within named messages.
-
-=head2 Attributes
-
-Planned improvements include helpers to merge annotation attributes into schedules, additional reporting functions, and automatic mapping of attributes for some action node parameters (eg limits).  As of 0.1.9, attributes may be "fixed" at activity boundaries but that is no longer done automatically.
+Has sadly grown quite complex.  A rewrite is likely, but no ETA.
 
 =head2 Annotations
 
-Some annotations may occur before an action but not when after certain other actions.  Annotations should support node filtering for this situation.
+Annotation filtering.  Some annotations may occur before an action but not when after certain other actions.  Annotations should support node filtering for this situation.
 
-Other improvements include helpers to merge annotation attributes into schedules.  This also requires options to control the order/materialization of annotation generation.  Proposed is annotation configuration per-node (with a keyname, possibly duplicated in the upper-level configuration).
+=head2 Scheduling
+
+Incremental scheduling is available in the module and from the commandline starting with 0.2.1.  Attribute recomputation and output behavior (from commandline) is not fully defined.  Ideally a finalized savefile would also store annotations.
+
+=head2 Attributes
+
+Attributes should be useful as "goals" for scheduling, but this is left to the caller at this time.  Ideally these goals could be used to filter result schedules (as a first step), and eventually to change the scoring method used to select nodes.
 
 =head2 Node filtering
 
-Node filtering is experimental starting in 0.1.6.  Filters support Booleans and attribute numeric comparisons.  Average value filtering should work but is not well tested.  Because per-node limits differ between limit-per-activity and limit-per-schedule, it's not clear that a special mechanism will be created to provide these limits, which can be achieved by setting the attribute to zero at the appropriate point and filtering normally.
+Average value filtering should work but is not well tested.
 
 =head2 Tutorial
 
@@ -48,7 +46,7 @@ On by default in 0.1.9, but can be turned off with C<unsafe=1> and C<schedule-ac
 
 Available in 0.1.8, basic C<schedule-activity.pl> script supports Dumper/JSON schedules and activity lists, compiling with/out safety checks.  Future support may provide for common schedule types:  Music playlists (high count, non-redundant nodes), exercise schedules (chunking, some repeats), chores/errands (small action count per activity/category), games (rounds, countdown reminders).
 
-In 0.1.9, some annotation handling is provided.
+In 0.1.9, some annotation handling is provided.  Incremental building is supported starting with 0.2.1.
 
 =head2 Markdown
 
@@ -70,18 +68,6 @@ Fourth, this may be useful as a test generation tool.  The C<prove> command alre
 
 =head1 Functional improvements
 
-=head2 Validation and configuration build
-
-Attribute registration is getting messy; needs more helpers, particularly for pulling attributes out of message objects.  Validation of named messages, and even messages themselves, is flakey.
-
-=head2 Object interface
-
-Move C<Schedule::Activity> from static functions to an object interface.  This is likely to occur when moving to 0.2.0.
-
-=head2 Pre-scheduling validation
-
-Scheduling shouldn't be attempted if it's impossible to achieve the goals.  As per the suggested convenience functions above, verify that the minimum path time and max path times bound the activity goal time.
-
 =head2 Annotation validation
 
 Annotations need better pre-scheduling validation and better separation from the main scheduling code.  Currently unclear of the best place to provide those helpers, as well as annotation-group-merging functions and the associated configurations.
@@ -90,16 +76,12 @@ Annotations need better pre-scheduling validation and better separation from the
 
 Goals can never be met if slack/buffers are zero and the activity time requested doesn't exactly match action choices.  This should likely fail with an error similar to the convenience functions mentioned above.
 
-=head2 Support full object configurations
-
-The current validation logic assumes plain hash references in several spots, but a user should be able to build an object-oriented collection of Nodes etcetera and still call schedule, without manually overriding the pre-validation flag.
-
 =head2 Backtracking behavior
 
 The current mechanism is primarily for safety.  Better backtracking support should be possible.
 
-=head2 Validation of tmmin/avg/max
+=head2 Performance
 
-Validation should check that values are non-decreasing.
+Both processing time and memory have been secondary considerations in initial versions.  Some optimizations are possible, particularly with rolling averages and the main scheduling algorithm.
 
 =cut

@@ -1,5 +1,5 @@
 {
-	"version" : "0.2.0",
+	"version" : "0.2.1",
 	"name"    : "Schedule-Activity",
 	"author"  : ["Brian Blackmore <BBLACKM@cpan.org>"],
 	"abstract": "Generate activity schedules",
@@ -16,6 +16,9 @@
 				"List::Util": "1.33",
 				"Ref::Util": "0.010",
 				"Scalar::Util": "1.39"
+			},
+			"suggests": {
+				"Pod::Usage": "1.64"
 			}
 		},
 		"test": {

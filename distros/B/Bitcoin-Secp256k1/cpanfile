@@ -4,6 +4,6 @@ on 'test' => sub {
 
 on 'configure' => sub {
 	# first version working properly on all platforms
-	requires 'Alien::libsecp256k1' => '0.050103';
+	requires 'Alien::libsecp256k1' => '0.060001';
 };
 

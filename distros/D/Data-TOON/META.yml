@@ -1,0 +1,45 @@
+---
+abstract: 'Complete Perl implementation of TOON (Token-Oriented Object Notation)'
+author:
+  - 'ytnobody <ytnobody@gmail.com>'
+build_requires:
+  JSON::PP: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.25, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-TOON
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Data::TOON:
+    file: lib/Data/TOON.pm
+    version: '0.02'
+  Data::TOON::Decoder:
+    file: lib/Data/TOON/Decoder.pm
+  Data::TOON::Encoder:
+    file: lib/Data/TOON/Encoder.pm
+  Data::TOON::Validator:
+    file: lib/Data/TOON/Validator.pm
+requires:
+  perl: '5.014'
+resources:
+  bugtracker: https://github.com/ytnobody/p5-Data-TOON/issues
+  homepage: https://github.com/ytnobody/p5-Data-TOON
+  repository: https://github.com/ytnobody/p5-Data-TOON.git
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

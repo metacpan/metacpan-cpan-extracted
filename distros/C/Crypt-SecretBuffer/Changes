@@ -1,3 +1,10 @@
+Version 0.008 - 2025-11-17
+  - New Span objects assist with parsing secrets.
+  - New INI object for parsing common INI-like formats.
+  - SecretBuffer now has 'rindex' and 'scan' methods, and 'index' allows the
+    pattern to be a Regexp-ref as long as it is only a single character class.
+  - New SecretBuffer methods load_file and save_file.
+
 Version 0.007 - 2025-10-31
   - New API unmask_secrets_to and ->unmask_to
   - Documented ways to use SecretBuffer without depending on it

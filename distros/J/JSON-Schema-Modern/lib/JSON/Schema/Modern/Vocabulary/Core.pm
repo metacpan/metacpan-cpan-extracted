@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Core;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Core vocabulary
 
-our $VERSION = '0.622';
+our $VERSION = '0.623';
 
 use 5.020;
 use Moo;
@@ -126,7 +126,8 @@ sub _eval_keyword_id ($class, $data, $schema, $state) {
   $state->{keyword_path} = '';
   $state->@{qw(specification_version vocabularies)} = $schema_info->@{qw(specification_version vocabularies)};
 
-  push $state->{dynamic_scope}->@*, $state->{initial_schema_uri};
+  push $state->{dynamic_scope}->@*, $state->{initial_schema_uri}
+    if $state->{dynamic_scope}->[-1] ne $schema_info->{canonical_uri};
 
   return 1;
 }
@@ -137,7 +138,7 @@ sub _traverse_keyword_schema ($class, $schema, $state) {
 
   # Note that because this keyword is parsed ahead of "id"/"$id", location information may not
   # be correct if an error occurs when parsing this keyword.
-  ()= E($state, '$schema value is not a string'), return if not is_type('string', $schema->{'$schema'});
+  return E($state, '$schema value is not a string') if not is_type('string', $schema->{'$schema'});
   return if not assert_uri($state, $schema, $schema->{'$schema'});
 
   my ($spec_version, $vocabularies);
@@ -336,6 +337,7 @@ sub _eval_keyword_dynamicRef ($class, $data, $schema, $state) {
     # "$dynamicAnchor".
     foreach my $scope_uri ($state->{dynamic_scope}->@*) {
       my $resource = $state->{evaluator}->_get_or_load_resource($scope_uri);
+      die 'bad dynamic scope uri: ', $scope_uri if not $resource;
       if (exists(($resource->{anchors}//{})->{$anchor}) and $resource->{anchors}{$anchor}{dynamic}) {
         $uri = Mojo::URL->new($scope_uri)->fragment($anchor);
         last;
@@ -407,7 +409,7 @@ JSON::Schema::Modern::Vocabulary::Core - Implementation of the JSON Schema Core 
 
 =head1 VERSION
 
-version 0.622
+version 0.623
 
 =head1 DESCRIPTION
 

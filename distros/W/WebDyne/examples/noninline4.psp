@@ -1,0 +1,25 @@
+<html>
+<head><title>Hello World</title></head>
+<body>
+
+<perl method="hello"/>
+<p>
+<perl method="hello"/>
+
+</body>
+</html>
+
+__PERL__
+
+my $i=0;
+$i++;
+
+my $x=0;
+
+sub hello {
+	
+	#  Note x may not increment as you expect because you will probably
+	#  get a different Apache process each time you load this page
+	#
+	return sprintf("value of i: $i, value of x in PID $$: %s", $x++)
+}

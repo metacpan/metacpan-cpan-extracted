@@ -1,17 +1,19 @@
 package Dev::Util::OS;
 
-use lib 'lib';
 use Dev::Util::Syntax;
 use Exporter qw(import);
+
 use IPC::Cmd qw[can_run run];
 
-our $VERSION = version->declare("v2.18.19");
+our $VERSION = version->declare("v2.19.6");
 
 our @EXPORT_OK = qw(
     get_os
     get_hostname
     is_linux
     is_mac
+    is_freebsd
+    is_openbsd
     is_sunos
     ipc_run_c
     ipc_run_e
@@ -51,6 +53,24 @@ sub is_mac {
     }
 }
 
+sub is_freebsd {
+    if ( get_os() eq "FreeBSD" ) {
+        return 1;
+    }
+    else {
+        return 0;
+    }
+}
+
+sub is_openbsd {
+    if ( get_os() eq "OpenBSD" ) {
+        return 1;
+    }
+    else {
+        return 0;
+    }
+}
+
 sub is_sunos {
     if ( get_os() eq "SunOS" ) {
         return 1;
@@ -59,6 +79,137 @@ sub is_sunos {
         return 0;
     }
 }
+
+my %osx_distro_ver = (
+                       10.0  => 'Cheetah',
+                       10.1  => 'Puma',
+                       10.2  => 'Jaguar',
+                       10.3  => 'Panther',
+                       10.4  => 'Tiger',
+                       10.5  => 'Leopard',
+                       10.6  => 'Snow Leopard',
+                       10.7  => 'Lion',
+                       10.8  => 'Mountain Lion',
+                       10.9  => 'Mavericks',
+                       10.10 => 'Yosemite',
+                       10.11 => 'El Capitan',
+                       10.12 => 'Sierra',
+                       10.13 => 'High Sierra',
+                       10.14 => 'Mojave',
+                       10.15 => 'Catalina',
+                     );
+my %macos_distro_ver = (
+                         11 => 'Big Sur',
+                         12 => 'Monterey',
+                         13 => 'Ventura',
+                         14 => 'Sonoma',
+                         15 => 'Sequioa',
+                         16 => 'Tahoe',
+                       );
+
+my %ubuntu_distro_ver = (
+                          '4.10'  => 'Warty Warthog',
+                          '5.04'  => 'Hoary Hedgehog',
+                          '5.10'  => 'Breezy Badger',
+                          '6.06'  => 'Dapper Drake',
+                          '6.10'  => 'Edgy Eft',
+                          '7.04'  => 'Feisty Fawn',
+                          '7.10'  => 'Gutsy Gibbon',
+                          '8.04'  => 'Hardy Heron',
+                          '8.10'  => 'Intrepid Ibex',
+                          '9.04'  => 'Jaunty Jackalope',
+                          '9.10'  => 'Karmic Koala',
+                          '10.04' => 'Lucid Lynx',
+                          '10.10' => 'Maverick Meerkat',
+                          '11.04' => 'Natty Narwhal',
+                          '11.10' => 'Oneiric Ocelot',
+                          '12.04' => 'Precise Pangolin',
+                          '12.10' => 'Quantal Quetzal',
+                          '13.04' => 'Raring Ringtail',
+                          '13.10' => 'Saucy Salamander',
+                          '14.04' => 'Trusty Tahr',
+                          '14.10' => 'Utopic Unicorn',
+                          '15.04' => 'Vivid Vervet',
+                          '15.10' => 'Wily Werewolf',
+                          '16.04' => 'Xenial Xerus',
+                          '16.10' => 'Yakkety Yak',
+                          '17.04' => 'Zesty Zapus',
+                          '17.10' => 'Artful Aardvark',
+                          '18.04' => 'Bionic Beaver',
+                          '18.10' => 'Cosmic Cuttlefish',
+                          '19.04' => 'Disco Dingo',
+                          '19.10' => 'Eoan Ermine',
+                          '20.04' => 'Focal Fossa',
+                          '20.10' => 'Groovy Gorilla',
+                          '21.04' => 'Hirsute Hippo',
+                          '21.10' => 'Impish Indri',
+                          '22.04' => 'Jammy Jellyfish',
+                          '22.10' => 'Kinetic Kudu',
+                          '23.04' => 'Lunar Lobster',
+                          '23.10' => 'Mantic Minotaur',
+                          '24.04' => 'Noble Numbat',
+                          '24.10' => 'Oracular Oriole',
+                          '25.04' => 'Plucky Puffin',
+                          '25.10' => 'Questing Quokka',
+                          '26.04' => 'Resolute Raccoon',
+                        );
+
+my %opensuse_distro_ver = (
+                            11.2 => 'Emerald',
+                            11.3 => 'Teal',
+                            11.4 => 'Celadon',
+                            12.1 => 'Asparagus',
+                            12.2 => 'Mantis',
+                            12.3 => 'Dartmoth',
+                            13.1 => 'Bottle',
+                            13.2 => 'Harlequin',
+                            42.1 => 'Malacite',
+                          );
+
+my %debian_distro_ver = (
+                          '1.1' => 'buzz',
+                          '1.2' => 'rex',
+                          '1.3' => 'bo',
+                          '2.0' => 'hamm',
+                          '2.1' => 'slink',
+                          '2.2' => 'potato',
+                          '3.0' => 'woody',
+                          '3.1' => 'sarge',
+                          '4.0' => 'etch',
+                          '5.0' => 'lenny',
+                          '6.0' => 'squeeze',
+                          '7'   => 'wheezy',
+                          '8'   => 'jessie',
+                          '9'   => 'stretch',
+                          '10'  => 'buster',
+                          '11'  => 'bullseye',
+                          '12'  => 'bookworm',
+                          '13'  => 'trixie',
+                          '14'  => 'forky',
+                          '15'  => 'duke',
+                        );
+
+my %redhat_distro_ver = (
+                          '2.1' => 'Pensacola',
+                          '3'   => 'Taroon',
+                          '4'   => 'Nahant',
+                          '5'   => 'Tikanga',
+                          '6'   => 'Santiago',
+                          '7'   => 'Maipo',
+                          '8'   => 'Ootpa',
+                          '9'   => 'Plow',
+                          '10'  => 'Coughlan',
+                        );
+
+my %raspbian_distro_ver = (
+                            '7'  => 'wheezy',
+                            '8'  => 'jessie',
+                            '9'  => 'stretch',
+                            '10' => 'buster',
+                            '11' => 'bullseye',
+                            '12' => 'bookworm',
+                            '13' => 'trixie',
+                          );
 
 # execute the cmd return 1 on success 0 on failure
 sub ipc_run_e {
@@ -119,7 +270,7 @@ Dev::Util::OS - OS discovery and functions
 
 =head1 VERSION
 
-Version v2.18.19
+Version v2.19.6
 
 =head1 SYNOPSIS
 
@@ -140,6 +291,8 @@ OS discovery and functions
     get_hostname
     is_linux
     is_mac
+    is_freebsd
+    is_openbsd
     is_sunos
     ipc_run_e
     ipc_run_c
@@ -169,6 +322,18 @@ Return true if the current system is Linux.
 Return true if the current system is MacOS (Darwin).
 
     my $system_is_macOS = is_mac();
+
+=head2 B<is_freebsd>
+
+Return true if the current system is FreeBSD.
+
+    my $system_is_FreeBSD = is_freebsd();
+
+=head2 B<is_openbsd>
+
+Return true if the current system is OpenBSD.
+
+    my $system_is_OpenBSD = is_openbsd();
 
 =head2 B<is_sunos>
 

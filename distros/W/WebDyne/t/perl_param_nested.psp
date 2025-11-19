@@ -1,0 +1,46 @@
+<start_html>
+<perl handler="a" param="%{ a1=>1 }">
+<perl handler="b" param="%{ b1=>1 }">
+<perl handler="c" param="%{ c1=>1 }">
+<pre>
+<? Dumper($_[1]) ?>
+</pre>
+<perl handler="d">
+<p>
+Hello ${b1}
+</perl>
+<perl handler="e">
+<p>
+Hello ${b1}
+</perl>
+<perl handler="f" param="%{ f1=>1, f2=>2 }">
+<p>
+Dump ${dump}
+</perl>
+</perl>
+</perl>
+</perl>
+</perl>
+
+__PERL__
+use Data::Dumper;
+$Data::Dumper::Sortkeys=1;
+sub a { 
+    return shift()->render( a2=>2 )
+}
+sub b { 
+    return shift()->render( b2=>2)
+}
+sub c { 
+    return shift()->render( c2=>2 )
+}
+sub d {
+    return shift()->render()
+}
+sub e {
+    return shift()->render( e1=>1 )
+}
+sub f {
+    my ($self, $param_hr)=@_;
+    return $self->render( dump=>Dumper($param_hr))
+}

@@ -3,6 +3,7 @@ requires 'perl', '5.008001';
 
 requires 'Mouse';
 requires 'Module::Runtime';
+requires 'JSON';
 requires 'JSON::MaybeXS';
 requires 'File::AddInc';
 

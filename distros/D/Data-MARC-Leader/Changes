@@ -1,3 +1,9 @@
+0.07 2025-11-14T16:52:08+01:00
+ - Add ACKNOWLEDGEMENTS section to doc.
+ - Add Czech translation.
+ - Add tests.
+ - Update copyright years.
+
 0.06 2024-02-13T08:06:38+01:00
  - Add tests.
  - Fix dependencies.

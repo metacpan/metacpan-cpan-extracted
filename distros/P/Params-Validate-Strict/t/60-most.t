@@ -325,12 +325,12 @@ subtest 'Case sensitivity in memberof/notmemberof' => sub {
 	} 'case sensitive memberof fails for wrong case';
 };
 
-subtest 'Validation with error_message' => sub {
+subtest 'Validation with error_msg' => sub {
 	my $schema = {
 		age => {
 			type => 'integer',
 			min => 18,
-			error_message => 'You must be at least 18 years old'
+			error_msg => 'You must be at least 18 years old'
 		}
 	};
 
@@ -659,12 +659,12 @@ subtest 'Empty hash with nested schema' => sub {
 };
 
 subtest 'Custom error messages in various rules' => sub {
-	# Test error_message with min rule
+	# Test error_msg with min rule
 	my $schema = {
 		age => {
 			type => 'integer',
 			min => 18,
-			error_message => 'Must be at least 18 years old'
+			error_msg => 'Must be at least 18 years old'
 		}
 	};
 
@@ -675,12 +675,12 @@ subtest 'Custom error messages in various rules' => sub {
 		);
 	} qr/Must be at least 18 years old/, 'custom error message for min rule';
 
-	# Test error_message with memberof
+	# Test error_msg with memberof
 	$schema = {
 		status => {
 			type => 'string',
 			memberof => ['active', 'inactive'],
-			error_message => 'Invalid status value'
+			error_msg => 'Invalid status value'
 		}
 	};
 
@@ -691,12 +691,12 @@ subtest 'Custom error messages in various rules' => sub {
 		);
 	} qr/Invalid status value/, 'custom error message for memberof';
 
-	# Test error_message with matches
+	# Test error_msg with matches
 	$schema = {
 		email => {
 			type => 'string',
 			matches => qr/\@/,
-			error_message => 'Invalid email format'
+			error_msg => 'Invalid email format'
 		}
 	};
 
@@ -1174,7 +1174,7 @@ subtest 'Array validation with schema edge cases' => sub {
 			schema => {
 				type => 'arrayref',
 				element_type => 'integer',
-				error_message => 'matrix elements must be an array of numbers'
+				error_msg => 'matrix elements must be an array of numbers'
 			},
 		}
 	};
@@ -1248,11 +1248,12 @@ subtest 'Transform with validation interactions' => sub {
 			type => 'string',
 			transform => sub {
 				my $val = $_[0];
-				return $val =~ s/\s+//gr;  # Remove whitespace
+				$val =~ s/\s+//g;	# Remove whitespace (RT#171339)
+				return $val;
 			},
 			matches => qr/^[A-Z]+$/,  # Should validate against transformed value
 			min => 3,
-			error_message => 'invalid data'
+			error_msg => 'invalid data'
 		}
 	};
 

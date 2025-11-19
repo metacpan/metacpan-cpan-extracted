@@ -1,0 +1,17 @@
+<start_html>
+<htmx handler="server_time">
+<p>
+Server local time: ${server_time}
+</htmx>
+
+__PERL__
+
+sub server_time {
+    my $self=shift();
+    my $time=scalar localtime;
+    for (1..3) {
+        $self->print( $self->render( server_time=> $time ));
+    }
+    return \undef;
+}
+

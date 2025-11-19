@@ -251,7 +251,7 @@ use Params::Validate::Strict qw(validate_strict);
         status => {
             type => 'string',
             memberof => ['active', 'inactive'],
-            error_message => 'Status must be either active or inactive'
+            error_msg => 'Status must be either active or inactive'
         }
     };
 

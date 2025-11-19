@@ -11,7 +11,7 @@ no if "$]" >= 5.041009, feature => 'smartmatch';
 no feature 'switch';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
-use Test::Fatal;
+use Test2::Tools::Exception;
 use Storable 'dclone';
 use lib 't/lib';
 use Helper;
@@ -31,8 +31,8 @@ subtest 'local JSON pointer' => sub {
     'can follow local $ref to a false schema',
   );
 
-  is(
-    exception {
+  ok(
+    lives {
       my $result = $js->evaluate(true, { '$ref' => '#/$defs/nowhere' });
       like(
         (($result->errors)[0])->error,
@@ -40,7 +40,6 @@ subtest 'local JSON pointer' => sub {
         'got error for unresolvable ref',
       );
     },
-    undef,
     'no exception',
   );
 };
@@ -94,7 +93,7 @@ subtest 'local anchor' => sub {
   );
 
   is(
-    exception {
+    dies {
       my $result = $js->evaluate(true, { '$ref' => '#nowhere' });
       like(
         (($result->errors)[0])->error,
@@ -1042,6 +1041,72 @@ subtest '$dynamicRef to $dynamicAnchor not directly in the evaluation path' => s
   );
 };
 
+subtest 'multiple layers in the dynamic scope' => sub {
+  $js->{_resource_index} = {};
+  my $schema = {
+    # We $ref from base -> first#/$defs/stuff -> second#/$defs/stuff -> third#/$defs/stuff
+    # and then follow a $dynamicRef to #length.
+    # At no point do we ever actually evaluate at the root schema for each scope.
+    # The dynamic scope is [ base, first, second, third ] and we check the scopes in order,
+    # therefore the first scope we find with a dynamic anchor "length" is "second".
+    '$id' => 'base',
+    '$ref' => 'first#/$defs/stuff',
+    '$defs' => {
+      first => {
+        '$id' => 'first',
+        '$defs' => {
+          stuff => {    # first#/$defs/stuff
+            '$ref' => 'second#/$defs/stuff',
+          },
+          length => {   # first#length
+            # no $dynamicAnchor here!
+            maxLength => 1,
+          },
+        },
+      },
+      second => {
+        '$id' => 'second',
+        '$defs' => {
+          stuff => {    # second#/$defs/stuff
+            '$ref' => 'third#/$defs/stuff',
+          },
+          length => {   # second#length
+            '$dynamicAnchor' => 'length',
+            maxLength => 2,               # <-- this is the scope that we should find and evaluate
+          },
+        },
+      },
+      third => {
+        '$id' => 'third',
+        '$defs' => {
+          stuff => {    # third#/$defs/stuff
+            '$dynamicRef' => '#length',
+          },
+          length => {   # third#length
+            '$dynamicAnchor' => 'length',
+            maxLength => 3,         # this should never get evaluated
+          }
+        },
+      },
+    },
+  };
+  cmp_result(
+    $js->evaluate('hello', $schema)->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '',
+          keywordLocation => '/$ref/$ref/$ref/$dynamicRef/maxLength',
+          absoluteKeywordLocation => 'second#/$defs/length/maxLength',
+          error => 'length is greater than 2',
+        },
+      ],
+    },
+    'dynamic scopes are pushed onto the stack even when its root resource (and $id keyword) are not directly evaluated',
+  );
+};
+
 subtest 'after leaving a dynamic scope, it should not be used by a $dynamicRef' => sub {
   $js->{_resource_index} = {};
   my $schema = {
@@ -1291,6 +1356,67 @@ subtest 'evaluate at a non-schema location' => sub {
       ],
     },
     'evaluating at a non-schema location is not permitted',
+  );
+};
+
+subtest 'evaluate at a subschema, with $dynamicRef' => sub {
+  # from a real bug I encountered while writing a t/parameters.t test in OpenAPI-Modern!
+  # if we evaluate in the middle of a document, and a $dynamicRef is involved, mayhem ensues.
+  $js->{_resource_index} = {};
+  $js->add_schema({
+    '$id' => 'http://strict_metaschema',
+    '$defs' => {
+      schema => {
+        '$dynamicAnchor' => 'meta',
+        type => 'object', # disallows boolean
+      },
+      parameter => {
+        '$ref' => 'http://loose_metaschema#/$defs/parameter',
+      },
+    },
+    '$ref' => 'http://loose_metaschema#/intentionally/bad/reference',
+  });
+
+  $js->add_schema({
+    '$id' => 'http://loose_metaschema',
+    '$defs' => {
+      schema => {
+        '$dynamicAnchor' => 'meta',
+        type => [ 'object', 'boolean' ],
+      },
+      parameter => {
+        type => 'object',
+        properties => {
+          name => { type => 'string' },
+          schema => { '$dynamicRef' => '#meta' },
+        },
+      },
+    },
+  });
+
+  cmp_result(
+    $js->evaluate(
+      { name => 'hi', schema => false },
+      'http://strict_metaschema#/$defs/parameter',
+    )->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/schema',
+          keywordLocation => '/$ref/properties/schema/$dynamicRef/type',
+          absoluteKeywordLocation => 'http://strict_metaschema#/$defs/schema/type',
+          error => 'got boolean, not object',
+        },
+        {
+          instanceLocation => '',
+          keywordLocation => '/$ref/properties',
+          absoluteKeywordLocation => 'http://loose_metaschema#/$defs/parameter/properties',
+          error => 'not all properties are valid',
+        },
+      ],
+    },
+    'correctly navigated a $dynamicRef while evaluating in the middle of a document',
   );
 };
 

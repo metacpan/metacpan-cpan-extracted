@@ -3,9 +3,12 @@ abstract: 'Data objects for MARC leader.'
 author:
   - 'Michal Josef Spacek <skim@cpan.org>'
 build_requires:
+  English: 0
+  Error::Pure::Utils: 0
   ExtUtils::MakeMaker: 6.59
   Test::More: 0
   Test::NoWarnings: 0
+  Unicode::UTF8: 0
 configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
@@ -35,4 +38,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Data-MARC-Leader
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Data-MARC-Leader
-version: '0.06'
+version: '0.07'

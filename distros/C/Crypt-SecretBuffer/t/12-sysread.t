@@ -2,6 +2,7 @@ use FindBin;
 use lib "$FindBin::Bin/lib";
 use Test2AndUtils;
 use IO::Handle;
+use File::Temp;
 use Crypt::SecretBuffer qw(NONBLOCK);
 
 sub check_content {
@@ -32,6 +33,15 @@ subtest 'append_sysread EOF' => sub {
    $got = $buf->append_sysread($r, 1);
    is($got, 0, 'zero at EOF');
    close $r;
+};
+
+subtest load_file => sub {
+   my $content= "1234"x50;
+   my $f= File::Temp->new;
+   $f->print($content);
+   $f->close;
+   my $buf= Crypt::SecretBuffer->new(load_file => "$f");
+   check_content($buf, $content);
 };
 
 done_testing;

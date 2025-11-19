@@ -1,0 +1,10 @@
+<start_html>
+<form>
+<submit name="submit" value="Show Block">
+<p>
+<reset>
+</form>
+<block name="test" display="!{! $_{'submit'} !}">
+<p>
+You pressed submit - here is a block
+</block>

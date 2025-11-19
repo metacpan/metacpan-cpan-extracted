@@ -1,0 +1,17 @@
+<start_html title="Error">
+<perl method="hello">
+
+Hello World ${foo}
+
+</perl>
+<end_html>
+
+__PERL__
+
+sub hello {
+
+	#  Check for error after calling render function
+	#
+	shift()->render( bar=> 'Again') || return err();
+
+}

@@ -1,0 +1,60 @@
+<html>
+<head>
+<title>Blocks</title>
+</head>
+<body>
+<p>
+
+<form>
+2 + 2 = <textfield name="sum">
+<p><submit>
+</form>
+
+<p>
+<perl method="check">
+
+
+<!-- Each block below is only rendered if specifically requested by the Perl code -->
+
+<block name="pass">
+Yes, +{sum} is the correct answer ! Brilliant ..
+</block>
+
+<block name="fail">
+I am sorry .. +{sum} is not correct .. Please try again !
+</block>
+
+<block name="silly">
+Danger, does not compute ! .. "+{sum}" is not a number !
+</block>
+
+<p>
+Thanks for playing !
+
+</perl>
+
+</body>
+</html>
+
+__PERL__
+
+sub check {
+
+	my $self=shift();
+
+	if ((my $ans=$_{'sum'}) == 4) {
+		$self->render_block('pass')
+	}
+	elsif ($ans=~/^[0-9.]+$/) {
+		$self->render_block('fail')
+	}
+	elsif ($ans) {
+		$self->render_block('silly')
+	}
+
+	#  Blocks aren't displayed until whole section rendered
+	#
+	return $self->render();
+
+}
+		

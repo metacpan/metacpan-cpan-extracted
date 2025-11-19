@@ -1,12 +1,11 @@
 #!/usr/bin/env perl
 
 use Test2::V0;
-use lib 'lib';
 
 use Dev::Util::Syntax;
 use Dev::Util qw(::OS);
 
-plan tests => 17;
+plan tests => 19;
 
 #======================================#
 #             get_hostname             #
@@ -50,6 +49,28 @@ if ( $expected_os eq "Darwin" ) {
 }
 else {
     is( is_mac, 0, "is_mac - false if not macOS" );
+}
+
+#======================================#
+#                is_freebsd            #
+#======================================#
+
+if ( $expected_os eq "FreeBSD" ) {
+    is( is_freebsd, 1, "is_freebsd - true if freeBSD" );
+}
+else {
+    is( is_freebsd, 0, "is_freebsd - false if not freeBSD" );
+}
+
+#======================================#
+#                is_openbsd            #
+#======================================#
+
+if ( $expected_os eq "OpenBSD" ) {
+    is( is_openbsd, 1, "is_openbsd - true if openBSD" );
+}
+else {
+    is( is_openbsd, 0, "is_openbsd - false if not openBSD" );
 }
 
 #======================================#

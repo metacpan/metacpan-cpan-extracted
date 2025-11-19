@@ -4,7 +4,7 @@ Dev::Util::Sem -  Module to do Semaphore locking
 
 # VERSION
 
-Version v2.18.19
+Version v2.19.6
 
 # SYNOPSIS
 
@@ -36,7 +36,7 @@ lock dirs will be tried.
     my $sem1 = Sem->new('/wherever/locks/mylock1.sem');
     my $sem2 = Sem->new('mylock2.sem', TIMEOUT);
 
-`TIMEOUT` number of seconds to wait while trying to acquire a lock
+`TIMEOUT` number of seconds to wait while trying to acquire a lock. Default = 60 seconds
 
 Alternate lock dirs: 
 

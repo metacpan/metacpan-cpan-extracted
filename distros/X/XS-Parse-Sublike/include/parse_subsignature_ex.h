@@ -16,6 +16,10 @@ enum {
   /* Permits ( $param :Attribute(Value) )  attributes on params
    * These must be registered by calling register_subsignature_attribute()
    */
+
+  PARSE_SUBSIGNATURE_REFALIAS = (1<<2),
+  /* Permits ( \$scalar, \@array, \%hash )  refalias parameters
+   */
 };
 
 #define boot_parse_subsignature_ex()  XPS_boot_parse_subsignature_ex(aTHX)

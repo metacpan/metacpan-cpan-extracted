@@ -39,7 +39,7 @@ use WebDyne::Request::PSGI::Constant;
 
 #  Version information
 #
-$VERSION='2.028';
+$VERSION='2.031';
 
 
 #  API file name cache
@@ -332,7 +332,8 @@ sub handler {
             my @api_fn;
             while (my $dn=shift @api_dn) {
                 push @api_fn, $dn;
-                my $api_fn=File::Spec->catfile($document_root, @api_fn) . '.psp';
+                #my $api_fn=File::Spec->catfile($document_root, @api_fn) . '.psp';
+                my $api_fn=File::Spec->catfile($document_root, @api_fn) . WEBDYNE_PSP_EXT;
                 debug("check $api_fn");
                 #  Check of outside docroot
                 last if (index($api_fn, $document_root) !=0);

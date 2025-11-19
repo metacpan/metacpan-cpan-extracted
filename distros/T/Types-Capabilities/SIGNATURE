@@ -1,0 +1,56 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 37f9dc02aaa09592f42a792f0c7e3ffc75f732441465ec8ed94798bdf11d2b8b COPYRIGHT
+SHA256 7977c02e031153dc91d6db9d2e803671d586e59bca2c5c3dc6211f29c04d92d6 CREDITS
+SHA256 9d925640ff02f06a204c4b7b9150bad34b4338c7ecb467a7b742f290361de2d1 Changes
+SHA256 374ca3f708de9d9363d8009d41b7e1d37c178f252f03c1ec2d7301b3725418d2 INSTALL
+SHA256 8e7094312357a5a73b44c1b87d32fca39e6d2f6c5a5504bcbcd0f0cf34b7c9cc LICENSE
+SHA256 a262b520ed2fc5c63c0e2993c523da5b8e4c7093397d7b930e390b10b4cfba1e MANIFEST
+SHA256 8b02b915115bcab58ee9778299d09ae765fba5fa97536b2679a2e80f92b1408d META.json
+SHA256 bc04c7e68503cbbeec957bade57fff3aad25dddd5da30fbe7ad277530dbe9ae0 META.yml
+SHA256 5ebc593df24a0f83162a5ce1287fb3942deae3a7bab994b197779839280438f8 Makefile.PL
+SHA256 93835a99bcb1250b439d780e4c36f9f39b1f5a8b5af64c8566984b08c210883f README
+SHA256 450c8ca63a5b4f3a9e6bf959982a879e05d11184cdced4bb1bf14bf9c41ff3d9 dist.ini
+SHA256 0ffaf7bf850051cc43e6f8460632447afed9c3a3fc867ff6c09304d0d3101dff doap.ttl
+SHA256 63b0f051e818c36ad7f7a6b691ecbaf493d6bdaac8047ba3616a80eedfa108f7 lib/Types/Capabilities.pm
+SHA256 bc075f3adf3cd086b86cbe9755a84bf83c4667229e9784e091e3092b08f1c827 lib/Types/Capabilities/CoercedValue/ARRAYREF.pm
+SHA256 ae8e340e69402c0516c348f3e71e7ac92114f7f988a56140e7ae9f0e86d71915 lib/Types/Capabilities/CoercedValue/QUEUE.pm
+SHA256 42401e2425d479f1e18dfd581f193897c39df98a90f7d9ebdc3aa02261bd9d08 lib/Types/Capabilities/CoercedValue/STACK.pm
+SHA256 5d9b017dbfa273eb4e9a00483d8874a7341a96be1b46033ae77f4ef2d3e23974 lib/Types/Capabilities/Constraint.pm
+SHA256 2da1cda4ad065d823df28c33f60086c29be9c1191b9c6dd404efdd10a94f611e t/00start.t
+SHA256 8fdd1f1b37e6256e325d1daaacb451c5809e742051a7d9ff059a28cdd3197df5 t/01basic.t
+SHA256 e2e8adaa775eb809770125bd8aa8f66ce22f2f83ccd2678b9b59970a1e0c40e6 t/integration/intercoercion.t
+SHA256 aabc651e0b8fd68b24631f936957b4a80276f82e4fe40ffc4f0851b5a573ca91 t/integration/simple-test.t
+SHA256 18786b85d13a9eb3951ee23bf295fc9176e4217699b0a5e0a368c353b4d85fc1 t/lib/Local/Example/Countable.pm
+SHA256 dcdcaf06770b7a9fd6497bbfecb66bc4a00a2770548ce8ef6c3468f923a30e19 t/lib/Local/Example/Dequeueable.pm
+SHA256 d7ec63ea4fa2655d3d09a7ee10154e498b29bb99065f9dd9948a359a63bf01cb t/lib/Local/Example/Eachable.pm
+SHA256 93c93fc8345ad68a885da79fdf83026f1878d7b4f975d09a609c32c9254e5a33 t/lib/Local/Example/Enqueueable.pm
+SHA256 419049aed9271b66cd7b67cf5f57e0f04733c162b4fe7c88eb39040d1c4bdf2d t/lib/Local/Example/Greppable.pm
+SHA256 48e0d6ab1f338ea6fff7fc0260a929b67e21b80bb0839cd169d49efbde531344 t/lib/Local/Example/Joinable.pm
+SHA256 5a95e5ea3aac2dd9f9e0ece96e2695d9689ebb63fa49ed1fd697b298c4294e32 t/lib/Local/Example/Mappable.pm
+SHA256 d0fa5df433143fbed4f3851dcd4d9887d3459e7d74113735b8945942f7a41085 t/lib/Local/Example/Peekable.pm
+SHA256 790091ee4213718c7a5a1398a2a63bfd1e52b201946c20bade629844a8f33d04 t/lib/Local/Example/Poppable.pm
+SHA256 ba5af719cef64ee3197ffc8b95d1f9ac725cb403a437c3d0fd29e158bc2b2584 t/lib/Local/Example/Pushable.pm
+SHA256 6576a185d626dbb782a5000feec29da5d24addb4aa3380084ac5ad6d7251e52a t/lib/Local/Example/Reversible.pm
+SHA256 7ffdc09da5a3e74c539d76f23f61d857421d2269af2b1d8b476764348d0b9e78 t/lib/Local/Example/Sortable.pm
+SHA256 75c154aa423b0282c8be843e21013edb6e110074637aeb8bc6398db027d96b43 t/unit/Types/Capabilities.t
+-----BEGIN PGP SIGNATURE-----
+
+iF0EAREDAB0WIQRVJKj/4+s6z4WzNujOv4Eoaip9OQUCaRhW5wAKCRDOv4Eoaip9
+OU0eAKCyPYzZidNuv2piOOj5BIZBOL39RwCgjHqNW/SF5+0zqGy68kMudOoC0dI=
+=hVxB
+-----END PGP SIGNATURE-----

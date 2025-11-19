@@ -36,6 +36,7 @@ t/04func-named-params.t
 t/05func-sig-attributes.t
 t/06func-conditional-default.t
 t/07func-lexical.t
+t/08func-refs.t
 t/10stages-permit.t
 t/11stages-pre_subparse.t
 t/12stages-post_blockstart.t

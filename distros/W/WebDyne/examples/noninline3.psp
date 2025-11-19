@@ -1,0 +1,23 @@
+<html>
+<head><title>Hello World</title></head>
+<body>
+
+<!-- The "Hello World" text will be rendered multiple times -->
+
+<perl method="hello">
+<p>
+Hello World 
+</perl>
+
+</body>
+</html>
+
+__PERL__
+
+sub hello {
+	
+	my $self=shift();
+	my @html;
+	for (0..3) { push @html, $self->render() };
+	return \@html;
+}

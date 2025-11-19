@@ -8,7 +8,7 @@ use utf8;
 use parent 'Class::Accessor';
 use List::Util qw(uniq);
 
-our $VERSION = '0.15';
+our $VERSION = '0.18';
 
 Travel::Status::DE::DBRIS::Formation::Group->mk_ro_accessors(
 	qw(designation name train_no train_type description desc_short destination has_sectors model series start_percent end_percent)
@@ -277,16 +277,16 @@ my %ice_name = (
 	9041 => 'Baden-Württemberg',
 	9046 => 'Female ICE',
 	9050 => 'Metropole Ruhr',
-    9201 => 'Hannover',
+	9201 => 'Hannover',
 	9202 => 'Schleswig-Holstein',
-    9203 => 'Stendal',
-    9205 => 'Biosphärengebiet Schwäbische Alb',
+	9203 => 'Stendal',
+	9205 => 'Biosphärengebiet Schwäbische Alb',
 	9208 => 'Nationalpark Bayrischer Wald',
 	9234 => 'Ruhr',
 	9237 => 'Spree',
 	9457 => 'Bundesrepublik Deutschland',
 	9481 => 'Rheinland-Pfalz',
-    9485 => 'Karriere-ICE',
+	9485 => 'Karriere-ICE',
 	9488 => 'Würzburg'
 );
 
@@ -295,8 +295,9 @@ my %ice_name = (
 # {{{ Rolling Stock Models
 
 my %model_name = (
-	'011'      => [ 'ICE T',        'ÖBB 4011' ],
-	'023'      => [ 'CFL KISS',     'CFL 2300' ],
+	'011'      => [ 'ICE T',    'ÖBB 4011' ],
+	'023'      => [ 'CFL KISS', 'CFL 2300' ],
+	'091'      => ['ICE L'],
 	'401'      => [ 'ICE 1',        'BR 401' ],
 	'402'      => [ 'ICE 2',        'BR 402' ],
 	'403.S1'   => [ 'ICE 3',        'BR 403, 1. Serie' ],
@@ -330,6 +331,7 @@ my %model_name = (
 	'612'      => [ 'RegioSwinger',        'BR 612' ],
 	'620'      => [ 'LINT 81',             'BR 620' ],
 	'622'      => [ 'LINT 54',             'BR 622' ],
+	'623'      => [ 'LINT 41',             'BR 623' ],
 	'631'      => [ 'Link I',              'BR 631' ],
 	'632'      => [ 'Link II',             'BR 632' ],
 	'633'      => [ 'Link III',            'BR 633' ],
@@ -433,6 +435,7 @@ sub parse_model {
 	my %ml = (
 		'011'      => 0,
 		'023'      => 0,
+		'091'      => 0,
 		'401'      => 0,
 		'402'      => 0,
 		'403.S1'   => 0,
@@ -465,6 +468,7 @@ sub parse_model {
 		'612'      => 0,
 		'620'      => 0,
 		'622'      => 0,
+		'623'      => 0,
 		'631'      => 0,
 		'632'      => 0,
 		'633'      => 0,
@@ -485,8 +489,15 @@ sub parse_model {
 			next;
 		}
 
-		if ( $carriage->model == 023 ) {
+		if ( $carriage->model == 23 ) {
 			$ml{'023'}++;
+		}
+		elsif ($carriage->model == 91
+			or $carriage->model == 491
+			or $carriage->model == 791
+			or $carriage->model == 891 )
+		{
+			$ml{'091'}++;
 		}
 		elsif ( $carriage->model == 401
 			or ( $carriage->model >= 801 and $carriage->model <= 804 ) )
@@ -601,6 +612,9 @@ sub parse_model {
 		}
 		elsif ( $carriage->model == 622 ) {
 			$ml{'622'}++;
+		}
+		elsif ( $carriage->model == 623 ) {
+			$ml{'623'}++;
 		}
 		elsif ( $carriage->model == 631 ) {
 			$ml{'631'}++;

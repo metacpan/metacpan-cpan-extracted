@@ -1,0 +1,17 @@
+<html>
+<head><title>Hello World</title></head>
+<body>
+<p>
+
+<!-- The perl method will be called, but "Hello World" will not be displayed ! -->
+
+<perl method="hello">
+Hello World 
+</perl>
+
+</body>
+</html>
+
+__PERL__
+
+sub hello { return localtime() }

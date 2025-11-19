@@ -145,7 +145,7 @@ Additionally, we also have "shift masks" (see below).
 
 =head4 Coordinates
 
-When we talk of coordinates, we mean a pair of a file and a rank, but
+When we talk about coordinates, we mean a pair of a file and a rank, but
 always as 0-based indexes. So the files "a" to "h" are indexed as
 0 ... 7, and the ranks "1" to "8" are indexed as 0 ... 7.
 

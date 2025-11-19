@@ -1,5 +1,19 @@
 # Change Log
 
+## [0.4.1] - 2025-11-15
+
+### Fixed
+
+- Uninitialised value error
+
+## [0.4.0] - 2025-11-15
+
+### Fixed
+
+- Bug in getting entry title
+- Format of code
+- Deduplication logic
+
 ## [0.3.1] - 2025-05-10
 
 ### Added

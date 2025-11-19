@@ -1,0 +1,141 @@
+# Basic setup
+severity = 2
+verbose = 8
+
+# Prohibit indirect syntax of "new", "create" and "destroy"
+# Should we add "connect" (DBI) as well?
+[Objects::ProhibitIndirectSyntax]
+severity = 4
+forbid = create destroy connect
+
+# We decide on a case-by-case basis what are considered complex regex
+[-RegularExpressions::ProhibitComplexRegexes]
+[-RegularExpressions::RequireExtendedFormatting]
+
+# PageCamel is a highly complex project. Splitting
+# everything into multiple subroutines just makes matters worse
+#[Subroutines::ProhibitExcessComplexity]
+#max_mccabe = 67
+[-Subroutines::ProhibitExcessComplexity]
+
+# When writing commercial applications, the default is somewhat conservative
+[Subroutines::ProhibitManyArgs]
+max_arguments = 8
+
+# There are a few cases where deep nests are the best alternative
+# from a basket of bad possibilities
+[ControlStructures::ProhibitDeepNests]
+max_nests = 9
+
+# RCS Keywords are outdated. They mess up patch-files (see "Updating 
+# FreeBSD from Source" as a prime example why NOT to use them these days)
+# and they are also discouraged by the mercurial team.
+# This has now been deprecated in Perl::Critic
+#[-Perl::Critic::Policy::Miscellanea::RequireRcsKeywords]
+
+# POD documentation has a rather low priority in this project. Set severety to the
+# lowest level
+[Perl::Critic::Policy::Documentation::RequirePodSections]
+severity = 1
+
+# This is a web project. HTTP status codes aren't undocumented "magic numbers", they are *very*
+# well defined in RFC2612. It just doesn't make sense to use them as named variables by default. In fact,
+# it might be much worse
+[-ValuesAndExpressions::ProhibitMagicNumbers]
+
+# I disagree with this policy. If you look into the examples given by
+# the manual of this very same policy, the regex are easy to read whereas
+# the alternatives are jumbled character soup.
+# Also performance is *not* an issue as long as you use /o
+#[-Perl::Critic::Policy::RegularExpressions::ProhibitFixedStringMatches]
+
+# I like perls matching behaviour just as it is, thank you very much
+[-Perl::Critic::Policy::RegularExpressions::RequireLineBoundaryMatching]
+[-RegularExpressions::RequireDotMatchAnything]
+
+# Whats that about Conway and his dislike of PostfixControls? Sure, you
+# have to be a bit carefull when and where to use them. But *i* like and use
+# them because there are instances they make the code more readable to *me*.
+# And since i seems to be the only one who actually does any work on this project,
+# i might as well use my own styleguide...
+[-ControlStructures::ProhibitPostfixControls]
+
+# "unless" in its block form is *really* bad. Bump it up to a more
+# reasonable error level
+[Perl::Critic::Policy::ControlStructures::ProhibitUnlessBlocks]
+severity = 4
+
+# What the...? q{} is more readable than '' for empty strings??? No, not in my world.
+[-ValuesAndExpressions::ProhibitEmptyQuotes]
+# The same goes for "noisy" quotes
+[-ValuesAndExpressions::ProhibitNoisyQuotes]
+
+#I like using package vars. The C++ OO model is bullsh*t in my eyes
+[-Variables::ProhibitPackageVars]
+
+# I like backticks
+[-InputOutput::ProhibitBacktickOperators]
+
+# Until the Smartmatch and given/when topics are resolved by the perl dev team, 
+# i'm not switching over all my code
+[ControlStructures::ProhibitCascadingIfElse]
+max_elsif = 20
+
+# Allow line breaks in strings. We use this quite a lot for SQL statements, because it makes
+# copy/paste to and from pgAdmin much less error prone
+[-ValuesAndExpressions::ProhibitImplicitNewlines]
+
+# C-Style for loops are much better than the ".." operator. Implicit variables are
+# an ugly, horrible idea and banned from this project for good reasons!
+[-ControlStructures::ProhibitCStyleForLoops]
+
+# I know that "fixed string matches" as regexp might be a tad slower. But sometimes they are much more readable than a bunch if string compares
+[-RegularExpressions::ProhibitFixedStringMatches]
+
+# I usually use qw[], but sometimes context is clearer (or safer in case of spaces) to actually write out the
+# list with quotes
+[-CodeLayout::ProhibitQuotedWordLists]
+
+# No. just no. This doesn't make sense in many cases
+[-Variables::RequireLocalizedPunctuationVars]
+
+# This was fixed in Perl 5.20, released in 2015. Don't complain, upgrade!
+[-Perl::Critic::Policy::Modules::RequireNoMatchVarsWithUseEnglish]
+
+# I only use those for REAPER functions
+[-Subroutines::ProhibitAmpersandSigils]
+
+# Allow subroutine prototypes
+[-Subroutines::ProhibitSubroutinePrototypes]
+
+# 5.36 doesn't need "use warnings"
+[-TestingAndDebugging::ProhibitNoWarnings]
+
+# We NEED to "use v5.36"
+[-ValuesAndExpressions::ProhibitVersionStrings]
+
+# For backward compatibility, we ignore that certain function names conflict with perl buildins
+[-Subroutines::ProhibitBuiltinHomonyms]
+
+# We handle eval "returns" a bit differently, usually by manually setting a status variable "$ok = 1" at the end of the eval block.
+[-ErrorHandling::RequireCheckingReturnValueOfEval]
+
+# Ignore the "useless use of no critic" for now
+[-Miscellanea::ProhibitUselessNoCritic]
+
+# Don't f*ck with my naming conventions
+[-NamingConventions::ProhibitAmbiguousNames]
+
+# Sometimes, a "brief open" is not possible
+[-InputOutput::RequireBriefOpen]
+
+# make unless() more flexible
+[-ControlStructures::ProhibitNegativeExpressionsInUnlessAndUntilConditions]
+
+# due to inheritance ("use base"), there MAY be private subs that are not used in that particular pm file
+[-Subroutines::ProhibitUnusedPrivateSubroutines]
+
+# Allow use of 'use constant' pragma for Constants.pm which has 200+ constants
+# This is standard Perl core functionality and converting to Readonly would be impractical
+[-ValuesAndExpressions::ProhibitConstantPragma]
+

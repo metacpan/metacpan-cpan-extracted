@@ -62,8 +62,6 @@
       },
       "test" : {
          "requires" : {
-            "App::Yath" : "0",
-            "English" : "0",
             "ExtUtils::Manifest" : "0",
             "File::Compare" : "0",
             "File::Path" : "0",
@@ -83,6 +81,6 @@
          "web" : "https://github.com/mattmartini/Dev-Util"
       }
    },
-   "version" : "v2.18.19",
+   "version" : "v2.19.6",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

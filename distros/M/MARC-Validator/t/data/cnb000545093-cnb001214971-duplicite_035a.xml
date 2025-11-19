@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<collection
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"
+  xmlns="http://www.loc.gov/MARC21/slim">
+
+<record>
+  <leader>     nam a22     1  4500</leader>
+  <controlfield tag="001">bk193002190</controlfield>
+  <controlfield tag="003">CZ PrNK</controlfield>
+  <controlfield tag="005">20210226072558.0</controlfield>
+  <controlfield tag="008">991217s1929    xr            ||| | cze</controlfield>
+  <datafield tag="015" ind1=" " ind2=" ">
+    <subfield code="a">cnb000545093</subfield>
+  </datafield>
+  <datafield tag="035" ind1=" " ind2=" ">
+    <subfield code="a">(OCoLC)51768478</subfield>
+  </datafield>
+  <datafield tag="040" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+    <subfield code="b">cze</subfield>
+    <subfield code="c">LIA001</subfield>
+    <subfield code="d">ABA001</subfield>
+  </datafield>
+  <datafield tag="100" ind1="1" ind2=" ">
+    <subfield code="a">Medek, Rudolf,</subfield>
+    <subfield code="d">1890-1940</subfield>
+    <subfield code="7">jk01081030</subfield>
+    <subfield code="4">aut</subfield>
+  </datafield>
+  <datafield tag="245" ind1="1" ind2="0">
+    <subfield code="a">Veliké dni :</subfield>
+    <subfield code="b">román z války /</subfield>
+    <subfield code="c">Rudolf Medek</subfield>
+  </datafield>
+  <datafield tag="250" ind1=" " ind2=" ">
+    <subfield code="a">10. vyd.</subfield>
+  </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="a">V Praze :</subfield>
+    <subfield code="b">Jos. R. Vilímek,</subfield>
+    <subfield code="c">1929</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">463, [I] s. ;</subfield>
+    <subfield code="c">8°</subfield>
+  </datafield>
+  <datafield tag="490" ind1="1" ind2=" ">
+    <subfield code="a">Legionářská epopeja ;</subfield>
+    <subfield code="v">sv. 2 (X. vyd.)</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Poctěno státní cenou</subfield>
+  </datafield>
+  <datafield tag="830" ind1=" " ind2="0">
+    <subfield code="a">Legionářská epopeja</subfield>
+  </datafield>
+  <datafield tag="998" ind1=" " ind2=" ">
+    <subfield code="a">http://aleph.nkp.cz/F/?func=direct&amp;doc_number=000545093&amp;local_base=CNB</subfield>
+  </datafield>
+</record>
+<record>
+  <leader>     nam a22     1  4500</leader>
+  <controlfield tag="001">bknzdr20462</controlfield>
+  <controlfield tag="003">CZ PrNK</controlfield>
+  <controlfield tag="005">20190729153538.0</controlfield>
+  <controlfield tag="008">030105s1929    xr     e      ||| 1 cze</controlfield>
+  <datafield tag="015" ind1=" " ind2=" ">
+    <subfield code="a">cnb001214971</subfield>
+  </datafield>
+  <datafield tag="035" ind1=" " ind2=" ">
+    <subfield code="a">(OCoLC)51768478</subfield>
+  </datafield>
+  <datafield tag="040" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+    <subfield code="b">cze</subfield>
+    <subfield code="c">ABA001</subfield>
+    <subfield code="d">ABA001</subfield>
+  </datafield>
+  <datafield tag="072" ind1=" " ind2="7">
+    <subfield code="a">821.162.3-3</subfield>
+    <subfield code="x">Česká próza</subfield>
+    <subfield code="2">Konspekt</subfield>
+    <subfield code="9">25</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">821.162.3-31</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">(0:82-31)</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="100" ind1="1" ind2=" ">
+    <subfield code="a">Medek, Rudolf,</subfield>
+    <subfield code="d">1890-1940</subfield>
+    <subfield code="7">jk01081030</subfield>
+    <subfield code="4">aut</subfield>
+  </datafield>
+  <datafield tag="245" ind1="1" ind2="0">
+    <subfield code="a">Veliké dni :</subfield>
+    <subfield code="b">Román z války /</subfield>
+    <subfield code="c">Rudolf Medek</subfield>
+  </datafield>
+  <datafield tag="250" ind1=" " ind2=" ">
+    <subfield code="a">11. vyd.</subfield>
+  </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="a">Praha :</subfield>
+    <subfield code="b">Jos. R. Vilímek,</subfield>
+    <subfield code="c">1929</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">463 s. ;</subfield>
+    <subfield code="c">8°</subfield>
+  </datafield>
+  <datafield tag="490" ind1="1" ind2=" ">
+    <subfield code="a">Legionářské epopeje</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="7">
+    <subfield code="a">české romány</subfield>
+    <subfield code="7">fd133974</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="830" ind1=" " ind2="0">
+    <subfield code="a">Legionářské epopeje</subfield>
+  </datafield>
+  <datafield tag="998" ind1=" " ind2=" ">
+    <subfield code="a">http://aleph.nkp.cz/F/?func=direct&amp;doc_number=001214971&amp;local_base=CNB</subfield>
+  </datafield>
+</record>
+
+</collection>

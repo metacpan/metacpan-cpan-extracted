@@ -1,5 +1,23 @@
 Revision history for Perl module JSON::Schema::Validate
 
+v0.4.1 2025-11-18T14:21:35+0900
+    [Bug Fixes]
+    - Corrected logic in register_builtin_formats() when helper modules such as
+      DateTime::Format::ISO8601 or Net::IDN::Encode are missing, ensuring
+      date-time and email / IDN-email formats are validated consistently
+      (thanks Slaven Rezić, GitLab #2).
+    - Dropped Regexp::Common as a dependency; the email format now uses a
+      precomputed RFC 5322-style regex, avoiding a runtime dependency.
+
+v0.4.0 2025-11-16T15:50:29+0900
+    - Added optional pruning support to JSON::Schema::Validate, as it is often required 
+      by REST APIs:
+      * New constructor option 'prune_unknown' to remove unknown object
+        properties from instances before validation, based on the schema’s
+        properties, patternProperties, additionalProperties and allOf keywords.
+      * New method 'prune_instance' returning a pruned copy of the given
+        instance without modifying the original data structure.
+
 v0.3.0 2025-11-11T09:20:18+0900
     [Error Object Improvements]
     - Error reporting overhaul:

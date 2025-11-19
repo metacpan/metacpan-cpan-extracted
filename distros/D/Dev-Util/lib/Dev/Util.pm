@@ -1,13 +1,12 @@
 package Dev::Util;
 
-use lib 'lib';
 use 5.018;
 use strict;
 use warnings;
 use version;
-use Carp;
+use Carp qw(carp);
 
-our $VERSION = version->declare("v2.18.19");
+our $VERSION = version->declare("v2.19.6");
 
 use Exporter   qw( );
 use List::Util qw( uniq );
@@ -57,18 +56,18 @@ Dev::Util - Base modules for Perl Development
 
 =head1 VERSION
 
-Version v2.18.19
+Version v2.19.6
 
 =head1 SYNOPSIS
 
 Dev::Util provides a loader for sub-modules where a leading :: denotes a package to load.
 
-    use Dev::Util qw( ::OS ::Utils );
+    use Dev::Util qw( ::OS ::File );
 
 This is equivalent to:
 
     user Dev::Util::OS    qw(:all);
-    user Dev::Util::Utils qw(:all);
+    user Dev::Util::File  qw(:all);
 
 =head1 SUBROUTINES/METHODS
 
@@ -93,11 +92,12 @@ L<Dev::Util::File>,
 L<Dev::Util::OS>,
 L<Dev::Util::Query>
 L<Dev::Util::Syntax>,
+L<Dev::Util::Sem>,
 
 
 =head1 AUTHOR
 
-Matt Martini,  C<< <matt at imaginarywave.com> >>
+Matt Martini, C<< <matt.martini at imaginarywave.com> >>
 
 =head1 BUGS
 

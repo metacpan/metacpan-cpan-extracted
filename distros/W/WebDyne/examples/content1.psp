@@ -1,0 +1,12 @@
+<html>
+<head><title>Content 1</title></head>
+
+<body>
+This is my super content !
+</body>
+
+</html>
+
+__PERL__
+
+use WebDyne::Template qw(template1.psp);

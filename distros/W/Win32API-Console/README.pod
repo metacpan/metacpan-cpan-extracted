@@ -1,0 +1,36 @@
+=head1 Win32API::Console
+
+=head2 INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+=head2 SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+	perldoc Win32API::Console
+
+You can also look for information at:
+
+	GitHub's issues tracker (please report bugs here!)
+		https://github.com/brickpool/Win32API-Console/issues
+
+	GitHub
+		https://github.com/brickpool/Win32API-Console
+
+	Search CPAN
+		https://metacpan.org/dist/Win32API-Console
+
+=head2 LICENSE AND COPYRIGHT
+
+	Copyright (c) 2025 by J. Schneider.
+
+The library files are licensed under MIT licence.
+
+For details, see the full text of the licenses in the file LICENSE.

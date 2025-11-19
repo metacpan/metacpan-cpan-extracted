@@ -1,0 +1,27 @@
+<api handler=uppercase pattern="/api/uppercase/{user}/:id"/>
+<api handler=doublecase pattern="/api/doublecase/{user}/:id"/>
+__PERL__
+sub uppercase {
+
+    my ($self, $match_hr)=@_;
+    my ($user, $id)=@{$match_hr}{qw(user id)};
+    my %data=(
+        user => uc($user),
+        id   => $id
+    );
+    return \%data
+    
+}
+
+sub doublecase {
+
+    my ($self, $match_hr)=@_;
+    my ($user, $id)=@{$match_hr}{qw(user id)};
+    my %data=(
+        user => join('_', uc($user), lc($user)),
+        id   => $id
+    );
+    return \%data
+    
+}
+

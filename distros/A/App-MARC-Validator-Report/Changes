@@ -1,2 +1,15 @@
+0.03 2025-11-14T17:22:34+01:00
+ - Add link to marc-validator tool.
+ - Add test for exit code in -l processing.
+ - Add test for report output.
+ - Add tests for errors in input structure.
+ - Fix error messages.
+ - Rewrite err usage to STDERR and exit 1.
+ - Sort parameters in report.
+
+0.02 2025-11-14T16:06:11+01:00
+ - Add ACKNOWLEDGEMENTS section to doc.
+ - Sort the output plugins.
+
 0.01 2025-07-02T22:09:03+02:00
  - First version.

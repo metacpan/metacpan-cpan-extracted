@@ -3,7 +3,7 @@ package Schedule::Activity::Attribute;
 use strict;
 use warnings;
 
-our $VERSION='0.2.0';
+our $VERSION='0.2.1';
 
 my %types=(
 	int=>{
@@ -135,7 +135,7 @@ sub _changeInt {
 	if($opt{_log})         { }
 	#
 	my $dt=($opt{tm}//$$self{tmmax})-$$self{tmmax};
-	if($dt==0) { $$self{avg}=$$self{tmsum}=undef; $self->average() }
+	if($dt==0) { $$self{avg}=$$self{tmsum}=undef; $self->log($$self{tmmax})->average() }
 	elsif(defined($$self{avg})) {
 		$$self{avg}=$$self{avg}*($$self{tmsum}/($$self{tmsum}+$dt))+0.5*($ya+$$self{value})*($dt/($$self{tmsum}+$dt));
 		$$self{tmsum}+=$dt;
@@ -153,7 +153,7 @@ sub _changeBool {
 	if($opt{_log})         { }
 	#
 	my $dt=($opt{tm}//$$self{tmmax})-$$self{tmmax};
-	if($dt==0) { $$self{avg}=$$self{tmsum}=undef; $self->average() }
+	if($dt==0) { $$self{avg}=$$self{tmsum}=undef; $self->log($$self{tmmax})->average() }
 	elsif(defined($$self{avg})) {
 		$$self{avg}=$$self{avg}*$$self{tmsum}/($$self{tmsum}+$dt)+$dt*$ya/($$self{tmsum}+$dt);
 		$$self{tmsum}+=$dt;

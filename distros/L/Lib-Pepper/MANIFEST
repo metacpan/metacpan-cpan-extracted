@@ -1,0 +1,47 @@
+.claude/settings.local.json
+Changes
+CLAUDE.md
+codingstyle.md
+data/logging/.placeholder
+data/README.md
+data/runtime/.placeholder
+devscripts/fixpragmas.pl
+devscripts/setversion.pl
+examples/check_terminal_connection.pl
+examples/config/pepper_config.xml
+examples/config/pepper_config.xml.example
+examples/README.md
+examples/simple_endofday.pl
+examples/simple_payment_example.pl
+lib/Lib/Pepper.pm
+lib/Lib/Pepper/Constants.pm
+lib/Lib/Pepper/Exception.pm
+lib/Lib/Pepper/Instance.pm
+lib/Lib/Pepper/OptionList.pm
+lib/Lib/Pepper/Simple.pm
+libpepcore.so
+libpepperc.so
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+pepper.h
+Pepper.xs
+pepperenums.h
+peppererrors.h
+peppertypes.h
+ppport.h
+README
+share/pepper_cardtypes.xml
+t/02-instance.t
+t/03-simple.t
+t/04-multi-terminal.t
+t/05-stress-test.t
+t/06-leak-detection.t
+t/10-pod.t
+t/11-podcoverage.t
+t/30-perlcritic.t
+t/Lib-Pepper.t
+t/perlcriticrc
+typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

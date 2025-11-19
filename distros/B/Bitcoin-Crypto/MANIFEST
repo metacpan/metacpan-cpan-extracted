@@ -13,6 +13,7 @@ ex/bip44_extpub.pl
 ex/bip85_mnemonic.pl
 ex/networks.pl
 ex/persistent_hd_wallet.pl
+ex/psbt_docs.pl
 ex/script_runner.pl
 ex/signature_generator.pl
 ex/tx/legacy.pl
@@ -71,6 +72,7 @@ lib/Bitcoin/Crypto/Transaction/ControlBlock.pm
 lib/Bitcoin/Crypto/Transaction/Digest.pm
 lib/Bitcoin/Crypto/Transaction/Digest/Config.pm
 lib/Bitcoin/Crypto/Transaction/Digest/Result.pm
+lib/Bitcoin/Crypto/Transaction/Flags.pm
 lib/Bitcoin/Crypto/Transaction/Input.pm
 lib/Bitcoin/Crypto/Transaction/Output.pm
 lib/Bitcoin/Crypto/Transaction/Sign.pm
@@ -128,6 +130,7 @@ t/Transaction/checksigadd.t
 t/Transaction/deterministic-signatures.t
 t/Transaction/digest.t
 t/Transaction/edge-cases.t
+t/Transaction/flags.t
 t/Transaction/locktime.t
 t/Transaction/sequence.t
 t/Transaction/sign.t

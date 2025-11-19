@@ -1,0 +1,8 @@
+<start_html>
+<p>
+<form>
+Your Name: <textfield name="name">
+<p>
+<submit>
+</form>
+<dump all force>

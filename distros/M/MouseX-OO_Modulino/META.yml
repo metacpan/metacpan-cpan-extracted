@@ -27,12 +27,13 @@ no_index:
 provides:
   MouseX::OO_Modulino:
     file: lib/MouseX/OO_Modulino.pm
-    version: '0.02'
+    version: '0.03'
   MouseX::OO_Modulino::MOP4Import:
     file: lib/MouseX/OO_Modulino/MOP4Import.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   File::AddInc: '0'
+  JSON: '0'
   JSON::MaybeXS: '0'
   Module::Runtime: '0'
   Mouse: '0'
@@ -41,6 +42,6 @@ resources:
   bugtracker: https://github.com/hkoba/perl-MouseX-OO_Modulino/issues
   homepage: https://github.com/hkoba/perl-MouseX-OO_Modulino
   repository: https://github.com/hkoba/perl-MouseX-OO_Modulino.git
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
 x_static_install: 1

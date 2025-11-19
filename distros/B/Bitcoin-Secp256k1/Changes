@@ -1,5 +1,12 @@
 Revision history for Bitcoin-Secp256k1
 
+0.010 - 2025-11-17
+	[New interface]
+	- Added recoverable signature support
+	- Added methods sign_message_recoverable, sign_digest_recoverable
+	- Added methods verify_message_recoverable, verify_digest_recoverable
+	- Added methods recover_public_key_message, recover_public_key_digest
+
 0.009 - 2025-11-09
 	- Removed a warning when verifying unnormalized signatures
 

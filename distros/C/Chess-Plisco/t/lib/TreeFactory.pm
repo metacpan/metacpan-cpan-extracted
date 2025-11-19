@@ -38,11 +38,11 @@ sub new {
 	my $info = $args{info} || sub {};
 	my $tt = $args{tt} || Chess::Plisco::Engine::TranspositionTable->new(16);
 	my $tree = Chess::Plisco::Engine::Tree->new(
-		$position->copy,
-		$tt,
-		$watcher,
-		$info,
-		\@signatures,
+		position => $position->copy,
+		tt => $tt,
+		watcher => $watcher,
+		info => $info,
+		signatures => \@signatures,
 	);
 
 	my $tc = Chess::Plisco::Engine::TimeControl->new($tree, %args);

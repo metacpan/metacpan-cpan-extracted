@@ -1,0 +1,48 @@
+<html>
+<head>
+<title>Caching</title>
+<!-- Set static and cache meta parameters -->
+<meta name="WebDyne" content="cache=&cache;static=1">
+</head>
+
+<body>
+<p>
+
+This page will update once every 10 seconds.
+
+<p>
+
+Hello World !{! localtime() !}
+
+</body>
+</html>
+
+__PERL__
+
+
+#  The following would work in place of the meta tags
+#
+#use WebDyne::Static;
+#use WebDyne::Cache (\&cache);
+
+
+sub cache {
+
+	my $self=shift();
+
+	#  Get cache file mtime (modified time)
+        #
+        my $mtime=${ $self->cache_mtime() };
+
+
+        #  If older than 10 seconds force recompile
+        #
+        if ((time()-$mtime) > 10) { 
+                $self->cache_compile(1) 
+        };
+
+	#  Done
+	#
+	return \undef;
+
+}

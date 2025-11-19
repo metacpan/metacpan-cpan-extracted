@@ -355,14 +355,14 @@ use Params::Validate::Strict qw(validate_strict);
     } qr/failed custom validation/, 'Odd number fails callback';
 }
 
-# Custom type with error_message
+# Custom type with error_msg
 {
     my $custom_types = {
         strong_password => {
             type => 'string',
             min => 8,
             matches => qr/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[\@$!%*?&])/,
-            error_message => 'Password must be at least 8 characters with uppercase, lowercase, number, and special character'
+            error_msg => 'Password must be at least 8 characters with uppercase, lowercase, number, and special character'
         }
     };
 

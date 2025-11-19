@@ -1,0 +1,23 @@
+<start_html title="Hello World" 
+    style="@{qw(https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Playfair+Display:wght@700&display=swap)}"
+    script="@{qw(https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js https://cdn.jsdelivr.net/npm/typed.js@2.1.0/dist/typed.umd.js)}"
+>
+<p>
+<h2 id="typed"></h2>
+<div data-aos="fade-up">I animate on load and scroll !</div>
+
+<script>
+  AOS.init({
+    duration: 1000,  // 1s animations
+    once: true       // animate only once
+  });
+</script>
+
+<script>
+  new Typed('#typed', {
+    strings: ["Lorem", "Ipsum", "!{! localtime !}"],
+    typeSpeed: 50,
+    backSpeed: 25,
+    loop: true
+  });
+</script>

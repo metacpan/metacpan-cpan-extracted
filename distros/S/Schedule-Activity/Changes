@@ -1,5 +1,10 @@
 Revision history for Schedule::Activity
 
+0.2.1 - 2025-11-16
+	- Incremental schedule construction
+	- Improved script for --help and --man
+	- Fixed average value recalculation when dt==0
+
 0.2.0 - 2025-11-08
 	- Schedule::Activity only provides the object interface
 	- Tutorial added

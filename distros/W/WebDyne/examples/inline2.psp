@@ -1,0 +1,11 @@
+<html>
+<head><title>Hello World</title></head>
+<body>
+<p>
+
+<!-- Very quick and dirty block of perl code -->
+
+Copyright (C) <perl>(localtime())[5]+1900</perl> Foobar Gherkin corp.
+
+</body>
+</html>

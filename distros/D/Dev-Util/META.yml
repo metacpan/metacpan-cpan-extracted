@@ -3,8 +3,6 @@ abstract: 'Base modules for Perl Development'
 author:
   - 'Matt Martini <matt@imaginarywave.com>'
 build_requires:
-  App::Yath: '0'
-  English: '0'
   ExtUtils::MakeMaker: '0'
   ExtUtils::Manifest: '0'
   File::Compare: '0'
@@ -56,5 +54,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/mattmartini/Dev-Util.git
-version: v2.18.19
+version: v2.19.6
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

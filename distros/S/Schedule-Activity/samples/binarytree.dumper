@@ -1,4 +1,4 @@
-@VAR1=(node=>{
+%VAR1=(node=>{
 	'root'=>{message=>'root',next=>[qw/A B/],finish=>'terminal',tmmin=>1,tmavg=>10,tmmax=>99},
 	'A'   =>{message=>'A',   next=>[qw/A-A A-B/],tmmin=>1,tmavg=>10,tmmax=>99},
 	'B'   =>{message=>'B',   next=>[qw/B-A B-B/],tmmin=>1,tmavg=>10,tmmax=>99},

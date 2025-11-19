@@ -1,5 +1,0 @@
-<start_html>
-Hello World
-__PERL__
-die('Bang !');
-1;

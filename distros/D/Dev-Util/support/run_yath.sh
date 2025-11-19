@@ -8,11 +8,19 @@ cleanup() {
   yath stop
 }
 
-yath start
+yath_args=''
+yath_start_args=''
 
-if [[ $# -eq 1 ]] && [[ "$1" == '--verbose' ]]; then
-  find lib t xt | entr yath run --verbose
-else
-  find lib t xt | entr yath run
-fi
+while [[ "$#" -gt 0 ]]; do
+  if [[ "$1" == '--verbose' ]]; then
+    yath_args+=' --verbose'
+  elif [[ "$1" == '--single' ]]; then
+    yath_start_args+=' --no-job-count --no-slots-per-job'
+  fi
+  shift
+done
+
+yath start $yath_start_args
+
+find lib t xt | entr yath run $yath_args
 

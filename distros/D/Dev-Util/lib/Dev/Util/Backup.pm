@@ -1,7 +1,5 @@
 package Dev::Util::Backup;
 
-use lib 'lib';
-
 use Dev::Util::Syntax;
 use Exporter qw(import);
 
@@ -12,7 +10,7 @@ use File::Find;
 use IO::File;
 use Archive::Tar;
 
-our $VERSION = version->declare("v2.18.19");
+our $VERSION = version->declare("v2.19.6");
 
 our @EXPORT_OK = qw(
     backup
@@ -218,11 +216,11 @@ sub _file_diff {
 
 =head1 NAME
 
-Dev::Util::Backup - backup functions
+Dev::Util::Backup - Simple backup functions for files and dirs
 
 =head1 VERSION
 
-Version v2.18.19
+Version v2.19.6
 
 =head1 SYNOPSIS
 

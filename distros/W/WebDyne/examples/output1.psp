@@ -1,0 +1,169 @@
+<start_html>
+<pre>
+<perl handler="handler1" />
+<perl handler="handler2" />
+<perl handler="handler3" />
+<perl handler="handler4" />
+<perl handler="handler5" />
+<perl handler="handler6" chomp />
+<perl handler="handler7" />
+<perl handler="handler8" />
+__PERL__
+
+#  Different ways of sending output to the browser
+#
+sub handler1 {
+
+    #  Simplest - just return a scalar variable
+    #
+    my $text='Hello World 1';
+    return $text;
+    
+}
+
+sub handler2 {
+
+    #  Scalar ref better because if var is empty (undef) won't trigger and error
+    #
+    my $text='Hello World 2';
+    return \$text;
+    
+}
+
+sub handler3 {
+
+    #  Returning an array ref is OK
+    #
+    my @text=('Hello', 'World', 3);
+    
+    
+    #  This won't work
+    #
+    #return @text
+
+    
+    #  Returning an array ref is OK - note it won't auto insert spaces though !
+    #
+    return \@text
+    
+}
+
+sub handler4 {
+
+    #  Print something also using the print statement
+    #
+    my $text='Hello World 4';
+    print $text;
+    print "\n";
+    
+    #  Printing a scalar ref is OK
+    #
+    print \$text;
+    
+}
+
+
+sub handler5 {
+
+    #  Print arrays
+    #
+    my @text=('Hello ', 'World ', 5);
+    print @text;
+    
+    
+    #  Print new line manually, or turn on autonewline -
+    #  see next example;
+    #
+    print "\n";
+    
+    #  Array refs are OK
+    #
+    print \@text;
+    
+    
+    #  Printing hash ref's won't work ! This will fail
+    #
+    # print { a=>1, b=>2 }
+    return \undef;
+    
+}
+
+sub handler6 {
+
+    #  You can print using a webdyne method handler
+    #
+    my $self=shift();
+    
+    
+    #  Text we want to print
+    #
+    my $text="Hello World 6\n";
+    my @text=('Hello ', 'World ', 6, "\n");
+    
+    
+    #  These all work
+    #
+    $self->print($text);
+    $self->print(\$text);
+    $self->print(@text);
+    $self->print(\@text);
+    return \undef;
+    
+}
+
+sub handler7 {
+
+    #  You can print using a webdyne method handler
+    #
+    my $self=shift();
+    
+    
+    #  Text we want to print
+    #
+    my $text="Hello World 7";
+    my @text=('Hello ', 'World ', 7);
+    
+    
+    #  Turn on autonew line to print "\n" at end of every call
+    #
+    $self->autonewline(1);
+    
+    
+    #  These work
+    #
+    $self->print($text);
+    $self->print(\$text);
+    
+    
+    #  These put a CR between every element in the array
+    $self->print(@text);
+    $self->print(\@text);
+    
+    
+    #  Turn off autonewline and return
+    #
+    $self->autonewline(0);
+    return \undef;
+    
+}
+
+sub handler8 {
+
+    #  The say() method is supported also
+    #
+    use feature 'say';
+    my $self=shift();
+    my $text='Hello World 8';
+    
+    
+    #  These will print, but won't send newline - say() won't send \n to TIEHANDLE
+    #
+    say($text);
+    say($text);
+    $self->print("\n");
+    
+    
+    #  Use this instead
+    #
+    $self->say($text, $text);
+}

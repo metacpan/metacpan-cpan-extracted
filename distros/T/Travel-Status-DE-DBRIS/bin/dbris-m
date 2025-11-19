@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.020;
 
-our $VERSION = '0.15';
+our $VERSION = '0.18';
 
 use utf8;
 use DateTime;
@@ -389,10 +389,20 @@ elsif ( $opt{journey} and not( $raw_json_output or $json_output ) ) {
 		}
 	}
 
-	printf( "%s %s am %s\n\n",
+	printf( "%s %s am %s\n",
 		$trip->type,
-		$trip->train_no // $trip->number,
+		$trip->line_no // join( q{ / }, $trip->trip_numbers ),
 		$trip->day->strftime('%d.%m.%Y') );
+
+	if ( $trip->operators ) {
+		printf( "Betrieb: %s\n", join( q{, }, $trip->operators ) );
+	}
+	say q{};
+
+	my $prev_trip_no;
+	if ( scalar $trip->trip_numbers > 1 ) {
+		$prev_trip_no = q{};
+	}
 
 	for my $stop ( $trip->route ) {
 		if ( $stop == $mark_stop ) {
@@ -421,11 +431,20 @@ elsif ( $opt{journey} and not( $raw_json_output or $json_output ) ) {
 		if ($max_occupancy) {
 			printf( "  %${max_occupancy}s", format_occupancy($stop) );
 		}
-		printf( "  %-${max_name}s  %${max_platform}s\n",
+		printf( "  %-${max_name}s  %${max_platform}s",
 			$stop->name, $stop->platform // q{} );
 		if ( $stop == $mark_stop ) {
 			print($output_reset);
 		}
+
+		if (    defined $prev_trip_no
+			and defined $stop->trip_no
+			and $stop->trip_no ne $prev_trip_no )
+		{
+			printf( '  (%s %s)', $trip->type, $stop->trip_no );
+			$prev_trip_no = $stop->trip_no;
+		}
+		print("\n");
 	}
 	if ( $trip->attributes ) {
 		say q{};
@@ -607,7 +626,7 @@ B<dbris-m> B<?>I<query>|I<lat>B<:>I<lon>
 
 =head1 VERSION
 
-version 0.15
+version 0.18
 
 =head1 DESCRIPTION
 

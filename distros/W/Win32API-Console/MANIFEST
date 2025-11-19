@@ -1,0 +1,27 @@
+Changes
+lib/Win32API/Console.pm
+lib/Win32API/Console.pod
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.pod
+t/01-load.t
+t/02-helper.t
+t/03-detect_unicode.t
+t/04-alloc_with_options.t
+t/05-xs-import.t
+t/06-struct.t
+t/07-basic.t
+t/08-font.t
+t/09-cursor.t
+t/10-fill.t
+t/11-screenbuffer.t
+t/12-displaymode.t
+t/13-ctrlhandler.t
+t/14-input.t
+t/15-output.t
+t/16-title.t
+t/17-buffer.t
+t/18-misc.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,17 @@
+Build.PL
+Changes
+LICENSE
+README.md
+cpanfile
+lib/Daje/Document/Builder.pm
+lib/Daje/Document/Builder/Html.pm
+lib/Daje/Document/Load/Template.pm
+lib/Daje/Document/Templates/Base.pm
+lib/Daje/Document/Templates/Mail_Login.pm
+minil.toml
+script/process.pl
+t/00_compile.t
+testbench/template.pl
+META.json
+META.yml
+MANIFEST

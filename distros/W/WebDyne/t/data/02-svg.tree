@@ -1,0 +1,7 @@
+<html> @0 (IMPLICIT)
+  <head> @0.0 (IMPLICIT)
+  <body> @0.1 (IMPLICIT)
+    <a @click.prevent="isOpen = !isOpen" class="cursor-pointer inline-flex items-center gap-1"> @0.1.0
+      "  "
+      <span> @0.1.0.1
+        "Source"

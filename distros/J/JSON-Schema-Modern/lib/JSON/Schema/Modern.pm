@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.621-5-g72428aae
+package JSON::Schema::Modern; # git description: v0.622-7-gee615857
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema using a JSON Schema
 # KEYWORDS: JSON Schema validator data validation structure specification
 
-our $VERSION = '0.622';
+our $VERSION = '0.623';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -414,7 +414,7 @@ sub evaluate ($self, $data, $schema_reference, $config_override = {}) {
       %$state,
       initial_schema_uri => $schema_info->{canonical_uri}, # the canonical URI as of the start of evaluation, or last $id or $ref
       $schema_info->%{qw(document specification_version vocabularies)},
-      dynamic_scope => [ $schema_info->{canonical_uri} ],
+      dynamic_scope => [ $schema_info->{canonical_uri}->clone->fragment(undef) ],
       annotations => [],
       seen => {},
       callbacks => $config_override->{callbacks} // {},
@@ -843,7 +843,10 @@ has _resource_index => (
     ]],
 );
 
-sub _get_resource { ($_[0]->{_resource_index}//{})->{$_[1]} }
+sub _get_resource {
+  die 'bad resource: ', $_[1] if $_[1] =~ /#/;
+  ($_[0]->{_resource_index}//{})->{$_[1]}
+}
 
 # does not check for duplicate entries, or for malformed uris
 sub _add_resources_unsafe {
@@ -1287,7 +1290,7 @@ JSON::Schema::Modern - Validate data against a schema using a JSON Schema
 
 =head1 VERSION
 
-version 0.622
+version 0.623
 
 =head1 SYNOPSIS
 

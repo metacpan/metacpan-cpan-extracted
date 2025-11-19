@@ -1,0 +1,68 @@
+<html>
+<head>
+<title>Variables</title>
+</head>
+<body>
+
+<!-- Environment variables -->
+
+<p>
+<!-- Short Way -->
+Mod Perl Version: *{MOD_PERL}
+<br>
+<!-- Same as Perl code -->
+Mod Perl Version: 
+<perl> \$ENV{'MOD_PERL'} </perl>
+
+
+<!-- Apache request record methods. Only methods that return a scalar result are usable -->
+
+<p>
+<!-- Short Way -->
+Request Protocol: ^{protocol}
+<br>
+<!-- Same as Perl code -->
+Request Protocol: 
+<perl> my $self=shift(); my $r=$self->r(); \$r->protocol() </perl>
+
+
+<!-- CGI params -->
+
+<form>
+Your Name:
+<p><textfield name="name" default="Test" size="12">
+<p><submit name="Submit">
+</form>
+<p>
+<!-- Short Way -->
+You Entered: +{name}
+<br>
+<!-- Same as Perl code -->
+You Entered: 
+<perl> my $self=shift(); my $cgi_or=$self->CGI(); \$cgi_or->param('name') </perl>
+<br>
+<!-- CGI vars are also loaded into the %_ global var, so the above is the same as -->
+You Entered: 
+<perl> $_{'name'} </perl>
+
+
+<!-- Arrays -->
+
+<form>
+<p>
+Favourite colour 1:
+<p><popup_menu name="popup_menu" values="@{qw(red green blue)}">
+
+
+<!-- Hashes -->
+
+<p>
+Favourite colour 2:
+<p><popup_menu name="popup_menu" 
+	values="%{red=>Red, green=>Green, blue=>Blue}">
+
+</form>
+
+</body>
+</html>
+

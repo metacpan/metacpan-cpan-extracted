@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<PepperConfig version="4" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <!--
+        Pepper Library Configuration for Examples
+
+        This configuration uses relative paths from the examples/ directory.
+        To use this configuration:
+        1. Copy this file to pepper_config.xml in the same directory
+        2. Adjust paths if needed for your environment
+        3. Ensure all directories exist before running examples
+    -->
+
+    <Logging>
+        <!-- Logging configuration -->
+        <Target>file</Target>
+        <Level>info</Level>
+        <MaxFileSizeInMB>5</MaxFileSizeInMB>
+        <UseSingleFile>true</UseSingleFile>
+        <Directory>./data/logging</Directory>
+        <Archive>
+            <Directory>./data/logging/archive</Directory>
+            <MaxAgeInDays>40</MaxAgeInDays>
+        </Archive>
+    </Logging>
+
+    <CardTypes>
+        <!-- Card types database - bundled with Lib::Pepper -->
+        <!-- This will be automatically configured by examples using Lib::Pepper->cardtypes_file() -->
+        <!-- For custom configs, use: <File>/path/to/installed/auto/Lib/Pepper/pepper_cardtypes.xml</File> -->
+        <File>CARDTYPES_AUTODETECT</File>
+    </CardTypes>
+
+    <Working>
+        <!-- Runtime working directory for database and temporary files -->
+        <Directory>./data/runtime</Directory>
+    </Working>
+
+    <!--
+        Note: License can be provided via XML string in code (as shown in examples)
+        or specified here with <License><File>path/to/license.xml</File></License>
+    -->
+</PepperConfig>

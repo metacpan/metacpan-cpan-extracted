@@ -39,7 +39,7 @@ use WebDyne::Util;
 
 #  Version information
 #
-$VERSION='2.028';
+$VERSION='2.031';
 
 
 #  Debug load
@@ -85,7 +85,7 @@ sub new {
     #  to make it work
     #
     my ($class, @opt)=@_;
-    my %opt=ref($opt[0] eq 'HASH') ? %{$opt[0]} : @opt;
+    my %opt=(ref($opt[0]) eq 'HASH') ? %{$opt[0]} : @opt;
     debug("$class, opt: %s", Dumper(\%opt));
 
 
@@ -728,14 +728,19 @@ sub optimise_one {
                 debug("about to call $html_tag with attr_hr:%s, data_child: %s", Dumper($attr_hr, \@data_child));
                 my $html=eval {
                     $attr_hr=undef unless keys %{$attr_hr};
-                    $html_tiny_or->$html_tag(grep {$_} $attr_hr, join(undef, @data_child))
+                    if ($html_tiny_or->can($html_tag)) {
+                        $html_tiny_or->$html_tag(grep {$_} $attr_hr, join(undef, @data_child))
+                    }
+                    else {
+                        $html_tiny_or->tag($html_tag, grep {$_} $attr_hr, join(undef, @data_child))
+                    }
 
                     #  Older attempts
                     #
                     #$html_tiny_or->$html_tag(grep {$_} $attr_hr || {}, join(undef, @data_child))
                     #$html_tiny_or->$html_tag($attr_hr || {}, join(undef, grep {$_} @data_child))
-                } ||
-
+                } || 
+                    
                     #  Use errsubst as CGI may have DIEd during eval and be caught by WebDyne SIG handler
                     return errsubst(
                     "CGI tag '<$html_tag>': %s",
@@ -1016,10 +1021,9 @@ sub optimise_two {
             #  Now render to make HTML and modify the data arrat above us with the rendered code
             #
             debug("compile_cr: if 2");
-            my $html_sr=$self->render(
-                {
-                    data => [$data_ar],
-                }) || return err();
+            my $html_sr=$self->render_data_ar(
+                data => [$data_ar],
+            ) || return err();
             my @data_child_ar=$data_uppr_ar->[WEBDYNE_NODE_CHLD_IX]
                 ?
                 @{$data_uppr_ar->[WEBDYNE_NODE_CHLD_IX]}

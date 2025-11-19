@@ -4,7 +4,7 @@ Params::Validate::Strict - Validates a set of parameters against a schema
 
 # VERSION
 
-Version 0.23
+Version 0.24
 
 # SYNOPSIS
 
@@ -59,17 +59,37 @@ Validates a set of parameters against a schema.
 
 This function takes two mandatory arguments:
 
-- `schema`
+- `schema` || `members`
 
     A reference to a hash that defines the validation rules for each parameter.
     The keys of the hash are the parameter names, and the values are either a string representing the parameter type or a reference to a hash containing more detailed rules.
+
+    For some sort of compatibility with [Data::Processor](https://metacpan.org/pod/Data%3A%3AProcessor),
+    it is possible to wrap the schema within a hash like this:
+
+        $schema = {
+          description => 'Describe what this schema does',
+          error_msg => 'An error message',
+          schema => {
+            # ... schema goes here
+          }
+        }
 
 - `args` || `input`
 
     A reference to a hash containing the parameters to be validated.
     The keys of the hash are the parameter names, and the values are the parameter values.
 
-It takes three optional arguments:
+It takes optional arguments:
+
+- `description`
+
+    What the schema does,
+    used in error messages.
+
+- `error_msg`
+
+    Overrides the default message when something doesn't validate.
 
 - `unknown_parameter_handler`
 
@@ -93,7 +113,7 @@ It takes three optional arguments:
           email => {
             type => 'string',
             matches => qr/^[\w\.\-]+@[\w\.\-]+\.\w+$/,
-            error_message => 'Invalid email address format'
+            error_msg => 'Invalid email address format'
           }, phone => {
             type => 'string',
             matches => qr/^\+?[1-9]\d{1,14}$/,
@@ -313,6 +333,10 @@ The schema can define the following rules for each parameter:
     If this is set for all arguments,
     `validate_strict` will return a reference to an array, rather than a reference to a hash.
 
+- `description`
+
+    The description of the rule
+
 - `callback`
 
     A code reference to a subroutine that performs custom validation logic.
@@ -346,14 +370,14 @@ The schema can define the following rules for each parameter:
           max => 5
         }
 
-- `error_message`
+- `error_msg`
 
     The custom error message to be used in the event of a validation failure.
 
         age => {
           type => 'integer',
           min => 18,
-          error_message => 'You must be at least 18 years old'
+          error_msg => 'You must be at least 18 years old'
         }
 
 - `schema`
@@ -524,6 +548,10 @@ The schema can define the following rules for each parameter:
           }
         }
 
+- `validator`
+
+    A synonym of Cvalidate>, for compatibility with [Data::Processor](https://metacpan.org/pod/Data%3A%3AProcessor).
+
 - `cross_validation`
 
     A reference to a hash that defines validation rules that depend on more than one parameter.
@@ -664,7 +692,7 @@ If the validation is successful, the function will return a reference to a new h
 
     # New style
     validate_strict(
-        schema => {
+        schema => {     # or "members"
             name => 'string',
             age => { type => 'integer', min => 0 }
         },
@@ -737,12 +765,43 @@ Nigel Horne, `<njh at nigelhorne.com>`
 
     type_matches: VALUE × ValidationRule → 𝔹
 
+# EXAMPLE
+
+    use Params::Get;
+    use Params::Validate::Strict;
+
+    sub where_am_i
+    {
+        my $params = Params::Validate::Strict::validate_strict({
+            args => Params::Get::get_params(undef, \@_),
+            description => 'Print a string of latitude and longitude',
+            error_msg => 'Latitude is a number between +/- 90, longitude is a number between +/- 180',
+            members => {
+                'latitude' => {
+                    type => 'number',
+                    min => -90,
+                    max => 90
+                }, 'longitude' => {
+                    type => 'number',
+                    min => -180,
+                    max => 180
+                }
+            }
+        });
+
+        print 'You are at ', $params->{'latitude'}, ', ', $params->{'longitude'}, "\n";
+    }
+
+    where_am_i({ latitude => 3.14, longitude => -155 });
+
 # BUGS
 
 # SEE ALSO
 
 - Test coverage report: [https://nigelhorne.github.io/Params-Validate-Strict/coverage/](https://nigelhorne.github.io/Params-Validate-Strict/coverage/)
+- [Data::Processor](https://metacpan.org/pod/Data%3A%3AProcessor)
 - [Params::Get](https://metacpan.org/pod/Params%3A%3AGet)
+- [Params::Smart](https://metacpan.org/pod/Params%3A%3ASmart)
 - [Params::Validate](https://metacpan.org/pod/Params%3A%3AValidate)
 - [Return::Set](https://metacpan.org/pod/Return%3A%3ASet)
 - [App::Test::Generator](https://metacpan.org/pod/App%3A%3ATest%3A%3AGenerator)

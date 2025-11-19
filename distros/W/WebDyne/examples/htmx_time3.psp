@@ -1,0 +1,2 @@
+<htmx display="+{time_local}"> Time Local: <? localtime() ?></htmx>
+<htmx display="+{time_utc}"> Time UTC: <? gmtime() ?></htmx>

@@ -1,0 +1,10 @@
+<start_html>
+
+Session ID: !{! shift()->session_id() !}
+
+<end_html>
+
+__PERL__
+
+use WebDyne::Session;
+1;

@@ -26,6 +26,20 @@ subtest 'Basic validation' => sub {
 		is($result->{age}, 30, 'Integer coerced');
 		is(ref($result->{age}), '', 'Age is now a true integer');
 	} 'Basic validation succeeds';
+
+	lives_ok {
+		my $result = validate_strict(members => $schema, 'description' => 'Basic test', args => $args);
+		is($result->{name}, 'John', 'String value preserved');
+		is($result->{age}, 30, 'Integer coerced');
+		is(ref($result->{age}), '', 'Age is now a true integer');
+	} 'Members is a synonym of schema';
+
+	lives_ok {
+		my $result = validate_strict(schema => { members => $schema, 'description' => 'Basic test' }, args => $args);
+		is($result->{name}, 'John', 'String value preserved');
+		is($result->{age}, 30, 'Integer coerced');
+		is(ref($result->{age}), '', 'Age is now a true integer');
+	} 'Hybrid model works';
 };
 
 # Test type coercion edge cases

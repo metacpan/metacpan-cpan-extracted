@@ -30,7 +30,7 @@ sub run_case
     my( $format, $value, $ok ) = @_;
     my $js = JSON::Schema::Validate->new( $fmt->( $format ) )->register_builtin_formats;
     my $got = $js->validate({ v => $value });
-    ok( $ok ? $got : !$got, "$format: ".($ok?'OK':'FAIL')." - $value" )
+    ok( $ok ? $got : !$got, "$format: " . ( $ok ? 'OK':'FAIL' ) . " - $value" )
         or diag( $js->error );
 }
 

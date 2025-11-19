@@ -1,0 +1,48 @@
+<start_html title="JSON Chart Example" script="https://cdn.jsdelivr.net/npm/chart.js">
+<p>
+Sales Data:
+<json id=chart-data handler="chart_data"/>
+
+<!-- Canvas for the chart -->
+<canvas id="myChart" width="400" height="200"></canvas>
+
+<script>
+  // Get JSON data from script tag
+  const jsonData = JSON.parse(document.getElementById("chart-data").textContent);
+
+  // Draw chart
+  new Chart(document.getElementById("myChart"), {
+    type: "bar", // change to "line" for a line chart
+    data: jsonData,
+    options: {
+      responsive: true,
+      scales: {
+        y: { beginAtZero: true }
+      }
+    }
+  });
+</script>
+
+__PERL__
+
+sub chart_data {
+    
+    my $self=shift();
+    my %sales=(
+        Jan => 10,
+        Feb => 20,
+        Mar => 15,
+        Apr => 30,
+        May => 25
+    );
+    my %json=(
+        labels    => [keys %sales],
+        datasets  => [{
+            label => 'Sales',
+            data => [values %sales]
+        }]
+    );
+    return \%json;
+    
+}
+    

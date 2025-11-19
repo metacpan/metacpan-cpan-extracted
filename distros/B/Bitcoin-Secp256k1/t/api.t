@@ -117,5 +117,83 @@ subtest 'should combine' => sub {
 	is $secp->combine_public_keys($t{pubkey}, @to_combine), $combined_pubkey, 'combined pubkey ok';
 };
 
+subtest 'should sign and verify a message (recoverable)' => sub {
+	my $rec_sig = $secp->sign_message_recoverable($t{privkey}, $t{preimage});
+	ok defined($rec_sig), 'recoverable message signed ok';
+
+	ok defined($rec_sig->{signature}), 'compact signature extracted ok';
+	ok defined($rec_sig->{recovery_id}), 'recovery id extracted ok';
+	is length($rec_sig->{signature}), 64, 'compact signature length ok';
+	ok $rec_sig->{recovery_id} >= 0 && $rec_sig->{recovery_id} <= 3, 'recovery id range ok';
+
+	# Test recovery
+	my $recovered_pubkey = $secp->recover_public_key_message($rec_sig, $t{preimage});
+	is $recovered_pubkey, $t{pubkey}, 'public key recovered from message ok';
+
+	# Test verification methods
+	ok $secp->verify_message_recoverable($t{pubkey}, $rec_sig, $t{preimage}), 'recoverable message verified ok';
+
+	# Test with wrong pubkey should fail
+	my $wrong_pubkey = pack 'H*', '025476c2e83188368da1ff3e292e7acafcdb3566bb0ad253f62fc70f07aeee6358';
+	ok !$secp->verify_message_recoverable($wrong_pubkey, $rec_sig, $t{preimage}),
+		'wrong pubkey verification fails ok';
+};
+
+subtest 'should sign and verify a digest (recoverable)' => sub {
+	my $digest = sha256(sha256($t{preimage}));
+	my $rec_sig = $secp->sign_digest_recoverable($t{privkey}, $digest);
+	ok defined($rec_sig), 'recoverable digest signed ok';
+
+	# Test recovery
+	my $recovered_pubkey = $secp->recover_public_key_digest($rec_sig, $digest);
+	is $recovered_pubkey, $t{pubkey}, 'public key recovered from digest ok';
+
+	# Test verification
+	ok $secp->verify_digest_recoverable($t{pubkey}, $rec_sig, $digest), 'recoverable digest verified ok';
+
+	# Test with bad digest should fail
+	my $bad_digest = $digest;
+	substr($bad_digest, 0, 1) = "\xff";
+	ok !$secp->verify_digest_recoverable($t{pubkey}, $rec_sig, $bad_digest),
+		'wrong digest verification fails ok';
+};
+
+# https://ethereum.github.io/yellowpaper/paper.pdf
+# Appendix F. Signing Transactions
+subtest 'ethereum yellowpaper specification' => sub {
+	my @test_cases = (
+		{
+			name => 'pk1 recoverable case',
+			privkey => pack('H*', '0000000000000000000000000000000000000000000000000000000000000001'),
+			message => pack('H*', '0000000000000000000000000000000000000000000000000000000000000001'),
+		},
+		{
+			name => 'pk2 recoverable case',
+			privkey => pack('H*', '4646464646464646464646464646464646464646464646464646464646464646'),
+			message => pack('H*', '9c22ff5f21f0b81b113e63f7db6da94fedef11b2119b4088b89664fb9a3cb658'),
+		},
+	);
+
+	for my $case (@test_cases) {
+		subtest $case->{name} => sub {
+			my $rec_sig = $secp->sign_digest_recoverable($case->{privkey}, $case->{message});
+
+			# Yellowpaper constraint: v ∈ {0, 1}
+			my $v = $rec_sig->{recovery_id};
+			ok $v >= 0 && $v <= 1, 'v in valid range [0,1]';
+
+			# Test recovery
+			my $recovered_pubkey = $secp->recover_public_key_digest($rec_sig, $case->{message});
+			my $original_pubkey = $secp->create_public_key($case->{privkey});
+			is $recovered_pubkey, $original_pubkey, 'recovery matches original';
+
+			# Test message-level recovery
+			my $rec_sig_msg = $secp->sign_message_recoverable($case->{privkey}, $case->{message});
+			my $recovered_pubkey_msg = $secp->recover_public_key_message($rec_sig_msg, $case->{message});
+			is $recovered_pubkey_msg, $original_pubkey, 'message recovery matches original';
+		};
+	}
+};
+
 done_testing;
 

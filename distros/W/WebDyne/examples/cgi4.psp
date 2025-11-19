@@ -1,0 +1,65 @@
+<html>
+<head><title>Hello World</title></head>
+<body>
+<p>
+<form>
+Enter your name:
+<p><textfield name="name">
+<p><submit>
+</form>
+
+<!-- Use the %_ global var, other options below -->
+<p>
+Hello <? uc($_{'name'} || 'Anonymous') ?>, pleased to meet you.
+
+
+<!-- Quick and dirty, no perl code at all -->
+
+<p>
+Hello +{name}, pleased to meet you.
+
+
+<!-- Traditional, using the CGI::Simple param() call in the hello1 sub -->
+
+<p>
+<perl method="hello1">
+Hello ${name}, pleased to meet you.
+</perl>
+
+
+<!-- Quicker method using %_ global var in the hello2 sub -->
+
+<p>
+<perl method="hello2">
+Hello ${name}, pleased to meet you.
+</perl>
+
+
+<!-- Quick and dirty using inline Perl. Note use of \ to prevent error if param empty -->
+
+<p>
+Hello !{! \$_{name} !}, pleased to meet you.
+
+</body>
+</html>
+
+
+__PERL__
+
+sub hello1 { 
+	my $self=shift();
+	my $cgi_or=$self->CGI();
+	my $name=$cgi_or->param('name');
+	$self->render( name=>$name);
+}
+
+sub hello2 { 
+
+	my $self=shift();
+	
+	#  Quicker method of getting name param
+	#
+	my $name=$_{'name'};
+	$self->render( name=>$name);
+}
+

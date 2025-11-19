@@ -4,7 +4,7 @@
       "Jan Eskilsson"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.25, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Minilla/v3.1.28, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -43,7 +43,8 @@
       "runtime" : {
          "requires" : {
             "Mojo::Base" : "0",
-            "Mojo::Loader" : "0"
+            "Mojo::Loader" : "0",
+            "perl" : "v5.42.0"
          }
       },
       "test" : {
@@ -55,7 +56,7 @@
    "provides" : {
       "Daje::Tools::Datasections" : {
          "file" : "lib/Daje/Tools/Datasections.pm",
-         "version" : "0.11"
+         "version" : "1.00"
       }
    },
    "release_status" : "stable",
@@ -70,7 +71,7 @@
          "web" : "https://github.com/janeskil1525/Daje-Tools-Datasections"
       }
    },
-   "version" : "0.11",
+   "version" : "1.00",
    "x_contributors" : [
       "janeskil1525 <janeskil1525@gmail.com>"
    ],

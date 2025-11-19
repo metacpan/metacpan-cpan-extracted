@@ -1,0 +1,13 @@
+Syntax-Keyword-Wielding
+=======================
+
+Created:      2025-11-15
+Home page:    <https://metacpan.org/release/Syntax-Keyword-Wielding>
+Bug tracker:  <https://github.com/tobyink/p5-syntax-keyword-wielding/issues>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.001001	2025-11-15
+
+ - Minor documentation improvements.
+
+0.001000	2025-11-15	Initial release

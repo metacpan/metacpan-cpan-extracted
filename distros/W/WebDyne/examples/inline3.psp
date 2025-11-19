@@ -1,0 +1,15 @@
+<html>
+<head><title>Hello World</title></head>
+<body>
+
+<!-- Same code with alternative denotation -->
+
+The time is: !{! localtime() !}
+
+<p>
+
+The time is:  <? localtime() ?>
+
+
+</body>
+</html>

@@ -1,21 +1,20 @@
-"Schedule::Activity" Version 0.2.0
+"Schedule::Activity" Version 0.2.1
 
 Abstract:
 ---------
 This package provides a mechanism to construct "random" schedules of events using a graph-based configuration of activities and actions.  Action scheduling allows cycles/recursion to meet activity schedule goals.
+
+What's new in version 0.2.1:
+--------------------------
+* Incremental schedule construction
+* Fixed average value recalculations
+* Better script documentation
 
 What's new in version 0.2.0:
 --------------------------
 * Schedule::Activity only provides the object interface
 * Tutorial added
 * References to named messages are checked
-
-What's new in version 0.1.9:
---------------------------
-* Attributes are no longer "fixed" at activity boundaries, only at the start/end of schedule.
-* Tension algorithm uses mathematically-proven distribution.
-* schedule-activity.pl supports annotations
-* buildSchedule will be deprecated in 0.2.0.
 
 Copyright & License:
 --------------------

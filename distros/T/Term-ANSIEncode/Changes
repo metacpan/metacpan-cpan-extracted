@@ -189,3 +189,7 @@
         Added "ansi-modes" option to show supported ANSI color support.
 
 		Changed version handling
+
+1.46    Nov 14, 2025
+
+        Color option fix

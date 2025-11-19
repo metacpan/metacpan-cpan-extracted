@@ -1,4 +1,13 @@
 Revision history for Net-IMAP-Client
+
+0.9511  Nov 18, 2025
+         - update to Changes file omitted in previous patch
+
+0.9510  Nov 18, 2025
+         - Add colon only to atom regex (fixes RT#169466)
+           (thanks to Martin Samuelsson for bug report and patch)
+
+
 0.9509  Nov 13, 2025
          - revert previous, overambitious patch
 

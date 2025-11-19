@@ -22,7 +22,7 @@ SV* return_secret_via_api(SV *password) {
 
    HV *secretbuffer_api = get_hv("Crypt::SecretBuffer::C_API", 0);
    if (secretbuffer_api) { /* only becomes true after 'use Crypt::SecretBuffer;' */
-     SV **svp = hv_fetch(secretbuffer_api, "secret_buffer_from_magic", 24, 0);
+     SV **svp = hv_fetchs(secretbuffer_api, "secret_buffer_from_magic", 0);
      sb_from_magic_t *sb_from_magic= svp && *svp? (sb_from_magic_t*) SvIV(*svp) : NULL;
      secret_buffer *buf;
      if (sb_from_magic && (buf= sb_from_magic(password, 0))) {

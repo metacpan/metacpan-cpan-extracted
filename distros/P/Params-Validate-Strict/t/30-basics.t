@@ -165,7 +165,7 @@ subtest 'Invalid Inputs' => sub {
 	} qr/must be an integer/, 'Fails validation for non-scalar';
 
 	throws_ok {
-		validate_strict(args => $args12, schema => { number => { type => 'integer', error_message => 'xyzzy' } });
+		validate_strict(args => $args12, schema => { number => { type => 'integer', error_msg => 'xyzzy' } });
 	} qr/xyzzy/, 'Permeats error message correctly';
 
 	my $args13 = { number => 997 };
@@ -176,10 +176,10 @@ subtest 'Invalid Inputs' => sub {
 		validate_strict(args => $args13, schema => $schema, unknown_parameter_handler => 'die')
 	} qr/must be one of/, 'memberof detects when a number is not in the list';
 
-	$schema->{'number'}->{'error_message'} = 'Number not in list';
+	$schema->{'number'}->{'error_msg'} = 'Number not in list';
 	throws_ok {
 		validate_strict(args => $args13, schema => $schema, unknown_parameter_handler => 'die')
-	} qr/Number not in list/, 'memberof sends correct error_message';
+	} qr/Number not in list/, 'memberof sends correct error_msg';
 
 	$schema = {
 		'number' => { 'type' => 'integer', 'min' => 1000, 'max' => 995 }

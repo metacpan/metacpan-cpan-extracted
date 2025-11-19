@@ -144,8 +144,8 @@ my @tests = (
 );
 
 foreach my $test (@tests) {
-	my $pos = Chess::Plisco->new($test->{before});
-	my $move = $pos->parseMove($test->{move});
+	my $pos = Chess::Plisco->new($test->{before}, 1);
+	my $move = $pos->parseMove($test->{move}, 1);
 	ok $move, "$test->{name}: parse $test->{move}";
 
 	my $copy = $pos->copy;

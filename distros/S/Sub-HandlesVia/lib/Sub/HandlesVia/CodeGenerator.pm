@@ -5,7 +5,7 @@ use warnings;
 package Sub::HandlesVia::CodeGenerator;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.050006';
+our $VERSION   = '0.050007';
 
 use Sub::HandlesVia::Mite -all;
 

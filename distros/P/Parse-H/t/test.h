@@ -13,8 +13,9 @@ extern short var21;
 extern signed short var22;
 extern unsigned short var23;
 
-extern int var31;
-extern signed int var32;
+/* var31 is volatile */
+extern volatile int var31;
+extern signed int var32; /* var32 is not volatile */
 extern unsigned int var33;
 
 extern long int var41;
@@ -27,6 +28,12 @@ extern unsigned long long int var53;
 
 extern unsigned long long int
 	var61;
+
+extern float var71f;
+extern double var71d;
+extern long double var71ld;
+
+extern char**** var_multi_p_extrn;
 
 extern char f1(int a);
 extern short f2(int a);
@@ -42,11 +49,15 @@ extern __attribute__((noreturn)) char f6a(int a);
 
 /* forward structure declaration */
 struct s_forward;
+struct s_forward_with_comment; /* forward */
+struct s_forward2_with_comment; // forward2
 struct {};
+struct {}; /* invalid struct comment */
+struct {}; // invalid struct comment 2
 struct {
 
 };
-struct empty_sameline {};
+struct empty_sameline {}; /* empty struct comment */
 
 // a simple structure with a C++-style comment
 struct s1 // comment on s1
@@ -59,10 +70,12 @@ struct s1 // comment on s1
 	signed short var22;
 	unsigned short var23;
 
-	int var31;
-	signed int var32;
+	/* var31 in struct is volatile */
+	volatile int var31;
+	signed int var32; /* var32 in struct is not volatile */
 	unsigned int var33;
 
+	// comment before var41
 	long int var41;
 	signed long int var42;
 	unsigned long int var43;
@@ -75,6 +88,8 @@ struct s1 // comment on s1
 	float var61;
 	double var62;
 	long double var63;
+
+	uint128_t var128_s;
 
 	struct array_struct as1;
 	struct
@@ -133,6 +148,8 @@ struct array_struct /* comment on array_struct */
 	double var62[16];
 	long double var63[17];
 
+	uint128_t var128_sa[18];
+
 	struct s1 arr_s1[1];
 	union u1 field_u1_arr[2];
 
@@ -166,6 +183,8 @@ struct array_struct_name_size
 	double var62[COUNT];
 	long double var63[COUNT];
 
+	uint128_t var128_sa_name[COUNT];
+
 	struct s1 arr_s1[COUNT];
 	union u1 field_u1_arr[COUNT];
 };
@@ -196,6 +215,10 @@ struct point_struc
 	double* var62p;
 	long double *var63p;
 
+	uint128_t * var128_sp;
+
+	char**** var_multi_p_struct;
+
 	char (*f1)(int a);
 	short (*f2)(int a); /* function pointer comment */
 	int (*f3)(int a);
@@ -211,6 +234,8 @@ struct multi_struct
 	long mvar3l[5], mvar4l[6]; /* long comment */
 	short mvar1s,
 		mvar2s, mvar3s;
+	int mvar1i,\
+		mvar2i, mvar3i;
 	float mvar1f, /* float comment */
 		mvar2f, mvar3f;
 };
@@ -241,6 +266,8 @@ struct point_multi_struc
 	double* var62p, var62p2;
 	long double *var63p, var63p2;
 
+	uint128_t * var128_sm1, var128_sm2;
+
 	char (*f1)(int a), (*f1a)(int a);
 	short (*f2)(int a), (*f2a)(int a);
 	int (*f3)(int a), (*f3a)(int a); /* function pointer comment */
@@ -264,7 +291,8 @@ struct struct_w_union2
 	} swu_u2;
 };
 
-struct s1 func_ret_s1(void);
+struct s1 func_ret_s1_skip(void);
+extern struct s1 func_ret_s1(void);
 
 struct {
 	char str_ptr;
@@ -278,11 +306,15 @@ struct sattr {
 
 /* forward union declaration */
 union u_forward;
+union u_forward_with_comment; /* forward */
+union u_forward2_with_comment; // forward2
 union {};
+union {}; /* invalid union comment */
+union {}; // invalid union comment 2
 union {
 
 };
-union empty_sameline_u {};
+union empty_sameline_u {}; /* empty union comment */
 
 union u1
 {
@@ -294,11 +326,13 @@ union u1
 	signed short var22;
 	unsigned short var23;
 
-	int var31;
-	signed int var32;
+	/* var31u in union is volatile */
+	volatile int var31u;
+	signed int var32; /* var32 in union is not volatile */
 	unsigned int var33;
 
-	long int var41;
+	// comment before var41u
+	long int var41u;
 	signed long int var42;
 	unsigned long int var43;
 
@@ -310,6 +344,9 @@ union u1
 	double var62;
 	long double var63;
 #define var63_value 1
+
+	uint128_t var128_u;
+
 	struct array_struct as1;
 	struct
 	{
@@ -367,6 +404,8 @@ union array_union
 	double var62[16];
 	long double var63[17];
 
+	uint128_t var128_ua[18];
+
 	struct s1 arr_s1[1];
 	union u1 field_u1_arr[2];
 
@@ -399,6 +438,8 @@ union array_union_name_size
 	double var62[COUNT];
 	long double var63[COUNT];
 
+	uint128_t var128_ua_name[COUNT];
+
 	struct s1 arr_s1[COUNT];
 	union u1 field_u1_arr[COUNT];
 };
@@ -429,6 +470,10 @@ union point_union
 	double* var62p;
 	long double *var63p;
 
+	uint128_t * var128_up;
+
+	char**** var_multi_p_union;
+
 	char (*f1)(int a);
 	short (*f2)(int a);
 	int (*f3)(int a);
@@ -444,9 +489,13 @@ union multi_union
 		mvar2s, mvar3s;
 	/* float comment */ float mvar1f,
 		mvar2f, mvar3f;
+	uint128_t var128_um1, var128_um2;
+	int mvar1ui,\
+		mvar2ui, mvar3ui;
 };
 
-union u1 func_ret_u1(void);
+union u1 func_ret_u1_skip(void);
+extern union u1 func_ret_u1(void);
 
 union {
 	char u_ptr;
@@ -492,6 +541,9 @@ enum eminus
 {
 	emv1 = -5
 };
+
+enum e1 func_ret_e1_skip(void);
+extern enum e1 func_ret_e1(void);
 
 /* ========================= Typedefs ========================== */
 

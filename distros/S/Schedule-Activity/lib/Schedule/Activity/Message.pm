@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Ref::Util qw/is_arrayref is_hashref is_ref/;
 
-our $VERSION='0.2.0';
+our $VERSION='0.2.1';
 
 my %property=map {$_=>undef} qw/message attributes names note/;
 

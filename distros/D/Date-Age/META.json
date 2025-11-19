@@ -32,8 +32,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Time::Local" : "0",
-            "Time::Piece" : "0"
+            "Time::Local" : "0"
          }
       },
       "test" : {
@@ -53,6 +52,6 @@
          "url" : "https://github.com/nigelhorne/Date-Age"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

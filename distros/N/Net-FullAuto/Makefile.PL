@@ -25,7 +25,7 @@
 #
 ################################################################
 
-our $VERSION='1.0000830';
+our $VERSION='1.0000831';
 
 #print `env`,"\n\n\n";
 
@@ -850,7 +850,6 @@ END
       ($version,$cpanfil,$instfile,$mod_info)=cpan_modules($module_fail);
       fa_system("sudo echo y | /bin/rm -rf \"$instfile\"");
    } elsif (2<$exec_cnt) {
-#print "EXEC_CNT=$exec_cnt\n";
       my $timeout=300;
       ($version,$cpanfil,$instfile,$mod_info)=cpan_modules($module_fail);
       eval {
@@ -890,7 +889,7 @@ END
    }
 }
 
-if (-e "dependencies/CPAN/authors" &&
+if (-e "dependencies/CPAN/authors" && !(-e "MANIFEST.SKIP") &&
       !(grep {
       /(?:use[-_]?)?internet|online|connect_to_internet_ok/i } @ARGV)) {
    if (grep { /-*(?:add|all)[-_]?dependencies/i } @ARGV) { 
@@ -1703,6 +1702,9 @@ sub fa_find_latest {
       my $cwd=&cwd;
       fa_system("cd $ENV{CPAN_BUILD_DIR};tar xvf ".
                 "$cwd/dependencies/CPAN/authors/id/$cpanfil;cd $cwd");
+      $look=$cpanfil;
+      $look=~s/.tar.gz//;
+      $look=~s/^.*\/(.*)$/$1/;
    }
    my $new='';my $file='';
    opendir(DH,$d) or
@@ -1710,7 +1712,12 @@ sub fa_find_latest {
    my %timestamps=();
    while ($_ = readdir(DH)) {
       next if ($_ eq ".") || ($_ eq "..") || (/\.yml$/);
-      if ($_!~/^$look[-][vV]?\d/) {
+      if (-e "dependencies/CPAN/authors" && !(-e "MANIFEST.SKIP") &&
+            !(grep {
+            /(?:use[-_]?)?internet|online|connect_to_internet_ok/i
+            } @ARGV)) {
+         next if $_ ne $look;
+      } elsif ($_!~/^$look[-][vV]?\d/) {
          if (-d $d.'/'.$_) {
             my $dr=$d.'/'.$_;
             $new=&look_inside_dir($dr,$look);
@@ -1856,7 +1863,7 @@ sub fa_install_mod {
             $version=$cpanver;
          }
       } else {
-         ($version,$cpanfil)=cpan_modules($p);
+         ($version,$cpanfil,$instfile,$mod_info)=cpan_modules($p);
       }
    } else {
       $cpanfil=$p;
@@ -1906,7 +1913,7 @@ sub fa_install_mod {
       eval {
          local $SIG{__DIE__}; # No sigdie handler;
          require CPAN;
-         unless (-e "dependencies/CPAN/authors" &&
+         unless (-e "dependencies/CPAN/authors" && !(-e "MANIFEST.SKIP") &&
                !(grep {
                /(?:use[-_]?)?internet|online|connect_to_internet_ok/i } @ARGV)) {
             CPAN::Shell->notest('get',$p);
@@ -1991,9 +1998,9 @@ sub fa_install_mod {
                            ."cd \"$cwd\";$^X Makefile.PL SKIP $argvs";
                exec $exec_cmd;
             }
-         } elsif ($p eq 'LWP') {
-            $dir=&fa_find_latest('libwww-perl');
-         }
+         } #elsif ($p eq 'LWP') {
+           # $dir=&fa_find_latest('libwww-perl');
+         #}
          $env="export $env;" if $env;
          my $s='';
          $s="${sudo}-E " if $sudo && $env;
@@ -2163,6 +2170,13 @@ END
                fa_system("cd \"$dir\";./Build build;./Build install");
             }
          }
+      } elsif (lc($task) eq 'get') {
+         my $sudo='';
+         my $cpanfile=$cpanfil;
+         $cpanfil=~s/^.*\/(.*)$/$1/;
+         $cpanfil=~s/^(.*)-.*$/$1/;
+         $cpanfil=~s/-/::/;
+         $dir||=&fa_find_latest($cpanfil,$cpanfile);
       }
       chdir $cwd;
       my $_p=$p;
@@ -2375,7 +2389,7 @@ if (($^O ne 'MSWin32') && ($^O ne 'MSWin64') && !grep { /^GETBERK$/ } @ARGV) {
    &fa_install_module('Try::Tiny','install','Makefile');
    &fa_install_module('Test::Fatal','install','Makefile');
    my $mod_info='';my $mod_build_version=0.3601;
-   unless (-e "dependencies/CPAN/authors" &&
+   unless (-e "dependencies/CPAN/authors" && !(-e "MANIFEST.SKIP") &&
          !(grep {
          /(?:use[-_]?)?internet|online|connect_to_internet_ok/i } @ARGV)) {
       eval {
@@ -2608,7 +2622,20 @@ if (($^O ne 'MSWin32') && ($^O ne 'MSWin64') && !grep { /^GETBERK$/ } @ARGV) {
    if ($@ || grep { /-*(?:add|all)[-_]?dependencies/i } @ARGV) {
       &fa_install_module('Data::Dump::Streamer','get');
       unless (grep { /-*(?:add|all)[-_]?dependencies/i } @ARGV) {
-         my $dir=&fa_find_latest('Data-Dump-Streamer');
+         my $dir='';
+         if (-e "dependencies/BerkeleyDB" && !(grep {
+               /(?:use[-_]?)?internet|online|connect_to_internet_ok/i
+               } @ARGV)) {
+
+            my ($version,$cpanfil,$instfile,$mod_info)=cpan_modules('Data::Dump::Streamer');
+            my $cpanfile=$cpanfil;
+            $cpanfil=~s/^.*\/(.*)$/$1/;
+            $cpanfil=~s/^(.*)-.*$/$1/;
+            $cpanfil=~s/-/::/;
+            $dir||=&fa_find_latest($cpanfil,$cpanfile);
+         } else {
+            $dir=&fa_find_latest('Data-Dump-Streamer');
+         }
          fa_system("cd \"$dir\";$^X Build.PL NODDS;");
          if ($ARGV[$#ARGV]=~/^(\d+)$/) {
             pop @ARGV;pop @ARGV;
@@ -4811,7 +4838,7 @@ if ($get_BerkeleyDB && $^O ne 'cygwin') {
          $ENV{'LD_LIBRARY_PATH'}=$berkeleydb;
          $ENV{'LD_RUN_PATH'}=$ENV{'LD_LIBRARY_PATH'};
       } else {
-         if (-e "dependencies/BerkeleyDB" && !(grep {
+         if (-e "dependencies/BerkeleyDB" && !(-e "MANIFEST.SKIP") && !(grep {
                /(?:use[-_]?)?internet|online|connect_to_internet_ok/i
                } @ARGV)) {
             cpan_gunzip_and_untar();
@@ -6505,7 +6532,7 @@ sub cpan_modules {
       print $mod_info;
       unlink $instfile;
       $version=$cpanver;
-      return $version,$cpanfil;
+      return $version,$cpanfil,$instfile,$mod_info;
    } elsif ($ENV{CPAN_OUTDATED_MODULES} eq 'choose' &&
          ($instfile ne 'not installed') and ($instver<$cpanver)) {
       my $message=<<'END';
@@ -6560,12 +6587,12 @@ END
          $ENV{CPAN_OUTDATED_MODULES}='choose';
          print "   **** NOT UPDATING $p ****\n\n";
       }
-      return $version,$cpanfil;
+      return $version,$cpanfil,$instfile,$mod_info;
    } elsif ($ENV{CPAN_OUTDATED_MODULES} eq 'ignore') {
       print "   **** NOT UPDATING $p ****\n\n";
    }
    print "    ",$mod_info;
-   return $version,$cpanfil;
+   return $version,$cpanfil,$instfile,$mod_info;
 }
 
 sub install_figlet {

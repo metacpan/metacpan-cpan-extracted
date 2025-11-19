@@ -1,0 +1,51 @@
+---
+abstract: "It's new $module"
+author:
+  - 'janeskil1525 <janeskil1525@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.28, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Daje-Document-Builder
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Daje::Document::Builder:
+    file: lib/Daje/Document/Builder.pm
+    version: '0.01'
+  Daje::Document::Builder::Html:
+    file: lib/Daje/Document/Builder/Html.pm
+  Daje::Document::Load::Template:
+    file: lib/Daje/Document/Load/Template.pm
+    version: '0.02'
+  Daje::Document::Templates::Base:
+    file: lib/Daje/Document/Templates/Base.pm
+  Daje::Document::Templates::Mail_Login:
+    file: lib/Daje/Document/Templates/Mail_Login.pm
+requires:
+  Class::Load: '0.25'
+  Daje::Tools::Datasections: '1.00'
+  Mojo::Base: '0'
+  Template: '3.102'
+  perl: v5.42.0
+resources:
+  bugtracker: https://github.com/janeskil1525/Daje-Document-Builder/issues
+  homepage: https://github.com/janeskil1525/Daje-Document-Builder
+  repository: https://github.com/janeskil1525/Daje-Document-Builder.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
+x_static_install: 1

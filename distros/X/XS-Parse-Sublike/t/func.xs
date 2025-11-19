@@ -32,6 +32,12 @@ static const struct XSParseSublikeHooks parse_afunc_hooks = {
   .flags = XS_PARSE_SUBLIKE_FLAG_SIGNATURE_PARAM_ATTRIBUTES,
 };
 
+static const struct XSParseSublikeHooks parse_rfunc_hooks = {
+  .ver            = XSPARSESUBLIKE_ABI_VERSION,
+  .permit_hintkey = "t::func/rfunc",
+  .flags = XS_PARSE_SUBLIKE_FLAG_SIGNATURE_REFALIAS,
+};
+
 static const struct XSParseSublikeHooks parse_nafunc_hooks = {
   .ver            = XSPARSESUBLIKE_ABI_VERSION,
   .permit_hintkey = "t::func/nafunc",
@@ -100,6 +106,7 @@ BOOT:
   register_xs_parse_sublike("func",   &parse_func_hooks,   NULL);
   register_xs_parse_sublike("nfunc",  &parse_nfunc_hooks,  NULL);
   register_xs_parse_sublike("afunc",  &parse_afunc_hooks,  NULL);
+  register_xs_parse_sublike("rfunc",  &parse_rfunc_hooks,  NULL);
   register_xs_parse_sublike("nafunc", &parse_nafunc_hooks, NULL);
 
   register_xs_parse_sublike("nopkgfunc",   &parse_nopkgfunc_hooks,   NULL);

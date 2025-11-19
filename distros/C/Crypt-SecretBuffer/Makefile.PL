@@ -97,6 +97,8 @@ my %WriteMakefileArgs = (
     "Carp" => 0,
     "DynaLoader" => 0,
     "Exporter" => 0,
+    "File::Spec" => 0,
+    "File::Temp" => 0,
     "Scalar::Util" => 0,
     "overload" => 0,
     "parent" => 0,
@@ -104,7 +106,8 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "File::Temp" => 0,
+    "Data::Dumper" => 0,
+    "Encode" => 0,
     "FindBin" => 0,
     "IO::Handle" => 0,
     "POSIX" => 0,
@@ -114,7 +117,7 @@ my %WriteMakefileArgs = (
     "Time::HiRes" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.007",
+  "VERSION" => "0.008",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -127,8 +130,11 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
+  "Data::Dumper" => 0,
   "DynaLoader" => 0,
+  "Encode" => 0,
   "Exporter" => 0,
+  "File::Spec" => 0,
   "File::Temp" => 0,
   "FindBin" => 0,
   "IO::Handle" => 0,

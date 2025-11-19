@@ -1,5 +1,8 @@
 Revision history for Perl module Ma::OSVersion
 
+1.018 2025-11-17T07:36:00Z
+	* update Tahoe to macOS 26, now indexed on year
+
 1.017 2025-04-13T22:31:45Z
 	* require a newer version.pm for v5.10.1 tests
 

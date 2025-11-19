@@ -8,7 +8,7 @@ use English;
 use Error::Pure qw(err);
 use Readonly;
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 # Constructor.
 sub new {

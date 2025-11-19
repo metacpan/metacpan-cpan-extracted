@@ -1,0 +1,64 @@
+<!-- Start to cheat by using start/end_html tags to save space -->
+
+<start_html>
+<form method="GET">
+Get sales results for:&nbsp;<popup_menu name="month" values="@{qw(January February March)}">
+<submit>
+</form>
+
+<perl method="results">
+Sales results for +{month}: $${results}
+</perl>
+
+<hr>
+This page generated: !{! localtime() !}
+<end_html>
+
+__PERL__
+
+use WebDyne::Static;
+use WebDyne::Cache (\&cache);
+
+my %results=(
+
+	January		=> 20,
+	February	=> 30,
+	March		=> 40
+);
+
+sub cache {
+
+	#  Return UID based on month
+	#
+	my $uid=undef;
+	if (my $month=$_{'month'}) {
+
+		#  Make sure month is valid
+		#
+		$uid=$month if defined $results{$month}
+
+	}
+	return \$uid;
+
+}
+
+
+sub results {
+
+	my $self=shift();
+	if (my $month=$_{'month'}) {
+		
+		#  Could be a really long complex SQL query ...
+		#
+		my $results=$results{$month};
+
+
+		#  And display
+		#
+		return $self->render(results => $results);
+	}
+	else {
+		return \undef;
+	}
+
+}

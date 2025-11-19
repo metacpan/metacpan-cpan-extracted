@@ -312,7 +312,7 @@ subtest 'custom error messages' => sub {
 		age => {
 			type => 'integer',
 			min => 18,
-			error_message => 'You must be at least 18 years old'
+			error_msg => 'You must be at least 18 years old'
 		},
 	};
 

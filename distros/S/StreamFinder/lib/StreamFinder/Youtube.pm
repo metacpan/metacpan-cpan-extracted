@@ -4,7 +4,7 @@ StreamFinder::Youtube - Fetch actual raw streamable URLs from YouTube and others
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2017-2021 by
+This module is Copyright (C) 2017-2025 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -436,7 +436,7 @@ L<http://search.cpan.org/dist/StreamFinder-Youtube/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2021 Jim Turner.
+Copyright 2017-2025 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -524,7 +524,7 @@ sub new
 		} elsif ($_[0] =~ /^\-?formatonly$/o) {
 			shift;
 			$self->{'formatonly'} = (defined $_[0]) ? shift : 1;
-		} elsif ($_[0] =~ /^\-?notrim$/o) {   #NOT CURRENTLY USED, RESERVED FOR FUTURE USE.
+		} elsif ($_[0] =~ /^\-?notrim$/o) {
 			shift;
 			$self->{'notrim'} = (defined $_[0]) ? shift : 1;
 		} elsif ($_[0] =~ /^\-?youtube-site$/o) {
@@ -560,8 +560,8 @@ sub new
 	$self->{'youtube-dl'} = 'yt-dlp'  unless (defined $self->{'youtube-dl'});
 
 	print STDERR "-0(Youtube): URL=$url=\n"  if ($DEBUG);
-	$url =~ s/\?autoplay\=true$//;  #STRIP THIS OFF SO WE DON'T HAVE TO.
-	$url =~ s/\?list\=.*$//;  #yt-dlp SEEMS TO JUST HANG ON "lists" (TRYING TO FETCH A LIST OF VIDEOS?!).
+	$url =~ s/[\?\&]autoplay\=true$//;  #STRIP THIS OFF SO WE DON'T HAVE TO.
+	$url =~ s/[\?\&]list\=.*$//;  #yt-dlp SEEMS TO JUST HANG ON "lists" (TRYING TO FETCH A LIST OF VIDEOS?!).
 	(my $url2fetch = $url);
 	$self->{'_isaYtPage'} = 1;
 	#DEPRECIATED (STATION-IDS NOW INCLUDE STUFF BEFORE THE DASH: ($self->{'id'} = $url) =~ s#^.*\-([a-z]\d+)\/?$#$1#;
@@ -576,6 +576,7 @@ sub new
 		$self->{'id'} = $url;
 		$url2fetch = $self->{'youtube-site'} . '/watch?v=' . $url;
 	}
+	$url2fetch =~ s/[\?\&](?!v\=).*$//  unless ($self->{'notrim'});
 	print STDERR "-1 (isYT=$$self{'_isaYtPage'}) FETCHING URL=$url2fetch= VIA $$self{'youtube-dl'}: ID=$$self{'id'}=\n"  if ($DEBUG);
 	$self->{'genre'} = 'Video';
 	$self->{'albumartist'} = $url2fetch;
@@ -633,11 +634,11 @@ sub new
 			$ua->max_size(undef);  #(NOW OK TO FETCH THE WHOLE DOCUMENT)
 		 	my $response = $ua->get($url2fetch);
 		 	$html = $response->decoded_content  if ($response->is_success);
-			while ($html && $html =~ s#\<iframe([^\>]+)\>##s) {
+			while ($html && $html =~ s#\<iframe([^\>]+)\>##so) {
 				my $one = $1;
 				my $embeddedURL = ($one =~ m#\"(https?\:\/\/[^\"]+)#s) ? $1 : '';
 				if ($embeddedURL) {
-					$embeddedURL =~ s/[\?\&].*$//  unless ($self->{'notrim'} || $embeddedURL =~ /watch\?v\=/);
+					$embeddedURL =~ s/[\?\&](?!v\=).*$//  unless ($self->{'notrim'});
 					print STDERR "--embedded IFRAME url=$embeddedURL=\n"  if ($DEBUG);
 					my $haveStreamFinder = 0;
 					eval { require 'StreamFinder.pm'; $haveStreamFinder = 1; };
@@ -652,7 +653,21 @@ sub new
 				}
 			}
 			return $embedded_video  if (defined($embedded_video) && $embedded_video->count() > 0);
-
+			##NEXT, TRY FOR YOUTUBE URLs HIDDEN IN JSON:
+			while ($html && $html =~ s#\"url\"\:\"([^\"]+)\"\,##so) {
+				my $one = $1;
+				my $embeddedURL = ($one =~ m#(https?\:\/\/[^\"]+)#so) ? $1 : '';
+				next  unless ($embeddedURL && $embeddedURL =~ /\b(?:youtube\.|youtu.be|ytimg\.)\b/o);
+				$embeddedURL =~ s/[\?\&](?!v\=).*$//  unless ($self->{'notrim'});
+				$url2fetch = $embeddedURL;
+				print STDERR "--embedded YOUTUBE JSON url=$url2fetch=\n"  if ($DEBUG);
+				$self->{'_isaYtPage'} = 1;
+				$self->{'id'} = $1  if ($url2fetch =~ m#\/([^\/]+)\/?$#);
+				$self->{'id'} =~ s/^watch\?v\=//;
+				$self->{'id'} =~ s/[\?\&].*$//;
+				$self->{'id'} = $1  if (!$self->{'_isaYtPage'} && $url2fetch =~ m#id[\=\:\#]?([^\/\s\=\:\#]+)#);
+				last;
+			}
 			unless ($self->{'youtubeonly'}) {
 				if ($html =~ /\bRumble\s*\(\"play\"\,\s+\{\"video\"\:\"([a-z0-9\-\_]+)\"/si) {
 					#EXTRACT CERTAIN EMBEDDED RUMBLE VIDEOS NOT NECESSARILY IN AN IFRAME:

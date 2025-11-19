@@ -1,0 +1,104 @@
+{
+   "abstract" : "don't care what type of data you are given, just what you can do with it",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Types-Capabilities",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Dist::Inkt" : "0.001"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Method::Modifiers" : "0",
+            "Module::Runtime" : "0",
+            "Sub::HandlesVia::CodeGenerator" : "0.050006",
+            "Sub::HandlesVia::Handler" : "0.050006",
+            "Type::Library" : "2.000000",
+            "Type::Tiny::Duck" : "2.000000",
+            "Types::TypeTiny" : "2.000000",
+            "parent" : "0",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::Plugin::BailOnFail" : "0",
+            "Test2::Require::AuthorTesting" : "0",
+            "Test2::Require::Module" : "0",
+            "Test2::Tools::Spec" : "0",
+            "Test2::V0" : "0",
+            "Types::Common" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Types::Capabilities" : {
+         "file" : "lib/Types/Capabilities.pm",
+         "version" : "0.002001"
+      },
+      "Types::Capabilities::CoercedValue::ARRAYREF" : {
+         "file" : "lib/Types/Capabilities/CoercedValue/ARRAYREF.pm",
+         "version" : "0.002001"
+      },
+      "Types::Capabilities::CoercedValue::QUEUE" : {
+         "file" : "lib/Types/Capabilities/CoercedValue/QUEUE.pm",
+         "version" : "0.002001"
+      },
+      "Types::Capabilities::CoercedValue::STACK" : {
+         "file" : "lib/Types/Capabilities/CoercedValue/STACK.pm",
+         "version" : "0.002001"
+      },
+      "Types::Capabilities::Constraint" : {
+         "file" : "lib/Types/Capabilities/Constraint.pm",
+         "version" : "0.002001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tobyink/p5-types-capabilities/issues"
+      },
+      "homepage" : "https://metacpan.org/release/Types-Capabilities",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-types-capabilities.git",
+         "web" : "https://github.com/tobyink/p5-types-capabilities"
+      },
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Types-Capabilities/project"
+   },
+   "version" : "0.002001",
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_static_install" : 1
+}

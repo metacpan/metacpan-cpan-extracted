@@ -38,7 +38,7 @@ $Data::Dumper::Indent=1;
 
 #  Version information
 #
-$VERSION='2.028';
+$VERSION='2.031';
 
 
 #  Debug
@@ -245,12 +245,18 @@ sub err_html {
             #  Reset render state and render error page
             #
             $self->render_reset($data_ar);
-            my $html_sr=$self->render({
+            #my $html_sr=$self->render({
+##
+#                    data  => $data_ar,
+#                    param => \%param
+#
+#            }) || return $self->err_html('fatal problem in error handler during render: %s !', errstr() || 'undefined error');
+            my $html_sr=$self->render_data_ar(
 
                     data  => $data_ar,
                     param => \%param
 
-            }) || return $self->err_html('fatal problem in error handler during render: %s !', errstr() || 'undefined error');
+            ) || return $self->err_html('fatal problem in error handler during render: %s !', errstr() || 'undefined error');
 
 
             #  Set custom handler

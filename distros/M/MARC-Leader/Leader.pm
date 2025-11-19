@@ -9,7 +9,7 @@ use Error::Pure qw(err);
 use Mo::utils 0.06 qw(check_bool);
 use Scalar::Util qw(blessed);
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 # Constructor.
 sub new {
@@ -357,8 +357,15 @@ L<http://skim.cz>
 
 BSD 2-Clause License
 
+=head1 ACKNOWLEDGEMENTS
+
+Development of this software has been made possible by institutional support
+for the long-term strategic development of the National Library of the Czech
+Republic as a research organization provided by the Ministry of Culture of
+the Czech Republic (DKRVO 2024–2028), Area 11: Linked Open Data.
+
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

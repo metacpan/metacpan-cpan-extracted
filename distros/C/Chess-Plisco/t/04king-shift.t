@@ -23,7 +23,7 @@ ok $move, 'move e4';
 ok $pos->doMove($move), 'doMove e4';
 is($pos->kingShift, CP_E8, 'after 1. e4');
 
-$pos = Chess::Plisco->new('8/8/4k3/5P2/8/8/8/K7 w - - 0 1');
+$pos = Chess::Plisco->new('8/8/4k3/5P2/8/8/8/K7 w - - 0 1', 1);
 ok $pos, 'created';
 is($pos->kingShift, CP_A1, 'white king on a1');
 

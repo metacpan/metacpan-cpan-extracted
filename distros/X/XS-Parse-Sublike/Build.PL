@@ -26,7 +26,7 @@ my $build = Module::Build::with::XSTests->new(
    },
    test_requires => {
       'Sub::Util' => 0,
-      'Test2::V0' => 0,
+      'Test2::V0' => '0.000147',
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires

@@ -10,7 +10,7 @@
 # http://www.wtfpl.net/ for more details.
 
 package Chess::Plisco::Engine::Position;
-$Chess::Plisco::Engine::Position::VERSION = 'v0.7.0';
+$Chess::Plisco::Engine::Position::VERSION = 'v0.8.0';
 use strict;
 use integer;
 
@@ -343,8 +343,10 @@ sub new {
 	my $self = $class->SUPER::new(@args);
 
 	my $op_phase = 0;
+
 	my $op_score = 0;
 	my $eg_score = 0;
+
 	my $white = $self->[CP_POS_WHITE_PIECES];
 	my $black = $self->[CP_POS_BLACK_PIECES];
 
@@ -451,6 +453,18 @@ sub endgameDelta {
 	my ($self, $index) = @_;
 
 	return $endgame_deltas[$index];
+}
+
+# This is only for debugging.
+sub formatMoves {
+	my ($self, @moves) = @_;
+
+	my @formatted;
+	foreach my $move (@moves) {
+		push @formatted, $self->moveCoordinateNotation($move);
+	}
+
+	return @formatted;
 }
 
 1;

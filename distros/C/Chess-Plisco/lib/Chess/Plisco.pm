@@ -39,7 +39,7 @@
 # more extensive use of Chess::Plisco::Macro.
 
 package Chess::Plisco;
-$Chess::Plisco::VERSION = 'v0.7.0';
+$Chess::Plisco::VERSION = 'v0.8.0';
 use strict;
 use integer;
 no warnings qw(portable);
@@ -362,9 +362,9 @@ my @piece_values = (0, CP_PAWN_VALUE, CP_KNIGHT_VALUE, CP_BISHOP_VALUE,
 
 
 sub new {
-	my ($class, $fen) = @_;
+	my ($class, $fen, $relaxed) = @_;
 
-	return $class->newFromFEN($fen) if defined $fen && length $fen;
+	return $class->newFromFEN($fen, $relaxed) if defined $fen && length $fen;
 
 	my $self = bless [], $class;
 	$self->[CP_POS_WHITE_PIECES] = CP_1_MASK | CP_2_MASK;
@@ -394,20 +394,21 @@ sub new {
 	
 	$self->__updateZobristKey;
 	(do {	my $c = (($info & (1 << 4)) >> 4);	my $kings = $self->[CP_POS_KINGS]		& ($c ? $self->[CP_POS_BLACK_PIECES] : $self->[CP_POS_WHITE_PIECES]);	my $king_shift = (do {	my $A = $kings - 1 - ((($kings - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});	($info = ($info & ~(0x3f << 11)) | ($king_shift << 11));	my $checkers = $self->[CP_POS_IN_CHECK] = (do {	my $her_color = !$c;	my $her_pieces = $self->[CP_POS_WHITE_PIECES + $her_color];	my $occupancy = $self->[CP_POS_WHITE_PIECES + $c] | $her_pieces;	my $queens = $self->[CP_POS_QUEENS];	$her_pieces		& (($pawn_masks[$c]->[2]->[$king_shift] & $self->[CP_POS_PAWNS])			| ($knight_attack_masks[$king_shift] & $self->[CP_POS_KNIGHTS])			| ($king_attack_masks[$king_shift] & $self->[CP_POS_KINGS])			| (CP_MAGICMOVESBDB->[$king_shift][(((($occupancy) & CP_MAGICMOVES_B_MASK->[$king_shift]) * CP_MAGICMOVES_B_MAGICS->[$king_shift]) >> 55) & ((1 << (64 - 55)) - 1)] & ($queens | $self->[CP_POS_BISHOPS]))			| (CP_MAGICMOVESRDB->[$king_shift][(((($occupancy) & CP_MAGICMOVES_R_MASK->[$king_shift]) * CP_MAGICMOVES_R_MAGICS->[$king_shift]) >> 52) & ((1 << (64 - 52)) - 1)] & ($queens | $self->[CP_POS_ROOKS])));});	if ($checkers) {		if ($checkers & ($checkers - 1)) {			($info = ($info & ~(0x3 << 17)) | (CP_EVASION_KING_MOVE << 17));		} elsif ($checkers & ($self->[CP_POS_KNIGHTS] | ($self->[CP_POS_PAWNS]))) {			($info = ($info & ~(0x3 << 17)) | (CP_EVASION_CAPTURE << 17));			$self->[CP_POS_EVASION_SQUARES] = $checkers;		} else {			($info = ($info & ~(0x3 << 17)) | (CP_EVASION_ALL << 17));			my $piece_shift = (do {	my $A = $checkers - 1 - ((($checkers - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});			my ($attack_type, undef, $attack_ray) =				@{$common_lines[$king_shift]->[$piece_shift]};			if ($attack_ray) {				$self->[CP_POS_EVASION_SQUARES] = $attack_ray;			} else {				$self->[CP_POS_EVASION_SQUARES] = $checkers;			}		}	}	$self->[CP_POS_INFO] = $info;});
-	
+
 	return $self;
 }
 
 sub newFromFEN {
-	my ($class, $fen) = @_;
+	my ($class, $fen, $relaxed) = @_;
 
 	my ($pieces, $color, $castling, $ep_square, $hmc, $moveno)
 			= split /[ \t]+/, $fen;
-	$ep_square = '-' if !defined $ep_square;
-	$hmc = 0 if !defined $hmc;
 	$moveno = 1 if !defined $moveno;
+	$hmc = 0 if !defined $hmc;
+	$ep_square = '-' if !defined $ep_square;
+	$castling = '-' if !defined $castling;
 
-	if (!(defined $pieces && defined $color && defined $castling)) {
+	if (!(defined $pieces && defined $color)) {
 		die __"Illegal FEN: Incomplete.\n";
 	}
 
@@ -497,17 +498,6 @@ sub newFromFEN {
 		$shift -= 16;
 	}
 
-	my $popcount;
-
-	{ my $_b = $w_pieces & $kings; for ($popcount = 0; $_b; ++$popcount) { $_b &= $_b - 1; } };
-	if ($popcount != 1) {
-		die __"Illegal FEN: White must have exactly one king.\n";
-	}
-	{ my $_b = $b_pieces & $kings; for ($popcount = 0; $_b; ++$popcount) { $_b &= $_b - 1; } };
-	if ($popcount != 1) {
-		die __"Illegal FEN: Black must have exactly one king.\n";
-	}
-
 	my $self = bless [], $class;
 
 	$self->[CP_POS_WHITE_PIECES] = $w_pieces;
@@ -530,51 +520,202 @@ sub newFromFEN {
 		die __x"Illegal FEN: Side to move is neither 'w' nor 'b'.\n";
 	}
 
-	if (!length $castling) {
-		die __"Illegal FEN: Missing castling state.\n";
-	}
-	if ($castling !~ /^(?:-|K?Q?k?q?)/) {
-		die __x("Illegal FEN: Illegal castling state '{state}'.\n",
+	$self->__checkPieceCounts if !$relaxed;
+
+	if ($castling ne '-' && $castling !~ /^K?Q?k?q?$/) {
+		die __x("Illegal FEN: Illegal castling rights '{state}'.\n",
 				state => $castling);
 	}
 
-	my ($piece_type, $piece_color);
-
-	($piece_type, $piece_color) = $self->pieceAtShift(CP_E1);
-	if (!($piece_type && $piece_type == CP_KING && $piece_color == CP_WHITE)) {
-		$castling =~ s/KQ//;
-	}
-	($piece_type, $piece_color) = $self->pieceAtShift(CP_E8);
-	if (!($piece_type && $piece_type == CP_KING && $piece_color == CP_BLACK)) {
-		$castling =~ s/kq//;
-	}
-
 	if ($castling =~ /K/) {
-		($piece_type, $piece_color) = $self->pieceAtShift(CP_H1);
-		if ($piece_type && $piece_type == CP_ROOK && $piece_color == CP_WHITE) {
-			($pos_info = ($pos_info & ~(1 << 0)) | (1 << 0));
-		}
+		$self->__checkCastlingState(CP_G1);
+		($pos_info = ($pos_info & ~(1 << 0)) | (1 << 0));
 	}
 	if ($castling =~ /Q/) {
-		($piece_type, $piece_color) = $self->pieceAtShift(CP_A1);
-		if ($piece_type && $piece_type == CP_ROOK && $piece_color == CP_WHITE) {
-			($pos_info = ($pos_info & ~(1 << 1)) | (1 << 1));
-		}
+		$self->__checkCastlingState(CP_C1);
+		($pos_info = ($pos_info & ~(1 << 1)) | (1 << 1));
 	}
+
 	if ($castling =~ /k/) {
-		($piece_type, $piece_color) = $self->pieceAtShift(CP_H8);
-		if ($piece_type && $piece_type == CP_ROOK && $piece_color == CP_BLACK) {
-			($pos_info = ($pos_info & ~(1 << 2)) | (1 << 2));
-		}
+		$self->__checkCastlingState(CP_G8);
+		($pos_info = ($pos_info & ~(1 << 2)) | (1 << 2));
 	}
 	if ($castling =~ /q/) {
-		($piece_type, $piece_color) = $self->pieceAtShift(CP_A8);
-		if ($piece_type && $piece_type == CP_ROOK && $piece_color == CP_BLACK) {
-			($pos_info = ($pos_info & ~(1 << 3)) | (1 << 3));
+		$self->__checkCastlingState(CP_C8);
+		($pos_info = ($pos_info & ~(1 << 3)) | (1 << 3));
+	}
+
+	$self->[CP_POS_INFO] = $pos_info;
+
+	my $to_move = (($pos_info & (1 << 4)) >> 4);
+	$pos_info = $self->__checkEnPassantState($ep_square, $to_move, $pos_info);
+
+	# This is not redundant! Without it, the Zobrist key does not get calculated
+	# correctly.
+	$self->[CP_POS_INFO] = $pos_info;
+
+	if ($hmc !~ /^0|[1-9][0-9]*$/) {
+		$hmc = 0;
+	}
+	$self->[CP_POS_HALF_MOVE_CLOCK] = $self->[CP_POS_REVERSIBLE_CLOCK] = $hmc;
+
+	if ($moveno !~ /^[1-9][0-9]*$/) {
+		$moveno = 1;
+	}
+
+	if ($to_move == CP_WHITE) {
+			$self->[CP_POS_HALF_MOVES] = ($moveno - 1) << 1;
+	} else {
+			$self->[CP_POS_HALF_MOVES] = (($moveno - 1) << 1) + 1;
+	}
+
+	$self->__checkIllegalCheck($to_move) if !$relaxed;
+
+	$self->__updateZobristKey;
+	(do {	my $c = (($pos_info & (1 << 4)) >> 4);	my $kings = $self->[CP_POS_KINGS]		& ($c ? $self->[CP_POS_BLACK_PIECES] : $self->[CP_POS_WHITE_PIECES]);	my $king_shift = (do {	my $A = $kings - 1 - ((($kings - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});	($pos_info = ($pos_info & ~(0x3f << 11)) | ($king_shift << 11));	my $checkers = $self->[CP_POS_IN_CHECK] = (do {	my $her_color = !$c;	my $her_pieces = $self->[CP_POS_WHITE_PIECES + $her_color];	my $occupancy = $self->[CP_POS_WHITE_PIECES + $c] | $her_pieces;	my $queens = $self->[CP_POS_QUEENS];	$her_pieces		& (($pawn_masks[$c]->[2]->[$king_shift] & $self->[CP_POS_PAWNS])			| ($knight_attack_masks[$king_shift] & $self->[CP_POS_KNIGHTS])			| ($king_attack_masks[$king_shift] & $self->[CP_POS_KINGS])			| (CP_MAGICMOVESBDB->[$king_shift][(((($occupancy) & CP_MAGICMOVES_B_MASK->[$king_shift]) * CP_MAGICMOVES_B_MAGICS->[$king_shift]) >> 55) & ((1 << (64 - 55)) - 1)] & ($queens | $self->[CP_POS_BISHOPS]))			| (CP_MAGICMOVESRDB->[$king_shift][(((($occupancy) & CP_MAGICMOVES_R_MASK->[$king_shift]) * CP_MAGICMOVES_R_MAGICS->[$king_shift]) >> 52) & ((1 << (64 - 52)) - 1)] & ($queens | $self->[CP_POS_ROOKS])));});	if ($checkers) {		if ($checkers & ($checkers - 1)) {			($pos_info = ($pos_info & ~(0x3 << 17)) | (CP_EVASION_KING_MOVE << 17));		} elsif ($checkers & ($self->[CP_POS_KNIGHTS] | ($self->[CP_POS_PAWNS]))) {			($pos_info = ($pos_info & ~(0x3 << 17)) | (CP_EVASION_CAPTURE << 17));			$self->[CP_POS_EVASION_SQUARES] = $checkers;		} else {			($pos_info = ($pos_info & ~(0x3 << 17)) | (CP_EVASION_ALL << 17));			my $piece_shift = (do {	my $A = $checkers - 1 - ((($checkers - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});			my ($attack_type, undef, $attack_ray) =				@{$common_lines[$king_shift]->[$piece_shift]};			if ($attack_ray) {				$self->[CP_POS_EVASION_SQUARES] = $attack_ray;			} else {				$self->[CP_POS_EVASION_SQUARES] = $checkers;			}		}	}	$self->[CP_POS_INFO] = $pos_info;});
+
+	return $self;
+}
+
+sub __checkIllegalCheck {
+	my ($self, $to_move) = @_;
+
+	# Check whether the other side's king is in chess.
+	my $king_index = $to_move == CP_WHITE ? CP_POS_BLACK_PIECES : CP_POS_WHITE_PIECES;
+	my $king_bb = $self->[CP_POS_KINGS] & $self->[$king_index];
+	my $king_shift = (do {	my $B = $king_bb & -$king_bb;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});
+
+	if ($to_move == CP_WHITE) {
+		if ((do {	my $her_color = !CP_BLACK;	my $her_pieces = $self->[CP_POS_WHITE_PIECES + $her_color];	my $occupancy = $self->[CP_POS_WHITE_PIECES + CP_BLACK] | $her_pieces;	my $queens = $self->[CP_POS_QUEENS];	$her_pieces		& (($pawn_masks[CP_BLACK]->[2]->[$king_shift] & $self->[CP_POS_PAWNS])			| ($knight_attack_masks[$king_shift] & $self->[CP_POS_KNIGHTS])			| ($king_attack_masks[$king_shift] & $self->[CP_POS_KINGS])			| (CP_MAGICMOVESBDB->[$king_shift][(((($occupancy) & CP_MAGICMOVES_B_MASK->[$king_shift]) * CP_MAGICMOVES_B_MAGICS->[$king_shift]) >> 55) & ((1 << (64 - 55)) - 1)] & ($queens | $self->[CP_POS_BISHOPS]))			| (CP_MAGICMOVESRDB->[$king_shift][(((($occupancy) & CP_MAGICMOVES_R_MASK->[$king_shift]) * CP_MAGICMOVES_R_MAGICS->[$king_shift]) >> 52) & ((1 << (64 - 52)) - 1)] & ($queens | $self->[CP_POS_ROOKS])));})) {
+			die __"Illegal FEN: side not to move is in check!\n";
+		}
+	} else {
+		if ((do {	my $her_color = !CP_WHITE;	my $her_pieces = $self->[CP_POS_WHITE_PIECES + $her_color];	my $occupancy = $self->[CP_POS_WHITE_PIECES + CP_WHITE] | $her_pieces;	my $queens = $self->[CP_POS_QUEENS];	$her_pieces		& (($pawn_masks[CP_WHITE]->[2]->[$king_shift] & $self->[CP_POS_PAWNS])			| ($knight_attack_masks[$king_shift] & $self->[CP_POS_KNIGHTS])			| ($king_attack_masks[$king_shift] & $self->[CP_POS_KINGS])			| (CP_MAGICMOVESBDB->[$king_shift][(((($occupancy) & CP_MAGICMOVES_B_MASK->[$king_shift]) * CP_MAGICMOVES_B_MAGICS->[$king_shift]) >> 55) & ((1 << (64 - 55)) - 1)] & ($queens | $self->[CP_POS_BISHOPS]))			| (CP_MAGICMOVESRDB->[$king_shift][(((($occupancy) & CP_MAGICMOVES_R_MASK->[$king_shift]) * CP_MAGICMOVES_R_MAGICS->[$king_shift]) >> 52) & ((1 << (64 - 52)) - 1)] & ($queens | $self->[CP_POS_ROOKS])));})) {
+			die __"Illegal FEN: side not to move is in check!\n";
 		}
 	}
 
+	return $self;
+}
+
+sub __checkPieceCounts {
+	my ($self, $pos_info) = @_;
+
 	my $to_move = (($pos_info & (1 << 4)) >> 4);
+
+	my $kings = $self->[CP_POS_KINGS];
+	my $w_pieces = $self->[CP_POS_WHITE_PIECES];
+	my $num_white_kings;
+	{ my $_b = $w_pieces & $kings; for ($num_white_kings = 0; $_b; ++$num_white_kings) { $_b &= $_b - 1; } };
+	if ($num_white_kings != 1) {
+		die __"Illegal FEN: White must have exactly one king.\n";
+	}
+
+	my $b_pieces = $self->[CP_POS_BLACK_PIECES];
+	my $num_black_kings;
+	{ my $_b = $b_pieces & $kings; for ($num_black_kings = 0; $_b; ++$num_black_kings) { $_b &= $_b - 1; } };
+	if ($num_black_kings != 1) {
+		die __"Illegal FEN: Black must have exactly one king.\n";
+	}
+
+	my $pawns = $self->[CP_POS_PAWNS];
+
+	# Pawn on 1st or 8th rank?
+	if ($pawns & (CP_1_MASK | CP_8_MASK)) {
+		die __"Illegal FEN: There can be no pawns on the first or eighth rank.\n";
+	}
+
+	my $num_white_pawns;
+	{ my $_b = $w_pieces & $pawns; for ($num_white_pawns = 0; $_b; ++$num_white_pawns) { $_b &= $_b - 1; } };
+	if ($num_white_pawns > 8) {
+		die __x("Illegal FEN: {colour} has too many {pieces}.\n",
+			colour => __"White", pieces => __"pawns");
+	}
+
+	my $num_black_pawns;
+	{ my $_b = $b_pieces & $pawns; for ($num_black_pawns = 0; $_b; ++$num_black_pawns) { $_b &= $_b - 1; } };
+	if ($num_black_pawns > 8) {
+		die __x("Illegal FEN: {colour} has too many {pieces}.\n",
+			colour => __"Black", pieces => __"pawns");
+	}
+
+	my $max_white_promotions = 8 - $num_white_pawns;
+	my $max_black_promotions = 8 - $num_black_pawns;
+
+	$self->__checkPromotionConsistency(
+		\$max_white_promotions,
+		__"queens",
+		CP_WHITE, $self->[CP_POS_QUEENS], 1,
+	);
+
+	$self->__checkPromotionConsistency(
+		\$max_black_promotions,
+		__"queens",
+		CP_BLACK, $self->[CP_POS_QUEENS], 1,
+	);
+
+	$self->__checkPromotionConsistency(
+		\$max_white_promotions,
+		__"rooks",
+		CP_WHITE, $self->[CP_POS_ROOKS], 2,
+	);
+
+	$self->__checkPromotionConsistency(
+		\$max_black_promotions,
+		__"rooks",
+		CP_BLACK, $self->[CP_POS_ROOKS], 2,
+	);
+
+	$self->__checkPromotionConsistency(
+		\$max_white_promotions,
+		__"bishops",
+		CP_WHITE, $self->[CP_POS_BISHOPS], 2,
+	);
+
+	$self->__checkPromotionConsistency(
+		\$max_black_promotions,
+		__"bishops",
+		CP_BLACK, $self->[CP_POS_BISHOPS], 2,
+	);
+
+	$self->__checkPromotionConsistency(
+		\$max_white_promotions,
+		__"knights",
+		CP_WHITE, $self->[CP_POS_KNIGHTS], 2,
+	);
+
+	$self->__checkPromotionConsistency(
+		\$max_black_promotions,
+		__"knights",
+		CP_BLACK, $self->[CP_POS_KNIGHTS], 2,
+	);
+
+	return $self;
+}
+
+sub __checkPromotionConsistency {
+	my ($self, $max_promotions, $piece_name, $to_move, $pieces, $initial_count) = @_;
+
+	my $all_pieces = $to_move == CP_WHITE ?
+		$self->[CP_POS_WHITE_PIECES]
+		: $self->[CP_POS_BLACK_PIECES];
+	my $colour_name = $to_move == CP_WHITE ? __"White" : __"Black";
+
+	my $num_pieces;
+	{ my $_b = $all_pieces & $pieces; for ($num_pieces = 0; $_b; ++$num_pieces) { $_b &= $_b - 1; } };
+
+	$$max_promotions -= $num_pieces - $initial_count;
+	if ($$max_promotions < 0) {
+		die __x("Illegal FEN: {colour} has too many {pieces}.\n",
+			colour => $colour_name, pieces => $piece_name);
+	}
+
+	return $self;
+}
+
+sub __checkEnPassantState {
+	my ($self, $ep_square, $to_move, $pos_info) = @_;
+
 	if ('-' eq $ep_square) {
 		($pos_info = ($pos_info & ~(0x3f << 5)) | (0 << 5));
 	} elsif ($to_move == CP_WHITE) {
@@ -599,74 +740,33 @@ sub newFromFEN {
 		}
 	}
 
-	$self->[CP_POS_INFO] = $pos_info;
-
-	if ($hmc !~ /^0|[1-9][0-9]*$/) {
-		$hmc = 0;
-	}
-	$self->[CP_POS_HALF_MOVE_CLOCK] = $self->[CP_POS_REVERSIBLE_CLOCK] = $hmc;
-
-	if ($moveno !~ /^[1-9][0-9]*$/) {
-		$moveno = 1;
-	}
-
-	if (((($self->[CP_POS_INFO] & (1 << 4)) >> 4)) == CP_WHITE) {
-			$self->[CP_POS_HALF_MOVES] = ($moveno - 1) << 1;
-	} else {
-			$self->[CP_POS_HALF_MOVES] = (($moveno - 1) << 1) + 1;
-	}
-
-	$self->__updateZobristKey;
-	(do {	my $c = (($pos_info & (1 << 4)) >> 4);	my $kings = $self->[CP_POS_KINGS]		& ($c ? $self->[CP_POS_BLACK_PIECES] : $self->[CP_POS_WHITE_PIECES]);	my $king_shift = (do {	my $A = $kings - 1 - ((($kings - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});	($pos_info = ($pos_info & ~(0x3f << 11)) | ($king_shift << 11));	my $checkers = $self->[CP_POS_IN_CHECK] = (do {	my $her_color = !$c;	my $her_pieces = $self->[CP_POS_WHITE_PIECES + $her_color];	my $occupancy = $self->[CP_POS_WHITE_PIECES + $c] | $her_pieces;	my $queens = $self->[CP_POS_QUEENS];	$her_pieces		& (($pawn_masks[$c]->[2]->[$king_shift] & $self->[CP_POS_PAWNS])			| ($knight_attack_masks[$king_shift] & $self->[CP_POS_KNIGHTS])			| ($king_attack_masks[$king_shift] & $self->[CP_POS_KINGS])			| (CP_MAGICMOVESBDB->[$king_shift][(((($occupancy) & CP_MAGICMOVES_B_MASK->[$king_shift]) * CP_MAGICMOVES_B_MAGICS->[$king_shift]) >> 55) & ((1 << (64 - 55)) - 1)] & ($queens | $self->[CP_POS_BISHOPS]))			| (CP_MAGICMOVESRDB->[$king_shift][(((($occupancy) & CP_MAGICMOVES_R_MASK->[$king_shift]) * CP_MAGICMOVES_R_MAGICS->[$king_shift]) >> 52) & ((1 << (64 - 52)) - 1)] & ($queens | $self->[CP_POS_ROOKS])));});	if ($checkers) {		if ($checkers & ($checkers - 1)) {			($pos_info = ($pos_info & ~(0x3 << 17)) | (CP_EVASION_KING_MOVE << 17));		} elsif ($checkers & ($self->[CP_POS_KNIGHTS] | ($self->[CP_POS_PAWNS]))) {			($pos_info = ($pos_info & ~(0x3 << 17)) | (CP_EVASION_CAPTURE << 17));			$self->[CP_POS_EVASION_SQUARES] = $checkers;		} else {			($pos_info = ($pos_info & ~(0x3 << 17)) | (CP_EVASION_ALL << 17));			my $piece_shift = (do {	my $A = $checkers - 1 - ((($checkers - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});			my ($attack_type, undef, $attack_ray) =				@{$common_lines[$king_shift]->[$piece_shift]};			if ($attack_ray) {				$self->[CP_POS_EVASION_SQUARES] = $attack_ray;			} else {				$self->[CP_POS_EVASION_SQUARES] = $checkers;			}		}	}	$self->[CP_POS_INFO] = $pos_info;});
-
-	return $self;
+	return $pos_info;
 }
 
+sub __checkCastlingState {
+	my ($self, $king_destination) = @_;
 
-sub __legalityCheck {
-	my ($self) = @_;
-
-	# Pawn on 1st or 8th rank?
-	return if $self->[CP_POS_PAWNS] & (CP_1_MASK | CP_8_MASK);
-
-	my $to_move = $self->toMove;
-
-	my $ep_shift = ((($self->[CP_POS_INFO] & (0x3f << 5)) >> 5));
-	if ($ep_shift) {
-		my $ep_mask = 1 << $ep_shift;
-		my $occupancy = $self->[CP_POS_WHITE_PIECES] | $self->[CP_POS_BLACK_PIECES];
-		my ($ep_rank_mask, $ep_cross_mask);
-		if ($to_move == CP_WHITE) {
-			$ep_rank_mask = CP_6_MASK;
-			$ep_cross_mask = 1 << ($ep_shift + 8);
-		} else {
-			$ep_rank_mask = CP_3_MASK;
-			$ep_cross_mask = 1 << ($ep_shift - 8);
-		}
-
-		return if !$ep_mask & $ep_rank_mask; # Wrong rank.
-		return if $ep_cross_mask & $occupancy; # En-passant square is occupied.
-	}
-
-	# Check whether the other side's king is in chess.
-	my $king_index = $to_move == CP_WHITE ? CP_POS_BLACK_PIECES : CP_POS_WHITE_PIECES;
-	my $king_bb = $self->[CP_POS_KINGS] & $self->[$king_index];
-	my $king_shift = (do {	my $B = $king_bb & -$king_bb;	my $A = $B - 1 - ((($B - 1) >> 1) & 0x5555_5555_5555_5555);	my $C = ($A & 0x3333_3333_3333_3333) + (($A >> 2) & 0x3333_3333_3333_3333);	my $n = $C + ($C >> 32);	$n = ($n & 0x0f0f0f0f) + (($n >> 4) & 0x0f0f0f0f);	$n = ($n & 0xffff) + ($n >> 16);	$n = ($n & 0xff) + ($n >> 8);});
-
-	my $cp_black = CP_BLACK;
-	if ($to_move == CP_WHITE) {
-		if ((do {	my $her_color = !CP_BLACK;	my $her_pieces = $self->[CP_POS_WHITE_PIECES + $her_color];	my $occupancy = $self->[CP_POS_WHITE_PIECES + CP_BLACK] | $her_pieces;	my $queens = $self->[CP_POS_QUEENS];	$her_pieces		& (($pawn_masks[CP_BLACK]->[2]->[$king_shift] & $self->[CP_POS_PAWNS])			| ($knight_attack_masks[$king_shift] & $self->[CP_POS_KNIGHTS])			| ($king_attack_masks[$king_shift] & $self->[CP_POS_KINGS])			| (CP_MAGICMOVESBDB->[$king_shift][(((($occupancy) & CP_MAGICMOVES_B_MASK->[$king_shift]) * CP_MAGICMOVES_B_MAGICS->[$king_shift]) >> 55) & ((1 << (64 - 55)) - 1)] & ($queens | $self->[CP_POS_BISHOPS]))			| (CP_MAGICMOVESRDB->[$king_shift][(((($occupancy) & CP_MAGICMOVES_R_MASK->[$king_shift]) * CP_MAGICMOVES_R_MAGICS->[$king_shift]) >> 52) & ((1 << (64 - 52)) - 1)] & ($queens | $self->[CP_POS_ROOKS])));})) {
-			return;
-		}
+	my $is_white = $king_destination < CP_A2;
+	my $king_square = $is_white ? CP_E1 : CP_E8;
+	my $rook_square;
+	if ($king_destination == CP_G1) {
+		$rook_square = CP_H1;
+	} elsif ($king_destination == CP_C1) {
+		$rook_square = CP_A1;
+	} elsif ($king_destination == CP_G8) {
+		$rook_square = CP_H8;
 	} else {
-		if ((do {	my $her_color = !CP_WHITE;	my $her_pieces = $self->[CP_POS_WHITE_PIECES + $her_color];	my $occupancy = $self->[CP_POS_WHITE_PIECES + CP_WHITE] | $her_pieces;	my $queens = $self->[CP_POS_QUEENS];	$her_pieces		& (($pawn_masks[CP_WHITE]->[2]->[$king_shift] & $self->[CP_POS_PAWNS])			| ($knight_attack_masks[$king_shift] & $self->[CP_POS_KNIGHTS])			| ($king_attack_masks[$king_shift] & $self->[CP_POS_KINGS])			| (CP_MAGICMOVESBDB->[$king_shift][(((($occupancy) & CP_MAGICMOVES_B_MASK->[$king_shift]) * CP_MAGICMOVES_B_MAGICS->[$king_shift]) >> 55) & ((1 << (64 - 55)) - 1)] & ($queens | $self->[CP_POS_BISHOPS]))			| (CP_MAGICMOVESRDB->[$king_shift][(((($occupancy) & CP_MAGICMOVES_R_MASK->[$king_shift]) * CP_MAGICMOVES_R_MAGICS->[$king_shift]) >> 52) & ((1 << (64 - 52)) - 1)] & ($queens | $self->[CP_POS_ROOKS])));})) {
-			return;
-		}
+		$rook_square = CP_A8;
+	}
+	my $my_pieces = $is_white ? $self->[CP_POS_WHITE_PIECES] : $self->[CP_POS_BLACK_PIECES];
+
+	if (($my_pieces & $self->[CP_POS_KINGS]) != (1 << $king_square)) {
+		die __"Illegal castling rights: king not on initial square!\n";
 	}
 
-	# Check castling rights consistency.
-
-	# Check number of pieces.
+	if (!($my_pieces & $self->[CP_POS_ROOKS] & (1 << $rook_square))) {
+		die __"Illegal castling rights: rook not on initial square!\n";
+	}
 
 	return $self;
 }
@@ -983,10 +1083,10 @@ sub attacked {
 }
 
 sub moveAttacked {
-	my ($self, $move) = @_;
+	my ($self, $move, $pseudo_legal) = @_;
 
 	if ($move =~ /[a-z]/i) {
-		$move = $self->parseMove($move) or return;
+		$move = $self->parseMove($move, $pseudo_legal);
 	}
 
 	my ($from, $to) = ((($move >> 6) & 0x3f), (($move) & 0x3f));
@@ -1050,10 +1150,10 @@ sub moveGivesCheck {
 }
 
 sub movePinned {
-	my ($self, $move) = @_;
+	my ($self, $move, $pseudo_legal) = @_;
 
 	if ($move =~ /[a-z]/i) {
-		$move = $self->parseMove($move) or return;
+		$move = $self->parseMove($move, $pseudo_legal);
 	}
 
 	my $to_move = ((($self->[CP_POS_INFO] & (1 << 4)) >> 4));
@@ -1732,15 +1832,14 @@ sub SEE {
 }
 
 sub parseMove {
-	my ($self, $notation) = @_;
+	my ($self, $notation, $pseudo_legal) = @_;
 
 	my $move;
 
 	if ($notation =~ /^([a-h][1-8])([a-h][1-8])([qrbn])?$/) {
-		$move = $self->__parseUCIMove(map { lc $_ } ($1, $2, $3))
-			or return;
+		$move = $self->__parseUCIMove(map { lc $_ } ($1, $2, $3));
 	} else {
-		$move = $self->__parseSAN($notation) or return;
+		$move = $self->__parseSAN($notation);
 	}
 
 	my $piece;
@@ -1786,6 +1885,14 @@ sub parseMove {
 
 	(($move) = (($move) & ~0x20_0000) | (($self->toMove) & 0x1) << 21);
 
+	if (!$pseudo_legal) {
+		foreach my $candidate ($self->legalMoves) {
+			return $move if $candidate == $move;
+		}
+
+		die __"Illegal move!\n";
+	}
+
 	return $move;
 }
 
@@ -1796,10 +1903,8 @@ sub __parseUCIMove {
 	my $from = $class->squareToShift($from_square);
 	my $to = $class->squareToShift($to_square);
 
-	return if $from < 0;
-	return if $from > 63;
-	return if $to < 0;
-	return if $to > 63;
+	# There is no need for boundary checking. The regexes [a-h][1-8] used in
+	# the callers are sufficient for that.
 
 	(($move) = (($move) & ~0xfc0) | (($from) & 0x3f) << 6);
 	(($move) = (($move) & ~0x3f) | (($to) & 0x3f));
@@ -2880,7 +2985,10 @@ sub __parseSAN {
 		}
 
 		# Leading garbage?
-		return if @san;
+		if (@san) {
+			require Carp;
+			Carp::Croak(__"Illegal SAN string: leading garbage found!\n");
+		}
 
 		$pattern = join '', $piece, 
 				$from_file, $from_rank, $to_file, $to_rank, $promote;
@@ -2909,10 +3017,19 @@ sub __parseSAN {
 		@candidates = grep { /^$pattern$/ } @legal;
 	}
 
-	return if @candidates != 1;
+	if (!@candidates) {
+		require Carp;
+		Carp::croak(__"Illegal SAN string: illegal move.\n");
+	} elsif (@candidates > 1) {
+		require Carp;
+		Carp::croak(__"Illegal SAN string: move is ambiguous.\n");
+	}
 
 	$move = $candidates[0];
-	return if $move !~ /^[PNBRQK]([a-h][1-8])([a-h][1-8])([qrbn])?$/;
+	if ($move !~ /^[PNBRQK]([a-h][1-8])([a-h][1-8])([qrbn])?$/) {
+		require Carp;
+		Carp::croak(__"Illegal SAN string: syntax error.\n");
+	}
 
 	return $self->__parseUCIMove($1, $2, $3);
 }

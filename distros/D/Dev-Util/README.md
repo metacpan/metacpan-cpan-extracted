@@ -2,7 +2,7 @@
 Dev::Util - Utilities useful in the development of perl programs
 
 # VERSION
-Version v2.18.19
+Version v2.19.6
 
 # SYNOPSIS
 
@@ -55,6 +55,8 @@ This is equivalent to:
     use English qw( -no_match_vars );
 
     # Rest of Code...
+
+**Note: `use Dev::Util::Syntax` automatically adds `use strict` and `use warnings` to the program.**
 
 ## Dev::Util::Const
 Defines named constants as Readonly, based on best practices.
@@ -112,7 +114,7 @@ Module to do Semaphore locking
     $sem->unlock;
 
 # EXAMPLES
-Example programs demonstrate how the `Dev::Util` modules can be used are in the F<examples> dir.
+Example programs demonstrate how the `Dev::Util` modules can be used are in the `examples` dir.
 
 
 # INSTALLATION

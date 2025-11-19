@@ -1,4 +1,4 @@
-@VAR1=(node=>{
+%VAR1=(node=>{
 
 	Chores=>{
 		message=>'Time to start chores!',

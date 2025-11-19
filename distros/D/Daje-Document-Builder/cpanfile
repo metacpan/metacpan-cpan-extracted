@@ -1,0 +1,12 @@
+requires 'perl', '5.042000';
+
+requires 'Template', '3.102';
+requires 'Mojo::Base', '0';
+requires "Daje::Tools::Datasections","1.00";
+requires "Class::Load", "0.25";
+
+on 'test' => sub {
+    requires 'Test::More', '0.98';
+
+};
+

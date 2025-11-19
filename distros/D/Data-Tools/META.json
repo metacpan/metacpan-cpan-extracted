@@ -39,6 +39,6 @@
          "web" : "https://github.com/cade-vs/perl-data-tools"
       }
    },
-   "version" : "1.49",
+   "version" : "1.50",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

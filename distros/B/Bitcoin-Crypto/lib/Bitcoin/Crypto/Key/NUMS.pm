@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Key::NUMS;
-$Bitcoin::Crypto::Key::NUMS::VERSION = '4.001';
+$Bitcoin::Crypto::Key::NUMS::VERSION = '4.002';
 use v5.10;
 use strict;
 use warnings;

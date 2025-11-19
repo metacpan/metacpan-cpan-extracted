@@ -48,7 +48,7 @@ my $symbols   = FALSE;
 my $unicode   = FALSE;
 my $colors    = FALSE;
 my $Dump      = FALSE;
-my $c16       = ($ENV{'TERM'} =~ /xterm/) ? TRUE : FALSE;
+my $c16       = TRUE;
 my $c256      = FALSE;
 my $crgb      = FALSE;
 my $frames    = FALSE;
@@ -139,7 +139,7 @@ my $text = <<'VERSION';
 [% YELLOW %]║[% RESET %][% B_COLOR 17 %]                         Written By [% BRIGHT YELLOW %]Richard Kelsch[% RESET %][% B_COLOR 17 %]                           [% RESET %][% YELLOW %]║[% RESET %]
 [% YELLOW %]║[% RESET %][% B_COLOR 17 %]                       Copyright ©[% GREEN %]2025 [% BRIGHT YELLOW %]Richard Kelsch[% RESET %][% B_COLOR 17 %]                        [% RESET %][% YELLOW %]║[% RESET %]
 [% YELLOW %]║[% RESET %][% B_COLOR 17 %]                            All Rights Reserved                              [% RESET %][% YELLOW %]║[% RESET %]
-[% YELLOW %]║[% RESET %][% B_COLOR 17 %]                           Perl Artistic License                             [% RESET %][% YELLOW %]║[% RESET %]
+[% YELLOW %]║[% RESET %][% B_COLOR 17 %]                         Perl Artistic License 2.0                           [% RESET %][% YELLOW %]║[% RESET %]
 [% YELLOW %]║[% RESET %][% B_COLOR 17 %]                               Version [% GREEN %]XXXX[% RESET %][% B_COLOR 17 %]                                  [% RESET %][% YELLOW %]║[% RESET %]
 [% YELLOW %]║[% RESET %][% B_COLOR 17 %]              GitHub:  https://github.com/richcsst/ansi-encode               [% RESET %][% YELLOW %]║[% RESET %]
 [% YELLOW %]╚═════════════════════════════════════════════════════════════════════════════╝[% RESET %]
@@ -314,7 +314,7 @@ $to .= '│' . colored(['bright_yellow'],  q{                     MMM     "YMMMM
 $to .= '╰───────────────────────────────────────┴────────────────────────────────────────────────────────╯' . "\n";
 ###
 
-{
+{ # Colors
     my $new;
     foreach my $code (qw(attributes foreground background)) {
         if ($code eq 'background') {
@@ -336,36 +336,45 @@ $to .= '╰───────────────────────
     }
     $new = '[% RESET %]' . colored(['bright_green'],'│');
     $to =~ s/│/$new/gs;
+
     $new = colored(['bright_green'],'─');
     $to =~ s/─/$new/gs;
+
     $new = colored(['bright_green'],'┴');
     $to =~ s/┴/$new/gs;
+
     $new = colored(['bright_green'],'╭');
     $to =~ s/╭/$new/gs;
+
     $new = colored(['bright_green'],'╮');
     $to =~ s/╮/$new/gs;
+
     $new = colored(['bright_green'],'╰');
     $to =~ s/╰/$new/gs;
+
     $new = colored(['bright_green'],'╯');
     $to =~ s/╯/$new/gs;
+
     $new = colored(['bright_green'],'╞');
     $to =~ s/╞/$new/gs;
+
     $new = colored(['bright_green'],'═');
     $to =~ s/═/$new/gs;
+
     $new = colored(['bright_green'],'╤');
     $to =~ s/╤/$new/gs;
+
     $new = colored(['bright_green'],'╡');
     $to =~ s/╡/$new/gs;
+
     $new = colored(['bright_green'],'╪');
     $to =~ s/╪/$new/gs;
+
     $new = 'RULE [% FAINT %][% ITALIC %]color[% RESET %]';
     $to =~ s/RULE color/$new/s;
-    $new = '[% FAINT %][% ITALIC %]red[% RESET %]';
-    $to =~ s/red/$new/gs;
-    $new = '[% FAINT %][% ITALIC %]green[% RESET %]';
-    $to =~ s/green/$new/gs;
-    $new = '[% FAINT %][% ITALIC %]blue[% RESET %]';
-    $to =~ s/blue/$new/gs;
+
+    $new = '[% FAINT %][% ITALIC %]red[% RESET %],[% FAINT %][% ITALIC %]green[% RESET %],[% FAINT %][% ITALIC %]blue[% RESET %]';
+    $to =~ s/red,green,blue/$new/gs;
 }
 
 $| = 1;
@@ -402,13 +411,13 @@ if ($version) {
     print "\n╔", '═' x 131, "╗\n";
     $ansi->ansi_output('║[% B_BLACK %][% BRIGHT YELLOW %]' . ' ' x 46 . 'THE FOLLOWING ARE THE AVAILABLE TOKENS' . ' ' x 47 . "[% RESET %]║\n");
     print '╠', '═' x 32, '╦', '═' x 32, '╦', '═' x 32, '╦', '═' x 32, '╣', "\n";
-    printf('║ %-31s║ %-31s║ %-31s║ %-31s║', 'COLOR 0 - COLOR 231', 'B_COLOR 0 - B_COLOR 231', 'GREY 0 - GREY 28', 'B_GREY 0 - B_GREY 28');
+    printf('║ %-31s║ %-31s║ %-31s║ %-31s║', 'COLOR 0 - COLOR 231', 'B_COLOR 0 - B_COLOR 231', 'GRAY 0 - GRAY 28', 'B_GRAY 0 - B_GRAY 28');
     print "\n║";
     my $width = 4;
     my $count = 1;
     foreach my $codes ('clear','cursor','attributes','foreground','background') {
         foreach my $token (sort(keys %{ $ansi->{'ansi_meta'}->{$codes} })) {
-            next if ($token =~ /COLOR |GREY /);
+            next if ($token =~ /COLOR |GRAY /);
             printf(' %-31s', $token);
             $count++;
             if ($count > $width) {
@@ -513,10 +522,10 @@ if ($version) {
     } ## end while (scalar(@names))
     $ansi->ansi_output('[% COLOR 52 %]╰─────────┴─' . '─' x $size . '─╯[% RESET %]' . "\n\n");
 } elsif ($colors) {
-    my $grey   = '[% GREY 8 %]';
+    my $grey   = '[% GRAY 8 %]';
     my $off    = '[% RESET %]';
     my $string = '';
-    $string .= "\n" . '[% BRIGHT WHITE %] ANSI Colors and GREY colors (requires a terminal with 256 color support for all colors)' . $off . "\n";
+    $string .= "\n" . '[% BRIGHT WHITE %] ANSI Colors and GRAY colors (requires a terminal with 256 color support for all colors)' . $off . "\n";
     $string .= $grey . '╭─────┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──┬──╮' . $off . "\n";
     $string .= $grey . '│' . $off . 'COLOR';
     foreach my $i (0 .. 35) {
@@ -535,7 +544,7 @@ if ($version) {
         my $_i = ($i * 36) + 16;
         $string .= "\n" . $grey . '├─────┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┼──┤' . $off . "\n";
         if ($i == 6) {
-            $string .= $grey . '│' . $off . 'GREY ' . $grey . '│' . $off;
+            $string .= $grey . '│' . $off . 'GRAY ' . $grey . '│' . $off;
         } else {
             $string .= sprintf("%s│%s %4d%s│%s", $grey, $off, $_i, $grey, $off);
         }

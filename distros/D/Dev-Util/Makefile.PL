@@ -40,9 +40,7 @@ WriteMakefile(
                        'version'         => 0,
                        'warnings'        => 0,
                  },
-    TEST_REQUIRES => {     'App::Yath'          => 0,
-                           'English'            => 0,
-                           'ExtUtils::Manifest' => 0,
+    TEST_REQUIRES => {     'ExtUtils::Manifest' => 0,
                            'File::Compare'      => 0,
                            'File::Path'         => 0,
                            'FindBin'            => 0,
@@ -66,6 +64,7 @@ WriteMakefile(
 );
 
 # XT_TEST_REQUIRES => { 'Pod::Coverage'                 => 0,
+#                       'App::Yath'                     => 0,
 #                       'Pod::Wordlist'                 => 0,
 #                       'Test2::Bundle::More'           => 0,
 #                       'Test2::Require::AuthorTesting' => 0,

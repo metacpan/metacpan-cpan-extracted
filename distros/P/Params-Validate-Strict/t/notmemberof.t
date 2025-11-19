@@ -186,7 +186,7 @@ use Params::Validate::Strict qw(validate_strict);
         username => {
             type => 'string',
             notmemberof => ['admin', 'root', 'system', 'guest'],
-            error_message => 'This username is reserved and cannot be used'
+            error_msg => 'This username is reserved and cannot be used'
         }
     };
 

@@ -1,24 +1,60 @@
-  :root {
-    --pico-font-size: 85%;
-  }
-  body {
-    margin: 1rem auto;
-    max-width: 900px;
-  }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  th, td {
-    text-align: left;
-    padding: 0.5rem;
-  }
-  th {
-    font-weight: bold;
-  }
-  tr:nth-child(even) {
-    background-color: var(--pico-background-color-hover);
-  }
-  hr {
-    margin: 1.5rem 0;
-  }
+/* Layout and font selections */
+
+:root {
+  --pico-font-size: 85%;
+}
+body {
+  margin: 1rem auto;
+  max-width: 900px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+th, td {
+  text-align: left;
+  padding: 0.5rem;
+}
+th {
+  font-weight: bold;
+}
+tr:nth-child(even) {
+  background-color: var(--pico-background-color-hover);
+}
+hr {
+  margin: 1.5rem 0;
+}
+
+/* Keep the table from expanding when code is injected */
+table {
+  table-layout: fixed;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* Make sure the cell doesn't force wider layout */
+.source-row td {
+  max-width: 100%;
+  overflow: hidden; /* hides anything outside the cell */
+}
+
+/* Style the code block properly */
+.source-row pre {
+  margin: 0;
+  padding: 0.5em;
+  background: #f8f8f8; /* optional */
+  border-radius: 4px;
+
+  /* The key bits: */
+  white-space: pre;      /* no wrapping */
+  overflow-x: auto;      /* horizontal scroll if needed */
+  overflow-y: hidden;    /* avoid double scrollbars */
+  max-width: 100%;       /* stay within the table cell */
+  box-sizing: border-box;
+}
+
+/* Ensure code fits inside pre block */
+.source-row code {
+  display: inline-block;
+  min-width: 100%;
+}

@@ -1,7 +1,5 @@
 package Dev::Util::Sem;
 
-use lib 'lib';
-
 use Dev::Util::Syntax;
 use Dev::Util::File qw(mk_temp_dir dir_writable dir_suffix_slash);
 use Exporter        qw(import);
@@ -10,7 +8,7 @@ use FileHandle;
 use Carp();
 use Fcntl 'LOCK_EX';
 
-our $VERSION = version->declare("v2.18.19");
+our $VERSION = version->declare("v2.19.6");
 
 our @EXPORT_OK = qw(
     new
@@ -87,7 +85,7 @@ Dev::Util::Sem -  Module to do Semaphore locking
 
 =head1 VERSION
 
-Version v2.18.19
+Version v2.19.6
 
 =head1 SYNOPSIS
 
@@ -119,7 +117,7 @@ lock dirs will be tried.
     my $sem1 = Sem->new('/wherever/locks/mylock1.sem');
     my $sem2 = Sem->new('mylock2.sem', TIMEOUT);
 
-C<TIMEOUT> number of seconds to wait while trying to acquire a lock
+C<TIMEOUT> number of seconds to wait while trying to acquire a lock. Default = 60 seconds
 
 Alternate lock dirs: 
 

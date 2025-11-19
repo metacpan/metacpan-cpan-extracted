@@ -1,5 +1,29 @@
 Revision history for Parse-H
 
+2025-11- 11	Bogdan Drozdowski <bogdro \at\ cpan . org>
+
+	* Version 0.30
+	  Parsing fixes and improvements.
+	  Code style updates.
+	  Other small fixes and improvements.
+	  Build system improvements.
+	  Updated copyright.
+	* lib/Parse/H.pm (parse_file): Skip functions returning enums.
+	* lib/Parse/H.pm (parse_struct, parse_union): Fixed support for
+	  multi-line declarations with comments. Adding a newline at the end
+	  if not present. Support multiple levels of pointers. Support the
+	  (u)intXXX_t data types. Process comments in invalid or empty
+	  declarations.
+	* lib/Parse/H.pm (parse_struct): Stop skipping 'volatile' in comments.
+	* lib/Parse/H.pm (parse_struct, parse_union, _split_decl): Improved
+	  joining lines.
+	* lib/Parse/H.pm (_split_decl): Simplified the procedure.
+	* lib/Parse/H.pm, t/z_parse_file.t: Use @_ for subs with many
+	  parameters.
+	* Makefile.PL: Put the version in a variable.
+	* lib/Parse/H.pm, t/z*.t, Makefile.PL, README: Updated the copyright
+	  and version.
+
 2023-10-23	Bogdan Drozdowski <bogdro \at\ cpan . org>
 
 	* Version 0.21

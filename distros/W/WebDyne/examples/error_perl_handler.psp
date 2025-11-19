@@ -1,8 +1,0 @@
-<start_html>
-Hello World
-!{! &handler !}
-__PERL__
-sub handler {
-    die('Bang !')
-}
-1;

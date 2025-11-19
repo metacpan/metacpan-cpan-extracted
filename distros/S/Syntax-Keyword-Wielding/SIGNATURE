@@ -1,0 +1,38 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 adf9f4fed78320d62374cf94c2f6d1d4545a979befb015f217a268d1511019eb COPYRIGHT
+SHA256 7977c02e031153dc91d6db9d2e803671d586e59bca2c5c3dc6211f29c04d92d6 CREDITS
+SHA256 2b303292fded40a0504ea2a67f3629d96f4a637eca48025dba7c871991325924 Changes
+SHA256 b1fa34a41f44a094a430b21b42895c17fae3aec30f52e3bdbecb0e170f478aeb INSTALL
+SHA256 8e7094312357a5a73b44c1b87d32fca39e6d2f6c5a5504bcbcd0f0cf34b7c9cc LICENSE
+SHA256 52dfe7395c56107511df2b2f98e92f3b7086f7a6d949de3907b8f2b9869c13d7 MANIFEST
+SHA256 b9024967a99f8ea69fa6eb2b793a1e588d4ee6cbcc24a5b377d8770ec2175d49 META.json
+SHA256 0bf62361474f28f8750655400753772082fc4ed755e205c352a8868f2ef02b63 META.yml
+SHA256 16ab509065747e3252e6c60b4c4fc1ffd5bdd2f2cdbbba9cc76441b81c009332 Makefile.PL
+SHA256 6db13e78f5c401e829795b8bd34baacbc4ce99cf51d0aec7677ef034ce5d5845 README
+SHA256 0b5ffc089ef6b000e3c053c38ca233d46bff4d9521d17a0e6f04f8c55b576276 dist.ini
+SHA256 3868c278f886847f832a2e4768a912c6b5b95cf41407495bbef50900913d2cf9 doap.ttl
+SHA256 e57c3a2b78b3849471229388102af584f78ceed7e2823b4725d8327ebc255117 lib/Syntax/Keyword/Wielding.pm
+SHA256 0438058856d2f9cfd58c0ea4312c0539f0c0aa1a63cb5fe74a4230c4b7a0d589 t/00start.t
+SHA256 e0bb3131313a8f16d362f424ca65b475f2e5483f4d498614333031223c9992ba t/01basic.t
+SHA256 0d74151d18ce82613012fd62be551b694413a2384e8ba7c9d6b99f0cf40287fb t/integration/example.t
+-----BEGIN PGP SIGNATURE-----
+
+iF0EAREDAB0WIQRVJKj/4+s6z4WzNujOv4Eoaip9OQUCaRkF9gAKCRDOv4Eoaip9
+OaMqAKCLPh/wXpE7VnQN/jpe6dZ8ZmWUWACgpKMrL3FCmfiVWcShPkbxu+JaHnk=
+=rhYB
+-----END PGP SIGNATURE-----

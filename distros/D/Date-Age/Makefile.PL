@@ -15,9 +15,9 @@ WriteMakefile(
     ABSTRACT     => 'Calculate precise or range-based age from dates',
     AUTHOR       => 'Nigel Horne <njh@nigelhorne.com>',
     LICENSE      => 'GPL',
+	EXE_FILES => [ 'bin/date-age' ],
     PREREQ_PM    => {
-	'Time::Local' => 0,
-	'Time::Piece' => 0
+	'Time::Local' => 0
 	}, TEST_REQUIRES => {
 		'Test::DescribeMe' => 0,
 		'Test::Most' => 0,

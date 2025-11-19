@@ -29,7 +29,6 @@ my %WriteMakefileArgs = (
         'Encode'            => 0,
         'JSON'              => 0,
         'List::Util'        => 0,
-        'Regexp::Common'    => 0,
         'Scalar::Util'      => 0,
     },
     TEST_REQUIRES =>

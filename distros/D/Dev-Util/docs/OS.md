@@ -4,7 +4,7 @@ Dev::Util::OS - OS discovery and functions
 
 # VERSION
 
-Version v2.18.19
+Version v2.19.6
 
 # SYNOPSIS
 
@@ -25,6 +25,8 @@ OS discovery and functions
     get_hostname
     is_linux
     is_mac
+    is_freebsd
+    is_openbsd
     is_sunos
     ipc_run_e
     ipc_run_c
@@ -54,6 +56,18 @@ Return true if the current system is Linux.
 Return true if the current system is MacOS (Darwin).
 
     my $system_is_macOS = is_mac();
+
+## **is\_freebsd**
+
+Return true if the current system is FreeBSD.
+
+    my $system_is_FreeBSD = is_freebsd();
+
+## **is\_openbsd**
+
+Return true if the current system is OpenBSD.
+
+    my $system_is_OpenBSD = is_openbsd();
 
 ## **is\_sunos**
 

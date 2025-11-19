@@ -81,4 +81,3 @@ $obj = Data::MARC::Field008::Book->new(
 isa_ok($obj, 'Data::MARC::Field008::Book');
 @errors = err_get;
 is(scalar @errors, 0, 'Number of errors (0).');
-clean();

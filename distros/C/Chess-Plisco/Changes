@@ -1,5 +1,14 @@
 Revision history for Perl extension Chess-Plisco
 
+v0.8.0  2025-11-16
+	- pondering implemented in engine
+	- improved time management
+	- fixed printing of prinicipal variation
+	- principal variation no longer printed in quiescence search
+	- parseMove() now throws exceptions
+	- parseMove() now does a complete legality check (and throws ...)
+	- constructor does now a complete legality/consistency check on position
+
 v0.7.0  2025-11-11
 	- probing of Syzygy endgame tablebase implemented (not yet used in engine)
 	- documentation for helper modules added

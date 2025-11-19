@@ -1,0 +1,12 @@
+<html>
+<head><title>Hello World</title></head>
+<body>
+
+The value of $i is !{! \$i !}
+
+</body>
+</html>
+
+__PERL__
+
+my $i=5;

@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Key::Private;
-$Bitcoin::Crypto::Key::Private::VERSION = '4.001';
+$Bitcoin::Crypto::Key::Private::VERSION = '4.002';
 use v5.10;
 use strict;
 use warnings;
@@ -321,10 +321,22 @@ is used.
 
 =head3 verify_message
 
-	$signature_valid = $object->verify_message($message, $signature)
+	$signature_valid = $object->verify_message($message, $signature, %params)
 
 Verifies C<$signature> against digest of C<$message> (digesting it with double
 sha256) using private key.
+
+C<%params> can be any of:
+
+=over
+
+=item * C<flags>
+
+An instance of L<Bitcoin::Crypto::Transaction::Flags>. If not passed, full set
+of consensus flags will be assumed (same as calling
+L<Bitcoin::Crypto::Transaction::Flags/new> with no arguments).
+
+=back
 
 Returns boolean.
 

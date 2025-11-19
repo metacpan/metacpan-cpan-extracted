@@ -53,7 +53,7 @@ subtest 'Change:  Boolean'=>sub {
 };
 
 subtest 'Change:  Log behavior'=>sub {
-	plan tests=>3;
+	plan tests=>5;
 	my $attr=Schedule::Activity::Attribute->new(type=>'int',value=>0,tm=>0);
 	$attr->change(set=>10,tm=>3);
 	$attr->change(set=>20,tm=>6);
@@ -64,6 +64,13 @@ subtest 'Change:  Log behavior'=>sub {
 	$attr->change(set=>15,tm=>3);
 	is($attr->value(),30,'Historic event does not affect value');
 	is_deeply($$attr{log},{0=>0,6=>30},'Historic event is not logged');
+	#
+	$attr=Schedule::Activity::Attribute->new(type=>'int',value=>0,tm=>0);
+	$attr->change(set=>10,tm=>6);
+	$attr->change(set=>12,tm=>6);
+	is($$attr{avg},6,'Time overwrite corrects average');
+	$attr->change(incr=>2,tm=>6);
+	is($$attr{avg},7,'Time increment corrects average');
 };
 
 # t  x

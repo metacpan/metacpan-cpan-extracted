@@ -74,7 +74,7 @@ Readonly::Array our @TARGET_AUDIENCES => (' ', 'a', 'b', 'c', 'd', 'e', 'f',
 	'g', 'j', '|');
 Readonly::Array our @TYPE_OF_DATES => qw(b c d e i k m n p q r s t u |);
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 sub check_book_biography {
 	my ($self, $key) = @_;
@@ -1493,8 +1493,15 @@ L<http://skim.cz>
 
 BSD 2-Clause License
 
+=head1 ACKNOWLEDGEMENTS
+
+Development of this software has been made possible by institutional support
+for the long-term strategic development of the National Library of the Czech
+Republic as a research organization provided by the Ministry of Culture of
+the Czech Republic (DKRVO 2024–2028), Area 11: Linked Open Data.
+
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

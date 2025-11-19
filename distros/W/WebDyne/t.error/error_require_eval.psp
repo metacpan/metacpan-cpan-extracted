@@ -1,0 +1,2 @@
+<start_html>
+<perl require="error_require.pm" handler="error_require::error_die_eval"/>

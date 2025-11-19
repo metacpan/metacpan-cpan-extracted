@@ -1,0 +1,19 @@
+Types-Capabilities
+==================
+
+Created:      2025-11-14
+Home page:    <https://metacpan.org/release/Types-Capabilities>
+Bug tracker:  <https://github.com/tobyink/p5-types-capabilities/issues>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.002001	2025-11-15
+
+ - Bugfixes for some stack/queue methods.
+ - More tests.
+
+0.002000	2025-11-15
+
+ - It is now possible to coerce from Eachable, Mappable, and Greppable
+   objects.
+
+0.001000	2025-11-14	Initial release

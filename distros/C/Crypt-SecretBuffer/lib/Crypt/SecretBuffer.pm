@@ -1,7 +1,7 @@
 package Crypt::SecretBuffer;
 # VERSION
 # ABSTRACT: Prevent accidentally leaking a string of sensitive data
-$Crypt::SecretBuffer::VERSION = '0.007';
+$Crypt::SecretBuffer::VERSION = '0.008';
 
 use strict;
 use warnings;
@@ -16,17 +16,25 @@ bootstrap Crypt::SecretBuffer;
 
 {
    package Crypt::SecretBuffer::Exports;
-$Crypt::SecretBuffer::Exports::VERSION = '0.007';
+$Crypt::SecretBuffer::Exports::VERSION = '0.008';
 use Exporter 'import';
-   @Crypt::SecretBuffer::Exports::EXPORT_OK= qw( secret_buffer secret unmask_secrets_to
-      NONBLOCK AT_LEAST
+   @Crypt::SecretBuffer::Exports::EXPORT_OK= qw(
+      secret_buffer secret unmask_secrets_to
+      NONBLOCK AT_LEAST ISO8859_1 ASCII UTF8 UTF16LE UTF16BE HEX
+      MATCH_MULTI MATCH_REVERSE MATCH_NEGATE MATCH_ANCHORED
    );
-   sub secret_buffer {
-      Crypt::SecretBuffer->new(@_)
-   }
-   *secret=   *secret_buffer;
-   *NONBLOCK= *Crypt::SecretBuffer::NONBLOCK;
-   *AT_LEAST= *Crypt::SecretBuffer::AT_LEAST;
+   *NONBLOCK=       *Crypt::SecretBuffer::NONBLOCK;
+   *AT_LEAST=       *Crypt::SecretBuffer::AT_LEAST;
+   *ISO8859_1=      *Crypt::SecretBuffer::ISO8859_1;
+   *ASCII=          *Crypt::SecretBuffer::ASCII;
+   *UTF8=           *Crypt::SecretBuffer::UTF8;
+   *UTF16LE=        *Crypt::SecretBuffer::UTF16LE;
+   *UTF16BE=        *Crypt::SecretBuffer::UTF16BE;
+   *HEX=            *Crypt::SecretBuffer::HEX;
+   *MATCH_MULTI=    *Crypt::SecretBuffer::MATCH_MULTI;
+   *MATCH_REVERSE=  *Crypt::SecretBuffer::MATCH_REVERSE;
+   *MATCH_NEGATE=   *Crypt::SecretBuffer::MATCH_NEGATE;
+   *MATCH_ANCHORED= *Crypt::SecretBuffer::MATCH_ANCHORED;
 }
 
 sub import {
@@ -37,17 +45,6 @@ sub import {
 sub Inline {
    require Crypt::SecretBuffer::Install::Files;
    goto \&Crypt::SecretBuffer::Install::Files::Inline;
-}
-
-
-sub new {
-   my $self= bless {}, shift;
-   $self->assign(shift) if @_ == 1;
-   while (@_) {
-      my ($attr, $val)= splice(@_, 0, 2);
-      $self->$attr($val);
-   }
-   $self;
 }
 
 
@@ -70,6 +67,58 @@ sub as_pipe {
 }
 
 
+sub load_file {
+   my ($self, $path)= @_;
+   open my $fh, '<', $path or croak "open($path): $!";
+   my $blocksize= -s $path;
+   while (1) {
+      my $got= $self->append_sysread($fh, $blocksize);
+      defined $got or croak "sysread($path): $!";
+      last if $got == 0;
+      # should have read the whole thing first try, but file could be changing, so keep going
+      # at 16K intervals until EOF.
+      $blocksize= 16*1024 if $blocksize > 16*1024;
+   }
+   close($fh) or croak "close($path): $!";
+   return $self;
+}
+
+
+sub save_file {
+   my ($self, $path, $overwrite)= @_;
+   my $fh;
+   my $cur_path= "$path";
+   if (!$overwrite) {
+      -e $path and croak "File '$path' already exists";
+      # I don't think there's an atomic way to create-without-overwrite in perl, so try this..
+      open $fh, '>>', $path or croak "open($path): $!";
+      croak "File '$path' already exists"
+         if -s $fh > 0;
+   } elsif ($overwrite eq 'rename') {
+      require File::Temp;
+      require File::Spec;
+      my ($vol, $dir, $file)= File::Spec->splitpath($path);
+      $fh= File::Temp->new(DIR => File::Spec->catpath($vol, $dir, ''));
+      $cur_path= "$fh";
+   } else {
+      open $fh, '>', $path or croak "open($path): $!";
+   }
+   my $wrote= 0;
+   while ($wrote < $self->length) {
+      my $w= $self->syswrite($fh, $self->length - $wrote);
+      defined $w or croak "syswrite($cur_path): $!";
+      $wrote += $w;
+   }
+   close($fh) or croak "close($cur_path): $!";
+   if ($overwrite eq 'rename') {
+      rename($cur_path, $path) or croak "rename($cur_path -> $path): $!";
+      $fh->unlink_on_destroy(0);
+   }
+   return $self;
+}
+
+
+require Crypt::SecretBuffer::Span;
 1;
 
 __END__
@@ -99,7 +148,7 @@ Crypt::SecretBuffer - Prevent accidentally leaking a string of sensitive data
   );                      # without it ever being copied into a Perl scalar
   
   undef $buf;             # no copies of password remain in memory.
-
+  
   # pass secret directly to a XS function without copying a scalar
   use Crypt::SecretBuffer 'unmask_secrets_to';
   unmask_secrets_to(\&c_function, $buf);
@@ -156,7 +205,10 @@ L</C API> that doesn't rely on perl stringification behavior.
 If you have a module where you'd like to optionally receive secrets via SecretBuffer objects,
 but don't want your module to depend on Crypt::SecretBuffer, here are some useful recipes:
 
-  # unmask a single variable with duck-typing
+=over
+
+=item unmask a single variable with duck-typing
+
   sub connect($self, $dsn, $user, $password) {
     local $password->{stringify_mask}= undef
       if blessed $password && $password->can('stringify_mask');
@@ -164,7 +216,8 @@ but don't want your module to depend on Crypt::SecretBuffer, here are some usefu
     ...
   }
 
-  # use unmask_secrets_to with a fallback if SecretBuffer is not installed
+=item use unmask_secrets_to with a fallback if SecretBuffer is not installed
+
   BEGIN {
     eval 'use Crypt::SecretBuffer qw/unmask_secrets_to/; 1'
     or eval 'sub unmask_secrets_to { shift->(@_) }'
@@ -174,9 +227,8 @@ but don't want your module to depend on Crypt::SecretBuffer, here are some usefu
     ...
   }
 
-  /*
-   * In C code, perform the 'local' technique and overloaded stringification
-   */
+=item In C code, perform the 'local' technique and overloaded stringification
+
   const char *actual_pass= NULL;
   STRLEN actual_pass_len;
   if (sv_isobject(password) && sv_derived_from(password, "Crypt::SecretBuffer")) {
@@ -192,9 +244,8 @@ but don't want your module to depend on Crypt::SecretBuffer, here are some usefu
   }
   actual_pass= SvPV(password, actual_pass_len);
 
-  /*
-   * In C code, conditionally access the SecretBuffer C API
-   */
+=item In C code, conditionally access the SecretBuffer C API
+
   typedef struct {
     char *data;
     size_t len, capacity;
@@ -208,7 +259,7 @@ but don't want your module to depend on Crypt::SecretBuffer, here are some usefu
   
      HV *secretbuffer_api = get_hv("Crypt::SecretBuffer::C_API", 0);
      if (secretbuffer_api) { /* only becomes true after 'use Crypt::SecretBuffer;' */
-       SV **svp = hv_fetch(secretbuffer_api, "secret_buffer_from_magic", 24, 0);
+       SV **svp = hv_fetchs(secretbuffer_api, "secret_buffer_from_magic", 0);
        sb_from_magic_t *sb_from_magic= svp && *svp? (sb_from_magic_t*) SvIV(*svp) : NULL;
        secret_buffer *buf;
        if (sb_from_magic && (buf= sb_from_magic(password, 0))) {
@@ -219,6 +270,8 @@ but don't want your module to depend on Crypt::SecretBuffer, here are some usefu
      if (!actual_pass)
        actual_pass= SvPV(password, actual_pass_len);
   ...
+
+=back
 
 =head1 CONSTRUCTORS
 
@@ -322,12 +375,54 @@ See also: L</unmask_secrets_to>.
 
 =head2 index
 
-  $ofs= $buf->index($str);
-  $ofs= $buf->index($str, $from_offset);
+  $ofs= $buf->index($str_or_charclass, $from_offset=0);
 
-Like Perl's C<index> function, returns -1 if not found, or else the offset of the start of the
-string you asked it to look for.  You can specify an optional starting offset to search from.
-Negative starting offsets search from that many characters before the end of the buffer.
+Like Perl's C<index> function, it scans the string from an optional offset and
+returns the location the string was found, or -1 if it doesn't exist.  This can
+also scan for a character class provided in a C<< qr// >> expression, like the
+L</scan> function.  C<$from_offset> may be negative to count backward from the
+end of the buffer.
+
+=head2 rindex
+
+  $ofs= $buf->index($str_or_charclass, $from_offset=-1);
+
+Like L</index> but in reverse, where the default C<$from_offset> is -1 (end of
+buffer).
+
+=head2 scan
+
+  ($ofs, $len)= $buf->scan($s, $flags=0, $ofs=0, $len=undef);
+
+This function scans through the buffer looking for the first match of a string
+or a character class.  The scan can optionally be limited to an offset and
+length describing a substring of the buffer.  The return value is the position
+of the start of the match, and number of I<bytes> matched (which can be greater
+than one when matching a character class in UTF-8, or if C<MATCH_MULTI> flag is
+requested).  Unlike C<index> or C<rindex>, on failure the return value will be
+C<< (C<$ofs> + C<$len>, 0) >>, or with MATCH_REVERSE, C<< (C<$ofs>, 0) >>.
+Also unlike C<rindex>, a reverse scan must fall entirely within the range of
+C<< ($ofs, $len) >> rather than just starting before C<< $ofs+$len >>.
+
+Eventually, this function may be enhanced with full regex support, but for now
+it is limited to one character class and optionally a '+' modifier as an alias
+for flag MATCH_MULTI.  Until that enhancement occurs, your regex notation must
+start with '[' and must end with either ']' or '+'.
+
+  ($ofs, $len)= $buf->scan(qr/[\w]+/); # implies MATCH_MULTI
+
+The C<$flags> may be a bitwise OR of the L</Match Flags> and one
+L<Character Encoding|/Character Encodings>.
+If your pattern is a plain string (not regexp), B<< you must encode it with
+the same encoding >>.
+
+  my $str= "\x{100}";
+  utf8::encode($str);
+  my ($ofs, $len)= $buf->scan($str, UTF8);
+
+Note that C<$ofs> and C<$len> are still byte positions, and still suitable for
+L</substr> on the buffer, which is different from Perl's substr on a unicode
+string which works in terms of characters.
 
 =head2 substr
 
@@ -335,8 +430,17 @@ Negative starting offsets search from that many characters before the end of the
   $buf->substr(0,5);          # First 5 characters of buffer
   $buf->substr(0,5,$buf2);    # replace first 5 characters with content of $buf2
 
-This is exactly like Perl's C<substr> function, but it returns C<Crypt::SecretBuffer> objects,
-and they are not an lvalue that alters the original.
+This is exactly like Perl's C<substr> function, but it returns
+C<Crypt::SecretBuffer> objects, and they are not an lvalue that alters the
+original.  The offset and length are always bytes.
+
+=head2 span
+
+  $span= $buf->span($pos= 0, $len= $buf->len, $encoding=undef);
+  $span= $buf->span(pos => $p0, lim => $p1, encoding => UTF8);
+
+Like substr, but returns a L<Crypt::SecretBuffer::Span> which holds a reference back to the
+original SecretBuffer.  The Span object has various methods convenient for parsing.
 
 =head2 append_random
 
@@ -423,6 +527,25 @@ with L<IPC::Run>.
 The C<$async_result> from L</write_async> is ignored, allowing the background thread to complete
 (or error on a closed pipe) on its own time.
 
+=head2 load_file
+
+  $buf= secret(load_file => $path);
+  # or
+  $buf->load_file($path);
+
+This is a simple wrapper around C<open> and C<append_sysread> and C<close>, checking for errors
+at each step.
+
+=head2 save_file
+
+  $buf->save_file($path);
+  $buf->save_file($path, $overwrite); # bool, overwrite existing file
+  $buf->save_file($path, 'rename'); # overwrite using 'rename' of a temp file
+
+This writes the contents of the buffer to a file at C<$path>, checking for errors at each step.
+The file must not previously exist unless C<$overwrite> is true.  C<$overwrite> may be the
+special value C<'rename'> to write to a temp file and then rename it into place.
+
 =head1 EXPORTS
 
 =over 15
@@ -449,6 +572,69 @@ Shorthand function for calling L</new>.
 
 Call a coderef with a list of arguments, and any argument which is a SecretBuffer will be
 replaced by a scalar referencing the actual secret.
+
+=back
+
+There are also constants for various character encodings, used by L</scan> and
+L<Crypt::SecretBuffer::Span/encoding>.
+
+=head2 Character Encodings
+
+=over 20
+
+=item ISO8859_1
+
+The default - bytes are treated as the first 256 codepoints of Unicode.
+
+=item ASCII
+
+Bytes are restricted to 7-bit ASCII.  High bytes throw an exception.
+
+=item HEX
+
+Decode hexadecimal from the buffer before comparing to bytes in the search
+string.  Hex is case-insensitive and whitespace in a HEX string is ignored,
+allowing the data to be line-wraped.  There must be a multiple of two hex
+characters, and each byte's characters must be adjacent.
+
+=item UTF8
+
+=item UTF16BE
+
+=item UTF16LE
+
+Treat the buffer as the specified character set, and die if any character
+scanned is not valid.  (unpaired surrogates, overlong encodings, etc).
+
+=back
+
+=head2 Match Flags
+
+=over
+
+=item MATCH_REVERSE
+
+Walk backward from the end of the buffer (or specified span) looking for a
+match.
+
+=item MATCH_MULTI
+
+Once found, keep scanning until the buffer does I<not> match.  This is the same
+as using a regex that ends with C<'+'>, but applies to the string searches as
+well.
+
+=item MATCH_NEGATE
+
+Invert the result of each comparison.  This saves you the trouble of creating a
+new regex with a negated character class.  It also works with plain-string searches,
+so e.g. C<< scan($str, MATCH_MULTI) >> will start at the first character that wasn't
+the start of a C<$str> match and include all characters until the first match or end
+of buffer.
+
+=item MATCH_ANCHORED
+
+Require the match begin at the start of the specified range of the buffer.
+(or with C<MATCH_REVERSE>, end at the end of the range of the buffer).
 
 =back
 
@@ -495,7 +681,7 @@ instructions how to report security vulnerabilities.
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 AUTHOR
 

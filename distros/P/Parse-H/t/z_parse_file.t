@@ -1,7 +1,7 @@
 #!perl -w
 # A test for Parse::H - A parser module for C header files.
 #
-#	Copyright (C) 2022-2023 Bogdan 'bogdro' Drozdowski,
+#	Copyright (C) 2022-2025 Bogdan 'bogdro' Drozdowski,
 #	  bogdro (at) users . sourceforge . net
 #	  bogdro /at\ cpan . org
 #
@@ -57,8 +57,7 @@ my $preproc_sub = sub
 
 my $typedef_sub = sub
 {
-	my $old_type = shift;
-	my $new_type = shift;
+	my ($old_type, $new_type) = @_;
 	print STDERR "Typedef: old='$old_type', new='$new_type'\n" if $debug;
 	$was_typedef = 1;
 	return $new_type;
@@ -74,8 +73,7 @@ my $struct_start_sub = sub
 
 my $struct_entry_sub = sub
 {
-	my $name = shift;
-	my $size = shift;
+	my ($name, $size) = @_;
 	print STDERR "Structure entry: '$name' of size $size\n" if $debug;
 	$was_struct_entry = 1;
 	return $name;
@@ -99,8 +97,7 @@ my $enum_start_sub = sub
 
 my $enum_entry_sub = sub
 {
-	my $name = shift;
-	my $value = shift;
+	my ($name, $value) = @_;
 	print STDERR "Enum entry: '$name' of value $value\n" if $debug;
 	$was_enum_entry_sub = 1;
 	return $name;
@@ -123,8 +120,7 @@ my $union_start_sub = sub
 
 my $union_entry_sub = sub
 {
-	my $name = shift;
-	my $size = shift;
+	my ($name, $size) = @_;
 	print STDERR "Union entry: '$name' of size $size\n" if $debug;
 	$was_union_entry = 1;
 	return $name;
@@ -169,8 +165,7 @@ sub reset_vars
 
 sub should_have_var($$)
 {
-	my $params = shift;
-	my $name = shift;
+	my ($params, $name) = @_;
 	return defined ($params->{'infile'}) && defined ($params->{$name})? 1 : 0;
 }
 

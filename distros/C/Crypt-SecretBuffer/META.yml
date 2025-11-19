@@ -3,7 +3,8 @@ abstract: 'Prevent accidentally copying a string of sensitive data'
 author:
   - 'Michael Conrad <mike@nrdvana.net>'
 build_requires:
-  File::Temp: '0'
+  Data::Dumper: '0'
+  Encode: '0'
   FindBin: '0'
   IO::Handle: '0'
   POSIX: '0'
@@ -26,6 +27,8 @@ requires:
   Carp: '0'
   DynaLoader: '0'
   Exporter: '0'
+  File::Spec: '0'
+  File::Temp: '0'
   Scalar::Util: '0'
   overload: '0'
   parent: '0'
@@ -34,7 +37,7 @@ requires:
 resources:
   bugtracker: https://github.com/nrdvana/perl-Crypt-SecretBuffer/issues
   repository: https://github.com/nrdvana/perl-Crypt-SecretBuffer.git
-version: '0.007'
+version: '0.008'
 x_contributors:
   - 'Michael Conrad <mconrad@intellitree.com>'
 x_generated_by_perl: v5.40.0

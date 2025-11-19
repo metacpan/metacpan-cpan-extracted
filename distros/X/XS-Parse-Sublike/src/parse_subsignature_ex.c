@@ -432,6 +432,49 @@ static void opdump_argelems_named(pTHX_ const OP *o, struct Perl_OpDumpContext *
 }
 #endif
 
+static XOP xop_refargelem;
+static OP *pp_refargelem(pTHX)
+{
+  U8 priv = PL_op->op_private;
+  IV argix = PTR2IV(cUNOP_AUX->op_aux);
+
+  SV **svp = av_fetch(GvAV(PL_defgv), argix, FALSE);
+  if(!svp || !SvROK(*svp))
+    croak_from_caller("Expected argument %" IVdf " to %" SVf " to be a reference",
+        argix + 1, SVfARG(S_find_runcv_name(aTHX)));
+
+  SV *rv = SvRV(*svp);
+
+  const char *exp_reftype = NULL;
+  switch(priv & OPpARGELEM_MASK) {
+    case OPpARGELEM_SV:
+      if(SvTYPE(rv) > SVt_PVMG)
+        exp_reftype = "SCALAR";
+      break;
+
+    case OPpARGELEM_AV:
+      if(SvTYPE(rv) != SVt_PVAV)
+        exp_reftype = "ARRAY";
+      break;
+
+    case OPpARGELEM_HV:
+      if(SvTYPE(rv) != SVt_PVHV)
+        exp_reftype = "HASH";
+      break;
+  }
+  if(exp_reftype)
+    croak_from_caller("Expected argument %" IVdf " to %" SVf " to be a reference to %s",
+        argix + 1, SVfARG(S_find_runcv_name(aTHX)), exp_reftype);
+
+  /* Perform refaliasing into the pad */
+  SV **padentry = &(PAD_SVl(PL_op->op_targ));
+  save_clearsv(padentry);
+  SvREFCNT_dec(*padentry);
+  *padentry = SvREFCNT_inc(rv);
+
+  return PL_op->op_next;
+}
+
 /* Parameter attribute extensions */
 typedef struct SignatureAttributeRegistration SignatureAttributeRegistration;
 
@@ -538,6 +581,16 @@ static void S_sigctx_add_param(pTHX_ struct SignatureParsingContext *sigctx, str
      */
     intro_my();
   }
+  else if(paramctx->is_refalias) {
+    /* A positional reference alias. */
+
+    /* Acts as a positional for argument consuming purposes */
+    if(paramctx->op)
+      sigctx->positional_elems = op_append_list(OP_LINESEQ, sigctx->positional_elems,
+          newSTATEOP(0, NULL, paramctx->op));
+
+    sigctx->n_elems++;
+  }
   else if(paramctx->sigil == '$') {
     /* A positional scalar */
 
@@ -575,6 +628,7 @@ void XPS_signature_add_param(pTHX_ struct XSParseSublikeContext *ctx, struct XPS
 
   struct XPSSignatureParamContext paramctx = {
     .is_named = false,
+    .is_refalias = false,
     .sigil = details->sigil,
     .padix = details->padix,
     .varop = NULL, /* wil be set below */
@@ -634,6 +688,17 @@ static void S_parse_sigelem(pTHX_ struct SignatureParsingContext *sigctx, U32 fl
     c = lex_peek_unichar(0);
   }
 
+  if((flags & PARSE_SUBSIGNATURE_REFALIAS) && c == '\\') {
+    Perl_ck_warner_d(aTHX_ packWARN(WARN_EXPERIMENTAL__REFALIASING),
+      "refaliases are experimental");
+
+    lex_read_unichar(0);
+    lex_read_space(0);
+
+    paramctx.is_refalias = true;
+    c = lex_peek_unichar(0);
+  }
+
   paramctx.sigil = c;
   switch(paramctx.sigil) {
     case '$': private = OPpARGELEM_SV; break;
@@ -671,7 +736,12 @@ static void S_parse_sigelem(pTHX_ struct SignatureParsingContext *sigctx, U32 fl
       /* named params don't get an individual varop */
     }
     else {
-      paramctx.varop = newUNOP_AUX(OP_ARGELEM, 0, NULL, INT2PTR(UNOP_AUX_item *, (sigctx->n_elems)));
+      if(paramctx.is_refalias) {
+        paramctx.varop = newUNOP_AUX(OP_CUSTOM, 0, NULL, INT2PTR(UNOP_AUX_item *, (sigctx->n_elems)));
+        paramctx.varop->op_ppaddr = &pp_refargelem;
+      }
+      else
+        paramctx.varop = newUNOP_AUX(OP_ARGELEM, 0, NULL, INT2PTR(UNOP_AUX_item *, (sigctx->n_elems)));
       paramctx.varop->op_private |= private;
       paramctx.varop->op_targ = paramctx.padix;
     }
@@ -720,7 +790,7 @@ static void S_parse_sigelem(pTHX_ struct SignatureParsingContext *sigctx, U32 fl
     }
   }
 
-  if(paramctx.sigil == '$') {
+  if(paramctx.sigil == '$' || paramctx.is_refalias) {
     if(paramctx.is_named) {
     }
     else {
@@ -732,6 +802,8 @@ static void S_parse_sigelem(pTHX_ struct SignatureParsingContext *sigctx, U32 fl
     if(lex_consume("=") ||
         (default_if_undef = lex_consume("//=")) ||
         (default_if_false = lex_consume("||="))) {
+      if(paramctx.is_refalias)
+        croak("Cannot supply a defaulting expression to a refalias parameter");
       OP *defexpr = parse_termexpr(PARSE_OPTIONAL);
       if(PL_parser->error_count)
         croak("Expected a defaulting expression for optional parameter");
@@ -845,7 +917,7 @@ OP *XPS_parse_subsignature_ex(pTHX_ int flags,
   if(ctx)
     ctx->sigctx = sigctx;
 
-  assert((flags & ~(PARSE_SUBSIGNATURE_NAMED_PARAMS|PARSE_SUBSIGNATURE_PARAM_ATTRIBUTES)) == 0);
+  assert((flags & ~(PARSE_SUBSIGNATURE_NAMED_PARAMS|PARSE_SUBSIGNATURE_PARAM_ATTRIBUTES|PARSE_SUBSIGNATURE_REFALIAS)) == 0);
 
   ENTER;
   SAVEDESTRUCTOR_X(&free_parsing_ctx, sigctx);
@@ -1037,6 +1109,11 @@ void XPS_boot_parse_subsignature_ex(pTHX)
   XopENTRY_set(&xop_argelems_named, xop_dump, &opdump_argelems_named);
 #endif
   Perl_custom_op_register(aTHX_ &pp_argelems_named, &xop_argelems_named);
+
+  XopENTRY_set(&xop_refargelem, xop_name, "refargelem");
+  XopENTRY_set(&xop_refargelem, xop_desc, "refalias argument element");
+  XopENTRY_set(&xop_refargelem, xop_class, OA_UNOP_AUX);
+  Perl_custom_op_register(aTHX_ &pp_refargelem, &xop_refargelem);
 }
 
 #else /* !HAVE_PERL_VERSION(5, 26, 0) */

@@ -1,10 +1,11 @@
 #!/usr/bin/env perl
 
-use 5.018;
 use Test2::V0;
 use Test2::Require::AuthorTesting;
 
-plan tests => 9;
+use Dev::Util::Syntax;
+
+plan tests => 10;
 
 sub not_in_file_ok {
     my ( $filename, %regex ) = @_;
@@ -59,6 +60,7 @@ todo 'Need to replace the boilerplate text' => sub {
     module_boilerplate_ok('lib/Dev/Util/OS.pm');
     module_boilerplate_ok('lib/Dev/Util/Query.pm');
     module_boilerplate_ok('lib/Dev/Util/Syntax.pm');
+    module_boilerplate_ok('lib/Dev/Util/Sem.pm');
 
 };
 

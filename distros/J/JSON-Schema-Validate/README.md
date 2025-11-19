@@ -24,6 +24,7 @@ JSON::Schema::Validate - Lean, recursion-safe JSON Schema validator (Draft 2020-
         ->compile
         ->content_checks
         ->ignore_unknown_required_vocab
+        ->prune_unknown
         ->register_builtin_formats
         ->trace
         ->trace_limit(200); # 0 means unlimited
@@ -35,7 +36,7 @@ JSON::Schema::Validate - Lean, recursion-safe JSON Schema validator (Draft 2020-
 
 # VERSION
 
-v0.2.0
+v0.4.1
 
 # DESCRIPTION
 
@@ -97,7 +98,7 @@ Call `register_builtin_formats` to install default validators for the following 
 
 - `email`, `idn-email`
 
-    Uses [Regexp::Common](https://metacpan.org/pod/Regexp%3A%3ACommon) with `Email::Address` if available.
+    Imported and use the very complex and complete regular expression from [Regexp::Common::Email::Address](https://metacpan.org/pod/Regexp%3A%3ACommon%3A%3AEmail%3A%3AAddress), but without requiring this module.
 
 - `hostname`, `idn-hostname`
 
@@ -174,6 +175,37 @@ Options (all optional):
     Defaults to `1`
 
     When true, the instance is round-tripped through [JSON](https://metacpan.org/pod/JSON) before validation, which enforces strict JSON typing (strings remain strings; numbers remain numbers). This matches Python `jsonschema`’s type behaviour. Set to `0` if you prefer Perl’s permissive numeric/string duality.
+
+- `prune_unknown => 1|0`
+
+    Defaults to `0`
+
+    When set to a true value, unknown object properties in the instance are pruned (removed) prior to validation, based on the schema’s structural keywords.
+
+    Pruning currently takes into account:
+
+    - `properties`
+    - `patternProperties`
+    - `additionalProperties`
+
+        (item value or subschema, including within `allOf`)
+
+    - `allOf` (for merging additional object or array constraints)
+
+    For objects:
+
+    - Any property explicitly declared under `properties` is kept, and its value is recursively pruned according to its subschema (if it is itself an object or array).
+    - Any property whose name matches one of the `patternProperties` regular expressions is kept, and pruned recursively according to the associated subschema.
+    - If `additionalProperties` is `false`, any object property not covered by `properties` or `patternProperties` is removed.
+    - If `additionalProperties` is a subschema, any such additional property is kept, and its value is pruned recursively following that subschema.
+
+    For arrays:
+
+    - Items covered by `prefixItems` (by index) or `items` (for remaining elements) are kept, and if they are objects or arrays, they are pruned recursively. Existing positions are never removed; pruning only affects the nested contents.
+
+    The pruner intentionally does **not** interpret `anyOf`, `oneOf` or `not` when deciding which properties to keep or drop, because doing so would require running full validation logic and could remove legitimate data incorrectly. In those cases, pruning errs on the side of keeping more data rather than over-pruning.
+
+    When `prune_unknown` is disabled (the default), the instance is not modified for validation purposes, and no pruning is performed.
 
 - `trace`
 
@@ -299,6 +331,22 @@ Read-only accessor.
 
 Returns true if unknown required vocabularies are being ignored, false otherwise.
 
+## prune\_instance
+
+    my $pruned = $jsv->prune_instance( $instance );
+
+Returns a pruned copy of `$instance` according to the schema that was passed to `new`. The original data structure is **not** modified.
+
+The pruning rules are the same as those used when the constructor option `prune_unknown` is enabled (see ["prune\_unknown"](#prune_unknown)), namely:
+
+- For objects, only properties allowed by `properties`, `patternProperties` and `additionalProperties` (including those brought in via `allOf`) are kept. Their values are recursively pruned when they are objects or arrays.
+- If `additionalProperties` is `false`, properties not matched by `properties` or `patternProperties` are removed.
+- If `additionalProperties` is a subschema, additional properties are kept and pruned recursively according to that subschema.
+- For arrays, items are never removed by index. However, for elements covered by `prefixItems` or `items`, their nested content is pruned recursively when it is an object or array.
+- `anyOf`, `oneOf` and `not` are **not** used to decide which properties to drop, to avoid over-pruning valid data without performing full validation.
+
+This method is useful when you want to clean incoming data structures before further processing, without necessarily performing a full schema validation at the same time.
+
 ## register\_builtin\_formats
 
     $js->register_builtin_formats;
@@ -310,6 +358,14 @@ User-supplied callbacks passed via `format => { ... }` are preserved and take pr
 ## register\_content\_decoder
 
     $js->register_content_decoder( $name => sub{ ... } );
+
+or
+
+    $js->register_content_decoder(rot13 => sub
+    {
+        $bytes =~ tr/A-Za-z/N-ZA-Mn-za-m/;
+        return( $bytes ); # now treated as (1, undef, $decoded)
+    });
 
 Register a content **decoder** for `contentEncoding`. The callback receives a single argument: the raw data, and should return one of:
 
@@ -490,6 +546,8 @@ Jacques Deguest <`jack@deguest.jp`>
 [fastjsonschema](https://github.com/horejsek/python-fastjsonschema),
 [Pydantic](https://docs.pydantic.dev),
 [RapidJSON Schema](https://rapidjson.org/md_doc_schema.html)
+
+[https://json-schema.org/specification](https://json-schema.org/specification)
 
 # COPYRIGHT & LICENSE
 

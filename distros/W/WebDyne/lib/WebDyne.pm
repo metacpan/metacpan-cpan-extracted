@@ -59,7 +59,7 @@ use Exporter qw(import);
 #  Version information
 #
 $AUTHORITY='cpan:ASPEER';
-$VERSION='2.028';
+$VERSION='2.031';
 chomp($VERSION_GIT_REF=do { local (@ARGV, $/) = ($_=__FILE__.'.tmp'); <> if -f $_ });
 
 
@@ -740,7 +740,7 @@ sub handler : method {    # no subsort
 
     #  Get the actual html. The main event - convert data_ar to html
     #
-    $html_sr=$self->render({data => $data_ar, param => $param_hr}) || do {
+    $html_sr=$self->render_data_ar(data => $data_ar, param => $param_hr) || do {
 
 
         #  Our render routine returned an error. Debug
@@ -1488,17 +1488,54 @@ sub render {
     #  If not supplied param as hash ref assume all vars are params to be subs't when
     #  rendering this data block
     #
-    ref($param_hr) || ($param_hr={param => {@_[1..$#_]}}) if $param_hr;
+    my %param=(ref($param_hr) eq 'HASH') ? %{$param_hr} : @_[1..$#_];
+    
+    
+    #  Get node array ref
+    #
+    my $data_ar=$self->{'_perl'}[0][WEBDYNE_NODE_CHLD_IX] ||
+        return err('unable to get HTML data array');
+        
+
+    #  Any data params for this render ? Add them to parent data as additive
+    #
+    foreach my $perl_data_hr (@{$self->{'_perl_data'}}) {
+        map { $param{$_}=$perl_data_hr->{$_} unless exists $param{$_} } keys %{$perl_data_hr}
+    }
+
+        
+    #  Call render_node
+    #
+    return $self->render_data_ar( data=>$data_ar, param=>\%param) ||
+        err();
+    
+
+}
+
+
+sub render_data_ar {
+
+
+    #  Convert data array structure into HTML
+    #
+    my ($self, %param)=@_;
+
+
+    #  If not supplied param as hash ref assume all vars are params to be subs't when
+    #  rendering this data block
+    #
+    #ref($param_hr) || ($param_hr={param => {@_[1..$#_]}}) if $param_hr;
 
 
     #  Debug
     #
-    debug('in render, param data %s, stack: %s', $param_hr->{'data'}, join('*', @{$self->{'_perl'}}));
+    #debug('in render, param data %s, stack: %s', $param_hr->{'data'}, join('*', @{$self->{'_perl'}}));
 
 
     #  Get node array ref
     #
-    my $data_ar=$param_hr->{'data'} || $self->{'_perl'}[0][WEBDYNE_NODE_CHLD_IX] ||
+    #my $data_ar=$param_hr->{'data'} || $self->{'_perl'}[0][WEBDYNE_NODE_CHLD_IX] ||
+    my $data_ar=$param{'data'} || # $self->{'_perl'}[0][WEBDYNE_NODE_CHLD_IX] ||
         return err('unable to get HTML data array');
     #$self->{'_perl'}[0] ||= $data_ar;
 
@@ -1511,8 +1548,10 @@ sub render {
 
     #  If block name spec'd register it now
     #
-    $param_hr->{'block'} && (
-        $self->render_block($param_hr) || return err());
+    #$param_hr->{'block'} && (
+    #    $self->render_block($param_hr) || return err());
+    #$param{'block'} && (
+    #    $self->render_block(\%param) || return err());
 
 
     #  Get CGI object
@@ -1531,181 +1570,20 @@ sub render {
         $WEBDYNE_CGI_AUTOESCAPE;
         
         
-    #  Any data params for this render
+    #  Any data params for this render ? Add them to parent data as additive
     #
-    my $param_data_hr=$param_hr->{'param'};
+    #my %param_data=%{$param_hr->{'param'} || $param_hr};
+    #foreach my $param_data_hr (@{$self->{'_perl_data'}}) {
+    #    map { $param_data{$_}=$param_data_hr->{$_} unless exists $param_data{$_} } keys %{$param_data_hr}
+    #}
+    
 
 
     #  Recursive anon sub to do the render, init and store in class space
     #  if not already done, saves a small amount of time if doing many
     #  iterations
     #
-    my $render_cr=$Package{'_render_cr'} ||= sub {
-
-
-        #  Get self ref, node array etc
-        #
-        my ($render_cr, $self, $cgi_or, $data_ar, $param_data_hr)=@_;
-
-
-        #  Get tag
-        #
-        my ($html_tag, $html_line_no)=
-            @{$data_ar}[WEBDYNE_NODE_NAME_IX, WEBDYNE_NODE_LINE_IX];
-        my $html_chld;
-
-
-        #  Save current data block away for reference by error handler if something goes
-        #  wrong
-        #
-        push @{$self->{'_data_ar_err'}},$data_ar;
-        unshift @{$self->{'_perl_data'}}, $param_data_hr;
-
-
-        #  Debug
-        #
-        debug("render tag $html_tag, line $html_line_no");
-
-
-        #  Get attr hash ref
-        #
-        my $attr_hr=$data_ar->[WEBDYNE_NODE_ATTR_IX];
-
-
-        #  If subst flag present, means we need to process attr values
-        #
-        if ($data_ar->[WEBDYNE_NODE_SBST_IX]) {
-            $attr_hr=$self->subst_attr($data_ar, $attr_hr, $param_data_hr) ||
-                return err();
-        }
-
-
-        #  If param present, use for sub-render
-        #
-        $attr_hr->{'param'} && ($param_data_hr=$attr_hr->{'param'});
-
-
-        #  Process sub nodes to get child html data, only if not a perl tag or block tag
-        #  though - they will choose when to render sub data. Subst is OK
-        #
-        if (!$CGI_TAG_WEBDYNE{$html_tag} || ($html_tag eq 'subst')) {
-
-
-            #  Not a perl tag, recurse through children and render them, building
-            #  up HTML from inside out
-            #
-            my @data_child_ar=$data_ar->[WEBDYNE_NODE_CHLD_IX] ? @{$data_ar->[WEBDYNE_NODE_CHLD_IX]} : undef;
-            foreach my $data_chld_ar (@data_child_ar) {
-
-
-                #  Debug
-                #
-                debug('data_chld_ar %s', Dumper($data_chld_ar));
-
-
-                #  Only recurse on children which are are refs, as these are sub nodes. A
-                #  child that is not a ref is merely HTML text
-                #
-                if (ref($data_chld_ar)) {
-
-
-                    #  It is a sub node, render recursively
-                    #
-                    $html_chld.=${
-                        (
-                            $render_cr->($render_cr, $self, $cgi_or, $data_chld_ar, $param_data_hr)
-                                ||
-                                return err())};
-
-                    #$html_chld.="\n";
-
-                }
-                else {
-
-
-                    #  Text node only, add text to child html string
-                    #
-                    $html_chld.=$data_chld_ar;
-
-                }
-
-            }
-
-        }
-        else {
-
-            debug("skip child render, under $html_tag tag");
-
-        }
-
-
-        #  Debug
-        #
-        debug("html_chld $html_chld");
-        my $html;
-
-
-        #  Render *our* node now, trying to use most efficient/appropriated method depending on a number
-        #  of factors
-        #
-        if ($CGI_TAG_WEBDYNE{$html_tag}) {
-
-
-            #  Special WebDyne tag, render using our self ref, not CGI object
-            #
-            debug("rendering webdyne tag $html_tag");
-            $html=${ $self->$html_tag($data_ar, $attr_hr, $param_data_hr, $html_chld) ||
-                return err() };
-
-
-
-        }
-        elsif ($attr_hr) {
-
-
-            #  Normal CGI tag, with attributes and perhaps child text
-            #
-            debug("rendering normal HTML tag: $html_tag with attr: %s", Dumper($attr_hr));
-            $html=$cgi_or->$html_tag(grep {$_} $attr_hr || {}, $html_chld) ||
-                return err( "CGI tag '<$html_tag>' did not return any text" );
-            
-
-        }
-        elsif ($html_chld) {
-
-
-            #  Normal CGI tag, no attributes but with child text
-            #
-            debug("rendering normal HTML tag: $html_tag, no attributes but with child text");
-            $html=$cgi_or->$html_tag($html_chld) ||
-                return err("CGI tag '<$html_tag>' did not return any text");
-
-
-        }
-        else {
-
-
-            #  Empty CGI object, eg <hr>
-            #
-            debug("rendering empty HTML tag: $html_tag");
-            $html=$cgi_or->$html_tag() ||
-                return err("CGI tag '<$html_tag>' did not return any text");
-
-        }
-
-
-        #  No errors, pop error handler stack
-        #
-        pop @{$self->{'_data_ar_err'}};
-        shift @{$self->{'_perl_data'}};
-        
-
-        #  Return
-        #
-        return \$html;
-
-
-    };
+    my $render_cr=$Package{'_render_cr'} ||= \&render_cr;
 
 
     #  At the top level the array may have completly text nodes, and no children, so
@@ -1724,7 +1602,8 @@ sub render {
             #
             debug('recursive render node_data_ar: %s', Dumper($node_data_ar));
             push @html,
-                ${$render_cr->($render_cr, $self, $cgi_or, $node_data_ar, $param_data_hr) || return err()};
+                #${$render_cr->($render_cr, $self, $cgi_or, $node_data_ar, \%param_data) || return err()};
+                ${$render_cr->($render_cr, $self, $cgi_or, $node_data_ar, $param{'param'}) || return err()};
 
 
         }
@@ -1747,6 +1626,194 @@ sub render {
 
 
 }
+
+
+sub render_cr {
+
+    
+    #  Code ref used recursively by render() above
+    #
+
+    #  Get self ref, node array etc
+    #
+    my ($render_cr, $self, $cgi_or, $data_ar, $param_data_hr)=@_;
+    debug("render_cr: $render_cr, self:$self, data_ar:$data_ar, param_data_hr:$param_data_hr (%s), caller:%s", Dumper($param_data_hr), Dumper([caller()]));
+
+
+    #  Get tag
+    #
+    my ($html_tag, $html_line_no)=
+        @{$data_ar}[WEBDYNE_NODE_NAME_IX, WEBDYNE_NODE_LINE_IX];
+    my $html_chld;
+
+
+    #  Save current data block away for reference by error handler if something goes
+    #  wrong
+    #
+    push @{$self->{'_data_ar_err'}},$data_ar;
+
+
+    #  Debug
+    #
+    debug("render tag $html_tag, line $html_line_no");
+
+
+    #  Get attr hash ref
+    #
+    my $attr_hr=$data_ar->[WEBDYNE_NODE_ATTR_IX];
+
+
+    #  If subst flag present, means we need to process attr values
+    #
+    if ($data_ar->[WEBDYNE_NODE_SBST_IX]) {
+        $attr_hr=$self->subst_attr($data_ar, $attr_hr, $param_data_hr) ||
+            return err();
+    }
+    debug("attr_hr: $attr_hr (%s)", Dumper($attr_hr));
+
+
+    #  If param present, use for sub-render. Commented out was when render was co-mingled, not needed now separated to render_data_ar(), render() methods
+    #
+    #if (!exists($param_data_hr->{'param'})) {
+        if ($attr_hr->{'param'}) {
+            my %param_data=(%{$param_data_hr}, %{$attr_hr->{'param'}});
+            $param_data_hr=\%param_data;
+        }
+    #}
+    #elsif ($attr_hr->{'param'})  {
+    #    $param_data_hr=$attr_hr->{'param'}
+    #}
+    debug('result: %s', Dumper($param_data_hr));
+
+
+    #  Was this, but it didn't allow nested param
+    #
+    #$attr_hr->{'param'} && ($param_data_hr=$attr_hr->{'param'});
+    unshift @{$self->{'_perl_data'}}, $param_data_hr;
+
+
+    #  Process sub nodes to get child html data, only if not a perl tag or block tag
+    #  though - they will choose when to render sub data. Subst is OK
+    #
+    if (!$CGI_TAG_WEBDYNE{$html_tag} || ($html_tag eq 'subst')) {
+
+
+        #  Not a perl tag, recurse through children and render them, building
+        #  up HTML from inside out
+        #
+        my @data_child_ar=$data_ar->[WEBDYNE_NODE_CHLD_IX] ? @{$data_ar->[WEBDYNE_NODE_CHLD_IX]} : undef;
+        foreach my $data_chld_ar (@data_child_ar) {
+
+
+            #  Debug
+            #
+            debug('data_chld_ar %s', Dumper($data_chld_ar));
+
+
+            #  Only recurse on children which are are refs, as these are sub nodes. A
+            #  child that is not a ref is merely HTML text
+            #
+            if (ref($data_chld_ar)) {
+
+
+                #  It is a sub node, render recursively
+                #
+                $html_chld.=${
+                    (
+                        $render_cr->($render_cr, $self, $cgi_or, $data_chld_ar, $param_data_hr)
+                            ||
+                            return err())};
+
+                #$html_chld.="\n";
+
+            }
+            else {
+
+
+                #  Text node only, add text to child html string
+                #
+                $html_chld.=$data_chld_ar;
+
+            }
+
+        }
+
+    }
+    else {
+
+        debug("skip child render, under $html_tag tag");
+
+    }
+
+
+    #  Debug
+    #
+    debug("html_chld $html_chld");
+    my $html;
+
+
+    #  Render *our* node now, trying to use most efficient/appropriated method depending on a number
+    #  of factors
+    #
+    if ($CGI_TAG_WEBDYNE{$html_tag}) {
+
+
+        #  Special WebDyne tag, render using our self ref, not CGI object
+        #
+        debug("rendering webdyne tag $html_tag");
+        $html=${ $self->$html_tag($data_ar, $attr_hr, $param_data_hr, $html_chld) ||
+            return err() };
+
+
+
+    }
+    elsif ($attr_hr) {
+
+
+        #  Normal CGI tag, with attributes and perhaps child text
+        #
+        debug("rendering normal HTML tag: $html_tag with attr: %s", Dumper($attr_hr));
+        $html=$cgi_or->$html_tag(grep {$_} $attr_hr || {}, $html_chld) ||
+            return err( "CGI tag '<$html_tag>' did not return any text" );
+        
+
+    }
+    elsif ($html_chld) {
+
+
+        #  Normal CGI tag, no attributes but with child text
+        #
+        debug("rendering normal HTML tag: $html_tag, no attributes but with child text");
+        $html=$cgi_or->$html_tag($html_chld) ||
+            return err("CGI tag '<$html_tag>' did not return any text");
+
+
+    }
+    else {
+
+
+        #  Empty CGI object, eg <hr>
+        #
+        debug("rendering empty HTML tag: $html_tag");
+        $html=$cgi_or->$html_tag() ||
+            return err("CGI tag '<$html_tag>' did not return any text");
+
+    }
+
+
+    #  No errors, pop error handler stack
+    #
+    pop @{$self->{'_data_ar_err'}};
+    shift @{$self->{'_perl_data'}};
+    
+
+    #  Return
+    #
+    return \$html;
+
+
+}    
+
 
 
 sub redirect {
@@ -2224,13 +2291,10 @@ sub render_block {
 
         #  Yes, Get HTML for block immedialtly
         #
-        my $html_sr=$self->render(
-            {
-
-                data  => $data_block_ar->[WEBDYNE_NODE_CHLD_IX],
-                param => $param_hr->{'param'},
-
-            }) || return err();
+        my $html_sr=$self->render_data_ar(
+            data  => $data_block_ar->[WEBDYNE_NODE_CHLD_IX],
+            param => $param_hr->{'param'},
+        ) || return err();
 
 
         #  Debug
@@ -2354,13 +2418,10 @@ sub block {
 
             #  Render it
             #
-            push @html_sr, $self->render(
-                {
-
-                    data  => $data_ar->[WEBDYNE_NODE_CHLD_IX],
-                    param => $param_data_block_hr
-
-                }) || return err();
+            push @html_sr, $self->render_data_ar(
+                data  => $data_ar->[WEBDYNE_NODE_CHLD_IX],
+                param => $param_data_block_hr
+            ) || return err();
 
         }
 
@@ -2375,13 +2436,10 @@ sub block {
 
         #  User wants block displayed normally
         #
-        return $self->render(
-            {
-
-                data  => $data_ar->[WEBDYNE_NODE_CHLD_IX],
-                param => $param_data_hr
-
-            }) || err();
+        return $self->render_data_ar(
+            data  => $data_ar->[WEBDYNE_NODE_CHLD_IX],
+            param => $param_data_hr
+        ) || err();
 
     }
     else {
@@ -2503,7 +2561,7 @@ sub htmx {
         #  No handler, just render
         #
         debug('htmx render without handler');
-        $html_sr=$self->render({ data=> $data_ar->[$WEBDYNE_NODE_CHLD_IX] }) ||
+        $html_sr=$self->render_data_ar(data=> $data_ar->[$WEBDYNE_NODE_CHLD_IX]) ||
             return err();
         debug("html_sr: $html_sr");
         
@@ -2730,11 +2788,17 @@ sub perl {
             $function="WebDyne::${inode}::${function}"
         }
         debug("about to eval $function");
+        
+        
+        #  Inherit params from data stack and add any supplied here
+        #
+        my %param=(%{$self->{'_perl_data'}[0]}, %{$attr_hr->{'param'}});
 
 
         #  Run the eval code to get HTML
         #
-        $html_sr=$Package{'_eval_cr'}{'!'}->($self, $data_ar, $attr_hr->{'param'}, "&${function}") || do {
+        #$html_sr=$Package{'_eval_cr'}{'!'}->($self, $data_ar, $attr_hr->{'param'}, "&${function}") || do {
+        $html_sr=$Package{'_eval_cr'}{'!'}->($self, $data_ar, \%param, "&${function}") || do {
 
 
             #  Error occurred. Pop data ref off stack and return
@@ -3366,7 +3430,7 @@ sub include {
 
             #  Render included block and return after stripping <p></p>
             #
-            my $html_sr=$self->render({data => $block_ar->[$WEBDYNE_NODE_CHLD_IX], param => $param_hr->{'param'}}) || 
+            my $html_sr=$self->render_data_ar(data => $block_ar->[$WEBDYNE_NODE_CHLD_IX], param => $param_hr->{'param'}) || 
                 return err();
             #return $html_sr;
             push @html, ${$html_sr}
@@ -3443,7 +3507,7 @@ sub include {
             #  child of results [WEBDYNE_NODE_CHLD_IX].
             #
             debug('calling render');
-            my $html_sr=$self->render({data => $block_ar->[$WEBDYNE_NODE_CHLD_IX], param => ($param_hr->{'param'} || $param_data_hr)}) || 
+            my $html_sr=$self->render_data_ar(data => $block_ar->[$WEBDYNE_NODE_CHLD_IX], param => ($param_hr->{'param'} || $param_data_hr)) || 
                 return err();
             #return $html_sr;
             push @html, ${$html_sr};

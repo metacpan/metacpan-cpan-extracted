@@ -12,7 +12,7 @@ package Data::Tools::CSV;
 use strict;
 use Exporter;
 
-our $VERSION = '1.47';
+our $VERSION = '1.50';
 
 our @ISA    = qw( Exporter );
 our @EXPORT = qw(

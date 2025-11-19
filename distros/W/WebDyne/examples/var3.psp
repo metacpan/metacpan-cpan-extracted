@@ -1,0 +1,29 @@
+<html>
+<head><title>Hello World</title></head>
+<body>
+
+<!-- Render paramaters also work in tag attributes -->
+
+<perl method="hello">
+<p>
+<font color="${color}">
+Hello World
+</font>
+</perl>
+
+</body>
+</html>
+
+__PERL__
+
+sub hello {
+
+	my $self=shift();
+	my @html;
+	for (0..3) {
+		my $color=(qw(red green yellow blue orange))[rand 5];
+		push @html, $self->render( color=>$color );
+	}
+	\@html;
+
+}

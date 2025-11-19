@@ -10,7 +10,7 @@
 # http://www.wtfpl.net/ for more details.
 
 package Chess::Plisco::Engine;
-$Chess::Plisco::Engine::VERSION = 'v0.7.0';
+$Chess::Plisco::Engine::VERSION = 'v0.8.0';
 use strict;
 use integer;
 
@@ -24,6 +24,7 @@ use Chess::Plisco::Engine::TimeControl;
 use Chess::Plisco::Engine::Tree;
 use Chess::Plisco::Engine::InputWatcher;
 use Chess::Plisco::Engine::TranspositionTable;
+use Chess::Plisco::Engine::Book;
 
 # These figures are taken from 
 use constant MIN_HASH_SIZE => 1;
@@ -50,6 +51,28 @@ use constant UCI_OPTIONS => [
 		default => 'false',
 		callback => '__changeBatchMode',
 	},
+	{
+		name => 'OwnBook',
+		type => 'check',
+		default => 'false',
+	},
+	{
+		name => 'BookFile',
+		type => 'string',
+		callback => '__setBookFile',
+	},
+	{
+		name => 'BookDepth',
+		type => 'spin',
+		min => 1,
+		max => 1024,
+		default => 20,
+	},
+	{
+		name => 'Ponder',
+		type => 'check',
+		default => 'false',
+	},
 ];
 
 my $uci_options = UCI_OPTIONS;
@@ -63,6 +86,7 @@ sub new {
 		__position => $position,
 		__signatures => [$position->signature],
 		__options => {},
+		__book => Chess::Plisco::Engine::Book->new,
 	};
 
 	my $options = UCI_OPTIONS;
@@ -179,9 +203,9 @@ sub __msDosSocket {
 sub __onEof {
 	my ($self, $line) = @_;
 
-	$self->{__abort} = 1;
+	$self->DESTROY;
 
-	return $self;
+	exit;
 }
 
 sub __onUciInput {
@@ -195,9 +219,21 @@ sub __onUciInput {
 	my $method = '__onUciCmd' . ucfirst lc $cmd;
 	$args = $self->__trim($args);
 	if ($self->can($method)) {
-		my $stop_if_thinking = $self->$method($args);
-		if ($self->{__tree} && $stop_if_thinking) {
-			die "PLISCO_ABORTED\n";
+		my $success = $self->$method($args);
+		# Was this go command cancelled because of an already running search?
+		# In this case, we have remembered the arguments, and can start a new
+		# search now.
+		#
+		# This will happen instantly. If a "go" command is sent during a
+		# running search, this will only be noticed during the time control
+		# check of the search tree. The "go" handler does not start a new
+		# search but simply cancels the current search. Because this happens
+		# during the time control check, the current search will terminate
+		# instantly, and we will end up here. Now, the current search will
+		# basically be replaced by a new one without recursion.
+		if ($success && 'go' eq lc $cmd && $self->{__go_queue} && !$self->{__tree}) {
+			$args = delete $self->{__go_queue};
+			$self->__onUciCmdGo($args);
 		}
 	} else {
 		$self->{__out}->print("info unknown command '$cmd'\n");
@@ -264,8 +300,26 @@ sub __onUciCmdSee {
 	return $self;
 }
 
+sub __cancelSearch {
+	my ($self) = @_;
+
+	return if !$self->{__tree};
+
+	$self->{__watcher}->requestStop;
+	$self->{__tree}->{cancelled} = 1;
+
+	return $self;
+}
+
 sub __onUciCmdGo {
 	my ($self, $args) = @_;
+
+	if ($self->__cancelSearch) {
+		# Remember the arguments to this go command and re-try as soon as the
+		# currently still running search terminates.
+		$self->{__go_queue} = $args;
+		return;
+	}
 
 	my @args = split /[ \t]+/, $args;
 
@@ -289,7 +343,7 @@ sub __onUciCmdGo {
 			my $val = shift @args;
 			$val ||= 0;
 			$val = +$val;
-			unless ($val) {
+			if ($val < 0) {
 				$self->__info("error: argument '$arg' expects an integer > 0");
 				return;
 			}
@@ -314,28 +368,43 @@ sub __onUciCmdGo {
 		$self->{__watcher}->setBatchMode(0);
 	}
 
-	my $tree = Chess::Plisco::Engine::Tree->new(
-		$self->{__position}->copy,
-		$self->{__tt},
-		$self->{__watcher},
-		$info,
-		$self->{__signatures});
+	my %options = (
+		position => $self->{__position}->copy,
+		tt => $self->{__tt},
+		watcher => $self->{__watcher},
+		info => $info,
+		signatures => $self->{__signatures},
+	);
+	if ($self->{__options}->{OwnBook} eq 'true') {
+		$options{book} = $self->{__book};
+		$options{book_depth} = $self->{__options}->{BookDepth};
+	}
+	my $tree = Chess::Plisco::Engine::Tree->new(%options);
 	$tree->{debug} = 1 if $self->{__debug};
+	$tree->{ponder} = 1 if $params{ponder};
 
-	my $tc = Chess::Plisco::Engine::TimeControl->new($tree, %params);
+	my $tc = $self->{__tc} = Chess::Plisco::Engine::TimeControl->new($tree, %params);
 
 	$self->{__tree} = $tree;
-	my $bestmove;
+
+	my ($bestmove, $ponder);
 	eval {
-		$bestmove = $tree->think;
-		delete $self->{__tree};
+		($bestmove, $ponder) = $tree->think;
 	};
 	if ($@) {
 		$self->__output("unexpected exception: $@");
 	}
+	delete $self->{__tree};
+	delete $self->{__tc};
+
 	if ($bestmove) {
 		my $cn = $self->{__position}->moveCoordinateNotation($bestmove);
-		$self->__output("bestmove $cn");
+		if (defined $ponder) {
+			my $pcn = $self->{__position}->copy->moveCoordinateNotation($ponder);
+			$self->__output("bestmove $cn ponder $pcn");
+		} else {
+			$self->__output("bestmove $cn");
+		}
 	}
 
 	$self->{__watcher}->setBatchMode(0);
@@ -343,8 +412,20 @@ sub __onUciCmdGo {
 	return $self;
 }
 
+sub __onUciCmdPonderhit {
+	my ($self) = @_;
+
+	return if !$self->{__tc};
+
+	$self->{__tc}->onPonderhit;
+
+	return $self;
+}
+
 sub __onUciCmdUcinewgame {
 	my ($self) = @_;
+
+	$self->__cancelSearch;
 
 	$self->{__tt}->clear;
 
@@ -424,16 +505,39 @@ sub __changeBatchMode {
 	}
 }
 
+sub __setBookFile {
+	my ($self, $value) = @_;
+
+	if ($self->{__options}->{OwnBook} ne 'true') {
+		$self->__info("Warning: book file will not be used, when OwnBook is set to 'false'!");
+	}
+
+	my $callback = sub { $self->__info(@_) };
+	$self->{__book}->setFile($value, $callback);
+
+	return $self;
+}
+
 sub __onUciCmdStop {
 	my ($self) = @_;
 
-	# Ignored. Any valid command will terminate the search.
+	if ($self->{__tree}) {
+		$self->__cancelSearch;
+
+		# Apparently, all GUIs send a "stop" to cancel a (failed) ponder. And
+		# They also expect a "bestmove" reply. But the tree suppresses that
+		# "bestmove" reply, when the "cancelled" flag is set.  We therefore
+		# unset the flag here.
+		delete $self->{__tree}->{cancelled};
+	}
 
 	return $self;
 }
 
 sub __onUciCmdPosition {
 	my ($self, $args) = @_;
+
+	$self->__cancelSearch;
 
 	unless (defined $args && length $args) {
 		$self->__info("error: usage: position FEN POSITION | startpos [MOVES...]");
@@ -471,10 +575,14 @@ sub __onUciCmdPosition {
 	$self->{__moves} = [];
 	my @signatures = ($position->signature);
 	if ('moves' eq shift @moves) {
-		foreach my $move (@moves) {
-			my $status = $position->applyMove($move);
-			if (!$status) {
-				$self->__info("error: invalid or illegal move '$move'");
+		for (my $i = 0; $i < @moves; ++$i) {
+			my $move = $moves[$i];
+			eval { $position->applyMove($move) };
+			if ($@) {
+				$@ =~ s/(.+) at .*/$1/s;
+				$moves[$i] = ">>>$move<<<";
+				my $moves = join ' ', @moves;
+				$self->__info("Error with given moves: $moves: $@");
 				return;
 			}
 			push @signatures, $position->signature;
@@ -520,9 +628,7 @@ EOF
 sub __onUciCmdQuit {
 	my ($self) = @_;
 
-	$self->{__abort} = 1;
-
-	return $self;
+	exit;
 }
 
 sub __onUciCmdUci {

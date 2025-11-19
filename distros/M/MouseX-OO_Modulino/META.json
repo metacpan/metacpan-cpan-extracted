@@ -43,6 +43,7 @@
       "runtime" : {
          "requires" : {
             "File::AddInc" : "0",
+            "JSON" : "0",
             "JSON::MaybeXS" : "0",
             "Module::Runtime" : "0",
             "Mouse" : "0",
@@ -59,11 +60,11 @@
    "provides" : {
       "MouseX::OO_Modulino" : {
          "file" : "lib/MouseX/OO_Modulino.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "MouseX::OO_Modulino::MOP4Import" : {
          "file" : "lib/MouseX/OO_Modulino/MOP4Import.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -78,7 +79,7 @@
          "web" : "https://github.com/hkoba/perl-MouseX-OO_Modulino"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

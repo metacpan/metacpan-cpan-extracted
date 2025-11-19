@@ -1,0 +1,66 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/Syntax-Keyword-Wielding/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.014"^^doap-deps:CpanId ], [ doap-deps:on "Keyword::Declare"^^doap-deps:CpanId ], [ doap-deps:on "Import::Into"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test2::V0"^^doap-deps:CpanId ], [ doap-deps:on "Test2::Tools::Spec"^^doap-deps:CpanId ], [
+		doap-deps:on "Test2::Require::AuthorTesting"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "Test2::Require::Module"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "Test2::Plugin::BailOnFail"^^doap-deps:CpanId;
+	];
+	doap:bug-database    <https://github.com/tobyink/p5-syntax-keyword-wielding/issues>;
+	doap:created         "2025-11-15"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/Syntax-Keyword-Wielding>;
+	doap:homepage        <https://metacpan.org/release/Syntax-Keyword-Wielding>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "Syntax-Keyword-Wielding";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Syntax-Keyword-Wielding/v_0-001000>, <http://purl.org/NET/cpan-uri/dist/Syntax-Keyword-Wielding/v_0-001001>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-syntax-keyword-wielding>;
+	];
+	doap:shortdesc       "adds a `wielding` keyword to make it easier to call the same function or method multiple times".
+
+<http://purl.org/NET/cpan-uri/dist/Syntax-Keyword-Wielding/v_0-001000>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "Syntax-Keyword-Wielding-0.001000"^^xsd:string;
+	dc:issued            "2025-11-15"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Syntax-Keyword-Wielding-0.001000.tar.gz>;
+	doap:revision        "0.001000"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Syntax-Keyword-Wielding/v_0-001001>
+	a                    doap:Version;
+	dc:identifier        "Syntax-Keyword-Wielding-0.001001"^^xsd:string;
+	dc:issued            "2025-11-15"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [ rdfs:label "Minor documentation improvements." ];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Syntax-Keyword-Wielding-0.001001.tar.gz>;
+	doap:revision        "0.001001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+

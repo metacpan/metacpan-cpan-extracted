@@ -1,0 +1,40 @@
+<start_html>
+
+<!-- Call perl code to render server time -->
+<perl handler="server_time">
+
+<!-- Template Block it will be rendered into -->
+<block name="server_time">
+<p>
+Loop ${i}: The local server time is: ${time}
+</block>
+
+</perl>
+
+__PERL__
+
+sub server_time {
+
+    #  Get self ref
+    #
+    my $self=shift();
+    
+    #  Get local time
+    #
+    my $time=scalar localtime();
+
+    #  Loop 4 times
+    #
+    foreach my $i (1..4) {
+    
+        #  Render template block
+        #
+        $self->render_block('server_time', i=>$i, time=>$time)
+        
+    }
+
+    #  Return section
+    #
+    return $self->render()
+
+}

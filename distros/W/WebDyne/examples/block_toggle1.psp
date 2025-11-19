@@ -1,0 +1,24 @@
+<start_html>
+
+<!-- Form to get block toggle status. Update hidden param based on toggle button -->
+<form>
+<submit name="button" value="Toggle">
+<hidden name="toggle" value="!{! $_{'toggle'} ? 0 : 1 !}">
+</form>
+
+<!-- This block will only be displayed if the toggle value is true -->
+<block name="toggle1" display="!{! $_{'toggle'} !}">
+Toggle On (+{toggle})
+</block>
+<p>
+
+<!-- This block will always display -->
+<block name="hello" display=1>
+Hello World
+</block>
+
+<!-- This block will never display unless called from a perl handler -->
+<block name="hello" display=0>
+Goodbye world
+</block>
+

@@ -22,7 +22,7 @@ Readonly::Array our @TYPE => qw(a c d e f g i j k m o p r t);
 Readonly::Array our @TYPE_OF_CONTROL => (' ', 'a');
 Readonly::Array our @UNDEFINED => ('0');
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 has bibliographic_level => (
 	is => 'ro',
@@ -113,6 +113,9 @@ sub BUILD {
 
 	# Check indicator_count.
 	check_strings($self, 'indicator_count', \@INDICATOR_COUNT);
+
+	# Check length.
+	# TODO
 
 	# Check length_of_field_portion_len.
 	check_strings($self, 'length_of_field_portion_len',
@@ -564,12 +567,19 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2023-2024 Michal Josef Špaček
+© 2023-2025 Michal Josef Špaček
 
 BSD 2-Clause License
 
+=head1 ACKNOWLEDGEMENTS
+
+Development of this software has been made possible by institutional support
+for the long-term strategic development of the National Library of the Czech
+Republic as a research organization provided by the Ministry of Culture of
+the Czech Republic (DKRVO 2024–2028), Area 11: Linked Open Data.
+
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

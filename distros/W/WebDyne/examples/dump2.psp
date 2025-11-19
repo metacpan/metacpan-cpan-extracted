@@ -1,0 +1,10 @@
+<start_html>
+<p>
+<form>
+Your Name: <textfield name="name">
+<p>
+Show Dump: <checkbox name="dump_enable">
+<p>
+<submit>
+</form>
+<dump all force="!{! $_{'dump_enable'} !}">

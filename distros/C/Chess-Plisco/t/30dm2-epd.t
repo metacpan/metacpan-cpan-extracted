@@ -30,4 +30,4 @@ if ($ENV{CP_STRESS_TEST}) {
 	$limit = 50;
 }
 
-EPDSolver->new($epd_file, $limit)->solve;
+EPDSolver->new($epd_file, $limit, pseudo_legal => 1)->solve;

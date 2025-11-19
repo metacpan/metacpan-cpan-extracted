@@ -43,7 +43,7 @@ my @tests = (
 
 foreach my $test (@tests) {
 	my $pos = Chess::Plisco->new($test->{fen});
-	my $move = $pos->parseMove($test->{move});
+	my $move = $pos->parseMove($test->{move}, 1);
 	ok $move, "parse $test->{move}";
 
 	if ($test->{attacked}) {

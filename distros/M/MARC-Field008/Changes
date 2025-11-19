@@ -1,3 +1,9 @@
+0.04 2025-11-14T16:12:35+01:00
+ - API change: Parameter 'leader' isn't required in constructor. Only for
+   parse() method.
+ - Add ACKNOWLEDGEMENTS section to doc.
+ - Fix doc for leader parameter.
+
 0.03 2025-06-26T15:10:12+02:00
  - Add 'ignore_data_errors' parameter.
  - Add tests for computer file material in parse().

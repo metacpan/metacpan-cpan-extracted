@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2023-2024 -- leonerd@leonerd.org.uk
 
-package Sublike::Extended 0.39;
+package Sublike::Extended 0.40;
 
 use v5.14;
 use warnings;
@@ -68,7 +68,7 @@ parsing of a subroutine signature. Since signatures are only available on Perl
 version 5.26 or later, this module is unlikely to be useful in earlier
 versions of Perl.
 
-=head2 Named parameters
+=head2 Named Parameters
 
 Extended subroutines can declare named parameters in the signature, after any
 positional ones. These take the form of a name prefixed by a colon character.
@@ -118,6 +118,10 @@ In the case of a slurpy array, it will contain every argument value that was
 not consumed as a named parameter pair, in the original order passed by the
 caller, including any duplicates.
 
+This syntax is compatible with that proposed by
+L<PPC0024|https://github.com/Perl/PPCs/blob/main/ppcs/ppc0024-signature-named-parameters.md>,
+which will become available in Perl version 5.43.5.
+
 =head2 Parameter Attributes
 
 Parameters to extended subroutines can use attribute syntax to apply extra
@@ -129,6 +133,35 @@ Any attributes that are available are ones that have been previously
 registered with L<XS::Parse::Sublike> using its XS-level API. The particular
 behaviour of such an attribute would be defined by whatever module provided
 the attribute.
+
+=head2 Refalias Parameters
+
+I<Since version 0.40.>
+
+Parameters to extended subroutines can use refalias syntax in order to create
+lexical variables that alias, rather than contain copies of, variables that
+callers pass in references.
+
+   sub h (\@items) { ... }
+
+   # The caller must provide an ARRAY reference
+   my @arr = (1, 2, 3, 4, 5);
+   h(\@arr);
+
+This syntax is similar to refalias assignment as provided by
+L<feature/The 'refaliasing' feature>. This example creates a lexical array
+variable within the body of the function, which aliases an array passed
+I<by reference> from the caller.
+
+Refaliased variables may be scalars, arrays, or hashes. For argument handling
+purposes each will act like a mandatory positional scalar which consumes a
+reference to a variable of the matching type. If the caller does not pass a
+reference, or a reference to a mismatched type of variable, an exception is
+thrown as part of argument handling in the signature.
+
+The body of the function can see the value stored by the referred variable
+and make modifications to it. Any such modifications will be reflected in the
+variable whose reference was passed by the caller.
 
 =head1 KEYWORDS
 

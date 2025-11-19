@@ -1,0 +1,10 @@
+{
+   "field_008" : {
+      "checks" : {
+      },
+      "datetime" : "2025-07-02T20:03:53",
+      "module_name" : "MARC::Validator::Plugin::Field008",
+      "module_version" : 0.01,
+      "name" : "field_008"
+   }
+}

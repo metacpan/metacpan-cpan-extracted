@@ -1,3 +1,4 @@
+bin/date-age
 Changes
 lib/Date/Age.pm
 LICENSE
@@ -7,5 +8,6 @@ README.md
 t/30-basics.t
 t/eof.t
 t/eol.t
+t/invalid.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

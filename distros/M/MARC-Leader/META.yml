@@ -10,6 +10,7 @@ build_requires:
   Test::MockObject: 0
   Test::More: 0
   Test::NoWarnings: 0
+  Test::Output: 0
 configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
@@ -38,4 +39,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/MARC-Leader
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/MARC-Leader
-version: '0.06'
+version: '0.07'

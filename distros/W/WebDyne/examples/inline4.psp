@@ -1,0 +1,14 @@
+<html>
+<head><title>Hello World</title></head>
+<body>
+<p>
+
+<!-- Perl code can be used in tag attributes also -->
+
+<font color="!{! (qw(red blue green))[rand 3] !}">
+
+Hello World
+
+</font>
+</body>
+</html>

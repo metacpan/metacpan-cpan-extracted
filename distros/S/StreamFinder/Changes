@@ -732,3 +732,10 @@ Revision history for StreamFinder
         hire developers to obfuscate their sites to prevent a handful of users 
         like us avoiding their javascripts, trackers, spam, excess ads, etc. :(
         - StreamFinder::Rumble - Set default "-order" to "quality".
+2.46    2025/11/14
+        - StreamFinder::Rumble - Add "-notrim" option, and strip off "?ets=..."
+        from urls unless set.  Also fix a Perl uninitialized variable warning.
+        - StreamFinder::Youtube - Properly strip off excess bs from URLs, such 
+        as "&source=..." unless "-notrim" option set.
+        Also now search for any Youtube urls embedded in webpages' JSON code 
+        as a fallback.  Update copyright year to 2025.

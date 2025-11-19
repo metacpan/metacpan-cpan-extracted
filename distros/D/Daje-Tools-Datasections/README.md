@@ -10,6 +10,8 @@ Daje::Tools::Datasections - Load and store data sections in memory from a named 
 
 [Mojo::Loader](https://metacpan.org/pod/Mojo%3A%3ALoader) 
 
+[v5.42](https://metacpan.org/pod/v5.42) 
+
 [Mojo::Base](https://metacpan.org/pod/Mojo%3A%3ABase) 
 
 # METHODS
@@ -32,9 +34,9 @@ Add a new section to load
 
 # Synopsis
 
-    use GenerateSQL::Tools::Datasections
+    use Daje::Tools::Datasections;
 
-    my $data = GenerateSQL::Tools::Datasections->new(
+    my $data = Daje::Tools::Datasections->new(
 
          data_sections => ['c1','c2','c3'],
 

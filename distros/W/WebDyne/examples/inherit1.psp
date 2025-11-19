@@ -1,0 +1,15 @@
+<start_html>
+<perl method="inherit">
+<pre>
+Time - Unix epoch format: ${time}
+Time - local time format: <? strftime('%X', localtime($_[1]->{'time'})) ?>
+Date - ISO format: <? strftime('%Y-%m-%d', localtime($_[1]->{'time'})) ?>
+Date - US format: <? strftime('%m/%d/%Y', localtime($_[1]->{'time'})) ?>
+Date - UK format: <? strftime('%d/%m/%Y', localtime($_[1]->{'time'})) ?>
+</pre>
+</perl>
+__PERL__
+use POSIX qw(strftime);
+sub inherit {
+    shift()->render( time=>time() )
+}

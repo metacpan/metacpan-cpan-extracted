@@ -1,6 +1,13 @@
 Revision history for Date-Range
 
-0.03
+0.04	Mon Nov 17 21:33:22 EST 2025
+	Added bin/date-age
+	Fixed is_leap logic
+	Added date sanity tests
+	Added GitHub Actions test flow
+	Use Time::Local instead of Time::Piece for performance
+
+0.03	Thu May 29 21:00:00 EDT 2025
 	Fix pre-requisites
 
 0.02	Wed May 28 20:35:05 EDT 2025

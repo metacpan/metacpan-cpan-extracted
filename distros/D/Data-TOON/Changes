@@ -1,0 +1,14 @@
+Revision history for Perl extension Data-TOON
+
+0.02 2025-11-16T07:54:32Z
+    - Improved error handling
+    - Enhanced validation logic
+    - Bug fixes and code refactoring
+
+0.01 2025-11-16T03:26:06Z
+
+    - Initial release with core API structure
+    - Encoder, Decoder, Validator module templates
+    - Comprehensive README with TOON format examples
+    - Basic test suite (compile, encode/decode, validate)
+

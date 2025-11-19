@@ -1,5 +1,5 @@
 package Bitcoin::Secp256k1;
-$Bitcoin::Secp256k1::VERSION = '0.009';
+$Bitcoin::Secp256k1::VERSION = '0.010';
 use v5.10;
 use strict;
 use warnings;
@@ -111,6 +111,13 @@ sub sign_message_schnorr
 	return $self->sign_digest_schnorr($private_key, sha256($message));
 }
 
+sub sign_message_recoverable
+{
+	my ($self, $private_key, $message) = @_;
+
+	return $self->sign_digest_recoverable($private_key, sha256(sha256($message)));
+}
+
 sub sign_digest
 {
 	my ($self, $private_key, $digest) = @_;
@@ -127,6 +134,30 @@ sub sign_digest_schnorr
 	return $self->_signature_schnorr;
 }
 
+sub sign_digest_recoverable
+{
+	my ($self, $private_key, $digest) = @_;
+
+	$self->_sign_recoverable($private_key, $digest);
+	return $self->_signature_recoverable;
+}
+
+sub recover_public_key_digest
+{
+	my ($self, $recoverable_signature, $digest) = @_;
+
+	$self->_signature_recoverable($recoverable_signature);
+	$self->_recover_pubkey_recoverable($digest);
+	return $self->_pubkey;
+}
+
+sub recover_public_key_message
+{
+	my ($self, $recoverable_signature, $message) = @_;
+
+	return $self->recover_public_key_digest($recoverable_signature, sha256(sha256($message)));
+}
+
 sub verify_message
 {
 	my ($self, $public_key, $signature, $message) = @_;
@@ -139,6 +170,13 @@ sub verify_message_schnorr
 	my ($self, $public_key, $signature, $message) = @_;
 
 	return $self->verify_digest_schnorr($public_key, $signature, sha256($message));
+}
+
+sub verify_message_recoverable
+{
+	my ($self, $public_key, $signature, $message) = @_;
+
+	return $self->verify_digest_recoverable($public_key, $signature, sha256(sha256($message)));
 }
 
 sub verify_digest
@@ -160,6 +198,17 @@ sub verify_digest_schnorr
 	$self->_signature_schnorr($signature);
 
 	return $self->_verify_schnorr($digest);
+}
+
+sub verify_digest_recoverable
+{
+	my ($self, $public_key, $signature, $digest) = @_;
+
+	$self->_signature_recoverable($signature);
+	$self->_recover_pubkey_recoverable($digest);
+	my $recovered_pubkey = $self->_pubkey;
+
+	return $recovered_pubkey eq $public_key;
 }
 
 sub negate_public_key
@@ -262,6 +311,11 @@ Bitcoin::Secp256k1 - Perl interface to libsecp256k1
 	my $schnorr_signature = $secp256k1->sign_message_schnorr($private_key, $message);
 	my $xonly_public_key = $secp256k1->xonly_public_key($public_key);
 	my $valid = $secp256k1->verify_message_schnorr($xonly_public_key, $schnorr_signature, $message);
+
+	# Recoverable signatures (used in Ethereum)
+	my $recoverable_signature = $secp256k1->sign_message_recoverable($private_key, $message);
+	my $recovered_pubkey = $secp256k1->recover_public_key_message($recoverable_signature, $message);
+	my $valid = $secp256k1->verify_message_recoverable($public_key, $recoverable_signature, $message);
 
 =head1 DESCRIPTION
 
@@ -375,6 +429,34 @@ value to be used instead by setting package variable
 C<$Bitcoin::Secp256k1::FORCED_SCHNORR_AUX_RAND> to any bytestring of length
 C<32>.
 
+=head3 sign_message_recoverable
+
+	$signature = $secp256k1->sign_message_recoverable($private_key, $message)
+
+Signs C<$message>, which may be a bytestring of any length, with
+C<$private_key>, which must be a bytestring of length C<32>. Returns
+a hash reference containing the recoverable signature.
+
+C<$message> is first hashed with double SHA256 (known an HASH256 in Bitcoin)
+before passing it to signing algorithm (which expects length C<32> bytestrings).
+
+The returned hash reference contains:
+
+=over
+
+=item C<signature> - 64 bytes containing r (32 bytes) and s (32 bytes) values
+
+=item C<recovery_id> - Integer from 0 to 3 indicating which recovery method to use
+
+=back
+
+Recoverable signatures allow the public key to be recovered from the signature
+and message, which is useful for systems like Ethereum where only the signature
+is stored in transactions.
+
+This method always produces deterministic signatures suitable for use in
+recoverable signature systems.
+
 =head3 sign_digest
 
 	$signature = $secp256k1->sign_digest($private_key, $message_digest)
@@ -389,6 +471,35 @@ Because of that, C<$message_digest> must be a bytestring of length C<32>.
 Same as L</sign_message_schnorr>, but it does not perform SHA256 on its input.
 While Schnorr allows any length message, this method requires
 C<$message_digest> to be a bytestring of length C<32>.
+
+=head3 sign_digest_recoverable
+
+	$signature = $secp256k1->sign_digest_recoverable($private_key, $message_digest)
+
+Same as L</sign_message_recoverable>, but it does not perform double SHA256 on its input.
+Because of that, C<$message_digest> must be a bytestring of length C<32>.
+
+Returns the same hash reference format as L</sign_message_recoverable>.
+
+=head3 recover_public_key_digest
+
+	$public_key = $secp256k1->recover_public_key_digest($recoverable_signature, $message_digest)
+
+Recovers the public key from a recoverable signature and message digest.
+Takes a C<$recoverable_signature> (hash reference as returned by signing methods) and
+C<$message_digest> (bytestring of length C<32>). Returns the recovered
+public key in compressed form.
+
+This is the core functionality that makes recoverable signatures useful -
+it allows determining which public key created a signature without storing
+the public key separately.
+
+=head3 recover_public_key_message
+
+	$public_key = $secp256k1->recover_public_key_message($recoverable_signature, $message)
+
+Same as L</recover_public_key_digest>, but performs double SHA256 on C<$message> first.
+C<$message> may be a bytestring of any length.
 
 =head3 verify_message
 
@@ -415,7 +526,24 @@ length) against C<$xonly_public_key> (bytestring). Returns true is verification
 is successful.
 
 C<$message> is first hashed with SHA256 before passing it to verification
-algorithm.
+algorithm to ensure digest length of 32 bytes. B<This is probably not correct
+for most use cases>, as schnorr message verification uses tagged hashes with
+customizable tags (implemented in L<Bitcoin::Crypto>, not in
+Bitcoin::Secp256k1). Use L</verify_digest_schnorr> with more specific digest
+algorithm instead.
+
+=head3 verify_message_recoverable
+
+	$valid = $secp256k1->verify_message_recoverable($public_key, $signature, $message)
+
+Verifies a recoverable C<$signature> (hash reference as returned by signing methods) of C<$message> (bytestring of any length)
+against C<$public_key> (compressed or uncompressed, bytestring). Returns true
+if verification is successful.
+
+C<$message> is first hashed with double SHA256 before verification.
+
+This method works by recovering the public key from the signature and comparing
+it to the provided public key.
 
 =head3 verify_digest
 
@@ -431,6 +559,13 @@ Because of that, C<$message_digest> must be a bytestring of length C<32>.
 Same as L</verify_message_schnorr>, but it does not perform SHA256 on its
 input. While Schnorr allows any length message, this method requires
 C<$message_digest> to be a bytestring of length C<32>.
+
+=head3 verify_digest_recoverable
+
+	$valid = $secp256k1->verify_digest_recoverable($public_key, $signature, $message_digest)
+
+Same as L</verify_message_recoverable>, but it does not perform double SHA256 on its input.
+Because of that, C<$message_digest> must be a bytestring of length C<32>.
 
 =head3 xonly_public_key
 
@@ -525,10 +660,10 @@ documentation for details.
 
 =head2 TODO
 
-This module currently covers most usage paths of the base libsecp256k1 and the
-Schnorr module. It currently does not aim to cover every usage path, most
-notably signing variable length messages with Schnorr (without digesting
-first).
+This module currently covers most usage paths of the base libsecp256k1, the
+Schnorr module, and the recovery module. It currently does not aim to cover
+every usage path, most notably signing variable length messages with Schnorr
+(without digesting first).
 
 =head1 CAVEATS
 
@@ -549,6 +684,16 @@ L<Bitcoin::Crypto>
 =head1 AUTHOR
 
 Bartosz Jarzyna E<lt>bbrtj.pro@gmail.comE<gt>
+
+=head2 Contributors
+
+In no particular order:
+
+=over
+
+=item * Reginaldo Costa
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

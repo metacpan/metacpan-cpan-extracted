@@ -43,7 +43,7 @@ my @tests = (
 	},
 	{
 		name => 'allow king to evade check',
-		fen => 'r3k2r/p1ppqpb1/1n2pnp1/3PN3/1p2P3/2N2Q1p/PPPBbPPP/R4K1R w KQkq - 0 1',
+		fen => 'r3k2r/p1ppqpb1/1n2pnp1/3PN3/1p2P3/2N2Q1p/PPPBbPPP/R4K1R w kq - 0 1',
 		moves => [qw(c3e2 f1e1 f1g1 f3e2 f1e2)],
 	},
 	{

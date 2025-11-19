@@ -1,0 +1,856 @@
+package Lib::Pepper::Constants;
+#---AUTOPRAGMASTART---
+use v5.42;
+use strict;
+use diagnostics;
+use mro 'c3';
+use English;
+use Carp qw[carp croak confess cluck longmess shortmess];
+our $VERSION = 0.4;
+use autodie qw( close );
+use Array::Contains;
+use utf8;
+use Data::Dumper;
+use Data::Printer;
+#---AUTOPRAGMAEND---
+
+
+use parent 'Exporter';
+
+###############################################################################
+# OPERATIONS
+###############################################################################
+
+use constant {
+    PEP_OPERATION_OPEN             => 1,
+    PEP_OPERATION_CLOSE            => 2,
+    PEP_OPERATION_RECOVERY         => 3,
+    PEP_OPERATION_TRANSACTION      => 4,
+    PEP_OPERATION_SETTLEMENT       => 5,
+    PEP_OPERATION_UTILITY          => 6,
+    PEP_OPERATION_AUXILIARY        => 7,
+    PEP_OPERATION_DOWNLOAD_LICENSE => 8,
+};
+
+###############################################################################
+# STATES
+###############################################################################
+
+use constant {
+    PEP_STATE_CREATED                           => 1,
+    PEP_STATE_CONFIGURING                       => 2,
+    PEP_STATE_IDLE                              => 3,
+    PEP_STATE_PREPARING_OPEN                    => 10,
+    PEP_STATE_STARTING_OPEN                     => 11,
+    PEP_STATE_EXECUTING_OPEN                    => 12,
+    PEP_STATE_FINALIZING_OPEN                   => 13,
+    PEP_STATE_OPEN                              => 14,
+    PEP_STATE_PREPARING_CLOSE                   => 20,
+    PEP_STATE_STARTING_CLOSE                    => 21,
+    PEP_STATE_EXECUTING_CLOSE                   => 22,
+    PEP_STATE_FINALIZING_CLOSE                  => 23,
+    PEP_STATE_CLOSED                            => 24,
+    PEP_STATE_PREPARING_RECOVERY                => 30,
+    PEP_STATE_STARTING_RECOVERY                 => 31,
+    PEP_STATE_EXECUTING_RECOVERY                => 32,
+    PEP_STATE_FINALIZING_RECOVERY               => 33,
+    PEP_STATE_PREPARING_TRANSACTION             => 40,
+    PEP_STATE_STARTING_TRANSACTION              => 41,
+    PEP_STATE_EXECUTING_TRANSACTION             => 42,
+    PEP_STATE_FINALIZING_TRANSACTION            => 43,
+    PEP_STATE_PREPARING_SETTLEMENT              => 50,
+    PEP_STATE_STARTING_SETTLEMENT               => 51,
+    PEP_STATE_EXECUTING_SETTLEMENT              => 52,
+    PEP_STATE_FINALIZING_SETTLEMENT             => 53,
+    PEP_STATE_PREPARING_UTILITY                 => 60,
+    PEP_STATE_STARTING_UTILITY                  => 61,
+    PEP_STATE_EXECUTING_UTILITY                 => 62,
+    PEP_STATE_FINALIZING_UTILITY                => 63,
+    PEP_STATE_PREPARING_AUXILIARY               => 70,
+    PEP_STATE_STARTING_AUXILIARY                => 71,
+    PEP_STATE_EXECUTING_AUXILIARY               => 72,
+    PEP_STATE_FINALIZING_AUXILIARY              => 73,
+    PEP_STATE_PREPARING_DOWNLOAD_LICENSE        => 80,
+    PEP_STATE_STARTING_DOWNLOAD_LICENSE         => 81,
+    PEP_STATE_EXECUTING_DOWNLOAD_LICENSE        => 82,
+    PEP_STATE_FINALIZING_DOWNLOAD_LICENSE       => 83,
+};
+
+###############################################################################
+# TRANSACTION TYPES
+###############################################################################
+
+use constant {
+    PEP_TRANSACTION_TYPE_GOODS_PAYMENT          => 11,
+    PEP_TRANSACTION_TYPE_VOID_GOODS_PAYMENT     => 12,
+    PEP_TRANSACTION_TYPE_CREDIT                 => 41,
+    PEP_TRANSACTION_TYPE_RESERVATION            => 51,
+    PEP_TRANSACTION_TYPE_BOOK_RESERVATION       => 52,
+    PEP_TRANSACTION_TYPE_CANCEL_RESERVATION     => 53,
+    PEP_TRANSACTION_TYPE_VOID_RESERVATION       => 54,
+    PEP_TRANSACTION_TYPE_VOID_BOOK_RESERVATION  => 55,
+};
+
+###############################################################################
+# CALLBACK EVENTS AND OPTIONS
+###############################################################################
+
+use constant {
+    PEP_CALLBACK_EVENT_OUTPUT  => 1,
+    PEP_CALLBACK_EVENT_INPUT   => 2,
+};
+
+use constant {
+    PEP_CALLBACK_OPTION_INTERMEDIATE_STATUS         => 1,
+    PEP_CALLBACK_OPTION_OPERATION_FINISHED          => 8,
+    PEP_CALLBACK_OPTION_INTERMEDIATE_TICKET         => 16,
+    PEP_CALLBACK_OPTION_SELECTION_LIST              => 65_536,
+    PEP_CALLBACK_OPTION_NUMERICAL_INPUT             => 131_072,
+    PEP_CALLBACK_OPTION_ALPHANUMERICAL_INPUT        => 262_144,
+    PEP_CALLBACK_OPTION_COMPLEX_INPUT               => 524_288,
+};
+
+###############################################################################
+# TICKET TYPES
+###############################################################################
+
+use constant {
+    PEP_TICKET_TYPE_CLIENT              => 1,
+    PEP_TICKET_TYPE_MERCHANT            => 2,
+    PEP_TICKET_TYPE_SETTLEMENT          => 3,
+    PEP_TICKET_TYPE_CONFIGURATION       => 4,
+    PEP_TICKET_TYPE_DIAGNOSIS           => 5,
+    PEP_TICKET_TYPE_INITIALIZATION      => 6,
+};
+
+###############################################################################
+# UTILITY CODES
+###############################################################################
+
+use constant {
+    PEP_UTILITY_CODE_GET_STATE  => 1,
+};
+
+###############################################################################
+# AUXILIARY CODES
+###############################################################################
+
+use constant {
+    PEP_AUXILIARY_CODE_PRINT_DATA           => 1,
+    PEP_AUXILIARY_CODE_DIAGNOSIS            => 2,
+    PEP_AUXILIARY_CODE_INITIALIZATION       => 3,
+    PEP_AUXILIARY_CODE_STATUS_ENQUIRY       => 4,
+    PEP_AUXILIARY_CODE_RESET_TERMINAL       => 5,
+    PEP_AUXILIARY_CODE_DISPLAY_MENU         => 6,
+    PEP_AUXILIARY_CODE_GET_CUSTOMER_DETAILS => 7,
+};
+
+###############################################################################
+# CURRENCIES (ISO 4217)
+###############################################################################
+
+use constant {
+    PEP_CURRENCY_EUR  => 978,   # Euro
+    PEP_CURRENCY_USD  => 840,   # US Dollar
+    PEP_CURRENCY_GBP  => 826,   # Pound Sterling
+    PEP_CURRENCY_CHF  => 756,   # Swiss Franc
+    PEP_CURRENCY_CHW  => 948,   # WIR Franc
+    PEP_CURRENCY_JPY  => 392,   # Yen
+    PEP_CURRENCY_CNY  => 156,   # Yuan Renminbi
+    PEP_CURRENCY_CAD  => 124,   # Canadian Dollar
+    PEP_CURRENCY_AUD  => 36,    # Australian Dollar
+    PEP_CURRENCY_NZD  => 554,   # New Zealand Dollar
+    PEP_CURRENCY_SEK  => 752,   # Swedish Krona
+    PEP_CURRENCY_NOK  => 578,   # Norwegian Krone
+    PEP_CURRENCY_DKK  => 208,   # Danish Krone
+    PEP_CURRENCY_PLN  => 985,   # Zloty
+    PEP_CURRENCY_CZK  => 203,   # Czech Koruna
+    PEP_CURRENCY_HUF  => 348,   # Forint
+    PEP_CURRENCY_RON  => 946,   # Romanian Leu
+    PEP_CURRENCY_BGN  => 975,   # Bulgarian Lev
+    PEP_CURRENCY_HRK  => 191,   # Croatian Kuna
+    PEP_CURRENCY_RUB  => 643,   # Russian Ruble
+    PEP_CURRENCY_TRY  => 949,   # Turkish Lira
+    PEP_CURRENCY_INR  => 356,   # Indian Rupee
+    PEP_CURRENCY_BRL  => 986,   # Brazilian Real
+    PEP_CURRENCY_ZAR  => 710,   # Rand
+    PEP_CURRENCY_MXN  => 484,   # Mexican Peso
+    PEP_CURRENCY_SGD  => 702,   # Singapore Dollar
+    PEP_CURRENCY_HKD  => 344,   # Hong Kong Dollar
+    PEP_CURRENCY_THB  => 764,   # Baht
+    PEP_CURRENCY_MYR  => 458,   # Malaysian Ringgit
+    PEP_CURRENCY_IDR  => 360,   # Rupiah
+    PEP_CURRENCY_PHP  => 608,   # Philippine Peso
+    PEP_CURRENCY_KRW  => 410,   # Won
+    PEP_CURRENCY_AED  => 784,   # UAE Dirham
+    PEP_CURRENCY_SAR  => 682,   # Saudi Riyal
+    PEP_CURRENCY_ILS  => 376,   # New Israeli Sheqel
+    PEP_CURRENCY_ARS  => 32,    # Argentine Peso
+    PEP_CURRENCY_CLP  => 152,   # Chilean Peso
+    PEP_CURRENCY_COP  => 170,   # Colombian Peso
+};
+
+###############################################################################
+# COMMUNICATION PARAMETERS
+###############################################################################
+
+use constant {
+    PEP_BAUD_RATE_9600    => 9_600,
+    PEP_BAUD_RATE_19200   => 19_200,
+    PEP_BAUD_RATE_38400   => 38_400,
+    PEP_BAUD_RATE_57600   => 57_600,
+    PEP_BAUD_RATE_115200  => 115_200,
+};
+
+use constant {
+    PEP_PARITY_NONE   => 0,
+    PEP_PARITY_ODD    => 1,
+    PEP_PARITY_EVEN   => 2,
+};
+
+use constant {
+    PEP_DATA_BITS_7  => 7,
+    PEP_DATA_BITS_8  => 8,
+};
+
+use constant {
+    PEP_STOP_BITS_1  => 1,
+    PEP_STOP_BITS_2  => 2,
+};
+
+###############################################################################
+# PAYMENT MODE
+###############################################################################
+
+use constant {
+    PEP_PAYMENT_MODE_UNDEFINED         => 0,
+    PEP_PAYMENT_MODE_CARD_PRESENT      => 1,
+    PEP_PAYMENT_MODE_CARD_NOT_PRESENT  => 2,
+};
+
+###############################################################################
+# PROTOCOL VERSION
+###############################################################################
+
+use constant {
+    PEP_PROTOCOL_VERSION_UNDEFINED  => 0,
+    PEP_PROTOCOL_VERSION_ZVT        => 1,
+};
+
+###############################################################################
+# TICKET PRINTING MODE
+###############################################################################
+
+use constant {
+    PEP_TICKET_PRINTING_MODE_POS              => 0,  # POS/cash register prints (disables terminal printer)
+    PEP_TICKET_PRINTING_MODE_EFT              => 1,  # Terminal prints
+    PEP_TICKET_PRINTING_MODE_CLIENT_ONLY_EFT  => 2,  # Client receipt on terminal only
+    PEP_TICKET_PRINTING_MODE_NONE             => 3,  # No printing at all
+    PEP_TICKET_PRINTING_MODE_ECR_AND_TERMINAL => 4,  # Print on both terminal and POS
+};
+
+###############################################################################
+# CONFIG BYTE VALUES
+###############################################################################
+
+use constant {
+    PEP_CONFIG_BYTE_NORMAL          => 0x00,  # Normal operation
+    PEP_CONFIG_BYTE_DISABLE_PRINTER => 0x06,  # Disable terminal printer (bit 1 + bit 2)
+};
+
+###############################################################################
+# ERROR CODES (PEPFunctionResult)
+###############################################################################
+
+use constant {
+    # Success
+    PEP_FUNCTION_RESULT_SUCCESS  => 0,
+
+    # Generic failures
+    PEP_FUNCTION_RESULT_FAILURE_GENERIC                          => -1,
+    PEP_FUNCTION_RESULT_FAILURE_GENERIC_INVALID_VALUE            => -2,
+    PEP_FUNCTION_RESULT_FAILURE_GENERIC_INVALID_STATE            => -3,
+    PEP_FUNCTION_RESULT_FAILURE_GENERIC_FUNCTIONALITY_NOT_LICENSED  => -4,
+    PEP_FUNCTION_RESULT_FAILURE_GENERIC_OUT_OF_MEMORY            => -5,
+
+    # Library initialization errors (-100 to -106)
+    PEP_FUNCTION_RESULT_FAILURE_LIBRARY_INITIALIZATION_GENERIC   => -100,
+    PEP_FUNCTION_RESULT_FAILURE_LIBRARY_ALREADY_INITIALIZED      => -101,
+    PEP_FUNCTION_RESULT_FAILURE_LIBRARY_LOADING_ERROR            => -102,
+    PEP_FUNCTION_RESULT_FAILURE_LIBRARY_NOT_INITIALIZED          => -103,
+    PEP_FUNCTION_RESULT_FAILURE_LIBRARY_VERSION_MISMATCH         => -104,
+    PEP_FUNCTION_RESULT_FAILURE_LIBRARY_DEPENDENCY_ERROR         => -105,
+    PEP_FUNCTION_RESULT_FAILURE_LIBRARY_STILL_IN_USE             => -106,
+
+    # Configuration errors (-200 to -204)
+    PEP_FUNCTION_RESULT_FAILURE_CONFIGURATION_GENERIC            => -200,
+    PEP_FUNCTION_RESULT_FAILURE_CONFIGURATION_INVALID            => -201,
+    PEP_FUNCTION_RESULT_FAILURE_MISSING_CONFIGURATION_FILE       => -202,
+    PEP_FUNCTION_RESULT_FAILURE_CONFIGURATION_FILE_INVALID       => -203,
+    PEP_FUNCTION_RESULT_FAILURE_CONFIGURATION_INCOMPLETE         => -204,
+
+    # Logging errors (-300 to -303)
+    PEP_FUNCTION_RESULT_FAILURE_LOGGING_GENERIC                  => -300,
+    PEP_FUNCTION_RESULT_FAILURE_LOGGING_INITIALIZATION           => -301,
+    PEP_FUNCTION_RESULT_FAILURE_LOGGING_FILE_CREATION            => -302,
+    PEP_FUNCTION_RESULT_FAILURE_LOGGING_FILE_WRITE               => -303,
+
+    # Persistence errors (-400 to -405)
+    PEP_FUNCTION_RESULT_FAILURE_PERSISTENCE_GENERIC              => -400,
+    PEP_FUNCTION_RESULT_FAILURE_PERSISTENCE_DATABASE_ERROR       => -401,
+    PEP_FUNCTION_RESULT_FAILURE_PERSISTENCE_FILE_ERROR           => -402,
+    PEP_FUNCTION_RESULT_FAILURE_PERSISTENCE_DATA_CORRUPT         => -403,
+    PEP_FUNCTION_RESULT_FAILURE_PERSISTENCE_NO_DATA              => -404,
+    PEP_FUNCTION_RESULT_FAILURE_PERSISTENCE_INVALID_DATA         => -405,
+
+    # Core errors (-500 to -502)
+    PEP_FUNCTION_RESULT_FAILURE_CORE_GENERIC                     => -500,
+    PEP_FUNCTION_RESULT_FAILURE_CORE_INITIALIZATION              => -501,
+    PEP_FUNCTION_RESULT_FAILURE_CORE_OPERATION                   => -502,
+
+    # License errors (-700 to -708)
+    PEP_FUNCTION_RESULT_FAILURE_LICENSE_GENERIC                  => -700,
+    PEP_FUNCTION_RESULT_FAILURE_LICENSE_INVALID                  => -701,
+    PEP_FUNCTION_RESULT_FAILURE_LICENSE_EXPIRED                  => -702,
+    PEP_FUNCTION_RESULT_FAILURE_LICENSE_NOT_FOUND                => -703,
+    PEP_FUNCTION_RESULT_FAILURE_LICENSE_DOWNLOAD_FAILED          => -704,
+    PEP_FUNCTION_RESULT_FAILURE_LICENSE_VERIFICATION_FAILED      => -705,
+    PEP_FUNCTION_RESULT_FAILURE_LICENSE_FEATURE_NOT_LICENSED     => -706,
+    PEP_FUNCTION_RESULT_FAILURE_LICENSE_TERMINAL_NOT_LICENSED    => -707,
+    PEP_FUNCTION_RESULT_FAILURE_LICENSE_LIMIT_EXCEEDED           => -708,
+
+    # Handle errors (-1000 to -1004)
+    PEP_FUNCTION_RESULT_FAILURE_HANDLE_INVALID                   => -1000,
+    PEP_FUNCTION_RESULT_FAILURE_HANDLE_NULL                      => -1001,
+    PEP_FUNCTION_RESULT_FAILURE_HANDLE_NOT_FOUND                 => -1002,
+    PEP_FUNCTION_RESULT_FAILURE_HANDLE_TYPE_MISMATCH             => -1003,
+    PEP_FUNCTION_RESULT_FAILURE_HANDLE_CREATION_FAILED           => -1004,
+
+    # Option list errors (-1100 to -1106)
+    PEP_FUNCTION_RESULT_FAILURE_OPTION_LIST_GENERIC              => -1100,
+    PEP_FUNCTION_RESULT_FAILURE_OPTION_LIST_ELEMENT_NOT_FOUND    => -1101,
+    PEP_FUNCTION_RESULT_FAILURE_OPTION_LIST_TYPE_MISMATCH        => -1102,
+    PEP_FUNCTION_RESULT_FAILURE_OPTION_LIST_INVALID_KEY          => -1103,
+    PEP_FUNCTION_RESULT_FAILURE_OPTION_LIST_EMPTY                => -1104,
+    PEP_FUNCTION_RESULT_FAILURE_OPTION_LIST_DUPLICATE_KEY        => -1105,
+    PEP_FUNCTION_RESULT_FAILURE_OPTION_LIST_OPERATION_FAILED     => -1106,
+
+    # Instance errors (-1200 to -1208)
+    PEP_FUNCTION_RESULT_FAILURE_INSTANCE_GENERIC                 => -1200,
+    PEP_FUNCTION_RESULT_FAILURE_INSTANCE_CREATION_FAILED         => -1201,
+    PEP_FUNCTION_RESULT_FAILURE_INSTANCE_NOT_CONFIGURED          => -1202,
+    PEP_FUNCTION_RESULT_FAILURE_INSTANCE_INVALID_STATE           => -1203,
+    PEP_FUNCTION_RESULT_FAILURE_INSTANCE_OPERATION_PENDING       => -1204,
+    PEP_FUNCTION_RESULT_FAILURE_INSTANCE_NOT_OPEN                => -1205,
+    PEP_FUNCTION_RESULT_FAILURE_INSTANCE_ALREADY_OPEN            => -1206,
+    PEP_FUNCTION_RESULT_FAILURE_INSTANCE_CONFIGURATION_ERROR     => -1207,
+    PEP_FUNCTION_RESULT_FAILURE_INSTANCE_CALLBACK_ERROR          => -1208,
+
+    # State machine errors (-1300 to -1304)
+    PEP_FUNCTION_RESULT_FAILURE_STATE_MACHINE_GENERIC            => -1300,
+    PEP_FUNCTION_RESULT_FAILURE_STATE_MACHINE_INVALID_TRANSITION => -1301,
+    PEP_FUNCTION_RESULT_FAILURE_STATE_MACHINE_OPERATION_NOT_ALLOWED  => -1302,
+    PEP_FUNCTION_RESULT_FAILURE_STATE_MACHINE_TIMEOUT            => -1303,
+    PEP_FUNCTION_RESULT_FAILURE_STATE_MACHINE_ABORTED            => -1304,
+
+    # Card type errors (-1400 to -1402)
+    PEP_FUNCTION_RESULT_FAILURE_CARD_TYPE_GENERIC                => -1400,
+    PEP_FUNCTION_RESULT_FAILURE_CARD_TYPE_NOT_FOUND              => -1401,
+    PEP_FUNCTION_RESULT_FAILURE_CARD_TYPE_CONFIGURATION_ERROR    => -1402,
+
+    # Communication errors (-1500 to -1509)
+    PEP_FUNCTION_RESULT_FAILURE_COMMUNICATION_GENERIC            => -1500,
+    PEP_FUNCTION_RESULT_FAILURE_COMMUNICATION_CONNECTION_FAILED  => -1501,
+    PEP_FUNCTION_RESULT_FAILURE_COMMUNICATION_DISCONNECTED       => -1502,
+    PEP_FUNCTION_RESULT_FAILURE_COMMUNICATION_TIMEOUT            => -1503,
+    PEP_FUNCTION_RESULT_FAILURE_COMMUNICATION_SEND_ERROR         => -1504,
+    PEP_FUNCTION_RESULT_FAILURE_COMMUNICATION_RECEIVE_ERROR      => -1505,
+    PEP_FUNCTION_RESULT_FAILURE_COMMUNICATION_PROTOCOL_ERROR     => -1506,
+    PEP_FUNCTION_RESULT_FAILURE_COMMUNICATION_INVALID_RESPONSE   => -1507,
+    PEP_FUNCTION_RESULT_FAILURE_COMMUNICATION_TERMINAL_BUSY      => -1508,
+    PEP_FUNCTION_RESULT_FAILURE_COMMUNICATION_TERMINAL_ERROR     => -1509,
+};
+
+###############################################################################
+# TRANSACTION RESULTS
+###############################################################################
+
+use constant {
+    PEP_TRANSACTION_RESULT_AUTHORIZED    => 0,
+    PEP_TRANSACTION_RESULT_NOT_AUTHORIZED  => -1,
+    PEP_TRANSACTION_RESULT_UNCERTAIN     => -2,
+};
+
+###############################################################################
+# SPECIAL VALUES
+###############################################################################
+
+use constant {
+    PEP_INVALID_HANDLE  => -1,
+    PEP_FALSE           => 0,
+    PEP_TRUE            => 1,
+};
+
+###############################################################################
+# LANGUAGE CODES (for ZVT)
+###############################################################################
+
+use constant {
+    PEP_LANGUAGE_GERMAN   => 25_701,
+    PEP_LANGUAGE_ENGLISH  => 25_966,
+};
+
+###############################################################################
+# TERMINAL TYPES
+###############################################################################
+
+use constant {
+    PEP_TERMINAL_TYPE_GENERIC_ZVT  => 118,
+    PEP_TERMINAL_TYPE_HOBEX_ZVT    => 120,
+    PEP_TERMINAL_TYPE_MOCK         => 999,
+};
+
+###############################################################################
+# EXPORT TAGS
+###############################################################################
+
+our @EXPORT_OK = qw(
+    PEP_OPERATION_OPEN
+    PEP_OPERATION_CLOSE
+    PEP_OPERATION_RECOVERY
+    PEP_OPERATION_TRANSACTION
+    PEP_OPERATION_SETTLEMENT
+    PEP_OPERATION_UTILITY
+    PEP_OPERATION_AUXILIARY
+    PEP_OPERATION_DOWNLOAD_LICENSE
+
+    PEP_STATE_CREATED
+    PEP_STATE_CONFIGURING
+    PEP_STATE_IDLE
+    PEP_STATE_PREPARING_OPEN
+    PEP_STATE_STARTING_OPEN
+    PEP_STATE_EXECUTING_OPEN
+    PEP_STATE_FINALIZING_OPEN
+    PEP_STATE_OPEN
+    PEP_STATE_PREPARING_CLOSE
+    PEP_STATE_STARTING_CLOSE
+    PEP_STATE_EXECUTING_CLOSE
+    PEP_STATE_FINALIZING_CLOSE
+    PEP_STATE_CLOSED
+    PEP_STATE_PREPARING_RECOVERY
+    PEP_STATE_STARTING_RECOVERY
+    PEP_STATE_EXECUTING_RECOVERY
+    PEP_STATE_FINALIZING_RECOVERY
+    PEP_STATE_PREPARING_TRANSACTION
+    PEP_STATE_STARTING_TRANSACTION
+    PEP_STATE_EXECUTING_TRANSACTION
+    PEP_STATE_FINALIZING_TRANSACTION
+    PEP_STATE_PREPARING_SETTLEMENT
+    PEP_STATE_STARTING_SETTLEMENT
+    PEP_STATE_EXECUTING_SETTLEMENT
+    PEP_STATE_FINALIZING_SETTLEMENT
+    PEP_STATE_PREPARING_UTILITY
+    PEP_STATE_STARTING_UTILITY
+    PEP_STATE_EXECUTING_UTILITY
+    PEP_STATE_FINALIZING_UTILITY
+    PEP_STATE_PREPARING_AUXILIARY
+    PEP_STATE_STARTING_AUXILIARY
+    PEP_STATE_EXECUTING_AUXILIARY
+    PEP_STATE_FINALIZING_AUXILIARY
+    PEP_STATE_PREPARING_DOWNLOAD_LICENSE
+    PEP_STATE_STARTING_DOWNLOAD_LICENSE
+    PEP_STATE_EXECUTING_DOWNLOAD_LICENSE
+    PEP_STATE_FINALIZING_DOWNLOAD_LICENSE
+
+    PEP_TRANSACTION_TYPE_GOODS_PAYMENT
+    PEP_TRANSACTION_TYPE_VOID_GOODS_PAYMENT
+    PEP_TRANSACTION_TYPE_CREDIT
+    PEP_TRANSACTION_TYPE_RESERVATION
+    PEP_TRANSACTION_TYPE_BOOK_RESERVATION
+    PEP_TRANSACTION_TYPE_CANCEL_RESERVATION
+    PEP_TRANSACTION_TYPE_VOID_RESERVATION
+    PEP_TRANSACTION_TYPE_VOID_BOOK_RESERVATION
+
+    PEP_CALLBACK_EVENT_OUTPUT
+    PEP_CALLBACK_EVENT_INPUT
+    PEP_CALLBACK_OPTION_INTERMEDIATE_STATUS
+    PEP_CALLBACK_OPTION_OPERATION_FINISHED
+    PEP_CALLBACK_OPTION_INTERMEDIATE_TICKET
+    PEP_CALLBACK_OPTION_SELECTION_LIST
+    PEP_CALLBACK_OPTION_NUMERICAL_INPUT
+    PEP_CALLBACK_OPTION_ALPHANUMERICAL_INPUT
+    PEP_CALLBACK_OPTION_COMPLEX_INPUT
+
+    PEP_TICKET_TYPE_CLIENT
+    PEP_TICKET_TYPE_MERCHANT
+    PEP_TICKET_TYPE_SETTLEMENT
+    PEP_TICKET_TYPE_CONFIGURATION
+    PEP_TICKET_TYPE_DIAGNOSIS
+    PEP_TICKET_TYPE_INITIALIZATION
+
+    PEP_UTILITY_CODE_GET_STATE
+
+    PEP_AUXILIARY_CODE_PRINT_DATA
+    PEP_AUXILIARY_CODE_DIAGNOSIS
+    PEP_AUXILIARY_CODE_INITIALIZATION
+    PEP_AUXILIARY_CODE_STATUS_ENQUIRY
+    PEP_AUXILIARY_CODE_RESET_TERMINAL
+    PEP_AUXILIARY_CODE_DISPLAY_MENU
+    PEP_AUXILIARY_CODE_GET_CUSTOMER_DETAILS
+
+    PEP_CURRENCY_EUR
+    PEP_CURRENCY_USD
+    PEP_CURRENCY_GBP
+    PEP_CURRENCY_CHF
+    PEP_CURRENCY_CHW
+    PEP_CURRENCY_JPY
+    PEP_CURRENCY_CNY
+    PEP_CURRENCY_CAD
+    PEP_CURRENCY_AUD
+    PEP_CURRENCY_NZD
+    PEP_CURRENCY_SEK
+    PEP_CURRENCY_NOK
+    PEP_CURRENCY_DKK
+    PEP_CURRENCY_PLN
+    PEP_CURRENCY_CZK
+    PEP_CURRENCY_HUF
+    PEP_CURRENCY_RON
+    PEP_CURRENCY_BGN
+    PEP_CURRENCY_HRK
+    PEP_CURRENCY_RUB
+    PEP_CURRENCY_TRY
+    PEP_CURRENCY_INR
+    PEP_CURRENCY_BRL
+    PEP_CURRENCY_ZAR
+    PEP_CURRENCY_MXN
+    PEP_CURRENCY_SGD
+    PEP_CURRENCY_HKD
+    PEP_CURRENCY_THB
+    PEP_CURRENCY_MYR
+    PEP_CURRENCY_IDR
+    PEP_CURRENCY_PHP
+    PEP_CURRENCY_KRW
+    PEP_CURRENCY_AED
+    PEP_CURRENCY_SAR
+    PEP_CURRENCY_ILS
+    PEP_CURRENCY_ARS
+    PEP_CURRENCY_CLP
+    PEP_CURRENCY_COP
+
+    PEP_BAUD_RATE_9600
+    PEP_BAUD_RATE_19200
+    PEP_BAUD_RATE_38400
+    PEP_BAUD_RATE_57600
+    PEP_BAUD_RATE_115200
+
+    PEP_PARITY_NONE
+    PEP_PARITY_ODD
+    PEP_PARITY_EVEN
+
+    PEP_DATA_BITS_7
+    PEP_DATA_BITS_8
+
+    PEP_STOP_BITS_1
+    PEP_STOP_BITS_2
+
+    PEP_PAYMENT_MODE_UNDEFINED
+    PEP_PAYMENT_MODE_CARD_PRESENT
+    PEP_PAYMENT_MODE_CARD_NOT_PRESENT
+
+    PEP_PROTOCOL_VERSION_UNDEFINED
+    PEP_PROTOCOL_VERSION_ZVT
+
+    PEP_TICKET_PRINTING_MODE_POS
+    PEP_TICKET_PRINTING_MODE_EFT
+    PEP_TICKET_PRINTING_MODE_CLIENT_ONLY_EFT
+    PEP_TICKET_PRINTING_MODE_NONE
+    PEP_TICKET_PRINTING_MODE_ECR_AND_TERMINAL
+
+    PEP_CONFIG_BYTE_NORMAL
+    PEP_CONFIG_BYTE_DISABLE_PRINTER
+
+    PEP_FUNCTION_RESULT_SUCCESS
+    PEP_FUNCTION_RESULT_FAILURE_GENERIC
+    PEP_FUNCTION_RESULT_FAILURE_GENERIC_INVALID_VALUE
+    PEP_FUNCTION_RESULT_FAILURE_GENERIC_INVALID_STATE
+    PEP_FUNCTION_RESULT_FAILURE_GENERIC_FUNCTIONALITY_NOT_LICENSED
+    PEP_FUNCTION_RESULT_FAILURE_GENERIC_OUT_OF_MEMORY
+    PEP_FUNCTION_RESULT_FAILURE_LIBRARY_INITIALIZATION_GENERIC
+    PEP_FUNCTION_RESULT_FAILURE_LIBRARY_ALREADY_INITIALIZED
+    PEP_FUNCTION_RESULT_FAILURE_LIBRARY_LOADING_ERROR
+    PEP_FUNCTION_RESULT_FAILURE_LIBRARY_NOT_INITIALIZED
+    PEP_FUNCTION_RESULT_FAILURE_LIBRARY_VERSION_MISMATCH
+    PEP_FUNCTION_RESULT_FAILURE_LIBRARY_DEPENDENCY_ERROR
+    PEP_FUNCTION_RESULT_FAILURE_LIBRARY_STILL_IN_USE
+    PEP_FUNCTION_RESULT_FAILURE_CONFIGURATION_GENERIC
+    PEP_FUNCTION_RESULT_FAILURE_CONFIGURATION_INVALID
+    PEP_FUNCTION_RESULT_FAILURE_MISSING_CONFIGURATION_FILE
+    PEP_FUNCTION_RESULT_FAILURE_CONFIGURATION_FILE_INVALID
+    PEP_FUNCTION_RESULT_FAILURE_CONFIGURATION_INCOMPLETE
+    PEP_FUNCTION_RESULT_FAILURE_LOGGING_GENERIC
+    PEP_FUNCTION_RESULT_FAILURE_LOGGING_INITIALIZATION
+    PEP_FUNCTION_RESULT_FAILURE_LOGGING_FILE_CREATION
+    PEP_FUNCTION_RESULT_FAILURE_LOGGING_FILE_WRITE
+    PEP_FUNCTION_RESULT_FAILURE_PERSISTENCE_GENERIC
+    PEP_FUNCTION_RESULT_FAILURE_PERSISTENCE_DATABASE_ERROR
+    PEP_FUNCTION_RESULT_FAILURE_PERSISTENCE_FILE_ERROR
+    PEP_FUNCTION_RESULT_FAILURE_PERSISTENCE_DATA_CORRUPT
+    PEP_FUNCTION_RESULT_FAILURE_PERSISTENCE_NO_DATA
+    PEP_FUNCTION_RESULT_FAILURE_PERSISTENCE_INVALID_DATA
+    PEP_FUNCTION_RESULT_FAILURE_CORE_GENERIC
+    PEP_FUNCTION_RESULT_FAILURE_CORE_INITIALIZATION
+    PEP_FUNCTION_RESULT_FAILURE_CORE_OPERATION
+    PEP_FUNCTION_RESULT_FAILURE_LICENSE_GENERIC
+    PEP_FUNCTION_RESULT_FAILURE_LICENSE_INVALID
+    PEP_FUNCTION_RESULT_FAILURE_LICENSE_EXPIRED
+    PEP_FUNCTION_RESULT_FAILURE_LICENSE_NOT_FOUND
+    PEP_FUNCTION_RESULT_FAILURE_LICENSE_DOWNLOAD_FAILED
+    PEP_FUNCTION_RESULT_FAILURE_LICENSE_VERIFICATION_FAILED
+    PEP_FUNCTION_RESULT_FAILURE_LICENSE_FEATURE_NOT_LICENSED
+    PEP_FUNCTION_RESULT_FAILURE_LICENSE_TERMINAL_NOT_LICENSED
+    PEP_FUNCTION_RESULT_FAILURE_LICENSE_LIMIT_EXCEEDED
+    PEP_FUNCTION_RESULT_FAILURE_HANDLE_INVALID
+    PEP_FUNCTION_RESULT_FAILURE_HANDLE_NULL
+    PEP_FUNCTION_RESULT_FAILURE_HANDLE_NOT_FOUND
+    PEP_FUNCTION_RESULT_FAILURE_HANDLE_TYPE_MISMATCH
+    PEP_FUNCTION_RESULT_FAILURE_HANDLE_CREATION_FAILED
+    PEP_FUNCTION_RESULT_FAILURE_OPTION_LIST_GENERIC
+    PEP_FUNCTION_RESULT_FAILURE_OPTION_LIST_ELEMENT_NOT_FOUND
+    PEP_FUNCTION_RESULT_FAILURE_OPTION_LIST_TYPE_MISMATCH
+    PEP_FUNCTION_RESULT_FAILURE_OPTION_LIST_INVALID_KEY
+    PEP_FUNCTION_RESULT_FAILURE_OPTION_LIST_EMPTY
+    PEP_FUNCTION_RESULT_FAILURE_OPTION_LIST_DUPLICATE_KEY
+    PEP_FUNCTION_RESULT_FAILURE_OPTION_LIST_OPERATION_FAILED
+    PEP_FUNCTION_RESULT_FAILURE_INSTANCE_GENERIC
+    PEP_FUNCTION_RESULT_FAILURE_INSTANCE_CREATION_FAILED
+    PEP_FUNCTION_RESULT_FAILURE_INSTANCE_NOT_CONFIGURED
+    PEP_FUNCTION_RESULT_FAILURE_INSTANCE_INVALID_STATE
+    PEP_FUNCTION_RESULT_FAILURE_INSTANCE_OPERATION_PENDING
+    PEP_FUNCTION_RESULT_FAILURE_INSTANCE_NOT_OPEN
+    PEP_FUNCTION_RESULT_FAILURE_INSTANCE_ALREADY_OPEN
+    PEP_FUNCTION_RESULT_FAILURE_INSTANCE_CONFIGURATION_ERROR
+    PEP_FUNCTION_RESULT_FAILURE_INSTANCE_CALLBACK_ERROR
+    PEP_FUNCTION_RESULT_FAILURE_STATE_MACHINE_GENERIC
+    PEP_FUNCTION_RESULT_FAILURE_STATE_MACHINE_INVALID_TRANSITION
+    PEP_FUNCTION_RESULT_FAILURE_STATE_MACHINE_OPERATION_NOT_ALLOWED
+    PEP_FUNCTION_RESULT_FAILURE_STATE_MACHINE_TIMEOUT
+    PEP_FUNCTION_RESULT_FAILURE_STATE_MACHINE_ABORTED
+    PEP_FUNCTION_RESULT_FAILURE_CARD_TYPE_GENERIC
+    PEP_FUNCTION_RESULT_FAILURE_CARD_TYPE_NOT_FOUND
+    PEP_FUNCTION_RESULT_FAILURE_CARD_TYPE_CONFIGURATION_ERROR
+    PEP_FUNCTION_RESULT_FAILURE_COMMUNICATION_GENERIC
+    PEP_FUNCTION_RESULT_FAILURE_COMMUNICATION_CONNECTION_FAILED
+    PEP_FUNCTION_RESULT_FAILURE_COMMUNICATION_DISCONNECTED
+    PEP_FUNCTION_RESULT_FAILURE_COMMUNICATION_TIMEOUT
+    PEP_FUNCTION_RESULT_FAILURE_COMMUNICATION_SEND_ERROR
+    PEP_FUNCTION_RESULT_FAILURE_COMMUNICATION_RECEIVE_ERROR
+    PEP_FUNCTION_RESULT_FAILURE_COMMUNICATION_PROTOCOL_ERROR
+    PEP_FUNCTION_RESULT_FAILURE_COMMUNICATION_INVALID_RESPONSE
+    PEP_FUNCTION_RESULT_FAILURE_COMMUNICATION_TERMINAL_BUSY
+    PEP_FUNCTION_RESULT_FAILURE_COMMUNICATION_TERMINAL_ERROR
+
+    PEP_TRANSACTION_RESULT_AUTHORIZED
+    PEP_TRANSACTION_RESULT_NOT_AUTHORIZED
+    PEP_TRANSACTION_RESULT_UNCERTAIN
+
+    PEP_INVALID_HANDLE
+    PEP_FALSE
+    PEP_TRUE
+
+    PEP_LANGUAGE_GERMAN
+    PEP_LANGUAGE_ENGLISH
+
+    PEP_TERMINAL_TYPE_GENERIC_ZVT
+    PEP_TERMINAL_TYPE_HOBEX_ZVT
+    PEP_TERMINAL_TYPE_MOCK
+);
+
+our %EXPORT_TAGS = (
+    all          => \@EXPORT_OK,
+    operations   => [grep { /^PEP_OPERATION_/ } @EXPORT_OK],
+    states       => [grep { /^PEP_STATE_/ } @EXPORT_OK],
+    transactions => [grep { /^PEP_TRANSACTION_/ } @EXPORT_OK],
+    callbacks    => [grep { /^PEP_CALLBACK_/ } @EXPORT_OK],
+    tickets      => [grep { /^PEP_TICKET_/ } @EXPORT_OK],
+    utilities    => [grep { /^PEP_UTILITY_|^PEP_TICKET_PRINTING_MODE_|^PEP_CONFIG_BYTE_/ } @EXPORT_OK],
+    auxiliary    => [grep { /^PEP_AUXILIARY_/ } @EXPORT_OK],
+    currencies   => [grep { /^PEP_CURRENCY_/ } @EXPORT_OK],
+    communication => [grep { /^PEP_(BAUD_RATE|PARITY|DATA_BITS|STOP_BITS)_/ } @EXPORT_OK],
+    payment      => [grep { /^PEP_PAYMENT_MODE_/ } @EXPORT_OK],
+    protocol     => [grep { /^PEP_PROTOCOL_VERSION_/ } @EXPORT_OK],
+    errors       => [grep { /^PEP_FUNCTION_RESULT_/ } @EXPORT_OK],
+    results      => [grep { /^PEP_TRANSACTION_RESULT_/ } @EXPORT_OK],
+    special      => [qw(PEP_INVALID_HANDLE PEP_FALSE PEP_TRUE)],
+    language     => [grep { /^PEP_LANGUAGE_/ } @EXPORT_OK],
+    terminals    => [grep { /^PEP_TERMINAL_TYPE_/ } @EXPORT_OK],
+);
+
+1;
+
+__END__
+
+=head1 NAME
+
+Lib::Pepper::Constants - Constants and enumerations for Lib::Pepper
+
+=head1 SYNOPSIS
+
+    use Lib::Pepper::Constants qw(:all);
+
+    # Or import specific groups
+    use Lib::Pepper::Constants qw(:operations :currencies :errors);
+
+    # Use the constants
+    my $operation = PEP_OPERATION_TRANSACTION;
+    my $currency = PEP_CURRENCY_EUR;
+
+    if($result == PEP_FUNCTION_RESULT_SUCCESS) {
+        print "Operation successful\n";
+    }
+
+=head1 DESCRIPTION
+
+This module provides all constants and enumerations from the Pepper library,
+including operations, states, transaction types, currencies, error codes,
+and more. Constants are organized into export tags for convenience.
+
+=head1 EXPORT TAGS
+
+=over 4
+
+=item B<:all>
+
+All constants
+
+=item B<:operations>
+
+Operation type constants (OPEN, CLOSE, TRANSACTION, etc.)
+
+=item B<:states>
+
+State machine state constants
+
+=item B<:transactions>
+
+Transaction type constants (GOODS_PAYMENT, CREDIT, etc.)
+
+=item B<:callbacks>
+
+Callback event and option constants
+
+=item B<:tickets>
+
+Ticket type constants
+
+=item B<:utilities>
+
+Utility code constants
+
+=item B<:auxiliary>
+
+Auxiliary code constants
+
+=item B<:currencies>
+
+Currency code constants (ISO 4217)
+
+=item B<:communication>
+
+Communication parameter constants (baud rate, parity, etc.)
+
+=item B<:payment>
+
+Payment mode constants
+
+=item B<:protocol>
+
+Protocol version constants
+
+=item B<:errors>
+
+Error code constants (PEPFunctionResult values)
+
+=item B<:results>
+
+Transaction result constants
+
+=item B<:special>
+
+Special values (INVALID_HANDLE, TRUE, FALSE)
+
+=item B<:language>
+
+Language code constants for ZVT
+
+=item B<:terminals>
+
+Terminal type constants
+
+=back
+
+=head1 KEY CONSTANTS
+
+=head2 Operations
+
+    PEP_OPERATION_OPEN
+    PEP_OPERATION_CLOSE
+    PEP_OPERATION_TRANSACTION
+    PEP_OPERATION_SETTLEMENT
+    PEP_OPERATION_RECOVERY
+    PEP_OPERATION_UTILITY
+    PEP_OPERATION_AUXILIARY
+    PEP_OPERATION_DOWNLOAD_LICENSE
+
+=head2 Transaction Types
+
+    PEP_TRANSACTION_TYPE_GOODS_PAYMENT (11)
+    PEP_TRANSACTION_TYPE_VOID_GOODS_PAYMENT (12)
+    PEP_TRANSACTION_TYPE_CREDIT (41)
+    PEP_TRANSACTION_TYPE_RESERVATION (51)
+
+=head2 Currencies
+
+    PEP_CURRENCY_EUR (978)
+    PEP_CURRENCY_USD (840)
+    PEP_CURRENCY_GBP (826)
+    PEP_CURRENCY_CHF (756)
+    PEP_CURRENCY_CHW (948)
+
+=head2 Error Codes
+
+    PEP_FUNCTION_RESULT_SUCCESS (0)
+    PEP_FUNCTION_RESULT_FAILURE_GENERIC (-1)
+    PEP_FUNCTION_RESULT_FAILURE_LIBRARY_NOT_INITIALIZED (-103)
+    PEP_FUNCTION_RESULT_FAILURE_COMMUNICATION_TIMEOUT (-1503)
+
+=head2 Terminal Types
+
+    PEP_TERMINAL_TYPE_GENERIC_ZVT (118) - Generic ZVT protocol
+    PEP_TERMINAL_TYPE_HOBEX_ZVT (120) - Hobex ZVT protocol
+    PEP_TERMINAL_TYPE_MOCK (999) - Mock implementation for testing
+
+=head1 WARNING: AI USE
+
+Warning, this file was generated with the help of the 'Claude' AI (an LLM/large
+language model by the USA company Anthropic PBC) in November 2025. It was not
+reviewed line-by-line by a human, only on a functional level. It is therefore
+not up to the usual code quality and review standards. Different copyright laws
+may also apply, since the program was not created by humans but mostly by a machine,
+therefore the laws requiring a human creative process may or may not apply. Laws
+regarding AI use are changing rapidly. Before using the code provided in this
+file for any of your projects, make sure to check the current version of your
+local laws.
+
+=head1 AUTHOR
+
+Rene Schickbauer, E<lt>cavac@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2025 by Rene Schickbauer
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.42.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

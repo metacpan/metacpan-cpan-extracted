@@ -17,7 +17,7 @@ use List::Util 1.33 qw(any);
 use Mo::utils 0.08 qw(check_bool check_isa check_required);
 use Scalar::Util qw(blessed);
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Constructor.
 sub new {
@@ -43,7 +43,6 @@ sub new {
 	check_bool($self, 'ignore_data_errors');
 
 	# Check 'leader'.
-	check_required($self, 'leader');
 	check_isa($self, 'leader', 'Data::MARC::Leader');
 
 	# Check 'verbose'.
@@ -54,6 +53,9 @@ sub new {
 
 sub parse {
 	my ($self, $field_008) = @_;
+
+	# Parameter 'leader' is required for parse().
+	check_required($self, 'leader');
 
 	# XXX Fix white space issue in MARC XML record.
 	if (length($field_008) < 40) {
@@ -384,9 +386,9 @@ Default value is 0.
 
 =item * C<leader>
 
-MARC leader string.
+MARC leader in L<Data::MARC::Leader> instance.
 
-It's required.
+It's required for parse() method only.
 
 Default is undef.
 
@@ -430,13 +432,15 @@ Returns string.
                          Reference: %s
          From Mo::utils::check_required():
                  Parameter 'ignore_data_errors' is required.
-                 Parameter 'leader' is required.
          From Class::Utils::set_params():
                  Unknown parameter '%s'.
 
  parse():
          Bad length of MARC 008 field.
                  Length: %s
+
+         From Mo::utils::check_required():
+                 Parameter 'leader' is required.
 
          Errors from L<Data::MARC::Field008>, see documentation.
 
@@ -589,8 +593,15 @@ L<http://skim.cz>
 
 BSD 2-Clause License
 
+=head1 ACKNOWLEDGEMENTS
+
+Development of this software has been made possible by institutional support
+for the long-term strategic development of the National Library of the Czech
+Republic as a research organization provided by the Ministry of Culture of
+the Czech Republic (DKRVO 2024–2028), Area 11: Linked Open Data.
+
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

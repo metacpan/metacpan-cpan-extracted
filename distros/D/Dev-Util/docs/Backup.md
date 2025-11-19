@@ -1,10 +1,10 @@
 # NAME
 
-Dev::Util::Backup - backup functions
+Dev::Util::Backup - Simple backup functions for files and dirs
 
 # VERSION
 
-Version v2.18.19
+Version v2.19.6
 
 # SYNOPSIS
 

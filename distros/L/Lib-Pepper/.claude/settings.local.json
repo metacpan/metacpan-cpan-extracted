@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(make test:*)",
+      "Bash(perl Makefile.PL:*)",
+      "Bash(TEST_POD=1 make test:*)",
+      "Bash(TEST_CRITIC=1 make test:*)",
+      "Bash(PEPPER_LICENSE=/home/cavac/src/pepperclient/pepper_license_8v5r22cg.xml perl:*)",
+      "Bash(perl:*)",
+      "Bash(lsof:*)",
+      "Bash(make:*)",
+      "Bash(PEPPER_LICENSE=/home/cavac/src/pepperclient/pepper_license_8v5r22cg.xml make test:*)",
+      "Bash(ldd:*)",
+      "Bash(export PEPPER_LICENSE=/home/cavac/src/pepperclient/pepper_license_8v5r22cg.xml)",
+      "Bash(DEBUG_PEPPER=1 perl:*)",
+      "Bash(cat:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

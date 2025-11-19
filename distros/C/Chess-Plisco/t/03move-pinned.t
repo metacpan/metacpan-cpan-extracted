@@ -109,8 +109,8 @@ my @tests = (
 plan tests => @tests << 1;
 
 foreach my $test (@tests) {
-	my $pos = Chess::Plisco->new($test->{fen});
-	my $move = $pos->parseMove($test->{move});
+	my $pos = Chess::Plisco->new($test->{fen}, 1);
+	my $move = $pos->parseMove($test->{move}, 1);
 	ok $move, "$test->{name}: parse $test->{move}";
 
 	if ($test->{pinned}) {

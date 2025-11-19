@@ -1,0 +1,31 @@
+<html>
+<head><title>Hello World</title></head>
+
+<body>
+<perl method="hello">
+
+<!-- This block is rendered -->
+<block name="hello">
+Hello World
+</block>
+
+</perl>
+
+<p>
+<!-- So is this one, even though it is outside the <perl>..</perl> block -->
+<block name="hello">
+Again
+</block>
+
+</body>
+</html>
+
+__PERL__
+
+sub hello {
+
+	my $self=shift();
+	$self->render_block('hello');
+	$self->render();
+
+}

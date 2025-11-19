@@ -1,0 +1,31 @@
+<html>
+<head><title>Hello World</title></head>
+<body>
+
+<!-- Does not work -->
+The value of $i is !{! $::i !}
+<p>
+
+<!-- Ugly hack, does work though -->
+The value of $i is !{! ${__PACKAGE__.::i} !}
+<p>
+
+<!-- Probably best to just do this though -->
+The value of $i is !{! &get_i() !}
+<p>
+
+<!-- Or this - see variable substitution section  -->
+<perl method="render_i">
+The value of $i is ${i}
+</perl>
+
+</body>
+</html>
+
+__PERL__
+
+our $i=5;
+
+sub get_i { \$i }
+
+sub render_i { shift()->render(i=>$i) }

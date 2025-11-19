@@ -1,0 +1,61 @@
+<html>
+
+<head>
+<block name="head" display="1">
+<title>Template</title>
+</block>
+</head>
+
+<body>
+
+<table width="100%">
+
+<tr>
+<td colspan=2 bgcolor="green">
+<span style="color:white;font-size:20px">Site Name</span>
+</td>
+</tr>
+
+<tr>
+<td bgcolor="green" width="100px">
+<p>
+Left
+<p>
+Menu
+<p>
+Here
+</td>
+
+<td bgcolor="white">
+
+<!-- Content goes here -->
+<block name="body" display="1">
+This is where the content will go
+</block>
+
+</td>
+</tr>
+
+<tr>
+<td colspan=2 bgcolor="green">
+<span style="color:white">
+<perl method="copyright">
+Copyright (C) ${year} Foobar corp.
+</perl>
+</span>
+</td>
+</tr>
+
+
+</table>
+
+</body>
+</html>
+
+__PERL__
+	
+sub copyright {
+
+	shift()->render(year=>((localtime)[5]+1900));
+
+}

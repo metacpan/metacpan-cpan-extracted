@@ -1,0 +1,21 @@
+<start_html>
+<pre>
+<perl handler="a" param="%{ dar=>'dar' }">
+<? uc($_[1]->{'dar'}) ?>
+<perl handler="b" param="%{ bar=>2 }">
+Foo: <? $_[1]->{'foo'} ?>
+Bar: <? $_[1]->{'bar'} ?>
+</perl>
+</perL>
+</pre>
+__PERL__
+use Data::Dumper;
+sub a {
+    return shift()->render();
+}
+sub b { 
+    
+    my ($self, $param_hr)=@_;
+    return $self->render( foo=>2, %{$param_hr} ) 
+
+}

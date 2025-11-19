@@ -396,6 +396,7 @@ sub new
 	my $self = $class->SUPER::new('Rumble', @_);
 	$DEBUG = $self->{'debug'}  if (defined $self->{'debug'});
 
+	$self->{'notrim'} = 0;
 	$self->{'order'} = 'quality';
 	my (@okStreams);
 	while (@_) {
@@ -414,6 +415,9 @@ sub new
 		} elsif ($_[0] =~ /^\-?bitrate$/o) {
 			shift;
 			$self->{'bitrate'} = (defined $_[0]) ? shift : 0;
+		} elsif ($_[0] =~ /^\-?notrim$/o) {
+			shift;
+			$self->{'notrim'} = (defined $_[0]) ? shift : 1;
 		} else {
 			shift;
 		}
@@ -464,6 +468,7 @@ sub new
 
 		#DEPRECIATED (VIDEO-IDS NOW INCLUDE STUFF BEFORE THE DASH: ($self->{'id'} = $url) =~ s#^.*\-([a-z]\d+)\/?$#$1#;
 		if ($url2fetch =~ m#^https?\:#) {
+			$url2fetch =~ s#\?.*$##  unless ($self->{'notrim'});  #STRIP OFF ANY EXTRA ARGS, IE. "?e2s=blahblah"
 #			$url2fetch .= '.html'  unless ($url2fetch =~ /\.html?$/);  #NEEDED FOR Fauxdacious!
 			$self->{'id'} = $1  if ($url2fetch =~ m#\/([^\/]+)\.html?#);
 			unless (defined($self->{'id'}) && $self->{'id'}) {   #PERHAPS WE HAVE A CHANNEL PAGE?
@@ -582,8 +587,8 @@ sub new
 						last;
 					}
 				}
-				$quality = 1  if ($ext =~ /aac/o);  #MAKE AUDIO-ONLY STREAMS LOWEST QUALITY TO SORT LAST.
-				if ($quality =~ /\D/) {
+				$quality = 1  if (defined($ext) && $ext =~ /aac/o);  #MAKE AUDIO-ONLY STREAMS LOWEST QUALITY TO SORT LAST.
+				if ($quality =~ /\D/o) {
 					if ($quality =~ /audio/o) {
 						$quality = 1;
 					} elsif ($quality =~ /(?:hls|auto)/o) {

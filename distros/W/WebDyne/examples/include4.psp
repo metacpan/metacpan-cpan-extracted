@@ -1,0 +1,10 @@
+<start_html>
+<p>
+<block name="block1" display>
+This is block 1
+</block>
+
+<p>
+<block name="block2" display>
+This is block 2
+</block>

@@ -1,0 +1,57 @@
+<start_html title="State">
+
+<perl method="state">
+
+<block name="login">
+You are logged in as user "${user}"
+<p>
+The following data is associated with user ${user}:
+<pre>
+${data}
+</pre>
+</block>
+
+<block name="logout">
+You are not logged in.
+</block>
+<hr>
+
+<form>
+<submit name="login" value="Login">
+<submit name="logout" value="Logout">
+<submit name="refresh" value="Refresh">
+</form>
+</perl>
+
+<end_html>
+
+__PERL__
+
+use WebDyne::Session;
+use WebDyne::State::BerkeleyDB;
+use Data::Dumper;
+
+sub state {
+
+	my $self=shift();
+
+	if ($_{'login'}) {
+		$self->login('alice') || return err();
+		my %data=( fullname=>'Alice Smith', favourite_colour=>'Blue');
+		$self->state_store({ data=>\%data }) || return err();
+	}
+	elsif ($_{'logout'}) {
+		$self->logout
+	}
+
+	if (my $user=${ $self->user() || return err() }) {
+		my $data_hr=$self->state_fetch();
+		$self->render_block('login', user=>$user, data=>Dumper($data_hr));
+	}
+	else {
+		$self->render_block('logout');
+	}
+
+	$self->render();
+
+}

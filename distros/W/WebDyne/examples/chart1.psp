@@ -1,0 +1,37 @@
+<start_html title="Sample JSON Chart" script="https://cdn.jsdelivr.net/npm/chart.js">
+
+<h2>Monthly Sales Chart</h2>
+
+<canvas id="myChart"></canvas>
+
+<json handler="chart_data" id="chartData">
+
+<script>
+  // Parse JSON from the script tag
+  const data = JSON.parse(document.getElementById("chartData").textContent);
+
+  const ctx = document.getElementById('myChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar', // You can also use 'line', 'pie', etc.
+    data: {
+      labels: data.labels,
+      datasets: [{
+        label: 'Sales',
+        data: data.values,
+      }]
+    }
+  });
+</script>
+
+__PERL__
+
+sub chart_data {
+
+    my %data=(
+        labels  => [qw(Jan Feb Mar Apr)],
+        values  => [(120, 150, 180, 100)]
+    );
+    return \%data
+    
+}
+        

@@ -1,0 +1,8 @@
+<start_html title="Server Time">
+The local server time is <? print_time() ?>
+</html>
+__PERL__
+sub print_time {
+    print(scalar localtime);
+}
+    

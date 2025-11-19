@@ -1,3 +1,69 @@
+commit 67602dfa2d235cc65942d7cb349794ee2116f86e
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Nov 16 20:20:31 2025 +1030
+
+    VERSION increment: 2.031
+
+commit a8ea41c6f641fe566e9e8fe3384a402b351d5375
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Nov 16 20:19:33 2025 +1030
+
+    Commit before merge to main
+
+commit 0566ebe6da8216e1378ab043b9f2adf1be2dcaea
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Nov 16 20:15:43 2025 +1030
+
+    Commit before merge to main
+
+commit 70b4aa0a02f4f694e04c26405fc611d917099c35
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Nov 16 20:06:31 2025 +1030
+
+    VERSION increment: 2.030_410
+
+commit 81416cd0de6f31e3e1de0103bdcadd61b8aae824
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Nov 16 20:06:14 2025 +1030
+
+    Commit before merge to main
+
+commit 3c9bea525e6d8828ad09a8c7e223bca0bdd1804b
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Nov 16 20:05:02 2025 +1030
+
+    Commit before merge to main
+
+commit 57e817e534ea8ee4d9154992eb86878fe532ccec
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Nov 16 18:52:39 2025 +1030
+
+    Interim commit, separate render, render_data_ar, use WEBDYNE_PSP_EXT for extension name
+
+commit 10257aff3ec6a0620a4f8f00876923ce81206566
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Nov 16 16:34:41 2025 +1030
+
+    Interim commit with first working code
+
+commit 6407761755ef51e67eb31d00589bf64d3e630db7
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Nov 16 12:08:41 2025 +1030
+
+    VERSION increment: 2.029
+
+commit f44d34e08fd11b7a015c65f2f521a6ffeff53fec
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Nov 16 12:07:12 2025 +1030
+
+    Fix svg tag not being interpreted correctly, improve indexer code, start implementation of WEBDYNE_PSP_EXT constant
+
+commit a588ad20ef2b912fd586fb208ac3b26473a03f58
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat Nov 15 18:18:27 2025 +1030
+
+    Interim commit
+
 commit dffda081257d3274131ff2e4504a04eef33effaa
 Author: Andrew Speer <andrew.speer@isolutions.com.au>
 Date:   Wed Nov 12 23:37:33 2025 +1030

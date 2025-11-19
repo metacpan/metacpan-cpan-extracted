@@ -1,0 +1,56 @@
+<html>
+<head><title>Hello World</title></head>
+<body>
+<p>
+<form>
+Enter your name:
+<p><textfield name="name">
+<p><submit>
+</form>
+
+<perl method="hello">
+
+
+<!-- The following block is only rendered if we get a name - see the perl 
+	code -->
+
+<block name="greeting">
+Hello +{name}, pleased to meet you !
+<p>
+</block>
+
+
+<!-- This text is always rendered - it is not part of a block -->
+
+The time here is !{! localtime() !}
+
+
+<!-- This block has the same name as the first one, so will be rendered
+	whenever that one is -->
+
+<block name="greeting">
+<p>
+It has been a pleasure to serve you, +{name} !
+</block>
+
+
+</perl>
+
+</body>
+</html>
+
+__PERL__
+
+sub hello { 
+
+	my $self=shift();
+
+	#  Only render greeting blocks if name given. Both blocks
+	#  will be rendered, as the both have the name "greeting"
+	#
+	if ($_{'name'}) {
+		$self->render_block('greeting');
+	}
+
+	$self->render();
+}

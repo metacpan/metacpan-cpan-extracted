@@ -34,20 +34,19 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Chess-Plisco",
   "EXE_FILES" => [
-    "bin/pfathom",
     "bin/plisco"
   ],
   "LICENSE" => "unrestricted",
   "NAME" => "Chess::Plisco",
   "PREREQ_PM" => {
     "Carp" => 0,
+    "Chess::Opening::Book::Polyglot" => 0,
     "Exporter" => 0,
     "Fcntl" => 0,
     "File::Basename" => 0,
     "File::Globstar" => 0,
     "File::Temp" => 0,
     "Filter::Util::Call" => 0,
-    "Getopt::Long" => 0,
     "IO::Select" => 0,
     "IO::Socket::UNIX" => 0,
     "List::Util" => 0,
@@ -74,7 +73,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "lib" => 0
   },
-  "VERSION" => "v0.7.0",
+  "VERSION" => "v0.8.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -82,6 +81,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
+  "Chess::Opening::Book::Polyglot" => 0,
   "Chess::PGN::Parse" => 0,
   "Cwd" => 0,
   "Data::Dumper" => 0,
@@ -92,7 +92,6 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "File::Temp" => 0,
   "Filter::Util::Call" => 0,
-  "Getopt::Long" => 0,
   "IO::Select" => 0,
   "IO::Socket::UNIX" => 0,
   "List::Util" => 0,

@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Tapscript::Opcode;
-$Bitcoin::Crypto::Tapscript::Opcode::VERSION = '4.001';
+$Bitcoin::Crypto::Tapscript::Opcode::VERSION = '4.002';
 use v5.10;
 use strict;
 use warnings;
@@ -91,7 +91,8 @@ sub _OP_CHECKSIG
 		}
 
 		my $preimage = $runner->transaction->get_digest($runner->subscript, $hashtype, $ext);
-		my $result = $known_pubkey_type ? $pubkey->verify_message($preimage, $sig) : !!1;
+		my $result =
+			$known_pubkey_type ? $pubkey->verify_message($preimage, $sig, flags => $runner->flags) : !!1;
 
 		$runner->_invalid_script('signature verification failed') unless $result;
 		push @$stack, $runner->from_bool($result);

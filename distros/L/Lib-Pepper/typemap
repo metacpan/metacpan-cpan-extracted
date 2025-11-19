@@ -1,0 +1,36 @@
+TYPEMAP
+# Map Pepper types to Perl types
+
+# Handle type (void*)
+PEPHandle                   T_PTR
+
+# Result and enum types (all are int64_t or enums)
+PEPFunctionResult           T_IV
+PEPTransactionResult        T_IV
+int64_t                     T_IV
+
+# Enum types
+PEPOperation                T_IV
+PEPState                    T_IV
+PEPTransactionType          T_IV
+PEPCallbackEvent            T_IV
+PEPCallbackOption           T_IV
+PEPTicketType               T_IV
+PEPUtilityCode              T_IV
+PEPAuxiliaryCode            T_IV
+PEPCurrency                 T_IV
+PEPBaudRate                 T_IV
+PEPParity                   T_IV
+PEPDataBits                 T_IV
+PEPStopBits                 T_IV
+PEPPaymentMode              T_IV
+PEPProtocolVersion          T_IV
+PEPBool                     T_IV
+
+INPUT
+T_PTR
+    $var = INT2PTR($type, SvIV($arg))
+
+OUTPUT
+T_PTR
+    sv_setiv($arg, PTR2IV($var));

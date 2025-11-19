@@ -5,7 +5,7 @@ use English;
 use Error::Pure::Utils qw(clean);
 use MARC::Leader;
 use MARC::Field008;
-use Test::More 'tests' => 91;
+use Test::More 'tests' => 92;
 use Test::NoWarnings;
 
 # Test.
@@ -187,3 +187,12 @@ $obj = MARC::Field008->new(
 ## Bad MARC, ignore errors.
 $ret = $obj->parse('900912s1990    xr a         u0|1   cze  ');
 isa_ok($ret, 'Data::MARC::Field008');
+
+# Test.
+$obj = MARC::Field008->new;
+eval {
+	$obj->parse('900912s1990    xr a         u0|1   cze  ');
+};
+is($EVAL_ERROR, "Parameter 'leader' is required.\n",
+	"Parameter 'leader' is required.");
+clean();

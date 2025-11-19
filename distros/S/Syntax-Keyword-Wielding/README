@@ -1,0 +1,161 @@
+NAME
+    Syntax::Keyword::Wielding - adds a "wielding" keyword to make it easier to
+    call the same function or method multiple times
+
+SYNOPSIS
+      my $play = Play->new;
+      $play->add_line( "Bernado",   "Who's there?" );
+      $play->add_line( "Francisco", "Nay, answer me! Stand and unfold yourself!" );
+      $play->add_line( "Bernado",   "Long live the king!" );
+      $play->add_line( "Francisco", "Bernardo?" );
+      $play->add_line( "Bernado",   "He." );
+      $play->add_line( "Francisco", "You come most carefully upon your hour." );
+
+    It gets repetitive, right?
+
+      my $play = Play->new;
+      wielding $play->add_line {
+        my $b = 'Bernado';
+        my $f = 'Francisco';
+        _ $b => "Who's there?";
+        _ $f => "Nay, answer me! Stand and unfold yourself!";
+        _ $b => "Long live the king!";
+        _ $f => "Bernardo?";
+        _ $b => "He.";
+        _ $f => "You come most carefully upon your hour.";
+      }
+
+DESCRIPTION
+    The `wielding` keyword takes a template method call or function call
+    followed by a block. It executes the block, but within the block, a `_`
+    keyword (yes, we're using a plain underscore as a keyword) will be
+    expanded to that method call or function call.
+
+    Technically as `_` is parsed as a statement like `if`, it doesn't need to
+    be followed by a semicolon, so the example in the "SYNOPSIS" can be
+    written as:
+
+      my $play = Play->new;
+      wielding $play->add_line {
+        my $b = 'Bernado';
+        my $f = 'Francisco';
+        _ $b => "Who's there?"
+        _ $f => "Nay, answer me! Stand and unfold yourself!"
+        _ $b => "Long live the king!"
+        _ $f => "Bernardo?"
+        _ $b => "He."
+        _ $f => "You come most carefully upon your hour."
+      }
+
+    Leading arguments to the function can be curried:
+
+      my $play = Play->new;
+      wielding $play->add_line("Bernardo") {
+        _ "Who's there?"
+      };
+
+    The template method call or function call can be written in any of the
+    following styles:
+
+    *   Simple method call:
+
+          wielding $object->method {
+            _ @args;
+          }
+
+    *   Method call with curried arguments:
+
+          wielding $object->method(@args) {
+            _ @moreargs;
+          }
+
+    *   Simple function call:
+
+          wielding func {
+            _ @args;
+          }
+
+    *   Function call with curried arguments:
+
+          wielding func(@args) {
+            _ @moreargs;
+          }
+
+    *   Fully-qualified function call:
+
+          wielding Some::Package::func {
+            _ @args;
+          }
+
+    *   Fully-qualified function call with curried arguments:
+
+          wielding Some::Package::func(@args) {
+            _ @moreargs;
+          }
+
+    *   Coderef:
+
+          my $callback = sub { ... };
+          wielding $callback->() {
+            _ @args;
+          }
+
+        Note that the `->()` is required.
+
+    *   Coderef with curried arguments:
+
+          my $callback = sub { ... };
+          wielding $callback->(@args) {
+            _ @moreargs;
+          }
+
+    *   Code block:
+
+          wielding { @args = @_; ... } {
+            _ @args;
+          }
+
+        Internally the block is just wrapped in a `sub { ... }`, so `return`
+        will return from the code block.
+
+    Because `_` is always taken to be the start of a statement, you cannot use
+    it as part of an expression:
+
+      wielding func() {
+        my $x = _ @args;
+      }
+
+    However, you can wrap it in a `do {...}` block:
+
+      wielding func() {
+        my $x = do { _ @args };
+      }
+
+    Similarly, `wielding` cannot be used as part of an expression, but is a
+    whole statement. Again, wrapping it in `do {...}` is a workaround.
+
+    This is a limitation of the underlying keyword declaration mechanism used
+    by this module.
+
+BUGS
+    Please report any bugs to
+    <https://github.com/tobyink/p5-syntax-keyword-wielding/issues>.
+
+SEE ALSO
+    I can't think of any module weird enough to consider being related to
+    this.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2025 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

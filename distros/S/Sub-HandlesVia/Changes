@@ -6,6 +6,12 @@ Home page:    <https://metacpan.org/release/Sub-HandlesVia>
 Bug tracker:  <https://github.com/tobyink/p5-sub-handlesvia/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.050007	2025-11-15
+
+ [ Test Suite ]
+ - Some of the Corinna test cases accidentally required Moo.
+   <https://github.com/tobyink/p5-sub-handlesvia/issues/18>
+
 0.050006	2025-11-10
 
  [ Documentation ]

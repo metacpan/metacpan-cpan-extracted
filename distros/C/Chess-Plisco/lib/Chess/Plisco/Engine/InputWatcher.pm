@@ -10,7 +10,7 @@
 # http://www.wtfpl.net/ for more details.
 
 package Chess::Plisco::Engine::InputWatcher;
-$Chess::Plisco::Engine::InputWatcher::VERSION = 'v0.7.0';
+$Chess::Plisco::Engine::InputWatcher::VERSION = 'v0.8.0';
 use strict;
 
 use IO::Select;
@@ -51,9 +51,13 @@ sub onEof {
 }
 
 sub check {
-	my ($self) = @_;
+	my ($self, $tree) = @_;
 
 	return if $self->{__batch_mode};
+
+	if (delete $self->{__stop_requested}) {
+		$tree->{stop_requested} = 1;
+	}
 
 	while (my @ready = $self->{__sel}->can_read(0)) {
 		foreach my $fh (@ready) {
@@ -67,6 +71,12 @@ sub check {
 			}
 		}
 	}
+}
+
+sub requestStop {
+	my ($self) = @_;
+
+	$self->{__stop_requested} = 1;
 }
 
 1;

@@ -18,7 +18,15 @@ inc/ExtUtils/CFeatureTest.pm
 inc/ExtUtils/Depends.pm
 lib/Crypt/SecretBuffer.pm
 lib/Crypt/SecretBuffer/AsyncResult.pm
+lib/Crypt/SecretBuffer/INI.pm
+lib/Crypt/SecretBuffer/Span.pm
 ppport.h
+secret_buffer_async_write.c
+secret_buffer_base.c
+secret_buffer_charset.c
+secret_buffer_console.c
+secret_buffer_parse.c
+secret_buffer_span.c
 t/01-ctor.t
 t/02-stringify.t
 t/03-allocate.t
@@ -32,6 +40,8 @@ t/14-read.t
 t/20-textline.t
 t/21-write-async.t
 t/22-as_pipe.t
+t/30-span.t
+t/40-ini.t
 t/90-with-inline.t
 t/91-optional-c-support.t
 t/author-pod-coverage.t

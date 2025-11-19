@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## JSON Schema Validator - ~/lib/JSON/Schema/Validate.pm
-## Version v0.3.0
+## Version v0.4.1
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2025/11/07
-## Modified 2025/11/10
+## Modified 2025/11/18
 ## All rights reserved
 ## 
 ## 
@@ -23,9 +23,10 @@ BEGIN
     use Scalar::Util qw( blessed looks_like_number reftype refaddr );
     use List::Util qw( first any all );
     use Encode ();
-    our $VERSION = 'v0.3.0';
+    our $VERSION = 'v0.4.1';
 };
 
+use v5.16.0;
 use strict;
 use warnings;
 
@@ -54,6 +55,8 @@ sub new
         media_validators    => {},
         # boolean
         normalize_instance  => 1,
+        # boolean: when true, prune unknown properties before validate()
+        prune_unknown       => 0,
         # ($abs_uri) -> $schema_hashref
         resolver            => undef,
         schema              => _clone( $schema ),
@@ -70,7 +73,12 @@ sub new
 
     bless( $self, $class );
     my $opts = $self->_get_args_as_hash( @_ );
-    my @bool_options = qw( content_assert ignore_req_vocab normalize_instance );
+    my @bool_options = qw(
+        content_assert
+        ignore_req_vocab
+        normalize_instance
+        prune_unknown
+    );
     foreach my $opt ( @bool_options )
     {
         next unless( exists( $opts->{ $opt } ) );
@@ -190,19 +198,42 @@ sub is_trace_on { $_[0]->{trace_on} ? 1 : 0 }
 
 sub is_unknown_required_vocab_ignored { $_[0]->{ignore_req_vocab} ? 1 : 0 }
 
+# Example:
+# my $pruned = $js->prune_instance( $incoming_data );
+sub prune_instance
+{
+    my( $self, $data ) = @_;
+
+    # Work on a cloned copy if normalize_instance is on,
+    # to remain consistent with validate().
+    if( $self->{normalize_instance} )
+    {
+        my $json = JSON->new->allow_nonref(1)->canonical(1);
+        $data = $json->decode( $json->encode( $data ) );
+    }
+
+    return( $self->_prune_with_schema( $self->{schema}, $data ) );
+}
+
+sub prune_unknown
+{
+    my( $self, $bool ) = @_;
+    my $on = defined( $bool ) ? $bool : 1;
+    $self->{prune_unknown} = $on ? 1 : 0;
+    return( $self );
+}
+
 sub register_builtin_formats
 {
     my( $self ) = @_;
 
-    require Regexp::Common;
-    Regexp::Common->import();
     require DateTime;
     require DateTime::Duration;
     local $@;
-    my $email_re;
     my $has_iso  = eval{ require DateTime::Format::ISO8601; 1 } ? 1 : 0;
     my $has_idn  = eval{ require Net::IDN::Encode; 1 } ? 1 : 0;
-    my $has_mail = eval{ require Regexp::Common; Regexp::Common->import('Email::Address'); no warnings 'once'; $email_re = qr/\A$Regexp::Common::RE{Email}{Address}\z/; 1 } ? 1 : 0;
+    # perl -MRegexp::Common=Email::Address -lE 'say $Regexp::Common::RE{Email}{Address}'
+    state $email_re = qr/\A(?:(?^u:(?:(?^u:(?>(?^u:(?^u:(?>(?^u:(?>(?^u:(?>(?^u:(?^u:(?>\s*\((?:\s*(?^u:(?^u:(?>[^()\\]+))|(?^u:\\(?^u:[^\x0A\x0D]))|))*\s*\)\s*))|(?>\s+))*[^\x00-\x1F\x7F()<>\[\]:;@\\,."\s]+(?^u:(?^u:(?>\s*\((?:\s*(?^u:(?^u:(?>[^()\\]+))|(?^u:\\(?^u:[^\x0A\x0D]))|))*\s*\)\s*))|(?>\s+))*))|\.|\s*"(?^u:(?^u:[^\\"])|(?^u:\\(?^u:[^\x0A\x0D])))+"\s*))+))|(?>(?^u:(?^u:(?>(?^u:(?^u:(?>\s*\((?:\s*(?^u:(?^u:(?>[^()\\]+))|(?^u:\\(?^u:[^\x0A\x0D]))|))*\s*\)\s*))|(?>\s+))*[^\x00-\x1F\x7F()<>\[\]:;@\\,."\s]+(?^u:(?^u:(?>\s*\((?:\s*(?^u:(?^u:(?>[^()\\]+))|(?^u:\\(?^u:[^\x0A\x0D]))|))*\s*\)\s*))|(?>\s+))*))|(?^u:(?>(?^u:(?^u:(?>\s*\((?:\s*(?^u:(?^u:(?>[^()\\]+))|(?^u:\\(?^u:[^\x0A\x0D]))|))*\s*\)\s*))|(?>\s+))*"(?^u:(?^u:[^\\"])|(?^u:\\(?^u:[^\x0A\x0D])))*"(?^u:(?^u:(?>\s*\((?:\s*(?^u:(?^u:(?>[^()\\]+))|(?^u:\\(?^u:[^\x0A\x0D]))|))*\s*\)\s*))|(?>\s+))*)))+))?)(?^u:(?>(?^u:(?^u:(?>\s*\((?:\s*(?^u:(?^u:(?>[^()\\]+))|(?^u:\\(?^u:[^\x0A\x0D]))|))*\s*\)\s*))|(?>\s+))*<(?^u:(?^u:(?^u:(?>(?^u:(?^u:(?>\s*\((?:\s*(?^u:(?^u:(?>[^()\\]+))|(?^u:\\(?^u:[^\x0A\x0D]))|))*\s*\)\s*))|(?>\s+))*(?^u:(?>[^\x00-\x1F\x7F()<>\[\]:;@\\,."\s]+(?:\.[^\x00-\x1F\x7F()<>\[\]:;@\\,."\s]+)*))(?^u:(?^u:(?>\s*\((?:\s*(?^u:(?^u:(?>[^()\\]+))|(?^u:\\(?^u:[^\x0A\x0D]))|))*\s*\)\s*))|(?>\s+))*))|(?^u:(?>(?^u:(?^u:(?>\s*\((?:\s*(?^u:(?^u:(?>[^()\\]+))|(?^u:\\(?^u:[^\x0A\x0D]))|))*\s*\)\s*))|(?>\s+))*"(?^u:(?^u:[^\\"])|(?^u:\\(?^u:[^\x0A\x0D])))*"(?^u:(?^u:(?>\s*\((?:\s*(?^u:(?^u:(?>[^()\\]+))|(?^u:\\(?^u:[^\x0A\x0D]))|))*\s*\)\s*))|(?>\s+))*)))\@(?^u:(?^u:(?>(?^u:(?^u:(?>\s*\((?:\s*(?^u:(?^u:(?>[^()\\]+))|(?^u:\\(?^u:[^\x0A\x0D]))|))*\s*\)\s*))|(?>\s+))*(?^u:(?>[^\x00-\x1F\x7F()<>\[\]:;@\\,."\s]+(?:\.[^\x00-\x1F\x7F()<>\[\]:;@\\,."\s]+)*))(?^u:(?^u:(?>\s*\((?:\s*(?^u:(?^u:(?>[^()\\]+))|(?^u:\\(?^u:[^\x0A\x0D]))|))*\s*\)\s*))|(?>\s+))*))|(?^u:(?>(?^u:(?^u:(?>\s*\((?:\s*(?^u:(?^u:(?>[^()\\]+))|(?^u:\\(?^u:[^\x0A\x0D]))|))*\s*\)\s*))|(?>\s+))*\[(?:\s*(?^u:(?^u:[^\[\]\\])|(?^u:\\(?^u:[^\x0A\x0D]))))*\s*\](?^u:(?^u:(?>\s*\((?:\s*(?^u:(?^u:(?>[^()\\]+))|(?^u:\\(?^u:[^\x0A\x0D]))|))*\s*\)\s*))|(?>\s+))*))))>(?^u:(?^u:(?>\s*\((?:\s*(?^u:(?^u:(?>[^()\\]+))|(?^u:\\(?^u:[^\x0A\x0D]))|))*\s*\)\s*))|(?>\s+))*)))|(?^u:(?^u:(?^u:(?>(?^u:(?^u:(?>\s*\((?:\s*(?^u:(?^u:(?>[^()\\]+))|(?^u:\\(?^u:[^\x0A\x0D]))|))*\s*\)\s*))|(?>\s+))*(?^u:(?>[^\x00-\x1F\x7F()<>\[\]:;@\\,."\s]+(?:\.[^\x00-\x1F\x7F()<>\[\]:;@\\,."\s]+)*))(?^u:(?^u:(?>\s*\((?:\s*(?^u:(?^u:(?>[^()\\]+))|(?^u:\\(?^u:[^\x0A\x0D]))|))*\s*\)\s*))|(?>\s+))*))|(?^u:(?>(?^u:(?^u:(?>\s*\((?:\s*(?^u:(?^u:(?>[^()\\]+))|(?^u:\\(?^u:[^\x0A\x0D]))|))*\s*\)\s*))|(?>\s+))*"(?^u:(?^u:[^\\"])|(?^u:\\(?^u:[^\x0A\x0D])))*"(?^u:(?^u:(?>\s*\((?:\s*(?^u:(?^u:(?>[^()\\]+))|(?^u:\\(?^u:[^\x0A\x0D]))|))*\s*\)\s*))|(?>\s+))*)))\@(?^u:(?^u:(?>(?^u:(?^u:(?>\s*\((?:\s*(?^u:(?^u:(?>[^()\\]+))|(?^u:\\(?^u:[^\x0A\x0D]))|))*\s*\)\s*))|(?>\s+))*(?^u:(?>[^\x00-\x1F\x7F()<>\[\]:;@\\,."\s]+(?:\.[^\x00-\x1F\x7F()<>\[\]:;@\\,."\s]+)*))(?^u:(?^u:(?>\s*\((?:\s*(?^u:(?^u:(?>[^()\\]+))|(?^u:\\(?^u:[^\x0A\x0D]))|))*\s*\)\s*))|(?>\s+))*))|(?^u:(?>(?^u:(?^u:(?>\s*\((?:\s*(?^u:(?^u:(?>[^()\\]+))|(?^u:\\(?^u:[^\x0A\x0D]))|))*\s*\)\s*))|(?>\s+))*\[(?:\s*(?^u:(?^u:[^\[\]\\])|(?^u:\\(?^u:[^\x0A\x0D]))))*\s*\](?^u:(?^u:(?>\s*\((?:\s*(?^u:(?^u:(?>[^()\\]+))|(?^u:\\(?^u:[^\x0A\x0D]))|))*\s*\)\s*))|(?>\s+))*)))))(?>(?^u:(?>\s*\((?:\s*(?^u:(?^u:(?>[^()\\]+))|(?^u:\\(?^u:[^\x0A\x0D]))|))*\s*\)\s*))*)))\z/;
 
     my %F;
 
@@ -211,8 +242,39 @@ sub register_builtin_formats
     {
         my( $s ) = @_;
         return(0) unless( defined( $s ) && !ref( $s ) );
-        return eval{ DateTime::Format::ISO8601->parse_datetime( $s ) ? 1 : 0 } if( $has_iso );
-        return( $s =~ /\A\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+\-]\d{2}:\d{2})\z/ ? 1 : 0 );
+
+        # Preferred path when DateTime::Format::ISO8601 is available
+        if( $has_iso )
+        {
+            return( eval{ DateTime::Format::ISO8601->parse_datetime( $s ) ? 1 : 0 } ? 1 : 0 );
+        }
+
+        # Fallback: parse and validate with DateTime itself
+        # YYYY-MM-DDThh:mm:ss[.fraction](Z|±hh:mm)
+        return(0) unless( $s =~ /\A
+            (\d{4})-(\d{2})-(\d{2})      # date
+            T
+            (\d{2}):(\d{2}):(\d{2})      # time
+            (?:\.\d+)?                   # optional fraction
+            (?:Z|[+\-]\d{2}:\d{2})       # offset
+        \z/x );
+
+        my( $y, $m, $d, $H, $M, $S ) = ( $1, $2, $3, $4, $5, $6 );
+
+        my $ok = eval
+        {
+            DateTime->new(
+                year   => $y,
+                month  => $m,
+                day    => $d,
+                hour   => $H,
+                minute => $M,
+                second => $S,
+            );
+            1;
+        };
+
+        return( $ok ? 1 : 0 );
     };
 
     $F{'date'} = sub
@@ -270,39 +332,42 @@ sub register_builtin_formats
     };
 
     # Email / IDN email
-    if( $has_mail )
+    # Plain email (ASCII) — unchanged
+    $F{'email'} = sub
     {
-        # Plain email (ASCII) — unchanged
-        $F{'email'} = sub
+        my( $s ) = @_;
+        return(0) unless( defined( $s ) && !ref( $s ) );
+        return( $s =~ $email_re ? 1 : 0 );
+    };
+
+    # IDN email: punycode the domain, validate with same regex
+    $F{'idn-email'} = sub
+    {
+        my( $s ) = @_;
+        return(0) unless( defined( $s ) && !ref( $s ) );
+        return(0) unless( $s =~ /\A(.+)\@(.+)\z/s );  # keep local-part as-is (EAI allows UTF-8)
+        my( $local, $domain ) = ( $1, $2 );
+
+        if( $has_idn )
         {
-            my( $s ) = @_;
-            return(0) unless( defined( $s ) && !ref( $s ) );
-            return( $s =~ $email_re ? 1 : 0 );
-        };
+            local $@;
+            my $ascii = eval{ Net::IDN::Encode::domain_to_ascii( $domain ) };
+            return(0) unless( defined( $ascii ) && length( $ascii ) );
 
-        # IDN email: punycode the domain, validate with same regex
-        $F{'idn-email'} = sub
+            my $candidate = "$local\@$ascii";
+            return( $candidate =~ $email_re ? 1 : 0 );
+        }
+
+        # Fallback: if the domain already *looks* ASCII, validate directly
+        if( $domain =~ /\A[[:ascii:]]+\z/ )
         {
-            my( $s ) = @_;
-            return(0) unless( defined( $s ) && !ref( $s ) );
-            return(0) unless( $s =~ /\A(.+)\@(.+)\z/s );  # keep local-part as-is (EAI allows UTF-8)
-            my( $local, $domain ) = ( $1, $2 );
+            my $candidate = "$local\@$domain";
+            return( $candidate =~ $email_re ? 1 : 0 );
+        }
 
-            if( $has_idn )
-            {
-                local $@;
-                my $ascii = eval{ Net::IDN::Encode::domain_to_ascii( $domain ) };
-                return(0) unless( defined( $ascii ) && length( $ascii ) );
-
-                my $candidate = "$local\@$ascii";
-                return( $candidate =~ $email_re ? 1 : 0 );
-            }
-
-            # Without IDN module, fall back to permissive Unicode domain check + ASCII regex
-            # If you prefer to hard-fail instead, return 0 here.
-            return(0);
-        };
-    }
+        # Without IDN module, fall back to permissive Unicode domain check + ASCII regex
+        return(0);
+    };
 
     # Hostnames
     $F{'hostname'} = sub
@@ -580,6 +645,13 @@ sub validate
     {
         my $json = JSON->new->allow_nonref(1)->canonical(1);
         $data = $json->decode( $json->encode( $data ) );
+    }
+
+    # Optional pre-validation pruning of unknown properties / nested objects.
+    # This only happens if explicitly enabled via prune_unknown => 1.
+    if( $self->{prune_unknown} )
+    {
+        $data = $self->_prune_with_schema( $self->{schema}, $data );
     }
 
     my $ctx =
@@ -1192,6 +1264,114 @@ sub _err_res
     my( $ctx, $schema_ptr, $msg, $keyword ) = @_;
     _err( $ctx, $schema_ptr, $msg, $keyword );
     return( { ok => 0, props => {}, items => {} } );
+}
+
+# Used by _prune* methods
+sub _extract_array_shape
+{
+    my( $self, $schema, $out ) = @_;
+
+    return unless( ref( $schema ) eq 'HASH' );
+
+    if( ref( $schema->{prefixItems} ) eq 'ARRAY' )
+    {
+        my $src = $schema->{prefixItems};
+        for my $i ( 0 .. $#$src )
+        {
+            # First win: do not override an existing prefix schema at this index
+            $out->{prefix_items}->[ $i ] = $src->[ $i ]
+                unless( defined( $out->{prefix_items}->[ $i ] ) );
+        }
+    }
+
+    if( exists( $schema->{items} ) && ref( $schema->{items} ) eq 'HASH' )
+    {
+        # Again, first win: if we already have items from another branch, keep it.
+        $out->{items} = $schema->{items} unless( $out->{items} );
+    }
+
+    # allOf mixins for arrays as well
+    if( ref( $schema->{allOf} ) eq 'ARRAY' )
+    {
+        foreach my $sub ( @{$schema->{allOf}} )
+        {
+            $self->_extract_array_shape( $sub, $out );
+        }
+    }
+
+    # anyOf / oneOf / not ignored for same reason as objects.
+}
+
+# Used by _prune* methods
+sub _extract_object_shape
+{
+    my( $self, $schema, $out ) = @_;
+
+    return unless( ref( $schema ) eq 'HASH' );
+
+    # Direct properties
+    if( ref( $schema->{properties} ) eq 'HASH' )
+    {
+        foreach my $k ( keys( %{$schema->{properties}} ) )
+        {
+            # First win: do not override an already-collected subschema
+            $out->{props}->{ $k } = $schema->{properties}->{ $k }
+                unless( exists( $out->{props}->{ $k } ) );
+        }
+    }
+
+    # patternProperties
+    if( ref( $schema->{patternProperties} ) eq 'HASH' )
+    {
+        foreach my $re ( keys( %{$schema->{patternProperties}} ) )
+        {
+            push( @{$out->{patterns}}, [ $re, $schema->{patternProperties}->{ $re } ] );
+        }
+    }
+
+    # additionalProperties
+    if( exists( $schema->{additionalProperties} ) )
+    {
+        my $ap = $schema->{additionalProperties};
+
+        # JSON booleans or plain scalars
+        if( !ref( $ap ) || ( blessed( $ap ) && $ap->isa( 'JSON::PP::Boolean' ) ) )
+        {
+            if( $ap )
+            {
+                # true: additionalProperties allowed; keep any stricter setting we might already have
+                $out->{allow_ap} = 1 unless( defined( $out->{allow_ap} ) && !$out->{allow_ap} );
+                # do not touch ap_schema here
+            }
+            else
+            {
+                # false: forbidden regardless of earlier "true"
+                $out->{allow_ap}  = 0;
+                $out->{ap_schema} = undef;
+            }
+        }
+        elsif( ref( $ap ) eq 'HASH' )
+        {
+            # Schema for additionals
+            $out->{allow_ap}  = 1;
+            $out->{ap_schema} = $ap;
+        }
+    }
+
+    # allOf mixins: merge their object keywords as well.
+    if( ref( $schema->{allOf} ) eq 'ARRAY' )
+    {
+        foreach my $sub ( @{$schema->{allOf}} )
+        {
+            $self->_extract_object_shape( $sub, $out );
+        }
+    }
+
+    # NOTE:
+    # We intentionally ignore anyOf / oneOf / not for pruning.
+    # Without performing full validation against each branch, we cannot
+    # safely decide which properties are truly forbidden, so we err on
+    # the side of *keeping* more rather than over-pruning.
 }
 
 sub _fail { return( { ok => 0, props => {}, items => {} } ); }
@@ -1842,6 +2022,138 @@ sub _parse_media_type
     return( lc( $type ), \%p );
 }
 
+sub _prune_array_with_schema
+{
+    my( $self, $schema, $data ) = @_;
+
+    my @out;
+
+    my $shape =
+    {
+        prefix_items => [],   # index => subschema
+        items        => undef # subschema for additional items
+    };
+
+    $self->_extract_array_shape( $schema, $shape );
+
+    for my $i ( 0 .. $#$data )
+    {
+        my $item = $data->[ $i ];
+        my $item_schema;
+
+        if( defined( $shape->{prefix_items}->[ $i ] ) )
+        {
+            $item_schema = $shape->{prefix_items}->[ $i ];
+        }
+        elsif( $shape->{items} )
+        {
+            $item_schema = $shape->{items};
+        }
+
+        if( $item_schema && ref( $item ) )
+        {
+            $out[ $i ] = $self->_prune_with_schema( $item_schema, $item );
+        }
+        else
+        {
+            # No structural knowledge or scalar item: keep as-is
+            $out[ $i ] = $item;
+        }
+    }
+
+    return( \@out );
+}
+
+sub _prune_object_with_schema
+{
+    my( $self, $schema, $data ) = @_;
+
+    # Collect effective object shape from this schema and any allOf mixins.
+    my $shape =
+    {
+        props     => {},   # property name => subschema
+        patterns  => [],   # [ regex, subschema ] ...
+        allow_ap  => 1,    # additionalProperties allowed?
+        ap_schema => undef # subschema for additionalProperties, if any
+    };
+
+    $self->_extract_object_shape( $schema, $shape );
+
+    my %clean;
+
+    KEY:
+    foreach my $key ( keys( %$data ) )
+    {
+        my $val = $data->{ $key };
+
+        # 1) Direct properties
+        if( exists( $shape->{props}->{ $key } ) )
+        {
+            my $sub = $shape->{props}->{ $key };
+            $clean{ $key } = $self->_prune_with_schema( $sub, $val );
+            next KEY;
+        }
+
+        # 2) patternProperties
+        foreach my $pair ( @{$shape->{patterns}} )
+        {
+            my( $re, $pschema ) = @$pair;
+            my $ok;
+
+            {
+                local $@;
+                $ok = eval{ $key =~ /$re/ ? 1 : 0; };
+            }
+
+            next unless( $ok );
+
+            $clean{ $key } = $self->_prune_with_schema( $pschema, $val );
+            next KEY;
+        }
+
+        # 3) additionalProperties
+        if( $shape->{allow_ap} )
+        {
+            if( $shape->{ap_schema} && ref( $val ) )
+            {
+                $clean{ $key } = $self->_prune_with_schema( $shape->{ap_schema}, $val );
+            }
+            else
+            {
+                # allowed, but no further structure known
+                $clean{ $key } = $val;
+            }
+        }
+        else
+        {
+            # additionalProperties is false (or equivalent) => drop unknown key
+            next KEY;
+        }
+    }
+
+    return( \%clean );
+}
+
+sub _prune_with_schema
+{
+    my( $self, $schema, $data ) = @_;
+
+    # Boolean schemas and non-hash schemas: do not attempt pruning.
+    return( $data ) unless( ref( $schema ) eq 'HASH' );
+
+    # Only prune structured values; scalars we leave untouched.
+    if( ref( $data ) eq 'HASH' )
+    {
+        return( $self->_prune_object_with_schema( $schema, $data ) );
+    }
+    elsif( ref( $data ) eq 'ARRAY' )
+    {
+        return( $self->_prune_array_with_schema( $schema, $data ) );
+    }
+
+    return( $data );
+}
+
 sub _ptr_of_node
 {
     my( $root, $target ) = @_;
@@ -2379,6 +2691,7 @@ JSON::Schema::Validate - Lean, recursion-safe JSON Schema validator (Draft 2020-
         ->compile
         ->content_checks
         ->ignore_unknown_required_vocab
+        ->prune_unknown
         ->register_builtin_formats
         ->trace
         ->trace_limit(200); # 0 means unlimited
@@ -2390,7 +2703,7 @@ JSON::Schema::Validate - Lean, recursion-safe JSON Schema validator (Draft 2020-
 
 =head1 VERSION
 
-v0.3.0
+v0.4.1
 
 =head1 DESCRIPTION
 
@@ -2473,7 +2786,7 @@ Leverages L<DateTime> and L<DateTime::Format::ISO8601> when available (falls bac
 
 =item * C<email>, C<idn-email>
 
-Uses L<Regexp::Common> with C<Email::Address> if available.
+Imported and use the very complex and complete regular expression from L<Regexp::Common::Email::Address>, but without requiring this module.
 
 =item * C<hostname>, C<idn-hostname>
 
@@ -2554,6 +2867,64 @@ Sets the maximum number of errors to be recorded.
 Defaults to C<1>
 
 When true, the instance is round-tripped through L<JSON> before validation, which enforces strict JSON typing (strings remain strings; numbers remain numbers). This matches Python C<jsonschema>’s type behaviour. Set to C<0> if you prefer Perl’s permissive numeric/string duality.
+
+=item C<prune_unknown =E<gt> 1|0>
+
+Defaults to C<0>
+
+When set to a true value, unknown object properties in the instance are pruned (removed) prior to validation, based on the schema’s structural keywords.
+
+Pruning currently takes into account:
+
+=over 4
+
+=item * C<properties>
+
+=item * C<patternProperties>
+
+=item * C<additionalProperties>
+
+(item value or subschema, including within C<allOf>)
+
+=item * C<allOf> (for merging additional object or array constraints)
+
+=back
+
+For objects:
+
+=over 4
+
+=item *
+
+Any property explicitly declared under C<properties> is kept, and its value is recursively pruned according to its subschema (if it is itself an object or array).
+
+=item *
+
+Any property whose name matches one of the C<patternProperties> regular expressions is kept, and pruned recursively according to the associated subschema.
+
+=item *
+
+If C<additionalProperties> is C<false>, any object property not covered by C<properties> or C<patternProperties> is removed.
+
+=item *
+
+If C<additionalProperties> is a subschema, any such additional property is kept, and its value is pruned recursively following that subschema.
+
+=back
+
+For arrays:
+
+=over 4
+
+=item *
+
+Items covered by C<prefixItems> (by index) or C<items> (for remaining elements) are kept, and if they are objects or arrays, they are pruned recursively. Existing positions are never removed; pruning only affects the nested contents.
+
+=back
+
+The pruner intentionally does B<not> interpret C<anyOf>, C<oneOf> or C<not> when deciding which properties to keep or drop, because doing so would require running full validation logic and could remove legitimate data incorrectly. In those cases, pruning errs on the side of keeping more data rather than over-pruning.
+
+When C<prune_unknown> is disabled (the default), the instance is not modified for validation purposes, and no pruning is performed.
 
 =item C<trace>
 
@@ -2681,6 +3052,40 @@ Read-only accessor.
 
 Returns true if unknown required vocabularies are being ignored, false otherwise.
 
+=head2 prune_instance
+
+    my $pruned = $jsv->prune_instance( $instance );
+
+Returns a pruned copy of C<$instance> according to the schema that was passed to C<new>. The original data structure is B<not> modified.
+
+The pruning rules are the same as those used when the constructor option C<prune_unknown> is enabled (see L</prune_unknown>), namely:
+
+=over 4
+
+=item *
+
+For objects, only properties allowed by C<properties>, C<patternProperties> and C<additionalProperties> (including those brought in via C<allOf>) are kept. Their values are recursively pruned when they are objects or arrays.
+
+=item *
+
+If C<additionalProperties> is C<false>, properties not matched by C<properties> or C<patternProperties> are removed.
+
+=item *
+
+If C<additionalProperties> is a subschema, additional properties are kept and pruned recursively according to that subschema.
+
+=item *
+
+For arrays, items are never removed by index. However, for elements covered by C<prefixItems> or C<items>, their nested content is pruned recursively when it is an object or array.
+
+=item *
+
+C<anyOf>, C<oneOf> and C<not> are B<not> used to decide which properties to drop, to avoid over-pruning valid data without performing full validation.
+
+=back
+
+This method is useful when you want to clean incoming data structures before further processing, without necessarily performing a full schema validation at the same time.
+
 =head2 register_builtin_formats
 
     $js->register_builtin_formats;
@@ -2692,6 +3097,14 @@ User-supplied callbacks passed via C<< format => { ... } >> are preserved and ta
 =head2 register_content_decoder
 
     $js->register_content_decoder( $name => sub{ ... } );
+
+or
+
+    $js->register_content_decoder(rot13 => sub
+    {
+        $bytes =~ tr/A-Za-z/N-ZA-Mn-za-m/;
+        return( $bytes ); # now treated as (1, undef, $decoded)
+    });
 
 Register a content B<decoder> for C<contentEncoding>. The callback receives a single argument: the raw data, and should return one of:
 
@@ -2905,6 +3318,8 @@ L<python-jsonschema|https://github.com/python-jsonschema/jsonschema>,
 L<fastjsonschema|https://github.com/horejsek/python-fastjsonschema>,
 L<Pydantic|https://docs.pydantic.dev>,
 L<RapidJSON Schema|https://rapidjson.org/md_doc_schema.html>
+
+L<https://json-schema.org/specification>
 
 =head1 COPYRIGHT & LICENSE
 

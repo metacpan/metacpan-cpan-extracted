@@ -1,0 +1,46 @@
+<!-- The same form from the CGI example -->
+
+<start_html title="A simple example">
+<h1>A Simple Example</h1>
+<start_form>
+<p>
+What's your name ?
+<p><textfield name="name">
+<p>
+What's the combination ? 
+<p><checkbox_group 
+	name="words" values="@{qw(eenie meenie minie moe)}" defaults="@{qw(eenie minie)}">
+<p>
+What's your favourite color ? 
+<p><popup_menu name="color" values="@{qw(red green blue chartreuse)}">
+<p><submit>
+<end_form>
+<hr>
+
+
+<!-- This section only rendered when form submitted -->
+
+<perl method="answers">
+<p>
+Your name is: <em>+{name}</em>
+<p>
+The keywords are: <em>${words}</em>
+<p>
+Your favorite color is: <em>+{color}</em>
+</perl>
+
+__PERL__
+
+sub answers {
+
+	my $self=shift();
+	my $cgi_or=$self->CGI();
+	if ($cgi_or->param()) {
+		my $words=join(",", $cgi_or->param('words'));
+		return $self->render( words=>$words )
+	}
+	else {
+		return \undef;
+	}
+
+}

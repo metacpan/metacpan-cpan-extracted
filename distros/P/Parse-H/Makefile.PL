@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 # A build file for Parse::H - A parser module for C header files.
 #
-#	Copyright (C) 2022-2023 Bogdan 'bogdro' Drozdowski,
+#	Copyright (C) 2022-2025 Bogdan 'bogdro' Drozdowski,
 #	  bogdro (at) users . sourceforge . net
 #	  bogdro /at\ cpan . org
 #
@@ -15,6 +15,7 @@ use ExtUtils::MakeMaker;
 
 my $mod_file = 'lib/Parse/H.pm';
 my $mod_name = 'Parse::H';
+my $mod_ver = '0.30';
 
 # Dynamic configuration is a workaround for systems where BSD tar
 # is installed instead of GNU tar
@@ -55,7 +56,7 @@ WriteMakefile(
 	MIN_PERL_VERSION	=> '5.006',	# just because of 'Exporter'
 	META_ADD		=> { provides => { $mod_name => {
 					file => $mod_file,
-					version => '0.21'
+					version => $mod_ver
 					}
 				} },
 

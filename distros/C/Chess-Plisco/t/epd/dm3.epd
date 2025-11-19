@@ -1731,7 +1731,7 @@
 1B3KR1/b5pp/b1pN2P1/4kp2/1p3N2/3Pp3/1qr3Q1/2R3n1 w - - bm gxh7; ce 32762; dm 3; id "line #1731";
 1b2nN2/8/3p4/1P6/2Npk1Pr/3p1R2/3Q3p/1b5K w - - bm Qa2; ce 32762; dm 3; id "line #1732";
 1B3n2/3B1K2/3PPpp1/p2pk2n/6PN/r2PP3/bbP1Q2P/3r3q w - - bm Qf3; ce 32762; dm 3; id "line #1733";
-1b3q1n/2pb2r1/4P3/r3pp2/3PP2p/P1NkPNP1/Q2B4/R3K2R w QK - bm d5; ce 32762; dm 3; id "line #1734";
+1b3q1n/2pb2r1/4P3/r3pp2/3PP2p/P1NkPNP1/Q2B4/R3K2R w KQ - bm d5; ce 32762; dm 3; id "line #1734";
 1b2n3/p1R5/2p4Q/1p3P2/2r2P2/3B4/4P3/B1k1K3 w - - bm Qh1; ce 32762; dm 3; id "line #1735";
 1B2N3/3K4/1Q6/1B1N4/5Q2/4Pn2/5bk1/8 w - - bm Qg6+; ce 32762; dm 3; id "line #1736";
 1B3Nb1/1p1B4/1p3p2/1K1k1r2/n1R1p3/2p3r1/4P2p/2bN4 w - - bm e3; ce 32762; dm 3; id "line #1737";
@@ -2534,7 +2534,7 @@
 1B5k/8/q5b1/3KP3/1P2P3/b3r2B/P3P3/8 b - - bm Bxe4+; ce 32762; dm 3; id "line #2534";
 1B6/1P3p2/p1b1kPp1/3N2P1/8/1QR5/8/7K w - - bm Rc4; ce 32762; dm 3; id "line #2535";
 1B6/2R3p1/3kp1K1/8/1p1nP1N1/4b3/2P5/5B2 w - - bm Ne5; ce 32762; dm 3; id "line #2536";
-1B5k/4N1b1/4P1P1/1p1bQ1P1/7r/6P1/4B2N/R3K2R w QK - bm O-O-O; ce 32762; dm 3; id "line #2537";
+1B5k/4N1b1/4P1P1/1p1bQ1P1/7r/6P1/4B2N/R3K2R w KQ - bm O-O-O; ce 32762; dm 3; id "line #2537";
 1B5Q/2p5/1P2p3/P2kP3/1P6/p2BP3/p1p5/nbK5 w - - bm Qd8+; ce 32762; dm 3; id "line #2538";
 1b5n/2p1Qp2/r7/2p1NkpB/2Np3R/8/8/q1B3K1 w - - bm Bg4+; ce 32762; dm 3; id "line #2539";
 1b5n/1P4R1/4Pp2/3PNp2/3B1k1P/5P2/5K2/2n5 w - - bm Rd7; ce 32762; dm 3; id "line #2540";
@@ -4856,7 +4856,7 @@
 1k1B4/8/2P5/6pR/2p5/1B2P3/1pK1N3/8 w - - bm Bb6; ce 32762; dm 3; id "line #4856";
 1bR1n3/3R2p1/1p1qNkr1/p2Q1pp1/3Pp3/1P2P1P1/P4P1P/1KQ5 w - - bm Rf7+; ce 32762; dm 3; id "line #4857";
 1br5/3B2R1/1P1P4/1pkp1P2/1N6/2P1NP2/K7/2Q5 w - - bm Qa3; ce 32762; dm 3; id "line #4858";
-1br2N2/6p1/b3n2r/Q3pB1p/5p1k/p1B1P2N/6PP/R3K2R w QK - bm Qb4; ce 32762; dm 3; id "line #4859";
+1br2N2/6p1/b3n2r/Q3pB1p/5p1k/p1B1P2N/6PP/R3K2R w KQ - bm Qb4; ce 32762; dm 3; id "line #4859";
 1BR5/1B6/8/4N3/r2k2pp/pp6/4K3/8 w - - bm Bh1; ce 32762; dm 3; id "line #4860";
 1brk1Nq1/1pR2bp1/5n2/1PK1Qn2/3N4/8/8/8 w - - bm Qe8+; ce 32762; dm 3; id "line #4861";
 1k1b1nb1/1p6/1B1p1P1p/3P2p1/3r2N1/6N1/Q5PP/6K1 w - - bm Qa7+; ce 32762; dm 3; id "line #4862";

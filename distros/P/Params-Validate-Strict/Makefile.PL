@@ -63,4 +63,5 @@ WriteMakefile(
 		'Test::Warnings' => 0
 	}, dist => $dist,
 	clean => { FILES => 'Params-Validate-Strict-*' },	# Clean up distribution files
+	MIN_PERL_VERSION	=> '5.008'
 );

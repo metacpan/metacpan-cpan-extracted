@@ -2,7 +2,7 @@
 #
 <start_html 
     title="File Index" 
-    include_style="@{qw(index.css index_highlight.css)}"
+    include_style="@{qw(index.css)}"
     style="@{qw(
         https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css
         https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.classless.min.css
@@ -12,9 +12,11 @@
         https://cdn.jsdelivr.net/npm/htmx.org@1.9.5
         https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js#defer
         https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js
+        https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.js#defer
     )}"
-    include_script="index_highlight.js" 
+    include_script="@{qw(index.js)}" 
 >
+
 <perl handler="index">
 <header>
   <h1>Index of <span id="current-path">${path_dn}</span></h1>
@@ -37,49 +39,54 @@
         <td><a href="${href}">${filename}</a></td>
         <td>${date}</td>
         <td>${size}</td>
-        <td style="text-align: right"  x-data="{ isOpen: false }">
-            <a href="#" 
-              @click.prevent="toggleSourceRow($el, $data)"
-              data-filename="${filename}"
-              x-text="isOpen ? 'Hide Source' : 'View Source'"
-            >
-            View Source
-            <!-- <img src="https://unpkg.com/lucide-static/icons/code.svg" alt="View Source icon" width="18" height="18"> -->
-            </a>
+        
+            <block name="file" display="!{! $_[1]->{'type'} eq 'file' !}" >
+            <td style="text-align: right"  x-data="{ isOpen: false }">
+                <a href="#" @click.prevent="toggleSourceRow($el, $data)" class="cursor-pointer inline-flex items-center gap-1"  data-filename="${filename}" data-md5="${md5_hex}">
+                    <svg data-lucide="chevron-left" width="16" height="16" :style="isOpen ? 'transform: rotate(-90deg)' : ''" style="transition: transform .15s ease-in-out;"></svg>
+                </a>
+            </td>
+            </block>
 
-        </td>
+            <block name="dir" display="!{! $_[1]->{'type'} eq 'dir' !}">
+            <td style="text-align: right">
+            -
+            </td>
+            </block>
+
       </tr>
       </block>
     </tbody>
   </table>
 </main>
 
-<! -- HTMX section start -->
-
-<htmx display="+{source}" handler="source">
-<tr class="source-row"><td colspan="4">
-
-<script id="srce_html" data-language="html" type="text/plain">
-${srce_html}
-</script>
-<script id="srce_lang" data-language="${language}" type="text/plain">
-${srce_lang}
-</script>
-
-<pre>
-<code class="hljs" data-mode="${mode}" id="srce_highlight"></code>
-</pre>
-
-</td></tr>
-</htmx>
-
-<! -- HTMX section end -->
 
 <footer>
   <hr>
   <small>Generated on ${timestamp} by WebDyne Indexer in ${sec} sec.</small>
 </footer>
 </perl>
+
+
+<!-- HTMX section start -->
+
+<htmx display="+{source}" handler="source">
+<tr class="source-row" id="source-row-${md5_hex}" data-md5="${md5_hex}"><td colspan="4">
+
+<block name="source">
+<script  data-lang="${lang}" type="text/plain">
+${code}
+</script>
+</block>
+
+<pre>
+<code class="hljs" id="srce_highlight-${md5_hex}"></code>
+</pre>
+
+</td></tr>
+</htmx>
+
+<!-- HTMX section end -->
 
 
 __PERL__
@@ -92,6 +99,8 @@ use POSIX qw(strftime);
 use WebDyne::Util;
 use Cwd qw(realpath);
 use IO::File;
+use Digest::MD5 qw(md5_hex);
+
 
 sub source {
 
@@ -135,12 +144,12 @@ sub source {
     
     #  Now iterate over file
     #
-    my ($binary, $language);  
+    my ($binary, $lang);  
     while (my $line=<$path_fh>) {
         
         if ($line =~ /[\x00-\x08\x0B\x0C\x0E-\x1F\x80-\xFF]/) {
             push @srce_lang, 'Binary file - not displaying';
-            $language='text';
+            $lang='text';
             $binary++;
             last;
         }
@@ -161,22 +170,28 @@ sub source {
     #
     my $ext_to_lang_hr=&ext_to_lang();
     my ($ext)=($srce_fn=~/\.(.*?)$/);
-    $language ||= $ext_to_lang_hr->{$ext};
-    $language ||= $ext ? 'automatic' : 'text';
-    #$language= $ext_to_lang_hr->{$ext};
+    $lang ||= $ext_to_lang_hr->{$ext};
+    $lang ||= $ext ? 'automatic' : 'text';
     
     
-    #  Concatenate together and escape </script> tag in HTML
+    #  Concatenate together and escape </script> tag in HTML, then render
     #
-    my $srce_html=join(undef, @srce_html);
-    my $srce_lang=join(undef, @srce_lang);
-    $srce_html=~s/<\/script>/<\\\/script>/gm;
-    $srce_lang=~s/<\/script>/<\\\/script>/gm;
+    #
+    if (my $srce_html=join(undef, @srce_html)) {
+        $srce_html=~s/<\/script>/<\\\/script>/gm;
+        $self->render_block('source', lang=>'html', code=>$srce_html);
+    }
+    if (my $srce_lang=join(undef, @srce_lang)) {
+        $srce_lang=~s/<\/script>/<\\\/script>/gm;
+        $self->render_block('source', lang=>$lang, code=>$srce_lang);
+    }
+        
+
+    #  And render
+    #
     return $self->render(
-        srce_html   => $srce_html, 
-        srce_lang   => $srce_lang, 
-        language    => $language, 
-        mode        => $srce_html ? 'combined' : 'single'
+        language    => $lang, 
+        md5_hex     => md5_hex($srce_fn)
     );
     
 }
@@ -338,25 +353,34 @@ sub index {
         
         #  Build file href differently if dir vs file
         #
-        my $href;
+        my ($href, $type);
         if ($fn=~m{/$}) {
             #  Dir
             $href=File::Spec->catdir($path_dn, split(m{/+}, $fn));
+            $type='dir';
         }
         else {
             #  Normal file
             $href=File::Spec->catfile($path_dn, $fn);
+            $type='file';
         }
+        
+
+        #  Attrs we will need
+        #
+        my %data=(
+            filename    => $fn,
+            href        => $href || $fn,
+            date        => $mtime,
+            size        => $size,
+            md5_hex     => md5_hex($fn),
+            type        => $type
+        );
         
         
         #  Now render info about file into page
         #
-        $self->render_block('index',
-            filename    => $fn,
-            href        => $href || $fn,
-            date        => $mtime,
-            size        => $size
-        );
+        $self->render_block('index', %data);
         
     }
     

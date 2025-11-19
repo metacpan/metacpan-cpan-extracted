@@ -1,0 +1,222 @@
+@  changeset:   43:e5f8da3b0e06
+|  tag:         tip
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Tue Nov 18 15:27:56 2025 +0100
+|  summary:     Use the cpan.org email address
+|
+o  changeset:   42:23f6a2a329e2
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Fri Nov 14 13:25:20 2025 +0100
+|  summary:     Bump version to 0.4
+|
+o  changeset:   41:8d3284c48098
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Fri Nov 14 13:22:37 2025 +0100
+|  summary:     BF "Wide character" warning
+|
+o  changeset:   40:ff7b3d9c9c00
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Fri Nov 14 13:19:57 2025 +0100
+|  summary:     use print not say
+|
+o  changeset:   39:5b952b18098e
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Fri Nov 14 13:07:14 2025 +0100
+|  summary:     Cleanup
+|
+o  changeset:   38:fd3e11286c51
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Fri Nov 14 12:49:23 2025 +0100
+|  summary:     Cleanup
+|
+o  changeset:   37:339d217121c7
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Fri Nov 14 12:46:05 2025 +0100
+|  summary:     Tests working
+|
+o  changeset:   36:3d3404c83e79
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Fri Nov 14 12:37:34 2025 +0100
+|  summary:     More working tests
+|
+o  changeset:   35:9899af2337c2
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Fri Nov 14 11:17:06 2025 +0100
+|  summary:     Leak tests
+|
+o  changeset:   34:7375a36ad261
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Fri Nov 14 10:54:38 2025 +0100
+|  summary:     Work on multi-terminal support
+|
+o  changeset:   33:c3d75f8665ec
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Fri Nov 14 08:49:30 2025 +0100
+|  summary:     Bump version to 0.3
+|
+o  changeset:   32:2b9edb3590f5
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Fri Nov 14 08:44:49 2025 +0100
+|  summary:     Hide internal CARDTYPES_AUTODETECT in Lib::Pepper::Simple instead of having the the client program deal with it.
+|
+o  changeset:   31:c731b0bb8194
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Wed Nov 12 15:45:28 2025 +0100
+|  summary:     Perl::Critic
+|
+o  changeset:   30:c56c6b4748fc
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Wed Nov 12 15:15:11 2025 +0100
+|  summary:     MANIFEST
+|
+o  changeset:   29:d9bd0644f52c
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Wed Nov 12 15:13:09 2025 +0100
+|  summary:     Bump version to 0.2
+|
+o  changeset:   28:8856e2355dd8
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Wed Nov 12 15:11:48 2025 +0100
+|  summary:     Reporting handler
+|
+o  changeset:   27:3ce59161f15d
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Wed Nov 12 14:50:55 2025 +0100
+|  summary:     BF magic bytes
+|
+o  changeset:   26:d484116b125d
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Wed Nov 12 14:46:10 2025 +0100
+|  summary:     Option to disable terminal printing
+|
+o  changeset:   25:646b4d66abb3
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Wed Nov 12 14:40:10 2025 +0100
+|  summary:     Flag to disable printing.
+|
+o  changeset:   24:15a7e2962afe
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Wed Nov 12 14:12:04 2025 +0100
+|  summary:     Refund now works without swiping the card
+|
+o  changeset:   23:306ef5602648
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Wed Nov 12 09:08:58 2025 +0100
+|  summary:     MANIFEST
+|
+o  changeset:   22:1a14fed73502
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Wed Nov 12 09:07:56 2025 +0100
+|  summary:     Set version to 0.1, fix pragmas
+|
+o  changeset:   21:d99ced832b21
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Wed Nov 12 09:00:00 2025 +0100
+|  summary:     Copy over some devscripts from pagecamel
+|
+o  changeset:   20:d3d764386bc6
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Tue Nov 11 16:28:07 2025 +0100
+|  summary:     Added tag _before_nonblocking for changeset 9f285ea4a23f
+|
+o  changeset:   19:9f285ea4a23f
+|  tag:         _before_nonblocking
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Tue Nov 11 16:16:57 2025 +0100
+|  summary:     BF
+|
+o  changeset:   18:08ce09b5c7bb
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Tue Nov 11 16:10:38 2025 +0100
+|  summary:     Test loading XML files or XML data
+|
+o  changeset:   17:86b61728db16
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Tue Nov 11 16:07:38 2025 +0100
+|  summary:     Can use XML files *or* XML data
+|
+o  changeset:   16:5c396606170c
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Tue Nov 11 15:46:58 2025 +0100
+|  summary:     Add AI warning
+|
+o  changeset:   15:5e4cc0bfba4e
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Tue Nov 11 15:38:39 2025 +0100
+|  summary:     Add example for end-of-day command
+|
+o  changeset:   14:5407bb6b2463
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Tue Nov 11 15:30:31 2025 +0100
+|  summary:     More BF
+|
+o  changeset:   13:6d7e8cffd88d
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Tue Nov 11 15:02:39 2025 +0100
+|  summary:     Cleanup
+|
+o  changeset:   12:071ac3b2df9e
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Tue Nov 11 15:00:40 2025 +0100
+|  summary:     POD, Perlcritic
+|
+o  changeset:   11:0749b9f09aa1
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Tue Nov 11 14:38:56 2025 +0100
+|  summary:     Better documentation
+|
+o  changeset:   10:9ed57c76abae
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Tue Nov 11 14:18:24 2025 +0100
+|  summary:     More aligning with code styleguide, add additional tests
+|
+o  changeset:   9:8be3183bdd9f
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Tue Nov 11 13:59:51 2025 +0100
+|  summary:     Add Lib::Pepper::Simple (untested)
+|
+o  changeset:   8:3730212dd511
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Tue Nov 11 12:30:22 2025 +0100
+|  summary:     Implement end-of-day settlement
+|
+o  changeset:   7:844b81d9f179
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Tue Nov 11 12:21:03 2025 +0100
+|  summary:     More tests
+|
+o  changeset:   6:c8547c33e120
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Tue Nov 11 11:27:14 2025 +0100
+|  summary:     CLeanup
+|
+o  changeset:   5:8d4bbce17686
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Tue Nov 11 10:55:16 2025 +0100
+|  summary:     codingstyle
+|
+o  changeset:   4:a8849e210dcd
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Tue Nov 11 10:43:30 2025 +0100
+|  summary:     Better working example
+|
+o  changeset:   3:a7b6565d2219
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Tue Nov 11 10:12:04 2025 +0100
+|  summary:     MANIFEST
+|
+o  changeset:   2:0ce2c816833a
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Tue Nov 11 10:10:15 2025 +0100
+|  summary:     Working example?
+|
+o  changeset:   1:87e35d4db5f9
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Tue Nov 11 09:44:32 2025 +0100
+|  summary:     More clown AI
+|
+o  changeset:   0:ef94728cd039
+   user:        Rene Schickbauer <cavac@palebluedot>
+   date:        Tue Nov 11 08:43:17 2025 +0100
+   summary:     Initial checkin
+

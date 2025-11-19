@@ -47,6 +47,7 @@ t/075-constructor-options.t
 t/076-trace.t
 t/077-compile.t
 t/078-comment.t
+t/080.prune_instance.t
 t/900_pod.t
 t/910_coverage.t
 t/920_manifest.t

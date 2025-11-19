@@ -1,0 +1,12 @@
+Revision history for Win32API::Console
+
+0.1.1  2025-11-14
+    - Adapting the test for GitHub Actions
+    - fixing bugs in POD
+    - Adjust parameter check for SetConsoleCtrlHandler
+
+0.1.0  2025-11-14
+    - First published version
+
+0.0.1  2025-10-24
+    - Initial release

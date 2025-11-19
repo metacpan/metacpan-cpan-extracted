@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::BIP85;
-$Bitcoin::Crypto::BIP85::VERSION = '4.001';
+$Bitcoin::Crypto::BIP85::VERSION = '4.002';
 use v5.10;
 use strict;
 use warnings;
