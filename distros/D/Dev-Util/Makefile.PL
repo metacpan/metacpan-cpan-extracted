@@ -29,7 +29,7 @@ WriteMakefile(
                        'IO::Prompt'      => 0,
                        'IPC::Cmd'        => 0,
                        'Import::Into'    => 0,
-                       'List::Util'      => 0,
+                       'List::Util'      => 1.66,
                        'Module::Runtime' => 0,
                        'Readonly'        => 0,
                        'Term::ANSIColor' => 0,

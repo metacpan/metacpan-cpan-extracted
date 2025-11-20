@@ -1,5 +1,5 @@
 package Crypt::HSM::Verify;
-$Crypt::HSM::Verify::VERSION = '0.022';
+$Crypt::HSM::Verify::VERSION = '0.023';
 use strict;
 use warnings;
 
@@ -22,7 +22,7 @@ Crypt::HSM::Verify - A PKCS11 ongoing verification operation.
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 SYNOPSIS
 

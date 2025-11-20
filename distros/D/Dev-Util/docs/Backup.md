@@ -4,7 +4,7 @@ Dev::Util::Backup - Simple backup functions for files and dirs
 
 # VERSION
 
-Version v2.19.6
+Version v2.19.7
 
 # SYNOPSIS
 

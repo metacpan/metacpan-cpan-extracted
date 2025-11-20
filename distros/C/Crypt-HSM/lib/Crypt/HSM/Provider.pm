@@ -1,5 +1,5 @@
 package Crypt::HSM::Provider;
-$Crypt::HSM::Provider::VERSION = '0.022';
+$Crypt::HSM::Provider::VERSION = '0.023';
 use strict;
 use warnings;
 
@@ -19,7 +19,7 @@ Crypt::HSM::Provider - A PKCS11 provider
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 SYNOPSIS
 
@@ -44,7 +44,31 @@ This returns a L<Crypt::HSM::Slot|Crypt::HSM::Slot> for the slot with the given 
 
 =head2 info()
 
-This returns a hash with information about the HSM.
+This returns a hash with information about the HSM. It contains the following keys:
+
+=over 4
+
+=item * C<cryptoki-version>
+
+Cryptoki interface version number, for compatibility with future revisions of this interface.
+
+=item * C<manufacturer-id>
+
+ID of the Cryptoki library manufacturer.
+
+=item * C<flags>
+
+Flags reserved for future versions.
+
+=item * C<library-description>
+
+Description of the library.
+
+=item * C<library-version>
+
+Cryptoki library version number.
+
+=back
 
 =head2 wait_for_event(@flags)
 

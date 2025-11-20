@@ -22,7 +22,6 @@ WriteMakefile1(
   PREREQ_PM => {
     'Win32::API'         => 0.77,
     'Win32::Console'     => '0.10',
-    'Win32API::Registry' => 0.21,
   },
 
   TEST_REQUIRES => {
@@ -54,8 +53,9 @@ WriteMakefile1(
           'version'        => 0.77,
         },
         recommends => {
-          'Win32::GuiTest'  => 0,
-          'Types::Standard' => 0,
+          'Win32::GuiTest'     => 0,
+          'Win32API::Registry' => 0.21,
+          'Types::Standard'    => 0,
         },
       },
       # test => {

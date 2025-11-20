@@ -1,5 +1,5 @@
 package Crypt::HSM::Session;
-$Crypt::HSM::Session::VERSION = '0.022';
+$Crypt::HSM::Session::VERSION = '0.023';
 use strict;
 use warnings;
 
@@ -22,7 +22,7 @@ Crypt::HSM::Session - A PKCS11 session
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 SYNOPSIS
 
@@ -42,7 +42,7 @@ This represents a session with a PKCS module such as an HSM. It does most of the
 
 =head2 Constants
 
-This module uses hundreds of constants from the PKCS11 standard as short stings. They're all lowercased, without prefix and with hyphens instead of underscores. So C<CKM_SHA256_RSA_PKCS> becomes C<'sha256-rsa-pkcs'>. In KDF names, the <-kdf> part is eliminated.
+This module uses hundreds of constants from the PKCS11 standard as short strings. They're all lowercased, without prefix and with hyphens instead of underscores. So C<CKM_SHA256_RSA_PKCS> becomes C<'sha256-rsa-pkcs'>. In KDF names, the <-kdf> part is eliminated.
 
 =head2 Types
 
@@ -52,11 +52,11 @@ Various types of arguments are recurring its methods, these are:
 
 =item key/object
 
-This is an identifier that refers to resource inside the HSM, it has no meaning outside of it.
+This is a L<Crypt::HSM::Object> object. Typically this is a key, but it can also be other things like a certificate, a piece of data, a hardware feature (e.g. clock or user-interface), or domain parameters.
 
 =item mechanism
 
-This is a mechanism for a cryptographic operation, e.g. C<'aes-gcm'>, C<'sha256-rsa-pkcs'> or C<'sha512-hmac'>. The list of supported mechanisms can be retrieved using the C<mechanisms> method on the C<Crypt::HSM> object.
+This is a mechanism for a cryptographic operation. This may either be a L<Crypt::HSM::Mechanism> object, or the name of a mechanism (e.g. C<'aes-gcm'>, C<'sha256-rsa-pkcs'> or C<'sha512-hmac'>). The list of supported mechanisms can be retrieved using the C<mechanisms> method on the C<Crypt::HSM> object.
 
 =item attributes
 
@@ -146,7 +146,61 @@ This generate C<$length> bytes of randomness.
 
 =head2 info()
 
-This returns information about the current session.
+This returns a hash with information about the current session.
+
+=over 4
+
+=item * C<slot-id>
+
+ID of the slot that interfaces with the token
+
+=item * C<state>
+
+=over 4
+
+=item * C<ro-public-session>
+
+The application has opened a read-only session.  The application has read-only access to public token objects and read/write access to public session objects.
+
+=item * C<ro-user-functions>
+
+The normal user has been authenticated to the token. The application has read-only access to all token objects (public or private) and read/write access to all session objects (public or private).
+
+=item * C<rw-public-session>
+
+The application has opened a read/write session. The application has read/write access to all public objects.
+
+=item * C<rw-user-functions>
+
+The normal user has been authenticated to the token. The application has read/write access to all objects.
+
+=item * C<rw-so-functions>
+
+The Security Officer has been authenticated to the token. The application has read/write access only to public objects on the token, not to private objects.  The SO can set the normal user’s PIN.
+
+=back
+
+=item * C<flags>
+
+Flags that define the type of session, this hash contains the following entries:
+
+=over 4
+
+=item * rw-session
+
+True if the session is read/write; false if the session is read-only
+
+=item * serial-session
+
+This flag is provided for backward compatibility, and should always be set to true
+
+=back
+
+=item * C<device-error>
+
+An error code defined by the cryptographic device.
+
+=back
 
 =head2 init_pin($pin)
 

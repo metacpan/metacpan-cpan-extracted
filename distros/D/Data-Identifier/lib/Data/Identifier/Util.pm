@@ -17,7 +17,7 @@ use Carp;
 
 use Data::Identifier;
 
-our $VERSION = v0.24;
+our $VERSION = v0.25;
 
 my $_DEFAULT_INSTANCE = __PACKAGE__->new;
 
@@ -246,6 +246,8 @@ sub parse_sirtx {
         return Data::Identifier->new($1 => int($2));
     } elsif ($data =~ /^uuid:([0-9a-fA-F-]+)$/) {
         return Data::Identifier->new(uuid => $1);
+    } elsif ($data =~ /^wd:([QPL][1-9][0-9]*)$/) {
+        return Data::Identifier->new(wd => $1);
     } elsif ($data =~ /^~([0-9]+)$/) {
         return Data::Identifier->new(hdi => int($1));
     } elsif ($data =~ /^raen:([0-9]+)$/) {
@@ -281,6 +283,7 @@ sub render_sirtx {
     state $map = [
         [sid        => Data::Identifier->new(wellknown => 'sid')->register],
         [sni        => Data::Identifier->new(wellknown => 'sni')->register],
+        [wd         => Data::Identifier->new(wellknown => 'wd')->register],
         ['/'        => Data::Identifier->new(uuid => 'd73b6550-5309-46ad-acc9-865c9261065b')->register],
         [raen       => Data::Identifier->new(uuid => '2bffc55d-7380-454e-bd53-c5acd525d692')->register],
         [chat0w     => Data::Identifier->new(uuid => '2c7e15ed-aa2f-4e2f-9a1d-64df0c85875a')->register],
@@ -371,7 +374,7 @@ Data::Identifier::Util - format independent identifier object
 
 =head1 VERSION
 
-version v0.24
+version v0.25
 
 =head1 SYNOPSIS
 

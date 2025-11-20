@@ -17,10 +17,11 @@ defined in this module.
 
 Any function here shall return something reasonable, even if the conversion
 fails for some reason.  Each fuction returns the data for a referenve to a
-hash of values, which are accessible in the output formatter.  Each hash
+hash of values, which are accessible in the output formatter.  Each HASH
 must define either
- image => {}, html => ''     # an image is produced, or
- image => '', html => {}     # html was produced
+
+  image => {}, html => ''     # an image is produced, or
+  image => '', html => {}     # html was produced
 
 Each of the functions is called with five arguments: PAGE, MESSAGE,
 PART, ATTACH, and ARGS argument.  The PAGE is the object which produces pages,
@@ -36,7 +37,7 @@ then accessible via the formatter.
 
 The ARGS is a wild combination of information about the formatter
 and information defined by it.  For instance, the arguments which are
-passed with the tag in the template file can be found in there.  Print the 
+passed with the tag in the template file can be found in there.  Print the
 content of the hash to see how much information you get... (sorry for this
 rough description)
 
@@ -44,7 +45,7 @@ rough description)
 
 =over 4
 
-=item B<previewHtml>(PAGE, MESSAGE, PART, ATTACH, ARGS)
+=item B<previewHtml>($page, $mssage, $part, \%attach, \%options)
 
 Produce a small preview of the html, where first the title is taken
 and put in bold. The rest of the header is removed.  Then the first
@@ -59,17 +60,17 @@ characters of the rest of the content are displayed.
 
 =back
 
-example: of a plain text preview with the Text::MagicTemplate formatter
+» example: of a plain text preview with the Text::MagicTemplate formatter
 
- <!--{preview text_max_chars => 120}-->
-    <!--{html}-->
-       <blockquote><cite>
-       <!--{text}-->&nbsp;...
-       </cite></blockquote>
-    <!--{/html}-->
- <!--{/preview}-->
+  <!--{preview text_max_chars => 120}-->
+     <!--{html}-->
+        <blockquote><cite>
+        <!--{text}-->&nbsp;...
+        </cite></blockquote>
+     <!--{/html}-->
+  <!--{/preview}-->
 
-=item B<previewImage>(PAGE, MESSAGE, PART, ATTACH, ARGS)
+=item B<previewImage>($page, $mssage, $part, \%attach, \%options)
 
 Produce a small preview of the html, where first the title is taken
 and put in bold. The rest of the header is removed.  Then the first
@@ -87,14 +88,14 @@ characters of the rest of the content are displayed.
 
 =back
 
-example: of a plain text preview with the Text::MagicTemplate formatter
+» example: of a plain text preview with the Text::MagicTemplate formatter
 
- <!--{preview img_max_width => 200, img_max_height => 200}-->
-    <!--{image}-->
-    <!--{/image}-->
- <!--{/preview}-->
+  <!--{preview img_max_width => 200, img_max_height => 200}-->
+     <!--{image}-->
+     <!--{/image}-->
+  <!--{/preview}-->
 
-=item B<previewText>(PAGE, MESSAGE, PART, ATTACH, ARGS)
+=item B<previewText>($page, $mssage, $part, \%attach, \%options)
 
 Produce a small preview of the text, where all wrappig is removed.
 
@@ -107,28 +108,29 @@ Produce a small preview of the text, where all wrappig is removed.
 
 =back
 
-example: of a plain text preview with the Text::MagicTemplate formatter
+» example: of a plain text preview with the Text::MagicTemplate formatter
 
- <!--{preview text_max_chars => 120}-->
-    <!--{html}-->
-       <blockquote><cite>
-       <!--{text}-->&nbsp;...
-       </cite></blockquote>
-    <!--{/html}-->
- <!--{/preview}-->
+  <!--{preview text_max_chars => 120}-->
+     <!--{html}-->
+        <blockquote><cite>
+        <!--{text}-->&nbsp;...
+        </cite></blockquote>
+     <!--{/html}-->
+  <!--{/preview}-->
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of HTML-FromMail distribution version 0.12,
-built on January 29, 2018. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of HTML-FromMail version 3.00,
+built on November 19, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2003-2018 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2003-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

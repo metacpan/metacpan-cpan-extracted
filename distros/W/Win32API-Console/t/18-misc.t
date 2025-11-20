@@ -2,37 +2,43 @@ use strict;
 use warnings;
 
 use Test::More tests => 4;
+use FindBin;
+use lib "$FindBin::Bin/lib";
 
 BEGIN {
+  use_ok 'TestConsole', qw( GetConsoleOutputHandle );
   use_ok 'Win32API::Console', qw(
-    GetStdHandle
     GetLargestConsoleWindowSize
     GetConsoleMode
     SetConsoleMode
-    STD_ERROR_HANDLE
   );
 }
 
-my $hConsole = GetStdHandle(STD_ERROR_HANDLE);
-ok(defined $hConsole, 'STD_ERROR_HANDLE is defined');
+# Get a handle to the current console output
+my $hConsole = GetConsoleOutputHandle();
+diag "$^E" if $^E;
 
-subtest 'GetLargestConsoleWindowSize' => sub {
-  my $size = GetLargestConsoleWindowSize($hConsole);
-  diag "$^E" if $^E;
-  ok($size->{X} > 0 && $size->{Y} > 0, 'Largest window size is valid');
-};
+SKIP: {
+  skip "No real console output handle available" => 2 unless $hConsole;
 
-subtest 'GetConsoleMode / SetConsoleMode' => sub {
-  my $mode;
-  my $ok = GetConsoleMode($hConsole, \$mode);
-  diag "$^E" if $^E;
-  ok($ok, 'GetConsoleMode returned a value');
-  ok(defined $mode, 'GetConsoleMode returned a valid current mode');
+  subtest 'GetLargestConsoleWindowSize' => sub {
+    my $size = GetLargestConsoleWindowSize($hConsole);
+    diag "$^E" if $^E;
+    ok($size->{X} > 0 && $size->{Y} > 0, 'Largest window size is valid');
+  };
 
-  # reapply same mode
-  $ok = defined($mode) && SetConsoleMode($hConsole, $mode);
-  diag "$^E" if $^E;
-  ok($ok, 'SetConsoleMode reapplied current mode');
-};
+  subtest 'GetConsoleMode / SetConsoleMode' => sub {
+    my $mode;
+    my $ok = GetConsoleMode($hConsole, \$mode);
+    diag "$^E" if $^E;
+    ok($ok, 'GetConsoleMode returned a value');
+    ok(defined $mode, 'GetConsoleMode returned a valid current mode');
+
+    # reapply same mode
+    $ok = defined($mode) && SetConsoleMode($hConsole, $mode);
+    diag "$^E" if $^E;
+    ok($ok, 'SetConsoleMode reapplied current mode');
+  };
+}
 
 done_testing();

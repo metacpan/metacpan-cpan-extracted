@@ -3,13 +3,13 @@ use 5.22.0;
 no strict; no warnings; no diagnostics;
 use common::sense;
 
-our $VERSION = "0.1.2";
+our $VERSION = "0.2.0";
 
 use Exporter qw/import/;
-use File::Spec     qw//;
 use Scalar::Util   qw//;
 use List::Util     qw//;
 use Time::HiRes    qw//;
+use Aion::Fs::Find;
 
 our @EXPORT = our @EXPORT_OK = grep {
 	ref \$Aion::Fs::{$_} eq "GLOB" && *{$Aion::Fs::{$_}}{CODE} && !/^(?:_|(NaN|import)\z)/
@@ -488,7 +488,7 @@ sub mkpath (;$) {
 	$path
 }
 
-# Считывает файл
+# Считать файл
 sub cat(;$) {
     my ($file) = @_ == 0? $_: @_;
 	my $layer = ":utf8";
@@ -499,7 +499,7 @@ sub cat(;$) {
 	$x
 }
 
-# записать файл
+# Записать файл
 sub lay ($;$) {
 	my ($file, $s) = @_ == 1? ($_, @_): @_;
 	my $layer = ":utf8";
@@ -511,7 +511,7 @@ sub lay ($;$) {
 	$file
 }
 
-# считать файл, если он ещё не был считан
+# Считать файл, если он ещё не был считан
 our %FILE_INC;
 sub catonce (;$) {
 	my ($file) = @_ == 0? $_: @_;
@@ -575,11 +575,13 @@ sub _filters(@) {
 
 # Найти файлы
 sub find(;@) {
-	my $file = @_? shift: $_;
-    $file = [$file] unless ref $file;
+	my $files = @_? shift: $_;
+    $files = [$files] unless ref $files;
 
 	my @noenters; my $errorenter = sub {};
-	my $ex = @_ && ref($_[$#_]) =~ /^Aion::Fs::(noenter|errorenter)\z/ ? pop: undef;
+	my $ex = @_ && ref($_[$#_]) =~ /^Aion::Fs::(noenter|errorenter)\z/
+		? pop
+		: undef;
 
 	if($ex) {
 		if($1 eq "errorenter") {
@@ -591,47 +593,17 @@ sub find(;@) {
 	}
 	
 	my @filters = _filters @_;
-	my $wantarray = wantarray;
 
-	my @ret; my $count;
+	my $iter = Aion::Fs::Find->new(
+		noenters => \@noenters,
+		errorenter => $errorenter,
+		filters => \@filters,
+		files => $files,
+	);
 
-	eval {
-		local $_;
-		
-	    FILE: while(@$file) {
-			my $path = shift @$file;
-
-			for my $filter (@filters) {
-				local $_ = $path;
-				goto DIR unless $filter->();
-			}
-
-			# Не держим память, если это не нужно
-			if($wantarray) { push @ret, $path } else { $count++ }
-
-			DIR: if(-d $path) {
-				for my $noenter (@noenters) {
-					local $_ = $path;
-					next FILE if $noenter->();
-				}
-
-				opendir my $dir, $path or do { local $_ = $path; $errorenter->(); next FILE };
-				my @file;
-				while(my $f = readdir $dir) {
-					push @file, File::Spec->join($path, $f) if $f !~ /^\.{1,2}\z/;
-				}
-				push @$file, sort @file;
-				closedir $dir;
-			}
-		}
-		
-	};
-	
-	if($@) {
-		die if ref $@ ne "Aion::Fs::stop";
-	}
-
-	wantarray? @ret: $count
+	defined(wantarray)
+		? (wantarray? @$iter: $iter)
+		: do { while(defined $iter->next) {} };
 }
 
 # Не входить в подкаталоги
@@ -740,11 +712,11 @@ __END__
 
 =head1 NAME
 
-Aion::Fs - утилиты для файловой системы: чтение, запись, поиск, замена файлов и т.д.
+Aion::Fs - utilities for the file system: reading, writing, searching, replacing files, etc.
 
 =head1 VERSION
 
-0.1.2
+0.2.0
 
 =head1 SYNOPSIS
 
@@ -755,45 +727,54 @@ Aion::Fs - утилиты для файловой системы: чтение, 
 	lay mkpath "hello/big/world.txt", "hellow!";
 	lay mkpath "hello/small/world.txt", "noenter";
 	
-	mtime "hello"  # ~> ^\d+(\.\d+)?$
+	mtime "hello";  # ~> ^\d+(\.\d+)?$
 	
-	[map cat, grep -f, find ["hello/big", "hello/small"]]  # --> [qw/ hellow! noenter /]
+	[map cat, grep -f, find ["hello/big", "hello/small"]];  # --> [qw/ hellow! noenter /]
 	
 	my @noreplaced = replace { s/h/$a $b H/ }
 	    find "hello", "-f", "*.txt", qr/\.txt$/, sub { /\.txt$/ },
 	        noenter "*small*",
 	            errorenter { warn "find $_: $!" };
 	
-	\@noreplaced # --> ["hello/moon.txt"]
+	\@noreplaced; # --> ["hello/moon.txt"]
 	
-	cat "hello/world.txt"       # => hello/world.txt :utf8 Hi!
-	cat "hello/moon.txt"        # => noreplace
-	cat "hello/big/world.txt"   # => hello/big/world.txt :utf8 Hellow!
-	cat "hello/small/world.txt" # => noenter
+	cat "hello/world.txt";       # => hello/world.txt :utf8 Hi!
+	cat "hello/moon.txt";        # => noreplace
+	cat "hello/big/world.txt";   # => hello/big/world.txt :utf8 Hellow!
+	cat "hello/small/world.txt"; # => noenter
 	
-	[find "hello", "*.txt"]  # --> [qw!  hello/moon.txt  hello/world.txt  hello/big/world.txt  hello/small/world.txt  !]
-	[find "hello", "-d"]  # --> [qw!  hello  hello/big hello/small  !]
+	[find "hello", "*.txt"]; # --> [qw!  hello/moon.txt  hello/world.txt  hello/big/world.txt  hello/small/world.txt  !]
+	
+	my @dirs;
+	
+	my $iter = find "hello", "-d";
+	
+	while(<$iter>) {
+	    push @dirs, $_;
+	}
+	
+	\@dirs; # --> [qw!  hello  hello/big hello/small  !]
 	
 	erase reverse find "hello";
 	
-	-e "hello"  # -> undef
+	-e "hello";  # -> undef
 
 =head1 DESCRIPTION
 
-Этот модуль облегчает использование файловой системы.
+This module makes it easier to use the file system.
 
-Модули C<File::Path>, C<File::Slurper> и
-C<File::Find> обременены различными возможностями, которые используются редко, но требуют времени на ознакомление и тем самым повышают порог входа.
+Modules C<File::Path>, C<File::Slurper> and
+C<File::Find> is burdened with various features that are rarely used, but require time to become familiar with and thereby increase the barrier to entry.
 
-В C<Aion::Fs> же использован принцип программирования KISS - чем проще, тем лучше!
+C<Aion::Fs> uses the KISS programming principle - the simpler the better!
 
-Супермодуль C<IO::All> не является конкурентом C<Aion::Fs>, т.к. использует ООП подход, а C<Aion::Fs> – ФП.
+The C<IO::All> supermodule is not a competitor to C<Aion::Fs>, because uses an OOP approach, and C<Aion::Fs> is FP.
 
 =over
 
-=item * ООП — объектно-ориентированное программирование.
+=item * OOP – object-oriented programming.
 
-=item * ФП — функциональное программирование.
+=item * FP – functional programming.
 
 =back
 
@@ -801,17 +782,17 @@ C<File::Find> обременены различными возможностям
 
 =head2 cat ($file)
 
-Считывает файл. Если параметр не указан, использует C<$_>.
+Reads the file. If no parameter is specified, use C<$_>.
 
 	cat "/etc/passwd"  # ~> root
 
-C<cat> читает со слоем C<:utf8>. Но можно указать другой слой следующим образом:
+C<cat> reads with layer C<:utf8>. But you can specify another layer like this:
 
 	lay "unicode.txt", "↯";
 	length cat "unicode.txt"            # -> 1
 	length cat["unicode.txt", ":raw"]   # -> 3
 
-C<cat> вызывает исключение в случае ошибки операции ввода-вывода:
+C<cat> throws an exception if the I/O operation fails:
 
 	eval { cat "A" }; $@  # ~> cat A: No such file or directory
 
@@ -821,15 +802,15 @@ C<cat> вызывает исключение в случае ошибки опе
 
 =item * L<autodie> – C<< open $f, "r.txt"; $s = join "", E<lt>$fE<gt>; close $f >>.
 
-=item * L<File::Slurp> — C<read_file('file.txt')>.
+=item * L<File::Slurp> – C<read_file('file.txt')>.
 
-=item * L<File::Slurper> — C<read_text('file.txt')>, C<read_binary('file.txt')>.
+=item * L<File::Slurper> – C<read_text('file.txt')>, C<read_binary('file.txt')>.
 
-=item * L<File::Util> — C<< File::Util-E<gt>new-E<gt>load_file(file =E<gt> 'file.txt') >>.
+=item * L<File::Util> – C<< File::Util-E<gt>new-E<gt>load_file(file =E<gt> 'file.txt') >>.
 
-=item * L<IO::All> — C<< io('file.txt') E<gt> $contents >>.
+=item * L<IO::All> – C<< io('file.txt') E<gt> $contents >>.
 
-=item * L<IO::Util> — C<$contents = ${ slurp 'file.txt' }>.
+=item * L<IO::Util> - C<$contents = ${ slurp 'file.txt' }>.
 
 =item * L<Mojo::File> – C<< path($file)-E<gt>slurp >>.
 
@@ -837,13 +818,13 @@ C<cat> вызывает исключение в случае ошибки опе
 
 =head2 lay ($file?, $content)
 
-Записывает C<$content> в C<$file>.
+Writes C<$content> to C<$file>.
 
 =over
 
-=item * Если указан один параметр, использует C<$_> вместо C<$file>.
+=item * If one parameter is specified, use C<$_> instead of C<$file>.
 
-=item * C<lay>, использует слой C<:utf8>. Для указания иного слоя используется массив из двух элементов в параметре C<$file>:
+=item * C<lay>, uses the C<:utf8> layer. To specify a different layer, use an array of two elements in the C<$file> parameter:
 
 =back
 
@@ -858,15 +839,15 @@ C<cat> вызывает исключение в случае ошибки опе
 
 =item * L<autodie> – C<< open $f, "E<gt>r.txt"; print $f $contents; close $f >>.
 
-=item * L<File::Slurp> — C<write_file('file.txt', $contents)>.
+=item * L<File::Slurp> – C<write_file('file.txt', $contents)>.
 
-=item * L<File::Slurper> — C<write_text('file.txt', $contents)>, C<write_binary('file.txt', $contents)>.
+=item * L<File::Slurper> – C<write_text('file.txt', $contents)>, C<write_binary('file.txt', $contents)>.
 
-=item * L<IO::All> — C<< io('file.txt') E<lt> $contents >>.
+=item * L<IO::All> – C<< io('file.txt') E<lt> $contents >>.
 
-=item * L<IO::Util> — C<slurp \$contents, 'file.txt'>.
+=item * L<IO::Util> – C<slurp \$contents, 'file.txt'>.
 
-=item * L<File::Util> — C<< File::Util-E<gt>new-E<gt>write_file(file =E<gt> 'file.txt', content =E<gt> $contents, bitmask =E<gt> 0644) >>.
+=item * L<File::Util> – C<< File::Util-E<gt>new-E<gt>write_file(file =E<gt> 'file.txt', content =E<gt> $contents, bitmask =E<gt> 0644) >>.
 
 =item * L<Mojo::File> – C<< path($file)-E<gt>spew($chars, 'UTF-8') >>.
 
@@ -874,31 +855,31 @@ C<cat> вызывает исключение в случае ошибки опе
 
 =head2 find (;$path, @filters)
 
-Рекурсивно обходит и возвращает пути из указанного пути или путей, если C<$path> является ссылкой на массив. Без параметров использует C<$_> как C<$path>.
+Recursively traverses and returns paths from the specified path or paths if C<$path> is an array reference. Without parameters, uses C<$_> as C<$path>.
 
-Фильтры могут быть:
+Filters can be:
 
 =over
 
-=item * Подпрограммой — путь к текущему файлу передаётся в C<$_>, а подпрограмма должна вернуть истину или ложь, как они понимаются perl-ом.
+=item * By subroutine - the path to the current file is passed to C<$_>, and the subroutine must return true or false, as understood by Perl.
 
-=item * Regexp — тестирует каждый путь регулярным выражением.
+=item * Regexp – tests each path with a regular expression.
 
-=item * Строка в виде "-Xxx", где C<Xxx> — один или несколько символов. Аналогична операторам perl-а для тестирования файлов. Пример: C<-fr> проверяет путь файловыми тестировщиками LLL<https://perldoc.perl.org/functions/-X>.
+=item * String in the form "-Xxx", where C<Xxx> is one or more characters. Similar to Perl operators for testing files. Example: C<-fr> checks the path with file testers LLL<https://perldoc.perl.org/functions/-X>.
 
-=item * Остальные строки превращаются функцией C<wildcard> (см. ниже) в регулярное выражение для проверки каждого пути.
+=item * The remaining lines are turned by the C<wildcard> function (see below) into a regular expression to test each path.
 
 =back
 
-Пути, не прошедшие проверку C<@filters>, не возвращаются.
+Paths that fail the C<@filters> check are not returned.
 
-Если фильтр -X не является файловой функцией perl, то выбрасывается исключение:
+If the -X filter is not a perl file function, an exception is thrown:
 
 	eval { find "example", "-h" }; $@   # ~> Undefined subroutine &Aion::Fs::h called
 
-В этом примере C<find> не может войти в подкаталог и передаёт ошибку в функцию C<errorenter> (см. ниже) с установленными переменными C<$_> и C<$!> (путём к каталогу и сообщением ОС об ошибке).
+In this example, C<find> cannot enter the subdirectory and passes an error to the C<errorenter> function (see below) with the C<$_> and C<$!> variables set (to the directory path and the OS error message).
 
-B<Внимание!> Если C<errorenter> не указана, то все ошибки B<игнорируются>!
+B<Attention!> If C<errorenter> is not specified, then all errors are B<ignored>!
 
 	mkpath ["example/", 0];
 	
@@ -910,94 +891,96 @@ B<Внимание!> Если C<errorenter> не указана, то все о�
 	mkpath for qw!ex/1/11 ex/1/12 ex/2/21 ex/2/22!;
 	
 	my $count = 0;
-	find "ex", sub { find_stop if ++$count == 3; 1}  # -> 2
+	find "ex", sub { find_stop if ++$count == 3; 1};
+	$count # -> 3
 
 =head3 See also
 
 =over
 
-=item * L<AudioFile::Find> — ищет аудиофайлы в указанной директории. Позволяет фильтровать их по атрибутам: названию, артисту, жанру, альбому и трэку.
+=item * L<AudioFile::Find> – searches for audio files in the specified directory. Allows you to filter them by attributes: title, artist, genre, album and track.
 
-=item * L<Directory::Iterator> — C<< $it = Directory::Iterator-E<gt>new($dir, %opts); push @paths, $_ while E<lt>$itE<gt> >>.
+=item * L<Directory::Iterator> – C<< $it = Directory::Iterator-E<gt>new($dir, %opts); push @paths, $_ while E<lt>$itE<gt> >>.
 
-=item * L<IO::All> — C<< @paths = map { "$_" } grep { -f $_ && $_-E<gt>size E<gt> 10*1024 } io(".")-E<gt>all(0) >>.
+=item * L<IO::All> – C<< @paths = map { "$_" } grep { -f $_ && $_-E<gt>size E<gt> 10*1024 } io(".")-E<gt>all(0) >>.
 
-=item * L<IO::All::Rule> — C<< $next = IO::All::Rule-E<gt>new-E<gt>file-E<gt>size("E<gt>10k")-E<gt>iter($dir1, $dir2); push @paths, "$f" while $f = $next-E<gt>() >>.
+=item * L<IO::All::Rule> – C<< $next = IO::All::Rule-E<gt>new-E<gt>file-E<gt>size("E<gt>10k")-E<gt>iter($dir1, $dir2); push @paths, "$f" while $f = $next-E<gt>() >>.
 
-=item * L<File::Find> — C<find( sub { push @paths, $File::Find::name if /\.png/ }, $dir )>.
+=item * L<File::Find> – C<find( sub { push @paths, $File::Find::name if /\.png/ }, $dir )>.
 
-=item * L<File::Find::utf8> — как L<File::Find>, только пути файлов в I<utf8>.
+=item * L<File::Find::utf8> – like L<File::Find>, only file paths are in I<utf8>.
 
-=item * L<File::Find::Age> — сортирует файлы по времени модификации (наследует L<File::Find::Rule>): C<< File::Find::Age-E<gt>in($dir1, $dir2) >>.
+=item * L<File::Find::Age> – sorts files by modification time (inherits L<File::Find::Rule>): C<< File::Find::Age-E<gt>in($dir1, $dir2) >>.
 
-=item * L<File::Find::Declare> — C<< @paths = File::Find::Declare-E<gt>new({ size =E<gt> 'E<gt>10K', perms =E<gt> 'wr-wr-wr-', modified =E<gt> 'E<lt>2010-01-30', recurse =E<gt> 1, dirs =E<gt> [$dir1] })-E<gt>find >>.
+=item * L<File::Find::Declare> – C<< @paths = File::Find::Declare-E<gt>new({ size =E<gt> 'E<gt>10K', perms =E<gt> 'wr-wr-wr-', modified =E<gt> 'E<lt>2010-01-30', recurse =E<gt> 1, dirs =E<gt> [$dir1] })-E<gt>find >>.
 
-=item * L<File::Find::Iterator> — имеет ООП интерфейс с итератором и функции C<imap> и C<igrep>.
+=item * L<File::Find::Iterator> – has an OOP interface with an iterator and the C<imap> and C<igrep> functions.
 
-=item * L<File::Find::Match> — вызывает обработчик на каждый подошедший фильтр. Похож на C<switch>.
+=item * L<File::Find::Match> – calls a handler for each matching filter. Similar to C<switch>.
 
-=item * L<File::Find::Node> — обходит иерархию файлов параллельно несколькими процессами: C<< tie @paths, IPC::Shareable, { key =E<gt> "GLUE STRING", create =E<gt> 1 }; File::Find::Node-E<gt>new(".")-E<gt>process(sub { my $f = shift; $f-E<gt>fork(5); tied(@paths)-E<gt>lock; push @paths, $f-E<gt>path; tied(@paths)-E<gt>unlock })-E<gt>find; tied(@paths)-E<gt>remove >>.
+=item * L<File::Find::Node> – traverses the file hierarchy in parallel by several processes: C<< tie @paths, IPC::Shareable, { key =E<gt> "GLUE STRING", create =E<gt> 1 }; File::Find::Node-E<gt>new(".")-E<gt>process(sub { my $f = shift; $f-E<gt>fork(5); tied(@paths)-E<gt>lock; push @paths, $f-E<gt>path; tied(@paths)-E<gt>unlock })-E<gt>find; tied(@paths)-E<gt>remove >>.
 
-=item * L<File::Find::Fast> — C<@paths = @{ find($dir) }>.
+=item * L<File::Find::Fast> – C<@paths = @{ find($dir) }>.
 
-=item * L<File::Find::Object> — имеет ООП интерфейс с итератором.
+=item * L<File::Find::Object> – has an OOP interface with an iterator.
 
-=item * L<File::Find::Parallel> — умеет сравнивать два каталога и возвращать их объединение, пересечение и количественное пересечение.
+=item * L<File::Find::Parallel> – can compare two directories and return their union, intersection and quantitative intersection.
 
-=item * L<File::Find::Random> — выбирает файл или директорию наугад из иерархии файлов.
+=item * L<File::Find::Random> – selects a file or directory at random from the file hierarchy.
 
-=item * L<File::Find::Rex> — C<< @paths = File::Find::Rex-E<gt>new(recursive =E<gt> 1, ignore_hidden =E<gt> 1)-E<gt>query($dir, qr/^b/i) >>.
+=item * L<File::Find::Rex> – C<< @paths = File::Find::Rex-E<gt>new(recursive =E<gt> 1, ignore_hidden =E<gt> 1)-E<gt>query($dir, qr/^b/i) >>.
 
-=item * L<File::Find::Rule> — C<< @files = File::Find::Rule-E<gt>any( File::Find::Rule-E<gt>file-E<gt>name('*.mp3', '*.ogg')-E<gt>size('E<gt>2M'), File::Find::Rule-E<gt>empty )-E<gt>in($dir1, $dir2); >>. Имеет итератор, процедурный интерфейс и расширения L<File::Find::Rule::ImageSize> и L<File::Find::Rule::MMagic>: C<< @images = find(file =E<gt> magic =E<gt> 'image/*', '!image_x' =E<gt> 'E<gt>20', in =E<gt> '.') >>.
+=item * L<File::Find::Rule> – C<< @files = File::Find::Rule-E<gt>any( File::Find::Rule-E<gt>file-E<gt>name('*.mp3', '*.ogg')-E<gt>size('E<gt>2M'), File::Find::Rule-E<gt>empty )-E<gt>in($dir1, $dir2); >>. Has an iterator, procedural interface and extensions L<File::Find::Rule::ImageSize> and L<File::Find::Rule::MMagic>: C<< @images = find(file =E<gt> magic =E<gt> 'image/*', '!image_x' =E<gt> 'E<gt>20', in =E<gt> '.') >>.
 
-=item * L<File::Find::Wanted> — C<@paths = find_wanted( sub { -f && /\.png/ }, $dir )>.
+=item * L<File::Find::Wanted> – C<@paths = find_wanted( sub { -f && /\.png/ }, $dir )>.
 
-=item * L<File::Hotfolder> — C<< watch( $dir, callback =E<gt> sub { push @paths, shift } )-E<gt>loop >>. Работает на C<AnyEvent>. Настраиваемый. Есть распараллеливание на несколько процессов.
+=item * L<File::Hotfolder> – C<< watch( $dir, callback =E<gt> sub { push @paths, shift } )-E<gt>loop >>. Powered by C<AnyEvent>. Customizable. There is parallelization into several processes.
 
-=item * L<File::Mirror> — формирует так же параллельный путь для копирования файлов: C<recursive { my ($src, $dst) = @_; push @paths, $src } '/path/A', '/path/B'>.
+=item * L<File::Mirror> – also forms a parallel path for copying files: C<recursive { my ($src, $dst) = @_; push @paths, $src } '/path/A', '/path/B'>.
 
-=item * L<File::Set> — C<< $fs = File::Set-E<gt>new; $fs-E<gt>add($dir); @paths = map { $_-E<gt>[0] } $fs-E<gt>get_path_list >>.
+=item * L<File::Set> – C<< $fs = File::Set-E<gt>new; $fs-E<gt>add($dir); @paths = map { $_-E<gt>[0] } $fs-E<gt>get_path_list >>.
 
-=item * L<File::Wildcard> — C<< $fw = File::Wildcard-E<gt>new(exclude =E<gt> qr/.svn/, case_insensitive =E<gt> 1, sort =E<gt> 1, path =E<gt> "src///*.cpp", match =E<gt> qr(^src/(.*?)\.cpp$), derive =E<gt> ['src/$1.o','src/$1.hpp']); push @paths, $f while $f = $fw-E<gt>next >>.
+=item * L<File::Wildcard> – C<< $fw = File::Wildcard-E<gt>new(exclude =E<gt> qr/.svn/, case_insensitive =E<gt> 1, sort =E<gt> 1, path =E<gt> "src///*.cpp", match =E<gt> qr(^src/(.*?)\.cpp$), derive =E<gt> ['src/$1.o','src/$1.hpp']); push @paths, $f while $f = $fw-E<gt>next >>.
 
-=item * L<File::Wildcard::Find> — C<findbegin($dir); push @paths, $f while $f = findnext()> или  C<findbegin($dir); @paths = findall()>.
+=item * L<File::Wildcard::Find> – C<findbegin($dir); push @paths, $f while $f = findnext()> or C<findbegin($dir); @paths = findall()>.
 
-=item * L<File::Util> — C<< File::Util-E<gt>new-E<gt>list_dir($dir, qw/ --pattern=\.txt$ --files-only --recurse /) >>.
+=item * L<File::Util> – C<< File::Util-E<gt>new-E<gt>list_dir($dir, qw/ --pattern=\.txt$ --files-only --recurse /) >>.
 
 =item * L<Mojo::File> – C<< say for path($path)-E<gt>list_tree({hidden =E<gt> 1, dir =E<gt> 1})-E<gt>each >>.
 
-=item * L<Path::Find> — C<@paths = path_find( $dir, "*.png" )>. Для сложных запросов использует I<matchable>: C<< my $sub = matchable( sub { my( $entry, $directory, $fullname, $depth ) = @_; $depth E<lt>= 3 } >>.
+=item * L<Path::Find> – C<@paths = path_find( $dir, "*.png" )>. For complex queries, use I<matchable>: C<< my $sub = matchable( sub { my( $entry, $directory, $fullname, $depth ) = @_; $depth E<lt>= 3 } >>.
 
-=item * L<Path::Extended::Dir> — C<< @paths = Path::Extended::Dir-E<gt>new($dir)-E<gt>find('*.txt') >>.
+=item * L<Path::Extended::Dir> – C<< @paths = Path::Extended::Dir-E<gt>new($dir)-E<gt>find('*.txt') >>.
 
-=item * L<Path::Iterator::Rule> — C<< $i = Path::Iterator::Rule-E<gt>new-E<gt>file; @paths = $i-E<gt>clone-E<gt>size("E<gt>10k")-E<gt>all(@dirs); $i-E<gt>size("E<lt>10k")... >>.
+=item * L<Path::Iterator::Rule> – C<< $i = Path::Iterator::Rule-E<gt>new-E<gt>file; @paths = $i-E<gt>clone-E<gt>size("E<gt>10k")-E<gt>all(@dirs); $i-E<gt>size("E<lt>10k")... >>.
 
-=item * L<Path::Class::Each> — C<< dir($dir)-E<gt>each(sub { push @paths, "$_" }) >>.
+=item * L<Path::Class::Each> – C<< dir($dir)-E<gt>each(sub { push @paths, "$_" }) >>.
 
-=item * L<Path::Class::Iterator> — C<< $i = Path::Class::Iterator-E<gt>new(root =E<gt> $dir, depth =E<gt> 2); until ($i-E<gt>done) { push @paths, $i-E<gt>next-E<gt>stringify } >>.
+=item * L<Path::Class::Iterator> – C<< $i = Path::Class::Iterator-E<gt>new(root =E<gt> $dir, depth =E<gt> 2); until ($i-E<gt>done) { push @paths, $i-E<gt>next-E<gt>stringify } >>.
 
-=item * L<Path::Class::Rule> — C<< @paths = Path::Class::Rule-E<gt>new-E<gt>file-E<gt>size("E<gt>10k")-E<gt>all($dir) >>.
+=item * L<Path::Class::Rule> – C<< @paths = Path::Class::Rule-E<gt>new-E<gt>file-E<gt>size("E<gt>10k")-E<gt>all($dir) >>.
 
 =back
 
 =head2 noenter (@filters)
 
-Говорит C<find> не входить в каталоги соответствующие фильтрам за ним.
+Tells C<find> not to enter directories matching the filters behind it.
 
 =head2 errorenter (&block)
 
-Вызывает C<&block> для каждой ошибки возникающей при невозможности войти в какой-либо каталог.
+Calls C<&block> for every error that occurs when a directory cannot be entered.
 
 =head2 find_stop ()
 
-Останавливает C<find> будучи вызван в одном из его фильтров, C<errorenter> или C<noenter>.
+Stops C<find> being called in one of its filters, C<errorenter> or C<noenter>.
 
 	my $count = 0;
-	find "ex", sub { find_stop if ++$count == 3; 1}  # -> 2
+	find "ex", sub { find_stop if ++$count == 3; 1};
+	$count # -> 3
 
 =head2 erase (@paths)
 
-Удаляет файлы и пустые каталоги. Возвращает C<@paths>. При ошибке ввода-вывода выбрасывает исключение.
+Removes files and empty directories. Returns C<@paths>. If there is an I/O error, it throws an exception.
 
 	eval { erase "/" }; $@  # ~> erase dir /: Device or resource busy
 	eval { erase "/dev/null" }; $@  # ~> erase file /dev/null: Permission denied
@@ -1008,9 +991,9 @@ B<Внимание!> Если C<errorenter> не указана, то все о�
 
 =item * C<unlink> + C<rmdir>.
 
-=item * L<File::Path> — C<remove_tree("dir")>.
+=item * L<File::Path> – C<remove_tree("dir")>.
 
-=item * L<File::Path::Tiny> — C<File::Path::Tiny::rm($path)>. Не выбрасывает исключений.
+=item * L<File::Path::Tiny> – C<File::Path::Tiny::rm($path)>. Does not throw exceptions.
 
 =item * L<Mojo::File> – C<< path($file)-E<gt>remove >>.
 
@@ -1018,23 +1001,23 @@ B<Внимание!> Если C<errorenter> не указана, то все о�
 
 =head2 replace (&sub, @files)
 
-Заменяет каждый файл на C<$_>, если его изменяет C<&sub>. Возвращает файлы, в которых не было замен.
+Replaces each file with C<$_> if it is modified by C<&sub>. Returns files that have no replacements.
 
-C<@files> может содержать массивы из двух элементов. Первый рассматривается как путь, а второй — как слой. Слой по умолчанию — C<:utf8>.
+C<@files> can contain arrays of two elements. The first is considered as a path, and the second as a layer. The default layer is C<:utf8>.
 
-C<&sub> вызывается для каждого файла из C<@files>. В неё передаются:
+C<&sub> is called for each file in C<@files>. It transmits:
 
 =over
 
-=item * C<$_> — содержимое файла.
+=item * C<$_> – file contents.
 
-=item * C<$a> — путь к файлу.
+=item * C<$a> – path to the file.
 
-=item * C<$b> — слой которым был считан файл и которым он будет записан.
+=item * C<$b> – the layer with which the file was read and with which it will be written.
 
 =back
 
-В примере ниже файл "replace.ex" считывается слоем C<:utf8>, а записывается слоем C<:raw> в функции C<replace>:
+In the example below, the file "replace.ex" is read by the C<:utf8> layer and written by the C<:raw> layer in the C<replace> function:
 
 	local $_ = "replace.ex";
 	lay "abc";
@@ -1057,17 +1040,17 @@ C<&sub> вызывается для каждого файла из C<@files>. В
 
 =head2 mkpath (;$path)
 
-Как B<mkdir -p>, но считает последнюю часть пути (после последней косой черты) именем файла и не создаёт её каталогом. Без параметра использует C<$_>.
+Like B<mkdir -p>, but considers the last part of the path (after the last slash) to be a filename and does not create it as a directory. Without a parameter, uses C<$_>.
 
 =over
 
-=item * Если C<$path> не указан, использует C<$_>.
+=item * If C<$path> is not specified, use C<$_>.
 
-=item * Если C<$path> является ссылкой на массив, тогда используется путь в качестве первого элемента и права в качестве второго элемента.
+=item * If C<$path> is an array reference, then the path is used as the first element and rights as the second element.
 
-=item * Права по умолчанию — C<0755>.
+=item * Default permissions are C<0755>.
 
-=item * Возвращает C<$path>.
+=item * Returns C<$path>.
 
 =back
 
@@ -1083,17 +1066,17 @@ C<&sub> вызывается для каждого файла из C<@files>. В
 
 =over
 
-=item * L<File::Path> — C<mkpath("dir1/dir2")>.
+=item * L<File::Path> – C<mkpath("dir1/dir2")>.
 
-=item * L<File::Path::Tiny> — C<File::Path::Tiny::mk($path)>. Не выбрасывает исключений.
+=item * L<File::Path::Tiny> – C<File::Path::Tiny::mk($path)>. Does not throw exceptions.
 
 =back
 
 =head2 mtime (;$path)
 
-Время модификации C<$path> в unixtime с дробной частью (из C<Time::HiRes::stat>). Без параметра использует C<$_>.
+Modification time of C<$path> in unixtime with fractional part (from C<Time::HiRes::stat>). Without a parameter, uses C<$_>.
 
-Выбрасывает исключение, если файл не существует или нет прав:
+Throws an exception if the file does not exist or does not have permission:
 
 	local $_ = "nofile";
 	eval { mtime }; $@  # ~> mtime nofile: No such file or directory
@@ -1104,23 +1087,23 @@ C<&sub> вызывается для каждого файла из C<@files>. В
 
 =over
 
-=item * C<-M> — C<-M "file.txt">, C<-M _> в днях от текущего времени.
+=item * C<-M> – C<-M "file.txt">, C<-M _> in days from the current time.
 
-=item * L<stat> — C<(stat "file.txt")[9]> в секундах (unixtime).
+=item * L<stat> – C<(stat "file.txt")[9]> in seconds (unixtime).
 
-=item * L<Time::HiRes> — C<(Time::HiRes::stat "file.txt")[9]> в секундах с дробной частью.
+=item * L<Time::HiRes> – C<(Time::HiRes::stat "file.txt")[9]> in seconds with fractional part.
 
-=item * L<Mojo::File> — C<< path($file)-E<gt>stat-E<gt>mtime >>.
+=item * L<Mojo::File> – C<< path($file)-E<gt>stat-E<gt>mtime >>.
 
 =back
 
 =head2 sta (;$path)
 
-Возвращает статистику о файле. Без параметра использует C<$_>.
+Returns statistics about the file. Without a parameter, uses C<$_>.
 
-Чтобы можно было использовать с другими файловыми функциями, может получать ссылку на массив из которого берёт первый элемент в качестве файлового пути.
+To be used with other file functions, it can receive a reference to an array from which it takes the first element as the file path.
 
-Выбрасывает исключение, если файл не существует или нет прав:
+Throws an exception if the file does not exist or does not have permission:
 
 	local $_ = "nofile";
 	eval { sta }; $@  # ~> sta nofile: No such file or directory
@@ -1132,47 +1115,47 @@ C<&sub> вызывается для каждого файла из C<@files>. В
 
 =over
 
-=item * L<Fcntl> – содержит константы для распознавания режима.
+=item * L<Fcntl> – contains constants for mode recognition.
 
-=item * L<BSD::stat> – дополнительно возвращает atime, ctime и mtime в наносекундах, флаги пользователя и номер генерации файла. Имеет ООП-интерфейс.
+=item * L<BSD::stat> - optionally returns atime, ctime and mtime in nanoseconds, user flags and file generation number. Has an OOP interface.
 
 =item * L<File::chmod> – C<chmod("o=,g-w","file1","file2")>, C<@newmodes = getchmod("+x","file1","file2")>.
 
-=item * L<File::stat> – предоставляет ООП-интерфейс к stat.
+=item * L<File::stat> – provides an OOP interface to stat.
 
-=item * L<File::Stat::Bits> – аналогичен L<Fcntl>.
+=item * L<File::Stat::Bits> - similar to L<Fcntl>.
 
-=item * L<File::stat::Extra> – расширяет L<File::stat> методами для получения информации о режиме, а так же перезагружает B<-X>, B<< <=> >>, B<cmp> и B<~~> операторы и стрингифицируется.
+=item * L<File::stat::Extra> – extends L<File::stat> methods to obtain information about the mode, and also reloads B<-X>, B<< <=> >>, B<cmp> and B<~~> operators and is stringified.
 
-=item * L<File::Stat::Ls> – возвращает режим в формате утилиты ls.
+=item * L<File::Stat::Ls> – returns the mode in the format of the ls utility.
 
-=item * L<File::Stat::Moose> – ООП интерфейс на Moose.
+=item * L<File::Stat::Moose> – OOP interface for Moose.
 
-=item * L<File::Stat::OO> – предоставляет ООП-интерфейс к stat. Может возвращать atime, ctime и mtime сразу в C<DateTime>.
+=item * L<File::Stat::OO> – provides an OOP interface to stat. Can return atime, ctime and mtime at once in C<DateTime>.
 
-=item * L<File::Stat::Trigger> – следилка за изменением атрибутов файла.
+=item * L<File::Stat::Trigger> – monitors changes in file attributes.
 
-=item * L<Linux::stat> – парсит /proc/stat и возвращает доп-информацию. Однако в других ОС не работает.
+=item * L<Linux::stat> – parses /proc/stat and returns additional information. However, it does not work on other OSes.
 
-=item * L<Stat::lsMode> – возвращает режим в формате утилиты ls.
+=item * L<Stat::lsMode> – returns the mode in the ls utility format.
 
-=item * L<VMS::Stat> – возвращает списки VMS ACL.
+=item * L<VMS::Stat> - returns VMS ACLs.
 
 =back
 
 =head2 path (;$path)
 
-Разбивает файловый путь на составляющие или собирает его из составляющих.
+Splits a file path into its components or assembles it from its components.
 
 =over
 
-=item * Если получает ссылку на массив, то воспринимает его первый элемент как путь.
+=item * If it receives a reference to an array, it treats its first element as a path.
 
-=item * Если получает ссылку на хэш, то собирает из него путь. Незнакомые ключи просто игнорирует. Набор ключей для каждой ФС – разный.
+=item * If it receives a link to a hash, it collects a path from it. Unfamiliar keys are simply ignored. The set of keys for each FS is different.
 
-=item * ФС берётся из системной переменной C<$^O>.
+=item * FS is taken from the system variable C<$^O>.
 
-=item * К файловой системе не обращается.
+=item * The file system is not accessed.
 
 =back
 
@@ -1413,29 +1396,29 @@ C<&sub> вызывается для каждого файла из C<@files>. В
 
 =back
 
-Модули для определения ОС, а значит и определения, какие в ОС файловые пути:
+Modules for determining the OS, and therefore determining what file paths are in the OS:
 
 =over
 
-=item * C<$^O> – суперглобальная переменная с названием текущей ОС.
+=item * C<$^O> – superglobal variable with the name of the current OS.
 
-=item * L<Devel::CheckOS>, L<Perl::OSType> – определяют ОС.
+=item * L<Devel::CheckOS>, L<Perl::OSType> – define the OS.
 
-=item * L<Devel::AssertOS> – запрещает использовать модуль вне указанных ОС.
+=item * L<Devel::AssertOS> – prohibits the use of the module outside the specified OS.
 
-=item * L<System::Info> – информация об ОС, её версии, дистрибутиве, CPU и хосте.
+=item * L<System::Info> – information about the OS, its version, distribution, CPU and host.
 
 =back
 
-Выделяют части файловых путей:
+Parts of file paths are distinguished:
 
 =over
 
-=item * L<File::Spec> – C<< ($volume, $directories, $file) = File::Spec-E<gt>splitpath($path) >>. Поддерживает только unix, win32, os/2, vms, cygwin и amigaos.
+=item * L<File::Spec> – C<< ($volume, $directories, $file) = File::Spec-E<gt>splitpath($path) >>. Only supports unix, win32, os/2, vms, cygwin and amigaos.
 
-=item * L<File::Spec::Functions> – C<($volume, $directories, $file) = splitpath($path)>.
+=item * L<File::Spec::Functions> - C<($volume, $directories, $file) = splitpath($path)>.
 
-=item * L<File::Spec::Mac> – входит в L<File::Spec>, но не определяется им, поэтому приходится использовать отдельно. Для mac os по 9-ю версию.
+=item * L<File::Spec::Mac> - included in L<File::Spec>, but not defined by it, so it has to be used separately. For mac os version 9.
 
 =item * L<File::Basename> – C<($name, $path, $suffix) = fileparse($fullname, @suffixlist)>.
 
@@ -1445,21 +1428,21 @@ C<&sub> вызывается для каждого файла из C<@files>. В
 
 =item * L<Mojo::File> – C<< path($file)-E<gt>extname >>.
 
-=item * L<Path::Util> – C<$filename = basename($dir)>.
+=item * L<Path::Util> - C<$filename = basename($dir)>.
 
-=item * L<Parse::Path> – C<< Parse::Path-E<gt>new(path =E<gt> 'gophers[0].food.count', style =E<gt> 'DZIL')-E<gt>push("chunk") >>. Работает с путями как с массивами (C<push>, C<pop>, C<shift>, C<splice>). Так же перегружает операторы сравнения. У него есть стили: C<DZIL>, C<File::Unix>, C<File::Win32>, C<PerlClass> и C<PerlClassUTF8>.
+=item * L<Parse::Path> – C<< Parse::Path-E<gt>new(path =E<gt> 'gophers[0].food.count', style =E<gt> 'DZIL')-E<gt>push("chunk") >>. Works with paths as arrays (C<push>, C<pop>, C<shift>, C<splice>). It also overloads comparison operators. It has styles: C<DZIL>, C<File::Unix>, C<File::Win32>, C<PerlClass> and C<PerlClassUTF8>.
 
 =back
 
 =head2 transpath ($path?, $from, $to)
 
-Переводит путь из формата одной ОС в другую.
+Converts a path from one OS format to another.
 
-Если C<$path> не указан, то используется C<$_>.
+If C<$path> is not specified, C<$_> is used.
 
-Перечень поддерживаемых ОС смотрите в примерах подпрограммы C<path> чуть выше или так: C<keys %Aion::Fs::FS>.
+For a list of supported operating systems, see the examples of the C<path> subroutine just above or like this: C<keys %Aion::Fs::FS>.
 
-Названия ОС – регистронезависимы.
+OS names are case insensitive.
 
 	local $_ = ">x>y>z.doc.zip";
 	transpath "vos", "unix"       # \> /x/y/z.doc.zip
@@ -1468,14 +1451,14 @@ C<&sub> вызывается для каждого файла из C<@files>. В
 
 =head2 splitdir (;$dir)
 
-Разбивает директорию на составляющие. Директорию следует вначале получить из C<< path-E<gt>{dir} >>.
+Splits a directory into components. The directory should first be obtained from C<< path-E<gt>{dir} >>.
 
 	local $^O = "unix";
 	[ splitdir "/x/" ]    # --> ["", "x", ""]
 
 =head2 joindir (;$dirparts)
 
-Объединяет директорию из составляющих. Затем полученную директорию следует включить в C<< path +{dir =E<gt> $dir} >>.
+Combines a directory from its components. The resulting directory should then be included in C<< path +{dir =E<gt> $dir} >>.
 
 	local $^O = "unix";
 	joindir qw/x y z/    # => x/y/z
@@ -1484,14 +1467,14 @@ C<&sub> вызывается для каждого файла из C<@files>. В
 
 =head2 splitext (;$ext)
 
-Разбивает расширение на составляющие. Расширение следует вначале получить из C<< path-E<gt>{ext} >>.
+Breaks the extension into its components. The extension should first be obtained from C<< path-E<gt>{ext} >>.
 
 	local $^O = "unix";
 	[ splitext ".x." ]    # --> ["", "x", ""]
 
 =head2 joinext (;$extparts)
 
-Объединяет расширение из составляющих. Затем полученное расширение следует включить в C<< path +{ext =E<gt> $ext} >>.
+Combines an extension from its components. The resulting extension should then be included in C<< path +{ext =E<gt> $ext} >>.
 
 	local $^O = "unix";
 	joinext qw/x y z/    # => x.y.z
@@ -1500,15 +1483,15 @@ C<&sub> вызывается для каждого файла из C<@files>. В
 
 =head2 include (;$pkg)
 
-Подключает C<$pkg> (если он ещё не был подключён через C<use> или C<require>) и возвращает его. Без параметра использует C<$_>.
+Connects C<$pkg> (if it has not already been connected via C<use> or C<require>) and returns it. Without a parameter, uses C<$_>.
 
-Файл lib/A.pm:
+lib/A.pm file:
 
 	package A;
 	sub new { bless {@_}, shift }
 	1;
 
-Файл lib/N.pm:
+lib/N.pm file:
 
 	package N;
 	sub ex { 123 }
@@ -1523,13 +1506,13 @@ C<&sub> вызывается для каждого файла из C<@files>. В
 
 =head2 catonce (;$file)
 
-Считывает файл в первый раз. Любая последующая попытка считать этот файл возвращает C<undef>. Используется для вставки модулей js и css в результирующий файл. Без параметра использует C<$_>.
+Reads the file for the first time. Any subsequent attempt to read this file returns C<undef>. Used to insert js and css modules into the resulting file. Without a parameter, uses C<$_>.
 
 =over
 
-=item * C<$file> может содержать массивы из двух элементов. Первый рассматривается как путь, а второй — как слой. Слой по умолчанию — C<:utf8>.
+=item * C<$file> can contain arrays of two elements. The first is considered as a path, and the second as a layer. The default layer is C<:utf8>.
 
-=item * Если C<$file> не указан – использует C<$_>.
+=item * If C<$file> is not specified, use C<$_>.
 
 =back
 
@@ -1542,7 +1525,7 @@ C<&sub> вызывается для каждого файла из C<@files>. В
 
 =head2 wildcard (;$wildcard)
 
-Переводит файловую маску в регулярное выражение. Без параметра использует C<$_>.
+Converts a file mask to a regular expression. Without a parameter, uses C<$_>.
 
 =over
 
@@ -1560,14 +1543,14 @@ C<&sub> вызывается для каждого файла из C<@files>. В
 
 =item * C<,> - C<|>
 
-=item * Остальные символы экранируются с помощью C<quotemeta>.
+=item * Other characters are escaped using C<quotemeta>.
 
 =back
 
 	wildcard "*.{pm,pl}"  # \> (?^usn:^.*?\.(pm|pl)$)
 	wildcard "?_??_**"  # \> (?^usn:^._[^/]_[^/]*?$)
 
-Используется в фильтрах функции C<find>.
+Used in filters of the C<find> function.
 
 =head3 See also
 
@@ -1577,15 +1560,15 @@ C<&sub> вызывается для каждого файла из C<@files>. В
 
 =item * L<String::Wildcard::Bash>.
 
-=item * L<Text::Glob> — C<glob_to_regex("*.{pm,pl}")>.
+=item * L<Text::Glob> – C<glob_to_regex("*.{pm,pl}")>.
 
 =back
 
 =head2 goto_editor ($path, $line)
 
-Открывает файл в редакторе из .config на указанной строке. По умолчанию использует C<vscodium %p:%l>.
+Opens the file in the editor from .config at the specified line. Defaults to C<vscodium %p:%l>.
 
-Файл .config.pm:
+.config.pm file:
 
 	package config;
 	
@@ -1604,14 +1587,14 @@ C<&sub> вызывается для каждого файла из C<@files>. В
 
 =head2 from_pkg (;$pkg)
 
-Переводит пакет в путь ФС. Без параметра использует C<$_>.
+Transfers the packet to the FS path. Without a parameter, uses C<$_>.
 
 	from_pkg "Aion::Fs"  # => Aion/Fs.pm
 	[map from_pkg, "Aion::Fs", "A::B::C"]  # --> ["Aion/Fs.pm", "A/B/C.pm"]
 
 =head2 to_pkg (;$path)
 
-Переводит путь из ФС в пакет. Без параметра использует C<$_>.
+Translates the path from the FS to the package. Without a parameter, uses C<$_>.
 
 	to_pkg "Aion/Fs.pm"  # => Aion::Fs
 	[map to_pkg, "Aion/Fs.md", "A/B/C.md"]  # --> ["Aion::Fs", "A::B::C"]

@@ -56,3 +56,4 @@ t/40_unsprout_hydrogens.t
 t/41_unusual_valence.t
 t/42_tetrahedral_chirality.t
 t/43_roundtrip.t
+t/44_report_unnecessary_dot_usage.t

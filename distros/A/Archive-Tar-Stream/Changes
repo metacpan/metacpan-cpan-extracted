@@ -1,8 +1,19 @@
 Revision history for Archive-Tar-Stream
 
-0.01    Thu Oct  6 20:01:32 CEST 2011
-        - Packaged up initial ME::TarStream code from FastMail
-        - Added basic tests and documentation
+0.05    Wed Nov 19 18:18:44 EST 2025
+        - Fix a thinko in the zero byte file copying (the test just happened
+          to not catch it)
+
+0.04    Wed Nov 19 13:30:14 EST 2025
+        - Fix the copying of zero-byte files and links
+
+0.03    Thu Nov 13 10:48:01 EST 2025
+        - Copy all the changes from Fastmail to copy data in much
+          larger blocks
 
 0.02    Sat Jan  4 14:59:10 EST 2014
         - [rt.cpan.org #91796] added missing typeflag to AddLink
+
+0.01    Thu Oct  6 20:01:32 CEST 2011
+        - Packaged up initial ME::TarStream code from FastMail
+        - Added basic tests and documentation

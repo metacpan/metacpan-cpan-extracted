@@ -1,5 +1,9 @@
 Revision history for OpenAPI-Modern
 
+0.106     2025-11-19 20:28:01Z
+          - fix invalid restriction on trailing '/' in server urls (added in
+            v0.086)
+
 0.105     2025-11-03 20:04:48Z
           - improved specification compliance when matching URIs to path
             patterns and server url patterns

@@ -32,6 +32,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Scalar::Util" : "1.26",
             "perl" : "5.010"
          }
       },
@@ -44,9 +45,11 @@
    "release_status" : "stable",
    "resources" : {
       "repository" : {
-         "type" : "git"
+         "type" : "git",
+         "url" : "https://github.com/scottchiefbaker/perl-Dump-Krumo.git",
+         "web" : "https://github.com/scottchiefbaker/perl-Dump-Krumo/"
       }
    },
-   "version" : "v0.1.2",
+   "version" : "v0.1.4",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

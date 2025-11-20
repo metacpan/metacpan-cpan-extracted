@@ -1,5 +1,9 @@
 Release history for Tie-Hash-MultiValueOpts
 
+1.0.3    Thu Nov 20 08:18:30 AM CET 2025
+         - Fix dependencies setup
+         - Improve documentation
+
 1.0.2    Fri Nov 14 08:00:08 AM CET 2025
          - Improve tests
 

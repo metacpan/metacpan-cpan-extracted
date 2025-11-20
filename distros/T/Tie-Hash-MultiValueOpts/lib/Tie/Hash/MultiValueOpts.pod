@@ -17,7 +17,7 @@ Tie::Hash::MultiValueOpts - Store multiple values per option
 
 The L<Getopt::Std> core module exports the C<getopts()> function that processes
 single-character options. If we use the two-argument form of C<getopts()>,
-the second argument is a HASH reference C<\%opts> that stores the processing
+the second parameter C<\%opts> is a hash reference that stores the processing
 result. Each hash key refers to a provided option and the corresponding hash
 value refers to the option-argument (or C<1> if it is a flag).
 

@@ -15,7 +15,8 @@ BEGIN
 # Testing minimum, and maximum value for integers
 my $js = JSON::Schema::Validate->new({
     type => 'object',
-    properties => {
+    properties => 
+    {
         mynumber => { type => 'integer', minimum => 1, maximum=>4 }
     }
 });

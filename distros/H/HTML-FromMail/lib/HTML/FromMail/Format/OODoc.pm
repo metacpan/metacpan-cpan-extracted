@@ -1,14 +1,21 @@
-# Copyrights 2003-2018 by [Mark Overmeer <markov@cpan.org>].
-#  For other contributors see ChangeLog.
-# See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.02.
-# This code is part of distribution HTML-FromMail.  Meta-POD processed with
-# OODoc into POD and HTML manual-pages.  See README.md
-# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
+# This code is part of Perl distribution HTML-FromMail version 3.00.
+# The POD got stripped from this file by OODoc version 3.05.
+# For contributors see file ChangeLog.
 
-package HTML::FromMail::Format::OODoc;
-use vars '$VERSION';
-$VERSION = '0.12';
+# This software is copyright (c) 2003-2025 by Mark Overmeer.
+
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
+
+#oodist: *** DO NOT USE THIS VERSION FOR PRODUCTION ***
+#oodist: This file contains OODoc-style documentation which will get stripped
+#oodist: during its release in the distribution.  You can use this file for
+#oodist: testing, however the code of this development version may be broken!
+
+package HTML::FromMail::Format::OODoc;{
+our $VERSION = '3.00';
+}
 
 use base 'HTML::FromMail::Format';
 
@@ -18,78 +25,78 @@ use warnings;
 use Carp;
 use OODoc::Template;
 
+#--------------------
 
 sub init($)
-{   my ($self, $args) = @_;
-
-    $self->SUPER::init($args) or return;
-    $self;
+{	my ($self, $args) = @_;
+	$self->SUPER::init($args) or return;
+	$self;
 }
 
 sub export($@)
-{   my ($self, %args) = @_;
+{	my ($self, %args) = @_;
 
-    my $oodoc  = $self->{HFFM_oodoc} = OODoc::Template->new;
+	my $oodoc  = $self->{HFFM_oodoc} = OODoc::Template->new;
 
-    my $output = $args{output};
-    $self->log(ERROR => "Cannot write to $output: $!"), return
-       unless open my($out), ">", $output;
+	my $output = $args{output};
+	open my($out), ">", $output
+		or $self->log(ERROR => "Cannot write to $output: $!"), return;
 
-    my $input  = $args{input};
-    $self->log(ERROR => "Cannot open template file $input: $!"), return
-       unless open my($in), "<", $input;
+	my $input  = $args{input};
+	open my($in), "<", $input
+		or $self->log(ERROR => "Cannot open template file $input: $!"), return;
 
-    my $template = join '', <$in>;
-    close $in;
+	my $template = join '', <$in>;
+	close $in;
 
-    my %defaults =
-      ( DYNAMIC => sub { $self->expand(\%args, @_) }
-      );
+	my %defaults = (
+		DYNAMIC => sub { $self->expand(\%args, @_) },
+	);
 
-    my $oldout   = select $out;
-    $oodoc->parse($template, \%defaults);
-    select $oldout;
+	my $oldout   = select $out;
+	$oodoc->parse($template, \%defaults);
+	select $oldout;
 
-    close $out;
-    $self;
+	close $out;
+	$self;
 }
 
 
-sub oodoc() { shift->{HFFM_oodoc} }
+sub oodoc() { $_[0]->{HFFM_oodoc} }
 
 
 sub expand($$$)
-{   my ($self, $args, $tag, $attrs, $textref) = @_;
+{	my ($self, $args, $tag, $attrs, $textref) = @_;
 
-    # Lookup the method to be called.
-    my $method = 'html' . ucfirst($tag);
-    my $prod   = $args->{producer};
+	# Lookup the method to be called.
+	my $method = 'html' . ucfirst($tag);
+	my $prod   = $args->{producer};
 
-    return undef unless $prod->can($method);
+	$prod->can($method) or return undef;
 
-    my %info  = (%$args, %$attrs, textref => $textref);
-    $prod->$method($args->{object}, \%info);
+	my %info  = (%$args, %$attrs, textref => $textref);
+	$prod->$method($args->{object}, \%info);
 }
 
 sub containerText($)
-{   my ($self, $args) = @_;
-    my $textref = $args->{textref};
-    defined $textref ? $$textref : undef;
+{	my ($self, $args) = @_;
+	my $textref = $args->{textref};
+	defined $textref ? $$textref : undef;
 }
 
 sub processText($$)
-{   my ($self, $text, $args) = @_;
-    $self->oodoc->parse($text, {});
+{	my ($self, $text, $args) = @_;
+	$self->oodoc->parse($text, {});
 }
 
 sub lookup($$)
-{   my ($self, $what, $args) = @_;
-    $self->oodoc->valueFor($what);
+{	my ($self, $what, $args) = @_;
+	$self->oodoc->valueFor($what);
 }
 
 sub onFinalToken($)
-{   my ($self, $args) = @_;
-    not (defined $args->{textref} && defined ${$args->{textref}});
+{	my ($self, $args) = @_;
+	not (defined $args->{textref} && defined ${$args->{textref}});
 }
 
 1;

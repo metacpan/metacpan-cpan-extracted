@@ -25,7 +25,7 @@
 #
 ################################################################
 
-our $VERSION='1.0000831';
+our $VERSION='1.0000832';
 
 #print `env`,"\n\n\n";
 
@@ -139,6 +139,7 @@ END
 our $aws;
 our %amazon;
 $ENV{LOADED_MODULES}||='';
+$ENV{PERL_MM_USE_DEFAULT}=1;
 BEGIN { # FullAuto© MICROSOFT WINDOWS INSTALLER
 
    # September 1, 2024 NOTE:  The Windows installer has NOT been
@@ -292,14 +293,21 @@ END
          my $check=`perl -MCPAN -e 1 2>&1`;
          if (-1<index $check,"Can't locate CPAN") {
             if ($aws) {
-               system('sudo dnf -y install cpan');
+               system('sudo dnf -y install cpan perl-HTTP-Date.noarch');
                my $cmd='mkdir -pv '.(getpwuid $>)[7].'/.cpan/build';
                `$cmd` || die "Cannot $cmd $!";
+               $ENV{PERL_MM_USE_DEFAULT}=1;
             } else {
                my $die="Can't locate CPAN.pm in \@INC ".
                        "(you may need to install the CPAN module)\n$!";
                die $die;
             }
+         } elsif (-e 'MANIFEST.SKIP') {
+            eval {
+               local $SIG{__DIE__}; # No sigdie handler
+               require CPAN;
+               CPAN::Shell->reload('index');
+            };
          } return 1;
       }
    };
@@ -1830,6 +1838,18 @@ sub fa_install_mod {
          );
          $minicpan->mirror_file(
             "authors/id/$let/$lett/$distribution");
+         $minicpan->clean_file(
+            "dependencies/CPAN/authors/01mailrc.txt.gz");
+         $minicpan->mirror_file(
+            "authors/01mailrc.txt.gz");
+         $minicpan->clean_file(
+            "dependencies/CPAN/modules/02packages.details.txt.gz");
+         $minicpan->mirror_file(
+            "modules/02packages.details.txt.gz");
+         $minicpan->clean_file(
+            "dependencies/CPAN/modules/03modlist.data.gz");
+         $minicpan->mirror_file(
+            "modules/03modlist.data.gz");
       }
    }
    my $mod_info='';my $instfile='';my $cpanfil='';
@@ -2071,7 +2091,20 @@ END
                      pop @ARGV;pop @ARGV;
                   }
                }
-               my $dir=&fa_find_latest('Net-SSLeay');my $nano_flag=0;
+               my $dir='';
+               if (-e "dependencies/BerkeleyDB" && !(grep {
+                     /(?:use[-_]?)?internet|online|connect_to_internet_ok/i
+                     } @ARGV)) {
+                  my ($version,$cpanfil,$instfile,$mod_info)=cpan_modules('Net::SSLeay');
+                  my $cpanfile=$cpanfil;
+                  $cpanfil=~s/^.*\/(.*)$/$1/;
+                  $cpanfil=~s/^(.*)-.*$/$1/;
+                  $cpanfil=~s/-/::/;
+                  $dir||=&fa_find_latest($cpanfil,$cpanfile);
+               } else {
+                  $dir=&fa_find_latest('Net-SSLeay');
+               }
+               my $nano_flag=0;
                fa_system("(cd \"$dir\";echo n | $^X Makefile.PL) 2>&1");
                if (exists $amazon{instance_type} && $amazon{instance_type}=~/micro/) {
                   my $ulimit=`ulimit -s`;
@@ -2626,7 +2659,6 @@ if (($^O ne 'MSWin32') && ($^O ne 'MSWin64') && !grep { /^GETBERK$/ } @ARGV) {
          if (-e "dependencies/BerkeleyDB" && !(grep {
                /(?:use[-_]?)?internet|online|connect_to_internet_ok/i
                } @ARGV)) {
-
             my ($version,$cpanfil,$instfile,$mod_info)=cpan_modules('Data::Dump::Streamer');
             my $cpanfile=$cpanfil;
             $cpanfil=~s/^.*\/(.*)$/$1/;

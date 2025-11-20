@@ -6,6 +6,7 @@ use Test::More;
 use Dump::Krumo;
 
 $Dump::Krumo::return_string = 1;
+$Dump::Krumo::use_color     = 0;
 
 is(kx(undef)      , 'undef'          );
 is(kx(1.5)        , '1.5'            );

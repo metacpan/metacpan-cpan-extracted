@@ -19,16 +19,16 @@ THIS MODULE IS UNDER CONSTRUCTION.  However, a lot of things already
 work.  Best take a look at the examples directory.
 
 Extends L<"DESCRIPTION" in HTML::FromMail::Page|HTML::FromMail::Page/"DESCRIPTION">.
- 
+
 =head1 METHODS
 
 Extends L<"METHODS" in HTML::FromMail::Page|HTML::FromMail::Page/"METHODS">.
- 
+
 =over 4
 
-=item $obj-E<gt>B<createAttachment>(MESSAGE, PART, ARGS)
+=item $obj-E<gt>B<createAttachment>($message, $part, \%options)
 
-Create an attachment file, and return a hash with information about
+Create an attachment file, and return a HASH with information about
 that file.  Returns C<undef> if creation fails.
 
 This method is used by L<htmlAttach()|HTML::FromMail::Message/"METHODS"> and L<htmlPreview()|HTML::FromMail::Message/"METHODS"> to create
@@ -40,17 +40,16 @@ tags for the template.
 
 =over 2
 
-=item outdir => DIRECTORY
+=item outdir => $directory
 
-The name of the directory where the external file will be produced
-must be part of the ARGS hash.
+The name of the C<$directory> where the external file will be produced.
 
 =back
 
-=item $obj-E<gt>B<disposition>(MESSAGE, PART, ARGS)
+=item $obj-E<gt>B<disposition>($message, $part, \%options)
 
 Returns a string, which is either C<inline>, C<attach>, or C<preview>,
-which indicates how the part of the message should be formatted.
+which indicates how the C<$part> of the C<$message> should be formatted.
 This can be changed with setting C<disposition>.
 
 =item $obj-E<gt>B<fields>()
@@ -61,30 +60,30 @@ Returns the field text producing object.
 
 Returns the header text producting object.
 
-=item $obj-E<gt>B<htmlAddresses>(MESSAGE, ARGS)
+=item $obj-E<gt>B<htmlAddresses>($message, \%options)
 
 Produce data about addresses which are in the field.  This method uses
 L<HTML::FromMail::Field::htmlAddresses()|HTML::FromMail::Field/"METHODS"> for that.
 
-=item $obj-E<gt>B<htmlAttach>()
+=item $obj-E<gt>B<htmlAttach>($message, \%options)
 
 The C<attach> container defines C<url>, C<size> and C<type>
 tags for the template.
 
-example: using L<HTML::FromMail::Format::Magic|HTML::FromMail::Format::Magic>
+» example: using HTML::FromMail::Format::Magic
 
   <!--{message}-->
     <!--{attach}-->
     <!--{/attach}-->
   <!--{/message}-->
 
-=item $obj-E<gt>B<htmlBody>(MESSAGE, ARGS)
+=item $obj-E<gt>B<htmlBody>($message, \%options)
 
 Produce the body of a field.  This tag can only be used inside a field
 container. See L<HTML::FromMail::Field::htmlBody()|HTML::FromMail::Field/"METHODS"> for the use and
 options.
 
-=item $obj-E<gt>B<htmlField>(MESSAGE, ARGS)
+=item $obj-E<gt>B<htmlField>($message, \%options)
 
 Returns the field definition for the currently active message part. When
 the formatter sees this is a final token, then only the body of the
@@ -93,25 +92,25 @@ are accepted as well).  Otherwise, the information about the field is
 captured to be used later.
 
  -Option--Default
-  decode  <true> if possible
-  from    PART
+  decode  true if possible
+  from    'PART'
   name    <required>
 
 =over 2
 
 =item decode => BOOLEAN
 
-=item from => PART|PARENT|MESSAGE
+=item from => 'PART'|'PARENT'|$message
 
-The source of this field: the currently active PART (which may be the
-main message), the PARENT of the active part (defaults to the message),
-or the main MESSAGE itself.
+The source of this field: the currently active 'PART' (which may be the
+main message), the 'PARENT' of the active part (defaults to the message),
+or the main C<$message> itself.
 
 =item name => STRING
 
 =back
 
-example: using L<HTML::FromMail::Format::Magic|HTML::FromMail::Format::Magic>
+» example: using HTML::FromMail::Format::Magic
 
   <!--{field name => To, content => REFOLD, wrap => 20}-->
 
@@ -120,16 +119,16 @@ example: using L<HTML::FromMail::Format::Magic|HTML::FromMail::Format::Magic>
      <!--{body wrap => 30}-->
   <!--{/field}-->
 
-=item $obj-E<gt>B<htmlForeachPart>(MESSAGE, ARGS)
+=item $obj-E<gt>B<htmlForeachPart>($message|$part, \%options)
 
-Produces html for the parts of a multipart mesasge body.  Each part
+Produces html for the parts of a multipart body.  Each C<$part>
 may be a multipart too.  For each part, the C<message> container
 code is applied recursively.
 
 This container defines a C<part_number>, and enables the use of the
 C<part> tag.
 
-example: using L<HTML::FromMail::Format::Magic|HTML::FromMail::Format::Magic>
+» example: using HTML::FromMail::Format::Magic
 
   <!--{message}-->
     <!--{multipart}-->
@@ -143,54 +142,56 @@ example: using L<HTML::FromMail::Format::Magic|HTML::FromMail::Format::Magic>
     <!--{/multipart}-->
   <!--{message}-->
 
-=item $obj-E<gt>B<htmlHead>(MESSAGE, ARGS)
+=item $obj-E<gt>B<htmlHead>($message, \%options)
 
 Defines the fields of a header.  The options are provided by
 L<HTML::FromMail::Head::fields()|HTML::FromMail::Head/"METHODS">.
 
-example: using L<HTML::FromMail::Format::Magic|HTML::FromMail::Format::Magic>
+» example: using HTML::FromMail::Format::Magic
 
- # simple
- <pre><!--{head}--></pre>
+  # simple
+  <pre><!--{head}--></pre>
 
- # complex
- <table>
- <!--{head remove_spam_groups => 0}-->
-   <tr><td><!--{name}--></td>
-       <td><!--{body}--></td></tr>
- <!--{/head}-->
- </table>
+  # complex
+  <table>
+  <!--{head remove_spam_groups => 0}-->
+    <tr><td><!--{name}--></td>
+        <td><!--{body}--></td></tr>
+  <!--{/head}-->
+  </table>
 
-=item $obj-E<gt>B<htmlInline>()
+=item $obj-E<gt>B<htmlInline>($message, \%options)
+
+Z<>
 
  -Option--Default
   type    ''
 
 =over 2
 
-=item type => MIME-TYPE
+=item type => $mime_type
 
-Selects the MIME types which are handled by this singlepart block.  You can
-specify the types as defined by MIME::Type subroutine equal.
+Selects the C<$mime_type> which is handled by this singlepart block.  Type
+comparison uses MIME::Type, so is smart.
 
 =back
 
-example: using L<HTML::FromMail::Format::Magic|HTML::FromMail::Format::Magic>
+» example: using HTML::FromMail::Format::Magic
 
- <!--{message}-->
-    <!--{inline type => text/html}-->
-       <!--{html}-->
-    <!--{/inline}-->
- <!--{/message}-->
+  <!--{message}-->
+     <!--{inline type => text/html}-->
+        <!--{html}-->
+     <!--{/inline}-->
+  <!--{/message}-->
 
-=item $obj-E<gt>B<htmlMessage>(MESSAGE, ARGS)
+=item $obj-E<gt>B<htmlMessage>($message, \%options)
 
-Encapsulated code which is producing the message, which may
+Encapsulated code which is producing the C<$message>, which may
 be a multipart.  You have to defined the message block when
 you use the part (see L<htmlPart()|HTML::FromMail::Message/"METHODS">) tag.  If you do not use
 that, you do not need this.
 
-example: using L<HTML::FromMail::Format::Magic|HTML::FromMail::Format::Magic>
+» example: using HTML::FromMail::Format::Magic
 
   <!--{message}-->
     <!--{inline}-->This is an inlined singlepart<!--{/inline}-->
@@ -200,38 +201,40 @@ example: using L<HTML::FromMail::Format::Magic|HTML::FromMail::Format::Magic>
     <!--{nested}-->message/rfc822 encapsulated<!--{/nested}-->
   <!--{/message}-->
 
-=item $obj-E<gt>B<htmlMultipart>(MESSAGE, ARGS)
+=item $obj-E<gt>B<htmlMultipart>($message, \%options)
 
-Encapsulates text to be produced when the message(-part) is a
+Encapsulates text to be produced when the C<$message>(-part) is a
 multipart.
 
-=item $obj-E<gt>B<htmlName>(MESSAGE, ARGS)
+=item $obj-E<gt>B<htmlName>($message, \%options)
 
 Produce the name of a field.  This tag can only be used inside a field
 container. See L<HTML::FromMail::Field::htmlName()|HTML::FromMail::Field/"METHODS"> for the use and
 options.
 
-=item $obj-E<gt>B<htmlNested>(MESSAGE, ARGS)
+=item $obj-E<gt>B<htmlNested>($message, \%options)
 
-Contains text to be produced when the message(-part) is a
+Contains text to be produced when the C<$message>(-part) is a
 nested message; encapsulated in a message/rfc822.
 
-=item $obj-E<gt>B<htmlPart>(MESSAGE, ARGS)
+=item $obj-E<gt>B<htmlPart>($message|$part, \%options)
 
-Apply the C<message> container of the current part on its data.  See example
+Apply the C<$message> container of the current C<$part> on its data.  See example
 in L<htmlForeachPart()|HTML::FromMail::Message/"METHODS">.
 
-=item $obj-E<gt>B<htmlPreview>()
+=item $obj-E<gt>B<htmlPreview>($message, \%options)
+
+Z<>
 
  -Option--Default
   type    ''
 
 =over 2
 
-=item type => MIME-TYPE
+=item type => $mime_type
 
-Selects the MIME types which are handled by this singlepart block.  You can
-specify the types as defined by MIME::Type subroutine equal.
+Selects the C<$mime_type> which are handled by this singlepart block.  You can
+specify the types as defined by MIME::Type subroutine equals.
 
 The C<preview> container defines C<url>, C<size> and C<type>
 tags for the template, which describe the attachment file.  Besides,
@@ -244,7 +247,7 @@ C<smallwidth>, C<smallheight>, C<width>, and C<height>.
 
 =back
 
-example: using L<HTML::FromMail::Format::Magic|HTML::FromMail::Format::Magic>
+» example: using HTML::FromMail::Format::Magic
 
   <!--{message}-->
     <!--{preview}-->
@@ -262,33 +265,35 @@ example: using L<HTML::FromMail::Format::Magic|HTML::FromMail::Format::Magic>
     <!--{/preview}-->
   <!--{/message}-->
 
-=item $obj-E<gt>B<htmlRawText>(MESSAGE, ARGS)
+=item $obj-E<gt>B<htmlRawText>($message, \%options)
 
 Returns the plain text of the body.
 
-=item $obj-E<gt>B<htmlSubject>(MESSAGE, ARGS)
+=item $obj-E<gt>B<htmlSubject>($message, \%options)
 
-Get the subject field from the message's header, just a short-cut
+Get the subject field from the C<$message>'s header, just a short-cut
 for specifying L<htmlField(name)|HTML::FromMail::Message/"METHODS"> with C<subject>.
 
-example: using L<HTML::FromMail::Format::Magic|HTML::FromMail::Format::Magic>
+» example: using HTML::FromMail::Format::Magic
 
   <!--{subject}-->                # message subject
   <!--{field name => subject}-->  # part's subject
   <!--{field name => subject, from => MESSAGE}-->  # message subject
 
-=item $obj-E<gt>B<htmlifier>(MIME-TYPE)
+=item $obj-E<gt>B<htmlifier>($mime_type)
 
 Returns the code reference for a routine which can create html
-for the objects of the specified MIME-TYPE.  The TYPE may be a (smartly
-overloaded) L<MIME::Type> object. The behaviour can be changed with
+for the objects of the specified C<$mime_type>.  The type may be a (smartly
+overloaded) MIME::Type object. The behaviour can be changed with
 the C<htmlifiers> setting.
 
-=item $obj-E<gt>B<lookup>(LABEL, ARGS)
+=item $obj-E<gt>B<lookup>($label, \%options)
 
 Inherited, see L<HTML::FromMail::Page/"METHODS">
 
-=item HTML::FromMail::Message-E<gt>B<new>(OPTIONS)
+=item $class-E<gt>B<new>(%options)
+
+Z<>
 
  -Option  --Defined in            --Default
   settings  HTML::FromMail::Object  {}
@@ -296,17 +301,17 @@ Inherited, see L<HTML::FromMail::Page/"METHODS">
 
 =over 2
 
-=item settings => HASH-OF-HASHES
+=item settings => \%map
 
 =item topic => STRING
 
 =back
 
-=item $obj-E<gt>B<previewer>(MIME-TYPE)
+=item $obj-E<gt>B<previewer>($mime_type)
 
 Returns the code reference for a routine which can create a preview
-for the objects of the specified MIME-TYPE.  The TYPE may be a (smartly
-overloaded) L<MIME::Type> object.  The behaviour can be changed with
+for the objects of the specified C<$mime_type>.  The type may be a (smartly
+overloaded) MIME::Type object.  The behaviour can be changed with
 the C<previewers> setting.
 
 =back
@@ -331,23 +336,20 @@ exception will be made... for instance, binary messages will never be
 inlined.  You can create your own code reference to change the behavior
 of the default algorithm.
 
-B<. Example: of own disposition rules>
+=head4 » Example: of own disposition rules
 
- my $f = HTML::FromMail->new
-  ( settings =>
-      { message => { disposition => \&my_disposer }
-      }
+  my $f = HTML::FromMail->new(
+     settings => {
+        message => { disposition => \&my_disposer },
+     },
   );
 
- sub my_disposer($$$$$)
- {   my ($obj, $message, $part, $suggestion, $args) = @_;
+  sub my_disposer($$$$$)
+  {   my ($obj, $message, $part, $suggestion, $args) = @_;
+      $suggestion eq 'inline' && $part->size > 10_000 ? 'attach' : $suggestion;
+  }
 
-     return 'attach'
-        if $suggestion eq 'inline' && $part->size > 10_000;
-     $suggestion;
- }
-
-=head3 previewers ARRAY-OF-PAIRS
+=head3 previewers \@pairs
 
 For some kinds of message parts, previews can be produced.  This ordered
 list of PAIRS contains mime type with code reference combinations, each
@@ -359,7 +361,7 @@ Method L<previewer()|HTML::FromMail::Message/"METHODS"> is called when a preview
 type has to be looked-up.  The default previewers are defined (and
 implemented) in HTML::FromMail::Default::Previewers.
 
-=head3 htmlifiers ARRAY-OF-PAIRS
+=head3 htmlifiers \@pairs
 
 Some kinds of information can be translated into HTML.  When a data
 type defines such a translation, it may be inlined (see L<htmlInline()|HTML::FromMail::Message/"METHODS">),
@@ -370,59 +372,76 @@ Method L<htmlifier()|HTML::FromMail::Message/"METHODS"> is called when a htmlifi
 type has to be looked-up.  The default htmlifiers are defined (and
 implemented) in HTML::FromMail::Default::HTMLifiers.
 
-B<. Example: use own converters>
+=head4 » Example: use own converters
 
- my @prevs = ( 'text/postscript' => \&prepost
-             , 'image'           => \&imagemagick
-             );
- my @html  = ( 'text/html'       => \&strip_html
-             , 'text/plain'      => \&plain2html
-             );
-
- my $f = HTML::FromMail->new
-  ( settings =>
-      { message => { previewers  => \@prevs
-                   , htmlifiers  => \@html
-                   , disposition => \&my_disposer
-                   }
-      }
+  my @prevs = (
+     'text/postscript' => \&prepost,
+     'image'           => \&imagemagick,
   );
 
- sub prepost($$$$$)
- {   my ($page, $message, $part, $attach, $args) = @_;
-     # args contains extra info from template
-     # returns a hash of info which is used in a
-     # preview block (see htmlPreview())
- }
+  my @html  = (
+     'text/html'       => \&strip_html,
+     'text/plain'      => \&plain2html,
+  );
+
+  my $f = HTML::FromMail->new(
+      settings => {
+         message => {
+            previewers  => \@prevs,
+            htmlifiers  => \@html,
+            disposition => \&my_disposer,
+         },
+      },
+   );
+
+  sub prepost($$$$$)
+  {   my ($page, $message, $part, $attach, $args) = @_;
+      # args contains extra info from template
+      # returns a hash of info which is used in a
+      # preview block (see htmlPreview())
+  }
 
 =head1 DIAGNOSTICS
 
 =over 4
 
-=item Error: No field name specified in $template
+=item Warning: No field name specified in $template
+
+Cast by C<htmlField()>
 
 =item Error: foreachPart not used within part
 
+Cast by C<htmlForeachPart()>
+
 =item Error: foreachPart outside multipart
+
+Cast by C<htmlForeachPart()>
 
 =item Error: use of 'addresses' outside field container
 
+Cast by C<htmlAddresses()>
+
 =item Error: use of 'body' outside field container
 
+Cast by C<htmlBody()>
+
 =item Error: use of 'name' outside field container
+
+Cast by C<htmlName()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of HTML-FromMail distribution version 0.12,
-built on January 29, 2018. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of HTML-FromMail version 3.00,
+built on November 19, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2003-2018 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2003-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

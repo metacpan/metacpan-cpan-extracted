@@ -16,29 +16,30 @@ HTML::FromMail::Field - output a header field as HTML
 =head1 DESCRIPTION
 
 Extends L<"DESCRIPTION" in HTML::FromMail::Page|HTML::FromMail::Page/"DESCRIPTION">.
- 
+
 =head1 METHODS
 
 Extends L<"METHODS" in HTML::FromMail::Page|HTML::FromMail::Page/"METHODS">.
- 
+
 =over 4
 
-=item $obj-E<gt>B<addressField>(FIELD, HOW, ARGS)
+=item $obj-E<gt>B<addressField>($field, $how, ARGS)
 
-Produce text for a header field containing addresses.  HOW this is done
-is defining the result.  Possible values are C<'ADDRESS'>, C<'PHRASE'>,
-C<'PLAIN'>, C<'MAILTO'>, or C<'LINK'>.  See L</address HOW> for details.
+Produce text for a header C<$field> containing addresses.  On C<$how> this
+is done is defining the result.  Possible values are C<'ADDRESS'>,
+C<'PHRASE'>, C<'PLAIN'>, C<'MAILTO'>, or C<'LINK'>.  See L</address HOW>
+for details.
 
-=item $obj-E<gt>B<fromHead>(HEAD, NAME, ARGS)
+=item $obj-E<gt>B<fromHead>($head, $name, \%args)
 
-Returns the fields from the header with NAME.  Some fields appear more
-than once, some may not be present.
+Returns the fields from the header with C<$name>.  Some fields appear
+more than once, some may not be present.
 
-=item $obj-E<gt>B<htmlAddresses>(FIELD, ARGS)
+=item $obj-E<gt>B<htmlAddresses>($field, \%options)
 
 Returns an array with address info.
 
-=item $obj-E<gt>B<htmlBody>(ARGS)
+=item $obj-E<gt>B<htmlBody>(\%options)
 
 Produce the body of the field: everything after the first colon on the
 header line.
@@ -54,7 +55,7 @@ header line.
 
 See L</address HOW>
 
-=item content => FOLDED|REFOLD|UNFOLDED|DECODED
+=item content => 'FOLDED'|'REFOLD'|'UNFOLDED'|'DECODED'
 
 How to included the body of the field.  If a C<wrap> is defined, then
 REFOLD is taken as default, otherwise DECODED is the default. See
@@ -67,7 +68,7 @@ of characters requested per line.  See L</wrap INTEGER>.
 
 =back
 
-=item $obj-E<gt>B<htmlName>(ARGS)
+=item $obj-E<gt>B<htmlName>(\%options)
 
 Returns the name of the header field.
 
@@ -83,11 +84,13 @@ See L</names HOW>.
 
 =back
 
-=item $obj-E<gt>B<lookup>(LABEL, ARGS)
+=item $obj-E<gt>B<lookup>($label, \%options)
 
 Inherited, see L<HTML::FromMail::Page/"METHODS">
 
-=item HTML::FromMail::Field-E<gt>B<new>(OPTIONS)
+=item $class-E<gt>B<new>(%options)
+
+Z<>
 
  -Option  --Defined in            --Default
   settings  HTML::FromMail::Object  {}
@@ -95,7 +98,7 @@ Inherited, see L<HTML::FromMail::Page/"METHODS">
 
 =over 2
 
-=item settings => HASH-OF-HASHES
+=item settings => \%map
 
 =item topic => STRING
 
@@ -115,8 +118,8 @@ for topic C<field>:
 Some fields are pre-defined to contain e-mail addresses.  In many web-based
 clients, you see that these addresses are bluntly linked to, but you here
 have a choice.  As example, the header field contains the address
- "My Name" E<lt>me@example.comE<gt>
- you@example.com
+  "My Name" E<lt>me@example.comE<gt>
+  you@example.com
 
 The possible settings for this parameter are
 
@@ -126,37 +129,37 @@ The possible settings for this parameter are
 
 Show the address as was specified in the message header, without smart
 processing.
- "My Name" E<lt>me@example.com E<gt>
- you@example.com
+  "My Name" E<lt>me@example.com E<gt>
+  you@example.com
 
 =item * C<'PHRASE'>
 
 According to the standards, the phrase is ment to represent the user
 in an understandable way.  Usually this is the full name of the user.
 No link is made.
- My Name
- you@example.com
+  My Name
+  you@example.com
 
 =item * C<'ADDRESS'>
 
 Only show the address of the users.
- my@example.com
- you@example.com
+  my@example.com
+  you@example.com
 
 =item * C<'MAILTO'>
 
 Create a link behind the phrase.  In case there is no phrase, the
 address itself is displayed.  This is the most convenient link, if
 you decide to create a link.
- <a href="mailto:me@example.com">My Name </a>
- <a href="mailto:you@example.com">you@example.com </a>
+  <a href="mailto:me@example.com">My Name </a>
+  <a href="mailto:you@example.com">you@example.com </a>
 
 =item * C<'LINK'>
 
 Often seen, but more for simplicity of implementation is the link
 under the address.  The C<'MAILTO'> is probably easier to understand.
- "My Name" <a href="mailto:me@example.com">me@example.com</a>
- <a href="mailto:you@example.com">you@example.com</a>
+  "My Name" <a href="mailto:me@example.com">me@example.com</a>
+  <a href="mailto:you@example.com">you@example.com</a>
 
 =back
 
@@ -199,7 +202,7 @@ of capitals.  The correct use of capitals is implemented by
 Mail::Message::Field subroutine wellformedName and will be used when WELLFORMED
 is selected.  By default, the names are displayed UNCHANGED.
 
-B<. Example: using HTML::FromMail::Format::Magic>
+=head4 » Example: using HTML::FromMail::Format::Magic
 
   <!--{name capitals => WELLFORMED}-->
 
@@ -210,14 +213,15 @@ are requested per line.
 
 =head1 SEE ALSO
 
-This module is part of HTML-FromMail distribution version 0.12,
-built on January 29, 2018. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of HTML-FromMail version 3.00,
+built on November 19, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2003-2018 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2003-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

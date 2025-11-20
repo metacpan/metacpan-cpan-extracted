@@ -19,7 +19,7 @@ use Carp;
 use Math::BigInt lib => 'GMP';
 use URI;
 
-our $VERSION = v0.24;
+our $VERSION = v0.25;
 
 use constant {
     RE_UUID => qr/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/,
@@ -128,7 +128,9 @@ $_->register foreach values %well_known;
         '2bffc55d-7380-454e-bd53-c5acd525d692'  =>  26, # roaraudio-error-number
         WK_SID()                                =>  27,
         'd2750351-aed7-4ade-aa80-c32436cc6030'  =>  28, # also-has-role
-        # Unassigned: 29, 30, 31
+        '11d8962c-0a71-4d00-95ed-fa69182788a8'  =>  29, # also-has-comment
+        '30710bdb-6418-42fb-96db-2278f3bfa17f'  =>  30, # also-has-description
+        # Unassigned: 31
         '448c50a8-c847-4bc7-856e-0db5fea8f23b'  =>  32, # final-file-encoding
         '79385945-0963-44aa-880a-bca4a42e9002'  =>  33, # final-file-hash
         '3fde5688-6e34-45e9-8f33-68f079b152c8'  =>  34, # SEEK_SET
@@ -218,6 +220,8 @@ foreach my $ise (NS_WD, NS_INT, NS_DATE) {
         '59cfe520-ba32-48cc-b654-74f7a05779db'  => 'marked-as',
         '2bffc55d-7380-454e-bd53-c5acd525d692'  => 'roaraudio-error-number',
         'd2750351-aed7-4ade-aa80-c32436cc6030'  => 'also-has-role',
+        '11d8962c-0a71-4d00-95ed-fa69182788a8'  => 'also-has-comment',
+        '30710bdb-6418-42fb-96db-2278f3bfa17f'  => 'also-has-description',
         '448c50a8-c847-4bc7-856e-0db5fea8f23b'  => 'final-file-encoding',
         '79385945-0963-44aa-880a-bca4a42e9002'  => 'final-file-hash',
         '3fde5688-6e34-45e9-8f33-68f079b152c8'  => 'SEEK_SET',
@@ -939,7 +943,7 @@ Data::Identifier - format independent identifier object
 
 =head1 VERSION
 
-version v0.24
+version v0.25
 
 =head1 SYNOPSIS
 

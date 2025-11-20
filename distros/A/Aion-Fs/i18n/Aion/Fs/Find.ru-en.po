@@ -1,0 +1,24 @@
+msgid "Aion::Fs::Find - итератор поиска файлов для Aion::Fs#find"
+msgstr "Aion::Fs::Find - file search iterator for Aion::Fs#find"
+
+msgid "Итератор поиска файлов для функции-адаптера `find` из модуля `Aion::Fs`."
+msgstr "File search iterator for the `find` adapter function from the `Aion::Fs` module."
+
+msgid "Отдельно использовать не предполагается."
+msgstr "Not intended to be used separately."
+
+msgid "Обладает перегруженными операторами  `<>`, `@{}` и `&{}`."
+msgstr "It has overloaded `<>`, `@{}` and `&{}` operators."
+
+msgid "Конструктор."
+msgstr "Constructor."
+
+msgid "Следующая итерация."
+msgstr "Next iteration."
+
+msgid "⚖ **GPLv3**"
+msgstr "⚖ **GPLv3**"
+
+msgid "The Aion::Fs::Find module is copyright © 2025 Yaroslav O. Kosmina. Rusland. All rights reserved."
+msgstr "The Aion::Fs::Find module is copyright © 2025 Yaroslav O. Kosmina. Rusland. All rights reserved."
+

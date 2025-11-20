@@ -1,3 +1,9 @@
+v0.25  2025-11-19Z
+    - Added new SID values
+    - Added support for wd:TNNN parsing and rendering in Util
+    - Fix Unicode character generator to correctly emit displaynames
+    - Added basic language generator
+
 v0.24  2025-11-10Z
     - Added support for Data::Identifier::Util->render_sirtx()
     - Fixed parsing of SIRTX identifiers

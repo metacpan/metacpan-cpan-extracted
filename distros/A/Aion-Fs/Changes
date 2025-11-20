@@ -1,5 +1,9 @@
 Revision history for Perl extension Aion::Fs
 
+0.2.0 2025-11-20T10:12:43Z
+
+    - change: find in scalar context return file-iterator. Was: count of finded files
+
 0.1.2 2024-11-18T10:36:25Z
 
     - change links and requires

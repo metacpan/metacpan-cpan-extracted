@@ -1,5 +1,5 @@
 package Crypt::HSM::Object;
-$Crypt::HSM::Object::VERSION = '0.022';
+$Crypt::HSM::Object::VERSION = '0.023';
 use strict;
 use warnings;
 
@@ -22,7 +22,7 @@ Crypt::HSM::Object - A PKCS11 object
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 SYNOPSIS
 
@@ -34,7 +34,9 @@ version 0.022
 
 =head1 DESCRIPTION
 
-This class represents an object (usually a key) in the HSM's database. It's returned by L<Crypt::HSM::Session|Crypt::HSM::Session> methods like C<find_object> and C<generate_key>, and used in methods such as C<encrypt>, C<decrypt>, C<sign> and C<verify>.
+This class represents an object (usually a key) in the HSM's database. The type of the object us stored in the C<class> attribute, and can be one of C<data>, C<certificate>, C<public-key>, C<private-key>, C<secret-key>, C<hw-feature>, C<domain-parameters>, C<mechanism>, C<otp-key>, C<profile>, or C<vendor-defined>; this type will define what other attributes are available for it.
+
+It's returned by L<Crypt::HSM::Session|Crypt::HSM::Session> methods like C<find_object> and C<generate_key>, and used in methods such as C<encrypt>, C<decrypt>, C<sign> and C<verify>.
 
 =head1 METHODS
 

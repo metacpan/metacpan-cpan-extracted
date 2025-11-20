@@ -19,11 +19,11 @@ template system, which focusses on giving produced pieces of HTML a place
 in larger HTML structures.
 
 Extends L<"DESCRIPTION" in HTML::FromMail::Format|HTML::FromMail::Format/"DESCRIPTION">.
- 
+
 =head1 METHODS
 
 Extends L<"METHODS" in HTML::FromMail::Format|HTML::FromMail::Format/"METHODS">.
- 
+
 =over 4
 
 =item $obj-E<gt>B<containerText>(ARGS)
@@ -38,13 +38,15 @@ Inherited, see L<HTML::FromMail::Format/"METHODS">
 
 Kind of autoloader, used to discover the correct method to be invoked
 when a pattern must be filled-in.
-ZONE is the found L<Template::Magic::Zone> information.
+C<ZONE> is the found L<Template::Magic::Zone> information.
 
 =item $obj-E<gt>B<magic>()
 
 Returns the L<Template::Magic> object which is used.
 
-=item HTML::FromMail::Format::Magic-E<gt>B<new>(OPTIONS)
+=item $class-E<gt>B<new>(OPTIONS)
+
+Z<>
 
 =item $obj-E<gt>B<onFinalToken>(ARGS)
 
@@ -58,14 +60,15 @@ Inherited, see L<HTML::FromMail::Format/"METHODS">
 
 =head1 SEE ALSO
 
-This module is part of HTML-FromMail distribution version 0.12,
-built on January 29, 2018. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of HTML-FromMail version 3.00,
+built on November 19, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2003-2018 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2003-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

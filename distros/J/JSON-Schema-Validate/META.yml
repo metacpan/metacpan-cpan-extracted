@@ -34,5 +34,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jackdeguest/JSON-Schema-Validate/issues
   repository: https://gitlab.com/jackdeguest/JSON-Schema-Validate
-version: v0.4.1
+version: v0.5.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

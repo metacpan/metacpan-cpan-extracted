@@ -25,12 +25,13 @@ use constant {
     WK_UNICODE_CHARACTER_GENERATOR      => 'd74f8c35-bcb8-465c-9a77-01010e8ed25c',
     WK_RGB_COLOUR_GENERATOR             => '55febcc4-6655-4397-ae3d-2353b5856b34',
     WK_DATE_GENERATOR                   => '97b7f241-e1c5-4f02-ae3c-8e31e501e1dc',
+    #WK_LANGUAGE_GENERATOR               => '',
     WK_MULTIPLICITY_GENERATOR           => '19659233-0a22-412c-bdf1-8ee9f8fc4086',
     WK_MINIMUM_MULTIPLICITY_GENERATOR   => '5ec197c3-1406-467c-96c7-4b1a6ec2c5c9',
 };
 
 
-our $VERSION = v0.24;
+our $VERSION = v0.25;
 
 my %_multiplicity_prefix = (
     total   => '4.1',
@@ -121,6 +122,8 @@ sub unicode_character {
         croak 'Rejected use of special character: '.$unicode_cp_str unless $opts{allow_special};
     }
 
+    $opts{displayname} //= $unicode_cp_str;
+
     return Data::Identifier->new(unicodecp => $unicode_cp_str, displayname => $opts{displayname}, generator => WK_UNICODE_CHARACTER_GENERATOR, request => $unicode_cp_str);
 }
 
@@ -198,6 +201,30 @@ sub date {
     $opts{displayname}//= $request;
     $opts{generator}    = WK_DATE_GENERATOR;
 
+    return $pkg->generic(%opts);
+}
+
+
+sub language {
+    my ($pkg, $req, %opts) = @_;
+    my $name;
+
+    require I18N::LangTags::List;
+
+    $opts{request}      = $req;
+    $opts{style}        = 'id-based';
+    $opts{namespace}    = '47dd950c-9089-4956-87c1-54c122533219';
+    #$opts{generator}    = WK_LANGUAGE_GENERATOR;
+
+    croak 'Bad language: '.$req unless I18N::LangTags::List::is_decent($req);
+
+    $name = I18N::LangTags::List::name($req);
+
+    unless (defined($name) && length($name)) {
+        croak 'Bad language: '.$req;
+    }
+
+    $opts{displayname} //= $name;
     return $pkg->generic(%opts);
 }
 
@@ -469,7 +496,7 @@ Data::Identifier::Generate - format independent identifier object
 
 =head1 VERSION
 
-version v0.24
+version v0.25
 
 =head1 SYNOPSIS
 
@@ -628,6 +655,34 @@ The precision to use for the identifier.
 One of C<year>, C<month>, and C<day>.
 
 Defaults to the highest possible precision available with the given date.
+
+=back
+
+=head2 language
+
+    my Data::Identifier $identifier = Data::Identifier::Generate->language($langtag [, %opts ] );
+    # e.g.:
+    my Data::Identifier $identifier = Data::Identifier::Generate->language('de-de');
+
+(experimental since v0.25)
+
+Generates an identifier for a given IETF language tag.
+
+This method does it's best to validate the language tag.
+However the exact nature of checks is not yet fully defined (v0.25).
+
+This method might require other modules to be available.
+
+The following options (all optional) are supported:
+
+=over
+
+=item C<displayname>
+
+The displayname as to be used for the identifier.
+This is the same as defined by L<Data::Identifier/new>.
+
+Defaults to a name for the given language if known.
 
 =back
 

@@ -57,6 +57,8 @@ if (!$item || $item eq 'default') {
 
 	bytes => "A\x01B\x02C\x03D\x04",
 
+	regexp => qr/^(foo)bar.+?\z/,
+
 	coderef => \&color,
 
 	glob => \*STDOUT,

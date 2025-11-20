@@ -1,11 +1,11 @@
-use common::sense; use open qw/:std :utf8/;  use Carp qw//; use File::Basename qw//; use File::Find qw//; use File::Slurper qw//; use File::Spec qw//; use File::Path qw//; use Scalar::Util qw//;  use Test::More 0.98;  BEGIN {     $SIG{__DIE__} = sub {         my ($s) = @_;         if(ref $s) {             $s->{STACKTRACE} = Carp::longmess "?" if "HASH" eq Scalar::Util::reftype $s;             die $s;         } else {             die Carp::longmess defined($s)? $s: "undef"         }     };      my $t = File::Slurper::read_text(__FILE__);     my $s =  '/tmp/.liveman/perl-aion-fs/aion!fs'    ;     File::Find::find(sub { chmod 0700, $_ if !/^\.{1,2}\z/ }, $s), File::Path::rmtree($s) if -e $s;     File::Path::mkpath($s);     chdir $s or die "chdir $s: $!";      while($t =~ /^#\@> (.*)\n((#>> .*\n)*)#\@< EOF\n/gm) {         my ($file, $code) = ($1, $2);         $code =~ s/^#>> //mg;         File::Path::mkpath(File::Basename::dirname($file));         File::Slurper::write_text($file, $code);     }  } # 
+use common::sense; use open qw/:std :utf8/;  use Carp qw//; use Cwd qw//; use File::Basename qw//; use File::Find qw//; use File::Slurper qw//; use File::Spec qw//; use File::Path qw//; use Scalar::Util qw//;  use Test::More 0.98;  BEGIN { 	$SIG{__DIE__} = sub { 		my ($msg) = @_; 		if(ref $msg) { 			$msg->{STACKTRACE} = Carp::longmess "?" if "HASH" eq Scalar::Util::reftype $msg; 			die $msg; 		} else { 			die Carp::longmess defined($msg)? $msg: "undef" 		} 	}; 	 	my $t = File::Slurper::read_text(__FILE__); 	 	my @dirs = File::Spec->splitdir(File::Basename::dirname(Cwd::abs_path(__FILE__))); 	my $project_dir = File::Spec->catfile(@dirs[0..$#dirs-2]); 	my $project_name = $dirs[$#dirs-2]; 	my @test_dirs = @dirs[$#dirs-2+2 .. $#dirs];  	$ENV{TMPDIR} = $ENV{LIVEMAN_TMPDIR} if exists $ENV{LIVEMAN_TMPDIR};  	my $dir_for_tests = File::Spec->catfile(File::Spec->tmpdir, ".liveman", $project_name, join("!", @test_dirs, File::Basename::basename(__FILE__))); 	 	File::Find::find(sub { chmod 0700, $_ if !/^\.{1,2}\z/ }, $dir_for_tests), File::Path::rmtree($dir_for_tests) if -e $dir_for_tests; 	File::Path::mkpath($dir_for_tests); 	 	chdir $dir_for_tests or die "chdir $dir_for_tests: $!"; 	 	push @INC, "$project_dir/lib", "lib"; 	 	$ENV{PROJECT_DIR} = $project_dir; 	$ENV{DIR_FOR_TESTS} = $dir_for_tests; 	 	while($t =~ /^#\@> (.*)\n((#>> .*\n)*)#\@< EOF\n/gm) { 		my ($file, $code) = ($1, $2); 		$code =~ s/^#>> //mg; 		File::Path::mkpath(File::Basename::dirname($file)); 		File::Slurper::write_text($file, $code); 	} } # 
 # # NAME
 # 
 # Aion::Fs - утилиты для файловой системы: чтение, запись, поиск, замена файлов и т.д.
 # 
 # # VERSION
 # 
-# 0.1.0
+# 0.1.2
 # 
 # # SYNOPSIS
 # 
@@ -17,28 +17,37 @@ lay mkpath "hello/moon.txt", "noreplace";
 lay mkpath "hello/big/world.txt", "hellow!";
 lay mkpath "hello/small/world.txt", "noenter";
 
-::like scalar do {mtime "hello"}, qr!^\d+(\.\d+)?$!, 'mtime "hello"  # ~> ^\d+(\.\d+)?$';
+::like scalar do {mtime "hello";}, qr{^\d+(\.\d+)?$}, 'mtime "hello";  # ~> ^\d+(\.\d+)?$';
 
-::is_deeply scalar do {[map cat, grep -f, find ["hello/big", "hello/small"]]}, scalar do {[qw/ hellow! noenter /]}, '[map cat, grep -f, find ["hello/big", "hello/small"]]  # --> [qw/ hellow! noenter /]';
+::is_deeply scalar do {[map cat, grep -f, find ["hello/big", "hello/small"]];}, scalar do {[qw/ hellow! noenter /]}, '[map cat, grep -f, find ["hello/big", "hello/small"]];  # --> [qw/ hellow! noenter /]';
 
 my @noreplaced = replace { s/h/$a $b H/ }
     find "hello", "-f", "*.txt", qr/\.txt$/, sub { /\.txt$/ },
         noenter "*small*",
             errorenter { warn "find $_: $!" };
 
-::is_deeply scalar do {\@noreplaced}, scalar do {["hello/moon.txt"]}, '\@noreplaced # --> ["hello/moon.txt"]';
+::is_deeply scalar do {\@noreplaced;}, scalar do {["hello/moon.txt"]}, '\@noreplaced; # --> ["hello/moon.txt"]';
 
-::is scalar do {cat "hello/world.txt"}, "hello/world.txt :utf8 Hi!", 'cat "hello/world.txt"       # => hello/world.txt :utf8 Hi!';
-::is scalar do {cat "hello/moon.txt"}, "noreplace", 'cat "hello/moon.txt"        # => noreplace';
-::is scalar do {cat "hello/big/world.txt"}, "hello/big/world.txt :utf8 Hellow!", 'cat "hello/big/world.txt"   # => hello/big/world.txt :utf8 Hellow!';
-::is scalar do {cat "hello/small/world.txt"}, "noenter", 'cat "hello/small/world.txt" # => noenter';
+::is scalar do {cat "hello/world.txt";}, "hello/world.txt :utf8 Hi!", 'cat "hello/world.txt";       # => hello/world.txt :utf8 Hi!';
+::is scalar do {cat "hello/moon.txt";}, "noreplace", 'cat "hello/moon.txt";        # => noreplace';
+::is scalar do {cat "hello/big/world.txt";}, "hello/big/world.txt :utf8 Hellow!", 'cat "hello/big/world.txt";   # => hello/big/world.txt :utf8 Hellow!';
+::is scalar do {cat "hello/small/world.txt";}, "noenter", 'cat "hello/small/world.txt"; # => noenter';
 
-::is_deeply scalar do {[find "hello", "*.txt"]}, scalar do {[qw!  hello/moon.txt  hello/world.txt  hello/big/world.txt  hello/small/world.txt  !]}, '[find "hello", "*.txt"]  # --> [qw!  hello/moon.txt  hello/world.txt  hello/big/world.txt  hello/small/world.txt  !]';
-::is_deeply scalar do {[find "hello", "-d"]}, scalar do {[qw!  hello  hello/big hello/small  !]}, '[find "hello", "-d"]  # --> [qw!  hello  hello/big hello/small  !]';
+::is_deeply scalar do {[find "hello", "*.txt"];}, scalar do {[qw!  hello/moon.txt  hello/world.txt  hello/big/world.txt  hello/small/world.txt  !]}, '[find "hello", "*.txt"]; # --> [qw!  hello/moon.txt  hello/world.txt  hello/big/world.txt  hello/small/world.txt  !]';
+
+my @dirs;
+
+my $iter = find "hello", "-d";
+
+while(<$iter>) {
+    push @dirs, $_;
+}
+
+::is_deeply scalar do {\@dirs;}, scalar do {[qw!  hello  hello/big hello/small  !]}, '\@dirs; # --> [qw!  hello  hello/big hello/small  !]';
 
 erase reverse find "hello";
 
-::is scalar do {-e "hello"}, scalar do{undef}, '-e "hello"  # -> undef';
+::is scalar do {-e "hello";}, scalar do{undef}, '-e "hello";  # -> undef';
 
 # 
 # # DESCRIPTION
@@ -52,8 +61,8 @@ erase reverse find "hello";
 # 
 # Супермодуль `IO::All` не является конкурентом `Aion::Fs`, т.к. использует ООП подход, а `Aion::Fs` – ФП.
 # 
-# * ООП — объектно-ориентированное программирование.
-# * ФП — функциональное программирование.
+# * ООП – объектно-ориентированное программирование.
+# * ФП – функциональное программирование.
 # 
 # # SUBROUTINES/METHODS
 # 
@@ -61,8 +70,8 @@ erase reverse find "hello";
 # 
 # Считывает файл. Если параметр не указан, использует `$_`.
 # 
-done_testing; }; subtest 'cat ($file)' => sub { 
-::like scalar do {cat "/etc/passwd"}, qr!root!, 'cat "/etc/passwd"  # ~> root';
+::done_testing; }; subtest 'cat ($file)' => sub { 
+::like scalar do {cat "/etc/passwd"}, qr{root}, 'cat "/etc/passwd"  # ~> root';
 
 # 
 # `cat` читает со слоем `:utf8`. Но можно указать другой слой следующим образом:
@@ -76,17 +85,17 @@ lay "unicode.txt", "↯";
 # `cat` вызывает исключение в случае ошибки операции ввода-вывода:
 # 
 
-::like scalar do {eval { cat "A" }; $@}, qr!cat A: No such file or directory!, 'eval { cat "A" }; $@  # ~> cat A: No such file or directory';
+::like scalar do {eval { cat "A" }; $@}, qr{cat A: No such file or directory}, 'eval { cat "A" }; $@  # ~> cat A: No such file or directory';
 
 # 
 # ### See also
 # 
 # * [autodie](https://metacpan.org/pod/autodie) – `open $f, "r.txt"; $s = join "", <$f>; close $f`.
-# * <https://metacpan.org/pod/File::Slurp> — `read_file('file.txt')`.
-# * <https://metacpan.org/pod/File::Slurper> — `read_text('file.txt')`, `read_binary('file.txt')`.
-# * [File::Util](https://metacpan.org/pod/File::Util) — `File::Util->new->load_file(file => 'file.txt')`.
-# * [IO::All](https://metacpan.org/pod/IO::All) — `io('file.txt') > $contents`.
-# * [IO::Util](https://metacpan.org/pod/IO::Util) — `$contents = ${ slurp 'file.txt' }`.
+# * [File::Slurp](https://metacpan.org/pod/File::Slurp) – `read_file('file.txt')`.
+# * [File::Slurper](https://metacpan.org/pod/File::Slurper) – `read_text('file.txt')`, `read_binary('file.txt')`.
+# * [File::Util](https://metacpan.org/pod/File::Util) – `File::Util->new->load_file(file => 'file.txt')`.
+# * [IO::All](https://metacpan.org/pod/IO::All) – `io('file.txt') > $contents`.
+# * [IO::Util](https://metacpan.org/pod/IO::Util) – `$contents = ${ slurp 'file.txt' }`.
 # * [Mojo::File](https://metacpan.org/pod/Mojo::File) – `path($file)->slurp`.
 # 
 # ## lay ($file?, $content)
@@ -96,21 +105,21 @@ lay "unicode.txt", "↯";
 # * Если указан один параметр, использует `$_` вместо `$file`.
 # * `lay`, использует слой `:utf8`. Для указания иного слоя используется массив из двух элементов в параметре `$file`:
 # 
-done_testing; }; subtest 'lay ($file?, $content)' => sub { 
+::done_testing; }; subtest 'lay ($file?, $content)' => sub { 
 ::is scalar do {lay "unicode.txt", "↯"}, "unicode.txt", 'lay "unicode.txt", "↯"  # => unicode.txt';
 ::is scalar do {lay ["unicode.txt", ":raw"], "↯"}, "unicode.txt", 'lay ["unicode.txt", ":raw"], "↯"  # => unicode.txt';
 
-::like scalar do {eval { lay "/", "↯" }; $@}, qr!lay /: Is a directory!, 'eval { lay "/", "↯" }; $@ # ~> lay /: Is a directory';
+::like scalar do {eval { lay "/", "↯" }; $@}, qr{lay /: Is a directory}, 'eval { lay "/", "↯" }; $@ # ~> lay /: Is a directory';
 
 # 
 # ### See also
 # 
 # * [autodie](https://metacpan.org/pod/autodie) – `open $f, ">r.txt"; print $f $contents; close $f`.
-# * [File::Slurp](https://metacpan.org/pod/File::Slurp) — `write_file('file.txt', $contents)`.
-# * [File::Slurper](https://metacpan.org/pod/File::Slurper) — `write_text('file.txt', $contents)`, `write_binary('file.txt', $contents)`.
-# * [IO::All](https://metacpan.org/pod/IO::All) — `io('file.txt') < $contents`.
-# * [IO::Util](https://metacpan.org/pod/IO::Util) — `slurp \$contents, 'file.txt'`.
-# * [File::Util](https://metacpan.org/pod/File::Util) — `File::Util->new->write_file(file => 'file.txt', content => $contents, bitmask => 0644)`.
+# * [File::Slurp](https://metacpan.org/pod/File::Slurp) – `write_file('file.txt', $contents)`.
+# * [File::Slurper](https://metacpan.org/pod/File::Slurper) – `write_text('file.txt', $contents)`, `write_binary('file.txt', $contents)`.
+# * [IO::All](https://metacpan.org/pod/IO::All) – `io('file.txt') < $contents`.
+# * [IO::Util](https://metacpan.org/pod/IO::Util) – `slurp \$contents, 'file.txt'`.
+# * [File::Util](https://metacpan.org/pod/File::Util) – `File::Util->new->write_file(file => 'file.txt', content => $contents, bitmask => 0644)`.
 # * [Mojo::File](https://metacpan.org/pod/Mojo::File) – `path($file)->spew($chars, 'UTF-8')`.
 # 
 # ## find (;$path, @filters)
@@ -119,17 +128,17 @@ done_testing; }; subtest 'lay ($file?, $content)' => sub {
 # 
 # Фильтры могут быть:
 # 
-# * Подпрограммой — путь к текущему файлу передаётся в `$_`, а подпрограмма должна вернуть истину или ложь, как они понимаются perl-ом.
-# * Regexp — тестирует каждый путь регулярным выражением.
-# * Строка в виде "-Xxx", где `Xxx` — один или несколько символов. Аналогична операторам perl-а для тестирования файлов. Пример: `-fr` проверяет путь файловыми тестировщиками [-f и -r](https://perldoc.perl.org/functions/-X).
+# * Подпрограммой – путь к текущему файлу передаётся в `$_`, а подпрограмма должна вернуть истину или ложь, как они понимаются perl-ом.
+# * Regexp – тестирует каждый путь регулярным выражением.
+# * Строка в виде "-Xxx", где `Xxx` – один или несколько символов. Аналогична операторам perl-а для тестирования файлов. Пример: `-fr` проверяет путь файловыми тестировщиками [-f и -r](https://perldoc.perl.org/functions/-X).
 # * Остальные строки превращаются функцией `wildcard` (см. ниже) в регулярное выражение для проверки каждого пути.
 # 
 # Пути, не прошедшие проверку `@filters`, не возвращаются.
 # 
 # Если фильтр -X не является файловой функцией perl, то выбрасывается исключение:
 # 
-done_testing; }; subtest 'find (;$path, @filters)' => sub { 
-::like scalar do {eval { find "example", "-h" }; $@}, qr!Undefined subroutine &Aion::Fs::h called!, 'eval { find "example", "-h" }; $@   # ~> Undefined subroutine &Aion::Fs::h called';
+::done_testing; }; subtest 'find (;$path, @filters)' => sub { 
+::like scalar do {eval { find "example", "-h" }; $@}, qr{Undefined subroutine &Aion::Fs::h called}, 'eval { find "example", "-h" }; $@   # ~> Undefined subroutine &Aion::Fs::h called';
 
 # 
 # В этом примере `find` не может войти в подкаталог и передаёт ошибку в функцию `errorenter` (см. ниже) с установленными переменными `$_` и `$!` (путём к каталогу и сообщением ОС об ошибке). 
@@ -142,47 +151,48 @@ mkpath ["example/", 0];
 ::is_deeply scalar do {[find "example"]}, scalar do {["example"]}, '[find "example"]                  # --> ["example"]';
 ::is_deeply scalar do {[find "example", noenter "-d"]}, scalar do {["example"]}, '[find "example", noenter "-d"]    # --> ["example"]';
 
-::like scalar do {eval { find "example", errorenter { die "find $_: $!" } }; $@}, qr!find example: Permission denied!, 'eval { find "example", errorenter { die "find $_: $!" } }; $@   # ~> find example: Permission denied';
+::like scalar do {eval { find "example", errorenter { die "find $_: $!" } }; $@}, qr{find example: Permission denied}, 'eval { find "example", errorenter { die "find $_: $!" } }; $@   # ~> find example: Permission denied';
 
 mkpath for qw!ex/1/11 ex/1/12 ex/2/21 ex/2/22!;
 
 my $count = 0;
-::is scalar do {find "ex", sub { find_stop if ++$count == 3; 1}}, scalar do{2}, 'find "ex", sub { find_stop if ++$count == 3; 1}  # -> 2';
+find "ex", sub { find_stop if ++$count == 3; 1};
+::is scalar do {$count}, scalar do{3}, '$count # -> 3';
 
 # 
 # ### See also
 # 
-# * [AudioFile::Find](https://metacpan.org/pod/AudioFile::Find) — ищет аудиофайлы в указанной директории. Позволяет фильтровать их по атрибутам: названию, артисту, жанру, альбому и трэку.
-# * [Directory::Iterator](https://metacpan.org/pod/Directory::Iterator) — `$it = Directory::Iterator->new($dir, %opts); push @paths, $_ while <$it>`.
-# * [IO::All](https://metacpan.org/pod/IO::All) — `@paths = map { "$_" } grep { -f $_ && $_->size > 10*1024 } io(".")->all(0)`.
-# * [IO::All::Rule](https://metacpan.org/pod/IO::All::Rule) — `$next = IO::All::Rule->new->file->size(">10k")->iter($dir1, $dir2); push @paths, "$f" while $f = $next->()`.
-# * [File::Find](https://metacpan.org/pod/File::Find) — `find( sub { push @paths, $File::Find::name if /\.png/ }, $dir )`.
-# * [File::Find::utf8](https://metacpan.org/pod/File::Find::utf8) — как [File::Find](https://metacpan.org/pod/File::Find), только пути файлов в _utf8_.
-# * [File::Find::Age](https://metacpan.org/pod/File::Find::Age) — сортирует файлы по времени модификации (наследует [File::Find::Rule](https://metacpan.org/pod/File::Find::Rule)): `File::Find::Age->in($dir1, $dir2)`.
-# * [File::Find::Declare](https://metacpan.org/pod/File::Find::Declare) — `@paths = File::Find::Declare->new({ size => '>10K', perms => 'wr-wr-wr-', modified => '<2010-01-30', recurse => 1, dirs => [$dir1] })->find`.
-# * [File::Find::Iterator](https://metacpan.org/pod/File::Find::Iterator) — имеет ООП интерфейс с итератором и функции `imap` и `igrep`.
-# * [File::Find::Match](https://metacpan.org/pod/File::Find::Match) — вызывает обработчик на каждый подошедший фильтр. Похож на `switch`.
-# * [File::Find::Node](https://metacpan.org/pod/File::Find::Node) — обходит иерархию файлов параллельно несколькими процессами: `tie @paths, IPC::Shareable, { key => "GLUE STRING", create => 1 }; File::Find::Node->new(".")->process(sub { my $f = shift; $f->fork(5); tied(@paths)->lock; push @paths, $f->path; tied(@paths)->unlock })->find; tied(@paths)->remove`.
-# * [File::Find::Fast](https://metacpan.org/pod/File::Find::Fast) — `@paths = @{ find($dir) }`.
-# * [File::Find::Object](https://metacpan.org/pod/File::Find::Object) — имеет ООП интерфейс с итератором.
-# * [File::Find::Parallel](https://metacpan.org/pod/File::Find::Parallel) — умеет сравнивать два каталога и возвращать их объединение, пересечение и количественное пересечение.
-# * [File::Find::Random](https://metacpan.org/pod/File::Find::Random) — выбирает файл или директорию наугад из иерархии файлов.
-# * [File::Find::Rex](https://metacpan.org/pod/File::Find::Rex) — `@paths = File::Find::Rex->new(recursive => 1, ignore_hidden => 1)->query($dir, qr/^b/i)`.
-# * [File::Find::Rule](https://metacpan.org/pod/File::Find::Rule) — `@files = File::Find::Rule->any( File::Find::Rule->file->name('*.mp3', '*.ogg')->size('>2M'), File::Find::Rule->empty )->in($dir1, $dir2);`. Имеет итератор, процедурный интерфейс и расширения [::ImageSize](File::Find::Rule::ImageSize) и [::MMagic](File::Find::Rule::MMagic): `@images = find(file => magic => 'image/*', '!image_x' => '>20', in => '.')`.
-# * [File::Find::Wanted](https://metacpan.org/pod/File::Find::Wanted) — `@paths = find_wanted( sub { -f && /\.png/ }, $dir )`.
-# * [File::Hotfolder](https://metacpan.org/pod/File::Hotfolder) — `watch( $dir, callback => sub { push @paths, shift } )->loop`. Работает на `AnyEvent`. Настраиваемый. Есть распараллеливание на несколько процессов.
-# * [File::Mirror](https://metacpan.org/pod/File::Mirror) — формирует так же параллельный путь для копирования файлов: `recursive { my ($src, $dst) = @_; push @paths, $src } '/path/A', '/path/B'`.
-# * [File::Set](https://metacpan.org/pod/File::Set) — `$fs = File::Set->new; $fs->add($dir); @paths = map { $_->[0] } $fs->get_path_list`.
-# * [File::Wildcard](https://metacpan.org/pod/File::Wildcard) — `$fw = File::Wildcard->new(exclude => qr/.svn/, case_insensitive => 1, sort => 1, path => "src///*.cpp", match => qr(^src/(.*?)\.cpp$), derive => ['src/$1.o','src/$1.hpp']); push @paths, $f while $f = $fw->next`.
-# * [File::Wildcard::Find](https://metacpan.org/pod/File::Wildcard::Find) — `findbegin($dir); push @paths, $f while $f = findnext()` или  `findbegin($dir); @paths = findall()`.
-# * [File::Util](https://metacpan.org/pod/File::Util) — `File::Util->new->list_dir($dir, qw/ --pattern=\.txt$ --files-only --recurse /)`.
+# * [AudioFile::Find](https://metacpan.org/pod/AudioFile::Find) – ищет аудиофайлы в указанной директории. Позволяет фильтровать их по атрибутам: названию, артисту, жанру, альбому и трэку.
+# * [Directory::Iterator](https://metacpan.org/pod/Directory::Iterator) – `$it = Directory::Iterator->new($dir, %opts); push @paths, $_ while <$it>`.
+# * [IO::All](https://metacpan.org/pod/IO::All) – `@paths = map { "$_" } grep { -f $_ && $_->size > 10*1024 } io(".")->all(0)`.
+# * [IO::All::Rule](https://metacpan.org/pod/IO::All::Rule) – `$next = IO::All::Rule->new->file->size(">10k")->iter($dir1, $dir2); push @paths, "$f" while $f = $next->()`.
+# * [File::Find](https://metacpan.org/pod/File::Find) – `find( sub { push @paths, $File::Find::name if /\.png/ }, $dir )`.
+# * [File::Find::utf8](https://metacpan.org/pod/File::Find::utf8) – как [File::Find](https://metacpan.org/pod/File::Find), только пути файлов в _utf8_.
+# * [File::Find::Age](https://metacpan.org/pod/File::Find::Age) – сортирует файлы по времени модификации (наследует [File::Find::Rule](https://metacpan.org/pod/File::Find::Rule)): `File::Find::Age->in($dir1, $dir2)`.
+# * [File::Find::Declare](https://metacpan.org/pod/File::Find::Declare) – `@paths = File::Find::Declare->new({ size => '>10K', perms => 'wr-wr-wr-', modified => '<2010-01-30', recurse => 1, dirs => [$dir1] })->find`.
+# * [File::Find::Iterator](https://metacpan.org/pod/File::Find::Iterator) – имеет ООП интерфейс с итератором и функции `imap` и `igrep`.
+# * [File::Find::Match](https://metacpan.org/pod/File::Find::Match) – вызывает обработчик на каждый подошедший фильтр. Похож на `switch`.
+# * [File::Find::Node](https://metacpan.org/pod/File::Find::Node) – обходит иерархию файлов параллельно несколькими процессами: `tie @paths, IPC::Shareable, { key => "GLUE STRING", create => 1 }; File::Find::Node->new(".")->process(sub { my $f = shift; $f->fork(5); tied(@paths)->lock; push @paths, $f->path; tied(@paths)->unlock })->find; tied(@paths)->remove`.
+# * [File::Find::Fast](https://metacpan.org/pod/File::Find::Fast) – `@paths = @{ find($dir) }`.
+# * [File::Find::Object](https://metacpan.org/pod/File::Find::Object) – имеет ООП интерфейс с итератором.
+# * [File::Find::Parallel](https://metacpan.org/pod/File::Find::Parallel) – умеет сравнивать два каталога и возвращать их объединение, пересечение и количественное пересечение.
+# * [File::Find::Random](https://metacpan.org/pod/File::Find::Random) – выбирает файл или директорию наугад из иерархии файлов.
+# * [File::Find::Rex](https://metacpan.org/pod/File::Find::Rex) – `@paths = File::Find::Rex->new(recursive => 1, ignore_hidden => 1)->query($dir, qr/^b/i)`.
+# * [File::Find::Rule](https://metacpan.org/pod/File::Find::Rule) – `@files = File::Find::Rule->any( File::Find::Rule->file->name('*.mp3', '*.ogg')->size('>2M'), File::Find::Rule->empty )->in($dir1, $dir2);`. Имеет итератор, процедурный интерфейс и расширения [::ImageSize](File::Find::Rule::ImageSize) и [::MMagic](File::Find::Rule::MMagic): `@images = find(file => magic => 'image/*', '!image_x' => '>20', in => '.')`.
+# * [File::Find::Wanted](https://metacpan.org/pod/File::Find::Wanted) – `@paths = find_wanted( sub { -f && /\.png/ }, $dir )`.
+# * [File::Hotfolder](https://metacpan.org/pod/File::Hotfolder) – `watch( $dir, callback => sub { push @paths, shift } )->loop`. Работает на `AnyEvent`. Настраиваемый. Есть распараллеливание на несколько процессов.
+# * [File::Mirror](https://metacpan.org/pod/File::Mirror) – формирует так же параллельный путь для копирования файлов: `recursive { my ($src, $dst) = @_; push @paths, $src } '/path/A', '/path/B'`.
+# * [File::Set](https://metacpan.org/pod/File::Set) – `$fs = File::Set->new; $fs->add($dir); @paths = map { $_->[0] } $fs->get_path_list`.
+# * [File::Wildcard](https://metacpan.org/pod/File::Wildcard) – `$fw = File::Wildcard->new(exclude => qr/.svn/, case_insensitive => 1, sort => 1, path => "src///*.cpp", match => qr(^src/(.*?)\.cpp$), derive => ['src/$1.o','src/$1.hpp']); push @paths, $f while $f = $fw->next`.
+# * [File::Wildcard::Find](https://metacpan.org/pod/File::Wildcard::Find) – `findbegin($dir); push @paths, $f while $f = findnext()` или  `findbegin($dir); @paths = findall()`.
+# * [File::Util](https://metacpan.org/pod/File::Util) – `File::Util->new->list_dir($dir, qw/ --pattern=\.txt$ --files-only --recurse /)`.
 # * [Mojo::File](https://metacpan.org/pod/Mojo::File) – `say for path($path)->list_tree({hidden => 1, dir => 1})->each`.
-# * [Path::Find](https://metacpan.org/pod/Path::Find) — `@paths = path_find( $dir, "*.png" )`. Для сложных запросов использует _matchable_: `my $sub = matchable( sub { my( $entry, $directory, $fullname, $depth ) = @_; $depth <= 3 }`.
-# * [Path::Extended::Dir](https://metacpan.org/pod/Path::Extended::Dir) — `@paths = Path::Extended::Dir->new($dir)->find('*.txt')`.
-# * [Path::Iterator::Rule](https://metacpan.org/pod/Path::Iterator::Rule) — `$i = Path::Iterator::Rule->new->file; @paths = $i->clone->size(">10k")->all(@dirs); $i->size("<10k")...`.
-# * [Path::Class::Each](https://metacpan.org/pod/Path::Class::Each) — `dir($dir)->each(sub { push @paths, "$_" })`.
-# * [Path::Class::Iterator](https://metacpan.org/pod/Path::Class::Iterator) — `$i = Path::Class::Iterator->new(root => $dir, depth => 2); until ($i->done) { push @paths, $i->next->stringify }`.
-# * [Path::Class::Rule](https://metacpan.org/pod/Path::Class::Rule) — `@paths = Path::Class::Rule->new->file->size(">10k")->all($dir)`.
+# * [Path::Find](https://metacpan.org/pod/Path::Find) – `@paths = path_find( $dir, "*.png" )`. Для сложных запросов использует _matchable_: `my $sub = matchable( sub { my( $entry, $directory, $fullname, $depth ) = @_; $depth <= 3 }`.
+# * [Path::Extended::Dir](https://metacpan.org/pod/Path::Extended::Dir) – `@paths = Path::Extended::Dir->new($dir)->find('*.txt')`.
+# * [Path::Iterator::Rule](https://metacpan.org/pod/Path::Iterator::Rule) – `$i = Path::Iterator::Rule->new->file; @paths = $i->clone->size(">10k")->all(@dirs); $i->size("<10k")...`.
+# * [Path::Class::Each](https://metacpan.org/pod/Path::Class::Each) – `dir($dir)->each(sub { push @paths, "$_" })`.
+# * [Path::Class::Iterator](https://metacpan.org/pod/Path::Class::Iterator) – `$i = Path::Class::Iterator->new(root => $dir, depth => 2); until ($i->done) { push @paths, $i->next->stringify }`.
+# * [Path::Class::Rule](https://metacpan.org/pod/Path::Class::Rule) – `@paths = Path::Class::Rule->new->file->size(">10k")->all($dir)`.
 # 
 # ## noenter (@filters)
 # 
@@ -196,42 +206,43 @@ my $count = 0;
 # 
 # Останавливает `find` будучи вызван в одном из его фильтров, `errorenter` или `noenter`.
 # 
-done_testing; }; subtest 'find_stop ()' => sub { 
+::done_testing; }; subtest 'find_stop ()' => sub { 
 my $count = 0;
-::is scalar do {find "ex", sub { find_stop if ++$count == 3; 1}}, scalar do{2}, 'find "ex", sub { find_stop if ++$count == 3; 1}  # -> 2';
+find "ex", sub { find_stop if ++$count == 3; 1};
+::is scalar do {$count}, scalar do{3}, '$count # -> 3';
 
 # 
 # ## erase (@paths)
 # 
 # Удаляет файлы и пустые каталоги. Возвращает `@paths`. При ошибке ввода-вывода выбрасывает исключение.
 # 
-done_testing; }; subtest 'erase (@paths)' => sub { 
-::like scalar do {eval { erase "/" }; $@}, qr!erase dir /: Device or resource busy!, 'eval { erase "/" }; $@  # ~> erase dir /: Device or resource busy';
-::like scalar do {eval { erase "/dev/null" }; $@}, qr!erase file /dev/null: Permission denied!, 'eval { erase "/dev/null" }; $@  # ~> erase file /dev/null: Permission denied';
+::done_testing; }; subtest 'erase (@paths)' => sub { 
+::like scalar do {eval { erase "/" }; $@}, qr{erase dir /: Device or resource busy}, 'eval { erase "/" }; $@  # ~> erase dir /: Device or resource busy';
+::like scalar do {eval { erase "/dev/null" }; $@}, qr{erase file /dev/null: Permission denied}, 'eval { erase "/dev/null" }; $@  # ~> erase file /dev/null: Permission denied';
 
 # 
 # ### See also
 # 
 # * `unlink` + `rmdir`.
-# * [File::Path](https://metacpan.org/pod/File::Path) — `remove_tree("dir")`.
-# * [File::Path::Tiny](https://metacpan.org/pod/File::Path::Tiny) — `File::Path::Tiny::rm($path)`. Не выбрасывает исключений.
+# * [File::Path](https://metacpan.org/pod/File::Path) – `remove_tree("dir")`.
+# * [File::Path::Tiny](https://metacpan.org/pod/File::Path::Tiny) – `File::Path::Tiny::rm($path)`. Не выбрасывает исключений.
 # * [Mojo::File](https://metacpan.org/pod/Mojo::File) – `path($file)->remove`.
 # 
 # ## replace (&sub, @files)
 # 
 # Заменяет каждый файл на `$_`, если его изменяет `&sub`. Возвращает файлы, в которых не было замен.
 # 
-# `@files` может содержать массивы из двух элементов. Первый рассматривается как путь, а второй — как слой. Слой по умолчанию — `:utf8`.
+# `@files` может содержать массивы из двух элементов. Первый рассматривается как путь, а второй – как слой. Слой по умолчанию – `:utf8`.
 # 
 # `&sub` вызывается для каждого файла из `@files`. В неё передаются:
 # 
-# * `$_` — содержимое файла.
-# * `$a` — путь к файлу.
-# * `$b` — слой которым был считан файл и которым он будет записан.
+# * `$_` – содержимое файла.
+# * `$a` – путь к файлу.
+# * `$b` – слой которым был считан файл и которым он будет записан.
 # 
 # В примере ниже файл "replace.ex" считывается слоем `:utf8`, а записывается слоем `:raw` в функции `replace`:
 # 
-done_testing; }; subtest 'replace (&sub, @files)' => sub { 
+::done_testing; }; subtest 'replace (&sub, @files)' => sub { 
 local $_ = "replace.ex";
 lay "abc";
 replace { $b = ":utf8"; y/a/¡/ } [$_, ":raw"];
@@ -251,14 +262,14 @@ replace { $b = ":utf8"; y/a/¡/ } [$_, ":raw"];
 # 
 # * Если `$path` не указан, использует `$_`.
 # * Если `$path` является ссылкой на массив, тогда используется путь в качестве первого элемента и права в качестве второго элемента.
-# * Права по умолчанию — `0755`.
+# * Права по умолчанию – `0755`.
 # * Возвращает `$path`.
 # 
-done_testing; }; subtest 'mkpath (;$path)' => sub { 
+::done_testing; }; subtest 'mkpath (;$path)' => sub { 
 local $_ = ["A", 0755];
 ::is scalar do {mkpath}, "A", 'mkpath   # => A';
 
-::like scalar do {eval { mkpath "/A/" }; $@}, qr!mkpath /A: Permission denied!, 'eval { mkpath "/A/" }; $@   # ~> mkpath /A: Permission denied';
+::like scalar do {eval { mkpath "/A/" }; $@}, qr{mkpath /A: Permission denied}, 'eval { mkpath "/A/" }; $@   # ~> mkpath /A: Permission denied';
 
 mkpath "A///./file";
 ::is scalar do {-d "A"}, scalar do{1}, '-d "A"  # -> 1';
@@ -266,8 +277,8 @@ mkpath "A///./file";
 # 
 # ### See also
 # 
-# * [File::Path](https://metacpan.org/pod/File::Path) — `mkpath("dir1/dir2")`.
-# * [File::Path::Tiny](https://metacpan.org/pod/File::Path::Tiny) — `File::Path::Tiny::mk($path)`. Не выбрасывает исключений.
+# * [File::Path](https://metacpan.org/pod/File::Path) – `mkpath("dir1/dir2")`.
+# * [File::Path::Tiny](https://metacpan.org/pod/File::Path::Tiny) – `File::Path::Tiny::mk($path)`. Не выбрасывает исключений.
 # 
 # ## mtime (;$path)
 # 
@@ -275,19 +286,19 @@ mkpath "A///./file";
 # 
 # Выбрасывает исключение, если файл не существует или нет прав:
 # 
-done_testing; }; subtest 'mtime (;$path)' => sub { 
+::done_testing; }; subtest 'mtime (;$path)' => sub { 
 local $_ = "nofile";
-::like scalar do {eval { mtime }; $@}, qr!mtime nofile: No such file or directory!, 'eval { mtime }; $@  # ~> mtime nofile: No such file or directory';
+::like scalar do {eval { mtime }; $@}, qr{mtime nofile: No such file or directory}, 'eval { mtime }; $@  # ~> mtime nofile: No such file or directory';
 
-::like scalar do {mtime ["/"]}, qr!^\d+(\.\d+)?$!, 'mtime ["/"]   # ~> ^\d+(\.\d+)?$';
+::like scalar do {mtime ["/"]}, qr{^\d+(\.\d+)?$}, 'mtime ["/"]   # ~> ^\d+(\.\d+)?$';
 
 # 
 # ### See also
 # 
-# * `-M` — `-M "file.txt"`, `-M _` в днях от текущего времени.
-# * [stat](https://metacpan.org/pod/stat) — `(stat "file.txt")[9]` в секундах (unixtime).
-# * [Time::HiRes](https://metacpan.org/pod/Time::HiRes) — `(Time::HiRes::stat "file.txt")[9]` в секундах с дробной частью.
-# * [Mojo::File](https://metacpan.org/pod/Mojo::File) — `path($file)->stat->mtime`.
+# * `-M` – `-M "file.txt"`, `-M _` в днях от текущего времени.
+# * [stat](https://metacpan.org/pod/stat) – `(stat "file.txt")[9]` в секундах (unixtime).
+# * [Time::HiRes](https://metacpan.org/pod/Time::HiRes) – `(Time::HiRes::stat "file.txt")[9]` в секундах с дробной частью.
+# * [Mojo::File](https://metacpan.org/pod/Mojo::File) – `path($file)->stat->mtime`.
 # 
 # ## sta (;$path)
 # 
@@ -297,12 +308,12 @@ local $_ = "nofile";
 # 
 # Выбрасывает исключение, если файл не существует или нет прав:
 # 
-done_testing; }; subtest 'sta (;$path)' => sub { 
+::done_testing; }; subtest 'sta (;$path)' => sub { 
 local $_ = "nofile";
-::like scalar do {eval { sta }; $@}, qr!sta nofile: No such file or directory!, 'eval { sta }; $@  # ~> sta nofile: No such file or directory';
+::like scalar do {eval { sta }; $@}, qr{sta nofile: No such file or directory}, 'eval { sta }; $@  # ~> sta nofile: No such file or directory';
 
-::like scalar do {sta(["/"])->{ino}}, qr!^\d+$!, 'sta(["/"])->{ino} # ~> ^\d+$';
-::like scalar do {sta(".")->{atime}}, qr!^\d+(\.\d+)?$!, 'sta(".")->{atime} # ~> ^\d+(\.\d+)?$';
+::like scalar do {sta(["/"])->{ino}}, qr{^\d+$}, 'sta(["/"])->{ino} # ~> ^\d+$';
+::like scalar do {sta(".")->{atime}}, qr{^\d+(\.\d+)?$}, 'sta(".")->{atime} # ~> ^\d+(\.\d+)?$';
 
 # 
 # ### See also
@@ -330,7 +341,7 @@ local $_ = "nofile";
 # * ФС берётся из системной переменной `$^O`.
 # * К файловой системе не обращается.
 # 
-done_testing; }; subtest 'path (;$path)' => sub { 
+::done_testing; }; subtest 'path (;$path)' => sub { 
 {
     local $^O = "freebsd";
 
@@ -594,7 +605,7 @@ done_testing; }; subtest 'path (;$path)' => sub {
 # 
 # Названия ОС – регистронезависимы.
 # 
-done_testing; }; subtest 'transpath ($path?, $from, $to)' => sub { 
+::done_testing; }; subtest 'transpath ($path?, $from, $to)' => sub { 
 local $_ = ">x>y>z.doc.zip";
 ::is scalar do {transpath "vos", "unix"}, '/x/y/z.doc.zip', 'transpath "vos", "unix"       # \> /x/y/z.doc.zip';
 ::is scalar do {transpath "vos", "VMS"}, '[.x.y]z.doc.zip', 'transpath "vos", "VMS"        # \> [.x.y]z.doc.zip';
@@ -606,7 +617,7 @@ local $_ = ">x>y>z.doc.zip";
 # 
 # Разбивает директорию на составляющие. Директорию следует вначале получить из `path->{dir}`.
 # 
-done_testing; }; subtest 'splitdir (;$dir)' => sub { 
+::done_testing; }; subtest 'splitdir (;$dir)' => sub { 
 local $^O = "unix";
 ::is_deeply scalar do {[ splitdir "/x/" ]}, scalar do {["", "x", ""]}, '[ splitdir "/x/" ]    # --> ["", "x", ""]';
 
@@ -615,7 +626,7 @@ local $^O = "unix";
 # 
 # Объединяет директорию из составляющих. Затем полученную директорию следует включить в `path +{dir => $dir}`.
 # 
-done_testing; }; subtest 'joindir (;$dirparts)' => sub { 
+::done_testing; }; subtest 'joindir (;$dirparts)' => sub { 
 local $^O = "unix";
 ::is scalar do {joindir qw/x y z/}, "x/y/z", 'joindir qw/x y z/    # => x/y/z';
 
@@ -626,7 +637,7 @@ local $^O = "unix";
 # 
 # Разбивает расширение на составляющие. Расширение следует вначале получить из `path->{ext}`.
 # 
-done_testing; }; subtest 'splitext (;$ext)' => sub { 
+::done_testing; }; subtest 'splitext (;$ext)' => sub { 
 local $^O = "unix";
 ::is_deeply scalar do {[ splitext ".x." ]}, scalar do {["", "x", ""]}, '[ splitext ".x." ]    # --> ["", "x", ""]';
 
@@ -635,7 +646,7 @@ local $^O = "unix";
 # 
 # Объединяет расширение из составляющих. Затем полученное расширение следует включить в `path +{ext => $ext}`.
 # 
-done_testing; }; subtest 'joinext (;$extparts)' => sub { 
+::done_testing; }; subtest 'joinext (;$extparts)' => sub { 
 local $^O = "unix";
 ::is scalar do {joinext qw/x y z/}, "x.y.z", 'joinext qw/x y z/    # => x.y.z';
 
@@ -660,9 +671,9 @@ local $^O = "unix";
 #>> 1;
 #@< EOF
 # 
-done_testing; }; subtest 'include (;$pkg)' => sub { 
+::done_testing; }; subtest 'include (;$pkg)' => sub { 
 use lib "lib";
-::like scalar do {include("A")->new}, qr!A=HASH\(0x\w+\)!, 'include("A")->new               # ~> A=HASH\(0x\w+\)';
+::like scalar do {include("A")->new}, qr{A=HASH\(0x\w+\)}, 'include("A")->new               # ~> A=HASH\(0x\w+\)';
 ::is_deeply scalar do {[map include, qw/A N/]}, scalar do {[qw/A N/]}, '[map include, qw/A N/]          # --> [qw/A N/]';
 ::is scalar do {{ local $_="N"; include->ex }}, scalar do{123}, '{ local $_="N"; include->ex }   # -> 123';
 
@@ -671,16 +682,16 @@ use lib "lib";
 # 
 # Считывает файл в первый раз. Любая последующая попытка считать этот файл возвращает `undef`. Используется для вставки модулей js и css в результирующий файл. Без параметра использует `$_`.
 # 
-# * `$file` может содержать массивы из двух элементов. Первый рассматривается как путь, а второй — как слой. Слой по умолчанию — `:utf8`.
+# * `$file` может содержать массивы из двух элементов. Первый рассматривается как путь, а второй – как слой. Слой по умолчанию – `:utf8`.
 # * Если `$file` не указан – использует `$_`.
 # 
-done_testing; }; subtest 'catonce (;$file)' => sub { 
+::done_testing; }; subtest 'catonce (;$file)' => sub { 
 local $_ = "catonce.txt";
 lay "result";
 ::is scalar do {catonce}, scalar do{"result"}, 'catonce  # -> "result"';
 ::is scalar do {catonce}, scalar do{undef}, 'catonce  # -> undef';
 
-::like scalar do {eval { catonce[] }; $@}, qr!catonce not use ref path\!!, 'eval { catonce[] }; $@ # ~> catonce not use ref path!';
+::like scalar do {eval { catonce[] }; $@}, qr{catonce not use ref path\!}, 'eval { catonce[] }; $@ # ~> catonce not use ref path!';
 
 # 
 # ## wildcard (;$wildcard)
@@ -696,7 +707,7 @@ lay "result";
 # * `,` - `|`
 # * Остальные символы экранируются с помощью `quotemeta`.
 # 
-done_testing; }; subtest 'wildcard (;$wildcard)' => sub { 
+::done_testing; }; subtest 'wildcard (;$wildcard)' => sub { 
 ::is scalar do {wildcard "*.{pm,pl}"}, '(?^usn:^.*?\.(pm|pl)$)', 'wildcard "*.{pm,pl}"  # \> (?^usn:^.*?\.(pm|pl)$)';
 ::is scalar do {wildcard "?_??_**"}, '(?^usn:^._[^/]_[^/]*?$)', 'wildcard "?_??_**"  # \> (?^usn:^._[^/]_[^/]*?$)';
 
@@ -707,7 +718,7 @@ done_testing; }; subtest 'wildcard (;$wildcard)' => sub {
 # 
 # * [File::Wildcard](https://metacpan.org/pod/File::Wildcard).
 # * [String::Wildcard::Bash](https://metacpan.org/pod/String::Wildcard::Bash).
-# * [Text::Glob](https://metacpan.org/pod/Text::Glob) — `glob_to_regex("*.{pm,pl}")`.
+# * [Text::Glob](https://metacpan.org/pod/Text::Glob) – `glob_to_regex("*.{pm,pl}")`.
 # 
 # ## goto_editor ($path, $line)
 # 
@@ -724,18 +735,18 @@ done_testing; }; subtest 'wildcard (;$wildcard)' => sub {
 #>> 1;
 #@< EOF
 # 
-done_testing; }; subtest 'goto_editor ($path, $line)' => sub { 
+::done_testing; }; subtest 'goto_editor ($path, $line)' => sub { 
 goto_editor "mypath", 10;
 ::is scalar do {cat "ed.txt"}, "mypath:10\n", 'cat "ed.txt"  # => mypath:10\n';
 
-::like scalar do {eval { goto_editor "`", 1 }; $@}, qr!`:1 --> 512!, 'eval { goto_editor "`", 1 }; $@  # ~> `:1 --> 512';
+::like scalar do {eval { goto_editor "`", 1 }; $@}, qr{`:1 --> 512}, 'eval { goto_editor "`", 1 }; $@  # ~> `:1 --> 512';
 
 # 
 # ## from_pkg (;$pkg)
 # 
 # Переводит пакет в путь ФС. Без параметра использует `$_`.
 # 
-done_testing; }; subtest 'from_pkg (;$pkg)' => sub { 
+::done_testing; }; subtest 'from_pkg (;$pkg)' => sub { 
 ::is scalar do {from_pkg "Aion::Fs"}, "Aion/Fs.pm", 'from_pkg "Aion::Fs"  # => Aion/Fs.pm';
 ::is_deeply scalar do {[map from_pkg, "Aion::Fs", "A::B::C"]}, scalar do {["Aion/Fs.pm", "A/B/C.pm"]}, '[map from_pkg, "Aion::Fs", "A::B::C"]  # --> ["Aion/Fs.pm", "A/B/C.pm"]';
 
@@ -744,7 +755,7 @@ done_testing; }; subtest 'from_pkg (;$pkg)' => sub {
 # 
 # Переводит путь из ФС в пакет. Без параметра использует `$_`.
 # 
-done_testing; }; subtest 'to_pkg (;$path)' => sub { 
+::done_testing; }; subtest 'to_pkg (;$path)' => sub { 
 ::is scalar do {to_pkg "Aion/Fs.pm"}, "Aion::Fs", 'to_pkg "Aion/Fs.pm"  # => Aion::Fs';
 ::is_deeply scalar do {[map to_pkg, "Aion/Fs.md", "A/B/C.md"]}, scalar do {["Aion::Fs", "A::B::C"]}, '[map to_pkg, "Aion/Fs.md", "A/B/C.md"]  # --> ["Aion::Fs", "A::B::C"]';
 
@@ -761,7 +772,7 @@ done_testing; }; subtest 'to_pkg (;$path)' => sub {
 # 
 # The Aion::Fs is copyright © 2023 by Yaroslav O. Kosmina. Rusland. All rights reserved.
 
-	done_testing;
+	::done_testing;
 };
 
-done_testing;
+::done_testing;

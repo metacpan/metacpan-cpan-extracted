@@ -1,5 +1,11 @@
 Revision history for Crypt-HSM
 
+0.023     2025-11-19 19:09:44+01:00 Europe/Brussels
+          - [BREAKING] Turn open_session argument into named arguments
+          - Fix session state field to a scalar
+          - Make various flag fields hashes instead of arrays
+          - Allow for undefined PIN
+
 0.022     2025-11-14 01:48:35+01:00 Europe/Brussels
           - Return correct types in open_* methods
           - Null-initialize attribute before using it to fetch

@@ -61,10 +61,13 @@ elsif($cpanfile) {
 elsif(defined $diff_cpanfile) {
 	require File::Spec;
 	require File::Slurper;
+	require File::Path;
 	require Liveman::Cpanfile;
     my $cpanfile = Liveman::Cpanfile->new->cpanfile;
 
-    my $cpanfile_path = File::Spec->catfile(File::Spec->tmpdir, 'cpanfile');
+    my $cpanfile_path = File::Spec->catdir(File::Spec->tmpdir, '.liveman');
+    File::Path::mkpath($cpanfile_path);
+    $cpanfile_path = File::Spec->catfile($cpanfile_path , 'cpanfile');
     File::Slurper::write_text($cpanfile_path, $cpanfile);
     
     $diff_cpanfile ||= 'meld';
@@ -114,7 +117,7 @@ In other words, B<liveman> converts B<lib/**.md>-files to test files (B<t/**.t>)
 
 The coating can be viewed in the I<*cover_db/coverage.html> file.
 
-Note: it is better to immediately place I<cover_db/> in I<.gitignore>.
+B<Note:> It is better to immediately put I<cover_db/> in I<.gitignore>.
 
 =head1 OPTIONS
 

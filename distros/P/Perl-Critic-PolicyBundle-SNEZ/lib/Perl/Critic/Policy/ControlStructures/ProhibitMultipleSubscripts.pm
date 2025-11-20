@@ -138,6 +138,50 @@ exactly once and assigning them to variables for later access.
 Not only does it make the code less cluttered with repeated lookups,
 it is also more efficient in many cases.
 
+    # Not ok
+    for my $n (0..$#clients) {
+        $clients[$n]->tally_hours();
+        $clients[$n]->bill_hours();
+        $clients[$n]->reset_hours();
+    }
+
+    # Ok
+    for my $client (@clients) {
+        $client->tally_hours();
+        $client->bill_hours();
+        $client->reset_hours();
+    }
+
+    # Not ok
+    for my $agent_num (0..$#operatives) {                        # Iterate indices
+        print "Checking agent $agent_num\n";                     # Use index
+        if ($on_disavowed_list{$operatives[$agent_num]}) {       # Extract value
+            print "\t...$operatives[$agent_num] disavowed!\n";   # Extract value again
+        }
+    }
+
+    # Ok
+    for my $agent_num (0 .. $#operatives) {
+        print "Checking agent $agent_num\n";
+        my $agent = $operatives[$agent_num];
+        if ($on_disavowed_list{$agent}) {
+            print "\t...$agent disavowed!\n";
+        }
+    }
+
+    # Not ok
+    foreach my $elem_ref (@stuff) {
+        Some::Util::foo($elem_ref->{data});
+        Some::Util::bar($elem_ref->{data});
+    }
+
+    # Ok
+    foreach my $elem_ref (@stuff) {
+        my $data = $elem_ref->{data};
+        Some::Util::foo($data);
+        Some::Util::bar($data);
+    }
+
 =head1 CONFIGURATION
 
 This Policy is not configurable except for the standard options.

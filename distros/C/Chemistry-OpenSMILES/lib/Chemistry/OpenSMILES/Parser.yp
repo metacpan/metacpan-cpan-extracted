@@ -70,6 +70,11 @@ In particular, C<write_SMILES()> calls from L<Chemistry::OpenSMILES::Writer|Chem
 
 This option is now deprecated and may be removed in upcoming versions.
 
+=item C<report_unnecessary_dot_usage>
+
+With C<report_unnecessary_dot_usage> set to anything evaluating to true, the parser will emit warnings about bot bonds used in parentheses.
+This could be used to detect the unnecessary use of dot bonds.
+
 =back
 
 =head1 CAVEATS
@@ -175,6 +180,11 @@ chain: atom
         }
      | chain '(' chain ')'
         {
+            if( $_[0]->{USER}{OPTIONS}{report_unnecessary_dot_usage} &&
+                $_[3]->{first}{index} != $_[3]->{last}{index} ) {
+                warn 'unnecessary use of dot in parenthesis' . "\n";
+            }
+
             if( $_[1]->{last}{index} != $_[3]->{first}{index} ) {
                 $_[0]->_merge_graphs( $_[1]->{last}{index},
                                       $_[3]->{first}{index} );
@@ -196,6 +206,11 @@ chain: atom
         }
      | chain '(' bond chain ')'
         {
+            if( $_[0]->{USER}{OPTIONS}{report_unnecessary_dot_usage} &&
+                $_[4]->{first}{index} != $_[4]->{last}{index} ) {
+                warn 'unnecessary use of dot in parenthesis' . "\n";
+            }
+
             if( $_[1]->{last}{index} != $_[4]->{first}{index} ) {
                 $_[0]->_merge_graphs( $_[1]->{last}{index},
                                       $_[4]->{first}{index} );
@@ -217,6 +232,13 @@ chain: atom
             return $_[1];
         }
      | chain '(' '.' chain ')'
+        {
+            if( $_[0]->{USER}{OPTIONS}{report_unnecessary_dot_usage} ) {
+                warn 'unnecessary use of dot in parenthesis' . "\n";
+            }
+
+            return $_[1];
+        }
 
      # According to the specification of OpenSMILES, ring bonds are
      # allowed only before the branch enumeration. However, I think this

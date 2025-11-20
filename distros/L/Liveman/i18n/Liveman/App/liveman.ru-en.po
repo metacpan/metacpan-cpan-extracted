@@ -20,8 +20,8 @@ msgstr "In other words, **liveman** converts **lib/\\*\\*.md**-files to test fil
 msgid "Покрытие можно просмотреть в файле *cover_db/coverage.html*."
 msgstr "The coating can be viewed in the **cover_db/coverage.html* file."
 
-msgid "Примечание: лучше сразу поместить *cover_db/* в *.gitignore*."
-msgstr "Note: it is better to immediately place *cover_db/* in *.gitignore*."
+msgid "**Примечание:** лучше сразу поместить *cover_db/* в *.gitignore*."
+msgstr "**Note:** It is better to immediately put *cover_db/* in *.gitignore*."
 
 msgid "Показать справку и выйти."
 msgstr "Show a certificate and get out."

@@ -2,7 +2,7 @@ package Liveman;
 use 5.22.0;
 use common::sense;
 
-our $VERSION = "3.4";
+our $VERSION = "3.5";
 
 use File::Basename qw/dirname/;
 use File::Find::Wanted qw/find_wanted/;
@@ -121,10 +121,10 @@ sub _to_testing {
 	elsif(exists $x{begins})  { my $ex = _q_esc($expected); "::cmp_ok scalar do {$code}, '=~', '^' . quotemeta '$ex', '$q';\n" }
 	elsif(exists $x{ends})  { my $ex = _q_esc($expected); "::cmp_ok scalar do {$code}, '=~', quotemeta('$ex') . '\$', '$q';\n" }
 	elsif(exists $x{inners})  { my $ex = _q_esc($expected); "::cmp_ok scalar do {$code}, '=~', quotemeta '$ex', '$q';\n" }
-	elsif(exists $x{error})  { my $ex = _q_esc($expected); "::cmp_ok do { eval {$code}; \$\@ }, '=~', '^' . quotemeta '$ex', '$q';\n" }
-	elsif(exists $x{qqerror})  { my $ex = _qq_esc($expected); "::cmp_ok do { eval {$code}; \$\@ }, '=~', '^' . quotemeta \"$ex\", '$q';\n" }
-	elsif(exists $x{qrerror})  { my $ex = _qr_esc($expected); "::like scalar do { eval { $code }; \$\@ }, qr{$ex}, '$q';\n" }
-	elsif(exists $x{unqrerror})  { my $ex = _qr_esc($expected); "::unlike scalar do { eval { $code }; \$\@ }, qr{$ex}, '$q';\n" }
+	elsif(exists $x{error})  { my $ex = _q_esc($expected); "eval {$code}; ok defined(\$\@), '$q'; ::cmp_ok \$\@, '=~', '^' . quotemeta '$ex', '$q';\n" }
+	elsif(exists $x{qqerror})  { my $ex = _qq_esc($expected); "eval {$code}; ok defined(\$\@), '$q'; ::cmp_ok \$\@, '=~', '^' . quotemeta \"$ex\", '$q';\n" }
+	elsif(exists $x{qrerror})  { my $ex = _qr_esc($expected); "eval {$code}; ok defined(\$\@), '$q'; ::like scalar \$\@, qr{$ex}, '$q';\n" }
+	elsif(exists $x{unqrerror})  { my $ex = _qr_esc($expected); "eval {$code}; ok defined(\$\@), '$q'; ::unlike scalar \$\@, qr{$ex}, '$q';\n" }
 	else { # Что-то ужасное вырвалось на волю!
 		"???"
 	}
@@ -287,6 +287,9 @@ BEGIN {
 	my $project_dir = File::Spec->catfile(@dirs[0..$#dirs-%(T_DIRS)]);
 	my $project_name = $dirs[$#dirs-%(T_DIRS)];
 	my @test_dirs = @dirs[$#dirs-%(T_DIRS)+2 .. $#dirs];
+
+	$ENV{TMPDIR} = $ENV{LIVEMAN_TMPDIR} if exists $ENV{LIVEMAN_TMPDIR};
+
 	my $dir_for_tests = File::Spec->catfile(File::Spec->tmpdir, ".liveman", $project_name, join("!", @test_dirs, File::Basename::basename(__FILE__)));
 	
 	File::Find::find(sub { chmod 0700, $_ if !/^\.{1,2}\z/ }, $dir_for_tests), File::Path::rmtree($dir_for_tests) if -e $dir_for_tests;
@@ -439,6 +442,9 @@ sub transform {
 sub tests {
 	my ($self) = @_;
 
+	local $ENV{LIVEMAN_TMPDIR} = Cwd::abs_path(File::Spec->catfile($ENV{TMPDIR} // '/tmp'));
+	mkpath($ENV{LIVEMAN_TMPDIR});
+
 	my $cover = "/usr/bin/site_perl/cover";
 	$cover = 'cover' if !-e $cover;
 
@@ -451,7 +457,7 @@ sub tests {
 		$yath = "/usr/bin/site_perl/yath";
 		$yath = 'yath' if !-e $yath;
 	}
-
+	
 	my $options = $self->{options};
 
 	if($self->{files}) {
@@ -500,7 +506,7 @@ Liveman - compiler from Markdown to tests and documentation
 
 =head1 VERSION
 
-3.4
+3.5
 
 =head1 SYNOPSIS
 
@@ -569,6 +575,44 @@ The predecessor of C<liveman> is LL<https://github.com/darviarush/miu>.
 =head2 TYPES OF TESTS
 
 Section codes without a specified programming language or with C<perl> are written as code in the file C<t/**.t>. And a comment with an arrow (# -> ) turns into a C<Test::More> test.
+
+Supported tests:
+
+=over
+
+=item * C<< -E<gt> >>, C<→> – comparison of scalars;
+
+=item * C<< --E<gt> >>, C<⟶> – comparison of structures;
+
+=item * C<< =E<gt> >>, C<⇒> – comparison with the interpolated string;
+
+=item * C<< \E<gt> >>, C<↦> – comparison with a non-interpolated string;
+
+=item * C<< ^=E<gt> >>, C<⤇> – comparison of the beginning of the scalar with the interpolated string;
+
+=item * C<< $=E<gt> >>, C<➾> – comparison of the end of the scalar with the interpolated string;
+
+=item * C<< *=E<gt> >>, C<⥴> – comparison of the middle of the scalar with the interpolated string;
+
+=item * C<< ^-E<gt> >>, C<↣> – comparison of the beginning of a scalar with a non-interpolated string;
+
+=item * C<< $-E<gt> >>, C<⇥> – comparison of the end of a scalar with a non-interpolated string;
+
+=item * C<< *-E<gt> >>, C<⥵> – comparison of the middle of a scalar with a non-interpolated string;
+
+=item * C<< ~E<gt> >>, C<↬> – matching a scalar with a regular expression (C<$code =~ /.../>);
+
+=item * C<< E<lt>~ >>, C<↫> – negative matching of a scalar with a regular expression (C<$code !~ /.../>);
+
+=item * C<< @-E<gt> >>, C<↯> – comparison of the beginning of the exception with a non-interpolated string;
+
+=item * C<< @=E<gt> >>, C<⤯> – comparison of the beginning of the exception with the interpolated string;
+
+=item * C<< @~E<gt> >>, C<⇝> – matching an exception with a regular expression (C<defined $@ && $@ =~ /.../>);
+
+=item * C<< E<lt>~@ >>, C<⇜> – negative matching of an exception with a regular expression (C<defined $@ && $@ !~ /.../>);
+
+=back
 
 =head3 C<is>
 

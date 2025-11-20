@@ -55,7 +55,7 @@ my %att = (
   NO_PERLLOCAL => 1,
   clean        => { FILES                => "$distname*" },
   dist         => { TARFLAGS             => 'cf', COMPRESS => 'gzip -9f', SUFFIX => 'gz' },
-  realclean    => { FILES                => 'local' },
+  realclean    => { FILES                => 'cover_db local' },
   test         => { RECURSIVE_TEST_FILES => 1 }
 );
 

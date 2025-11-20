@@ -1,5 +1,5 @@
 package Gherkin::Pickles::Compiler;
-$Gherkin::Pickles::Compiler::VERSION = '36.1.0';
+$Gherkin::Pickles::Compiler::VERSION = '37.0.0';
 use strict;
 use warnings;
 use Scalar::Util qw(reftype);
@@ -85,6 +85,7 @@ sub _compile_scenario {
                 id           => $id_generator->(),
                 name         => $scenario->name,
                 language     => $language,
+                location     => $scenario->location,
                 steps        => \@steps,
                 tags         => $class->_pickle_tags( \@all_tags ),
                 uri          => $uri,
@@ -139,6 +140,7 @@ sub _compile_scenario_outline {
                             $scenario->name,
                             $variables, $values->cells || [] ),
                         language     => $language,
+                        location     => $values->location,
                         steps        => \@steps,
                         tags         => $class->_pickle_tags( \@tags ),
                         uri          => $uri,

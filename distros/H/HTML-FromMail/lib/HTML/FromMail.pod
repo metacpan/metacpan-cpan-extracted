@@ -11,14 +11,14 @@ HTML::FromMail - base-class for the HTML producers
 
 =head1 SYNOPSIS
 
- use Mail::Message;   # part of Mail::Box
- use HTML::FromMail;
+  use Mail::Message;   # part of Mail::Box
+  use HTML::FromMail;
 
- my $msg    = Mail::Message->read(\*STDIN);
- my $fmt    = HTML::FromMail->new(templates => 'templ');
- my $output = $fmt->export($msg, output => $tempdir);
+  my $msg    = Mail::Message->read(\*STDIN);
+  my $fmt    = HTML::FromMail->new(templates => 'templ');
+  my $output = $fmt->export($msg, output => $tempdir);
 
- # See full example in examples/msg2html.pl
+  # See full example in examples/msg2html.pl
 
 =head1 DESCRIPTION
 
@@ -98,7 +98,9 @@ hard.
 
 =over 4
 
-=item HTML::FromMail-E<gt>B<new>(OPTIONS)
+=item $class-E<gt>B<new>(%options)
+
+Z<>
 
  -Option   --Default
   formatter  HTML::FromMail::Format::OODoc
@@ -108,19 +110,19 @@ hard.
 
 =over 2
 
-=item formatter => CLASS|OBJECT|HASH
+=item formatter => CLASS|$formatter|HASH
 
 The formatter which is used to process the template files which produce
 the output.
 
-You can specify a CLASS, a formatter OBJECT, or a HASH with options for
+You can specify a CLASS, a C<$formatter> object, or a HASH with options for
 a L<HTML::FromMail::Format::OODoc|HTML::FromMail::Format::OODoc> object which will be created for you.
 
-=item producers => HASH
+=item producers => \%map
 
 The producer list describes which set of formatting commands are
-applicable to certain objects when producing HTML.  The HASH
-maps external classes (usually implemented in L<Mail::Box>) to
+applicable to certain objects when producing HTML.  The C<%map>
+links external class names (usually implemented in Mail::Box) to
 sub-classes of this object.  You may modify the default list
 using L<producer()|HTML::FromMail/"Attributes">.  Read more in L</Producers>.
 
@@ -132,7 +134,7 @@ of HTML.  This option adds/modifies the settings for a certain group
 of producers, but influence the formatters behavior as well.
 Read more in L</Settings>.
 
-=item templates => DIRECTORY
+=item templates => $directory
 
 The location where the template files can be found.  It is used as
 base for relative names.
@@ -149,39 +151,38 @@ base for relative names.
 
 Returns the selected formatter object.
 
-=item $obj-E<gt>B<producer>( (CLASS|OBJECT) [, HTML_PRODUCER] )
+=item $obj-E<gt>B<producer>( (CLASS|$object), [$producer] )
 
-The CLASS object, for instance a Mail::Message, is handled by the
-HTML_PRODUCER class.  When an OBJECT is specified, the class of that
-object will be used.  The producer returned is the best fit with
-respect of the inheritance relations.  C<undef> is returned when
-no producer was found.
+The C<CLASS> object, for instance a Mail::Message, is handled by the HTML
+C<$producer> class.  When an C<$object> is specified, the C<CLASS> of that object
+will be used.  The producer returned is the best fit with respect of
+the inheritance relations.  C<undef> is returned when no producer was found.
 
-Without producer as parameter, the actual producer for the CLASS is
+Without producer as parameter, the actual producer for the C<CLASS> is
 returned.  In this case, the producer class will be compiled for you,
 if that hasn't be done before.
 
-example: 
+» example: 
 
- use HTML::FromMail;
- my $converter = HTML::FromMail->new;
- print $converter->producer("Mail::Message");
+  use HTML::FromMail;
+  my $converter = HTML::FromMail->new;
+  print $converter->producer("Mail::Message");
 
- print $converter->producer($msg);
+  print $converter->producer($msg);
 
-=item $obj-E<gt>B<settings>( (PRODUCER|TOPIC) [,HASH|LIST] )
+=item $obj-E<gt>B<settings>( ($producer|$topic), [HASH|LIST] )
 
-Returns a hash which contains the differences from the default for
-producers of a certain TOPIC, or the topic of the specified PRODUCER.
-With HASH, all settings will be replaced by that value as new set.
+Returns a C<HASH> which contains the differences from the default for
+producers of a certain C<$topic>, or the topic of the specified C<$producer>.
+With C<HASH>, all settings will be replaced by that value as new set.
 
 It may be easier to use L<new(settings)|HTML::FromMail/"Constructors"> or add the information to
 the content of your templates.
 
-=item $obj-E<gt>B<templates>( [PRODUCER|TOPIC] )
+=item $obj-E<gt>B<templates>( [$producer|$topic] )
 
-Returns the location of the templates.  When a TOPIC is specified,
-that is added to the templates path.  With a PRODUCER, that is object is used
+Returns the location of the templates.  When a C<$topic> is specified,
+that is added to the templates path.  With a C<$producer>, that is object is used
 to get the topic.
 
 =back
@@ -190,9 +191,9 @@ to get the topic.
 
 =over 4
 
-=item $obj-E<gt>B<export>(OBJECT, OPTIONS)
+=item $obj-E<gt>B<export>($object, %options)
 
-Produce the HTML output of the OBJECT, using the specified OPTIONS.
+Produce the HTML output of the C<$object>.
 
  -Option--Default
   output  <required>
@@ -200,16 +201,16 @@ Produce the HTML output of the OBJECT, using the specified OPTIONS.
 
 =over 2
 
-=item output => DIRECTORY|FILENAME
+=item output => $directory|$filename
 
-The DIRECTORY where the processed templates for the object are written to.
-It is only permitted to supply a single filename when the template
+The C<$directory> where the processed templates for the object are written
+to.  It is only permitted to supply a single C<$filename> when the template
 specifies a single filename as well.
 
-=item use => ARRAY-OF-FILENAMES
+=item use => \@files
 
-Directoy C<new(templates)> defines the location of all template files.  In
-that directort, you have sub-directories for each kind of object which
+Directory C<new(templates)> defines the location of all template C<@files>.  In
+that directory, you have sub-directories for each kind of object which
 can be formatted sorted on C<topic>.
 
 for instance, C<templates> contains C</home/me/templates> and the object
@@ -229,10 +230,10 @@ is absolute (starts with a slash), that name is used.
 
 =over 4
 
-=item $obj-E<gt>B<expandFiles>(DIRECTORY|FILENAME|ARRAY-OF-FILENAMES)
+=item $obj-E<gt>B<expandFiles>($directory|$file|\@files)
 
-Returns a list with all filenames which are included in the DIRECTORY
-specified or the ARRAY.  If only one FILENAME is specified, then that
+Returns a LIST with all filenames which are included in the C<$directory>
+specified or the ARRAY.  If only one C<$file> is specified, then that
 will be returned.
 
 =back
@@ -249,12 +250,12 @@ L<new(producers)|HTML::FromMail/"Constructors"> and L<producer()|HTML::FromMail/
 On the moment, the following producers are defined.  When marked with
 a C<(*)>, the implementation is not yet finished.
 
- Mail::Message            HTML::FromMail::Message
- Mail::Message::Head      HTML::FromMail::Head
- Mail::Message::Field     HTML::FromMail::Field
- Mail::Message::Body      HTML::FromMail::Body      *
- Mail::Box                HTML::FromMail::Box       *
- Mail::Box::Thread::Node  HTML::FromMail::Thread    *
+  Mail::Message            HTML::FromMail::Message
+  Mail::Message::Head      HTML::FromMail::Head
+  Mail::Message::Field     HTML::FromMail::Field
+  Mail::Message::Body      HTML::FromMail::Body      *
+  Mail::Box                HTML::FromMail::Box       *
+  Mail::Box::Thread::Node  HTML::FromMail::Thread    *
 
 =head2 Settings
 
@@ -269,16 +270,16 @@ for the formatter as well as the producer when formatting that topic.
 
 An example should clarify things a little:
 
- my $fmt = HTML::FromMail->new
-   ( settings =>
-       { message =>
-           { previewers    => \@my_prevs
-           , disposition   => sub { 'attach' }
-           }
-       , field   => { }
-       }
-   );
- print $fmt->export($msg, output => '/tmp/x');
+  my $fmt = HTML::FromMail->new(
+     settings => {
+        message => {
+           previewers  => \@my_prevs,
+           disposition => sub { 'attach' },
+        },
+        field   => { },
+     },
+  );
+  print $fmt->export($msg, output => '/tmp/x');
 
 For settings available for messages, see L<HTML::FromMail::Message/Settings>.
 
@@ -288,44 +289,65 @@ For settings available for messages, see L<HTML::FromMail::Message/Settings>.
 
 =item Warning: Cannot find $dir/file
 
+Cast by C<expandFiles()>
+
 =item Error: Cannot find template file or directory $topic in $directory.
 
 The templates directory (see L<new(templates)|HTML::FromMail/"Constructors">) does not contain a template
 for the specified topic (see L<HTML::FromMail::Object::new(topic)|HTML::FromMail::Object/"METHODS">).
+Cast by C<templates()>
 
 =item Error: Cannot read from directory $thing: $!
+
+Cast by C<expandFiles()>
 
 =item Error: Cannot use $producer for $class: $@
 
 The specified producer (see L<new(producers)|HTML::FromMail/"Constructors">) does not exist or produces
 compilation errors.  The problem is displayed.
+Cast by C<producer()>
 
 =item Error: Formatter $class can not be used: $@
 
+Cast by C<new()>
+
 =item Error: Formatter $class could not be instantiated
+
+Cast by C<new()>
 
 =item Error: No output directory or file specified.
 
+Cast by C<export()>
+
 =item Error: No producer for $class objects.
+
+Cast by C<export()>
 
 =item Warning: No templates for $topic objects.
 
+Cast by C<export()>
+
 =item Warning: No templates found in $templates directory
 
+Cast by C<export()>
+
 =item Warning: Skipping $full, which is neither file or directory.
+
+Cast by C<expandFiles()>
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of HTML-FromMail distribution version 0.12,
-built on January 29, 2018. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of HTML-FromMail version 3.00,
+built on November 19, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2003-2018 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2003-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

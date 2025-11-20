@@ -9,6 +9,7 @@ no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 no if "$]" >= 5.041009, feature => 'smartmatch';
 no feature 'switch';
+use utf8;
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
 use Test::Memory::Cycle;
@@ -655,24 +656,24 @@ servers:
   - url: https://example.com/{version}/{greeting}
     variables:
       version:
-        default: v1
+        default: v1                       # invalid default
         enum: [v2, v3]
       greeting:
         default: hi
-      unused:
+      unused:                             # valid, but inadvised
         default: nope
-  - url: https://example.com/{v}/{g}
-  - url: https://example.com/{foo}/{foo}
+  - url: https://example.com/{v}/{g}      # invalid: missing 'variables'
+  - url: https://example.com/{foo}/{foo}  # invalid: duplicate variable
     variables: {}
   - url: http://example.com/literal
     variables:
-      version:
-        default: v1
+      unused:
+        default: v1                       # invalid default, even if unused
         enum: [v2, v3]
-  - url: http://example.com/literal2
-  - url: http://example.com/
-  - url: http://example.com?foo=1
-  - url: http://example.com#bar
+  - url: http://example.com/literal2      # valid
+  - url: http://example.com/              # valid, but inadvised
+  - url: http://example.com?foo=1         # invalid
+  - url: http://example.com#bar           # invalid
   - url: http://{host}.com/{path1}{path2} # valid, but inadvised
     variables:
       host:
@@ -681,18 +682,26 @@ servers:
         default: b
       path2:
         default: c
-  - url: http://{host}.com/{pa{th}
-  - url: http://example.com/^illegal
+  - url: http://{host}.com/{pa{th}        # invalid
+  - url: http://example.com/^illegal      # invalid
   - url: http://example.com/d/{d}.d       # valid
     variables:
       d:
         default: d
-  - url: http://example.com/{foo}%20{bar}   # valid
+  - url: http://example.com/{foo}%20{bar} # valid
     variables:
       foo:
         default: foo
       bar:
         default: bar
+  - url: http://example.com/x/{foo?bar}   # valid, but weird
+    variables:
+      foo?bar:
+        default: foo
+  - url: http://example.com/y/{foo#bar}   # valid, but weird
+    variables:
+      foo#bar:
+        default: foo
 YAML
 
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
@@ -753,8 +762,8 @@ YAML
         },
         {
           instanceLocation => '',
-          keywordLocation => $_.'/servers/3/variables/version/default',
-          absoluteKeywordLocation => 'http://localhost:1234/api#'.$_.'/servers/3/variables/version/default',
+          keywordLocation => $_.'/servers/3/variables/unused/default',
+          absoluteKeywordLocation => 'http://localhost:1234/api#'.$_.'/servers/3/variables/unused/default',
           error => 'servers default is not a member of enum',
         },
         do {
@@ -763,8 +772,8 @@ YAML
             instanceLocation => '',
             keywordLocation => $base.'/servers/'.$_.'/url',
             absoluteKeywordLocation => 'http://localhost:1234/api#'.$base.'/servers/'.$_.'/url',
-            error => 'server url cannot end in / or contain query or fragment components',
-          }, 5,6,7
+            error => 'invalid server url "'.$doc->schema->{servers}[$_]{url}.'"',
+          }, 6,7
         },
         {
           instanceLocation => '',
@@ -790,10 +799,9 @@ YAML
 '/servers/2/url': duplicate of templated server url "https://example.com/{v}/{g}"
 '/servers/2/variables': missing "variables" definition for servers template variable "foo"
 '/servers/2': duplicate servers template variable "foo"
-'/servers/3/variables/version/default': servers default is not a member of enum
-'/servers/5/url': server url cannot end in / or contain query or fragment components
-'/servers/6/url': server url cannot end in / or contain query or fragment components
-'/servers/7/url': server url cannot end in / or contain query or fragment components
+'/servers/3/variables/unused/default': servers default is not a member of enum
+'/servers/6/url': invalid server url "http://example.com?foo=1"
+'/servers/7/url': invalid server url "http://example.com#bar"
 '/servers/9/url': invalid server url "http://{host}.com/{pa{th}"
 '/servers/10/url': invalid server url "http://example.com/^illegal"
 '/components/pathItems/path0/servers/0/variables/version/default': servers default is not a member of enum
@@ -802,10 +810,9 @@ YAML
 '/components/pathItems/path0/servers/2/url': duplicate of templated server url "https://example.com/{v}/{g}"
 '/components/pathItems/path0/servers/2/variables': missing "variables" definition for servers template variable "foo"
 '/components/pathItems/path0/servers/2': duplicate servers template variable "foo"
-'/components/pathItems/path0/servers/3/variables/version/default': servers default is not a member of enum
-'/components/pathItems/path0/servers/5/url': server url cannot end in / or contain query or fragment components
-'/components/pathItems/path0/servers/6/url': server url cannot end in / or contain query or fragment components
-'/components/pathItems/path0/servers/7/url': server url cannot end in / or contain query or fragment components
+'/components/pathItems/path0/servers/3/variables/unused/default': servers default is not a member of enum
+'/components/pathItems/path0/servers/6/url': invalid server url "http://example.com?foo=1"
+'/components/pathItems/path0/servers/7/url': invalid server url "http://example.com#bar"
 '/components/pathItems/path0/servers/9/url': invalid server url "http://{host}.com/{pa{th}"
 '/components/pathItems/path0/servers/10/url': invalid server url "http://example.com/^illegal"
 '/components/pathItems/path0/get/servers/0/variables/version/default': servers default is not a member of enum
@@ -814,10 +821,9 @@ YAML
 '/components/pathItems/path0/get/servers/2/url': duplicate of templated server url "https://example.com/{v}/{g}"
 '/components/pathItems/path0/get/servers/2/variables': missing "variables" definition for servers template variable "foo"
 '/components/pathItems/path0/get/servers/2': duplicate servers template variable "foo"
-'/components/pathItems/path0/get/servers/3/variables/version/default': servers default is not a member of enum
-'/components/pathItems/path0/get/servers/5/url': server url cannot end in / or contain query or fragment components
-'/components/pathItems/path0/get/servers/6/url': server url cannot end in / or contain query or fragment components
-'/components/pathItems/path0/get/servers/7/url': server url cannot end in / or contain query or fragment components
+'/components/pathItems/path0/get/servers/3/variables/unused/default': servers default is not a member of enum
+'/components/pathItems/path0/get/servers/6/url': invalid server url "http://example.com?foo=1"
+'/components/pathItems/path0/get/servers/7/url': invalid server url "http://example.com#bar"
 '/components/pathItems/path0/get/servers/9/url': invalid server url "http://{host}.com/{pa{th}"
 '/components/pathItems/path0/get/servers/10/url': invalid server url "http://example.com/^illegal"
 ERRORS

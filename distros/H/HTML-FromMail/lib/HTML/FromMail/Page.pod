@@ -20,19 +20,19 @@ HTML::FromMail::Page - base class for outputting pages
 =head1 DESCRIPTION
 
 Extends L<"DESCRIPTION" in HTML::FromMail::Object|HTML::FromMail::Object/"DESCRIPTION">.
- 
+
 =head1 METHODS
 
 Extends L<"METHODS" in HTML::FromMail::Object|HTML::FromMail::Object/"METHODS">.
- 
+
 =over 4
 
-=item $obj-E<gt>B<lookup>(LABEL, ARGS)
+=item $obj-E<gt>B<lookup>($label, \%options)
 
 Look-up, in a formatter dependent way, what the value related to a certain
-LABEL is.  The location which is being produced on the moment that this
+C<$label> is.  The location which is being produced on the moment that this
 method is called is stored somewhere in the OPTIONS.  The formatter
-(which is also in the OPTIONS) is called to get the value based on that
+(which is also in the C<%options>) is called to get the value based on that
 location information.
 
  -Option   --Default
@@ -44,7 +44,9 @@ location information.
 
 =back
 
-=item HTML::FromMail::Page-E<gt>B<new>(OPTIONS)
+=item $class-E<gt>B<new>(OPTIONS)
+
+Z<>
 
  -Option  --Defined in            --Default
   settings  HTML::FromMail::Object  {}
@@ -52,7 +54,7 @@ location information.
 
 =over 2
 
-=item settings => HASH-OF-HASHES
+=item settings => \%map
 
 =item topic => STRING
 
@@ -62,14 +64,15 @@ location information.
 
 =head1 SEE ALSO
 
-This module is part of HTML-FromMail distribution version 0.12,
-built on January 29, 2018. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of HTML-FromMail version 3.00,
+built on November 19, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2003-2018 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2003-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

@@ -1,5 +1,19 @@
 Revision history for Perl module JSON::Schema::Validate
 
+v0.5.0 2025-11-19T18:15:12+0900
+    [Bug Fixes]
+    - Corrected bad unit tests (thanks Slaven Rezić, GitLab #3).
+
+    [New Features]
+    - Extensions: Added opt-in support for non-core applicators.
+      * uniqueKeys: Enforce uniqueness of property values (or tuples) across array items.
+        Enable via ->extensions(1) or ->unique_keys(1). Off by default.
+        Example: "uniqueKeys": [ ["id"], ["email"] ]
+      Fully integrated into both interpreter and compiled fast-path.
+    - API: New methods extensions(), unique_keys(), is_unique_keys_enabled().
+    - Tests: comprehensive t/081_unique-keys.t covering single, composite, disabled,
+      and mixed-type cases.
+
 v0.4.1 2025-11-18T14:21:35+0900
     [Bug Fixes]
     - Corrected logic in register_builtin_formats() when helper modules such as

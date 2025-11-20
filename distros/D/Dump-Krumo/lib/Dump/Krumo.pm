@@ -11,7 +11,7 @@ use Exporter 'import';
 our @EXPORT  = qw(kx kxd);
 
 # https://blogs.perl.org/users/grinnz/2018/04/a-guide-to-versions-in-perl.html
-our $VERSION = 'v0.1.2';
+our $VERSION = 'v0.1.4';
 
 our $use_color     = 1; # Output in color
 our $return_string = 0; # Return a string instead of printing it
@@ -19,6 +19,7 @@ our $hash_sort     = 1; # Sort hash keys before output
 our $debug         = 0; # Low level developer level debugging
 our $disable       = 0; # Disable Dump::Krumo
 our $indent_spaces = 2; # Number of spaces to use for each level of indent
+our $promote_bool  = 1; # Convert JSON::PP::Boolean to raw true/false
 
 # Global var to track how many levels we're indented
 my $current_indent_level = 0;
@@ -26,21 +27,21 @@ my $current_indent_level = 0;
 my $left_pad_width       = 0;
 
 our $COLORS = {
-	'string'       => 230, # Standard strings
-	'control_char' => 226, # the `\n`, `\r`, and `\t` inside strings
-	'undef'        => 196, # undef
-	'hash_key'     => 208, # hash keys on the left of =>
-	'integer'      => 33,  # integers
-	'float'        => 51,  # things that look like floating point
-	'class'        => 118, # Classes/Object names
-	'binary'       => 111, # Strings that contain non-printable chars
-	'scalar_ref'   => 225, # References to scalar variables
-	'boolean'      => 141, # Native boolean types
-	'regexp'       => 164, # qr() style regexp variables
-	'glob'         => 40,  # \*STDOUT variables
-	'coderef'      => 168, # code references
-	'vstring'      => 153, # Version strings
-	'empty_braces' => 15,  # Either [] or {}
+	'string'       => 230,       # Standard strings
+	'control_char' => 226,       # the `\n`, `\r`, and `\t` inside strings
+	'undef'        => 196,       # undef
+	'hash_key'     => 208,       # hash keys on the left of =>
+	'integer'      => 33,        # integers
+	'float'        => 51,        # things that look like floating point
+	'class'        => 118,       # Classes/Object names
+	'binary'       => 226,       # Strings that contain non-printable chars
+	'scalar_ref'   => 225,       # References to scalar variables
+	'boolean'      => 141,       # Native boolean types
+	'regexp'       => 164,       # qr() style regexp variables
+	'glob'         => 40,        # \*STDOUT variables
+	'coderef'      => 168,       # code references
+	'vstring'      => 153,       # Version strings
+	'empty_braces' => '15_bold', # Either [] or {}
 };
 
 my $WIDTH = get_terminal_width();
@@ -118,7 +119,7 @@ sub __dump {
 	} elsif ($type eq 'HASH') {
 		$ret = __dump_hash($x);
 	} elsif ($type eq 'SCALAR') {
-		$ret = color($COLORS->{scalar_ref}, '\\' . quote_string($$x));
+		$ret = color(get_color('scalar_ref'), '\\' . quote_string($$x));
 	} elsif (!$type && is_bool_val($x)) {
 		$ret = __dump_bool($x);
 	} elsif (!$type && is_integer($x)) {
@@ -155,9 +156,9 @@ sub __dump_bool {
 	my $ret;
 
 	if ($x) {
-		$ret = color($COLORS->{boolean}, "true");
+		$ret = color(get_color('boolean'), "true");
 	} else {
-		$ret = color($COLORS->{boolean}, "false");
+		$ret = color(get_color('boolean'), "false");
 	}
 
 	return $ret;
@@ -166,7 +167,7 @@ sub __dump_bool {
 sub __dump_regexp {
 	my ($class, $x) = @_;
 
-	my $ret = color($COLORS->{regexp}, "qr$x");
+	my $ret = color(get_color('regexp'), "qr$x");
 
 	return $ret;
 }
@@ -174,7 +175,7 @@ sub __dump_regexp {
 sub __dump_coderef {
 	my ($class, $x) = @_;
 
-	my $ret = color($COLORS->{coderef}, "sub { ... }");
+	my $ret = color(get_color('coderef'), "sub { ... }");
 
 	return $ret;
 }
@@ -182,7 +183,7 @@ sub __dump_coderef {
 sub __dump_glob {
 	my ($class, $x) = @_;
 
-	my $ret = color($COLORS->{glob}, "\\" . $$x);
+	my $ret = color(get_color('glob'), "\\" . $$x);
 
 	return $ret;
 }
@@ -190,9 +191,17 @@ sub __dump_glob {
 sub __dump_class {
 	my ($class, $x) = @_;
 
-	my $ret      = '"' . color($COLORS->{class}, $class) . "\" :: ";
+	my $ret      = '"' . color(get_color('class'), $class) . "\" :: ";
 	my $reftype  = Scalar::Util::reftype($x);
 	my $y;
+
+	if ($promote_bool && $class eq 'JSON::PP::Boolean') {
+		my $val = $$x;
+		return __dump_bool(!!$val);
+	}
+
+	my $len = length($class) + 6; # 2x quotes and ' :: '
+	$left_pad_width += $len;
 
 	# We need an unblessed copy of the data so we can display it
 	if ($reftype eq 'ARRAY') {
@@ -207,19 +216,21 @@ sub __dump_class {
 
 	$ret .= __dump($y);
 
+	$left_pad_width -= $len;
+
 	return $ret;
 }
 
 sub __dump_integer {
 	my $x   = shift();
-	my $ret = color($COLORS->{integer}, $x);
+	my $ret = color(get_color('integer'), $x);
 
 	return $ret;
 }
 
 sub __dump_float {
 	my $x   = shift();
-	my $ret = color($COLORS->{float}, $x);
+	my $ret = color(get_color('float'), $x);
 
 	return $ret;
 }
@@ -230,7 +241,7 @@ sub __dump_vstring {
 	my @parts = unpack("C*", $$x);
 	my $str   = "\\v" .(join ".", @parts);
 
-	my $ret = color($COLORS->{vstring}, $str);
+	my $ret = color(get_color('vstring'), $str);
 
 	return $ret;
 }
@@ -239,15 +250,15 @@ sub __dump_string {
 	my $x = shift();
 
 	if (length($x) == 0) {
-		return color($COLORS->{empty_braces}, "''"),
+		return color(get_color('empty_braces'), "''"),
 	}
 
 	my $printable = is_printable($x);
 
 	# Convert all \n to printable version
-	my $slash_n = color($COLORS->{control_char}, '\\n') . color($COLORS->{string});
-	my $slash_r = color($COLORS->{control_char}, '\\r') . color($COLORS->{string});
-	my $slash_t = color($COLORS->{control_char}, '\\t') . color($COLORS->{string});
+	my $slash_n = color(get_color('control_char'), '\\n') . color(get_color('string'));
+	my $slash_r = color(get_color('control_char'), '\\r') . color(get_color('string'));
+	my $slash_t = color(get_color('control_char'), '\\t') . color(get_color('string'));
 
 	my $ret = '';
 
@@ -260,23 +271,23 @@ sub __dump_string {
 			my $is_printable = is_printable(chr($x));
 
 			if ($is_printable) {
-				$str .= chr($x);
+				$str .= color(get_color('string'),chr($x));
 			} else {
-				$str .= '\\x{' . sprintf("%02X", $x) . '}';
+				$str .= color(get_color('binary'), '\\x{' . sprintf("%02X", $x) . '}');
 			}
 		}
 
-		$ret = color($COLORS->{binary}, "\"$str\"");
+		$ret = "\"$str\"";
 	# Longer unprintable stuff we just spit out the raw HEX
 	} elsif (!$printable) {
-		$ret = color($COLORS->{binary}, 'pack("H*", ' . bin2hex($x) . ")");
+		$ret = color(get_color('binary'), 'pack("H*", ' . bin2hex($x) . ")");
 	# If it's a simple string we single quote it
 	} elsif ($x =~ /^[\w .,":;?!#\$%^*&\/=-]*$/g) {
-		$ret = "'" . color($COLORS->{string}, "$x") . "'";
+		$ret = "'" . color(get_color('string'), "$x") . "'";
 	# Otherwise we clean it up and then double quote it
 	} else {
 		# Do some clean up here?
-		$ret = '"' . color($COLORS->{string}, "$x") . '"';
+		$ret = '"' . color(get_color('string'), "$x") . '"';
 	}
 
 	$ret =~ s/\n/$slash_n/g;
@@ -287,7 +298,7 @@ sub __dump_string {
 }
 
 sub __dump_undef {
-	my $ret = color($COLORS->{undef}, 'undef');
+	my $ret = color(get_color('undef'), 'undef');
 
 	return $ret;
 }
@@ -305,7 +316,7 @@ sub __dump_array {
 	my $cnt = scalar(@$x);
 	if ($cnt == 0) {
 		$current_indent_level--;
-		return color($COLORS->{empty_braces}, '[]'),
+		return color(get_color('empty_braces'), '[]'),
 	}
 
 	# See if we need to switch to column mode to output this array
@@ -352,13 +363,18 @@ sub __dump_hash {
 
 	if ($cnt == 0) {
 		$current_indent_level--;
-		return color($COLORS->{empty_braces}, '{}'),
+		return color(get_color('empty_braces'), '{}'),
+	}
+
+	my $key_len = 0;
+	foreach my $x (@keys) {
+		$key_len += length($x) + 4; # Add four for ' => '
 	}
 
 	# See if we need to switch to column mode to output this array
 	my $max_length  = max_length(@keys);
 	$left_pad_width = $max_length;
-	my $column_mode = needs_column_mode($x);
+	my $column_mode = needs_column_mode($x, $key_len);
 
 	# If we're not in column mode there is no need to compensate for this
 	if (!$column_mode) {
@@ -380,9 +396,9 @@ sub __dump_hash {
 
 		my $key_str = '';
 		if ($keys_need_quotes) {
-			$key_str = "'" . color($COLORS->{hash_key}, $key) . "'";
+			$key_str = "'" . color(get_color('hash_key'), $key) . "'";
 		} else {
-			$key_str = color($COLORS->{hash_key}, $key);
+			$key_str = color(get_color('hash_key'), $key);
 		}
 
 		# Align the hash keys
@@ -451,9 +467,16 @@ sub array_str_len {
 			$len += array_str_len(@$x);
 		} elsif (ref $x eq 'HASH') {
 			$len += array_str_len(%$x);
+		} elsif (is_bool_val($x) && $x) {
+			$len += 6; # 'true'
+		} elsif (is_bool_val($x)) {
+			$len += 7; # 'false'
 		} else {
 			$len += length($x);
-			$len += 2; # For the quotes around the string
+
+			if (!is_numeric($x)) {
+				$len += 2; # For the quotes around the string
+			}
 		}
 
 		# We stop counting after we hit $WIDTH so we don't
@@ -469,7 +492,8 @@ sub array_str_len {
 
 # Calculate if this data structure will wrap the screen and needs to be in column mode instead
 sub needs_column_mode {
-	my $x = shift();
+	my ($x, $extra_len) = @_;
+	$extra_len        //= 0;
 
 	my $ret  = 0;
 	my $len  = 0;
@@ -507,7 +531,7 @@ sub needs_column_mode {
 	my $pad_width    = $left_pad_width + 4; # For the ' => '
 
 	# Add it all together
-	$len = $left_indent + $pad_width + $len;
+	$len = $left_indent + $pad_width + $len + $extra_len;
 
 	# If we're too wide for the screen we drop to column mode
 	# Our math isn't 100% down the character so we use 97% to give
@@ -523,10 +547,11 @@ sub needs_column_mode {
 
 		if ($first) {
 			printf("Screen width: %d\n\n", $WIDTH * .97);
-			printf("Left Indent | Hash Padding | Content | Total\n");
+			printf("Left Indent | Hash Padding | Content | Extra | Total\n");
 			$first = 0;
 		}
-		printf("%8d    +    %6d    +  %4d   = %4d    (%d)\n", $left_indent, $pad_width, $content_len, $len, $ret);
+
+		printf("%8d    +    %6d    +  %4d   + %4d  = %4d    (%d)\n", $left_indent, $pad_width, $content_len, $extra_len, $len, $ret);
 	}
 
 	return $ret;
@@ -595,19 +620,19 @@ sub is_infinity {
 }
 
 sub is_string {
-    my ($value) = @_;
-    return defined($value) && $value !~ /^-?\d+(?:\.\d+)?$/;
+	my ($value) = @_;
+	return defined($value) && $value !~ /^-?\d+(?:\.\d+)?$/;
 }
 
 sub is_integer {
-    my ($value) = @_;
-    return defined($value) && $value =~ /^-?\d+$/;
+	my ($value) = @_;
+	return defined($value) && $value =~ /^-?\d+$/;
 }
 
 sub is_float {
-    my ($value) = @_;
-    #my $ret     = defined($value) && $value =~ /^-?\d+\.\d+$/;
-    my $ret     = defined($value) && $value =~ /^-?\d+\.\d+(e[+-]\d+)?$/;
+	my ($value) = @_;
+	#my $ret     = defined($value) && $value =~ /^-?\d+\.\d+$/;
+	my $ret     = defined($value) && $value =~ /^-?\d+\.\d+(e[+-]\d+)?$/;
 
 	return $ret;
 }
@@ -628,39 +653,48 @@ sub is_bool_val {
 	return 0;
 }
 
+sub is_numeric {
+	my $ret = Scalar::Util::looks_like_number($_[0]);
+
+	return $ret;
+}
+
 ################################################################################
 
 # String format: '115', '165_bold', '10_on_140', 'reset', 'on_173', 'red', 'white_on_blue'
 sub color {
-    my ($str, $txt) = @_;
+	my ($str, $txt) = @_;
 
-    # If we're NOT connected to a an interactive terminal don't do color
-    if (!$use_color || -t STDOUT == 0) { return $txt // ""; }
+	# If we're NOT connected to a an interactive terminal don't do color
+	state $color_available = (!$use_color || -t STDOUT == 0);
+	if ($color_available) {
+		return $txt // "";
+	}
 
-    # No string sent in, so we just reset
-    if (!length($str) || $str eq 'reset') { return "\e[0m"; }
+	# No string sent in, so we just reset
+	if (!length($str) || $str eq 'reset') { return "\e[0m"; }
 
-    # Some predefined colors
-    my %color_map = qw(red 160 blue 27 green 34 yellow 226 orange 214 purple 93 white 15 black 0);
-    $str =~ s|([A-Za-z]+)|$color_map{$1} // $1|eg;
+	# Some predefined colors
+	my %color_map = qw(red 160 blue 27 green 34 yellow 226 orange 214 purple 93 white 15 black 0);
+	$str =~ s|([A-Za-z]+)|$color_map{$1} // $1|eg;
 
-    # Get foreground/background and any commands
-    my ($fc,$cmd) = $str =~ /^(\d{1,3})?_?(\w+)?$/g;
-    my ($bc)      = $str =~ /on_(\d{1,3})$/g;
+	# Get foreground/background and any commands
+	my ($fc,$cmd) = $str =~ /^(\d{1,3})?_?(\w+)?$/g;
+	my ($bc)      = $str =~ /on_(\d{1,3})$/g;
 
-    if (defined($fc) && int($fc) > 255) { $fc = undef; } # above 255 is invalid
+	if (defined($fc) && int($fc) > 255) { $fc = undef; } # above 255 is invalid
 
-    # Some predefined commands
-    my %cmd_map = qw(bold 1 italic 3 underline 4 blink 5 inverse 7);
-    my $cmd_num = $cmd_map{$cmd // 0};
+	# Some predefined commands
+	my %cmd_map = qw(bold 1 italic 3 underline 4 blink 5 inverse 7);
+	my $cmd_num = $cmd_map{$cmd // 0};
 
-    my $ret = '';
-    if ($cmd_num)      { $ret .= "\e[${cmd_num}m"; }
-    if (defined($fc))  { $ret .= "\e[38;5;${fc}m"; }
-    if (defined($bc))  { $ret .= "\e[48;5;${bc}m"; }
-    if (defined($txt)) { $ret .= $txt . "\e[0m";   }
+	my $ret = '';
+	if ($cmd_num)      { $ret .= "\e[${cmd_num}m"; }
+	if (defined($fc))  { $ret .= "\e[38;5;${fc}m"; }
+	if (defined($bc))  { $ret .= "\e[48;5;${bc}m"; }
+	if (defined($txt)) { $ret .= $txt . "\e[0m";   }
 
-    return $ret;
+	return $ret;
 }
 
 sub get_terminal_width {
@@ -700,6 +734,14 @@ sub quote_string {
 	$escaped =~ s/\b/\\b/g;
 
 	return "\"$escaped\"";
+}
+
+sub get_color {
+	my $str = $_[0] || "";
+
+	my $ret = $COLORS->{$str} // 251;
+
+	return $ret;
 }
 
 # Creates methods k() and kd() to print, and print & die respectively
@@ -772,7 +814,7 @@ Debug print C<$var> and C<die()>. This outputs file and line information.
 
 =item C<$Dump::Krumo::use_color = 1>
 
-Turn on/off color
+Turn color on/off
 
 =item C<$Dump::Krumo::return_string = 0>
 
@@ -786,6 +828,15 @@ Number of spaces to indent each level
 
 Disable all output from C<Dump::Krumo>. This allows you to leave all of your
 debug print statements in your code, and disable them at runtime as needed.
+
+=item C<$Dump::Krumo::promote_bool = 1>
+
+Convert JSON::PP::Booleans to true/false instead of treating them as objects.
+
+=item C<$Dump::Krumo::COLORS>
+
+Reference to a hash of colors for each variable type. Update this and create
+your own color scheme.
 
 =back
 

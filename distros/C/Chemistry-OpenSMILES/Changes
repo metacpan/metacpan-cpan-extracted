@@ -1,3 +1,7 @@
+0.12.2 2025-11-19
+
+    - Introduce 'report_unnecessary_dot_usage' parser option.
+
 0.12.1 2025-10-22
 
     - Do not remove square brackets from atom if its normal valence is

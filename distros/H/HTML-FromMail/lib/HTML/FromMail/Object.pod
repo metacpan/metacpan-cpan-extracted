@@ -20,7 +20,9 @@ HTML::FromMail::Object - base-class for convertable items
 
 =over 4
 
-=item HTML::FromMail::Object-E<gt>B<new>(OPTIONS)
+=item $class-E<gt>B<new>(%options)
+
+Z<>
 
  -Option  --Default
   settings  {}
@@ -28,9 +30,10 @@ HTML::FromMail::Object - base-class for convertable items
 
 =over 2
 
-=item settings => HASH-OF-HASHES
+=item settings => \%map
 
-Contains the special settings for each of the topics.
+Contains the special settings for each of the topics.  This expects a C<%map>
+from topic names to configuration HASHes.
 See L<HTML::FromMail::new(settings)|HTML::FromMail/"Constructors">.
 
 =item topic => STRING
@@ -52,7 +55,7 @@ L<HTML::FromMail::new(settings)|HTML::FromMail/"Constructors"> and L<HTML::FromM
 
 =item $obj-E<gt>B<settings>( [TOPIC] )
 
-Returns the settings for objects with a certain TOPIC, by default
+Returns the settings for objects with a certain C<TOPIC>, by default
 for objects of the current.  An empty hash will be returned when
 not settings where specified.
 
@@ -70,20 +73,21 @@ Returns the abstract topic of the producer.
 
 =item $obj-E<gt>B<plain2html>(STRING)
 
-Convert a STRING into HTML.
+Convert a C<STRING> into HTML.
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of HTML-FromMail distribution version 0.12,
-built on January 29, 2018. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of HTML-FromMail version 3.00,
+built on November 19, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2003-2018 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2003-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

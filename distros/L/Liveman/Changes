@@ -1,5 +1,11 @@
 Revision history for Perl extension Liveman
 
+3.5 2025-11-20T09:56:33Z
+
+    - brifing test spec
+    - tmp dir does not overlap yath in tests
+    - diff cpanfile writed to /tmp/.liveman
+
 3.4 2025-11-06T10:10:27Z
 
     - if not *.pm, then writes *.pod

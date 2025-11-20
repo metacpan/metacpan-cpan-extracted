@@ -25,6 +25,9 @@ my @cases = (
     [ 'C/1=C/C=C\C=C/C=C\1', 'C/1(=C(/C(=C(\C(=C(/C(=C\1)))))))' ],
     # A regression test for improperly recorded fact that 0 H atoms are present:
     [ '[C]#[O]', '[C](#[O])' ],
+    # Regression cases for https://github.com/merkys/Chemistry-OpenSMILES/issues/11
+    [ 'C(C.[Cu])', 'C(C).[Cu]', 'CC.[Cu]' ],
+    [ 'C(C.[Cu])C', 'C(C)(C).[Cu]', 'C(C)C.[Cu]' ],
 );
 
 plan tests => 4 * @cases + grep { @$_ == 3 && $_->[2] =~ /:/ } @cases;

@@ -1,11 +1,11 @@
-[![Actions Status](https://github.com/darviarush/perl-liveman/actions/workflows/test.yml/badge.svg)](https://github.com/darviarush/perl-liveman/actions) [![MetaCPAN Release](https://badge.fury.io/pl/Liveman.svg)](https://metacpan.org/release/Liveman) [![Coverage](https://raw.githubusercontent.com/darviarush/perl-liveman/master/doc/badges/total.svg)](https://fast2-matrix.cpantesters.org/?dist=Liveman+3.4)
+[![Actions Status](https://github.com/darviarush/perl-liveman/actions/workflows/test.yml/badge.svg)](https://github.com/darviarush/perl-liveman/actions) [![MetaCPAN Release](https://badge.fury.io/pl/Liveman.svg)](https://metacpan.org/release/Liveman) [![Coverage](https://raw.githubusercontent.com/darviarush/perl-liveman/master/doc/badges/total.svg)](https://fast2-matrix.cpantesters.org/?dist=Liveman+3.5)
 # NAME
 
 Liveman - компиллятор из markdown в тесты и документацию
 
 # VERSION
 
-3.4
+3.5
 
 # SYNOPSIS
 
@@ -76,6 +76,25 @@ Liveman заменяет `our $VERSION = "...";` в `lib/**.pm` из `lib/**.md`
 ## TYPES OF TESTS
 
 Коды секций без указанного языка программирования или с `perl` записываются как код в файл `t/**.t`. А комментарий со стрелкой (# -> )превращается в тест `Test::More`.
+
+Поддерживаемые тесты:
+
+* `->`, `→` – сравнение скаляров;
+* `-->`, `⟶` – сравнение структур;
+* `=>`, `⇒` – сравнение c интерполируемой строкой;
+* `\>`, `↦` – сравнение с неинтерполируемой строкой;
+* `^=>`, `⤇` – сравнение начала скаляра с интерполируемой строкой;
+* `$=>`, `➾` – сравнение конца скаляра с интерполируемой строкой;
+* `*=>`, `⥴` – сравнение середины скаляра с интерполируемой строкой;
+* `^->`, `↣` – сравнение начала скаляра с неинтерполируемой строкой;
+* `$->`, `⇥` – сравнение конца скаляра с неинтерполируемой строкой;
+* `*->`, `⥵` – сравнение середины скаляра с неинтерполируемой строкой;
+* `~>`, `↬` – сопоставление скаляра с регулярным выражением (`$code =~ /.../`);
+* `<~`, `↫` – отрицательное сопоставление скаляра с регулярным выражением (`$code !~ /.../`);
+* `@->`, `↯` – сравнение начала исключения с неинтерполируемой строкой;
+* `@=>`, `⤯` – сравнение начала исключения с интерполируемой строкой;
+* `@~>`, `⇝` – сопоставление исключения с регулярным выражением (`defined $@ && $@ =~ /.../`);
+* `<~@`, `⇜` – отрицательное сопоставление исключения с регулярным выражением (`defined $@ && $@ !~ /.../`);
 
 ### `is`
 

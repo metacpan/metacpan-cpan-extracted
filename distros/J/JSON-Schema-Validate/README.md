@@ -36,7 +36,7 @@ JSON::Schema::Validate - Lean, recursion-safe JSON Schema validator (Draft 2020-
 
 # VERSION
 
-v0.4.1
+v0.4.2
 
 # DESCRIPTION
 
@@ -152,6 +152,22 @@ Options (all optional):
 
     When enabling, built-in media validators are registered (e.g. `application/json`).
 
+- `extensions => 1|0`
+
+    Defaults to `0`
+
+    This enables or disables all non-core extensions currently implemented by the validator.
+
+    When set to a true value, this enables the `uniqueKeys` applicator. Future extensions (e.g. custom keywords, additional vocabularies) will also be controlled by this flag.
+
+    When set to a true value, all known extensions are activated; setting it to false disables them all.
+
+    If you set separately an extension boolean value, it will not be overriden by this. So for example:
+
+        my $js = JSON::Schema::Validate->new( $schema, extension => 0, unique_keys => 1 );
+
+    Will globally disable extension, but will enable `uniqueKeys`
+
 - `format => \%callbacks`
 
     Hash of `format_name => sub{ ... }` validators. Each sub receives the string to validate and must return true/false. Entries here take precedence when you later call `register_builtin_formats` (i.e. your callbacks remain in place).
@@ -223,6 +239,23 @@ Options (all optional):
 
     Enable probabilistic sampling of trace events. `$percent` is an integer percentage in `[0,100]`. `0` disables sampling. Sampling occurs per-event, and still respects ["trace\_limit"](#trace_limit).
 
+- `unique_keys => 1|0`
+
+    Defaults to `0`
+
+    Explicitly enable or disable the `uniqueKeys` applicator.
+
+    `uniqueKeys` is a non-standard extension (proposed for future drafts) that enforces uniqueness of one or more properties across all objects in an array.
+
+        "uniqueKeys": [ ["id"], ["email"] ]        # id AND email must each be unique
+        "uniqueKeys": [ ["category", "code"] ]     # the pair (category,code) must be unique
+
+    The applicator supports both single-property constraints and true composite keys.
+
+    This option is useful when you need stronger guarantees than `uniqueItems` provides, without resorting to complex `contains`/`not` patterns.
+
+    When `extensions` is enabled, `unique_keys` is automatically turned on; the specific method allows finer-grained control.
+
 - `vocab_support => {}`
 
     A hash reference of support vocabularies.
@@ -268,6 +301,18 @@ When stringified, the object provides a short, human-oriented message for the fi
     my $array_ref = $js->errors;
 
 All collected [error objects](https://metacpan.org/pod/JSON%3A%3ASchema%3A%3AValidate%3A%3AError) (up to the internal `max_errors` cap).
+
+## extensions
+
+    $js->extensions;       # enable all extensions
+    $js->extensions(1);    # enable
+    $js->extensions(0);    # disable
+
+Turn the extension framework on or off.
+
+Enabling extensions currently activates the `uniqueKeys` applicator (and any future non-core features). Disabling it turns all extensions off, regardless of individual settings.
+
+Returns the object for method chaining.
 
 ## get\_trace
 
@@ -322,6 +367,14 @@ Returns true if content assertions are enabled, false otherwise.
 Read-only accessor.
 
 Returns true if tracing is enabled, false otherwise.
+
+## is\_unique\_keys\_enabled
+
+    my $bool = $js->is_unique_keys_enabled;
+
+Read-only accessor.
+
+Returns true if the `uniqueKeys` applicator is currently active, false otherwise.
 
 ## is\_unknown\_required\_vocab\_ignored
 
@@ -429,7 +482,7 @@ This returns the current object.
 
 ## set\_resolver
 
-    $js->set_resolver( sub { my( $absolute_uri ) = @_; ...; return $schema_hashref } );
+    $js->set_resolver( sub{ my( $absolute_uri ) = @_; ...; return $schema_hashref } );
 
 Install a resolver for external documents. It is called with an absolute URI (formed from the current base `$id` and the `$ref`) and must return a Perl hash reference representation of a JSON Schema. If the returned hash contains `'$id'`, it will become the new base for that document; otherwise, the absolute URI is used as its base.
 
@@ -473,6 +526,18 @@ It returns the current object for chaining.
 Enable probabilistic sampling of trace events. `$percent` is an integer percentage in `[0,100]`. `0` disables sampling. Sampling occurs per-event, and still respects ["trace\_limit"](#trace_limit).
 
 It returns the current object for chaining.
+
+## unique\_keys
+
+    $js->unique_keys;       # enable uniqueKeys
+    $js->unique_keys(1);    # enable
+    $js->unique_keys(0);    # disable
+
+Enable or disable the `uniqueKeys` applicator independently of the `extensions` option.
+
+When disabled (the default), schemas containing the `uniqueKeys` keyword are ignored.
+
+Returns the object for method chaining.
 
 ## validate
 
@@ -527,10 +592,6 @@ In practice this improves steady-state throughput (especially for large/branchy 
 - a small memory footprint for closures (one per visited node).
 
 If you only validate once or twice against a tiny schema, compilation will not matter; for services, batch jobs, or streaming pipelines it typically yields a noticeable speedup. Always benchmark with your own schema+data.
-
-# CREDITS
-
-Albert from OpenAI for his invaluable help.
 
 # AUTHOR
 

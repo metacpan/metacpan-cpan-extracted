@@ -23,7 +23,7 @@ liveman [-h] [--man] [-A pkg [license]] [-w] [-o][-c][-f][-s][-a] [<files> ...]
 
 Покрытие можно просмотреть в файле *cover_db/coverage.html*.
 
-Примечание: лучше сразу поместить *cover_db/* в *.gitignore*.
+**Примечание:** лучше сразу поместить *cover_db/* в *.gitignore*.
 
 # OPTIONS
 

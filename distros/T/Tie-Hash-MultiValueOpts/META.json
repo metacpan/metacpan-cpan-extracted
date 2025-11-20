@@ -29,15 +29,15 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "6.76",
             "ExtUtils::MakeMaker::CPANfile" : "0.09",
-            "File::Spec" : "0",
+            "File::Spec::Functions" : "0",
             "strict" : "0",
             "warnings" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "Getopt::Std" : "0",
             "Tie::Hash" : "0",
+            "parent" : "0",
             "perl" : "5.010001",
             "strict" : "0",
             "warnings" : "0"
@@ -45,6 +45,7 @@
       },
       "test" : {
          "requires" : {
+            "Getopt::Std" : "0",
             "Test::More" : "1.001005"
          }
       }
@@ -52,7 +53,7 @@
    "provides" : {
       "Tie::Hash::MultiValueOpts" : {
          "file" : "lib/Tie/Hash/MultiValueOpts.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       }
    },
    "release_status" : "stable",
@@ -66,5 +67,5 @@
          "web" : "https://github.com/XSven/Tie-Hash-MultiValueOpts"
       }
    },
-   "version" : "v1.0.2"
+   "version" : "v1.0.3"
 }

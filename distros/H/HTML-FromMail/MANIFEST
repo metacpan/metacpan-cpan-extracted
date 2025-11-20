@@ -1,7 +1,6 @@
 ChangeLog
 MANIFEST
 Makefile.PL
-README
 README.md
 examples/README
 examples/demo.pl

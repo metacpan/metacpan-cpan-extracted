@@ -7,6 +7,10 @@
 #define NEED_mg_findext
 #include "ppport.h"
 
+#ifndef newSVbool
+#define newSVbool(value) newSVsv(boolSV(value))
+#endif
+
 #include "cryptoki.h"
 #include "refcount.h"
 
@@ -193,8 +197,6 @@ static const map session_flags = {
 	{ STR_WITH_LEN("rw-session"), CKF_RW_SESSION },
 	{ STR_WITH_LEN("serial-session"), CKF_SERIAL_SESSION },
 };
-typedef CK_FLAGS Session_flags;
-#define XS_unpack_Session_flags(input) get_flags(session_flags, input)
 
 static const map mechanism_flags = {
 	{ STR_WITH_LEN("hw"), CKF_HW },
@@ -257,20 +259,16 @@ static UV S_get_flags(pTHX_ const map table, size_t table_size, SV* input) {
 }
 #define get_flags(table, input) S_get_flags(aTHX_ table, sizeof table / sizeof *table, input)
 
-static AV* S_reverse_flags(pTHX_ const map table, size_t table_size, CK_ULONG input) {
-	AV* result = newAV();
+static SV* S_reverse_flags(pTHX_ const map table, size_t table_size, CK_ULONG input) {
+	HV* result = newHV();
 	CK_ULONG i;
 	for (i = 0; i < CHAR_BIT * sizeof(CK_ULONG); ++i) {
 		CK_ULONG right = 1ul << i;
-		if (input & right) {
-			const entry* item = S_map_reverse_find(aTHX_ table, table_size, right);
-			if (item)
-				av_push(result, newSVpvn(item->key, item->length));
-			else
-				av_push(result, newSVpvs("unknown"));
-		}
+		const entry* item = S_map_reverse_find(aTHX_ table, table_size, right);
+		if (item)
+			hv_store(result, item->key, item->length, newSVbool(input & right), 0);
 	}
-	return result;
+	return newRV_noinc((SV*)result);
 }
 #define reverse_flags(table, input) S_reverse_flags(aTHX_ table, sizeof table / sizeof *table, input)
 
@@ -1494,7 +1492,7 @@ static SV* S_reverse_attribute(pTHX_ CK_ATTRIBUTE* attribute) {
 		case IntAttr:
 			return newSVuv(get_intval(pointer));
 		case BoolAttr:
-			return newSVsv(boolSV(*(const char*)pointer));
+			return newSVbool(*(const char*)pointer);
 		case StrAttr: {
 			SV* result = newSVpvn_utf8(pointer, length, TRUE);
 			sv_utf8_downgrade(result, TRUE);
@@ -1541,11 +1539,11 @@ static SV* S_reverse_attribute(pTHX_ CK_ATTRIBUTE* attribute) {
 		}
 		case TokenFlagsAttr: {
 			CK_ULONG integer = get_intval(pointer);
-			return newRV_noinc((SV*)reverse_flags(token_flags, integer));
+			return reverse_flags(token_flags, integer);
 		}
 		case SecurityDomainAttr: {
 			CK_ULONG integer = get_intval(pointer);
-			return newRV_noinc((SV*)reverse_flags(security_domains, integer));
+			return reverse_flags(security_domains, integer);
 		}
 		case IntArrayAttr: {
 			AV* result = newAV();
@@ -1807,7 +1805,6 @@ TYPEMAP: <<END
 
 	CK_MECHANISM_TYPE            T_PACKED
 	Attributes                   T_PACKED
-	Session_flags                T_PACKED
 END
 
 BOOT:
@@ -1864,7 +1861,7 @@ CODE:
 	RETVAL = newHV();
 	hv_stores(RETVAL, "cryptoki-version", version_to_sv(&info.cryptokiVersion));
 	hv_stores(RETVAL, "manufacturer-id", trimmed_value(info.manufacturerID, 32));
-	hv_stores(RETVAL, "flags", newRV_noinc((SV*)newAV()));
+	hv_stores(RETVAL, "flags", newRV_noinc((SV*)newHV()));
 	hv_stores(RETVAL, "library-description", trimmed_value(info.libraryDescription, 32));
 	hv_stores(RETVAL, "library-version", version_to_sv(&info.libraryVersion));
 OUTPUT:
@@ -1936,7 +1933,7 @@ CODE:
 	RETVAL = newHV();
 	hv_stores(RETVAL, "description", trimmed_value(info.slotDescription, 64));
 	hv_stores(RETVAL, "manufacturer-id", trimmed_value(info.manufacturerID, 32));
-	hv_stores(RETVAL, "flags", newRV_noinc((SV*)reverse_flags(slot_flags, info.flags)));
+	hv_stores(RETVAL, "flags", reverse_flags(slot_flags, info.flags));
 	hv_stores(RETVAL, "hardware-version", version_to_sv(&info.hardwareVersion));
 	hv_stores(RETVAL, "firmware-version", version_to_sv(&info.firmwareVersion));
 OUTPUT:
@@ -1954,7 +1951,7 @@ CODE:
 	hv_stores(RETVAL, "manufacturer-id", trimmed_value(info.manufacturerID, 32));
 	hv_stores(RETVAL, "model", trimmed_value(info.model, 16));
 	hv_stores(RETVAL, "serial-number", trimmed_value(info.serialNumber, 16));
-	hv_stores(RETVAL, "flags", newRV_noinc((SV*)reverse_flags(token_flags, info.flags)));
+	hv_stores(RETVAL, "flags", reverse_flags(token_flags, info.flags));
 	hv_stores(RETVAL, "max-session-count", newSVuv(info.ulMaxSessionCount));
 	hv_stores(RETVAL, "session-count", newSVuv(info.ulSessionCount));
 	hv_stores(RETVAL, "max-rw-session-count", newSVuv(info.ulMaxRwSessionCount));
@@ -1971,10 +1968,20 @@ CODE:
 OUTPUT:
 	RETVAL
 
-Crypt::HSM::Session open_session(Crypt::HSM::Slot self, Session_flags flags = 0)
+Crypt::HSM::Session open_session(Crypt::HSM::Slot self, ...)
 CODE:
 	CK_NOTIFY Notify = NULL;
 	CK_SESSION_HANDLE handle;
+
+	CK_ULONG flags = CKF_SERIAL_SESSION;
+	size_t current = 1;
+	for (current = 1; current + 2 <= items; current += 2) {
+		CK_ULONG internal = map_get(session_flags, ST(current), "session flag");
+		if (SvTRUE(ST(current + 1)))
+			flags |= internal;
+		else
+			flags &= ~internal;
+	}
 
 	CK_RV result = self->provider->funcs->C_OpenSession(self->slot, flags | CKF_SERIAL_SESSION, NULL, Notify, &handle);
 	if (result != CKR_OK)
@@ -2063,7 +2070,7 @@ CODE:
 	RETVAL = newHV();
 	hv_stores(RETVAL, "min-key-size", newSVuv(self->ulMinKeySize));
 	hv_stores(RETVAL, "max-key-size", newSVuv(self->ulMaxKeySize));
-	hv_stores(RETVAL, "flags", newRV_noinc((SV*)reverse_flags(mechanism_flags, self->flags)));
+	hv_stores(RETVAL, "flags", reverse_flags(mechanism_flags, self->flags));
 OUTPUT:
 	RETVAL
 
@@ -2119,8 +2126,8 @@ CODE:
 
 	RETVAL = newHV();
 	hv_stores(RETVAL, "slot-id", newSVuv(info.slotID));
-	hv_stores(RETVAL, "state", newRV_noinc((SV*)reverse_flags(state_flags, info.state)));
-	hv_stores(RETVAL, "flags", newRV_noinc((SV*)reverse_flags(session_flags, info.flags)));
+	hv_stores(RETVAL, "state", entry_to_sv(map_reverse_find(state_flags, info.state)));
+	hv_stores(RETVAL, "flags", reverse_flags(session_flags, info.flags));
 	hv_stores(RETVAL, "device-error", newSVuv(info.ulDeviceError));
 OUTPUT:
 	RETVAL
@@ -2142,9 +2149,11 @@ OUTPUT:
 
 void login(Crypt::HSM::Session self, CK_USER_TYPE type, SV* pin)
 CODE:
-	STRLEN pin_len;
-	char* pinPV = SvPVutf8(pin, pin_len);
-	CK_RV result = self->provider->funcs->C_Login(self->handle, type, (CK_BYTE*)pinPV, pin_len);
+	STRLEN pin_len = 0;
+	CK_BYTE* pinPV = NULL;
+	if (SvOK(pin))
+		pinPV = (CK_BYTE*)SvPVutf8(pin, pin_len);
+	CK_RV result = self->provider->funcs->C_Login(self->handle, type, pinPV, pin_len);
 	if (result != CKR_OK)
 		croak_with("Could not log in", result);
 
@@ -2158,21 +2167,26 @@ CODE:
 
 void init_pin(Crypt::HSM::Session self, SV* pin)
 CODE:
-	STRLEN pin_len;
-	char* pinPV = SvPVutf8(pin, pin_len);
+	STRLEN pin_len = 0;
+	CK_BYTE* pinPV = NULL;
+	if (SvOK(pin))
+		pinPV = (CK_BYTE*)SvPVutf8(pin, pin_len);
 
-	CK_RV result = self->provider->funcs->C_InitPIN(self->handle, (CK_BYTE*)pinPV, pin_len);
+	CK_RV result = self->provider->funcs->C_InitPIN(self->handle, pinPV, pin_len);
 	if (result != CKR_OK)
 		croak_with("Could not initialize pin", result);
 
 
 void set_pin(Crypt::HSM::Session self, SV* old_pin, SV* new_pin)
 CODE:
-	STRLEN old_pin_len, new_pin_len;
-	char* old_pinPV = SvPVutf8(old_pin, old_pin_len);
-	char* new_pinPV = SvPVutf8(new_pin, new_pin_len);
+	STRLEN old_pin_len = 0, new_pin_len = 0;
+	CK_BYTE* old_pinPV = NULL, *new_pinPV = NULL;
+	if (SvOK(old_pin))
+		old_pinPV = (CK_BYTE*)SvPVutf8(old_pin, old_pin_len);
+	if (SvOK(new_pin))
+		new_pinPV = (CK_BYTE*)SvPVutf8(new_pin, new_pin_len);
 
-	CK_RV result = self->provider->funcs->C_SetPIN(self->handle, (CK_BYTE*)old_pinPV, old_pin_len, (CK_BYTE*)new_pinPV, new_pin_len);
+	CK_RV result = self->provider->funcs->C_SetPIN(self->handle, old_pinPV, old_pin_len, new_pinPV, new_pin_len);
 	if (result != CKR_OK)
 		croak_with("Could not set pin", result);
 
@@ -2195,18 +2209,19 @@ PPCODE:
 	if (result != CKR_OK)
 		croak_with("Could not find objects", result);
 
-	while (1) {
-		CK_OBJECT_HANDLE current;
-		CK_ULONG actual;
-		CK_RV result = self->provider->funcs->C_FindObjects(self->handle, &current, 1, &actual);
+	CK_ULONG actual = 0;
+	do {
+		static const CK_ULONG buffer_size = 16;
+		CK_OBJECT_HANDLE current[buffer_size];
+		CK_ULONG iter;
+		CK_RV result = self->provider->funcs->C_FindObjects(self->handle, current, buffer_size, &actual);
 		if (result != CKR_OK) {
 			self->provider->funcs->C_FindObjectsFinal(self->handle);
 			croak_with("Could not find objects", result);
 		}
-		if (actual == 0)
-			break;
-		mXPUSHs(new_object(self, current));
-	}
+		for (iter = 0; iter < actual; ++iter)
+			mXPUSHs(new_object(self, current[iter]));
+	} while (actual > 0);
 	self->provider->funcs->C_FindObjectsFinal(self->handle);
 
 

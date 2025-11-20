@@ -1,7 +1,7 @@
 package Chemistry::OpenSMILES::Writer;
 
 # ABSTRACT: OpenSMILES format writer
-our $VERSION = '0.12.1'; # VERSION
+our $VERSION = '0.12.2'; # VERSION
 
 =head1 NAME
 

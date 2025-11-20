@@ -1,9 +1,38 @@
 Revision history for Win32API::Console
 
+0.1.6  2025-11-19
+    - Further adjustment to ANSI handling
+    - UTF-8 flag should be deleted for ANSI
+
+0.1.5  2025-11-19
+    - Change regarding the use of Encode::Unicode
+    - Fix ScrollConsoleScreenBuffer; XS uses WCHAR
+    - Fix FillConsoleOutputCharacterA; uses CHAR
+    - Fix don't set UTF8-Flag on ANSI strings
+
+0.1.4  2025-11-18
+    - Add "macros" (subs) to improve readability
+    - Add ANSI functions if XS was compiled with Unicode
+    - Change the output tests to include additional cases
+    - Fix GetClientRect call in GetConsoleFontSize()
+    - Fix memory reservation in ReadConsoleOutput()
+
+0.1.3  2025-11-17
+    - Fix tried to plan twice
+    - Fix blocking mode for ReadConsoleInputA
+
+0.1.2  2025-11-16
+    - Add a TestConsole Module for automated tests
+    - Fixed no WC_NO_BEST_FIT_CHARS when CP_UTF8
+    - Change regarding the use of Encode::Unicode
+    - Change emulation use for SetConsoleDisplayMode()
+    - Change of osname detection for GetOSVersion()
+    - Remove dependency on the Win32API::Registry module
+
 0.1.1  2025-11-14
-    - Adapting the test for GitHub Actions
-    - fixing bugs in POD
-    - Adjust parameter check for SetConsoleCtrlHandler
+    - Fix bugs in POD
+    - Change tests for GitHub Actions
+    - Change parameter check for SetConsoleCtrlHandler()
 
 0.1.0  2025-11-14
     - First published version

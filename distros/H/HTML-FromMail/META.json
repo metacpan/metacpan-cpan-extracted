@@ -4,7 +4,7 @@
       "Mark Overmeer <markov@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -30,27 +30,68 @@
             "ExtUtils::MakeMaker" : "0"
          }
       },
+      "develop" : {
+         "requires" : {
+            "OODoc" : "3.00"
+         }
+      },
       "runtime" : {
          "requires" : {
             "HTML::FromText" : "2.03",
             "Mail::Box" : "2.051",
-            "OODoc::Template" : "0.01",
+            "OODoc::Template" : "0.01"
+         },
+         "x_optional" : {
+            "Image::Magick" : "5.0",
+            "Template::Magic" : "1.02"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1",
             "Test::Pod" : "1"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/markov2/perl5-HTML-FromMail/issues"
+      },
       "homepage" : "http://perl.overmeer.net/CPAN/",
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ],
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/markov2/perl5-HTML-FromMail.git",
          "web" : "https://github.com/markov2/perl5-HTML-FromMail"
       }
    },
-   "version" : "0.12",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "3.00",
+   "x_oodist" : {
+      "email" : "markov@cpan.org",
+      "first_year" : 2003,
+      "generate" : [
+         {
+            "format" : "pod3",
+            "podtail" : null
+         }
+      ],
+      "include" : [],
+      "oodoc_version" : 3.05,
+      "parser" : {
+         "pmhead" : null,
+         "skip_links" : [
+            "Template::Magic"
+         ],
+         "syntax" : "markov"
+      },
+      "raw" : {
+         "publish" : "../public_html/html-frommail/raw"
+      },
+      "release" : {
+         "publish" : "../public_html/html-frommail/source"
+      },
+      "tests" : {},
+      "use" : []
+   },
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

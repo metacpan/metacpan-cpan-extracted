@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## JSON Schema Validator - ~/lib/JSON/Schema/Validate.pm
-## Version v0.4.1
+## Version v0.5.0
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2025/11/07
-## Modified 2025/11/18
+## Modified 2025/11/19
 ## All rights reserved
 ## 
 ## 
@@ -17,13 +17,13 @@ BEGIN
     use strict;
     use warnings;
     use warnings::register;
-    use vars qw( $VERSION );
+    use vars qw( $VERSION $DEBUG );
     use B ();
     use JSON ();
     use Scalar::Util qw( blessed looks_like_number reftype refaddr );
     use List::Util qw( first any all );
     use Encode ();
-    our $VERSION = 'v0.4.1';
+    our $VERSION = 'v0.5.0';
 };
 
 use v5.16.0;
@@ -46,6 +46,8 @@ sub new
         content_assert      => 0,
         content_decoders    => {},
         errors              => [],
+        # boolean; when true, then non-standard extensions are enabled.
+        extensions          => 0,
         formats             => {},
         # boolean
         ignore_req_vocab    => 0,
@@ -66,6 +68,8 @@ sub new
         trace_on            => 0,
         # 0 = record all
         trace_sample        => 0,
+        # boolean; when true, 'uniqueKeys' extension is enabled.
+        unique_keys         => 0,
         # internal boolean; not an option
         vocab_checked       => 0,
         vocab_support       => {},
@@ -75,15 +79,19 @@ sub new
     my $opts = $self->_get_args_as_hash( @_ );
     my @bool_options = qw(
         content_assert
+        extensions
         ignore_req_vocab
         normalize_instance
         prune_unknown
+        unique_keys
     );
     foreach my $opt ( @bool_options )
     {
         next unless( exists( $opts->{ $opt } ) );
         $self->{ $opt } = $opts->{ $opt } ? 1 : 0
     }
+    # Make sure the boolean value for 'extensions' is propagated to 'unique_keys' unless the option 'unique_keys' has been explicitly specified, and then we do not want to overwrite it.
+    $self->{unique_keys} = $self->{extensions} unless( exists( $opts->{unique_keys} ) );
     if( exists( $opts->{ignore_unknown_required_vocab} ) )
     {
         $self->{ignore_req_vocab} = $opts->{ignore_unknown_required_vocab} ? 1 : 0;
@@ -169,6 +177,15 @@ sub error { $_[0]->{last_error} }
 # We return a copy of the array reference containing the error objects
 sub errors { return( [@{$_[0]->{errors}}] ); }
 
+sub extensions
+{
+    my( $self, $bool ) = @_;
+    my $on = defined( $bool ) ? $bool : 1;
+    $self->{extensions} = $on;
+    $self->unique_keys( $on );
+    return( $self );
+}
+
 sub get_trace
 {
     my( $self ) = @_;
@@ -195,6 +212,8 @@ sub is_content_checks_enabled { $_[0]->{content_assert} ? 1 : 0 }
 
 # Accessor only method. See trace or the mutator vession.
 sub is_trace_on { $_[0]->{trace_on} ? 1 : 0 }
+
+sub is_unique_keys_enabled { $_[0]->{unique_keys} ? 1 : 0 }
 
 sub is_unknown_required_vocab_ignored { $_[0]->{ignore_req_vocab} ? 1 : 0 }
 
@@ -609,6 +628,14 @@ sub trace_sample
     return( $self );
 }
 
+sub unique_keys
+{
+    my( $self, $bool ) = @_;
+    my $on = defined( $bool ) ? $bool : 1;
+    $self->{unique_keys} = $on;
+    return( $self );
+}
+
 sub validate
 {
     my( $self, $data ) = @_;
@@ -685,7 +712,11 @@ sub validate
         media_validators => $self->{media_validators},
         content_decoders => $self->{content_decoders},
 
-        comment_handler => $self->{comment_handler},
+        comment_handler  => $self->{comment_handler},
+
+        # extensions
+        unique_keys      => $self->{unique_keys},
+        extensions       => $self->{extensions},
     };
 
     # Guarantee at least one trace entry when trace is enabled
@@ -896,6 +927,10 @@ sub _compile_node
     my $has_format  = exists( $S->{format} );
     my $format_name = $S->{format};
 
+    my $has_unique_keys =
+        exists( $S->{uniqueKeys} ) &&
+        ref( $S->{uniqueKeys} ) eq 'ARRAY';
+
     # Precompile child closures (same structure your interpreter walks)
     my %child;
 
@@ -998,6 +1033,13 @@ sub _compile_node
         if( $has_type  ) { _k_type(  $ctx, $inst, $type_spec, $ptr ) or return( _fail() ); }
         if( $has_const ) { _k_const( $ctx, $inst, $const_val, $ptr ) or return( _fail() ); }
         if( $has_enum  ) { _k_enum(  $ctx, $inst, $enum_vals, $ptr ) or return( _fail() ); }
+
+        # uniqueKeys extension (compiled path)
+        if( $ctx->{unique_keys} && $has_unique_keys && ref( $inst ) eq 'ARRAY' )
+        {
+            my $r = _k_unique_keys( $ctx, $ptr, $S->{uniqueKeys}, $inst );
+            return( $r ) unless( $r->{ok} );
+        }
 
         # Numbers
         if( _is_number( $inst ) )
@@ -1116,7 +1158,7 @@ sub _compile_node
         {
             my $r = _k_object_all( $ctx, $ptr, $S, $inst );
             return( $r ) unless( $r->{ok} );
-            %ann_props = ( %ann_props, %{ $r->{props} } );
+            %ann_props = ( %ann_props, %{$r->{props}} );
         }
 
         # Combinators
@@ -1125,10 +1167,10 @@ sub _compile_node
             my( %p, %it );
             for my $i ( 0 .. $#{ $S->{allOf} } )
             {
-                my $r = $child{"allOf:$i"}->( $ctx, $inst );
+                my $r = $child{ "allOf:$i" }->( $ctx, $inst );
                 return $r unless $r->{ok};
-                %p  = ( %p,  %{ $r->{props} } );
-                %it = ( %it, %{ $r->{items} } );
+                %p  = ( %p,  %{$r->{props}} );
+                %it = ( %it, %{$r->{items}} );
             }
             %ann_props = ( %ann_props, %p );
             %ann_items = ( %ann_items, %it );
@@ -1138,7 +1180,7 @@ sub _compile_node
             my $ok = 0;
             for my $i ( 0 .. $#{ $S->{anyOf} } )
             {
-                my $r = $child{"anyOf:$i"}->( $ctx, $inst );
+                my $r = $child{ "anyOf:$i" }->( $ctx, $inst );
                 if( $r->{ok} )
                 {
                     $ok = 1;
@@ -1152,34 +1194,34 @@ sub _compile_node
             my $hits = 0;
             for my $i ( 0 .. $#{$S->{oneOf}} )
             {
-                my $r = $child{"oneOf:$i"}->( $ctx, $inst );
+                my $r = $child{ "oneOf:$i" }->( $ctx, $inst );
                 $hits++ if( $r->{ok} );
             }
             return( _err_res( $ctx, $ptr, "instance satisfies $hits schemas in oneOf (expected exactly 1)", 'oneOf' ) ) unless( $hits == 1 );
         }
         if( exists( $S->{not} ) && ref( $S->{not} ) )
         {
-            my $r = $child{"not"}->( $ctx, $inst );
-            return( _err_res( $ctx, $ptr, "instance matches forbidden not-schema", 'oneOf' ) ) if( $r->{ok} );
+            my $r = $child{ "not" }->( $ctx, $inst );
+            return( _err_res( $ctx, $ptr, "instance matches forbidden not-schema", 'not' ) ) if( $r->{ok} );
         }
 
         # Conditionals
         if( exists( $S->{if} ) && ref( $S->{if} ) )
         {
-            my $cond = $child{"if"}->( $ctx, $inst );
+            my $cond = $child{ "if" }->( $ctx, $inst );
             if( $cond->{ok} )
             {
-                if( exists( $child{"then"} ) )
+                if( exists( $child{ "then" } ) )
                 {
-                    my $r = $child{"then"}->( $ctx, $inst );
+                    my $r = $child{ "then" }->( $ctx, $inst );
                     return( $r ) unless( $r->{ok} );
                 }
             }
             else
             {
-                if( exists( $child{"else"} ) )
+                if( exists( $child{ "else" } ) )
                 {
-                    my $r = $child{"else"}->( $ctx, $inst );
+                    my $r = $child{ "else" }->( $ctx, $inst );
                     return( $r ) unless( $r->{ok} );
                 }
             }
@@ -1534,6 +1576,8 @@ sub _k_array_all
         my $tuple = $S->{prefixItems};
         for my $i ( 0 .. $#$A )
         {
+            push( @{$ctx->{ptr_stack}}, _join_ptr( $sp, $i ) );
+
             if( $i <= $#$tuple )
             {
                 my $r = _v( $ctx, _join_ptr( $sp, "prefixItems/$i" ), $tuple->[$i], $A->[$i] );
@@ -1546,15 +1590,19 @@ sub _k_array_all
                 return( $r ) unless( $r->{ok} );
                 $items_ann{ $i } = 1;
             }
+
+            pop( @{$ctx->{ptr_stack}} );
         }
     }
     elsif( ref( $S->{items} ) eq 'HASH' )
     {
         for my $i ( 0 .. $#$A )
         {
+            push( @{$ctx->{ptr_stack}}, _join_ptr( $sp, $i ) );
             my $r = _v( $ctx, _join_ptr( $sp, "items" ), $S->{items}, $A->[$i] );
             return( $r ) unless( $r->{ok} );
             $items_ann{ $i } = 1;
+            pop( @{$ctx->{ptr_stack}} );
         }
     }
 
@@ -1812,6 +1860,9 @@ sub _k_object_all
         my $v = $H->{ $k };
         my $matched = 0;
 
+        my $child_path = _join_ptr( $sp, $k );
+        push( @{$ctx->{ptr_stack}}, $child_path );
+
         if( exists( $props->{ $k } ) )
         {
             my $r = _v( $ctx, _join_ptr( $sp, "properties/$k" ), $props->{ $k }, $v );
@@ -1847,6 +1898,8 @@ sub _k_object_all
                 $ann{ $k } = 1;
             }
         }
+
+        pop( @{$ctx->{ptr_stack}} );
     }
 
     if( my $depR = $S->{dependentRequired} )
@@ -1954,6 +2007,65 @@ sub _k_type
     return( _err( $ctx, $ptr, "type mismatch: expected $exp", 'type' ) );
 }
 
+sub _k_unique_keys
+{
+    my( $ctx, $sp, $uk_def, $array ) = @_;
+    unless( ref( $uk_def ) eq 'ARRAY' && @$uk_def )
+    {
+        return( { ok => 1, props => {}, items => {} } );
+    }
+
+    for my $key_set ( @$uk_def )
+    {
+        next unless( ref( $key_set ) eq 'ARRAY' && @$key_set );
+
+        my %seen;
+        for my $i ( 0 .. $#$array )
+        {
+            my $item = $array->[$i];
+            next unless( ref( $item ) eq 'HASH' );
+
+            my @key_vals;
+            my $all_present = 1;
+            for my $key ( @$key_set )
+            {
+                if( exists( $item->{ $key } ) )
+                {
+                    push( @key_vals, _canon( $item->{ $key } ) );
+                }
+                else
+                {
+                    $all_present = 0;
+                    last;
+                }
+            }
+
+            # Skip items that do not have *all* keys in this key set
+            next unless( $all_present );
+
+            my $composite = join( "\0", @key_vals );
+            if( exists( $seen{ $composite } ) )
+            {
+                my $prev_i = $seen{ $composite };
+                my $keys   = join( ', ', map { "'$_'" } @$key_set );
+                push( @{$ctx->{ptr_stack}}, _join_ptr( $sp, $i ) );
+                my $res = _err_res(
+                    $ctx,
+                    $sp,
+                    "uniqueKeys violation: items[$prev_i] and items[$i] have identical values for key(s) [$keys]",
+                    'uniqueKeys',
+                );
+                pop( @{$ctx->{ptr_stack}} );
+
+                return( $res );
+            }
+            $seen{ $composite } = $i;
+        }
+    }
+
+    return( { ok => 1, props => {}, items => {} } );
+}
+
 sub _match_type
 {
     my( $v, $t ) = @_;
@@ -1962,7 +2074,7 @@ sub _match_type
 
     if( $t eq 'boolean' )
     {
-        return(0) if( ref( $v ) || !defined( $v ) );
+        return(0) if( !defined( $v ) );
         if( blessed( $v ) && ( ref( $v ) =~ /Boolean/ ) )
         {
             my $s = "$v";
@@ -2175,7 +2287,9 @@ sub _register_builtin_media_validators
         my( $bytes, $params ) = @_;
         local $@;
         my $v = eval{ JSON->new->allow_nonref(1)->decode( $bytes ) };
-        return( $v ? ( 1, undef, $v ) : ( 0, 'invalid JSON' ) );
+        return( 0, 'invalid JSON', undef ) if( $@ );
+        # JSON value is valid even if it’s 0, "", or false
+        return( 1, undef, $v );
     } );
 
     return( $self );
@@ -2275,7 +2389,7 @@ sub _t
         return if( int( rand(100) ) >= $ctx->{trace_sample} );
     }
 
-    push( @{ $ctx->{trace} }, 
+    push( @{$ctx->{trace}}, 
     {
         schema_ptr => $schema_ptr,
         keyword    => $keyword,
@@ -2380,6 +2494,15 @@ sub _v_node
     }
     _t( $ctx, $schema_ptr, 'type/const/enum', undef, 'pass', '' ) if( $ctx->{trace_on} );
 
+    if( $ctx->{unique_keys} &&
+        exists( $schema->{uniqueKeys} ) &&
+        ref( $schema->{uniqueKeys} ) eq 'ARRAY' &&
+        ref( $inst ) eq 'ARRAY' )
+    {
+        my $r = _k_unique_keys( $ctx, $ptr, $schema->{uniqueKeys}, $inst );
+        return( $r ) unless( $r->{ok} );
+    }
+
     # Numbers
     if( _is_number( $inst ) )
     {
@@ -2479,18 +2602,6 @@ sub _v_node
                     return( $r ) unless( $r->{ok} );
                 }
             }
-        }
-    }
-
-    if( !ref( $inst ) && defined( $inst ) )
-    {
-        if( exists( $schema->{minLength} ) || exists( $schema->{maxLength} ) || exists( $schema->{pattern} ) )
-        {
-            _k_string( $ctx, $inst, $schema, $ptr ) or return( _fail() );
-        }
-        if( exists( $schema->{format} ) )
-        {
-            _k_format( $ctx, $inst, $schema->{format}, $ptr ) or return( _fail() );
         }
     }
 
@@ -2703,7 +2814,7 @@ JSON::Schema::Validate - Lean, recursion-safe JSON Schema validator (Draft 2020-
 
 =head1 VERSION
 
-v0.4.1
+v0.5.0
 
 =head1 DESCRIPTION
 
@@ -2844,6 +2955,24 @@ Enable or disable the content assertions for the C<contentEncoding>, C<contentMe
 
 When enabling, built-in media validators are registered (e.g. C<application/json>).
 
+=item C<extensions =E<gt> 1|0>
+
+Defaults to C<0>
+
+This enables or disables all non-core extensions currently implemented by the validator.
+
+When set to a true value, this enables the C<uniqueKeys> applicator. Future extensions (e.g. custom keywords, additional vocabularies) will also be controlled by this flag.
+
+When set to a true value, all known extensions are activated; setting it to false disables them all.
+
+If you set separately an extension boolean value, it will not be overriden by this. So for example:
+
+    my $js = JSON::Schema::Validate->new( $schema, extension => 0, unique_keys => 1 );
+
+Will globally disable extension, but will enable C<uniqueKeys>
+
+Enabling extensions does not affect core Draft 2020-12 compliance — unknown keywords are still ignored unless explicitly supported.
+
 =item C<format =E<gt> \%callbacks>
 
 Hash of C<format_name =E<gt> sub{ ... }> validators. Each sub receives the string to validate and must return true/false. Entries here take precedence when you later call C<register_builtin_formats> (i.e. your callbacks remain in place).
@@ -2942,6 +3071,28 @@ Set a hard cap on the number of trace entries recorded during a single C<validat
 
 Enable probabilistic sampling of trace events. C<$percent> is an integer percentage in C<[0,100]>. C<0> disables sampling. Sampling occurs per-event, and still respects L</trace_limit>.
 
+=item C<unique_keys =E<gt> 1|0>
+
+Defaults to C<0>
+
+Explicitly enable or disable the C<uniqueKeys> applicator.
+
+C<uniqueKeys> is a non-standard extension (proposed for future drafts) that enforces uniqueness of one or more properties across all objects in an array.
+
+    "uniqueKeys": [ ["id"] ]                    # 'id' must be unique
+    "uniqueKeys": [ ["id"], ["email"] ]        # id AND email must each be unique
+    "uniqueKeys": [ ["category", "code"] ]     # the pair (category,code) must be unique
+
+The applicator supports both single-property constraints and true composite keys.
+
+This option is useful when you need stronger guarantees than C<uniqueItems> provides, without resorting to complex C<contains>/C<not> patterns.
+
+When C<extensions> is enabled, C<unique_keys> is automatically turned on; the specific method allows finer-grained control.
+
+This works in B<both interpreted and compiled modes> and is fully integrated into the annotation system (plays nicely with C<unevaluatedProperties>, etc.).
+
+Disabled by default for maximum spec purity.
+
 =item C<vocab_support =E<gt> {}>
 
 A hash reference of support vocabularies.
@@ -2989,6 +3140,18 @@ When stringified, the object provides a short, human-oriented message for the fi
     my $array_ref = $js->errors;
 
 All collected L<error objects|JSON::Schema::Validate::Error> (up to the internal C<max_errors> cap).
+
+=head2 extensions
+
+    $js->extensions;       # enable all extensions
+    $js->extensions(1);    # enable
+    $js->extensions(0);    # disable
+
+Turn the extension framework on or off.
+
+Enabling extensions currently activates the C<uniqueKeys> applicator (and any future non-core features). Disabling it turns all extensions off, regardless of individual settings.
+
+Returns the object for method chaining.
 
 =head2 get_trace
 
@@ -3043,6 +3206,14 @@ Returns true if content assertions are enabled, false otherwise.
 Read-only accessor.
 
 Returns true if tracing is enabled, false otherwise.
+
+=head2 is_unique_keys_enabled
+
+    my $bool = $js->is_unique_keys_enabled;
+
+Read-only accessor.
+
+Returns true if the C<uniqueKeys> applicator is currently active, false otherwise.
 
 =head2 is_unknown_required_vocab_ignored
 
@@ -3185,7 +3356,7 @@ This returns the current object.
 
 =head2 set_resolver
 
-    $js->set_resolver( sub { my( $absolute_uri ) = @_; ...; return $schema_hashref } );
+    $js->set_resolver( sub{ my( $absolute_uri ) = @_; ...; return $schema_hashref } );
 
 Install a resolver for external documents. It is called with an absolute URI (formed from the current base C<$id> and the C<$ref>) and must return a Perl hash reference representation of a JSON Schema. If the returned hash contains C<'$id'>, it will become the new base for that document; otherwise, the absolute URI is used as its base.
 
@@ -3229,6 +3400,18 @@ It returns the current object for chaining.
 Enable probabilistic sampling of trace events. C<$percent> is an integer percentage in C<[0,100]>. C<0> disables sampling. Sampling occurs per-event, and still respects L</trace_limit>.
 
 It returns the current object for chaining.
+
+=head2 unique_keys
+
+    $js->unique_keys;       # enable uniqueKeys
+    $js->unique_keys(1);    # enable
+    $js->unique_keys(0);    # disable
+
+Enable or disable the C<uniqueKeys> applicator independently of the C<extensions> option.
+
+When disabled (the default), schemas containing the C<uniqueKeys> keyword are ignored.
+
+Returns the object for method chaining.
 
 =head2 validate
 
@@ -3299,10 +3482,6 @@ In practice this improves steady-state throughput (especially for large/branchy 
 =back
 
 If you only validate once or twice against a tiny schema, compilation will not matter; for services, batch jobs, or streaming pipelines it typically yields a noticeable speedup. Always benchmark with your own schema+data.
-
-=head1 CREDITS
-
-Albert from OpenAI for his invaluable help.
 
 =head1 AUTHOR
 

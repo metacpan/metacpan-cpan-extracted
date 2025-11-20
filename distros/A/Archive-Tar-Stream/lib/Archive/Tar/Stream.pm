@@ -24,11 +24,11 @@ Archive::Tar::Stream - pure perl IO-friendly tar file management
 
 =head1 VERSION
 
-Version 0.03
+Version 0.05
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 
 =head1 SYNOPSIS
@@ -174,11 +174,9 @@ sub AddFile {
   my $size = shift;
   my $fh = shift;
 
-  my $header = $Self->BlankHeader(@_);
-  $header->{name} = $name;
-  $header->{size} = $size;
+  my $header = $Self->BlankHeader(@_, name => $name, size => $size);
 
-  return $header->{size} ? $Self->WriteFromFh($fh, $header) : $Self->WriteHeader($header);
+  return $size ? $Self->WriteFromFh($fh, $header) : $Self->WriteHeader($header);
 }
 
 =head2 AddLink
@@ -198,9 +196,7 @@ sub AddLink {
   my $name = shift;
   my $linkname = shift;
 
-  my $header = $Self->BlankHeader(@_);
-  $header->{name} = $name;
-  $header->{linkname} = $linkname;
+  my $header = $Self->BlankHeader(typeflag => 2, @_, name => $name, linkname => $linkname);
 
   return $Self->WriteHeader($header);
 }
@@ -286,7 +282,7 @@ sub StreamCopy {
           $Self->WriteFromFh($TempFile, $header);
         }
         # guarantee safety by getting everything into a temporary file first
-        elsif ($Self->{safe_copy}) {
+        elsif ($Self->{safe_copy} and $header->{size}) {
           $TempFile = $Self->CopyToTempFile($header->{size});
           $Self->WriteFromFh($TempFile, $header);
         }
@@ -730,13 +726,15 @@ sub CopyFromFh {
 
   my $tocopy = $bytes + $pos;
 
-  while ($pos < $tocopy) {
+  while ($tocopy) {
     my $chunk = min($tocopy - $pos, BUFSIZE);
-    my $n = sysread($Fh, $buf, $chunk, $pos);
-    unless ($n) {
-      die "Failed to read $chunk bytes from input fh at at $pos\n";
+    if ($chunk) {
+      my $n = sysread($Fh, $buf, $chunk, $pos);
+      unless ($n) {
+        die "Failed to read $chunk bytes from input fh at at $pos\n";
+      }
+      $pos += $n;
     }
-    $pos += $n;
 
     # if we're done, write including padding
     if ($pos == $tocopy) {
@@ -797,19 +795,23 @@ sub WriteCopy {
 
   my $pos = $Self->{outpos};
 
-  my $block = $Self->CreateHeader($header);
-  my $hn = 1;
+  my $toread = $header->{size};
 
-  my $bytes = $header->{size};
-  while ($bytes > 0) {
-    my $n = min(1 + int(($bytes-1) / BLOCKSIZE), BLOCKCOUNT);
-    my $dump = $Self->ReadBlocks($n);
-    die "Failed to read $n blocks for $bytes at $Self->{inpos}\n" unless defined $dump;
-    $Self->WriteBlocks($block . $dump, $hn + $n);
-    $bytes -= length($dump);
-    # only write header on the first time;
-    $block = '';
-    $hn = 0;
+  my $blocks = $Self->CreateHeader($header);
+  my $count = 1;
+
+  while ($count || $toread > 0) {
+    if ($toread) {
+      my $n = min(1 + int(($toread-1) / BLOCKSIZE), BLOCKCOUNT-$count);
+      my $dump = $Self->ReadBlocks($n);
+      die "Failed to read $n blocks for $toread at $Self->{inpos}\n" unless defined $dump;
+      $blocks .= $dump;
+      $count += $n;
+      $toread -= length($dump);
+    }
+    $Self->WriteBlocks($blocks, $count);
+    $blocks = '';
+    $count = 0;
   }
 
   return( {%$header, _pos => $pos} );

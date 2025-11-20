@@ -50,6 +50,6 @@
          "url" : "https://github.com/brong/Archive-Tar-Stream"
       }
    },
-   "version" : "0.03",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

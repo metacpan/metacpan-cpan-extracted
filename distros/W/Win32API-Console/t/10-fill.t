@@ -4,56 +4,60 @@ use warnings;
 use utf8;
 
 use Test::More tests => 7;
+use FindBin;
+use lib "$FindBin::Bin/lib";
 
 BEGIN {
+  use_ok 'TestConsole', qw( GetConsoleOutputHandle );
   use_ok 'Win32API::Console', qw(
-    GetStdHandle
     FillConsoleOutputCharacterW
     FillConsoleOutputCharacterA
-    STD_ERROR_HANDLE
   );
 }
 
 # Get a handle to the current console output
-my $handle = GetStdHandle(STD_ERROR_HANDLE);
-ok($handle, 'Obtained console handle');
-diag "$^E" unless $handle;
+my $hConsole = GetConsoleOutputHandle();
+diag "$^E" if $^E;
 
-# Define the write position and length
-my %coord = (X => 0, Y => 0);
-my $length = 10;
-my $written = 0;
+SKIP: {
+  skip "No real console output handle available" => 4 unless $hConsole;
 
-# Define the Unicode character to write (e.g., U+2592: Medium Shade Block)
-my $char = "\N{U+2592}";
+  # Define the write position and length
+  my %coord = (X => 0, Y => 0);
+  my $length = 10;
+  my $written = 0;
 
-# Call the wrapper functions for FillConsoleOutputCharacter
-my $ok = FillConsoleOutputCharacterW(
-    $handle,
+  # Define the Unicode character to write (e.g., U+2592: Medium Shade Block)
+  my $char = "\N{U+2592}";
+
+  # Call the wrapper functions for FillConsoleOutputCharacter
+  my $ok = FillConsoleOutputCharacterW(
+    $hConsole,
     $char,
     $length,
     \%coord,
     \$written
-);
-diag "$^E" unless $ok;
+  );
+  diag "$^E" unless $ok;
 
-ok($ok, 'FillConsoleOutputCharacterW call succeeded');
-is($written, $length, 'Correct number of characters written');
+  ok($ok, 'FillConsoleOutputCharacterW call succeeded');
+  is($written, $length, 'Correct number of characters written');
 
-$char = 'ö';
-$coord{X} = $written;
+  $char = 'ö';
+  $coord{X} = $written;
 
-$ok = FillConsoleOutputCharacterA(
-    $handle,
+  $ok = FillConsoleOutputCharacterA(
+    $hConsole,
     $char,
     $length,
     \%coord,
     \$written
-);
-diag "$^E" unless $ok;
+  );
+  diag "$^E" unless $ok;
 
-ok($ok, 'FillConsoleOutputCharacterA call succeeded');
-is($written, $length, 'Correct number of characters written');
+  ok($ok, 'FillConsoleOutputCharacterA call succeeded');
+  is($written, $length, 'Correct number of characters written');
+}
 
 subtest 'Wrapper for the Unicode and ANSI functions' => sub {
   can_ok('Win32API::Console', 'FillConsoleOutputCharacter');

@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.104-11-ge2d9fc88
+package OpenAPI::Modern; # git description: v0.105-9-g21a5ea59
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.1 or v3.2 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.1 v3.2 Swagger HTTP request response
 
-our $VERSION = '0.105';
+our $VERSION = '0.106';
 
 use 5.020;
 use utf8;
@@ -653,7 +653,7 @@ sub _match_uri ($self, $method, $uri, $path_template, $state) {
   # There could be another paths entry that matches this URI that does have this method
   # implemented, so we return false and keep searching. Since we may still match to the wrong URI,
   # the correct operation can be forced to match by explicitly passing the corresponding
-  # path_template or (preferrably) operationId to be used in the search.
+  # path_template or (preferably) operationId to be used in the search.
 
   $local_state->@{qw(operation operation_path_suffix)} =
     (any { $method eq $_ } qw(GET PUT POST DELETE OPTIONS HEAD PATCH TRACE QUERY))
@@ -1232,7 +1232,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.1 o
 
 =head1 VERSION
 
-version 0.105
+version 0.106
 
 =head1 SYNOPSIS
 
@@ -1660,7 +1660,8 @@ code or configurations to keep pace with internal changes.
 
 An even stricter schema and dialect are available, via the metaschema_uri
 C<https://raw.githubusercontent.com/karenetheridge/OpenAPI-Modern/master/share/3.2/strict-schema.json>,
-which prevents any unknown keywords from being used in JSON Schemas. This is useful to avoid
+which treats the `format` keyword as an assertion, and also prevents any unknown keywords from being
+used in JSON Schemas. This is useful to avoid
 spelling mistakes from going unnoticed and resulting in false positive results.
 
 =head1 ON THE USE OF JSON SCHEMAS

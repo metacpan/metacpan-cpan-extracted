@@ -20,6 +20,15 @@
 #######################################################################
 
 
+2025-11-19  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000832 released
+
+        * Updated Makefile.PL for COMPLETE builds
+
+	* COMPLETE bundle installs successfully for
+	  AWS micro and nano servers
+
 2025-11-18  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000831 released

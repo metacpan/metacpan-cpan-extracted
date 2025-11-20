@@ -4,8 +4,22 @@
 Unless noted otherwise, these changes where initiated and applied by
 Mark Overmeer.
 
+version 3.00: Wed 19 Nov 12:09:30 CET 2025
+
+	Changes:
+	- removed interactive selection of optional modules.
+
+	Improvements:
+	- small doc-fixes.
+	- add .gitignore
+	- convert style to OODoc 3
+	- convert install process to OODoc 3.05
+	- reflect that this is module is compatible with Mail-Box 3 in the
+	  version number.
+
 version 0.12: Mon Jan 29 23:49:23 CET 2018
 
+	Improvements:
 	- do not run pod.t in devel environment.
 	- convert to GIT
 	- publish via GitHub

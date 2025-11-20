@@ -20,7 +20,7 @@ use Data::Identifier::Generate;
 
 use parent 'Data::Identifier::Interface::Known';
 
-our $VERSION = v0.24;
+our $VERSION = v0.25;
 
 use constant {
     WK_UUID => '8be115d2-dc2f-4a98-91e1-a6e3075cbc31', # uuid
@@ -229,7 +229,7 @@ Data::Identifier::Wellknown - format independent identifier object
 
 =head1 VERSION
 
-version v0.24
+version v0.25
 
 =head1 SYNOPSIS
 
@@ -695,17 +695,19 @@ $type uuid
 .   c8530d1b-d600-47e5-bc06-7b01416c79eb    generalises
 .   4c771f95-9c12-4fc7-9cf6-1d5dee7024f9    has-colour-value
 .   d0421d68-8d37-4f78-b800-cae3e896bea5    primary-colour
-.   30710bdb-6418-42fb-96db-2278f3bfa17f    also-has-description
+.   30710bdb-6418-42fb-96db-2278f3bfa17f    also-has-description        sid=30
 .   1eae4688-f66c-4c77-bc9b-bb38be88240a    inverse-relation
 .   ddd1ca08-2b4a-4818-a3d8-de86921f07e2    also-shares-first-name
 .   31ea2111-e233-488d-883a-4c1e6083a652    also-shares-last-name
 .   756e3502-4f23-4b4b-b205-e1adaf520a85    also-shares-nickname
 .   e48cd5c6-83d7-411e-9640-cb370f3502fc    implies
 .   0a9c6e4e-0dc3-4467-a95a-d97e32d6c13c    also-has-commissioner
-.   94a4ce85-dda0-433e-8b57-949a20606d7f    also-has-artist
+.   94a4ce85-dda0-433e-8b57-949a20606d7f    also-has-artist             sid=136
 .   164ffdf5-f272-409c-91cf-a34702d01872    also-has-emblem
 .   f61caf39-b5e1-48f3-9a68-2a70b132db55    also-has-profile-image
-.   11d8962c-0a71-4d00-95ed-fa69182788a8    also-has-comment
+.   11d8962c-0a71-4d00-95ed-fa69182788a8    also-has-comment            sid=29
+.   50f70987-d0fb-4e9b-ae7f-52505948ec74    also-has-example            sid=137
+.   ef90615f-6d94-4db0-b41b-d45b96d9d856    also-has-definition         sid=138
 .   a845bfb7-130f-4f55-8a6d-ea3e5b1c2a09    also-has-proto-title
 .   f7fd59e6-6727-4128-a0a7-cbc702dc09b8    also-has-title
 .   df70343f-0c5f-4d76-93b6-4376f680f567    also-has-subtitle
@@ -1172,15 +1174,15 @@ $namespace 47dd950c-9089-4956-87c1-54c122533219
 .   en      English         sid=70
 .   eo      Esperanto
 .   es      Spanish         sid=73
-.   fi      Finnish
+.   fi      Finnish         sid=347
 .   fr      French          sid=244
 .   gu      Gujarati        sid=331
 .   ha      Hausa           sid=321
-.   he      Hebrew
+.   he      Hebrew          sid=348
 .   hi      Hindi           sid=242
-.   ia      Interlingua
+.   ia      Interlingua     sid=350
 .   id      Indonesian      sid=248
-.   ie      Interlingue
+.   ie      Interlingue     sid=349
 .   it      Italian         sid=330
 .   ja      Japanese        sid=250
 .   jv      Javanese        sid=329
@@ -1189,10 +1191,10 @@ $namespace 47dd950c-9089-4956-87c1-54c122533219
 .   mi      Maori           sid=254
 .   mr      Marathi         sid=251
 .   nl      Dutch           sid=72
-.   no      Norwegian
+.   no      Norwegian       sid=345
 .   pt      Portuguese      sid=246
 .   ru      Russian         sid=247
-.   sv      Swedish
+.   sv      Swedish         sid=346
 .   sw      Swahili         sid=241
 .   ta      Tamil           sid=325
 .   te      Telugu          sid=320
@@ -1203,6 +1205,14 @@ $namespace 47dd950c-9089-4956-87c1-54c122533219
 .   vi      Vietnamese      sid=252
 .   zh      Chinese         sid=74
 .   zu      Zulu            sid=253
+
+
+$class language
+$extra_classes languoid
+$type uuid
+
+.   8ca63437-1b1e-4a85-8512-02ba5c15a412    Lapine      sid=340
+.   1d668738-8aef-4cb4-a4ed-9368e872a93f    famibeib    sid=341
 
 
 $class mediatype
@@ -1395,8 +1405,8 @@ $type uuid
 .   6085f87e-4797-4bb2-b23d-85ff7edc1da0    text-fragment               sid=19
 % Handled above: 20 - 22
 .   65bb36f2-b558-48af-8512-bca9150cca85    proxy-type                  sid=23
-% Handled above: 24 - 28
-% Unassigned: 29 - 31
+% Handled above: 24 - 30
+% Unassigned: 31
 % Handled above: 32 - 33
 .   3fde5688-6e34-45e9-8f33-68f079b152c8    SEEK_SET                    sid=34
 .   bc598c52-642e-465b-b079-e9253cd6f190    SEEK_CUR                    sid=35
@@ -1432,7 +1442,8 @@ $type uuid
 % Handled above: 132 - 133
 .   2ec4a6b0-e6bf-40cd-96a2-490cbc8d6c4b    empty-set                   sid=134
 .   99437f71-f1b5-4a50-8ecf-882b61b86b1e    final-file-charset          sid=135
-% Unassigned: 136 - 142
+% Handled above: 136 - 138
+% Unassigned: 139 - 142
 .   807e485f-8b3a-5483-8bb5-d58648acaa8f    UTF-8                       sid=143
 % Handled above: 144 - 145
 % Unassigned: 146 - 158

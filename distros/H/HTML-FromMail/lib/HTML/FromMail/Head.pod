@@ -16,31 +16,29 @@ HTML::FromMail::Head - output a message header as HTML
 =head1 DESCRIPTION
 
 Extends L<"DESCRIPTION" in HTML::FromMail::Page|HTML::FromMail::Page/"DESCRIPTION">.
- 
+
 =head1 METHODS
 
 Extends L<"METHODS" in HTML::FromMail::Page|HTML::FromMail::Page/"METHODS">.
- 
+
 =over 4
 
-=item $obj-E<gt>B<fields>(MESSAGE, OPTIONS)
-
-=item HTML::FromMail::Head-E<gt>B<fields>(MESSAGE, OPTIONS)
+=item $any-E<gt>B<fields>($message, %options)
 
 Collect information about the header fields.
 
  -Option              --Default
   ignore                undef
-  remove_list_group     1
-  remove_resent_groups  1
-  remove_spam_groups    1
+  remove_list_group     true
+  remove_resent_groups  true
+  remove_spam_groups    true
   select                ''
 
 =over 2
 
-=item ignore => STRING
+=item ignore => $exclude
 
-The reverse of C<select>: which fields not to take.
+The reverse of C<select>: patterns listing which fields not to take.
 
 =item remove_list_group => BOOLEAN
 
@@ -58,20 +56,23 @@ with C<Resent->.  See Mail::Message::Head::ResentGroup.
 Do not select headers which were added by spam fighting software.  See
 Mail::Message::Head::SpamGroup.
 
-=item select => STRING
+=item select => $patterns
 
-Select only the fields which match the patterns found in STRING.  Multiple
-patterns can be specified separated by vertical bars (I<pipes>).  The fields
-are ordered as specified in the STRING.
+Select only the fields which match the C<$patterns>.  Multiple patterns can
+be specified separated by vertical bars (I<pipes>).  The fields returned
+are ordered as specified.
+
 See Mail::Message::Head::Complete subroutine grepNames.
 
 =back
 
-=item $obj-E<gt>B<lookup>(LABEL, ARGS)
+=item $obj-E<gt>B<lookup>($label, \%options)
 
 Inherited, see L<HTML::FromMail::Page/"METHODS">
 
-=item HTML::FromMail::Head-E<gt>B<new>(OPTIONS)
+=item $class-E<gt>B<new>(OPTIONS)
+
+Z<>
 
  -Option  --Defined in            --Default
   settings  HTML::FromMail::Object  {}
@@ -79,7 +80,7 @@ Inherited, see L<HTML::FromMail::Page/"METHODS">
 
 =over 2
 
-=item settings => HASH-OF-HASHES
+=item settings => \%map
 
 =item topic => STRING
 
@@ -89,14 +90,15 @@ Inherited, see L<HTML::FromMail::Page/"METHODS">
 
 =head1 SEE ALSO
 
-This module is part of HTML-FromMail distribution version 0.12,
-built on January 29, 2018. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of HTML-FromMail version 3.00,
+built on November 19, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2003-2018 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2003-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

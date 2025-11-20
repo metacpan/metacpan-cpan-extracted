@@ -15,14 +15,14 @@ HTML::FromMail::Format - base-class for message formatters
 
 =head1 SYNOPSIS
 
- my $fmt  = HTML::FromMail::Format::Magic->new(...);
+  my $fmt  = HTML::FromMail::Format::Magic->new(...);
 
- my $make = HTML::FromMail->new
-  ( templates => ...
-  , formatter => 'Magic'
- #, formatter => 'HTML::FromMail::Format::Magic'
- #, formatter => $fmt
-  );
+  my $make = HTML::FromMail->new(
+    templates => ...,
+    formatter => 'Magic'
+  #, formatter => 'HTML::FromMail::Format::Magic'
+  #, formatter => $fmt
+   );
 
 =head1 DESCRIPTION
 
@@ -35,16 +35,16 @@ At the moment, the following template systems are available:
 
 =item * L<HTML::FromMail::Format::OODoc|HTML::FromMail::Format::OODoc>
 
-Based on L<OODoc::Template>, a simplified version of Template::Magic. It
+Based on OODoc::Template, a simplified version of Template::Magic. It
 has all the basic needs of a template system, but may get slow for large
 template files.
 
 =item * L<HTML::FromMail::Format::Magic|HTML::FromMail::Format::Magic>
 
-Based on L<Template::Magic>, created by Domizio Demichelis.
-You will have to install Bundle::MagicTemplate before you can use this
-formatter.  The default system is compatible with the previous formatter,
-so you can easily upgrade.
+Based on Template::Magic, created by Domizio Demichelis.  You will
+have to install that optional module before you can use this formatter.
+The default system is compatible with the previous formatter, so you
+can easily upgrade.
 
 The formatter has nice simplifications for the user, especially
 when a lot own data must be included in the templates: so data with or
@@ -66,14 +66,16 @@ value of C<undef> is returned.  When the container is "empty", an
 
 =item $obj-E<gt>B<lookup>(TAG, ARGS)
 
-Lookup the value for a certain TAG.  This TAG may, but also may not,
+Lookup the value for a certain C<TAG>.  This C<TAG> may, but also may not,
 be derived from the template.  The value is lookup is the data produced
 by the various producer methods, implemented in L<HTML::FromMail::Page|HTML::FromMail::Page>
 extensions.  The values are administered by the various formatters,
 because there meaning (and for instance their scoping) is formatter
 dependent.  Values which are looked-up are often not simple strings.
 
-=item HTML::FromMail::Format-E<gt>B<new>(OPTIONS)
+=item $class-E<gt>B<new>(OPTIONS)
+
+Z<>
 
 =item $obj-E<gt>B<onFinalToken>(ARGS)
 
@@ -82,21 +84,22 @@ the template.
 
 =item $obj-E<gt>B<processText>(TEXT, ARGS)
 
-New TEXT is supplied, which can be seen as part of the currently active
+New C<TEXT> is supplied, which can be seen as part of the currently active
 container.
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of HTML-FromMail distribution version 0.12,
-built on January 29, 2018. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of HTML-FromMail version 3.00,
+built on November 19, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2003-2018 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+For contributors see file ChangeLog.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://dev.perl.org/licenses/>
+This software is copyright (c) 2003-2025 by Mark Overmeer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 

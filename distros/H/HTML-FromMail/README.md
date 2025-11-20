@@ -1,13 +1,42 @@
 # distribution HTML-FromMail
 
-  * My extended documentation: <http://perl.overmeer.net/CPAN/>
-  * Development via GitHub: <https://github.com/markov2/perl5-HTML-FromMail>
-  * Download from CPAN: <ftp://ftp.cpan.org/pub/CPAN/authors/id/M/MA/MARKOV/>
-  * Indexed from CPAN: <http://search.cpan.org/~markov/HTML-FromMail/>
-    and <https://metacpan.org/release/HTML-FromMail>
-
 This module is designed to put e-mail related data on web-pages.
 This could be used to create web-mail clients.
+
+  * My extended documentation: <http://perl.overmeer.net/CPAN/>
+  * Development via GitHub: <https://github.com/markov2/perl5-HTML-FromMail>
+  * Sponsor me: <https://markov.solutions/sponsor/index-en.html>
+  * Download from CPAN: <ftp://ftp.cpan.org/pub/CPAN/authors/id/M/MA/MARKOV/>
+  * Indexed from CPAN: <https://metacpan.org/release/HTML-FromMail>
+
+## Installing
+
+On github, you can find the processed version for each release.  But the
+better source is CPAN; to get it installed simply run:
+
+```sh
+   cpan -i HTML::From-Mail
+```
+
+You may wish to install with following extras:
+
+```sh
+   cpan -i Template::Magic Image::Magick HTML::From-Mail
+```
+
+### optional Template::Magic
+
+Required if you want to use the Template::Magic formatter, which is not
+required to run the examples.
+
+### optional Image::Magick
+
+When messages contain images, these images can be shown as small
+previews.  This is done with Image::Magick, which is quite hard to
+install (IMHO).  So if you want to give it a try answer yes.
+
+When you do not install Image::Magick, some examples will not work.  But
+you can always install it later.
 
 ## Development &rarr; Release
 
@@ -22,13 +51,6 @@ existed, sorry for the confusion)
 
 Clone from github for the "raw" version.  For instance, when you want
 to contribute a new feature.
-
-On github, you can find the processed version for each release.  But the
-better source is CPAN; to get it installed simply run:
-
-```sh
-   cpan -i HTML::From-Mail
-```
 
 ## Contributing
 

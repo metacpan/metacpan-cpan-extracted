@@ -10,6 +10,9 @@ my %WriteMakefileArgs = (
     ABSTRACT_FROM    => 'lib/Dump/Krumo.pm',
     LICENSE          => 'mit',
     MIN_PERL_VERSION => '5.010',
+	PREREQ_PM => {
+        'Scalar::Util' => '1.26',
+    },
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
     },
@@ -23,8 +26,8 @@ my %WriteMakefileArgs = (
         'meta-spec' => { version => 2 },
         resources => {
             repository => {
-                url => '',
-                web => '',
+                url => 'https://github.com/scottchiefbaker/perl-Dump-Krumo.git',
+                web => 'https://github.com/scottchiefbaker/perl-Dump-Krumo/',
                 type => 'git'
             }
         }
