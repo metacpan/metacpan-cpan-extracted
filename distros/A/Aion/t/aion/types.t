@@ -1,6 +1,7 @@
-use common::sense; use open qw/:std :utf8/;  use Carp qw//; use Cwd qw//; use File::Basename qw//; use File::Find qw//; use File::Slurper qw//; use File::Spec qw//; use File::Path qw//; use Scalar::Util qw//;  use Test::More 0.98;  BEGIN { 	$SIG{__DIE__} = sub { 		my ($msg) = @_; 		if(ref $msg) { 			$msg->{STACKTRACE} = Carp::longmess "?" if "HASH" eq Scalar::Util::reftype $msg; 			die $msg; 		} else { 			die Carp::longmess defined($msg)? $msg: "undef" 		} 	}; 	 	my $t = File::Slurper::read_text(__FILE__); 	 	my @dirs = File::Spec->splitdir(File::Basename::dirname(Cwd::abs_path(__FILE__))); 	my $project_dir = File::Spec->catfile(@dirs[0..$#dirs-2]); 	my $project_name = $dirs[$#dirs-2]; 	my @test_dirs = @dirs[$#dirs-2+2 .. $#dirs];  	my $dir_for_tests = File::Spec->catfile(File::Spec->tmpdir, ".liveman", $project_name, join("!", @test_dirs, File::Basename::basename(__FILE__))); 	 	File::Find::find(sub { chmod 0700, $_ if !/^\.{1,2}\z/ }, $dir_for_tests), File::Path::rmtree($dir_for_tests) if -e $dir_for_tests; 	File::Path::mkpath($dir_for_tests); 	 	chdir $dir_for_tests or die "chdir $dir_for_tests: $!"; 	 	push @INC, "$project_dir/lib", "lib"; 	 	$ENV{PROJECT_DIR} = $project_dir; 	$ENV{DIR_FOR_TESTS} = $dir_for_tests; 	 	while($t =~ /^#\@> (.*)\n((#>> .*\n)*)#\@< EOF\n/gm) { 		my ($file, $code) = ($1, $2); 		$code =~ s/^#>> //mg; 		File::Path::mkpath(File::Basename::dirname($file)); 		File::Slurper::write_text($file, $code); 	} } # # NAME
+use common::sense; use open qw/:std :utf8/;  use Carp qw//; use Cwd qw//; use File::Basename qw//; use File::Find qw//; use File::Slurper qw//; use File::Spec qw//; use File::Path qw//; use Scalar::Util qw//;  use Test::More 0.98;  BEGIN { 	$SIG{__DIE__} = sub { 		my ($msg) = @_; 		if(ref $msg) { 			$msg->{STACKTRACE} = Carp::longmess "?" if "HASH" eq Scalar::Util::reftype $msg; 			die $msg; 		} else { 			die Carp::longmess defined($msg)? $msg: "undef" 		} 	}; 	 	my $t = File::Slurper::read_text(__FILE__); 	 	my @dirs = File::Spec->splitdir(File::Basename::dirname(Cwd::abs_path(__FILE__))); 	my $project_dir = File::Spec->catfile(@dirs[0..$#dirs-2]); 	my $project_name = $dirs[$#dirs-2]; 	my @test_dirs = @dirs[$#dirs-2+2 .. $#dirs];  	$ENV{TMPDIR} = $ENV{LIVEMAN_TMPDIR} if exists $ENV{LIVEMAN_TMPDIR};  	my $dir_for_tests = File::Spec->catfile(File::Spec->tmpdir, ".liveman", $project_name, join("!", @test_dirs, File::Basename::basename(__FILE__))); 	 	File::Find::find(sub { chmod 0700, $_ if !/^\.{1,2}\z/ }, $dir_for_tests), File::Path::rmtree($dir_for_tests) if -e $dir_for_tests; 	File::Path::mkpath($dir_for_tests); 	 	chdir $dir_for_tests or die "chdir $dir_for_tests: $!"; 	 	push @INC, "$project_dir/lib", "lib"; 	 	$ENV{PROJECT_DIR} = $project_dir; 	$ENV{DIR_FOR_TESTS} = $dir_for_tests; 	 	while($t =~ /^#\@> (.*)\n((#>> .*\n)*)#\@< EOF\n/gm) { 		my ($file, $code) = ($1, $2); 		$code =~ s/^#>> //mg; 		File::Path::mkpath(File::Basename::dirname($file)); 		File::Slurper::write_text($file, $code); 	} } # 
+# # NAME
 # 
-# Aion::Types is a library of validators. And it makes new validators
+# Aion::Types - библиотека стандартных валидаторов и служит для создания новых валидаторов
 # 
 # # SYNOPSIS
 # 
@@ -15,7 +16,7 @@ BEGIN {
 ::is scalar do {"Kitty!" ~~ SpeakOfKitty}, scalar do{1}, '"Kitty!" ~~ SpeakOfKitty # -> 1';
 ::is scalar do {"abc"    ~~ SpeakOfKitty}, scalar do{""}, '"abc"    ~~ SpeakOfKitty # -> ""';
 
-::cmp_ok do { eval {SpeakOfKitty->validate("abc", "This")}; $@ }, '=~', '^' . quotemeta 'Speak is\'nt included kitty!', 'SpeakOfKitty->validate("abc", "This") # @-> Speak is\'nt included kitty!';
+eval {SpeakOfKitty->validate("abc", "This")}; ok defined($@), 'SpeakOfKitty->validate("abc", "This") # @-> Speak is\'nt included kitty!'; ::cmp_ok $@, '=~', '^' . quotemeta 'Speak is\'nt included kitty!', 'SpeakOfKitty->validate("abc", "This") # @-> Speak is\'nt included kitty!';
 
 
 BEGIN {
@@ -34,13 +35,13 @@ coerce IntOrArrayRef, from Num, via { int($_ + .5) };
 # 
 # # DESCRIPTION
 # 
-# This module export subroutines:
+# Этот модуль экспортирует подпрограммы:
 # 
-# * `subtype`, `as`, `init_where`, `where`, `awhere`, `message` — for create validators.
-# * `SELF`, `ARGS`, `A`, `B`, `C`, `D`, `M`, `N` — for use in validators has arguments.
-# * `coerce`, `from`, `via` — for create coerce, using for translate values from one class to other class.
+# * `subtype`, `as`, `init_where`, `where`, `awhere`, `message` — для создания валидаторов.
+# * `SELF`, `ARGS`, `A`, `B`, `C`, `D`, `M`, `N` — для использования в валидаторах типа и его аргументов.
+# * `coerce`, `from`, `via` — для создания конвертора значений из одного класса в другой.
 # 
-# Hierarhy of validators:
+# Иерархия валидаторов:
 # 
 
 # Any
@@ -85,11 +86,15 @@ coerce IntOrArrayRef, from Num, via { int($_ + .5) };
 # 				Tied`[A]
 # 				LValueRef
 # 				FormatRef
-# 				CodeRef
+# 				CodeRef`[name, proto]
+# 					ReachableCodeRef`[name, proto]
+# 					UnreachableCodeRef`[name, proto]
 # 				RegexpRef
-# 				ScalarRef`[A]
-# 				RefRef`[A]
-# 				GlobRef`[A]
+# 				ScalarRefRef`[A]
+# 					RefRef`[A]
+# 					ScalarRef`[A]
+# 				GlobRef
+# 					FileHandle
 # 				ArrayRef`[A]
 # 				HashRef`[H]
 # 				Object`[O]
@@ -118,14 +123,13 @@ coerce IntOrArrayRef, from Num, via { int($_ + .5) };
 # 					Range[from, to]
 # 					Bytes[A, B?]
 # 					PositiveBytes[A, B?]
-# 
 
 # 
 # # SUBROUTINES
 # 
 # ## subtype ($name, @paraphernalia)
 # 
-# Make new type.
+# Создаёт новый тип.
 # 
 ::done_testing; }; subtest 'subtype ($name, @paraphernalia)' => sub { 
 BEGIN {
@@ -137,7 +141,7 @@ BEGIN {
 ::like scalar do {eval { One->validate(0) }; $@}, qr{Actual 1 only\!}, 'eval { One->validate(0) }; $@ # ~> Actual 1 only!';
 
 # 
-# `where` and `message` is syntax sugar, and `subtype` can be used without them.
+# `where` и `message` — это синтаксический сахар, а `subtype` можно использовать без них.
 # 
 
 BEGIN {
@@ -151,13 +155,13 @@ BEGIN {
 ::like scalar do {eval { subtype 'Many' }; $@}, qr{subtype Many: main::Many exists\!}, 'eval { subtype \'Many\' }; $@ # ~> subtype Many: main::Many exists!';
 
 # 
-# ## as ($parenttype)
+# ## as ($super_type)
 # 
-# Use with `subtype` for extended create type of `$parenttype`.
+# Используется с `subtype` для расширения создаваемого типа `$super_type`.
 # 
 # ## init_where ($code)
 # 
-# Initialize type with new arguments. Use with `subtype`.
+# Инициализирует тип с новыми аргументами. Используется с `subtype`.
 # 
 ::done_testing; }; subtest 'init_where ($code)' => sub { 
 BEGIN {
@@ -173,7 +177,7 @@ BEGIN {
 # 
 # ## where ($code)
 # 
-# Set in type `$code` as test. Value for test set in `$_`.
+# Использует `$code` как тест. Значение для теста передаётся в `$_`.
 # 
 ::done_testing; }; subtest 'where ($code)' => sub { 
 BEGIN {
@@ -185,17 +189,17 @@ BEGIN {
 ::is scalar do {3 ~~ Two}, scalar do{""}, '3 ~~ Two # -> ""';
 
 # 
-# Use with `subtype`. Need if is the required arguments.
+# Используется с `subtype`. Необходимо, если у типа есть аргументы.
 # 
 
-::like scalar do {eval { subtype 'Ex[A]' }; $@}, qr{subtype Ex\[A\]: needs a where}, 'eval { subtype \'Ex[A]\' }; $@  # ~> subtype Ex\[A\]: needs a where';
+eval {subtype 'Ex[A]'}; ok defined($@), 'subtype \'Ex[A]\' # @-> subtype Ex[A]: needs a where'; ::cmp_ok $@, '=~', '^' . quotemeta 'subtype Ex[A]: needs a where', 'subtype \'Ex[A]\' # @-> subtype Ex[A]: needs a where';
 
 # 
 # ## awhere ($code)
 # 
-# Use with `subtype`.
+# Используется с `subtype`.
 # 
-# If type maybe with and without arguments, then use for set test with arguments, and `where` - without.
+# Если тип может быть с аргументами и без, то используется для проверки набора с аргументами, а `where` — без.
 # 
 ::done_testing; }; subtest 'awhere ($code)' => sub { 
 BEGIN {
@@ -205,18 +209,18 @@ BEGIN {
 	;
 }
 
-::is scalar do {0 ~~ GreatThen}, scalar do{""}, '0 ~~ GreatThen	# -> ""';
-::is scalar do {1 ~~ GreatThen}, scalar do{1}, '1 ~~ GreatThen	# -> 1';
+::is scalar do {0 ~~ GreatThen}, scalar do{""}, '0 ~~ GreatThen # -> ""';
+::is scalar do {1 ~~ GreatThen}, scalar do{1}, '1 ~~ GreatThen # -> 1';
 
 ::is scalar do {3 ~~ GreatThen[3]}, scalar do{""}, '3 ~~ GreatThen[3] # -> ""';
 ::is scalar do {4 ~~ GreatThen[3]}, scalar do{1}, '4 ~~ GreatThen[3] # -> 1';
 
 # 
-# Need if arguments is optional.
+# Необходимо, если аргументы необязательны.
 # 
 
-::like scalar do {eval { subtype 'Ex`[A]', where {} }; $@}, qr{subtype Ex`\[A\]: needs a awhere}, 'eval { subtype \'Ex`[A]\', where {} }; $@  # ~> subtype Ex`\[A\]: needs a awhere';
-::like scalar do {eval { subtype 'Ex', awhere {} }; $@}, qr{subtype Ex: awhere is excess}, 'eval { subtype \'Ex\', awhere {} }; $@  # ~> subtype Ex: awhere is excess';
+eval {subtype 'Ex`[A]', where {}}; ok defined($@), 'subtype \'Ex`[A]\', where {} # @-> subtype Ex`[A]: needs a awhere'; ::cmp_ok $@, '=~', '^' . quotemeta 'subtype Ex`[A]: needs a awhere', 'subtype \'Ex`[A]\', where {} # @-> subtype Ex`[A]: needs a awhere';
+eval {subtype 'Ex', awhere {}}; ok defined($@), 'subtype \'Ex\', awhere {} # @-> subtype Ex: awhere is excess'; ::cmp_ok $@, '=~', '^' . quotemeta 'subtype Ex: awhere is excess', 'subtype \'Ex\', awhere {} # @-> subtype Ex: awhere is excess';
 
 BEGIN {
 	subtype 'MyEnum`[A...]',
@@ -230,29 +234,29 @@ BEGIN {
 # 
 # ## SELF
 # 
-# The current type. `SELF` use in `init_where`, `where` and `awhere`.
+# Текущий тип. `SELF` используется в `init_where`, `where` и `awhere`.
 # 
 # ## ARGS
 # 
-# Arguments of the current type. In scalar context returns array ref on the its. And in array context returns its. Use in `init_where`, `where` and `awhere`.
+# Аргументы текущего типа. В скалярном контексте возвращает ссылку на массив, а в контексте массива возвращает список. Используется в `init_where`, `where` и `awhere`.
 # 
 # ## A, B, C, D
 # 
-# First, second, third and fifth argument of the type.
+# Первый, второй, третий и пятый аргумент типа.
 # 
 ::done_testing; }; subtest 'A, B, C, D' => sub { 
 BEGIN {
 	subtype "Seria[A,B,C,D]", where { A < B && B < $_ && $_ < C && C < D };
 }
 
-::is scalar do {2.5 ~~ Seria[1,2,3,4]}, scalar do{1}, '2.5 ~~ Seria[1,2,3,4]   # -> 1';
+::is scalar do {2.5 ~~ Seria[1,2,3,4]}, scalar do{1}, '2.5 ~~ Seria[1,2,3,4] # -> 1';
 
 # 
-# Use in `init_where`, `where` and `awhere`.
+# Используется в `init_where`, `where` и `awhere`.
 # 
 # ## M, N
 # 
-# `M` and `N` is the reduction for `SELF->{M}` and `SELF->{N}`.
+# `M` и `N` сокращение для `SELF->{M}` и `SELF->{N}`.
 # 
 ::done_testing; }; subtest 'M, N' => sub { 
 BEGIN {
@@ -264,26 +268,26 @@ BEGIN {
 		where { $_ =~ N && $_ =~ M };
 }
 
-::is scalar do {"Hi, my dear!" ~~ BeginAndEnd["Hi,", "!"];}, scalar do{1}, '"Hi, my dear!" ~~ BeginAndEnd["Hi,", "!"];   # -> 1';
-::is scalar do {"Hi my dear!" ~~ BeginAndEnd["Hi,", "!"];}, scalar do{""}, '"Hi my dear!" ~~ BeginAndEnd["Hi,", "!"];   # -> ""';
+::is scalar do {"Hi, my dear!" ~~ BeginAndEnd["Hi,", "!"];}, scalar do{1}, '"Hi, my dear!" ~~ BeginAndEnd["Hi,", "!"]; # -> 1';
+::is scalar do {"Hi my dear!" ~~ BeginAndEnd["Hi,", "!"];}, scalar do{""}, '"Hi my dear!" ~~ BeginAndEnd["Hi,", "!"];  # -> ""';
 
-::is scalar do {"" . BeginAndEnd["Hi,", "!"]}, "BeginAndEnd['Hi,', '!']", '"" . BeginAndEnd["Hi,", "!"]   # => BeginAndEnd[\'Hi,\', \'!\']';
+::is scalar do {"" . BeginAndEnd["Hi,", "!"]}, "BeginAndEnd['Hi,', '!']", '"" . BeginAndEnd["Hi,", "!"] # => BeginAndEnd[\'Hi,\', \'!\']';
 
 # 
 # ## message ($code)
 # 
-# Use with `subtype` for make the message on error, if the value excluded the type. In `$code` use subroutine: `SELF` - the current type, `ARGS`, `A`, `B`, `C`, `D` - arguments of type (if is), and the testing value in `$_`. It can be stringified using `SELF->val_to_str($_)`.
+# Используется с `subtype` для вывода сообщения об ошибке, если значение исключает тип. В `$code` используется: `SELF` - текущий тип, `ARGS`, `A`, `B`, `C`, `D` - аргументы типа (если есть) и проверочное значение в `$_`. Его можно преобразовать в строку с помощью `SELF->val_to_str($_)`.
 # 
 # ## coerce ($type, from => $from, via => $via)
 # 
-# It add new coerce ($via) to `$type` from `$from`-type.
+# Добавляет новое приведение (`$via`) к `$type` из `$from` типа.
 # 
 ::done_testing; }; subtest 'coerce ($type, from => $from, via => $via)' => sub { 
 BEGIN {subtype Four => where {4 eq $_}}
 
-::is scalar do {"4a" ~~ Four}, scalar do{""}, '"4a" ~~ Four	# -> ""';
+::is scalar do {"4a" ~~ Four}, scalar do{""}, '"4a" ~~ Four # -> ""';
 
-::is scalar do {Four->coerce("4a")}, scalar do{"4a"}, 'Four->coerce("4a")	# -> "4a"';
+::is scalar do {Four->coerce("4a")}, scalar do{"4a"}, 'Four->coerce("4a") # -> "4a"';
 
 coerce Four, from Str, via { 0+$_ };
 
@@ -296,7 +300,7 @@ coerce Four, from ArrayRef, via { scalar @$_ };
 ::is scalar do {Four->coerce([1,2,3,4]) ~~ Four}, scalar do{1}, 'Four->coerce([1,2,3,4]) ~~ Four # -> 1';
 
 # 
-# `coerce` throws exeptions:
+# `coerce` выбрасывает исключения:
 # 
 
 ::like scalar do {eval {coerce Int, via1 => 1}; $@}, qr{coerce Int unused keys left: via1}, 'eval {coerce Int, via1 => 1}; $@  # ~> coerce Int unused keys left: via1';
@@ -307,34 +311,34 @@ coerce Four, from ArrayRef, via { scalar @$_ };
 ::like scalar do {eval {coerce Int, (from=>Num, via=>"x")}; $@}, qr{coerce Int: via is not subroutine\!}, 'eval {coerce Int, (from=>Num, via=>"x")}; $@  # ~> coerce Int: via is not subroutine!';
 
 # 
-# Standart coerces:
+# Стандартные приведения:
 # 
 
 # Str from Undef — empty string
 ::is scalar do {Str->coerce(undef)}, scalar do{""}, 'Str->coerce(undef) # -> ""';
 
 # Int from Num — rounded integer
-::is scalar do {Int->coerce(2.5)}, scalar do{3}, 'Int->coerce(2.5) # -> 3';
+::is scalar do {Int->coerce(2.5)}, scalar do{3}, 'Int->coerce(2.5)  # -> 3';
 ::is scalar do {Int->coerce(-2.5)}, scalar do{-3}, 'Int->coerce(-2.5) # -> -3';
 
 # Bool from Any — 1 or ""
-::is scalar do {Bool->coerce([])}, scalar do{1}, 'Bool->coerce([])	# -> 1';
-::is scalar do {Bool->coerce(0)}, scalar do{""}, 'Bool->coerce(0)		# -> ""';
+::is scalar do {Bool->coerce([])}, scalar do{1}, 'Bool->coerce([]) # -> 1';
+::is scalar do {Bool->coerce(0)}, scalar do{""}, 'Bool->coerce(0)  # -> ""';
 
 # 
 # ## from ($type)
 # 
-# Syntax sugar for `coerce`.
+# Синтаксический сахар для `coerce`.
 # 
 # ## via ($code)
 # 
-# Syntax sugar for `coerce`.
+# Синтаксический сахар для `coerce`.
 # 
 # # ATTRIBUTES
 # 
 # ## :Isa (@signature)
 # 
-# Check the subroutine signature: arguments and returns.
+# Проверяет сигнатуру подпрограммы: аргументы и результаты.
 # 
 ::done_testing; }; subtest ':Isa (@signature)' => sub { 
 sub minint($$) : Isa(Int => Int => Int) {
@@ -358,62 +362,62 @@ sub half($) : Isa(Int => Int) {
 # 
 # ## Any
 # 
-# Top-level type in the hierarchy. Match all.
+# Тип верхнего уровня в иерархии. Сопоставляет всё.
 # 
 # ## Control
 # 
-# Top-level type in the hierarchy constructors new types from any types.
+# Тип верхнего уровня в конструкторах иерархии создает новые типы из любых типов.
 # 
 # ## Union[A, B...]
 # 
-# Union many types. It analog operator `$type1 | $type2`.
+# Союз нескольких типов. Аналогичен оператору `$type1 | $type2`.
 # 
 ::done_testing; }; subtest 'Union[A, B...]' => sub { 
-::is scalar do {33  ~~ Union[Int, Ref]}, scalar do{1}, '33  ~~ Union[Int, Ref]	# -> 1';
+::is scalar do {33  ~~ Union[Int, Ref]}, scalar do{1}, '33  ~~ Union[Int, Ref] # -> 1';
 ::is scalar do {[]  ~~ Union[Int, Ref]}, scalar do{1}, '[]  ~~ Union[Int, Ref]	# -> 1';
 ::is scalar do {"a" ~~ Union[Int, Ref]}, scalar do{""}, '"a" ~~ Union[Int, Ref]	# -> ""';
 
 # 
 # ## Intersection[A, B...]
 # 
-# Intersection many types. It analog operator `$type1 & $type2`.
+# Пересечение нескольких типов. Аналогичен оператору `$type1 & $type2`.
 # 
 ::done_testing; }; subtest 'Intersection[A, B...]' => sub { 
-::is scalar do {15 ~~ Intersection[Int, StrMatch[/5/]]}, scalar do{1}, '15 ~~ Intersection[Int, StrMatch[/5/]]	# -> 1';
+::is scalar do {15 ~~ Intersection[Int, StrMatch[/5/]]}, scalar do{1}, '15 ~~ Intersection[Int, StrMatch[/5/]] # -> 1';
 
 # 
 # ## Exclude[A, B...]
 # 
-# Exclude many types. It analog operator `~ $type`.
+# Исключение нескольких типов. Аналогичен оператору `~ $type`.
 # 
 ::done_testing; }; subtest 'Exclude[A, B...]' => sub { 
-::is scalar do {-5  ~~ Exclude[PositiveInt]}, scalar do{1}, '-5  ~~ Exclude[PositiveInt]	# -> 1';
-::is scalar do {"a" ~~ Exclude[PositiveInt]}, scalar do{1}, '"a" ~~ Exclude[PositiveInt]	# -> 1';
-::is scalar do {5   ~~ Exclude[PositiveInt]}, scalar do{""}, '5   ~~ Exclude[PositiveInt]	# -> ""';
-::is scalar do {5.5 ~~ Exclude[PositiveInt]}, scalar do{1}, '5.5 ~~ Exclude[PositiveInt]	# -> 1';
+::is scalar do {-5  ~~ Exclude[PositiveInt]}, scalar do{1}, '-5  ~~ Exclude[PositiveInt] # -> 1';
+::is scalar do {"a" ~~ Exclude[PositiveInt]}, scalar do{1}, '"a" ~~ Exclude[PositiveInt] # -> 1';
+::is scalar do {5   ~~ Exclude[PositiveInt]}, scalar do{""}, '5   ~~ Exclude[PositiveInt] # -> ""';
+::is scalar do {5.5 ~~ Exclude[PositiveInt]}, scalar do{1}, '5.5 ~~ Exclude[PositiveInt] # -> 1';
 
 # 
-# If `Exclude` has many arguments, then this analog `~ ($type1 | $type2 ...)`.
+# Если `Exclude` имеет много аргументов, то это аналог `~ ($type1 | $type2 ...)`.
 # 
 
-::is scalar do {-5  ~~ Exclude[PositiveInt, Enum[-2]]}, scalar do{1}, '-5  ~~ Exclude[PositiveInt, Enum[-2]]	# -> 1';
-::is scalar do {-2  ~~ Exclude[PositiveInt, Enum[-2]]}, scalar do{""}, '-2  ~~ Exclude[PositiveInt, Enum[-2]]	# -> ""';
-::is scalar do {0   ~~ Exclude[PositiveInt, Enum[-2]]}, scalar do{""}, '0   ~~ Exclude[PositiveInt, Enum[-2]]	# -> ""';
+::is scalar do {-5  ~~ Exclude[PositiveInt, Enum[-2]]}, scalar do{1}, '-5  ~~ Exclude[PositiveInt, Enum[-2]] # -> 1';
+::is scalar do {-2  ~~ Exclude[PositiveInt, Enum[-2]]}, scalar do{""}, '-2  ~~ Exclude[PositiveInt, Enum[-2]] # -> ""';
+::is scalar do {0   ~~ Exclude[PositiveInt, Enum[-2]]}, scalar do{""}, '0   ~~ Exclude[PositiveInt, Enum[-2]] # -> ""';
 
 # 
 # ## Option[A]
 # 
-# The optional keys in the `Dict`.
+# Дополнительные ключи в `Dict`.
 # 
 ::done_testing; }; subtest 'Option[A]' => sub { 
-::is scalar do {{a=>55} ~~ Dict[a=>Int, b => Option[Int]]}, scalar do{1}, '{a=>55} ~~ Dict[a=>Int, b => Option[Int]] # -> 1';
-::is scalar do {{a=>55, b=>31} ~~ Dict[a=>Int, b => Option[Int]]}, scalar do{1}, '{a=>55, b=>31} ~~ Dict[a=>Int, b => Option[Int]] # -> 1';
+::is scalar do {{a=>55} ~~ Dict[a=>Int, b => Option[Int]]}, scalar do{1}, '{a=>55} ~~ Dict[a=>Int, b => Option[Int]]          # -> 1';
+::is scalar do {{a=>55, b=>31} ~~ Dict[a=>Int, b => Option[Int]]}, scalar do{1}, '{a=>55, b=>31} ~~ Dict[a=>Int, b => Option[Int]]   # -> 1';
 ::is scalar do {{a=>55, b=>31.5} ~~ Dict[a=>Int, b => Option[Int]]}, scalar do{""}, '{a=>55, b=>31.5} ~~ Dict[a=>Int, b => Option[Int]] # -> ""';
 
 # 
 # ## Wantarray[A, S]
 # 
-# if the subroutine returns different values in the context of an array and a scalar, then using type `Wantarray` with type `A` for array context and type `S` for scalar context.
+# Если подпрограмма возвращает разные значения в контексте массива и скаляра, то используется тип `Wantarray` с типом `A` для контекста массива и типом `S` для скалярного контекста.
 # 
 ::done_testing; }; subtest 'Wantarray[A, S]' => sub { 
 sub arr : Isa(PositiveInt => Wantarray[ArrayRef[PositiveInt], PositiveInt]) {
@@ -424,85 +428,85 @@ sub arr : Isa(PositiveInt => Wantarray[ArrayRef[PositiveInt], PositiveInt]) {
 my @a = arr(3);
 my $s = arr(3);
 
-::is_deeply scalar do {\@a}, scalar do {[1,2,3]}, '\@a  # --> [1,2,3]';
-::is scalar do {$s}, scalar do{3}, '$s	 # -> 3';
+::is_deeply scalar do {\@a}, scalar do {[1,2,3]}, '\@a # --> [1,2,3]';
+::is scalar do {$s}, scalar do{3}, '$s  # -> 3';
 
 # 
 # ## Item
 # 
-# Top-level type in the hierarchy scalar types.
+# Тип верхнего уровня в иерархии скалярных типов.
 # 
 # ## Bool
 # 
 # `1` is true. `0`, `""` or `undef` is false.
 # 
 ::done_testing; }; subtest 'Bool' => sub { 
-::is scalar do {1 ~~ Bool}, scalar do{1}, '1 ~~ Bool	 # -> 1';
-::is scalar do {0 ~~ Bool}, scalar do{1}, '0 ~~ Bool	 # -> 1';
+::is scalar do {1 ~~ Bool}, scalar do{1}, '1 ~~ Bool  # -> 1';
+::is scalar do {0 ~~ Bool}, scalar do{1}, '0 ~~ Bool  # -> 1';
 ::is scalar do {undef ~~ Bool}, scalar do{1}, 'undef ~~ Bool # -> 1';
-::is scalar do {"" ~~ Bool}, scalar do{1}, '"" ~~ Bool	# -> 1';
+::is scalar do {"" ~~ Bool}, scalar do{1}, '"" ~~ Bool # -> 1';
 
-::is scalar do {2 ~~ Bool}, scalar do{""}, '2 ~~ Bool	 # -> ""';
-::is scalar do {[] ~~ Bool}, scalar do{""}, '[] ~~ Bool	# -> ""';
+::is scalar do {2 ~~ Bool}, scalar do{""}, '2 ~~ Bool  # -> ""';
+::is scalar do {[] ~~ Bool}, scalar do{""}, '[] ~~ Bool # -> ""';
 
 # 
 # ## Enum[A...]
 # 
-# Enumerate values.
+# Перечисление.
 # 
 ::done_testing; }; subtest 'Enum[A...]' => sub { 
-::is scalar do {3 ~~ Enum[1,2,3]}, scalar do{1}, '3 ~~ Enum[1,2,3]			# -> 1';
+::is scalar do {3 ~~ Enum[1,2,3]}, scalar do{1}, '3 ~~ Enum[1,2,3]   # -> 1';
 ::is scalar do {"cat" ~~ Enum["cat", "dog"]}, scalar do{1}, '"cat" ~~ Enum["cat", "dog"] # -> 1';
-::is scalar do {4 ~~ Enum[1,2,3]}, scalar do{""}, '4 ~~ Enum[1,2,3]			# -> ""';
+::is scalar do {4 ~~ Enum[1,2,3]}, scalar do{""}, '4 ~~ Enum[1,2,3]   # -> ""';
 
 # 
 # ## Maybe[A]
 # 
-# `undef` or type in `[]`.
+# `undef` или тип в `[]`.
 # 
 ::done_testing; }; subtest 'Maybe[A]' => sub { 
-::is scalar do {undef ~~ Maybe[Int]}, scalar do{1}, 'undef ~~ Maybe[Int]	# -> 1';
-::is scalar do {4 ~~ Maybe[Int]}, scalar do{1}, '4 ~~ Maybe[Int]		# -> 1';
-::is scalar do {"" ~~ Maybe[Int]}, scalar do{""}, '"" ~~ Maybe[Int]	   # -> ""';
+::is scalar do {undef ~~ Maybe[Int]}, scalar do{1}, 'undef ~~ Maybe[Int] # -> 1';
+::is scalar do {4 ~~ Maybe[Int]}, scalar do{1}, '4 ~~ Maybe[Int]     # -> 1';
+::is scalar do {"" ~~ Maybe[Int]}, scalar do{""}, '"" ~~ Maybe[Int]    # -> ""';
 
 # 
 # ## Undef
 # 
-# `undef` only.
+# Только `undef`.
 # 
 ::done_testing; }; subtest 'Undef' => sub { 
-::is scalar do {undef ~~ Undef}, scalar do{1}, 'undef ~~ Undef	# -> 1';
-::is scalar do {0 ~~ Undef}, scalar do{""}, '0 ~~ Undef		# -> ""';
+::is scalar do {undef ~~ Undef}, scalar do{1}, 'undef ~~ Undef # -> 1';
+::is scalar do {0 ~~ Undef}, scalar do{""}, '0 ~~ Undef     # -> ""';
 
 # 
 # ## Defined
 # 
-# All exclude `undef`.
+# Всё за исключением `undef`.
 # 
 ::done_testing; }; subtest 'Defined' => sub { 
-::is scalar do {\0 ~~ Defined}, scalar do{1}, '\0 ~~ Defined	   # -> 1';
-::is scalar do {undef ~~ Defined}, scalar do{""}, 'undef ~~ Defined	# -> ""';
+::is scalar do {\0 ~~ Defined}, scalar do{1}, '\0 ~~ Defined    # -> 1';
+::is scalar do {undef ~~ Defined}, scalar do{""}, 'undef ~~ Defined # -> ""';
 
 # 
 # ## Value
 # 
-# Defined unreference values.
+# Определённые значения без ссылок.
 # 
 ::done_testing; }; subtest 'Value' => sub { 
-::is scalar do {3 ~~ Value}, scalar do{1}, '3 ~~ Value		# -> 1';
-::is scalar do {\3 ~~ Value}, scalar do{""}, '\3 ~~ Value	   # -> ""';
-::is scalar do {undef ~~ Value}, scalar do{""}, 'undef ~~ Value	# -> ""';
+::is scalar do {3 ~~ Value}, scalar do{1}, '3 ~~ Value  # -> 1';
+::is scalar do {\3 ~~ Value}, scalar do{""}, '\3 ~~ Value    # -> ""';
+::is scalar do {undef ~~ Value}, scalar do{""}, 'undef ~~ Value # -> ""';
 
 # 
 # ## Len[A, B?]
 # 
-# Defines the length value from `A` to `B`, or from 0 to `A` if `B` is'nt present.
+# Определяет значение длины от `A` до `B` или от 0 до `A`, если `B` отсутствует.
 # 
 ::done_testing; }; subtest 'Len[A, B?]' => sub { 
 ::is scalar do {"1234" ~~ Len[3]}, scalar do{""}, '"1234" ~~ Len[3]   # -> ""';
-::is scalar do {"123" ~~ Len[3]}, scalar do{1}, '"123" ~~ Len[3]	# -> 1';
-::is scalar do {"12" ~~ Len[3]}, scalar do{1}, '"12" ~~ Len[3]	 # -> 1';
-::is scalar do {"" ~~ Len[1, 2]}, scalar do{""}, '"" ~~ Len[1, 2]	# -> ""';
+::is scalar do {"123" ~~ Len[3]}, scalar do{1}, '"123" ~~ Len[3]    # -> 1';
+::is scalar do {"12" ~~ Len[3]}, scalar do{1}, '"12" ~~ Len[3]     # -> 1';
+::is scalar do {"" ~~ Len[1, 2]}, scalar do{""}, '"" ~~ Len[1, 2]    # -> ""';
 ::is scalar do {"1" ~~ Len[1, 2]}, scalar do{1}, '"1" ~~ Len[1, 2]   # -> 1';
 ::is scalar do {"12" ~~ Len[1, 2]}, scalar do{1}, '"12" ~~ Len[1, 2]  # -> 1';
 ::is scalar do {"123" ~~ Len[1, 2]}, scalar do{""}, '"123" ~~ Len[1, 2] # -> ""';
@@ -510,157 +514,157 @@ my $s = arr(3);
 # 
 # ## Version
 # 
-# Perl versions.
+# Perl версии.
 # 
 ::done_testing; }; subtest 'Version' => sub { 
-::is scalar do {1.1.0 ~~ Version}, scalar do{1}, '1.1.0 ~~ Version	# -> 1';
-::is scalar do {v1.1.0 ~~ Version}, scalar do{1}, 'v1.1.0 ~~ Version   # -> 1';
-::is scalar do {v1.1 ~~ Version}, scalar do{1}, 'v1.1 ~~ Version	 # -> 1';
-::is scalar do {v1 ~~ Version}, scalar do{1}, 'v1 ~~ Version	   # -> 1';
-::is scalar do {1.1 ~~ Version}, scalar do{""}, '1.1 ~~ Version	  # -> ""';
-::is scalar do {"1.1.0" ~~ Version}, scalar do{""}, '"1.1.0" ~~ Version  # -> ""';
+::is scalar do {1.1.0 ~~ Version}, scalar do{1}, '1.1.0 ~~ Version   # -> 1';
+::is scalar do {v1.1.0 ~~ Version}, scalar do{1}, 'v1.1.0 ~~ Version  # -> 1';
+::is scalar do {v1.1 ~~ Version}, scalar do{1}, 'v1.1 ~~ Version    # -> 1';
+::is scalar do {v1 ~~ Version}, scalar do{1}, 'v1 ~~ Version      # -> 1';
+::is scalar do {1.1 ~~ Version}, scalar do{""}, '1.1 ~~ Version     # -> ""';
+::is scalar do {"1.1.0" ~~ Version}, scalar do{""}, '"1.1.0" ~~ Version # -> ""';
 
 # 
 # ## Str
 # 
-# Strings, include numbers.
+# Строки, включая числа.
 # 
 ::done_testing; }; subtest 'Str' => sub { 
-::is scalar do {1.1 ~~ Str}, scalar do{1}, '1.1 ~~ Str		 # -> 1';
-::is scalar do {"" ~~ Str}, scalar do{1}, '"" ~~ Str		  # -> 1';
-::is scalar do {1.1.0 ~~ Str}, scalar do{""}, '1.1.0 ~~ Str	   # -> ""';
+::is scalar do {1.1 ~~ Str}, scalar do{1}, '1.1 ~~ Str   # -> 1';
+::is scalar do {"" ~~ Str}, scalar do{1}, '"" ~~ Str    # -> 1';
+::is scalar do {1.1.0 ~~ Str}, scalar do{""}, '1.1.0 ~~ Str # -> ""';
 
 # 
 # ## Uni
 # 
-# Unicode strings: with utf8-flag or decode to utf8 without error.
+# Строки Unicode с флагом utf8 или если декодирование в utf8 происходит без ошибок.
 # 
 ::done_testing; }; subtest 'Uni' => sub { 
-::is scalar do {"↭" ~~ Uni}, scalar do{1}, '"↭" ~~ Uni	# -> 1';
-::is scalar do {123 ~~ Uni}, scalar do{""}, '123 ~~ Uni	# -> ""';
-::is scalar do {do {no utf8; "↭" ~~ Uni}}, scalar do{1}, 'do {no utf8; "↭" ~~ Uni}	# -> 1';
+::is scalar do {"↭" ~~ Uni}, scalar do{1}, '"↭" ~~ Uni # -> 1';
+::is scalar do {123 ~~ Uni}, scalar do{""}, '123 ~~ Uni # -> ""';
+::is scalar do {do {no utf8; "↭" ~~ Uni}}, scalar do{1}, 'do {no utf8; "↭" ~~ Uni} # -> 1';
 
 # 
 # ## Bin
 # 
-# Binary strings: without utf8-flag and octets with numbers less then 128.
+# Бинарные строки без флага utf8 и октетов с номерами меньше 128.
 # 
 ::done_testing; }; subtest 'Bin' => sub { 
-::is scalar do {123 ~~ Bin}, scalar do{1}, '123 ~~ Bin	# -> 1';
-::is scalar do {"z" ~~ Bin}, scalar do{1}, '"z" ~~ Bin	# -> 1';
-::is scalar do {"↭" ~~ Bin}, scalar do{""}, '"↭" ~~ Bin	# -> ""';
+::is scalar do {123 ~~ Bin}, scalar do{1}, '123 ~~ Bin # -> 1';
+::is scalar do {"z" ~~ Bin}, scalar do{1}, '"z" ~~ Bin # -> 1';
+::is scalar do {"↭" ~~ Bin}, scalar do{""}, '"↭" ~~ Bin # -> ""';
 ::is scalar do {do {no utf8; "↭" ~~ Bin }}, scalar do{""}, 'do {no utf8; "↭" ~~ Bin }   # -> ""';
 
 # 
 # ## StartsWith\[S]
 # 
-# The string starts with `S`.
+# Строка начинается с `S`.
 # 
 ::done_testing; }; subtest 'StartsWith\[S]' => sub { 
-::is scalar do {"Hi, world!" ~~ StartsWith["Hi,"]}, scalar do{1}, '"Hi, world!" ~~ StartsWith["Hi,"]	# -> 1';
-::is scalar do {"Hi world!" ~~ StartsWith["Hi,"]}, scalar do{""}, '"Hi world!" ~~ StartsWith["Hi,"]	# -> ""';
+::is scalar do {"Hi, world!" ~~ StartsWith["Hi,"]}, scalar do{1}, '"Hi, world!" ~~ StartsWith["Hi,"] # -> 1';
+::is scalar do {"Hi world!" ~~ StartsWith["Hi,"]}, scalar do{""}, '"Hi world!" ~~ StartsWith["Hi,"] # -> ""';
 
 # 
 # ## EndsWith\[S]
 # 
-# The string ends with `S`.
+# Строка заканчивается на `S`.
 # 
 ::done_testing; }; subtest 'EndsWith\[S]' => sub { 
-::is scalar do {"Hi, world!" ~~ EndsWith["world!"]}, scalar do{1}, '"Hi, world!" ~~ EndsWith["world!"]	# -> 1';
-::is scalar do {"Hi, world" ~~ EndsWith["world!"]}, scalar do{""}, '"Hi, world" ~~ EndsWith["world!"]	# -> ""';
+::is scalar do {"Hi, world!" ~~ EndsWith["world!"]}, scalar do{1}, '"Hi, world!" ~~ EndsWith["world!"] # -> 1';
+::is scalar do {"Hi, world" ~~ EndsWith["world!"]}, scalar do{""}, '"Hi, world" ~~ EndsWith["world!"]  # -> ""';
 
 # 
 # ## NonEmptyStr
 # 
-# String with one or many non-space characters.
+# Строка с одним или несколькими символами, не являющимися пробелами.
 # 
 ::done_testing; }; subtest 'NonEmptyStr' => sub { 
-::is scalar do {" " ~~ NonEmptyStr}, scalar do{""}, '" " ~~ NonEmptyStr		# -> ""';
-::is scalar do {" S " ~~ NonEmptyStr}, scalar do{1}, '" S " ~~ NonEmptyStr	  # -> 1';
-::is scalar do {" S " ~~ (NonEmptyStr & Len[2])}, scalar do{""}, '" S " ~~ (NonEmptyStr & Len[2])   # -> ""';
+::is scalar do {" " ~~ NonEmptyStr}, scalar do{""}, '" " ~~ NonEmptyStr              # -> ""';
+::is scalar do {" S " ~~ NonEmptyStr}, scalar do{1}, '" S " ~~ NonEmptyStr            # -> 1';
+::is scalar do {" S " ~~ (NonEmptyStr & Len[2])}, scalar do{""}, '" S " ~~ (NonEmptyStr & Len[2]) # -> ""';
 
 # 
 # ## Email
 # 
-# Strings with `@`.
+# Строки с `@`.
 # 
 ::done_testing; }; subtest 'Email' => sub { 
-::is scalar do {'@' ~~ Email}, scalar do{1}, '\'@\' ~~ Email	  # -> 1';
-::is scalar do {'a@a.a' ~~ Email}, scalar do{1}, '\'a@a.a\' ~~ Email  # -> 1';
-::is scalar do {'a.a' ~~ Email}, scalar do{""}, '\'a.a\' ~~ Email	# -> ""';
+::is scalar do {'@' ~~ Email}, scalar do{1}, '\'@\' ~~ Email     # -> 1';
+::is scalar do {'a@a.a' ~~ Email}, scalar do{1}, '\'a@a.a\' ~~ Email # -> 1';
+::is scalar do {'a.a' ~~ Email}, scalar do{""}, '\'a.a\' ~~ Email   # -> ""';
 
 # 
 # ## Tel
 # 
-# Format phones is plus sign and seven or great digits.
+# Формат телефонов — знак плюс и семь или больше цифр.
 # 
 ::done_testing; }; subtest 'Tel' => sub { 
-::is scalar do {"+1234567" ~~ Tel}, scalar do{1}, '"+1234567" ~~ Tel	# -> 1';
-::is scalar do {"+1234568" ~~ Tel}, scalar do{1}, '"+1234568" ~~ Tel	# -> 1';
-::is scalar do {"+ 1234567" ~~ Tel}, scalar do{""}, '"+ 1234567" ~~ Tel	# -> ""';
-::is scalar do {"+1234567 " ~~ Tel}, scalar do{""}, '"+1234567 " ~~ Tel	# -> ""';
+::is scalar do {"+1234567" ~~ Tel}, scalar do{1}, '"+1234567" ~~ Tel # -> 1';
+::is scalar do {"+1234568" ~~ Tel}, scalar do{1}, '"+1234568" ~~ Tel # -> 1';
+::is scalar do {"+ 1234567" ~~ Tel}, scalar do{""}, '"+ 1234567" ~~ Tel # -> ""';
+::is scalar do {"+1234567 " ~~ Tel}, scalar do{""}, '"+1234567 " ~~ Tel # -> ""';
 
 # 
 # ## Url
 # 
-# Web urls is string with prefix http:// or https://.
+# URL-адреса веб-сайтов — это строка с префиксом http:// или https://.
 # 
 ::done_testing; }; subtest 'Url' => sub { 
-::is scalar do {"http://" ~~ Url}, scalar do{1}, '"http://" ~~ Url	# -> 1';
-::is scalar do {"http:/" ~~ Url}, scalar do{""}, '"http:/" ~~ Url	# -> ""';
+::is scalar do {"http://" ~~ Url}, scalar do{1}, '"http://" ~~ Url # -> 1';
+::is scalar do {"http:/" ~~ Url}, scalar do{""}, '"http:/" ~~ Url  # -> ""';
 
 # 
 # ## Path
 # 
-# The paths starts with a slash.
+# Пути начинаются с косой черты.
 # 
 ::done_testing; }; subtest 'Path' => sub { 
-::is scalar do {"/" ~~ Path}, scalar do{1}, '"/" ~~ Path	 # -> 1';
+::is scalar do {"/" ~~ Path}, scalar do{1}, '"/" ~~ Path  # -> 1';
 ::is scalar do {"/a/b" ~~ Path}, scalar do{1}, '"/a/b" ~~ Path  # -> 1';
 ::is scalar do {"a/b" ~~ Path}, scalar do{""}, '"a/b" ~~ Path   # -> ""';
 
 # 
 # ## Html
 # 
-# The html starts with a `<!doctype` or `<html`.
+# HTML начинается с `<!doctype html` или `<html`.
 # 
 ::done_testing; }; subtest 'Html' => sub { 
-::is scalar do {"<HTML" ~~ Html}, scalar do{1}, '"<HTML" ~~ Html			# -> 1';
-::is scalar do {" <html" ~~ Html}, scalar do{1}, '" <html" ~~ Html		   # -> 1';
+::is scalar do {"<HTML" ~~ Html}, scalar do{1}, '"<HTML" ~~ Html   # -> 1';
+::is scalar do {" <html" ~~ Html}, scalar do{1}, '" <html" ~~ Html     # -> 1';
 ::is scalar do {" <!doctype html>" ~~ Html}, scalar do{1}, '" <!doctype html>" ~~ Html # -> 1';
-::is scalar do {" <html1>" ~~ Html}, scalar do{""}, '" <html1>" ~~ Html		 # -> ""';
+::is scalar do {" <html1>" ~~ Html}, scalar do{""}, '" <html1>" ~~ Html   # -> ""';
 
 # 
 # ## StrDate
 # 
-# The date is format `yyyy-mm-dd`.
+# Дата в формате `yyyy-mm-dd`.
 # 
 ::done_testing; }; subtest 'StrDate' => sub { 
-::is scalar do {"2001-01-12" ~~ StrDate}, scalar do{1}, '"2001-01-12" ~~ StrDate	# -> 1';
-::is scalar do {"01-01-01" ~~ StrDate}, scalar do{""}, '"01-01-01" ~~ StrDate	# -> ""';
+::is scalar do {"2001-01-12" ~~ StrDate}, scalar do{1}, '"2001-01-12" ~~ StrDate # -> 1';
+::is scalar do {"01-01-01" ~~ StrDate}, scalar do{""}, '"01-01-01" ~~ StrDate   # -> ""';
 
 # 
 # ## StrDateTime
 # 
-# The dateTime is format `yyyy-mm-dd HH:MM:SS`.
+# Дата и время в формате `yyyy-mm-dd HH:MM:SS`.
 # 
 ::done_testing; }; subtest 'StrDateTime' => sub { 
-::is scalar do {"2012-12-01 00:00:00" ~~ StrDateTime}, scalar do{1}, '"2012-12-01 00:00:00" ~~ StrDateTime	 # -> 1';
-::is scalar do {"2012-12-01 00:00:00 " ~~ StrDateTime}, scalar do{""}, '"2012-12-01 00:00:00 " ~~ StrDateTime	# -> ""';
+::is scalar do {"2012-12-01 00:00:00" ~~ StrDateTime}, scalar do{1}, '"2012-12-01 00:00:00" ~~ StrDateTime  # -> 1';
+::is scalar do {"2012-12-01 00:00:00 " ~~ StrDateTime}, scalar do{""}, '"2012-12-01 00:00:00 " ~~ StrDateTime # -> ""';
 
 # 
 # ## StrMatch[qr/.../]
 # 
-# Match value with regular expression.
+# Сопоставляет строку с регулярным выражением.
 # 
 ::done_testing; }; subtest 'StrMatch[qr/.../]' => sub { 
-::is scalar do {' abc ' ~~ StrMatch[qr/abc/]}, scalar do{1}, '\' abc \' ~~ StrMatch[qr/abc/]	# -> 1';
-::is scalar do {' abbc ' ~~ StrMatch[qr/abc/]}, scalar do{""}, '\' abbc \' ~~ StrMatch[qr/abc/]   # -> ""';
+::is scalar do {' abc ' ~~ StrMatch[qr/abc/]}, scalar do{1}, '\' abc \' ~~ StrMatch[qr/abc/]  # -> 1';
+::is scalar do {' abbc ' ~~ StrMatch[qr/abc/]}, scalar do{""}, '\' abbc \' ~~ StrMatch[qr/abc/] # -> ""';
 
 # 
 # ## ClassName
 # 
-# Classname is the package with method `new`.
+# Имя класса — это пакет с методом `new`.
 # 
 ::done_testing; }; subtest 'ClassName' => sub { 
 ::is scalar do {'Aion::Type' ~~ ClassName}, scalar do{1}, '\'Aion::Type\' ~~ ClassName  # -> 1';
@@ -669,7 +673,7 @@ my $s = arr(3);
 # 
 # ## RoleName
 # 
-# Rolename is the package without method `new`, and with `@ISA` or with one any method.
+# Имя роли — это пакет без метода `new`, с `@ISA` или с одним любым методом.
 # 
 ::done_testing; }; subtest 'RoleName' => sub { 
 package ExRole1 {
@@ -689,7 +693,7 @@ package ExRole2 {
 # 
 # ## Rat
 # 
-# Rational numbers.
+# Рациональные числа.
 # 
 ::done_testing; }; subtest 'Rat' => sub { 
 ::is scalar do {"6/7" ~~ Rat}, scalar do{1}, '"6/7" ~~ Rat  # -> 1';
@@ -705,7 +709,7 @@ package ExRole2 {
 # 
 # ## Num
 # 
-# The numbers.
+# Числа.
 # 
 ::done_testing; }; subtest 'Num' => sub { 
 ::is scalar do {-6.5 ~~ Num}, scalar do{1}, '-6.5 ~~ Num   # -> 1';
@@ -715,7 +719,7 @@ package ExRole2 {
 # 
 # ## PositiveNum
 # 
-# The positive numbers.
+# Положительные числа.
 # 
 ::done_testing; }; subtest 'PositiveNum' => sub { 
 ::is scalar do {0 ~~ PositiveNum}, scalar do{1}, '0 ~~ PositiveNum    # -> 1';
@@ -726,7 +730,7 @@ package ExRole2 {
 # 
 # ## Float
 # 
-# The machine float number is 4 bytes.
+# Машинное число с плавающей запятой составляет 4 байта.
 # 
 ::done_testing; }; subtest 'Float' => sub { 
 ::is scalar do {-4.8 ~~ Float}, scalar do{1}, '-4.8 ~~ Float             # -> 1';
@@ -737,7 +741,7 @@ package ExRole2 {
 # 
 # ## Double
 # 
-# The machine float number is 8 bytes.
+# Машинное число с плавающей запятой составляет 8 байт.
 # 
 ::done_testing; }; subtest 'Double' => sub { 
 use Scalar::Util qw//;
@@ -750,7 +754,7 @@ use Scalar::Util qw//;
 # 
 # ## Range[from, to]
 # 
-# Numbers between `from` and `to`.
+# Числа между `from` и `to`.
 # 
 ::done_testing; }; subtest 'Range[from, to]' => sub { 
 ::is scalar do {1 ~~ Range[1, 3]}, scalar do{1}, '1 ~~ Range[1, 3]   # -> 1';
@@ -762,7 +766,7 @@ use Scalar::Util qw//;
 # 
 # ## Int
 # 
-# Integers.
+# Целые числа.
 # 
 ::done_testing; }; subtest 'Int' => sub { 
 ::is scalar do {123 ~~ Int}, scalar do{1}, '123 ~~ Int	# -> 1';
@@ -772,68 +776,68 @@ use Scalar::Util qw//;
 # 
 # ## Bytes[N]
 # 
-# `N` - the number of bytes for limit.
+# Рассчитывает максимальное и минимальное числа, которые поместятся в `N` байт и проверяет ограничение между ними.
 # 
 ::done_testing; }; subtest 'Bytes[N]' => sub { 
-::is scalar do {-129 ~~ Bytes[1]}, scalar do{""}, '-129 ~~ Bytes[1]	# -> ""';
-::is scalar do {-128 ~~ Bytes[1]}, scalar do{1}, '-128 ~~ Bytes[1]	# -> 1';
-::is scalar do {127 ~~ Bytes[1]}, scalar do{1}, '127 ~~ Bytes[1]	 # -> 1';
-::is scalar do {128 ~~ Bytes[1]}, scalar do{""}, '128 ~~ Bytes[1]	 # -> ""';
+::is scalar do {-129 ~~ Bytes[1]}, scalar do{""}, '-129 ~~ Bytes[1] # -> ""';
+::is scalar do {-128 ~~ Bytes[1]}, scalar do{1}, '-128 ~~ Bytes[1] # -> 1';
+::is scalar do {127 ~~ Bytes[1]}, scalar do{1}, '127 ~~ Bytes[1]  # -> 1';
+::is scalar do {128 ~~ Bytes[1]}, scalar do{""}, '128 ~~ Bytes[1]  # -> ""';
 
 # 2 bits power of (8 bits * 8 bytes - 1)
 my $N = 1 << (8*8-1);
-::is scalar do {(-$N-1) ~~ Bytes[8]}, scalar do{""}, '(-$N-1) ~~ Bytes[8]   # -> ""';
-::is scalar do {(-$N) ~~ Bytes[8]}, scalar do{1}, '(-$N) ~~ Bytes[8]	 # -> 1';
-::is scalar do {($N-1) ~~ Bytes[8]}, scalar do{1}, '($N-1) ~~ Bytes[8]	  # -> 1';
-::is scalar do {$N ~~ Bytes[8]}, scalar do{""}, '$N ~~ Bytes[8]		  # -> ""';
+::is scalar do {(-$N-1) ~~ Bytes[8]}, scalar do{""}, '(-$N-1) ~~ Bytes[8] # -> ""';
+::is scalar do {(-$N) ~~ Bytes[8]}, scalar do{1}, '(-$N) ~~ Bytes[8]   # -> 1';
+::is scalar do {($N-1) ~~ Bytes[8]}, scalar do{1}, '($N-1) ~~ Bytes[8]  # -> 1';
+::is scalar do {$N ~~ Bytes[8]}, scalar do{""}, '$N ~~ Bytes[8]      # -> ""';
 
 require Math::BigInt;
 
 my $N17 = 1 << (8*Math::BigInt->new(17) - 1);
 
-::is scalar do {((-$N17-1) . "") ~~ Bytes[17]}, scalar do{""}, '((-$N17-1) . "") ~~ Bytes[17]  # -> ""';
-::is scalar do {(-$N17 . "") ~~ Bytes[17]}, scalar do{1}, '(-$N17 . "") ~~ Bytes[17]  # -> 1';
+::is scalar do {((-$N17-1) . "") ~~ Bytes[17]}, scalar do{""}, '((-$N17-1) . "") ~~ Bytes[17] # -> ""';
+::is scalar do {(-$N17 . "") ~~ Bytes[17]}, scalar do{1}, '(-$N17 . "") ~~ Bytes[17]     # -> 1';
 ::is scalar do {(($N17-1) . "") ~~ Bytes[17]}, scalar do{1}, '(($N17-1) . "") ~~ Bytes[17]  # -> 1';
-::is scalar do {($N17 . "") ~~ Bytes[17]}, scalar do{""}, '($N17 . "") ~~ Bytes[17]  # -> ""';
+::is scalar do {($N17 . "") ~~ Bytes[17]}, scalar do{""}, '($N17 . "") ~~ Bytes[17]      # -> ""';
 
 # 
 # ## PositiveInt
 # 
-# Positive integers.
+# Положительные целые числа.
 # 
 ::done_testing; }; subtest 'PositiveInt' => sub { 
-::is scalar do {+0 ~~ PositiveInt}, scalar do{1}, '+0 ~~ PositiveInt	# -> 1';
-::is scalar do {-0 ~~ PositiveInt}, scalar do{1}, '-0 ~~ PositiveInt	# -> 1';
-::is scalar do {55 ~~ PositiveInt}, scalar do{1}, '55 ~~ PositiveInt	# -> 1';
-::is scalar do {-1 ~~ PositiveInt}, scalar do{""}, '-1 ~~ PositiveInt	# -> ""';
+::is scalar do {+0 ~~ PositiveInt}, scalar do{1}, '+0 ~~ PositiveInt # -> 1';
+::is scalar do {-0 ~~ PositiveInt}, scalar do{1}, '-0 ~~ PositiveInt # -> 1';
+::is scalar do {55 ~~ PositiveInt}, scalar do{1}, '55 ~~ PositiveInt # -> 1';
+::is scalar do {-1 ~~ PositiveInt}, scalar do{""}, '-1 ~~ PositiveInt # -> ""';
 
 # 
 # ## PositiveBytes[N]
 # 
-# `N` - the number of bytes for limit.
+# Рассчитывает максимальное число, которое поместится в `N` байт (полагая, что в байтах нет отрицательного бита) и проверяет ограничение от 0 до этого числа.
 # 
 ::done_testing; }; subtest 'PositiveBytes[N]' => sub { 
-::is scalar do {-1 ~~ PositiveBytes[1]}, scalar do{""}, '-1 ~~ PositiveBytes[1]	# -> ""';
-::is scalar do {0 ~~ PositiveBytes[1]}, scalar do{1}, '0 ~~ PositiveBytes[1]	# -> 1';
-::is scalar do {255 ~~ PositiveBytes[1]}, scalar do{1}, '255 ~~ PositiveBytes[1]	# -> 1';
-::is scalar do {256 ~~ PositiveBytes[1]}, scalar do{""}, '256 ~~ PositiveBytes[1]	# -> ""';
+::is scalar do {-1 ~~ PositiveBytes[1]}, scalar do{""}, '-1 ~~ PositiveBytes[1]  # -> ""';
+::is scalar do {0 ~~ PositiveBytes[1]}, scalar do{1}, '0 ~~ PositiveBytes[1]   # -> 1';
+::is scalar do {255 ~~ PositiveBytes[1]}, scalar do{1}, '255 ~~ PositiveBytes[1] # -> 1';
+::is scalar do {256 ~~ PositiveBytes[1]}, scalar do{""}, '256 ~~ PositiveBytes[1] # -> ""';
 
-::is scalar do {-1 ~~ PositiveBytes[8]}, scalar do{""}, '-1 ~~ PositiveBytes[8] # -> ""';
+::is scalar do {-1 ~~ PositiveBytes[8]}, scalar do{""}, '-1 ~~ PositiveBytes[8]   # -> ""';
 ::is scalar do {1.01 ~~ PositiveBytes[8]}, scalar do{""}, '1.01 ~~ PositiveBytes[8] # -> ""';
-::is scalar do {0 ~~ PositiveBytes[8]}, scalar do{1}, '0 ~~ PositiveBytes[8] # -> 1';
+::is scalar do {0 ~~ PositiveBytes[8]}, scalar do{1}, '0 ~~ PositiveBytes[8]    # -> 1';
 
 my $N8 = 2 ** (8*Math::BigInt->new(8)) - 1;
 
-::is scalar do {$N8 . "" ~~ PositiveBytes[8]}, scalar do{1}, '$N8 . "" ~~ PositiveBytes[8] # -> 1';
+::is scalar do {$N8 . "" ~~ PositiveBytes[8]}, scalar do{1}, '$N8 . "" ~~ PositiveBytes[8]     # -> 1';
 ::is scalar do {($N8+1) . "" ~~ PositiveBytes[8]}, scalar do{""}, '($N8+1) . "" ~~ PositiveBytes[8] # -> ""';
 
 ::is scalar do {-1 ~~ PositiveBytes[17]}, scalar do{""}, '-1 ~~ PositiveBytes[17] # -> ""';
-::is scalar do {0 ~~ PositiveBytes[17]}, scalar do{1}, '0 ~~ PositiveBytes[17] # -> 1';
+::is scalar do {0 ~~ PositiveBytes[17]}, scalar do{1}, '0 ~~ PositiveBytes[17]  # -> 1';
 
 # 
 # ## Nat
 # 
-# Integers 1+.
+# Целые числа 1+.
 # 
 ::done_testing; }; subtest 'Nat' => sub { 
 ::is scalar do {0 ~~ Nat}, scalar do{""}, '0 ~~ Nat	# -> ""';
@@ -842,16 +846,17 @@ my $N8 = 2 ** (8*Math::BigInt->new(8)) - 1;
 # 
 # ## Ref
 # 
-# The value is reference.
+# Ссылка.
 # 
 ::done_testing; }; subtest 'Ref' => sub { 
-::is scalar do {\1 ~~ Ref}, scalar do{1}, '\1 ~~ Ref	# -> 1';
-::is scalar do {1 ~~ Ref}, scalar do{""}, '1 ~~ Ref	 # -> ""';
+::is scalar do {\1 ~~ Ref}, scalar do{1}, '\1 ~~ Ref # -> 1';
+::is scalar do {[] ~~ Ref}, scalar do{1}, '[] ~~ Ref # -> 1';
+::is scalar do {1 ~~ Ref}, scalar do{""}, '1 ~~ Ref  # -> ""';
 
 # 
 # ## Tied`[A]
 # 
-# The reference on the tied variable.
+# Ссылка на связанную переменную.
 # 
 ::done_testing; }; subtest 'Tied`[A]' => sub { 
 package TiedHash { sub TIEHASH { bless {@_}, shift } }
@@ -863,33 +868,31 @@ tie my @a, "TiedArray";
 tie my $a, "TiedScalar";
 my %b; my @b; my $b;
 
-::is scalar do {\%a ~~ Tied}, scalar do{1}, '\%a ~~ Tied	# -> 1';
-::is scalar do {\@a ~~ Tied}, scalar do{1}, '\@a ~~ Tied	# -> 1';
-::is scalar do {\$a ~~ Tied}, scalar do{1}, '\$a ~~ Tied	# -> 1';
+::is scalar do {\%a ~~ Tied}, scalar do{1}, '\%a ~~ Tied # -> 1';
+::is scalar do {\@a ~~ Tied}, scalar do{1}, '\@a ~~ Tied # -> 1';
+::is scalar do {\$a ~~ Tied}, scalar do{1}, '\$a ~~ Tied # -> 1';
 
-::is scalar do {\%b ~~ Tied}, scalar do{""}, '\%b ~~ Tied	# -> ""';
-::is scalar do {\@b ~~ Tied}, scalar do{""}, '\@b ~~ Tied	# -> ""';
-::is scalar do {\$b ~~ Tied}, scalar do{""}, '\$b ~~ Tied	# -> ""';
-::is scalar do {\\$b ~~ Tied}, scalar do{""}, '\\$b ~~ Tied	# -> ""';
+::is scalar do {\%b ~~ Tied}, scalar do{""}, '\%b ~~ Tied  # -> ""';
+::is scalar do {\@b ~~ Tied}, scalar do{""}, '\@b ~~ Tied  # -> ""';
+::is scalar do {\$b ~~ Tied}, scalar do{""}, '\$b ~~ Tied  # -> ""';
+::is scalar do {\\$b ~~ Tied}, scalar do{""}, '\\$b ~~ Tied # -> ""';
 
-::is scalar do {ref tied %a}, "TiedHash", 'ref tied %a  # => TiedHash';
-::is scalar do {ref tied %{\%a}}, "TiedHash", 'ref tied %{\%a}  # => TiedHash';
+::is scalar do {ref tied %a}, "TiedHash", 'ref tied %a     # => TiedHash';
+::is scalar do {ref tied %{\%a}}, "TiedHash", 'ref tied %{\%a} # => TiedHash';
 
-::is scalar do {\%a ~~ Tied["TiedHash"]}, scalar do{1}, '\%a ~~ Tied["TiedHash"]	 # -> 1';
-::is scalar do {\@a ~~ Tied["TiedArray"]}, scalar do{1}, '\@a ~~ Tied["TiedArray"]	# -> 1';
-::is scalar do {\$a ~~ Tied["TiedScalar"]}, scalar do{1}, '\$a ~~ Tied["TiedScalar"]   # -> 1';
+::is scalar do {\%a ~~ Tied["TiedHash"]}, scalar do{1}, '\%a ~~ Tied["TiedHash"]   # -> 1';
+::is scalar do {\@a ~~ Tied["TiedArray"]}, scalar do{1}, '\@a ~~ Tied["TiedArray"]  # -> 1';
+::is scalar do {\$a ~~ Tied["TiedScalar"]}, scalar do{1}, '\$a ~~ Tied["TiedScalar"] # -> 1';
 
-::is scalar do {\%a ~~ Tied["TiedArray"]}, scalar do{""}, '\%a ~~ Tied["TiedArray"]	# -> ""';
-::is scalar do {\@a ~~ Tied["TiedScalar"]}, scalar do{""}, '\@a ~~ Tied["TiedScalar"]   # -> ""';
-::is scalar do {\$a ~~ Tied["TiedHash"]}, scalar do{""}, '\$a ~~ Tied["TiedHash"]	 # -> ""';
-::is scalar do {\\$a ~~ Tied["TiedScalar"]}, scalar do{""}, '\\$a ~~ Tied["TiedScalar"]	 # -> ""';
-
-
+::is scalar do {\%a ~~ Tied["TiedArray"]}, scalar do{""}, '\%a ~~ Tied["TiedArray"]   # -> ""';
+::is scalar do {\@a ~~ Tied["TiedScalar"]}, scalar do{""}, '\@a ~~ Tied["TiedScalar"]  # -> ""';
+::is scalar do {\$a ~~ Tied["TiedHash"]}, scalar do{""}, '\$a ~~ Tied["TiedHash"]    # -> ""';
+::is scalar do {\\$a ~~ Tied["TiedScalar"]}, scalar do{""}, '\\$a ~~ Tied["TiedScalar"] # -> ""';
 
 # 
 # ## LValueRef
 # 
-# The function allows assignment.
+# Функция позволяет присваивание.
 # 
 ::done_testing; }; subtest 'LValueRef' => sub { 
 ::is scalar do {ref \substr("abc", 1, 2)}, "LVALUE", 'ref \substr("abc", 1, 2) # => LVALUE';
@@ -899,7 +902,7 @@ my %b; my @b; my $b;
 ::is scalar do {\vec(42, 1, 2) ~~ LValueRef}, scalar do{1}, '\vec(42, 1, 2) ~~ LValueRef # -> 1';
 
 # 
-# But it with `: lvalue` do'nt working.
+# Но с `:lvalue` не работает.
 # 
 
 sub abc: lvalue { $_ }
@@ -936,12 +939,12 @@ substr($x, 1, 1) = 10;
 
 ::is scalar do {$x}, "a10c", '$x # => a10c';
 
-::is scalar do {LValueRef->include(\substr($x, 1, 1))}, "1", 'LValueRef->include(\substr($x, 1, 1))	# => 1';
+::is scalar do {LValueRef->include( \substr($x, 1, 1) )}, "1", 'LValueRef->include( \substr($x, 1, 1) )	# => 1';
 
 # 
 # ## FormatRef
 # 
-# The format.
+# Формат.
 # 
 ::done_testing; }; subtest 'FormatRef' => sub { 
 format EXAMPLE_FMT =
@@ -953,58 +956,150 @@ format EXAMPLE_FMT =
 ::is scalar do {\1 ~~ FormatRef}, scalar do{""}, '\1 ~~ FormatRef				# -> ""';
 
 # 
-# ## CodeRef
+# ## CodeRef`[name, proto]
 # 
-# Subroutine.
+# Подпрограмма.
 # 
-::done_testing; }; subtest 'CodeRef' => sub { 
+::done_testing; }; subtest 'CodeRef`[name, proto]' => sub { 
 ::is scalar do {sub {} ~~ CodeRef}, scalar do{1}, 'sub {} ~~ CodeRef	# -> 1';
 ::is scalar do {\1 ~~ CodeRef}, scalar do{""}, '\1 ~~ CodeRef		# -> ""';
+
+sub code_ex ($;$) { ... }
+
+::is scalar do {\&code_ex ~~ CodeRef['main::code_ex']}, scalar do{1}, '\&code_ex ~~ CodeRef[\'main::code_ex\']         # -> 1';
+::is scalar do {\&code_ex ~~ CodeRef['code_ex']}, scalar do{""}, '\&code_ex ~~ CodeRef[\'code_ex\']               # -> ""';
+::is scalar do {\&code_ex ~~ CodeRef[qr/_/]}, scalar do{1}, '\&code_ex ~~ CodeRef[qr/_/]                   # -> 1';
+::is scalar do {\&code_ex ~~ CodeRef[undef, '$;$']}, scalar do{1}, '\&code_ex ~~ CodeRef[undef, \'$;$\']            # -> 1';
+::is scalar do {\&code_ex ~~ CodeRef[undef, qr/^(\$;\$|\@)$/]}, scalar do{1}, '\&code_ex ~~ CodeRef[undef, qr/^(\$;\$|\@)$/] # -> 1';
+::is scalar do {\&code_ex ~~ CodeRef[undef, '@']}, scalar do{""}, '\&code_ex ~~ CodeRef[undef, \'@\']              # -> ""';
+::is scalar do {\&code_ex ~~ CodeRef['main::code_ex', '$;$']}, scalar do{1}, '\&code_ex ~~ CodeRef[\'main::code_ex\', \'$;$\']  # -> 1';
+
+# 
+# 
+# ## ReachableCodeRef`[name, proto]
+# 
+# Подпрограмма с телом.
+# 
+::done_testing; }; subtest 'ReachableCodeRef`[name, proto]' => sub { 
+sub code_forward ($;$);
+
+::is scalar do {\&code_ex ~~ ReachableCodeRef['main::code_ex']}, scalar do{1}, '\&code_ex ~~ ReachableCodeRef[\'main::code_ex\']        # -> 1';
+::is scalar do {\&code_ex ~~ ReachableCodeRef['code_ex']}, scalar do{""}, '\&code_ex ~~ ReachableCodeRef[\'code_ex\']              # -> ""';
+::is scalar do {\&code_ex ~~ ReachableCodeRef[qr/_/]}, scalar do{1}, '\&code_ex ~~ ReachableCodeRef[qr/_/]                  # -> 1';
+::is scalar do {\&code_ex ~~ ReachableCodeRef[undef, '$;$']}, scalar do{1}, '\&code_ex ~~ ReachableCodeRef[undef, \'$;$\']           # -> 1';
+::is scalar do {\&code_ex ~~ CodeRef[undef, qr/^(\$;\$|\@)$/]}, scalar do{1}, '\&code_ex ~~ CodeRef[undef, qr/^(\$;\$|\@)$/]         # -> 1';
+::is scalar do {\&code_ex ~~ ReachableCodeRef[undef, '@']}, scalar do{""}, '\&code_ex ~~ ReachableCodeRef[undef, \'@\']             # -> ""';
+::is scalar do {\&code_ex ~~ ReachableCodeRef['main::code_ex', '$;$']}, scalar do{1}, '\&code_ex ~~ ReachableCodeRef[\'main::code_ex\', \'$;$\'] # -> 1';
+
+::is scalar do {\&code_forward ~~ ReachableCodeRef}, scalar do{""}, '\&code_forward ~~ ReachableCodeRef # -> ""';
+
+# 
+# ## UnreachableCodeRef`[name, proto]
+# 
+# Подпрограмма без тела.
+# 
+::done_testing; }; subtest 'UnreachableCodeRef`[name, proto]' => sub { 
+::is scalar do {\&nouname ~~ UnreachableCodeRef}, scalar do{1}, '\&nouname ~~ UnreachableCodeRef # -> 1';
+::is scalar do {\&code_ex ~~ UnreachableCodeRef}, scalar do{""}, '\&code_ex ~~ UnreachableCodeRef # -> ""';
+::is scalar do {\&code_forward ~~ UnreachableCodeRef['main::code_forward', '$;$']}, scalar do{1}, '\&code_forward ~~ UnreachableCodeRef[\'main::code_forward\', \'$;$\'] # -> 1';
+
+# 
+# ## Isa[A...]
+# 
+# Ссылка на подпрограмму с соответствующей сигнатурой.
+# 
+::done_testing; }; subtest 'Isa[A...]' => sub { 
+sub sig_ex :Isa(Int => Str) {}
+
+::is scalar do {\&sig_ex ~~ Isa[Int => Str]}, scalar do{1}, '\&sig_ex ~~ Isa[Int => Str]        # -> 1';
+::is scalar do {\&sig_ex ~~ Isa[Int => Str => Num]}, scalar do{""}, '\&sig_ex ~~ Isa[Int => Str => Num] # -> ""';
+::is scalar do {\&sig_ex ~~ Isa[Int => Num]}, scalar do{""}, '\&sig_ex ~~ Isa[Int => Num]        # -> ""';
+
+# 
+# Подпрограммы без тела не оборачиваются в обработчик сигнатуры, а сигнатура запоминается для валидации соответствия впоследствии объявленной подпрограммы с телом. Поэтому функция не имеет сигнатуры.
+# 
+
+sub unreachable_sig_ex :Isa(Int => Str);
+
+::is scalar do {\&unreachable_sig_ex ~~ Isa[Int => Str]}, scalar do{""}, '\&unreachable_sig_ex ~~ Isa[Int => Str] # -> ""';
 
 # 
 # ## RegexpRef
 # 
-# The regular expression.
+# Регулярное выражение.
 # 
 ::done_testing; }; subtest 'RegexpRef' => sub { 
-::is scalar do {qr// ~~ RegexpRef}, scalar do{1}, 'qr// ~~ RegexpRef	# -> 1';
-::is scalar do {\1 ~~ RegexpRef}, scalar do{""}, '\1 ~~ RegexpRef		 # -> ""';
+::is scalar do {qr// ~~ RegexpRef}, scalar do{1}, 'qr// ~~ RegexpRef # -> 1';
+::is scalar do {\1 ~~ RegexpRef}, scalar do{""}, '\1 ~~ RegexpRef   # -> ""';
+
+# 
+# ## ScalarRefRef`[A]
+# 
+# Ссылка на скаляр или ссылка на ссылку.
+# 
+::done_testing; }; subtest 'ScalarRefRef`[A]' => sub { 
+::is scalar do {\12    ~~ ScalarRefRef}, scalar do{1}, '\12    ~~ ScalarRefRef                    # -> 1';
+::is scalar do {\12    ~~ ScalarRefRef}, scalar do{1}, '\12    ~~ ScalarRefRef                    # -> 1';
+::is scalar do {\-1.2  ~~ ScalarRefRef[Num]}, scalar do{1}, '\-1.2  ~~ ScalarRefRef[Num]               # -> 1';
+::is scalar do {\\-1.2 ~~ ScalarRefRef[ScalarRefRef[Num]]}, scalar do{1}, '\\-1.2 ~~ ScalarRefRef[ScalarRefRef[Num]] # -> 1';
 
 # 
 # ## ScalarRef`[A]
 # 
-# The scalar.
+# Ссылка на скаляр.
 # 
 ::done_testing; }; subtest 'ScalarRef`[A]' => sub { 
-::is scalar do {\12 ~~ ScalarRef}, scalar do{1}, '\12 ~~ ScalarRef			 # -> 1';
-::is scalar do {\\12 ~~ ScalarRef}, scalar do{""}, '\\12 ~~ ScalarRef			# -> ""';
-::is scalar do {\-1.2 ~~ ScalarRef[Num]}, scalar do{1}, '\-1.2 ~~ ScalarRef[Num]	 # -> 1';
-::is scalar do {\\-1.2 ~~ ScalarRef[Num]}, scalar do{""}, '\\-1.2 ~~ ScalarRef[Num]	 # -> ""';
+::is scalar do {\12   ~~ ScalarRef}, scalar do{1}, '\12   ~~ ScalarRef      # -> 1';
+::is scalar do {\\12  ~~ ScalarRef}, scalar do{""}, '\\12  ~~ ScalarRef      # -> ""';
+::is scalar do {\-1.2 ~~ ScalarRef[Num]}, scalar do{1}, '\-1.2 ~~ ScalarRef[Num] # -> 1';
 
 # 
 # ## RefRef`[A]
 # 
-# The ref as ref.
+# Ссылка на ссылку.
 # 
 ::done_testing; }; subtest 'RefRef`[A]' => sub { 
-::is scalar do {\\1 ~~ RefRef}, scalar do{1}, '\\1 ~~ RefRef	# -> 1';
-::is scalar do {\1 ~~ RefRef}, scalar do{""}, '\1 ~~ RefRef	 # -> ""';
-::is scalar do {\\1.3 ~~ RefRef[ScalarRef[Num]]}, scalar do{1}, '\\1.3 ~~ RefRef[ScalarRef[Num]]	# -> 1';
-::is scalar do {\1.3 ~~ RefRef[ScalarRef[Num]]}, scalar do{""}, '\1.3 ~~ RefRef[ScalarRef[Num]]	# -> ""';
+::is scalar do {\12    ~~ RefRef}, scalar do{""}, '\12    ~~ RefRef                 # -> ""';
+::is scalar do {\\12   ~~ RefRef}, scalar do{1}, '\\12   ~~ RefRef                 # -> 1';
+::is scalar do {\-1.2  ~~ RefRef[Num]}, scalar do{""}, '\-1.2  ~~ RefRef[Num]            # -> ""';
+::is scalar do {\\-1.2 ~~ RefRef[ScalarRef[Num]]}, scalar do{1}, '\\-1.2 ~~ RefRef[ScalarRef[Num]] # -> 1';
 
 # 
 # ## GlobRef
 # 
-# The global.
+# Ссылка на глоб.
 # 
 ::done_testing; }; subtest 'GlobRef' => sub { 
-::is scalar do {\*A::a ~~ GlobRef}, scalar do{1}, '\*A::a ~~ GlobRef	# -> 1';
-::is scalar do {*A::a ~~ GlobRef}, scalar do{""}, '*A::a ~~ GlobRef	 # -> ""';
+::is scalar do {\*A::a ~~ GlobRef}, scalar do{1}, '\*A::a ~~ GlobRef # -> 1';
+::is scalar do {*A::a ~~ GlobRef}, scalar do{""}, '*A::a ~~ GlobRef  # -> ""';
+
+# 
+# ## FileHandle
+# 
+# Файловый описатель.
+# 
+::done_testing; }; subtest 'FileHandle' => sub { 
+::is scalar do {\*A::a ~~ FileHandle}, scalar do{""}, '\*A::a ~~ FileHandle         # -> ""';
+::is scalar do {\*STDIN ~~ FileHandle}, scalar do{1}, '\*STDIN ~~ FileHandle        # -> 1';
+
+open my $fh, "<", "/dev/null";
+::is scalar do {$fh ~~ FileHandle}, scalar do{1}, '$fh ~~ FileHandle	         # -> 1';
+close $fh;
+
+opendir my $dh, ".";
+::is scalar do {$dh ~~ FileHandle}, scalar do{1}, '$dh ~~ FileHandle	         # -> 1';
+closedir $dh;
+
+use constant { PF_UNIX => 1, SOCK_STREAM => 1 };
+
+socket my $sock, PF_UNIX, SOCK_STREAM, 0;
+::is scalar do {$sock ~~ FileHandle}, scalar do{1}, '$sock ~~ FileHandle	         # -> 1';
+close $sock;
 
 # 
 # ## ArrayRef`[A]
 # 
-# The arrays.
+# Ссылки на массивы.
 # 
 ::done_testing; }; subtest 'ArrayRef`[A]' => sub { 
 ::is scalar do {[] ~~ ArrayRef}, scalar do{1}, '[] ~~ ArrayRef	# -> 1';
@@ -1017,10 +1112,10 @@ format EXAMPLE_FMT =
 # 
 # ## Lim[A, B?]
 # 
-# Limit arrays from `A` to `B`, or from 0 to `A`, if `B` is'nt present.
+# Ограничивает массивы от `A` до `B` элементов или от 0 до `A`, если `B` отсутствует.
 # 
 ::done_testing; }; subtest 'Lim[A, B?]' => sub { 
-::is scalar do {[] ~~ Lim[5]}, scalar do{1}, '[] ~~ Lim[5] # -> 1';
+::is scalar do {[] ~~ Lim[5]}, scalar do{1}, '[] ~~ Lim[5]     # -> 1';
 ::is scalar do {[1..5] ~~ Lim[5]}, scalar do{1}, '[1..5] ~~ Lim[5] # -> 1';
 ::is scalar do {[1..6] ~~ Lim[5]}, scalar do{""}, '[1..6] ~~ Lim[5] # -> ""';
 
@@ -1028,122 +1123,122 @@ format EXAMPLE_FMT =
 ::is scalar do {[1..6] ~~ Lim[1,5]}, scalar do{""}, '[1..6] ~~ Lim[1,5] # -> ""';
 
 ::is scalar do {[1] ~~ Lim[1,5]}, scalar do{1}, '[1] ~~ Lim[1,5] # -> 1';
-::is scalar do {[] ~~ Lim[1,5]}, scalar do{""}, '[] ~~ Lim[1,5] # -> ""';
+::is scalar do {[] ~~ Lim[1,5]}, scalar do{""}, '[] ~~ Lim[1,5]  # -> ""';
 
 # 
 # ## HashRef`[H]
 # 
-# The hashes.
+# Ссылки на хеши.
 # 
 ::done_testing; }; subtest 'HashRef`[H]' => sub { 
-::is scalar do {{} ~~ HashRef}, scalar do{1}, '{} ~~ HashRef	# -> 1';
-::is scalar do {\1 ~~ HashRef}, scalar do{""}, '\1 ~~ HashRef	# -> ""';
+::is scalar do {{} ~~ HashRef}, scalar do{1}, '{} ~~ HashRef # -> 1';
+::is scalar do {\1 ~~ HashRef}, scalar do{""}, '\1 ~~ HashRef # -> ""';
 
-::is scalar do {[]  ~~ HashRef[Int]}, scalar do{""}, '[]  ~~ HashRef[Int]	# -> ""';
-::is scalar do {{x=>1, y=>2}  ~~ HashRef[Int]}, scalar do{1}, '{x=>1, y=>2}  ~~ HashRef[Int]	# -> 1';
-::is scalar do {{x=>1, y=>""} ~~ HashRef[Int]}, scalar do{""}, '{x=>1, y=>""} ~~ HashRef[Int]	# -> ""';
+::is scalar do {[]  ~~ HashRef[Int]}, scalar do{""}, '[]  ~~ HashRef[Int]           # -> ""';
+::is scalar do {{x=>1, y=>2}  ~~ HashRef[Int]}, scalar do{1}, '{x=>1, y=>2}  ~~ HashRef[Int] # -> 1';
+::is scalar do {{x=>1, y=>""} ~~ HashRef[Int]}, scalar do{""}, '{x=>1, y=>""} ~~ HashRef[Int] # -> ""';
 
 # 
 # ## Object`[O]
 # 
-# The blessed values.
+# Благословлённые ссылки.
 # 
 ::done_testing; }; subtest 'Object`[O]' => sub { 
-::is scalar do {bless(\(my $val=10), "A1") ~~ Object}, scalar do{1}, 'bless(\(my $val=10), "A1") ~~ Object	# -> 1';
-::is scalar do {\(my $val=10) ~~ Object}, scalar do{""}, '\(my $val=10) ~~ Object					# -> ""';
+::is scalar do {bless(\(my $val=10), "A1") ~~ Object}, scalar do{1}, 'bless(\(my $val=10), "A1") ~~ Object # -> 1';
+::is scalar do {\(my $val=10) ~~ Object}, scalar do{""}, '\(my $val=10) ~~ Object              # -> ""';
 
-::is scalar do {bless(\(my $val=10), "A1") ~~ Object["A1"]}, scalar do{1}, 'bless(\(my $val=10), "A1") ~~ Object["A1"]   # -> 1';
-::is scalar do {bless(\(my $val=10), "A1") ~~ Object["B1"]}, scalar do{""}, 'bless(\(my $val=10), "A1") ~~ Object["B1"]   # -> ""';
+::is scalar do {bless(\(my $val=10), "A1") ~~ Object["A1"]}, scalar do{1}, 'bless(\(my $val=10), "A1") ~~ Object["A1"] # -> 1';
+::is scalar do {bless(\(my $val=10), "A1") ~~ Object["B1"]}, scalar do{""}, 'bless(\(my $val=10), "A1") ~~ Object["B1"] # -> ""';
 
 # 
 # ## Me
 # 
-# The blessed values self package.
+# Благословенные ссылки на объекты текущего пакета.
 # 
 ::done_testing; }; subtest 'Me' => sub { 
 package A1 {
-	use Aion;
-::is scalar do {bless({}, __PACKAGE__) ~~ Me}, scalar do{1}, '	bless({}, __PACKAGE__) ~~ Me  # -> 1';
-::is scalar do {bless({}, "A2") ~~ Me}, scalar do{""}, '	bless({}, "A2") ~~ Me  # -> ""';
+ use Aion;
+::is scalar do {bless({}, __PACKAGE__) ~~ Me}, scalar do{1}, ' bless({}, __PACKAGE__) ~~ Me  # -> 1';
+::is scalar do {bless({}, "A2") ~~ Me}, scalar do{""}, ' bless({}, "A2") ~~ Me         # -> ""';
 }
 
 # 
 # ## Map[K, V]
 # 
-# As `HashRef`, but has type for keys also.
+# Как `HashRef`, но с типом для ключей.
 # 
 ::done_testing; }; subtest 'Map[K, V]' => sub { 
-::is scalar do {{} ~~ Map[Int, Int]}, scalar do{1}, '{} ~~ Map[Int, Int]			 # -> 1';
-::is scalar do {{5 => 3} ~~ Map[Int, Int]}, scalar do{1}, '{5 => 3} ~~ Map[Int, Int]	# -> 1';
-::is scalar do {+{5.5 => 3} ~~ Map[Int, Int]}, scalar do{""}, '+{5.5 => 3} ~~ Map[Int, Int] # -> ""';
-::is scalar do {{5 => 3.3} ~~ Map[Int, Int]}, scalar do{""}, '{5 => 3.3} ~~ Map[Int, Int]  # -> ""';
-::is scalar do {{5 => 3, 6 => 7} ~~ Map[Int, Int]}, scalar do{1}, '{5 => 3, 6 => 7} ~~ Map[Int, Int]  # -> 1';
+::is scalar do {{} ~~ Map[Int, Int]}, scalar do{1}, '{} ~~ Map[Int, Int]               # -> 1';
+::is scalar do {{5 => 3} ~~ Map[Int, Int]}, scalar do{1}, '{5 => 3} ~~ Map[Int, Int]         # -> 1';
+::is scalar do {+{5.5 => 3} ~~ Map[Int, Int]}, scalar do{""}, '+{5.5 => 3} ~~ Map[Int, Int]      # -> ""';
+::is scalar do {{5 => 3.3} ~~ Map[Int, Int]}, scalar do{""}, '{5 => 3.3} ~~ Map[Int, Int]       # -> ""';
+::is scalar do {{5 => 3, 6 => 7} ~~ Map[Int, Int]}, scalar do{1}, '{5 => 3, 6 => 7} ~~ Map[Int, Int] # -> 1';
 
 # 
 # ## Tuple[A...]
 # 
-# The tuple.
+# Тьюпл.
 # 
 ::done_testing; }; subtest 'Tuple[A...]' => sub { 
-::is scalar do {["a", 12] ~~ Tuple[Str, Int]}, scalar do{1}, '["a", 12] ~~ Tuple[Str, Int]	# -> 1';
-::is scalar do {["a", 12, 1] ~~ Tuple[Str, Int]}, scalar do{""}, '["a", 12, 1] ~~ Tuple[Str, Int]	# -> ""';
-::is scalar do {["a", 12.1] ~~ Tuple[Str, Int]}, scalar do{""}, '["a", 12.1] ~~ Tuple[Str, Int]	# -> ""';
+::is scalar do {["a", 12] ~~ Tuple[Str, Int]}, scalar do{1}, '["a", 12] ~~ Tuple[Str, Int]    # -> 1';
+::is scalar do {["a", 12, 1] ~~ Tuple[Str, Int]}, scalar do{""}, '["a", 12, 1] ~~ Tuple[Str, Int] # -> ""';
+::is scalar do {["a", 12.1] ~~ Tuple[Str, Int]}, scalar do{""}, '["a", 12.1] ~~ Tuple[Str, Int]  # -> ""';
 
 # 
 # ## CycleTuple[A...]
 # 
-# The tuple one or more times.
+# Тьюпл повторённый один или несколько раз.
 # 
 ::done_testing; }; subtest 'CycleTuple[A...]' => sub { 
-::is scalar do {["a", -5] ~~ CycleTuple[Str, Int]}, scalar do{1}, '["a", -5] ~~ CycleTuple[Str, Int]	# -> 1';
-::is scalar do {["a", -5, "x"] ~~ CycleTuple[Str, Int]}, scalar do{""}, '["a", -5, "x"] ~~ CycleTuple[Str, Int]	# -> ""';
-::is scalar do {["a", -5, "x", -6] ~~ CycleTuple[Str, Int]}, scalar do{1}, '["a", -5, "x", -6] ~~ CycleTuple[Str, Int]	# -> 1';
-::is scalar do {["a", -5, "x", -6.2] ~~ CycleTuple[Str, Int]}, scalar do{""}, '["a", -5, "x", -6.2] ~~ CycleTuple[Str, Int]	# -> ""';
+::is scalar do {["a", -5] ~~ CycleTuple[Str, Int]}, scalar do{1}, '["a", -5] ~~ CycleTuple[Str, Int] # -> 1';
+::is scalar do {["a", -5, "x"] ~~ CycleTuple[Str, Int]}, scalar do{""}, '["a", -5, "x"] ~~ CycleTuple[Str, Int] # -> ""';
+::is scalar do {["a", -5, "x", -6] ~~ CycleTuple[Str, Int]}, scalar do{1}, '["a", -5, "x", -6] ~~ CycleTuple[Str, Int] # -> 1';
+::is scalar do {["a", -5, "x", -6.2] ~~ CycleTuple[Str, Int]}, scalar do{""}, '["a", -5, "x", -6.2] ~~ CycleTuple[Str, Int] # -> ""';
 
 # 
 # ## Dict[k => A, ...]
 # 
-# The dictionary.
+# Словарь.
 # 
 ::done_testing; }; subtest 'Dict[k => A, ...]' => sub { 
-::is scalar do {{a => -1.6, b => "abc"} ~~ Dict[a => Num, b => Str]}, scalar do{1}, '{a => -1.6, b => "abc"} ~~ Dict[a => Num, b => Str]	# -> 1';
+::is scalar do {{a => -1.6, b => "abc"} ~~ Dict[a => Num, b => Str]}, scalar do{1}, '{a => -1.6, b => "abc"} ~~ Dict[a => Num, b => Str] # -> 1';
 
-::is scalar do {{a => -1.6, b => "abc", c => 3} ~~ Dict[a => Num, b => Str]}, scalar do{""}, '{a => -1.6, b => "abc", c => 3} ~~ Dict[a => Num, b => Str]	# -> ""';
-::is scalar do {{a => -1.6} ~~ Dict[a => Num, b => Str]}, scalar do{""}, '{a => -1.6} ~~ Dict[a => Num, b => Str]	# -> ""';
+::is scalar do {{a => -1.6, b => "abc", c => 3} ~~ Dict[a => Num, b => Str]}, scalar do{""}, '{a => -1.6, b => "abc", c => 3} ~~ Dict[a => Num, b => Str] # -> ""';
+::is scalar do {{a => -1.6} ~~ Dict[a => Num, b => Str]}, scalar do{""}, '{a => -1.6} ~~ Dict[a => Num, b => Str] # -> ""';
 
-::is scalar do {{a => -1.6} ~~ Dict[a => Num, b => Option[Str]]}, scalar do{1}, '{a => -1.6} ~~ Dict[a => Num, b => Option[Str]]	# -> 1';
+::is scalar do {{a => -1.6} ~~ Dict[a => Num, b => Option[Str]]}, scalar do{1}, '{a => -1.6} ~~ Dict[a => Num, b => Option[Str]] # -> 1';
 
 # 
 # ## HasProp[p...]
 # 
-# The hash has the properties.
+# Хэш имеет перечисленные свойства. Кроме них он может иметь и другие.
 # 
 ::done_testing; }; subtest 'HasProp[p...]' => sub { 
-::is scalar do {[0, 1] ~~ HasProp[qw/0 1/]}, scalar do{""}, '[0, 1] ~~ HasProp[qw/0 1/]	# -> ""';
+::is scalar do {[0, 1] ~~ HasProp[qw/0 1/]}, scalar do{""}, '[0, 1] ~~ HasProp[qw/0 1/] # -> ""';
 
-::is scalar do {{a => 1, b => 2, c => 3} ~~ HasProp[qw/a b/]}, scalar do{1}, '{a => 1, b => 2, c => 3} ~~ HasProp[qw/a b/]	# -> 1';
-::is scalar do {{a => 1, b => 2} ~~ HasProp[qw/a b/]}, scalar do{1}, '{a => 1, b => 2} ~~ HasProp[qw/a b/]	# -> 1';
-::is scalar do {{a => 1, c => 3} ~~ HasProp[qw/a b/]}, scalar do{""}, '{a => 1, c => 3} ~~ HasProp[qw/a b/]	# -> ""';
+::is scalar do {{a => 1, b => 2, c => 3} ~~ HasProp[qw/a b/]}, scalar do{1}, '{a => 1, b => 2, c => 3} ~~ HasProp[qw/a b/] # -> 1';
+::is scalar do {{a => 1, b => 2} ~~ HasProp[qw/a b/]}, scalar do{1}, '{a => 1, b => 2} ~~ HasProp[qw/a b/] # -> 1';
+::is scalar do {{a => 1, c => 3} ~~ HasProp[qw/a b/]}, scalar do{""}, '{a => 1, c => 3} ~~ HasProp[qw/a b/] # -> ""';
 
-::is scalar do {bless({a => 1, b => 3}, "A") ~~ HasProp[qw/a b/]}, scalar do{1}, 'bless({a => 1, b => 3}, "A") ~~ HasProp[qw/a b/]	# -> 1';
+::is scalar do {bless({a => 1, b => 3}, "A") ~~ HasProp[qw/a b/]}, scalar do{1}, 'bless({a => 1, b => 3}, "A") ~~ HasProp[qw/a b/] # -> 1';
 
 # 
 # ## Like
 # 
-# The object or string.
+# Объект или строка.
 # 
 ::done_testing; }; subtest 'Like' => sub { 
-::is scalar do {"" ~~ Like}, scalar do{1}, '"" ~~ Like		# -> 1';
-::is scalar do {1 ~~ Like}, scalar do{1}, '1 ~~ Like		# -> 1';
-::is scalar do {bless({}, "A") ~~ Like}, scalar do{1}, 'bless({}, "A") ~~ Like	# -> 1';
-::is scalar do {bless([], "A") ~~ Like}, scalar do{1}, 'bless([], "A") ~~ Like	# -> 1';
-::is scalar do {bless(\(my $str = ""), "A") ~~ Like}, scalar do{1}, 'bless(\(my $str = ""), "A") ~~ Like	# -> 1';
-::is scalar do {\1 ~~ Like}, scalar do{""}, '\1 ~~ Like		# -> ""';
+::is scalar do {"" ~~ Like}, scalar do{1}, '"" ~~ Like # -> 1';
+::is scalar do {1 ~~ Like}, scalar do{1}, '1 ~~ Like  # -> 1';
+::is scalar do {bless({}, "A") ~~ Like}, scalar do{1}, 'bless({}, "A") ~~ Like # -> 1';
+::is scalar do {bless([], "A") ~~ Like}, scalar do{1}, 'bless([], "A") ~~ Like # -> 1';
+::is scalar do {bless(\(my $str = ""), "A") ~~ Like}, scalar do{1}, 'bless(\(my $str = ""), "A") ~~ Like # -> 1';
+::is scalar do {\1 ~~ Like}, scalar do{""}, '\1 ~~ Like  # -> ""';
 
 # 
 # ## HasMethods[m...]
 # 
-# The object or the class has the methods.
+# Объект или класс имеет перечисленные методы. Кроме них может иметь и другие.
 # 
 ::done_testing; }; subtest 'HasMethods[m...]' => sub { 
 package HasMethodsExample {
@@ -1161,29 +1256,29 @@ package HasMethodsExample {
 # 
 # ## Overload`[op...]
 # 
-# The object or the class is overloaded.
+# Объект или класс с перегруженными операторами.
 # 
 ::done_testing; }; subtest 'Overload`[op...]' => sub { 
 package OverloadExample {
 	use overload '""' => sub { "abc" };
 }
 
-::is scalar do {"OverloadExample" ~~ Overload}, scalar do{1}, '"OverloadExample" ~~ Overload	# -> 1';
-::is scalar do {bless({}, "OverloadExample") ~~ Overload}, scalar do{1}, 'bless({}, "OverloadExample") ~~ Overload	# -> 1';
-::is scalar do {"A" ~~ Overload}, scalar do{""}, '"A" ~~ Overload					# -> ""';
-::is scalar do {bless({}, "A") ~~ Overload}, scalar do{""}, 'bless({}, "A") ~~ Overload		# -> ""';
+::is scalar do {"OverloadExample" ~~ Overload}, scalar do{1}, '"OverloadExample" ~~ Overload            # -> 1';
+::is scalar do {bless({}, "OverloadExample") ~~ Overload}, scalar do{1}, 'bless({}, "OverloadExample") ~~ Overload # -> 1';
+::is scalar do {"A" ~~ Overload}, scalar do{""}, '"A" ~~ Overload                          # -> ""';
+::is scalar do {bless({}, "A") ~~ Overload}, scalar do{""}, 'bless({}, "A") ~~ Overload               # -> ""';
 
 # 
-# And it has the operators if arguments are specified.
+# И у него есть операторы указанные операторы.
 # 
 
-::is scalar do {"OverloadExample" ~~ Overload['""']}, scalar do{1}, '"OverloadExample" ~~ Overload[\'""\']   # -> 1';
-::is scalar do {"OverloadExample" ~~ Overload['|']}, scalar do{""}, '"OverloadExample" ~~ Overload[\'|\']	# -> ""';
+::is scalar do {"OverloadExample" ~~ Overload['""']}, scalar do{1}, '"OverloadExample" ~~ Overload[\'""\'] # -> 1';
+::is scalar do {"OverloadExample" ~~ Overload['|']}, scalar do{""}, '"OverloadExample" ~~ Overload[\'|\']  # -> ""';
 
 # 
 # ## InstanceOf[A...]
 # 
-# The class or the object inherits the list of classes.
+# Класс или объект наследует классы из списка.
 # 
 ::done_testing; }; subtest 'InstanceOf[A...]' => sub { 
 package Animal {}
@@ -1191,16 +1286,14 @@ package Cat { our @ISA = qw/Animal/ }
 package Tiger { our @ISA = qw/Cat/ }
 
 
-::is scalar do {"Tiger" ~~ InstanceOf['Animal', 'Cat']}, scalar do{1}, '"Tiger" ~~ InstanceOf[\'Animal\', \'Cat\']  # -> 1';
-::is scalar do {"Tiger" ~~ InstanceOf['Tiger']}, scalar do{1}, '"Tiger" ~~ InstanceOf[\'Tiger\']			# -> 1';
-::is scalar do {"Tiger" ~~ InstanceOf['Cat', 'Dog']}, scalar do{""}, '"Tiger" ~~ InstanceOf[\'Cat\', \'Dog\']		# -> ""';
+::is scalar do {"Tiger" ~~ InstanceOf['Animal', 'Cat']}, scalar do{1}, '"Tiger" ~~ InstanceOf[\'Animal\', \'Cat\'] # -> 1';
+::is scalar do {"Tiger" ~~ InstanceOf['Tiger']}, scalar do{1}, '"Tiger" ~~ InstanceOf[\'Tiger\']         # -> 1';
+::is scalar do {"Tiger" ~~ InstanceOf['Cat', 'Dog']}, scalar do{""}, '"Tiger" ~~ InstanceOf[\'Cat\', \'Dog\']    # -> ""';
 
 # 
 # ## ConsumerOf[A...]
 # 
-# The class or the object has the roles.
-# 
-# The presence of the role is checked by the `DOES` method.
+# Класс или объект имеет указанные роли.
 # 
 ::done_testing; }; subtest 'ConsumerOf[A...]' => sub { 
 package NoneExample {}
@@ -1210,14 +1303,14 @@ package RoleExample { sub DOES { $_[1] ~~ [qw/Role1 Role2/] } }
 ::is scalar do {'RoleExample' ~~ ConsumerOf[qw/Role2 Role1/]}, scalar do{1}, '\'RoleExample\' ~~ ConsumerOf[qw/Role2 Role1/] # -> 1';
 ::is scalar do {bless({}, 'RoleExample') ~~ ConsumerOf[qw/Role3 Role2 Role1/]}, scalar do{""}, 'bless({}, \'RoleExample\') ~~ ConsumerOf[qw/Role3 Role2 Role1/] # -> ""';
 
-::is scalar do {'NoneExample' ~~ ConsumerOf[qw/Role1/]}, scalar do{""}, '\'NoneExample\' ~~ ConsumerOf[qw/Role1/]	# -> ""';
+::is scalar do {'NoneExample' ~~ ConsumerOf[qw/Role1/]}, scalar do{""}, '\'NoneExample\' ~~ ConsumerOf[qw/Role1/] # -> ""';
 
 # 
 # ## BoolLike
 # 
-# Check the 1, 0, "", undef or object with overloaded operator `0+` as `JSON::PP::Boolean`.
+# Проверяет 1, 0, "", undef или объект с перегруженным оператором `bool` или `0+` как `JSON::PP::Boolean`. Во втором случае вызывает оператор  `0+` и проверяет результат как `Bool`.
 # 
-# The operator `0+` evaluates, and result is checking.
+# `BoolLike` вызывает оператор `0+` и проверяет результат.
 # 
 ::done_testing; }; subtest 'BoolLike' => sub { 
 package BoolLikeExample {
@@ -1227,70 +1320,77 @@ package BoolLikeExample {
 ::is scalar do {bless(\(my $x = 1 ), 'BoolLikeExample') ~~ BoolLike}, scalar do{1}, 'bless(\(my $x = 1 ), \'BoolLikeExample\') ~~ BoolLike # -> 1';
 ::is scalar do {bless(\(my $x = 11), 'BoolLikeExample') ~~ BoolLike}, scalar do{""}, 'bless(\(my $x = 11), \'BoolLikeExample\') ~~ BoolLike # -> ""';
 
-::is scalar do {1 ~~ BoolLike}, scalar do{1}, '1 ~~ BoolLike	  # -> 1';
-::is scalar do {0 ~~ BoolLike}, scalar do{1}, '0 ~~ BoolLike	  # -> 1';
-::is scalar do {"" ~~ BoolLike}, scalar do{1}, '"" ~~ BoolLike	  # -> 1';
+::is scalar do {1 ~~ BoolLike}, scalar do{1}, '1 ~~ BoolLike     # -> 1';
+::is scalar do {0 ~~ BoolLike}, scalar do{1}, '0 ~~ BoolLike     # -> 1';
+::is scalar do {"" ~~ BoolLike}, scalar do{1}, '"" ~~ BoolLike    # -> 1';
 ::is scalar do {undef ~~ BoolLike}, scalar do{1}, 'undef ~~ BoolLike # -> 1';
+
+package BoolLike2Example {
+	use overload 'bool' => sub { ${$_[0]} };
+}
+
+::is scalar do {bless(\(my $x = 1 ), 'BoolLike2Example') ~~ BoolLike}, scalar do{1}, 'bless(\(my $x = 1 ), \'BoolLike2Example\') ~~ BoolLike # -> 1';
+::is scalar do {bless(\(my $x = 11), 'BoolLike2Example') ~~ BoolLike}, scalar do{1}, 'bless(\(my $x = 11), \'BoolLike2Example\') ~~ BoolLike # -> 1';
 
 # 
 # ## StrLike
 # 
-# String or object with overloaded operator `""`.
+# Строка или объект с перегруженным оператором `""`.
 # 
 ::done_testing; }; subtest 'StrLike' => sub { 
-::is scalar do {"" ~~ StrLike}, scalar do{1}, '"" ~~ StrLike								# -> 1';
+::is scalar do {"" ~~ StrLike}, scalar do{1}, '"" ~~ StrLike # -> 1';
 
 package StrLikeExample {
 	use overload '""' => sub { "abc" };
 }
 
-::is scalar do {bless({}, "StrLikeExample") ~~ StrLike}, scalar do{1}, 'bless({}, "StrLikeExample") ~~ StrLike		# -> 1';
+::is scalar do {bless({}, "StrLikeExample") ~~ StrLike}, scalar do{1}, 'bless({}, "StrLikeExample") ~~ StrLike # -> 1';
 
-::is scalar do {{} ~~ StrLike}, scalar do{""}, '{} ~~ StrLike								# -> ""';
+::is scalar do {{} ~~ StrLike}, scalar do{""}, '{} ~~ StrLike # -> ""';
 
 # 
 # ## RegexpLike
 # 
-# The regular expression or the object with overloaded operator `qr`.
+# Регулярное выражение или объект с перегруженным оператором `qr`.
 # 
 ::done_testing; }; subtest 'RegexpLike' => sub { 
 ::is scalar do {ref(qr//)}, "Regexp", 'ref(qr//)  # => Regexp';
-::is scalar do {Scalar::Util::reftype(qr//)}, "REGEXP", 'Scalar::Util::reftype(qr//)  # => REGEXP';
+::is scalar do {Scalar::Util::reftype(qr//)}, "REGEXP", 'Scalar::Util::reftype(qr//) # => REGEXP';
 
 my $regex = bless qr//, "A";
 ::is scalar do {Scalar::Util::reftype($regex)}, "REGEXP", 'Scalar::Util::reftype($regex) # => REGEXP';
 
-::is scalar do {$regex ~~ RegexpLike}, scalar do{1}, '$regex ~~ RegexpLike	# -> 1';
-::is scalar do {qr// ~~ RegexpLike}, scalar do{1}, 'qr// ~~ RegexpLike		# -> 1';
-::is scalar do {"" ~~ RegexpLike}, scalar do{""}, '"" ~~ RegexpLike		# -> ""';
+::is scalar do {$regex ~~ RegexpLike}, scalar do{1}, '$regex ~~ RegexpLike # -> 1';
+::is scalar do {qr// ~~ RegexpLike}, scalar do{1}, 'qr// ~~ RegexpLike   # -> 1';
+::is scalar do {"" ~~ RegexpLike}, scalar do{""}, '"" ~~ RegexpLike     # -> ""';
 
 package RegexpLikeExample {
-	use overload 'qr' => sub { qr/abc/ };
+ use overload 'qr' => sub { qr/abc/ };
 }
 
-::is scalar do {"RegexpLikeExample" ~~ RegexpLike}, scalar do{""}, '"RegexpLikeExample" ~~ RegexpLike	# -> ""';
-::is scalar do {bless({}, "RegexpLikeExample") ~~ RegexpLike}, scalar do{1}, 'bless({}, "RegexpLikeExample") ~~ RegexpLike	# -> 1';
+::is scalar do {"RegexpLikeExample" ~~ RegexpLike}, scalar do{""}, '"RegexpLikeExample" ~~ RegexpLike # -> ""';
+::is scalar do {bless({}, "RegexpLikeExample") ~~ RegexpLike}, scalar do{1}, 'bless({}, "RegexpLikeExample") ~~ RegexpLike # -> 1';
 
 # 
 # ## CodeLike
 # 
-# The subroutines.
+# Подпрограмма или объект с перегруженным оператором `&{}`.
 # 
 ::done_testing; }; subtest 'CodeLike' => sub { 
-::is scalar do {sub {} ~~ CodeLike}, scalar do{1}, 'sub {} ~~ CodeLike		# -> 1';
-::is scalar do {\&CodeLike ~~ CodeLike}, scalar do{1}, '\&CodeLike ~~ CodeLike  # -> 1';
-::is scalar do {{} ~~ CodeLike}, scalar do{""}, '{} ~~ CodeLike		  # -> ""';
+::is scalar do {sub {} ~~ CodeLike}, scalar do{1}, 'sub {} ~~ CodeLike     # -> 1';
+::is scalar do {\&CodeLike ~~ CodeLike}, scalar do{1}, '\&CodeLike ~~ CodeLike # -> 1';
+::is scalar do {{} ~~ CodeLike}, scalar do{""}, '{} ~~ CodeLike         # -> ""';
 
 # 
 # ## ArrayLike`[A]
 # 
-# The arrays or objects with  or overloaded operator `@{}`.
+# Массивы или объекты с перегруженным оператором или `@{}`.
 # 
 ::done_testing; }; subtest 'ArrayLike`[A]' => sub { 
-::is scalar do {{} ~~ ArrayLike}, scalar do{""}, '{} ~~ ArrayLike			# -> ""';
-::is scalar do {{} ~~ ArrayLike[Int]}, scalar do{""}, '{} ~~ ArrayLike[Int]	# -> ""';
+::is scalar do {{} ~~ ArrayLike}, scalar do{""}, '{} ~~ ArrayLike      # -> ""';
+::is scalar do {{} ~~ ArrayLike[Int]}, scalar do{""}, '{} ~~ ArrayLike[Int] # -> ""';
 
-::is scalar do {[] ~~ ArrayLike}, scalar do{1}, '[] ~~ ArrayLike		# -> 1';
+::is scalar do {[] ~~ ArrayLike}, scalar do{1}, '[] ~~ ArrayLike # -> 1';
 
 package ArrayLikeExample {
 	use overload '@{}' => sub {
@@ -1300,23 +1400,23 @@ package ArrayLikeExample {
 
 my $x = bless {}, 'ArrayLikeExample';
 $x->[1] = 12;
-::is_deeply scalar do {$x->{array}}, scalar do {[undef, 12]}, '$x->{array}  # --> [undef, 12]';
+::is_deeply scalar do {$x->{array}}, scalar do {[undef, 12]}, '$x->{array} # --> [undef, 12]';
 
-::is scalar do {$x ~~ ArrayLike}, scalar do{1}, '$x ~~ ArrayLike	# -> 1';
+::is scalar do {$x ~~ ArrayLike}, scalar do{1}, '$x ~~ ArrayLike # -> 1';
 
-::is scalar do {$x ~~ ArrayLike[Int]}, scalar do{""}, '$x ~~ ArrayLike[Int]	# -> ""';
+::is scalar do {$x ~~ ArrayLike[Int]}, scalar do{""}, '$x ~~ ArrayLike[Int] # -> ""';
 
 $x->[0] = 13;
-::is scalar do {$x ~~ ArrayLike[Int]}, scalar do{1}, '$x ~~ ArrayLike[Int]	# -> 1';
+::is scalar do {$x ~~ ArrayLike[Int]}, scalar do{1}, '$x ~~ ArrayLike[Int] # -> 1';
 
 # 
 # ## HashLike`[A]
 # 
-# The hashes or objects with overloaded operator `%{}`.
+# Хэши или объекты с перегруженным оператором `%{}`.
 # 
 ::done_testing; }; subtest 'HashLike`[A]' => sub { 
-::is scalar do {{} ~~ HashLike}, scalar do{1}, '{} ~~ HashLike		# -> 1';
-::is scalar do {[] ~~ HashLike}, scalar do{""}, '[] ~~ HashLike		# -> ""';
+::is scalar do {{} ~~ HashLike}, scalar do{1}, '{} ~~ HashLike  # -> 1';
+::is scalar do {[] ~~ HashLike}, scalar do{""}, '[] ~~ HashLike  # -> ""';
 ::is scalar do {[] ~~ HashLike[Int]}, scalar do{""}, '[] ~~ HashLike[Int] # -> ""';
 
 package HashLikeExample {
@@ -1329,9 +1429,9 @@ my $x = bless [], 'HashLikeExample';
 $x->{key} = 12.3;
 ::is_deeply scalar do {$x->[0]}, scalar do {{key => 12.3}}, '$x->[0]  # --> {key => 12.3}';
 
-::is scalar do {$x ~~ HashLike}, scalar do{1}, '$x ~~ HashLike		   # -> 1';
-::is scalar do {$x ~~ HashLike[Int]}, scalar do{""}, '$x ~~ HashLike[Int]	# -> ""';
-::is scalar do {$x ~~ HashLike[Num]}, scalar do{1}, '$x ~~ HashLike[Num]	# -> 1';
+::is scalar do {$x ~~ HashLike}, scalar do{1}, '$x ~~ HashLike      # -> 1';
+::is scalar do {$x ~~ HashLike[Int]}, scalar do{""}, '$x ~~ HashLike[Int] # -> ""';
+::is scalar do {$x ~~ HashLike[Num]}, scalar do{1}, '$x ~~ HashLike[Num] # -> 1';
 
 # 
 # # AUTHOR

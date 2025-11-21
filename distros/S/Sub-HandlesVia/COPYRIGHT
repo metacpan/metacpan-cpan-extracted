@@ -32,6 +32,9 @@ Files: Changes
  lib/Sub/HandlesVia/Toolkit/ObjectPad.pm.mite.pm
  lib/Sub/HandlesVia/Toolkit/Plain.pm
  lib/Sub/HandlesVia/Toolkit/Plain.pm.mite.pm
+ t/02moo/modifiers.t
+ t/03moo_mxtt.t
+ t/03moo_mxtth.t
  t/30egpod/array.t
  t/30egpod/bool.t
  t/30egpod/code.t
@@ -76,7 +79,6 @@ Files: dist.ini
  t/02moo.t
  t/02moo/ext_attr.t
  t/02moo/roles-multiple.t
- t/03moo_mxtt.t
  t/04moose.t
  t/04moose/ext_attr.t
  t/04moose/role.t

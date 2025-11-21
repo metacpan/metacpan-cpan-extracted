@@ -1,0 +1,73 @@
+!ru:en,badges
+# NAME
+
+Aion::Annotation - обрабатывает аннотации в модулях perl
+
+# VERSION
+
+0.0.2-prealpha
+
+# SYNOPSIS
+
+Файл lib/For/Test.pm:
+```perl
+package For::Test;
+# The package for testing
+#@deprecated for_test
+
+#@deprecated
+#@todo add1
+# Is property
+#   readonly
+has abc => (is => 'ro');
+
+#@todo add2
+sub xyz {}
+
+1;
+```
+
+```perl
+use Aion::Annotation;
+
+Aion::Annotation->new->scan;
+
+open my $f, '<', 'etc/annotation/modules.mtime.ini' or die $!; my @modules_mtime = <$f>; chop for @modules_mtime; close $f;
+open my $f, '<', 'etc/annotation/remarks.ini' or die $!; my @remarks = <$f>; chop for @remarks; close $f;
+open my $f, '<', 'etc/annotation/todo.ann' or die $!; my @todo = <$f>; chop for @todo; close $f;
+open my $f, '<', 'etc/annotation/deprecated.ann' or die $!; my @deprecated = <$f>; chop for @deprecated; close $f;
+
+0+@modules_mtime  # -> 1
+$modules_mtime[0] # ~> ^For::Test=\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d$
+\@remarks         # --> ['For::Test#=The package for testing', 'For::Test#abc=Is property\n  readonly']
+\@todo            # --> ['For::Test#abc=add1', 'For::Test#xyz=add2']
+\@deprecated      # --> ['For::Test#=for_test', 'For::Test#abc=']
+```
+
+# DESCRIPTION
+
+`Aion::Annotation` сканирует модули perl в каталоге **lib** и распечатывает их в соответстующие файлы в каталоге **etc/annotation**.
+
+Сменить **lib** можно через конфиг `LIB`, а **etc/annotation** через конфиг `INI`.
+
+1. В **modules.mtime.ini** хранятся времена последнего обновления модулей.
+2. В **remarks.ini** сохраняются комментарии к подпрограммам, свойствам и пакетам.
+3. В файлах **имя.ann** сохраняются аннотации по своим именам.
+
+# SUBROUTINES/METHODS
+
+## scan ()
+
+Сканирует кодовую базу задаваемую конфигом `LIB` (перечень каталогов, по умолчанию `["lib"]`). И достаёт все аннотации и комментарии и распечатывает их в соответстующие файлы в каталоге `INI` (по умолчанию "etc/annotation").
+
+# AUTHOR
+
+Yaroslav O. Kosmina <dart@cpan.org>
+
+# LICENSE
+
+⚖ **GPLv3**
+
+# COPYRIGHT
+
+The Aion::Annotation module is copyright © 2025 Yaroslav O. Kosmina. Rusland. All rights reserved.

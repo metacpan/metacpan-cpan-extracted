@@ -1,5 +1,20 @@
 Revision history for Perl module JSON::Schema::Validate
 
+v0.5.1 2025-11-20T16:07:53+0900
+    - Fixed _k_combinator to avoid leaking errors from anyOf/oneOf branches
+      into the main validation context; only the selected branch now contributes
+      errors and annotations.
+    - Fixed _k_if_then_else so that the "if" subschema is always evaluated in a
+      shadow context. Keywords such as "required" inside "if" no longer produce
+      spurious failures when the condition is not satisfied; only "then"/"else"
+      affect the outcome.
+    - Improved error reporting to include both the schema pointer and the
+      instance path, along with required vs present properties, which makes
+      debugging nested combinators (anyOf/oneOf/if/then/not) much easier.
+    - Added regression tests covering if/then with conditional "required", and
+      a oneOf-based "shares" schema combining simple totals and share classes,
+      including edge cases around "golden" and "no voting right" shares.
+
 v0.5.0 2025-11-19T18:15:12+0900
     [Bug Fixes]
     - Corrected bad unit tests (thanks Slaven Rezić, GitLab #3).

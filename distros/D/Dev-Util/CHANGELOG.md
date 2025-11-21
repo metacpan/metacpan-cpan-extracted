@@ -2,6 +2,63 @@
 
 All notable changes to this project will be documented in this file.
 
+## [version/v2.19.11] - 2025-11-20
+
+### 🐛 Bug Fixes
+
+- *(query)* Make yes_no_prompt return 1 or 0 as the API specifies
+
+### ⚙️ Miscellaneous Tasks
+
+- *(version)* Bump version patch level
+
+## [release/2025/11/20/1836] - 2025-11-20
+
+### 📚 Documentation
+
+- *(changelog)* Update changelog
+
+## [version/v2.19.10] - 2025-11-20
+
+### 🐛 Bug Fixes
+
+- *(query)* Return value of response, not IO::Prompt::ReturnVal
+- *(banner)* Explicitly specify Term::ReadKey::GetTerminalSize()
+
+### ⚙️ Miscellaneous Tasks
+
+- *(version)* Bump version patch level
+
+### 🎨 Styling
+
+- *(spelling)* Fix typo, add to dictionary
+
+## [release/2025/11/20/1406] - 2025-11-20
+
+### 📚 Documentation
+
+- *(changelog)* Update changelog
+
+## [version/v2.19.8] - 2025-11-20
+
+### ⚙️ Miscellaneous Tasks
+
+- *(version)* Bump version patch level
+
+### 🚜 Refactor
+
+- *(manifest)* Cleanup manifest skip file
+
+### 📚 Documentation
+
+- *(pod)* Improve sub-module descritions in Util.pm for CPAN
+
+## [release/2025/11/19/0732] - 2025-11-19
+
+### 📚 Documentation
+
+- *(changelog)* Update changelog
+
 ## [version/v2.19.7] - 2025-11-19
 
 ### 🐛 Bug Fixes

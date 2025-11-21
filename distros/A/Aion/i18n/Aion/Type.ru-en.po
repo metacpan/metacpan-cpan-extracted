@@ -1,0 +1,122 @@
+msgid "Aion::Type - класс валидаторов"
+msgstr "Aion::Type - class of validators"
+
+msgid "Порождает валидаторы. Используется в `Aion::Types::subtype`."
+msgstr "Spawns validators. Used in `Aion::Types::subtype`."
+
+msgid "Конструктор."
+msgstr "Constructor."
+
+msgid ""
+"* name (Str) — Название типа.\n"
+"* args (ArrayRef) — Список аргументов типа.\n"
+"* init (CodeRef) — Инициализатор типа.\n"
+"* test (CodeRef) — Чекер.\n"
+"* a_test (CodeRef) — Чекер значений для типов с необязательными аргументами.\n"
+"* coerce (ArrayRef[Tuple[Aion::Type, CodeRef]]) — Массив пар: тип и переход."
+msgstr ""
+"* name (Str) — Type name.\n"
+"* args (ArrayRef) — List of type arguments.\n"
+"* init (CodeRef) — Type initializer.\n"
+"* test (CodeRef) - Checker.\n"
+"* a_test (CodeRef) — Value checker for types with optional arguments.\n"
+"* coerce (ArrayRef[Tuple[Aion::Type, CodeRef]]) - Array of pairs: type and transition."
+
+msgid "Строковое преобразование объекта (имя с аргументами):"
+msgstr "String conversion of object (name with arguments):"
+
+msgid "Операции так же преобразуются в строку:"
+msgstr "Operations are also converted to a string:"
+
+msgid "Операции — это объекты `Aion::Type` со специальными именами:"
+msgstr "Operations are `Aion::Type` objects with special names:"
+
+msgid "Тестирует, что `$_` принадлежит классу."
+msgstr "Tests that `$_` belongs to a class."
+
+msgid "Инициализатор валидатора."
+msgstr "Validator initializer."
+
+msgid "Проверяет, принадлежит ли аргумент классу."
+msgstr "Checks whether the argument belongs to the class."
+
+msgid "Проверяет, что аргумент не принадлежит классу."
+msgstr "Checks that the argument does not belong to the class."
+
+msgid "Привести `$value` к типу, если приведение из типа и функции находится в `$self->{coerce}`."
+msgstr "Cast `$value` to type if the cast from type and function is in `$self->{coerce}`."
+
+msgid "Формирует сообщение ошибки."
+msgstr "Generates an error message."
+
+msgid "Проверяет `$element` и выбрасывает сообщение `detail`, если элемент не принадлежит классу."
+msgstr "Checks `$element` and throws a `detail` message if the element does not belong to the class."
+
+msgid "Переводит `$val` в строку."
+msgstr "Converts `$val` to a string."
+
+msgid "Определяет, что тип является подтипом другого `$type`."
+msgstr "Specifies that a type is a subtype of another `$type`."
+
+msgid "Создаёт подпрограмму без аргументов, которая возвращает тип."
+msgstr "Creates a subroutine with no arguments that returns a type."
+
+msgid "Свойство `init` не может использоваться с `make`."
+msgstr "The `init` property cannot be used with `make`."
+
+msgid "Создает подпрограмму с аргументами, которая возвращает тип."
+msgstr "Creates a subroutine with arguments that returns a type."
+
+msgid "Если подпрограмма не может быть создана, то выбрасывается исключение."
+msgstr "If the routine cannot be created, an exception is thrown."
+
+msgid "Типы равны, если они имеют одинаковое имя, одинаковое количество аргументов, родительский элемент и аргументы равны."
+msgstr "Types are equal if they have the same name, the same number of arguments, the parent element, and the arguments are equal."
+
+msgid "Обратная операция к `equal`."
+msgstr "The reverse operation of `equal`."
+
+msgid "Список аргументов."
+msgstr "List of arguments."
+
+msgid "Имя типа."
+msgstr "Type name."
+
+msgid "Родительский тип."
+msgstr "Parent type."
+
+msgid "Акцессор сообщения. Использует `&message` для генерации сообщения об ошибке."
+msgstr "Message accessor. Uses `&message` to generate an error message."
+
+msgid "Акцессор заголовка (используется для создания схемы **swagger**)."
+msgstr "Header accessor (used to create the **swagger** schema)."
+
+msgid "Акцессор описания (используется для создания схемы **swagger**)."
+msgstr "Description accessor (used to create a **swagger** schema)."
+
+msgid "Делает объект вызываемым."
+msgstr "Makes the object callable."
+
+msgid "Стрингифицирует объект."
+msgstr "Strings an object."
+
+msgid "Создает новый тип как объединение `$a` и `$b`."
+msgstr "Creates a new type as the union of `$a` and `$b`."
+
+msgid "Создает новый тип как пересечение `$a` и `$b`."
+msgstr "Creates a new type as the intersection of `$a` and `$b`."
+
+msgid "Создает новый тип как исключение из `$a`."
+msgstr "Creates a new type as an exception to `$a`."
+
+msgid "`$a` равно `$b`."
+msgstr "`$a` is equal to `$b`."
+
+msgid "`$a` не равно `$b`."
+msgstr "`$a` is not equal to `$b`."
+
+msgid "⚖ **GPLv3**"
+msgstr "⚖ **GPLv3**"
+
+msgid "The Aion::Type module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All rights reserved."
+msgstr "The Aion::Type module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All rights reserved."

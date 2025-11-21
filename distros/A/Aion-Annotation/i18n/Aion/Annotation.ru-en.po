@@ -1,0 +1,30 @@
+msgid "Aion::Annotation - обрабатывает аннотации в модулях perl"
+msgstr "Aion::Annotation - processes annotations in perl modules"
+
+msgid "Файл lib/For/Test.pm:"
+msgstr "lib/For/Test.pm file:"
+
+msgid "`Aion::Annotation` сканирует модули perl в каталоге **lib** и распечатывает их в соответстующие файлы в каталоге **etc/annotation**."
+msgstr "`Aion::Annotation` scans the perl modules in the **lib** directory and prints them to the corresponding files in the **etc/annotation** directory."
+
+msgid "Сменить **lib** можно через конфиг `LIB`, а **etc/annotation** через конфиг `INI`."
+msgstr "You can change **lib** through the `LIB` config, and **etc/annotation** through the `INI` config."
+
+msgid ""
+"1. В **modules.mtime.ini** хранятся времена последнего обновления модулей.\n"
+"2. В **remarks.ini** сохраняются комментарии к подпрограммам, свойствам и пакетам.\n"
+"3. В файлах **имя.ann** сохраняются аннотации по своим именам."
+msgstr ""
+"1. **modules.mtime.ini** stores the times of the last module update.\n"
+"2. **remarks.ini** stores comments for routines, properties and packages.\n"
+"3. The **name.ann** files save annotations by their names."
+
+msgid "Сканирует кодовую базу задаваемую конфигом `LIB` (перечень каталогов, по умолчанию `[\"lib\"]`). И достаёт все аннотации и комментарии и распечатывает их в соответстующие файлы в каталоге `INI` (по умолчанию \"etc/annotation\")."
+msgstr "Scans the codebase specified by the `LIB` config (list of directories, default `[\"lib\"]`). And it takes out all the annotations and comments and prints them into the corresponding files in the `INI` directory (by default \"etc/annotation\")."
+
+msgid "⚖ **GPLv3**"
+msgstr "⚖ **GPLv3**"
+
+msgid "The Aion::Annotation module is copyright © 2025 Yaroslav O. Kosmina. Rusland. All rights reserved."
+msgstr "The Aion::Annotation module is copyright © 2025 Yaroslav O. Kosmina. Rusland. All Rights Reserved."
+

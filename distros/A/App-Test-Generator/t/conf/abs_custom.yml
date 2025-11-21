@@ -1,0 +1,39 @@
+---
+module: builtin
+function: abs
+
+config:
+  test_undef: no
+  properties:
+    enable: true
+    trials: 500
+
+input:
+  number:
+    type: number
+    position: 0
+
+output:
+  type: number
+  min: 0
+
+transforms:
+  all_numbers:
+    input:
+      number:
+        type: number
+    output:
+      type: number
+      min: 0
+    properties:
+      - name: magnitude_preserved
+        description: "abs value equals magnitude"
+        code: "$result == abs($number)"
+
+      - name: double_application
+        description: "abs(abs(x)) == abs(x)"
+        code: "abs(abs($number)) == abs($number)"
+
+      - name: zero_preserved
+        description: "abs(0) == 0"
+        code: "$number == 0 ? $result == 0 : 1"

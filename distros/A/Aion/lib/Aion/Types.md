@@ -1,6 +1,7 @@
+!ru:en
 # NAME
 
-Aion::Types is a library of validators. And it makes new validators
+Aion::Types - библиотека стандартных валидаторов и служит для создания новых валидаторов
 
 # SYNOPSIS
 
@@ -34,13 +35,13 @@ IntOrArrayRef->coerce(5.5) # => 6
 
 # DESCRIPTION
 
-This module export subroutines:
+Этот модуль экспортирует подпрограммы:
 
-* `subtype`, `as`, `init_where`, `where`, `awhere`, `message` — for create validators.
-* `SELF`, `ARGS`, `A`, `B`, `C`, `D`, `M`, `N` — for use in validators has arguments.
-* `coerce`, `from`, `via` — for create coerce, using for translate values from one class to other class.
+* `subtype`, `as`, `init_where`, `where`, `awhere`, `message` — для создания валидаторов.
+* `SELF`, `ARGS`, `A`, `B`, `C`, `D`, `M`, `N` — для использования в валидаторах типа и его аргументов.
+* `coerce`, `from`, `via` — для создания конвертора значений из одного класса в другой.
 
-Hierarhy of validators:
+Иерархия валидаторов:
 
 ```text
 Any
@@ -85,11 +86,15 @@ Any
 				Tied`[A]
 				LValueRef
 				FormatRef
-				CodeRef
+				CodeRef`[name, proto]
+					ReachableCodeRef`[name, proto]
+					UnreachableCodeRef`[name, proto]
 				RegexpRef
-				ScalarRef`[A]
-				RefRef`[A]
-				GlobRef`[A]
+				ScalarRefRef`[A]
+					RefRef`[A]
+					ScalarRef`[A]
+				GlobRef
+					FileHandle
 				ArrayRef`[A]
 				HashRef`[H]
 				Object`[O]
@@ -118,14 +123,13 @@ Any
 					Range[from, to]
 					Bytes[A, B?]
 					PositiveBytes[A, B?]
-
 ```
 
 # SUBROUTINES
 
 ## subtype ($name, @paraphernalia)
 
-Make new type.
+Создаёт новый тип.
 
 ```perl
 BEGIN {
@@ -137,7 +141,7 @@ BEGIN {
 eval { One->validate(0) }; $@ # ~> Actual 1 only!
 ```
 
-`where` and `message` is syntax sugar, and `subtype` can be used without them.
+`where` и `message` — это синтаксический сахар, а `subtype` можно использовать без них.
 
 ```perl
 BEGIN {
@@ -151,13 +155,13 @@ eval { subtype Many => (where1 => sub { $_ > 1 }) }; $@ # ~> subtype Many unused
 eval { subtype 'Many' }; $@ # ~> subtype Many: main::Many exists!
 ```
 
-## as ($parenttype)
+## as ($super_type)
 
-Use with `subtype` for extended create type of `$parenttype`.
+Используется с `subtype` для расширения создаваемого типа `$super_type`.
 
 ## init_where ($code)
 
-Initialize type with new arguments. Use with `subtype`.
+Инициализирует тип с новыми аргументами. Используется с `subtype`.
 
 ```perl
 BEGIN {
@@ -173,7 +177,7 @@ eval { LessThen["string"] }; $@  # ~> Argument LessThen\[A\]
 
 ## where ($code)
 
-Set in type `$code` as test. Value for test set in `$_`.
+Использует `$code` как тест. Значение для теста передаётся в `$_`.
 
 ```perl
 BEGIN {
@@ -185,17 +189,17 @@ BEGIN {
 3 ~~ Two # -> ""
 ```
 
-Use with `subtype`. Need if is the required arguments.
+Используется с `subtype`. Необходимо, если у типа есть аргументы.
 
 ```perl
-eval { subtype 'Ex[A]' }; $@  # ~> subtype Ex\[A\]: needs a where
+subtype 'Ex[A]' # @-> subtype Ex[A]: needs a where
 ```
 
 ## awhere ($code)
 
-Use with `subtype`.
+Используется с `subtype`.
 
-If type maybe with and without arguments, then use for set test with arguments, and `where` - without.
+Если тип может быть с аргументами и без, то используется для проверки набора с аргументами, а `where` — без.
 
 ```perl
 BEGIN {
@@ -205,18 +209,18 @@ BEGIN {
 	;
 }
 
-0 ~~ GreatThen	# -> ""
-1 ~~ GreatThen	# -> 1
+0 ~~ GreatThen # -> ""
+1 ~~ GreatThen # -> 1
 
 3 ~~ GreatThen[3] # -> ""
 4 ~~ GreatThen[3] # -> 1
 ```
 
-Need if arguments is optional.
+Необходимо, если аргументы необязательны.
 
 ```perl
-eval { subtype 'Ex`[A]', where {} }; $@  # ~> subtype Ex`\[A\]: needs a awhere
-eval { subtype 'Ex', awhere {} }; $@  # ~> subtype Ex: awhere is excess
+subtype 'Ex`[A]', where {} # @-> subtype Ex`[A]: needs a awhere
+subtype 'Ex', awhere {} # @-> subtype Ex: awhere is excess
 
 BEGIN {
 	subtype 'MyEnum`[A...]',
@@ -230,29 +234,29 @@ BEGIN {
 
 ## SELF
 
-The current type. `SELF` use in `init_where`, `where` and `awhere`.
+Текущий тип. `SELF` используется в `init_where`, `where` и `awhere`.
 
 ## ARGS
 
-Arguments of the current type. In scalar context returns array ref on the its. And in array context returns its. Use in `init_where`, `where` and `awhere`.
+Аргументы текущего типа. В скалярном контексте возвращает ссылку на массив, а в контексте массива возвращает список. Используется в `init_where`, `where` и `awhere`.
 
 ## A, B, C, D
 
-First, second, third and fifth argument of the type.
+Первый, второй, третий и пятый аргумент типа.
 
 ```perl
 BEGIN {
 	subtype "Seria[A,B,C,D]", where { A < B && B < $_ && $_ < C && C < D };
 }
 
-2.5 ~~ Seria[1,2,3,4]   # -> 1
+2.5 ~~ Seria[1,2,3,4] # -> 1
 ```
 
-Use in `init_where`, `where` and `awhere`.
+Используется в `init_where`, `where` и `awhere`.
 
 ## M, N
 
-`M` and `N` is the reduction for `SELF->{M}` and `SELF->{N}`.
+`M` и `N` сокращение для `SELF->{M}` и `SELF->{N}`.
 
 ```perl
 BEGIN {
@@ -264,26 +268,26 @@ BEGIN {
 		where { $_ =~ N && $_ =~ M };
 }
 
-"Hi, my dear!" ~~ BeginAndEnd["Hi,", "!"];   # -> 1
-"Hi my dear!" ~~ BeginAndEnd["Hi,", "!"];   # -> ""
+"Hi, my dear!" ~~ BeginAndEnd["Hi,", "!"]; # -> 1
+"Hi my dear!" ~~ BeginAndEnd["Hi,", "!"];  # -> ""
 
-"" . BeginAndEnd["Hi,", "!"]   # => BeginAndEnd['Hi,', '!']
+"" . BeginAndEnd["Hi,", "!"] # => BeginAndEnd['Hi,', '!']
 ```
 
 ## message ($code)
 
-Use with `subtype` for make the message on error, if the value excluded the type. In `$code` use subroutine: `SELF` - the current type, `ARGS`, `A`, `B`, `C`, `D` - arguments of type (if is), and the testing value in `$_`. It can be stringified using `SELF->val_to_str($_)`.
+Используется с `subtype` для вывода сообщения об ошибке, если значение исключает тип. В `$code` используется: `SELF` - текущий тип, `ARGS`, `A`, `B`, `C`, `D` - аргументы типа (если есть) и проверочное значение в `$_`. Его можно преобразовать в строку с помощью `SELF->val_to_str($_)`.
 
 ## coerce ($type, from => $from, via => $via)
 
-It add new coerce ($via) to `$type` from `$from`-type.
+Добавляет новое приведение (`$via`) к `$type` из `$from` типа.
 
 ```perl
 BEGIN {subtype Four => where {4 eq $_}}
 
-"4a" ~~ Four	# -> ""
+"4a" ~~ Four # -> ""
 
-Four->coerce("4a")	# -> "4a"
+Four->coerce("4a") # -> "4a"
 
 coerce Four, from Str, via { 0+$_ };
 
@@ -296,7 +300,7 @@ Four->coerce([1,2,3]) ~~ Four   # -> ""
 Four->coerce([1,2,3,4]) ~~ Four # -> 1
 ```
 
-`coerce` throws exeptions:
+`coerce` выбрасывает исключения:
 
 ```perl
 eval {coerce Int, via1 => 1}; $@  # ~> coerce Int unused keys left: via1
@@ -307,34 +311,34 @@ eval {coerce Int, from Num}; $@  # ~> coerce Int: via is not subroutine!
 eval {coerce Int, (from=>Num, via=>"x")}; $@  # ~> coerce Int: via is not subroutine!
 ```
 
-Standart coerces:
+Стандартные приведения:
 
 ```perl
 # Str from Undef — empty string
 Str->coerce(undef) # -> ""
 
 # Int from Num — rounded integer
-Int->coerce(2.5) # -> 3
+Int->coerce(2.5)  # -> 3
 Int->coerce(-2.5) # -> -3
 
 # Bool from Any — 1 or ""
-Bool->coerce([])	# -> 1
-Bool->coerce(0)		# -> ""
+Bool->coerce([]) # -> 1
+Bool->coerce(0)  # -> ""
 ```
 
 ## from ($type)
 
-Syntax sugar for `coerce`.
+Синтаксический сахар для `coerce`.
 
 ## via ($code)
 
-Syntax sugar for `coerce`.
+Синтаксический сахар для `coerce`.
 
 # ATTRIBUTES
 
 ## :Isa (@signature)
 
-Check the subroutine signature: arguments and returns.
+Проверяет сигнатуру подпрограммы: аргументы и результаты.
 
 ```perl
 sub minint($$) : Isa(Int => Int => Int) {
@@ -358,62 +362,62 @@ eval {half 5}; $@ # ~> Return of method `half` must have the type Int. The it is
 
 ## Any
 
-Top-level type in the hierarchy. Match all.
+Тип верхнего уровня в иерархии. Сопоставляет всё.
 
 ## Control
 
-Top-level type in the hierarchy constructors new types from any types.
+Тип верхнего уровня в конструкторах иерархии создает новые типы из любых типов.
 
 ## Union[A, B...]
 
-Union many types. It analog operator `$type1 | $type2`.
+Союз нескольких типов. Аналогичен оператору `$type1 | $type2`.
 
 ```perl
-33  ~~ Union[Int, Ref]	# -> 1
+33  ~~ Union[Int, Ref] # -> 1
 []  ~~ Union[Int, Ref]	# -> 1
 "a" ~~ Union[Int, Ref]	# -> ""
 ```
 
 ## Intersection[A, B...]
 
-Intersection many types. It analog operator `$type1 & $type2`.
+Пересечение нескольких типов. Аналогичен оператору `$type1 & $type2`.
 
 ```perl
-15 ~~ Intersection[Int, StrMatch[/5/]]	# -> 1
+15 ~~ Intersection[Int, StrMatch[/5/]] # -> 1
 ```
 
 ## Exclude[A, B...]
 
-Exclude many types. It analog operator `~ $type`.
+Исключение нескольких типов. Аналогичен оператору `~ $type`.
 
 ```perl
--5  ~~ Exclude[PositiveInt]	# -> 1
-"a" ~~ Exclude[PositiveInt]	# -> 1
-5   ~~ Exclude[PositiveInt]	# -> ""
-5.5 ~~ Exclude[PositiveInt]	# -> 1
+-5  ~~ Exclude[PositiveInt] # -> 1
+"a" ~~ Exclude[PositiveInt] # -> 1
+5   ~~ Exclude[PositiveInt] # -> ""
+5.5 ~~ Exclude[PositiveInt] # -> 1
 ```
 
-If `Exclude` has many arguments, then this analog `~ ($type1 | $type2 ...)`.
+Если `Exclude` имеет много аргументов, то это аналог `~ ($type1 | $type2 ...)`.
 
 ```perl
--5  ~~ Exclude[PositiveInt, Enum[-2]]	# -> 1
--2  ~~ Exclude[PositiveInt, Enum[-2]]	# -> ""
-0   ~~ Exclude[PositiveInt, Enum[-2]]	# -> ""
+-5  ~~ Exclude[PositiveInt, Enum[-2]] # -> 1
+-2  ~~ Exclude[PositiveInt, Enum[-2]] # -> ""
+0   ~~ Exclude[PositiveInt, Enum[-2]] # -> ""
 ```
 
 ## Option[A]
 
-The optional keys in the `Dict`.
+Дополнительные ключи в `Dict`.
 
 ```perl
-{a=>55} ~~ Dict[a=>Int, b => Option[Int]] # -> 1
-{a=>55, b=>31} ~~ Dict[a=>Int, b => Option[Int]] # -> 1
+{a=>55} ~~ Dict[a=>Int, b => Option[Int]]          # -> 1
+{a=>55, b=>31} ~~ Dict[a=>Int, b => Option[Int]]   # -> 1
 {a=>55, b=>31.5} ~~ Dict[a=>Int, b => Option[Int]] # -> ""
 ```
 
 ## Wantarray[A, S]
 
-if the subroutine returns different values in the context of an array and a scalar, then using type `Wantarray` with type `A` for array context and type `S` for scalar context.
+Если подпрограмма возвращает разные значения в контексте массива и скаляра, то используется тип `Wantarray` с типом `A` для контекста массива и типом `S` для скалярного контекста.
 
 ```perl
 sub arr : Isa(PositiveInt => Wantarray[ArrayRef[PositiveInt], PositiveInt]) {
@@ -424,85 +428,85 @@ sub arr : Isa(PositiveInt => Wantarray[ArrayRef[PositiveInt], PositiveInt]) {
 my @a = arr(3);
 my $s = arr(3);
 
-\@a  # --> [1,2,3]
-$s	 # -> 3
+\@a # --> [1,2,3]
+$s  # -> 3
 ```
 
 ## Item
 
-Top-level type in the hierarchy scalar types.
+Тип верхнего уровня в иерархии скалярных типов.
 
 ## Bool
 
 `1` is true. `0`, `""` or `undef` is false.
 
 ```perl
-1 ~~ Bool	 # -> 1
-0 ~~ Bool	 # -> 1
+1 ~~ Bool  # -> 1
+0 ~~ Bool  # -> 1
 undef ~~ Bool # -> 1
-"" ~~ Bool	# -> 1
+"" ~~ Bool # -> 1
 
-2 ~~ Bool	 # -> ""
-[] ~~ Bool	# -> ""
+2 ~~ Bool  # -> ""
+[] ~~ Bool # -> ""
 ```
 
 ## Enum[A...]
 
-Enumerate values.
+Перечисление.
 
 ```perl
-3 ~~ Enum[1,2,3]			# -> 1
+3 ~~ Enum[1,2,3]   # -> 1
 "cat" ~~ Enum["cat", "dog"] # -> 1
-4 ~~ Enum[1,2,3]			# -> ""
+4 ~~ Enum[1,2,3]   # -> ""
 ```
 
 ## Maybe[A]
 
-`undef` or type in `[]`.
+`undef` или тип в `[]`.
 
 ```perl
-undef ~~ Maybe[Int]	# -> 1
-4 ~~ Maybe[Int]		# -> 1
-"" ~~ Maybe[Int]	   # -> ""
+undef ~~ Maybe[Int] # -> 1
+4 ~~ Maybe[Int]     # -> 1
+"" ~~ Maybe[Int]    # -> ""
 ```
 
 ## Undef
 
-`undef` only.
+Только `undef`.
 
 ```perl
-undef ~~ Undef	# -> 1
-0 ~~ Undef		# -> ""
+undef ~~ Undef # -> 1
+0 ~~ Undef     # -> ""
 ```
 
 ## Defined
 
-All exclude `undef`.
+Всё за исключением `undef`.
 
 ```perl
-\0 ~~ Defined	   # -> 1
-undef ~~ Defined	# -> ""
+\0 ~~ Defined    # -> 1
+undef ~~ Defined # -> ""
 ```
 
 ## Value
 
-Defined unreference values.
+Определённые значения без ссылок.
 
 ```perl
-3 ~~ Value		# -> 1
-\3 ~~ Value	   # -> ""
-undef ~~ Value	# -> ""
+3 ~~ Value  # -> 1
+\3 ~~ Value    # -> ""
+undef ~~ Value # -> ""
 ```
 
 ## Len[A, B?]
 
-Defines the length value from `A` to `B`, or from 0 to `A` if `B` is'nt present.
+Определяет значение длины от `A` до `B` или от 0 до `A`, если `B` отсутствует.
 
 ```perl
 "1234" ~~ Len[3]   # -> ""
-"123" ~~ Len[3]	# -> 1
-"12" ~~ Len[3]	 # -> 1
-"" ~~ Len[1, 2]	# -> ""
+"123" ~~ Len[3]    # -> 1
+"12" ~~ Len[3]     # -> 1
+"" ~~ Len[1, 2]    # -> ""
 "1" ~~ Len[1, 2]   # -> 1
 "12" ~~ Len[1, 2]  # -> 1
 "123" ~~ Len[1, 2] # -> ""
@@ -510,157 +514,157 @@ Defines the length value from `A` to `B`, or from 0 to `A` if `B` is'nt present.
 
 ## Version
 
-Perl versions.
+Perl версии.
 
 ```perl
-1.1.0 ~~ Version	# -> 1
-v1.1.0 ~~ Version   # -> 1
-v1.1 ~~ Version	 # -> 1
-v1 ~~ Version	   # -> 1
-1.1 ~~ Version	  # -> ""
-"1.1.0" ~~ Version  # -> ""
+1.1.0 ~~ Version   # -> 1
+v1.1.0 ~~ Version  # -> 1
+v1.1 ~~ Version    # -> 1
+v1 ~~ Version      # -> 1
+1.1 ~~ Version     # -> ""
+"1.1.0" ~~ Version # -> ""
 ```
 
 ## Str
 
-Strings, include numbers.
+Строки, включая числа.
 
 ```perl
-1.1 ~~ Str		 # -> 1
-"" ~~ Str		  # -> 1
-1.1.0 ~~ Str	   # -> ""
+1.1 ~~ Str   # -> 1
+"" ~~ Str    # -> 1
+1.1.0 ~~ Str # -> ""
 ```
 
 ## Uni
 
-Unicode strings: with utf8-flag or decode to utf8 without error.
+Строки Unicode с флагом utf8 или если декодирование в utf8 происходит без ошибок.
 
 ```perl
-"↭" ~~ Uni	# -> 1
-123 ~~ Uni	# -> ""
-do {no utf8; "↭" ~~ Uni}	# -> 1
+"↭" ~~ Uni # -> 1
+123 ~~ Uni # -> ""
+do {no utf8; "↭" ~~ Uni} # -> 1
 ```
 
 ## Bin
 
-Binary strings: without utf8-flag and octets with numbers less then 128.
+Бинарные строки без флага utf8 и октетов с номерами меньше 128.
 
 ```perl
-123 ~~ Bin	# -> 1
-"z" ~~ Bin	# -> 1
-"↭" ~~ Bin	# -> ""
+123 ~~ Bin # -> 1
+"z" ~~ Bin # -> 1
+"↭" ~~ Bin # -> ""
 do {no utf8; "↭" ~~ Bin }   # -> ""
 ```
 
 ## StartsWith\[S]
 
-The string starts with `S`.
+Строка начинается с `S`.
 
 ```perl
-"Hi, world!" ~~ StartsWith["Hi,"]	# -> 1
-"Hi world!" ~~ StartsWith["Hi,"]	# -> ""
+"Hi, world!" ~~ StartsWith["Hi,"] # -> 1
+"Hi world!" ~~ StartsWith["Hi,"] # -> ""
 ```
 
 ## EndsWith\[S]
 
-The string ends with `S`.
+Строка заканчивается на `S`.
 
 ```perl
-"Hi, world!" ~~ EndsWith["world!"]	# -> 1
-"Hi, world" ~~ EndsWith["world!"]	# -> ""
+"Hi, world!" ~~ EndsWith["world!"] # -> 1
+"Hi, world" ~~ EndsWith["world!"]  # -> ""
 ```
 
 ## NonEmptyStr
 
-String with one or many non-space characters.
+Строка с одним или несколькими символами, не являющимися пробелами.
 
 ```perl
-" " ~~ NonEmptyStr		# -> ""
-" S " ~~ NonEmptyStr	  # -> 1
-" S " ~~ (NonEmptyStr & Len[2])   # -> ""
+" " ~~ NonEmptyStr              # -> ""
+" S " ~~ NonEmptyStr            # -> 1
+" S " ~~ (NonEmptyStr & Len[2]) # -> ""
 ```
 
 ## Email
 
-Strings with `@`.
+Строки с `@`.
 
 ```perl
-'@' ~~ Email	  # -> 1
-'a@a.a' ~~ Email  # -> 1
-'a.a' ~~ Email	# -> ""
+'@' ~~ Email     # -> 1
+'a@a.a' ~~ Email # -> 1
+'a.a' ~~ Email   # -> ""
 ```
 
 ## Tel
 
-Format phones is plus sign and seven or great digits.
+Формат телефонов — знак плюс и семь или больше цифр.
 
 ```perl
-"+1234567" ~~ Tel	# -> 1
-"+1234568" ~~ Tel	# -> 1
-"+ 1234567" ~~ Tel	# -> ""
-"+1234567 " ~~ Tel	# -> ""
+"+1234567" ~~ Tel # -> 1
+"+1234568" ~~ Tel # -> 1
+"+ 1234567" ~~ Tel # -> ""
+"+1234567 " ~~ Tel # -> ""
 ```
 
 ## Url
 
-Web urls is string with prefix http:// or https://.
+URL-адреса веб-сайтов — это строка с префиксом http:// или https://.
 
 ```perl
-"http://" ~~ Url	# -> 1
-"http:/" ~~ Url	# -> ""
+"http://" ~~ Url # -> 1
+"http:/" ~~ Url  # -> ""
 ```
 
 ## Path
 
-The paths starts with a slash.
+Пути начинаются с косой черты.
 
 ```perl
-"/" ~~ Path	 # -> 1
+"/" ~~ Path  # -> 1
 "/a/b" ~~ Path  # -> 1
 "a/b" ~~ Path   # -> ""
 ```
 
 ## Html
 
-The html starts with a `<!doctype` or `<html`.
+HTML начинается с `<!doctype html` или `<html`.
 
 ```perl
-"<HTML" ~~ Html			# -> 1
-" <html" ~~ Html		   # -> 1
+"<HTML" ~~ Html   # -> 1
+" <html" ~~ Html     # -> 1
 " <!doctype html>" ~~ Html # -> 1
-" <html1>" ~~ Html		 # -> ""
+" <html1>" ~~ Html   # -> ""
 ```
 
 ## StrDate
 
-The date is format `yyyy-mm-dd`.
+Дата в формате `yyyy-mm-dd`.
 
 ```perl
-"2001-01-12" ~~ StrDate	# -> 1
-"01-01-01" ~~ StrDate	# -> ""
+"2001-01-12" ~~ StrDate # -> 1
+"01-01-01" ~~ StrDate   # -> ""
 ```
 
 ## StrDateTime
 
-The dateTime is format `yyyy-mm-dd HH:MM:SS`.
+Дата и время в формате `yyyy-mm-dd HH:MM:SS`.
 
 ```perl
-"2012-12-01 00:00:00" ~~ StrDateTime	 # -> 1
-"2012-12-01 00:00:00 " ~~ StrDateTime	# -> ""
+"2012-12-01 00:00:00" ~~ StrDateTime  # -> 1
+"2012-12-01 00:00:00 " ~~ StrDateTime # -> ""
 ```
 
 ## StrMatch[qr/.../]
 
-Match value with regular expression.
+Сопоставляет строку с регулярным выражением.
 
 ```perl
-' abc ' ~~ StrMatch[qr/abc/]	# -> 1
-' abbc ' ~~ StrMatch[qr/abc/]   # -> ""
+' abc ' ~~ StrMatch[qr/abc/]  # -> 1
+' abbc ' ~~ StrMatch[qr/abc/] # -> ""
 ```
 
 ## ClassName
 
-Classname is the package with method `new`.
+Имя класса — это пакет с методом `new`.
 
 ```perl
 'Aion::Type' ~~ ClassName  # -> 1
@@ -669,7 +673,7 @@ Classname is the package with method `new`.
 
 ## RoleName
 
-Rolename is the package without method `new`, and with `@ISA` or with one any method.
+Имя роли — это пакет без метода `new`, с `@ISA` или с одним любым методом.
 
 ```perl
 package ExRole1 {
@@ -689,7 +693,7 @@ package ExRole2 {
 
 ## Rat
 
-Rational numbers.
+Рациональные числа.
 
 ```perl
 "6/7" ~~ Rat  # -> 1
@@ -705,7 +709,7 @@ Rational numbers.
 
 ## Num
 
-The numbers.
+Числа.
 
 ```perl
 -6.5 ~~ Num   # -> 1
@@ -715,7 +719,7 @@ The numbers.
 
 ## PositiveNum
 
-The positive numbers.
+Положительные числа.
 
 ```perl
 0 ~~ PositiveNum    # -> 1
@@ -726,7 +730,7 @@ The positive numbers.
 
 ## Float
 
-The machine float number is 4 bytes.
+Машинное число с плавающей запятой составляет 4 байта.
 
 ```perl
 -4.8 ~~ Float             # -> 1
@@ -737,7 +741,7 @@ The machine float number is 4 bytes.
 
 ## Double
 
-The machine float number is 8 bytes.
+Машинное число с плавающей запятой составляет 8 байт.
 
 ```perl
 use Scalar::Util qw//;
@@ -750,7 +754,7 @@ use Scalar::Util qw//;
 
 ## Range[from, to]
 
-Numbers between `from` and `to`.
+Числа между `from` и `to`.
 
 ```perl
 1 ~~ Range[1, 3]   # -> 1
@@ -762,7 +766,7 @@ Numbers between `from` and `to`.
 
 ## Int
 
-Integers.
+Целые числа.
 
 ```perl
 123 ~~ Int	# -> 1
@@ -772,68 +776,68 @@ Integers.
 
 ## Bytes[N]
 
-`N` - the number of bytes for limit.
+Рассчитывает максимальное и минимальное числа, которые поместятся в `N` байт и проверяет ограничение между ними.
 
 ```perl
--129 ~~ Bytes[1]	# -> ""
--128 ~~ Bytes[1]	# -> 1
-127 ~~ Bytes[1]	 # -> 1
-128 ~~ Bytes[1]	 # -> ""
+-129 ~~ Bytes[1] # -> ""
+-128 ~~ Bytes[1] # -> 1
+127 ~~ Bytes[1]  # -> 1
+128 ~~ Bytes[1]  # -> ""
 
 # 2 bits power of (8 bits * 8 bytes - 1)
 my $N = 1 << (8*8-1);
-(-$N-1) ~~ Bytes[8]   # -> ""
-(-$N) ~~ Bytes[8]	 # -> 1
-($N-1) ~~ Bytes[8]	  # -> 1
-$N ~~ Bytes[8]		  # -> ""
+(-$N-1) ~~ Bytes[8] # -> ""
+(-$N) ~~ Bytes[8]   # -> 1
+($N-1) ~~ Bytes[8]  # -> 1
+$N ~~ Bytes[8]      # -> ""
 
 require Math::BigInt;
 
 my $N17 = 1 << (8*Math::BigInt->new(17) - 1);
 
-((-$N17-1) . "") ~~ Bytes[17]  # -> ""
-(-$N17 . "") ~~ Bytes[17]  # -> 1
+((-$N17-1) . "") ~~ Bytes[17] # -> ""
+(-$N17 . "") ~~ Bytes[17]     # -> 1
 (($N17-1) . "") ~~ Bytes[17]  # -> 1
-($N17 . "") ~~ Bytes[17]  # -> ""
+($N17 . "") ~~ Bytes[17]      # -> ""
 ```
 
 ## PositiveInt
 
-Positive integers.
+Положительные целые числа.
 
 ```perl
-+0 ~~ PositiveInt	# -> 1
--0 ~~ PositiveInt	# -> 1
-55 ~~ PositiveInt	# -> 1
--1 ~~ PositiveInt	# -> ""
++0 ~~ PositiveInt # -> 1
+-0 ~~ PositiveInt # -> 1
+55 ~~ PositiveInt # -> 1
+-1 ~~ PositiveInt # -> ""
 ```
 
 ## PositiveBytes[N]
 
-`N` - the number of bytes for limit.
+Рассчитывает максимальное число, которое поместится в `N` байт (полагая, что в байтах нет отрицательного бита) и проверяет ограничение от 0 до этого числа.
 
 ```perl
--1 ~~ PositiveBytes[1]	# -> ""
-0 ~~ PositiveBytes[1]	# -> 1
-255 ~~ PositiveBytes[1]	# -> 1
-256 ~~ PositiveBytes[1]	# -> ""
+-1 ~~ PositiveBytes[1]  # -> ""
+0 ~~ PositiveBytes[1]   # -> 1
+255 ~~ PositiveBytes[1] # -> 1
+256 ~~ PositiveBytes[1] # -> ""
 
--1 ~~ PositiveBytes[8] # -> ""
+-1 ~~ PositiveBytes[8]   # -> ""
 1.01 ~~ PositiveBytes[8] # -> ""
-0 ~~ PositiveBytes[8] # -> 1
+0 ~~ PositiveBytes[8]    # -> 1
 
 my $N8 = 2 ** (8*Math::BigInt->new(8)) - 1;
 
-$N8 . "" ~~ PositiveBytes[8] # -> 1
+$N8 . "" ~~ PositiveBytes[8]     # -> 1
 ($N8+1) . "" ~~ PositiveBytes[8] # -> ""
 
 -1 ~~ PositiveBytes[17] # -> ""
-0 ~~ PositiveBytes[17] # -> 1
+0 ~~ PositiveBytes[17]  # -> 1
 ```
 
 ## Nat
 
-Integers 1+.
+Целые числа 1+.
 
 ```perl
 0 ~~ Nat	# -> ""
@@ -842,16 +846,17 @@ Integers 1+.
 
 ## Ref
 
-The value is reference.
+Ссылка.
 
 ```perl
-\1 ~~ Ref	# -> 1
-1 ~~ Ref	 # -> ""
+\1 ~~ Ref # -> 1
+[] ~~ Ref # -> 1
+1 ~~ Ref  # -> ""
 ```
 
 ## Tied`[A]
 
-The reference on the tied variable.
+Ссылка на связанную переменную.
 
 ```perl
 package TiedHash { sub TIEHASH { bless {@_}, shift } }
@@ -863,33 +868,31 @@ tie my @a, "TiedArray";
 tie my $a, "TiedScalar";
 my %b; my @b; my $b;
 
-\%a ~~ Tied	# -> 1
-\@a ~~ Tied	# -> 1
-\$a ~~ Tied	# -> 1
+\%a ~~ Tied # -> 1
+\@a ~~ Tied # -> 1
+\$a ~~ Tied # -> 1
 
-\%b ~~ Tied	# -> ""
-\@b ~~ Tied	# -> ""
-\$b ~~ Tied	# -> ""
-\\$b ~~ Tied	# -> ""
+\%b ~~ Tied  # -> ""
+\@b ~~ Tied  # -> ""
+\$b ~~ Tied  # -> ""
+\\$b ~~ Tied # -> ""
 
-ref tied %a  # => TiedHash
-ref tied %{\%a}  # => TiedHash
+ref tied %a     # => TiedHash
+ref tied %{\%a} # => TiedHash
 
-\%a ~~ Tied["TiedHash"]	 # -> 1
-\@a ~~ Tied["TiedArray"]	# -> 1
-\$a ~~ Tied["TiedScalar"]   # -> 1
+\%a ~~ Tied["TiedHash"]   # -> 1
+\@a ~~ Tied["TiedArray"]  # -> 1
+\$a ~~ Tied["TiedScalar"] # -> 1
 
-\%a ~~ Tied["TiedArray"]	# -> ""
-\@a ~~ Tied["TiedScalar"]   # -> ""
-\$a ~~ Tied["TiedHash"]	 # -> ""
-\\$a ~~ Tied["TiedScalar"]	 # -> ""
-
-
+\%a ~~ Tied["TiedArray"]   # -> ""
+\@a ~~ Tied["TiedScalar"]  # -> ""
+\$a ~~ Tied["TiedHash"]    # -> ""
+\\$a ~~ Tied["TiedScalar"] # -> ""
 ```
 
 ## LValueRef
 
-The function allows assignment.
+Функция позволяет присваивание.
 
 ```perl
 ref \substr("abc", 1, 2) # => LVALUE
@@ -899,7 +902,7 @@ ref \vec(42, 1, 2) # => LVALUE
 \vec(42, 1, 2) ~~ LValueRef # -> 1
 ```
 
-But it with `: lvalue` do'nt working.
+Но с `:lvalue` не работает.
 
 ```perl
 sub abc: lvalue { $_ }
@@ -936,12 +939,12 @@ substr($x, 1, 1) = 10;
 
 $x # => a10c
 
-LValueRef->include(\substr($x, 1, 1))	# => 1
+LValueRef->include( \substr($x, 1, 1) )	# => 1
 ```
 
 ## FormatRef
 
-The format.
+Формат.
 
 ```perl
 format EXAMPLE_FMT =
@@ -953,58 +956,150 @@ format EXAMPLE_FMT =
 \1 ~~ FormatRef				# -> ""
 ```
 
-## CodeRef
+## CodeRef`[name, proto]
 
-Subroutine.
+Подпрограмма.
 
 ```perl
 sub {} ~~ CodeRef	# -> 1
 \1 ~~ CodeRef		# -> ""
+
+sub code_ex ($;$) { ... }
+
+\&code_ex ~~ CodeRef['main::code_ex']         # -> 1
+\&code_ex ~~ CodeRef['code_ex']               # -> ""
+\&code_ex ~~ CodeRef[qr/_/]                   # -> 1
+\&code_ex ~~ CodeRef[undef, '$;$']            # -> 1
+\&code_ex ~~ CodeRef[undef, qr/^(\$;\$|\@)$/] # -> 1
+\&code_ex ~~ CodeRef[undef, '@']              # -> ""
+\&code_ex ~~ CodeRef['main::code_ex', '$;$']  # -> 1
+```
+
+
+## ReachableCodeRef`[name, proto]
+
+Подпрограмма с телом.
+
+```perl
+sub code_forward ($;$);
+
+\&code_ex ~~ ReachableCodeRef['main::code_ex']        # -> 1
+\&code_ex ~~ ReachableCodeRef['code_ex']              # -> ""
+\&code_ex ~~ ReachableCodeRef[qr/_/]                  # -> 1
+\&code_ex ~~ ReachableCodeRef[undef, '$;$']           # -> 1
+\&code_ex ~~ CodeRef[undef, qr/^(\$;\$|\@)$/]         # -> 1
+\&code_ex ~~ ReachableCodeRef[undef, '@']             # -> ""
+\&code_ex ~~ ReachableCodeRef['main::code_ex', '$;$'] # -> 1
+
+\&code_forward ~~ ReachableCodeRef # -> ""
+```
+
+## UnreachableCodeRef`[name, proto]
+
+Подпрограмма без тела.
+
+```perl
+\&nouname ~~ UnreachableCodeRef # -> 1
+\&code_ex ~~ UnreachableCodeRef # -> ""
+\&code_forward ~~ UnreachableCodeRef['main::code_forward', '$;$'] # -> 1
+```
+
+## Isa[A...]
+
+Ссылка на подпрограмму с соответствующей сигнатурой.
+
+```perl
+sub sig_ex :Isa(Int => Str) {}
+
+\&sig_ex ~~ Isa[Int => Str]        # -> 1
+\&sig_ex ~~ Isa[Int => Str => Num] # -> ""
+\&sig_ex ~~ Isa[Int => Num]        # -> ""
+```
+
+Подпрограммы без тела не оборачиваются в обработчик сигнатуры, а сигнатура запоминается для валидации соответствия впоследствии объявленной подпрограммы с телом. Поэтому функция не имеет сигнатуры.
+
+```perl
+sub unreachable_sig_ex :Isa(Int => Str);
+
+\&unreachable_sig_ex ~~ Isa[Int => Str] # -> ""
 ```
 
 ## RegexpRef
 
-The regular expression.
+Регулярное выражение.
 
 ```perl
-qr// ~~ RegexpRef	# -> 1
-\1 ~~ RegexpRef		 # -> ""
+qr// ~~ RegexpRef # -> 1
+\1 ~~ RegexpRef   # -> ""
+```
+
+## ScalarRefRef`[A]
+
+Ссылка на скаляр или ссылка на ссылку.
+
+```perl
+\12    ~~ ScalarRefRef                    # -> 1
+\12    ~~ ScalarRefRef                    # -> 1
+\-1.2  ~~ ScalarRefRef[Num]               # -> 1
+\\-1.2 ~~ ScalarRefRef[ScalarRefRef[Num]] # -> 1
 ```
 
 ## ScalarRef`[A]
 
-The scalar.
+Ссылка на скаляр.
 
 ```perl
-\12 ~~ ScalarRef			 # -> 1
-\\12 ~~ ScalarRef			# -> ""
-\-1.2 ~~ ScalarRef[Num]	 # -> 1
-\\-1.2 ~~ ScalarRef[Num]	 # -> ""
+\12   ~~ ScalarRef      # -> 1
+\\12  ~~ ScalarRef      # -> ""
+\-1.2 ~~ ScalarRef[Num] # -> 1
 ```
 
 ## RefRef`[A]
 
-The ref as ref.
+Ссылка на ссылку.
 
 ```perl
-\\1 ~~ RefRef	# -> 1
-\1 ~~ RefRef	 # -> ""
-\\1.3 ~~ RefRef[ScalarRef[Num]]	# -> 1
-\1.3 ~~ RefRef[ScalarRef[Num]]	# -> ""
+\12    ~~ RefRef                 # -> ""
+\\12   ~~ RefRef                 # -> 1
+\-1.2  ~~ RefRef[Num]            # -> ""
+\\-1.2 ~~ RefRef[ScalarRef[Num]] # -> 1
 ```
 
 ## GlobRef
 
-The global.
+Ссылка на глоб.
 
 ```perl
-\*A::a ~~ GlobRef	# -> 1
-*A::a ~~ GlobRef	 # -> ""
+\*A::a ~~ GlobRef # -> 1
+*A::a ~~ GlobRef  # -> ""
+```
+
+## FileHandle
+
+Файловый описатель.
+
+```perl
+\*A::a ~~ FileHandle         # -> ""
+\*STDIN ~~ FileHandle        # -> 1
+
+open my $fh, "<", "/dev/null";
+$fh ~~ FileHandle	         # -> 1
+close $fh;
+
+opendir my $dh, ".";
+$dh ~~ FileHandle	         # -> 1
+closedir $dh;
+
+use constant { PF_UNIX => 1, SOCK_STREAM => 1 };
+
+socket my $sock, PF_UNIX, SOCK_STREAM, 0;
+$sock ~~ FileHandle	         # -> 1
+close $sock;
 ```
 
 ## ArrayRef`[A]
 
-The arrays.
+Ссылки на массивы.
 
 ```perl
 [] ~~ ArrayRef	# -> 1
@@ -1017,10 +1112,10 @@ The arrays.
 
 ## Lim[A, B?]
 
-Limit arrays from `A` to `B`, or from 0 to `A`, if `B` is'nt present.
+Ограничивает массивы от `A` до `B` элементов или от 0 до `A`, если `B` отсутствует.
 
 ```perl
-[] ~~ Lim[5] # -> 1
+[] ~~ Lim[5]     # -> 1
 [1..5] ~~ Lim[5] # -> 1
 [1..6] ~~ Lim[5] # -> ""
 
@@ -1028,122 +1123,122 @@ Limit arrays from `A` to `B`, or from 0 to `A`, if `B` is'nt present.
 [1..6] ~~ Lim[1,5] # -> ""
 
 [1] ~~ Lim[1,5] # -> 1
-[] ~~ Lim[1,5] # -> ""
+[] ~~ Lim[1,5]  # -> ""
 ```
 
 ## HashRef`[H]
 
-The hashes.
+Ссылки на хеши.
 
 ```perl
-{} ~~ HashRef	# -> 1
-\1 ~~ HashRef	# -> ""
+{} ~~ HashRef # -> 1
+\1 ~~ HashRef # -> ""
 
-[]  ~~ HashRef[Int]	# -> ""
-{x=>1, y=>2}  ~~ HashRef[Int]	# -> 1
-{x=>1, y=>""} ~~ HashRef[Int]	# -> ""
+[]  ~~ HashRef[Int]           # -> ""
+{x=>1, y=>2}  ~~ HashRef[Int] # -> 1
+{x=>1, y=>""} ~~ HashRef[Int] # -> ""
 ```
 
 ## Object`[O]
 
-The blessed values.
+Благословлённые ссылки.
 
 ```perl
-bless(\(my $val=10), "A1") ~~ Object	# -> 1
-\(my $val=10) ~~ Object					# -> ""
+bless(\(my $val=10), "A1") ~~ Object # -> 1
+\(my $val=10) ~~ Object              # -> ""
 
-bless(\(my $val=10), "A1") ~~ Object["A1"]   # -> 1
-bless(\(my $val=10), "A1") ~~ Object["B1"]   # -> ""
+bless(\(my $val=10), "A1") ~~ Object["A1"] # -> 1
+bless(\(my $val=10), "A1") ~~ Object["B1"] # -> ""
 ```
 
 ## Me
 
-The blessed values self package.
+Благословенные ссылки на объекты текущего пакета.
 
 ```perl
 package A1 {
-	use Aion;
-	bless({}, __PACKAGE__) ~~ Me  # -> 1
-	bless({}, "A2") ~~ Me  # -> ""
+ use Aion;
+ bless({}, __PACKAGE__) ~~ Me  # -> 1
+ bless({}, "A2") ~~ Me         # -> ""
 }
 ```
 
 ## Map[K, V]
 
-As `HashRef`, but has type for keys also.
+Как `HashRef`, но с типом для ключей.
 
 ```perl
-{} ~~ Map[Int, Int]			 # -> 1
-{5 => 3} ~~ Map[Int, Int]	# -> 1
-+{5.5 => 3} ~~ Map[Int, Int] # -> ""
-{5 => 3.3} ~~ Map[Int, Int]  # -> ""
-{5 => 3, 6 => 7} ~~ Map[Int, Int]  # -> 1
+{} ~~ Map[Int, Int]               # -> 1
+{5 => 3} ~~ Map[Int, Int]         # -> 1
++{5.5 => 3} ~~ Map[Int, Int]      # -> ""
+{5 => 3.3} ~~ Map[Int, Int]       # -> ""
+{5 => 3, 6 => 7} ~~ Map[Int, Int] # -> 1
 ```
 
 ## Tuple[A...]
 
-The tuple.
+Тьюпл.
 
 ```perl
-["a", 12] ~~ Tuple[Str, Int]	# -> 1
-["a", 12, 1] ~~ Tuple[Str, Int]	# -> ""
-["a", 12.1] ~~ Tuple[Str, Int]	# -> ""
+["a", 12] ~~ Tuple[Str, Int]    # -> 1
+["a", 12, 1] ~~ Tuple[Str, Int] # -> ""
+["a", 12.1] ~~ Tuple[Str, Int]  # -> ""
 ```
 
 ## CycleTuple[A...]
 
-The tuple one or more times.
+Тьюпл повторённый один или несколько раз.
 
 ```perl
-["a", -5] ~~ CycleTuple[Str, Int]	# -> 1
-["a", -5, "x"] ~~ CycleTuple[Str, Int]	# -> ""
-["a", -5, "x", -6] ~~ CycleTuple[Str, Int]	# -> 1
-["a", -5, "x", -6.2] ~~ CycleTuple[Str, Int]	# -> ""
+["a", -5] ~~ CycleTuple[Str, Int] # -> 1
+["a", -5, "x"] ~~ CycleTuple[Str, Int] # -> ""
+["a", -5, "x", -6] ~~ CycleTuple[Str, Int] # -> 1
+["a", -5, "x", -6.2] ~~ CycleTuple[Str, Int] # -> ""
 ```
 
 ## Dict[k => A, ...]
 
-The dictionary.
+Словарь.
 
 ```perl
-{a => -1.6, b => "abc"} ~~ Dict[a => Num, b => Str]	# -> 1
+{a => -1.6, b => "abc"} ~~ Dict[a => Num, b => Str] # -> 1
 
-{a => -1.6, b => "abc", c => 3} ~~ Dict[a => Num, b => Str]	# -> ""
-{a => -1.6} ~~ Dict[a => Num, b => Str]	# -> ""
+{a => -1.6, b => "abc", c => 3} ~~ Dict[a => Num, b => Str] # -> ""
+{a => -1.6} ~~ Dict[a => Num, b => Str] # -> ""
 
-{a => -1.6} ~~ Dict[a => Num, b => Option[Str]]	# -> 1
+{a => -1.6} ~~ Dict[a => Num, b => Option[Str]] # -> 1
 ```
 
 ## HasProp[p...]
 
-The hash has the properties.
+Хэш имеет перечисленные свойства. Кроме них он может иметь и другие.
 
 ```perl
-[0, 1] ~~ HasProp[qw/0 1/]	# -> ""
+[0, 1] ~~ HasProp[qw/0 1/] # -> ""
 
-{a => 1, b => 2, c => 3} ~~ HasProp[qw/a b/]	# -> 1
-{a => 1, b => 2} ~~ HasProp[qw/a b/]	# -> 1
-{a => 1, c => 3} ~~ HasProp[qw/a b/]	# -> ""
+{a => 1, b => 2, c => 3} ~~ HasProp[qw/a b/] # -> 1
+{a => 1, b => 2} ~~ HasProp[qw/a b/] # -> 1
+{a => 1, c => 3} ~~ HasProp[qw/a b/] # -> ""
 
-bless({a => 1, b => 3}, "A") ~~ HasProp[qw/a b/]	# -> 1
+bless({a => 1, b => 3}, "A") ~~ HasProp[qw/a b/] # -> 1
 ```
 
 ## Like
 
-The object or string.
+Объект или строка.
 
 ```perl
-"" ~~ Like		# -> 1
-1 ~~ Like		# -> 1
-bless({}, "A") ~~ Like	# -> 1
-bless([], "A") ~~ Like	# -> 1
-bless(\(my $str = ""), "A") ~~ Like	# -> 1
-\1 ~~ Like		# -> ""
+"" ~~ Like # -> 1
+1 ~~ Like  # -> 1
+bless({}, "A") ~~ Like # -> 1
+bless([], "A") ~~ Like # -> 1
+bless(\(my $str = ""), "A") ~~ Like # -> 1
+\1 ~~ Like  # -> ""
 ```
 
 ## HasMethods[m...]
 
-The object or the class has the methods.
+Объект или класс имеет перечисленные методы. Кроме них может иметь и другие.
 
 ```perl
 package HasMethodsExample {
@@ -1161,29 +1256,29 @@ bless({}, "HasMethodsExample") ~~ HasMethods[qw/x1/]	# -> 1
 
 ## Overload`[op...]
 
-The object or the class is overloaded.
+Объект или класс с перегруженными операторами.
 
 ```perl
 package OverloadExample {
 	use overload '""' => sub { "abc" };
 }
 
-"OverloadExample" ~~ Overload	# -> 1
-bless({}, "OverloadExample") ~~ Overload	# -> 1
-"A" ~~ Overload					# -> ""
-bless({}, "A") ~~ Overload		# -> ""
+"OverloadExample" ~~ Overload            # -> 1
+bless({}, "OverloadExample") ~~ Overload # -> 1
+"A" ~~ Overload                          # -> ""
+bless({}, "A") ~~ Overload               # -> ""
 ```
 
-And it has the operators if arguments are specified.
+И у него есть операторы указанные операторы.
 
 ```perl
-"OverloadExample" ~~ Overload['""']   # -> 1
-"OverloadExample" ~~ Overload['|']	# -> ""
+"OverloadExample" ~~ Overload['""'] # -> 1
+"OverloadExample" ~~ Overload['|']  # -> ""
 ```
 
 ## InstanceOf[A...]
 
-The class or the object inherits the list of classes.
+Класс или объект наследует классы из списка.
 
 ```perl
 package Animal {}
@@ -1191,16 +1286,14 @@ package Cat { our @ISA = qw/Animal/ }
 package Tiger { our @ISA = qw/Cat/ }
 
 
-"Tiger" ~~ InstanceOf['Animal', 'Cat']  # -> 1
-"Tiger" ~~ InstanceOf['Tiger']			# -> 1
-"Tiger" ~~ InstanceOf['Cat', 'Dog']		# -> ""
+"Tiger" ~~ InstanceOf['Animal', 'Cat'] # -> 1
+"Tiger" ~~ InstanceOf['Tiger']         # -> 1
+"Tiger" ~~ InstanceOf['Cat', 'Dog']    # -> ""
 ```
 
 ## ConsumerOf[A...]
 
-The class or the object has the roles.
-
-The presence of the role is checked by the `DOES` method.
+Класс или объект имеет указанные роли.
 
 ```perl
 package NoneExample {}
@@ -1210,14 +1303,14 @@ package RoleExample { sub DOES { $_[1] ~~ [qw/Role1 Role2/] } }
 'RoleExample' ~~ ConsumerOf[qw/Role2 Role1/] # -> 1
 bless({}, 'RoleExample') ~~ ConsumerOf[qw/Role3 Role2 Role1/] # -> ""
 
-'NoneExample' ~~ ConsumerOf[qw/Role1/]	# -> ""
+'NoneExample' ~~ ConsumerOf[qw/Role1/] # -> ""
 ```
 
 ## BoolLike
 
-Check the 1, 0, "", undef or object with overloaded operator `0+` as `JSON::PP::Boolean`.
+Проверяет 1, 0, "", undef или объект с перегруженным оператором `bool` или `0+` как `JSON::PP::Boolean`. Во втором случае вызывает оператор  `0+` и проверяет результат как `Bool`.
 
-The operator `0+` evaluates, and result is checking.
+`BoolLike` вызывает оператор `0+` и проверяет результат.
 
 ```perl
 package BoolLikeExample {
@@ -1227,70 +1320,77 @@ package BoolLikeExample {
 bless(\(my $x = 1 ), 'BoolLikeExample') ~~ BoolLike # -> 1
 bless(\(my $x = 11), 'BoolLikeExample') ~~ BoolLike # -> ""
 
-1 ~~ BoolLike	  # -> 1
-0 ~~ BoolLike	  # -> 1
-"" ~~ BoolLike	  # -> 1
+1 ~~ BoolLike     # -> 1
+0 ~~ BoolLike     # -> 1
+"" ~~ BoolLike    # -> 1
 undef ~~ BoolLike # -> 1
+
+package BoolLike2Example {
+	use overload 'bool' => sub { ${$_[0]} };
+}
+
+bless(\(my $x = 1 ), 'BoolLike2Example') ~~ BoolLike # -> 1
+bless(\(my $x = 11), 'BoolLike2Example') ~~ BoolLike # -> 1
 ```
 
 ## StrLike
 
-String or object with overloaded operator `""`.
+Строка или объект с перегруженным оператором `""`.
 
 ```perl
-"" ~~ StrLike								# -> 1
+"" ~~ StrLike # -> 1
 
 package StrLikeExample {
 	use overload '""' => sub { "abc" };
 }
 
-bless({}, "StrLikeExample") ~~ StrLike		# -> 1
+bless({}, "StrLikeExample") ~~ StrLike # -> 1
 
-{} ~~ StrLike								# -> ""
+{} ~~ StrLike # -> ""
 ```
 
 ## RegexpLike
 
-The regular expression or the object with overloaded operator `qr`.
+Регулярное выражение или объект с перегруженным оператором `qr`.
 
 ```perl
 ref(qr//)  # => Regexp
-Scalar::Util::reftype(qr//)  # => REGEXP
+Scalar::Util::reftype(qr//) # => REGEXP
 
 my $regex = bless qr//, "A";
 Scalar::Util::reftype($regex) # => REGEXP
 
-$regex ~~ RegexpLike	# -> 1
-qr// ~~ RegexpLike		# -> 1
-"" ~~ RegexpLike		# -> ""
+$regex ~~ RegexpLike # -> 1
+qr// ~~ RegexpLike   # -> 1
+"" ~~ RegexpLike     # -> ""
 
 package RegexpLikeExample {
-	use overload 'qr' => sub { qr/abc/ };
+ use overload 'qr' => sub { qr/abc/ };
 }
 
-"RegexpLikeExample" ~~ RegexpLike	# -> ""
-bless({}, "RegexpLikeExample") ~~ RegexpLike	# -> 1
+"RegexpLikeExample" ~~ RegexpLike # -> ""
+bless({}, "RegexpLikeExample") ~~ RegexpLike # -> 1
 ```
 
 ## CodeLike
 
-The subroutines.
+Подпрограмма или объект с перегруженным оператором `&{}`.
 
 ```perl
-sub {} ~~ CodeLike		# -> 1
-\&CodeLike ~~ CodeLike  # -> 1
-{} ~~ CodeLike		  # -> ""
+sub {} ~~ CodeLike     # -> 1
+\&CodeLike ~~ CodeLike # -> 1
+{} ~~ CodeLike         # -> ""
 ```
 
 ## ArrayLike`[A]
 
-The arrays or objects with  or overloaded operator `@{}`.
+Массивы или объекты с перегруженным оператором или `@{}`.
 
 ```perl
-{} ~~ ArrayLike			# -> ""
-{} ~~ ArrayLike[Int]	# -> ""
+{} ~~ ArrayLike      # -> ""
+{} ~~ ArrayLike[Int] # -> ""
 
-[] ~~ ArrayLike		# -> 1
+[] ~~ ArrayLike # -> 1
 
 package ArrayLikeExample {
 	use overload '@{}' => sub {
@@ -1300,23 +1400,23 @@ package ArrayLikeExample {
 
 my $x = bless {}, 'ArrayLikeExample';
 $x->[1] = 12;
-$x->{array}  # --> [undef, 12]
+$x->{array} # --> [undef, 12]
 
-$x ~~ ArrayLike	# -> 1
+$x ~~ ArrayLike # -> 1
 
-$x ~~ ArrayLike[Int]	# -> ""
+$x ~~ ArrayLike[Int] # -> ""
 
 $x->[0] = 13;
-$x ~~ ArrayLike[Int]	# -> 1
+$x ~~ ArrayLike[Int] # -> 1
 ```
 
 ## HashLike`[A]
 
-The hashes or objects with overloaded operator `%{}`.
+Хэши или объекты с перегруженным оператором `%{}`.
 
 ```perl
-{} ~~ HashLike		# -> 1
-[] ~~ HashLike		# -> ""
+{} ~~ HashLike  # -> 1
+[] ~~ HashLike  # -> ""
 [] ~~ HashLike[Int] # -> ""
 
 package HashLikeExample {
@@ -1329,9 +1429,9 @@ my $x = bless [], 'HashLikeExample';
 $x->{key} = 12.3;
 $x->[0]  # --> {key => 12.3}
 
-$x ~~ HashLike		   # -> 1
-$x ~~ HashLike[Int]	# -> ""
-$x ~~ HashLike[Num]	# -> 1
+$x ~~ HashLike      # -> 1
+$x ~~ HashLike[Int] # -> ""
+$x ~~ HashLike[Num] # -> 1
 ```
 
 # AUTHOR

@@ -32,6 +32,15 @@ use overload
 Aion::Meta::Util::create_getters(qw/name args as me/);
 Aion::Meta::Util::create_accessors(qw/message/);
 
+$Aion::Type::SELF = {
+	A => __PACKAGE__->new(name => "Argument_A"),
+	B => __PACKAGE__->new(name => "Argument_B"),
+	C => __PACKAGE__->new(name => "Argument_C"),
+	D => __PACKAGE__->new(name => "Argument_D"),
+	N => __PACKAGE__->new(name => "Argument_N"),
+	M => __PACKAGE__->new(name => "Argument_M"),
+};
+
 # конструктор
 # * name (Str) — Имя типа.
 # * as (Object[Aion::Type]) — наследуемый тип.
@@ -259,7 +268,7 @@ __END__
 
 =head1 NAME
 
-Aion::Type - class of validators
+Aion::Type - validator class
 
 =head1 SYNOPSIS
 
@@ -289,9 +298,7 @@ Aion::Type - class of validators
 
 =head1 DESCRIPTION
 
-This is construct for make any validators.
-
-It using in C<Aion::Types::subtype>.
+Spawns validators. Used in C<Aion::Types::subtype>.
 
 =head1 METHODS
 
@@ -303,23 +310,23 @@ Constructor.
 
 =over
 
-=item * name (Str) — Name of type.
+=item * name (Str) — Type name.
 
 =item * args (ArrayRef) — List of type arguments.
 
-=item * init (CodeRef) — Initializer for type.
+=item * init (CodeRef) — Type initializer.
 
-=item * test (CodeRef) — Values cheker.
+=item * test (CodeRef) - Checker.
 
-=item * a_test (CodeRef) — Values cheker for types with optional arguments.
+=item * a_test (CodeRef) — Value checker for types with optional arguments.
 
-=item * coerce (ArrayRef[Tuple[Aion::Type, CodeRef]]) — Array of pairs: type and via.
+=item * coerce (ArrayRef[Tuple[Aion::Type, CodeRef]]) - Array of pairs: type and transition.
 
 =back
 
 =head2 stringify
 
-Stringify of object (name with arguments):
+String conversion of object (name with arguments):
 
 	my $Char = Aion::Type->new(name => "Char");
 	
@@ -332,13 +339,13 @@ Stringify of object (name with arguments):
 	
 	$Int->stringify  #=> Int[3, 5]
 
-Stringify operations:
+Operations are also converted to a string:
 
 	($Int & $Char)->stringify   # => ( Int[3, 5] & Char )
 	($Int | $Char)->stringify   # => ( Int[3, 5] | Char )
 	(~$Int)->stringify		  # => ~Int[3, 5]
 
-The operations is objects of C<Aion::Type> with special names:
+Operations are C<Aion::Type> objects with special names:
 
 	Aion::Type->new(name => "Exclude", args => [$Int, $Char])->stringify   # => ~( Int[3, 5] | Char )
 	Aion::Type->new(name => "Union", args => [$Int, $Char])->stringify   # => ( Int[3, 5] | Char )
@@ -346,7 +353,7 @@ The operations is objects of C<Aion::Type> with special names:
 
 =head2 test
 
-Testing the C<$_> belongs to the class.
+Tests that C<$_> belongs to a class.
 
 	my $PositiveInt = Aion::Type->new(
 		name => "PositiveInt",
@@ -360,7 +367,7 @@ Testing the C<$_> belongs to the class.
 
 =head2 init
 
-Initial the validator.
+Validator initializer.
 
 	my $Range = Aion::Type->new(
 		name => "Range",
@@ -382,7 +389,7 @@ Initial the validator.
 
 =head2 include ($element)
 
-checks whether the argument belongs to the class.
+Checks whether the argument belongs to the class.
 
 	my $PositiveInt = Aion::Type->new(
 		name => "PositiveInt",
@@ -406,7 +413,7 @@ Checks that the argument does not belong to the class.
 
 =head2 coerce ($value)
 
-Coerce C<$value> to the type, if coerce from type and function is in C<< $self-E<gt>{coerce} >>.
+Cast C<$value> to type if the cast from type and function is in C<< $self-E<gt>{coerce} >>.
 
 	my $Int = Aion::Type->new(name => "Int", test => sub { /^-?\d+\z/ });
 	my $Num = Aion::Type->new(name => "Num", test => sub { /^-?\d+(\.\d+)?\z/ });
@@ -421,7 +428,7 @@ Coerce C<$value> to the type, if coerce from type and function is in C<< $self-E
 
 =head2 detail ($element, $feature)
 
-Return message belongs to error.
+Generates an error message.
 
 	my $Int = Aion::Type->new(name => "Int");
 	
@@ -431,13 +438,13 @@ Return message belongs to error.
 		"Error: $_ is'nt $Aion::Type::SELF->{N}!"
 	});
 	
-	$Num->detail("x", "car")  # => Error: x is'nt car!
+	$Num->detail("x", "car") # => Error: x is'nt car!
 
 C<< $Aion::Type::SELF-E<gt>{N} >> equivalent to C<N> in context of C<Aion::Types>.
 
 =head2 validate ($element, $feature)
 
-It tested C<$element> and throw C<detail> if element is exclude from class.
+Checks C<$element> and throws a C<detail> message if the element does not belong to the class.
 
 	my $PositiveInt = Aion::Type->new(
 		name => "PositiveInt",
@@ -447,31 +454,31 @@ It tested C<$element> and throw C<detail> if element is exclude from class.
 	eval {
 		$PositiveInt->validate(-1, "Neg")
 	};
-	$@   # ~> Neg must have the type PositiveInt. The it is -1
+	$@ # ~> Neg must have the type PositiveInt. The it is -1
 
 =head2 val_to_str ($val)
 
-Переводит C<$val> в строку.
+Converts C<$val> to a string.
 
-	Aion::Type->new->val_to_str([1,2,{x=>6}])   # => [1, 2, {x => 6}]
+	Aion::Type->new->val_to_str([1,2,{x=>6}]) # => [1, 2, {x => 6}]
 
 =head2 instanceof ($type)
 
-Determines that the type is a subtype of a different $type.
+Specifies that a type is a subtype of another C<$type>.
 
 	my $int = Aion::Type->new(name => "Int");
 	my $positiveInt = Aion::Type->new(name => "PositiveInt", as => $int);
 	
-	$positiveInt->instanceof($int)		  # -> 1
+	$positiveInt->instanceof($int)          # -> 1
 	$positiveInt->instanceof($positiveInt)  # -> 1
-	$positiveInt->instanceof('Int')		 # -> 1
+	$positiveInt->instanceof('Int')         # -> 1
 	$positiveInt->instanceof('PositiveInt') # -> 1
-	$int->instanceof('PositiveInt')		 # -> ""
-	$int->instanceof('Int')				 # -> 1
+	$int->instanceof('PositiveInt')         # -> ""
+	$int->instanceof('Int')                 # -> 1
 
 =head2 make ($pkg)
 
-It make subroutine without arguments, who return type.
+Creates a subroutine with no arguments that returns a type.
 
 	BEGIN {
 		Aion::Type->new(name=>"Rim", test => sub { /^[IVXLCDM]+$/i })->make(__PACKAGE__);
@@ -479,17 +486,17 @@ It make subroutine without arguments, who return type.
 	
 	"IX" ~~ Rim	 # => 1
 
-Property C<init> won't use with C<make>.
+The C<init> property cannot be used with C<make>.
 
 	eval { Aion::Type->new(name=>"Rim", init => sub {...})->make(__PACKAGE__) }; $@ # ~> init_where won't work in Rim
 
-If subroutine make'nt, then died.
+If the routine cannot be created, an exception is thrown.
 
 	eval { Aion::Type->new(name=>"Rim")->make }; $@ # ~> syntax error
 
 =head2 make_arg ($pkg)
 
-It make subroutine with arguments, who return type.
+Creates a subroutine with arguments that returns a type.
 
 	BEGIN {
 		Aion::Type->new(name=>"Len", test => sub {
@@ -499,13 +506,13 @@ It make subroutine with arguments, who return type.
 	
 	"IX" ~~ Len[2,2]	# => 1
 
-If subroutine make'nt, then died.
+If the routine cannot be created, an exception is thrown.
 
 	eval { Aion::Type->new(name=>"Rim")->make_arg }; $@ # ~> syntax error
 
 =head2 make_maybe_arg ($pkg)
 
-It make subroutine with or without arguments, who return type.
+Creates a subroutine with arguments that returns a type.
 
 	BEGIN {
 		Aion::Type->new(
@@ -519,13 +526,13 @@ It make subroutine with or without arguments, who return type.
 	3 ~~ Enum123[4,5,6]	 # -> ""
 	5 ~~ Enum123[4,5,6]	 # -> 1
 
-If subroutine make'nt, then died.
+If the routine cannot be created, an exception is thrown.
 
 	eval { Aion::Type->new(name=>"Rim")->make_maybe_arg }; $@ # ~> syntax error
 
 =head2 equal ($type)
 
-Types are equal when they have the same name, the same number of arguments, parent and arguments are equal.
+Types are equal if they have the same name, the same number of arguments, the parent element, and the arguments are equal.
 
 	my $Int = Aion::Type->new(name => "Int");
 	my $PositiveInt = Aion::Type->new(name => "PositiveInt", as => $Int);
@@ -535,23 +542,23 @@ Types are equal when they have the same name, the same number of arguments, pare
 	my $IntWithDifferentArgs = Aion::Type->new(name => "Int", args => [3, 4]);
 	my $Str = Aion::Type->new(name => "Str");
 	
-	$Int->equal($Int)                     # -> 1
-	$Int->equal($AnotherInt)              # -> 1
+	$Int->equal($Int)                        # -> 1
+	$Int->equal($AnotherInt)                 # -> 1
 	$IntWithArgs->equal($AnotherIntWithArgs) # -> 1
-	$PositiveInt->equal($PositiveInt)     # -> 1
+	$PositiveInt->equal($PositiveInt)        # -> 1
 	
-	$Int->equal($Str)                     # -> ""
-	$Int->equal($IntWithArgs)             # -> ""
+	$Int->equal($Str)                          # -> ""
+	$Int->equal($IntWithArgs)                  # -> ""
 	$IntWithArgs->equal($IntWithDifferentArgs) # -> ""
-	$PositiveInt->equal($Int)             # -> ""
+	$PositiveInt->equal($Int)                  # -> ""
 	
-	$Int->equal("not a type")             # -> ""
+	$Int->equal("not a type") # -> ""
 	
 	my $PositiveInt2 = Aion::Type->new(name => "PositiveInt", as => $Str);
-	$PositiveInt->equal($PositiveInt2)    # -> ""
+	$PositiveInt->equal($PositiveInt2) # -> ""
 	
-	$Int->equal($PositiveInt)             # -> ""
-	$PositiveInt->equal($Int)             # -> ""
+	$Int->equal($PositiveInt) # -> ""
+	$PositiveInt->equal($Int) # -> ""
 	
 	my $PositiveIntWithArgs = Aion::Type->new(name => "PositiveInt", as => $Int, args => [1]);
 	my $PositiveIntWithArgs2 = Aion::Type->new(name => "PositiveInt", as => $Int, args => [2]);
@@ -559,7 +566,7 @@ Types are equal when they have the same name, the same number of arguments, pare
 
 =head2 nonequal ($type)
 
-Inverse of equal.
+The reverse operation of C<equal>.
 
 	my $Int = Aion::Type->new(name => "Int");
 	my $PositiveInt = Aion::Type->new(name => "PositiveInt", as => $Int);
@@ -569,33 +576,33 @@ Inverse of equal.
 
 =head2 args ()
 
-The list of arguments.
+List of arguments.
 
 =head2 name ()
 
-The name of type.
+Type name.
 
 =head2 as ()
 
-The parent type.
+Parent type.
 
 =head2 message (;&message)
 
-Getter/setter for message. Message use for generate error message.
+Message accessor. Uses C<&message> to generate an error message.
 
 =head2 title (;$title)
 
-Getter/setter for title (using for swagger).
+Header accessor (used to create the B<swagger> schema).
 
 =head2 description (;$description)
 
-Getter/setter for description (using for swagger).
+Description accessor (used to create a B<swagger> schema).
 
 =head1 OPERATORS
 
 =head2 &{}
 
-It make the object is callable.
+Makes the object callable.
 
 	my $PositiveInt = Aion::Type->new(
 		name => "PositiveInt",
@@ -610,7 +617,7 @@ It make the object is callable.
 
 =head2 ""
 
-Stringify object.
+Strings an object.
 
 	Aion::Type->new(name => "Int") . ""   # => Int
 	
@@ -620,7 +627,7 @@ Stringify object.
 
 =head2 $a | $b
 
-It make new type as union of C<$a> and C<$b>.
+Creates a new type as the union of C<$a> and C<$b>.
 
 	my $Int = Aion::Type->new(name => "Int", test => sub { /^-?\d+$/ });
 	my $Char = Aion::Type->new(name => "Char", test => sub { /^.\z/ });
@@ -633,7 +640,7 @@ It make new type as union of C<$a> and C<$b>.
 
 =head2 $a & $b
 
-It make new type as intersection of C<$a> and C<$b>.
+Creates a new type as the intersection of C<$a> and C<$b>.
 
 	my $Int = Aion::Type->new(name => "Int", test => sub { /^-?\d+$/ });
 	my $Char = Aion::Type->new(name => "Char", test => sub { /^.\z/ });
@@ -646,30 +653,32 @@ It make new type as intersection of C<$a> and C<$b>.
 
 =head2 ~ $a
 
-It make exclude type from C<$a>.
+Creates a new type as an exception to C<$a>.
 
 	my $Int = Aion::Type->new(name => "Int", test => sub { /^-?\d+$/ });
 	
 	"a" ~~ ~$Int; # -> 1
 	5   ~~ ~$Int; # -> ""
 
-=head2 $a eq $b
+=head2 $a eq $b, $a == $b
 
-C<$a> equal C<$b>.
+C<$a> is equal to C<$b>.
 
 	my $Int1 = Aion::Type->new(name => "Int");
 	my $Int2 = Aion::Type->new(name => "Int");
 	
 	$Int1 eq $Int2 # -> 1
+	$Int1 == $Int2 # -> 1
 
-=head2 $a ne $b
+=head2 $a ne $b, $a != $b
 
-C<$a> not equal C<$b>.
+C<$a> is not equal to C<$b>.
 
 	my $Int1 = Aion::Type->new(name => "Int");
 	my $Int2 = Aion::Type->new(name => "Int");
 	
 	$Int1 ne $Int2 # -> ""
+	$Int1 != $Int2 # -> ""
 	123 ne $Int2 # -> 1
 
 =head1 AUTHOR

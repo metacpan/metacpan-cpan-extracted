@@ -45,8 +45,6 @@ lib/OpenTelemetry/Instrumentation/HTTP/Tiny.pm
 lib/OpenTelemetry/Instrumentation/HTTP/Tiny.pod
 lib/OpenTelemetry/Instrumentation/LWP/UserAgent.pm
 lib/OpenTelemetry/Instrumentation/LWP/UserAgent.pod
-lib/OpenTelemetry/Instrumentation/namespace.pm
-lib/OpenTelemetry/Instrumentation/namespace.pod
 lib/OpenTelemetry/Integration.pm
 lib/OpenTelemetry/Integration.pod
 lib/OpenTelemetry/Logs/LogRecord/Processor.pm
@@ -132,5 +130,6 @@ t/OpenTelemetry/Trace/Span/Status.t
 t/OpenTelemetry/Trace/Tracer.t
 t/OpenTelemetry/Trace/TracerProvider.t
 t/OpenTelemetry/X.t
+t/lib/OpenTelemetry/Integration/Local/Only/Legacy.pm
 xt/author/00-compile.t
 xt/author/pod-syntax.t

@@ -22,6 +22,7 @@ my %WriteMakefileArgs = (
     PL_FILES            => {},
     PREREQ_PM           => {
         'strict'            => 0,
+        'utf8'              => 0,
         'warnings'          => 0,
         'vars'              => 0,
         'DateTime'          => 0,

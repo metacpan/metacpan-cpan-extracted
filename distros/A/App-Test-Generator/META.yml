@@ -5,7 +5,9 @@ author:
 build_requires:
   Cwd: '0'
   Data::Random: '0'
+  Data::Random::String: '0'
   Data::Random::String::Matches: '0.02'
+  Data::Random::Structure: '0'
   Encode: '0'
   ExtUtils::MakeMaker: '0'
   File::Temp: '0'
@@ -13,6 +15,7 @@ build_requires:
   IPC::System::Simple: '0'
   JSON::MaybeXS: '0'
   Test::DescribeMe: '0'
+  Test::LectroTest: '0'
   Test::Most: '0'
   Test::Needs: '0'
   Test::Returns: '0.02'
@@ -49,5 +52,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-Test-Generator
   homepage: https://metacpan.org/pod/App::Test::Generator
   repository: git://github.com/nigelhorne/App-Test-Generator.git
-version: '0.15'
+version: '0.16'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

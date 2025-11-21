@@ -65,6 +65,7 @@ t/00begin.t
 t/01basic.t
 t/02moo.t
 t/02moo/ext_attr.t
+t/02moo/modifiers.t
 t/02moo/role.t
 t/02moo/roles-multiple.t
 t/02moo/trait_array.t
@@ -83,6 +84,7 @@ t/03moo_mxtt/trait_counter.t
 t/03moo_mxtt/trait_hash.t
 t/03moo_mxtt/trait_number.t
 t/03moo_mxtt/trait_string.t
+t/03moo_mxtth.t
 t/04moose.t
 t/04moose/ext_attr.t
 t/04moose/role.t

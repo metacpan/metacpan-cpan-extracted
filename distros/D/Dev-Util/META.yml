@@ -1,5 +1,5 @@
 ---
-abstract: 'Base modules for Perl Development'
+abstract: 'Utilities useful in the development of perl programs'
 author:
   - 'Matt Martini <matt@imaginarywave.com>'
 build_requires:
@@ -54,5 +54,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/mattmartini/Dev-Util.git
-version: v2.19.7
+version: v2.19.11
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

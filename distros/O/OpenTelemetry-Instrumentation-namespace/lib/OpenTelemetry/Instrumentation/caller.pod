@@ -1,0 +1,128 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenTelemetry::Instrumentation::caller - OpenTelemetry instrumentation for the calling namespace
+
+=head1 SYNOPSIS
+
+    # This instrumentation is EXPERIMENTAL
+
+    package My::Package;
+
+    # Declare your functions
+    sub reticulate_splines { ... }
+
+    ...
+
+    # Use this instrumentation at the end of your package
+    # The order is important!
+    # Functions declared afterwards will not be visible
+
+    use OpenTelemetry::Instrumentation (
+        caller => [
+            # Provide no rules to autoinstrument everything
+
+            # Or provide simple rules to use the default instrumentation
+            reticulate_splines => 1,
+            reveal_passwords   => 0,
+
+            # Or access more fine-grained control
+            # with regex matchers and custom span starters
+            qr/^(?re)?frobligate$/ => sub {
+                my ( $package, $subname, $orig, @args ) = @_;
+                ...
+            },
+        ],
+    );
+
+=head1 DESCRIPTION
+
+This module provides a mechanism to automatically instrument the code in an
+existing package with L<OpenTelemetry> without needing to modify the code,
+or depend on some other instrumentation library. It is similar to
+L<OpenTelemetry::Instrumentation::namespace>, and indeed uses it internally.
+The main difference is that while that one can be used to instrument existing
+code that you cannot modify, this one is designed to make it easier to instrument
+code from within the package that defines it.
+
+When loaded, it will use the provided configuration to determine what
+subroutines in the current package are relevant for instrumentation, and
+install the instrumentation code. See L<below|/CONFIGURATION> for details on
+how this configuration works.
+
+Since this instrumentation only concerns itself with subroutines in its own
+package, it does not require to install any C<require> hooks.
+
+See L<OpenTelemetry::Instrumentation> for more details.
+
+=head1 CONFIGURATION
+
+Configuration behaves like that described in
+L<OpenTelemetry::Instrumentation::namespace/CONFIGURATION>, with the only
+caveat that this instrumentation ignores what is described in that document
+as "Package Rules".
+
+=head2 Examples
+
+The most basic import is one without rules
+
+    use OpenTelemetry::Instrumentation 'caller';
+
+which is equivalent to the following:
+
+    use OpenTelemetry::Instrumentation caller => [
+        # Options
+        -ignore_constants        => 1,
+        -ignore_private          => 1,
+        -ignore_import           => 1,
+        -prefer_instrumentations => 1,
+        # Rules
+        qr/.*/                   => 1,
+    ];
+
+which is to say, any subroutine in the matching package (except those that
+have been globally ignored, see
+L<"-ignore_import"|OpenTelemetry::Instrumentation::namespace/-ignore_import>,
+L<"-ignore_constants"|OpenTelemetry::Instrumentation::namespace/-ignore_constants>,
+and L<"-ignore_private"|OpenTelemetry::Instrumentation::namespace/-ignore_private>
+in L<OpenTelemetry::Instrumentation::namespace>) should use the default instrumentation.
+
+The default instrumentation is equivalent to wrapping the matching subroutine
+in a call to L<OpenTelemetry::Trace::Tracer/in_span>, with the name of the span
+being made up of the full name of the subroutine, including the package name.
+
+If this is insufficient, it can be customised further by passing a code reference
+as the value of the rule. The example above could be further expanded to
+
+    use OpenTelemetry::Instrumentation caller => [
+        # Options
+        ...
+        # Rules
+        qr/.*/ => sub ( $package, $subname, $orig, @args ) {
+            OpenTelemetry
+                ->tracer_provider
+                ->tracer( name => $package, version => $package->VERSION )
+                ->in_span(
+                    "${package}::${subname}" => sub { $orig->(@args) },
+                );
+        },
+    ];
+
+=head1 LIMITATIONS
+
+This instrumentaton relies on L<namespace::clean/get_functions> to detect the
+functions in the calling package. This means that it is liable to the same
+limitations as described in L<namespace::clean/Late binding caveat>. In the
+context of this module, that means that you should C<use> it after any subroutines
+of interest have been defined.
+
+See L<OpenTelemetry::Instrumentation::namespace/LIMITATIONS> for other limitations
+of the underlying implementation.
+
+=head1 COPYRIGHT
+
+This software is copyright (c) 2025 by José Joaquín Atria.
+
+This is free software; you can redistribute it and/or modify it under the same
+terms as the Perl 5 programming language system itself.

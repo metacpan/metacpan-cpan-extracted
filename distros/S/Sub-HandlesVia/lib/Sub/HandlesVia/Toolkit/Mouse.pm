@@ -5,7 +5,7 @@ use warnings;
 package Sub::HandlesVia::Toolkit::Mouse;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.050007';
+our $VERSION   = '0.052000';
 
 use Sub::HandlesVia::Mite;
 extends 'Sub::HandlesVia::Toolkit';
@@ -175,7 +175,7 @@ sub code_generator_for_attribute {
 package Sub::HandlesVia::Toolkit::Mouse::PackageTrait;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.050007';
+our $VERSION   = '0.052000';
 
 use Mouse::Role;
 
@@ -214,7 +214,7 @@ around add_attribute => sub {
 package Sub::HandlesVia::Toolkit::Mouse::RoleTrait;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.050007';
+our $VERSION   = '0.052000';
 
 use Mouse::Role;
 requires '_shv_toolkit';

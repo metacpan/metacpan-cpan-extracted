@@ -4,7 +4,7 @@ Dev::Util::Query - Functions to prompt user for input, y/n, or menus.
 
 # VERSION
 
-Version v2.19.7
+Version v2.19.11
 
 # SYNOPSIS
 
@@ -87,16 +87,16 @@ A carriage return will return the default.  Returns 1 for yes, 0 for no.
 
 ## **prompt(ARGS\_HASH)**
 
-Prompt user for input. 
+Prompt user for input.
 
 **ARGS\_HASH:**
 { text => TEXT, default => DEFAULT, valid => VALID, prepend => PREPEND, append => APPEND, noecho => ECHO\_BOOL }
 
 `DEFAULT` Set the default response, optionally.
 
-`VALID` Ensures the response is valid.  Can be a list or array reference, in which case 
-the values will be presented as a menu.  Alternately, it can be a code ref, where the 
-subroutine is run with `$_` set to the response.  An invalid response will re-prompt 
+`VALID` Ensures the response is valid.  Can be a list or array reference, in which case
+the values will be presented as a menu.  Alternately, it can be a code ref, where the
+subroutine is run with `$_` set to the response.  An invalid response will re-prompt
 the user for input.
 
 `ECHO_BOOL` Normally (the default 0) text will be echoed as it is typed.  If set to 1

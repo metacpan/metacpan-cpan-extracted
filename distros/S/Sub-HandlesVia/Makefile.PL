@@ -53,68 +53,95 @@ my $meta = {
                                      },
                       },
   "provides"       => {
-                        "Sub::HandlesVia"                               => { file => "lib/Sub/HandlesVia.pm", version => 0.050007 },
-                        "Sub::HandlesVia::CodeGenerator"                => { file => "lib/Sub/HandlesVia/CodeGenerator.pm", version => 0.050007 },
-                        "Sub::HandlesVia::Declare"                      => { file => "lib/Sub/HandlesVia/Declare.pm", version => 0.050007 },
-                        "Sub::HandlesVia::Handler"                      => { file => "lib/Sub/HandlesVia/Handler.pm", version => 0.050007 },
-                        "Sub::HandlesVia::Handler::CodeRef"             => { file => "lib/Sub/HandlesVia/Handler.pm", version => 0.050007 },
-                        "Sub::HandlesVia::Handler::Traditional"         => { file => "lib/Sub/HandlesVia/Handler.pm", version => 0.050007 },
-                        "Sub::HandlesVia::HandlerLibrary"               => { file => "lib/Sub/HandlesVia/HandlerLibrary.pm", version => 0.050007 },
+                        "Sub::HandlesVia"                               => { file => "lib/Sub/HandlesVia.pm", version => "0.052000" },
+                        "Sub::HandlesVia::CodeGenerator"                => {
+                                                                             file => "lib/Sub/HandlesVia/CodeGenerator.pm",
+                                                                             version => "0.052000",
+                                                                           },
+                        "Sub::HandlesVia::Declare"                      => { file => "lib/Sub/HandlesVia/Declare.pm", version => "0.052000" },
+                        "Sub::HandlesVia::Handler"                      => { file => "lib/Sub/HandlesVia/Handler.pm", version => "0.052000" },
+                        "Sub::HandlesVia::Handler::CodeRef"             => { file => "lib/Sub/HandlesVia/Handler.pm", version => "0.052000" },
+                        "Sub::HandlesVia::Handler::Traditional"         => { file => "lib/Sub/HandlesVia/Handler.pm", version => "0.052000" },
+                        "Sub::HandlesVia::HandlerLibrary"               => {
+                                                                             file => "lib/Sub/HandlesVia/HandlerLibrary.pm",
+                                                                             version => "0.052000",
+                                                                           },
                         "Sub::HandlesVia::HandlerLibrary::Array"        => {
                                                                              file => "lib/Sub/HandlesVia/HandlerLibrary/Array.pm",
-                                                                             version => 0.050007,
+                                                                             version => "0.052000",
                                                                            },
                         "Sub::HandlesVia::HandlerLibrary::Blessed"      => {
                                                                              file => "lib/Sub/HandlesVia/HandlerLibrary/Blessed.pm",
-                                                                             version => 0.050007,
+                                                                             version => "0.052000",
                                                                            },
                         "Sub::HandlesVia::HandlerLibrary::Bool"         => {
                                                                              file => "lib/Sub/HandlesVia/HandlerLibrary/Bool.pm",
-                                                                             version => 0.050007,
+                                                                             version => "0.052000",
                                                                            },
                         "Sub::HandlesVia::HandlerLibrary::Code"         => {
                                                                              file => "lib/Sub/HandlesVia/HandlerLibrary/Code.pm",
-                                                                             version => 0.050007,
+                                                                             version => "0.052000",
                                                                            },
                         "Sub::HandlesVia::HandlerLibrary::Counter"      => {
                                                                              file => "lib/Sub/HandlesVia/HandlerLibrary/Counter.pm",
-                                                                             version => 0.050007,
+                                                                             version => "0.052000",
                                                                            },
                         "Sub::HandlesVia::HandlerLibrary::Enum"         => {
                                                                              file => "lib/Sub/HandlesVia/HandlerLibrary/Enum.pm",
-                                                                             version => 0.050007,
+                                                                             version => "0.052000",
                                                                            },
                         "Sub::HandlesVia::HandlerLibrary::Hash"         => {
                                                                              file => "lib/Sub/HandlesVia/HandlerLibrary/Hash.pm",
-                                                                             version => 0.050007,
+                                                                             version => "0.052000",
                                                                            },
                         "Sub::HandlesVia::HandlerLibrary::Number"       => {
                                                                              file => "lib/Sub/HandlesVia/HandlerLibrary/Number.pm",
-                                                                             version => 0.050007,
+                                                                             version => "0.052000",
                                                                            },
                         "Sub::HandlesVia::HandlerLibrary::Scalar"       => {
                                                                              file => "lib/Sub/HandlesVia/HandlerLibrary/Scalar.pm",
-                                                                             version => 0.050007,
+                                                                             version => "0.052000",
                                                                            },
                         "Sub::HandlesVia::HandlerLibrary::String"       => {
                                                                              file => "lib/Sub/HandlesVia/HandlerLibrary/String.pm",
-                                                                             version => 0.050007,
+                                                                             version => "0.052000",
                                                                            },
                         "Sub::HandlesVia::Mite"                         => { file => "lib/Sub/HandlesVia/Mite.pm" },
-                        "Sub::HandlesVia::Toolkit"                      => { file => "lib/Sub/HandlesVia/Toolkit.pm", version => 0.050007 },
-                        "Sub::HandlesVia::Toolkit::Mite"                => { file => "lib/Sub/HandlesVia/Toolkit/Mite.pm", version => 0.050007 },
-                        "Sub::HandlesVia::Toolkit::Moo"                 => { file => "lib/Sub/HandlesVia/Toolkit/Moo.pm", version => 0.050007 },
-                        "Sub::HandlesVia::Toolkit::Moose"               => { file => "lib/Sub/HandlesVia/Toolkit/Moose.pm", version => 0.050007 },
-                        "Sub::HandlesVia::Toolkit::Moose::PackageTrait" => { file => "lib/Sub/HandlesVia/Toolkit/Moose.pm", version => 0.050007 },
-                        "Sub::HandlesVia::Toolkit::Moose::RoleTrait"    => { file => "lib/Sub/HandlesVia/Toolkit/Moose.pm", version => 0.050007 },
-                        "Sub::HandlesVia::Toolkit::Mouse"               => { file => "lib/Sub/HandlesVia/Toolkit/Mouse.pm", version => 0.050007 },
-                        "Sub::HandlesVia::Toolkit::Mouse::PackageTrait" => { file => "lib/Sub/HandlesVia/Toolkit/Mouse.pm", version => 0.050007 },
-                        "Sub::HandlesVia::Toolkit::Mouse::RoleTrait"    => { file => "lib/Sub/HandlesVia/Toolkit/Mouse.pm", version => 0.050007 },
+                        "Sub::HandlesVia::Toolkit"                      => { file => "lib/Sub/HandlesVia/Toolkit.pm", version => "0.052000" },
+                        "Sub::HandlesVia::Toolkit::Mite"                => { file => "lib/Sub/HandlesVia/Toolkit/Mite.pm", version => "0.052000" },
+                        "Sub::HandlesVia::Toolkit::Moo"                 => { file => "lib/Sub/HandlesVia/Toolkit/Moo.pm", version => "0.052000" },
+                        "Sub::HandlesVia::Toolkit::Moose"               => {
+                                                                             file => "lib/Sub/HandlesVia/Toolkit/Moose.pm",
+                                                                             version => "0.052000",
+                                                                           },
+                        "Sub::HandlesVia::Toolkit::Moose::PackageTrait" => {
+                                                                             file => "lib/Sub/HandlesVia/Toolkit/Moose.pm",
+                                                                             version => "0.052000",
+                                                                           },
+                        "Sub::HandlesVia::Toolkit::Moose::RoleTrait"    => {
+                                                                             file => "lib/Sub/HandlesVia/Toolkit/Moose.pm",
+                                                                             version => "0.052000",
+                                                                           },
+                        "Sub::HandlesVia::Toolkit::Mouse"               => {
+                                                                             file => "lib/Sub/HandlesVia/Toolkit/Mouse.pm",
+                                                                             version => "0.052000",
+                                                                           },
+                        "Sub::HandlesVia::Toolkit::Mouse::PackageTrait" => {
+                                                                             file => "lib/Sub/HandlesVia/Toolkit/Mouse.pm",
+                                                                             version => "0.052000",
+                                                                           },
+                        "Sub::HandlesVia::Toolkit::Mouse::RoleTrait"    => {
+                                                                             file => "lib/Sub/HandlesVia/Toolkit/Mouse.pm",
+                                                                             version => "0.052000",
+                                                                           },
                         "Sub::HandlesVia::Toolkit::ObjectPad"           => {
                                                                              file => "lib/Sub/HandlesVia/Toolkit/ObjectPad.pm",
-                                                                             version => 0.050007,
+                                                                             version => "0.052000",
                                                                            },
-                        "Sub::HandlesVia::Toolkit::Plain"               => { file => "lib/Sub/HandlesVia/Toolkit/Plain.pm", version => 0.050007 },
+                        "Sub::HandlesVia::Toolkit::Plain"               => {
+                                                                             file => "lib/Sub/HandlesVia/Toolkit/Plain.pm",
+                                                                             version => "0.052000",
+                                                                           },
                       },
   "release_status" => "stable",
   "resources"      => {
@@ -128,7 +155,7 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/project",
                       },
-  "version"        => 0.050007,
+  "version"        => "0.052000",
 };
 
 my %dynamic_config;

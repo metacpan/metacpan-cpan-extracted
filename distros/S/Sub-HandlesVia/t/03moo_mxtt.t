@@ -6,6 +6,33 @@ use Test::Fatal;
 
 { package Local::Dummy1; use Test::Requires 'Moo'; use Test::Requires 'MooX::TypeTiny'; };
 
+our $modified_GenerateAccessor = !!0;
+
+{
+        package TestRole;
+        use Devel::StackTrace;
+        use Moo::Role;
+
+        # test that at some point in the calling chain the modified
+        # _generate_isa_check routine in
+        # MooX::TypeTiny::Role::GenerateAccessor was involved.  this
+        # depends upon internal knowledge of MooX::TypeTiny.  This
+        # guards against the possibility that Sub::HandlesVia is
+        # subverting the actions of MooX::TypeTiny, as there is no
+        # difference in behavior between MooX::TypeTiny silently being
+        # ignored and it working.
+
+        around  inline_assert => sub {
+          my $level = 0;
+          while ( my @caller = caller(++$level ) ) {
+             $::modified_GenerateAccessor ||= $caller[0] eq 'MooX::TypeTiny::Role::GenerateAccessor';
+          }
+          my $orig = shift;
+          $orig->(@_);
+        };
+
+}
+
 note 'Local::Bleh';
 {
 	package Local::Bleh;
@@ -14,9 +41,12 @@ note 'Local::Bleh';
 	use Types::Standard -types;
 	use Sub::HandlesVia;
 
+        my $check = ArrayRef[ Int->plus_coercions(Num, 'int($_)') ];
+        Moo::Role->apply_roles_to_object( $check, 'TestRole');
+
 	has nums => (
 		is           => 'lazy',
-		isa          => ArrayRef[ Int->plus_coercions(Num, 'int($_)') ],
+		isa          => $check,
 		coerce       => 1,
 		builder      => sub { [1..2] },
 		handles_via  => 'Array',
@@ -29,6 +59,9 @@ note 'Local::Bleh';
 }
 
 my $bleh = Local::Bleh->new;
+
+ok( $modified_GenerateAccessor, 'MooX::Type::Tiny::Role::GenarateAccessor was applied'  );
+
 my @r = $bleh->splice_nums(0, 2, 3..5);
 is_deeply($bleh->nums, [3..5], 'delegated method worked');
 is_deeply(\@r, [1..2], '... and returned correct value');

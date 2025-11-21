@@ -4,7 +4,7 @@ App::Test::Generator - Generate fuzz and corpus-driven test harnesses
 
 # VERSION
 
-Version 0.15
+Version 0.16
 
 # SYNOPSIS
 
@@ -190,10 +190,6 @@ Recognized items:
 
         new:
 
-    For the legacy Perl variable syntax, use the empty string:
-
-        our $new = '';
-
 - `%cases` - optional Perl static corpus, when the output is a simple string (expected => \[ args... \]):
 
     Maps the expected output string to the input and \_STATUS
@@ -268,16 +264,43 @@ Recognized items:
     - `test_empty`, test with empty strings (default: 1)
     - `dedup`, fuzzing can create duplicate tests, go some way to remove duplicates (default: 1)
 
-## OUTPUT
+### Semantic Data Generators
 
-The generated test:
+For property-based testing, you can use semantic generators to create realistic test data:
 
-- Seeds RND (if configured) for reproducible fuzz runs
-- Uses edge cases (per-field and per-type) with configurable probability
-- Runs `$iterations` fuzz cases plus appended edge-case runs
-- Validates inputs with Params::Get / Params::Validate::Strict
-- Validates outputs with [Return::Set](https://metacpan.org/pod/Return%3A%3ASet)
-- Runs static `is(... )` corpus tests from Perl and/or YAML corpus
+    input:
+      email:
+        type: string
+        semantic: email
+
+      user_id:
+        type: string
+        semantic: uuid
+
+      phone:
+        type: string
+        semantic: phone_us
+
+#### Available Semantic Types
+
+- `email` - Valid email addresses (user@domain.tld)
+- `url` - HTTP/HTTPS URLs
+- `uuid` - UUIDv4 identifiers
+- `phone_us` - US phone numbers (XXX-XXX-XXXX)
+- `phone_e164` - International E.164 format (+XXXXXXXXXXXX)
+- `ipv4` - IPv4 addresses (0.0.0.0 - 255.255.255.255)
+- `ipv6` - IPv6 addresses
+- `username` - Alphanumeric usernames with \_ and -
+- `slug` - URL slugs (lowercase-with-hyphens)
+- `hex_color` - Hex color codes (#RRGGBB)
+- `iso_date` - ISO 8601 dates (YYYY-MM-DD)
+- `iso_datetime` - ISO 8601 datetimes (YYYY-MM-DDTHH:MM:SSZ)
+- `semver` - Semantic version strings (major.minor.patch)
+- `jwt` - JWT-like tokens (base64url format)
+- `json` - Simple JSON objects
+- `base64` - Base64-encoded strings
+- `md5` - MD5 hashes (32 hex chars)
+- `sha256` - SHA-256 hashes (64 hex chars)
 
 ## TRANSFORMS
 
@@ -421,64 +444,7 @@ without relying solely on randomness.
 
 # EXAMPLES
 
-## Math::Simple::add()
-
-Functional fuzz + Perl corpus + seed:
-
-    our $module = 'Math::Simple';
-    our $function = 'add';
-    our %input = ( a => { type => 'integer' }, b => { type => 'integer' } );
-    our %output = ( type => 'integer' );
-    our %cases = (
-      '3' => [1, 2],
-      '0' => [0, 0],
-      '-1' => [-2, 1],
-      '_STATUS:DIES' => [ 'a', 'b' ],     # non-numeric args should die
-      '_STATUS:WARNS' => [ undef, undef ], # undef args should warn
-    );
-    our $seed = 12345;
-    our $iterations = 100;
-
-## Adding YAML file to generate tests
-
-OO fuzz + YAML corpus + edge cases:
-
-        our %input = ( query => { type => 'string' } );
-        our %output = ( type => 'string' );
-        our $function = 'search';
-        our $new = { api_key => 'ABC123' };
-        our $yaml_cases = 't/corpus.yml';
-        our %edge_cases = ( query => [ '', '    ', '<script>' ] );
-        our %type_edge_cases = ( string => [ \"\\0", "\x{FFFD}" ] );
-        our $seed = 999;
-
-### YAML Corpus Example (t/corpus.yml)
-
-A YAML mapping of expected -> args array:
-
-        "success":
-          - "Alice"
-          - 30
-        "failure":
-          - "Bob"
-
-## Example with arrayref + hashref
-
-    our %input = (
-      tags => { type => 'arrayref', optional => 1 },
-      config => { type => 'hashref' },
-    );
-    our %output = ( type => 'hashref' );
-
-## Example with memberof
-
-    our %input = (
-        status => { type => 'string', memberof => [ 'ok', 'error', 'pending' ] },
-    );
-    our %output = ( type => 'string' );
-    our %config = ( test_nuls => 0, test_undef => 1 );
-
-This will generate fuzz cases for 'ok', 'error', 'pending', and one invalid string that should die.
+See the files in `t/conf` for examples.
 
 ## Adding Scheduled fuzz Testing with GitHub Actions to Your Code
 
@@ -597,8 +563,8 @@ Then create this file as &lt;t/fuzz.t>:
     use FindBin qw($Bin);
     use IPC::Run3;
     use IPC::System::Simple qw(system);
-    use Test::Most;
     use Test::Needs 'App::Test::Generator';
+    use Test::Most;
 
     my $dirname = "$Bin/conf";
 
@@ -621,7 +587,7 @@ Then create this file as &lt;t/fuzz.t>:
                                           diag("$1 tests run");
                                   }
                           } else {
-                                  diag("STDOUT:\n$stdout");
+                                  diag("$filepath: STDOUT:\n$stdout");
                           }
                           diag($stderr) if(length($stderr));
                   }
@@ -631,11 +597,402 @@ Then create this file as &lt;t/fuzz.t>:
 
     done_testing();
 
+## Property-Based Testing with Transforms
+
+The generator can create property-based tests using [Test::LectroTest](https://metacpan.org/pod/Test%3A%3ALectroTest) when the
+`properties` configuration option is enabled.
+This provides more comprehensive
+testing by automatically generating thousands of test cases and verifying that
+mathematical properties hold across all inputs.
+
+### Basic Property-Based Transform Example
+
+Here's a complete example testing the `abs` builtin function:
+
+**t/conf/abs.yml**:
+
+    ---
+    module: builtin
+    function: abs
+
+    config:
+      test_undef: no
+      test_empty: no
+      test_nuls: no
+      properties:
+        enable: true
+        trials: 1000
+
+    input:
+      number:
+        type: number
+        position: 0
+
+    output:
+      type: number
+      min: 0
+
+    transforms:
+      positive:
+        input:
+          number:
+            type: number
+            min: 0
+        output:
+          type: number
+          min: 0
+
+      negative:
+        input:
+          number:
+            type: number
+            max: 0
+        output:
+          type: number
+          min: 0
+
+This configuration:
+
+- Enables property-based testing with 1000 trials per property
+- Defines two transforms: one for positive numbers, one for negative
+- Automatically generates properties that verify `abs()` always returns non-negative numbers
+
+Generate the test:
+
+    fuzz-harness-generator t/conf/abs.yml > t/abs_property.t
+
+The generated test will include:
+
+- Traditional edge-case tests for boundary conditions
+- Random fuzzing with 50 iterations (or as configured)
+- Property-based tests that verify the transforms with 1000 trials each
+
+### What Properties Are Tested?
+
+The generator automatically detects and tests these properties based on your transform specifications:
+
+- **Range constraints** - If output has `min` or `max`, verifies results stay within bounds
+- **Type preservation** - Ensures numeric inputs produce numeric outputs
+- **Definedness** - Verifies the function doesn't return `undef` unexpectedly
+- **Specific values** - If output specifies a `value`, checks exact equality
+
+For the `abs` example above, the generated properties verify:
+
+    # For the "positive" transform:
+    - Given a positive number, abs() returns >= 0
+    - The result is a valid number
+    - The result is defined
+
+    # For the "negative" transform:
+    - Given a negative number, abs() returns >= 0
+    - The result is a valid number
+    - The result is defined
+
+### Advanced Example: String Normalization
+
+Here's a more complex example testing a string normalization function:
+
+**t/conf/normalize.yml**:
+
+    ---
+    module: Text::Processor
+    function: normalize_whitespace
+
+    config:
+      properties:
+        enable: true
+        trials: 500
+
+    input:
+      text:
+        type: string
+        min: 0
+        max: 1000
+        position: 0
+
+    output:
+      type: string
+      min: 0
+      max: 1000
+
+    transforms:
+      empty_preserved:
+        input:
+          text:
+            type: string
+            value: ""
+        output:
+          type: string
+          value: ""
+
+      single_space:
+        input:
+          text:
+            type: string
+            min: 1
+            matches: '^\S+(\s+\S+)*$'
+        output:
+          type: string
+          matches: '^\S+( \S+)*$'
+
+      length_bounded:
+        input:
+          text:
+            type: string
+            min: 1
+            max: 100
+        output:
+          type: string
+          min: 1
+          max: 100
+
+This tests that the normalization function:
+
+- Preserves empty strings (`empty_preserved` transform)
+- Collapses multiple spaces into single spaces (`single_space` transform)
+- Maintains length constraints (`length_bounded` transform)
+
+### Interpreting Property Test Results
+
+When property-based tests run, you'll see output like:
+
+    ok 123 - negative property holds (1000 trials)
+    ok 124 - positive property holds (1000 trials)
+
+If a property fails, Test::LectroTest will attempt to find the minimal failing
+case and display it:
+
+    not ok 123 - positive property holds (47 trials)
+    # Property failed
+    # Reason: counterexample found
+
+This helps you quickly identify edge cases that your function doesn't handle correctly.
+
+### Configuration Options for Property-Based Testing
+
+In the `config` section:
+
+    config:
+      properties:
+        enable: true     # Enable property-based testing (default: false)
+        trials: 1000     # Number of test cases per property (default: 1000)
+
+You can also disable traditional fuzzing and only use property-based tests:
+
+    config:
+      properties:
+        enable: true
+        trials: 5000
+
+    iterations: 0  # Disable random fuzzing, use only property tests
+
+### When to Use Property-Based Testing
+
+Property-based testing with transforms is particularly useful for:
+
+- Mathematical functions (`abs`, `sqrt`, `min`, `max`, etc.)
+- Data transformations (encoding, normalization, sanitization)
+- Parsers and formatters
+- Functions with clear input-output relationships
+- Code that should satisfy mathematical properties (commutativity, associativity, idempotence)
+
+### Requirements
+
+Property-based testing requires [Test::LectroTest](https://metacpan.org/pod/Test%3A%3ALectroTest) to be installed:
+
+    cpanm Test::LectroTest
+
+If not installed, the generated tests will automatically skip the property-based
+portion with a message.
+
+### Testing Email Validation
+
+    ---
+    module: Email::Valid
+    function: rfc822
+
+    config:
+      properties:
+        enable: true
+        trials: 200
+      test_undef: no
+      test_empty: no
+      test_nuls: no
+
+    input:
+      email:
+        type: string
+        semantic: email
+        position: 0
+
+    output:
+      type: boolean
+
+    transforms:
+      valid_emails:
+        input:
+          email:
+            type: string
+            semantic: email
+        output:
+          type: boolean
+
+This generates 200 realistic email addresses for testing, rather than random strings.
+
+### Combining Semantic with Regex
+
+You can combine semantic generators with regex validation:
+
+    input:
+      corporate_email:
+        type: string
+        semantic: email
+        matches: '@company\.com$'
+
+The semantic generator creates realistic emails, and the regex ensures they match your domain.
+
+### Custom Properties for Transforms
+
+You can define additional properties that should hold for your transforms beyond
+the automatically detected ones.
+
+#### Using Built-in Properties
+
+    transforms:
+      positive:
+        input:
+          number:
+            type: number
+            min: 0
+        output:
+          type: number
+          min: 0
+        properties:
+          - idempotent       # f(f(x)) == f(x)
+          - non_negative     # result >= 0
+          - positive         # result > 0
+
+Available built-in properties:
+
+- `idempotent` - Function is idempotent: f(f(x)) == f(x)
+- `non_negative` - Result is always >= 0
+- `positive` - Result is always > 0
+- `non_empty` - String result is never empty
+- `length_preserved` - Output length equals input length
+- `uppercase` - Result is all uppercase
+- `lowercase` - Result is all lowercase
+- `trimmed` - No leading/trailing whitespace
+- `sorted_ascending` - Array is sorted ascending
+- `sorted_descending` - Array is sorted descending
+- `unique_elements` - Array has no duplicates
+- `preserves_keys` - Hash has same keys as input
+
+#### Custom Property Code
+
+Custom properties allows the definition additional invariants and relationships that should hold for their transforms,
+beyond what's auto-detected.
+For example:
+
+- Idempotence: f(f(x)) == f(x)
+- Commutativity: f(x, y) == f(y, x)
+- Associativity: f(f(x, y), z) == f(x, f(y, z))
+- Inverse relationships: decode(encode(x)) == x
+- Domain-specific invariants: Custom business logic
+
+Define your own properties with custom Perl code:
+
+    transforms:
+      normalize:
+        input:
+          text:
+            type: string
+        output:
+          type: string
+        properties:
+          - name: single_spaces
+            description: "No multiple consecutive spaces"
+            code: $result !~ /  /
+
+          - name: no_leading_space
+            description: "No space at start"
+            code: $result !~ /^\s/
+
+          - name: reversible
+            description: "Can be reversed back"
+            code: length($result) == length($text)
+
+The code has access to:
+
+- `$result` - The function's return value
+- Input variables - All input parameters (e.g., `$text`, `$number`)
+- The function itself - Can call it again for idempotence checks
+
+#### Combining Auto-detected and Custom Properties
+
+The generator automatically detects properties from your output spec, and adds
+your custom properties:
+
+    transforms:
+      sanitize:
+        input:
+          html:
+            type: string
+        output:
+          type: string
+          min: 0              # Auto-detects: defined, min_length >= 0
+          max: 10000
+        properties:           # Additional custom checks:
+          - name: no_scripts
+            code: $result !~ /<script/i
+          - name: no_iframes
+            code: $result !~ /<iframe/i
+
+## OUTPUT
+
+The generated test:
+
+- Seeds RND (if configured) for reproducible fuzz runs
+- Uses edge cases (per-field and per-type) with configurable probability
+- Runs `$iterations` fuzz cases plus appended edge-case runs
+- Validates inputs with Params::Get / Params::Validate::Strict
+- Validates outputs with [Return::Set](https://metacpan.org/pod/Return%3A%3ASet)
+- Runs static `is(... )` corpus tests from Perl and/or YAML corpus
+
 # METHODS
 
     generate($schema_file, $test_file)
 
 Takes a schema file and produces a test file (or STDOUT).
+
+## \_generate\_transform\_properties
+
+Converts transform specifications into LectroTest property definitions.
+
+## \_process\_custom\_properties
+
+Processes custom property definitions from the schema.
+
+## \_detect\_transform\_properties
+
+Automatically detects testable properties from transform input/output specs.
+
+## \_get\_semantic\_generators
+
+Returns a hash of built-in semantic generators for common data types.
+
+## \_get\_builtin\_properties
+
+Returns a hash of built-in property templates that can be applied to transforms.
+
+## \_schema\_to\_lectrotest\_generator
+
+Converts a schema field spec to a LectroTest generator string.
+
+## Helper functions for type detection
+
+## \_render\_properties
+
+Renders property definitions into Perl code for the template.
 
 # NOTES
 
@@ -647,6 +1004,7 @@ Takes a schema file and produces a test file (or STDOUT).
 - [Params::Validate::Strict](https://metacpan.org/pod/Params%3A%3AValidate%3A%3AStrict): Schema Definition
 - [Params::Get](https://metacpan.org/pod/Params%3A%3AGet): Input validation
 - [Return::Set](https://metacpan.org/pod/Return%3A%3ASet): Output validation
+- [Test::LectroTest](https://metacpan.org/pod/Test%3A%3ALectroTest)
 - [Test::Most](https://metacpan.org/pod/Test%3A%3AMost)
 - [YAML::XS](https://metacpan.org/pod/YAML%3A%3AXS)
 

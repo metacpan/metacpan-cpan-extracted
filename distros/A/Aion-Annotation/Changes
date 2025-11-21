@@ -1,0 +1,14 @@
+Revision history for Perl extension Aion::Annotation
+
+0.0.2 2025-11-20T14:40:03Z
+
+    - add unsupported os
+
+0.0.1 2025-11-20T14:36:19Z
+
+    - used LIB config as array
+
+0.01 2018-04-19T11:17:54Z
+
+    - original version
+

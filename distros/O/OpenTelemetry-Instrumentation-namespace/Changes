@@ -1,0 +1,9 @@
+Revision history for OpenTelemetry-Instrumentation-namespace
+
+0.033     2025-11-20 22:50:11 GMT
+
+    * Add repository information to META
+
+0.032     2025-11-20 22:43:25 GMT
+
+    Released as a separate distribution from OpenTelemetry

@@ -1,7 +1,7 @@
 package OpenTelemetry::Instrumentation;
 # ABSTRACT: Top-level interface for OpenTelemetry instrumentations
 
-our $VERSION = '0.031';
+our $VERSION = '0.032';
 
 use strict;
 use warnings;
@@ -14,7 +14,8 @@ use Module::Pluggable search_path => [qw(
     OpenTelemetry::Instrumentation
     OpenTelemetry::Integration
 )];
-use Ref::Util 'is_hashref';
+use Scalar::Util 'blessed';
+use Ref::Util qw( is_coderef is_hashref is_arrayref );
 use OpenTelemetry::Common ();
 
 my $logger = OpenTelemetry::Common::internal_logger;
@@ -23,19 +24,10 @@ my $logger = OpenTelemetry::Common::internal_logger;
 sub dependencies { }
 sub uninstall { } # experimental
 
-my sub module_exists ($module) {
-    my $file = Module::Runtime::module_notional_filename $module;
-    for (@INC) {
-        return 1 if -e "$_/$file";
-    }
-    return 0;
-}
-
-my @installed;
-sub import ( $class, @args ) {
-    return unless @args;
-
-    my $all = $args[0] =~ /^[:-]all$/ && shift @args;
+my %REGISTRY;
+my sub find_instrumentations {
+    my $class = shift;
+    return if %REGISTRY; # Runs once and caches results
 
     # Inlined from OpenTelemetry::Common to read Perl-specific config
     my $legacy_support = $ENV{OTEL_PERL_USE_LEGACY_INSTRUMENTATIONS} // 1;
@@ -44,37 +36,50 @@ sub import ( $class, @args ) {
         : $legacy_support =~ /^false$/i ? 0
         : $legacy_support;
 
+    # We sort the plugins so that we prefer the Instrumentation namespace
+    for ( sort $class->plugins ) {
+        last if /^OpenTelemetry::Integration::/ && !$legacy_support;
+        $REGISTRY{ s/^OpenTelemetry::(?:Instrumentation|Integration):://r } ||= $_
+    }
+
+    return;
+}
+
+sub for_package ($class, $package, @) {
+    find_instrumentations($class);
+    $REGISTRY{$package // ''};
+}
+
+my @installed;
+sub import ( $class, @args ) {
+    return unless @args;
+
+    my $all = $args[0] =~ /^[:-]all$/ && shift @args;
+
     my %configuration;
     while ( my $key = shift @args ) {
-        my $options = is_hashref $args[0] ? shift @args : {};
+        my $options = is_hashref($args[0]) || is_arrayref($args[0])
+            ? shift @args : {};
 
         # Legacy namespace support. If we are loading an integration
         # by name which does not exist in INC in the new namespace,
         # but does exist in the legacy namespace, we use the legacy
         # name instead.
-        my $module = __PACKAGE__ . '::' . $key;
-        if ( $legacy_support && !module_exists($module) ) {
-            my $legacy = $module =~ s/^OpenTelemetry::Instrumentation/OpenTelemetry::Integration/r;
-            $module = $legacy if module_exists($legacy);
+        my $instrumentation = $class->for_package($key);
+
+        unless ( $instrumentation ) {
+            $logger->warn(
+                "Unable to load OpenTelemetry instrumentation for $key: Can't locate any suitable module in \@INC (you may need to install OpenTelemetry::Instrumentation::$key) (\@INC entries checked: @INC)",
+            );
+            next;
         }
 
-        $configuration{$module} = $options;
+        $configuration{$instrumentation} = $options;
     }
 
     if ($all) {
-        for my $plugin ($class->plugins) {
-            if ( $plugin =~ /^OpenTelemetry::Instrumentation/ ) {
-                $configuration{$plugin} //= {};
-                next;
-            }
-
-            next unless $legacy_support;
-
-            my $canonical = $plugin =~ s/^OpenTelemetry::Integration/OpenTelemetry::Instrumentation/r;
-            next if $configuration{$canonical};
-
-            $configuration{$plugin} //= {};
-        }
+        find_instrumentations($class);
+        $configuration{$_} //= {} for values %REGISTRY;
     }
 
     for my $package ( keys %configuration ) {
@@ -88,7 +93,8 @@ sub import ( $class, @args ) {
                 Module::Runtime::require_module($_) for $package->dependencies;
             }
 
-            my $ok = $package->install( %{ $configuration{ $package } } );
+            my $config = $configuration{ $package };
+            my $ok = $package->install( is_hashref $config ? %$config : @$config );
 
             if ($ok) {
                 push @installed, $package;

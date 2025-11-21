@@ -1,0 +1,222 @@
+# NAME
+
+OpenTelemetry::Instrumentation::namespace - OpenTelemetry instrumentation for a namespace
+
+# SYNOPSIS
+
+    # This instrumentation is EXPERIMENTAL
+
+    use OpenTelemetry::Instrumentation (
+        namespace => [
+            # Load config from the file system
+            -from_file => '/path/to/config.yaml',
+
+            # Match packages exactly
+            # using sensible defaults
+            'Exact::Match' => 1,
+
+            # Match packages with a regex
+            # and exclude them
+            qr/^Local::Secret::/ => 0,
+
+            # Rules are matched in order,
+            # so this one ignores the secret packages
+            qr/^Local::/ => [
+                # Add rules for subroutine names
+                # and use custom span starters
+                qr/^(?re)?frobligate$/ => sub {
+                    my ( $package, $subname, $orig, @args ) = @_;
+                    ...
+                },
+            ]
+        ],
+    );
+
+# DESCRIPTION
+
+This module provides a generic mechanism to automatically instrument existing
+codebases with [OpenTelemetry](https://metacpan.org/pod/OpenTelemetry) without needing to modify the code, or depend
+on some other instrumentation library. This is not intended as a replacement
+for writing custom instrumentation libraries, but to make it easier to
+selectively instrument large codebases that you may not be able to or willing
+to modify.
+
+When loaded, it will use the provided configuration to determine what
+subroutines from which packages are relevant for instrumentation. It will then
+look among loaded packages for any that match, and instrument any relevant
+subroutines as appropriate. See [below](#configuration) for details on how to
+configure it.
+
+It will also install a hook in the require process so that those same rules are
+applied to the modules that are loaded after this point.
+
+See [OpenTelemetry::Instrumentation](https://metacpan.org/pod/OpenTelemetry%3A%3AInstrumentation) for more details.
+
+# CONFIGURATION
+
+This instrumentation supports configuration with either a hash reference, or
+an array reference with key-value pairs. In both cases, these will be
+processed in order, although when using a hash reference the order of the
+pairs will not be up to the user.
+
+Configuration values are broadly separated into two categories: options,
+which modify the general behaviour of the instrumentation; and rules, which
+control the namespaces and subroutines to instrument, and the way in which
+they are to be instrumented.
+
+## Options
+
+Any key that starts with a hyphen (`-`) is considered an option. These can
+appear anywhere in the list of parameters. Supported options are described
+below.
+
+### -ignore\_constants
+
+If set to a true value, subroutines whose names are in ALL CAPS will be
+skipped when deciding which subroutines to instrument. Defaults to true.
+
+### -ignore\_private
+
+If set to a true value, subroutines whose names have a leading underscore
+(`_`) will be skipped when deciding which subroutines to instrument.
+Defaults to true.
+
+### -ignore\_import
+
+If set to a true value, any `import` and `unimport` subroutines will be
+skipped when deciding which subroutines to instrument. Defaults to true.
+
+### -prefer\_instrumentations
+
+If set to a true value, packages for which an instrumentation library is
+available in the system will be will be skipped when deciding which
+packages to instrument. Defaults to true.
+
+### -from\_file
+
+If set to the path of a file in the filesystem, this instrumentation will
+attempt to load rules from it. The file must be in YAML format, and should
+contain either a map or a list of rules, as described below.
+
+Rules loaded from a file will be prepended to any rules given at time of
+import. Defaults to unset.
+
+## Rules
+
+Pairs in a rule set are interpreted as being composed of a matcher and an
+action. The matcher, which takes the place of the key, defines what the
+auto-instrumentation should apply _to_; and the action, in place of the
+value, defines what sort of instrumentation to implement.
+
+Matchers can be plain strings or regular expressions. String matchers will
+be matched directly. In both cases, a positive match means that the
+accompanying action applies to whatever was being matched. Otherwise,
+processing will move on to the next rule.
+
+### Package Rules
+
+At the top level, the matching will be done against package names. Any match
+will mean that the current action should apply to the current package.
+
+When matching packages, actions that are plain scalars will be interpreted
+in boolean context. A false value means that this package is _not_ to be
+instrumented, while a true value means this package should be instrumented
+with the defaults.
+
+For example, a rule set like
+
+    [
+        'Local::Secret::Common' => 1,
+        qr/^Local::Secret::/    => 0,
+        qr/^Local::/            => 1,
+        qr/^Test::/             => 1,
+    ]
+
+means that the "Local::Secret::Common" package should be instrumented, but any
+other package in the "Local::Secret::" namespace should not. Any remaining
+packages in the "Local::" or "Test::" namespaces shouls also be instrumented.
+
+Note that this type of cascading behaviour allows for considerable complexity,
+but is only supported when using an array reference to configure this
+instrumentation, since otherwise the order of these rules would not be preserved.
+
+If the action is an array or a hash reference, it will itself be interpreted
+as a rule set, this time applying to the symbols inside the corresponding
+package. See below for more details.
+
+No other reference types are supported.
+
+### Subroutine Rules
+
+Nested a level under package rules, subroutine rules apply to the subs within
+matching packages. Like with package names, rules will be applied in order, and
+plain string matchers will be matched directly against the subroutine name.
+
+Again like with package rules, actions can be plain scalars which will be
+interpreted as booleans, to indicate whether a particular matching subroutine
+should be instrumented with the defaults, or not instrumented at all.
+
+In the example above, the rule matching packages in the "Test::" namespace
+is equivalent to
+
+    [
+        qr/^Test::/ => [
+            qr/.*/ => 1
+        ],
+    ]
+
+which is to say, any subroutine in the matching package (except those that
+have been globally ignored, see ["-ignore\_import"](#ignore_import), ["-ignore\_constants"](#ignore_constants),
+and ["-ignore\_private"](#ignore_private) above) should use the default instrumentation.
+
+If the action is a code reference, it will be used to generate the
+instrumentation and wrapped around the code of the matching subroutine.
+Whenever the matching subroutine is called, this code reference will be
+executed with the following positional parameters:
+
+- The name of the matching package
+- The name of the matching subroutine
+- A reference to the matching subroutine
+- Any parameters that were passed by the caller
+
+Fully expanded, the example above is roughly equivalent to
+
+    [
+        qr/^Test::/ => [
+            qr/.*/ => sub ( $package, $subname, $orig, @args ) {
+                OpenTelemetry
+                    ->tracer_provider
+                    ->tracer( name => $package, version => $package->VERSION )
+                    ->in_span(
+                        "${package}::${subname}" => sub { $orig->(@args) },
+                    );
+            },
+        ],
+    ]
+
+# LIMITATIONS
+
+## Subpackages
+
+When Perl imports a module, this single file may declare more than one package,
+all of which become available for use. The top level package (or at least the way
+that Perl was able to identify the module to load) gets an entry in `%INC`, which
+is how Perl knows not to attempt to load any module more than once. However, no
+entries are created for any other packages that may be declared in that module.
+
+This instrumentation can only discover packages that have entries in `%INC`, so
+it does not support subpackages. To instrument those, you can use the traditional
+methods of instrumentation (see for example [OpenTelemetry::Instrumentation::DBI](https://metacpan.org/pod/OpenTelemetry%3A%3AInstrumentation%3A%3ADBI),
+which installs wrappers around some subroutines defined in subpackages), or you
+might be successful using [OpenTelemetry::Instrumentation::caller](https://metacpan.org/pod/OpenTelemetry%3A%3AInstrumentation%3A%3Acaller) from within the
+subpackage, if you can modigy the source code.
+
+That said, if you _can_ modify the source code, the recommendation would be to
+break each package into its own module, to avoid this and other similar issues.
+
+# COPYRIGHT
+
+This software is copyright (c) 2025 by José Joaquín Atria.
+
+This is free software; you can redistribute it and/or modify it under the same
+terms as the Perl 5 programming language system itself.

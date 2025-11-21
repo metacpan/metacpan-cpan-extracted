@@ -2,6 +2,7 @@ bin/fuzz-harness-generator
 Changes
 doc/getting-started-blog.md
 lib/App/Test/Generator.pm
+lib/App/Test/Generator/Template.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
@@ -15,12 +16,16 @@ t/abs.t
 t/conf-corpus.t
 t/conf-fuzz.t
 t/conf/abs.yml
+t/conf/abs_custom.yml
+t/conf/app_generator.yml
 t/conf/class_simple.conf
 t/conf/data_text_append.conf
 t/conf/data_text_set.conf
 t/conf/data_text_set.yml
+t/conf/email_rfc822.yml
 t/conf/html_genealogy_map.conf
 t/conf/html_genealogy_map.yml
+t/conf/uc.conf
 t/eof.t
 t/eol.t
 t/errors.t

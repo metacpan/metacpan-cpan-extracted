@@ -40,6 +40,7 @@
             "Scalar::Util" : "0",
             "perl" : "5.016000",
             "strict" : "0",
+            "utf8" : "0",
             "vars" : "0",
             "warnings" : "0"
          }
@@ -62,6 +63,6 @@
          "web" : "https://gitlab.com/jackdeguest/JSON-Schema-Validate"
       }
    },
-   "version" : "v0.5.0",
+   "version" : "v0.5.1",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,5 +1,5 @@
 {
-   "abstract" : "Base modules for Perl Development",
+   "abstract" : "Utilities useful in the development of perl programs",
    "author" : [
       "Matt Martini <matt@imaginarywave.com>"
    ],
@@ -81,6 +81,6 @@
          "web" : "https://github.com/mattmartini/Dev-Util"
       }
    },
-   "version" : "v2.19.7",
+   "version" : "v2.19.11",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

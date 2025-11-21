@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::MsgMaker::PromptUser;
-$App::SpreadRevolutionaryDate::MsgMaker::PromptUser::VERSION = '0.51';
+$App::SpreadRevolutionaryDate::MsgMaker::PromptUser::VERSION = '0.52';
 # ABSTRACT: MsgMaker class for L<App::SpreadRevolutionaryDate> to build message by prompting user
 
 use Moose;
@@ -35,19 +35,19 @@ has 'default' => (
 
 has 'img_path' => (
   is => 'rw',
-  isa => 'Str',
+  isa => 'Maybe[Str]',
   default => '',
 );
 
 has 'img_alt' => (
   is => 'rw',
-  isa => 'Str',
+  isa => 'Maybe[Str]',
   default => '',
 );
 
 has 'img_url' => (
   is => 'rw',
-  isa => 'Str',
+  isa => 'Maybe[Str]',
   default => '',
 );
 
@@ -146,7 +146,7 @@ App::SpreadRevolutionaryDate::MsgMaker::PromptUser - MsgMaker class for L<App::S
 
 =head1 VERSION
 
-version 0.51
+version 0.52
 
 =head1 METHODS
 

@@ -5,7 +5,7 @@ use warnings;
 package Sub::HandlesVia::Toolkit::Moo;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.050007';
+our $VERSION   = '0.052000';
 
 use Sub::HandlesVia::Mite;
 extends 'Sub::HandlesVia::Toolkit';
@@ -23,21 +23,9 @@ sub install_has_wrapper {
 	my $me = shift;
 	my ($target) = @_;
 
-	my ($installer, $orig);
-	if ($INC{'Moo/Role.pm'} && 'Moo::Role'->is_role($target)) {
-		$installer = 'Moo::Role::_install_tracked';
-		$orig = $Moo::Role::INFO{$target}{exports}{has};
-	}
-	else {
-		require Moo;
-		$installer = 'Moo::_install_tracked';
-		$orig = $Moo::MAKERS{$target}{exports}{has} || $Moo::MAKERS{$target}{non_methods}{has};
-	}
-	
-	$orig ||= $target->can('has');
-	ref($orig) or croak("$target doesn't have a `has` function");
-	
-	$target->$installer(has => sub {
+        require Moo::_Utils;
+        Moo::_Utils::_install_modifier( $target, around => has => sub {
+            my $orig = shift;
 		if (@_ % 2 == 0) {
 			require Carp;
 			Carp::croak("Invalid options for attribute(s): even number of arguments expected, got " . scalar @_);

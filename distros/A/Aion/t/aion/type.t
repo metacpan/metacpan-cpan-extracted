@@ -1,6 +1,7 @@
-use common::sense; use open qw/:std :utf8/;  use Carp qw//; use Cwd qw//; use File::Basename qw//; use File::Find qw//; use File::Slurper qw//; use File::Spec qw//; use File::Path qw//; use Scalar::Util qw//;  use Test::More 0.98;  BEGIN { 	$SIG{__DIE__} = sub { 		my ($msg) = @_; 		if(ref $msg) { 			$msg->{STACKTRACE} = Carp::longmess "?" if "HASH" eq Scalar::Util::reftype $msg; 			die $msg; 		} else { 			die Carp::longmess defined($msg)? $msg: "undef" 		} 	}; 	 	my $t = File::Slurper::read_text(__FILE__); 	 	my @dirs = File::Spec->splitdir(File::Basename::dirname(Cwd::abs_path(__FILE__))); 	my $project_dir = File::Spec->catfile(@dirs[0..$#dirs-2]); 	my $project_name = $dirs[$#dirs-2]; 	my @test_dirs = @dirs[$#dirs-2+2 .. $#dirs];  	my $dir_for_tests = File::Spec->catfile(File::Spec->tmpdir, ".liveman", $project_name, join("!", @test_dirs, File::Basename::basename(__FILE__))); 	 	File::Find::find(sub { chmod 0700, $_ if !/^\.{1,2}\z/ }, $dir_for_tests), File::Path::rmtree($dir_for_tests) if -e $dir_for_tests; 	File::Path::mkpath($dir_for_tests); 	 	chdir $dir_for_tests or die "chdir $dir_for_tests: $!"; 	 	push @INC, "$project_dir/lib", "lib"; 	 	$ENV{PROJECT_DIR} = $project_dir; 	$ENV{DIR_FOR_TESTS} = $dir_for_tests; 	 	while($t =~ /^#\@> (.*)\n((#>> .*\n)*)#\@< EOF\n/gm) { 		my ($file, $code) = ($1, $2); 		$code =~ s/^#>> //mg; 		File::Path::mkpath(File::Basename::dirname($file)); 		File::Slurper::write_text($file, $code); 	} } # # NAME
+use common::sense; use open qw/:std :utf8/;  use Carp qw//; use Cwd qw//; use File::Basename qw//; use File::Find qw//; use File::Slurper qw//; use File::Spec qw//; use File::Path qw//; use Scalar::Util qw//;  use Test::More 0.98;  BEGIN { 	$SIG{__DIE__} = sub { 		my ($msg) = @_; 		if(ref $msg) { 			$msg->{STACKTRACE} = Carp::longmess "?" if "HASH" eq Scalar::Util::reftype $msg; 			die $msg; 		} else { 			die Carp::longmess defined($msg)? $msg: "undef" 		} 	}; 	 	my $t = File::Slurper::read_text(__FILE__); 	 	my @dirs = File::Spec->splitdir(File::Basename::dirname(Cwd::abs_path(__FILE__))); 	my $project_dir = File::Spec->catfile(@dirs[0..$#dirs-2]); 	my $project_name = $dirs[$#dirs-2]; 	my @test_dirs = @dirs[$#dirs-2+2 .. $#dirs];  	$ENV{TMPDIR} = $ENV{LIVEMAN_TMPDIR} if exists $ENV{LIVEMAN_TMPDIR};  	my $dir_for_tests = File::Spec->catfile(File::Spec->tmpdir, ".liveman", $project_name, join("!", @test_dirs, File::Basename::basename(__FILE__))); 	 	File::Find::find(sub { chmod 0700, $_ if !/^\.{1,2}\z/ }, $dir_for_tests), File::Path::rmtree($dir_for_tests) if -e $dir_for_tests; 	File::Path::mkpath($dir_for_tests); 	 	chdir $dir_for_tests or die "chdir $dir_for_tests: $!"; 	 	push @INC, "$project_dir/lib", "lib"; 	 	$ENV{PROJECT_DIR} = $project_dir; 	$ENV{DIR_FOR_TESTS} = $dir_for_tests; 	 	while($t =~ /^#\@> (.*)\n((#>> .*\n)*)#\@< EOF\n/gm) { 		my ($file, $code) = ($1, $2); 		$code =~ s/^#>> //mg; 		File::Path::mkpath(File::Basename::dirname($file)); 		File::Slurper::write_text($file, $code); 	} } # 
+# # NAME
 # 
-# Aion::Type - class of validators
+# Aion::Type - класс валидаторов
 # 
 # # SYNOPSIS
 # 
@@ -32,28 +33,26 @@ my $Digit = $Int & $Char;
 # 
 # # DESCRIPTION
 # 
-# This is construct for make any validators.
-# 
-# It using in `Aion::Types::subtype`.
+# Порождает валидаторы. Используется в `Aion::Types::subtype`.
 # 
 # # METHODS
 # 
 # ## new (%ARGUMENTS)
 # 
-# Constructor.
+# Конструктор.
 # 
 # ### ARGUMENTS
 # 
-# * name (Str) — Name of type.
-# * args (ArrayRef) — List of type arguments.
-# * init (CodeRef) — Initializer for type.
-# * test (CodeRef) — Values cheker.
-# * a_test (CodeRef) — Values cheker for types with optional arguments.
-# * coerce (ArrayRef[Tuple[Aion::Type, CodeRef]]) — Array of pairs: type and via.
+# * name (Str) — Название типа.
+# * args (ArrayRef) — Список аргументов типа.
+# * init (CodeRef) — Инициализатор типа.
+# * test (CodeRef) — Чекер.
+# * a_test (CodeRef) — Чекер значений для типов с необязательными аргументами.
+# * coerce (ArrayRef[Tuple[Aion::Type, CodeRef]]) — Массив пар: тип и переход.
 # 
 # ## stringify
 # 
-# Stringify of object (name with arguments):
+# Строковое преобразование объекта (имя с аргументами):
 # 
 ::done_testing; }; subtest 'stringify' => sub { 
 my $Char = Aion::Type->new(name => "Char");
@@ -68,7 +67,7 @@ my $Int = Aion::Type->new(
 ::is scalar do {$Int->stringify}, "Int[3, 5]", '$Int->stringify  #=> Int[3, 5]';
 
 # 
-# Stringify operations:
+# Операции так же преобразуются в строку:
 # 
 
 ::is scalar do {($Int & $Char)->stringify}, "( Int[3, 5] & Char )", '($Int & $Char)->stringify   # => ( Int[3, 5] & Char )';
@@ -76,7 +75,7 @@ my $Int = Aion::Type->new(
 ::is scalar do {(~$Int)->stringify}, "~Int[3, 5]", '(~$Int)->stringify		  # => ~Int[3, 5]';
 
 # 
-# The operations is objects of `Aion::Type` with special names:
+# Операции — это объекты `Aion::Type` со специальными именами:
 # 
 
 ::is scalar do {Aion::Type->new(name => "Exclude", args => [$Int, $Char])->stringify}, "~( Int[3, 5] | Char )", 'Aion::Type->new(name => "Exclude", args => [$Int, $Char])->stringify   # => ~( Int[3, 5] | Char )';
@@ -86,7 +85,7 @@ my $Int = Aion::Type->new(
 # 
 # ## test
 # 
-# Testing the `$_` belongs to the class.
+# Тестирует, что `$_` принадлежит классу.
 # 
 ::done_testing; }; subtest 'test' => sub { 
 my $PositiveInt = Aion::Type->new(
@@ -102,7 +101,7 @@ local $_ = -6;
 # 
 # ## init
 # 
-# Initial the validator.
+# Инициализатор валидатора.
 # 
 ::done_testing; }; subtest 'init' => sub { 
 my $Range = Aion::Type->new(
@@ -127,7 +126,7 @@ $Range->init;
 # 
 # ## include ($element)
 # 
-# checks whether the argument belongs to the class.
+# Проверяет, принадлежит ли аргумент классу.
 # 
 ::done_testing; }; subtest 'include ($element)' => sub { 
 my $PositiveInt = Aion::Type->new(
@@ -141,7 +140,7 @@ my $PositiveInt = Aion::Type->new(
 # 
 # ## exclude ($element)
 # 
-# Checks that the argument does not belong to the class.
+# Проверяет, что аргумент не принадлежит классу.
 # 
 ::done_testing; }; subtest 'exclude ($element)' => sub { 
 my $PositiveInt = Aion::Type->new(
@@ -155,7 +154,7 @@ my $PositiveInt = Aion::Type->new(
 # 
 # ## coerce ($value)
 # 
-# Coerce `$value` to the type, if coerce from type and function is in `$self->{coerce}`.
+# Привести `$value` к типу, если приведение из типа и функции находится в `$self->{coerce}`.
 # 
 ::done_testing; }; subtest 'coerce ($value)' => sub { 
 my $Int = Aion::Type->new(name => "Int", test => sub { /^-?\d+\z/ });
@@ -172,7 +171,7 @@ push @{$Int->{coerce}}, [$Num, sub { int($_+.5) }];
 # 
 # ## detail ($element, $feature)
 # 
-# Return message belongs to error.
+# Формирует сообщение ошибки.
 # 
 ::done_testing; }; subtest 'detail ($element, $feature)' => sub { 
 my $Int = Aion::Type->new(name => "Int");
@@ -183,14 +182,14 @@ my $Num = Aion::Type->new(name => "Num", message => sub {
 	"Error: $_ is'nt $Aion::Type::SELF->{N}!"
 });
 
-::is scalar do {$Num->detail("x", "car")}, "Error: x is'nt car!", '$Num->detail("x", "car")  # => Error: x is\'nt car!';
+::is scalar do {$Num->detail("x", "car")}, "Error: x is'nt car!", '$Num->detail("x", "car") # => Error: x is\'nt car!';
 
 # 
 # `$Aion::Type::SELF->{N}` equivalent to `N` in context of `Aion::Types`.
 # 
 # ## validate ($element, $feature)
 # 
-# It tested `$element` and throw `detail` if element is exclude from class.
+# Проверяет `$element` и выбрасывает сообщение `detail`, если элемент не принадлежит классу.
 # 
 ::done_testing; }; subtest 'validate ($element, $feature)' => sub { 
 my $PositiveInt = Aion::Type->new(
@@ -201,7 +200,7 @@ my $PositiveInt = Aion::Type->new(
 eval {
 	$PositiveInt->validate(-1, "Neg")
 };
-::like scalar do {$@}, qr{Neg must have the type PositiveInt. The it is -1}, '$@   # ~> Neg must have the type PositiveInt. The it is -1';
+::like scalar do {$@}, qr{Neg must have the type PositiveInt. The it is -1}, '$@ # ~> Neg must have the type PositiveInt. The it is -1';
 
 # 
 # ## val_to_str ($val)
@@ -209,28 +208,28 @@ eval {
 # Переводит `$val` в строку.
 # 
 ::done_testing; }; subtest 'val_to_str ($val)' => sub { 
-::is scalar do {Aion::Type->new->val_to_str([1,2,{x=>6}])}, "[1, 2, {x => 6}]", 'Aion::Type->new->val_to_str([1,2,{x=>6}])   # => [1, 2, {x => 6}]';
+::is scalar do {Aion::Type->new->val_to_str([1,2,{x=>6}])}, "[1, 2, {x => 6}]", 'Aion::Type->new->val_to_str([1,2,{x=>6}]) # => [1, 2, {x => 6}]';
 
 # 
 # ## instanceof ($type)
 # 
-# Determines that the type is a subtype of a different $type.
+# Определяет, что тип является подтипом другого `$type`.
 # 
 ::done_testing; }; subtest 'instanceof ($type)' => sub { 
 my $int = Aion::Type->new(name => "Int");
 my $positiveInt = Aion::Type->new(name => "PositiveInt", as => $int);
 
-::is scalar do {$positiveInt->instanceof($int)}, scalar do{1}, '$positiveInt->instanceof($int)		  # -> 1';
+::is scalar do {$positiveInt->instanceof($int)}, scalar do{1}, '$positiveInt->instanceof($int)          # -> 1';
 ::is scalar do {$positiveInt->instanceof($positiveInt)}, scalar do{1}, '$positiveInt->instanceof($positiveInt)  # -> 1';
-::is scalar do {$positiveInt->instanceof('Int')}, scalar do{1}, '$positiveInt->instanceof(\'Int\')		 # -> 1';
+::is scalar do {$positiveInt->instanceof('Int')}, scalar do{1}, '$positiveInt->instanceof(\'Int\')         # -> 1';
 ::is scalar do {$positiveInt->instanceof('PositiveInt')}, scalar do{1}, '$positiveInt->instanceof(\'PositiveInt\') # -> 1';
-::is scalar do {$int->instanceof('PositiveInt')}, scalar do{""}, '$int->instanceof(\'PositiveInt\')		 # -> ""';
-::is scalar do {$int->instanceof('Int')}, scalar do{1}, '$int->instanceof(\'Int\')				 # -> 1';
+::is scalar do {$int->instanceof('PositiveInt')}, scalar do{""}, '$int->instanceof(\'PositiveInt\')         # -> ""';
+::is scalar do {$int->instanceof('Int')}, scalar do{1}, '$int->instanceof(\'Int\')                 # -> 1';
 
 # 
 # ## make ($pkg)
 # 
-# It make subroutine without arguments, who return type.
+# Создаёт подпрограмму без аргументов, которая возвращает тип.
 # 
 ::done_testing; }; subtest 'make ($pkg)' => sub { 
 BEGIN {
@@ -240,13 +239,13 @@ BEGIN {
 ::is scalar do {"IX" ~~ Rim}, "1", '"IX" ~~ Rim	 # => 1';
 
 # 
-# Property `init` won't use with `make`.
+# Свойство `init` не может использоваться с `make`.
 # 
 
 ::like scalar do {eval { Aion::Type->new(name=>"Rim", init => sub {...})->make(__PACKAGE__) }; $@}, qr{init_where won't work in Rim}, 'eval { Aion::Type->new(name=>"Rim", init => sub {...})->make(__PACKAGE__) }; $@ # ~> init_where won\'t work in Rim';
 
 # 
-# If subroutine make'nt, then died.
+# Если подпрограмма не может быть создана, то выбрасывается исключение.
 # 
 
 ::like scalar do {eval { Aion::Type->new(name=>"Rim")->make }; $@}, qr{syntax error}, 'eval { Aion::Type->new(name=>"Rim")->make }; $@ # ~> syntax error';
@@ -254,7 +253,7 @@ BEGIN {
 # 
 # ## make_arg ($pkg)
 # 
-# It make subroutine with arguments, who return type.
+# Создает подпрограмму с аргументами, которая возвращает тип.
 # 
 ::done_testing; }; subtest 'make_arg ($pkg)' => sub { 
 BEGIN {
@@ -266,7 +265,7 @@ BEGIN {
 ::is scalar do {"IX" ~~ Len[2,2]}, "1", '"IX" ~~ Len[2,2]	# => 1';
 
 # 
-# If subroutine make'nt, then died.
+# Если подпрограмма не может быть создана, то выбрасывается исключение.
 # 
 
 ::like scalar do {eval { Aion::Type->new(name=>"Rim")->make_arg }; $@}, qr{syntax error}, 'eval { Aion::Type->new(name=>"Rim")->make_arg }; $@ # ~> syntax error';
@@ -274,7 +273,7 @@ BEGIN {
 # 
 # ## make_maybe_arg ($pkg)
 # 
-# It make subroutine with or without arguments, who return type.
+# Создает подпрограмму с аргументами, которая возвращает тип.
 # 
 ::done_testing; }; subtest 'make_maybe_arg ($pkg)' => sub { 
 BEGIN {
@@ -290,7 +289,7 @@ BEGIN {
 ::is scalar do {5 ~~ Enum123[4,5,6]}, scalar do{1}, '5 ~~ Enum123[4,5,6]	 # -> 1';
 
 # 
-# If subroutine make'nt, then died.
+# Если подпрограмма не может быть создана, то выбрасывается исключение.
 # 
 
 ::like scalar do {eval { Aion::Type->new(name=>"Rim")->make_maybe_arg }; $@}, qr{syntax error}, 'eval { Aion::Type->new(name=>"Rim")->make_maybe_arg }; $@ # ~> syntax error';
@@ -298,7 +297,7 @@ BEGIN {
 # 
 # ## equal ($type)
 # 
-# Types are equal when they have the same name, the same number of arguments, parent and arguments are equal.
+# Типы равны, если они имеют одинаковое имя, одинаковое количество аргументов, родительский элемент и аргументы равны.
 # 
 ::done_testing; }; subtest 'equal ($type)' => sub { 
 my $Int = Aion::Type->new(name => "Int");
@@ -309,23 +308,23 @@ my $AnotherIntWithArgs = Aion::Type->new(name => "Int", args => [1, 2]);
 my $IntWithDifferentArgs = Aion::Type->new(name => "Int", args => [3, 4]);
 my $Str = Aion::Type->new(name => "Str");
 
-::is scalar do {$Int->equal($Int)}, scalar do{1}, '$Int->equal($Int)                     # -> 1';
-::is scalar do {$Int->equal($AnotherInt)}, scalar do{1}, '$Int->equal($AnotherInt)              # -> 1';
+::is scalar do {$Int->equal($Int)}, scalar do{1}, '$Int->equal($Int)                        # -> 1';
+::is scalar do {$Int->equal($AnotherInt)}, scalar do{1}, '$Int->equal($AnotherInt)                 # -> 1';
 ::is scalar do {$IntWithArgs->equal($AnotherIntWithArgs)}, scalar do{1}, '$IntWithArgs->equal($AnotherIntWithArgs) # -> 1';
-::is scalar do {$PositiveInt->equal($PositiveInt)}, scalar do{1}, '$PositiveInt->equal($PositiveInt)     # -> 1';
+::is scalar do {$PositiveInt->equal($PositiveInt)}, scalar do{1}, '$PositiveInt->equal($PositiveInt)        # -> 1';
 
-::is scalar do {$Int->equal($Str)}, scalar do{""}, '$Int->equal($Str)                     # -> ""';
-::is scalar do {$Int->equal($IntWithArgs)}, scalar do{""}, '$Int->equal($IntWithArgs)             # -> ""';
+::is scalar do {$Int->equal($Str)}, scalar do{""}, '$Int->equal($Str)                          # -> ""';
+::is scalar do {$Int->equal($IntWithArgs)}, scalar do{""}, '$Int->equal($IntWithArgs)                  # -> ""';
 ::is scalar do {$IntWithArgs->equal($IntWithDifferentArgs)}, scalar do{""}, '$IntWithArgs->equal($IntWithDifferentArgs) # -> ""';
-::is scalar do {$PositiveInt->equal($Int)}, scalar do{""}, '$PositiveInt->equal($Int)             # -> ""';
+::is scalar do {$PositiveInt->equal($Int)}, scalar do{""}, '$PositiveInt->equal($Int)                  # -> ""';
 
-::is scalar do {$Int->equal("not a type")}, scalar do{""}, '$Int->equal("not a type")             # -> ""';
+::is scalar do {$Int->equal("not a type")}, scalar do{""}, '$Int->equal("not a type") # -> ""';
 
 my $PositiveInt2 = Aion::Type->new(name => "PositiveInt", as => $Str);
-::is scalar do {$PositiveInt->equal($PositiveInt2)}, scalar do{""}, '$PositiveInt->equal($PositiveInt2)    # -> ""';
+::is scalar do {$PositiveInt->equal($PositiveInt2)}, scalar do{""}, '$PositiveInt->equal($PositiveInt2) # -> ""';
 
-::is scalar do {$Int->equal($PositiveInt)}, scalar do{""}, '$Int->equal($PositiveInt)             # -> ""';
-::is scalar do {$PositiveInt->equal($Int)}, scalar do{""}, '$PositiveInt->equal($Int)             # -> ""';
+::is scalar do {$Int->equal($PositiveInt)}, scalar do{""}, '$Int->equal($PositiveInt) # -> ""';
+::is scalar do {$PositiveInt->equal($Int)}, scalar do{""}, '$PositiveInt->equal($Int) # -> ""';
 
 my $PositiveIntWithArgs = Aion::Type->new(name => "PositiveInt", as => $Int, args => [1]);
 my $PositiveIntWithArgs2 = Aion::Type->new(name => "PositiveInt", as => $Int, args => [2]);
@@ -334,7 +333,7 @@ my $PositiveIntWithArgs2 = Aion::Type->new(name => "PositiveInt", as => $Int, ar
 # 
 # ## nonequal ($type)
 # 
-# Inverse of equal.
+# Обратная операция к `equal`.
 # 
 ::done_testing; }; subtest 'nonequal ($type)' => sub { 
 my $Int = Aion::Type->new(name => "Int");
@@ -346,33 +345,33 @@ my $PositiveInt = Aion::Type->new(name => "PositiveInt", as => $Int);
 # 
 # ## args ()
 # 
-# The list of arguments.
+# Список аргументов.
 # 
 # ## name ()
 # 
-# The name of type.
+# Имя типа.
 # 
 # ## as ()
 # 
-# The parent type.
+# Родительский тип.
 # 
 # ## message (;&message)
 # 
-# Getter/setter for message. Message use for generate error message.
+# Акцессор сообщения. Использует `&message` для генерации сообщения об ошибке.
 # 
 # ## title (;$title)
 # 
-# Getter/setter for title (using for swagger).
+# Акцессор заголовка (используется для создания схемы **swagger**).
 # 
 # ## description (;$description)
 # 
-# Getter/setter for description (using for swagger).
+# Акцессор описания (используется для создания схемы **swagger**).
 # 
 # # OPERATORS
 # 
 # ## &{}
 # 
-# It make the object is callable.
+# Делает объект вызываемым.
 # 
 ::done_testing; }; subtest '&{}' => sub { 
 my $PositiveInt = Aion::Type->new(
@@ -389,7 +388,7 @@ $_ = -1;
 # 
 # ## ""
 # 
-# Stringify object.
+# Стрингифицирует объект.
 # 
 ::done_testing; }; subtest '""' => sub { 
 ::is scalar do {Aion::Type->new(name => "Int") . ""}, "Int", 'Aion::Type->new(name => "Int") . ""   # => Int';
@@ -401,7 +400,7 @@ my $Enum = Aion::Type->new(name => "Enum", args => [qw/A B C/]);
 # 
 # ## $a | $b
 # 
-# It make new type as union of `$a` and `$b`.
+# Создает новый тип как объединение `$a` и `$b`.
 # 
 ::done_testing; }; subtest '$a | $b' => sub { 
 my $Int = Aion::Type->new(name => "Int", test => sub { /^-?\d+$/ });
@@ -416,7 +415,7 @@ my $IntOrChar = $Int | $Char;
 # 
 # ## $a & $b
 # 
-# It make new type as intersection of `$a` and `$b`.
+# Создает новый тип как пересечение `$a` и `$b`.
 # 
 ::done_testing; }; subtest '$a & $b' => sub { 
 my $Int = Aion::Type->new(name => "Int", test => sub { /^-?\d+$/ });
@@ -431,7 +430,7 @@ my $Digit = $Int & $Char;
 # 
 # ## ~ $a
 # 
-# It make exclude type from `$a`.
+# Создает новый тип как исключение из `$a`.
 # 
 ::done_testing; }; subtest '~ $a' => sub { 
 my $Int = Aion::Type->new(name => "Int", test => sub { /^-?\d+$/ });
@@ -440,26 +439,28 @@ my $Int = Aion::Type->new(name => "Int", test => sub { /^-?\d+$/ });
 ::is scalar do {5   ~~ ~$Int;}, scalar do{""}, '5   ~~ ~$Int; # -> ""';
 
 # 
-# ## $a eq $b
+# ## $a eq $b, $a == $b
 # 
-# `$a` equal `$b`.
+# `$a` равно `$b`.
 # 
-::done_testing; }; subtest '$a eq $b' => sub { 
+::done_testing; }; subtest '$a eq $b, $a == $b' => sub { 
 my $Int1 = Aion::Type->new(name => "Int");
 my $Int2 = Aion::Type->new(name => "Int");
 
 ::is scalar do {$Int1 eq $Int2}, scalar do{1}, '$Int1 eq $Int2 # -> 1';
+::is scalar do {$Int1 == $Int2}, scalar do{1}, '$Int1 == $Int2 # -> 1';
 
 # 
-# ## $a ne $b
+# ## $a ne $b, $a != $b
 # 
-# `$a` not equal `$b`.
+# `$a` не равно `$b`.
 # 
-::done_testing; }; subtest '$a ne $b' => sub { 
+::done_testing; }; subtest '$a ne $b, $a != $b' => sub { 
 my $Int1 = Aion::Type->new(name => "Int");
 my $Int2 = Aion::Type->new(name => "Int");
 
 ::is scalar do {$Int1 ne $Int2}, scalar do{""}, '$Int1 ne $Int2 # -> ""';
+::is scalar do {$Int1 != $Int2}, scalar do{""}, '$Int1 != $Int2 # -> ""';
 ::is scalar do {123 ne $Int2}, scalar do{1}, '123 ne $Int2 # -> 1';
 
 # 

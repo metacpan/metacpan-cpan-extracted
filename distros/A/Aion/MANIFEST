@@ -12,6 +12,8 @@ i18n/Aion/Meta/RequiresAnyFunction.ru-en.po
 i18n/Aion/Meta/RequiresFeature.ru-en.po
 i18n/Aion/Meta/Subroutine.ru-en.po
 i18n/Aion/Meta/Util.ru-en.po
+i18n/Aion/Type.ru-en.po
+i18n/Aion/Types.ru-en.po
 lib/Aion.md
 lib/Aion.pm
 lib/Aion/Meta/Feature.md

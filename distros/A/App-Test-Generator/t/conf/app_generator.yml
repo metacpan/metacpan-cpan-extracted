@@ -1,0 +1,18 @@
+---
+module: App::Test::Generator
+function: generate
+
+input:
+  schema_file:
+    position: 0
+    type: string
+    max: 128
+  test_file:
+    position: 1
+    type: string
+    optional: yes
+    max: 128
+
+# All of the random files should die
+output:
+  _STATUS: DIES

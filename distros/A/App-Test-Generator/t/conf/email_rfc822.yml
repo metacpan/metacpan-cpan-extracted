@@ -1,0 +1,29 @@
+---
+module: Email::Valid
+function: rfc822
+
+config:
+  properties:
+    enable: true
+    trials: 200
+  test_undef: no
+  test_empty: no
+  test_nuls: no
+
+input:
+  email:
+    type: string
+    semantic: email
+    position: 0
+
+output:
+  type: boolean
+
+transforms:
+  valid_emails:
+    input:
+      email:
+        type: string
+        semantic: email
+    output:
+      type: boolean

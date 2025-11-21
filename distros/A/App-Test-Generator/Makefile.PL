@@ -38,13 +38,16 @@ WriteMakefile(
 	TEST_REQUIRES => {
 		'Cwd' => 0,
 		'Data::Random' => 0,
+		'Data::Random::String' => 0,
 		'Data::Random::String::Matches' => 0.02,
+		'Data::Random::Structure' => 0,
 		'Encode' => 0,
 		'File::Temp' => 0,
 		'IPC::Run3' => 0,
 		'IPC::System::Simple' => 0,
 		'JSON::MaybeXS' => 0,
 		'Test::DescribeMe' => 0,
+		'Test::LectroTest' => 0,
 		'Test::Most' => 0,
 		'Test::Needs' => 0,
 		'Test::Returns' => 0.02

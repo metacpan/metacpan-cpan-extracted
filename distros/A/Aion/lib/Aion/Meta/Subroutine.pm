@@ -5,6 +5,7 @@ use common::sense;
 
 use Aion::Meta::Util qw//;
 use Aion::Types qw/Tuple/;
+use Scalar::Util qw//;
 use Sub::Util qw//;
 
 Aion::Meta::Util::create_getters(qw/pkg subname signature referent wrapsub/);
@@ -45,9 +46,17 @@ sub wrap_sub {
 
 	Sub::Util::set_prototype Sub::Util::prototype($referent), $sub;
 	Sub::Util::set_subname Sub::Util::subname($referent), $sub;
-	*{"$pkg\::$subname"} = $self->{wrapsub} = $sub;
-
+	
+	*{"$pkg\::$subname"} = $sub if $subname ne '__ANON__';
+	
+	$self->{wrapsub} = $sub;
 	$Aion::META{$pkg}{subroutine}{$subname} = $self;
+
+	my $key = pack 'J', Scalar::Util::refaddr $sub;
+	$Aion::Isa{$key} = $self;
+	Scalar::Util::weaken $Aion::Isa{$key};
+	
+	$self
 }
 
 sub compare {

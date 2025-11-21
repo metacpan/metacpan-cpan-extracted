@@ -1,6 +1,9 @@
 Changes
 =======
 
+0.08 0 2025 Nov 20
+    - ignore versions of required packages
+
 0.07 - 2022 Sep 27
     - do not use SSE instructions for ARM architecture
 

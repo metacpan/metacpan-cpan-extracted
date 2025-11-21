@@ -36,7 +36,7 @@ JSON::Schema::Validate - Lean, recursion-safe JSON Schema validator (Draft 2020-
 
 # VERSION
 
-v0.4.2
+v0.5.1
 
 # DESCRIPTION
 
@@ -168,6 +168,8 @@ Options (all optional):
 
     Will globally disable extension, but will enable `uniqueKeys`
 
+    Enabling extensions does not affect core Draft 2020-12 compliance — unknown keywords are still ignored unless explicitly supported.
+
 - `format => \%callbacks`
 
     Hash of `format_name => sub{ ... }` validators. Each sub receives the string to validate and must return true/false. Entries here take precedence when you later call `register_builtin_formats` (i.e. your callbacks remain in place).
@@ -247,6 +249,7 @@ Options (all optional):
 
     `uniqueKeys` is a non-standard extension (proposed for future drafts) that enforces uniqueness of one or more properties across all objects in an array.
 
+        "uniqueKeys": [ ["id"] ]                    # 'id' must be unique
         "uniqueKeys": [ ["id"], ["email"] ]        # id AND email must each be unique
         "uniqueKeys": [ ["category", "code"] ]     # the pair (category,code) must be unique
 
@@ -255,6 +258,10 @@ Options (all optional):
     This option is useful when you need stronger guarantees than `uniqueItems` provides, without resorting to complex `contains`/`not` patterns.
 
     When `extensions` is enabled, `unique_keys` is automatically turned on; the specific method allows finer-grained control.
+
+    This works in **both interpreted and compiled modes** and is fully integrated into the annotation system (plays nicely with `unevaluatedProperties`, etc.).
+
+    Disabled by default for maximum spec purity.
 
 - `vocab_support => {}`
 
@@ -565,9 +572,38 @@ On failure, inspect `$js->error` to retrieve the [error object](https://metacpan
 
     For practicality in Perl, `type => 'boolean'` accepts JSON-like booleans (e.g. true/false, 1/0 as strings) as well as Perl boolean objects (if you use a boolean class). If you need stricter behaviour, you can adapt `_match_type` or introduce a constructor flag and branch there.
 
+- Combinators `allOf`, `anyOf`, `oneOf`, `not`
+
+    `allOf` validates all subschemas and merges their annotations (e.g. evaluated properties/items) into the parent schema’s annotation. If any subschema fails, `allOf` fails.
+
+    `anyOf` and `oneOf` always validate their branches in a “shadow” context.
+    Errors produced by non-selected branches do not leak into the main context when the combinator as a whole succeeds. When `anyOf` fails (no branch matched) or `oneOf` fails (zero or more than one branch matched), the validator merges the collected branch errors into the main context to make debugging easier.
+
+    `not` is also evaluated in a shadow context. If the inner subschema validates, `not` fails with a single “forbidden not-schema” error; otherwise `not` succeeds and any inner errors are discarded.
+
+- Conditionals `if` / `then` / `else`
+
+    The subschema under `if` is treated purely as a condition:
+
+    - `if` is always evaluated in an isolated “shadow” context. Any errors it produces (for example from `required`) are never reported directly.
+    - If `if` succeeds and `then` is present, `then` is evaluated against the real context and may produce errors.
+    - If `if` fails and `else` is present, `else` is evaluated against the real context and may produce errors.
+
+    This matches the JSON Schema 2020-12 intent: only `then`/`else` affect validity, `if` itself never does.
+
 - Unevaluated\*
 
     Both `unevaluatedItems` and `unevaluatedProperties` are enforced using annotation produced by earlier keyword evaluations within the same schema object, matching draft 2020-12 semantics.
+
+- Error reporting and pointers
+
+    Each error object contains both:
+
+    - `path` – a JSON Pointer-like path to the failing location in the instance (e.g. `#/properties~1s/oneOf~11/properties~1classes/0`).
+    - `schema_pointer` – a JSON Pointer into the root schema that identifies the keyword which emitted the error (e.g.
+    `#/properties~1s/oneOf~11/properties~1classes/items/allOf~10/then/voting_right`).
+
+    Messages for `required` errors also list the full required set and the keys actually present at that location to help debug combinators such as `anyOf`/`oneOf`/`if`/`then`/`else`.
 
 - RFC rigor and media types
 

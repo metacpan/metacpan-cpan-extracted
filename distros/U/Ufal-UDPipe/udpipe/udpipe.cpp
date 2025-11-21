@@ -208,9 +208,10 @@ class multiword_token : public token {
  public:
   // form and misc are inherited from token
   int id_first, id_last;
+  string feats; // can contain only Typo=Yes
 
   multiword_token(int id_first = -1, int id_last = -1, string_piece form = string_piece(), string_piece misc = string_piece())
-      : token(form, misc), id_first(id_first), id_last(id_last) {}
+      : token(form, misc), id_first(id_first), id_last(id_last), feats() {}
 };
 
 /////////
@@ -18483,9 +18484,15 @@ bool input_format_conllu::next_sentence(sentence& s, string& error) {
         return error.assign("Multiword token '").append(line.str, line.len).append("' overlaps with the previous one!"), false;
       last_multiword_token = to;
       for (int i = 2; i < 9; i++)
-        if (tokens[i].len != 1 || tokens[i].str[0] != '_')
-          return error.assign("Column ").append(columns[i]).append(" of an multi-word token '").append(line.str, line.len).append("' is not an empty!"), false;
+        if (version >= 2 && i == 5) { // feats can be Typo=Yes in version >= 2
+          if ((tokens[i].len != 1 || tokens[i].str[0] != '_') && (tokens[i].len != 8 || memcmp(tokens[i].str, "Typo=Yes", 8) != 0))
+            return error.assign("Column ").append(columns[i]).append(" of an multi-word token '").append(line.str, line.len).append("' is not empty or Typo=Yes!"), false;
+        } else {
+          if (tokens[i].len != 1 || tokens[i].str[0] != '_')
+            return error.assign("Column ").append(columns[i]).append(" of an multi-word token '").append(line.str, line.len).append("' is not empty!"), false;
+        }
       s.multiword_tokens.emplace_back(from, to, tokens[1], tokens[9].len == 1 && tokens[9].str[0] == '_' ? string_piece() : tokens[9]);
+      if (tokens[5].len != 1 || tokens[5].str[0] != '_') s.multiword_tokens.back().feats.assign(tokens[5].str, tokens[5].len);
       continue;
     }
 
@@ -19034,7 +19041,8 @@ void output_format_conllu::write_sentence(const sentence& s, ostream& os) {
           i == s.multiword_tokens[multiword_token].id_first) {
         os << s.multiword_tokens[multiword_token].id_first << '-'
            << s.multiword_tokens[multiword_token].id_last << '\t';
-        write_with_spaces(os, s.multiword_tokens[multiword_token].form) << "\t_\t_\t_\t_\t_\t_\t_\t"
+        write_with_spaces(os, s.multiword_tokens[multiword_token].form) << "\t_\t_\t_\t"
+           << underscore_on_empty(s.multiword_tokens[multiword_token].feats) << "\t_\t_\t_\t"
            << underscore_on_empty(s.multiword_tokens[multiword_token].misc) << '\n';
         multiword_token++;
       }
@@ -20502,7 +20510,7 @@ class trainer_morphodita_parsito : public trainer {
   static const string& combine_lemma(const word& w, int use_lemma, string& combined_lemma, const unordered_set<string>& flat_lemmas = unordered_set<string>());
 
   // Generic options handling
-  static const string& option_str(const named_values::map& options, const string& name, int model = -1);
+  static const string& option_str(const named_values::map& options, const char* name, int model = -1);
   static bool option_int(const named_values::map& options, const string& name, int& value, string& error, int model = -1);
   static bool option_bool(const named_values::map& options, const string& name, bool& value, string& error, int model = -1);
   static bool option_double(const named_values::map& options, const string& name, double& value, string& error, int model = -1);
@@ -22108,11 +22116,16 @@ const string& trainer_morphodita_parsito::combine_lemma(const word& w, int use_l
 
 // Generic options handling
 
-const string& trainer_morphodita_parsito::option_str(const named_values::map& options, const string& name, int model) {
+const string& trainer_morphodita_parsito::option_str(const named_values::map& options, const char* name, int model) {
+  // We use const char* for name to avoid a false-positive dangling-reference warning from g++.
   string indexed_name(name);
   if (model >= 0 && model < 9) indexed_name.append("_").push_back('1' + model);
 
-  return options.count(indexed_name) ? options.at(indexed_name) : options.count(name) ? options.at(name) : empty_string;
+  if (options.count(indexed_name))
+    return options.at(indexed_name);
+
+  indexed_name.assign(name);
+  return options.count(name) ? options.at(name) : empty_string;
 }
 
 bool trainer_morphodita_parsito::option_int(const named_values::map& options, const string& name, int& value, string& error, int model) {
@@ -27585,40 +27598,6 @@ const uint8_t *LzmaEnc_GetCurBuf(CLzmaEncHandle pp)
   return p->matchFinder.GetPointerToCurrentPos(p->matchFinderObj) - p->additionalOffset;
 }
 
-SRes LzmaEnc_CodeOneMemBlock(CLzmaEncHandle pp, bool reInit,
-    uint8_t *dest, size_t *destLen, uint32_t desiredPackSize, uint32_t *unpackSize)
-{
-  CLzmaEnc *p = (CLzmaEnc *)pp;
-  uint64_t nowPos64;
-  SRes res;
-  CSeqOutStreamBuf outStream;
-
-  outStream.funcTable.Write = MyWrite;
-  outStream.data = dest;
-  outStream.rem = *destLen;
-  outStream.overflow = false;
-
-  p->writeEndMark = false;
-  p->finished = false;
-  p->result = SZ_OK;
-
-  if (reInit)
-    LzmaEnc_Init(p);
-  LzmaEnc_InitPrices(p);
-  nowPos64 = p->nowPos64;
-  RangeEnc_Init(&p->rc);
-  p->rc.outStream = &outStream.funcTable;
-
-  res = LzmaEnc_CodeOneBlock(p, true, desiredPackSize, *unpackSize);
-  
-  *unpackSize = (uint32_t)(p->nowPos64 - nowPos64);
-  *destLen -= outStream.rem;
-  if (outStream.overflow)
-    return SZ_ERROR_OUTPUT_EOF;
-
-  return res;
-}
-
 static SRes LzmaEnc_Encode2(CLzmaEnc *p, ICompressProgress *progress)
 {
   SRes res = SZ_OK;
@@ -27778,7 +27757,7 @@ bool compressor::save(ostream& os, const binary_encoder& enc) {
 
 // Returns current version.
 version version::current() {
-  return {1, 3, 1, ""};
+  return {1, 4, 0, ""};
 }
 
 // Returns multi-line formated version and copyright string.
@@ -27794,9 +27773,9 @@ string version::version_and_copyright(const string& other_libraries) {
        << (udpipe.prerelease.empty() ? "" : "-") << udpipe.prerelease
        << " (using UniLib " << unilib.major << '.' << unilib.minor << '.' << unilib.patch
        << (unilib.prerelease.empty() ? "" : "-") << unilib.prerelease
-       << ",\nMorphoDiTa " << morphodita.major << '.' << morphodita.minor << '.' << unilib.patch
+       << ",\nMorphoDiTa " << morphodita.major << '.' << morphodita.minor << '.' << morphodita.patch
        << (morphodita.prerelease.empty() ? "" : "-") << morphodita.prerelease
-       << ", Parsito " << parsito.major << '.' << parsito.minor << '.' << unilib.patch
+       << ", Parsito " << parsito.major << '.' << parsito.minor << '.' << parsito.patch
        << (parsito.prerelease.empty() ? "" : "-") << parsito.prerelease
        << (other_libraries.empty() ? "" : " and ") << other_libraries << ")\n"
           "Copyright 2016 by Institute of Formal and Applied Linguistics, Faculty of\n"

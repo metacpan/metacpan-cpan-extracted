@@ -1,5 +1,11 @@
 Revision history for Perl extension Aion
 
+1.2 2025-11-20T12:35:01Z
+
+    - add types Isa, BoolLike, ReachableCodeRef, UnreachableCodeRef, ScalarRefRef
+    - add arguments for CodeRef`[name, proto]
+    - translate *.md into russian.
+
 1.1 2025-11-13T10:14:37Z
 
     - val_to_str added Regexp formatter

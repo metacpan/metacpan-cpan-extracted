@@ -19,6 +19,7 @@ CMD
 FH
 Readonly
 SunOS
+TLDR
 UTF
 YYYYMMDD
 ascii

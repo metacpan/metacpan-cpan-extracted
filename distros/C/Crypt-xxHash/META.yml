@@ -3,13 +3,13 @@ abstract: 'xxHash implementation for Perl'
 author:
   - 'Chernenko Dmitiry cdn@cpan.org'
 build_requires:
-  ExtUtils::CBuilder: '0.280225'
-  File::Which: '1.21'
-  IPC::Run: '20200505.0'
-  Math::Int64: '0.54'
-  Test::More: '1.302171'
+  ExtUtils::CBuilder: '0'
+  File::Which: '0'
+  IPC::Run: '0'
+  Math::Int64: '0'
+  Test::More: '0'
 configure_requires:
-  Module::Build: '0.19'
+  Module::Build: '0'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: bsd
@@ -20,10 +20,10 @@ name: Crypt-xxHash
 provides:
   Crypt::xxHash:
     file: lib/Crypt/xxHash.pm
-    version: '0.07'
+    version: '0.08'
 resources:
   bugtracker: https://github.com/KalessinD/perl_crypt_xxhash/issues
   license: http://opensource.org/licenses/BSD-3-Clause
   repository: https://github.com/KalessinD/perl_crypt_xxhash
-version: '0.07'
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

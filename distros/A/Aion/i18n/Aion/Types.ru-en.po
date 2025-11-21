@@ -1,0 +1,329 @@
+msgid "Aion::Types - библиотека стандартных валидаторов и служит для создания новых валидаторов"
+msgstr "Aion::Types - a library of standard validators and it is used to create new validators"
+
+msgid "Этот модуль экспортирует подпрограммы:"
+msgstr "This module exports routines:"
+
+msgid ""
+"* `subtype`, `as`, `init_where`, `where`, `awhere`, `message` — для создания валидаторов.\n"
+"* `SELF`, `ARGS`, `A`, `B`, `C`, `D`, `M`, `N` — для использования в валидаторах типа и его аргументов.\n"
+"* `coerce`, `from`, `via` — для создания конвертора значений из одного класса в другой."
+msgstr ""
+"* `subtype`, `as`, `init_where`, `where`, `awhere`, `message` - for creating validators.\n"
+"* `SELF`, `ARGS`, `A`, `B`, `C`, `D`, `M`, `N` - for use in validators of a type and its arguments.\n"
+"* `coerce`, `from`, `via` - to create a value converter from one class to another."
+
+msgid "Иерархия валидаторов:"
+msgstr "Validator hierarchy:"
+
+msgid "Создаёт новый тип."
+msgstr "Creates a new type."
+
+msgid "`where` и `message` — это синтаксический сахар, а `subtype` можно использовать без них."
+msgstr "`where` and `message` are syntactic sugar, and `subtype` can be used without them."
+
+msgid "Используется с `subtype` для расширения создаваемого типа `$super_type`."
+msgstr "Used with `subtype` to extend the created `$super_type` type."
+
+msgid "Инициализирует тип с новыми аргументами. Используется с `subtype`."
+msgstr "Initializes a type with new arguments. Used with `subtype`."
+
+msgid "Использует `$code` как тест. Значение для теста передаётся в `$_`."
+msgstr "Uses `$code` as a test. The value for the test is passed to `$_`."
+
+msgid "Используется с `subtype`. Необходимо, если у типа есть аргументы."
+msgstr "Used with `subtype`. Required if the type has arguments."
+
+msgid "Используется с `subtype`."
+msgstr "Used with `subtype`."
+
+msgid "Если тип может быть с аргументами и без, то используется для проверки набора с аргументами, а `where` — без."
+msgstr "If the type can be with or without arguments, then it is used to check the set with arguments, and `where` - without."
+
+msgid "Необходимо, если аргументы необязательны."
+msgstr "Required if arguments are optional."
+
+msgid "Текущий тип. `SELF` используется в `init_where`, `where` и `awhere`."
+msgstr "Current type. `SELF` is used in `init_where`, `where` and `awhere`."
+
+msgid "Аргументы текущего типа. В скалярном контексте возвращает ссылку на массив, а в контексте массива возвращает список. Используется в `init_where`, `where` и `awhere`."
+msgstr "Arguments of the current type. In a scalar context, it returns a reference to an array, and in an array context, it returns a list. Used in `init_where`, `where` and `awhere`."
+
+msgid "Первый, второй, третий и пятый аргумент типа."
+msgstr "The first, second, third and fifth type arguments."
+
+msgid "Используется в `init_where`, `where` и `awhere`."
+msgstr "Used in `init_where`, `where` and `awhere`."
+
+msgid "`M` и `N` сокращение для `SELF->{M}` и `SELF->{N}`."
+msgstr "`M` and `N` are shorthand for `SELF->{M}` and `SELF->{N}`."
+
+msgid "Используется с `subtype` для вывода сообщения об ошибке, если значение исключает тип. В `$code` используется: `SELF` - текущий тип, `ARGS`, `A`, `B`, `C`, `D` - аргументы типа (если есть) и проверочное значение в `$_`. Его можно преобразовать в строку с помощью `SELF->val_to_str($_)`."
+msgstr "Used with `subtype` to print an error message if the value excludes the type. `$code` uses: `SELF` - the current type, `ARGS`, `A`, `B`, `C`, `D` - type arguments (if any) and a test value in `$_`. It can be converted to a string using `SELF->val_to_str($_)`."
+
+msgid "Добавляет новое приведение (`$via`) к `$type` из `$from` типа."
+msgstr "Adds a new cast (`$via`) to `$type` from `$from` type."
+
+msgid "`coerce` выбрасывает исключения:"
+msgstr "`coerce` throws exceptions:"
+
+msgid "Стандартные приведения:"
+msgstr "Standard casts:"
+
+msgid "Синтаксический сахар для `coerce`."
+msgstr "Syntactic sugar for `coerce`."
+
+msgid "Проверяет сигнатуру подпрограммы: аргументы и результаты."
+msgstr "Checks the signature of a subroutine: arguments and results."
+
+msgid "Тип верхнего уровня в иерархии. Сопоставляет всё."
+msgstr "The top level type in the hierarchy. Compares everything."
+
+msgid "Тип верхнего уровня в конструкторах иерархии создает новые типы из любых типов."
+msgstr "The top-level type in hierarchy constructors creates new types from any types."
+
+msgid "Союз нескольких типов. Аналогичен оператору `$type1 | $type2`."
+msgstr "Union of several types. Similar to the `$type1 | $type2`."
+
+msgid "Пересечение нескольких типов. Аналогичен оператору `$type1 & $type2`."
+msgstr "The intersection of several types. Similar to the `$type1 & $type2` operator."
+
+msgid "Исключение нескольких типов. Аналогичен оператору `~ $type`."
+msgstr "Exclusion of several types. Similar to the `~$type` operator."
+
+msgid "Если `Exclude` имеет много аргументов, то это аналог `~ ($type1 | $type2 ...)`."
+msgstr "If `Exclude` has many arguments, then it is analogous to `~ ($type1 | $type2 ...)`."
+
+msgid "Дополнительные ключи в `Dict`."
+msgstr "Additional keys in `Dict`."
+
+msgid "Если подпрограмма возвращает разные значения в контексте массива и скаляра, то используется тип `Wantarray` с типом `A` для контекста массива и типом `S` для скалярного контекста."
+msgstr "If the routine returns different values in array and scalar contexts, then the `Wantarray` type is used with type `A` for the array context and type `S` for the scalar context."
+
+msgid "Тип верхнего уровня в иерархии скалярных типов."
+msgstr "The top-level type in the hierarchy of scalar types."
+
+msgid "Перечисление."
+msgstr "Enumeration."
+
+msgid "`undef` или тип в `[]`."
+msgstr "`undef` or type in `[]`."
+
+msgid "Только `undef`."
+msgstr "Only `undef`."
+
+msgid "Всё за исключением `undef`."
+msgstr "Everything except `undef`."
+
+msgid "Определённые значения без ссылок."
+msgstr "Defined values without references."
+
+msgid "Определяет значение длины от `A` до `B` или от 0 до `A`, если `B` отсутствует."
+msgstr "Specifies a length value from `A` to `B`, or from 0 to `A` if `B` is missing."
+
+msgid "Perl версии."
+msgstr "Perl version."
+
+msgid "Строки, включая числа."
+msgstr "Strings, including numbers."
+
+msgid "Строки Unicode с флагом utf8 или если декодирование в utf8 происходит без ошибок."
+msgstr "Unicode strings with the utf8 flag or if decoding to utf8 occurs without errors."
+
+msgid "Бинарные строки без флага utf8 и октетов с номерами меньше 128."
+msgstr "Binary strings without the utf8 flag and octets with numbers less than 128."
+
+msgid "Строка начинается с `S`."
+msgstr "The line starts with `S`."
+
+msgid "Строка заканчивается на `S`."
+msgstr "The line ends with `S`."
+
+msgid "Строка с одним или несколькими символами, не являющимися пробелами."
+msgstr "A string containing one or more non-blank characters."
+
+msgid "Строки с `@`."
+msgstr "Lines with `@`."
+
+msgid "Формат телефонов — знак плюс и семь или больше цифр."
+msgstr "The telephone format is a plus sign and seven or more digits."
+
+msgid "URL-адреса веб-сайтов — это строка с префиксом http:// или https://."
+msgstr "Website URLs are a string prefixed with http:// or https://."
+
+msgid "Пути начинаются с косой черты."
+msgstr "Paths start with a slash."
+
+msgid "HTML начинается с `<!doctype html` или `<html`."
+msgstr "HTML starts with `<!doctype html` or `<html`."
+
+msgid "Дата в формате `yyyy-mm-dd`."
+msgstr "Date in `yyyy-mm-dd` format."
+
+msgid "Дата и время в формате `yyyy-mm-dd HH:MM:SS`."
+msgstr "Date and time in the format `yyyy-mm-dd HH:MM:SS`."
+
+msgid "Сопоставляет строку с регулярным выражением."
+msgstr "Matches a string against a regular expression."
+
+msgid "Имя класса — это пакет с методом `new`."
+msgstr "The class name is a package with a `new` method."
+
+msgid "Имя роли — это пакет без метода `new`, с `@ISA` или с одним любым методом."
+msgstr "The role name is a package without the `new` method, with `@ISA`, or with any one method."
+
+msgid "Рациональные числа."
+msgstr "Rational numbers."
+
+msgid "Числа."
+msgstr "Numbers."
+
+msgid "Положительные числа."
+msgstr "Positive numbers."
+
+msgid "Машинное число с плавающей запятой составляет 4 байта."
+msgstr "A machine floating point number is 4 bytes."
+
+msgid "Машинное число с плавающей запятой составляет 8 байт."
+msgstr "A machine floating point number is 8 bytes."
+
+msgid "Числа между `from` и `to`."
+msgstr "Numbers between `from` and `to`."
+
+msgid "Целые числа."
+msgstr "Whole numbers."
+
+msgid "Рассчитывает максимальное и минимальное числа, которые поместятся в `N` байт и проверяет ограничение между ними."
+msgstr "Calculates the maximum and minimum numbers that will fit in `N` bytes and checks the constraint between them."
+
+msgid "Положительные целые числа."
+msgstr "Positive integers."
+
+msgid "Рассчитывает максимальное число, которое поместится в `N` байт (полагая, что в байтах нет отрицательного бита) и проверяет ограничение от 0 до этого числа."
+msgstr "Calculates the maximum number that will fit in `N` bytes (assuming there is no negative bit in the bytes) and checks the limit from 0 to that number."
+
+msgid "Целые числа 1+."
+msgstr "Integers 1+."
+
+msgid "Ссылка."
+msgstr "Link."
+
+msgid "Ссылка на связанную переменную."
+msgstr "Link to the associated variable."
+
+msgid "Функция позволяет присваивание."
+msgstr "The function allows assignment."
+
+msgid "Но с `:lvalue` не работает."
+msgstr "But it doesn't work with `:lvalue`."
+
+msgid "Формат."
+msgstr "Format."
+
+msgid "Подпрограмма."
+msgstr "Subroutine."
+
+msgid "Подпрограмма с телом."
+msgstr "Subroutine with body."
+
+msgid "Подпрограмма без тела."
+msgstr "Subroutine without body."
+
+msgid "Ссылка на подпрограмму с соответствующей сигнатурой."
+msgstr "A link to a subroutine with the corresponding signature."
+
+msgid "Подпрограммы без тела не оборачиваются в обработчик сигнатуры, а сигнатура запоминается для валидации соответствия впоследствии объявленной подпрограммы с телом. Поэтому функция не имеет сигнатуры."
+msgstr "Subroutines without a body are not wrapped in a signature handler, and the signature is remembered to validate the conformity of a subsequently declared subroutine with a body. Therefore the function has no signature."
+
+msgid "Регулярное выражение."
+msgstr "Regular expression."
+
+msgid "Ссылка на скаляр или ссылка на ссылку."
+msgstr "A reference to a scalar or a reference to a reference."
+
+msgid "Ссылка на скаляр."
+msgstr "Reference to a scalar."
+
+msgid "Ссылка на ссылку."
+msgstr "Link to link."
+
+msgid "Ссылка на глоб."
+msgstr "Link to global"
+
+msgid "Файловый описатель."
+msgstr "File descriptor."
+
+msgid "Ссылки на массивы."
+msgstr "Array references."
+
+msgid "Ограничивает массивы от `A` до `B` элементов или от 0 до `A`, если `B` отсутствует."
+msgstr "Limits arrays from `A` to `B` elements, or from 0 to `A` if `B` is missing."
+
+msgid "Ссылки на хеши."
+msgstr "Links to hashes."
+
+msgid "Благословлённые ссылки."
+msgstr "Blessed links."
+
+msgid "Благословенные ссылки на объекты текущего пакета."
+msgstr "Blessed references to objects of the current package."
+
+msgid "Как `HashRef`, но с типом для ключей."
+msgstr "Like `HashRef`, but with a key type."
+
+msgid "Тьюпл."
+msgstr "Tuple."
+
+msgid "Тьюпл повторённый один или несколько раз."
+msgstr "Tuple repeated one or more times."
+
+msgid "Словарь."
+msgstr "Dictionary."
+
+msgid "Хэш имеет перечисленные свойства. Кроме них он может иметь и другие."
+msgstr "A hash has the following properties. In addition to them, he may have others."
+
+msgid "Объект или строка."
+msgstr "Object or string."
+
+msgid "Объект или класс имеет перечисленные методы. Кроме них может иметь и другие."
+msgstr "An object or class has listed methods. In addition to them, there may be others."
+
+msgid "Объект или класс с перегруженными операторами."
+msgstr "An object or class with overloaded operators."
+
+msgid "И у него есть операторы указанные операторы."
+msgstr "And it has operators specified operators."
+
+msgid "Класс или объект наследует классы из списка."
+msgstr "A class or object inherits classes from a list."
+
+msgid "Класс или объект имеет указанные роли."
+msgstr "A class or object has the specified roles."
+
+msgid "Проверяет 1, 0, \"\", undef или объект с перегруженным оператором `bool` или `0+` как `JSON::PP::Boolean`. Во втором случае вызывает оператор  `0+` и проверяет результат как `Bool`."
+msgstr "Tests for 1, 0, \"\", undef, or an object with an overloaded `bool` or `0+` operator as `JSON::PP::Boolean`. In the second case, it calls the `0+` operator and checks the result as `Bool`."
+
+msgid "`BoolLike` вызывает оператор `0+` и проверяет результат."
+msgstr "`BoolLike` calls the `0+` operator and checks the result."
+
+msgid "Строка или объект с перегруженным оператором `\"\"`."
+msgstr "A string or object overloaded with the `\"\"` operator."
+
+msgid "Регулярное выражение или объект с перегруженным оператором `qr`."
+msgstr "A regular expression or object with an overload of the `qr` operator."
+
+msgid "Подпрограмма или объект с перегруженным оператором `&{}`."
+msgstr "A subroutine or object with an overload of the `&{}` operator."
+
+msgid "Массивы или объекты с перегруженным оператором или `@{}`."
+msgstr "Arrays or objects with an overloaded operator or `@{}`."
+
+msgid "Хэши или объекты с перегруженным оператором `%{}`."
+msgstr "Hashes or objects with the `%{}` operator overloaded."
+
+msgid "⚖ **GPLv3**"
+msgstr "⚖ **GPLv3**"
+
+msgid "The Aion::Types module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All rights reserved."
+msgstr "The Aion::Types module is copyright © 2023 Yaroslav O. Kosmina. Rusland. All rights reserved."

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## JSON Schema Validator - ~/lib/JSON/Schema/Validate.pm
-## Version v0.5.0
+## Version v0.5.1
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2025/11/07
-## Modified 2025/11/19
+## Modified 2025/11/20
 ## All rights reserved
 ## 
 ## 
@@ -23,7 +23,7 @@ BEGIN
     use Scalar::Util qw( blessed looks_like_number reftype refaddr );
     use List::Util qw( first any all );
     use Encode ();
-    our $VERSION = 'v0.5.0';
+    our $VERSION = 'v0.5.1';
 };
 
 use v5.16.0;
@@ -1162,6 +1162,7 @@ sub _compile_node
         }
 
         # Combinators
+        # allOf: all subschemas must pass, and we merge their annotations.
         if( exists( $S->{allOf} ) && ref( $S->{allOf} ) eq 'ARRAY' )
         {
             my( %p, %it );
@@ -1175,34 +1176,89 @@ sub _compile_node
             %ann_props = ( %ann_props, %p );
             %ann_items = ( %ann_items, %it );
         }
+
+        # anyOf: at least one subschema must pass; do NOT leak errors from
+        # non-selected branches into the main context.
         if( exists( $S->{anyOf} ) && ref( $S->{anyOf} ) eq 'ARRAY' )
         {
             my $ok = 0;
+            my( %p, %it );
+            my @branch_errs;
+
             for my $i ( 0 .. $#{ $S->{anyOf} } )
             {
-                my $r = $child{ "anyOf:$i" }->( $ctx, $inst );
+                # Shadow context for this branch
+                my %shadow = %$ctx;
+                my @errs;
+                $shadow{errors}      = \@errs;
+                $shadow{error_count} = 0;
+
+                my $r = $child{ "anyOf:$i" }->( \%shadow, $inst );
+
                 if( $r->{ok} )
                 {
                     $ok = 1;
+                    %p  = ( %p,  %{$r->{props}} );
+                    %it = ( %it, %{$r->{items}} );
                     last;
                 }
+
+                push( @branch_errs, \@errs );
             }
-            return( _err_res( $ctx, $ptr, "instance does not satisfy anyOf", 'anyOf' ) ) unless( $ok );
+
+            unless( $ok )
+            {
+                # No branch matched: merge collected branch errors into main context
+                for my $aref ( @branch_errs )
+                {
+                    next unless( @$aref );
+                    push( @{$ctx->{errors}}, @$aref );
+                    $ctx->{error_count} += scalar( @$aref );
+                }
+
+                return( _err_res( $ctx, $ptr, "instance does not satisfy anyOf", 'anyOf' ) );
+            }
+
+            %ann_props = ( %ann_props, %p );
+            %ann_items = ( %ann_items, %it );
         }
+
+        # oneOf: exactly one subschema must pass; again, isolate branch errors.
         if( exists( $S->{oneOf} ) && ref( $S->{oneOf} ) eq 'ARRAY' )
         {
             my $hits = 0;
-            for my $i ( 0 .. $#{$S->{oneOf}} )
+
+            for my $i ( 0 .. $#{ $S->{oneOf} } )
             {
-                my $r = $child{ "oneOf:$i" }->( $ctx, $inst );
+                my %shadow = %$ctx;
+                my @errs;
+                $shadow{errors}      = \@errs;
+                $shadow{error_count} = 0;
+
+                my $r = $child{ "oneOf:$i" }->( \%shadow, $inst );
                 $hits++ if( $r->{ok} );
             }
-            return( _err_res( $ctx, $ptr, "instance satisfies $hits schemas in oneOf (expected exactly 1)", 'oneOf' ) ) unless( $hits == 1 );
+
+            return( _err_res( $ctx, $ptr, "instance satisfies $hits subschemas in oneOf (expected exactly 1)", 'oneOf' ) )
+                unless( $hits == 1 );
         }
+
+        # not: the inner schema must **fail**; its own errors are irrelevant
+        # on success, so we run it entirely in a shadow context.
         if( exists( $S->{not} ) && ref( $S->{not} ) )
         {
-            my $r = $child{ "not" }->( $ctx, $inst );
-            return( _err_res( $ctx, $ptr, "instance matches forbidden not-schema", 'not' ) ) if( $r->{ok} );
+            my %shadow = %$ctx;
+            my @errs;
+            $shadow{errors}      = \@errs;
+            $shadow{error_count} = 0;
+
+            my $r = $child{ "not" }->( \%shadow, $inst );
+
+            # If inner schema passes, then "not" fails
+            return( _err_res( $ctx, $ptr, "instance matches forbidden not-schema", 'not' ) )
+                if( $r->{ok} );
+
+            # Otherwise, "not" is satisfied; ignore inner errors entirely
         }
 
         # Conditionals
@@ -1660,48 +1716,133 @@ sub _k_combinator
 {
     my( $ctx, $sp, $S, $inst, $kw ) = @_;
 
+
+    # allOf: all subschemas must pass, we merge their annotations
     if( $kw eq 'allOf' )
     {
-        my %props; my %items;
+        my %props;
+        my %items;
+
         for my $i ( 0 .. $#{$S->{allOf}} )
         {
             my $r = _v( $ctx, _join_ptr( $sp, "allOf/$i" ), $S->{allOf}->[ $i ], $inst );
             return( $r ) unless( $r->{ok} );
+
             %props = ( %props, %{$r->{props}} );
             %items = ( %items, %{$r->{items}} );
         }
+
         return( { ok => 1, props => \%props, items => \%items } );
     }
 
+    # anyOf: at least one subschema must pass.
+    # Errors from failing branches must NOT leak into the main context.
     if( $kw eq 'anyOf' )
     {
+        my @branch_errs;
+
         for my $i ( 0 .. $#{$S->{anyOf}} )
         {
-            my $r = _v( $ctx, _join_ptr( $sp, "anyOf/$i" ), $S->{anyOf}->[ $i ], $inst );
-            return( $r ) if( $r->{ok} );
+            # Shadow context: isolate errors for this branch
+            my %shadow = %$ctx;
+            my @errs;
+            $shadow{errors}      = \@errs;
+            $shadow{error_count} = 0;
+
+            my $r = _v( \%shadow, _join_ptr( $sp, "anyOf/$i" ), $S->{anyOf}->[ $i ], $inst );
+
+            if( $r->{ok} )
+            {
+                # One branch passed: combinator satisfied.
+                # Ignore all other branch errors.
+                return( { ok => 1, props => {}, items => {} } );
+            }
+
+            push( @branch_errs, \@errs );
         }
+
+        # No branch matched: merge collected branch errors into main context
+        for my $aref ( @branch_errs )
+        {
+            next unless( @$aref );
+            push( @{$ctx->{errors}}, @$aref );
+            $ctx->{error_count} += scalar( @$aref );
+        }
+
         return( _err_res( $ctx, $sp, "instance does not satisfy anyOf", 'anyOf' ) );
     }
 
+    # oneOf: exactly one subschema must pass.
+    # Again, do not leak errors from non-selected branches.
     if( $kw eq 'oneOf' )
     {
-        my @ok;
+        my @ok_results;
+        my @branch_errs;
+
         for my $i ( 0 .. $#{$S->{oneOf}} )
         {
-            my $r = _v( $ctx, _join_ptr( $sp,"oneOf/$i" ), $S->{oneOf}->[$i], $inst );
-            push( @ok, $r ) if( $r->{ok} );
+            my %shadow = %$ctx;
+            my @errs;
+            $shadow{errors}      = \@errs;
+            $shadow{error_count} = 0;
+
+            my $r = _v( \%shadow, _join_ptr( $sp, "oneOf/$i" ), $S->{oneOf}->[$i], $inst );
+
+            if( $r->{ok} )
+            {
+                push( @ok_results, $r );
+            }
+            else
+            {
+                push( @branch_errs, \@errs );
+            }
         }
-        return( $ok[0] ) if( @ok == 1 );
-        return( _err_res( $ctx, $sp, "instance satisfies " . scalar( @ok ) . " schemas in oneOf (expected exactly 1)", 'oneOf' ) );
+
+        if( @ok_results == 1 )
+        {
+            # Exactly one branch matched: combinator satisfied.
+            # Do NOT bubble up branch props/items through oneOf.
+            return( { ok => 1, props => {}, items => {} } );
+        }
+
+        # Zero or >1 matched -> failure; merge branch errors
+        for my $aref ( @branch_errs )
+        {
+            next unless( @$aref );
+            push( @{$ctx->{errors}}, @$aref );
+            $ctx->{error_count} += scalar( @$aref );
+        }
+
+        return(
+            _err_res(
+                $ctx,
+                $sp,
+                "instance satisfies " . scalar( @ok_results ) . " schemas in oneOf (expected exactly 1)",
+                'oneOf'
+            )
+        );
     }
 
+    # not: subschema must NOT validate.
+    # Any errors from validating the inner schema are irrelevant on success.
     if( $kw eq 'not' )
     {
-        my $r = _v( $ctx, _join_ptr( $sp, "not" ), $S->{not}, $inst );
-        return( _err_res( $ctx, $sp, "instance matches forbidden not-schema", 'not' ) ) if( $r->{ok} );
+        my %shadow = %$ctx;
+        my @errs;
+        $shadow{errors}      = \@errs;
+        $shadow{error_count} = 0;
+
+        my $r = _v( \%shadow, _join_ptr( $sp, "not" ), $S->{not}, $inst );
+
+        # If inner schema passes, then "not" fails
+        return( _err_res( $ctx, $sp, "instance matches forbidden not-schema", 'not' ) )
+            if( $r->{ok} );
+
+        # Otherwise, "not" is satisfied; ignore inner errors entirely
         return( { ok => 1, props => {}, items => {} } );
     }
 
+    # Unknown / unsupported combinator (defensive default)
     return( { ok => 1, props => {}, items => {} } );
 }
 
@@ -1736,17 +1877,30 @@ sub _k_if_then_else
 {
     my( $ctx, $sp, $S, $inst ) = @_;
 
-    my $cond = _v( $ctx, _join_ptr( $sp, 'if' ), $S->{if}, $inst );
+    # Evaluate "if" in a shadow context so its errors do NOT leak
+    my %shadow = %$ctx;
+    my @errs;
+    $shadow{errors}      = \@errs;
+    $shadow{error_count} = 0;
+
+    my $cond = _v( \%shadow, _join_ptr( $sp, 'if' ), $S->{if}, $inst );
+
     if( $cond->{ok} )
     {
         _t( $ctx, $sp, 'if', undef, 'pass', 'then' ) if( $ctx->{trace_on} );
-        return( { ok => 1, props => {}, items => {} } ) unless( exists( $S->{then} ) );
+        return( { ok => 1, props => {}, items => {} } )
+            unless( exists( $S->{then} ) );
+
+        # Apply "then" against the REAL context
         return( _v( $ctx, _join_ptr( $sp, 'then' ), $S->{then}, $inst ) );
     }
     else
     {
         _t( $ctx, $sp, 'if', undef, 'pass', 'else' ) if( $ctx->{trace_on} );
-        return( { ok => 1, props => {}, items => {} } ) unless( exists( $S->{else} ) );
+        return( { ok => 1, props => {}, items => {} } )
+            unless( exists( $S->{else} ) );
+
+        # Apply "else" against the REAL context
         return( _v( $ctx, _join_ptr( $sp, 'else' ), $S->{else}, $inst ) );
     }
 }
@@ -1836,7 +1990,24 @@ sub _k_object_all
     {
         next if( exists( $H->{ $rq } ) );
         _t( $ctx,$sp, 'required', undef, 'fail', $rq ) if( $ctx->{trace_on} );
-        return( _err_res( $ctx, _join_ptr( $sp, $rq ), "required property '$rq' is missing", 'required' ) );
+
+        my @need = sort grep { $required{ $_ } } keys %required;
+        my @have = sort keys %$H;
+
+        my $need_str = @need ? join( ', ', @need ) : '(none)';
+        my $have_str = @have ? join( ', ', @have ) : '(none)';
+
+        my $msg = "required property '$rq' is missing "
+                . "(required: $need_str; present: $have_str)";
+
+        return(
+            _err_res(
+                $ctx,
+                _join_ptr( $sp, $rq ),
+                $msg,
+                'required'
+            )
+        );
     }
 
     if( exists( $S->{propertyNames} ) && ref( $S->{propertyNames} ) eq 'HASH' )
@@ -2441,15 +2612,19 @@ sub _v_node
     my( $ctx, $schema_ptr, $schema, $inst ) = @_;
 
     # $ref / $dynamicRef first
-    if( ref( $schema ) eq 'HASH' && exists( $schema->{'$ref'} ) )
+    if( ref( $schema ) eq 'HASH' &&
+        exists( $schema->{'$ref'} ) )
     {
         return( _apply_ref( $ctx, $schema_ptr, $schema->{'$ref'}, $inst ) );
     }
-    if( ref( $schema ) eq 'HASH' && exists( $schema->{'$dynamicRef'} ) )
+    if( ref( $schema ) eq 'HASH' &&
+        exists( $schema->{'$dynamicRef'} ) )
     {
         return( _apply_dynamic_ref( $ctx, $schema_ptr, $schema->{'$dynamicRef'}, $inst ) );
     }
-    if( exists( $schema->{'$comment'} ) && defined( $schema->{'$comment'} ) )
+    if( ref( $schema ) eq 'HASH' &&
+        exists( $schema->{'$comment'} ) &&
+        defined( $schema->{'$comment'} ) )
     {
         my $c = $schema->{'$comment'};
         if( my $cb = $ctx->{comment_handler} )
@@ -2671,6 +2846,7 @@ BEGIN
 
 use strict;
 use warnings;
+use utf8;
 
 sub new
 {
@@ -2814,7 +2990,7 @@ JSON::Schema::Validate - Lean, recursion-safe JSON Schema validator (Draft 2020-
 
 =head1 VERSION
 
-v0.5.0
+v0.5.1
 
 =head1 DESCRIPTION
 
@@ -3441,9 +3617,59 @@ C<type> may be an array mixing string type names and inline schemas. Any inline 
 
 For practicality in Perl, C<< type => 'boolean' >> accepts JSON-like booleans (e.g. true/false, 1/0 as strings) as well as Perl boolean objects (if you use a boolean class). If you need stricter behaviour, you can adapt C<_match_type> or introduce a constructor flag and branch there.
 
+=item * Combinators C<allOf>, C<anyOf>, C<oneOf>, C<not>
+
+C<allOf> validates all subschemas and merges their annotations (e.g. evaluated properties/items) into the parent schema’s annotation. If any subschema fails, C<allOf> fails.
+
+C<anyOf> and C<oneOf> always validate their branches in a “shadow” context.
+Errors produced by non-selected branches do not leak into the main context when the combinator as a whole succeeds. When C<anyOf> fails (no branch matched) or C<oneOf> fails (zero or more than one branch matched), the validator merges the collected branch errors into the main context to make debugging easier.
+
+C<not> is also evaluated in a shadow context. If the inner subschema validates, C<not> fails with a single “forbidden not-schema” error; otherwise C<not> succeeds and any inner errors are discarded.
+
+=item * Conditionals C<if> / C<then> / C<else>
+
+The subschema under C<if> is treated purely as a condition:
+
+=over 4
+
+=item *
+
+C<if> is always evaluated in an isolated “shadow” context. Any errors it produces (for example from C<required>) are never reported directly.
+
+=item *
+
+If C<if> succeeds and C<then> is present, C<then> is evaluated against the real context and may produce errors.
+
+=item *
+
+If C<if> fails and C<else> is present, C<else> is evaluated against the real context and may produce errors.
+
+=back
+
+This matches the JSON Schema 2020-12 intent: only C<then>/C<else> affect validity, C<if> itself never does.
+
 =item * Unevaluated*
 
 Both C<unevaluatedItems> and C<unevaluatedProperties> are enforced using annotation produced by earlier keyword evaluations within the same schema object, matching draft 2020-12 semantics.
+
+=item * Error reporting and pointers
+
+Each error object contains both:
+
+=over 4
+
+=item *
+
+C<path> – a JSON Pointer-like path to the failing location in the instance (e.g. C<#/properties~1s/oneOf~11/properties~1classes/0>).
+
+=item *
+
+C<schema_pointer> – a JSON Pointer into the root schema that identifies the keyword which emitted the error (e.g.
+C<#/properties~1s/oneOf~11/properties~1classes/items/allOf~10/then/voting_right>).
+
+=back
+
+Messages for C<required> errors also list the full required set and the keys actually present at that location to help debug combinators such as C<anyOf>/C<oneOf>/C<if>/C<then>/C<else>.
 
 =item * RFC rigor and media types
 

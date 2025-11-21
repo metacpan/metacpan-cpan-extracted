@@ -14,6 +14,7 @@ binmode STDERR, ':utf8';
 
 use open qw(:std :encoding(UTF-8));
 
+use App::Test::Generator::Template;
 use Carp qw(carp croak);
 use Config::Abstraction 0.36;
 use Data::Dumper;
@@ -28,7 +29,12 @@ use Exporter 'import';
 
 our @EXPORT_OK = qw(generate);
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
+
+use constant {
+	DEFAULT_ITERATIONS => 50,
+	DEFAULT_PROPERTY_TRIALS => 1000
+};
 
 =head1 NAME
 
@@ -36,7 +42,7 @@ App::Test::Generator - Generate fuzz and corpus-driven test harnesses
 
 =head1 VERSION
 
-Version 0.15
+Version 0.16
 
 =head1 SYNOPSIS
 
@@ -240,10 +246,6 @@ To ensure C<new()> is called with no arguments, you still need to define new, th
 
   new:
 
-For the legacy Perl variable syntax, use the empty string:
-
-  our $new = '';
-
 =item * C<%cases> - optional Perl static corpus, when the output is a simple string (expected => [ args... ]):
 
 Maps the expected output string to the input and _STATUS
@@ -330,23 +332,62 @@ The current supported variables are
 
 =back
 
-=head2 OUTPUT
+=head3 Semantic Data Generators
 
-The generated test:
+For property-based testing, you can use semantic generators to create realistic test data:
+
+  input:
+    email:
+      type: string
+      semantic: email
+
+    user_id:
+      type: string
+      semantic: uuid
+
+    phone:
+      type: string
+      semantic: phone_us
+
+=head4 Available Semantic Types
 
 =over 4
 
-=item * Seeds RND (if configured) for reproducible fuzz runs
+=item * C<email> - Valid email addresses (user@domain.tld)
 
-=item * Uses edge cases (per-field and per-type) with configurable probability
+=item * C<url> - HTTP/HTTPS URLs
 
-=item * Runs C<$iterations> fuzz cases plus appended edge-case runs
+=item * C<uuid> - UUIDv4 identifiers
 
-=item * Validates inputs with Params::Get / Params::Validate::Strict
+=item * C<phone_us> - US phone numbers (XXX-XXX-XXXX)
 
-=item * Validates outputs with L<Return::Set>
+=item * C<phone_e164> - International E.164 format (+XXXXXXXXXXXX)
 
-=item * Runs static C<is(... )> corpus tests from Perl and/or YAML corpus
+=item * C<ipv4> - IPv4 addresses (0.0.0.0 - 255.255.255.255)
+
+=item * C<ipv6> - IPv6 addresses
+
+=item * C<username> - Alphanumeric usernames with _ and -
+
+=item * C<slug> - URL slugs (lowercase-with-hyphens)
+
+=item * C<hex_color> - Hex color codes (#RRGGBB)
+
+=item * C<iso_date> - ISO 8601 dates (YYYY-MM-DD)
+
+=item * C<iso_datetime> - ISO 8601 datetimes (YYYY-MM-DDTHH:MM:SSZ)
+
+=item * C<semver> - Semantic version strings (major.minor.patch)
+
+=item * C<jwt> - JWT-like tokens (base64url format)
+
+=item * C<json> - Simple JSON objects
+
+=item * C<base64> - Base64-encoded strings
+
+=item * C<md5> - MD5 hashes (32 hex chars)
+
+=item * C<sha256> - SHA-256 hashes (64 hex chars)
 
 =back
 
@@ -500,64 +541,7 @@ without relying solely on randomness.
 
 =head1 EXAMPLES
 
-=head2 Math::Simple::add()
-
-Functional fuzz + Perl corpus + seed:
-
-  our $module = 'Math::Simple';
-  our $function = 'add';
-  our %input = ( a => { type => 'integer' }, b => { type => 'integer' } );
-  our %output = ( type => 'integer' );
-  our %cases = (
-    '3' => [1, 2],
-    '0' => [0, 0],
-    '-1' => [-2, 1],
-    '_STATUS:DIES' => [ 'a', 'b' ],     # non-numeric args should die
-    '_STATUS:WARNS' => [ undef, undef ], # undef args should warn
-  );
-  our $seed = 12345;
-  our $iterations = 100;
-
-=head2 Adding YAML file to generate tests
-
-OO fuzz + YAML corpus + edge cases:
-
-	our %input = ( query => { type => 'string' } );
-	our %output = ( type => 'string' );
-	our $function = 'search';
-	our $new = { api_key => 'ABC123' };
-	our $yaml_cases = 't/corpus.yml';
-	our %edge_cases = ( query => [ '', '	', '<script>' ] );
-	our %type_edge_cases = ( string => [ \"\\0", "\x{FFFD}" ] );
-	our $seed = 999;
-
-=head3 YAML Corpus Example (t/corpus.yml)
-
-A YAML mapping of expected -> args array:
-
-	"success":
-	  - "Alice"
-	  - 30
-	"failure":
-	  - "Bob"
-
-=head2 Example with arrayref + hashref
-
-  our %input = (
-    tags => { type => 'arrayref', optional => 1 },
-    config => { type => 'hashref' },
-  );
-  our %output = ( type => 'hashref' );
-
-=head2 Example with memberof
-
-  our %input = (
-      status => { type => 'string', memberof => [ 'ok', 'error', 'pending' ] },
-  );
-  our %output = ( type => 'string' );
-  our %config = ( test_nuls => 0, test_undef => 1 );
-
-This will generate fuzz cases for 'ok', 'error', 'pending', and one invalid string that should die.
+See the files in C<t/conf> for examples.
 
 =head2 Adding Scheduled fuzz Testing with GitHub Actions to Your Code
 
@@ -676,8 +660,8 @@ Then create this file as <t/fuzz.t>:
   use FindBin qw($Bin);
   use IPC::Run3;
   use IPC::System::Simple qw(system);
-  use Test::Most;
   use Test::Needs 'App::Test::Generator';
+  use Test::Most;
 
   my $dirname = "$Bin/conf";
 
@@ -700,7 +684,7 @@ Then create this file as <t/fuzz.t>:
 					diag("$1 tests run");
 				}
 			} else {
-				diag("STDOUT:\n$stdout");
+				diag("$filepath: STDOUT:\n$stdout");
 			}
 			diag($stderr) if(length($stderr));
 		}
@@ -709,6 +693,438 @@ Then create this file as <t/fuzz.t>:
   }
 
   done_testing();
+
+=head2 Property-Based Testing with Transforms
+
+The generator can create property-based tests using L<Test::LectroTest> when the
+C<properties> configuration option is enabled.
+This provides more comprehensive
+testing by automatically generating thousands of test cases and verifying that
+mathematical properties hold across all inputs.
+
+=head3 Basic Property-Based Transform Example
+
+Here's a complete example testing the C<abs> builtin function:
+
+B<t/conf/abs.yml>:
+
+  ---
+  module: builtin
+  function: abs
+
+  config:
+    test_undef: no
+    test_empty: no
+    test_nuls: no
+    properties:
+      enable: true
+      trials: 1000
+
+  input:
+    number:
+      type: number
+      position: 0
+
+  output:
+    type: number
+    min: 0
+
+  transforms:
+    positive:
+      input:
+        number:
+          type: number
+          min: 0
+      output:
+        type: number
+        min: 0
+
+    negative:
+      input:
+        number:
+          type: number
+          max: 0
+      output:
+        type: number
+        min: 0
+
+This configuration:
+
+=over 4
+
+=item * Enables property-based testing with 1000 trials per property
+
+=item * Defines two transforms: one for positive numbers, one for negative
+
+=item * Automatically generates properties that verify C<abs()> always returns non-negative numbers
+
+=back
+
+Generate the test:
+
+  fuzz-harness-generator t/conf/abs.yml > t/abs_property.t
+
+The generated test will include:
+
+=over 4
+
+=item * Traditional edge-case tests for boundary conditions
+
+=item * Random fuzzing with 50 iterations (or as configured)
+
+=item * Property-based tests that verify the transforms with 1000 trials each
+
+=back
+
+=head3 What Properties Are Tested?
+
+The generator automatically detects and tests these properties based on your transform specifications:
+
+=over 4
+
+=item * B<Range constraints> - If output has C<min> or C<max>, verifies results stay within bounds
+
+=item * B<Type preservation> - Ensures numeric inputs produce numeric outputs
+
+=item * B<Definedness> - Verifies the function doesn't return C<undef> unexpectedly
+
+=item * B<Specific values> - If output specifies a C<value>, checks exact equality
+
+=back
+
+For the C<abs> example above, the generated properties verify:
+
+  # For the "positive" transform:
+  - Given a positive number, abs() returns >= 0
+  - The result is a valid number
+  - The result is defined
+
+  # For the "negative" transform:
+  - Given a negative number, abs() returns >= 0
+  - The result is a valid number
+  - The result is defined
+
+=head3 Advanced Example: String Normalization
+
+Here's a more complex example testing a string normalization function:
+
+B<t/conf/normalize.yml>:
+
+  ---
+  module: Text::Processor
+  function: normalize_whitespace
+
+  config:
+    properties:
+      enable: true
+      trials: 500
+
+  input:
+    text:
+      type: string
+      min: 0
+      max: 1000
+      position: 0
+
+  output:
+    type: string
+    min: 0
+    max: 1000
+
+  transforms:
+    empty_preserved:
+      input:
+        text:
+          type: string
+          value: ""
+      output:
+        type: string
+        value: ""
+
+    single_space:
+      input:
+        text:
+          type: string
+          min: 1
+          matches: '^\S+(\s+\S+)*$'
+      output:
+        type: string
+        matches: '^\S+( \S+)*$'
+
+    length_bounded:
+      input:
+        text:
+          type: string
+          min: 1
+          max: 100
+      output:
+        type: string
+        min: 1
+        max: 100
+
+This tests that the normalization function:
+
+=over 4
+
+=item * Preserves empty strings (C<empty_preserved> transform)
+
+=item * Collapses multiple spaces into single spaces (C<single_space> transform)
+
+=item * Maintains length constraints (C<length_bounded> transform)
+
+=back
+
+=head3 Interpreting Property Test Results
+
+When property-based tests run, you'll see output like:
+
+  ok 123 - negative property holds (1000 trials)
+  ok 124 - positive property holds (1000 trials)
+
+If a property fails, Test::LectroTest will attempt to find the minimal failing
+case and display it:
+
+  not ok 123 - positive property holds (47 trials)
+  # Property failed
+  # Reason: counterexample found
+
+This helps you quickly identify edge cases that your function doesn't handle correctly.
+
+=head3 Configuration Options for Property-Based Testing
+
+In the C<config> section:
+
+  config:
+    properties:
+      enable: true     # Enable property-based testing (default: false)
+      trials: 1000     # Number of test cases per property (default: 1000)
+
+You can also disable traditional fuzzing and only use property-based tests:
+
+  config:
+    properties:
+      enable: true
+      trials: 5000
+
+  iterations: 0  # Disable random fuzzing, use only property tests
+
+=head3 When to Use Property-Based Testing
+
+Property-based testing with transforms is particularly useful for:
+
+=over 4
+
+=item * Mathematical functions (C<abs>, C<sqrt>, C<min>, C<max>, etc.)
+
+=item * Data transformations (encoding, normalization, sanitization)
+
+=item * Parsers and formatters
+
+=item * Functions with clear input-output relationships
+
+=item * Code that should satisfy mathematical properties (commutativity, associativity, idempotence)
+
+=back
+
+=head3 Requirements
+
+Property-based testing requires L<Test::LectroTest> to be installed:
+
+  cpanm Test::LectroTest
+
+If not installed, the generated tests will automatically skip the property-based
+portion with a message.
+
+=head3 Testing Email Validation
+
+  ---
+  module: Email::Valid
+  function: rfc822
+
+  config:
+    properties:
+      enable: true
+      trials: 200
+    test_undef: no
+    test_empty: no
+    test_nuls: no
+
+  input:
+    email:
+      type: string
+      semantic: email
+      position: 0
+
+  output:
+    type: boolean
+
+  transforms:
+    valid_emails:
+      input:
+        email:
+          type: string
+          semantic: email
+      output:
+        type: boolean
+
+This generates 200 realistic email addresses for testing, rather than random strings.
+
+=head3 Combining Semantic with Regex
+
+You can combine semantic generators with regex validation:
+
+  input:
+    corporate_email:
+      type: string
+      semantic: email
+      matches: '@company\.com$'
+
+The semantic generator creates realistic emails, and the regex ensures they match your domain.
+
+=head3 Custom Properties for Transforms
+
+You can define additional properties that should hold for your transforms beyond
+the automatically detected ones.
+
+=head4 Using Built-in Properties
+
+  transforms:
+    positive:
+      input:
+        number:
+          type: number
+          min: 0
+      output:
+        type: number
+        min: 0
+      properties:
+        - idempotent       # f(f(x)) == f(x)
+        - non_negative     # result >= 0
+        - positive         # result > 0
+
+Available built-in properties:
+
+=over 4
+
+=item * C<idempotent> - Function is idempotent: f(f(x)) == f(x)
+
+=item * C<non_negative> - Result is always >= 0
+
+=item * C<positive> - Result is always > 0
+
+=item * C<non_empty> - String result is never empty
+
+=item * C<length_preserved> - Output length equals input length
+
+=item * C<uppercase> - Result is all uppercase
+
+=item * C<lowercase> - Result is all lowercase
+
+=item * C<trimmed> - No leading/trailing whitespace
+
+=item * C<sorted_ascending> - Array is sorted ascending
+
+=item * C<sorted_descending> - Array is sorted descending
+
+=item * C<unique_elements> - Array has no duplicates
+
+=item * C<preserves_keys> - Hash has same keys as input
+
+=back
+
+=head4 Custom Property Code
+
+Custom properties allows the definition additional invariants and relationships that should hold for their transforms,
+beyond what's auto-detected.
+For example:
+
+=over 4
+
+=item * Idempotence: f(f(x)) == f(x)
+
+=item * Commutativity: f(x, y) == f(y, x)
+
+=item * Associativity: f(f(x, y), z) == f(x, f(y, z))
+
+=item * Inverse relationships: decode(encode(x)) == x
+
+=item * Domain-specific invariants: Custom business logic
+
+=back
+
+Define your own properties with custom Perl code:
+
+  transforms:
+    normalize:
+      input:
+        text:
+          type: string
+      output:
+        type: string
+      properties:
+        - name: single_spaces
+          description: "No multiple consecutive spaces"
+          code: $result !~ /  /
+
+        - name: no_leading_space
+          description: "No space at start"
+          code: $result !~ /^\s/
+
+        - name: reversible
+          description: "Can be reversed back"
+          code: length($result) == length($text)
+
+The code has access to:
+
+=over 4
+
+=item * C<$result> - The function's return value
+
+=item * Input variables - All input parameters (e.g., C<$text>, C<$number>)
+
+=item * The function itself - Can call it again for idempotence checks
+
+=back
+
+=head4 Combining Auto-detected and Custom Properties
+
+The generator automatically detects properties from your output spec, and adds
+your custom properties:
+
+  transforms:
+    sanitize:
+      input:
+        html:
+          type: string
+      output:
+        type: string
+        min: 0              # Auto-detects: defined, min_length >= 0
+        max: 10000
+      properties:           # Additional custom checks:
+        - name: no_scripts
+          code: $result !~ /<script/i
+        - name: no_iframes
+          code: $result !~ /<iframe/i
+
+=head2 OUTPUT
+
+The generated test:
+
+=over 4
+
+=item * Seeds RND (if configured) for reproducible fuzz runs
+
+=item * Uses edge cases (per-field and per-type) with configurable probability
+
+=item * Runs C<$iterations> fuzz cases plus appended edge-case runs
+
+=item * Validates inputs with Params::Get / Params::Validate::Strict
+
+=item * Validates outputs with L<Return::Set>
+
+=item * Runs static C<is(... )> corpus tests from Perl and/or YAML corpus
+
+=back
 
 =head1 METHODS
 
@@ -726,77 +1142,40 @@ sub generate
 
 	my ($schema_file, $test_file) = @_;
 
-	# --- Globals exported by the user's conf (all optional except function maybe) ---
-	# Ensure data don't persist across calls, which would allow
-	local our (%input, %output, %config, $module, $function, $new, %cases, $yaml_cases, %transforms);
-	local our ($seed, $iterations);
-	local our (%edge_cases, @edge_case_array, %type_edge_cases);
+	# Globals loaded from the user's conf (all optional except function maybe)
+	my (%input, %output, %config, $module, $function, $new, %cases, $yaml_cases, %transforms);
+	my ($seed, $iterations);
+	my (%edge_cases, @edge_case_array, %type_edge_cases);
 
 	@edge_case_array = ();
 
 	if(defined($schema_file)) {
-		if(!-r $schema_file) {
-			croak(__PACKAGE__, ": generate($schema_file): $!");
+		if(my $schema = _load_schema($schema_file)) {
+			# Parse the schema file and load into our structures
+			%input = %{_load_schema_section($schema, 'input', $schema_file)};
+			%output = %{_load_schema_section($schema, 'output', $schema_file)};
+			%transforms = %{_load_schema_section($schema, 'transforms', $schema_file)};
+
+			%cases = %{$schema->{cases}} if(exists($schema->{cases}));
+			%edge_cases = %{$schema->{edge_cases}} if(exists($schema->{edge_cases}));
+			%type_edge_cases = %{$schema->{type_edge_cases}} if(exists($schema->{type_edge_cases}));
+
+			$module = $schema->{module} if(exists($schema->{module}));
+			$function = $schema->{function} if(exists($schema->{function}));
+			if(exists($schema->{new})) {
+				$new = defined($schema->{'new'}) ? $schema->{new} : '_UNDEF';
+			}
+			$yaml_cases = $schema->{yaml_cases} if(exists($schema->{yaml_cases}));
+			$seed = $schema->{seed} if(exists($schema->{seed}));
+			$iterations = $schema->{iterations} if(exists($schema->{iterations}));
+
+			@edge_case_array = @{$schema->{edge_case_array}} if(exists($schema->{edge_case_array}));
+			_validate_config($schema);
+
+			%config = %{$schema->{config}} if(exists($schema->{config}));
+		} else {
+			croak "Failed to load schema from $schema_file";
 		}
-
-		# --- Load configuration safely (require so config can use 'our' variables) ---
-		# FIXME:  would be better to use Config::Abstraction, since requiring the user's config could execute arbitrary code
-		# my $abs = $schema_file;
-		# $abs = "./$abs" unless $abs =~ m{^/};
-		# require $abs;
-
-		my $config;
-		if($config = Config::Abstraction->new(config_dirs => ['.', ''], config_file => $schema_file)) {
-			$config = $config->all();
-			if(defined($config->{'$module'}) || defined($config->{'our $module'}) || !defined($config->{'module'})) {
-				# Legacy file format. This will go away.
-				# TODO: remove this code
-				$config = _load_conf(File::Spec->rel2abs($schema_file));
-				if($config) {
-					carp("$schema_file: Loading perl files as configs is deprecated and will be removed soon.");
-				}
-			}
-		}
-
-		if($config) {
-			%config = %{$config->{config}} if(exists($config->{config}));
-			if(exists($config->{input})) {
-				if(ref($config->{input}) eq 'HASH') {
-					%input = %{$config->{input}}
-				} elsif(defined($config->{'input'}) && ($config->{'input'} ne 'undef')) {
-					croak("$schema_file: input should be a hash, not ", ref($config->{'input'}));
-				}
-			}
-			if(exists($config->{output})) {
-				if(ref($config->{output}) eq 'HASH') {
-					%output = %{$config->{output}}
-				} elsif(defined($config->{'output'}) && ($config->{'output'} ne 'undef')) {
-					croak("$schema_file: output should be a hash");
-				}
-			}
-			if(exists($config->{transforms})) {
-				if(ref($config->{transforms}) eq 'HASH') {
-					%transforms = %{$config->{transforms}}
-				} elsif(defined($config->{'transforms'}) && ($config->{'transforms'} ne 'undef')) {
-					croak("$schema_file: transforms should be a hash");
-				}
-			}
-			%cases = %{$config->{cases}} if(exists($config->{cases}));
-			%edge_cases = %{$config->{edge_cases}} if(exists($config->{edge_cases}));
-			%type_edge_cases = %{$config->{type_edge_cases}} if(exists($config->{type_edge_cases}));
-
-			$module = $config->{module} if(exists($config->{module}));
-			$function = $config->{function} if(exists($config->{function}));
-			if(exists($config->{new})) {
-				$new = defined($config->{'new'}) ? $config->{new} : '_UNDEF';
-			}
-			$yaml_cases = $config->{yaml_cases} if(exists($config->{yaml_cases}));
-			$seed = $config->{seed} if(exists($config->{seed}));
-			$iterations = $config->{iterations} if(exists($config->{iterations}));
-
-			@edge_case_array = @{$config->{edge_case_array}} if(exists($config->{edge_case_array}));
-		}
-		_validate_config($config);
 	} else {
 		croak 'Usage: generate(schema_file [, outfile])';
 	}
@@ -829,7 +1208,7 @@ sub generate
 
 	# sensible defaults
 	$function ||= 'run';
-	$iterations ||= 50;		 # default fuzz runs if not specified
+	$iterations ||= DEFAULT_ITERATIONS;		 # default fuzz runs if not specified
 	$seed = undef if defined $seed && $seed eq '';	# treat empty as undef
 
 	# --- YAML corpus support (yaml_cases is filename string) ---
@@ -863,268 +1242,6 @@ sub generate
 		}
 	}
 
-	# --- Helpers for rendering data structures into Perl code for the generated test ---
-
-	sub _load_conf {
-		my $file = $_[0];
-
-		my $pkg = 'ConfigLoader';
-
-		# eval in a separate package
-		{
-			package ConfigLoader;
-			no strict 'refs';
-			do $file or die "Error loading $file: ", ($@ || $!);
-		}
-
-		# Now pull variables from ConfigLoader
-		my @vars = qw(
-			module new edge_cases function input output cases yaml_cases
-			seed iterations edge_case_array type_edge_cases config
-		);
-
-		my %conf;
-		no strict 'refs';	# allow symbolic references here
-		for my $v (@vars) {
-			if(my $full = "${pkg}::$v") {
-				if (defined ${$full}) {	# scalar
-					$conf{$v} = ${$full};
-				} elsif (@{$full}) {	# array
-					$conf{$v} = [ @{$full} ];
-				} elsif (%{$full}) {	# hash
-					$conf{$v} = { %{$full} };
-				}
-			}
-		}
-
-		return \%conf;
-	}
-
-	# Input validation for configuration
-	sub _validate_config {
-		my $config = $_[0];
-
-		if((!defined($config->{'module'})) && (!defined($config->{'function'}))) {
-			# Can't work out what should be tested
-			croak('At least one of function and module must be defined');
-		}
-
-		if((!defined($config->{'input'})) && (!defined($config->{'output'}))) {
-			# Routine takes no input and no output, so there's nothing that would be gained using this software
-			croak('You must specify at least one of input and output');
-		}
-		if(($config->{'input'}) && (ref($config->{input}) ne 'HASH')) {
-			if($config->{'input'} eq 'undef') {
-				delete $config->{'input'};
-			} else {
-				croak('Invalid input specification')
-			}
-		}
-
-		# Validate types, constraints, etc.
-		for my $param (keys %{$config->{input}}) {
-			my $spec = $config->{input}{$param};
-			if(ref($spec)) {
-				croak "Invalid type '$spec->{type}' for parameter '$param'" unless _valid_type($spec->{type});
-			} else {
-				croak "Invalid type '$spec' for parameter '$param'" unless _valid_type($spec);
-			}
-		}
-
-		# Check if using positional arguments
-		my $has_positions = 0;
-		my %positions;
-
-		for my $param (keys %{$config->{input}}) {
-			my $spec = $config->{input}{$param};
-			if (ref($spec) eq 'HASH' && defined($spec->{position})) {
-				$has_positions = 1;
-				my $pos = $spec->{position};
-
-				# Validate position is non-negative integer
-				croak "Position for '$param' must be a non-negative integer" unless $pos =~ /^\d+$/;
-
-				# Check for duplicate positions
-				croak "Duplicate position $pos for parameters '$positions{$pos}' and '$param'" if exists $positions{$pos};
-
-				$positions{$pos} = $param;
-			}
-		}
-
-		# If using positions, all params must have positions
-		if ($has_positions) {
-			for my $param (keys %{$config->{input}}) {
-				my $spec = $config->{input}{$param};
-				unless (ref($spec) eq 'HASH' && defined($spec->{position})) {
-					croak "Parameter '$param' missing position (all params must have positions if any do)";
-				}
-			}
-
-			# Check for gaps in positions (0, 1, 3 - missing 2)
-			my @sorted = sort { $a <=> $b } keys %positions;
-			for my $i (0..$#sorted) {
-				if ($sorted[$i] != $i) {
-					carp "Warning: Position sequence has gaps (positions: @sorted)";
-					last;
-				}
-			}
-		}
-	}
-
-	sub _valid_type
-	{
-		my $type = $_[0];
-
-		return(($type eq 'string') ||
-			($type eq 'boolean') ||
-			($type eq 'integer') ||
-			($type eq 'number') ||
-			($type eq 'float') ||
-			($type eq 'hashref') ||
-			($type eq 'arrayref') ||
-			($type eq 'object'));
-	}
-
-	sub _validate_module {
-		my ($module, $schema_file) = @_;
-
-		return 1 unless $module;	# No module to validate (builtin functions)
-
-		# Check if the module can be found
-		my $mod_info = check_install(module => $module);
-
-		if (!$mod_info) {
-			# Module not found - this is just a warning, not an error
-			# The module might not be installed on the generation machine
-			# but could be on the test machine
-			carp("Warning: Module '$module' not found in \@INC during generation.");
-			carp("  Config file: $schema_file");
-			carp("  This is OK if the module will be available when tests run.");
-			carp('  If this is unexpected, check your module name and installation.');
-			return 0;  # Not found, but not fatal
-		}
-
-		# Module was found
-		if ($ENV{TEST_VERBOSE} || $ENV{GENERATOR_VERBOSE}) {
-			print STDERR "Found module '$module' at: $mod_info->{file}\n",
-				'  Version: ', ($mod_info->{version} || 'unknown'), "\n";
-		}
-
-		# Optionally try to load it (disabled by default since it can have side effects)
-		if ($ENV{GENERATOR_VALIDATE_LOAD}) {
-			my $loaded = can_load(modules => { $module => undef }, verbose => 0);
-
-			if (!$loaded) {
-				carp("Warning: Module '$module' found but failed to load: $Module::Load::Conditional::ERROR");
-				carp("  This might indicate a broken installation or missing dependencies.");
-				return 0;
-			}
-
-			if ($ENV{TEST_VERBOSE} || $ENV{GENERATOR_VERBOSE}) {
-				print STDERR "Successfully loaded module '$module'\n";
-			}
-		}
-
-		return 1;
-	}
-
-	sub perl_sq {
-		my $s = $_[0];
-		$s =~ s/\\/\\\\/g; $s =~ s/'/\\'/g; $s =~ s/\n/\\n/g; $s =~ s/\r/\\r/g; $s =~ s/\t/\\t/g;
-		return $s;
-	}
-
-	sub perl_quote {
-		my $v = $_[0];
-		return 'undef' unless defined $v;
-		if(ref($v)) {
-			if(ref($v) eq 'ARRAY') {
-				my @quoted_v = map { perl_quote($_) } @{$v};
-				return '[ ' . join(', ', @quoted_v) . ' ]';
-			}
-			if(ref($v) eq 'Regexp') {
-				my $s = "$v";
-
-				# default to qr{...}
-				return "qr{$s}" unless $s =~ /[{}]/;
-
-				# fallback: quote with slash if no slash inside
-				return "qr/$s/" unless $s =~ m{/};
-
-				# fallback: quote with # if slash inside
-				return "qr#$s#";
-			}
-			# Generic fallback
-			$v = Dumper($v);
-			$v =~ s/\$VAR1 =//;
-			$v =~ s/;//;
-			return $v;
-		}
-		$v =~ s/\\/\\\\/g;
-		# return $v =~ /^-?\d+(\.\d+)?$/ ? $v : "'" . ( $v =~ s/'/\\'/gr ) . "'";
-		return $v =~ /^-?\d+(\.\d+)?$/ ? $v : "'" . perl_sq($v) . "'";
-	}
-
-	sub render_hash {
-		my $href = $_[0];
-		return '' unless $href && ref($href) eq 'HASH';
-		my @lines;
-		for my $k (sort keys %$href) {
-			my $def = $href->{$k} // {};
-			next unless ref $def eq 'HASH';
-			my @pairs;
-			for my $subk (sort keys %$def) {
-				next unless defined $def->{$subk};
-				if(ref($def->{$subk})) {
-					unless((ref($def->{$subk}) eq 'ARRAY') || (ref($def->{$subk}) eq 'Regexp')) {
-						croak(__PACKAGE__, ": schema_file, $subk is a nested element, not yet supported (", ref($def->{$subk}), ')');
-					}
-				}
-				if(($subk eq 'matches') || ($subk eq 'nomatch')) {
-					push @pairs, "$subk => qr/$def->{$subk}/";
-				} else {
-					push @pairs, "$subk => " . perl_quote($def->{$subk});
-				}
-			}
-			push @lines, '	' . perl_quote($k) . " => { " . join(", ", @pairs) . " }";
-		}
-		return join(",\n", @lines);
-	}
-
-	sub render_args_hash {
-		my $href = $_[0];
-		return '' unless $href && ref($href) eq 'HASH';
-		my @pairs = map { perl_quote($_) . ' => ' . perl_quote($href->{$_}) } sort keys %$href;
-		return join(', ', @pairs);
-	}
-
-	sub render_arrayref_map {
-		my $href = $_[0];
-		return '()' unless $href && ref($href) eq 'HASH';
-		my @entries;
-		for my $k (sort keys %$href) {
-			my $aref = $href->{$k};
-			next unless ref $aref eq 'ARRAY';
-			my $vals = join(', ', map { perl_quote($_) } @$aref);
-			push @entries, '	' . perl_quote($k) . " => [ $vals ]";
-		}
-		return join(",\n", @entries);
-	}
-
-	# Robustly quote a string (GitHub#1)
-	sub q_wrap {
-		my $s = $_[0];
-		for my $p ( ['{','}'], ['(',')'], ['[',']'], ['<','>'] ) {
-			my ($l,$r) = @$p;
-			return "q$l$s$r" unless $s =~ /\Q$l\E|\Q$r\E/;
-		}
-		for my $d ('~', '!', '%', '^', '=', '+', ':', ',', ';', '|', '/', '#') {
-			return "q$d$s$d" unless index($s, $d) >= 0;
-		}
-		(my $esc = $s) =~ s/'/\\'/g;
-		return "'$esc'";
-	}
-
 	# render edge case maps for inclusion in the .t
 	my $edge_cases_code = render_arrayref_map(\%edge_cases);
 	my $type_edge_cases_code = render_arrayref_map(\%type_edge_cases);
@@ -1137,6 +1254,11 @@ sub generate
 	# Render configuration - all the values are integers for now, if that changes, wrap the $config{$key} in single quotes
 	my $config_code = '';
 	foreach my $key (sort keys %config) {
+		# Skip nested structures like 'properties' - they're used during
+		# generation but don't need to be in the generated test
+		if(ref($config{$key}) eq 'HASH') {
+			next;
+		}
 		$config_code .= "'$key' => $config{$key},\n";
 	}
 
@@ -1174,6 +1296,26 @@ sub generate
 			"\t},\n";
 		}
 		$transforms_code .= "}\n";
+	}
+
+	my $transform_properties_code = '';
+	my $use_properties = 0;
+
+	if (keys %transforms && ($config{properties}{enable} // 0)) {
+		$use_properties = 1;
+
+		# Generate property-based tests for transforms
+		my $properties = _generate_transform_properties(
+			\%transforms,
+			$function,
+			$module,
+			\%input,
+			\%config,
+			$new
+		);
+
+		# Convert to code for template
+		$transform_properties_code = _render_properties($properties);
 	}
 
 	# Setup / call code (always load module)
@@ -1269,7 +1411,8 @@ sub generate
 	my $tt = Template->new({ ENCODING => 'utf8', TRIM => 1 });
 
 	# Read template from DATA handle
-	my $template = Data::Section::Simple::get_data_section('test.tt');
+	my $template_package = __PACKAGE__ . '::Template';
+	my $template = $template_package->get_data_section('test.tt');
 
 	my $vars = {
 		setup_code => $setup_code,
@@ -1285,11 +1428,14 @@ sub generate
 		call_code => $call_code,
 		function => $function,
 		iterations_code => int($iterations),
+		use_properties => $use_properties,
+		transform_properties_code => $transform_properties_code,
+		property_trials => $config{properties}{trials} // DEFAULT_PROPERTY_TRIALS,
 		module => $module
 	};
 
 	my $test;
-	$tt->process(\$template, $vars, \$test) or die $tt->error();
+	$tt->process($template, $vars, \$test) or die $tt->error();
 
 	if ($test_file) {
 		open my $fh, '>:encoding(UTF-8)', $test_file or die "Cannot open $test_file: $!";
@@ -1303,6 +1449,1244 @@ sub generate
 	} else {
 		print "$test\n";
 	}
+}
+
+# --- Helpers for rendering data structures into Perl code for the generated test ---
+
+sub _load_schema {
+	my $schema_file = $_[0];
+
+	if(!-r $schema_file) {
+		croak(__PACKAGE__, ": generate($schema_file): $!");
+	}
+
+	# --- Load configuration safely (require so config can use 'our' variables) ---
+	# FIXME:  would be better to use Config::Abstraction, since requiring the user's config could execute arbitrary code
+	# my $abs = $schema_file;
+	# $abs = "./$abs" unless $abs =~ m{^/};
+	# require $abs;
+
+	if(my $config = Config::Abstraction->new(config_dirs => ['.', ''], config_file => $schema_file)) {
+		$config = $config->all();
+		if(defined($config->{'$module'}) || defined($config->{'our $module'}) || !defined($config->{'module'})) {
+			# Legacy file format. This will go away.
+			# TODO: remove this code
+			# $config = _load_conf(File::Spec->rel2abs($schema_file));
+			# if($config) {
+				croak("$schema_file: Loading perl files as configs is no longer supported");
+			# }
+		}
+		return $config;
+	}
+}
+
+sub _load_schema_section
+{
+	my($schema, $section, $schema_file) = @_;
+
+	if(exists($schema->{$section})) {
+		if(ref($schema->{$section}) eq 'HASH') {
+			return $schema->{$section};
+		} elsif(defined($schema->{$section}) && ($schema->{$section} ne 'undef')) {
+			# carp(Dumper($schema));
+			if(ref($schema->{$section}) && length($schema->{$section})) {
+				croak("$schema_file: $section should be a hash, not ", ref($schema->{$section}));
+			} else {
+				croak("$schema_file: $section should be a hash, not ", $schema->{$section});
+			}
+		}
+	}
+	return {};
+}
+
+sub _load_conf {
+	croak('Loading perl files as configs is no longer supported');
+
+	my $file = $_[0];
+
+	my $pkg = 'ConfigLoader';
+
+	# eval in a separate package
+	{
+		package ConfigLoader;
+		no strict 'refs';
+		do $file or die "Error loading $file: ", ($@ || $!);
+	}
+
+	# Now pull variables from ConfigLoader
+	my @vars = qw(
+		module new edge_cases function input output cases yaml_cases
+		seed iterations edge_case_array type_edge_cases config
+	);
+
+	my %conf;
+	no strict 'refs';	# allow symbolic references here
+	for my $v (@vars) {
+		if(my $full = "${pkg}::$v") {
+			if (defined ${$full}) {	# scalar
+				$conf{$v} = ${$full};
+			} elsif (@{$full}) {	# array
+				$conf{$v} = [ @{$full} ];
+			} elsif (%{$full}) {	# hash
+				$conf{$v} = { %{$full} };
+			}
+		}
+	}
+
+	return \%conf;
+}
+
+# Input validation for configuration
+sub _validate_config {
+	my $config = $_[0];
+
+	if((!defined($config->{'module'})) && (!defined($config->{'function'}))) {
+		# Can't work out what should be tested
+		croak('At least one of function and module must be defined');
+	}
+
+	if((!defined($config->{'input'})) && (!defined($config->{'output'}))) {
+		# Routine takes no input and no output, so there's nothing that would be gained using this software
+		croak('You must specify at least one of input and output');
+	}
+	if(($config->{'input'}) && (ref($config->{input}) ne 'HASH')) {
+		if($config->{'input'} eq 'undef') {
+			delete $config->{'input'};
+		} else {
+			croak('Invalid input specification')
+		}
+	}
+
+	# Validate types, constraints, etc.
+	for my $param (keys %{$config->{input}}) {
+		my $spec = $config->{input}{$param};
+		if(ref($spec)) {
+			croak "Invalid type '$spec->{type}' for parameter '$param'" unless _valid_type($spec->{type});
+		} else {
+			croak "Invalid type '$spec' for parameter '$param'" unless _valid_type($spec);
+		}
+	}
+
+	# Check if using positional arguments
+	my $has_positions = 0;
+	my %positions;
+
+	for my $param (keys %{$config->{input}}) {
+		my $spec = $config->{input}{$param};
+		if (ref($spec) eq 'HASH' && defined($spec->{position})) {
+			$has_positions = 1;
+			my $pos = $spec->{position};
+
+			# Validate position is non-negative integer
+			croak "Position for '$param' must be a non-negative integer" unless $pos =~ /^\d+$/;
+
+			# Check for duplicate positions
+			croak "Duplicate position $pos for parameters '$positions{$pos}' and '$param'" if exists $positions{$pos};
+
+			$positions{$pos} = $param;
+		}
+	}
+
+	# If using positions, all params must have positions
+	if ($has_positions) {
+		for my $param (keys %{$config->{input}}) {
+			my $spec = $config->{input}{$param};
+			unless (ref($spec) eq 'HASH' && defined($spec->{position})) {
+				croak "Parameter '$param' missing position (all params must have positions if any do)";
+			}
+		}
+
+		# Check for gaps in positions (0, 1, 3 - missing 2)
+		my @sorted = sort { $a <=> $b } keys %positions;
+		for my $i (0..$#sorted) {
+			if ($sorted[$i] != $i) {
+				carp "Warning: Position sequence has gaps (positions: @sorted)";
+				last;
+			}
+		}
+	}
+
+	# Validate semantic types
+	my $semantic_generators = _get_semantic_generators();
+	for my $param (keys %{$config->{input}}) {
+		my $spec = $config->{input}{$param};
+		if (ref($spec) eq 'HASH' && defined($spec->{semantic})) {
+			my $semantic = $spec->{semantic};
+			unless (exists $semantic_generators->{$semantic}) {
+				carp "Warning: Unknown semantic type '$semantic' for parameter '$param'. Available types: ",
+					join(', ', sort keys %$semantic_generators);
+			}
+		}
+	}
+
+	# Validate custom properties in transforms
+	if (exists $config->{transforms} && ref($config->{transforms}) eq 'HASH') {
+		my $builtin_props = _get_builtin_properties();
+
+		for my $transform_name (keys %{$config->{transforms}}) {
+			my $transform = $config->{transforms}{$transform_name};
+
+			if (exists $transform->{properties}) {
+				unless (ref($transform->{properties}) eq 'ARRAY') {
+					croak "Transform '$transform_name': properties must be an array";
+				}
+
+				for my $prop (@{$transform->{properties}}) {
+					if (!ref($prop)) {
+						# Check if builtin exists
+						unless (exists $builtin_props->{$prop}) {
+							carp "Transform '$transform_name': unknown built-in property '$prop'. Available: ",
+								join(', ', sort keys %$builtin_props);
+						}
+					}
+					elsif (ref($prop) eq 'HASH') {
+						# Validate custom property structure
+						unless ($prop->{name} && $prop->{code}) {
+							croak "Transform '$transform_name': custom properties must have 'name' and 'code' fields";
+						}
+					}
+					else {
+						croak "Transform '$transform_name': invalid property definition";
+					}
+				}
+			}
+		}
+	}
+}
+
+sub _valid_type
+{
+	my $type = $_[0];
+
+	return(($type eq 'string') ||
+		($type eq 'boolean') ||
+		($type eq 'integer') ||
+		($type eq 'number') ||
+		($type eq 'float') ||
+		($type eq 'hashref') ||
+		($type eq 'arrayref') ||
+		($type eq 'object'));
+}
+
+sub _validate_module {
+	my ($module, $schema_file) = @_;
+
+	return 1 unless $module;	# No module to validate (builtin functions)
+
+	# Check if the module can be found
+	my $mod_info = check_install(module => $module);
+
+	if (!$mod_info) {
+		# Module not found - this is just a warning, not an error
+		# The module might not be installed on the generation machine
+		# but could be on the test machine
+		carp("Warning: Module '$module' not found in \@INC during generation.");
+		carp("  Config file: $schema_file");
+		carp("  This is OK if the module will be available when tests run.");
+		carp('  If this is unexpected, check your module name and installation.');
+		return 0;	# Not found, but not fatal
+	}
+
+	# Module was found
+	if ($ENV{TEST_VERBOSE} || $ENV{GENERATOR_VERBOSE}) {
+		print STDERR "Found module '$module' at: $mod_info->{file}\n",
+			'  Version: ', ($mod_info->{version} || 'unknown'), "\n";
+	}
+
+	# Optionally try to load it (disabled by default since it can have side effects)
+	if ($ENV{GENERATOR_VALIDATE_LOAD}) {
+		my $loaded = can_load(modules => { $module => undef }, verbose => 0);
+
+		if (!$loaded) {
+			carp("Warning: Module '$module' found but failed to load: $Module::Load::Conditional::ERROR");
+			carp("  This might indicate a broken installation or missing dependencies.");
+			return 0;
+		}
+
+		if ($ENV{TEST_VERBOSE} || $ENV{GENERATOR_VERBOSE}) {
+			print STDERR "Successfully loaded module '$module'\n";
+		}
+	}
+
+	return 1;
+}
+
+sub perl_sq {
+	my $s = $_[0];
+	$s =~ s/\\/\\\\/g; $s =~ s/'/\\'/g; $s =~ s/\n/\\n/g; $s =~ s/\r/\\r/g; $s =~ s/\t/\\t/g;
+	return $s;
+}
+
+sub perl_quote {
+	my $v = $_[0];
+	return 'undef' unless defined $v;
+	if(ref($v)) {
+		if(ref($v) eq 'ARRAY') {
+			my @quoted_v = map { perl_quote($_) } @{$v};
+			return '[ ' . join(', ', @quoted_v) . ' ]';
+		}
+		if(ref($v) eq 'Regexp') {
+			my $s = "$v";
+
+			# default to qr{...}
+			return "qr{$s}" unless $s =~ /[{}]/;
+
+			# fallback: quote with slash if no slash inside
+			return "qr/$s/" unless $s =~ m{/};
+
+			# fallback: quote with # if slash inside
+			return "qr#$s#";
+		}
+		# Generic fallback
+		$v = Dumper($v);
+		$v =~ s/\$VAR1 =//;
+		$v =~ s/;//;
+		return $v;
+	}
+	$v =~ s/\\/\\\\/g;
+	# return $v =~ /^-?\d+(\.\d+)?$/ ? $v : "'" . ( $v =~ s/'/\\'/gr ) . "'";
+	return $v =~ /^-?\d+(\.\d+)?$/ ? $v : "'" . perl_sq($v) . "'";
+}
+
+sub render_hash {
+	my $href = $_[0];
+	return '' unless $href && ref($href) eq 'HASH';
+	my @lines;
+	for my $k (sort keys %$href) {
+		my $def = $href->{$k} // {};
+		next unless ref $def eq 'HASH';
+		my @pairs;
+		for my $subk (sort keys %$def) {
+			next unless defined $def->{$subk};
+			if(ref($def->{$subk})) {
+				unless((ref($def->{$subk}) eq 'ARRAY') || (ref($def->{$subk}) eq 'Regexp')) {
+					croak(__PACKAGE__, ": schema_file, $subk is a nested element, not yet supported (", ref($def->{$subk}), ')');
+				}
+			}
+			if(($subk eq 'matches') || ($subk eq 'nomatch')) {
+				push @pairs, "$subk => qr/$def->{$subk}/";
+			} else {
+				push @pairs, "$subk => " . perl_quote($def->{$subk});
+			}
+		}
+		push @lines, '	' . perl_quote($k) . " => { " . join(", ", @pairs) . " }";
+	}
+	return join(",\n", @lines);
+}
+
+sub render_args_hash {
+	my $href = $_[0];
+	return '' unless $href && ref($href) eq 'HASH';
+	my @pairs = map { perl_quote($_) . ' => ' . perl_quote($href->{$_}) } sort keys %$href;
+	return join(', ', @pairs);
+}
+
+sub render_arrayref_map {
+	my $href = $_[0];
+	return '()' unless $href && ref($href) eq 'HASH';
+	my @entries;
+	for my $k (sort keys %$href) {
+		my $aref = $href->{$k};
+		next unless ref $aref eq 'ARRAY';
+		my $vals = join(', ', map { perl_quote($_) } @$aref);
+		push @entries, '	' . perl_quote($k) . " => [ $vals ]";
+	}
+	return join(",\n", @entries);
+}
+
+# Robustly quote a string (GitHub#1)
+sub q_wrap {
+	my $s = $_[0];
+	for my $p ( ['{','}'], ['(',')'], ['[',']'], ['<','>'] ) {
+		my ($l,$r) = @$p;
+		return "q$l$s$r" unless $s =~ /\Q$l\E|\Q$r\E/;
+	}
+	for my $d ('~', '!', '%', '^', '=', '+', ':', ',', ';', '|', '/', '#') {
+		return "q$d$s$d" unless index($s, $d) >= 0;
+	}
+	(my $esc = $s) =~ s/'/\\'/g;
+	return "'$esc'";
+}
+
+
+=head2 _generate_transform_properties
+
+Converts transform specifications into LectroTest property definitions.
+
+=cut
+
+sub _generate_transform_properties {
+	my ($transforms, $function, $module, $input, $config, $new) = @_;
+
+	my @properties;
+
+	for my $transform_name (sort keys %$transforms) {
+		my $transform = $transforms->{$transform_name};
+
+		my $input_spec = $transform->{input};
+		my $output_spec = $transform->{output};
+
+		# Skip if input is 'undef'
+		if (!ref($input_spec) && $input_spec eq 'undef') {
+			next;
+		}
+
+		# Detect automatic properties from the transform spec
+		my @detected_props = _detect_transform_properties(
+			$transform_name,
+			$input_spec,
+			$output_spec
+		);
+
+		# Process custom properties from schema
+		my @custom_props = ();
+		if (exists $transform->{properties} && ref($transform->{properties}) eq 'ARRAY') {
+			@custom_props = _process_custom_properties(
+				$transform->{properties},
+				$function,
+				$module,
+				$input_spec,
+				$output_spec,
+				$new
+			);
+		}
+
+		# Combine detected and custom properties
+		my @all_props = (@detected_props, @custom_props);
+
+		# Skip if no properties detected or defined
+		next unless @all_props;
+
+		# Build LectroTest generator specification
+		my @generators;
+		my @var_names;
+
+		for my $field (sort keys %$input_spec) {
+			my $spec = $input_spec->{$field};
+			next unless ref($spec) eq 'HASH';
+
+			my $gen = _schema_to_lectrotest_generator($field, $spec);
+			push @generators, $gen;
+			push @var_names, $field;
+		}
+
+		my $gen_spec = join(', ', @generators);
+
+		# Build the call code
+		my $call_code;
+		if ($module) {
+			# $call_code = "$module\::$function";
+			$call_code = "$module->$function";
+		} else {
+			$call_code = $function;
+		}
+
+		# Build argument list (respect positions if defined)
+		my @args;
+		if (_has_positions($input_spec)) {
+			my @sorted = sort {
+				$input_spec->{$a}{position} <=> $input_spec->{$b}{position}
+			} keys %$input_spec;
+			@args = map { "\$$_" } @sorted;
+		} else {
+			@args = map { "\$$_" } @var_names;
+		}
+		my $args_str = join(', ', @args);
+
+		# Build property checks
+		my @checks = map { $_->{code} } @all_props;
+		my $property_checks = join(" &&\n\t", @checks);
+
+		# Handle _STATUS in output
+		my $should_die = ($output_spec->{_STATUS} // '') eq 'DIES';
+
+		push @properties, {
+			name => $transform_name,
+			generator_spec => $gen_spec,
+			call_code => "$call_code($args_str)",
+			property_checks => $property_checks,
+			should_die => $should_die,
+			trials => $config->{properties}{trials} // DEFAULT_PROPERTY_TRIALS,
+		};
+	}
+
+	return \@properties;
+}
+
+=head2 _process_custom_properties
+
+Processes custom property definitions from the schema.
+
+=cut
+
+sub _process_custom_properties {
+	my ($properties_spec, $function, $module, $input_spec, $output_spec, $schema) = @_;
+
+	my @properties;
+	my $builtin_properties = _get_builtin_properties();
+	my $new = defined($schema->{'new'}) ? $schema->{new} : '_UNDEF';
+
+	for my $prop_def (@$properties_spec) {
+		my $prop_name;
+		my $prop_code;
+		my $prop_desc;
+
+		if (!ref($prop_def)) {
+			# Simple string - lookup builtin property
+			$prop_name = $prop_def;
+
+			if (exists $builtin_properties->{$prop_name}) {
+				my $builtin = $builtin_properties->{$prop_name};
+
+				# Get input variable names
+				my @var_names = sort keys %$input_spec;
+
+				# Build call code
+				my $call_code;
+				if ($module) {
+					$call_code = "$module\::$function";
+				} else {
+					$call_code = $function;
+				}
+				# Check if this is OO mode
+				if($module && defined($new)) {
+					$call_code = "my \$obj = new_ok('$module');";
+					$call_code .= "\$obj->$function";  # Method call
+				} elsif($module && $module ne 'builtin') {
+					$call_code = "$module\::$function";  # Function call
+				} else {
+					$call_code = $function;  # Builtin
+				}
+
+				# Build args
+				my @args;
+				if (_has_positions($input_spec)) {
+					my @sorted = sort {
+						$input_spec->{$a}{position} <=> $input_spec->{$b}{position}
+					} @var_names;
+					@args = map { "\$$_" } @sorted;
+				} else {
+					@args = map { "\$$_" } @var_names;
+				}
+				$call_code .= '(' . join(', ', @args) . ')';
+
+				# Generate property code from template
+				$prop_code = $builtin->{code_template}->($function, $call_code, \@var_names);
+				$prop_desc = $builtin->{description};
+			} else {
+				carp "Unknown built-in property '$prop_name', skipping";
+				next;
+			}
+		}
+		elsif (ref($prop_def) eq 'HASH') {
+			# Custom property with code
+			$prop_name = $prop_def->{name} || 'custom_property';
+			$prop_code = $prop_def->{code};
+			$prop_desc = $prop_def->{description} || "Custom property: $prop_name";
+
+			unless ($prop_code) {
+				carp "Custom property '$prop_name' missing 'code' field, skipping";
+				next;
+			}
+
+			# Validate that the code looks reasonable
+			unless ($prop_code =~ /\$/ || $prop_code =~ /\w+/) {
+				carp "Custom property '$prop_name' code looks invalid: $prop_code";
+				next;
+			}
+		}
+		else {
+			carp 'Invalid property definition: ', Dumper($prop_def);
+			next;
+		}
+
+		push @properties, {
+			name => $prop_name,
+			code => $prop_code,
+			description => $prop_desc,
+		};
+	}
+
+	return @properties;
+}
+
+=head2 _detect_transform_properties
+
+Automatically detects testable properties from transform input/output specs.
+
+=cut
+
+sub _detect_transform_properties {
+	my ($transform_name, $input_spec, $output_spec) = @_;
+
+	my @properties;
+
+	# Skip if input is 'undef'
+	return @properties if (!ref($input_spec) && $input_spec eq 'undef');
+
+	# Property 1: Output range constraints (numeric)
+	if (_is_numeric_transform($input_spec, $output_spec)) {
+		if (defined $output_spec->{min}) {
+			my $min = $output_spec->{min};
+			push @properties, {
+				name => 'min_constraint',
+				code => "\$result >= $min"
+			};
+		}
+
+		if (defined $output_spec->{max}) {
+			my $max = $output_spec->{max};
+			push @properties, {
+				name => 'max_constraint',
+				code => "\$result <= $max"
+			};
+		}
+
+		# For transforms, add idempotence check where appropriate
+		# e.g., abs(abs(x)) == abs(x)
+		if ($transform_name =~ /positive/i) {
+			push @properties, {
+				name => 'non_negative',
+				code => "\$result >= 0"
+			};
+		}
+	}
+
+	# Property 2: Specific value output
+	if (defined $output_spec->{value}) {
+		my $expected = $output_spec->{value};
+		push @properties, {
+			name => 'exact_value',
+			code => "\$result == $expected"
+		};
+	}
+
+	# Property 3: String length constraints
+	if (_is_string_transform($input_spec, $output_spec)) {
+		if (defined $output_spec->{min}) {
+			push @properties, {
+				name => 'min_length',
+				code => "length(\$result) >= $output_spec->{min}"
+			};
+		}
+
+		if (defined $output_spec->{max}) {
+			push @properties, {
+				name => 'max_length',
+				code => "length(\$result) <= $output_spec->{max}"
+			};
+		}
+
+		if (defined $output_spec->{matches}) {
+			my $pattern = $output_spec->{matches};
+			push @properties, {
+				name => 'pattern_match',
+				code => "\$result =~ qr/$pattern/"
+			};
+		}
+	}
+
+	# Property 4: Type preservation
+	if (_same_type($input_spec, $output_spec)) {
+		my $type = _get_dominant_type($output_spec);
+
+		if ($type eq 'number' || $type eq 'integer' || $type eq 'float') {
+			push @properties, {
+				name => 'numeric_type',
+				code => "looks_like_number(\$result)"
+			};
+		}
+	}
+
+	# Property 5: Definedness (unless output can be undef)
+	unless (($output_spec->{type} // '') eq 'undef') {
+		push @properties, {
+			name => 'defined',
+			code => "defined(\$result)"
+		};
+	}
+
+	return @properties;
+}
+
+=head2 _get_semantic_generators
+
+Returns a hash of built-in semantic generators for common data types.
+
+=cut
+
+sub _get_semantic_generators {
+	return {
+		email => {
+			code => q{
+				Gen {
+					my $len = 5 + int(rand(10));
+					my @addr;
+					my @tlds = qw(com org net edu gov io co uk de fr);
+
+					for(my $i = 0; $i < $len; $i++) {
+						push @addr, pack('c', (int(rand 26))+97);
+					}
+					push @addr, '@';
+					$len = 5 + int(rand(10));
+					for(my $i = 0; $i < $len; $i++) {
+						push @addr, pack('c', (int(rand 26))+97);
+					}
+					push @addr, '.';
+					$len = rand($#tlds+1);
+					push @addr, $tlds[$len];
+					return join('', @addr);
+				}
+			},
+			description => 'Valid email addresses',
+		},
+		url => {
+			code => q{
+				Gen {
+					my @schemes = qw(http https);
+					my @tlds = qw(com org net io);
+					my $scheme = $schemes[int(rand(@schemes))];
+					my $domain = join('', map { ('a'..'z')[int(rand(26))] } 1..(5 + int(rand(10))));
+					my $tld = $tlds[int(rand(@tlds))];
+					my $path = join('', map { ('a'..'z', '0'..'9', '-', '_')[int(rand(38))] } 1..int(rand(20)));
+
+					return "$scheme://$domain.$tld" . ($path ? "/$path" : '');
+				}
+			},
+			description => 'Valid HTTP/HTTPS URLs',
+		},
+
+		uuid => {
+			code => q{
+				Gen {
+					sprintf('%08x-%04x-%04x-%04x-%012x',
+						int(rand(0xffffffff)),
+						int(rand(0xffff)),
+						(int(rand(0xffff)) & 0x0fff) | 0x4000,
+						(int(rand(0xffff)) & 0x3fff) | 0x8000,
+						int(rand(0x1000000000000))
+					);
+				}
+			},
+			description => 'Valid UUIDv4 identifiers',
+		},
+
+		phone_us => {
+			code => q{
+				Gen {
+					my $area = 200 + int(rand(800));
+					my $exchange = 200 + int(rand(800));
+					my $subscriber = int(rand(10000));
+					sprintf('%03d-%03d-%04d', $area, $exchange, $subscriber);
+				}
+			},
+			description => 'US phone numbers (XXX-XXX-XXXX format)',
+		},
+
+		phone_e164 => {
+			code => q{
+				Gen {
+					my $country = 1 + int(rand(999));
+					my $area = 100 + int(rand(900));
+					my $number = int(rand(10000000));
+					sprintf('+%d%03d%07d', $country, $area, $number);
+				}
+			},
+			description => 'E.164 international phone numbers',
+		},
+
+		ipv4 => {
+			code => q{
+				Gen {
+					join('.', map { int(rand(256)) } 1..4);
+				}
+			},
+			description => 'IPv4 addresses',
+		},
+
+		ipv6 => {
+			code => q{
+				Gen {
+					join(':', map { sprintf('%04x', int(rand(0x10000))) } 1..8);
+				}
+			},
+			description => 'IPv6 addresses',
+		},
+
+		username => {
+			code => q{
+				Gen {
+					my $len = 3 + int(rand(13));
+					my @chars = ('a'..'z', '0'..'9', '_', '-');
+					my $first = ('a'..'z')[int(rand(26))];
+					$first . join('', map { $chars[int(rand(@chars))] } 1..($len-1));
+				}
+			},
+			description => 'Valid usernames (alphanumeric with _ and -)',
+		},
+
+		slug => {
+			code => q{
+				Gen {
+					my @words = qw(quick brown fox jumps over lazy dog hello world test data);
+					my $count = 1 + int(rand(4));
+					join('-', map { $words[int(rand(@words))] } 1..$count);
+				}
+			},
+			description => 'URL slugs (lowercase words separated by hyphens)',
+		},
+
+		hex_color => {
+			code => q{
+				Gen {
+					sprintf('#%06x', int(rand(0x1000000)));
+				}
+			},
+			description => 'Hex color codes (#RRGGBB)',
+		},
+
+		iso_date => {
+			code => q{
+				Gen {
+					my $year = 2000 + int(rand(25));
+					my $month = 1 + int(rand(12));
+					my $day = 1 + int(rand(28));
+					sprintf('%04d-%02d-%02d', $year, $month, $day);
+				}
+			},
+			description => 'ISO 8601 date format (YYYY-MM-DD)',
+		},
+
+		iso_datetime => {
+			code => q{
+				Gen {
+					my $year = 2000 + int(rand(25));
+					my $month = 1 + int(rand(12));
+					my $day = 1 + int(rand(28));
+					my $hour = int(rand(24));
+					my $minute = int(rand(60));
+					my $second = int(rand(60));
+					sprintf('%04d-%02d-%02dT%02d:%02d:%02dZ',
+						$year, $month, $day, $hour, $minute, $second);
+				}
+			},
+			description => 'ISO 8601 datetime format (YYYY-MM-DDTHH:MM:SSZ)',
+		},
+
+		semver => {
+			code => q{
+				Gen {
+					my $major = int(rand(10));
+					my $minor = int(rand(20));
+					my $patch = int(rand(50));
+					"$major.$minor.$patch";
+				}
+			},
+			description => 'Semantic version strings (major.minor.patch)',
+		},
+
+		jwt => {
+			code => q{
+				Gen {
+					my @chars = ('A'..'Z', 'a'..'z', '0'..'9', '-', '_');
+					my $header = join('', map { $chars[int(rand(@chars))] } 1..20);
+					my $payload = join('', map { $chars[int(rand(@chars))] } 1..40);
+					my $signature = join('', map { $chars[int(rand(@chars))] } 1..30);
+					"$header.$payload.$signature";
+				}
+			},
+			description => 'JWT-like tokens (base64url format)',
+		},
+
+		json => {
+			code => q{
+				Gen {
+					my @keys = qw(id name value status count);
+					my $key = $keys[int(rand(@keys))];
+					my $value = 1 + int(rand(1000));
+					qq({"$key":$value});
+				}
+			},
+			description => 'Simple JSON objects',
+		},
+
+		base64 => {
+			code => q{
+				Gen {
+					my @chars = ('A'..'Z', 'a'..'z', '0'..'9', '+', '/');
+					my $len = 12 + int(rand(20));
+					my $str = join('', map { $chars[int(rand(@chars))] } 1..$len);
+					$str .= '=' x (4 - ($len % 4)) if $len % 4;
+					$str;
+				}
+			},
+			description => 'Base64-encoded strings',
+		},
+
+		md5 => {
+			code => q{
+				Gen {
+					join('', map { sprintf('%x', int(rand(16))) } 1..32);
+				}
+			},
+			description => 'MD5 hashes (32 hex characters)',
+		},
+
+		sha256 => {
+			code => q{
+				Gen {
+					join('', map { sprintf('%x', int(rand(16))) } 1..64);
+				}
+			},
+			description => 'SHA-256 hashes (64 hex characters)',
+		},
+	};
+}
+
+=head2 _get_builtin_properties
+
+Returns a hash of built-in property templates that can be applied to transforms.
+
+=cut
+
+sub _get_builtin_properties {
+	return {
+		idempotent => {
+			description => 'Function is idempotent: f(f(x)) == f(x)',
+			code_template => sub {
+				my ($function, $call_code, $input_vars) = @_;
+				# Use string comparison - works for all types in Perl
+				return "do { my \$tmp = $call_code; \$result eq \$tmp }";
+			},
+			applicable_to => ['all'],
+		},
+
+		non_negative => {
+			description => 'Result is always non-negative',
+			code_template => sub {
+				my ($function, $call_code, $input_vars) = @_;
+				return '$result >= 0';
+			},
+			applicable_to => ['number', 'integer', 'float'],
+		},
+
+		positive => {
+			description => 'Result is always positive (> 0)',
+			code_template => sub {
+				my ($function, $call_code, $input_vars) = @_;
+				return '$result > 0';
+			},
+			applicable_to => ['number', 'integer', 'float'],
+		},
+
+		non_empty => {
+			description => 'Result is never empty',
+			code_template => sub {
+				my ($function, $call_code, $input_vars) = @_;
+				return 'length($result) > 0';
+			},
+			applicable_to => ['string'],
+		},
+
+		length_preserved => {
+			description => 'Output length equals input length',
+			code_template => sub {
+				my ($function, $call_code, $input_vars) = @_;
+				my $first_var = $input_vars->[0];
+				return "length(\$result) == length(\$$first_var)";
+			},
+			applicable_to => ['string'],
+		},
+
+		uppercase => {
+			description => 'Result is all uppercase',
+			code_template => sub {
+				my ($function, $call_code, $input_vars) = @_;
+				return '$result eq uc($result)';
+			},
+			applicable_to => ['string'],
+		},
+
+		lowercase => {
+			description => 'Result is all lowercase',
+			code_template => sub {
+				my ($function, $call_code, $input_vars) = @_;
+				return '$result eq lc($result)';
+			},
+			applicable_to => ['string'],
+		},
+
+		trimmed => {
+			description => 'Result has no leading/trailing whitespace',
+			code_template => sub {
+				my ($function, $call_code, $input_vars) = @_;
+				return '$result !~ /^\s/ && $result !~ /\s$/';
+			},
+			applicable_to => ['string'],
+		},
+
+		sorted_ascending => {
+			description => 'Array is sorted in ascending order',
+			code_template => sub {
+				my ($function, $call_code, $input_vars) = @_;
+				return 'do { my @arr = @$result; my $sorted = 1; for my $i (1..$#arr) { $sorted = 0 if $arr[$i] < $arr[$i-1]; } $sorted }';
+			},
+			applicable_to => ['arrayref'],
+		},
+
+		sorted_descending => {
+			description => 'Array is sorted in descending order',
+			code_template => sub {
+				my ($function, $call_code, $input_vars) = @_;
+				return 'do { my @arr = @$result; my $sorted = 1; for my $i (1..$#arr) { $sorted = 0 if $arr[$i] > $arr[$i-1]; } $sorted }';
+			},
+			applicable_to => ['arrayref'],
+		},
+
+		unique_elements => {
+			description => 'Array has no duplicate elements',
+			code_template => sub {
+				my ($function, $call_code, $input_vars) = @_;
+				return 'do { my @arr = @$result; my %seen; !grep { $seen{$_}++ } @arr }';
+			},
+			applicable_to => ['arrayref'],
+		},
+
+		preserves_keys => {
+			description => 'Hash has same keys as input',
+			code_template => sub {
+				my ($function, $call_code, $input_vars) = @_;
+				my $first_var = $input_vars->[0];
+				return 'do { my @in = sort keys %{$' . $first_var . '}; my @out = sort keys %$result; join(",", @in) eq join(",", @out) }';
+			},
+			applicable_to => ['hashref'],
+		},
+
+		monotonic_increasing => {
+			description => 'For x <= y, f(x) <= f(y)',
+			code_template => sub {
+				my ($function, $call_code, $input_vars) = @_;
+				# This would need multiple inputs - complex
+				return '1';	# Placeholder
+			},
+			applicable_to => ['number', 'integer'],
+		},
+	};
+}
+
+=head2 _schema_to_lectrotest_generator
+
+Converts a schema field spec to a LectroTest generator string.
+
+=cut
+
+sub _schema_to_lectrotest_generator {
+	my ($field_name, $spec) = @_;
+
+	my $type = $spec->{type} || 'string';
+
+	# Check for semantic generator first
+	if ($type eq 'string' && defined $spec->{semantic}) {
+		my $semantic_type = $spec->{semantic};
+		my $generators = _get_semantic_generators();
+
+		if (exists $generators->{$semantic_type}) {
+			my $gen_code = $generators->{$semantic_type}{code};
+			# Remove leading/trailing whitespace and compress
+			$gen_code =~ s/^\s+//;
+			$gen_code =~ s/\s+$//;
+			$gen_code =~ s/\n\s+/ /g;
+			return "$field_name <- $gen_code";
+		} else {
+			carp "Unknown semantic type '$semantic_type', falling back to regular string generator";
+			# Fall through to regular string generation
+		}
+	}
+
+	if ($type eq 'integer') {
+		my $min = $spec->{min};
+		my $max = $spec->{max};
+
+		if (!defined($min) && !defined($max)) {
+			return "$field_name <- Int";
+		} elsif (!defined($min)) {
+			return "$field_name <- Int(sized => sub { int(rand($max + 1)) })";
+		} elsif (!defined($max)) {
+			return "$field_name <- Int(sized => sub { $min + int(rand(1000)) })";
+		} else {
+			my $range = $max - $min;
+			return "$field_name <- Int(sized => sub { $min + int(rand($range + 1)) })";
+		}
+	}
+	elsif ($type eq 'number' || $type eq 'float') {
+		my $min = $spec->{min};
+		my $max = $spec->{max};
+
+		if (!defined($min) && !defined($max)) {
+			# No constraints - full range
+			return "$field_name <- Float(sized => sub { rand(1000) - 500 })";
+		} elsif (!defined($min)) {
+			# Only max defined
+			if ($max == 0) {
+				# max=0 means negative numbers only
+				return "$field_name <- Float(sized => sub { -rand(1000) })";
+			} elsif ($max > 0) {
+				# Positive max, generate 0 to max
+				return "$field_name <- Float(sized => sub { rand($max) })";
+			} else {
+				# Negative max, generate from some negative to max
+				return "$field_name <- Float(sized => sub { ($max - 1000) + rand(1000 + $max) })";
+			}
+		} elsif (!defined($max)) {
+			# Only min defined
+			if ($min == 0) {
+				# min=0 means positive numbers only
+				return "$field_name <- Float(sized => sub { rand(1000) })";
+			} elsif ($min > 0) {
+				# Positive min
+				return "$field_name <- Float(sized => sub { $min + rand(1000) })";
+			} else {
+				# Negative min
+				return "$field_name <- Float(sized => sub { $min + rand(-$min + 1000) })";
+			}
+		} else {
+			# Both min and max defined
+			my $range = $max - $min;
+			if ($range <= 0) {
+				carp "Invalid range: min=$min, max=$max";
+				return "$field_name <- Float(sized => sub { $min })";
+			}
+			return "$field_name <- Float(sized => sub { $min + rand($range) })";
+		}
+	}
+	elsif ($type eq 'string') {
+		my $min_len = $spec->{min} // 0;
+		my $max_len = $spec->{max} // 100;
+
+		# Handle regex patterns
+		if (defined $spec->{matches}) {
+			my $pattern = $spec->{matches};
+
+			# Build generator using Data::Random::String::Matches
+			if (defined $spec->{max}) {
+				return "$field_name <- Gen { Data::Random::String::Matches->create_random_string({ regex => qr/$pattern/, length => $spec->{max} }) }";
+			} elsif (defined $spec->{min}) {
+				return "$field_name <- Gen { Data::Random::String::Matches->create_random_string({ regex => qr/$pattern/, length => $spec->{min} }) }";
+			} else {
+				return "$field_name <- Gen { Data::Random::String::Matches->create_random_string({ regex => qr/$pattern/ }) }";
+			}
+		}
+
+		return "$field_name <- String(length => [$min_len, $max_len])";
+	} elsif ($type eq 'boolean') {
+		return "$field_name <- Bool";
+	}
+	elsif ($type eq 'arrayref') {
+		my $min_size = $spec->{min} // 0;
+		my $max_size = $spec->{max} // 10;
+		return "$field_name <- List(Int, length => [$min_size, $max_size])";
+	}
+	elsif ($type eq 'hashref') {
+		# LectroTest doesn't have built-in Hash, use custom generator
+		my $min_keys = $spec->{min} // 0;
+		my $max_keys = $spec->{max} // 10;
+		return "$field_name <- Elements(map { my \%h; for (1..\$_) { \$h{'key'.\$_} = \$_ }; \\\%h } $min_keys..$max_keys)";
+	}
+	else {
+		carp "Unknown type '$type' for LectroTest generator, using String";
+		return "$field_name <- String";
+	}
+}
+
+=head2 Helper functions for type detection
+
+=cut
+
+sub _is_numeric_transform {
+	my ($input_spec, $output_spec) = @_;
+
+	my $out_type = $output_spec->{type} // '';
+	return $out_type eq 'number' || $out_type eq 'integer' || $out_type eq 'float';
+}
+
+sub _is_string_transform {
+	my ($input_spec, $output_spec) = @_;
+
+	my $out_type = $output_spec->{type} // '';
+	return $out_type eq 'string';
+}
+
+sub _same_type {
+	my ($input_spec, $output_spec) = @_;
+
+	# Simplified - would need more sophisticated logic for multiple inputs
+	my $in_type = _get_dominant_type($input_spec);
+	my $out_type = _get_dominant_type($output_spec);
+
+	return $in_type eq $out_type;
+}
+
+sub _get_dominant_type {
+	my $spec = $_[0];
+
+	return $spec->{type} if defined $spec->{type};
+
+	# For multi-field specs, return first type found
+	for my $field (keys %$spec) {
+		next unless ref($spec->{$field}) eq 'HASH';
+		return $spec->{$field}{type} if defined $spec->{$field}{type};
+	}
+
+	return 'string';	# Default
+}
+
+sub _has_positions {
+	my $spec = $_[0];
+
+	for my $field (keys %$spec) {
+		next unless ref($spec->{$field}) eq 'HASH';
+		return 1 if defined $spec->{$field}{position};
+	}
+
+	return 0;
+}
+
+=head2 _render_properties
+
+Renders property definitions into Perl code for the template.
+
+=cut
+
+sub _render_properties {
+	my $properties = $_[0];
+
+	my $code = "use_ok('Test::LectroTest::Compat');\n\n";
+
+	for my $prop (@$properties) {
+		$code .= "# Transform property: $prop->{name}\n";
+		$code .= "my \$$prop->{name} = Property {\n";
+		$code .= "    ##[ $prop->{generator_spec} ]##\n";
+		$code .= "    \n";
+		$code .= "    my \$result = eval { $prop->{call_code} };\n";
+
+		if ($prop->{should_die}) {
+			$code .= "    my \$died = defined(\$\@) && \$\@;\n";
+			$code .= "    \$died;\n";
+		} else {
+			$code .= "    my \$error = \$\@;\n";
+			# $code .= "    ::diag(\"\$$prop->{name} -> \$error; \") if(\$ENV{'TEST_VERBOSE'});\n";
+			$code .= "    \n";
+			$code .= "    !\$error && (\n";
+			$code .= "        $prop->{property_checks}\n";
+			$code .= "    );\n";
+		}
+
+		$code .= "}, name => '$prop->{name}', trials => $prop->{trials};\n\n";
+
+		$code .= "holds(\$$prop->{name});\n";
+	}
+
+	return $code;
 }
 
 1;
@@ -1327,6 +2711,8 @@ sub generate
 
 =item * L<Return::Set>: Output validation
 
+=item * L<Test::LectroTest>
+
 =item * L<Test::Most>
 
 =item * L<YAML::XS>
@@ -1343,1378 +2729,4 @@ and authorship by Nigel Horne.
 
 =cut
 
-__DATA__
-
-@@ test.tt
-#!/usr/bin/env perl
-
-use strict;
-use warnings;
-
-use utf8;
-use open qw(:std :encoding(UTF-8));	# https://github.com/nigelhorne/App-Test-Generator/issues/1
-
-use Data::Dumper;
-use Data::Random qw(:all);
-use Data::Random::String::Matches 0.02;
-use Test::Most;
-use Test::Returns 0.02;
-
-if($^O ne 'MSWin32') {
-	close(STDIN);
-	open(STDIN, '<', '/dev/null');
-}
-
-[% setup_code %]
-
-[% IF module %]
-	diag('[% module %]->[% function %] test case created by https://github.com/nigelhorne/App-Test-Generator');
-[% ELSE %]
-	diag('[% function %] test case created by https://github.com/nigelhorne/App-Test-Generator');
-[% END %]
-
-# Edge-case maps injected from config (optional)
-my %edge_cases = (
-[% edge_cases_code %]
-);
-my @edge_case_array = (
-[% edge_case_array_code %]
-);
-my %type_edge_cases = (
-[% type_edge_cases_code %]
-);
-my %config = (
-[% config_code %]
-);
-
-# Seed for reproducible fuzzing (if provided)
-[% seed_code %]
-
-my %input = (
-[% input_code %]
-);
-
-my %output = (
-[% output_code %]
-);
-
-my %transforms = (
-[% transforms_code %]
-);
-
-# Candidates for regex comparisons
-my @candidate_good = ('123', 'abc', 'A1B2', '0');
-my @candidate_bad = (
-	"😊",	# emoji
-	"１２３",	# full-width digits
-	"١٢٣",	# Arabic digits
-	'..',	# regex metachars
-	"a\nb",	# newline in middle
-	"é",	# E acute
-	'x' x 5000,	# huge string
-
-	# Added later if the configuration says so
-	# '',	# empty
-	# undef,	# undefined
-	# "\0",	# null byte
-);
-
-# --- Fuzzer helpers ---
-sub _pick_from {
-	my $arrayref = $_[0];
-	return undef unless $arrayref && ref $arrayref eq 'ARRAY' && @$arrayref;
-	return $arrayref->[ int(rand(scalar @$arrayref)) ];
-}
-
-sub rand_ascii_str {
-	my $len = shift || int(rand(10)) + 1;
-	join '', map { chr(97 + int(rand(26))) } 1..$len;
-}
-
-my @unicode_codepoints = (
-    0x00A9,	# ©
-    0x00AE,        # ®
-    0x03A9,        # Ω
-    0x20AC,        # €
-    0x2013,        # – (en-dash)
-    0x0301,        # combining acute accent
-    0x0308,        # combining diaeresis
-    0x1F600,       # 😀 (emoji)
-    0x1F62E,       # 😮
-    0x1F4A9,	# 💩 (yes)
-);
-
-# Tests for matches or nomatch
-my @regex_tests = (
-	'match123',
-	'nope',
-	'/fullpath',
-	'/',
-	'/etc/passwd',
-	"/etc/passwd\0",
-	"D:\\dos_path",
-	"I:\\",
-);
-
-sub rand_unicode_char {
-	my $cp = $unicode_codepoints[ int(rand(@unicode_codepoints)) ];
-	return chr($cp);
-}
-
-# Generate a string: mostly ASCII, sometimes unicode, sometimes nul bytes or combining marks
-sub rand_str
-{
-	my $len = shift || int(rand(10)) + 1;
-
-	my @chars;
-	for (1..$len) {
-		my $r = rand();
-		if ($r < 0.72) {
-			push @chars, chr(97 + int(rand(26)));	# a-z
-		} elsif ($r < 0.88) {
-			push @chars, chr(65 + int(rand(26)));	# A-Z
-		} elsif ($r < 0.95) {
-			push @chars, chr(48 + int(rand(10)));	# 0-9
-		} elsif ($r < 0.975) {
-			push @chars, rand_unicode_char();	# occasional emoji/marks
-		} elsif($config{'test_nuls'}) {
-			push @chars, chr(0);	# nul byte injection
-		} else {
-			push @chars, chr(97 + int(rand(26)));	# a-z
-		}
-	}
-	# Occasionally prepend/append a combining mark to produce combining sequences
-	if (rand() < 0.08) {
-		unshift @chars, chr(0x0301);
-	}
-	if (rand() < 0.08) {
-		push @chars, chr(0x0308);
-	}
-	return join('', @chars);
-}
-
-# Random character either upper or lower case
-sub rand_char
-{
-	return rand_chars(set => 'all', min => 1, max => 1);
-
-	# my $char = '';
-	# my $upper_chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-	# my $lower_chars = 'abcdefghijklmnopqrstuvwxyz';
-	# my $combined_chars = $upper_chars . $lower_chars;
-
-	# # Generate a random index between 0 and the length of the string minus 1
-	# my $rand_index = int(rand(length($combined_chars)));
-
-	# # Get the character at that index
-	# return substr($combined_chars, $rand_index, 1);
-}
-
-# Integer generator: mix typical small ints with large limits
-sub rand_int {
-	my $r = rand();
-	if ($r < 0.75) {
-		return int(rand(200)) - 100;	# -100 .. 100 (usual)
-	} elsif ($r < 0.9) {
-		return int(rand(2**31)) - 2**30;	# 32-bit-ish
-	} elsif ($r < 0.98) {
-		return (int(rand(2**63)) - 2**62);	# 64-bit-ish
-	} else {
-		# very large/suspicious values
-		return 2**63 - 1;
-	}
-}
-sub rand_bool { rand() > 0.5 ? 1 : 0 }
-
-# Number generator (floating), includes tiny/huge floats
-sub rand_num {
-	my $r = rand();
-	if ($r < 0.7) {
-		return (rand() * 200 - 100);	# -100 .. 100
-	} elsif ($r < 0.9) {
-		return (rand() * 1e12) - 5e11;	# large-ish
-	} elsif ($r < 0.98) {
-		return (rand() * 1e308) - 5e307;	# very large floats
-	} else {
-		return 1e-308 * (rand() * 1000);	# tiny float, subnormal-like
-	}
-}
-
-sub rand_arrayref {
-	my $len = shift || int(rand(3)) + 1; # small arrays
-
-	return [ map { rand_str() } 1..$len ];
-}
-
-sub rand_hashref {
-	my $len = shift || int(rand(3)) + 1; # small hashes
-	my %h;
-	for (1..$len) {
-		$h{rand_str(3)} = rand_str(5);
-	}
-	return \%h;
-}
-
-sub fuzz_inputs
-{
-	my @cases;
-
-	# Are any options manadatory?
-	my $all_optional = 1;
-	my %mandatory_strings;	# List of mandatory strings to be added to all tests, always put at start so it can be overwritten
-	my %mandatory_objects;
-	my %mandatory_numbers;
-	my $class_simple_loaded;
-	foreach my $field (keys %input) {
-		my $spec = $input{$field} || {};
-		if((ref($spec) eq 'HASH') && (!$spec->{optional})) {
-			$all_optional = 0;
-			if($spec->{'type'} eq 'string') {
-				local $config{'test_undef'} = 0;
-				local $config{'test_nuls'} = 0;
-				local $config{'test_empty'} = 0;
-				$mandatory_strings{$field} = rand_ascii_str();
-			} elsif($spec->{'type'} eq 'object') {
-				my $method = $spec->{'can'};
-				if(!$class_simple_loaded) {
-					require_ok('Class::Simple');
-					eval {
-						Class::Simple->import();
-						$class_simple_loaded = 1;
-					};
-				}
-				my $obj = new_ok('Class::Simple');
-				$obj->$method(1);
-				$mandatory_objects{$field} = $obj;
-				$config{'dedup'} = 0;	# FIXME:	Can't yet dedup with class method calls
-			} elsif(($spec->{'type'} eq 'float') || ($spec->{'type'} eq 'number')) {
-				my $min = $spec->{'min'};
-				my $max = $spec->{'max'};
-				my $number;
-				if(defined($min)) {
-					$number = rand($min);
-				} else {
-					$number = rand(100000);
-				}
-				if(defined($max)) {
-					if($number > $max) {
-						$number = $max;
-					}
-				}
-				$mandatory_numbers{$field} = $number;
-			} else {
-				die 'TODO: type = ', $spec->{'type'};
-			}
-		}
-	}
-	my %mandatory_args = (%mandatory_strings, %mandatory_objects, %mandatory_numbers);
-
-	if(($all_optional) || ((scalar keys %input) > 1)) {
-		# Basic test cases
-		if(((scalar keys %input) == 1) && exists($input{'type'}) && !ref($input{'type'})) {
-			# our %input = ( type => 'string' );
-			my $type = $input{'type'};
-
-			foreach my $field(keys %input) {
-				if(!grep({ $_ eq $field } ('type', 'min', 'max', 'optional', 'matches', 'can'))) {
-					diag(__LINE__, ": TODO: handle schema keyword '$field'");
-				}
-			}
-
-			if ($type eq 'string') {
-				# Is hello allowed?
-				if(!defined($input{'memberof'}) || (grep { $_ eq 'hello' } @{$input{'memberof'}})) {
-					if(defined($input{'notmemberof'}) && (grep { $_ eq 'hello' } @{$input{'notmemberof'}})) {
-						push @cases, { _input => 'hello', _STATUS => 'DIES' };
-					} else {
-						push @cases, { _input => 'hello' };
-					}
-				} elsif(defined($input{'memberof'}) && !defined($input{'max'})) {
-					# Data::Random
-					push @cases, { _input => rand_set(set => $input{'memberof'}, size => 1) }
-				} else {
-					if((!defined($input{'min'})) || ($input{'min'} >= 1)) {
-						push @cases, { _input => '0' } if(!defined($input{'memberof'}));
-					}
-					if(defined($input{'notmemberof'}) || (!grep { $_ eq 'hello' } @{$input{'memberof'}})) {
-						push @cases, { _input => 'hello' };
-					} else {
-						push @cases, { _input => 'hello', _STATUS => 'DIES' };
-					}
-				}
-				push @cases, { _input => '' } if((!exists($input{'min'})) || ($input{'min'} == 0));
-				# push @cases, { $field => "emoji \x{1F600}" };
-				push @cases, { _input => "\0null" } if($config{'test_nuls'});
-			} else {
-				die 'TODO';
-			}
-		} else {
-			# our %input = ( str => { type => 'string' } );
-			foreach my $arg_name (keys %input) {
-				my $spec = $input{$arg_name} || {};
-				my $type = lc((!ref($spec)) ? $spec : $spec->{type}) || 'string';
-
-				foreach my $field(keys %{$spec}) {
-					if(!grep({ $_ eq $field } ('type', 'min', 'max', 'optional', 'matches', 'can', 'memberof'))) {
-						diag(__LINE__, ": TODO: handle schema keyword '$field'");
-					}
-				}
-
-				# --- Type-based seeds ---
-				if ($type eq 'number') {
-					push @cases, { $arg_name => 0 };
-					push @cases, { $arg_name => 1.23 };
-					push @cases, { $arg_name => -42 };
-					push @cases, { $arg_name => 'abc', _STATUS => 'DIES' };
-				}
-				elsif ($type eq 'integer') {
-					push @cases, { %mandatory_args, ( $arg_name => 42 ) };
-					if((!defined $spec->{min}) || ($spec->{min} <= -1)) {
-						push @cases, { %mandatory_args, ( $arg_name => -1, _LINE => __LINE__ ) };
-					}
-					push @cases, { %mandatory_args, ( $arg_name => 3.14, _STATUS => 'DIES' ) };
-					push @cases, { %mandatory_args, ( $arg_name => 'xyz', _STATUS => 'DIES' ) };
-					# --- min/max numeric boundaries ---
-					# Probably duplicated below, but here as well just in case
-					if (defined $spec->{min}) {
-						my $min = $spec->{min};
-						push @cases, { %mandatory_args, ( $arg_name => $min - 1, _STATUS => 'DIES' ) };
-						push @cases, { %mandatory_args, ( $arg_name => $min, _LINE => __LINE__ ) };
-						push @cases, { %mandatory_args, ( $arg_name => $min + 1 ) };
-					}
-					if (defined $spec->{max}) {
-						my $max = $spec->{max};
-						push @cases, { %mandatory_args, ( $arg_name => $max - 1 ) };
-						push @cases, { %mandatory_args, ( $arg_name => $max ) };
-						push @cases, { %mandatory_args, ( $arg_name => $max + 1, _STATUS => 'DIES' ) };
-					}
-				} elsif ($type eq 'string') {
-					# Is hello allowed?
-					if(my $re = $spec->{matches}) {
-						if(ref($re) ne 'Regexp') {
-							$re = qr/$re/;
-						}
-						my $random_string;
-						if($spec->{'max'}) {
-							$random_string = Data::Random::String::Matches->create_random_string({ length => $spec->{'max'}, regex => $re });
-						} elsif($spec->{'min'}) {
-							$random_string = Data::Random::String::Matches->create_random_string({ length => $spec->{'min'}, regex => $re });
-						} else {
-							$random_string = Data::Random::String::Matches->create_random_string({ regex => $re });
-						}
-    						foreach my $str('hello', $random_string) {
-							if($str =~ $re) {
-								if(!defined($spec->{'memberof'}) || (grep { $_ eq $str } @{$spec->{'memberof'}})) {
-									if(defined($spec->{'notmemberof'}) && (grep { $_ eq $str } @{$spec->{'notmemberof'}})) {
-										push @cases, { %mandatory_args, ( $arg_name => $str, _STATUS => 'DIES' ) };
-									} else {
-										push @cases, { %mandatory_args, ( $arg_name => $str ) };
-									}
-								} elsif(defined($spec->{'memberof'}) && !defined($spec->{'max'})) {
-									# Data::Random
-									push @cases, { %mandatory_args, ( _input => rand_set(set => $spec->{'memberof'}, size => 1) ) }
-								} else {
-									push @cases, { %mandatory_args, ( $arg_name => $str, _STATUS => 'DIES' ) };
-								}
-							} else {
-								push @cases, { %mandatory_args, ( $arg_name => $str, _STATUS => 'DIES' ) };
-							}
-						}
-					} else {
-						if(!defined($spec->{'memberof'}) || (grep { $_ eq 'hello' } @{$spec->{'memberof'}})) {
-							if(defined($spec->{'notmemberof'}) && (grep { $_ eq 'hello' } @{$spec->{'notmemberof'}})) {
-								push @cases, { %mandatory_args, ( $arg_name => 'hello', _LINE => __LINE__, _STATUS => 'DIES' ) };
-							} else {
-								push @cases, { %mandatory_args, ( $arg_name => 'hello' ) };
-							}
-						} else {
-							push @cases, { %mandatory_args, ( $arg_name => 'hello', _LINE => __LINE__, _STATUS => 'DIES' ) };
-						}
-					}
-					if((!exists($spec->{min})) || ($spec->{min} == 0)) {
-						# '' should die unless it's in the memberof list
-						if(defined($spec->{'memberof'}) && (!grep { $_ eq '' } @{$spec->{'memberof'}})) {
-							push @cases, { %mandatory_args, ( $arg_name => '', _NAME => $arg_name, _STATUS => 'DIES' ) }
-						} elsif(defined($spec->{'memberof'}) && !defined($spec->{'max'})) {
-							# Data::Random
-							push @cases, { %mandatory_args, _input => rand_set(set => $spec->{'memberof'}, size => 1) }
-						} else {
-							push @cases, { %mandatory_args, ( $arg_name => '', _NAME => $arg_name ) } if((!exists($spec->{min})) || ($spec->{min} == 0));
-						}
-					}
-					# push @cases, { $arg_name => "emoji \x{1F600}" };
-					push @cases, { %mandatory_args, ( $arg_name => "\0null" ) } if($config{'test_nuls'} && (!(defined $spec->{memberof})) && !defined($spec->{matches}));
-
-					unless(defined($spec->{memberof}) || defined($spec->{matches})) {
-						# --- min/max string/array boundaries ---
-						if (defined $spec->{min}) {
-							my $len = $spec->{min};
-							push @cases, { %mandatory_args, ( $arg_name => 'a' x ($len - 1), _STATUS => 'DIES' ) } if($len > 0);
-							push @cases, { %mandatory_args, ( $arg_name => 'a' x $len ) };
-							push @cases, { %mandatory_args, ( $arg_name => 'a' x ($len + 1) ) };
-						}
-						if (defined $spec->{max}) {
-							my $len = $spec->{max};
-							push @cases, { %mandatory_args, ( $arg_name => 'a' x ($len - 1) ) };
-							push @cases, { %mandatory_args, ( $arg_name => 'a' x $len ) };
-							push @cases, { %mandatory_args, ( $arg_name => 'a' x ($len + 1), _STATUS => 'DIES' ) };
-						}
-					}
-				}
-				elsif ($type eq 'boolean') {
-					push @cases, { %mandatory_args, ( $arg_name => 0 ) };
-					push @cases, { %mandatory_args, ( $arg_name => 1 ) };
-					push @cases, { %mandatory_args, ( $arg_name => 'true' ) };
-					push @cases, { %mandatory_args, ( $arg_name => 'false' ) };
-					push @cases, { %mandatory_args, ( $arg_name => 'off' ) };
-					push @cases, { %mandatory_args, ( $arg_name => 'on' ) };
-					push @cases, { %mandatory_args, ( $arg_name => 'bletch', _STATUS => 'DIES' ) };
-				}
-				elsif ($type eq 'hashref') {
-					push @cases, { $arg_name => { a => 1 } };
-					push @cases, { $arg_name => [], _STATUS => 'DIES' };
-				}
-				elsif ($type eq 'arrayref') {
-					push @cases, { $arg_name => [1,2] };
-					push @cases, { $arg_name => { a => 1 }, _STATUS => 'DIES' };
-				}
-
-				# --- matches (regex) ---
-				if (defined $spec->{matches}) {
-					my $regex = $spec->{matches};
-					for my $string(@regex_tests) {
-						if($string =~ $regex) {
-							push @cases, { %mandatory_args, ( $arg_name => $string ) };
-						} else {
-							push @cases, { %mandatory_args, ( $arg_name => $string, _STATUS => 'DIES' ) };
-						}
-					}
-				}
-
-				# --- nomatch (regex) ---
-				if (defined $spec->{nomatch}) {
-					my $regex = $spec->{nomatch};
-					for my $string(@regex_tests) {
-						if($string =~ $regex) {
-							push @cases, { %mandatory_args, ( $arg_name => $string, _STATUS => 'DIES' ) };
-						} else {
-							push @cases, { %mandatory_args, ( $arg_name => $string ) };
-						}
-					}
-				}
-
-				# --- memberof ---
-				if (defined $spec->{memberof}) {
-					my @set = @{ $spec->{memberof} };
-					push @cases, { %mandatory_args, ( $arg_name => $set[0] ) } if @set;
-					push @cases, { %mandatory_args, ( $arg_name => '_not_in_set_', _STATUS => 'DIES' ) };
-				}
-
-				# --- notmemberof ---
-				if (defined $spec->{notmemberof}) {
-					my @set = @{ $spec->{notmemberof} };
-					push @cases, { %mandatory_args, ( $arg_name => $set[0], _STATUS => 'DIES' ) } if @set;
-					push @cases, { %mandatory_args, ( $arg_name => '_not_in_set_' ) };
-				}
-			}
-		}
-	}
-
-	# Optional deduplication
-	# my %seen;
-	# @cases = grep { !$seen{join '|', %$_}++ } @cases;
-
-	# Random data test cases
-	if(scalar keys %input) {
-		if(((scalar keys %input) == 1) && exists($input{'type'}) && !ref($input{'type'})) {
-			# our %input = ( type => 'string' );
-			my $type = $input{'type'};
-			for (1..[% iterations_code %]) {
-				my $case_input;
-				if (@edge_case_array && rand() < 0.4) {
-					# Sometimes pick a field-specific edge-case
-					$case_input = _pick_from(\@edge_case_array);
-				} elsif(exists $type_edge_cases{$type} && rand() < 0.3) {
-					# Sometimes pick a type-level edge-case
-					$case_input = _pick_from($type_edge_cases{$type});
-				} elsif($type eq 'string') {
-					if($input{matches}) {
-						$case_input = Data::Random::String::Matches->create_random_string({ regex => $input{'matches'} });
-					} else {
-						$case_input = rand_str();
-					}
-				} elsif($type eq 'integer') {
-					$case_input = rand_int() + $input{'min'};
-				} elsif(($type eq 'number') || ($type eq 'float')) {
-					$case_input = rand_num() + $input{'min'};
-				} elsif($type eq 'boolean') {
-					$case_input = rand_bool();
-				} else {
-					die 'TODO';
-				}
-				push @cases, { _input => $case_input, status => 'OK', _LINE => __LINE__ } if($case_input);
-			}
-		} else {
-			# our %input = ( str => { type => 'string' } );
-			foreach my $field (keys %input) {
-				my $spec = $input{$field} || {};
-				foreach my $field(keys %{$spec}) {
-					if(!grep({ $_ eq $field } ('type', 'min', 'max', 'optional', 'matches', 'can', 'position'))) {
-						diag(__LINE__, ": TODO: handle schema keyword '$field'");
-					}
-				}
-			}
-			for (1..[% iterations_code %]) {
-				my %case_input = (%mandatory_args);
-				foreach my $field (keys %input) {
-					my $spec = $input{$field} || {};
-					next if $spec->{'memberof'};	# Memberof data is created below
-					my $type = $spec->{type} || 'string';
-
-					# 1) Sometimes pick a field-specific edge-case
-					if (exists $edge_cases{$field} && rand() < 0.4) {
-						$case_input{$field} = _pick_from($edge_cases{$field});
-						next;
-					}
-
-					# 2) Sometimes pick a type-level edge-case
-					if (exists $type_edge_cases{$type} && rand() < 0.3) {
-						$case_input{$field} = _pick_from($type_edge_cases{$type});
-						next;
-					}
-
-					# 3) Sormal random generation by type
-					if ($type eq 'string') {
-						if(my $re = $spec->{matches}) {
-							if(ref($re) ne 'Regexp') {
-								$re = qr/$re/;
-							}
-							if($spec->{'max'}) {
-								$case_input{$field} = Data::Random::String::Matches->create_random_string({ length => $spec->{'max'}, regex => $re });
-							} elsif($spec->{'min'}) {
-								$case_input{$field} = Data::Random::String::Matches->create_random_string({ length => $spec->{'min'}, regex => $re });
-							} else {
-								$case_input{$field} = Data::Random::String::Matches->create_random_string({ regex => $re });
-							}
-						} else {
-							if(my $min = $spec->{min}) {
-								$case_input{$field} = rand_str($min);
-								if($config{'test_empty'} && ($min == 0)) {
-									push @cases, { _input => \%case_input, status => 'OK' } if(keys %case_input);
-									$case_input{$field} = '';
-								}
-							} else {
-								$case_input{$field} = rand_str();
-								if($config{'test_empty'}) {
-									push @cases, { _input => \%case_input, status => 'OK' } if(keys %case_input);
-									$case_input{$field} = '';
-								}
-							}
-						}
-					} elsif ($type eq 'integer') {
-						if(my $min = $spec->{min}) {
-							if(my $max = $spec->{'max'}) {
-								$case_input{$field} = int(rand($max - $min + 1)) + $min;
-							} else {
-								$case_input{$field} = rand_int() + $min;
-							}
-						} elsif(exists($spec->{min})) {
-							# min == 0
-							if(my $max = $spec->{'max'}) {
-								$case_input{$field} = int(rand($max + 1));
-							} else {
-								$case_input{$field} = abs(rand_int());
-							}
-						} else {
-							$case_input{$field} = rand_int();
-						}
-					}
-					elsif ($type eq 'boolean') {
-						$case_input{$field} = rand_bool();
-					}
-					elsif ($type eq 'number') {
-						if(my $min = $spec->{min}) {
-							$case_input{$field} = rand_num() + $min;
-						} else {
-							$case_input{$field} = rand_num();
-						}
-					}
-					elsif ($type eq 'arrayref') {
-						$case_input{$field} = rand_arrayref();
-					}
-					elsif ($type eq 'hashref') {
-						$case_input{$field} = rand_hashref();
-					} elsif($config{'test_undef'}) {
-						$case_input{$field} = undef;
-					}
-
-					# 4) occasionally drop optional fields
-					if ($spec->{optional} && rand() < 0.25) {
-						delete $case_input{$field};
-					}
-				}
-				push @cases, { _input => \%case_input, status => 'OK' } if(keys %case_input);
-			}
-		}
-	}
-
-	# edge-cases
-	if($config{'test_undef'}) {
-		if($all_optional) {
-			push @cases, {};
-		} else {
-			# Note that this is set on the input rather than output
-			push @cases, { '_STATUS' => 'DIES' };	# At least one argument is needed
-		}
-	}
-
-	if(scalar keys %input) {
-		push @cases, { '_STATUS' => 'DIES', map { $_ => undef } keys %input } if($config{'test_undef'});
-	} else {
-		push @cases, { };	# Takes no input
-	}
-
-	# If it's not in mandatory_strings it sets to 'undef' which is the idea, to test { value => undef } in the args
-	push @cases, { map { $_ => $mandatory_strings{$_} } keys %input, %mandatory_objects } if($config{'test_undef'});
-
-	push @candidate_bad, '' if($config{'test_empty'});
-	push @candidate_bad, undef if($config{'test_undef'});
-	push @candidate_bad, "\0" if($config{'test_nuls'});
-
-	# generate numeric, string, hashref and arrayref min/max edge cases
-	# TODO: For hashref and arrayref, if there's a $spec->{schema} field, use that for the data that's being generated
-	if(((scalar keys %input) == 1) && exists($input{'type'}) && !ref($input{'type'})) {
-		# our %input = ( type => 'string' );
-		my $type = $input{type};
-		if (exists $input{memberof} && ref $input{memberof} eq 'ARRAY' && @{$input{memberof}}) {
-			# Generate edge cases for memberof inside values
-			foreach my $val (@{$input{memberof}}) {
-				push @cases, { _input => $val };
-			}
-			# outside value
-			my $outside;
-			if(($type eq 'integer') || ($type eq 'number') || ($type eq 'float')) {
-				$outside = (sort { $a <=> $b } @{$input{memberof}})[-1] + 1;
-			} else {
-				$outside = 'INVALID_MEMBEROF';
-			}
-			push @cases, { _input => $outside, _STATUS => 'DIES' };
-		} else {
-			# Generate edge cases for min/max
-			if ($type eq 'number' || $type eq 'integer') {
-				if (defined $input{min}) {
-					push @cases, { %mandatory_args, ( _input => $input{min} + 1 ) };	# just inside
-					push @cases, { %mandatory_args, ( _input => $input{min} ) };	# border
-					push @cases, { %mandatory_args, ( _input => $input{min} - 1, _STATUS => 'DIES' ) }; # outside
-				} else {
-					push @cases, { %mandatory_args, ( _input => 0, _LINE => __LINE__ ) };	# No min, so 0 should be allowable
-					push @cases, { %mandatory_args, ( _input => -1, _LINE => __LINE__ ) };	# No min, so -1 should be allowable
-				}
-				if (defined $input{max}) {
-					push @cases, { %mandatory_args, ( _input => $input{max} - 1 ) };	# just inside
-					push @cases, { %mandatory_args, ( _input => $input{max} ) };	# border
-					push @cases, { %mandatory_args, ( _input => $input{max} + 1, _STATUS => 'DIES' ) }; # outside
-				}
-			} elsif ($type eq 'string') {
-				if (defined $input{min}) {
-					my $len = $input{min};
-					push @cases, { _input => 'a' x ($len + 1) };	# just inside
-					if($len == 0) {
-						push @cases, { _input => '' } if($config{'test_empty'});
-					} else {
-						# outside
-						push @cases, { _input => 'a' x $len };	# border
-						push @cases, { _input => 'a' x ($len - 1), _STATUS => 'DIES' };
-					}
-					if($len >= 1) {
-						# Test checking of 'defined'/'exists' rather than if($string)
-						push @cases, { %mandatory_args, ( _input => '0', _LINE => __LINE__ ) };
-					} else {
-						push @cases, { _input => '0', _STATUS => 'DIES' }
-					}
-				} else {
-					push @cases, { _input => '', _LINE => __LINE__ } if($config{'test_empty'});	# No min, empty string should be allowable
-				}
-				if (defined $input{max}) {
-					my $len = $input{max};
-					push @cases, { %mandatory_args, ( _input => 'a' x ($len - 1) ) };	# just inside
-					push @cases, { %mandatory_args, ( _input => 'a' x $len ) };	# border
-					push @cases, { %mandatory_args, ( _input => 'a' x ($len + 1), _STATUS => 'DIES' ) }; # outside
-				}
-				if(defined $input{matches}) {
-					my $re = $input{matches};
-
-					# --- Positive controls ---
-					foreach my $val (@candidate_good) {
-						if ($val =~ $re) {
-							push @cases, { %mandatory_args, ( _input => $val ) };
-							last; # one good match is enough
-						}
-					}
-
-					# --- Negative controls ---
-					foreach my $val (@candidate_bad) {
-						if(!defined($val)) {
-							push @cases, { _input => undef, _STATUS => 'DIES' };
-						} elsif ($val !~ $re) {
-							push @cases, { _input => $val, _STATUS => 'DIES' };
-						}
-					}
-					push @cases, { _input => undef, _STATUS => 'DIES' } if($config{'test_undef'});
-					push @cases, { _input => "\0", _STATUS => 'DIES' } if($config{'test_nuls'});
-				}
-				if(defined $input{nomatch}) {
-					my $re = $input{nomatch};
-
-					# --- Positive controls ---
-					foreach my $val (@candidate_good) {
-						if ($val !~ $re) {
-							push @cases, { %mandatory_args, ( _input => $val ) };
-							last; # one good match is enough
-						}
-					}
-
-					# --- Negative controls ---
-					foreach my $val (@candidate_bad) {
-						if ($val =~ $re) {
-							push @cases, { _input => $val, _STATUS => 'DIES' };
-						}
-					}
-				}
-			} elsif ($type eq 'arrayref') {
-				if (defined $input{min}) {
-					my $len = $input{min};
-					push @cases, { _input => [ (1) x ($len + 1) ] };	# just inside
-					push @cases, { _input => [ (1) x $len ] };	# border
-					push @cases, { _input => [ (1) x ($len - 1) ], _STATUS => 'DIES' } if $len > 0; # outside
-				} else {
-					push @cases, { _input => [] } if($config{'test_empty'});	# No min, empty array should be allowable
-				}
-				if (defined $input{max}) {
-					my $len = $input{max};
-					push @cases, { _input => [ (1) x ($len - 1) ] };	# just inside
-					push @cases, { _input => [ (1) x $len ] };	# border
-					push @cases, { _input => [ (1) x ($len + 1) ], _STATUS => 'DIES' }; # outside
-				}
-			} elsif ($type eq 'hashref') {
-				if (defined $input{min}) {
-					my $len = $input{min};
-					push @cases, { _input => { map { "k$_" => 1 }, 1 .. ($len + 1) } };
-					push @cases, { _input => { map { "k$_" => 1 }, 1 .. $len } };
-					push @cases, { _input => { map { "k$_" => 1 }, 1 .. ($len - 1) }, _STATUS => 'DIES' } if $len > 0;
-				} else {
-					push @cases, { _input => {} } if($config{'test_empty'});	# No min, empty hash should be allowable
-				}
-				if (defined $input{max}) {
-					my $len = $input{max};
-					push @cases, { _input => { map { "k$_" => 1 }, 1 .. ($len - 1) } };
-					push @cases, { _input => { map { "k$_" => 1 }, 1 .. $len } };
-					push @cases, { _input => { map { "k$_" => 1 }, 1 .. ($len + 1) }, _STATUS => 'DIES' };
-				}
-			} elsif ($type eq 'boolean') {
-				if (exists $input{memberof} && ref $input{memberof} eq 'ARRAY') {
-					# memberof already defines allowed booleans
-					foreach my $val (@{$input{memberof}}) {
-						push @cases, { _input => $val };
-					}
-				} else {
-					# basic boolean edge cases
-					push @cases,
-						{ _input => 0 },
-						{ _input => 1 },
-						{ _input => 'off' },
-						{ _input => 'on' },
-						{ _input => 'false' },
-						{ _input => 'true' },
-						{ _input => 'yes' },
-						{ _input => 'no' },
-						{ _input => 2, _STATUS => 'DIES' },	# invalid boolean
-						{ _input => [ 3 ], _STATUS => 'DIES' },	# invalid boolean
-						{ _input => { 'abc' => 'xyz' }, _STATUS => 'DIES' },	# invalid boolean
-						{ _input => 'plugh', _STATUS => 'DIES' };	# invalid boolean
-					push @cases, { _input => undef, _STATUS => 'DIES' } if($config{'test_undef'});
-				}
-			}
-
-			# Test all edge cases
-			foreach my $edge(@edge_case_array) {
-				push @cases, { _input => $edge };
-			}
-		}
-	} else {
-		# our %input = ( str => { type => 'string' } );
-		push @cases, @{generate_tests(\%input, \%mandatory_args)};
-	}
-
-	# FIXME: I don't think this catches them all
-	# FIXME: Handle cases with Class::Simple calls
-	if($config{'dedup'}) {
-		require JSON::MaybeXS;
-		JSON::MaybeXS->import();
-
-		# dedup, fuzzing can easily generate repeats
-		my %seen;
-		@cases = grep {
-			my $dump = encode_json($_);
-			!$seen{$dump}++
-		} @cases;
-	}
-
-	# use Data::Dumper;
-	# die(Dumper(@cases));
-
-	return \@cases;
-}
-
-sub generate_tests
-{
-	my $input = $_[0];
-	my %mandatory_args = %{$_[1]};
-
-	my @cases;
-
-	foreach my $field (keys %input) {
-		my $spec = $input{$field} || {};
-		my $type = $spec->{type} || 'string';
-
-		if (exists $spec->{memberof} && ref $spec->{memberof} eq 'ARRAY' && @{$spec->{memberof}}) {
-			# Generate edge cases for memberof
-			# inside values
-			foreach my $val (@{$spec->{memberof}}) {
-				push @cases, { %mandatory_args, ( $field => $val ) };
-			}
-			# outside value
-			my $outside;
-			if ($type eq 'integer' || $type eq 'number') {
-				$outside = (sort { $a <=> $b } @{$spec->{memberof}})[-1] + 1;
-			} else {
-				$outside = 'INVALID_MEMBEROF';
-			}
-			push @cases, { %mandatory_args, ( $field => $outside, _STATUS => 'DIES' ) };
-		} else {
-			# Generate edge cases for min/max
-			if(($type eq 'number') || ($type eq 'integer') || ($type eq 'float')) {
-				if(defined $spec->{min}) {
-					push @cases, { %mandatory_args, ( $field => $spec->{min} + 1 ) };	# just inside
-					push @cases, { %mandatory_args, ( $field => $spec->{min} ) };	# border
-					push @cases, { %mandatory_args, ( $field => $spec->{min} - 1, _STATUS => 'DIES' ) }; # outside
-				} else {
-					push @cases, { $field => 0, _LINE => __LINE__ };	# No min, so 0 should be allowable
-					push @cases, { $field => -1, _LINE => __LINE__ };	# No min, so -1 should be allowable
-				}
-				if(defined $spec->{max}) {
-					push @cases, { %mandatory_args, ( $field => $spec->{max} - 1, _LINE => __LINE__ ) };	# just inside
-					push @cases, { %mandatory_args, ( $field => $spec->{max}, _LINE => __LINE__ ) };	# border
-					push @cases, { %mandatory_args, ( $field => $spec->{max} + 1, _STATUS => 'DIES', _LINE => __LINE__ ) }; # outside
-				}
-
-				[% IF module %]
-					# Send wrong data type - builtins aren't good at checking this
-					push @cases, { %mandatory_args, ( $field => 'test string in integer field', _STATUS => 'DIES', _LINE => __LINE__ ) };
-					push @cases, { %mandatory_args, ( $field => {}, _STATUS => 'DIES', _LINE => __LINE__ ) };
-					push @cases, { %mandatory_args, ( $field => [], _STATUS => 'DIES', _LINE => __LINE__ ) };
-				[% END %]
-				if($type eq 'integer') {
-					# Float
-					push @cases, { %mandatory_args, ( $field => 0.5, _STATUS => 'DIES', _LINE => __LINE__ ) };
-				}
-			} elsif($type eq 'string') {
-				if (defined $spec->{min}) {
-					my $len = $spec->{min};
-					if(my $re = $spec->{matches}) {
-						for my $count ($len + 1, $len, $len - 1) {
-							next if ($count < 0);
-							my $str = rand_char() x $count;
-							if($str =~ $re) {
-								push @cases, { %mandatory_args, ( $field => $str ) };
-							} else {
-								push @cases, { %mandatory_args, ( $field => $str, _STATUS => 'DIES' ) };
-							}
-						}
-					} else {
-						push @cases, { %mandatory_args, ( $field => 'a' x ($len + 1) ) };	# just inside
-						push @cases, { %mandatory_args, ( $field => 'a' x $len ) };	# border
-						if($len > 0) {
-							if(($len > 1) || $config{'test_empty'}) {
-								# outside
-								push @cases, { %mandatory_args, ( $field => 'a' x ($len - 1), _STATUS => 'DIES' ) };
-							}
-							if($len <= 1) {
-								push @cases, { %mandatory_args, ( $field => '9' ) };
-								push @cases, { %mandatory_args, ( $field => '' ) } if($len == 0);
-							}
-						} else {
-							push @cases, { %mandatory_args, ( $field => '' ) } if($config{'test_empty'});	# min == 0, empty string should be allowable
-							# Don't confuse if() with if(defined())
-							push @cases, { %mandatory_args, ( $field => '0', _STATUS => 'DIES' ) };
-						}
-					}
-				} else {
-					push @cases, { %mandatory_args, ( $field => '' ) } if($config{'test_empty'});	# No min, empty string should be allowable
-				}
-				if (defined $spec->{max}) {
-					my $len = $spec->{max};
-					if((!defined($spec->{min})) || ($spec->{min} != $len)) {
-						if(my $re = $spec->{matches}) {
-							for my $count ($len - 1, $len, $len + 1) {
-								my $str = rand_char() x $count;
-								if($str =~ $re) {
-									if($count > $len) {
-										push @cases, { %mandatory_args, ( $field => $str, _LINE => __LINE__, _STATUS => 'DIES' ) };
-									} else {
-										push @cases, { %mandatory_args, ( $field => $str, _LINE => __LINE__ ) };
-									}
-								} else {
-									push @cases, { %mandatory_args, ( $field => $str, _STATUS => 'DIES', _LINE => __LINE__ ) };
-								}
-							}
-						} else {
-							push @cases, { %mandatory_args, ( $field => 'a' x ($len - 1), _LINE => __LINE__ ) };	# just inside
-							push @cases, { %mandatory_args, ( $field => 'a' x $len, _LINE => __LINE__ ) };	# border
-							push @cases, { %mandatory_args, ( $field => 'a' x ($len + 1), _LINE => __LINE__, _STATUS => 'DIES' ) }; # outside
-						}
-					}
-				} else {
-					if(exists($spec->{'min'})) {
-						push @cases, { %mandatory_args, ( $field => 'a' x (($spec->{'min'} + 1) * 1_000), _LINE => __LINE__ ) };
-					} else {
-						push @cases, { %mandatory_args, ( $field => 'a' x 10_000, _LINE => __LINE__ ) };
-					}
-				}
-
-				if(defined $spec->{matches}) {
-					my $re = $spec->{matches};
-
-					# --- Positive controls ---
-					foreach my $val (@candidate_good) {
-						if ($val =~ $re) {
-							push @cases, { %mandatory_args, ( $field => $val ) };
-							last; # one good match is enough
-						}
-					}
-
-					# --- Negative controls ---
-					foreach my $val (@candidate_bad) {
-						if(!defined($val)) {
-							push @cases, { _input => undef, _STATUS => 'DIES' } if($config{'test_undef'});
-						} elsif ($val !~ $re) {
-							push @cases, { _input => $val, _STATUS => 'DIES' };
-						}
-					}
-					push @cases, { $field => undef, _STATUS => 'DIES' } if($config{'test_undef'});
-					push @cases, { $field => "\0", _STATUS => 'DIES' } if($config{'test_nuls'});
-				}
-				if(defined $spec->{nomatch}) {
-					my $re = $spec->{nomatch};
-
-					# --- Positive controls ---
-					foreach my $val (@candidate_good) {
-						if ($val !~ $re) {
-							push @cases, { %mandatory_args, ( $field => $val ) };
-							last; # one good match is enough
-						}
-					}
-
-					# --- Negative controls ---
-					foreach my $val (@candidate_bad) {
-						if ($val =~ $re) {
-							push @cases, { $field => $val, _STATUS => 'DIES' };
-						}
-					}
-				}
-				# Send wrong data type
-				push @cases, { %mandatory_args, ( $field => [], _STATUS => 'DIES', _LINE => __LINE__ ) } if($config{'test_empty'});
-				push @cases, { %mandatory_args, ( $field => {}, _STATUS => 'DIES', _LINE => __LINE__ ) } if($config{'test_empty'});
-			} elsif ($type eq 'arrayref') {
-				if (defined $spec->{min}) {
-					my $len = $spec->{min};
-					push @cases, { $field => [ (1) x ($len + 1) ] };	# just inside
-					push @cases, { $field => [ (1) x $len ] };	# border
-					push @cases, { $field => [ (1) x ($len - 1) ], _STATUS => 'DIES' } if $len > 0; # outside
-				} else {
-					push @cases, { $field => [] } if($config{'test_empty'});	# No min, empty array should be allowable
-				}
-				if (defined $spec->{max}) {
-					my $len = $spec->{max};
-					push @cases, { $field => [ (1) x ($len - 1) ] };	# just inside
-					push @cases, { $field => [ (1) x $len ] };	# border
-					push @cases, { $field => [ (1) x ($len + 1) ], _STATUS => 'DIES' }; # outside
-				}
-			} elsif ($type eq 'hashref') {
-				if (defined $spec->{min}) {
-					my $len = $spec->{min};
-					push @cases, { $field => { map { "k$_" => 1 }, 1 .. ($len + 1) } };
-					push @cases, { $field => { map { "k$_" => 1 }, 1 .. $len } };
-					push @cases, { $field => { map { "k$_" => 1 }, 1 .. ($len - 1) }, _STATUS => 'DIES' } if $len > 0;
-				} else {
-					push @cases, { $field => {} } if($config{'test_empty'});	# No min, empty hash should be allowable
-				}
-				if (defined $spec->{max}) {
-					my $len = $spec->{max};
-					push @cases, { $field => { map { "k$_" => 1 }, 1 .. ($len - 1) } };
-					push @cases, { $field => { map { "k$_" => 1 }, 1 .. $len } };
-					push @cases, { $field => { map { "k$_" => 1 }, 1 .. ($len + 1) }, _STATUS => 'DIES' };
-				}
-			} elsif ($type eq 'boolean') {
-				if (exists $spec->{memberof} && ref $spec->{memberof} eq 'ARRAY') {
-					# memberof already defines allowed booleans
-					foreach my $val (@{$spec->{memberof}}) {
-						push @cases, { %mandatory_args, ( $field => $val ) };
-					}
-				} else {
-					# basic boolean edge cases
-					push @cases, { %mandatory_args, ( $field => 0 ) };
-					push @cases, { %mandatory_args, ( $field => 1 ) };
-					push @cases, { %mandatory_args, ( $field => 'false' ) };
-					push @cases, { %mandatory_args, ( $field => 'true' ) };
-					push @cases, { %mandatory_args, ( $field => 'off' ) };
-					push @cases, { %mandatory_args, ( $field => 'on' ) };
-					push @cases, { %mandatory_args, ( $field => undef, _STATUS => 'DIES' ) } if($config{'test_undef'});
-					push @cases, { %mandatory_args, ( $field => 2, _STATUS => 'DIES' ) };	# invalid boolean
-					push @cases, { %mandatory_args, ( $field => 'xyzzy', _STATUS => 'DIES' ) };	# invalid boolean
-				}
-			}
-		}
-
-		# case_sensitive tests for memberof
-		if (defined $spec->{memberof} && exists $spec->{case_sensitive}) {
-			if (!$spec->{case_sensitive}) {
-				# Generate mixed-case versions of memberof values
-				foreach my $val (@{$spec->{memberof}}) {
-					push @cases, { %mandatory_args, ( $field => uc($val) ) },
-						{ %mandatory_args, ( $field => lc($val) ) },
-						{ %mandatory_args, ( $field => ucfirst(lc($val)) ) };
-				}
-			}
-		}
-
-		# Add notmemberof tests
-		if (defined $spec->{notmemberof}) {
-			my @blacklist = @{$spec->{notmemberof}};
-			# Each blacklisted value should die
-			foreach my $val (@blacklist) {
-				push @cases, { %mandatory_args, ( $field => $val, _STATUS => 'DIES' ) };
-			}
-			# Non-blacklisted value should pass
-			push @cases, { %mandatory_args, ( $field => '_not_in_blacklist_' ) };
-		}
-
-		# TODO:	How do we generate tests for cross-field validation?
-	}
-
-	return \@cases;
-}
-
-sub populate_positions
-{
-	my $input = shift;
-
-	my $rc;
-	foreach my $arg (keys %{$input}) {
-		my $spec = $input->{$arg} || {};
-		if(((ref($spec)) eq 'HASH') && defined($spec->{'position'})) {
-			$rc->{$arg} = $spec->{'position'};
-		} else {
-			if($rc) {
-				::diag("$arg is missing a position parameter in its schema");
-			}
-			return;	# All must be defined
-		}
-	}
-
-	return $rc;
-}
-
-sub run_test
-{
-	my($case, $input, $output, $positions) = @_;
-
-	if($ENV{'TEST_VERBOSE'}) {
-		diag('input: ', Dumper($input));
-	}
-
-	my $name = $case->{'_NAME'};
-	my $result;
-	my $mess;
-	if(defined($input) && !ref($input)) {
-		if($name) {
-			$mess = "[% function %]($name = '$input') %s";
-		} else {
-			$mess = "[% function %]('$input') %s";
-		}
-	} elsif(defined($input)) {
-		my @alist = ();
-		if($positions) {
-			# Positional args
-			foreach my $key (keys %{$input}) {
-				if($key ne '_STATUS') {
-					if(exists($positions->{$key})) {
-						$alist[$positions->{$key}] = delete $input->{$key};
-					} else {
-						diag("Lost position number for $key");
-					}
-				}
-			}
-			@alist = grep { defined $_ } @alist;	# Undefs will cause not enough args to be sent, which is a nice test
-			$input = join(', ', @alist);
-		} else {
-			# Named args
-			foreach my $key (sort keys %{$input}) {
-				if($key ne '_STATUS') {
-					if(defined($input->{$key})) {
-						push @alist, "'$key' => '$input->{$key}'";
-					} else {
-						push @alist, "'$key' => undef";
-					}
-				}
-			}
-		}
-		my $args = join(', ', @alist);
-		$args =~ s/%/%%/g;
-		$mess = "[% function %]($args) %s";
-	} else {
-		$mess = "[% function %] %s";
-	}
-
-	if(my $status = (delete $case->{'_STATUS'} || delete $output->{'_STATUS'})) {
-		if($status eq 'DIES') {
-			dies_ok { [% call_code %] } sprintf($mess, 'dies');
-		} elsif($status eq 'WARNS') {
-			warnings_exist { [% call_code %] } qr/./, sprintf($mess, 'warns');
-		} else {
-			lives_ok { [% call_code %] } sprintf($mess, 'survives');
-		}
-	} else {
-		lives_ok { [% call_code %] } sprintf($mess, 'survives');
-	}
-
-	if(scalar keys %{$output}) {
-		if($ENV{'TEST_VERBOSE'}) {
-			diag('result: ', Dumper($result));
-		}
-		returns_ok($result, $output, 'output validates');
-	}
-}
-
-my $positions = populate_positions(\%input);
-
-diag('Run Fuzz Tests') if($ENV{'TEST_VERBOSE'});
-
-foreach my $case (@{fuzz_inputs()}) {
-	# my %params;
-	# lives_ok { %params = get_params(\%input, %$case) } 'Params::Get input check';
-	# lives_ok { validate_strict(\%input, %params) } 'Params::Validate::Strict input check';
-
-	my $input;
-	if((ref($case) eq 'HASH') && exists($case->{'_input'})) {
-		$input = $case->{'_input'};
-	} else {
-		$input = $case;
-	}
-
-	if(my $line = (delete $case->{'_LINE'} || delete $input{'_LINE'})) {
-		diag("Test case from line number $line") if($ENV{'TEST_VERBOSE'});
-	}
-
-	{
-		# local %ENV;
-		run_test($case, $input, \%output, $positions);
-		# delete $ENV{'LANG'};
-		# delete $ENV{'LC_ALL'};
-		# run_test($case, $input, \%output, $positions);
-		# $ENV{'LANG'} = 'fr_FR.utf8';
-		# $ENV{'LC_ALL'} = 'fr_FR.utf8';
-		# run_test($case, $input, \%output, $positions);
-	}
-}
-
-diag('Run ', scalar(keys %transforms), ' transform tests') if($ENV{'TEST_VERBOSE'});
-# diag('-' x 60);
-
-# Build the foundation - which is a basic test with sensible defaults in the field
-foreach my $transform (keys %transforms) {
-	my $foundation;	# basic set of data with every field filled in with a sensible default value
-
-	foreach my $field (keys %input) {
-		my $spec = $input{$field} || {};
-		my $type = $spec->{type} || 'string';
-
-		if(($type eq 'number') || ($type eq 'float')) {
-			if(defined $spec->{min}) {
-				if(defined $spec->{max}) {
-					$foundation->{$field} = $spec->{max};	# border
-				} else {
-					$foundation->{$field} = rand_num() + $spec->{'min'};
-				}
-			} else {
-				if(defined $spec->{max}) {
-					$foundation->{$field} = $spec->{max};	# border
-				} else {
-					$foundation->{$field} = -0.1;	# No min, so -0.1 should be allowable
-				}
-			}
-		} elsif($type eq 'string') {
-			if(defined $spec->{min} && $spec->{min} > 0) {
-				$foundation->{$field} = 'a' x $spec->{min};
-			} elsif(defined $spec->{max} && $spec->{max} > 0) {
-				$foundation->{$field} = 'b' x $spec->{max};
-			} else {
-				$foundation->{$field} = 'test_value';
-			}
-		} elsif ($type eq 'integer') {
-			if (defined $spec->{min}) {
-				$foundation->{$field} = $spec->{min};
-			} elsif (defined $spec->{max}) {
-				$foundation->{$field} = rand_int() + $spec->{max};
-			} else {
-				$foundation->{$field} = rand_int();
-			}
-		} elsif ($type eq 'boolean') {
-			$foundation->{$field} = 1;
-		} elsif ($type eq 'arrayref') {
-			$foundation->{$field} = rand_arrayref(defined($spec->{'min'}) ? $spec->{'min'} : ($spec->{'max'} // 5));
-		} elsif ($type eq 'hashref') {
-			$foundation->{$field} = { key => 'value' };
-		} else {
-			die("TODO: transform type $type for foundation");
-		}
-	}
-
-	# The foundation should work
-	my $case = { _NAME => "basic $transform test", _LINE => __LINE__ };
-	my $positions = populate_positions(\%input);
-	run_test($case, $foundation, \%output, $positions);
-
-	# Generate transform tests
-	# Don't generate invalid data, that's all already done,
-	#	this is about verifying the transorms
-	my @tests;
-	diag("tests for transform $transform") if($ENV{'TEST_VERBOSE'});
-
-	# Now modify the foundation with test code
-
-	# BUILD CODE TO CALL FUNCTION
-	# CALL FUNCTION
-	# CHECK STATUS CORRECT
-	# IF STATUS EQ LIVES
-	#   CHECK OUTPUT USING returns_ok
-	# FI
-
-	my $transform_input = $transforms{$transform}{'input'} || {};
-
-	foreach my $field (keys %input) {
-		my $spec = $transform_input->{$field} || {};
-		my $type = $spec->{type} || 'string';
-
-		# If there's a specific value, test that exact value
-		if (exists $spec->{value}) {
-			push @tests, {
-				%{$foundation},
-				$field => $spec->{value},
-				_LINE => __LINE__
-				# _DESCRIPTION => "$transform_name: $field=$spec->{value}"
-			};
-			next;
-		}
-
-		# Generate edge cases based on type and contraints
-		if(($type eq 'number') || ($type eq 'integer') || ($type eq 'float')) {
-			if(defined $spec->{min}) {
-				push @tests, { %{$foundation}, ( $field => $spec->{min} + 1 ) };	# just inside
-				push @tests, { %{$foundation}, ( $field => $spec->{min} ) };	# border
-				# Test 0 if it's in range
-				push @tests, { %{$foundation}, ( $field => 0 ) } if($spec->{'min'} < -1);
-				if(!defined($spec->{'max'})) {
-					if($type eq 'integer') {
-						push @tests, { %{$foundation}, ( $field => abs(rand_int()) ) };
-					} else {
-						push @tests, { %{$foundation}, ( $field => abs(rand_num()) ) };
-					}
-				}
-			} else {
-				push @tests, { %{$foundation}, ( $field => 0 ) };	# No min, so 0 should be allowable
-				push @tests, { %{$foundation}, ( $field => (($type eq 'integer') ? -1 : -0.1), _LINE => __LINE__ ) };	# No min, so -1 should be allowable
-				if(defined($spec->{'max'})) {
-					if($type eq 'integer') {
-						push @tests, { %{$foundation}, ( $field => $spec->{'max'} - abs(rand_int()) ) };
-					} else {
-						push @tests, { %{$foundation}, ( $field => $spec->{'max'} - abs(rand_num()) ) };
-					}
-				} else {
-					if($type eq 'integer') {
-						push @tests, { %{$foundation}, ( $field => rand_int() ) };
-					} else {
-						push @tests, { %{$foundation}, ( $field => rand_num() ) };
-					}
-				}
-			}
-			if(defined $spec->{max}) {
-				push @tests, { %{$foundation}, ( $field => $spec->{max} - (($type eq 'integer') ? 1 : 0.1 ) ) };	# just inside
-				if((defined $spec->{min}) && ($spec->{'min'} != $spec->{'max'})) {
-					push @tests, { %{$foundation}, ( $field => $spec->{max} ) };	# border
-				}
-			}
-		} elsif($type eq 'string') {
-			if(defined $spec->{min}) {
-				push @tests, { %{$foundation}, ( $field => rand_str($spec->{min} + 1) ) };	# just inside
-				push @tests, { %{$foundation}, ( $field => rand_str($spec->{min}) ) };	# border
-			} else {
-				push @tests, { %{$foundation}, ( $field => rand_str() ) };
-			}
-			if(defined $spec->{max}) {
-				push @tests, { %{$foundation}, ( $field => rand_str($spec->{max} - 1) ) };	# just inside
-				if((defined $spec->{min}) && ($spec->{'min'} != $spec->{'max'})) {
-					push @tests, { %{$foundation}, ( $field => rand_str($spec->{max}) ) };	# border
-				}
-			}
-		} elsif($type eq 'boolean') {
-			push @tests, { %{$foundation}, ( $field => 1 ) }, { %{$foundation}, ( $field => 0 ) };
-		} elsif ($type eq 'arrayref') {
-			if(defined $spec->{min}) {
-				push @tests, { %{$foundation}, ( $field => rand_arrayref($spec->{min} + 1) ) };	# just inside
-				push @tests, { %{$foundation}, ( $field => rand_arrayref($spec->{min}) ) };	# border
-			} else {
-				push @tests, { %{$foundation}, ( $field => rand_arrayref() ) };
-			}
-			if(defined $spec->{max}) {
-				push @tests, { %{$foundation}, ( $field => rand_arrayref($spec->{max} - 1) ) };	# just inside
-				if((defined $spec->{min}) && ($spec->{'min'} != $spec->{'max'})) {
-					push @tests, { %{$foundation}, ( $field => rand_arrayref($spec->{max}) ) };	# border
-				}
-			}
-		} else {
-			die("TODO: transform type $type for test case");
-		}
-	}
-
-	if($config{'dedup'}) {
-		# dedup, fuzzing can easily generate repeats
-		my %seen;
-		@tests = grep {
-			my $dump = encode_json($_);
-			!$seen{$dump}++
-		} @tests;
-	}
-
-	{
-		# local %ENV;
-		my $transform_output = $transforms{$transform}{'output'} || {};
-		foreach my $test(@tests) {
-			if(my $line = (delete $test->{'_LINE'} || delete $input{'_LINE'})) {
-				diag("Test case from line number $line") if($ENV{'TEST_VERBOSE'});
-			}
-			run_test({ _NAME => $transform }, $test, $transform_output, $positions);
-			# delete $ENV{'LANG'};
-			# delete $ENV{'LC_ALL'};
-			# run_test({ _NAME => $transform }, $test, \%output, $positions);
-			# $ENV{'LANG'} = 'fr_FR.utf8';
-			# $ENV{'LC_ALL'} = 'fr_FR.utf8';
-			# run_test({ _NAME => $transform }, $test, \%output, $positions);
-		}
-	}
-}
-
-[% corpus_code %]
-
-done_testing();
 __END__

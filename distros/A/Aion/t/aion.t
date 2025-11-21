@@ -1,11 +1,11 @@
-use common::sense; use open qw/:std :utf8/;  use Carp qw//; use Cwd qw//; use File::Basename qw//; use File::Find qw//; use File::Slurper qw//; use File::Spec qw//; use File::Path qw//; use Scalar::Util qw//;  use Test::More 0.98;  BEGIN { 	$SIG{__DIE__} = sub { 		my ($msg) = @_; 		if(ref $msg) { 			$msg->{STACKTRACE} = Carp::longmess "?" if "HASH" eq Scalar::Util::reftype $msg; 			die $msg; 		} else { 			die Carp::longmess defined($msg)? $msg: "undef" 		} 	}; 	 	my $t = File::Slurper::read_text(__FILE__); 	 	my @dirs = File::Spec->splitdir(File::Basename::dirname(Cwd::abs_path(__FILE__))); 	my $project_dir = File::Spec->catfile(@dirs[0..$#dirs-1]); 	my $project_name = $dirs[$#dirs-1]; 	my @test_dirs = @dirs[$#dirs-1+2 .. $#dirs];  	my $dir_for_tests = File::Spec->catfile(File::Spec->tmpdir, ".liveman", $project_name, join("!", @test_dirs, File::Basename::basename(__FILE__))); 	 	File::Find::find(sub { chmod 0700, $_ if !/^\.{1,2}\z/ }, $dir_for_tests), File::Path::rmtree($dir_for_tests) if -e $dir_for_tests; 	File::Path::mkpath($dir_for_tests); 	 	chdir $dir_for_tests or die "chdir $dir_for_tests: $!"; 	 	push @INC, "$project_dir/lib", "lib"; 	 	$ENV{PROJECT_DIR} = $project_dir; 	$ENV{DIR_FOR_TESTS} = $dir_for_tests; 	 	while($t =~ /^#\@> (.*)\n((#>> .*\n)*)#\@< EOF\n/gm) { 		my ($file, $code) = ($1, $2); 		$code =~ s/^#>> //mg; 		File::Path::mkpath(File::Basename::dirname($file)); 		File::Slurper::write_text($file, $code); 	} } # 
+use common::sense; use open qw/:std :utf8/;  use Carp qw//; use Cwd qw//; use File::Basename qw//; use File::Find qw//; use File::Slurper qw//; use File::Spec qw//; use File::Path qw//; use Scalar::Util qw//;  use Test::More 0.98;  BEGIN { 	$SIG{__DIE__} = sub { 		my ($msg) = @_; 		if(ref $msg) { 			$msg->{STACKTRACE} = Carp::longmess "?" if "HASH" eq Scalar::Util::reftype $msg; 			die $msg; 		} else { 			die Carp::longmess defined($msg)? $msg: "undef" 		} 	}; 	 	my $t = File::Slurper::read_text(__FILE__); 	 	my @dirs = File::Spec->splitdir(File::Basename::dirname(Cwd::abs_path(__FILE__))); 	my $project_dir = File::Spec->catfile(@dirs[0..$#dirs-1]); 	my $project_name = $dirs[$#dirs-1]; 	my @test_dirs = @dirs[$#dirs-1+2 .. $#dirs];  	$ENV{TMPDIR} = $ENV{LIVEMAN_TMPDIR} if exists $ENV{LIVEMAN_TMPDIR};  	my $dir_for_tests = File::Spec->catfile(File::Spec->tmpdir, ".liveman", $project_name, join("!", @test_dirs, File::Basename::basename(__FILE__))); 	 	File::Find::find(sub { chmod 0700, $_ if !/^\.{1,2}\z/ }, $dir_for_tests), File::Path::rmtree($dir_for_tests) if -e $dir_for_tests; 	File::Path::mkpath($dir_for_tests); 	 	chdir $dir_for_tests or die "chdir $dir_for_tests: $!"; 	 	push @INC, "$project_dir/lib", "lib"; 	 	$ENV{PROJECT_DIR} = $project_dir; 	$ENV{DIR_FOR_TESTS} = $dir_for_tests; 	 	while($t =~ /^#\@> (.*)\n((#>> .*\n)*)#\@< EOF\n/gm) { 		my ($file, $code) = ($1, $2); 		$code =~ s/^#>> //mg; 		File::Path::mkpath(File::Basename::dirname($file)); 		File::Slurper::write_text($file, $code); 	} } # 
 # # NAME
 # 
 # Aion - постмодернистская объектная система для Perl 5, такая как «Mouse», «Moose», «Moo», «Mo» и «M», но с улучшениями
 # 
 # # VERSION
 # 
-# 1.0
+# 1.1
 # 
 # # SYNOPSIS
 # 
@@ -260,14 +260,14 @@ package NewExample { use Aion;
 	has z => (is => 'ro-', isa => Num);
 }
 
-::cmp_ok do { eval {NewExample->new(f => 5)}; $@ }, '=~', '^' . quotemeta 'y required!', 'NewExample->new(f => 5) # @-> y required!';
-::cmp_ok do { eval {NewExample->new(f => 5, y => 10)}; $@ }, '=~', '^' . quotemeta 'f is\'nt feature!', 'NewExample->new(f => 5, y => 10) # @-> f is\'nt feature!';
-::cmp_ok do { eval {NewExample->new(f => 5, p => 6, y => 10)}; $@ }, '=~', '^' . quotemeta 'f, p is\'nt features!', 'NewExample->new(f => 5, p => 6, y => 10) # @-> f, p is\'nt features!';
-::cmp_ok do { eval {NewExample->new(z => 10, y => 10)}; $@ }, '=~', '^' . quotemeta 'z excessive!', 'NewExample->new(z => 10, y => 10) # @-> z excessive!';
+eval {NewExample->new(f => 5)}; ok defined($@), 'NewExample->new(f => 5) # @-> y required!'; ::cmp_ok $@, '=~', '^' . quotemeta 'y required!', 'NewExample->new(f => 5) # @-> y required!';
+eval {NewExample->new(f => 5, y => 10)}; ok defined($@), 'NewExample->new(f => 5, y => 10) # @-> f is\'nt feature!'; ::cmp_ok $@, '=~', '^' . quotemeta 'f is\'nt feature!', 'NewExample->new(f => 5, y => 10) # @-> f is\'nt feature!';
+eval {NewExample->new(f => 5, p => 6, y => 10)}; ok defined($@), 'NewExample->new(f => 5, p => 6, y => 10) # @-> f, p is\'nt features!'; ::cmp_ok $@, '=~', '^' . quotemeta 'f, p is\'nt features!', 'NewExample->new(f => 5, p => 6, y => 10) # @-> f, p is\'nt features!';
+eval {NewExample->new(z => 10, y => 10)}; ok defined($@), 'NewExample->new(z => 10, y => 10) # @-> z excessive!'; ::cmp_ok $@, '=~', '^' . quotemeta 'z excessive!', 'NewExample->new(z => 10, y => 10) # @-> z excessive!';
 
 my $ex = NewExample->new(y => 8);
 
-::cmp_ok do { eval {$ex->x}; $@ }, '=~', '^' . quotemeta 'Get feature x must have the type Num. The it is undef!', '$ex->x # @-> Get feature x must have the type Num. The it is undef!';
+eval {$ex->x}; ok defined($@), '$ex->x # @-> Get feature x must have the type Num. The it is undef!'; ::cmp_ok $@, '=~', '^' . quotemeta 'Get feature x must have the type Num. The it is undef!', '$ex->x # @-> Get feature x must have the type Num. The it is undef!';
 
 $ex = NewExample->new(x => 10.1, y => 8);
 
@@ -349,8 +349,8 @@ package ExIs { use Aion;
 	has wo => (is => 'wo-?');
 }
 
-::cmp_ok do { eval {ExIs->new}; $@ }, '=~', '^' . quotemeta 'ro required!', 'ExIs->new # @-> ro required!';
-::cmp_ok do { eval {ExIs->new(ro => 10, wo => -10)}; $@ }, '=~', '^' . quotemeta 'wo excessive!', 'ExIs->new(ro => 10, wo => -10) # @-> wo excessive!';
+eval {ExIs->new}; ok defined($@), 'ExIs->new # @-> ro required!'; ::cmp_ok $@, '=~', '^' . quotemeta 'ro required!', 'ExIs->new # @-> ro required!';
+eval {ExIs->new(ro => 10, wo => -10)}; ok defined($@), 'ExIs->new(ro => 10, wo => -10) # @-> wo excessive!'; ::cmp_ok $@, '=~', '^' . quotemeta 'wo excessive!', 'ExIs->new(ro => 10, wo => -10) # @-> wo excessive!';
 
 ::is scalar do {ExIs->new(ro => 10)->has_rw}, scalar do{""}, 'ExIs->new(ro => 10)->has_rw # -> ""';
 ::is scalar do {ExIs->new(ro => 10, rw => 20)->has_rw}, scalar do{1}, 'ExIs->new(ro => 10, rw => 20)->has_rw # -> 1';
@@ -359,7 +359,7 @@ package ExIs { use Aion;
 ::is scalar do {ExIs->new(ro => 10)->ro}, scalar do{10}, 'ExIs->new(ro => 10)->ro  # -> 10';
 
 ::is scalar do {ExIs->new(ro => 10)->wo(30)->has_wo}, scalar do{1}, 'ExIs->new(ro => 10)->wo(30)->has_wo # -> 1';
-::cmp_ok do { eval {ExIs->new(ro => 10)->wo}; $@ }, '=~', '^' . quotemeta 'Feature wo cannot be get!', 'ExIs->new(ro => 10)->wo # @-> Feature wo cannot be get!';
+eval {ExIs->new(ro => 10)->wo}; ok defined($@), 'ExIs->new(ro => 10)->wo # @-> Feature wo cannot be get!'; ::cmp_ok $@, '=~', '^' . quotemeta 'Feature wo cannot be get!', 'ExIs->new(ro => 10)->wo # @-> Feature wo cannot be get!';
 ::is scalar do {ExIs->new(ro => 10)->rw(30)->rw}, scalar do{30}, 'ExIs->new(ro => 10)->rw(30)->rw  # -> 30';
 
 # 
@@ -394,8 +394,8 @@ package ExIsa { use Aion;
 	has x => (is => 'ro', isa => Int);
 }
 
-::cmp_ok do { eval {ExIsa->new(x => 'str')}; $@ }, '=~', '^' . quotemeta 'Set feature x must have the type Int. The it is \'str\'!', 'ExIsa->new(x => \'str\') # @-> Set feature x must have the type Int. The it is \'str\'!';
-::cmp_ok do { eval {ExIsa->new->x}; $@ }, '=~', '^' . quotemeta 'Get feature x must have the type Int. The it is undef!', 'ExIsa->new->x # @-> Get feature x must have the type Int. The it is undef!';
+eval {ExIsa->new(x => 'str')}; ok defined($@), 'ExIsa->new(x => \'str\') # @-> Set feature x must have the type Int. The it is \'str\'!'; ::cmp_ok $@, '=~', '^' . quotemeta 'Set feature x must have the type Int. The it is \'str\'!', 'ExIsa->new(x => \'str\') # @-> Set feature x must have the type Int. The it is \'str\'!';
+eval {ExIsa->new->x}; ok defined($@), 'ExIsa->new->x # @-> Get feature x must have the type Int. The it is undef!'; ::cmp_ok $@, '=~', '^' . quotemeta 'Get feature x must have the type Int. The it is undef!', 'ExIsa->new->x # @-> Get feature x must have the type Int. The it is undef!';
 ::is scalar do {ExIsa->new(x => 10)->x}, scalar do{10}, 'ExIsa->new(x => 10)->x			  # -> 10';
 
 # 
@@ -643,8 +643,8 @@ my $anim = MaybeCat->new;
 ::is scalar do {$anim->is_cat('cat')}, scalar do{1}, '$anim->is_cat(\'cat\')	# -> 1';
 ::is scalar do {$anim->is_cat('dog')}, scalar do{""}, '$anim->is_cat(\'dog\')	# -> ""';
 
-::cmp_ok do { eval {MaybeCat->is_cat("cat")}; $@ }, '=~', '^' . quotemeta 'Arguments of method `is_cat` must have the type Tuple[Me, Str].', 'MaybeCat->is_cat("cat") # @-> Arguments of method `is_cat` must have the type Tuple[Me, Str].';
-::cmp_ok do { eval {my @items = $anim->is_cat("cat")}; $@ }, '=~', '^' . quotemeta 'Returns of method `is_cat` must have the type Tuple[Bool].', 'my @items = $anim->is_cat("cat") # @-> Returns of method `is_cat` must have the type Tuple[Bool].';
+eval {MaybeCat->is_cat("cat")}; ok defined($@), 'MaybeCat->is_cat("cat") # @-> Arguments of method `is_cat` must have the type Tuple[Me, Str].'; ::cmp_ok $@, '=~', '^' . quotemeta 'Arguments of method `is_cat` must have the type Tuple[Me, Str].', 'MaybeCat->is_cat("cat") # @-> Arguments of method `is_cat` must have the type Tuple[Me, Str].';
+eval {my @items = $anim->is_cat("cat")}; ok defined($@), 'my @items = $anim->is_cat("cat") # @-> Returns of method `is_cat` must have the type Tuple[Bool].'; ::cmp_ok $@, '=~', '^' . quotemeta 'Returns of method `is_cat` must have the type Tuple[Bool].', 'my @items = $anim->is_cat("cat") # @-> Returns of method `is_cat` must have the type Tuple[Bool].';
 
 # 
 # Атрибут Isa позволяет объявить требуемые функции:
@@ -672,7 +672,7 @@ package Mouse { use Aion; with qw/Anim/;
 
 ::is scalar do {Cat->new->is_cat}, scalar do{1}, 'Cat->new->is_cat # -> 1';
 ::is scalar do {Dog->new->is_cat}, scalar do{0}, 'Dog->new->is_cat # -> 0';
-::cmp_ok do { eval {Mouse->new}; $@ }, '=~', '^' . quotemeta 'Signature mismatch: is_cat(Me => Bool) of Anim <=> is_cat(Me => Int) of Mouse', 'Mouse->new # @-> Signature mismatch: is_cat(Me => Bool) of Anim <=> is_cat(Me => Int) of Mouse';
+eval {Mouse->new}; ok defined($@), 'Mouse->new # @-> Signature mismatch: is_cat(Me => Bool) of Anim <=> is_cat(Me => Int) of Mouse'; ::cmp_ok $@, '=~', '^' . quotemeta 'Signature mismatch: is_cat(Me => Bool) of Anim <=> is_cat(Me => Int) of Mouse', 'Mouse->new # @-> Signature mismatch: is_cat(Me => Bool) of Anim <=> is_cat(Me => Int) of Mouse';
 
 # 
 # # AUTHOR

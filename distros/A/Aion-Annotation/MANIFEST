@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+doc/badges/total.svg
+i18n/Aion/Annotation.ru-en.po
+lib/Aion/Annotation.md
+lib/Aion/Annotation.pm
+minil.toml
+script/aion-scan
+t/aion/annotation.t
+META.yml
+MANIFEST

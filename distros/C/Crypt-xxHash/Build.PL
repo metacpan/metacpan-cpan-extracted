@@ -36,17 +36,17 @@ my $build = Module::Build->new(
     license             => 'bsd',
     create_readme       => 1,
     configure_requires  => {
-        'Module::Build' => 0.19, # xs
+        'Module::Build' => undef, # xs
     },
     config => {
         $has_cpp_compiler ? (cc => 'c++', ld => 'c++') : (),
     },
     build_requires       => {
-        'File::Which'        => 1.21,
-        'IPC::Run'           => '20200505.0',
-        'ExtUtils::CBuilder' => 0.280225,
-        'Test::More'         => 1.302171,
-        'Math::Int64'        => '0.54' # 32bit perl without int64 :\
+        'File::Which'        => undef,
+        'IPC::Run'           => undef,
+        'ExtUtils::CBuilder' => undef,
+        'Test::More'         => undef,
+        'Math::Int64'        => undef # 32bit perl without int64 :\
     },
     requires       => {
 	},
@@ -70,3 +70,5 @@ $build->create_build_script;
 
 1;
 __END__
+
+${EXTLIB_PROJECT}-${version}.tar.gz

@@ -1,6 +1,7 @@
+!ru:en
 # NAME
 
-Aion::Type - class of validators
+Aion::Type - класс валидаторов
 
 # SYNOPSIS
 
@@ -32,28 +33,26 @@ eval { $Int->validate("a", "..Eval..") }; $@	# ~> ..Eval.. must have the type In
 
 # DESCRIPTION
 
-This is construct for make any validators.
-
-It using in `Aion::Types::subtype`.
+Порождает валидаторы. Используется в `Aion::Types::subtype`.
 
 # METHODS
 
 ## new (%ARGUMENTS)
 
-Constructor.
+Конструктор.
 
 ### ARGUMENTS
 
-* name (Str) — Name of type.
-* args (ArrayRef) — List of type arguments.
-* init (CodeRef) — Initializer for type.
-* test (CodeRef) — Values cheker.
-* a_test (CodeRef) — Values cheker for types with optional arguments.
-* coerce (ArrayRef[Tuple[Aion::Type, CodeRef]]) — Array of pairs: type and via.
+* name (Str) — Название типа.
+* args (ArrayRef) — Список аргументов типа.
+* init (CodeRef) — Инициализатор типа.
+* test (CodeRef) — Чекер.
+* a_test (CodeRef) — Чекер значений для типов с необязательными аргументами.
+* coerce (ArrayRef[Tuple[Aion::Type, CodeRef]]) — Массив пар: тип и переход.
 
 ## stringify
 
-Stringify of object (name with arguments):
+Строковое преобразование объекта (имя с аргументами):
 
 ```perl
 my $Char = Aion::Type->new(name => "Char");
@@ -68,7 +67,7 @@ my $Int = Aion::Type->new(
 $Int->stringify  #=> Int[3, 5]
 ```
 
-Stringify operations:
+Операции так же преобразуются в строку:
 
 ```perl
 ($Int & $Char)->stringify   # => ( Int[3, 5] & Char )
@@ -76,7 +75,7 @@ Stringify operations:
 (~$Int)->stringify		  # => ~Int[3, 5]
 ```
 
-The operations is objects of `Aion::Type` with special names:
+Операции — это объекты `Aion::Type` со специальными именами:
 
 ```perl
 Aion::Type->new(name => "Exclude", args => [$Int, $Char])->stringify   # => ~( Int[3, 5] | Char )
@@ -86,7 +85,7 @@ Aion::Type->new(name => "Intersection", args => [$Int, $Char])->stringify   # =>
 
 ## test
 
-Testing the `$_` belongs to the class.
+Тестирует, что `$_` принадлежит классу.
 
 ```perl
 my $PositiveInt = Aion::Type->new(
@@ -102,7 +101,7 @@ $PositiveInt->test  # -> ""
 
 ## init
 
-Initial the validator.
+Инициализатор валидатора.
 
 ```perl
 my $Range = Aion::Type->new(
@@ -127,7 +126,7 @@ $Range->init;
 
 ## include ($element)
 
-checks whether the argument belongs to the class.
+Проверяет, принадлежит ли аргумент классу.
 
 ```perl
 my $PositiveInt = Aion::Type->new(
@@ -141,7 +140,7 @@ $PositiveInt->include(-6) # -> ""
 
 ## exclude ($element)
 
-Checks that the argument does not belong to the class.
+Проверяет, что аргумент не принадлежит классу.
 
 ```perl
 my $PositiveInt = Aion::Type->new(
@@ -155,7 +154,7 @@ $PositiveInt->exclude(-6) # -> 1
 
 ## coerce ($value)
 
-Coerce `$value` to the type, if coerce from type and function is in `$self->{coerce}`.
+Привести `$value` к типу, если приведение из типа и функции находится в `$self->{coerce}`.
 
 ```perl
 my $Int = Aion::Type->new(name => "Int", test => sub { /^-?\d+\z/ });
@@ -172,7 +171,7 @@ $Int->coerce("abc")  # => abc
 
 ## detail ($element, $feature)
 
-Return message belongs to error.
+Формирует сообщение ошибки.
 
 ```perl
 my $Int = Aion::Type->new(name => "Int");
@@ -183,14 +182,14 @@ my $Num = Aion::Type->new(name => "Num", message => sub {
 	"Error: $_ is'nt $Aion::Type::SELF->{N}!"
 });
 
-$Num->detail("x", "car")  # => Error: x is'nt car!
+$Num->detail("x", "car") # => Error: x is'nt car!
 ```
 
 `$Aion::Type::SELF->{N}` equivalent to `N` in context of `Aion::Types`.
 
 ## validate ($element, $feature)
 
-It tested `$element` and throw `detail` if element is exclude from class.
+Проверяет `$element` и выбрасывает сообщение `detail`, если элемент не принадлежит классу.
 
 ```perl
 my $PositiveInt = Aion::Type->new(
@@ -201,7 +200,7 @@ my $PositiveInt = Aion::Type->new(
 eval {
 	$PositiveInt->validate(-1, "Neg")
 };
-$@   # ~> Neg must have the type PositiveInt. The it is -1
+$@ # ~> Neg must have the type PositiveInt. The it is -1
 ```
 
 ## val_to_str ($val)
@@ -209,28 +208,28 @@ $@   # ~> Neg must have the type PositiveInt. The it is -1
 Переводит `$val` в строку.
 
 ```perl
-Aion::Type->new->val_to_str([1,2,{x=>6}])   # => [1, 2, {x => 6}]
+Aion::Type->new->val_to_str([1,2,{x=>6}]) # => [1, 2, {x => 6}]
 ```
 
 ## instanceof ($type)
 
-Determines that the type is a subtype of a different $type.
+Определяет, что тип является подтипом другого `$type`.
 
 ```perl
 my $int = Aion::Type->new(name => "Int");
 my $positiveInt = Aion::Type->new(name => "PositiveInt", as => $int);
 
-$positiveInt->instanceof($int)		  # -> 1
+$positiveInt->instanceof($int)          # -> 1
 $positiveInt->instanceof($positiveInt)  # -> 1
-$positiveInt->instanceof('Int')		 # -> 1
+$positiveInt->instanceof('Int')         # -> 1
 $positiveInt->instanceof('PositiveInt') # -> 1
-$int->instanceof('PositiveInt')		 # -> ""
-$int->instanceof('Int')				 # -> 1
+$int->instanceof('PositiveInt')         # -> ""
+$int->instanceof('Int')                 # -> 1
 ```
 
 ## make ($pkg)
 
-It make subroutine without arguments, who return type.
+Создаёт подпрограмму без аргументов, которая возвращает тип.
 
 ```perl
 BEGIN {
@@ -240,13 +239,13 @@ BEGIN {
 "IX" ~~ Rim	 # => 1
 ```
 
-Property `init` won't use with `make`.
+Свойство `init` не может использоваться с `make`.
 
 ```perl
 eval { Aion::Type->new(name=>"Rim", init => sub {...})->make(__PACKAGE__) }; $@ # ~> init_where won't work in Rim
 ```
 
-If subroutine make'nt, then died.
+Если подпрограмма не может быть создана, то выбрасывается исключение.
 
 ```perl
 eval { Aion::Type->new(name=>"Rim")->make }; $@ # ~> syntax error
@@ -254,7 +253,7 @@ eval { Aion::Type->new(name=>"Rim")->make }; $@ # ~> syntax error
 
 ## make_arg ($pkg)
 
-It make subroutine with arguments, who return type.
+Создает подпрограмму с аргументами, которая возвращает тип.
 
 ```perl
 BEGIN {
@@ -266,7 +265,7 @@ BEGIN {
 "IX" ~~ Len[2,2]	# => 1
 ```
 
-If subroutine make'nt, then died.
+Если подпрограмма не может быть создана, то выбрасывается исключение.
 
 ```perl
 eval { Aion::Type->new(name=>"Rim")->make_arg }; $@ # ~> syntax error
@@ -274,7 +273,7 @@ eval { Aion::Type->new(name=>"Rim")->make_arg }; $@ # ~> syntax error
 
 ## make_maybe_arg ($pkg)
 
-It make subroutine with or without arguments, who return type.
+Создает подпрограмму с аргументами, которая возвращает тип.
 
 ```perl
 BEGIN {
@@ -290,7 +289,7 @@ BEGIN {
 5 ~~ Enum123[4,5,6]	 # -> 1
 ```
 
-If subroutine make'nt, then died.
+Если подпрограмма не может быть создана, то выбрасывается исключение.
 
 ```perl
 eval { Aion::Type->new(name=>"Rim")->make_maybe_arg }; $@ # ~> syntax error
@@ -298,7 +297,7 @@ eval { Aion::Type->new(name=>"Rim")->make_maybe_arg }; $@ # ~> syntax error
 
 ## equal ($type)
 
-Types are equal when they have the same name, the same number of arguments, parent and arguments are equal.
+Типы равны, если они имеют одинаковое имя, одинаковое количество аргументов, родительский элемент и аргументы равны.
 
 ```perl
 my $Int = Aion::Type->new(name => "Int");
@@ -309,23 +308,23 @@ my $AnotherIntWithArgs = Aion::Type->new(name => "Int", args => [1, 2]);
 my $IntWithDifferentArgs = Aion::Type->new(name => "Int", args => [3, 4]);
 my $Str = Aion::Type->new(name => "Str");
 
-$Int->equal($Int)                     # -> 1
-$Int->equal($AnotherInt)              # -> 1
+$Int->equal($Int)                        # -> 1
+$Int->equal($AnotherInt)                 # -> 1
 $IntWithArgs->equal($AnotherIntWithArgs) # -> 1
-$PositiveInt->equal($PositiveInt)     # -> 1
+$PositiveInt->equal($PositiveInt)        # -> 1
 
-$Int->equal($Str)                     # -> ""
-$Int->equal($IntWithArgs)             # -> ""
+$Int->equal($Str)                          # -> ""
+$Int->equal($IntWithArgs)                  # -> ""
 $IntWithArgs->equal($IntWithDifferentArgs) # -> ""
-$PositiveInt->equal($Int)             # -> ""
+$PositiveInt->equal($Int)                  # -> ""
 
-$Int->equal("not a type")             # -> ""
+$Int->equal("not a type") # -> ""
 
 my $PositiveInt2 = Aion::Type->new(name => "PositiveInt", as => $Str);
-$PositiveInt->equal($PositiveInt2)    # -> ""
+$PositiveInt->equal($PositiveInt2) # -> ""
 
-$Int->equal($PositiveInt)             # -> ""
-$PositiveInt->equal($Int)             # -> ""
+$Int->equal($PositiveInt) # -> ""
+$PositiveInt->equal($Int) # -> ""
 
 my $PositiveIntWithArgs = Aion::Type->new(name => "PositiveInt", as => $Int, args => [1]);
 my $PositiveIntWithArgs2 = Aion::Type->new(name => "PositiveInt", as => $Int, args => [2]);
@@ -334,7 +333,7 @@ $PositiveIntWithArgs->equal($PositiveIntWithArgs2) # -> ""
 
 ## nonequal ($type)
 
-Inverse of equal.
+Обратная операция к `equal`.
 
 ```perl
 my $Int = Aion::Type->new(name => "Int");
@@ -346,33 +345,33 @@ $Int ne $PositiveInt         # -> 1
 
 ## args ()
 
-The list of arguments.
+Список аргументов.
 
 ## name ()
 
-The name of type.
+Имя типа.
 
 ## as ()
 
-The parent type.
+Родительский тип.
 
 ## message (;&message)
 
-Getter/setter for message. Message use for generate error message.
+Акцессор сообщения. Использует `&message` для генерации сообщения об ошибке.
 
 ## title (;$title)
 
-Getter/setter for title (using for swagger).
+Акцессор заголовка (используется для создания схемы **swagger**).
 
 ## description (;$description)
 
-Getter/setter for description (using for swagger).
+Акцессор описания (используется для создания схемы **swagger**).
 
 # OPERATORS
 
 ## &{}
 
-It make the object is callable.
+Делает объект вызываемым.
 
 ```perl
 my $PositiveInt = Aion::Type->new(
@@ -389,7 +388,7 @@ $PositiveInt->()	# -> ""
 
 ## ""
 
-Stringify object.
+Стрингифицирует объект.
 
 ```perl
 Aion::Type->new(name => "Int") . ""   # => Int
@@ -401,7 +400,7 @@ my $Enum = Aion::Type->new(name => "Enum", args => [qw/A B C/]);
 
 ## $a | $b
 
-It make new type as union of `$a` and `$b`.
+Создает новый тип как объединение `$a` и `$b`.
 
 ```perl
 my $Int = Aion::Type->new(name => "Int", test => sub { /^-?\d+$/ });
@@ -416,7 +415,7 @@ my $IntOrChar = $Int | $Char;
 
 ## $a & $b
 
-It make new type as intersection of `$a` and `$b`.
+Создает новый тип как пересечение `$a` и `$b`.
 
 ```perl
 my $Int = Aion::Type->new(name => "Int", test => sub { /^-?\d+$/ });
@@ -431,7 +430,7 @@ my $Digit = $Int & $Char;
 
 ## ~ $a
 
-It make exclude type from `$a`.
+Создает новый тип как исключение из `$a`.
 
 ```perl
 my $Int = Aion::Type->new(name => "Int", test => sub { /^-?\d+$/ });
@@ -440,26 +439,28 @@ my $Int = Aion::Type->new(name => "Int", test => sub { /^-?\d+$/ });
 5   ~~ ~$Int; # -> ""
 ```
 
-## $a eq $b
+## $a eq $b, $a == $b
 
-`$a` equal `$b`.
+`$a` равно `$b`.
 
 ```perl
 my $Int1 = Aion::Type->new(name => "Int");
 my $Int2 = Aion::Type->new(name => "Int");
 
 $Int1 eq $Int2 # -> 1
+$Int1 == $Int2 # -> 1
 ```
 
-## $a ne $b
+## $a ne $b, $a != $b
 
-`$a` not equal `$b`.
+`$a` не равно `$b`.
 
 ```perl
 my $Int1 = Aion::Type->new(name => "Int");
 my $Int2 = Aion::Type->new(name => "Int");
 
 $Int1 ne $Int2 # -> ""
+$Int1 != $Int2 # -> ""
 123 ne $Int2 # -> 1
 ```
 

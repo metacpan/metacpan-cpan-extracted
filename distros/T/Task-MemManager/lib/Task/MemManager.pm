@@ -1,5 +1,5 @@
 package Task::MemManager;
-$Task::MemManager::VERSION = '0.09';
+$Task::MemManager::VERSION = '0.10';
 # ABSTRACT: A memory allocator for low level code in Perl.
 use strict;
 use warnings;
@@ -342,6 +342,7 @@ sub DESTROY {
     delete $size_of_element{$identifier};
     delete $num_of_elements{$identifier};
     delete $creation_opts{$identifier};
+    delete $memory_region{$identifier};
 }
 ###############################################################################
 # Usage       : Task::MemManager->extract_buffer_region(pos_start, pos_end);
@@ -442,7 +443,7 @@ Task::MemManager - A memory allocated and manager for low level code in Perl.
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 

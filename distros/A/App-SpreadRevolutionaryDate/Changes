@@ -1,6 +1,9 @@
 Changelog for App-SpreadRevolutionaryDate
 
-0.51 2025-06-09T12:15:44
+0.52 2025-11-20T11:13:34
+ - Fix undefined options img_* for MsgPrompt
+
+0.51 2025-06-09T12:15:44Z
  - Fix easter eggs url only for configured day
  - Fix error message for cpan testers on bsd
 
