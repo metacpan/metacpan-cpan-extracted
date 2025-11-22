@@ -1,5 +1,10 @@
 Revision history for Char-Replace
 
+0.006     2025-11-21 16:07:16-07:00 America/Denver
+
+- Fix compiling issue with threaded Perl versions
+- Fix compiling warnings
+
 0.005     2025-05-18 15:27:02-06:00 America/Denver
 
 - Fix compiler error due to incorrect pointer type in Newx cal

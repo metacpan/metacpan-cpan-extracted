@@ -29,43 +29,63 @@ Extends L<"DESCRIPTION" in HTML::FromMail::Format|HTML::FromMail::Format/"DESCRI
 
 Extends L<"METHODS" in HTML::FromMail::Format|HTML::FromMail::Format/"METHODS">.
 
+=head2 Constructors
+
+Extends L<"Constructors" in HTML::FromMail::Format|HTML::FromMail::Format/"Constructors">.
+
 =over 4
 
-=item $obj-E<gt>B<containerText>(ARGS)
-
-Inherited, see L<HTML::FromMail::Format/"METHODS">
-
-=item $obj-E<gt>B<expand>(ARGS, TAG, ATTRS, TEXTREF)
-
-Kind of autoloader, used to discover the correct method to be invoked
-when a pattern must be filled-in.
-
-=item $obj-E<gt>B<lookup>(TAG, ARGS)
-
-Inherited, see L<HTML::FromMail::Format/"METHODS">
-
-=item $class-E<gt>B<new>(OPTIONS)
+=item $class-E<gt>B<new>(%options)
 
 Z<>
 
-=item $obj-E<gt>B<onFinalToken>(ARGS)
+=back
 
-Inherited, see L<HTML::FromMail::Format/"METHODS">
+=head2 Attributes
+
+Extends L<"Attributes" in HTML::FromMail::Format|HTML::FromMail::Format/"Attributes">.
+
+=over 4
 
 =item $obj-E<gt>B<oodoc>()
 
 Returns the L<OODoc::Template> object which is used.
 
-=item $obj-E<gt>B<processText>(TEXT, ARGS)
+=back
 
-Inherited, see L<HTML::FromMail::Format/"METHODS">
+=head2 Other methods
+
+Extends L<"Other methods" in HTML::FromMail::Format|HTML::FromMail::Format/"Other methods">.
+
+=over 4
+
+=item $obj-E<gt>B<containerText>(\%options)
+
+Inherited, see L<HTML::FromMail::Format/"Other methods">
+
+=item $obj-E<gt>B<expand>(\%options, $tag, \%attrs, \$text)
+
+Kind of autoloader, used to discover the correct method to be invoked
+when a pattern must be filled-in.
+
+=item $obj-E<gt>B<lookup>($tag, \%options)
+
+Inherited, see L<HTML::FromMail::Format/"Other methods">
+
+=item $obj-E<gt>B<onFinalToken>(\%options)
+
+Inherited, see L<HTML::FromMail::Format/"Other methods">
+
+=item $obj-E<gt>B<processText>($template, \%options)
+
+Inherited, see L<HTML::FromMail::Format/"Other methods">
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of HTML-FromMail version 3.00,
-built on November 19, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of HTML-FromMail version 3.01,
+built on November 21, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

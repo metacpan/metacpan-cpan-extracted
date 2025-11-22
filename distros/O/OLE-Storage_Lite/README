@@ -8,7 +8,7 @@ DESCRIPTION
     Macintosh platforms.
 
 REQUIREMENT
-     Perl 5.005 or later.
+     Perl 5.006 or later.
 
 INSTALLATION
     The module can be installed using the standard Perl procedure:

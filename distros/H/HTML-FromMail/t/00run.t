@@ -3,7 +3,14 @@ use Test::More;
 
 use_ok 'HTML::FromMail::Default::HTMLifiers';
 use_ok 'HTML::FromMail::Default::Previewers';
-use_ok 'HTML::FromMail::Format::Magic';
+
+SKIP: {
+	eval { require Template::Magic };
+	skip 'Template::Magic not installed', 1 if $@;
+
+	use_ok 'HTML::FromMail::Format::Magic';
+}
+
 use_ok 'HTML::FromMail::Format::OODoc';
 use_ok 'HTML::FromMail::Format';
 use_ok 'HTML::FromMail::Head';

@@ -21,16 +21,60 @@ Extends L<"DESCRIPTION" in HTML::FromMail::Page|HTML::FromMail::Page/"DESCRIPTIO
 
 Extends L<"METHODS" in HTML::FromMail::Page|HTML::FromMail::Page/"METHODS">.
 
+=head2 Constructors
+
+Extends L<"Constructors" in HTML::FromMail::Page|HTML::FromMail::Page/"Constructors">.
+
 =over 4
 
-=item $obj-E<gt>B<addressField>($field, $how, ARGS)
+=item $class-E<gt>B<new>(%options)
+
+Z<>
+
+ -Option  --Defined in            --Default
+  settings  HTML::FromMail::Object  {}
+  topic     HTML::FromMail::Object  'field'
+
+=over 2
+
+=item settings => \%map
+
+=item topic => STRING
+
+=back
+
+=back
+
+=head2 Attributes
+
+Extends L<"Attributes" in HTML::FromMail::Page|HTML::FromMail::Page/"Attributes">.
+
+=over 4
+
+=item $obj-E<gt>B<settings>( [TOPIC] )
+
+Inherited, see L<HTML::FromMail::Object/"Attributes">
+
+=item $obj-E<gt>B<topic>()
+
+Inherited, see L<HTML::FromMail::Object/"Attributes">
+
+=back
+
+=head2 Other methods
+
+Extends L<"Other methods" in HTML::FromMail::Page|HTML::FromMail::Page/"Other methods">.
+
+=over 4
+
+=item $obj-E<gt>B<addressField>($field, $how, \%options)
 
 Produce text for a header C<$field> containing addresses.  On C<$how> this
 is done is defining the result.  Possible values are C<'ADDRESS'>,
 C<'PHRASE'>, C<'PLAIN'>, C<'MAILTO'>, or C<'LINK'>.  See L</address HOW>
 for details.
 
-=item $obj-E<gt>B<fromHead>($head, $name, \%args)
+=item $obj-E<gt>B<fromHead>($head, $name, \%options)
 
 Returns the fields from the header with C<$name>.  Some fields appear
 more than once, some may not be present.
@@ -51,7 +95,7 @@ header line.
 
 =over 2
 
-=item address => ADDRESS|PHRASE|PLAIN|MAILTO|LINK
+=item address => 'ADDRESS'|'PHRASE'|'PLAIN'|'MAILTO'|'LINK'
 
 See L</address HOW>
 
@@ -79,30 +123,18 @@ Returns the name of the header field.
 
 =item capitals => 'UNCHANGED'|'WELLFORMED'
 
-Overrules the default from L<new(settings)|HTML::FromMail::Object/"METHODS"> C<names>.
+Overrules the default from L<new(settings)|HTML::FromMail::Object/"Constructors"> C<names>.
 See L</names HOW>.
 
 =back
 
 =item $obj-E<gt>B<lookup>($label, \%options)
 
-Inherited, see L<HTML::FromMail::Page/"METHODS">
+Inherited, see L<HTML::FromMail::Page/"Other methods">
 
-=item $class-E<gt>B<new>(%options)
+=item $obj-E<gt>B<plain2html>(STRING)
 
-Z<>
-
- -Option  --Defined in            --Default
-  settings  HTML::FromMail::Object  {}
-  topic     HTML::FromMail::Object  'field'
-
-=over 2
-
-=item settings => \%map
-
-=item topic => STRING
-
-=back
+Inherited, see L<HTML::FromMail::Object/"Other methods">
 
 =back
 
@@ -170,23 +202,23 @@ Valid values are
 
 =over 4
 
-=item  C<'FOLDED'>
+=item * C<'FOLDED'>
 
 Included the content FOLDED as found in the source message.  This is the
 fastest choice, and usually in a preformatted html block, otherwise the
 folding will be lost again.
 
-=item C<'REFOLD'>
+=item * C<'REFOLD'>
 
 Do not accept the folding as found in the message headers, but force it
 into the wrap which is defined by C<wrap>.
 
-=item C<'UNFOLDED'>
+=item * C<'UNFOLDED'>
 
 All line folding is removed from the field.  This useful when the field body
 is displayed in a proportional font.
 
-=item C<'DECODED'>
+=item * C<'DECODED'>
 
 Fields may be character-set encoded.  Decoding these fields is nicest,
 but consumes considerable time.
@@ -213,8 +245,8 @@ are requested per line.
 
 =head1 SEE ALSO
 
-This module is part of HTML-FromMail version 3.00,
-built on November 19, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of HTML-FromMail version 3.01,
+built on November 21, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

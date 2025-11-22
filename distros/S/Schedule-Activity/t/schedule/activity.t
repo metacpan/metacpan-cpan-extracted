@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use Schedule::Activity;
-use Test::More tests=>17;
+use Test::More tests=>18;
 
 subtest 'validation'=>sub {
 	plan tests=>2;
@@ -244,16 +244,17 @@ subtest 'Message randomization'=>sub {
 		},
 	);
 	my $scheduler=Schedule::Activity->new(configuration=>\%configuration);
-	my %seen;
-	foreach (1..4*4*100) {
-		%schedule=$scheduler->schedule(activities=>[[30,'Activity']]);
-		foreach my $msg (map {$$_[1]{message}} @{$schedule{activities}}) { $seen{$msg}=1 }
-	}
-	my %expect;
+	my ($countdown,@needed,%seen,%expect)=(2e3);
 	foreach my $i (0..3) {
 	foreach my $j (0..3) {
 		$expect{"act$i.$j"}=1;
 	} }
+	@needed=keys(%expect);
+	while($countdown&&@needed) {
+		$countdown--;
+		%schedule=$scheduler->schedule(activities=>[[30,'Activity']]);
+		foreach my $msg (map {$$_[1]{message}} @{$schedule{activities}}) { $seen{$msg}=1; if($msg eq ($needed[0]//'')) { shift(@needed) } }
+	}
 	is_deeply(\%seen,\%expect,'All combinations observed');
 	is_deeply($configuration{node}{Activity}{message},[map {'act0.'.$_} (0..3)],'verify non-mutation of configuration');
 };
@@ -369,6 +370,44 @@ subtest 'Node+Message attributes'=>sub {
 	is_deeply($schedule{attributes}{intA}{xy}[4],[20,12],'Integer:  end of activity');
 };
 
+subtest 'Attribute recomputation'=>sub {
+	plan tests=>2;
+	my $scheduler=Schedule::Activity->new(configuration=>{
+		node=>{
+			root=>{
+				message=>{alternates=>[{message=>'root',attributes=>{A=>{set=>0}}}]},
+				next=>['step1'],
+				tmavg=>5,
+				finish=>'finish',
+			},
+			step1=>{
+				message=>{alternates=>[{message=>'step1',attributes=>{A=>{incr=>1}}}]},
+				next=>['finish'],
+				tmavg=>5,
+			},
+			finish=>{
+				message=>{alternates=>[{message=>'finish',attributes=>{A=>{incr=>2}}}]},
+				tmavg=>5,
+			},
+		},
+		annotations=>{
+			group=>[
+				{
+					message=>{alternates=>[{message=>'note1',attributes=>{A=>{incr=>1}}}]},
+					nodes=>qr/step1|finish/,
+					before=>{min=>1,max=>2},
+				}
+			],
+		},
+	});
+	my %schedule=$scheduler->schedule(activities=>[[15,'root']]);
+	my %attrScheduler=$$scheduler{attr}->report();
+	my $avgSchedule=$schedule{attributes}{A}{avg};
+	my %attrNotes=$scheduler->computeAttributes(@{$schedule{activities}},@{$schedule{annotations}{group}{events}});
+	is_deeply({$$scheduler{attr}->report()},\%attrScheduler,'Scheduler attributes are unaltered');
+	ok($avgSchedule!=$attrNotes{A}{avg},'Computed attribute differs');
+};
+
 subtest 'Annotations'=>sub {
 	plan tests=>1;
 	my %configuration=(
@@ -397,7 +436,7 @@ subtest 'Annotations'=>sub {
 		annotations=>{
 			'apple'=>[
 				{
-					message=>'annotation 1',
+					message=>{alternates=>[{message=>'annotation 1',attributes=>{thing=>{incr=>1}}}]},
 					nodes=>qr/action 1/,
 					before=>{min=>-5,max=>-5},
 				},
@@ -411,7 +450,7 @@ subtest 'Annotations'=>sub {
 	);
 	my $scheduler=Schedule::Activity->new(configuration=>\%configuration);
 	my %schedule=$scheduler->schedule(activities=>[[30,'Activity']]);
-	is_deeply($schedule{annotations},{apple=>{events=>[[10,{message=>'annotation 1'}]]}},'Annotations created, overlap removed');
+	is_deeply($schedule{annotations},{apple=>{events=>[[10,{message=>'annotation 1',attributes=>{thing=>{incr=>1}}}]]}},'Annotations created, overlap removed');
 };
 
 subtest 'Named messages'=>sub {
@@ -647,13 +686,13 @@ subtest 'tension control'=>sub {
 		});
 	my @tests=(
 		# slack, buffer, goal, label, validator, negate, test count (0=default), # probability of test failure over all cycles
-		[1.0,1.0,299,'=12',sub { return $_[0]!=12},1,500],  # 0
+		[1.0,1.0,299,'=12',sub { return $_[0]!=12},1,200],  # 0
 		[0.0,1.0,300,'>13',sub { return $_[0]>13 },0,100],  # 1e-26 = (100*l(1-45/99))/l(10)
 		[1.0,0.0,279,'<11',sub { return $_[0]<11 },0,2e3],  # 1e-22 = (2000*l(1-0.025))/l(10)
 		[0.0,0.0,312,'<12',sub { return $_[0]<12 },0,2e3],  # 1e-29 = (2000*l(1-1/30))/l(10)
 		[0.0,0.0,300,'>13',sub { return $_[0]>13 },0,500],  # 1e-21 = (500*l(1-69/99000-94/1000))/l(10)
-		[0.0,0.7,300,'>11',sub { return $_[0]<=11 },1,1e3], # 0
-		[0.7,0.0,300,'<14',sub { return $_[0]>=14 },1,1e3], # 0
+		[0.0,0.7,300,'>11',sub { return $_[0]<=11 },1,200], # 0
+		[0.7,0.0,300,'<14',sub { return $_[0]>=14 },1,200], # 0
 	);
 	foreach my $test (@tests) {
 		my ($limit,$pass)=($$test[6]||1000,$$test[5]);

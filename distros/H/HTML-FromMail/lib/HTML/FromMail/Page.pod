@@ -25,26 +25,13 @@ Extends L<"DESCRIPTION" in HTML::FromMail::Object|HTML::FromMail::Object/"DESCRI
 
 Extends L<"METHODS" in HTML::FromMail::Object|HTML::FromMail::Object/"METHODS">.
 
+=head2 Constructors
+
+Extends L<"Constructors" in HTML::FromMail::Object|HTML::FromMail::Object/"Constructors">.
+
 =over 4
 
-=item $obj-E<gt>B<lookup>($label, \%options)
-
-Look-up, in a formatter dependent way, what the value related to a certain
-C<$label> is.  The location which is being produced on the moment that this
-method is called is stored somewhere in the OPTIONS.  The formatter
-(which is also in the C<%options>) is called to get the value based on that
-location information.
-
- -Option   --Default
-  formatter  <required>
-
-=over 2
-
-=item formatter => OBJECT
-
-=back
-
-=item $class-E<gt>B<new>(OPTIONS)
+=item $class-E<gt>B<new>(%options)
 
 Z<>
 
@@ -62,10 +49,55 @@ Z<>
 
 =back
 
+=head2 Attributes
+
+Extends L<"Attributes" in HTML::FromMail::Object|HTML::FromMail::Object/"Attributes">.
+
+=over 4
+
+=item $obj-E<gt>B<settings>( [TOPIC] )
+
+Inherited, see L<HTML::FromMail::Object/"Attributes">
+
+=item $obj-E<gt>B<topic>()
+
+Inherited, see L<HTML::FromMail::Object/"Attributes">
+
+=back
+
+=head2 Other methods
+
+Extends L<"Other methods" in HTML::FromMail::Object|HTML::FromMail::Object/"Other methods">.
+
+=over 4
+
+=item $obj-E<gt>B<lookup>($label, \%options)
+
+Look-up, in a formatter dependent way, what the value related to a certain
+C<$label> is.  The location which is being produced on the moment that this
+method is called is stored somewhere in the OPTIONS.  The formatter
+(which is also in the C<%options>) is called to get the value based on that
+location information.
+
+ -Option   --Default
+  formatter  <required>
+
+=over 2
+
+=item formatter => $object
+
+=back
+
+=item $obj-E<gt>B<plain2html>(STRING)
+
+Inherited, see L<HTML::FromMail::Object/"Other methods">
+
+=back
+
 =head1 SEE ALSO
 
-This module is part of HTML-FromMail version 3.00,
-built on November 19, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of HTML-FromMail version 3.01,
+built on November 21, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

@@ -1,20 +1,21 @@
-"Schedule::Activity" Version 0.2.1
+"Schedule::Activity" Version 0.2.2
 
 Abstract:
 ---------
 This package provides a mechanism to construct "random" schedules of events using a graph-based configuration of activities and actions.  Action scheduling allows cycles/recursion to meet activity schedule goals.
+
+What's new in version 0.2.2:
+--------------------------
+* Script can show attribute grids/averages
+* Support attribute reporting from general activity lists
+* Fix annotation attributes during merge
+* Script --save with --notemerge now works
 
 What's new in version 0.2.1:
 --------------------------
 * Incremental schedule construction
 * Fixed average value recalculations
 * Better script documentation
-
-What's new in version 0.2.0:
---------------------------
-* Schedule::Activity only provides the object interface
-* Tutorial added
-* References to named messages are checked
 
 Copyright & License:
 --------------------

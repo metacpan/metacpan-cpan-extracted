@@ -4,13 +4,13 @@
       "Kawai Takanori (kwitknr@cpan.org)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "OLE-Storage_Lite",
    "no_index" : {
@@ -31,9 +31,12 @@
          }
       },
       "runtime" : {
-         "requires" : {}
+         "requires" : {
+            "perl" : "5.006"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : "0.22"
+   "version" : "0.24",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

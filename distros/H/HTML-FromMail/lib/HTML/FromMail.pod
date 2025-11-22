@@ -11,8 +11,8 @@ HTML::FromMail - base-class for the HTML producers
 
 =head1 SYNOPSIS
 
-  use Mail::Message;   # part of Mail::Box
-  use HTML::FromMail;
+  use Mail::Message  ();
+  use HTML::FromMail ();
 
   my $msg    = Mail::Message->read(\*STDIN);
   my $fmt    = HTML::FromMail->new(templates => 'templ');
@@ -22,8 +22,12 @@ HTML::FromMail - base-class for the HTML producers
 
 =head1 DESCRIPTION
 
-This module, L<HTML::FromMail|HTML::FromMail>, is designed to put e-mail related data
-on web-pages.  This could be used to create web-mail clients.
+This module is designed to put e-mail related data on web-pages.
+This could be used to create web-mail clients.
+
+B<This is a maintenance release for the old interface>.  Read
+F<https://https://github.com/markov2/perl5-Mail-Box/wiki/> how
+to move to towards version 4.
 
 =head2 Status
 
@@ -105,7 +109,7 @@ Z<>
  -Option   --Default
   formatter  HTML::FromMail::Format::OODoc
   producers  <some basic items>
-  settings   {}
+  settings   +{}
   templates  '.'
 
 =over 2
@@ -124,14 +128,14 @@ The producer list describes which set of formatting commands are
 applicable to certain objects when producing HTML.  The C<%map>
 links external class names (usually implemented in Mail::Box) to
 sub-classes of this object.  You may modify the default list
-using L<producer()|HTML::FromMail/"Attributes">.  Read more in L</Producers>.
+using L<producer()|HTML::FromMail/"Other methods">.  Read more in L</Producers>.
 
-=item settings => HASH
+=item settings => \%map
 
 Each producer has defaults for formatting flexability.  For instance,
 sometimes alternatives are available for creating certain pieces
 of HTML.  This option adds/modifies the settings for a certain group
-of producers, but influence the formatters behavior as well.
+of producers, but influences the formatters their behavior as well.
 Read more in L</Settings>.
 
 =item templates => $directory
@@ -150,6 +154,51 @@ base for relative names.
 =item $obj-E<gt>B<formatter>()
 
 Returns the selected formatter object.
+
+=back
+
+=head2 Other methods
+
+=over 4
+
+=item $obj-E<gt>B<expandFiles>($directory|$file|\@files)
+
+Returns a LIST with all filenames which are included in the C<$directory>
+specified or the ARRAY.  If only one C<$file> is specified, then that
+will be returned.
+
+=item $obj-E<gt>B<export>($object, %options)
+
+Produce the HTML output of the C<$object>.
+
+ -Option--Default
+  output  <required>
+  use     undef
+
+=over 2
+
+=item output => $directory|$filename
+
+The C<$directory> where the processed templates for the object are written
+to.  It is only permitted to supply a single C<$filename> when the template
+specifies a single filename as well.
+
+=item use => \@files
+
+Directory C<new(templates)> defines the location of all template C<@files>.  In
+that directory, you have sub-directories for each kind of object which
+can be formatted sorted on C<topic>.
+
+for instance, C<templates> contains C</home/me/templates> and the object
+is a L<Mail::Message> which is handled by L<HTML::FromMail::Message|HTML::FromMail::Message>
+which has topic C<message>.  This directory plus the topic result in
+the directory path C</home/me/templates/message/>.  By default, all
+the files found in there get formatted.  However, when the C<use>
+option is provided, only the specified files are taken.  If that filename
+is related, it is relative to the C<templates> direcory.  If the filename
+is absolute (starts with a slash), that name is used.
+
+=back
 
 =item $obj-E<gt>B<producer>( (CLASS|$object), [$producer] )
 
@@ -187,57 +236,6 @@ to get the topic.
 
 =back
 
-=head2 Export
-
-=over 4
-
-=item $obj-E<gt>B<export>($object, %options)
-
-Produce the HTML output of the C<$object>.
-
- -Option--Default
-  output  <required>
-  use     undef
-
-=over 2
-
-=item output => $directory|$filename
-
-The C<$directory> where the processed templates for the object are written
-to.  It is only permitted to supply a single C<$filename> when the template
-specifies a single filename as well.
-
-=item use => \@files
-
-Directory C<new(templates)> defines the location of all template C<@files>.  In
-that directory, you have sub-directories for each kind of object which
-can be formatted sorted on C<topic>.
-
-for instance, C<templates> contains C</home/me/templates> and the object
-is a L<Mail::Message> which is handled by L<HTML::FromMail::Message|HTML::FromMail::Message>
-which has topic C<message>.  This directory plus the topic result in
-the directory path C</home/me/templates/message/>.  By default, all
-the files found in there get formatted.  However, when the C<use>
-option is provided, only the specified files are taken.  If that filename
-is related, it is relative to the C<templates> direcory.  If the filename
-is absolute (starts with a slash), that name is used.
-
-=back
-
-=back
-
-=head2 Other methods
-
-=over 4
-
-=item $obj-E<gt>B<expandFiles>($directory|$file|\@files)
-
-Returns a LIST with all filenames which are included in the C<$directory>
-specified or the ARRAY.  If only one C<$file> is specified, then that
-will be returned.
-
-=back
-
 =head1 DETAILS
 
 =head2 Producers
@@ -245,7 +243,7 @@ will be returned.
 Producers are sets of methods which can be used to produce HTML for
 a specific object.  For instance, the L<HTML::FromMail::Message|HTML::FromMail::Message> produces
 output for Mail::Message objects.  You can add and overrule producers via
-L<new(producers)|HTML::FromMail/"Constructors"> and L<producer()|HTML::FromMail/"Attributes">.
+L<new(producers)|HTML::FromMail/"Constructors"> and L<producer()|HTML::FromMail/"Other methods">.
 
 On the moment, the following producers are defined.  When marked with
 a C<(*)>, the implementation is not yet finished.
@@ -261,7 +259,7 @@ a C<(*)>, the implementation is not yet finished.
 
 Each producer has one single topic, but there may be multiple alternatives
 for one topic.  The topic is configurable with
-L<HTML::FromMail::Object::new(topic)|HTML::FromMail::Object/"METHODS">.
+L<HTML::FromMail::Object::new(topic)|HTML::FromMail::Object/"Constructors">.
 
 For each item which is converted to HTML, one of the producers for that
 item is created.  The topic of the producer is used to select a group of
@@ -294,7 +292,7 @@ Cast by C<expandFiles()>
 =item Error: Cannot find template file or directory $topic in $directory.
 
 The templates directory (see L<new(templates)|HTML::FromMail/"Constructors">) does not contain a template
-for the specified topic (see L<HTML::FromMail::Object::new(topic)|HTML::FromMail::Object/"METHODS">).
+for the specified topic (see L<HTML::FromMail::Object::new(topic)|HTML::FromMail::Object/"Constructors">).
 Cast by C<templates()>
 
 =item Error: Cannot read from directory $thing: $!
@@ -339,8 +337,8 @@ Cast by C<expandFiles()>
 
 =head1 SEE ALSO
 
-This module is part of HTML-FromMail version 3.00,
-built on November 19, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of HTML-FromMail version 3.01,
+built on November 21, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

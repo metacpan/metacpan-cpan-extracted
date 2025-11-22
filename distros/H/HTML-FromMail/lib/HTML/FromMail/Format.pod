@@ -55,44 +55,54 @@ without relation to messages which is not provided by this distribution
 
 =head1 METHODS
 
+=head2 Constructors
+
 =over 4
 
-=item $obj-E<gt>B<containerText>(ARGS)
+=item $class-E<gt>B<new>(%options)
+
+Z<>
+
+=back
+
+=head2 Attributes
+
+=head2 Other methods
+
+=over 4
+
+=item $obj-E<gt>B<containerText>(\%options)
 
 Produces the text encapsulated between begin and end tag of this
 template block.  If the tag is "stand alone", not a container, the
 value of C<undef> is returned.  When the container is "empty", an
 (optionally empty) string with white-spaces is returned.
 
-=item $obj-E<gt>B<lookup>(TAG, ARGS)
+=item $obj-E<gt>B<lookup>($tag, \%options)
 
-Lookup the value for a certain C<TAG>.  This C<TAG> may, but also may not,
+Lookup the value for a certain C<$tag>.  This C<$tag> may, but also may not,
 be derived from the template.  The value is lookup is the data produced
 by the various producer methods, implemented in L<HTML::FromMail::Page|HTML::FromMail::Page>
 extensions.  The values are administered by the various formatters,
 because there meaning (and for instance their scoping) is formatter
 dependent.  Values which are looked-up are often not simple strings.
 
-=item $class-E<gt>B<new>(OPTIONS)
-
-Z<>
-
-=item $obj-E<gt>B<onFinalToken>(ARGS)
+=item $obj-E<gt>B<onFinalToken>(\%options)
 
 Returns whether the parser has more data in this particular part of
 the template.
 
-=item $obj-E<gt>B<processText>(TEXT, ARGS)
+=item $obj-E<gt>B<processText>($template, \%options)
 
-New C<TEXT> is supplied, which can be seen as part of the currently active
-container.
+A new C<$template> is supplied, which can be seen as part of the currently
+active container.
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of HTML-FromMail version 3.00,
-built on November 19, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of HTML-FromMail version 3.01,
+built on November 21, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

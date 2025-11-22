@@ -38,7 +38,7 @@
       "runtime" : {
          "requires" : {
             "HTML::FromText" : "2.03",
-            "Mail::Box" : "2.051",
+            "Mail::Box" : ">= 2.051, < 4.0",
             "OODoc::Template" : "0.01"
          },
          "x_optional" : {
@@ -65,7 +65,7 @@
          "web" : "https://github.com/markov2/perl5-HTML-FromMail"
       }
    },
-   "version" : "3.00",
+   "version" : "3.01",
    "x_oodist" : {
       "email" : "markov@cpan.org",
       "first_year" : 2003,

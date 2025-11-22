@@ -70,6 +70,30 @@ sub materialize {
 	foreach my $entry (@materialized) { print join(' ',@$entry),"\n" }
 }
 
+sub attrgrid {
+	my (%schedule)=@_;
+	my $tmmax=$schedule{_tmmax};
+	my $tmstep=int(0.5+$tmmax/10);
+	print "\n";
+	for(my $tm=0;$tm<=$tmmax;$tm+=$tmstep) { print "$tm\t" }; print "avg\tAttribute\n";
+	foreach my $name (sort keys %{$schedule{attributes}}) {
+		my $attr=$schedule{attributes}{$name}{xy};
+		my ($i,$y)=(-1);
+		for(my $tm=0;$tm<=$tmmax;$tm+=$tmstep) {
+			while(($i<$#$attr)&&($tm>=$$attr[$i+1][0])) { $i++ }
+			if($i<0)           { $y=0 }
+			elsif($i>=$#$attr) { $y=$$attr[$i][1] }
+			elsif($i==0)       { $y=$$attr[0][1] }
+			else {
+				my $p=($tm-$$attr[$i][0])/($$attr[$i+1][0]-$$attr[$i][0]);
+				$y=(1-$p)*$$attr[$i][1]+$p*$$attr[$i+1][1];
+			}
+			print sprintf("%0.4g\t",$y);
+		}
+		print sprintf('%0.4g',$schedule{attributes}{$name}{avg}//0),"\t$name\n";
+	}
+}
+
 my %opt=(
 	schedule  =>undef,
 	json      =>undef,
@@ -81,6 +105,7 @@ my %opt=(
 	activities=>undef,
 	notemerge =>1,
 	noteorder =>undef,
+	attribute =>'',
 	tslack    =>undef,
 	tbuffer   =>undef,
 	after     =>undef,
@@ -96,6 +121,7 @@ GetOptions(
 	'activities=s'=>\$opt{activities},
 	'notemerge!'  =>\$opt{notemerge},
 	'noteorder=s' =>\$opt{noteorder},
+	'attribute=s' =>\$opt{attribute},
 	'tslack=f'    =>\$opt{tslack},
 	'tbuffer=f'   =>\$opt{tbuffer},
 	'after=s'     =>\$opt{after},
@@ -136,7 +162,7 @@ if($schedule{error}) { print STDERR join("\n",@{$schedule{error}}),"\n"; exit(1)
 # materialized into the activity schedule.  Such nodes are unexpected
 # during subsequent annotation runs, and will need to be stashed/restored
 # if we want to support saving annotations incrementally.
-if($opt{save}) { $opt{notemerge}=0; saveafter($opt{save},\%configuration,\%schedule) }
+if($opt{save}) { saveafter($opt{save},\%configuration,\%schedule) }
 
 if($opt{notemerge}) {
 	my %seen;
@@ -149,10 +175,15 @@ if($opt{notemerge}) {
 		push @{$schedule{activities}},@{$schedule{annotations}{$group}{events}};
 		$seen{$group}=1;
 	}
-	if(%seen) { @{$schedule{activities}}=sort {$$a[0]<=>$$b[0]} @{$schedule{activities}} }
+	if(%seen) {
+		@{$schedule{activities}}=sort {$$a[0]<=>$$b[0]} @{$schedule{activities}};
+		%{$schedule{attributes}}=$scheduler->computeAttributes(@{$schedule{activities}});
+	}
 }
 
 materialize(%schedule);
+
+if($opt{attribute} eq 'grid') { attrgrid(%schedule) }
 
 __END__
 
@@ -188,6 +219,10 @@ Only merge the annotation groups specified by the names.  Default is all, alphab
 =head2 --nonotemerge
 
 Do not merge annotation messages into the final schedule.
+
+=head2 --attribute=grid
+
+Display all attributes, their values over time, and averages.  (No other output formats are supported at this time)
 
 =head2 --unsafe
 

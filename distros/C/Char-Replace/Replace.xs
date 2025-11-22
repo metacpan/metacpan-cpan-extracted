@@ -22,7 +22,7 @@ SV *_replace_str( SV *sv, SV *map );
 SV *_trim_sv( SV *sv );
 
 SV *_trim_sv( SV *sv ) {
-
+  dTHX;
   int len  = SvCUR(sv);
   char *str = SvPVX(sv);;
   char *end = str + len - 1;
@@ -35,7 +35,7 @@ SV *_trim_sv( SV *sv ) {
 
   // Trim at end...
   while (end > str && isspace( (unsigned char) *end) ) {
-    *end--;// = 0;
+    end--;
     --len;
   }
 
@@ -44,26 +44,33 @@ SV *_trim_sv( SV *sv ) {
 
 
 SV *_replace_str( SV *sv, SV *map ) {
-  char buffer[_REPLACE_BUFFER_SIZE] = { 0 };
-  char *src = SvPVX(sv);
-  int len = SvCUR(sv);
-  int           i = 0;
-  char     *ptr = src;
-  char           *str = buffer;             /* the new string we are going to use */
-  char     *tmp; /* used to grow */
-  int      str_size = _REPLACE_BUFFER_SIZE; /* we start with the buffer */
-  int   ix_newstr = 0;
+  dTHX;
+  STRLEN len;
+  char *src;
+  STRLEN        i = 0;
+  char     *ptr;
+  char           *str;                      /* the new string we are going to use */
+  STRLEN      str_size;                     /* start with input length + some padding */
+  STRLEN   ix_newstr = 0;
   AV           *mapav;
   SV           *reply;
 
   if ( !map || SvTYPE(map) != SVt_RV || SvTYPE(SvRV(map)) != SVt_PVAV
     || AvFILL( SvRV(map) ) <= 0
     ) {
-      return newSVpv( src, len ); /* no alteration */
+      src = SvPV(sv, len);
+      return newSVpvn_flags( src, len, SvUTF8(sv) ); /* no alteration */
   }
+
+  src = SvPV(sv, len);
+  ptr = src;
+  str_size = len + 64;
 
   mapav = (AV *)SvRV(map);
   SV **ary = AvARRAY(mapav);
+
+  /* Always allocate memory using Perl's memory management */
+  Newx(str, str_size, char);
 
 
   for ( i = 0; i < len; ++i, ++ptr, ++ix_newstr ) {
@@ -74,34 +81,27 @@ SV *_replace_str( SV *sv, SV *map ) {
 
     str[ix_newstr] = c; /* default always performed... */
     if ( ix >= AvFILL(mapav)
-      || !AvARRAY(mapav)[ix]
+      || !ary[ix]
       ) {
       continue;
     } else {
-      SV *entry = AvARRAY(mapav)[ix];
+      SV *entry = ary[ix];
       if ( SvPOK( entry ) ) {
-        int slen = SvCUR( entry ); /* length of the string used for replacement */
+        STRLEN slen;
+        char *replace = SvPV( entry, slen ); /* length of the string used for replacement */
         if ( slen <= 0  ) {
           continue;
         } else {
-          char *replace = SvPVX( entry );
           int j;
 
           /* Check if we need to expand. */
           if (str_size <= (ix_newstr + slen + 1) ) { /* +1 for \0 */
-            //printf( "#### need to grow %d -> %d\n", str_size, ix_newstr + slen );
-            str_size *= 2;
-
-            if ( str == buffer ) {
-              /* our first malloc */
-              Newx(str, str_size, char);
-              memcpy( str, buffer, _REPLACE_BUFFER_SIZE ); /* strncpy stops after the first \0 */
-            } else {
-              /* grow the string */
-              tmp = Perl_realloc( str, str_size );
-              if ( !tmp ) Perl_croak(aTHX_ "failed to realloc string" );
-              str = tmp;
+            /* Calculate the required size, ensuring it's enough */
+            while (str_size <= (ix_newstr + slen + 1)) {
+              str_size *= 2;
             }
+            /* grow the string */
+            Renew( str, str_size, char );
           }
 
           /* replace all characters except the last one, which avoids us to do a --ix_newstr after */
@@ -120,8 +120,8 @@ SV *_replace_str( SV *sv, SV *map ) {
 
   reply = newSVpvn_flags( str, ix_newstr, SvUTF8(sv) );
 
-  /* free our tmp buffer if needed */
-  if ( str != buffer ) free(str);
+  /* free our tmp buffer */
+  Safefree(str);
 
   return reply;
 }

@@ -21,6 +21,50 @@ Extends L<"DESCRIPTION" in HTML::FromMail::Page|HTML::FromMail::Page/"DESCRIPTIO
 
 Extends L<"METHODS" in HTML::FromMail::Page|HTML::FromMail::Page/"METHODS">.
 
+=head2 Constructors
+
+Extends L<"Constructors" in HTML::FromMail::Page|HTML::FromMail::Page/"Constructors">.
+
+=over 4
+
+=item $class-E<gt>B<new>(%options)
+
+Z<>
+
+ -Option  --Defined in            --Default
+  settings  HTML::FromMail::Object  {}
+  topic     HTML::FromMail::Object  'head'
+
+=over 2
+
+=item settings => \%map
+
+=item topic => STRING
+
+=back
+
+=back
+
+=head2 Attributes
+
+Extends L<"Attributes" in HTML::FromMail::Page|HTML::FromMail::Page/"Attributes">.
+
+=over 4
+
+=item $obj-E<gt>B<settings>( [TOPIC] )
+
+Inherited, see L<HTML::FromMail::Object/"Attributes">
+
+=item $obj-E<gt>B<topic>()
+
+Inherited, see L<HTML::FromMail::Object/"Attributes">
+
+=back
+
+=head2 Other methods
+
+Extends L<"Other methods" in HTML::FromMail::Page|HTML::FromMail::Page/"Other methods">.
+
 =over 4
 
 =item $any-E<gt>B<fields>($message, %options)
@@ -68,30 +112,18 @@ See Mail::Message::Head::Complete subroutine grepNames.
 
 =item $obj-E<gt>B<lookup>($label, \%options)
 
-Inherited, see L<HTML::FromMail::Page/"METHODS">
+Inherited, see L<HTML::FromMail::Page/"Other methods">
 
-=item $class-E<gt>B<new>(OPTIONS)
+=item $obj-E<gt>B<plain2html>(STRING)
 
-Z<>
-
- -Option  --Defined in            --Default
-  settings  HTML::FromMail::Object  {}
-  topic     HTML::FromMail::Object  'head'
-
-=over 2
-
-=item settings => \%map
-
-=item topic => STRING
-
-=back
+Inherited, see L<HTML::FromMail::Object/"Other methods">
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of HTML-FromMail version 3.00,
-built on November 19, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of HTML-FromMail version 3.01,
+built on November 21, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

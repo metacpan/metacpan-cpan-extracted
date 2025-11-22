@@ -96,21 +96,21 @@ As seen in the sample, some tasks (actions) repeat.  As an example, there is alw
 
 Chores are organized like this (some labels are abbreviated):
 
-           Chores
-          /     \
-         /       \
-        v         v
-      large1    large2
-          \      /
-           v    v
-       Chores, small <-
-     /  ^    |  ^   \  \
-    /  /     |  |    \  \
-   v  /      v  |     v  \
-  small1    small2    small3
-       \      |      /
-        v     v     v
-       Chores, finish
+  #          Chores
+  #         /     \
+  #        /       \
+  #       v         v
+  #     large1    large2
+  #         \      /
+  #          v    v
+  #      Chores, small <-
+  #    /  ^    |  ^   \  \
+  #   /  /     |  |    \  \
+  #  v  /      v  |     v  \
+  # small1    small2    small3
+  #      \      |      /
+  #       v     v     v
+  #      Chores, finish
 
 In your personal evening schedule, some of the small may not repeat, and there are ways to configure that with node filters, not demonstrated below.
 
@@ -118,22 +118,22 @@ In your personal evening schedule, some of the small may not repeat, and there a
 
 Exercise is organized like this (some labels are abbreviated):
 
-              Exercise
-                 |
-                 v
-          Exercise, setup
-                 |
-                 v
-     -----Exercise, sets<---------
-    /    ^ |  ^     ^  |\    \    \
-    |   /  |  |     |  | \    \    \
-    v  /   v  |     |  v  \    \    |
-thing1-   thing2   thing3  ->thing4 |
-       \  |          |   \  /     | |
-        \ |          |    v       | |
-         \|          |    break >-+-/
-          v          v           /
-          Exercise, finish<------
+  #               Exercise
+  #                  |
+  #                  v
+  #           Exercise, setup
+  #                  |
+  #                  v
+  #      -----Exercise, sets<---------
+  #     /    ^ |  ^     ^  |\    \    \
+  #     |   /  |  |     |  | \    \    \
+  #     v  /   v  |     |  v  \    \    |
+  # thing1-   thing2   thing3  ->thing4 |
+  #        \  |          |   \  /     | |
+  #         \ |          |    v       | |
+  #          \|          |    break >-+-/
+  #           v          v           /
+  #           Exercise, finish<------
 
 =head2 Activities and Actions
 

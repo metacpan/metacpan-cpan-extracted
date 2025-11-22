@@ -1,4 +1,4 @@
-# This code is part of Perl distribution HTML-FromMail version 3.00.
+# This code is part of Perl distribution HTML-FromMail version 3.01.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -8,13 +8,9 @@
 # the same terms as the Perl 5 programming language system itself.
 # SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
 
-#oodist: *** DO NOT USE THIS VERSION FOR PRODUCTION ***
-#oodist: This file contains OODoc-style documentation which will get stripped
-#oodist: during its release in the distribution.  You can use this file for
-#oodist: testing, however the code of this development version may be broken!
 
 package HTML::FromMail::Message;{
-our $VERSION = '3.00';
+our $VERSION = '3.01';
 }
 
 use base 'HTML::FromMail::Page';
@@ -35,7 +31,6 @@ use File::Basename 'basename';
 sub init($)
 {	my ($self, $args) = @_;
 	$args->{topic} ||= 'message';
-
 	$self->SUPER::init($args) or return;
 
 	$self->{HFM_dispose}  = $args->{disposition};
@@ -62,6 +57,15 @@ sub init($)
 	$self;
 }
 
+#-----------
+
+sub fields() { $_[0]->{HFM_field} }
+
+
+sub header() { $_[0]->{HFM_head} }
+
+#-----------
+
 
 my $attach_id = 0;
 
@@ -79,20 +83,14 @@ sub createAttachment($$$)
 	$decoded->write(filename => $filename)
 		or return ();
 
-	(	url      => basename($filename),
+	  (	url      => basename($filename),
 		size     => (-s $filename),
 		type     => $decoded->type->body,
 
 		filename => $filename,    # absolute
 		decoded  => $decoded,
-	);
+	  );
 }
-
-
-sub fields() { $_[0]->{HFM_field} }
-
-
-sub header() { $_[0]->{HFM_head} }
 
 
 sub htmlField($$)

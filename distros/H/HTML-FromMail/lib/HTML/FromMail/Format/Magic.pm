@@ -1,4 +1,4 @@
-# This code is part of Perl distribution HTML-FromMail version 3.00.
+# This code is part of Perl distribution HTML-FromMail version 3.01.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -8,13 +8,9 @@
 # the same terms as the Perl 5 programming language system itself.
 # SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
 
-#oodist: *** DO NOT USE THIS VERSION FOR PRODUCTION ***
-#oodist: This file contains OODoc-style documentation which will get stripped
-#oodist: during its release in the distribution.  You can use this file for
-#oodist: testing, however the code of this development version may be broken!
 
 package HTML::FromMail::Format::Magic;{
-our $VERSION = '3.00';
+our $VERSION = '3.01';
 }
 
 use base 'HTML::FromMail::Format';
@@ -26,16 +22,16 @@ use Carp;
 
 BEGIN
 {	eval { require Template::Magic };
-	$@ and die "Install Bundle::Template::Magic for this formatter\n";
+	$@ and die "Install Template::Magic for this formatter\n";
 }
 
 #--------------------
 
-sub init($)
-{	my ($self, $args) = @_;
-	$self->SUPER::init($args) or return;
-	$self;
-}
+#-----------
+
+sub magic() { $_[0]->{HFFM_magic} }
+
+#-----------
 
 sub export($@)
 {	my ($self, %args) = @_;
@@ -56,9 +52,6 @@ sub export($@)
 	$self;
 }
 
-
-
-sub magic() { $_[0]->{HFFM_magic} }
 
 
 sub lookupTemplate($$)

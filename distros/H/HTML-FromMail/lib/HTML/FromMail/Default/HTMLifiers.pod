@@ -12,7 +12,7 @@ Html::FromMail::Default::HTMLifiers - convert data type to HTML
 
 =over 4
 
-=item B<htmlifyHtml>(PAGE, MESSAGE, PART, ARGS)
+=item B<htmlifyHtml>($page, $message, $part, \%options)
 
 THIS FUNCTION IS NOT PRESENT, for the following reason.  What should
 happen here?  The message part/multipart contains an html message, but
@@ -28,7 +28,7 @@ html messages and non-html messages.  Produce the page according to
 the template, and then simply link to the produced HTML for the user.
 However, I don't know whether that is smart....
 
-=item B<htmlifyText>(PAGE, MESSAGE, PART, ARGS)
+=item B<htmlifyText>($page, $message, $part, \%options)
 
 Convert plain text into HTML using HTML::FromText.  Configuration
 can be supplied as show in the example.  The defaults are set to mode C<pre>
@@ -37,18 +37,18 @@ with C<urls>, C<email>, C<bold>, and C<underline>.
 » example: configuring text conversion
 
   my $f = HTML::FromMail->new(
-    settings =>
-      { message        => { disposition => \&my_disposer },
-        HTML::FromText => { block_code  => 0 },
-      },
+    settings => {
+       message        => { disposition => \&my_disposer },
+       HTML::FromText => { block_code  => 0 },
+    },
   );
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of HTML-FromMail version 3.00,
-built on November 19, 2025. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of HTML-FromMail version 3.01,
+built on November 21, 2025. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

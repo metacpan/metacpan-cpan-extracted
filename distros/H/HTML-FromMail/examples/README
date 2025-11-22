@@ -3,7 +3,6 @@ Examples for HTML::FromMail
 ===========================
 
 This directory contains two examples for the "oodoc" or "magic" formatter.
-The latter requires Bundle::Text::MagicTemplate to be installed.
 
  show_all.pl [-v] msg   # where "msg" is a file containing one message
                         #    without a leading 'From '

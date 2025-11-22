@@ -4,6 +4,23 @@
 Unless noted otherwise, these changes where initiated and applied by
 Mark Overmeer.
 
+#!!! This is the maintenance version of this module.  When you start fresh,
+#!!! go for version 4 (or higher).  On github, this code is branch 'maint3'
+#!!! Convert? See F<https://https://github.com/markov2/perl5-Mail-Box/wiki/>
+
+version 3.01: Fri 21 Nov 13:49:38 CET 2025
+
+	Changes:
+	- maintenance release with Mail::Box version 3 compatibility.
+
+	Fixes:
+	- fix test when Template::Magic is not installed.
+	  gituhub issue #1, cpantesters [Slaven Rezic]
+
+	Improvements:
+	- organization of methods.
+	- remove Bundle::TemplateMagic references
+
 version 3.00: Wed 19 Nov 12:09:30 CET 2025
 
 	Changes:

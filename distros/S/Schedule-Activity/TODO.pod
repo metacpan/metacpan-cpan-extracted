@@ -2,6 +2,10 @@
 
 =head1 Features
 
+=head2 Goals
+
+Scheduling goals are planned for 0.2.3, specifically of the form C<cycles=N>, C<attribute=E<gt>{name=E<gt>{op=>'gt|lt',value=>x}}>.  Rescheduling will repeat through C<cycles> and the schedule with the highest score will be returned.  Only attribute-based goals seeking is planned for 0.2.3.
+
 =head2 Documentation
 
 Has sadly grown quite complex.  A rewrite is likely, but no ETA.
@@ -12,11 +16,13 @@ Annotation filtering.  Some annotations may occur before an action but not when 
 
 =head2 Scheduling
 
-Incremental scheduling is available in the module and from the commandline starting with 0.2.1.  Attribute recomputation and output behavior (from commandline) is not fully defined.  Ideally a finalized savefile would also store annotations.
+Incremental scheduling is available in the module and from the commandline starting with 0.2.1.  Attribute recomputation is supported for materialized annotations starting with 0.2.2.  Ideally a finalized savefile could also store annotations.
 
 =head2 Attributes
 
-Attributes should be useful as "goals" for scheduling, but this is left to the caller at this time.  Ideally these goals could be used to filter result schedules (as a first step), and eventually to change the scoring method used to select nodes.
+Attribute recomputation is supported starting with 0.2.2, primarily for merged annotation support.  Attributes as "goals" is planned for 0.2.3.
+
+Rudimentary attribute reporting from the commandline is supported starting with 0.2.2.
 
 =head2 Node filtering
 

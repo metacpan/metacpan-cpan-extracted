@@ -1,4 +1,4 @@
-# This code is part of Perl distribution HTML-FromMail version 3.00.
+# This code is part of Perl distribution HTML-FromMail version 3.01.
 # The POD got stripped from this file by OODoc version 3.05.
 # For contributors see file ChangeLog.
 
@@ -8,13 +8,9 @@
 # the same terms as the Perl 5 programming language system itself.
 # SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
 
-#oodist: *** DO NOT USE THIS VERSION FOR PRODUCTION ***
-#oodist: This file contains OODoc-style documentation which will get stripped
-#oodist: during its release in the distribution.  You can use this file for
-#oodist: testing, however the code of this development version may be broken!
 
 package HTML::FromMail;{
-our $VERSION = '3.00';
+our $VERSION = '3.01';
 }
 
 use base 'Mail::Reporter';
@@ -35,7 +31,6 @@ my %default_producers = ( # classes will be compiled automatically when used
 
 sub init($)
 {	my ($self, $args) = @_;
-
 	$self->SUPER::init($args) or return;
 
 	# Defining the formatter to be used
@@ -76,6 +71,8 @@ sub init($)
 #--------------------
 
 sub formatter() { $_[0]->{HF_formatter} }
+
+#-----------
 
 
 sub producer($;$)
@@ -127,7 +124,6 @@ sub settings($;@)
 	$self->{HF_settings}{$topic} = @_ == 1 ? shift : +{ @_ };
 }
 
-#--------------------
 
 sub export($@)
 {	my ($self, $object, %args) = @_;
@@ -184,7 +180,6 @@ sub export($@)
 	$outfiles[0];
 }
 
-#--------------------
 
 sub expandFiles($)
 {	my ($self, $thing) = @_;

@@ -21,13 +21,13 @@ no_index:
     - inc
 requires:
   HTML::FromText: '2.03'
-  Mail::Box: '2.051'
+  Mail::Box: '>= 2.051, < 4.0'
   OODoc::Template: '0.01'
 resources:
   bugtracker: https://github.com/markov2/perl5-HTML-FromMail/issues
   homepage: http://perl.overmeer.net/CPAN/
   repository: https://github.com/markov2/perl5-HTML-FromMail.git
-version: '3.00'
+version: '3.01'
 x_oodist:
   email: markov@cpan.org
   first_year: 2003

@@ -1,6 +1,9 @@
 # OLE::Storage_Lite
 #  by Kawai, Takanori (Hippo2000) 2000.11.4, 8, 14
 # This Program is Still ALPHA version.
+
+use 5.006;
+
 #//////////////////////////////////////////////////////////////////////////////
 # OLE::Storage_Lite::PPS Object
 #//////////////////////////////////////////////////////////////////////////////
@@ -8,11 +11,8 @@
 # OLE::Storage_Lite::PPS
 #==============================================================================
 package OLE::Storage_Lite::PPS;
-require Exporter;
 use strict;
-use vars qw($VERSION @ISA);
-@ISA = qw(Exporter);
-$VERSION = '0.22';
+our $VERSION = '0.24';
 
 #------------------------------------------------------------------------------
 # new (OLE::Storage_Lite::PPS)
@@ -27,7 +27,7 @@ sub new ($$$$$$$$$$;$$) {
         ($iNo, $sNm, $iType, $iPrev, $iNext, $iDir, $raTime1st, $raTime2nd,
          $iStart, $iSize, $sData, $raChild);
   }
-  elsif($iType == OLE::Storage_Lite::PpsType_Dir()) { #DIRECTRY
+  elsif($iType == OLE::Storage_Lite::PpsType_Dir()) { #DIRECTORY
     return OLE::Storage_Lite::PPS::Dir->_new
         ($iNo, $sNm, $iType, $iPrev, $iNext, $iDir, $raTime1st, $raTime2nd,
          $iStart, $iSize, $sData, $raChild);
@@ -164,14 +164,12 @@ sub _savePpsWk($$)
 # OLE::Storage_Lite::PPS::Root
 #==============================================================================
 package OLE::Storage_Lite::PPS::Root;
-require Exporter;
 use strict;
 use IO::File;
 use IO::Handle;
 use Fcntl;
-use vars qw($VERSION @ISA);
-@ISA = qw(OLE::Storage_Lite::PPS Exporter);
-$VERSION = '0.22';
+our @ISA = qw(OLE::Storage_Lite::PPS);
+our $VERSION = '0.24';
 sub _savePpsSetPnt($$$);
 sub _savePpsSetPnt2($$$);
 #------------------------------------------------------------------------------
@@ -232,7 +230,7 @@ sub save($$;$$) {
   elsif(!ref($sFile)) {
     if($sFile ne '-') {
         my $oIo = new IO::File;
-        $oIo->open(">$sFile") || return undef;
+        $oIo->open($sFile, "w") || return undef;
         binmode($oIo);
         $rhInfo->{_FILEH_} = $oIo;
     }
@@ -268,7 +266,7 @@ sub save($$;$$) {
 
   #3.Make Small Data string (write SBD)
   my $sSmWk = $oThis->_makeSmallData(\@aList, $rhInfo);
-  $oThis->{Data} = $sSmWk;  #Small Datas become RootEntry Data
+  $oThis->{Data} = $sSmWk;  #Small Data become RootEntry Data
 
   #4. Write BB
   my $iBBlk = $iSBDcnt;
@@ -277,7 +275,7 @@ sub save($$;$$) {
   #5. Write PPS
   $oThis->_savePps(\@aList, $rhInfo);
 
-  #6. Write BD and BDList and Adding Header informations
+  #6. Write BD and BDList and Adding Header information
   $oThis->_saveBbd($iSBDcnt, $iBBcnt, $iPPScnt,  $rhInfo);
 
   #7.Close File
@@ -496,7 +494,7 @@ sub _savePpsSetPnt2($$$)
       push @$raList, $aThis->[$iPos];
       $aThis->[$iPos]->{No} = $#$raList;
 
-#1.3.2 Devide a array into Previous,Next
+#1.3.2 Divide a array into Previous,Next
       $aThis->[$iPos]->{NextPps} = _savePpsSetPnt2(
             \@aNext, $raList, $rhInfo);
       $aThis->[$iPos]->{DirPps} = _savePpsSetPnt2($aThis->[$iPos]->{Child}, $raList, $rhInfo);
@@ -532,7 +530,7 @@ sub _savePpsSetPnt2s($$$)
       push @$raList, $aThis->[$iPos];
       $aThis->[$iPos]->{No} = $#$raList;
       my @aWk = @$aThis;
-#1.3.2 Devide a array into Previous,Next
+#1.3.2 Divide a array into Previous,Next
       my @aPrev = splice(@aWk, 0, $iPos);
       my @aNext = splice(@aWk, 1, $iCnt - $iPos -1);
       $aThis->[$iPos]->{PrevPps} = _savePpsSetPnt2(
@@ -571,7 +569,7 @@ sub _savePpsSetPnt($$$)
       push @$raList, $aThis->[$iPos];
       $aThis->[$iPos]->{No} = $#$raList;
       my @aWk = @$aThis;
-#1.3.2 Devide a array into Previous,Next
+#1.3.2 Divide a array into Previous,Next
       my @aPrev = splice(@aWk, 0, $iPos);
       my @aNext = splice(@aWk, 1, $iCnt - $iPos -1);
       $aThis->[$iPos]->{PrevPps} = _savePpsSetPnt(
@@ -610,7 +608,7 @@ sub _savePpsSetPnt1($$$)
       push @$raList, $aThis->[$iPos];
       $aThis->[$iPos]->{No} = $#$raList;
       my @aWk = @$aThis;
-#1.3.2 Devide a array into Previous,Next
+#1.3.2 Divide a array into Previous,Next
       my @aPrev = splice(@aWk, 0, $iPos);
       my @aNext = splice(@aWk, 1, $iCnt - $iPos -1);
       $aThis->[$iPos]->{PrevPps} = _savePpsSetPnt(
@@ -709,11 +707,9 @@ sub _saveBbd($$$$)
 # OLE::Storage_Lite::PPS::File
 #==============================================================================
 package OLE::Storage_Lite::PPS::File;
-require Exporter;
 use strict;
-use vars qw($VERSION @ISA);
-@ISA = qw(OLE::Storage_Lite::PPS Exporter);
-$VERSION = '0.22';
+our @ISA = qw(OLE::Storage_Lite::PPS);
+our $VERSION = '0.24';
 #------------------------------------------------------------------------------
 # new (OLE::Storage_Lite::PPS::File)
 #------------------------------------------------------------------------------
@@ -797,11 +793,9 @@ sub append ($$) {
 # new (OLE::Storage_Lite::PPS::Dir)
 #------------------------------------------------------------------------------
 package OLE::Storage_Lite::PPS::Dir;
-require Exporter;
 use strict;
-use vars qw($VERSION @ISA);
-@ISA = qw(OLE::Storage_Lite::PPS Exporter);
-$VERSION = '0.22';
+our @ISA = qw(OLE::Storage_Lite::PPS);
+our $VERSION = '0.24';
 sub new ($$;$$$) {
     my($sClass, $sName, $raTime1st, $raTime2nd, $raChild) = @_;
     OLE::Storage_Lite::PPS::_new(
@@ -823,7 +817,6 @@ sub new ($$;$$$) {
 # OLE::Storage_Lite
 #==============================================================================
 package OLE::Storage_Lite;
-require Exporter;
 
 use strict;
 use Carp;
@@ -831,9 +824,7 @@ use IO::File;
 use List::Util qw(first);
 use Time::Local 'timegm';
 
-use vars qw($VERSION @ISA @EXPORT);
-@ISA = qw(Exporter);
-$VERSION = '0.22';
+our $VERSION = '0.24';
 sub _getPpsSearch($$$$$;$);
 sub _getPpsTree($$$;$);
 #------------------------------------------------------------------------------
@@ -924,7 +915,7 @@ sub _initParse($) {
   #3. $sFile is a simple filename string
   elsif(!ref($sFile)) {
     $oIo = new IO::File;
-    $oIo->open("<$sFile") || return undef;
+    $oIo->open($sFile, "r") || return undef;
     binmode($oIo);
   }
   #4 Assume that if $sFile is a ref then it is a valid filehandle
@@ -1003,7 +994,7 @@ sub _getPpsSearch($$$$$;$) {
   return @aRes;
 }
 #===================================================================
-# Get Header Info (BASE Informain about that file)
+# Get Header Info (BASE Information about that file)
 #===================================================================
 sub _getHeaderInfo($){
   my($FILE) = @_;
@@ -1370,9 +1361,9 @@ sub LocalDate2OLE {
     return "\x00" x 8 unless $localtime;
 
     # Convert from localtime (actually gmtime) to seconds.
-    my @localtimecopy = @{$localtime};
-    $localtimecopy[5] += 1900 unless $localtimecopy[5] > 99;
-    my $time = timegm( @localtimecopy );
+    my @localtime_copy = @{$localtime};
+    $localtime_copy[5] += 1900 unless $localtime_copy[5] > 99;
+    my $time = timegm( @localtime_copy );
 
     # Add the number of seconds between the 1601 and 1970 epochs.
     $time += 11644473600;
@@ -1411,7 +1402,7 @@ OLE::Storage_Lite - Simple Class for OLE document interface.
     # From a filehandle object
     use IO::File;
     my $oIo = new IO::File;
-    $oIo->open("<iofile.xls");
+    $oIo->open("iofile.xls", "r");
     binmode($oIo);
     my $oOl = OLE::Storage_Lite->new($oFile);
 
@@ -1425,8 +1416,8 @@ OLE::Storage_Lite - Simple Class for OLE document interface.
 
     # To a filehandle object
     my $oIo = new IO::File;
-    $oIo->open(">iofile.xls");
-    bimode($oIo);
+    $oIo->open("iofile.xls", "w");
+    binmode($oIo);
     $oPps->save($oIo);
 
 
