@@ -9,7 +9,7 @@ use Log::Any;
 use Workflow::Exception qw( persist_error );
 use Syntax::Keyword::Try;
 
-$Workflow::Persister::DBI::SequenceId::VERSION = '2.08';
+$Workflow::Persister::DBI::SequenceId::VERSION = '2.09';
 
 my @FIELDS = qw( log sequence_name sequence_select );
 __PACKAGE__->mk_accessors(@FIELDS);
@@ -54,15 +54,15 @@ Workflow::Persister::DBI::SequenceId - Persister to fetch ID from a sequence
 
 =head1 VERSION
 
-This documentation describes version 2.08 of this package
+This documentation describes version 2.09 of this package
 
 =head1 SYNOPSIS
 
- <persister
-     name="MyPersister"
-     workflow_sequence="wf_seq"
-     history_sequence="wf_history_seq"
- ...
+ persister:
+ - name: MyPersister
+   workflow_sequence: wf_seq
+   history_sequence: wf_history_seq
+   ...
 
 =head1 DESCRIPTION
 

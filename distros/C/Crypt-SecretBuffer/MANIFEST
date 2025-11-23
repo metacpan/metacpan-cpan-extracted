@@ -42,8 +42,9 @@ t/21-write-async.t
 t/22-as_pipe.t
 t/30-span.t
 t/40-ini.t
-t/90-with-inline.t
+t/90-c-api.t
 t/91-optional-c-support.t
+t/92-with-inline.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/lib/Test2AndUtils.pm

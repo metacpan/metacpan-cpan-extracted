@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Request::Role::Query::Param::Version_id;
 # ABSTRACT: version_id query param role
-$Net::Amazon::S3::Request::Role::Query::Param::Version_id::VERSION = '0.991';
+$Net::Amazon::S3::Request::Role::Query::Param::Version_id::VERSION = '0.992';
 use Moose::Role;
 
 with 'Net::Amazon::S3::Request::Role::Query::Param' => {
@@ -24,7 +24,7 @@ Net::Amazon::S3::Request::Role::Query::Param::Version_id - version_id query para
 
 =head1 VERSION
 
-version 0.991
+version 0.992
 
 =head1 AUTHOR
 
@@ -32,7 +32,7 @@ Branislav Zahradník <barney@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
+This software is copyright (c) 2025 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

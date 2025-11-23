@@ -1,5 +1,14 @@
 Revision history for Perl module Net::Amazon::S3:
 
+v0.992     2025-11-22
+
+v0.992     2025-11-22
+	- Drop explicit use of 'sort' pragma, since this has been discouraged (thanks jjatria)
+	- Fix multipart upload bug (issue #123, thanks vitstradal)
+	- Fix operator precedence bug (thanks mauke)
+	- Bump min Perl version due dependencies: v5.16
+	- Change github uris
+
 v0.991     2022-07-17
 	- Fix Signature V4 when uri contains tilde (issue #119, thanks marcusclip)
 	- API->bucket now accepts optional region (issue #117)

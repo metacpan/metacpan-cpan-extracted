@@ -6,7 +6,7 @@ use v5.14.0;
 
 use parent qw( Workflow::Condition );
 
-$Workflow::Condition::HasUser::VERSION = '2.08';
+$Workflow::Condition::HasUser::VERSION = '2.09';
 
 my $DEFAULT_USER_KEY = 'current_user';
 
@@ -42,26 +42,28 @@ Workflow::Condition::HasUser - Condition to determine if a user is available
 
 =head1 VERSION
 
-This documentation describes version 2.08 of this package
+This documentation describes version 2.09 of this package
 
 =head1 SYNOPSIS
 
  # First setup the condition
 
- <conditions>
-   <condition name="HasUser"
-              class="Workflow::Condition::HasUser">
-     <param name="user_key" value="CurrentUser" />
-   </condition>
-   ...
+ condition:
+ - name: HasUser
+   class: Workflow::Condition::HasUser
+   param:
+   - name: user_key
+     value: CurrentUser
 
  # Next, attach it to an action
 
- <state name="INITIAL">
-   <action name="create issue"
-           resulting_state="CREATED">
-       <condition name="CurrentUser" />
-   </action>
+ state:
+ - name: INITIAL
+   action:
+   - name: 'create issue'
+     resulting_state: CREATED
+     condition:
+     - name: CurrentUser
    ...
 
  # Whenever you fetch available actions from state 'INITIAL' you must

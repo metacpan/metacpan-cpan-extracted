@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Response;
 # ABSTRACT: Behaviour common to most S3 responses.
-$Net::Amazon::S3::Response::VERSION = '0.991';
+$Net::Amazon::S3::Response::VERSION = '0.992';
 use Moose;
 
 use Carp ();
@@ -122,7 +122,12 @@ sub version_id {
 sub is_xml_content {
 	my ($self) = @_;
 
-	return $self->content_type =~ m:[/+]xml\b: && $self->decoded_content;
+	my $decoded_content = $self->decoded_content;
+	my $content_type = $self->content_type;
+
+	return $content_type =~ m{[/+]xml\b} && $decoded_content if $content_type;
+	return 1 if $decoded_content && $decoded_content =~ /^<\?xml\b/;
+	return 0;
 }
 
 sub is_error {
@@ -255,7 +260,7 @@ Net::Amazon::S3::Response - Behaviour common to most S3 responses.
 
 =head1 VERSION
 
-version 0.991
+version 0.992
 
 =head1 SYNOPSIS
 
@@ -447,7 +452,7 @@ Branislav Zahradník <barney@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
+This software is copyright (c) 2025 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

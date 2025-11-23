@@ -12,7 +12,7 @@ use Workflow::Condition::IsFalse;
 use Workflow::Condition::IsTrue;
 
 $Workflow::Condition::CACHE_RESULTS = 1;
-$Workflow::Condition::VERSION = '2.08';
+$Workflow::Condition::VERSION = '2.09';
 
 $Workflow::Condition::STRICT_BOOLEANS = 1;
 
@@ -98,40 +98,35 @@ Workflow::Condition - Evaluate a condition depending on the workflow state and e
 
 =head1 VERSION
 
-This documentation describes version 2.08 of this package
+This documentation describes version 2.09 of this package
 
 =head1 SYNOPSIS
 
- # First declare the condition in a 'workflow_condition.xml'...
+ # First declare the condition in a 'workflow_condition.yaml'...
 
- <conditions>
-   <condition
-      name="IsAdminUser"
-      class="MyApp::Condition::IsAdminUser">
-         <param name="admin_group_id" value="5" />
-         <param name="admin_group_id" value="6" />
-   </condition>
- ...
+ condition:
+ - name: IsAdminUser
+   class: MyApp::Condition::IsAdminUser
+   param:
+   - name: admin_group_id
+     value: '5'
+   - name: admin_group_id
+     value: '6'
 
  # Reference the condition in an action of the state/workflow definition...
- <workflow>
-   <state>
-     ...
-     <action name="SomeAdminAction">
-       ...
-       <condition name="IsAdminUser" />
-     </action>
-     <action name="AnotherAdminAction">
-      ...
-      <condition name="IsAdminUser" />
-     </action>
-     <action name="AUserAction">
-      ...
-      <condition name="!IsAdminUser" />
-     </action>
-   </state>
+ state:
+ - name: SomeAdminAction
    ...
- </workflow>
+   condition:
+   - name: IsAdminUser
+ - name: AnotherAdminAction
+   ...
+   condition:
+   - name: IsAdminUser
+ - name: AUserAction
+   ...
+   condition:
+   - name: !IsAdminUser
 
  # Then implement the condition
 
@@ -192,15 +187,15 @@ for both.
 
 You can accomplish this by adding a type in the condition configuration.
 
- <conditions>
- <type>Ticket</type>
-   <condition
-      name="IsAdminUser"
-      class="MyApp::Condition::IsAdminUser">
-         <param name="admin_group_id" value="5" />
-         <param name="admin_group_id" value="6" />
-   </condition>
- ...
+ type: Ticket
+ condition:
+ - name: IsAdminUser
+   class: MyApp::Condition::IsAdminUser
+   param:
+   - name: admin_group_id
+     value: '5'
+   - name: admin_group_id
+     value: '6'
 
 The type must match a loaded workflow type, or the condition won't work.
 When the workflow looks for a condition, it will look for a typed condition

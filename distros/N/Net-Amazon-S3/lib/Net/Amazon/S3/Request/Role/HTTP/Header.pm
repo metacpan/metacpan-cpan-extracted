@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Request::Role::HTTP::Header;
 # ABSTRACT: HTTP Header Role
-$Net::Amazon::S3::Request::Role::HTTP::Header::VERSION = '0.991';
+$Net::Amazon::S3::Request::Role::HTTP::Header::VERSION = '0.992';
 use MooseX::Role::Parameterized;
 
 parameter name => (
@@ -42,7 +42,7 @@ role {
 	has $name => (
 		is => 'ro',
 		isa => $params->constraint,
-		(init_arg => undef) x!! $name =~ m/^_/,
+		(init_arg => undef) x!! ($name =~ m/^_/),
 		required => $params->required,
 		(default => $params->default) x!! defined $params->default,
 	);
@@ -71,7 +71,7 @@ Net::Amazon::S3::Request::Role::HTTP::Header - HTTP Header Role
 
 =head1 VERSION
 
-version 0.991
+version 0.992
 
 =head1 AUTHOR
 
@@ -79,7 +79,7 @@ Branislav Zahradník <barney@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
+This software is copyright (c) 2025 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

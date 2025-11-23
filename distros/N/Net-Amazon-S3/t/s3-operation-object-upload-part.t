@@ -42,8 +42,6 @@ sub expect_operation_object_upload_part {
 					value       => 'foo-bar-baz',
 					upload_id   => 42,
 					part_number => 1,
-					acl_short   => 'private',
-					copy_source => 'source-key',
 					headers     => {
 						x_amz_meta_additional => 'additional-header',
 					},
@@ -54,8 +52,6 @@ sub expect_operation_object_upload_part {
 					value       => 'foo-bar-baz',
 					upload_id   => 42,
 					part_number => 1,
-					acl_short   => 'private',
-					copy_source => 'source-key',
 					headers     => {
 						x_amz_meta_additional => 'additional-header',
 						'Content-Length' => 11,

@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Client::Object;
-$Net::Amazon::S3::Client::Object::VERSION = '0.991';
+$Net::Amazon::S3::Client::Object::VERSION = '0.992';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 use DateTime::Format::HTTP;
@@ -344,8 +344,6 @@ sub put_part {
 
 		upload_id   => $args{upload_id},
 		part_number => $args{part_number},
-		acl_short   => $args{acl_short},
-		copy_source => $args{copy_source},
 		headers     => $args{headers},
 		value       => $args{value},
 	);
@@ -363,7 +361,7 @@ sub uri {
 	my $self = shift;
 	return Net::Amazon::S3::Operation::Object::Fetch::Request->new (
 		s3     => $self->client->s3,
-		bucket => $self->bucket->name,
+		bucket => $self->bucket,
 		key    => $self->key,
 		method => 'GET',
 	)->http_request->uri;
@@ -378,7 +376,7 @@ sub query_string_authentication_uri_for_method {
 	my ($self, $method, $query_form) = @_;
 	return Net::Amazon::S3::Operation::Object::Fetch::Request->new (
 		s3     => $self->client->s3,
-		bucket => $self->bucket->name,
+		bucket => $self->bucket,
 		key    => $self->key,
 		method => $method,
 	)->query_string_authentication_uri ($self->expires->epoch, $query_form);
@@ -537,7 +535,7 @@ Net::Amazon::S3::Client::Object - An easy-to-use Amazon S3 client object
 
 =head1 VERSION
 
-version 0.991
+version 0.992
 
 =head1 SYNOPSIS
 
@@ -887,7 +885,7 @@ Branislav Zahradník <barney@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
+This software is copyright (c) 2025 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -101,45 +101,76 @@ void secret_buffer_set_len(secret_buffer *buf, size_t new_len) {
       SvCUR(buf->stringify_sv)= new_len;
 }
 
-/* Overwrite the buffer with the contents of the SV, taking into account
- * whether it might be a scalar-ref, SecretBuffer, or SecretBuffer::Span.
+/* Return a pointer to some data and the length of that data, using SvPVbyte or equivalent
+ * for SecretBuffer or SecretBuffer::SPan objects.
  */
-void secret_buffer_assign_sv(secret_buffer *buf, SV *src) {
+const char *secret_buffer_SvPVbyte(SV *thing, STRLEN *len_out) {
    secret_buffer *src_buf;
    secret_buffer_span *span;
+   // The string is not NUL-terminated, so the user must use this value
+   if (!len_out)
+      croak("len_out is required");
    // if it is a ref to something that isn't an object (like a scalar-ref)
    // then load from that instead.
-   if (src && SvROK(src) && !sv_isobject(src))
-      src= SvRV(src);
-   // Assigning from NULL or undef empties the buffer
-   if (!src || !SvOK(src)) {
-      secret_buffer_realloc(buf, 0);
-      return;
+   if (thing && SvROK(thing) && !sv_isobject(thing))
+      thing= SvRV(thing);
+   // NULL or undef represent an empty string
+   if (!thing || !SvOK(thing)) {
+      *len_out= 0;
+      return "";
    }
-   else if ((src_buf= secret_buffer_from_magic(src, 0))) {
-      secret_buffer_set_len(buf, src_buf->len);
-      if (src_buf->len)
-         memcpy(buf->data, src_buf->data, src_buf->capacity < buf->capacity? src_buf->capacity : buf->capacity);
+   else if ((src_buf= secret_buffer_from_magic(thing, 0))) {
+      *len_out= src_buf->len;
+      return src_buf->data? src_buf->data : "";
    }
-   else if ((span= secret_buffer_span_from_magic(src, 0))) {
-      SV **buf_field= hv_fetchs(((HV*)SvRV(src)), "buf", 0);
-      secret_buffer_set_len(buf, 0);
-      if (buf_field && *buf_field && (src_buf= secret_buffer_from_magic(src, 0))) {
-         size_t lim= span->lim > src_buf->len? src_buf->len : span->lim;
-         size_t pos= span->pos > lim? lim : span->pos;
-         if (pos < lim) {
-            secret_buffer_set_len(buf, lim - pos);
-            memcpy(buf->data, src_buf->data + pos, lim - pos);
-         }
-      }
+   else if ((span= secret_buffer_span_from_magic(thing, 0))) {
+      SV **buf_field= hv_fetchs(((HV*)SvRV(thing)), "buf", 0);
+      if (!buf_field || !*buf_field || !(src_buf= secret_buffer_from_magic(*buf_field, 0)))
+         croak("Span lacks reference to source buffer");
+      if (span->lim > src_buf->len || span->pos > span->lim)
+         croak("Span references invalid range of source buffer");
+      *len_out= span->lim - span->pos;
+      return src_buf->data? (src_buf->data + span->pos) : "";
    }
    else {
-      STRLEN len;
-      char *str= SvPVbyte(src, len);
-      secret_buffer_set_len(buf, len);
-      if (len)
-         memcpy(buf->data, str, len);
+      return SvPVbyte(thing, *len_out);
    }
+}
+
+/* Overwrite the span of the buffer with the contents of the SV, taking into account
+ * whether it might be a scalar-ref, SecretBuffer, or SecretBuffer::Span.
+ */
+void secret_buffer_splice(secret_buffer *buf, size_t ofs, size_t len,
+      const char *replacement, size_t replacement_len
+) {
+   IV tail_len;
+   const char *splice_pos;
+
+   if (ofs > buf->len)
+      croak("Attempt to splice beyond end of buffer");
+   if (ofs + len > buf->len)
+      len= buf->len - ofs;
+
+   tail_len= buf->len - (ofs + len);
+   if (replacement_len > len) /* buffer is growing */
+      secret_buffer_set_len(buf, buf->len + (replacement_len - len));
+   splice_pos= buf->data + ofs;
+   //warn("splice: buf->data=%p buf->len=%d buf->capacity=%d ofs=%d len=%d replacement=%p replacement_len=%d splice_pos=%p tail_len=%d",
+   //   buf->data, (int)buf->len, (int)buf->capacity, (int)ofs, (int)len, replacement, (int)replacement_len, splice_pos, (int)tail_len);
+   /* copy anything beyond the splice to its new location */
+   if (tail_len)
+      Move(splice_pos + len, splice_pos + replacement_len, tail_len, unsigned char);
+   /* copy new data */
+   if (replacement_len)
+      Copy(replacement, splice_pos, replacement_len, unsigned char);
+   if (replacement_len < len) /* buffer shrank, wipe remainder */
+      secret_buffer_set_len(buf, buf->len - len + replacement_len);
+}
+
+void secret_buffer_splice_sv(secret_buffer *buf, size_t ofs, size_t len, SV *replacement) {
+   STRLEN repl_len;
+   const char *repl_str= secret_buffer_SvPVbyte(replacement, &repl_len);
+   secret_buffer_splice(buf, ofs, len, repl_str, repl_len);
 }
 
 /* This is just exposing the wipe function of this library for general use.

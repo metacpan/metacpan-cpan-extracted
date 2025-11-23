@@ -36,22 +36,31 @@ subtest 'basic substr functionality' => sub {
 
 subtest 'replacement functionality' => sub {
    my $buf = Crypt::SecretBuffer->new("password123");
-   my $replacement = Crypt::SecretBuffer->new("SECRET");
-   
-   # Test replacement
-   $buf->substr(4, 4, $replacement);
-   
    local $buf->{stringify_mask} = undef;
+
+   # Test replacement
+   $buf->substr(4, 4, Crypt::SecretBuffer->new("SECRET"));
    is("$buf", 'passSECRET123', 'substr replacement works correctly');
-   
+
    # Test empty replacement
-   my $empty = Crypt::SecretBuffer->new("");
-   $buf->substr(4, 6, $empty);
-   is("$buf", 'pass123', 'empty replacement removes characters');
-   
+   $buf->substr(4, 6, undef);
+   is("$buf", 'pass123', 'replace with undef');
+
    # Test replacement beyond string length
    $buf->substr(7, 0, Crypt::SecretBuffer->new("!"));
-   is("$buf", 'pass123!', 'appending with substr works');
+   is("$buf", 'pass123!', 'replace with secret');
+
+   # Test replacement with a Span
+   $buf->substr(7, 999, Crypt::SecretBuffer->new("0123456789")->span(4,4));
+   is("$buf", 'pass1234567', 'replace with Span');
+
+   # Test replacement with a scalar
+   $buf->substr(1, -1, 123456789);
+   is("$buf", 'p1234567897', 'replace with scalar');
+
+   # Test replacement with a scalar-ref
+   $buf->substr(1, -1, \"--");
+   is("$buf", 'p--7', 'replace with scalar-ref');
 };
 
 subtest 'edge cases' => sub {
@@ -86,7 +95,7 @@ subtest 'security aspects' => sub {
    
    # Test that substr is truly separate from original
    $buf->clear();
-   local $sub->{stringify_mask} = undef;
+   $sub->{stringify_mask} = undef;
    is("$sub", 'password', 'substr maintains independence after original clear');
    
    # Check behavior with custom stringify_mask
@@ -94,6 +103,14 @@ subtest 'security aspects' => sub {
    $buf->{stringify_mask} = '***';
    my $sub2 = $buf->substr(0, 6);
    is("$sub2", '***', 'substr inherits custom stringify_mask');
+
+   # Verify bytes got wiped when substr-splice shrinks the buffer
+   $buf= Crypt::SecretBuffer->new("0123456789");
+   $buf->{stringify_mask}= undef;
+   $buf->substr(2,2,"");
+   is( $buf, "01456789", 'remove 2 chars' );
+   $buf->length(10);
+   is( $buf, "01456789\0\0", 'substr wiped bytes when shrunk' );
 };
 
 done_testing;

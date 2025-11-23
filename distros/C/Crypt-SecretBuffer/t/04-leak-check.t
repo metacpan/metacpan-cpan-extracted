@@ -29,7 +29,9 @@ my $clone2= secret($buf);
 is( count_copies_in_mem($buf), 3, 'original + 2x copy' );
 
 undef $clone;
+print "# after undef\n";
 $clone2->clear;
+print "# after clear\n";
 is( count_copies_in_mem($buf), 1, 'copies cleared' );
 
 done_testing;

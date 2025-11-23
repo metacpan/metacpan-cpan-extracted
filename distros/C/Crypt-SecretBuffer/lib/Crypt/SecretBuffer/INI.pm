@@ -1,7 +1,7 @@
 package Crypt::SecretBuffer::INI;
 # VERSION
 # ABSTRACT: Parse INI format from a SecretBuffer
-$Crypt::SecretBuffer::INI::VERSION = '0.008';
+$Crypt::SecretBuffer::INI::VERSION = '0.010';
 use strict;
 use warnings;
 use Carp;
@@ -348,27 +348,30 @@ which also means your values can't contain the comment character.
 This is an arrayref of rules that describe which flags should be applied to which
 type of keys.  Each element is of the form:
 
-  { key => $literal_or_pattern, flags => $flags },
+  { key => $literal_or_regex, encoding => $enc, secret => $bool },
 
 or
 
-  { section => $header_or_regex, rules => [
+  { section => $literal_or_regex, rules => [
      ...
   ]}
 
 As a convenience, that structure can be built from a shorter notation:
 
-  $literal_key     => $flags,
-  qr/$key_pattern/ => $flags,
-  $section_header => [
+  [
+    $literal_key     => \%attrs,
+    qr/$key_pattern/ => \%attrs,
+    $section_header => [
+      ...
+    ],
+    qr/$section_pattern/ => [
+      ...
+    ],
     ...
-  ],
-  qr/$section_pattern/ => [
-    ...
-  ],
-  ...
+  ]
 
-During a parse, rules are processed in order, and the first match wins.
+Note that the rule lists are arrays, not hashrefs.  THis allows them to have regexes as keys,
+and preserves order.  During a parse, rules are checked first to last, and the first match wins.
 
 =head1 METHODS
 
@@ -402,7 +405,7 @@ This function dies on any parse errors.
 
 =head1 VERSION
 
-version 0.008
+version 0.010
 
 =head1 AUTHOR
 

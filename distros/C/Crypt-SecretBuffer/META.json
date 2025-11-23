@@ -69,7 +69,7 @@
          "web" : "https://github.com/nrdvana/perl-Crypt-SecretBuffer"
       }
    },
-   "version" : "0.008",
+   "version" : "0.010",
    "x_contributors" : [
       "Michael Conrad <mconrad@intellitree.com>"
    ],

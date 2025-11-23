@@ -4,7 +4,7 @@
       "Branislav Zahradn\u00edk <barney@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.036, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -83,7 +83,7 @@
             "constant" : "0",
             "namespace::clean" : "0",
             "parent" : "0",
-            "sort" : "0",
+            "perl" : "5.016",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -107,15 +107,15 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/rustyconover/net-amazon-s3/issues"
+         "web" : "https://github.com/happy-barney/net-amazon-s3/issues"
       },
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/rustyconover/net-amazon-s3",
-         "web" : "https://github.com/rustyconover/net-amazon-s3"
+         "url" : "https://github.com/happy-barney/net-amazon-s3",
+         "web" : "https://github.com/happy-barney/net-amazon-s3"
       }
    },
-   "version" : "0.991",
+   "version" : "0.992",
    "x_contributors" : [
       "Aaron Crane <arc@cpan.org>",
       "Ali Anari <ali@anari.me>",
@@ -125,6 +125,7 @@
       "Branislav Zahradn\u00edk <happy.barney@gmail.com>",
       "Christian Lackas <lackas@invicro.com>",
       "Conor Keegan <git@cpk.ee>",
+      "Dabrien 'Dabe' Murphy <dabe@parabon.com>",
       "Douglas Sims <ratsbane@gmail.com>",
       "Dylan William Hardison <dylan@hardison.net>",
       "Eden Crane <>",
@@ -135,9 +136,11 @@
       "Gavin Carr <gavin@openfusion.com.au>",
       "gregor herrmann <gregoa@debian.org>",
       "Haruka Iwao <haruka@fout.jp>",
+      "Jos\u00e9 Joaqu\u00edn Atria <jjatria@gmail.com>",
       "Jun Kuriyama <kuriyama@s2factory.co.jp>",
       "Leo Lapworth <leo@cuckoo.org>",
       "Leon Brocard <acme@astray.com>",
+      "mauke <lukasmai.403@gmail.com>",
       "Michael Schout <schoutm@gmail.com>",
       "Michal Josef \u0160pa\u010dek <michal.spacek@gooddata.com>",
       "Michele Beltrame <mb@cattlegrid.info>",
@@ -164,10 +167,11 @@
       "Stuart Skelton <stuarts@broadbean.com>",
       "Tom Hukins <tom@eborcom.com>",
       "toritori0318 <toritori0318@gmail.com>",
+      "V\u00edt Str\u00e1dal <vit.stradal@gooddata.com>",
       "Yanick Champoux <yanick@babyl.dyndns.org>"
    ],
-   "x_generated_by_perl" : "v5.30.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_generated_by_perl" : "v5.38.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

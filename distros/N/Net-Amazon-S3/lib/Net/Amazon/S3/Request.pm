@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Request;
-$Net::Amazon::S3::Request::VERSION = '0.991';
+$Net::Amazon::S3::Request::VERSION = '0.992';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 use Moose::Util::TypeConstraints;
@@ -14,23 +14,35 @@ enum 'LocationConstraint' => [
 	# https://docs.aws.amazon.com/AmazonS3/latest/API/API_CreateBucket.html#API_CreateBucket_RequestSyntax
 	'af-south-1',
 	'ap-east-1',
+	'ap-east-2',
 	'ap-northeast-1',
 	'ap-northeast-2',
 	'ap-northeast-3',
 	'ap-south-1',
+	'ap-south-2',
 	'ap-southeast-1',
 	'ap-southeast-2',
+	'ap-southeast-3',
+	'ap-southeast-4',
+	'ap-southeast-5',
+	'ap-southeast-7',
 	'ca-central-1',
+	'ca-west-1',
 	'cn-north-1',
 	'cn-northwest-1',
 	'EU',
 	'eu-central-1',
+	'eu-central-2',
 	'eu-north-1',
 	'eu-south-1',
+	'eu-south-2',
 	'eu-west-1',
 	'eu-west-2',
 	'eu-west-3',
+	'il-central-1',
+	'me-central-1',
 	'me-south-1',
+	'mx-central-1',
 	'sa-east-1',
 	'us-east-1',
 	'us-east-2',
@@ -192,7 +204,7 @@ Net::Amazon::S3::Request - Base class for request objects
 
 =head1 VERSION
 
-version 0.991
+version 0.992
 
 =head1 SYNOPSIS
 
@@ -209,7 +221,7 @@ Branislav Zahradník <barney@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
+This software is copyright (c) 2025 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

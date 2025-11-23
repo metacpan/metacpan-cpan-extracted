@@ -1,2 +1,10 @@
+v0.02  2025-11-22Z
+    - Added support to create a chunk from a file
+    - Fixed documentation
+    - Added experimental support for chunk types:
+        * sni:237, padding
+        * sni:230, colour palette
+        * sni:197, octet stream
+
 v0.01  2025-10-26Z
     - Initial release

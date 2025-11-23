@@ -1,6 +1,6 @@
 package Net::Amazon::S3;
 # ABSTRACT: Use the Amazon S3 - Simple Storage Service
-$Net::Amazon::S3::VERSION = '0.991';
+$Net::Amazon::S3::VERSION = '0.992';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 
@@ -416,7 +416,7 @@ Net::Amazon::S3 - Use the Amazon S3 - Simple Storage Service
 
 =head1 VERSION
 
-version 0.991
+version 0.992
 
 =head1 SYNOPSIS
 
@@ -523,7 +523,7 @@ in buckets. Bucket names are global.
 Note: This is the legacy interface, please check out
 L<Net::Amazon::S3::Client> instead.
 
-Development of this code happens here: https://github.com/rustyconover/net-amazon-s3
+Development of this code happens here: https://github.com/happy-barney/perl-net-amazon-s3
 
 =head2 Bucket names with dots, HTTPS, and Signature V4
 
@@ -1116,7 +1116,7 @@ Branislav Zahradník <barney@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
+This software is copyright (c) 2025 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

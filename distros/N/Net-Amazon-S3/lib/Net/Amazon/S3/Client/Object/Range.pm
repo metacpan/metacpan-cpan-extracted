@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Client::Object::Range;
 # ABSTRACT: Object extension allowing to fetch part of an object
-$Net::Amazon::S3::Client::Object::Range::VERSION = '0.991';
+$Net::Amazon::S3::Client::Object::Range::VERSION = '0.992';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 
@@ -68,7 +68,7 @@ Net::Amazon::S3::Client::Object::Range - Object extension allowing to fetch part
 
 =head1 VERSION
 
-version 0.991
+version 0.992
 
 =head1 SYNOPSIS
 
@@ -112,7 +112,7 @@ Branislav Zahradník <barney@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
+This software is copyright (c) 2025 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Request::Role::Tags::Add;
 # ABSTRACT: Add tags request parts common to Bucket and Object
-$Net::Amazon::S3::Request::Role::Tags::Add::VERSION = '0.991';
+$Net::Amazon::S3::Request::Role::Tags::Add::VERSION = '0.992';
 use Moose::Role;
 
 with 'Net::Amazon::S3::Request::Role::HTTP::Method::PUT';
@@ -41,7 +41,7 @@ Net::Amazon::S3::Request::Role::Tags::Add - Add tags request parts common to Buc
 
 =head1 VERSION
 
-version 0.991
+version 0.992
 
 =head1 AUTHOR
 
@@ -49,7 +49,7 @@ Branislav Zahradník <barney@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
+This software is copyright (c) 2025 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

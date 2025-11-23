@@ -15,10 +15,11 @@ use Carp;
 use Fcntl qw(SEEK_SET SEEK_CUR SEEK_END);
 
 use Data::Identifier;
+use Data::Identifier::Util v0.24;
 
 use parent qw(Data::Identifier::Interface::Userdata Data::Identifier::Interface::Known);
 
-our $VERSION = v0.01;
+our $VERSION = v0.02;
 
 use constant {
     WK_SID => Data::Identifier->new(uuid => 'f87a38cb-fd13-4e15-866c-e49901adbec5'), # small-identifier
@@ -31,6 +32,8 @@ use constant {
     FLAG_PADDING            => (1<<0),
 };
 
+my $_util = Data::Identifier::Util->new;
+
 my %_flags = map {$_ => 1} qw(standalone);
 
 # Fields:
@@ -42,6 +45,25 @@ my %_flags = map {$_ => 1} qw(standalone);
 # - Data
 # * Padding
 
+my %_type_to_pkg;
+my %_pkg_to_type;
+
+{
+    my %_sni_to_pkg = (
+        197 => 'OctetStream',
+        230 => 'ColourPalette',
+        237 => 'Padding',
+    );
+
+    foreach my $sni (keys %_sni_to_pkg) {
+        my $type = Data::Identifier->new(sni => $sni)->register;
+        my $pkg = 'SIRTX::VM::Chunk::Type::'.$_sni_to_pkg{$sni};
+
+        $_type_to_pkg{$_util->render_sirtx($type)} = $pkg;
+        $_pkg_to_type{$pkg} = $type;
+    }
+}
+
 
 sub new {
     my ($pkg, %opts) = @_;
@@ -51,6 +73,15 @@ sub new {
         chunk_identifier => undef,
         data => undef,
     }, $pkg;
+
+    if (defined(my $from = delete $opts{from})) {
+        if ($from->isa('File::Information::Inode')) {
+            $opts{type} //= $from->get('mediatype', as => 'Data::Identifier');
+            $self->attach_data($from->open_handle);
+        } else {
+            croak 'Not a supported type';
+        }
+    }
 
     if (defined(my $v = delete $opts{type})) {
         $self->type($v);
@@ -205,6 +236,8 @@ sub read {
         croak 'Invalid padding' unless ord($data) == 0;
     }
 
+    $self->attach_data($in, $data_offset, $data_length);
+
     {
         my $flags_type = $flags & ((1<<15)|(1<<14));
 
@@ -221,7 +254,6 @@ sub read {
 
     $self->set_flag(standalone => $flags & FLAG_STANDALONE);
     $self->chunk_identifier($chunk_identifier);
-    $self->attach_data($in, $data_offset, $data_length);
 }
 
 
@@ -232,6 +264,13 @@ sub type {
 
     if (defined $n) {
         $self->{type} = Data::Identifier->new(from => $n);
+
+        if (defined(my $pkg = $_type_to_pkg{$_util->render_sirtx($self->{type})})) {
+            if (ref($self) ne $pkg) {
+                require ($pkg =~ s/::/\//gr).'.pm';
+                $pkg->_upgrade($self);
+            }
+        }
     }
 
     return $self->{type};
@@ -358,6 +397,12 @@ sub _data_length {
     return $self->{data}{length};
 }
 
+sub _type {
+    my ($self) = @_;
+
+    return $_pkg_to_type{ref $self};
+}
+
 1;
 
 __END__
@@ -372,7 +417,7 @@ SIRTX::VM::Chunk - module for interacting with SIRTX VM chunks
 
 =head1 VERSION
 
-version v0.01
+version v0.02
 
 =head1 SYNOPSIS
 
@@ -401,6 +446,14 @@ The type of the chunk as per L</type>.
 =item C<flags>
 
 A hashref with flags that are to be set as per L</set_flag>.
+
+=item C<from>
+
+(since v0.02)
+
+Takes values from the object passed.
+Currently supported:
+L<File::Information::Inode>.
 
 =back
 
@@ -448,6 +501,11 @@ In order to be useable a type must have a valid I<sid> (C<small-identifier>),
 I<sni> (C<sirtx-numerical-identifier>) assigned, or being mapped to a host defined identifier,
 or a private identifier.
 
+B<Note:>
+Once set to a supported value this value might become read only.
+Hence one should only set it once.
+That is via L</new>, being read in via L</read>, or manually using this method.
+
 =head2 chunk_identifier
 
     my $chunk_identifier = $chunk->chunk_identifier;
@@ -482,6 +540,8 @@ This method is hardly useful for most code. It is provided only for debugging.
 B<Note:>
 The returned value might or might not reflect the value as read by L</read>.
 It might be a calculated value.
+
+=head2 flag
 
     my $bool = $chunk->flag($flag);
     # or:
@@ -540,6 +600,10 @@ See also L<perlfunc/binmode> regarding binary mode.
 B<Note:>
 If the data the handle refers to is altered in the used range (see offset and length) after this method is called
 the behaviour is undefined.
+
+B<Note:>
+Once the type of a chunk becomes read only this method might also become read only.
+See L</type> for details.
 
 =head2 read_data
 

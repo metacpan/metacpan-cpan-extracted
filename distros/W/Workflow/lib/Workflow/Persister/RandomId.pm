@@ -9,7 +9,7 @@ use constant DEFAULT_ID_LENGTH  => 8;
 use constant RANDOM_SEED        => 26;
 use constant CONSTANT_INCREMENT => 65;
 
-$Workflow::Persister::RandomId::VERSION = '2.08';
+$Workflow::Persister::RandomId::VERSION = '2.09';
 
 my @FIELDS = qw( id_length );
 __PACKAGE__->mk_accessors(@FIELDS);
@@ -43,14 +43,14 @@ Workflow::Persister::RandomId - Persister to generate random ID
 
 =head1 VERSION
 
-This documentation describes version 2.08 of this package
+This documentation describes version 2.09 of this package
 
 =head1 SYNOPSIS
 
- <persister
-     name="MyPersister"
-     id_length="16"
- ...
+ persister:
+ - name: MyPersister
+   id_length: 16
+   ...
 
 =head1 DESCRIPTION
 

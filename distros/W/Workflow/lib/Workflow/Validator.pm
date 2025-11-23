@@ -5,7 +5,7 @@ use strict;
 use v5.14.0;
 use parent qw( Workflow::Base );
 
-$Workflow::Validator::VERSION = '2.08';
+$Workflow::Validator::VERSION = '2.09';
 
 my @FIELDS = qw( description name );
 __PACKAGE__->mk_accessors(@FIELDS);
@@ -33,32 +33,38 @@ Workflow::Validator - Interface definition for data validation
 
 =head1 VERSION
 
-This documentation describes version 2.08 of this package
+This documentation describes version 2.09 of this package
 
 =head1 SYNOPSIS
 
  # First declare the validator...
- <validator name="DateValidator"
-            class="MyApp::Validator::Date">
-   <param name="date_format" value="%Y-%m-%d %h:%m"/>
- </validator>
+ validator:
+ - name: DateValidator
+   class: MyApp::Validator::Date
+   param:
+   - name: date_format
+     value: '%Y-%m-%d %H:%M'
 
  # Then associate the validator with runtime data from the context...
- <action name="MyAction">
-    <validator name="DateValidator">
-       <arg>$due_date</arg>
-    </validator>
- </action>
+ action:
+ - name: MyAction
+   validator:
+   - name: DateValidator
+     arg:
+     - '$due_date'
 
  # TODO: You can also inintialize and instantiate in one step if you
  # don't need to centralize or reuse (does this work?)
 
- <action name="MyAction">
-    <validator class="MyApp::Validator::Date">
-       <param name="date_format" value="%Y-%m-%d %h:%m"/>
-       <arg>$due_date</arg>
-    </validator>
- </action>
+ action:
+ - name: MyAction
+   validator:
+   - class: MyApp::Validator::Date
+     param:
+     - name: date_format
+       value: '%Y-%m-%d %H:%M'
+     arg:
+     - '$due_date'
 
  # Then implement the logic using your favorite object system; e.g. Moo
 

@@ -1,9 +1,45 @@
+Version 0.010 - 2025-11-22
+  - Fix bug where substr with replacement that shrinks the buffer would leave
+    un-wiped bytes at the end of the string.
+  - Fix compile error on BSD, possibly others
+  - New methods: splice, append
+  - substr, splice, append, and assign now all have special cases for assigning
+    a Span of a buffer.
+  - New C API functions:
+     - secret_buffer_SvPVbyte
+     - secret_buffer_splice
+     - secret_buffer_splice_sv
+  - Removed the short-lived secret_buffer_assign_sv from the previous release
+    since secret_buffer_splice_sv provides a more powerful way to do it.
+  - C API is now exported as package variables for simpler conditional use of
+    the API, such as
+    get_sv("Crypt::SecretBuffer::C_API::void secret_buffer_wipe(char *, size_t)",0);
+  - Standardized signatures of exported functions in these variables
+  - Removed the macros
+      SECRET_BUFFER_DECLARE_FUNCTION_POINTERS,
+      SECRET_BUFFER_DEFINE_FUNCTION_POINTERS, and
+      SECRET_BUFFER_DEFINE_FUNCTION_POINTERS
+    because I'm pretty sure they'll never get used, and so now SecretBuffer.h
+    doesn't need to include SecretBufferManualLinkage.h and the user can just
+    copy SecretBuffer.h as-is from the git repo.
+
 Version 0.008 - 2025-11-17
   - New Span objects assist with parsing secrets.
   - New INI object for parsing common INI-like formats.
   - SecretBuffer now has 'rindex' and 'scan' methods, and 'index' allows the
     pattern to be a Regexp-ref as long as it is only a single character class.
   - New SecretBuffer methods load_file and save_file.
+  - New C API functions:
+     - secret_buffer_charset_from_regexpref
+     - secret_buffer_charset_test_byte
+     - secret_buffer_charset_test_codepoint
+     - secret_buffer_parse_init
+     - secret_buffer_match
+     - secret_buffer_match_charset
+     - secret_buffer_match_bytestr
+     - secret_buffer_sizeof_transcode
+     - secret_buffer_transcode
+     - secret_buffer_assign_sv
 
 Version 0.007 - 2025-10-31
   - New API unmask_secrets_to and ->unmask_to

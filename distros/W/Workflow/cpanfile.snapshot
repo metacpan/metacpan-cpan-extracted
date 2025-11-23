@@ -1,19 +1,5 @@
 # carton snapshot format: version 1.0
 DISTRIBUTIONS
-  AppConfig-1.71
-    pathname: N/NE/NEILB/AppConfig-1.71.tar.gz
-    provides:
-      AppConfig 1.71
-      AppConfig::Args 1.71
-      AppConfig::CGI 1.71
-      AppConfig::File 1.71
-      AppConfig::Getopt 1.71
-      AppConfig::State 1.71
-      AppConfig::Sys 1.71
-    requirements:
-      ExtUtils::MakeMaker 0
-      Test::More 0
-      perl 5.008008
   B-Hooks-EndOfScope-0.28
     pathname: E/ET/ETHER/B-Hooks-EndOfScope-0.28.tar.gz
     provides:
@@ -31,36 +17,6 @@ DISTRIBUTIONS
       Variable::Magic 0.48
       perl 5.006001
       strict 0
-      warnings 0
-  CGI-4.65
-    pathname: L/LE/LEEJO/CGI-4.65.tar.gz
-    provides:
-      CGI 4.65
-      CGI::Carp 4.65
-      CGI::Cookie 4.59
-      CGI::File::Temp 4.65
-      CGI::HTML::Functions undef
-      CGI::MultipartBuffer 4.65
-      CGI::Pretty 4.65
-      CGI::Push 4.65
-      CGI::Util 4.65
-      Fh 4.65
-    requirements:
-      Carp 0
-      Config 0
-      Encode 0
-      Exporter 0
-      ExtUtils::MakeMaker 0
-      File::Spec 0.82
-      File::Temp 0.17
-      HTML::Entities 3.69
-      URI 1.76
-      if 0
-      overload 0
-      parent 0.225
-      perl 5.008001
-      strict 0
-      utf8 0
       warnings 0
   CPAN-Requirements-Dynamic-0.001
     pathname: L/LE/LEONT/CPAN-Requirements-Dynamic-0.001.tar.gz
@@ -156,25 +112,6 @@ DISTRIBUTIONS
       Test::Exception 0.31
       Test::More 0.47
       perl 5.008001
-  DBD-SQLite-1.74
-    pathname: I/IS/ISHIGAKI/DBD-SQLite-1.74.tar.gz
-    provides:
-      DBD::SQLite 1.74
-      DBD::SQLite::Constants undef
-      DBD::SQLite::GetInfo undef
-      DBD::SQLite::VirtualTable 1.74
-      DBD::SQLite::VirtualTable::Cursor 1.74
-      DBD::SQLite::VirtualTable::FileContent undef
-      DBD::SQLite::VirtualTable::FileContent::Cursor undef
-      DBD::SQLite::VirtualTable::PerlData undef
-      DBD::SQLite::VirtualTable::PerlData::Cursor undef
-    requirements:
-      DBI 1.57
-      ExtUtils::MakeMaker 0
-      File::Spec 0.82
-      Test::More 0.88
-      Tie::Hash 0
-      perl 5.006
   DBI-1.643
     pathname: T/TI/TIMB/DBI-1.643.tar.gz
     provides:
@@ -972,24 +909,6 @@ DISTRIBUTIONS
       locale 0
       perl 5.008001
       strict 0
-  HTTP-Daemon-6.16
-    pathname: O/OA/OALDERS/HTTP-Daemon-6.16.tar.gz
-    provides:
-      HTTP::Daemon 6.16
-    requirements:
-      Carp 0
-      ExtUtils::MakeMaker 0
-      HTTP::Date 6
-      HTTP::Request 6
-      HTTP::Response 6
-      HTTP::Status 6
-      IO::Socket::IP 0.32
-      LWP::MediaTypes 6
-      Module::Build::Tiny 0.034
-      Socket 0
-      perl 5.006
-      strict 0
-      warnings 0
   HTTP-Date-6.06
     pathname: O/OA/OALDERS/HTTP-Date-6.06.tar.gz
     provides:
@@ -1419,65 +1338,6 @@ DISTRIBUTIONS
       XS::Parse::Keyword 0.06
       XS::Parse::Keyword::Builder 0.06
       perl 5.014
-  Template-Toolkit-3.101
-    pathname: A/AB/ABW/Template-Toolkit-3.101.tar.gz
-    provides:
-      Template 3.101
-      Template::Base 3.100
-      Template::Config 3.100
-      Template::Constants 3.100
-      Template::Context 3.100
-      Template::Directive 3.100
-      Template::Document 3.100
-      Template::Exception 3.100
-      Template::Filters 3.100
-      Template::Grammar 3.100
-      Template::Iterator 3.100
-      Template::Monad::Assert 3.100
-      Template::Monad::Scalar 3.100
-      Template::Namespace::Constants 3.100
-      Template::Parser 3.100
-      Template::Perl 3.100
-      Template::Plugin 3.100
-      Template::Plugin::Assert 3.100
-      Template::Plugin::Datafile 3.100
-      Template::Plugin::Date 3.100
-      Template::Plugin::Date::Calc 3.100
-      Template::Plugin::Date::Manip 3.100
-      Template::Plugin::Directory 3.100
-      Template::Plugin::Dumper 3.100
-      Template::Plugin::File 3.100
-      Template::Plugin::Filter 3.100
-      Template::Plugin::Format 3.100
-      Template::Plugin::HTML 3.100
-      Template::Plugin::Image 3.100
-      Template::Plugin::Iterator 3.100
-      Template::Plugin::Math 3.100
-      Template::Plugin::Pod 3.100
-      Template::Plugin::Procedural 3.100
-      Template::Plugin::Scalar 3.100
-      Template::Plugin::String 3.100
-      Template::Plugin::Table 3.100
-      Template::Plugin::URL 3.100
-      Template::Plugin::View 3.100
-      Template::Plugin::Wrap 3.100
-      Template::Plugins 3.100
-      Template::Provider 3.100
-      Template::Service 3.100
-      Template::Stash 3.100
-      Template::Stash::Context 3.100
-      Template::Stash::XS undef
-      Template::Test 3.100
-      Template::TieString 3.100
-      Template::Toolkit 3.100
-      Template::VMethods 3.100
-      Template::View 3.100
-    requirements:
-      AppConfig 1.56
-      ExtUtils::MakeMaker 0
-      File::Spec 0.8
-      File::Temp 0.12
-      Scalar::Util 0
   Test-Exception-0.43
     pathname: E/EX/EXODIST/Test-Exception-0.43.tar.gz
     provides:

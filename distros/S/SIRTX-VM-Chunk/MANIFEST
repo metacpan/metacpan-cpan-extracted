@@ -10,5 +10,9 @@ README
 cpanfile
 dist.ini
 lib/SIRTX/VM/Chunk.pm
+lib/SIRTX/VM/Chunk/Type.pm
+lib/SIRTX/VM/Chunk/Type/ColourPalette.pm
+lib/SIRTX/VM/Chunk/Type/OctetStream.pm
+lib/SIRTX/VM/Chunk/Type/Padding.pm
 t/01_load.t
 xt/author/pod-syntax.t

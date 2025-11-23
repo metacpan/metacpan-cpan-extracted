@@ -53,6 +53,18 @@ SV* return_secret_via_local(SV *password) {
   return newSVpvn(actual_pass, actual_pass_len);
 }
 
+typedef const char * (*sb_SvPVbyte_p)(SV *, STRLEN *);
+
+SV* return_secret_via_sbSvPV(SV *password) {
+   SV *sv= get_sv("Crypt::SecretBuffer::C_API::const char * secret_buffer_SvPVbyte(SV *, STRLEN *)", 0);
+   if (sv) {
+      STRLEN len;
+      const char *str= ((sb_SvPVbyte_p)SvIV(sv))(password, &len);
+      return newSVpvn(str, len);
+   }
+   return &PL_sv_undef;
+}
+
 END_C
 
 1;
@@ -76,6 +88,8 @@ END_PM
    is( TestSBOptional::return_secret_via_local($s), "test", 'via_local from SecretBuffer' );
    # ensure 'local' reverted after the C call
    is( "$s", "<PASSWORD>", 'mask returned after via_local' );
+   # Using the package sv of the function signature
+   is( TestSBOptional::return_secret_via_sbSvPV($s), "test", 'via global SV named after the function' );
 }
 else {
    diag $@;

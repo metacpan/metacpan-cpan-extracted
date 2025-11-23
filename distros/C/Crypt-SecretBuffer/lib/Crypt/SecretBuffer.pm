@@ -1,7 +1,7 @@
 package Crypt::SecretBuffer;
 # VERSION
 # ABSTRACT: Prevent accidentally leaking a string of sensitive data
-$Crypt::SecretBuffer::VERSION = '0.008';
+$Crypt::SecretBuffer::VERSION = '0.010';
 
 use strict;
 use warnings;
@@ -16,7 +16,7 @@ bootstrap Crypt::SecretBuffer;
 
 {
    package Crypt::SecretBuffer::Exports;
-$Crypt::SecretBuffer::Exports::VERSION = '0.008';
+$Crypt::SecretBuffer::Exports::VERSION = '0.010';
 use Exporter 'import';
    @Crypt::SecretBuffer::Exports::EXPORT_OK= qw(
       secret_buffer secret unmask_secrets_to
@@ -246,29 +246,19 @@ but don't want your module to depend on Crypt::SecretBuffer, here are some usefu
 
 =item In C code, conditionally access the SecretBuffer C API
 
-  typedef struct {
-    char *data;
-    size_t len, capacity;
-    SV *stringify_sv;
-  } secret_buffer;
-  typedef secret_buffer* sb_from_magic_t(SV *ref, int flags);
-  
+(secret_buffer_SvPVbyte is a handy function that gives you a pointer to the
+buffer, and even handles Span objects for you, and works like SvPVbyte even on
+things that are not SecretBuffer objects)
+
+  typedef const char * (*sb_SvPVbyte_p)(SV *, STRLEN *);
   ...
-     const char *actual_pass= NULL;
-     STRLEN actual_pass_len;
-  
-     HV *secretbuffer_api = get_hv("Crypt::SecretBuffer::C_API", 0);
-     if (secretbuffer_api) { /* only becomes true after 'use Crypt::SecretBuffer;' */
-       SV **svp = hv_fetchs(secretbuffer_api, "secret_buffer_from_magic", 0);
-       sb_from_magic_t *sb_from_magic= svp && *svp? (sb_from_magic_t*) SvIV(*svp) : NULL;
-       secret_buffer *buf;
-       if (sb_from_magic && (buf= sb_from_magic(password, 0))) {
-         actual_pass= buf->data;
-         actual_pass_len= buf->len;
-       }
-     }
-     if (!actual_pass)
-       actual_pass= SvPV(password, actual_pass_len);
+  const char *actual_pass= NULL;
+  STRLEN actual_pass_len;
+  SV *sv= get_sv("Crypt::SecretBuffer::C_API::const char * secret_buffer_SvPVbyte(SV *, STRLEN *)", 0);
+  if (sv)
+    actual_pass= ((sb_SvPVbyte_p)SvIV(sv))(password, &actual_pass_len);
+  else
+    actual_pass= SvPV(password, &actual_pass_len);
   ...
 
 =back
@@ -332,12 +322,45 @@ hash key directly.
 
 Erases the buffer.  Equivalent to C<< $buf->length(0) >>.  Returns C<$self> for chaining.
 
+=head2 splice
+
+  $buf->splice($offset, $length, $replacement);
+
+Replace a span of bytes in the buffer with a new value.  C<$offset> and C<$length> may be
+negative to reference backward from the end of the buffer.  The replacement may be another
+C<SecretBuffer>, a L<Span|Crypt::SecretBuffer::Span>, a scalar, a scalar-ref.
+
+Returns C<$self>, for chaining.  If you want to return the replaced span, use C<substr>.
+
 =head2 assign
 
-  $buf->assign($other_buf); # good
-  $buf->assign($string);    # works, but $string isn't secret...
+  $buf->assign($replacement);
 
-Assign a value to the buffer.  Returns C<$self>, for chaining.
+Alias for C<< $buf->splice(0, $buf->length, $replacemenmt) >>.
+
+=head2 append
+
+  $buf->append($data)
+
+Alias for C<< $buf->splice($buf->length, 0, $replacemenmt) >>.
+
+=head2 substr
+
+  $buf->substr(1);            # New SecretBuffer minus the first character
+  $buf->substr(0,5);          # First 5 characters of buffer
+  $buf->substr(0,5,$buf2);    # replace first 5 characters with content of $buf2
+
+This is exactly like Perl's C<substr> function, but it returns
+C<Crypt::SecretBuffer> objects, and they are not an lvalue that alters the
+original.  The offset and length are always bytes.
+
+=head2 span
+
+  $span= $buf->span($pos= 0, $len= $buf->len, $encoding=undef);
+  $span= $buf->span(pos => $p0, lim => $p1, encoding => UTF8);
+
+Like substr, but returns a L<Crypt::SecretBuffer::Span> which holds a reference back to the
+original SecretBuffer.  The Span object has various methods convenient for parsing.
 
 =head2 stringify
 
@@ -423,24 +446,6 @@ the same encoding >>.
 Note that C<$ofs> and C<$len> are still byte positions, and still suitable for
 L</substr> on the buffer, which is different from Perl's substr on a unicode
 string which works in terms of characters.
-
-=head2 substr
-
-  $buf->substr(1);            # New SecretBuffer minus the first character
-  $buf->substr(0,5);          # First 5 characters of buffer
-  $buf->substr(0,5,$buf2);    # replace first 5 characters with content of $buf2
-
-This is exactly like Perl's C<substr> function, but it returns
-C<Crypt::SecretBuffer> objects, and they are not an lvalue that alters the
-original.  The offset and length are always bytes.
-
-=head2 span
-
-  $span= $buf->span($pos= 0, $len= $buf->len, $encoding=undef);
-  $span= $buf->span(pos => $p0, lim => $p1, encoding => UTF8);
-
-Like substr, but returns a L<Crypt::SecretBuffer::Span> which holds a reference back to the
-original SecretBuffer.  The Span object has various methods convenient for parsing.
 
 =head2 append_random
 
@@ -584,7 +589,7 @@ L<Crypt::SecretBuffer::Span/encoding>.
 
 =item ISO8859_1
 
-The default - bytes are treated as the first 256 codepoints of Unicode.
+The default; bytes are treated as the first 256 codepoints of Unicode.
 
 =item ASCII
 
@@ -592,10 +597,9 @@ Bytes are restricted to 7-bit ASCII.  High bytes throw an exception.
 
 =item HEX
 
-Decode hexadecimal from the buffer before comparing to bytes in the search
-string.  Hex is case-insensitive and whitespace in a HEX string is ignored,
-allowing the data to be line-wraped.  There must be a multiple of two hex
-characters, and each byte's characters must be adjacent.
+Decode hexadecimal from the buffer before comparing to bytes in the search string.
+Hex is case-insensitive and whitespace is ignored, allowing the data to be line-wraped.
+There must be a multiple of two hex characters, and each byte's characters must be adjacent.
 
 =item UTF8
 
@@ -603,7 +607,7 @@ characters, and each byte's characters must be adjacent.
 
 =item UTF16LE
 
-Treat the buffer as the specified character set, and die if any character
+Treat the buffer as the specified character encoding, and die if any character
 scanned is not valid.  (unpaired surrogates, overlong encodings, etc).
 
 =back
@@ -633,8 +637,8 @@ of buffer.
 
 =item MATCH_ANCHORED
 
-Require the match begin at the start of the specified range of the buffer.
-(or with C<MATCH_REVERSE>, end at the end of the range of the buffer).
+Require the match begin at the start of the specified span of the buffer.
+(or with C<MATCH_REVERSE>, end at the end of the span of the buffer).
 
 =back
 
@@ -681,7 +685,7 @@ instructions how to report security vulnerabilities.
 
 =head1 VERSION
 
-version 0.008
+version 0.010
 
 =head1 AUTHOR
 

@@ -18,7 +18,7 @@ use Readonly;
 Readonly::Scalar my $TRUE => 1;
 Readonly::Scalar my $FALSE => 0;
 
-$Workflow::Persister::DBI::VERSION = '2.08';
+$Workflow::Persister::DBI::VERSION = '2.09';
 
 my @FIELDS = qw( _wf_fields _hist_fields handle dsn user password driver
     workflow_table history_table date_format parser autocommit options);
@@ -483,32 +483,30 @@ Workflow::Persister::DBI - Persist workflow and history to DBI database
 
 =head1 VERSION
 
-This documentation describes version 2.08 of this package
+This documentation describes version 2.09 of this package
 
 =head1 SYNOPSIS
 
- <persister name="MainDatabase"
-            class="Workflow::Persister::DBI"
-            dsn="DBI:mysql:database=workflows"
-            user="wf"
-            password="mypass"/>
-
- <persister name="BackupDatabase"
-            class="Workflow::Persister::DBI"
-            dsn="DBI:Pg:dbname=workflows"
-            user="wf"
-            password="mypass"
-            date_format="%Y-%m-%d %H:%M"
-            autocommit="0"
-            workflow_table="wf"
-            workflow_sequence="wf_seq"
-            history_table="wf_history"
-            history_sequence="wf_history_seq"/>
-
- <persister name="OtherDatabase"
-            class="My::Persister::DBHFromElsewhere"
-            driver="mysql"
-            />
+ # persister.yaml
+ persister:
+ - name: MainDatabase
+   class: Workflow::Persister::DBI
+   dsn: DBI:mysql:database=workflows
+   user: wf
+   password: mypass
+ - name: BackupDatabase
+   class: Workflow::Persister::DBI
+   user: wf
+   password: mypass
+   date_format: '%Y-%m-%d %H:%M'
+   autocommit: 0
+   workflow_table: wf
+   workflow_sequence: wf_seq
+   history_table: wf_history
+   history_sequence: wf_history_seq
+ - name: OtherDatabase
+   class: My::Persester::DBHFromElsewhere
+   driver: mysql
 
 
 =head1 DESCRIPTION

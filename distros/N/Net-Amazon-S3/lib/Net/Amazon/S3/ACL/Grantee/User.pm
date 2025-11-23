@@ -1,6 +1,6 @@
 package Net::Amazon::S3::ACL::Grantee::User;
 # ABSTRACT: Represents user reference for ACL
-$Net::Amazon::S3::ACL::Grantee::User::VERSION = '0.991';
+$Net::Amazon::S3::ACL::Grantee::User::VERSION = '0.992';
 use Moose;
 
 extends 'Net::Amazon::S3::ACL::Grantee';
@@ -38,7 +38,7 @@ Net::Amazon::S3::ACL::Grantee::User - Represents user reference for ACL
 
 =head1 VERSION
 
-version 0.991
+version 0.992
 
 =head1 SYNOPSIS
 
@@ -61,7 +61,7 @@ Branislav Zahradník <barney@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
+This software is copyright (c) 2025 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
